@@ -23,6 +23,10 @@ export CCSHARED  = "-fPIC -DPIC"
 # the python executable
 export LINKFORSHARED = "${SECURITY_CFLAGS} -Xlinker -export-dynamic"
 
+# The environment variable SETUPTOOLS_SCM_SUBPROCESS_TIMEOUT allows
+# to override the subprocess timeout.
+export SETUPTOOLS_SCM_SUBPROCESS_TIMEOUT ??= "600"
+
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 FILES:${PN}-staticdev += "${PYTHON_SITEPACKAGES_DIR}/*.a"
 FILES:${PN}-dev += "${PYTHON_SITEPACKAGES_DIR}/*.la"

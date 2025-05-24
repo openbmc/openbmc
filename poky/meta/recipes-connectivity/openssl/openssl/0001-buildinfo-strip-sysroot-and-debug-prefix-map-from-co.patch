@@ -30,23 +30,26 @@ Update to fix buildpaths qa issue for '-ffile-prefix-map'.
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 ---
- Configurations/unix-Makefile.tmpl | 12 +++++++++++-
+ Configurations/unix-Makefile.tmpl | 16 +++++++++++++++-
  crypto/build.info                 |  2 +-
- 2 files changed, 12 insertions(+), 2 deletions(-)
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-Index: openssl-3.0.4/Configurations/unix-Makefile.tmpl
-===================================================================
---- openssl-3.0.4.orig/Configurations/unix-Makefile.tmpl
-+++ openssl-3.0.4/Configurations/unix-Makefile.tmpl
-@@ -502,13 +502,23 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
+diff --git a/Configurations/unix-Makefile.tmpl b/Configurations/unix-Makefile.tmpl
+index 09303c4..011bda1 100644
+--- a/Configurations/unix-Makefile.tmpl
++++ b/Configurations/unix-Makefile.tmpl
+@@ -502,13 +502,27 @@ BIN_LDFLAGS={- join(' ', $target{bin_lflags} || (),
                           '$(CNF_LDFLAGS)', '$(LDFLAGS)') -}
  BIN_EX_LIBS=$(CNF_EX_LIBS) $(EX_LIBS)
  
 -# CPPFLAGS_Q is used for one thing only: to build up buildinf.h
 +# *_Q variables are used for one thing only: to build up buildinf.h
  CPPFLAGS_Q={- $cppflags1 =~ s|([\\"])|\\$1|g;
++              $cppflags1 =~ s|-isystem/[^ ]+/usr/include||g;
                $cppflags2 =~ s|([\\"])|\\$1|g;
++              $cppflags2 =~ s|-isystem/[^ ]+/usr/include||g;
                $lib_cppflags =~ s|([\\"])|\\$1|g;
++              $lib_cppflags =~ s|-isystem/[^ ]+/usr/include||g;
                join(' ', $lib_cppflags || (), $cppflags2 || (),
                          $cppflags1 || ()) -}
  
@@ -54,6 +57,7 @@ Index: openssl-3.0.4/Configurations/unix-Makefile.tmpl
 +              s|-fdebug-prefix-map=[^ ]+|-fdebug-prefix-map=|g;
 +              s|-fmacro-prefix-map=[^ ]+|-fmacro-prefix-map=|g;
 +              s|-ffile-prefix-map=[^ ]+|-ffile-prefix-map=|g;
++              s|-isystem/[^ ]+/usr/include ||g;
 +            }
 +            join(' ', @{$config{CFLAGS}}) -}
 +

@@ -1,0 +1,58 @@
+From 0a49ed8e949adda11c6268f36a10ac12074cd377 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Tue, 1 Apr 2025 23:42:39 +0200
+Subject: [PATCH] reproducibility: Prevent configuration from reading host
+ directories
+
+Current code choose where to install fonts based on what directory
+exists on build host. This is not reproducible.
+
+Remove the existence check and change the lists to the one matching
+OpenEmbedded paths.
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ CMakeLists.txt | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c5548b3..a2f8b4d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -7,8 +7,8 @@ set(VERSION "2.0")
+ 
+ # These are relative to CMAKE_INSTALL_PREFIX
+ # which by default is "/usr/local"
+-set(CONSOLE_FONTS_DIRS "share/consolefonts" "lib/kbd/consolefonts")
+-set(X_FONTS_DIRS "lib/X11/fonts/misc" "X11R6/lib/X11/fonts/misc" "share/fonts/X11/misc")
++set(CONSOLE_FONTS_DIRS "${CMAKE_INSTALL_DATAROOTDIR}/consolefonts")
++set(X_FONTS_DIRS "${CMAKE_INSTALL_LIBDIR}/X11/fonts/misc" "${CMAKE_INSTALL_DATAROOTDIR}/fonts/X11/misc")
+ 
+ set(MKFONTDIR "/usr/bin/mkfontdir")
+ 
+@@ -47,16 +47,13 @@ install(TARGETS cmatrix DESTINATION bin)
+ 
+ if     (UNIX)
+ 	foreach    (CONSOLE_FONTS_DIR ${CONSOLE_FONTS_DIRS})
+-		if     (IS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${CONSOLE_FONTS_DIR}")
+ 			message(STATUS "Installing matrix console fonts to ${CMAKE_INSTALL_PREFIX}/${CONSOLE_FONTS_DIR}")
+ 			install(FILES
+ 				"${CMAKE_SOURCE_DIR}/matrix.fnt"
+ 				"${CMAKE_SOURCE_DIR}/matrix.psf.gz"
+ 				DESTINATION "${CONSOLE_FONTS_DIR}")
+-		endif  ()
+ 	endforeach ()
+ 	foreach    (X_FONTS_DIR ${X_FONTS_DIRS})
+-		if     (IS_DIRECTORY "${CMAKE_INSTALL_PREFIX}/${X_FONTS_DIR}")
+ 			message(STATUS "Installing matrix X window fonts to ${CMAKE_INSTALL_PREFIX}/${X_FONTS_DIR}")
+ 			install(FILES
+ 				"${CMAKE_SOURCE_DIR}/mtx.pcf"
+@@ -67,7 +64,6 @@ if     (UNIX)
+ 				"execute_process(COMMAND \"${MKFONTDIR}\" \"${CMAKE_INSTALL_PREFIX}/${X_FONTS_DIR}\")")
+ 			install(CODE
+ 				"message(STATUS \"If this is the first time you have installed CMatrix you will probably have to restart X window in order to use the mtx.pcf font.\")")
+-		endif  ()
+ 	endforeach ()
+ endif  ()
+ 

@@ -24,4 +24,6 @@ COMPATIBLE_HOST = '(x86_64|i.86).*-linux'
 export LIBDIR = "${libdir}"
 export BACKEND = "x86emu"
 
-inherit autotools-brokensep
+do_install() {
+    oe_runmake 'DESTDIR=${D}' install
+}

@@ -1,0 +1,32 @@
+From 3bb5707c6a6a0d2061c79c556cbe4a87efea02ab Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 27 Feb 2025 00:44:34 -0800
+Subject: [PATCH 3/3] Makefile.am: disable building noinst tests for musl
+
+Build fails for musl + qemuppc64 about ld failing to find
+symbols in libucontext. Until a real solution is found,
+we need this workaround.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 9fa24c0..7dd1b60 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -938,7 +938,7 @@ endif WITH_HEAP_PROFILER_OR_CHECKER
+ # This should always include $(TESTS), but may also include other
+ # binaries that you compile but don't want automatically installed.
+ # We'll add to this later, on a library-by-library basis
+-noinst_PROGRAMS += $(TESTS)
++#noinst_PROGRAMS += $(TESTS)
+ 
+ # http://linux.die.net/man/1/pkg-config, http://pkg-config.freedesktop.org/wiki
+ pkgconfigdir = $(libdir)/pkgconfig
+-- 
+2.25.1
+

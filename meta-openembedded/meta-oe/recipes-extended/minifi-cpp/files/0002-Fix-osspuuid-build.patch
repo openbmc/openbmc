@@ -1,4 +1,4 @@
-From 4e8e1943541d3b887ba86dc1b488cbb058c7d1cd Mon Sep 17 00:00:00 2001
+From 429b2b357e5142e2b845da95bdd38e8fc1229831 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 19 Mar 2024 20:48:25 +0800
 Subject: [PATCH] Fix osspuuid build
@@ -16,7 +16,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  create mode 100644 thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch
 
 diff --git a/cmake/BundledOSSPUUID.cmake b/cmake/BundledOSSPUUID.cmake
-index c4fa1523..1faf2e5c 100644
+index 747e52c27..fb6e2164d 100644
 --- a/cmake/BundledOSSPUUID.cmake
 +++ b/cmake/BundledOSSPUUID.cmake
 @@ -23,10 +23,12 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
@@ -33,16 +33,16 @@ index c4fa1523..1faf2e5c 100644
  
      # Define byproducts
      set(BYPRODUCTS "lib/libuuid.a"
-@@ -39,7 +41,7 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
-     ENDFOREACH(BYPRODUCT)
- 
-     # Build project
--    set(CONFIGURE_COMMAND ./configure "CC=${CMAKE_C_COMPILER}" "CXX=${CMAKE_CXX_COMPILER}" "CFLAGS=${PASSTHROUGH_CMAKE_C_FLAGS} -fPIC" "CXXFLAGS=${PASSTHROUGH_CMAKE_CXX_FLAGS} -fPIC" --enable-shared=no --with-cxx --without-perl --without-php --without-pgsql "--prefix=${BINARY_DIR}/thirdparty/ossp-uuid-install")
+@@ -45,7 +47,7 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
+     if(APPLE)
+         string(APPEND ADDITIONAL_COMPILER_FLAGS "-isysroot ${CMAKE_OSX_SYSROOT} ")
+     endif()
+-    set(CONFIGURE_COMMAND ./configure "CC=${CMAKE_C_COMPILER}" "CXX=${CMAKE_CXX_COMPILER}" "CFLAGS=${PASSTHROUGH_CMAKE_C_FLAGS} ${ADDITIONAL_COMPILER_FLAGS}" "CXXFLAGS=${PASSTHROUGH_CMAKE_CXX_FLAGS} ${ADDITIONAL_COMPILER_FLAGS}" --enable-shared=no --with-cxx --without-perl --without-php --without-pgsql "--prefix=${BINARY_DIR}/thirdparty/ossp-uuid-install")
 +    set(CONFIGURE_COMMAND ac_cv_va_copy=C99 ./configure --host=${HOST_SYS} --build=${BUILD_SYS} "CC=${CMAKE_C_COMPILER}" "CXX=${CMAKE_CXX_COMPILER}" "CFLAGS=${PASSTHROUGH_CMAKE_C_FLAGS} -fPIC" "CXXFLAGS=${PASSTHROUGH_CMAKE_CXX_FLAGS} -fPIC" --enable-shared=no --with-cxx --without-perl --without-php --without-pgsql "--prefix=${BINARY_DIR}/thirdparty/ossp-uuid-install")
+ 
      string(TOLOWER "${CMAKE_BUILD_TYPE}" build_type)
-     if(NOT build_type MATCHES debug)
-         list(APPEND CONFIGURE_COMMAND --enable-debug=yes)
-@@ -47,10 +49,8 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
+     if(build_type MATCHES debug)
+@@ -54,10 +56,8 @@ function(use_bundled_osspuuid SOURCE_DIR BINARY_DIR)
  
      ExternalProject_Add(
              ossp-uuid-external
@@ -56,7 +56,7 @@ index c4fa1523..1faf2e5c 100644
              UPDATE_COMMAND ""
 diff --git a/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch b/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch
 new file mode 100644
-index 00000000..b8d7b0bb
+index 000000000..b8d7b0bba
 --- /dev/null
 +++ b/thirdparty/ossp-uuid/ossp-uuid-cross-compile-fix.patch
 @@ -0,0 +1,13 @@
@@ -74,5 +74,5 @@ index 00000000..b8d7b0bb
 +         if [ ".$opt_o" != . ]; then
 +             if [ ".$opt_t" = .yes ]; then
 -- 
-2.25.1
+2.34.1
 

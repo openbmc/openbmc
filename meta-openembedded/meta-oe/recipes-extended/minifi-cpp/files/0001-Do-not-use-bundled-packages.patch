@@ -1,4 +1,4 @@
-From 65923a872e44cb461ef1a03374057351f0bc5efe Mon Sep 17 00:00:00 2001
+From 4952f03d150770ff06f9a12ff42d8de680407649 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 19 Mar 2024 19:39:04 +0800
 Subject: [PATCH] Do not use bundled packages
@@ -10,60 +10,27 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- CMakeLists.txt                       | 23 ++++++-----------------
- extensions/libarchive/CMakeLists.txt |  7 ++-----
- 2 files changed, 8 insertions(+), 22 deletions(-)
+ CMakeLists.txt                       | 3 +--
+ cmake/GetBZip2.cmake                 | 3 +++
+ cmake/GetCatch2.cmake                | 4 ++++
+ cmake/GetCivetWeb.cmake              | 3 +++
+ cmake/GetFmt.cmake                   | 3 +++
+ cmake/GetLibCURL.cmake               | 3 +++
+ cmake/GetLibXml2.cmake               | 3 +++
+ cmake/GetOpenSSL.cmake               | 3 +++
+ cmake/GetRocksDB.cmake               | 4 ++++
+ cmake/GetSpdlog.cmake                | 4 ++++
+ cmake/GetZLIB.cmake                  | 3 +++
+ cmake/GetZstd.cmake                  | 4 ++++
+ extensions/libarchive/CMakeLists.txt | 6 ++----
+ 13 files changed, 40 insertions(+), 6 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 13a2b992..8a1dd6d9 100644
+index 50e31d871..fc1718dfd 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -222,9 +222,7 @@ else()
- endif()
- 
- if (NOT DISABLE_BZIP2 AND (NOT DISABLE_LIBARCHIVE OR (NOT DISABLE_ROCKSDB AND NOT WIN32)))
--    include(BundledBZip2)
--    use_bundled_bzip2(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
--    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/bzip2/dummy")
-+    find_package(BZip2 REQUIRED)
- endif()
- 
- if(NOT WIN32)
-@@ -247,9 +245,7 @@ endif()
- 
- # OpenSSL
- if (NOT OPENSSL_OFF)
--    include(BundledOpenSSL)
--    use_openssl("${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
--    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/ssl")
-+    find_package(OpenSSL REQUIRED)
- 
-     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DOPENSSL_SUPPORT")
-     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DOPENSSL_SUPPORT")
-@@ -262,9 +258,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DSODIUM_STATIC=1")
- set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DSODIUM_STATIC=1")
- 
- # zlib
--include(BundledZLIB)
--use_bundled_zlib(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
--list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/zlib/dummy")
-+find_package(ZLIB REQUIRED)
- 
- # uthash
- add_library(ut INTERFACE)
-@@ -272,9 +266,7 @@ target_include_directories(ut SYSTEM INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/thir
- 
- # cURL
- if(NOT DISABLE_CURL)
--    include(BundledLibcURL)
--    use_bundled_curl(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
--    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/curl/dummy")
-+    find_package(CURL REQUIRED)
- else()
-     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDISABLE_CURL")
-     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DDISABLE_CURL")
-@@ -285,8 +277,7 @@ include(BundledSpdlog)
- use_bundled_spdlog(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+@@ -265,8 +265,7 @@ include(GetSpdlog)
+ get_spdlog()
  
  # yaml-cpp
 -include(BundledYamlCpp)
@@ -72,27 +39,162 @@ index 13a2b992..8a1dd6d9 100644
  
  # concurrentqueue
  add_library(concurrentqueue INTERFACE)
-@@ -357,9 +348,7 @@ include(Extensions)
- add_subdirectory(libminifi)
- 
- if ((ENABLE_OPENWSMAN AND NOT DISABLE_CIVET AND NOT DISABLE_CURL) OR ENABLE_ALL OR ENABLE_AZURE)
--    include(BundledLibXml2)
--    use_bundled_libxml2(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
--    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/libxml2/dummy")
-+    find_package(LibXml2 REQUIRED)
- endif()
- 
- if (ENABLE_ALL OR ENABLE_PROMETHEUS OR NOT DISABLE_CIVET)
+diff --git a/cmake/GetBZip2.cmake b/cmake/GetBZip2.cmake
+index 2a7d47e9e..754122895 100644
+--- a/cmake/GetBZip2.cmake
++++ b/cmake/GetBZip2.cmake
+@@ -23,5 +23,8 @@ function(get_bzip2 SOURCE_DIR BINARY_DIR)
+         message("Using CMake to build bzip2 from source")
+         include(BundledBZip2)
+         use_bundled_bzip2(${SOURCE_DIR} ${BINARY_DIR})
++    elseif(MINIFI_BZIP2_SOURCE STREQUAL "SYSTEM")
++        message("Using bzip2 provided by system")
++        find_package(BZip2 REQUIRED)
+     endif()
+ endfunction(get_bzip2)
+diff --git a/cmake/GetCatch2.cmake b/cmake/GetCatch2.cmake
+index d6c1d6acc..ec11b0a77 100644
+--- a/cmake/GetCatch2.cmake
++++ b/cmake/GetCatch2.cmake
+@@ -23,5 +23,9 @@ function(get_catch2)
+     elseif(MINIFI_CATCH2_SOURCE STREQUAL "BUILD")
+         message("Using CMake to build Catch2 from source")
+         include(Catch2)
++    elseif(MINIFI_CATCH2_SOURCE STREQUAL "SYSTEM")
++        message("Using Catch2 provided by system")
++        find_package(Catch2 REQUIRED)
++        add_library(Catch2WithMain ALIAS Catch2::Catch2WithMain)
+     endif()
+ endfunction(get_catch2)
+diff --git a/cmake/GetCivetWeb.cmake b/cmake/GetCivetWeb.cmake
+index f30d22289..8fc39a0e2 100644
+--- a/cmake/GetCivetWeb.cmake
++++ b/cmake/GetCivetWeb.cmake
+@@ -22,5 +22,8 @@ function(get_civetweb)
+     elseif(MINIFI_CIVETWEB_SOURCE STREQUAL "BUILD")
+         message("Using CMake to build CivetWeb from source")
+         include(CivetWeb)
++    elseif(MINIFI_CIVETWEB_SOURCE STREQUAL "SYSTEM")
++        message("Using CivetWeb provided by system")
++        find_package(civetweb REQUIRED)
+     endif()
+ endfunction(get_civetweb)
+diff --git a/cmake/GetFmt.cmake b/cmake/GetFmt.cmake
+index f4f28458d..579a63897 100644
+--- a/cmake/GetFmt.cmake
++++ b/cmake/GetFmt.cmake
+@@ -22,5 +22,8 @@ function(get_fmt)
+     elseif(MINIFI_FMT_SOURCE STREQUAL "BUILD")
+         message("Using CMake to build Fmt from source")
+         include(fmt)
++    elseif(MINIFI_FMT_SOURCE STREQUAL "SYSTEM")
++        message("Using Fmt provided by system")
++        find_package(fmt REQUIRED)
+     endif()
+ endfunction(get_fmt)
+diff --git a/cmake/GetLibCURL.cmake b/cmake/GetLibCURL.cmake
+index afd38f3c9..0eac59ec4 100644
+--- a/cmake/GetLibCURL.cmake
++++ b/cmake/GetLibCURL.cmake
+@@ -23,5 +23,8 @@ function(get_curl SOURCE_DIR BINARY_DIR)
+         message("Using CMake to build libcurl from source")
+         include(BundledLibcURL)
+         use_bundled_curl(${SOURCE_DIR} ${BINARY_DIR})
++    elseif(MINIFI_LIBCURL_SOURCE STREQUAL "SYSTEM")
++        message("Using libcurl provided by system")
++        find_package(CURL REQUIRED)
+     endif()
+ endfunction(get_curl SOURCE_DIR BINARY_DIR)
+diff --git a/cmake/GetLibXml2.cmake b/cmake/GetLibXml2.cmake
+index 5915b117d..18048715d 100644
+--- a/cmake/GetLibXml2.cmake
++++ b/cmake/GetLibXml2.cmake
+@@ -23,5 +23,8 @@ function(get_libxml2 SOURCE_DIR BINARY_DIR)
+         message("Using CMake to build libxml2 from source")
+         include(BundledLibXml2)
+         use_bundled_libxml2(${SOURCE_DIR} ${BINARY_DIR})
++    elseif(MINIFI_LIBXML2_SOURCE STREQUAL "SYSTEM")
++        message("Using libxml2 provided by system")
++        find_package(libxml2 REQUIRED)
+     endif()
+ endfunction(get_libxml2)
+diff --git a/cmake/GetOpenSSL.cmake b/cmake/GetOpenSSL.cmake
+index 58132c6bf..2b142f94e 100644
+--- a/cmake/GetOpenSSL.cmake
++++ b/cmake/GetOpenSSL.cmake
+@@ -23,5 +23,8 @@ function(get_openssl SOURCE_DIR BINARY_DIR)
+         message("Using CMake to build OpenSSL from source")
+         include(BundledOpenSSL)
+         use_openssl(${SOURCE_DIR} ${BINARY_DIR})
++    elseif(MINIFI_OPENSSL_SOURCE STREQUAL "SYSTEM")
++        message("Using OpenSSL provided by system")
++        find_package(OpenSSL REQUIRED)
+     endif()
+ endfunction(get_openssl)
+diff --git a/cmake/GetRocksDB.cmake b/cmake/GetRocksDB.cmake
+index 0968afc38..3ca1fe565 100644
+--- a/cmake/GetRocksDB.cmake
++++ b/cmake/GetRocksDB.cmake
+@@ -30,5 +30,9 @@ function(get_rocksdb SOURCE_DIR BINARY_DIR)
+             list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/cmake/rocksdb/sys")
+             find_package(RocksDB REQUIRED)
+         endif()
++    elseif(MINIFI_ROCKSDB_SOURCE STREQUAL "SYSTEM")
++        message("Using RocksDB provided by system")
++        list(APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/cmake/rocksdb/sys")
++        find_package(RocksDB REQUIRED)
+     endif()
+ endfunction(get_rocksdb SOURCE_DIR BINARY_DIR)
+diff --git a/cmake/GetSpdlog.cmake b/cmake/GetSpdlog.cmake
+index 747894984..6255e31bf 100644
+--- a/cmake/GetSpdlog.cmake
++++ b/cmake/GetSpdlog.cmake
+@@ -27,5 +27,9 @@ function(get_spdlog)
+     elseif(MINIFI_SPDLOG_SOURCE STREQUAL "BUILD")
+         message("Using CMake to build spdlog from source")
+         include(Spdlog)
++    elseif(MINIFI_SPDLOG_SOURCE STREQUAL "SYSTEM")
++        message("Using spdlog provided by system")
++        find_package(spdlog REQUIRED)
++        add_library(spdlog ALIAS spdlog::spdlog)
+     endif()
+ endfunction(get_spdlog)
+diff --git a/cmake/GetZLIB.cmake b/cmake/GetZLIB.cmake
+index 6e7bea1e3..c15e2246a 100644
+--- a/cmake/GetZLIB.cmake
++++ b/cmake/GetZLIB.cmake
+@@ -23,5 +23,8 @@ function(get_zlib SOURCE_DIR BINARY_DIR)
+         message("Using CMake to build zlib from source")
+         include(BundledZLIB)
+         use_bundled_zlib(${SOURCE_DIR} ${BINARY_DIR})
++    elseif(MINIFI_ZLIB_SOURCE STREQUAL "SYSTEM")
++        message("Using zlib provided by system")
++        find_package(ZLIB REQUIRED)
+     endif()
+ endfunction(get_zlib)
+diff --git a/cmake/GetZstd.cmake b/cmake/GetZstd.cmake
+index a0334b02d..0e7600c22 100644
+--- a/cmake/GetZstd.cmake
++++ b/cmake/GetZstd.cmake
+@@ -23,5 +23,9 @@ function(get_zstd)
+     elseif(MINIFI_ZSTD_SOURCE STREQUAL "BUILD")
+         message("Using CMake to build zstd from source")
+         include(Zstd)
++    elseif(MINIFI_ZSTD_SOURCE STREQUAL "SYSTEM")
++        message("Using zstd provided by system")
++        find_package(zstd REQUIRED)
++        add_library(zstd::zstd ALIAS zstd::libzstd_static)
+     endif()
+ endfunction(get_zstd)
 diff --git a/extensions/libarchive/CMakeLists.txt b/extensions/libarchive/CMakeLists.txt
-index 2b89d3ea..49e13e21 100644
+index bf7b2a7f5..eb6b71091 100644
 --- a/extensions/libarchive/CMakeLists.txt
 +++ b/extensions/libarchive/CMakeLists.txt
-@@ -22,13 +22,10 @@ if (DISABLE_LIBARCHIVE)
+@@ -22,12 +22,10 @@ if (NOT ENABLE_LIBARCHIVE)
  endif()
  
- if (NOT DISABLE_LZMA)
--    include(BundledLibLZMA)
--    use_bundled_liblzma(${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+ if (ENABLE_LZMA)
+-    include(LibLZMA)
 -    list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/liblzma/dummy")
 +    find_package(LibLZMA REQUIRED)
  endif()
@@ -104,5 +206,5 @@ index 2b89d3ea..49e13e21 100644
  include(${CMAKE_SOURCE_DIR}/extensions/ExtensionHeader.txt)
  
 -- 
-2.25.1
+2.34.1
 

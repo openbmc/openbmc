@@ -1,5 +1,5 @@
 SUMMARY = "Telepathy IM framework - Python package"
-HOMEPAGE = "http://telepathy.freedesktop.org/wiki/"
+HOMEPAGE = "https://telepathy.freedesktop.org/wiki/"
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://src/utils.py;beginline=1;endline=17;md5=9a07d1a9791a7429a14e7b25c6c86822"

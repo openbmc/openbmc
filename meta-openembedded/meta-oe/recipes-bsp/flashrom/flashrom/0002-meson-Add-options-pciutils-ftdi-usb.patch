@@ -1,0 +1,49 @@
+From 3ea99c117aa4c7a3502c93e4e4df50b3623e46c3 Mon Sep 17 00:00:00 2001
+From: Patrick Rudolph <patrick.rudolph@9elements.com>
+Date: Tue, 15 Oct 2024 10:42:05 +0200
+Subject: [PATCH 2/2] meson: Add options pciutils, ftdi, usb
+
+The options have been dropped in favor of an array option called programmer.
+Since this doesn't integrate well into yocto add back the old options.
+
+Upstream-Status: Inappropriate Just to fix yocto build system
+
+Change-Id: Ib697b9f7cc7fc553cfdeb75ae9d49a367badd286
+Signed-off-by: Patrick Rudolph <patrick.rudolph@9elements.com>
+---
+ meson.build       | 6 +++---
+ meson_options.txt | 3 +++
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 6c8d3d3..61b794d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -150,9 +150,9 @@ systems_serial     = [ 'linux', 'openbsd', 'freebsd', 'dragonfly', 'netbsd', 'da
+ 
+ cpus_port_io = [ 'x86', 'x86_64' ]
+ 
+-group_ftdi   = get_option('programmer').contains('group_ftdi')
+-group_pci    = get_option('programmer').contains('group_pci')
+-group_usb    = get_option('programmer').contains('group_usb')
++group_ftdi   = get_option('programmer').contains('group_ftdi') or get_option('ftdi')
++group_pci    = get_option('programmer').contains('group_pci') or get_option('pciutils')
++group_usb    = get_option('programmer').contains('group_usb') or get_option('usb')
+ group_i2c    = get_option('programmer').contains('group_i2c')
+ group_serial = get_option('programmer').contains('group_serial')
+ group_jlink  = get_option('programmer').contains('group_jlink')
+diff --git a/meson_options.txt b/meson_options.txt
+index 87456a9..570b152 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -24,4 +24,7 @@ option('ni845x_search_path', type : 'string', value : 'C:\Program Files (x86)\Na
+ option('delay_minimum_sleep_us', type : 'integer', min : 0, value : 100,
+        description : 'Minimum time in microseconds to suspend execution for (rather than polling) when a delay is required.'
+                    + ' Larger values may perform better on machines with low timer resolution, at the cost of increased power.')
++option('pciutils', type : 'boolean', value : false, description : 'Select programmer group pci')
++option('usb', type : 'boolean', value : false, description : 'Select programmer group usb')
++option('ftdi', type : 'boolean', value : false, description : 'Select programmer group ftdi')
+ option('rpmc', type : 'feature', value : 'auto', description : 'Support for Replay Protected Monotonic Counter (RPMC) commands as specified by JESD260')
+-- 
+2.43.0
+

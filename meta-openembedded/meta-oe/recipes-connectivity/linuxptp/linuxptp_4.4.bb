@@ -17,7 +17,7 @@ inherit systemd
 EXTRA_OEMAKE = "CC='${CC}' EXTRA_CFLAGS='${CFLAGS}' mandir='${mandir}' \
     sbindir='${sbindir}'"
 
-export KBUILD_OUTPUT="${RECIPE_SYSROOT}"
+export KBUILD_OUTPUT = "${RECIPE_SYSROOT}"
 
 LINUXPTP_SYSTEMD_SERVICES = "phc2sys@.service ptp4l@.service"
 

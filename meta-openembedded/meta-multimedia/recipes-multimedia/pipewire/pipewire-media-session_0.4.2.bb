@@ -10,7 +10,9 @@ DEPENDS = " \
 	dbus \
 "
 
-SRC_URI = "git://gitlab.freedesktop.org/pipewire/media-session.git;protocol=https;branch=master"
+SRC_URI = "git://gitlab.freedesktop.org/pipewire/media-session.git;protocol=https;branch=master \
+           file://0001-pass-right-types-to-methods.patch \
+           "
 
 S = "${WORKDIR}/git"
 SRCREV = "80dae7e24bec02b2befe09a72fbac6e2b38ccb5c"

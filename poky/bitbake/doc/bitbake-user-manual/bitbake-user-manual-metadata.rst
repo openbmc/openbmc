@@ -900,6 +900,33 @@ definitions::
    of include . Doing so makes sure that an error is produced if the file cannot
    be found.
 
+``include_all`` Directive
+-------------------------
+
+The ``include_all`` directive works like the :ref:`include
+<bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`
+directive but will include all of the files that match the specified path in
+the enabled layers (layers part of :term:`BBLAYERS`).
+
+For example, let's say a ``maintainers.inc`` file is present in different layers
+and is conventionally placed in the ``conf/distro/include`` directory of each
+layer. In that case the ``include_all`` directive can be used to include
+the ``maintainers.inc`` file for all of these layers::
+
+   include_all conf/distro/include/maintainers.inc
+
+In other words, the ``maintainers.inc`` file for each layer is included through
+the :ref:`include <bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`
+directive.
+
+BitBake will iterate through the colon-separated :term:`BBPATH` list to look for
+matching files to include, from left to right. As a consequence, matching files
+are included in that order.
+
+As the ``include_all`` directive uses the :ref:`include
+<bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`
+directive in the background, no error is produced if no files are matched.
+
 .. _require-inclusion:
 
 ``require`` Directive

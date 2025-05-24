@@ -1,0 +1,105 @@
+From 96570c03f46e0a5c17e721737a38c717c67e358b Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 14 Oct 2024 15:50:40 +0200
+Subject: [PATCH 2/2] sfdisk: add --sector-size commanand line option
+
+* improves compatibility with fdisk
+* add ability to work with disk images where libfdisk defaults to 512
+
+Addresses: https://github.com/util-linux/util-linux/pull/3235
+Signed-off-by: Karel Zak <kzak@redhat.com>
+
+Upstream-Status: Backport [ef7b76baa17ddb5414691fa8f49d61415c30871c]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ disk-utils/sfdisk.8.adoc |  5 ++++-
+ disk-utils/sfdisk.c      | 14 ++++++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/disk-utils/sfdisk.8.adoc b/disk-utils/sfdisk.8.adoc
+index bc3ff9bb8..d1eaa3712 100644
+--- a/disk-utils/sfdisk.8.adoc
++++ b/disk-utils/sfdisk.8.adoc
+@@ -201,6 +201,9 @@ The default list of columns may be extended if _list_ is specified in the format
+ *-q*, *--quiet*::
+ Suppress extra info messages.
+ 
++*--sector-size* _sectorsize_::
++Specify the sector size of the disk. Valid values are 512, 1024, 2048, and 4096. The kernel is aware of the sector size for regular block devices. Use this option only on very old kernels, when working with disk images, or to override the kernel's default sector size. Since util-linux-2.17, *fdisk* distinguishes between logical and physical sector size. This option changes both sector sizes to the specified _sectorsize_.
++
+ *-u*, *--unit S*::
+ Deprecated option. Only the sector unit is supported. This option is not supported when using the *--show-size* command.
+ 
+@@ -249,7 +252,7 @@ Specify the maximal number of GPT partitions.
+ *grain*::
+ Specify minimal size in bytes used to calculate partitions alignment. The default is 1MiB and it's strongly recommended to use the default. Do not modify this variable if you're not sure.
+ *sector-size*::
+-Specify sector size. *sfdisk* always uses device sector size. Since version 2.39 *sfdisk* recalculates sizes from dump if the script and device sector size differ.
++Specifies the sector size used in the input. *sfdisk* always internally uses the device sector size provided by the kernel for the block device, or as specified by the user on the command line (see *--sector-size*). Starting with version 2.39, *sfdisk* recalculates sizes from the input if the *sector-size* header and device sector size are different.
+ 
+ Note that it is only possible to use header lines before the first partition is specified in the input.
+ 
+diff --git a/disk-utils/sfdisk.c b/disk-utils/sfdisk.c
+index d8dd8d296..97d426559 100644
+--- a/disk-utils/sfdisk.c
++++ b/disk-utils/sfdisk.c
+@@ -2084,6 +2084,8 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	      _("     --color[=<when>]      colorize output (%s, %s or %s)\n"), "auto", "always", "never");
+ 	fprintf(out,
+ 	        "                             %s\n", USAGE_COLORS_DEFAULT);
++	fputs(_("     --sector-size <size>  physical and logical sector size\n"), out);
++
+ 	fprintf(out,
+ 	      _("     --lock[=<mode>]       use exclusive device lock (%s, %s or %s)\n"), "yes", "no", "nonblock");
+ 	fputs(_(" -N, --partno <num>        specify partition number\n"), out);
+@@ -2120,6 +2122,7 @@ int main(int argc, char *argv[])
+ 	const char *outarg = NULL;
+ 	int rc = -EINVAL, c, longidx = -1, bytes = 0;
+ 	int colormode = UL_COLORMODE_UNDEF;
++	size_t user_ss = 0;
+ 	struct sfdisk _sf = {
+ 		.partno = -1,
+ 		.wipemode = WIPEMODE_AUTO,
+@@ -2145,6 +2148,7 @@ int main(int argc, char *argv[])
+ 		OPT_NOTELL,
+ 		OPT_RELOCATE,
+ 		OPT_LOCK,
++		OPT_SECTORSIZE
+ 	};
+ 
+ 	static const struct option longopts[] = {
+@@ -2174,6 +2178,7 @@ int main(int argc, char *argv[])
+ 		{ "output",  required_argument, NULL, 'o' },
+ 		{ "partno",  required_argument, NULL, 'N' },
+ 		{ "reorder", no_argument,       NULL, 'r' },
++		{ "sector-size", required_argument, NULL, OPT_SECTORSIZE },
+ 		{ "show-geometry", no_argument, NULL, 'g' },
+ 		{ "quiet",   no_argument,       NULL, 'q' },
+ 		{ "verify",  no_argument,       NULL, 'V' },
+@@ -2373,6 +2378,13 @@ int main(int argc, char *argv[])
+ 				sf->lockmode = optarg;
+ 			}
+ 			break;
++		case OPT_SECTORSIZE:
++			user_ss = strtou32_or_err(optarg,
++					_("invalid sector size argument"));
++			if (user_ss != 512 && user_ss != 1024 &&
++			    user_ss != 2048 && user_ss != 4096)
++				errx(EXIT_FAILURE, _("invalid sector size argument"));
++			break;
+ 		default:
+ 			errtryhelp(EXIT_FAILURE);
+ 		}
+@@ -2383,6 +2395,8 @@ int main(int argc, char *argv[])
+ 	sfdisk_init(sf);
+ 	if (bytes)
+ 		fdisk_set_size_unit(sf->cxt, FDISK_SIZEUNIT_BYTES);
++	if (user_ss)
++		fdisk_save_user_sector_size(sf->cxt, user_ss, user_ss);
+ 
+ 	if (outarg)
+ 		init_fields(NULL, outarg, NULL);
+-- 
+2.25.1
+

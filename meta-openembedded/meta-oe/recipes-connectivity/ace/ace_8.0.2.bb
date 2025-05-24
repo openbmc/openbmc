@@ -22,7 +22,7 @@ COMPATIBLE_HOST:libc-musl = "null"
 
 S = "${WORKDIR}/ACE_wrappers"
 B = "${WORKDIR}/ACE_wrappers/ace"
-export ACE_ROOT="${WORKDIR}/ACE_wrappers"
+export ACE_ROOT = "${WORKDIR}/ACE_wrappers"
 
 inherit pkgconfig
 

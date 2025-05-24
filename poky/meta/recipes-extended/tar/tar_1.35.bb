@@ -22,12 +22,6 @@ EXTRA_OECONF += "DEFAULT_RMT_DIR=${sbindir}"
 
 CACHED_CONFIGUREVARS += "tar_cv_path_RSH=no"
 
-# Let aclocal use the relative path for the m4 file rather than the
-# absolute since tar has a lot of m4 files, otherwise there might
-# be an "Argument list too long" error when it is built in a long/deep
-# directory.
-acpaths = "-I ./m4"
-
 do_install () {
     autotools_do_install
     ln -s tar ${D}${bindir}/gtar

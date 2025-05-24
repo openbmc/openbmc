@@ -73,6 +73,18 @@ do_configure:prepend () {
 
 CFLAGS += "-Wno-error=incompatible-pointer-types"
 
+# Commit 7a2b9acef2 cargo: pass PACKAGECONFIG_CONFARGS to cargo build
+# breaks building this recipe. Providing a copy of the original function
+# Armin 2025/04/01
+#
+oe_cargo_build () {
+    export RUSTFLAGS="${RUSTFLAGS}"
+    bbnote "Using rust targets from ${RUST_TARGET_PATH}"
+    bbnote "cargo = $(which ${CARGO})"
+    bbnote "${CARGO} build ${CARGO_BUILD_FLAGS}$@"
+    "${CARGO}" build ${CARGO_BUILD_FLAGS}"$@"
+}
+
 do_compile () {
     # we do this to bypass the make provided by this pkg 
     # patches Makefile to skip the subdir

@@ -14,7 +14,8 @@ As such, it is safe to assume off_t is 64-bit wide. This is checked by a
 static_assert to catch any platform where autoconf would let a 32-bit
 off_t slip.
 
-Upstream-Status: Submitted [https://review.lttng.org/c/lttng-tools/+/9268]
+Submitted [https://review.lttng.org/c/lttng-tools/+/9268]
+Upstream-Status: Backport [https://github.com/lttng/lttng-tools/commit/57fd993799a2b081c826f6fc8def32d28d526bfb]
 Reported-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
 Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8

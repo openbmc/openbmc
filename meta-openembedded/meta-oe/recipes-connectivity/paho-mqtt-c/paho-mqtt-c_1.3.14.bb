@@ -10,7 +10,10 @@ LIC_FILES_CHKSUM = " \
     file://epl-v20;md5=d9fc0efef5228704e7f5b37f27192723 \
 "
 
-SRC_URI = "git://github.com/eclipse/paho.mqtt.c;protocol=https;branch=master"
+SRC_URI = " \
+    git://github.com/eclipse/paho.mqtt.c;protocol=https;branch=master \
+    file://0001-Fix-build-error-due-to-bool-keyword-with-gcc-15.patch \
+"
 
 SRCREV = "2150ba29d9df24ad1733c460eb099f292af84ee5"
 

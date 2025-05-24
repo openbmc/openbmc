@@ -1,4 +1,4 @@
-From d0fa5b259c2dc942d0a43a9cf1bfc32f40c184f9 Mon Sep 17 00:00:00 2001
+From c47048a68eec6838c87e5cde5fddc7e7500b7742 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Thu, 7 Jan 2016 22:37:30 -0800
 Subject: [PATCH] libtool: do not use jlibtool
@@ -12,26 +12,25 @@ Upstream-Status: Inappropriate [embedded specific]
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 ---
- Make.inc.in        |  4 ++--
+ Make.inc.in        |  3 ++-
  scripts/boiler.mk  |  2 ++
  scripts/install.mk | 14 +++++++-------
- scripts/libtool.mk | 22 ++++++++++++++++------
- 4 files changed, 27 insertions(+), 15 deletions(-)
+ scripts/libtool.mk | 22 +++++++++++++++-------
+ 4 files changed, 26 insertions(+), 15 deletions(-)
 
 diff --git a/Make.inc.in b/Make.inc.in
-index 05f82776ff..e78f3fe9dc 100644
+index 6d5cc1c343..7944aa7143 100644
 --- a/Make.inc.in
 +++ b/Make.inc.in
-@@ -57,7 +57,7 @@ CPPFLAGS	= @CPPFLAGS@
+@@ -57,6 +57,7 @@ CPPFLAGS	= @CPPFLAGS@
  LIBPREFIX	= @LIBPREFIX@
  EXEEXT		= @EXEEXT@
  
--LIBTOOL		= JLIBTOOL
 +LIBTOOL		= @LIBTOOL@
  ACLOCAL		= @ACLOCAL@
  AUTOCONF	= @AUTOCONF@
  AUTOHEADER	= @AUTOHEADER@
-@@ -168,7 +168,7 @@ ANALYZE.c       := @clang_path@
+@@ -168,7 +169,7 @@ ANALYZE.c       := @clang_path@
  #
  ifeq "$(USE_SHARED_LIBS)" "yes"
  	TESTBINDIR = ./$(BUILD_DIR)/bin/local
@@ -41,10 +40,10 @@ index 05f82776ff..e78f3fe9dc 100644
  	TESTBINDIR = ./$(BUILD_DIR)/bin
  	TESTBIN    = ./$(BUILD_DIR)/bin
 diff --git a/scripts/boiler.mk b/scripts/boiler.mk
-index 2ce0c18f34..567cc0f22f 100644
+index 9d70104747..a882e5ce2b 100644
 --- a/scripts/boiler.mk
 +++ b/scripts/boiler.mk
-@@ -272,6 +272,7 @@ define COMPILE_C_CMDS
+@@ -271,6 +271,7 @@ define COMPILE_C_CMDS
  	$(Q)$(ECHO) CC $<
  	$(Q)$(strip ${COMPILE.c} -o $@ -c -MD ${CPPFLAGS} ${CFLAGS} ${SRC_CFLAGS} ${INCDIRS} \
  	    $(addprefix -I, ${SRC_INCDIRS}) ${SRC_DEFS} ${DEFS} $<)
@@ -52,7 +51,7 @@ index 2ce0c18f34..567cc0f22f 100644
  endef
  else
  #
-@@ -287,6 +288,7 @@ define COMPILE_C_CMDS
+@@ -286,6 +287,7 @@ define COMPILE_C_CMDS
  	$(Q)cppcheck --enable=style -q ${CHECKFLAGS} $(filter -isystem%,${SRC_CFLAGS}) \
  	     $(filter -I%,${SRC_CFLAGS}) $(filter -D%,${SRC_CFLAGS}) ${INCDIRS} \
  	     $(addprefix -I,${SRC_INCDIRS}) ${SRC_DEFS} ${DEFS} --suppress=variableScope --suppress=invalidscanf $<
@@ -116,21 +115,28 @@ index 916411563b..e38c1ed697 100644
  
  
 diff --git a/scripts/libtool.mk b/scripts/libtool.mk
-index 381127ec2d..e83d7e6ad7 100644
+index 64c2fe0804..05ed2292f0 100644
 --- a/scripts/libtool.mk
 +++ b/scripts/libtool.mk
-@@ -60,7 +60,9 @@ ifeq "${LIBTOOL}" "JLIBTOOL"
-     # Tell GNU Make to use this value, rather than anything specified
-     # on the command line.
-     override LIBTOOL := ${JLIBTOOL}
--endif    # else we're not using jlibtool
-+else    # else we're not using jlibtool
-+    all install: ${LIBTOOL}
-+endif
+@@ -33,7 +33,7 @@ JLIBTOOL := ${BUILD_DIR}/make/jlibtool
+ 
+ # Add a rule to build jlibtool BEFORE any other targets.  This
+ # means that we can use it to build the later targets.
+-all install: ${JLIBTOOL}
++all install: ${LIBTOOL}
+ 
+ # Note that we need to use a compilation rule that does NOT
+ # include referencing ${LIBTOOL}, as we don't have a jlibtool
+@@ -51,7 +51,7 @@ jlibtool_clean:
+ 
+ # Tell GNU Make to use this value, rather than anything specified
+ # on the command line.
+-override LIBTOOL := ${JLIBTOOL}
++#override LIBTOOL := ${JLIBTOOL}
  
  # When using libtool, it produces a '.libs' directory.  Ensure that it
  # is removed on "make clean", too.
-@@ -74,11 +76,19 @@ clean: .libs_clean
+@@ -65,11 +65,19 @@ clean: .libs_clean
  # Re-define compilers and linkers
  #
  OBJ_EXT = lo

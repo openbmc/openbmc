@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2024, Arm Limited.
+ # Copyright (c) 2022-2025, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -46,7 +46,7 @@ Each subsystem provides different functionality to overall SoC.
 
 
 The Secure Enclave System, provides PSA Root of Trust (RoT) and
-cryptographic functions. It is based on an Cortex-M0+ processor,
+cryptographic functions. It is based on a Cortex-M0+ processor,
 CC312 Cryptographic Accelerator and peripherals, such as watchdog and
 secure flash. Software running on the Secure Enclave is isolated via
 hardware for enhanced security. Communication with the Secure Encalve
@@ -80,7 +80,7 @@ development.
 Overall, the Corstone-1000 architecture is designed to cover a range
 of Power, Performance, and Area (PPA) applications, and enable extension
 for use-case specific applications, for example, sensors, cloud
-connectivitiy, and edge computing.
+connectivity, and edge computing.
 
 *****************
 Secure Boot Chain

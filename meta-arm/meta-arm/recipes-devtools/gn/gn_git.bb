@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d"
 UPSTREAM_CHECK_COMMITS = "1"
 
 SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main"
-SRCREV = "95b0f8fe31a992a33c040bbe3867901335c12762"
+SRCREV = "ab638bd7cbb9ac8468bf2fbe60c74ed4706a14a7"
 PV = "0+git"
 
 S = "${WORKDIR}/git"

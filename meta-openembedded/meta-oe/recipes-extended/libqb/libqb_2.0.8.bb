@@ -9,18 +9,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=321bf41f280cf805086dd5a720b37785"
 
 inherit autotools pkgconfig
 
-SRCREV = "002171bbcf4bc4728da56c1538afd9e9d814ecaf"
-SRC_URI = "git://github.com/ClusterLabs/${BPN}.git;branch=main;protocol=https \
-          "
-S = "${WORKDIR}/git"
+SRC_URI = "https://github.com/ClusterLabs/${BPN}/releases/download/v${PV}/${BP}.tar.xz"
+SRC_URI[sha256sum] = "b42531fc20b8ac02f4c6d0a4dc49f7c4a1eef09bdb13af5f6927b7fc49522ee6"
 
 DEPENDS += "libxml2"
 
 CFLAGS += "-pthread -D_REENTRANT"
-
-do_configure:prepend() {
-    ( cd ${S}
-    ${S}/autogen.sh )
-}
 
 BBCLASSEXTEND = "native"

@@ -1,0 +1,35 @@
+From d9fc6b314cefe010a0deb6e591719cfb0ff226a5 Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Tue, 9 Nov 2021 13:10:33 -0500
+Subject: [PATCH] iconv: fix detection
+
+Upstream-Status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+update patch to version 7.4.4
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+update patch to version 8.0.12
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
+
+update patch to version 8.4.4
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ build/php.m4 | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/build/php.m4 b/build/php.m4
+index d8a5cbf0..aee21924 100644
+--- a/build/php.m4
++++ b/build/php.m4
+@@ -1829,7 +1829,8 @@ AC_DEFUN([PHP_SETUP_ICONV], [
+     [Define to 1 if you have the 'libiconv' function.])
+ 
+   dnl Check libc first if no path is provided in --with-iconv.
+-  AS_VAR_IF([PHP_ICONV], [yes], [
++  dnl must check against no, not against yes as PHP_ICONV can also include a path, which implies yes
++  AS_VAR_IF([PHP_ICONV], [no], [], [
+     dnl Reset LIBS temporarily as it may have already been included -liconv in.
+     LIBS_save=$LIBS
+     LIBS=

@@ -1,20 +1,21 @@
-From 328805fd16930deefda400a77e9c2c5d17d04d29 Mon Sep 17 00:00:00 2001
+From 1526be49b8c49719459ef15c93090fdbdc10f3cb Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 13 Mar 2021 00:42:25 -0800
-Subject: [PATCH] Compatibility fixes for musl.
+Subject: [PATCH 1/3] Compatibility fixes for musl.
 
----
 Upstream-Status: Pending
 
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
  src/getpc.h                        | 4 ++++
  src/stacktrace_powerpc-linux-inl.h | 8 ++++++--
  2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/src/getpc.h b/src/getpc.h
-index 87d18b6..c569731 100644
+index c14c9d0..cf4866b 100644
 --- a/src/getpc.h
 +++ b/src/getpc.h
-@@ -68,6 +68,10 @@
+@@ -61,6 +61,10 @@
  typedef ucontext ucontext_t;
  #endif
  
@@ -59,3 +60,6 @@ index 883e7d2..212bd25 100644
        }
  #endif
  
+-- 
+2.25.1
+

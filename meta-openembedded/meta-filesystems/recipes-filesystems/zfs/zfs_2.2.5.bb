@@ -2,7 +2,7 @@ SUMMARY = "OpenZFS on Linux and FreeBSD"
 DESCRIPTION = "OpenZFS on Linux and FreeBSD"
 LICENSE = "CDDL-1.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=7087caaf1dc8a2856585619f4a787faa"
-HOMEPAGE ="https://github.com/openzfs/zfs"
+HOMEPAGE = "https://github.com/openzfs/zfs"
 
 SRCREV = "33174af15112ed5c53299da2d28e763b0163f428"
 SRC_URI = "git://github.com/openzfs/zfs;protocol=https;branch=zfs-2.2-release \

@@ -54,7 +54,7 @@ CORE_IMAGE_EXTRA_INSTALL = "gdbserver"
                             self.logger.warning("starting gdb %s" % cmd)
                             r = runCmd(cmd, native_sysroot=native_sysroot, target_sys=target_sys)
                             self.assertEqual(0, r.status)
-                            line_re = r"Line \d+ of \"/usr/src/debug/kmod/.*/tools/kmod.c\" starts at address 0x[0-9A-Fa-f]+ <kmod_help>"
+                            line_re = r"Line \d+ of \".*\" starts at address 0x[0-9A-Fa-f]+ <kmod_help>"
                             self.assertRegex(r.output, line_re)
                             break
                         else:

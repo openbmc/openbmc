@@ -70,8 +70,8 @@ diff --git a/lib/ctraces/CMakeLists.txt b/lib/ctraces/CMakeLists.txt
 index e47ba022d..0ddfd5f97 100644
 --- a/lib/ctraces/CMakeLists.txt
 +++ b/lib/ctraces/CMakeLists.txt
-@@ -30,12 +30,8 @@ set(CTR_VERSION_MINOR  5)
- set(CTR_VERSION_PATCH  7)
+@@ -30,12 +30,8 @@ set(CTR_VERSION_MINOR  6)
+ set(CTR_VERSION_PATCH  0)
  set(CTR_VERSION_STR "${CTR_VERSION_MAJOR}.${CTR_VERSION_MINOR}.${CTR_VERSION_PATCH}")
  
 -# Define __FILENAME__ consistently across Operating Systems
@@ -95,9 +95,9 @@ index 028240bcc..b386cb726 100644
  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99 -Wall -Wextra")
 -set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__='\"$$(subst ${CMAKE_SOURCE_DIR}/,,$$(abspath \$$<))\"'")
 -else()
--set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
- endif()
-+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
++endif()
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__FILENAME__=__FILE__")
+-endif()
  
  # Monkey Version
  set(MK_VERSION_MAJOR  1)

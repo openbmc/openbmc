@@ -1,0 +1,252 @@
+From 8a6b5f649fe7f42aff4f69a8d99c522adb22f54c Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 10 Apr 2025 13:19:07 +0900
+Subject: [PATCH] Fix build errors related to incorrect function parameters in
+ gcc-15
+
+* see more details
+  http://errors.yoctoproject.org/Errors/Details/851798/
+
+    lat_rpc.c:172:1: error: conflicting types for 'client_rpc_xact_1'; have 'char *(char *, CLIENT *)' {aka 'char *(char *, struct __rpc_client *)'}
+    172 | client_rpc_xact_1(char *argp, CLIENT *clnt)
+        | ^~~~~~~~~~~~~~~~~
+    bench.h:349:14: note: previous declaration of 'client_rpc_xact_1' with type 'char *(void)'
+    349 | extern char *client_rpc_xact_1();
+        |              ^~~~~~~~~~~~~~~~~
+    lat_rpc.c: In function 'rpc_xact_1':
+    lat_rpc.c:189:1: warning: old-style function definition [-Wold-style-definition]
+    189 | rpc_xact_1(msg, transp)
+        | ^~~~~~~~~~
+    lat_rpc.c:192:1: error: number of arguments doesn't match prototype
+    192 | {
+        | ^
+    bench.h:348:14: error: prototype declaration
+    348 | extern char *rpc_xact_1();
+        |              ^~~~~~~~~~
+
+  Fix errors due to old-style function declarations
+
+  The code was using old-style function declarations without proper prototypes,
+  which causes compilation errors with newer GCC versions. This patch updates
+  the function declarations to use modern C syntax with proper parameter types.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/lmbench/patches/3]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/bench.h   |  4 ++--
+ src/lat_rpc.c | 24 ++++++++++--------------
+ src/lat_udp.c |  4 ++--
+ src/lmdd.c    | 18 +++++++++---------
+ src/lmhttp.c  |  4 ++--
+ 5 files changed, 25 insertions(+), 29 deletions(-)
+
+diff --git a/src/bench.h b/src/bench.h
+index 1768ef7..4fc2822 100644
+--- a/src/bench.h
++++ b/src/bench.h
+@@ -345,7 +345,7 @@ extern int sched_pin(int cpu);
+ #define XACT_VERS ((u_long)1)
+ #define RPC_XACT ((u_long)1)
+ #define RPC_EXIT ((u_long)2)
+-extern char *rpc_xact_1();
+-extern char *client_rpc_xact_1();
++extern char *rpc_xact_1(char *msg, struct svc_req *rqstp);
++extern char *client_rpc_xact_1(char *argp, CLIENT *clnt);
+ 
+ #endif /* _BENCH_H */
+diff --git a/src/lat_rpc.c b/src/lat_rpc.c
+index 9c02192..e1450af 100644
+--- a/src/lat_rpc.c
++++ b/src/lat_rpc.c
+@@ -185,17 +185,15 @@ client_rpc_xact_1(char *argp, CLIENT *clnt)
+  * The remote procedure[s] that will be called
+  */
+ /* ARGSUSED */
+-char	*
+-rpc_xact_1(msg, transp)
+-     	char	*msg;
+-	register SVCXPRT *transp;
++char *
++rpc_xact_1(char *msg, struct svc_req *rqstp /* transp is unused */)
+ {
+ 	static char r = 123;
+ 
+ 	return &r;
+ }
+ 
+-static void xact_prog_1();
++static void xact_prog_1(struct svc_req *rqstp, register SVCXPRT *transp);
+ 
+ void
+ server_main()
+@@ -233,16 +231,14 @@ server_main()
+ }
+ 
+ static void
+-xact_prog_1(rqstp, transp)
+-	struct svc_req *rqstp;
+-	register SVCXPRT *transp;
++xact_prog_1(struct svc_req *rqstp, register SVCXPRT *transp)
+ {
+ 	union {
+ 		char rpc_xact_1_arg;
+ 	} argument;
+ 	char *result;
+-	bool_t (*xdr_argument)(), (*xdr_result)();
+-	char *(*local)();
++	bool_t (*xdr_argument)(XDR *, void *), (*xdr_result)(XDR *, void *);
++	char *(*local)(char *, struct svc_req *);
+ 
+ 	switch (rqstp->rq_proc) {
+ 	case NULLPROC:
+@@ -250,9 +246,9 @@ xact_prog_1(rqstp, transp)
+ 		return;
+ 
+ 	case RPC_XACT:
+-		xdr_argument = xdr_char;
+-		xdr_result = xdr_char;
+-		local = (char *(*)()) rpc_xact_1;
++		xdr_argument = (bool_t (*)(XDR *, void *))xdr_char;
++		xdr_result = (bool_t (*)(XDR *, void *))xdr_char;
++		local = rpc_xact_1;
+ 		break;
+ 
+ 	case RPC_EXIT:
+@@ -269,7 +265,7 @@ xact_prog_1(rqstp, transp)
+ 		svcerr_decode(transp);
+ 		return;
+ 	}
+-	result = (*local)(&argument, rqstp);
++	result = local(&argument.rpc_xact_1_arg, rqstp);
+ 	if (result != NULL && !svc_sendreply(transp, (xdrproc_t)xdr_result, result)) {
+ 		svcerr_systemerr(transp);
+ 	}
+diff --git a/src/lat_udp.c b/src/lat_udp.c
+index cdd2e9b..292d5c4 100644
+--- a/src/lat_udp.c
++++ b/src/lat_udp.c
+@@ -19,7 +19,7 @@ char	*id = "$Id$\n";
+ 
+ void	client_main(int ac, char **av);
+ void	server_main();
+-void	timeout();
++void	timeout(int sig);
+ void	init(iter_t iterations, void* cookie);
+ void	cleanup(iter_t iterations, void* cookie);
+ void    doit(iter_t iterations, void* cookie);
+@@ -164,7 +164,7 @@ cleanup(iter_t iterations, void* cookie)
+ }
+ 
+ void
+-timeout()
++timeout(__attribute__((unused)) int sig)
+ {
+ 	fprintf(stderr, "Recv timed out\n");
+ 	exit(1);
+diff --git a/src/lmdd.c b/src/lmdd.c
+index dee37b4..da64b04 100644
+--- a/src/lmdd.c
++++ b/src/lmdd.c
+@@ -76,7 +76,7 @@ int	norepeats = -1;
+ 	bds_msg	*m1, *m2;
+ #endif
+ 
+-uint64	getarg();
++uint64	getarg(char *s, int ac, char **av);
+ int	been_there(uint64 off);
+ int	getfile(char *s, int ac, char **av);
+ 
+@@ -148,7 +148,7 @@ char   *cmds[] = {
+ 
+ 
+ void error(char *);
+-void    done();
++void    done(int sig);
+ #ifdef	DBG
+ extern int dbg;
+ #endif
+@@ -162,7 +162,7 @@ main(int ac, char **av)
+ 	int     Fork, misses, mismatch, outpat, inpat, in, timeopen, gotcnt;
+ 	int	slp;
+ 	uint64	skip, size, count;
+-	void	chkarg();
++	void	chkarg(char *arg);
+ 	int     i;
+ 	uint64	off = 0;
+ 	int	touch;
+@@ -332,7 +332,7 @@ main(int ac, char **av)
+ 		register int moved;
+ 
+ 		if (gotcnt && count-- <= 0) {
+-			done();
++			done(0);
+ 		}
+ 
+ 		/*
+@@ -445,7 +445,7 @@ main(int ac, char **av)
+ 			perror("read");
+ 		}
+ 		if (moved <= 0) {
+-			done();
++			done(0);
+ 		}
+ 		if (inpat != -1) {
+ 			register int foo, cnt;
+@@ -458,7 +458,7 @@ main(int ac, char **av)
+ 					    (uint)(off + foo*sizeof(int)),
+ 					    buf[foo]);
+ 					if (mismatch != -1 && --misses == 0) {
+-						done();
++						done(0);
+ 					}
+ 				}
+ 			}
+@@ -523,7 +523,7 @@ main(int ac, char **av)
+ 			if (moved2 != moved) {
+ 				fprintf(stderr, "write: wanted=%d got=%d\n",
+ 				    moved, moved2);
+-				done();
++				done(0);
+ 			}
+ 			if ((Wtmax != -1) || (Wtmin != -1)) {
+ 				int mics = stop(&start_tv, &stop_tv);
+@@ -560,7 +560,7 @@ main(int ac, char **av)
+ 				perror("write");
+ 			}
+ 			if (moved2 != moved) {
+-				done();
++				done(0);
+ 			}
+ 
+ 			if (touch) {
+@@ -626,7 +626,7 @@ chkarg(char *arg)
+ }
+ 
+ void 
+-done(void)
++done(__attribute__((unused)) int sig)
+ {
+ 	int	i;
+ 	int	step;
+diff --git a/src/lmhttp.c b/src/lmhttp.c
+index 41d9949..c2f3cb9 100644
+--- a/src/lmhttp.c
++++ b/src/lmhttp.c
+@@ -26,7 +26,7 @@ char	*buf;
+ char	*bufs[3];
+ int	Dflg, dflg, nflg, lflg, fflg, zflg;
+ int	data, logfile;
+-void	die();
++void	die(int sig);
+ void	worker();
+ char	*http_time(void);
+ char	*date(time_t *tt);
+@@ -387,7 +387,7 @@ logit(int sock, char *name, int size)
+ 	nbytes += len;
+ }
+ 
+-void die()
++void die(__attribute__((unused)) int sig)
+ {
+ 	if (nbytes) {
+ 		write(logfile, logbuf, nbytes);

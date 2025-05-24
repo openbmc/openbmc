@@ -2,7 +2,7 @@ SUMMARY = "Pure-Python Java Keystore (JKS) library"
 DESCRIPTION = "PyJKS enables Python projects to load and manipulate\
  Java KeyStore (JKS) data without a JVM dependency. PyJKS supports JKS,\
  JCEKS, BKS and UBER (BouncyCastle) keystores."
-HOMEPAGE = "http://github.com/kurtbrose/pyjks"
+HOMEPAGE = "https://github.com/kurtbrose/pyjks"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9694d6cc724caf7f7386be88a4a81958"
 

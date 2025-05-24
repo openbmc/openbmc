@@ -1,5 +1,5 @@
 SUMMARY = "Draws ASCII trees."
-HOMEPAGE = "http://github.com/mbr/asciitree"
+HOMEPAGE = "https://github.com/mbr/asciitree"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a985ccb0df374f2a8cab75010bf8db73"
 

@@ -63,9 +63,6 @@ PACKAGECONFIG[libxml] = "--without-included-libxml,--with-included-libxml,libxml
 PACKAGECONFIG[libunistring] = "--with-libunistring-prefix=${STAGING_LIBDIR}/..,--with-included-libunistring,libunistring"
 PACKAGECONFIG[msgcat-curses] = "--with-libncurses-prefix=${STAGING_LIBDIR}/..,--disable-curses,ncurses,"
 
-acpaths = '-I ${S}/gettext-runtime/m4 \
-           -I ${S}/gettext-tools/m4'
-
 do_install:append:libc-musl () {
 	rm -f ${D}${libdir}/charset.alias
 	rm -f ${D}${includedir}/libintl.h

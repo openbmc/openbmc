@@ -142,6 +142,12 @@ do_install:append() {
 	fi
 }
 
+do_install_ptest() {
+    mkdir -p ${D}${PTEST_PATH}/tests
+    find ${B}/tests -maxdepth 1 -type f -exec cp {} ${D}${PTEST_PATH}/tests \;
+    install -m 0644 ${S}/tests/confdir ${D}${PTEST_PATH}/tests
+}
+
 pkg_postinst:${PN}() {
          if [ -z "$D" ] && [ -e /etc/init.d/populate-volatile.sh ] ; then
                  /etc/init.d/populate-volatile.sh update

@@ -22,8 +22,6 @@ UPSTREAM_CHECK_URI = "https://grsecurity.net/download"
 
 S = "${WORKDIR}/gradm"
 
-inherit autotools-brokensep
-
 do_compile() {
     oe_runmake 'CC=${CC}'                               \
                'LIBS='                                  \

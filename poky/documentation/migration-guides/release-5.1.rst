@@ -9,3 +9,5 @@ Release 5.1 (styhead)
    release-notes-5.1
    release-notes-5.1.1
    release-notes-5.1.2
+   release-notes-5.1.3
+   release-notes-5.1.4

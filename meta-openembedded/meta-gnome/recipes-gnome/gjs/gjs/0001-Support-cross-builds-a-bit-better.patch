@@ -1,4 +1,4 @@
-From 8e7a25b0171eb60c802168593355354dff7806f5 Mon Sep 17 00:00:00 2001
+From b6996f3683f0a1428657636c372ef7af8d0b43ff Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Wed, 27 Oct 2021 20:18:47 +0200
 Subject: [PATCH] Support cross builds a bit better
@@ -17,7 +17,7 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index f3081fc..ac958d3 100644
+index a969ce2..1885afc 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -252,6 +252,7 @@ release builds of SpiderMonkey. Try configuring SpiderMonkey with
@@ -34,9 +34,9 @@ index f3081fc..ac958d3 100644
  endif
 +endif # not meson.is_cross_build()
  
- have_printf_alternative_int = cc.compiles('''
- #include <stdio.h>
-@@ -656,7 +658,7 @@ subdir('installed-tests')
+ ### Check for external programs ################################################
+ 
+@@ -651,7 +653,7 @@ subdir('installed-tests')
  
  # Note: The test program in test/ needs to be ported
  #       to Windows before we can build it on Windows.

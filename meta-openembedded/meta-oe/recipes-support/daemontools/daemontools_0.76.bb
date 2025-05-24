@@ -24,6 +24,7 @@ SRC_URI = "http://cr.yp.to/daemontools/${BPN}-${PV}.tar.gz \
     file://0001-daemontools-Fix-QA-Issue.patch \
     file://warnings.patch \
     file://0001-Fix-signature-of-main-function.patch \
+    file://0001-fix-prototype-declaration-with-gcc-15.patch \
 "
 
 SRC_URI[sha256sum] = "a55535012b2be7a52dcd9eccabb9a198b13be50d0384143bd3b32b8710df4c1f"

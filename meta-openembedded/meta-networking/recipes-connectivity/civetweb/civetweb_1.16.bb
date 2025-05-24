@@ -30,7 +30,7 @@ EXTRA_OECMAKE = " \
 # should come from external CMake project)
 OECMAKE_GENERATOR = "Unix Makefiles"
 
-PACKAGECONFIG ??= "caching ipv6 server ssl websockets"
+PACKAGECONFIG ??= "caching ipv6 server ssl websockets cpp"
 PACKAGECONFIG[caching] = "-DCIVETWEB_DISABLE_CACHING=OFF,-DCIVETWEB_DISABLE_CACHING=ON,"
 PACKAGECONFIG[cgi] = "-DCIVETWEB_DISABLE_CGI=OFF,-DCIVETWEB_DISABLE_CGI=ON,"
 PACKAGECONFIG[cpp] = "-DCIVETWEB_ENABLE_CXX=ON,-DCIVETWEB_ENABLE_CXX=OFF,"

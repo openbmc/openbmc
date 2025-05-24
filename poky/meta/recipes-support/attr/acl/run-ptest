@@ -1,16 +1,31 @@
 #!/bin/sh
-#
-#This script is used to run acl test suites
 
-#umask 077
+failed=0
+all=0
 
-mkdir -p /tmp/acl-ptest/test
-cp test/test.* /tmp/acl-ptest/test
 
-set +e
-make test-suite.log
-exitcode=$?
-if [ $exitcode -ne 0 -a -e test-suite.log ]; then
-    cat test-suite.log
+for f in *.test; do
+    LD_PRELOAD=$(pwd)/libtestlookup.so ./run $f
+    case "$?" in
+        0)
+            echo "PASS: $f"
+            all=$((all + 1))
+            ;;
+        77)
+            echo "SKIP: $f"
+            ;;
+        *)
+            echo "FAIL: $f"
+            failed=$((failed + 1))
+            all=$((all + 1))
+            ;;
+    esac
+done
+
+if [ "$failed" -eq 0 ] ; then
+    echo "All $all tests passed"
+    exit 0
+else
+    echo "$failed of $all tests failed"
+    exit 1
 fi
-exit $exitcode

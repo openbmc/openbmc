@@ -29,7 +29,7 @@ UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools
 
-export EXPLICIT_VERSION="${PV}"
+export EXPLICIT_VERSION = "${PV}"
 
 EXTRA_OECONF = "--prefix=${datadir}/cfengine"
 

@@ -3,7 +3,6 @@ DESCRIPTION = "Open Portable Trusted Execution Environment - Test suite"
 HOMEPAGE = "https://www.op-tee.org/"
 
 LICENSE = "BSD-2-Clause & GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=daa2bcccc666345ab8940aab1315a4fa"
 
 inherit python3native ptest
 inherit deploy

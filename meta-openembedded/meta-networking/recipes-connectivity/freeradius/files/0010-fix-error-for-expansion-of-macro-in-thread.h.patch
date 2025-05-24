@@ -1,4 +1,4 @@
-From 30ce5ccd62446349d432ff65d3fe8d46872423c8 Mon Sep 17 00:00:00 2001
+From 0475d948ceab91b22172f0fae3bc01e0a1502ae8 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Wed, 18 Jan 2017 14:59:39 +0800
 Subject: [PATCH] fix error for expansion of macro in thread.h
@@ -22,10 +22,10 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/src/include/threads.h b/src/include/threads.h
-index e36d81dac0..2bcb6aadcb 100644
+index f2aea776d6..1c4e526797 100644
 --- a/src/include/threads.h
 +++ b/src/include/threads.h
-@@ -89,7 +89,7 @@ static _t __fr_thread_local_init_##_n(pthread_destructor_t func)\
+@@ -92,7 +92,7 @@ static _t __fr_thread_local_init_##_n(pthread_destructor_t func)\
  #  define fr_thread_local_get(_n) _n
  #elif defined(HAVE_PTHREAD_H)
  #  include <pthread.h>
@@ -34,7 +34,7 @@ index e36d81dac0..2bcb6aadcb 100644
  static pthread_key_t __fr_thread_local_key_##_n;\
  static pthread_once_t __fr_thread_local_once_##_n = PTHREAD_ONCE_INIT;\
  static pthread_destructor_t __fr_thread_local_destructor_##_n = NULL;\
-@@ -100,17 +100,17 @@ static void __fr_thread_local_destroy_##_n(UNUSED void *unused)\
+@@ -103,17 +103,17 @@ static void __fr_thread_local_destroy_##_n(UNUSED void *unused)\
  static void __fr_thread_local_key_init_##_n(void)\
  {\
  	(void) pthread_key_create(&__fr_thread_local_key_##_n, __fr_thread_local_destroy_##_n);\

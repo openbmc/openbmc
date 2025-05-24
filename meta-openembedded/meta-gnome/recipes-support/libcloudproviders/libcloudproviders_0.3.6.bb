@@ -1,5 +1,5 @@
 SUMMARY = "libcloudproviders is a DBus API that allows cloud storage sync clients to expose their services."
-LICENSE="LGPL-3.0-or-later"
+LICENSE = "LGPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e6a600fd5e1d9cbde2d983680233ad02"
 
 VALA_MESON_OPTION ?= 'vapigen'

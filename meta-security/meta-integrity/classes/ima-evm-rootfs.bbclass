@@ -15,6 +15,10 @@ IMA_EVM_PRIVKEY_KEYID_OPT ?= ""
 # Password for the private key
 IMA_EVM_EVMCTL_KEY_PASSWORD ?= ""
 
+# Whether to create IMA signatures (--imasig) or hashes (--imahash).
+# Hashes are sufficient for IMA when EVM uses signatures.
+IMA_EVM_IMA_XATTR_OPT ?= "--imasig"
+
 # Public part of certificates (used for both IMA and EVM).
 # The default is okay when using the example key directory.
 IMA_EVM_X509 ?= "${IMA_EVM_KEY_DIR}/x509_ima.der"
@@ -78,11 +82,13 @@ ima_evm_sign_rootfs () {
     export EVMCTL_KEY_PASSWORD=${IMA_EVM_EVMCTL_KEY_PASSWORD}
 
     bbnote "IMA/EVM: Signing root filesystem at ${IMAGE_ROOTFS} with key ${IMA_EVM_PRIVKEY}"
-    evmctl sign --imasig ${evmctl_param} --portable -a sha256 \
+    evmctl sign ${IMA_EVM_IMA_XATTR_OPT} ${evmctl_param} --portable -a sha256 \
         --key "${IMA_EVM_PRIVKEY}" ${IMA_EVM_PRIVKEY_KEYID_OPT} -r "${IMAGE_ROOTFS}"
 
     # check signing key and signature verification key
-    evmctl ima_verify ${evmctl_param} --key "${IMA_EVM_X509}" "${IMAGE_ROOTFS}/lib/libc.so.6" || exit 1
+    if [ "${IMA_EVM_IMA_XATTR_OPT}" = "--imasig" ]; then
+        evmctl ima_verify ${evmctl_param} --key "${IMA_EVM_X509}" "${IMAGE_ROOTFS}/lib/libc.so.6" || exit 1
+    fi
     evmctl verify     ${evmctl_param} --key "${IMA_EVM_X509}" "${IMAGE_ROOTFS}/lib/libc.so.6" || exit 1
 
     # Optionally install custom policy for loading by systemd.

@@ -1,0 +1,61 @@
+From ea00e32a87cc733dd5aa05cef407a5bee3e6db29 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 18 Mar 2025 22:42:45 -0700
+Subject: [PATCH] check for _nl_msg_cat_cntr in configure
+
+_nl_msg_cat_cntr is not available in all implementations e.g. musl libintl
+does not have it, therefore add a check to detect it and use it only if
+it is found.
+
+Upstream-Status: Backport [https://gitlab.com/man-db/man-db/-/commit/7430ca617b5cee3d4420da3158382c5ffbc3e77d]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac        | 9 +++++++++
+ include/manconfig.h | 6 ++++--
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -404,6 +404,15 @@ AC_TYPE_PID_T
+ AC_TYPE_UID_T
+ AC_TYPE_SIZE_T
+ 
++dnl _nl_msg_cat_cntr is required for GNU gettext
++AC_MSG_CHECKING([for _nl_msg_cat_cntr])
++AC_LINK_IFELSE([AC_LANG_PROGRAM(
++	[[#include <libintl.h>
++	extern int _nl_msg_cat_cntr;]],
++	[[++_nl_msg_cat_cntr;]])],
++	AC_MSG_RESULT([yes]); AC_DEFINE([HAVE_NL_MSG_CAT_CNTR], [], [_nl_msg_cat_cntr from GNU Gettext]),
++	AC_MSG_RESULT([no]))
++
+ # Check for pipeline library.
+ PKG_CHECK_MODULES([libpipeline], [libpipeline >= 1.5.0])
+ 
+--- a/include/manconfig.h
++++ b/include/manconfig.h
+@@ -24,6 +24,8 @@
+ #ifndef MANCONFIG_H
+ #define MANCONFIG_H
+ 
++#include "config.h"
++
+ /* STD_SECTIONS must contain all of your man hierarchy subdirectories. The
+    order is important. Manual pages will be displayed in this order. Ie
+    if "1" comes before "2", then a kill(1) will be displayed in preference to
+@@ -138,13 +140,13 @@
+ #define UNLIKELY(cond) __builtin_expect ((cond), 0)
+ 
+ /* GNU gettext needs to know when the locale changes. This macro tells it. */
+-#ifdef ENABLE_NLS
++#ifdef HAVE_NL_MSG_CAT_CNTR
+ extern int _nl_msg_cat_cntr;
+ #  define locale_changed()                                                    \
+ 	  do {                                                                \
+ 		  ++_nl_msg_cat_cntr;                                         \
+ 	  } while (0)
+-#else /* !ENABLE_NLS */
++#else /* !HAVE_NL_MSG_CAT_CNTR */
+ #  define locale_changed()
+ #endif /* ENABLE_NLS */
+ 

@@ -1,4 +1,4 @@
-From 1c697e4d75f0045d5364d622960ff8047a4ad3ec Mon Sep 17 00:00:00 2001
+From a19e548826e65a95a55ac6b9c12a83d3dcc0010d Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 19 Mar 2024 20:56:05 +0800
 Subject: [PATCH] Fix libsodium build
@@ -14,7 +14,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/cmake/BundledLibSodium.cmake b/cmake/BundledLibSodium.cmake
-index 3a3daf41..d851f753 100644
+index 98d05b737..4f0faa879 100644
 --- a/cmake/BundledLibSodium.cmake
 +++ b/cmake/BundledLibSodium.cmake
 @@ -58,14 +58,12 @@ function(use_bundled_libsodium SOURCE_DIR BINARY_DIR)
@@ -26,7 +26,7 @@ index 3a3daf41..d851f753 100644
  
          ExternalProject_Add(
                  libsodium-external
--                URL "${LIBSODIUM_OFFICIAL_MIRROR_URL} ${LIBSODIUM_GITHUB_MIRROR_URL} ${LIBSODIUM_GENTOO_MIRROR_URL}"
+-                URL "${LIBSODIUM_OFFICIAL_MIRROR_URL}" "${LIBSODIUM_GITHUB_MIRROR_URL}" "${LIBSODIUM_GENTOO_MIRROR_URL}"
 -                URL_HASH ${LIBSODIUM_URL_HASH}
                  BUILD_IN_SOURCE true
 -                SOURCE_DIR "${BINARY_DIR}/thirdparty/libsodium-src"
@@ -35,5 +35,5 @@ index 3a3daf41..d851f753 100644
                  CMAKE_COMMAND ""
                  UPDATE_COMMAND ""
 -- 
-2.25.1
+2.34.1
 

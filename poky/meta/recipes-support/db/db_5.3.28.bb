@@ -118,5 +118,6 @@ INSANE_SKIP:${PN}-cxx = "dev-so"
 BBCLASSEXTEND = "native nativesdk"
 
 # many configure tests are failing with gcc-14
-CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
-BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
+# -Wno-error=incompatible-pointer-types needed for gcc-15
+CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"
+BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"

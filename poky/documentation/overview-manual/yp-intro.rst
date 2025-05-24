@@ -400,7 +400,7 @@ Yocto Project:
    Autobuilder :doc:`here </test-manual/understand-autobuilder>`.
 
 -  *Pseudo:* Pseudo is the Yocto Project implementation of
-   `fakeroot <http://man.he.net/man1/fakeroot>`__, which is used to run
+   :manpage:`fakeroot <fakeroot(1)>`, which is used to run
    commands in an environment that seemingly has root privileges.
 
    During a build, it can be necessary to perform operations that

@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING.BSD;md5=42dd9555eb177f35150cf9aa240b61e5"
 
 require opensbi-payloads.inc
 
-inherit autotools-brokensep deploy
+inherit deploy
 
 SRCREV = "bd613dd92113f683052acfb23d9dc8ba60029e0a"
 SRC_URI = "git://github.com/riscv/opensbi.git;branch=master;protocol=https"
@@ -26,7 +26,12 @@ EXTRA_OEMAKE:append = " ${@riscv_get_extra_oemake_fdt(d)}"
 # Required if specifying a custom payload
 do_compile[depends] += "${@riscv_get_do_compile_depends(d)}"
 
-do_install:append() {
+do_compile() {
+	oe_runmake
+}
+
+do_install() {
+	oe_runmake DESTDIR=${D} install
 	# In the future these might be required as a dependency for other packages.
 	# At the moment just delete them to avoid warnings
 	rm -r ${D}/include

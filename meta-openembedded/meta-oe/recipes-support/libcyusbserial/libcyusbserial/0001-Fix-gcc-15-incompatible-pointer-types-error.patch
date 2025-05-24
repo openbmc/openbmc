@@ -1,0 +1,41 @@
+From 7b5318037b2a21a592e8a85c9724c1dc35078426 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 3 Apr 2025 20:42:03 +0900
+Subject: [PATCH] Fix gcc 15 incompatible-pointer-types error
+
+* Fix incompatible pointer type error in signal function parameter
+TOPDIR/tmp/work/core2-64-oe-linux/libcyusbserial/1.0.0+git/git/tools/cyusbserialtest.c:101:22: error: passing argument 2 of 'signal' from incompatible pointer type [-Wincompatible-pointer-types]
+  101 |     signal (SIGUSR1, deviceHotPlug);
+      |                      ^~~~~~~~~~~~~
+      |                      |
+      |                      void (*)(void)
+In file included from TOPDIR/tmp/work/core2-64-oe-linux/libcyusbserial/1.0.0+git/git/tools/cyusbserialtest.c:25:
+TOPDIR/tmp/work/core2-64-oe-linux/libcyusbserial/1.0.0+git/recipe-sysroot/usr/include/signal.h:88:57: note: expected '__sighandler_t' {aka 'void (*)(int)'} but argument is of type 'void (*)(void)'
+   88 | extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+      |                                          ~~~~~~~~~~~~~~~^~~~~~~~~
+TOPDIR/tmp/work/core2-64-oe-linux/libcyusbserial/1.0.0+git/git/tools/cyusbserialtest.c:83:6: note: 'deviceHotPlug' declared here
+   83 | void deviceHotPlug () {
+      |      ^~~~~~~~~~~~~
+TOPDIR/tmp/work/core2-64-oe-linux/libcyusbserial/1.0.0+git/recipe-sysroot/usr/include/signal.h:72:16: note: '__sighandler_t' declared here
+   72 | typedef void (*__sighandler_t) (int);
+      |                ^~~~~~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/cyrozap/libcyusbserial/pull/7]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ tools/cyusbserialtest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/cyusbserialtest.c b/tools/cyusbserialtest.c
+index 9f21249..92e91a1 100644
+--- a/tools/cyusbserialtest.c
++++ b/tools/cyusbserialtest.c
+@@ -80,7 +80,7 @@ int getUserInput()
+     return output;
+ }
+ 
+-void deviceHotPlug () {
++void deviceHotPlug (int sig) {
+     CY_RETURN_STATUS rStatus;
+     deviceAddedRemoved = true;
+     selectedDeviceNum = -1;

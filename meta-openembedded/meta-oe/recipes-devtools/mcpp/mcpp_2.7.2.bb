@@ -21,3 +21,7 @@ BBCLASSEXTEND = "native nativesdk"
 # http://errors.yoctoproject.org/Errors/Details/766883/
 # mcpp-2.7.2/src/expand.c:713:21: error: assignment to 'char *' from incompatible pointer type 'LOCATION *' {aka 'struct location *'} [-Wincompatible-pointer-types]
 CFLAGS += "-Wno-error=incompatible-pointer-types"
+
+# http://errors.yoctoproject.org/Errors/Details/850149/
+# ../../mcpp-2.7.2/src/system.c:3436:15: error: expected identifier or '*' before 'true'
+CFLAGS += "-std=gnu17"

@@ -1,0 +1,52 @@
+From a1c1211fd6fc8d82053074c6dc531340f046c8d4 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Tue, 1 Apr 2025 16:06:56 +0900
+Subject: [PATCH] Fix build error in gcc 15.0.1 due to function redeclaration.
+
+Fix build error:
+linpacknew.c: In function 'dgefa':
+linpacknew.c:257:9: error: conflicting types for 'idamax'; have 'int(void)'
+  257 |     int idamax(),j,k,kp1,l,nm1;
+      |         ^~~~~~
+linpacknew.c:63:13: note: previous declaration of 'idamax' with type 'int(int,  REAL *, int)' {aka 'int(int,  double *, int)'}
+   63 | static int  idamax   (int n,REAL *dx,int incx);
+      |             ^~~~~~
+linpacknew.c:272:21: error: too many arguments to function 'idamax'; expected 0, have 3
+  272 |                 l = idamax(n-k,&a[lda*k+k],1) + k;
+      |                     ^~~~~~ ~~~
+linpacknew.c:257:9: note: declared here
+  257 |     int idamax(),j,k,kp1,l,nm1;
+      |         ^~~~~~
+linpacknew.c:326:21: error: too many arguments to function 'idamax'; expected 0, have 3
+  326 |                 l = idamax(n-k,&a[lda*k+k],1) + k;
+      |                     ^~~~~~ ~~~
+linpacknew.c:257:9: note: declared here
+  257 |     int idamax(),j,k,kp1,l,nm1;
+      |         ^~~~~~
+
+The function was already declared as static int idamax(int n, REAL *dx, int incx);
+on line 63, but it was redeclared as int idamax() inside the dgefa function on line 257,
+causing a conflict.
+where functions are redeclared without parameters,
+causing conflicts with the original function definitions.
+
+Upstream-Status: Inactive-Upstream [lastrelease: 2/25/94]
+
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ linpacknew.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linpacknew.c b/linpacknew.c
+index c656082..5c8687b 100644
+--- a/linpacknew.c
++++ b/linpacknew.c
+@@ -254,7 +254,7 @@ static void dgefa(REAL *a,int lda,int n,int *ipvt,int *info,int roll)
+ 
+     {
+     REAL t;
+-    int idamax(),j,k,kp1,l,nm1;
++    int j,k,kp1,l,nm1;
+ 
+     /* gaussian elimination with partial pivoting */
+ 

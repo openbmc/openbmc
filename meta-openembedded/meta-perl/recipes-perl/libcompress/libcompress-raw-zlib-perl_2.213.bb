@@ -18,7 +18,7 @@ S = "${WORKDIR}/Compress-Raw-Zlib-${PV}"
 
 inherit cpan
 
-export BUILD_ZLIB="0"
+export BUILD_ZLIB = "0"
 
 do_compile() {
 	export LIBC="$(find ${STAGING_DIR_TARGET}/${base_libdir}/ -name 'libc-*.so')"

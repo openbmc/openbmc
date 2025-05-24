@@ -299,6 +299,11 @@ def check_path_length(filepath, pathname, limit):
         return "The length of %s is longer than %s, this would cause unexpected errors, please use a shorter path.\n" % (pathname, limit)
     return ""
 
+def check_non_ascii(filepath, pathname):
+    if(not filepath.isascii()):
+        return "Non-ASCII character(s) in %s path (\"%s\") detected. This would cause build failures as we build software that doesn't support this.\n" % (pathname, filepath)
+    return ""
+
 def get_filesystem_id(path):
     import subprocess
     try:
@@ -602,9 +607,9 @@ def drop_v14_cross_builds(d):
                 bb.utils.remove(stamp + "*")
                 bb.utils.remove(workdir, recurse = True)
 
-def check_cpp_toolchain(d):
+def check_cpp_toolchain_flag(d, flag, error_message=None):
     """
-    it checks if the c++ compiling and linking to libstdc++ works properly in the native system
+    Checks if the C++ toolchain support the given flag
     """
     import shlex
     import subprocess
@@ -617,12 +622,12 @@ def check_cpp_toolchain(d):
     }
     """
 
-    cmd = shlex.split(d.getVar("BUILD_CXX")) + ["-x", "c++","-", "-o", "/dev/null", "-lstdc++"]
+    cmd = shlex.split(d.getVar("BUILD_CXX")) + ["-x", "c++","-", "-o", "/dev/null", flag]
     try:
         subprocess.run(cmd, input=cpp_code, capture_output=True, text=True, check=True)
         return None
     except subprocess.CalledProcessError as e:
-        return f"An unexpected issue occurred during the C++ toolchain check: {str(e)}"
+        return error_message or f"An unexpected issue occurred during the C++ toolchain check: {str(e)}"
 
 def sanity_handle_abichanges(status, d):
     #
@@ -719,6 +724,7 @@ def check_sanity_version_change(status, d):
     # Check that TMPDIR isn't on a filesystem with limited filename length (eg. eCryptFS)
     import stat
     tmpdir = d.getVar('TMPDIR')
+    topdir = d.getVar('TOPDIR')
     status.addresult(check_create_long_filename(tmpdir, "TMPDIR"))
     tmpdirmode = os.stat(tmpdir).st_mode
     if (tmpdirmode & stat.S_ISGID):
@@ -785,6 +791,9 @@ def check_sanity_version_change(status, d):
     # The length of TMPDIR can't be longer than 400
     status.addresult(check_path_length(tmpdir, "TMPDIR", 400))
 
+    # Check that TOPDIR does not contain non ascii chars (perl_5.40.0, Perl-native and shadow-native build failures)
+    status.addresult(check_non_ascii(topdir, "TOPDIR"))
+
     # Check that TMPDIR isn't located on nfs
     status.addresult(check_not_nfs(tmpdir, "TMPDIR"))
 
@@ -793,7 +802,12 @@ def check_sanity_version_change(status, d):
     status.addresult(check_case_sensitive(tmpdir, "TMPDIR"))
 
     # Check if linking with lstdc++ is failing
-    status.addresult(check_cpp_toolchain(d))
+    status.addresult(check_cpp_toolchain_flag(d, "-lstdc++"))
+
+    # Check if the C++ toochain support the "--std=gnu++20" flag
+    status.addresult(check_cpp_toolchain_flag(d, "--std=gnu++20",
+        "An error occurred during checking the C++ toolchain for '--std=gnu++20' support. "
+        "Please use a g++ compiler that supports C++20 (e.g. g++ version 10 onwards)."))
 
 def sanity_check_locale(d):
     """
@@ -813,10 +827,10 @@ def check_sanity_everybuild(status, d):
     if 0 == os.getuid():
         raise_sanity_error("Do not use Bitbake as root.", d)
 
-    # Check the Python version, we now have a minimum of Python 3.8
+    # Check the Python version, we now have a minimum of Python 3.9
     import sys
-    if sys.hexversion < 0x030800F0:
-        status.addresult('The system requires at least Python 3.8 to run. Please update your Python interpreter.\n')
+    if sys.hexversion < 0x030900F0:
+        status.addresult('The system requires at least Python 3.9 to run. Please update your Python interpreter.\n')
 
     # Check the bitbake version meets minimum requirements
     minversion = d.getVar('BB_MIN_VERSION')

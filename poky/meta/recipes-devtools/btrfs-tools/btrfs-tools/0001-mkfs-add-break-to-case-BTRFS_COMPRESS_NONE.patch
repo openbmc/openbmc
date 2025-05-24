@@ -1,0 +1,40 @@
+From ae0743dea3498429fce144e75c8b5b6eeed6f490 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Tue, 11 Mar 2025 05:24:54 +0000
+Subject: [PATCH] mkfs: add break to case BTRFS_COMPRESS_NONE
+
+when compression null, always through error "lzo support not compiled in"
+
+This bug was imported by following commit:
+----------------------------------------------------
+commit c6d24a363daed6501d13d9125c560387e2d755ca
+Author: Mark Harmstone <maharmstone@fb.com>
+Date:   Thu Dec 12 20:36:55 2024 +0000
+
+     btrfs-progs: mkfs: add lzo to --compress option
+
+     Allow --compress to work with lzo.
+----------------------------------------------------
+
+Upstream-Status: Submitted [https://github.com/kdave/btrfs-progs/pull/967]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ mkfs/rootdir.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/mkfs/rootdir.c b/mkfs/rootdir.c
+index 1927394..5f4cfb9 100644
+--- a/mkfs/rootdir.c
++++ b/mkfs/rootdir.c
+@@ -1654,6 +1654,7 @@ int btrfs_mkfs_fill_dir(struct btrfs_trans_handle *trans, const char *source_dir
+ 
+ 	switch (compression) {
+ 	case BTRFS_COMPRESS_NONE:
++                break;
+ 	case BTRFS_COMPRESS_LZO:
+ #if !COMPRESSION_LZO
+ 		error("lzo support not compiled in");
+-- 
+2.43.0
+

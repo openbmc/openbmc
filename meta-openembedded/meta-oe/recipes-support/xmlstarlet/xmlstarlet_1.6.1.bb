@@ -22,7 +22,7 @@ SRC_URI[sha256sum] = "15d838c4f3375332fd95554619179b69e4ec91418a3a5296e7c631b7ed
 inherit autotools
 
 # doc build: requires (native) xstlproc, fop, pdf2ps
-EXTRA_OECONF="--disable-build-docs \
+EXTRA_OECONF = "--disable-build-docs \
   --with-libxml-prefix=${STAGING_LIBDIR}/.. \
   --with-libxslt-prefix=${STAGING_LIBDIR}/.."
 

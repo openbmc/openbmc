@@ -17,6 +17,7 @@ SECTION = "utils"
 GITHUB_BASE_URI = "https://github.com/cronie-crond/${BPN}/releases/"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/cronie-${PV}/cronie-${PV}.tar.gz \
+           file://make_error_func_prototype_complete.patch \
            file://crond.init \
            file://crontab \
            file://crond.service \

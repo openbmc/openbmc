@@ -11,11 +11,8 @@ import re, fcntl, os, string, stat, shutil, time
 import sys
 import errno
 import logging
-import bb
-import bb.msg
 import locale
 import multiprocessing
-import fcntl
 import importlib
 import importlib.machinery
 import importlib.util
@@ -24,7 +21,6 @@ import subprocess
 import glob
 import fnmatch
 import traceback
-import errno
 import signal
 import collections
 import copy
@@ -36,6 +32,8 @@ import tempfile
 from subprocess import getstatusoutput
 from contextlib import contextmanager
 from ctypes import cdll
+import bb
+import bb.msg
 
 logger = logging.getLogger("BitBake.Util")
 python_extensions = importlib.machinery.all_suffixes()
@@ -1457,8 +1455,6 @@ def edit_bblayers_conf(bblayers_conf, add, remove, edit_cb=None):
             but weren't (because they weren't in the list)
     """
 
-    import fnmatch
-
     def remove_trailing_sep(pth):
         if pth and pth[-1] == os.sep:
             pth = pth[:-1]
@@ -1649,7 +1645,7 @@ def ioprio_set(who, cls, value):
         bb.warn("Unable to set IO Prio for arch %s" % _unamearch)
 
 def set_process_name(name):
-    from ctypes import cdll, byref, create_string_buffer
+    from ctypes import byref, create_string_buffer
     # This is nice to have for debugging, not essential
     try:
         libc = cdll.LoadLibrary('libc.so.6')
@@ -1883,12 +1879,30 @@ def path_is_descendant(descendant, ancestor):
 # If we don't have a timeout of some kind and a process/thread exits badly (for example
 # OOM killed) and held a lock, we'd just hang in the lock futex forever. It is better
 # we exit at some point than hang. 5 minutes with no progress means we're probably deadlocked.
+# This function can still deadlock python since it can't signal the other threads to exit
+# (signals are handled in the main thread) and even os._exit() will wait on non-daemon threads
+# to exit.
 @contextmanager
 def lock_timeout(lock):
-    held = lock.acquire(timeout=5*60)
     try:
+        s = signal.pthread_sigmask(signal.SIG_BLOCK, signal.valid_signals())
+        held = lock.acquire(timeout=5*60)
         if not held:
+            bb.server.process.serverlog("Couldn't get the lock for 5 mins, timed out, exiting.\n%s" % traceback.format_stack())
             os._exit(1)
         yield held
     finally:
         lock.release()
+        signal.pthread_sigmask(signal.SIG_SETMASK, s)
+
+# A version of lock_timeout without the check that the lock was locked and a shorter timeout
+@contextmanager
+def lock_timeout_nocheck(lock):
+    try:
+        s = signal.pthread_sigmask(signal.SIG_BLOCK, signal.valid_signals())
+        l = lock.acquire(timeout=10)
+        yield l
+    finally:
+        if l:
+            lock.release()
+        signal.pthread_sigmask(signal.SIG_SETMASK, s)

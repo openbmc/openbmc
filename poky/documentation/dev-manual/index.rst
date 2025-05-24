@@ -20,6 +20,7 @@ Yocto Project Development Tasks Manual
    development-shell
    python-development-shell
    building
+   multiconfig
    speeding-up-build
    libraries
    prebuilt-libraries

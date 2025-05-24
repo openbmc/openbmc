@@ -13,7 +13,9 @@ DEPENDS = "ncurses bison-native libcap libpcre gdbm groff-native"
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.xz"
 SRC_URI[sha256sum] = "9b8d1ecedd5b5e81fbf1918e876752a7dd948e05c1a0dba10ab863842d45acd5"
 
-inherit autotools-brokensep gettext update-alternatives manpages
+inherit autotools gettext update-alternatives manpages
+
+EXTRA_AUTORECONF += "--exclude=aclocal"
 
 EXTRA_OECONF = " \
     --bindir=${base_bindir} \
@@ -30,7 +32,7 @@ EXTRA_OECONF = " \
 "
 
 # Configure respects --bindir from EXTRA_OECONF, but then Src/Makefile will read bindir from environment
-export bindir="${base_bindir}"
+export bindir = "${base_bindir}"
 
 EXTRA_OEMAKE = "-e MAKEFLAGS="
 
@@ -39,12 +41,8 @@ ALTERNATIVE_LINK_NAME[sh] = "${base_bindir}/sh"
 ALTERNATIVE_TARGET[sh] = "${base_bindir}/${BPN}"
 ALTERNATIVE_PRIORITY = "90"
 
-export AUTOHEADER = "true"
-
-do_configure () {
-    gnu-configize --force ${S}
-    oe_runconf
-}
+# Needed for manpages.bbclass, but they're always installed
+PACKAGECONFIG[manpages] = ""
 
 do_install:append() {
     sed -i -e '1!b; s:^#!.*[ /]zsh:#!${bindir}/zsh:; s#/usr/local/bin#${bindir}#;' \

@@ -9,11 +9,11 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-__version__ = "2.9.1"
+__version__ = "2.12.0"
 
 import sys
-if sys.version_info < (3, 8, 0):
-    raise RuntimeError("Sorry, python 3.8.0 or later is required for this version of bitbake")
+if sys.version_info < (3, 9, 0):
+    raise RuntimeError("Sorry, python 3.9.0 or later is required for this version of bitbake")
 
 if sys.version_info < (3, 10, 0):
     # With python 3.8 and 3.9, we see errors of "libgcc_s.so.1 must be installed for pthread_cancel to work"
@@ -194,7 +194,6 @@ def deprecated(func, name=None, advice=""):
 # For compatibility
 def deprecate_import(current, modulename, fromlist, renames = None):
     """Import objects from one module into another, wrapping them with a DeprecationWarning"""
-    import sys
 
     module = __import__(modulename, fromlist = fromlist)
     for position, objname in enumerate(fromlist):

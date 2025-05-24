@@ -12,13 +12,9 @@ DEPENDS = "nativesdk-ncurses nativesdk-expat nativesdk-gettext nativesdk-gmp nat
 GDBPROPREFIX = "--program-prefix='${TARGET_PREFIX}'"
 
 # Overrides PACKAGECONFIG variables in gdb-common.inc
-PACKAGECONFIG ??= "python readline ${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', d)}"
 PACKAGECONFIG[python] = "--with-python=${WORKDIR}/python,--without-python,nativesdk-python3, \
                          nativesdk-python3-core \
-                         nativesdk-python3-codecs nativesdk-python3-netclient \
-                         "
-PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,nativesdk-readline"
-PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, nativesdk-elfutils"
+                         nativesdk-python3-codecs nativesdk-python3-netclient"
 
 SSTATE_ALLOW_OVERLAP_FILES += "${STAGING_DATADIR}/gdb"
 

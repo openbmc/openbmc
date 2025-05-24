@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# Disabled tests:
+# "winapi: Allocating BSTR string from nullptr C strings"
+#   this test is memory hungry, it allocates 800MB chunks
+#   it succeeds when there is enough free RAM, but most machines don't have it
+
+if /usr/lib/bit7z/ptest/bit7z-tests ~"winapi: Allocating BSTR string from nullptr C strings"; then
+    echo "PASS: bit7z-tests"
+else
+    echo "FAIL: bit7z-tests"
+fi
+
+if /usr/lib/bit7z/ptest/bit7z-tests-public; then
+    echo "PASS: bit7z-tests-public"
+else
+    echo "FAIL: bit7z-tests-public"
+fi

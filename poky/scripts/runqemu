@@ -1676,6 +1676,9 @@ to your build configuration.
         if multiconfig:
             multiconfig = "mc:%s" % multiconfig
 
+        if self.rootfs and not target:
+            target = self.rootfs
+
         if mach:
             cmd = 'MACHINE=%s bitbake -e %s %s' % (mach, multiconfig, target)
         else:

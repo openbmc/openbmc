@@ -1,0 +1,59 @@
+From d72ad4df929bc9d0882298fc1f85ecf589456ff6 Mon Sep 17 00:00:00 2001
+From: Daniel Lundberg Pedersen <dlp@qtec.com>
+Date: Thu, 23 Jan 2025 11:48:16 +0100
+Subject: [PATCH] CMakeLists.txt: Add support for pkg-config
+
+Create and install pkg-config (.pc) file for dependency detection.
+Upstream-Status: Submitted [https://github.com/pybind/pybind11_json/pull/75]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CMakeLists.txt      | 24 ++++++++++++++++++++++++
+ pybind11_json.pc.in |  7 +++++++
+ 2 files changed, 31 insertions(+)
+ create mode 100644 pybind11_json.pc.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c0ef675..a92240a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -133,3 +133,27 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${PROJECT_NAME}Config.cmake
+ install(EXPORT ${PROJECT_NAME}-targets
+         FILE ${PROJECT_NAME}Targets.cmake
+         DESTINATION ${PYBIND11_JSON_CMAKECONFIG_INSTALL_DIR})
++
++# pkg-config support
++if(NOT prefix_for_pc_file)
++if(IS_ABSOLUTE "${CMAKE_INSTALL_DATAROOTDIR}")
++  set(prefix_for_pc_file "${CMAKE_INSTALL_PREFIX}")
++else()
++  set(pc_datarootdir "${CMAKE_INSTALL_DATAROOTDIR}")
++  if(CMAKE_VERSION VERSION_LESS 3.20)
++    set(prefix_for_pc_file "\${pcfiledir}/..")
++    while(pc_datarootdir)
++      get_filename_component(pc_datarootdir "${pc_datarootdir}" DIRECTORY)
++      string(APPEND prefix_for_pc_file "/..")
++    endwhile()
++  else()
++    cmake_path(RELATIVE_PATH CMAKE_INSTALL_PREFIX BASE_DIRECTORY CMAKE_INSTALL_DATAROOTDIR
++               OUTPUT_VARIABLE prefix_for_pc_file)
++  endif()
++endif()
++endif()
++set(includedir_for_pc_file "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
++configure_file("${CMAKE_CURRENT_SOURCE_DIR}/pybind11_json.pc.in"
++             "${CMAKE_CURRENT_BINARY_DIR}/pybind11_json.pc" @ONLY)
++install(FILES "${CMAKE_CURRENT_BINARY_DIR}/pybind11_json.pc"
++      DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig/")
+diff --git a/pybind11_json.pc.in b/pybind11_json.pc.in
+new file mode 100644
+index 0000000..da5bfde
+--- /dev/null
++++ b/pybind11_json.pc.in
+@@ -0,0 +1,7 @@
++prefix=@prefix_for_pc_file@
++includedir=@includedir_for_pc_file@
++
++Name: @PROJECT_NAME@
++Description: Using nlohmann::json with pybind11
++Version: @PROJECT_VERSION@
++Cflags: -I${includedir}

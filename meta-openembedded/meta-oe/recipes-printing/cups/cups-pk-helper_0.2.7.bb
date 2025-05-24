@@ -7,7 +7,7 @@ DEPENDS = "cups polkit glib-2.0"
 
 inherit meson pkgconfig gettext features_check
 
-REQUIRED_DISTRO_FEATURES ="polkit"
+REQUIRED_DISTRO_FEATURES = "polkit"
 
 SRC_URI = " \
     https://www.freedesktop.org/software/cups-pk-helper/releases/cups-pk-helper-${PV}.tar.xz \

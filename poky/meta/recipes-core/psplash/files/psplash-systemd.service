@@ -1,14 +1,13 @@
 [Unit]
 Description=Start psplash-systemd progress communication helper
 DefaultDependencies=no
-After=psplash-start.service
-Requires=psplash-start.service
+After=psplash-start@fb0.service
+Requires=psplash-start@fb0.service
 RequiresMountsFor=/run
 ConditionFileIsExecutable=/usr/bin/psplash
+ConditionFileIsExecutable=/usr/bin/psplash-systemd
+ConditionPathExists=/run/psplash_fifo
 
 [Service]
-ExecStart=/usr/bin/psplash-systemd
+ExecStart=-/usr/bin/psplash-systemd
 RemainAfterExit=yes
-
-[Install]
-WantedBy=sysinit.target

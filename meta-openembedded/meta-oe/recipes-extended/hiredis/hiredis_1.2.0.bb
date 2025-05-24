@@ -35,5 +35,5 @@ do_install_ptest() {
 
 FILES:${PN}-dev += "${datadir}/hiredis_ssl ${prefix}/build"
 
-RDEPENDS:${PN} = "redis"
+RDEPENDS:${PN} = "virtual-redis"
 RDEPENDS:${PN}-ptest = "${@bb.utils.contains('PACKAGECONFIG', 'testssl', 'openssl-bin', '', d)}"

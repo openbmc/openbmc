@@ -9,24 +9,6 @@ from oeqa.core.decorator.data import skipIfQemu
 
 class Ethernet_Test(OERuntimeTestCase):
 
-    def set_ip(self, x): 
-        x = x.split(".")
-        sample_host_address = '150'        
-        x[3] = sample_host_address
-        x = '.'.join(x)
-        return x
-    
-    @skipIfQemu()
-    @OETestDepends(['ssh.SSHTest.test_ssh'])
-    def test_set_virtual_ip(self):
-        (status, output) = self.target.run("ifconfig eth0 | grep 'inet ' | awk '{print $2}'")
-        self.assertEqual(status, 0, msg='Failed to get ip address. Make sure you have an ethernet connection on your device, output: %s' % output)
-        original_ip = output 
-        virtual_ip = self.set_ip(original_ip)
-        
-        (status, output) = self.target.run("ifconfig eth0:1 %s netmask 255.255.255.0 && sleep 2 && ping -c 5 %s && ifconfig eth0:1 down" % (virtual_ip,virtual_ip))
-        self.assertEqual(status, 0, msg='Failed to create virtual ip address, output: %s' % output)
-        
     @skipIfQemu()
     @OETestDepends(['ethernet_ip_connman.Ethernet_Test.test_set_virtual_ip'])  
     def test_get_ip_from_dhcp(self): 

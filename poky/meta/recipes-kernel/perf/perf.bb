@@ -9,8 +9,8 @@ HOMEPAGE = "https://perf.wiki.kernel.org/index.php/Main_Page"
 
 LICENSE = "GPL-2.0-only"
 
-
-PACKAGECONFIG ??= "python tui libunwind libtraceevent"
+# zstd is required for kernels 6.14+ when libelf-zstd is detected
+PACKAGECONFIG ??= "python tui libunwind libtraceevent zstd"
 PACKAGECONFIG[dwarf] = ",NO_DWARF=1"
 PACKAGECONFIG[perl] = ",NO_LIBPERL=1,perl"
 PACKAGECONFIG[python] = ",NO_LIBPYTHON=1,python3 python3-setuptools-native"

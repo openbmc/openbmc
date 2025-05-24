@@ -79,7 +79,6 @@ if 'sqlite' in settings.DATABASES['default']['ENGINE']:
     # end of HACK
 
 class GitURLValidator(validators.URLValidator):
-    import re
     regex = re.compile(
         r'^(?:ssh|git|http|ftp)s?://'  # http:// or https://
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
@@ -1500,7 +1499,7 @@ class Layer_Version(models.Model):
     # code lifted, with adaptations, from the layerindex-web application
     # https://git.yoctoproject.org/cgit/cgit.cgi/layerindex-web/
     def _handle_url_path(self, base_url, path):
-        import re, posixpath
+        import posixpath
         if base_url:
             if self.dirpath:
                 if path:

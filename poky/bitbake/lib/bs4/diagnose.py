@@ -17,7 +17,6 @@ import tempfile
 import time
 import traceback
 import sys
-import cProfile
 
 def diagnose(data):
     """Diagnostic suite for isolating common problems.

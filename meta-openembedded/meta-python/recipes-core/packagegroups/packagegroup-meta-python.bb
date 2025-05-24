@@ -471,6 +471,8 @@ RDEPENDS:packagegroup-meta-python3 = "\
     telepathy-python3 \
     unattended-upgrades \
 "
+# Due to pydantic not being buildable on rv32
+RDEPENDS:packagegroup-meta-python3:remove:riscv32 = "python3-web3"
 
 RDEPENDS:packagegroup-meta-python3-ptest = "\
     python3-ansicolors-ptest \

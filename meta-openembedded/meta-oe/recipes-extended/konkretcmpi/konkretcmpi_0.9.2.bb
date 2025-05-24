@@ -24,8 +24,6 @@ EXTRA_OECMAKE = "-DWITH_PYTHON=ON \
                  ${@oe.utils.conditional("libdir", "/usr/lib32", "-DLIB_SUFFIX=32", "", d)} \
                 "
 
-LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
-
 do_install:append() {
     rm -rf ${D}${datadir}
 }

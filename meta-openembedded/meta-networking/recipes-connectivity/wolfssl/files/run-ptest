@@ -1,0 +1,24 @@
+#!/bin/sh
+
+echo "############ Running Wolfssl Ptest ##########"
+
+log_file=ptest.log
+temp_dir=$(mktemp -d /tmp/wolfss_temp.XXXXXX)
+echo "Wolfssl ptest logs are stored in ${temp_dir}/${log_file}"
+
+./test/unit.test > "$temp_dir/$log_file" 2>&1  
+
+echo "Test script returned: $?"
+
+MAGIC_SENTENCE=$(grep "unit_test: Success for all configured tests." $temp_dir/$log_file)
+
+if [ -n "$MAGIC_SENTENCE" ]; then
+    echo "$MAGIC_SENTENCE"
+    echo "PASS: Wolfssl"
+else
+    echo "#### Issue with at least one test !####"
+    echo "FAIL: Wolfssl"
+fi
+NUM_FAILS=$(grep -c "Failed" $temp_dir/$log_file)
+
+exit $NUM_FAILS

@@ -1,0 +1,40 @@
+From ad0bbc5099d99bbb0c914b39cb5ab4920fd6eeda Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sun, 16 Feb 2025 14:23:40 +0100
+Subject: [PATCH] Fix compiling demos without nuklear
+
+Demos can't be compiled if nuklear headers are not present, because
+the implementation of parse_args function is guarded by HAVE_NUKLEAR macro.
+
+To allow compiling demos without the Nuklear headers, move the implementation
+outside of this ifdef.
+
+Upstream-Status: Submitted [https://github.com/haasn/libplacebo/pull/315]
+---
+ demos/settings.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/demos/settings.c b/demos/settings.c
+index 197e8b7e..73f0e5b9 100644
+--- a/demos/settings.c
++++ b/demos/settings.c
+@@ -14,9 +14,6 @@
+ #define PL_BASENAME basename
+ #endif
+ 
+-#ifdef HAVE_NUKLEAR
+-#include "ui.h"
+-
+ bool parse_args(struct plplay_args *args, int argc, char *argv[])
+ {
+     static struct option long_options[] = {
+@@ -89,6 +86,9 @@ error:
+     return false;
+ }
+ 
++#ifdef HAVE_NUKLEAR
++#include "ui.h"
++
+ static void add_hook(struct plplay *p, const struct pl_hook *hook, const char *path)
+ {
+     if (!hook)

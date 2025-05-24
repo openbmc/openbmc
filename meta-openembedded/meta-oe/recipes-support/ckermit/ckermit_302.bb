@@ -29,7 +29,7 @@ do_compile () {
     # The original makefile doesn't differentiate between CC and CC_FOR_BUILD,
     # so we build wart manually. Note that you need a ckwart.o with the proper
     # timestamp to make this hack work:
-    ${BUILD_CC} -c ckwart.c
+    ${BUILD_CC} -DMAINTYPE=int -c -o ckwart.o ckwart.c
     ${BUILD_CC} -o wart ckwart.o
     ./wart ckcpro.w ckcpro.c
 
@@ -46,7 +46,8 @@ do_compile () {
         -DNORESEND -DNOAUTODL -DNOSTREAMING -DNOHINTS -DNOCKXYZ -DNOLEARN \
         -DNOMKDIR -DNOPERMS -DNOCKTIMERS -DNOCKREGEX -DNOREALPATH \
         -DCK_SMALL -DNOLOGDIAL -DNORENAME -DNOWHATAMI \
-        -DNOARROWKEYS -DMAINTYPE=int"
+        -DNOARROWKEYS -DMAINTYPE=int \
+        -D_DEFAULT_SOURCE -ansi"
 }
 
 do_install () {

@@ -3,3 +3,6 @@ NUMA: Failed to initialise from firmware
 
 # TODO: we should be using bochsdrm over efifb?
 efifb: cannot reserve video memory at 0x80000000
+
+# TODO: debug why this sometimes happens
+failed to find screen to remove

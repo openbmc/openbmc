@@ -1,8 +1,0 @@
-[Unit]
-Description=NFSD configuration filesystem
-After=systemd-modules-load.service
-
-[Mount]
-What=nfsd
-Where=/proc/fs/nfsd
-Type=nfsd

@@ -20,6 +20,9 @@ SRC_URI[sha256sum] = "ef607cfaabfd3767d40b9b9e32032f748beebc4d686831f6111e0e68fb
 DEPENDS = "zlib bison-native libnsl2 flex-native openssl virtual/crypt"
 
 inherit autotools-brokensep systemd update-rc.d
+# brokensep because | ../../monit-5.34.4/libmonit/src/util/Str.c:26:10: fatal error: Config.h: No such file or directory
+
+EXTRA_AUTORECONF += "-I config"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam"
@@ -37,10 +40,6 @@ SYSTEMD_AUTO_ENABLE = "enable"
 INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME:${PN} = "monit"
 INITSCRIPT_PARAMS:${PN} = "defaults 89"
-
-do_configure:prepend() {
-    rm -rf ${S}/m4/*
-}
 
 do_install:append() {
 

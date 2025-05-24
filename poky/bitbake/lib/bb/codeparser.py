@@ -72,12 +72,20 @@ def add_module_functions(fn, functions, namespace):
             parser.parse_python(None, filename=fn, lineno=1, fixedhash=fixedhash+f)
             #bb.warn("Cached %s" % f)
         except KeyError:
-            targetfn = inspect.getsourcefile(functions[f])
+            try:
+                targetfn = inspect.getsourcefile(functions[f])
+            except TypeError:
+                # Builtin
+                continue
             if fn != targetfn:
                 # Skip references to other modules outside this file
                 #bb.warn("Skipping %s" % name)
                 continue
-            lines, lineno = inspect.getsourcelines(functions[f])
+            try:
+                lines, lineno = inspect.getsourcelines(functions[f])
+            except TypeError:
+                # Builtin
+                continue
             src = "".join(lines)
             parser.parse_python(src, filename=fn, lineno=lineno, fixedhash=fixedhash+f)
             #bb.warn("Not cached %s" % f)

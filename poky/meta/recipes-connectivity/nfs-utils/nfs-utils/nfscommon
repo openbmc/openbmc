@@ -1,63 +1,279 @@
 #!/bin/sh
+
 ### BEGIN INIT INFO
 # Provides:          nfs-common
-# Required-Start:    $portmap hwclock
-# Required-Stop:     $portmap hwclock
-# Default-Start:     2 3 4 5
+# Required-Start:    $portmap $time
+# Required-Stop:     $portmap $time
+# Default-Start:     S
 # Default-Stop:      0 1 6
-# Short-Description: NFS support for both client and server
+# Short-Description: NFS support files common to client and server
 # Description:       NFS is a popular protocol for file sharing across
-#                    TCP/IP networks. This service provides various
+#		     TCP/IP networks. This service provides various
 #                    support functions for NFS mounts.
 ### END INIT INFO
-#
-# Startup script for nfs-utils
-#
-#
-# Location of executables:
 
-# Source function library.
+# What is this?
+DESC="NFS common utilities"
+
+# Read config
+DEFAULTFILE=/etc/default/nfs-utils
+NEED_STATD=
+NEED_GSSD=
+if nfsconf --isset general pipefs-directory; then
+    PIPEFS_MOUNTPOINT=$(nfsconf --get general pipefs-directory)
+else
+    PIPEFS_MOUNTPOINT=/var/lib/nfs/rpc_pipefs
+fi
+if [ -f $DEFAULTFILE ]; then
+    . $DEFAULTFILE
+fi
+
 . /etc/init.d/functions
 
-test -x "$NFS_STATD" || NFS_STATD=/usr/sbin/rpc.statd
-test -z "$STATD_PID" && STATD_PID=/var/run/rpc.statd.pid
-#
-# The default state directory is /var/lib/nfs
-test -n "$NFS_STATEDIR" || NFS_STATEDIR=/var/lib/nfs
-#
-#----------------------------------------------------------------------
-# Startup and shutdown functions.
-#  Actual startup/shutdown is at the end of this file.
+# Exit if required binaries are missing.
+[ -x /usr/sbin/rpc.statd ] || exit 0
 
-start_statd(){
-	echo -n "starting statd: "
-	start-stop-daemon --start --exec "$NFS_STATD" --pidfile "$STATD_PID"
-	echo done
-}
-stop_statd(){
-	echo -n 'stopping statd: '
-	start-stop-daemon --stop --quiet --signal 1 --pidfile "$STATD_PID"
-	echo done
-}
-#----------------------------------------------------------------------
 #
-# supported options:
-#  start
-#  stop
-#  restart: stops and starts mountd
-#FIXME: need to create the /var/lib/nfs/... directories
+# Parse the fstab file, and determine whether we need gssd. (The
+# /etc/defaults settings, if any, will override our autodetection.) This code
+# is partially adapted from the mountnfs.sh script in the sysvinit package.
+#
+AUTO_NEED_GSSD=no
+
+if [ -f /etc/fstab ]; then
+    exec 9<&0 </etc/fstab
+
+    while read -r DEV _ _ OPTS _
+    do
+	case $DEV in
+	    ''|\#*)
+		continue
+		;;
+	esac
+	OLDIFS="$IFS"
+	IFS=","
+	for OPT in $OPTS; do
+	    case "$OPT" in
+		sec=krb5|sec=krb5i|sec=krb5p)
+		    AUTO_NEED_GSSD=yes
+		;;
+	    esac
+	done
+	IFS="$OLDIFS"
+    done
+
+    exec 0<&9 9<&-
+fi
+
+case "$NEED_STATD" in
+    yes|no)
+        ;;
+    *)
+        NEED_STATD=yes
+        ;;
+esac
+
+case "$NEED_IDMAPD" in
+    yes|no)
+        ;;
+    *)
+        NEED_IDMAPD=yes
+	;;
+esac
+
+case "$NEED_GSSD" in
+    yes|no)
+        ;;
+    *)
+        NEED_GSSD=$AUTO_NEED_GSSD
+	;;
+esac
+
+do_modprobe() {
+    if [ -x /sbin/modprobe ] && [ -f /proc/modules ]
+    then
+        modprobe -q "$1" || true
+    fi
+}
+
+do_mount() {
+    if ! grep -E -qs "$1\$" /proc/filesystems
+    then
+	return 1
+    fi
+    if ! mountpoint -q "$2"
+    then
+	mount -t "$1" "$1" "$2"
+	return
+    fi
+    return 0
+}
+
+do_umount() {
+    if mountpoint -q "$1"
+    then
+	umount "$1"
+    fi
+    return 0
+}
+
+# See how we were called.
 case "$1" in
   start)
-	start_statd;;
+	echo -n "Starting $DESC ..."
+
+	if [ "$NEED_STATD" = yes ]; then
+	    echo -n " statd"
+
+	    # See if rpcbind is running
+	    if [ -x /usr/sbin/rpcinfo ]; then
+		/usr/sbin/rpcinfo -p >/dev/null 2>&1
+		RET=$?
+		if [ $RET != 0 ]; then
+		   echo
+		   echo "Not starting: portmapper is not running"
+		   exit 0
+		fi
+	    fi
+	    start-stop-daemon --start --oknodo --quiet \
+		--pidfile /run/rpc.statd.pid \
+	        --exec /usr/sbin/rpc.statd
+	    RET=$?
+	    if [ $RET != 0 ]; then
+	        echo " failed" $RET
+	        exit $RET
+	    else
+		if [ -d /run/sendsigs.omit.d ]; then
+		    rm -f /run/sendsigs.omit.d/statd
+		    ln -s /run/rpc.statd.pid /run/sendsigs.omit.d/statd
+		fi
+	    fi
+	fi
+
+	# Don't start idmapd and gssd if we don't have them (say, if /usr is not
+	# up yet).
+	[ -x /usr/sbin/rpc.idmapd ] || NEED_IDMAPD=no
+	[ -x /usr/sbin/rpc.gssd   ] || NEED_GSSD=no
+
+	if [ "$NEED_IDMAPD" = yes ] || [ "$NEED_GSSD" = yes ]
+	then
+	    do_modprobe sunrpc
+	    do_modprobe nfs
+	    do_modprobe nfsd
+	    mkdir -p "$PIPEFS_MOUNTPOINT"
+	    if do_mount rpc_pipefs $PIPEFS_MOUNTPOINT
+	    then
+	    	if [ "$NEED_IDMAPD" = yes ]
+		then
+	            ecno -n " idmapd"
+		    start-stop-daemon --start --oknodo --quiet \
+			    --exec /usr/sbin/rpc.idmapd
+		    RET=$?
+	            if [ $RET != 0 ]; then
+        	        echo " failed" $RET
+        	        exit $RET
+                    fi
+		fi
+		if [ "$NEED_GSSD" = yes ]
+		then
+		    do_modprobe rpcsec_gss_krb5
+	            echo -n " gssd"
+
+		    start-stop-daemon --start --oknodo --quiet \
+			    --exec /usr/sbin/rpc.gssd
+		    RET=$?
+	            if [ $RET != 0 ]; then
+        	        echo " failed" $RET
+        	        exit $RET
+                    fi
+		fi
+	    fi
+	fi
+	echo " done"
+	;;
+
   stop)
-	stop_statd;;
+	echo -n "Stopping $DESC ..."
+
+	if [ "$NEED_GSSD" = yes ]
+	then
+	    echo -n " gssd"
+	    start-stop-daemon --stop --oknodo --quiet \
+		    --name rpc.gssd
+	    RET=$?
+	    if [ $RET != 0 ]; then
+                echo " failed" $RET
+                exit $RET
+            fi
+	fi
+	if [ "$NEED_IDMAPD" = yes ]
+	then
+	    echo -n " idmapd"
+	    start-stop-daemon --stop --oknodo --quiet \
+		--name rpc.idmapd
+            RET=$?
+	    if [ $RET != 0 ]; then
+                echo " failed" $RET
+                exit $RET
+            fi
+	fi
+	if [ "$NEED_STATD" = yes ]
+	then
+	    echo -n " statd"
+	    start-stop-daemon --stop --oknodo --quiet \
+	        --name rpc.statd
+	    RET=$?
+	    if [ $RET != 0 ]; then
+                echo " failed" $RET
+                exit $RET
+            fi
+	fi
+	do_umount $PIPEFS_MOUNTPOINT 2>/dev/null || true
+	echo " done"
+	;;
+
   status)
-	status $NFS_STATD
-	exit $?;;
-  restart)
+	if [ "$NEED_STATD" = yes ]
+	then
+	    if ! pidof rpc.statd >/dev/null
+	    then
+	        echo "rpc.statd not running"
+	        exit 3
+	    fi
+	fi
+
+	if [ "$NEED_GSSD" = yes ]
+	then
+            if ! pidof rpc.gssd >/dev/null
+	    then
+		echo "rpc.gssd not running"
+		exit 3
+	    fi
+	fi
+
+	if [ "$NEED_IDMAPD" = yes ]
+	then
+            if ! pidof rpc.idmapd >/dev/null
+	    then
+		echo "rpc.idmapd not running"
+		exit 3
+	    fi
+	fi
+
+	echo "all daemons running"
+	exit 0
+	;;
+
+  restart | force-reload)
 	$0 stop
-	$0 start;;
+	sleep 1
+	$0 start
+	;;
+
   *)
-	echo "Usage: $0 {start|stop|status|restart}"
-	exit 1;;
+	echo "Usage: nfscommon {start|stop|status|restart}"
+	exit 1
+	;;
 esac
+
+exit 0

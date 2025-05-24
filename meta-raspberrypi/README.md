@@ -70,9 +70,10 @@ This layer depends on:
 ## Quick Start with kas
 
 1. Install kas build tool from PyPi (sudo pip3 install kas)
-2. kas build meta-raspberrypi/kas-poky-rpi.yml
-3. Use bmaptool to copy the generated .wic.bz2 file to the SD card
-4. Boot your RPI
+2. Set the `machine: ` in kas-poky-rpi.yml to one of the supported boards (see conf/machine/*.conf)
+3. kas build meta-raspberrypi/kas-poky-rpi.yml
+4. Use bmaptool to copy the generated .wic.bz2 file to the SD card
+5. Boot your RPI
 
 To adjust the build configuration with specific options (I2C, SPI, ...), simply add
 a section as follows:

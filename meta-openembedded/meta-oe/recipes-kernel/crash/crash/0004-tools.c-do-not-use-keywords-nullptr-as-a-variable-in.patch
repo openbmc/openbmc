@@ -1,0 +1,60 @@
+From 325a9d1b3b4ce76bf4556235c885e619e219622c Mon Sep 17 00:00:00 2001
+From: Lianbo Jiang <lijiang@redhat.com>
+Date: Fri, 24 Jan 2025 15:32:59 +0800
+Subject: [PATCH] tools.c: do not use keywords 'nullptr' as a variable in code
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Without the patch:
+
+  tools.c: In function ‘drop_core’:
+  tools.c:6251:23: error: expected identifier or ‘(’ before ‘nullptr’
+   6251 |         volatile int *nullptr;
+        |                       ^~~~~~~
+  tools.c:6259:17: error: lvalue required as left operand of assignment
+   6259 |         nullptr = NULL;
+        |                 ^
+  tools.c:6261:21: error: invalid type argument of unary ‘*’ (have ‘typeof (nullptr)’)
+   6261 |                 i = *nullptr;
+        |                     ^~~~~~~~
+  make[6]: *** [Makefile:345: tools.o] Error 1
+
+Note: this was observed on gcc version 15.0.1
+
+Signed-off-by: Lianbo Jiang <lijiang@redhat.com>
+Signed-off-by: mark.yang <mark.yang@lge.com>
+
+Upstream-Status: Backport [325a9d1 tools.c: do not use keywords 'nullptr' as a variable in code]
+---
+ tools.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tools.c b/tools.c
+index 85d8b6f..c9305be 100644
+--- a/tools.c
++++ b/tools.c
+@@ -6248,7 +6248,7 @@ lowest_bit_long(ulong val)
+ void
+ drop_core(char *s)
+ {
+-	volatile int *nullptr;
++	volatile int *ptr;
+ 	int i ATTRIBUTE_UNUSED;
+ 
+ 	if (s && ascii_string(s))
+@@ -6256,9 +6256,9 @@ drop_core(char *s)
+ 
+ 	kill((pid_t)pc->program_pid, 3);
+ 
+-	nullptr = NULL;
++	ptr = NULL;
+ 	while (TRUE)
+-		i = *nullptr;
++		i = *ptr;
+ }
+ 
+ 
+-- 
+2.34.1
+

@@ -1,4 +1,4 @@
-From 3540ddcc7448dc784b65c74424c8a25132cb8534 Mon Sep 17 00:00:00 2001
+From 80190be8d9c82ed816fb571abef416a1fbfb9a35 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 31 Jul 2018 17:24:47 +0800
 Subject: [PATCH] support authentication for kickstart
@@ -12,11 +12,14 @@ which the invoker could parse this specific error.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase to 3.62
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
  pykickstart/errors.py | 17 +++++++++++++++++
- pykickstart/load.py   | 32 +++++++++++++++++++++++++++-----
+ pykickstart/load.py   | 33 ++++++++++++++++++++++++++++-----
  pykickstart/parser.py |  4 ++--
- 3 files changed, 46 insertions(+), 7 deletions(-)
+ 3 files changed, 47 insertions(+), 7 deletions(-)
 
 diff --git a/pykickstart/errors.py b/pykickstart/errors.py
 index 8294f59..3d20bf8 100644
@@ -51,7 +54,7 @@ index 8294f59..3d20bf8 100644
 +    def __str__(self):
 +        return self.value
 diff --git a/pykickstart/load.py b/pykickstart/load.py
-index eb76b65..f51cf08 100644
+index e8301a4..45d402a 100644
 --- a/pykickstart/load.py
 +++ b/pykickstart/load.py
 @@ -18,9 +18,11 @@
@@ -85,7 +88,7 @@ index eb76b65..f51cf08 100644
      else:
          return _load_file(location)
  
-@@ -69,11 +71,31 @@ def load_to_file(location, destination):
+@@ -69,11 +71,32 @@ def load_to_file(location, destination):
          _copy_file(location, destination)
          return destination
  
@@ -111,19 +114,20 @@ index eb76b65..f51cf08 100644
 +
 +def _load_url(location, user=None, passwd=None):
      '''Load a location (URL or filename) and return contents as string'''
-+    auth = _get_auth(location, user=user, passwd=passwd)
  
++    auth = _get_auth(location, user=user, passwd=passwd)
++
      try:
--        request = requests.get(location, verify=SSL_VERIFY)
-+        request = requests.get(location, verify=SSL_VERIFY, auth=auth)
+-        request = requests.get(location, verify=SSL_VERIFY, timeout=120)
++        request = requests.get(location, verify=SSL_VERIFY, auth=auth, timeout=120)
      except SSLError as e:
          raise KickstartError(_('Error securely accessing URL "%s"') % location + ': {e}'.format(e=str(e)))
      except RequestException as e:
 diff --git a/pykickstart/parser.py b/pykickstart/parser.py
-index 7edf8aa..46c5299 100644
+index 12b0467..351dc1b 100644
 --- a/pykickstart/parser.py
 +++ b/pykickstart/parser.py
-@@ -790,7 +790,7 @@ class KickstartParser(object):
+@@ -831,7 +831,7 @@ class KickstartParser(object):
          i = PutBackIterator(s.splitlines(True) + [""])
          self._stateMachine(i)
  
@@ -132,7 +136,7 @@ index 7edf8aa..46c5299 100644
          """Process a kickstart file, given by the filename f."""
          if reset:
              self._reset()
-@@ -811,7 +811,7 @@ class KickstartParser(object):
+@@ -852,7 +852,7 @@ class KickstartParser(object):
          self.currentdir[self._includeDepth] = cd
  
          try:

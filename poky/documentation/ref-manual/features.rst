@@ -12,7 +12,7 @@ Features provide a mechanism for working out which packages should be
 included in the generated images. Distributions can select which
 features they want to support through the :term:`DISTRO_FEATURES` variable,
 which is set or appended to in a distribution's configuration file such
-as ``poky.conf``, ``poky-tiny.conf``, ``poky-lsb.conf`` and so forth.
+as ``poky.conf``, ``poky-tiny.conf``, ``poky-altcfg.conf`` and so forth.
 Machine features are set in the :term:`MACHINE_FEATURES` variable, which is
 set in the machine configuration file and specifies the hardware
 features for a given machine.
@@ -166,9 +166,6 @@ metadata, as extra layers can define their own:
 
 -  *multiarch:* Enable building applications with multiple architecture
    support.
-
--  *ld-is-gold:* Use the :wikipedia:`gold <Gold_(linker)>`
-   linker instead of the standard GCC linker (bfd).
 
 -  *ldconfig:* Include support for ldconfig and ``ld.so.conf`` on the
    target.

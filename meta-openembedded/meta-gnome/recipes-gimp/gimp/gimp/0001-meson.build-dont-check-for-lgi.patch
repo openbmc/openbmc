@@ -1,0 +1,35 @@
+From e56a6330f1e29e489601ea3e7cb31bfd2ebb787a Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Thu, 27 Mar 2025 21:02:22 +0100
+Subject: [PATCH] meson.build: dont check for lgi
+
+Checking if host can run lgi is pointless for cross-compile
+Set to be always true because we ensure to install lgi via PACKAGECONFIG
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ meson.build | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index c91e8fc97d..efbc2d8175 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1235,11 +1235,7 @@ if have_lua
+       endif
+ 
+       if is_supported_lua
+-        have_lua_lgi = run_command(lua, '-e',
+-                                   '''
+-                                   local lgi = require 'lgi'
+-                                   ''',
+-                                   check: false).returncode() == 0
++        have_lua_lgi = true
+       endif
+ 
+       if have_lua_lgi
+-- 
+2.49.0
+

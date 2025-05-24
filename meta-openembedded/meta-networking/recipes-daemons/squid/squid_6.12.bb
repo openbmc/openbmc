@@ -75,7 +75,7 @@ EXTRA_OECONF += "--with-default-user=squid \
 # Upstream issue closed as invalid : https://bugs.squid-cache.org/show_bug.cgi?id=5376
 BUILD_CXXFLAGS += "-std=c++17"
 
-export BUILDCXXFLAGS="${BUILD_CXXFLAGS}"
+export BUILDCXXFLAGS = "${BUILD_CXXFLAGS}"
 
 TESTDIR = "test-suite"
 

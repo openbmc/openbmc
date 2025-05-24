@@ -1,0 +1,28 @@
+From 4363ef59cc9f2169455f56453759d4a4d9b89a5f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Feb 2025 22:14:47 -0800
+Subject: [PATCH] Include time.h for timespec struct definition
+
+Fixes
+git/isobusfs/../libj1939.h:33:18: error: field has incomplete type 'struct timespec'
+   33 |         struct timespec next_send_time;
+      |                         ^
+
+Upstream-Status: Submitted [https://github.com/linux-can/can-utils/pull/579]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libj1939.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libj1939.h b/libj1939.h
+index 44393a2..7c19f43 100644
+--- a/libj1939.h
++++ b/libj1939.h
+@@ -17,6 +17,7 @@
+ #include <linux/can/j1939.h>
+ #include <stdbool.h>
+ #include <stdint.h>
++#include <time.h>
+ #include <sys/socket.h>
+ 
+ #ifndef J1939_LIB_H

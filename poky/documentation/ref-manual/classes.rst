@@ -600,7 +600,7 @@ You can also look for vulnerabilities in specific packages by passing
 ``-c cve_check`` to BitBake.
 
 After building the software with Bitbake, CVE check output reports are available in ``tmp/deploy/cve``
-and image specific summaries in ``tmp/deploy/images/*.cve`` or ``tmp/deploy/images/*.json`` files.
+and image specific summaries in ``tmp/deploy/images/*.json`` files.
 
 When building, the CVE checker will emit build time warnings for any detected
 issues which are in the state ``Unpatched``, meaning that CVE issue seems to affect the software component
@@ -2707,6 +2707,20 @@ For information on setting up and running ptests, see the
 ":ref:`test-manual/ptest:testing packages with ptest`"
 section in the Yocto Project Development Tasks Manual.
 
+.. _ref-classes-ptest-python-pytest:
+
+``ptest-python-pytest``
+=======================
+
+The :ref:`ref-classes-ptest-python-pytest` class can be inherited in Python-based
+recipes to automatically configure the :ref:`ref-classes-ptest` class for Python
+packages leveraging the `pytest <https://docs.pytest.org>`__ unit test framework.
+
+Within the recipe, the :term:`PTEST_PYTEST_DIR` variable specifies the path to
+the directory containing the tests that will be installed in :term:`D` by the
+:ref:`ref-tasks-install_ptest_base` task, as well as a specific ``run-ptest``
+script for this task.
+
 .. _ref-classes-python3-dir:
 
 ``python3-dir``
@@ -3401,6 +3415,19 @@ The variables used by this class are:
 -  :term:`UBOOT_FITIMAGE_ENABLE`: enable the generation of a U-Boot FIT image.
 -  :term:`UBOOT_MKIMAGE_DTCOPTS`: DTC options for U-Boot ``mkimage`` when
    rebuilding the FIT image containing the kernel.
+-  :term:`UBOOT_FIT_ARM_TRUSTED_FIRMWARE`: include the Trusted Firmware-A
+   (TF-A) binary in the U-Boot FIT image.
+-  :term:`UBOOT_FIT_ARM_TRUSTED_FIRMWARE_IMAGE`: specifies the path to the
+   Trusted Firmware-A (TF-A) binary.
+-  :term:`UBOOT_FIT_TEE`: include the Trusted Execution Environment (TEE)
+   binary in the U-Boot FIT image.
+-  :term:`UBOOT_FIT_TEE_IMAGE`: specifies the path to the Trusted Execution
+   Environment (TEE) binary.
+-  :term:`UBOOT_FIT_USER_SETTINGS`: adds a user-specific snippet to the U-Boot
+   Image Tree Source (ITS). Users can include their custom U-Boot Image Tree
+   Source (ITS) snippet in this variable.
+-  :term:`UBOOT_FIT_CONF_USER_LOADABLES`: adds one or more user-defined images
+   to the ``loadables`` property of the configuration node.
 
 See U-Boot's documentation for details about `verified boot
 <https://source.denx.de/u-boot/u-boot/-/blob/master/doc/uImage.FIT/verified-boot.txt>`__
@@ -3425,7 +3452,7 @@ on target hardware. Using ``systemd`` as init is recommended. Image builds
 should create an ESP partition for UEFI firmware and copy ``systemd-boot`` and
 UKI files there. Sample configuration for Wic images is provided in
 :oe_git:`scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in
-<openembedded-core/tree/scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in>`.
+</openembedded-core/tree/scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in>`.
 UKIs are generated using ``systemd`` reference implementation `ukify
 <https://www.freedesktop.org/software/systemd/man/latest/ukify.html>`__.
 This class uses a number of variables but tries to find sensible defaults for
@@ -3435,7 +3462,7 @@ The variables used by this class are:
 
 -  :term:`EFI_ARCH`: architecture name within EFI standard, set in
    :oe_git:`meta/conf/image-uefi.conf
-   <openembedded-core/tree/meta/conf/image-uefi.conf>`
+   </openembedded-core/tree/meta/conf/image-uefi.conf>`
 -  :term:`IMAGE_EFI_BOOT_FILES`: files to install to EFI boot partition
    created by the ``bootimg-efi`` Wic plugin
 -  :term:`INITRAMFS_IMAGE`: initramfs recipe name
@@ -3454,9 +3481,9 @@ The variables used by this class are:
 
 For examples on how to use this class see oeqa selftest
 :oe_git:`meta/lib/oeqa/selftest/cases/uki.py
-<openembedded-core/tree/meta/lib/oeqa/selftest/cases/uki.py>`.
+</openembedded-core/tree/meta/lib/oeqa/selftest/cases/uki.py>`.
 Also an oeqa runtime test :oe_git:`meta/lib/oeqa/runtime/cases/uki.py
-<openembedded-core/tree/meta/lib/oeqa/runtime/cases/uki.py>` is provided which
+</openembedded-core/tree/meta/lib/oeqa/runtime/cases/uki.py>` is provided which
 verifies that the target system booted the same UKI binary as was set at
 buildtime via :term:`UKI_FILENAME`.
 

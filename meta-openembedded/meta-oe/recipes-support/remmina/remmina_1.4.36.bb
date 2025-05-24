@@ -44,7 +44,7 @@ do_configure:append() {
 
 RDEPENDS:${PN} = "bash"
 
-FILES:${PN}+= " \
+FILES:${PN} += " \
     ${datadir}/metainfo \
     ${datadir}/mime \
 "

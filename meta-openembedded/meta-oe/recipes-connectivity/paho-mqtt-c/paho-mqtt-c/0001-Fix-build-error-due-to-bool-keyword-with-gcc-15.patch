@@ -1,0 +1,37 @@
+From 02fa96d0d59211e64483273e5253ca45c4395154 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 9 Apr 2025 19:05:55 +0900
+Subject: [PATCH] Fix build error due to bool keyword with gcc-15
+
+* gcc-15 uses gnu23 for c.
+  'bool' is a keyword.
+TOPDIR/tmp/work/core2-64-oe-linux/paho-mqtt-c/1.3.14/git/src/MQTTPacket.h:31:22: error: 'bool' cannot be defined via 'typedef'
+   31 | typedef unsigned int bool;
+      |                      ^~~~
+TOPDIR/tmp/work/core2-64-oe-linux/paho-mqtt-c/1.3.14/git/src/MQTTPacket.h:31:22: note: 'bool' is a keyword with '-std=c23' onwards
+TOPDIR/tmp/work/core2-64-oe-linux/paho-mqtt-c/1.3.14/git/src/MQTTPacket.h:31:1: warning: useless type name in empty declaration
+   31 | typedef unsigned int bool;
+      | ^~~~~~~
+
+Upstream-Status: Submitted [https://github.com/eclipse-paho/paho.mqtt.c/pull/1595]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+Signed-off-by: markyang92 <pllpokko@alumni.kaist.ac.kr>
+
+---
+ src/MQTTPacket.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/MQTTPacket.h b/src/MQTTPacket.h
+index fd384ae9..0c64a0f4 100644
+--- a/src/MQTTPacket.h
++++ b/src/MQTTPacket.h
+@@ -28,7 +28,9 @@
+ #include "LinkedList.h"
+ #include "Clients.h"
+ 
++#if defined __STDC__ && defined __STDC_VERSION__ && __STDC_VERSION__ <= 201710L
+ typedef unsigned int bool;
++#endif
+ typedef void* (*pf)(int, unsigned char, char*, size_t);
+ 
+ #include "MQTTProperties.h"

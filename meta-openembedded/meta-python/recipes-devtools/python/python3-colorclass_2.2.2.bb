@@ -8,7 +8,7 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "6d4fe287766166a98ca7bc6f6312daf04a0481b1eda43e7173484051c0ab4366"
 
-PYPI_PACKAGE="colorclass"
+PYPI_PACKAGE = "colorclass"
 
 RDEPENDS:${PN} += "\
     python3-ctypes \

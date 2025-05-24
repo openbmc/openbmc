@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "\
 inherit cargo cargo-update-recipe-crates pkgconfig
 
 export BINDGEN_EXTRA_CLANG_ARGS
-BINDGEN_EXTRA_CLANG_ARGS = "--sysroot=${WORKDIR}/recipe-sysroot -I${WORKDIR}/recipe-sysroot/usr/include"
+BINDGEN_EXTRA_CLANG_ARGS = "--sysroot=${STAGING_DIR_HOST} -I${STAGING_INCDIR}"
 
 SRC_URI += "git://github.com/westerndigitalcorporation/spdm-utils.git;protocol=https;branch=master"
 

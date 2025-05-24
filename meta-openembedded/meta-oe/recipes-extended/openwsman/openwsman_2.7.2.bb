@@ -34,8 +34,6 @@ inherit systemd cmake pkgconfig python3native perlnative
 SYSTEMD_SERVICE:${PN} = "openwsmand.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
-LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', " -fuse-ld=bfd ", '', d)}"
-
 EXTRA_OECMAKE = "-DBUILD_BINDINGS=NO \
                  -DBUILD_LIBCIM=NO \
                  -DBUILD_PERL=YES \

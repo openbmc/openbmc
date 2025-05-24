@@ -102,6 +102,13 @@ class OESelftestTestContext(OETestContext):
         oe.path.copytree(builddir + "/cache", newbuilddir + "/cache")
         oe.path.copytree(selftestdir, newselftestdir)
 
+        # if the last line of local.conf in newbuilddir is not empty and does not end with newline then add one
+        localconf_path = newbuilddir + "/conf/local.conf"
+        with open(localconf_path, "r+", encoding="utf-8") as f:
+            last_line = f.readlines()[-1]
+            if last_line and not last_line.endswith("\n"):
+                f.write("\n")
+
         subprocess.check_output("git init && git add * && git commit -a -m 'initial'", cwd=newselftestdir, shell=True)
 
         # Tried to used bitbake-layers add/remove but it requires recipe parsing and hence is too slow

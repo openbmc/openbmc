@@ -12,7 +12,8 @@ LIC_FILES_CHKSUM = "file://hdsploader/COPYING;md5=59530bdf33659b29e73d4adb9f9f65
                     file://ld10k1/COPYING.LIB;md5=a916467b91076e631dd8edb7424769c7 \
                     "
 
-SRC_URI = "https://www.alsa-project.org/files/pub/tools/${BP}.tar.bz2"
+SRC_URI = "https://www.alsa-project.org/files/pub/tools/${BP}.tar.bz2 \
+           file://0001-hdajackretask-fix-reset_changes_boot-declaration.patch"
 
 SRC_URI[sha256sum] = "0915c9634a502fd3655ca9c574d259bc9e79983d91d45aeacff6f3c00f8ae3e9"
 

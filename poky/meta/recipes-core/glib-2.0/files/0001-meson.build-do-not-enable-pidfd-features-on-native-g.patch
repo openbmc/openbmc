@@ -1,4 +1,4 @@
-From 51d592900e8acdec4f043ceeb23e32d27dded8eb Mon Sep 17 00:00:00 2001
+From d5e566c45a9ab4d7e51104ab176e6eb5f705f91d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sat, 16 Sep 2023 22:28:27 +0200
 Subject: [PATCH] meson.build: do not enable pidfd features on native glib
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 963815f..4d4a9f3 100644
+index 041b68e..155bfd4 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1048,7 +1048,8 @@ if cc.links('''#include <sys/syscall.h>
+@@ -1073,7 +1073,8 @@ if cc.links('''#include <sys/syscall.h>
                   waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
                   return 0;
                 }''', name : 'pidfd_open(2) system call')

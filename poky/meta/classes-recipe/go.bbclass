@@ -7,6 +7,9 @@
 inherit goarch
 inherit linuxloader
 
+# if the GO_IMPORT is not set in recipe generate an error
+GO_IMPORT ??= "${@bb.fatal("The recipe needs to set GO_IMPORT for go.bbclass to work")}"
+
 GO_PARALLEL_BUILD ?= "${@oe.utils.parallel_make_argument(d, '-p %d')}"
 
 export GODEBUG = "gocachehash=1"
@@ -15,7 +18,6 @@ GOROOT:class-native = "${STAGING_LIBDIR_NATIVE}/go"
 GOROOT:class-nativesdk = "${STAGING_DIR_TARGET}${libdir}/go"
 GOROOT = "${STAGING_LIBDIR}/go"
 export GOROOT
-export GOROOT_FINAL = "${libdir}/go"
 export GOCACHE = "${B}/.cache"
 
 export GOARCH = "${TARGET_GOARCH}"

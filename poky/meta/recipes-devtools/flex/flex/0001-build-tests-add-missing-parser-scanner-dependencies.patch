@@ -1,0 +1,51 @@
+From 47e3916842ffefd7def84ae85758fdcceeb77839 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 20 Mar 2025 12:16:50 +0000
+Subject: [PATCH] build(tests): add missing parser->scanner dependencies
+
+With sufficient parallelism and `make --shuffle` to reorder builds the
+test suite occasionally fails to build with errors like this:
+
+ tests/bison_yylval_parser.y:36:10: fatal error: bison_yylval_scanner.h: No such file or directory
+    36 | #include "bison_yylval_scanner.h"
+
+Solve this by adding the missing dependencies to the *_parser.o targets
+on the _scanner.h files.
+
+Upstream-Status: Submitted [https://github.com/westes/flex/pull/702]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/Makefile.am | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 2cb51df..d0c199d 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -343,6 +343,7 @@ FLEX = $(top_builddir)/src/flex
+ 
+ bison_nr_main.$(OBJEXT): bison_nr_parser.h bison_nr_scanner.h
+ bison_nr_scanner.$(OBJEXT): bison_nr_parser.h
++bison_nr_parser.$(OBJEXT): bison_nr_scanner.h
+ 
+ bison_nr_scanner.h: bison_nr_scanner.c
+ 	@if test ! -f $@; then rm -f $<; else :; fi
+@@ -350,6 +351,7 @@ bison_nr_scanner.h: bison_nr_scanner.c
+ 
+ bison_yylloc_main.$(OBJEXT): bison_yylloc_parser.h bison_yylloc_scanner.h
+ bison_yylloc_scanner.$(OBJEXT): bison_yylloc_parser.h
++bison_yylloc_parser.$(OBJEXT): bison_yylloc_scanner.h
+ 
+ bison_yylloc_scanner.h: bison_yylloc_scanner.c
+ 	@if test ! -f $@; then rm -f $<; else :; fi
+@@ -357,6 +359,7 @@ bison_yylloc_scanner.h: bison_yylloc_scanner.c
+ 
+ bison_yylval_main.$(OBJEXT): bison_yylval_parser.h bison_yylval_scanner.h
+ bison_yylval_scanner.$(OBJEXT): bison_yylval_parser.h
++bison_yylval_parser.$(OBJEXT): bison_yylval_scanner.h
+ 
+ bison_yylval_scanner.h: bison_yylval_scanner.c
+ 	@if test ! -f $@; then rm -f $<; else :; fi
+-- 
+2.43.0
+

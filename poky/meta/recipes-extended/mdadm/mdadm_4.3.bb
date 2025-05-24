@@ -28,7 +28,7 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/raid/mdadm/${BPN}-${PV}.tar.xz \
 
 SRC_URI[sha256sum] = "416727ae1f1080ea6e3090cea36dd076826fc369151e36ab736557ba92196f9f"
 
-inherit autotools-brokensep ptest systemd
+inherit ptest systemd
 
 DEPENDS = "udev"
 
@@ -44,28 +44,17 @@ CFLAGS:append:mipsarchn64 = ' -D__SANE_USERSPACE_TYPES__'
 CFLAGS:append:mipsarchn32 = ' -D__SANE_USERSPACE_TYPES__'
 
 EXTRA_OEMAKE = 'CHECK_RUN_DIR=0 CXFLAGS="${CFLAGS}" SYSTEMD_DIR=${systemd_system_unitdir} \
-                BINDIR="${base_sbindir}" UDEVDIR="${nonarch_base_libdir}/udev" LDFLAGS="${LDFLAGS}"'
+                BINDIR="${base_sbindir}" UDEVDIR="${nonarch_base_libdir}/udev" LDFLAGS="${LDFLAGS}" \
+                SYSROOT="${STAGING_DIR_TARGET}" STRIP='
 
 DEBUG_OPTIMIZATION:append = " -Wno-error"
 
-do_compile() {
-	oe_runmake SYSROOT="${STAGING_DIR_TARGET}"
-}
-
 do_install() {
-	export STRIP=""
-	autotools_do_install
-}
-
-do_install:append() {
+        oe_runmake 'DESTDIR=${D}' install install-systemd
         install -d ${D}/${sysconfdir}/
         install -m 644 ${S}/mdadm.conf-example ${D}${sysconfdir}/mdadm.conf
         install -d ${D}/${sysconfdir}/init.d
         install -m 755 ${UNPACKDIR}/mdadm.init ${D}${sysconfdir}/init.d/mdmonitor
-}
-
-do_install:append() {
-        oe_runmake install-systemd DESTDIR=${D}
 }
 
 do_compile_ptest() {

@@ -18,12 +18,11 @@ SRC_URI_EDK2_PLATFORMS ?= "git://github.com/tianocore/edk2-platforms.git;protoco
 SRCBRANCH_edk2 = "master"
 SRCBRANCH_edk2_platforms = "master"
 SRC_URI = "\
-    ${SRC_URI_EDK2};branch=${SRCBRANCH_edk2_platforms};name=edk2;destsuffix=edk2 \
-    ${SRC_URI_EDK2_PLATFORMS};branch=${SRCBRANCH_edk2};name=edk2-platforms;destsuffix=edk2/edk2-platforms \
-    file://0001-Platform-StMmRpmb-Fix-build.patch;patchdir=edk2-platforms \
+    ${SRC_URI_EDK2};branch=${SRCBRANCH_edk2};name=edk2;destsuffix=edk2 \
+    ${SRC_URI_EDK2_PLATFORMS};branch=${SRCBRANCH_edk2_platforms};name=edk2-platforms;destsuffix=edk2/edk2-platforms \
 "
 
-SRCREV_FORMAT         = "edk2_edk2-platforms"
+SRCREV_FORMAT = "edk2_edk2-platforms"
 UPSTREAM_CHECK_GITTAGREGEX = "^edk2-stable(?P<pver>\d+)$"
 
 COMPATIBLE_MACHINE ?= "invalid"
@@ -42,6 +41,9 @@ EDK2_ARCH:aarch64  = "AARCH64"
 EDK2_ARCH:x86      = "IA32"
 EDK2_ARCH:x86-64   = "X64"
 EDK2_ARCH:riscv64  = "RISCV64"
+
+# Use the package version as the version to be printed out but allow for it to be overridden
+EDK2_VERSION ?= "${PV}"
 
 # Extra arguments passed to build
 EDK2_EXTRA_BUILD   = ""
@@ -116,6 +118,7 @@ do_compile() {
        --tagname ${EDK_COMPILER} \
        --platform ${EDK2_PLATFORM_DSC} \
        ${@oe.utils.parallel_make_argument(d, "-n %d")} \
+       -D FIRMWARE_VER="${EDK2_VERSION}" \
        ${EDK2_EXTRA_BUILD}
 }
 

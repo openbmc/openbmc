@@ -23,7 +23,7 @@ RDEPENDS:${PN}-dev = " \
     bash \
 "
 
-export GO111MODULE="on"
+export GO111MODULE = "on"
 
 inherit go systemd pkgconfig features_check
 

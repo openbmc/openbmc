@@ -1,0 +1,54 @@
+From 4a8352eeaa99bbea3461696855c973447e87abdd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Mar 2025 15:14:16 -0700
+Subject: [PATCH] Add parameter signatures for getenv() and getopt()
+
+GCC-15 complains about it when building for musl C library
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bug-gawk/2025-03/msg00027.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ missing_d/fnmatch.c | 2 +-
+ support/getopt.c    | 2 +-
+ support/getopt.h    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/missing_d/fnmatch.c b/missing_d/fnmatch.c
+index ccb7e34..7f97fbf 100644
+--- a/missing_d/fnmatch.c
++++ b/missing_d/fnmatch.c
+@@ -121,7 +121,7 @@ USA.  */
+    whose names are inconsistent.  */
+ 
+ # if !defined _LIBC && !defined getenv
+-extern char *getenv ();
++extern char *getenv (const char*);
+ # endif
+ 
+ # ifndef errno
+diff --git a/support/getopt.c b/support/getopt.c
+index eeb71ba..e7ebd19 100644
+--- a/support/getopt.c
++++ b/support/getopt.c
+@@ -152,7 +152,7 @@ static struct _getopt_data getopt_data;
+    whose names are inconsistent.  */
+ 
+ #ifndef getenv
+-extern char *getenv ();
++extern char *getenv (const char*);
+ #endif
+ 
+ #endif /* not __GNU_LIBRARY__ */
+diff --git a/support/getopt.h b/support/getopt.h
+index 8393569..06482cf 100644
+--- a/support/getopt.h
++++ b/support/getopt.h
+@@ -181,7 +181,7 @@ extern int __posix_getopt (int ___argc, char *const *___argv,
+ #  endif
+ # endif
+ #else /* not __GNU_LIBRARY__ */
+-extern int getopt ();
++extern int getopt (int,  char * const*, const char *);
+ #endif /* __GNU_LIBRARY__ */
+ 
+ #ifndef __need_getopt

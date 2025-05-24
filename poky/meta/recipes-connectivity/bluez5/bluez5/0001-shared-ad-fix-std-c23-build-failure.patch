@@ -1,0 +1,34 @@
+From 5c4cbf5cb95e4fc1a53545af52b420a8008b3ffa Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 20 Nov 2024 13:02:56 +0000
+Subject: [PATCH 1/3] shared/ad: fix -std=c23 build failure
+
+gcc-15 switched to -std=c23 by default:
+
+    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
+
+As a result `bluez` fails the build as:
+
+    src/shared/ad.c:1090:24: error: incompatible types when returning type '_Bool' but 'const char *' was expected
+     1090 |                 return false;
+          |                        ^~~~~
+
+Upstream-Status: Backport [https://web.git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=da5b5b0ecb1ead38676768ef78d46449d404bdc0]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/shared/ad.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index d08ce7a..dac381b 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -1087,7 +1087,7 @@ bool bt_ad_add_name(struct bt_ad *ad, const char *name)
+ const char *bt_ad_get_name(struct bt_ad *ad)
+ {
+ 	if (!ad)
+-		return false;
++		return NULL;
+ 
+ 	return ad->name;
+ }

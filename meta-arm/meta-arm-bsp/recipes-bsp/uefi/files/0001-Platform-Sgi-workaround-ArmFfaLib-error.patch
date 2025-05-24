@@ -1,0 +1,41 @@
+From b368ff0e774508b60c18bc19fbfaaa3910616e66 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Wed, 2 Apr 2025 15:57:21 -0400
+Subject: [PATCH] Platform/Sgi: workaround ArmFfaLib error
+
+When attempting to build sgi575, the following error is encountered
+
+| Active Platform          = /builder/meta-arm/build/tmp/work/sgi575-poky-linux/edk2-firmware/202502/edk2/edk2-platforms/Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc
+|
+|
+| build.py...
+| /builder/meta-arm/build/tmp/work/sgi575-poky-linux/edk2-firmware/202502/edk2/edk2-platforms/Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc(...): error 4000: Instance of library class [ArmFfaLib] is not found
+| 	in [/builder/meta-arm/build/tmp/work/sgi575-poky-linux/edk2-firmware/202502/edk2/ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf] [AARCH64]
+| 	consumed by module [/builder/meta-arm/build/tmp/work/sgi575-poky-linux/edk2-firmware/202502/edk2/ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf]
+|
+|
+
+This is because commit 9f9a3de9e4c5595cd42d14c705570887630209d8 in
+edk2-firmware adds a reference to the ArmFfaLib in
+ArmPkg/Drivers/MmCommunicationDxe/MmCommunication.inf
+That file is referenced in Platform/ARM/SgiPkg/SgiPlatform.dsc.inc
+
+To workaround this issue, add the ArmFfaLib to Sgi575.dsc.
+
+Upstream-Status: Pending [https://github.com/tianocore/edk2-platforms/issues/761]
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+---
+ Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc b/Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc
+index f29272778d73..30f2d1fd49a7 100644
+--- a/Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc
++++ b/Platform/ARM/SgiPkg/Sgi575/Sgi575.dsc
+@@ -55,3 +55,6 @@
+ 
+ [Components.common]
+   Platform/ARM/SgiPkg/AcpiTables/Sgi575AcpiTables.inf
++
++[LibraryClasses.common.DXE_RUNTIME_DRIVER]
++  ArmFfaLib|ArmPkg/Library/ArmFfaLib/ArmFfaDxeLib.inf

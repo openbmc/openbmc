@@ -233,7 +233,6 @@ def filter_sizeovertotal(package_object, total_size):
 
     return '{:.1%}'.format(float(size)/float(total_size))
 
-from django.utils.safestring import mark_safe
 @register.filter
 def format_vpackage_rowclass(size):
     if size == -1:

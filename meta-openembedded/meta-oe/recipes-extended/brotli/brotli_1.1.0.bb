@@ -7,7 +7,7 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=941ee9cd1609382f946352712a319b4b"
 
 SRC_URI = "git://github.com/google/brotli.git;branch=master;protocol=https"
-SRCREV= "ed738e842d2fbdf2d6459e39267a633c4a9b2f5d"
+SRCREV = "ed738e842d2fbdf2d6459e39267a633c4a9b2f5d"
 
 S = "${WORKDIR}/git"
 

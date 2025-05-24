@@ -34,7 +34,7 @@ EXTRA_OECMAKE += '-DLIBGCC_LOCATE_CFLAGS="--sysroot=${STAGING_DIR_HOST}" \
                   -DCROSS_COMPILE="${TARGET_PREFIX}" \
                   -DTS_PLATFORM="${TS_PLATFORM}" \
                  '
-export CROSS_COMPILE="${TARGET_PREFIX}"
+export CROSS_COMPILE = "${TARGET_PREFIX}"
 
 # Default TS installation path
 TS_INSTALL = "/usr/${TS_ENV}"

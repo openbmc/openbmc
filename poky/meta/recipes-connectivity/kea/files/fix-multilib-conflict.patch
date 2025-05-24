@@ -8,17 +8,21 @@ Subject: [PATCH] There are conflict of config files between kea and lib32-kea:
      lib32-kea-1.7.10-r0.core2_32 and kea-1.7.10-r0.core2_64
 |  file /etc/kea/kea-dhcp4.conf conflicts between attempted installs of
      lib32-kea-1.7.10-r0.core2_32 and kea-1.7.10-r0.core2_64
+|  file /etc/kea/kea-dhcp6.conf conflicts between attempted installs of
+     lib32-kea-2.6.1-r0.core2_32 and kea-2.6.1-r0.core2_64
 
 Because they are all commented out, replace the expanded libdir path with
 '$libdir' in the config files to avoid conflict.
 
 Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/issues/2602]
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
 
 ---
  src/bin/keactrl/kea-ctrl-agent.conf.pre | 3 ++-
  src/bin/keactrl/kea-dhcp4.conf.pre      | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+ src/bin/keactrl/kea-dhcp6.conf.pre      | 4 ++--
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/src/bin/keactrl/kea-ctrl-agent.conf.pre b/src/bin/keactrl/kea-ctrl-agent.conf.pre
 index e6ae8b8..50a3092 100644
@@ -55,4 +59,26 @@ index 6edb8a1..b2a7385 100644
 +    //       "library": "$libdir/kea/hooks/libdhcp_flex_id.so",
      //       "parameters": {
      //           "identifier-expression": "relay4[2].hex"
+     //       }
+diff --git a/src/bin/keactrl/kea-dhcp6.conf.pre b/src/bin/keactrl/kea-dhcp6.conf.pre
+index 271021b..5b85854 100644
+--- a/src/bin/keactrl/kea-dhcp6.conf.pre
++++ b/src/bin/keactrl/kea-dhcp6.conf.pre
+@@ -201,7 +201,7 @@
+     //       // of all devices serviced by Kea, including their identifiers
+     //       // (like MAC address), their location in the network, times
+     //       // when they were active etc.
+-    //       "library": "@libdir@/kea/hooks/libdhcp_legal_log.so",
++    //       "library": "$libdir/kea/hooks/libdhcp_legal_log.so",
+     //       "parameters": {
+     //           "path": "/var/lib/kea",
+     //           "base-name": "kea-forensic6"
+@@ -218,7 +218,7 @@
+     //       // of specific options or perhaps even a combination of several
+     //       // options and fields to uniquely identify a client. Those scenarios
+     //       // are addressed by the Flexible Identifiers hook application.
+-    //       "library": "@libdir@/kea/hooks/libdhcp_flex_id.so",
++    //       "library": "$libdir/kea/hooks/libdhcp_flex_id.so",
+     //       "parameters": {
+     //           "identifier-expression": "relay6[0].option[37].hex"
      //       }

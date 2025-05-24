@@ -29,6 +29,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/lmbench/lmbench-${PV}.tgz \
            file://0001-doc-Fix-typos-in-lat_unix_connect-manual-page.patch \
            file://0001-bench.h-Fix-typo-in-specifying-string.h.patch \
            file://0001-scripts-build-Fix-the-tests-to-build-with-clang15.patch \
+           file://0001-Fix-build-errors-related-to-incorrect-function-param.patch \
            "
 SRC_URI[sha256sum] = "cbd5777d15f44eab7666dcac418054c3c09df99826961a397d9acf43d8a2a551"
 

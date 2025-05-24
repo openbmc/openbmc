@@ -18,7 +18,7 @@ SRCREV = "a2d96f40e707ba54b57e7d98c3277d3ea6611ace"
 S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig update-alternatives
-export ac_cv_sys_file_offset_bits="64"
+export ac_cv_sys_file_offset_bits = "64"
 
 EXTRA_OECONF = "--program-prefix= --program-suffix=.im7 --without-perl --enable-largefile"
 

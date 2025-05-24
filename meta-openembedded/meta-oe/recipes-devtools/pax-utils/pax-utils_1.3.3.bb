@@ -30,6 +30,6 @@ PACKAGECONFIG ??= ""
 
 PACKAGECONFIG[libcap] = "--with-caps, --without-caps, libcap"
 PACKAGECONFIG[libseccomp] = "--with-seccomp, --without-seccomp, libseccomp"
-PACKAGECONFIG[pyelftools] = "--with-python, --without-python,, pyelftools"
+PACKAGECONFIG[pyelftools] = "--with-python, --without-python,, python3-pyelftools"
 
 EXTRA_OECONF += "--enable-largefile"

@@ -1,0 +1,32 @@
+From 54242aa53da0d69c04b76c22120956ac6079ef6f Mon Sep 17 00:00:00 2001
+From: Joe Slater <jslater@windriver.com>
+Date: Thu, 27 Mar 2025 11:12:33 +0800
+Subject: [PATCH] Fix sha256 for big-endian machines
+
+After computing the digest, big-endian machines would
+memset() the digest to the first byte of state instead
+of using memcpy() to transfer it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Joe Slater <jslater@windriver.com>
+---
+ src/sh_checksum.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sh_checksum.c b/src/sh_checksum.c
+index e434d5c..dc23738 100644
+--- a/src/sh_checksum.c
++++ b/src/sh_checksum.c
+@@ -468,7 +468,7 @@ void SHA256_Final(sha2_byte digest[SHA256_DIGEST_LENGTH], SHA256_CTX* context)
+       }
+     }
+ #else
+-    memset(d, context->state, SHA256_DIGEST_LENGTH);
++    memcpy(d, context->state, SHA256_DIGEST_LENGTH);
+     /* bcopy(context->state, d, SHA256_DIGEST_LENGTH); */
+ #endif
+   }
+-- 
+2.34.1
+

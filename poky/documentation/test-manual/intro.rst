@@ -51,13 +51,11 @@ fashion. Basically, during the development of a Yocto Project release,
 the Autobuilder tests if things work. The Autobuilder builds all test
 targets and runs all the tests.
 
-The Yocto Project uses now uses standard upstream
-Buildbot (`version 3.8 <https://docs.buildbot.net/3.8.0/>`__) to
-drive its integration and testing. Buildbot has a plug-in interface
-that the Yocto Project customizes using code from the
-``yocto-autobuilder2`` repository, adding its own console UI plugin. The
-resulting UI plug-in allows you to visualize builds in a way suited to
-the project's needs.
+The Yocto Project uses standard upstream Buildbot to drive its integration and
+testing. Buildbot has a plug-in interface that the Yocto Project customizes
+using code from the :yocto_git:`yocto-autobuilder2 </yocto-autobuilder2>`
+repository, adding its own console UI plugin. The resulting UI plug-in allows
+you to visualize builds in a way suited to the project's needs.
 
 A ``helper`` layer provides configuration and job management through
 scripts found in the ``yocto-autobuilder-helper`` repository. The

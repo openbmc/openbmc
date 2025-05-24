@@ -44,7 +44,7 @@ following requirements:
    much more will help to run multiple builds and increase
    performance by reusing build artifacts.
 
--  At least &MIN_RAM; Gbytes of RAM, though a modern modern build host with as
+-  At least &MIN_RAM; Gbytes of RAM, though a modern build host with as
    much RAM and as many CPU cores as possible is strongly recommended to
    maximize build performance.
 

@@ -30,6 +30,8 @@ python __anonymous () {
         grubtarget = 'riscv64'
     elif re.match('riscv32', target):
         grubtarget = 'riscv32'
+    elif re.match('loongarch64', target):
+        grubtarget = 'loongarch64'
     else:
         raise bb.parse.SkipRecipe("grub-efi is incompatible with target %s" % target)
     grubimage = prefix + d.getVar("EFI_BOOT_IMAGE")
@@ -43,6 +45,9 @@ inherit deploy
 
 CACHED_CONFIGUREVARS += "ac_cv_path_HELP2MAN="
 EXTRA_OECONF += "--enable-efiemu=no"
+
+# Define GRUB_MKIMAGE_OPTS variable for additional grub-mkimage options (e.g., disabling shim lock)
+GRUB_MKIMAGE_OPTS ?= ""
 
 do_mkimage() {
 	cd ${B}
@@ -60,7 +65,7 @@ do_mkimage() {
 	# built in cfg file provided via this recipe
 	grub-mkimage -v -c ${UNPACKDIR}/cfg -p ${EFIDIR} -d ./grub-core/ \
 	               -O ${GRUB_TARGET}-efi -o ./${GRUB_IMAGE_PREFIX}${GRUB_IMAGE} \
-	               ${GRUB_MKIMAGE_MODULES}
+	               ${GRUB_MKIMAGE_OPTS} ${GRUB_MKIMAGE_MODULES}
 }
 
 addtask mkimage before do_install after do_compile

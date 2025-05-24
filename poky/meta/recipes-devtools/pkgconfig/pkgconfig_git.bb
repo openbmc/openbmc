@@ -31,8 +31,6 @@ PACKAGECONFIG:class-native = ""
 
 PACKAGECONFIG[glib] = "--without-internal-glib,--with-internal-glib,glib-2.0 pkgconfig-native"
 
-acpaths = "-I ."
-
 BBCLASSEXTEND = "native nativesdk"
 
 # Set an empty dev package to ensure the base PN package gets

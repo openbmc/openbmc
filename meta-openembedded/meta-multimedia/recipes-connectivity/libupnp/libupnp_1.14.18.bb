@@ -12,7 +12,7 @@ SRCREV = "c540ce2431bdeac73359029d4592b45790e1d154"
 SRC_URI = "git://github.com/pupnp/pupnp.git;protocol=https;branch=branch-1.14.x \
           "
 
-S="${WORKDIR}/git"
+S = "${WORKDIR}/git"
 
 inherit autotools pkgconfig
 

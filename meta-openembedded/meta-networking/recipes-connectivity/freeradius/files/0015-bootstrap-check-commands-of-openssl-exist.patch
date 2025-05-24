@@ -1,4 +1,4 @@
-From 78494ea005bd38324953b05176d6eb2c3f55af2c Mon Sep 17 00:00:00 2001
+From e8802c019085c743dc691e9329f05f7e559d1fa5 Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Sun, 8 Jan 2023 23:21:24 +0800
 Subject: [PATCH] bootstrap: check commands of openssl exist

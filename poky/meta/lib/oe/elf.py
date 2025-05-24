@@ -88,6 +88,7 @@ def machine_dict(d):
                   "i586":       (   3,     0,    0,          True,          32),
                   "i686":       (   3,     0,    0,          True,          32),
                   "x86_64":     (  62,     0,    0,          True,          64),
+                  "loongarch64":( 258,     0,    0,          True,          64),
                   "mips":       (   8,     0,    0,          False,         32),
                   "mipsel":     (   8,     0,    0,          True,          32),
                   "mips64":     (   8,     0,    0,          False,         64),

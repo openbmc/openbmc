@@ -1,5 +1,5 @@
 SUMMARY = "Gammu bindings for Python"
-DESCRIPTION ="Python bindings for the Gammu library."
+DESCRIPTION = "Python bindings for the Gammu library."
 HOMEPAGE = "https://wammu.eu/python-gammu/"
 BUGRACKER = "https://github.com/gammu/python-gammu/issues"
 LICENSE = "GPL-2.0-or-later"

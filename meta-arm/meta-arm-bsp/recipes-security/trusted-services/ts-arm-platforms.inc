@@ -22,6 +22,7 @@ SRC_URI:append:corstone1000  = " \
     file://0018-Make-RSS-and-MHU-sizes-compile-time-definitions-user.patch \
     file://0019-Align-PSA-Crypto-with-TF-Mv2.1.patch \
     file://0020-se-proxy-protobuf-change.patch \
+    file://0021-Align-PSA-Crypto-structs-with-TF-Mv2.1.1.patch \
     "
 
 # The patches above introduce errors with GCC 14.1, silence them for now

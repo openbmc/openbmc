@@ -39,5 +39,5 @@ OECMAKE_CXX_FLAGS:remove = "-D_FORTIFY_SOURCE=2"
 
 # Override yoctos default linux specific toolchain file. trusted-services.inc
 # will add a proper tooclhain option.
-OECMAKE_ARGS:remove="-DCMAKE_TOOLCHAIN_FILE:FILEPATH=${WORKDIR}/toolchain.cmake"
+OECMAKE_ARGS:remove = "-DCMAKE_TOOLCHAIN_FILE:FILEPATH=${WORKDIR}/toolchain.cmake"
 

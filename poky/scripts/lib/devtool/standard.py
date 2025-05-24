@@ -1951,7 +1951,7 @@ def _reset(recipes, no_clean, remove_work, config, basepath, workspace):
             lines = f.readlines()
             with open(new_layerconf_file, 'a') as nf:
                 for line in lines:
-                    pprovider_exp = r'^PREFERRED_PROVIDER_.*? = "' + pn + r'"$'
+                    pprovider_exp = r'^PREFERRED_PROVIDER_.*? = "' + re.escape(pn) + r'"$'
                     if not re.match(pprovider_exp, line):
                         nf.write(line)
                     else:

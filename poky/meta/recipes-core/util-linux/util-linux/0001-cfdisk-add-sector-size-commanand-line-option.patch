@@ -1,0 +1,90 @@
+From 724b95ee6847613e23ca18f4918d4e65ff5b270e Mon Sep 17 00:00:00 2001
+From: Karel Zak <kzak@redhat.com>
+Date: Mon, 14 Oct 2024 15:48:46 +0200
+Subject: [PATCH 1/2] cfdisk: add --sector-size commanand line option
+
+* improves compatibility with fdisk
+* add ability to work with disk images where libfdisk defaults to 512
+
+Signed-off-by: Karel Zak <kzak@redhat.com>
+
+Upstream-Status: Backport [fd38ee2274f7a30393d3839dfce556260355c3fa]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ disk-utils/cfdisk.8.adoc |  3 +++
+ disk-utils/cfdisk.c      | 15 ++++++++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/disk-utils/cfdisk.8.adoc b/disk-utils/cfdisk.8.adoc
+index 97fad621d..759f39f0e 100644
+--- a/disk-utils/cfdisk.8.adoc
++++ b/disk-utils/cfdisk.8.adoc
+@@ -55,6 +55,9 @@ Use exclusive BSD lock for device or file it operates. The optional argument _mo
+ *-r*, *--read-only*::
+ Forced open in read-only mode.
+ 
++*-b*, *--sector-size* _sectorsize_::
++Specify the sector size of the disk. Valid values are 512, 1024, 2048, and 4096. The kernel is aware of the sector size for regular block devices. Use this option only on very old kernels, when working with disk images, or to override the kernel's default sector size. Since util-linux-2.17, *fdisk* distinguishes between logical and physical sector size. This option changes both sector sizes to the specified _sectorsize_.
++
+ *-z*, *--zero*::
+ Start with an in-memory zeroed partition table. This option does not zero the partition table on the disk; rather, it simply starts the program without reading the existing partition table. This option allows you to create a new partition table from scratch or from an *sfdisk*(8)-compatible script.
+ 
+diff --git a/disk-utils/cfdisk.c b/disk-utils/cfdisk.c
+index 183b7671e..f37e2d72a 100644
+--- a/disk-utils/cfdisk.c
++++ b/disk-utils/cfdisk.c
+@@ -2739,6 +2739,8 @@ static void __attribute__((__noreturn__)) usage(void)
+ 	      _("     --lock[=<mode>]      use exclusive device lock (%s, %s or %s)\n"), "yes", "no", "nonblock");
+ 	fputs(_(" -r, --read-only          forced open cfdisk in read-only mode\n"), out);
+ 
++	fputs(_(" -b, --sector-size <size> physical and logical sector size\n"), out);
++
+ 	fputs(USAGE_SEPARATOR, out);
+ 	fprintf(out, USAGE_HELP_OPTIONS(26));
+ 
+@@ -2751,6 +2753,7 @@ int main(int argc, char *argv[])
+ 	const char *diskpath = NULL, *lockmode = NULL;
+ 	int rc, c, colormode = UL_COLORMODE_UNDEF;
+ 	int read_only = 0;
++	size_t user_ss = 0;
+ 	struct cfdisk _cf = { .lines_idx = 0 },
+ 		      *cf = &_cf;
+ 	enum {
+@@ -2760,6 +2763,7 @@ int main(int argc, char *argv[])
+ 		{ "color",   optional_argument, NULL, 'L' },
+ 		{ "lock",    optional_argument, NULL, OPT_LOCK },
+ 		{ "help",    no_argument,       NULL, 'h' },
++		{ "sector-size", required_argument, NULL, 'b' },
+ 		{ "version", no_argument,       NULL, 'V' },
+ 		{ "zero",    no_argument,	NULL, 'z' },
+ 		{ "read-only", no_argument,     NULL, 'r' },
+@@ -2771,8 +2775,15 @@ int main(int argc, char *argv[])
+ 	textdomain(PACKAGE);
+ 	close_stdout_atexit();
+ 
+-	while((c = getopt_long(argc, argv, "L::hVzr", longopts, NULL)) != -1) {
++	while((c = getopt_long(argc, argv, "b:L::hVzr", longopts, NULL)) != -1) {
+ 		switch(c) {
++		case 'b':
++			user_ss = strtou32_or_err(optarg,
++					_("invalid sector size argument"));
++			if (user_ss != 512 && user_ss != 1024 &&
++			    user_ss != 2048 && user_ss != 4096)
++				errx(EXIT_FAILURE, _("invalid sector size argument"));
++			break;
+ 		case 'h':
+ 			usage();
+ 			break;
+@@ -2811,6 +2822,8 @@ int main(int argc, char *argv[])
+ 	cf->cxt = fdisk_new_context();
+ 	if (!cf->cxt)
+ 		err(EXIT_FAILURE, _("failed to allocate libfdisk context"));
++	if (user_ss)
++		fdisk_save_user_sector_size(cf->cxt, user_ss, user_ss);
+ 
+ 	fdisk_set_ask(cf->cxt, ask_callback, (void *) cf);
+ 
+-- 
+2.25.1
+

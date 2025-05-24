@@ -29,3 +29,6 @@ do_configure() {
     sed -i 's,cf_have_ncuconfig=unknown,cf_have_ncuconfig=yes,g' -i configure
     oe_runconf
 }
+do_install:append () {
+        ln -sf ${bindir}/${HOST_SYS}-dialog ${D}${bindir}/${PN}
+}

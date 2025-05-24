@@ -113,6 +113,9 @@ SPDX_ON_BEHALF_OF[doc] = "The base variable name to describe the Agent on who's 
 SPDX_PACKAGE_SUPPLIER[doc] = "The base variable name to describe the Agent who \
     is supplying artifacts produced by the build"
 
+SPDX_PACKAGE_VERSION ??= "${PV}"
+SPDX_PACKAGE_VERSION[doc] = "The version of a package, software_packageVersion \
+    in software_Package"
 
 IMAGE_CLASSES:append = " create-spdx-image-3.0"
 SDK_CLASSES += "create-spdx-sdk-3.0"
@@ -134,7 +137,6 @@ python do_create_spdx() {
     import oe.spdx30_tasks
     oe.spdx30_tasks.create_spdx(d)
 }
-do_create_spdx[vardepsexclude] += "BB_NUMBER_THREADS SPDX_BUILD_HOST"
 do_create_spdx[vardeps] += "\
     SPDX_INCLUDE_BITBAKE_PARENT_BUILD \
     SPDX_PACKAGE_ADDITIONAL_PURPOSE \
@@ -170,7 +172,7 @@ python do_create_package_spdx() {
     import oe.spdx30_tasks
     oe.spdx30_tasks.create_package_spdx(d)
 }
-do_create_package_spdx[vardepsexclude] += "OVERRIDES SPDX_MULTILIB_SSTATE_ARCHS"
+oe.spdx30_tasks.create_package_spdx[vardepsexclude] = "OVERRIDES"
 
 addtask do_create_package_spdx after do_create_spdx before do_build do_rm_work
 SSTATETASKS += "do_create_package_spdx"

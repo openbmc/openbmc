@@ -21,8 +21,8 @@ RDEPENDS:${PN} += "\
     perl-module-universal \
 "
 
-export LIBLZMA_INCLUDE="-I${STAGING_DIR_HOST}${includedir}"
-export LIBLZMA_LIB="-I${STAGING_DIR_HOST}${libdir}"
+export LIBLZMA_INCLUDE = "-I${STAGING_DIR_HOST}${includedir}"
+export LIBLZMA_LIB = "-I${STAGING_DIR_HOST}${libdir}"
 
 do_compile() {
 	export LIBC="$(find ${STAGING_DIR_TARGET}/${base_libdir}/ -name 'libc-*.so')"

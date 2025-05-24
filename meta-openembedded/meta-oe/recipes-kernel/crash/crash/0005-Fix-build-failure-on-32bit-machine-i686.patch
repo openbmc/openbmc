@@ -1,0 +1,83 @@
+From 2724bb1d0260f3886f8a3d533838caf80c7e61e5 Mon Sep 17 00:00:00 2001
+From: Lianbo Jiang <lijiang@redhat.com>
+Date: Fri, 24 Jan 2025 17:56:23 +0800
+Subject: [PATCH 10/10] Fix build failure on 32bit machine(i686)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This issue was caused by commit 0f39e33d3504 with the following
+compilation error:
+
+  frame.c: In function ‘CORE_ADDR frame_unwind_pc(frame_info*)’:
+  frame.c:982:35: error: cannot convert ‘CORE_ADDR*’ {aka ‘long long unsigned int*’} to ‘ulong*’ {aka ‘long unsigned int*’}
+    982 |           crash_decode_ptrauth_pc(&pc);
+        |                                   ^~~
+        |                                   |
+        |                                   CORE_ADDR* {aka long long unsigned int*}
+  frame.c:948:48: note: initializing argument 1 of ‘void crash_decode_ptrauth_pc(ulong*)’
+    948 | extern "C" void crash_decode_ptrauth_pc(ulong* pc);
+        |                                         ~~~~~~~^~
+
+Upstream-Status: Backport [https://github.com/crash-utility/crash/commit/2724bb1d0260f3886f8a3d533838caf80c7e61e5]
+Fixes: 0f39e33d3504 ("arm64: add pac mask to better support gdb stack unwind")
+Reported-by: Guanyou.Chen <chenguanyou@xiaomi.com>
+Signed-off-by: Lianbo Jiang <lijiang@redhat.com>
+---
+ gdb-10.2.patch  | 6 +++---
+ gdb_interface.c | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/gdb-10.2.patch b/gdb-10.2.patch
+index 8f5d7db22840..d22f2d6d75bc 100644
+--- a/gdb-10.2.patch
++++ b/gdb-10.2.patch
+@@ -55,7 +55,7 @@ exit 0
+  # your system doesn't have fcntl.h in /usr/include (which is where it
+  # should be according to Posix).
+ -DEFS = @DEFS@
+-+DEFS = -DCRASH_MERGE @DEFS@
+++DEFS = -DCRASH_MERGE -D${CRASH_TARGET} @DEFS@
+  GDB_CFLAGS = -I. -I$(srcdir) -I$(srcdir)/config \
+  	-DLOCALEDIR="\"$(localedir)\"" $(DEFS)
+  
+@@ -16222,7 +16222,7 @@ exit 0
+    return NULL;
+  }
+ 
+-+#ifdef CRASH_MERGE
+++#if defined(CRASH_MERGE) && defined(ARM64)
+ +extern "C" void crash_decode_ptrauth_pc(ulong* pc);
+ +#endif
+ +
+@@ -16233,7 +16233,7 @@ exit 0
+        try
+ 	{
+ 	  pc = gdbarch_unwind_pc (prev_gdbarch, this_frame);
+-+#ifdef CRASH_MERGE
+++#if defined(CRASH_MERGE) && defined(ARM64)
+ +	  crash_decode_ptrauth_pc(&pc);
+ +#endif
+ 	  pc_p = true;
+diff --git a/gdb_interface.c b/gdb_interface.c
+index e108d097ee5f..c2e99f5c156a 100644
+--- a/gdb_interface.c
++++ b/gdb_interface.c
+@@ -1084,12 +1084,12 @@ int crash_get_current_task_reg (int regno, const char *regname,
+ }
+ 
+ /* arm64 kernel lr maybe has patuh */
++#ifdef ARM64
+ void crash_decode_ptrauth_pc(ulong *pc);
+ void crash_decode_ptrauth_pc(ulong *pc)
+ {
+-#ifdef ARM64
+ 	struct machine_specific *ms = machdep->machspec;
+ 	if (is_kernel_text(*pc | ms->CONFIG_ARM64_KERNELPACMASK))
+ 		*pc |= ms->CONFIG_ARM64_KERNELPACMASK;
+-#endif /* !ARM64 */
+ }
++#endif /* !ARM64 */
+-- 
+2.47.1
+

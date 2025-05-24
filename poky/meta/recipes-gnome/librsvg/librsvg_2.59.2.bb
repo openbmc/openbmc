@@ -34,7 +34,7 @@ UPSTREAM_CHECK_REGEX = "librsvg-(?P<pver>\d+\.\d+\.(?!9\d+)\d+)"
 # for cargo to be happy
 BASEDEPENDS:append = " cargo-native"
 
-export EXTRA_NATIVE_PKGCONFIG_PATH = "${B}/meson-uninstalled:"
+export EXTRA_NATIVE_PKGCONFIG_PATH = ":${B}/meson-uninstalled"
 export RUST_BACKTRACE = "full"
 export RUSTFLAGS
 

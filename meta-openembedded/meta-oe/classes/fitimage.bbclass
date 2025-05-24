@@ -276,7 +276,7 @@ def fitimage_emit_subsection_signature(d, fd, sign_images_list):
     fd.write('\t\t\tsignature-1 {\n')
     fd.write(f'\t\t\t\talgo = "{hash_algo},{encrypt_algo}";\n')
     if conf_sign_keyname:
-        fd.write(f'\t\t\t\tkey-name-hint = {conf_sign_keyname}";\n')
+        fd.write(f'\t\t\t\tkey-name-hint = "{conf_sign_keyname}";\n')
     fd.write(f'\t\t\t\tsign-images = {sign_images};\n')
     fd.write(f'\t\t\t\tsigner-name = "{signer_name}";\n')
     fd.write(f'\t\t\t\tsigner-version = "{signer_version}";\n')
@@ -341,9 +341,9 @@ def fitimage_emit_section_config_fdto(d, fd, dtb, compatible):
 
     fd.write(f'\t\t{dtb} {{\n')
     fd.write(f'\t\t\tdescription = "Device Tree Overlay";\n')
-    fd.write(f'\t\t\tfdt = "fdt-{dtb}";')
+    fd.write(f'\t\t\tfdt = "fdt-{dtb}";\n')
     if compatible:
-       fd.write(f'\t\t\tcompatible = "{compatible}";')
+       fd.write(f'\t\t\tcompatible = "{compatible}";\n')
 
     if sign == "1":
         sign_images = ["fdt"]
@@ -493,7 +493,7 @@ do_configure[postfuncs] += "write_manifest"
 do_fitimage () {
     if [ "${FITIMAGE_SIGN}" = "1" ]; then
         uboot-mkimage ${FITIMAGE_MKIMAGE_EXTRA_ARGS} \
-            -k ${FITIMAGE_SIGN_KEYDIR} -r \
+            -k "${FITIMAGE_SIGN_KEYDIR}" -r \
             -f "${B}/manifest.its" \
             "${B}/fitImage"
     else

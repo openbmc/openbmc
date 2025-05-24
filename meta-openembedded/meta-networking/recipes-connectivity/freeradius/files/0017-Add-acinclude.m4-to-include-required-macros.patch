@@ -1,4 +1,4 @@
-From 40abff4062d0521cf2b2a8a4660a3d2933f86f9d Mon Sep 17 00:00:00 2001
+From f48b2887ef2ecff333a5d00551e108fc283c2ba5 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Mon, 1 Apr 2024 09:09:07 +0000
 Subject: [PATCH] Add acinclude.m4 to include required macros
@@ -57,5 +57,5 @@ index 0000000000..690efc3258
 +   echo "$as_me:$LINENO: \$? = $ac_status" >&AS_MESSAGE_LOG_FD
 +   (exit $ac_status); }])
 -- 
-2.35.5
+2.25.1
 

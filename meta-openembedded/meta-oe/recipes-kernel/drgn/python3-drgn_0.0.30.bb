@@ -17,7 +17,7 @@ DEPENDS = "\
     elfutils \
     "
 
-DEPENDS:append:toolchain-clang:class-target ="\
+DEPENDS:append:toolchain-clang:class-target = "\
     openmp \
     "
 

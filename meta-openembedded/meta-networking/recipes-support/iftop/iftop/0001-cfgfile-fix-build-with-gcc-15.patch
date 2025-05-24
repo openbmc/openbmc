@@ -1,0 +1,46 @@
+From e579fbe1f73dc89e2bf81a5b6c949f8ae24f93b2 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 21 Mar 2025 09:31:05 +0000
+Subject: [PATCH] cfgfile: fix build with gcc-15
+
+* fix read_config declaration to match
+
+cfgfile.c:247:5: error: conflicting types for 'read_config'; have 'int(char *, int)'
+  247 | int read_config(char *file, int whinge_on_error) {
+      |     ^~~~~~~~~~~
+In file included from cfgfile.c:16:
+cfgfile.h:16:5: note: previous declaration of 'read_config' with type 'int(void)'
+   16 | int read_config();
+      |     ^~~~~~~~~~~
+make[2]: *** [Makefile:566: cfgfile.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+iftop.c: In function 'main':
+iftop.c:803:5: error: too many arguments to function 'read_config'; expected 0, have 2
+  803 |     read_config(options.config_file, options.config_file_specified);
+      |     ^~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~
+In file included from iftop.c:50:
+cfgfile.h:16:5: note: declared here
+   16 | int read_config();
+      |     ^~~~~~~~~~~
+
+Upstream-Status: Pending [last pre release was over 10 years ago and https://code.blinkace.com/pdw/iftop has last commit from 4 years ago]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+
+ cfgfile.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cfgfile.h b/cfgfile.h
+index 11ba475..a331b75 100644
+--- a/cfgfile.h
++++ b/cfgfile.h
+@@ -13,7 +13,7 @@ typedef struct {
+     int value;
+ } config_enumeration_type;
+ 
+-int read_config();
++int read_config(char *file, int whinge_on_error);
+ 
+ char *config_get_string(const char *directive);
+ int config_get_bool(const char *directive);

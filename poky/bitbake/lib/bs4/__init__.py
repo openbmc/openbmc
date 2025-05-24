@@ -835,6 +835,5 @@ class FeatureNotFound(ValueError):
 
 #If this file is run as a script, act as an HTML pretty-printer.
 if __name__ == '__main__':
-    import sys
     soup = BeautifulSoup(sys.stdin)
     print((soup.prettify()))

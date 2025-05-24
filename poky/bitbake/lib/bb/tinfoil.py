@@ -15,6 +15,7 @@ import atexit
 import re
 from collections import OrderedDict, defaultdict
 from functools import partial
+from contextlib import contextmanager
 
 import bb.cache
 import bb.cooker
@@ -641,11 +642,28 @@ class Tinfoil:
         fn = self.get_recipe_file(pn)
         return self.parse_recipe_file(fn)
 
+    @contextmanager
+    def _data_tracked_if_enabled(self):
+        """
+        A context manager to enable data tracking for a code segment if data
+        tracking was enabled for this tinfoil instance.
+        """
+        if self.tracking:
+            # Enable history tracking just for the operation
+            self.run_command('enableDataTracking')
+
+        # Here goes the operation with the optional data tracking
+        yield
+
+        if self.tracking:
+            self.run_command('disableDataTracking')
+
     def finalizeData(self):
         """
         Run anonymous functions and expand keys
         """
-        return self._reconvert_type(self.run_command('finalizeData'), 'DataStoreConnectionHandle')
+        with self._data_tracked_if_enabled():
+            return self._reconvert_type(self.run_command('finalizeData'), 'DataStoreConnectionHandle')
 
     def parse_recipe_file(self, fn, appends=True, appendlist=None, config_data=None):
         """
@@ -659,10 +677,7 @@ class Tinfoil:
             appendlist: optional list of bbappend files to apply, if you
                         want to filter them
         """
-        if self.tracking:
-            # Enable history tracking just for the parse operation
-            self.run_command('enableDataTracking')
-        try:
+        with self._data_tracked_if_enabled():
             if appends and appendlist == []:
                 appends = False
             if config_data:
@@ -674,9 +689,6 @@ class Tinfoil:
                 return self._reconvert_type(dscon, 'DataStoreConnectionHandle')
             else:
                 return None
-        finally:
-            if self.tracking:
-                self.run_command('disableDataTracking')
 
     def build_file(self, buildfile, task, internal=True):
         """

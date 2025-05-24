@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://../LICENSE.LGPL-2.1;md5=b370887980db5dd40659b50909238
 
 DEPENDS = "zlib elfutils"
 
-SRC_URI = "git://github.com/libbpf/libbpf.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/libbpf/libbpf.git;protocol=https;branch=master \
+           file://0001-libbpf-check-for-empty-BTF-data-section-in-btf_parse.patch \
+"
 SRCREV = "09b9e83102eb8ab9e540d36b4559c55f3bcdb95d"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

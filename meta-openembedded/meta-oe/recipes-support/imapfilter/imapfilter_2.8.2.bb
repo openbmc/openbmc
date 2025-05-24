@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/lefcha/imapfilter;protocol=https;branch=master \
 "
 S = "${WORKDIR}/git"
 
-DEPENDS= "openssl lua libpcre2"
+DEPENDS = "openssl lua libpcre2"
 
 EXTRA_OEMAKE:append = " PREFIX=${prefix}"
 

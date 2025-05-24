@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5308494bc0590c0cb036afd781d78f06"
 
 SRC_URI = "git://github.com/NLnetLabs/unbound.git;protocol=https;branch=master \
            file://run-ptest \
+           file://0001-fix-build-with-gcc-15-Wbuiltin-declaration-mismatch-.patch \
            "
 
 # 17 commits after 1.22.0 tag:

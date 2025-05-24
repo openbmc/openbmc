@@ -1,0 +1,26 @@
+From 2b666ccbd616e0e0215241cb69b65d69d5146c8c Mon Sep 17 00:00:00 2001
+From: Jaroslav Kysela <perex@perex.cz>
+Date: Mon, 27 Jan 2025 11:02:21 +0100
+Subject: [PATCH] hdajackretask: fix reset_changes_boot() declaration
+
+Upstream-Status: Backport [https://github.com/alsa-project/alsa-tools/commit/5eaadd15bda4cf0424ee2470a6d304a0c2ce10cb]
+
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ hdajackretask/apply-changes.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hdajackretask/apply-changes.h b/hdajackretask/apply-changes.h
+index e08d66d..e431a0d 100644
+--- a/hdajackretask/apply-changes.h
++++ b/hdajackretask/apply-changes.h
+@@ -9,7 +9,7 @@ gboolean apply_changes_reconfig(pin_configs_t* pins, int entries, int card, int
+ 
+ gboolean apply_changes_boot(pin_configs_t* pins, int entries, int card, int device, 
+     const char* model, const char* hints, GError** err);
+-gboolean reset_changes_boot();
++gboolean reset_changes_boot(GError ** err);
+ 
+ #endif
+ 

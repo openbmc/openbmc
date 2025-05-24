@@ -146,7 +146,7 @@ set -e
     # standalone for use by wic and other tools.
     if image:
         if d.getVar('INITRAMFS_MULTICONFIG'):
-            d.appendVarFlag('do_bundle_initramfs', 'mcdepends', ' mc::${INITRAMFS_MULTICONFIG}:${INITRAMFS_IMAGE}:do_image_complete')
+            d.appendVarFlag('do_bundle_initramfs', 'mcdepends', ' mc:${BB_CURRENT_MC}:${INITRAMFS_MULTICONFIG}:${INITRAMFS_IMAGE}:do_image_complete')
         else:
             d.appendVarFlag('do_bundle_initramfs', 'depends', ' ${INITRAMFS_IMAGE}:do_image_complete')
     if image and bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
@@ -233,7 +233,7 @@ KERNEL_VERSION = "${@get_kernelversion_headers('${B}')}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 # U-Boot support
-UBOOT_ENTRYPOINT ?= "20008000"
+UBOOT_ENTRYPOINT ?= "0x20008000"
 UBOOT_LOADADDRESS ?= "${UBOOT_ENTRYPOINT}"
 
 # Some Linux kernel configurations need additional parameters on the command line
@@ -690,9 +690,6 @@ kernel_do_configure() {
 }
 
 inherit cml1 pkgconfig
-
-# Need LD, HOSTLDFLAGS and more for config operations
-KCONFIG_CONFIG_COMMAND:append = " ${EXTRA_OEMAKE}"
 
 EXPORT_FUNCTIONS do_compile do_transform_kernel do_transform_bundled_initramfs do_install do_configure
 

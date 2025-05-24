@@ -8,7 +8,7 @@ require recipes-security/trusted-services/ts-uuid.inc
 
 TS_ENV ?= "opteesp"
 TS_BIN = "${RECIPE_SYSROOT}/usr/${TS_ENV}/bin"
-TS_BIN_SPM_TEST= "${RECIPE_SYSROOT}/usr/opteesp/bin"
+TS_BIN_SPM_TEST = "${RECIPE_SYSROOT}/usr/opteesp/bin"
 
 SP_EXT = "${@oe.utils.conditional('TS_ENV','opteesp','.stripped.elf','.bin',d)}"
 

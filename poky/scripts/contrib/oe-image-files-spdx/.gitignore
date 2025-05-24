@@ -1,0 +1,8 @@
+*.spdx.json
+*.pyc
+*.bak
+*.swp
+*.swo
+*.swn
+venv/*
+.venv/*

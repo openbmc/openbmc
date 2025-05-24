@@ -1,0 +1,35 @@
+From 47f8039ec9bd08b629775c8e788d11e41fa95f14 Mon Sep 17 00:00:00 2001
+From: Andreas Gruenbacher <agruenba@redhat.com>
+Date: Mon, 24 Mar 2025 21:14:09 +0100
+Subject: [PATCH] test/misc.test: Don't mix stdout and stderr
+
+In different environments, we may not get the stdout and stderr output
+in the order the run script expects, so check both separately.
+
+Fixes: https://savannah.nongnu.org/bugs/?66944
+Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ test/misc.test | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/test/misc.test b/test/misc.test
+index 06b3136..57c02e5 100644
+--- a/test/misc.test
++++ b/test/misc.test
+@@ -440,8 +440,9 @@ Dangling symlink test https://savannah.nongnu.org/bugs/?28131
+ 	> other::r-x
+ 	> 
+ 	$ setfacl -R -m u:bin:rw d
+-	$ getfacl -RL d
++	$ getfacl -RL d > /dev/null
+ 	> getfacl: d/b: No such file or directory
++	$ getfacl -RL d 2> /dev/null
+ 	> # file: d
+ 	> # owner: %TUSER
+ 	> # group: %TGROUP
+-- 
+2.43.0
+

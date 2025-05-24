@@ -10,10 +10,10 @@ Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
  .../tracker-miners-enum-types.c.template                        | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/libtracker-miners-common/tracker-miners-enum-types.c.template b/src/libtracker-miners-common/tracker-miners-enum-types.c.template
+diff --git a/src/common/tracker-miners-enum-types.c.template b/src/common/tracker-miners-enum-types.c.template
 index 4db7ef1..7c44c13 100644
---- a/src/libtracker-miners-common/tracker-miners-enum-types.c.template
-+++ b/src/libtracker-miners-common/tracker-miners-enum-types.c.template
+--- a/src/common/tracker-miners-enum-types.c.template
++++ b/src/common/tracker-miners-enum-types.c.template
 @@ -7,7 +7,7 @@
  
  /*** BEGIN file-production ***/

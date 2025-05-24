@@ -18,6 +18,10 @@ PV = "1.0+really0.15.2"
 
 GTKDOC_MESON_OPTION = "enable-gtk-doc"
 
+# Documentation doesn't currently build:
+# gtkdoc-mkhtml: error: unrecognized arguments: ../gstd-docs.xml
+GTKDOC_ENABLED = "False"
+
 inherit meson pkgconfig gettext gtk-doc python3native python3-dir python3targetconfig
 
 do_install:append() {

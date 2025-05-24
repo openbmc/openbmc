@@ -9,7 +9,7 @@ LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a \
                     "
 
-DEPENDS = "flex-native bison-native iptables libcap"
+DEPENDS = "flex-native bison-native libcap"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/net/${BPN}/${BP}.tar.xz \
            file://0001-include-libnetlink.h-add-missing-include-for-htobe64.patch \
@@ -19,10 +19,11 @@ SRC_URI[sha256sum] = "a43aa43338d882b44d01e549f3f105a92ae9feea32a82fae45a88e7a49
 
 inherit update-alternatives bash-completion pkgconfig
 
-PACKAGECONFIG ??= "tipc elf devlink"
+PACKAGECONFIG ??= "tipc elf devlink iptables"
 PACKAGECONFIG[tipc] = ",,libmnl,"
 PACKAGECONFIG[elf] = ",,elfutils,"
 PACKAGECONFIG[devlink] = ",,libmnl,"
+PACKAGECONFIG[iptables] = ",,iptables"
 PACKAGECONFIG[rdma] = ",,libmnl,"
 PACKAGECONFIG[selinux] = ",,libselinux"
 

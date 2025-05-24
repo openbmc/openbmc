@@ -1,0 +1,29 @@
+From 5e23482b89dfbed025eb5e505aba6420512bd9c3 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Tue, 1 Apr 2025 11:31:38 +0200
+Subject: [PATCH] cmake: disable dependency inclusion
+
+In Yocto we don't download dependencies, they are satisfied from
+sysroot.
+This cmake file would try to download dependency management tool CPM
+even if all dependencies are satisfied.
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5378bb3..5916025 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -194,7 +194,7 @@ include( cmake/BuildOptions.cmake )
+ include( cmake/CompilerOptions.cmake )
+ 
+ # dependencies
+-include( cmake/Dependencies.cmake )
++#include( cmake/Dependencies.cmake )
+ 
+ # 7-zip source code
+ target_link_libraries( ${LIB_TARGET} PRIVATE 7-zip )

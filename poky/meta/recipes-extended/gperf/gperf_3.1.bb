@@ -18,4 +18,6 @@ inherit autotools
 # it where to look explicitly (mirroring the behaviour of upstream's Makefile.devel).
 EXTRA_AUTORECONF += " -I ${S} --exclude=aclocal"
 
+CFLAGS += "-std=gnu17"
+
 BBCLASSEXTEND = "native nativesdk"

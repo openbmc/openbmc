@@ -1,7 +1,7 @@
-From c481b055cd464734a3c2d80719ead4c1c92a40c9 Mon Sep 17 00:00:00 2001
+From c23b787f9a38be2cdc57133915c402b69acedd1a Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Mon, 4 May 2015 22:31:48 -0700
-Subject: [PATCH 02/10] base/gendev.c: fix for -Werror=return-type
+Subject: [PATCH] base/gendev.c: fix for -Werror=return-type
 
 Fixed:
 base/gendev.c:80:1: error: return type defaults to 'int' [-Werror=return-type]
@@ -14,7 +14,7 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/base/gendev.c b/base/gendev.c
-index 59d5999..7766b08 100644
+index f36cfe2..031f30b 100644
 --- a/base/gendev.c
 +++ b/base/gendev.c
 @@ -77,6 +77,7 @@ static const char *indent_item = "";
@@ -25,6 +25,3 @@ index 59d5999..7766b08 100644
  main(int argc, char *argv[])
  {
      config conf;
--- 
-1.8.3.1
-

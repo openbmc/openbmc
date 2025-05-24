@@ -170,17 +170,29 @@ series = [k for k in release_series]
 previousseries = series[series.index(ourseries)+1:] or [""]
 lastlts = [k for k in previousseries if k in ltsseries] or "dunfell"
 
+latestreltag = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "--match", "yocto-*"], capture_output=True, text=True).stdout
+latestreltag = latestreltag.strip()
+if latestreltag:
+    if latestreltag.startswith("yocto-"):
+        latesttag = latestreltag[6:]
+else:
+    # fallback on the calculated version
+    print("Did not find a tag with 'git describe', falling back to %s" % ourversion)
+    latestreltag = "yocto-" + ourversion
+    latesttag = ourversion
+
 print("Version calculated to be %s" % ourversion)
+print("Latest release tag found is %s" % latestreltag)
 print("Release series calculated to be %s" % ourseries)
 
 replacements = {
     "DISTRO" : ourversion,
+    "DISTRO_LATEST_TAG": latesttag,
     "DISTRO_NAME_NO_CAP" : ourseries,
     "DISTRO_NAME" : ourseries.capitalize(),
     "DISTRO_NAME_NO_CAP_MINUS_ONE" : previousseries[0],
     "DISTRO_NAME_NO_CAP_LTS" : lastlts[0],
     "YOCTO_DOC_VERSION" : ourversion,
-    "DISTRO_REL_TAG" : "yocto-" + ourversion,
     "DOCCONF_VERSION" : docconfver,
     "BITBAKE_SERIES" : bitbakeversion,
 }
@@ -318,3 +330,5 @@ with open('releases.rst', 'w') as f:
             if tag == release_series[series] or tag.startswith('%s.' % release_series[series]):
                 f.write('- :yocto_docs:`%s Documentation </%s>`\n' % (tag, tag))
         f.write('\n')
+
+

@@ -18,13 +18,36 @@ SRC_URI = "git://sourceware.org/git/lvm2.git;branch=main \
            file://0001-include-libgen.h-for-basename.patch \
            "
 
-SRCREV = "9f81fccd65a29030bf70417e8aca659ae536e081"
+SRCREV = "3a6e221c569eb253fa38a772b15e53b5de65b5d1"
 S = "${WORKDIR}/git"
-PV = "2.03.30"
+PV = "2.03.31"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\_\d+)+)"
 
 inherit autotools-brokensep pkgconfig systemd
+
+def get_dm_version(p):
+    import re
+
+    fn = p + '/VERSION_DM'
+    try:
+        f = open(fn, 'r')
+    except IOError:
+        return None
+
+    lines = f.readlines()
+    f.close()
+    for line in lines:
+        m = re.match(r'(\w+)[-. ](\w+)[-. ](\w+)', line.strip())
+        if m:
+            return ".".join([m.group(1), m.group(2), m.group(3)])
+
+    return None
+
+DM_VERSION = '${@get_dm_version("${S}")}'
+python do_package:prepend() {
+    d.setVar('PKGV:libdevmapper', d.getVar("DM_VERSION"))
+}
 
 LVM2_PACKAGECONFIG = "dmeventd"
 LVM2_PACKAGECONFIG:append:class-target = " \
@@ -58,7 +81,3 @@ EXTRA_OECONF = "--with-user= \
                 --with-thin-repair=${sbindir}/thin_repair \
                 --with-thin-restore=${sbindir}/thin_restore \
 "
-
-# gold doesn't like multiple dm_bitset_parse_list definitions in libdm/.exported_symbols.DM_1_02_138 and libdm/.exported_symbols.DM_1_02_129
-# after it was uncommented in the later in 2.03.12 with https://github.com/lvmteam/lvm2/commit/60eb608d66c2056a78e81f27db3da14139d9faab
-LDFLAGS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', " -fuse-ld=bfd", '', d)}"

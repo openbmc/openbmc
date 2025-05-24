@@ -14,6 +14,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-aspectlib \
     python3-bleak \
     python3-blinker \
+    python3-breathe \
     python3-cachetools \
     python3-cbor2 \
     python3-configobj \
@@ -42,6 +43,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-msgpack \
     python3-multidict \
     python3-netaddr \
+    python3-objgraph \
     python3-ordered-set \
     python3-outcome \
     python3-parse \
@@ -53,6 +55,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-precise-runner \
     python3-prettytable \
     python3-propcache \
+    python3-pyasyncore \
     python3-pydantic \
     python3-pydantic-core \
     python3-pylint \
@@ -82,6 +85,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-tomlkit \
     python3-trustme \
     python3-typeguard \
+    python3-typing-inspection \
     python3-tzdata \
     python3-ujson \
     python3-u-msgpack-python \
@@ -111,7 +115,7 @@ PTESTS_SLOW_META_PYTHON = "\
     python3-yappi \
 "
 
-PTESTS_PROBLEMS_META_PYTHON ="\
+PTESTS_PROBLEMS_META_PYTHON = "\
     python3-betamax \
     python3-dnspython \
     python3-fastjsonschema \

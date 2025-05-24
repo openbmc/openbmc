@@ -19,6 +19,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+def walk_error(err):
+    bb.error(f"ERROR walking {err.filename}: {err}")
+
+
 def set_timestamp_now(d, o, prop):
     if d.getVar("SPDX_INCLUDE_TIMESTAMPS") == "1":
         setattr(o, prop, datetime.now(timezone.utc))
@@ -148,11 +152,17 @@ def add_package_files(
     spdx_files = set()
 
     file_counter = 1
-    for subdir, dirs, files in os.walk(topdir):
+    if not os.path.exists(topdir):
+        bb.note(f"Skip {topdir}")
+        return spdx_files
+
+    for subdir, dirs, files in os.walk(topdir, onerror=walk_error):
         dirs[:] = [d for d in dirs if d not in ignore_dirs]
         if subdir == str(topdir):
             dirs[:] = [d for d in dirs if d not in ignore_top_level_dirs]
 
+        dirs.sort()
+        files.sort()
         for file in files:
             filepath = Path(subdir) / file
             if filepath.is_symlink() or not filepath.is_file():
@@ -346,76 +356,77 @@ def add_download_files(d, objset):
     for download_idx, src_uri in enumerate(urls):
         fd = fetch.ud[src_uri]
 
-        for name in fd.names:
-            file_name = os.path.basename(fetch.localpath(src_uri))
-            if oe.patch.patch_path(src_uri, fetch, "", expand=False):
-                primary_purpose = oe.spdx30.software_SoftwarePurpose.patch
-            else:
-                primary_purpose = oe.spdx30.software_SoftwarePurpose.source
+        file_name = os.path.basename(fetch.localpath(src_uri))
+        if oe.patch.patch_path(src_uri, fetch, "", expand=False):
+            primary_purpose = oe.spdx30.software_SoftwarePurpose.patch
+        else:
+            primary_purpose = oe.spdx30.software_SoftwarePurpose.source
 
-            if fd.type == "file":
-                if os.path.isdir(fd.localpath):
-                    walk_idx = 1
-                    for root, dirs, files in os.walk(fd.localpath):
-                        for f in files:
-                            f_path = os.path.join(root, f)
-                            if os.path.islink(f_path):
-                                # TODO: SPDX doesn't support symlinks yet
-                                continue
-
-                            file = objset.new_file(
-                                objset.new_spdxid(
-                                    "source", str(download_idx + 1), str(walk_idx)
-                                ),
-                                os.path.join(
-                                    file_name, os.path.relpath(f_path, fd.localpath)
-                                ),
-                                f_path,
-                                purposes=[primary_purpose],
-                            )
-
-                            inputs.add(file)
-                            walk_idx += 1
-
-                else:
-                    file = objset.new_file(
-                        objset.new_spdxid("source", str(download_idx + 1)),
-                        file_name,
-                        fd.localpath,
-                        purposes=[primary_purpose],
-                    )
-                    inputs.add(file)
-
-            else:
-                dl = objset.add(
-                    oe.spdx30.software_Package(
-                        _id=objset.new_spdxid("source", str(download_idx + 1)),
-                        creationInfo=objset.doc.creationInfo,
-                        name=file_name,
-                        software_primaryPurpose=primary_purpose,
-                        software_downloadLocation=oe.spdx_common.fetch_data_to_uri(
-                            fd, name
-                        ),
-                    )
-                )
-
-                if fd.method.supports_checksum(fd):
-                    # TODO Need something better than hard coding this
-                    for checksum_id in ["sha256", "sha1"]:
-                        expected_checksum = getattr(
-                            fd, "%s_expected" % checksum_id, None
-                        )
-                        if expected_checksum is None:
+        if fd.type == "file":
+            if os.path.isdir(fd.localpath):
+                walk_idx = 1
+                for root, dirs, files in os.walk(fd.localpath, onerror=walk_error):
+                    dirs.sort()
+                    files.sort()
+                    for f in files:
+                        f_path = os.path.join(root, f)
+                        if os.path.islink(f_path):
+                            # TODO: SPDX doesn't support symlinks yet
                             continue
 
-                        dl.verifiedUsing.append(
-                            oe.spdx30.Hash(
-                                algorithm=getattr(oe.spdx30.HashAlgorithm, checksum_id),
-                                hashValue=expected_checksum,
-                            )
+                        file = objset.new_file(
+                            objset.new_spdxid(
+                                "source", str(download_idx + 1), str(walk_idx)
+                            ),
+                            os.path.join(
+                                file_name, os.path.relpath(f_path, fd.localpath)
+                            ),
+                            f_path,
+                            purposes=[primary_purpose],
                         )
 
-                inputs.add(dl)
+                        inputs.add(file)
+                        walk_idx += 1
+
+            else:
+                file = objset.new_file(
+                    objset.new_spdxid("source", str(download_idx + 1)),
+                    file_name,
+                    fd.localpath,
+                    purposes=[primary_purpose],
+                )
+                inputs.add(file)
+
+        else:
+            dl = objset.add(
+                oe.spdx30.software_Package(
+                    _id=objset.new_spdxid("source", str(download_idx + 1)),
+                    creationInfo=objset.doc.creationInfo,
+                    name=file_name,
+                    software_primaryPurpose=primary_purpose,
+                    software_downloadLocation=oe.spdx_common.fetch_data_to_uri(
+                        fd, fd.name
+                    ),
+                )
+            )
+
+            if fd.method.supports_checksum(fd):
+                # TODO Need something better than hard coding this
+                for checksum_id in ["sha256", "sha1"]:
+                    expected_checksum = getattr(
+                        fd, "%s_expected" % checksum_id, None
+                    )
+                    if expected_checksum is None:
+                        continue
+
+                    dl.verifiedUsing.append(
+                        oe.spdx30.Hash(
+                            algorithm=getattr(oe.spdx30.HashAlgorithm, checksum_id),
+                            hashValue=expected_checksum,
+                        )
+                    )
+
+            inputs.add(dl)
 
     return inputs
 
@@ -490,8 +501,13 @@ def create_spdx(d):
     # Add CVEs
     cve_by_status = {}
     if include_vex != "none":
-        for cve in d.getVarFlags("CVE_STATUS") or {}:
-            decoded_status = oe.cve_check.decode_cve_status(d, cve)
+        patched_cves = oe.cve_check.get_patched_cves(d)
+        for cve, patched_cve in patched_cves.items():
+            decoded_status = {
+                "mapping": patched_cve["abbrev-status"],
+                "detail": patched_cve["status"],
+                "description": patched_cve.get("justification", None)
+            }
 
             # If this CVE is fixed upstream, skip it unless all CVEs are
             # specified.
@@ -590,7 +606,7 @@ def create_spdx(d):
                     _id=pkg_objset.new_spdxid("package", pkg_name),
                     creationInfo=pkg_objset.doc.creationInfo,
                     name=pkg_name,
-                    software_packageVersion=d.getVar("PV"),
+                    software_packageVersion=d.getVar("SPDX_PACKAGE_VERSION"),
                 )
             )
             set_timestamp_now(d, spdx_package, "builtTime")
@@ -1046,10 +1062,12 @@ def create_rootfs_spdx(d):
     collect_build_package_inputs(d, objset, rootfs_build, packages, files_by_hash)
 
     files = set()
-    for dirpath, dirnames, filenames in os.walk(image_rootfs):
+    for dirpath, dirnames, filenames in os.walk(image_rootfs, onerror=walk_error):
+        dirnames.sort()
+        filenames.sort()
         for fn in filenames:
             fpath = Path(dirpath) / fn
-            if not fpath.is_file() or fpath.is_symlink():
+            if fpath.is_symlink() or not fpath.is_file():
                 continue
 
             relpath = str(fpath.relative_to(image_rootfs))
@@ -1282,7 +1300,9 @@ def create_sdk_sbom(d, sdk_deploydir, spdx_work_dir, toolchain_outputname):
     root_files = []
 
     # NOTE: os.walk() doesn't return symlinks
-    for dirpath, dirnames, filenames in os.walk(sdk_deploydir):
+    for dirpath, dirnames, filenames in os.walk(sdk_deploydir, onerror=walk_error):
+        dirnames.sort()
+        filenames.sort()
         for fn in filenames:
             fpath = Path(dirpath) / fn
             if not fpath.is_file() or fpath.is_symlink():

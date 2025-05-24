@@ -1,0 +1,33 @@
+From f5b2fa90e0c0324f31e72429e7a7382f49a25912 Mon Sep 17 00:00:00 2001
+From: Shen Jiamin <shen_jiamin@comp.nus.edu.sg>
+Date: Wed, 24 Jul 2024 18:58:55 +0800
+Subject: [PATCH] fix(zynqmp): handle secure SGI at EL1 for OP-TEE
+
+OP-TEE requires SGIs to be handled at S-EL1. The
+Makefile was not properly setting the flag
+GICV2_G0_FOR_EL3 to 0 when the SPD is OP-TEE.
+
+Change-Id: I256afa37ddf4ad4a154c43d51807de670c3689bb
+Signed-off-by: Shen Jiamin <shen_jiamin@comp.nus.edu.sg>
+---
+ plat/xilinx/zynqmp/platform.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Upstream-Status: Backport
+
+diff --git a/plat/xilinx/zynqmp/platform.mk b/plat/xilinx/zynqmp/platform.mk
+index c340009d0..22eceb621 100644
+--- a/plat/xilinx/zynqmp/platform.mk
++++ b/plat/xilinx/zynqmp/platform.mk
+@@ -21,7 +21,7 @@ ENABLE_LTO := 1
+ EL3_EXCEPTION_HANDLING := $(SDEI_SUPPORT)
+ 
+ # pncd SPD requires secure SGI to be handled at EL1
+-ifeq (${SPD}, $(filter ${SPD},pncd tspd))
++ifeq (${SPD}, $(filter ${SPD},pncd tspd opteed))
+ ifeq (${ZYNQMP_WDT_RESTART},1)
+ $(error "Error: ZYNQMP_WDT_RESTART and SPD=pncd are incompatible")
+ endif
+-- 
+2.34.1
+

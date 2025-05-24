@@ -125,7 +125,7 @@ EXTRA_OECONF += "--enable-fhs \
                  --pythondir=${PYTHON_SITEPACKAGES_DIR} \
                 "
 
-LDFLAGS += "-Wl,-z,relro,-z,now ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS += "-Wl,-z,relro,-z,now"
 
 do_configure:append() {
     cd ${S}/pidl/

@@ -36,9 +36,13 @@ UPSTREAM_CHECK_REGEX = "/rdist/(?P<pver>\d+(\.\d+)+)"
 
 DEPENDS = "bison-native"
 
-inherit autotools-brokensep
+CFLAGS += "-std=gnu17"
 
 EXTRA_OEMAKE = "CPPFLAGS='${CFLAGS}' BIN_GROUP=root MAN_GROUP=root RDIST_MODE=755 RDISTD_MODE=755 MAN_MODE=644"
+
+do_install() {
+    oe_runmake 'DESTDIR=${D}' install
+}
 
 # http://errors.yoctoproject.org/Errors/Details/186972/
 COMPATIBLE_HOST:libc-musl = 'null'

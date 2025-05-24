@@ -1,0 +1,58 @@
+From 7c07bb10f57c80467bc3079d45dac4d3839927d0 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 20 Nov 2024 13:03:55 +0000
+Subject: [PATCH 3/3] shared/gatt-helpers: fix -std=c23 build failure
+
+gcc-15 switched to -std=c23 by default:
+
+    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
+
+As a result `bluez` fails the build as:
+
+    src/shared/gatt-helpers.c:1136:24: error: incompatible types when returning type '_Bool' but 'struct bt_gatt_request *' was expected
+     1136 |                 return false;
+          |                        ^~~~~
+    src/shared/gatt-helpers.c:1250:24: error: incompatible types when returning type '_Bool' but 'struct bt_gatt_request *' was expected
+     1250 |                 return false;
+          |                        ^~~~~
+    src/shared/gatt-helpers.c:1478:24: error: incompatible types when returning type '_Bool' but 'struct bt_gatt_request *' was expected
+     1478 |                 return false;
+          |                        ^~~~~
+
+Upstream-Status: Backport [https://web.git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=6f3111eb680df9c13502aacd65554846a9e13a3f]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/shared/gatt-helpers.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 50fcb26..f1fa630 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -1133,7 +1133,7 @@ struct bt_gatt_request *bt_gatt_discover_included_services(struct bt_att *att,
+ 	uint8_t pdu[6];
+ 
+ 	if (!att)
+-		return false;
++		return NULL;
+ 
+ 	op = new0(struct bt_gatt_request, 1);
+ 	op->att = att;
+@@ -1247,7 +1247,7 @@ struct bt_gatt_request *bt_gatt_discover_characteristics(struct bt_att *att,
+ 	uint8_t pdu[6];
+ 
+ 	if (!att)
+-		return false;
++		return NULL;
+ 
+ 	op = new0(struct bt_gatt_request, 1);
+ 	op->att = att;
+@@ -1475,7 +1475,7 @@ struct bt_gatt_request *bt_gatt_discover_descriptors(struct bt_att *att,
+ 	uint8_t pdu[4];
+ 
+ 	if (!att)
+-		return false;
++		return NULL;
+ 
+ 	op = new0(struct bt_gatt_request, 1);
+ 	op->att = att;

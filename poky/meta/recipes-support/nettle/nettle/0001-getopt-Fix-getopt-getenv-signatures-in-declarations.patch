@@ -1,0 +1,44 @@
+From 20eb61eded3bf2ef03e1f37c8c1535b9c246d0f7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Mar 2025 13:48:29 -0700
+Subject: [PATCH] getopt: Fix getopt/getenv signatures in declarations
+
+GCC-15 complains about this when trying to build on musl
+
+| ../nettle-3.10.1/getopt.c:139:14: error: conflicting types for 'getenv'; have 'char *(void)'
+|   139 | extern char *getenv ();
+|       |              ^~~~~~
+
+Upstream-Status: Submitted [https://lists.lysator.liu.se/mailman/hyperkitty/list/nettle-bugs@lists.lysator.liu.se/thread/R6BDHRO44KSRDAOZQAREYICI2RG5PVNC/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ getopt.c | 2 +-
+ getopt.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/getopt.c b/getopt.c
+index 9d29de7..5b89302 100644
+--- a/getopt.c
++++ b/getopt.c
+@@ -136,7 +136,7 @@ static struct _getopt_data getopt_data;
+    whose names are inconsistent.  */
+ 
+ #ifndef getenv
+-extern char *getenv ();
++extern char *getenv (const char *);
+ #endif
+ 
+ #endif /* not __GNU_LIBRARY__ */
+diff --git a/getopt.h b/getopt.h
+index da1a01f..ab50792 100644
+--- a/getopt.h
++++ b/getopt.h
+@@ -166,7 +166,7 @@ extern int __posix_getopt (int ___argc, char *const *___argv,
+ #  endif
+ # endif
+ #else /* not __GNU_LIBRARY__ */
+-extern int getopt ();
++extern int getopt(int, char * const [], const char *);
+ #endif /* __GNU_LIBRARY__ */
+ 
+ #ifndef __need_getopt

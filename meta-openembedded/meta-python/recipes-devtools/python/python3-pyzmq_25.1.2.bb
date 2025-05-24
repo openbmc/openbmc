@@ -1,6 +1,6 @@
 SUMMARY = "PyZMQ: Python bindings for ZMQ"
 DESCRIPTION = "This package contains Python bindings for ZeroMQ. ZMQ is a lightweight and fast messaging implementation."
-HOMEPAGE = "http://zeromq.org/bindings:python"
+HOMEPAGE = "https://zeromq.org/bindings:python"
 LICENSE = "BSD-3-Clause & LGPL-3.0-only"
 LIC_FILES_CHKSUM = "\
     file://LICENSE.BSD;md5=1787206f198344195a671b60326c59dc \

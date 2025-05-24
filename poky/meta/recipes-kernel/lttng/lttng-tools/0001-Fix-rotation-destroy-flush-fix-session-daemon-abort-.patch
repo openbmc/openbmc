@@ -24,8 +24,8 @@ environment variable any more.
 Fixes: 3a174400
 ("tests:add check_skip_kernel_test to check root user and lttng kernel modules")
 
-Upstream-Status: Submitted [https://review.lttng.org/c/lttng-tools/+/12155]
-
+Submitted [https://review.lttng.org/c/lttng-tools/+/12155]
+Upstream-Status: Backport [https://github.com/lttng/lttng-tools/commit/78f5b22de60c114c5c83410015a08bdd212edc0b]
 Change-Id: I371e9ba717613e2940186f710cf3cccd35baed6c
 Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
 ---

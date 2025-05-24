@@ -1,0 +1,38 @@
+From 90d68222c184f681472d9d9ce2ae443ebd76386e Mon Sep 17 00:00:00 2001
+From: Maximiliano Sandoval <msandova@gnome.org>
+Date: Sat, 15 Mar 2025 10:47:31 +0100
+Subject: [PATCH] meson: Check g-i before using --doc-format arg
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libadwaita/-/commit/90d68222c184f681472d9d9ce2ae443ebd76386e.patch]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ src/meson.build | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 90cecc6a1..585fe3aad 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -450,11 +450,17 @@ meson.override_dependency(package_api_name, libadwaita_dep)
+ 
+ if introspection
+ 
++   gir_dep = dependency('gobject-introspection-1.0')
+    libadwaita_gir_extra_args = [
+      '--quiet',
+-     '--doc-format=gi-docgen',
+      '-DADWAITA_COMPILATION',
+    ]
++   if gir_dep.version().version_compare('>=1.83.2')
++     libadwaita_gir_extra_args += [
++       '--doc-format=gi-docgen',
++     ]
++   endif
++
+ 
+    libadwaita_gir = gnome.generate_gir(libadwaita,
+                  sources: libadwaita_generated_headers + libadwaita_public_headers + libadwaita_public_sources,
+-- 
+GitLab
+

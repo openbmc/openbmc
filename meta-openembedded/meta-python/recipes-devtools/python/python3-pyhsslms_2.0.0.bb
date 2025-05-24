@@ -1,5 +1,5 @@
 SUMMARY = "Pure-Python implementation of HSS/LMS Digital Signatures (RFC 8554)"
-HOMEPAGE ="https://pypi.org/project/pyhsslms"
+HOMEPAGE = "https://pypi.org/project/pyhsslms"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=bbc59ef8bf238c2902ca816b87b58571"
 

@@ -4,7 +4,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=091556bd6d0154cd4c2d17a1bfc7380a"
 
 DEPENDS = "libusb1"
 
-SRC_URI = "http://www.draisberghof.de/usb_modeswitch/${BP}.tar.bz2"
+SRC_URI = "http://www.draisberghof.de/usb_modeswitch/${BP}.tar.bz2 \
+    file://0001-Fix-build-with-gcc-15.patch \
+"
 SRC_URI[sha256sum] = "5195d9e136e52f658f19e9f93e4f982b1b67bffac197d0a455cd8c2cd245fa34"
 
 inherit pkgconfig systemd

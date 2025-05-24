@@ -58,14 +58,19 @@ fi
 
 if test -z "$XDG_RUNTIME_DIR"; then
 	export XDG_RUNTIME_DIR=/run/user/`id -u ${WESTON_USER}`
-	if ! test -d "$XDG_RUNTIME_DIR"; then
-		mkdir --parents $XDG_RUNTIME_DIR
-		chmod 0700 $XDG_RUNTIME_DIR
-	fi
-	if [ -n "$WESTON_USER" ]
-	then
-		chown $WESTON_USER:$WESTON_GROUP $XDG_RUNTIME_DIR
+	if test -d "$XDG_RUNTIME_DIR"; then
+	    # Check permissions on existing directory
+	    if [ "$(stat -c %u-%a "$XDG_RUNTIME_DIR")" != "$(id -u ${WESTON_USER})-700" ]; then
+			echo "ERROR: $XDG_RUNTIME_DIR has incorrect permissions"
+			exit 1
+		fi
+	else
+		mkdir --mode 0700 --parents $XDG_RUNTIME_DIR
+		if [ -n "$WESTON_USER" ]
+		then
+			chown $WESTON_USER:$WESTON_GROUP $XDG_RUNTIME_DIR
+		fi
 	fi
 fi
 
-su -c "XDG_RUNTIME_DIR=/run/user/`id -u ${WESTON_USER}` weston $weston_args --log=/tmp/weston.log" $WESTON_USER
+su -c "XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR weston $weston_args --log=/tmp/weston.log" $WESTON_USER

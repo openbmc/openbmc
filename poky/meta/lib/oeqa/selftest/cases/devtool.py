@@ -1027,7 +1027,7 @@ class DevtoolModifyTests(DevtoolBase):
         # Configure the recipe to check that the git dependencies are correctly patched in cargo config
         bitbake('-c configure %s' % testrecipe)
 
-        cargo_config_path = os.path.join(cargo_home, 'config')
+        cargo_config_path = os.path.join(cargo_home, 'config.toml')
         with open(cargo_config_path, "r") as f:
             cargo_config_contents = [line.strip('\n') for line in f.readlines()]
 
@@ -1757,6 +1757,8 @@ class DevtoolExtractTests(DevtoolBase):
         self.assertExists(os.path.join(tempdir, 'Makefile.am'), 'Extracted source could not be found')
         self._check_src_repo(tempdir)
 
+class DevtoolResetTests(DevtoolBase):
+
     def test_devtool_reset_all(self):
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -1782,6 +1784,21 @@ class DevtoolExtractTests(DevtoolBase):
         self.assertFalse(matches1, 'Stamp files exist for recipe %s that should have been cleaned' % testrecipe1)
         matches2 = glob.glob(stampprefix2 + '*')
         self.assertFalse(matches2, 'Stamp files exist for recipe %s that should have been cleaned' % testrecipe2)
+
+    def test_devtool_reset_re_plus_plus(self):
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        testrecipe = 'devtool-test-reset-re++'
+        result = runCmd('devtool modify %s' % testrecipe)
+        result = runCmd('devtool reset -n %s' % testrecipe)
+        self.assertIn(testrecipe, result.output)
+        result = runCmd('devtool status')
+        self.assertNotIn(testrecipe, result.output)
+        self.assertNotExists(os.path.join(self.workspacedir, 'recipes', testrecipe), 'Recipe directory should not exist after resetting')
+
+class DevtoolDeployTargetTests(DevtoolBase):
 
     @OETestTag("runqemu")
     def test_devtool_deploy_target(self):
@@ -1849,6 +1866,8 @@ class DevtoolExtractTests(DevtoolBase):
             result = runCmd('devtool undeploy-target -c %s root@%s' % (testrecipe, qemu.ip))
             result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, testcommand), ignore_status=True)
             self.assertNotEqual(result, 0, 'undeploy-target did not remove command as it should have')
+
+class DevtoolBuildImageTests(DevtoolBase):
 
     def test_devtool_build_image(self):
         """Test devtool build-image plugin"""

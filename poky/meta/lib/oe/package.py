@@ -18,7 +18,7 @@ import shutil
 
 import oe.cachedpath
 
-def runstrip(arg):
+def runstrip(file, elftype, strip, extra_strip_sections=''):
     # Function to strip a single file, called from split_and_strip_files below
     # A working 'file' (one which works on the target architecture)
     #
@@ -27,12 +27,6 @@ def runstrip(arg):
     # 4 - executable
     # 8 - shared library
     # 16 - kernel module
-
-    if len(arg) == 3:
-        (file, elftype, strip) = arg
-        extra_strip_sections = ''
-    else:
-        (file, elftype, strip, extra_strip_sections) = arg
 
     newmode = None
     if not os.access(file, os.W_OK) or os.access(file, os.R_OK):
@@ -220,10 +214,9 @@ def file_reverse_translate(file):
 
     return ft
 
-def filedeprunner(arg):
+def filedeprunner(pkg, pkgfiles, rpmdeps, pkgdest):
     import re, subprocess, shlex
 
-    (pkg, pkgfiles, rpmdeps, pkgdest) = arg
     provides = {}
     requires = {}
 

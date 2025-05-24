@@ -1,0 +1,53 @@
+From e654a7015f5e8f20bf7681681cc2b80082303007 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Tue, 25 Feb 2025 13:43:42 +0100
+Subject: [PATCH] Export binaries only for native build
+
+By default, the cmake configuratione exports all generated files,
+so when using the generated cmake file with a find_package command,
+it verifies that these files actually exist.
+
+When using the cross-compiled version of capnproto, the generated
+binaries are not available in RECIPE_SYSROOT (since they can be
+used as RDEPENDS only, but not usable as DEPENDS), and due to
+this the compilation fails.
+
+To avoid this, check during the compilation of capnproto if it is
+being cross-compiled, or not. If is it cross-compiled, then only
+install the generated binary files in their final location, but
+don't export them. When not cross-compiling, do the same, but also
+export the files (which is the default behavior).
+
+Upstream-Status: Inappropriate [oe specific: see above message]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ c++/src/capnp/CMakeLists.txt | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/c++/src/capnp/CMakeLists.txt b/c++/src/capnp/CMakeLists.txt
+index 9980fde6..8732db93 100644
+--- a/src/capnp/CMakeLists.txt
++++ b/src/capnp/CMakeLists.txt
+@@ -210,7 +210,20 @@ if(NOT CAPNP_LITE)
+   target_link_libraries(capnpc_capnp capnp kj)
+   set_target_properties(capnpc_capnp PROPERTIES OUTPUT_NAME capnpc-capnp)
+ 
+-  install(TARGETS capnp_tool capnpc_cpp capnpc_capnp ${INSTALL_TARGETS_DEFAULT_ARGS})
++  if(NOT CMAKE_CROSSCOMPILING)
++    install(TARGETS capnp_tool capnpc_cpp capnpc_capnp ${INSTALL_TARGETS_DEFAULT_ARGS})
++  else()
++    # INSTALL_TARGETS_CROSS_COMPILED_BINARY_ARGS is identical to INSTALL_TARGETS_DEFAULT_ARGS,
++    # except that the installed files are not exported, so when the generated cmake file
++    # is used by a find_package command, it won't try to find these files.
++    set(INSTALL_TARGETS_CROSS_COMPILED_BINARY_ARGS
++      ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
++      LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
++      RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
++    )
++
++    install(TARGETS capnp_tool capnpc_cpp capnpc_capnp ${INSTALL_TARGETS_CROSS_COMPILED_BINARY_ARGS})
++  endif()
+ 
+   if(WIN32)
+     # On Windows platforms symlinks are not guaranteed to support. Also different version of CMake handle create_symlink in a different way.

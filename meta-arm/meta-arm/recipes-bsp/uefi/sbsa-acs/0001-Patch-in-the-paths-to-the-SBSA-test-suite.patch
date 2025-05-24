@@ -1,6 +1,6 @@
-From e7918dbd4a02be2a474534da3f1e565931a5e632 Mon Sep 17 00:00:00 2001
+From 17df0e93949097c18c65567bdf8c7ad2478f63b4 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
-Date: Thu, 16 Feb 2023 21:53:25 +0000
+Date: Thu, 16 Feb 2023 21:53:25 -0500
 Subject: [PATCH] Patch in the paths to the SBSA test suite
 
 Upstream-Status: Inappropriate (required action)
@@ -10,7 +10,7 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 3 insertions(+)
 
 diff --git a/ShellPkg/ShellPkg.dsc b/ShellPkg/ShellPkg.dsc
-index 557b0ec0f3d6..85b3f4fc65d0 100644
+index 7e985f8280a7..052510236cae 100644
 --- a/ShellPkg/ShellPkg.dsc
 +++ b/ShellPkg/ShellPkg.dsc
 @@ -23,6 +23,8 @@
@@ -22,7 +22,7 @@ index 557b0ec0f3d6..85b3f4fc65d0 100644
    UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
    UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
    UefiBootServicesTableLib|MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
-@@ -88,6 +90,7 @@
+@@ -79,6 +81,7 @@
    # Build all the libraries when building this package.
    # This helps developers test changes and how they affect the package.
    #

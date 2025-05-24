@@ -33,6 +33,9 @@ EXTRA_OECONF = " \
 
 PEP517_SOURCE_PATH = "${S}/py"
 
+# xtables will need it on musl see iptables
+CFLAGS:append:libc-musl = " -D__UAPI_DEF_ETHHDR=0"
+
 inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python', 'python_setuptools_build_meta', '', d)}
 
 PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'python', '${PN}-python', '', d)}"

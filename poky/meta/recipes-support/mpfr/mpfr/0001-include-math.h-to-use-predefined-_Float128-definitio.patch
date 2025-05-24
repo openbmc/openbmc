@@ -1,44 +1,356 @@
-From 4f2af1afce6edb4ba1dfc9bb4849c9f300efe213 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Thu, 26 Dec 2024 19:44:12 -0800
-Subject: [PATCH] include math.h to use predefined _Float128 definition
+From c37c9d599b9aced92e182507bf223440bbc9a9f1 Mon Sep 17 00:00:00 2001
+From: Vincent Lefevre <vincent@vinc17.net>
+Date: Thu, 6 Mar 2025 01:34:28 +0100
+Subject: [PATCH] Portability: clean up support for binary128 (a.k.a.
+ float128).
 
-glibc has added this patch [1] which defines __HAVE_FLOAT128 for clang
-therefore include math.h to avoid defining _Float128 during configure if
-not needed.
+This fixes a configure failure with Clang and glibc 2.41:
+  https://bugs.gentoo.org/949962
+  https://sourceware.org/bugzilla/show_bug.cgi?id=32750
+  https://sympa.inria.fr/sympa/arc/mpfr/2025-02/msg00025.html
+  https://sympa.inria.fr/sympa/arc/mpfr/2025-03/msg00001.html
 
-Fixes
-cannot combine with previous '__float128' declaration specifier
+The issue is the following: in its configure script, GNU MPFR first
+tests whether _Float128 is supported (without header inclusions);
+if it isn't, MPFR then tests whether __float128 is supported, and
+in such a case, it defines _Float128 as __float128 with
 
-[1] https://sourceware.org/git/?p=glibc.git;a=blobdiff;f=sysdeps/x86/bits/floatn.h;h=ba030d270a73c71f166083b30dbaf89371ff49fa;hp=e661abaea469b8b916fd312cc42382ad4c5e220f;hb=d773aff467840f5ed305e40c180466e90bd88183;hpb=b2556550a0f952b2a841a0b4bddc999c2df1b233
+  AC_DEFINE([_Float128],[__float128],[__float128 fallback])
 
-Upstream-Status: Submitted [https://sympa.inria.fr/sympa/arc/mpfr/2024-12/msg00001.html]
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
+As Clang supports __float128 but not _Float128 (at least on x86_64,
+up to version 19), this fallback is selected. But glibc 2.41 has a
+similar fallback, with a typedef:
+
+  typedef __float128 _Float128;
+
+With the MPFR _Float128 macro defined as __float128, as soon as some
+header such as <stdio.h> is included, this yields
+
+  typedef __float128 __float128;
+
+which is incorrect. This first occurs in the
+
+  AC_MSG_CHECKING(for GMP_NUMB_BITS and sizeof(mp_limb_t) consistency)
+  [...]
+
+configure test (in configure.ac), hence the failure of this test and
+the configure script.
+
+As an attempt to avoid such an issue with header inclusion, a solution
+should be to include the common headers in every configure test.
+
+But since _Float128 is a reserved identifier, we must avoid defining
+it as a macro (a typedef would also be incorrect). This is done here,
+by defining a mpfr_float128 macro instead. In the public mpfr.h header
+file, if the user has defined MPFR_WANT_FLOAT128: mpfr_float128 will
+be defined as _Float128 by default (thus this will not change the API),
+but if _Float128 is not supported, the user should define mpfr_float128
+as __float128 (or an equivalent type that is supported).
+
+* acinclude.m4: changed _Float128 to mpfr_float128 in AC_DEFINE.
+* configure.ac: updated a comment about _Float128.
+* doc/README.dev: update about MPFR_WANT_FLOAT128 and _Float128.
+* doc/mpfr.texi: in "Nomenclature and Types", added a paragraph about
+  binary128 support and the mpfr_float128 macro; update concerning the
+  functions related to binary128 (in particular, in the prototypes,
+  changed _Float128 to mpfr_float128).
+* src/mpfr.h: under "#ifdef MPFR_WANT_FLOAT128", define mpfr_float128
+  as _Float128 if not defined yet; in the prototypes, changed
+  _Float128 to mpfr_float128.
+* src/get_float128.c, src/set_float128.c, tests/tset_float128.c:
+  changed _Float128 to mpfr_float128; updated comments.
+* tests/tversion.c: for "float128 = yes", also output the actual type.
+
+Upstream-Status: Backport [https://gitlab.inria.fr/mpfr/mpfr/-/commit/c37c9d599b9aced92e182507bf223440bbc9a9f1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>                                             
 ---
- acinclude.m4 | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ acinclude.m4          | 11 +++++++----
+ configure.ac          |  2 +-
+ doc/README.dev        | 11 ++---------
+ doc/mpfr.texi         | 37 ++++++++++++++++++++++++++-----------
+ src/get_float128.c    | 17 ++++++++++-------
+ src/mpfr.h            | 10 ++++++++--
+ src/set_float128.c    | 15 +++++++++------
+ tests/tset_float128.c |  8 ++++----
+ tests/tversion.c      |  8 +++++++-
+ 9 files changed, 74 insertions(+), 45 deletions(-)
 
-diff --git a/acinclude.m4 b/acinclude.m4
-index 3d7910517..65c4eb9fd 100644
 --- a/acinclude.m4
 +++ b/acinclude.m4
-@@ -805,8 +805,9 @@ dnl the "undefined reference" error disappear.
- if test "$enable_float128" != no; then
-    AC_MSG_CHECKING(if _Float128 with hex constants is supported)
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([[]], [[
--volatile _Float128 x = 0x1.fp+16383f128;
--return x == 0;
-+     #include <math.h>
-+     volatile _Float128 x = 0x1.fp+16383f128;
-+     return x == 0;
+@@ -781,8 +781,11 @@ fi
+ # End of decimal float checks
+ 
+ dnl Check if _Float128 or __float128 is available. We also require the
+-dnl compiler to support hex constants with the f128 or q suffix (this
+-dnl prevents the _Float128 support with GCC's -std=c90, but who cares?).
++dnl compiler to support hex constants with the f128 or q suffix respectively.
++dnl If _Float128 is supported, then the mpfr_float128 macro should be
++dnl defined as this type. We do not define it here because this will be
++dnl done in mpfr.h, and not defining it here is the only way to ensure
++dnl that under "make check", mpfr.h really defines it.
+ dnl Note: We use AC_LINK_IFELSE instead of AC_COMPILE_IFELSE since an
+ dnl error may occur only at link time, such as under NetBSD:
+ dnl   https://mail-index.netbsd.org/pkgsrc-users/2018/02/02/msg026220.html
+@@ -809,8 +812,8 @@ return x == 0;
  ]])],
-       [AC_MSG_RESULT(yes)
-        AC_DEFINE([MPFR_WANT_FLOAT128],1,[Build float128 functions])],
-@@ -816,6 +817,7 @@ dnl Use the q suffix in this case.
-        AC_LINK_IFELSE([AC_LANG_PROGRAM([[
- #define _Float128 __float128
- ]], [[
-+#include <math.h>
- volatile _Float128 x = 0x1.fp+16383q;
- return x == 0;
- ]])],
+           [AC_MSG_RESULT(yes)
+            AC_DEFINE([MPFR_WANT_FLOAT128],2,
+-                     [Build float128 functions with float128 fallback])
+-           AC_DEFINE([_Float128],[__float128],[__float128 fallback])],
++                     [Build float128 functions with __float128 fallback])
++           AC_DEFINE([mpfr_float128],[__float128],[__float128 fallback])],
+           [AC_MSG_RESULT(no)
+            if test "$enable_float128" = yes; then
+               AC_MSG_ERROR(
+--- a/configure.ac
++++ b/configure.ac
+@@ -277,7 +277,7 @@ AC_ARG_ENABLE(decimal-float,
+ 
+ dnl Warning! Not to be confused with _Decimal128. Thus it is better
+ dnl to say binary128 in the description. It can correspond to either
+-dnl _Float128 (ISO/IEC TS 18661) or __float128 (old type name).
++dnl _Float128 (ISO C23) or __float128 (old type name).
+ AC_ARG_ENABLE(float128,
+    [  --disable-float128      explicitly disable binary128 support
+   --enable-float128       build conversion functions from/to binary128
+--- a/doc/README.dev
++++ b/doc/README.dev
+@@ -836,13 +836,6 @@ does not conform to the C standard by de
+ 
+    =====================================================================
+ 
+-In MPFR, _Float128 may be defined as __float128 if the latter is provided
+-by the compiler, but not the former. In such a case, do not assume that
+-_Float128 and long double are necessarily different types (as required by
+-the WG14 N2579 draft "IEC 60559 interchange and extended types").
+-
+-   =====================================================================
+-
+ For string suffix selection, do not write expressions of the form
+ string + integer, such as
+ 
+--- a/doc/mpfr.texi
++++ b/doc/mpfr.texi
+@@ -833,6 +833,26 @@ MPFR has a global (or per-thread) flag f
+ provides operations on flags (@ref{Exceptions}). This C data type is used
+ to represent a group of flags (or a mask).
+ 
++@cindex binary128
++@cindex float128
++@tindex @code{_Float128}
++@tindex @code{__float128}
++@tindex @code{mpfr_float128}
++MPFR can be built with binary128 support (a.k.a.@: float128) for some
++conversion functions if the @samp{_Float128} type (from ISO C23) or
++the @samp{__float128} type (a common extension) is available. This is
++automatically detected, but the @samp{--enable-float128} configure option
++can also be used to ensure this support.  For this support, MPFR uses a
++@code{mpfr_float128} macro, which needs to be defined as a supported type
++for the binary128 format, typically @samp{_Float128} or @samp{__float128},
++depending on the compiler and the system used to compile the user code.
++Before including @file{mpfr.h}, the user needs to do the following (in
++any order): define the @code{MPFR_WANT_FLOAT128} macro and define the
++@code{mpfr_float128} macro as the actual float128 type; @file{mpfr.h} will
++define @code{mpfr_float128} as @samp{_Float128} by default, but mainly for
++compatibility with software written for MPFR@tie{}4.1.x and 4.2.0, where
++the prototypes used @samp{_Float128}.
++
+ @node MPFR Variable Conventions, Rounding, Nomenclature and Types, MPFR Basics
+ @comment  node-name,  next,  previous,  up
+ @section MPFR Variable Conventions
+@@ -3646,9 +3666,9 @@ return zero otherwise.
+ @end deftypefun
+ 
+ @deftypefun int mpfr_buildopt_float128_p (void)
+-Return a non-zero value if MPFR was compiled with @samp{_Float128} support
+-(that is, MPFR was built with the @samp{--enable-float128} configure option),
+-return zero otherwise.
++Return a non-zero value if MPFR was compiled with binary128 support
++(a.k.a.@: float128), return zero otherwise. @xref{Nomenclature and Types}
++for additional information.
+ @end deftypefun
+ 
+ @deftypefun int mpfr_buildopt_decimal_p (void)
+--- a/src/get_float128.c
++++ b/src/get_float128.c
+@@ -1,5 +1,5 @@
+ /* mpfr_get_float128 -- convert a multiple precision floating-point
+-                        number to a _Float128 number
++                        number to a binary128 (a.k.a. float128) number
+ 
+ Copyright 2012-2023 Free Software Foundation, Inc.
+ Contributed by the AriC and Caramba projects, INRIA.
+@@ -25,17 +25,20 @@ https://www.gnu.org/licenses/ or write t
+ 
+ #ifdef MPFR_WANT_FLOAT128
+ 
++/* Note: mpfr_get_float128 is a macro defined as the actual binary128 type:
++   either _Float128 or __float128. */
++
+ /* generic code */
+-_Float128
++mpfr_float128
+ mpfr_get_float128 (mpfr_srcptr x, mpfr_rnd_t rnd_mode)
+ {
+ 
+   if (MPFR_UNLIKELY (MPFR_IS_SINGULAR (x)))
+-    return (_Float128) mpfr_get_d (x, rnd_mode);
++    return (mpfr_float128) mpfr_get_d (x, rnd_mode);
+   else /* now x is a normal non-zero number */
+     {
+-      _Float128 r; /* result */
+-      _Float128 m;
++      mpfr_float128 r; /* result */
++      mpfr_float128 m;
+       mpfr_exp_t e;  /* exponent of x (before rounding) */
+       mpfr_exp_t sh; /* exponent shift, so that x/2^sh is in the double range */
+       const int emin = -16381;
+@@ -62,7 +65,7 @@ mpfr_get_float128 (mpfr_srcptr x, mpfr_r
+ 
+           MPFR_SAVE_EXPO_MARK (expo);
+ 
+-          /* First round x to the target _Float128 precision, taking the
++          /* First round x to the target binary128 precision, taking the
+              reduced precision of the subnormals into account, so that all
+              subsequent operations are exact (this avoids double rounding
+              problems). */
+@@ -83,7 +86,7 @@ mpfr_get_float128 (mpfr_srcptr x, mpfr_r
+                  always work if GMP_NUMB_BITS > IEEE_FLOAT128_MANT_DIG.
+                  MPFR_LIMB_HIGHBIT has the advantage to fit on 1 bit. */
+               r += yp[i];
+-              r *= 1 / (2 * (_Float128) MPFR_LIMB_HIGHBIT);
++              r *= 1 / (2 * (mpfr_float128) MPFR_LIMB_HIGHBIT);
+             }
+ 
+           mpfr_clear (y);
+--- a/src/mpfr.h
++++ b/src/mpfr.h
+@@ -476,8 +476,14 @@ __MPFR_DECLSPEC int mpfr_set_decimal128
+ #endif
+ __MPFR_DECLSPEC int mpfr_set_ld (mpfr_ptr, long double, mpfr_rnd_t);
+ #ifdef MPFR_WANT_FLOAT128
+-__MPFR_DECLSPEC int mpfr_set_float128 (mpfr_ptr, _Float128, mpfr_rnd_t);
+-__MPFR_DECLSPEC _Float128 mpfr_get_float128 (mpfr_srcptr, mpfr_rnd_t);
++/* The user is free to define mpfr_float128 as another equivalent type,
++   such as __float128 if this one is supported by the current compiler
++   but _Float128 isn't. */
++# ifndef mpfr_float128
++#  define mpfr_float128 _Float128
++# endif
++__MPFR_DECLSPEC int mpfr_set_float128 (mpfr_ptr, mpfr_float128, mpfr_rnd_t);
++__MPFR_DECLSPEC mpfr_float128 mpfr_get_float128 (mpfr_srcptr, mpfr_rnd_t);
+ #endif
+ __MPFR_DECLSPEC int mpfr_set_z (mpfr_ptr, mpz_srcptr, mpfr_rnd_t);
+ __MPFR_DECLSPEC int mpfr_set_z_2exp (mpfr_ptr, mpz_srcptr, mpfr_exp_t,
+--- a/src/set_float128.c
++++ b/src/set_float128.c
+@@ -1,4 +1,4 @@
+-/* mpfr_set_float128 -- convert a machine _Float128 number to
++/* mpfr_set_float128 -- convert a binary128 (a.k.a. float128) number to
+                         a multiple precision floating-point number
+ 
+ Copyright 2012-2023 Free Software Foundation, Inc.
+@@ -26,8 +26,11 @@ https://www.gnu.org/licenses/ or write t
+ 
+ #ifdef MPFR_WANT_FLOAT128
+ 
++/* Note: mpfr_get_float128 is a macro defined as the actual binary128 type:
++   either _Float128 or __float128. */
++
+ #if MPFR_WANT_FLOAT128 == 1
+-/* _Float128 type from ISO/IEC TS 18661 */
++/* _Float128 type from ISO C23 */
+ # define MPFR_FLOAT128_MAX 0x1.ffffffffffffffffffffffffffffp+16383f128
+ #elif MPFR_WANT_FLOAT128 == 2
+ /* __float128 type (GNU C extension) */
+@@ -37,12 +40,12 @@ https://www.gnu.org/licenses/ or write t
+ #endif
+ 
+ int
+-mpfr_set_float128 (mpfr_ptr r, _Float128 d, mpfr_rnd_t rnd_mode)
++mpfr_set_float128 (mpfr_ptr r, mpfr_float128 d, mpfr_rnd_t rnd_mode)
+ {
+   mpfr_t t;
+   mp_limb_t *tp;
+   int inexact, shift_exp, neg, e, i;
+-  _Float128 p[14], q[14];
++  mpfr_float128 p[14], q[14];
+   MPFR_SAVE_EXPO_DECL (expo);
+ 
+   /* Check for NaN */
+@@ -66,7 +69,7 @@ mpfr_set_float128 (mpfr_ptr r, _Float128
+       return 0;
+     }
+   /* Check for ZERO */
+-  else if (MPFR_UNLIKELY (d == (_Float128) 0.0))
++  else if (MPFR_UNLIKELY (d == (mpfr_float128) 0.0))
+     return mpfr_set_d (r, (double) d, rnd_mode);
+ 
+   shift_exp = 0; /* invariant: remainder to deal with is d*2^shift_exp */
+@@ -129,7 +132,7 @@ mpfr_set_float128 (mpfr_ptr r, _Float128
+ 
+   for (i = MPFR_LAST_LIMB (t); i >= 0; i--)
+     {
+-      d *= 2 * (_Float128) MPFR_LIMB_HIGHBIT;
++      d *= 2 * (mpfr_float128) MPFR_LIMB_HIGHBIT;
+       tp[i] = (mp_limb_t) d;
+       d -= tp[i];
+     }
+--- a/tests/tset_float128.c
++++ b/tests/tset_float128.c
+@@ -33,7 +33,7 @@ https://www.gnu.org/licenses/ or write t
+ static void
+ check_special (void)
+ {
+-  _Float128 f;
++  mpfr_float128 f;
+   mpfr_t x;
+ 
+   mpfr_init2 (x, 113);
+@@ -162,7 +162,7 @@ static void
+ check_large (void)
+ {
+   mpfr_exp_t emin, emax;
+-  _Float128 f, e;
++  mpfr_float128 f, e;
+   int i;
+   mpfr_t x, y;
+   int r;
+@@ -177,7 +177,7 @@ check_large (void)
+   /* check with the largest float128 number 2^16384*(1-2^(-113)) */
+   for (f = 1.0, i = 0; i < 113; i++)
+     f = f + f;
+-  f = f - (_Float128) 1.0;
++  f = f - (mpfr_float128) 1.0;
+   mpfr_set_ui (y, 1, MPFR_RNDN);
+   mpfr_mul_2ui (y, y, 113, MPFR_RNDN);
+   mpfr_sub_ui (y, y, 1, MPFR_RNDN);
+@@ -258,7 +258,7 @@ check_small (void)
+ {
+   int t[5] = { 1, 2, 17, 111, 112 };
+   mpfr_exp_t emin;
+-  _Float128 e, f;
++  mpfr_float128 e, f;
+   int i, j, neg, inex, r;
+   mpfr_t w, x, y, z;
+ 
+--- a/tests/tversion.c
++++ b/tests/tversion.c
+@@ -309,10 +309,16 @@ main (void)
+       err = 1;
+     }
+ 
++#ifdef MPFR_WANT_FLOAT128
++# define MPFR_F128 "yes (" MAKE_STR(mpfr_float128) ")"
++#else
++# define MPFR_F128 "no"
++#endif
++
+   (printf) ("[tversion] TLS = %s, float128 = %s, decimal = %s,"
+             " GMP internals = %s\n",
+             mpfr_buildopt_tls_p () ? "yes" : "no",
+-            mpfr_buildopt_float128_p () ? "yes" : "no",
++            MPFR_F128,
+             mpfr_buildopt_decimal_p () ? "yes"
+ #if defined(DECIMAL_BID_FORMAT)
+             " (BID)"

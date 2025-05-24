@@ -1,7 +1,7 @@
 require samhain.inc
 
-SRC_URI += "file://samhain-not-run-ptest-on-host.patch \
-            file://0001-Don-t-expose-configure-args.patch \
+SRC_URI += "file://0011-not-run-test-on-host-since-we-are-doing-cross-compil.patch \
+            file://0012-Don-t-expose-configure-args.patch \
             file://run-ptest \
 "
 
@@ -28,7 +28,8 @@ do_install:append() {
 
 do_install_ptest() {
 	mkdir -p ${D}${PTEST_PATH}
-	install ${S}/cutest ${D}${PTEST_PATH}
+	install -m 755 ${S}/cutest ${D}${PTEST_PATH}
+	install -m 644 ${S}/COPYING ${D}${PTEST_PATH}
 }
 
 RPROVIDES:${PN} += "samhain"

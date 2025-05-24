@@ -21,4 +21,4 @@ DEPENDS += "pcsc-lite"
 
 RDEPENDS:${PN} += "perl-module-carp"
 
-BBCLASSEXTEND="native"
+BBCLASSEXTEND = "native"

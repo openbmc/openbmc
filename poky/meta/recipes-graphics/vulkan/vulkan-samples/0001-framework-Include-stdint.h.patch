@@ -1,0 +1,26 @@
+From 445fcfd7b9245881d769880a5942ce9faa893045 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 23 Mar 2025 20:09:35 -0700
+Subject: [PATCH] framework: Include stdint.h
+
+Needed for uint32_t used in this header
+GCC 15 gets upset about it.
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/Vulkan-Samples/pull/1314]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ framework/platform/configuration.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/framework/platform/configuration.h b/framework/platform/configuration.h
+index f6a9cae..c15f76f 100644
+--- a/framework/platform/configuration.h
++++ b/framework/platform/configuration.h
+@@ -18,6 +18,7 @@
+ #pragma once
+ 
+ #include <algorithm>
++#include <cstdint>
+ #include <map>
+ #include <memory>
+ #include <string>

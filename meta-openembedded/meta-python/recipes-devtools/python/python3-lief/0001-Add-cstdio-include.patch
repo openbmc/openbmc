@@ -1,0 +1,134 @@
+From a9b7a9f5c5572fc839d05457da073dc817722ace Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 1 Apr 2025 17:27:46 -0700
+Subject: [PATCH] Add cstdio include
+
+This is needed for uintXX_t types, GCC-15 is defauling to C23 and will error
+about it.
+
+e.g.
+
+include/LIEF/PE/LoadConfigurations/VolatileMetadata.hpp:145:3: note: 'uint32_t' is defined in header '<cstdint>'; this is probably fixable by adding '#include <cstdint>'
+
+Upstream-Status: Submitted [https://github.com/lief-project/LIEF/pull/1184]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/LIEF/DWARF/Scope.hpp                                     | 1 +
+ include/LIEF/ObjC/Method.hpp                                     | 1 +
+ include/LIEF/PDB/PublicSymbol.hpp                                | 1 +
+ include/LIEF/PDB/types/Attribute.hpp                             | 1 +
+ include/LIEF/PE/LoadConfigurations/VolatileMetadata.hpp          | 1 +
+ include/LIEF/PE/Relocation.hpp                                   | 1 +
+ include/LIEF/PE/signature/attributes/PKCS9AtSequenceNumber.hpp   | 1 +
+ include/LIEF/PE/signature/attributes/SpcRelaxedPeMarkerCheck.hpp | 1 +
+ src/MachO/TrieNode.hpp                                           | 1 +
+ 9 files changed, 9 insertions(+)
+
+diff --git a/include/LIEF/DWARF/Scope.hpp b/include/LIEF/DWARF/Scope.hpp
+index 78752847..61977c21 100644
+--- a/include/LIEF/DWARF/Scope.hpp
++++ b/include/LIEF/DWARF/Scope.hpp
+@@ -15,6 +15,7 @@
+ #ifndef LIEF_DWARF_SCOPE_H
+ #define LIEF_DWARF_SCOPE_H
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ 
+diff --git a/include/LIEF/ObjC/Method.hpp b/include/LIEF/ObjC/Method.hpp
+index b4e82c6e..b9f37288 100644
+--- a/include/LIEF/ObjC/Method.hpp
++++ b/include/LIEF/ObjC/Method.hpp
+@@ -16,6 +16,7 @@
+ #define LIEF_OBJC_METHOD_H
+ #include <LIEF/visibility.h>
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ 
+diff --git a/include/LIEF/PDB/PublicSymbol.hpp b/include/LIEF/PDB/PublicSymbol.hpp
+index b8904a5b..0e105435 100644
+--- a/include/LIEF/PDB/PublicSymbol.hpp
++++ b/include/LIEF/PDB/PublicSymbol.hpp
+@@ -14,6 +14,7 @@
+  */
+ #ifndef LIEF_PDB_PUBLIC_SYMBOL_H
+ #define LIEF_PDB_PUBLIC_SYMBOL_H
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <ostream>
+diff --git a/include/LIEF/PDB/types/Attribute.hpp b/include/LIEF/PDB/types/Attribute.hpp
+index a41270c0..fc961be5 100644
+--- a/include/LIEF/PDB/types/Attribute.hpp
++++ b/include/LIEF/PDB/types/Attribute.hpp
+@@ -17,6 +17,7 @@
+ 
+ #include "LIEF/visibility.h"
+ 
++#include <cstdint>
+ #include <string>
+ #include <memory>
+ 
+diff --git a/include/LIEF/PE/LoadConfigurations/VolatileMetadata.hpp b/include/LIEF/PE/LoadConfigurations/VolatileMetadata.hpp
+index 41b9e36b..073ccabc 100644
+--- a/include/LIEF/PE/LoadConfigurations/VolatileMetadata.hpp
++++ b/include/LIEF/PE/LoadConfigurations/VolatileMetadata.hpp
+@@ -15,6 +15,7 @@
+  */
+ #ifndef LIEF_PE_LOAD_CONFIGURATION_VOLATILE_METADATA_H
+ #define LIEF_PE_LOAD_CONFIGURATION_VOLATILE_METADATA_H
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <vector>
+diff --git a/include/LIEF/PE/Relocation.hpp b/include/LIEF/PE/Relocation.hpp
+index a4cd2e96..cd81bf68 100644
+--- a/include/LIEF/PE/Relocation.hpp
++++ b/include/LIEF/PE/Relocation.hpp
+@@ -15,6 +15,7 @@
+  */
+ #ifndef LIEF_PE_RELOCATION_H
+ #define LIEF_PE_RELOCATION_H
++#include <cstdint>
+ #include <vector>
+ #include <ostream>
+ #include <memory>
+diff --git a/include/LIEF/PE/signature/attributes/PKCS9AtSequenceNumber.hpp b/include/LIEF/PE/signature/attributes/PKCS9AtSequenceNumber.hpp
+index a89901fa..32db1470 100644
+--- a/include/LIEF/PE/signature/attributes/PKCS9AtSequenceNumber.hpp
++++ b/include/LIEF/PE/signature/attributes/PKCS9AtSequenceNumber.hpp
+@@ -15,6 +15,7 @@
+  */
+ #ifndef LIEF_PE_ATTRIBUTES_PKCS9_AT_SEQUENCE_NUMBER_H
+ #define LIEF_PE_ATTRIBUTES_PKCS9_AT_SEQUENCE_NUMBER_H
++#include <cstdint>
+ 
+ #include "LIEF/visibility.h"
+ #include "LIEF/PE/signature/Attribute.hpp"
+diff --git a/include/LIEF/PE/signature/attributes/SpcRelaxedPeMarkerCheck.hpp b/include/LIEF/PE/signature/attributes/SpcRelaxedPeMarkerCheck.hpp
+index f84fbcbf..5cce98b4 100644
+--- a/include/LIEF/PE/signature/attributes/SpcRelaxedPeMarkerCheck.hpp
++++ b/include/LIEF/PE/signature/attributes/SpcRelaxedPeMarkerCheck.hpp
+@@ -15,6 +15,7 @@
+  */
+ #ifndef LIEF_PE_ATTRIBUTES_SPC_RELAXED_PE_MARKER_CHECK_H
+ #define LIEF_PE_ATTRIBUTES_SPC_RELAXED_PE_MARKER_CHECK_H
++#include <cstdint>
+ 
+ #include "LIEF/visibility.h"
+ #include "LIEF/PE/signature/Attribute.hpp"
+diff --git a/src/MachO/TrieNode.hpp b/src/MachO/TrieNode.hpp
+index f6c411b8..6bdde9ec 100644
+--- a/src/MachO/TrieNode.hpp
++++ b/src/MachO/TrieNode.hpp
+@@ -15,6 +15,7 @@
+  */
+ #ifndef LIEF_MACHO_TRIE_NODE_H_
+ #define LIEF_MACHO_TRIE_NODE_H_
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ #include <memory>

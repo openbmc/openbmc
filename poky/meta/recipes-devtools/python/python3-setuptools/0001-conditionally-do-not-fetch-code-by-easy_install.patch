@@ -1,4 +1,4 @@
-From 9441848a121912b6627c7188ab95595684c8306b Mon Sep 17 00:00:00 2001
+From a8bffb1a3d0273d049b93df18982edee7b0cc4ec Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 17 Jul 2018 10:13:38 +0800
 Subject: [PATCH] conditionally do not fetch code by easy_install
@@ -20,10 +20,10 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/setuptools/command/easy_install.py b/setuptools/command/easy_install.py
-index 66fe68f..8647c20 100644
+index eb1b4c1..4fd8d14 100644
 --- a/setuptools/command/easy_install.py
 +++ b/setuptools/command/easy_install.py
-@@ -673,6 +673,11 @@ class easy_install(Command):
+@@ -672,6 +672,11 @@ class easy_install(Command):
              os.path.exists(tmpdir) and _rmtree(tmpdir)
  
      def easy_install(self, spec, deps: bool = False) -> Distribution | None:

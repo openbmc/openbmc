@@ -1,5 +1,5 @@
 SUMMARY = "Fast, Extensible Progress Meter"
-HOMEPAGE = "http://tqdm.github.io/"
+HOMEPAGE = "https://tqdm.github.io/"
 SECTION = "devel/python"
 
 LICENSE = "MIT & MPL-2.0"

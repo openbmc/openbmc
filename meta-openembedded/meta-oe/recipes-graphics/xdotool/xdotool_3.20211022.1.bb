@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "96f0facfde6d78eacad35b91b0f46fecd0b35e474c03e00e30da3fdd34
 
 EXTRA_OEMAKE = "PREFIX=${prefix} INSTALLLIB=${libdir} INSTALLMAN=${mandir} WITHOUT_RPATH_FIX=1"
 
-UPSTREAM_CHECK_URI="https://github.com/jordansissel/xdotool/tags"
+UPSTREAM_CHECK_URI = "https://github.com/jordansissel/xdotool/tags"
 UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+\.\d{8}\.\d+)"
 
 do_install() {

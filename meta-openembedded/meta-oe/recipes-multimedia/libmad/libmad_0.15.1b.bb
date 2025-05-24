@@ -16,10 +16,14 @@ SRC_URI = "https://downloads.sourceforge.net/mad/libmad-${PV}.tar.gz \
     file://obsolete_automake_macros.patch \
     file://automake-foreign.patch \
     file://0001-configure-Respect-the-cflags-from-environment.patch \
+    file://CVE-2017-8372_CVE-2017-8373.patch \
+    file://CVE-2017-8374.patch \
 "
 SRC_URI:append:toolchain-clang = " file://0004-Remove-clang-unsupported-compiler-flags.patch "
 
 SRC_URI[sha256sum] = "bbfac3ed6bfbc2823d3775ebb931087371e142bb0e9bb1bee51a76a6e0078690"
+
+CVE_PRODUCT:append = " mad_libmad"
 
 S = "${WORKDIR}/libmad-${PV}"
 
@@ -34,3 +38,6 @@ do_configure:prepend () {
 }
 
 ARM_INSTRUCTION_SET = "arm"
+
+CVE_STATUS[CVE-2017-11552] = "cpe-incorrect: this CVE is for mpg321, not libmad"
+CVE_STATUS[CVE-2018-7263] = "cpe-incorrect: this CVE is for mpg321, not libmad"

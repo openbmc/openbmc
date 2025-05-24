@@ -35,8 +35,8 @@ class AutotoolsTest(OESDKTestCase):
             self.assertTrue(os.path.isdir(dirs["source"]))
             os.makedirs(dirs["build"])
 
-            self._run("cd {build} && {source}/configure $CONFIGURE_FLAGS".format(**dirs))
-            self._run("cd {build} && make -j".format(**dirs))
+            self._run("cd {build} && {source}/configure CFLAGS='-std=gnu17 -Dbool=int -Dtrue=1 -Dfalse=0 -Wno-error=implicit-function-declaration' $CONFIGURE_FLAGS".format(**dirs))
+            self._run("cd {build} && make CFLAGS='-std=gnu17 -Dbool=int -Dtrue=1 -Dfalse=0 -Wno-error=implicit-function-declaration' -j".format(**dirs))
             self._run("cd {build} && make install DESTDIR={install}".format(**dirs))
 
             self.check_elf(os.path.join(dirs["install"], "usr", "local", "bin", "cpio"))

@@ -46,4 +46,4 @@ FILES:${PN}-uv-dev = "${includedir}/dbus-cxx-uv-2.0/* \
   ${libdir}/libdbus-cxx-uv.so \
   "
 
-BBCLASSEXTEND="native nativesdk"
+BBCLASSEXTEND = "native nativesdk"

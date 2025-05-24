@@ -12,13 +12,13 @@ Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Markus Volk <f_l_k@t-online.de>
 ---
- src/libtracker-sparql/meson.build | 2 +-
+ src/libtinysparql/meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/libtracker-sparql/meson.build b/src/libtracker-sparql/meson.build
+diff --git a/src/libtinysparql/meson.build b/src/libtinysparql/meson.build
 index 5eccb92fc..6ed7c2b1f 100644
---- a/src/libtracker-sparql/meson.build
-+++ b/src/libtracker-sparql/meson.build
+--- a/src/libtinysparql/meson.build
++++ b/src/libtinysparql/meson.build
 @@ -247,6 +247,6 @@ endif
  
  tracker_sparql_uninstalled_dir = meson.current_build_dir()

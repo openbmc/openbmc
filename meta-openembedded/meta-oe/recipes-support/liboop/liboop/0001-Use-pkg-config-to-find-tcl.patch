@@ -1,0 +1,48 @@
+From 5dad843ca0860d6d7be443ddc850566584b8004a Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sun, 16 Feb 2025 21:09:02 +0100
+Subject: [PATCH] Use pkg-config to find tcl
+
+Instead of using hardcoded path for the tcl include folder
+use pkg-config to find the proper values.
+
+That way it won't use the system folders for cross-compilation.
+
+Also, extend the number of tcl versions to check (at the time of
+this commit oe-core provides version 8.6)
+
+Upstream-Status: Pending
+---
+ configure.ac | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e95956e..3d0dc82 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -71,18 +71,17 @@ if test xno != x$with_glib; then
+ fi
+ 
+ if test xno != x$with_tcl; then
+-  for version in 8.4 8.3 8.2 8.1 8.0 ; do
+-    CPPFLAGS="$save_cppflags -I/usr/include/tcl$version"
+-    AC_CHECK_LIB(tcl$version,Tcl_Main,[
+-    AC_CHECK_HEADER(tcl.h,[
++  save_cppflags="$CPPFLAGS"
++  for version in "" 8.4 8.3 8.2 8.1 8.0 ; do
++    PKG_CHECK_EXISTS(tcl$version,,continue)
++    PKG_CHECK_MODULES(TCL, tcl$version, [
+       LIBOOP_LIBS="liboop-tcl.la $LIBOOP_LIBS"
+       AC_DEFINE(HAVE_TCL)
+-      TCL_INCLUDES="-I/usr/include/tcl$version"
+-      TCL_LIBS="-ltcl$version"
++      TCL_INCLUDES="$TCL_CFLAGS"
++      CPPFLAGS="$save_cppflags $TCL_CFLAGS"
+       break
+-    ])])
++  ])
+   done
+-  CPPFLAGS="$save_cppflags"
+ fi
+ 
+ if test xyes = x$with_libwww; then

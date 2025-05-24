@@ -19,8 +19,13 @@ target:
   # Target packages to test aarch64
   - fvp-base-a-aem
   - fvp-corstone1000
+  - fvp-rd1-ae
+  - fvp-v3-r1
   # Nativesdk to test x86-64
   - nativesdk-fvp-base-a-aem
   - nativesdk-fvp-corstone1000
-  - nativesdk-fvp-n1-edge
+  - nativesdk-fvp-rd1-ae
+  - nativesdk-fvp-v3-r1
+  # These are x86 only... :(
   - nativesdk-fvp-sgi575
+  - nativesdk-fvp-tc3

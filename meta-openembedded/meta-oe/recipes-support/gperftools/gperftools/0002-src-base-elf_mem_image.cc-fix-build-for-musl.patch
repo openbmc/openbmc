@@ -1,0 +1,35 @@
+From 02ff9fcc74ba64aeb22fcc553f30657bd2b62930 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Wed, 26 Feb 2025 23:46:56 -0800
+Subject: [PATCH 2/3] src/base/elf_mem_image.cc: fix build for musl
+
+Include header file for musl to avoid error below:
+
+  error: '__WORDSIZE' was not declared in this scope
+
+Upstream-Status: Pending
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ src/base/elf_mem_image.cc | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/base/elf_mem_image.cc b/src/base/elf_mem_image.cc
+index d2ca1a5..89dc0e4 100644
+--- a/src/base/elf_mem_image.cc
++++ b/src/base/elf_mem_image.cc
+@@ -38,6 +38,11 @@
+ 
+ #ifdef HAVE_ELF_MEM_IMAGE  // defined in elf_mem_image.h
+ 
++// for musl __WORDSIZE definition
++#if !defined(__GLIBC__)
++#include <sys/reg.h>
++#endif
++
+ #include <stddef.h>   // for size_t, ptrdiff_t
+ #include "base/logging.h"
+ 
+-- 
+2.25.1
+

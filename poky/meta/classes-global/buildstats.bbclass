@@ -188,14 +188,17 @@ python run_buildstats () {
     # bitbake fires HeartbeatEvent even before a build has been
     # triggered, causing BUILDNAME to be None
     ########################################################################
-    if bn is not None:
-        bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
-        taskdir = os.path.join(bsdir, d.getVar('PF'))
-        if isinstance(e, bb.event.HeartbeatEvent) and bb.utils.to_boolean(d.getVar("BB_LOG_HOST_STAT_ON_INTERVAL")):
+    if bn is None:
+        return
+
+    bsdir = os.path.join(d.getVar('BUILDSTATS_BASE'), bn)
+    taskdir = os.path.join(bsdir, d.getVar('PF'))
+    if isinstance(e, bb.event.HeartbeatEvent):
+        if bb.utils.to_boolean(d.getVar("BB_LOG_HOST_STAT_ON_INTERVAL")):
             bb.utils.mkdirhier(bsdir)
             write_host_data(os.path.join(bsdir, "host_stats_interval"), e, d, "interval")
 
-    if isinstance(e, bb.event.BuildStarted):
+    elif isinstance(e, bb.event.BuildStarted):
         ########################################################################
         # If the kernel was not configured to provide I/O statistics, issue
         # a one time warning.
@@ -234,7 +237,7 @@ python run_buildstats () {
                 if cpu:
                     f.write("CPU usage: %0.1f%% \n" % cpu)
 
-    if isinstance(e, bb.build.TaskStarted):
+    elif isinstance(e, bb.build.TaskStarted):
         set_timedata("__timedata_task", d, e.time)
         bb.utils.mkdirhier(taskdir)
         # write into the task event file the name and start time

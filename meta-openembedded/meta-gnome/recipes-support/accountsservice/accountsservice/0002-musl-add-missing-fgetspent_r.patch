@@ -1,27 +1,29 @@
-From 7401e682400df87f3258f795bb1d143f64a35a9f Mon Sep 17 00:00:00 2001
+From 87c5c711f6f828053abd754628a0067696cfd54d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
-Date: Mon, 9 Dec 2019 00:12:08 +0100
+Date: Mon, 9 Dec 2019 09:36:12 +0100
 Subject: [PATCH] musl: add missing fgetspent_r
+
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 
 Stolen from void-linux
 
 Upstream-Status: Inappropriate [musl-specific]
-
 ---
- src/daemon.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ src/daemon.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
 diff --git a/src/daemon.c b/src/daemon.c
-index c52bda3..a7676fe 100644
+index aa9d050..cc53eae 100644
 --- a/src/daemon.c
 +++ b/src/daemon.c
-@@ -164,6 +164,26 @@ remove_cache_files (const gchar *user_name)
+@@ -215,6 +215,28 @@ remove_cache_files (const gchar *user_name)
          g_remove (icon_filename);
  }
  
-+/* Musl libc does not support fgetspent_r(), write own
-+ * wrapper
-+ */
++#ifndef __GLIBC__
++ /* Musl libc does not support fgetspent_r(), write own
++  * wrapper
++  */
 +static int fgetspent_r(FILE *fp, struct spwd *spbuf, char *buf, size_t buflen, struct spwd **spbufp) {
 +       struct spwd *shadow_entry = fgetspent(fp);
 +       if(!shadow_entry)
@@ -38,6 +40,7 @@ index c52bda3..a7676fe 100644
 +
 +       return 0;
 +}
++#endif
 +
  static struct passwd *
  entry_generator_fgetpwent (Daemon       *daemon,

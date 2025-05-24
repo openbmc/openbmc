@@ -15,8 +15,8 @@ SRC_URI[sha256sum] = "21b1e2e1cb0e288b0ec8fcfd9fed449914e0f8e6fc273706bd5b3d4f6a
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS = "virtual/kernel"
 
-EXTRA_OEMAKE="CROSS_COMPILE=${TARGET_PREFIX} CC='${CC} ${LDFLAGS}' \
-              KERNEL_DIR=${STAGING_KERNEL_DIR} "
+EXTRA_OEMAKE = "CROSS_COMPILE=${TARGET_PREFIX} CC='${CC} ${LDFLAGS}' \
+                KERNEL_DIR=${STAGING_KERNEL_DIR} "
 
 do_compile:prepend () {
     oe_runmake clean

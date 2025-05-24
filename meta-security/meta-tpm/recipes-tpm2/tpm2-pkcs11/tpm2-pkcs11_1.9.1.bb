@@ -44,6 +44,6 @@ FILES:${PN} += "\
 INSANE_SKIP:${PN}   += "dev-so"
 
 RDEPENDS:${PN} = "p11-kit tpm2-tools "
-RDEPENDS:${PN}-tools = "python3-pyyaml python3-cryptography python3-pyasn1-modules"
+RDEPENDS:${PN}-tools = "python3-pyyaml python3-cryptography python3-pyasn1-modules python3-compression python3-fcntl python3-sqlite3 python3-tpm2-pytss"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -42,7 +42,8 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
       - name: Run yocto-check-layer
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE:/work:ro" \
+          docker run --rm --security-opt apparmor=unconfined \
+            -v "$GITHUB_WORKSPACE:/work:ro" \
             --env "BASE_REF=$GITHUB_BASE_REF" \
             "yocto-builder-${{ github.event.number }}" \
             /entrypoint-yocto-check-layer.sh

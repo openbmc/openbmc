@@ -15,8 +15,8 @@ SRC_URI += "file://0001-Remove-unsuitble-part-for-cross-compile.patch \
             file://fix_parallel_make.patch \
            "
 
-export PCP_DIR="${RECIPE_SYSROOT_NATIVE}"
-#export PCP_RUN_DIR="${RECIPE_SYSROOT_NATIVE}"
+export PCP_DIR = "${RECIPE_SYSROOT_NATIVE}"
+#export PCP_RUN_DIR = "${RECIPE_SYSROOT_NATIVE}"
 EXTRA_OEMAKE = "CC="${CC}" LD="${LD}""
 inherit useradd systemd features_check python3targetconfig
 

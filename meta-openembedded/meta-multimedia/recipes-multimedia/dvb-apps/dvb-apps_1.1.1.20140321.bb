@@ -17,7 +17,7 @@ S = "${WORKDIR}/${BPN}-3d43b280298c"
 
 inherit perlnative
 
-export enable_static="no"
+export enable_static = "no"
 
 export PERL_USE_UNSAFE_INC = "1"
 

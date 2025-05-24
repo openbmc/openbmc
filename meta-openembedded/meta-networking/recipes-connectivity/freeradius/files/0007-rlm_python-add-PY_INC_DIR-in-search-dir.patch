@@ -1,4 +1,4 @@
-From e4ff7a2a9834e2589bc7bdda4b74f5bc962b15e6 Mon Sep 17 00:00:00 2001
+From 0aab0817acf2179d99c516d7933c80c411855eb7 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Wed, 27 Jan 2016 05:07:19 -0500
 Subject: [PATCH] rlm_python: add PY_INC_DIR in search dir
@@ -28,3 +28,6 @@ index c79c327064..5f4d274990 100644
  	FR_SMART_CHECK_INCLUDE(Python.h)
  	CFLAGS=$old_CFLAGS
  
+-- 
+2.25.1
+

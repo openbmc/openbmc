@@ -267,12 +267,15 @@ class QemuRunner:
             self.monitorpipe = os.fdopen(w, "w")
         else:
             # child process
-            os.setpgrp()
-            os.close(w)
-            r = os.fdopen(r)
-            x = r.read()
-            os.killpg(os.getpgid(self.runqemu.pid), signal.SIGTERM)
-            os._exit(0)
+            try:
+                os.setpgrp()
+                os.close(w)
+                r = os.fdopen(r)
+                x = r.read()
+                os.killpg(os.getpgid(self.runqemu.pid), signal.SIGTERM)
+            finally:
+                # We must exit under all circumstances
+                os._exit(0)
 
         self.logger.debug("runqemu started, pid is %s" % self.runqemu.pid)
         self.logger.debug("waiting at most %d seconds for qemu pid (%s)" %
@@ -534,7 +537,7 @@ class QemuRunner:
                 self.logger.debug("Logged in as %s in serial console" % self.boot_patterns['send_login_user'].replace("\n", ""))
                 if netconf:
                     # configure guest networking
-                    cmd = "ifconfig eth0 %s netmask %s up\n" % (self.ip, self.netmask)
+                    cmd = "ip addr add %s/%s dev eth0\nip link set dev eth0 up\n" % (self.ip, self.netmask)
                     output = self.run_serial(cmd, raw=True)[1]
                     if re.search(r"root@[a-zA-Z0-9\-]+:~#", output):
                         self.logger.debug("configured ip address %s", self.ip)

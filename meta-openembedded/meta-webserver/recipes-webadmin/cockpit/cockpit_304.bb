@@ -60,10 +60,8 @@ PACKAGES =+ " \
     ${PN}-sosreport \
     ${PN}-storaged \
     ${PN}-networkmanager \
-    ${PN}-machines \
     ${PN}-selinux \
     ${PN}-playground \
-    ${PN}-docker \
     ${PN}-dashboard \
     ${PN}-packagekit \
     ${PN}-apps \
@@ -103,19 +101,11 @@ FILES:${PN}-networkmanager = " \
 "
 RDEPENDS:${PN}-networkmanager = "networkmanager"
 
-FILES:${PN}-machines = " \
-    ${datadir}/cockpit/machines \
-    ${datadir}/metainfo/org.cockpit-project.cockpit-machines.metainfo.xml \
-"
 FILES:${PN}-selinux = " \
     ${datadir}/cockpit/selinux \
     ${datadir}/metainfo/org.cockpit-project.cockpit-selinux.metainfo.xml \
 "
 FILES:${PN}-playground = "${datadir}/cockpit/playground"
-FILES:${PN}-docker = " \
-    ${datadir}/cockpit/docker \
-    ${datadir}/metainfo/org.cockpit-project.cockpit-docker.metainfo.xml \
-"
 FILES:${PN}-dashboard = "${datadir}/cockpit/dashboard"
 ALLOW_EMPTY:${PN}-dashboard = "1"
 

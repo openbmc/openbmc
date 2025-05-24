@@ -16,11 +16,17 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  Lib/test/test_readline.py | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/Lib/test/test_readline.py b/Lib/test/test_readline.py
-index 50e77cb..09b644a 100644
 --- a/Lib/test/test_readline.py
 +++ b/Lib/test/test_readline.py
-@@ -141,6 +141,7 @@ class TestHistoryManipulation (unittest.TestCase):
+@@ -70,6 +70,7 @@ class TestHistoryManipulation (unittest.
+ 
+     @unittest.skipUnless(hasattr(readline, "append_history_file"),
+                          "append_history not available")
++    @unittest.skip("Skipping problematic test")
+     def test_write_read_append(self):
+         hfile = tempfile.NamedTemporaryFile(delete=False)
+         hfile.close()
+@@ -141,6 +142,7 @@ class TestHistoryManipulation (unittest.
          self.assertEqual(readline.get_history_item(1), "entrée 1")
          self.assertEqual(readline.get_history_item(2), "entrée 22")
  
@@ -28,7 +34,7 @@ index 50e77cb..09b644a 100644
      def test_write_read_limited_history(self):
          previous_length = readline.get_history_length()
          self.addCleanup(readline.set_history_length, previous_length)
-@@ -382,6 +383,7 @@ readline.write_history_file(history_file)
+@@ -382,6 +384,7 @@ readline.write_history_file(history_file
          self.assertIn(b"done", output)
  
  

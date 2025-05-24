@@ -29,6 +29,8 @@ EDEPENDS_WAYLAND = "virtual/egl virtual/libgles2 wayland"
 ERDEPENDS_GL    = "libgl"
 ERDEPENDS_GLES2 = "libgles2"
 
+# Needed for introspection.m4
+EXTRA_AUTORECONF += "-I m4"
 # GLESv1 is rarely tested, so disable it
 EXTRA_OECONF += "--enable-examples-install	\
 	       	 --enable-debug		 	\

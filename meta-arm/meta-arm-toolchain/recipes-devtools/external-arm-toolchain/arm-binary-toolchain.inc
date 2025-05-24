@@ -28,4 +28,4 @@ BBCLASSEXTEND = "native nativesdk"
 # Skipping file deps - we don't control the dependencies for prebuilt libraries, resulting in
 # nothing provides libcrypt.so.1()(64bit) needed by nativesdk-gcc-arm-none-eabi 
 # when packaged as RPM for SDK.
-SKIP_FILEDEPS="1"
+SKIP_FILEDEPS = "1"

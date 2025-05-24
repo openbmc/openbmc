@@ -298,7 +298,6 @@ SOUTH_TESTS_MIGRATE = False
 
 # We automatically detect and install applications here if
 # they have a 'models.py' or 'views.py' file
-import os
 currentdir = os.path.dirname(__file__)
 for t in os.walk(os.path.dirname(currentdir)):
     modulename = os.path.basename(t[0])

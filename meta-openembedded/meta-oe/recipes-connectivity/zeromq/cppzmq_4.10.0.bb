@@ -14,7 +14,4 @@ inherit cmake
 
 EXTRA_OECMAKE = "-DCPPZMQ_BUILD_TESTS=OFF"
 
-PACKAGES = "${PN}-dev"
-
-RDEPENDS:${PN}-dev = "zeromq-dev zeromq-staticdev"
-DEV_PKG_DEPENDENCY = ""
+ALLOW_EMPTY:${PN} = "1"

@@ -452,7 +452,7 @@ universal, the list includes them just in case:
      the Source Directory, if you do, the top-level directory name of the
      Source Directory is derived from the Yocto Project release tarball.
      For example, downloading and unpacking poky tarballs from
-     :yocto_dl:`/releases/yocto/&DISTRO_REL_TAG;/`
+     :yocto_dl:`/releases/yocto/&DISTRO_REL_LATEST_TAG;/`
      results in a Source Directory whose root folder is named poky.
 
 

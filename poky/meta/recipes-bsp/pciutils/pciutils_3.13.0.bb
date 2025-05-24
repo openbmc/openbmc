@@ -32,7 +32,10 @@ EXTRA_OEMAKE += "CC="${CC} ${CFLAGS}" AR="${AR}" STRIP= LDFLAGS="${LDFLAGS}""
 EXTRA_OEMAKE += "PREFIX=${prefix} LIBDIR=${libdir} SBINDIR=${sbindir} SHAREDIR=${datadir} MANDIR=${mandir}"
 
 do_install () {
-	oe_runmake DESTDIR=${D} install install-lib
+	# Do these in separate calls as they expose a race in pseudo when creating
+	# symlinks when ran in parallel.
+	oe_runmake DESTDIR=${D} install
+	oe_runmake DESTDIR=${D} install-lib
 
 	install -d ${D}${bindir}
 

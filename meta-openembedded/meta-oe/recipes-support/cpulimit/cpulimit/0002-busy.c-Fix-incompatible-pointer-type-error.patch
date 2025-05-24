@@ -1,0 +1,51 @@
+From 86b71c49a373f78920d78c0e88f530f476b4fe70 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 26 Mar 2025 15:57:54 +0900
+Subject: [PATCH] busy.c: Fix incompatible pointer type error.
+
+Error occurs in gcc 15.0.1 environment.
+busy.c: In function 'main':
+busy.c:20:58: error: passing argument 3 of 'pthread_create' from incompatible pointer type [-Wincompatible-pointer-types]
+   20 |                 if ((ret = pthread_create(&thread, NULL, loop, NULL)) != 0)
+      |                                                          ^~~~
+      |                                                          |
+      |                                                          void * (*)(void)
+In file included from busy.c:3:
+recipe-sysroot/usr/include/pthread.h:204:36: note: expected 'void * (*)(void *)' but argument is of type 'void * (*)(void)'
+  204 |                            void *(*__start_routine) (void *),
+      |                            ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+busy.c:6:7: note: 'loop' declared here
+    6 | void *loop()
+      |       ^~~~
+
+Set loop parameter to void* since it requires void* type argument.
+
+Signed-off-by: mark.yang <mark.yang@lge.com>
+
+Upstream-Status: Inactive-Upstream [lastcommit: 9 Years ago and lastrelease: 9 Years ago]
+---
+ tests/busy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/busy.c b/tests/busy.c
+index b3afb7c..2d726eb 100644
+--- a/tests/busy.c
++++ b/tests/busy.c
+@@ -3,7 +3,7 @@
+ #include <pthread.h>
+ #include <unistd.h>
+ 
+-void *loop()
++void *loop(void *arg)
+ {
+ 	while(1);
+ }
+@@ -23,7 +23,7 @@ int main(int argc, char **argv) {
+ 			exit(1);
+ 		}
+ 	}
+-	loop();
++	loop(NULL);
+ 	return 0;
+ }
+ 

@@ -12,29 +12,32 @@ not at run-time.
 Upstream-Status: Inappropriate [config]
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
+
+Rebase for xfce4-session 4.20.0.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- configure.ac |    8 +-------
- 1 files changed, 1 insertions(+), 7 deletions(-)
+ configure.ac | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 3cf3510..505e744 100644
+index 81b362f..ccde685 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -111,13 +111,7 @@ XDT_FEATURE_DEBUG([xfsm_debug_default])
- dnl Check for linker optimizations
- XDT_FEATURE_LINKER_OPTS()
+@@ -136,13 +136,7 @@ if test x"$ENABLE_X11" = x"yes"; then
+   AC_CHECK_FUNCS([_IceTransNoListen])
+   LIBS="$ac_LIBS"
  
--dnl Check for iceauth
--AC_PATH_PROG([ICEAUTH], [iceauth])
--if test x"$ICEAUTH" != x""; then
--  AC_DEFINE_UNQUOTED([ICEAUTH_CMD], ["$ICEAUTH"], [path to iceauth])
--else
--  AC_MSG_ERROR([iceauth missing, please check your X11 installation])
--fi
-+AC_DEFINE_UNQUOTED([ICEAUTH_CMD], ["$bindir/iceauth"], [path to iceauth])
+-  dnl Check for iceauth
+-  AC_PATH_PROG([ICEAUTH], [iceauth])
+-  if test x"$ICEAUTH" != x""; then
+-    AC_DEFINE_UNQUOTED([ICEAUTH_CMD], ["$ICEAUTH"], [path to iceauth])
+-  else
+-    AC_MSG_ERROR([iceauth missing, please check your X11 installation])
+-  fi
++  AC_DEFINE_UNQUOTED([ICEAUTH_CMD], ["$bindir/iceauth"], [path to iceauth])
  
- dnl Find a location for the session desktop file
- AC_MSG_CHECKING([what xsession-prefix to use])
+   dnl Find a location for the session desktop file
+   AC_MSG_CHECKING([what xsession-prefix to use])
 -- 
 1.7.4.4
-

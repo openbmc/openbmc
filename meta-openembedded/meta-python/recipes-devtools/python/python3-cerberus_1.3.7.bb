@@ -1,5 +1,5 @@
 SUMMARY = "Lightweight, extensible schema and data validation tool for Python dictionaries."
-HOMEPAGE = "http://docs.python-cerberus.org/"
+HOMEPAGE = "https://docs.python-cerberus.org/"
 SECTION = "devel/python"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48f8e9432d0dac5e0e7a18211a0bacdb"

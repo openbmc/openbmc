@@ -26,6 +26,7 @@ NE10_TARGET_ARCH:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon","armv7","
 NE10_TARGET_ARCH:armv7ve = "${@bb.utils.contains("TUNE_FEATURES","neon","armv7","",d)}"
 
 EXTRA_OECMAKE = '-DGNULINUX_PLATFORM=ON -DNE10_BUILD_SHARED=ON -DNE10_LINUX_TARGET_ARCH="${NE10_TARGET_ARCH}"'
+CFLAGS += "-Wa,--noexecstack"
 
 do_install() {
     install -d ${D}${libdir}

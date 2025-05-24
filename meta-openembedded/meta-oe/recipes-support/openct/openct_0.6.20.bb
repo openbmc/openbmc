@@ -32,7 +32,7 @@ inherit systemd
 SYSTEMD_SERVICE:${PN} += "openct.service "
 SYSTEMD_AUTO_ENABLE = "enable"
 
-EXTRA_OECONF=" \
+EXTRA_OECONF = " \
     --disable-static \
     --enable-usb \
     --enable-pcsc \

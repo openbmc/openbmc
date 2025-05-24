@@ -683,7 +683,7 @@ Source Fetching
 The first stages of building a recipe are to fetch and unpack the source
 code:
 
-.. image:: figures/source-fetching.png
+.. image:: svg/source-fetching.*
    :width: 100%
 
 The :ref:`ref-tasks-fetch` and :ref:`ref-tasks-unpack` tasks fetch
@@ -704,10 +704,10 @@ a defined structure. For additional general information on the
 the Yocto Project Reference Manual.
 
 Each recipe has an area in the :term:`Build Directory` where the unpacked
-source code resides. The :term:`S` variable points to this area for a recipe's
-unpacked source code. The name of that directory for any given recipe is
-defined from several different variables. The preceding figure and the
-following list describe the :term:`Build Directory`'s hierarchy:
+source code resides. The :term:`UNPACKDIR` variable points to this area for a
+recipe's unpacked source code, and has the default ``sources-unpack`` name. The
+preceding figure and the following list describe the :term:`Build Directory`'s
+hierarchy:
 
 -  :term:`TMPDIR`: The base directory
    where the OpenEmbedded build system performs all its work during the
@@ -736,11 +736,11 @@ following list describe the :term:`Build Directory`'s hierarchy:
    -  :term:`PV`: The version of the
       recipe used to build the package.
 
-   -  :term:`PR`: The revision of the
-      recipe used to build the package.
+-  :term:`UNPACKDIR`: Contains the unpacked source files for a given recipe.
 
--  :term:`S`: Contains the unpacked source
-   files for a given recipe.
+-  :term:`S`: Contains the final location of the source code.
+
+   The default value for :term:`BP` is ``${BPN}-${PV}`` where:
 
    -  :term:`BPN`: The name of the recipe
       used to build the package. The :term:`BPN` variable is a version of
@@ -764,7 +764,7 @@ Patching
 Once source code is fetched and unpacked, BitBake locates patch files
 and applies them to the source files:
 
-.. image:: figures/patching.png
+.. image:: svg/patching.*
    :width: 100%
 
 The :ref:`ref-tasks-patch` task uses a
@@ -805,7 +805,7 @@ After source code is patched, BitBake executes tasks that configure and
 compile the source code. Once compilation occurs, the files are copied
 to a holding area (staged) in preparation for packaging:
 
-.. image:: figures/configuration-compile-autoreconf.png
+.. image:: svg/configuration-compile-autoreconf.*
    :width: 100%
 
 This step in the build process consists of the following tasks:
@@ -861,7 +861,7 @@ Package Splitting
 After source code is configured, compiled, and staged, the build system
 analyzes the results and splits the output into packages:
 
-.. image:: figures/analysis-for-package-splitting.png
+.. image:: svg/analysis-for-package-splitting.*
    :width: 100%
 
 The :ref:`ref-tasks-package` and
@@ -2204,7 +2204,7 @@ require root privileges, the fact that some earlier steps ran in a fake
 root environment does not cause problems.
 
 The capability to run tasks in a fake root environment is known as
-"`fakeroot <http://man.he.net/man1/fakeroot>`__", which is derived from
+":manpage:`fakeroot <fakeroot(1)>`", which is derived from
 the BitBake keyword/variable flag that requests a fake root environment
 for a task.
 

@@ -1,5 +1,5 @@
 SUMMARY = "Convex optimization package"
-HOMEPAGE = "http://cvxopt.org"
+HOMEPAGE = "https://cvxopt.org"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=66ec4f8e53d3e733a8c26d5ca3830fba"
 

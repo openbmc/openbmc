@@ -15,7 +15,7 @@ CFLAGS:prepend = "-I${WORKDIR}/build "
 
 inherit autotools
 
-EXTRA_OECONF="--with-ssh=/usr/bin/ssh"
+EXTRA_OECONF = "--with-ssh=/usr/bin/ssh"
 
 do_compile:append() {
         cp ${WORKDIR}/autossh-${PV}/CHANGES ${WORKDIR}/build

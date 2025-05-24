@@ -1,4 +1,4 @@
-LICENSE= "MIT"
+LICENSE =  "MIT"
 SUMMARY = "X Server Nokia 770 extensions library"
 SECTION = "x11/libs"
 DEPENDS = "virtual/libx11 libxext xpext"

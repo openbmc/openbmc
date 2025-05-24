@@ -82,7 +82,7 @@ class Wget(FetchMethod):
         if not ud.localfile:
             ud.localfile = ud.host + ud.path.replace("/", ".")
 
-        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget -t 2 -T 100"
+        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget --tries=2 --timeout=100"
 
         if ud.type == 'ftp' or ud.type == 'ftps':
             self.basecmd += " --passive-ftp"
@@ -96,7 +96,7 @@ class Wget(FetchMethod):
 
         logger.debug2("Fetching %s using command '%s'" % (ud.url, command))
         bb.fetch2.check_network_access(d, command, ud.url)
-        runfetchcmd(command + ' --progress=dot -v', d, quiet, log=progresshandler, workdir=workdir)
+        runfetchcmd(command + ' --progress=dot --verbose', d, quiet, log=progresshandler, workdir=workdir)
 
     def download(self, ud, d):
         """Fetch urls"""
@@ -106,7 +106,7 @@ class Wget(FetchMethod):
         dldir = os.path.realpath(d.getVar("DL_DIR"))
         localpath = os.path.join(dldir, ud.localfile) + ".tmp"
         bb.utils.mkdirhier(os.path.dirname(localpath))
-        fetchcmd += " -O %s" % shlex.quote(localpath)
+        fetchcmd += " --output-document=%s" % shlex.quote(localpath)
 
         if ud.user and ud.pswd:
             fetchcmd += " --auth-no-challenge"
@@ -122,12 +122,7 @@ class Wget(FetchMethod):
                 fetchcmd += " --user=%s --password=%s" % (ud.user, ud.pswd)
 
         uri = ud.url.split(";")[0]
-        if os.path.exists(ud.localpath):
-            # file exists, but we didnt complete it.. trying again..
-            fetchcmd += " -c -P " + dldir + " '" + uri + "'"
-        else:
-            fetchcmd += " -P " + dldir + " '" + uri + "'"
-
+        fetchcmd += " --continue --directory-prefix=%s '%s'" % (dldir, uri)
         self._runwget(ud, d, fetchcmd, False)
 
         # Sanity check since wget can pretend it succeed when it didn't
@@ -490,7 +485,7 @@ class Wget(FetchMethod):
         f = tempfile.NamedTemporaryFile()
         with tempfile.TemporaryDirectory(prefix="wget-index-") as workdir, tempfile.NamedTemporaryFile(dir=workdir, prefix="wget-listing-") as f:
             fetchcmd = self.basecmd
-            fetchcmd += " -O " + f.name + " '" + uri + "'"
+            fetchcmd += " --output-document=%s '%s'" % (f.name, uri)
             try:
                 self._runwget(ud, d, fetchcmd, True, workdir=workdir)
                 fetchresult = f.read()
@@ -650,13 +645,17 @@ class Wget(FetchMethod):
 
         sanity check to ensure same name and type.
         """
-        package = ud.path.split("/")[-1]
+        if 'downloadfilename' in ud.parm:
+            package = ud.parm['downloadfilename']
+        else:
+            package = ud.path.split("/")[-1]
         current_version = ['', d.getVar('PV'), '']
 
         """possible to have no version in pkg name, such as spectrum-fw"""
         if not re.search(r"\d+", package):
             current_version[1] = re.sub('_', '.', current_version[1])
             current_version[1] = re.sub('-', '.', current_version[1])
+            bb.debug(3, "latest_versionstring: no version found in %s" % package)
             return (current_version[1], '')
 
         package_regex = self._init_regexes(package, ud, d)

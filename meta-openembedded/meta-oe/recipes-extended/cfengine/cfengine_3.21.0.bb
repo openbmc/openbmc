@@ -26,7 +26,7 @@ SRC_URI[sha256sum] = "911778ddb0a4e03a3ddfc8fc0f033136e1551849ea2dcbdb3f0f14359d
 
 inherit autotools-brokensep systemd
 
-export EXPLICIT_VERSION="${PV}"
+export EXPLICIT_VERSION = "${PV}"
 
 SYSTEMD_SERVICE:${PN} = "cfengine3.service cf-apache.service cf-hub.service cf-postgres.service \
                          cf-runalerts.service cf-execd.service \

@@ -1,0 +1,49 @@
+From 56abe432b65801f31277fb9a3bca0f9e31502315 Mon Sep 17 00:00:00 2001
+From: Matthias Gerstner <matthias.gerstner@suse.de>
+Date: Thu, 25 Apr 2024 12:43:49 +0200
+Subject: [PATCH] libmisc: __acl_get_uid(): fix memory wasting loop if user
+ does not exist
+
+I noticed that `acl_from_text()` unexpectedly returns ENOMEM for invalid
+user names. The reason for this is a missing break statement in the for
+loop in `__acl_get_uid()`, which causes the loop to act as if ERANGE was
+returned from `getpwnam_r()`, thereby exponentially increasing the
+buffer size to (in my case) multiple gigabytes, until `grow_buffer()`
+reports ENOMEM, which terminates the `__acl_get_uid()` function.
+
+This is a pretty costly "no such user" lookup that can disturb a
+process's heap memory management, but can also cause a process to fail
+e.g. if it is multithreaded and other threads encounter an ENOMEM,
+before `__acl_get_uid()` frees the gigantic heap buffer and returns.
+The allocated memory isn't actually used. Therefore on Linux it should
+not affect other processes by default, due to its overcommit memory
+and lazy memory allocation strategy.
+
+Fix this by properly terminating the for loop on any conditions except
+an ERANGE error being reported. The same break statement correctly
+exists in `__acl_get_gid()` already.
+
+Fixes: 3737f00 ("use thread-safe getpwnam_r and getgrnam_r")
+Signed-off-by: Andreas Gruenbacher <agruenba@redhat.com>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ libmisc/uid_gid_lookup.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libmisc/uid_gid_lookup.c b/libmisc/uid_gid_lookup.c
+index a4f21f6..74baab4 100644
+--- a/libmisc/uid_gid_lookup.c
++++ b/libmisc/uid_gid_lookup.c
+@@ -91,6 +91,7 @@ __acl_get_uid(const char *token, uid_t *uid_p)
+ 		if (err == ERANGE)
+ 			continue;
+ 		errno = err ? err : EINVAL;
++		break;
+ 	}
+ 	free(buffer);
+ 	return result ? 0 : -1;
+-- 
+2.43.0
+

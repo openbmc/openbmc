@@ -33,7 +33,7 @@ DEPENDS += "trusted-firmware-m-scripts-native"
 
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.
-export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
+export OPENSSL_MODULES = "${STAGING_LIBDIR_NATIVE}/ossl-modules"
 
 # The arguments passed to the TF-M image signing script. Override this variable
 # in an image recipe to customize the arguments.

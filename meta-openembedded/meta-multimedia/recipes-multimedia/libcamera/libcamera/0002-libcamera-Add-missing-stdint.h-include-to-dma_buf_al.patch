@@ -1,0 +1,38 @@
+From 91de550243121056984e5b9b693b486860655d31 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Sat, 28 Dec 2024 19:11:19 +0000
+Subject: [PATCH] libcamera: Add missing <stdint.h> include to
+ dma_buf_allocator.h
+
+Without the change the build fails on upcoming `gcc-15` as:
+
+    In file included from ../src/libcamera/dma_buf_allocator.cpp:9:
+    ../include/libcamera/internal/dma_buf_allocator.h:66:19: error: 'uint64_t' has not been declared
+       66 |         void sync(uint64_t step);
+          |                   ^~~~~~~~
+
+Signed-off-by: Sergei Trofimovich <slyich@gmail.com>
+Reviewed-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Reviewed-by: Kieran Bingham <kieran.bingham@ideasonboard.com>
+Signed-off-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+
+Upstream-Status: Backport [https://git.libcamera.org/libcamera/libcamera.git/commit/?id=91de550243121056984e5b9b693b486860655d31]
+---
+ include/libcamera/internal/dma_buf_allocator.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/libcamera/internal/dma_buf_allocator.h b/include/libcamera/internal/dma_buf_allocator.h
+index d26f8a74..13600915 100644
+--- a/include/libcamera/internal/dma_buf_allocator.h
++++ b/include/libcamera/internal/dma_buf_allocator.h
+@@ -8,6 +8,7 @@
+ #pragma once
+ 
+ #include <memory>
++#include <stdint.h>
+ #include <string>
+ #include <vector>
+ 
+-- 
+2.34.1
+

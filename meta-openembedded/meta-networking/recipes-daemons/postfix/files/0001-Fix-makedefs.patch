@@ -1,4 +1,4 @@
-From 9000ee4d8bb5c5e0bcc588e9bec86eb56f4285e1 Mon Sep 17 00:00:00 2001
+From e4197bc1f431fd7e555a31e6f7f1e020b4ec8f4c Mon Sep 17 00:00:00 2001
 From: Li xin <lixin.fnst@cn.fujitsu.com>
 Date: Fri, 19 Jun 2015 16:45:54 +0900
 Subject: [PATCH] Fix makedefs
@@ -19,10 +19,10 @@ Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
  1 file changed, 11 insertions(+), 16 deletions(-)
 
 diff --git a/makedefs b/makedefs
-index 3448c1e..78e0717 100644
+index a740e41..28fb128 100644
 --- a/makedefs
 +++ b/makedefs
-@@ -197,9 +197,6 @@ echo "# pie=$pie"
+@@ -230,9 +230,6 @@ echo "# pie=$pie"
  
  # Defaults for most sane systems
  
@@ -32,7 +32,7 @@ index 3448c1e..78e0717 100644
  ARFL=rv
  
  # Ugly function to make our error message more visible among the
-@@ -492,12 +489,12 @@ case "$SYSTEM.$RELEASE" in
+@@ -563,12 +560,12 @@ case "$SYSTEM.$RELEASE" in
  		case "$CCARGS" in
  		 *-DNO_DB*) ;;
  		 *-DHAS_DB*) ;;
@@ -48,7 +48,7 @@ index 3448c1e..78e0717 100644
  		    else
  			# No, we're not going to try db1 db2 db3 etc.
  			# On a properly installed system, Postfix builds
-@@ -506,12 +503,12 @@ case "$SYSTEM.$RELEASE" in
+@@ -577,12 +574,12 @@ case "$SYSTEM.$RELEASE" in
  			echo "Install the appropriate db*-devel package first." 1>&2
  			exit 1
  		    fi
@@ -63,7 +63,7 @@ index 3448c1e..78e0717 100644
  		    do
  			test -e $lib/lib$name.a -o -e $lib/lib$name.so && {
  			    SYSLIBS="$SYSLIBS -l$name"
-@@ -531,7 +528,7 @@ case "$SYSTEM.$RELEASE" in
+@@ -602,7 +599,7 @@ case "$SYSTEM.$RELEASE" in
  		       if [ `expr "X$CCARGS" : "X.*-DNO_EPOLL"` -gt 0 ]
  		       then
  			   :
@@ -72,7 +72,7 @@ index 3448c1e..78e0717 100644
  		       then
  			   echo CCARGS="$CCARGS -DNO_EPOLL"
  		       else
-@@ -555,8 +552,6 @@ int     main(int argc, char **argv)
+@@ -626,8 +623,6 @@ int     main(int argc, char **argv)
  }
  EOF
  			   ${CC-gcc} -o makedefs.test makedefs.test.c || exit 1
@@ -81,7 +81,7 @@ index 3448c1e..78e0717 100644
  			   rm -f makedefs.test makedefs.test.[co]
  		       fi;;
  		esac
-@@ -572,12 +567,12 @@ EOF
+@@ -644,12 +639,12 @@ EOF
  		case "$CCARGS" in
  		 *-DNO_DB*) ;;
  		 *-DHAS_DB*) ;;
@@ -97,7 +97,7 @@ index 3448c1e..78e0717 100644
  		    else
  			# On a properly installed system, Postfix builds
  			# by including <db.h> and by linking with -ldb
-@@ -585,12 +580,12 @@ EOF
+@@ -657,12 +652,12 @@ EOF
  			echo "Install the appropriate db*-devel package first." 1>&2
  			exit 1
  		    fi
@@ -113,5 +113,5 @@ index 3448c1e..78e0717 100644
  			test -e $lib/lib$name.a -o -e $lib/lib$name.so && {
  			    SYSLIBS="$SYSLIBS -l$name"
 -- 
-2.17.1
+2.25.1
 

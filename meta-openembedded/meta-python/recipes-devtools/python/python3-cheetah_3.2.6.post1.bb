@@ -9,7 +9,7 @@ UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} = "python3-pickle python3-pprint"
-RDEPENDS:${PN}:class-native = ""
+RDEPENDS:${PN}:class-native = "python3-legacy-cgi-native"
 
 BBCLASSEXTEND = "native nativesdk"
 

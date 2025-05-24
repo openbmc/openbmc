@@ -1,0 +1,69 @@
+From ab6b5ee4c23099bf15ddd145fdf1ff4f5e34e802 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 26 Apr 2025 03:38:32 +0000
+Subject: [PATCH] fix nsectors exceeds 0xffff situation
+
+According to page 11: `Figure 5 - Section Entry' in El Torito Bootable
+CD-ROM Format Specification [1]. The sector count takes 2 byte which
+means max sector count is 0xffff (65535), for 512-byte sector, the
+size of bootable image is no more than 32MB (65536 * 512 / 1024 / 1024)
+
+If the size of efi.img > 32MB, the partition table will be truncated
+in ISO, which caused UEFI system or grub-efi read efi.img broken
+occasionally.
+
+In this patch, nsectors means sector count, if it exceeds 0xffff,
+truncate to 0xffff and set selection criteria type = 2, then save
+extra nsectors to vendor unique selection criteria
+
+[1]https://pdos.csail.mit.edu/6.828/2017/readings/boot-cdrom.pdf
+
+Upstream-Status: Inappropriate [upstream https://sourceforge.net/projects/cdrtools/ is not alive since 2019]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ mkisofs/eltorito.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/mkisofs/eltorito.c b/mkisofs/eltorito.c
+index 5dd04bc..a391003 100644
+--- a/mkisofs/eltorito.c
++++ b/mkisofs/eltorito.c
+@@ -568,6 +568,34 @@ fill_boot_desc(boot_desc_entry, boot_entry)
+ 	fprintf(stderr, "Extent of boot images is %d\n",
+ 				get_733(de->isorec.extent));
+ #endif
++
++	// Boot sectors exceeds 0xffff
++	if (nsectors > 0xffff) {
++		unsigned int extra_nsectors = nsectors - 0xffff;
++
++		fprintf(stderr, "Warning: Boot sectors 0x%x(%u) exceeds 0xffff(65535), save extra %u to pad2\n",
++		    nsectors, nsectors, extra_nsectors);
++
++		// Set nsectors to maximum 0xffff(65535)
++		nsectors = 0xffff;
++
++		// Offset     : 0C byte
++		// Type       : Byte
++		// Description: Selection criteria type. This defines a vendor unique format
++		// for bytes 0D-1F.
++		// The following formats is reserved by Yocto:
++		// 2 - Save extra sector count to vendor unique selection criteria
++		boot_desc_entry->pad2[0] = 2;
++
++
++		// Offset     : 0D-0E-0F-10 byte
++		// Type       : D Word
++		// Description: Save extra sector count to vendor unique selection criteria.
++		// It takes 4 bytes in pad2, starting at pad2[1]
++		set_731(&boot_desc_entry->pad2[1], extra_nsectors);
++
++	}
++
+ 	set_721(boot_desc_entry->nsect, (unsigned int) nsectors);
+ 	set_731(boot_desc_entry->bootoff,
+ 		(unsigned int) get_733(de->isorec.extent));
+-- 
+2.44.1
+

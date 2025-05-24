@@ -2,7 +2,7 @@ SUMMARY = "Library for developers to extract data from Microsoft Excel (tm) spre
 DESCRIPTION = "Extract data from Excel spreadsheets (.xls and .xlsx,\
  versions 2.0 onwards) on any platform. Pure Python (2.6, 2.7, 3.2+). \
 Strong support for Excel dates. Unicode-aware."
-HOMEPAGE = "http://www.python-excel.org/"
+HOMEPAGE = "https://www.python-excel.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=00ea1e843a43c20d9b63a8112239b0d1"
 

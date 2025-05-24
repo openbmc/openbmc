@@ -1,0 +1,33 @@
+From ef9dfeb6e96bf7f71162691a78d6b82c9516c0c0 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Tue, 1 Apr 2025 10:34:31 -0400
+Subject: [PATCH] edk2-firmware: fix SOURCE_DATE_EPOCH use
+
+printenv host tool is not exposed to recipes so
+just set epoch using SOURCE_DATE_EPOCH which is always
+set. Fixes compile error:
+
+Building ... ../build/tmp_zynqmp-kria-starter-psa/work/zynqmp_kria_starter_psa-poky-linux/edk2-firmware/202411/edk2/MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf [AARCH64]
+../build/tmp_zynqmp-kria-starter-psa/work/zynqmp_kria_starter_psa-poky-linux/edk2-firmware/202411/edk2/EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.c: In function 'LibGetTime':
+<command-line>: error: stray '`' in program
+../build/tmp_zynqmp-kria-starter-psa/work/zynqmp_kria_starter_psa-poky-linux/edk2-firmware/202411/edk2/EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.c:89:20: note: in expansion of macro 'BUILD_EPOCH'
+   89 |     EpochSeconds = BUILD_EPOCH;
+      |                    ^~~~~~~~~~~
+
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+
+Upstream-Status: Inappropriate [OE specific build config fix, though filed as https://github.com/tianocore/edk2/issues/10910]
+---
+ .../Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf b/EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf
+index 285e880daab8..e1c986a6532d 100644
+--- a/EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf
++++ b/EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf
+@@ -34,4 +34,4 @@
+ 
+ # Current usage of this library expects GCC in a UNIX-like shell environment with the date command
+ [BuildOptions]
+-  GCC:*_*_*_CC_FLAGS = -DBUILD_EPOCH=`printenv SOURCE_DATE_EPOCH || date +%s`
++  GCC:*_*_*_CC_FLAGS = -DBUILD_EPOCH=${SOURCE_DATE_EPOCH}

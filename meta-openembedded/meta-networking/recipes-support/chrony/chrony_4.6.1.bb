@@ -67,6 +67,7 @@ PACKAGECONFIG[sechash] = "--without-tomcrypt,--disable-sechash,nss"
 PACKAGECONFIG[privdrop] = ",--disable-privdrop,libcap"
 PACKAGECONFIG[scfilter] = "--enable-scfilter,--without-seccomp,libseccomp"
 PACKAGECONFIG[ipv6] = ",--disable-ipv6,"
+PACKAGECONFIG[nts] = ",--disable-nts,gnutls"
 
 # --disable-static isn't supported by chrony's configure script.
 DISABLE_STATIC = ""

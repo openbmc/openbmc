@@ -1,7 +1,2 @@
 # tee devices can only be accessed by the teeclnt group members
 KERNEL=="tee[0-9]*", TAG+="systemd", MODE="0660", GROUP="teeclnt"
-
-# If a /dev/teepriv[0-9]* device is detected, start an instance of
-# tee-supplicant.service with the device name as parameter
-KERNEL=="teepriv[0-9]*", MODE="0660", OWNER="root", GROUP="tee", \
-    TAG+="systemd", ENV{SYSTEMD_WANTS}+="tee-supplicant@%k.service"

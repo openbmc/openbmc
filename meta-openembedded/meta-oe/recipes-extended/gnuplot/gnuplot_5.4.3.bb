@@ -5,11 +5,10 @@ HOMEPAGE = "http://www.gnuplot.info/"
 SECTION = "console/scientific"
 LICENSE = "gnuplot"
 LIC_FILES_CHKSUM = "file://Copyright;md5=243a186fc2fd3b992125d60d5b1bab8f"
-DEPENDS = "${BPN}-native virtual/libx11 gd readline"
+DEPENDS = "${BPN}-native gd readline"
 
-inherit autotools features_check pkgconfig
+inherit autotools pkgconfig
 # depends on virtual/libx11
-REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.gz;name=archive \
            http://www.mneuroth.de/privat/zaurus/qtplot-0.2.tar.gz;name=qtplot \
@@ -38,10 +37,11 @@ do_install:class-native() {
     rm ${D}${bindir}/*.o
 }
 
-PACKAGECONFIG ??= "cairo"
+PACKAGECONFIG ??= "cairo ${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[cairo] = "--with-cairo,--without-cairo,cairo pango"
 PACKAGECONFIG[lua] = "--with-lua,--without-lua,lua"
 PACKAGECONFIG[qt5] = "--with-qt --with-qt5nativesysroot=${STAGING_DIR_NATIVE},--without-qt,qtbase-native qtbase qtsvg qttools-native"
+PACKAGECONFIG[x11] = "--with-x,--without-x,virtual/libx11"
 
 EXTRA_OECONF = " \
     --with-readline=${STAGING_LIBDIR}/.. \

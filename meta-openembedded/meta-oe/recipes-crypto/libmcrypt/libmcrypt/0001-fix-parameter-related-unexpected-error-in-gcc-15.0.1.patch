@@ -1,0 +1,119 @@
+From 046d1474a9a367d4b7772233e026855f1b55d58c Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Tue, 1 Apr 2025 17:58:49 +0900
+Subject: [PATCH] fix parameter-related unexpected error in gcc 15.0.1
+
+* see more details: http://errors.yoctoproject.org/Errors/Details/850150/
+    des.c:199:9: error: too many arguments to function 'spinit'; expected 0, have 1
+    199 |         spinit(key);
+        |         ^~~~~~ ~~~
+    des.c:38:56: note: declared here
+    38 | static void permute_ip(), permute_fp(), perminit_ip(), spinit(),
+        |                                                        ^~~~~~
+
+* Move function forward declarations to .h file to fix the following errors:
+    tripledes.c: In function '_mcrypt_desinit':
+    tripledes.c:198:18: error: passing argument 1 of 'perminit' from incompatible pointer type [-Wincompatible-pointer-types]
+    198 |         perminit(&key->iperm, ip);
+        |                  ^~~~~~~~~~~
+        |                  |
+        |                  char (*)[16][16][8]
+    In file included from tripledes.c:23:
+    tripledes.h:11:27: note: expected 'char (*)[16][8]' but argument is of type 'char (*)[16][16][8]'
+    11 | static void perminit(char perm[][16][8], char p[64]);
+        |                      ~~~~~^~~~~~~~~~~~~
+    tripledes.c:199:18: error: passing argument 1 of 'perminit' from incompatible pointer type [-Wincompatible-pointer-types]
+    199 |         perminit(&key->fperm, fp);
+        |                  ^~~~~~~~~~~
+        |                  |
+        |                  char (*)[16][16][8]
+    tripledes.h:11:27: note: expected 'char (*)[16][8]' but argument is of type 'char (*)[16][16][8]'
+    11 | static void perminit(char perm[][16][8], char p[64]);
+        |                      ~~~~~^~~~~~~~~~~~~
+
+	Changed parameter from &key to key
+	perminit(key->iperm, ip);
+	perminit(key->fperm, fp);
+
+Signed-off-by: mark.yang <mark.yang@lge.com>
+
+Upstream-Status: Pending
+---
+ modules/algorithms/des.c       | 5 -----
+ modules/algorithms/des.h       | 6 ++++++
+ modules/algorithms/tripledes.c | 8 ++------
+ modules/algorithms/tripledes.h | 5 +++++
+ 4 files changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/modules/algorithms/des.c b/modules/algorithms/des.c
+index 5810811..695e740 100644
+--- a/modules/algorithms/des.c
++++ b/modules/algorithms/des.c
+@@ -35,11 +35,6 @@
+ 
+ /* #define	NULL	0 */
+ 
+-static void permute_ip(), permute_fp(), perminit_ip(), spinit(),
+-perminit_fp();
+-static word32 f();
+-
+-
+ /* Tables defined in the Data Encryption Standard documents */
+ 
+ /* initial permutation IP */
+diff --git a/modules/algorithms/des.h b/modules/algorithms/des.h
+index c333c5b..65dba63 100644
+--- a/modules/algorithms/des.h
++++ b/modules/algorithms/des.h
+@@ -5,3 +5,9 @@ typedef struct des_key {
+ 	char fperm[16][16][8];
+ } DES_KEY;
+ 
++static void permute_ip(char *inblock, DES_KEY * key, char *outblock);
++static void permute_fp(char *inblock, DES_KEY * key, char *outblock);
++static void perminit_ip(DES_KEY * key);
++static void spinit(DES_KEY * key);
++static void perminit_fp(DES_KEY * key);
++static word32 f(DES_KEY * key, register word32 r, register char *subkey);
+diff --git a/modules/algorithms/tripledes.c b/modules/algorithms/tripledes.c
+index 7b3c324..67985db 100644
+--- a/modules/algorithms/tripledes.c
++++ b/modules/algorithms/tripledes.c
+@@ -36,10 +36,6 @@
+ 
+ /* #define	NULL	0 */
+ 
+-static void permute(), perminit(), spinit();
+-static word32 f();
+-
+-
+ /* Tables defined in the Data Encryption Standard documents */
+ 
+ /* initial permutation IP */
+@@ -199,8 +195,8 @@ static int _mcrypt_desinit(TRIPLEDES_KEY * key)
+ 	spinit(key, 0);
+ 	spinit(key, 1);
+ 	spinit(key, 2);
+-	perminit(&key->iperm, ip);
+-	perminit(&key->fperm, fp);
++	perminit(key->iperm, ip);
++	perminit(key->fperm, fp);
+ 
+ 
+ 	return 0;
+diff --git a/modules/algorithms/tripledes.h b/modules/algorithms/tripledes.h
+index dec7682..10c7bc6 100644
+--- a/modules/algorithms/tripledes.h
++++ b/modules/algorithms/tripledes.h
+@@ -7,3 +7,8 @@ typedef struct triple_des_key {
+ 
+ } TRIPLEDES_KEY;
+ 
++static void permute(char *inblock, char perm[16][16][8], char *outblock);
++static void perminit(char perm[16][16][8], char p[64]);
++static void spinit(TRIPLEDES_KEY * key, int pos);
++static word32 f(TRIPLEDES_KEY * key, int pos, register word32 r, register char *subkey);
++
+-- 
+2.34.1
+

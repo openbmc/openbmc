@@ -1,0 +1,25 @@
+From 206cfdff171e5ce0df02e635ba0d331a7dc5d992 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 14 Apr 2025 14:48:08 +0800
+Subject: [PATCH] configure.ac: update version to 0.64
+
+Upstream-Status: Submitted [http://pagure.io/libuser/issue/74]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 51508b7..68c6e50 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,4 +1,4 @@
+-AC_INIT([libuser], [0.62], [https://pagure.io/libuser], ,
++AC_INIT([libuser], [0.64], [https://pagure.io/libuser], ,
+         [https://pagure.io/libuser])
+ AC_PREREQ([2.63b])
+ AC_CONFIG_HEADERS(config.h)
+-- 
+2.34.1
+

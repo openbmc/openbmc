@@ -21,6 +21,9 @@ EDEPENDS_WAYLAND = "wayland libxkbcommon gdk-pixbuf"
 EDEPENDS_EVDEV = "libxkbcommon"
 ERDEPENDS_EVDEV = "xkeyboard-config"
 
+# Needed for finding introspection.m4
+EXTRA_AUTORECONF += "-I m4"
+
 # Disable pretty much everything, override in platform specific set up
 EXTRA_OECONF += "--disable-quartz-backend	\
 	     	 --disable-win32-backend	\

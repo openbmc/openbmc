@@ -1,4 +1,4 @@
-From 7ca0b0a4f8a37f9dbe461e28a731364b9aaa60bb Mon Sep 17 00:00:00 2001
+From 4c7658b43f903599608c1fea4fbd7e37dc117119 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Thu, 20 Jul 2017 05:06:00 -0400
 Subject: [PATCH] add missing dynamic library to FLTK_LIBRARIES
@@ -11,17 +11,17 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index c47c9c0e..f4b576a0 100644
+index 80c2762c..eb581600 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -270,6 +270,8 @@ if(BUILD_VIEWER)
-   endif()
+@@ -315,6 +315,8 @@ if(BUILD_VIEWER)
+   set(CMAKE_REQUIRED_LIBRARIES)
  endif()
  
 +set(FLTK_LIBRARIES ${FLTK_LIBRARIES} -lm -ldl -lpng -ljpeg)
 +
  # Check for GNUTLS library
- option(ENABLE_GNUTLS "Enable protocol encryption and advanced authentication" ON)
+ trioption(ENABLE_GNUTLS "Enable protocol encryption and advanced authentication")
  if(ENABLE_GNUTLS)
 -- 
 2.25.1

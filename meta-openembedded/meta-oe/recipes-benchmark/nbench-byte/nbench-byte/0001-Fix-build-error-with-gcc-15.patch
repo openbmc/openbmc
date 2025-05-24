@@ -1,0 +1,34 @@
+From 3ee8798764919cd3f7d983f99f6189bbb940d639 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 10 Apr 2025 10:53:14 +0900
+Subject: [PATCH] Fix build error with gcc-15
+
+* Fix the following build error with gcc-15:
+nbench1.c:3520:13: error: conflicting types for 'adjust_mid_wts'; have 'void(int)'
+ 3520 | static void adjust_mid_wts(int patt)
+      |             ^~~~~~~~~~~~~~
+In file included from nbench1.c:64:
+nbench1.h:373:13: note: previous declaration of 'adjust_mid_wts' with type 'void(void)'
+  373 | static void adjust_mid_wts();
+      |             ^~~~~~~~~~~~~~
+
+Upstream-Status: Inappropriate [no upstream]
+
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ nbench1.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/nbench1.h b/nbench1.h
+index 13a5907..b81ca82 100644
+--- a/nbench1.h
++++ b/nbench1.h
+@@ -370,7 +370,7 @@ static void do_out_error(int patt);
+ static void worst_pass_error();
+ static void do_mid_error();
+ static void adjust_out_wts();
+-static void adjust_mid_wts();
++static void adjust_mid_wts(int patt);
+ static void do_back_pass(int patt);
+ static void move_wt_changes();
+ static int check_out_error();

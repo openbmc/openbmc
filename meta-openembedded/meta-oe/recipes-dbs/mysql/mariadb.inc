@@ -24,8 +24,10 @@ SRC_URI = "https://archive.mariadb.org/${BP}/source/${BP}.tar.gz \
            file://lfs64.patch \
            file://0001-Add-missing-includes-cstdint-and-cstdio.patch \
            file://0001-Ensure-compatibility-with-ARMv9-by-updating-.arch-di.patch \
+           file://3871.patch \
+           file://riscv32.patch \
           "
-SRC_URI[sha256sum] = "96fbd2e6e93fb7e8b373eea75d85b6fea57c0e111a02090cbbefed52599dc77b"
+SRC_URI[sha256sum] = "ff6595f8c482f9921e39b97fa1122377a69f0dcbd92553c6b9032cbf0e9b5354"
 
 UPSTREAM_CHECK_URI = "https://github.com/MariaDB/server/tags"
 
@@ -63,19 +65,13 @@ PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)} lz4 openssl"
 EXTRA_OEMAKE = "'GEN_LEX_HASH=${STAGING_BINDIR_NATIVE}/gen_lex_hash'"
 
 PACKAGECONFIG:class-native = ""
-PACKAGECONFIG[pam] = "-DPLUGIN_AUTH_PAM=YES,-DPLUGIN_AUTH_PAM=NO,libpam"
+PACKAGECONFIG[pam] = "-DPLUGIN_AUTH_PAM=YES -DINSTALL_PAMDIR=${base_libdir}/security,-DPLUGIN_AUTH_PAM=NO,libpam"
 PACKAGECONFIG[valgrind] = "-DWITH_VALGRIND=TRUE,-DWITH_VALGRIND=FALSE,valgrind"
 PACKAGECONFIG[krb5] = ", ,krb5"
 PACKAGECONFIG[lz4] = ", ,lz4"
 PACKAGECONFIG[openssl] = "-DWITH_SSL='system',-DWITH_SSL='bundled',openssl"
 
-# MariaDB doesn't link properly with gold
-# https://mariadb.atlassian.net/browse/MDEV-5982
-TARGET_CFLAGS += "-fuse-ld=bfd"
 LDFLAGS += " -pthread"
-
-BUILD_CFLAGS += "-fuse-ld=bfd"
-BUILD_CXXFLAGS += "-fuse-ld=bfd"
 
 LDFLAGS:x86:toolchain-clang = "-latomic"
 LDFLAGS:riscv32:toolchain-clang = "-latomic"
@@ -93,10 +89,10 @@ EXTRA_OECMAKE = "-DWITH_EMBEDDED_SERVER=ON \
                  -DINSTALL_DOCDIR:PATH=${datadir}/doc/${BPN} \
                  -DINSTALL_LIBDIR:PATH=${baselib} \
                  -DINSTALL_PLUGINDIR:PATH=${baselib}/plugin \
+                 -DINSTALL_PCDIR:PATH=${baselib}/pkgconfig \
                  -DINSTALL_SYSCONFDIR:PATH=${sysconfdir} \
                  -DMYSQL_DATADIR:PATH=/var/mysql \
                  -DCAT_EXECUTABLE=`which cat` \
-                 -DSTACK_DIRECTION=1 \
                  -DHAVE_SYSTEM_LIBFMT_EXITCODE=0 \
                  -DLSTAT_FOLLOWS_SLASHED_SYMLINK_EXITCODE=0 \
                  -DSTAT_EMPTY_STRING_BUG_EXITCODE=0 \
@@ -186,16 +182,8 @@ do_install() {
     # mini-benchmark used for Gitlab-CI to run on every commit to catch
     # if there are severe performance regressions.
     # remove it to avoid introducing bash dependency
-    if [ -f ${D}${datadir}/mysql/mini-benchmark ]; then
-        rm -rf ${D}${datadir}/mysql/mini-benchmark
-    fi
-    if ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'true', 'false', d)}; then
-        pam_so=$(find ${D} -name pam_user_map.so)
-        if [ x"${pam_so}" != x ]; then
-            pam_dir=$(dirname ${pam_so})
-            mv ${pam_dir} ${D}/${base_libdir}
-            rmdir --ignore-fail-on-non-empty ${pam_dir%security}
-        fi
+    if [ -f ${D}${datadir}/mariadb/mini-benchmark ]; then
+        rm -rf ${D}${datadir}/mariadb/mini-benchmark
     fi
 }
 
@@ -349,7 +337,7 @@ FILES:${PN}-server = "\
     ${libdir}/plugin/*.so \
     ${base_libdir}/security/*.so \
     ${libdir}/plugin/auth_pam_tool_dir/auth_pam_tool \
-    ${datadir}/mysql/ \
+    ${datadir}/mariadb/ \
     ${localstatedir}/mysql/ \
     ${sysconfdir}/init.d/mysqld \
     ${sysconfdir}/my.cnf \

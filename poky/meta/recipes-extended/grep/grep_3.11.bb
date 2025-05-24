@@ -12,9 +12,6 @@ SRC_URI[sha256sum] = "1db2aedde89d0dea42b16d9528f894c8d15dae4e190b59aecc78f5a951
 
 inherit autotools gettext texinfo pkgconfig
 
-# Fix "Argument list too long" error when len(TMPDIR) = 410
-acpaths = "-I ./m4"
-
 do_configure:prepend () {
 	sed -i -e '1s,#!@SHELL@,#!/bin/sh,' ${S}/src/egrep.sh
 	rm -f ${S}/m4/init.m4

@@ -21,6 +21,9 @@ inherit autotools-brokensep binconfig perlnative systemd update-rc.d pkgconfig
 SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
 SRC_URI = "http://web.mit.edu/kerberos/dist/${BPN}/${SHRT_VER}/${BP}.tar.gz \
            file://debian-suppress-usr-lib-in-krb5-config.patch;striplevel=2 \
+           file://0001-Eliminate-old-style-function-declarations.patch;patchdir=.. \
+           file://0001-Fix-more-non-prototype-functions.patch;patchdir=.. \
+           file://0002-Avoid-strict-prototype-compiler-errors.patch;patchdir=.. \
            file://crosscompile_nm.patch \
            file://etc/init.d/krb5-kdc \
            file://etc/init.d/krb5-admin-server \
@@ -29,6 +32,7 @@ SRC_URI = "http://web.mit.edu/kerberos/dist/${BPN}/${SHRT_VER}/${BP}.tar.gz \
            file://krb5-kdc.service \
            file://krb5-admin-server.service \
            file://CVE-2024-26458_CVE-2024-26461.patch;striplevel=2 \
+           file://CVE-2025-24528.patch;striplevel=2 \
 "
 
 SRC_URI[sha256sum] = "b7a4cd5ead67fb08b980b21abd150ff7217e85ea320c9ed0c6dadd304840ad35"

@@ -5,24 +5,16 @@ TS_ENV = "arm-linux"
 
 require trusted-services.inc
 
-SRC_URI += "file://tee-udev.rules \
-            file://0001-Remove-TEE-driver-external-component.patch \
+SRC_URI += "file://0001-Remove-TEE-driver-external-component.patch \
            "
+# If optee-client is not included, take care of udev and related configuration.
+require ${@bb.utils.contains('IMAGE_INSTALL', 'optee-client', '', 'libts-udev.inc', d)}
 
-OECMAKE_SOURCEPATH="${S}/deployments/libts/${TS_ENV}"
+OECMAKE_SOURCEPATH = "${S}/deployments/libts/${TS_ENV}"
 
 DEPENDS           += "arm-ffa-user"
 
-# Unix group name for dev/tee* ownership.
-TEE_GROUP_NAME ?= "teeclnt"
-
 do_install:append () {
-    if ${@oe.utils.conditional('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', 'false', 'true', d)}; then
-        install -d ${D}${nonarch_base_libdir}/udev/rules.d/
-        install -m 755 ${UNPACKDIR}/tee-udev.rules ${D}${nonarch_base_libdir}/udev/rules.d/
-        sed -i -e "s/teeclnt/${TEE_GROUP_NAME}/" ${D}${nonarch_base_libdir}/udev/rules.d/tee-udev.rules
-    fi
-
     # Move the dynamic libraries into the standard place.
     install -d ${D}${libdir}
     mv ${D}${TS_INSTALL}/lib/libts* ${D}${libdir}
@@ -34,9 +26,5 @@ do_install:append () {
     fi
 }
 
-inherit ${@oe.utils.conditional('VIRTUAL-RUNTIME_dev_manager', 'busybox-mdev', '', 'useradd', d)}
-USERADD_PACKAGES = "${PN}"
-GROUPADD_PARAM:${PN} = "--system ${TEE_GROUP_NAME}"
-
-FILES:${PN} = "${libdir}/libts.so.* ${nonarch_base_libdir}/udev/rules.d/"
-FILES:${PN}-dev = "${TS_INSTALL}/lib/cmake ${TS_INSTALL}/include ${libdir}/libts.so"
+FILES:${PN} += " ${libdir}/libts*.so.*"
+FILES:${PN}-dev += " ${TS_INSTALL}/lib/cmake ${TS_INSTALL}/include ${libdir}/libts*.so"

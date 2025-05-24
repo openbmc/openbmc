@@ -1,0 +1,85 @@
+From 0f39e33d3504f3a17b83574c3be97640460b7eef Mon Sep 17 00:00:00 2001
+From: "Guanyou.Chen" <chenguanyou@xiaomi.com>
+Date: Wed, 25 Dec 2024 23:50:28 +0800
+Subject: [PATCH] arm64: add pac mask to better support gdb stack unwind
+
+Currently, gdb passthroughs of 'bt', 'frame', 'up', 'down',
+'info, locals' don't work on arm64 machine enabled pauth.
+This is because gdb does not know the lr register actual values
+to unwind the stack frames.
+
+Without the patch:
+    crash> gdb bt
+    #0  __switch_to (prev=0xffffff8001af92c0, next=0xffffff889da7a580) at /proc/self/cwd/common/arch/arm64/kernel/process.c:569
+    #1  0x9fc5c5d3602132c0 in ?? ()
+    Backtrace stopped: previous frame identical to this frame (corrupt stack?)
+
+With the patch:
+    crash> gdb bt
+    #0  __switch_to (prev=prev@entry=0xffffff8001af92c0, next=next@entry=0xffffff889da7a580) at /proc/self/cwd/common/arch/arm64/kernel/process.c:569
+    #1  0xffffffd3602132c0 in context_switch (rq=0xffffff8a7295a080, prev=0xffffff8001af92c0, next=0xffffff889da7a580, rf=<optimized out>) at /proc/self/cwd/common/kernel/sched/core.c:5515
+    #2  __schedule (sched_mode=<optimized out>, sched_mode@entry=2147859424) at /proc/self/cwd/common/kernel/sched/core.c:6843
+    #3  0xffffffd3602136d8 in schedule () at /proc/self/cwd/common/kernel/sched/core.c:6917
+    ...
+
+Signed-off-by: Guanyou.Chen <chenguanyou@xiaomi.com>
+Signed-off-by: mark.yang <mark.yang@lge.com>
+
+Upstream-Status: Backport [0f39e33 arm64: add pac mask to better support gdb stack unwind]
+---
+ gdb-10.2.patch  | 23 +++++++++++++++++++++++
+ gdb_interface.c | 10 ++++++++++
+ 2 files changed, 33 insertions(+)
+
+diff --git a/gdb-10.2.patch b/gdb-10.2.patch
+index c867660..fd6fadb 100644
+--- a/gdb-10.2.patch
++++ b/gdb-10.2.patch
+@@ -16216,3 +16216,26 @@ exit 0
+  	    printf_filtered (_("Backtrace stopped: %s\n"),
+  			     frame_stop_reason_string (trailing));
+  	}
++--- gdb-10.2/gdb/frame.c.orig
+++++ gdb-10.2/gdb/frame.c
++@@ -944,6 +944,10 @@ frame_find_by_id (struct frame_id id)
++   return NULL;
++ }
++
+++#ifdef CRASH_MERGE
+++extern "C" void crash_decode_ptrauth_pc(ulong* pc);
+++#endif
+++
++ static CORE_ADDR
++ frame_unwind_pc (struct frame_info *this_frame)
++ {
++@@ -974,6 +978,9 @@ frame_unwind_pc (struct frame_info *this_frame)
++       try
++	{
++	  pc = gdbarch_unwind_pc (prev_gdbarch, this_frame);
+++#ifdef CRASH_MERGE
+++	  crash_decode_ptrauth_pc(&pc);
+++#endif
++	  pc_p = true;
++	}
++       catch (const gdb_exception_error &ex)
+diff --git a/gdb_interface.c b/gdb_interface.c
+index 315711e..e108d09 100644
+--- a/gdb_interface.c
++++ b/gdb_interface.c
+@@ -1083,3 +1083,13 @@ int crash_get_current_task_reg (int regno, const char *regname,
+ 	return machdep->get_current_task_reg(regno, regname, regsize, value);
+ }
+ 
++/* arm64 kernel lr maybe has patuh */
++void crash_decode_ptrauth_pc(ulong *pc);
++void crash_decode_ptrauth_pc(ulong *pc)
++{
++#ifdef ARM64
++	struct machine_specific *ms = machdep->machspec;
++	if (is_kernel_text(*pc | ms->CONFIG_ARM64_KERNELPACMASK))
++		*pc |= ms->CONFIG_ARM64_KERNELPACMASK;
++#endif /* !ARM64 */
++}
+-- 
+2.34.1
+

@@ -1,0 +1,29 @@
+From d6923ac0adc11a0364acd421316116190eedb508 Mon Sep 17 00:00:00 2001
+From: Brad Smith <brad@comstyle.com>
+Date: Fri, 7 Mar 2025 02:04:01 -0500
+Subject: [PATCH] Fix building with Clang and GCC on RISC-V
+
+Clang does not have the builtin __builtin_riscv_pause().
+
+Upstream-Status: Backport [https://github.com/MariaDB/server/pull/3871]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/my_cpu.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+--- a/include/my_cpu.h
++++ b/include/my_cpu.h
+@@ -97,7 +97,12 @@ static inline void MY_RELAX_CPU(void)
+   /* Changed from __ppc_get_timebase for musl and clang compatibility */
+   __builtin_ppc_get_timebase();
+ #elif defined __GNUC__ && defined __riscv
+-  __builtin_riscv_pause();
++  /* The GCC-only __builtin_riscv_pause() or the pause instruction is
++  encoded like a fence instruction with special parameters. On RISC-V
++  implementations that do not support arch=+zihintpause this
++  instruction could be interpreted as a more expensive memory fence;
++  it should not be an illegal instruction. */
++  __asm__ volatile(".long 0x0100000f" ::: "memory");
+ #elif defined __GNUC__
+   /* Mainly, prevent the compiler from optimizing away delay loops */
+   __asm__ __volatile__ ("":::"memory");

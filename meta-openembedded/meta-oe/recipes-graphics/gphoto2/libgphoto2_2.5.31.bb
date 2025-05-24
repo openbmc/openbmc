@@ -11,7 +11,6 @@ DEPENDS = "libtool jpeg virtual/libusb0 libexif zlib libxml2"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/gphoto/libgphoto2-${PV}.tar.bz2;name=libgphoto2 \
            file://40-libgphoto2.rules \
-           file://0001-configure.ac-remove-AM_PO_SUBDIRS.patch \
            file://0001-configure-Filter-out-buildpaths-from-CC.patch \
            file://fix-build-with-gcc-14.patch \
 "
@@ -25,18 +24,6 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[gd] = ",--without-gdlib,gd"
 PACKAGECONFIG[serial] = "--enable-serial,--disable-serial,lockdev"
 
-do_configure:prepend() {
-    rm -rf ${S}/libgphoto2_port/auto-m4/*
-    rm -rf ${S}/auto-m4/*
-}
-
-do_configure:append() {
-    cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/libgphoto2_port/po/
-    cd ${S}/libgphoto2_port/
-    autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
-    cd ${S}
-}
-
 do_install:append() {
     install -d ${D}${sysconfdir}/udev/rules.d/
     install -m 0644 ${UNPACKDIR}/*.rules ${D}${sysconfdir}/udev/rules.d/
@@ -49,6 +36,4 @@ RRECOMMENDS:${PN} = "libgphoto2-camlibs"
 FILES:libgphotoport = "${libdir}/libgphoto2_port.so.*"
 
 FILES:${PN} += "${nonarch_base_libdir}/udev/*"
-FILES:${PN}-dbg += "${libdir}/*/*/.debug"
-FILES:${PN}-dev += "${libdir}/*/*/*.la"
 FILES:${PN}-doc += "${datadir}/libgphoto2_port/0.12.?/vcamera/README.txt"

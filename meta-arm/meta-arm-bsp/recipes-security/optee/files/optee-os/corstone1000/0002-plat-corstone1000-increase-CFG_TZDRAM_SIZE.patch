@@ -1,0 +1,30 @@
+From ce58e4d78dc7a4f3c3b08ee425461eb190d70543 Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Fri, 1 Nov 2024 00:45:53 +0100
+Subject: [PATCH] plat-corstone1000: increase CFG_TZDRAM_SIZE
+
+TZDRAM is a 4MB SRAM in Corstone-1000. Its start address is `0x0200_0000`
+but the first 0x2000 bytes are reserved for future use. `CFG_TZDRAM_SIZE`
+can be increased to `0x360000` so OP-TEE has more RAM.
+
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Upstream-Status: Pending
+---
+ core/arch/arm/plat-corstone1000/conf.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/arch/arm/plat-corstone1000/conf.mk b/core/arch/arm/plat-corstone1000/conf.mk
+index 9fa0729d5..745dc958a 100644
+--- a/core/arch/arm/plat-corstone1000/conf.mk
++++ b/core/arch/arm/plat-corstone1000/conf.mk
+@@ -34,7 +34,7 @@ CFG_TEE_CORE_NB_CORE ?= 1
+ CFG_TZDRAM_START ?= 0x02002000
+ 
+ # TEE_RAM (OP-TEE kernel + DATA) + TA_RAM
+-CFG_TZDRAM_SIZE  ?= 0x340000
++CFG_TZDRAM_SIZE  ?= 0x360000
+ CFG_SHMEM_START  ?= 0x86000000
+ CFG_SHMEM_SIZE   ?= 0x00200000
+ 
+-- 
+2.25.1

@@ -1,0 +1,34 @@
+From b42265af87d9efcc9aac91b3a3da3df5c5c66e29 Mon Sep 17 00:00:00 2001
+From: Nguyen Dat Tho <tho3.nguyen@lge.com>
+Date: Wed, 9 Apr 2025 17:33:25 +0900
+Subject: [PATCH] Fix build with gcc-15
+
+To fix the following error:
+In file included from string_matching.cpp:1:
+./string_matching.h:10:18: error: 'uint16_t' does not name a type
+   10 |     extern const uint16_t   PATTERN_LIMIT;
+      |                  ^~~~~~~~
+./string_matching.h:7:1: note: 'uint16_t' is defined in header '<cstdint>'; this is probably fixable by adding '#include <cstdint>'
+
+Upstream-Status: Submitted [https://github.com/LINBIT/drbd-utils/pull/50]
+
+Signed-off-by: Nguyen Dat Tho <tho3.nguyen@lge.com>
+---
+ user/drbdmon/string_matching.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/user/drbdmon/string_matching.h b/user/drbdmon/string_matching.h
+index 9b3918fe..b783ba48 100644
+--- a/user/drbdmon/string_matching.h
++++ b/user/drbdmon/string_matching.h
+@@ -4,6 +4,7 @@
+ #include <string>
+ #include <memory>
+ #include <stdexcept>
++#include <cstdint>
+ 
+ namespace string_matching
+ {
+-- 
+2.34.1
+

@@ -1,0 +1,51 @@
+From bc5f2e5af90854c8f84b5829493dd01facf9af84 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Mon, 7 Apr 2025 16:29:32 +0200
+Subject: [PATCH] Fix tests with musl
+
+Upstream-Status: Submitted [https://github.com/rikyoz/bit7z/pull/292]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ tests/src/test_bitexception.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/tests/src/test_bitexception.cpp b/tests/src/test_bitexception.cpp
+index 7161fcc5..d85d430d 100644
+--- a/tests/src/test_bitexception.cpp
++++ b/tests/src/test_bitexception.cpp
+@@ -49,6 +49,8 @@ constexpr PortableErrorTest hresult_tests[] = { // NOLINT(*-avoid-c-arrays)
+     { HRESULT_WIN32_TEST( ERROR_OPEN_FAILED ),
+ #ifdef _WIN32
+       "The system cannot open the device or file specified.",
++#elif defined( __linux__ ) && !defined ( __GLIBC__ )
++      "I/O error",
+ #else
+         "Input/output error",
+ #endif
+@@ -67,6 +69,8 @@ constexpr PortableErrorTest hresult_tests[] = { // NOLINT(*-avoid-c-arrays)
+     { HRESULT_WIN32_TEST( ERROR_SEEK ),
+ #ifdef _WIN32
+       "The drive cannot locate a specific area or track on the disk.",
++#elif defined( __linux__ ) && !defined ( __GLIBC__ )
++      "I/O error",
+ #else
+         "Input/output error",
+ #endif
+@@ -74,6 +78,8 @@ constexpr PortableErrorTest hresult_tests[] = { // NOLINT(*-avoid-c-arrays)
+     { HRESULT_WIN32_TEST( ERROR_READ_FAULT ),
+ #ifdef _WIN32
+       "The system cannot read from the specified device.",
++#elif defined( __linux__ ) && !defined ( __GLIBC__ )
++      "I/O error",
+ #else
+         "Input/output error",
+ #endif
+@@ -81,6 +87,8 @@ constexpr PortableErrorTest hresult_tests[] = { // NOLINT(*-avoid-c-arrays)
+     { HRESULT_WIN32_TEST( ERROR_WRITE_FAULT ),
+ #ifdef _WIN32
+       "The system cannot write to the specified device.",
++#elif defined( __linux__ ) && !defined ( __GLIBC__ )
++      "I/O error",
+ #else
+         "Input/output error",
+ #endif

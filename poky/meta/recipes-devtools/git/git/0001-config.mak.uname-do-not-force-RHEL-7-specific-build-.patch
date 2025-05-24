@@ -1,4 +1,4 @@
-From 2a97f61c558a03282c7d81797f1cd8b594f953dc Mon Sep 17 00:00:00 2001
+From 325c30dac4eafdd463c8ffcfe1215858d642ab91 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 7 Feb 2022 10:13:15 +0100
 Subject: [PATCH] config.mak.uname: do not force RHEL-7 specific build settings

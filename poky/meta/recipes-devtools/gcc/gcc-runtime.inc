@@ -205,6 +205,7 @@ FILES:libstdc++-dev = "\
     ${libdir}/libstdc++.so \
     ${libdir}/libstdc++*.la \
     ${libdir}/libsupc++.la \
+    ${libdir}/libstdc++.modules.json \
 "
 SUMMARY:libstdc++-dev = "GNU standard C++ library - development files"
 FILES:libstdc++-staticdev = "\

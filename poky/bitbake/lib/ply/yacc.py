@@ -1122,7 +1122,6 @@ class LRParser:
 # manipulate the rules that make up a grammar. 
 # -----------------------------------------------------------------------------
 
-import re
 
 # regex matching identifiers
 _is_identifier = re.compile(r'^[a-zA-Z0-9_-]+$')

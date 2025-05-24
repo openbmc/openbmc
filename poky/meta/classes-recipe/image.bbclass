@@ -699,13 +699,6 @@ reproducible_final_image_task () {
     find  ${IMAGE_ROOTFS} -print0 | xargs -0 touch -h  --date=@$REPRODUCIBLE_TIMESTAMP_ROOTFS
 }
 
-systemd_preset_all () {
-    if [ -e ${IMAGE_ROOTFS}${root_prefix}/lib/systemd/systemd ]; then
-	systemctl --root="${IMAGE_ROOTFS}" --preset-mode=enable-only preset-all
-	systemctl --root="${IMAGE_ROOTFS}" --global --preset-mode=enable-only preset-all
-    fi
-}
-
-IMAGE_PREPROCESS_COMMAND:append = " ${@ 'systemd_preset_all' if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d) and not bb.utils.contains('IMAGE_FEATURES', 'stateless-rootfs', True, False, d) else ''} reproducible_final_image_task "
+IMAGE_PREPROCESS_COMMAND:append = " reproducible_final_image_task "
 
 CVE_PRODUCT = ""

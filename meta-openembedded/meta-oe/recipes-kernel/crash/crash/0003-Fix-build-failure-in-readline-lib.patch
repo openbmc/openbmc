@@ -1,0 +1,136 @@
+From 772fbb1022911410b5fb773fde37910fc8286041 Mon Sep 17 00:00:00 2001
+From: Lianbo Jiang <lijiang@redhat.com>
+Date: Fri, 24 Jan 2025 16:12:40 +0800
+Subject: [PATCH] Fix build failure in readline lib
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is a backported patch from gdb upstream, see the commit
+425f843d58c5 ("Import GNU Readline 8.2"), and only backported
+patch related to compilation errors.
+
+Without the patch:
+
+  signals.c: In function ‘_rl_handle_signal’:
+  signals.c:62:36: error: ‘return’ with a value, in function returning void [-Wreturn-mismatch]
+     62 | #  define SIGHANDLER_RETURN return (0)
+        |                                    ^
+  signals.c:290:3: note: in expansion of macro ‘SIGHANDLER_RETURN’
+    290 |   SIGHANDLER_RETURN;
+        |   ^~~~~~~~~~~~~~~~~
+  signals.c:178:1: note: declared here
+    178 | _rl_handle_signal (int sig)
+        | ^~~~~~~~~~~~~~~~~
+  signals.c: In function ‘rl_sigwinch_handler’:
+  signals.c:306:32: error: passing argument 2 of ‘rl_set_sighandler’ from incompatible pointer type [-Wincompatible-pointer-types]
+    306 |   rl_set_sighandler (SIGWINCH, rl_sigwinch_handler, &dummy_winch);
+        |                                ^~~~~~~~~~~~~~~~~~~
+        |                                |
+        |                                void (*)(int)
+  In file included from rldefs.h:31,
+                   from signals.c:37:
+  signals.c:81:51: note: expected ‘void (*)(void)’ but argument is of type ‘void (*)(int)’
+     81 | static SigHandler *rl_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
+
+Note: the current build failure was observed on gcc (GCC) 15.0.0.
+
+Signed-off-by: Lianbo Jiang <lijiang@redhat.com>
+Signed-off-by: mark.yang <mark.yang@lge.com>
+
+Upstream-Status: Backport [772fbb1 Fix build failure in readline lib]
+---
+ gdb-10.2.patch | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
+
+diff --git a/gdb-10.2.patch b/gdb-10.2.patch
+index fd6fadb..8f5d7db 100644
+--- a/gdb-10.2.patch
++++ b/gdb-10.2.patch
+@@ -16239,3 +16239,85 @@ exit 0
+ 	  pc_p = true;
+ 	}
+        catch (const gdb_exception_error &ex)
++--- gdb-10.2/readline/readline/signals.c.orig
+++++ gdb-10.2/readline/readline/signals.c
++@@ -48,23 +48,11 @@
++ 
++ #if defined (HANDLE_SIGNALS)
++ 
++-#if !defined (RETSIGTYPE)
++-#  if defined (VOID_SIGHANDLER)
++-#    define RETSIGTYPE void
++-#  else
++-#    define RETSIGTYPE int
++-#  endif /* !VOID_SIGHANDLER */
++-#endif /* !RETSIGTYPE */
++-
++-#if defined (VOID_SIGHANDLER)
++-#  define SIGHANDLER_RETURN return
++-#else
++-#  define SIGHANDLER_RETURN return (0)
++-#endif
+++#define SIGHANDLER_RETURN return
++ 
++ /* This typedef is equivalent to the one for Function; it allows us
++    to say SigHandler *foo = signal (SIGKILL, SIG_IGN); */
++-typedef RETSIGTYPE SigHandler ();
+++typedef void SigHandler (int);
++ 
++ #if defined (HAVE_POSIX_SIGNALS)
++ typedef struct sigaction sighandler_cxt;
++@@ -78,12 +66,12 @@ typedef struct { SigHandler *sa_handler; int sa_mask, sa_flags; } sighandler_cxt
++ #  define SA_RESTART 0
++ #endif
++ 
++-static SigHandler *rl_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
++-static void rl_maybe_set_sighandler PARAMS((int, SigHandler *, sighandler_cxt *));
++-static void rl_maybe_restore_sighandler PARAMS((int, sighandler_cxt *));
+++static SigHandler *rl_set_sighandler (int, SigHandler *, sighandler_cxt *);
+++static void rl_maybe_set_sighandler (int, SigHandler *, sighandler_cxt *);
+++static void rl_maybe_restore_sighandler (int, sighandler_cxt *);
++ 
++-static RETSIGTYPE rl_signal_handler PARAMS((int));
++-static RETSIGTYPE _rl_handle_signal PARAMS((int));
+++static void rl_signal_handler (int);
+++static void _rl_handle_signal (int);
++      
++ /* Exported variables for use by applications. */
++ 
++@@ -137,7 +125,7 @@ void *_rl_sigcleanarg;
++ /* Readline signal handler functions. */
++ 
++ /* Called from RL_CHECK_SIGNALS() macro */
++-RETSIGTYPE
+++void
++ _rl_signal_handler (int sig)
++ {
++   _rl_caught_signal = 0;	/* XXX */
++@@ -160,7 +148,7 @@ _rl_signal_handler (int sig)
++   SIGHANDLER_RETURN;
++ }
++ 
++-static RETSIGTYPE
+++static void
++ rl_signal_handler (int sig)
++ {
++   if (_rl_interrupt_immediately)
++@@ -174,7 +162,7 @@ rl_signal_handler (int sig)
++   SIGHANDLER_RETURN;
++ }
++ 
++-static RETSIGTYPE
+++static void
++ _rl_handle_signal (int sig)
++ {
++ #if defined (HAVE_POSIX_SIGNALS)
++@@ -291,7 +279,7 @@ _rl_handle_signal (int sig)
++ }
++ 
++ #if defined (SIGWINCH)
++-static RETSIGTYPE
+++static void
++ rl_sigwinch_handler (int sig)
++ {
++   SigHandler *oh;
+

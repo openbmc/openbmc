@@ -30,6 +30,5 @@ RDEPENDS:${PN}-utils = "\
     xrandr \
     xmodmap \
     xdpyinfo \
-    xinput-calibrator \
-    dbus-x11 \
+    xinput-calibrator \
     "

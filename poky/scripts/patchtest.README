@@ -69,7 +69,7 @@ the target project, but these parameters can be configured using the `--limit`,
 To run patchtest on the host, do the following:
 
 1. In openembedded-core/poky, do `source oe-init-build-env`
-2. Generate patch files from the target repository by doing `git-format patch -N`,
+2. Generate patch files from the target repository by doing `git format-patch -N`,
    where N is the number of patches starting at HEAD, or by using git-pw
    or patchtest-get-series
 3. Run patchtest on a patch file by doing the following:

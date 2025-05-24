@@ -28,7 +28,7 @@ PTESTS_SLOW_META_PERL = "\
     libio-socket-ssl-perl \
 "
 
-PTESTS_PROBLEMS_META_PERL ="\
+PTESTS_PROBLEMS_META_PERL = "\
     libauthen-sasl-perl \
     libconfig-autoconf-perl \
     libcrypt-openssl-guess-perl \

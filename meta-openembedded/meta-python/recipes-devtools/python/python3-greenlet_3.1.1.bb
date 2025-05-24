@@ -8,4 +8,6 @@ SRC_URI[sha256sum] = "4ce3ac6cdb6adf7946475d7ef31777c26d94bccc377e070a7986bd2d5c
 
 inherit pypi python_setuptools_build_meta
 
+SRC_URI += "file://0001-slp_switch-Implement-for-RISCV32.patch"
+
 BBCLASSEXTEND = "native nativesdk"

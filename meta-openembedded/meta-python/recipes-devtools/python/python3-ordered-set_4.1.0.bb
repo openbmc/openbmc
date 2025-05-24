@@ -1,5 +1,5 @@
 SUMMARY = "A MutableSet that remembers its order, so that every entry has an index."
-HOMEPAGE = "http://github.com/LuminosoInsight/ordered-set"
+HOMEPAGE = "https://github.com/LuminosoInsight/ordered-set"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://MIT-LICENSE;md5=3bf5e1ad64c0d99032c3143361fa234e"
 

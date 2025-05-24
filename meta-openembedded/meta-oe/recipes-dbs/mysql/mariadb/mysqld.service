@@ -13,7 +13,7 @@ Group=mysql
 PermissionsStartOnly=true
 
 # Start main service
-ExecStart=@BINDIR@/mysqld_safe --basedir=@PREFIX@
+ExecStart=@BINDIR@/mariadbd-safe --basedir=@PREFIX@
 
 # Don't signal startup success before a ping works
 ExecStartPost=@BINDIR@/mysql-systemd-start post

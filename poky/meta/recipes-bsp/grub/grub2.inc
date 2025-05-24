@@ -18,20 +18,35 @@ SRC_URI = "${GNU_MIRROR}/grub/grub-${PV}.tar.gz \
            file://grub-module-explicitly-keeps-symbole-.module_license.patch \
            file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
            file://0001-RISC-V-Restore-the-typcast-to-long.patch \
+           file://0001-misc-Implement-grub_strlcpy.patch \
+           file://CVE-2024-45781.patch \
+           file://CVE-2024-45782_CVE-2024-56737.patch \
+           file://CVE-2024-45780.patch \
+           file://CVE-2024-45783.patch \
+           file://CVE-2025-0624.patch \
+           file://CVE-2024-45774.patch \
+           file://CVE-2024-45775.patch \
+           file://CVE-2025-0622-01.patch \
+           file://CVE-2025-0622-02.patch \
+           file://CVE-2025-0622-03.patch \
+           file://CVE-2024-45776.patch \
+           file://CVE-2024-45777.patch \
+           file://CVE-2025-0690.patch \
+           file://CVE-2025-1118.patch \
+           file://CVE-2024-45778_CVE-2024-45779.patch \
+           file://CVE-2025-0677_CVE-2025-0684_CVE-2025-0685_CVE-2025-0686_CVE-2025-0689.patch \
+           file://CVE-2025-0678_CVE-2025-1125.patch \
 "
 
 SRC_URI[sha256sum] = "b30919fa5be280417c17ac561bb1650f60cfb80cc6237fa1e2b6f56154cb9c91"
 
 CVE_STATUS[CVE-2019-14865] = "not-applicable-platform: applies only to RHEL"
-CVE_STATUS[CVE-2021-46705] = "not-applicable-platform: Applies only to SUSE"
 CVE_STATUS[CVE-2023-4001]  = "not-applicable-platform: Applies only to RHEL/Fedora"
 CVE_STATUS[CVE-2024-1048]  = "not-applicable-platform: Applies only to RHEL/Fedora"
-CVE_STATUS[CVE-2023-4692]  = "cpe-incorrect: Fixed in version 2.12 already"
-CVE_STATUS[CVE-2023-4693]  = "cpe-incorrect: Fixed in version 2.12 already"
 
 DEPENDS = "flex-native bison-native gettext-native"
 
-GRUB_COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|riscv.*)-(linux.*|freebsd.*)'
+GRUB_COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|loongarch64.*|riscv.*)-(linux.*|freebsd.*)'
 COMPATIBLE_HOST = "${GRUB_COMPATIBLE_HOST}"
 # Grub doesn't support hard float toolchain and won't be able to forcefully
 # disable it on some of the target CPUs. See 'configure.ac' for
@@ -44,6 +59,7 @@ COMPATIBLE_HOST:armv7ve = "${@'null' if bb.utils.contains('TUNE_CCARGS_MFLOAT', 
 
 GRUBPLATFORM:arm = "efi"
 GRUBPLATFORM:aarch64 = "efi"
+GRUBPLATFORM:loongarch64 = "efi"
 GRUBPLATFORM:riscv32 = "efi"
 GRUBPLATFORM:riscv64 = "efi"
 GRUBPLATFORM ??= "pc"

@@ -66,7 +66,8 @@ jobs:
         if: steps.changed-files-specific.outputs.any_changed == 'true'
       - name: Build the image
         run: |
-          docker run --rm \
+          docker run --rm --security-opt apparmor=unconfined \
+            --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:/work:ro" \
             -v "$DL_DIR:$DL_DIR:rw" \
             -v "$SSTATE_DIR:$SSTATE_DIR:rw" \
@@ -76,6 +77,7 @@ jobs:
             --env "IMAGE=${{ matrix.image }}" \
             --env "DL_DIR=$DL_DIR" \
             --env "SSTATE_DIR=$SSTATE_DIR" \
+            --ulimit "nofile=1024:1048576" \
             "yocto-builder-${{ github.event.number }}" \
             /entrypoint-build.sh
         if: steps.changed-files-specific.outputs.any_changed == 'true'

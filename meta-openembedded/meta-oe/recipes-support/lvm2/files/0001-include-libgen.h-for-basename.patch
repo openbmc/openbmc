@@ -1,4 +1,4 @@
-From 4e2dc175e99792d84873a4785ff1524845267c3e Mon Sep 17 00:00:00 2001
+From c7a63e17fc841eab5874aa5dc4e848e2bf300bf0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 25 Mar 2024 13:07:28 -0700
 Subject: [PATCH] include libgen.h for basename
@@ -16,11 +16,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/lib/device/device_id.c b/lib/device/device_id.c
-index b3330f2ba..291bd5c73 100644
+index a3f341bfc..0c05eb151 100644
 --- a/lib/device/device_id.c
 +++ b/lib/device/device_id.c
-@@ -28,6 +28,7 @@
- #include "lib/activate/activate.h"
+@@ -27,6 +27,7 @@
+ #include "lib/display/display.h"
  #include "device_mapper/misc/dm-ioctl.h"
  
 +#include <libgen.h>

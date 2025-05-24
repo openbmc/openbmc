@@ -39,7 +39,7 @@ def get_fm_short_pv_url(d):
 VERSION = "${@oe.utils.trim_version(d.getVar('PV', -1))}"
 BUILD = "${@d.getVar('PV').split('.')[-1]}"
 PV_URL = "${@get_real_pv(d)}"
-PV_URL_SHORT="${@get_fm_short_pv_url(d)}"
+PV_URL_SHORT = "${@get_fm_short_pv_url(d)}"
 
 # The directory the FVP is installed into
 FVPDIR = "${libdir}/fvp/${BPN}"

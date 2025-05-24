@@ -1363,7 +1363,6 @@ WKS_FILE = "test_efi_plugin.wks"
 
 # efi, uki and systemd features must be enabled
 MACHINE_FEATURES:append = " efi"
-DISTRO_FEATURES_NATIVE:append = " systemd"
 IMAGE_CLASSES:append:pn-core-image-base = " uki"
 
 # uki embeds also an initrd, no systemd or udev

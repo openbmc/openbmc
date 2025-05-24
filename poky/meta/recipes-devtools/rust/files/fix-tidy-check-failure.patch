@@ -1,0 +1,19 @@
+fix a comment with uneven number of backticks in rustc_mir_build
+
+Upstream-Status: Backport [https://github.com/rust-lang/rust/commit/8e7734978245522cbbd14e53e08e888faf031ded]
+
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+---
+diff --git a/compiler/rustc_mir_build/src/build/expr/as_rvalue.rs b/compiler/rustc_mir_build/src/build/expr/as_rvalue.rs
+index 3f89e33778..c66af11845 100644
+--- a/compiler/rustc_mir_build/src/build/expr/as_rvalue.rs
++++ b/compiler/rustc_mir_build/src/build/expr/as_rvalue.rs
+@@ -231,7 +231,7 @@ impl<'a, 'tcx> Builder<'a, 'tcx> {
+                             if range.start <= range.end { BinOp::BitAnd } else { BinOp::BitOr };
+
+                         let mut comparer = |range: u128, bin_op: BinOp| -> Place<'tcx> {
+-                            // We can use `ty::TypingEnv::fully_monomorphized()`` here
++                            // We can use `ty::TypingEnv::fully_monomorphized()` here
+                             // as we only need it to compute the layout of a primitive.
+                             let range_val = Const::from_bits(
+                                 this.tcx,

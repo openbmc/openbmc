@@ -1,0 +1,32 @@
+From a9e41f7e9590c757e74877cace6442dd676223ff Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 21 Mar 2025 10:25:43 +0000
+Subject: [PATCH] thorvg: fix build with gcc-15
+
+* add missing include to fix:
+  src/libs/thorvg/thorvg.h:357:20: error: 'uint8_t' has not been declared
+  357 |     Result opacity(uint8_t o) noexcept;
+      |                    ^~~~~~~
+
+* not needed with latest master where it was resolved differently in
+  fc5c15638 feat(thorvg): use LVGL's malloc/realloc/zalloc/free (#7772)
+  which includes stdlib/lv_string.h which includes misc/lv_types.h which
+  includes stdint
+
+Upstream-Status: Pending [not needed with latest master where it was resolved differently in fc5c15638 feat(thorvg): use LVGL's malloc/realloc/zalloc/free (#7772)]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ src/libs/thorvg/thorvg.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/src/libs/thorvg/thorvg.h
++++ b/src/libs/thorvg/thorvg.h
+@@ -12,6 +12,7 @@
+ #define TVG_BUILD 1
+ 
+ 
++#include <cstdint>
+ #include <functional>
+ #include <memory>
+ #include <string>

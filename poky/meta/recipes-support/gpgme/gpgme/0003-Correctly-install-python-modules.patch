@@ -1,4 +1,4 @@
-From 548d84c703a747c41a02e1d0ff6ad4c193a34a5c Mon Sep 17 00:00:00 2001
+From d8e884d1fa8c35ce68e94a0668548580cf5ba2d3 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 30 Jan 2018 15:28:49 +0800
 Subject: [PATCH] Correctly install python modules
@@ -17,7 +17,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/lang/python/Makefile.am b/lang/python/Makefile.am
-index a6fd639..136e979 100644
+index 1aa330f..d1d5c63 100644
 --- a/lang/python/Makefile.am
 +++ b/lang/python/Makefile.am
 @@ -97,6 +97,7 @@ install-exec-local:

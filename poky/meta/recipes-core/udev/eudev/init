@@ -27,8 +27,7 @@ make_static_nodes () {
     [ -e /lib/modules/$(uname -r)/modules.devname ] || return 0
     [ -x @KMOD@ ] || return 0
 
-    #output to /proc/self/fd/1 since /dev/stdout not created by udevd yet
-    @KMOD@ static-nodes --format=tmpfiles --output=/proc/self/fd/1 |
+    @KMOD@ static-nodes --format=tmpfiles |
     while read TTYPE TPATH TMODE TUSER TGROUP TAGE TARG; do
     case "${TTYPE}" in
     'd')

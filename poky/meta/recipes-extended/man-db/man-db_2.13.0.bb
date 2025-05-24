@@ -9,6 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
 
 SRC_URI = "${SAVANNAH_NONGNU_MIRROR}/man-db/man-db-${PV}.tar.xz \
            file://flex.patch \
+           file://0001-check-for-_nl_msg_cat_cntr-in-configure.patch \
            file://99_mandb \
           "
 SRC_URI[sha256sum] = "82f0739f4f61aab5eb937d234de3b014e777b5538a28cbd31433c45ae09aefb9"
@@ -17,15 +18,16 @@ DEPENDS = "libpipeline gdbm groff-native base-passwd"
 RDEPENDS:${PN} += "base-passwd"
 PACKAGE_WRITE_DEPS += "base-passwd"
 
-# | /usr/src/debug/man-db/2.8.0-r0/man-db-2.8.0/src/whatis.c:939: undefined reference to `_nl_msg_cat_cntr'
-USE_NLS:libc-musl = "no"
-
 inherit gettext pkgconfig autotools systemd
 
 EXTRA_OECONF = "--with-pager=less --with-systemdsystemunitdir=${systemd_system_unitdir}"
 EXTRA_AUTORECONF += "-I ${S}/gl/m4"
 
+PACKAGECONFIG ??= ""
+
 PACKAGECONFIG[bzip2] = "--with-bzip2=bzip2,ac_cv_prog_have_bzip2='',bzip2"
+# util-linux col is deprecated and only builds for glibc
+PACKAGECONFIG[col] = "--with-col=col,--with-col=,,util-linux-col"
 PACKAGECONFIG[gzip] = "--with-gzip=gzip,ac_cv_prog_have_gzip='',gzip"
 PACKAGECONFIG[lzip] = "--with-lzip=lzip,ac_cv_prog_have_lzip='',lzip"
 PACKAGECONFIG[lzma] = "--with-lzma=lzma,ac_cv_prog_have_lzma='',xz"
@@ -39,10 +41,6 @@ do_install() {
 	        install -d ${D}/etc/default/volatiles
 		install -m 0644 ${UNPACKDIR}/99_mandb ${D}/etc/default/volatiles
 	fi
-}
-
-do_install:append:libc-musl() {
-        rm -f ${D}${libdir}/charset.alias
 }
 
 FILES:${PN} += "${prefix}/lib/tmpfiles.d"

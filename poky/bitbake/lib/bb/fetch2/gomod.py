@@ -107,23 +107,23 @@ class GoMod(Wget):
         if ud.path != '/':
             module += ud.path
         ud.parm['module'] = module
+        version = ud.parm['version']
 
         # Set URL and filename for wget download
-        path = escape(module + '/@v/' + ud.parm['version'])
         if ud.parm.get('mod', '0') == '1':
-            path += '.mod'
+            ext = '.mod'
         else:
-            path += '.zip'
-            ud.parm['unpack'] = '0'
+            ext = '.zip'
+        path = escape(f"{module}/@v/{version}{ext}")
         ud.url = bb.fetch2.encodeurl(
             ('https', proxy, '/' + path, None, None, None))
-        ud.parm['downloadfilename'] = path
+        ud.parm['downloadfilename'] =  f"{module.replace('/', '.')}@{version}{ext}"
 
-        ud.parm['name'] = f"{module}@{ud.parm['version']}"
+        # Set name for checksum verification
+        ud.parm['name'] = f"{module}@{version}"
 
-        # Set subdir for unpack
-        ud.parm['subdir'] = os.path.join(moddir, 'cache/download',
-                                         os.path.dirname(path))
+        # Set path for unpack
+        ud.parm['unpackpath'] = os.path.join(moddir, 'cache/download', path)
 
         super().urldata_init(ud, d)
 
@@ -131,13 +131,22 @@ class GoMod(Wget):
         """Unpack the module in the module cache."""
 
         # Unpack the module zip file or go.mod file
-        super().unpack(ud, rootdir, d)
+        unpackpath = os.path.join(rootdir, ud.parm['unpackpath'])
+        unpackdir = os.path.dirname(unpackpath)
+        bb.utils.mkdirhier(unpackdir)
+        ud.unpack_tracer.unpack("file-copy", unpackdir)
+        cmd = f"cp {ud.localpath} {unpackpath}"
+        path = d.getVar('PATH')
+        if path:
+            cmd = f"PATH={path} {cmd}"
+        name = os.path.basename(unpackpath)
+        bb.note(f"Unpacking {name} to {unpackdir}/")
+        subprocess.check_call(cmd, shell=True, preexec_fn=subprocess_setup)
 
-        if ud.localpath.endswith('.zip'):
+        if name.endswith('.zip'):
             # Unpack the go.mod file from the zip file
             module = ud.parm['module']
-            unpackdir = os.path.join(rootdir, ud.parm['subdir'])
-            name = os.path.basename(ud.localpath).rsplit('.', 1)[0] + '.mod'
+            name = name.rsplit('.', 1)[0] + '.mod'
             bb.note(f"Unpacking {name} to {unpackdir}/")
             with zipfile.ZipFile(ud.localpath) as zf:
                 with open(os.path.join(unpackdir, name), mode='wb') as mf:
@@ -190,15 +199,14 @@ class GoModGit(Git):
                 ud.path = ''
         if 'protocol' not in ud.parm:
             ud.parm['protocol'] = 'https'
-        name = f"{module}@{ud.parm['version']}"
-        ud.names = [name]
-        srcrev = d.getVar('SRCREV_' + name)
+        ud.name = f"{module}@{ud.parm['version']}"
+        srcrev = d.getVar('SRCREV_' + ud.name)
         if srcrev:
             if 'srcrev' not in ud.parm:
                 ud.parm['srcrev'] = srcrev
         else:
             if 'srcrev' in ud.parm:
-                d.setVar('SRCREV_' + name, ud.parm['srcrev'])
+                d.setVar('SRCREV_' + ud.name, ud.parm['srcrev'])
         if 'branch' not in ud.parm:
             ud.parm['nobranch'] = '1'
 

@@ -1,4 +1,4 @@
-compatibility_level = 3.6
+compatibility_level = 3.10
 smtputf8_enable = no
 
 # Configure your domain and accounts

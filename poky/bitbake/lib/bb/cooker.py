@@ -316,8 +316,14 @@ class BBCooker:
                     try:
                         with hashserv.create_client(upstream) as client:
                             client.ping()
-                    except (ConnectionError, ImportError) as e:
-                        bb.warn("BB_HASHSERVE_UPSTREAM is not valid, unable to connect hash equivalence server at '%s': %s"
+                    except ImportError as e:
+                        bb.fatal(""""Unable to use hash equivalence server at '%s' due to missing or incorrect python module:
+%s
+Please install the needed module on the build host, or use an environment containing it (e.g a pip venv or OpenEmbedded's buildtools tarball).
+You can also remove the BB_HASHSERVE_UPSTREAM setting, but this may result in significantly longer build times as bitbake will be unable to reuse prebuilt sstate artefacts."""
+                                 % (upstream, repr(e)))
+                    except ConnectionError as e:
+                        bb.warn("Unable to connect to hash equivalence server at '%s', please correct or remove BB_HASHSERVE_UPSTREAM:\n%s"
                                  % (upstream, repr(e)))
                         upstream = None
 
@@ -1630,6 +1636,7 @@ class BBCooker:
         self.state = State.PARSING
 
         if not self.parser.parse_next():
+            bb.server.process.serverlog("Parsing completed")
             collectlog.debug("parsing complete")
             if self.parser.error:
                 raise bb.BBHandledException()

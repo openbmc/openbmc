@@ -1,4 +1,4 @@
-From afef4a9391e6bb1a6c3e73d370f240577ed8b0dd Mon Sep 17 00:00:00 2001
+From 404150f53bb49af987d7338a808f47fdbd50ba7f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 16 Jan 2022 11:21:54 +0800
 Subject: [PATCH] Fix icu config
@@ -10,18 +10,18 @@ corrupted in any case its just adding -I/usr/include
 to the CCARGS which we loose nothing if its not
 entertained.
 
+Upstream-Status: Inappropriate [embedded specific]
+
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
  makedefs | 1 -
  1 file changed, 1 deletion(-)
 
 diff --git a/makedefs b/makedefs
-index 3299eba..2a76f20 100644
+index 313b401..e5db212 100644
 --- a/makedefs
 +++ b/makedefs
-@@ -826,7 +826,6 @@ EOF
+@@ -906,7 +906,6 @@ EOF
  		    ${BUILD_CC-gcc} -o makedefs.test makedefs.test.c $icu_cppflags \
  			$icu_ldflags >/dev/null 2>&1
  		    if ./makedefs.test 2>/dev/null ; then
@@ -30,5 +30,5 @@ index 3299eba..2a76f20 100644
  		    else
  			CCARGS="$CCARGS -DNO_EAI"
 -- 
-2.17.1
+2.25.1
 

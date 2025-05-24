@@ -1,0 +1,28 @@
+From 7fc1f0a8d4c6a109f7e86853a9136a008c68808a Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Thu, 14 Sep 2017 13:26:55 +0800
+Subject: [PATCH] Add LDFLAGS variable for compiling samhain_setpwd
+
+Upstream-Status: Pending
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ Makefile.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index ade0638..1806159 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1159,7 +1159,7 @@ sh_tiger_i.o: $(srcsrc)/$(TIGER_SRC) Makefile config_xor.h
+ samhain_setpwd: encode config_xor.h $(srcsrc)/samhain_setpwd.c
+ 	@echo '$(COMPILE)  -o samhain_setpwd $(srcsrc)/samhain_setpwd.c'; \
+ 	./encode $(XOR_CODE) $(srcsrc)/samhain_setpwd.c; \
+-	$(COMPILE)  -o samhain_setpwd x_samhain_setpwd.c; \
++	$(COMPILE) $(LDFLAGS) -o samhain_setpwd x_samhain_setpwd.c; \
+ 	rm x_samhain_setpwd.c
+ 
+ samhain_stealth: encode config_xor.h $(srcsrc)/samhain_stealth.c
+-- 
+2.34.1
+

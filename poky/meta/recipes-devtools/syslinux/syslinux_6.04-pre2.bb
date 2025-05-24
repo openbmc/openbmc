@@ -23,6 +23,7 @@ SRC_URI = "https://www.zytor.com/pub/syslinux/Testing/6.04/syslinux-${PV}.tar.xz
            file://0013-remove-clean-script.patch \
            file://0014-Fix-reproducibility-issues.patch \
            file://0001-ext2_fs.h-do-not-carry-an-outdated-copy.patch \
+           file://0001-Add-extra-sector-count-from-section-entry-for-EFI-ca.patch \
            "
 
 SRC_URI[md5sum] = "2b31c78f087f99179feb357da312d7ec"
@@ -49,7 +50,7 @@ TARGET_LDFLAGS = ""
 SECURITY_LDFLAGS = ""
 LDFLAGS_SECTION_REMOVAL = ""
 
-CFLAGS += "-DNO_INLINE_FUNCS -Wno-error=implicit-function-declaration"
+CFLAGS += "-DNO_INLINE_FUNCS -Wno-error=implicit-function-declaration -idirafter ${STAGING_INCDIR}"
 
 EXTRA_OEMAKE = " \
 	BINDIR=${bindir} SBINDIR=${sbindir} LIBDIR=${libdir} \

@@ -24,7 +24,7 @@ SRC_URI = "http://sourceforge.net/projects/irstessi/files/${BPN}.${PV}.tgz \
            "
 SRC_URI[sha256sum] = "59daab29363d6e9f07c524029c4239653cfbbee6b0e57fd75df62499728dad8a"
 
-S ="${WORKDIR}/${BPN}.${PV}"
+S = "${WORKDIR}/${BPN}.${PV}"
 
 inherit autotools
 

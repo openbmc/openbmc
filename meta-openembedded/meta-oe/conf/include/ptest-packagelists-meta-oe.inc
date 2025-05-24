@@ -31,6 +31,7 @@ PTESTS_FAST_META_OE = "\
     lmdb \
     microsoft-gsl \
     minicoredumper \
+    minizip-ng \
     neon \
     nlohmann-json \
     nodejs \

@@ -806,8 +806,8 @@ def _get_srcrev(d, method_name='sortable_revision'):
         return "", revs
 
 
-    if len(scms) == 1 and len(urldata[scms[0]].names) == 1:
-        autoinc, rev = getattr(urldata[scms[0]].method, method_name)(urldata[scms[0]], d, urldata[scms[0]].names[0])
+    if len(scms) == 1:
+        autoinc, rev = getattr(urldata[scms[0]].method, method_name)(urldata[scms[0]], d, urldata[scms[0]].name)
         revs.append(rev)
         if len(rev) > 10:
             rev = rev[:10]
@@ -828,13 +828,12 @@ def _get_srcrev(d, method_name='sortable_revision'):
     seenautoinc = False
     for scm in scms:
         ud = urldata[scm]
-        for name in ud.names:
-            autoinc, rev = getattr(ud.method, method_name)(ud, d, name)
-            revs.append(rev)
-            seenautoinc = seenautoinc or autoinc
-            if len(rev) > 10:
-                rev = rev[:10]
-            name_to_rev[name] = rev
+        autoinc, rev = getattr(ud.method, method_name)(ud, d, ud.name)
+        revs.append(rev)
+        seenautoinc = seenautoinc or autoinc
+        if len(rev) > 10:
+            rev = rev[:10]
+        name_to_rev[ud.name] = rev
     # Replace names by revisions in the SRCREV_FORMAT string. The approach used
     # here can handle names being prefixes of other names and names appearing
     # as substrings in revisions (in which case the name should not be
@@ -1248,19 +1247,16 @@ def srcrev_internal_helper(ud, d, name):
         if srcrev and srcrev != "INVALID":
             break
 
-    if 'rev' in ud.parm and 'tag' in ud.parm:
-        raise FetchError("Please specify a ;rev= parameter or a ;tag= parameter in the url %s but not both." % (ud.url))
-
-    if 'rev' in ud.parm or 'tag' in ud.parm:
-        if 'rev' in ud.parm:
-            parmrev = ud.parm['rev']
-        else:
-            parmrev = ud.parm['tag']
+    if 'rev' in ud.parm:
+        parmrev = ud.parm['rev']
         if srcrev == "INVALID" or not srcrev:
             return parmrev
         if srcrev != parmrev:
             raise FetchError("Conflicting revisions (%s from SRCREV and %s from the url) found, please specify one valid value" % (srcrev, parmrev))
         return parmrev
+
+    if 'tag' in ud.parm and (srcrev == "INVALID" or not srcrev):
+        return ud.parm['tag']
 
     if srcrev == "INVALID" or not srcrev:
         raise FetchError("Please set a valid SRCREV for url %s (possible key names are %s, or use a ;rev=X URL parameter)" % (str(attempts), ud.url), ud.url)
@@ -1348,7 +1344,9 @@ class FetchData(object):
             setattr(self, "%s_name" % checksum_id, checksum_name)
             setattr(self, "%s_expected" % checksum_id, checksum_expected)
 
-        self.names = self.parm.get("name",'default').split(',')
+        self.name = self.parm.get("name",'default')
+        if "," in self.name:
+            raise ParameterError("The fetcher no longer supports multiple name parameters in a single url", self.url)
 
         self.method = None
         for m in methods:
@@ -1400,13 +1398,7 @@ class FetchData(object):
         self.lockfile = basepath + '.lock'
 
     def setup_revisions(self, d):
-        self.revisions = {}
-        for name in self.names:
-            self.revisions[name] = srcrev_internal_helper(self, d, name)
-
-        # add compatibility code for non name specified case
-        if len(self.names) == 1:
-            self.revision = self.revisions[self.names[0]]
+        self.revision = srcrev_internal_helper(self, d, self.name)
 
     def setup_localpath(self, d):
         if not self.localpath:
@@ -1883,25 +1875,28 @@ class Fetch(object):
                             logger.debug(str(e))
                             done = False
 
+                d = self.d
                 if premirroronly:
-                    self.d.setVar("BB_NO_NETWORK", "1")
+                    # Only disable the network in a copy
+                    d = bb.data.createCopy(self.d)
+                    d.setVar("BB_NO_NETWORK", "1")
 
                 firsterr = None
                 verified_stamp = False
                 if done:
-                    verified_stamp = m.verify_donestamp(ud, self.d)
-                if not done and (not verified_stamp or m.need_update(ud, self.d)):
+                    verified_stamp = m.verify_donestamp(ud, d)
+                if not done and (not verified_stamp or m.need_update(ud, d)):
                     try:
-                        if not trusted_network(self.d, ud.url):
+                        if not trusted_network(d, ud.url):
                             raise UntrustedUrl(ud.url)
                         logger.debug("Trying Upstream")
-                        m.download(ud, self.d)
+                        m.download(ud, d)
                         if hasattr(m, "build_mirror_data"):
-                            m.build_mirror_data(ud, self.d)
+                            m.build_mirror_data(ud, d)
                         done = True
                         # early checksum verify, so that if checksum mismatched,
                         # fetcher still have chance to fetch from mirror
-                        m.update_donestamp(ud, self.d)
+                        m.update_donestamp(ud, d)
 
                     except bb.fetch2.NetworkAccess:
                         raise
@@ -1920,17 +1915,17 @@ class Fetch(object):
                         firsterr = e
                         # Remove any incomplete fetch
                         if not verified_stamp and m.cleanup_upon_failure():
-                            m.clean(ud, self.d)
+                            m.clean(ud, d)
                         logger.debug("Trying MIRRORS")
-                        mirrors = mirror_from_string(self.d.getVar('MIRRORS'))
-                        done = m.try_mirrors(self, ud, self.d, mirrors)
+                        mirrors = mirror_from_string(d.getVar('MIRRORS'))
+                        done = m.try_mirrors(self, ud, d, mirrors)
 
-                if not done or not m.done(ud, self.d):
+                if not done or not m.done(ud, d):
                     if firsterr:
                         logger.error(str(firsterr))
                     raise FetchError("Unable to fetch URL from any source.", u)
 
-                m.update_donestamp(ud, self.d)
+                m.update_donestamp(ud, d)
 
             except IOError as e:
                 if e.errno in [errno.ESTALE]:

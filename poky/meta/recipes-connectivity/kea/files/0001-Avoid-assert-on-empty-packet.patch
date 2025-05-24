@@ -1,0 +1,148 @@
+From 9cf3b6e8d705957927c2fbc9928318f4eda265c8 Mon Sep 17 00:00:00 2001
+From: Thomas Markwalder <tmark@isc.org>
+Date: Tue, 11 Feb 2025 18:52:41 +0000
+Subject: [PATCH 1/2] Avoid assert on empty packet
+
+/src/lib/dhcp/pkt_filter_lpf.cc
+    PktFilterLPF::receive() - throw if packet has no data
+
+/src/lib/util/buffer.h
+    InputBuffer::readVecotr() - avoid peek if read request length is 0
+
+/src/lib/util/tests/buffer_unittest.cc
+    Updated test
+
+Upstream-Status: Backport
+[https://gitlab.isc.org/isc-projects/kea/-/commit/0b98eae16d9b6ecdf57005624712b9b26fa05bc0]
+[https://gitlab.isc.org/isc-projects/kea/-/commit/16306026e37b32a2ce4b16fb5b78561ae153d570]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/lib/dhcp/pkt_filter_lpf.cc        | 10 +++++++---
+ src/lib/util/buffer.h                 |  9 ++++++---
+ src/lib/util/tests/buffer_unittest.cc |  8 +++++++-
+ 3 files changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/src/lib/dhcp/pkt_filter_lpf.cc b/src/lib/dhcp/pkt_filter_lpf.cc
+index 69bdecc0e1..b0c8f108d3 100644
+--- a/src/lib/dhcp/pkt_filter_lpf.cc
++++ b/src/lib/dhcp/pkt_filter_lpf.cc
+@@ -318,9 +318,14 @@ PktFilterLPF::receive(Iface& iface, const SocketInfo& socket_info) {
+     decodeEthernetHeader(buf, dummy_pkt);
+     decodeIpUdpHeader(buf, dummy_pkt);
+ 
++    auto v4_len = buf.getLength() - buf.getPosition();
++    if (v4_len <= 0) {
++        isc_throw(SocketReadError, "Pkt4FilterLpf:: packet has no DHCPv4 data");
++    }
++
+     // Read the DHCP data.
+     std::vector<uint8_t> dhcp_buf;
+-    buf.readVector(dhcp_buf, buf.getLength() - buf.getPosition());
++    buf.readVector(dhcp_buf, v4_len);
+ 
+     // Decode DHCP data into the Pkt4 object.
+     Pkt4Ptr pkt = Pkt4Ptr(new Pkt4(&dhcp_buf[0], dhcp_buf.size()));
+@@ -344,8 +349,7 @@ PktFilterLPF::receive(Iface& iface, const SocketInfo& socket_info) {
+ 
+             struct timeval cmsg_time;
+             memcpy(&cmsg_time, CMSG_DATA(cmsg), sizeof(cmsg_time));
+-            pkt->addPktEvent(PktEvent::SOCKET_RECEIVED, cmsg_time);
+-            break;
++            pkt->addPktEvent(PktEvent::SOCKET_RECEIVED, cmsg_time); break;
+         }
+ 
+         cmsg = CMSG_NXTHDR(&m, cmsg);
+diff --git a/src/lib/util/buffer.h b/src/lib/util/buffer.h
+index 41ecdf3375..c426a14495 100644
+--- a/src/lib/util/buffer.h
++++ b/src/lib/util/buffer.h
+@@ -1,4 +1,4 @@
+-// Copyright (C) 2009-2024 Internet Systems Consortium, Inc. ("ISC")
++// Copyright (C) 2009-2025 Internet Systems Consortium, Inc. ("ISC")
+ //
+ // This Source Code Form is subject to the terms of the Mozilla Public
+ // License, v. 2.0. If a copy of the MPL was not distributed with this
+@@ -233,7 +233,8 @@ public:
+     /// @details If specified buffer is too short, it will be expanded using
+     /// vector::resize() method. If the remaining length of the buffer
+     /// is smaller than the specified length, an exception of class
+-    /// @c isc::OutOfRange will be thrown.
++    /// @c isc::OutOfRange will be thrown.  Read length zero results
++    /// in an empty vector.
+     ///
+     /// @param data Reference to a buffer (data will be stored there).
+     /// @param len Size specified number of bytes to read in a vector.
+@@ -244,7 +245,9 @@ public:
+         }
+ 
+         data.resize(len);
+-        peekData(&data[0], len);
++        if (len) {
++            peekData(&data[0], len);
++        }
+     }
+ 
+     /// @brief Read specified number of bytes as a vector.
+diff --git a/src/lib/util/tests/buffer_unittest.cc b/src/lib/util/tests/buffer_unittest.cc
+index 66c43e8f21..bae051dd16 100644
+--- a/src/lib/util/tests/buffer_unittest.cc
++++ b/src/lib/util/tests/buffer_unittest.cc
+@@ -1,4 +1,4 @@
+-// Copyright (C) 2009-2024 Internet Systems Consortium, Inc. ("ISC")
++// Copyright (C) 2009-2025 Internet Systems Consortium, Inc. ("ISC")
+ //
+ // This Source Code Form is subject to the terms of the Mozilla Public
+ // License, v. 2.0. If a copy of the MPL was not distributed with this
+@@ -197,6 +197,12 @@ TEST_F(BufferTest, inputBufferRead) {
+     ASSERT_EQ(sizeof(vdata), datav.size());
+     ASSERT_EQ(0, memcmp(&vdata[0], testdata, sizeof(testdata)));
+     ASSERT_EQ(sizeof(vdata), ibuffer.getPosition());
++
++    // Verify that read len of zero results in an empty
++    // vector without throwing.
++    datav.resize(8);
++    ASSERT_NO_THROW(ibuffer.readVector(datav, 0));
++    ASSERT_EQ(datav.size(), 0);
+ }
+ 
+ TEST_F(BufferTest, outputBufferReadAt) {
+-- 
+2.25.1
+
+From 614a6c136fc20ee428b1c880889ef61253657499 Mon Sep 17 00:00:00 2001
+From: Thomas Markwalder <tmark@isc.org>
+Date: Tue, 18 Feb 2025 15:03:12 +0000
+Subject: [PATCH 2/2] Addressed review comments
+
+Couple of typos fixed.
+---
+ src/lib/dhcp/pkt_filter_lpf.cc | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/lib/dhcp/pkt_filter_lpf.cc b/src/lib/dhcp/pkt_filter_lpf.cc
+index b0c8f108d3..3642915cc1 100644
+--- a/src/lib/dhcp/pkt_filter_lpf.cc
++++ b/src/lib/dhcp/pkt_filter_lpf.cc
+@@ -320,7 +320,7 @@ PktFilterLPF::receive(Iface& iface, const SocketInfo& socket_info) {
+ 
+     auto v4_len = buf.getLength() - buf.getPosition();
+     if (v4_len <= 0) {
+-        isc_throw(SocketReadError, "Pkt4FilterLpf:: packet has no DHCPv4 data");
++        isc_throw(SocketReadError, "Pkt4FilterLpf packet has no DHCPv4 data");
+     }
+ 
+     // Read the DHCP data.
+@@ -349,7 +349,8 @@ PktFilterLPF::receive(Iface& iface, const SocketInfo& socket_info) {
+ 
+             struct timeval cmsg_time;
+             memcpy(&cmsg_time, CMSG_DATA(cmsg), sizeof(cmsg_time));
+-            pkt->addPktEvent(PktEvent::SOCKET_RECEIVED, cmsg_time); break;
++            pkt->addPktEvent(PktEvent::SOCKET_RECEIVED, cmsg_time);
++            break;
+         }
+ 
+         cmsg = CMSG_NXTHDR(&m, cmsg);
+-- 
+2.25.1
+

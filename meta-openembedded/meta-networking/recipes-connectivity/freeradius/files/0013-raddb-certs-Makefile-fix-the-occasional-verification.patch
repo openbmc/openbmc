@@ -1,4 +1,4 @@
-From bb1cb2ffc7a31c0a2bb2de51ef82d304b0a107c3 Mon Sep 17 00:00:00 2001
+From 38cbab566143b9e002ee24a1f08a52ec74186eca Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Wed, 5 Aug 2020 07:23:11 +0000
 Subject: [PATCH] raddb/certs/Makefile: fix the occasional verification failure
@@ -29,7 +29,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/raddb/certs/Makefile b/raddb/certs/Makefile
-index d064fe252d..86f4547804 100644
+index cae939668e..52ae65755f 100644
 --- a/raddb/certs/Makefile
 +++ b/raddb/certs/Makefile
 @@ -59,7 +59,7 @@ passwords.mk: server.cnf ca.cnf client.cnf inner-server.cnf

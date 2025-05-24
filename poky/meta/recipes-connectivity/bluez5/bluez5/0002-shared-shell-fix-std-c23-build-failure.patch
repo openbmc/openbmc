@@ -1,0 +1,34 @@
+From 408510d751e9482fe965e5dd96fbac7f9ee2ef62 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Wed, 20 Nov 2024 13:03:29 +0000
+Subject: [PATCH 2/3] shared/shell: fix -std=c23 build failure
+
+gcc-15 switched to -std=c23 by default:
+
+    https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
+
+As a result `bluez` fails the build as:
+
+    src/shared/shell.c:365:24: error: incompatible types when returning type '_Bool' but 'struct input *' was expected
+      365 |                 return false;
+          |                        ^~~~~
+
+Upstream-Status: Backport [https://web.git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=4d60826865c760cc4e5718b6414746a394768110]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/shared/shell.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index a8fa876..aa6c16c 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -362,7 +362,7 @@ static struct input *input_new(int fd)
+ 
+ 	io = io_new(fd);
+ 	if (!io)
+-		return false;
++		return NULL;
+ 
+ 	input = new0(struct input, 1);
+ 	input->io = io;

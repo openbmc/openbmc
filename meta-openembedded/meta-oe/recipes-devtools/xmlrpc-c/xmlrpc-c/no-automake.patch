@@ -1,0 +1,18 @@
+This doesn't use automake so don't turn it on, as autoreconf will refuse to work.
+
+Upstream-Status: Submitted
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git i/stable/configure.in w/stable/configure.in
+index 4a9ade8c..baba1edc 100644
+--- i/configure.in
++++ w/configure.in
+@@ -8,7 +8,7 @@ dnl =======================================================================
+ 
+ dnl "x.xx" is supposed to be a version number, but is meaningless here.
+ dnl The real version number is in Makefile.version.
+-AM_INIT_AUTOMAKE(xmlrpc-c, x.xx)
++dnl AM_INIT_AUTOMAKE(xmlrpc-c, x.xx)
+ 
+ dnl Define @build@, @build_cpu@, @build_vendor@, @build_os,
+ dnl @host, @host_cpu@, @host_vender, and @host_os@ substitutions.

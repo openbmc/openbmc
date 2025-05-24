@@ -1,4 +1,4 @@
-From e75f27cb1d70052fe2bb6cae5846b68f8ea7fa65 Mon Sep 17 00:00:00 2001
+From 62d8c09422148c56b7b1011a5b3ccd553631e3c5 Mon Sep 17 00:00:00 2001
 From: Marko Lindqvist <cazfi74@gmail.com>
 Date: Sun, 29 Sep 2024 18:38:05 +0800
 Subject: [PATCH] dont depend on help2man
@@ -11,10 +11,10 @@ Signed-off-by: Marko Lindqvist <cazfi74@gmail.com>
  1 file changed, 1 insertion(+), 8 deletions(-)
 
 diff --git a/doc/Makefile.am b/doc/Makefile.am
-index d63cafa..ba9aab4 100644
+index ff62009..dba833f 100644
 --- a/doc/Makefile.am
 +++ b/doc/Makefile.am
-@@ -70,16 +70,9 @@ BUILT_SOURCES = example.txt example2.txt example3.txt example4.txt example5.txt
+@@ -87,16 +87,9 @@ BUILT_SOURCES = example.txt example2.txt example3.txt example4.txt example5.txt
  
  # Man pages.
  
@@ -25,10 +25,13 @@ index d63cafa..ba9aab4 100644
 -idn.1: $(top_srcdir)/src/idn.c $(top_srcdir)/src/idn.ggo $(top_srcdir)/.version
 -	$(MAKE) -C ../lib
 -	$(MAKE) -C ../src
--	$(AM_V_GEN)$(HELP2MAN) \
+-	$(AM_V_GEN)env SOURCE_DATE_EPOCH=0 $(HELP2MAN) \
 -		--name="Internationalized Domain Names command line tool" \
 -		--output=$@ $(top_builddir)/src/idn$(EXEEXT)
 -
  # GDOC
  
  gdoc_TEXINFOS =
+-- 
+2.34.1
+

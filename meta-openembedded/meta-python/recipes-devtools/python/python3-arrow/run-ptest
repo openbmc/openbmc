@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Ignore test_parse_tz_name_zzz[America/Coyhaique] because this has changed in latest pytz and zoneinfo
+# modules and latest version of arrow has moved away from pytz to zoneinfo module so once updating to
+# 1.4.0 or newer see if this test passes
+# see https://github.com/arrow-py/arrow/commit/2aaafcd581115c50cdcbf04b196657dad1692a26
+pytest --automake --deselect tests/test_parser.py::TestDateTimeParserParse::test_parse_tz_name_zzz[America/Coyhaique]

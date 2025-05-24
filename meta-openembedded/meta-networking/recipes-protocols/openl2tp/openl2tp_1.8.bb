@@ -41,14 +41,14 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${PV}/${BP}.tar.gz \
 SRC_URI[md5sum] = "e3d08dedfb9e6a9a1e24f6766f6dadd0"
 SRC_URI[sha256sum] = "1c97704d4b963a87fbc0e741668d4530933991515ae9ab0dffd11b5444f4860f"
 
-inherit autotools-brokensep pkgconfig systemd ptest
+inherit pkgconfig systemd ptest
 
 SYSTEMD_SERVICE:${PN} = "openl2tpd.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 DEPENDS += "libtirpc"
 CPPFLAGS += "-I${STAGING_INCDIR}/tirpc"
-CFLAGS += "-I${STAGING_INCDIR}/tirpc"
+CFLAGS += "-I${STAGING_INCDIR}/tirpc -std=gnu17"
 LDFLAGS += "-ltirpc"
 
 PARALLEL_MAKE = ""
@@ -67,7 +67,9 @@ do_compile:prepend() {
         ${S}/Makefile
 }
 
-do_install:append () {
+do_install () {
+    oe_runmake 'DESTDIR=${D}' install
+
     install -d ${D}${sysconfdir}/init.d
     install -d ${D}${sysconfdir}/default
     install -m 0755 ${S}/etc/rc.d/init.d/openl2tpd ${D}${sysconfdir}/init.d/openl2tpd

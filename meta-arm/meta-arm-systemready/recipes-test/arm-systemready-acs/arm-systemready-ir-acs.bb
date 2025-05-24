@@ -49,9 +49,9 @@ PV = "2.0.0"
 PV_DATE = "23.03"
 FULL_PV = "v${PV_DATE}_${PV}"
 ARM_SYSTEMREADY_IR_ACS_BRANCH ?= "main"
-IMAGE_FILENAME = "ir-acs-live-image-generic-arm64.wic"
+IMAGE_FILENAME = "ir-acs-live-image-generic-arm64-${PV}.wic"
 SRC_URI = " \
-    https://github.com/ARM-software/arm-systemready/raw/${ARM_SYSTEMREADY_IR_ACS_BRANCH}/IR/prebuilt_images/${FULL_PV}/${IMAGE_FILENAME}.xz;name=acs-img \
+    https://github.com/ARM-software/arm-systemready/raw/${ARM_SYSTEMREADY_IR_ACS_BRANCH}/IR/prebuilt_images/${FULL_PV}/ir-acs-live-image-generic-arm64.wic.xz;name=acs-img;downloadfilename=${IMAGE_FILENAME}.xz \
     git://git.gitlab.arm.com/systemready/systemready-ir-template.git;protocol=https;nobranch=1;destsuffix=systemready-ir-template;name=sr-ir-template \
 "
 SRC_URI[acs-img.sha256sum] = "ea52f84dab44bde97de3e2d2224d883acaae35724dd8e2bdfb125de49040f9b3"

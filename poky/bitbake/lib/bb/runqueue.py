@@ -477,7 +477,6 @@ class RunQueueData:
         self.runtaskentries = {}
 
     def runq_depends_names(self, ids):
-        import re
         ret = []
         for id in ids:
             nam = os.path.basename(id)
@@ -730,6 +729,8 @@ class RunQueueData:
                 if mc == frommc:
                     fn = taskData[mcdep].build_targets[pn][0]
                     newdep = '%s:%s' % (fn,deptask)
+                    if newdep not in taskData[mcdep].taskentries:
+                        bb.fatal("Task mcdepends on non-existent task %s" % (newdep))
                     taskData[mc].taskentries[tid].tdepends.append(newdep)
 
         for mc in taskData:

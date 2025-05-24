@@ -34,7 +34,7 @@ install_db () {
     [ -d "$datadir/mysql" ] && exit 0
 
     # Create initial db
-    /usr/bin/mysql_install_db --rpm --datadir="$datadir" --user=mysql
+    /usr/bin/mariadb-install-db --rpm --datadir="$datadir" --user=mysql
     exit 0
 }
 
@@ -51,7 +51,7 @@ pinger () {
 
     while /bin/true ; do
         sleep 1
-        mysqladmin --no-defaults --socket="$adminsocket" --user=UNKNOWN_MYSQL_USER ping >/dev/null 2>&1 && break
+        mariadb-admin --no-defaults --socket="$adminsocket" --user=UNKNOWN_MYSQL_USER ping >/dev/null 2>&1 && break
     done
     exit 0
 }

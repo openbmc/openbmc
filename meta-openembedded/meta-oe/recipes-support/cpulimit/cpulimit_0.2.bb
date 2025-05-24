@@ -7,6 +7,7 @@ SRCREV ?= "f4d2682804931e7aea02a869137344bb5452a3cd"
 
 SRC_URI = "git://github.com/opsengine/cpulimit.git;protocol=https;branch=master \
            file://0001-Remove-sys-sysctl.h-and-add-missing-libgen.h-include.patch \
+           file://0002-busy.c-Fix-incompatible-pointer-type-error.patch \
            "
 
 S = "${WORKDIR}/git"

@@ -143,14 +143,14 @@ class Command:
                 return bb.server.process.idleFinish(traceback.format_exc())
 
     def finishAsyncCommand(self, msg=None, code=None):
+        self.cooker.finishcommand()
+        self.process_server.clear_async_cmd()
         if msg or msg == "":
             bb.event.fire(CommandFailed(msg), self.cooker.data)
         elif code:
             bb.event.fire(CommandExit(code), self.cooker.data)
         else:
             bb.event.fire(CommandCompleted(), self.cooker.data)
-        self.cooker.finishcommand()
-        self.process_server.clear_async_cmd()
 
     def reset(self):
         if self.remotedatastores:

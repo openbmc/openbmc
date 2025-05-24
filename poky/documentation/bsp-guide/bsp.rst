@@ -166,7 +166,7 @@ section.
    BSPs, which are maintained in their own layers or in layers designed
    to contain several BSPs. To get an idea of machine support through
    BSP layers, you can look at the
-   :yocto_dl:`index of machines </releases/yocto/yocto-&DISTRO;/machines>`
+   :yocto_dl:`index of machines </releases/yocto/&DISTRO_REL_LATEST_TAG;/machines>`
    for the release.
 
 #. *Optionally Clone the meta-intel BSP Layer:* If your hardware is

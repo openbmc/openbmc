@@ -1,0 +1,26 @@
+ARG ARG_FROM=debian:12 # default value to avoid warning
+FROM $ARG_FROM
+
+ARG DOCS=ubuntu_docs.sh
+ARG DOCS_PDF=ubuntu_docs_pdf.sh
+
+ENV DEBIAN_FRONTEND=noninteractive
+ARG TZ=Europe/Vienna
+
+# relative to the location of the dockerfile
+COPY --chmod=777 ${DOCS} /temp/host_packages_docs.sh
+COPY --chmod=777 ${DOCS_PDF} /temp/host_packages_docs_pdf.sh
+
+RUN ln -fs "/usr/share/zoneinfo/$TZ" /etc/localtime \
+ && apt-get update \
+ && apt-get install -y sudo \
+ && yes | /temp/host_packages_docs.sh \
+ && yes | /temp/host_packages_docs_pdf.sh \
+ && apt-get --yes autoremove \
+ && apt-get clean \
+ && rm -rf /temp
+
+RUN git config --global --add safe.directory /docs
+
+ENTRYPOINT ["/usr/bin/env", "make", "-C", "documentation/"]
+CMD ["publish"]

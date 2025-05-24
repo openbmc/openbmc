@@ -1,0 +1,28 @@
+From eaa9964cd6d22564fa5f1270d194eb65ebaef57c Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Wed, 12 Mar 2025 17:44:39 +0000
+Subject: [PATCH] cgi.py: fixup interpreter according to OE
+
+The underlying distribution is required to update the interpreter
+by design. This can be referenced from the notice that is found
+on top of the same file being patched here.
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Awais Belal <awais.belal@gmail.com>
+---
+ cgi.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cgi.py b/cgi.py
+index 22897a1..f86db84 100755
+--- a/cgi.py
++++ b/cgi.py
+@@ -1,4 +1,4 @@
+-#! /usr/local/bin/python
++#!/usr/bin/env python
+ 
+ # NOTE: the above "/usr/local/bin/python" is NOT a mistake.  It is
+ # intentionally NOT "/usr/bin/env python".  On many systems
+-- 
+2.43.0
+

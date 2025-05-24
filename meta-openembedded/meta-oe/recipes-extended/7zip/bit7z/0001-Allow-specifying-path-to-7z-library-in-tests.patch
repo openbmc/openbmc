@@ -1,0 +1,48 @@
+From 60137ec132951f941f2fb98cd6353717b322cbf1 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Wed, 2 Apr 2025 10:17:38 +0200
+Subject: [PATCH] Allow specifying path to 7z library in tests
+
+For instance to override path to library on Linux when using real 7-zip
+instead of pzip: /usr/lib/lib7z.so
+
+Upstream-Status: Submitted [https://github.com/rikyoz/bit7z/pull/288]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ tests/CMakeLists.txt           | 7 +++++++
+ tests/src/utils/shared_lib.hpp | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 60da280d..1307366a 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -103,6 +103,13 @@ message( STATUS "Use system 7-zip for tests: ${BIT7Z_TESTS_USE_SYSTEM_7ZIP}" )
+ if( BIT7Z_TESTS_USE_SYSTEM_7ZIP )
+     target_compile_definitions( ${TESTS_TARGET} PRIVATE BIT7Z_TESTS_USE_SYSTEM_7ZIP )
+     target_compile_definitions( ${TESTS_TARGET_PUBLIC} PRIVATE BIT7Z_TESTS_USE_SYSTEM_7ZIP )
++else()
++    set( BIT7Z_TESTS_7Z_LIBRARY_PATH "" CACHE STRING "The path of the 7-Zip library to be used for running the tests" )
++    if( NOT BIT7Z_TESTS_7Z_LIBRARY_PATH STREQUAL "" )
++        message( STATUS "Use custom 7-zip library for tests: ${BIT7Z_TESTS_7Z_LIBRARY_PATH}" )
++        target_compile_definitions( ${TESTS_TARGET} PRIVATE BIT7Z_TESTS_7Z_LIBRARY_PATH="${BIT7Z_TESTS_7Z_LIBRARY_PATH}" )
++        target_compile_definitions( ${TESTS_TARGET_PUBLIC} PRIVATE BIT7Z_TESTS_7Z_LIBRARY_PATH="${BIT7Z_TESTS_7Z_LIBRARY_PATH}" )
++    endif()
+ endif()
+ 
+ # Avoiding linking unnecessary libraries.
+diff --git a/tests/src/utils/shared_lib.hpp b/tests/src/utils/shared_lib.hpp
+index 41435a9b..8bc02939 100644
+--- a/tests/src/utils/shared_lib.hpp
++++ b/tests/src/utils/shared_lib.hpp
+@@ -20,7 +20,9 @@ namespace bit7z {
+ namespace test {
+ 
+ inline auto sevenzip_lib_path() -> tstring {
+-#ifdef BIT7Z_TESTS_USE_SYSTEM_7ZIP
++#ifdef BIT7Z_TESTS_7Z_LIBRARY_PATH
++    static const tstring lib_path = BIT7Z_STRING( BIT7Z_TESTS_7Z_LIBRARY_PATH );
++#elif defined( BIT7Z_TESTS_USE_SYSTEM_7ZIP )
+ #ifdef _WIN64
+     static const tstring lib_path = BIT7Z_STRING( "C:\\Program Files\\7-Zip\\7z.dll" );
+ #elif defined( _WIN32 )

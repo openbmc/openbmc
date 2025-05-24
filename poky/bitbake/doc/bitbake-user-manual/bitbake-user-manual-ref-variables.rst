@@ -127,6 +127,11 @@ overview of their function and contents.
       Contains the name of the currently running task. The name does not
       include the ``do_`` prefix.
 
+   :term:`BB_CURRENT_MC`
+      Contains the name of the current multiconfig a task is being run under.
+      The name is taken from the multiconfig configuration file (a file
+      ``mc1.conf`` would make this variable equal to ``mc1``).
+
    :term:`BB_DEFAULT_TASK`
       The default task to use when none is specified (e.g. with the ``-c``
       command line option). The task name specified should not include the
@@ -315,11 +320,26 @@ overview of their function and contents.
       mirror tarball. If the shallow mirror tarball cannot be fetched, it will
       try to fetch the full mirror tarball and use that.
 
-      When a mirror tarball is not available, a full git clone will be performed
-      regardless of whether this variable is set or not. Support for shallow
-      clones is not currently implemented as git does not directly support
-      shallow cloning a particular git commit hash (it only supports cloning
-      from a tag or branch reference).
+      This setting causes an initial shallow clone instead of an initial full bare clone.
+      The amount of data transferred during the initial clone will be significantly reduced.
+
+      However, every time the source revision (referenced in :term:`SRCREV`)
+      changes, regardless of whether the cache within the download directory
+      (defined by :term:`DL_DIR`) has been cleaned up or not,
+      the data transfer may be significantly higher because entirely
+      new shallow clones are required for each source revision change.
+
+      Over time, numerous shallow clones may cumulatively transfer
+      the same amount of data as an initial full bare clone.
+      This is especially the case with very large repositories.
+
+      Existing initial full bare clones, created without this setting,
+      will still be utilized.
+
+      If the Git error "Server does not allow request for unadvertised object"
+      occurs, an initial full bare clone is fetched automatically.
+      This may happen if the Git server does not allow the request
+      or if the Git client has issues with this functionality.
 
       See also :term:`BB_GIT_SHALLOW_DEPTH` and
       :term:`BB_GENERATE_SHALLOW_TARBALLS`.
@@ -686,6 +706,12 @@ overview of their function and contents.
    :term:`BB_TASKHASH`
       Within an executing task, this variable holds the hash of the task as
       returned by the currently enabled signature generator.
+
+   :term:`BB_USE_HOME_NPMRC`
+      Controls whether or not BitBake uses the user's .npmrc file within their
+      home directory within the npm fetcher. This can be used for authentication
+      of private NPM registries, among other uses. This is turned off by default
+      and requires the user to explicitly set it to "1" to enable.
 
    :term:`BB_VERBOSE_LOGS`
       Controls how verbose BitBake is during builds. If set, shell scripts

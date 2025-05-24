@@ -1,8 +1,10 @@
 #!/bin/sh
+
 ### BEGIN INIT INFO
 # Provides:          nfs-kernel-server
-# Required-Start:    $remote_fs nfs-common $portmap hwclock
-# Required-Stop:     $remote_fs nfs-common $portmap hwclock
+# Required-Start:    $remote_fs nfs-common $portmap $time
+# Required-Stop:     $remote_fs nfs-common $portmap $time
+# Should-Start:      $named
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Kernel NFS server support
@@ -19,20 +21,25 @@
 #
 # The environment variable NFS_SERVERS may be set in /etc/default/nfsd
 # Other control variables may be overridden here too
-test -r /etc/default/nfsd && . /etc/default/nfsd
+test -r /etc/default/nfs-utils && . /etc/default/nfs-utils
 #
 # Location of executables:
 test -x "$NFS_MOUNTD" || NFS_MOUNTD=/usr/sbin/rpc.mountd
 test -x "$NFS_NFSD" || NFS_NFSD=/usr/sbin/rpc.nfsd
+test -x "$NFS_SVCGSSD" || NFS_SVCGSSD=/usr/sbin/rpc.svcgssd
 #
 # The user mode program must also exist (it just starts the kernel
 # threads using the kernel module code).
 test -x "$NFS_MOUNTD" || exit 0
 test -x "$NFS_NFSD" || exit 0
-#
-# Default is 8 threads, value is settable between 1 and the truely
-# ridiculous 99
-test "$NFS_SERVERS" != "" && test "$NFS_SERVERS" -gt 0 && test "$NFS_SERVERS" -lt 100 || NFS_SERVERS=8
+
+case "$NEED_SVCGSSD" in
+	yes|no)
+		;;
+	*)
+		NEED_SVCGSSD=no
+		;;
+esac
 #
 #----------------------------------------------------------------------
 # Startup and shutdown functions.
@@ -49,6 +56,22 @@ stop_mountd(){
 	echo done
 }
 #
+#svcgssd
+start_svcgssd(){
+	modprobe -q rpcsec_gss_krb5
+	if [ "$NEED_SVCGSSD" = "yes" ]; then
+		echo -n "starting svcgssd: "
+		start-stop-daemon --start --exec "$NFS_SVCGSSD" -- "$@"
+		echo done
+	fi
+}
+stop_svcgssd(){
+	if [ "$NEED_SVCGSSD" = "yes" ]; then
+		echo -n "stop svcgssd: "
+		start-stop-daemon --stop --exec "$NFS_SVCGSSD"
+		echo done
+	fi
+}
 #nfsd
 start_nfsd(){
         modprobe -q nfsd
@@ -62,7 +85,7 @@ start_nfsd(){
 		exit 1
         }
 
-	echo -n "starting $1 nfsd kernel threads: "
+	echo -n "starting nfsd: "
 	start-stop-daemon --start --exec "$NFS_NFSD" -- "$@"
 	echo done
 }
@@ -108,11 +131,13 @@ stop_nfsd(){
 case "$1" in
   start)
 	test -r /etc/exports && exportfs -r
-	start_nfsd "$NFS_SERVERS"
+	start_nfsd
+	start_svcgssd
 	start_mountd
 	test -r /etc/exports && exportfs -a;;
   stop)	exportfs -ua
 	stop_mountd
+	stop_svcgssd
 	stop_nfsd;;
   status)
 	status /usr/sbin/rpc.mountd
