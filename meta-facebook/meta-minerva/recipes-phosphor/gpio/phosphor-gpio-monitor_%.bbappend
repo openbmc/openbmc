@@ -4,8 +4,6 @@ inherit obmc-phosphor-systemd systemd
 
 SERVICE_LIST = "power-good-assert@.service \
                 power-good-deassert@.service \
-                leak-detect-assert@.service \
-                leak-detect-deassert@.service \
                 rpu-ready-assert@.service \
                 rpu-ready-deassert@.service \
                 ac-power-good-assert@.service \

@@ -1,7 +1,0 @@
-[Unit]
-Description=%i Leak Detect Deassert
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/log-create xyz.openbmc_project.State.Leak.Detector.LeakDetectedNormal --json "{\"DETECTOR_NAME\": \"/xyz/openbmc_project/state/leak/detector/%i\"}"
-SyslogIdentifier=%i-leak-detect-deassert
