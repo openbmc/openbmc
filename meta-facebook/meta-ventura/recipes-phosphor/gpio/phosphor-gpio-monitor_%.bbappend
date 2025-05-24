@@ -4,12 +4,8 @@ inherit obmc-phosphor-systemd systemd
 
 SERVICE_LIST = "power-good-assert@.service \
                 power-good-deassert@.service \
-                critical-leak-detect-assert@.service \
-                leak-detect-assert@.service \
-                leak-detect-deassert@.service \
                 rpu-ready-assert@.service \
                 rpu-ready-deassert@.service \
-                rack-level-leak@.service \
                 led-blue-assert@.service \
                 led-blue-deassert@.service \
                 led-amber-assert@.service \
@@ -21,7 +17,6 @@ SERVICE_FILE_FMT = "file://{0}"
 SRC_URI += "file://ventura-phosphor-multi-gpio-monitor.json \
             file://ventura-phosphor-multi-gpio-presence.json \
             file://logging \
-            file://rack-level-leak \
             file://frontled \
             ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
             "
@@ -48,6 +43,5 @@ do_install:append:() {
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/rack-level-leak ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/frontled ${D}${libexecdir}/${PN}/
 }
