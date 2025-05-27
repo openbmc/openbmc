@@ -1,0 +1,53 @@
+From e16430ea57a9c1d83ced8799a358018f8a6e7c93 Mon Sep 17 00:00:00 2001
+From: Paul Fertser <fercerpav@gmail.com>
+Date: Tue, 11 Feb 2025 13:33:15 +0000
+Subject: [PATCH] socket: resolve unit specifiers in BindToDevice
+
+There are cases where templated Socket unit files are used for network services
+with interface name used as an instance. This patch allows using %i for
+BindToDevice setting to limit the scope automatically.
+
+Upstream-Status: Backport v258
+---
+ src/core/load-fragment.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/src/core/load-fragment.c b/src/core/load-fragment.c
+index f34c930f4e..0d53d00152 100644
+--- a/src/core/load-fragment.c
++++ b/src/core/load-fragment.c
+@@ -1089,7 +1089,9 @@ int config_parse_socket_bindtodevice(
+                 void *data,
+                 void *userdata) {
+ 
++        _cleanup_free_ char *p = NULL;
+         Socket *s = ASSERT_PTR(data);
++        int r;
+ 
+         assert(filename);
+         assert(lvalue);
+@@ -1100,12 +1102,18 @@ int config_parse_socket_bindtodevice(
+                 return 0;
+         }
+ 
+-        if (!ifname_valid(rvalue)) {
+-                log_syntax(unit, LOG_WARNING, filename, line, 0, "Invalid interface name, ignoring: %s", rvalue);
++        r = unit_full_printf(UNIT(s), rvalue, &p);
++        if (r < 0) {
++                log_syntax(unit, LOG_WARNING, filename, line, r, "Failed to resolve unit specifiers in %s, ignoring: %m", rvalue);
++                return 0;
++        }
++
++        if (!ifname_valid(p)) {
++                log_syntax(unit, LOG_WARNING, filename, line, 0, "Invalid interface name, ignoring: %s", p);
+                 return 0;
+         }
+ 
+-        return free_and_strdup_warn(&s->bind_to_device, rvalue);
++        return free_and_replace(s->bind_to_device, p);
+ }
+ 
+ int config_parse_exec_input(
+-- 
+2.49.0
+

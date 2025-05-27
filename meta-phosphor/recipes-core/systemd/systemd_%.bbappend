@@ -27,6 +27,7 @@ FILES:${PN}-catalog-extralocales = "\
 
 SRC_URI:append = " \
   file://40-hardware-watchdog.conf \
+  file://1000-socket-resolve-unit-specifiers-in-BindToDevice.patch \
   "
 
 FILES:${PN}:append = " \
