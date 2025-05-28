@@ -224,6 +224,8 @@ python systemd_populate_packages() {
                         service, pkg_systemd, "Also looked for service unit '{0}'.".format(base) if base is not None else ""))
 
     def systemd_create_presets(pkg, action, user):
+        import re
+
         # Check there is at least one service of given type (system/user), don't
         # create empty files.
         needs_preset = False
@@ -239,10 +241,17 @@ python systemd_populate_packages() {
         presetf = oe.path.join(d.getVar("PKGD"), d.getVar("systemd_unitdir"), "%s-preset/98-%s.preset" % (prefix, pkg))
         bb.utils.mkdirhier(os.path.dirname(presetf))
         with open(presetf, 'a') as fd:
+            template_services = {}
             for service in d.getVar('SYSTEMD_SERVICE:%s' % pkg).split():
                 if not systemd_service_exists(service, user, d):
                     continue
-                fd.write("%s %s\n" % (action,service))
+                if '@' in service and '@.' not in service:
+                    (servicename, instance, service_type) = re.split('[@.]', service)
+                    template_services.setdefault(servicename + '@.' + service_type, []).append(instance)
+                else:
+                    fd.write("%s %s\n" % (action,service))
+            for template, instances in template_services.items():
+                fd.write("%s %s %s\n" % (action, template, ' '.join(instances)))
         d.appendVar("FILES:%s" % pkg, ' ' + oe.path.join(d.getVar("systemd_unitdir"), "%s-preset/98-%s.preset" % (prefix, pkg)))
 
     # Run all modifications once when creating package
