@@ -119,17 +119,6 @@
         "Continue": true
     },
     {
-        "Name": "leakage-detect-alert",
-        "ChipId": "0",
-        "GpioNum": 92,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["leak-detect-deassert-log@0_leakage-detect-alert.service"],
-            "FALLING": ["leak-detect-assert-log@0_leakage-detect-alert.service"]
-        },
-        "Continue": true
-    },
-    {
         "Name": "irq-uv-detect-alert",
         "ChipId": "2",
         "GpioNum": 174,

@@ -29,9 +29,6 @@ SRC_URI += "file://assert-post-end \
             file://gpios-assert-log@.service \
             file://gpios-deassert-log@.service \
             file://gpios-event-logger \
-            file://leak-detect-assert-log@.service \
-            file://leak-detect-deassert-log@.service \
-            file://leak-detect-event-logger \
             file://logging-util \
             file://multi-gpios-sys-init \
             file://multi-gpios-sys-init.service \
@@ -84,7 +81,6 @@ do_install:append:() {
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/gpios-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/leak-detect-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
