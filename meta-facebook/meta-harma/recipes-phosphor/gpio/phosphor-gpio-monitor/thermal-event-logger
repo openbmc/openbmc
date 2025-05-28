@@ -26,7 +26,7 @@ number="${MESSAGE%%_*}"
 # remove prefix from 0_xxxxxx to xxxxxx
 GPIO_NAME="${MESSAGE#*_}"
 MSG_ID="xyz.openbmc_project.State.Thermal.$1"
-DEVICE_PATH="/xyz/openbmc_project/State/Thermal/host0"
+DEVICE_PATH="/xyz/openbmc_project/State/Thermal/cpu0"
 STASH_FILE="/run/${GPIO_NAME}.log_entry"
 
 if gpio_logging_valid "$number" "$action" ; then
