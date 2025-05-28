@@ -4,6 +4,13 @@
             "Name": "FCB_0_FAN_0_CURR_A",
             "SensorType": "current"
         },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -22,6 +29,13 @@
             "Name": "FCB_0_FAN_1_CURR_A",
             "SensorType": "current"
         },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_Fan_Board_0"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -40,6 +54,13 @@
             "Name": "FCB_1_FAN_2_CURR_A",
             "SensorType": "current"
         },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
@@ -58,6 +79,13 @@
             "Name": "FCB_1_FAN_3_CURR_A",
             "SensorType": "current"
         },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_Fan_Board_1"
+            ]
+        ],
         "Params": {
             "DbusParam": [
                 {
