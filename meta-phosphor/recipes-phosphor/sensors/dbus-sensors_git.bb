@@ -11,7 +11,7 @@ DEPENDS = " \
     phosphor-logging \
     sdbusplus \
     "
-SRCREV = "8339febfe7e5f55c17eb598af02debf92e544e04"
+SRCREV = "021261ce7a0b6686e4f040f7212718ba74d15137"
 PACKAGECONFIG ??= " \
     adcsensor \
     exitairtempsensor \
@@ -41,6 +41,7 @@ PACKAGECONFIG[mcutempsensor] = "-Dmcu=enabled, -Dmcu=disabled"
 PACKAGECONFIG[nvidia-gpu] = "-Dnvidia-gpu=enabled, -Dnvidia-gpu=disabled"
 PACKAGECONFIG[nvmesensor] = "-Dnvme=enabled, -Dnvme=disabled"
 PACKAGECONFIG[psusensor] = "-Dpsu=enabled, -Dpsu=disabled"
+PACKAGECONFIG[smbpbi] = "-Dsmbpbi=enabled, -Dsmbpbi=disabled"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/dbus-sensors.git;branch=master;protocol=https"
@@ -69,6 +70,9 @@ SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'intrusionsensor
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ipmbsensor', \
                                                'xyz.openbmc_project.ipmbsensor.service', \
                                                '', d)}"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'leakdetector', \
+                                               'xyz.openbmc_project.leakdetector.service', \
+                                               '', d)}"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'mctpreactor', \
                                                'xyz.openbmc_project.mctpreactor.service', \
                                                '', d)}"
@@ -81,9 +85,10 @@ SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'nvmesensor', \
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'psusensor', \
                                                'xyz.openbmc_project.psusensor.service', \
                                                '', d)}"
-SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'leakdetector', \
-                                               'xyz.openbmc_project.leakdetector.service', \
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'smbpbi', \
+                                               'xyz.openbmc_project.smbpbisensor.service', \
                                                '', d)}"
+
 S = "${WORKDIR}/git"
 
 inherit pkgconfig meson systemd
