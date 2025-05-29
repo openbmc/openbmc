@@ -51,12 +51,23 @@ set_sd_bic_interface_to_i3c()
 }
 
 # get present status of slot 1~8 and keep in /tmp/gpio/PRSNT_SB_SLOT{1~8}_N
-mkdir -p /tmp/gpio
-for slot in {1..8}
-do
-  get_gpio PRSNT_SB_SLOT"${slot}"_N
-  echo "$?" > /tmp/gpio/PRSNT_SB_SLOT"${slot}"_N
-done
+check_slot_presence() {
+    local ret
+
+    mkdir -p /tmp/gpio
+    for slot in {1..8}
+    do
+        echo "Checking presence status for slot ${slot}..."
+        get_gpio PRSNT_SB_SLOT"${slot}"_N
+        ret=$?
+        if [ "$ret" -eq 0 ] || [ "$ret" -eq 1 ]; then
+            echo "Valid status for slot ${slot}, ret = ${ret}, saving to file..."
+            echo "$ret" > /tmp/gpio/PRSNT_SB_SLOT"${slot}"_N
+        else
+            echo "Invalid status for slot ${slot}, ret = ${ret}, skipping..."
+        fi
+    done
+}
 
 # Function to calculate BIT(n)
 BIT() {
@@ -175,6 +186,8 @@ then
     # adjust the i2c clock duty cycle for bus 11
     devmem 0x1E78A604 32 0x00487006
 fi
+
+check_slot_presence
 
 # Enable all fan input as early as possible
 enable_all_fan_input
