@@ -10,7 +10,7 @@ DEPENDS:append = "\
     phosphor-logging \
     sdbusplus \
 "
-SRCREV = "4b98de56a69895d0c26e9abd6e236a73a236263a"
+SRCREV = "04605fa2ad256f0bdedcfc1f9bcd1f24fdc4cd93"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
