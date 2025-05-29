@@ -39,6 +39,7 @@ SYSTEMD_PACKAGES = "${PN}-discover \
 PACKAGECONFIG ??= " \
     only-run-apr-on-power-loss \
     only-allow-boot-when-bmc-ready \
+    run-apr-on-software-reset \
     install-utils \
     "
 
@@ -53,6 +54,15 @@ PACKAGECONFIG[only-run-apr-on-power-loss] = "-Donly-run-apr-on-power-loss=true,-
 
 # Only allow boot operations when BMC is in Ready state
 PACKAGECONFIG[only-allow-boot-when-bmc-ready] = "-Donly-allow-boot-when-bmc-ready=true,-Donly-allow-boot-when-bmc-ready=false"
+
+# Allow run APR when BMC has been rebooted due to pinhole action
+PACKAGECONFIG[run-apr-on-pinhole-reset] = "-Drun-apr-on-pinhole-reset=true,-Drun-apr-on-pinhole-reset=false"
+
+# Allow run APR when BMC has been rebooted due to watchdog
+PACKAGECONFIG[run-apr-on-watchdog-reset] = "-Drun-apr-on-watchdog-reset=true,-Drun-apr-on-watchdog-reset=false"
+
+# Allow run APR when BMC has been rebooted due to software request
+PACKAGECONFIG[run-apr-on-software-reset] = "-Drun-apr-on-software-reset=true,-Drun-apr-on-software-reset=false"
 
 # Enable host state GPIO
 PACKAGECONFIG[host-gpio] = "-Dhost-gpios=enabled,-Dhost-gpios=disabled,gpioplus"
