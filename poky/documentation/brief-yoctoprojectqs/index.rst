@@ -44,7 +44,7 @@ following requirements:
    much more will help to run multiple builds and increase
    performance by reusing build artifacts.
 
--  At least &MIN_RAM; Gbytes of RAM, though a modern modern build host with as
+-  At least &MIN_RAM; Gbytes of RAM, though a modern build host with as
    much RAM and as many CPU cores as possible is strongly recommended to
    maximize build performance.
 
@@ -76,9 +76,10 @@ Build Host Packages
 
 You must install essential host packages on your build host. The
 following command installs the host packages based on an Ubuntu
-distribution::
+distribution:
 
-   $ sudo apt install &UBUNTU_DEBIAN_HOST_PACKAGES_ESSENTIAL;
+.. literalinclude:: ../tools/host_packages_scripts/ubuntu_essential.sh
+   :language: shell
 
 .. note::
 
@@ -182,7 +183,7 @@ an entire Linux distribution, including the toolchain, from source.
       page of the Yocto Project Wiki.
 
 #. **Initialize the Build Environment:** From within the ``poky``
-   directory, run the :ref:`ref-manual/structure:\`\`oe-init-build-env\`\``
+   directory, run the :ref:`ref-manual/structure:``oe-init-build-env```
    environment
    setup script to define Yocto Project's build environment on your
    build host.
@@ -252,7 +253,7 @@ an entire Linux distribution, including the toolchain, from source.
       file in the :term:`Build Directory`::
 
          BB_HASHSERVE_UPSTREAM = "wss://hashserv.yoctoproject.org/ws"
-         SSTATE_MIRRORS ?= "file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH"
+         SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
          BB_HASHSERVE = "auto"
          BB_SIGNATURE_HANDLER = "OEEquivHash"
 

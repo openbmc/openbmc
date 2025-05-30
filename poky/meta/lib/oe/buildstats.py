@@ -10,6 +10,7 @@
 import time
 import re
 import bb.event
+from collections import deque
 
 class SystemStats:
     def __init__(self, d):
@@ -18,7 +19,8 @@ class SystemStats:
         bb.utils.mkdirhier(bsdir)
         file_handlers =  [('diskstats', self._reduce_diskstats),
                             ('meminfo', self._reduce_meminfo),
-                            ('stat', self._reduce_stat)]
+                            ('stat', self._reduce_stat),
+                            ('net/dev', self._reduce_net)]
 
         # Some hosts like openSUSE have readable /proc/pressure files
         # but throw errors when these files are opened. Catch these error
@@ -47,7 +49,10 @@ class SystemStats:
                 # not strictly necessary, but using it makes the class
                 # more robust should two processes ever write
                 # concurrently.
-                destfile = os.path.join(bsdir, '%sproc_%s.log' % ('reduced_' if handler else '', filename))
+                if filename == 'net/dev':
+                    destfile = os.path.join(bsdir, 'reduced_proc_net.log')
+                else:
+                    destfile = os.path.join(bsdir, '%sproc_%s.log' % ('reduced_' if handler else '', filename))
                 self.proc_files.append((filename, open(destfile, 'ab'), handler))
         self.monitor_disk = open(os.path.join(bsdir, 'monitor_disk.log'), 'ab')
         # Last time that we sampled /proc data resp. recorded disk monitoring data.
@@ -66,12 +71,13 @@ class SystemStats:
         self.min_seconds = 1.0 - self.tolerance
 
         self.meminfo_regex = re.compile(rb'^(MemTotal|MemFree|Buffers|Cached|SwapTotal|SwapFree):\s*(\d+)')
-        self.diskstats_regex = re.compile(rb'^([hsv]d.|mtdblock\d|mmcblk\d|cciss/c\d+d\d+.*)$')
+        self.diskstats_regex = re.compile(rb'^([hsv]d.|mtdblock\d|mmcblk\d|cciss/c\d+d\d+|nvme\d+n\d+.*)$')
         self.diskstats_ltime = None
         self.diskstats_data = None
         self.stat_ltimes = None
         # Last time we sampled /proc/pressure. All resources stored in a single dict with the key as filename
         self.last_pressure = {"pressure/cpu": None, "pressure/io": None, "pressure/memory": None}
+        self.net_stats = {}
 
     def close(self):
         self.monitor_disk.close()
@@ -93,8 +99,41 @@ class SystemStats:
                     b' '.join([values[x] for x in
                                (b'MemTotal', b'MemFree', b'Buffers', b'Cached', b'SwapTotal', b'SwapFree')]) + b'\n')
 
+    def _reduce_net(self, time, data, filename):
+        data = data.split(b'\n')
+        for line in data[2:]:
+            if b":" not in line:
+                continue
+            try:
+                parts = line.split()
+                iface = (parts[0].strip(b':')).decode('ascii')
+                receive_bytes = int(parts[1])
+                transmit_bytes = int(parts[9])
+            except Exception:
+                continue
+
+            if iface not in self.net_stats:
+                self.net_stats[iface] = deque(maxlen=2)
+                self.net_stats[iface].append((receive_bytes, transmit_bytes, 0, 0))
+            prev = self.net_stats[iface][-1] if self.net_stats[iface] else (0, 0, 0, 0)            
+            receive_diff = receive_bytes - prev[0]
+            transmit_diff = transmit_bytes - prev[1]
+            self.net_stats[iface].append((
+                receive_bytes,
+                transmit_bytes,
+                receive_diff,
+                transmit_diff
+            ))
+
+        result_str = "\n".join(
+            f"{iface}: {net_data[-1][0]} {net_data[-1][1]} {net_data[-1][2]} {net_data[-1][3]}"
+            for iface, net_data in self.net_stats.items()
+        ) + "\n"
+
+        return time, result_str.encode('ascii')
+
     def _diskstats_is_relevant_line(self, linetokens):
-        if len(linetokens) != 14:
+        if len(linetokens) < 14:
             return False
         disk = linetokens[2]
         return self.diskstats_regex.match(disk)

@@ -1,0 +1,35 @@
+From f06bb3e20e47ab5a76efa76f50f0bbef682cd263 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Oct 2020 22:19:57 -0700
+Subject: [PATCH] clang: Use python3 in python scripts
+
+Some scripts ask for python, but they work fine with python3
+and in OE python symlink is not exposed to build, only python3 is
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../find-all-symbols/tool/run-find-all-symbols.py               | 2 +-
+ clang/tools/scan-view/bin/scan-view                             | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py b/clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+index 471dbf8c110b..f98385dc6651 100755
+--- a/clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
++++ b/clang-tools-extra/clang-include-fixer/find-all-symbols/tool/run-find-all-symbols.py
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ #
+ # =- run-find-all-symbols.py - Parallel find-all-symbols runner -*- python  -*-=#
+ #
+diff --git a/clang/tools/scan-view/bin/scan-view b/clang/tools/scan-view/bin/scan-view
+index d01aebb4029a..f3375804654d 100755
+--- a/clang/tools/scan-view/bin/scan-view
++++ b/clang/tools/scan-view/bin/scan-view
+@@ -1,4 +1,4 @@
+-#!/usr/bin/env python
++#!/usr/bin/env python3
+ 
+ from __future__ import print_function
+ 

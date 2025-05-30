@@ -1,0 +1,25 @@
+ARG ARG_FROM=fedora:40 # default value to avoid warning
+FROM $ARG_FROM
+
+ARG DOCS=fedora_docs.sh
+ARG DOCS_PDF=fedora_docs_pdf.sh
+ARG PIP3=pip3_docs.sh
+
+# relative to the location of the dockerfile
+COPY --chmod=777 ${DOCS} /temp/host_packages_docs.sh
+COPY --chmod=777 ${DOCS_PDF} /temp/host_packages_docs_pdf.sh
+COPY --chmod=777 ${PIP3} /temp/pip3_docs.sh
+
+RUN dnf update -y \
+ && dnf install -y sudo \
+ && yes | /temp/host_packages_docs.sh \
+ && yes | /temp/host_packages_docs_pdf.sh \
+ && yes | /temp/pip3_docs.sh \
+ && dnf autoremove -y \
+ && dnf clean all -y \
+ && rm -rf /temp
+
+RUN git config --global --add safe.directory /docs
+
+ENTRYPOINT ["/usr/bin/env", "make", "-C", "documentation/"]
+CMD ["publish"]

@@ -32,6 +32,7 @@ CACHED_CONFIGUREVARS += "ac_cv_path_PERL_FOR_BUILD='/usr/bin/env perl'"
 CACHED_CONFIGUREVARS += "ac_cv_path_PYTHON='/usr/bin/env python'"
 CACHED_CONFIGUREVARS += "ac_cv_path_GREP='/usr/bin/env grep'"
 CACHED_CONFIGUREVARS += "ac_cv_path_ZIP='/usr/bin/zip'"
+CACHED_CONFIGUREVARS += "ac_cv_path_UNZIP='/usr/bin/unzip'"
 CACHED_CONFIGUREVARS += "mc_cv_have_zipinfo=yes"
 
 do_install:append () {

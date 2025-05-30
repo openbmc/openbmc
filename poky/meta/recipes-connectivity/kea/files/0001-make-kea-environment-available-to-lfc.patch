@@ -1,0 +1,96 @@
+From 72d7e6c0b6b5af4fea2e4db9ed33757984ccdc5b Mon Sep 17 00:00:00 2001
+From: Razvan Becheriu <razvan@isc.org>
+Date: Fri, 14 Jun 2024 17:09:50 +0300
+Subject: [PATCH] make kea environment available to lfc
+
+Upstream-Status: Backport
+[https://gitlab.isc.org/isc-projects/kea/-/commit/f477e8ebcc8b8e1f1adaad4d55031084c0ff6f40]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ configure.ac                                  |  2 ++
+ src/lib/dhcpsrv/memfile_lease_mgr.cc          |  3 ++-
+ .../tests/memfile_lease_mgr_unittest.cc       | 26 +++++++++++++++++++
+ src/lib/dhcpsrv/tests/test_kea_lfc_env.sh.in  |  6 +++++
+ 4 files changed, 36 insertions(+), 1 deletion(-)
+ create mode 100644 src/lib/dhcpsrv/tests/test_kea_lfc_env.sh.in
+
+diff --git a/configure.ac b/configure.ac
+index c00edb5..7b572b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1629,6 +1629,8 @@ AC_CONFIG_FILES([src/lib/dhcp_ddns/tests/Makefile])
+ AC_CONFIG_FILES([src/lib/dhcpsrv/Makefile])
+ AC_CONFIG_FILES([src/lib/dhcpsrv/tests/Makefile])
+ AC_CONFIG_FILES([src/lib/dhcpsrv/tests/test_libraries.h])
++AC_CONFIG_FILES([src/lib/dhcpsrv/tests/test_kea_lfc_env.sh],
++                [chmod +x src/lib/dhcpsrv/tests/test_kea_lfc_env.sh])
+ AC_CONFIG_FILES([src/lib/dhcpsrv/testutils/Makefile])
+ AC_CONFIG_FILES([src/lib/dns/Makefile])
+ AC_CONFIG_FILES([src/lib/dns/tests/Makefile])
+diff --git a/src/lib/dhcpsrv/memfile_lease_mgr.cc b/src/lib/dhcpsrv/memfile_lease_mgr.cc
+index db4f5d5..0ecf3e7 100644
+--- a/src/lib/dhcpsrv/memfile_lease_mgr.cc
++++ b/src/lib/dhcpsrv/memfile_lease_mgr.cc
+@@ -209,7 +209,8 @@ LFCSetup::setup(const uint32_t lfc_interval,
+     args.push_back("ignored-path");
+ 
+     // Create the process (do not start it yet).
+-    process_.reset(new ProcessSpawn(ProcessSpawn::ASYNC, executable, args));
++    process_.reset(new ProcessSpawn(ProcessSpawn::ASYNC, executable, args,
++                                    ProcessEnvVars(), true));
+ 
+     // If we've been told to run it once now, invoke the callback directly.
+     if (run_once_now) {
+diff --git a/src/lib/dhcpsrv/tests/memfile_lease_mgr_unittest.cc b/src/lib/dhcpsrv/tests/memfile_lease_mgr_unittest.cc
+index 034f1f5..9edf637 100644
+--- a/src/lib/dhcpsrv/tests/memfile_lease_mgr_unittest.cc
++++ b/src/lib/dhcpsrv/tests/memfile_lease_mgr_unittest.cc
+@@ -534,6 +534,32 @@ TEST_F(MemfileLeaseMgrTest, lfcTimer) {
+     EXPECT_EQ(2, lease_mgr->getLFCCount());
+ }
+ 
++/// @brief Check that the kea environment is accesible to the Lease
++/// File Cleanup process.
++TEST_F(MemfileLeaseMgrTest, lfcEnv) {
++    DatabaseConnection::ParameterMap pmap;
++    pmap["type"] = "memfile";
++    pmap["universe"] = "4";
++    pmap["name"] = getLeaseFilePath("leasefile4_0.csv");
++    pmap["lfc-interval"] = "1";
++
++    std::ostringstream s;
++    s << DHCP_DATA_DIR << "/test_kea_lfc_env.sh";
++    setenv("KEA_LFC_EXECUTABLE", s.str().c_str(), 1);
++
++    boost::scoped_ptr<NakedMemfileLeaseMgr> lease_mgr(new NakedMemfileLeaseMgr(pmap));
++
++    // Try to run the lease file cleanup.
++    ASSERT_NO_THROW(lease_mgr->lfcCallback());
++
++    // Wait for the LFC process to complete.
++    ASSERT_TRUE(waitForProcess(*lease_mgr, 1));
++
++    // And make sure it has returned an exit status of 0.
++    EXPECT_EQ(0, lease_mgr->getLFCExitStatus())
++        << "environment not available to LFC";
++}
++
+ /// @brief This test checks if the LFC timer is disabled (doesn't trigger)
+ /// cleanups when the lfc-interval is set to 0.
+ TEST_F(MemfileLeaseMgrTest, lfcTimerDisabled) {
+diff --git a/src/lib/dhcpsrv/tests/test_kea_lfc_env.sh.in b/src/lib/dhcpsrv/tests/test_kea_lfc_env.sh.in
+new file mode 100644
+index 0000000..3eb71d5
+--- /dev/null
++++ b/src/lib/dhcpsrv/tests/test_kea_lfc_env.sh.in
+@@ -0,0 +1,6 @@
++#!/bin/sh
++
++if [ $(env | grep -c KEA_LFC_EXECUTABLE) != 0 ]; then
++    exit 0
++fi
++exit 1
+-- 
+2.25.1
+

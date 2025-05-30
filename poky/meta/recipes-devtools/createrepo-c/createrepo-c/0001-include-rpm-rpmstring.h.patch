@@ -1,4 +1,4 @@
-From d1a474e4002b978a54c918d46423c35bfbadad8b Mon Sep 17 00:00:00 2001
+From aa508662cfa48f706bf68ace55ed311a9e820d3f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 13 Jan 2023 13:21:51 -0800
 Subject: [PATCH] include rpm/rpmstring.h

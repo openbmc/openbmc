@@ -173,7 +173,7 @@ You just need to follow these general steps:
    root filesystem images.
 
    If you are going to develop your application on hardware, go to the
-   :yocto_dl:`machines </releases/yocto/yocto-&DISTRO;/machines/>` download area and choose a
+   :yocto_dl:`machines </releases/yocto/&DISTRO_REL_LATEST_TAG;/machines/>` download area and choose a
    target machine area from which to download the kernel image and root
    filesystem. This download area could have several files in it that
    support development using actual hardware. For example, the area
@@ -183,7 +183,7 @@ You just need to follow these general steps:
 
    If you are going to develop your application and then run and test it
    using the QEMU emulator, go to the
-   :yocto_dl:`machines/qemu </releases/yocto/yocto-&DISTRO;/machines/qemu>` download area. From this
+   :yocto_dl:`machines/qemu </releases/yocto/&DISTRO_REL_LATEST_TAG;/machines/qemu>` download area. From this
    area, go down into the directory for your target architecture (e.g.
    ``qemux86_64`` for an Intel-based 64-bit architecture). Download the
    kernel, root filesystem, and any other files you need for your

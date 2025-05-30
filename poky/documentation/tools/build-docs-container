@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+# -*- vim: set expandtab tabstop=2 shiftwidth=2:
+#
+# Build a container ready to build the documentation be reading the dependencies
+# listed in shell scripts in documentation/tools/host_packages_scripts, and
+# start a documentation build in this container.
+#
+# Usage:
+#
+#   ./documentation/tools/build-docs-container <image> [<make target>]
+#
+# e.g.:
+#
+#   ./documentation/tools/build-docs-container ubuntu:24.04 html
+#
+# Will build the docs in an Ubuntu 24.04 container in html.
+#
+# The container engine can be selected by exporting CONTAINERCMD in the
+# environment. The default is docker, but podman can also be used.
+
+set -eu -o pipefail
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+CONTAINERCMD=${CONTAINERCMD:-docker}
+DOCS_DIR="$SCRIPT_DIR/../.."
+SH_DIR="$SCRIPT_DIR/host_packages_scripts"
+
+function usage()
+{
+  echo "$0 -- script to build documentation from within a container
+
+$0 OCI_IMAGE [make arguments...]
+
+   OCI_IMAGE is an image:tag of an OCI image hosted on hub.docker.com. It is one
+   of:
+     - debian:12
+     - fedora:38
+     - fedora:39
+     - fedora:40
+     - leap:15.4
+     - leap:15.5
+     - ubuntu:22.04
+     - ubuntu:24.04
+
+   [make arguments] is one or more argument to pass to the make command of
+   documentation/Makefile, see that file for what's supported. This is typically
+   intended to be used to provide specific make targets.
+   Default: publish
+"
+}
+
+main ()
+{
+  if [ "$#" -lt 1 ]; then
+    usage
+    exit 1
+  fi
+
+  local image="$1"
+  shift
+
+  OCI=$(which "$CONTAINERCMD")
+
+  # docker build doesn't accept 2 colons, so "sanitize" the name
+  local sanitized_dockername
+  sanitized_dockername=$(echo "$image" | tr ':.' '-')
+
+  local version
+  version=$(echo "$image" | awk -F: '{print $NF}')
+
+  case $image in
+    # Missing latexmk texlive-gnu-freefont packages at the very least
+    # "almalinux:8"*|\
+    # "almalinux:9"*)
+    #   containerfile=Containerfile.almalinux
+    #   docs=almalinux_docs.sh
+    #   docs_pdf=almalinux_docs_pdf.sh
+    #   pip3=pip3_docs.sh
+    #   ;;
+    # Missing python3-saneyaml
+    # "debian:11"*|\
+    "debian:12"*)
+      containerfile=Containerfile.debian
+      docs=ubuntu_docs.sh
+      docs_pdf=ubuntu_docs_pdf.sh
+      ;;
+    "fedora:38"*|\
+    "fedora:39"*|\
+    "fedora:40"*)
+      containerfile=Containerfile.fedora
+      docs=fedora_docs.sh
+      docs_pdf=fedora_docs_pdf.sh
+      pip3=pip3_docs.sh
+      ;;
+    "leap:15.4"*|\
+    "leap:15.5"*)
+    # Seems like issue with permissions package, c.f.
+    #
+    # Updating /etc/sysconfig/security ...
+    # /dev/zero: chown: Permission denied
+    # /dev/null: chown: Permission denied
+    # /dev/full: chown: Permission denied
+    # ERROR: not all operations were successful.
+    # Checking permissions and ownerships - using the permissions files
+    # 	/etc/permissions
+    # 	/etc/permissions.easy
+    # 	/etc/permissions.local
+    # setting / to root:root 0755. (wrong permissions 0555)
+    # setting /dev/zero to root:root 0666. (wrong owner/group 65534:65534)
+    # setting /dev/null to root:root 0666. (wrong owner/group 65534:65534)
+    # setting /dev/full to root:root 0666. (wrong owner/group 65534:65534)
+    # warning: %post(permissions-20240826-150600.10.12.1.x86_64) scriptlet failed, exit status 1
+    #
+    # "leap:15.6"*)
+      image=opensuse/leap:$version
+      containerfile=Containerfile.zypper
+      docs=opensuse_docs.sh
+      docs_pdf=opensuse_docs_pdf.sh
+      pip3=pip3_docs.sh
+      ;;
+    # Missing python3-saneyaml
+    # "ubuntu:18.04"*|\
+    # "ubuntu:20.04"*|\
+    # Cannot fetch packages anymore
+    # "ubuntu:23.04"*|\
+    "ubuntu:22.04"*|\
+    "ubuntu:24.04"*)
+      containerfile=Containerfile.ubuntu
+      docs=ubuntu_docs.sh
+      docs_pdf=ubuntu_docs_pdf.sh
+      ;;
+    *)
+      echo "$image not supported!"
+      usage
+      exit 1
+      ;;
+  esac
+
+  $OCI build \
+    --tag "yocto-docs-$sanitized_dockername:latest" \
+    --build-arg ARG_FROM="docker.io/$image" \
+    --build-arg DOCS="$docs" \
+    --build-arg DOCS_PDF="$docs_pdf" \
+    --build-arg PIP3="${pip3:-}" \
+    --file "$SCRIPT_DIR/$containerfile" \
+    "$SH_DIR/"
+
+  local -a args_run=(
+    --rm
+    --interactive
+    --tty
+    --volume="$DOCS_DIR:/docs:rw"
+    --workdir=/docs
+    --security-opt label=disable
+  )
+
+  if [ "$OCI" = "docker" ]; then
+    args_run+=(
+      --user="$(id -u)":"$(id -g)"
+    )
+  elif [ "$OCI" = "podman" ]; then
+    # we need net access to fetch bitbake terms
+    args_run+=(
+      --cap-add=NET_RAW
+      --userns=keep-id
+    )
+  fi
+
+  $OCI run \
+    "${args_run[@]}" \
+    "yocto-docs-$sanitized_dockername" \
+    "$@"
+}
+
+main "$@"

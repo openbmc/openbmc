@@ -1,0 +1,117 @@
+From a6bf17d7eb64bd7beabc73b5fe319b7a375bbcce Mon Sep 17 00:00:00 2001
+From: Ovidiu Panait <ovidiu.panait@windriver.com>
+Date: Fri, 31 Jan 2020 10:56:11 +0200
+Subject: [PATCH] cmake: Fix configure for packages using find_package()
+
+Currently, when a package (i.e. bcc [https://github.com/iovisor/bcc.git])
+that depends on LLVM/Clang tries to run cmake find_package() during
+do_configure, it will fail with a similar error:
+
+|   The imported target "llvm-tblgen" references the file
+|      ".../recipe-sysroot/usr/bin/llvm-tblgen"
+|
+|   but this file does not exist.  Possible reasons include:
+|   * The file was deleted, renamed, or moved to another location.
+|   * An install or uninstall procedure did not complete successfully.
+|   * The installation package was faulty and contained
+|      ".../recipe-sysroot/usr/lib/cmake/LLVMExports.cmake"
+|   but not all the files it references.
+
+This is due to the fact that currently the cmake scripts look for target
+binaries in sysroot. Work around this by not exporting the target binaries in
+Exports-* cmake files.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Ovidiu Panait <ovidiu.panait@windriver.com>
+---
+ clang/cmake/modules/AddClang.cmake | 2 --
+ llvm/cmake/modules/AddLLVM.cmake   | 9 ++-------
+ llvm/cmake/modules/TableGen.cmake  | 6 ------
+ 3 files changed, 2 insertions(+), 15 deletions(-)
+
+diff --git a/clang/cmake/modules/AddClang.cmake b/clang/cmake/modules/AddClang.cmake
+index cdc8bd5cd503..5faa9117a30f 100644
+--- a/clang/cmake/modules/AddClang.cmake
++++ b/clang/cmake/modules/AddClang.cmake
+@@ -182,7 +182,6 @@ macro(add_clang_tool name)
+     if (CLANG_BUILD_TOOLS)
+       get_target_export_arg(${name} Clang export_to_clangtargets)
+       install(TARGETS ${name}
+-        ${export_to_clangtargets}
+         RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+         COMPONENT ${name})
+ 
+@@ -191,7 +190,6 @@ macro(add_clang_tool name)
+                                  DEPENDS ${name}
+                                  COMPONENT ${name})
+       endif()
+-      set_property(GLOBAL APPEND PROPERTY CLANG_EXPORTS ${name})
+     endif()
+   endif()
+   set_target_properties(${name} PROPERTIES XCODE_GENERATE_SCHEME ON)
+diff --git a/llvm/cmake/modules/AddLLVM.cmake b/llvm/cmake/modules/AddLLVM.cmake
+index d3e9377c8d2f..fe22d6f2b35a 100644
+--- a/llvm/cmake/modules/AddLLVM.cmake
++++ b/llvm/cmake/modules/AddLLVM.cmake
+@@ -1492,7 +1492,6 @@ macro(llvm_add_tool project name)
+       if( LLVM_BUILD_TOOLS )
+         get_target_export_arg(${name} ${project} export_to_llvmexports)
+         install(TARGETS ${name}
+-                ${export_to_llvmexports}
+                 RUNTIME DESTINATION ${${project}_TOOLS_INSTALL_DIR}
+                 COMPONENT ${name})
+ 
+@@ -1503,10 +1502,8 @@ macro(llvm_add_tool project name)
+         endif()
+       endif()
+     endif()
+-    if( LLVM_BUILD_TOOLS )
+-      string(TOUPPER "${project}" project_upper)
+-      set_property(GLOBAL APPEND PROPERTY ${project_upper}_EXPORTS ${name})
+-    endif()
++    string(TOUPPER "${project}" project_upper)
++    set_target_properties(${name} PROPERTIES FOLDER "Tools")
+   endif()
+   get_subproject_title(subproject_title)
+   set_target_properties(${name} PROPERTIES FOLDER "${subproject_title}/Tools")
+@@ -1556,7 +1553,6 @@ macro(add_llvm_utility name)
+     if (LLVM_INSTALL_UTILS AND LLVM_BUILD_UTILS)
+       get_target_export_arg(${name} LLVM export_to_llvmexports)
+       install(TARGETS ${name}
+-              ${export_to_llvmexports}
+               RUNTIME DESTINATION ${LLVM_UTILS_INSTALL_DIR}
+               COMPONENT ${name})
+ 
+@@ -1565,7 +1561,6 @@ macro(add_llvm_utility name)
+                                  DEPENDS ${name}
+                                  COMPONENT ${name})
+       endif()
+-      set_property(GLOBAL APPEND PROPERTY LLVM_EXPORTS ${name})
+     elseif(LLVM_BUILD_UTILS)
+       set_property(GLOBAL APPEND PROPERTY LLVM_EXPORTS_BUILDTREE_ONLY ${name})
+     endif()
+diff --git a/llvm/cmake/modules/TableGen.cmake b/llvm/cmake/modules/TableGen.cmake
+index ffcc718b4777..a76f28e74b86 100644
+--- a/llvm/cmake/modules/TableGen.cmake
++++ b/llvm/cmake/modules/TableGen.cmake
+@@ -232,12 +232,7 @@ macro(add_tablegen target project)
+ 
+   if (ADD_TABLEGEN_DESTINATION AND NOT LLVM_INSTALL_TOOLCHAIN_ONLY AND
+       (LLVM_BUILD_UTILS OR ${target} IN_LIST LLVM_DISTRIBUTION_COMPONENTS))
+-    set(export_arg)
+-    if(ADD_TABLEGEN_EXPORT)
+-      get_target_export_arg(${target} ${ADD_TABLEGEN_EXPORT} export_arg)
+-    endif()
+     install(TARGETS ${target}
+-            ${export_arg}
+             COMPONENT ${target}
+             RUNTIME DESTINATION "${ADD_TABLEGEN_DESTINATION}")
+     if(NOT LLVM_ENABLE_IDE)
+@@ -248,6 +243,5 @@ macro(add_tablegen target project)
+   endif()
+   if(ADD_TABLEGEN_EXPORT)
+     string(TOUPPER ${ADD_TABLEGEN_EXPORT} export_upper)
+-    set_property(GLOBAL APPEND PROPERTY ${export_upper}_EXPORTS ${target})
+   endif()
+ endmacro()

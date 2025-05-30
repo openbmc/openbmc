@@ -515,7 +515,7 @@ generated during the :ref:`ref-tasks-packagedata` task. The files stored in this
 directory contain information about each output package produced by the
 OpenEmbedded build system, and are used in different ways by the build system
 such as ":ref:`dev-manual/debugging:viewing package information with
-\`\`oe-pkgdata-util\`\``".
+``oe-pkgdata-util```".
 
 .. _structure-build-tmp-sstate-control:
 

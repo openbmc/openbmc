@@ -4,6 +4,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
+from datetime import datetime, timezone
 import sqlite3
 import logging
 from contextlib import closing
@@ -51,6 +52,22 @@ CONFIG_TABLE_DEFINITION = (
 )
 
 CONFIG_TABLE_COLUMNS = tuple(name for name, _, _ in CONFIG_TABLE_DEFINITION)
+
+
+def adapt_datetime_iso(val):
+    """Adapt datetime.datetime to UTC ISO 8601 date."""
+    return val.astimezone(timezone.utc).isoformat()
+
+
+sqlite3.register_adapter(datetime, adapt_datetime_iso)
+
+
+def convert_datetime(val):
+    """Convert ISO 8601 datetime to datetime.datetime object."""
+    return datetime.fromisoformat(val.decode())
+
+
+sqlite3.register_converter("DATETIME", convert_datetime)
 
 
 def _make_table(cursor, name, definition):

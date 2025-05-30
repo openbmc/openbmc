@@ -295,7 +295,7 @@ New Features / Enhancements in 4.3
    -  Generation of :term:`SPDX` manifests is now enabled by default.
 
    -  Git based recipes in OE-Core which used the ``git``  protocol have been
-      changed to use `https`` where possible, as it is typically faster and
+      changed to use ``https`` where possible, as it is typically faster and
       more reliable.
 
    -  The ``os-release`` recipe added a ``CPE_NAME`` to the fields provided, with the

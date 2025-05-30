@@ -1,15 +1,17 @@
 RUST_VERSION ?= "${@d.getVar('PV').split('-')[0]}"
 
 SRC_URI += "https://static.rust-lang.org/dist/rustc-${RUST_VERSION}-src.tar.xz;name=rust \
-            file://zlib-off64_t.patch;patchdir=${RUSTSRC} \
-            file://rv32-rustix-libc-backend.patch;patchdir=${RUSTSRC} \
-            file://rv32-cargo-rustix-0.38.28-fix.patch;patchdir=${RUSTSRC} \
+            file://0001-Define-more-ioctl-codes-on-riscv32gc-unknown-linux-g.patch;patchdir=${RUSTSRC} \
             file://rust-oe-selftest.patch;patchdir=${RUSTSRC} \
             file://repro-issue-fix-with-cc-crate-hashmap.patch;patchdir=${RUSTSRC} \
             file://oeqa-selftest-Increase-timeout-in-process-sigpipe-ru.patch;patchdir=${RUSTSRC} \
             file://0001-src-core-build_steps-tool.rs-switch-off-lto-for-rust.patch;patchdir=${RUSTSRC} \
+            file://revert-link-std-statically-in-rustc_driver-feature.patch;patchdir=${RUSTSRC} \
+            file://Zdual-proc-macros-additional-check.patch;patchdir=${RUSTSRC} \
+            file://0001-libunwind-Use-gcs-instead-of-gcs-target-attribute.patch;patchdir=${RUSTSRC} \
+            file://0001-Disable-libunwind-cross-architecture-unwinding.patch;patchdir=${RUSTSRC} \
 "
-SRC_URI[rust.sha256sum] = "36217ef7e32f40a180e3d79bd666b4dfdaed49dd381023a5fb765fd12d0092ce"
+SRC_URI[rust.sha256sum] = "b1fbf809efe9f036939401e142631c201a53bcf43ec1696bd9f5290ba236a266"
 
 RUSTSRC = "${WORKDIR}/rustc-${RUST_VERSION}-src"
 

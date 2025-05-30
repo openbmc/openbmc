@@ -1,0 +1,34 @@
+From c9e8942cace57d9d222e8f005408631e1cd06c5c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Nov 2019 17:00:29 -0800
+Subject: [PATCH] Check for atomic<double> intrinsics
+
+On some architectures e.g. x86/32bit gcc decides to inline calls to
+double atomic variables but clang does not and defers it to libatomic
+therefore detect if clang can use built-ins for atomic<double> if not
+then link libatomic, this helps building clangd for x86 on linux systems
+with gcc runtime
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ llvm/cmake/modules/CheckAtomic.cmake | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/llvm/cmake/modules/CheckAtomic.cmake b/llvm/cmake/modules/CheckAtomic.cmake
+index f11cadf39ff6..80a18a92956a 100644
+--- a/llvm/cmake/modules/CheckAtomic.cmake
++++ b/llvm/cmake/modules/CheckAtomic.cmake
+@@ -30,10 +30,11 @@ function(check_working_cxx_atomics64 varname)
+ #include <atomic>
+ #include <cstdint>
+ std::atomic<uint64_t> x (0);
++std::atomic<double> y (0);
+ int main() {
+   uint64_t i = x.load(std::memory_order_relaxed);
+   (void)i;
+-  return 0;
++  return int(y);
+ }
+ " ${varname})
+   set(CMAKE_REQUIRED_FLAGS ${OLD_CMAKE_REQUIRED_FLAGS})

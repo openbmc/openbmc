@@ -76,7 +76,7 @@ SSTATE_SCAN_CMD_NATIVE ??= 'grep -Irl -e ${RECIPE_SYSROOT} -e ${RECIPE_SYSROOT_N
 SSTATE_HASHEQUIV_FILEMAP ?= " \
     populate_sysroot:*/postinst-useradd-*:${TMPDIR} \
     populate_sysroot:*/postinst-useradd-*:${COREBASE} \
-    populate_sysroot:*/postinst-useradd-*:regex-\s(PATH|PSEUDO_IGNORE_PATHS|HOME|LOGNAME|OMP_NUM_THREADS|USER)=.*\s \
+    populate_sysroot:*/postinst-useradd-*:regex-\s(PATH|PSEUDO_INCLUDE_PATHS|HOME|LOGNAME|OMP_NUM_THREADS|USER)=.*\s \
     populate_sysroot:*/crossscripts/*:${TMPDIR} \
     populate_sysroot:*/crossscripts/*:${COREBASE} \
     "

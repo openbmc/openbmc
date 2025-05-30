@@ -1,0 +1,33 @@
+From 31a835dd2573c17d77efa8803c7fb28e0d58abc6 Mon Sep 17 00:00:00 2001
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Date: Thu, 22 May 2025 20:11:46 +0300
+Subject: [PATCH] meson: stop building XA by default
+
+Commit cf40099730c4 ("meson: deprecate gallium-xa") deprecated XA
+tracker, but didn't disable it by default. Thus any attempt to disable
+it would cause a deprecated option warning. Flip the default to disable
+XA tracker by default.
+
+Fixes: cf40099730c4 ("meson: deprecate gallium-xa")
+Backport-to: 25.1
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+Upstream-Status: Backport [https://gitlab.freedesktop.org/mesa/mesa/-/commit/31cf6b94ad1dfaf4272b22a39d7e2805d03f9375]
+---
+ meson.options | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.options b/meson.options
+index e6c9567ade86..a56bcef6e2ca 100644
+--- a/meson.options
++++ b/meson.options
+@@ -127,6 +127,7 @@ option(
+ option(
+   'gallium-xa',
+   type : 'feature',
++  value : 'disabled',
+   description : 'enable gallium xa frontend.',
+   deprecated: true,
+ )
+-- 
+2.47.2
+

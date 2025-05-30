@@ -42,7 +42,7 @@ PACKAGECONFIG:class-native = ""
 PACKAGECONFIG[libmount] = "-Dlibmount=enabled,-Dlibmount=disabled,util-linux"
 PACKAGECONFIG[manpages] = "-Dman-pages=enabled, -Dman-pages=disabled, python3-docutils-native"
 PACKAGECONFIG[libelf] = "-Dlibelf=enabled,-Dlibelf=disabled,elfutils"
-PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false,"
+PACKAGECONFIG[tests] = "-Dtests=true -Dinstalled_tests=true,-Dtests=false -Dinstalled_tests=false,"
 PACKAGECONFIG[selinux] = "-Dselinux=enabled,-Dselinux=disabled,libselinux"
 PACKAGECONFIG[introspection] = "-Dintrospection=enabled,-Dintrospection=disabled,gobject-introspection-native gobject-introspection glib-2.0-initial"
 
@@ -157,12 +157,10 @@ CODEGEN_PYTHON_RDEPENDS:mingw32 = ""
 
 RDEPENDS:${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"
 
-RDEPENDS:${PN}-ptest += "${PN}-utils"
-
 RDEPENDS:${PN}-ptest += "\
             coreutils \
             libgcc \
-            dbus \
+            ${VIRTUAL-RUNTIME_dbus} \
             desktop-file-utils \
             gnome-desktop-testing \
             tzdata \
@@ -171,6 +169,7 @@ RDEPENDS:${PN}-ptest += "\
             tzdata-europe \
             tzdata-posix \
             shared-mime-info \
+            ${PN}-dev \
             ${PN}-locale-ja \
             ${PN}-locale-fr \
             ${PN}-locale-el \
@@ -179,6 +178,7 @@ RDEPENDS:${PN}-ptest += "\
             ${PN}-locale-pl \
             ${PN}-locale-ru \
             ${PN}-locale-th \
+            ${PN}-utils \
             python3-core \
             python3-modules \
             ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'python3-dbusmock', '', d)} \
@@ -190,6 +190,7 @@ RDEPENDS:${PN}-ptest += "\
             locale-base-fr-fr \
             locale-base-ru-ru \
            "
+INSANE_SKIP:${PN}-ptest = "dev-deps"
 
 RDEPENDS:${PN}-ptest:append:libc-glibc = "\
             glibc-gconv-utf-16 \
@@ -203,6 +204,7 @@ RDEPENDS:${PN}-ptest:append:libc-glibc = "\
             glibc-gconv-iso8859-15 \
             glibc-charmap-invariant \
             glibc-localedata-translit-cjk-variants \
+            locale-base-c \
             locale-base-lt-lt \
             locale-base-ja-jp.euc-jp \
             locale-base-fa-ir \
@@ -232,7 +234,7 @@ SRC_URI:append:class-native = " file://relocate-modules.patch \
                                 file://0001-meson.build-do-not-enable-pidfd-features-on-native-g.patch \
                               "
 
-SRC_URI[sha256sum] = "37dd0877fe964cd15e9a2710b044a1830fb1bd93652a6d0cb6b8b2dff187c709"
+SRC_URI[sha256sum] = "88e960dd937057407d61fcb3b45a860704b25923c37ae2478b85f2ecb5a4021f"
 
 # Find any meson cross files in FILESPATH that are relevant for the current
 # build (using siteinfo) and add them to EXTRA_OEMESON.

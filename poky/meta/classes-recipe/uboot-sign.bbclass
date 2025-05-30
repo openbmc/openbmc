@@ -86,6 +86,29 @@ UBOOT_FIT_KEY_SIGN_PKCS ?= "-x509"
 # ex: 1 32bits address, 2 64bits address
 UBOOT_FIT_ADDRESS_CELLS ?= "1"
 
+# ARM Trusted Firmware(ATF) is a reference implementation of secure world
+# software for Arm A-Profile architectures, (Armv8-A and Armv7-A), including
+# an Exception Level 3 (EL3) Secure Monitor.
+UBOOT_FIT_ARM_TRUSTED_FIRMWARE ?= "0"
+UBOOT_FIT_ARM_TRUSTED_FIRMWARE_IMAGE ?= "bl31.bin"
+
+# A Trusted Execution Environment(TEE) is an environment for executing code,
+# in which those executing the code can have high levels of trust in the asset
+# management of that surrounding environment.
+UBOOT_FIT_TEE ?= "0"
+UBOOT_FIT_TEE_IMAGE ?= "tee-raw.bin"
+
+# User specific settings
+UBOOT_FIT_USER_SETTINGS ?= ""
+
+# Sets the firmware property to select the image to boot first.
+# If not set, the first entry in "loadables" is used instead.
+UBOOT_FIT_CONF_FIRMWARE ?= ""
+
+# Unit name containing a list of users additional binaries to be loaded.
+# It is a comma-separated list of strings.
+UBOOT_FIT_CONF_USER_LOADABLES ?= ''
+
 UBOOT_FIT_UBOOT_LOADADDRESS ?= "${UBOOT_LOADADDRESS}"
 UBOOT_FIT_UBOOT_ENTRYPOINT ?= "${UBOOT_ENTRYPOINT}"
 
@@ -94,6 +117,8 @@ python() {
     sign = d.getVar('UBOOT_SIGN_ENABLE') == '1'
     if d.getVar('UBOOT_FITIMAGE_ENABLE') == '1' or sign:
         d.appendVar('DEPENDS', " u-boot-tools-native dtc-native")
+    if d.getVar('FIT_GENERATE_KEYS') == '1' and sign:
+        d.appendVarFlag('do_uboot_assemble_fitimage', 'depends', ' virtual/kernel:do_kernel_generate_rsa_keys')
 }
 
 concat_dtb() {
@@ -282,9 +307,65 @@ do_uboot_generate_rsa_keys() {
 
 addtask uboot_generate_rsa_keys before do_uboot_assemble_fitimage after do_compile
 
+# Create a ITS file for the atf
+uboot_fitimage_atf() {
+	cat << EOF >> ${UBOOT_ITS}
+        atf {
+            description = "ARM Trusted Firmware";
+            data = /incbin/("${UBOOT_FIT_ARM_TRUSTED_FIRMWARE_IMAGE}");
+            type = "firmware";
+            arch = "${UBOOT_ARCH}";
+            os = "arm-trusted-firmware";
+            load = <${UBOOT_FIT_ARM_TRUSTED_FIRMWARE_LOADADDRESS}>;
+            entry = <${UBOOT_FIT_ARM_TRUSTED_FIRMWARE_ENTRYPOINT}>;
+            compression = "none";
+EOF
+	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
+		cat << EOF >> ${UBOOT_ITS}
+            signature {
+                algo = "${UBOOT_FIT_HASH_ALG},${UBOOT_FIT_SIGN_ALG}";
+                key-name-hint = "${SPL_SIGN_KEYNAME}";
+            };
+EOF
+	fi
+
+	cat << EOF >> ${UBOOT_ITS}
+        };
+EOF
+}
+
+# Create a ITS file for the tee
+uboot_fitimage_tee() {
+	cat << EOF >> ${UBOOT_ITS}
+        tee {
+            description = "Trusted Execution Environment";
+            data = /incbin/("${UBOOT_FIT_TEE_IMAGE}");
+            type = "tee";
+            arch = "${UBOOT_ARCH}";
+            os = "tee";
+            load = <${UBOOT_FIT_TEE_LOADADDRESS}>;
+            entry = <${UBOOT_FIT_TEE_ENTRYPOINT}>;
+            compression = "none";
+EOF
+	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
+		cat << EOF >> ${UBOOT_ITS}
+            signature {
+                algo = "${UBOOT_FIT_HASH_ALG},${UBOOT_FIT_SIGN_ALG}";
+                key-name-hint = "${SPL_SIGN_KEYNAME}";
+            };
+EOF
+	fi
+
+	cat << EOF >> ${UBOOT_ITS}
+        };
+EOF
+}
+
 # Create a ITS file for the U-boot FIT, for use when
 # we want to sign it so that the SPL can verify it
 uboot_fitimage_assemble() {
+	conf_loadables="\"uboot\""
+	conf_firmware=""
 	rm -f ${UBOOT_ITS} ${UBOOT_FITIMAGE_BINARY}
 
 	# First we create the ITS script
@@ -337,13 +418,38 @@ EOF
 
 	cat << EOF >> ${UBOOT_ITS}
         };
+EOF
+	if [ "${UBOOT_FIT_TEE}" = "1" ] ; then
+		conf_loadables="\"tee\", ${conf_loadables}"
+		uboot_fitimage_tee
+	fi
+
+	if [ "${UBOOT_FIT_ARM_TRUSTED_FIRMWARE}" = "1" ] ; then
+		conf_loadables="\"atf\", ${conf_loadables}"
+		uboot_fitimage_atf
+	fi
+
+	if [ -n "${UBOOT_FIT_USER_SETTINGS}" ] ; then
+		printf "%b" "${UBOOT_FIT_USER_SETTINGS}" >> ${UBOOT_ITS}
+	fi
+
+	if [ -n "${UBOOT_FIT_CONF_USER_LOADABLES}" ] ; then
+		conf_loadables="${conf_loadables}${UBOOT_FIT_CONF_USER_LOADABLES}"
+	fi
+
+	if [ -n "${UBOOT_FIT_CONF_FIRMWARE}" ] ; then
+		conf_firmware="firmware = \"${UBOOT_FIT_CONF_FIRMWARE}\";"
+	fi
+
+	cat << EOF >> ${UBOOT_ITS}
     };
 
     configurations {
         default = "conf";
         conf {
             description = "Boot with signed U-Boot FIT";
-            loadables = "uboot";
+            ${conf_firmware}
+            loadables = ${conf_loadables};
             fdt = "fdt";
         };
     };

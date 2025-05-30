@@ -7,9 +7,9 @@
 import os
 import subprocess
 import tempfile
-import unittest
 
 from oeqa.sdk.case import OESDKTestCase
+from oeqa.sdkext.context import OESDKExtTestContext
 from oeqa.utils.subprocesstweak import errors_have_output
 errors_have_output()
 
@@ -17,16 +17,14 @@ class KernelModuleTest(OESDKTestCase):
     """
     Test that out-of-tree kernel modules build.
     """
+    def test_cryptodev(self):
+        if isinstance(self.tc, OESDKExtTestContext):
+            self.skipTest(f"{self.id()} does not support eSDK (https://bugzilla.yoctoproject.org/show_bug.cgi?id=15850)")
 
-    def setUp(self):
-        if not self.tc.hasTargetPackage("kernel-devsrc"):
-            raise unittest.SkipTest("KernelModuleTest needs kernel-devsrc")
-
+        self.ensure_target_package("kernel-devsrc")
         # These targets need to be built before kernel modules can be built.
         self._run("make -j -C $OECORE_TARGET_SYSROOT/usr/src/kernel prepare scripts")
 
-
-    def test_cryptodev(self):
         with tempfile.TemporaryDirectory(prefix="cryptodev", dir=self.tc.sdk_dir) as testdir:
             git_url = "https://github.com/cryptodev-linux/cryptodev-linux"
             # This is a knnown-good commit post-1.13 that builds with kernel 6.7+

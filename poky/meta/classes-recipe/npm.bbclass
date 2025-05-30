@@ -154,6 +154,9 @@ python npm_do_configure() {
         has_shrinkwrap_file = False
 
     if has_shrinkwrap_file:
+       if int(orig_shrinkwrap.get("lockfileVersion", 0)) < 2:
+           bb.fatal("%s: lockfileVersion version 2 or later is required" % orig_shrinkwrap_file)
+
        cached_shrinkwrap = copy.deepcopy(orig_shrinkwrap)
        for package in orig_shrinkwrap["packages"]:
             if package != "":

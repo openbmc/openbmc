@@ -9,8 +9,8 @@ HOMEPAGE = "https://perf.wiki.kernel.org/index.php/Main_Page"
 
 LICENSE = "GPL-2.0-only"
 
-
-PACKAGECONFIG ??= "python tui libunwind libtraceevent"
+# zstd is required for kernels 6.14+ when libelf-zstd is detected
+PACKAGECONFIG ??= "python tui libunwind libtraceevent zstd"
 PACKAGECONFIG[dwarf] = ",NO_DWARF=1"
 PACKAGECONFIG[perl] = ",NO_LIBPERL=1,perl"
 PACKAGECONFIG[python] = ",NO_LIBPYTHON=1,python3 python3-setuptools-native"
@@ -80,6 +80,16 @@ LDFLAGS = "-ldl -lutil"
 # built with appropriate -f*-prefix-map options,
 # avoiding the 'buildpaths' QA warning.
 TARGET_CC_ARCH += "${SELECTED_OPTIMIZATION} ${DEBUG_PREFIX_MAP}"
+
+#| libbpf.c: In function 'find_kernel_btf_id.constprop':
+#| libbpf.c:10009:33: error: 'mod_len' may be used uninitialized [-Werror=maybe-uninitialized]
+#| 10009 |                 if (mod_name && strncmp(mod->name, mod_name, mod_len) != 0)
+#|       |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#| libbpf.c:9979:21: note: 'mod_len' was declared here
+#|  9979 |         int ret, i, mod_len;
+#|       |                     ^~~~~~~
+#| cc1: all warnings being treated as errors
+TARGET_CC_ARCH:append:toolchain-clang:arm = " -fno-error=maybe-uninitialized"
 
 EXTRA_OEMAKE = '\
     V=1 \

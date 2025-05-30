@@ -1,0 +1,42 @@
+From a2af266f013722a64c5d04e0fe097cd711393a53 Mon Sep 17 00:00:00 2001
+From: Daniel McGregor <daniel.mcgregor@vecima.com>
+Date: Wed, 8 Nov 2023 16:24:20 -0600
+Subject: [PATCH] find OE provided Kerberos
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Daniel McGregor <daniel.mcgregor@vecima.com>
+---
+ aclocal/kerberos5.m4 | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/aclocal/kerberos5.m4 b/aclocal/kerberos5.m4
+index f96f0fd4..ad85fdf2 100644
+--- a/aclocal/kerberos5.m4
++++ b/aclocal/kerberos5.m4
+@@ -22,8 +22,8 @@ AC_DEFUN([AC_KERBEROS_V5],[
+     dnl This ugly hack brought on by the split installation of
+     dnl MIT Kerberos on Fedora Core 1
+     K5CONFIG=""
+-    if test -f $dir/bin/krb5-config; then
+-      K5CONFIG=$dir/bin/krb5-config
++    if test -f $dir/bin/crossscripts/krb5-config; then
++      K5CONFIG=$dir/bin/crossscripts/krb5-config
+     elif test -f "/usr/kerberos/bin/krb5-config"; then
+       K5CONFIG="/usr/kerberos/bin/krb5-config"
+     elif test -f "/usr/lib/mit/bin/krb5-config"; then
+@@ -72,6 +72,7 @@ AC_DEFUN([AC_KERBEROS_V5],[
+   AC_MSG_RESULT($KRBDIR)
+ 
+   dnl Check if -rpath=$(KRBDIR)/lib is needed
++  if false; then
+   echo "The current KRBDIR is $KRBDIR"
+   if test "$KRBDIR/lib" = "/lib" -o "$KRBDIR/lib" = "/usr/lib" \
+        -o "$KRBDIR/lib" = "//lib" -o "$KRBDIR/lib" = "/usr//lib" ; then
+@@ -81,6 +82,7 @@ AC_DEFUN([AC_KERBEROS_V5],[
+   else
+     KRBLDFLAGS="-Wl,-rpath=$KRBDIR/lib"
+   fi
++  fi
+ 
+   dnl Now check for functions within gssapi library
+   AC_CHECK_LIB($gssapi_lib, gss_krb5_export_lucid_sec_context,

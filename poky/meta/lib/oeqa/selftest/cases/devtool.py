@@ -1027,7 +1027,7 @@ class DevtoolModifyTests(DevtoolBase):
         # Configure the recipe to check that the git dependencies are correctly patched in cargo config
         bitbake('-c configure %s' % testrecipe)
 
-        cargo_config_path = os.path.join(cargo_home, 'config')
+        cargo_config_path = os.path.join(cargo_home, 'config.toml')
         with open(cargo_config_path, "r") as f:
             cargo_config_contents = [line.strip('\n') for line in f.readlines()]
 
@@ -1185,13 +1185,16 @@ class DevtoolUpdateTests(DevtoolBase):
         result = runCmd('echo "A new file" > devtool-new-file', cwd=tempdir)
         result = runCmd('git add devtool-new-file', cwd=tempdir)
         result = runCmd('git commit -m "Add a new file"', cwd=tempdir)
-        self.add_command_to_tearDown('cd %s; rm %s/*.patch; git checkout %s %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile)))
+        cleanup_cmd = 'cd %s; rm %s/*.patch; git add %s; git checkout %s' % (os.path.dirname(recipefile), testrecipe, testrecipe, os.path.basename(recipefile))
+        self.add_command_to_tearDown(cleanup_cmd)
         result = runCmd('devtool update-recipe %s' % testrecipe)
         result = runCmd('git add minicom', cwd=os.path.dirname(recipefile))
         expected_status = [(' M', '.*/%s$' % os.path.basename(recipefile)),
                            ('A ', '.*/0001-Change-the-README.patch$'),
                            ('A ', '.*/0002-Add-a-new-file.patch$')]
         self._check_repo_status(os.path.dirname(recipefile), expected_status)
+        result = runCmd(cleanup_cmd)
+        self._check_repo_status(os.path.dirname(recipefile), [])
 
     def test_devtool_update_recipe_git(self):
         # Check preconditions
@@ -1248,7 +1251,7 @@ class DevtoolUpdateTests(DevtoolBase):
 
     def test_devtool_update_recipe_append(self):
         # Check preconditions
-        testrecipe = 'mdadm'
+        testrecipe = 'minicom'
         bb_vars = get_bb_vars(['FILE', 'SRC_URI'], testrecipe)
         recipefile = bb_vars['FILE']
         src_uri = bb_vars['SRC_URI']
@@ -1266,7 +1269,7 @@ class DevtoolUpdateTests(DevtoolBase):
         # Check git repo
         self._check_src_repo(tempsrcdir)
         # Add a commit
-        result = runCmd("sed 's!\\(#define VERSION\\W*\"[^\"]*\\)\"!\\1-custom\"!' -i ReadMe.c", cwd=tempsrcdir)
+        result = runCmd('echo "Additional line" >> README', cwd=tempsrcdir)
         result = runCmd('git commit -a -m "Add our custom version"', cwd=tempsrcdir)
         self.add_command_to_tearDown('cd %s; rm -f %s/*.patch; git checkout .' % (os.path.dirname(recipefile), testrecipe))
         # Create a temporary layer and add it to bblayers.conf
@@ -1305,7 +1308,7 @@ class DevtoolUpdateTests(DevtoolBase):
             self.assertEqual(expectedlines2, f.readlines())
         # Put commit back and check we can run it if layer isn't in bblayers.conf
         os.remove(bbappendfile)
-        result = runCmd("sed 's!\\(#define VERSION\\W*\"[^\"]*\\)\"!\\1-custom\"!' -i ReadMe.c", cwd=tempsrcdir)
+        result = runCmd('echo "Additional line" >> README', cwd=tempsrcdir)
         result = runCmd('git commit -a -m "Add our custom version"', cwd=tempsrcdir)
         result = runCmd('bitbake-layers remove-layer %s' % templayerdir, cwd=self.builddir)
         result = runCmd('devtool update-recipe %s -a %s' % (testrecipe, templayerdir))
@@ -1757,6 +1760,8 @@ class DevtoolExtractTests(DevtoolBase):
         self.assertExists(os.path.join(tempdir, 'Makefile.am'), 'Extracted source could not be found')
         self._check_src_repo(tempdir)
 
+class DevtoolResetTests(DevtoolBase):
+
     def test_devtool_reset_all(self):
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -1782,6 +1787,21 @@ class DevtoolExtractTests(DevtoolBase):
         self.assertFalse(matches1, 'Stamp files exist for recipe %s that should have been cleaned' % testrecipe1)
         matches2 = glob.glob(stampprefix2 + '*')
         self.assertFalse(matches2, 'Stamp files exist for recipe %s that should have been cleaned' % testrecipe2)
+
+    def test_devtool_reset_re_plus_plus(self):
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        testrecipe = 'devtool-test-reset-re++'
+        result = runCmd('devtool modify %s' % testrecipe)
+        result = runCmd('devtool reset -n %s' % testrecipe)
+        self.assertIn(testrecipe, result.output)
+        result = runCmd('devtool status')
+        self.assertNotIn(testrecipe, result.output)
+        self.assertNotExists(os.path.join(self.workspacedir, 'recipes', testrecipe), 'Recipe directory should not exist after resetting')
+
+class DevtoolDeployTargetTests(DevtoolBase):
 
     @OETestTag("runqemu")
     def test_devtool_deploy_target(self):
@@ -1849,6 +1869,8 @@ class DevtoolExtractTests(DevtoolBase):
             result = runCmd('devtool undeploy-target -c %s root@%s' % (testrecipe, qemu.ip))
             result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, testcommand), ignore_status=True)
             self.assertNotEqual(result, 0, 'undeploy-target did not remove command as it should have')
+
+class DevtoolBuildImageTests(DevtoolBase):
 
     def test_devtool_build_image(self):
         """Test devtool build-image plugin"""

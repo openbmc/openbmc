@@ -1,0 +1,35 @@
+From 590937523deea4ad2a2ee0e1ae4412a8f59e0170 Mon Sep 17 00:00:00 2001
+From: Ines KCHELFI <ines.kchelfi@smile.fr>
+Date: Thu, 10 Apr 2025 15:14:11 +0200
+Subject: [PATCH] Use optional env vars to force runtime paths in tests
+
+Signed-off-by: Ines KCHELFI <ines.kchelfi@smile.fr>
+Upstream-Status: Submitted [https://github.com/rpm-software-management/rpm-sequoia/pull/86]
+---
+ tests/symbols.rs | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tests/symbols.rs b/tests/symbols.rs
+index c16dd9b..dc4a42c 100644
+--- a/tests/symbols.rs
++++ b/tests/symbols.rs
+@@ -14,7 +14,8 @@ fn symbols() -> anyhow::Result<()> {
+     // OUT_DIR gives us
+     // `/tmp/rpm-sequoia/debug/build/rpm-sequoia-HASH/out`.
+ 
+-    let out_dir = PathBuf::from(env!("OUT_DIR"));
++    let out_dir = PathBuf::from(option_env!("FORCE_RUNTIME_PATH_LIB")
++        .unwrap_or(env!("OUT_DIR")));
+     let mut build_dir = out_dir;
+     let lib = loop {
+         let mut lib = build_dir.clone();
+@@ -53,7 +54,8 @@ fn symbols() -> anyhow::Result<()> {
+     }
+ 
+     let mut expected_symbols_txt_fn
+-        = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
++    = PathBuf::from(option_env!("FORCE_RUNTIME_PATH_SRC")
++        .unwrap_or(env!("CARGO_MANIFEST_DIR")));
+     expected_symbols_txt_fn.push("src/symbols.txt");
+ 
+     let mut expected_symbols_txt = Vec::new();

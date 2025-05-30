@@ -14,12 +14,14 @@ Change-Id: I9f377e47c22ef20497479c0978c053ed5de46a38
 
 Upstream-Status: Submitted [https://go-review.googlesource.com/c/go/+/391115]
 ---
+ src/cmd/link/internal/ld/lib.go | 21 ---------------------
+ 1 file changed, 21 deletions(-)
 
 diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
-index 2d8f964..fcf0bc7 100644
+index dfc72e02c0..2a2a304113 100644
 --- a/src/cmd/link/internal/ld/lib.go
 +++ b/src/cmd/link/internal/ld/lib.go
-@@ -1670,27 +1670,6 @@
+@@ -1673,27 +1673,6 @@ func (ctxt *Link) hostlink() {
  			// Use lld to avoid errors from default linker (issue #38838)
  			altLinker = "lld"
  		}
@@ -47,3 +49,6 @@ index 2d8f964..fcf0bc7 100644
  	}
  	if ctxt.Arch.Family == sys.ARM64 && buildcfg.GOOS == "freebsd" {
  		// Switch to ld.bfd on freebsd/arm64.
+-- 
+2.25.1
+

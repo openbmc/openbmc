@@ -190,28 +190,28 @@ class Archiver(OESelftestTestCase):
         Test that the archiver works with `ARCHIVER_MODE[src] = "original"`.
         """
 
-        self._test_archiver_mode('original', 'ed-1.14.1.tar.lz')
+        self._test_archiver_mode('original', 'ed-1.21.1.tar.lz')
 
     def test_archiver_mode_patched(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[src] = "patched"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-patched.tar.xz')
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.21.1-r0-patched.tar.xz')
 
     def test_archiver_mode_configured(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[src] = "configured"`.
         """
 
-        self._test_archiver_mode('configured', 'selftest-ed-native-1.14.1-r0-configured.tar.xz')
+        self._test_archiver_mode('configured', 'selftest-ed-native-1.21.1-r0-configured.tar.xz')
 
     def test_archiver_mode_recipe(self):
         """
         Test that the archiver works with `ARCHIVER_MODE[recipe] = "1"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-recipe.tar.xz',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.21.1-r0-recipe.tar.xz',
                                  'ARCHIVER_MODE[recipe] = "1"\n')
 
     def test_archiver_mode_diff(self):
@@ -220,7 +220,7 @@ class Archiver(OESelftestTestCase):
         Exclusions controlled by `ARCHIVER_MODE[diff-exclude]` are not yet tested.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-diff.gz',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.21.1-r0-diff.gz',
                                  'ARCHIVER_MODE[diff] = "1"\n')
 
     def test_archiver_mode_dumpdata(self):
@@ -228,7 +228,7 @@ class Archiver(OESelftestTestCase):
         Test that the archiver works with `ARCHIVER_MODE[dumpdata] = "1"`.
         """
 
-        self._test_archiver_mode('patched', 'selftest-ed-native-1.14.1-r0-showdata.dump',
+        self._test_archiver_mode('patched', 'selftest-ed-native-1.21.1-r0-showdata.dump',
                                  'ARCHIVER_MODE[dumpdata] = "1"\n')
 
     def test_archiver_mode_mirror(self):
@@ -236,7 +236,7 @@ class Archiver(OESelftestTestCase):
         Test that the archiver works with `ARCHIVER_MODE[src] = "mirror"`.
         """
 
-        self._test_archiver_mode('mirror', 'ed-1.14.1.tar.lz',
+        self._test_archiver_mode('mirror', 'ed-1.21.1.tar.lz',
                                  'BB_GENERATE_MIRROR_TARBALLS = "1"\n')
 
     def test_archiver_mode_mirror_excludes(self):
@@ -247,7 +247,7 @@ class Archiver(OESelftestTestCase):
         """
 
         target='selftest-ed'
-        target_file_name = 'ed-1.14.1.tar.lz'
+        target_file_name = 'ed-1.21.1.tar.lz'
 
         features = 'INHERIT += "archiver"\n'
         features += 'ARCHIVER_MODE[src] = "mirror"\n'
@@ -285,7 +285,7 @@ class Archiver(OESelftestTestCase):
             bitbake('-c deploy_archives %s' % (target))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC'])
-        for target_file_name in ['ed-1.14.1.tar.lz', 'hello.c']:
+        for target_file_name in ['ed-1.21.1.tar.lz', 'hello.c']:
             glob_str = os.path.join(bb_vars['DEPLOY_DIR_SRC'], 'mirror', target_file_name)
             glob_result = glob.glob(glob_str)
             self.assertTrue(glob_result, 'Missing archive file %s' % (target_file_name))

@@ -34,6 +34,7 @@ python gcc_multilib_setup() {
                 '%s/aarch64/aarch64-linux.h' % src_conf_dir,
                 '%s/aarch64/aarch64-cores.def' % src_conf_dir,
                 '%s/arm/linux-eabi.h' % src_conf_dir,
+                '%s/riscv/t-linux*' % src_conf_dir,
                 '%s/*/linux.h' % src_conf_dir,
                 '%s/linux.h' % src_conf_dir)
 
@@ -44,6 +45,9 @@ python gcc_multilib_setup() {
             parent_dir = os.path.dirname(rel_path)
             bb.utils.mkdirhier('%s/%s' % (build_conf_dir, parent_dir))
             bb.utils.copyfile(fn, '%s/%s' % (build_conf_dir, rel_path))
+
+    # For now, force the riscv multilib view to our own meaning we can always enable multilib
+    bb.utils.copyfile('%s/riscv/t-linux' % src_conf_dir, '%s/riscv/t-linux-multilib' % build_conf_dir)
 
     pn = d.getVar('PN')
     multilibs = (d.getVar('MULTILIB_VARIANTS') or '').split()
@@ -145,6 +149,8 @@ python gcc_multilib_setup() {
         'i686'      : ['gcc/config/i386/t-linux64'],
         'mips'      : ['gcc/config/mips/t-linux64'],
         'mips64'    : ['gcc/config/mips/t-linux64'],
+        'riscv32'     : ['gcc/config/riscv/t-linux-multilib'],
+        'riscv64'     : ['gcc/config/riscv/t-linux-multilib'],
         'powerpc'   : ['gcc/config/rs6000/t-linux64'],
         'powerpc64' : ['gcc/config/rs6000/t-linux64'],
         'aarch64'   : ['gcc/config/aarch64/t-aarch64'],
@@ -161,6 +167,8 @@ python gcc_multilib_setup() {
         'powerpc64' : ['gcc/config/linux.h', 'gcc/config/rs6000/linux64.h'],
         'aarch64'   : ['gcc/config/linux.h', 'gcc/config/aarch64/aarch64-linux.h', 'gcc/config/arm/linux-eabi.h'],
         'arm'       : ['gcc/config/linux.h', 'gcc/config/aarch64/aarch64-linux.h', 'gcc/config/arm/linux-eabi.h'],
+        'riscv32'     : ['gcc/config/linux.h'],
+        'riscv64'     : ['gcc/config/linux.h'],
     }
 
     libdir32 = 'SYSTEMLIBS_DIR'

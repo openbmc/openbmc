@@ -59,7 +59,6 @@ PACKAGES =+ "${PN}-sdl \
              ${PN}-xvfb \
              ${PN}-utils \
              ${PN}-xephyr \
-             ${PN}-xwayland \
              ${PN}-multimedia-modules \
              ${PN}-extension-dri \
              ${PN}-extension-dri2 \
@@ -82,7 +81,6 @@ SUMMARY:xf86-video-modesetting = "X.Org X server -- modesetting display driver"
 
 XSERVER_RDEPENDS = "xkeyboard-config rgb xserver-xf86-config xkbcomp xf86-input-libinput"
 RDEPENDS:${PN} += "${XSERVER_RDEPENDS}"
-RDEPENDS:${PN}-xwayland += "${XSERVER_RDEPENDS}"
 RDEPENDS:${PN}-xvfb += "xkeyboard-config"
 RDEPENDS:${PN}-module-exa = "${PN} (= ${EXTENDPKGV})"
 
@@ -94,7 +92,6 @@ FILES:${PN}-fbdev = "${bindir}/Xfbdev"
 FILES:${PN}-xvfb = "${bindir}/Xvfb"
 FILES:${PN}-utils = "${bindir}/scanpci ${bindir}/pcitweak ${bindir}/ioport ${bindir}/in[bwl] ${bindir}/out[bwl] ${bindir}/mmap[rw] ${bindir}/gtf ${bindir}/getconfig ${bindir}/getconfig.pl"
 FILES:${PN}-xephyr = "${bindir}/Xephyr"
-FILES:${PN}-xwayland = "${bindir}/Xwayland"
 FILES:${PN}-multimedia-modules = "${libdir}/xorg/modules/multimedia/*drv*"
 FILES:${PN}-extension-dri = "${libdir}/xorg/modules/extensions/libdri.so"
 FILES:${PN}-extension-dri2 = "${libdir}/xorg/modules/extensions/libdri2.so"

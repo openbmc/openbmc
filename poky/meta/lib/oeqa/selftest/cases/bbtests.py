@@ -233,6 +233,7 @@ INHERIT:remove = \"report-error\"
 
     def test_non_gplv3(self):
         self.write_config('''INCOMPATIBLE_LICENSE = "GPL-3.0-or-later"
+OVERRIDES .= ":gplv3test"
 require conf/distro/include/no-gplv3.inc
 ''')
         result = bitbake('selftest-ed', ignore_status=True)
@@ -241,7 +242,7 @@ require conf/distro/include/no-gplv3.inc
         arch = get_bb_var('SSTATE_PKGARCH')
         filename = os.path.join(lic_dir, arch, 'selftest-ed', 'generic_GPL-3.0-or-later')
         self.assertFalse(os.path.isfile(filename), msg="License file %s exists and shouldn't" % filename)
-        filename = os.path.join(lic_dir, arch, 'selftest-ed', 'generic_GPL-2.0-or-later')
+        filename = os.path.join(lic_dir, arch, 'selftest-ed', 'generic_GPL-2.0-only')
         self.assertTrue(os.path.isfile(filename), msg="License file %s doesn't exist" % filename)
 
     def test_setscene_only(self):

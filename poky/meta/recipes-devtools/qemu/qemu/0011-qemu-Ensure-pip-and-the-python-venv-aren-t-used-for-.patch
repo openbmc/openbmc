@@ -1,4 +1,4 @@
-From 68a13afd6606c2aaf1f0debd325d7314aaa61411 Mon Sep 17 00:00:00 2001
+From e0ae1256317af5157c44b7a56e045c3dbee8c923 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 22 May 2024 13:58:23 +0200
 Subject: [PATCH] qemu: Ensure pip and the python venv aren't used for meson
@@ -29,10 +29,10 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index af0bd2c66..88dab6a95 100755
+index 2c5ecd346..5315ede35 100755
 --- a/configure
 +++ b/configure
-@@ -944,14 +944,14 @@ python="$(command -v "$python")"
+@@ -969,14 +969,14 @@ python="$(command -v "$python")"
  echo "python determined to be '$python'"
  echo "python version: $($python --version)"
  

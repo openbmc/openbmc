@@ -1,4 +1,4 @@
-From 2237748af00467ad8250a7ccd944200f811db69a Mon Sep 17 00:00:00 2001
+From 3f1f1dc868accca37d2f276ed741884698b38538 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Thu, 12 Dec 2019 16:52:07 +0100
 Subject: [PATCH] tests: do not strip a helper library

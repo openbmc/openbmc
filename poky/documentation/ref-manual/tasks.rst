@@ -726,7 +726,7 @@ tool, which you then use to modify the kernel configuration.
            $ bitbake linux-yocto -c menuconfig
 
 
-See the ":ref:`kernel-dev/common:using \`\`menuconfig\`\``"
+See the ":ref:`kernel-dev/common:using ``menuconfig```"
 section in the Yocto Project Linux Kernel Development Manual for more
 information on this configuration tool.
 
@@ -750,7 +750,7 @@ which can then be applied by subsequent tasks such as
 
 Runs ``make menuconfig`` for the kernel. For information on
 ``menuconfig``, see the
-":ref:`kernel-dev/common:using \`\`menuconfig\`\``"
+":ref:`kernel-dev/common:using ``menuconfig```"
 section in the Yocto Project Linux Kernel Development Manual.
 
 .. _ref-tasks-savedefconfig:

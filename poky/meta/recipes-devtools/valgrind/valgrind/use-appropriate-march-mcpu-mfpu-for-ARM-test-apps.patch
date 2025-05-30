@@ -1,4 +1,4 @@
-From 2446e14216b6888dd39eed877bc6952c577b4e41 Mon Sep 17 00:00:00 2001
+From a5cd00f1c2d78e2a15f4a0c595f5ac10ca4c3290 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 19 Jan 2016 16:00:00 -0800
 Subject: [PATCH] use appropriate -march/-mcpu/-mfpu for ARM test apps

@@ -114,7 +114,8 @@ class TestSDK(TestSDKBase):
                 host_pkg_manifest=host_pkg_manifest, **context_args)
 
             try:
-                tc.loadTests(self.context_executor_class.default_cases)
+                modules = (d.getVar("TESTSDK_SUITES") or "").split()
+                tc.loadTests(self.context_executor_class.default_cases, modules)
             except Exception as e:
                 import traceback
                 bb.fatal("Loading tests failed:\n%s" % traceback.format_exc())

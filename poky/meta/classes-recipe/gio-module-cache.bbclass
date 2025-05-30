@@ -4,8 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-PACKAGE_WRITE_DEPS += "qemu-native"
-inherit qemu
+PACKAGE_WRITE_DEPS += "qemuwrapper-cross"
 
 GIO_MODULE_PACKAGES ??= "${PN}"
 

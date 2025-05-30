@@ -1,0 +1,60 @@
+From 1fa8ec110c67714cff009b481c430e3d004bfaad Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 27 Aug 2017 10:37:49 -0700
+Subject: [PATCH] libcxxabi: Find libunwind headers when
+ LIBCXXABI_LIBUNWIND_INCLUDES is set
+
+Currently, when LIBCXXABI_LIBUNWIND_INCLUDES is set via CMake arguments
+then it ends up not searching the specified dir and unwind.h is not found
+especially for ARM targets
+
+This patch makes the searching synthesized directories and then set
+LIBCXXABI_LIBUNWIND_INCLUDES if its there in environment
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libcxxabi/CMakeLists.txt | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/libcxxabi/CMakeLists.txt b/libcxxabi/CMakeLists.txt
+index 6dcfc51e5532..32478a62a058 100644
+--- a/libcxxabi/CMakeLists.txt
++++ b/libcxxabi/CMakeLists.txt
+@@ -465,7 +465,7 @@ set(LIBCXXABI_LIBUNWIND_PATH "${LIBCXXABI_LIBUNWIND_PATH}" CACHE PATH
+     "Specify path to libunwind source." FORCE)
+ 
+ if (LIBCXXABI_USE_LLVM_UNWINDER OR LLVM_NATIVE_ARCH MATCHES ARM)
+-  find_path(LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL libunwind.h
++  find_path(LIBCXXABI_LIBUNWIND_INCLUDES libunwind.h
+     PATHS ${LIBCXXABI_LIBUNWIND_INCLUDES}
+           ${LIBCXXABI_LIBUNWIND_PATH}/include
+           ${CMAKE_BINARY_DIR}/${LIBCXXABI_LIBUNWIND_INCLUDES}
+@@ -476,18 +476,23 @@ if (LIBCXXABI_USE_LLVM_UNWINDER OR LLVM_NATIVE_ARCH MATCHES ARM)
+     NO_CMAKE_FIND_ROOT_PATH
+   )
+ 
+-  if (LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL STREQUAL "LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL-NOTFOUND")
+-    set(LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL "")
++  if (LIBCXXABI_LIBUNWIND_INCLUDES STREQUAL "LIBCXXABI_LIBUNWIND_INCLUDES-NOTFOUND")
++    set(LIBCXXABI_LIBUNWIND_INCLUDES "")
+   endif()
+ endif()
+ 
+-if (NOT "${LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL}" STREQUAL "")
+-  include_directories("${LIBCXXABI_LIBUNWIND_INCLUDES_INTERNAL}")
++if (NOT "${LIBCXXABI_LIBUNWIND_INCLUDES}" STREQUAL "")
++  include_directories("${LIBCXXABI_LIBUNWIND_INCLUDES}")
+ endif()
+ 
+ add_custom_target(cxxabi-test-depends
+   COMMENT "Build dependencies required to run the libc++abi test suite.")
+ 
++set(LIBCXXABI_LIBUNWIND_INCLUDES "${LIBCXXABI_LIBUNWIND_INCLUDES}" CACHE PATH
++    "Specify path to libunwind includes." FORCE)
++set(LIBCXXABI_LIBUNWIND_PATH "${LIBCXXABI_LIBUNWIND_PATH}" CACHE PATH
++    "Specify path to libunwind source." FORCE)
++
+ # Add source code. This also contains all of the logic for deciding linker flags
+ # soname, etc...
+ add_subdirectory(include)

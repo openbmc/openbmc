@@ -23,7 +23,7 @@ inherit autotools pkgconfig multilib_header
 # Adapt autotools to work with the minimal autoconf usage in freetype
 AUTOTOOLS_SCRIPT_PATH = "${S}/builds/unix"
 CONFIGURE_SCRIPT = "${S}/configure"
-EXTRA_AUTORECONF += "--exclude=autoheader --exclude=automake"
+EXTRA_AUTORECONF += "--exclude=autoheader --exclude=automake -I ."
 
 PACKAGECONFIG ??= "zlib pixmap"
 

@@ -43,7 +43,7 @@ ROOTFS_POSTUNINSTALL_COMMAND =+ "write_image_manifest"
 POSTINST_LOGFILE ?= "${localstatedir}/log/postinstall.log"
 # Set default target for systemd images
 SYSTEMD_DEFAULT_TARGET ?= '${@bb.utils.contains_any("IMAGE_FEATURES", [ "x11-base", "weston" ], "graphical.target", "multi-user.target", d)}'
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "systemd", "set_systemd_default_target systemd_sysusers_check", "", d)}'
+ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "systemd", "set_systemd_default_target systemd_sysusers_check systemd_handle_machine_id", "", d)}'
 
 ROOTFS_POSTPROCESS_COMMAND += 'empty_var_volatile'
 
@@ -173,6 +173,23 @@ python systemd_sysusers_check() {
                     check_group_exists(d, sid)
 }
 
+systemd_handle_machine_id() {
+    if ${@bb.utils.contains("IMAGE_FEATURES", "read-only-rootfs", "true", "false", d)}; then
+        # Create machine-id
+        # 20:12 < mezcalero> koen: you have three options: a) run systemd-machine-id-setup at install time, b) have / read-only and an empty file there (for stateless) and c) boot with / writable
+        touch ${IMAGE_ROOTFS}${sysconfdir}/machine-id
+    fi
+    # In order to be backward compatible with the previous OE-core specific (re)implementation of systemctl
+    # we need to touch machine-id when handling presets and when the rootfs is NOT stateless
+    if ${@ 'true' if not bb.utils.contains('IMAGE_FEATURES', 'stateless-rootfs', True, False, d) else 'false'}; then
+        touch ${IMAGE_ROOTFS}${sysconfdir}/machine-id
+        if [ -e ${IMAGE_ROOTFS}${root_prefix}/lib/systemd/systemd ]; then
+            systemctl --root="${IMAGE_ROOTFS}" --preset-mode=enable-only preset-all
+            systemctl --root="${IMAGE_ROOTFS}" --global --preset-mode=enable-only preset-all
+        fi
+    fi
+}
+
 #
 # A hook function to support read-only-rootfs IMAGE_FEATURES
 #
@@ -223,12 +240,6 @@ read_only_rootfs_hook () {
 		if [ -x ${IMAGE_ROOTFS}/etc/init.d/populate-volatile.sh ]; then
 			${IMAGE_ROOTFS}/etc/init.d/populate-volatile.sh
 		fi
-	fi
-
-	if ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "true", "false", d)}; then
-	# Create machine-id
-	# 20:12 < mezcalero> koen: you have three options: a) run systemd-machine-id-setup at install time, b) have / read-only and an empty file there (for stateless) and c) boot with / writable
-		touch ${IMAGE_ROOTFS}${sysconfdir}/machine-id
 	fi
 }
 

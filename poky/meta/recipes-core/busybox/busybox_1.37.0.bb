@@ -53,6 +53,8 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-syslogd-fix-wrong-OPT_locallog-flag-detection.patch \
            file://0002-start-stop-daemon-fix-tests.patch \
            file://0003-start-stop-false.patch \
+           file://0001-archival-disallow-path-traversals-CVE-2023-39810.patch \
+           file://0001-hwclock-Check-for-SYS_settimeofday-before-calling-sy.patch \
            "
 SRC_URI:append:libc-musl = " file://musl.cfg"
 SRC_URI:append:x86-64 = " file://sha_accel.cfg"

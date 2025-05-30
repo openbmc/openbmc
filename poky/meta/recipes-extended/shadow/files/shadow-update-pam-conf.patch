@@ -15,7 +15,6 @@ Upstream-Status: Inappropriate [oe-core specific]
 
 Signed-off-by: Kang Kai <kai.kang@windriver.com>
 ---
- etc/pam.d/chage     | 2 +-
  etc/pam.d/chgpasswd | 2 +-
  etc/pam.d/groupadd  | 2 +-
  etc/pam.d/groupdel  | 2 +-
@@ -24,18 +23,8 @@ Signed-off-by: Kang Kai <kai.kang@windriver.com>
  etc/pam.d/useradd   | 2 +-
  etc/pam.d/userdel   | 2 +-
  etc/pam.d/usermod   | 2 +-
- 9 files changed, 9 insertions(+), 9 deletions(-)
+ 8 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/etc/pam.d/chage b/etc/pam.d/chage
-index 8f49f5c..b1f365d 100644
---- a/etc/pam.d/chage
-+++ b/etc/pam.d/chage
-@@ -1,4 +1,4 @@
- #%PAM-1.0
- auth		sufficient	pam_rootok.so
- account		required	pam_permit.so
--password	include		system-auth
-+password	include		common-password
 diff --git a/etc/pam.d/chgpasswd b/etc/pam.d/chgpasswd
 index 8f49f5c..b1f365d 100644
 --- a/etc/pam.d/chgpasswd
@@ -116,3 +105,6 @@ index 8f49f5c..b1f365d 100644
  account		required	pam_permit.so
 -password	include		system-auth
 +password	include		common-password
+-- 
+2.43.0
+

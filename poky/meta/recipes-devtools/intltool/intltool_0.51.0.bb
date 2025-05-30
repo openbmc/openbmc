@@ -11,7 +11,6 @@ SRC_URI = "http://launchpad.net/${BPN}/trunk/${PV}/+download/${BP}.tar.gz \
            file://remove-perl-check.patch \
            file://noperlcheck.patch \
            "
-SRC_URI[md5sum] = "12e517cac2b57a0121cda351570f1e63"
 SRC_URI[sha256sum] = "67c74d94196b153b774ab9f89b2fa6c6ba79352407037c8c14d5aeb334e959cd"
 
 UPSTREAM_CHECK_URI = "https://launchpad.net/intltool/trunk/"

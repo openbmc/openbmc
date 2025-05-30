@@ -1,4 +1,4 @@
-From a9292f711375c12c5135b207698e623e297b049b Mon Sep 17 00:00:00 2001
+From c878aaacadf8ec723be882f9335cb33240df13d6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 20 Apr 2017 10:11:16 -0700
 Subject: [PATCH] makefiles: Drop setting -mcpu to cortex-a8 on arm
@@ -19,7 +19,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/helgrind/tests/Makefile.am b/helgrind/tests/Makefile.am
-index d7101ed..670c29f 100755
+index 7adc5c6..cac23c9 100755
 --- a/helgrind/tests/Makefile.am
 +++ b/helgrind/tests/Makefile.am
 @@ -226,9 +226,9 @@ if ! VGCONF_PLATFORMS_INCLUDE_X86_DARWIN

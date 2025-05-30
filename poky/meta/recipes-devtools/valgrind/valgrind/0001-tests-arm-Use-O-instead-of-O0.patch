@@ -1,4 +1,4 @@
-From 0fba6bce02108b355a291f7dcb9497d0c7291e6b Mon Sep 17 00:00:00 2001
+From 8087ae8dcc46f3f81af58ed9b7176761b988ee61 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 10 May 2024 17:44:47 -0700
 Subject: [PATCH] tests/arm: Use -O instead of -O0

@@ -63,7 +63,7 @@ universal, the list includes them just in case:
       This term refers to the area used by the OpenEmbedded build system for
       builds. The area is created when you ``source`` the setup environment
       script that is found in the Source Directory
-      (i.e. :ref:`ref-manual/structure:\`\`oe-init-build-env\`\``). The
+      (i.e. :ref:`ref-manual/structure:``oe-init-build-env```). The
       :term:`TOPDIR` variable points to the :term:`Build Directory`.
 
       You have a lot of flexibility when creating the :term:`Build Directory`.
@@ -452,7 +452,7 @@ universal, the list includes them just in case:
      the Source Directory, if you do, the top-level directory name of the
      Source Directory is derived from the Yocto Project release tarball.
      For example, downloading and unpacking poky tarballs from
-     :yocto_dl:`/releases/yocto/&DISTRO_REL_TAG;/`
+     :yocto_dl:`/releases/yocto/&DISTRO_REL_LATEST_TAG;/`
      results in a Source Directory whose root folder is named poky.
 
 

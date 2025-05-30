@@ -15,7 +15,7 @@ diff --git a/Makefile.am b/Makefile.am
 index 4cb9a5c..8adcd7e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -27,6 +27,16 @@ check_PROGRAMS = \
+@@ -26,6 +26,16 @@ check_PROGRAMS = \
  	testparser \
  	testrecurse
  
@@ -29,6 +29,6 @@ index 4cb9a5c..8adcd7e 100644
 +	cp -r $(srcdir)/result $(DESTDIR)$(ptestdir)
 +	cp -r $(srcdir)/python/tests $(DESTDIR)$(ptestdir)/python
 +
- bin_PROGRAMS = xmllint xmlcatalog
+ bin_PROGRAMS = xmllint
  
  bin_SCRIPTS = xml2-config

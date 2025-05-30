@@ -35,7 +35,6 @@ setuptools3_legacy_do_configure() {
 
 setuptools3_legacy_do_compile() {
         cd ${SETUPTOOLS_SETUP_PATH}
-        NO_FETCH_BUILD=1 \
         STAGING_INCDIR=${STAGING_INCDIR} \
         STAGING_LIBDIR=${STAGING_LIBDIR} \
         ${STAGING_BINDIR_NATIVE}/python3-native/python3 setup.py \

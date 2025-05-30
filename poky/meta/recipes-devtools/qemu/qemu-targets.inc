@@ -7,6 +7,12 @@ def get_qemu_target_list(d):
     import bb
     archs = d.getVar('QEMU_TARGETS').split()
     tos = d.getVar('HOST_OS')
+    tarch = d.getVar('HOST_ARCH')
+    # 32 bit hosts can't handle 64 bit targets
+    if "64" not in tarch:
+        for arch in archs.copy():
+            if "64" in arch:
+                archs.remove(arch)
     softmmuonly = ""
     for arch in ['ppcemb', 'lm32']:
         if arch in archs:

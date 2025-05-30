@@ -1,0 +1,43 @@
+From 6b6a518bc7686af7680f45fcdea7c414a22a2f53 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 21 Feb 2023 12:46:10 -0800
+Subject: [PATCH] compiler-rt: Undef _TIME_BITS along with _FILE_OFFSET_BITS in
+ sanitizers
+
+On 32bit systems using 64bit time_t build fails because
+_FILE_OFFSET_BITS is undefined here but _TIME_BITS is still set to 64
+
+Fixes
+In file included from compiler-rt/lib/sanitizer_common/sanitizer_procmaps_solaris.cpp:17:
+In file included from compiler-rt/lib/sanitizer_common/sanitizer_platform.h:25:
+In file included from /usr/include/features.h:393:
+/usr/include/features-time64.h:26:5: error: "_TIME_BITS=64 is allowed only with _FILE_OFFSET_BITS=64"
+    ^
+1 error generated.
+
+Upstream-Status: Submitted [https://reviews.llvm.org/D144514]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ compiler-rt/lib/sanitizer_common/sanitizer_platform.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_platform.h b/compiler-rt/lib/sanitizer_common/sanitizer_platform.h
+index 57966403c92a..efa83f30eca0 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_platform.h
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_platform.h
+@@ -22,6 +22,15 @@
+ // function declarations into a .S file which doesn't compile.
+ // https://crbug.com/1162741
+ #if __has_include(<features.h>) && !defined(__ANDROID__)
++// Some sources undefine _FILE_OFFSET_BITS deliberately e.g.
++// sanitizer_procmaps_solaris.cpp. This is problematic on glibc systems with
++// 32-bit architectures using 64-bit time_t and users passing _TIME_BITS=64
++// from build environment, therefore both _FILE_OFFSET_BITS and _TIME_BITS
++// need to be undefined together since features.h will check for both being 64
++// if one is set to 64.
++#  if !defined(_FILE_OFFSET_BITS)
++#    undef _TIME_BITS
++#  endif
+ #  include <features.h>
+ #endif
+ 

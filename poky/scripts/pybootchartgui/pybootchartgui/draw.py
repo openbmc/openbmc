@@ -69,6 +69,11 @@ CPU_COLOR = (0.40, 0.55, 0.70, 1.0)
 IO_COLOR = (0.76, 0.48, 0.48, 0.5)
 # Disk throughput color.
 DISK_TPUT_COLOR = (0.20, 0.71, 0.20, 1.0)
+
+BYTES_RECEIVED_COLOR = (0.0, 0.0, 1.0, 1.0)
+BYTES_TRANSMITTED_COLOR = (1.0, 0.0, 0.0, 1.0)
+BYTES_RECEIVE_DIFF_COLOR = (0.0, 0.0, 1.0, 0.3)
+BYTES_TRANSMIT_DIFF_COLOR = (1.0, 0.0, 0.0, 0.3)
 # CPU load chart color.
 FILE_OPEN_COLOR = (0.20, 0.71, 0.71, 1.0)
 # Mem cached color
@@ -436,6 +441,49 @@ def render_charts(ctx, options, clip, trace, curr_y, w, h, sec_w):
         draw_text (ctx, label, DISK_TPUT_COLOR, pos_x + shift_x, curr_y + shift_y)
 
         curr_y = curr_y + 30 + bar_h
+
+    if trace.net_stats:
+        for iface, samples in trace.net_stats.items():
+            max_received_sample = max(samples, key=lambda s: s.received_bytes)
+            max_transmitted_sample = max(samples, key=lambda s: s.transmitted_bytes)
+            max_receive_diff_sample = max(samples, key=lambda s: s.receive_diff)
+            max_transmit_diff_sample = max(samples, key=lambda s: s.transmit_diff)
+
+            draw_text(ctx, "Iface: %s" % (iface), TEXT_COLOR, off_x, curr_y+20)
+            draw_legend_line(ctx, "Bytes received (max %d)" % (max_received_sample.received_bytes),
+                             BYTES_RECEIVED_COLOR, off_x+150, curr_y+20, leg_s)
+            draw_legend_line(ctx, "Bytes transmitted (max %d)" % (max_transmitted_sample.transmitted_bytes),
+                             BYTES_TRANSMITTED_COLOR, off_x+400, curr_y+20, leg_s)
+            draw_legend_box(ctx, "Bytes receive diff (max %d)" % (max_receive_diff_sample.receive_diff),
+                             BYTES_RECEIVE_DIFF_COLOR, off_x+650, curr_y+20, leg_s)
+            draw_legend_box(ctx, "Bytes transmit diff (max %d)" % (max_transmit_diff_sample.transmit_diff),
+                             BYTES_TRANSMIT_DIFF_COLOR, off_x+900, curr_y+20, leg_s)
+
+
+            chart_rect = (off_x, curr_y + 30, w, bar_h)
+            if clip_visible(clip, chart_rect):
+                draw_box_ticks(ctx, chart_rect, sec_w)
+                draw_annotations(ctx, proc_tree, trace.times, chart_rect)
+
+            if clip_visible (clip, chart_rect):
+                draw_chart (ctx, BYTES_RECEIVED_COLOR, False, chart_rect, \
+                        [(sample.time, sample.received_bytes) for sample in samples], \
+                        proc_tree, None)
+
+                draw_chart (ctx, BYTES_TRANSMITTED_COLOR, False, chart_rect, \
+                        [(sample.time, sample.transmitted_bytes) for sample in samples], \
+                        proc_tree, None)
+
+            if clip_visible (clip, chart_rect):
+                draw_chart (ctx, BYTES_RECEIVE_DIFF_COLOR, True, chart_rect, \
+                        [(sample.time, sample.receive_diff) for sample in samples], \
+                        proc_tree, None)
+
+                draw_chart (ctx, BYTES_TRANSMIT_DIFF_COLOR, True, chart_rect, \
+                        [(sample.time, sample.transmit_diff) for sample in samples], \
+                        proc_tree, None)
+
+            curr_y = curr_y + 30 + bar_h
 
     # render CPU pressure chart
     if trace.cpu_pressure:

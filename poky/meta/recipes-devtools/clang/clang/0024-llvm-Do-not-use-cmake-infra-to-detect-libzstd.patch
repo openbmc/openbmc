@@ -1,0 +1,62 @@
+From 9cf5cc6d4378ad7918f338aa65ce79178d8a84f2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 12 Aug 2022 11:50:57 -0700
+Subject: [PATCH] llvm: Do not use cmake infra to detect libzstd
+
+OE's version is build using plain make not cmake as a result we do not
+have the cmake support files and this probing method can get this info
+from build host and force linking with libzstd from /usr/lib which is
+not what we want when cross building.
+
+Fixes errors building llvm-config like
+/usr/lib/libzstd.so.1.5.2: error adding symbols: file in wrong
+format
+| clang-15: error: linker command failed with exit code 1 (use -v to see invocation)
+| ninja: build stopped: subcommand failed.
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ llvm/lib/Support/CMakeLists.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/lib/Support/CMakeLists.txt b/llvm/lib/Support/CMakeLists.txt
+index a6d8a2581886..5b461547bdde 100644
+--- a/llvm/lib/Support/CMakeLists.txt
++++ b/llvm/lib/Support/CMakeLists.txt
+@@ -22,7 +22,7 @@ if (HAS_WERROR_GLOBAL_CTORS)
+ endif()
+ 
+ if(LLVM_ENABLE_ZLIB)
+-  list(APPEND imported_libs ZLIB::ZLIB)
++  list(APPEND imported_libs z)
+ endif()
+ 
+ if(LLVM_ENABLE_ZSTD)
+@@ -34,7 +34,7 @@ if(LLVM_ENABLE_ZSTD)
+ endif()
+ 
+ if(LLVM_ENABLE_ZSTD)
+-  list(APPEND imported_libs ${zstd_target})
++  list(APPEND imported_libs zstd)
+ endif()
+ 
+ if( WIN32 )
+@@ -325,7 +325,7 @@ if(LLVM_ENABLE_ZLIB)
+     get_property(zlib_library TARGET ZLIB::ZLIB PROPERTY LOCATION)
+   endif()
+   get_library_name(${zlib_library} zlib_library)
+-  set(llvm_system_libs ${llvm_system_libs} "${zlib_library}")
++  set(llvm_system_libs ${llvm_system_libs} z)
+ endif()
+ 
+ if(LLVM_ENABLE_ZSTD)
+@@ -339,7 +339,7 @@ if(LLVM_ENABLE_ZSTD)
+   endif()
+   if (zstd_target STREQUAL zstd::libzstd_shared)
+     get_library_name(${zstd_library} zstd_library)
+-    set(llvm_system_libs ${llvm_system_libs} "${zstd_library}")
++    set(llvm_system_libs ${llvm_system_libs} zstd)
+   else()
+     set(llvm_system_libs ${llvm_system_libs} "${zstd_STATIC_LIBRARY}")
+   endif()

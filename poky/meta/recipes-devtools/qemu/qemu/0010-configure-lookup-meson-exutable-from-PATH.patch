@@ -1,4 +1,4 @@
-From 2e9642b9001df523628ab2cacbbbf2b208c49437 Mon Sep 17 00:00:00 2001
+From 9067e464685cb503d58a07520769a49c5f9f2e47 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
 Date: Wed, 22 May 2024 14:02:55 +0200
 Subject: [PATCH] configure: lookup meson exutable from PATH
@@ -9,10 +9,10 @@ Upstream-Status: Inappropriate [workaround, would need a real fix for upstream]
  1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/configure b/configure
-index d08b71f14..af0bd2c66 100755
+index 02f1dd231..2c5ecd346 100755
 --- a/configure
 +++ b/configure
-@@ -958,12 +958,7 @@ mkvenv="$python ${source_path}/python/scripts/mkvenv.py"
+@@ -983,12 +983,7 @@ mkvenv="$python ${source_path}/python/scripts/mkvenv.py"
  $mkvenv ensuregroup --dir "${source_path}/python/wheels" \
       ${source_path}/pythondeps.toml meson || exit 1
  

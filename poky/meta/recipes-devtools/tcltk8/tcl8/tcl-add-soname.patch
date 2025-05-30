@@ -3,7 +3,7 @@ From: Richard Purdie <rpurdie@linux.intel.com>
 Date: Wed, 9 Dec 2009 23:59:44 +0000
 Subject: [PATCH] tcl: Add tcltk from OE.dev but with legacy staging function
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [tcl 8.x is obsolete; upstream submission should be for 9.x patches]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  unix/Makefile.in | 5 ++++-

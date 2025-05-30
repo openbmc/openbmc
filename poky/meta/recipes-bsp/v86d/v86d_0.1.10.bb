@@ -14,7 +14,6 @@ SRC_URI = "http://snapshot.debian.org/archive/debian/20110427T035506Z/pool/main/
            file://Support-for-cross-compilation.patch \
 "
 
-SRC_URI[md5sum] = "889686ec8424468fe0d205742e77a4c2"
 SRC_URI[sha256sum] = "93575c82e4307d8c4c370ec6b767f5cf87e527b2378146d652a6d8e25d5bdbc5"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

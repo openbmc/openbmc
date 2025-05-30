@@ -1,4 +1,4 @@
-From 4dddd9e533847f07327cde9a062fc7cbba9d5584 Mon Sep 17 00:00:00 2001
+From c287382a1f3dd9f2db3df54dde54b4b266791bb9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 10 Jun 2017 00:46:39 -0700
 Subject: [PATCH] sigqueue: Rename _sifields to __si_fields on musl

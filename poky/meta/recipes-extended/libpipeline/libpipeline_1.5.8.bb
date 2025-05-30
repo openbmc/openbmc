@@ -10,5 +10,3 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/libpipeline/libpipeline-${PV}.tar.gz"
 SRC_URI[sha256sum] = "1b1203ca152ccd63983c3f2112f7fe6fa5afd453218ede5153d1b31e11bb8405"
 
 inherit pkgconfig autotools
-
-acpaths = "-I ${S}/gl/m4 -I ${S}/m4"

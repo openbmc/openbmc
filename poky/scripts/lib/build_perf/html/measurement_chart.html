@@ -40,7 +40,7 @@
       trigger: 'axis',
       enterable: true,
       position: function (point, params, dom, rect, size) {
-        return [point[0]+20, '10%'];
+        return [point[0], '0%'];
       },
       formatter: function (param) {
         const value = param[0].value[1]
@@ -82,7 +82,6 @@
       {
         name: '{{ measurement.value_type.quantity }}',
         type: 'line',
-        step: 'start',
         symbol: 'none',
         data: data
       }
@@ -94,7 +93,7 @@
       trigger: 'axis',
       enterable: true,
       position: function (point, params, dom, rect, size) {
-        return [point[0]+20, '10%'];
+        return [point[0], '0%'];
       },
       formatter: function (param) {
         const value = param[0].value
@@ -137,7 +136,6 @@
       {
         name: '{{ measurement.value_type.quantity }}',
         type: 'line',
-        step: 'start',
         symbol: 'none',
         data: commitCountData
       }

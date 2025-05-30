@@ -57,8 +57,8 @@ logger = scriptutils.logger_create(PROGNAME, stream=sys.stdout)
 
 DEFAULT_INSTALL_DIR = os.path.join(os.path.split(scripts_path)[0],'buildtools')
 DEFAULT_BASE_URL = 'https://downloads.yoctoproject.org/releases/yocto'
-DEFAULT_RELEASE = 'yocto-5.1.1'
-DEFAULT_INSTALLER_VERSION = '5.1.1'
+DEFAULT_RELEASE = 'yocto-5.2'
+DEFAULT_INSTALLER_VERSION = '5.2'
 DEFAULT_BUILDDATE = '202110XX'
 
 # Python version sanity check
@@ -141,6 +141,9 @@ def main():
     parser.add_argument('-d', '--directory',
                         default=DEFAULT_INSTALL_DIR,
                         help='directory where buildtools SDK will be installed (optional)',
+                        action='store')
+    parser.add_argument('--downloads-directory',
+                        help='use this directory for tarball/checksum downloads and do not erase them (default is a temporary directory which is deleted after unpacking and installing the buildtools)',
                         action='store')
     parser.add_argument('-r', '--release',
                         default=DEFAULT_RELEASE,
@@ -235,11 +238,14 @@ def main():
                 safe_filename = quote(filename)
                 buildtools_url = "%s/%s/buildtools/%s" % (base_url, args.release, safe_filename)
 
-    tmpsdk_dir = tempfile.mkdtemp()
+    sdk_dir = args.downloads_directory or tempfile.mkdtemp()
+    os.makedirs(sdk_dir, exist_ok=True)
     try:
         # Fetch installer
         logger.info("Fetching buildtools installer")
-        tmpbuildtools = os.path.join(tmpsdk_dir, filename)
+        tmpbuildtools = os.path.join(sdk_dir, filename)
+        with open(os.path.join(sdk_dir, 'buildtools_url'), 'w') as f:
+            f.write(buildtools_url)
         ret = subprocess.call("wget -q -O %s %s" %
                               (tmpbuildtools, buildtools_url), shell=True)
         if ret != 0:
@@ -250,13 +256,15 @@ def main():
         if args.check:
             logger.info("Fetching buildtools installer checksum")
             checksum_type = "sha256sum"
-            check_url = "{}.{}".format(buildtools_url, checksum_type)
+            checksum_url = "{}.{}".format(buildtools_url, checksum_type)
             checksum_filename = "{}.{}".format(filename, checksum_type)
-            tmpbuildtools_checksum = os.path.join(tmpsdk_dir, checksum_filename)
+            tmpbuildtools_checksum = os.path.join(sdk_dir, checksum_filename)
+            with open(os.path.join(sdk_dir, 'checksum_url'), 'w') as f:
+                f.write(checksum_url)
             ret = subprocess.call("wget -q -O %s %s" %
-                                    (tmpbuildtools_checksum, check_url), shell=True)
+                                    (tmpbuildtools_checksum, checksum_url), shell=True)
             if ret != 0:
-                logger.error("Could not download file from %s" % check_url)
+                logger.error("Could not download file from %s" % checksum_url)
                 return ret
             regex = re.compile(r"^(?P<checksum>[0-9a-f]+)\s+(?P<path>.*/)?(?P<filename>.*)$")
             with open(tmpbuildtools_checksum, 'rb') as f:
@@ -347,7 +355,8 @@ def main():
 
     finally:
         # cleanup tmp directory
-        shutil.rmtree(tmpsdk_dir)
+        if not args.downloads_directory:
+            shutil.rmtree(sdk_dir)
 
 
 if __name__ == '__main__':

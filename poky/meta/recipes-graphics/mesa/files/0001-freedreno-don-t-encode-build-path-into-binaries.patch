@@ -22,18 +22,29 @@ diff --git a/src/freedreno/afuc/meson.build b/src/freedreno/afuc/meson.build
 index bb7cebf5a748..351cc31ef2de 100644
 --- a/src/freedreno/afuc/meson.build
 +++ b/src/freedreno/afuc/meson.build
-@@ -56,6 +56,7 @@ if with_tests
+@@ -56,10 +56,12 @@ if with_tests
    asm_fw = custom_target('afuc_test.fw',
      output: 'afuc_test.fw',
-     command: [asm, '-g', '6', files('../.gitlab-ci/traces/afuc_test.asm'), '@OUTPUT@'],
+     command: [asm, files('../.gitlab-ci/traces/afuc_test.asm'), '@OUTPUT@'],
++    env: {'RNN_PATH': rnn_src_path},
+   )
+   asm_fw_a7xx = custom_target('afuc_test_a7xx.fw',
+     output: 'afuc_test_a7xx.fw',
+     command: [asm, files('../.gitlab-ci/traces/afuc_test_a7xx.asm'), '@OUTPUT@'],
 +    env: {'RNN_PATH': rnn_src_path},
    )
    test('afuc-asm',
      diff,
-@@ -120,6 +122,7 @@ if cc.sizeof('size_t') > 4
+@@ -120,11 +122,13 @@ if cc.sizeof('size_t') > 4
      disasm_fw = custom_target('afuc_test.asm',
        output: 'afuc_test.asm',
-       command: [disasm, '-u', files('../.gitlab-ci/reference/afuc_test.fw'), '-g', '630'],
+       command: [disasm, '-u', files('../.gitlab-ci/reference/afuc_test.fw')],
++      env: {'RNN_PATH': rnn_src_path},
+       capture: true
+     )
+     disasm_fw_a7xx = custom_target('afuc_test_a7xx.asm',
+       output: 'afuc_test_a7xx.asm',
+       command: [disasm, '-u', files('../.gitlab-ci/reference/afuc_test_a7xx.fw')],
 +      env: {'RNN_PATH': rnn_src_path},
        capture: true
      )
@@ -71,8 +82,29 @@ index 98e49b8fcf0e..145e72597eb9 100644
 -rnn_path = rnn_src_path + ':' + get_option('prefix') + '/' + rnn_install_path
 +rnn_path = get_option('prefix') + '/' + rnn_install_path
  
- dep_lua = dependency('lua54', 'lua53', 'lua52', 'lua', required: false,
-                      allow_fallback: true, version: '>=5.2')
--- 
+ dep_libarchive = dependency('libarchive', allow_fallback: true, required: false)
+ dep_libxml2 = dependency('libxml-2.0', allow_fallback: true, required: false)
+diff --git a/src/freedreno/registers/gen_header.py b/src/freedreno/registers/gen_header.py
+--- a/src/freedreno/registers/gen_header.py
++++ b/src/freedreno/registers/gen_header.py
+@@ -885,13 +885,14 @@ The rules-ng-ng source files this header
+ """)
+ 	maxlen = 0
+ 	for filepath in p.xml_files:
+-		maxlen = max(maxlen, len(filepath))
++		maxlen = max(maxlen, len(os.path.basename(filepath)))
+ 	for filepath in p.xml_files:
+-		pad = " " * (maxlen - len(filepath))
++		filename = os.path.basename(filepath)
++		pad = " " * (maxlen - len(filename))
+ 		filesize = str(os.path.getsize(filepath))
+ 		filesize = " " * (7 - len(filesize)) + filesize
+ 		filetime = time.ctime(os.path.getmtime(filepath))
+-		print("- " + filepath + pad + " (" + filesize + " bytes, from " + filetime + ")")
++		print("- " + filename + pad + " (" + filesize + " bytes, from " + filetime + ")")
+ 	if p.copyright_year:
+ 		current_year = str(datetime.date.today().year)
+ 		print()
+---
 2.39.2
 

@@ -30,7 +30,7 @@ WICVARS ?= "\
 	KERNEL_CONSOLE \
 	KERNEL_IMAGETYPE \
 	MACHINE \
-	PSEUDO_IGNORE_PATHS \
+	PSEUDO_INCLUDE_PATHS \
 	RECIPE_SYSROOT_NATIVE \
 	ROOTFS_SIZE \
 	STAGING_DATADIR \
@@ -95,8 +95,6 @@ IMAGE_CMD:wic () {
 IMAGE_CMD:wic[vardepsexclude] = "WKS_FULL_PATH WKS_FILES TOPDIR"
 SPDX_IMAGE_PURPOSE:wic = "diskImage"
 do_image_wic[cleandirs] = "${WORKDIR}/build-wic"
-
-PSEUDO_IGNORE_PATHS .= ",${WORKDIR}/build-wic"
 
 # Rebuild when the wks file or vars in WICVARS change
 USING_WIC = "${@bb.utils.contains_any('IMAGE_FSTYPES', 'wic ' + ' '.join('wic.%s' % c for c in '${CONVERSIONTYPES}'.split()), '1', '', d)}"

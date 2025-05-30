@@ -1,6 +1,6 @@
-From 838daab44918ef738402a2dd069537c6ac519305 Mon Sep 17 00:00:00 2001
+From f7c26bbbf0496d179f5e71107fe6cf1320b25901 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Mon, 8 Mar 2021 16:04:20 -0800
+Date: Thu, 23 Jan 2025 17:12:51 -0800
 Subject: [PATCH] gcc: poison-system-directories
 
 Add /sw/include and /opt/include based on the original
@@ -13,23 +13,23 @@ wants this to be a failure, they can add "-Werror=poison-system-directories".
 
 Upstream-Status: Inappropriate [OE configuration]
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
-Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: sunil dora <sunilkumar.dora@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  gcc/common.opt      |  4 ++++
  gcc/config.in       | 10 ++++++++++
  gcc/configure       | 19 +++++++++++++++++++
  gcc/configure.ac    | 16 ++++++++++++++++
  gcc/doc/invoke.texi |  9 +++++++++
- gcc/gcc.cc          |  9 +++++++--
+ gcc/gcc.cc          | 12 ++++++++++--
  gcc/incpath.cc      | 25 +++++++++++++++++++++++++
- 7 files changed, 90 insertions(+), 2 deletions(-)
+ 7 files changed, 93 insertions(+), 2 deletions(-)
 
 diff --git a/gcc/common.opt b/gcc/common.opt
-index ad348844775..df3992b420d 100644
+index e3fa0dacec4..bea1adc0940 100644
 --- a/gcc/common.opt
 +++ b/gcc/common.opt
-@@ -715,6 +715,10 @@ Wreturn-local-addr
+@@ -729,6 +729,10 @@ Wreturn-local-addr
  Common Var(warn_return_local_addr) Init(1) Warning
  Warn about returning a pointer/reference to a local or temporary variable.
  
@@ -41,7 +41,7 @@ index ad348844775..df3992b420d 100644
  Common Var(warn_shadow) Warning
  Warn when one variable shadows another.  Same as -Wshadow=global.
 diff --git a/gcc/config.in b/gcc/config.in
-index f3de4ba6776..3ce3113510b 100644
+index a79c51adb2b..8a531ed591c 100644
 --- a/gcc/config.in
 +++ b/gcc/config.in
 @@ -249,6 +249,16 @@
@@ -62,10 +62,10 @@ index f3de4ba6776..3ce3113510b 100644
     optimizer and back end) to be checked for dynamic type safety at runtime.
     This is quite expensive. */
 diff --git a/gcc/configure b/gcc/configure
-index abc8bfdc244..d3fa80408f4 100755
+index 16965953f05..0f4a5d52c30 100755
 --- a/gcc/configure
 +++ b/gcc/configure
-@@ -1050,6 +1050,7 @@ enable_maintainer_mode
+@@ -1051,6 +1051,7 @@ enable_maintainer_mode
  enable_link_mutex
  enable_link_serialization
  enable_version_specific_runtime_libs
@@ -73,7 +73,7 @@ index abc8bfdc244..d3fa80408f4 100755
  enable_plugin
  enable_host_shared
  enable_host_pie
-@@ -1823,6 +1824,8 @@ Optional Features:
+@@ -1828,6 +1829,8 @@ Optional Features:
    --enable-version-specific-runtime-libs
                            specify that runtime libraries should be installed
                            in a compiler-specific directory
@@ -82,7 +82,7 @@ index abc8bfdc244..d3fa80408f4 100755
    --enable-plugin         enable plugin support
    --enable-host-shared    build host code as shared libraries
    --enable-host-pie       build host code as PIE
-@@ -34028,6 +34031,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
+@@ -34027,6 +34030,22 @@ if test "${enable_version_specific_runtime_libs+set}" = set; then :
  fi
  
  
@@ -106,10 +106,10 @@ index abc8bfdc244..d3fa80408f4 100755
  
  
 diff --git a/gcc/configure.ac b/gcc/configure.ac
-index 1d2cefa3f6a..2760b6c540c 100644
+index 9f67e62950a..b0e3615e5aa 100644
 --- a/gcc/configure.ac
 +++ b/gcc/configure.ac
-@@ -7527,6 +7527,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
+@@ -7502,6 +7502,22 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
                  [specify that runtime libraries should be
                   installed in a compiler-specific directory])])
  
@@ -133,20 +133,20 @@ index 1d2cefa3f6a..2760b6c540c 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index f82f7d2817b..1da91813b0e 100644
+index c2e1bf8031b..d33e2042f38 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
-@@ -391,6 +391,7 @@ Objective-C and Objective-C++ Dialects}.
+@@ -405,6 +405,7 @@ Objective-C and Objective-C++ Dialects}.
  -Wpacked  -Wno-packed-bitfield-compat  -Wpacked-not-aligned  -Wpadded
  -Wparentheses  -Wno-pedantic-ms-format
  -Wpointer-arith  -Wno-pointer-compare  -Wno-pointer-to-int-cast
 +-Wno-poison-system-directories
- -Wno-pragmas  -Wno-prio-ctor-dtor  -Wredundant-decls
- -Wrestrict  -Wno-return-local-addr  -Wreturn-type
- -Wno-scalar-storage-order  -Wsequence-point
-@@ -8861,6 +8862,14 @@ made up of data only and thus requires no special treatment.  But, for
- most targets, it is made up of code and thus requires the stack to be
- made executable in order for the program to work properly.
+ -Wno-pragmas  -Wno-pragma-once-outside-header  -Wno-prio-ctor-dtor
+ -Wno-psabi
+ -Wredundant-decls  -Wrestrict
+@@ -10727,6 +10728,14 @@ an error. @option{Wint-to-pointer-cast} is enabled by default.
+ Suppress warnings from casts from a pointer to an integer type of a
+ different size.
  
 +@opindex Wno-poison-system-directories
 +@item -Wno-poison-system-directories
@@ -156,14 +156,14 @@ index f82f7d2817b..1da91813b0e 100644
 +directories contain the correct headers and libraries for the target
 +system rather than the host.
 +
- @opindex Wfloat-equal
- @opindex Wno-float-equal
- @item -Wfloat-equal
+ @opindex Winvalid-pch
+ @opindex Wno-invalid-pch
+ @item -Winvalid-pch
 diff --git a/gcc/gcc.cc b/gcc/gcc.cc
-index 728332b8153..a63f128cb95 100644
+index 4fd87f2c4a1..79d4920a047 100644
 --- a/gcc/gcc.cc
 +++ b/gcc/gcc.cc
-@@ -902,6 +902,12 @@ proper position among the other output files.  */
+@@ -909,6 +909,12 @@ proper position among the other output files.  */
  #define ASM_MAP ""
  #endif
  
@@ -176,7 +176,7 @@ index 728332b8153..a63f128cb95 100644
  /* Assembler options for compressed debug sections.  */
  #if HAVE_LD_COMPRESS_DEBUG == 0
  /* Reject if the linker cannot write compressed debug sections.  */
-@@ -1159,6 +1163,8 @@ proper position among the other output files.  */
+@@ -1166,6 +1172,8 @@ proper position among the other output files.  */
     "%{fuse-ld=*:-fuse-ld=%*} " LINK_COMPRESS_DEBUG_SPEC \
     "%X %{o*} %{e*} %{N} %{n} %{r}\
      %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!r:%{!nostartfiles:%S}}} \
@@ -185,7 +185,7 @@ index 728332b8153..a63f128cb95 100644
      %{static|no-pie|static-pie:} %@{L*} %(link_libgcc) " \
      VTABLE_VERIFICATION_SPEC " " SANITIZER_EARLY_SPEC " %o "" \
      %{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*:%*} 1):\
-@@ -1261,7 +1267,7 @@ static const char *cpp_options =
+@@ -1268,7 +1276,7 @@ static const char *cpp_options =
  "%(cpp_unique_options) %1 %{m*} %{std*&ansi&trigraphs} %{W*&pedantic*} %{w}\
   %{f*} %{g*:%{%:debug-level-gt(0):%{g*}\
   %{!fno-working-directory:-fworking-directory}}} %{O*}\
@@ -194,9 +194,9 @@ index 728332b8153..a63f128cb95 100644
  
  /* Pass -d* flags, possibly modifying -dumpdir, -dumpbase et al.
  
-@@ -1290,7 +1296,7 @@ static const char *cc1_options =
+@@ -1297,7 +1305,7 @@ static const char *cc1_options =
   %{coverage:-fprofile-arcs -ftest-coverage}\
-  %{fprofile-arcs|fcondition-coverage|fprofile-generate*|coverage:\
+  %{fprofile-arcs|fcondition-coverage|fpath-coverage|fprofile-generate*|coverage:\
     %{!fprofile-update=single:\
 -     %{pthread:-fprofile-update=prefer-atomic}}}";
 +     %{pthread:-fprofile-update=prefer-atomic}}}" POISON_IS_ERROR;
@@ -204,7 +204,7 @@ index 728332b8153..a63f128cb95 100644
  static const char *asm_options =
  "%{-target-help:%:print-asm-header()} "
 diff --git a/gcc/incpath.cc b/gcc/incpath.cc
-index 64cdd2f4a..89f42900d 100644
+index c1bbfd3872a..2cdbebc4c50 100644
 --- a/gcc/incpath.cc
 +++ b/gcc/incpath.cc
 @@ -26,6 +26,7 @@
@@ -216,19 +216,19 @@ index 64cdd2f4a..89f42900d 100644
  /* Microsoft Windows does not natively support inodes.
     VMS has non-numeric inodes.  */
 @@ -273,6 +274,10 @@ remove_duplicates (cpp_reader *pfile, struct cpp_dir *head,
-			     cur->name, xstrerror (errno));
-	      reason = REASON_NOENT;
-	    }
+ 			     cur->name, xstrerror (errno));
+ 	      reason = REASON_NOENT;
+ 	    }
 +#ifdef ENABLE_POISON_SYSTEM_DIRECTORIES
 +	  pcur = &cur->next;
 +	  continue;
 +#endif
-	}
-       else if (!S_ISDIR (st.st_mode))
-	cpp_error_with_line (pfile, CPP_DL_WARNING, 0, 0,
-@@ -399,6 +404,26 @@ merge_include_chains (const char *sysroot, cpp_reader *pfile, int verbose)
  	}
-       fprintf (stderr, _("End of search list.\n"));
+       else if (!S_ISDIR (st.st_mode))
+ 	cpp_error_with_line (pfile, CPP_DL_WARNING, 0, 0,
+@@ -411,6 +416,26 @@ merge_include_chains (const char *sysroot, cpp_reader *pfile, int verbose)
+ 	  fprintf (stderr, _("End of #embed search list.\n"));
+ 	}
      }
 +
 +#ifdef ENABLE_POISON_SYSTEM_DIRECTORIES
@@ -253,5 +253,3 @@ index 64cdd2f4a..89f42900d 100644
  }
  
  /* Use given -I paths for #include "..." but not #include <...>, and
---
-2.34.1

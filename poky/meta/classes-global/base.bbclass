@@ -464,7 +464,7 @@ python () {
             if "DEPENDS" in varname or varname.startswith("RRECOMMENDS"):
                 if bb.data.inherits_class('nativesdk', d) or bb.data.inherits_class('cross-canadian', d) :
                     appends = expandFilter(appends, "", "nativesdk-")
-                elif bb.data.inherits_class('native', d):
+                elif bb.data.inherits_class('native', d) or bb.data.inherits_class('cross', d):
                     appends = expandFilter(appends, "-native", "")
                 elif mlprefix:
                     appends = expandFilter(appends, "", mlprefix)

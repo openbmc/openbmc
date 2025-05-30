@@ -1,0 +1,228 @@
+rust: oe-selftest issue fix with v1.82
+
+A new feature "Link std statically in rustc_driver" was introduced 
+in rust_1.82 [https://github.com/rust-lang/rust/pull/122362],and 
+which is causing the below failure in oe-selftest.
+
+Running unittests src/main.rs (build/x86_64-unknown-linux-gnu/stage1-rustc/
+x86_64-poky-linux-gnu/release/deps/rustc_main-92223b15c9f2d827)
+uploaded ".../build/x86_64-unknown-linux-gnu/stage1-rustc/x86_64-poky-linux-gnu/
+release/deps/rustc_main-92223b15c9f2d827", waiting for result
+/tmp/work/test4056/rustc_main-92223b15c9f2d827: error while loading shared 
+libraries: librustc_driver-fb0866b1cd913c20.so: cannot open shared object file: No 
+such file or directory
+
+The rustc_main binary depends on the librustc_driver-*.so file. However, 
+this file has not been copied to QEMU. If we manually copy the file into 
+QEMU and export the LD_LIBRARY_PATH, the issue does not occur. Issue 
+reprorted to upstream and reverted the buggy code as a workaround.
+
+Upstream-Status: Inappropriate [reported at https://github.com/rust-lang/rust/issues/136237]
+
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+diff --git a/compiler/rustc/src/main.rs b/compiler/rustc/src/main.rs
+index e9a7397557..29766fc9d8 100644
+--- a/compiler/rustc/src/main.rs
++++ b/compiler/rustc/src/main.rs
+@@ -1,5 +1,3 @@
+-// We need this feature as it changes `dylib` linking behavior and allows us to link to `rustc_driver`.
+-#![feature(rustc_private)]
+ // Several crates are depended upon but unused so that they are present in the sysroot
+ #![expect(unused_crate_dependencies)]
+
+diff --git a/compiler/rustc_metadata/src/dependency_format.rs b/compiler/rustc_metadata/src/dependency_format.rs
+index 39fa23766b..51d86b4009 100644
+--- a/compiler/rustc_metadata/src/dependency_format.rs
++++ b/compiler/rustc_metadata/src/dependency_format.rs
+@@ -51,7 +51,7 @@
+ //! Additionally, the algorithm is geared towards finding *any* solution rather
+ //! than finding a number of solutions (there are normally quite a few).
+
+-use rustc_data_structures::fx::{FxHashMap, FxHashSet};
++use rustc_data_structures::fx::FxHashMap;
+ use rustc_hir::def_id::{CrateNum, LOCAL_CRATE};
+ use rustc_index::IndexVec;
+ use rustc_middle::bug;
+@@ -161,44 +161,19 @@ fn calculate_type(tcx: TyCtxt<'_>, ty: CrateType) -> DependencyList {
+         }
+         Linkage::Dynamic | Linkage::IncludedFromDylib => {}
+     }
+-
+-    let all_dylibs = || {
+-        tcx.crates(()).iter().filter(|&&cnum| {
+-            !tcx.dep_kind(cnum).macros_only() && tcx.used_crate_source(cnum).dylib.is_some()
+-        })
+-    };
+-
+-    let mut upstream_in_dylibs = FxHashSet::default();
+-
+-    if tcx.features().rustc_private() {
+-        // We need this to prevent users of `rustc_driver` from linking dynamically to `std`
+-        // which does not work as `std` is also statically linked into `rustc_driver`.
+-
+-        // Find all libraries statically linked to upstream dylibs.
+-        for &cnum in all_dylibs() {
+-            let deps = tcx.dylib_dependency_formats(cnum);
+-            for &(depnum, style) in deps.iter() {
+-                if let RequireStatic = style {
+-                    upstream_in_dylibs.insert(depnum);
+-                }
+-            }
+-        }
+-    }
+-
+     let mut formats = FxHashMap::default();
+
+     // Sweep all crates for found dylibs. Add all dylibs, as well as their
+     // dependencies, ensuring there are no conflicts. The only valid case for a
+     // dependency to be relied upon twice is for both cases to rely on a dylib.
+-    for &cnum in all_dylibs() {
+-        if upstream_in_dylibs.contains(&cnum) {
+-            info!("skipping dylib: {}", tcx.crate_name(cnum));
+-            // If this dylib is also available statically linked to another dylib
+-            // we try to use that instead.
++    for &cnum in tcx.crates(()).iter() {
++        if tcx.dep_kind(cnum).macros_only() {
+             continue;
+         }
+
+         let name = tcx.crate_name(cnum);
++        let src = tcx.used_crate_source(cnum);
++        if src.dylib.is_some() {
+         info!("adding dylib: {}", name);
+         add_library(tcx, cnum, RequireDynamic, &mut formats, &mut unavailable_as_static);
+         let deps = tcx.dylib_dependency_formats(cnum);
+@@ -207,6 +182,7 @@ fn calculate_type(tcx: TyCtxt<'_>, ty: CrateType) -> DependencyList {
+             add_library(tcx, depnum, style, &mut formats, &mut unavailable_as_static);
+         }
+     }
++    }
+
+     // Collect what we've got so far in the return vector.
+     let last_crate = tcx.crates(()).len();
+diff --git a/src/bootstrap/src/bin/rustc.rs b/src/bootstrap/src/bin/rustc.rs
+index d04e2fbeb7..011c289d93 100644
+--- a/src/bootstrap/src/bin/rustc.rs
++++ b/src/bootstrap/src/bin/rustc.rs
+@@ -89,24 +89,6 @@ fn main() {
+         rustc_real
+     };
+
+-    // Get the name of the crate we're compiling, if any.
+-    let crate_name = parse_value_from_args(&orig_args, "--crate-name");
+-
+-    // When statically linking `std` into `rustc_driver`, remove `-C prefer-dynamic`
+-    if env::var("RUSTC_LINK_STD_INTO_RUSTC_DRIVER").unwrap() == "1"
+-        && crate_name == Some("rustc_driver")
+-    {
+-        if let Some(pos) = args.iter().enumerate().position(|(i, a)| {
+-            a == "-C" && args.get(i + 1).map(|a| a == "prefer-dynamic").unwrap_or(false)
+-        }) {
+-            args.remove(pos);
+-            args.remove(pos);
+-        }
+-        if let Some(pos) = args.iter().position(|a| a == "-Cprefer-dynamic") {
+-            args.remove(pos);
+-        }
+-    }
+-
+     let mut cmd = match env::var_os("RUSTC_WRAPPER_REAL") {
+         Some(wrapper) if !wrapper.is_empty() => {
+             let mut cmd = Command::new(wrapper);
+@@ -117,6 +99,9 @@ fn main() {
+     };
+     cmd.args(&args).env(dylib_path_var(), env::join_paths(&dylib_path).unwrap());
+
++    // Get the name of the crate we're compiling, if any.
++    let crate_name = parse_value_from_args(&orig_args, "--crate-name");
++
+     if let Some(crate_name) = crate_name {
+         if let Some(target) = env::var_os("RUSTC_TIME") {
+             if target == "all"
+diff --git a/src/bootstrap/src/core/builder/cargo.rs b/src/bootstrap/src/core/builder/cargo.rs
+index 0688a1d689..066e6bf53f 100644
+--- a/src/bootstrap/src/core/builder/cargo.rs
++++ b/src/bootstrap/src/core/builder/cargo.rs
+@@ -1146,7 +1146,7 @@ impl Builder<'_> {
+         // When we build Rust dylibs they're all intended for intermediate
+         // usage, so make sure we pass the -Cprefer-dynamic flag instead of
+         // linking all deps statically into the dylib.
+-        if matches!(mode, Mode::Std) {
++        if matches!(mode, Mode::Std | Mode::Rustc) {
+             rustflags.arg("-Cprefer-dynamic");
+         }
+         if matches!(mode, Mode::Rustc) && !self.link_std_into_rustc_driver(target) {
+diff --git a/src/tools/clippy/src/main.rs b/src/tools/clippy/src/main.rs
+index c9853e53f3..c9af2138a7 100644
+--- a/src/tools/clippy/src/main.rs
++++ b/src/tools/clippy/src/main.rs
+@@ -1,6 +1,3 @@
+-// We need this feature as it changes `dylib` linking behavior and allows us to link to
+-// `rustc_driver`.
+-#![feature(rustc_private)]
+ // warn on lints, that are included in `rust-lang/rust`s bootstrap
+ #![warn(rust_2018_idioms, unused_lifetimes)]
+
+diff --git a/src/tools/clippy/tests/compile-test.rs b/src/tools/clippy/tests/compile-test.rs
+index 9754254cdd..dd95cc71cd 100644
+--- a/src/tools/clippy/tests/compile-test.rs
++++ b/src/tools/clippy/tests/compile-test.rs
+@@ -1,4 +1,4 @@
+-#![feature(rustc_private, let_chains)]
++#![feature(let_chains)]
+ #![warn(rust_2018_idioms, unused_lifetimes)]
+ #![allow(unused_extern_crates)]
+
+diff --git a/src/tools/rustdoc/main.rs b/src/tools/rustdoc/main.rs
+index d4099cafe5..5b499a1fa1 100644
+--- a/src/tools/rustdoc/main.rs
++++ b/src/tools/rustdoc/main.rs
+@@ -1,6 +1,3 @@
+-// We need this feature as it changes `dylib` linking behavior and allows us to link to `rustc_driver`.
+-#![feature(rustc_private)]
+-
+ fn main() {
+     rustdoc::main()
+ }
+diff --git a/src/tools/rustfmt/src/git-rustfmt/main.rs b/src/tools/rustfmt/src/git-rustfmt/main.rs
+index b8b0432aa9..b5bd71e015 100644
+--- a/src/tools/rustfmt/src/git-rustfmt/main.rs
++++ b/src/tools/rustfmt/src/git-rustfmt/main.rs
+@@ -1,7 +1,3 @@
+-// We need this feature as it changes `dylib` linking behavior and allows us to link to
+-// `rustc_driver`.
+-#![feature(rustc_private)]
+-
+ use std::env;
+ use std::io::stdout;
+ use std::path::{Path, PathBuf};
+diff --git a/src/bootstrap/src/core/build_steps/compile.rs b/src/bootstrap/src/core/build_steps/compile.rs
+index 27bbc8bd8f..a6fc4df2eb 100644
+--- a/src/bootstrap/src/core/build_steps/compile.rs
++++ b/src/bootstrap/src/core/build_steps/compile.rs
+@@ -1940,24 +1940,8 @@ impl Step for Assemble {
+         let src_libdir = builder.sysroot_target_libdir(build_compiler, host);
+         for f in builder.read_dir(&src_libdir) {
+             let filename = f.file_name().into_string().unwrap();
+-
+-            let is_proc_macro = proc_macros.contains(&filename);
+-            let is_dylib_or_debug = is_dylib(&f.path()) || is_debug_info(&filename);
+-
+-            // If we link statically to stdlib, do not copy the libstd dynamic library file
+-            // FIXME: Also do this for Windows once incremental post-optimization stage0 tests
+-            // work without std.dll (see https://github.com/rust-lang/rust/pull/131188).
+-            let can_be_rustc_dynamic_dep = if builder
+-                .link_std_into_rustc_driver(target_compiler.host)
+-                && !target_compiler.host.is_windows()
++            if (is_dylib(Path::new(&filename)) || is_debug_info(&filename)) && !proc_macros.contains(&filename)
+             {
+-                let is_std = filename.starts_with("std-") || filename.starts_with("libstd-");
+-                !is_std
+-            } else {
+-                true
+-            };
+-
+-            if is_dylib_or_debug && can_be_rustc_dynamic_dep && !is_proc_macro {
+                 builder.copy_link(&f.path(), &rustc_libdir.join(&filename));
+             }
+         }

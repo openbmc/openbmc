@@ -13,6 +13,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import re
 import sys
 import datetime
 try:
@@ -111,6 +112,9 @@ extlinks = {
     'wikipedia': ('https://en.wikipedia.org/wiki/%s', None),
 }
 
+# To be able to use :manpage:`<something>` in the docs.
+manpages_url = 'https://manpages.debian.org/{path}'
+
 # Intersphinx config to use cross reference with BitBake user manual
 intersphinx_mapping = {
     'bitbake': ('https://docs.yoctoproject.org/bitbake/' + bitbake_version, None)
@@ -136,6 +140,7 @@ except ImportError:
     sys.exit(1)
 
 html_logo = 'sphinx-static/YoctoProject_Logo_RGB.jpg'
+html_favicon = 'sphinx-static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -168,6 +173,24 @@ latex_elements = {
     'passoptionstopackages': '\\PassOptionsToPackage{bookmarksdepth=5}{hyperref}',
     'preamble': '\\usepackage[UTF8]{ctex}\n\\setcounter{tocdepth}{2}',
 }
+
+
+from sphinx.search import SearchEnglish
+from sphinx.search import languages
+class DashFriendlySearchEnglish(SearchEnglish):
+
+    # Accept words that can include hyphens
+    _word_re = re.compile(r'[\w\-]+')
+
+    js_splitter_code = """
+function splitQuery(query) {
+    return query
+        .split(/[^\p{Letter}\p{Number}_\p{Emoji_Presentation}-]+/gu)
+        .filter(term => term.length > 0);
+}
+"""
+
+languages['en'] = DashFriendlySearchEnglish
 
 # Make the EPUB builder prefer PNG to SVG because of issues rendering Inkscape SVG
 from sphinx.builders.epub3 import Epub3Builder

@@ -1,7 +1,11 @@
-From 74b3844737b03492756b4f896c938b504b069f14 Mon Sep 17 00:00:00 2001
-From: Jérémie Galarneau <jeremie.galarneau@efficios.com>
+From e5b2615aaad44a1c0d52da1469b28f99cfb12b5f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=A9r=C3=A9mie=20Galarneau?=
+ <jeremie.galarneau@efficios.com>
 Date: Tue, 17 Jan 2023 16:57:35 -0500
 Subject: [PATCH] compat: off64_t is not defined by musl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 This helps compile with latest musl, where off64_t is not defined unless
 _LARGEFILE64_SOURCE is defined. On glibc, _LARGEFILE64_SOURCE is defined
@@ -14,12 +18,18 @@ As such, it is safe to assume off_t is 64-bit wide. This is checked by a
 static_assert to catch any platform where autoconf would let a 32-bit
 off_t slip.
 
-Upstream-Status: Submitted [https://review.lttng.org/c/lttng-tools/+/9268]
+Submitted [https://review.lttng.org/c/lttng-tools/+/9268]
+Upstream-Status: Backport [https://github.com/lttng/lttng-tools/commit/57fd993799a2b081c826f6fc8def32d28d526bfb]
 Reported-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Jérémie Galarneau <jeremie.galarneau@efficios.com>
 Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8
 ---
+ src/common/compat/compat-fcntl.c |  5 ++++-
+ src/common/compat/fcntl.h        | 10 +++-------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
+diff --git a/src/common/compat/compat-fcntl.c b/src/common/compat/compat-fcntl.c
+index 5c0bdc9..18bab0a 100644
 --- a/src/common/compat/compat-fcntl.c
 +++ b/src/common/compat/compat-fcntl.c
 @@ -8,14 +8,17 @@
@@ -41,6 +51,8 @@ Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8
  #ifdef HAVE_SYNC_FILE_RANGE
  	return sync_file_range(fd, offset, nbytes, flags);
  #else
+diff --git a/src/common/compat/fcntl.h b/src/common/compat/fcntl.h
+index 5e566e5..93b22b7 100644
 --- a/src/common/compat/fcntl.h
 +++ b/src/common/compat/fcntl.h
 @@ -13,16 +13,12 @@
@@ -61,7 +73,7 @@ Change-Id: If2c6007a8c85bc3f3065002af8a7538b882fb4a8
  		unsigned int flags);
  #define lttng_sync_file_range(fd, offset, nbytes, flags) \
  	compat_sync_file_range(fd, offset, nbytes, flags)
-@@ -37,8 +33,8 @@ extern int compat_sync_file_range(int fd
+@@ -37,8 +33,8 @@ extern int compat_sync_file_range(int fd, off64_t offset, off64_t nbytes,
  #define SYNC_FILE_RANGE_WAIT_BEFORE   0
  #define SYNC_FILE_RANGE_WRITE         0
  

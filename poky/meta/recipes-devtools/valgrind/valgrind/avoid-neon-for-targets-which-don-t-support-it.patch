@@ -1,4 +1,4 @@
-From 5c0afe3f46d52923dd37845aea1e51be1e54ce19 Mon Sep 17 00:00:00 2001
+From 596372bc9b4d31bc9811881cfa747d99a8c25141 Mon Sep 17 00:00:00 2001
 From: Andre McCurdy <armccurdy@gmail.com>
 Date: Tue, 19 Jan 2016 16:42:36 -0800
 Subject: [PATCH] avoid neon for targets which don't support it
@@ -16,7 +16,7 @@ Signed-off-by: Andre McCurdy <armccurdy@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/memcheck/tests/sh-mem-random.c b/memcheck/tests/sh-mem-random.c
-index ae82248..816e139 100644
+index 0e01684..e41957e 100644
 --- a/memcheck/tests/sh-mem-random.c
 +++ b/memcheck/tests/sh-mem-random.c
 @@ -191,7 +191,7 @@ void do_test_at ( U1* arr )

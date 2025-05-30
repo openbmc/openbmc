@@ -41,7 +41,7 @@ finish_run() {
 		mount --move /sys $ROOTFS_DIR/sys
 
 		cd $ROOTFS_DIR
-		exec switch_root -c /dev/console $ROOTFS_DIR ${bootparam_init:-/sbin/init}
+		exec switch_root $ROOTFS_DIR ${bootparam_init:-/sbin/init}
 	else
 		debug "No rootfs has been set"
 	fi

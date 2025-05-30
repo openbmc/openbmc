@@ -1,4 +1,4 @@
-From 4c27b9259f4aa1b4dc0741c56ab90b6c57905564 Mon Sep 17 00:00:00 2001
+From bbb5e8a6fc5eec178f8077ab006ab42c009528d4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 24 Jan 2020 17:55:39 +0100
 Subject: [PATCH] none/tests/fdleak_cmsg.stderr.exp: adjust /tmp paths
@@ -13,13 +13,13 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/none/tests/fdleak_cmsg.stderr.exp b/none/tests/fdleak_cmsg.stderr.exp
-index 0fe56ea..5a0605e 100644
+index 6b3b53f..45e7e2f 100644
 --- a/none/tests/fdleak_cmsg.stderr.exp
 +++ b/none/tests/fdleak_cmsg.stderr.exp
 @@ -25,10 +25,10 @@ Open file descriptor ...: /dev/null
  
  
- FILE DESCRIPTORS: 6 open (3 std) at exit.
+ FILE DESCRIPTORS: 6 open (3 inherited) at exit.
 -Open file descriptor ...: /tmp/data2
 +Open file descriptor ...: ...
     ...

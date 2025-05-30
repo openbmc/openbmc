@@ -128,7 +128,7 @@ class BuildTest(unittest.TestCase):
         if os.environ.get("TOASTER_TEST_USE_SSTATE_MIRROR"):
             ProjectVariable.objects.get_or_create(
                 name="SSTATE_MIRRORS",
-                value="file://.* http://cdn.jsdelivr.net/yocto/sstate/all/PATH;downloadfilename=PATH",
+                value="file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH",
                 project=project)
 
         ProjectTarget.objects.create(project=project,

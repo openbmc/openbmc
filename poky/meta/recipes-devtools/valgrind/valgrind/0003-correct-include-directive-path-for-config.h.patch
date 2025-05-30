@@ -1,4 +1,4 @@
-From fbddd889e2fbc1195009d8947211b8900c03c641 Mon Sep 17 00:00:00 2001
+From de4d7e478515b63f049b211266d9b946c15cc0b9 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 10 Jun 2017 01:03:17 -0700
 Subject: [PATCH] correct include directive path for config.h

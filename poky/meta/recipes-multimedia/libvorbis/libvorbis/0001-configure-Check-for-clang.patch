@@ -12,8 +12,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  configure.ac | 19 +++++++++++++++++--
  1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 28b0a14..2d4e984 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -98,6 +98,16 @@ AC_ARG_ENABLE(examples,
@@ -51,6 +49,20 @@ index 28b0a14..2d4e984 100644
  
  		# glibc < 2.1.3 has a serious FP bug in the math inline header
  		# that will cripple Vorbis.  Look to see if the magic FP stack
--- 
-2.17.0
-
+@@ -178,12 +193,12 @@ else
+   		fi;;
+         powerpc-*-linux*spe)
+  	        DEBUG="-g -Wall -Wextra -D_REENTRANT -D__NO_MATH_INLINES"
+- 	        CFLAGS="-O3 -Wall -Wextra -ffast-math -mfused-madd -D_REENTRANT"
+- 	        PROFILE="-pg -g -O3 -ffast-math -mfused-madd -D_REENTRANT";;
++			CFLAGS="-O3 -Wall -Wextra -ffast-math -D_REENTRANT"
++			PROFILE="-pg -g -O3 -ffast-math -D_REENTRANT";;
+ 	powerpc-*-linux*)
+ 		DEBUG="-g -Wall -Wextra -D_REENTRANT -D__NO_MATH_INLINES"
+-		CFLAGS="-O3 -Wall -Wextra -ffast-math -mfused-madd -mcpu=750 -D_REENTRANT"
+-		PROFILE="-pg -g -O3 -ffast-math -mfused-madd -mcpu=750 -D_REENTRANT";;
++		CFLAGS="-O3 -Wall -Wextra -ffast-math -mcpu=750 -D_REENTRANT"
++		PROFILE="-pg -g -O3 -ffast-math -mcpu=750 -D_REENTRANT";;
+ 	*-*-linux*)
+ 		DEBUG="-g -Wall -Wextra -D_REENTRANT -D__NO_MATH_INLINES -fsigned-char"
+ 		CFLAGS="-O3 -Wall -Wextra -ffast-math -D_REENTRANT -fsigned-char"

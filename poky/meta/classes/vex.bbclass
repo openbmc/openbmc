@@ -76,21 +76,8 @@ python () {
     if bb.data.inherits_class("cve-check", d):
         raise bb.parse.SkipRecipe("Skipping recipe: found incompatible combination of cve-check and vex enabled at the same time.")
 
-    # Fallback all CVEs from CVE_CHECK_IGNORE to CVE_STATUS
-    cve_check_ignore = d.getVar("CVE_CHECK_IGNORE")
-    if cve_check_ignore:
-        bb.warn("CVE_CHECK_IGNORE is deprecated in favor of CVE_STATUS")
-        for cve in (d.getVar("CVE_CHECK_IGNORE") or "").split():
-            d.setVarFlag("CVE_STATUS", cve, "ignored")
-
-    # Process CVE_STATUS_GROUPS to set multiple statuses and optional detail or description at once
-    for cve_status_group in (d.getVar("CVE_STATUS_GROUPS") or "").split():
-        cve_group = d.getVar(cve_status_group)
-        if cve_group is not None:
-            for cve in cve_group.split():
-                d.setVarFlag("CVE_STATUS", cve, d.getVarFlag(cve_status_group, "status"))
-        else:
-            bb.warn("CVE_STATUS_GROUPS contains undefined variable %s" % cve_status_group)
+    from oe.cve_check import extend_cve_status
+    extend_cve_status(d)
 }
 
 def generate_json_report(d, out_path, link_path):
@@ -209,6 +196,8 @@ python vex_write_rootfs_manifest () {
             with open(pkgfilepath) as j:
                 data = json.load(j)
                 cve_check_merge_jsons(json_data, data)
+        else:
+            bb.warn("Missing cve file for %s" % pkg)
 
     d.setVar("PN", save_pn)
 
@@ -303,9 +292,12 @@ def cve_write_data_json(d, cve_data, cve_status):
     cvelogpath = d.getVar("CVE_CHECK_SUMMARY_DIR")
     index_path = d.getVar("CVE_CHECK_SUMMARY_INDEX_PATH")
     bb.utils.mkdirhier(cvelogpath)
+    bb.utils.mkdirhier(os.path.dirname(deploy_file))
     fragment_file = os.path.basename(deploy_file)
     fragment_path = os.path.join(cvelogpath, fragment_file)
     with open(fragment_path, "w") as f:
+        f.write(write_string)
+    with open(deploy_file, "w") as f:
         f.write(write_string)
     with open(index_path, "a+") as f:
         f.write("%s\n" % fragment_path)

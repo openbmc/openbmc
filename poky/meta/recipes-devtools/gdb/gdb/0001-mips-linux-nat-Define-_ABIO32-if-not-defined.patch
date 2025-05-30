@@ -1,4 +1,4 @@
-From 31c6c42479e750aff3130e76bae2646c418cb548 Mon Sep 17 00:00:00 2001
+From 8448967d9cfb09eb11fd3573a72a35ae94a89ba1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 23 Mar 2016 06:30:09 +0000
 Subject: [PATCH] mips-linux-nat: Define _ABIO32 if not defined

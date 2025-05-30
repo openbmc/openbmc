@@ -99,9 +99,12 @@ python split_kernel_module_packages () {
             bb.warn("module_autoload_%s was replaced by KERNEL_MODULE_AUTOLOAD for cases where basename == module name, please drop it" % basename)
         if autoload and basename not in autoloadlist:
             bb.warn("module_autoload_%s is defined but '%s' isn't included in KERNEL_MODULE_AUTOLOAD, please add it there" % (basename, basename))
+
+        # The .conf file can either be installed by a recipe or generated from module_autoload_*
+        conf = '%s/%s.conf' % (d.getVar('modulesloaddir'), basename)
+        name = '%s%s' % (dvar, conf)
+        # If module name is in KERNEL_MODULE_AUTOLOAD, then generate the .conf file and write to `name`.
         if basename in autoloadlist:
-            conf = '%s/%s.conf' % (d.getVar('modulesloaddir'), basename)
-            name = '%s%s' % (dvar, conf)
             os.makedirs(os.path.dirname(name), exist_ok=True)
             with open(name, 'w') as f:
                 if autoload:
@@ -109,6 +112,9 @@ python split_kernel_module_packages () {
                         f.write('%s\n' % m)
                 else:
                     f.write('%s\n' % basename)
+        # If the .conf file exits, then add it to FILES:* and CONFFILES:* and add postinstall hook.
+        # It doesn't matter if it was generated from module_autoload_* or installed by the recipe.
+        if os.path.exists(name):
             conf2append = ' %s' % conf
             d.appendVar('FILES:%s' % pkg, conf2append)
             d.appendVar('CONFFILES:%s' % pkg, conf2append)
@@ -121,18 +127,23 @@ python split_kernel_module_packages () {
         # Write out any modconf fragment
         modconflist = (d.getVar("KERNEL_MODULE_PROBECONF") or "").split()
         modconf = d.getVar('module_conf_%s' % basename)
+
+        # The .conf file can either be installed by a recipe or generated from module_conf_*
+        conf = '%s/%s.conf' % (d.getVar('modprobedir'), basename)
+        name = '%s%s' % (dvar, conf)
+        # If module name is in KERNEL_MODULE_PROBECONF, then generate the .conf file and write to `name`.
         if modconf and basename in modconflist:
-            conf = '%s/%s.conf' % (d.getVar('modprobedir'), basename)
-            name = '%s%s' % (dvar, conf)
             os.makedirs(os.path.dirname(name), exist_ok=True)
             with open(name, 'w') as f:
                 f.write("%s\n" % modconf)
+        elif modconf:
+            bb.error("Please ensure module %s is listed in KERNEL_MODULE_PROBECONF since module_conf_%s is set" % (basename, basename))
+        # If the .conf file exits, then add it to FILES:* and CONFFILES:*.
+        # It doesn't matter if it was generated from module_conf_* or installed by the recipe.
+        if os.path.exists(name):
             conf2append = ' %s' % conf
             d.appendVar('FILES:%s' % pkg, conf2append)
             d.appendVar('CONFFILES:%s' % pkg, conf2append)
-
-        elif modconf:
-            bb.error("Please ensure module %s is listed in KERNEL_MODULE_PROBECONF since module_conf_%s is set" % (basename, basename))
 
         if "description" in vals:
             old_desc = d.getVar('DESCRIPTION:' + pkg) or ""

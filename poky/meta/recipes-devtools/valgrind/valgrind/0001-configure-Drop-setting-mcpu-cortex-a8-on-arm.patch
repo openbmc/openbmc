@@ -1,4 +1,4 @@
-From 26a3367fbbab2a664a288f4ff8ef3273ebe57124 Mon Sep 17 00:00:00 2001
+From 5a776e61af5ab7f0cfd10cde55c796189686916f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 10 May 2024 16:27:34 -0700
 Subject: [PATCH] configure: Drop setting mcpu=cortex-a8 on arm
@@ -16,10 +16,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 095659a..75d42c9 100755
+index 2dfbd1c..b42fdd4 100755
 --- a/configure.ac
 +++ b/configure.ac
-@@ -275,13 +275,13 @@ case "${host_cpu}" in
+@@ -251,13 +251,13 @@ case "${host_cpu}" in
  
       armv8*)
          AC_MSG_RESULT([ok (${host_cpu})])

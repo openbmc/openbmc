@@ -685,6 +685,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             to,
             spdxid_name="vex-affected",
             security_vexVersion=VEX_VERSION,
+            security_actionStatement="Mitigation action unknown",
         )
 
     def new_vex_ignored_relationship(self, from_, to, *, impact_statement):

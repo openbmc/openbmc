@@ -1,11 +1,19 @@
+From ede03b847038afc294e206ca345d12d75bbba844 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 26 Aug 2022 15:23:37 +0100
+Subject: [PATCH] libgcrypt: rewrite ptest
+
 Don't depend on a native libgpg-error to build the test driver, as it's
 an optional dependency for some C annotations.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/testdrv.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/tests/testdrv.c b/tests/testdrv.c
-index 0ccde326..6d6abd57 100644
+index bfca4c2..634b718 100644
 --- a/tests/testdrv.c
 +++ b/tests/testdrv.c
 @@ -32,7 +32,6 @@

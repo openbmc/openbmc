@@ -36,7 +36,6 @@ inherit siteinfo
 # the contents of the sysroot.
 export CONFIG_SITE
 
-acpaths ?= "default"
 EXTRA_AUTORECONF += "--exclude=autopoint"
 
 export lt_cv_sys_lib_dlsearch_path_spec = "${libdir} ${base_libdir}"
@@ -167,15 +166,6 @@ autotools_do_configure() {
 		cd ${AUTOTOOLS_SCRIPT_PATH}
 		# aclocal looks in the native sysroot by default, so tell it to also look in the target sysroot.
 		ACLOCAL="aclocal --aclocal-path=${STAGING_DATADIR}/aclocal/"
-		if [ x"${acpaths}" = xdefault ]; then
-			acpaths=
-			for i in `find ${AUTOTOOLS_SCRIPT_PATH} -ignore_readdir_race -maxdepth 2 -name \*.m4|grep -v 'aclocal.m4'| \
-				grep -v 'acinclude.m4' | sed -e 's,\(.*/\).*$,\1,'|sort -u`; do
-				acpaths="$acpaths -I $i"
-			done
-		else
-			acpaths="${acpaths}"
-		fi
 		# autoreconf is too shy to overwrite aclocal.m4 if it doesn't look
 		# like it was auto-generated.  Work around this by blowing it away
 		# by hand, unless the package specifically asked not to run aclocal.
@@ -212,15 +202,12 @@ autotools_do_configure() {
 			find ${S} -ignore_readdir_race -name $i -delete
 		done
 
-		bbnote Executing ACLOCAL=\"$ACLOCAL\" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF} $acpaths
-		ACLOCAL="$ACLOCAL" autoreconf -Wcross -Wno-obsolete --verbose --install --force ${EXTRA_AUTORECONF} $acpaths || die "autoreconf execution failed."
+		bbnote Executing ACLOCAL=\"$ACLOCAL\" autoreconf -Wcross --verbose --install --force ${EXTRA_AUTORECONF}
+		ACLOCAL="$ACLOCAL" autoreconf -Wcross -Wno-obsolete --verbose --install --force ${EXTRA_AUTORECONF} || die "autoreconf execution failed."
 		cd $olddir
 	fi
-	if [ -e ${CONFIGURE_SCRIPT} ]; then
-		oe_runconf
-	else
-		bbnote "nothing to configure"
-	fi
+
+	oe_runconf
 }
 
 autotools_do_compile() {

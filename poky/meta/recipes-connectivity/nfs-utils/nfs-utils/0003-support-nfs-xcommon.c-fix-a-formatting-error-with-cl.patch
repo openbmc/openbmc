@@ -1,0 +1,40 @@
+From cc59a7fe15b6ca2ee43cba0dc1d699323b36ffcc Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 21 Mar 2025 10:42:56 +0100
+Subject: [PATCH] support/nfs/xcommon.c: fix a formatting error with clang
+
+Specifically, this happens:
+
+| xcommon.c:101:24: error: format string is not a string literal [-Werror,-Wformat-nonliteral]
+|   101 |      vfprintf (stderr, fmt2, args);
+|       |                        ^~~~
+
+A similar approach (print \n seprately) is already used elsewhere in
+the same file.
+
+Upstream-Status: Submitted [via email to steved@redhat.com,linux-nfs@vger.kernel.org]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ support/nfs/xcommon.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/support/nfs/xcommon.c b/support/nfs/xcommon.c
+index 3989f0b..1d04dd1 100644
+--- a/support/nfs/xcommon.c
++++ b/support/nfs/xcommon.c
+@@ -94,13 +94,11 @@ xstrconcat4 (const char *s, const char *t, const char *u, const char *v) {
+ void
+ nfs_error (const char *fmt, ...) {
+      va_list args;
+-     char *fmt2;
+ 
+-     fmt2 = xstrconcat2 (fmt, "\n");
+      va_start (args, fmt);
+-     vfprintf (stderr, fmt2, args);
++     vfprintf (stderr, fmt, args);
++     fprintf (stderr, "\n");
+      va_end (args);
+-     free (fmt2);
+ }
+ 
+ /* Make a canonical pathname from PATH.  Returns a freshly malloced string.

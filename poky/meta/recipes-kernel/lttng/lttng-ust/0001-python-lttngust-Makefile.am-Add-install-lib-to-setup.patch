@@ -1,4 +1,4 @@
-From f65efd963e52de51d35e2e03fb773f33dd64f565 Mon Sep 17 00:00:00 2001
+From 30660997d220602202d8dc7264e49095a1581947 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 20 Feb 2024 12:19:06 +0000
 Subject: [PATCH] python-lttngust/Makefile.am: Add --install-lib to setup.py
@@ -9,7 +9,6 @@ building.
 Upstream-Status: Submitted [https://github.com/lttng/lttng-ust/pull/59]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
-
 ---
  src/python-lttngust/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

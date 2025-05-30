@@ -9,8 +9,7 @@
 # packages.
 #
 
-PACKAGE_WRITE_DEPS += "qemu-native"
-inherit qemu
+PACKAGE_WRITE_DEPS += "qemuwrapper-cross"
 
 FONT_PACKAGES ??= "${PN}"
 FONT_PACKAGES:class-native = ""

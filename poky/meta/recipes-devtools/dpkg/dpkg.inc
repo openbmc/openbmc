@@ -43,6 +43,8 @@ do_configure:prepend () {
         # update dselect/po and scripts/po
         cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/dselect/po/
         cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/scripts/po/
+
+        [ ! -e ${S}/.dist-version ] && echo ${PV} > ${S}/.dist-version
 }
 
 do_install:append () {

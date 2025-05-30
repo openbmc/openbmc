@@ -15,13 +15,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e4742cf92e89040b39486a6219b68067 \
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/flex-${PV}.tar.gz \
            file://run-ptest \
            file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
-           ${@bb.utils.contains('PTEST_ENABLED', '1', '', 'file://disable-tests.patch', d)} \
            file://0001-build-AC_USE_SYSTEM_EXTENSIONS-in-configure.ac.patch \
            file://check-funcs.patch \
            file://0001-Emit-no-line-directives-if-gen_line_dirs-is-false.patch \
+           file://0001-build-tests-add-missing-parser-scanner-dependencies.patch \
+           file://0001-Match-malloc-signature-to-its-use.patch \
            "
 
-SRC_URI[md5sum] = "2882e3179748cc9f9c23ec593d6adc8d"
 SRC_URI[sha256sum] = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995"
 
 GITHUB_BASE_URI = "https://github.com/westes/flex/releases"
@@ -56,9 +56,8 @@ RDEPENDS:${PN} += "m4"
 RDEPENDS:${PN}-ptest += "bash gawk make"
 
 do_compile_ptest() {
-	oe_runmake -C ${B}/tests -f ${B}/tests/Makefile top_builddir=${B} INCLUDES=-I${S}/src buildtests
+	oe_runmake -C ${B}/tests buildtests
 }
-PTEST_PARALLEL_MAKE = ""
 
 do_install_ptest() {
 	mkdir -p ${D}${PTEST_PATH}/build-aux/
@@ -82,4 +81,4 @@ do_install_ptest() {
 do_install_ptest[vardepsexclude] += "UNINATIVE_LOADER"
 
 # Not Apache Flex, or Adobe Flex, or IBM Flex.
-CVE_PRODUCT = "flex_project:flex"
+CVE_PRODUCT = "flex_project:flex westes:flex"

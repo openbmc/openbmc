@@ -1,4 +1,4 @@
-From edc8f1cee2c9c4a441032fa22d0272b41b829dc6 Mon Sep 17 00:00:00 2001
+From f2649410d2eb1c3983054020c9238887bd31273f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 6 Jun 2018 12:10:22 -0700
 Subject: [PATCH] Re-introduce spe commandline options
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 13 insertions(+)
 
 diff --git a/gcc/config/rs6000/rs6000.opt b/gcc/config/rs6000/rs6000.opt
-index e8ca70340df..5c8545d4f1b 100644
+index 88cf16ca581..fc283ccc934 100644
 --- a/gcc/config/rs6000/rs6000.opt
 +++ b/gcc/config/rs6000/rs6000.opt
-@@ -344,6 +344,19 @@ mdebug=
+@@ -348,6 +348,19 @@ mdebug=
  Target RejectNegative Joined
  -mdebug=	Enable debug output.
  

@@ -8,7 +8,7 @@ DEFAULTTUNE ?= "mips"
 
 # Endianess
 TUNEVALID[bigendian] = "Enable big-endian mode"
-TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', ' -meb', ' -mel', d)}"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'bigendian', ' -EB', ' -EL', d)}"
 
 # ABI flags
 TUNEVALID[o32] = "MIPS o32 ABI"

@@ -1,4 +1,4 @@
-From a32cbf0d1c036e6435469898829f96a02c5993a8 Mon Sep 17 00:00:00 2001
+From f28f581fbafa76a48cc7e88ab9c6eb63db6342c4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 3 Mar 2015 08:21:19 +0000
 Subject: [PATCH] Don't search host directory during "relink" if $inst_prefix
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/ltmain.sh b/ltmain.sh
-index 9ebc7e3d1e0..7ea79fa8be6 100644
+index ef93f977a52..2ae16bf5d63 100644
 --- a/ltmain.sh
 +++ b/ltmain.sh
-@@ -6004,12 +6004,13 @@ func_mode_link ()
+@@ -6026,12 +6026,13 @@ func_mode_link ()
  	      fi
  	    else
  	      # We cannot seem to hardcode it, guess we'll fake it.

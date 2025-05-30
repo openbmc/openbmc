@@ -1,0 +1,35 @@
+From 0e2095bcc50e7a07d3478f8d3c0ae5ad46575594 Mon Sep 17 00:00:00 2001
+From: Mikko Rapeli <mikko.rapeli@linaro.org>
+Date: Mon, 28 Apr 2025 12:07:24 +0000
+Subject: [PATCH] lttng-modules: fix sigaction build without
+ CONFIG_COMPAT_OLD_SIGACTION
+
+Workaround build failure when CONFIG_COMPAT_OLD_SIGACTION is not enabled
+in kernel config.
+
+Upstream-Status: Submitted [https://bugs.lttng.org/issues/1426]
+
+Signed-off-by: Mikko Rapeli <mikko.rapeli@linaro.org>
+---
+ .../instrumentation/syscalls/headers/arm-32-syscalls_pointers.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/include/instrumentation/syscalls/headers/arm-32-syscalls_pointers.h b/include/instrumentation/syscalls/headers/arm-32-syscalls_pointers.h
+index 5f4ca5b..1514cae 100644
+--- a/include/instrumentation/syscalls/headers/arm-32-syscalls_pointers.h
++++ b/include/instrumentation/syscalls/headers/arm-32-syscalls_pointers.h
+@@ -1890,9 +1890,11 @@ TRACE_SYSCALL_TABLE(chroot, chroot, 61, 1)
+ #ifndef OVERRIDE_TABLE_32_ustat
+ TRACE_SYSCALL_TABLE(ustat, ustat, 62, 2)
+ #endif
++#ifdef CONFIG_COMPAT_OLD_SIGACTION
+ #ifndef OVERRIDE_TABLE_32_sigaction
+ TRACE_SYSCALL_TABLE(sigaction, sigaction, 67, 3)
+ #endif
++#endif /* CONFIG_COMPAT_OLD_SIGACTION */
+ #ifndef OVERRIDE_TABLE_32_sigpending
+ TRACE_SYSCALL_TABLE(sigpending, sigpending, 73, 1)
+ #endif
+-- 
+2.49.0
+

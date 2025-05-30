@@ -1,4 +1,8 @@
-Upstream-Status: Pending
+Note: upcoming avahi 0.9 drops debian initscripts altogether,
+so any version update would probably have to copy the last
+upstream versions into oe-core, and install them from the recipe.
+
+Upstream-Status: Inappropriate [upstream removed the files]
 
 Index: avahi-0.7/initscript/debian/avahi-daemon.in
 ===================================================================

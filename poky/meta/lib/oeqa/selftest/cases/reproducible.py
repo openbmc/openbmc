@@ -97,8 +97,10 @@ def compare_file(reference, test, diffutils_sysroot):
     result.status = SAME
     return result
 
-def run_diffoscope(a_dir, b_dir, html_dir, max_report_size=0, **kwargs):
+def run_diffoscope(a_dir, b_dir, html_dir, max_report_size=0, max_diff_block_lines=1024, max_diff_block_lines_saved=0, **kwargs):
     return runCmd(['diffoscope', '--no-default-limits', '--max-report-size', str(max_report_size),
+                   '--max-diff-block-lines-saved', str(max_diff_block_lines_saved),
+                   '--max-diff-block-lines', str(max_diff_block_lines),
                    '--exclude-directory-metadata', 'yes', '--html-dir', html_dir, a_dir, b_dir],
                 **kwargs)
 
@@ -131,6 +133,11 @@ class ReproducibleTests(OESelftestTestCase):
 
     # Maximum report size, in bytes
     max_report_size = 250 * 1024 * 1024
+
+    # Maximum diff blocks size, in lines
+    max_diff_block_lines = 1024
+    # Maximum diff blocks size (saved in memory), in lines
+    max_diff_block_lines_saved = max_diff_block_lines
 
     # targets are the things we want to test the reproducibility of
     # Have to add the virtual targets manually for now as builds may or may not include them as they're exclude from world
@@ -391,6 +398,8 @@ class ReproducibleTests(OESelftestTestCase):
                 self.copy_file(os.path.join(jquery_sysroot, 'usr/share/javascript/jquery/jquery.min.js'), os.path.join(package_html_dir, 'jquery.js'))
 
                 run_diffoscope('reproducibleA', 'reproducibleB-extended', package_html_dir, max_report_size=self.max_report_size,
+                        max_diff_block_lines_saved=self.max_diff_block_lines_saved,
+                        max_diff_block_lines=self.max_diff_block_lines,
                         native_sysroot=diffoscope_sysroot, ignore_status=True, cwd=package_dir)
 
         if fails:

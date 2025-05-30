@@ -7,7 +7,7 @@ Remove hardcoded library install path. Change $(prefix)/lib/ to ${libdir}.
 
 [YOCTO #2876]
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [tcl 8.x is obsolete; upstream submission should be for 9.x patches]
 
 Signed-off-by: Song.Li <Song.Li@windriver.com>
 Signed-off-by: Kai Kang <kai.kang@windriver.com>

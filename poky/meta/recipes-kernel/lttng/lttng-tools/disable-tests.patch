@@ -1,3 +1,8 @@
+From 1fbd24512e8fce64b92efa846c301e45a7371ed2 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 14 Dec 2021 12:34:04 +0000
+Subject: [PATCH] lttng-tools: Disable problem tests
+
 Upstream-Status: Inappropriate [need to root cause the test hangs]
 
 We keep seeing hangs in the tools/notifications tests on x86 and arm for
@@ -8,11 +13,14 @@ of them.
 https://bugzilla.yoctoproject.org/show_bug.cgi?id=14263
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ tests/regression/Makefile.am | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-Index: lttng-tools-2.13.1/tests/regression/Makefile.am
-===================================================================
---- lttng-tools-2.13.1.orig/tests/regression/Makefile.am
-+++ lttng-tools-2.13.1/tests/regression/Makefile.am
+diff --git a/tests/regression/Makefile.am b/tests/regression/Makefile.am
+index e556223..756fb98 100644
+--- a/tests/regression/Makefile.am
++++ b/tests/regression/Makefile.am
 @@ -29,18 +29,6 @@ TESTS = tools/base-path/test_ust \
  	tools/crash/test_crash \
  	tools/regen-metadata/test_ust \

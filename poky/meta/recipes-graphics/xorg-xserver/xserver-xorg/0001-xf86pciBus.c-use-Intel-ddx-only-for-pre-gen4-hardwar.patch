@@ -11,8 +11,11 @@ default it for older hardware for which it has shown to be better for.
 
 Others fall through to the -modesetting default.
 
-Upstream-Status: Pending [Debian/Fedora patch
-https://src.fedoraproject.org/rpms/xorg-x11-server/c/ee515e44b07e37689abf48cf2fffb41578f3bc1d]
+Patch taken from:
+https://src.fedoraproject.org/rpms/xorg-x11-server/c/ee515e44b07e37689abf48cf2fffb41578f3bc1d
+https://salsa.debian.org/xorg-team/xserver/xorg-server/-/commit/192254841ab79e102c18fc299f18af0e27d5b517
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/xorg/xserver/-/merge_requests/1887]
 
 Signed-off-by: California Sullivan <california.l.sullivan@intel.com>
 ---

@@ -1,4 +1,4 @@
-From 462e2111804490fcdbb9fd87a86b1e7ac1805803 Mon Sep 17 00:00:00 2001
+From 7108016f82a3ce9d275b5d0f37dbde422de6ab15 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:29:11 +0400
 Subject: [PATCH] libtool
@@ -22,10 +22,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+)
 
 diff --git a/ltmain.sh b/ltmain.sh
-index 70990740b6c..ee938056bef 100644
+index 1a710177fb2..e8474602b0b 100644
 --- a/ltmain.sh
 +++ b/ltmain.sh
-@@ -6359,6 +6359,10 @@ func_mode_link ()
+@@ -6381,6 +6381,10 @@ func_mode_link ()
  	func_warning "ignoring multiple \`-rpath's for a libtool library"
  
        install_libdir="$1"

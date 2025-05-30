@@ -16,6 +16,7 @@ BitBake User Manual
    bitbake-user-manual/bitbake-user-manual-ref-variables-context
    bitbake-user-manual/bitbake-user-manual-fetching
    bitbake-user-manual/bitbake-user-manual-ref-variables
+   bitbake-user-manual/bitbake-user-manual-library-functions
    bitbake-user-manual/bitbake-user-manual-hello
 
 .. toctree::

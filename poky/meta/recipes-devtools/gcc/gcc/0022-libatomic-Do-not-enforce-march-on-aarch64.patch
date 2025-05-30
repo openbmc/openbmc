@@ -1,4 +1,4 @@
-From 6ebeb70ce2e78a84295f4e392602ae3c4026783a Mon Sep 17 00:00:00 2001
+From 95ee2cf97c5c2a4bd66c54d078b960a1d541d35e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 13 May 2020 15:10:38 -0700
 Subject: [PATCH] libatomic: Do not enforce march on aarch64
@@ -17,10 +17,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 2 deletions(-)
 
 diff --git a/libatomic/Makefile.am b/libatomic/Makefile.am
-index 980677f3533..26188917946 100644
+index 0f1a7156084..255fe448e63 100644
 --- a/libatomic/Makefile.am
 +++ b/libatomic/Makefile.am
-@@ -130,7 +130,6 @@ libatomic_la_LIBADD = $(foreach s,$(SIZES),$(addsuffix _$(s)_.lo,$(SIZEOBJS)))
+@@ -128,7 +128,6 @@ libatomic_la_LIBADD = $(foreach s,$(SIZES),$(addsuffix _$(s)_.lo,$(SIZEOBJS)))
  ## On a target-specific basis, include alternates to be selected by IFUNC.
  if HAVE_IFUNC
  if ARCH_AARCH64_LINUX
@@ -29,7 +29,7 @@ index 980677f3533..26188917946 100644
  
  endif
 diff --git a/libatomic/Makefile.in b/libatomic/Makefile.in
-index d9d529bc502..47dacef9e01 100644
+index 9798e7c09e9..3b3027eb77d 100644
 --- a/libatomic/Makefile.in
 +++ b/libatomic/Makefile.in
 @@ -452,7 +452,6 @@ M_SRC = $(firstword $(filter %/$(M_FILE), $(all_c_files)))

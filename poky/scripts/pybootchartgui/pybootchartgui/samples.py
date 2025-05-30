@@ -37,6 +37,16 @@ class CPUSample:
         return str(self.time) + "\t" + str(self.user) + "\t" + \
                str(self.sys) + "\t" + str(self.io) + "\t" + str (self.swap)
 
+
+class NetSample:
+    def __init__(self, time, iface, received_bytes, transmitted_bytes, receive_diff, transmit_diff):
+        self.time = time
+        self.iface = iface
+        self.received_bytes = received_bytes
+        self.transmitted_bytes = transmitted_bytes
+        self.receive_diff = receive_diff
+        self.transmit_diff = transmit_diff
+
 class CPUPressureSample:
     def __init__(self, time, avg10, avg60, avg300, deltaTotal):
         self.time = time

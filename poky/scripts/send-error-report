@@ -6,6 +6,7 @@
 # Copyright (C) 2013 Intel Corporation
 # Author: Andreea Proca <andreea.b.proca@intel.com>
 # Author: Michael Wood <michael.g.wood@intel.com>
+# Author: Thomas Perrot <thomas.perrot@bootlin.com>
 #
 # SPDX-License-Identifier: GPL-2.0-only
 #
@@ -22,7 +23,7 @@ scripts_lib_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'li
 sys.path.insert(0, scripts_lib_path)
 import argparse_oe
 
-version = "0.3"
+version = "0.4"
 
 log = logging.getLogger("send-error-report")
 logging.basicConfig(format='%(levelname)s: %(message)s')
@@ -65,7 +66,7 @@ def edit_content(json_file_path):
 
 def prepare_data(args):
     # attempt to get the max_log_size from the server's settings
-    max_log_size = getPayloadLimit(args.protocol+args.server+"/ClientPost/JSON")
+    max_log_size = getPayloadLimit(args.server+"/ClientPost/JSON")
 
     if not os.path.isfile(args.error_file):
         log.error("No data file found.")
@@ -135,18 +136,37 @@ def send_data(data, args):
     headers={'Content-type': 'application/json', 'User-Agent': "send-error-report/"+version}
 
     if args.json:
-        url = args.protocol+args.server+"/ClientPost/JSON/"
+        url = args.server+"/ClientPost/JSON/"
     else:
-        url = args.protocol+args.server+"/ClientPost/"
+        url = args.server+"/ClientPost/"
 
     req = urllib.request.Request(url, data=data, headers=headers)
+
+    log.debug(f"Request URL: {url}")
+    log.debug(f"Request Headers: {headers}")
+    log.debug(f"Request Data: {data.decode('utf-8')}")
+
     try:
         response = urllib.request.urlopen(req)
     except urllib.error.HTTPError as e:
-        logging.error(str(e))
+        log.error(f"HTTP Error {e.code}: {e.reason}")
+        log.debug(f"Response Content: {e.read().decode('utf-8')}")
         sys.exit(1)
 
+    log.debug(f"Response Status: {response.status}")
+    log.debug(f"Response Headers: {response.getheaders()}")
     print(response.read().decode('utf-8'))
+
+def validate_server_url(args):
+    # Get the error report server from an argument
+    server = args.server or 'https://errors.yoctoproject.org'
+
+    if not server.startswith('http://') and not server.startswith('https://'):
+        log.error("Missing a URL scheme either http:// or https:// in the server name: " + server)
+        sys.exit(1)
+
+    # Construct the final URL
+    return f"{server}"
 
 
 if __name__ == '__main__':
@@ -164,8 +184,7 @@ if __name__ == '__main__':
     arg_parse.add_argument("-s",
                            "--server",
                            help="Server to send error report to",
-                           type=str,
-                           default="errors.yoctoproject.org")
+                           type=str)
 
     arg_parse.add_argument("-e",
                            "--email",
@@ -190,17 +209,21 @@ if __name__ == '__main__':
                            help="Return the result in json format, silences all other output",
                            action="store_true")
 
-    arg_parse.add_argument("--no-ssl",
-                           help="Use http instead of https protocol",
-                           dest="protocol",
-                           action="store_const", const="http://", default="https://")
-
-
+    arg_parse.add_argument("-d",
+                           "--debug",
+                           help="Enable debug mode to print request/response details",
+                           action="store_true")
 
     args = arg_parse.parse_args()
 
+    args.server = validate_server_url(args)
+
     if (args.json == False):
         print("Preparing to send errors to: "+args.server)
+
+    # Enable debugging if requested
+    if args.debug:
+        log.setLevel(logging.DEBUG)
 
     data = prepare_data(args)
     send_data(data, args)

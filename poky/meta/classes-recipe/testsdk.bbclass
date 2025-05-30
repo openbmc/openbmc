@@ -14,6 +14,9 @@
 #
 # where "<image-name>" is an image like core-image-sato.
 
+# List of test modules to run, or run all that can be found if unset
+TESTSDK_SUITES ?= ""
+
 TESTSDK_CLASS_NAME ?= "oeqa.sdk.testsdk.TestSDK"
 TESTSDKEXT_CLASS_NAME ?= "oeqa.sdkext.testsdk.TestSDKExt"
 

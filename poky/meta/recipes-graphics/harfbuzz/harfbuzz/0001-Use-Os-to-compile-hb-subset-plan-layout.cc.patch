@@ -1,0 +1,72 @@
+From 8d876ea19579ee6b687668921c17be423cf7d6c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 27 Apr 2025 15:26:09 -0700
+Subject: [PATCH] Use -Os to compile hb-subset-plan-layout.cc
+
+This helps compiling with GCC 15
+
+Reported upstream with GH Issues [1]
+
+[1] https://github.com/harfbuzz/harfbuzz/issues/5306
+
+Upstream-Status: Inappropriate [GCC-15 workaround]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/meson.build | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 3d1c00d..fded728 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -393,7 +393,6 @@ hb_subset_sources = files(
+   'hb-subset-instancer-solver.hh',
+   'hb-subset-instancer-solver.cc',
+   'hb-subset-plan.cc',
+-  'hb-subset-plan-layout.cc',
+   'hb-subset-plan-var.cc',
+   'hb-subset-plan.hh',
+   'hb-subset-plan-member-list.hh',
+@@ -410,6 +409,10 @@ hb_subset_sources = files(
+   'hb-subset.hh',
+ )
+ 
++hb_subset_sources_os = files(
++  'hb-subset-plan-layout.cc',
++)
++
+ hb_subset_headers = files(
+   'hb-subset.h',
+   'hb-subset-serialize.h'
+@@ -618,6 +621,12 @@ endif
+ 
+ darwin_versions = [hb_version_int, '@0@.0.0'.format(hb_version_int)]
+ 
++special_subset_layout_lib = static_library('special_subset_layout',
++  'hb-subset-plan-layout.cc',
++  include_directories: incconfig,
++  cpp_args: cpp_args + extra_hb_cpp_args + ['-Os'], # <== compile this one with -Os
++)
++
+ libharfbuzz = library('harfbuzz', hb_sources,
+   include_directories: incconfig,
+   dependencies: harfbuzz_deps,
+@@ -645,7 +654,7 @@ defs_list += [harfbuzz_subset_def]
+ libharfbuzz_subset = library('harfbuzz-subset', hb_subset_sources,
+   include_directories: incconfig,
+   dependencies: [m_dep],
+-  link_with: [libharfbuzz],
++  link_with: [libharfbuzz] + [special_subset_layout_lib],
+   cpp_args: cpp_args + extra_hb_cpp_args,
+   soversion: hb_so_version,
+   version: version,
+@@ -657,7 +666,7 @@ libharfbuzz_subset = library('harfbuzz-subset', hb_subset_sources,
+ custom_target('harfbuzz-subset.cc',
+   build_by_default: true,
+   output: 'harfbuzz-subset.cc',
+-  input: hb_base_sources + hb_subset_sources,
++  input: hb_base_sources + hb_subset_sources + hb_subset_sources_os,
+   command: [find_program('gen-harfbuzzcc.py'),
+             '@OUTPUT@', meson.current_source_dir(), '@INPUT@'],
+ )

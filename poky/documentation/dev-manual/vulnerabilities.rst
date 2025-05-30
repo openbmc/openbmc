@@ -66,37 +66,77 @@ found in ``build/tmp/deploy/cve``.
 
 For example the CVE check report for the ``flex-native`` recipe looks like::
 
-   $ cat poky/build/tmp/deploy/cve/flex-native
-   LAYER: meta
-   PACKAGE NAME: flex-native
-   PACKAGE VERSION: 2.6.4
-   CVE: CVE-2016-6354
-   CVE STATUS: Patched
-   CVE SUMMARY: Heap-based buffer overflow in the yy_get_next_buffer function in Flex before 2.6.1 might allow context-dependent attackers to cause a denial of service or possibly execute arbitrary code via vectors involving num_to_read.
-   CVSS v2 BASE SCORE: 7.5
-   CVSS v3 BASE SCORE: 9.8
-   VECTOR: NETWORK
-   MORE INFORMATION: https://nvd.nist.gov/vuln/detail/CVE-2016-6354
-
-   LAYER: meta
-   PACKAGE NAME: flex-native
-   PACKAGE VERSION: 2.6.4
-   CVE: CVE-2019-6293
-   CVE STATUS: Ignored
-   CVE SUMMARY: An issue was discovered in the function mark_beginning_as_normal in nfa.c in flex 2.6.4. There is a stack exhaustion problem caused by the mark_beginning_as_normal function making recursive calls to itself in certain scenarios involving lots of '*' characters. Remote attackers could leverage this vulnerability to cause a denial-of-service.
-   CVSS v2 BASE SCORE: 4.3
-   CVSS v3 BASE SCORE: 5.5
-   VECTOR: NETWORK
-   MORE INFORMATION: https://nvd.nist.gov/vuln/detail/CVE-2019-6293
+   $ cat ./tmp/deploy/cve/flex-native_cve.json
+   {
+     "version": "1",
+     "package": [
+       {
+         "name": "flex-native",
+         "layer": "meta",
+         "version": "2.6.4",
+         "products": [
+           {
+             "product": "flex",
+             "cvesInRecord": "No"
+           },
+           {
+             "product": "flex",
+             "cvesInRecord": "Yes"
+           }
+         ],
+         "issue": [
+           {
+             "id": "CVE-2006-0459",
+             "status": "Patched",
+             "link": "https://nvd.nist.gov/vuln/detail/CVE-2006-0459",
+             "summary": "flex.skl in Will Estes and John Millaway Fast Lexical Analyzer Generator (flex) before 2.5.33 does not allocate enough memory for grammars containing (1) REJECT statements or (2) trailing context rules, which causes flex to generate code that contains a buffer overflow that might allow context-dependent attackers to execute arbitrary code.",
+             "scorev2": "7.5",
+             "scorev3": "0.0",
+             "scorev4": "0.0",
+             "modified": "2024-11-21T00:06Z",
+             "vector": "NETWORK",
+             "vectorString": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+             "detail": "version-not-in-range"
+           },
+           {
+             "id": "CVE-2016-6354",
+             "status": "Patched",
+             "link": "https://nvd.nist.gov/vuln/detail/CVE-2016-6354",
+             "summary": "Heap-based buffer overflow in the yy_get_next_buffer function in Flex before 2.6.1 might allow context-dependent attackers to cause a denial of service or possibly execute arbitrary code via vectors involving num_to_read.",
+             "scorev2": "7.5",
+             "scorev3": "9.8",
+             "scorev4": "0.0",
+             "modified": "2024-11-21T02:55Z",
+             "vector": "NETWORK",
+             "vectorString": "AV:N/AC:L/Au:N/C:P/I:P/A:P",
+             "detail": "version-not-in-range"
+           },
+           {
+             "id": "CVE-2019-6293",
+             "status": "Ignored",
+             "link": "https://nvd.nist.gov/vuln/detail/CVE-2019-6293",
+             "summary": "An issue was discovered in the function mark_beginning_as_normal in nfa.c in flex 2.6.4. There is a stack exhaustion problem caused by the mark_beginning_as_normal function making recursive calls to itself in certain scenarios involving lots of '*' characters. Remote attackers could leverage this vulnerability to cause a denial-of-service.",
+             "scorev2": "4.3",
+             "scorev3": "5.5",
+             "scorev4": "0.0",
+             "modified": "2024-11-21T04:46Z",
+             "vector": "NETWORK",
+             "vectorString": "AV:N/AC:M/Au:N/C:N/I:N/A:P",
+             "detail": "upstream-wontfix",
+             "description": "there is stack exhaustion but no bug and it is building the parser, not running it, effectively similar to a compiler ICE. Upstream no plans to address this."
+           }
+         ]
+       }
+     ]
+   }
 
 For images, a summary of all recipes included in the image and their CVEs is also
-generated in textual and JSON formats. These ``.cve`` and ``.json`` reports can be found
+generated in the JSON format. These ``.json`` reports can be found
 in the ``tmp/deploy/images`` directory for each compiled image.
 
 At build time CVE check will also throw warnings about ``Unpatched`` CVEs::
 
-   WARNING: flex-2.6.4-r0 do_cve_check: Found unpatched CVE (CVE-2019-6293), for more information check /poky/build/tmp/work/core2-64-poky-linux/flex/2.6.4-r0/temp/cve.log
-   WARNING: libarchive-3.5.1-r0 do_cve_check: Found unpatched CVE (CVE-2021-36976), for more information check /poky/build/tmp/work/core2-64-poky-linux/libarchive/3.5.1-r0/temp/cve.log
+   WARNING: qemu-native-9.2.0-r0 do_cve_check: Found unpatched CVE (CVE-2023-1386)
 
 It is also possible to check the CVE status of individual packages as follows::
 
@@ -115,10 +155,10 @@ upstream `NIST CVE database <https://nvd.nist.gov/>`__.
 
 The variable supports using vendor and product names like this::
 
-   CVE_PRODUCT = "flex_project:flex"
+   CVE_PRODUCT = "flex_project:flex westes:flex"
 
-In this example the vendor name used in the CVE database is ``flex_project`` and the
-product is ``flex``. With this setting the ``flex`` recipe only maps to this specific
+In this example we have two possible vendors names,  ``flex_project`` and ``westes``,
+with the product name ``flex``. With this setting the ``flex`` recipe only maps to this specific
 product and not products from other vendors with same name ``flex``.
 
 Similarly, when the recipe version :term:`PV` is not compatible with software versions used by

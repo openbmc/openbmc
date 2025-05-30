@@ -1,4 +1,4 @@
-From 60783f0d885c9a0db8b6f1d528786321e53f1512 Mon Sep 17 00:00:00 2001
+From 4e726a5aaa75d60fab6a56bc37dbec48be53ff79 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Apr 2015 23:02:21 -0700
 Subject: [PATCH] gweb/gresolv.c: make use of res_ninit optional and subject to
@@ -83,6 +83,3 @@ index 8101d71..9f1477c 100644
  
  		if (!resolv->nameserver_list)
  			g_resolv_add_nameserver(resolv, "127.0.0.1", 53, 0);
--- 
-2.39.2
-

@@ -316,7 +316,9 @@ def multiprocess_launch_mp(target, items, max_process, extraargs=None):
     items = list(items)
     while (items and not errors) or launched:
         if not errors and items and len(launched) < max_process:
-            args = (items.pop(),)
+            args = items.pop()
+            if not type(args) is tuple:
+                args = (args,)
             if extraargs is not None:
                 args = args + extraargs
             p = ProcessLaunch(target=target, args=args)

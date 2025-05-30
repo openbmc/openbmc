@@ -5,6 +5,7 @@ require binutils-${PV}.inc
 DEPENDS += "zlib perl-native"
 
 EXTRA_OECONF += "--with-sysroot=/ \
+                --with-libtool-sysroot=${STAGING_DIR_HOST} \
                 --enable-install-libbfd \
                 --enable-install-libiberty \
                 --enable-shared \

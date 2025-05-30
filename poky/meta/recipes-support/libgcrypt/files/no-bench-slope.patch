@@ -1,3 +1,8 @@
+From eb3a5bc4d5a212da64c0f9396c7f31f83aa6f36c Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 9 Sep 2022 11:13:37 +0100
+Subject: [PATCH] libgcrypt: disable bench-slope test case
+
 The bench-slope test appears to be aborting fairly frequently, which causes
 failures on the autobuilder.
 
@@ -10,10 +15,10 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/tests/testdrv.c b/tests/testdrv.c
-index bfca4c2314..5a755f512e 100644
+index 634b718..1e9dddb 100644
 --- a/tests/testdrv.c
 +++ b/tests/testdrv.c
-@@ -77,7 +77,6 @@ static struct {
+@@ -76,7 +76,6 @@ static struct {
     { "t-x448"      },
     { "t-ed448"     },
     { "benchmark"   },
@@ -21,4 +26,3 @@ index bfca4c2314..5a755f512e 100644
     { "hashtest-6g", "hashtest", "--hugeblock --gigs 6 SHA1 SHA256 SHA512 "
                                                       "SHA3-512 SM3 BLAKE2S_256 "
                                                       "BLAKE2B_512 CRC32 "
-

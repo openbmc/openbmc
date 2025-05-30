@@ -1,0 +1,1 @@
+sudo zypper install 'texlive-collection-lang*' texlive-collection-fontsextra texlive-collection-fontsrecommended texlive-collection-latex texlive-collection-latexextra texlive-collection-latexrecommended texlive-collection-xetex texlive-fncychap texlive-gnu-freefont texlive-latexmk texlive-tex-gyre texlive-xetex

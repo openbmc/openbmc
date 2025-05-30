@@ -1,0 +1,186 @@
+From 3739faa41f60841d5277344b17ddc69e78ed8996 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Mar 2025 22:58:33 -0700
+Subject: [PATCH] Fix build with GCC 15
+
+This is collection of changes needed to get compiling with gcc-15
+which switched to use C23 as default std.
+
+Upstream-Status: Submitted [https://github.com/UweOhse/lrzsz/pull/8]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/error.c        | 2 +-
+ lib/getopt.h       | 2 +-
+ lib/long-options.c | 4 ++--
+ lib/long-options.h | 2 +-
+ lib/xstrtol.c      | 2 --
+ src/lrz.c          | 8 +-------
+ src/lsz.c          | 8 +-------
+ src/tcp.c          | 2 +-
+ src/zglobal.h      | 2 +-
+ src/zreadline.c    | 2 +-
+ 10 files changed, 10 insertions(+), 24 deletions(-)
+
+diff --git a/lib/error.c b/lib/error.c
+index 8f679c7..4632c9c 100644
+--- a/lib/error.c
++++ b/lib/error.c
+@@ -73,7 +73,7 @@ extern char *program_name;
+ 
+ # if HAVE_STRERROR
+ #  ifndef strerror		/* On some systems, strerror is a macro */
+-char *strerror ();
++char *strerror (int);
+ #  endif
+ # else
+ static char *
+diff --git a/lib/getopt.h b/lib/getopt.h
+index 4ac33b7..46971cb 100644
+--- a/lib/getopt.h
++++ b/lib/getopt.h
+@@ -101,7 +101,7 @@ struct option
+    errors, only prototype getopt for the GNU C library.  */
+ extern int getopt (int argc, char *const *argv, const char *shortopts);
+ #else /* not __GNU_LIBRARY__ */
+-extern int getopt ();
++extern int getopt (int, char * const [], const char *);
+ #endif /* __GNU_LIBRARY__ */
+ extern int getopt_long (int argc, char *const *argv, const char *shortopts,
+ 		        const struct option *longopts, int *longind);
+diff --git a/lib/long-options.c b/lib/long-options.c
+index 9ee8f66..2c8d267 100644
+--- a/lib/long-options.c
++++ b/lib/long-options.c
+@@ -40,7 +40,7 @@ parse_long_options (argc, argv,version, usage)
+      int argc;
+      char **argv;
+      void (*version)();
+-     void (*usage)();
++     void (*usage)(int);
+ {
+   int c;
+   int saved_opterr;
+@@ -61,7 +61,7 @@ parse_long_options (argc, argv,version, usage)
+ 	  (*usage) (0);
+ 
+ 	case 'v':
+-	  (*version) (0);
++	  (*version) ();
+ 	  /* printf ("%s (%s) %s\n", command_name, package, version_string); */
+ 	  exit (0);
+ 
+diff --git a/lib/long-options.h b/lib/long-options.h
+index 14459cd..3fb8fa6 100644
+--- a/lib/long-options.h
++++ b/lib/long-options.h
+@@ -6,5 +6,5 @@
+ #endif
+ 
+ void parse_long_options __P ((int _argc, char **_argv, 
+-							  void (*_version) (void), 
++							  void (*_version) (), 
+ 							  void (*_usage) (int)));
+diff --git a/lib/xstrtol.c b/lib/xstrtol.c
+index 8755cf4..0ab337d 100644
+--- a/lib/xstrtol.c
++++ b/lib/xstrtol.c
+@@ -65,8 +65,6 @@ extern int errno;
+ 	}								\
+       while (0)
+ 
+-__unsigned long int __strtol ();
+-
+ /* FIXME: comment.  */
+ 
+ strtol_error
+diff --git a/src/lrz.c b/src/lrz.c
+index b3cf1d5..ae3c62d 100644
+--- a/src/lrz.c
++++ b/src/lrz.c
+@@ -41,12 +41,6 @@
+ #include "xstrtoul.h"
+ #include "error.h"
+ 
+-#ifndef STRICT_PROTOTYPES
+-extern time_t time();
+-extern char *strerror();
+-extern char *strstr();
+-#endif
+-
+ #ifndef HAVE_ERRNO_DECLARATION
+ extern int errno;
+ #endif
+@@ -191,7 +185,7 @@ int enable_syslog=FALSE;
+ 
+ 
+ /* called by signal interrupt or terminate to clean things up */
+-RETSIGTYPE
++void
+ bibi(int n)
+ {
+ 	if (zmodem_requested)
+diff --git a/src/lsz.c b/src/lsz.c
+index e9e4660..69f4fb8 100644
+--- a/src/lsz.c
++++ b/src/lsz.c
+@@ -50,12 +50,6 @@ void *mm_addr=NULL;
+ #include "xstrtoul.h"
+ #include "error.h"
+ 
+-#ifndef STRICT_PROTOTYPES
+-extern time_t time();
+-extern char *strerror();
+-extern char *strstr();
+-#endif
+-
+ #ifndef HAVE_ERRNO_DECLARATION
+ extern int errno;
+ #endif
+@@ -218,7 +212,7 @@ static int zrqinits_sent=0;
+ static int play_with_sigint=0;
+ 
+ /* called by signal interrupt or terminate to clean things up */
+-RETSIGTYPE
++void
+ bibi (int n)
+ {
+ 	canit(STDOUT_FILENO);
+diff --git a/src/tcp.c b/src/tcp.c
+index 137f94c..a885d5b 100644
+--- a/src/tcp.c
++++ b/src/tcp.c
+@@ -38,7 +38,7 @@
+ #include <stdlib.h>
+ #include "error.h"
+ 
+-static RETSIGTYPE
++static void
+ tcp_alarm_handler(int dummy LRZSZ_ATTRIB_UNUSED)
+ {
+     /* doesn't need to do anything */
+diff --git a/src/zglobal.h b/src/zglobal.h
+index 573b461..55bd58f 100644
+--- a/src/zglobal.h
++++ b/src/zglobal.h
+@@ -357,7 +357,7 @@ extern int no_timeout;
+ extern int Zctlesc;    /* Encode control characters */
+ extern int under_rsh;
+ 
+-RETSIGTYPE bibi __P ((int n));
++void bibi __P ((int n));
+ 
+ #define sendline(c) putchar((c) & 0377)
+ #define xsendline(c) putchar(c)
+diff --git a/src/zreadline.c b/src/zreadline.c
+index aeda95c..c8f8263 100644
+--- a/src/zreadline.c
++++ b/src/zreadline.c
+@@ -43,7 +43,7 @@ static char *readline_buffer;
+ int readline_left=0;
+ char *readline_ptr;
+ 
+-static RETSIGTYPE
++static void
+ zreadline_alarm_handler(int dummy LRZSZ_ATTRIB_UNUSED)
+ {
+ 	/* doesn't need to do anything */

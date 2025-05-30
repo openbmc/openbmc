@@ -6,7 +6,7 @@ Subject: [PATCH] vim: do not adjust script pathnames
 When cross-compiling, we do not want to reference the host versions of
 things like perl and awk.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [specific to cross compilation and sysroots]
 
 Signed-off-by: Joe Slater <joe.slater@windriver.com>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>

@@ -10,9 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://COPYING3;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "https://sourceware.org/ftp/debugedit/${PV}/debugedit-${PV}.tar.xz \
-           "
-
-SRC_URI:append:libc-musl = "\
+           file://0001-Add-option-to-allow-disabling-inlined-xxhash.patch \
            file://0003-Makefile.am-do-not-update-manual.patch \
            "
 
@@ -24,6 +22,8 @@ DEPENDS:append:libc-musl = " musl-legacy-error"
 inherit pkgconfig autotools multilib_script
 
 RDEPENDS:${PN} += "bash elfutils-binutils"
+
+EXTRA_OECONF = "${@oe.utils.vartrue('DEBUG_BUILD', '--disable-inlined-xxhash', '', d)}"
 
 BBCLASSEXTEND = "native nativesdk"
 

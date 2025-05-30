@@ -372,7 +372,6 @@ def _get_parameters_values(request, default_count, default_order):
 # set cookies for parameters. this is usefull in case parameters are set
 # manually from the GET values of the link
 def _set_parameters_values(pagesize, orderby, request):
-    from django.urls import resolve
     current_url = resolve(request.path_info).url_name
     request.session['%s_count' % current_url] = pagesize
     request.session['%s_orderby' % current_url] =orderby
@@ -699,7 +698,6 @@ class LazyEncoder(json.JSONEncoder):
         return super(LazyEncoder, self).default(obj)
 
 from toastergui.templatetags.projecttags import filtered_filesizeformat
-import os
 def _get_dir_entries(build_id, target_id, start):
     node_str = {
         Target_File.ITYPE_REGULAR   : '-',

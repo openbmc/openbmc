@@ -672,7 +672,7 @@ The steps in this procedure show you how you can patch the kernel using
 
    Before attempting this procedure, be sure you have performed the
    steps to get ready for updating the kernel as described in the
-   ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``"
+   ":ref:`kernel-dev/common:getting ready to develop using ``devtool```"
    section.
 
 Patching the kernel involves changing or adding configurations to an
@@ -685,7 +685,7 @@ output at boot time through ``printk`` statements in the kernel's
 ``calibrate.c`` source code file. Applying the patch and booting the
 modified image causes the added messages to appear on the emulator's
 console. The example is a continuation of the setup procedure found in
-the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Section.
+the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Section.
 
 #. *Check Out the Kernel Source Files:* First you must use ``devtool``
    to checkout the kernel source code in its workspace.
@@ -693,7 +693,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
    .. note::
 
       See this step in the
-      ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``"
+      ":ref:`kernel-dev/common:getting ready to develop using ``devtool```"
       section for more information.
 
    Use the following ``devtool`` command to check out the code::
@@ -804,7 +804,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``" Se
    .. note::
 
       See Step 3 of the
-      ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``"
+      ":ref:`kernel-dev/common:getting ready to develop using ``devtool```"
       section for information on setting up this layer.
 
    Once the command
@@ -1190,7 +1190,7 @@ appear in the ``.config`` file, which is in the :term:`Build Directory`.
 
    For more information about where the ``.config`` file is located, see the
    example in the
-   ":ref:`kernel-dev/common:using \`\`menuconfig\`\``"
+   ":ref:`kernel-dev/common:using ``menuconfig```"
    section.
 
 It is simple to create a configuration fragment. One method is to use
@@ -1286,7 +1286,7 @@ when you override a policy configuration in a hardware configuration
 fragment.
 
 In order to run this task, you must have an existing ``.config`` file.
-See the ":ref:`kernel-dev/common:using \`\`menuconfig\`\``" section for
+See the ":ref:`kernel-dev/common:using ``menuconfig```" section for
 information on how to create a configuration file.
 
 Here is sample output from the :ref:`ref-tasks-kernel_configcheck` task:
@@ -1359,7 +1359,7 @@ and
 tasks until they produce no warnings.
 
 For more information on how to use the ``menuconfig`` tool, see the
-:ref:`kernel-dev/common:using \`\`menuconfig\`\`` section.
+:ref:`kernel-dev/common:using ``menuconfig``` section.
 
 Fine-Tuning the Kernel Configuration File
 -----------------------------------------

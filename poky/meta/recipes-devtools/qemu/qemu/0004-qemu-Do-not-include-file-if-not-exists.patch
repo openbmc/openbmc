@@ -1,4 +1,4 @@
-From 081c1e4ee93b22ec00136db45c36650427213c09 Mon Sep 17 00:00:00 2001
+From 09936dc09b577448d354e82919829ef6a809dc94 Mon Sep 17 00:00:00 2001
 From: Oleksiy Obitotskyy <oobitots@cisco.com>
 Date: Wed, 25 Mar 2020 21:21:35 +0200
 Subject: [PATCH] qemu: Do not include file if not exists
@@ -16,10 +16,10 @@ Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9d5415674..22df46859 100644
+index 8bfe4912e..d04984f66 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -117,7 +117,9 @@
+@@ -118,7 +118,9 @@
  #include <linux/blkpg.h>
  #include <netpacket/packet.h>
  #include <linux/netlink.h>

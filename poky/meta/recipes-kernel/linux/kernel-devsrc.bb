@@ -75,7 +75,8 @@ do_install() {
         if [ -s Module.symvers ]; then
             cp Module.symvers $kerneldir/build
         fi
-        cp System.map* $kerneldir/build
+        cp System.map-* $kerneldir/build
+        ln -s System.map-* $kerneldir/build/System.map
         if [ -s Module.markers ]; then
             cp Module.markers $kerneldir/build
         fi

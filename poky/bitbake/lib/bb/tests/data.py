@@ -450,17 +450,64 @@ class TestFlags(unittest.TestCase):
         self.d = bb.data.init()
         self.d.setVar("foo", "value of foo")
         self.d.setVarFlag("foo", "flag1", "value of flag1")
+        self.d.setVarFlag("foo", "_defaultval_flag_flag1", "default of flag1")
         self.d.setVarFlag("foo", "flag2", "value of flag2")
+        self.d.setVarFlag("foo", "_defaultval_flag_flag2", "default of flag2")
+        self.d.setVarFlag("foo", "flag3", "value of flag3")
+        self.d.setVarFlag("foo", "_defaultval_flag_flagnovalue", "default of flagnovalue")
 
     def test_setflag(self):
         self.assertEqual(self.d.getVarFlag("foo", "flag1", False), "value of flag1")
         self.assertEqual(self.d.getVarFlag("foo", "flag2", False), "value of flag2")
+        self.assertDictEqual(
+            self.d.getVarFlags("foo"),
+            {
+                "flag1": "value of flag1",
+                "flag2": "value of flag2",
+                "flag3": "value of flag3",
+                "flagnovalue": "default of flagnovalue",
+            }
+        )
+        self.assertDictEqual(
+            self.d.getVarFlags("foo", internalflags=True),
+            {
+                "_content": "value of foo",
+                "flag1": "value of flag1",
+                "flag2": "value of flag2",
+                "flag3": "value of flag3",
+                "_defaultval_flag_flag1": "default of flag1",
+                "_defaultval_flag_flag2": "default of flag2",
+                "_defaultval_flag_flagnovalue": "default of flagnovalue",
+            }
+        )
 
     def test_delflag(self):
         self.d.delVarFlag("foo", "flag2")
+        self.d.delVarFlag("foo", "flag3")
         self.assertEqual(self.d.getVarFlag("foo", "flag1", False), "value of flag1")
         self.assertEqual(self.d.getVarFlag("foo", "flag2", False), None)
+        self.assertDictEqual(
+            self.d.getVarFlags("foo"),
+            {
+                "flag1": "value of flag1",
+                "flagnovalue": "default of flagnovalue",
+            }
+        )
+        self.assertDictEqual(
+            self.d.getVarFlags("foo", internalflags=True),
+            {
+                "_content": "value of foo",
+                "flag1": "value of flag1",
+                "_defaultval_flag_flag1": "default of flag1",
+                "_defaultval_flag_flagnovalue": "default of flagnovalue",
+            }
+        )
 
+    def test_delvar(self):
+        self.d.delVar("foo")
+        self.assertEqual(self.d.getVarFlag("foo", "flag1", False), None)
+        self.assertEqual(self.d.getVarFlag("foo", "flag2", False), None)
+        self.assertEqual(self.d.getVarFlags("foo", internalflags=True), None)
 
 class Contains(unittest.TestCase):
     def setUp(self):

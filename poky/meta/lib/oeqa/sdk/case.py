@@ -7,14 +7,72 @@
 import os
 import subprocess
 import shutil
+import unittest
 
 from oeqa.core.case import OETestCase
+from oeqa.sdkext.context import OESDKExtTestContext
 
 class OESDKTestCase(OETestCase):
     def _run(self, cmd):
         return subprocess.check_output(". %s > /dev/null; %s;" % \
                 (self.tc.sdk_env, cmd), shell=True, executable="/bin/bash",
                 stderr=subprocess.STDOUT, universal_newlines=True)
+
+    def ensure_host_package(self, *packages, recipe=None):
+        """
+        Check that the host variation of one of the packages listed is available
+        in the SDK (nativesdk-foo for SDK, foo-native for eSDK). The package is
+        a list for the case where debian-renaming may have occured, and the
+        manifest could contain 'foo' or 'libfoo'.
+
+        If testing an eSDK and the package is not found, then try to install the
+        specified recipe to install it from sstate.
+        """
+
+        # In a SDK the manifest is correct. In an eSDK the manifest may be
+        # correct (type=full) or not include packages that exist in sstate but
+        # not installed yet (minimal) so we should try to install the recipe.
+        for package in packages:
+            if isinstance(self.tc, OESDKExtTestContext):
+                package = package + "-native"
+            else:
+                package = "nativesdk-" + package
+
+            if self.tc.hasHostPackage(package):
+                break
+        else:
+            if isinstance(self.tc, OESDKExtTestContext):
+                recipe = (recipe or packages[0]) + "-native"
+                print("Trying to install %s..." % recipe)
+                self._run('devtool sdk-install %s' % recipe)
+            else:
+                raise unittest.SkipTest("Test %s needs one of %s" % (self.id(), ", ".join(packages)))
+
+    def ensure_target_package(self, *packages, multilib=False, recipe=None):
+        """
+        Check that at least one of the packages listed is available in the SDK,
+        adding the multilib prefix if required. The target package is a list for
+        the case where debian-renaming may have occured, and the manifest could
+        contain 'foo' or 'libfoo'.
+
+        If testing an eSDK and the package is not found, then try to install the
+        specified recipe to install it from sstate.
+        """
+
+        # In a SDK the manifest is correct. In an eSDK the manifest may be
+        # correct (type=full) or not include packages that exist in sstate but
+        # not installed yet (minimal) so we should try to install the recipe.
+        for package in packages:
+            if self.tc.hasTargetPackage(package, multilib=multilib):
+                break
+        else:
+            if isinstance(self.tc, OESDKExtTestContext):
+                recipe = recipe or packages[0]
+                print("Trying to install %s..." % recipe)
+                self._run('devtool sdk-install %s' % recipe)
+            else:
+                raise unittest.SkipTest("Test %s needs one of %s" % (self.id(), ", ".join(packages)))
+
 
     def fetch(self, workdir, dl_dir, url, archive=None):
         if not archive:

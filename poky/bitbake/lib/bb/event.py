@@ -194,7 +194,12 @@ def fire_ui_handlers(event, d):
         ui_queue.append(event)
         return
 
-    with bb.utils.lock_timeout(_thread_lock):
+    with bb.utils.lock_timeout_nocheck(_thread_lock) as lock:
+        if not lock:
+            # If we can't get the lock, we may be recursively called, queue and return
+            ui_queue.append(event)
+            return
+
         errors = []
         for h in _ui_handlers:
             #print "Sending event %s" % event
@@ -212,6 +217,9 @@ def fire_ui_handlers(event, d):
                 errors.append(h)
         for h in errors:
             del _ui_handlers[h]
+
+    while ui_queue:
+        fire_ui_handlers(ui_queue.pop(), d)
 
 def fire(event, d):
     """Fire off an Event"""

@@ -26,6 +26,7 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-soft', ' -msoft-float
 TARGET_FPU .= "${@bb.utils.contains('TUNE_FEATURES', 'fpu-soft', 'soft', '', d)}"
 
 TUNEVALID[altivec] = "Altivec"
+TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'altivec', ' -maltivec', '', d)}"
 
 # Basic tune definitions
 AVAILTUNES += "powerpc powerpc-nf powerpcle powerpcle-nf" 

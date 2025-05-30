@@ -1,0 +1,129 @@
+From 1dc81f272855d94e6a78f7d10ea952745d991aa9 Mon Sep 17 00:00:00 2001
+From: Bin Lan <bin.lan.cn@windriver.com>
+Date: Tue, 11 Mar 2025 17:19:11 +0800
+Subject: [PATCH] Tests: fix test applications in cpp-common are needed to
+ re-build
+
+Test applications in cpp-common directory are needed to re-build when
+calling make check in embedded system. The following error is shown
+when running test applications:
+make[3]: *** No rule to make target 'cpp-common/test-c-string-view.cpp',
+needed by 'cpp-common/test-c-string-view.o'.
+make[3]: *** No rule to make target '../tests/utils/tap/libtap.la',
+needed by 'cpp-common/test-c-string-view'.
+make[3]: *** No rule to make target '../src/common/libcommon.la',
+needed by 'cpp-common/test-c-string-view'.
+make[3]: *** No rule to make target '../src/logging/liblogging.la',
+needed by 'cpp-common/test-c-string-view'.
+...
+make[2]: *** [Makefile:1274: check-TESTS] Error 2
+make[1]: *** [Makefile:1805: check-am] Error 2
+make: *** [Makefile:1033: check-recursive] Error 1
+make: Target 'check' not remade because of errors.
+
+Create some new shell scripts which are used to call test applications
+in cpp-common directory. Then these test applications can run without
+actually examining the source code.
+
+Upstream-Status: Submitted [https://review.lttng.org/c/babeltrace/+/14213]
+
+Signed-off-by: Bin Lan <bin.lan.cn@windriver.com>
+---
+ tests/Makefile.am                      |  6 +++---
+ tests/cpp-common/test-c-string-view.sh | 17 +++++++++++++++++
+ tests/cpp-common/test-unicode-conv.sh  | 17 +++++++++++++++++
+ tests/cpp-common/test-uuid.sh          | 17 +++++++++++++++++
+ 4 files changed, 54 insertions(+), 3 deletions(-)
+ create mode 100755 tests/cpp-common/test-c-string-view.sh
+ create mode 100755 tests/cpp-common/test-unicode-conv.sh
+ create mode 100755 tests/cpp-common/test-uuid.sh
+
+diff --git a/tests/Makefile.am b/tests/Makefile.am
+index 2a4022bc4..c79b77b32 100644
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -129,9 +129,9 @@ cpp_common_test_unicode_conv_LDADD = \
+ 	$(COMMON_TEST_LDADD)
+ 
+ TESTS_CPP_COMMON = \
+-	cpp-common/test-c-string-view \
+-	cpp-common/test-uuid \
+-	cpp-common/test-unicode-conv
++	cpp-common/test-c-string-view.sh \
++	cpp-common/test-uuid.sh \
++	cpp-common/test-unicode-conv.sh
+ 
+ TESTS_LIB = \
+ 	lib/test-bt-uuid \
+diff --git a/tests/cpp-common/test-c-string-view.sh b/tests/cpp-common/test-c-string-view.sh
+new file mode 100755
+index 000000000..9c2ca5818
+--- /dev/null
++++ b/tests/cpp-common/test-c-string-view.sh
+@@ -0,0 +1,17 @@
++#!/bin/bash
++#
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Copyright (C) 2025 Bin Lan <bin.lan.cn@windriver.com>
++#
++
++if [ -n "${BT_TESTS_SRCDIR:-}" ]; then
++	UTILSSH="$BT_TESTS_SRCDIR/utils/utils.sh"
++else
++	UTILSSH="$(dirname "$0")/../utils/utils.sh"
++fi
++
++# shellcheck source=../utils/utils.sh
++source "$UTILSSH"
++
++"${BT_TESTS_BUILDDIR}/cpp-common/test-c-string-view" "$BT_TESTS_BT2_BIN"
+diff --git a/tests/cpp-common/test-unicode-conv.sh b/tests/cpp-common/test-unicode-conv.sh
+new file mode 100755
+index 000000000..df490b2eb
+--- /dev/null
++++ b/tests/cpp-common/test-unicode-conv.sh
+@@ -0,0 +1,17 @@
++#!/bin/bash
++#
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Copyright (C) 2025 Bin Lan <bin.lan.cn@windriver.com>
++#
++
++if [ -n "${BT_TESTS_SRCDIR:-}" ]; then
++	UTILSSH="$BT_TESTS_SRCDIR/utils/utils.sh"
++else
++	UTILSSH="$(dirname "$0")/../utils/utils.sh"
++fi
++
++# shellcheck source=../utils/utils.sh
++source "$UTILSSH"
++
++"${BT_TESTS_BUILDDIR}/cpp-common/test-unicode-conv" "$BT_TESTS_BT2_BIN"
+diff --git a/tests/cpp-common/test-uuid.sh b/tests/cpp-common/test-uuid.sh
+new file mode 100755
+index 000000000..8c65daa94
+--- /dev/null
++++ b/tests/cpp-common/test-uuid.sh
+@@ -0,0 +1,17 @@
++#!/bin/bash
++#
++# SPDX-License-Identifier: GPL-2.0-only
++#
++# Copyright (C) 2025 Bin Lan <bin.lan.cn@windriver.com>
++#
++
++if [ -n "${BT_TESTS_SRCDIR:-}" ]; then
++	UTILSSH="$BT_TESTS_SRCDIR/utils/utils.sh"
++else
++	UTILSSH="$(dirname "$0")/../utils/utils.sh"
++fi
++
++# shellcheck source=../utils/utils.sh
++source "$UTILSSH"
++
++"${BT_TESTS_BUILDDIR}/cpp-common/test-uuid" "$BT_TESTS_BT2_BIN"
+-- 
+2.34.1
+

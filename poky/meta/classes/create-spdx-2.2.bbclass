@@ -15,6 +15,8 @@ SPDX_SUPPLIER[doc] = "The SPDX PackageSupplier field for SPDX packages created f
     is the contact information for the person or organization who is doing the \
     build."
 
+SPDX_ARCHIVE_SOURCES ??= "0"
+SPDX_ARCHIVE_PACKAGED ??= "0"
 
 def get_namespace(d, name):
     import uuid
@@ -279,21 +281,21 @@ def collect_dep_recipes(d, doc, spdx_recipe):
 
     deps = oe.spdx_common.get_spdx_deps(d)
 
-    for dep_pn, dep_hashfn, in_taskhash in deps:
+    for dep in deps:
         # If this dependency is not calculated in the taskhash skip it.
         # Otherwise, it can result in broken links since this task won't
         # rebuild and see the new SPDX ID if the dependency changes
-        if not in_taskhash:
+        if not dep.in_taskhash:
             continue
 
-        dep_recipe_path = oe.sbom.doc_find_by_hashfn(deploy_dir_spdx, package_archs, "recipe-" + dep_pn, dep_hashfn)
+        dep_recipe_path = oe.sbom.doc_find_by_hashfn(deploy_dir_spdx, package_archs, "recipe-" + dep.pn, dep.hashfn)
         if not dep_recipe_path:
-            bb.fatal("Cannot find any SPDX file for recipe %s, %s" % (dep_pn, dep_hashfn))
+            bb.fatal("Cannot find any SPDX file for recipe %s, %s" % (dep.pn, dep.hashfn))
 
         spdx_dep_doc, spdx_dep_sha1 = oe.sbom.read_doc(dep_recipe_path)
 
         for pkg in spdx_dep_doc.packages:
-            if pkg.name == dep_pn:
+            if pkg.name == dep.pn:
                 spdx_dep_recipe = pkg
                 break
         else:
@@ -352,34 +354,33 @@ def add_download_packages(d, doc, recipe):
     for download_idx, src_uri in enumerate(d.getVar('SRC_URI').split()):
         f = bb.fetch2.FetchData(src_uri, d)
 
-        for name in f.names:
-            package = oe.spdx.SPDXPackage()
-            package.name = "%s-source-%d" % (d.getVar("PN"), download_idx + 1)
-            package.SPDXID = oe.sbom.get_download_spdxid(d, download_idx + 1)
+        package = oe.spdx.SPDXPackage()
+        package.name = "%s-source-%d" % (d.getVar("PN"), download_idx + 1)
+        package.SPDXID = oe.sbom.get_download_spdxid(d, download_idx + 1)
 
-            if f.type == "file":
-                continue
+        if f.type == "file":
+            continue
 
-            if f.method.supports_checksum(f):
-                for checksum_id in CHECKSUM_LIST:
-                    if checksum_id.upper() not in oe.spdx.SPDXPackage.ALLOWED_CHECKSUMS:
-                        continue
+        if f.method.supports_checksum(f):
+            for checksum_id in CHECKSUM_LIST:
+                if checksum_id.upper() not in oe.spdx.SPDXPackage.ALLOWED_CHECKSUMS:
+                    continue
 
-                    expected_checksum = getattr(f, "%s_expected" % checksum_id)
-                    if expected_checksum is None:
-                        continue
+                expected_checksum = getattr(f, "%s_expected" % checksum_id)
+                if expected_checksum is None:
+                    continue
 
-                    c = oe.spdx.SPDXChecksum()
-                    c.algorithm = checksum_id.upper()
-                    c.checksumValue = expected_checksum
-                    package.checksums.append(c)
+                c = oe.spdx.SPDXChecksum()
+                c.algorithm = checksum_id.upper()
+                c.checksumValue = expected_checksum
+                package.checksums.append(c)
 
-            package.downloadLocation = oe.spdx_common.fetch_data_to_uri(f, name)
-            doc.packages.append(package)
-            doc.add_relationship(doc, "DESCRIBES", package)
-            # In the future, we might be able to do more fancy dependencies,
-            # but this should be sufficient for now
-            doc.add_relationship(package, "BUILD_DEPENDENCY_OF", recipe)
+        package.downloadLocation = oe.spdx_common.fetch_data_to_uri(f, f.name)
+        doc.packages.append(package)
+        doc.add_relationship(doc, "DESCRIBES", package)
+        # In the future, we might be able to do more fancy dependencies,
+        # but this should be sufficient for now
+        doc.add_relationship(package, "BUILD_DEPENDENCY_OF", recipe)
 
 def get_license_list_version(license_data, d):
     # Newer versions of the SPDX license list are SemVer ("MAJOR.MINOR.MICRO"),

@@ -18,8 +18,6 @@
 
 import os
 import sys
-import argparse
-import logging
 
 scripts_path = os.path.dirname(os.path.realpath(__file__))
 lib_path = scripts_path + '/lib'

@@ -31,13 +31,13 @@ class SPDX22Check(OESelftestTestCase):
         self.write_config(config)
 
         deploy_dir = get_bb_var("DEPLOY_DIR")
-        machine_var = get_bb_var("MACHINE")
+        arch_dir = get_bb_var("PACKAGE_ARCH", target_name)
         spdx_version = get_bb_var("SPDX_VERSION")
         # qemux86-64 creates the directory qemux86_64
-        machine_dir = machine_var.replace("-", "_")
+        #arch_dir = arch_var.replace("-", "_")
 
         full_file_path = os.path.join(
-            deploy_dir, "spdx", spdx_version, machine_dir, high_level_dir, spdx_file
+            deploy_dir, "spdx", spdx_version, arch_dir, high_level_dir, spdx_file
         )
 
         try:
@@ -67,6 +67,9 @@ class SPDX22Check(OESelftestTestCase):
 
     def test_spdx_base_files(self):
         self.check_recipe_spdx("packages", "base-files.spdx.json", "base-files")
+
+    def test_spdx_tar(self):
+        self.check_recipe_spdx("packages", "tar.spdx.json", "tar")
 
 
 class SPDX3CheckBase(object):

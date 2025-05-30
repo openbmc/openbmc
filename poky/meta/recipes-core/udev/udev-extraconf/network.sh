@@ -11,7 +11,7 @@ export PATH
 if grep -q "iface \+$INTERFACE" /etc/network/interfaces; then
   case $ACTION in
     add)
-    	ifconfig | grep -q "^$INTERFACE" || ifup $INTERFACE
+    	ip addr show dev "$INTERFACE" up | grep -q "$INTERFACE" || ifup $INTERFACE
     	;;
     remove)
     	ifdown $INTERFACE

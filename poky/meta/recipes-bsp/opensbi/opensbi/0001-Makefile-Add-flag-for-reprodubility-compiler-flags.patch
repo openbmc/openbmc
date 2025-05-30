@@ -1,0 +1,49 @@
+From f4c440219f42d74bd3d6688132ea876f3f51e601 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 May 2025 19:50:24 -0700
+Subject: [PATCH] Makefile: Add flag for reprodubility compiler flags
+
+Provides mechanism to remove absolute paths from binaries using
+-ffile-prefix-map
+
+It will help distros (e.g. yocto based ones ) which want to ship
+the .elf files but need to scrub absolute paths in objects
+
+Upstream-Status: Submitted [https://lists.infradead.org/pipermail/opensbi/2025-May/008458.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index e90836c7..22d4ecff 100644
+--- a/Makefile
++++ b/Makefile
+@@ -174,6 +174,11 @@ else
+ USE_LD_FLAG	=	-fuse-ld=bfd
+ endif
+ 
++REPRODUCIBLE ?= n
++ifeq ($(REPRODUCIBLE),y)
++REPRODUCIBLE_FLAGS		+=	-ffile-prefix-map=$(src_dir)=
++endif
++
+ # Check whether the linker supports creating PIEs
+ OPENSBI_LD_PIE := $(shell $(CC) $(CLANG_TARGET) $(RELAX_FLAG) $(USE_LD_FLAG) -fPIE -nostdlib -Wl,-pie -x c /dev/null -o /dev/null >/dev/null 2>&1 && echo y || echo n)
+ 
+@@ -362,6 +367,7 @@ GENFLAGS	+=	$(firmware-genflags-y)
+ 
+ CFLAGS		=	-g -Wall -Werror -ffreestanding -nostdlib -fno-stack-protector -fno-strict-aliasing -ffunction-sections -fdata-sections
+ CFLAGS		+=	-fno-omit-frame-pointer -fno-optimize-sibling-calls
++CFLAGS		+=	$(REPRODUCIBLE_FLAGS)
+ # Optionally supported flags
+ ifeq ($(CC_SUPPORT_VECTOR),y)
+ CFLAGS		+=	-DOPENSBI_CC_SUPPORT_VECTOR
+@@ -387,6 +393,7 @@ CPPFLAGS	+=	$(firmware-cppflags-y)
+ ASFLAGS		=	-g -Wall -nostdlib
+ ASFLAGS		+=	-fno-omit-frame-pointer -fno-optimize-sibling-calls
+ ASFLAGS		+=	-fPIE
++ASFLAGS		+=	$(REPRODUCIBLE_FLAGS)
+ # Optionally supported flags
+ ifeq ($(CC_SUPPORT_SAVE_RESTORE),y)
+ ASFLAGS		+=	-mno-save-restore

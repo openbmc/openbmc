@@ -1,0 +1,22 @@
+When building images using shadow-native, we shouldn't be spamming the host's
+log with lots of syslog messages which aren't relavent. Disable syslog use
+in the native case.
+
+Upstream-Status: Inappropriate [Would upstream accept a configure option?]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: shadow-4.17.2/lib/defines.h
+===================================================================
+--- shadow-4.17.2.orig/lib/defines.h
++++ shadow-4.17.2/lib/defines.h
+@@ -88,7 +88,9 @@
+ 
+ /* cleaner than lots of #ifdefs everywhere - use this as follows:
+    SYSLOG((LOG_CRIT, "user %s cracked root", user)); */
+-#ifdef ENABLE_NLS
++#if 1
++#define SYSLOG(x)
++#elif ENABLE_NLS
+ /* Temporarily set LC_TIME to "C" to avoid strange dates in syslog.
+    This is a workaround for a more general syslog(d) design problem -
+    syslogd should log the current system time for each event, and not

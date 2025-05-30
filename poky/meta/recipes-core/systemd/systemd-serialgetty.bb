@@ -9,14 +9,6 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;m
 # required.  This recipe (enabled via disabling serial-getty-generator in systemd)
 # should only be used if the generator is not appropriate.
 
-SERIAL_CONSOLES ?= "115200;ttyS0"
-SERIAL_TERM ?= "linux"
-
-SRC_URI = "file://serial-getty@.service"
-
-S = "${WORKDIR}/sources"
-UNPACKDIR = "${S}"
-
 # As this package is tied to systemd, only build it when we're also building systemd.
 inherit features_check
 REQUIRED_DISTRO_FEATURES += "systemd"
@@ -25,11 +17,7 @@ REQUIRED_DISTRO_FEATURES += "usrmerge"
 do_install() {
 	if [ ! -z "${SERIAL_CONSOLES}" ] ; then
 		default_baudrate=`echo "${SERIAL_CONSOLES}" | sed 's/\;.*//'`
-		install -d ${D}${systemd_system_unitdir}/
 		install -d ${D}${sysconfdir}/systemd/system/getty.target.wants/
-		install -m 0644 ${S}/serial-getty@.service ${D}${systemd_system_unitdir}/
-		sed -i -e "s/\@BAUDRATE\@/$default_baudrate/g" ${D}${systemd_system_unitdir}/serial-getty@.service
-		sed -i -e "s/\@TERM\@/${SERIAL_TERM}/g" ${D}${systemd_system_unitdir}/serial-getty@.service
 
 		tmp="${SERIAL_CONSOLES}"
 		for entry in $tmp ; do
@@ -52,7 +40,7 @@ do_install() {
 }
 
 # This is a machine specific file
-FILES:${PN} = "${systemd_system_unitdir}/*.service ${sysconfdir}"
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+FILES:${PN} = "${sysconfdir}"
 
 ALLOW_EMPTY:${PN} = "1"

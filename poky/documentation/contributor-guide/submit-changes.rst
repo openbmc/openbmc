@@ -776,6 +776,38 @@ argument to ``git format-patch`` with a version number::
 
    git format-patch -v2 <ref-branch>
 
+
+After generating updated patches (v2, v3, and so on) via ``git
+format-patch``, ideally developers will add a patch version changelog
+to each patch that describes what has changed between each revision of
+the patch. Add patch version changelogs after the ``---`` marker in the
+patch, indicating that this information is part of this patch, but is not
+suitable for inclusion in the commit message (i.e. the git history) itself.
+Providing a patch version changelog makes it easier for maintainers and
+reviewers to succinctly understand what changed in all versions of the
+patch, without having to consult alternate sources of information, such as
+searching through messages on a mailing list. For example::
+
+   <patch title>
+
+   <commit message>
+
+   <Signed-off-by/other trailers>
+   ---
+   changes in v4:
+   - provide a clearer commit message
+   - fix spelling mistakes
+
+   changes in v3:
+   - replace func() to use other_func() instead
+
+   changes in v2:
+   - this patch was added in v2
+   ---
+   <diffstat output>
+
+   <unified diff>
+
 Lastly please ensure that you also test your revised changes. In particular
 please don't just edit the patch file written out by ``git format-patch`` and
 resend it.
@@ -832,3 +864,52 @@ Other layers may have similar testing branches but there is no formal
 requirement or standard for these so please check the documentation for the
 layers you are contributing to.
 
+Acceptance of AI Generated Code
+===============================
+
+The Yocto Project and OpenEmbedded follow the guidance of the Linux Foundation
+in regards to the use of generative AI tools. See:
+https://www.linuxfoundation.org/legal/generative-ai.
+
+All of the existing guidelines in this document are expected to be followed,
+including in the :doc:`recipe-style-guide`, and contributing the changes with
+additional requirements to the items in section
+:ref:`contributor-guide/submit-changes:Implement and commit changes`.
+
+All AI Generated Code must be labeled as such in the commit message,
+prior to your ``Signed-off-by`` line. It is also strongly recommended,
+that any patches or code within the commit also have a comment or other
+indication that this code was AI generated.
+
+For example, here is a properly formatted commit message::
+
+   component: Add the ability to ...
+
+   AI-Generated: Uses GitHub Copilot
+
+   Signed-off-by: Your Name <your.name@domain>
+
+The ``Signed-off-by`` line must be written by you, and not the AI helper.
+As a reminder, when contributing a change, your ``Signed-off-by`` line is
+required and the stipulations in the `Developer's Statement of Origin
+1.1 <https://developercertificate.org/>`__ still apply.
+
+Additionally, you must stipulate AI contributions conform to the Linux
+Foundation policy, specifically:
+
+#. Contributors should ensure that the terms and conditions of the generative AI
+   tool do not place any contractual restrictions on how the tool's output can
+   be used that are inconsistent with the project's open source software
+   license, the project's intellectual property policies, or the Open Source
+   Definition.
+
+#. If any pre-existing copyrighted materials (including pre-existing open
+   source code) authored or owned by third parties are included in the AI tool's
+   output, prior to contributing such output to the project, the Contributor
+   should confirm that they have permission from the third party
+   owners -- such as the form of an open source license or public domain
+   declaration that complies with the project's licensing policies -- to use and
+   modify such pre-existing materials and contribute them to the project.
+   Additionally, the contributor should provide notice and attribution of such
+   third party rights, along with information about the applicable license
+   terms, with their contribution.

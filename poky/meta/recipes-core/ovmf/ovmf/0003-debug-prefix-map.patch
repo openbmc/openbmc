@@ -21,11 +21,9 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  BaseTools/Conf/tools_def.template | 18 +++++++++---------
  1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
-index 14f3b643c4..4987488e88 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -896,7 +896,7 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink="$(DEBUG_DIR)/$(MODULE_
+@@ -920,7 +920,7 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --a
  *_*_*_DTC_PATH                     = DEF(DTC_BIN)
  
  # All supported GCC archs except LOONGARCH64 support -mstack-protector-guard=global, so set that on everything except LOONGARCH64
@@ -34,7 +32,7 @@ index 14f3b643c4..4987488e88 100755
  DEFINE GCC_IA32_X64_CC_FLAGS       = -mstack-protector-guard=global
  DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -fno-pic -fno-pie -mstack-protector-guard=global
  DEFINE GCC_LOONGARCH64_CC_FLAGS    = DEF(GCC_ALL_CC_FLAGS) -mabi=lp64d -fno-asynchronous-unwind-tables -Wno-address -fno-short-enums -fsigned-char -ffunction-sections -fdata-sections
-@@ -918,8 +918,8 @@ DEFINE GCC_ARM_ASLDLINK_FLAGS      = DEF(GCC_ARM_DLINK_FLAGS) -Wl,--entry,Refere
+@@ -941,8 +941,8 @@ DEFINE GCC_ARM_ASLDLINK_FLAGS      = DEF
  DEFINE GCC_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_AARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
  DEFINE GCC_LOONGARCH64_ASLDLINK_FLAGS = DEF(GCC_LOONGARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
  DEFINE GCC_IA32_X64_DLINK_FLAGS    = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
@@ -45,7 +43,7 @@ index 14f3b643c4..4987488e88 100755
  DEFINE GCC_VFRPP_FLAGS             = -x c -E -P -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
  DEFINE GCC_ASLPP_FLAGS             = -x c -E -include AutoGen.h
  DEFINE GCC_ASLCC_FLAGS             = -x c
-@@ -1072,7 +1072,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(
+@@ -1095,7 +1095,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS
  *_GCC48_IA32_DLINK2_FLAGS         = DEF(GCC48_IA32_DLINK2_FLAGS)
  *_GCC48_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
  *_GCC48_IA32_OBJCOPY_FLAGS        =
@@ -54,7 +52,7 @@ index 14f3b643c4..4987488e88 100755
  
    DEBUG_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS)
  RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Wno-unused-but-set-variable
-@@ -1100,7 +1100,7 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Wno-unused-but-set
+@@ -1123,7 +1123,7 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(
  *_GCC48_X64_DLINK2_FLAGS         = DEF(GCC48_X64_DLINK2_FLAGS)
  *_GCC48_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
  *_GCC48_X64_OBJCOPY_FLAGS        =
@@ -63,7 +61,7 @@ index 14f3b643c4..4987488e88 100755
  
    DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS)
  RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Wno-unused-but-set-variable
-@@ -1209,7 +1209,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
+@@ -1232,7 +1232,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(G
  *_GCC49_IA32_DLINK2_FLAGS         = DEF(GCC49_IA32_DLINK2_FLAGS)
  *_GCC49_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
  *_GCC49_IA32_OBJCOPY_FLAGS        =
@@ -72,7 +70,7 @@ index 14f3b643c4..4987488e88 100755
  
    DEBUG_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS)
  RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable
-@@ -1237,7 +1237,7 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Wno-unused-but-set
+@@ -1260,7 +1260,7 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(
  *_GCC49_X64_DLINK2_FLAGS         = DEF(GCC49_X64_DLINK2_FLAGS)
  *_GCC49_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
  *_GCC49_X64_OBJCOPY_FLAGS        =
@@ -81,7 +79,7 @@ index 14f3b643c4..4987488e88 100755
  
    DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS)
  RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable
-@@ -1496,7 +1496,7 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
+@@ -1519,7 +1519,7 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS
  *_GCC5_IA32_DLINK2_FLAGS         = DEF(GCC5_IA32_DLINK2_FLAGS) -no-pie
  *_GCC5_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
  *_GCC5_IA32_OBJCOPY_FLAGS        =
@@ -90,7 +88,7 @@ index 14f3b643c4..4987488e88 100755
  
    DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto
    DEBUG_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
-@@ -1528,7 +1528,7 @@ RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,
+@@ -1551,7 +1551,7 @@ RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(G
  *_GCC5_X64_DLINK2_FLAGS          = DEF(GCC5_X64_DLINK2_FLAGS)
  *_GCC5_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
  *_GCC5_X64_OBJCOPY_FLAGS         =
@@ -99,6 +97,3 @@ index 14f3b643c4..4987488e88 100755
  
    DEBUG_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO
    DEBUG_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
--- 
-2.39.5
-

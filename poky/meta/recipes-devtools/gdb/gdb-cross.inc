@@ -4,11 +4,7 @@ DEPENDS = "expat-native gmp-native mpfr-native ncurses-native flex-native bison-
 
 inherit python3native pkgconfig
 
-# Overrides PACKAGECONFIG variables in gdb-common.inc
-PACKAGECONFIG ??= "python readline ${@bb.utils.filter('DISTRO_FEATURES', 'debuginfod', d)}"
 PACKAGECONFIG[python] = "--with-python=${PYTHON},--without-python,python3-native"
-PACKAGECONFIG[readline] = "--with-system-readline,--without-system-readline,readline-native"
-PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod, elfutils-native"
 
 do_compile:prepend() {
     export STAGING_LIBDIR="${STAGING_LIBDIR_NATIVE}"

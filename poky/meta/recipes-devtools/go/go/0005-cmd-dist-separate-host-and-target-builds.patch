@@ -1,7 +1,7 @@
-From bae1cec790ff17c4c93a2f8fda27036e5e021f6d Mon Sep 17 00:00:00 2001
+From 12bf824f8b7e85f05434aa00e866e883a551aaeb Mon Sep 17 00:00:00 2001
 From: Alex Kube <alexander.j.kube@gmail.com>
-Date: Wed, 23 Oct 2019 21:18:12 +0430
-Subject: [PATCH] cmd/dist: separate host and target builds
+Date: Fri, 28 Feb 2025 19:09:17 -0800
+Subject: [PATCH 05/11] cmd/dist: separate host and target builds
 
 Change the dist tool to allow for OE-style cross-
 and cross-canadian builds:
@@ -40,23 +40,26 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Alexander J Kube <alexander.j.kube@gmail.com>
 Signed-off-by: Jose Quaresma <jose.quaresma@foundries.io>
+
+Rebase to 1.24.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  src/cmd/dist/build.go | 76 ++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 75 insertions(+), 1 deletion(-)
 
 diff --git a/src/cmd/dist/build.go b/src/cmd/dist/build.go
-index 06ee4de..016b1dd 100644
+index b62e518030..0c54d82300 100644
 --- a/src/cmd/dist/build.go
 +++ b/src/cmd/dist/build.go
-@@ -46,6 +46,7 @@ var (
- 	goexperiment     string
+@@ -49,6 +49,7 @@ var (
+ 	gofips140        string
  	workdir          string
  	tooldir          string
 +	build_tooldir    string
  	oldgoos          string
  	oldgoarch        string
  	oldgocache       string
-@@ -58,6 +59,7 @@ var (
+@@ -61,6 +62,7 @@ var (
  	rebuildall bool
  	noOpt      bool
  	isRelease  bool
@@ -64,7 +67,7 @@ index 06ee4de..016b1dd 100644
  
  	vflag int // verbosity
  )
-@@ -265,6 +267,8 @@ func xinit() {
+@@ -286,6 +288,8 @@ func xinit() {
  
  	goversion := findgoversion()
  	isRelease = strings.HasPrefix(goversion, "release.") || strings.HasPrefix(goversion, "go")
@@ -73,7 +76,7 @@ index 06ee4de..016b1dd 100644
  }
  
  // compilerEnv returns a map from "goos/goarch" to the
-@@ -499,8 +503,10 @@ func setup() {
+@@ -547,8 +551,10 @@ func setup() {
  	goosGoarch := pathf("%s/pkg/%s_%s", goroot, gohostos, gohostarch)
  	if rebuildall {
  		xremoveall(goosGoarch)
@@ -84,7 +87,7 @@ index 06ee4de..016b1dd 100644
  	xatexit(func() {
  		if files := xreaddir(goosGoarch); len(files) == 0 {
  			xremove(goosGoarch)
-@@ -1338,14 +1344,20 @@ func cmdbootstrap() {
+@@ -1411,14 +1417,20 @@ func cmdbootstrap() {
  	defer timelog("end", "dist bootstrap")
  
  	var debug, distpack, force, noBanner, noClean bool
@@ -106,7 +109,7 @@ index 06ee4de..016b1dd 100644
  
  	if noClean {
  		xprintf("warning: --no-clean is deprecated and has no effect; use 'go install std cmd' instead\n")
-@@ -1357,6 +1369,18 @@ func cmdbootstrap() {
+@@ -1430,6 +1442,18 @@ func cmdbootstrap() {
  			"Use the -force flag to build anyway.\n", goos, goarch)
  	}
  
@@ -125,7 +128,7 @@ index 06ee4de..016b1dd 100644
  	// Set GOPATH to an internal directory. We shouldn't actually
  	// need to store files here, since the toolchain won't
  	// depend on modules outside of vendor directories, but if
-@@ -1434,9 +1458,14 @@ func cmdbootstrap() {
+@@ -1513,9 +1537,14 @@ func cmdbootstrap() {
  		xprintf("\n")
  	}
  
@@ -140,7 +143,7 @@ index 06ee4de..016b1dd 100644
  	goBootstrap := pathf("%s/go_bootstrap", tooldir)
  	if debug {
  		run("", ShowOutput|CheckExit, pathf("%s/compile", tooldir), "-V=full")
-@@ -1464,7 +1493,11 @@ func cmdbootstrap() {
+@@ -1543,7 +1572,11 @@ func cmdbootstrap() {
  		xprintf("\n")
  	}
  	xprintf("Building Go toolchain2 using go_bootstrap and Go toolchain1.\n")
@@ -152,7 +155,7 @@ index 06ee4de..016b1dd 100644
  	// Now that cmd/go is in charge of the build process, enable GOEXPERIMENT.
  	os.Setenv("GOEXPERIMENT", goexperiment)
  	// No need to enable PGO for toolchain2.
-@@ -1517,6 +1550,7 @@ func cmdbootstrap() {
+@@ -1596,6 +1629,7 @@ func cmdbootstrap() {
  		os.Setenv("GOCACHE", oldgocache)
  	}
  
@@ -160,7 +163,7 @@ index 06ee4de..016b1dd 100644
  	if goos == oldgoos && goarch == oldgoarch {
  		// Common case - not setting up for cross-compilation.
  		timelog("build", "toolchain")
-@@ -1560,6 +1594,42 @@ func cmdbootstrap() {
+@@ -1639,6 +1673,42 @@ func cmdbootstrap() {
  		checkNotStale(toolenv(), goBootstrap, toolchain...)
  		copyfile(pathf("%s/compile4", tooldir), pathf("%s/compile", tooldir), writeExec)
  	}
@@ -203,7 +206,7 @@ index 06ee4de..016b1dd 100644
  
  	// Check that there are no new files in $GOROOT/bin other than
  	// go and gofmt and $GOOS_$GOARCH (target bin when cross-compiling).
-@@ -1582,8 +1652,12 @@ func cmdbootstrap() {
+@@ -1661,8 +1731,12 @@ func cmdbootstrap() {
  		}
  	}
  
@@ -216,3 +219,6 @@ index 06ee4de..016b1dd 100644
  
  	if goos == "android" {
  		// Make sure the exec wrapper will sync a fresh $GOROOT to the device.
+-- 
+2.25.1
+

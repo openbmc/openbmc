@@ -268,6 +268,10 @@ def parse_arguments():
     # )
 
     parser.add_argument(
+        "-n", "--dry-run", action="store_true", help="Don't execute, just go through the motions."
+    )
+
+    parser.add_argument(
         "-y",
         "--yes",
         action="store_true",
@@ -314,6 +318,9 @@ def main():
     if args.debug >= 1:
         print("\n".join([str(p.path) for p in remove]))
     print(f"{len(remove)} out of {len(paths)} files will be removed!")
+    if args.dry_run:
+        return 0
+
     if not args.yes:
         print("Do you want to continue (y/n)?")
         confirm = input() in ("y", "Y")

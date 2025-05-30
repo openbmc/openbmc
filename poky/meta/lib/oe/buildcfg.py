@@ -17,21 +17,21 @@ def get_scmbasepath(d):
 def get_metadata_git_branch(path):
     try:
         rev, _ = bb.process.run('git rev-parse --abbrev-ref HEAD', cwd=path)
-    except bb.process.ExecutionError:
+    except (bb.process.ExecutionError, bb.process.NotFoundError):
         rev = '<unknown>'
     return rev.strip()
 
 def get_metadata_git_revision(path):
     try:
         rev, _ = bb.process.run('git rev-parse HEAD', cwd=path)
-    except bb.process.ExecutionError:
+    except (bb.process.ExecutionError, bb.process.NotFoundError):
         rev = '<unknown>'
     return rev.strip()
 
 def get_metadata_git_toplevel(path):
     try:
         toplevel, _ = bb.process.run('git rev-parse --show-toplevel', cwd=path)
-    except bb.process.ExecutionError:
+    except (bb.process.ExecutionError, bb.process.NotFoundError):
         return ""
     return toplevel.strip()
 
@@ -39,21 +39,21 @@ def get_metadata_git_remotes(path):
     try:
         remotes_list, _ = bb.process.run('git remote', cwd=path)
         remotes = remotes_list.split()
-    except bb.process.ExecutionError:
+    except (bb.process.ExecutionError, bb.process.NotFoundError):
         remotes = []
     return remotes
 
 def get_metadata_git_remote_url(path, remote):
     try:
         uri, _ = bb.process.run('git remote get-url {remote}'.format(remote=remote), cwd=path)
-    except bb.process.ExecutionError:
+    except (bb.process.ExecutionError, bb.process.NotFoundError):
         return ""
     return uri.strip()
 
 def get_metadata_git_describe(path):
     try:
         describe, _ = bb.process.run('git describe --tags --dirty', cwd=path)
-    except bb.process.ExecutionError:
+    except (bb.process.ExecutionError, bb.process.NotFoundError):
         return ""
     return describe.strip()
 

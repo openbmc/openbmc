@@ -1,0 +1,56 @@
+From f60c6ade92826cea1c3d63d70f1168f4048a624b Mon Sep 17 00:00:00 2001
+From: Maksim Kita <maksim-kita@yandex-team.ru>
+Date: Sun, 23 May 2021 10:27:29 +0000
+Subject: [PATCH] libunwind: Added unw_backtrace method
+
+Source: https://github.com/ClickHouse-Extras/libunwind/commit/52f0f7861926cbfaef7e6c97d8a6d7ba2a1f6747#diff-a82fc885e2e4facf4b92d26171c13aa4aa5db296f77e1158ba2f8664e3bd1f5c
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libunwind/include/libunwind.h |  1 +
+ libunwind/src/libunwind.cpp   | 20 ++++++++++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/libunwind/include/libunwind.h b/libunwind/include/libunwind.h
+index b2dae8feed9a..0ab974c9bfa4 100644
+--- a/libunwind/include/libunwind.h
++++ b/libunwind/include/libunwind.h
+@@ -130,6 +130,7 @@ extern int unw_is_fpreg(unw_cursor_t *, unw_regnum_t) LIBUNWIND_AVAIL;
+ extern int unw_is_signal_frame(unw_cursor_t *) LIBUNWIND_AVAIL;
+ extern int unw_get_proc_name(unw_cursor_t *, char *, size_t, unw_word_t *) LIBUNWIND_AVAIL;
+ //extern int       unw_get_save_loc(unw_cursor_t*, int, unw_save_loc_t*);
++extern int unw_backtrace(void **, int) LIBUNWIND_AVAIL;
+ 
+ extern unw_addr_space_t unw_local_addr_space;
+ 
+diff --git a/libunwind/src/libunwind.cpp b/libunwind/src/libunwind.cpp
+index cf39ec5f7dbd..1896f20d57f8 100644
+--- a/libunwind/src/libunwind.cpp
++++ b/libunwind/src/libunwind.cpp
+@@ -431,6 +431,26 @@ int __unw_remove_find_dynamic_unwind_sections(
+ 
+ #endif // __APPLE__
+ 
++int unw_backtrace(void **buffer, int size) {
++  unw_context_t context;
++  unw_cursor_t cursor;
++  if (unw_getcontext(&context) || unw_init_local(&cursor, &context)) {
++    return 0;
++  }
++
++  unw_word_t ip;
++  int current = 0;
++  while (unw_step(&cursor) > 0) {
++    if (current >= size || unw_get_reg(&cursor, UNW_REG_IP, &ip)) {
++      break;
++    }
++
++    buffer[current++] = reinterpret_cast<void *>(static_cast<uintptr_t>(ip));
++  }
++
++  return current;
++}
++
+ // Add logging hooks in Debug builds only
+ #ifndef NDEBUG
+ #include <stdlib.h>

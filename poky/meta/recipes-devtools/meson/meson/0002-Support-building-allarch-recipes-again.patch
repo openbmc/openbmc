@@ -1,4 +1,4 @@
-From bcdd72ed1956e0a1b1b725e552fa391c549c2099 Mon Sep 17 00:00:00 2001
+From e123195e5990c3071385defd96dfab1211e98c08 Mon Sep 17 00:00:00 2001
 From: Peter Kjellerstedt <pkj@axis.com>
 Date: Thu, 26 Jul 2018 16:32:49 +0200
 Subject: [PATCH] Support building allarch recipes again
@@ -12,10 +12,10 @@ Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 9703315..74f2477 100644
+index 27be871..994ac77 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -28,6 +28,7 @@ from pathlib import Path
+@@ -31,6 +31,7 @@ if T.TYPE_CHECKING:
  
  
  known_cpu_families = (

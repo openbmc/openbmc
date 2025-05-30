@@ -109,7 +109,7 @@ ${UNINATIVE_STAGING_DIR}-uninative/relocate_sdk.py \
   ${UNINATIVE_LOADER} \
   ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux/${bindir_native}/patchelf-uninative \
   ${UNINATIVE_STAGING_DIR}-uninative/${BUILD_ARCH}-linux${base_libdir_native}/libc*.so*" % chksum)
-        subprocess.check_output(cmd, shell=True)
+        subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.STDOUT)
 
         with open(loaderchksum, "w") as f:
             f.write(chksum)
@@ -122,7 +122,9 @@ ${UNINATIVE_STAGING_DIR}-uninative/relocate_sdk.py \
         bb.warn("Disabling uninative as unable to fetch uninative tarball: %s" % str(exc))
         bb.warn("To build your own uninative loader, please bitbake uninative-tarball and set UNINATIVE_TARBALL appropriately.")
     except subprocess.CalledProcessError as exc:
-        bb.warn("Disabling uninative as unable to install uninative tarball: %s" % str(exc))
+        bb.warn("Disabling uninative as unable to install uninative tarball:")
+        bb.warn(str(exc))
+        bb.warn(exc.stdout)
         bb.warn("To build your own uninative loader, please bitbake uninative-tarball and set UNINATIVE_TARBALL appropriately.")
     finally:
         os.chdir(olddir)

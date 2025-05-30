@@ -1,0 +1,85 @@
+From 12abcd058e2aa468054708b0ca7a06f2638eabab Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Tue, 25 Mar 2025 22:25:55 +0100
+Subject: [PATCH] clangd: Add a build option to disable building dexp
+
+Building dexp on Debian 11 currently causes intermittent failure[0][1].
+
+Adding the CLANGD_BUILD_DEXP option to disable dexp from the build
+allows Debian 11 users to build clang (albeit without the dexp tool).
+
+This option is set to "Build Dexp" by default so, no change is expected
+without manual setting.
+
+[0]: https://bugzilla.yoctoproject.org/show_bug.cgi?id=15803
+[1]: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1101322
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/133124]
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang-tools-extra/clangd/CMakeLists.txt          | 8 +++++++-
+ clang-tools-extra/clangd/test/CMakeLists.txt     | 7 +++++--
+ clang-tools-extra/clangd/test/lit.site.cfg.py.in | 1 +
+ 3 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/clang-tools-extra/clangd/CMakeLists.txt b/clang-tools-extra/clangd/CMakeLists.txt
+index 6f10afe4a562..a1e9da41b4b3 100644
+--- a/clang-tools-extra/clangd/CMakeLists.txt
++++ b/clang-tools-extra/clangd/CMakeLists.txt
+@@ -210,6 +210,9 @@ if (CLANGD_ENABLE_REMOTE)
+   include(AddGRPC)
+ endif()
+ 
++option(CLANGD_BUILD_DEXP "Build the dexp tool as part of Clangd" ON)
++llvm_canonicalize_cmake_booleans(CLANGD_BUILD_DEXP)
++
+ if(CLANG_INCLUDE_TESTS)
+   add_subdirectory(test)
+   add_subdirectory(unittests)
+@@ -220,4 +223,7 @@ option(CLANGD_ENABLE_REMOTE "Use gRPC library to enable remote index support for
+ set(GRPC_INSTALL_PATH "" CACHE PATH "Path to gRPC library manual installation.")
+ 
+ add_subdirectory(index/remote)
+-add_subdirectory(index/dex/dexp)
++
++if(CLANGD_BUILD_DEXP)
++  add_subdirectory(index/dex/dexp)
++endif()
+diff --git a/clang-tools-extra/clangd/test/CMakeLists.txt b/clang-tools-extra/clangd/test/CMakeLists.txt
+index b51f461a4986..42fc3506641f 100644
+--- a/clang-tools-extra/clangd/test/CMakeLists.txt
++++ b/clang-tools-extra/clangd/test/CMakeLists.txt
+@@ -3,8 +3,6 @@ set(CLANGD_TEST_DEPS
+   ClangdTests
+   clangd-indexer
+   split-file
+-  # No tests for it, but we should still make sure they build.
+-  dexp
+   )
+ 
+ if(CLANGD_BUILD_XPC)
+@@ -12,6 +10,11 @@ if(CLANGD_BUILD_XPC)
+   list(APPEND CLANGD_TEST_DEPS ClangdXpcUnitTests)
+ endif()
+ 
++if(CLANGD_BUILD_DEXP)
++  # No tests for it, but we should still make sure they build.
++  list(APPEND CLANGD_TEST_DEPS dexp)
++endif()
++
+ if(CLANGD_ENABLE_REMOTE)
+   list(APPEND CLANGD_TEST_DEPS clangd-index-server clangd-index-server-monitor)
+ endif()
+diff --git a/clang-tools-extra/clangd/test/lit.site.cfg.py.in b/clang-tools-extra/clangd/test/lit.site.cfg.py.in
+index 1fe7c8d0f324..a0bb3561e19e 100644
+--- a/clang-tools-extra/clangd/test/lit.site.cfg.py.in
++++ b/clang-tools-extra/clangd/test/lit.site.cfg.py.in
+@@ -15,6 +15,7 @@ config.llvm_shlib_dir = "@SHLIBDIR@"
+ config.clangd_source_dir = "@CMAKE_CURRENT_SOURCE_DIR@/.."
+ config.clangd_binary_dir = "@CMAKE_CURRENT_BINARY_DIR@/.."
+ config.clangd_build_xpc = @CLANGD_BUILD_XPC@
++config.clangd_build_dexp = @CLANGD_BUILD_DEXP@
+ config.clangd_enable_remote = @CLANGD_ENABLE_REMOTE@
+ config.clangd_tidy_checks = @CLANGD_TIDY_CHECKS@
+ config.have_zlib = @LLVM_ENABLE_ZLIB@

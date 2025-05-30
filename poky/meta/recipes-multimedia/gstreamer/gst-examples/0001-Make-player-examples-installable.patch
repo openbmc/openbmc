@@ -13,25 +13,25 @@ https://bugzilla.gnome.org/show_bug.cgi?id=777827
  playback/player/gtk/meson.build      | 1 +
  2 files changed, 2 insertions(+)
 
-diff --git a/playback/player/gst-play/meson.build b/playback/player/gst-play/meson.build
-index 8ec021d..977cc5c 100644
---- a/playback/player/gst-play/meson.build
-+++ b/playback/player/gst-play/meson.build
+Index: gst-examples/playback/player/gst-play/meson.build
+===================================================================
+--- gst-examples.orig/playback/player/gst-play/meson.build
++++ gst-examples/playback/player/gst-play/meson.build
 @@ -2,5 +2,6 @@ executable('gst-play',
      ['gst-play.c',
       'gst-play-kb.c',
       'gst-play-kb.h'],
 +    install: true,
-     dependencies : [gst_dep, gstplayer_dep, m_dep])
+     dependencies : [gst_dep, dependency('gstreamer-play-1.0'), m_dep])
  
-diff --git a/playback/player/gtk/meson.build b/playback/player/gtk/meson.build
-index f7a7419..6281130 100644
---- a/playback/player/gtk/meson.build
-+++ b/playback/player/gtk/meson.build
-@@ -13,5 +13,6 @@ if gtk_dep.found()
-         gtk_play_resources,
+Index: gst-examples/playback/player/gtk/meson.build
+===================================================================
+--- gst-examples.orig/playback/player/gtk/meson.build
++++ gst-examples/playback/player/gtk/meson.build
+@@ -20,5 +20,6 @@ if gtk_dep.found()
         'gtk-video-renderer.h',
         'gtk-video-renderer.c'],
-+    install: true,
-       dependencies : [glib_dep, gobject_dep, gmodule_dep, gst_dep, gsttag_dep, gstplayer_dep, gtk_dep, x11_dep])
+       c_args :  extra_c_args,
++      install: true,
+       dependencies : [gst_dep, gsttag_dep, gstplay_dep, gtk_dep, x11_dep])
  endif

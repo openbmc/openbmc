@@ -468,9 +468,11 @@ class BaseConfig(object):
                 self.set("IMAGE_LINK_NAME", image_link_name)
                 logger.debug('Using IMAGE_LINK_NAME = "%s"' % image_link_name)
 
-    def set_dri_path(self):
+    def set_mesa_paths(self):
         drivers_path = os.path.join(self.bindir_native, '../lib/dri')
-        if not os.path.exists(drivers_path) or not os.listdir(drivers_path):
+        gbm_path = os.path.join(self.bindir_native, '../lib/gbm')
+        if not os.path.exists(drivers_path) or not os.listdir(drivers_path) \
+                or not os.path.exists(gbm_path) or not os.listdir(gbm_path):
             raise RunQemuError("""
 qemu has been built without opengl support and accelerated graphics support is not available.
 To enable it, add:
@@ -479,6 +481,7 @@ DISTRO_FEATURES_NATIVESDK:append = " opengl"
 to your build configuration.
 """)
         self.qemu_environ['LIBGL_DRIVERS_PATH'] = drivers_path
+        self.qemu_environ['GBM_BACKENDS_PATH'] = gbm_path
 
     def check_args(self):
         for debug in ("-d", "--debug"):
@@ -1461,7 +1464,7 @@ to your build configuration.
             self.qemu_opt += ' -display '
             if self.egl_headless == True:
                 self.check_render_nodes()
-                self.set_dri_path()
+                self.set_mesa_paths()
                 self.qemu_opt += 'egl-headless,'
             else:
                 if self.sdl == True:
@@ -1471,10 +1474,10 @@ to your build configuration.
                     self.qemu_opt += 'gtk,'
 
                 if self.gl == True:
-                    self.set_dri_path()
+                    self.set_mesa_paths()
                     self.qemu_opt += 'gl=on,'
                 elif self.gl_es == True:
-                    self.set_dri_path()
+                    self.set_mesa_paths()
                     self.qemu_opt += 'gl=es,'
             self.qemu_opt += 'show-cursor=on'
 
@@ -1675,6 +1678,9 @@ to your build configuration.
         multiconfig = self.get('MULTICONFIG')
         if multiconfig:
             multiconfig = "mc:%s" % multiconfig
+
+        if self.rootfs and not target:
+            target = self.rootfs
 
         if mach:
             cmd = 'MACHINE=%s bitbake -e %s %s' % (mach, multiconfig, target)

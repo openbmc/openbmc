@@ -27,7 +27,7 @@ RRECOMMENDS:${PN} += "ca-certificates"
 
 BBCLASSEXTEND = "nativesdk"
 
-PACKAGECONFIG ??= "gnutls pcre zlib \
+PACKAGECONFIG ??= "gnutls pcre2 zlib \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
 PACKAGECONFIG[ares] = "--with-cares,--without-cares,c-ares"
 PACKAGECONFIG[gnutls] = "--with-ssl=gnutls,,gnutls"
@@ -37,9 +37,5 @@ PACKAGECONFIG[libpsl] = "--with-libpsl,--without-libpsl,libpsl"
 PACKAGECONFIG[libuuid] = "--with-libuuid,--without-libuuid,util-linux"
 PACKAGECONFIG[openssl] = "--with-ssl=openssl,,openssl"
 PACKAGECONFIG[pcre] = "--enable-pcre,--disable-pcre,libpcre"
+PACKAGECONFIG[pcre2] = "--enable-pcre2,--disable-pcre2,libpcre2"
 PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
-
-# Let aclocal use the relative path for the m4 file rather than
-# absolute, otherwise there might be an "Argument list too long" error
-# when it is built in a long/deep directory.
-acpaths = "-I ./m4"

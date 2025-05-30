@@ -1,0 +1,27 @@
+From e5216c3fb1fa8d60a18c68e4749a3ff902f6678b Mon Sep 17 00:00:00 2001
+From: Ian Zborovsky <ian@veego.io>
+Date: Mon, 6 May 2024 02:01:19 +0300
+Subject: [PATCH 3/4] Fixed miscompilation of unw_getcontext() on ARM
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ include/libunwind-arm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/libunwind-arm.h b/include/libunwind-arm.h
+index 6cfa577d..6643a185 100644
+--- a/include/libunwind-arm.h
++++ b/include/libunwind-arm.h
+@@ -288,7 +288,7 @@ unw_tdep_context_t;
+     "mov r0, #0\n\t"                                                                            \
+     "stmia %[base]!, {r0-r15}\n\t"                                                              \
+     VSTMIA                                                                                      \
+-    : [r0] "=r" (r0) : [base] "r" (unw_base) : "memory");                                       \
++    : [r0] "=r" (r0), [base] "+r" (unw_base) : : "memory");                                     \
+   (int)r0; })
+ #else /* __thumb__ */
+ #define unw_tdep_getcontext(uc) ({                                        \
+-- 
+2.34.1
+

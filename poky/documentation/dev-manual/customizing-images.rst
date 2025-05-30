@@ -79,15 +79,14 @@ recipe that are enabled with :term:`IMAGE_FEATURES`. The value of
 :term:`EXTRA_IMAGE_FEATURES` is added to :term:`IMAGE_FEATURES` within
 ``meta/conf/bitbake.conf``.
 
-To illustrate how you can use these variables to modify your image,
-consider an example that selects the SSH server. The Yocto Project ships
-with two SSH servers you can use with your images: Dropbear and OpenSSH.
-Dropbear is a minimal SSH server appropriate for resource-constrained
-environments, while OpenSSH is a well-known standard SSH server
-implementation. By default, the ``core-image-sato`` image is configured
-to use Dropbear. The ``core-image-full-cmdline`` and ``core-image-lsb``
-images both include OpenSSH. The ``core-image-minimal`` image does not
-contain an SSH server.
+To illustrate how you can use these variables to modify your image, consider an
+example that selects the SSH server. The Yocto Project ships with two SSH
+servers you can use with your images: Dropbear and OpenSSH. Dropbear is a
+minimal SSH server appropriate for resource-constrained environments, while
+OpenSSH is a well-known standard SSH server implementation. By default, the
+``core-image-sato`` image is configured to use Dropbear. The
+``core-image-full-cmdline`` image includes OpenSSH. The ``core-image-minimal``
+image does not contain an SSH server.
 
 You can customize your image and change these defaults. Edit the
 :term:`IMAGE_FEATURES` variable in your recipe or use the

@@ -1,0 +1,30 @@
+From c608975f4490f67872926f2601e5c37f2e570307 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 9 Apr 2025 01:40:46 +0000
+Subject: [PATCH] cmCurl: Avoid using undocumented type for CURLOPT_NETRC
+ values
+
+Fix: nativesdk-cmake/3.31.6/cmake-3.31.6/Source/cmCurl.cxx:178:26: error: invalid conversion from 'long int' to 'CURL_NETRC_OPTION' [-fpermissive]
+Upstream-Status: Backport [https://gitlab.kitware.com/cmake/cmake/-/merge_requests/10449/diffs?commit_id=1b0c92a3a1b782ff3e1c4499b6ab8db614d45bcd]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ Source/cmCurl.cxx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Source/cmCurl.cxx b/Source/cmCurl.cxx
+index b9133ed7..0cf8a71a 100644
+--- a/Source/cmCurl.cxx
++++ b/Source/cmCurl.cxx
+@@ -170,7 +170,7 @@ std::string cmCurlSetNETRCOption(::CURL* curl, const std::string& netrc_level,
+                                  const std::string& netrc_file)
+ {
+   std::string e;
+-  CURL_NETRC_OPTION curl_netrc_level = CURL_NETRC_LAST;
++  long curl_netrc_level = CURL_NETRC_LAST;
+   ::CURLcode res;
+ 
+   if (!netrc_level.empty()) {
+-- 
+2.43.0
+

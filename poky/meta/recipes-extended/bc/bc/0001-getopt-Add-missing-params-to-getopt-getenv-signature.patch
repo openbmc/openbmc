@@ -1,0 +1,40 @@
+From 493997b0d2c3dc6469f967d8f619ed934667c71e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Mar 2025 18:33:08 -0700
+Subject: [PATCH] getopt: Add missing params to getopt/getenv signatures
+
+This ensures it can compile with GCC 15 on musl
+
+Upstream-Status: Submitted [sent to bug-bc@gnu.org]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ h/getopt.h   | 2 +-
+ lib/getopt.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/h/getopt.h b/h/getopt.h
+index cc45f46..5ea5eac 100644
+--- a/h/getopt.h
++++ b/h/getopt.h
+@@ -141,7 +141,7 @@ struct option
+    errors, only prototype getopt for the GNU C library.  */
+ extern int getopt (int ___argc, char *const *___argv, const char *__shortopts);
+ #else /* not __GNU_LIBRARY__ */
+-extern int getopt ();
++extern int getopt (int,  char * const*, const char *);
+ #endif /* __GNU_LIBRARY__ */
+ 
+ #ifndef __need_getopt
+diff --git a/lib/getopt.c b/lib/getopt.c
+index b270074..3e6d071 100644
+--- a/lib/getopt.c
++++ b/lib/getopt.c
+@@ -197,7 +197,7 @@ static char *posixly_correct;
+    whose names are inconsistent.  */
+ 
+ #ifndef getenv
+-extern char *getenv ();
++extern char *getenv (const char*);
+ #endif
+ 
+ #endif /* not __GNU_LIBRARY__ */

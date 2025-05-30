@@ -12,5 +12,4 @@ DEPENDS += "libxext libxmu gettext-native"
 PE = "0"
 
 SRC_URI_EXT = "xz"
-SRC_URI[md5sum] = "c91201bc1eb5e7b38933be8d0f7f16a8"
 SRC_URI[sha256sum] = "3518897c17448df9ba99ad6d9bb1ca0f17bc0ed7c0fd61281b34ceed29a9253f"

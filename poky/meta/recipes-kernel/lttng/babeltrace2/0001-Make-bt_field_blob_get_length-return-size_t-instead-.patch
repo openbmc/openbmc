@@ -1,0 +1,38 @@
+From a73cef80a0d4129f74ab2e160a15693235aad4d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Mar 2025 18:10:08 -0700
+Subject: [PATCH] Cast result of bt_field_blob_get_length to size_t in
+ constructor of bt2s::span
+
+Fixes errors e.g.
+| ../../git/src/cpp-common/bt2/field.hpp:1139:82: error: non-constant-expression cannot be narrowed from type 'std::uint64_t' (aka 'unsigned long long') to 'size_type' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
+|  1139 |         return {internal::CommonBlobFieldSpec<LibObjT>::data(this->libObjPtr()), this->length()};
+|       |                                                                                  ^~~~~~~~~~~~~~
+| ../../git/src/plugins/ctf/common/src/msg-iter.cpp:744:56: note: in instantiation of member function 'bt2::CommonBlobField<bt_field>::data' requested here
+|   744 |     std::memcpy(&this->_stackTopCurSubField().asBlob().data()[_mCurBlobFieldDataOffset],
+|       |                                                        ^
+| ../../git/src/cpp-common/bt2/field.hpp:1139:82: note: insert an explicit cast to silence this issue
+|  1139 |         return {internal::CommonBlobFieldSpec<LibObjT>::data(this->libObjPtr()), this->length()};
+|       |                                                                                  ^~~~~~~~~~~~~~
+|       |                                                                                  static_cast<size_type>( )
+
+Upstream-Status: Backport [https://github.com/efficios/babeltrace/commit/1e6b34e411c61135ad256047a985a9bad927eae0]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/cpp-common/bt2/field.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/cpp-common/bt2/field.hpp b/src/cpp-common/bt2/field.hpp
+index 8b291f7a..3a7d30a4 100644
+--- a/src/cpp-common/bt2/field.hpp
++++ b/src/cpp-common/bt2/field.hpp
+@@ -1136,7 +1136,7 @@ public:
+ 
+     bt2s::span<typename internal::CommonBlobFieldSpec<LibObjT>::Data> data() const noexcept
+     {
+-        return {internal::CommonBlobFieldSpec<LibObjT>::data(this->libObjPtr()), this->length()};
++        return {internal::CommonBlobFieldSpec<LibObjT>::data(this->libObjPtr()), static_cast<std::size_t>(this->length())};
+     }
+ 
+     std::uint64_t length() const noexcept

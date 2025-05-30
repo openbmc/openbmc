@@ -222,19 +222,19 @@ class Partition():
         if (pseudo_dir):
             # Canonicalize the ignore paths. This corresponds to
             # calling oe.path.canonicalize(), which is used in bitbake.conf.
-            ignore_paths = [rootfs] + (get_bitbake_var("PSEUDO_IGNORE_PATHS") or "").split(",")
+            include_paths = [rootfs_dir] + (get_bitbake_var("PSEUDO_INCLUDE_PATHS") or "").split(",")
             canonical_paths = []
-            for path in ignore_paths:
+            for path in include_paths:
                 if "$" not in path:
                     trailing_slash = path.endswith("/") and "/" or ""
                     canonical_paths.append(os.path.realpath(path) + trailing_slash)
-            ignore_paths = ",".join(canonical_paths)
+            include_paths = ",".join(canonical_paths)
 
             pseudo = "export PSEUDO_PREFIX=%s;" % p_prefix
             pseudo += "export PSEUDO_LOCALSTATEDIR=%s;" % pseudo_dir
             pseudo += "export PSEUDO_PASSWD=%s;" % rootfs_dir
             pseudo += "export PSEUDO_NOSYMLINKEXP=1;"
-            pseudo += "export PSEUDO_IGNORE_PATHS=%s;" % ignore_paths
+            pseudo += "export PSEUDO_INCLUDE_PATHS=%s;" % include_paths
             pseudo += "%s " % get_bitbake_var("FAKEROOTCMD")
         else:
             pseudo = None
@@ -244,7 +244,7 @@ class Partition():
             # from bitbake variable
             rsize_bb = get_bitbake_var('ROOTFS_SIZE')
             rdir = get_bitbake_var('IMAGE_ROOTFS')
-            if rsize_bb and rdir == rootfs_dir:
+            if rsize_bb and (rdir == rootfs_dir or (rootfs_dir.split('/')[-2] == "tmp-wic" and rootfs_dir.split('/')[-1][:6] == "rootfs")):
                 # Bitbake variable ROOTFS_SIZE is calculated in
                 # Image._get_rootfs_size method from meta/lib/oe/image.py
                 # using IMAGE_ROOTFS_SIZE, IMAGE_ROOTFS_ALIGNMENT,

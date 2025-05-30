@@ -18,9 +18,9 @@ SRCBRANCH ?= "binutils-2_44-branch"
 
 UPSTREAM_CHECK_GITTAGREGEX = "binutils-(?P<pver>\d+_(\d_?)*)"
 
-CVE_STATUS[CVE-2023-25584] = "cpe-incorrect: Applies only for version 2.40 and earlier"
+CVE_STATUS[CVE-2025-1153] = "cpe-stable-backport: fix available in used git hash"
 
-SRCREV ?= "815d9a14cbbb3b81843f7566222c87fb22e7255d"
+SRCREV ?= "96bc9e8081a5dbe8329c1d5b0c94191fd5bed840"
 BINUTILS_GIT_URI ?= "git://sourceware.org/git/binutils-gdb.git;branch=${SRCBRANCH};protocol=https"
 SRC_URI = "\
      ${BINUTILS_GIT_URI} \
@@ -35,5 +35,8 @@ SRC_URI = "\
      file://0012-Only-generate-an-RPATH-entry-if-LD_RUN_PATH-is-not-e.patch \
      file://0013-Define-alignof-using-_Alignof-when-using-C11-or-newe.patch \
      file://0014-Remove-duplicate-pe-dll.o-entry-deom-targ_extra_ofil.patch \
+     file://0015-CVE-2025-1178.patch \
+     file://CVE-2025-1180.patch \
+     file://CVE-2025-1182.patch \
 "
 S  = "${WORKDIR}/git"

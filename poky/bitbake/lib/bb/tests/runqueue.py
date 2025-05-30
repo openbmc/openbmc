@@ -26,7 +26,7 @@ class RunQueueTests(unittest.TestCase):
     a1_sstatevalid = "a1:do_package a1:do_package_qa a1:do_packagedata a1:do_package_write_ipk a1:do_package_write_rpm a1:do_populate_lic a1:do_populate_sysroot"
     b1_sstatevalid = "b1:do_package b1:do_package_qa b1:do_packagedata b1:do_package_write_ipk b1:do_package_write_rpm b1:do_populate_lic b1:do_populate_sysroot"
 
-    def run_bitbakecmd(self, cmd, builddir, sstatevalid="", slowtasks="", extraenv=None, cleanup=False):
+    def run_bitbakecmd(self, cmd, builddir, sstatevalid="", slowtasks="", extraenv=None, cleanup=False, allowfailure=False):
         env = os.environ.copy()
         env["BBPATH"] = os.path.realpath(os.path.join(os.path.dirname(__file__), "runqueue-tests"))
         env["BB_ENV_PASSTHROUGH_ADDITIONS"] = "SSTATEVALID SLOWTASKS TOPDIR"
@@ -41,6 +41,8 @@ class RunQueueTests(unittest.TestCase):
             output = subprocess.check_output(cmd, env=env, stderr=subprocess.STDOUT,universal_newlines=True, cwd=builddir)
             print(output)
         except subprocess.CalledProcessError as e:
+            if allowfailure:
+                return e.output
             self.fail("Command %s failed with %s" % (cmd, e.output))
         tasks = []
         tasklog = builddir + "/task.log"
@@ -313,6 +315,13 @@ class RunQueueTests(unittest.TestCase):
             expected = ["mc-1:f1:%s" % t for t in rerun_tasks] + \
                        ["mc_2:a1:%s" % t for t in rerun_tasks]
             self.assertEqual(set(tasks), set(expected))
+
+            # Check that a multiconfig that doesn't exist rasies a correct error message
+            error_output = self.run_bitbakecmd(["bitbake", "g1"], tempdir, "", extraenv=extraenv, cleanup=True, allowfailure=True)
+            self.assertIn("non-existent task", error_output)
+            # If the word 'Traceback' or 'KeyError' is in the output we've regressed
+            self.assertNotIn("Traceback", error_output)
+            self.assertNotIn("KeyError", error_output)
 
             self.shutdown(tempdir)
 

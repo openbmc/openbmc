@@ -1,0 +1,38 @@
+From 001913c5eb0aad933a93ee966252905cd46d776b Mon Sep 17 00:00:00 2001
+From: Daniel McGregor <daniel.mcgregor@vecima.com>
+Date: Tue, 6 Jun 2023 16:07:53 -0600
+Subject: [PATCH] Use "nogroup" for nobody group
+
+Upstream-Status: Inappropriate [oe-core specific, configuration]
+Signed-off-by: Daniel McGregor <daniel.mcgregor@vecima.com>
+---
+ support/nfsidmap/idmapd.conf | 2 +-
+ utils/idmapd/idmapd.c        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/support/nfsidmap/idmapd.conf b/support/nfsidmap/idmapd.conf
+index 2a2f79a1..e6f3724f 100644
+--- a/support/nfsidmap/idmapd.conf
++++ b/support/nfsidmap/idmapd.conf
+@@ -41,7 +41,7 @@
+ [Mapping]
+ 
+ #Nobody-User = nobody
+-#Nobody-Group = nobody
++#Nobody-Group = nogroup
+ 
+ [Translation]
+ 
+diff --git a/utils/idmapd/idmapd.c b/utils/idmapd/idmapd.c
+index cd9a965f..3be805e9 100644
+--- a/utils/idmapd/idmapd.c
++++ b/utils/idmapd/idmapd.c
+@@ -89,7 +89,7 @@
+ #endif
+ 
+ #ifndef NFS4NOBODY_GROUP
+-#define NFS4NOBODY_GROUP "nobody"
++#define NFS4NOBODY_GROUP "nogroup"
+ #endif
+ 
+ /* From Niels */

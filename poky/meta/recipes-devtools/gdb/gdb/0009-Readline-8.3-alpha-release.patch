@@ -1,0 +1,164 @@
+From 8807681557d9f30aac819186369ee62f4f8d1d96 Mon Sep 17 00:00:00 2001
+From: Chet Ramey <chet.ramey@case.edu>
+Date: Mon, 22 Apr 2024 10:41:37 -0400
+Subject: [PATCH] Readline-8.3-alpha release
+
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/readline.git/commit/tcap.h?h=readline-8.3-testing&id=69e5c5e4c9778bf86c3d1c6b058ddece70854de8]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ...ap-Add-function-parameter-prototypes.patch | 37 ++++++++++
+ ...d=cef614441f99b7b6e444ba601d8465a6e88f5a98 | 67 +++++++++++++++++++
+ readline/readline/tcap.h                      | 14 ++--
+ 3 files changed, 111 insertions(+), 7 deletions(-)
+ create mode 100644 readline/readline/0001-tcap-Add-function-parameter-prototypes.patch
+ create mode 100644 readline/readline/index.html?id=cef614441f99b7b6e444ba601d8465a6e88f5a98
+
+diff --git a/readline/readline/0001-tcap-Add-function-parameter-prototypes.patch b/readline/readline/0001-tcap-Add-function-parameter-prototypes.patch
+new file mode 100644
+index 00000000000..f28e31fd0e0
+--- /dev/null
++++ b/readline/readline/0001-tcap-Add-function-parameter-prototypes.patch
+@@ -0,0 +1,37 @@
++From 0c16af6ebf0bf81138c973e5e6a7c4ebf71f2489 Mon Sep 17 00:00:00 2001
++From: Khem Raj <raj.khem@gmail.com>
++Date: Wed, 30 Apr 2025 10:41:12 -0700
++Subject: [PATCH] tcap: Add function parameter prototypes
++
++GCC-15 with C23 dilect defaults expects full function signature
++
++Signed-off-by: Khem Raj <raj.khem@gmail.com>
++---
++ readline/readline/tcap.h | 14 ++++++--------
++ 1 file changed, 6 insertions(+), 8 deletions(-)
++
++diff --git a/readline/readline/tcap.h b/readline/readline/tcap.h
++index 859e6ee..2b22ff7 100644
++--- a/readline/readline/tcap.h
+++++ b/readline/readline/tcap.h
++@@ -46,14 +46,12 @@ extern char *UP, *BC;
++ 
++ extern short ospeed;
++ 
++-extern int tgetent ();
++-extern int tgetflag ();
++-extern int tgetnum ();
++-extern char *tgetstr ();
++-
++-extern int tputs ();
++-
++-extern char *tgoto ();
+++extern int tgetent(char*, const char*);
+++extern int tgetflag(const char*);
+++extern int tgetnum(const char*);
+++extern char *tgetstr(const char*, char**);
+++extern char *tgoto(const char*, int, int);
+++extern int tputs(const char*, int, int (*)(int));
++ 
++ #endif /* HAVE_TERMCAP_H */
++ 
+diff --git a/readline/readline/index.html?id=cef614441f99b7b6e444ba601d8465a6e88f5a98 b/readline/readline/index.html?id=cef614441f99b7b6e444ba601d8465a6e88f5a98
+new file mode 100644
+index 00000000000..02e665b143b
+--- /dev/null
++++ b/readline/readline/index.html?id=cef614441f99b7b6e444ba601d8465a6e88f5a98
+@@ -0,0 +1,67 @@
++From cef614441f99b7b6e444ba601d8465a6e88f5a98 Mon Sep 17 00:00:00 2001
++From: Chet Ramey <chet.ramey@case.edu>
++Date: Sun, 14 Jan 2024 15:19:37 -0500
++Subject: Readline-8.2 patch 8: add missing function prototypes
++
++---
++ bind.c     | 4 +---
++ patchlevel | 2 +-
++ rltty.c    | 3 +--
++ text.c     | 3 +--
++ 4 files changed, 4 insertions(+), 8 deletions(-)
++
++diff --git a/bind.c b/bind.c
++index 971116a..2596006 100644
++--- a/bind.c
+++++ b/bind.c
++@@ -1167,9 +1167,7 @@ _rl_init_file_error (va_alist)
++ /* **************************************************************** */
++ 
++ static int
++-parse_comparison_op (s, indp)
++-     const char *s;
++-     int *indp;
+++parse_comparison_op (const char *s, int *indp)
++ {
++   int i, peekc, op;
++ 
++diff --git a/patchlevel b/patchlevel
++index e340b58..6c10f12 100644
++--- a/patchlevel
+++++ b/patchlevel
++@@ -1,3 +1,3 @@
++ # Do not edit -- exists only for use by patch
++ 
++-7
+++8
++diff --git a/rltty.c b/rltty.c
++index 882a3d4..a4863ac 100644
++--- a/rltty.c
+++++ b/rltty.c
++@@ -80,8 +80,7 @@ static int ksrflow;
++ /* Dummy call to force a backgrounded readline to stop before it tries
++    to get the tty settings. */
++ static void
++-set_winsize (tty)
++-     int tty;
+++set_winsize (int tty)
++ {
++ #if defined (TIOCGWINSZ)
++   struct winsize w;
++diff --git a/text.c b/text.c
++index 91c3f33..30fdaa1 100644
++--- a/text.c
+++++ b/text.c
++@@ -1764,8 +1764,7 @@ _rl_char_search (int count, int fdir, int bdir)
++ 
++ #if defined (READLINE_CALLBACKS)
++ static int
++-_rl_char_search_callback (data)
++-     _rl_callback_generic_arg *data;
+++_rl_char_search_callback (_rl_callback_generic_arg *data)
++ {
++   _rl_callback_func = 0;
++   _rl_want_redisplay = 1;
++-- 
++cgit v1.1
++
+diff --git a/readline/readline/tcap.h b/readline/readline/tcap.h
+index 859e6eed5aa..467ea60e903 100644
+--- a/readline/readline/tcap.h
++++ b/readline/readline/tcap.h
+@@ -1,6 +1,6 @@
+ /* tcap.h -- termcap library functions and variables. */
+ 
+-/* Copyright (C) 1996-2015 Free Software Foundation, Inc.
++/* Copyright (C) 1996-2015,2023 Free Software Foundation, Inc.
+ 
+    This file is part of the GNU Readline Library (Readline), a library
+    for reading lines of text with interactive input and history editing.      
+@@ -46,14 +46,14 @@ extern char *UP, *BC;
+ 
+ extern short ospeed;
+ 
+-extern int tgetent ();
+-extern int tgetflag ();
+-extern int tgetnum ();
+-extern char *tgetstr ();
++extern int tgetent (char *, const char *);
++extern int tgetflag (const char *);
++extern int tgetnum (const char *);
++extern char *tgetstr (const char *, char **);
+ 
+-extern int tputs ();
++extern int tputs (const char *, int, int (*)(int));
+ 
+-extern char *tgoto ();
++extern char *tgoto (const char *, int, int);
+ 
+ #endif /* HAVE_TERMCAP_H */
+ 

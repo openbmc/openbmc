@@ -1,0 +1,50 @@
+From f3c6f924525179ca190fecce2889997250ca8705 Mon Sep 17 00:00:00 2001
+From: Jim Broadus <jbroadus@xevo.com>
+Date: Thu, 26 Mar 2020 16:05:53 -0700
+Subject: [PATCH] clang: Fix resource dir location for cross toolchains
+
+When clang looks for the resources directory, it does so based on the binary
+location and assumes that the containing directory is a sibling to lib. The
+Yocto cross.bbclass defines the default bindir as
+${exec_prefix}/bin/${CROSS_TARGET_SYS_DIR}. ex: /usr/bin/aarch64-poky-linux/.
+This causes clang to form a path that looks like /usr/bin/lib/clang/...
+
+As a fix for this, check the parent directory name. If that is "bin", then
+use that directory's parent.
+
+Upstream-Status: Pending
+Signed-off-by: Jim Broadus <jbroadus@xevo.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/lib/Driver/Driver.cpp | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/clang/lib/Driver/Driver.cpp b/clang/lib/Driver/Driver.cpp
+index 87855fdb7997..036c9d09df26 100644
+--- a/clang/lib/Driver/Driver.cpp
++++ b/clang/lib/Driver/Driver.cpp
+@@ -176,6 +176,7 @@ std::string Driver::GetResourcesPath(StringRef BinaryPath) {
+ 
+   // Dir is bin/ or lib/, depending on where BinaryPath is.
+   StringRef Dir = llvm::sys::path::parent_path(BinaryPath);
++  StringRef LastDirName = llvm::sys::path::filename(Dir);
+   SmallString<128> P(Dir);
+ 
+   StringRef ConfiguredResourceDir(CLANG_RESOURCE_DIR);
+@@ -187,9 +188,15 @@ std::string Driver::GetResourcesPath(StringRef BinaryPath) {
+     // With a static-library build of libclang, LibClangPath will contain the
+     // path of the embedding binary, which for LLVM binaries will be in bin/.
+     // ../lib gets us to lib/ in both cases.
+-    P = llvm::sys::path::parent_path(Dir);
+     // This search path is also created in the COFF driver of lld, so any
+     // changes here also needs to happen in lld/COFF/Driver.cpp
++
++    // OE cross toolchains are installed, by default, in a subdir of bin.
++    if (LastDirName == "bin") {
++      P = llvm::sys::path::parent_path(Dir);
++    } else {
++      P = llvm::sys::path::parent_path(llvm::sys::path::parent_path(Dir));
++    }
+     llvm::sys::path::append(P, CLANG_INSTALL_LIBDIR_BASENAME, "clang",
+                             CLANG_VERSION_MAJOR_STRING);
+   }

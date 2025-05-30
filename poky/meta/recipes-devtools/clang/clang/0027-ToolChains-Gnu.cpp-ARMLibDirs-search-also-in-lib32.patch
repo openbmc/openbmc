@@ -1,0 +1,81 @@
+From a83b407a9c1b04d95e6cda74059744fe815fde17 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <Martin.Jansa@gmail.com>
+Date: Thu, 31 Aug 2023 18:14:47 +0200
+Subject: [PATCH] ToolChains/Gnu.cpp: ARMLibDirs search also in lib32
+
+* in some strange multilib configs we build lib32-image where
+  32bit libs are in /usr/lib32 and 64bit in /usr/lib64 but in such
+  setup the clang search for GCC candidate installation doesn't
+  check lib32 directory in sysroot and fails to find the installation
+
+  X86LibDirs was already searching in lib32 for very long time:
+  https://github.com/llvm/llvm-project/commit/621fed5f5a051a0333415aaed75b8f2ed2350dbd
+  but ARMLibDirs didn't include it for some reason.
+
+* if we don't add lib32 for arm in getOSLibDir(), then it will
+  find -lgcc, crtbeginS.o, crtendS.o, but still fail to find
+  -lgcc_s, -lc, Scrt1.o, crti.o, crtn.o
+
+* fixes lib32-compiler-rt build failure:
+
+-- Configuring incomplete, errors occurred!
+CMake Error at TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native/usr/share/cmake-3.26/Modules/CMakeTestCCompiler.cmake:67 (message):
+  The C compiler
+
+    "TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native/usr/bin/arm-oemllib32-linux-gnueabi/arm-oemllib32-linux-gnueabi-clang"
+
+  is not able to compile a simple test program.
+
+  It fails with the following output:
+
+    Change Dir: TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build/CMakeFiles/CMakeScratch/TryCompile-rWXyQZ
+
+    Run Build Command(s):ninja -v cmTC_84d18 && [1/2] TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native/usr/bin/arm-oemllib32-linux-gnueabi/arm-oemllib32-linux-gnueabi-clang --target=arm-oemllib32-linux-gnueabi --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot   -target arm-oemllib32-linux-gnueabi  -march=armv7ve -mthumb -mfpu=neon-vfpv4 -mfloat-abi=softfp -mlittle-endian --dyld-prefix=/usr -Qunused-arguments -funwind-tables -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Werror=return-type -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64  --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot  -O2 -pipe -g -feliminate-unused-debug-types   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native=    -fPIE -MD -MT CMakeFiles/cmTC_84d18.dir/testCCompiler.c.o -MF CMakeFiles/cmTC_84d18.dir/testCCompiler.c.o.d -o CMakeFiles/cmTC_84d18.dir/testCCompiler.c.o -c TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build/CMakeFiles/CMakeScratch/TryCompile-rWXyQZ/testCCompiler.c
+    [2/2] : && TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native/usr/bin/arm-oemllib32-linux-gnueabi/arm-oemllib32-linux-gnueabi-clang --target=arm-oemllib32-linux-gnueabi --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot -target arm-oemllib32-linux-gnueabi  -march=armv7ve -mthumb -mfpu=neon-vfpv4 -mfloat-abi=softfp -mlittle-endian --dyld-prefix=/usr -Qunused-arguments -funwind-tables -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Werror=return-type -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64  --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot  -O2 -pipe -g -feliminate-unused-debug-types   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native= -target arm-oemllib32-linux-gnueabi  -march=armv7ve -mthumb -mfpu=neon-vfpv4 -mfloat-abi=softfp -mlittle-endian --dyld-prefix=/usr -Qunused-arguments -funwind-tables -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Werror=return-type -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64  --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot  -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native=  -Wl,-z,relro,-z,now -unwindlib=libgcc -rtlib=libgcc -stdlib=libstdc++   -fuse-ld=lld -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native=  -Wl,-z,relro,-z,now -unwindlib=libgcc -rtlib=libgcc -stdlib=libstdc++   -fuse-ld=lld CMakeFiles/cmTC_84d18.dir/testCCompiler.c.o -o cmTC_84d18   && :
+    FAILED: cmTC_84d18
+    : && TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native/usr/bin/arm-oemllib32-linux-gnueabi/arm-oemllib32-linux-gnueabi-clang --target=arm-oemllib32-linux-gnueabi --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot -target arm-oemllib32-linux-gnueabi  -march=armv7ve -mthumb -mfpu=neon-vfpv4 -mfloat-abi=softfp -mlittle-endian --dyld-prefix=/usr -Qunused-arguments -funwind-tables -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Werror=return-type -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64  --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot  -O2 -pipe -g -feliminate-unused-debug-types   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native= -target arm-oemllib32-linux-gnueabi  -march=armv7ve -mthumb -mfpu=neon-vfpv4 -mfloat-abi=softfp -mlittle-endian --dyld-prefix=/usr -Qunused-arguments -funwind-tables -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security -Werror=return-type -D_TIME_BITS=64 -D_FILE_OFFSET_BITS=64  --sysroot=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot  -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native=  -Wl,-z,relro,-z,now -unwindlib=libgcc -rtlib=libgcc -stdlib=libstdc++   -fuse-ld=lld -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed   -fmacro-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work-shared/llvm-project-source-16.0.6-r0/git=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/build=/usr/src/debug/lib32-compiler-rt/16.0.6-r0  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fmacro-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/lib32-recipe-sysroot=  -fdebug-prefix-map=TOPDIR/BUILD/work/raspberrypi4_64-oemllib32-linux-gnueabi/lib32-compiler-rt/16.0.6/recipe-sysroot-native=  -Wl,-z,relro,-z,now -unwindlib=libgcc -rtlib=libgcc -stdlib=libstdc++   -fuse-ld=lld CMakeFiles/cmTC_84d18.dir/testCCompiler.c.o -o cmTC_84d18   && :
+    arm-oemllib32-linux-gnueabi-ld.lld: error: cannot open Scrt1.o: No such file or directory
+    arm-oemllib32-linux-gnueabi-ld.lld: error: cannot open crti.o: No such file or directory
+    arm-oemllib32-linux-gnueabi-ld.lld: error: cannot open crtbeginS.o: No such file or directory
+    arm-oemllib32-linux-gnueabi-ld.lld: error: unable to find library -lgcc
+    arm-oemllib32-linux-gnueabi-ld.lld: error: unable to find library -lgcc_s
+    arm-oemllib32-linux-gnueabi-ld.lld: error: unable to find library -lc
+    arm-oemllib32-linux-gnueabi-ld.lld: error: unable to find library -lgcc
+    arm-oemllib32-linux-gnueabi-ld.lld: error: unable to find library -lgcc_s
+    arm-oemllib32-linux-gnueabi-ld.lld: error: cannot open crtendS.o: No such file or directory
+    arm-oemllib32-linux-gnueabi-ld.lld: error: cannot open crtn.o: No such file or directory
+    clang-16: error: linker command failed with exit code 1 (use -v to see invocation)
+    ninja: build stopped: subcommand failed.
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <Martin.Jansa@gmail.com>
+---
+ clang/lib/Driver/ToolChains/Gnu.cpp   | 2 +-
+ clang/lib/Driver/ToolChains/Linux.cpp | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
+index 868d32f501e8..beed8d34a127 100644
+--- a/clang/lib/Driver/ToolChains/Gnu.cpp
++++ b/clang/lib/Driver/ToolChains/Gnu.cpp
+@@ -2428,7 +2428,7 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
+   static const char *const AArch64beLibDirs[] = {"/lib"};
+   static const char *const AArch64beTriples[] = {"aarch64_be-none-linux-gnu"};
+ 
+-  static const char *const ARMLibDirs[] = {"/lib"};
++  static const char *const ARMLibDirs[] = {"/lib", "/lib32"};
+   static const char *const ARMTriples[] = {"arm-linux-gnueabi"};
+   static const char *const ARMHFTriples[] = {"arm-linux-gnueabihf",
+                                              "armv7hl-redhat-linux-gnueabi",
+diff --git a/clang/lib/Driver/ToolChains/Linux.cpp b/clang/lib/Driver/ToolChains/Linux.cpp
+index ee0b4acbcef0..b02409fd72ee 100644
+--- a/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -199,6 +199,7 @@ static StringRef getOSLibDir(const llvm::Triple &Triple, const ArgList &Args) {
+   // reasoning about oslibdir spellings with the lib dir spellings in the
+   // GCCInstallationDetector, but that is a more significant refactoring.
+   if (Triple.getArch() == llvm::Triple::x86 || Triple.isPPC32() ||
++      Triple.getArch() == llvm::Triple::arm || Triple.getArch() == llvm::Triple::thumb ||
+       Triple.getArch() == llvm::Triple::sparc)
+     return "lib32";
+ 

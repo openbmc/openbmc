@@ -1,0 +1,1 @@
+sudo dnf install 'texlive-collection-lang*' latexmk texlive-collection-fontsextra texlive-collection-fontsrecommended texlive-collection-latex texlive-collection-latexextra texlive-collection-latexrecommended texlive-collection-xetex texlive-fncychap texlive-gnu-freefont texlive-tex-gyre texlive-xetex

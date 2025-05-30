@@ -12,19 +12,14 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  configure.ac | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/configure.ac b/configure.ac
-index 78b8788..931fa6f 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -22,7 +22,7 @@ AC_INIT([GNU M4], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
+@@ -22,7 +22,7 @@ AC_INIT([GNU M4], m4_esyscmd([build-aux/
    [bug-m4@gnu.org])
  AC_CONFIG_AUX_DIR([build-aux])
  
--AM_INIT_AUTOMAKE([1.11.6 dist-bzip2 dist-xz color-tests parallel-tests
-+AM_INIT_AUTOMAKE([1.11.6 dist-bzip2 dist-xz color-tests serial-tests
+-AM_INIT_AUTOMAKE([1.14 dist-bzip2 dist-xz color-tests parallel-tests
++AM_INIT_AUTOMAKE([1.14 dist-bzip2 dist-xz color-tests serial-tests
  silent-rules subdir-objects gnu])
  AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
  
--- 
-2.7.4
-

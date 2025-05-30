@@ -104,7 +104,6 @@ class CommonCheckLayer(OECheckLayerTestCase):
                 self.tc.layer['name'])
             self.fail('\n'.join(msg))
 
-    @unittest.expectedFailure
     def test_patches_upstream_status(self):
         import sys
         sys.path.append(os.path.join(sys.path[0], '../../../../meta/lib/'))

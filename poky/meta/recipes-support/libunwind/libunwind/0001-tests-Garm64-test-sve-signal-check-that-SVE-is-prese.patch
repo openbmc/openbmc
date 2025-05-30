@@ -1,0 +1,73 @@
+From 2f03399911abdd549237fa2db64a4a8311fe67dc Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 15 Jan 2024 16:59:14 +0000
+Subject: [PATCH 1/4] tests/Garm64-test-sve-signal: check that SVE is present
+ before running tests
+
+If the compiler supports -march=armv8-a+sve then those options are used
+to build this test, but all that needs is a sufficiently new compiler.
+
+This then results in the __ARM_FEATURE_SVE check always passing, because
+SVE is explicitly enabled.
+
+However it's perfectly possible for the compiler to support +sve but the
+machine running the code to not, which results with the test crashing
+with "Illegal instruction".
+
+Handle this case by checking HWCAP for SVE support, and skipping the
+test unless we know it is available.  This check is Linux-specific at
+present, but the logic is easily extended.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tests/Garm64-test-sve-signal.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/tests/Garm64-test-sve-signal.c b/tests/Garm64-test-sve-signal.c
+index 52cb9ac6..cf66b3f1 100644
+--- a/tests/Garm64-test-sve-signal.c
++++ b/tests/Garm64-test-sve-signal.c
+@@ -9,11 +9,16 @@
+ #include <libunwind.h>
+ #include <signal.h>
+ #include <stdio.h>
++#include <stdbool.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <time.h>
+ #include <unistd.h>
+ 
++#if defined(__linux__)
++#include <sys/auxv.h>
++#endif
++
+ int64_t z[100];
+ 
+ void signal_handler(int signum)
+@@ -96,8 +101,22 @@ int64_t square(svint64_t z0)
+   return res;
+ }
+ 
++bool has_sve(void) {
++#if defined(__linux__)
++  return (getauxval(AT_HWCAP) & HWCAP_SVE) ? true : false;
++#else
++  printf("Cannot determine if SVE is present, assuming it is not\n");
++  return false;
++#endif
++}
++
+ int main()
+ {
++  if (!has_sve()) {
++    printf("SVE not available, skipping\n");
++    return 77;
++  }
++
+   signal(SIGUSR1, signal_handler);
+   for (unsigned int i = 0; i < sizeof(z) / sizeof(z[0]); ++i)
+     z[i] = rand();
+-- 
+2.34.1
+

@@ -10,7 +10,7 @@
 # by default.
 PACKAGECONFIG:append:class-target = " ${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'manpages', '', d)}"
 
-inherit qemu
+PACKAGE_WRITE_DEPS += "${@bb.utils.contains('DISTRO_FEATURES', 'api-documentation', 'qemuwrapper-cross', '', d)}"
 
 # usually manual files are packaged to ${PN}-doc except man-pages
 MAN_PKG ?= "${PN}-doc"

@@ -53,7 +53,7 @@ subject = None
 ref = None
 
 if not shutil.which("lsdiff"):
-    print("lsdiff missing from host, please install patchutils")
+    print("lsdiff missing from host, please install patchutils", file=sys.stderr)
     sys.exit(-1)
 
 try:
@@ -80,7 +80,7 @@ try:
                 break
 
         if not ref:
-            print("Failed to find ref to cover letter (References:)...")
+            print("Failed to find ref to cover letter (References:)...", file=sys.stderr)
             sys.exit(-2)
 
         ref = ref.group(1)
@@ -143,7 +143,8 @@ try:
 
     if cmd == "prep-perpatch-check-cmd":
         if len(projs) > 1:
-            print(f"Diff spans more than one project ({', '.join(sorted(projs))}), split into multiple commits...")
+            print(f"Diff spans more than one project ({', '.join(sorted(projs))}), split into multiple commits...",
+                  file=sys.stderr)
             sys.exit(-3)
 
         # No need to check other patches in the series as there aren't any
@@ -164,7 +165,8 @@ try:
         series_check.write_text('\n'.join(uniq_series_projs))
 
         if len(uniq_series_projs) > 1:
-            print(f"Series spans more than one project ({', '.join(sorted(uniq_series_projs))}), split into multiple series...")
+            print(f"Series spans more than one project ({', '.join(sorted(uniq_series_projs))}), split into multiple series...",
+                  file=sys.stderr)
             sys.exit(-4)
     else:  # send-auto-cc-cmd / send-auto-to-cmd
         ml_projs = {

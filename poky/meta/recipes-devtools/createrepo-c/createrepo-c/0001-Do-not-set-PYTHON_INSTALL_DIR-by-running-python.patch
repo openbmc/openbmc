@@ -1,4 +1,4 @@
-From 5d974eddfd59291fbbf9bf9b352431d8565011d2 Mon Sep 17 00:00:00 2001
+From 20aec3f83a7ab6ebb89f40ee8c5df1af65eba32b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:31:02 +0200
 Subject: [PATCH] Do not set PYTHON_INSTALL_DIR by running python

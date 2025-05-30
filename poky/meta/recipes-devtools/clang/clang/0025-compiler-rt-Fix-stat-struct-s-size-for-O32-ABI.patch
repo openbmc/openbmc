@@ -1,0 +1,46 @@
+From 744dbb6cf6925796e2bc5c028af08c40445bbb1c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 3 Jan 2023 18:44:34 -0800
+Subject: [PATCH] compiler-rt: Fix stat struct's size for O32 ABI
+
+stat struct size differs on glibc based on ABI choices e.g. 64bit off_t
+and/or 64bit time_t will make this size different. Therefore separate
+out the O32 case out, makes it more readable.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../sanitizer_platform_limits_posix.h               | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h b/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h
+index 1a7d9e64048e..854a87e17236 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.h
+@@ -98,6 +98,18 @@ const unsigned struct_kernel_stat64_sz = 104;
+ const unsigned struct_kernel_stat_sz = 144;
+ const unsigned struct_kernel_stat64_sz = 104;
+ #elif defined(__mips__)
++#if defined(__mips_o32) // O32 ABI
++#if _TIME_BITS == 64
++const unsigned struct_kernel_stat_sz = 112;
++const unsigned struct_kernel_stat64_sz = 112;
++#elif _FILE_OFFSET_BITS == 64
++const unsigned struct_kernel_stat_sz = 160;
++const unsigned struct_kernel_stat64_sz = 160;
++#else
++const unsigned struct_kernel_stat_sz = 144;
++const unsigned struct_kernel_stat64_sz = 160;
++#endif
++#else // __mips_o32
+ const unsigned struct_kernel_stat_sz = SANITIZER_ANDROID
+                                            ? FIRST_32_SECOND_64(104, 128)
+ #      if defined(_ABIN32) && _MIPS_SIM == _ABIN32
+@@ -106,6 +118,7 @@ const unsigned struct_kernel_stat_sz = SANITIZER_ANDROID
+                                            : FIRST_32_SECOND_64(160, 216);
+ #      endif
+ const unsigned struct_kernel_stat64_sz = 104;
++#endif
+ #elif defined(__s390__) && !defined(__s390x__)
+ const unsigned struct_kernel_stat_sz = 64;
+ const unsigned struct_kernel_stat64_sz = 104;

@@ -1,0 +1,123 @@
+From dc2de98d70a763f30347df2d76df1c70cc464b87 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 20 Mar 2021 16:09:16 -0700
+Subject: [PATCH] clang: Define / releative gcc installation dir
+
+This is required for OE gcc installation to work.
+Without this its not able to find the paths for libgcc
+and other standard headers and libraries from gcc
+installation in OE
+
+* Do not use install relative libc++ headers
+In OE we use same clang for native and cross builds, therefore we need
+to ensure that native sysroot install of libc++ is not searched for
+headers when doing cross compile instead it searches the target sysroot
+this is especially troublesome when libcxx-native is staged along with
+libcxx e.g. chromium
+
+ * Fix lib paths for OpenEmbedded Host
+
+Under OpenEmbedded Host, while building with clang-native, it cannot find
+the GCCInstallPath, which causing following error:
+[snip]
+compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin/clang
+-target x86_64-linux
+-isystem/path/to/x86_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/include
+-O2 -pipe
+/path/to/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/share/cmake-3.21/Modules/CMakeCCompilerABI.c`
+hosttools/ld: cannot find crtbeginS.o: No such file or directory
+[snip]
+
+Before this patch:
+compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin/clang
+clang version 13.0.1 (https://github.com/llvm/llvm-project 08e3a5ccd952edee36b3c002e3a29c6b1b5153de)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /build/tmp-glibc/work/x86_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin
+Found candidate GCC installation: /usr/lib/gcc/x86_64-wrs-linux/10.2.0
+
+After this patch:
+compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin/clang
+clang version 13.0.1 (https://github.com/llvm/llvm-project 08e3a5ccd952edee36b3c002e3a29c6b1b5153de)
+Thread model: posix
+InstalledDir: /build/tmp-glibc/work/x86_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin
+Found candidate GCC installation: /usr/lib/gcc/x86_64-wrs-linux/10.2.0
+Found candidate GCC installation: /usr/lib/x86_64-wrs-linux/10.2.0
+Selected GCC installation: /usr/lib/x86_64-wrs-linux/10.2.0
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
+
+For OpenEmbedded Host, sysroots are of the form<sysroot>/usr/lib/<triple>/x.y.z.
+Take x86-64 as example, the default triple is x86_64-unknown-linux-gnu.
+For clang-native, the target vendor is '-unknown', need to test current distro
+to follow above form.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/lib/Driver/ToolChains/Gnu.cpp | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
+
+diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
+index 9f7b9e8d42a8..268fb7bf7167 100644
+--- a/clang/lib/Driver/ToolChains/Gnu.cpp
++++ b/clang/lib/Driver/ToolChains/Gnu.cpp
+@@ -19,6 +19,7 @@
+ #include "Linux.h"
+ #include "clang/Config/config.h" // for GCC_INSTALL_PREFIX
+ #include "clang/Driver/Compilation.h"
++#include "clang/Driver/Distro.h"
+ #include "clang/Driver/Driver.h"
+ #include "clang/Driver/DriverDiagnostic.h"
+ #include "clang/Driver/MultilibBuilder.h"
+@@ -2860,6 +2861,7 @@ void Generic_GCC::GCCInstallationDetector::ScanLibDirForGCCTriple(
+     const llvm::Triple &TargetTriple, const ArgList &Args,
+     const std::string &LibDir, StringRef CandidateTriple,
+     bool NeedsBiarchSuffix, bool GCCDirExists, bool GCCCrossDirExists) {
++  Distro Distro(D.getVFS(), TargetTriple);
+   // Locations relative to the system lib directory where GCC's triple-specific
+   // directories might reside.
+   struct GCCLibSuffix {
+@@ -2871,19 +2873,20 @@ void Generic_GCC::GCCInstallationDetector::ScanLibDirForGCCTriple(
+     // Whether this library suffix is relevant for the triple.
+     bool Active;
+   } Suffixes[] = {
+-      // This is the normal place.
+-      {"gcc/" + CandidateTriple.str(), "../..", GCCDirExists},
+-
+-      // Debian puts cross-compilers in gcc-cross.
+-      {"gcc-cross/" + CandidateTriple.str(), "../..", GCCCrossDirExists},
+-
+       // The Freescale PPC SDK has the gcc libraries in
+       // <sysroot>/usr/lib/<triple>/x.y.z so have a look there as well. Only do
+       // this on Freescale triples, though, since some systems put a *lot* of
+       // files in that location, not just GCC installation data.
+       {CandidateTriple.str(), "..",
+        TargetTriple.getVendor() == llvm::Triple::Freescale ||
+-           TargetTriple.getVendor() == llvm::Triple::OpenEmbedded}};
++           TargetTriple.getVendor() == llvm::Triple::OpenEmbedded ||
++           Distro.IsOpenEmbedded()},
++
++      // This is the normal place.
++      {"gcc/" + CandidateTriple.str(), "../..", GCCDirExists},
++
++      // Debian puts cross-compilers in gcc-cross.
++      {"gcc-cross/" + CandidateTriple.str(), "../..", GCCCrossDirExists}};
+ 
+   for (auto &Suffix : Suffixes) {
+     if (!Suffix.Active)
+@@ -3274,8 +3277,11 @@ Generic_GCC::addLibCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
+   // incompatible with the NDK libraries.
+   SmallString<128> DriverIncludeDir(getDriver().Dir);
+   llvm::sys::path::append(DriverIncludeDir, "..", "include");
++
++  // do not add it when --sysroot is specified, since it would expect
++  // libc++ headers from sysroot and not relative to compiler install location
+   if (AddIncludePath(DriverIncludeDir,
+-                     /*TargetDirRequired=*/getTriple().isAndroid()))
++                     /*TargetDirRequired=*/getTriple().isAndroid() | !computeSysRoot().empty()))
+     return;
+   // If this is a development, non-installed, clang, libcxx will
+   // not be found at ../include/c++ but it likely to be found at

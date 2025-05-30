@@ -1,0 +1,61 @@
+From b5d03d5313d4cc19a7e6e9ba5fd74d1f8400cd46 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 24 Apr 2025 21:28:55 +0800
+Subject: [PATCH] Remove sassc_version.h from source directory
+
+The sassc_version.h should be generated from sassc_version.h.in. If the
+build directory is out of the source directory, the sassc_version.h is
+generated in build directory and the original sassc_version.h in source
+directory is not overwritten. However, the latter is used during the
+build, resulting in a missing runtime version:
+
+$ sassc --version
+sassc: [NA]
+libsass: [NA]
+sass2scss: 1.1.1
+sass: 3.5
+
+Remove sassc_version.h from source directory to ensure that the
+sassc_version.h in build directory is used during the build.
+
+Also remove '--dirty' option from 'git describe' command line in
+version.sh to get rid of '-dirty' suffix from version number that
+was introduced with this change.
+
+Upstream-Status: Submitted [https://github.com/sass/sassc/pull/283]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ sassc_version.h | 8 --------
+ version.sh      | 2 +-
+ 2 files changed, 1 insertion(+), 9 deletions(-)
+ delete mode 100644 sassc_version.h
+
+diff --git a/sassc_version.h b/sassc_version.h
+deleted file mode 100644
+index 3ca12e3..0000000
+--- a/sassc_version.h
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#ifndef SASSC_VERSION_H
+-#define SASSC_VERSION_H
+-
+-#ifndef SASSC_VERSION
+-#define SASSC_VERSION "[NA]"
+-#endif
+-
+-#endif
+diff --git a/version.sh b/version.sh
+index d56af99..cf97d82 100755
+--- a/version.sh
++++ b/version.sh
+@@ -1,5 +1,5 @@
+ if test "x$SASSC_VERSION" = "x"; then
+-  SASSC_VERSION=`git describe --abbrev=4 --dirty --always --tags 2>/dev/null`
++  SASSC_VERSION=`git describe --abbrev=4 --always --tags 2>/dev/null`
+ fi
+ if test "x$SASSC_VERSION" = "x"; then
+   SASSC_VERSION=`cat VERSION 2>/dev/null`
+-- 
+2.34.1
+

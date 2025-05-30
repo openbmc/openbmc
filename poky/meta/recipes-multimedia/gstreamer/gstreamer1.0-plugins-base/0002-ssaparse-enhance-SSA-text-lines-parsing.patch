@@ -1,4 +1,4 @@
-From 1b9887421de593854632571327b4918b880900c6 Mon Sep 17 00:00:00 2001
+From 1cc876662b7707eb5a2f668654f7921b5642e108 Mon Sep 17 00:00:00 2001
 From: Mingke Wang <mingke.wang@freescale.com>
 Date: Thu, 19 Mar 2015 14:17:10 +0800
 Subject: [PATCH] ssaparse: enhance SSA text lines parsing.

@@ -1,0 +1,475 @@
+From edf745dc519ddbfef127e2789bf11bfbacd300b7 Mon Sep 17 00:00:00 2001
+From: Jakub Jelinek <jakub@redhat.com>
+Date: Wed, 7 May 2025 17:25:42 +0200
+Subject: libcpp: Further fixes for incorrect line numbers in large files
+ [PR120061]
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The backport of the PR108900 fix to 14 branch broke building chromium
+because static_assert (__LINE__ == expected_line_number, ""); now triggers
+as the __LINE__ values are off by one.
+This isn't the case on the trunk and 15 branch because we've switched
+to 64-bit location_t and so one actually needs far longer header files
+to trigger it.
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120061#c11
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120061#c12
+contain (large) testcases in patch form which show on the 14 branch
+that the first one used to fail before the PR108900 backport and now
+works correctly, while the second one attempts to match the chromium
+behavior and it used to pass before the PR108900 backport and now it
+FAILs.
+The two testcases show rare problematic cases, because
+do_include_common -> parse_include -> check_eol -> check_eol_1 ->
+cpp_get_token_1 -> _cpp_lex_token -> _cpp_lex_direct -> linemap_line_start
+triggers there
+      /* Allocate the new line_map.  However, if the current map only has a
+         single line we can sometimes just increase its column_bits instead. */
+      if (line_delta < 0
+          || last_line != ORDINARY_MAP_STARTING_LINE_NUMBER (map)
+          || SOURCE_COLUMN (map, highest) >= (1U << (column_bits - range_bits))
+          || ( /* We can't reuse the map if the line offset is sufficiently
+                  large to cause overflow when computing location_t values.  */
+              (to_line - ORDINARY_MAP_STARTING_LINE_NUMBER (map))
+              >= (((uint64_t) 1)
+                  << (CHAR_BIT * sizeof (linenum_type) - column_bits)))
+          || range_bits < map->m_range_bits)
+        map = linemap_check_ordinary
+                (const_cast <line_map *>
+                  (linemap_add (set, LC_RENAME,
+                                ORDINARY_MAP_IN_SYSTEM_HEADER_P (map),
+                                ORDINARY_MAP_FILE_NAME (map),
+                                to_line)));
+and so creates a new ordinary map on the line right after the
+(problematic) #include line.
+Now, in the spot that r14-11679-g8a884140c2bcb7 patched,
+pfile->line_table->highest_location in all 3 tests (also
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=120061#c13
+) is before the decrement the start of the line after the #include line and so
+the decrement is really desirable in that case to put highest_location
+somewhere on the line where the #include actually is.
+But at the same time it is also undesirable, because if we do decrement it,
+then linemap_add LC_ENTER called from _cpp_do_file_change will then
+  /* Generate a start_location above the current highest_location.
+     If possible, make the low range bits be zero.  */
+  location_t start_location = set->highest_location + 1;
+  unsigned range_bits = 0;
+  if (start_location < LINE_MAP_MAX_LOCATION_WITH_COLS)
+    range_bits = set->default_range_bits;
+  start_location += (1 << range_bits) - 1;
+  start_location &=  ~((1 << range_bits) - 1);
+
+  linemap_assert (!LINEMAPS_ORDINARY_USED (set)
+                  || (start_location
+                      >= MAP_START_LOCATION (LINEMAPS_LAST_ORDINARY_MAP (set))));
+and we can end up with the new LC_ENTER ordinary map having the same
+start_location as the preceding LC_RENAME one.
+Next thing that happens is computation of included_from:
+  if (reason == LC_ENTER)
+    {
+      if (set->depth == 0)
+        map->included_from = 0;
+      else
+        /* The location of the end of the just-closed map.  */
+        map->included_from
+          = (((map[0].start_location - 1 - map[-1].start_location)
+              & ~((1 << map[-1].m_column_and_range_bits) - 1))
+             + map[-1].start_location);
+The normal case (e.g. with the testcase included at the start of this comment) is
+that map[-1] starts somewhere earlier and so map->included_from computation above
+nicely computes location_t which expands to the start of the #include line.
+With r14-11679 reverted, for #c11 as well as #c12
+map[0].start_location == map[-1].start_location above, and so it is
+((location_t) -1 & ~((1 << map[-1].m_column_and_range_bits) - 1)))
++ map[-1].start_location,
+which happens to be start of the #include line.
+For #c11 map[0].start_location is 0x500003a0 and map[-1] has
+m_column_and_range_bits 7 and map[-2] has m_column_and_range_bits 12 and
+map[0].included_from is set to 0x50000320.
+For #c12 map[0].start_location is 0x606c0402 and map[-2].start_location is
+0x606c0400 and m_column_and_range_bits is 0 for all 3 maps.
+map[0].included_from is set to 0x606c0401.
+The last important part is again in linemap_add when doing LC_LEAVE:
+      /* (MAP - 1) points to the map we are leaving. The
+         map from which (MAP - 1) got included should be the map
+         that comes right before MAP in the same file.  */
+      from = linemap_included_from_linemap (set, map - 1);
+
+      /* A TO_FILE of NULL is special - we use the natural values.  */
+      if (to_file == NULL)
+        {
+          to_file = ORDINARY_MAP_FILE_NAME (from);
+          to_line = SOURCE_LINE (from, from[1].start_location);
+          sysp = ORDINARY_MAP_IN_SYSTEM_HEADER_P (from);
+        }
+Here it wants to compute the right to_line which ought to be the line after
+the #include directive.
+On the #c11 testcase that doesn't work correctly though, because
+map[-1].included_from is 0x50000320, from[0] for that is LC_ENTER with
+start_location 0x4080 and m_column_and_range_bits 12 but note that we've
+earlier computed map[-1].start_location + (-1 & 0xffffff80) and so only
+decreased by 7 bits, so to_line is still on the line with #include and not
+after it.  In the #c12 that doesn't happen, all the ordinary maps involved
+there had 0 m_column_and_range_bits and so this computes correct line.
+
+Below is a fix for the trunk including testcases using the
+location_overflow_plugin hack to simulate the bugs without needing huge
+files (in the 14 case it is just 330KB and almost 10MB, but in the 15
+case it would need to be far bigger).
+The pre- r15-9018 trunk has
+FAIL: gcc.dg/plugin/location-overflow-test-pr116047.c -fplugin=./location_overflow_plugin.so  scan-file static_assert[^\n\r]*6[^\n\r]*== 6
+and current trunk
+FAIL: gcc.dg/plugin/location-overflow-test-pr116047.c -fplugin=./location_overflow_plugin.so  scan-file static_assert[^\n\r]*6[^\n\r]*== 6
+FAIL: gcc.dg/plugin/location-overflow-test-pr120061.c -fplugin=./location_overflow_plugin.so  scan-file static_assert[^\n\r]*5[^\n\r]*== 5
+and with the patch everything PASSes.
+I'll post afterwards a 14 version of the patch.
+
+The patch reverts the r15-9018 change, because it is incorrect,
+we really need to decrement it even when crossing ordinary map
+boundaries, so that the location is not on the line after the #include
+line but somewhere on the #include line.  It also patches two spots
+in linemap_add mentioned above to make sure we get correct locations
+both in the included_from location_t when doing LC_ENTER (second
+line-map.cc hunk) and when doing LC_LEAVE to compute the right to_line
+(first line-map.cc hunk), both in presence of an added LC_RENAME
+with the same start_location as the following LC_ENTER (i.e. the
+problematic cases).
+The LC_ENTER hunk is mostly to ensure included_form location_t is
+at the start of the #include line (column 0), without it we can
+decrease include_from not enough and end up at some random column
+in the middle of the line, because it is masking away
+map[-1].m_column_and_range_bits bits even when in the end the resulting
+include_from location_t will be found in map[-2] map with perhaps
+different m_column_and_range_bits.  That alone doesn't fix the bug
+though.
+The more important is the LC_LEAVE hunk and the problem there is
+caused by linemap_line_start not actually doing
+    r = set->highest_line + (line_delta << map->m_column_and_range_bits);
+when adding a new map (the LC_RENAME one because we need to switch to
+different number of directly encoded ranges, or columns, etc.).
+So, in the original PR108900 case that
+  to_line = SOURCE_LINE (from, from[1].start_location);
+doesn't do the right thing, from there is the last < 0x50000000 map
+with m_column_and_range_bits 12, from[1] is the first one above it
+and map[-1].included_from is the correct location of column 0 on
+the #include line, but as the new LC_RENAME map has been created without
+actually increasing highest_location to be on the new line (we've just
+set to_line of the new LC_RENAME map to the correct line),
+  to_line = SOURCE_LINE (from, from[1].start_location);
+stays on the same source line.  I've tried to just replace that with
+  to_line = SOURCE_LINE (from, linemap_included_from (map - 1)) + 1;
+i.e. just find out the #include line from map[-1].included_from and
+add 1 to it, unfortunately that breaks the
+c-c++-common/cpp/line-4.c
+test where we expect to stay on the same 0 line for LC_LEAVE from
+<command line> and gcc.dg/cpp/trad/Wunused.c, gcc.dg/cpp/trad/builtins.c
+and c-c++-common/analyzer/named-constants-via-macros-traditional.c tests
+all with -traditional-cpp preprocessing where to_line is also off-by-one
+from the expected one.
+So, this patch instead conditionalizes it, uses the
+  to_line = SOURCE_LINE (from, linemap_included_from (map - 1)) + 1;
+way only if from[1] is a LC_RENAME map (rather than the usual
+LC_ENTER one), that should limit it to the problematic cases of when
+parse_include peeked after EOL and had to create LC_RENAME map with
+the same start_location as the LC_ENTER after it.
+
+Some further justification for the LC_ENTER hunk, using the
+https://gcc.gnu.org/pipermail/gcc-patches/2025-May/682774.html testcase
+(old is 14 before r14-11679, vanilla current 14 and new with the 14 patch)
+I get
+$ /usr/src/gcc-14/obj/gcc/cc1.old -quiet -std=c23 pr116047.c -nostdinc
+In file included from pr116047-1.h:327677:21,
+                 from pr116047.c:4:
+pr116047-2.h:1:1: error: unknown type name ‘a’
+    1 | a b c;
+      | ^
+pr116047-2.h:1:5: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘c’
+    1 | a b c;
+      |     ^
+pr116047-1.h:327677:1: error: static assertion failed: ""
+327677 | #include "pr116047-2.h"
+       | ^~~~~~~~~~~~~
+$ /usr/src/gcc-14/obj/gcc/cc1.vanilla -quiet -std=c23 pr116047.c -nostdinc
+In file included from pr116047-1.h:327678,
+                 from pr116047.c:4:
+pr116047-2.h:1:1: error: unknown type name ‘a’
+    1 | a b c;
+      | ^
+pr116047-2.h:1:5: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘c’
+    1 | a b c;
+      |     ^
+$ /usr/src/gcc-14/obj/gcc/cc1.new -quiet -std=c23 pr116047.c -nostdinc
+In file included from pr116047-1.h:327677,
+                 from pr116047.c:4:
+pr116047-2.h:1:1: error: unknown type name ‘a’
+    1 | a b c;
+      | ^
+pr116047-2.h:1:5: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘c’
+    1 | a b c;
+      |     ^
+
+pr116047-1.h has on lines 327677+327678:
+ #include "pr116047-2.h"
+ static_assert (__LINE__ == 327678, "");
+so the static_assert failure is something that was dealt mainly in the
+LC_LEAVE hunk and files.cc reversion, but please have a look at the
+In file included from lines.
+14.2 emits correct line (#include "pr116047-2.h" is indeed on line
+327677) but some random column in there (which is not normally printed
+for smaller headers; 21 is the . before extension in the filename).
+Current trunk emits incorrect line (327678 instead of 327677, clearly
+it didn't decrement).
+And the patched compiler emits the right line with no column, as would
+be printed if I remove e.g. 300000 newlines from the file.
+
+2025-05-07  Jakub Jelinek  <jakub@redhat.com>
+
+	PR preprocessor/108900
+	PR preprocessor/116047
+	PR preprocessor/120061
+	* files.cc (_cpp_stack_file): Revert 2025-03-28 change.
+	* line-map.cc (linemap_add): Use
+	SOURCE_LINE (from, linemap_included_from (map - 1)) + 1; instead of
+	SOURCE_LINE (from, from[1].start_location); to compute to_line
+	for LC_LEAVE.  For LC_ENTER included_from computation, look at
+	map[-2] or even lower if map[-1] has the same start_location as
+	map[0].
+
+	* gcc.dg/plugin/plugin.exp: Add location-overflow-test-pr116047.c
+	and location-overflow-test-pr120061.c.
+	* gcc.dg/plugin/location_overflow_plugin.cc (plugin_init): Don't error
+	on unknown values, instead just break.  Handle 0x4fHHHHHH arguments
+	differently.
+	* gcc.dg/plugin/location-overflow-test-pr116047.c: New test.
+	* gcc.dg/plugin/location-overflow-test-pr116047-1.h: New test.
+	* gcc.dg/plugin/location-overflow-test-pr116047-2.h: New test.
+	* gcc.dg/plugin/location-overflow-test-pr120061.c: New test.
+	* gcc.dg/plugin/location-overflow-test-pr120061-1.h: New test.
+	* gcc.dg/plugin/location-overflow-test-pr120061-2.h: New test.
+
+Upstream-Status: Backport [https://gcc.gnu.org/cgit/gcc/commit/?id=edf745dc519ddbfef127e2789bf11bfbacd300b7]
+Signed-off-by: Yash Shinde <Yash.Shinde@windriver.com>
+---
+ .../plugin/location-overflow-test-pr116047-1.h     |  6 +++
+ .../plugin/location-overflow-test-pr116047-2.h     |  1 +
+ .../plugin/location-overflow-test-pr116047.c       |  5 +++
+ .../plugin/location-overflow-test-pr120061-1.h     |  6 +++
+ .../plugin/location-overflow-test-pr120061-2.h     |  1 +
+ .../plugin/location-overflow-test-pr120061.c       |  6 +++
+ .../gcc.dg/plugin/location_overflow_plugin.cc      | 15 +++++--
+ gcc/testsuite/gcc.dg/plugin/plugin.exp             |  4 +-
+ libcpp/files.cc                                    |  8 ----
+ libcpp/line-map.cc                                 | 48 ++++++++++++++++++----
+ 10 files changed, 80 insertions(+), 20 deletions(-)
+ create mode 100644 gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-1.h
+ create mode 100644 gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-2.h
+ create mode 100644 gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047.c
+ create mode 100644 gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-1.h
+ create mode 100644 gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-2.h
+ create mode 100644 gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061.c
+
+diff --git a/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-1.h b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-1.h
+new file mode 100644
+index 000000000000..3dd6434a938b
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-1.h
+@@ -0,0 +1,6 @@
++
++
++
++
++#include "location-overflow-test-pr116047-2.h"
++static_assert (__LINE__ == 6, "");
+diff --git a/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-2.h b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-2.h
+new file mode 100644
+index 000000000000..048f715b4656
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047-2.h
+@@ -0,0 +1 @@
++int i;
+diff --git a/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047.c b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047.c
+new file mode 100644
+index 000000000000..75161fa5f055
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr116047.c
+@@ -0,0 +1,5 @@
++/* PR preprocessor/116047 */
++/* { dg-do preprocess } */
++/* { dg-options "-nostdinc -std=c23 -fplugin-arg-location_overflow_plugin-value=0x4ffe0180" } */
++#include "location-overflow-test-pr116047-1.h"
++/* { dg-final { scan-file location-overflow-test-pr116047.i "static_assert\[^\n\r]\*6\[^\n\r]\*== 6" } } */
+diff --git a/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-1.h b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-1.h
+new file mode 100644
+index 000000000000..ebf7704f568e
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-1.h
+@@ -0,0 +1,6 @@
++
++
++
++
++#include "location-overflow-test-pr120061-2.h"
++
+diff --git a/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-2.h b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-2.h
+new file mode 100644
+index 000000000000..048f715b4656
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061-2.h
+@@ -0,0 +1 @@
++int i;
+diff --git a/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061.c b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061.c
+new file mode 100644
+index 000000000000..e8e803898da3
+--- /dev/null
++++ b/gcc/testsuite/gcc.dg/plugin/location-overflow-test-pr120061.c
+@@ -0,0 +1,6 @@
++/* PR preprocessor/120061 */
++/* { dg-do preprocess } */
++/* { dg-options "-nostdinc -std=c23 -fplugin-arg-location_overflow_plugin-value=0x61000000" } */
++#include "location-overflow-test-pr120061-1.h"
++static_assert (__LINE__ == 5, "");
++/* { dg-final { scan-file location-overflow-test-pr120061.i "static_assert\[^\n\r]\*5\[^\n\r]\*== 5" } } */
+diff --git a/gcc/testsuite/gcc.dg/plugin/location_overflow_plugin.cc b/gcc/testsuite/gcc.dg/plugin/location_overflow_plugin.cc
+index f731b1421b0f..f770d35ea518 100644
+--- a/gcc/testsuite/gcc.dg/plugin/location_overflow_plugin.cc
++++ b/gcc/testsuite/gcc.dg/plugin/location_overflow_plugin.cc
+@@ -85,9 +85,18 @@ plugin_init (struct plugin_name_args *plugin_info,
+     error_at (UNKNOWN_LOCATION, "missing plugin argument");
+ 
+   /* With 64-bit locations, the thresholds are larger, so shift the base
+-     location argument accordingly.  */
++     location argument accordingly, basically remap the GCC 14 32-bit
++     location_t argument values to 64-bit location_t counterparts.  There
++     is one exception for values slightly before the 32-bit location_t
++     LINE_MAP_MAX_LOCATION_WITH_PACKED_RANGES (0x50000000).  In that case
++     remap them to the same amount before the 64-bit location_t
++     LINE_MAP_MAX_LOCATION_WITH_PACKED_RANGES -
++     ((location_t) 0x50000000) << 31.  */
+   gcc_assert (sizeof (location_t) == sizeof (uint64_t));
+-  base_location = 1 + ((base_location - 1) << 31);
++  if (base_location >= 0x4f000000 && base_location <= 0x4fffffff)
++    base_location += (((location_t) 0x50000000) << 31) - 0x50000000;
++  else
++    base_location = 1 + ((base_location - 1) << 31);
+ 
+   register_callback (plugin_info->base_name,
+ 		     PLUGIN_PRAGMAS,
+@@ -107,7 +116,7 @@ plugin_init (struct plugin_name_args *plugin_info,
+       break;
+ 
+     default:
+-      error_at (UNKNOWN_LOCATION, "unrecognized value for plugin argument");
++      break;
+     }
+ 
+   return 0;
+diff --git a/gcc/testsuite/gcc.dg/plugin/plugin.exp b/gcc/testsuite/gcc.dg/plugin/plugin.exp
+index 90c91621d0aa..96e76d2e0c36 100644
+--- a/gcc/testsuite/gcc.dg/plugin/plugin.exp
++++ b/gcc/testsuite/gcc.dg/plugin/plugin.exp
+@@ -138,7 +138,9 @@ set plugin_test_list [list \
+     { location_overflow_plugin.cc \
+ 	  location-overflow-test-1.c \
+ 	  location-overflow-test-2.c \
+-	  location-overflow-test-pr83173.c } \
++	  location-overflow-test-pr83173.c \
++	  location-overflow-test-pr116047.c \
++	  location-overflow-test-pr120061.c } \
+     { must_tail_call_plugin.cc \
+ 	  must-tail-call-1.c \
+ 	  must-tail-call-2.c } \
+diff --git a/libcpp/files.cc b/libcpp/files.cc
+index c1abde6639fe..d80c4bfd9077 100644
+--- a/libcpp/files.cc
++++ b/libcpp/files.cc
+@@ -1047,14 +1047,6 @@ _cpp_stack_file (cpp_reader *pfile, _cpp_file *file, include_type type,
+ 		    && (pfile->line_table->highest_location
+ 			!= LINE_MAP_MAX_LOCATION - 1));
+ 
+-  if (decrement && LINEMAPS_ORDINARY_USED (pfile->line_table))
+-    {
+-      const line_map_ordinary *map
+-	= LINEMAPS_LAST_ORDINARY_MAP (pfile->line_table);
+-      if (map && map->start_location == pfile->line_table->highest_location)
+-	decrement = false;
+-    }
+-
+   if (decrement)
+     pfile->line_table->highest_location--;
+ 
+diff --git a/libcpp/line-map.cc b/libcpp/line-map.cc
+index 17e7f12551c0..cf6557117c81 100644
+--- a/libcpp/line-map.cc
++++ b/libcpp/line-map.cc
+@@ -621,8 +621,8 @@ linemap_add (line_maps *set, enum lc_reason reason,
+ 	 #include "included", inside the same "includer" file.  */
+ 
+       linemap_assert (!MAIN_FILE_P (map - 1));
+-      /* (MAP - 1) points to the map we are leaving. The
+-	 map from which (MAP - 1) got included should be the map
++      /* (MAP - 1) points to the map we are leaving.  The
++	 map from which (MAP - 1) got included should be usually the map
+ 	 that comes right before MAP in the same file.  */
+       from = linemap_included_from_linemap (set, map - 1);
+ 
+@@ -630,7 +630,24 @@ linemap_add (line_maps *set, enum lc_reason reason,
+       if (to_file == NULL)
+ 	{
+ 	  to_file = ORDINARY_MAP_FILE_NAME (from);
+-	  to_line = SOURCE_LINE (from, from[1].start_location);
++	  /* Compute the line on which the map resumes, for #include this
++	     should be the line after the #include line.  Usually FROM is
++	     the map right before LC_ENTER map - the first map of the included
++	     file, and in that case SOURCE_LINE (from, from[1].start_location);
++	     computes the right line (and does handle even some special cases
++	     (e.g. where for returning from <command line> we still want to
++	     be at line 0 or some -traditional-cpp cases).  In rare cases
++	     FROM can be followed by LC_RENAME created by linemap_line_start
++	     for line right after #include line.  If that happens,
++	     start_location of the FROM[1] map will be the same as
++	     start_location of FROM[2] LC_ENTER, but FROM[1] start_location
++	     might not have advance enough for moving to a full next line.
++	     In that case compute the line of #include line and add 1 to it
++	     to advance to the next line.  See PR120061.  */
++	  if (from[1].reason == LC_RENAME)
++	    to_line = SOURCE_LINE (from, linemap_included_from (map - 1)) + 1;
++	  else
++	    to_line = SOURCE_LINE (from, from[1].start_location);
+ 	  sysp = ORDINARY_MAP_IN_SYSTEM_HEADER_P (from);
+ 	}
+       else
+@@ -660,11 +677,26 @@ linemap_add (line_maps *set, enum lc_reason reason,
+       if (set->depth == 0)
+ 	map->included_from = 0;
+       else
+-	/* The location of the end of the just-closed map.  */
+-	map->included_from
+-	  = (((map[0].start_location - 1 - map[-1].start_location)
+-	      & ~((loc_one << map[-1].m_column_and_range_bits) - 1))
+-	     + map[-1].start_location);
++	{
++	  /* Compute location from whence this line map was included.
++	     For #include this should be preferrably column 0 of the
++	     line on which #include directive appears.
++	     map[-1] is the just closed map and usually included_from
++	     falls within that map.  In rare cases linemap_line_start
++	     can insert a new LC_RENAME map for the line immediately
++	     after #include line, in that case map[-1] will have the
++	     same start_location as the new one and so included_from
++	     would not be from map[-1] but likely map[-2].  If that
++	     happens, mask off map[-2] m_column_and_range_bits bits
++	     instead of map[-1].  See PR120061.  */
++	  int i = -1;
++	  while (map[i].start_location == map[0].start_location)
++	    --i;
++	  map->included_from
++	    = (((map[0].start_location - 1 - map[i].start_location)
++		& ~((loc_one << map[i].m_column_and_range_bits) - 1))
++	       + map[i].start_location);
++	}
+       set->depth++;
+       if (set->trace_includes)
+ 	trace_include (set, map);
+-- 
+

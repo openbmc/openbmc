@@ -1,0 +1,79 @@
+From 7c70f891fb94f2d8c88bc6af4514d8dcd6488658 Mon Sep 17 00:00:00 2001
+From: Oleksandr Ocheretnyi <oocheret@cisco.com>
+Date: Wed, 15 Apr 2020 00:08:39 +0300
+Subject: [PATCH] clang: driver: Add dyld-prefix when checking sysroot for ldso
+ path
+
+ * the dyld-prefix shall be taken into account when the default
+   path for the dynamic linker has to be checked.
+
+ * this patch shall be used as annex to the next patch:
+   'clang: driver: Check sysroot for ldso path' which includes
+   the usrmerge scenario.
+
+Upstream-Status: Pending
+Signed-off-by: Oleksandr Ocheretnyi <oocheret@cisco.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/lib/Driver/ToolChains/Linux.cpp | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/clang/lib/Driver/ToolChains/Linux.cpp b/clang/lib/Driver/ToolChains/Linux.cpp
+index 621fa17e0603..8fd454d4eff4 100644
+--- a/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -525,8 +525,8 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
+ 
+     Loader = HF ? "ld-linux-armhf.so.3" : "ld-linux.so.3";
+     LibDir = "lib32";
+-    if (!getVFS().exists(getDriver().SysRoot + "/" + LibDir + "/" + Loader) &&
+-         getVFS().exists(getDriver().SysRoot + "/lib/" + Loader)) {
++    if (!getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/" + LibDir + "/" + Loader) &&
++         getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/lib/" + Loader)) {
+         LibDir = "lib";
+     }
+     break;
+@@ -582,8 +582,8 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
+     LibDir = "lib64";
+     Loader =
+         (tools::ppc::hasPPCAbiArg(Args, "elfv2")) ? "ld64.so.2" : "ld64.so.1";
+-    if (!getVFS().exists(getDriver().SysRoot + "/" + LibDir + "/" + Loader) &&
+-         getVFS().exists(getDriver().SysRoot + "/lib/" + Loader)) {
++    if (!getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/" + LibDir + "/" + Loader) &&
++         getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/lib/" + Loader)) {
+         LibDir = "lib";
+     }
+     break;
+@@ -591,8 +591,8 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
+     LibDir = "lib64";
+     Loader =
+         (tools::ppc::hasPPCAbiArg(Args, "elfv1")) ? "ld64.so.1" : "ld64.so.2";
+-    if (!getVFS().exists(getDriver().SysRoot + "/" + LibDir + "/" + Loader) &&
+-         getVFS().exists(getDriver().SysRoot + "/lib/" + Loader)) {
++    if (!getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/" + LibDir + "/" + Loader) &&
++         getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/lib/" + Loader)) {
+         LibDir = "lib";
+     }
+     break;
+@@ -612,8 +612,8 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
+   case llvm::Triple::sparcv9:
+     LibDir = "lib64";
+     Loader = "ld-linux.so.2";
+-    if (!getVFS().exists(getDriver().SysRoot + "/" + LibDir + "/" + Loader) &&
+-         getVFS().exists(getDriver().SysRoot + "/lib/" + Loader)) {
++    if (!getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/" + LibDir + "/" + Loader) &&
++         getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/lib/" + Loader)) {
+         LibDir = "lib";
+     }
+     break;
+@@ -630,8 +630,8 @@ std::string Linux::getDynamicLinker(const ArgList &Args) const {
+ 
+     LibDir = X32 ? "libx32" : "lib64";
+     Loader = X32 ? "ld-linux-x32.so.2" : "ld-linux-x86-64.so.2";
+-    if (!getVFS().exists(getDriver().SysRoot + "/" + LibDir + "/" + Loader) &&
+-         getVFS().exists(getDriver().SysRoot + "/lib/" + Loader)) {
++    if (!getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/" + LibDir + "/" + Loader) &&
++         getVFS().exists(getDriver().SysRoot + getDriver().DyldPrefix + "/lib/" + Loader)) {
+         LibDir = "lib";
+     }
+     break;

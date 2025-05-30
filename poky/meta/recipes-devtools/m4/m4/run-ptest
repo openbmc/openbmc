@@ -2,4 +2,4 @@
 #
 #This script is used to run m4 test suites
 cd tests 
-make -k runtest-TESTS top_srcdir=.. srcdir=.
+make -k runtest-TESTS abs_aux_dir=../../@BP@/tests/build-aux abs_top_srcdir=../../@BP@/tests abs_srcdir=../../@BP@/tests top_srcdir=.. srcdir=.

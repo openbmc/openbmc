@@ -1,6 +1,8 @@
 
 # Some additional dependencies that the above doesn't manage to figure out
+RDEPENDS:perl-module-file-path += "perl-module-file-spec"
 RDEPENDS:perl-module-file-spec += "perl-module-file-spec-unix"
+RDEPENDS:perl-module-file-spec += "perl-module-constant"
 RDEPENDS:perl-module-scalar-util += "perl-module-list-util"
 RDEPENDS:perl-module-file-temp += "perl-module-scalar-util"
 RDEPENDS:perl-module-file-temp += "perl-module-file-spec"

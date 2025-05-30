@@ -1,4 +1,4 @@
-From ddf3ac832d85bd9a1266c52ff3ae5ec88c4114db Mon Sep 17 00:00:00 2001
+From 3a51ed107f67732910dec12279a9279e158afbe7 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 9 Mar 2020 16:30:19 -0700
 Subject: [PATCH] memcheck/tests: Fix timerfd syscall test
@@ -16,10 +16,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 15 insertions(+), 3 deletions(-)
 
 diff --git a/config.h.in b/config.h.in
-index d2e8b26..f235dec 100644
+index 00db1a6..23fd77a 100644
 --- a/config.h.in
 +++ b/config.h.in
-@@ -406,6 +406,9 @@
+@@ -409,6 +409,9 @@
  /* Define to 1 if you have the <sys/sysnvl.h> header file. */
  #undef HAVE_SYS_SYSNVL_H
  
@@ -30,10 +30,10 @@ index d2e8b26..f235dec 100644
  #undef HAVE_SYS_TIME_H
  
 diff --git a/configure.ac b/configure.ac
-index 75d42c9..b6ec119 100755
+index b42fdd4..ec95146 100755
 --- a/configure.ac
 +++ b/configure.ac
-@@ -4844,6 +4844,7 @@ AC_CHECK_HEADERS([       \
+@@ -4892,6 +4892,7 @@ AC_CHECK_HEADERS([       \
          sys/syscall.h    \
          sys/sysnvl.h     \
          sys/time.h       \

@@ -15,7 +15,7 @@ class BuildLzipTest(OERuntimeTestCase):
     @classmethod
     def setUpClass(cls):
         uri = 'http://downloads.yoctoproject.org/mirror/sources'
-        uri = '%s/lzip-1.19.tar.gz' % uri
+        uri = '%s/lzip-1.25.tar.gz' % uri
         cls.project = TargetBuildProject(cls.tc.target,
                                          uri,
                                          dl_dir = cls.tc.td['DL_DIR'])

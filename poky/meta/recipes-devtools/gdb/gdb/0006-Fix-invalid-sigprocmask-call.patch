@@ -1,4 +1,4 @@
-From f63dddf6b986642eeeefa27176d59780e1681ddd Mon Sep 17 00:00:00 2001
+From 13e61d515b74389e61fa52ca43656f9d1c294683 Mon Sep 17 00:00:00 2001
 From: Yousong Zhou <yszhou4tech@gmail.com>
 Date: Fri, 24 Mar 2017 10:36:03 +0800
 Subject: [PATCH] Fix invalid sigprocmask call

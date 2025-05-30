@@ -22,8 +22,9 @@ RDEPENDS:${PN} += "\
 
 BBCLASSEXTEND = "native nativesdk"
 
-do_install_ptest() {
+do_install_ptest:append() {
+    # The tests need some files from the source tree
     install -d ${D}${PTEST_PATH}/src
-    cp -rf ${S}/src/* ${D}${PTEST_PATH}/src/
-    cp -rf ${S}/setup.cfg ${D}${PTEST_PATH}/
+    ln -s ${PYTHON_SITEPACKAGES_DIR}/license_expression/ ${D}${PTEST_PATH}/src/
+    install -m644 ${S}/setup.cfg ${D}${PTEST_PATH}/
 }

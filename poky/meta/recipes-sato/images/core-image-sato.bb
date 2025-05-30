@@ -10,8 +10,8 @@ LICENSE = "MIT"
 
 inherit core-image
 
-TOOLCHAIN_HOST_TASK:append = " nativesdk-intltool nativesdk-glib-2.0"
-TOOLCHAIN_HOST_TASK:remove:task-populate-sdk-ext = " nativesdk-intltool nativesdk-glib-2.0"
+TOOLCHAIN_HOST_TASK:append = " nativesdk-intltool nativesdk-glib-2.0-utils"
+TOOLCHAIN_HOST_TASK:remove:task-populate-sdk-ext = " nativesdk-intltool nativesdk-glib-2.0-utils"
 
 QB_MEM = '${@bb.utils.contains("DISTRO_FEATURES", "opengl", "-m 512", "-m 256", d)}'
 QB_MEM:qemuarmv5 = "-m 256"

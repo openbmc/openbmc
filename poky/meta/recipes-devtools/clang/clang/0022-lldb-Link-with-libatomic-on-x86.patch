@@ -1,0 +1,33 @@
+From 45d44576a0dbaf843a9795519cafa944801c4679 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Feb 2022 01:31:26 -0800
+Subject: [PATCH] lldb: Link with libatomic on x86
+
+cmake atomic check is not sufficient for i686 target where clang14 still
+generates __atomic_store calls but the check does not entail this
+function and happily thinks that compiler can resolve all atomic via intrinsics
+on i686, but thats not the case, ideally the check for determining
+atomic operation should be make more robust but until then lets ask to
+link with libatomic on i686/linux
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lldb/source/Utility/CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lldb/source/Utility/CMakeLists.txt b/lldb/source/Utility/CMakeLists.txt
+index 6954a2508ffe..b8bf8c07fefb 100644
+--- a/lldb/source/Utility/CMakeLists.txt
++++ b/lldb/source/Utility/CMakeLists.txt
+@@ -19,6 +19,10 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+   list(APPEND LLDB_SYSTEM_LIBS ws2_32 rpcrt4)
+ endif ()
+ 
++if (CMAKE_SYSTEM_PROCESSOR MATCHES "i686" AND CMAKE_SYSTEM_NAME MATCHES "Linux")
++    list(APPEND LLDB_SYSTEM_LIBS atomic)
++endif()
++
+ if (NOT HAVE_CXX_ATOMICS64_WITHOUT_LIB )
+     list(APPEND LLDB_SYSTEM_LIBS atomic)
+ endif()

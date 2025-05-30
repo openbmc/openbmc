@@ -1,4 +1,4 @@
-From b12b01239909b6fb41adc64d3c0ed32795554369 Mon Sep 17 00:00:00 2001
+From 95d0bae453b2b5a7d25b92d99565d27407fffa1b Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 10 May 2019 14:18:04 +0800
 Subject: [PATCH] Revert "build: Make gpgme.m4 use gpgrt-config with *.pc."

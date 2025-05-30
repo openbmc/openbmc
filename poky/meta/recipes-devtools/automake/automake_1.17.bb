@@ -19,9 +19,7 @@ RDEPENDS:${PN} += "\
 RDEPENDS:${PN}:class-native = "autoconf-native hostperl-runtime-native"
 
 SRC_URI += "\
-           file://0001-automake-Add-default-libtool_tag-to-cppasm.patch \
            file://0002-automake-Update-for-python.m4-to-respect-libdir.patch \
-           file://0003-build-fix-race-in-parallel-builds.patch \
            file://0004-Add-a-new-distro-feature-ptest.patch \
            file://0006-automake-Remove-delays-in-configure-scripts-using-au.patch \
            file://0001-configure-don-t-report-error-when-the-path-of-Perl-c.patch \

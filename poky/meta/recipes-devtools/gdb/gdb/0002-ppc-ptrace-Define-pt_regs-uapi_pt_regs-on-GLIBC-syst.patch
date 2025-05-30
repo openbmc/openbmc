@@ -1,4 +1,4 @@
-From 8f350f9b7b3934bd492cad35e1b6e44d142313a4 Mon Sep 17 00:00:00 2001
+From ec49e6283bc6a4a99596410db9509bee6cd941ce Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 18:32:14 -0700
 Subject: [PATCH] ppc/ptrace: Define pt_regs uapi_pt_regs on !GLIBC systems
@@ -12,7 +12,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 12 insertions(+)
 
 diff --git a/gdb/nat/ppc-linux.h b/gdb/nat/ppc-linux.h
-index b51e2278f4b..f1bc07df0e9 100644
+index 3efc1b9a9bf..635d07486de 100644
 --- a/gdb/nat/ppc-linux.h
 +++ b/gdb/nat/ppc-linux.h
 @@ -18,7 +18,13 @@
@@ -30,7 +30,7 @@ index b51e2278f4b..f1bc07df0e9 100644
  
  /* This sometimes isn't defined.  */
 diff --git a/gdbserver/linux-ppc-low.cc b/gdbserver/linux-ppc-low.cc
-index bd3ac143660..1c8c0b3a98e 100644
+index 3ce978f4c7c..38534297cdf 100644
 --- a/gdbserver/linux-ppc-low.cc
 +++ b/gdbserver/linux-ppc-low.cc
 @@ -22,7 +22,13 @@

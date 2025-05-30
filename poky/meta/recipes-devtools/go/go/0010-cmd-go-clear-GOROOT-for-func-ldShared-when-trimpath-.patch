@@ -1,0 +1,51 @@
+From c4215b5ca69a7626d97cf9b7ebc460c2b5b9148b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 28 Feb 2025 19:13:18 -0800
+Subject: [PATCH 10/11] cmd/go: clear GOROOT for func ldShared when -trimpath
+ is used
+
+In commit [cmd: remove support for GOROOT_FINAL][1], it clear GOROOT
+for func ld when -trimpath is used. [2]
+
+This commit do the same thing for func ldShared, otherwise run go_bootstrap
+with -trimpath does not remove build path directory from the generated share
+libarary
+
+  $ ./make.bash --target-only --no-banner std
+  $ go_bootstrap install -linkshared -buildmode=shared -trimpath std
+  $ grep "$(pwd)" ./pkg/linux_amd64_dynlink/libstd.so
+  Binary file ./pkg/linux_amd64_dynlink/libstd.so matches
+
+[1] https://github.com/golang/go/commit/507d1b22f4b58ac68841582d0c2c0ab6b20e5a98
+[2] https://github.com/golang/go/commit/507d1b22f4b58ac68841582d0c2c0ab6b20e5a98#diff-cab5921f94f2667bb0bc1b935d2d46b4c03541b4351b33438ab7290b94dea212R669
+
+Upstream-Status: Submitted [https://go-review.googlesource.com/c/go/+/653895]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/cmd/go/internal/work/gc.go | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/cmd/go/internal/work/gc.go b/src/cmd/go/internal/work/gc.go
+index 3a173efee8..8b7a44e031 100644
+--- a/src/cmd/go/internal/work/gc.go
++++ b/src/cmd/go/internal/work/gc.go
+@@ -728,7 +728,14 @@ func (gcToolchain) ldShared(b *Builder, root *Action, toplevelactions []*Action,
+ 	// the output file path is recorded in the .gnu.version_d section.
+ 	dir, targetPath := filepath.Split(targetPath)
+ 
+-	return b.Shell(root).run(dir, targetPath, nil, cfg.BuildToolexec, base.Tool("link"), "-o", targetPath, "-importcfg", importcfg, ldflags)
++	env := []string{}
++	// When -trimpath is used, GOROOT is cleared
++	if cfg.BuildTrimpath {
++		env = append(env, "GOROOT=")
++	} else {
++		env = append(env, "GOROOT="+cfg.GOROOT)
++	}
++	return b.Shell(root).run(dir, targetPath, env, cfg.BuildToolexec, base.Tool("link"), "-o", targetPath, "-importcfg", importcfg, ldflags)
+ }
+ 
+ func (gcToolchain) cc(b *Builder, a *Action, ofile, cfile string) error {
+-- 
+2.25.1
+

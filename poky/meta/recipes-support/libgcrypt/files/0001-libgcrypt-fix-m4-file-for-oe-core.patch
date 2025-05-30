@@ -1,4 +1,4 @@
-From bcfd89abdb5110b93314297120412d4c7f2da313 Mon Sep 17 00:00:00 2001
+From fcb53181b18c00083a8b08625db74829cfd6b4b2 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <trevor.gamblin@windriver.com>
 Date: Tue, 29 Oct 2019 14:08:32 -0400
 Subject: [PATCH] libgcrypt: fix m4 file for oe-core
@@ -11,13 +11,12 @@ settings.
 Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Trevor Gamblin <trevor.gamblin@windriver.com>
-
 ---
  src/libgcrypt.m4 | 90 +++---------------------------------------------
  1 file changed, 4 insertions(+), 86 deletions(-)
 
 diff --git a/src/libgcrypt.m4 b/src/libgcrypt.m4
-index 353df81b6d..b195e22894 100644
+index 353df81..b195e22 100644
 --- a/src/libgcrypt.m4
 +++ b/src/libgcrypt.m4
 @@ -116,41 +116,6 @@ dnl
@@ -144,6 +143,3 @@ index 353df81b6d..b195e22894 100644
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(LIBGCRYPT_CFLAGS)
--- 
-2.34.1
-

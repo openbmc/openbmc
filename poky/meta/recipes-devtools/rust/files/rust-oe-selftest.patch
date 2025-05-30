@@ -43,161 +43,10 @@ diff --git a/compiler/rustc_interface/src/tests.rs b/compiler/rustc_interface/sr
  fn test_can_print_warnings() {
      sess_and_cfg(&["-Awarnings"], |sess, _cfg| {
          assert!(!sess.dcx().can_emit_warnings());
-diff --git a/library/test/src/stats/tests.rs b/library/test/src/stats/tests.rs
---- a/library/test/src/stats/tests.rs
-+++ b/library/test/src/stats/tests.rs
-@@ -40,6 +40,7 @@
- }
-
- #[test]
-+#[ignore]
- fn test_min_max_nan() {
-     let xs = &[1.0, 2.0, f64::NAN, 3.0, 4.0];
-     let summary = Summary::new(xs);
-diff --git a/library/std/src/io/buffered/tests.rs b/library/std/src/io/buffered/tests.rs
-index 35a5291a347..5f2858d2505 100644
---- a/library/std/src/io/buffered/tests.rs
-+++ b/library/std/src/io/buffered/tests.rs
-@@ -488,6 +488,7 @@ fn flush(&mut self) -> io::Result<()> {
- }
-
- #[test]
-+#[ignore]
- #[cfg_attr(target_os = "emscripten", ignore)]
- fn panic_in_write_doesnt_flush_in_drop() {
-     static WRITES: AtomicUsize = AtomicUsize::new(0);
-diff --git a/library/std/src/io/stdio/tests.rs b/library/std/src/io/stdio/tests.rs
-index f89fd27ce6c..79737f5b127 100644
---- a/library/std/src/io/stdio/tests.rs
-+++ b/library/std/src/io/stdio/tests.rs
-@@ -25,6 +25,7 @@ fn stderrlock_unwind_safe() {
- fn assert_unwind_safe<T: UnwindSafe + RefUnwindSafe>() {}
-
- #[test]
-+#[ignore]
- #[cfg_attr(target_os = "emscripten", ignore)]
- fn panic_doesnt_poison() {
-     thread::spawn(|| {
-diff --git a/library/std/src/sync/mpsc/sync_tests.rs b/library/std/src/sync/mpsc/sync_tests.rs
-index 945de280f40..1ac7eeabc5c 100644
---- a/library/std/src/sync/mpsc/sync_tests.rs
-+++ b/library/std/src/sync/mpsc/sync_tests.rs
-@@ -252,6 +252,7 @@ fn oneshot_single_thread_send_port_close() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_single_thread_recv_chan_close() {
-     // Receiving on a closed chan will panic
-     let res = thread::spawn(move || {
-@@ -347,6 +348,7 @@ fn oneshot_multi_task_recv_then_send() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_multi_task_recv_then_close() {
-     let (tx, rx) = sync_channel::<Box<i32>>(0);
-     let _t = thread::spawn(move || {
-@@ -371,6 +373,7 @@ fn oneshot_multi_thread_close_stress() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_multi_thread_send_close_stress() {
-     for _ in 0..stress_factor() {
-         let (tx, rx) = sync_channel::<i32>(0);
-@@ -385,6 +388,7 @@ fn oneshot_multi_thread_send_close_stress() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_multi_thread_recv_close_stress() {
-     for _ in 0..stress_factor() {
-         let (tx, rx) = sync_channel::<i32>(0);
-diff --git a/library/std/src/sync/mpsc/tests.rs b/library/std/src/sync/mpsc/tests.rs
-index ac1a804cf9c..7c687982324 100644
---- a/library/std/src/sync/mpsc/tests.rs
-+++ b/library/std/src/sync/mpsc/tests.rs
-@@ -233,6 +233,7 @@ fn oneshot_single_thread_send_port_close() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_single_thread_recv_chan_close() {
-     // Receiving on a closed chan will panic
-     let res = thread::spawn(move || {
-@@ -313,6 +314,7 @@ fn oneshot_multi_task_recv_then_send() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_multi_task_recv_then_close() {
-     let (tx, rx) = channel::<Box<i32>>();
-     let _t = thread::spawn(move || {
-@@ -337,6 +339,7 @@ fn oneshot_multi_thread_close_stress() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_multi_thread_send_close_stress() {
-     for _ in 0..stress_factor() {
-         let (tx, rx) = channel::<i32>();
-@@ -351,6 +354,7 @@ fn oneshot_multi_thread_send_close_stress() {
- }
-
- #[test]
-+#[ignore]
- fn oneshot_multi_thread_recv_close_stress() {
-     for _ in 0..stress_factor() {
-         let (tx, rx) = channel::<i32>();
-diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/tests.rs
-index 1786a3c09ff..9dcead7092b 100644
---- a/library/std/src/sync/mutex/tests.rs
-+++ b/library/std/src/sync/mutex/tests.rs
-@@ -82,6 +82,7 @@ fn drop(&mut self) {
- }
-
- #[test]
-+#[ignore]
- fn test_into_inner_poison() {
-     let m = Arc::new(Mutex::new(NonCopy(10)));
-     let m2 = m.clone();
-@@ -106,6 +107,7 @@ fn test_get_mut() {
- }
-
- #[test]
-+#[ignore]
- fn test_get_mut_poison() {
-     let m = Arc::new(Mutex::new(NonCopy(10)));
-     let m2 = m.clone();
-@@ -146,6 +148,7 @@ fn test_mutex_arc_condvar() {
- }
-
- #[test]
-+#[ignore]
- fn test_arc_condvar_poison() {
-     let packet = Packet(Arc::new((Mutex::new(1), Condvar::new())));
-     let packet2 = Packet(packet.0.clone());
-@@ -175,6 +178,7 @@ fn test_arc_condvar_poison() {
- }
-
- #[test]
-+#[ignore]
- fn test_mutex_arc_poison() {
-     let arc = Arc::new(Mutex::new(1));
-     assert!(!arc.is_poisoned());
-@@ -220,6 +220,7 @@ fn test_mutex_arc_nested() {
- }
-
- #[test]
-+#[ignore]
- fn test_mutex_arc_access_in_unwind() {
-     let arc = Arc::new(Mutex::new(1));
-     let arc2 = arc.clone();
-diff --git a/library/std/src/sync/rwlock/tests.rs b/library/std/src/sync/rwlock/tests.rs
+diff --git a/library/std/src/sync/poison/rwlock/tests.rs b/library/std/src/sync/poison/rwlock/tests.rs
 index 1a9d3d3f12f..0a9cfc48806 100644
---- a/library/std/src/sync/rwlock/tests.rs
-+++ b/library/std/src/sync/rwlock/tests.rs
+--- a/library/std/src/sync/poison/rwlock/tests.rs
++++ b/library/std/src/sync/poison/rwlock/tests.rs
 @@ -47,6 +47,7 @@ fn frob() {
  }
 
@@ -244,91 +93,16 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  #[test]
 +#[ignore]
  fn test_into_inner_poison() {
-     let m = Arc::new(RwLock::new(NonCopy(10)));
-     let m2 = m.clone();
+     let m = new_poisoned_rwlock(NonCopy(10));
+
 @@ -299,6 +305,7 @@ fn test_get_mut() {
  }
 
  #[test]
 +#[ignore]
  fn test_get_mut_poison() {
-     let m = Arc::new(RwLock::new(NonCopy(10)));
-     let m2 = m.clone();
-diff --git a/library/std/src/sys/pal/unix/process/process_unix/tests.rs b/library/std/src/sys/pal/unix/process/process_unix/tests.rs
-index 0a6c6ec19fc..bec257bc630 100644
---- a/library/std/src/sys/pal/unix/process/process_unix/tests.rs
-+++ b/library/std/src/sys/pal/unix/process/process_unix/tests.rs
-@@ -6,6 +6,7 @@
- // safety etc., are tested in tests/ui/process/process-panic-after-fork.rs
+     let mut m = new_poisoned_rwlock(NonCopy(10));
 
- #[test]
-+#[ignore]
- fn exitstatus_display_tests() {
-     // In practice this is the same on every Unix.
-     // If some weird platform turns out to be different, and this test fails, use #[cfg].
-@@ -37,6 +38,7 @@
- }
-
- #[test]
-+#[ignore]
- #[cfg_attr(target_os = "emscripten", ignore)]
- fn test_command_fork_no_unwind() {
-     let got = catch_unwind(|| {
-diff --git a/library/std/src/thread/tests.rs b/library/std/src/thread/tests.rs
-index 5d6b9e94ee9..a5aacb2eb87 100644
---- a/library/std/src/thread/tests.rs
-+++ b/library/std/src/thread/tests.rs
-@@ -116,6 +116,7 @@ fn test_is_finished() {
- }
-
- #[test]
-+#[ignore]
- fn test_join_panic() {
-     match thread::spawn(move || panic!()).join() {
-         result::Result::Err(_) => (),
-@@ -218,6 +219,7 @@ fn test_simple_newsched_spawn() {
- }
-
- #[test]
-+#[ignore]
- fn test_try_panic_message_string_literal() {
-     match thread::spawn(move || {
-         panic!("static string");
-@@ -234,6 +236,7 @@ fn test_try_panic_message_string_literal() {
- }
-
- #[test]
-+#[ignore]
- fn test_try_panic_any_message_owned_str() {
-     match thread::spawn(move || {
-         panic_any("owned string".to_string());
-@@ -250,6 +253,7 @@ fn test_try_panic_any_message_owned_str() {
- }
-
- #[test]
-+#[ignore]
- fn test_try_panic_any_message_any() {
-     match thread::spawn(move || {
-         panic_any(Box::new(413u16) as Box<dyn Any + Send>);
-@@ -268,6 +272,7 @@ fn test_try_panic_any_message_any() {
- }
-
- #[test]
-+#[ignore]
- fn test_try_panic_any_message_unit_struct() {
-     struct Juju;
-
-diff --git a/library/alloc/src/slice/tests.rs b/library/alloc/src/slice/tests.rs
---- a/library/alloc/src/slice/tests.rs
-+++ b/library/alloc/src/slice/tests.rs
-@@ -186,6 +186,7 @@
- std::thread_local!(static SILENCE_PANIC: Cell<bool> = Cell::new(false));
-
- #[test]
-+#[ignore]
- #[cfg_attr(target_os = "emscripten", ignore)] // no threads
- #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
- fn panic_safe() {
 diff --git a/library/test/src/tests.rs b/library/test/src/tests.rs
 --- a/library/test/src/tests.rs
 +++ b/library/test/src/tests.rs
@@ -340,9 +114,9 @@ diff --git a/library/test/src/tests.rs b/library/test/src/tests.rs
  fn test_time_options_threshold() {
      let unit = TimeThreshold::new(Duration::from_millis(50), Duration::from_millis(100));
      let integration = TimeThreshold::new(Duration::from_millis(500), Duration::from_millis(1000));
-diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/tests.rs
---- a/library/std/src/sync/mutex/tests.rs
-+++ b/library/std/src/sync/mutex/tests.rs
+diff --git a/library/std/src/sync/poison/mutex/tests.rs b/library/std/src/sync/poison/mutex/tests.rs
+--- a/library/std/src/sync/poison/mutex/tests.rs
++++ b/library/std/src/sync/poison/mutex/tests.rs
 @@ -193,6 +193,7 @@
  }
 
@@ -351,9 +125,9 @@ diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/te
  fn test_mutex_arc_poison_mapped() {
      let arc = Arc::new(Mutex::new(1));
      assert!(!arc.is_poisoned());
-diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/tests.rs
---- a/library/std/src/sync/mutex/tests.rs
-+++ b/library/std/src/sync/mutex/tests.rs
+diff --git a/library/std/src/sync/poison/mutex/tests.rs b/library/std/src/sync/poison/mutex/tests.rs
+--- a/library/std/src/sync/poison/mutex/tests.rs
++++ b/library/std/src/sync/poison/mutex/tests.rs
 @@ -272,6 +272,7 @@
  }
 
@@ -362,9 +136,9 @@ diff --git a/library/std/src/sync/mutex/tests.rs b/library/std/src/sync/mutex/te
  fn panic_while_mapping_unlocked_poison() {
      let lock = Mutex::new(());
 
-diff --git a/library/std/src/sync/rwlock/tests.rs b/library/std/src/sync/rwlock/tests.rs
---- a/library/std/src/sync/rwlock/tests.rs
-+++ b/library/std/src/sync/rwlock/tests.rs
+diff --git a/library/std/src/sync/rwlock/tests.rs b/library/std/src/sync/poison/rwlock/tests.rs
+--- a/library/std/src/sync/poison/rwlock/tests.rs
++++ b/library/std/src/sync/poison/rwlock/tests.rs
 @@ -59,6 +59,7 @@ fn test_rw_arc_poison_wr() {
  }
 
@@ -401,3 +175,70 @@ index 3807cd5d76c..018c5c04456 100644
          fn $geometric(bench: &mut Bencher) {
              let bases: [$t; 16] = [2, 3, 4, 5, 7, 8, 9, 15, 16, 17, 31, 32, 33, 63, 64, 65];
              let base_and_numbers: Vec<($t, Vec<$t>)> = bases
+diff --git a/compiler/rustc_data_structures/src/tagged_ptr/copy/tests.rs b/compiler/rustc_data_structures/src/tagged_ptr/copy/tests.rs
+index 160af8a65d..686f4607bb 100644
+--- a/compiler/rustc_data_structures/src/tagged_ptr/copy/tests.rs
++++ b/compiler/rustc_data_structures/src/tagged_ptr/copy/tests.rs
+@@ -5,6 +5,7 @@ use crate::stable_hasher::{HashStable, StableHasher};
+ use crate::tagged_ptr::{CopyTaggedPtr, Pointer, Tag, Tag2};
+
+ #[test]
++#[ignore]
+ fn smoke() {
+     let value = 12u32;
+     let reference = &value;
+diff --git a/compiler/rustc_data_structures/src/tagged_ptr/drop/tests.rs b/compiler/rustc_data_structures/src/tagged_ptr/drop/tests.rs
+index 4d342c72cc..9a77f92616 100644
+--- a/compiler/rustc_data_structures/src/tagged_ptr/drop/tests.rs
++++ b/compiler/rustc_data_structures/src/tagged_ptr/drop/tests.rs
+@@ -4,6 +4,7 @@ use std::sync::Arc;
+ use crate::tagged_ptr::{Pointer, Tag, Tag2, TaggedPtr};
+
+ #[test]
++#[ignore]
+ fn smoke() {
+     let value = 12u32;
+     let reference = &value;
+diff --git a/library/std/src/thread/local/tests.rs b/library/std/src/thread/local/tests.rs
+index 9d4f52a092..d425e5f7b7 100644
+--- a/library/std/src/thread/local/tests.rs
++++ b/library/std/src/thread/local/tests.rs
+@@ -346,6 +346,7 @@ fn join_orders_after_tls_destructors() {
+
+ // Test that thread::current is still available in TLS destructors.
+ #[test]
++#[ignore]
+ fn thread_current_in_dtor() {
+     // Go through one round of TLS destruction first.
+     struct Defer;
+diff --git a/library/alloc/tests/sort/tests.rs b/library/alloc/tests/sort/tests.rs
+index 14e6013f96..b670f27ab4 100644
+--- a/library/alloc/tests/sort/tests.rs
++++ b/library/alloc/tests/sort/tests.rs
+@@ -915,12 +915,14 @@ gen_sort_test_fns_with_default_patterns_3_ty!(
+ macro_rules! instantiate_sort_test_inner {
+     ($sort_impl:ty, miri_yes, $test_fn_name:ident) => {
+         #[test]
++        #[ignore]
+         fn $test_fn_name() {
+             $crate::sort::tests::$test_fn_name::<$sort_impl>();
+         }
+     };
+     ($sort_impl:ty, miri_no, $test_fn_name:ident) => {
+         #[test]
++        #[ignore]
+         #[cfg_attr(miri, ignore)]
+         fn $test_fn_name() {
+             $crate::sort::tests::$test_fn_name::<$sort_impl>();
+diff --git a/compiler/rustc_data_structures/src/vec_cache/tests.rs b/compiler/rustc_data_structures/src/vec_cache/tests.rs
+index a05f274136..0e69b4cb98 100644
+--- a/compiler/rustc_data_structures/src/vec_cache/tests.rs
++++ b/compiler/rustc_data_structures/src/vec_cache/tests.rs
+@@ -17,6 +17,7 @@ fn vec_cache_insert_and_check() {
+ }
+
+ #[test]
++#[ignore]
+ fn sparse_inserts() {
+     let cache: VecCache<u32, u8, u32> = VecCache::default();
+     let end = if cfg!(target_pointer_width = "64") && cfg!(target_os = "linux") {

@@ -1,0 +1,45 @@
+From 6ad5b6a9ce81383ef75e6f7b88f54d3c29294e63 Mon Sep 17 00:00:00 2001
+From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Date: Sat, 15 Mar 2025 11:50:08 +0100
+Subject: [PATCH] API documentation: replace modules.html by topics.html
+
+This fixes the issue reported on
+https://lists.xiph.org/pipermail/flac-dev/2025-February/006696.html
+
+Newer Doxygen versions call what was previously api/modules.html
+api/topics.html instead.
+
+Signed-off-by: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Suggested-by: Christian Weisgerber <naddy@mips.inka.de>
+Upstream-Status: Submitted [https://github.com/xiph/flac/pull/824]
+---
+ configure.ac       | 2 +-
+ include/FLAC/all.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8eb82320..74295eec 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -296,7 +296,7 @@ if test "x$enable_doxygen_docs" != xfalse ; then
+ fi
+ AM_CONDITIONAL(FLaC__HAS_DOXYGEN, test -n "$DOXYGEN")
+ 
+-if test ! -n "$DOXYGEN" && test -f "$srcdir/doc/FLAC.tag" && test -f "$srcdir/doc/api/modules.html" ; then
++if test ! -n "$DOXYGEN" && test -f "$srcdir/doc/FLAC.tag" && test -f "$srcdir/doc/api/topics.html" ; then
+ 	HAS_PREBUILT_DOXYGEN=yes
+ fi
+ AM_CONDITIONAL(FLaC__HAS_PREBUILT_DOXYGEN, test "x$HAS_PREBUILT_DOXYGEN" = xyes)
+diff --git a/include/FLAC/all.h b/include/FLAC/all.h
+index f29aa010..0be26fd7 100644
+--- a/include/FLAC/all.h
++++ b/include/FLAC/all.h
+@@ -102,7 +102,7 @@
+  * \section getting_started Getting Started
+  *
+  * A good starting point for learning the API is to browse through
+- * the <A HREF="modules.html">modules</A>.  Modules are logical
++ * the <A HREF="topics.html">modules</A>.  Modules are logical
+  * groupings of related functions or classes, which correspond roughly
+  * to header files or sections of header files.  Each module includes a
+  * detailed description of the general usage of its functions or

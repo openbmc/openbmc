@@ -6,7 +6,7 @@ Subject: [PATCH 2/2] byte order
 endian.h on musl/mips can't be included in __ASSEMBLER__ mode,
 so use the __BYTE_ORDER__ symbol instead.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://github.com/libunwind/libunwind/pull/816]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  src/mips/getcontext.S | 3 +--

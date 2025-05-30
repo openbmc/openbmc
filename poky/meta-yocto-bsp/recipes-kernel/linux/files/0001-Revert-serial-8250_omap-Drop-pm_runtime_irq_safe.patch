@@ -1,0 +1,130 @@
+From cc255f5132cf39e9154340cf58780f8c763c6481 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 23 Jan 2025 17:06:08 +0000
+Subject: [PATCH] Revert "serial: 8250_omap: Drop pm_runtime_irq_safe()"
+
+This reverts commit 8700a7ea5519fb0b3bad2362adfeac358c2119ce.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ drivers/tty/serial/8250/8250_omap.c | 29 ++++++++---------------------
+ 1 file changed, 8 insertions(+), 21 deletions(-)
+
+diff --git a/drivers/tty/serial/8250/8250_omap.c b/drivers/tty/serial/8250/8250_omap.c
+index 0dd68bdbfbcf7..db24d7d1dcb67 100644
+--- a/drivers/tty/serial/8250/8250_omap.c
++++ b/drivers/tty/serial/8250/8250_omap.c
+@@ -8,7 +8,6 @@
+  *
+  */
+ 
+-#include <linux/atomic.h>
+ #include <linux/clk.h>
+ #include <linux/device.h>
+ #include <linux/io.h>
+@@ -134,7 +133,6 @@ struct omap8250_priv {
+ 
+ 	u8 tx_trigger;
+ 	u8 rx_trigger;
+-	atomic_t active;
+ 	bool is_suspending;
+ 	int wakeirq;
+ 	u32 latency;
+@@ -636,23 +634,14 @@ static irqreturn_t omap8250_irq(int irq, void *dev_id)
+ 	unsigned int iir, lsr;
+ 	int ret;
+ 
+-	pm_runtime_get_noresume(port->dev);
+-
+-	/* Shallow idle state wake-up to an IO interrupt? */
+-	if (atomic_add_unless(&priv->active, 1, 1)) {
+-		priv->latency = priv->calc_latency;
+-		schedule_work(&priv->qos_work);
+-	}
+-
+ #ifdef CONFIG_SERIAL_8250_DMA
+ 	if (up->dma) {
+ 		ret = omap_8250_dma_handle_irq(port);
+-		pm_runtime_mark_last_busy(port->dev);
+-		pm_runtime_put(port->dev);
+ 		return IRQ_RETVAL(ret);
+ 	}
+ #endif
+ 
++	serial8250_rpm_get(up);
+ 	lsr = serial_port_in(port, UART_LSR);
+ 	iir = serial_port_in(port, UART_IIR);
+ 	ret = serial8250_handle_irq(port, iir);
+@@ -701,8 +690,7 @@ static irqreturn_t omap8250_irq(int irq, void *dev_id)
+ 		schedule_delayed_work(&up->overrun_backoff, delay);
+ 	}
+ 
+-	pm_runtime_mark_last_busy(port->dev);
+-	pm_runtime_put(port->dev);
++	serial8250_rpm_put(up);
+ 
+ 	return IRQ_RETVAL(ret);
+ }
+@@ -1314,8 +1302,11 @@ static int omap_8250_dma_handle_irq(struct uart_port *port)
+ 	u16 status;
+ 	u8 iir;
+ 
++	serial8250_rpm_get(up);
++
+ 	iir = serial_port_in(port, UART_IIR);
+ 	if (iir & UART_IIR_NO_INT) {
++		serial8250_rpm_put(up);
+ 		return IRQ_HANDLED;
+ 	}
+ 
+@@ -1348,6 +1339,7 @@ static int omap_8250_dma_handle_irq(struct uart_port *port)
+ 
+ 	uart_unlock_and_check_sysrq(port);
+ 
++	serial8250_rpm_put(up);
+ 	return 1;
+ }
+ 
+@@ -1539,6 +1531,8 @@ static int omap8250_probe(struct platform_device *pdev)
+ 	if (!of_get_available_child_count(pdev->dev.of_node))
+ 		pm_runtime_set_autosuspend_delay(&pdev->dev, -1);
+ 
++	pm_runtime_irq_safe(&pdev->dev);
++
+ 	pm_runtime_get_sync(&pdev->dev);
+ 
+ 	omap_serial_fill_features_erratas(&up, priv);
+@@ -1776,7 +1770,6 @@ static int omap8250_runtime_suspend(struct device *dev)
+ 
+ 	priv->latency = PM_QOS_CPU_LATENCY_DEFAULT_VALUE;
+ 	schedule_work(&priv->qos_work);
+-	atomic_set(&priv->active, 0);
+ 
+ 	return 0;
+ }
+@@ -1786,10 +1779,6 @@ static int omap8250_runtime_resume(struct device *dev)
+ 	struct omap8250_priv *priv = dev_get_drvdata(dev);
+ 	struct uart_8250_port *up = NULL;
+ 
+-	/* Did the hardware wake to a device IO interrupt before a wakeirq? */
+-	if (atomic_read(&priv->active))
+-		return 0;
+-
+ 	if (priv->line >= 0)
+ 		up = serial8250_get_port(priv->line);
+ 
+@@ -1805,10 +1794,8 @@ static int omap8250_runtime_resume(struct device *dev)
+ 		uart_port_unlock_irq(&up->port);
+ 	}
+ 
+-	atomic_set(&priv->active, 1);
+ 	priv->latency = priv->calc_latency;
+ 	schedule_work(&priv->qos_work);
+-
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
+

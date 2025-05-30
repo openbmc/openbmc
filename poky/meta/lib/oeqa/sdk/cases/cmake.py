@@ -23,9 +23,7 @@ class CMakeTest(OESDKTestCase):
         if libc in [ 'newlib' ]:
             raise unittest.SkipTest("CMakeTest class: SDK doesn't contain a supported C library")
 
-        if not (self.tc.hasHostPackage("nativesdk-cmake") or
-                self.tc.hasHostPackage("cmake-native")):
-            raise unittest.SkipTest("CMakeTest: needs cmake")
+        self.ensure_host_package("cmake")
 
     def test_assimp(self):
         with tempfile.TemporaryDirectory(prefix="assimp", dir=self.tc.sdk_dir) as testdir:

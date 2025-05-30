@@ -33,7 +33,7 @@
 
 inherit sanity
 
-RPM_SIGN_PACKAGES='1'
+RPM_SIGN_PACKAGES = '1'
 RPM_SIGN_FILES ?= '0'
 RPM_GPG_BACKEND ?= 'local'
 # SHA-256 is used by default

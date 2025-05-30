@@ -1,0 +1,87 @@
+From e5af3bbc9ea6e56e3d4e5cabcb5ac57b521fa6c0 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 24 Apr 2025 22:47:52 +0800
+Subject: [PATCH] Remove version.h from source directory
+
+The version.h should be generated from version.h.in. If the build
+directory is out of the source directory, the version.h is generated in
+build directory and the original version.h in source directory is not
+overwritten. However, the latter is used during the build, resulting in
+a missing runtime version:
+
+$ sassc --version
+sassc: [NA]
+libsass: [NA]
+sass2scss: 1.1.1
+sass: 3.5
+
+Remove version.h from source directory to ensure that the version.h in
+build directory is used during the build.
+
+Also remove '--dirty' option from 'git describe' command line in
+version.sh to get rid of '-dirty' suffix from version number that
+was introduced with this change.
+
+Upstream-Status: Submitted [https://github.com/sass/libsass/pull/3196]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ include/sass/version.h | 12 ------------
+ src/GNUmakefile.am     |  4 ++--
+ version.sh             |  2 +-
+ 3 files changed, 3 insertions(+), 15 deletions(-)
+ delete mode 100644 include/sass/version.h
+
+diff --git a/include/sass/version.h b/include/sass/version.h
+deleted file mode 100644
+index 56ea016a..00000000
+--- a/include/sass/version.h
++++ /dev/null
+@@ -1,12 +0,0 @@
+-#ifndef SASS_VERSION_H
+-#define SASS_VERSION_H
+-
+-#ifndef LIBSASS_VERSION
+-#define LIBSASS_VERSION "[NA]"
+-#endif
+-
+-#ifndef LIBSASS_LANGUAGE_VERSION
+-#define LIBSASS_LANGUAGE_VERSION "3.5"
+-#endif
+-
+-#endif
+diff --git a/src/GNUmakefile.am b/src/GNUmakefile.am
+index 9b0e6a99..e955f0b4 100644
+--- a/src/GNUmakefile.am
++++ b/src/GNUmakefile.am
+@@ -8,7 +8,7 @@ if ENABLE_COVERAGE
+ 	AM_COVLDFLAGS += -lgcov
+ endif
+ 
+-AM_CPPFLAGS = -I$(top_srcdir)/include
++AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_builddir)/include
+ AM_CFLAGS   = $(AM_COPT)
+ AM_CXXFLAGS = $(AM_COPT)
+ AM_LDFLAGS  = $(AM_COPT) $(AM_COVLDFLAGS)
+@@ -45,6 +45,6 @@ sass_includedir = $(includedir)/sass
+ 
+ sass_include_HEADERS = $(top_srcdir)/include/sass/base.h \
+                        $(top_srcdir)/include/sass/values.h \
+-                       $(top_srcdir)/include/sass/version.h \
++                       $(top_builddir)/include/sass/version.h \
+                        $(top_srcdir)/include/sass/context.h \
+                        $(top_srcdir)/include/sass/functions.h
+diff --git a/version.sh b/version.sh
+index 281de74d..7bc57230 100755
+--- a/version.sh
++++ b/version.sh
+@@ -1,5 +1,5 @@
+ if test "x$LIBSASS_VERSION" = "x"; then
+-  LIBSASS_VERSION=`git describe --abbrev=4 --dirty --always --tags 2>/dev/null`
++  LIBSASS_VERSION=`git describe --abbrev=4 --always --tags 2>/dev/null`
+ fi
+ if test "x$LIBSASS_VERSION" = "x"; then
+   LIBSASS_VERSION=`cat VERSION 2>/dev/null`
+-- 
+2.34.1
+

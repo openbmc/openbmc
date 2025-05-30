@@ -23,9 +23,9 @@ SRC_URI = "https://www.zytor.com/pub/syslinux/Testing/6.04/syslinux-${PV}.tar.xz
            file://0013-remove-clean-script.patch \
            file://0014-Fix-reproducibility-issues.patch \
            file://0001-ext2_fs.h-do-not-carry-an-outdated-copy.patch \
+           file://0001-Add-extra-sector-count-from-section-entry-for-EFI-ca.patch \
            "
 
-SRC_URI[md5sum] = "2b31c78f087f99179feb357da312d7ec"
 SRC_URI[sha256sum] = "4441a5d593f85bb6e8d578cf6653fb4ec30f9e8f4a2315a3d8f2d0a8b3fadf94"
 
 # remove at next version upgrade or when output changes
@@ -49,7 +49,7 @@ TARGET_LDFLAGS = ""
 SECURITY_LDFLAGS = ""
 LDFLAGS_SECTION_REMOVAL = ""
 
-CFLAGS += "-DNO_INLINE_FUNCS -Wno-error=implicit-function-declaration"
+CFLAGS += "-DNO_INLINE_FUNCS -Wno-error=implicit-function-declaration -idirafter ${STAGING_INCDIR}"
 
 EXTRA_OEMAKE = " \
 	BINDIR=${bindir} SBINDIR=${sbindir} LIBDIR=${libdir} \
@@ -130,3 +130,8 @@ FILES:${PN}-staticdev += "${datadir}/${BPN}/com32/lib*.a ${libdir}/${BPN}/com32/
 FILES:${PN}-misc = "${datadir}/${BPN}/* ${libdir}/${BPN}/* ${bindir}/*"
 
 BBCLASSEXTEND = "native nativesdk"
+
+# com32/lib/../include/stdarg.h:9:15: fatal error: 'stdarg.h' file not found
+#    9 | #include_next <stdarg.h>
+#      |               ^~~~~~~~~~
+TOOLCHAIN = "gcc"

@@ -397,7 +397,7 @@ def create_progress_handler(func, progress, logfile, d):
         # Use specified regex
         return bb.progress.OutOfProgressHandler(d, regex=progress.split(':', 1)[1], outfile=logfile)
     elif progress.startswith("custom:"):
-        # Use a custom progress handler that was injected via OE_EXTRA_IMPORTS or __builtins__
+        # Use a custom progress handler that was injected via other means
         import functools
         from types import ModuleType
 

@@ -1,4 +1,4 @@
-From 19a8777c81bc451d65a4071528e4715e19941e0a Mon Sep 17 00:00:00 2001
+From f040b04c50d13755b2063c4db0e0be0647cf5d14 Mon Sep 17 00:00:00 2001
 From: Jeff Dike <jdike@x86_64.user-mode-linux.org>
 Date: Wed, 14 Jul 2010 14:35:52 -0400
 Subject: [PATCH] sysvinit - Remove sulogin dependency on /usr/lib*/libcrypt.a
@@ -14,7 +14,7 @@ Upstream-Status: Inappropriate [configuration]
  1 file changed, 2 insertions(+), 10 deletions(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 4ce4889..1611c1c 100644
+index 6d9f01c..b12a233 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -97,16 +97,8 @@ else

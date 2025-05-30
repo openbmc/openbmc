@@ -13,6 +13,7 @@ SECTION = "base"
 DEPENDS = "flex-native"
 
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
+           file://0001-getopt-Add-missing-params-to-getopt-getenv-signature.patch \
            file://run-ptest"
 SRC_URI[sha256sum] = "b71457ffeb210d7ea61825ff72b3e49dc8f2c1a04102bbe23591d783d1bfe996"
 

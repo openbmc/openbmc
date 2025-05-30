@@ -11,10 +11,18 @@ if &compatible || version < 600 || exists("b:loaded_bitbake_plugin")
 endif
 
 " .bb, .bbappend and .bbclass
-au BufNewFile,BufRead *.{bb,bbappend,bbclass}  set filetype=bitbake
+au BufNewFile,BufRead *.{bb,bbappend,bbclass}  setfiletype bitbake
 
-" .inc
-au BufNewFile,BufRead *.inc		set filetype=bitbake
+" .inc -- meanwhile included upstream
+if !has("patch-9.0.0055")
+    au BufNewFile,BufRead *.inc                call s:BBIncDetect()
+    def s:BBIncDetect()
+        l:lines = getline(1) .. getline(2) .. getline(3)
+        if l:lines =~# '\<\%(require\|inherit\)\>' || lines =~# '[A-Z][A-Za-z0-9_:${}]*\s\+\%(??\|[?:+]\)\?= '
+            set filetype bitbake
+        endif
+    enddef
+endif
 
 " .conf
 au BufNewFile,BufRead *.conf

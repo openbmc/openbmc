@@ -1,0 +1,35 @@
+From 9f88f2e4efa56e53c78f9b67775c71afa711a69c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 22 May 2025 21:50:45 -0700
+Subject: [PATCH] [compiler-rt] Hardcode uptr/sptr typedefs on Mips/Linux
+
+Sanitizer build on Mips/Linux faills to build due to assertion errors
+mismatched definitions. This is due to inconsistent definitions of
+`uptr` of either `unsigned long` or `unsigned int` in compiler-rt. This
+is caused by clang defining
+
+__UINTPTR_TYPE__ long unsigned int where as gcc defines it as
+unsigned int
+
+As a workaround, this hardcodes `uptr`/`sptr` in compiler-rt to
+`unsigned int`/`int` on Linux Mips, matching gcc.
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/141201]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ compiler-rt/lib/sanitizer_common/sanitizer_internal_defs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compiler-rt/lib/sanitizer_common/sanitizer_internal_defs.h b/compiler-rt/lib/sanitizer_common/sanitizer_internal_defs.h
+index fff60c96f632..511ee8fe49cc 100644
+--- a/compiler-rt/lib/sanitizer_common/sanitizer_internal_defs.h
++++ b/compiler-rt/lib/sanitizer_common/sanitizer_internal_defs.h
+@@ -139,7 +139,7 @@
+ namespace __sanitizer {
+ 
+ #if defined(__UINTPTR_TYPE__)
+-#  if defined(__arm__) && defined(__linux__)
++#  if (defined(__arm__) || _ABIO32 == 1) && defined(__linux__)
+ // Linux Arm headers redefine __UINTPTR_TYPE__ and disagree with clang/gcc.
+ typedef unsigned int uptr;
+ typedef int sptr;

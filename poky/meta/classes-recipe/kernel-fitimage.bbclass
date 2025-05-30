@@ -243,6 +243,8 @@ EOF
 fitimage_emit_section_setup() {
 
 	setup_csum="${FIT_HASH_ALG}"
+	setup_sign_algo="${FIT_SIGN_ALG}"
+	setup_sign_keyname="${UBOOT_SIGN_IMG_KEYNAME}"
 
 	cat << EOF >> $1
                 setup-$2 {
@@ -259,6 +261,17 @@ fitimage_emit_section_setup() {
                         };
                 };
 EOF
+
+	if [ "${UBOOT_SIGN_ENABLE}" = "1" -a "${FIT_SIGN_INDIVIDUAL}" = "1" -a -n "$setup_sign_keyname" ] ; then
+		sed -i '$ d' $1
+		cat << EOF >> $1
+                        signature-1 {
+                                algo = "$setup_csum,$setup_sign_algo";
+                                key-name-hint = "$setup_sign_keyname";
+                        };
+                };
+EOF
+	fi
 }
 
 #

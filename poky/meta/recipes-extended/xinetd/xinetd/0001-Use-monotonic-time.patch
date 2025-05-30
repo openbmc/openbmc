@@ -1,0 +1,325 @@
+From 753aa53e817d29e979c2a2fca7da40a3d115f93c Mon Sep 17 00:00:00 2001
+From: Li Wang <li.wang@windriver.com>
+Date: Tue, 3 Sep 2024 15:21:52 +0800
+Subject: [PATCH] Use monotonic time
+
+When using xinet.d to limit rsync connections, it can't handle changes
+in system time. When time is set back, the connection limit is reached
+very quickly and rsync gets deactivated, if time is changed again, rsync
+is never reactivated.
+
+The current timer of xinet.d is based on the time() and is affected by
+the system time. Use clock_gettime() with CLOCK_MONOTONIC as the new
+timer because CLOCK_MONOTONIC clock is not affected by discontinuous
+jumps in the system time.
+
+Upstream-Status: Submitted [https://github.com/openSUSE/xinetd/pull/48]
+
+Signed-off-by: Li Wang <li.wang@windriver.com>
+---
+ src/access.c       |  6 +++---
+ src/builtins.c     |  5 +++--
+ src/internals.c    |  2 +-
+ src/log.c          |  3 ++-
+ src/sensor.c       |  6 +++---
+ src/server.c       |  3 ++-
+ src/service.c      |  5 +++--
+ src/signals.c      |  2 +-
+ src/time.c         |  3 ++-
+ src/xlog/filelog.c |  3 ++-
+ src/xtimer.c       | 15 ++++++++++++---
+ src/xtimer.h       |  1 +
+ 12 files changed, 35 insertions(+), 19 deletions(-)
+
+diff --git a/src/access.c b/src/access.c
+index e942db7..eb9da6e 100644
+--- a/src/access.c
++++ b/src/access.c
+@@ -70,7 +70,7 @@ static void cps_service_restart(void)
+    time_t nowtime;
+    const char *func = "cps_service_restart";
+ 
+-   nowtime = time(NULL);
++   nowtime = _time(NULL);
+    for( i=0; i < pset_count( SERVICES(ps) ); i++ ) {
+       struct service *sp;
+       struct service_config *scp;
+@@ -104,7 +104,7 @@ void cps_service_stop(struct service *sp, const char *reason)
+    msg(LOG_ERR, "service_stop", 
+ 	"Deactivating service %s due to %s.  Restarting in %d seconds.", 
+ 	SC_NAME(scp), reason, (int)SC_TIME_WAIT(scp));
+-   nowtime = time(NULL);
++   nowtime = _time(NULL);
+    SC_TIME_REENABLE(scp) = nowtime + SC_TIME_WAIT(scp);
+    xtimer_add(cps_service_restart, SC_TIME_WAIT(scp));
+ }
+@@ -284,7 +284,7 @@ access_e parent_access_control( struct service *sp, const connection_s *cp )
+    /* CPS handler */
+    if( SC_TIME_CONN_MAX(scp) != 0 ) {
+       int time_diff;
+-      nowtime = time(NULL);
++      nowtime = _time(NULL);
+       time_diff = nowtime - SC_TIME_LIMIT(scp) ;
+ 
+       if( SC_TIME_CONN(scp) == 0 ) {
+diff --git a/src/builtins.c b/src/builtins.c
+index 042e5dc..c285a02 100644
+--- a/src/builtins.c
++++ b/src/builtins.c
+@@ -36,6 +36,7 @@
+ #include "nvlists.h"
+ #include "child.h"
+ #include "access.h"
++#include "xtimer.h"
+ 
+ #define BUFFER_SIZE               1024
+ 
+@@ -237,7 +238,7 @@ static void daytime_protocol( char *buf, unsigned int *buflen )
+    int         size = *buflen ;
+    int      cc ;
+ 
+-   (void) time( &now ) ;
++   (void) _time( &now ) ;
+    tmp = localtime( &now ) ;
+    cc = strx_nprint( buf, size,
+       "%02d %s %d %02d:%02d:%02d",
+@@ -308,7 +309,7 @@ static void time_protocol( unsigned char *timep )
+    time_t now ;
+    unsigned long base1900;
+ 
+-   (void) time( &now ) ;
++   (void) _time( &now ) ;
+    base1900 = (unsigned long)now + TIME_OFFSET ;
+    timep[0] = base1900 >> 24;
+    timep[1] = base1900 >> 16;
+diff --git a/src/internals.c b/src/internals.c
+index c5ed4f8..6a19207 100644
+--- a/src/internals.c
++++ b/src/internals.c
+@@ -85,7 +85,7 @@ void dump_internal_state(void)
+     * Print the program name, version, and timestamp.
+     * Note that the program_version variable contains the program name.
+     */
+-   (void) time( &current_time ) ;
++   (void) _time( &current_time ) ;
+    Sprint( dump_fd, "INTERNAL STATE DUMP: %s\n", program_version ) ;
+    Sprint( dump_fd, "Current time: %s\n", ctime( &current_time ) ) ;
+ 
+diff --git a/src/log.c b/src/log.c
+index b66ab24..7aba30d 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -21,6 +21,7 @@
+ #include "sconf.h"
+ #include "sconst.h"
+ #include "msg.h"
++#include "xtimer.h"
+ 
+ 
+ #define LOGBUF_SIZE                  1024
+@@ -202,7 +203,7 @@ void svc_log_exit( struct service *sp, const struct server *serp )
+    {
+       time_t current_time ;
+ 
+-      (void) time( &current_time ) ;
++      (void) _time( &current_time ) ;
+       cc = strx_nprint( &buf[ len ], bufsize, " duration=%ld(sec)",
+          (long)(current_time - SERVER_STARTTIME( serp )) ) ;
+       len += cc ;
+diff --git a/src/sensor.c b/src/sensor.c
+index cd85806..24bd816 100644
+--- a/src/sensor.c
++++ b/src/sensor.c
+@@ -68,7 +68,7 @@ void process_sensor( const struct service *sp, const union xsockaddr *addr)
+                time_t nowtime;
+                char time_buf[40], *tmp;
+ 
+-	       nowtime = time(NULL);
++	       nowtime = _time(NULL);
+ 	       msg(LOG_CRIT, func,
+ 	           "Adding %s to the global_no_access list for %d minutes",
+ 	            dup_addr, SC_DENY_TIME(SVC_CONF(sp)));
+@@ -113,7 +113,7 @@ void process_sensor( const struct service *sp, const union xsockaddr *addr)
+                {
+                   time_t nowtime, new_time;
+ 
+-                  nowtime = time(NULL);
++                  nowtime = _time(NULL);
+                   new_time = (time_t)nowtime+(60*SC_DENY_TIME(SVC_CONF(sp)));                     if (difftime(new_time, (time_t)stored_time) > 0.0)
+ 	          {   /* new_time is longer save it   */
+ 		     char time_buf[40], *new_exp_time;
+@@ -163,7 +163,7 @@ static void scrub_global_access_list( void )
+    {
+       int found_one = 0;
+       unsigned u;
+-      time_t nowtime = time(NULL);
++      time_t nowtime = _time(NULL);
+ 
+       for (u=0; u < count; u++)
+       {
+diff --git a/src/server.c b/src/server.c
+index 4c4a2b8..e201a57 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -30,6 +30,7 @@
+ #include "retry.h"
+ #include "child.h"
+ #include "signals.h"
++#include "xtimer.h"
+ 
+ 
+ #define NEW_SERVER()                NEW( struct server )
+@@ -228,7 +229,7 @@ status_e server_start( struct server *serp )
+          return( FAILED ) ;
+ 
+       default:
+-         (void) time( &SERVER_STARTTIME(serp) ) ;
++         (void) _time( &SERVER_STARTTIME(serp) ) ;
+          SVC_INC_RUNNING_SERVERS( sp ) ;
+ 
+          /*
+diff --git a/src/service.c b/src/service.c
+index 93c2162..04422c3 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -43,6 +43,7 @@
+ #include "logctl.h"
+ #include "xconfig.h"
+ #include "special.h"
++#include "xtimer.h"
+ 
+ 
+ #define NEW_SVC()              NEW( struct service )
+@@ -840,7 +841,7 @@ static status_e failed_service(struct service *sp,
+ 	       SVC_LAST_DGRAM_ADDR(sp) = (union xsockaddr *)last;
+             }
+ 
+-            (void) time( &current_time ) ;
++            (void) _time( &current_time ) ;
+             if ( sinp->sin_addr.s_addr == last->sin_addr.s_addr &&
+                                           sinp->sin_port == last->sin_port )
+             {
+@@ -867,7 +868,7 @@ static status_e failed_service(struct service *sp,
+ 	       SVC_LAST_DGRAM_ADDR( sp ) = (union xsockaddr *)last;
+             }
+ 
+-            (void) time( &current_time ) ;
++            (void) _time( &current_time ) ;
+             if ( IN6_ARE_ADDR_EQUAL(&(sinp->sin6_addr), &(last->sin6_addr)) && 
+                  sinp->sin6_port == last->sin6_port )
+             {
+diff --git a/src/signals.c b/src/signals.c
+index 3c42db3..4160e6d 100644
+--- a/src/signals.c
++++ b/src/signals.c
+@@ -301,7 +301,7 @@ static void bad_signal(void)
+    else if ( total_signal_count > MAX_SIGNAL_COUNT )
+       _exit( 1 ) ;      /* in case of a problem in exit(3) */
+    
+-   (void) time( &current_time ) ;
++   (void) _time( &current_time ) ;
+ 
+    if ( interval_signal_count > 0 &&
+             current_time - interval_start <= SIGNAL_INTERVAL )
+diff --git a/src/time.c b/src/time.c
+index a4d63fb..68142b0 100644
+--- a/src/time.c
++++ b/src/time.c
+@@ -16,6 +16,7 @@
+ #include "timex.h"
+ #include "msg.h"
+ #include "util.h"
++#include "xtimer.h"
+ 
+ 
+ #define IN_RANGE( val, low, high )     ( (low) <= (val) && (val) <= (high) )
+@@ -41,7 +42,7 @@ bool_int ti_current_time_check( const pset_h intervals )
+    int16_t     min_current ;
+    struct tm   *tmp ;
+ 
+-   (void) time( &current_time ) ;
++   (void) _time( &current_time ) ;
+    tmp = localtime( &current_time ) ;
+    min_current = tmp->tm_hour * 60 + tmp->tm_min ;
+ 
+diff --git a/src/xlog/filelog.c b/src/xlog/filelog.c
+index ee688e5..46cf1e2 100644
+--- a/src/xlog/filelog.c
++++ b/src/xlog/filelog.c
+@@ -25,6 +25,7 @@
+ #include "str.h"
+ #include "xlog.h"
+ #include "filelog.h"
++#include "xtimer.h"
+ 
+ static int filelog_init(xlog_s *, va_list) ;
+ static void filelog_fini(xlog_s *) ;
+@@ -190,7 +191,7 @@ static int filelog_write( xlog_s *xp, const char buf[], int len, int flags,
+ 	if ( flp->fl_state != FL_OPEN )
+ 		return( flp->fl_error ) ;
+ 
+-	(void) time( &current_time ) ;
++	(void) _time( &current_time ) ;
+ 	tmp = localtime( &current_time ) ;
+ 	cc = Sprint( flp->fl_fd, "%02d/%d/%d@%02d:%02d:%02d",
+ 		tmp->tm_year%100, tmp->tm_mon+1, tmp->tm_mday,
+diff --git a/src/xtimer.c b/src/xtimer.c
+index 2053ef4..7a125d8 100644
+--- a/src/xtimer.c
++++ b/src/xtimer.c
+@@ -11,6 +11,15 @@
+ #include "pset.h"
+ #include "msg.h"
+ 
++time_t _time(time_t *t)
++{
++	struct timespec ts;
++	clock_gettime(CLOCK_MONOTONIC, &ts);
++	if(t)
++		*t = ts.tv_sec;
++	return ts.tv_sec;
++}
++
+ /* A note on the usage of timers in these functions:
+  * The timers are composed of 3 elements, a pointer to a callback function,
+  * the expire time of the timer, and a unique (pseudo-monotomically increasing)
+@@ -68,7 +77,7 @@ int xtimer_add( void (*func)(void), time_t secs )
+ 		return -1;
+ 	}
+ 
+-	tmptime = time(NULL);
++	tmptime = _time(NULL);
+ 	if( tmptime == -1 ) {
+ 		free( new_xtimer );
+ 		return -1;
+@@ -107,7 +116,7 @@ int xtimer_poll(void)
+ 
+ 	for( i = 0; i < pset_count( xtimer_list ); i++ ) {
+ 		xtime_h *cur_timer = pset_pointer( xtimer_list, i );
+-		time_t cur_time    = time(NULL);
++		time_t cur_time    = _time(NULL);
+ 
+ 		/* The list is sorted, low to high.  If there's no
+ 		 * timers left, return.
+@@ -163,7 +172,7 @@ time_t xtimer_nexttime(void)
+ 	if( pset_count(xtimer_list) == 0 )
+ 		return -1;
+ 
+-	ret = ((xtime_h *)pset_pointer(xtimer_list, 0))->when - time(NULL) ;
++	ret = ((xtime_h *)pset_pointer(xtimer_list, 0))->when - _time(NULL) ;
+ 	if( ret < 0 )
+ 		ret = 0;
+ 	return( ret );
+diff --git a/src/xtimer.h b/src/xtimer.h
+index b0f8451..3ba0d0a 100644
+--- a/src/xtimer.h
++++ b/src/xtimer.h
+@@ -22,4 +22,5 @@ int xtimer_poll(void);
+ int xtimer_remove(int);
+ time_t xtimer_nexttime(void);
+ 
++time_t _time(time_t *t);
+ #endif /* _X_TIMER_H */
+-- 
+2.34.1
+

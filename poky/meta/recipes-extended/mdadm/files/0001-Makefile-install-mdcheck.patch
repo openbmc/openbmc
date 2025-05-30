@@ -1,4 +1,4 @@
-From 0be066d57a7dd1aead5488d0a095863608f2e559 Mon Sep 17 00:00:00 2001
+From 407691e11037709af888ce2cf6bd5eac6971ac61 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Tue, 25 Jan 2022 16:25:01 +0800
 Subject: [PATCH] Makefile: install mdcheck
@@ -14,10 +14,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile b/Makefile
-index 1141971..f4059e2 100644
+index 981e16fa..b28e7855 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -325,6 +325,7 @@ install-systemd: systemd/mdmon@.service
+@@ -345,6 +345,7 @@ install-systemd: systemd/mdmon@.service
  install-bin: mdadm mdmon
  	$(INSTALL) -D $(STRIP) -m 755 mdadm $(DESTDIR)$(BINDIR)/mdadm
  	$(INSTALL) -D $(STRIP) -m 755 mdmon $(DESTDIR)$(BINDIR)/mdmon

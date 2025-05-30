@@ -1,0 +1,27 @@
+From b68b3c6157c531bdcf5812fd93aadff9c18de6bd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Mar 2025 14:41:23 -0700
+Subject: [PATCH] getopt: Fix type signature for getenv()
+
+This fixes build on musl with GCC 15
+
+Upstream-Status: Inappropriate [Next version is use getopt.c from gnulib]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/libs/libgroff/getopt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libs/libgroff/getopt.c b/src/libs/libgroff/getopt.c
+index 6efa529..ce39115 100644
+--- a/src/libs/libgroff/getopt.c
++++ b/src/libs/libgroff/getopt.c
+@@ -122,7 +122,7 @@ static struct _getopt_data getopt_data;
+    whose names are inconsistent.  */
+ 
+ #ifndef getenv
+-extern char *getenv ();
++extern char *getenv (const char *);
+ #endif
+ 
+ #endif /* not __GNU_LIBRARY__ */

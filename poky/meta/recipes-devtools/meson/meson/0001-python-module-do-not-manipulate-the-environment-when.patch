@@ -1,7 +1,8 @@
-From f264b7fd2c86edfd5db77da264e8bf05f5e2bfeb Mon Sep 17 00:00:00 2001
+From 859711f99ea9b183a1dffb9b97de09ad0fe9803b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 19 Nov 2018 14:24:26 +0100
 Subject: [PATCH] python module: do not manipulate the environment when calling
+
  pkg-config
 
 Upstream-Status: Inappropriate [oe-core specific]
@@ -11,10 +12,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/mesonbuild/dependencies/python.py b/mesonbuild/dependencies/python.py
-index 326e605..f5eb50f 100644
+index 3dab31c..b9307fc 100644
 --- a/mesonbuild/dependencies/python.py
 +++ b/mesonbuild/dependencies/python.py
-@@ -403,9 +403,6 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+@@ -410,9 +410,6 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
                      empty.name = 'python'
                      return empty
  
@@ -24,7 +25,7 @@ index 326e605..f5eb50f 100644
                  try:
                      return PythonPkgConfigDependency(name, env, kwargs, installation, True)
                  finally:
-@@ -414,8 +411,7 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+@@ -421,8 +418,7 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
                              os.environ[name] = value
                          elif name in os.environ:
                              del os.environ[name]
@@ -32,5 +33,5 @@ index 326e605..f5eb50f 100644
 -                    set_env('PKG_CONFIG_PATH', old_pkg_path)
 +                    pass
  
-             candidates.append(functools.partial(wrap_in_pythons_pc_dir, pkg_name, env, kwargs, installation))
-             # We only need to check both, if a python install has a LIBPC. It might point to the wrong location,
+             # Otherwise this doesn't fulfill the interface requirements
+             wrap_in_pythons_pc_dir.log_tried = PythonPkgConfigDependency.log_tried  # type: ignore[attr-defined]

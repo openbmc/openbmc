@@ -28,7 +28,7 @@ PACKAGECONFIG[jack] = ",,jack"
 PACKAGECONFIG[openal] = ",,openal-soft"
 PACKAGECONFIG[portaudio] = ",,portaudio-v19"
 PACKAGECONFIG[pulseaudio] = "--with-default-audio=pulse,,pulseaudio"
-PACKAGECONFIG[sdl] = ",,libsdl2"
+PACKAGECONFIG[sdl] = ",,virtual/libsdl2"
 
 # Following are possible sound output modules:
 # alsa arts coreaudio dummy esd jack nas openal os2 oss portaudio pulse sdl sndio sun tinyalsa win32 win32_wasapi

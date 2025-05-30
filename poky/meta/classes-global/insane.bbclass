@@ -1066,6 +1066,7 @@ def package_qa_check_host_user(path, name, d, elf):
         check_gid = int(d.getVar('HOST_USER_GID'))
         if stat.st_gid == check_gid:
             oe.qa.handle_error("host-user-contaminated", "%s: %s is owned by gid %d, which is the same as the user running bitbake. This may be due to host contamination" % (pn, package_qa_clean_path(path, d, name), check_gid), d)
+package_qa_check_host_user[vardepsexclude] = "HOST_USER_UID HOST_USER_GID"
 
 QARECIPETEST[unhandled-features-check] = "package_qa_check_unhandled_features_check"
 def package_qa_check_unhandled_features_check(pn, d):
@@ -1331,6 +1332,13 @@ python do_qa_patch() {
     elif os.path.exists(os.path.join(srcdir, "Makefile.in")) and (match_line_in_files(srcdir, "**/Makefile.in", r'\s*TESTS\s*\+?=') or match_line_in_files(srcdir,"**/*.at",r'.*AT_INIT')):
         oe.qa.handle_error("unimplemented-ptest", "%s: autotools-based tests detected" % d.getVar('PN'), d)
 
+    # Detect cargo-based tests
+    elif os.path.exists(os.path.join(srcdir, "Cargo.toml")) and (
+        match_line_in_files(srcdir, "**/*.rs", r'\s*#\s*\[\s*test\s*\]') or 
+        match_line_in_files(srcdir, "**/*.rs", r'\s*#\s*\[\s*cfg\s*\(\s*test\s*\)\s*\]')
+    ):
+        oe.qa.handle_error("unimplemented-ptest", "%s: cargo-based tests detected" % d.getVar('PN'), d)
+
     # Last resort, detect a test directory in sources
     elif os.path.exists(srcdir) and any(filename.lower() in ["test", "tests"] for filename in os.listdir(srcdir)):
         oe.qa.handle_error("unimplemented-ptest", "%s: test subdirectory detected" % d.getVar('PN'), d)
@@ -1417,16 +1425,6 @@ Rerun configure task after fixing this."""
         except subprocess.CalledProcessError:
             pass
 
-    # Check invalid PACKAGECONFIG
-    pkgconfig = (d.getVar("PACKAGECONFIG") or "").split()
-    if pkgconfig:
-        pkgconfigflags = d.getVarFlags("PACKAGECONFIG") or {}
-        for pconfig in pkgconfig:
-            if pconfig not in pkgconfigflags:
-                pn = d.getVar('PN')
-                error_msg = "%s: invalid PACKAGECONFIG: %s" % (pn, pconfig)
-                oe.qa.handle_error("invalid-packageconfig", error_msg, d)
-
     oe.qa.exit_if_errors(d)
 }
 
@@ -1474,10 +1472,20 @@ python do_recipe_qa() {
             if re.search(r"git(hu|la)b\.com/.+/.+/archive/.+", url) or "//codeload.github.com/" in url:
                 oe.qa.handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub/GitLab archives, convert recipe to use git protocol" % pn, d)
 
+    def test_packageconfig(pn, d):
+        pkgconfigs = (d.getVar("PACKAGECONFIG") or "").split()
+        if pkgconfigs:
+            pkgconfigflags = d.getVarFlags("PACKAGECONFIG") or {}
+            invalid_pkgconfigs = set(pkgconfigs) - set(pkgconfigflags)
+            if invalid_pkgconfigs:
+                error_msg = "%s: invalid PACKAGECONFIG(s): %s" % (pn, " ".join(sorted(invalid_pkgconfigs)))
+                oe.qa.handle_error("invalid-packageconfig", error_msg, d)
+
     pn = d.getVar('PN')
     test_missing_metadata(pn, d)
     test_missing_maintainer(pn, d)
     test_srcuri(pn, d)
+    test_packageconfig(pn, d)
     oe.qa.exit_if_errors(d)
 }
 

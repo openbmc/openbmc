@@ -353,7 +353,7 @@ def print_event_log(event, includelogs, loglines, termfilter):
         termfilter.clearFooter()
         bb.error("Logfile of failure stored in: %s" % logfile)
         if includelogs and not event.errprinted:
-            print("Log data follows:")
+            bb.plain("Log data follows:")
             f = open(logfile, "r")
             lines = []
             while True:
@@ -366,11 +366,11 @@ def print_event_log(event, includelogs, loglines, termfilter):
                     if len(lines) > int(loglines):
                         lines.pop(0)
                 else:
-                    print('| %s' % l)
+                    bb.plain('| %s' % l)
             f.close()
             if lines:
                 for line in lines:
-                    print(line)
+                    bb.plain(line)
 
 def _log_settings_from_server(server, observe_only):
     # Get values of variables which control our output

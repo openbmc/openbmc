@@ -1,0 +1,28 @@
+From 739e65a126178e4c4d8452297ac13c119ae79403 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 May 2021 17:56:03 -0700
+Subject: [PATCH] clang: Fix x86 triple for non-debian multiarch linux distros
+
+OpenEmbedded does not hardcode mutli-arch like debian therefore ensure
+that it still uses the proper tuple
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/lib/Driver/ToolChains/Linux.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/clang/lib/Driver/ToolChains/Linux.cpp b/clang/lib/Driver/ToolChains/Linux.cpp
+index fb9d433a80be..ee0b4acbcef0 100644
+--- a/clang/lib/Driver/ToolChains/Linux.cpp
++++ b/clang/lib/Driver/ToolChains/Linux.cpp
+@@ -728,6 +728,9 @@ void Linux::addLibStdCxxIncludePaths(const llvm::opt::ArgList &DriverArgs,
+       GCCInstallation.getTriple().getArch() == llvm::Triple::x86
+           ? "i386-linux-gnu"
+           : TripleStr;
++  // OpenEmbedded does not hardcode the triple to i386-linux-gnu like debian
++  if (GCCInstallation.getTriple().getVendor() == llvm::Triple::OpenEmbedded)
++	  DebianMultiarch = TripleStr;
+ 
+   // Try generic GCC detection first.
+   if (Generic_GCC::addGCCLibStdCxxIncludePaths(DriverArgs, CC1Args,

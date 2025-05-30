@@ -21,7 +21,7 @@ d) Use bash for perl-cross configure since otherwise trnl gets set to "\n" with 
 
 RP 2020/2/7
 
-Upstream-Status: Pending [75% submitted]
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/154 https://github.com/arsv/perl-cross/pull/155]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
 ---
  cnf/configure         | 2 +-

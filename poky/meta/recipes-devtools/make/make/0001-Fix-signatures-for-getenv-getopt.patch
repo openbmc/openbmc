@@ -1,0 +1,60 @@
+From f844b6588dbdb93d9ff0fe883bd801df62c965b7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 22 Mar 2025 14:07:56 -0700
+Subject: [PATCH] Fix signatures for getenv/getopt
+
+GCC-15 complains about missing parameters, this gets found
+out when using non-glibc ( e.g. musl ) C library
+
+Fixes
+lib/fnmatch.c:124:14: error: conflicting types for 'getenv'; have 'char *(void)'
+|   124 | extern char *getenv ();
+|       |              ^~~~~~
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bug-make/2025-03/msg00032.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/fnmatch.c | 2 +-
+ src/getopt.c  | 2 +-
+ src/getopt.h  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/lib/fnmatch.c b/lib/fnmatch.c
+index 01da376..cb1c856 100644
+--- a/lib/fnmatch.c
++++ b/lib/fnmatch.c
+@@ -121,7 +121,7 @@ USA.  */
+    whose names are inconsistent.  */
+ 
+ # if !defined _LIBC && !defined getenv
+-extern char *getenv ();
++extern char *getenv (const char *);
+ # endif
+ 
+ # ifndef errno
+diff --git a/src/getopt.c b/src/getopt.c
+index 7a792de..76251cc 100644
+--- a/src/getopt.c
++++ b/src/getopt.c
+@@ -202,7 +202,7 @@ static char *posixly_correct;
+    whose names are inconsistent.  */
+ 
+ #ifndef getenv
+-extern char *getenv ();
++extern char *getenv (const char *);
+ #endif
+ 
+ static char *
+diff --git a/src/getopt.h b/src/getopt.h
+index df18cee..d8bb226 100644
+--- a/src/getopt.h
++++ b/src/getopt.h
+@@ -102,7 +102,7 @@ struct option
+    errors, only prototype getopt for the GNU C library.  */
+ extern int getopt (int argc, char *const *argv, const char *shortopts);
+ #else /* not __GNU_LIBRARY__ */
+-extern int getopt ();
++extern int getopt (int,  char * const*, const char *);
+ #endif /* __GNU_LIBRARY__ */
+ extern int getopt_long (int argc, char *const *argv, const char *shortopts,
+ 		        const struct option *longopts, int *longind);

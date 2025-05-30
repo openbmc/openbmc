@@ -12,6 +12,7 @@ import glob
 import logging
 import math
 import os
+import pathlib
 import sys
 from operator import attrgetter
 
@@ -251,10 +252,31 @@ Script for comparing buildstats of two separate builds."""
                              "average over them")
     parser.add_argument('--only-task', dest='only_tasks', metavar='TASK', action='append', default=[],
                         help="Only include TASK in report. May be specified multiple times")
-    parser.add_argument('buildstats1', metavar='BUILDSTATS1', help="'Left' buildstat")
-    parser.add_argument('buildstats2', metavar='BUILDSTATS2', help="'Right' buildstat")
+    parser.add_argument('buildstats1', metavar='BUILDSTATS1', nargs="?", help="'Left' buildstat")
+    parser.add_argument('buildstats2', metavar='BUILDSTATS2', nargs="?", help="'Right' buildstat")
 
     args = parser.parse_args(argv)
+
+    if args.buildstats1 and args.buildstats2:
+        # Both paths specified
+        pass
+    elif args.buildstats1 or args.buildstats2:
+        # Just one path specified, this is an error
+        parser.print_usage(sys.stderr)
+        print("Either specify two buildstats paths, or none to use the last two paths.", file=sys.stderr)
+        sys.exit(1)
+    else:
+        # No paths specified, try to find the last two buildstats
+        try:
+            buildstats_dir = pathlib.Path(os.environ["BUILDDIR"]) / "tmp" / "buildstats"
+            paths = sorted(buildstats_dir.iterdir())
+            args.buildstats2 = paths.pop()
+            args.buildstats1 = paths.pop()
+            print(f"Comparing {args.buildstats1} -> {args.buildstats2}\n")
+        except KeyError:
+            parser.print_usage(sys.stderr)
+            print("Build environment has not been configured, cannot find buildstats", file=sys.stderr)
+            sys.exit(1)
 
     # We do not nedd/want to read all buildstats if we just want to look at the
     # package versions

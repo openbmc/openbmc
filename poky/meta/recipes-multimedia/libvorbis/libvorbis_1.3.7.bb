@@ -13,7 +13,6 @@ DEPENDS = "libogg"
 SRC_URI = "http://downloads.xiph.org/releases/vorbis/${BP}.tar.xz \
            file://0001-configure-Check-for-clang.patch \
           "
-SRC_URI[md5sum] = "50902641d358135f06a8392e61c9ac77"
 SRC_URI[sha256sum] = "b33cc4934322bcbf6efcbacf49e3ca01aadbea4114ec9589d1b1e9d20f72954b"
 
 inherit autotools pkgconfig

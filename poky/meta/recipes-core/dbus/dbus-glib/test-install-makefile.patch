@@ -1,4 +1,8 @@
-Change Makefile.am to install regression tests for test package purpose.
+From 4dbb1a459c281eeb716b4f0ce2fc01e8034c3e20 Mon Sep 17 00:00:00 2001
+From: Yao Zhao <yao.zhao@windriver.com>
+Date: Tue, 17 Jul 2012 16:46:30 -0400
+Subject: [PATCH] Change Makefile.am to install regression tests for test
+ package purpose.
 
 Upstream-Status: Inappropriate [test not install is for purpose from upstream]
 
@@ -11,7 +15,7 @@ Signed-off-by: Chong Lu <Chong.Lu@windriver.com>
  3 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/test/Makefile.am b/test/Makefile.am
-index 379c8c3..6580927 100644
+index 7393bed..1c25d5d 100644
 --- a/test/Makefile.am
 +++ b/test/Makefile.am
 @@ -48,7 +48,8 @@ TESTS = \
@@ -25,10 +29,10 @@ index 379c8c3..6580927 100644
  	$(test_related_programs) \
  	$(NULL)
 diff --git a/test/core/Makefile.am b/test/core/Makefile.am
-index e4bceb4..54b077d 100644
+index 35defa9..295202f 100644
 --- a/test/core/Makefile.am
 +++ b/test/core/Makefile.am
-@@ -64,7 +64,8 @@ endif
+@@ -57,7 +57,8 @@ if DBUS_BUILD_TESTS
  
  ## we use noinst_PROGRAMS not check_PROGRAMS for TESTS so that we
  ## build even when not doing "make check"
@@ -39,7 +43,7 @@ index e4bceb4..54b077d 100644
  	test-error-mapping \
  	test-service-glib \
 diff --git a/test/interfaces/Makefile.am b/test/interfaces/Makefile.am
-index a94d08d..707dcac 100644
+index f3f62e4..f034b95 100644
 --- a/test/interfaces/Makefile.am
 +++ b/test/interfaces/Makefile.am
 @@ -57,7 +57,8 @@ if DBUS_BUILD_TESTS
@@ -52,6 +56,3 @@ index a94d08d..707dcac 100644
  
  test_service_SOURCES = \
  	test-interfaces.c \
--- 
-1.9.1
-

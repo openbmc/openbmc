@@ -1,0 +1,36 @@
+From d2eeccf36542d506b660641a07a44f3976772897 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Thu, 15 May 2025 16:44:33 +0800
+Subject: [PATCH] tests/ts/kill/decode: avoid using shell built-in kill command
+
+This test case should do the same as other kill test cases, avoiding
+using shell built-in kill command.
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Upstream-Status: Backport [https://github.com/util-linux/util-linux/commit/d2eeccf36542d506b660641a07a44f3976772897]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ tests/ts/kill/decode | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tests/ts/kill/decode b/tests/ts/kill/decode
+index 03bc25ff6..57149899e 100755
+--- a/tests/ts/kill/decode
++++ b/tests/ts/kill/decode
+@@ -18,6 +18,11 @@ TS_DESC="decode functions"
+ . "$TS_TOPDIR/functions.sh"
+ ts_init "$*"
+ 
++# make sure we do not use shell built-in command
++if [ "$TS_USE_SYSTEM_COMMANDS" == "yes" ]; then
++	TS_CMD_KILL="$(which kill)"
++fi
++
+ ts_skip_qemu_user
+ 
+ ts_check_test_command "$TS_CMD_KILL"
+-- 
+2.34.1
+

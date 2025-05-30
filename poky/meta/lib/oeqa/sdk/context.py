@@ -47,7 +47,7 @@ class OESDKTestContext(OETestContext):
         return self._hasPackage(self.host_pkg_manifest, pkg, regex=regex)
 
     def hasTargetPackage(self, pkg, multilib=False, regex=False):
-        if multilib:
+        if multilib and self.multilib:
             pkg = self.multilib + '-' + pkg
         return self._hasPackage(self.target_pkg_manifest, pkg, regex=regex)
 

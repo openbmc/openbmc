@@ -22,9 +22,8 @@ modprobe loop
 # for a long description of mount namespaces in Linux
 mount --make-shared /
 
-# lsfd/option-inet has races in the test script:
-# https://github.com/util-linux/util-linux/issues/2399
-./tests/run.sh --use-system-commands --parsable --show-diff --exclude=lsfd/option-inet | sed -u '{
+# lsfd/mkfds-bpf* have issues with the gcc 15 upgrade
+./tests/run.sh --use-system-commands --parsable --show-diff --exclude='lsfd/mkfds-bpf-map lsfd/mkfds-bpf-prog' | sed -u '{
       s/^\(.*\):\(.*\) \.\.\. OK$/PASS: \1:\2/                              
       s/^\(.*\):\(.*\) \.\.\. FAILED \(.*\)$/FAIL: \1:\2 \3/                
       s/^\(.*\):\(.*\) \.\.\. SKIPPED \(.*\)$/SKIP: \1:\2 \3/               

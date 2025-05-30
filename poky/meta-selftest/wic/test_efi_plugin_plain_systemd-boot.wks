@@ -2,4 +2,4 @@
 part /boot --source bootimg-efi --sourceparams="loader=systemd-boot,initrd=${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}" --active --align 1024 --use-uuid
 part / --source rootfs --fstype=ext4 --align 1024 --use-uuid
 
-bootloader  --timeout=0 --append="console=ttyS0,115200n8"
+bootloader  --timeout=0

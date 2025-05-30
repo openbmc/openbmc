@@ -47,9 +47,9 @@ class MetaIDE(OESelftestTestCase):
                         "https://ftp.gnu.org/gnu/cpio/cpio-2.15.tar.gz",
                         self.tmpdir_metaideQA, self.td['DATETIME'], dl_dir=dl_dir)
         self.project.download_archive()
-        self.assertEqual(self.project.run_configure('$CONFIGURE_FLAGS'), 0,
+        self.assertEqual(self.project.run_configure('CFLAGS="-std=gnu17 -Dbool=int -Dtrue=1 -Dfalse=0 -Wno-error=implicit-function-declaration" $CONFIGURE_FLAGS'), 0,
                         msg="Running configure failed")
-        self.assertEqual(self.project.run_make(), 0,
+        self.assertEqual(self.project.run_make(make_args="CFLAGS='-std=gnu17 -Dbool=int -Dtrue=1 -Dfalse=0 -Wno-error=implicit-function-declaration'"), 0,
                         msg="Running make failed")
         self.assertEqual(self.project.run_install(), 0,
                         msg="Running make install failed")

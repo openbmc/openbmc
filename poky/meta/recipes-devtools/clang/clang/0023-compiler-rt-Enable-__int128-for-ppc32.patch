@@ -1,0 +1,73 @@
+From b676d7d93fa35e095595fc1f967e4c6a3b58414b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Mar 2022 16:28:16 -0800
+Subject: [PATCH] compiler-rt: Enable __int128 for ppc32
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ compiler-rt/lib/builtins/CMakeLists.txt | 15 +++++++--------
+ compiler-rt/lib/builtins/int_types.h    |  2 +-
+ 2 files changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/compiler-rt/lib/builtins/CMakeLists.txt b/compiler-rt/lib/builtins/CMakeLists.txt
+index 19316c52d12c..cb276311b290 100644
+--- a/compiler-rt/lib/builtins/CMakeLists.txt
++++ b/compiler-rt/lib/builtins/CMakeLists.txt
+@@ -720,11 +720,9 @@ set(mips64el_SOURCES ${GENERIC_TF_SOURCES}
+ 
+ set(nvptx64_SOURCES ${GENERIC_SOURCES})
+ 
+-set(powerpc_SOURCES ${GENERIC_SOURCES})
+-
+ set(powerpcspe_SOURCES ${GENERIC_SOURCES})
+ 
+-set(powerpc64_SOURCES
++set(powerpc_SOURCES
+   ppc/divtc3.c
+   ppc/fixtfdi.c
+   ppc/fixunstfdi.c
+@@ -739,14 +737,15 @@ set(powerpc64_SOURCES
+ )
+ # These routines require __int128, which isn't supported on AIX.
+ if (NOT OS_NAME MATCHES "AIX")
+-  set(powerpc64_SOURCES
++  set(powerpc_SOURCES
+     ppc/floattitf.c
+     ppc/fixtfti.c
+     ppc/fixunstfti.c
+-    ${powerpc64_SOURCES}
++    ${powerpc_SOURCES}
+   )
+ endif()
+-set(powerpc64le_SOURCES ${powerpc64_SOURCES})
++set(powerpc64le_SOURCES ${powerpc_SOURCES})
++set(powerpc64_SOURCES ${powerpc_SOURCES})
+ 
+ set(riscv_SOURCES
+   cpu_model/riscv.c
+@@ -904,9 +903,9 @@ else ()
+         list(APPEND BUILTIN_CFLAGS_${arch} -fomit-frame-pointer -DCOMPILER_RT_ARMHF_TARGET)
+       endif()
+ 
+-      # For RISCV32, we must force enable int128 for compiling long
++      # For RISCV32/PPC32, we must force enable int128 for compiling long
+       # double routines.
+-      if(COMPILER_RT_ENABLE_SOFTWARE_INT128 OR "${arch}" STREQUAL "riscv32")
++      if(COMPILER_RT_ENABLE_SOFTWARE_INT128 OR "${arch}" STREQUAL "riscv32" OR "${arch}" STREQUAL "powerpc")
+         list(APPEND BUILTIN_CFLAGS_${arch} -fforce-enable-int128)
+       endif()
+ 
+diff --git a/compiler-rt/lib/builtins/int_types.h b/compiler-rt/lib/builtins/int_types.h
+index 48862f364217..cc47d3e33f67 100644
+--- a/compiler-rt/lib/builtins/int_types.h
++++ b/compiler-rt/lib/builtins/int_types.h
+@@ -64,7 +64,7 @@ typedef union {
+ } udwords;
+ 
+ #if defined(__LP64__) || defined(__wasm__) || defined(__mips64) ||             \
+-    defined(__SIZEOF_INT128__) || defined(_WIN64)
++    defined(__SIZEOF_INT128__) || defined(_WIN64) || defined(__powerpc__)
+ #define CRT_HAS_128BIT
+ #endif
+ 

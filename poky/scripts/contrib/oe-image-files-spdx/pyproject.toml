@@ -1,0 +1,23 @@
+[project]
+name = "oe-image-files"
+description = "Displays all packaged files on the root file system"
+dynamic = ["version"]
+requires-python = ">= 3.8"
+readme = "README.md"
+
+dependencies = [
+    "spdx_python_model @ git+https://github.com/spdx/spdx-python-model.git@aa40861f11d1b5d20edba7101835341a70d91179",
+]
+
+[project.scripts]
+oe-image-files = "oe_image_files:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/oe_image_files/version.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true

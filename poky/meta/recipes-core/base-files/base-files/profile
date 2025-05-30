@@ -1,7 +1,7 @@
 # /etc/profile: system-wide .profile file for the Bourne shell (sh(1))
 # and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
 
-PATH="/usr/local/bin:/usr/bin:/bin"
+PATH="$PATH:/usr/local/bin:/usr/bin:/bin"
 [ "$TERM" ] || TERM="vt100"	# Basic terminal capab. For screen etc.
 
 # Add /sbin & co to $PATH for the root user

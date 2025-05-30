@@ -176,4 +176,41 @@ def get_file_depends(d):
         dep_files.append(os.path.abspath(fn))
     return " ".join(dep_files)
 
+def vardeps(*varnames):
+    """
+    Function decorator that can be used to instruct the bitbake dependency
+    parsing to add a dependency on the specified variables names
+
+    Example:
+
+        @bb.parse.vardeps("FOO", "BAR")
+        def my_function():
+            ...
+
+    """
+    def inner(f):
+        if not hasattr(f, "bb_vardeps"):
+            f.bb_vardeps = set()
+        f.bb_vardeps |= set(varnames)
+        return f
+    return inner
+
+def vardepsexclude(*varnames):
+    """
+    Function decorator that can be used to instruct the bitbake dependency
+    parsing to ignore dependencies on the specified variable names in the code
+
+    Example:
+
+        @bb.parse.vardepsexclude("FOO", "BAR")
+        def my_function():
+            ...
+    """
+    def inner(f):
+        if not hasattr(f, "bb_vardepsexclude"):
+            f.bb_vardepsexclude = set()
+        f.bb_vardepsexclude |= set(varnames)
+        return f
+    return inner
+
 from bb.parse.parse_py import __version__, ConfHandler, BBHandler

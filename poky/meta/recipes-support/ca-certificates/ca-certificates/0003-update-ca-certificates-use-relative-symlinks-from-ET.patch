@@ -1,4 +1,4 @@
-From 38d47c53749c6f16d5d7993410b256116e0ee0b8 Mon Sep 17 00:00:00 2001
+From a69933f96a8675369de702bdb55e57dc21f65e7f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andr=C3=A9=20Draszik?= <andre.draszik@jci.com>
 Date: Wed, 28 Mar 2018 16:45:05 +0100
 Subject: [PATCH] update-ca-certificates: use relative symlinks from
@@ -45,26 +45,26 @@ Signed-off-by: André Draszik <andre.draszik@jci.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/sbin/update-ca-certificates b/sbin/update-ca-certificates
-index f7d0dbf..97a589c 100755
+index 1e737b9..8510082 100755
 --- a/sbin/update-ca-certificates
 +++ b/sbin/update-ca-certificates
-@@ -29,6 +29,7 @@ CERTSDIR=$SYSROOT/usr/share/ca-certificates
- LOCALCERTSDIR=$SYSROOT/usr/local/share/ca-certificates
+@@ -30,6 +30,7 @@ LOCALCERTSDIR=/usr/local/share/ca-certificates
  CERTBUNDLE=ca-certificates.crt
- ETCCERTSDIR=$SYSROOT/etc/ssl/certs
+ ETCCERTSDIR=/etc/ssl/certs
+ HOOKSDIR=/etc/ca-certificates/update.d
 +FSROOT=../../../ # to get from $ETCCERTSDIR to the root of the file system
- HOOKSDIR=$SYSROOT/etc/ca-certificates/update.d
  
  while [ $# -gt 0 ];
-@@ -125,9 +126,10 @@ add() {
+ do
+@@ -100,9 +101,10 @@ add() {
    PEM="$ETCCERTSDIR/$(basename "$CERT" .crt | sed -e 's/ /_/g' \
                                                    -e 's/[()]/=/g' \
                                                    -e 's/,/_/g').pem"
--  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "${CERT##$SYSROOT}" ]
+-  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "$CERT" ]
 +  DST="$(echo ${CERT} | sed -e "s|^$SYSROOT||" -e "s|^/|$FSROOT|" )"
 +  if ! test -e "$PEM" || [ "$(readlink "$PEM")" != "${DST}" ]
    then
--    ln -sf "${CERT##$SYSROOT}" "$PEM"
+-    ln -sf "$CERT" "$PEM"
 +    ln -sf "${DST}" "$PEM"
      echo "+$PEM" >> "$ADDED"
    fi

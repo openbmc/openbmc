@@ -1,0 +1,31 @@
+From 4a07e8f22b4f224dca79767e5cb86a0de91498dc Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 17 May 2025 07:48:50 -0700
+Subject: [PATCH] ppc/fs2dt: Match function signatures
+
+The prototypes of function pointers is analysed and
+compiler finds the signature mismatches and complain about it.
+
+../kexec-tools-2.0.31/kexec/arch/ppc/fs2dt.c:338:44: error: incompatible function pointer types passing 'int (const void *, const void *)' to parameter of type 'int (*)(const struct dirent **, const struct dirent **)' [-Wincompatible-function-pointer-types]
+  338 |         numlist = scandir(pathname, &namelist, 0, comparefunc);
+      |                                                   ^~~~~~~~~~~
+
+Upstream-Status: Submitted [https://lore.kernel.org/kexec/20250517145852.2488183-1-raj.khem@gmail.com/T/#u]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kexec/arch/ppc/fs2dt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/kexec/arch/ppc/fs2dt.c b/kexec/arch/ppc/fs2dt.c
+index fed499b..4952bfc 100644
+--- a/kexec/arch/ppc/fs2dt.c
++++ b/kexec/arch/ppc/fs2dt.c
+@@ -292,7 +292,7 @@ static void putprops(char *fn, struct dirent **nlist, int numlist)
+  * Compare function used to sort the device-tree directories
+  * This function will be passed to scandir.
+  */
+-static int comparefunc(const void *dentry1, const void *dentry2)
++static int comparefunc(const struct dirent ** dentry1, const struct dirent **dentry2)
+ {
+ 	char *str1 = (*(struct dirent **)dentry1)->d_name;
+ 	char *str2 = (*(struct dirent **)dentry2)->d_name;

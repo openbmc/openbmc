@@ -1,0 +1,68 @@
+From 4a23e833e66896f40bb36c3c13b4a4bb1b79162f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 May 2021 17:32:13 -0700
+Subject: [PATCH] compiler-rt: Do not use backtrace APIs on non-glibc linux
+
+musl e.g. does not provide backtrace APIs
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ .../lib/gwp_asan/optional/backtrace_linux_libc.cpp  | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/compiler-rt/lib/gwp_asan/optional/backtrace_linux_libc.cpp b/compiler-rt/lib/gwp_asan/optional/backtrace_linux_libc.cpp
+index ea8e72be287d..0344074dd254 100644
+--- a/compiler-rt/lib/gwp_asan/optional/backtrace_linux_libc.cpp
++++ b/compiler-rt/lib/gwp_asan/optional/backtrace_linux_libc.cpp
+@@ -7,7 +7,9 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include <assert.h>
++#ifdef __GLIBC__
+ #include <execinfo.h>
++#endif
+ #include <stddef.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+@@ -21,8 +23,11 @@
+ namespace {
+ size_t Backtrace(uintptr_t *TraceBuffer, size_t Size) {
+   static_assert(sizeof(uintptr_t) == sizeof(void *), "uintptr_t is not void*");
+-
++#ifdef __GLIBC__
+   return backtrace(reinterpret_cast<void **>(TraceBuffer), Size);
++#else
++  return -1;
++#endif
+ }
+ 
+ // We don't need any custom handling for the Segv backtrace - the libc unwinder
+@@ -30,7 +35,11 @@ size_t Backtrace(uintptr_t *TraceBuffer, size_t Size) {
+ // to avoid the additional frame.
+ GWP_ASAN_ALWAYS_INLINE size_t SegvBacktrace(uintptr_t *TraceBuffer, size_t Size,
+                                             void * /*Context*/) {
++#ifdef __GLIBC__
+   return Backtrace(TraceBuffer, Size);
++#else
++  return -1;
++#endif
+ }
+ 
+ static void PrintBacktrace(uintptr_t *Trace, size_t TraceLength,
+@@ -40,6 +49,7 @@ static void PrintBacktrace(uintptr_t *Trace, size_t TraceLength,
+     return;
+   }
+ 
++#ifdef __GLIBC__
+   char **BacktraceSymbols =
+       backtrace_symbols(reinterpret_cast<void **>(Trace), TraceLength);
+ 
+@@ -53,6 +63,7 @@ static void PrintBacktrace(uintptr_t *Trace, size_t TraceLength,
+   Printf("\n");
+   if (BacktraceSymbols)
+     free(BacktraceSymbols);
++#endif
+ }
+ } // anonymous namespace
+ 

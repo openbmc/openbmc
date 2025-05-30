@@ -16,7 +16,6 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/watchdog/watchdog-${PV}.tar.gz \
            file://0001-shutdown-Do-not-guard-sys-quota.h-sys-swap.h-and-sys.patch \
 "
 
-SRC_URI[md5sum] = "1b4f51cabc64d1bee2fce7cdd626831f"
 SRC_URI[sha256sum] = "b8e7c070e1b72aee2663bdc13b5cc39f76c9232669cfbb1ac0adc7275a3b019d"
 
 # Can be dropped when the output next changes, avoids failures after

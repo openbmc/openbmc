@@ -1,0 +1,63 @@
+From d2360096db2da00121f4e653b39ca1f7eb2801eb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 10 May 2025 14:03:12 -0700
+Subject: [PATCH] compiler-rt: Exclude sync_fetch_and_* for any pre-ARMv6 targets
+
+Sometimes builds may happen where ABI is not indidated by host_triple
+e.g. on Yocto the compiler used is called arm-poky-linux-gnueabi-clang
+for all arm32 cross compilers, it passed the ABI flags on cmdline in
+addition. e.g.
+
+-march=armv5te -mfloat-abi=soft
+or
+-march=armv7-a -mfloat-abi=hard
+
+compiler-rt's makery tries to add arm to COMPILER_RT_SUPPORTED_ARCH
+deducing it from triple name.
+
+which ends up choosing `arm` as one of compiler-rt arch to build for.
+This arch is however using armv7+ defaults and then tried to build sync
+builtins using
+
+arm-poky-linux-gnueabi-clang -march=armv5te -mfloat-abi=soft ...
+
+Which does not compile correctly, in such cases it should simply
+remove the sync builtins from list of things to build similar to what
+is done when we use armv4t or armv5t
+
+set(armv4t_SOURCES ${arm_min_SOURCES})
+set(armv5te_SOURCES ${arm_min_SOURCES})
+
+This lets compiler-rt build for arm architectures without depending
+upong compiler triple, but instead of poking the compiler for what
+it is building for
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/139411]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ compiler-rt/lib/builtins/CMakeLists.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/compiler-rt/lib/builtins/CMakeLists.txt b/compiler-rt/lib/builtins/CMakeLists.txt
+index cb276311b290..53a3cd1dc81f 100644
+--- a/compiler-rt/lib/builtins/CMakeLists.txt
++++ b/compiler-rt/lib/builtins/CMakeLists.txt
+@@ -864,6 +864,18 @@ else ()
+       list(JOIN BUILTIN_CFLAGS " " CMAKE_REQUIRED_FLAGS)
+       set(CMAKE_REQUIRED_FLAGS "${TARGET_${arch}_CFLAGS} ${BUILTIN_CFLAGS_${arch}}")
+       message(STATUS "Performing additional configure checks with target flags: ${CMAKE_REQUIRED_FLAGS}")
++      # For ARM archs, exclude any sync builtins if dmb or mcr p15, #0, r0, c7, c10, #5
++      # is not supported
++      if (${arch} MATCHES "^(arm|armhf)$")
++        try_compile_only(COMPILER_RT_HAS_${arch}_SYNC
++                         SOURCE  "#if __ARM_ARCH < 6
++                                  #error DMB is only supported on ARMv6+ !
++                                  #endif
++                                  int main(void) { return 0; }")
++        if(NOT COMPILER_RT_HAS_${arch}_SYNC)
++          list(REMOVE_ITEM ${arch}_SOURCES ${arm_sync_SOURCES})
++        endif()
++      endif()
+       # For ARM archs, exclude any VFP builtins if VFP is not supported
+       if (${arch} MATCHES "^(arm|armhf|armv7|armv7s|armv7k|armv7m|armv7em|armv8m.main|armv8.1m.main)$")
+         string(REPLACE ";" " " _TARGET_${arch}_CFLAGS "${TARGET_${arch}_CFLAGS}")

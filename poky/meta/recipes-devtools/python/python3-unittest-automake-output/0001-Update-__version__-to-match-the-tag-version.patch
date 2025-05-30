@@ -1,0 +1,30 @@
+From 8da931c5e9e32a15091d517b28cdf2e2b5395f77 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 8 Apr 2025 15:55:42 +0800
+Subject: [PATCH] Update __version__ to match the tag version
+
+Update __version__ to 0.2 to match the current tag.
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+
+Upstream-Status: Backport
+[https://gitlab.com/rossburton/python-unittest-automake-output/-/commit/8da931c5e9e32a15091d517b28cdf2e2b5395f77]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/putao/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/putao/__init__.py b/src/putao/__init__.py
+index e8758de..00265e2 100644
+--- a/src/putao/__init__.py
++++ b/src/putao/__init__.py
+@@ -5,4 +5,4 @@
+ Tools to write automake-style test reports.
+ """
+ 
+-__version__ = "0.1"
++__version__ = "0.2"
+-- 
+2.34.1
+

@@ -1,4 +1,4 @@
-From 33f9c4e4f0a5c2af8ab12612c28ba218ae491587 Mon Sep 17 00:00:00 2001
+From a4f799209882107726f547a4637659068ae07476 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:10:06 +0400
 Subject: [PATCH] 64-bit multilib hack
@@ -38,7 +38,7 @@ Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
  6 files changed, 15 insertions(+), 42 deletions(-)
 
 diff --git a/gcc/config/aarch64/t-aarch64-linux b/gcc/config/aarch64/t-aarch64-linux
-index 3f7b786ecbb..a6c1c92fc7f 100644
+index 70e36b3299e..4267c32763c 100644
 --- a/gcc/config/aarch64/t-aarch64-linux
 +++ b/gcc/config/aarch64/t-aarch64-linux
 @@ -21,8 +21,8 @@
@@ -55,7 +55,7 @@ index 3f7b786ecbb..a6c1c92fc7f 100644
 -MULTILIB_OSDIRNAMES += mabi.ilp32=../libilp32$(call if_multiarch,:aarch64$(AARCH_BE)-linux-gnu_ilp32)
 +#MULTILIB_OSDIRNAMES += mabi.ilp32=../libilp32$(call if_multiarch,:aarch64$(AARCH_BE)-linux-gnu_ilp32)
 diff --git a/gcc/config/arc/t-multilib-linux b/gcc/config/arc/t-multilib-linux
-index 07bc77ba34a..f7e2e3919cf 100644
+index e72687260eb..f701fa9e201 100644
 --- a/gcc/config/arc/t-multilib-linux
 +++ b/gcc/config/arc/t-multilib-linux
 @@ -16,9 +16,9 @@
@@ -71,7 +71,7 @@ index 07bc77ba34a..f7e2e3919cf 100644
  # Aliases:
  MULTILIB_MATCHES += mcpu?arc700=mA7
 diff --git a/gcc/config/i386/t-linux64 b/gcc/config/i386/t-linux64
-index f9edc289e57..047d8e4aff9 100644
+index 64a4a20e64f..2666e731dd6 100644
 --- a/gcc/config/i386/t-linux64
 +++ b/gcc/config/i386/t-linux64
 @@ -32,7 +32,5 @@
@@ -85,7 +85,7 @@ index f9edc289e57..047d8e4aff9 100644
 +MULTILIB_DIRNAMES = . .
 +MULTILIB_OSDIRNAMES = ../$(shell basename $(base_libdir)) ../$(shell basename $(base_libdir))
 diff --git a/gcc/config/mips/t-linux64 b/gcc/config/mips/t-linux64
-index e4e2f5eaedb..c503974de37 100644
+index 34a84461ebb..431a6b5183f 100644
 --- a/gcc/config/mips/t-linux64
 +++ b/gcc/config/mips/t-linux64
 @@ -17,29 +17,5 @@
@@ -134,7 +134,7 @@ index a6f64f88d25..0e21db58f7d 100644
 -MULTIARCH_DIRNAME := $(call if_multiarch,$(firstword $(subst -, ,$(target)))-linux-gnu)
 +#MULTIARCH_DIRNAME := $(call if_multiarch,$(firstword $(subst -, ,$(target)))-linux-gnu)
 diff --git a/gcc/config/rs6000/t-linux64 b/gcc/config/rs6000/t-linux64
-index 248b5891e36..379689561a7 100644
+index f56b47c268e..c408c32d8f4 100644
 --- a/gcc/config/rs6000/t-linux64
 +++ b/gcc/config/rs6000/t-linux64
 @@ -26,10 +26,9 @@

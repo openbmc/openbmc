@@ -17,3 +17,5 @@ FILES:${PN} = " \
     ${libdir}/libxcvt.so.0* \
     ${bindir}/cvt \
 "
+
+BBCLASSEXTEND = "native"

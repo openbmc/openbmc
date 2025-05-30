@@ -1,0 +1,32 @@
+ARG ARG_FROM=opensuse/leap:15.4 # default value to avoid warning
+FROM $ARG_FROM
+
+ARG DOCS=opensuse_docs.sh
+ARG DOCS_PDF=opensuse_docs_pdf.sh
+ARG PIP3=pip3_docs.sh
+
+# relative to the location of the dockerfile
+COPY --chmod=777 ${DOCS} /temp/host_packages_docs.sh
+COPY --chmod=777 ${DOCS_PDF} /temp/host_packages_docs_pdf.sh
+COPY --chmod=777 ${PIP3} /temp/pip3_docs.sh
+
+# Zypper doesn't have environment variables to specify whether to run in
+# non-interactive mode like Debian does with DEBIAN_FRONTEND and piping yes to
+# the scripts doesn't need to be enough as well, so let's force all zypper calls
+# to be non-interactive by adding the appropriate flag in the scripts.
+RUN for script in /temp/*.sh; do \
+	sed -i 's/zypper/zypper --non-interactive/' $script; \
+    done
+
+RUN zypper update -y \
+ && zypper install -y sudo \
+ && yes | /temp/host_packages_docs.sh \
+ && yes | /temp/host_packages_docs_pdf.sh \
+ && yes | /temp/pip3_docs.sh \
+ && zypper clean --all \
+ && rm -rf /temp
+
+RUN git config --global --add safe.directory /docs
+
+ENTRYPOINT ["/usr/bin/env", "make", "-C", "documentation/"]
+CMD ["publish"]

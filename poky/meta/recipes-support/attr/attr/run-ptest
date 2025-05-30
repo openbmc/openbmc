@@ -1,10 +1,30 @@
 #!/bin/sh
 
-set +e
-make test-suite.log
-exitcode=$?
-if [ $exitcode -ne 0 -a -e test-suite.log ]; then
-    cat test-suite.log
-fi
-exit $exitcode
+failed=0
+all=0
 
+for f in *.test; do
+    ./run $f
+    case "$?" in
+        0)
+            echo "PASS: $f"
+            all=$((all + 1))
+            ;;
+        77)
+            echo "SKIP: $f"
+            ;;
+        *)
+            echo "FAIL: $f"
+            failed=$((failed + 1))
+            all=$((all + 1))
+            ;;
+    esac
+done
+
+if [ "$failed" -eq 0 ] ; then
+    echo "All $all tests passed"
+    exit 0
+else
+    echo "$failed of $all tests failed"
+    exit 1
+fi

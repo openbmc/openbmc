@@ -1,4 +1,4 @@
-From 46987c9092d52ee47071be563f48ee80a3c4f71f Mon Sep 17 00:00:00 2001
+From 62e25edd60d45eaec331a3273880f6ff3248ef62 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 17 Aug 2023 09:01:40 -0700
 Subject: [PATCH] gcc testsuite tweaks for mips/OE
@@ -33,13 +33,13 @@ discussion. Need to investigate why qemu-user passes the 'bad' instructions']
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- gcc/testsuite/gcc.target/mips/mips.exp | 16 +++++++++
+ gcc/testsuite/gcc.target/mips/mips.exp | 16 ++++++++++
  gcc/testsuite/lib/gcc-dg.exp           | 11 +++++++
- gcc/testsuite/lib/target-supports.exp  | 45 ++++++++------------------
- 3 files changed, 41 insertions(+), 31 deletions(-)
+ gcc/testsuite/lib/target-supports.exp  | 44 ++++++++------------------
+ 3 files changed, 40 insertions(+), 31 deletions(-)
 
 diff --git a/gcc/testsuite/gcc.target/mips/mips.exp b/gcc/testsuite/gcc.target/mips/mips.exp
-index e028bc93b40..b54a40d6509 100644
+index 82d418a7cd4..46f7bf4ef92 100644
 --- a/gcc/testsuite/gcc.target/mips/mips.exp
 +++ b/gcc/testsuite/gcc.target/mips/mips.exp
 @@ -711,7 +711,23 @@ proc mips_first_unsupported_option { upstatus } {
@@ -67,10 +67,10 @@ index e028bc93b40..b54a40d6509 100644
  	    regsub -all "\n" $code "\\n\\\n" asm
  	    # Use check_runtime from target-supports.exp, which caches
 diff --git a/gcc/testsuite/lib/gcc-dg.exp b/gcc/testsuite/lib/gcc-dg.exp
-index 228c21d1207..d3b88e0419e 100644
+index 6dd8fa3fce9..95672008219 100644
 --- a/gcc/testsuite/lib/gcc-dg.exp
 +++ b/gcc/testsuite/lib/gcc-dg.exp
-@@ -232,9 +232,20 @@ proc schedule-cleanups { opts } {
+@@ -233,9 +233,20 @@ proc schedule-cleanups { opts } {
  
  proc gcc-dg-test-1 { target_compile prog do_what extra_tool_flags } {
      # Set up the compiler flags, based on what we're going to do.
@@ -92,10 +92,10 @@ index 228c21d1207..d3b88e0419e 100644
  	"preprocess" {
  	    set compile_type "preprocess"
 diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
-index d8b5a06a422..f66f5fea58e 100644
+index a62f459ad7e..6886cfeee49 100644
 --- a/gcc/testsuite/lib/target-supports.exp
 +++ b/gcc/testsuite/lib/target-supports.exp
-@@ -2483,14 +2483,7 @@ proc check_mips_loongson_mmi_hw_available { } {
+@@ -2949,14 +2949,7 @@ proc check_mips_loongson_mmi_hw_available { } {
  	if { !([istarget mips*-*-*]) } {
  	    expr 0
  	} else {
@@ -111,7 +111,7 @@ index d8b5a06a422..f66f5fea58e 100644
  	}
      }]
  }
-@@ -2504,29 +2497,7 @@ proc check_mips_msa_hw_available { } {
+@@ -2970,29 +2963,7 @@ proc check_mips_msa_hw_available { } {
      if { !([istarget mips*-*-*]) } {
        expr 0
      } else {
@@ -142,7 +142,7 @@ index d8b5a06a422..f66f5fea58e 100644
      }
    }]
  }
-@@ -9900,6 +9871,7 @@ proc is-effective-target-keyword { arg } {
+@@ -10354,6 +10325,7 @@ proc is-effective-target-keyword { arg } {
  
  proc et-dg-runtest { runtest testcases flags default-extra-flags } {
      global dg-do-what-default
@@ -150,7 +150,7 @@ index d8b5a06a422..f66f5fea58e 100644
      global EFFECTIVE_TARGETS
      global et_index
  
-@@ -9907,6 +9879,7 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+@@ -10361,6 +10333,7 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
  	foreach target $EFFECTIVE_TARGETS {
  	    set target_flags $flags
  	    set dg-do-what-default compile
@@ -158,7 +158,7 @@ index d8b5a06a422..f66f5fea58e 100644
  	    set et_index [lsearch -exact $EFFECTIVE_TARGETS $target]
  	    if { [info procs add_options_for_${target}] != [list] } {
  		set target_flags [add_options_for_${target} "$flags"]
-@@ -9914,8 +9887,10 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+@@ -10368,8 +10341,10 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
  	    if { [info procs check_effective_target_${target}_runtime]
  		 != [list] && [check_effective_target_${target}_runtime] } {
  		set dg-do-what-default run
@@ -169,67 +169,59 @@ index d8b5a06a422..f66f5fea58e 100644
  	}
      } else {
  	set et_index 0
-@@ -11620,6 +11595,7 @@ proc check_effective_target_sigsetjmp {} {
+@@ -12155,6 +12130,7 @@ proc check_effective_target_sigsetjmp {} {
  proc check_vect_support_and_set_flags { } {
      global DEFAULT_VECTCFLAGS
      global dg-do-what-default
 +    global do-what-limit
      global EFFECTIVE_TARGETS
  
-     if  [istarget powerpc-*paired*]  {
-@@ -11628,6 +11604,7 @@ proc check_vect_support_and_set_flags { } {
-             set dg-do-what-default run
-         } else {
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
-     } elseif [istarget powerpc*-*-*] {
-         # Skip targets not supporting -maltivec.
-@@ -11658,6 +11635,7 @@ proc check_vect_support_and_set_flags { } {
+     if [istarget powerpc*-*-*] {
+@@ -12186,6 +12162,7 @@ proc check_vect_support_and_set_flags { } {
  		set DEFAULT_VECTCFLAGS [linsert $DEFAULT_VECTCFLAGS 0 "-mcpu=970"]
-             }
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
-     } elseif { [istarget i?86-*-*] || [istarget x86_64-*-*] } {
-         lappend DEFAULT_VECTCFLAGS "-msse2"
-@@ -11665,6 +11643,7 @@ proc check_vect_support_and_set_flags { } {
-             set dg-do-what-default run
-         } else {
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
+ 	    }
+ 	    set dg-do-what-default compile
++        set do-what-limit link
+ 	}
+     } elseif { [check_effective_target_x86] } {
+ 	lappend DEFAULT_VECTCFLAGS "-msse2"
+@@ -12193,6 +12170,7 @@ proc check_vect_support_and_set_flags { } {
+ 	    set dg-do-what-default run
+ 	} else {
+ 	    set dg-do-what-default compile
++        set do-what-limit link
+ 	}
      } elseif { [istarget mips*-*-*]
  	       && [check_effective_target_nomips16] } {
-@@ -11684,6 +11663,7 @@ proc check_vect_support_and_set_flags { } {
-             set dg-do-what-default run
-         } else {
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
+@@ -12212,6 +12190,7 @@ proc check_vect_support_and_set_flags { } {
+ 	    set dg-do-what-default run
+ 	} else {
+ 	    set dg-do-what-default compile
++        set do-what-limit link
+ 	}
      } elseif [istarget alpha*-*-*] {
-         # Alpha's vectorization capabilities are extremely limited.
-@@ -11697,6 +11677,7 @@ proc check_vect_support_and_set_flags { } {
-             set dg-do-what-default run
-         } else {
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
+ 	# Alpha's vectorization capabilities are extremely limited.
+@@ -12225,6 +12204,7 @@ proc check_vect_support_and_set_flags { } {
+ 	    set dg-do-what-default run
+ 	} else {
+ 	    set dg-do-what-default compile
++        set do-what-limit link
+ 	}
      } elseif [istarget ia64-*-*] {
-         set dg-do-what-default run
-@@ -11710,6 +11691,7 @@ proc check_vect_support_and_set_flags { } {
-             set dg-do-what-default run
-         } else {
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
+ 	set dg-do-what-default run
+@@ -12238,6 +12218,7 @@ proc check_vect_support_and_set_flags { } {
+ 	    set dg-do-what-default run
+ 	} else {
+ 	    set dg-do-what-default compile
++        set do-what-limit link
+ 	}
      } elseif [istarget aarch64*-*-*] {
-         set dg-do-what-default run
-@@ -11734,6 +11716,7 @@ proc check_vect_support_and_set_flags { } {
-         } else {
+ 	set dg-do-what-default run
+@@ -12262,6 +12243,7 @@ proc check_vect_support_and_set_flags { } {
+ 	} else {
  	    lappend DEFAULT_VECTCFLAGS "-march=z14" "-mzarch"
-             set dg-do-what-default compile
-+            set do-what-limit link
-         }
+ 	    set dg-do-what-default compile
++        set do-what-limit link
+ 	}
      } elseif [istarget amdgcn-*-*] {
-         set dg-do-what-default run
+ 	set dg-do-what-default run

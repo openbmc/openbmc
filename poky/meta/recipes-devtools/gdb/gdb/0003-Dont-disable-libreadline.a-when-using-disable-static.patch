@@ -1,4 +1,4 @@
-From c4102e4fd74804b053c437352ef92c64c8b1fdbf Mon Sep 17 00:00:00 2001
+From 2fa91dec5f0ec5663861ca53bde8951e48557bb3 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Apr 2016 15:25:03 -0700
 Subject: [PATCH] Dont disable libreadline.a when using --disable-static

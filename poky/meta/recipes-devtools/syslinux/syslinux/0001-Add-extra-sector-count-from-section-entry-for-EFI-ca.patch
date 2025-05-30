@@ -1,0 +1,104 @@
+From 79a26046d178ae132cb88ba75de7141bd169ff16 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 26 Apr 2025 10:45:08 +0800
+Subject: [PATCH] Add extra sector count from section entry for EFI catalogue
+
+According to page 11: `Figure 5 - Section Entry' in El Torito Bootable
+CD-ROM Format Specification [1]. The sector count tooks 2 byte which
+means max sector count is 0xffff (65535), for 512-byte sector, the
+size of bootable image is no more than 32MB (65536 * 512 / 1024 / 1024)
+
+If the size of efi.img > 32MB, the partition table will be truncated
+in ISO, which caused UEFI system or grub-efi read efi.img broken
+occasionally.
+
+This patch extend efi_count, mac_count and count to 4 byte int, if
+Yocto defines `Selection criteria type = 2', add extra sector count
+to original sector count as total count; for other situation, still use
+original sector count as usual
+
+[1]https://pdos.csail.mit.edu/6.828/2017/readings/boot-cdrom.pdf
+
+Upstream-Status: Inappropriate [Yocto specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ utils/isohybrid.c | 48 ++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 43 insertions(+), 5 deletions(-)
+
+diff --git a/utils/isohybrid.c b/utils/isohybrid.c
+index a9e38d4..1bbfd45 100644
+--- a/utils/isohybrid.c
++++ b/utils/isohybrid.c
+@@ -76,7 +76,7 @@ uint32_t de_lba = 0;
+ uint16_t de_seg = 0, de_count = 0, de_mbz2 = 0;
+ uint8_t de_boot = 0, de_media = 0, de_sys = 0, de_mbz1 = 0;
+ uint32_t efi_lba = 0, mac_lba = 0;
+-uint16_t efi_count = 0, mac_count = 0;
++uint32_t efi_count = 0, mac_count = 0;
+ uint8_t efi_boot = 0, efi_media = 0, efi_sys = 0;
+ 
+ int apm_parts = 3;
+@@ -552,17 +552,55 @@ read_efi_section(const uint8_t *buf)
+ }
+ 
+ int
+-read_efi_catalogue(const uint8_t *buf, uint16_t *count, uint32_t *lba)
++read_efi_catalogue(const uint8_t *buf, uint32_t *count, uint32_t *lba)
+ {
++    uint16_t _count = 0;
++
++    // Jump to offset 6 byte
+     buf += 6;
+ 
+-    memcpy(count, buf, 2);
+-    *count = lendian_short(*count);
++    *count = 0;
++
++    // Offset     : 6-7 byte
++    // Type       : Word
++    // Description: Sector Count, the number of virtual/emulated sectors
++    // the system will store at Load Segment during the initial boot procedure
++    memcpy(&_count, buf, 2);
++    _count = lendian_short(_count);
+     buf += 2;
+ 
++    // Offset     : 8-0B byte
++    // Type       : D Word
++    // Description: Load RBA. This is the start address of the virtual disk. CD’s use
++    // Relative/Logical block addressing.
+     memcpy(lba, buf, 4);
+     *lba = lendian_int(*lba);
+-    buf += 6;
++    buf += 4;
++
++    // Offset     : 0C byte
++    // Type       : Byte
++    // Description: Selection criteria type. This defines a vendor unique format
++    // for bytes 0D-1F.
++    // The following formats have currently been assigned:
++    // 0 - No selection criteria
++    // 1 - Language and Version Information (IBM)
++    // 2 - Save extra sector count to vendor unique selection criteria (Yocto)
++    // 3-FF - Reserved
++    unsigned char slection_criteria_type = *buf;
++    buf += 1;
++
++    // Offset     : 0D-0E-0F-10 byte
++    // Type       : D Word
++    // Description: Selection criteria type = 2, reserved by Yocto,
++    // save extra sector count to vendor unique selection criteria
++    if (slection_criteria_type == 2) {
++        memcpy(count, buf, 4);
++        *count = lendian_int(*count);
++        buf += 4;
++    }
++
++    // total count = sector count + extra sector count
++    *count += _count;
+ 
+     return 0;
+ }
+-- 
+2.34.1
+

@@ -6,7 +6,7 @@ Subject: [PATCH] tcl: fix race in interp.test
 The interp-36.7 patch has race conditions and is missing cleanup.  This patch by
 a Tcl maintainer should improve matters.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [tcl 8.x is obsolete; upstream submission should be for 9.x patches]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  tests/interp.test | 7 ++++---

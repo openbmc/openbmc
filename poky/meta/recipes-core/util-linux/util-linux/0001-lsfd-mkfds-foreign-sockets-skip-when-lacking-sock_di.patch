@@ -1,0 +1,36 @@
+From b3a1d92a9078fada31b2cf64b802edd616026766 Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Mon, 26 May 2025 15:24:16 +0800
+Subject: [PATCH] lsfd/mkfds-foreign-sockets: skip when lacking sock_diag
+ ability
+
+The ENDPOINTS will need sock_diag ability. The kernel might not
+enable related configs. Check and skip in case of lacking such ability.
+
+Fixes: https://github.com/util-linux/util-linux/issues/3590
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+
+Upstream-Status: Submitted [https://github.com/util-linux/util-linux/pull/3591]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ tests/ts/lsfd/mkfds-foreign-sockets | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/ts/lsfd/mkfds-foreign-sockets b/tests/ts/lsfd/mkfds-foreign-sockets
+index cd94da799..76138a7a6 100755
+--- a/tests/ts/lsfd/mkfds-foreign-sockets
++++ b/tests/ts/lsfd/mkfds-foreign-sockets
+@@ -30,6 +30,8 @@ ts_skip_nonroot
+ ts_skip_qemu_user
+ ts_cd "$TS_OUTDIR"
+ 
++lsfd_check_sockdiag "unix"
++
+ declare -A tcase
+ tcase[NAME]="state=connected"
+ tcase[SOCK.NETNS]=
+-- 
+2.34.1
+

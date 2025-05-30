@@ -1,4 +1,4 @@
-From aa86de05cd6a75222b38e0789ac96fe00f705430 Mon Sep 17 00:00:00 2001
+From 9e3b15adf86147fe581cd2159cb99708abe26158 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 10 Nov 2022 12:31:22 -0800
 Subject: [PATCH] restripe.c: Use _FILE_OFFSET_BITS to enable largefile support
@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  3 files changed, 22 insertions(+), 15 deletions(-)
 
 diff --git a/raid6check.c b/raid6check.c
-index 9947776..8e7f142 100644
+index 99477761..8e7f1421 100644
 --- a/raid6check.c
 +++ b/raid6check.c
 @@ -22,6 +22,9 @@
@@ -60,7 +60,7 @@ index 9947776..8e7f142 100644
  			if (seek_res < 0) {
  				fprintf(stderr, "lseek to source %d failed\n", i);
 diff --git a/restripe.c b/restripe.c
-index a7a7229..1c03577 100644
+index 5e126eb7..af76c634 100644
 --- a/restripe.c
 +++ b/restripe.c
 @@ -22,6 +22,9 @@
@@ -71,9 +71,9 @@ index a7a7229..1c03577 100644
 +#define _FILE_OFFSET_BITS 64
 +
  #include "mdadm.h"
- #include <stdint.h>
+ #include "xmalloc.h"
  
-@@ -581,7 +584,7 @@ int save_stripes(int *source, unsigned long long *offsets,
+@@ -583,7 +586,7 @@ int save_stripes(int *source, unsigned long long *offsets,
  				       raid_disks, level, layout);
  			if (dnum < 0) abort();
  			if (source[dnum] < 0 ||
@@ -82,7 +82,7 @@ index a7a7229..1c03577 100644
  				    offsets[dnum] + offset, 0) < 0 ||
  			    read(source[dnum], buf+disk * chunk_size,
  				 chunk_size) != chunk_size) {
-@@ -754,8 +757,8 @@ int restore_stripes(int *dest, unsigned long long *offsets,
+@@ -756,8 +759,8 @@ int restore_stripes(int *dest, unsigned long long *offsets,
  					   raid_disks, level, layout);
  			if (src_buf == NULL) {
  				/* read from file */
@@ -93,7 +93,7 @@ index a7a7229..1c03577 100644
  					rv = -1;
  					goto abort;
  				}
-@@ -816,7 +819,7 @@ int restore_stripes(int *dest, unsigned long long *offsets,
+@@ -818,7 +821,7 @@ int restore_stripes(int *dest, unsigned long long *offsets,
  		}
  		for (i=0; i < raid_disks ; i++)
  			if (dest[i] >= 0) {
@@ -102,7 +102,7 @@ index a7a7229..1c03577 100644
  					 offsets[i]+offset, 0) < 0) {
  					rv = -1;
  					goto abort;
-@@ -866,7 +869,7 @@ int test_stripes(int *source, unsigned long long *offsets,
+@@ -868,7 +871,7 @@ int test_stripes(int *source, unsigned long long *offsets,
  		int disk;
  
  		for (i = 0 ; i < raid_disks ; i++) {
@@ -112,7 +112,7 @@ index a7a7229..1c03577 100644
  			     chunk_size)) {
  				free(q);
 diff --git a/swap_super.c b/swap_super.c
-index b6db574..18c89e2 100644
+index b6db5743..18c89e2b 100644
 --- a/swap_super.c
 +++ b/swap_super.c
 @@ -1,3 +1,6 @@
