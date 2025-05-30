@@ -19,11 +19,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
 
-# Monitor gpio presence status
-OBMC_IMAGE_EXTRA_INSTALL:append = " \
-    phosphor-gpio-monitor-presence \
-"
-
 # Enable for debug card function
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-ipmi-ipmb \
