@@ -40,7 +40,9 @@ BINCONFIG = "${bindir}/sdl-config"
 inherit autotools lib_package binconfig-disabled pkgconfig
 
 CVE_PRODUCT = "simple_directmedia_layer sdl"
-
+# GCC15/C23 results in following errors
+# ../SDL-1.2.15/src/video/Xext/XME/xme.c:218:5: error: initialization of 'int (*)(Display *, XExtCodes *)' from incompatible pointer type 'int (*)(void)' [-Wincompatible-pointer-types]
+CFLAGS += "-std=c17"
 EXTRA_OECONF = "--disable-static --enable-cdrom --enable-threads --enable-timers \
                 --enable-file --disable-oss --disable-esd --disable-arts \
                 --disable-diskaudio --disable-nas \

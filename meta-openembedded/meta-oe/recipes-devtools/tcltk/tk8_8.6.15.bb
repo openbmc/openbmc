@@ -39,6 +39,7 @@ CFLAGS += "-I${STAGING_INCDIR}/tcl${VER}"
 inherit autotools features_check pkgconfig
 
 AUTOTOOLS_SCRIPT_PATH = "${S}/unix"
+EXTRA_AUTORECONF += "--exclude=aclocal"
 
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
@@ -50,7 +51,7 @@ EXTRA_OECONF = "\
     --libdir=${libdir} \
 "
 
-export TK_LIBRARY='${libdir}/tk${VER}'
+export TK_LIBRARY = '${libdir}/tk${VER}'
 
 do_install:append() {
     ln -sf libtk${VER}.so ${D}${libdir}/libtk${VER}.so.0

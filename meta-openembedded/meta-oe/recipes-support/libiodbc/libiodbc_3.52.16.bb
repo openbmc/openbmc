@@ -31,3 +31,9 @@ EXTRA_OECONF += " --prefix=/usr/local \
 
 inherit multilib_script
 MULTILIB_SCRIPTS = "${PN}:${bindir}/iodbc-config"
+
+# avoid http://errors.yoctoproject.org/Errors/Details/852861/
+CFLAGS += "-std=gnu17"
+# http://errors.yoctoproject.org/Errors/Details/853276/
+# libiodbc-3.52.16/iodbcinst/unicode.c:1565:16: error: initialization of 'ucs4_t *' {aka 'unsigned int *'} from incompatible pointer type 'wchar_t *' {aka 'long int *'} [-Wincompatible-pointer-types]
+CFLAGS += "-Wno-error=incompatible-pointer-types"

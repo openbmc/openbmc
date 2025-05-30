@@ -1,5 +1,5 @@
 SUMMARY = "Fast and Lightweight HTTP Server for Linux"
-HOMEPAGE = "http://monkey-project.com"
+HOMEPAGE = "https://github.com/monkey/monkey/issues/414"
 BUGTRACKER = "https://github.com/monkey/monkey/issues"
 
 LICENSE = "Apache-2.0"

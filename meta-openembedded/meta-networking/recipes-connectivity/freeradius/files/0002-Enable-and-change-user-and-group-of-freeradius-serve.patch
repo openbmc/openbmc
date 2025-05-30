@@ -1,4 +1,4 @@
-From 2a74c10836c0d2d19248ca40d113936f4a56b039 Mon Sep 17 00:00:00 2001
+From 77e9dbe0d0d175deead427793192ffb4ffad2825 Mon Sep 17 00:00:00 2001
 From: "Roy.Li" <rongqing.li@windriver.com>
 Date: Sun, 8 Jan 2023 22:47:11 +0800
 Subject: [PATCH] Enable and change user and group of freeradius server to
@@ -13,10 +13,10 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/raddb/radiusd.conf.in b/raddb/radiusd.conf.in
-index 154b50d610..4594d6d2d2 100644
+index 376892e151..63c49a224c 100644
 --- a/raddb/radiusd.conf.in
 +++ b/raddb/radiusd.conf.in
-@@ -557,8 +557,8 @@ security {
+@@ -562,8 +562,8 @@ security {
  	#  member.  This can allow for some finer-grained access
  	#  controls.
  	#

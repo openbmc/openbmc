@@ -20,9 +20,9 @@ def repo_shortname(url):
             .replace('*', '.'))
 
 repositories = (
-    "https://git.yoctoproject.org/git/poky",
+    "https://git.yoctoproject.org/poky",
     "https://git.openembedded.org/meta-openembedded",
-    "https://git.yoctoproject.org/git/meta-virtualization",
+    "https://git.yoctoproject.org/meta-virtualization",
     "https://github.com/kraj/meta-clang",
 )
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         if repodir.exists():
             try:
                 print("Updating %s..." % repo)
-                subprocess.run(["git", "-C", repodir, "-c", "gc.autoDetach=false", "fetch"], check=True)
+                subprocess.run(["git", "-C", repodir, "-c", "gc.autoDetach=false", "fetch", repo], check=True)
             except subprocess.CalledProcessError as e:
                 print(e)
                 failed = True

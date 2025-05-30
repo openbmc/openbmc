@@ -38,7 +38,7 @@ SYSTEMD_SERVICE:${PN} = "upower.service"
 # don't start on boot by default - dbus does that on demand
 SYSTEMD_AUTO_ENABLE = "disable"
 
-RDEPENDS:${PN} += "dbus"
+RDEPENDS:${PN} += "${VIRTUAL-RUNTIME_dbus}"
 RRECOMMENDS:${PN} += "pm-utils"
 FILES:${PN} += " \
     ${datadir}/dbus-1/ \

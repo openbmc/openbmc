@@ -6,4 +6,5 @@ postgres:x:28:
 zabbix:x:605:
 mail:x:606:
 influxdb:x:622:
+gpio:x:624:
 nogroup:x:65534:

@@ -1,0 +1,53 @@
+From 6faf90773a7327e54342a5d3caee151623b5caf0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?G=C3=BCnter=20Obiltschnig?= <guenter.obiltschnig@appinf.com>
+Date: Fri, 27 Sep 2024 08:53:18 +0200
+Subject: [PATCH] =?UTF-8?q?fix(Foundation):=20Build=20error=20with=20GCC-1?=
+ =?UTF-8?q?5=20(class=20Poco::PriorityDelegate<TObj,=20void,=20true>?=
+ =?UTF-8?q?=E2=80=99=20has=20no=20member=20named=20=E2=80=98=5FpTarget?=
+ =?UTF-8?q?=E2=80=99)=20(#4695)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Backport [6faf907 fix(Foundation): Build error with GCC-15 (class Poco::PriorityDelegate<TObj, void, true>’ has no member named ‘_pTarget’) (#4695)]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ Foundation/include/Poco/PriorityDelegate.h | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/Foundation/include/Poco/PriorityDelegate.h b/Foundation/include/Poco/PriorityDelegate.h
+index 4cd664aab..cac9cf25e 100644
+--- a/Foundation/include/Poco/PriorityDelegate.h
++++ b/Foundation/include/Poco/PriorityDelegate.h
+@@ -52,7 +52,6 @@ public:
+ 	{
+ 		if (&delegate != this)
+ 		{
+-			this->_pTarget        = delegate._pTarget;
+ 			this->_receiverObject = delegate._receiverObject;
+ 			this->_receiverMethod = delegate._receiverMethod;
+ 			this->_priority       = delegate._priority;
+@@ -126,7 +125,6 @@ public:
+ 	{
+ 		if (&delegate != this)
+ 		{
+-			this->_pTarget        = delegate._pTarget;
+ 			this->_receiverObject = delegate._receiverObject;
+ 			this->_receiverMethod = delegate._receiverMethod;
+ 			this->_priority       = delegate._priority;
+@@ -200,7 +198,6 @@ public:
+ 	{
+ 		if (&delegate != this)
+ 		{
+-			this->_pTarget        = delegate._pTarget;
+ 			this->_receiverObject = delegate._receiverObject;
+ 			this->_receiverMethod = delegate._receiverMethod;
+ 			this->_priority       = delegate._priority;
+@@ -274,7 +271,6 @@ public:
+ 	{
+ 		if (&delegate != this)
+ 		{
+-			this->_pTarget        = delegate._pTarget;
+ 			this->_receiverObject = delegate._receiverObject;
+ 			this->_receiverMethod = delegate._receiverMethod;
+ 			this->_priority       = delegate._priority;

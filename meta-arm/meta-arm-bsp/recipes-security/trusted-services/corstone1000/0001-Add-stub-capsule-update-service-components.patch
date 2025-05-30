@@ -1,7 +1,7 @@
-From 1ba2a22575c1b73b5ab09e040a00f370eca4b758 Mon Sep 17 00:00:00 2001
+From fd171007b073a4cff7c3deabfdff233c0a9ed507 Mon Sep 17 00:00:00 2001
 From: Julian Hall <julian.hall@arm.com>
 Date: Tue, 12 Oct 2021 15:45:41 +0100
-Subject: [PATCH 1/8] Add stub capsule update service components
+Subject: [PATCH 01/12] Add stub capsule update service components
 
 To facilitate development of a capsule update service provider,
 stub components are added to provide a starting point for an
@@ -280,13 +280,13 @@ index 000000000..1d412eb23
 +	"${CMAKE_CURRENT_LIST_DIR}/capsule_update_provider.c"
 +	)
 diff --git a/deployments/se-proxy/infra/corstone1000/infra.cmake b/deployments/se-proxy/infra/corstone1000/infra.cmake
-index a52a1b711..4658c9662 100644
+index 3830f9d61..27af8a333 100644
 --- a/deployments/se-proxy/infra/corstone1000/infra.cmake
 +++ b/deployments/se-proxy/infra/corstone1000/infra.cmake
-@@ -21,6 +21,7 @@ add_components(TARGET "se-proxy"
- 		"components/service/attestation/key_mngr/local"
- 		"components/service/attestation/reporter/psa_ipc"
- 		"components/service/crypto/backend/psa_ipc"
+@@ -27,6 +27,7 @@ add_components(TARGET "se-proxy"
+ 		"components/service/fwu/provider/serializer"
+ 		"components/service/fwu/psa_fwu_m/agent"
+ 		"components/service/fwu/psa_fwu_m/interface/stub"
 +		"components/service/capsule_update/provider"
  		"components/service/secure_storage/backend/secure_storage_ipc"
  )

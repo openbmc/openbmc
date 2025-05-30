@@ -1,0 +1,31 @@
+From 99d7788bab614ff5a451f09204139b4cae40be3e Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Tue, 4 Mar 2025 13:30:48 +0000
+Subject: [PATCH] pyproject.toml: Support newer versions
+
+Support newer versions when building through bitbake.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pyproject.toml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index f8e54eb03..e6242f042 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,9 +1,9 @@
+ 
+ [build-system]
+ requires = [
+-    "hatchling==1.26.1",
+-    "hatch-vcs==0.4.0",
+-    "hatch-fancy-pypi-readme==24.1.0"
++    "hatchling>=1.26.1",
++    "hatch-vcs>=0.4.0",
++    "hatch-fancy-pypi-readme>=24.1.0"
+ ]
+ build-backend = "hatchling.build"
+ 

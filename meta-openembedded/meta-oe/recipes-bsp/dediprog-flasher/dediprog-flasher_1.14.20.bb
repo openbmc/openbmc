@@ -12,18 +12,28 @@ SRC_URI = " \
     file://0002-Makefile-add-conditional-stripping.patch \
     "
 
-EXTRA_OEMAKE = "NOSTRIP=1"
+EXTRA_OEMAKE = "NOSTRIP=1 DESTDIR=${D} PREFIX=${prefix}"
 
 PV = "1.0+${SRCPV}"
 
 S = "${WORKDIR}/git"
 
-do_install () {
-    oe_runmake DESTDIR=${D} PREFIX=/usr install
+do_install() {
+    oe_runmake install
+}
+
+do_install:append:class-nativesdk() {
+    # QA override: omit packaging dediprog's udev rule under /etc/udev.
+    # The file resides outside the nativesdk ${prefix} and must not pollute the
+    # host environment.
+    rm -rf ${D}/etc
 }
 
 FILES:${PN} += " \
+    ${bindir} \
     ${datadir}/DediProg \
 "
 
 inherit pkgconfig
+
+BBCLASSEXTEND += " native nativesdk"

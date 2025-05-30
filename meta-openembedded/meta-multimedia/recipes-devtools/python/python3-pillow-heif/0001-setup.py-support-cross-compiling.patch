@@ -1,0 +1,56 @@
+From 98e6831754712221ce030ce8b27e100a3926c543 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 5 May 2025 16:08:37 +0000
+Subject: [PATCH] setup.py: support cross compiling
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ setup.py | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index 68945e4..67566e8 100644
+--- a/setup.py
++++ b/setup.py
+@@ -125,12 +125,12 @@ class PillowHeifBuildExt(build_ext):
+                     self._add_directory(library_dirs, match.group(1))
+ 
+         # include, rpath, if set as environment variables
+-        for k in ("C_INCLUDE_PATH", "CPATH", "INCLUDE"):
++        for k in ("C_INCLUDE_PATH", "CPATH", "INCLUDE", "STAGING_INCDIR"):
+             if k in os.environ:
+                 for d in os.environ[k].split(os.path.pathsep):
+                     self._add_directory(include_dirs, d)
+ 
+-        for k in ("LD_RUN_PATH", "LIBRARY_PATH", "LIB"):
++        for k in ("LD_RUN_PATH", "LIBRARY_PATH", "LIB", "STAGING_LIBDIR"):
+             if k in os.environ:
+                 for d in os.environ[k].split(os.path.pathsep):
+                     self._add_directory(library_dirs, d)
+@@ -199,12 +199,15 @@ class PillowHeifBuildExt(build_ext):
+             self._update_extension("_pillow_heif", ["heif"], extra_compile_args=["-O3", "-Werror"])
+         else:  # let's assume it's some kind of linux
+             # this old code waiting for refactoring, when time comes.
+-            self._add_directory(include_dirs, "/usr/local/include")
+-            self._add_directory(include_dirs, "/usr/include")
+-            self._add_directory(library_dirs, "/usr/local/lib")
+-            self._add_directory(library_dirs, "/usr/lib64")
+-            self._add_directory(library_dirs, "/usr/lib")
+-            self._add_directory(library_dirs, "/lib")
++            include_os_path = os.environ.get("STAGING_INCDIR")
++            if include_os_path:
++                for path in include_os_path.split(os.pathsep):
++                    self._add_directory(include_dirs, path)
++
++            lib_os_path = os.environ.get("STAGING_LIBDIR")
++            if lib_os_path:
++                for path in lib_os_path.split(os.pathsep):
++                    self._add_directory(library_dirs, path)
+ 
+             self._update_extension("_pillow_heif", ["heif"], extra_compile_args=["-O3", "-Werror"])
+ 
+-- 
+2.39.5
+

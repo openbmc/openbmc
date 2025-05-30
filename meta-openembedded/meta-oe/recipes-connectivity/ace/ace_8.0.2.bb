@@ -22,12 +22,12 @@ COMPATIBLE_HOST:libc-musl = "null"
 
 S = "${WORKDIR}/ACE_wrappers"
 B = "${WORKDIR}/ACE_wrappers/ace"
-export ACE_ROOT="${WORKDIR}/ACE_wrappers"
+export ACE_ROOT = "${WORKDIR}/ACE_wrappers"
 
 inherit pkgconfig
 
 CXXFLAGS:append = " -fpermissive -Wnodeprecated-declarations"
-CXX:append = " -ffile-prefix-map=${WORKDIR}= -fdebug-prefix-map=${WORKDIR}= "
+CXX:append = " -ffile-prefix-map=${WORKDIR}= "
 EXTRA_OEMAKE += "INSTALL_LIB=${baselib} install_rpath=0"
 
 do_install() {

@@ -1,0 +1,94 @@
+From 69690b0fdff43cdf6ab1718cd86396de3b27081f Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Tue, 6 May 2025 00:00:38 +0200
+Subject: [PATCH] cogl-path: add explicit cast to avoid an
+ incompatible-pointer-types error
+
+Callbacks declarations are not compatible with gluTessCallback(...,
+_GLUfuncptr CallBackFunc) under gcc15. Use an intermediary (void *) cast
+to workaround the incompatible-pointer-types error.
+
+This is safe to do because inside gluTessCallback(), function pointers
+are cast back to their proper prototypes.
+
+This corrects these 4 errors:
+|../../cogl-1.22.8/cogl-path/cogl-path.c: In function '_cogl_path_build_fill_attribute_buffer':
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1361:20: error: passing argument 3 of 'gluTessCallback' from incompatible pointer type [-Wincompatible-pointer-types]
+| 1361 |                    _cogl_path_tesselator_begin);
+|      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+|      |                    |
+|      |                    void (*)(GLenum,  CoglPathTesselator *) {aka void (*)(unsigned int,  struct _CoglPathTesselator *)}
+|In file included from ../../cogl-1.22.8/cogl-path/cogl-path.c:49:
+|../../cogl-1.22.8/cogl-path/tesselator/tesselator.h:57:70: note: expected 'void (*)(void)' but argument is of type 'void (*)(GLenum,  CoglPathTesselator *)' {aka 'void (*)(unsigned int,  struct _CoglPathTesselator *)'}
+|   57 | void gluTessCallback (GLUtesselator* tess, GLenum which, _GLUfuncptr CallBackFunc);
+|      |                                                          ~~~~~~~~~~~~^~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1094:1: note: '_cogl_path_tesselator_begin' declared here
+| 1094 | _cogl_path_tesselator_begin (GLenum type,
+|      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1363:20: error: passing argument 3 of 'gluTessCallback' from incompatible pointer type [-Wincompatible-pointer-types]
+| 1363 |                    _cogl_path_tesselator_vertex);
+|      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|      |                    |
+|      |                    void (*)(void *, CoglPathTesselator *) {aka void (*)(void *, struct _CoglPathTesselator *)}
+|../../cogl-1.22.8/cogl-path/tesselator/tesselator.h:57:70: note: expected 'void (*)(void)' but argument is of type 'void (*)(void *, CoglPathTesselator *)' {aka 'void (*)(void *, struct _CoglPathTesselator *)'}
+|   57 | void gluTessCallback (GLUtesselator* tess, GLenum which, _GLUfuncptr CallBackFunc);
+|      |                                                          ~~~~~~~~~~~~^~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1164:1: note: '_cogl_path_tesselator_vertex' declared here
+| 1164 | _cogl_path_tesselator_vertex (void *vertex_data,
+|      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1365:20: error: passing argument 3 of 'gluTessCallback' from incompatible pointer type [-Wincompatible-pointer-types]
+| 1365 |                    _cogl_path_tesselator_end);
+|      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+|      |                    |
+|      |                    void (*)(CoglPathTesselator *) {aka void (*)(struct _CoglPathTesselator *)}
+|../../cogl-1.22.8/cogl-path/tesselator/tesselator.h:57:70: note: expected 'void (*)(void)' but argument is of type 'void (*)(CoglPathTesselator *)' {aka 'void (*)(struct _CoglPathTesselator *)'}
+|   57 | void gluTessCallback (GLUtesselator* tess, GLenum which, _GLUfuncptr CallBackFunc);
+|      |                                                          ~~~~~~~~~~~~^~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1223:1: note: '_cogl_path_tesselator_end' declared here
+| 1223 | _cogl_path_tesselator_end (CoglPathTesselator *tess)
+|      | ^~~~~~~~~~~~~~~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1367:20: error: passing argument 3 of 'gluTessCallback' from incompatible pointer type [-Wincompatible-pointer-types]
+| 1367 |                    _cogl_path_tesselator_combine);
+|      |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|      |                    |
+|      |                    void (*)(double *, void **, float *, void **, CoglPathTesselator *) {aka void (*)(double *, void **, float *, void **, struct _CoglPathTesselator *)}
+|../../cogl-1.22.8/cogl-path/tesselator/tesselator.h:57:70: note: expected 'void (*)(void)' but argument is of type 'void (*)(double *, void **, float *, void **, CoglPathTesselator *)' {aka 'void (*)(double *, void **, float *, void **, struct _CoglPathTesselator *)'}
+|   57 | void gluTessCallback (GLUtesselator* tess, GLenum which, _GLUfuncptr CallBackFunc);
+|      |                                                          ~~~~~~~~~~~~^~~~~~~~~~~~
+|../../cogl-1.22.8/cogl-path/cogl-path.c:1229:1: note: '_cogl_path_tesselator_combine' declared here
+| 1229 | _cogl_path_tesselator_combine (double coords[3],
+|      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|make[3]: *** [Makefile:905: libcogl_path_la-cogl-path.lo] Error 1
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2021-05-02]
+Gitlab instance is redirected to https://gitlab.gnome.org/Archive/cogl
+with a notice: "This is an archived project. Repository and other
+project resources are read-only."
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ cogl-path/cogl-path.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/cogl-path/cogl-path.c b/cogl-path/cogl-path.c
+index 2b4b3c6..f87ea4a 100644
+--- a/cogl-path/cogl-path.c
++++ b/cogl-path/cogl-path.c
+@@ -1358,13 +1358,13 @@ _cogl_path_build_fill_attribute_buffer (CoglPath *path)
+   gluTessNormal (tess.glu_tess, 0.0, 0.0, 1.0);
+ 
+   gluTessCallback (tess.glu_tess, GLU_TESS_BEGIN_DATA,
+-                   _cogl_path_tesselator_begin);
++                   (void *) _cogl_path_tesselator_begin);
+   gluTessCallback (tess.glu_tess, GLU_TESS_VERTEX_DATA,
+-                   _cogl_path_tesselator_vertex);
++                   (void *) _cogl_path_tesselator_vertex);
+   gluTessCallback (tess.glu_tess, GLU_TESS_END_DATA,
+-                   _cogl_path_tesselator_end);
++                   (void *) _cogl_path_tesselator_end);
+   gluTessCallback (tess.glu_tess, GLU_TESS_COMBINE_DATA,
+-                   _cogl_path_tesselator_combine);
++                   (void *) _cogl_path_tesselator_combine);
+ 
+   gluTessBeginPolygon (tess.glu_tess, &tess);
+ 

@@ -1,0 +1,17 @@
+Fix crash in swinst
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/agent/mibgroup/host/data_access/swinst_pkginfo.c
++++ b/agent/mibgroup/host/data_access/swinst_pkginfo.c
+@@ -210,7 +210,9 @@ netsnmp_swinst_arch_load( netsnmp_contai
+ 	    memcpy( entry->swDate, cp, date_len );
+ 	    entry->swDate_len = date_len;
+ 	}
+-	closedir( d );
++	if (d != NULL)
++		closedir( d );
++
+ #ifdef HAVE_LIBPKG
+     }
+ #endif

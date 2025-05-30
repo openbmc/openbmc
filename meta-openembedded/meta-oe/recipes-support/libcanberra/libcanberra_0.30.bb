@@ -13,6 +13,7 @@ SRC_URI = " \
     file://0001-build-gtk-and-gtk3-version-for-canberra_gtk_play.patch \
     file://0001-gtk-Don-t-assume-all-GdkDisplays-are-GdkX11Displays-.patch \
     file://0001-remove-dropped-templates.patch \
+    file://0001-Determine-audio-buffer-size-for-a-time-of-500ms.patch \
 "
 SRC_URI[sha256sum] = "c2b671e67e0c288a69fc33dc1b6f1b534d07882c2aceed37004bf48c601afa72"
 

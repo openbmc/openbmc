@@ -1,4 +1,7 @@
-Fix cross link using autoconf detected AR
+From 0f33421000006f5991d1cddcb9dbc68b64141e44 Mon Sep 17 00:00:00 2001
+From: Jason Wessel <jason.wessel@windriver.com>
+Date: Wed, 19 Jun 2024 11:22:48 +0200
+Subject: [PATCH] Fix cross link using autoconf detected AR
 
 If building on 32bit host and creating 64bit libraries, the target
 package builds should not invoke the 32bit hosts's ar.  Specifically
@@ -18,10 +21,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  configure.ac | 4 ++++
  2 files changed, 6 insertions(+), 1 deletion(-)
 
-Index: newt-0.52.20/Makefile.in
-===================================================================
---- newt-0.52.20.orig/Makefile.in
-+++ newt-0.52.20/Makefile.in
+diff --git a/Makefile.in b/Makefile.in
+index f8fe290..8a44a56 100644
+--- a/Makefile.in
++++ b/Makefile.in
 @@ -7,6 +7,7 @@ CFLAGS = @CFLAGS@
  LDFLAGS = @LDFLAGS@
  CPPFLAGS = -D_GNU_SOURCE @CPPFLAGS@
@@ -30,7 +33,7 @@ Index: newt-0.52.20/Makefile.in
  
  VERSION = @VERSION@
  TAG = r$(subst .,-,$(VERSION))
-@@ -109,7 +110,7 @@ whiptcl.$(SOEXT): $(WHIPTCLOBJS) $(LIBNE
+@@ -109,7 +110,7 @@ whiptcl.$(SOEXT): $(WHIPTCLOBJS) $(LIBNEWTSH)
  	$(CC) -shared $(SHCFLAGS) $(LDFLAGS) -o whiptcl.$(SOEXT) $(WHIPTCLOBJS) -L. -lnewt  $(LIBTCL) -lpopt $(LIBS)
  
  $(LIBNEWT): $(LIBOBJS)
@@ -39,11 +42,11 @@ Index: newt-0.52.20/Makefile.in
  
  newt.o $(SHAREDDIR)/newt.o: newt.c Makefile
  
-Index: newt-0.52.20/configure.ac
-===================================================================
---- newt-0.52.20.orig/configure.ac
-+++ newt-0.52.20/configure.ac
-@@ -15,6 +15,10 @@ AC_PROG_INSTALL
+diff --git a/configure.ac b/configure.ac
+index 434121e..2cfffd6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -15,6 +15,10 @@ AC_PROG_CC
  AC_PROG_LN_S
  AC_PROG_GREP
  AC_SYS_LARGEFILE

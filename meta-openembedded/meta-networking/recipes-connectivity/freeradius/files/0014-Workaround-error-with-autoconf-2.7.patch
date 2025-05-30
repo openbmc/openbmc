@@ -1,4 +1,4 @@
-From c591da4a361496eec93625cf8c4f89bddfedaca7 Mon Sep 17 00:00:00 2001
+From 9fed86858d8d2045f3de77405059d786bb2d50ac Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sun, 7 Feb 2021 16:02:36 +0800
 Subject: [PATCH] Workaround error with autoconf 2.7
@@ -19,12 +19,12 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 8 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 263098f7fd..fc296832d8 100644
+index 64aa9e4293..0861514ef7 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -878,14 +878,6 @@ fi
+@@ -926,14 +926,6 @@ if test "x$WITH_RADLAST" != "xyes"; then
+ fi
  
- AC_PATH_PROG(RUSERS, rusers, /usr/bin/rusers)
  
 -dnl #
 -dnl #  FIXME This is truly gross.

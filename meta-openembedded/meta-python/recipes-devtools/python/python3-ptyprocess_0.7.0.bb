@@ -1,5 +1,5 @@
 SUMMARY = "Run a subprocess in a pseudo terminal"
-HOMEPAGE = "http://ptyprocess.readthedocs.io/en/latest/"
+HOMEPAGE = "https://ptyprocess.readthedocs.io/en/latest/"
 SECTION = "devel/python"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=cfdcd51fa7d5808da4e74346ee394490"

@@ -1,13 +1,113 @@
-Upstream-Status: Pending
+From 92add24ccfc7e643349a1c091957595ce25a9915 Mon Sep 17 00:00:00 2001
+From: Yoann Congal <yoann.congal@smile.fr>
+Date: Tue, 27 May 2025 08:45:36 +0200
+Subject: [PATCH] QA: cleanup localconfig.h build dependencies
 
+Some QA binaries include localconfig.h but there is no explicit dependencies
+between the binary build and the localconfig.h generation.
+On heavily loaded systems, this can result in the binary being built
+before localconf.h and a compilation error, e.g:
+| username.c:8:10: fatal error: localconfig.h: No such file or directory
+|     8 | #include "localconfig.h"
+|       |          ^~~~~~~~~~~~~~~
+| compilation terminated.
+
+This can be reproduced by adding "sleep 30" at the start of the
+localconfig.h generation rule.
+
+Fix this by adding the missing Makefile rule dependency between the
+binary (or its pre-link .o) and localconfig.h.
+
+Also remove an un-needed scale.o->localconfig.h dependency.
+
+Upstream-Status: Backport [https://github.com/performancecopilot/pcp/commit/8de7bbb06703f224b72fe0994acde3189b742fd2]
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ qa/src/GNUlocaldefs | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/qa/src/GNUlocaldefs b/qa/src/GNUlocaldefs
+index f83826068..e47fbfd72 100644
 --- a/qa/src/GNUlocaldefs
 +++ b/qa/src/GNUlocaldefs
-@@ -728,7 +728,7 @@ scale.o:	localconfig.h
+@@ -299,7 +299,7 @@ diowr:	diowr.c
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ diowr.c
+ 
+-endian:	endian.c
++endian:	endian.c localconfig.h
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ endian.c
+ 
+@@ -331,15 +331,15 @@ exercise:	exercise.c
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ exercise.c $(LDLIBS)
+ 
+-chkacc1:	chkacc1.c
++chkacc1:	chkacc1.c localconfig.h
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ chkacc1.c $(LDLIBS)
+ 
+-chkacc2:	chkacc2.c
++chkacc2:	chkacc2.c localconfig.h
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ chkacc2.c $(LDLIBS)
+ 
+-chkacc3:	chkacc3.c
++chkacc3:	chkacc3.c localconfig.h
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ chkacc3.c $(LDLIBS)
+ 
+@@ -489,7 +489,7 @@ pmdashutdown:	pmdashutdown.c
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ $@.c $(LDLIBS) -lpcp_pmda
+ 
+-dumb_pmda: dumb_pmda.c
++dumb_pmda: dumb_pmda.c localconfig.h
+ 	$(CCF) $(LCDEFS) $(LCOPTS) -o $@ $@.c $(LDLIBS) -lpcp_pmda
+ 
+ pmdacache: pmdacache.c
+@@ -633,7 +633,7 @@ else
+ 	$(CCF) $(CDEFS) -o $@ $@.c $(LIB_FOR_PTHREADS) $(LDLIBS)
+ endif
+ 
+-multithread2:	multithread2.c
++multithread2:	multithread2.c localconfig.h
+ 	rm -f $@
+ 	$(CCF) $(CDEFS) -o $@ $@.c $(LIB_FOR_PTHREADS) $(LDLIBS)
+ 
+@@ -786,7 +786,6 @@ $(NVIDIAQALIB):	nvidia-ml.o
+ endif
+ 
+ arch_maxfd.o:	localconfig.h
+-scale.o:	localconfig.h
+ 
  779246.o:	libpcp.h
  aggrstore.o:	libpcp.h
- badmmv.o:	libpcp.h
--chkacc1.o:	libpcp.h
-+chkacc1.o:	libpcp.h localconfig.h
- chkacc2.o:	libpcp.h
- chkacc3.o:	libpcp.h
- chkacc4.o:	libpcp.h
+@@ -847,14 +846,14 @@ multithread14.o:	libpcp.h
+ nameall.o:	libpcp.h
+ parsehostattrs.o:	libpcp.h
+ parsehostspec.o:	libpcp.h
+-pdubufbounds.o:	libpcp.h
+-pducheck.o:	libpcp.h
++pdubufbounds.o:	libpcp.h localconfig.h
++pducheck.o:	libpcp.h localconfig.h
+ pducrash.o:	libpcp.h
+-pdu-server.o:	libpcp.h
++pdu-server.o:	libpcp.h localconfig.h
+ pmcdgone.o:	libpcp.h
+ pmlcmacro.o:	libpcp.h
+ pmnsinarchives.o:	libpcp.h
+-pmnsunload.o:	libpcp.h
++pmnsunload.o:	libpcp.h localconfig.h
+ proc_test.o:	libpcp.h
+ qa_libpcp_compat.o:	libpcp.h
+ qa_timezone.o:	libpcp.h
+@@ -874,6 +873,7 @@ torture_pmns.o:	libpcp.h
+ tztest.o:	libpcp.h
+ unpack.o:	libpcp.h
+ unpickargs.o:	libpcp.h
++username.o:	localconfig.h
+ xarch.o:	libpcp.h
+ xlog.o:	libpcp.h
+ xmktime.o:	libpcp.h

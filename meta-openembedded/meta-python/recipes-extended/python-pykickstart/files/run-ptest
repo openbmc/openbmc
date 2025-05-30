@@ -1,0 +1,3 @@
+#!/bin/sh
+
+pytest --automake --deselect tests/test_packages.py::AddGroupsAndEnvironment_TestCase --deselect tests/commands/test_reboot.py::Reboot_TestCase

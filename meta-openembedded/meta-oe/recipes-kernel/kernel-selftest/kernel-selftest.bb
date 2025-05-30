@@ -2,9 +2,12 @@ SUMMARY = "Kernel selftest for Linux"
 DESCRIPTION = "Kernel selftest for Linux"
 LICENSE = "GPL-2.0-only"
 
-LIC_FILES_CHKSUM = "file://${UNPACKDIR}/COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
+LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
 DEPENDS = "rsync-native llvm-native"
+
+S = "${WORKDIR}/sources"
+UNPACKDIR = "${S}"
 
 # for musl libc
 SRC_URI:append:libc-musl = "\
@@ -108,10 +111,6 @@ do_install() {
     chown root:root  -R ${D}/usr/kernel-selftest
 }
 
-do_configure() {
-    install -D -m 0644 ${UNPACKDIR}/COPYING ${S}/COPYING
-}
-
 do_patch[prefuncs] += "copy_kselftest_source_from_kernel remove_unrelated"
 python copy_kselftest_source_from_kernel() {
     sources = (d.getVar("KERNEL_SELFTEST_SRC") or "").split()
@@ -142,7 +141,7 @@ do_configure[dirs] = "${S}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
-INHIBIT_PACKAGE_DEBUG_SPLIT="1"
+INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 FILES:${PN} += "/usr/kernel-selftest"
 
 RDEPENDS:${PN} += "python3 perl perl-module-io-handle"

@@ -1,0 +1,57 @@
+From 919015a92dc0b98bbef81fb68cd9f90b89abb2dd Mon Sep 17 00:00:00 2001
+From: Gyorgy Szing <gyorgy.szing@arm.com>
+Date: Thu, 17 Oct 2024 09:46:58 +0000
+Subject: [PATCH 1/1] Fix MbedTLS 3.6 and GCC 14 compatibility
+
+For details please see the patch file.
+
+Upstream-Status: Pending
+
+Signed-off-by: Gyorgy Szing <gyorgy.szing@arm.com>
+---
+ ...or-triggered-build-issue-with-gcc-14.patch | 33 +++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+ create mode 100644 external/MbedTLS/0002-Fix-Werror-triggered-build-issue-with-gcc-14.patch
+
+diff --git a/external/MbedTLS/0002-Fix-Werror-triggered-build-issue-with-gcc-14.patch b/external/MbedTLS/0002-Fix-Werror-triggered-build-issue-with-gcc-14.patch
+new file mode 100644
+index 000000000..6e195f927
+--- /dev/null
++++ b/external/MbedTLS/0002-Fix-Werror-triggered-build-issue-with-gcc-14.patch
+@@ -0,0 +1,33 @@
++From 390c4bd9822b44b1f4c366e62634d328e8baf9a1 Mon Sep 17 00:00:00 2001
++From: Gyorgy Szing <gyorgy.szing@arm.com>
++Date: Thu, 17 Oct 2024 08:54:22 +0000
++Subject: [PATCH 1/1] Fix -Werror triggered build issue with gcc 14
++
++GCC 14 emits new warnings when compiling MbedTLS v3.6. This is
++a known issue (see [1]) and I am taking the proposed fix.
++
++https://github.com/Mbed-TLS/mbedtls/issues/9003#issuecomment-2108239255
++
++Upstream-Status: Pending
++
++Signed-off-by: Gyorgy Szing <gyorgy.szing@arm.com>
++---
++ library/common.h | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/library/common.h b/library/common.h
++index 3936ffdfe1..d8c4073198 100644
++--- a/library/common.h
+++++ b/library/common.h
++@@ -199,7 +199,7 @@ static inline void mbedtls_xor(unsigned char *r,
++         uint8x16_t x = veorq_u8(v1, v2);
++         vst1q_u8(r + i, x);
++     }
++-#if defined(__IAR_SYSTEMS_ICC__)
+++#if defined(__IAR_SYSTEMS_ICC__) || defined(MBEDTLS_COMPILER_IS_GCC)
++     /* This if statement helps some compilers (e.g., IAR) optimise out the byte-by-byte tail case
++      * where n is a constant multiple of 16.
++      * For other compilers (e.g. recent gcc and clang) it makes no difference if n is a compile-time
++-- 
++2.43.0
++
+-- 
+2.43.0
+

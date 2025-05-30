@@ -146,7 +146,7 @@ verity_setup() {
         HASH_OFFSET="--hash-offset="$SIZE
     fi
 
-    cp -a $INPUT $OUTPUT
+    cp -a --sparse=never $INPUT $OUTPUT
 
     SETUP_ARGS=" \
         ${DM_VERITY_SETUP_ARGS} \

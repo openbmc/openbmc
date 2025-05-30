@@ -1,4 +1,4 @@
-From 0f9f18fc330fe88080be13e43f300fbf7ba4a85a Mon Sep 17 00:00:00 2001
+From de2b9e3b8f9ad8b8ac3e7e820b8b831e91c2dd71 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Mon, 13 Jul 2020 07:01:45 +0000
 Subject: [PATCH] raddb/certs/Makefile: fix the existed certificate error
@@ -29,7 +29,7 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/raddb/certs/Makefile b/raddb/certs/Makefile
-index c9fbc9e864..d064fe252d 100644
+index 34948bd924..cae939668e 100644
 --- a/raddb/certs/Makefile
 +++ b/raddb/certs/Makefile
 @@ -92,7 +92,7 @@ server.csr server.key: server.cnf

@@ -1,0 +1,110 @@
+From cc3724348c8e6371351e4370f158d17f28838e3b Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Sat, 26 Apr 2025 11:40:45 +0200
+Subject: [PATCH] Fix build with gcc-15
+
+* fixes:
+  http://errors.yoctoproject.org/Errors/Details/852983/
+
+../../../../../snort-2.9.20/src/preprocessors/HttpInspect/files/file_decomp_PDF.c:1062:13: error: conflicting types for 'File_Decomp_PDF'; have 'fd_status_t(struct fd_session_s *)' {aka 'enum fd_status(struct fd_session_s *)'}
+ 1062 | fd_status_t File_Decomp_PDF( fd_session_p_t SessionPtr )
+      |             ^~~~~~~~~~~~~~~
+In file included from ../../../../../snort-2.9.20/src/preprocessors/HttpInspect/include/file_decomp.h:59,
+                 from ../../../../../snort-2.9.20/src/preprocessors/HttpInspect/files/file_decomp_PDF.c:31:
+../../../../../snort-2.9.20/src/preprocessors/HttpInspect/include/file_decomp_PDF.h:83:13: note: previous declaration of 'File_Decomp_PDF' with type 'fd_status_t(void)' {aka 'enum fd_status(void)'}
+   83 | fd_status_t File_Decomp_PDF();
+      |             ^~~~~~~~~~~~~~~
+make[5]: *** [Makefile:374: file_decomp_PDF.o] Error 1
+make[5]: *** Waiting for unfinished jobs....
+../../../../../snort-2.9.20/src/preprocessors/HttpInspect/files/file_decomp.c: In function 'Process_Decompression':
+../../../../../snort-2.9.20/src/preprocessors/HttpInspect/files/file_decomp.c:245:24: error: too many arguments to function 'File_Decomp_PDF'; expected 0, have 1
+  245 |             Ret_Code = File_Decomp_PDF( SessionPtr );
+      |                        ^~~~~~~~~~~~~~~  ~~~~~~~~~~
+In file included from ../../../../../snort-2.9.20/src/preprocessors/HttpInspect/include/file_decomp.h:59,
+                 from ../../../../../snort-2.9.20/src/preprocessors/HttpInspect/files/file_decomp.c:34:
+../../../../../snort-2.9.20/src/preprocessors/HttpInspect/include/file_decomp_PDF.h:83:13: note: declared here
+   83 | fd_status_t File_Decomp_PDF();
+      |             ^~~~~~~~~~~~~~~
+
+  http://errors.yoctoproject.org/Errors/Details/852992/
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c: In function 'DCE2_InitGlobal':
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:348:25: error: too many arguments to function 'DCE2_GetReloadSafeMemcap'; expected 0, have 1
+  348 |         size_t memcap = DCE2_GetReloadSafeMemcap(dce2_config);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: declared here
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c: In function 'DCE2_ReloadGlobal':
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:1291:25: error: too many arguments to function 'DCE2_GetReloadSafeMemcap'; expected 0, have 1
+ 1291 |         size_t memcap = DCE2_GetReloadSafeMemcap(dce2_swap_config);
+      |                         ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: declared here
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c: In function 'DCE2_ReloadVerify':
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:1436:35: error: too many arguments to function 'DCE2_GetReloadSafeMemcap'; expected 0, have 1
+ 1436 |     uint32_t current_memcap     = DCE2_GetReloadSafeMemcap(dce2_config);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: declared here
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:1437:35: error: too many arguments to function 'DCE2_GetReloadSafeMemcap'; expected 0, have 1
+ 1437 |     uint32_t new_memcap         = DCE2_GetReloadSafeMemcap(dce2_swap_config);
+      |                                   ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: declared here
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c: In function 'DCE2_ReloadSwap':
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:1535:26: error: too many arguments to function 'DCE2_GetReloadSafeMemcap'; expected 0, have 1
+ 1535 |         current_memcap = DCE2_GetReloadSafeMemcap(dce2_config);
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: declared here
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:1538:26: error: too many arguments to function 'DCE2_GetReloadSafeMemcap'; expected 0, have 1
+ 1538 |         swap_memcap    = DCE2_GetReloadSafeMemcap(dce2_swap_config);
+      |                          ^~~~~~~~~~~~~~~~~~~~~~~~ ~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: declared here
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c: At top level:
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:1673:17: error: conflicting types for 'DCE2_GetReloadSafeMemcap'; have 'uint32_t(tSfPolicyUserContext *)' {aka 'unsigned int(tSfPolicyUserContext *)'}
+ 1673 | static uint32_t DCE2_GetReloadSafeMemcap(tSfPolicyUserContextId pConfig)
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+../../../../snort-2.9.20/src/dynamic-preprocessors/dcerpc2/spp_dce2.c:163:17: note: previous declaration of 'DCE2_GetReloadSafeMemcap' with type 'uint32_t(void)' {aka 'unsigned int(void)'}
+  163 | static uint32_t DCE2_GetReloadSafeMemcap();
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Backport [resolved in snort3 https://github.com/snort3/snort3/commit/c3cc27355ac302bd24ee3e9d613166898ec2be64]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ src/dynamic-preprocessors/dcerpc2/spp_dce2.c            | 2 +-
+ src/preprocessors/HttpInspect/include/file_decomp_PDF.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/dynamic-preprocessors/dcerpc2/spp_dce2.c b/src/dynamic-preprocessors/dcerpc2/spp_dce2.c
+index 7fd78ee..150645f 100644
+--- a/src/dynamic-preprocessors/dcerpc2/spp_dce2.c
++++ b/src/dynamic-preprocessors/dcerpc2/spp_dce2.c
+@@ -160,7 +160,7 @@ static void DCE2_ReloadSwapFree(void *);
+ static void DCE2_AddPortsToPaf(struct _SnortConfig *, DCE2_Config *, tSfPolicyId);
+ static void DCE2_ScAddPortsToPaf(struct _SnortConfig *, void *);
+ static uint32_t max(uint32_t a, uint32_t b);
+-static uint32_t DCE2_GetReloadSafeMemcap();
++static uint32_t DCE2_GetReloadSafeMemcap(tSfPolicyUserContextId pConfig);
+ 
+ static bool dce2_file_cache_is_enabled = false;
+ static bool dce2_file_cache_was_enabled = false;
+diff --git a/src/preprocessors/HttpInspect/include/file_decomp_PDF.h b/src/preprocessors/HttpInspect/include/file_decomp_PDF.h
+index 8d39185..0e624f7 100644
+--- a/src/preprocessors/HttpInspect/include/file_decomp_PDF.h
++++ b/src/preprocessors/HttpInspect/include/file_decomp_PDF.h
+@@ -80,6 +80,6 @@ fd_status_t File_Decomp_Init_PDF( fd_session_p_t SessionPtr );
+ 
+ fd_status_t File_Decomp_End_PDF( fd_session_p_t SessionPtr );
+ 
+-fd_status_t File_Decomp_PDF();
++fd_status_t File_Decomp_PDF( fd_session_p_t SessionPtr );
+ 
+ #endif /* FILE_DECOMP_PDF_H */

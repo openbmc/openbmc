@@ -1,0 +1,47 @@
+From ba7b4a8cc570f0ce154f186fbe840f0ac23b2b96 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 28 Apr 2025 10:04:46 +0800
+Subject: [PATCH] Fix build with libpcap 1.10.5
+
+Fixes:
+In file included from /build/tmp/work/core2-64-poky-linux/nmap/7.92/recipe-sysroot/usr/include/pcap/pcap.h:130,
+                 from /build/tmp/work/core2-64-poky-linux/nmap/7.92/recipe-sysroot/usr/include/pcap.h:43,
+                 from tcpip.h:72,
+                 from nse_nsock.cc:4:
+nse_nsock.cc:36:3: error: expected identifier before 'int'
+   36 |   PCAP_SOCKET = lua_upvalueindex(3), /* pcap socket metatable */
+      |   ^~~~~~~~~~~
+nse_nsock.cc:36:3: error: expected '}' before 'int'
+nse_nsock.cc:33:6: note: to match this '{'
+   33 | enum {
+      |      ^
+nse_nsock.cc:36:15: error: expected unqualified-id before '=' token
+   36 |   PCAP_SOCKET = lua_upvalueindex(3), /* pcap socket metatable */
+      |               ^
+nse_nsock.cc:40:1: error: expected declaration before '}' token
+   40 | };
+      | ^
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ nse_nsock.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/nse_nsock.cc b/nse_nsock.cc
+index 75ddeb6..a3c5186 100644
+--- a/nse_nsock.cc
++++ b/nse_nsock.cc
+@@ -29,6 +29,8 @@
+ 
+ #define DEFAULT_TIMEOUT 30000
+ 
++#undef PCAP_SOCKET
++
+ /* Upvalues for library variables */
+ enum {
+   NSOCK_POOL = lua_upvalueindex(1),
+-- 
+2.34.1
+

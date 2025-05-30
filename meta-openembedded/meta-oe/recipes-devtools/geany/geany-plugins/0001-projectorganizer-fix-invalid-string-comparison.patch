@@ -1,0 +1,24 @@
+From 8dfd7f2cba428f5eb232fbbe3427c64171bae0f4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ji=C5=99=C3=AD=20Techet?= <techet@gmail.com>
+Date: Tue, 5 Mar 2024 18:36:37 +0100
+Subject: [PATCH 1/3] projectorganizer: fix invalid string comparison
+
+Upstream-Status: Backport [https://github.com/geany/geany-plugins/commit/8dfd7f2cba428f5eb232fbbe3427c64171bae0f4]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ projectorganizer/src/prjorg-sidebar.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/projectorganizer/src/prjorg-sidebar.c b/projectorganizer/src/prjorg-sidebar.c
+index b6422f0..0139473 100644
+--- a/projectorganizer/src/prjorg-sidebar.c
++++ b/projectorganizer/src/prjorg-sidebar.c
+@@ -346,7 +346,7 @@ static gchar *get_fallback_dir_of_selection(void)
+ 		{
+ 			locale_path = g_path_get_dirname(doc->real_path);
+ 
+-			if (locale_path && locale_path == '.')
++			if (locale_path && *locale_path == '.')
+ 			{
+ 				g_free(locale_path);
+ 				locale_path = NULL;

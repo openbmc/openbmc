@@ -1,0 +1,35 @@
+From 8ccd12d6ec3330e9646ae9db6fd491226d516dc3 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Fri, 28 Mar 2025 01:33:00 +0100
+Subject: [PATCH] meson.build: require iso-codes-native
+
+This fixes:
+FAILED: app/widgets/gimplanguagestore-data.h
+/mnt/b/yoe/master/build/tmp/work/core2-64-yoe-linux-musl/gimp/3.0.2/build/tools/gen-languages
+gimp_language_store_parser_init: 0.006277 seconds
+ERROR: parse_iso_codes: error parsing '/usr/share/xml/iso-codes/iso_639_3.xml': No such file or directory
+
+Upstream-Status: Denied [https://gitlab.gnome.org/GNOME/gimp/-/merge_requests/2185]
+Upstream argues that iso-codes locale (.mo files) are required on the target
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index efbc2d8175..fd050f4d3c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1135,7 +1135,7 @@ endif
+ ################################################################################
+ # ISO codes
+ 
+-isocodes = dependency('iso-codes', required: false)
++isocodes = dependency('iso-codes', required: false, native: true)
+ if isocodes.found()
+   isocodes_prefix = isocodes.get_variable(pkgconfig: 'prefix')
+   isocodes_location = isocodes_prefix / 'share' / 'xml' / 'iso-codes'
+-- 
+2.49.0
+

@@ -1,7 +1,7 @@
-From ef6b4fef7b7a740d6df8dab12aa7c73d06bb9f3b Mon Sep 17 00:00:00 2001
+From fea499f48d07638417511f194c2977133fd75b4d Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Fri, 8 Jul 2022 09:48:06 +0100
-Subject: [PATCH 3/8] FMP Support in Corstone1000.
+Subject: [PATCH 03/12] FMP Support in Corstone1000.
 
 The FMP support is used by u-boot to pupolate ESRT information
 for the kernel.
@@ -70,7 +70,7 @@ index 1d412eb23..6b0601494 100644
  	)
 diff --git a/components/service/capsule_update/provider/corstone1000_fmp_service.c b/components/service/capsule_update/provider/corstone1000_fmp_service.c
 new file mode 100644
-index 000000000..56ce38579
+index 000000000..2222251a7
 --- /dev/null
 +++ b/components/service/capsule_update/provider/corstone1000_fmp_service.c
 @@ -0,0 +1,307 @@

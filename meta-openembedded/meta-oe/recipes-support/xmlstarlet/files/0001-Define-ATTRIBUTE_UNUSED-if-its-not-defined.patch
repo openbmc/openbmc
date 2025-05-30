@@ -1,0 +1,37 @@
+From 4e94034e9231f5d8312497b7504f21b7a6062bf4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 27 May 2025 16:12:01 -0700
+Subject: [PATCH] Define ATTRIBUTE_UNUSED if its not defined
+
+ATTRIBUTE_UNUSED is not defined in libxml2 2.14+, so check if the define is
+not there then define it.
+
+Fixes build errors e.g.
+../xmlstarlet-1.6.1/src/xml_pyx.c:203:36: error: expected ')'
+  203 | pyxExternalSubsetHandler(void *ctx ATTRIBUTE_UNUSED, const xmlChar *name,
+      |                                    ^
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/xml_pyx.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/xml_pyx.c b/src/xml_pyx.c
+index ab295f1..f1a1884 100644
+--- a/src/xml_pyx.c
++++ b/src/xml_pyx.c
+@@ -21,6 +21,13 @@
+ 
+ #include "xmlstar.h"
+ 
++/**
++ * Unbreak build with libxml2 2.14
++ */
++#ifndef ATTRIBUTE_UNUSED
++#define ATTRIBUTE_UNUSED __attribute__((unused))
++#endif
++
+ /**
+  *  Output newline and tab characters as escapes
+  *  Required both for attribute values and character data (#PCDATA)

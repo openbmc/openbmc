@@ -28,13 +28,13 @@ PACKAGECONFIG[fortran] = "--with-cross=${WORKDIR}/cross_values.txt --enable-fort
 LDFLAGS:append:x86-64 = " -lgcc"
 LDFLAGS:append:x86 = " -lgcc"
 
-inherit autotools gettext pkgconfig qemu
+inherit autotools gettext pkgconfig
 
 DEPENDS += "qemu-native"
 
 do_configure() {
     if [ "${@bb.utils.contains('PACKAGECONFIG', 'fortran', '1', '', d)}" = "1" ]; then
-        qemu_binary="${@qemu_wrapper_cmdline(d, d.getVar('STAGING_DIR_HOST'), [d.expand('${STAGING_DIR_HOST}${libdir}'),d.expand('${STAGING_DIR_HOST}${base_libdir}')])}"
+        qemu_binary="${@oe.qemu.qemu_wrapper_cmdline(d, d.getVar('STAGING_DIR_HOST'), [d.expand('${STAGING_DIR_HOST}${libdir}'),d.expand('${STAGING_DIR_HOST}${base_libdir}')])}"
         cat > ${WORKDIR}/qemuwrapper << EOF
 #!/bin/sh
 $qemu_binary "\$@"

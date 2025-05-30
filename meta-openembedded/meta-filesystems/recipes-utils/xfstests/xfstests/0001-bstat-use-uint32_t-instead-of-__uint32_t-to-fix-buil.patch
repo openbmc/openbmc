@@ -1,0 +1,33 @@
+From c3cc5c68a297a98adb9a7046c7563d0678245243 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Sun, 27 Apr 2025 20:29:09 +0200
+Subject: [PATCH] bstat: use uint32_t instead of __uint32_t to fix build with
+ musl
+
+* with musl this fails with:
+  http://errors.yoctoproject.org/Errors/Details/853041/
+
+bstat.c:65:33: error: unknown type name '__uint32_t'; did you mean 'uint32_t'?
+   65 | static inline int xfs_highbit32(__uint32_t v)
+      |                                 ^~~~~~~~~~
+      |                                 uint32_t
+
+Upstream-Status: Pending
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ src/bstat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/bstat.c b/src/bstat.c
+index 9a028a0d..a833af59 100644
+--- a/src/bstat.c
++++ b/src/bstat.c
+@@ -62,7 +62,7 @@ static inline int fls(int x)
+ 	return r;
+ }
+ 
+-static inline int xfs_highbit32(__uint32_t v)
++static inline int xfs_highbit32(uint32_t v)
+ {
+ 	return fls(v) - 1;
+ }

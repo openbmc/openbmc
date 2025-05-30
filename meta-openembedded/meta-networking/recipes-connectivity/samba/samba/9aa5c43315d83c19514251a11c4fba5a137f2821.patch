@@ -1,0 +1,70 @@
+From 9aa5c43315d83c19514251a11c4fba5a137f2821 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Tue, 21 Jan 2025 17:59:27 +0100
+Subject: [PATCH] lib:replace: Don't use deprecated readline CPPFunction cast
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+HAVE_RL_COMPLETION_FUNC_T was unused and not checking for the right
+function.
+
+libcli/smbreadline/smbreadline.c: In function ‘smb_readline’:
+libcli/smbreadline/smbreadline.c:139:17: warning: ‘CPPFunction’ is deprecated [-Wdeprecated-declarations]
+  139 |                 rl_attempted_completion_function = RL_COMPLETION_CAST completion_fn;
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+libcli/smbreadline/smbreadline.c:139:50: error: assignment to ‘char ** (*)(const char *, int,  int)’ from incompatible pointer type ‘char ** (*)(void)’ [-Wincompatible-pointer-types]
+  139 |                 rl_attempted_completion_function = RL_COMPLETION_CAST completion_fn;
+      |                                                  ^
+
+BUG: https://bugzilla.samba.org/show_bug.cgi?id=15788
+
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Alexander Bokovoy <ab@samba.org>
+
+Autobuild-User(master): Andreas Schneider <asn@cryptomilk.org>
+Autobuild-Date(master): Tue Jan 21 19:38:37 UTC 2025 on atb-devel-224
+
+Upstream-Status: Backport [https://github.com/samba-team/samba/commit/9aa5c43315d83c19514251a11c4fba5a137f2821]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ lib/replace/system/readline.h        | 4 +++-
+ libcli/smbreadline/wscript_configure | 8 +++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/lib/replace/system/readline.h b/lib/replace/system/readline.h
+index 9a9af266ca6d..ac3604fc12e0 100644
+--- a/lib/replace/system/readline.h
++++ b/lib/replace/system/readline.h
+@@ -46,7 +46,9 @@
+ #endif
+ 
+ #ifdef HAVE_NEW_LIBREADLINE
+-#ifdef HAVE_CPPFUNCTION
++#if defined(HAVE_RL_COMPLETION_FUNC_T)
++#  define RL_COMPLETION_CAST (rl_completion_func_t *)
++#elif defined(HAVE_CPPFUNCTION)
+ #  define RL_COMPLETION_CAST (CPPFunction *)
+ #elif defined(HAVE_RL_COMPLETION_T)
+ #  define RL_COMPLETION_CAST (rl_completion_t *)
+diff --git a/libcli/smbreadline/wscript_configure b/libcli/smbreadline/wscript_configure
+index 912ff53a150d..f5a401ebae00 100644
+--- a/libcli/smbreadline/wscript_configure
++++ b/libcli/smbreadline/wscript_configure
+@@ -51,10 +51,12 @@ conf.CHECK_CODE('''
+ #    endif
+ #  endif
+ #endif
+-int main(void) {rl_completion_t f; return 0;}
++int main(void) {rl_completion_func_t f; return 0;}
+ ''',
+-'HAVE_RL_COMPLETION_FUNC_T', execute=False, addmain=False,
+-msg='Checking for rl_completion_t')
++                'HAVE_RL_COMPLETION_FUNC_T',
++                execute=False,
++                addmain=False,
++                msg='Checking for rl_completion_func_t')
+ 
+ conf.CHECK_CODE('''
+ #ifdef HAVE_READLINE_READLINE_H

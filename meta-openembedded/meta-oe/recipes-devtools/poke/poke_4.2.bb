@@ -13,12 +13,7 @@ DEPENDS = "flex-native bison-native bdwgc readline"
 
 SRC_URI[sha256sum] = "8aaf36e61e367a53140ea40e2559e9ec512e779c42bee34e7ac24b34ba119bde"
 
-# poke does not support using out-of-tree builds
-inherit autotools-brokensep gettext pkgconfig
-
-# The automatic m4 path detection gets confused, so force the right value from
-# the poke bootstrap script.
-acpaths = "-I ./m4"
+inherit autotools gettext pkgconfig
 
 EXTRA_OECONF = "--disable-gui \
                 --disable-libnbd \
@@ -28,6 +23,9 @@ EXTRA_OECONF = "--disable-gui \
 PACKAGECONFIG[mi] = "--enable-mi,--disable-mi,json-c"
 
 PACKAGES =+ "${PN}-emacs ${PN}-vim"
+
+# Disable parallel install as it is not supported upstream
+PARALLEL_MAKEINST = "-j1"
 
 FILES:${PN}-emacs += "${datadir}/emacs/site-lisp"
 FILES:${PN}-vim += "${datadir}/vim/vimfiles"

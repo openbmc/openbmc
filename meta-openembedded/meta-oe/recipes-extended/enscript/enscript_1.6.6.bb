@@ -14,6 +14,7 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://enscript-autoconf.patch \
            file://0001-Fix-builds-with-recent-gettext.patch \
            file://0001-getopt-Include-string.h-for-strcmp-stcncmp-functions.patch \
+           file://0001-enscript-does-not-build-with-C23-standard.patch \
            "
 
 inherit autotools gettext

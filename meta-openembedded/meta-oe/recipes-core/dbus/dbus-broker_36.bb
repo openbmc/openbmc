@@ -30,6 +30,7 @@ do_install:append() {
     ln -s ${systemd_user_unitdir}/dbus-broker.service ${D}${sysconfdir}/systemd/user/dbus.service
 }
 
+RCONFLICTS:${PN} = "dbus"
 RDEPENDS:${PN} += "dbus-common"
 
 FILES:${PN} += "${nonarch_libdir}/systemd/catalog"

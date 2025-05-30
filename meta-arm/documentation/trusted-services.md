@@ -24,6 +24,7 @@ features for each [Secure Partition][^2] you would like to include:
 | se-proxy          | ts-se-proxy     |
 | smm-gateway       | ts-smm-gateway  |
 | spm-test[1-4]     | optee-spmc-test |
+| Logging           | ts-logging      |
 
 Other steps depend on your machine/platform definition:
 
@@ -56,6 +57,18 @@ Optionally for testing purposes you can add `packagegroup-ts-tests` into your im
 
   meta-arm also includes Trusted Service OEQA tests which can be used for automated testing.
 See `ci/trusted-services.yml` for an example how to include them into an image.
+
+## Configuration options
+
+Some TS recipes support yocto variables to set build configuration. These variables can be set in .conf files (machine
+specific or local.conf), or .bbappend files. 
+
+SmmGW SP recipe supports the following configuration variables
+
+| Variable name         | Type | Description                                                                                            |
+|-----------------------|------|--------------------------------------------------------------------------------------------------------|
+| SMMGW_AUTH_VAR        | Bool | Enable Authenticated variable support                                                                  |
+| SMMGW_INTERNAL_CRYPTO | Bool | Use MbedTLS build into SmmGW for authentication related crypto operations. Depends on SMMGW_AUTH_VAR=1 |
 
 
 ------

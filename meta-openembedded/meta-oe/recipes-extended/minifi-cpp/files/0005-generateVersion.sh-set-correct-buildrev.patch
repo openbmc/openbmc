@@ -1,0 +1,32 @@
+From 1861170c6de3dd851324debf3a6eaeff4d8d8bce Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 14 Mar 2025 20:26:38 +0800
+Subject: [PATCH] generateVersion.sh: set correct buildrev
+
+Since this script is run outside the source directory, git log can not
+get the commit id, so buildrev is not set correctly. Fix the issue by
+adding -C option.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ generateVersion.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/generateVersion.sh b/generateVersion.sh
+index ff25afba8..0b50a1693 100755
+--- a/generateVersion.sh
++++ b/generateVersion.sh
+@@ -28,7 +28,7 @@ buildident=$8
+ date=$(date +%s)
+ 
+ if [ -d "${src_dir}"/.git ]; then
+-  buildrev=$(git log -1 --pretty=format:"%H")
++  buildrev=$(git -C "${src_dir}" log -1 --pretty=format:"%H")
+ else
+   buildrev="Unknown"
+ fi
+-- 
+2.34.1
+

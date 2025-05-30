@@ -35,7 +35,6 @@ SRC_URI:append:corstone1000 = " \
     file://0013-CC312-ADAC-Add-PSA_WANT_ALG_SHA_256-definition.patch \
     file://0014-Platform-CS1000-Add-crypto-configs-for-ADAC.patch \
     file://0015-Platform-CS1000-Fix-platform-name-in-logs.patch \
-    file://0016-Platform-corstone1000-Fix-isolation-L2-memory-protection.patch \
     file://0017-Platform-CS1000-Remove-unused-BL1-files.patch \
     file://0018-Platform-CS1000-Remove-duplicated-metadata-write.patch \
     file://0019-Platform-CS1000-Fix-compiler-switch-in-BL1.patch \

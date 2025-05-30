@@ -3,6 +3,7 @@ DESCRIPTION = "TCG reference implementation of the TPM 2.0 Specification."
 HOMEPAGE = "https://github.com/microsoft/ms-tpm-20-ref/"
 
 COMPATIBLE_MACHINE ?= "invalid"
+COMPATIBLE_MACHINE:genericarm64 = "genericarm64"
 COMPATIBLE_MACHINE:qemuarm64 = "qemuarm64"
 COMPATIBLE_MACHINE:qemuarm64-secureboot = "qemuarm64"
 COMPATIBLE_MACHINE:qemuarm-secureboot = "qemuarm"
@@ -17,7 +18,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5a3925ece0806073ae9ebbb08ff6f11e"
 
 DEPENDS = "python3-pyelftools-native optee-os-tadevkit python3-cryptography-native "
 
-FTPM_UUID="bc50d971-d4c9-42c4-82cb-343fb7f37896"
+FTPM_UUID = "bc50d971-d4c9-42c4-82cb-343fb7f37896"
 
 SRC_URI = "gitsm://github.com/Microsoft/ms-tpm-20-ref;branch=main;protocol=https \
            file://0001-add-enum-to-ta-flags.patch"
@@ -49,7 +50,7 @@ CFLAGS += "-Wno-implicit-function-declaration -Wno-incompatible-pointer-types"
 
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.
-export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
+export OPENSSL_MODULES = "${STAGING_LIBDIR_NATIVE}/ossl-modules"
 
 PARALLEL_MAKE = ""
 

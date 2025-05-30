@@ -1,0 +1,43 @@
+From 1159686379184a1c899eabb2174258aba5e0fd79 Mon Sep 17 00:00:00 2001
+From: Patrick Griffis <pgriffis@igalia.com>
+Date: Mon, 20 Sep 2021 15:41:31 -0500
+Subject: [PATCH] Fix possibly uninitialized warnings
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libsoup/-/commit/fb98e9a8c3062c75357b961543af091de2dd5459]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ libsoup/soup-websocket-connection.c | 2 +-
+ tests/samesite-test.c               | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/libsoup/soup-websocket-connection.c b/libsoup/soup-websocket-connection.c
+index 65c1492..585d45c 100644
+--- a/libsoup/soup-websocket-connection.c
++++ b/libsoup/soup-websocket-connection.c
+@@ -471,7 +471,7 @@ send_message (SoupWebsocketConnection *self,
+ 	GByteArray *bytes;
+ 	gsize frame_len;
+ 	guint8 *outer;
+-	guint8 mask_offset;
++	guint8 mask_offset = 0;
+ 	GBytes *filtered_bytes;
+ 	GList *l;
+ 	GError *error = NULL;
+diff --git a/tests/samesite-test.c b/tests/samesite-test.c
+index 0b081b2..60c9b8e 100644
+--- a/tests/samesite-test.c
++++ b/tests/samesite-test.c
+@@ -60,6 +60,9 @@ assert_highest_policy_visible (GSList *cookies, SoupSameSitePolicy policy)
+ 	case SOUP_SAME_SITE_POLICY_NONE:
+ 		expected_count = 1;
+ 		break;
++	default:
++		g_assert_not_reached ();
++		break;
+ 	}
+ 
+ 	g_assert_cmpuint (size, ==, expected_count);
+-- 
+2.34.1
+

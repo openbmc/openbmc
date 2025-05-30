@@ -106,7 +106,7 @@ python __anonymous() {
         recipe = d.getVar('FITIMAGE_IMAGE_%s' % image)
 
         if not recipe:
-            bb.error("No recipe set for image '%s'. Specify via 'FITIMAGE_IMAGE_%s = \"<recipe-name>\"'" % (recipe, image))
+            bb.fatal(f"No recipe set for image '{image}'. Specify via 'FITIMAGE_IMAGE_{image} = \"<recipe-name>\"'")
             return
 
         d.appendVarFlag('do_unpack', 'vardeps', ' FITIMAGE_IMAGE_%s' % image)
@@ -276,7 +276,7 @@ def fitimage_emit_subsection_signature(d, fd, sign_images_list):
     fd.write('\t\t\tsignature-1 {\n')
     fd.write(f'\t\t\t\talgo = "{hash_algo},{encrypt_algo}";\n')
     if conf_sign_keyname:
-        fd.write(f'\t\t\t\tkey-name-hint = {conf_sign_keyname}";\n')
+        fd.write(f'\t\t\t\tkey-name-hint = "{conf_sign_keyname}";\n')
     fd.write(f'\t\t\t\tsign-images = {sign_images};\n')
     fd.write(f'\t\t\t\tsigner-name = "{signer_name}";\n')
     fd.write(f'\t\t\t\tsigner-version = "{signer_version}";\n')
@@ -290,7 +290,7 @@ def fitimage_emit_section_config(d, fd, dtb, kernelcount, ramdiskcount, setupcou
     conf_default = None
     conf_prefix = d.getVar('FITIMAGE_CONFIG_PREFIX') or ""
 
-    bb.note(f"Adding {dtb} section to ITS file")
+    bb.note(f"Adding {conf_prefix}{dtb} section to ITS file")
 
     conf_desc="Linux kernel"
     if dtb:
@@ -341,9 +341,9 @@ def fitimage_emit_section_config_fdto(d, fd, dtb, compatible):
 
     fd.write(f'\t\t{dtb} {{\n')
     fd.write(f'\t\t\tdescription = "Device Tree Overlay";\n')
-    fd.write(f'\t\t\tfdt = "fdt-{dtb}";')
+    fd.write(f'\t\t\tfdt = "fdt-{dtb}";\n')
     if compatible:
-       fd.write(f'\t\t\tcompatible = "{compatible}";')
+       fd.write(f'\t\t\tcompatible = "{compatible}";\n')
 
     if sign == "1":
         sign_images = ["fdt"]
@@ -388,8 +388,10 @@ python write_manifest() {
 
         for image in (images or "").split():
             imageflags = d.getVarFlags('FITIMAGE_IMAGE_%s' % image, expand=['file', 'fstype', 'type', 'comp']) or {}
-            imgtype = imageflags.get('type', '')
+            imgtype = imageflags.get('type', 'kernel')
             if imgtype == 'kernel':
+                if d.getVar('KERNEL_IMAGETYPE') not in ('zImage', 'Image') and not imageflags.get('comp'):
+                    bb.warn(f"KERNEL_IMAGETYPE is '{d.getVar('KERNEL_IMAGETYPE')}' but FITIMAGE_IMAGE_kernel[comp] is not set.")
                 default = "%s-%s%s" % (d.getVar('KERNEL_IMAGETYPE'), machine, d.getVar('KERNEL_IMAGE_BIN_EXT'))
                 imgsource = imageflags.get('file', default)
                 imgcomp = imageflags.get('comp', 'none')
@@ -455,11 +457,14 @@ python write_manifest() {
                 imgpath = d.getVar("DEPLOY_DIR_IMAGE")
                 bootscriptid = imgsource
                 fitimage_emit_section_bootscript(d, fd, imgpath, imgsource)
+            else:
+                bb.fatal(f"Unsupported image type: '{imgtype}'")
         fitimage_emit_section_end(d, fd)
         #
         # Step 5: Prepare a configurations section
         #
         fitimage_emit_section_start(d, fd, 'configurations')
+        confcount = 0
         dtbcount = 1
         for dtb in (DTBS or "").split():
             import subprocess
@@ -472,6 +477,7 @@ python write_manifest() {
             dtb_path, dtb_file = os.path.split(dtb)
             fitimage_emit_section_config(d, fd, dtb_file, kernelcount, ramdiskcount, setupcount, bootscriptid, compatible, dtbcount)
             dtbcount += 1
+            confcount += 1
         for dtb in (DTBOS or "").split():
             import subprocess
             try:
@@ -483,8 +489,13 @@ python write_manifest() {
 
             dtb_path, dtb_file = os.path.split(dtb)
             fitimage_emit_section_config_fdto(d, fd, dtb_file, compatible)
+            confcount += 1
 
         fitimage_emit_section_end(d, fd)
+
+        if confcount == 0:
+            bb.fatal("Empty 'configurations' node generated! At least one 'fdt' or 'fdto' type is required.")
+
         fitimage_emit_fit_footer(d, fd)
 }
 
@@ -493,7 +504,7 @@ do_configure[postfuncs] += "write_manifest"
 do_fitimage () {
     if [ "${FITIMAGE_SIGN}" = "1" ]; then
         uboot-mkimage ${FITIMAGE_MKIMAGE_EXTRA_ARGS} \
-            -k ${FITIMAGE_SIGN_KEYDIR} -r \
+            -k "${FITIMAGE_SIGN_KEYDIR}" -r \
             -f "${B}/manifest.its" \
             "${B}/fitImage"
     else

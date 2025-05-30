@@ -1,0 +1,47 @@
+From 7d3db0f63b9fa4a0deca486eccbe60c3cfa00750 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 16 Apr 2025 18:28:24 +0900
+Subject: [PATCH] Fix incompatible-pointer-types error with gcc 15
+
+../ssmtp-2.64/ssmtp.c:1454:31: error: passing argument 2 of 'signal' from incompatible pointer type [-Wincompatible-pointer-types]
+ 1454 |         (void)signal(SIGALRM, (void(*)())handler);      /* Catch SIGALRM */
+      |                               ^~~~~~~~~~~~~~~~~~
+      |                               |
+      |                               void (*)(void)
+In file included from TOPDIR/tmp/work/core2-64-oe-linux/ssmtp/2.64/recipe-sysroot/usr/include/sys/param.h:28,
+                 from ../ssmtp-2.64/ssmtp.c:18:
+TOPDIR/tmp/work/core2-64-oe-linux/ssmtp/2.64/recipe-sysroot/usr/include/signal.h:88:57: note: expected '__sighandler_t' {aka 'void (*)(int)'} but argument is of type 'void (*)(void)'
+   88 | extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+      |                                          ~~~~~~~~~~~~~~~^~~~~~~~~
+../ssmtp-2.64/ssmtp.c:1393:6: note: 'handler' declared here
+ 1393 | void handler(void)
+      |      ^~~~~~~
+
+Upstream-Status: Inactive-Upstream [This package has been orphaned https://bugs.debian.org/925056]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ ssmtp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ssmtp.c b/ssmtp.c
+index 4dedaf8..a938d14 100644
+--- a/ssmtp.c
++++ b/ssmtp.c
+@@ -1390,7 +1390,7 @@ handler() -- A "normal" non-portable version of an alarm handler
+ 			like a socket. So we longjump instead, which is erronious on
+ 			a small number of machines and ill-defined in the language
+ */
+-void handler(void)
++void handler(__attribute__((unused)) int sig)
+ {
+ 	extern jmp_buf TimeoutJmpBuf;
+ 
+@@ -1451,7 +1451,7 @@ int ssmtp(char *argv[])
+ 	from = from_format(uad, override_from);
+ 
+ 	/* Now to the delivery of the message */
+-	(void)signal(SIGALRM, (void(*)())handler);	/* Catch SIGALRM */
++	(void)signal(SIGALRM, handler);	/* Catch SIGALRM */
+ 	(void)alarm((unsigned) MAXWAIT);			/* Set initial timer */
+ 	if(setjmp(TimeoutJmpBuf) != 0) {
+ 		/* Then the timer has gone off and we bail out */

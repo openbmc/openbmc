@@ -1,7 +1,7 @@
 SUMMARY = "Music Player Daemon library"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
-HOMEPAGE ="http://sourceforge.net/projects/musicpd"
+HOMEPAGE = "http://sourceforge.net/projects/musicpd"
 DEPENDS = "glib-2.0"
 
 SRC_URI = "http://www.musicpd.org/download/${BPN}/${PV}/${BP}.tar.gz \

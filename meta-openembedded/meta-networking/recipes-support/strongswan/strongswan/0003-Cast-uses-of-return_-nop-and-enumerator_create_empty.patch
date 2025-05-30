@@ -1,0 +1,118 @@
+From 11978ddd39e800b5f35f721d726e8a4cb7e4ec0f Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 17:00:44 +0100
+Subject: [PATCH] Cast uses of return_*(), nop() and enumerator_create_empty()
+
+As described in the previous commit, GCC 15 uses C23 by default and that
+changes the meaning of such argument-less function declarations.  So
+whenever we assign such a function to a pointer that expects a function
+with arguments it causes an incompatible pointer type warning.  We
+could define dedicated functions/callbacks whenever necessary, but this
+seems like the simpler approach for now (especially since most uses of
+these functions have already been cast).
+
+Upstream-Status: Backport [11978dd Cast uses of return_*(), nop() and enumerator_create_empty()]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/charon-nm/nm/nm_handler.c                           | 2 +-
+ src/libcharon/encoding/payloads/encrypted_payload.c     | 2 +-
+ src/libcharon/plugins/android_dns/android_dns_handler.c | 2 +-
+ src/libcharon/plugins/ha/ha_attribute.c                 | 2 +-
+ src/libcharon/plugins/updown/updown_handler.c           | 2 +-
+ src/libstrongswan/utils/identification.c                | 6 +++---
+ 6 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/src/charon-nm/nm/nm_handler.c b/src/charon-nm/nm/nm_handler.c
+index d7331ad72..39d0190ac 100644
+--- a/src/charon-nm/nm/nm_handler.c
++++ b/src/charon-nm/nm/nm_handler.c
+@@ -195,7 +195,7 @@ nm_handler_t *nm_handler_create()
+ 		.public = {
+ 			.handler = {
+ 				.handle = _handle,
+-				.release = nop,
++				.release = (void*)nop,
+ 				.create_attribute_enumerator = _create_attribute_enumerator,
+ 			},
+ 			.create_enumerator = _create_enumerator,
+diff --git a/src/libcharon/encoding/payloads/encrypted_payload.c b/src/libcharon/encoding/payloads/encrypted_payload.c
+index 676d00b7a..4821c6108 100644
+--- a/src/libcharon/encoding/payloads/encrypted_payload.c
++++ b/src/libcharon/encoding/payloads/encrypted_payload.c
+@@ -1023,7 +1023,7 @@ encrypted_fragment_payload_t *encrypted_fragment_payload_create()
+ 				.get_length = _frag_get_length,
+ 				.add_payload = _frag_add_payload,
+ 				.remove_payload = (void*)return_null,
+-				.generate_payloads = nop,
++				.generate_payloads = (void*)nop,
+ 				.set_transform = _frag_set_transform,
+ 				.get_transform = _frag_get_transform,
+ 				.encrypt = _frag_encrypt,
+diff --git a/src/libcharon/plugins/android_dns/android_dns_handler.c b/src/libcharon/plugins/android_dns/android_dns_handler.c
+index 78f4f702a..14d2ff99a 100644
+--- a/src/libcharon/plugins/android_dns/android_dns_handler.c
++++ b/src/libcharon/plugins/android_dns/android_dns_handler.c
+@@ -191,7 +191,7 @@ METHOD(enumerator_t, enumerate_dns, bool,
+ 	VA_ARGS_VGET(args, type, data);
+ 	*type = INTERNAL_IP4_DNS;
+ 	*data = chunk_empty;
+-	this->venumerate = return_false;
++	this->venumerate = (void*)return_false;
+ 	return TRUE;
+ }
+ 
+diff --git a/src/libcharon/plugins/ha/ha_attribute.c b/src/libcharon/plugins/ha/ha_attribute.c
+index b865a4b82..103d1a937 100644
+--- a/src/libcharon/plugins/ha/ha_attribute.c
++++ b/src/libcharon/plugins/ha/ha_attribute.c
+@@ -381,7 +381,7 @@ ha_attribute_t *ha_attribute_create(ha_kernel_t *kernel, ha_segments_t *segments
+ 			.provider = {
+ 				.acquire_address = _acquire_address,
+ 				.release_address = _release_address,
+-				.create_attribute_enumerator = enumerator_create_empty,
++				.create_attribute_enumerator = (void*)enumerator_create_empty,
+ 			},
+ 			.reserve = _reserve,
+ 			.destroy = _destroy,
+diff --git a/src/libcharon/plugins/updown/updown_handler.c b/src/libcharon/plugins/updown/updown_handler.c
+index 36eb15615..3707e1e65 100644
+--- a/src/libcharon/plugins/updown/updown_handler.c
++++ b/src/libcharon/plugins/updown/updown_handler.c
+@@ -220,7 +220,7 @@ updown_handler_t *updown_handler_create()
+ 			.handler = {
+ 				.handle = _handle,
+ 				.release = _release,
+-				.create_attribute_enumerator = enumerator_create_empty,
++				.create_attribute_enumerator = (void*)enumerator_create_empty,
+ 			},
+ 			.create_dns_enumerator = _create_dns_enumerator,
+ 			.destroy = _destroy,
+diff --git a/src/libstrongswan/utils/identification.c b/src/libstrongswan/utils/identification.c
+index d31955b38..58a05052d 100644
+--- a/src/libstrongswan/utils/identification.c
++++ b/src/libstrongswan/utils/identification.c
+@@ -1625,7 +1625,7 @@ static private_identification_t *identification_create(id_type_t type)
+ 			this->public.hash = _hash_binary;
+ 			this->public.equals = _equals_binary;
+ 			this->public.matches = _matches_any;
+-			this->public.contains_wildcards = return_true;
++			this->public.contains_wildcards = (void*)return_true;
+ 			break;
+ 		case ID_FQDN:
+ 		case ID_RFC822_ADDR:
+@@ -1660,13 +1660,13 @@ static private_identification_t *identification_create(id_type_t type)
+ 			this->public.hash = _hash_binary;
+ 			this->public.equals = _equals_binary;
+ 			this->public.matches = _matches_range;
+-			this->public.contains_wildcards = return_false;
++			this->public.contains_wildcards = (void*)return_false;
+ 			break;
+ 		default:
+ 			this->public.hash = _hash_binary;
+ 			this->public.equals = _equals_binary;
+ 			this->public.matches = _matches_binary;
+-			this->public.contains_wildcards = return_false;
++			this->public.contains_wildcards = (void*)return_false;
+ 			break;
+ 	}
+ 	return this;

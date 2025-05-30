@@ -19,7 +19,7 @@ S = "${WORKDIR}/git"
 #   - CONFIG_FUNCTION_TRACER=y
 #   - CONFIG_FUNCTION_GRAPH_TRACER=y
 
-COMPATIBLE_HOST='(i.86|x86_64).*'
+COMPATIBLE_HOST = '(i.86|x86_64).*'
 EXTRA_OEMAKE = "PREFIX=${prefix} DESTDIR=${D} LIBDIR=${libdir} BASELIB=${baselib}"
 
 do_install() {

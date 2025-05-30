@@ -6,8 +6,8 @@ require trusted-services.inc
 
 DEPENDS        += "python3-jsonschema-native python3-jinja2-native"
 
-DEPENDS        += "libts"
-RDEPENDS:${PN} += "libts"
+DEPENDS        += "libpsats"
+RDEPENDS:${PN} += "libpsats"
 
 SRC_URI += "git://github.com/ARM-software/psa-arch-tests.git;name=psatest;protocol=https;branch=main;destsuffix=git/psatest \
             file://0001-Pass-Yocto-build-settings-to-psa-arch-tests-native.patch;patchdir=../psatest \

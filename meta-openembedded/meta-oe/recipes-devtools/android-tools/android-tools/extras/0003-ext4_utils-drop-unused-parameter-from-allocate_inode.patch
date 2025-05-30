@@ -1,0 +1,69 @@
+From c9f8cb184a7218c97ff966db44da6dd814c0e273 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 21 Mar 2025 09:49:32 +0000
+Subject: [PATCH] ext4_utils: drop unused parameter from allocate_inode()
+
+* fixes build with gcc-15:
+  http://errors.yoctoproject.org/Errors/Details/848455/
+
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c: In function 'make_directory':
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c:115:29: error: too many arguments to function 'allocate_inode'; expected 0, have 1
+  115 |                 inode_num = allocate_inode(info);
+      |                             ^~~~~~~~~~~~~~ ~~~~
+In file included from TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c:32:
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/allocate.h:61:5: note: declared here
+   61 | u32 allocate_inode();
+      |     ^~~~~~~~~~~~~~
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c: In function 'make_file':
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c:183:21: error: too many arguments to function 'allocate_inode'; expected 0, have 1
+  183 |         inode_num = allocate_inode(info);
+      |                     ^~~~~~~~~~~~~~ ~~~~
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/allocate.h:61:5: note: declared here
+   61 | u32 allocate_inode();
+      |     ^~~~~~~~~~~~~~
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c: In function 'make_link':
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/contents.c:218:21: error: too many arguments to function 'allocate_inode'; expected 0, have 1
+  218 |         inode_num = allocate_inode(info);
+      |                     ^~~~~~~~~~~~~~ ~~~~
+TOPDIR/tmp/work/core2-64-oe-linux/android-tools/5.1.1.r37/git/system/extras/ext4_utils/allocate.h:61:5: note: declared here
+   61 | u32 allocate_inode();
+      |     ^~~~~~~~~~~~~~
+make: *** [<builtin>: contents.o] Error 1
+
+Upstream-Status: Pending [this whole code was removed in newer version android-9.0.0_r1 https://android.googlesource.com/platform/system/extras/+/7a837fcd6e9c0e0219f743052c78cc1c5988dfaf]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ ext4_utils/contents.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/ext4_utils/contents.c b/ext4_utils/contents.c
+index 3144de93f..ac1b71706 100644
+--- a/ext4_utils/contents.c
++++ b/ext4_utils/contents.c
+@@ -112,7 +112,7 @@ u32 make_directory(u32 dir_inode_num, u32 entries, struct dentry *dentries,
+ 	len = blocks * info.block_size;
+ 
+ 	if (dir_inode_num) {
+-		inode_num = allocate_inode(info);
++		inode_num = allocate_inode();
+ 	} else {
+ 		dir_inode_num = EXT4_ROOT_INO;
+ 		inode_num = EXT4_ROOT_INO;
+@@ -180,7 +180,7 @@ u32 make_file(const char *filename, u64 len)
+ 	struct ext4_inode *inode;
+ 	u32 inode_num;
+ 
+-	inode_num = allocate_inode(info);
++	inode_num = allocate_inode();
+ 	if (inode_num == EXT4_ALLOCATE_FAILED) {
+ 		error("failed to allocate inode\n");
+ 		return EXT4_ALLOCATE_FAILED;
+@@ -215,7 +215,7 @@ u32 make_link(const char *link)
+ 	u32 inode_num;
+ 	u32 len = strlen(link);
+ 
+-	inode_num = allocate_inode(info);
++	inode_num = allocate_inode();
+ 	if (inode_num == EXT4_ALLOCATE_FAILED) {
+ 		error("failed to allocate inode\n");
+ 		return EXT4_ALLOCATE_FAILED;

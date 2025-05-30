@@ -3,25 +3,25 @@ HOMEPAGE    = "http://www.la-samhna.de/samhain/"
 LICENSE     = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8ca43cbc842c2336e835926c2166c28b"
 
-PV = "4.4.10"
+PV = "4.5.2"
 
 SRC_URI = "https://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
            file://${INITSCRIPT_NAME}.init \
            file://${INITSCRIPT_NAME}.default \
            file://samhain.service \
-           file://samhain-mips64-aarch64-dnmalloc-hash-fix.patch \
-           file://samhain-samhainrc.patch \
-           file://samhain-samhainrc-fix-files-dirs-path.patch \
-           file://samhain-pid-path.patch \
-           file://samhain-sha256-big-endian.patch \
-           file://samhain-configure-add-option-for-ps.patch \
-           file://samhain-avoid-searching-host-for-postgresql.patch \
-           file://samhain-add-LDFLAGS-variable-for-samhain_setpwd.patch \
-           file://fix-build-with-new-version-attr.patch \
-           file://samhain-fix-initializer-element-is-not-constant.patch \
+           file://0001-Hash-fix-for-MIPS64-and-AARCH64.patch \
+           file://0002-Make-samhainrc-OE-friendly.patch \
+           file://0003-fix-real-path-for-some-files-dirs.patch \
+           file://0004-Set-the-PID-Lock-path-for-samhain.pid.patch \
+           file://0005-Fix-sha256-for-big-endian-machines.patch \
+           file://0006-configure-add-option-for-ps.patch \
+           file://0007-configure.ac-avoid-searching-host-for-postgresql.patch \
+           file://0008-Add-LDFLAGS-variable-for-compiling-samhain_setpwd.patch \
+           file://0009-fix-build-with-new-version-attr.patch \
+           file://0010-Fix-initializer-element-is-not-constant.patch \
            "
 
-SRC_URI[sha256sum] = "ae6ee8eff3cb111b7fc14a57bcc258443dd0bcf1bfacfdf229935ed053c1ce3d"
+SRC_URI[sha256sum] = "0b5d3534fd60ecf45dfd79bd415e81f7a56eba7f1755771735e204f334033578"
 
 UPSTREAM_CHECK_URI = "https://www.la-samhna.de/samhain/archive.html"
 UPSTREAM_CHECK_REGEX = "samhain_signed-(?P<pver>(\d+(\.\d+)+))\.tar"

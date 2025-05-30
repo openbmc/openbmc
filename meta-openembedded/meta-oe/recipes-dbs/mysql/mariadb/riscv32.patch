@@ -1,0 +1,19 @@
+Do not use static_cast in C sources
+
+C compiler does not recognise static_cast which is a C++ keyword
+and bails out compiling mysys/my_rdtsc.c, use traditional typecast
+instead
+
+Upstream-Status: Submitted [https://github.com/MariaDB/server/pull/1981/files#r2032207090]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/include/my_rdtsc.h
++++ b/include/my_rdtsc.h
+@@ -226,7 +226,7 @@ static inline ulonglong my_timer_cycles(
+         "sub %0, zero, %0\n"
+         "and %1, %1, %0\n"
+         : "=r"(result_hi0), "=r"(result_lo), "=r"(result_hi1));
+-    return (static_cast<ulonglong>(result_hi1) << 32) | result_lo;
++    return ((ulonglong)result_hi1 << 32) | result_lo;
+ # else
+     ulonglong result;
+     __asm __volatile__("rdtime %0" : "=r"(result));

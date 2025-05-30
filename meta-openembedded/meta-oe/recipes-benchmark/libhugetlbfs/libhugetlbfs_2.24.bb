@@ -42,7 +42,7 @@ EXTRA_OEMAKE = "'ARCH=${LIBHUGETLBFS_ARCH}' 'OPT=${CFLAGS}' 'CC=${CC}' ${LIBARGS
 PARALLEL_MAKE = ""
 CFLAGS += "-fexpensive-optimizations -frename-registers -fomit-frame-pointer -g0"
 
-export HUGETLB_LDSCRIPT_PATH="${S}/ldscripts"
+export HUGETLB_LDSCRIPT_PATH = "${S}/ldscripts"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
@@ -50,15 +50,9 @@ LDFLAGS += "-B${S}"
 
 inherit autotools-brokensep cpan-base
 
-#The CUSTOM_LDSCRIPTS doesn't work with the gold linker
 do_configure:prepend() {
-    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'ld-is-gold', d)}" ]; then
-        sed -i 's/CUSTOM_LDSCRIPTS = yes/CUSTOM_LDSCRIPTS = no/'  Makefile.in
-    fi
-
     ln -sf ld.hugetlbfs ${S}/ld
     ln -sf ld.hugetlbfs ${S}/ld.bfd
-    ln -sf ld.hugetlbfs ${S}/ld.gold
     ln -sf ld.hugetlbfs ${S}/ld.lld
 }
 

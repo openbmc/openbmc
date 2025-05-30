@@ -10,6 +10,7 @@ do_patch[depends] = "quilt-native:do_populate_sysroot"
 SRC_URI = "http://snapshot.debian.org/archive/debian/20181022T085404Z/pool/main/n/netcat-openbsd/netcat-openbsd_${PV}.orig.tar.gz;name=netcat \
            http://snapshot.debian.org/archive/debian/20181022T085404Z/pool/main/n/netcat-openbsd/netcat-openbsd_${PV}-1.debian.tar.xz;name=netcat-patch;subdir=${BP} \
            file://0001-bundle-own-base64-encode-decode-functions.patch \
+           file://0001-fix-netcat-openbsd-ftbfs-with-GCC-15.patch \
            "
 
 SRC_URI[netcat.md5sum] = "219d5e49c45658e229a3bda63063a986"

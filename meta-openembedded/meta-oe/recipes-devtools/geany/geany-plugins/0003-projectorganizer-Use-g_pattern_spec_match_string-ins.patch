@@ -1,0 +1,89 @@
+From a4a7c4af7f62eb55c0bd100ed1d308e6512a66ce Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ji=C5=99=C3=AD=20Techet?= <techet@gmail.com>
+Date: Tue, 23 Apr 2024 18:43:51 +0200
+Subject: [PATCH 3/3] projectorganizer: Use g_pattern_spec_match_string() instead of g_pattern_match_string()
+
+Eliminates a warning on newer glib versions. Adds a fallback on older versions.
+
+Upstream-Status: Backport [https://github.com/geany/geany-plugins/commit/a4a7c4af7f62eb55c0bd100ed1d308e6512a66ce]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ projectorganizer/src/prjorg-project.c | 2 +-
+ projectorganizer/src/prjorg-sidebar.c | 4 ++--
+ projectorganizer/src/prjorg-utils.c   | 4 ++--
+ projectorganizer/src/prjorg-utils.h   | 5 +++++
+ 4 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/projectorganizer/src/prjorg-project.c b/projectorganizer/src/prjorg-project.c
+index a767ab8..71dc6e1 100644
+--- a/projectorganizer/src/prjorg-project.c
++++ b/projectorganizer/src/prjorg-project.c
+@@ -216,7 +216,7 @@ static gboolean match_basename(gconstpointer pft, gconstpointer user_data)
+ 	{
+ 		GPatternSpec *pattern = g_pattern_spec_new(ft->pattern[j]);
+ 
+-		if (g_pattern_match_string(pattern, utf8_base_filename))
++		if (g_pattern_spec_match_string(pattern, utf8_base_filename))
+ 		{
+ 			ret = TRUE;
+ 			g_pattern_spec_free(pattern);
+diff --git a/projectorganizer/src/prjorg-sidebar.c b/projectorganizer/src/prjorg-sidebar.c
+index e67cce2..b7536ee 100644
+--- a/projectorganizer/src/prjorg-sidebar.c
++++ b/projectorganizer/src/prjorg-sidebar.c
+@@ -657,7 +657,7 @@ static void find_file_recursive(GtkTreeIter *iter, gboolean case_sensitive, gboo
+ 		if (!case_sensitive)
+ 			SETPTR(utf8_name, g_utf8_strdown(utf8_name, -1));
+ 
+-		if (g_pattern_match_string(pattern, utf8_name))
++		if (g_pattern_spec_match_string(pattern, utf8_name))
+ 		{
+ 			gchar *utf8_base_path = get_project_base_path();
+ 			gchar *utf8_path, *rel_path;
+@@ -840,7 +840,7 @@ static gboolean match(TMTag *tag, const gchar *name, gboolean declaration, gbool
+ 				matches = g_strcmp0(name_case, name) == 0;
+ 				break;
+ 			case MATCH_PATTERN:
+-				matches = g_pattern_match_string(pspec, name_case);
++				matches = g_pattern_spec_match_string(pspec, name_case);
+ 				break;
+ 			case MATCH_PREFIX:
+ 				matches = g_str_has_prefix(name_case, name);
+diff --git a/projectorganizer/src/prjorg-utils.c b/projectorganizer/src/prjorg-utils.c
+index 2a8847e..0b573e5 100644
+--- a/projectorganizer/src/prjorg-utils.c
++++ b/projectorganizer/src/prjorg-utils.c
+@@ -80,7 +80,7 @@ gboolean patterns_match(GSList *patterns, const gchar *str)
+ 	foreach_slist (elem, patterns)
+ 	{
+ 		GPatternSpec *pattern = elem->data;
+-		if (g_pattern_match_string(pattern, str))
++		if (g_pattern_spec_match_string(pattern, str))
+ 			return TRUE;
+ 	}
+ 	return FALSE;
+@@ -269,7 +269,7 @@ gchar *try_find_header_source(gchar *utf8_file_name, gboolean is_header, GSList
+ 		full_name = elem->data;
+ 		gchar *base_name = g_path_get_basename(full_name);
+ 
+-		if (g_pattern_match_string(pattern, base_name))
++		if (g_pattern_spec_match_string(pattern, base_name))
+ 		{
+ 			if ((is_header && patterns_match(source_patterns, base_name)) ||
+ 				(!is_header && patterns_match(header_patterns, base_name)))
+diff --git a/projectorganizer/src/prjorg-utils.h b/projectorganizer/src/prjorg-utils.h
+index c3719a9..50ed123 100644
+--- a/projectorganizer/src/prjorg-utils.h
++++ b/projectorganizer/src/prjorg-utils.h
+@@ -19,6 +19,11 @@
+ #ifndef __PRJORG_UTILS_H__
+ #define __PRJORG_UTILS_H__
+ 
++
++ #if ! GLIB_CHECK_VERSION(2, 70, 0)
++ # define g_pattern_spec_match_string g_pattern_match_string
++ #endif
++ 
+ gchar *get_relative_path(const gchar *utf8_parent, const gchar *utf8_descendant);
+ 
+ gboolean patterns_match(GSList *patterns, const gchar *str);

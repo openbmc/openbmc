@@ -15,5 +15,7 @@ SRC_URI[sha256sum] = "1126f3a95856d08889ff89703cb1aa9ec9924d939d154e96904c920f05
 
 inherit autotools
 
-PACKAGECONFIG[libsodium] ="ac_cv_lib_sodium_crypto_pwhash_scryptsalsa208sha256_str=yes, \
-                           ac_cv_lib_sodium_crypto_pwhash_scryptsalsa208sha256_str=no, libsodium"
+EXTRA_AUTORECONF += "-I m4"
+
+PACKAGECONFIG[libsodium] = "ac_cv_lib_sodium_crypto_pwhash_scryptsalsa208sha256_str=yes, \
+                            ac_cv_lib_sodium_crypto_pwhash_scryptsalsa208sha256_str=no, libsodium"

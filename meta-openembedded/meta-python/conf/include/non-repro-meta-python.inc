@@ -7,9 +7,15 @@ KNOWN_NON_REPRO_META_PYTHON = " \
     python3-frozenlist \
     python3-frozenlist-dbg \
     python3-kivy-src \
+    python3-lief \
+    python3-mlcommons-loadgen \
+    python3-mlcommons-loadgen-dbg \
+    python3-mlcommons-loadgen-src \
     python3-pandas \
     python3-pandas-dbg \
     python3-pandas-src \
+    python3-propcache \
+    python3-propcache-dbg \
     python3-pybind11-json-dev \
     python3-pycocotools-src \
     python3-pydantic-core \

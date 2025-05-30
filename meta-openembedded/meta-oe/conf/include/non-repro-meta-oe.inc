@@ -1,12 +1,12 @@
 # List of known non-reproducible package of the meta-oe layer
 # Please keep this list sorted
 KNOWN_NON_REPRO_META_OE = " \
-    boinc-client-dev \
-    cjson-ptest \
+    apitrace \
+    apitrace-dbg \
+    asio-dbg \
+    asio-ptest \
+    asio-src \
     cpuid-doc \
-    crash \
-    crash-dbg \
-    crash-src \
     dhrystone \
     dhrystone-dbg \
     dhrystone-dev \
@@ -14,13 +14,20 @@ KNOWN_NON_REPRO_META_OE = " \
     directfb \
     directfb-dbg \
     doxygen-src \
+    edid-decode \
+    edid-decode-dbg \
     editorconfig-core-c-dev \
     etcd-cpp-apiv3-dev \
+    evemu-tools-python \
     fbgrab-doc \
     fluentbit-src \
+    fsverity-utils-dbg \
+    fsverity-utils-staticdev \
     fvwm-dbg \
     fvwm-doc \
     fvwm-extra \
+    fwupd-dbg \
+    fwupd-ptest \
     gcab-src \
     gosu \
     gosu-dbg \
@@ -33,20 +40,41 @@ KNOWN_NON_REPRO_META_OE = " \
     hdf5-dbg \
     hdf5-src \
     hdf5-staticdev \
+    hplip-dbg \
+    hplip-filter \
+    hplip-src \
+    iotop \
+    iotop-dbg \
+    ipmiutil \
+    ipmiutil-dbg \
+    ipmiutil-dev \
     jpnevulator-doc \
     jsonrpc-dev \
     kpatch-build \
     kpatch-doc \
     ldns \
+    libass9 \
+    libass-dbg \
+    libbotan-3-7 \
     libbotan-3-bin \
     libbotan-3-dbg \
     libbotan-3-dev \
     libck-doc \
     libdbus-cxx-dev \
     libforms \
+    libfsverity0 \
+    libhugetlbfs-doc \
     libiio-src \
     libjcat-dbg \
     libjcat-ptest \
+    librelp-dbg \
+    librelp-ptest \
+    libsdl2-compat \
+    libsdl2-compat-dbg \
+    libsource-highlight5 \
+    libsource-highlight-dbg \
+    libsource-highlight-dev \
+    libsource-highlight-src \
     libthrift-c-glib-zlib-src \
     libvncserver-dev \
     libwebsockets-testapps \
@@ -74,8 +102,7 @@ KNOWN_NON_REPRO_META_OE = " \
     nbench-byte-dbg \
     nbench-byte-src \
     nspr-staticdev \
-    openocd \
-    openocd-dbg \
+    obconf-locale-es \
     pcp \
     pcp-dev \
     pcp-doc \
@@ -86,13 +113,24 @@ KNOWN_NON_REPRO_META_OE = " \
     pidgin \
     pidgin-dbg \
     pim435-staticdev \
+    poco-ptest \
     postgresql-server-dev \
     qcbor-staticdev \
+    qperf-doc \
     sharutils \
     sharutils-dbg \
     smemstat-doc \
     soci-dev \
+    switchtec-user \
+    switchtec-user-dbg \
+    switchtec-user-staticdev \
     thin-provisioning-tools-dev \
+    toybox-inittab \
+    toybox-inittab-dbg \
+    toybox-inittab-dev \
+    transmission-dbg \
+    transmission-gtk \
+    transmission-src \
     vulkan-cts \
     vulkan-cts-dbg \
     waylandpp-dev \

@@ -10,7 +10,7 @@ variables:
   # The default machine tag for the build jobs
   DEFAULT_TAG: ""
   # The machine tag for the ACS test jobs
-  ACS_TAG: ""
+  ACS_TAG: "$DEFAULT_TAG"
   # The directory to use as the persistent cache (the root for DL_DIR, SSTATE_DIR, etc)
   CACHE_DIR: $CI_BUILDS_DIR/persist
   # The container mirror to use
@@ -33,9 +33,11 @@ stages:
   stage: build
   interruptible: true
   variables:
+    KUBERNETES_CPU_REQUEST: $CPU_REQUEST
     KAS_WORK_DIR: $CI_PROJECT_DIR/work
     KAS_BUILD_DIR: $KAS_WORK_DIR/build
-    KAS_REPO_REF_DIR: $CACHE_DIR/repos
+    # Set this in the environment to enable local repository caches
+    KAS_REPO_REF_DIR: ""
     SSTATE_DIR: $CACHE_DIR/sstate
     DL_DIR: $CACHE_DIR/downloads
     BB_LOGCONFIG: $CI_PROJECT_DIR/ci/logging.yml
@@ -43,17 +45,12 @@ stages:
     IMAGE_DIR: $KAS_BUILD_DIR/tmp/deploy/images
     TOOLCHAIN_LINK_DIR: $KAS_BUILD_DIR/toolchains
   before_script:
-    - echo KAS_WORK_DIR = $KAS_WORK_DIR
-    - echo SSTATE_DIR = $SSTATE_DIR
-    - echo DL_DIR = $DL_DIR
     - rm -rf $KAS_WORK_DIR
     - mkdir --verbose --parents $KAS_WORK_DIR $KAS_REPO_REF_DIR $SSTATE_DIR $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
 
 # Generalised fragment to do a Kas build
 .build:
   extends: .setup
-  variables:
-    KUBERNETES_CPU_REQUEST: $CPU_REQUEST
   rules:
     # Don't run MR pipelines
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -79,7 +76,8 @@ stages:
 
   artifacts:
     name: "logs"
-    when: always
+    when: on_failure
+    expire_in: 1 week
     paths:
       - $KAS_BUILD_DIR/tmp*/work*/**/temp/log.do_*.*
       - $KAS_BUILD_DIR/tmp*/work*/**/testimage/*
@@ -97,7 +95,18 @@ update-repos:
     exit_codes: 128
   script:
     - |
-      flock --verbose --timeout 60 $KAS_REPO_REF_DIR ./ci/update-repos
+      exit_code=0
+
+      # Dump the environment for reference
+      printenv
+
+      # Update the reference repositories if needed
+      if [ -n "$KAS_REPO_REF_DIR" ]; then
+        flock --verbose --timeout 60 $KAS_REPO_REF_DIR --command ./ci/update-repos || exit_code=$?
+        # Exit now if that failed, unless the status was 128 (fetch failed)
+        test $exit_code != 0 -a $exit_code != 128 && exit 1
+      fi
+
       # Only generate if doesn't already exist, to allow feature branches to drop one in.
       if test -f lockfile.yml; then
         echo Using existing lockfile.yml
@@ -105,8 +114,10 @@ update-repos:
         # Be sure that this is the complete list of layers being fetched
         kas dump --lock --update ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/clang.yml:ci/meta-virtualization.yml | tee lockfile.yml
       fi
+      exit $exit_code
   artifacts:
     name: "lockfile"
+    when: always
     paths:
       - lockfile.yml
 
@@ -250,9 +261,6 @@ pending-updates:
     # This configuration has all of the layers we need enabled
     - kas shell --update --force-checkout ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/meta-secure-core.yml:lockfile.yml --command \
       "$CI_PROJECT_DIR/scripts/machine-summary.py -t report -o $CI_PROJECT_DIR/update-report $($CI_PROJECT_DIR/ci/listmachines.py meta-arm meta-arm-bsp)"
-  # Do this on x86 whilst the compilers are x86-only
-  tags:
-    - x86_64
 
 qemuarm64-secureboot:
   extends: .build
@@ -343,6 +351,12 @@ selftest:
 
 sgi575:
   extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+  # FVP binary is x86-only
+  tags:
+    - x86_64
 
 toolchains:
   extends: .build

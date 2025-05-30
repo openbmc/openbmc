@@ -1,4 +1,4 @@
-From 8fe25b30b6fbb3170705f4468eb4c92eef3a968f Mon Sep 17 00:00:00 2001
+From d8631a433abf7336b065ecfaa5161e408ea47255 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Mon, 4 Jan 2016 01:44:04 -0500
 Subject: [PATCH] Avoid searching host dirs
@@ -14,15 +14,15 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 Rebased for 3.2.3
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---
- m4/fr_smart_check_include.m4                                |    2 +-
- m4/fr_smart_check_lib.m4                                    |   22 ----------------------
- src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac        |    4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_firebird/configure.ac   |    4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_iodbc/configure.ac      |    4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_mysql/configure.ac      |    6 +++---
- src/modules/rlm_sql/drivers/rlm_sql_oracle/configure.ac     |    2 +-
- src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac |    4 ++--
- src/modules/rlm_sql/drivers/rlm_sql_unixodbc/configure.ac   |    4 ++--
+ m4/fr_smart_check_include.m4                  |  2 +-
+ m4/fr_smart_check_lib.m4                      | 22 -------------------
+ .../rlm_sql/drivers/rlm_sql_db2/configure.ac  |  4 ++--
+ .../drivers/rlm_sql_firebird/configure.ac     |  4 ++--
+ .../drivers/rlm_sql_iodbc/configure.ac        |  4 ++--
+ .../drivers/rlm_sql_mysql/configure.ac        |  6 ++---
+ .../drivers/rlm_sql_oracle/configure.ac       |  2 +-
+ .../drivers/rlm_sql_postgresql/configure.ac   |  4 ++--
+ .../drivers/rlm_sql_unixodbc/configure.ac     |  4 ++--
  9 files changed, 15 insertions(+), 37 deletions(-)
 
 diff --git a/m4/fr_smart_check_include.m4 b/m4/fr_smart_check_include.m4
@@ -38,6 +38,39 @@ index e7d4443f9c..2b69704f98 100644
  
  dnl #  Our local versions
  _smart_try_dir=
+diff --git a/m4/fr_smart_check_lib.m4 b/m4/fr_smart_check_lib.m4
+index 16ac5b3c5e..0f5e9fc6d6 100644
+--- a/m4/fr_smart_check_lib.m4
++++ b/m4/fr_smart_check_lib.m4
+@@ -64,28 +64,6 @@ if test "x$smart_lib" = "x"; then
+   LIBS="$old_LIBS"
+ fi
+ 
+-dnl #
+-dnl #  Try to guess possible locations.
+-dnl #
+-if test "x$smart_lib" = "x"; then
+-  for try in /usr/local/lib /opt/lib; do
+-    AC_MSG_CHECKING([for $2 in -l$1 in $try])
+-    LIBS="-l$1 $old_LIBS"
+-    CPPFLAGS="-L$try -Wl,-rpath,$try $old_CPPFLAGS"
+-    AC_TRY_LINK([extern char $2();],
+-		[$2()],
+-		[
+-		  smart_lib="-l$1"
+-		  smart_ldflags="-L$try -Wl,-rpath,$try"
+-		  AC_MSG_RESULT(yes)
+-		  break
+-		],
+-		[AC_MSG_RESULT(no)])
+-  done
+-  LIBS="$old_LIBS"
+-  CPPFLAGS="$old_CPPFLAGS"
+-fi
+-
+ dnl #
+ dnl #  Found it, set the appropriate variable.
+ dnl #
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac
 index 0d94ee9bf6..6108e62054 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_db2/configure.ac
@@ -146,7 +179,7 @@ index f31b7d2c5a..67bbf66df5 100644
  if test "x$ORACLE_HOME" != "x"; then
  	smart_try_dir="${smart_try_dir} ${ORACLE_HOME}/include"
 diff --git a/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac b/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac
-index 46587e4099..b41c51bda7 100644
+index 6b1c9e964e..1937d81134 100644
 --- a/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac
 +++ b/src/modules/rlm_sql/drivers/rlm_sql_postgresql/configure.ac
 @@ -43,7 +43,7 @@ AC_ARG_WITH(rlm-sql-postgresql-include-dir,
@@ -158,7 +191,7 @@ index 46587e4099..b41c51bda7 100644
  FR_SMART_CHECK_INCLUDE(libpq-fe.h)
  if test "x$ac_cv_header_libpqmfe_h" != "xyes"; then
  	FR_MODULE_FAIL([libpq-fe.h])
-@@ -95,7 +95,7 @@ else
+@@ -110,7 +110,7 @@ else
  		])
  fi
  
@@ -188,36 +221,6 @@ index 3bdfae6032..ce68c312c6 100644
  FR_SMART_CHECK_INCLUDE(sql.h)
  if test "x$ac_cv_header_sql_h" != xyes; then
  	FR_MODULE_FAIL([sql.h])
-diff --git a/m4/fr_smart_check_lib.m4 b/m4/fr_smart_check_lib.m4
-index 16ac5b3c5e..0f5e9fc6d6 100644
---- a/m4/fr_smart_check_lib.m4
-+++ b/m4/fr_smart_check_lib.m4
-@@ -64,28 +64,6 @@ if test "x$smart_lib" = "x"; then
-   LIBS="$old_LIBS"
- fi
- 
--dnl #
--dnl #  Try to guess possible locations.
--dnl #
--if test "x$smart_lib" = "x"; then
--  for try in /usr/local/lib /opt/lib; do
--    AC_MSG_CHECKING([for $2 in -l$1 in $try])
--    LIBS="-l$1 $old_LIBS"
--    CPPFLAGS="-L$try -Wl,-rpath,$try $old_CPPFLAGS"
--    AC_TRY_LINK([extern char $2();],
--		[$2()],
--		[
--		  smart_lib="-l$1"
--		  smart_ldflags="-L$try -Wl,-rpath,$try"
--		  AC_MSG_RESULT(yes)
--		  break
--		],
--		[AC_MSG_RESULT(no)])
--  done
--  LIBS="$old_LIBS"
--  CPPFLAGS="$old_CPPFLAGS"
--fi
--
- dnl #
- dnl #  Found it, set the appropriate variable.
- dnl #
+-- 
+2.25.1
+

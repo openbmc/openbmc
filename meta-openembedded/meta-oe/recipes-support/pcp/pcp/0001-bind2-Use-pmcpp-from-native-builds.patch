@@ -1,0 +1,30 @@
+From 4c79ea13b8456155e1acd6a53a2586b6c2c32e05 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 3 May 2025 14:27:30 -0700
+Subject: [PATCH] bind2: Use pmcpp from native builds
+
+This is needed for cross compiling. Fixes
+| ./mk.rewrite
+| ./mk.rewrite: line 41: ../../pmcpp/pmcpp.static: No such file or directory
+| Error: pmcpp failed
+| make[3]: *** [GNUmakefile:54: rewrite.conf] Error 1
+
+Upstream-Status: Inappropriate [Cross-compiling specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/pmdas/bind2/mk.rewrite | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pmdas/bind2/mk.rewrite b/src/pmdas/bind2/mk.rewrite
+index 36e8dc1e61..142a75a824 100755
+--- a/src/pmdas/bind2/mk.rewrite
++++ b/src/pmdas/bind2/mk.rewrite
+@@ -38,7 +38,7 @@ inlist == 1		{ print }' \
+     -e 's/[ 	][ 	]*\([0-9][0-9]*\)/ { pmid -> BIND2.0.\1 }/' \
+ ) >$tmp.tmp
+ 
+-if PCP_CONF=../../include/pcp.conf ../../pmcpp/pmcpp.static -P <$tmp.tmp >>rewrite.conf
++if PCP_CONF=../../include/pcp.conf pmcpp -P <$tmp.tmp >>rewrite.conf
+ then
+     :
+ else

@@ -1,4 +1,4 @@
-From 3be3b9a1345942d1578ec73efa9b2e3c41bd67c5 Mon Sep 17 00:00:00 2001
+From 1e43b309183f2cca627d1995908aeb9bb0b5bf97 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Fri, 21 Jan 2022 13:22:24 +0800
 Subject: [PATCH] Add autogen.sh

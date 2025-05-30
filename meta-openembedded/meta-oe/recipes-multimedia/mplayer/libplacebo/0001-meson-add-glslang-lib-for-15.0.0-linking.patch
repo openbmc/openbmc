@@ -1,0 +1,34 @@
+From d18a23cc275576bcefbdcc179d08ae643eeb3f3e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kacper=20Michaj=C5=82ow?= <kasper93@gmail.com>
+Date: Mon, 2 Dec 2024 17:10:00 +0100
+Subject: [PATCH] meson: add glslang lib for 15.0.0 linking
+
+Glslang 15.0.0 moved some code around, add also linking to glslang,
+while this is not needed for older versions, it will still work.
+
+Unfortunately CMake config embedded in distributions is not usable
+without installing additional package like glslang-tools, because at
+least Ubuntu splits it. On Arch it would work, but generally the CMake
+config require cmake binary to work also, so let's keep it as-is for
+now.
+
+Upstream-Status: Backport [https://github.com/haasn/libplacebo/commit/056b852018db04aa2ebc0982e27713afcea8106b]
+---
+ src/glsl/meson.build | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/glsl/meson.build b/src/glsl/meson.build
+index 5a881960..8fb5e699 100644
+--- a/src/glsl/meson.build
++++ b/src/glsl/meson.build
+@@ -39,6 +39,10 @@ elif not glslang_req.disabled()
+ 
+     glslang_deps += spirv
+ 
++    # Glslang 15.0.0 moved some code around, add also linking to glslang, while
++    # this is not needed for older versions, it will still work.
++    glslang_deps += cxx.find_library('glslang', required: required, static: static)
++
+     if static
+       glslang_deps += [
+         # Always required for static linking

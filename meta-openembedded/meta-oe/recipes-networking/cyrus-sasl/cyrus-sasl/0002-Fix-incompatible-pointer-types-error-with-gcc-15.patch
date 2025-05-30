@@ -1,0 +1,122 @@
+From 8ad219c21914ee9815c915e075052805efff9757 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 9 Apr 2025 15:42:13 +0900
+Subject: [PATCH 2/3] Fix incompatible-pointer-types error with gcc-15
+
+  * Fix incompatible-pointer-types error with gcc-15
+../../git/saslauthd/md5.c:400:14: error: passing argument 1 of 'MD5_memset' from incompatible pointer type [-Wincompatible-pointer-types]
+  400 |   MD5_memset(&k_ipad, 0, sizeof(k_ipad));
+      |              ^~~~~~~
+      |              |
+      |              unsigned char (*)[65]
+../../git/saslauthd/md5.c:335:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'unsigned char (*)[65]'
+  335 | POINTER output;
+      |         ^~~~~~
+In file included from ../../git/saslauthd/md5.c:29:
+../include/md5global.h:16:24: note: 'POINTER' declared here
+   16 | typedef unsigned char *POINTER;
+      |                        ^~~~~~~
+../../git/saslauthd/md5.c:401:14: error: passing argument 1 of 'MD5_memset' from incompatible pointer type [-Wincompatible-pointer-types]
+  401 |   MD5_memset(&k_opad, 0, sizeof(k_opad));
+      |              ^~~~~~~
+      |              |
+      |              unsigned char (*)[65]
+../../git/saslauthd/md5.c:335:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'unsigned char (*)[65]'
+  335 | POINTER output;
+      |         ^~~~~~
+../include/md5global.h:16:24: note: 'POINTER' declared here
+   16 | typedef unsigned char *POINTER;
+      |                        ^~~~~~~
+../../git/saslauthd/md5.c:402:14: error: passing argument 1 of 'MD5_memset' from incompatible pointer type [-Wincompatible-pointer-types]
+  402 |   MD5_memset(&tk, 0, sizeof(tk));
+      |              ^~~
+      |              |
+      |              unsigned char (*)[16]
+../../git/saslauthd/md5.c:335:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'unsigned char (*)[16]'
+  335 | POINTER output;
+      |         ^~~~~~
+../include/md5global.h:16:24: note: 'POINTER' declared here
+   16 | typedef unsigned char *POINTER;
+      |                        ^~~~~~~
+../../git/saslauthd/md5.c: In function '_saslauthd_hmac_md5_precalc':
+../../git/saslauthd/md5.c:427:14: error: passing argument 1 of 'MD5_memset' from incompatible pointer type [-Wincompatible-pointer-types]
+  427 |   MD5_memset(&hmac, 0, sizeof(hmac));
+      |              ^~~~~
+      |              |
+      |              HMAC_MD5_CTX * {aka struct HMAC_MD5_CTX_s *}
+../../git/saslauthd/md5.c:335:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'HMAC_MD5_CTX *' {aka 'struct HMAC_MD5_CTX_s *'}
+  335 | POINTER output;
+      |         ^~~~~~
+../include/md5global.h:16:24: note: 'POINTER' declared here
+   16 | typedef unsigned char *POINTER;
+      |                        ^~~~~~~
+../../git/saslauthd/md5.c: In function '_saslauthd_hmac_md5_import':
+../../git/saslauthd/md5.c:435:14: error: passing argument 1 of 'MD5_memset' from incompatible pointer type [-Wincompatible-pointer-types]
+  435 |   MD5_memset(hmac, 0, sizeof(HMAC_MD5_CTX));
+      |              ^~~~
+      |              |
+      |              HMAC_MD5_CTX * {aka struct HMAC_MD5_CTX_s *}
+../../git/saslauthd/md5.c:335:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'HMAC_MD5_CTX *' {aka 'struct HMAC_MD5_CTX_s *'}
+  335 | POINTER output;
+      |         ^~~~~~
+../include/md5global.h:16:24: note: 'POINTER' declared here
+   16 | typedef unsigned char *POINTER;
+      |                        ^~~~~~~
+../../git/saslauthd/md5.c: In function '_saslauthd_hmac_md5':
+../../git/saslauthd/md5.c:455:6: warning: old-style function definition [-Wold-style-definition]
+  455 | void _saslauthd_hmac_md5(text, text_len, key, key_len, digest)
+      |      ^~~~~~~~~~~~~~~~~~~
+../../git/saslauthd/md5.c:499:23: warning: passing argument 2 of 'MD5_memcpy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  499 |   MD5_memcpy( k_ipad, key, key_len);
+      |                       ^~~
+../../git/saslauthd/md5.c:322:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'const unsigned char *'
+  322 | POINTER input;
+      |         ^~~~~
+../../git/saslauthd/md5.c:500:23: warning: passing argument 2 of 'MD5_memcpy' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+  500 |   MD5_memcpy( k_opad, key, key_len);
+      |                       ^~~
+../../git/saslauthd/md5.c:322:9: note: expected 'POINTER' {aka 'unsigned char *'} but argument is of type 'const unsigned char *'
+  322 | POINTER input;
+      |         ^~~~~
+
+Upstream-Status: Submitted [https://github.com/cyrusimap/cyrus-sasl/pull/873]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ saslauthd/md5.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/saslauthd/md5.c b/saslauthd/md5.c
+index d38425d2..c16922d8 100644
+--- a/saslauthd/md5.c
++++ b/saslauthd/md5.c
+@@ -397,9 +397,9 @@ void _saslauthd_hmac_md5_init(HMAC_MD5_CTX *hmac,
+   _saslauthd_MD5Update(&hmac->octx, k_opad, 64);     /* apply outer pad */
+ 
+   /* scrub the pads and key context (if used) */
+-  MD5_memset(&k_ipad, 0, sizeof(k_ipad));
+-  MD5_memset(&k_opad, 0, sizeof(k_opad));
+-  MD5_memset(&tk, 0, sizeof(tk));
++  MD5_memset(k_ipad, 0, sizeof(k_ipad));
++  MD5_memset(k_opad, 0, sizeof(k_opad));
++  MD5_memset(tk, 0, sizeof(tk));
+ 
+   /* and we're done. */
+ }
+@@ -424,7 +424,7 @@ void _saslauthd_hmac_md5_precalc(HMAC_MD5_STATE *state,
+     state->istate[lupe] = htonl(hmac.ictx.state[lupe]);
+     state->ostate[lupe] = htonl(hmac.octx.state[lupe]);
+   }
+-  MD5_memset(&hmac, 0, sizeof(hmac));
++  MD5_memset((POINTER)&hmac, 0, sizeof(hmac));
+ }
+ 
+ 
+@@ -432,7 +432,7 @@ void _saslauthd_hmac_md5_import(HMAC_MD5_CTX *hmac,
+ 				HMAC_MD5_STATE *state)
+ {
+   unsigned lupe;
+-  MD5_memset(hmac, 0, sizeof(HMAC_MD5_CTX));
++  MD5_memset((POINTER)hmac, 0, sizeof(HMAC_MD5_CTX));
+   for (lupe = 0; lupe < 4; lupe++) {
+     hmac->ictx.state[lupe] = ntohl(state->istate[lupe]);
+     hmac->octx.state[lupe] = ntohl(state->ostate[lupe]);

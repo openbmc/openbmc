@@ -1,0 +1,47 @@
+From a6b0bc129de493f57bf79005c48a8d4ca0df68c2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Apr 2025 17:34:55 -0700
+Subject: [PATCH] Do not download external dependency tarballs via meson
+
+They are fetched by bitbake fetcher already
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ subprojects/freetype-2.6.1.wrap | 7 +------
+ subprojects/qhull.wrap          | 9 ++-------
+ 2 files changed, 3 insertions(+), 13 deletions(-)
+
+diff --git a/subprojects/freetype-2.6.1.wrap b/subprojects/freetype-2.6.1.wrap
+index 763362b..74ecb13 100644
+--- a/subprojects/freetype-2.6.1.wrap
++++ b/subprojects/freetype-2.6.1.wrap
+@@ -1,10 +1,5 @@
+ [wrap-file]
+-source_url = https://download.savannah.gnu.org/releases/freetype/freetype-old/freetype-2.6.1.tar.gz
+-source_fallback_url = https://downloads.sourceforge.net/project/freetype/freetype2/2.6.1/freetype-2.6.1.tar.gz
+-source_filename = freetype-2.6.1.tar.gz
+-source_hash = 0a3c7dfbda6da1e8fce29232e8e96d987ababbbf71ebc8c75659e4132c367014
+-
+-patch_directory = freetype-2.6.1-meson
++directory = freetype-2.6.1
+ 
+ [provide]
+ freetype-2.6.1 = freetype_dep
+diff --git a/subprojects/qhull.wrap b/subprojects/qhull.wrap
+index c52b07d..30b6904 100644
+--- a/subprojects/qhull.wrap
++++ b/subprojects/qhull.wrap
+@@ -1,9 +1,4 @@
+ [wrap-file]
+-# Also bump the cache key in `.circleci/config.yml`.
+-# Also update the docs in `docs/devel/dependencies.rst`.
+-directory = qhull-8.0.2
+-source_url = https://github.com/qhull/qhull/archive/v8.0.2/qhull-8.0.2.tar.gz
+-source_filename = qhull-8.0.2.tgz
+-source_hash = 8774e9a12c70b0180b95d6b0b563c5aa4bea8d5960c15e18ae3b6d2521d64f8b
++directory = qhull-2020.2
+ 
+-patch_directory = qhull-8.0.2
++patch_directory = qhull-2020.2

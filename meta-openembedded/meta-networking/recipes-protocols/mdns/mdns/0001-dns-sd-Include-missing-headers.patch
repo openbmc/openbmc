@@ -1,4 +1,4 @@
-From a5fe20fa00088683136a09a4da3c36d9b20fe1b9 Mon Sep 17 00:00:00 2001
+From cdbc28c668dd627906f833f9a8e32ac53b0b0139 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 4 Nov 2021 07:31:32 -0700
 Subject: [PATCH] dns-sd: Include missing headers

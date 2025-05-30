@@ -1,0 +1,387 @@
+From c0ffa57e7628f23747d7ee947358f8a538fa5d4c Mon Sep 17 00:00:00 2001
+From: Bence Balogh <bence.balogh@arm.com>
+Date: Mon, 25 Nov 2024 22:17:51 +0100
+Subject: [PATCH 3/3] Revert "Make constraints of NV UEFI variables persistent"
+
+This reverts commit 64bbde5d9950413cf724ffb792d4d1637892fa8b.
+The FMP support didn't work with this commit. See the implementation in the
+0003-FMP-Support-in-Corstone1000.patch file. The 
+0003-FMP-Support-in-Corstone1000.patch will be redesigned but until that, this 
+commit has to be reverted.
+
+Upstream-Status: Inappropriate [To be removed after new FWU design]
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+---
+ .../backend/test/variable_index_tests.cpp     | 93 +++----------------
+ .../backend/uefi_variable_store.c             | 12 +--
+ .../smm_variable/backend/variable_index.c     | 90 +++---------------
+ .../smm_variable/backend/variable_index.h     |  7 +-
+ 4 files changed, 36 insertions(+), 166 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/test/variable_index_tests.cpp b/components/service/uefi/smm_variable/backend/test/variable_index_tests.cpp
+index a52cfbf76..1b7a6b879 100644
+--- a/components/service/uefi/smm_variable/backend/test/variable_index_tests.cpp
++++ b/components/service/uefi/smm_variable/backend/test/variable_index_tests.cpp
+@@ -214,28 +214,21 @@ TEST(UefiVariableIndexTests, dumpLoadRoadtrip)
+ 
+ 	/* Expect the info for two NV variables to have been dumped */
+ 	size_t dump_len = 0;
+-	bool is_dirty = false;
+-	efi_status_t status = EFI_SUCCESS;
+-
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
++	bool is_dirty = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len);
+ 
+ 	CHECK_TRUE(is_dirty);
+-	UNSIGNED_LONGS_EQUAL(EFI_SUCCESS, status);
+-	UNSIGNED_LONGS_EQUAL(((sizeof(struct variable_metadata) + sizeof(bool)) * 2), dump_len);
++	UNSIGNED_LONGS_EQUAL((sizeof(struct variable_metadata) * 2), dump_len);
+ 
+ 	/* Expect no records to be dirty when the dump is repeated */
+ 	dump_len = 0;
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
++	is_dirty = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len);
+ 
+-	UNSIGNED_LONGS_EQUAL(EFI_SUCCESS, status);
+ 	CHECK_FALSE(is_dirty);
+-	UNSIGNED_LONGS_EQUAL(((sizeof(struct variable_metadata) + sizeof(bool)) * 2), dump_len);
++	UNSIGNED_LONGS_EQUAL((sizeof(struct variable_metadata) * 2), dump_len);
+ 
+ 	/* Tear down and reinitialize to simulate a reboot */
+ 	variable_index_deinit(&m_variable_index);
+-	status = variable_index_init(&m_variable_index, MAX_VARIABLES);
++	efi_status_t status = variable_index_init(&m_variable_index, MAX_VARIABLES);
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+ 
+ 	/* Load the dumped contents */
+@@ -268,52 +261,6 @@ TEST(UefiVariableIndexTests, dumpLoadRoadtrip)
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_NOT_FOUND, status);
+ }
+ 
+-TEST(UefiVariableIndexTests, dumpLoadConstrainedVariable)
+-{
+-	uint8_t buffer[MAX_VARIABLES * sizeof(struct variable_metadata)];
+-
+-	create_variables();
+-
+-	struct variable_constraints constraints;
+-	constraints.revision = 10;
+-	constraints.property = VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY;
+-	constraints.attributes = 0;
+-	constraints.min_size = 1;
+-	constraints.max_size = 100;
+-
+-	/* Set check constraints on one of the variables */
+-	struct variable_info *info = variable_index_find(&m_variable_index, &guid_2,
+-							 string_get_size_in_bytes(name_2),
+-							 (const int16_t *)name_2.data());
+-
+-	CHECK_TRUE(info);
+-	CHECK_TRUE(info->is_variable_set);
+-	CHECK_FALSE(info->is_constraints_set);
+-
+-	variable_index_set_constraints(info, &constraints);
+-
+-	CHECK_TRUE(info->is_constraints_set);
+-	CHECK_TRUE(info->is_variable_set);
+-
+-	size_t dump_len = 0;
+-	bool is_dirty = false;
+-	efi_status_t status = EFI_SUCCESS;
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
+-
+-	UNSIGNED_LONGS_EQUAL(EFI_SUCCESS, status);
+-	CHECK_TRUE(is_dirty);
+-
+-	/* metadata and constraint status byte are stored for both NV variables, but only one of them has constraints */
+-	UNSIGNED_LONGS_EQUAL((sizeof(struct variable_metadata) + sizeof(bool)) * 2 +
+-				     sizeof(struct variable_constraints),
+-			     dump_len);
+-
+-	/* Load the dumped contents */
+-	size_t load_len = variable_index_restore(&m_variable_index, dump_len, buffer);
+-	UNSIGNED_LONGS_EQUAL(dump_len, load_len);
+-}
+-
+ TEST(UefiVariableIndexTests, dumpBufferTooSmall)
+ {
+ 	uint8_t buffer[1 * sizeof(struct variable_metadata) + 1];
+@@ -325,15 +272,10 @@ TEST(UefiVariableIndexTests, dumpBufferTooSmall)
+ 	 * exceed the length of the buffer.
+ 	 */
+ 	size_t dump_len = 0;
+-	bool is_dirty = false;
+-	efi_status_t status = EFI_SUCCESS;
+-
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
++	bool is_dirty = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len);
+ 
+ 	CHECK_TRUE(is_dirty);
+-	UNSIGNED_LONGS_EQUAL(EFI_BUFFER_TOO_SMALL, status);
+-	UNSIGNED_LONGS_EQUAL(0, dump_len);
++	UNSIGNED_LONGS_EQUAL(sizeof(struct variable_metadata) * 1, dump_len);
+ }
+ 
+ TEST(UefiVariableIndexTests, removeVariable)
+@@ -351,14 +293,10 @@ TEST(UefiVariableIndexTests, removeVariable)
+ 
+ 	/* Expect index to be dirty and for only one NV variable to be left */
+ 	size_t dump_len = 0;
+-	bool is_dirty = false;
+-	efi_status_t status = EFI_SUCCESS;
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
++	bool is_dirty = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len);
+ 
+ 	CHECK_TRUE(is_dirty);
+-	UNSIGNED_LONGS_EQUAL(EFI_SUCCESS, status);
+-	UNSIGNED_LONGS_EQUAL(sizeof(struct variable_metadata) + sizeof(bool), dump_len);
++	UNSIGNED_LONGS_EQUAL((sizeof(struct variable_metadata) * 1), dump_len);
+ 
+ 	/* Remove the volatile variable */
+ 	info = variable_index_find(&m_variable_index, &guid_1, string_get_size_in_bytes(name_1),
+@@ -368,12 +306,10 @@ TEST(UefiVariableIndexTests, removeVariable)
+ 
+ 	/* Expect index not to be dirty because there was no change to any NV variable */
+ 	dump_len = 0;
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
++	is_dirty = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len);
+ 
+ 	CHECK_FALSE(is_dirty);
+-	UNSIGNED_LONGS_EQUAL(EFI_SUCCESS, status);
+-	UNSIGNED_LONGS_EQUAL(sizeof(struct variable_metadata) + sizeof(bool), dump_len);
++	UNSIGNED_LONGS_EQUAL((sizeof(struct variable_metadata) * 1), dump_len);
+ 
+ 	/* Remove the remaining NV variable */
+ 	info = variable_index_find(&m_variable_index, &guid_1, string_get_size_in_bytes(name_3),
+@@ -383,15 +319,14 @@ TEST(UefiVariableIndexTests, removeVariable)
+ 
+ 	/* Expect index to be dirty and dump to now be empty */
+ 	dump_len = 0;
+-	status = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len,
+-				     &is_dirty);
++	is_dirty = variable_index_dump(&m_variable_index, sizeof(buffer), buffer, &dump_len);
+ 
+ 	CHECK_TRUE(is_dirty);
+-	UNSIGNED_LONGS_EQUAL(EFI_SUCCESS, status);
+-	UNSIGNED_LONGS_EQUAL(0, dump_len);
++	UNSIGNED_LONGS_EQUAL((sizeof(struct variable_metadata) * 0), dump_len);
+ 
+ 	/* Enumerate and now expect an empty index */
+ 	info = NULL;
++	efi_status_t status = EFI_SUCCESS;
+ 
+ 	info = variable_index_find_next(&m_variable_index, &guid_1,
+ 					string_get_size_in_bytes(null_name),  (const int16_t *) null_name.data(),
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index e5fc32864..7da2d1e71 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -575,10 +575,8 @@ efi_status_t uefi_variable_store_set_var_check_property(
+ 	status = variable_checker_set_constraints(&constraints, info->is_constraints_set,
+ 						  &property->VariableProperty);
+ 
+-	if (status == EFI_SUCCESS) {
++	if (status == EFI_SUCCESS)
+ 		variable_index_set_constraints(info, &constraints);
+-		status = sync_variable_index(context);
+-	}
+ 
+ 	variable_index_remove_unused_entry(&context->variable_index, info);
+ 
+@@ -643,15 +641,13 @@ static efi_status_t load_variable_index(struct uefi_variable_store *context)
+ static efi_status_t sync_variable_index(const struct uefi_variable_store *context)
+ {
+ 	efi_status_t status = EFI_SUCCESS;
+-	bool is_dirty = false;
+ 
+ 	/* Sync the variable index to storage if anything is dirty */
+ 	size_t data_len = 0;
+ 
+-	status = variable_index_dump(&context->variable_index, context->index_sync_buffer_size,
+-				     context->index_sync_buffer, &data_len, &is_dirty);
+-	if (status != EFI_SUCCESS)
+-		return status;
++	bool is_dirty = variable_index_dump(&context->variable_index,
++					    context->index_sync_buffer_size,
++					    context->index_sync_buffer, &data_len);
+ 
+ 	if (is_dirty) {
+ 		struct storage_backend *persistent_store =
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.c b/components/service/uefi/smm_variable/backend/variable_index.c
+index 5fb6d08c5..c39f7394b 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.c
++++ b/components/service/uefi/smm_variable/backend/variable_index.c
+@@ -108,9 +108,7 @@ void variable_index_deinit(struct variable_index *context)
+ 
+ size_t variable_index_max_dump_size(struct variable_index *context)
+ {
+-	return (sizeof(struct variable_metadata) + sizeof(bool) +
+-		sizeof(struct variable_constraints)) *
+-	       context->max_variables;
++	return sizeof(struct variable_metadata) * context->max_variables;
+ }
+ 
+ struct variable_info *variable_index_find(const struct variable_index *context,
+@@ -269,68 +267,37 @@ void variable_index_set_constraints(struct variable_info *info,
+ 				    const struct variable_constraints *constraints)
+ {
+ 	if (info) {
+-		struct variable_entry *entry = containing_entry(info);
+-
+ 		info->check_constraints = *constraints;
+ 		info->is_constraints_set = true;
+-
+-		mark_dirty(entry);
+ 	}
+ }
+ 
+-efi_status_t variable_index_dump(const struct variable_index *context, size_t buffer_size,
+-				 uint8_t *buffer, size_t *data_len, bool *any_dirty)
++bool variable_index_dump(const struct variable_index *context, size_t buffer_size, uint8_t *buffer,
++			 size_t *data_len)
+ {
++	bool any_dirty = false;
+ 	uint8_t *dump_pos = buffer;
+ 	size_t bytes_dumped = 0;
+ 
+-	*data_len = 0;
+-	*any_dirty = false;
+-
+ 	for (size_t pos = 0; pos < context->max_variables; pos++) {
+ 		struct variable_entry *entry = &context->entries[pos];
+ 		struct variable_metadata *metadata = &entry->info.metadata;
+-		struct variable_constraints *constraints = &entry->info.check_constraints;
+ 
+ 		if (entry->in_use && entry->info.is_variable_set &&
+-		    (metadata->attributes & EFI_VARIABLE_NON_VOLATILE)) {
+-			/* Store metadata */
+-			if (bytes_dumped + sizeof(struct variable_metadata) > buffer_size)
+-				return EFI_BUFFER_TOO_SMALL;
+-
++		    (metadata->attributes & EFI_VARIABLE_NON_VOLATILE) &&
++		    ((bytes_dumped + sizeof(struct variable_metadata)) <= buffer_size)) {
+ 			memcpy(dump_pos, metadata, sizeof(struct variable_metadata));
+ 			bytes_dumped += sizeof(struct variable_metadata);
+ 			dump_pos += sizeof(struct variable_metadata);
+-
+-			/* Store constraints' status */
+-			if (bytes_dumped + sizeof(entry->info.is_constraints_set) > buffer_size)
+-				return EFI_BUFFER_TOO_SMALL;
+-
+-			memcpy(dump_pos, &entry->info.is_constraints_set,
+-			       sizeof(entry->info.is_constraints_set));
+-			bytes_dumped += sizeof(entry->info.is_constraints_set);
+-			dump_pos += sizeof(entry->info.is_constraints_set);
+-
+-			/* Store constraints, if they are set */
+-			if (entry->info.is_constraints_set) {
+-				if (bytes_dumped + sizeof(entry->info.check_constraints) >
+-				    buffer_size)
+-					return EFI_BUFFER_TOO_SMALL;
+-
+-				memcpy(dump_pos, constraints,
+-				       sizeof(entry->info.check_constraints));
+-				bytes_dumped += sizeof(entry->info.check_constraints);
+-				dump_pos += sizeof(entry->info.check_constraints);
+-			}
+ 		}
+ 
+-		*any_dirty |= entry->dirty;
++		any_dirty |= entry->dirty;
+ 		entry->dirty = false;
+ 	}
+ 
+ 	*data_len = bytes_dumped;
+ 
+-	return EFI_SUCCESS;
++	return any_dirty;
+ }
+ 
+ 
+@@ -342,50 +309,23 @@ size_t variable_index_restore(const struct variable_index *context, size_t data_
+ 	int pos = 0;
+ 
+ 	while (bytes_loaded < data_len) {
+-		struct variable_entry *entry = &context->entries[pos];
+-
+ 		if ((data_len - bytes_loaded) >= sizeof(struct variable_metadata)) {
++			struct variable_entry *entry = &context->entries[pos];
+ 			struct variable_metadata *metadata = &entry->info.metadata;
+ 
+-			/* Load metadata */
+ 			memcpy(metadata, load_pos, sizeof(struct variable_metadata));
++
++			entry->info.is_variable_set = true;
++			entry->in_use = true;
++
+ 			bytes_loaded += sizeof(struct variable_metadata);
+ 			load_pos += sizeof(struct variable_metadata);
+-		} else {
+-			/* Not a whole number of variable_metadata structs! */
+-			break;
+-		}
+ 
+-		if ((data_len - bytes_loaded) >= sizeof(entry->info.is_constraints_set)) {
+-			/* Load constraints' status */
+-			memcpy(&entry->info.is_constraints_set, load_pos,
+-			       sizeof(entry->info.is_constraints_set));
+-			bytes_loaded += sizeof(entry->info.is_constraints_set);
+-			load_pos += sizeof(entry->info.is_constraints_set);
++			++pos;
+ 		} else {
+-			/* Not enough space for constraints' status! */
++			/* Not a whole number of variable_metadata structs! */
+ 			break;
+ 		}
+-
+-		if (entry->info.is_constraints_set) {
+-			if ((data_len - bytes_loaded) >= sizeof(struct variable_constraints)) {
+-				struct variable_constraints *constraints =
+-					&entry->info.check_constraints;
+-
+-				/* Load constraints if they are set */
+-				memcpy(constraints, load_pos, sizeof(struct variable_constraints));
+-				bytes_loaded += sizeof(struct variable_constraints);
+-				load_pos += sizeof(struct variable_constraints);
+-			} else {
+-				/* Not a whole number of variable_constraints structs! */
+-				break;
+-			}
+-		}
+-
+-		entry->info.is_variable_set = true;
+-		entry->in_use = true;
+-
+-		++pos;
+ 	}
+ 
+ 	return bytes_loaded;
+diff --git a/components/service/uefi/smm_variable/backend/variable_index.h b/components/service/uefi/smm_variable/backend/variable_index.h
+index 0151d636a..da6ed2476 100644
+--- a/components/service/uefi/smm_variable/backend/variable_index.h
++++ b/components/service/uefi/smm_variable/backend/variable_index.h
+@@ -201,12 +201,11 @@ void variable_index_set_constraints(struct variable_info *info,
+  * @param[in]  buffer_size Size of destination buffer
+  * @param[in]  buffer Dump to this buffer
+  * @param[out] data_len Length of serialized data
+- * @param[out] any_dirty True if there is unsaved data
+  *
+- * @return     EFI_SUCCESS if all the changes are dumped successfully
++ * @return     True if there is unsaved data
+  */
+-efi_status_t variable_index_dump(const struct variable_index *context, size_t buffer_size,
+-				 uint8_t *buffer, size_t *data_len, bool *any_dirty);
++bool variable_index_dump(const struct variable_index *context, size_t buffer_size, uint8_t *buffer,
++			 size_t *data_len);
+ 
+ /**
+  * @brief     Confirms the successful write of the variable index into the storage
+-- 
+2.25.1
+

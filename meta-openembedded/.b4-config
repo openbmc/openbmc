@@ -1,0 +1,4 @@
+[b4]
+	#email-exclude = *@lists.openembedded.org, *@lists.yoctoproject.org
+	#b4.ty-send-email = yes
+	trailer-order = link*,fixes*,acked*,reviewed*,tested*,*

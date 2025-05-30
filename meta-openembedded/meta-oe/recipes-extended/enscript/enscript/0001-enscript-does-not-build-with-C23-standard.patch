@@ -1,0 +1,32 @@
+From 9865262d7287320eba7d2fad2d4fcb12b489fc6c Mon Sep 17 00:00:00 2001
+From: zdohnal <email-is-unavailable>
+Date: Tue, 8 Apr 2025 20:25:47 +0900
+Subject: [PATCH] enscript does not build with C23 standard
+
+* Imported the submitted patch from:
+  https://savannah.gnu.org/bugs/?66845
+  to fix:
+  http://errors.yoctoproject.org/Errors/Details/851187/
+  ../../enscript-1.6.6/compat/regex.c:3565:13: error: too many arguments to function 're_match_2_internal'; expected 0, have 8
+ 3565 |       val = re_match_2_internal (bufp, string1, size1, string2, size2,
+      |             ^~~~~~~~~~~~~~~~~~~  ~~~~
+
+Upstream-Status: Submitted [https://savannah.gnu.org/bugs/?66845]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ compat/regex.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compat/regex.c b/compat/regex.c
+index c6907f3..da28664 100644
+--- a/compat/regex.c
++++ b/compat/regex.c
+@@ -336,7 +336,7 @@ typedef char boolean;
+ #define false 0
+ #define true 1
+ 
+-static int re_match_2_internal ();
++static int re_match_2_internal (struct re_pattern_buffer*, const char*, int, const char*, int, int, struct re_registers*, int);
+ 
+ /* These are the command codes that appear in compiled regular
+    expressions.  Some opcodes are followed by argument bytes.  A

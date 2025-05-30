@@ -1,0 +1,43 @@
+From 1df0f4ae8fd54bc1ae940dfafa701c84d068674d Mon Sep 17 00:00:00 2001
+From: Koen Kooi <koen@dominion.thruhere.net>
+Date: Sun, 25 May 2025 12:24:16 +0000
+Subject: [PATCH] Fix build issue caused by OE-core changes to
+ startup-notification:
+
+../libwnck-43.2/libwnck/tasklist.c: In function 'sequence_timeout_callback':
+../libwnck-43.2/libwnck/tasklist.c:5034:49: error: passing argument 2 of 'sn_startup_sequence_get_last_active_time' from incompatible pointer type [-Wincompatible-pointer-types]
+ 5034 |                                                 &tv_sec, &tv_usec);
+      |                                                 ^~~~~~~
+      |                                                 |
+      |                                                 long int *
+In file included from /build/angstrom/build/tmp/work/armv7at2hf-neon-angstrom-linux-gnueabi/libwnck3/43.2/recipe-sysroot/usr/include/startup-notification-1.0/libsn/sn.h:32,
+                 from ../libwnck-43.2/libwnck/tasklist.c:40:
+/build/angstrom/build/tmp/work/armv7at2hf-neon-angstrom-linux-gnueabi/libwnck3/43.2/recipe-sysroot/usr/include/startup-notification-1.0/libsn/sn-monitor.h:84:79: note: expected 'time_t *' {aka 'long long int *'} but argument is of type 'long int *'
+   84 |                                                            time_t            *tv_sec,
+      |                                                            ~~~~~~~~~~~~~~~~~~~^~~~~~
+
+It is caused by a patch of startup-notification in oe-core which is backported from upstream mailllist and changes the signature of function sn_startup_sequence_get_last_active_time().
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+---
+ libwnck/tasklist.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libwnck/tasklist.c b/libwnck/tasklist.c
+index 7418f89..460e11d 100644
+--- a/libwnck/tasklist.c
++++ b/libwnck/tasklist.c
+@@ -5031,7 +5031,7 @@ sequence_timeout_callback (void *user_data)
+       WnckTask *task = WNCK_TASK (tmp->data);
+ 
+       sn_startup_sequence_get_last_active_time (task->startup_sequence,
+-                                                &tv_sec, &tv_usec);
++                                                (time_t *) &tv_sec, &tv_usec);
+ 
+       elapsed = (now - (tv_sec * G_USEC_PER_SEC + tv_usec)) / 1000.0;
+ 
+-- 
+2.33.0
+

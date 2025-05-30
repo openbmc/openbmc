@@ -1,7 +1,7 @@
 SUMMARY = "Bindings for the Twofish implementation by Niels Ferguson"
 DESCRIPTION = "Bindings for the Twofish implementation by Niels Ferguson\
  libtwofish-dev."
-HOMEPAGE = "http://github.com/keybase/python-twofish"
+HOMEPAGE = "https://github.com/keybase/python-twofish"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=33a63abf6d7567b1689d8ce69f00e43b"
 

@@ -1,0 +1,25 @@
+From a7b5de569082398a14b7e571498e55d005903aaf Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 17:18:35 +0100
+Subject: [PATCH] pki: Fix signature of help() to match that of a callback in
+ command_t
+
+Upstream-Status: Backport [a7b5de5 pki: Fix signature of help() to match that of a callback in command_t]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/pki/command.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/pki/command.c b/src/pki/command.c
+index accec5fe5..6e6bf041e 100644
+--- a/src/pki/command.c
++++ b/src/pki/command.c
+@@ -265,7 +265,7 @@ int command_usage(char *error)
+ /**
+  * Show usage information
+  */
+-static int help(int c, char *v[])
++static int help()
+ {
+ 	return command_usage(NULL);
+ }

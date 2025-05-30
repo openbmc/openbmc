@@ -1,4 +1,4 @@
-From 5e6c3052930f1d831d3479cb59533c08277700ff Mon Sep 17 00:00:00 2001
+From a5bcf56630df520040076dd14c3c54fef0785ceb Mon Sep 17 00:00:00 2001
 From: Venture Research <tech@ventureresearch.com>
 Date: Fri, 8 Feb 2013 17:39:52 -0600
 Subject: [PATCH] hiredis: use default CC if it is set
@@ -20,9 +20,11 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
 Reworked for 8.0.0
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 
----
-Upstream-Status: Pending
+Reworked for 8.1.0
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 
+Upstream-Status: Inappropriate [OE-specifc]
+---
  deps/hiredis/Makefile | 2 --
  1 file changed, 2 deletions(-)
 

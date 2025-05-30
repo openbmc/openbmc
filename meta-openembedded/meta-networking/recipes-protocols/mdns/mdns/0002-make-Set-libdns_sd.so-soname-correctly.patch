@@ -1,4 +1,4 @@
-From dfa9e2c494d1a834f5bdfe4dc24e8329dd8720eb Mon Sep 17 00:00:00 2001
+From dcc1f39a0918cdebf53ac7c105b3d33df960ed14 Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 15:14:12 +0000
 Subject: [PATCH] make: Set libdns_sd.so soname correctly
@@ -10,7 +10,7 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
-index 041706523139..c877c8bb19e6 100755
+index e05ba10b4340..7c510317f1b6 100755
 --- a/mDNSPosix/Makefile
 +++ b/mDNSPosix/Makefile
 @@ -276,7 +276,7 @@ libdns_sd: setup $(BUILDDIR)/libdns_sd.$(LDSUFFIX)
@@ -21,4 +21,4 @@ index 041706523139..c877c8bb19e6 100755
 +	$(LD) $(SOOPTS) $(LINKOPTS) -Wl,-soname,libdns_sd.$(LDSUFFIX).1 -o $@ $+
  	$(STRIP) $@
  
- Clients: setup libdns_sd ../Clients/build/dns-sd
+ Clients: setup ../Clients/build/dns-sd

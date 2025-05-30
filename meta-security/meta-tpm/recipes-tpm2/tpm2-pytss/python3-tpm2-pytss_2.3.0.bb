@@ -18,4 +18,4 @@ DEPENDS = " \
     tpm2-tss \
 "
 
-RDEPENDS:${PN} = "libtss2"
+RDEPENDS:${PN} = "libtss2 python3-asn1crypto"

@@ -1,0 +1,145 @@
+From 0e3bfa22b23451531caf8cc30b1771ac6a41fcad Mon Sep 17 00:00:00 2001
+From: Carlos Garcia Campos <cgarcia@igalia.com>
+Date: Thu, 11 Feb 2021 10:47:09 +0100
+Subject: [PATCH] Remove http and https aliases support test
+
+Upstream has removed the whole function of http and https aliases
+support, this commit partially cherry pick it, only remove the test to
+mute the warning:
+| ../libsoup-2.74.3/tests/server-test.c: In function 'do_one_server_aliases_test':
+| ../libsoup-2.74.3/tests/server-test.c:180:17: warning: 'g_socket_client_set_tls_validation_flags' is deprecated [-Wdeprecated-declarations]
+|   180 |                 g_socket_client_set_tls_validation_flags (client, 0);
+|       |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libsoup/-/commit/111ae4ebe7cc2e389573cff5b9ac76509d6cbac0]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tests/server-test.c | 104 --------------------------------------------
+ 1 file changed, 104 deletions(-)
+
+diff --git a/tests/server-test.c b/tests/server-test.c
+index 8976103..cb7e815 100644
+--- a/tests/server-test.c
++++ b/tests/server-test.c
+@@ -154,108 +154,6 @@ do_star_test (ServerData *sd, gconstpointer test_data)
+ 	soup_uri_free (star_uri);
+ }
+ 
+-static void
+-do_one_server_aliases_test (SoupURI    *uri,
+-			    const char *alias,
+-			    gboolean    succeed)
+-{
+-	GSocketClient *client;
+-	GSocketConnectable *addr;
+-	GSocketConnection *conn;
+-	GInputStream *in;
+-	GOutputStream *out;
+-	GError *error = NULL;
+-	GString *req;
+-	static char buf[1024];
+-
+-	debug_printf (1, "  %s via %s\n", alias, uri->scheme);
+-
+-	/* There's no way to make libsoup's client side send an absolute
+-	 * URI (to a non-proxy server), so we have to fake this.
+-	 */
+-
+-	client = g_socket_client_new ();
+-	if (uri->scheme == SOUP_URI_SCHEME_HTTPS) {
+-		g_socket_client_set_tls (client, TRUE);
+-		g_socket_client_set_tls_validation_flags (client, 0);
+-	}
+-	addr = g_network_address_new (uri->host, uri->port);
+-
+-	conn = g_socket_client_connect (client, addr, NULL, &error);
+-	g_object_unref (addr);
+-	g_object_unref (client);
+-	if (!conn) {
+-		g_assert_no_error (error);
+-		g_error_free (error);
+-		return;
+-	}
+-
+-	in = g_io_stream_get_input_stream (G_IO_STREAM (conn));
+-	out = g_io_stream_get_output_stream (G_IO_STREAM (conn));
+-
+-	req = g_string_new (NULL);
+-	g_string_append_printf (req, "GET %s://%s:%d HTTP/1.1\r\n",
+-				alias, uri->host, uri->port);
+-	g_string_append_printf (req, "Host: %s:%d\r\n",
+-				uri->host, uri->port);
+-	g_string_append (req, "Connection: close\r\n\r\n");
+-
+-	if (!g_output_stream_write_all (out, req->str, req->len, NULL, NULL, &error)) {
+-		g_assert_no_error (error);
+-		g_error_free (error);
+-		g_object_unref (conn);
+-		g_string_free (req, TRUE);
+-		return;
+-	}
+-	g_string_free (req, TRUE);
+-
+-	if (!g_input_stream_read_all (in, buf, sizeof (buf), NULL, NULL, &error)) {
+-		g_assert_no_error (error);
+-		g_error_free (error);
+-		g_object_unref (conn);
+-		return;
+-	}
+-
+-	if (succeed)
+-		g_assert_true (g_str_has_prefix (buf, "HTTP/1.1 200 "));
+-	else
+-		g_assert_true (g_str_has_prefix (buf, "HTTP/1.1 400 "));
+-
+-	g_io_stream_close (G_IO_STREAM (conn), NULL, NULL);
+-	g_object_unref (conn);
+-}
+-
+-static void
+-do_server_aliases_test (ServerData *sd, gconstpointer test_data)
+-{
+-	char *http_aliases[] = { "dav", NULL };
+-	char *https_aliases[] = { "davs", NULL };
+-	char *http_good[] = { "http", "dav", NULL };
+-	char *http_bad[] = { "https", "davs", "fred", NULL };
+-	char *https_good[] = { "https", "davs", NULL };
+-	char *https_bad[] = { "http", "dav", "fred", NULL };
+-	int i;
+-
+-	g_test_bug ("703694");
+-
+-	g_object_set (G_OBJECT (sd->server),
+-		      SOUP_SERVER_HTTP_ALIASES, http_aliases,
+-		      SOUP_SERVER_HTTPS_ALIASES, https_aliases,
+-		      NULL);
+-
+-	for (i = 0; http_good[i]; i++)
+-		do_one_server_aliases_test (sd->base_uri, http_good[i], TRUE);
+-	for (i = 0; http_bad[i]; i++)
+-		do_one_server_aliases_test (sd->base_uri, http_bad[i], FALSE);
+-
+-	if (tls_available) {
+-		for (i = 0; https_good[i]; i++)
+-			do_one_server_aliases_test (sd->ssl_base_uri, https_good[i], TRUE);
+-		for (i = 0; https_bad[i]; i++)
+-			do_one_server_aliases_test (sd->ssl_base_uri, https_bad[i], FALSE);
+-	}
+-}
+-
+ static void
+ do_dot_dot_test (ServerData *sd, gconstpointer test_data)
+ {
+@@ -1382,8 +1280,6 @@ main (int argc, char **argv)
+ 
+ 	g_test_add ("/server/OPTIONS *", ServerData, NULL,
+ 		    server_setup, do_star_test, server_teardown);
+-	g_test_add ("/server/aliases", ServerData, NULL,
+-		    server_setup, do_server_aliases_test, server_teardown);
+ 	g_test_add ("/server/..-in-path", ServerData, NULL,
+ 		    server_setup, do_dot_dot_test, server_teardown);
+ 	g_test_add ("/server/ipv6", ServerData, NULL,
+-- 
+2.34.1
+

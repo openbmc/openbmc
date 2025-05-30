@@ -5,9 +5,10 @@ LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4cc91856b08b094b4f406a29dc61db21"
 
-SRCREV = "9042704131d270e713fc267d3cc84273bc995315"
+SRCREV = "dd944cf5b5a8b834f3685bcb2017190258dbcd0b"
 
-SRC_URI = "git://github.com/CodeConstruct/mctp;branch=main;protocol=https"
+SRC_URI = "git://github.com/CodeConstruct/mctp;branch=main;protocol=https \
+           file://0001-mctp-bench-Adjust-headers.patch"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,39 @@
+From 5c08d92aae49f83e3b52ae58e566ef48c749f3c7 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Fri, 7 Mar 2025 16:39:33 +0100
+Subject: [PATCH] do not compile stdbuf
+
+Due to including the host version of libstdbuf.so, stdbuf does not work when cross-compiled. See https://github.com/uutils/coreutils/issues/6591#issuecomment-2706575853 for details
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ Cargo.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index ea87ccea79..e218719363 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -154,7 +154,7 @@ feat_os_macos = [
+ feat_os_unix = [
+   "feat_Tier1",
+   #
+-  "feat_require_crate_cpp",
++  # don't compile feature_require_crate_cpp per default (which contains only stdbuf). "feat_require_crate_cpp",
+   "feat_require_unix",
+   "feat_require_unix_utmpx",
+   "feat_require_unix_hostid",
+@@ -189,7 +189,7 @@ feat_os_unix_android = [
+ # ** NOTE: these `feat_require_...` sets should be minimized as much as possible to encourage cross-platform availability of utilities
+ #
+ # "feat_require_crate_cpp" == set of utilities requiring the `cpp` crate (which fail to compile on several platforms; as of 2020-04-23)
+-feat_require_crate_cpp = ["stdbuf"]
++feat_require_crate_cpp = []
+ # "feat_require_unix" == set of utilities requiring support which is only available on unix platforms (as of 2020-04-23)
+ feat_require_unix = [
+   "chgrp",
+-- 
+2.43.0
+

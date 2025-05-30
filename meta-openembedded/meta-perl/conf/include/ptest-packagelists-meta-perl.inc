@@ -8,7 +8,6 @@
 # ptests which take less than ~30s each
 PTESTS_FAST_META_PERL = "\
     libcapture-tiny-perl \
-    libcgi-perl \
     libcrypt-openssl-random-perl \
     libdigest-hmac-perl \
     liberror-perl \
@@ -16,32 +15,32 @@ PTESTS_FAST_META_PERL = "\
     libextutils-installpaths-perl \
     libhtml-tagset-perl \
     libmozilla-ca-perl \
-    libmodule-build-tiny-perl \
+    libnet-ldap-perl \
     libstrictures-perl \
     libterm-readkey-perl \
     libtest-nowarnings-perl \
     libtext-diff-perl \
-    liburi-perl \
 "
 
 PTESTS_SLOW_META_PERL = "\
     libio-socket-ssl-perl \
 "
 
-PTESTS_PROBLEMS_META_PERL ="\
+PTESTS_PROBLEMS_META_PERL = "\
     libauthen-sasl-perl \
+    libcgi-perl \
     libconfig-autoconf-perl \
     libcrypt-openssl-guess-perl \
     libcrypt-openssl-rsa-perl \
     libdata-hexdump-perl \
     libdbd-sqlite-perl \
     libdigest-sha1-perl \
-    libnet-dns-perl \
-    libnet-dns-sec-perl \
-    libnet-ldap-perl \
     libfile-slurper-perl \
     libhtml-parser-perl \
     libmime-types-perl \
+    libmodule-build-tiny-perl \
+    libnet-dns-perl \
+    libnet-dns-sec-perl \
     libnet-ssleay-perl \
     libsub-uplevel-perl \
     libtest-deep-perl \
@@ -49,5 +48,6 @@ PTESTS_PROBLEMS_META_PERL ="\
     libtest-warn-perl \
     libunicode-linebreak-perl \
     libunix-statgrab \
+    liburi-perl \
     libxml-libxml-perl \
 "

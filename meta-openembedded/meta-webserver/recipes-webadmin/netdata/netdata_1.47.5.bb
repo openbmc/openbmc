@@ -50,7 +50,7 @@ CFLAGS += "${@bb.utils.contains('PACKAGECONFIG', 'go', \
 INSANE_SKIP:${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'go', 'already-stripped buildpaths', '', d)}"
 
 # network is required by go to get dependent packages
-do_compile[network] = "1"
+do_compile[network] = "${@bb.utils.contains('PACKAGECONFIG', 'go', '1', '0', d)}"
 
 #systemd
 SYSTEMD_PACKAGES = "${PN}"

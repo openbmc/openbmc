@@ -1,0 +1,25 @@
+From 57b626d6d8c247c9203dde51a988b9401abe065c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 9 Apr 2025 23:44:44 -0700
+Subject: [PATCH] pyproject.toml: Relax version for mypy
+
+It asks for mypy <= 1.14.0 but we have 1.15.x
+already in meta-python
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index bbb8227..ad42715 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools", "setuptools-scm", "mypy>=1.4.1,<=1.14.0"]
++requires = ["setuptools", "setuptools-scm", "mypy>=1.4.1,<=1.16.0"]
+ build-backend = "setuptools.build_meta"
+ 
+ [project]

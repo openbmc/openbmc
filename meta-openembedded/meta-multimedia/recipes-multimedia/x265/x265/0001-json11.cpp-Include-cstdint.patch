@@ -1,0 +1,33 @@
+From 6cbd417be3f6bcbda77464db6a4d83cef3df8904 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 5 May 2025 14:08:36 +0000
+Subject: [PATCH] json11.cpp: Include cstdint
+
+Fixes:
+
+json11.cpp:101:32: error: 'uint8_t' does not name a type
+
+This work was sponsored by GOVCERT.LU.
+
+Upstream-Status: Pending [https://bitbucket.org/multicoreware/x265_git/pull-requests/33]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ dynamicHDR10/json11/json11.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/dynamicHDR10/json11/json11.cpp b/dynamicHDR10/json11/json11.cpp
+index 7625777..74f990a 100644
+--- a/dynamicHDR10/json11/json11.cpp
++++ b/dynamicHDR10/json11/json11.cpp
+@@ -25,6 +25,7 @@
+ #include <cstdlib>
+ #include <cstdio>
+ #include <limits>
++#include <cstdint>
+ 
+ #if _MSC_VER
+ #pragma warning(disable: 4510) //const member cannot be default initialized
+-- 
+2.39.5
+

@@ -3,7 +3,7 @@ DESCRIPTION = "Firmware to be loaded and run in External System Harness in\
                support to the main application CPU."
 HOMEPAGE = "https://git.linaro.org/landing-teams/working/arm/external-system.git"
 DEPENDS = "gcc-arm-none-eabi-native"
-INHIBIT_DEFAULT_DEPS="1"
+INHIBIT_DEFAULT_DEPS = "1"
 LICENSE = "BSD-3-Clause & Apache-2.0"
 LIC_FILES_CHKSUM = "file://license.md;md5=e44b2531cd6ffe9dece394dbe988d9a0 \
                     file://cmsis/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"

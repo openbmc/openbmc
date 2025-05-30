@@ -1,6 +1,6 @@
 DESCRIPTION = "keybinder is a library for registering global key bindings, for gtk-based applications."
 HOMEPAGE = "https://github.com/engla/keybinder"
-LICENSE = "X11"
+LICENSE = "MIT"
 SECTION = "devel/lib"
 DEPENDS = "gtk+3 gobject-introspection-native \
            gtk+ \

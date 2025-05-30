@@ -6,6 +6,10 @@ SRC_URI[sha256sum] = "5c3c3d9895b551b763779ba7db7a03487dc1f8e3b385af819af341ae9e
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
+RDEPENDS:${PN} += " \
+    python3-pprint \
+"
+
 do_install_ptest:append () {
     install -d ${D}${PTEST_PATH}/tests
     cp -rf ${S}/netaddr/tests/* ${D}${PTEST_PATH}/tests/

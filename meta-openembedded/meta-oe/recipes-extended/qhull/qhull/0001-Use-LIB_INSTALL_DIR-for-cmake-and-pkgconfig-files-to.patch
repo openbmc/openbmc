@@ -1,0 +1,35 @@
+From f72312ae0becb581cd428d17dbbcdf1b6f02ebee Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Tue, 4 Oct 2022 21:56:58 -0600
+Subject: [PATCH] Use ${LIB_INSTALL_DIR} for cmake and pkgconfig files to
+ support multi-lib on Fedora/RedHat
+
+Upstream-Status: Backport [https://github.com/qhull/qhull/commit/67d231c872aa1bae892e5da9646a10b303477039]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f50b187..c2248f9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -709,7 +709,7 @@ configure_file(${PROJECT_SOURCE_DIR}/build/config.cmake.in
+   @ONLY
+ )
+ 
+-set(ConfigPackageLocation lib/cmake/Qhull)
++set(ConfigPackageLocation ${LIB_INSTALL_DIR}/cmake/Qhull)
+ install(EXPORT QhullTargets
+   FILE
+     QhullTargets.cmake
+@@ -728,7 +728,7 @@ install(
+     Devel
+ )
+ 
+-set(PkgConfigLocation lib/pkgconfig)
++set(PkgConfigLocation ${LIB_INSTALL_DIR}/pkgconfig)
+ foreach(pkgconfig IN ITEMS "${qhull_SHAREDR};Qhull reentrant shared library"
+                            "${qhull_STATIC};Qhull static library"
+                            "${qhull_STATICR};Qhull reentrant static library"

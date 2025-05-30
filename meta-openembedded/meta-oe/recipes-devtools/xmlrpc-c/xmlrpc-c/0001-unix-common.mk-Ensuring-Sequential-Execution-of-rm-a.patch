@@ -1,7 +1,8 @@
-From c9bd05e8f0ad805b81625cfa717d06071cfd9b48 Mon Sep 17 00:00:00 2001
+From e246247aceb3ac0fd7491b1ee34a049dd44f5025 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Wed, 16 Oct 2024 22:52:38 -0700
-Subject: [PATCH] unix-common.mk: Avoid race condition between mutliple make calls running in parallel
+Date: Mon, 10 Mar 2025 20:26:29 -0700
+Subject: [PATCH] unix-common.mk: Avoid race condition between mutliple make
+ calls running in parallel
 
 With high parallel execution, it results in race condition where
 its trying to create symlink while the original symlink while rm is
@@ -29,50 +30,14 @@ but I don't see any changes which should cause this in the git since
 1.59.01, but the gentoo bug report is against 1.54.06 already.
 
 martin@jama /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable $ grep -A 1 lib/libutil++/Makefile after-clean-j1.log
-make -C libutil++/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil++/Makefile \
-    all 
+make -C libutil++/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/lib/libutil++/Makefile \
+    all
 --
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil++/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil++/Makefile \
+make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/lib/libutil++/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/lib/libutil++/Makefile \
     libxmlrpc_util++.so
 
-martin@jama /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable $ grep -A 1 lib/libutil/Makefile after-clean-j1.log
-make -C libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    all 
 --
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
-    libxmlrpc_util.so
---
-make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/stable/lib/libutil/Makefile \
+make -C /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/lib/libutil/ -f /OE/build/oe-core/tmp/work/core2-64-oe-linux/xmlrpc-c/1.60.03/git/lib/libutil/Makefile \
     libxmlrpc_util.so
 
 Similar error reported here [1]
@@ -82,12 +47,15 @@ Similar error reported here [1]
 Upstream-Status: Pending
 Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Rebase to 1.64.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  unix-common.mk | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/unix-common.mk b/unix-common.mk
-index 6954faf5..983c48cd 100644
+index 6954faf5..e15a4f5c 100644
 --- a/unix-common.mk
 +++ b/unix-common.mk
 @@ -62,14 +62,12 @@ SHLIB_CMD = $(CCLD) $(LADD) $(LDFLAGS_SHLIB) -o $@ $^
@@ -107,3 +75,6 @@ index 6954faf5..983c48cd 100644
  
  .PHONY: $(SHLIB_INSTALL_TARGETS)
  .PHONY: install-shared-libraries
+-- 
+2.25.1
+

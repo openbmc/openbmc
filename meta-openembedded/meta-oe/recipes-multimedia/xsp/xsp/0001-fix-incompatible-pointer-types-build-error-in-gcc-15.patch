@@ -1,0 +1,40 @@
+From e001efa4a50e43fca5d8918ee05a3bc37180262d Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 24 Apr 2025 18:10:25 +0900
+Subject: [PATCH] fix incompatible-pointer-types build error in gcc 15
+
+../Xsp/Xsp.c:37:9: error: initialization of 'int (*)(Display *, XExtCodes *)' from incompatible pointer type 'int (*)(void)' [-Wincompatible-pointer-types]
+   37 |         XSPCloseDisplay,                    /* close_display */
+      |         ^~~~~~~~~~~~~~~
+../Xsp/Xsp.c:37:9: note: (near initialization for 'xsp_extension_hooks.close_display')
+../Xsp/Xsp.c:23:12: note: 'XSPCloseDisplay' declared here
+   23 | static int XSPCloseDisplay();
+      |            ^~~~~~~~~~~~~~~
+In file included from ../Xsp/Xsp.c:6:
+../Xsp/Xsp.c:49:37: error: conflicting types for 'XSPCloseDisplay'; have 'int(Display *, XExtCodes *)'
+   49 | static XEXT_GENERATE_CLOSE_DISPLAY (XSPCloseDisplay, xsp_info)
+      |                                     ^~~~~~~~~~~~~~~
+../Xsp/Xsp.c:36:9: error: 'XSPCloseDisplay' undeclared here (not in a function); did you mean 'XCloseDisplay'?
+   36 |         XSPCloseDisplay,                    /* close_display */
+      |         ^~~~~~~~~~~~~~~
+      |         XCloseDisplay
+
+Upstream-Status: Inactive-Upstream [seems to be unmaintained]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ Xsp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Xsp.c b/Xsp.c
+index 28e2d6e..9bcc958 100644
+--- a/Xsp.c
++++ b/Xsp.c
+@@ -20,7 +20,7 @@ static XExtensionInfo _xsp_info_data;
+ static XExtensionInfo *xsp_info = &_xsp_info_data;
+ static /* const */ char *xsp_extension_name = XSP_NAME;
+ 
+-static int XSPCloseDisplay();
++static XEXT_CLOSE_DISPLAY_PROTO(XSPCloseDisplay);
+ static Bool XSPWireToEvent(Display *dpy, XEvent *event, xEvent *wire);
+ 
+ static Status XSPEventToWire(Display *dpy, XEvent *event, xEvent *wire);

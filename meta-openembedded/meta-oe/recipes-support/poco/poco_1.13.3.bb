@@ -11,6 +11,8 @@ DEPENDS = "libpcre2 zlib"
 SRC_URI = "git://github.com/pocoproject/poco.git;branch=poco-1.13.3;protocol=https \
            file://0001-cppignore.lnx-Ignore-PKCS12-and-testLaunch-test.patch \
            file://run-ptest \
+           file://0001-SimpleRowFormatter.h-fix-the-build-on-gcc-15-unsatis.patch \
+           file://0002-fix-Foundation-Build-error-with-GCC-15-class-Poco-Pr.patch \
            "
 SRCREV = "7f848d25aa0461d3beeff1189dc61b48ffe8e2f4"
 

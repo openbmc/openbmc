@@ -19,6 +19,6 @@ EXTRA_OECONF += "--with-jpeg-prefix=${STAGING_INCDIR} \
                  --without-cdk \
 "
 
-do_configure:append() {
-	sed -i -E 's/--sysroot=[^ "]*([" ])/\1/g' ${B}/config.h
+do_compile:prepend() {
+	sed -i -e 's/--sysroot=[^ "]*//g' ${B}/config.h
 }

@@ -35,7 +35,7 @@ SYSTEMD_AUTO_ENABLE:inputattach = "enable"
 PROVIDES += "joystick"
 
 PACKAGECONFIG ??= "sdl"
-PACKAGECONFIG[sdl] = ",,libsdl2"
+PACKAGECONFIG[sdl] = ",,virtual/libsdl2"
 
 do_compile() {
     if ! ${@bb.utils.contains('PACKAGECONFIG', 'sdl', 'true', 'false', d)}; then

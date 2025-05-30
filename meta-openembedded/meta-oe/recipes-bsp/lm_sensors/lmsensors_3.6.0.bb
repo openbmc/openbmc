@@ -49,15 +49,15 @@ S = "${WORKDIR}/git"
 EXTRA_OEMAKE = 'EXLDFLAGS="${LDFLAGS}" \
         MACHINE=${TARGET_ARCH} PREFIX=${prefix} MANDIR=${mandir} \
         LIBDIR=${libdir} \
-        CC="${CC}" AR="${AR}"'
+        CC="${CC}" AR="${AR}" \
+        PROG_EXTRA="sensors ${PACKAGECONFIG_CONFARGS}"'
 
 do_compile() {
-    sed -i -e 's:^# \(PROG_EXTRA\):\1:' ${S}/Makefile
     # Respect LDFLAGS
     sed -i -e 's/\$(LIBDIR)$/\$(LIBDIR) \$(LDFLAGS)/g' ${S}/Makefile
     sed -i -e 's/\$(LIBSHSONAME) -o/$(LIBSHSONAME) \$(LDFLAGS) -o/g' \
                 ${S}/lib/Module.mk
-    oe_runmake user PROG_EXTRA="sensors ${PACKAGECONFIG_CONFARGS}"
+    oe_runmake user
 }
 
 do_install() {

@@ -1,26 +1,34 @@
-From 08e46feb6553af670754e65d94c3bb6fcd4e0cf9 Mon Sep 17 00:00:00 2001
+From cd6c5f36c0dc38e4734b74b03923489b7bfb9aba Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Sun, 31 Oct 2021 23:39:44 -0700
+Date: Mon, 10 Mar 2025 19:59:19 -0700
 Subject: [PATCH] Fix build on mips/clang
 
-clang13 crashes on mips, until its fixed upstream disable tailcall on
+clang20 crashes on mips, until its fixed upstream disable tailcall on
 mips
 
-https://bugs.llvm.org/show_bug.cgi?id=52367
+https://github.com/llvm/llvm-project/issues/51709
 
 Upstream-Status: Inappropriate [Clang workaround]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- src/google/protobuf/port_def.inc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
+Rebase to v5.29.4
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/google/protobuf/port_def.inc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/google/protobuf/port_def.inc b/src/google/protobuf/port_def.inc
+index 56f995e45..428d096b3 100644
 --- a/src/google/protobuf/port_def.inc
 +++ b/src/google/protobuf/port_def.inc
-@@ -255,6 +255,7 @@
+@@ -227,6 +227,7 @@ static_assert(PROTOBUF_ABSL_MIN(20230125, 3),
  #error PROTOBUF_TAILCALL was previously defined
  #endif
- #if __has_cpp_attribute(clang::musttail) && !defined(__arm__) && \
+ #if ABSL_HAVE_CPP_ATTRIBUTE(clang::musttail) && !defined(__arm__) &&  \
 +    !defined(__mips__) && \
-     !defined(_ARCH_PPC) && !defined(__wasm__) &&                 \
-     !(defined(_MSC_VER) && defined(_M_IX86)) &&                  \
-     !(defined(__NDK_MAJOR__) && __NDK_MAJOR <= 24)
+     !defined(_ARCH_PPC) && !defined(__wasm__) &&                      \
+     !(defined(_MSC_VER) && defined(_M_IX86)) && !defined(__i386__)
+ // Compilation fails on ARM32: b/195943306
+-- 
+2.25.1
+

@@ -24,12 +24,21 @@ SRC_URI = "git://github.com/rhboot/grubby.git;protocol=https;;branch=main \
 
 RDEPENDS:${PN} += "dracut"
 
-inherit autotools-brokensep ptest
+inherit ptest
 
 EXTRA_OEMAKE = "-e 'CC=${CC}' 'LDFLAGS=${LDFLAGS}' 'LIBS=${LIBS}'"
 
 LIBS:libc-musl = "-lexecinfo -largp"
 LIBS ?= ""
+
+do_compile() {
+	oe_runmake
+}
+
+do_install() {
+	oe_runmake DESTDIR=${D} install
+}
+
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}
     cp -r ${S}/test ${S}/test.sh ${D}${PTEST_PATH}

@@ -23,6 +23,7 @@ SRC_URI = "http://ftp.postgresql.org/pub/odbc/versions.old/src/${BPN}-${PV}.tar.
     file://psqlodbc-remove-some-checks-for-cross-compiling.patch \
     file://psqlodbc-donot-use-the-hardcode-libdir.patch \
     file://psqlodbc-fix-for-ptest-support.patch \
+    file://0001-configure-make-sure-to-call-AC_CHECK_HEADER_STDBOOL.patch \
     file://run-ptest \
 "
 

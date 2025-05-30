@@ -1,0 +1,626 @@
+From 663c416c59ea8e063d4b5a181104f26e4bd1658c Mon Sep 17 00:00:00 2001
+From: Andrzej Radecki <andrzejr@xfce.org>
+Date: Sun, 10 Nov 2024 16:29:21 +0000
+Subject: [PATCH 5/5] Make libsoup v3 support optional
+
+The plugin still targets Xfce4.16 and its contemporary is libsoup-2.4.
+This commit is to be reverted when support for libsoup-2.4 is
+no longer needed as all the #if's make the libsoup code less maintainable.
+
+Upstream-Status: Submitted [Upstream-Status: Backport [https://github.com/xfce-mirror/xfce4-weather-plugin/commit/663c416c59ea8e063d4b5a181104f26e4bd1658c]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac                   |   5 +-
+ panel-plugin/weather-config.c  |  28 +++++++
+ panel-plugin/weather-search.c  |  32 ++++++++
+ panel-plugin/weather-summary.c |  21 +++++
+ panel-plugin/weather.c         | 140 ++++++++++++++++++++++++++++++++-
+ panel-plugin/weather.h         |   4 +
+ 6 files changed, 225 insertions(+), 5 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index da98a5e..f60ad64 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -70,7 +70,9 @@ XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-2], [4.16.0])
+ XDT_CHECK_PACKAGE([LIBXFCE4PANEL], [libxfce4panel-2.0], [4.14.0])
+ XDT_CHECK_PACKAGE([XFCONF], [libxfconf-0], [4.12.0])
+ XDT_CHECK_PACKAGE([LIBXML], [libxml-2.0], [2.4.0])
+-XDT_CHECK_PACKAGE([SOUP], [libsoup-3.0], [3.0.0])
++dnl XDT_CHECK_PACKAGE([SOUP], [libsoup-3.0], [3.0.0])
++XDT_CHECK_PACKAGE([SOUP], [libsoup-3.0], [3.0.0], [],
++                          [XDT_CHECK_PACKAGE([SOUP], [libsoup-2.4], [2.42.0])])
+ XDT_CHECK_PACKAGE([JSON], [json-c], [0.13.1])
+ XDT_CHECK_OPTIONAL_PACKAGE([UPOWER_GLIB], [upower-glib], [0.9.0], [upower],
+                            [upower for adapting update interval to power state])
+@@ -121,3 +123,4 @@ echo "Build Configuration:"
+ echo
+ echo "* Debug Support:             $enable_debug"
+ echo "* UPower Glib Support:       ${UPOWER_GLIB_FOUND:-no}"
++echo "* Soup Version:              ${SOUP_VERSION:-no}"
+diff --git a/panel-plugin/weather-config.c b/panel-plugin/weather-config.c
+index d27c825..1035ddd 100644
+--- a/panel-plugin/weather-config.c
++++ b/panel-plugin/weather-config.c
+@@ -238,8 +238,13 @@ sanitize_location_name(const gchar *location_name)
+ 
+ 
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_lookup_altitude(GObject *source,
+                    GAsyncResult *result,
++#else
++cb_lookup_altitude(SoupSession *session,
++                   SoupMessage *msg,
++#endif
+                    gpointer user_data)
+ {
+     xfceweather_dialog *dialog = (xfceweather_dialog *) user_data;
+@@ -247,6 +252,7 @@ cb_lookup_altitude(GObject *source,
+     gdouble alt = 0;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     GError *error = NULL;
+     GBytes *response =
+         soup_session_send_and_read_finish(SOUP_SESSION(source), result, &error);
+@@ -255,6 +261,12 @@ cb_lookup_altitude(GObject *source,
+         g_error_free(error);
+     else
+         body = g_bytes_get_data(response, &len);
++#else
++    if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++        body = msg->response_body->data;
++        len = msg->response_body->length;
++    }
++#endif
+ 
+     if (global_dialog == NULL) {
+         weather_debug("%s called after dialog was destroyed", G_STRFUNC);
+@@ -274,19 +286,27 @@ cb_lookup_altitude(GObject *source,
+     else if (dialog->pd->units->altitude == FEET)
+         alt /= 0.3048;
+     gtk_spin_button_set_value(GTK_SPIN_BUTTON(dialog->spin_alt), alt);
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     g_bytes_unref(response);
++#endif
+ }
+ 
+ 
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_lookup_timezone(GObject *source,
+                    GAsyncResult *result,
++#else
++cb_lookup_timezone(SoupSession *session,
++                   SoupMessage *msg,
++#endif
+                    gpointer user_data)
+ {
+     xfceweather_dialog *dialog = (xfceweather_dialog *) user_data;
+     xml_timezone *xml_tz;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     GError *error = NULL;
+     GBytes *response =
+         soup_session_send_and_read_finish(SOUP_SESSION(source), result, &error);
+@@ -295,6 +315,12 @@ cb_lookup_timezone(GObject *source,
+         g_error_free(error);
+     else
+         body = g_bytes_get_data(response, &len);
++#else
++    if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++        body = msg->response_body->data;
++        len = msg->response_body->length;
++    }
++#endif
+ 
+     if (global_dialog == NULL) {
+         weather_debug("%s called after dialog was destroyed", G_STRFUNC);
+@@ -311,7 +337,9 @@ cb_lookup_timezone(GObject *source,
+         xml_timezone_free(xml_tz);
+     } else
+         gtk_entry_set_text(GTK_ENTRY(dialog->text_timezone), "");
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     g_bytes_unref(response);
++#endif
+ }
+ 
+ 
+diff --git a/panel-plugin/weather-search.c b/panel-plugin/weather-search.c
+index e030ff8..b07627e 100644
+--- a/panel-plugin/weather-search.c
++++ b/panel-plugin/weather-search.c
+@@ -78,8 +78,13 @@ sanitize_str(const gchar *str)
+ 
+ 
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_searchdone(GObject *source,
+               GAsyncResult *result,
++#else
++cb_searchdone(SoupSession *session,
++              SoupMessage *msg,
++#endif
+               gpointer user_data)
+ {
+     search_dialog *dialog = (search_dialog *) user_data;
+@@ -91,6 +96,7 @@ cb_searchdone(GObject *source,
+     GtkTreeSelection *selection;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     GError *error = NULL;
+     GBytes *response =
+         soup_session_send_and_read_finish(SOUP_SESSION(source), result, &error);
+@@ -99,6 +105,12 @@ cb_searchdone(GObject *source,
+         g_error_free(error);
+     else
+         body = g_bytes_get_data(response, &len);
++#else
++    if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++        body = msg->response_body->data;
++        len = msg->response_body->length;
++    }
++#endif
+ 
+     if (global_dialog == NULL) {
+         weather_debug("%s called after dialog was destroyed", G_STRFUNC);
+@@ -109,7 +121,9 @@ cb_searchdone(GObject *source,
+ 
+     doc = get_xml_document(body, len);
+     if (!doc) {
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_bytes_unref(response);
++#endif
+         return;
+     }
+ 
+@@ -145,7 +159,9 @@ cb_searchdone(GObject *source,
+         }
+ 
+     gtk_tree_view_column_set_title(dialog->column, _("Results"));
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     g_bytes_unref(response);
++#endif
+ }
+ 
+ 
+@@ -390,8 +406,13 @@ get_preferred_units(const gchar *country_code)
+ 
+ 
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_geolocation(GObject *source,
+                GAsyncResult *result,
++#else
++cb_geolocation(SoupSession *session,
++               SoupMessage *msg,
++#endif
+                gpointer user_data)
+ {
+     geolocation_data *data = (geolocation_data *) user_data;
+@@ -400,6 +421,7 @@ cb_geolocation(GObject *source,
+     units_config *units;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     GError *error = NULL;
+     GBytes *response =
+         soup_session_send_and_read_finish(SOUP_SESSION(source), result, &error);
+@@ -408,6 +430,12 @@ cb_geolocation(GObject *source,
+         g_error_free(error);
+     else
+         body = g_bytes_get_data(response, &len);
++#else
++    if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++        body = msg->response_body->data;
++        len = msg->response_body->length;
++    }
++#endif
+ 
+     if (global_dialog == NULL) {
+         weather_debug("%s called after dialog was destroyed", G_STRFUNC);
+@@ -420,7 +448,9 @@ cb_geolocation(GObject *source,
+ 
+     if (!geo) {
+         data->cb(NULL, NULL, NULL, NULL, data->user_data);
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_bytes_unref(response);
++#endif
+         g_free(data);
+         return;
+     }
+@@ -451,7 +481,9 @@ cb_geolocation(GObject *source,
+     g_slice_free(units_config, units);
+     xml_geolocation_free(geo);
+     g_free(full_loc);
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     g_bytes_unref(response);
++#endif
+     g_free(data);
+ }
+ 
+diff --git a/panel-plugin/weather-summary.c b/panel-plugin/weather-summary.c
+index 224bb34..8e79b0a 100644
+--- a/panel-plugin/weather-summary.c
++++ b/panel-plugin/weather-summary.c
+@@ -234,10 +234,16 @@ get_logo_path(void)
+ 
+ 
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ logo_fetched(GObject *source,
+              GAsyncResult *result,
++#else
++logo_fetched(SoupSession *session,
++             SoupMessage *msg,
++#endif
+              gpointer user_data)
+ {
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     GError *error = NULL;
+     GBytes *response =
+         soup_session_send_and_read_finish(SOUP_SESSION(source), result, &error);
+@@ -251,12 +257,23 @@ logo_fetched(GObject *source,
+         g_file_set_contents(path, body, len, &error);
+         g_bytes_unref(response);
+         if (error) {
++#else
++    if (msg && msg->response_body && msg->response_body->length > 0) {
++         gchar *path = get_logo_path();
++         GError *error = NULL;
++         GdkPixbuf *pixbuf = NULL;
++         gint scale_factor;
++         if (!g_file_set_contents(path, msg->response_body->data,
++                                  msg->response_body->length, &error)) {
++#endif
+             g_warning("Error downloading met.no logo image to %s, "
+                       "reason: %s\n", path,
+                       error ? error->message : "unknown");
+             g_error_free(error);
+             g_free(path);
++#if SOUP_CHECK_VERSION(3, 0, 0)
+             g_bytes_unref(response);
++#endif
+             return;
+         }
+         scale_factor = gtk_widget_get_scale_factor(user_data);
+@@ -268,9 +285,13 @@ logo_fetched(GObject *source,
+             cairo_surface_destroy(surface);
+             g_object_unref(pixbuf);
+         }
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_bytes_unref(response);
+     } else
+         g_error_free(error);
++#else
++    }
++#endif
+ }
+ 
+ 
+diff --git a/panel-plugin/weather.c b/panel-plugin/weather.c
+index 1a84537..db123fa 100644
+--- a/panel-plugin/weather.c
++++ b/panel-plugin/weather.c
+@@ -108,14 +108,22 @@ static void schedule_next_wakeup(plugin_data *data);
+ void
+ weather_http_queue_request(SoupSession *session,
+                            const gchar *uri,
++#if SOUP_CHECK_VERSION(3, 0, 0)
+                            GAsyncReadyCallback callback_func,
++#else
++                           SoupSessionCallback callback_func,
++#endif
+                            gpointer user_data)
+ {
+     SoupMessage *msg;
+ 
+     msg = soup_message_new("GET", uri);
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     soup_session_send_and_read_async(session, msg, G_PRIORITY_DEFAULT, NULL,
+                                      callback_func, user_data);
++#else
++    soup_session_queue_message(session, msg, callback_func, user_data);
++#endif
+ }
+ 
+ 
+@@ -484,8 +492,13 @@ calc_next_download_time(const update_info *upi,
+  * Process downloaded sun astro data and schedule next astro update.
+  */
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_astro_update_sun(GObject *source,
+                     GAsyncResult *result,
++#else
++cb_astro_update_sun(SoupSession *session,
++                    SoupMessage *msg,
++#endif
+                     gpointer user_data)
+ {
+     plugin_data *data = user_data;
+@@ -494,6 +507,7 @@ cb_astro_update_sun(GObject *source,
+     guint astro_forecast_days;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     SoupMessage *msg;
+     GError *error = NULL;
+     GBytes *response;
+@@ -505,6 +519,15 @@ cb_astro_update_sun(GObject *source,
+                                                  result, &error);
+     if (G_LIKELY(error == NULL)) {
+         body = g_bytes_get_data(response, &len);
++#else
++     data->msg_parse->sun_msg_processed++;
++     data->astro_update->http_status_code = msg->status_code;
++     if ((msg->status_code == 200 || msg->status_code == 203)) {
++         if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++             body = msg->response_body->data;
++             len = msg->response_body->length;
++         }
++#endif
+         json_tree = get_json_tree(body, len);
+         if (G_LIKELY(json_tree)) {
+             if (!parse_astrodata_sun(json_tree, data->astrodata))  {
+@@ -520,12 +543,19 @@ cb_astro_update_sun(GObject *source,
+             g_warning("Error parsing sun astronomical data!");
+             weather_debug("No json_tree");
+         }
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_bytes_unref(response);
+-    } else {
++#endif
++     } else {
+         data->msg_parse->http_msg_fail = TRUE;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_warning_once("Download of sun astronomical data failed: %s",
+                        error->message);
+         g_error_free(error);
++#else
++        g_warning_once("Download of sun astronomical data failed with HTTP Status Code %d, Reason phrase: %s",
++                       msg->status_code, msg->reason_phrase);
++#endif
+     }
+ 
+     astro_forecast_days = data->forecast_days + 1;
+@@ -551,8 +581,13 @@ cb_astro_update_sun(GObject *source,
+  * Process downloaded moon astro data and schedule next astro update.
+  */
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_astro_update_moon(GObject *source,
+                      GAsyncResult *result,
++#else
++cb_astro_update_moon(SoupSession *session,
++                     SoupMessage *msg,
++#endif
+                      gpointer user_data)
+ {
+     plugin_data *data = user_data;
+@@ -561,6 +596,7 @@ cb_astro_update_moon(GObject *source,
+     guint astro_forecast_days;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     SoupMessage *msg;
+     GError *error = NULL;
+     GBytes *response;
+@@ -572,6 +608,15 @@ cb_astro_update_moon(GObject *source,
+     data->astro_update->http_status_code = soup_message_get_status(msg);
+     if (G_LIKELY(error == NULL)) {
+         body = g_bytes_get_data(response, &len);
++#else
++     data->msg_parse->moon_msg_processed++;
++     data->astro_update->http_status_code = msg->status_code;
++     if ((msg->status_code == 200 || msg->status_code == 203)) {
++         if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++             body = msg->response_body->data;
++             len = msg->response_body->length;
++         }
++#endif
+         json_tree = get_json_tree(body, len);
+         if (G_LIKELY(json_tree)) {
+             if (!parse_astrodata_moon(json_tree, data->astrodata))  {
+@@ -587,13 +632,20 @@ cb_astro_update_moon(GObject *source,
+             g_warning("Error parsing moon astronomical data");
+             weather_debug("No json_tree");
+         }
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_bytes_unref(response);
+-    } else {
++#endif
++     } else {
+         data->msg_parse->http_msg_fail = TRUE;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_warning_once("Download of moon astronomical data failed: %s",
+                        error->message);
+         g_error_free(error);
+-    }
++#else
++        g_warning_once("Download of moon astronomical data failed with HTTP Status Code %d, Reason phrase: %s",
++                       msg->status_code, msg->reason_phrase);
++#endif
++     }
+ 
+     astro_forecast_days = data->forecast_days + 1;
+     if (data->msg_parse->sun_msg_processed == astro_forecast_days && data->msg_parse->moon_msg_processed == astro_forecast_days) {
+@@ -626,8 +678,13 @@ cb_astro_update_moon(GObject *source,
+  * Process downloaded weather data and schedule next weather update.
+  */
+ static void
++#if SOUP_CHECK_VERSION(3, 0, 0)
+ cb_weather_update(GObject *source,
+                   GAsyncResult *result,
++#else
++cb_weather_update(SoupSession *session,
++                  SoupMessage *msg,
++#endif
+                   gpointer user_data)
+ {
+     plugin_data *data = user_data;
+@@ -637,6 +694,7 @@ cb_weather_update(GObject *source,
+     gboolean parsing_error = TRUE;
+     const gchar *body = NULL;
+     gsize len = 0;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     SoupMessage *msg;
+     GError *error = NULL;
+     GBytes *response = NULL;
+@@ -650,6 +708,17 @@ cb_weather_update(GObject *source,
+     data->weather_update->http_status_code = soup_message_get_status(msg);
+     if (G_LIKELY(error == NULL)) {
+         body = g_bytes_get_data(response, &len);
++#else
++     weather_debug("Processing downloaded weather data.");
++     time(&now_t);
++     data->weather_update->attempt++;
++     data->weather_update->http_status_code = msg->status_code;
++     if (msg->status_code == 200 || msg->status_code == 203) {
++         if (G_LIKELY(msg->response_body && msg->response_body->data)) {
++             body = msg->response_body->data;
++             len = msg->response_body->length;
++         }
++#endif
+         doc = get_xml_document(body, len);
+         if (G_LIKELY(doc)) {
+             root_node = xmlDocGetRootElement(doc);
+@@ -661,14 +730,22 @@ cb_weather_update(GObject *source,
+                 }
+             xmlFreeDoc(doc);
+         }
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         g_bytes_unref(response);
++#endif
+         if (parsing_error)
+             g_warning("Error parsing weather data!");
+     } else {
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         weather_debug("Download of weather data failed: %s", error->message);
+         g_error_free(error);
++#else
++        weather_debug
++            ("Download of weather data failed with HTTP Status Code %d, "
++             "Reason phrase: %s", msg->status_code, msg->reason_phrase);
++#endif
+     }
+-    data->weather_update->next = calc_next_download_time(data->weather_update,
++     data->weather_update->next = calc_next_download_time(data->weather_update,
+                                                          now_t);
+ 
+     xml_weather_clean(data->weatherdata);
+@@ -1725,6 +1802,33 @@ mi_click(GtkWidget *widget,
+     update_weatherdata_with_reset(data);
+ }
+ 
++#if !SOUP_CHECK_VERSION(3, 0, 0)
++static void
++proxy_auth(SoupSession *session,
++           SoupMessage *msg,
++           SoupAuth *auth,
++           gboolean retrying,
++           gpointer user_data)
++{
++    SoupURI *soup_proxy_uri;
++    const gchar *proxy_uri;
++
++    if (!retrying) {
++        if (msg->status_code == SOUP_STATUS_PROXY_AUTHENTICATION_REQUIRED) {
++            proxy_uri = g_getenv("HTTP_PROXY");
++            if (!proxy_uri)
++                proxy_uri = g_getenv("http_proxy");
++            if (proxy_uri) {
++                soup_proxy_uri = soup_uri_new(proxy_uri);
++                soup_auth_authenticate(auth,
++                                       soup_uri_get_user(soup_proxy_uri),
++                                       soup_uri_get_password(soup_proxy_uri));
++                soup_uri_free(soup_proxy_uri);
++            }
++        }
++    }
++}
++#endif
+ 
+ #ifdef HAVE_UPOWER_GLIB
+ static void
+@@ -2028,10 +2132,18 @@ static plugin_data *
+ xfceweather_create_control(XfcePanelPlugin *plugin)
+ {
+     plugin_data *data = g_slice_new0(plugin_data);
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     GProxyResolver *proxy_resolver;
++#else
++    SoupURI *soup_proxy_uri;
++#endif
+     const gchar *proxy_uri;
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     const gchar *no_proxy;
+     gchar **no_proxy_lst = NULL;
++#else
++    const gchar *proxy_user;
++#endif
+     GtkWidget *refresh;
+     cairo_surface_t *icon = NULL;
+     data_types lbl;
+@@ -2069,15 +2181,23 @@ xfceweather_create_control(XfcePanelPlugin *plugin)
+ 
+     /* Setup session for HTTP connections */
+     data->session = soup_session_new();
++#if SOUP_CHECK_VERSION(3, 0, 0)
+     soup_session_set_user_agent(data->session,
+                                 PACKAGE_NAME "-" PACKAGE_VERSION);
+     soup_session_set_timeout(data->session, CONN_TIMEOUT);
++#else
++    g_object_set(data->session, SOUP_SESSION_USER_AGENT,
++                 PACKAGE_NAME "-" PACKAGE_VERSION, NULL);
++    g_object_set(data->session, SOUP_SESSION_TIMEOUT,
++                 CONN_TIMEOUT, NULL);
++#endif
+ 
+     /* Set the proxy URI from environment */
+     proxy_uri = g_getenv("HTTP_PROXY");
+     if (!proxy_uri)
+         proxy_uri = g_getenv("http_proxy");
+     if (proxy_uri) {
++#if SOUP_CHECK_VERSION(3, 0, 0)
+         no_proxy = g_getenv("no_proxy");
+         if (!no_proxy)
+             no_proxy = g_getenv("NO_PROXY");
+@@ -2087,6 +2207,18 @@ xfceweather_create_control(XfcePanelPlugin *plugin)
+         g_strfreev(no_proxy_lst);
+         soup_session_set_proxy_resolver(data->session, proxy_resolver);
+         g_object_unref(proxy_resolver);
++#else
++        soup_proxy_uri = soup_uri_new(proxy_uri);
++        g_object_set(data->session, SOUP_SESSION_PROXY_URI,
++                     soup_proxy_uri, NULL);
++        /* check if uri contains authentication info */
++        proxy_user = soup_uri_get_user(soup_proxy_uri);
++        if (proxy_user && strlen(proxy_user) > 0) {
++            g_signal_connect(G_OBJECT(data->session), "authenticate",
++                             G_CALLBACK(proxy_auth), NULL);
++        }
++        soup_uri_free(soup_proxy_uri);
++#endif
+     }
+     /* Otherwise, g_proxy_resolver_get_default() will be used */
+ 
+diff --git a/panel-plugin/weather.h b/panel-plugin/weather.h
+index 01974ce..87a6157 100644
+--- a/panel-plugin/weather.h
++++ b/panel-plugin/weather.h
+@@ -183,7 +183,11 @@ extern gboolean debug_mode;
+ 
+ void weather_http_queue_request(SoupSession *session,
+                                 const gchar *uri,
++#if SOUP_CHECK_VERSION(3, 0, 0)
+                                 GAsyncReadyCallback callback_func,
++#else
++                                SoupSessionCallback callback_func,
++#endif
+                                 gpointer user_data);
+ 
+ void scrollbox_set_visible(plugin_data *data);

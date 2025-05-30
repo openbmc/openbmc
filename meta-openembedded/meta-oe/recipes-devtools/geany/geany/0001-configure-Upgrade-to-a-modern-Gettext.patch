@@ -11,12 +11,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -8,7 +8,7 @@ AC_CONFIG_AUX_DIR([build-aux])
- AC_CONFIG_MACRO_DIR([m4])
+@@ -9,6 +9,7 @@ AC_CONFIG_MACRO_DIR([m4])
  AM_INIT_AUTOMAKE([1.11 -Wall parallel-tests subdir-objects])
  AC_CONFIG_HEADERS([config.h])
--
-+AC_PROG_INTLTOOL
- m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
  
- GEANY_PREFIX
++AC_PROG_INTLTOOL
+ # Silence "AC_LINK_IFELSE before AC_USE_SYSTEM_EXTENSIONS" warnings
+ # Note: Enables _GNU_SOURCE on Linux
+ AC_USE_SYSTEM_EXTENSIONS

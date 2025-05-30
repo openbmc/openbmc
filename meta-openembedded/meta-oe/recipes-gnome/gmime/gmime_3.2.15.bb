@@ -18,8 +18,8 @@ UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
 
 EXTRA_OECONF += "--enable-largefile"
 
-export ac_cv_have_iconv_detect_h="yes"
-export ac_cv_sys_file_offset_bits="64"
+export ac_cv_have_iconv_detect_h = "yes"
+export ac_cv_sys_file_offset_bits = "64"
 
 do_configure:append () {
     cp ${UNPACKDIR}/iconv-detect.h ${S}

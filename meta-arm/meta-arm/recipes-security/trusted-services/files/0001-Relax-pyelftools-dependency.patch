@@ -1,0 +1,31 @@
+From f2f867d3d84415f82c1750fa8d1f47842a7b7287 Mon Sep 17 00:00:00 2001
+From: kas User <kas@example.com>
+Date: Tue, 11 Mar 2025 15:19:58 +0000
+Subject: [PATCH 1/1] Relax pyelftools dependency
+
+tools/python/elf_segments_to_manifest.py was only accpeting pyelftools v0.31.
+Relax this requirement to accept v0.31 and newer versions.
+
+Upstream-Status: Pending
+Signed-off-by: Gyorgy Szing <gyorgy.szing@arm.com>
+
+---
+ tools/python/elf_segments_to_manifest.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/python/elf_segments_to_manifest.py b/tools/python/elf_segments_to_manifest.py
+index 378c318d4..52c12e0f4 100644
+--- a/tools/python/elf_segments_to_manifest.py
++++ b/tools/python/elf_segments_to_manifest.py
+@@ -16,7 +16,7 @@ from elftools import __version__ as module_version
+ from elftools.elf.elffile import ELFFile
+ from elftools.elf.constants import P_FLAGS
+ 
+-assert module_version == "0.31"
++assert module_version >= "0.31"
+ 
+ class ElfSegmentsToManifest:
+     """
+-- 
+2.43.0
+

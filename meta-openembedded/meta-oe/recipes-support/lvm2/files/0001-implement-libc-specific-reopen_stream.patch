@@ -1,4 +1,4 @@
-From cfa37411fa2ebe8ade94742ee00f86d0e386a651 Mon Sep 17 00:00:00 2001
+From 65a04547541894b3ec56bd70510b164810cd64b3 Mon Sep 17 00:00:00 2001
 From: Dengke Du <dengke.du@windriver.com>
 Date: Tue, 25 Oct 2016 11:49:40 +0000
 Subject: [PATCH] implement libc specific reopen_stream
@@ -45,10 +45,10 @@ index 90905e629..ed69662d0 100644
  void init_log_fn(lvm2_log_fn_t log_fn)
  {
 diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
-index 4af6adc83..fbab70988 100644
+index 22ae1e3bb..b0928bc04 100644
 --- a/tools/lvmcmdline.c
 +++ b/tools/lvmcmdline.c
-@@ -3395,7 +3395,7 @@ static int _check_standard_fds(void)
+@@ -3407,7 +3407,7 @@ static int _check_standard_fds(void)
  	int err = is_valid_fd(STDERR_FILENO);
  
  	if (!is_valid_fd(STDIN_FILENO) &&
@@ -57,7 +57,7 @@ index 4af6adc83..fbab70988 100644
  		if (err)
  			perror("stdin stream open");
  		else
-@@ -3405,7 +3405,7 @@ static int _check_standard_fds(void)
+@@ -3417,7 +3417,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDOUT_FILENO) &&
@@ -66,7 +66,7 @@ index 4af6adc83..fbab70988 100644
  		if (err)
  			perror("stdout stream open");
  		/* else no stdout */
-@@ -3413,7 +3413,7 @@ static int _check_standard_fds(void)
+@@ -3425,7 +3425,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDERR_FILENO) &&

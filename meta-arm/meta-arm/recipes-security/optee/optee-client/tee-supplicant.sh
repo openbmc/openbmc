@@ -14,7 +14,7 @@ test -f $DAEMON || exit 0
 test -f @sysconfdir@/default/$NAME && . @sysconfdir@/default/$NAME
 test -f @sysconfdir@/default/rcS && . @sysconfdir@/default/rcS
 
-SSD_OPTIONS="--oknodo --quiet --exec $DAEMON -- -d $OPTARGS"
+SSD_OPTIONS="-c @supluser@:@suplgroup@ --oknodo --quiet --exec $DAEMON -- -d $OPTARGS"
 
 set -e
 

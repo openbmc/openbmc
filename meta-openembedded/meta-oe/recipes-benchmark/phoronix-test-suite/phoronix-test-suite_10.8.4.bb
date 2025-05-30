@@ -25,6 +25,9 @@ do_install() {
     fi
 }
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[pdf] = ",,,ttf-dejavu-sans"
+
 # It is not advisable to enable these services by default since they can cause
 # continual target reboots if they encounter network problems.
 #

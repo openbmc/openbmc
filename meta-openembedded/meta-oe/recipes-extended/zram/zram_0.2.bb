@@ -4,8 +4,8 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 
 inherit update-rc.d systemd
 
-RDEPENDS:${PN} = "kmod \
-    ${@bb.utils.contains('DISTRO_FEATURES','systemd','util-linux','util-linux-swaponoff',d)}"
+RDEPENDS:${PN} = "kmod util-linux-swaponoff \
+    ${@bb.utils.contains('DISTRO_FEATURES','systemd','util-linux-zramctl','',d)}"
 RRECOMMENDS:${PN} = "kernel-module-zram"
 
 

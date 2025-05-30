@@ -22,3 +22,5 @@ PACKAGECONFIG[examples] = "-Dexamples=true,-Dexamples=false"
 PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false"
 
 SRC_URI[archive.sha256sum] = "9266a5c10ece383e193dfb7ffb07b509cc1f51521ab8dad76af96ed14212c2e3"
+
+PROVIDES = "librest"

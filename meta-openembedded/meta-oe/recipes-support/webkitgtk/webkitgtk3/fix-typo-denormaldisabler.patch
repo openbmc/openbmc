@@ -1,0 +1,18 @@
+From: Alberto Garcia <berto@igalia.com>
+Subject: Fix build failure due to missing semicolon
+
+Source: https://sources.debian.org/data/main/w/webkit2gtk/2.48.1-2/debian/patches/fix-typo-denormaldisabler.patch
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/Source/WebCore/platform/audio/DenormalDisabler.cpp
++++ b/Source/WebCore/platform/audio/DenormalDisabler.cpp
+@@ -91,7 +91,7 @@ DenormalDisabler::~DenormalDisabler()
+     }
+ }
+ #else
+-DenormalDisabler::DenormalDisabler() = default
++DenormalDisabler::DenormalDisabler() = default;
+ DenormalDisabler::~DenormalDisabler() = default;
+ #endif
+ 

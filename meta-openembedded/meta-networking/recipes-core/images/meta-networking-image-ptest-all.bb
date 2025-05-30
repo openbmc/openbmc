@@ -9,7 +9,7 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 require conf/include/ptest-packagelists-meta-networking.inc
 
 # Include the full set of ptests
-PTESTS_META_NETWORKING = "${PTESTS_FAST_META_NETWORKING} ${PTESTS_SLOW_META_NETWORKING} ${PTESTS_PROBLEMS_META_NETWORKING}"
+PTESTS_META_NETWORKING = "${PTESTS_FAST_META_NETWORKING} ${PTESTS_SLOW_META_NETWORKING}"
 
 do_testimage[noexec] = "1"
 do_testimage[depends] = "${@' '.join(['meta-networking-image-ptest-'+x+':do_testimage' for x in d.getVar('PTESTS_META_NETWORKING').split()])}"

@@ -17,6 +17,8 @@ SRCREV = "f4dbe258ff3d37489962ea9cf210192ae7ff9280"
 
 S = "${UNPACKDIR}/git"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 RDEPENDS:${PN} = "\
     python3-json \
 "

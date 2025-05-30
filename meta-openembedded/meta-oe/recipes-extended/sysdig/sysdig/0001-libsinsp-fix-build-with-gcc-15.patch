@@ -1,0 +1,31 @@
+From 47a86dabd065096ffc8818a1cffca96964d18120 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Tue, 22 Apr 2025 18:43:46 +0200
+Subject: [PATCH] libsinsp: fix build with gcc-15
+
+fixes:
+http://errors.yoctoproject.org/Errors/Details/852848/
+
+In file included from TOPDIR/tmp/work/core2-64-oe-linux/sysdig/0.28.0/git/falcosecurity-libs/userspace/chisel/lua_parser.cpp:20:
+TOPDIR/tmp/work/core2-64-oe-linux/sysdig/0.28.0/git/falcosecurity-libs/userspace/libsinsp/./gen_filter.h:87:17: error: 'uint64_t' does not name a type
+   87 |         virtual uint64_t get_ts() const = 0;
+      |                 ^~~~~~~~
+
+Upstream-Status: Pending [gen_filter is removed in newer version with https://github.com/falcosecurity/libs/commit/47e245f3d343eff27ed178ec2449caa3a01faabb]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ userspace/libsinsp/gen_filter.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/userspace/libsinsp/gen_filter.h b/userspace/libsinsp/gen_filter.h
+index f4cfa08b1..79ac30dc3 100644
+--- a/userspace/libsinsp/gen_filter.h
++++ b/userspace/libsinsp/gen_filter.h
+@@ -16,6 +16,7 @@ along with Falco.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <set>
+ #include <list>
+ #include <map>

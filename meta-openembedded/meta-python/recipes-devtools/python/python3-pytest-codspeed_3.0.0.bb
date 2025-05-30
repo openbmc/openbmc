@@ -11,4 +11,4 @@ inherit pypi python_hatchling
 PYPI_PACKAGE = "pytest_codspeed"
 UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
-RDEPENDS:${PN} = "python3-cffi python3-filelock python3-pytest"
+RDEPENDS:${PN} = "python3-cffi python3-filelock python3-pytest python3-rich python3-statistics"

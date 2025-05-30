@@ -9,30 +9,43 @@
 PTESTS_FAST_META_NETWORKING = "\
     freediameter \
     geoip \
+    geoip-perl \
     libcoap \
     libldb \
     libnftnl \
     libtalloc \
     libtdb \
+    libtevent \
     lldpd \
     mbedtls \
     openhpi \
+    openl2tp \
     squid \
     tcpdump \
+    wolfssl \
 "
+PTESTS_FAST_META_NETWORKING:remove:libc-musl = "\
+    libtalloc \
+    libtevent \
+    libtdb \
+    openhpi \
+    "
 
 # firewalld currently hangs forever so disable it for now
 #    firewalld
 PTESTS_SLOW_META_NETWORKING = "\
-    net-snmp \
     openvpn \
 "
 
 PTESTS_PROBLEMS_META_NETWORKING = "\
-    geoip-perl \
-    libtevent \
     lksctp-tools \
+    net-snmp \
     nftables \
-    openl2tp \
     python3-scapy \
 "
+PTESTS_PROBLEMS_META_NETWORKING:append:libc-musl = "\
+    libtalloc \
+    libtevent \
+    libtdb \
+    openhpi \
+    "

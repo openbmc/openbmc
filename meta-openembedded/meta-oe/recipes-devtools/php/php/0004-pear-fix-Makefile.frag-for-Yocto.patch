@@ -1,0 +1,31 @@
+From 35d7d40ac49c96b7a9a19b2f6593abb9f18ade2b Mon Sep 17 00:00:00 2001
+From: Claude Bing <cbing@cybernetics.com>
+Date: Tue, 9 Nov 2021 13:04:29 -0500
+Subject: [PATCH 4/5] pear: fix Makefile.frag for Yocto
+
+Upstream-Status: Pending
+
+Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+update patch to 8.0.12
+Signed-off-by: Claude Bing <cbing@cybernetics.com>
+---
+ pear/Makefile.frag | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pear/Makefile.frag b/pear/Makefile.frag
+index 9408757a3..69072f39e 100644
+--- a/pear/Makefile.frag
++++ b/pear/Makefile.frag
+@@ -10,7 +10,7 @@ PEAR_SUFFIX = -ds a$(program_suffix)
+ PEAR_INSTALLER_URL = https://pear.php.net/install-pear-nozlib.phar
+ 
+ install-pear-installer: $(SAPI_CLI_PATH)
+-	@$(top_builddir)/sapi/cli/php $(PEAR_INSTALL_FLAGS) pear/install-pear-nozlib.phar -d "$(peardir)" -b "$(bindir)" ${PEAR_PREFIX} ${PEAR_SUFFIX}
++	@$(PHP_NATIVE_DIR)/php $(PEAR_INSTALL_FLAGS) $(builddir)/install-pear-nozlib.phar -d "$(peardir)" -b "$(bindir)" ${PEAR_PREFIX} ${PEAR_SUFFIX}
+ 
+ install-pear:
+ 	@echo "Installing PEAR environment:      $(INSTALL_ROOT)$(peardir)/"
+-- 
+2.25.1
+

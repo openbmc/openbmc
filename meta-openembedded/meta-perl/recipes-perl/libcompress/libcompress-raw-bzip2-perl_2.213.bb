@@ -17,8 +17,8 @@ S = "${WORKDIR}/Compress-Raw-Bzip2-${PV}"
 
 inherit cpan
 
-export BUILD_BZIP2="0"
-export BZIP2_INCLUDE="-I${STAGING_DIR_HOST}${includedir}"
+export BUILD_BZIP2 = "0"
+export BZIP2_INCLUDE = "-I${STAGING_DIR_HOST}${includedir}"
 
 do_compile() {
 	export LIBC="$(find ${STAGING_DIR_TARGET}/${base_libdir}/ -name 'libc-*.so')"

@@ -26,6 +26,8 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-${PV}.tar.g
 
 SRC_URI[sha256sum] = "cf84c5f3fb1a295284942624d823fffa634144e096cfc4f9969ac98ef5f468e5"
 
+UPSTREAM_CHECK_REGEX = "ntp-(?P<pver>(\d+(\.\d+)+)(p\d+)?)\.tar"
+
 CVE_STATUS[CVE-2016-9312] = "not-applicable-platform: Issue only applies on Windows"
 CVE_STATUS[CVE-2019-11331] = "upstream-wontfix: inherent to RFC 5905 and cannot be fixed without breaking compatibility"
 CVE_STATUS_GROUPS += "CVE_STATUS_NTP"

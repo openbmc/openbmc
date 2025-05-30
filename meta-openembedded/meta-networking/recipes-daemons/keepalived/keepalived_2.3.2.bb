@@ -21,10 +21,11 @@ DEPENDS = "libnfnetlink openssl"
 
 inherit autotools pkgconfig systemd
 
-PACKAGECONFIG ??= "libnl snmp \
+PACKAGECONFIG ??= "libnl snmp reproducible \
     ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
 "
 PACKAGECONFIG[libnl] = "--enable-libnl,--disable-libnl,libnl"
+PACKAGECONFIG[reproducible] = "--enable-reproducible-build,,"
 PACKAGECONFIG[snmp] = "--enable-snmp,--disable-snmp,net-snmp"
 PACKAGECONFIG[systemd] = "--with-init=systemd --with-systemdsystemunitdir=${systemd_system_unitdir},--with-init=SYSV,systemd"
 
@@ -44,6 +45,9 @@ do_install:append() {
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         install -D -m 0644 ${B}/${BPN}/${BPN}.service ${D}${systemd_system_unitdir}/${BPN}.service
+    fi
+    if [ -n "${@bb.utils.filter('PACKAGECONFIG', 'reproducible', d)}" ]; then
+        sed -i -e 's|${WORKDIR}|<scrubbed>|g' ${D}${sysconfdir}/keepalived/keepalived.config-opts
     fi
 }
 

@@ -1,5 +1,5 @@
 SUMMARY = "Various helpers to pass trusted data to untrusted environments and back."
-HOMEPAGE = "http://github.com/mitsuhiko/itsdangerous"
+HOMEPAGE = "https://github.com/mitsuhiko/itsdangerous"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=4cda9a0ebd516714f360b0e9418cfb37"
 

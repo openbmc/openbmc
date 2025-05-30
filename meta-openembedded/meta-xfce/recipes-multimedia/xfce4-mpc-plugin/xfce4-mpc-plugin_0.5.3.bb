@@ -1,5 +1,5 @@
 SUMMARY = "Simple client plugin for Music Player Daemon"
-HOMEPAGE = "https://goodies.xfce.org/projects/panel-plugins/xfce4-mpc-plugin"
+HOMEPAGE = "https://docs.xfce.org/panel-plugins/xfce4-mpc-plugin/start"
 SECTION = "x11/application"
 LICENSE = "0BSD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3604d987e6dfdfc672c754d08953b0e0"

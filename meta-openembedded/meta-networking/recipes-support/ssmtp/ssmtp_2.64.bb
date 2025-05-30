@@ -9,6 +9,7 @@ SRC_URI = "${DEBIAN_MIRROR}/main/s/${BPN}/${BPN}_${PV}.orig.tar.bz2 \
            file://use-DESTDIR.patch \
            file://0001-ssmtp-Correct-the-null-pointer-assignment-to-char-po.patch \
            file://0001-include-libgen.h-for-basename.patch \
+           file://0001-Fix-incompatible-pointer-types-error-with-gcc-15.patch \
            "
 
 SRC_URI[md5sum] = "65b4e0df4934a6cd08c506cabcbe584f"

@@ -1,4 +1,4 @@
-From 0b3953dfdeef8dc9b8a23820659feee9e15b5bad Mon Sep 17 00:00:00 2001
+From e79f75487e32f87677519ec40c021b1623395bde Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 22:49:49 +0000
 Subject: [PATCH] mDNSCore: Fix broken debug parameter
@@ -10,10 +10,10 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/mDNSCore/mDNS.c b/mDNSCore/mDNS.c
-index d4519a7f62aa..3090edb2ac5d 100644
+index ad9eaa37a82a..fc51e1ad9bd4 100644
 --- a/mDNSCore/mDNS.c
 +++ b/mDNSCore/mDNS.c
-@@ -10253,7 +10253,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastAnswers(mDNS *const m, const DNSMessage *
+@@ -11046,7 +11046,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastAnswers(mDNS *const m, const DNSMessage *
  #else
                              const DNSServRef dnsserv = qptr->qDNSServer;
  #endif

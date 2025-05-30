@@ -1,0 +1,46 @@
+From 213f29fb63473304db098b3d12a0393fd50e4914 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 17 Mar 2025 13:28:13 +0800
+Subject: [PATCH] fix protobuf-native build failure with gcc 10
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Build protobuf-native failed on ubuntu 20.04 which has gcc 10
+
+protobuf-native/4.30.0/git/src/google/protobuf/port_def.inc:105:48:
+error: static assertion failed: Protobuf only supports C+
+   ↪ +17 and newer.
+   |   105 | #define PROTOBUF_CPLUSPLUS_MIN(x) (__cplusplus >= x)
+   |       |                                   ~~~~~~~~~~~~~^~~~~
+   | /home/kraj01/yoe/build/tmp/work/x86_64-linux/protobuf-native/4.30.0/git/src/google/protobuf/port_def.inc:119:15:
+note: in expansion of macro ‘PROTOBUF_CPLUSPLUS_MIN’
+   |   119 | static_assert(PROTOBUF_CPLUSPLUS_MIN(201703L),
+   |       |               ^~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ CMakeLists.txt | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index e90cb8aa2..3ffac1307 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,6 +14,10 @@ endif()
+ # Project
+ project(protobuf C CXX)
+ 
++set(CMAKE_CXX_STANDARD 17)
++set(CMAKE_CXX_STANDARD_REQUIRED ON)
++set(CMAKE_CXX_EXTENSIONS OFF)
++
+ if(protobuf_DEPRECATED_CMAKE_SUBDIRECTORY_USAGE)
+   if(CMAKE_PROJECT_NAME STREQUAL "protobuf")
+     get_filename_component(CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR} DIRECTORY)
+-- 
+2.25.1
+

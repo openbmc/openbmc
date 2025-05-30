@@ -1,0 +1,51 @@
+From 4ca437b129252635e89694446945e69912300ceb Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 16 Apr 2025 20:35:46 +0900
+Subject: [PATCH] fix netcat-openbsd: ftbfs with GCC-15
+
+* fix build failure with GCC-15
+netcat.c:1443:41: error: passing argument 2 of 'signal' from incompatible pointer type [-Wincompatible-pointer-types]
+ 1443 |                         signal(SIGALRM, quit);
+      |                                         ^~~~
+      |                                         |
+      |                                         void (*)(void)
+In file included from netcat.c:100:
+TOPDIR/tmp/work/core2-64-oe-linux/netcat-openbsd/1.195/recipe-sysroot/usr/include/signal.h:88:57: note: expected '__sighandler_t' {aka 'void (*)(int)'} but argument is of type 'void (*)(void)'
+   88 | extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+      |                                          ~~~~~~~~~~~~~~~^~~~~~~~~
+netcat.c:241:13: note: 'quit' declared here
+  241 | static void quit();
+      |             ^~~~
+TOPDIR/tmp/work/core2-64-oe-linux/netcat-openbsd/1.195/recipe-sysroot/usr/include/signal.h:72:16: note: '__sighandler_t' declared here
+   72 | typedef void (*__sighandler_t) (int);
+      |                ^~~~~~~~~~~~~~
+make: *** [Makefile:17: netcat.o] Error 1
+
+Upstream-Status: Submitted [https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1097448]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ netcat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/netcat.c b/netcat.c
+index d70598a..b8ba959 100644
+--- a/netcat.c
++++ b/netcat.c
+@@ -238,7 +238,7 @@ char *proto_name(int uflag, int dccpflag);
+ static int connect_with_timeout(int fd, const struct sockaddr *sa,
+         socklen_t salen, int ctimeout);
+ 
+-static void quit();
++static void quit(int sig);
+ 
+ int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
+ int    b64_pton(char const *src, u_char *target, size_t targsize);
+@@ -2235,7 +2235,7 @@ usage(int ret)
+  * quit()
+  * handler for a "-q" timeout (exit 0 instead of 1)
+  */
+-static void quit()
++static void quit(__attribute__((unused)) int sig)
+ {
+ 	exit(0);
+ }

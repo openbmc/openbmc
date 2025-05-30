@@ -1,0 +1,146 @@
+Fix build with GCC-15
+
+Upstream-Status: Backport [https://sourceforge.net/p/scintilla/code/ci/c7ffad21b23dfad4e8e9f36bb587acc2f6e84fee/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+--- a/scintilla/gtk/PlatGTK.cxx
++++ b/scintilla/gtk/PlatGTK.cxx
+@@ -5,6 +5,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cstring>
+ #include <cstdio>
+ #include <cmath>
+--- a/scintilla/src/AutoComplete.cxx
++++ b/scintilla/src/AutoComplete.cxx
+@@ -7,6 +7,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cassert>
+ #include <cstring>
+ #include <cstdio>
+--- a/scintilla/src/CallTip.cxx
++++ b/scintilla/src/CallTip.cxx
+@@ -7,6 +7,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cassert>
+ #include <cstring>
+ #include <cstdio>
+--- a/scintilla/src/CellBuffer.cxx
++++ b/scintilla/src/CellBuffer.cxx
+@@ -7,6 +7,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cassert>
+ #include <cstring>
+ #include <cstdio>
+--- a/scintilla/src/ChangeHistory.cxx
++++ b/scintilla/src/ChangeHistory.cxx
+@@ -7,6 +7,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cassert>
+ 
+ #include <stdexcept>
+--- a/scintilla/src/Decoration.cxx
++++ b/scintilla/src/Decoration.cxx
+@@ -6,6 +6,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cstring>
+ #include <cstdio>
+ #include <cstdarg>
+--- a/scintilla/src/Document.cxx
++++ b/scintilla/src/Document.cxx
+@@ -7,6 +7,7 @@
+ 
+ #include <cstddef>
+ #include <cstdlib>
++#include <cstdint>
+ #include <cassert>
+ #include <cstring>
+ #include <cstdio>
+--- a/scintilla/src/Indicator.cxx
++++ b/scintilla/src/Indicator.cxx
+@@ -5,6 +5,7 @@
+ // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
++#include <cstdint>
+ #include <cmath>
+ 
+ #include <stdexcept>
+--- a/scintilla/src/KeyMap.cxx
++++ b/scintilla/src/KeyMap.cxx
+@@ -6,6 +6,7 @@
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
+ #include <cstdlib>
++#include <cstdint>
+ 
+ #include <stdexcept>
+ #include <string_view>
+--- a/scintilla/src/LineMarker.cxx
++++ b/scintilla/src/LineMarker.cxx
+@@ -5,6 +5,7 @@
+ // Copyright 1998-2011 by Neil Hodgson <neilh@scintilla.org>
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
++#include <cstdint>
+ #include <cstring>
+ #include <cmath>
+ 
+--- a/scintilla/src/PerLine.cxx
++++ b/scintilla/src/PerLine.cxx
+@@ -6,6 +6,7 @@
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
+ #include <cstddef>
++#include <cstdint>
+ #include <cassert>
+ #include <cstring>
+ 
+--- a/scintilla/src/Style.cxx
++++ b/scintilla/src/Style.cxx
+@@ -5,6 +5,8 @@
+ // Copyright 1998-2001 by Neil Hodgson <neilh@scintilla.org>
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
++#include <cstdint>
++
+ #include <stdexcept>
+ #include <string_view>
+ #include <vector>
+--- a/scintilla/src/ViewStyle.cxx
++++ b/scintilla/src/ViewStyle.cxx
+@@ -6,6 +6,7 @@
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
+ #include <cstddef>
++#include <cstdint>
+ #include <cassert>
+ #include <cstring>
+ #include <cmath>
+--- a/scintilla/src/XPM.cxx
++++ b/scintilla/src/XPM.cxx
+@@ -6,6 +6,7 @@
+ // The License.txt file describes the conditions under which this software may be distributed.
+ 
+ #include <cstdlib>
++#include <cstdint>
+ #include <cstring>
+ #include <climits>
+ 

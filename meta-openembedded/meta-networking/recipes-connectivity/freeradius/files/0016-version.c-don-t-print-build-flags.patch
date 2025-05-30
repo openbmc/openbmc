@@ -1,4 +1,4 @@
-From cbbb62ddda5c189c225f96bf6b599b3b3e8c8252 Mon Sep 17 00:00:00 2001
+From 99ea83d998d3b8957830afa15cec42ba265b67ca Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Wed, 3 Aug 2022 16:44:29 +0800
 Subject: [PATCH] version.c: don't print build flags
@@ -13,10 +13,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 13 deletions(-)
 
 diff --git a/src/main/version.c b/src/main/version.c
-index f1f1e87810..3ffcbb25a0 100644
+index 44a6edc699..a0e6f26911 100644
 --- a/src/main/version.c
 +++ b/src/main/version.c
-@@ -589,19 +589,6 @@ void version_print(void)
+@@ -614,19 +614,6 @@ void version_print(void)
  		DEBUG2("  unknown");
  #endif
  

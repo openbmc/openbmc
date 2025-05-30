@@ -1,0 +1,59 @@
+From 03c35cff930e421199b586c33a00eb6cc537ba28 Mon Sep 17 00:00:00 2001
+From: Sergei Trofimovich <slyich@gmail.com>
+Date: Thu, 19 Sep 2024 09:36:48 +0100
+Subject: [PATCH] SimpleRowFormatter.h: fix the build on `gcc-15` (unsatisfied
+ `noexcept`)
+
+On today's `gcc-15` poco fails to build as:
+
+    In file included from /build/source/Data/include/Poco/Data/Statement.h:27,
+                     from /build/source/Data/include/Poco/Data/Session.h:23,
+                     from /build/source/Data/include/Poco/Data/ArchiveStrategy.h:22,
+                     from /build/source/Data/src/ArchiveStrategy.cpp:15:
+    /build/source/Data/include/Poco/Data/SimpleRowFormatter.h:114:21: error: declaration of 'std::_Require<std::__not_<std::__is_tuple_like<_Tp> >, std::is_move_construc
+    tible<_Tp>, std::is_move_assignable<_Tp> > std::swap(_Tp&, _Tp&) noexcept [with _Tp = Poco::Data::SimpleRowFormatter; _Require<__not_<__is_tuple_like<_Tp> >, is_move_constructible<_Tp>, is_move_assignable<_Tp> > = void]' has a different exception specifier
+      114 |         inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1,
+          |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    In file included from /nix/store/...-gcc-15.0.0/include/c++/15.0.0/bits/new_allocator.h:36,
+                     from /nix/store/...-gcc-15.0.0/include/c++/15.0.0/x86_64-unknown-linux-gnu/bits/c++allocator.h:33,
+                     from /nix/store/...-gcc-15.0.0/include/c++/15.0.0/bits/allocator.h:46,
+                     from /nix/store/...-gcc-15.0.0/include/c++/15.0.0/string:43,
+                     from /build/source/Foundation/include/Poco/Foundation.h:94,
+                     from /build/source/Data/include/Poco/Data/Data.h:23,
+                     from /build/source/Data/include/Poco/Data/ArchiveStrategy.h:21:
+    /nix/store/...-gcc-15.0.0/include/c++/15.0.0/bits/move.h:214:5: note: from previous declaration 'std::_Require<std::__not_<std::__is_tuple_like<_Tp> >, std::is_move_constructible<_Tp>, std::is_move_assignable<_Tp> > std::swap(_Tp&, _Tp&) noexcept (false) [with _Tp = Poco::Data::SimpleRowFormatter; _Require<__not_<__is_tuple_like<_Tp> >, is_move_constructible<_Tp>, is_move_assignable<_Tp> > = void]'
+      214 |     swap(_Tp& __a, _Tp& __b)
+          |     ^~~~
+
+Possibly because `SimpleRowFormatter` does not have constructors and
+assignment operators that involve rvalue references?
+
+Updated `noexcept` condition. Fixes the build on` gcc-15`. Still
+compiles on `gcc-13`.
+
+Upstream-Status: Backport [03c35cf SimpleRowFormatter.h: fix the build on `gcc-15` (unsatisfied `noexcept`)]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ Data/include/Poco/Data/SimpleRowFormatter.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/Data/include/Poco/Data/SimpleRowFormatter.h b/Data/include/Poco/Data/SimpleRowFormatter.h
+index 0dcb43b0b..c8417b3a7 100644
+--- a/Data/include/Poco/Data/SimpleRowFormatter.h
++++ b/Data/include/Poco/Data/SimpleRowFormatter.h
+@@ -109,13 +109,10 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
+ 
+ namespace std
+ {
+-	// Note: for an unknown reason, clang refuses to compile this function as noexcept
+ 	template<>
+ 	inline void swap<Poco::Data::SimpleRowFormatter>(Poco::Data::SimpleRowFormatter& s1,
+ 		Poco::Data::SimpleRowFormatter& s2)
+-#ifndef POCO_COMPILER_CLANG
+-		noexcept
+-#endif
++		noexcept(std::is_nothrow_swappable_v<Poco::Data::SimpleRowFormatter>)
+ 		/// Full template specalization of std:::swap for SimpleRowFormatter
+ 	{
+ 		s1.swap(s2);
+

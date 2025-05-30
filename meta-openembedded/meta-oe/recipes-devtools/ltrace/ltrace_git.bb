@@ -36,7 +36,7 @@ S = "${WORKDIR}/git"
 inherit autotools
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)}"
-PACKAGECONFIG[unwind] = "--with-libunwind,--without-libunwind,libunwind"
+PACKAGECONFIG[unwind] = "--with-libunwind --without-elfutils,--without-libunwind,libunwind"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,libselinux"
 
 COMPATIBLE_HOST:riscv64 = "null"

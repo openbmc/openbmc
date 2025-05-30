@@ -9,7 +9,7 @@ REQUIRED_DISTRO_FEATURES = "ptest"
 require conf/include/ptest-packagelists-meta-multimedia.inc
 
 # Include the full set of ptests
-PTESTS_META_MULTIMEDIA = "${PTESTS_FAST_META_MULTIMEDIA} ${PTESTS_SLOW_META_MULTIMEDIA} ${PTESTS_PROBLEMS_META_MULTIMEDIA}"
+PTESTS_META_MULTIMEDIA = "${PTESTS_FAST_META_MULTIMEDIA} ${PTESTS_SLOW_META_MULTIMEDIA}"
 
 do_testimage[noexec] = "1"
 do_testimage[depends] = "${@' '.join(['meta-multimedia-image-ptest-'+x+':do_testimage' for x in d.getVar('PTESTS_META_MULTIMEDIA').split()])}"

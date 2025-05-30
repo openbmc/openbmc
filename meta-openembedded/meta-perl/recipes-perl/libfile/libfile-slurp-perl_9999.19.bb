@@ -16,4 +16,4 @@ inherit cpan
 
 SRC_URI[sha256sum] = "ce29ebe995097ebd6e9bc03284714cdfa0c46dc94f6b14a56980747ea3253643"
 
-BBCLASSEXTEND="native"
+BBCLASSEXTEND = "native"

@@ -3,7 +3,8 @@ HOMEPAGE = "https://github.com/mozilla/cbindgen"
 LICENSE = "MPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9741c346eef56131163e13b9db1241b3"
 
-SRC_URI += "git://github.com/mozilla/cbindgen.git;protocol=https;branch=master"
+SRC_URI += "git://github.com/mozilla/cbindgen.git;protocol=https;branch=master \
+            file://0001-Define-more-ioctl-codes-on-riscv32gc-unknown-linux-g.patch;patchdir=${CARGO_VENDORING_DIRECTORY}/libc-0.2.155"
 SRCREV = "bd78bbe59b10eda6ef1255e4acda95c56c6d0279"
 S = "${WORKDIR}/git"
 

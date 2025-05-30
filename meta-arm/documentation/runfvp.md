@@ -59,6 +59,16 @@ There are recipes for common FVPs in meta-arm already, and writing new recipes i
 
 If `FVP_PROVIDER` is not set then it is assumed that `FVP_EXE` is installed on the host already.
 
+### `FVP_BINDIR`
+
+Optional parameter to configure the path of the FVP binary. For example, `fvp-base` uses path from the build host by default. This path can be customized by configuring like below.
+
+```
+FVP_BINDIR ?= "utilities/fvp/usr/bin"
+```
+
+Potential use case for this parameter configuration is to execute `runfvp` script without the need for bitbake environment initialization.
+
 ### `FVP_CONFIG`
 
 Parameters passed to the FVP with the `--parameter`/`-C` option.  These are expressed as variable flags so individual parameters can be altered easily. For example:

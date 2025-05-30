@@ -8,7 +8,7 @@ require recipes-security/trusted-services/ts-uuid.inc
 
 TS_ENV ?= "opteesp"
 TS_BIN = "${RECIPE_SYSROOT}/usr/${TS_ENV}/bin"
-TS_BIN_SPM_TEST= "${RECIPE_SYSROOT}/usr/opteesp/bin"
+TS_BIN_SPM_TEST = "${RECIPE_SYSROOT}/usr/opteesp/bin"
 
 SP_EXT = "${@oe.utils.conditional('TS_ENV','opteesp','.stripped.elf','.bin',d)}"
 
@@ -79,6 +79,13 @@ DEPENDS:append  = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-block-storage', 
 
 SP_PATHS:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-block-storage', \
                                         ' ${TS_BIN}/${BLOCK_STORAGE_UUID}${SP_EXT}', '', d)}"
+
+# Logging SP
+DEPENDS:append  = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-logging', \
+                                        ' ts-sp-logging', '' , d)}"
+SP_PATHS:append = "${@bb.utils.contains('MACHINE_FEATURES', 'ts-logging', \
+                                        ' ${TS_BIN}/${LOGGING_SP_UUID}${SP_EXT}', '', d)}"
+
 
 EXTRA_OEMAKE:append = "${@oe.utils.conditional('SP_PATHS', '', '', \
                         ' CFG_MAP_EXT_DT_SECURE=y CFG_SECURE_PARTITION=y \

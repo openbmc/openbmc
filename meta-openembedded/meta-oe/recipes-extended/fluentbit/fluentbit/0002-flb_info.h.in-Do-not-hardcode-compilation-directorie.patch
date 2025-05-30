@@ -13,8 +13,6 @@ Upstream-Status: Pending
  include/fluent-bit/flb_info.h.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/fluent-bit/flb_info.h.in b/include/fluent-bit/flb_info.h.in
-index 3a08f8051..aa6a48f29 100644
 --- a/include/fluent-bit/flb_info.h.in
 +++ b/include/fluent-bit/flb_info.h.in
 @@ -23,7 +23,7 @@

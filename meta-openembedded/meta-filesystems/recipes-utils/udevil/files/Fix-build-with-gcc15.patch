@@ -1,0 +1,68 @@
+Fix build with gcc-15
+
+Fix the following errors:
+../../udevil-0.4.4/src/udevil.c: In function 'command_monitor':
+../../udevil-0.4.4/src/udevil.c:4891:21: error: passing argument 2 of 'signal' from incompatible pointer type [-Wincompatible-pointer-types]
+ 4891 |     signal(SIGTERM, command_monitor_finalize );
+      |                     ^~~~~~~~~~~~~~~~~~~~~~~~
+      |                     |
+      |                     void (*)(void)
+In file included from /home/worker/nano-ai/build-nano-ai/BUILD/work/qcs8550_aihub-webos-linux/udevil/0.4.4/recipe-sysroot/usr/include/sys/wait.h:36,
+                 from ../../udevil-0.4.4/src/udevil.c:10:
+/home/worker/nano-ai/build-nano-ai/BUILD/work/qcs8550_aihub-webos-linux/udevil/0.4.4/recipe-sysroot/usr/include/signal.h:88:57: note: expected '__sighandler_t' {aka 'void (*)(int)'} but argument is of type 'void (*)(void)'
+   88 | extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+      |                                          ~~~~~~~~~~~~~~~^~~~~~~~~
+../../udevil-0.4.4/src/udevil.c:4798:6: note: 'command_monitor_finalize' declared here
+ 4798 | void command_monitor_finalize()
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~
+/home/worker/nano-ai/build-nano-ai/BUILD/work/qcs8550_aihub-webos-linux/udevil/0.4.4/recipe-sysroot/usr/include/signal.h:72:16: note: '__sighandler_t' declared here
+   72 | typedef void (*__sighandler_t) (int);
+      |                ^~~~~~~~~~~~~~
+...
+../../udevil-0.4.4/src/udevil.c: In function 'main':
+../../udevil-0.4.4/src/udevil.c:5035:22: error: passing argument 2 of 'signal' from incompatible pointer type [-Wincompatible-pointer-types]
+ 5035 |     signal( SIGTERM, command_interrupt );
+      |                      ^~~~~~~~~~~~~~~~~
+      |                      |
+      |                      void (*)(void)
+/home/worker/nano-ai/build-nano-ai/BUILD/work/qcs8550_aihub-webos-linux/udevil/0.4.4/recipe-sysroot/usr/include/signal.h:88:57: note: expected '__sighandler_t' {aka 'void (*)(int)'} but argument is of type 'void (*)(void)'
+   88 | extern __sighandler_t signal (int __sig, __sighandler_t __handler)
+      |                                          ~~~~~~~~~~~~~~~^~~~~~~~~
+../../udevil-0.4.4/src/udevil.c:4916:6: note: 'command_interrupt' declared here
+ 4916 | void command_interrupt()
+      |      ^~~~~~~~~~~~~~~~~
+/home/worker/nano-ai/build-nano-ai/BUILD/work/qcs8550_aihub-webos-linux/udevil/0.4.4/recipe-sysroot/usr/include/signal.h:72:16: note: '__sighandler_t' declared here
+   72 | typedef void (*__sighandler_t) (int);
+      |                ^~~~~~~~~~~~~~
+../../udevil-0.4.4/src/udevil.c:5036:22: error: passing argument 2 of 'signal' from incompatible pointer type [-Wincompatible-pointer-types]
+ 5036 |     signal( SIGINT,  command_interrupt );
+      |                      ^~~~~~~~~~~~~~~~~
+      |                      |
+      |                      void (*)(void)
+
+Signed-off-by: Nguyen Dat Tho <tho3.nguyen@lge.com>
+
+Upstream-Status: Inactive-Upstream [lastrelease: 10years ago]
+---
+diff --git a/src/udevil.c b/src/udevil.c
+index bab80e9..da629d9 100644
+--- a/src/udevil.c
++++ b/src/udevil.c
+@@ -4795,7 +4795,7 @@ static int command_info( CommandData* data )
+     return ret;
+ }
+ 
+-void command_monitor_finalize()
++void command_monitor_finalize(int)
+ {
+     //if (signal == SIGINT || signal == SIGTERM)
+     //printf( "\nudevil: SIGINT || SIGTERM\n");
+@@ -4913,7 +4913,7 @@ finish_:
+     return 1;
+ }
+ 
+-void command_interrupt()
++void command_interrupt(int)
+ {
+     if ( udev )
+     {

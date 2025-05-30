@@ -19,7 +19,7 @@ DESCRIPTION = "\
 "
 HOMEPAGE = "http://www.postgresql.com"
 LICENSE = "0BSD"
-DEPENDS = "libnsl2 tzcode-native perl"
+DEPENDS = "libnsl2 tzcode-native perl bison-native"
 
 ARM_INSTRUCTION_SET = "arm"
 
@@ -73,7 +73,7 @@ PACKAGECONFIG[openssl] = "--with-ssl=openssl,ac_cv_file__dev_urandom=yes,openssl
 PACKAGECONFIG[icu] = "--with-icu,--without-icu,icu,icu"
 PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 
-EXTRA_OECONF += "--enable-thread-safety --disable-rpath \
+EXTRA_OECONF += "--disable-rpath \
     --datadir=${datadir}/${BPN} \
     --sysconfdir=${sysconfdir}/${BPN} \
 "
@@ -133,6 +133,8 @@ def is_target(d):
 export PERLCONFIGTARGET = "${@is_target(d)}"
 export PERL_ARCHLIB = "${STAGING_LIBDIR}${PERL_OWN_DIR}/perl5/${@get_perl_version(d)}/${@get_perl_arch(d)}"
 
+EXTRA_AUTORECONF += "-I config"
+
 do_configure() {
     # do_configure
     autotools_do_configure
@@ -175,6 +177,11 @@ do_configure() {
 
 do_compile:append() {
     oe_runmake -C contrib all
+
+    for f in `find ${B} -name "*.[c|h]"`;
+    do
+        sed -i -e 's,${B}/../,,' $f
+    done
 }
 
 # server needs to configure user and group

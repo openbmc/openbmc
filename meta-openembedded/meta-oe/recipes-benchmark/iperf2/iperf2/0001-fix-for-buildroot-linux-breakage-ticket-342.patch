@@ -1,0 +1,26 @@
+From a25566dd66fb0ca951b3b6f6fa5a4bfaac276c71 Mon Sep 17 00:00:00 2001
+From: Robert McMahon <rjmcmahon@rjmcmahon.com>
+Date: Tue, 12 Nov 2024 12:06:54 -0800
+Subject: [PATCH] fix for buildroot linux breakage, ticket 342
+
+Upstream-Status: Backport [https://sourceforge.net/p/iperf2/code/ci/a25566dd66fb0ca951b3b6f6fa5a4bfaac276c71/]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/checksums.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/checksums.c b/src/checksums.c
+index 852f1952..d7a8109e 100644
+--- a/src/checksums.c
++++ b/src/checksums.c
+@@ -47,6 +47,9 @@
+  * by Robert J. McMahon (rjmcmahon@rjmcmahon.com, bob.mcmahon@broadcom.com)
+  * -------------------------------------------------------------------
+  */
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
+ #include "headers.h"
+ 
+ /*

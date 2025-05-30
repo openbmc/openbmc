@@ -1,0 +1,38 @@
+From 6ab6af57cbd3b3b0cd4ba04f7f65693e1ca69870 Mon Sep 17 00:00:00 2001
+From: Dan Gohman <dev@sunfishcode.online>
+Date: Sun, 6 Apr 2025 05:22:49 -0700
+Subject: [PATCH] Define more ioctl codes on riscv32gc-unknown-linux-gnu
+
+Define ioctl codes including `FICLONE` and `FS_IOC32_GETVERSION` on
+riscv32gc-unknown-linux-gnu.
+
+Upstream-Status: Submitted [https://github.com/rust-lang/libc/pull/4382]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/unix/linux_like/linux/arch/generic/mod.rs | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/unix/linux_like/linux/arch/generic/mod.rs b/src/unix/linux_like/linux/arch/generic/mod.rs
+index 2f437e1..db1f1e7 100644
+--- a/src/unix/linux_like/linux/arch/generic/mod.rs
++++ b/src/unix/linux_like/linux/arch/generic/mod.rs
+@@ -114,6 +114,7 @@ cfg_if! {
+                  target_arch = "x86_64",
+                  target_arch = "arm",
+                  target_arch = "aarch64",
++                 target_arch = "riscv32",
+                  target_arch = "riscv64",
+                  target_arch = "s390x",
+                  target_arch = "csky",
+@@ -218,7 +219,10 @@ cfg_if! {
+     // where S stands for size (int, long, struct...)
+     // where T stands for type ('f','v','X'...)
+     // where N stands for NR (NumbeR)
+-    if #[cfg(any(target_arch = "x86", target_arch = "arm", target_arch = "csky"))] {
++    if #[cfg(any(target_arch = "x86",
++                 target_arch = "arm",
++                 target_arch = "riscv32",
++                 target_arch = "csky"))] {
+         pub const FS_IOC_GETFLAGS: ::Ioctl = 0x80046601;
+         pub const FS_IOC_SETFLAGS: ::Ioctl = 0x40046602;
+         pub const FS_IOC_GETVERSION: ::Ioctl = 0x80047601;

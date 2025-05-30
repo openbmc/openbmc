@@ -26,7 +26,7 @@ RRECOMMENDS:${PN} = "\
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-inherit allarch
+PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 do_compile[noexec] = "1"
 

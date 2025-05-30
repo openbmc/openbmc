@@ -1,0 +1,41 @@
+From 333e92a2d804420748447e043c6a04affc600e20 Mon Sep 17 00:00:00 2001
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Thu, 27 Feb 2025 21:09:04 +0200
+Subject: [PATCH] Makefile.am: add ACLOCAL_AMFLAGS
+
+Add ACLOCAL_AMFLAGS, a standard way to tell aclocal where to find
+necessary macros.
+
+Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Upstream-Status: Submitted [https://github.com/HewlettPackard/netperf/pull/84]
+---
+ Makefile.am | 1 +
+ autogen.sh  | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2cb9c24f2eec..dc266e34c997 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -19,6 +19,7 @@
+ # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ # USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
++ACLOCAL_AMFLAGS = -I src/missing/m4
+ AUTOMAKE_OPTIONS = dist-bzip2 dist-zip
+ SUBDIRS = src doc
+ EXTRA_DIST = README.* Release_Notes inet_ntop.c autogen.sh m4
+diff --git a/autogen.sh b/autogen.sh
+index bc8389c24171..1156f42edae6 100755
+--- a/autogen.sh
++++ b/autogen.sh
+@@ -1,5 +1,5 @@
+ #! /bin/sh
+ 
+-aclocal -I src/missing/m4 \
++aclocal \
+ && automake  --add-missing \
+ && autoconf && autoheader
+-- 
+2.39.5
+

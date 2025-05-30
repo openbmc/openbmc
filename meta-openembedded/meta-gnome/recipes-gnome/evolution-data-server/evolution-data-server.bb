@@ -55,7 +55,7 @@ PACKAGECONFIG[weather] = "-DENABLE_WEATHER=ON,-DENABLE_WEATHER=OFF,libgweather4"
 LDFLAGS += "-lpthread -lgmodule-2.0 -lgthread-2.0"
 
 # invokes libraries from build host
-GI_DATA_ENABLED:libc-musl="False"
+GI_DATA_ENABLED:libc-musl = "False"
 
 do_configure:append () {
     cp ${UNPACKDIR}/iconv-detect.h ${S}/src

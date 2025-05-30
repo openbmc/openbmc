@@ -1,0 +1,52 @@
+From 16974cb6a9f10fbd08db964ee0d9f074ef430db6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 7 Mar 2025 11:55:12 -0800
+Subject: [PATCH] Remove whitespace in operator"" _json
+
+Clang 20+ errors about this whitespace.
+
+Fixes
+git/3rdParty/json/include/json.hpp:24428:58: error: identifier '_json' preceded by whitespace in a literal operator declaration is deprecated [-Werror,-Wdeprecated-literal-operator]
+ 24428 |     using nlohmann::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+       |                                              ~~~~~~~~~~~~^~~~~
+       |                                              operator""_json
+
+Upstream-Status: Backport [ Its fixed in json import post 2024.9 release ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ 3rdParty/json/include/json.hpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/3rdParty/json/include/json.hpp b/3rdParty/json/include/json.hpp
+index 60ba1df..6eceb7c 100644
+--- a/3rdParty/json/include/json.hpp
++++ b/3rdParty/json/include/json.hpp
+@@ -24353,7 +24353,7 @@ inline namespace json_literals
+ /// @brief user-defined string literal for JSON values
+ /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json/
+ JSON_HEDLEY_NON_NULL(1)
+-inline nlohmann::json operator "" _json(const char* s, std::size_t n)
++inline nlohmann::json operator ""_json(const char* s, std::size_t n)
+ {
+     return nlohmann::json::parse(s, s + n);
+ }
+@@ -24361,7 +24361,7 @@ inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+ /// @brief user-defined string literal for JSON pointer
+ /// @sa https://json.nlohmann.me/api/basic_json/operator_literal_json_pointer/
+ JSON_HEDLEY_NON_NULL(1)
+-inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
++inline nlohmann::json::json_pointer operator ""_json_pointer(const char* s, std::size_t n)
+ {
+     return nlohmann::json::json_pointer(std::string(s, n));
+ }
+@@ -24425,8 +24425,8 @@ inline void swap(nlohmann::NLOHMANN_BASIC_JSON_TPL& j1, nlohmann::NLOHMANN_BASIC
+ }  // namespace std
+ 
+ #if JSON_USE_GLOBAL_UDLS
+-    using nlohmann::literals::json_literals::operator "" _json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+-    using nlohmann::literals::json_literals::operator "" _json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
++    using nlohmann::literals::json_literals::operator ""_json; // NOLINT(misc-unused-using-decls,google-global-names-in-headers)
++    using nlohmann::literals::json_literals::operator ""_json_pointer; //NOLINT(misc-unused-using-decls,google-global-names-in-headers)
+ #endif
+ 
+ // #include <nlohmann/detail/macro_unscope.hpp>

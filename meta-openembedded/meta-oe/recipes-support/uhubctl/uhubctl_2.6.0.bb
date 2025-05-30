@@ -10,6 +10,8 @@ SRCREV = "352f5878e999c0a9d5a453b34110479b2056d7e7"
 SRC_URI = "git://github.com/mvp/${BPN};branch=master;protocol=https"
 S = "${WORKDIR}/git"
 
+inherit pkgconfig
+
 # uhubctl gets its program version from "git describe". As we use the source
 # archive do reduce download size replace the call with our hardcoded version.
 do_configure:append() {

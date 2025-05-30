@@ -1,5 +1,5 @@
 SUMMARY = "Easy progress reporting for Python"
-HOMEPAGE = "http://github.com/verigak/progress/"
+HOMEPAGE = "https://github.com/verigak/progress/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=00ab78a4113b09aacf63d762a7bb9644"
 

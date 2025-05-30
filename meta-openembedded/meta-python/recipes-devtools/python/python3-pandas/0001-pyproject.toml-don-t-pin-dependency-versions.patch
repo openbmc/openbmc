@@ -14,8 +14,6 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  pyproject.toml | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/pyproject.toml b/pyproject.toml
-index db9f055799..5158d60f59 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -2,10 +2,10 @@
@@ -27,11 +25,8 @@ index db9f055799..5158d60f59 100644
 +    "meson-python>=0.13.1",
 +    "meson>=1.2.1",
      "wheel",
--    "Cython==3.0.5",  # Note: sync with setup.py, environment.yml and asv.conf.json
+-    "Cython~=3.0.5",  # Note: sync with setup.py, environment.yml and asv.conf.json
 +    "Cython>=3.0.5",  # Note: sync with setup.py, environment.yml and asv.conf.json
-     # Force numpy higher than 2.0rc1, so that built wheels are compatible
+     # Force numpy higher than 2.0, so that built wheels are compatible
      # with both numpy 1 and 2
-     "numpy>=2.0.0rc1",
--- 
-2.39.2
-
+     "numpy>=2.0",

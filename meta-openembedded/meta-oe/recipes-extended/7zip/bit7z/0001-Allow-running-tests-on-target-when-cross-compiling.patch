@@ -1,0 +1,45 @@
+From 9f0eed91d32ec2f310bd5c23af187f888394fcb4 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Wed, 2 Apr 2025 09:33:03 +0200
+Subject: [PATCH] Allow running tests on target when cross-compiling
+
+When bit7z is Cross-compiled, target device does not contain
+source/build directory anymore and thus path to test data is different.
+Make it possible to pass the new path to cmake.
+
+Upstream-Status: Submitted [https://github.com/rikyoz/bit7z/pull/289]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ tests/CMakeLists.txt | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index 60da280..dbdff1f 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -49,6 +49,11 @@ add_executable( ${TESTS_TARGET_PUBLIC} ${SOURCE_FILES} ${PUBLIC_API_SOURCE_FILES
+ 
+ if( BIT7Z_TESTS_FILESYSTEM )
+     set( BIT7Z_TESTS_DATA_DIR ${CMAKE_CURRENT_BINARY_DIR}/data )
++    if( NOT BIT7Z_TESTS_DATA_DIR_TARGET )
++        set( BIT7Z_TESTS_DATA_DIR_TARGET ${BIT7Z_TESTS_DATA_DIR} )
++    else()
++        message( STATUS "Custom test data dir on target: ${BIT7Z_TESTS_DATA_DIR_TARGET}" )
++    endif()
+ 
+     include( FetchContent )
+     FetchContent_Declare( bit7z-test-data
+@@ -61,11 +66,11 @@ if( BIT7Z_TESTS_FILESYSTEM )
+     message( STATUS "Tests data directory: ${BIT7Z_TESTS_DATA_DIR}" )
+     target_compile_definitions( ${TESTS_TARGET} PRIVATE
+                                 BIT7Z_TESTS_FILESYSTEM
+-                                BIT7Z_TESTS_DATA_DIR="${BIT7Z_TESTS_DATA_DIR}" )
++                                BIT7Z_TESTS_DATA_DIR="${BIT7Z_TESTS_DATA_DIR_TARGET}" )
+     target_compile_definitions( ${TESTS_TARGET_PUBLIC} PRIVATE
+                                 BIT7Z_TESTS_PUBLIC_API_ONLY
+                                 BIT7Z_TESTS_FILESYSTEM
+-                                BIT7Z_TESTS_DATA_DIR="${BIT7Z_TESTS_DATA_DIR}" )
++                                BIT7Z_TESTS_DATA_DIR="${BIT7Z_TESTS_DATA_DIR_TARGET}" )
+     if( NOT EXISTS ${BIT7Z_TESTS_DATA_DIR}/test_filesystem/empty )
+         file( MAKE_DIRECTORY ${BIT7Z_TESTS_DATA_DIR}/test_filesystem/empty )
+     endif()

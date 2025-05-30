@@ -3,8 +3,8 @@ Description=Tiny/Turbo/Throttling Web Server
 
 [Service]
 Type=forking
-ExecStart=/usr/sbin/thttpd -C @@CONFFILE -c cgi-bin/* -i /var/run/thttpd.pid
-PIDFile=/var/run/thttpd.pid
+ExecStart=/usr/sbin/thttpd -C @@CONFFILE -c cgi-bin/* -i /run/thttpd.pid
+PIDFile=/run/thttpd.pid
 
 [Install]
 WantedBy=multi-user.target

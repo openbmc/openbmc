@@ -15,6 +15,9 @@ DEPENDS = "ncurses bison-native"
 SRC_URI = "git://github.com/telmich/gpm;protocol=https;branch=master \
            file://init \
            file://gpm.service.in \
+           file://0001-Avoid-shadowing-ncurses-functions.patch \
+           file://0002-Fix-function-definition-in-yacc-source-file-until-va.patch \
+           file://0003-Add-incomplete-type-definition-for-WINDOW-in-Gpm_Wge.patch \
            "
 
 S = "${WORKDIR}/git"

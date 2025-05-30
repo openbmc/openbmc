@@ -1,14 +1,14 @@
-From 834d5184902341414eb147204eeda8b0ff01f38c Mon Sep 17 00:00:00 2001
+From 74a07ccbb4eb573269672a0c1f61b9165a592b44 Mon Sep 17 00:00:00 2001
 From: Satish Kumar <satish.kumar01@arm.com>
 Date: Mon, 14 Feb 2022 08:22:25 +0000
-Subject: [PATCH 2/8] Fix in AEAD for psa-arch test 254
+Subject: [PATCH 02/12] Fix in AEAD for psa-arch test 254
 
 PSA crypto test 254 fails at checkpoint 6.
 Fix output arguments in various crypto AEAD functions
 to match crypto service implementation in TF-M. AEAD API's
 in TF-M start expecting output size as an argument.
 
-Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/31176] 
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TS/trusted-services/+/31176]
 Signed-off-by: Emekcan Aras <Emekcan.Aras@arm.com>
 Signed-off-by: Satish Kumar <satish.kumar01@arm.com>
 Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
@@ -23,7 +23,7 @@ Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
  6 files changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h b/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h
-index 417189e..236d3e2 100644
+index 417189e87..236d3e258 100644
 --- a/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h
 +++ b/components/service/crypto/client/caller/packed-c/crypto_caller_aead.h
 @@ -314,6 +314,7 @@ static inline psa_status_t crypto_caller_aead_update(struct service_client *cont
@@ -35,7 +35,7 @@ index 417189e..236d3e2 100644
  
  	/* Mandatory input data parameter */
 diff --git a/components/service/crypto/include/psa/crypto_sizes.h b/components/service/crypto/include/psa/crypto_sizes.h
-index 30aa102..130d272 100644
+index 30aa102da..130d27295 100644
 --- a/components/service/crypto/include/psa/crypto_sizes.h
 +++ b/components/service/crypto/include/psa/crypto_sizes.h
 @@ -351,7 +351,7 @@
@@ -48,7 +48,7 @@ index 30aa102..130d272 100644
  /** A sufficient output buffer size for psa_aead_update().
   *
 diff --git a/components/service/crypto/provider/extension/aead/aead_provider.c b/components/service/crypto/provider/extension/aead/aead_provider.c
-index b73d88d..510cffa 100644
+index b73d88d32..510cffa34 100644
 --- a/components/service/crypto/provider/extension/aead/aead_provider.c
 +++ b/components/service/crypto/provider/extension/aead/aead_provider.c
 @@ -283,10 +283,11 @@ static rpc_status_t aead_update_handler(void *context, struct rpc_request *req)
@@ -81,7 +81,7 @@ index b73d88d..510cffa 100644
  
  				psa_status = psa_aead_update(&crypto_context->op.aead,
 diff --git a/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h b/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h
-index be76d2b..5909730 100644
+index be76d2bc6..590973048 100644
 --- a/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h
 +++ b/components/service/crypto/provider/extension/aead/serializer/aead_provider_serializer.h
 @@ -51,6 +51,7 @@ struct aead_provider_serializer {
@@ -93,7 +93,7 @@ index be76d2b..5909730 100644
  
  	rpc_status_t (*serialize_aead_update_resp)(struct rpc_buffer *resp_buf,
 diff --git a/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c b/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c
-index 8f8c3c7..922a7b6 100644
+index 8f8c3c7f2..922a7b651 100644
 --- a/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c
 +++ b/components/service/crypto/provider/extension/aead/serializer/packed-c/packedc_aead_provider_serializer.c
 @@ -192,6 +192,7 @@ static rpc_status_t deserialize_aead_update_ad_req(const struct rpc_buffer *req_
@@ -113,7 +113,7 @@ index 8f8c3c7..922a7b6 100644
  		tlv_const_iterator_begin(&req_iter,
  			(uint8_t*)req_buf->data + expected_fixed_len,
 diff --git a/protocols/service/crypto/packed-c/aead.h b/protocols/service/crypto/packed-c/aead.h
-index 0be266b..435fd3b 100644
+index 0be266b52..435fd3b52 100644
 --- a/protocols/service/crypto/packed-c/aead.h
 +++ b/protocols/service/crypto/packed-c/aead.h
 @@ -98,6 +98,7 @@ enum

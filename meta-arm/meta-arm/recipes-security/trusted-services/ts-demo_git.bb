@@ -7,10 +7,10 @@ TS_ENV = "arm-linux"
 require trusted-services.inc
 
 DEPENDS        += "python3-jsonschema-native python3-jinja2-native"
-DEPENDS        += "libts"
-RDEPENDS:${PN} += "libts"
+DEPENDS        += "libpsats"
+RDEPENDS:${PN} += "libpsats"
 
-OECMAKE_SOURCEPATH="${S}/deployments/ts-demo/${TS_ENV}"
+OECMAKE_SOURCEPATH = "${S}/deployments/ts-demo/${TS_ENV}"
 
 # Mbedtls 3.1.0 does not compile with clang.
 # This can be removed after TS updated required mbedtls version

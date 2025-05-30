@@ -15,6 +15,7 @@ SRC_URI = "https://releases.pagure.org/libuser/libuser-${PV}.tar.gz \
            file://0001-docs-Disable-building.patch \
            file://0002-remove-unused-execinfo.h.patch \
            file://gtkdoc.patch \
+           file://0001-configure.ac-update-version-to-0.64.patch \
            "
 
 SRC_URI[sha256sum] = "ea6094c72cb9e60a42fb53509dc98d124a340f1c9222783b503208adc16a0a8f"

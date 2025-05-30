@@ -1,0 +1,40 @@
+From ef0e40d59c32d7ebeb94d242436e3144cefc174a Mon Sep 17 00:00:00 2001
+From: correctmost <136447-correctmost@users.noreply.gitlab.gnome.org>
+Date: Thu, 20 Mar 2025 03:03:44 -0400
+Subject: [PATCH] build: fix -Wheader-guard warnings reported by clang
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libwnck/-/commit/ef0e40d59c32d7ebeb94d242436e3144cefc174a]
+---
+ libwnck/pager-accessible-factory.h     | 2 +-
+ libwnck/workspace-accessible-factory.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libwnck/pager-accessible-factory.h b/libwnck/pager-accessible-factory.h
+index 8e2fe30c..25220fc2 100644
+--- a/libwnck/pager-accessible-factory.h
++++ b/libwnck/pager-accessible-factory.h
+@@ -17,7 +17,7 @@
+  */
+ 
+ #ifndef __WNCK_PAGER_ACCESSIBLE_FACTORY_H__
+-#define __WBCK_PAGER_ACCESSIBLE_FACTORY_H__
++#define __WNCK_PAGER_ACCESSIBLE_FACTORY_H__
+ 
+ #include <atk/atk.h>
+ 
+diff --git a/libwnck/workspace-accessible-factory.h b/libwnck/workspace-accessible-factory.h
+index d2d4a84a..335b465b 100644
+--- a/libwnck/workspace-accessible-factory.h
++++ b/libwnck/workspace-accessible-factory.h
+@@ -17,7 +17,7 @@
+  */
+ 
+ #ifndef __WNCK_WORKSPACE_ACCESSIBLE_FACTORY_H__
+-#define __WBCK_WORKSPACE_ACCESSIBLE_FACTORY_H__
++#define __WNCK_WORKSPACE_ACCESSIBLE_FACTORY_H__
+ 
+ #include <atk/atk.h>
+ 
+-- 
+GitLab
+

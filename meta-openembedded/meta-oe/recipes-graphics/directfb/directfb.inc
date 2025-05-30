@@ -34,9 +34,6 @@ LDFLAGS:append = " -lm"
 
 CXXFLAGS:append:toolchain-clang = " -Wno-error=dtor-typedef"
 
-# Workaround for linking issues seen with armv7a + gold
-LDFLAGS:append:arm = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
-
 BINCONFIG = "${bindir}/directfb-config"
 
 inherit autotools binconfig-disabled pkgconfig

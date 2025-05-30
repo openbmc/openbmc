@@ -11,4 +11,4 @@ S = "${WORKDIR}/git"
 
 inherit cmake
 
-BBCLASSEXTEND="native nativesdk"
+BBCLASSEXTEND = "native nativesdk"

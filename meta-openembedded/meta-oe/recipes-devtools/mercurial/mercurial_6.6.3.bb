@@ -16,7 +16,7 @@ S = "${WORKDIR}/mercurial-${PV}"
 
 BBCLASSEXTEND = "native"
 
-export LDSHARED="${CCLD} -shared"
+export LDSHARED = "${CCLD} -shared"
 
 EXTRA_OEMAKE = "STAGING_LIBDIR=${STAGING_LIBDIR} STAGING_INCDIR=${STAGING_INCDIR} \
     PREFIX=${prefix}"

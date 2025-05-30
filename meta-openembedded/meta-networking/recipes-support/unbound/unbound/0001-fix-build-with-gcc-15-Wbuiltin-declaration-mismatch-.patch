@@ -1,0 +1,44 @@
+From 1c58ce07919c36e6a11eead67bd6d14cc22acaec Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 2 Apr 2025 15:25:42 +0900
+Subject: [PATCH] fix build with gcc-15 -Wbuiltin-declaration-mismatch error
+
+See more details: http://errors.yoctoproject.org/Errors/Details/850313
+../git/compat/malloc.c:9:7: warning: conflicting types for built-in function 'malloc'; expected 'void *(long unsigned int)' [-Wbuiltin-declaration-mismatch]
+    9 | void *malloc ();
+      |       ^~~~~~
+../git/compat/malloc.c:5:1: note: 'malloc' is declared in header '<stdlib.h>'
+    4 | #include "config.h"
+  +++ |+#include <stdlib.h>
+    5 | #undef malloc
+../git/compat/malloc.c: In function 'rpl_malloc_unbound':
+../git/compat/malloc.c:23:10: error: too many arguments to function 'malloc'; expected 0, have 1
+   23 |   return malloc (n);
+      |          ^~~~~~  ~
+../git/compat/malloc.c:9:7: note: declared here
+    9 | void *malloc ();
+      |       ^~~~~~
+
+* Seeing that there is '#undef malloc', it appears they don't want to
+  use the malloc from stdlib.h.
+  Therefore, we need to correctly define the parameters for malloc.
+
+Upstream-Status: Submitted [https://github.com/NLnetLabs/unbound/pull/1262]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ compat/malloc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/compat/malloc.c b/compat/malloc.c
+index d8097b13e..af9dcf134 100644
+--- a/compat/malloc.c
++++ b/compat/malloc.c
+@@ -6,7 +6,7 @@
+ #include <sys/types.h>
+ 
+ #ifndef USE_WINSOCK
+-void *malloc ();
++void *malloc (size_t n);
+ #else
+ /* provide a prototype */
+ void *malloc (size_t n);

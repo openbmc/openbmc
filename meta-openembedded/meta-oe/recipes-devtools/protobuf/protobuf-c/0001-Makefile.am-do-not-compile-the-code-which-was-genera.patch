@@ -1,6 +1,6 @@
-From 62b2fd0a150133b6439f6537cb1762d35f5790ee Mon Sep 17 00:00:00 2001
+From ad4d22cd6b0b1237a4d50699736d38cd3c902ace Mon Sep 17 00:00:00 2001
 From: Xiangyu Chen <xiangyu.chen@windriver.com>
-Date: Fri, 31 Mar 2023 16:02:50 +0800
+Date: Wed, 12 Mar 2025 00:16:24 -0700
 Subject: [PATCH] Makefile.am: do not compile the code which was generated from
  test-full.proto in protobuf-c-native
 
@@ -11,15 +11,18 @@ the test-full.proto with latest version protobuf.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+
+Rebase to 1.5.1
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  Makefile.am | 75 -----------------------------------------------------
  1 file changed, 75 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index ff12664..7412aef 100644
+index 77aa9d9..5cdd81a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -136,81 +136,6 @@ else
+@@ -138,81 +138,6 @@ else
  
  LOG_COMPILER = $(VALGRIND)
  
@@ -72,20 +75,20 @@ index ff12664..7412aef 100644
 -t_generated_code2_cxx_generate_packed_data_LDADD = \
 -	$(protobuf_LIBS)
 -
--t/test.pb-c.c t/test.pb-c.h: $(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test.proto
--	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test.proto
+-t/test.pb-c.c t/test.pb-c.h: $(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test.proto
+-	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test.proto
 -
--t/test-optimized.pb-c.c t/test-optimized.pb-c.h: $(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test-optimized.proto
--	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test-optimized.proto
+-t/test-optimized.pb-c.c t/test-optimized.pb-c.h: $(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test-optimized.proto
+-	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test-optimized.proto
 -
--t/test-full.pb-c.c t/test-full.pb-c.h: $(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test-full.proto
--	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test-full.proto
+-t/test-full.pb-c.c t/test-full.pb-c.h: $(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test-full.proto
+-	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test-full.proto
 -
 -t/test-full.pb.cc t/test-full.pb.h: @PROTOC@ $(top_srcdir)/t/test-full.proto
 -	$(AM_V_GEN)@PROTOC@ -I$(top_srcdir) --cpp_out=$(top_builddir) $(top_srcdir)/t/test-full.proto
 -
--t/test-proto3.pb-c.c t/test-proto3.pb-c.h: $(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test-proto3.proto
--	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test-proto3.proto
+-t/test-proto3.pb-c.c t/test-proto3.pb-c.h: $(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) $(top_srcdir)/t/test-proto3.proto
+-	$(AM_V_GEN)@PROTOC@ --plugin=protoc-gen-c=$(top_builddir)/protoc-gen-c/protoc-gen-c$(EXEEXT) -I$(top_srcdir) --c_out=$(top_builddir) $(top_srcdir)/t/test-proto3.proto
 -
 -t/generated-code2/test-full-cxx-output.inc: t/generated-code2/cxx-generate-packed-data$(EXEEXT)
 -	$(AM_V_GEN)$(top_builddir)/t/generated-code2/cxx-generate-packed-data$(EXEEXT) > $(top_builddir)/t/generated-code2/test-full-cxx-output.inc
@@ -102,5 +105,5 @@ index ff12664..7412aef 100644
  	t/version/version.c
  t_version_version_LDADD = \
 -- 
-2.34.1
+2.25.1
 

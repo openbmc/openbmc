@@ -1,4 +1,4 @@
-From 737e9a7c11233183f48ce6c83d38b504c8ffed12 Mon Sep 17 00:00:00 2001
+From d5e6304dff890b39a53a96f03819aa118deb701a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 30 Jul 2018 15:52:21 +0800
 Subject: [PATCH] load.py: retry to invoke request with timeout
@@ -11,12 +11,15 @@ network is up, the fetch works.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase to 3.62
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
- pykickstart/load.py | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ pykickstart/load.py | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/pykickstart/load.py b/pykickstart/load.py
-index 58faba6..e856c8d 100644
+index 6eeffde..da0032f 100644
 --- a/pykickstart/load.py
 +++ b/pykickstart/load.py
 @@ -20,12 +20,16 @@
@@ -66,11 +69,10 @@ index 58faba6..e856c8d 100644
  def _get_auth(location, user=None, passwd=None):
  
      auth = None
-@@ -92,6 +119,10 @@ def _get_auth(location, user=None, passwd=None):
- 
+@@ -93,6 +120,9 @@ def _get_auth(location, user=None, passwd=None):
  def _load_url(location, user=None, passwd=None):
      '''Load a location (URL or filename) and return contents as string'''
-+
+ 
 +    if not _access_url(location):
 +        raise KickstartError(_("Connection %s failed" % location))
 +

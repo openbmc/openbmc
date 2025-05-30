@@ -24,7 +24,7 @@ SRC_URI[sha256sum] = "4bdd4b8a7042f63a40507ae0f16b360011e67cbb2f0276289636487a54
 # non-standard behavior so make sure the user actually wants it.
 PACKAGECONFIG[sys-class-mount] = ""
 
-export MOUNTPOINT="${@bb.utils.contains('PACKAGECONFIG', 'sys-class-mount', '\/sys\/class\/gpio', '\/run\/gpio', d)}"
+export MOUNTPOINT = "${@bb.utils.contains('PACKAGECONFIG', 'sys-class-mount', '/sys/class/gpio', '/run/gpio', d)}"
 
 do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
@@ -41,11 +41,11 @@ do_install:append() {
             ln -sf ../sys-class.mount ${D}${systemd_system_unitdir}/sysinit.target.wants/sys-class.mount
         fi
 
-        sed -i "s/@mountpoint@/$MOUNTPOINT/g" ${D}${systemd_system_unitdir}/gpiod-sysfs-proxy.service
+        sed -i "s:@mountpoint@:$MOUNTPOINT:g" ${D}${systemd_system_unitdir}/gpiod-sysfs-proxy.service
     elif ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/init.d
         install -m 0755 ${UNPACKDIR}/gpiod-sysfs-proxy.init.in ${D}${sysconfdir}/init.d/gpiod-sysfs-proxy
-        sed -i "s/@mountpoint@/$MOUNTPOINT/g" ${D}${sysconfdir}/init.d/gpiod-sysfs-proxy
+        sed -i "s:@mountpoint@:$MOUNTPOINT:g" ${D}${sysconfdir}/init.d/gpiod-sysfs-proxy
     fi
 }
 
@@ -72,7 +72,7 @@ python __anonymous() {
 do_install_ptest() {
     install -d ${D}${PTEST_PATH}/tests/
     install -m 0755 ${UNPACKDIR}/run-ptest.in ${D}${PTEST_PATH}/run-ptest
-    sed -i "s/@mountpoint@/$MOUNTPOINT/g" ${D}${PTEST_PATH}/run-ptest
+    sed -i "s:@mountpoint@:$MOUNTPOINT:g" ${D}${PTEST_PATH}/run-ptest
     install -m 0755 ${UNPACKDIR}/tests/gpio-sysfs-compat-tests ${D}${PTEST_PATH}/tests/gpio-sysfs-compat-tests
 }
 

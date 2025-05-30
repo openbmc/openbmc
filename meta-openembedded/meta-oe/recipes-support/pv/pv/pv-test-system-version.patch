@@ -1,0 +1,18 @@
+Use the version of pv installed on the system rather than the ./pv from 
+the development tree as is done when running 'make check'.
+
+Upstream-Status: Inappropriate [x-compile specific]
+
+---
+diff -Naur pv-1.9.31.orig/tests/test-env.sh pv-1.9.31/tests/test-env.sh
+--- pv-1.9.31.orig/tests/test-env.sh	2024-12-07 08:59:43.000000000 -0500
++++ pv-1.9.31/tests/test-env.sh	2025-03-26 14:11:30.987123378 -0400
+@@ -9,7 +9,7 @@
+ true "${srcdir:?not set - call this from 'make check'}"
+ 
+ # Parameters.
+-testSubject="./pv"
++testSubject="pv"
+ sourcePath="${srcdir}"
+ 
+ # Set everything to the "C" locale.

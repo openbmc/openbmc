@@ -20,10 +20,12 @@ PTESTS_FAST_META_OE = "\
     leveldb \
     libcereal \
     libgpiod \
+    libjcat \
     libio-pty-perl \
     libmanette \
     librelp \
     libssh \
+    libteam \
     libtinyxml2 \
     libtoml11 \
     libxml++-5.0 \
@@ -31,6 +33,7 @@ PTESTS_FAST_META_OE = "\
     lmdb \
     microsoft-gsl \
     minicoredumper \
+    minizip-ng \
     neon \
     nlohmann-json \
     nodejs \
@@ -49,7 +52,7 @@ PTESTS_FAST_META_OE = "\
 PTESTS_FAST_META_OE:append:x86 = " mcelog"
 PTESTS_FAST_META_OE:append:x86-64 = " mcelog"
 
-PTESTS_FAST_META_OE:remove:libc-musl = "minicoredumper"
+PTESTS_FAST_META_OE:remove:libc-musl = "jemalloc minicoredumper oprofile"
 PTESTS_FAST_META_OE:remove:riscv64 = "nodejs oprofile"
 PTESTS_FAST_META_OE:remove:riscv32 = "nodejs oprofile"
 
@@ -57,10 +60,7 @@ PTESTS_SLOW_META_OE = "\
     c-ares \
     fftw \
     libusb-compat \
-    rsyslog \
     rocksdb \
-    mariadb \
-    poco \
     re2 \
 "
 PTESTS_SLOW_META_OE:append:x86 = " kernel-selftest"
@@ -70,8 +70,10 @@ PTESTS_SLOW_META_OE:remove:libc-musl = "kernel-selftest"
 PTESTS_PROBLEMS_META_OE = "\
     keyutils \
     libdbi-perl \
-    libjcat \
-    libteam \
+    mariadb \
     ostree \
+    poco \
     psqlodbc \
+    rsyslog \
 "
+PTESTS_PROBLEMS_META_OE:append:libc-musl = " jemalloc minicoredumper oprofile"

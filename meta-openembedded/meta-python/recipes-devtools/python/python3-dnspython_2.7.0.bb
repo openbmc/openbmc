@@ -1,5 +1,5 @@
 DESCRIPTION = "DNS toolkit for Python"
-HOMEPAGE = "http://www.dnspython.org/"
+HOMEPAGE = "https://www.dnspython.org/"
 LICENSE = "ISC"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5af50906b5929837f667dfe31052bd34"
 

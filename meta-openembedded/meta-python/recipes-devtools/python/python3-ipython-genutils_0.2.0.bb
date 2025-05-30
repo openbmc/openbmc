@@ -1,5 +1,5 @@
 SUMMARY = "Vestigial utilities from IPython"
-HOMEPAGE = "http://ipython.org"
+HOMEPAGE = "https://ipython.org"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING.md;md5=f7c3032c3ac398265224533a0a333a35"
 

@@ -16,6 +16,7 @@ inherit autotools pkgconfig systemd
 SRC_URI = "https://github.com/IgnorantGuru/udevil/raw/pkg/${PV}/udevil-${PV}.tar.xz \
     file://0001-udevil-0.4.3-fix-compile-with-gcc6.patch \
     file://0002-etc-Makefile.am-Use-systemd_unitdir-instead-of-libdi.patch \
+    file://Fix-build-with-gcc15.patch \
 "
 
 SRC_URI[md5sum] = "dc1c489b603a0500a04dc7e1805ac1d9"

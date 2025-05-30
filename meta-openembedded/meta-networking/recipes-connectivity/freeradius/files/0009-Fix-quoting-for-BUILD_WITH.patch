@@ -1,4 +1,4 @@
-From 3e701d6274924adaed568e22af2362aa5af1f055 Mon Sep 17 00:00:00 2001
+From 33ef5c4e285796c5f208b2b091d4b75e0849f282 Mon Sep 17 00:00:00 2001
 From: Peter Seebach <peter.seebach@windriver.com>
 Date: Sun, 8 Jan 2023 23:01:28 +0800
 Subject: [PATCH] Fix quoting for BUILD_WITH

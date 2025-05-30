@@ -1,0 +1,48 @@
+From 2a08adb0e90219626dac0b6d05a21265e460eae2 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Thu, 20 Mar 2025 12:09:42 +0000
+Subject: [PATCH] pyproject.toml: Keep tool.setuptools.license-files
+
+Keep legacy license declaration and tool.setuptools.license-files
+to avoid the following errors:
+
+| ValueError: invalid pyproject.toml config: `project.license`.
+| configuration error: `project.license` must be valid exactly by one definition (2 matches found):
+
+| ValueError: invalid pyproject.toml config: `project`.
+| configuration error: `project` must not contain {'license-files'} properties
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pyproject.toml | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 0cf1ade57..7a4665ce0 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -8,8 +8,7 @@ name = "pylint"
+ description = "python code static checker"
+ readme = "README.rst"
+ keywords = [ "lint", "linter", "python", "static code analysis" ]
+-license = "GPL-2.0-or-later"
+-license-files = [ "LICENSE", "CONTRIBUTORS.txt" ]
++license = { text = "GPL-2.0-or-later" }
+ authors = [
+   { name = "Python Code Quality Authority", email = "code-quality@python.org" },
+ ]
+@@ -65,6 +64,9 @@ scripts.pylint-config = "pylint:_run_pylint_config"
+ scripts.pyreverse = "pylint:run_pyreverse"
+ scripts.symilar = "pylint:run_symilar"
+ 
++[tool.setuptools]
++license-files = [ "LICENSE", "CONTRIBUTORS.txt" ]
++
+ [tool.setuptools.packages.find]
+ include = [ "pylint*" ]
+ 
+-- 
+2.39.5
+

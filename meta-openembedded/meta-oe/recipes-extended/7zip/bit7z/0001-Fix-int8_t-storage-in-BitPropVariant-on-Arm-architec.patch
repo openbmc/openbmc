@@ -1,0 +1,41 @@
+From d504abaf2b0a514193f52df42098bc16de4718b2 Mon Sep 17 00:00:00 2001
+From: Oz <rik20@live.it>
+Date: Fri, 17 Jan 2025 21:23:59 +0100
+Subject: [PATCH] Fix int8_t storage in BitPropVariant on Arm architectures
+
+Upstream-Status: Backport [https://github.com/rikyoz/bit7z/commit/d504abaf2b0a514193f52df42098bc16de4718b2]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ include/bit7z/bitwindows.hpp | 4 ++++
+ src/bitpropvariant.cpp       | 2 +-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/include/bit7z/bitwindows.hpp b/include/bit7z/bitwindows.hpp
+index 5849b956..2f29a989 100644
+--- a/include/bit7z/bitwindows.hpp
++++ b/include/bit7z/bitwindows.hpp
+@@ -126,7 +126,11 @@ struct PROPVARIANT {
+     WORD wReserved2;
+     WORD wReserved3;
+     union {
++#if defined( __arm__ ) || defined( __aarch64__ )
++        signed char cVal;
++#else
+         char cVal;
++#endif
+         unsigned char bVal;
+         short iVal;
+         unsigned short uiVal;
+diff --git a/src/bitpropvariant.cpp b/src/bitpropvariant.cpp
+index 1e7f094f..642e1268 100644
+--- a/src/bitpropvariant.cpp
++++ b/src/bitpropvariant.cpp
+@@ -157,7 +157,7 @@ BitPropVariant::BitPropVariant( uint64_t value ) noexcept: PROPVARIANT() {
+ BitPropVariant::BitPropVariant( int8_t value ) noexcept: PROPVARIANT() {
+     vt = VT_I1;
+     wReserved1 = 0;
+-    cVal = static_cast< char >( value );
++    cVal = static_cast< decltype(cVal) >( value );
+ }
+ 
+ BitPropVariant::BitPropVariant( int16_t value ) noexcept: PROPVARIANT() {

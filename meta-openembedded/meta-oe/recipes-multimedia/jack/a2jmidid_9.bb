@@ -24,6 +24,6 @@ EXTRA_OEMESON = "-Db_lto=false"
 
 LDFLAGS:append:libc-musl = " -lexecinfo"
 
-export LINKFLAGS="${LDFLAGS}"
+export LINKFLAGS = "${LDFLAGS}"
 
 FILES:${PN} += "${datadir}/dbus-1/services"

@@ -1,7 +1,7 @@
 SUMMARY = "Linux network configuration library for Python"
 DESCRIPTION = "This library contains Python bindings to ioctl calls"
 SECTION = "devel/python"
-HOMEPAGE = "http://github.com/rlisagor/pynetlinux"
+HOMEPAGE = "https://github.com/rlisagor/pynetlinux"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=74e1861736ee959824fe7542323c12e9"
 

@@ -1,0 +1,45 @@
+From 58d47e60bdcec62fe74b4a38eaf39d16a9c80d42 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ji=C5=99=C3=AD=20Techet?= <techet@gmail.com>
+Date: Tue, 5 Mar 2024 18:40:10 +0100
+Subject: [PATCH 2/3] projectorganizer: fix various warnings
+
+Upstream-Status: Backport [https://github.com/geany/geany-plugins/commit/58d47e60bdcec62fe74b4a38eaf39d16a9c80d42]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ projectorganizer/src/prjorg-sidebar.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/projectorganizer/src/prjorg-sidebar.c b/projectorganizer/src/prjorg-sidebar.c
+index 0139473..e67cce2 100644
+--- a/projectorganizer/src/prjorg-sidebar.c
++++ b/projectorganizer/src/prjorg-sidebar.c
+@@ -382,7 +382,8 @@ void on_open_file_manager(G_GNUC_UNUSED GtkMenuItem * menuitem, G_GNUC_UNUSED gp
+ 
+ 	if (locale_path)
+ 	{
+-		gchar *command, *open_command;
++		const gchar *open_command;
++		gchar *command;
+ 
+ 		open_command = PRJORG_COMMAND_OPEN;
+ 		command = g_strconcat (open_command, " \"", locale_path, "\"", NULL);
+@@ -1562,7 +1563,7 @@ gchar **prjorg_sidebar_get_expanded_paths(void)
+ 		(GtkTreeViewMappingFunc)on_map_expanded, expanded_paths);
+ 	g_ptr_array_add(expanded_paths, NULL);
+ 
+-	return g_ptr_array_free(expanded_paths, FALSE);
++	return (gchar **)g_ptr_array_free(expanded_paths, FALSE);
+ }
+ 
+ 
+@@ -1587,10 +1588,6 @@ void prjorg_sidebar_update_full(gboolean reload, gchar **expanded_paths)
+ 
+ 	if (reload)
+ 	{
+-		GtkTreeSelection *treesel;
+-		GtkTreeIter iter;
+-		GtkTreeModel *model;
+-
+ 		expand_data->expanded_paths = expanded_paths != NULL ? expanded_paths : prjorg_sidebar_get_expanded_paths();
+ 		expand_data->selected_path = get_selected_path();
+ 

@@ -1,0 +1,48 @@
+From 6ad5e9302057e157ab701880a8543ca59058df2d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?K=C3=A9l=C3=A9fa=20San=C3=A9?= <kelefa.sane@smile.fr>
+Date: Fri, 16 May 2025 16:18:28 +0200
+Subject: [PATCH v2] Use CC env var to get compiler version
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The source file build_data.c generated at compilation time define a
+variable compiler_version which is obtained by calling "gcc --version"
+cmd. This call retrieve the native gcc compiler install on host build
+machine but not necessarily the compiler use to build the project (ex:
+cross compilation).
+
+The CC env variable commonly used in Makefile project define the
+compiler to use at build, so this is the appropriate way to retrieve the
+compiler version, when the CC env var is define.
+
+Upstream-Status: Submitted [https://lists.crash-utility.osci.io/archives/list/devel@lists.crash-utility.osci.io/thread/V3G3QH3YW6WZWD56TVTFQIHYLZ33UIJL/]
+
+Signed-off-by: Kéléfa Sané <kelefa.sane@smile.fr>
+---
+ configure.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/configure.c b/configure.c
+index 4668c9a..4b65bd7 100644
+--- a/configure.c
++++ b/configure.c
+@@ -1362,7 +1362,17 @@ make_build_data(char *target)
+ 
+         fp1 = popen("date", "r");
+         fp2 = popen("id", "r");
+-	fp3 = popen("gcc --version", "r");
++
++	const char *cc_env = getenv("CC");
++	if(NULL == cc_env) {
++		fp3 = popen("gcc --version", "r");
++	}
++	else {
++		char compiler_version_cmd[512];
++
++		snprintf(compiler_version_cmd, sizeof(compiler_version_cmd), "%s --version", cc_env);
++		fp3 = popen(compiler_version_cmd, "r");
++	}
+ 
+ 	if ((fp4 = fopen("build_data.c", "w")) == NULL) {
+ 		perror("build_data.c");

@@ -1,6 +1,6 @@
-From dba3c5bf34ed530fd41ed50968825af2158f142e Mon Sep 17 00:00:00 2001
+From 371c59c6135f53a6892c415bf9450c32e7ca3523 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
-Date: Tue, 29 Jan 2019 13:31:39 -0800
+Date: Mon, 10 Mar 2025 20:25:02 -0700
 Subject: [PATCH] test/cpp/server_abyss: Fix build with clang/libc++
 
 /mnt/a/yoe/workspace/sources/xmlrpc-c/test/cpp/server_abyss.cpp:87:14: error: assigning to 'int' from incompatible type '__bind<int
@@ -10,10 +10,15 @@ Subject: [PATCH] test/cpp/server_abyss: Fix build with clang/libc++
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- test/cpp/server_abyss.cpp | 56 +++++++++++++++++++--------------------
- 1 file changed, 28 insertions(+), 28 deletions(-)
 
+Rebase to 1.64.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ test/cpp/server_abyss.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/cpp/server_abyss.cpp b/test/cpp/server_abyss.cpp
+index c1b44995..14faf5a5 100644
 --- a/test/cpp/server_abyss.cpp
 +++ b/test/cpp/server_abyss.cpp
 @@ -85,7 +85,7 @@ public:
@@ -25,3 +30,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
          
          if (rc != 0) {
              closesock(this->fd);
+-- 
+2.25.1
+

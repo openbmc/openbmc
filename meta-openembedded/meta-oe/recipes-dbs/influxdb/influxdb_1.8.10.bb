@@ -77,3 +77,4 @@ INITSCRIPT_PARAMS = "defaults"
 SYSTEMD_SERVICE:${PN} = "influxdb.service"
 
 CVE_STATUS[CVE-2019-10329] = "cpe-incorrect: Version does not match and only the Jenkins plugin is affected."
+SKIP_RECIPE[influxdb] ?= "QA Issue: task do_compile has network enabled"

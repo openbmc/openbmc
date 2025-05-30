@@ -1,15 +1,15 @@
 SUMMARY = "Installation scripts and binaries for the Raspberry Pi 4 EEPROM"
-DESCRIPTION = "This repository contains the rpi4 bootloader and scripts \
+DESCRIPTION = "This repository contains the rpi4/rpi5 bootloader and scripts \
 for updating it in the spi eeprom"
 LICENSE = "BSD-3-Clause & Broadcom-RPi"
-LIC_FILES_CHKSUM = "file://LICENSE;md5=f546ed4f47e9d4c1fe954ecc9d3ef4f3"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=a6c5149578a16272119f3f9c13d6549b"
 
 SRC_URI = " \
     git://github.com/raspberrypi/rpi-eeprom.git;protocol=https;branch=master \
 "
 
-SRCREV = "36e58db5c2a2656e553441f4f48f32227809105d"
-PV = "v.2024.02.16-2712"
+SRCREV = "1bd0a1052b2e74d7af04de18d30b5edb12d8a423"
+PV = "v2025.03.10-2712"
 
 S = "${WORKDIR}/git"
 

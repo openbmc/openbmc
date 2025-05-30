@@ -46,6 +46,9 @@ BL32 = "${@oe.utils.conditional('SPMC_IS_OPTEE', '1',\
 EXTRA_OEMAKE += "${@oe.utils.conditional('SPMC_IS_OPTEE', '1', \
                 ' BL32=${BL32}', '', d)}"
 
+# Enable memory safety in TF-A if machine supports it.
+EXTRA_OEMAKE += "${@bb.utils.contains('MACHINE_FEATURES', 'arm-branch-protection', ' BRANCH_PROTECTION=1', '', d)}"
+
 # Generic configuration
 COMPATIBLE_MACHINE = "fvp-base"
 TFA_PLATFORM = "fvp"

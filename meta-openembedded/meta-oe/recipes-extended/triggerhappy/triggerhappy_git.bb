@@ -11,7 +11,7 @@ SRC_URI = "git://github.com/wertarbyte/${BPN}.git;branch=debian;protocol=https"
 
 S = "${WORKDIR}/git"
 
-inherit autotools-brokensep pkgconfig perlnative update-rc.d systemd
+inherit pkgconfig perlnative update-rc.d systemd
 
 PACKAGECONFIG = "${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd','',d)}"
 PACKAGECONFIG[systemd] = ",,systemd"
@@ -30,7 +30,9 @@ FILES:${PN} = "\
 "
 CONFFILES:${PN} = "${sysconfdir}/udev/rules.d/80-triggerhappy.rules"
 
-do_install:append() {
+do_install() {
+    oe_runmake 'DESTDIR=${D}' 'BINDIR=${D}${sbindir}' install
+
     install -d ${D}${sysconfdir}/triggerhappy/triggers.d
 
     install -d ${D}${nonarch_base_libdir}/udev/rules.d

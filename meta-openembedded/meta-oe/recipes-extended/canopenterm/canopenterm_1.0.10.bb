@@ -13,7 +13,7 @@ BUGTRACKER = "https://github.com/CANopenTerm/CANopenTerm/issues"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=10e84ea70e8c3a1fbc462f5424806474"
 
-DEPENDS = "cjson libinih libsdl2 lua libsocketcan pocketpy"
+DEPENDS = "cjson libinih virtual/libsdl2 lua libsocketcan pocketpy"
 
 SRC_URI = "git://github.com/CANopenTerm/CANopenTerm.git;protocol=https;branch=main"
 

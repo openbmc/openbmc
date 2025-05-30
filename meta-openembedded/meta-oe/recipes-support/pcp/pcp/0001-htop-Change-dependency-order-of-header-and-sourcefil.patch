@@ -16,14 +16,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/pcp/htop/GNUmakefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/pcp/htop/GNUmakefile b/src/pcp/htop/GNUmakefile
-index 6b7c0c5..5153c63 100644
 --- a/src/pcp/htop/GNUmakefile
 +++ b/src/pcp/htop/GNUmakefile
-@@ -186,8 +186,8 @@ CFGMETERS = $(patsubst %,pcp/meters/%,$(METERS))
- CFGCOLUMNS = $(patsubst %,pcp/columns/%,$(COLUMNS))
+@@ -210,8 +210,8 @@ CFGCOLUMNS = $(patsubst %,pcp/columns/%,
+ CFGSCREENS = $(patsubst %,pcp/screens/%,$(SCREENS))
  
- CFGXFILES = $(CFGMETERS) $(CFGCOLUMNS)
+ CFGXFILES = $(CFGMETERS) $(CFGCOLUMNS) $(CFGSCREENS)
 -TOPXFILES = $(TOPCFILES) $(TOPHFILES) $(DOCFILES)
 -SUBXFILES = $(SUBCFILES) $(SUBHFILES)
 +TOPXFILES = $(TOPHFILES) $(TOPCFILES) $(DOCFILES)
@@ -31,6 +29,3 @@ index 6b7c0c5..5153c63 100644
  CFILES = $(TOPCFILES) $(SUBCFILES)
  HFILES = $(TOPHFILES) $(SUBHFILES)
  LDIRT = $(TOPXFILES) $(SUBXFILES) $(CFGXFILES) \
--- 
-2.41.0
-

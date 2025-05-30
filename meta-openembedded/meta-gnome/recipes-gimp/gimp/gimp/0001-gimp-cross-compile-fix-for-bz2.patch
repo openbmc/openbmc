@@ -1,0 +1,30 @@
+From a7e40e19d17404cf5ec4135fc1becd5a90f5e1e1 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Wed, 25 Dec 2024 07:27:04 +0100
+Subject: [PATCH] gimp: cross-compile fix for bz2
+
+autotools bzip2 build does not create pkgconfig files so looking for the dependency fails.
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate [can probably be removed once bzip2 is built with meson or cmake]
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 4e48f8c64c..d5dce47015 100644
+--- a/meson.build
++++ b/meson.build
+@@ -765,7 +765,7 @@ zlib = dependency('zlib')
+ MIMEtypes += 'image/x-psp'
+ 
+ # Compiler-provided headers can't be found in crossroads environment
+-if not meson.is_cross_build()
++if true
+   bz2 = cc.find_library('bz2')
+ else
+   bz2 = dependency('bzip2')
+-- 
+2.47.1
+

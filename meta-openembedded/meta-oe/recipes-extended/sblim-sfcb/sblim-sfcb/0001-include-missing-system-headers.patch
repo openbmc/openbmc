@@ -18,8 +18,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  trace.h             | 3 ++-
  9 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/brokerEnc.c b/brokerEnc.c
-index 9115e71..889afcd 100644
 --- a/brokerEnc.c
 +++ b/brokerEnc.c
 @@ -25,6 +25,8 @@
@@ -31,8 +29,6 @@ index 9115e71..889afcd 100644
  extern const char *opGetClassNameChars(const CMPIObjectPath * cop);
  extern const char *opGetNameSpaceChars(const CMPIObjectPath * cop);
  extern CMPIConstClass *getConstClass(const char *ns, const char *cn);
-diff --git a/brokerOs.c b/brokerOs.c
-index 8d73a0b..b1427fd 100644
 --- a/brokerOs.c
 +++ b/brokerOs.c
 @@ -22,6 +22,7 @@
@@ -43,8 +39,6 @@ index 8d73a0b..b1427fd 100644
  
  static char    *
  resolveFileName(const char *filename)
-diff --git a/mlog.c b/mlog.c
-index a2d9eb7..6d9cd29 100644
 --- a/mlog.c
 +++ b/mlog.c
 @@ -26,6 +26,7 @@ const char     *_mlog_id =
@@ -55,8 +49,6 @@ index a2d9eb7..6d9cd29 100644
  #include <errno.h>
  #include <signal.h>
  #include "trace.h"              /* for setSignal() */
-diff --git a/mofc/backend_sfcb.c b/mofc/backend_sfcb.c
-index 614abcd..99d4061 100644
 --- a/mofc/backend_sfcb.c
 +++ b/mofc/backend_sfcb.c
 @@ -29,7 +29,7 @@
@@ -68,8 +60,6 @@ index 614abcd..99d4061 100644
  
  extern CMPIStatus sfcb_simpleArrayAdd(CMPIArray * array, CMPIValue * val, CMPIType type);
  extern CMPIObjectPath *getObjectPath(char *path, char **msg);
-diff --git a/sfcbdump.c b/sfcbdump.c
-index 8a9c335..aa8559c 100644
 --- a/sfcbdump.c
 +++ b/sfcbdump.c
 @@ -23,6 +23,7 @@
@@ -80,8 +70,6 @@ index 8a9c335..aa8559c 100644
  #include "objectImpl.h"
  
  #define BINARY_NAME argv[0]
-diff --git a/sfcbdumpP32onI32.c b/sfcbdumpP32onI32.c
-index ccf87dc..3540751 100644
 --- a/sfcbdumpP32onI32.c
 +++ b/sfcbdumpP32onI32.c
 @@ -22,6 +22,7 @@
@@ -92,8 +80,6 @@ index ccf87dc..3540751 100644
  #include <getopt.h>
  #include "objectImpl.h"
  #include <byteswap.h>
-diff --git a/sfcbsem.c b/sfcbsem.c
-index 3f8de7f..1e6358b 100644
 --- a/sfcbsem.c
 +++ b/sfcbsem.c
 @@ -21,6 +21,7 @@
@@ -104,8 +90,6 @@ index 3f8de7f..1e6358b 100644
  #include <getopt.h>
  #include <errno.h>
  
-diff --git a/trace.c b/trace.c
-index 23597e1..c4f8011 100644
 --- a/trace.c
 +++ b/trace.c
 @@ -25,6 +25,7 @@
@@ -125,8 +109,6 @@ index 23597e1..c4f8011 100644
  int             terminating = 0;
  int             colorTrace;
  
-diff --git a/trace.h b/trace.h
-index ea39850..52d408d 100644
 --- a/trace.h
 +++ b/trace.h
 @@ -25,6 +25,7 @@
@@ -137,7 +119,7 @@ index ea39850..52d408d 100644
  extern unsigned long _sfcb_trace_mask;
  /* use pointer indirect _sfcb_trace_mask to allow shared memory flag */
  extern unsigned long *_ptr_sfcb_trace_mask;
-@@ -162,7 +163,7 @@ extern sigHandler *setSignal(int sn, sigHandler * sh, int flags);
+@@ -162,7 +163,7 @@ extern sigHandler *setSignal(int sn, sig
  
  extern char    *processName;
  extern int      providerProcess;
@@ -146,6 +128,33 @@ index ea39850..52d408d 100644
  extern int      terminating;
  
  #endif
--- 
-2.37.3
-
+--- a/support.c
++++ b/support.c
+@@ -39,6 +39,7 @@
+ #include <err.h>
+ #endif
+ #include <errno.h>
++#include <string.h> /* memcpy */
+ #include "native.h"
+ #include "trace.h"
+ #include "control.h"
+--- a/qualifier.c
++++ b/qualifier.c
+@@ -19,6 +19,7 @@
+  *
+  */
+ 
++#include <string.h> /* memcpy */
+ #include "objectImpl.h"
+ #include "qualifier.h"
+ 
+--- a/objectImplSwapI32toP32.c
++++ b/objectImplSwapI32toP32.c
+@@ -24,6 +24,7 @@
+ #include <byteswap.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h> /* memcpy */
+ #include <sfcCommon/utilft.h>
+ #include <sys/utsname.h>
+ 

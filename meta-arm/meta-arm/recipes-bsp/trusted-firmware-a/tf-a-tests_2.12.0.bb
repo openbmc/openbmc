@@ -13,8 +13,6 @@ SRC_URI = "${SRC_URI_TRUSTED_FIRMWARE_A_TESTS};branch=${SRCBRANCH} \
 SRCBRANCH = "master"
 SRCREV = "6a113621a9efdc143e9270b1789046cd7d9cdfb1"
 
-DEPENDS += "optee-os"
-
 EXTRA_OEMAKE += "USE_NVM=0"
 EXTRA_OEMAKE += "SHELL_COLOR=1"
 EXTRA_OEMAKE += "DEBUG=1"
@@ -35,7 +33,7 @@ B = "${WORKDIR}/build"
 EXTRA_OEMAKE += "BUILD_BASE=${B} PLAT=${TFA_PLATFORM}"
 
 # Requires CROSS_COMPILE set by hand as there is no configure script
-export CROSS_COMPILE="${TARGET_PREFIX}"
+export CROSS_COMPILE = "${TARGET_PREFIX}"
 
 LDFLAGS[unexport] = "1"
 do_compile() {

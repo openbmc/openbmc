@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1a11ffd7e1bdd1d3156cecec60a2846f"
 DEPENDS = "\
     cglm \
     freetype \
-    libsdl2 \
+    virtual/libsdl2 \
     libwebp \
     opusfile \
     zstd \

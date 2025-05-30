@@ -1,0 +1,30 @@
+From 984538dcce7b184269efc1e1b0fb78e1cb932b5d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 21 Mar 2025 01:21:22 -0700
+Subject: [PATCH] Fix build errors on RISCV
+ https://bugs.webkit.org/show_bug.cgi?id=290163
+
+Reviewed by NOBODY (OOPS!).
+
+Include c++ header <system_error> for std::error_code.
+
+* Source/WebCore/contentextensions/ContentExtensionActions.h: Include system_error
+
+Upstream-Status: Submitted [https://github.com/WebKit/WebKit/pull/42802]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Source/WebCore/contentextensions/ContentExtensionActions.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Source/WebCore/contentextensions/ContentExtensionActions.h b/Source/WebCore/contentextensions/ContentExtensionActions.h
+index 0b75d2e1df78..61cb33c94ce8 100644
+--- a/Source/WebCore/contentextensions/ContentExtensionActions.h
++++ b/Source/WebCore/contentextensions/ContentExtensionActions.h
+@@ -28,6 +28,7 @@
+ #if ENABLE(CONTENT_EXTENSIONS)
+ 
+ #include "ContentExtensionStringSerialization.h"
++#include <system_error>
+ #include <wtf/JSONValues.h>
+ #include <wtf/Hasher.h>
+ 

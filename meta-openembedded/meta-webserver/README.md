@@ -52,6 +52,11 @@ Maintenance
 Send patches / pull requests to openembedded-devel@lists.openembedded.org
 with '[meta-webserver]' in the subject.
 
+When sending single patches, please use something like:
+```
+git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix="meta-webserver][PATCH"
+```
+
 Layer maintainer: Derek Straka <derek@asterius.io>
 
 

@@ -4,7 +4,7 @@ DESCRIPTION = "\
     utility lsi2c. \
 "
 HOMEPAGE = "https://github.com/costad2/i2cdev"
-LICENSE = "GPL-2.0-or-later"
+LICENSE = "LGPL-2.1-only & GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=768997ba510a952bef1775c50bc22b00 \
     file://include/libi2cdev.h;beginline=12;endline=25;md5=72486a5e192d6ac5c7e55a4a95e380a6 \

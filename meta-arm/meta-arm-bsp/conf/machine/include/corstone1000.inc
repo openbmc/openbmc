@@ -14,7 +14,8 @@ TFA_BL2_BINARY = "bl2-corstone1000.bin"
 TFA_FIP_BINARY = "fip-corstone1000.bin"
 
 # optee
-PREFERRED_VERSION_optee-os ?= "4.3.%"
+PREFERRED_VERSION_optee-os ?= "4.4.%"
+PREFERRED_VERSION_optee-client ?= "4.4.%"
 
 # Trusted Services
 TS_PLATFORM = "arm/corstone1000"
@@ -66,3 +67,8 @@ ARM_SYSTEMREADY_ACS_CONSOLE ?= "default"
 
 # Workaround IMAGE_ROOTFS_EXTRA_SPACE being ignored when images are repacked
 IMAGE_ROOTFS_EXTRA_ARGS += "--extra-space ${@${IMAGE_ROOTFS_EXTRA_SPACE}}K"
+
+# Enable Authenticated variable support in SmmGW
+SMMGW_AUTH_VAR = "1"
+# Use MbedTLS build into SmmGW for authentication related crypto operations.
+SMMGW_INTERNAL_CRYPTO = "1"

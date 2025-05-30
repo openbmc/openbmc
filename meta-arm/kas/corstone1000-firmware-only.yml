@@ -10,7 +10,7 @@ local_conf_header:
     OVERRIDES .= ":firmware"
 
     # Need to ensure we build with a small libc
-    TCLIBC="musl"
+    TCLIBC = "musl"
 
   mass-storage: |
     # Ensure the Mass Storage device is absent

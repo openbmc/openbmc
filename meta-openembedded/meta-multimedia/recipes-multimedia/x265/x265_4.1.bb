@@ -8,7 +8,10 @@ LIC_FILES_CHKSUM = "file://../COPYING;md5=c9e0427bc58f129f99728c62d4ad4091"
 
 DEPENDS = "nasm-native gnutls zlib libpcre numactl"
 
-SRC_URI = "https://bitbucket.org/multicoreware/x265_git/downloads/x265_${PV}.tar.gz"
+SRC_URI = " \
+    https://bitbucket.org/multicoreware/x265_git/downloads/x265_${PV}.tar.gz \
+    file://0001-json11.cpp-Include-cstdint.patch \
+"
 SRC_URI[sha256sum] = "a31699c6a89806b74b0151e5e6a7df65de4b49050482fe5ebf8a4379d7af8f29"
 S = "${WORKDIR}/x265_${PV}/source"
 

@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM += "file://docs/license.rst;md5=b5fbfdeb6855162dded31fadcd5d4dc
 
 # in TF-A src, docs/getting_started/prerequisites.rst lists the expected version mbedtls
 # mbedtls-3.6.0
-SRC_URI_MBEDTLS = "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;destsuffix=git/mbedtls;branch=master"
+SRC_URI_MBEDTLS = "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;destsuffix=git/mbedtls;branch=main"
 SRCREV_mbedtls = "2ca6c285a0dd3f33982dd57299012dacab1ff206"
 
 LIC_FILES_CHKSUM_MBEDTLS = "file://mbedtls/LICENSE;md5=379d5819937a6c2f1ef1630d341e026d"

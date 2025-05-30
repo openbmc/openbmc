@@ -1,4 +1,4 @@
-From ad79a81d6582555e580bdba42c959477e7d35ae7 Mon Sep 17 00:00:00 2001
+From 87bbb65c3c5fb7d248871d9c3bcbd3d27c781449 Mon Sep 17 00:00:00 2001
 From: Venture Research <tech@ventureresearch.com>
 Date: Wed, 6 Feb 2013 20:51:02 -0600
 Subject: [PATCH] hack to force use of libc malloc
@@ -17,14 +17,17 @@ Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Update to work with 8.0.0
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 
----
-Upstream-Status: Pending
+Update to work with 8.1.0
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 
+Upstream-Status: Inappropriate [Embedded specific]
+
+---
  src/Makefile | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 13fa1c027..e0b1d2722 100644
+index 1437f41bd..5919f01e9 100644
 --- a/src/Makefile
 +++ b/src/Makefile
 @@ -13,7 +13,8 @@

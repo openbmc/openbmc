@@ -25,4 +25,4 @@ do_install:append() {
            -e "/use strict;/ause warnings;" ${D}${bindir}/use-devel-checklib
 }
 
-BBCLASSEXTEND="native"
+BBCLASSEXTEND = "native"

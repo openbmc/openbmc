@@ -1,5 +1,5 @@
 SUMMARY = "Power manager for the Xfce desktop environment"
-HOMEPAGE = "http://goodies.xfce.org/projects/applications/xfce4-power-manager"
+HOMEPAGE = "https://docs.xfce.org/xfce/xfce4-power-manager/start"
 SECTION = "x11"
 
 LICENSE = "GPL-2.0-or-later"

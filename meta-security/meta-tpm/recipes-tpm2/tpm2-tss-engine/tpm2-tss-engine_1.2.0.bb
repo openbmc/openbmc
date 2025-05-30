@@ -29,7 +29,11 @@ do_configure:prepend() {
 
 PACKAGES += "${PN}-engines ${PN}-engines-staticdev ${PN}-bash-completion"
 
-FILES:${PN}-dev = "${libdir}/engines-3/tpm2tss.so ${includedir}/*"
-FILES:${PN}-engines = "${libdir}/engines-3/lib*.so*"
+FILES:${PN}-dev = "${includedir}/*"
+FILES:${PN}-engines = "${libdir}/engines-3/*.so*"
 FILES:${PN}-engines-staticdev = "${libdir}/engines-3/libtpm2tss.a"
 FILES:${PN}-bash-completion += "${datadir}/bash-completion/completions"
+
+# The tpm2tss.so symlink is in the main package because OpenSSL
+# searches for the shared object via the symlink.
+INSANE_SKIP:${PN}-engines += "dev-so"

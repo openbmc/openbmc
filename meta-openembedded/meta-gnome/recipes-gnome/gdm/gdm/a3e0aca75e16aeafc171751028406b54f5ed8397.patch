@@ -1,0 +1,56 @@
+From 2fbc2ac50b9f143eb594e5f77a8051222ffbd2c9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
+Date: Mon, 27 Jan 2025 14:01:23 +0100
+Subject: [PATCH] gdm-settings-utils: rename variable to fix build with gcc 15
+
+In GNU23 C, bool is a keyword. Rename the variable to avoid syntax error.
+---
+ common/gdm-settings-utils.c | 8 ++++----
+ common/gdm-settings-utils.h | 2 +-
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+ 
+ Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/gdm/-/commit/a3e0aca75e16aeafc171751028406b54f5ed8397.patch]
+
+diff --git a/common/gdm-settings-utils.c b/common/gdm-settings-utils.c
+index 636be3a9e..da4c7aefb 100644
+--- a/common/gdm-settings-utils.c
++++ b/common/gdm-settings-utils.c
+@@ -287,16 +287,16 @@ gdm_settings_parse_boolean_as_value  (gboolean boolval)
+ /* adapted from GKeyFile */
+ gboolean
+ gdm_settings_parse_value_as_boolean (const char *value,
+-                                     gboolean   *bool)
++                                     gboolean   *boolval)
+ {
+         g_return_val_if_fail (value != NULL, FALSE);
+-        g_return_val_if_fail (bool != NULL, FALSE);
++        g_return_val_if_fail (boolval != NULL, FALSE);
+ 
+         if (g_ascii_strcasecmp (value, "true") == 0 || strcmp (value, "1") == 0) {
+-                *bool = TRUE;
++                *boolval = TRUE;
+                 return TRUE;
+         } else if (g_ascii_strcasecmp (value, "false") == 0 || strcmp (value, "0") == 0) {
+-                *bool = FALSE;
++                *boolval = FALSE;
+                 return TRUE;
+         } else {
+                 return FALSE;
+diff --git a/common/gdm-settings-utils.h b/common/gdm-settings-utils.h
+index 4f2362ce7..734d625c7 100644
+--- a/common/gdm-settings-utils.h
++++ b/common/gdm-settings-utils.h
+@@ -44,7 +44,7 @@ gboolean                  gdm_settings_parse_schemas           (const char  *fil
+                                                                 GSList     **list);
+ 
+ gboolean                  gdm_settings_parse_value_as_boolean  (const char *value,
+-                                                                gboolean   *bool);
++                                                                gboolean   *boolval);
+ gboolean                  gdm_settings_parse_value_as_integer  (const char *value,
+                                                                 int        *intval);
+ gboolean                  gdm_settings_parse_value_as_double   (const char *value,
+-- 
+GitLab
+

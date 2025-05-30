@@ -1,0 +1,39 @@
+From 3982a8925e15ea16df49891a700e7f9d9a10541c Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Wed, 9 Apr 2025 11:46:36 +0900
+Subject: [PATCH 1/3] configure prototypes
+
+  * Set to use function prototypes for ANSI_C
+  If PROTOTYPES is set in md5global.h, it uses PROTO_LIST(list) list instead of PROTO_LIST(list) ()
+  to provide parameterized prototyping.
+  Therefore, at the configure.ac stage, when using ANSI_C, PROTOTYPES should be defined.
+
+  * to fix the build error with gcc-15
+    Even though I added this configuration to fix the error, the error shown in the following patch still occurs.
+../../git/lib/md5.c:139:8: error: too many arguments to function 'MD5_memcpy'; expected 0, have 3
+  139 |        MD5_memcpy
+      |        ^~~~~~~~~~
+  140 |        ((POINTER)&context->buffer[index], (POINTER)input, partLen); MD5Transform
+      |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../../git/lib/md5.c:62:13: note: declared here
+   62 | static void MD5_memcpy PROTO_LIST ((POINTER, POINTER, unsigned int));
+      |             ^~~~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/cyrusimap/cyrus-sasl/pull/873]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 2a0cf878..657e178b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -88,6 +88,7 @@ AC_ARG_ENABLE(obsolete_digest_attr,
+               enable_obsolete_digest_attr=yes)
+ 
+ AC_PROG_CC
++AC_C_PROTOTYPES
+ AX_PROG_CC_FOR_BUILD
+ AC_PROG_CPP
+ AC_PROG_AWK

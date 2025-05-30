@@ -1,0 +1,33 @@
+From 85189fb66d3abb2645605f8a3c14d8152ef755fe Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 18 May 2025 10:24:19 -0700
+Subject: [PATCH] pyproject.toml: Remove upper version constraint for Cython
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index e22ea42..f670d3d 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -50,7 +50,7 @@ pytest-cov = ">=3,<7"
+ pytest-asyncio = ">=0.19,<0.27"
+ pycairo = "^1.21.0"
+ PyGObject = {version = ">=3.50,<3.51", python = "<4"}
+-Cython = ">=3,<3.1.0"
++Cython = ">=3"
+ setuptools = ">=65.4.1,<79.0.0"
+ pytest-timeout = "^2.1.0"
+ pytest-codspeed = "^3.1.1"
+@@ -104,7 +104,7 @@ module = "docs.*"
+ ignore_errors = true
+ 
+ [build-system]
+-requires = ['setuptools>=65.4.1', 'wheel', 'Cython>=3,<3.1.0', "poetry-core>=1.0.0"]
++requires = ['setuptools>=65.4.1', 'wheel', 'Cython>=3', "poetry-core>=1.0.0"]
+ build-backend = "poetry.core.masonry.api"
+ 
+ [tool.ruff]

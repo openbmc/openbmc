@@ -19,9 +19,18 @@ CVE_STATUS_GROUPS += "CVES_2015"
 CVES_2015 = "CVE-2015-8270 CVE-2015-8271 CVE-2015-8272"
 CVES_2015[status] = "fixed-version: patched in current git hash"
 
-inherit autotools-brokensep
-
 EXTRA_OEMAKE = " \
     CC='${CC}' LD='${LD} ${STAGING_LIBDIR}' XCFLAGS='${CFLAGS}' XLDFLAGS='${LDFLAGS}' \
-    SYS=posix INC=-I=/usr/include DESTDIR=${D} CRYPTO=GNUTLS \
+    SYS=posix INC=-I${STAGING_INCDIR} DESTDIR=${D} CRYPTO=GNUTLS \
     prefix=${prefix} libdir=${libdir} incdir=${includedir}/librtmp bindir=${bindir} mandir=${mandir}"
+
+do_configure() {
+}
+
+do_compile() {
+    oe_runmake
+}
+
+do_install() {
+    oe_runmake install
+}

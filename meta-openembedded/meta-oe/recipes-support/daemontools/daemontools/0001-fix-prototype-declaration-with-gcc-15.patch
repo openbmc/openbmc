@@ -1,0 +1,252 @@
+From d4e8b6638ede51dee635317baf86a43d40bc45d2 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Tue, 8 Apr 2025 14:02:04 +0900
+Subject: [PATCH] fix prototype declaration with gcc 15
+
+* Fix prototype declaration and too many arguments function errors due to outdated style
+byte_chr.c:9:1: error: number of arguments doesn't match prototype
+    9 | {
+      | ^
+In file included from byte_chr.c:3:
+byte.h:6:21: error: prototype declaration
+    6 | extern unsigned int byte_chr();
+      |                     ^~~~~~~~
+...
+./compile buffer_get.c
+buffer_get.c: In function 'oneread':
+buffer_get.c:12:9: error: too many arguments to function 'op'; expected 0, have 3
+   12 |     r = op(fd,buf,len);
+      |         ^~ ~~
+...
+supervise.c: In function 'doit':
+supervise.c:144:11: error: too many arguments to function 'wait_nohang'; expected 0, have 1
+  144 |       r = wait_nohang(&wstat);
+      |           ^~~~~~~~~~~ ~~~~~~
+
+Upstream-Status: Inactive-Upstream [lastrelease: 10 years ago]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/alloc.c      |  6 ++----
+ src/alloc.h      |  6 +++---
+ src/alloc_re.c   |  5 +----
+ src/buffer_get.c |  2 +-
+ src/buffer_put.c |  2 +-
+ src/byte.h       | 10 +++++-----
+ src/byte_chr.c   |  5 +----
+ src/byte_copy.c  |  5 +----
+ src/byte_cr.c    |  5 +----
+ src/byte_diff.c  |  5 +----
+ src/byte_rchr.c  |  5 +----
+ src/select.h2    |  1 -
+ src/wait.h       |  4 ++--
+ 13 files changed, 20 insertions(+), 41 deletions(-)
+
+diff --git a/src/alloc.c b/src/alloc.c
+index c741aa4..5b21993 100644
+--- a/src/alloc.c
++++ b/src/alloc.c
+@@ -12,8 +12,7 @@ static aligned realspace[SPACE / ALIGNMENT];
+ #define space ((char *) realspace)
+ static unsigned int avail = SPACE; /* multiple of ALIGNMENT; 0<=avail<=SPACE */
+ 
+-/*@null@*//*@out@*/char *alloc(n)
+-unsigned int n;
++/*@null@*//*@out@*/char *alloc(unsigned int n)
+ {
+   char *x;
+   n = ALIGNMENT + n - (n & (ALIGNMENT - 1)); /* XXX: could overflow */
+@@ -23,8 +22,7 @@ unsigned int n;
+   return x;
+ }
+ 
+-void alloc_free(x)
+-char *x;
++void alloc_free(char *x)
+ {
+   if (x >= space)
+     if (x < space + SPACE)
+diff --git a/src/alloc.h b/src/alloc.h
+index 21122fc..7a13178 100644
+--- a/src/alloc.h
++++ b/src/alloc.h
+@@ -3,8 +3,8 @@
+ #ifndef ALLOC_H
+ #define ALLOC_H
+ 
+-extern /*@null@*//*@out@*/char *alloc();
+-extern void alloc_free();
+-extern int alloc_re();
++extern /*@null@*//*@out@*/char *alloc(unsigned int n);
++extern void alloc_free(char *x);
++extern int alloc_re(char **x,unsigned int m,unsigned int n);
+ 
+ #endif
+diff --git a/src/alloc_re.c b/src/alloc_re.c
+index 1074609..5096fb1 100644
+--- a/src/alloc_re.c
++++ b/src/alloc_re.c
+@@ -3,10 +3,7 @@
+ #include "alloc.h"
+ #include "byte.h"
+ 
+-int alloc_re(x,m,n)
+-char **x;
+-unsigned int m;
+-unsigned int n;
++int alloc_re(char **x,unsigned int m,unsigned int n)
+ {
+   char *y;
+  
+diff --git a/src/buffer_get.c b/src/buffer_get.c
+index 3a6e1b6..2a38fa1 100644
+--- a/src/buffer_get.c
++++ b/src/buffer_get.c
+@@ -4,7 +4,7 @@
+ #include "byte.h"
+ #include "error.h"
+ 
+-static int oneread(int (*op)(),int fd,char *buf,unsigned int len)
++static int oneread(int (*op)(int, char *, unsigned int),int fd,char *buf,unsigned int len)
+ {
+   int r;
+ 
+diff --git a/src/buffer_put.c b/src/buffer_put.c
+index 23164b3..23d1d2b 100644
+--- a/src/buffer_put.c
++++ b/src/buffer_put.c
+@@ -5,7 +5,7 @@
+ #include "byte.h"
+ #include "error.h"
+ 
+-static int allwrite(int (*op)(),int fd,const char *buf,unsigned int len)
++static int allwrite(int (*op)(int, const char *, unsigned int),int fd,const char *buf,unsigned int len)
+ {
+   int w;
+ 
+diff --git a/src/byte.h b/src/byte.h
+index 09aab61..d5ccf83 100644
+--- a/src/byte.h
++++ b/src/byte.h
+@@ -3,11 +3,11 @@
+ #ifndef BYTE_H
+ #define BYTE_H
+ 
+-extern unsigned int byte_chr();
+-extern unsigned int byte_rchr();
+-extern void byte_copy();
+-extern void byte_copyr();
+-extern int byte_diff();
++extern unsigned int byte_chr(char* s,register unsigned int n,int c);
++extern unsigned int byte_rchr(char* s,register unsigned int n,int c);
++extern void byte_copy(register char* to,register unsigned int n,register char* from);
++extern void byte_copyr(register char* to,register unsigned int n,register char* from);
++extern int byte_diff(register char* s,register unsigned int n,register char* t);
+ extern void byte_zero();
+ 
+ #define byte_equal(s,n,t) (!byte_diff((s),(n),(t)))
+diff --git a/src/byte_chr.c b/src/byte_chr.c
+index fd56056..7fbcd61 100644
+--- a/src/byte_chr.c
++++ b/src/byte_chr.c
+@@ -2,10 +2,7 @@
+ 
+ #include "byte.h"
+ 
+-unsigned int byte_chr(s,n,c)
+-char *s;
+-register unsigned int n;
+-int c;
++unsigned int byte_chr(char* s,register unsigned int n,int c)
+ {
+   register char ch;
+   register char *t;
+diff --git a/src/byte_copy.c b/src/byte_copy.c
+index 74c9e4a..917d795 100644
+--- a/src/byte_copy.c
++++ b/src/byte_copy.c
+@@ -2,10 +2,7 @@
+ 
+ #include "byte.h"
+ 
+-void byte_copy(to,n,from)
+-register char *to;
+-register unsigned int n;
+-register char *from;
++void byte_copy(register char* to,register unsigned int n,register char* from)
+ {
+   for (;;) {
+     if (!n) return; *to++ = *from++; --n;
+diff --git a/src/byte_cr.c b/src/byte_cr.c
+index 52dc251..ac3ec67 100644
+--- a/src/byte_cr.c
++++ b/src/byte_cr.c
+@@ -2,10 +2,7 @@
+ 
+ #include "byte.h"
+ 
+-void byte_copyr(to,n,from)
+-register char *to;
+-register unsigned int n;
+-register char *from;
++void byte_copyr(register char* to,register unsigned int n,register char* from)
+ {
+   to += n;
+   from += n;
+diff --git a/src/byte_diff.c b/src/byte_diff.c
+index 0c4d17b..e1ef257 100644
+--- a/src/byte_diff.c
++++ b/src/byte_diff.c
+@@ -2,10 +2,7 @@
+ 
+ #include "byte.h"
+ 
+-int byte_diff(s,n,t)
+-register char *s;
+-register unsigned int n;
+-register char *t;
++int byte_diff(register char* s,register unsigned int n,register char* t)
+ {
+   for (;;) {
+     if (!n) return 0; if (*s != *t) break; ++s; ++t; --n;
+diff --git a/src/byte_rchr.c b/src/byte_rchr.c
+index 7ea9948..04391bf 100644
+--- a/src/byte_rchr.c
++++ b/src/byte_rchr.c
+@@ -2,10 +2,7 @@
+ 
+ #include "byte.h"
+ 
+-unsigned int byte_rchr(s,n,c)
+-char *s;
+-register unsigned int n;
+-int c;
++unsigned int byte_rchr(char* s,register unsigned int n,int c)
+ {
+   register char ch;
+   register char *t;
+diff --git a/src/select.h2 b/src/select.h2
+index 4bd4fcf..b7ac8c9 100644
+--- a/src/select.h2
++++ b/src/select.h2
+@@ -8,6 +8,5 @@
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <sys/select.h>
+-extern int select();
+ 
+ #endif
+diff --git a/src/wait.h b/src/wait.h
+index d294e9d..168d1bf 100644
+--- a/src/wait.h
++++ b/src/wait.h
+@@ -3,8 +3,8 @@
+ #ifndef WAIT_H
+ #define WAIT_H
+ 
+-extern int wait_pid();
+-extern int wait_nohang();
++extern int wait_pid(int* status, int pid);
++extern int wait_nohang(int* status);
+ extern int wait_stop();
+ extern int wait_stopnohang();
+ 

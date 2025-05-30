@@ -1,0 +1,71 @@
+From 36e038d9e4047ae42a148f671f18971cc6a68558 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 10 Apr 2025 18:30:52 +0900
+Subject: [PATCH] Fix linker error for TX_RING
+
+Found similar issue in gcc 15 build environment.
+- See more details at: http://errors.yoctoproject.org/Errors/Details/851800/
+```
+TOPDIR/tmp/work/core2-64-oe-linux/tcpreplay/4.5.1/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/15.0.1/ld: ./common/libcommon.a(sendpacket.o): in function `sendpacket':
+/usr/src/debug/tcpreplay/4.5.1/src/common/sendpacket.c:328:(.text+0x1be): undefined reference to `txring_put'
+TOPDIR/tmp/work/core2-64-oe-linux/tcpreplay/4.5.1/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/15.0.1/ld: ./common/libcommon.a(sendpacket.o): in function `sendpacket_open_pf':
+/usr/src/debug/tcpreplay/4.5.1/src/common/sendpacket.c:1088:(.text+0x7ea): undefined reference to `txring_init'
+TOPDIR/tmp/work/core2-64-oe-linux/tcpreplay/4.5.1/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/15.0.1/ld: ./common/libcommon.a(sendpacket.o): in function `sendpacket':
+/usr/src/debug/tcpreplay/4.5.1/src/common/sendpacket.c:328:(.text+0x1be): undefined reference to `txring_put'
+TOPDIR/tmp/work/core2-64-oe-linux/tcpreplay/4.5.1/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/15.0.1/ld: ./common/libcommon.a(sendpacket.o): in function `sendpacket_open_pf':
+/usr/src/debug/tcpreplay/4.5.1/src/common/sendpacket.c:1088:(.text+0x7ea): undefined reference to `txring_init'
+TOPDIR/tmp/work/core2-64-oe-linux/tcpreplay/4.5.1/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/15.0.1/ld: ./common/libcommon.a(sendpacket.o): in function `sendpacket':
+/usr/src/debug/tcpreplay/4.5.1/src/common/sendpacket.c:328:(.text+0x1be): undefined reference to `txring_put'
+TOPDIR/tmp/work/core2-64-oe-linux/tcpreplay/4.5.1/recipe-sysroot-native/usr/bin/x86_64-oe-linux/../../libexec/x86_64-oe-linux/gcc/x86_64-oe-linux/15.0.1/ld: ./common/libcommon.a(sendpacket.o): in function `sendpacket_open_pf':
+/usr/src/debug/tcpreplay/4.5.1/src/common/sendpacket.c:1088:(.text+0x7ea): undefined reference to `txring_init'
+```
+- The result of "nm -u txring.o" shows no symbols exist.
+
+- The config.h has HAVE_TX_RING defined but txring.c is not aware of it.
+  txring.c and txring.h include config.h at the beginning.
+
+- This resulted in a successful build in my build environment.
+
+It may
+Fixes #731
+Fixes #904
+
+Upstream-Status: Submitted [https://github.com/appneta/tcpreplay/pull/924]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/common/txring.c | 3 +++
+ src/common/txring.h | 4 ++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/src/common/txring.c b/src/common/txring.c
+index d5768d75..f522893d 100644
+--- a/src/common/txring.c
++++ b/src/common/txring.c
+@@ -31,6 +31,9 @@
+  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#include "defines.h"
++#include "config.h"
++
+ #ifdef HAVE_TX_RING
+ 
+ #include "txring.h"
+diff --git a/src/common/txring.h b/src/common/txring.h
+index 309da84c..3f14cac0 100644
+--- a/src/common/txring.h
++++ b/src/common/txring.h
+@@ -33,11 +33,11 @@
+ 
+ #pragma once
+ 
+-#ifdef HAVE_TX_RING
+-
+ #include "defines.h"
+ #include "config.h"
+ 
++#ifdef HAVE_TX_RING
++
+ #if __GLIBC__ >= 2 && __GLIBC_MINOR >= 1
+ #include <net/ethernet.h> /* the L2 protocols */
+ #include <netpacket/packet.h>

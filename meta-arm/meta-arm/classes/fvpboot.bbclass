@@ -48,7 +48,11 @@ python do_write_fvpboot_conf() {
     provider = d.getVar("FVP_PROVIDER")
     if provider:
         data["provider"] = provider
-        data["fvp-bindir"] = os.path.join(d.getVar("COMPONENTS_DIR"),
+        bindir = d.getVar("FVP_BINDIR")
+        if bindir:
+            data["fvp-bindir"] = bindir
+        else:
+            data["fvp-bindir"] = os.path.join(d.getVar("COMPONENTS_DIR"),
                                             d.getVar("BUILD_ARCH"),
                                             provider,
                                             "usr", "bin")

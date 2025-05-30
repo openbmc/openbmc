@@ -38,4 +38,4 @@ PACKAGECONFIG[tools] = "--with-tools,--without-tools,libbytesize libdevmapper"
 PACKAGECONFIG[smart] = "--with-smart,--without-smart,libatasmart"
 PACKAGECONFIG[smartmontools] = "--with-smartmontools,--without-smartmontools,json-glib,smartmontools"
 
-export GIR_EXTRA_LIBS_PATH="${B}/src/utils/.libs"
+export GIR_EXTRA_LIBS_PATH = "${B}/src/utils/.libs"

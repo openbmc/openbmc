@@ -1,0 +1,20 @@
+From 34ac536970d2e9f3c3f8ffd691d6a8ef6f434b1a Mon Sep 17 00:00:00 2001
+From: Andrzej Radecki <andrzejr@xfce.org>
+Date: Sun, 10 Nov 2024 16:24:28 +0000
+Subject: [PATCH 4/5] Report UPower Glib support
+
+Upstream-Status: Submitted [Upstream-Status: Backport [https://github.com/xfce-mirror/xfce4-weather-plugin/commit/34ac536970d2e9f3c3f8ffd691d6a8ef6f434b1a]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configure.ac b/configure.ac
+index 15e8b46..da98a5e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -120,3 +120,4 @@ echo
+ echo "Build Configuration:"
+ echo
+ echo "* Debug Support:             $enable_debug"
++echo "* UPower Glib Support:       ${UPOWER_GLIB_FOUND:-no}"

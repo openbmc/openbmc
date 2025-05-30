@@ -1,0 +1,87 @@
+From e517347450636012e5f7a65a504e4ac9e1224c50 Mon Sep 17 00:00:00 2001
+From: Alexander Smorkalov <alexander.smorkalov@opencv.ai>
+Date: Thu, 13 Feb 2025 09:17:08 +0300
+Subject: [PATCH] FROMLIST: Switch to static instance of FastCV on Linux.
+
+Signed-off-by: Alexander Smorkalov <alexander.smorkalov@opencv.ai>
+Upstream-Status: Submitted [https://github.com/opencv/opencv/pull/26917]
+---
+ 3rdparty/fastcv/fastcv.cmake   |  7 ++++---
+ cmake/OpenCVFindLibsPerf.cmake | 21 +++++++++++++++------
+ 2 files changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/3rdparty/fastcv/fastcv.cmake b/3rdparty/fastcv/fastcv.cmake
+index b8172705ca..5c81c11300 100644
+--- a/3rdparty/fastcv/fastcv.cmake
++++ b/3rdparty/fastcv/fastcv.cmake
+@@ -1,7 +1,7 @@
+ function(download_fastcv root_dir)
+ 
+   # Commit SHA in the opencv_3rdparty repo
+-  set(FASTCV_COMMIT "dc5d58018f3af915a8d209386d2c58c0501c0f2c")
++  set(FASTCV_COMMIT "f4413cc2ab7233fdfc383a4cded402c072677fb0")
+ 
+   # Define actual FastCV versions
+   if(ANDROID)
+@@ -16,14 +16,15 @@ function(download_fastcv root_dir)
+     endif()
+   elseif(UNIX AND NOT APPLE AND NOT IOS AND NOT XROS)
+     if(AARCH64)
+-      set(FCV_PACKAGE_NAME  "fastcv_linux_aarch64_2024_12_11.tgz")
+-      set(FCV_PACKAGE_HASH  "7b33ad833e6f15ab6d4ec64fa3c17acd")
++      set(FCV_PACKAGE_NAME  "fastcv_linux_aarch64_2025_02_12.tgz")
++      set(FCV_PACKAGE_HASH  "33ac2a59cf3e7d6402eee2e010de1202")
+     else()
+       message("FastCV: fastcv lib for 32-bit Linux is not supported for now!")
+     endif()
+   endif(ANDROID)
+ 
+   # Download Package
++
+   set(OPENCV_FASTCV_URL "https://raw.githubusercontent.com/opencv/opencv_3rdparty/${FASTCV_COMMIT}/fastcv/")
+ 
+   ocv_download( FILENAME        ${FCV_PACKAGE_NAME}
+diff --git a/cmake/OpenCVFindLibsPerf.cmake b/cmake/OpenCVFindLibsPerf.cmake
+index c2380e6ce5..c5fb628c44 100644
+--- a/cmake/OpenCVFindLibsPerf.cmake
++++ b/cmake/OpenCVFindLibsPerf.cmake
+@@ -181,7 +181,14 @@ endif(WITH_KLEIDICV)
+ if(WITH_FASTCV)
+   if((EXISTS ${FastCV_INCLUDE_PATH}) AND (EXISTS ${FastCV_LIB_PATH}))
+     message(STATUS "Use external FastCV ${FastCV_INCLUDE_PATH}, ${FastCV_LIB_PATH}")
+-    set(HAVE_FASTCV TRUE CACHE BOOL "FastCV status")
++    find_library(FASTCV_LIBRARY NAMES "fastcv"
++                 PATHS "${FastCV_LIB_PATH}" NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
++    mark_as_advanced(FASTCV_LIBRARY)
++    if (FASTCV_LIBRARY)
++      set(HAVE_FASTCV TRUE CACHE BOOL "FastCV status")
++    else()
++      set(HAVE_FASTCV FALSE CACHE BOOL "FastCV status")
++    endif()
+   else()
+     include("${OpenCV_SOURCE_DIR}/3rdparty/fastcv/fastcv.cmake")
+     set(FCV_ROOT_DIR "${OpenCV_BINARY_DIR}/3rdparty/fastcv")
+@@ -190,13 +197,15 @@ if(WITH_FASTCV)
+       set(FastCV_INCLUDE_PATH "${FCV_ROOT_DIR}/inc" CACHE PATH "FastCV includes directory")
+       set(FastCV_LIB_PATH "${FCV_ROOT_DIR}/libs" CACHE PATH "FastCV library directory")
+       ocv_install_3rdparty_licenses(FastCV "${OpenCV_BINARY_DIR}/3rdparty/fastcv/LICENSE")
+-      install(FILES "${FastCV_LIB_PATH}/libfastcvopt.so"
+-              DESTINATION "${OPENCV_LIB_INSTALL_PATH}" COMPONENT "bin")
++      if(ANDROID)
++        set(FASTCV_LIBRARY "${FastCV_LIB_PATH}/libfastcvopt.so" CACHE PATH "FastCV library")
++        install(FILES "${FASTCV_LIBRARY}" DESTINATION "${OPENCV_LIB_INSTALL_PATH}" COMPONENT "bin")
++      else()
++        set(FASTCV_LIBRARY "${FastCV_LIB_PATH}/libfastcv.a" CACHE PATH "FastCV library")
++        install(FILES "${FASTCV_LIBRARY}" DESTINATION "${OPENCV_LIB_INSTALL_PATH}" COMPONENT "dev")
++      endif()
+     else()
+       set(HAVE_FASTCV FALSE CACHE BOOL "FastCV status")
+     endif()
+   endif()
+-  if(HAVE_FASTCV)
+-    set(FASTCV_LIBRARY "${FastCV_LIB_PATH}/libfastcvopt.so" CACHE PATH "FastCV library")
+-  endif()
+ endif(WITH_FASTCV)
+-- 
+2.34.1
+

@@ -1,0 +1,30 @@
+From 32a8a6bff42dfa493ae3c4a722109f2d3a32108e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 11 Apr 2025 19:14:16 -0700
+Subject: [PATCH] pyproject.toml: Use poetry-core
+
+Needed for using latest poetry infrastructure
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 65eaec9..50d26cc 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -58,9 +58,9 @@ documentation = "https://github.com/matthewdeanmartin/colorclass"
+ # per vermin's estimation
+ python = ">=2.6 || >=3.0"
+ 
+-[tool.poetry.dev-dependencies]
++[tool.poetry.group.dev.dependencies]
+ pytest = "==6.0.1"
+ 
+ [build-system]
+-requires = ["poetry>=0.12"]
+-build-backend = "poetry.masonry.api"
++requires = ["poetry-core"]
++build-backend = "poetry.core.masonry.api"

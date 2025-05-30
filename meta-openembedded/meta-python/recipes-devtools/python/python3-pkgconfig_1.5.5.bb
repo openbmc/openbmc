@@ -1,5 +1,5 @@
 SUMMARY = "Python module to interface with the pkg-config command line too"
-HOMEPAGE = "http://github.com/matze/pkgconfig"
+HOMEPAGE = "https://github.com/matze/pkgconfig"
 SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=faa7f82be8f220bff6156be4790344fc"

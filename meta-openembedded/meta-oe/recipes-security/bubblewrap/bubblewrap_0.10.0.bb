@@ -5,7 +5,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 
 DEPENDS = "libcap"
 
-SRC_URI = "https://github.com/containers/${BPN}/releases/download/v${PV}/${BP}.tar.xz"
+SRC_URI = " \
+    https://github.com/containers/${BPN}/releases/download/v${PV}/${BP}.tar.xz \
+    file://0001-Use-stdbool.h-for-booleans.patch \
+"
 SRC_URI[sha256sum] = "65d92cf44a63a51e1b7771f70c05013dce5bd6b0b2841c4b4be54b0c45565471"
 
 inherit autotools bash-completion github-releases manpages pkgconfig

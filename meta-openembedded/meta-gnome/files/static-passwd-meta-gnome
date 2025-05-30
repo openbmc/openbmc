@@ -1,1 +1,3 @@
-gdm:x:680:nogroup::/:/bin/nologin
+gdm:x:680:nogroup::/:/sbin/nologin
+gnome-remote-desktop:x:974:974::/var/lib/gnome-remote-desktop:/sbin/nologin
+

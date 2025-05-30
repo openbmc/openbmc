@@ -6,15 +6,19 @@ Subject: [PATCH 02/11] run_program support timeout
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Rebase for blivet 3.12.1.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- blivet/util.py | 70 +++++++++++++++++++++++++++++---------------------
+ blivet/util.py | 70 ++++++++++++++++++++++++++++++++++------------------------
  1 file changed, 41 insertions(+), 29 deletions(-)
 
 diff --git a/blivet/util.py b/blivet/util.py
-index f8a8f88..a5da7b6 100644
+index d194a5b..5985164 100644
 --- a/blivet/util.py
 +++ b/blivet/util.py
-@@ -171,6 +171,30 @@ class Path(str):
+@@ -169,6 +169,30 @@ class Path(str):
      def __hash__(self):
          return self._path.__hash__()
  
@@ -45,7 +49,7 @@ index f8a8f88..a5da7b6 100644
  
  def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=False, binary_output=False):
      if env_prune is None:
-@@ -193,35 +217,23 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
+@@ -191,35 +215,23 @@ def _run_program(argv, root='/', stdin=None, env_prune=None, stderr_to_stdout=Fa
              stderr_dir = subprocess.STDOUT
          else:
              stderr_dir = subprocess.PIPE
@@ -58,7 +62,7 @@ index f8a8f88..a5da7b6 100644
 -                                    preexec_fn=chroot, cwd=root, env=env)
 -
 -            out, err = proc.communicate()
--            if not binary_output and six.PY3:
+-            if not binary_output:
 -                out = out.decode("utf-8")
 -            if out:
 -                if not stderr_to_stdout:
@@ -85,7 +89,8 @@ index f8a8f88..a5da7b6 100644
 +                                   stderr=stderr_dir,
 +                                   close_fds=True,
 +                                   preexec_fn=chroot, cwd=root, env=env)
-+        if not binary_output and six.PY3:
++
++        if not binary_output:
 +            out = out.decode("utf-8")
 +        if out:
 +            if not stderr_to_stdout:
@@ -94,7 +99,6 @@ index f8a8f88..a5da7b6 100644
 +                program_log.info("%s", line)
 +
 +    return (res, out)
-+
  
  
  def run_program(*args, **kwargs):

@@ -19,6 +19,8 @@ S = "${WORKDIR}/git"
 
 COMPATIBLE_HOST = '(x86_64.*|i.86.*)-linux'
 
-inherit autotools-brokensep
+EXTRA_OEMAKE = "CFLAGS='${CFLAGS}'"
 
-EXTRA_OEMAKE = "destdir=${D} CFLAGS='${CFLAGS}'"
+do_install() {
+    oe_runmake 'destdir=${D}' install
+}

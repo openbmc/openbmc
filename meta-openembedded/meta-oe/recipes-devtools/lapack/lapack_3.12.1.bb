@@ -88,7 +88,8 @@ do_install_ptest () {
     rsync -a ${B}/LAPACKE ${D}${PTEST_PATH} \
           --exclude CMakeFiles \
           --exclude cmake_install.cmake \
-          --exclude Makefile
+          --exclude Makefile \
+          --exclude lapacke.pc
     cp -r ${B}/bin ${D}${PTEST_PATH}
     cp -r ${B}/lapack_testing.py ${D}${PTEST_PATH}
     cp ${B}/CTestTestfile.cmake ${D}${PTEST_PATH}

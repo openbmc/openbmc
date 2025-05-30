@@ -1,0 +1,86 @@
+From aa7186a69f8fb46cdb736e03682deb77f993103b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 5 Apr 2025 18:53:03 -0700
+Subject: [PATCH] Use portable atomics crate
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This extends building thing-provisioning-tools for
+32bit architectures without 64bit atomics support e.g.
+armv5, mips, ppc32 and riscv32. More info on portable-atomics [1]
+
+Fixes
+
+error[E0432]: unresolved import `std::sync::atomic::AtomicU64`
+│  232    --> src/cache/writeback.rs:6:25
+│  234    | use std::sync::atomic::{AtomicU64, Ordering};
+│  235    |                         ^^^^^^^^^
+
+[1] https://crates.io/crates/portable-atomic
+
+Upstream-Status: Submitted [https://github.com/jthornber/thin-provisioning-tools/pull/321]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Cargo.lock             | 5 +++--
+ Cargo.toml             | 1 +
+ src/cache/writeback.rs | 2 +-
+ src/thin/stat.rs       | 2 +-
+ 4 files changed, 6 insertions(+), 4 deletions(-)
+
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -649,9 +649,9 @@ checksum = "d231b230927b5e4ad203db57bbcb
+ 
+ [[package]]
+ name = "portable-atomic"
+-version = "1.7.0"
++version = "1.11.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "da544ee218f0d287a911e9c99a39a8c9bc8fcad3cb8db5959940044ecfc67265"
++checksum = "350e9b48cbc6b0e028b0473b114454c6316e57336ee184ceab6e53f72c178b3e"
+ 
+ [[package]]
+ name = "ppv-lite86"
+@@ -1000,6 +1000,7 @@ dependencies = [
+  "num-derive",
+  "num-traits",
+  "num_cpus",
++ "portable-atomic",
+  "quick-xml",
+  "quickcheck",
+  "quickcheck_macros",
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -30,6 +30,7 @@ nom = "7.1"
+ num_cpus = "1.16"
+ num-derive = "0.4"
+ num-traits = "0.2"
++portable-atomic = "1.11"
+ quick-xml = "0.36"
+ rand = "0.8"
+ rangemap = "1.5"
+--- a/src/cache/writeback.rs
++++ b/src/cache/writeback.rs
+@@ -1,9 +1,9 @@
+ use anyhow::anyhow;
++use portable_atomic::{AtomicU64, Ordering};
+ use roaring::RoaringBitmap;
+ use std::fs::File;
+ use std::io::Cursor;
+ use std::path::Path;
+-use std::sync::atomic::{AtomicU64, Ordering};
+ use std::sync::mpsc::{self, SyncSender};
+ use std::sync::{Arc, Mutex};
+ use std::thread;
+--- a/src/thin/stat.rs
++++ b/src/thin/stat.rs
+@@ -1,7 +1,7 @@
+ use anyhow::{anyhow, Result};
++use portable_atomic::{AtomicU64, Ordering};
+ use std::collections::BTreeMap;
+ use std::path::Path;
+-use std::sync::atomic::{AtomicU64, Ordering};
+ use std::sync::{Arc, Mutex};
+ use std::vec::Vec;
+ 

@@ -1,0 +1,379 @@
+From 422c63a716a55da5c750396c0f215b5be9e060b6 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Steffen=20Kie=C3=9F?=
+ <steffen.kiess@cis.iti.uni-stuttgart.de>
+Date: Tue, 13 Feb 2024 18:39:27 +0100
+Subject: [PATCH 2/2] Avoid strict-prototype compiler errors
+
+Commit 4b9d7f7c107f01a61600fddcd8cde3812d0366a2 added the
+-Werror=strict-prototypes parameter to the build process, but left
+behind 28 function definitions using "()" instead of "(void)".  Most
+of these definitions could not cause compiler errors for various
+reasons (such as an accompanying prototype), but a few could cause
+errors in gcc depending on the build configuration.
+
+For consistency and safety, add "(void)" to all 28 definitions.
+
+[ghudson@mit.edu: rewrote commit message]
+
+Upstream-Status: Backport [https://github.com/krb5/krb5/commit/3ae9244cd021a75eba909d872a92c25db490714d]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/clients/kcpytkt/kcpytkt.c                      | 2 +-
+ src/clients/kdeltkt/kdeltkt.c                      | 2 +-
+ src/clients/kinit/kinit.c                          | 4 ++--
+ src/clients/kinit/kinit_kdb.c                      | 2 +-
+ src/clients/klist/klist.c                          | 4 ++--
+ src/kadmin/cli/kadmin.c                            | 2 +-
+ src/kadmin/dbutil/kdb5_util.c                      | 4 ++--
+ src/kdc/main.c                                     | 2 +-
+ src/kprop/kpropd.c                                 | 4 ++--
+ src/lib/crypto/builtin/enc_provider/aes.c          | 2 +-
+ src/lib/crypto/openssl/hmac.c                      | 2 +-
+ src/lib/krb5/ccache/t_memory.c                     | 4 ++--
+ src/lib/krb5/ccache/t_stdio.c                      | 4 ++--
+ src/plugins/kdb/db2/libdb2/btree/bt_debug.c        | 2 +-
+ src/plugins/kdb/db2/libdb2/btree/bt_open.c         | 4 ++--
+ src/plugins/kdb/db2/libdb2/hash/dbm.c              | 2 +-
+ src/plugins/kdb/db2/libdb2/test/btree.tests/main.c | 2 +-
+ src/plugins/kdb/db2/libdb2/test/dbtest.c           | 2 +-
+ src/plugins/preauth/pkinit/pkinit_crypto_openssl.c | 2 +-
+ src/plugins/tls/k5tls/openssl.c                    | 2 +-
+ src/tests/asn.1/make-vectors.c                     | 2 +-
+ 21 files changed, 28 insertions(+), 28 deletions(-)
+
+diff --git a/src/clients/kcpytkt/kcpytkt.c b/src/clients/kcpytkt/kcpytkt.c
+index 0b88022..f1d50e5 100644
+--- a/src/clients/kcpytkt/kcpytkt.c
++++ b/src/clients/kcpytkt/kcpytkt.c
+@@ -10,7 +10,7 @@ static char *prog;
+ static int quiet = 0;
+ 
+ static void
+-xusage()
++xusage(void)
+ {
+     fprintf(stderr, "xusage: %s [-c from_ccache] [-e etype] [-f flags] "
+             "dest_ccache service1 service2 ...\n", prog);
+diff --git a/src/clients/kdeltkt/kdeltkt.c b/src/clients/kdeltkt/kdeltkt.c
+index cd0bf63..66a32a8 100644
+--- a/src/clients/kdeltkt/kdeltkt.c
++++ b/src/clients/kdeltkt/kdeltkt.c
+@@ -10,7 +10,7 @@ static char *prog;
+ static int quiet = 0;
+ 
+ static void
+-xusage()
++xusage(void)
+ {
+     fprintf(stderr, "xusage: %s [-c ccache] [-e etype] [-f flags] service1 "
+             "service2 ...\n", prog);
+diff --git a/src/clients/kinit/kinit.c b/src/clients/kinit/kinit.c
+index 7a33ffa..b27b723 100644
+--- a/src/clients/kinit/kinit.c
++++ b/src/clients/kinit/kinit.c
+@@ -55,7 +55,7 @@ get_name_from_os(void)
+ #else /* HAVE_PWD_H */
+ #ifdef _WIN32
+ static char *
+-get_name_from_os()
++get_name_from_os(void)
+ {
+     static char name[1024];
+     DWORD name_size = sizeof(name);
+@@ -69,7 +69,7 @@ get_name_from_os()
+ }
+ #else /* _WIN32 */
+ static char *
+-get_name_from_os()
++get_name_from_os(void)
+ {
+     return NULL;
+ }
+diff --git a/src/clients/kinit/kinit_kdb.c b/src/clients/kinit/kinit_kdb.c
+index fbd174b..4e7cd50 100644
+--- a/src/clients/kinit/kinit_kdb.c
++++ b/src/clients/kinit/kinit_kdb.c
+@@ -69,7 +69,7 @@ kinit_kdb_init(krb5_context *pcontext, char *realm)
+ }
+ 
+ void
+-kinit_kdb_fini()
++kinit_kdb_fini(void)
+ {
+     kadm5_destroy(server_handle);
+ }
+diff --git a/src/clients/klist/klist.c b/src/clients/klist/klist.c
+index c797b16..27cf0ee 100644
+--- a/src/clients/klist/klist.c
++++ b/src/clients/klist/klist.c
+@@ -359,7 +359,7 @@ do_keytab(const char *name)
+ }
+ 
+ static void
+-list_all_ccaches()
++list_all_ccaches(void)
+ {
+     krb5_error_code ret;
+     krb5_ccache cache;
+@@ -451,7 +451,7 @@ show_all_ccaches(void)
+ }
+ 
+ static void
+-do_ccache()
++do_ccache(void)
+ {
+     krb5_error_code ret;
+     krb5_ccache cache;
+diff --git a/src/kadmin/cli/kadmin.c b/src/kadmin/cli/kadmin.c
+index 23b64b0..c1256f7 100644
+--- a/src/kadmin/cli/kadmin.c
++++ b/src/kadmin/cli/kadmin.c
+@@ -607,7 +607,7 @@ kadmin_startup(int argc, char *argv[], char **request_out, char ***args_out)
+ }
+ 
+ int
+-quit()
++quit(void)
+ {
+     kadm5_ret_t retval;
+ 
+diff --git a/src/kadmin/dbutil/kdb5_util.c b/src/kadmin/dbutil/kdb5_util.c
+index 3a07fd5..187428e 100644
+--- a/src/kadmin/dbutil/kdb5_util.c
++++ b/src/kadmin/dbutil/kdb5_util.c
+@@ -367,7 +367,7 @@ main(int argc, char *argv[])
+  * program is run).
+  */
+ static int
+-open_db_and_mkey()
++open_db_and_mkey(void)
+ {
+     krb5_error_code retval;
+     krb5_data scratch, pwd, seed;
+@@ -489,7 +489,7 @@ open_db_and_mkey()
+ #endif
+ 
+ int
+-quit()
++quit(void)
+ {
+     krb5_error_code retval;
+     static krb5_boolean finished = 0;
+diff --git a/src/kdc/main.c b/src/kdc/main.c
+index bfdfef5..ad1d1bf 100644
+--- a/src/kdc/main.c
++++ b/src/kdc/main.c
+@@ -854,7 +854,7 @@ write_pid_file(const char *path)
+ }
+ 
+ static void
+-finish_realms()
++finish_realms(void)
+ {
+     int i;
+ 
+diff --git a/src/kprop/kpropd.c b/src/kprop/kpropd.c
+index 1b530fc..b11f3a9 100644
+--- a/src/kprop/kpropd.c
++++ b/src/kprop/kpropd.c
+@@ -376,7 +376,7 @@ get_wildcard_addr(struct addrinfo **res)
+ }
+ 
+ static void
+-do_standalone()
++do_standalone(void)
+ {
+     struct sockaddr_in frominet;
+     struct addrinfo *res;
+@@ -630,7 +630,7 @@ full_resync(CLIENT *clnt)
+  * Returns non-zero on failure due to errors.
+  */
+ krb5_error_code
+-do_iprop()
++do_iprop(void)
+ {
+     kadm5_ret_t retval;
+     krb5_principal iprop_svc_principal = NULL;
+diff --git a/src/lib/crypto/builtin/enc_provider/aes.c b/src/lib/crypto/builtin/enc_provider/aes.c
+index 7fa9449..39e2a84 100644
+--- a/src/lib/crypto/builtin/enc_provider/aes.c
++++ b/src/lib/crypto/builtin/enc_provider/aes.c
+@@ -69,7 +69,7 @@ void k5_iEnc256_CBC(struct aes_data *data);
+ void k5_iDec256_CBC(struct aes_data *data);
+ 
+ static krb5_boolean
+-aesni_supported_by_cpu()
++aesni_supported_by_cpu(void)
+ {
+     unsigned int a, b, c, d;
+ 
+diff --git a/src/lib/crypto/openssl/hmac.c b/src/lib/crypto/openssl/hmac.c
+index bf12b8d..799d700 100644
+--- a/src/lib/crypto/openssl/hmac.c
++++ b/src/lib/crypto/openssl/hmac.c
+@@ -70,7 +70,7 @@
+ 
+ #define HMAC_CTX_new compat_hmac_ctx_new
+ static HMAC_CTX *
+-compat_hmac_ctx_new()
++compat_hmac_ctx_new(void)
+ {
+     HMAC_CTX *ctx;
+ 
+diff --git a/src/lib/krb5/ccache/t_memory.c b/src/lib/krb5/ccache/t_memory.c
+index 6d103a0..0f94e82 100644
+--- a/src/lib/krb5/ccache/t_memory.c
++++ b/src/lib/krb5/ccache/t_memory.c
+@@ -85,7 +85,7 @@ krb5_creds test_creds = {
+ };
+ 
+ void
+-init_test_cred()
++init_test_cred(void)
+ {
+     test_creds.client = (krb5_principal) malloc(sizeof(krb5_data *)*3);
+     test_creds.client[0] = &client1;
+@@ -104,7 +104,7 @@ init_test_cred()
+     };
+ 
+ void
+-mcc_test()
++mcc_test(void)
+ {
+     krb5_ccache id;
+     krb5_creds creds;
+diff --git a/src/lib/krb5/ccache/t_stdio.c b/src/lib/krb5/ccache/t_stdio.c
+index 15185e3..06a9c2d 100644
+--- a/src/lib/krb5/ccache/t_stdio.c
++++ b/src/lib/krb5/ccache/t_stdio.c
+@@ -98,7 +98,7 @@ krb5_creds test_creds = {
+ };
+ 
+ void
+-init_test_cred()
++init_test_cred(void)
+ {
+     test_creds.client = (krb5_principal) malloc(sizeof(krb5_data *)*3);
+     test_creds.client[0] = &client1;
+@@ -118,7 +118,7 @@ init_test_cred()
+ 
+ int flags = 0;
+ void
+-scc_test()
++scc_test(void)
+ {
+     krb5_ccache id;
+     krb5_creds creds;
+diff --git a/src/plugins/kdb/db2/libdb2/btree/bt_debug.c b/src/plugins/kdb/db2/libdb2/btree/bt_debug.c
+index bc71076..5a955e0 100644
+--- a/src/plugins/kdb/db2/libdb2/btree/bt_debug.c
++++ b/src/plugins/kdb/db2/libdb2/btree/bt_debug.c
+@@ -56,7 +56,7 @@ static FILE *tracefp;
+  *	initialize debugging.
+  */
+ static void
+-__bt_dinit()
++__bt_dinit(void)
+ {
+ 	static int first = 1;
+ 
+diff --git a/src/plugins/kdb/db2/libdb2/btree/bt_open.c b/src/plugins/kdb/db2/libdb2/btree/bt_open.c
+index 0bb19d7..56bab19 100644
+--- a/src/plugins/kdb/db2/libdb2/btree/bt_open.c
++++ b/src/plugins/kdb/db2/libdb2/btree/bt_open.c
+@@ -390,7 +390,7 @@ nroot(BTREE *t)
+ }
+ 
+ static int
+-tmp()
++tmp(void)
+ {
+ #ifdef SIG_BLOCK
+ 	sigset_t set, oset;
+@@ -437,7 +437,7 @@ tmp()
+ }
+ 
+ static int
+-byteorder()
++byteorder(void)
+ {
+ 	u_int32_t x;
+ 	u_char *p;
+diff --git a/src/plugins/kdb/db2/libdb2/hash/dbm.c b/src/plugins/kdb/db2/libdb2/hash/dbm.c
+index 8e23d4c..6e5e96b 100644
+--- a/src/plugins/kdb/db2/libdb2/hash/dbm.c
++++ b/src/plugins/kdb/db2/libdb2/hash/dbm.c
+@@ -143,7 +143,7 @@ kdb2_store(datum key, datum dat)
+ }
+ 
+ static void
+-no_open_db()
++no_open_db(void)
+ {
+ 	(void)fprintf(stderr, "dbm: no open database.\n");
+ }
+diff --git a/src/plugins/kdb/db2/libdb2/test/btree.tests/main.c b/src/plugins/kdb/db2/libdb2/test/btree.tests/main.c
+index 088f903..eec843d 100644
+--- a/src/plugins/kdb/db2/libdb2/test/btree.tests/main.c
++++ b/src/plugins/kdb/db2/libdb2/test/btree.tests/main.c
+@@ -908,7 +908,7 @@ keydata(key, data)
+ }
+ 
+ void
+-usage()
++usage(void)
+ {
+ 	(void)fprintf(stderr,
+ 	    "usage: %s [-bdluw] [-c cache] [-i file] [-p page] [file]\n",
+diff --git a/src/plugins/kdb/db2/libdb2/test/dbtest.c b/src/plugins/kdb/db2/libdb2/test/dbtest.c
+index 04bf34b..a2866b4 100644
+--- a/src/plugins/kdb/db2/libdb2/test/dbtest.c
++++ b/src/plugins/kdb/db2/libdb2/test/dbtest.c
+@@ -792,7 +792,7 @@ xmalloc(char *text, size_t len)
+ }
+ 
+ void
+-usage()
++usage(void)
+ {
+ 	(void)fprintf(stderr,
+ 	    "usage: dbtest [-l] [-f file] [-i info] [-o file] type script\n");
+diff --git a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
+index 4c81256..4a8b6d9 100644
+--- a/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
++++ b/src/plugins/preauth/pkinit/pkinit_crypto_openssl.c
+@@ -3075,7 +3075,7 @@ cleanup:
+ }
+ 
+ int
+-pkinit_openssl_init()
++pkinit_openssl_init(void)
+ {
+     /* Initialize OpenSSL. */
+     ERR_load_crypto_strings();
+diff --git a/src/plugins/tls/k5tls/openssl.c b/src/plugins/tls/k5tls/openssl.c
+index 99fda7f..aab67c0 100644
+--- a/src/plugins/tls/k5tls/openssl.c
++++ b/src/plugins/tls/k5tls/openssl.c
+@@ -49,7 +49,7 @@ static int ex_handle_id = -1;
+ MAKE_INIT_FUNCTION(init_openssl);
+ 
+ int
+-init_openssl()
++init_openssl(void)
+ {
+     SSL_library_init();
+     SSL_load_error_strings();
+diff --git a/src/tests/asn.1/make-vectors.c b/src/tests/asn.1/make-vectors.c
+index 2fc8546..6f2b7dd 100644
+--- a/src/tests/asn.1/make-vectors.c
++++ b/src/tests/asn.1/make-vectors.c
+@@ -224,7 +224,7 @@ printbuf(void)
+ }
+ 
+ int
+-main()
++main(void)
+ {
+     /* Initialize values which can't use static initializers. */
+     asn_long2INTEGER(&otp_format, 2);  /* Alphanumeric */

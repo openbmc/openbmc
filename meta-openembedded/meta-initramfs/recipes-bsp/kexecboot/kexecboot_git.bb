@@ -5,7 +5,10 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 PV = "0.6+git"
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/kexecboot/kexecboot.git;branch=master;protocol=https"
+SRC_URI = " \
+    git://github.com/kexecboot/kexecboot.git;branch=master;protocol=https \
+    file://0001-Fix-argument-errors-in-gcc-15.patch \
+"
 SRC_URI:append:libc-klibc = "\
     file://0001-kexecboot-Use-new-reboot-API-with-klibc.patch \
     file://0001-make-Add-compiler-includes-in-cflags.patch \

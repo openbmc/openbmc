@@ -4,6 +4,8 @@ LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7a5d174db44ec45f9638b2c747806821"
 DEPENDS = "dbus ncurses python3 pps-tools"
 PROVIDES = "virtual/gpsd"
+BUGTRACKER = "https://gitlab.com/gpsd/gpsd/-/issues"
+HOMEPAGE = "https://gpsd.io/"
 
 SRC_URI = "${SAVANNAH_GNU_MIRROR}/${BPN}/${BP}.tar.gz \
            file://gpsd.init \

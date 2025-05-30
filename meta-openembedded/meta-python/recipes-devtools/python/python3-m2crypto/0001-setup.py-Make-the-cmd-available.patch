@@ -1,0 +1,37 @@
+From eaeb95ec64762a58dde7cf368fc17188382e7df6 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Fri, 28 Mar 2025 12:13:26 +0800
+Subject: [PATCH] setup.py: Make the cmd available
+
+The cmd will be None in OE environment as below.
+ >>> import os
+ >>> os.environ.get('CC', 'gcc')
+'x86_64-wrs-linux-gcc  -m64 -march=nehalem -mtune=generic -mfpmath=sse -msse4.2 -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/buildarea/tmp/work/corei7-64-wrs-linux/python3-m2crypto/0.44.0/recipe-sysroot'
+ >>> import shutil
+ >>> shutil.which(os.environ.get('CC', 'gcc'))
+ >>> cmd = [shutil.which(os.environ.get('CC', 'gcc'))]
+ >>> print(cmd)
+[None]
+
+So change the check logic to get the expected cmd.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 9938e67..21e2346 100644
+--- a/setup.py
++++ b/setup.py
+@@ -230,7 +230,7 @@ class _M2CryptoBuildExt(build_ext.build_ext):
+             with open(
+                 "src/SWIG/x509_v_flag.h", "w", encoding="utf-8"
+             ) as x509_v_h:
+-                cmd = [shutil.which(os.environ.get('CC', 'gcc'))]
++                cmd = os.environ.get('CC', 'gcc').split()
+                 cflags = os.environ.get("CFLAGS")
+                 if cflags is not None:
+                     cmd += cflags.split()

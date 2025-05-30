@@ -43,7 +43,7 @@ python () {
         d.setVar('DISABLE_STATIC', '')
 }
 
-export SGML_CATALOG_FILES="file://${STAGING_ETCDIR_NATIVE}/xml/catalog"
+export SGML_CATALOG_FILES = "file://${STAGING_ETCDIR_NATIVE}/xml/catalog"
 
 do_compile:prepend() {
     oe_runmake update-map-file

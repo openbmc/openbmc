@@ -11,14 +11,14 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 S = "${RPITOOLS_S}/armstubs"
 
-export CC7="${CC}"
-export LD7="${LD}"
-export OBJCOPY7="${OBJCOPY}"
-export OBJDUMP7="${OBJDUMP}"
-export CC8="${CC}"
-export LD8="${LD}"
-export OBJCOPY8="${OBJCOPY}"
-export OBJDUMP8="${OBJDUMP} -maarch64"
+export CC7 = "${CC}"
+export LD7 = "${LD}"
+export OBJCOPY7 = "${OBJCOPY}"
+export OBJDUMP7 = "${OBJDUMP}"
+export CC8 = "${CC}"
+export LD8 = "${LD}"
+export OBJCOPY8 = "${OBJCOPY}"
+export OBJDUMP8 = "${OBJDUMP} -maarch64"
 
 do_compile() {
     [ -z "${ARMSTUB}" ] && bbfatal "No ARMSTUB defined for your machine."

@@ -9,7 +9,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c40a383cb3f747e0c7abbf1482f194f0 \
 DEPENDS = "thrift-native boost flex-native bison-native openssl zlib"
 
 SRC_URI = "https://downloads.apache.org/${BPN}/${PV}/${BP}.tar.gz \
-           file://0001-DefineInstallationPaths.cmake-Define-libdir-in-terms.patch"
+           file://0001-DefineInstallationPaths.cmake-Define-libdir-in-terms.patch \
+           file://0002-THRIFT-5842-Add-missing-cstdint-include-for-int64_t.patch \
+           "
 SRC_URI[sha256sum] = "9a24f3eba9a4ca493602226c16d8c228037db3b9291c6fc4019bfe3bd39fc67c"
 
 BBCLASSEXTEND = "native nativesdk"

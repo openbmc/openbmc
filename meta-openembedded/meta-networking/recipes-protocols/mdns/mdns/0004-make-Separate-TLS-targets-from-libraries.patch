@@ -1,4 +1,4 @@
-From f871ac42165c29f763785aa0199dfc76f1731f4d Mon Sep 17 00:00:00 2001
+From f7ee12c1f8e85b9d2fe4023b6539c8051dc710c3 Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 15:14:26 +0000
 Subject: [PATCH] make: Separate TLS targets from libraries
@@ -13,7 +13,7 @@ Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
  1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/mDNSPosix/Makefile b/mDNSPosix/Makefile
-index c877c8bb19e6..3a5897c4dbee 100755
+index 7c510317f1b6..8dd5984020ee 100755
 --- a/mDNSPosix/Makefile
 +++ b/mDNSPosix/Makefile
 @@ -112,9 +112,11 @@ ifeq ($(findstring linux,$(os)),linux)

@@ -1,0 +1,90 @@
+From d18d3fb700540646f4b79f6c6788614ffff735f6 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 24 Apr 2025 16:17:49 +0900
+Subject: [PATCH] Fix argument errors in gcc 15
+
+* fix following errors:
+../../git/src/fb.c: In function 'fb_new':
+../../git/src/fb.c:646:17: error: too many arguments to function 'fb_destroy'; expected 0, have 1
+  646 |                 fb_destroy(fb);
+      |                 ^~~~~~~~~~ ~~
+../../git/src/fb.c:391:6: note: declared here
+  391 | void fb_destroy()
+      |      ^~~~~~~~~~
+../../git/src/tui.c:102:9: error: conflicting types for 'tui_init'; have 'kx_tui *(FILE *)'
+  102 | kx_tui *tui_init(FILE *ts)
+      |         ^~~~~~~~
+In file included from ../../git/src/tui.c:40:
+../../git/src/tui.h:36:9: note: previous declaration of 'tui_init' with type 'kx_tui *(void)'
+   36 | kx_tui *tui_init();
+...
+Upstream-Status: Submitted [https://github.com/kexecboot/kexecboot/pull/30]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/fb.c  | 4 ++--
+ src/fb.h  | 2 +-
+ src/gui.c | 2 +-
+ src/tui.h | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/fb.c b/src/fb.c
+index c68009f..6acd9f2 100644
+--- a/src/fb.c
++++ b/src/fb.c
+@@ -388,7 +388,7 @@ void fb_restore(char *dump)
+ }
+ 
+ 
+-void fb_destroy()
++void fb_destroy(FB fb)
+ {
+ 	if (fb.fd >= 0)
+ 		close(fb.fd);
+@@ -651,7 +651,7 @@ int fb_new(int angle)
+ 	return 0;
+ 
+ fail:
+-	fb_destroy();
++	fb_destroy(fb);
+ 	return -1;
+ }
+ 
+diff --git a/src/fb.h b/src/fb.h
+index 4a1e0d7..9e0af18 100644
+--- a/src/fb.h
++++ b/src/fb.h
+@@ -88,7 +88,7 @@ typedef struct {
+ } kx_picture;
+ 
+ 
+-void fb_destroy();
++void fb_destroy(FB fb);
+ 
+ int fb_new(int angle);
+ 
+diff --git a/src/gui.c b/src/gui.c
+index bf4230a..a140c9b 100644
+--- a/src/gui.c
++++ b/src/gui.c
+@@ -157,7 +157,7 @@ void gui_destroy(struct gui_t *gui)
+ 	free(gui->icons);
+ #endif
+ 
+-	fb_destroy();
++	fb_destroy(fb);
+ 	free(gui);
+ }
+ 
+diff --git a/src/tui.h b/src/tui.h
+index feed233..79faac0 100644
+--- a/src/tui.h
++++ b/src/tui.h
+@@ -33,7 +33,7 @@ typedef struct {
+ } kx_tui;
+ 
+ 
+-kx_tui *tui_init();
++kx_tui *tui_init(FILE *ts);
+ 
+ void tui_show_menu(kx_tui *tui, kx_menu *menu);
+ 

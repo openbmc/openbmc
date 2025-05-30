@@ -24,6 +24,7 @@ SRC_URI = "${SAMBA_MIRROR}/stable/samba-${PV}.tar.gz \
            file://0005-Fix-pyext_PATTERN-for-cross-compilation.patch \
            file://0006-smbtorture-skip-test-case-tfork_cmd_send.patch \
            file://0007-Deleted-settiong-of-python-to-fix-the-install-confli.patch \
+           file://9aa5c43315d83c19514251a11c4fba5a137f2821.patch \
            "
 
 SRC_URI:append:libc-musl = " \
@@ -125,7 +126,7 @@ EXTRA_OECONF += "--enable-fhs \
                  --pythondir=${PYTHON_SITEPACKAGES_DIR} \
                 "
 
-LDFLAGS += "-Wl,-z,relro,-z,now ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-gold', ' -fuse-ld=bfd ', '', d)}"
+LDFLAGS += "-Wl,-z,relro,-z,now"
 
 do_configure:append() {
     cd ${S}/pidl/

@@ -10,4 +10,4 @@ require ts-sp-common.inc
 SP_UUID = "${BLOCK_STORAGE_UUID}"
 TS_SP_BLOCK_STORAGE_CONFIG ?= "default"
 
-OECMAKE_SOURCEPATH="${S}/deployments/block-storage/config/${TS_SP_BLOCK_STORAGE_CONFIG}-${TS_ENV}"
+OECMAKE_SOURCEPATH = "${S}/deployments/block-storage/config/${TS_SP_BLOCK_STORAGE_CONFIG}-${TS_ENV}"

@@ -1,0 +1,30 @@
+From d8ba62262265fac19804cf52f99488ed226c9c51 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Fri, 21 Mar 2025 11:06:14 +0100
+Subject: [PATCH] task_queue: fix build with gcc-15
+
+* fixes:
+  http://errors.yoctoproject.org/Errors/Details/848476/
+  ../webrtc-audio-processing-1.3/webrtc/api/task_queue/task_queue_base.h:53:32: error: 'uint32_t' has not been declared
+   53 |                                uint32_t milliseconds) = 0;
+      |                                ^~~~~~~~
+
+Upstream-Status: Pending [uint32_t is no longer used here after "Bump to WebRTC M120 release" https://gitlab.freedesktop.org/pulseaudio/webrtc-audio-processing/-/commit/c6abf6cd3fbd688b111b339775cbd2d66d509ddc?page=2#66fd3af91f4a7b8a1dafa8180959efa4e32ac2f0]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ webrtc/api/task_queue/task_queue_base.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/webrtc/api/task_queue/task_queue_base.h b/webrtc/api/task_queue/task_queue_base.h
+index 90b1efd..63526a7 100644
+--- a/webrtc/api/task_queue/task_queue_base.h
++++ b/webrtc/api/task_queue/task_queue_base.h
+@@ -10,6 +10,7 @@
+ #ifndef API_TASK_QUEUE_TASK_QUEUE_BASE_H_
+ #define API_TASK_QUEUE_TASK_QUEUE_BASE_H_
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "api/task_queue/queued_task.h"

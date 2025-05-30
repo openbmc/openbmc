@@ -1,0 +1,28 @@
+From 76c443dfd209ddbed3ed4102596a568670d4c59f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 1 May 2025 20:16:11 -0700
+Subject: [PATCH] fix bool reserved word error in gcc 15
+
+gcc-15 switched to -std=c23 by default. https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
+
+Upstream-Status: Submitted [https://www.virtualbox.org/pipermail/vbox-dev/2025-May/010316.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ vboxsf/include/iprt/types.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/vboxsf/include/iprt/types.h b/vboxsf/include/iprt/types.h
+index 3bcc4146..33b46ef6 100644
+--- a/vboxsf/include/iprt/types.h
++++ b/vboxsf/include/iprt/types.h
+@@ -282,7 +282,9 @@ typedef _Bool bool;
+ #   endif
+ #  else
+ #   undef bool /* see above netbsd explanation */
+-typedef _Bool bool;
++#   if defined __STDC__ && defined __STDC_VERSION__ && __STDC_VERSION__ <= 201710L
++     typedef _Bool bool;
++#   endif
+ #  endif
+ # else
+ #  if RT_MSC_PREREQ(RT_MSC_VER_VC120)

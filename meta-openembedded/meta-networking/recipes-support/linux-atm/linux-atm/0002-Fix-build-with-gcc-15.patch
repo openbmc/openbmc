@@ -1,0 +1,91 @@
+From 2a9d42b2b190d533cf126a93bcad842cea825bbe Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Sat, 26 Apr 2025 13:04:56 +0200
+Subject: [PATCH] Fix build with gcc-15
+
+* taken from:
+  https://github.com/sbwml/package_network_utils_linux-atm/blob/1d1c3f884daf9ee4bce077f3db9d990617683669/patches/901-linux-atm-dont-use-bool-keyword.patch
+
+* fixes:
+  http://errors.yoctoproject.org/Errors/Details/852979/
+
+In file included from load_lex.l:11:
+../../../linux-atm-2.5.2/src/lane/load_lex.h:27:10: error: two or more data types in declaration specifiers
+   27 |   Bool_t bool;
+      |          ^~~~
+../../../linux-atm-2.5.2/src/lane/load_lex.h:27:14: warning: declaration does not declare anything
+   27 |   Bool_t bool;
+      |              ^
+In file included from ../../../linux-atm-2.5.2/src/lane/load.c:29:
+../../../linux-atm-2.5.2/src/lane/load_lex.h:27:10: error: two or more data types in declaration specifiers
+   27 |   Bool_t bool;
+      |          ^~~~
+../../../linux-atm-2.5.2/src/lane/load_lex.h:27:14: warning: declaration does not declare anything
+   27 |   Bool_t bool;
+      |              ^
+load_lex.l: In function 'yylex':
+load_lex.l:47:11: error: expected identifier before 'bool'
+load_lex.l:51:11: error: expected identifier before 'bool'
+../../../linux-atm-2.5.2/src/lane/load.c: In function 'load_vars':
+../../../linux-atm-2.5.2/src/lane/load.c:501:29: error: expected identifier before 'bool'
+  501 |                    g_return.bool==BL_TRUE?"True":"False");
+      |                             ^~~~
+../../../linux-atm-2.5.2/src/lane/load.c:502:51: error: expected identifier before 'bool'
+  502 |         set_var_bool(curr_unit, varname, g_return.bool);
+      |                                                   ^~~~
+make[3]: *** [Makefile:513: load.o] Error 1
+
+Upstream-Status: Inappropriate [Upstream is dead]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ src/lane/load.c     | 4 ++--
+ src/lane/load_lex.h | 2 +-
+ src/lane/load_lex.l | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/lane/load.c b/src/lane/load.c
+index 39d4672..1cc2202 100644
+--- a/src/lane/load.c
++++ b/src/lane/load.c
+@@ -498,8 +498,8 @@ load_vars(const char *file)
+ 	break;
+       case BOOLEAN:
+ 	Debug_unit(&load_unit, "Variable is boolean: %s", 
+-		   g_return.bool==BL_TRUE?"True":"False");
+-	set_var_bool(curr_unit, varname, g_return.bool);
++		   g_return.b==BL_TRUE?"True":"False");
++	set_var_bool(curr_unit, varname, g_return.b);
+ 	break;
+       case INTEGER:
+ 	Debug_unit(&load_unit, "Variable is integer: %d", g_return.intti);
+diff --git a/src/lane/load_lex.h b/src/lane/load_lex.h
+index 2384e70..72b8f9b 100644
+--- a/src/lane/load_lex.h
++++ b/src/lane/load_lex.h
+@@ -24,7 +24,7 @@
+ #define END 0
+ 
+ typedef struct {
+-  Bool_t bool;
++  Bool_t b;
+   int intti;
+   AtmAddr_t *atmaddress;
+   LaneDestination_t *destaddr;
+diff --git a/src/lane/load_lex.l b/src/lane/load_lex.l
+index c184795..1d412e3 100644
+--- a/src/lane/load_lex.l
++++ b/src/lane/load_lex.l
+@@ -44,11 +44,11 @@ H [0-9a-fA-F]
+ 		 return ATMADDRESS;
+ 	        }
+ True	|
+-true		{g_return.bool = BL_TRUE;
++true		{g_return.b = BL_TRUE;
+ 		 return BOOLEAN;
+ 		}	
+ False	|
+-false		{g_return.bool = BL_FALSE;
++false		{g_return.b = BL_FALSE;
+ 		 return BOOLEAN;
+ 		}
+ \#.*		{}

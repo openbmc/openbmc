@@ -4,7 +4,10 @@ DEPENDS = "libusb1"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=44fee82a1d2ed0676cf35478283e0aa0"
 
-SRC_URI = "git://github.com/bcl/digitemp;branch=master;protocol=https"
+SRC_URI = " \
+    git://github.com/bcl/digitemp;branch=master;protocol=https \
+    file://0001-Fix-conflicting-prototype.patch \
+"
 
 SRCREV = "a162e63aad35358aab325388f3d5e88121606419"
 

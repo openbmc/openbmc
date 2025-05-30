@@ -1,0 +1,540 @@
+From 87753249fb9ac26acd1eb0135fefded871c24e6c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 18 Apr 2025 17:54:42 -0700
+Subject: [PATCH] Upgrade radium to 1.0
+
+Upstream-Status: Submitted [https://github.com/ferrilab/bitvec/pull/220]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Cargo.toml          |   2 +-
+ src/macros/tests.rs | 256 ++++++++++++++++++++++----------------------
+ src/mem.rs          |  28 ++---
+ src/serdes.rs       |  58 +++++-----
+ src/store.rs        |  61 +++++------
+ 5 files changed, 207 insertions(+), 198 deletions(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -55,7 +55,7 @@ version = "^2.0"
+ default-features = false
+ 
+ [dependencies.radium]
+-version = "0.7"
++version = "1"
+ 
+ [dependencies.serde]
+ version = "1"
+--- a/src/macros/tests.rs
++++ b/src/macros/tests.rs
+@@ -231,50 +231,52 @@ fn compile_bits() {
+ 		let _: &BitSlice<u64, Msb0> = bits![u64, crate::order::Msb0; 1; 100];
+ 	}
+ 
+-	radium::if_atomic! {
+-		if atomic(8) {
+-			let _: &BitSlice<AtomicU8, LocalBits> = bits![AtomicU8, LocalBits; 0, 1];
+-			let _: &BitSlice<AtomicU8, Lsb0> = bits![AtomicU8, Lsb0; 0, 1];
+-			let _: &BitSlice<AtomicU8, Msb0> = bits![AtomicU8, Msb0; 0, 1];
+-			let _: &BitSlice<RadiumU8, LocalBits> = bits![RadiumU8, LocalBits; 1; 100];
+-			let _: &BitSlice<RadiumU8, Lsb0> = bits![RadiumU8, Lsb0; 1; 100];
+-			let _: &BitSlice<RadiumU8, Msb0> = bits![RadiumU8, Msb0; 1; 100];
+-		}
+-		if atomic(16) {
+-			let _: &BitSlice<AtomicU16, LocalBits> = bits![AtomicU16, LocalBits; 0, 1];
+-			let _: &BitSlice<AtomicU16, Lsb0> = bits![AtomicU16, Lsb0; 0, 1];
+-			let _: &BitSlice<AtomicU16, Msb0> = bits![AtomicU16, Msb0; 0, 1];
+-			let _: &BitSlice<RadiumU16, LocalBits> = bits![RadiumU16, LocalBits; 1; 100];
+-			let _: &BitSlice<RadiumU16, Lsb0> = bits![RadiumU16, Lsb0; 1; 100];
+-			let _: &BitSlice<RadiumU16, Msb0> = bits![RadiumU16, Msb0; 1; 100];
+-		}
+-		if atomic(32) {
+-			let _: &BitSlice<AtomicU32, LocalBits> = bits![AtomicU32, LocalBits; 0, 1];
+-			let _: &BitSlice<AtomicU32, Lsb0> = bits![AtomicU32, Lsb0; 0, 1];
+-			let _: &BitSlice<AtomicU32, Msb0> = bits![AtomicU32, Msb0; 0, 1];
+-			let _: &BitSlice<RadiumU32, LocalBits> = bits![RadiumU32, LocalBits; 1; 100];
+-			let _: &BitSlice<RadiumU32, Lsb0> = bits![RadiumU32, Lsb0; 1; 100];
+-			let _: &BitSlice<RadiumU32, Msb0> = bits![RadiumU32, Msb0; 1; 100];
+-		}
+-		if atomic(size) {
+-			let _: &BitSlice<AtomicUsize, LocalBits> = bits![AtomicUsize, LocalBits; 0, 1];
+-			let _: &BitSlice<AtomicUsize, Lsb0> = bits![AtomicUsize, Lsb0; 0, 1];
+-			let _: &BitSlice<AtomicUsize, Msb0> = bits![AtomicUsize, Msb0; 0, 1];
+-			let _: &BitSlice<RadiumUsize, LocalBits> = bits![RadiumUsize, LocalBits; 1; 100];
+-			let _: &BitSlice<RadiumUsize, Lsb0> = bits![RadiumUsize, Lsb0; 1; 100];
+-			let _: &BitSlice<RadiumUsize, Msb0> = bits![RadiumUsize, Msb0; 1; 100];
+-		}
++	#[cfg(target_has_atomic = "8")]
++	{
++		let _: &BitSlice<AtomicU8, LocalBits> = bits![AtomicU8, LocalBits; 0, 1];
++		let _: &BitSlice<AtomicU8, Lsb0> = bits![AtomicU8, Lsb0; 0, 1];
++		let _: &BitSlice<AtomicU8, Msb0> = bits![AtomicU8, Msb0; 0, 1];
++		let _: &BitSlice<RadiumU8, LocalBits> = bits![RadiumU8, LocalBits; 1; 100];
++		let _: &BitSlice<RadiumU8, Lsb0> = bits![RadiumU8, Lsb0; 1; 100];
++		let _: &BitSlice<RadiumU8, Msb0> = bits![RadiumU8, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "16")]
++	{
++		let _: &BitSlice<AtomicU16, LocalBits> = bits![AtomicU16, LocalBits; 0, 1];
++		let _: &BitSlice<AtomicU16, Lsb0> = bits![AtomicU16, Lsb0; 0, 1];
++		let _: &BitSlice<AtomicU16, Msb0> = bits![AtomicU16, Msb0; 0, 1];
++		let _: &BitSlice<RadiumU16, LocalBits> = bits![RadiumU16, LocalBits; 1; 100];
++		let _: &BitSlice<RadiumU16, Lsb0> = bits![RadiumU16, Lsb0; 1; 100];
++		let _: &BitSlice<RadiumU16, Msb0> = bits![RadiumU16, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "32")]
++	{
++		let _: &BitSlice<AtomicU32, LocalBits> = bits![AtomicU32, LocalBits; 0, 1];
++		let _: &BitSlice<AtomicU32, Lsb0> = bits![AtomicU32, Lsb0; 0, 1];
++		let _: &BitSlice<AtomicU32, Msb0> = bits![AtomicU32, Msb0; 0, 1];
++		let _: &BitSlice<RadiumU32, LocalBits> = bits![RadiumU32, LocalBits; 1; 100];
++		let _: &BitSlice<RadiumU32, Lsb0> = bits![RadiumU32, Lsb0; 1; 100];
++		let _: &BitSlice<RadiumU32, Msb0> = bits![RadiumU32, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "ptr")]
++	{
++		let _: &BitSlice<AtomicUsize, LocalBits> = bits![AtomicUsize, LocalBits; 0, 1];
++		let _: &BitSlice<AtomicUsize, Lsb0> = bits![AtomicUsize, Lsb0; 0, 1];
++		let _: &BitSlice<AtomicUsize, Msb0> = bits![AtomicUsize, Msb0; 0, 1];
++		let _: &BitSlice<RadiumUsize, LocalBits> = bits![RadiumUsize, LocalBits; 1; 100];
++		let _: &BitSlice<RadiumUsize, Lsb0> = bits![RadiumUsize, Lsb0; 1; 100];
++		let _: &BitSlice<RadiumUsize, Msb0> = bits![RadiumUsize, Msb0; 1; 100];
+ 	}
++
+ 	#[cfg(target_pointer_width = "64")]
+-	radium::if_atomic! {
+-		if atomic(64) {
+-			let _: &BitSlice<AtomicU64, LocalBits> = bits![AtomicU64, LocalBits; 0, 1];
+-			let _: &BitSlice<AtomicU64, Lsb0> = bits![AtomicU64, Lsb0; 0, 1];
+-			let _: &BitSlice<AtomicU64, Msb0> = bits![AtomicU64, Msb0; 0, 1];
+-			let _: &BitSlice<RadiumU64, LocalBits> = bits![RadiumU64, LocalBits; 1; 100];
+-			let _: &BitSlice<RadiumU64, Lsb0> = bits![RadiumU64, Lsb0; 1; 100];
+-			let _: &BitSlice<RadiumU64, Msb0> = bits![RadiumU64, Msb0; 1; 100];
+-		}
++	#[cfg(target_has_atomic = "64")]
++	{
++		let _: &BitSlice<AtomicU64, LocalBits> = bits![AtomicU64, LocalBits; 0, 1];
++		let _: &BitSlice<AtomicU64, Lsb0> = bits![AtomicU64, Lsb0; 0, 1];
++		let _: &BitSlice<AtomicU64, Msb0> = bits![AtomicU64, Msb0; 0, 1];
++		let _: &BitSlice<RadiumU64, LocalBits> = bits![RadiumU64, LocalBits; 1; 100];
++		let _: &BitSlice<RadiumU64, Lsb0> = bits![RadiumU64, Lsb0; 1; 100];
++		let _: &BitSlice<RadiumU64, Msb0> = bits![RadiumU64, Msb0; 1; 100];
+ 	}
+ }
+ 
+@@ -346,50 +348,51 @@ fn compile_bitvec() {
+ 			bitvec![Cell<u64>, crate::order::Msb0; 1; 100];
+ 		let _: BitVec<u64, Msb0> = bitvec![u64, crate::order::Msb0; 1; 100];
+ 	}
+-	radium::if_atomic! {
+-		if atomic(8) {
+-			let _: BitVec<AtomicU8, LocalBits> =bitvec![AtomicU8, LocalBits; 0, 1];
+-			let _: BitVec<AtomicU8, Lsb0> =bitvec![AtomicU8, Lsb0; 0, 1];
+-			let _: BitVec<AtomicU8, Msb0> =bitvec![AtomicU8, Msb0; 0, 1];
+-			let _: BitVec<RadiumU8, LocalBits> =bitvec![RadiumU8, LocalBits; 1; 100];
+-			let _: BitVec<RadiumU8, Lsb0> =bitvec![RadiumU8, Lsb0; 1; 100];
+-			let _: BitVec<RadiumU8, Msb0> =bitvec![RadiumU8, Msb0; 1; 100];
+-		}
+-		if atomic(16) {
+-			let _: BitVec<AtomicU16, LocalBits> =bitvec![AtomicU16, LocalBits; 0, 1];
+-			let _: BitVec<AtomicU16, Lsb0> =bitvec![AtomicU16, Lsb0; 0, 1];
+-			let _: BitVec<AtomicU16, Msb0> =bitvec![AtomicU16, Msb0; 0, 1];
+-			let _: BitVec<RadiumU16, LocalBits> =bitvec![RadiumU16, LocalBits; 1; 100];
+-			let _: BitVec<RadiumU16, Lsb0> =bitvec![RadiumU16, Lsb0; 1; 100];
+-			let _: BitVec<RadiumU16, Msb0> =bitvec![RadiumU16, Msb0; 1; 100];
+-		}
+-		if atomic(32) {
+-			let _: BitVec<AtomicU32, LocalBits> =bitvec![AtomicU32, LocalBits; 0, 1];
+-			let _: BitVec<AtomicU32, Lsb0> =bitvec![AtomicU32, Lsb0; 0, 1];
+-			let _: BitVec<AtomicU32, Msb0> =bitvec![AtomicU32, Msb0; 0, 1];
+-			let _: BitVec<RadiumU32, LocalBits> =bitvec![RadiumU32, LocalBits; 1; 100];
+-			let _: BitVec<RadiumU32, Lsb0> =bitvec![RadiumU32, Lsb0; 1; 100];
+-			let _: BitVec<RadiumU32, Msb0> =bitvec![RadiumU32, Msb0; 1; 100];
+-		}
+-		if atomic(size) {
+-			let _: BitVec<AtomicUsize, LocalBits> =bitvec![AtomicUsize, LocalBits; 0, 1];
+-			let _: BitVec<AtomicUsize, Lsb0> =bitvec![AtomicUsize, Lsb0; 0, 1];
+-			let _: BitVec<AtomicUsize, Msb0> =bitvec![AtomicUsize, Msb0; 0, 1];
+-			let _: BitVec<RadiumUsize, LocalBits> =bitvec![RadiumUsize, LocalBits; 1; 100];
+-			let _: BitVec<RadiumUsize, Lsb0> =bitvec![RadiumUsize, Lsb0; 1; 100];
+-			let _: BitVec<RadiumUsize, Msb0> =bitvec![RadiumUsize, Msb0; 1; 100];
+-		}
++	#[cfg(target_has_atomic = "8")]
++	{
++		let _: BitVec<AtomicU8, LocalBits> =bitvec![AtomicU8, LocalBits; 0, 1];
++		let _: BitVec<AtomicU8, Lsb0> =bitvec![AtomicU8, Lsb0; 0, 1];
++		let _: BitVec<AtomicU8, Msb0> =bitvec![AtomicU8, Msb0; 0, 1];
++		let _: BitVec<RadiumU8, LocalBits> =bitvec![RadiumU8, LocalBits; 1; 100];
++		let _: BitVec<RadiumU8, Lsb0> =bitvec![RadiumU8, Lsb0; 1; 100];
++		let _: BitVec<RadiumU8, Msb0> =bitvec![RadiumU8, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "16")]
++	{
++		let _: BitVec<AtomicU16, LocalBits> =bitvec![AtomicU16, LocalBits; 0, 1];
++		let _: BitVec<AtomicU16, Lsb0> =bitvec![AtomicU16, Lsb0; 0, 1];
++		let _: BitVec<AtomicU16, Msb0> =bitvec![AtomicU16, Msb0; 0, 1];
++		let _: BitVec<RadiumU16, LocalBits> =bitvec![RadiumU16, LocalBits; 1; 100];
++		let _: BitVec<RadiumU16, Lsb0> =bitvec![RadiumU16, Lsb0; 1; 100];
++		let _: BitVec<RadiumU16, Msb0> =bitvec![RadiumU16, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "32")]
++	{
++		let _: BitVec<AtomicU32, LocalBits> =bitvec![AtomicU32, LocalBits; 0, 1];
++		let _: BitVec<AtomicU32, Lsb0> =bitvec![AtomicU32, Lsb0; 0, 1];
++		let _: BitVec<AtomicU32, Msb0> =bitvec![AtomicU32, Msb0; 0, 1];
++		let _: BitVec<RadiumU32, LocalBits> =bitvec![RadiumU32, LocalBits; 1; 100];
++		let _: BitVec<RadiumU32, Lsb0> =bitvec![RadiumU32, Lsb0; 1; 100];
++		let _: BitVec<RadiumU32, Msb0> =bitvec![RadiumU32, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "ptr")]
++	{
++		let _: BitVec<AtomicUsize, LocalBits> =bitvec![AtomicUsize, LocalBits; 0, 1];
++		let _: BitVec<AtomicUsize, Lsb0> =bitvec![AtomicUsize, Lsb0; 0, 1];
++		let _: BitVec<AtomicUsize, Msb0> =bitvec![AtomicUsize, Msb0; 0, 1];
++		let _: BitVec<RadiumUsize, LocalBits> =bitvec![RadiumUsize, LocalBits; 1; 100];
++		let _: BitVec<RadiumUsize, Lsb0> =bitvec![RadiumUsize, Lsb0; 1; 100];
++		let _: BitVec<RadiumUsize, Msb0> =bitvec![RadiumUsize, Msb0; 1; 100];
+ 	}
+ 	#[cfg(target_pointer_width = "64")]
+-	radium::if_atomic! {
+-		if atomic(64) {
+-			let _: BitVec<AtomicU64, LocalBits> =bitvec![AtomicU64, LocalBits; 0, 1];
+-			let _: BitVec<AtomicU64, Lsb0> =bitvec![AtomicU64, Lsb0; 0, 1];
+-			let _: BitVec<AtomicU64, Msb0> =bitvec![AtomicU64, Msb0; 0, 1];
+-			let _: BitVec<RadiumU64, LocalBits> =bitvec![RadiumU64, LocalBits; 1; 100];
+-			let _: BitVec<RadiumU64, Lsb0> =bitvec![RadiumU64, Lsb0; 1; 100];
+-			let _: BitVec<RadiumU64, Msb0> =bitvec![RadiumU64, Msb0; 1; 100];
+-		}
++	#[cfg(target_has_atomic = "64")]
++	{
++		let _: BitVec<AtomicU64, LocalBits> =bitvec![AtomicU64, LocalBits; 0, 1];
++		let _: BitVec<AtomicU64, Lsb0> =bitvec![AtomicU64, Lsb0; 0, 1];
++		let _: BitVec<AtomicU64, Msb0> =bitvec![AtomicU64, Msb0; 0, 1];
++		let _: BitVec<RadiumU64, LocalBits> =bitvec![RadiumU64, LocalBits; 1; 100];
++		let _: BitVec<RadiumU64, Lsb0> =bitvec![RadiumU64, Lsb0; 1; 100];
++		let _: BitVec<RadiumU64, Msb0> =bitvec![RadiumU64, Msb0; 1; 100];
+ 	}
+ }
+ 
+@@ -461,50 +464,51 @@ fn compile_bitbox() {
+ 			bitbox![Cell<u64>, crate::order::Msb0; 1; 100];
+ 		let _: BitBox<u64, Msb0> = bitbox![u64, crate::order::Msb0; 1; 100];
+ 	}
+-	radium::if_atomic! {
+-		if atomic(8) {
+-			let _: BitBox<AtomicU8, LocalBits> =bitbox![AtomicU8, LocalBits; 0, 1];
+-			let _: BitBox<AtomicU8, Lsb0> =bitbox![AtomicU8, Lsb0; 0, 1];
+-			let _: BitBox<AtomicU8, Msb0> =bitbox![AtomicU8, Msb0; 0, 1];
+-			let _: BitBox<RadiumU8, LocalBits> =bitbox![RadiumU8, LocalBits; 1; 100];
+-			let _: BitBox<RadiumU8, Lsb0> =bitbox![RadiumU8, Lsb0; 1; 100];
+-			let _: BitBox<RadiumU8, Msb0> =bitbox![RadiumU8, Msb0; 1; 100];
+-		}
+-		if atomic(16) {
+-			let _: BitBox<AtomicU16, LocalBits> =bitbox![AtomicU16, LocalBits; 0, 1];
+-			let _: BitBox<AtomicU16, Lsb0> =bitbox![AtomicU16, Lsb0; 0, 1];
+-			let _: BitBox<AtomicU16, Msb0> =bitbox![AtomicU16, Msb0; 0, 1];
+-			let _: BitBox<RadiumU16, LocalBits> =bitbox![RadiumU16, LocalBits; 1; 100];
+-			let _: BitBox<RadiumU16, Lsb0> =bitbox![RadiumU16, Lsb0; 1; 100];
+-			let _: BitBox<RadiumU16, Msb0> =bitbox![RadiumU16, Msb0; 1; 100];
+-		}
+-		if atomic(32) {
+-			let _: BitBox<AtomicU32, LocalBits> =bitbox![AtomicU32, LocalBits; 0, 1];
+-			let _: BitBox<AtomicU32, Lsb0> =bitbox![AtomicU32, Lsb0; 0, 1];
+-			let _: BitBox<AtomicU32, Msb0> =bitbox![AtomicU32, Msb0; 0, 1];
+-			let _: BitBox<RadiumU32, LocalBits> =bitbox![RadiumU32, LocalBits; 1; 100];
+-			let _: BitBox<RadiumU32, Lsb0> =bitbox![RadiumU32, Lsb0; 1; 100];
+-			let _: BitBox<RadiumU32, Msb0> =bitbox![RadiumU32, Msb0; 1; 100];
+-		}
+-		if atomic(size) {
+-			let _: BitBox<AtomicUsize, LocalBits> =bitbox![AtomicUsize, LocalBits; 0, 1];
+-			let _: BitBox<AtomicUsize, Lsb0> =bitbox![AtomicUsize, Lsb0; 0, 1];
+-			let _: BitBox<AtomicUsize, Msb0> =bitbox![AtomicUsize, Msb0; 0, 1];
+-			let _: BitBox<RadiumUsize, LocalBits> =bitbox![RadiumUsize, LocalBits; 1; 100];
+-			let _: BitBox<RadiumUsize, Lsb0> =bitbox![RadiumUsize, Lsb0; 1; 100];
+-			let _: BitBox<RadiumUsize, Msb0> =bitbox![RadiumUsize, Msb0; 1; 100];
+-		}
++	#[cfg(target_has_atomic = "8")]
++	{
++		let _: BitBox<AtomicU8, LocalBits> =bitbox![AtomicU8, LocalBits; 0, 1];
++		let _: BitBox<AtomicU8, Lsb0> =bitbox![AtomicU8, Lsb0; 0, 1];
++		let _: BitBox<AtomicU8, Msb0> =bitbox![AtomicU8, Msb0; 0, 1];
++		let _: BitBox<RadiumU8, LocalBits> =bitbox![RadiumU8, LocalBits; 1; 100];
++		let _: BitBox<RadiumU8, Lsb0> =bitbox![RadiumU8, Lsb0; 1; 100];
++		let _: BitBox<RadiumU8, Msb0> =bitbox![RadiumU8, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "16")]
++	{
++		let _: BitBox<AtomicU16, LocalBits> =bitbox![AtomicU16, LocalBits; 0, 1];
++		let _: BitBox<AtomicU16, Lsb0> =bitbox![AtomicU16, Lsb0; 0, 1];
++		let _: BitBox<AtomicU16, Msb0> =bitbox![AtomicU16, Msb0; 0, 1];
++		let _: BitBox<RadiumU16, LocalBits> =bitbox![RadiumU16, LocalBits; 1; 100];
++		let _: BitBox<RadiumU16, Lsb0> =bitbox![RadiumU16, Lsb0; 1; 100];
++		let _: BitBox<RadiumU16, Msb0> =bitbox![RadiumU16, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "32")]
++	{
++		let _: BitBox<AtomicU32, LocalBits> =bitbox![AtomicU32, LocalBits; 0, 1];
++		let _: BitBox<AtomicU32, Lsb0> =bitbox![AtomicU32, Lsb0; 0, 1];
++		let _: BitBox<AtomicU32, Msb0> =bitbox![AtomicU32, Msb0; 0, 1];
++		let _: BitBox<RadiumU32, LocalBits> =bitbox![RadiumU32, LocalBits; 1; 100];
++		let _: BitBox<RadiumU32, Lsb0> =bitbox![RadiumU32, Lsb0; 1; 100];
++		let _: BitBox<RadiumU32, Msb0> =bitbox![RadiumU32, Msb0; 1; 100];
++	}
++	#[cfg(target_has_atomic = "ptr")]
++	{
++		let _: BitBox<AtomicUsize, LocalBits> =bitbox![AtomicUsize, LocalBits; 0, 1];
++		let _: BitBox<AtomicUsize, Lsb0> =bitbox![AtomicUsize, Lsb0; 0, 1];
++		let _: BitBox<AtomicUsize, Msb0> =bitbox![AtomicUsize, Msb0; 0, 1];
++		let _: BitBox<RadiumUsize, LocalBits> =bitbox![RadiumUsize, LocalBits; 1; 100];
++		let _: BitBox<RadiumUsize, Lsb0> =bitbox![RadiumUsize, Lsb0; 1; 100];
++		let _: BitBox<RadiumUsize, Msb0> =bitbox![RadiumUsize, Msb0; 1; 100];
+ 	}
+ 	#[cfg(target_pointer_width = "64")]
+-	radium::if_atomic! {
+-		if atomic(64) {
+-			let _: BitBox<AtomicU64, LocalBits> =bitbox![AtomicU64, LocalBits; 0, 1];
+-			let _: BitBox<AtomicU64, Lsb0> =bitbox![AtomicU64, Lsb0; 0, 1];
+-			let _: BitBox<AtomicU64, Msb0> =bitbox![AtomicU64, Msb0; 0, 1];
+-			let _: BitBox<RadiumU64, LocalBits> =bitbox![RadiumU64, LocalBits; 1; 100];
+-			let _: BitBox<RadiumU64, Lsb0> =bitbox![RadiumU64, Lsb0; 1; 100];
+-			let _: BitBox<RadiumU64, Msb0> =bitbox![RadiumU64, Msb0; 1; 100];
+-		}
++	#[cfg(target_has_atomic = "64")]
++	{
++		let _: BitBox<AtomicU64, LocalBits> =bitbox![AtomicU64, LocalBits; 0, 1];
++		let _: BitBox<AtomicU64, Lsb0> =bitbox![AtomicU64, Lsb0; 0, 1];
++		let _: BitBox<AtomicU64, Msb0> =bitbox![AtomicU64, Msb0; 0, 1];
++		let _: BitBox<RadiumU64, LocalBits> =bitbox![RadiumU64, LocalBits; 1; 100];
++		let _: BitBox<RadiumU64, Lsb0> =bitbox![RadiumU64, Lsb0; 1; 100];
++		let _: BitBox<RadiumU64, Msb0> =bitbox![RadiumU64, Msb0; 1; 100];
+ 	}
+ }
+ 
+--- a/src/mem.rs
++++ b/src/mem.rs
+@@ -101,30 +101,30 @@ macro_rules! element {
+ 			}
+ 		}
+ 
+-		radium::if_atomic!( if atomic($size) {
+-			use core::sync::atomic::$atom;
+-			impl BitElement<$atom> {
+-				/// Creates a new element wrapper from a raw integer.
+-				pub const fn new(elem: $bare) -> Self {
+-					Self {
+-						elem: <$atom>::new(elem),
+-					}
++		#[cfg(target_has_atomic = $size)]
++		use core::sync::atomic::$atom;
++		#[cfg(target_has_atomic = $size)]
++		impl BitElement<$atom> {
++			/// Creates a new element wrapper from a raw integer.
++			pub const fn new(elem: $bare) -> Self {
++				Self {
++					elem: <$atom>::new(elem),
+ 				}
+ 			}
+-		});
++		}
+ 	)+ };
+ }
+ 
+ element! {
+-	8, u8 => AtomicU8;
+-	16, u16 => AtomicU16;
+-	32, u32 => AtomicU32;
++	"8", u8 => AtomicU8;
++	"16", u16 => AtomicU16;
++	"32", u32 => AtomicU32;
+ }
+ 
+ #[cfg(target_pointer_width = "64")]
+-element!(64, u64 => AtomicU64);
++element!("64", u64 => AtomicU64);
+ 
+-element!(size, usize => AtomicUsize);
++element!("ptr", usize => AtomicUsize);
+ 
+ #[cfg(test)]
+ mod tests {
+--- a/src/serdes.rs
++++ b/src/serdes.rs
+@@ -112,36 +112,39 @@ mod tests {
+ 			Msb0 @ RadiumU8, RadiumU16, RadiumU32, RadiumUsize;
+ 			LocalBits @ RadiumU8, RadiumU16, RadiumU32, RadiumUsize;
+ 		}
+-		radium::if_atomic! {
+-			if atomic(8) {
+-				check_impl! {
+-					Lsb0 @ AtomicU8;
+-					Msb0 @ AtomicU8;
+-					LocalBits @ AtomicU8;
+-				}
++		#[cfg(target_has_atomic = "8")]
++		{
++			check_impl! {
++				Lsb0 @ AtomicU8;
++				Msb0 @ AtomicU8;
++				LocalBits @ AtomicU8;
+ 			}
+-			if atomic(16) {
+-				check_impl! {
+-					Lsb0 @ AtomicU16;
+-					Msb0 @ AtomicU16;
+-					LocalBits @ AtomicU16;
+-				}
++		}
++		#[cfg(target_has_atomic = "16")]
++		{
++			check_impl! {
++				Lsb0 @ AtomicU16;
++				Msb0 @ AtomicU16;
++				LocalBits @ AtomicU16;
+ 			}
+-			if atomic(32) {
+-				check_impl! {
+-					Lsb0 @ AtomicU32;
+-					Msb0 @ AtomicU32;
+-					LocalBits @ AtomicU32;
+-				}
++		}
++		#[cfg(target_has_atomic = "32")]
++		{
++			check_impl! {
++				Lsb0 @ AtomicU32;
++				Msb0 @ AtomicU32;
++				LocalBits @ AtomicU32;
+ 			}
+-			if atomic(ptr) {
+-				check_impl! {
+-					Lsb0 @ AtomicUsize;
+-					Msb0 @ AtomicUsize;
+-					LocalBits @ AtomicUsize;
+-				}
++		}
++		#[cfg(target_has_atomic = "ptr")]
++		{
++			check_impl! {
++				Lsb0 @ AtomicUsize;
++				Msb0 @ AtomicUsize;
++				LocalBits @ AtomicUsize;
+ 			}
+ 		}
++
+ 		#[cfg(target_pointer_width = "64")]
+ 		check_impl! {
+ 			Lsb0 @ u64, RadiumU64;
+@@ -149,12 +152,13 @@ mod tests {
+ 			LocalBits @ u64, RadiumU64;
+ 		}
+ 		#[cfg(target_pointer_width = "64")]
+-		radium::if_atomic!(if atomic(64) {
++		#[cfg(target_has_atomic = "64")]
++		{
+ 			check_impl! {
+ 				Lsb0 @ AtomicU64;
+ 				Msb0 @ AtomicU64;
+ 				LocalBits @ AtomicU64;
+ 			}
+-		});
++		}
+ 	}
+ }
+--- a/src/store.rs
++++ b/src/store.rs
+@@ -199,49 +199,49 @@ store!(usize => BitSafeUsize);
+ /// Generates `BitStore` implementations for atomic types.
+ macro_rules! atomic {
+ 	($($size:tt, $base:ty => $atom:ident);+ $(;)?) => { $(
+-		radium::if_atomic!(if atomic($size) {
+-			use core::sync::atomic::$atom;
++		#[cfg(target_has_atomic = $size)]
++		use core::sync::atomic::$atom;
+ 
+-			impl BitStore for $atom {
+-				type Mem = $base;
+-				type Access = Self;
+-				type Alias = Self;
+-				type Unalias = Self;
+-
+-				const ZERO: Self = <Self>::new(0);
+-
+-				#[inline]
+-				fn new(value: Self::Mem) -> Self { <Self>::new(value) }
+-
+-				#[inline]
+-				fn load_value(&self) -> Self::Mem {
+-					self.load(core::sync::atomic::Ordering::Relaxed)
+-				}
+-
+-				#[inline]
+-				fn store_value(&mut self, value: Self::Mem) {
+-					*self = Self::new(value);
+-				}
+-
+-				const ALIGNED_TO_SIZE: [(); 1]
+-					= [(); mem::aligned_to_size::<Self>() as usize];
++		#[cfg(target_has_atomic = $size)]
++		impl BitStore for $atom {
++			type Mem = $base;
++			type Access = Self;
++			type Alias = Self;
++			type Unalias = Self;
++
++			const ZERO: Self = <Self>::new(0);
++
++			#[inline]
++			fn new(value: Self::Mem) -> Self { <Self>::new(value) }
++
++			#[inline]
++			fn load_value(&self) -> Self::Mem {
++				self.load(core::sync::atomic::Ordering::Relaxed)
++			}
+ 
+-				const ALIAS_WIDTH: [(); 1] = [()];
++			#[inline]
++			fn store_value(&mut self, value: Self::Mem) {
++				*self = Self::new(value);
+ 			}
+-		});
++
++			const ALIGNED_TO_SIZE: [(); 1]
++				= [(); mem::aligned_to_size::<Self>() as usize];
++
++			const ALIAS_WIDTH: [(); 1] = [()];
++		}
+ 	)+ };
+ }
+ 
+ atomic! {
+-	8, u8 => AtomicU8;
+-	16, u16 => AtomicU16;
+-	32, u32 => AtomicU32;
++	"8", u8 => AtomicU8;
++	"16", u16 => AtomicU16;
++	"32", u32 => AtomicU32;
+ }
+ 
+ #[cfg(target_pointer_width = "64")]
+-atomic!(64, u64 => AtomicU64);
++atomic!("64", u64 => AtomicU64);
+ 
+-atomic!(size, usize => AtomicUsize);
++atomic!("ptr", usize => AtomicUsize);
+ 
+ #[cfg(test)]
+ mod tests {
+@@ -265,11 +265,12 @@ mod tests {
+ 		cell.store_value(39);
+ 		assert_eq!(cell.load_value(), 39);
+ 
+-		radium::if_atomic!(if atomic(size) {
++		#[cfg(target_has_atomic = "ptr")]
++		{
+ 			let mut atom = AtomicUsize::new(0);
+ 			atom.store_value(57);
+ 			assert_eq!(atom.load_value(), 57);
+-		});
++		}
+ 	}
+ 
+ 	/// Unaliased `BitSlice`s are universally threadsafe, because they satisfy

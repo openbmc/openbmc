@@ -77,7 +77,7 @@ TFA_BUILD_TARGET ?= "bl1"
 TFA_INSTALL_TARGET ?= "${TFA_BUILD_TARGET}"
 
 # Requires CROSS_COMPILE set by hand as there is no configure script
-export CROSS_COMPILE="${TARGET_PREFIX}"
+export CROSS_COMPILE = "${TARGET_PREFIX}"
 
 # Let the Makefile handle setting up the CFLAGS and LDFLAGS as it is a standalone application
 CFLAGS[unexport] = "1"

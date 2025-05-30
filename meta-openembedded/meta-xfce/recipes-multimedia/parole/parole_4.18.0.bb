@@ -23,7 +23,7 @@ RDEPENDS:${PN} += "gstreamer1.0-plugins-good"
 EXTRA_OECONF = "--disable-gtk-doc DATADIRNAME=share"
 
 PACKAGECONFIG ??= "notify"
-PACKAGECONFIG[clutter] = "--enable-clutter, --disable-clutter, clutter"
+PACKAGECONFIG[clutter] = "--enable-clutter, --disable-clutter, clutter-gtk-1.0"
 PACKAGECONFIG[notify] = "--enable-notify-plugin, --disable-notify-plugin, libnotify"
 
 FILES:${PN} += " \

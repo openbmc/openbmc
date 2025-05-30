@@ -1,0 +1,50 @@
+From 09cfcf7de2aab873a13949d5a128ccfb9e54732d Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Mon, 5 May 2025 08:15:37 +0200
+Subject: [PATCH] build_support: use source filename instead of 'foo' for
+ discover tests
+
+* helps when debugging the issues
+* use the same order of CC arguments in compile_and_run and
+  does_build_succeed just for consistency
+* use pthread in both compile_and_run and does_build_succeed functions
+  it was added only to does_build_succeed in 5ec39f7af8cfd8525d225b1302fa93f7133b3849
+  not sure if it was intentional
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Upstream-Status: Submitted [https://github.com/osvenskan/posix_ipc/pull/77]
+---
+ build_support/discover_system_info.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/build_support/discover_system_info.py b/build_support/discover_system_info.py
+index bc4d174..6d059d9 100644
+--- a/build_support/discover_system_info.py
++++ b/build_support/discover_system_info.py
+@@ -60,7 +60,7 @@ def does_build_succeed(filename, linker_options=""):
+     #     Rather than testing whether or not it's needed, I just specify it
+     #     everywhere since it's harmless to specify it when it's not needed.
+     cc = os.getenv("CC", "cc")
+-    cmd = "%s -Wall -o ./build_support/src/foo ./build_support/src/%s %s -lpthread" % (cc, filename, linker_options)
++    cmd = "%s -Wall -o ./build_support/src/%s ./build_support/src/%s %s -lpthread" % (cc, filename[:-2], filename, linker_options)
+ 
+     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
+ 
+@@ -73,7 +73,7 @@ def compile_and_run(filename, linker_options=""):
+     # Utility function that returns the stdout output from running the
+     # compiled source file; None if the compile fails.
+     cc = os.getenv("CC", "cc")
+-    cmd = "%s -Wall -o ./build_support/src/foo %s ./build_support/src/%s" % (cc, linker_options, filename)
++    cmd = "%s -Wall -o ./build_support/src/%s ./build_support/src/%s %s -lpthread" % (cc, filename[:-2], filename, linker_options)
+ 
+     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
+ 
+@@ -82,7 +82,7 @@ def compile_and_run(filename, linker_options=""):
+         return None
+     
+     try:
+-        s = subprocess.Popen(["./build_support/src/foo"],
++        s = subprocess.Popen(["./build_support/src/%s" % filename[:-2]],
+                              stdout=subprocess.PIPE).communicate()[0]
+         return s.strip().decode()
+     except Exception:

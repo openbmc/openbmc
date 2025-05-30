@@ -3,7 +3,7 @@ SECTION = "devel/python"
 LICENSE = "AGPL-3.0-only"
 LIC_FILES_CHKSUM = "file://agpl-3.0.txt;md5=73f1eb20517c55bf9493b7dd6e480788"
 
-HOMEPAGE = "http://lrparsing.sourceforge.net/"
+HOMEPAGE = "https://lrparsing.sourceforge.net/"
 BUGTRACKER = "https://sourceforge.net/p/lrparsing/tickets/"
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/lrparsing/files/"
 UPSTREAM_CHECK_REGEX = "lrparsing-(?P<pver>\d+(\.\d+)+)"

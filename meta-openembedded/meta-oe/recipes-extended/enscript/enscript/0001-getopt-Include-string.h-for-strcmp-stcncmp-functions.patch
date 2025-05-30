@@ -3,9 +3,10 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 2 Sep 2022 21:24:27 -0700
 Subject: [PATCH] getopt: Include string.h for strcmp/stcncmp functions
 
-Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Upstream-Status: Backport [http://git.savannah.gnu.org/gitweb/?p=enscript.git;a=commit;h=300ecf85a8fe166a39f9dd818945c7b8a970db39]
+Signed-off-by: mark.yang <mark.yang@lge.com>
 ---
  compat/getopt.c | 1 +
  1 file changed, 1 insertion(+)

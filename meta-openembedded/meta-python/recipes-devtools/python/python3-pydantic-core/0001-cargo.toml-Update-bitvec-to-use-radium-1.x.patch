@@ -1,0 +1,59 @@
+From 560c73cffabc1c2e66552d7c248c0928211d3dea Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 19 Apr 2025 00:09:42 -0700
+Subject: [PATCH] cargo.toml: Update bitvec to use radium 1.x
+
+Upstream-Status: Submitted [https://github.com/ferrilab/bitvec/pull/220]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Cargo.lock | 25 +++++++++++++++++++++++--
+ Cargo.toml |  1 +
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -27,6 +27,8 @@ include = [
+ rust-version = "1.75"
+ 
+ [dependencies]
++#bitvec = { git = "https://github.com/alexanderkjall/bitvec", branch = "upgrade-radium-to-1" }
++radium = "1"
+ # TODO it would be very nice to remove the "py-clone" feature as it can panic,
+ # but needs a bit of work to make sure it's not used in the codebase
+ pyo3 = { version = "0.24", features = ["generate-import-lib", "num-bigint", "py-clone"] }
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -43,7 +43,7 @@ source = "registry+https://github.com/ru
+ checksum = "1bc2832c24239b0141d5674bb9174f9d68a8b5b3f2753311927c172ca46f7e9c"
+ dependencies = [
+  "funty",
+- "radium",
++ "radium 1.1.0",
+  "tap",
+  "wyz",
+ ]
+@@ -436,6 +436,7 @@ dependencies = [
+  "num-traits",
+  "pyo3",
+  "pyo3-build-config",
++ "radium 1.1.0",
+  "regex",
+  "serde",
+  "serde_json",
+@@ -538,6 +539,15 @@ source = "registry+https://github.com/ru
+ checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
+ 
+ [[package]]
++name = "radium"
++version = "1.1.0"
++source = "registry+https://github.com/rust-lang/crates.io-index"
++checksum = "db0b76288902db304c864a12046b73d2d895cc34a4bb8137baaeebe9978a072c"
++dependencies = [
++ "cfg-if",
++]
++
++[[package]]
+ name = "regex"
+ version = "1.11.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"

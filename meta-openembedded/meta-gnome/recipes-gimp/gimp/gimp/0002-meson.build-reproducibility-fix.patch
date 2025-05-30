@@ -1,0 +1,56 @@
+From bf19c5687703769e406a8086036d4ed6421c33cb Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 13 Jan 2025 10:04:33 +0100
+Subject: [PATCH] meson.build: reproducibility fix
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ meson.build | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 97cd621780..e47180db87 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1599,23 +1599,23 @@ conf.set('HAVE_FUNC_ATTRIBUTE_DESTRUCTOR',
+ conf.set_quoted('CC',             cc.get_id())
+ 
+ cc_version=''
+-if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
+-  cc_cmd = run_command(cc, '-v', check: false)
++#if cc.get_id() == 'gcc' or cc.get_id() == 'clang'
++#  cc_cmd = run_command(cc, '-v', check: false)
+   # Note: the call might actually fail when using ccache.
+   # See: https://github.com/mesonbuild/meson/issues/6174
+-  if cc_cmd.returncode() == 0
+-    cc_version = cc_cmd.stdout() + cc_cmd.stderr()
+-  endif
+-else
++#  if cc_cmd.returncode() == 0
++#    cc_version = cc_cmd.stdout() + cc_cmd.stderr()
++#  endif
++#else
+   # Various compilers have various options. Try most common ones. This
+   # list of options comes from autotools checks.
+-  foreach arg : [ '--version', '-v', '-V', '-qversion' ]
+-    cc_cmd = run_command(cc, arg, check: false)
+-    if cc_cmd.returncode() == 0
+-      cc_version = cc_cmd.stdout()
+-    endif
+-  endforeach
+-endif
++#  foreach arg : [ '--version', '-v', '-V', '-qversion' ]
++#    cc_cmd = run_command(cc, arg, check: false)
++#    if cc_cmd.returncode() == 0
++#      cc_version = cc_cmd.stdout()
++#    endif
++#  endforeach
++#endif
+ if cc_version == ''
+   # We didn't manage to get a meaningful verbose version from the
+   # compiler. Just save its name and version.
+-- 
+2.47.1
+

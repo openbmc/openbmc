@@ -12,6 +12,8 @@ SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=master;protocol=https"
 
 S = "${WORKDIR}/git"
 
+CVE_PRODUCT = "freerdp"
+
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'pam pulseaudio wayland x11', d)} \
     ${@bb.utils.contains('LICENSE_FLAGS_ACCEPTED', 'commercial', 'ffmpeg', '', d)} \

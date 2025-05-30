@@ -1,0 +1,27 @@
+From 506833786a4ae5b888f12c59b82f7d842cda778c Mon Sep 17 00:00:00 2001
+From: Roy Li <rongqing.li@windriver.com>
+Date: Thu, 27 Mar 2025 11:46:20 +0800
+Subject: [PATCH] not run test on host, since we are doing cross-compile
+
+Upstream-Status: Inappropriate [cross compile specific]
+
+Signed-off-by: Roy Li <rongqing.li@windriver.com>
+---
+ Makefile.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 1806159..eccb4f6 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -1219,7 +1219,6 @@ intcutest: internal.h $(OBJECTS) $(CUTEST_OBJECTS) sh_tiger_i.o $(srcsrc)/CuTest
+ 	rm x_samhain.c; \
+ 	$(LINK) sh_tiger_i.o $(CUTEST_OBJECTS) CuTestMain.o CuTest.o $(OBJECTS) $(LIBS_TRY); \
+ 	test -f ./intcutest && mv ./intcutest ./cutest; \
+-	./cutest
+ 
+ runcutest:
+ 	gdb ./cutest
+-- 
+2.34.1
+

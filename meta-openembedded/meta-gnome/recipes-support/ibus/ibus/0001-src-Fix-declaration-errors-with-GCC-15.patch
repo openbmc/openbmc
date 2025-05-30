@@ -1,0 +1,36 @@
+From 0f5407f8a3846477fcaa73505437e805467901e1 Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 24 Jan 2025 09:40:31 +0900
+Subject: [PATCH] src: Fix declaration errors with GCC 15
+
+
+BUG=rhbz#2340629
+
+Upstream-Status: Backport [https://github.com/ibus/ibus/commit/aac5446e8c98db934912b9b15a1ef92c3b7e4c8c]
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ src/ibusenginesimple.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/ibusenginesimple.c b/src/ibusenginesimple.c
+index c57a3ea5..60e7fb34 100644
+--- a/src/ibusenginesimple.c
++++ b/src/ibusenginesimple.c
+@@ -477,7 +477,7 @@ check_hex (IBusEngineSimple *simple,
+ }
+ 
+ static IBusEngineDict *
+-load_emoji_dict ()
++load_emoji_dict (void)
+ {
+     IBusEngineDict *emoji_dict;
+     GList *keys;
+@@ -520,7 +520,7 @@ check_emoji_table (IBusEngineSimple       *simple,
+         g_object_ref_sink (priv->lookup_table);
+     }
+     if (emoji_dict == NULL)
+-        emoji_dict = priv->emoji_dict = load_emoji_dict (simple);
++        emoji_dict = priv->emoji_dict = load_emoji_dict ();
+ 
+     if (emoji_dict == NULL || emoji_dict->dict == NULL)
+         return FALSE;

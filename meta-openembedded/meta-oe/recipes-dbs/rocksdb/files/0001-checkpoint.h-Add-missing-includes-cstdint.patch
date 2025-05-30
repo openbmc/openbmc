@@ -1,0 +1,41 @@
+From 31012cdfa435d9203da3c3de8127b66bf018692a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jan 2023 21:40:43 -0800
+Subject: [PATCH] checkpoint.h: Add missing includes <cstdint>
+
+It uses uint64_t and it comes from <cstdint>
+This is needed with GCC 13 and newer [1]
+
+[1] https://www.gnu.org/software/gcc/gcc-13/porting_to.html
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+* build error:
+FAILED: CMakeFiles/checkpoint_test.dir/utilities/checkpoint/checkpoint_test.cc.o 
+In file included from rocksdb/9.10.0/git/utilities/checkpoint/checkpoint_test.cc:11:
+rocksdb/9.10.0/git/include/rocksdb/utilities/checkpoint.h:49:35: error: 'uint64_t' has not been declared
+   49 |                                   uint64_t log_size_for_flush = 0,
+      |                                   ^~~~~~~~
+rocksdb/9.10.0/git/include/rocksdb/utilities/checkpoint.h:14:1: note: 'uint64_t' is defined in header '<cstdint>'; this is probably fixable by adding '#include <cstdint>'
+   13 | #include "rocksdb/status.h"
+  +++ |+#include <cstdint>
+   14 | 
+
+Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/11137]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ include/rocksdb/utilities/checkpoint.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: git/include/rocksdb/utilities/checkpoint.h
+===================================================================
+--- git.orig/include/rocksdb/utilities/checkpoint.h
++++ git/include/rocksdb/utilities/checkpoint.h
+@@ -7,6 +7,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 

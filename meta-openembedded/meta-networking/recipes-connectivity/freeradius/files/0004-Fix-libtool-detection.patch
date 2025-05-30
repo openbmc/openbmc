@@ -1,4 +1,4 @@
-From 5ba3d140842268cbbdd983266efecb1fba5bdd59 Mon Sep 17 00:00:00 2001
+From 864316403192a3e93a2b1f37de479437964eb7f3 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 22 Aug 2019 10:45:46 +0800
 Subject: [PATCH] Fix libtool detection
@@ -20,10 +20,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 36 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index ad8bc8cdda..ef8fced680 100644
+index 6f29206646..c0d6ea99ca 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -321,6 +321,42 @@ dnl #  See if we have Git.
+@@ -319,6 +319,42 @@ dnl #  See if we have Git.
  dnl #
  AC_CHECK_PROG(GIT, git, yes, no)
  

@@ -34,7 +34,7 @@ EXTRA_OECMAKE += '-DLIBGCC_LOCATE_CFLAGS="--sysroot=${STAGING_DIR_HOST}" \
                   -DCROSS_COMPILE="${TARGET_PREFIX}" \
                   -DTS_PLATFORM="${TS_PLATFORM}" \
                  '
-export CROSS_COMPILE="${TARGET_PREFIX}"
+export CROSS_COMPILE = "${TARGET_PREFIX}"
 
 # Default TS installation path
 TS_INSTALL = "/usr/${TS_ENV}"
@@ -54,5 +54,5 @@ EXTRA_OECMAKE += "${@get_ts_toolchain_option(d)}"
 
 # Paths to pre-built dependencies required by some TS SPs/tools
 EXTRA_OECMAKE += "-Dlibts_ROOT=${STAGING_DIR_HOST}${TS_INSTALL}/lib/cmake/libts/ \
-                  -DNEWLIB_INSTALL_DIR=${STAGING_DIR_HOST}/usr/opteesp/newlib \
+                  -Dlibpsats_ROOT=${STAGING_DIR_HOST}${TS_INSTALL}/lib/cmake/libpsats/ \
                  "

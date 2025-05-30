@@ -1,10 +1,12 @@
-LICENSE= "MIT"
+LICENSE =  "MIT"
 SUMMARY = "X Server Nokia 770 extensions library"
 SECTION = "x11/libs"
 DEPENDS = "virtual/libx11 libxext xpext"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea2bda168c508c7cd8afa567b2fcc549"
 SRC_URI = "http://repository.maemo.org/pool/maemo/ossw/source/x/xsp/${BPN}_${PV}.tar.gz \
-           file://xsp-fix-pc.patch"
+           file://xsp-fix-pc.patch \
+           file://0001-fix-incompatible-pointer-types-build-error-in-gcc-15.patch \
+"
 S = "${WORKDIR}/Xsp"
 
 inherit autotools pkgconfig features_check

@@ -1,0 +1,31 @@
+From 229137659501ae51774dcb3249f94545bdd6e21f Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 19 Mar 2024 21:00:59 +0800
+Subject: [PATCH] Pass --noline flag to flex
+
+This ensures that line directive is not emitted into lexer output which
+could be absolute build paths.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ extensions/expression-language/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/extensions/expression-language/CMakeLists.txt b/extensions/expression-language/CMakeLists.txt
+index c179ab3ef..7f507b03a 100644
+--- a/extensions/expression-language/CMakeLists.txt
++++ b/extensions/expression-language/CMakeLists.txt
+@@ -103,7 +103,7 @@ flex_target(
+     el-scanner
+     ${CMAKE_CURRENT_SOURCE_DIR}/Scanner.ll
+     ${CMAKE_BINARY_DIR}/el-generated/Scanner.cpp
+-    COMPILE_FLAGS --c++
++    COMPILE_FLAGS "--c++ --noline"
+ )
+ 
+ set(EL_GENERATED_INCLUDE_DIR ${CMAKE_BINARY_DIR}/el-generated)
+-- 
+2.34.1
+

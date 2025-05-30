@@ -163,7 +163,7 @@ RDEPENDS:packagegroup-meta-oe-connectivity:append:libc-glibc = " wvstreams wvdia
 
 # dracut needs dracut
 RDEPENDS:packagegroup-meta-oe-core = "\
-    ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "dbus-broker", "", d)} \
+    ${@bb.utils.filter('VIRTUAL-RUNTIME_dbus', 'dbus-broker', d)} \
     dbus-cxx \
     dbus-daemon-proxy \
     distro-feed-configs \
@@ -201,7 +201,6 @@ RDEPENDS:packagegroup-meta-oe-crypto = "\
 RDEPENDS:packagegroup-meta-oe-crypto:remove:riscv32 = "botan"
 
 RDEPENDS:packagegroup-meta-oe-dbs = "\
-    influxdb \
     leveldb \
     libdbi \
     lmdb \
@@ -238,7 +237,7 @@ RDEPENDS:packagegroup-meta-oe-devtools = "\
     grpc \
     guider \
     heaptrack \
-    icon-slicer \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "icon-slicer", "", d)} \
     ipc-run \
     iptraf-ng \
     jemalloc \
@@ -294,8 +293,8 @@ RDEPENDS:packagegroup-meta-oe-devtools = "\
     yajl \
     yasm \
 "
-RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pahole pmtools"
-RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pahole pcimem pmtools"
+RDEPENDS:packagegroup-meta-oe-devtools:append:x86 = " cpuid msr-tools pahole"
+RDEPENDS:packagegroup-meta-oe-devtools:append:x86-64 = " cpuid msr-tools pahole pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:riscv64 = " pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:arm = " pcimem"
 RDEPENDS:packagegroup-meta-oe-devtools:append:aarch64 = " pahole pcimem"
@@ -761,7 +760,6 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     hunspell \
     hunspell-dictionaries \
     icyque \
-    iksemel \
     imagemagick \
     imapfilter \
     iniparser \
@@ -877,9 +875,7 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     stm32flash \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11", "synergy", "", d)} \
     syslog-ng \
-    system-config-keyboard \
     tbb \
-    thin-provisioning-tools \
     tokyocabinet \
     tree \
     uchardet \

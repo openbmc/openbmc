@@ -1,0 +1,29 @@
+From bcb052a8dadbd0a837986b1e15924b469fc59edc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?K=C3=A9l=C3=A9fa=20San=C3=A9?= <kelefa.sane@smile.fr>
+Date: Thu, 3 Apr 2025 10:08:49 +0200
+Subject: [PATCH] libdmmp/Makefile: Fix KBUILD_BUILD_TIMESTAMP usage
+
+Add missing $ (Makefile need to escape '$' as '$$')
+
+Upstream-Status: Submitted [https://lore.kernel.org/dm-devel/20250404122902.2750036-1-sofiane.hamam@smile.fr/]
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+Signed-off-by: Sofiane HAMAM <sofiane.hamam@smile.fr>
+Signed-off-by: Kelefa Sane <kelefa.sane@smile.fr>
+---
+ libdmmp/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libdmmp/Makefile b/libdmmp/Makefile
+index 172ba045..7e0e2509 100644
+--- a/libdmmp/Makefile
++++ b/libdmmp/Makefile
+@@ -74,7 +74,7 @@ doc: docs/man/dmmp_strerror.3
+ docs/man/dmmp_strerror.3:	$(HEADERS)
+ 	$(Q)TEMPFILE=$(shell mktemp); \
+ 	cat $^ | perl docs/doc-preclean.pl >$$TEMPFILE; \
+-	[ "$KBUILD_BUILD_TIMESTAMP" ] || \
++	[ "$$KBUILD_BUILD_TIMESTAMP" ] || \
+ 	    KBUILD_BUILD_TIMESTAMP=`git log -n1 --pretty=%cd --date=iso -- $^`; \
+ 	export KBUILD_BUILD_TIMESTAMP; \
+ 	LC_ALL=C \

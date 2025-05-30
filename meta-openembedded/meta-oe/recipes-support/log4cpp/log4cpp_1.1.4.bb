@@ -12,6 +12,8 @@ S = "${WORKDIR}/${BPN}"
 
 inherit autotools pkgconfig
 
+EXTRA_AUTORECONF += "-I m4"
+
 EXTRA_OECONF = "\
     --enable-doxygen=no \
     --enable-dot=no \

@@ -16,7 +16,7 @@ DEPENDS = " \
 DEPENDS:append:class-target = " ${BPN}-native"
 DEPENDS:append:class-nativesdk = " ${BPN}-native"
 
-inherit autotools-brokensep pkgconfig gettext qemu
+inherit autotools-brokensep pkgconfig gettext
 
 SRC_URI = "https://gitlab.com/api/v4/projects/4207231/packages/generic/${BPN}-releases/${PV}/${BP}.tar.xz \
            "
@@ -84,7 +84,7 @@ SYSROOT_PREPROCESS_FUNCS:append:class-native = " graphviz_sstate_postinst"
 pkg_postinst:${PN} () {
     if [ -n "$D" ]; then
         if ${@bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'true', 'false', d)}; then
-            ${@qemu_run_binary(d, '$D', '${bindir}/dot')} -c
+            ${@oe.qemu.qemu_run_binary(d, '$D', '${bindir}/dot')} -c
         fi
     else
         dot -c
@@ -96,7 +96,7 @@ pkg_postrm:${PN} () {
     rmdir --ignore-fail-on-non-empty $D${libdir}/graphviz
 }
 
-PACKAGE_WRITE_DEPS += "qemu-native"
+PACKAGE_WRITE_DEPS += "qemuwrapper-cross"
 
 PACKAGES =+ "${PN}-python ${PN}-perl ${PN}-demo"
 

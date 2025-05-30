@@ -1,4 +1,4 @@
-From cb69ffda0c2cbde6acdc8b01c8d5ff78d81a84fc Mon Sep 17 00:00:00 2001
+From 953719878466c55572294f42e85127bda5d34999 Mon Sep 17 00:00:00 2001
 From: Li xin <lixin.fnst@cn.fujitsu.com>
 Date: Fri, 19 Jun 2015 17:14:58 +0900
 Subject: [PATCH] Change fixed postconf to a variable for cross-compiling
@@ -12,7 +12,7 @@ Signed-off-by: Yao Zhao <yao.zhao@windriver.com>
  2 files changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 65e7911..40295be 100644
+index a37f89f..17cb64b 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -22,7 +22,7 @@ META	= meta/main.cf.proto meta/master.cf.proto meta/postfix-files \
@@ -25,10 +25,10 @@ index 65e7911..40295be 100644
  default: update
  
 diff --git a/postfix-install b/postfix-install
-index e498cd3..8049f43 100644
+index 563ee27..00d4651 100644
 --- a/postfix-install
 +++ b/postfix-install
-@@ -244,8 +244,8 @@ test -z "$non_interactive" -a ! -t 0 && {
+@@ -249,8 +249,8 @@ test -z "$non_interactive" -a ! -t 0 && {
      exit 1
  }
  
@@ -39,7 +39,7 @@ index e498cd3..8049f43 100644
      exit 1
  }
  
-@@ -266,7 +266,7 @@ do
+@@ -271,7 +271,7 @@ do
      case "$junk" in
      *MAIL_VERSION*) 
  	case "$mail_version" in
@@ -48,7 +48,7 @@ index e498cd3..8049f43 100644
  	esac
  	val=`echo "$junk" | sed 's/MAIL_VERSION$/'"$mail_version/g"` || exit 1
  	case "$val" in
-@@ -454,7 +454,7 @@ template files main.cf.proto and master.cf.proto."
+@@ -459,7 +459,7 @@ template files main.cf.proto and master.cf.proto."
  
  : ${install_root=/}
  : ${tempdir=`pwd`}
@@ -57,16 +57,16 @@ index e498cd3..8049f43 100644
  
  # Find out the location of installed configuration files.
  
-@@ -520,7 +520,7 @@ test -f $CONFIG_DIRECTORY/main.cf && {
+@@ -525,7 +525,7 @@ test -f $CONFIG_DIRECTORY/main.cf && {
  	case "$junk" in
  	"") eval unset $name;;
  	esac
--	eval : \${$name=\`bin/postconf -c $CONFIG_DIRECTORY -hx $name\`} ||
-+	eval : \${$name=\`$POSTCONF -c $CONFIG_DIRECTORY -hx $name\`} ||
+-	eval : \${$name=\`bin/postconf -qc $CONFIG_DIRECTORY -hx $name\`} ||
++	eval : \${$name=\`$POSTCONF -qc $CONFIG_DIRECTORY -hx $name\`} ||
  	    exit 1
      done
  }
-@@ -533,7 +533,7 @@ do
+@@ -538,7 +538,7 @@ do
      case "$junk" in
      "") eval unset $name;;
      esac
@@ -75,7 +75,7 @@ index e498cd3..8049f43 100644
  done
  
  # Override settings manually.
-@@ -670,6 +670,8 @@ README_DIRECTORY=$install_root$readme_directory
+@@ -675,6 +675,8 @@ README_DIRECTORY=$install_root$readme_directory
  SHLIB_DIRECTORY=$install_root$shlib_directory
  META_DIRECTORY=$install_root$meta_directory
  
@@ -84,7 +84,7 @@ index e498cd3..8049f43 100644
  # Avoid repeated tests for existence of these; default permissions suffice.
  
  test -d $DAEMON_DIRECTORY || mkdir -p $DAEMON_DIRECTORY || exit 1
-@@ -841,7 +843,7 @@ IFS="$BACKUP_IFS"
+@@ -846,7 +848,7 @@ IFS="$BACKUP_IFS"
  # the wrong place when Postfix is being upgraded.
  
  case "$mail_version" in
@@ -93,15 +93,15 @@ index e498cd3..8049f43 100644
  esac
  
  # Undo MAIL_VERSION expansion at the end of a parameter value. If
-@@ -861,7 +863,7 @@ do
+@@ -866,7 +868,7 @@ do
      esac
  done
  
--bin/postconf -c $CONFIG_DIRECTORY -e \
-+"$POSTCONF" -c $CONFIG_DIRECTORY -e \
+-bin/postconf -qc $CONFIG_DIRECTORY -e \
++"$POSTCONF" -qc $CONFIG_DIRECTORY -e \
      "daemon_directory = $daemon_directory" \
      "data_directory = $data_directory" \
      "command_directory = $command_directory" \
 -- 
-2.17.1
+2.25.1
 

@@ -12,8 +12,6 @@ SRC_URI[sha256sum] = "8a07cbf4df09b107fe3fc41d133ee2f6cea6ef4c33ccf06c8448ad058c
 
 inherit autotools gettext pkgconfig
 
-acpaths = "-I ./m4"
-
 EXTRA_OECONF += "--with-modules --disable-rpath"
 
 PACKAGECONFIG ??= "openssl zlib gnutls readline expat"
@@ -27,5 +25,4 @@ do_install:append() {
 	rm -rf ${D}${libdir}/charset.alias
 }
 FILES:${PN} += "${datadir}/icons/hicolor"
-FILES:${PN}-dbg += "${libdir}/lftp/${PV}/.debug"
 RDEPENDS:${PN} = "perl bash readline"

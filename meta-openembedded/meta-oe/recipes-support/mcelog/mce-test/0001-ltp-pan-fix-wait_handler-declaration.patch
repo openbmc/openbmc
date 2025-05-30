@@ -1,0 +1,47 @@
+From 3f1f2d143a1e365bb0451609d08194756951099a Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Tue, 22 Apr 2025 18:03:24 +0000
+Subject: [PATCH] ltp-pan: fix wait_handler declaration
+
+to match definition in:
+tools/ltp-pan/ltp-pan.c:wait_handler( int sig )
+
+* fixes build with gcc-15:
+  http://errors.yoctoproject.org/Errors/Details/852857/
+
+ltp-pan.c: In function 'main':
+ltp-pan.c:459:19: error: assignment to '__sighandler_t' {aka 'void (*)(int)'} from incompatible pointer type 'void (*)(void)' [-Wincompatible-pointer-types]
+  459 |     sa.sa_handler = wait_handler;
+      |                   ^
+In file included from ltp-pan.c:67:
+zoolib.h:52:6: note: 'wait_handler' declared here
+   52 | void wait_handler();
+      |      ^~~~~~~~~~~~
+In file included from TOPDIR/tmp/work/core2-64-oe-linux/mce-test/20230601+git/recipe-sysroot/usr/include/sys/param.h:28,
+                 from ltp-pan.c:56:
+TOPDIR/tmp/work/core2-64-oe-linux/mce-test/20230601+git/recipe-sysroot/usr/include/signal.h:72:16: note: '__sighandler_t' declared here
+   72 | typedef void (*__sighandler_t) (int);
+      |                ^~~~~~~~~~~~~~
+ltp-pan.c:489:17: error: too many arguments to function 'wait_handler'; expected 0, have 1
+  489 |                 wait_handler(SIGINT);
+      |                 ^~~~~~~~~~~~ ~~~~~~
+
+Upstream-Status: Submitted [https://github.com/andikleen/mce-test/pull/9]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ tools/ltp-pan/zoolib.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/ltp-pan/zoolib.h b/tools/ltp-pan/zoolib.h
+index 8b4049e..34ce76f 100644
+--- a/tools/ltp-pan/zoolib.h
++++ b/tools/ltp-pan/zoolib.h
+@@ -49,7 +49,7 @@ extern char zoo_error[ZELEN];
+ int lock_file( FILE *fp, short ltype, char **errmsg );
+ /* FILE *open_file( char *file, char *mode, char **errmsg ); */
+ 
+-void wait_handler();
++void wait_handler(int sig);
+ 
+ /*  char *zoo_active( void ); */
+ /* zoo_getname(): create a filename to use for the zoo

@@ -1,0 +1,41 @@
+From 6e231d887c20b2139db75e6dc6c20107273aaacd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?K=C3=A9l=C3=A9fa=20San=C3=A9?= <kelefa.sane@smile.fr>
+Date: Thu, 3 Apr 2025 10:25:30 +0200
+Subject: [PATCH] libdmmp/Makefile: Add target docs/man/dmmp_strerror.3 to
+ .PHONY list
+
+When cloning git repos, depending on the order of written to the disk, target
+docs/man/dmmp_strerror.3 is more recent that the prerequisite
+libdmmp/libdmmp.h this leads to a non reproducible behavior:
+Sometimes, the timestamps are updated in the man pages, sometimes not.
+
+Upstream-Status: Denied
+
+https://lore.kernel.org/dm-devel/72355f1d0984647e91f8c50f1c2295071af49e33.camel@suse.com/
+The patch has been rejected by upstream, who will update the timestamps of the 
+manpages with a new commit.
+In order to be reproducible without having a random result, forcing the target
+rebuild by adding it to .PHONY is the more acceptable solution, the alternative
+would have been to use the make -B option which consider all target has
+obsolete and rebuild them all, which is less efficient.
+
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+Signed-off-by: Sofiane HAMAM <sofiane.hamam@smile.fr>
+Signed-off-by: Kelefa Sane <kelefa.sane@smile.fr>
+---
+ libdmmp/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libdmmp/Makefile b/libdmmp/Makefile
+index 7e0e2509..187bcb8c 100644
+--- a/libdmmp/Makefile
++++ b/libdmmp/Makefile
+@@ -20,7 +20,7 @@ CFLAGS += $(LIB_CFLAGS) -fvisibility=hidden
+ LIBDEPS += $(shell $(PKG_CONFIG) --libs json-c) -L$(mpathcmddir) -lmpathcmd -lpthread
+ 
+ all: $(LIBS) doc
+-.PHONY:	doc clean install uninstall check speed_test dep_clean
++.PHONY:	doc clean install uninstall check speed_test dep_clean docs/man/dmmp_strerror.3
+ 
+ $(LIBS): $(OBJS)
+ 	$(Q)$(CC) $(LDFLAGS) $(SHARED_FLAGS) -Wl,-soname=$@ -o $@ $(OBJS) $(LIBDEPS)

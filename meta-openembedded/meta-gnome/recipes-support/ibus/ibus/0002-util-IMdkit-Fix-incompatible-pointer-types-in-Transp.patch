@@ -1,0 +1,109 @@
+From b0a554d7c9d4d52bd34a85fe66a85adf9542a2ec Mon Sep 17 00:00:00 2001
+From: fujiwarat <takao.fujiwara1@gmail.com>
+Date: Fri, 24 Jan 2025 10:01:11 +0900
+Subject: [PATCH] util/IMdkit: Fix incompatible-pointer-types in
+ TransportSW.checkAddr
+
+
+BUG=rhbz#2340629
+
+Upstream-Status: Backport [https://github.com/ibus/ibus/commit/d039b95b1af14fd34167a4ca038938cef2ea41ca]
+Signed-off-by: Yoann Congal <yoann.congal@smile.fr>
+---
+ util/IMdkit/Xi18n.h           | 18 ++++++++++--------
+ util/IMdkit/i18nMethod.c      |  3 ++-
+ util/IMdkit/i18nOffsetCache.c | 10 ++++++----
+ 3 files changed, 18 insertions(+), 13 deletions(-)
+
+diff --git a/util/IMdkit/Xi18n.h b/util/IMdkit/Xi18n.h
+index 79dd9619..09097bb6 100644
+--- a/util/IMdkit/Xi18n.h
++++ b/util/IMdkit/Xi18n.h
+@@ -3,7 +3,7 @@
+          Copyright (C) 1994-1995 Sun Microsystems, Inc.
+          Copyright (C) 1993-1994 Hewlett-Packard Company
+          Copyright (C) 2014 Peng Huang <shawn.p.huang@gmail.com>
+-         Copyright (C) 2014 Red Hat, Inc.
++         Copyright (C) 2014-2025 Red Hat, Inc.
+  
+ Permission to use, copy, modify, distribute, and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+@@ -71,13 +71,6 @@ IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ #define I18N_SET	1
+ #define I18N_GET	2
+ 
+-typedef struct
+-{
+-    char        *transportname;
+-    int         namelen;
+-    Bool        (*checkAddr) ();
+-} TransportSW;
+-
+ typedef struct _XIMPending
+ {
+     unsigned    char *p;
+@@ -172,6 +165,15 @@ typedef struct _Xi18nClient
+ 
+ typedef struct _Xi18nCore *Xi18n;
+ 
++typedef struct _TransportSW TransportSW;
++
++struct _TransportSW
++{
++    char        *transportname;
++    int         namelen;
++    Bool        (*checkAddr) (Xi18n, TransportSW *, char *);
++};
++
+ /*
+  * Callback Struct for XIM Protocol
+  */
+diff --git a/util/IMdkit/i18nMethod.c b/util/IMdkit/i18nMethod.c
+index 9c44e7fe..7f343d87 100644
+--- a/util/IMdkit/i18nMethod.c
++++ b/util/IMdkit/i18nMethod.c
+@@ -2,6 +2,7 @@
+  
+          Copyright 1994, 1995 by Sun Microsystems, Inc.
+          Copyright 1993, 1994 by Hewlett-Packard Company
++         Copyright (C) 2014-2025 Red Hat, Inc.
+  
+ Permission to use, copy, modify, distribute, and sell this software
+ and its documentation for any purpose is hereby granted without fee,
+@@ -89,7 +90,7 @@ TransportSW _TransR[] =
+ #ifdef DNETCONN
+     {"decnet",          6, _Xi18nCheckTransAddress},
+ #endif
+-    {(char *) NULL,     0, (Bool (*) ()) NULL}
++    {(char *) NULL,     0, (Bool (*) (Xi18n, TransportSW *, char *))NULL}
+ };
+ 
+ static Bool GetInputStyles (Xi18n i18n_core, XIMStyles **p_style)
+diff --git a/util/IMdkit/i18nOffsetCache.c b/util/IMdkit/i18nOffsetCache.c
+index e2fe8c6b..cab974c7 100644
+--- a/util/IMdkit/i18nOffsetCache.c
++++ b/util/IMdkit/i18nOffsetCache.c
+@@ -1,6 +1,6 @@
+ /*
+  * Copyright (C) 2014 Peng Huang <shawn.p.huang@gmail.com>
+- * Copyright (C) 2014 Red Hat, Inc.
++ * Copyright (C) 2014-2025 Red Hat, Inc.
+  *
+  * Permission to use, copy, modify, distribute, and sell this
+  * software and its documentation for any purpose is hereby granted
+@@ -83,10 +83,12 @@ void _Xi18nSetPropertyOffset (Xi18nOffsetCache *offset_cache, Atom key,
+     }
+ 
+     if (++offset_cache->size > offset_cache->capacity) {
+-        offset_cache->capacity *= OFFSET_CACHE_GROWTH_FACTOR;
+-        offset_cache->data = (Xi18nAtomOffsetPair *) realloc (data,
++        Xi18nAtomOffsetPair *pair = (Xi18nAtomOffsetPair *) realloc (data,
+                 offset_cache->capacity * sizeof (Xi18nAtomOffsetPair));
+-        if (offset_cache->data == NULL) {
++        offset_cache->capacity *= OFFSET_CACHE_GROWTH_FACTOR;
++        if (pair) {
++            offset_cache->data = pair;
++        } else {
+             offset_cache->data = data;
+             --offset_cache->size;
+         }

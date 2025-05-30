@@ -28,6 +28,7 @@ SRC_URI:append = " \
            \
            file://0001-Remove-check_build_deps-build-steps.patch \
            file://0002-traced-fix-missing-include.patch \
+           file://0001-add-missing-includes-for-the-build-with-use_libcxx_m.patch \
            "
 
 SRCREV_bionic = "a0d0355105cb9d4a4b5384897448676133d7b8e2"
@@ -44,7 +45,7 @@ SRCREV_libunwind = "419b03c0b8f20d6da9ddcb0d661a94a97cdd7dad"
 SRCREV_zlib = "6d3f6aa0f87c9791ca7724c279ef61384f331dfd"
 SRCREV_zstd = "77211fcc5e08c781734a386402ada93d0d18d093"
 
-SRCREV_FORMAT .="_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib_zstd"
+SRCREV_FORMAT .= "_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib_zstd"
 
 SRC_URI[gn.sha256sum] = "f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa2358177b64f5cd"
 

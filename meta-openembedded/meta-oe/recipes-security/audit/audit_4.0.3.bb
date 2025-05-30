@@ -96,6 +96,9 @@ do_install:append() {
     if ! ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
         rm -rf ${D}${nonarch_libdir}/systemd
         rm -rf ${D}${nonarch_libdir}/tmpfiles.d
+
+        # Remove empty directory when enable multilib
+        rmdir --ignore-fail-on-non-empty ${D}${nonarch_libdir}
     fi
 
     # Create /var/spool/audit directory for audisp-remote

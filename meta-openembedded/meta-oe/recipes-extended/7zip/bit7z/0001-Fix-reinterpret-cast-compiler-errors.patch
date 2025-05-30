@@ -1,0 +1,52 @@
+From bedeec4d57d29be7de91697277ace00ba87d3e75 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Tue, 1 Apr 2025 15:23:51 +0200
+Subject: [PATCH] Fix reinterpret-cast compiler errors
+
+Building on 32-bit arm, following warning/error occurs:
+
+src/internal/windows.cpp: In function 'bit7z::OLECHAR* AllocStringBuffer(LPCSTR, uint32_t)':
+src/internal/windows.cpp:79:6: error: cast from 'unsigned char*' to 'bstr_prefix_t*' {aka 'unsigned int*'} increases required alignment of target type [-Werror=cast-align]
+   79 |     *reinterpret_cast< bstr_prefix_t* >( bstrBuffer ) = byteLength;
+      |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+git/src/internal/windows.cpp:83:19: error: cast from 'unsigned char*' to 'bit7z::BSTR' {aka 'wchar_t*'} increases required alignment of target type [-Werror=cast-align]
+   83 |     BSTR result = reinterpret_cast< BSTR >( bstrBuffer + sizeof( bstr_prefix_t ) );
+      |                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors
+
+Fix it by using the desired variable size right away and thus avoid
+casting to an array with different alignment.
+
+Upstream-Status: Backport [https://github.com/rikyoz/bit7z/commit/b2789ea9b0fbb2a74dbf6764ddb72d60659a3bce]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ src/internal/windows.cpp | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/internal/windows.cpp b/src/internal/windows.cpp
+index 9304aed7..7bee5959 100644
+--- a/src/internal/windows.cpp
++++ b/src/internal/windows.cpp
+@@ -68,19 +68,18 @@ auto AllocStringBuffer( LPCSTR str, uint32_t byteLength ) -> BSTR {
+ 
+     // Allocating memory for storing the BSTR as a byte array.
+     // NOLINTNEXTLINE(cppcoreguidelines-no-malloc, cppcoreguidelines-owning-memory)
+-    auto* bstrBuffer = static_cast< byte_t* >( std::calloc( bufferSize, sizeof( byte_t ) ) );
++    auto* bstrBuffer = static_cast< bstr_prefix_t* >( std::calloc( bufferSize, sizeof( byte_t ) ) );
+ 
+     if ( bstrBuffer == nullptr ) { // Failed to allocate memory for the BSTR buffer.
+         return nullptr;
+     }
+ 
+     // Storing the number of bytes of the BSTR as a prefix of it.
+-    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+-    *reinterpret_cast< bstr_prefix_t* >( bstrBuffer ) = byteLength;
++    *bstrBuffer = byteLength;
+ 
+     // The actual BSTR must point after the byteLength prefix.
+     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-pointer-arithmetic, cppcoreguidelines-pro-type-reinterpret-cast)
+-    BSTR result = reinterpret_cast< BSTR >( bstrBuffer + sizeof( bstr_prefix_t ) );
++    BSTR result = reinterpret_cast< BSTR >( bstrBuffer + 1 );
+     if ( str != nullptr ) {
+         // Copying byte-by-byte the input string to the BSTR.
+         // Note: flawfinder warns about not checking for buffer overflows; this is a false alarm,

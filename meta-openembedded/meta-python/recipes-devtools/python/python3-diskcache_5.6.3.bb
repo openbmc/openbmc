@@ -1,5 +1,5 @@
 DESCRIPTION = "Disk Cache -- Disk and file backed persistent cache."
-HOMEPAGE = "http://www.grantjenks.com/docs/diskcache/"
+HOMEPAGE = "https://www.grantjenks.com/docs/diskcache/"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c60ef82f0f40155453f6d5f2c94b6e8e"
 

@@ -26,6 +26,10 @@
 # should be the same blockdevice in the command shown above while <dm_dev_name>
 # is the name of the to be created dm-verity-device.
 #
+# By specifying a different VERITY_IMAGE_HASHDEV_SUFFIX, the hash tree data can
+# be created in a separate file. In this case, <dev> is just zero padded to a
+# multiple of VERITY_BLOCK_SIZE. <hash_dev> will be a separate file.
+#
 # The root hash is calculated using a salt to make attacks more difficult. Thus,
 # please grant each image recipe its own salt which could be generated e.g. via
 #
@@ -42,6 +46,7 @@ VERITY_SALT ?= "${CLASS_VERITY_SALT}"
 VERITY_BLOCK_SIZE ?= "4096"
 VERITY_IMAGE_FSTYPE ?= "ext4"
 VERITY_IMAGE_SUFFIX ?= ".verity"
+VERITY_IMAGE_HASHDEV_SUFFIX ?= "${VERITY_IMAGE_SUFFIX}"
 VERITY_INPUT_IMAGE ?= "${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.${VERITY_IMAGE_FSTYPE}"
 
 IMAGE_TYPEDEP:verity = "${VERITY_IMAGE_FSTYPE}"
@@ -56,6 +61,7 @@ python __anonymous() {
 }
 
 python do_image_verity () {
+    import io
     import os
     import subprocess
     import shutil
@@ -65,6 +71,9 @@ python do_image_verity () {
 
     verity_image_suffix = d.getVar('VERITY_IMAGE_SUFFIX')
     verity = '{}{}'.format(image, verity_image_suffix)
+
+    verity_image_hashdev_suffix = d.getVar('VERITY_IMAGE_HASHDEV_SUFFIX')
+    verity_hashdev = '{}{}'.format(image, verity_image_hashdev_suffix)
 
     # For better readability the parameter VERITY_BLOCK_SIZE is specified in
     # bytes. It must be a multiple of the logical sector size which is 512 bytes
@@ -87,9 +96,9 @@ python do_image_verity () {
     bb.debug(1, f"data_size_blocks: {data_size_blocks}, {data_size_rest}")
     bb.debug(1, f"data_size: {data_size}")
 
-    # Create verity image
-    try:
-        output = subprocess.check_output([
+    if verity == verity_hashdev:
+        # creating self-contained dm-verity image
+        veritysetup_command = [
             'veritysetup', 'format',
             '--no-superblock',
             '--salt={}'.format(salt),
@@ -98,7 +107,27 @@ python do_image_verity () {
             '--hash-block-size={}'.format(block_size),
             '--hash-offset={}'.format(data_size),
             verity, verity,
-            ])
+        ]
+    else:
+        # creating separate dm-verity and hash device image
+        veritysetup_command = [
+            'veritysetup', 'format',
+            '--salt={}'.format(salt),
+            '--data-blocks={}'.format(data_blocks),
+            '--data-block-size={}'.format(block_size),
+            '--hash-block-size={}'.format(block_size),
+            verity, verity_hashdev,
+        ]
+        # veritysetup expects the data device size to be a multiple of block_size
+        # when creating a separate hashdev file, zero pad verity file if needed
+        if data_size_rest:
+            with open(verity, 'rb+') as verityfile:
+                verityfile.seek(0, io.SEEK_END)
+                verityfile.write(b'\x00' * (block_size - data_size_rest))
+
+    # Create verity image
+    try:
+        output = subprocess.check_output(veritysetup_command)
     except subprocess.CalledProcessError as err:
         bb.fatal('%s returned with %s (%s)' % (err.cmd, err.returncode, err.output))
 
@@ -128,7 +157,11 @@ python do_image_verity () {
         bb.fatal('Unexpected error %s' % err)
 
     # Create symlinks
-    for suffix in [ verity_image_suffix, '.verity-info', '.verity-params' ]:
+    suffix_list = [ verity_image_suffix, '.verity-info', '.verity-params' ]
+    if verity != verity_hashdev:
+        suffix_list.append(verity_image_hashdev_suffix)
+
+    for suffix in suffix_list:
         try:
             os.remove(link + suffix)
         except FileNotFoundError:

@@ -3,7 +3,11 @@
 cd tests
 for atest in test-* ; do
     rm -rf tests.log
-    ./${atest} > tests.log 2>&1
+    if [ ${atest} = "test-locale-cpp_cpp11" ]; then
+        ./${atest} --test-case-exclude="locale-dependent test (LC_NUMERIC=de_DE)" > tests.log 2>&1
+    else
+        ./${atest} > tests.log 2>&1
+    fi
     if [ $? = 0 ] ; then
         echo "PASS: ${atest}"
     else

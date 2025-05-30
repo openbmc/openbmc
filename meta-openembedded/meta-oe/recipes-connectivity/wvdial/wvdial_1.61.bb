@@ -21,7 +21,7 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 
 COMPATIBLE_HOST:libc-musl = "null"
 EXTRA_OEMAKE = ""
-export WVLINK="${LD}"
+export WVLINK = "${LD}"
 
 PARALLEL_MAKE = ""
 

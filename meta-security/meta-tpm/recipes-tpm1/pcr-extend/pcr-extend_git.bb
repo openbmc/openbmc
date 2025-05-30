@@ -16,6 +16,8 @@ inherit autotools
 
 S = "${WORKDIR}/git"
 
+do_configure[noexec] = "1"
+
 do_compile() {
     oe_runmake -C ${S}/src
 }

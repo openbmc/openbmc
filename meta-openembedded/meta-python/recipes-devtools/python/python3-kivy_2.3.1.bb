@@ -12,6 +12,7 @@ inherit setuptools3 pkgconfig features_check cython
 # Also, if using SDL2 as backend, SDL2 needs to be configured with gles
 SRC_URI = "git://github.com/kivy/kivy.git;protocol=https;branch=stable \
            file://0001-add-support-for-glesv2.patch \
+           file://0001-Remove-old-Python-2-long-from-Cython-files-fixes-bui.patch \
            "
 
 SRCREV = "20d74dcd30f143abbd1aa94c76bafc5bd934d5bd"
@@ -36,7 +37,7 @@ export USE_X11
 KIVY_GRAPHICS = "gles"
 export KIVY_GRAPHICS
 
-KIVY_CROSS_SYSROOT="${RECIPE_SYSROOT}"
+KIVY_CROSS_SYSROOT = "${RECIPE_SYSROOT}"
 export KIVY_CROSS_SYSROOT
 
 REQUIRED_DISTRO_FEATURES += "opengl gobject-introspection-data"
@@ -46,7 +47,7 @@ ANY_OF_DISTRO_FEATURES = "x11 wayland"
 DEPENDS += " \
     gstreamer1.0 \
     gstreamer1.0-python \
-    libsdl2 \
+    virtual/libsdl2 \
     libsdl2-ttf \
     libsdl2-image \
     libsdl2-mixer \

@@ -16,7 +16,7 @@ S = "${WORKDIR}/git"
 inherit cmake pkgconfig
 
 PACKAGECONFIG ?= "libsdl"
-PACKAGECONFIG[libsdl] = "-DENABLE_SDL=ON,-DENABLE_SDL=OFF,libsdl2"
+PACKAGECONFIG[libsdl] = "-DENABLE_SDL=ON,-DENABLE_SDL=OFF,virtual/libsdl2"
 
 FILES:${PN} += "${libdir}/libde265.so"
 FILES:${PN}-dev = "${includedir} ${libdir}/cmake ${libdir}/pkgconfig"

@@ -9,28 +9,31 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 SRC_URI:append = "\
     file://0001-Allow-configuring-flash-image-files-compile-time.patch \
+    file://0002-Fix-MbedTLS-3.6-and-GCC-14-compatibility.patch \
+    file://0001-Relax-pyelftools-dependency.patch \
 "
 
-# Trusted Services; aka. 2024 April 19
-SRCREV_trusted-services = "602be607198ea784bc5ab1c0c9d3ac4e2c67f1d9"
+# Trusted Services; aka. v1.1.0
+SRCREV_trusted-services = "83bd53b6689ebb071bc13fcd4e01618bab2e74ca"
 LIC_FILES_CHKSUM = "file://${S}/license.rst;md5=ea160bac7f690a069c608516b17997f4"
 
 S = "${WORKDIR}/git/trusted-services"
 PV ?= "0.0+git"
+UPSTREAM_CHECK_COMMITS = "1"
 
 # DTC, tag "v1.6.1"
 SRC_URI += "git://github.com/dgibson/dtc;name=dtc;protocol=https;branch=main;destsuffix=git/dtc"
 SRCREV_dtc = "b6910bec11614980a21e46fbccc35934b671bd81"
 LIC_FILES_CHKSUM += "file://../dtc/README.license;md5=a1eb22e37f09df5b5511b8a278992d0e"
 
-# MbedTLS, tag "v3.5.1"
-SRC_URI += "git://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;branch=master;destsuffix=git/mbedtls"
-SRCREV_mbedtls = "15254759342494c7e969766d5424d78d7deb9bfa"
+# MbedTLS, tag "v3.6.0"
+SRC_URI += "gitsm://github.com/ARMmbed/mbedtls.git;name=mbedtls;protocol=https;branch=master;destsuffix=git/mbedtls"
+SRCREV_mbedtls = "2ca6c285a0dd3f33982dd57299012dacab1ff206"
 LIC_FILES_CHKSUM += "file://../mbedtls/LICENSE;md5=379d5819937a6c2f1ef1630d341e026d"
 
-# Nanopb, tag "nanopb-0.4.7" plus some further fixes
+# Nanopb, tag "nanopb-0.4.8" plus some further fixes
 SRC_URI += "git://github.com/nanopb/nanopb.git;name=nanopb;protocol=https;branch=master;destsuffix=git/nanopb"
-SRCREV_nanopb = "dbbf5d8992295aae669b8071eadad02f87d5faf0"
+SRCREV_nanopb = "6cfe48d6f1593f8fa5c0f90437f5e6522587745e"
 LIC_FILES_CHKSUM += "file://../nanopb/LICENSE.txt;md5=9db4b73a55a3994384112efcdb37c01f"
 
 # qcbor, tag "v1.0.0"
@@ -60,11 +63,6 @@ do_apply_local_src_patches() {
     apply_local_src_patches ${S}/external/CppUTest ${WORKDIR}/git/cpputest
     apply_local_src_patches ${S}/external/libfdt ${WORKDIR}/git/dtc
     apply_local_src_patches ${S}/external/nanopb ${WORKDIR}/git/nanopb
-}
-
-do_config:append:() {
-    # Fine tune MbedTLS configuration for crypto only operation.
-    sh -c "cd ${WORKDIR}/git/mbedtls; python3 scripts/config.py crypto"
 }
 
 # Paths to dependencies required by some TS SPs/tools

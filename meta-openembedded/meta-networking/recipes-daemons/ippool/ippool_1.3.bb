@@ -83,7 +83,7 @@ FILES:${PN}-test = "/opt/${BPN}"
 # needs tcl to run tests
 RDEPENDS:${PN}-test += "tcl ${BPN}"
 
-PPPD_VERSION="${@get_ppp_version(d)}"
+PPPD_VERSION = "${@get_ppp_version(d)}"
 
 def get_ppp_version(d):
     import re

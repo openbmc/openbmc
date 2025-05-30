@@ -23,7 +23,7 @@ RDEPENDS:${PN}-dev = " \
     bash \
 "
 
-export GO111MODULE="on"
+export GO111MODULE = "on"
 
 inherit go systemd pkgconfig features_check
 
@@ -70,3 +70,4 @@ do_install:append() {
 
 FILES:${PN}:append = " ${sysconfdir}/etcd.d/etcd-existing.conf"
 
+SKIP_RECIPE[etcd] ?= "QA Issue: task do_compile has network enabled"

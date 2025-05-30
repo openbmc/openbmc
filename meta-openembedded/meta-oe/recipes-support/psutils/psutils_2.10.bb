@@ -6,7 +6,7 @@ SRC_URI[sha256sum] = "6f8339fd5322df5c782bfb355d9f89e513353220fca0700a5a28775404
 
 inherit perlnative autotools
 
-export PERL="/usr/bin/env perl"
+export PERL = "/usr/bin/env perl"
 
 DEPENDS += "libpaper-native"
 

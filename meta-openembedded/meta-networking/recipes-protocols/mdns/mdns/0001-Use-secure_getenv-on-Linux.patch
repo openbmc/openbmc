@@ -1,0 +1,30 @@
+From 1bf3be6cd775635aed95689f97a13fa6a037c741 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Tue, 27 May 2025 13:33:30 +0100
+Subject: [PATCH] Use secure_getenv on Linux
+
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ mDNSShared/dnssd_clientstub.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mDNSShared/dnssd_clientstub.c b/mDNSShared/dnssd_clientstub.c
+index 6667276ee33a..e7b51813664e 100644
+--- a/mDNSShared/dnssd_clientstub.c
++++ b/mDNSShared/dnssd_clientstub.c
+@@ -801,10 +801,14 @@ static DNSServiceErrorType ConnectToServer(DNSServiceRef *ref, DNSServiceFlags f
+         #endif
+         #ifndef USE_TCP_LOOPBACK
+         char* uds_serverpath = NULL;
++#ifdef TARGET_OS_LINUX
++        uds_serverpath = secure_getenv(MDNS_UDS_SERVERPATH_ENVVAR);
++#else
+         if (!issetugid())
+         {
+             uds_serverpath = getenv(MDNS_UDS_SERVERPATH_ENVVAR);
+         }
++#endif
+         if (uds_serverpath == NULL)
+             uds_serverpath = MDNS_UDS_SERVERPATH;
+         else if (strlen(uds_serverpath) >= MAX_CTLPATH)

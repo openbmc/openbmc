@@ -1,0 +1,32 @@
+From a0a976c0c4c2b92d61e71e00be4adfd8ea6d0d8f Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Thu, 10 Apr 2025 14:14:15 +0900
+Subject: [PATCH] fix too many arguments error in gcc15
+
+dhry_1.c: In function 'main':
+dhry_1.c:176:23: error: too many arguments to function 'Func_1'; expected 0, have 2
+  176 |       if (Enum_Loc == Func_1 (Ch_Index, 'C'))
+      |                       ^~~~~~  ~~~~~~~~
+dhry_1.c:33:17: note: declared here
+   33 | Enumeration     Func_1 ();
+      |                 ^~~~~~
+
+Upstream-Status: Inactive-Upstream [lastrelease: 1988]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ dhry_1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dhry_1.c b/dhry_1.c
+index b081b86..e5a4873 100644
+--- a/dhry_1.c
++++ b/dhry_1.c
+@@ -30,7 +30,7 @@ char            Ch_1_Glob,
+ int             Arr_1_Glob [50];
+ int             Arr_2_Glob [50] [50];
+ 
+-Enumeration     Func_1 ();
++Enumeration     Func_1 (Capital_Letter Ch_1_Par_Val, Capital_Letter Ch_2_Par_Val);
+   /* forward declaration necessary since Enumeration may not simply be int */
+ 
+ #ifndef REG

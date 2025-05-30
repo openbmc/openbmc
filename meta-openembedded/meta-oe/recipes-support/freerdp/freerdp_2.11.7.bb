@@ -20,6 +20,7 @@ SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=stable-2.0;protocol=https
            file://0001-Fix-const-qualifier-error.patch \
            file://0002-Do-not-install-tools-a-CMake-targets.patch \
            file://0001-Fixed-compilation-warnings-in-ainput-channel.patch \
+           file://CVE-2024-32661.patch \
            "
 
 S = "${WORKDIR}/git"
@@ -92,3 +93,9 @@ python populate_packages:prepend () {
         description='FreeRDP plugin %s',
         prepend=True, extra_depends='')
 }
+
+CVE_STATUS[CVE-2024-32662] = "fixed-version: 2.x is not affected, bug was introduced in 3.0.0"
+
+# avoid http://errors.yoctoproject.org/Errors/Details/852862/
+# fixed in freerdp3 with https://github.com/FreeRDP/FreeRDP/pull/10553
+CFLAGS += "-std=gnu17"

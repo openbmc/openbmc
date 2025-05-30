@@ -1,4 +1,4 @@
-From 892225f5101b1131434d323c55e79a93dc189609 Mon Sep 17 00:00:00 2001
+From 60487572d23cb374f8eb6b6560c385ecf6ad417e Mon Sep 17 00:00:00 2001
 From: Venture Research <tech@ventureresearch.com>
 Date: Fri, 8 Feb 2013 20:22:19 -0600
 Subject: [PATCH] lua: update Makefile to use environment build settings
@@ -15,19 +15,23 @@ Signed-off-by: Armin Kuster <akust808@gmail.com>
 updated to work wtih 6.2.1
 Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
 Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
----
-Upstream-Status: Pending
 
+Updated to work with 8.1.x
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+
+Upstream-Status: Inappropriate [OE-specific]
+
+---
  deps/Makefile         |  1 -
  deps/lua/Makefile     |  1 -
  deps/lua/src/Makefile | 16 ++++++----------
  3 files changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/deps/Makefile b/deps/Makefile
-index f1e4bd6ce..b9e50d049 100644
+index 72389def9..5d3ade528 100644
 --- a/deps/Makefile
 +++ b/deps/Makefile
-@@ -94,7 +94,6 @@ endif
+@@ -95,7 +95,6 @@ endif
  # lua's Makefile defines AR="ar rcu", which is unusual, and makes it more
  # challenging to cross-compile lua (and redis).  These defines make it easier
  # to fit redis into cross-compilation environments, which typically set AR.

@@ -1,4 +1,4 @@
-From bb044160faf4ae7615ddfdb17641dd88c33cde57 Mon Sep 17 00:00:00 2001
+From 26ed5003847a14a16d0c1d4030aa1a361c0289fb Mon Sep 17 00:00:00 2001
 From: Sakib Sajal <sakib.sajal@windriver.com>
 Date: Thu, 31 Mar 2022 15:09:58 -0400
 Subject: [PATCH] drbdmon: add LDFLAGS when linking
@@ -7,11 +7,11 @@ Upstream-Status: Pending
 
 Signed-off-by: Sakib Sajal <sakib.sajal@windriver.com>
 ---
- user/drbdmon/Makefile.in | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ user/drbdmon/Makefile.in | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/user/drbdmon/Makefile.in b/user/drbdmon/Makefile.in
-index 7bd8987e..115a81b8 100644
+index 9c5427e9..0101a60b 100644
 --- a/user/drbdmon/Makefile.in
 +++ b/user/drbdmon/Makefile.in
 @@ -1,6 +1,6 @@
@@ -22,12 +22,19 @@ index 7bd8987e..115a81b8 100644
  CXX = @CXX@
  LIBS = @LIBS@
  
-@@ -72,7 +72,7 @@ $(dsaext-obj): $(basename $(dsaext-obj)).cpp $(basename $(dsaext-obj)).h
+@@ -76,10 +76,10 @@ $(dsaext-obj): $(basename $(dsaext-obj)).cpp $(basename $(dsaext-obj)).h
  $(integerparse-obj): $(basename $(integerparse-obj)).cpp $(basename $(integerparse-obj)).h
  
  drbdmon: $(ls-obj)
 -	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) $^ $(LIBS)
 +	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $^ $(LIBS)
  
+ drbd-events-log-supplier: $(supplier-obj)
+-	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) $^
++	$(CXX) -o $@ $(CPPFLAGS) $(CXXFLAGS) $(LDFLAGS) $^
+ 
  # do not try to rebuild Makefile itself
  Makefile: ;
+-- 
+2.25.1
+

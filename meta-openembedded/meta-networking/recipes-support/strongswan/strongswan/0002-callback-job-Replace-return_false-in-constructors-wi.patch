@@ -1,0 +1,90 @@
+From d5d2568ff0e88d364dadf50b67bf17050763cf98 Mon Sep 17 00:00:00 2001
+From: Tobias Brunner <tobias@strongswan.org>
+Date: Fri, 21 Feb 2025 16:45:57 +0100
+Subject: [PATCH] callback-job: Replace return_false() in constructors with
+ dedicated function
+
+Besides being clearer, this fixes issues with GCC 15.  The latter uses
+C23 by default, which changes the meaning of function declarations
+without parameters such as
+
+	bool return false();
+
+Instead of "this function takes an unknown number of arguments", this
+now equals (void), that is, "this function takes no arguments".  So we
+run into incompatible pointer type warnings all over when using such
+functions.  They could be cast to (void*) but this seems the cleaner
+solution for this use case.
+
+Upstream-Status: Backport [d5d2568 callback-job: Replace return_false() in constructors with dedicated function]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ src/libstrongswan/processing/jobs/callback_job.c      | 10 +++++++++-
+ src/libstrongswan/processing/jobs/callback_job.h      | 11 ++++++++++-
+ src/libstrongswan/processing/scheduler.c              |  3 ++-
+ 3 files changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/src/libstrongswan/processing/jobs/callback_job.c b/src/libstrongswan/processing/jobs/callback_job.c
+index cb2a0aba5..3ab40b947 100644
+--- a/src/libstrongswan/processing/jobs/callback_job.c
++++ b/src/libstrongswan/processing/jobs/callback_job.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2009-2012 Tobias Brunner
++ * Copyright (C) 2009-2025 Tobias Brunner
+  * Copyright (C) 2007-2011 Martin Willi
+  *
+  * Copyright (C) secunet Security Networks AG
+@@ -131,3 +131,11 @@ callback_job_t *callback_job_create(callback_job_cb_t cb, void *data,
+ 	return callback_job_create_with_prio(cb, data, cleanup, cancel,
+ 										 JOB_PRIO_MEDIUM);
+ }
++
++/*
++ * Described in header
++ */
++bool callback_job_cancel_thread(void *data)
++{
++	return FALSE;
++}
+diff --git a/src/libstrongswan/processing/jobs/callback_job.h b/src/libstrongswan/processing/jobs/callback_job.h
+index 0f1ae212d..fda868879 100644
+--- a/src/libstrongswan/processing/jobs/callback_job.h
++++ b/src/libstrongswan/processing/jobs/callback_job.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (C) 2012 Tobias Brunner
++ * Copyright (C) 2012-2025 Tobias Brunner
+  * Copyright (C) 2007-2011 Martin Willi
+  *
+  * Copyright (C) secunet Security Networks AG
+@@ -62,6 +62,15 @@ typedef void (*callback_job_cleanup_t)(void *data);
+  */
+ typedef bool (*callback_job_cancel_t)(void *data);
+ 
++/**
++ * Default implementation of callback_job_cancel_t that simply returns FALSE
++ * to force cancellation of the thread by the processor.
++ *
++ * @param data			ignored argument
++ * @return				always returns FALSE
++ */
++bool callback_job_cancel_thread(void *data);
++
+ /**
+  * Class representing an callback Job.
+  *
+diff --git a/src/libstrongswan/processing/scheduler.c b/src/libstrongswan/processing/scheduler.c
+index c5e5dd83e..76d98ddff 100644
+--- a/src/libstrongswan/processing/scheduler.c
++++ b/src/libstrongswan/processing/scheduler.c
+@@ -329,7 +329,8 @@ scheduler_t * scheduler_create()
+ 	this->heap = (event_t**)calloc(this->heap_size + 1, sizeof(event_t*));
+ 
+ 	job = callback_job_create_with_prio((callback_job_cb_t)schedule, this,
+-										NULL, return_false, JOB_PRIO_CRITICAL);
++										NULL, callback_job_cancel_thread,
++										JOB_PRIO_CRITICAL);
+ 	lib->processor->queue_job(lib->processor, (job_t*)job);
+ 
+ 	return &this->public;

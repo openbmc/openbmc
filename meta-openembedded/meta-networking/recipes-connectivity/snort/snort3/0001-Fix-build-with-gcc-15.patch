@@ -1,0 +1,79 @@
+From 2bfb46b11d35f2fc5f3926376651cc936c6eab13 Mon Sep 17 00:00:00 2001
+From: Nguyen Dat Tho <tho3.nguyen@lge.com>
+Date: Mon, 31 Mar 2025 15:59:51 +0900
+Subject: [PATCH] Fix build with gcc-15
+
+Signed-off-by: Nguyen Dat Tho <tho3.nguyen@lge.com>
+
+Upstream-Status: Submitted <https://github.com/snort3/snort3/pull/408>
+---
+ tools/snort2lua/config_states/config_ignore_ports.cc     | 1 +
+ tools/snort2lua/preprocessor_states/pps_dcerpc_server.cc | 1 +
+ tools/snort2lua/preprocessor_states/pps_frag3_engine.cc  | 1 +
+ tools/snort2lua/preprocessor_states/pps_stream5_tcp.cc   | 1 +
+ tools/snort2lua/rule_states/rule_gid_sid.cc              | 1 +
+ 5 files changed, 5 insertions(+)
+
+diff --git a/tools/snort2lua/config_states/config_ignore_ports.cc b/tools/snort2lua/config_states/config_ignore_ports.cc
+index 4ddfebb5d..ec180a558 100644
+--- a/tools/snort2lua/config_states/config_ignore_ports.cc
++++ b/tools/snort2lua/config_states/config_ignore_ports.cc
+@@ -21,6 +21,7 @@
+ #include <vector>
+ #include <string>
+ #include <stdexcept>
++#include <cstdint>
+ 
+ #include "conversion_state.h"
+ #include "helpers/converter.h"
+diff --git a/tools/snort2lua/preprocessor_states/pps_dcerpc_server.cc b/tools/snort2lua/preprocessor_states/pps_dcerpc_server.cc
+index 2a41decb8..79e98dd2b 100644
+--- a/tools/snort2lua/preprocessor_states/pps_dcerpc_server.cc
++++ b/tools/snort2lua/preprocessor_states/pps_dcerpc_server.cc
+@@ -25,6 +25,7 @@
+ 
+ #include <algorithm>
+ #include <cstring>
++#include <cstdint>
+ 
+ namespace preprocessors
+ {
+diff --git a/tools/snort2lua/preprocessor_states/pps_frag3_engine.cc b/tools/snort2lua/preprocessor_states/pps_frag3_engine.cc
+index d5c1fcf4d..c0309cc6f 100644
+--- a/tools/snort2lua/preprocessor_states/pps_frag3_engine.cc
++++ b/tools/snort2lua/preprocessor_states/pps_frag3_engine.cc
+@@ -19,6 +19,7 @@
+ 
+ #include <sstream>
+ #include <vector>
++#include <cstdint>
+ 
+ #include "conversion_state.h"
+ #include "helpers/converter.h"
+diff --git a/tools/snort2lua/preprocessor_states/pps_stream5_tcp.cc b/tools/snort2lua/preprocessor_states/pps_stream5_tcp.cc
+index 1e97a58ad..3df35340e 100644
+--- a/tools/snort2lua/preprocessor_states/pps_stream5_tcp.cc
++++ b/tools/snort2lua/preprocessor_states/pps_stream5_tcp.cc
+@@ -20,6 +20,7 @@
+ #include <sstream>
+ #include <vector>
+ #include <string>
++#include <cstdint>
+ 
+ #include "conversion_state.h"
+ #include "helpers/s2l_util.h"
+diff --git a/tools/snort2lua/rule_states/rule_gid_sid.cc b/tools/snort2lua/rule_states/rule_gid_sid.cc
+index 7f2b84ae4..d3215b655 100644
+--- a/tools/snort2lua/rule_states/rule_gid_sid.cc
++++ b/tools/snort2lua/rule_states/rule_gid_sid.cc
+@@ -27,6 +27,7 @@
+ 
+ #include <sstream>
+ #include <unordered_map>
++#include <cstdint>
+ 
+ #include "conversion_state.h"
+ #include "helpers/converter.h"
+-- 
+2.34.1
+

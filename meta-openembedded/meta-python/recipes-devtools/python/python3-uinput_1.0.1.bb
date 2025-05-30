@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "853697344b64df5537d4ae32ba6fbcf0515d51a9010910f5d501995903
 
 PYPI_PACKAGE = "python-uinput"
 
-inherit pypi setuptools3
+inherit pypi python_setuptools_build_meta ptest-python-pytest
 
 DEPENDS += "udev"
 RDEPENDS:${PN} += " \

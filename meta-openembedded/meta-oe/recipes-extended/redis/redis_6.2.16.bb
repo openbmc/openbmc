@@ -20,7 +20,7 @@ SRC_URI = "http://download.redis.io/releases/${BP}.tar.gz \
 
 SRC_URI[sha256sum] = "846bff83c26d827d49f8cc8114ea9d1e72eea1169f7de36b8135ea2cec104e7d"
 
-inherit autotools-brokensep update-rc.d systemd useradd
+inherit update-rc.d systemd useradd
 
 FINAL_LIBS:x86:toolchain-clang = "-latomic"
 FINAL_LIBS:riscv32 = "-latomic"
@@ -37,7 +37,7 @@ GROUPADD_PARAM:${PN} = "--system redis"
 REDIS_ON_SYSTEMD = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}"
 
 do_compile:prepend() {
-    (cd deps && oe_runmake hiredis lua linenoise)
+    oe_runmake -C deps hiredis lua linenoise
 }
 
 do_install() {

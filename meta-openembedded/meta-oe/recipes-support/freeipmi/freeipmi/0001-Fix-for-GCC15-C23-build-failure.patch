@@ -1,0 +1,42 @@
+From 5afe6492735938e0053ae78817399fa433f0f8c7 Mon Sep 17 00:00:00 2001
+From: "Pavel Cahyna" <pcahyna@redhat.com>
+Date: Tue, 8 Apr 2025 19:05:53 +0900
+Subject: [PATCH] Fix for GCC15 / C23 build failure
+
+* Import submitted patch from:
+  https://lists.gnu.org/archive/html/freeipmi-devel/2025-02/msg00000.html
+
+  to fix:
+  http://errors.yoctoproject.org/Errors/Details/851185/
+  Error occurs with gcc version 15.
+  In gcc-15, C23 is the default and 'bool' is used as a reserved keyword.
+  https://gcc.gnu.org/git/?p=gcc.git;a=commitdiff;h=55e3bd376b2214e200fa76d12b67ff259b06c212
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/freeipmi-devel/2025-02/msg00000.html]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ common/toolcommon/tool-config-file-common.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/common/toolcommon/tool-config-file-common.c b/common/toolcommon/tool-config-file-common.c
+index 609e7a3..20dfad5 100644
+--- a/common/toolcommon/tool-config-file-common.c
++++ b/common/toolcommon/tool-config-file-common.c
+@@ -78,14 +78,14 @@ _config_file_bool (conffile_t cf,
+                    void *app_ptr,
+                    int app_data)
+ {
+-  int *bool;
++  int *value;
+ 
+   assert (data);
+   assert (optionname);
+   assert (option_ptr);
+ 
+-  bool = (int *)option_ptr;
+-  *bool = data->boolval;
++  value = (int *)option_ptr;
++  *value = data->boolval;
+   return (0);
+ }
+ 

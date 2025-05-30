@@ -1,5 +1,5 @@
 SUMMARY = "File transport adapter for Requests"
-HOMEPAGE = "http://github.com/dashea/requests-file"
+HOMEPAGE = "https://github.com/dashea/requests-file"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9cc728d6087e43796227b0a31422de6b"
 

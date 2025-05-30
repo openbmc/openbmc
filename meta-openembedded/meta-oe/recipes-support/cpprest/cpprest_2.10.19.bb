@@ -12,7 +12,7 @@ SRC_URI = "git://github.com/Microsoft/cpprestsdk.git;protocol=https;branch=maste
            file://disable-outside-tests.patch "
 
 # tag 2.10.19
-SRCREV= "411a109150b270f23c8c97fa4ec9a0a4a98cdecf"
+SRCREV = "411a109150b270f23c8c97fa4ec9a0a4a98cdecf"
 
 S = "${WORKDIR}/git"
 

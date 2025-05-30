@@ -28,8 +28,12 @@ KNOWN_NON_REPRO_META_NETWORKING = " \
     ntpsec-src \
     openl2tp \
     opensaf \
+    phytool \
+    phytool-dbg \
     postfix-cfg \
     rp-pppoe \
+    traceroute \
+    traceroute-dbg \
     udpcast-doc \
     unbound-doc \
     znc \

@@ -37,7 +37,7 @@ SRC_URI = "git://github.com/mongodb/mongo.git;branch=v4.4;protocol=https \
            file://0001-Fix-type-mismatch-on-32bit-arches.patch \
            file://0001-Fix-build-on-32bit.patch \
            "
-SRC_URI:append:libc-musl ="\
+SRC_URI:append:libc-musl = "\
            file://0001-Mark-one-of-strerror_r-implementation-glibc-specific.patch \
            file://0002-Fix-default-stack-size-to-256K.patch \
            file://0004-wiredtiger-Disable-strtouq-on-musl.patch \
@@ -72,10 +72,6 @@ MONGO_ARCH:powerpc64le = "ppc64le"
 WIREDTIGER ?= "off"
 WIREDTIGER:x86-64 = "on"
 WIREDTIGER:aarch64 = "on"
-
-# ld.gold: fatal error: build/59f4f0dd/mongo/mongod: Structure needs cleaning
-LDFLAGS:append:x86:libc-musl = " -fuse-ld=bfd"
-LDFLAGS:remove:toolchain-clang = "-fuse-ld=bfd"
 
 EXTRA_OESCONS = "PREFIX=${prefix} \
                  DESTDIR=${D} \

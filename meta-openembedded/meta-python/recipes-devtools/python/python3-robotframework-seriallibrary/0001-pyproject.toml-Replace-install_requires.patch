@@ -1,0 +1,31 @@
+From 29ca728481a275cc46fdf4f32b3aac5706aa0904 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 11 Apr 2025 21:03:43 -0700
+Subject: [PATCH] pyproject.toml: Replace install_requires
+
+install_requires is used with setuptools, with poetry it needs
+to use poetry.dependencies
+
+Fixes
+poetry.core.constraints.version.exceptions.ParseConstraintError: Could not parse version constraint: robotframework
+
+Upstream-Status: Submitted [https://github.com/whosaysni/robotframework-seriallibrary/pull/25]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ pyproject.toml | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index be9f51a..0ade7ee 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -24,7 +24,5 @@ packages = [
+   ]
+ 
+ [tool.poetry.dependencies]
+-install_requires=["robotframework", "pyserial"]
+-
+-
+-
++robotframework = ">=4.0"
++pyserial = ">=3.0"

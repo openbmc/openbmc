@@ -1,0 +1,79 @@
+From 9a3fc89f924f7a322c3b537256621640561daf95 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?=C4=90o=C3=A0n=20Tr=E1=BA=A7n=20C=C3=B4ng=20Danh?=
+ <congdanhqx@gmail.com>
+Date: Fri, 1 Mar 2024 21:56:34 +0700
+Subject: [PATCH 1/5] libxfce4ui: Avoid deprecated functions
+
+- xfce_titled_dialog_new_with_buttons is deprecated from 4.16.
+- xfce_spawn_command_line_on_screen is deprecated from 4.16
+
+- xfce_titled_dialog_new_with_mixed_buttons is available from 4.14
+- xfce_spawn_command_line is available from 4.16
+
+Upstream-Status: Backport [https://github.com/xfce-mirror/xfce4-weather-plugin/commit/9115037ed7cfe722d3739ca800d5247f4bb3bc53]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac                  |  2 +-
+ panel-plugin/weather-config.c |  4 ++--
+ panel-plugin/weather-search.c | 20 +++++++++++---------
+ 3 files changed, 14 insertions(+), 12 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index e0516e6..cf82b7e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -66,7 +66,7 @@ XDT_CHECK_PACKAGE([GTK], [gtk+-3.0], [3.22.0])
+ XDT_CHECK_PACKAGE([GTHREAD], [gthread-2.0], [2.64.0])
+ XDT_CHECK_PACKAGE([GLIB], [glib-2.0], [2.64.0])
+ XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.12.0])
+-XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-2], [4.12.0])
++XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-2], [4.16.0])
+ XDT_CHECK_PACKAGE([LIBXFCE4PANEL], [libxfce4panel-2.0], [4.14.0])
+ XDT_CHECK_PACKAGE([XFCONF], [libxfconf-0], [4.12.0])
+ XDT_CHECK_PACKAGE([LIBXML], [libxml-2.0], [2.4.0])
+diff --git a/panel-plugin/weather-config.c b/panel-plugin/weather-config.c
+index 9f77340..2645408 100644
+--- a/panel-plugin/weather-config.c
++++ b/panel-plugin/weather-config.c
+@@ -958,8 +958,8 @@ button_icons_dir_clicked(GtkWidget *button,
+     g_mkdir_with_parents(dir, 0755);
+     command = g_strdup_printf("exo-open %s", dir);
+     g_free(dir);
+-    xfce_spawn_command_line_on_screen(gdk_screen_get_default(),
+-                                      command, FALSE, TRUE, NULL);
++    xfce_spawn_command_line(gdk_screen_get_default(), command, FALSE,
++                            TRUE, TRUE, NULL);
+     g_free(command);
+ }
+ 
+diff --git a/panel-plugin/weather-search.c b/panel-plugin/weather-search.c
+index 83f1d71..7e87ae8 100644
+--- a/panel-plugin/weather-search.c
++++ b/panel-plugin/weather-search.c
+@@ -205,15 +205,17 @@ create_search_dialog(GtkWindow *parent,
+     dialog->session = session;
+ 
+     dialog->dialog =
+-        xfce_titled_dialog_new_with_buttons(_("Search location"),
+-                                            parent,
+-                                            GTK_DIALOG_MODAL |
+-                                            GTK_DIALOG_DESTROY_WITH_PARENT,
+-                                            _("Cancel"),
+-                                            GTK_RESPONSE_REJECT,
+-                                            _("OK"),
+-                                            GTK_RESPONSE_ACCEPT,
+-                                            NULL);
++        xfce_titled_dialog_new_with_mixed_buttons(_("Search location"),
++                                                  parent,
++                                                  GTK_DIALOG_MODAL |
++                                                  GTK_DIALOG_DESTROY_WITH_PARENT,
++                                                  "",
++                                                  _("Cancel"),
++                                                  GTK_RESPONSE_REJECT,
++                                                  "",
++                                                  _("OK"),
++                                                  GTK_RESPONSE_ACCEPT,
++                                                  NULL);
+     gtk_dialog_set_response_sensitive(GTK_DIALOG(dialog->dialog),
+                                       GTK_RESPONSE_ACCEPT, FALSE);
+     gtk_window_set_icon_name(GTK_WINDOW(dialog->dialog), "edit-find");
