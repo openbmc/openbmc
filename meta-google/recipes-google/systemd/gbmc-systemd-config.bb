@@ -55,7 +55,16 @@ do_install() {
   # mask systemd-pstore.service to avoid copying logs to SPI
   mkdir -p ${D}${sysconfdir}/systemd/system
   ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-pstore.service
-
+  # mask systemd kdump service since it is not used
+  ln -sv /dev/null ${D}${sysconfdir}/systemd/system/kdump.service
+  # mask systemd-nsresourced since it is not used
+  ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-nsresourced.service
+  # mask systemd-mountfsd.service since it is not used
+  ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-mountfsd.service
+  # mask systemd-sysext.service since it is not used
+  ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-sysext.service
+  # mask systemd-confext.service since it is not used
+  ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-confext.service
   # mask networkd-wait-online.service to avoid waiting
   ln -sv /dev/null ${D}/${sysconfdir}/systemd/system/systemd-networkd-wait-online.service
 
