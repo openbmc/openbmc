@@ -1,5 +1,6 @@
 OBMC_IMAGE_EXTRA_INSTALL:append = "\
     biosconfig-manager \
+    ipmitool \
     mctp \
     platform-init \
     smbios-mdr \
