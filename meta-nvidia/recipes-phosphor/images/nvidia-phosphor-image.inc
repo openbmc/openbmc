@@ -1,6 +1,7 @@
 IMAGE_FEATURES:remove = "\
     obmc-net-ipmi \
     obmc-user-mgmt-ldap \
+    obmc-leds \
 "
 
 OBMC_IMAGE_EXTRA_INSTALL:append = "\
