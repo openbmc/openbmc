@@ -38,6 +38,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * catalina
   * harma
   * minerva
+  * santabarbara
   * tiogapass
   * ventura
   * yosemite4
