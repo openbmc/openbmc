@@ -29,8 +29,6 @@ FILES:${PN} += "${systemd_system_unitdir}/*"
 
 SYSTEMD_SERVICE:${PN} += "${SERVICE_LIST}"
 
-SYSTEMD_AUTO_ENABLE = "enable"
-
 do_install:append:() {
     install -d ${D}${datadir}/phosphor-gpio-monitor
     install -m 0644 ${UNPACKDIR}/minerva-phosphor-multi-gpio-monitor.json \

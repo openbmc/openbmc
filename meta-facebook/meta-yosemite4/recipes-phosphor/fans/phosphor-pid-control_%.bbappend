@@ -10,8 +10,6 @@ SYSTEMD_SERVICE:${PN} += " \
     monitor-pldm-sensor.service \
 "
 
-SYSTEMD_AUTO_ENABLE = "enable"
-
 RDEPENDS:${PN}:append = " bash"
 FILES:${PN} += "${systemd_system_unitdir}/*"
 FILES:${PN} += "${libexecdir}/*"

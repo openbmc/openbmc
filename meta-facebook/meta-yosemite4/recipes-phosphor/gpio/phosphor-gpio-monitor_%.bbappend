@@ -69,8 +69,6 @@ SYSTEMD_SERVICE:${PN} += " \
     medusa-power-module-pwrgd@.service \
     "
 
-SYSTEMD_AUTO_ENABLE = "enable"
-
 do_install:append:() {
     install -d ${D}${datadir}/phosphor-gpio-monitor
     install -m 0644 ${UNPACKDIR}/yosemite4-phosphor-multi-gpio-monitor.json \

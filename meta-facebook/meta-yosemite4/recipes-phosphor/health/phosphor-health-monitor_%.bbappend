@@ -15,8 +15,6 @@ FILES:${PN} += "${systemd_system_unitdir}/*"
 SYSTEMD_SERVICE:${PN} += " \
     clean-up-filesystem.service \
     "
-SYSTEMD_AUTO_ENABLE = "enable"
-
 do_install:append:() {
     install -d ${D}${datadir}/phosphor-health-monitor
     install -m 0644 ${UNPACKDIR}/clean-up-filesystem.service ${D}${systemd_system_unitdir}/clean-up-filesystem.service
