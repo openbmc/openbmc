@@ -8,7 +8,7 @@ DEPENDS += "autoconf-archive-native \
             systemd \
             libgpiod \
            "
-SRCREV = "375786fc0e8ce34d72bafffb03a28689df94fb62"
+SRCREV = "6b62be601e3a871436bd01d2bce1e1260b2f8bdc"
 PACKAGECONFIG ??= "udev ssh"
 PACKAGECONFIG[udev] = "-Dudev=enabled,-Dudev=disabled,udev"
 PACKAGECONFIG[concurrent-servers] = "-Dconcurrent-servers=true,-Dconcurrent-servers=false,"
