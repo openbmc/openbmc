@@ -2,14 +2,6 @@
 
 # shellcheck disable=SC2046
 
-function bind_rtc_driver() {
-    # If rtc device can not present, bind the device
-    if [[ ! -e /dev/rtc0 ]]; then
-        echo "Bind rtc driver"
-        echo 6-0051 > /sys/bus/i2c/drivers/rtc-pcf85063/bind
-    fi
-}
-
 function pre-platform-init() {
     echo "Do pre platform init"
 }
@@ -32,9 +24,6 @@ function post-platform-init() {
 
     echo "Set default FAN speed to 60%"
     /usr/sbin/ampere_fanctrl.sh setspeed force all 60
-
-    # Bind rtc driver
-    bind_rtc_driver
 }
 
 export output_high_gpios_in_ac=(

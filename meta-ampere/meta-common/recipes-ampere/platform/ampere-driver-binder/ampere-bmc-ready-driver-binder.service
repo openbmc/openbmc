@@ -1,0 +1,13 @@
+[Unit]
+Description=Ampere BMC ready driver binder
+After=multi-user.target
+After=obmc-led-group-start@bmc_booted.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "if command -v ampere_bmc_ready_driver_binder.sh; then echo 'Try to bind driver after BMC ready if not already' && ampere_bmc_ready_driver_binder.sh; fi && exit 0;"
+SyslogIdentifier=bmc_ready_binder
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

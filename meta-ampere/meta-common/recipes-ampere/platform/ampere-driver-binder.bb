@@ -14,12 +14,14 @@ UNPACKDIR = "${S}"
 SRC_URI = " \
            file://ampere-power-on-driver-binder@.service \
            file://ampere-host-on-driver-binder@.service \
+           file://ampere-bmc-ready-driver-binder.service \
           "
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = " \
                          ampere-power-on-driver-binder@.service \
                          ampere-host-on-driver-binder@.service \
+                         ampere-bmc-ready-driver-binder.service \
                         "
 # bind driver after the power is on
 POWER_ON_DRIVER_BINDER_TGT = "ampere-power-on-driver-binder@.service"

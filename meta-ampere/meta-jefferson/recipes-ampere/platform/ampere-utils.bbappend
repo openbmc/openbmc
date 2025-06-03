@@ -8,6 +8,7 @@ SRC_URI:append = " \
                   file://ampere_power_util.sh \
                   file://ampere_fanctrl.sh \
                   file://ampere-fanctrl-manual.service \
+                  file://ampere_bmc_ready_driver_binder.sh \
                  "
 
 SYSTEMD_SERVICE:${PN} += " ampere-fanctrl-manual.service"
@@ -18,4 +19,5 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/ampere_flash_bios.sh ${D}/${sbindir}/
     install -m 0755 ${UNPACKDIR}/ampere_power_util.sh ${D}/${sbindir}/
     install -m 0755 ${UNPACKDIR}/ampere_fanctrl.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_bmc_ready_driver_binder.sh ${D}/${sbindir}/
 }

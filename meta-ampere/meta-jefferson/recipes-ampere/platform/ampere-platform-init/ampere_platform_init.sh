@@ -96,10 +96,4 @@ gpioset $(gpiofind host0-sysreset-n)=1
 
 fan_controller_init
 
-# Bind RTC if /dev/rtc0 is not available
-if [[ ! -e /dev/rtc0 ]]; then
-    echo "Bind rtc driver"
-    echo 6-0051 > /sys/bus/i2c/drivers/rtc-pcf8563/bind
-fi
-
 exit 0
