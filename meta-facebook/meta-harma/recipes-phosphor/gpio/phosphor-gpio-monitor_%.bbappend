@@ -37,8 +37,8 @@ SRC_URI += "file://assert-post-end \
             file://power-rail-assert-log@.service \
             file://power-rail-deassert-log@.service \
             file://power-rail-event-logger \
-            file://thermaltrip-assert-log@.service \
-            file://thermaltrip-deassert-log@.service \
+            file://thermtrip-assert-log@.service \
+            file://thermtrip-deassert-log@.service \
             file://thermal-event-logger \
             file://vr-fault-assert-log@.service \
             file://vr-fault-deassert-log@.service \
@@ -60,8 +60,8 @@ SYSTEMD_SERVICE:${PN} += " \
     multi-gpios-sys-init.service \
     device-reinitial@.service \
     fan-reload.service \
-    assert-thermtrip.service \
-    deassert-thermtrip.service \
+    thermtrip-assert-log@.service \
+    thermtrip-deassert-log@.service  \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -107,8 +107,6 @@ do_install:append:() {
     install -m 0755 ${UNPACKDIR}/auto-poweron ${D}${libexecdir}/${PN}/
 
     install -m 0755 ${UNPACKDIR}/fan-reload ${D}${libexecdir}/${PN}/
-
-    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"
