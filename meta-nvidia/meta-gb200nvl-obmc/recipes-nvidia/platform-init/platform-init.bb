@@ -19,7 +19,6 @@ SRC_URI += "\
 "
 
 EXTRA_OEMESON:append:nv-gpu-pcie-card = " -Dinit-p2020=enabled"
-EXTRA_OEMESON:append:nv-with-hmc = " -Dhmc-present=enabled"
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " platform_init.service "

@@ -253,23 +253,37 @@ void init_p2020_gpu_card() {
   set_gpio_raw(gpiochipint, 5, 1);
 }
 
+bool hmc_is_present() {
+  std::error_code ec;
+  bool exists = std::filesystem::exists("/sys/bus/i2c/devices/9-0074", ec);
+  if (ec) {
+    exists = false;
+  }
+  if (exists) {
+    std::cerr << "HMC present in platform";
+  } else {
+    std::cerr << "HMC not present in platform";
+  }
+  return exists;
+}
+
 int main() {
   // Reset USB hubs
   set_gpio("USB_HUB_RESET_L-O", 0, 10000ms);
-  if (HMC_PRESENT != 1) {
+  bool hmc_present = hmc_is_present();
+  if (!hmc_present) {
     set_gpio("SEC_USB2_HUB_RST_L-O", 0, 10000ms);
   }
 
   sleep_milliseconds(100ms);
-
-  if (HMC_PRESENT != 1) {
+  if (!hmc_present) {
     set_gpio("SEC_USB2_HUB_RST_L-O", 1);
   }
   //  Write SGPIO_BMC_EN-O=1 to correctly set mux to send SGPIO signals to FPGA
   set_gpio("SGPIO_BMC_EN-O", 1);
 
   // Write the bit for BMC without HMC
-  set_gpio("HMC_BMC_DETECT-O", HMC_PRESENT == 0, 30000ms);
+  set_gpio("HMC_BMC_DETECT-O", !hmc_present, 30000ms);
 
   // Set BMC_EROT_FPGA_SPI_MUX_SEL-O = 1 to enable FPGA to access its EROT
   set_gpio("BMC_EROT_FPGA_SPI_MUX_SEL-O", 1);
@@ -323,7 +337,7 @@ int main() {
   }
 
   set_gpio("USB_HUB_RESET_L-O", 1);
-  if (HMC_PRESENT != 1) {
+  if (!hmc_present) {
     set_gpio("SEC_USB2_HUB_RST_L-O", 1);
   }
 

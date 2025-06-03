@@ -15,7 +15,6 @@ libexec = get_option('prefix') + '/' + get_option('libexecdir')
 
 conf = configuration_data()
 conf.set10('INIT_CARD', get_option('init-p2020').allowed())
-conf.set10('HMC_PRESENT', get_option('hmc-present').allowed())
 configure_file(output: 'config.h', configuration: conf)
 configuration_inc = include_directories('.')
 
