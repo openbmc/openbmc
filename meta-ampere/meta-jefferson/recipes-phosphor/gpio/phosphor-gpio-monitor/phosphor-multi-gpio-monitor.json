@@ -29,5 +29,25 @@
           "RISING": ["ampere_hightemp_stop@0.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "PSU0_AC_LOSS_L",
+        "LineName": "ps0-ac-loss-n",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_psu_power_lost@0.service"],
+          "RISING": ["ampere_psu_power_restore@0.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PSU1_AC_LOSS_L",
+        "LineName": "ps1-ac-loss-n",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_psu_power_lost@1.service"],
+          "RISING": ["ampere_psu_power_restore@1.service"]
+        },
+        "Continue": true
     }
 ]

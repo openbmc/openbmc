@@ -12,6 +12,8 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
                                   ampere_overtemp@.service \
                                   ampere_hightemp_start@.service \
                                   ampere_hightemp_stop@.service \
+                                  ampere_psu_power_restore@.service \
+                                  ampere_psu_power_lost@.service \
                                  "
 
 FILES:${PN}-monitor += " \

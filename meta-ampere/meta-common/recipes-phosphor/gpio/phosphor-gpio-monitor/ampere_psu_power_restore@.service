@@ -1,0 +1,7 @@
+[Unit]
+Description=Ampere Computing LLC PSU Power Restored event
+StartLimitIntervalSec=0
+
+[Service]
+Restart=no
+ExecStart=/usr/sbin/ampere_add_redfishevent.sh OpenBMC.0.1.PowerSupplyPowerRestored "PSU%i"

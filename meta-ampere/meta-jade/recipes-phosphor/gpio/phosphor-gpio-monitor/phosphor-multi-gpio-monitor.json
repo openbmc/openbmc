@@ -57,15 +57,21 @@
     {
         "Name": "PSU1_VIN_GOOD",
         "LineName": "ps0-vin-good",
-        "EventMon": "RISING",
-        "Target": "psu_hotswap_reset@0.service",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_psu_power_lost@0.service"],
+          "RISING": ["psu_hotswap_reset@0.service", "ampere_psu_power_restore@0.service"]
+        },
         "Continue": true
     },
     {
         "Name": "PSU2_VIN_GOOD",
         "LineName": "ps1-vin-good",
-        "EventMon": "RISING",
-        "Target": "psu_hotswap_reset@1.service",
+        "EventMon": "BOTH",
+        "Targets": {
+          "FALLING": ["ampere_psu_power_lost@1.service"],
+          "RISING": ["psu_hotswap_reset@1.service", "ampere_psu_power_restore@1.service"]
+        },
         "Continue": true
     }
 ]

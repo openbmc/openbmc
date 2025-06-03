@@ -1,0 +1,7 @@
+[Unit]
+Description=Ampere Computing LLC PSU Power Lost event
+StartLimitIntervalSec=0
+
+[Service]
+Restart=no
+ExecStart=/usr/sbin/ampere_add_redfishevent.sh OpenBMC.0.1.PowerSupplyPowerLost "PSU%i"
