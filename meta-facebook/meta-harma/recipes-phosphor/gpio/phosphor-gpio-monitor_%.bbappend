@@ -64,7 +64,7 @@ SYSTEMD_SERVICE:${PN} += " \
     thermtrip-deassert-log@.service  \
     "
 
-do_install:append:() {
+do_install:append() {
     install -d ${D}${datadir}/phosphor-gpio-monitor
     install -d ${D}${systemd_system_unitdir}/
     install -d ${D}${libexecdir}/${PN}
