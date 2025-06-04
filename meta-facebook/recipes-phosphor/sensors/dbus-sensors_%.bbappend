@@ -11,3 +11,7 @@ FACEBOOK_REMOVED_DBUS_SENSORS = " \
 PACKAGECONFIG:remove = " \
     ${FACEBOOK_REMOVED_DBUS_SENSORS} \
 "
+
+PACKAGECONFIG:append:mf-fb-liquid-cooled = " \
+    leakdetector \
+"

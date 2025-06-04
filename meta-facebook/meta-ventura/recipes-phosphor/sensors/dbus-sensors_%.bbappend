@@ -4,10 +4,6 @@ inherit obmc-phosphor-systemd systemd
 
 CRITICAL_LEAK_SERVICE = "xyz.openbmc_project.leakdetector.critical@.service"
 
-PACKAGECONFIG:append = "\
-    leakdetector \
-"
-
 SRC_URI += "file://critical-leak-handler \
             file://${CRITICAL_LEAK_SERVICE} \
             "
