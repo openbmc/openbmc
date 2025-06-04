@@ -7,7 +7,13 @@ fi
 
 SUPPORTED_LEAK=0
 
-RACK_LEAKS=("RackDripPan" "RackFloorLeak1" "RackFloorLeak2" "RackRightManifold" "RackLeftManifold")
+RACK_LEAKS=(
+    "RackDripPan"
+    "RackFloorLeak1"
+    "RackFloorLeak2"
+    "RackRightManifold"
+    "RackLeftManifold"
+)
 for RACK_LEAK in "${RACK_LEAKS[@]}"; do
     if [[ "$1" == "$RACK_LEAK" ]]; then
         SUPPORTED_LEAK=1
@@ -19,7 +25,6 @@ if [ $SUPPORTED_LEAK -eq 0 ]; then
     echo "Leak handling not supported for $1"
     exit 0
 fi
-
 
 files=(
     "/var/facebook/rootcanal/rc_digicert_ca.pem"
@@ -39,12 +44,13 @@ done
 
 RACKPOWER_HOSTNAME=$(cat /mnt/data/etc/rackpower_hostname)
 RACKPOWER_IP=$(cat /mnt/data/etc/rackpower_ipaddr)
+RACKPOWER_URI="redfish/v1/Chassis/Rack/Actions/Chassis.Reset"
 
 curl -f -s -o /dev/null \
     --cacert /var/facebook/rootcanal/rc_digicert_ca.pem \
     --cert /mnt/data/etc/x509_highpriv_host.cert \
     --key /mnt/data/etc/x509_highpriv_host.key \
-    -X POST "https://${RACKPOWER_HOSTNAME}/redfish/v1/Chassis/Rack/Actions/Chassis.Reset" \
+    -X POST "https://${RACKPOWER_HOSTNAME}/${RACKPOWER_URI}" \
     --data '{"ResetType": "ForceOff"}' \
     --resolve "${RACKPOWER_HOSTNAME}:443:${RACKPOWER_IP}"
 
@@ -54,14 +60,19 @@ if [ $CMD_STATUS -eq 0 ]; then
     echo "Rack Power Off command sent successfully."
 
     busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Successfully sent rack power off command during rack leak to RackSwitch" \
-        xyz.openbmc_project.Logging.Entry.Level.Error 2 "DetectorName" "$1" "RackSwitch" "$RACKPOWER_HOSTNAME"
+        xyz.openbmc_project.Logging.Create Create "ssa{ss}" \
+        "Successfully sent rack power off command during rack leak to RackSwitch" \
+        xyz.openbmc_project.Logging.Entry.Level.Error 2 "DetectorName" "$1" \
+        "RackSwitch" "$RACKPOWER_HOSTNAME"
+
 else
     echo "Error: Failed($CMD_STATUS) to send Rack Power Off command."
 
     busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-        xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Failed to send rack power off command during rack leak to RackSwitch" \
-        xyz.openbmc_project.Logging.Entry.Level.Error 3 "DetectorName" "$1" "RackSwitch" "$RACKPOWER_HOSTNAME" "Error" "$CMD_STATUS"
+        xyz.openbmc_project.Logging.Create Create "ssa{ss}" \
+        "Failed to send rack power off command during rack leak to RackSwitch" \
+        xyz.openbmc_project.Logging.Entry.Level.Error 3 "DetectorName" "$1" \
+        "RackSwitch" "$RACKPOWER_HOSTNAME" "Error" "$CMD_STATUS"
 
     exit 1
 fi
