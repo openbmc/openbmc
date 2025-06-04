@@ -33,7 +33,6 @@ SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.EntityManager.service"
 SYSTEMD_SERVICE:fru-device = "xyz.openbmc_project.FruDevice.service"
 SYSTEMD_SERVICE:devicetree-vpd = "devicetree-vpd-parser.service"
 SYSTEMD_SERVICE:gpio-presence = "xyz.openbmc_project.gpiopresence.service"
-SYSTEMD_AUTO_ENABLE:fru-device:ibm-power-cpu = "disable"
 
 inherit pkgconfig meson systemd python3native
 
