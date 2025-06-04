@@ -2327,5 +2327,77 @@
             ]
         },
         "Expression": "WF_ADC_P3V3_STBY_VOLT_V == WF_ADC_P3V3_STBY_VOLT_V ? 100 : 0"
+    },
+    {
+        "Desc": {
+          "Name": "VIRTUAL_NIC0_TEMP_C",
+          "SensorType": "temperature"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "NIC_TEMP_C",
+              "Desc": {
+                "Name": "NIC0_TEMP_C",
+                "SensorType": "temperature"
+              }
+            }
+          ]
+        },
+        "Expression": "NIC_TEMP_C == NIC_TEMP_C ? NIC_TEMP_C : 0"
+    },
+    {
+        "Desc": {
+          "Name": "VIRTUAL_NIC1_TEMP_C",
+          "SensorType": "temperature"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "NIC_TEMP_C",
+              "Desc": {
+                "Name": "NIC1_TEMP_C",
+                "SensorType": "temperature"
+              }
+            }
+          ]
+        },
+        "Expression": "NIC_TEMP_C == NIC_TEMP_C ? NIC_TEMP_C : 0"
+    },
+    {
+        "Desc": {
+          "Name": "VIRTUAL_NIC2_TEMP_C",
+          "SensorType": "temperature"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "NIC_TEMP_C",
+              "Desc": {
+                "Name": "NIC2_TEMP_C",
+                "SensorType": "temperature"
+              }
+            }
+          ]
+        },
+        "Expression": "NIC_TEMP_C == NIC_TEMP_C ? NIC_TEMP_C : 0"
+    },
+    {
+        "Desc": {
+          "Name": "VIRTUAL_NIC3_TEMP_C",
+          "SensorType": "temperature"
+        },
+        "Params": {
+          "DbusParam": [
+            {
+              "ParamName": "NIC_TEMP_C",
+              "Desc": {
+                "Name": "NIC3_TEMP_C",
+                "SensorType": "temperature"
+              }
+            }
+          ]
+        },
+        "Expression": "NIC_TEMP_C == NIC_TEMP_C ? NIC_TEMP_C : 0"
     }
 ]
