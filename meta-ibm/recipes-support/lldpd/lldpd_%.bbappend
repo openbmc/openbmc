@@ -1,3 +1,5 @@
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
 #LLDP factory reset default configuration
 install_lldpd_configuration() {
     echo "configure system description BMC" >> ${D}${sysconfdir}/lldpd.conf
