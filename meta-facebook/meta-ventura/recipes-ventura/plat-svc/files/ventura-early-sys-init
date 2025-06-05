@@ -13,6 +13,20 @@ set_bmc_ready()
     return 0
 }
 
+# Check if both CPLDs are available.
+check_cpld_state()
+{
+    output=$(i2ctransfer -y 14 w4@0x40 0xE0 0x00 0x00 0x00 r4 2>/dev/null)
+    dev_id="21 2e 30 43"
+
+    response=$(echo "$output" | grep -oE '0x[0-9a-fA-F]{2}' | sed 's/0x//' | tr 'A-F' 'a-f' | xargs)
+    if [[ "$response" != "$dev_id" ]]; then
+        log-create xyz.openbmc_project.State.SMC.SMCFailed --json \
+        "{\"IDENTIFIER\": \"/xyz/openbmc_project/software/chassis/Ventura_RMC_cpld\", \"FAILURE_TYPE\": \"Critical\"}"
+    fi
+    return 0
+}
+
 #Set fixed PWM to 80% before power brick.
 set_fan_pwm_fixed()
 {
@@ -115,5 +129,6 @@ mdio_LED_setting_for_marvell_chip
 
 # Set fan target and enable all fan input as early as possible
 config_fan
+check_cpld_state
 
 exit 0
