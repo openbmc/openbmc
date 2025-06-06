@@ -7,5 +7,6 @@ SERIAL_CONSOLES ?= "115200;ttyS4"
 UBOOT_ENTRYPOINT ?= "0x40001000"
 UBOOT_LOADADDRESS ?= "0x40001000"
 
+QB_SYSTEM_NAME = "qemu-system-arm"
 QB_MEM = "-m 512"
 QB_MACHINE = "-machine palmetto-bmc"

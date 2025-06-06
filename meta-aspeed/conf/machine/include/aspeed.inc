@@ -27,7 +27,6 @@ MACHINEOVERRIDES =. "aspeed:"
 # runqemu support
 EXTRA_IMAGEDEPENDS += "qemu-helper-native"
 IMAGE_CLASSES += "qemuboot"
-QB_SYSTEM_NAME = "qemu-system-arm"
 QB_ROOTFS_OPT = "-drive file=@ROOTFS@,if=mtd,format=raw"
 QB_DEFAULT_FSTYPE = "static.mtd"
 # Disable virtio-pci device
