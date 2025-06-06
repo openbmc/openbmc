@@ -13,7 +13,12 @@ do_otptool() {
     local otptool_config=$1
     otptool_config_slug="$(basename ${otptool_config} .json)"
     otptool_config_outdir="${B}"/"${CONFIG_B_PATH}"/"${otptool_config_slug}"
-    otptool_user_folder="$([ -n "${OTPTOOL_USER_DIR}" ] && echo --user_data_folder ${OTPTOOL_USER_DIR})"
+    local otptool_user_folder=""
+
+    if [ -n "${OTPTOOL_USER_DIR}" ]; then
+        otptool_user_folder="--user_data_folder ${OTPTOOL_USER_DIR}"
+    fi
+
     mkdir -p "${otptool_config_outdir}"
     otptool make_otp_image \
         --key_folder ${OTPTOOL_KEY_DIR} \
