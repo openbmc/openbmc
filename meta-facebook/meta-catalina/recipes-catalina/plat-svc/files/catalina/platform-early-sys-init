@@ -72,6 +72,38 @@ config_hsc()
     fi
 }
 
+config_vr()
+{
+    BUS=19
+    ADDRESSES=(0x60 0x61 0x62)
+    EXPECTED_OUTPUT="0x01 0xff"
+    MAX_RETRIES=5
+
+    for ADDR in "${ADDRESSES[@]}"; do
+        echo "Configuring device at address $ADDR on bus $BUS..."
+
+        # Send configuration
+        i2ctransfer -f -y "$BUS" w3@"$ADDR" 0x1b 0x7e 0xff
+
+        # Retry read-back check up to MAX_RETRIES times
+        for ((attempt=1; attempt<=MAX_RETRIES; attempt++)); do
+            OUTPUT=$(i2ctransfer -f -y "$BUS" w3@"$ADDR" 0x1b 0x01 0x7e r2 2>/dev/null | tr -d '[],' | awk '{$1=$1};1')
+
+            if [ "$OUTPUT" == "$EXPECTED_OUTPUT" ]; then
+                echo "Read-back check passed at address $ADDR (attempt $attempt): $OUTPUT"
+                break
+            else
+                echo "Read-back check FAILED at address $ADDR (attempt $attempt): got '$OUTPUT', expected '$EXPECTED_OUTPUT'"
+                sleep 0.2
+            fi
+
+            if [ $attempt -eq $MAX_RETRIES ]; then
+                echo "ERROR: Read-back failed after $MAX_RETRIES attempts at address $ADDR"
+            fi
+        done
+    done
+}
+
 # Enable standby power and bind i2c components
 /usr/libexec/plat-svc/standby-power-enable
 
@@ -91,5 +123,8 @@ config_fan
 
 # configure hsc
 config_hsc
+
+# configure vr
+config_vr
 
 exit 0
