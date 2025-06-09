@@ -1,7 +1,0 @@
-[Unit]
-Description=%i Thermtrip Assert
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/thermal-event-logger DeviceOverOperatingTemperatureFault %i
-SyslogIdentifier=%i-thertrip-assert

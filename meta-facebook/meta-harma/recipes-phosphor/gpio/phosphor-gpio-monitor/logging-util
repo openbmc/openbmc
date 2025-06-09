@@ -27,6 +27,7 @@ gpio_logging_valid() {
       sleep 2
       return 0
   else
+      echo "Invalid gpio logging event"
       return 1
   fi
 }

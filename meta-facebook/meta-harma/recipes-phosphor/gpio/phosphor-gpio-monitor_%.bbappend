@@ -37,8 +37,10 @@ SRC_URI += "file://assert-post-end \
             file://power-rail-assert-log@.service \
             file://power-rail-deassert-log@.service \
             file://power-rail-event-logger \
-            file://thermtrip-assert-log@.service \
-            file://thermtrip-deassert-log@.service \
+            file://prochot-assert-log.service \
+            file://prochot-deassert-log.service \
+            file://thermtrip-assert-log.service \
+            file://thermtrip-deassert-log.service \
             file://thermal-event-logger \
             file://vr-fault-assert-log@.service \
             file://vr-fault-deassert-log@.service \
@@ -60,8 +62,10 @@ SYSTEMD_SERVICE:${PN} += " \
     multi-gpios-sys-init.service \
     device-reinitial@.service \
     fan-reload.service \
-    thermtrip-assert-log@.service \
-    thermtrip-deassert-log@.service  \
+    thermtrip-assert-log.service \
+    thermtrip-deassert-log.service  \
+    prochot-assert-log.service \
+    prochot-deassert-log.service  \
     "
 
 do_install:append() {

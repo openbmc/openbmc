@@ -1,0 +1,7 @@
+[Unit]
+Description=Thermtrip Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/thermal-event-logger assert cpu0-thermtrip-alert
+SyslogIdentifier=thermtrip-assert
