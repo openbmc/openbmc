@@ -49,7 +49,7 @@ while (( SECONDS - st_check_start < st_check_timeout )); do
     break;
   elif [[ "${if_st}" =~ "failed" ]]; then
     echo "${RA_IF} failed, need reconfiguring" >&2
-    networkctl reload && networkctl reconfigure ${RA_IF}
+    gbmc_net_networkd_reload "${RA_IF}"
   else
     echo "${RA_IF} still configuring, retry in 2s" >&2
   fi

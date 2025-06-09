@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 # shellcheck disable=SC2043
 for nic in @IFS@; do
@@ -6,6 +8,6 @@ for nic in @IFS@; do
   mkdir -p "${confdir}"
   echo "[Network]" > "${confdir}/10-ra-config.conf"
   echo "IPv6AcceptRA=true" >> "${confdir}/10-ra-config.conf"
-  networkctl reload && networkctl reconfigure "${nic}"
+  gbmc_net_networkd_reload "${nic}"
 done
 

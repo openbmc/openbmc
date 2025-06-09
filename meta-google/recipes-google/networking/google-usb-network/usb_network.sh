@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 # List of options the script accepts. Trailing column means that the option
 # requires an argument.
@@ -63,7 +65,8 @@ EOF
     fi
 
     # Ignore any failures due to systemd being unavailable at boot
-    networkctl reload || true
+    # shellcheck disable=SC2119
+    gbmc_net_networkd_reload || true
 
     local gadget_dir="${CONFIGFS_HOME}/usb_gadget/${GADGET_DIR_NAME}"
     mkdir -p "${gadget_dir}" || return
@@ -121,7 +124,8 @@ gadget_stop() {
       "${gadget_dir}" || true
 
     rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
-    networkctl reload || true
+    # shellcheck disable=SC2119
+    gbmc_net_networkd_reload || true
 }
 
 opts="$(getopt \

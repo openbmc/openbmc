@@ -13,6 +13,7 @@ inherit systemd
 DEPENDS += "m4-native"
 DEPENDS += "systemd"
 RDEPENDS:${PN} += "bash"
+RDEPENDS:${PN} += "gbmc-net-common"
 
 BMC_USB_ECM_PRODUCT_ID ??= ""
 BMC_USB_ECM_PRODUCT_NAME ??= "${MACHINE} BMC"
