@@ -9,14 +9,14 @@ declare -A MCTP_BUS_EID_LIST=(
   [5,0]=38 [5,1]=95
 )
 
-for i in $(seq 2 5)
+for i in $(seq 0 5)
 do
     MCTP_INTF="mctpi2c${MCTP_BUS_EID_LIST[$i,0]}"
     mctp link set "${MCTP_INTF}" down
     mctp addr del 8 dev "${MCTP_INTF}"
 done
 
-for i in $(seq 2 5)
+for i in $(seq 0 5)
 do
     MCTP_INTF="mctpi2c${MCTP_BUS_EID_LIST[$i,0]}"
     mctp link set "${MCTP_INTF}" up

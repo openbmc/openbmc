@@ -11,6 +11,8 @@ RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "fb-common-functions"
 
 SRC_URI:append = " \
+    file://frontend-nic-temp-read \
+    file://frontend-nic-temp-read.service \
     file://iob-nic-temp-read \
     file://iob-nic-temp-read.service \
     file://osfp-eeprom-driver-bind \
@@ -23,6 +25,7 @@ SRC_URI:append = " \
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN}:append = " \
+    frontend-nic-temp-read.service \
     iob-nic-temp-read.service \
     osfp-eeprom-driver-bind.service \
     platform-sys-init.service \
@@ -32,6 +35,7 @@ do_install() {
     PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
     install -d ${PLATSVC_LIBEXECDIR}
 
+    install -m 0755 ${UNPACKDIR}/frontend-nic-temp-read ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/iob-nic-temp-read ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/osfp-eeprom-driver-bind ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/platform-early-sys-init ${PLATSVC_LIBEXECDIR}
