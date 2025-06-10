@@ -413,46 +413,6 @@
         "Continue": true
     },
     {
-        "Name": "CHASSIS3_LEAK_Q_N_PLD",
-        "LineName": "CHASSIS3_LEAK_Q_N_PLD",
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@CHASSIS3_LEAK_Q_N_PLD.service"],
-            "FALLING": ["assert-gpio-log@CHASSIS3_LEAK_Q_N_PLD.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "CHASSIS2_LEAK_Q_N_PLD",
-        "LineName": "CHASSIS2_LEAK_Q_N_PLD",
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@CHASSIS2_LEAK_Q_N_PLD.service"],
-            "FALLING": ["assert-gpio-log@CHASSIS2_LEAK_Q_N_PLD.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "CHASSIS1_LEAK_Q_N_PLD",
-        "LineName": "CHASSIS1_LEAK_Q_N_PLD",
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@CHASSIS1_LEAK_Q_N_PLD.service"],
-            "FALLING": ["assert-gpio-log@CHASSIS1_LEAK_Q_N_PLD.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "CHASSIS0_LEAK_Q_N_PLD",
-        "LineName": "CHASSIS0_LEAK_Q_N_PLD",
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": ["deassert-gpio-log@CHASSIS0_LEAK_Q_N_PLD.service"],
-            "FALLING": ["assert-gpio-log@CHASSIS0_LEAK_Q_N_PLD.service"]
-        },
-        "Continue": true
-    },
-    {
         "Name": "SMB_RJ45_FIO_TMP_ALERT",
         "LineName": "SMB_RJ45_FIO_TMP_ALERT",
         "EventMon": "BOTH",
