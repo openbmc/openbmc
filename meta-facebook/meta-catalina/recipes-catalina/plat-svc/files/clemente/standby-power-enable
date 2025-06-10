@@ -54,15 +54,50 @@ bind_i2c_muxes()
     # i2c44 - i2c47
     bind_i2c_device pca954x 0-0077
 
-    # E1S Board I2C Mux, i2c48 - i2c55
-    bind_i2c_device pca954x 12-0070
+    # E1S 0 Board I2C Mux, i2c48 - i2c51
+    bind_i2c_device pca954x 25-0074
+    # E1S 1 Board I2C Mux, i2c52 - i2c55
+    bind_i2c_device pca954x 37-0074
+
 }
 
 bind_hsc_sensors()
 {
     bind_i2c_device lm25066 1-0012
     bind_i2c_device lm25066 1-0014
-    bind_i2c_device lm90 1-004a
+    bind_i2c_device lm75 1-004e
+}
+
+bind_pdb_sensors()
+{
+   bind_i2c_device raa228000 1-0060
+   bind_i2c_device raa228000 1-0061
+}
+
+bind_fan_control()
+{
+   bind_i2c_device max31790 1-0020
+   bind_i2c_device max31790 1-0023
+   bind_i2c_device max31790 1-002c
+   bind_i2c_device max31790 1-002f
+}
+
+bind_nvme_sensors()
+{
+    bind_i2c_device tmp75 48-006a
+    bind_i2c_device tmp75 50-006a
+    bind_i2c_device tmp75 52-006a
+    bind_i2c_device tmp75 54-006a
+}
+
+bind_interposer_sensors()
+{
+    bind_i2c_device ina238 16-0041
+    bind_i2c_device ina238 16-0042
+    bind_i2c_device ina238 16-0044
+
+    bind_i2c_device ina238 23-0042
+    bind_i2c_device ina238 23-0044
 }
 
 bind_gpio_expanders()
@@ -106,10 +141,18 @@ bind_fru_eeproms()
     bind_i2c_device at24 23-0051
     # IO Mezz 1 FRU
     bind_i2c_device at24 41-0050
-    # E1S Board FRU
-    bind_i2c_device at24 54-0056
-    # HSC Board FRU
-    bind_i2c_device at24 1-0053
+    # E1S 0 Board FRU
+    bind_i2c_device at24 25-0056
+    # E1S 1 Board FRU
+    bind_i2c_device at24 37-0056
+    # CX7 0 FRU
+    bind_i2c_device at24 10-0050
+    # CX7 1 FRU
+    bind_i2c_device at24 15-0052
+    # PDB FRU
+    bind_i2c_device at24 1-0050
+    # Interposer FRU
+    bind_i2c_device at24 21-0054
 }
 
 reset_host_usb()
@@ -168,8 +211,16 @@ is_hmc_reachable()
 
 enable_pdb_vr_setting()
 {
-    i2cset -f -y 19 0x60 0xEB 0x0796 w
-    i2cset -f -y 19 0x61 0xEB 0x0796 w
+    i2cset -f -y 1 0x60 0xEB 0x0796 w
+    i2cset -f -y 1 0x61 0xEB 0x0796 w
+}
+
+restart_eth()
+{
+    /bin/sh -c 'echo "BMC: Executing eth0 down" && /sbin/ip link set eth0 down'
+    /bin/sh -c 'echo "BMC: Executing eth0 up" && /sbin/ip link set eth0 up'
+    /bin/sh -c 'echo "BMC: Executing eth1 down" && /sbin/ip link set eth1 down'
+    /bin/sh -c 'echo "BMC: Executing eth1 up" && /sbin/ip link set eth1 up'
 }
 
 if ! is_stby_good; then
@@ -187,6 +238,10 @@ set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
 
 bind_i2c_muxes
 bind_hsc_sensors
+bind_pdb_sensors
+bind_fan_control
+bind_nvme_sensors
+bind_interposer_sensors
 bind_gpio_expanders
 
 set_gpio "HMC_PGOOD-O" "$GPIO_HIGH"
@@ -221,5 +276,8 @@ bind_fru_eeproms
 enable_pdb_vr_setting
 
 set_bmc_ready
+
+# restart eth0 and eth1 interfaces for get the correct MAC address
+restart_eth
 
 exit 0
