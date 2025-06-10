@@ -196,34 +196,6 @@
         "Inventory": "/system/board/Minerva_CMM/FCB_6"
     },
     {
-        "Name": "PRSNT_CABLE_CARTRIDGE_TOP",
-        "LineName": "CMM_CABLE_CARTRIDGE_PRSNT_TOP_N",
-        "ActiveLow": true,
-        "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/CABLE_CARTRIDGE_TOP"
-    },
-    {
-        "Name": "PRSNT_CABLE_CARTRIDGE_BOT",
-        "LineName": "CMM_CABLE_CARTRIDGE_PRSNT_BOT_N",
-        "ActiveLow": true,
-        "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/CABLE_CARTRIDGE_BOT"
-    },
-    {
-        "Name": "PRSNT_BCB_CABLE_BOT",
-        "LineName": "BOT_BCB_CABLE_PRSNT_N",
-        "ActiveLow": true,
-        "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/BCB_CABLE_BOT"
-    },
-    {
-        "Name": "PRSNT_BCB_CABLE_TOP",
-        "LineName": "TOP_BCB_CABLE_PRSNT_N",
-        "ActiveLow": true,
-        "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/BCB_CABLE_TOP"
-    },
-    {
         "Name": "CR_TOGGLE_BOOT",
         "LineName": "CR_TOGGLE_BOOT_N",
         "ActiveLow": true,
