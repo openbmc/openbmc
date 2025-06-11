@@ -63,11 +63,11 @@ fsc_source=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_
 # enable watchdog timeout for fan board 0
 
 if [ "$fsc_source" = "FSC-MAX" ]; then
-    i2cset -f -y 30 0x20 0x0 0x24
-    i2cset -f -y 30 0x2f 0x0 0x24
+    i2cset -f -y 30 0x20 0x0 0x26
+    i2cset -f -y 30 0x2f 0x0 0x26
 elif [ "$fsc_source" = "FSC-NCT" ]; then
-    i2cset -f -y 30 0x21 0x2A 0x80
-    i2cset -f -y 30 0x23 0x2A 0x80
+    i2cset -f -y 30 0x21 0x2A 0x8C
+    i2cset -f -y 30 0x23 0x2A 0x8C
 else
     echo "Failed to check fan board 0 fru info, watchdog timeout is keeping default setting"
 fi
@@ -78,11 +78,11 @@ fsc_source=$(busctl get-property xyz.openbmc_project.EntityManager /xyz/openbmc_
 # enable watchdog timeout for fan board 1
 
 if [ "$fsc_source" = "FSC-MAX" ]; then
-    i2cset -f -y 31 0x20 0x0 0x24
-    i2cset -f -y 31 0x2f 0x0 0x24
+    i2cset -f -y 31 0x20 0x0 0x26
+    i2cset -f -y 31 0x2f 0x0 0x26
 elif [ "$fsc_source" = "FSC-NCT" ]; then
-    i2cset -f -y 31 0x21 0x2A 0x80
-    i2cset -f -y 31 0x23 0x2A 0x80
+    i2cset -f -y 31 0x21 0x2A 0x8C
+    i2cset -f -y 31 0x23 0x2A 0x8C
 else
     echo "Failed to check fan board 1 fru info, watchdog timeout is keeping default setting"
 fi
