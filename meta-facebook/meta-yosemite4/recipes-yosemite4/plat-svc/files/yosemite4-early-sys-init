@@ -22,11 +22,10 @@ set_all_fan_pwm_70_percent() {
     for pwm_node in /sys/bus/i2c/devices/*/hwmon/*/pwm*
     do
         if [[ ! "$pwm_node" =~ _enable ]]; then
-            curr_pwm=$(cat "$pwm_node")
-
-            # Set PWM to 70% if current PWM is higher than 70%.
-            if [[ "$curr_pwm" -ge "$pwm_value" ]]; then
-              echo $pwm_value > "$pwm_node"
+            if echo $pwm_value > "$pwm_node"; then
+                echo "Successfully set PWM for $pwm_node to $pwm_value"
+            else
+                echo "Failed to set PWM for $pwm_node"
             fi
         fi
     done
