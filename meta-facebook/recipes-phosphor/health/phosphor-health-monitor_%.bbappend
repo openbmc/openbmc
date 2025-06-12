@@ -3,7 +3,7 @@ SRC_URI:append = " file://bmc_health_config.json \
                  "
 
 CPU_CRIT_VAL ?= "90.0"
-CPU_CRIT_TGT ?= "reboot.target"
+CPU_CRIT_TGT ?= ""
 CPU_WARN_VAL ?= "80.0"
 CPU_WARN_TGT ?= ""
 
