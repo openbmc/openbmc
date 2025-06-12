@@ -10,6 +10,7 @@ SOURCE_FILES = "\
     025-factory-reset \
     030-ubiattach-or-format \
     100-mount-persistent \
+    999-enable-debug-sh \
     "
 SRC_URI += "\
     file://init \

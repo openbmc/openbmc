@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if /sbin/fw_printenv openbmcinit openbmconce | grep -w -q debug-init-sh; then
+    echo "Starting debug shell..."
+    bash
+fi
