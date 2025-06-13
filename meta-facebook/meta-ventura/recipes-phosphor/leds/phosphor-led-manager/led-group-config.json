@@ -860,7 +860,7 @@
                 {
                     "Name": "fan0_ledd2_blue",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -870,7 +870,7 @@
                 {
                     "Name": "fan0_ledd2_amber",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Blink"
                 }
             ]
         },
@@ -880,7 +880,7 @@
                 {
                     "Name": "fan0_ledd1_blue",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -890,7 +890,7 @@
                 {
                     "Name": "fan0_ledd1_amber",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Blink"
                 }
             ]
         },
@@ -900,7 +900,7 @@
                 {
                     "Name": "fan1_ledd2_blue",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -910,7 +910,7 @@
                 {
                     "Name": "fan1_ledd2_amber",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Blink"
                 }
             ]
         },
@@ -920,7 +920,7 @@
                 {
                     "Name": "fan1_ledd1_blue",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -930,7 +930,67 @@
                 {
                     "Name": "fan1_ledd1_amber",
                     "Action": "On",
-                    "Priority": "On"
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan0_identify",
+            "members": [
+                {
+                    "Name": "fan0_ledd2_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fan0_ledd2_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan1_identify",
+            "members": [
+                {
+                    "Name": "fan0_ledd1_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fan0_ledd1_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb1fan2_identify",
+            "members": [
+                {
+                    "Name": "fan1_ledd2_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fan1_ledd2_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb1fan3_identify",
+            "members": [
+                {
+                    "Name": "fan1_ledd1_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fan1_ledd1_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
                 }
             ]
         }
