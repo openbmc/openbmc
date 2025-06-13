@@ -3,7 +3,7 @@ Before=gbmc-ip-monitor.service
 Before=systemd-networkd.service
 
 [Service]
-ExecStart=/bin/bash -c 'source /usr/share/gbmc-br-lib.sh && gbmc_br_reload_ip'
+ExecStart=/bin/bash -c 'source /usr/share/gbmc-br-lib.sh && gbmc_br_reload_ips'
 
 [Install]
 WantedBy=multi-user.target

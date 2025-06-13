@@ -15,6 +15,8 @@
 
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
 source /usr/share/gbmc-net-lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
+source /usr/share/gbmc-br-lib.sh || exit
 
 RA_IF=$1
 IP_OFFSET=1
@@ -52,8 +54,6 @@ update_fqdn() {
   true
 }
 
-old_ncsi_pfx=
-
 update_pfx() {
   local pfx="$1"
 
@@ -70,24 +70,7 @@ update_pfx() {
   # TODO: Remove this once internal relaying cleanups land
   gbmc-ncsi-smartnic-wa.sh || true
 
-  # Override any existing address information within files
-  # Make sure we cover `00-*` and `-*` files
-  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network; do
-    mkdir -p "$file.d"
-    printf '[Network]\nAddress=%s/128' \
-      "$pfx" >"$file.d"/10-ncsi-addr.conf
-  done
-
-  # Don't force networkd to reload as this can break phosphor-networkd
-  # Fall back to reload only if ip link commands fail
-  if [ -n "$old_ncsi_pfx" ]; then
-    ip -6 addr del "$old_ncsi_pfx/128" dev gbmcbr || true
-  fi
-  ip -6 addr replace "$pfx/128" dev gbmcbr || \
-    gbmc_net_networkd_reload gbmcbr || true
-  old_ncsi_pfx=$pfx
-
-  echo "Set NCSI addr $pfx on gbmcbr" >&2
+  gbmc_br_set_runtime_ip ncsi-ra "$pfx"
 }
 
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh

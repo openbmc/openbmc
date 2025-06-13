@@ -56,9 +56,9 @@ gbmc_ncsi_br_pub_addr_update() {
     # Remove any existing persisted IP
     gbmc_br_set_ip
     # Load the IP to the bridge non-persistently
-    gbmc_br_reload_ip "$(ip_bytes_to_str pfx_bytes)"
+    gbmc_br_set_runtime_ip static "$(ip_bytes_to_str pfx_bytes)"
   else
-    gbmc_br_reload_ip
+    gbmc_br_set_runtime_ip static
   fi
 }
 
