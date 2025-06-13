@@ -18,7 +18,7 @@ SRC_URI = "\
         file://nslcd.init \
         file://nslcd.service \
         "
-SRCREV="5f4aacc4a96b452c11e7a1a5625e86d29cb38b1e"
+SRCREV="8ddb983a546f632986a84a784c4625110f7782a2"
 
 SYSTEMD_SERVICE:${PN} = "nslcd.service"
 
