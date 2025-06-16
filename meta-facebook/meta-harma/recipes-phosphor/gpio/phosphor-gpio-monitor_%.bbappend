@@ -30,6 +30,7 @@ SRC_URI += "file://assert-post-end \
             file://gpios-deassert-log@.service \
             file://gpios-event-logger \
             file://logging-util \
+            file://mmc-recovery.service \
             file://multi-gpios-sys-init \
             file://multi-gpios-sys-init.service \
             file://plat-phosphor-multi-gpio-monitor.json \
@@ -59,6 +60,7 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-post-end.service \
     deassert-reset-button.service \
     deassert-uart-switch-button.service \
+    mmc-recovery.service \
     multi-gpios-sys-init.service \
     device-reinitial@.service \
     fan-reload.service \

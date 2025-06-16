@@ -1,0 +1,8 @@
+[Unit]
+Description=mmc recovery
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/mctp/setup-bic-eid
+
+SyslogIdentifier=mmc-recovery

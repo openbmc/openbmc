@@ -119,6 +119,16 @@
         "Continue": true
     },
     {
+        "Name": "power-asic-good",
+        "ChipId": "2",
+        "GpioNum": 92,
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["fw-versions-ag-vr@0.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "irq-uv-detect-alert",
         "ChipId": "2",
         "GpioNum": 174,
@@ -232,12 +242,12 @@
         "Continue": true
     },
     {
-        "Name": "power-asic-good",
-        "ChipId": "2",
-        "GpioNum": 92,
+        "Name": "health-mmc",
+        "ChipId": "5",
+        "GpioNum": 7,
         "EventMon": "RISING",
         "Targets": {
-            "RISING": ["fw-versions-ag-vr@0.service"]
+            "RISING": ["mmc-recovery.service"]
         },
         "Continue": true
     }
