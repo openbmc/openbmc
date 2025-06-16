@@ -7,7 +7,8 @@ get_init_tray_sgpio()
 
     systemctl stop phosphor-multi-gpio-monitor
 
-    local sgpio_value=0
+    # Set blue light LED to default
+    local sgpio_value=1
     local sgpio_index=0
 
     # Control compute tray i blue light LED group
@@ -27,6 +28,8 @@ get_init_tray_sgpio()
         fi
     done
 
+    # Set blue light LED to default
+    sgpio_value=1
     # Control nvs tray j blue light LED group
     for j in {1..9}
     do
@@ -44,6 +47,8 @@ get_init_tray_sgpio()
         fi
     done
 
+    # Set blue light LED to default
+    sgpio_value=1
     # Control compute tray i amber light LED group
     for i in {1..18}
     do
@@ -61,6 +66,8 @@ get_init_tray_sgpio()
         fi
     done
 
+    # Set blue light LED to default
+    sgpio_value=1
     # Control nvs tray j amber light LED group
     for j in {1..9}
     do
