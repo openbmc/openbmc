@@ -47,7 +47,22 @@ gbmc_nic_neigh_set() {
     sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null && \
       ip -6 neigh "$act" proxy "$ip" dev "$intf" || \
       failed_intfs+=("$intf")
+
+    # Write the necessary firewall rules to forward IP traffic
+    if [[ "$act" == add ]]; then
+      cat >/run/nftables/40-gbmc-"$intf"-br.rules <<EOF
+table inet filter {
+  chain ${intf}_forward {
+    ip6 saddr != $ip/64 ip6 daddr $ip/64 accept
+  }
+}
+EOF
+    else
+      rm -f /run/nftables/40-gbmc-"$intf"-br.rules
+    fi
   done
+  systemctl reset-failed nftables || true
+  systemctl --no-block reload-or-restart nftables || true
   [[ "$act" == del ]] && return
   if (( "${#failed_intfs[@]}" > 0 )); then
     gbmc_net_networkd_reload "${failed_intfs[@]}"
