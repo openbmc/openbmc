@@ -49,6 +49,7 @@ RDEPENDS:${PN}-software:append:system1 = " phosphor-software-manager-side-switch
 
 RDEPENDS:${PN}-host-state-mgmt:remove:p10bmc = "checkstop-monitor"
 RDEPENDS:${PN}-logging:append = " ${EXTRA_IBM_LOGGING_PKGS}"
+RDEPENDS:${PN}-logging:append = " phosphor-logging-test"
 RDEPENDS:${PN}-leds:remove:witherspoon-tacoma = "phosphor-led-manager-faultmonitor"
 RDEPENDS:${PN}-leds:remove:sbp1 = "phosphor-led-manager-faultmonitor"
 RDEPENDS:${PN}-devtools:remove:witherspoon = "rsync"
