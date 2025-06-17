@@ -23,10 +23,13 @@ ROUTE_METRIC=900
 ROUTE_TABLE=900
 
 update_rtr() {
+  local op="${3-add}"
   busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/"$RA_IF" \
     xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s "" || true
 
   default_update_rtr "$@"
+
+  [[ ${op} == "remove" ]] && return
 
   # Add additional gateway information
   for file in /run/systemd/network/{00,}-bmc-$RA_IF.network; do
