@@ -55,11 +55,11 @@
 - name: fan_rotor_fault_property
   class: group
   group: property
-  type: boolean
+  type: double
   members:
-    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+    - interface: xyz.openbmc_project.Sensor.Value
       meta: PROPERTY
-      property: CriticalAlarmLow
+      property: Value
 
 # call counts check when fan speed is 0
 - name: fan_rotor_fault_alarm
@@ -79,7 +79,8 @@
   countop: ">"
   countbound: 2
   op: "=="
-  bound: true
+  bound: 0
+  oneshot: true
 
 - name: set_all_slots_power_off
   class: callback
