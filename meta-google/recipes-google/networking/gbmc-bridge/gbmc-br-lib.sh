@@ -108,7 +108,7 @@ EOF
   local file
   for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-$name.conf; do
     mkdir -p "$(dirname "$file")"
-    printf '%s' "$contents$scontents" >"$file"
+    printf '%s\n%s' "$contents" "$scontents" >"$file"
   done
 
   gbmc_net_networkd_reload gbmcbr
