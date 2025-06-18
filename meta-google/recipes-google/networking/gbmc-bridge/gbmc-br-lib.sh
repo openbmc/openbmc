@@ -70,7 +70,6 @@ gbmc_br_set_runtime_ip() {
 
   local pfx
   pfx="$(ip_bytes_to_str pfx_bytes)"
-  (( pfx_bytes[9] &= 0xf0 ))
   # We either have an inband IP address that has a /76 allocation for
   # our BMCs, or we have an OOB address that is a /64. We can only tell the
   # difference by the 9th byte being 00 vs fd.
@@ -80,6 +79,8 @@ gbmc_br_set_runtime_ip() {
   else
     stateless_size=76
   fi
+  (( pfx_bytes[8] |= 0xfd ))
+  (( pfx_bytes[9] &= 0xf0 ))
   local stateless_pfx
   stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
   local contents
