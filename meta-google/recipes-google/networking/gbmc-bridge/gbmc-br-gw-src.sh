@@ -57,32 +57,44 @@ gbmc_br_set_router() {
 }
 
 gbmc_br_gw_src_update() {
-  # Pick the shortest address, we always want to use the most root level
-  # The order of preference looks roughly like
-  #   1. Root /64 address (2620:15c:2c3:aaae::/64)
-  #      This is generally used by the OOB RJ45 port and is our primary preference
-  #   2. BMC subordonate root (2620:15c:2c3:aaae:fd01::/80)
-  #      From the NIC over NCSI with the /64 shared with the CN
-  #   3. BMC stateless (2620:15c:2c3:aaae:fd00:3c8d:20dc:263e/80)
-  #      From the NIC, but derived from the MAC and typically never used
-  #   Root /64 can only be used by external nic
- local route
- for route in "${!gbmc_br_gw_src_routes[@]}"; do
-    local new_src=
+  local route
+  local ip
+  # {dev}-{ip} -> {metric}
+  local -A dev_ip_to_metric=()
+  for ip in "${!gbmc_br_gw_src_ips[@]}"; do
+    local rt
+    rt="$(ip -6 route get 2000:: from "$ip" 2>/dev/null)"
+    [[ "$rt" =~ ' dev '([^ ]+).*' metric '([^ ]+) ]] || continue
+    local rt_dev="${BASH_REMATCH[1]}"
+    local rt_metric="${BASH_REMATCH[2]}"
+    dev_ip_to_metric["$rt_dev-$ip"]+="$rt_metric"
+  done
+  for route in "${!gbmc_br_gw_src_routes[@]}"; do
+    local new_src
     local new_len=16
-    local ip
+    local new_metric=4096
+    [[ "$route" =~ dev' '([^ ]+) ]] || continue
+    local dev="${BASH_REMATCH[1]}"
     for ip in "${!gbmc_br_gw_src_ips[@]}"; do
+      # Prioritize the IP with the lowest route metric, as we want specific
+      # source routes to take precedence in selection. If they are the same,
+      # pick the shortest address, we always want to use the most root level
+      # The order of preference looks roughly like
+      #   1. Root /64 address (2620:15c:2c3:aaae::/64)
+      #      This is generally used by the OOB RJ45 port and is our primary preference
+      #   2. BMC subordonate root (2620:15c:2c3:aaae:fd01::/80)
+      #      From the NIC over NCSI with the /64 shared with the CN
+      #   3. BMC stateless (2620:15c:2c3:aaae:fd00:3c8d:20dc:263e/80)
+      #      From the NIC, but derived from the MAC and typically never used
+      local metric="${dev_ip_to_metric["$dev-$ip"]-1024}"
       local ip_len="${gbmc_br_gw_src_ips["$ip"]}"
-      if [[ $route == *' dev @NCSI_INTF@ '* ]]; then
-        (( ip_len < 9 )) && continue
-      fi
-      if (( ip_len < new_len )); then
+      if (( metric < new_metric || (metric == new_metric && ip_len < new_len) )); then
         new_src="$ip"
         new_len="$ip_len"
+        new_metric="$metric"
       fi
     done
     (( new_len >= 16 )) && continue
-
     [[ $route != *" src $new_src "* ]] || continue
     echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
     # shellcheck disable=SC2086

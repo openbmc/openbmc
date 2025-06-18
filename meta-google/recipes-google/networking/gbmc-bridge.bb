@@ -19,7 +19,7 @@ SRC_URI += " \
   file://gbmc-br-hostname.service \
   file://gbmc-br-ra.sh.in \
   file://gbmc-br-ra.service \
-  file://gbmc-br-gw-src.sh.in \
+  file://gbmc-br-gw-src.sh \
   file://gbmc-br-nft.sh \
   file://gbmc-br-dhcp.sh \
   file://50-gbmc-psu-hardreset.sh.in \
@@ -80,8 +80,6 @@ GBMC_COORDINATED_POWERCYCLE ?= "true"
 # Allow machines to upgrade all netboot warm reboots into powercyles in case
 # they have stability issues performing them. Disable this feature by default.
 GBMC_NETBOOT_UPGRADE_REBOOT ?= "0"
-
-GBMC_NCSI_IF_NAME ?= ""
 
 def mac_to_eui64(mac):
   if not mac:
@@ -147,13 +145,6 @@ do_install() {
   install -d -m0755 "$mondir"
   install -m0644 ${UNPACKDIR}/gbmc-br-ula.sh "$mondir"/
   install -m0644 ${UNPACKDIR}/gbmc-br-from-ra.sh "$mondir"/
-  if [ ! -z "${GBMC_NCSI_IF_NAME}" ]; then
-    sed 's,@NCSI_INTF@,${GBMC_NCSI_IF_NAME},'  \
-      ${UNPACKDIR}/gbmc-br-gw-src.sh.in >${UNPACKDIR}/gbmc-br-gw-src.sh
-  else
-    sed 's,@NCSI_INTF@,unexistintf,'  \
-      ${UNPACKDIR}/gbmc-br-gw-src.sh.in >${UNPACKDIR}/gbmc-br-gw-src.sh
-  fi
   install -m0644 ${UNPACKDIR}/gbmc-br-gw-src.sh "$mondir"/
   install -m0644 ${UNPACKDIR}/gbmc-br-nft.sh "$mondir"/
 
