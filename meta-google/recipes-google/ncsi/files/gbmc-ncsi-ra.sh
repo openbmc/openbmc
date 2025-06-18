@@ -29,19 +29,21 @@ update_rtr() {
   busctl set-property xyz.openbmc_project.Network /xyz/openbmc_project/network/"$RA_IF" \
     xyz.openbmc_project.Network.EthernetInterface DefaultGateway6 s "" || true
 
+  # It's important that this happens before the main table default router is configured.
+  # Otherwise, the IP source determination logic won't be able to pick the best route.
+  if [[ ${op} == "add" ]]; then
+    # Add additional gateway information
+    for file in /run/systemd/network/{00,}-bmc-$RA_IF.network; do
+      mkdir -p "$file.d"
+      printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=512\nTable=%d' \
+        "$rtr" "$ROUTE_TABLE" >"$file.d"/10-gateway-table.conf
+    done
+
+    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric 512 table "$ROUTE_TABLE" || \
+      gbmc_net_networkd_reload "$RA_IF"
+  fi
+
   default_update_rtr "$@"
-
-  [[ ${op} == "remove" ]] && return
-
-  # Add additional gateway information
-  for file in /run/systemd/network/{00,}-bmc-$RA_IF.network; do
-    mkdir -p "$file.d"
-    printf '[Route]\nGateway=%s\nGatewayOnLink=true\nTable=%d' \
-      "$rtr" "$ROUTE_TABLE" >"$file.d"/10-gateway-table.conf
-  done
-
-  ip -6 route replace default via "$rtr" onlink dev "$RA_IF" table "$ROUTE_TABLE" || \
-    gbmc_net_networkd_reload "$RA_IF"
 }
 
 ncsi_is_active() {
