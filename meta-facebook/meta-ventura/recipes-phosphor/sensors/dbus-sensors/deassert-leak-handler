@@ -1,0 +1,11 @@
+#!/bin/bash
+
+DetectorName=$1
+
+LeakType=$(echo "$DetectorName" | cut -d'_' -f2)
+temp=${DetectorName#*Port}
+portnum=${temp%%_*}
+
+if [ "$LeakType" == "Big" ]; then
+  busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/leakport""$portnum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+fi
