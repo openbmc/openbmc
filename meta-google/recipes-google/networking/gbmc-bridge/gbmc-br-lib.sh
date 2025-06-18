@@ -85,8 +85,9 @@ gbmc_br_set_runtime_ip() {
   stateless_pfx="$(ip_bytes_to_str pfx_bytes)"
   local contents
   read -r -d '' contents <<EOF
-[Network]
+[Address]
 Address=$pfx/128
+DuplicateAddressDetection=none
 [IPv6RoutePrefix]
 Route=$pfx/80
 LifetimeSec=120
