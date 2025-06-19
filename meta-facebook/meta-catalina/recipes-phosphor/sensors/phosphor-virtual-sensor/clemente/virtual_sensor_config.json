@@ -182,7 +182,7 @@
     },
     {
         "Desc": {
-            "Name": "PDB_CABLE_TSENSE_POSITIVE_TEMP_C",
+            "Name": "Interposer_CABLE_TSENSE_POSITIVE_TEMP_C",
             "SensorType": "temperature",
             "MaxValue": 127,
             "MinValue": -127
@@ -191,15 +191,15 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Clemente_PDB"
+                "/xyz/openbmc_project/inventory/system/board/Clemente_Interposer"
             ]
         ],
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "PDB_CTP_CURR",
+                    "ParamName": "Interposer_CTP_CURR",
                     "Desc": {
-                        "Name": "PDB_CABLE_TSENSE_POSITIVE_CURR_A",
+                        "Name": "Interposer_CABLE_TSENSE_POSITIVE_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -212,27 +212,27 @@
             "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
             "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
             "switch {",
-            "  case inrange(CURR[0],PDB_CTP_CURR,CURR[1]): TEMP[0]+((PDB_CTP_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
-            "  case inrange(CURR[1],PDB_CTP_CURR,CURR[2]): TEMP[1]+((PDB_CTP_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
-            "  case inrange(CURR[2],PDB_CTP_CURR,CURR[3]): TEMP[2]+((PDB_CTP_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
-            "  case inrange(CURR[3],PDB_CTP_CURR,CURR[4]): TEMP[3]+((PDB_CTP_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
-            "  case inrange(CURR[4],PDB_CTP_CURR,CURR[5]): TEMP[4]+((PDB_CTP_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
-            "  case inrange(CURR[5],PDB_CTP_CURR,CURR[6]): TEMP[5]+((PDB_CTP_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
-            "  case inrange(CURR[6],PDB_CTP_CURR,CURR[7]): TEMP[6]+((PDB_CTP_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
-            "  case inrange(CURR[7],PDB_CTP_CURR,CURR[8]): TEMP[7]+((PDB_CTP_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
-            "  case inrange(CURR[8],PDB_CTP_CURR,CURR[9]): TEMP[8]+((PDB_CTP_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
-            "  case inrange(CURR[9],PDB_CTP_CURR,CURR[10]): TEMP[9]+((PDB_CTP_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
-            "  case inrange(CURR[10],PDB_CTP_CURR,CURR[11]): TEMP[10]+((PDB_CTP_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
-            "  case inrange(CURR[11],PDB_CTP_CURR,CURR[12]): TEMP[11]+((PDB_CTP_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
-            "  case inrange(CURR[12],PDB_CTP_CURR,CURR[13]): TEMP[12]+((PDB_CTP_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
-            "  case PDB_CTP_CURR>CURR[13]: TEMP[13];",
+            "  case inrange(CURR[0],Interposer_CTP_CURR,CURR[1]): TEMP[0]+((Interposer_CTP_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],Interposer_CTP_CURR,CURR[2]): TEMP[1]+((Interposer_CTP_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],Interposer_CTP_CURR,CURR[3]): TEMP[2]+((Interposer_CTP_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],Interposer_CTP_CURR,CURR[4]): TEMP[3]+((Interposer_CTP_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],Interposer_CTP_CURR,CURR[5]): TEMP[4]+((Interposer_CTP_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],Interposer_CTP_CURR,CURR[6]): TEMP[5]+((Interposer_CTP_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],Interposer_CTP_CURR,CURR[7]): TEMP[6]+((Interposer_CTP_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],Interposer_CTP_CURR,CURR[8]): TEMP[7]+((Interposer_CTP_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],Interposer_CTP_CURR,CURR[9]): TEMP[8]+((Interposer_CTP_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],Interposer_CTP_CURR,CURR[10]): TEMP[9]+((Interposer_CTP_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],Interposer_CTP_CURR,CURR[11]): TEMP[10]+((Interposer_CTP_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],Interposer_CTP_CURR,CURR[12]): TEMP[11]+((Interposer_CTP_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],Interposer_CTP_CURR,CURR[13]): TEMP[12]+((Interposer_CTP_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case Interposer_CTP_CURR>CURR[13]: TEMP[13];",
             "  default : TEMP[0];",
             "}"
         ]
     },
     {
         "Desc": {
-            "Name": "PDB_CABLE_TSENSE_NEGATIVE_TEMP_C",
+            "Name": "Interposer_CABLE_TSENSE_NEGATIVE_TEMP_C",
             "SensorType": "temperature",
             "MaxValue": 127,
             "MinValue": -127
@@ -241,15 +241,15 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Clemente_PDB"
+                "/xyz/openbmc_project/inventory/system/board/Clemente_Interposer"
             ]
         ],
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "PDB_CTN_CURR",
+                    "ParamName": "Interposer_CTN_CURR",
                     "Desc": {
-                        "Name": "PDB_CABLE_TSENSE_NEGATIVE_CURR_A",
+                        "Name": "Interposer_CABLE_TSENSE_NEGATIVE_CURR_A",
                         "SensorType": "current"
                     }
                 }
@@ -262,20 +262,20 @@
             "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
             "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
             "switch {",
-            "  case inrange(CURR[0],PDB_CTN_CURR,CURR[1]): TEMP[0]+((PDB_CTN_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
-            "  case inrange(CURR[1],PDB_CTN_CURR,CURR[2]): TEMP[1]+((PDB_CTN_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
-            "  case inrange(CURR[2],PDB_CTN_CURR,CURR[3]): TEMP[2]+((PDB_CTN_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
-            "  case inrange(CURR[3],PDB_CTN_CURR,CURR[4]): TEMP[3]+((PDB_CTN_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
-            "  case inrange(CURR[4],PDB_CTN_CURR,CURR[5]): TEMP[4]+((PDB_CTN_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
-            "  case inrange(CURR[5],PDB_CTN_CURR,CURR[6]): TEMP[5]+((PDB_CTN_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
-            "  case inrange(CURR[6],PDB_CTN_CURR,CURR[7]): TEMP[6]+((PDB_CTN_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
-            "  case inrange(CURR[7],PDB_CTN_CURR,CURR[8]): TEMP[7]+((PDB_CTN_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
-            "  case inrange(CURR[8],PDB_CTN_CURR,CURR[9]): TEMP[8]+((PDB_CTN_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
-            "  case inrange(CURR[9],PDB_CTN_CURR,CURR[10]): TEMP[9]+((PDB_CTN_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
-            "  case inrange(CURR[10],PDB_CTN_CURR,CURR[11]): TEMP[10]+((PDB_CTN_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
-            "  case inrange(CURR[11],PDB_CTN_CURR,CURR[12]): TEMP[11]+((PDB_CTN_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
-            "  case inrange(CURR[12],PDB_CTN_CURR,CURR[13]): TEMP[12]+((PDB_CTN_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
-            "  case PDB_CTN_CURR>CURR[13]: TEMP[13];",
+            "  case inrange(CURR[0],Interposer_CTN_CURR,CURR[1]): TEMP[0]+((Interposer_CTN_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],Interposer_CTN_CURR,CURR[2]): TEMP[1]+((Interposer_CTN_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],Interposer_CTN_CURR,CURR[3]): TEMP[2]+((Interposer_CTN_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],Interposer_CTN_CURR,CURR[4]): TEMP[3]+((Interposer_CTN_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],Interposer_CTN_CURR,CURR[5]): TEMP[4]+((Interposer_CTN_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],Interposer_CTN_CURR,CURR[6]): TEMP[5]+((Interposer_CTN_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],Interposer_CTN_CURR,CURR[7]): TEMP[6]+((Interposer_CTN_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],Interposer_CTN_CURR,CURR[8]): TEMP[7]+((Interposer_CTN_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],Interposer_CTN_CURR,CURR[9]): TEMP[8]+((Interposer_CTN_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],Interposer_CTN_CURR,CURR[10]): TEMP[9]+((Interposer_CTN_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],Interposer_CTN_CURR,CURR[11]): TEMP[10]+((Interposer_CTN_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],Interposer_CTN_CURR,CURR[12]): TEMP[11]+((Interposer_CTN_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],Interposer_CTN_CURR,CURR[13]): TEMP[12]+((Interposer_CTN_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case Interposer_CTN_CURR>CURR[13]: TEMP[13];",
             "  default : TEMP[0];",
             "}"
         ]
@@ -311,13 +311,6 @@
                     }
                 },
                 {
-                    "ParamName": "VR_AUX_TEMP",
-                    "Desc": {
-                        "Name": "PDB_VR_P12V_AUX_TEMP_C",
-                        "SensorType": "temperature"
-                    }
-                },
-                {
                     "ParamName": "BRICK0_N1_TEMP",
                     "Desc": {
                         "Name": "PDB_BRICK0_P12V_N1_TEMP_C",
@@ -344,18 +337,11 @@
                         "Name": "PDB_BRICK1_P12V_N2_TEMP_C",
                         "SensorType": "temperature"
                     }
-                },
-                {
-                    "ParamName": "BRICK0_AUX_TEMP",
-                    "Desc": {
-                        "Name": "PDB_BRICK0_P12V_AUX_TEMP_C",
-                        "SensorType": "temperature"
-                    }
                 }
             ]
         },
         "Expression": [
-            "max(0, VR_N1_TEMP, VR_N2_TEMP, VR_AUX_TEMP, BRICK0_N1_TEMP, BRICK1_N1_TEMP, BRICK0_N2_TEMP, BRICK1_N2_TEMP, BRICK0_AUX_TEMP)"
+            "max(0, VR_N1_TEMP, VR_N2_TEMP, BRICK0_N1_TEMP, BRICK1_N1_TEMP, BRICK0_N2_TEMP, BRICK1_N2_TEMP)"
         ]
     }
 ]
