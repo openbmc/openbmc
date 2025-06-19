@@ -8,6 +8,25 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 check_valid_sgpio
 valid_sgpio=$?
 
+bios_version_file_init() {
+  # The new BIOS updater reads and writes the BIOS version from
+  # /var/bios/host0_bios_version.txt. If this file does not exist,
+  # create it using the version from /var/lib/fb-ipmi-oem/appData.json
+  # for backward compatibility. This ensures the updater can still function
+  # even if the version file hasn't been generated yet.
+  local legacy_bios_ver_file="/var/lib/fb-ipmi-oem/appData.json"
+  local bios_ver_file="/var/bios/host0_bios_version.txt"
+
+  if [ ! -f "$bios_ver_file" ]; then
+    if [ -f "$legacy_bios_ver_file" ]; then
+      version=$(jq -r '.sysfw_ver_server0' "$legacy_bios_ver_file")
+      echo "$version" > "$bios_ver_file"
+    else
+      echo "Legacy BIOS version file $legacy_bios_ver_file doesn't exist"
+    fi
+  fi
+}
+
 host_led_init() {
   if [ "$(get_gpio "power-host-good")" -eq 1 ] && [ "$valid_sgpio" -eq 0 ]; then
     systemctl start obmc-led-group-start@power_on.service
@@ -21,11 +40,8 @@ post_end_init() {
      busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
      xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
      xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby;
-     # Initial BIOS version after BMC reboot.
-     busctl set-property xyz.openbmc_project.Software.Manager \
-     /xyz/openbmc_project/software/bios_active \
-     xyz.openbmc_project.Software.Version \
-     Version s "$(jq -r '.sysfw_ver_server0' /var/lib/fb-ipmi-oem/appData.json)"
+     # Initialize new BIOS version file from legacy for compatibility.
+     bios_version_file_init
   else
      busctl set-property xyz.openbmc_project.State.Host0 \
      /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
