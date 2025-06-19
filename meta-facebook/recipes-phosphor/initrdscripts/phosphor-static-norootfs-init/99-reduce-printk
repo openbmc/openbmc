@@ -1,0 +1,2 @@
+# Reduce the printk to just warning and above.
+echo 4 > /proc/sys/kernel/printk
