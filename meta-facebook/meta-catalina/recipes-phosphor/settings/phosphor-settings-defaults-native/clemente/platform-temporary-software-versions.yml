@@ -38,7 +38,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/Clemente_PDB_vr_aux:
+/xyz/openbmc_project/software/chassis/Clemente_HDD_cpld_0:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
@@ -46,7 +46,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/Clemente_HDD_cpld:
+/xyz/openbmc_project/software/chassis/Clemente_HDD_cpld_1:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
