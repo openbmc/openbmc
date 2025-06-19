@@ -22,16 +22,16 @@
             "ignoreDbusMinMax": true
         },
         {
-            "name": "HDDBOARD_SSD0_TEMP_C",
+            "name": "HDDBOARD0_SSD0_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD_SSD0_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD0_SSD0_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "HDDBOARD_SSD2_TEMP_C",
+            "name": "HDDBOARD1_SSD0_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD_SSD2_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD1_SSD0_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -319,8 +319,8 @@
                     "name": "STEPWISE_HDDBOARD_SSD",
                     "type": "stepwise",
                     "inputs": [
-                        "HDDBOARD_SSD0_TEMP_C",
-                        "HDDBOARD_SSD2_TEMP_C"
+                        "HDDBOARD0_SSD0_TEMP_C",
+                        "HDDBOARD1_SSD0_TEMP_C"
                     ],
                     "setpoint": 0.0,
                     "pid": {
@@ -344,8 +344,8 @@
                     "name": "PID_HDDBOARD_SSD",
                     "type": "temp",
                     "inputs": [
-                        "HDDBOARD_SSD0_TEMP_C",
-                        "HDDBOARD_SSD2_TEMP_C"
+                        "HDDBOARD0_SSD0_TEMP_C",
+                        "HDDBOARD1_SSD0_TEMP_C"
                     ],
                     "setpoint": 60.0,
                     "pid": {
