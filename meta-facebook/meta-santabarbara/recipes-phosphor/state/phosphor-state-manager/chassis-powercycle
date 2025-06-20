@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+#Sled cycle
+echo "Starting Chassis Power Cycle"
+
+chassis-power-cycle() {
+    # LTC4287 MFR_REBOOT_CONTROL (FDh) Read/Write
+    # [3]:
+    #       REBOOT 0 Write a 1 to reboot.
+    # [2:0]
+    #       RBT_DL 100 Configures Auto-Reboot turn-on Delay (tDL(RBT)) after the REBOOT bit is set to 1
+    #       RBT_DL[2:0] DELAY
+    #       000 0.580 s
+    #       001 1.16 s
+    #       010 2.32 s
+    #       011 4.64 s
+    #       100 9.28 s
+    #       101 18.6 s
+    #       110 37.1 s
+    #       111 74.2 s
+    if ! i2cset -f -y 47 0x43 0xfd 0x05; then
+        echo "52V HSC1 set reboot delay failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 47 0x41 0xfd 0x05; then
+        echo "52V HSC2 set reboot delay failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 47 0x43 0xfd 0x0d; then
+        echo "52V HSC1 set reboot bit failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 47 0x41 0xfd 0x0d; then
+        echo "52V HSC2 set reboot bit failed"
+        return 1
+    fi
+
+    return 0
+}
+
+ChassisNumber=$1
+
+if [ "$ChassisNumber" == 0 ]
+then
+  echo "Starting Chassis Power Cycle"
+  chassis-power-cycle
+fi

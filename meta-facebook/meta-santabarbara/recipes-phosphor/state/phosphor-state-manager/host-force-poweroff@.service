@@ -1,0 +1,14 @@
+[Unit]
+Description=power off host:%i
+After=obmc-host-stop-pre@%i.target
+Before=obmc-host-stopping@%i.target
+Conflicts=obmc-host-startmin@%i.target
+
+[Service]
+Restart=no
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/phosphor-state-manager/host-force-poweroff %i
+
+[Install]
+RequiredBy=obmc-host-stop@%i.target

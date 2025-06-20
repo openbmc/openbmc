@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+# Disable SSC
+i2ctransfer -fy 17 w2@0x09 0xfd 0x03
+i2ctransfer -fy 17 w2@0x09 0x07 0x00
+
+# Create /dev/mem
+if [ ! -c /dev/mem ]; then
+    /bin/mknod /dev/mem c 1 1
+fi
+
+devmem 0x1e6ee000 32 0xff00ba55
+devmem 0x1e6e2454 32 0xaa000000
+devmem 0x1e6e2094 32 0x00000003
