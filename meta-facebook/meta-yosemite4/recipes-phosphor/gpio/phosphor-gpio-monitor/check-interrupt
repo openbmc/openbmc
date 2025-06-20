@@ -119,11 +119,11 @@ do
 
             # check which pin fault, add to fault info
             if (( (FAULT_BYTE >> 0) & 1 == 1 )); then
-                [ -n "$COMBINED_INFO" ] && COMBINED_INFO="${COMBINED_INFO},PWRGD_PVDDCR_CPU0_FAULT" || COMBINED_INFO="PWRGD_PVDDCR_CPU0_FAULT"
-            elif (( (FAULT_BYTE >> 1) & 1 == 1 )); then
-                [ -n "$COMBINED_INFO" ] && COMBINED_INFO="${COMBINED_INFO},PWRGD_PVDDCR_SOC_FAULT" || COMBINED_INFO="PWRGD_PVDDCR_SOC_FAULT"
-            elif (( (FAULT_BYTE >> 2) & 1 == 1 )); then
                 [ -n "$COMBINED_INFO" ] && COMBINED_INFO="${COMBINED_INFO},PWRGD_PVDDCR_CPU1_FAULT" || COMBINED_INFO="PWRGD_PVDDCR_CPU1_FAULT"
+            elif (( (FAULT_BYTE >> 1) & 1 == 1 )); then
+                [ -n "$COMBINED_INFO" ] && COMBINED_INFO="${COMBINED_INFO},PWRGD_PVDDCR_CPU0_FAULT" || COMBINED_INFO="PWRGD_PVDDCR_CPU0_FAULT"
+            elif (( (FAULT_BYTE >> 2) & 1 == 1 )); then
+                [ -n "$COMBINED_INFO" ] && COMBINED_INFO="${COMBINED_INFO},PWRGD_PVDDCR_SOC_FAULT" || COMBINED_INFO="PWRGD_PVDDCR_SOC_FAULT"
             elif (( (FAULT_BYTE >> 3) & 1 == 1 )); then
                 [ -n "$COMBINED_INFO" ] && COMBINED_INFO="${COMBINED_INFO},PWRGD_PVDDIO_FAULT" || COMBINED_INFO="PWRGD_PVDDIO_FAULT"
             elif (( (FAULT_BYTE >> 4) & 1 == 1 )); then
