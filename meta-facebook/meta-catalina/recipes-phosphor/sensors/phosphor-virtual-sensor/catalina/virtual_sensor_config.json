@@ -16,58 +16,58 @@
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "FAN0_PWM",
+                    "ParamName": "FAN0_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN0_PWM",
+                        "Name": "FAN0_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN1_PWM",
+                    "ParamName": "FAN1_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN1_PWM",
+                        "Name": "FAN1_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN2_PWM",
+                    "ParamName": "FAN2_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN2_PWM",
+                        "Name": "FAN2_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN3_PWM",
+                    "ParamName": "FAN3_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN3_PWM",
+                        "Name": "FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN4_PWM",
+                    "ParamName": "FAN4_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN4_PWM",
+                        "Name": "FAN4_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN5_PWM",
+                    "ParamName": "FAN5_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN5_PWM",
+                        "Name": "FAN5_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN6_PWM",
+                    "ParamName": "FAN6_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN6_PWM",
+                        "Name": "FAN6_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN7_PWM",
+                    "ParamName": "FAN7_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN7_PWM",
+                        "Name": "FAN7_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 }
@@ -75,8 +75,8 @@
         },
         "Expression": [
             "max(6.95927258, ",
-            "((2.825758 * (avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM)^2)) + ",
-            "(91.27348 * avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM)) - ",
+            "((2.825758 * (avg(FAN0_PWM_PCT, FAN1_PWM_PCT, FAN2_PWM_PCT, FAN3_PWM_PCT, FAN4_PWM_PCT, FAN5_PWM_PCT, FAN6_PWM_PCT, FAN7_PWM_PCT)^2)) + ",
+            "(91.27348 * avg(FAN0_PWM_PCT, FAN1_PWM_PCT, FAN2_PWM_PCT, FAN3_PWM_PCT, FAN4_PWM_PCT, FAN5_PWM_PCT, FAN6_PWM_PCT, FAN7_PWM_PCT)) - ",
             "2.196333))"
         ]
     },
@@ -104,65 +104,65 @@
                     }
                 },
                 {
-                    "ParamName": "FAN0_PWM",
+                    "ParamName": "FAN0_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN0_PWM",
+                        "Name": "FAN0_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN1_PWM",
+                    "ParamName": "FAN1_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN1_PWM",
+                        "Name": "FAN1_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN2_PWM",
+                    "ParamName": "FAN2_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN2_PWM",
+                        "Name": "FAN2_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN3_PWM",
+                    "ParamName": "FAN3_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN3_PWM",
+                        "Name": "FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN4_PWM",
+                    "ParamName": "FAN4_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN4_PWM",
+                        "Name": "FAN4_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN5_PWM",
+                    "ParamName": "FAN5_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN5_PWM",
+                        "Name": "FAN5_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN6_PWM",
+                    "ParamName": "FAN6_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN6_PWM",
+                        "Name": "FAN6_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN7_PWM",
+                    "ParamName": "FAN7_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN7_PWM",
+                        "Name": "FAN7_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM);",
+            "var DUTY_AVG:=avg(FAN0_PWM_PCT, FAN1_PWM_PCT, FAN2_PWM_PCT, FAN3_PWM_PCT, FAN4_PWM_PCT, FAN5_PWM_PCT, FAN6_PWM_PCT, FAN7_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={-1.0, -1.0, -1.0, -1.5, -1.5, -2.5, -2.5, -3.0, -3.0, -3.0, -3.0};",
             "switch {",
