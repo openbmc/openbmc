@@ -61,6 +61,9 @@ do_RUN_POWER_PG_change()
             return 0
         fi
 
+        # Add delay to prevent false RUN_POWER_PG when HMC unexpected reset
+        sleep 2
+
         # Sync power status to "On" for abnormal power-on scenarios.
         if [ "$(get_gpio "host0-ready")" -eq 1 ] && [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.On" ]; then
             set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
