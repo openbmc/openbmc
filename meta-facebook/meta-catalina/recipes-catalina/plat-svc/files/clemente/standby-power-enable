@@ -61,45 +61,6 @@ bind_i2c_muxes()
 
 }
 
-bind_hsc_sensors()
-{
-    bind_i2c_device lm25066 1-0012
-    bind_i2c_device lm25066 1-0014
-    bind_i2c_device lm75 1-004e
-}
-
-bind_pdb_sensors()
-{
-   bind_i2c_device raa228000 1-0060
-   bind_i2c_device raa228000 1-0061
-}
-
-bind_fan_control()
-{
-   bind_i2c_device max31790 1-0020
-   bind_i2c_device max31790 1-0023
-   bind_i2c_device max31790 1-002c
-   bind_i2c_device max31790 1-002f
-}
-
-bind_nvme_sensors()
-{
-    bind_i2c_device tmp75 48-006a
-    bind_i2c_device tmp75 50-006a
-    bind_i2c_device tmp75 52-006a
-    bind_i2c_device tmp75 54-006a
-}
-
-bind_interposer_sensors()
-{
-    bind_i2c_device ina238 16-0041
-    bind_i2c_device ina238 16-0042
-    bind_i2c_device ina238 16-0044
-
-    bind_i2c_device ina238 23-0042
-    bind_i2c_device ina238 23-0044
-}
-
 bind_gpio_expanders()
 {
     # BMC IOEXP
@@ -131,14 +92,11 @@ bind_fru_eeproms()
     bind_i2c_device at24 13-0054
     bind_i2c_device at24 13-0055
     # Module 0 Aux
-    bind_i2c_device at24 6-0050
     bind_i2c_device at24 2-0050
     # Module 1 Aux
     bind_i2c_device at24 2-0051
     # IO Mezz 0 FRU
     bind_i2c_device at24 29-0050
-    # FIO FRU
-    bind_i2c_device at24 23-0051
     # IO Mezz 1 FRU
     bind_i2c_device at24 41-0050
     # E1S 0 Board FRU
@@ -149,10 +107,29 @@ bind_fru_eeproms()
     bind_i2c_device at24 10-0050
     # CX7 1 FRU
     bind_i2c_device at24 15-0052
-    # PDB FRU
-    bind_i2c_device at24 1-0050
-    # Interposer FRU
-    bind_i2c_device at24 21-0054
+}
+
+bind_hsc_sensors()
+{
+    bind_i2c_device lm25066 1-0012
+    bind_i2c_device lm25066 1-0014
+    bind_i2c_device lm75 1-004e
+}
+
+bind_pdb_sensors()
+{
+   bind_i2c_device isl68137 1-0060
+   bind_i2c_device isl68137 1-0061
+}
+
+bind_interposer_sensors()
+{
+    bind_i2c_device ina238 16-0041
+    bind_i2c_device ina238 16-0042
+    bind_i2c_device ina238 16-0044
+
+    bind_i2c_device ina238 23-0042
+    bind_i2c_device ina238 23-0044
 }
 
 reset_host_usb()
@@ -160,8 +137,8 @@ reset_host_usb()
     set_gpio "USB2_HUB_RST_L-O" "$GPIO_LOW"
     set_gpio "USB2_HUB4_RST_L-O" "$GPIO_LOW"
     sleep 1
-    set_gio "USB2_HUB_RST_L" "$GPIO_HIGH"
-    set_gio "USB2_HUB4_RST_L" "$GPIO_HIGH"
+    set_gpio "USB2_HUB_RST_L" "$GPIO_HIGH"
+    set_gpio "USB2_HUB4_RST_L" "$GPIO_HIGH"
 }
 
 rebind_hmc_usb_network()
@@ -217,10 +194,20 @@ enable_pdb_vr_setting()
 
 restart_eth()
 {
+    for i in {1..2}
+    do
+    echo "Attempt $i to restart eth0 and eth1..."
     /bin/sh -c 'echo "BMC: Executing eth0 down" && /sbin/ip link set eth0 down'
-    /bin/sh -c 'echo "BMC: Executing eth0 up" && /sbin/ip link set eth0 up'
     /bin/sh -c 'echo "BMC: Executing eth1 down" && /sbin/ip link set eth1 down'
+    sleep 1
+    /bin/sh -c 'echo "BMC: Executing eth0 up" && /sbin/ip link set eth0 up'
     /bin/sh -c 'echo "BMC: Executing eth1 up" && /sbin/ip link set eth1 up'
+    sleep 20
+    if /sbin/ip a show eth0 | grep -q "inet " && /sbin/ip a show eth1 | grep -q "inet "; then
+        echo "eth0 and eth1 are up and both have IPs"
+        return 0
+    fi
+    done
 }
 
 if ! is_stby_good; then
@@ -237,11 +224,6 @@ set_gpio "BMC_12V_CTRL" "$GPIO_HIGH"
 set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
 
 bind_i2c_muxes
-bind_hsc_sensors
-bind_pdb_sensors
-bind_fan_control
-bind_nvme_sensors
-bind_interposer_sensors
 bind_gpio_expanders
 
 set_gpio "HMC_PGOOD-O" "$GPIO_HIGH"
@@ -251,6 +233,7 @@ set_gpio "HMC_EROT_RST_L-O" "$GPIO_HIGH"
 set_gpio "SCM_HPM_STBY_RST_N" "$GPIO_HIGH"
 
 if ! wait_gpio_value "HMC_READY-I" "$GPIO_HIGH" 180 1; then
+    restart_eth
     echo "Error: failed to get HMC_READY-I as high (1) in 180 sec"
     exit 1
 fi
@@ -262,22 +245,31 @@ if ! is_hmc_reachable 10; then
 fi
 
 if ! wait_gpio_value "FPGA_READY_BMC-I" "$GPIO_HIGH" 180 1; then
+    restart_eth
     echo "Error: failed to get FPGA_READY_BMC-I as high (1) in 180 sec"
     exit 1
 fi
 
 if ! wait_gpio_value "SEC_FPGA_READY_BMC" "$GPIO_HIGH" 180 1; then
+    restart_eth
     echo "Error: failed to get SEC_FPGA_READY_BMC as high (1) in 180 sec"
     exit 1
 fi
 
 bind_fru_eeproms
 
+# rebind Sensors
+bind_hsc_sensors
+bind_pdb_sensors
+bind_interposer_sensors
+
 enable_pdb_vr_setting
 
 set_bmc_ready
 
 # restart eth0 and eth1 interfaces for get the correct MAC address
-restart_eth
+if ! restart_eth ; then
+    echo "Failed to bring up IPv6 Scope:Global after 2 attempts."
+fi
 
 exit 0
