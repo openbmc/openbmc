@@ -94,7 +94,7 @@
             "name": "FAN0_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -103,7 +103,7 @@
             "name": "FAN0_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -112,7 +112,7 @@
             "name": "FAN1_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -121,7 +121,7 @@
             "name": "FAN1_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -130,7 +130,7 @@
             "name": "FAN2_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -139,7 +139,7 @@
             "name": "FAN2_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -148,7 +148,7 @@
             "name": "FAN3_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -157,7 +157,7 @@
             "name": "FAN3_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -166,7 +166,7 @@
             "name": "FAN4_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN4_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -175,7 +175,7 @@
             "name": "FAN4_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN4_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -184,7 +184,7 @@
             "name": "FAN5_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN5_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -193,7 +193,7 @@
             "name": "FAN5_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN5_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -202,7 +202,7 @@
             "name": "FAN6_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN6_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -211,7 +211,7 @@
             "name": "FAN6_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN6_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -220,7 +220,7 @@
             "name": "FAN7_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN7_TACH_IL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
@@ -229,7 +229,7 @@
             "name": "FAN7_TACH_OL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN7_TACH_OL_SPEED_RPM",
-            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
             "min": 0,
             "max": 255,
             "ignoreDbusMinMax": true
