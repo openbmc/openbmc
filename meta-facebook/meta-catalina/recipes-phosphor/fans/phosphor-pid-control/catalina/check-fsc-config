@@ -1,0 +1,60 @@
+#!/bin/bash
+
+PDB_OBJ_PATH="/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
+FSC_PDB_BRICK_CONF_PATH="/usr/share/swampd/config-pdb-brick.json"
+CONFIG_DIR="/var/lib/swampd"
+CONFIG_PATH="$CONFIG_DIR/config.json"
+PDB_BOARD_TYPE="unknow"
+
+is_pdb_discrete()
+{
+  timeout 3 mapper wait "$PDB_OBJ_PATH/PDB_VR_P12V_AUX"
+  return $?
+}
+
+is_pdb_brick()
+{
+  timeout 3 mapper wait "$PDB_OBJ_PATH/PDB_BRICK0_P12V_AUX"
+  return $?
+}
+
+check_fsc_config()
+{
+  if is_pdb_discrete; then
+    echo "pdb-discrete"
+  elif is_pdb_brick; then
+    echo "pdb-brick"
+  else
+    echo "unknow"
+  fi
+}
+
+# create config folder if not exist
+if [ ! -d "$CONFIG_DIR" ]; then
+  mkdir -p "$CONFIG_DIR"
+fi
+
+# clean up exist link
+if [ -L "$CONFIG_PATH" ]; then
+  rm "$CONFIG_PATH"
+fi
+
+# check pdb board type
+for i in {1..10}
+do
+  echo "check pdb board type, attempt $i"
+  if timeout 3 mapper wait "$PDB_OBJ_PATH"; then
+    PDB_BOARD_TYPE="$(check_fsc_config)"
+    break
+  fi
+done
+
+
+echo "pdb board type: $PDB_BOARD_TYPE"
+
+if [ "$PDB_BOARD_TYPE" = "pdb-brick" ]; then
+  # create a softlink "/var/lib/swampd/config.json" to link the config-pdb-brick.json
+  # because "/var/lib/swampd/config.json" has higher priority than "/usr/share/swampd/config.json"
+  echo "create softlink: $CONFIG_PATH"
+  ln -s "$FSC_PDB_BRICK_CONF_PATH" "$CONFIG_PATH"
+fi
