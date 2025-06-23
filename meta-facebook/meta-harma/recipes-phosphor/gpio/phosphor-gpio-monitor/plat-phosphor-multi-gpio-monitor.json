@@ -214,6 +214,28 @@
         "Continue": true
     },
     {
+        "Name": "irq-pvddcore0-ocp-alert",
+        "ChipId": "2",
+        "GpioNum": 226,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["vr-fault-deassert-log@2_irq-pvddcore0-ocp-alert.service"],
+            "FALLING": ["vr-fault-assert-log@2_irq-pvddcore0-ocp-alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "irq-pvddcore1-ocp-alert",
+        "ChipId": "2",
+        "GpioNum": 228,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["vr-fault-deassert-log@2_irq-pvddcore1-ocp-alert.service"],
+            "FALLING": ["vr-fault-assert-log@2_irq-pvddcore1-ocp-alert.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "fcb1-activate",
         "ChipId": "3",
         "GpioNum": 13,
