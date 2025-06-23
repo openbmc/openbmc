@@ -151,13 +151,17 @@
         "Continue": true
     },
     {
-        "Name": "irq-cpu-hsc-oc-n-alert",
+        "Name": "cpu0-prochot-alert",
         "ChipId": "2",
         "GpioNum": 178,
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["vr-fault-deassert-log@2_irq-cpu-hsc-oc-n-alert.service"],
-            "FALLING": ["vr-fault-assert-log@2_irq-cpu-hsc-oc-n-alert.service"]
+            "RISING": [
+                "prochot-deassert-log.service"
+             ],
+            "FALLING": [
+                "prochot-assert-log.service"
+             ]
         },
         "Continue": true
     },
@@ -172,21 +176,6 @@
              ],
             "FALLING": [
                 "thermtrip-assert-log.service"
-             ]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "cpu0-prochot-alert",
-        "ChipId": "2",
-        "GpioNum": 178,
-        "EventMon": "BOTH",
-        "Targets": {
-            "RISING": [
-                "prochot-deassert-log.service"
-             ],
-            "FALLING": [
-                "prochot-assert-log.service"
              ]
         },
         "Continue": true
