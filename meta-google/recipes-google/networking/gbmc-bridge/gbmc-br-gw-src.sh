@@ -92,6 +92,18 @@ gbmc_br_gw_src_update() {
         new_src="$ip"
         new_len="$ip_len"
         new_metric="$metric"
+      elif (( metric == new_metric && ip_len == 9 && new_len == 9 )); then
+        # 4. for hybrid mode we might get 2 ip with the same length and same
+        # metrics, but the oob one should have a 64 route without the suffix,
+        # since the route comes from the host BMC. We should priorize that.
+        local ip_bytes=()
+        ip_to_bytes ip_bytes "$ip"
+        ip_bytes[8]=0
+        ip_bytes[9]=0
+        local ip64
+        ip64=$(ip_bytes_to_str ip_bytes)/80
+        ip -6 route show "$ip64" | grep -q "$ip64" || continue
+        new_src="$ip"
       fi
     done
     (( new_len >= 16 )) && continue
