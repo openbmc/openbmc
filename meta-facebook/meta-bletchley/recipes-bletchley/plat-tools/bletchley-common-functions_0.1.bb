@@ -8,9 +8,11 @@ UNPACKDIR = "${S}"
 
 SRC_URI += " \
     file://bletchley-common-functions \
+    file://bletchley-platform-functions \
     "
 
 do_install() {
     install -d ${D}${libexecdir}
     install -m 0755 ${UNPACKDIR}/bletchley-common-functions ${D}${libexecdir}
+    install -m 0755 ${UNPACKDIR}/bletchley-platform-functions ${D}${libexecdir}
 }

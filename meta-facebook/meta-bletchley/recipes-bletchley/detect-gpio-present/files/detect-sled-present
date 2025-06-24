@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
+source /usr/libexec/bletchley-common-functions
 
 SLED_ID=$1
 SERVICE_NAME="xyz.openbmc_project.Inventory.Manager"
@@ -28,7 +30,8 @@ unbind_i2c_driver()
 sled_insert_action()
 {
     SLED_ID=$1
-    I2C_BUS_NUM=$((SLED_ID-1))
+    local I2C_BUS_NUM
+    I2C_BUS_NUM=$(get_bus_num "$SLED_ID")
 
     # 0022: fusb302
     bind_i2c_driver "${I2C_BUS_NUM}-0022" "typec_fusb302"
@@ -61,7 +64,8 @@ sled_insert_action()
 sled_remove_action()
 {
     SLED_ID=$1
-    I2C_BUS_NUM=$((SLED_ID-1))
+    local I2C_BUS_NUM
+    I2C_BUS_NUM=$(get_bus_num "$SLED_ID")
 
     # 0022: fusb302
     unbind_i2c_driver "${I2C_BUS_NUM}-0022" "typec_fusb302"

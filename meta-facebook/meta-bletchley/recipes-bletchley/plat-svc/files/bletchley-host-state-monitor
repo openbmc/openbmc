@@ -8,8 +8,6 @@ source /usr/libexec/bletchley-common-functions
 MDIO_TOOL="/usr/sbin/mdio"
 SWITCH_MDIO_BUS="1e650000.mdio-1"
 
-declare -a PORT_NUM_MAP=(10 3 2 1 7 6 5)
-
 declare -a HOST_PREVIOUS_STATE=("" "" "" "" "" "" "")
 declare -a HOST_NEW_STATE_TEMP=("" "" "" "" "" "" "")
 declare -a HOST_STATE_CHANGE_CHECK=(0 0 0 0 0 0 0)
@@ -41,14 +39,13 @@ CHASSIS_PWR_STATE_MAP["ON"]="On"
 
 is_host_ac_on()
 {
-    local HOST_ID=$1
     local I2C_BUS
+    I2C_BUS=$(get_bus_num "$1")
     local P1_OUTPUT_REG
     local P1_CONFIG_REG
     local HOST_PWR
     local IS_OUTPUT
 
-    I2C_BUS=$((HOST_ID-1))
     P1_OUTPUT_REG=$(i2cget -f -y "$I2C_BUS" 0x76 0x03)
     P1_CONFIG_REG=$(i2cget -f -y "$I2C_BUS" 0x76 0x07)
     HOST_PWR="$(( (P1_OUTPUT_REG & 0x80)>>7 ))"
@@ -132,7 +129,7 @@ check_host_state()
 
 while true
 do
-    for i in {1..6}
+    for i in $(seq 1 "$MAX_SLED_NUM")
     do
         HOST_STATE=""
         if ! is_sled_present "$i"; then

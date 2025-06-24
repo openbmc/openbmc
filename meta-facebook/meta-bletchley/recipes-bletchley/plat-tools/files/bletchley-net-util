@@ -1,7 +1,7 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
+source /usr/libexec/bletchley-common-functions
 
-declare -a PORT_NUM_MAP=(10 3 2 1 7 6 5)
-declare -a PORT_NAME_MAP=(BMC SLED1 SLED2 SLED3 SLED4 SLED5 SLED6)
 SWITCH_MDIO_BUS="1e650000.mdio-1"
 
 INNER_PORT_DEV_ID="4"
@@ -48,7 +48,7 @@ get_port_link_st()
     printf "Link Status\n"
     printf "========================================\n"
     printf "Switch:\n"
-    for port_phy in {0..6}
+    for port_phy in $(seq 0 $"$MAX_SLED_NUM")
     do
         printf "  Port %d (%s): %s\n" "${PORT_NUM_MAP[port_phy]}" "${PORT_NAME_MAP[port_phy]}" "$(get_switch_port_link_st "${PORT_NUM_MAP[port_phy]}")"
     done
@@ -61,7 +61,7 @@ get_port_link_st()
 
 get_switch_port_reg_dump()
 {
-    for port_phy in {0..6}
+    for port_phy in $(seq 0 $"$MAX_SLED_NUM")
     do
         printf "========================================\n"
         printf "Port %d (%s)\n" "${PORT_NUM_MAP[port_phy]}" "${PORT_NAME_MAP[port_phy]}"

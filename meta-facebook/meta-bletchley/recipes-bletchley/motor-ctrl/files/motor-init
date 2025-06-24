@@ -19,8 +19,9 @@ CALIBRATE_TIMEOUT=120
 
 #Enable pwm for sledN
 function open_pwm() {
-    local SLED_NUM="$1"
-    echo "Open pwm of sled$SLED_NUM"
+    local SLED_NUM
+    SLED_NUM="$(sled_mapping "$1")"
+    echo "Open pwm of sled$1"
     PWM_NUM=$(( SLED_NUM + PWM_NUM_OFFSET ))
     PWM_PATH="${PWM_CLASS_PATH}/pwm${PWM_NUM}"
     if [ ! -d "$PWM_PATH" ];then
@@ -64,7 +65,7 @@ function init_gpios() {
     done
 }
 
-if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
+if is_sled_valid "$1"; then
   SLED=$1
   SLED_NUM=${SLED:4}
 else
@@ -79,14 +80,15 @@ if ! is_sled_present "${SLED_NUM}"; then
     exit 1
 fi
 
+sled_gpio_num=$(sled_mapping "$SLED_NUM")
 #Init gpios
-init_gpios "$SLED_NUM"
+init_gpios "$sled_gpio_num"
 
 #enable pwm
 open_pwm "$SLED_NUM"
 
 #SLED{N}_MS_DETECT1  (initial position)
-DETECT_PIN1="SLED${SLED_NUM}_MS_DETECT1"
+DETECT_PIN1="SLED${sled_gpio_num}_MS_DETECT1"
 INIT_POS=$(get_gpio "$DETECT_PIN1")
 
 if [ "$INIT_POS" -eq 1 ];then

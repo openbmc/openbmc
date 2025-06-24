@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-platform-functions disable=SC1091
+source /usr/libexec/bletchley-platform-functions
 
 get_gpio()
 {
@@ -110,7 +112,8 @@ is_sled_present()
 
 spi2_mux_select()
 {
-    local SLED_INDEX="$1"
+    local SLED_INDEX
+    SLED_INDEX="$(sled_mapping "$1")"
     if [ "$SLED_INDEX" = "0" ]; then
         set_gpio SEL_SPI2_MUX 1
         set_gpio SPI2_MUX1 1

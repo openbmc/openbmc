@@ -15,10 +15,12 @@ source /usr/libexec/bletchley-common-functions
 #   5. Value of Motor Driver VREF PIN
 #######################################
 function set_motor() {
-    STBY_PIN="SLED${1}_MD_STBY_RESET"
-    EN_PIN="SLED${1}_MD_IOEXP_EN_FAULT"
-    DIR_PIN="SLED${1}_MD_DIR"
-    VREF_PIN="SLED${1}_MD_REF_PWM"
+    local sled_gpio_num
+    sled_gpio_num=$(sled_mapping "$1")
+    STBY_PIN="SLED${sled_gpio_num}_MD_STBY_RESET"
+    EN_PIN="SLED${sled_gpio_num}_MD_IOEXP_EN_FAULT"
+    DIR_PIN="SLED${sled_gpio_num}_MD_DIR"
+    VREF_PIN="SLED${sled_gpio_num}_MD_REF_PWM"
     set_gpio "$STBY_PIN" "$2"
     set_gpio "$EN_PIN"   "$3"
     set_gpio "$DIR_PIN"  "$4"
@@ -26,7 +28,7 @@ function set_motor() {
 }
 
 function show_usage(){
-    echo "Usage: motor-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [f r s]"
+    echo "Usage: motor-ctrl [$SLED_LIST]  [f r s]"
     echo "      f : Step Motor go forward"
     echo "      r : Step Motor go reverse"
     echo "      s : Step Motor stop "
@@ -37,7 +39,7 @@ if [ $# -ne 2 ]; then
     exit 1;
 fi
 
-if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
+if is_sled_valid "$1"; then
     SLED=$1
     SLED_NUM=${SLED:4}
     ACTION=$2

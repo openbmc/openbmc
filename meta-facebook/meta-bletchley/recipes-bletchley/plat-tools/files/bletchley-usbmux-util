@@ -1,7 +1,9 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
+source /usr/libexec/bletchley-common-functions
 
 CMD=$1
-SLED_INDEX=$2
+SLED_INDEX=$(sled_mapping "$2")
 
 CHIP_NUM=0
 USB2_SEL0_A_PIN_OFFSET=0
@@ -39,7 +41,7 @@ print_help()
     echo "    bletchley-usbmux-util off"
     echo "    bletchley-usbmux-util on <SLED_INDEX>"
     echo ""
-    echo "SLED_INDEX: 1 - 6"
+    echo "SLED_INDEX: 1 - $MAX_SLED_NUM"
     echo ""
 }
 
@@ -108,7 +110,7 @@ elif [ "$CMD" == "on" ]; then
     elif [ "$SLED_INDEX" -eq 6 ]; then
         usb_mux_sled6
     else
-        echo "Invalid SLED index: $SLED_INDEX"
+        echo "Invalid SLED index: $2"
         print_help
         exit 1
     fi

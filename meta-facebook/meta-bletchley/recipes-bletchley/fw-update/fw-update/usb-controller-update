@@ -1,4 +1,6 @@
 #!/bin/bash
+# shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
+source /usr/libexec/bletchley-common-functions
 
 is_valid_sled_num()
 {
@@ -20,7 +22,8 @@ set_gpio()
 
 bind_flash()
 {
-    local sled_index=$1
+    local sled_index
+    sled_index=$(sled_mapping "$1")
 
     if [ "$sled_index" -eq 1 ]; then
         set_gpio SEL_SPI2_MUX 0
@@ -99,7 +102,7 @@ if ! is_valid_sled_num "$SLED_INDEX"; then
     echo "Invalid sled number: $SLED_INDEX"
     echo "Usage: usb-controller-update <SLED_NUM>"
     echo ""
-    echo "  SLED_NUM [1-6]"
+    echo "  SLED_NUM [1-$MAX_SLED_NUM]"
     echo ""
     exit 1
 fi

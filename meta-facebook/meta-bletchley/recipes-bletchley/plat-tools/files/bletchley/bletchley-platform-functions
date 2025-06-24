@@ -1,0 +1,49 @@
+#!/bin/bash
+
+declare -a PORT_NUM_MAP=(10 3 2 1 7 6 5)
+declare -a PORT_NAME_MAP=(BMC SLED1 SLED2 SLED3 SLED4 SLED5 SLED6)
+declare -a HOST_MDIO_PORT_MAP=(0 3 2 1 7 6 5)
+MAX_SLED_NUM=6
+SLED_LIST="sled1 | sled2 | sled3 | sled4 | sled5 | sled6"
+
+export PORT_NUM_MAP
+export PORT_NAME_MAP
+export HOST_MDIO_PORT_MAP
+export MAX_SLED_NUM
+export SLED_LIST
+
+sled_mapping() {
+    echo "$1" # not change
+}
+
+#Get i2c bus number for sledN
+get_bus_num()
+{
+    SLED_NUM="$1"
+    local bus=0
+    #Mapping Sled number 1~6 to i2c bus number 0~5
+    if [[ "$SLED_NUM" = [1-6] ]]; then
+        bus=$(( SLED_NUM - 1 ))
+    fi
+    echo "$bus"
+}
+
+get_host_status_cmd()
+{
+    local sled_num="$1"
+    local rev="$2"
+
+    if [ "$rev" = "EVT" ]; then
+        get_host_status_dbus "$sled_num"
+    else
+        get_host_status_mdio "$sled_num"
+    fi
+}
+
+is_sled_valid()
+{
+    if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
+        return 0
+    fi
+    return 1
+}

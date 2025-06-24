@@ -102,11 +102,13 @@ function trigger_power_button()
 {
     local sled_num=$1
     local delay_time=$2
+    local sled_gpio_num
+    sled_gpio_num=$(sled_mapping "$1")
 
     #SLED{N}_MS_DETECT1  (initial position)
-    GPIO_DETECT_PIN1="SLED${sled_num}_MS_DETECT1"
+    GPIO_DETECT_PIN1="SLED${sled_gpio_num}_MS_DETECT1"
     #SLED{N}_MS_DETECT0  (MAC position)
-    GPIO_DETECT_PIN0="SLED${sled_num}_MS_DETECT0"
+    GPIO_DETECT_PIN0="SLED${sled_gpio_num}_MS_DETECT0"
 
     echo "Motor go forward to press Power key"
     motor-ctrl "sled${sled_num}" f >/dev/null
@@ -134,7 +136,9 @@ function trigger_power_button()
 function release_power_button()
 {
     local sled_num=$1
-    GPIO_DETECT_PIN1="SLED${sled_num}_MS_DETECT1"
+    local sled_gpio_num
+    sled_gpio_num=$(sled_mapping "$1")
+    GPIO_DETECT_PIN1="SLED${sled_gpio_num}_MS_DETECT1"
 
     if [ "$(get_gpio  "$GPIO_DETECT_PIN1")" -eq 0 ]; then
         echo "Motor at initial position already"
@@ -156,8 +160,9 @@ function release_power_button()
 function press_power_button()
 {
     local sled_num=$1
-
-    GPIO_DETECT_PIN0="SLED${sled_num}_MS_DETECT0"
+    local sled_gpio_num
+    sled_gpio_num=$(sled_mapping "$1")
+    GPIO_DETECT_PIN0="SLED${sled_gpio_num}_MS_DETECT0"
 
     echo "Motor go forward to press Power button"
     motor-ctrl "sled${sled_num}" f >/dev/null
@@ -173,20 +178,9 @@ function press_power_button()
     return 1
 }
 
-#Get i2c bus number for sledN
-function get_bus_num()
-{
-    SLED_NUM=$1
-    local bus=0
-    #Mapping Sled number 1~6 to i2c bus number 0~5
-    if [[ "$SLED_NUM" = [1-6] ]]; then
-        bus=$(( SLED_NUM - 1 ))
-    fi
-    echo "$bus"
-}
-
 function get_ac_status()
 {
+    local i2c_bus
     i2c_bus=$(get_bus_num "$1")
     p1_output_reg=$(i2cget -f -y "$i2c_bus" 0x76 0x03)
     p1_config_reg=$(i2cget -f -y "$i2c_bus" 0x76 0x07)
@@ -237,8 +231,6 @@ function get_host_status_mdio()
 
     MDIO_BUS="$(get_addr_from_dts_aliases mdio0).mdio-1"
 
-    declare -a PORT_MAP=(0 3 2 1 7 6 5)
-
     # check /dev/mem
     if ! create_dev_mem; then
         return 1
@@ -255,7 +247,7 @@ function get_host_status_mdio()
 
     while true
     do
-        if POST_ST_VAL=$(mdio "$MDIO_BUS" phy "${PORT_MAP[SLED_NUM]}" 0); then
+        if POST_ST_VAL=$(mdio "$MDIO_BUS" phy "${HOST_MDIO_PORT_MAP[SLED_NUM]}" 0); then
             if [ $((POST_ST_VAL&16#0800)) -eq $((16#0000)) ]; then
                 case $SLED_LAST_ACTION in
                     "$ACTION_DFU")
@@ -306,18 +298,14 @@ function get_host_status_mdio()
 
 function get_host_status()
 {
-    local sled_num=$1
+    local SLED_NUM=$1
 
     if [ "$(get_ac_status "$SLED_NUM")" == "$HOST_AC_OFF" ];then
         echo "$HOST_AC_OFF"
         return 0
     fi
 
-    if [ "$(get_board_rev)" = "$REV_EVT" ]; then
-        get_host_status_dbus "$sled_num"
-    else
-        get_host_status_mdio "$sled_num"
-    fi
+    get_host_status_cmd "$SLED_NUM" "$(get_board_rev)"
     return $?
 }
 
@@ -365,8 +353,10 @@ function do_action_cycle()
 function do_action_ac_on()
 {
     local SLED_NUM=$1
+    local sled_gpio_num
+    sled_gpio_num=$(sled_mapping "$1")
     echo "sled${SLED_NUM}: turn on AC"
-    set_gpio "power-host${SLED_NUM}" 1
+    set_gpio "power-host${sled_gpio_num}" 1
     sleep 3 # Newer versions of the managed system needs 3 second delay
     echo "$ACTION_AC_ON" > "/tmp/sled${SLED_NUM}-last-action"
 }
@@ -374,8 +364,10 @@ function do_action_ac_on()
 function do_action_ac_off()
 {
     local SLED_NUM=$1
+    local sled_gpio_num
+    sled_gpio_num=$(sled_mapping "$1")
     echo "sled${SLED_NUM}: turn off AC"
-    set_gpio "power-host${SLED_NUM}" 0
+    set_gpio "power-host${sled_gpio_num}" 0
     echo "$ACTION_AC_OFF" > "/tmp/sled${SLED_NUM}-last-action"
 }
 
@@ -642,7 +634,7 @@ function create_dev_mem()
 }
 
 function show_usage(){
-    echo "Usage: power-ctrl [sled1 | sled2 | sled3 | sled4 | sled5 | sled6]  [$VALID_SLED_ACTIONS]"
+    echo "Usage: power-ctrl [$SLED_LIST]  [$VALID_SLED_ACTIONS]"
     echo "       power-ctrl chassis-cycle"
 }
 
@@ -665,7 +657,7 @@ if [ $# -gt 2 ]; then
   exit  1;
 fi
 
-if [[ "$1" =~ ^(sled[1-6]{1})$ ]]; then
+if is_sled_valid "$1"; then
   SLED=$1
   ACTION=$2
   SLED_NUM=${SLED:4}
