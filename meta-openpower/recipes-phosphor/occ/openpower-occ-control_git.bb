@@ -23,6 +23,7 @@ DEPENDS += " \
         phosphor-logging \
         phosphor-dbus-interfaces \
         systemd \
+        libpldm \
         ${PYTHON_PN}-native \
         ${PYTHON_PN}-pyyaml-native \
         ${PYTHON_PN}-setuptools-native \
@@ -37,7 +38,6 @@ EXTRA_OEMESON = " \
              -Dps-derating-factor=${POWER_SUPPLY_DERATING_FACTOR} \
              -Dtests=disabled \
              "
-EXTRA_OEMESON:append = "${@bb.utils.contains('MACHINE_FEATURES', 'i2c-occ', ' -Di2c-occ=enabled', '', d)}"
 
 OCC_ENABLE = "enable"
 OCC_DISABLE = "disable"
