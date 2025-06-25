@@ -1,0 +1,95 @@
+- name: fanboard_fan_rotor_path_group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN0_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN0_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN2_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN2_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN3_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN3_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_OUTLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_INLET_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_OUTLET_SPEED_RPM
+
+# Define .Functional property for fan rotor fault
+- name: fan_rotor_functional_property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.State.Decorator.OperationalStatus
+      meta: PROPERTY
+      property: Functional
+
+# call counts check when fan functional is false
+- name: fan_rotor_missing_alarm
+  class: watch
+  watch: property
+  paths: fanboard_fan_rotor_path_group
+  properties: fan_rotor_functional_property
+  callback: check_fanboard_rotor_missing_threshold
+
+# check counts of both Fanboard Rotor unfunctional
+- name: check_fanboard_rotor_missing_threshold
+  class: condition
+  condition: count
+  paths: fanboard_fan_rotor_path_group
+  properties: fan_rotor_functional_property
+  callback: fan_rotor_missing_handle
+  countop: ">"
+  countbound: 2
+  op: "=="
+  bound: false
+
+- name: fan_rotor_missing_handle
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: fan-rotor-missing-mechanism.service
+        type: string
+      - value: replace
+        type: string

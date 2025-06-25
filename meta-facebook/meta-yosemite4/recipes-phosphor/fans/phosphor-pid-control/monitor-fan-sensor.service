@@ -1,0 +1,11 @@
+[Unit]
+Description=Monitor Fan rotor Sensors
+After=xyz.openbmc_project.FruDevice.service xyz.openbmc_project.PLDM.service
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-pid-control/monitor-fan-sensor
+
+[Install]
+WantedBy=multi-user.target

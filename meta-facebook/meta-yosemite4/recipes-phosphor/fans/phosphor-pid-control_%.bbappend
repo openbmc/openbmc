@@ -4,10 +4,13 @@ inherit obmc-phosphor-systemd systemd
 
 SRC_URI += "file://monitor-pldm-sensor \
             file://monitor-pldm-sensor.service \
+            file://monitor-fan-sensor \
+            file://monitor-fan-sensor.service \
 "
 
 SYSTEMD_SERVICE:${PN} += " \
     monitor-pldm-sensor.service \
+    monitor-fan-sensor.service \
 "
 
 RDEPENDS:${PN}:append = " bash"
@@ -24,6 +27,8 @@ do_install:append() {
     echo "After=monitor-pldm-sensor.service" >> ${override_file}
     echo "After=multi-user.target" >> ${override_file}
     install -m 0644 ${UNPACKDIR}/monitor-pldm-sensor.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/monitor-fan-sensor.service ${D}${systemd_system_unitdir}
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/monitor-pldm-sensor ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/monitor-fan-sensor ${D}${libexecdir}/${PN}/
 }

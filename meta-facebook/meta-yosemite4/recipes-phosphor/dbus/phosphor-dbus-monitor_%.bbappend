@@ -6,6 +6,8 @@ SRC_URI:append = " \
     file://control-fio-led \
     file://fan-rotor-fail-mechanism \
     file://fan-rotor-fail-mechanism.service \
+    file://fan-rotor-missing-mechanism \
+    file://fan-rotor-missing-mechanism.service \
 "
 
 SYSTEMD_SERVICE:${PN}:append = " \
@@ -24,6 +26,7 @@ do_install:append() {
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/fan-rotor-fail-mechanism ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/fan-rotor-missing-mechanism ${D}${libexecdir}/${PN}/
 }
 
 FILES:${PN} += "${systemd_system_unitdir}/*.service"

@@ -1,0 +1,6 @@
+[Unit]
+Description=Service to handle fan rotor missing events
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-dbus-monitor/fan-rotor-missing-mechanism

@@ -1,0 +1,144 @@
+#!/bin/bash
+
+# Define
+SERVICE="xyz.openbmc_project.FanSensor"
+VALUE_INTERFACE="xyz.openbmc_project.Sensor.Value"
+AVAILABILITY_INTERFACE="xyz.openbmc_project.State.Decorator.Availability"
+FUNCTIONAL_INTERFACE="xyz.openbmc_project.State.Decorator.OperationalStatus"
+
+# D-Bus paths of fan rotors
+FAN_PATHS=(
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN0_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN0_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN1_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN2_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN2_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN3_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN3_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN4_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN5_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN6_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN7_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN8_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD0_FAN9_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN10_TACH_OUTLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_INLET_SPEED_RPM"
+    "/xyz/openbmc_project/sensors/fan_tach/FANBOARD1_FAN11_TACH_OUTLET_SPEED_RPM"
+)
+
+# Add event log
+add_sel()
+{
+  MESSAGE="$*"
+
+  busctl call \
+    xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
+    xyz.openbmc_project.Logging.Entry.Level.Error 0 >/dev/null 2>&1
+}
+
+# Check Fan properties
+check_fan_properties() {
+    local fault_count=0
+    local msg=""
+    for path in "${FAN_PATHS[@]}"; do
+        # Get Dbus property
+        value=$(busctl get-property "$SERVICE" "$path" "$VALUE_INTERFACE" Value | awk '{print $2}')
+        available=$(busctl get-property "$SERVICE" "$path" "$AVAILABILITY_INTERFACE" Available | awk '{print $2}')
+        functional=$(busctl get-property "$SERVICE" "$path" "$FUNCTIONAL_INTERFACE" Functional | awk '{print $2}')
+
+        # check missing or not
+        if [[ "$value" == "nan" && "$available" == "true" && "$functional" == "false" ]]; then
+            fault_count=$((fault_count + 1))
+        fi
+    done
+
+    echo $fault_count
+    return 0
+}
+
+# Restart the fan sensors
+reload_fan_sensors() {
+    local ret=0
+    echo "Reloading fan sensors..."
+    systemctl restart xyz.openbmc_project.fansensor
+    ret=$?
+    sleep 30
+    if [ $ret -eq 0 ]; then
+        echo "Fan sensors reloaded successfully."
+    else
+        echo "Failed to reload fan sensors." >&2
+    fi
+}
+
+# AC off slot
+power_off_hosts(){
+    local slot_number=$1
+    local object_path="/xyz/openbmc_project/state/chassis${slot_number}"
+    local service_name="xyz.openbmc_project.State.Chassis${slot_number}"
+    local interface="xyz.openbmc_project.State.Chassis"
+    local property="RequestedPowerTransition"
+    local value="xyz.openbmc_project.State.Chassis.Transition.Off"
+    local ret=0
+
+    echo "AC Powering off slot $slot_number..."
+
+    busctl set-property "$service_name" "$object_path" "$interface" "$property" s "$value"
+    ret=$?
+
+    if [ $ret -eq 0 ]; then
+        echo "Slot $slot_number powered off successfully."
+    else
+        echo "Failed to power off slot $slot_number." >&2
+        return $ret
+    fi
+}
+
+power_off_all_hosts() {
+    # Log the event before shutting down
+    local msg=""
+
+    msg="Hosts 1 to 8 are being shut down due to the missing of more than 2 fan rotors."
+    echo "${msg}"
+    add_sel "${msg}"
+
+    # Power off each slot in sequence
+    for slot in {1..8}; do
+        power_off_hosts "$slot"
+    done
+}
+
+main() {
+    # Check first time
+    local fault_count=0
+    fault_count=$(check_fan_properties)
+    echo "Initial fault count: $fault_count"
+
+    if (( fault_count > 2 )); then
+        # Do a simple recovery
+        reload_fan_sensors
+
+        # Check again
+        fault_count=0
+        fault_count=$(check_fan_properties)
+        echo "Post-reload fault count: $fault_count"
+
+        if (( fault_count > 2 )); then
+            power_off_all_hosts
+        else
+            echo "Condition resolved after reload."
+        fi
+    else
+        echo "No significant rotor faults detected. fault_count: $fault_count"
+    fi
+}
+
+main

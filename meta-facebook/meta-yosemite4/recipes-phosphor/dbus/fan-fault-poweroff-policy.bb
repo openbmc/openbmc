@@ -13,12 +13,15 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
 SRC_URI:append = " \
     file://fan-rotor-fail-poweroff.yaml \
+    file://fan-rotor-missing-poweroff.yaml \
 "
 
 do_install() {
     install -D ${UNPACKDIR}/fan-rotor-fail-poweroff.yaml ${D}${config_dir}/fan-rotor-fail-poweroff.yaml
+    install -D ${UNPACKDIR}/fan-rotor-missing-poweroff.yaml ${D}${config_dir}/fan-rotor-missing-poweroff.yaml
 }
 
 FILES:${PN}:append = " \
     ${config_dir}/fan-rotor-fail-poweroff.yaml \
+    ${config_dir}/fan-rotor-missing-poweroff.yaml \
 "
