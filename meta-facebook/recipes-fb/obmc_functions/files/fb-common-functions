@@ -10,12 +10,19 @@ get_gpio()
         echo "get_gpio: can not find gpio, $NET_NAME" >&2
         return 1
     fi
-    if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
-        echo "get_gpio: get ${NET_NAME} failed" >&2
-        return 1
-    fi
-    echo "${RET_VAL}"
-    return 0
+    for _ in {1..10}
+    do
+        if ! RET_VAL=$(gpioget "${GPIO_INFO[0]}" "${GPIO_INFO[1]%$'\n'}") ; then
+            usleep 10000
+            continue
+        else
+            echo "${RET_VAL}"
+            return 0
+        fi
+    done
+
+    echo "get_gpio: get ${NET_NAME} failed" >&2
+    return 1
 }
 
 set_gpio()
