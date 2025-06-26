@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
-source /usr/libexec/fb-common-functions
-
 MAX_RETRY=10
 RETRY_DELAY_SEC=1
 
 is_host_on()
 {
-  if [ "$(get_gpio host0-ready)" != "1" ]; then
-    return 1
+  local host_power_state=""
+  host_power_state="$(busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState | cut -d'"' -f2)"
+
+  if [ "$host_power_state" != "xyz.openbmc_project.State.Host.HostState.Running" ]; then
+      return 1
   fi
   return 0
 }
@@ -142,7 +142,7 @@ remove_backend_nic_eid
 disconnect_all_i2c_mux
 
 # Get initial host power state
-LAST_HOST_READY="$(get_gpio host0-ready)"
+LAST_HOST_READY=$(is_host_on && echo "1" || echo "0")
 
 # Setup EID
 if [ "$LAST_HOST_READY" = "1" ]; then
@@ -153,7 +153,7 @@ fi
 while true
 do
   sleep 1
-  HOST_READY="$(get_gpio host0-ready)"
+  HOST_READY=$(is_host_on && echo "1" || echo "0")
 
   if [ "$HOST_READY" != "$LAST_HOST_READY" ]; then
     if [ "$HOST_READY" = "1" ]; then
