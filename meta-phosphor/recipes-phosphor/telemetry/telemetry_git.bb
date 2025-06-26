@@ -9,7 +9,7 @@ DEPENDS = "boost \
            phosphor-logging \
            sdbusplus \
            systemd"
-SRCREV = "3c8aa74d87f885c6a3bbf71c00d93699b5e91ab1"
+SRCREV = "a8d8aab855711d69d4fe87561d73b7e242049e5d"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/telemetry;branch=master;protocol=https"
