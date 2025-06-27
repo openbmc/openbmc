@@ -1,6 +1,6 @@
 KBRANCH ?= "dev-6.6"
 LINUX_VERSION ?= "6.6.94"
 
-SRCREV="fe092ecff7394dd59e4cee41b49165baf28a54c9"
+SRCREV="a6819c9a374af168702a9b5e4d066b1584c693b8"
 
 require linux-aspeed.inc
