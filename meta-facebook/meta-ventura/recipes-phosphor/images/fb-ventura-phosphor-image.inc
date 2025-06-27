@@ -40,3 +40,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-state-manager \
 "
+
+# Create udev symbolic links for each Modbus device
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    persistent-rs485-port-mapping \
+"
