@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Create /dev/mem
+if [ ! -c /dev/mem ]; then
+    /bin/mknod /dev/mem c 1 1
+fi
+
+# Disable FMC_WDT2
+FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
+SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
+/sbin/devmem 0x1e620064 32 "$SET_VAL"
+
+# Detect boot flash source
+SLOT_FILE="/run/media/slot"
+mkdir -p "$(dirname "${SLOT_FILE}")"
+if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
+    echo "1" > "$SLOT_FILE"
+else
+    echo "0" > "$SLOT_FILE"
+fi
+
+exit 0

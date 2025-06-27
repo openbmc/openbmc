@@ -1,5 +1,8 @@
 # Default console to use if there is only one host.
-OBMC_CONSOLE_HOST_TTY = "ttyS2"
+OBMC_CONSOLE_HOST_TTY:fb-compute = "ttyS2"
+
+# FBOSS platforms use ttyS1
+OBMC_CONSOLE_HOST_TTY:fb-fboss = "ttyS1"
 
 # TTYs that are reserved for non-console purposes.
 OBMC_CONSOLE_TTY_SKIP = "4"
@@ -9,7 +12,10 @@ def fb_get_consoles(d):
     hosts = len(d.getVar('OBMC_HOST_INSTANCES', True).split())
 
     if hosts <= 1:
-        return d.getVar('OBMC_CONSOLE_HOST_TTY', True)
+        obmc_console_host_tty = d.getVar('OBMC_CONSOLE_HOST_TTY', True)
+        if not obmc_console_host_tty:
+            bbfatal("OBMC_CONSOLE_HOST_TTY is not set")
+        return obmc_console_host_tty
 
     skipped = \
         [ int(i) for i in d.getVar('OBMC_CONSOLE_TTY_SKIP', True).split() ]
