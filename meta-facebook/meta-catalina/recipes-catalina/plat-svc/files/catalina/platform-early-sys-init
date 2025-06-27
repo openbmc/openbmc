@@ -107,16 +107,8 @@ config_vr()
 # Enable standby power and bind i2c components
 /usr/libexec/plat-svc/standby-power-enable
 
-# Workaround
-# rebind PDB i2c mux
+# Workaround, rebind PDB i2c mux
 bind_i2c_device pca954x 1-0070
-# rebind PDB Fan IC
-bind_i2c_device max31790 18-0021
-bind_i2c_device max31790 18-0027
-# rebind PDB FRU
-bind_i2c_device at24 21-0054
-# rebind FIO FRU
-bind_i2c_device at24 23-0053
 
 # Set fan target and enable all fan input as early as possible
 config_fan
