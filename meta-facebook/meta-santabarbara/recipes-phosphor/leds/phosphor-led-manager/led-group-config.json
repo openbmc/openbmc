@@ -1,0 +1,28 @@
+{
+    "leds": [
+        {
+            "group": "bmc_booted",
+            "members": [
+                {
+                    "Name": "bmc_heartbeat_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000
+                }
+            ]
+        },
+        {
+            "group": "enclosure_identify",
+            "members": [
+                {
+                    "Name": "fp_id_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000
+                }
+            ]
+        }
+    ]
+}
