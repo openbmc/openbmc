@@ -14,7 +14,7 @@ DEPENDS = " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest', '', d)} \
     ${@bb.utils.contains('PTEST_ENABLED', '1', 'gmock', '', d)} \
 "
-SRCREV = "06827463614f80eba8272c4b70f22ad708d50cf8"
+SRCREV = "fa712405fb3be628924ca06362e3ab3826b45495"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/bmcweb.git;branch=master;protocol=https"
@@ -30,6 +30,7 @@ inherit useradd
 inherit pkgconfig meson ptest
 
 PACKAGECONFIG ??= " \
+    http-zstd \
     kvm \
     mutual-tls-auth \
     redfish-allow-deprecated-power-thermal \
@@ -37,6 +38,7 @@ PACKAGECONFIG ??= " \
 "
 
 PACKAGECONFIG[dbus-rest] = "-Drest=enabled,-Drest=disabled"
+PACKAGECONFIG[http-zstd] = "-Dhttp-zstd=enabled,-Dhttp-zstd=disabled,zstd"
 PACKAGECONFIG[insecure-redfish-expand] = "-Dinsecure-enable-redfish-query=enabled"
 PACKAGECONFIG[kvm] = "-Dkvm=enabled,-Dkvm=disabled"
 PACKAGECONFIG[mutual-tls-auth] = "-Dmutual-tls-auth=enabled,-Dmutual-tls-auth=disabled"

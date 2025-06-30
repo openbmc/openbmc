@@ -42,6 +42,11 @@ PACKAGECONFIG:remove:witherspoon-tacoma = " \
     mutual-tls-auth \
 "
 
+# Witherspoon doesn't have the space for the both zstd and xz compression
+PACKAGECONFIG:remove:witherspoon = " \
+    http-zstd \
+"
+
 inherit obmc-phosphor-discovery-service
 
 REGISTERED_SERVICES:${PN} += "obmc_redfish:tcp:443:"
