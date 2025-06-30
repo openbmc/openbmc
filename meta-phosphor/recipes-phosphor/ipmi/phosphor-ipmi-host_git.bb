@@ -46,6 +46,7 @@ PACKAGECONFIG ??= " \
     oem-providers \
     "
 PACKAGECONFIG[allowlist] = '-Dwhitelist-conf="${WHITELIST_CONF}" -Dipmi-whitelist=enabled,-Dipmi-whitelist=disabled'
+PACKAGECONFIG[arm-sbmr] = "-Darm-sbmr=enabled,-Darm-sbmr=disabled"
 PACKAGECONFIG[boot-flag-safe-mode] = "-Dboot-flag-safe-mode-support=enabled,-Dboot-flag-safe-mode-support=disabled"
 PACKAGECONFIG[dynamic-sensors] = "-Ddynamic-sensors=enabled,-Ddynamic-sensors=disabled"
 PACKAGECONFIG[dynamic-storages-only] = "-Ddynamic-storages-only=enabled,-Ddynamic-storages-only=disabled"
