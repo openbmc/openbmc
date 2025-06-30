@@ -1,7 +1,13 @@
 FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 
 EXTRA_OEMESON:append = " \
-     -Dredfish-bmc-journal=enabled \
      -Dhttp-body-limit=65 \
-     -Dredfish-allow-deprecated-power-thermal=disabled \
-     "
+"
+
+PACKAGECONFIG:append = " \
+     redfish-bmc-journal \
+"
+
+PACKAGECONFIG:remove = " \
+     redfish-allow-deprecated-power-thermal \
+"

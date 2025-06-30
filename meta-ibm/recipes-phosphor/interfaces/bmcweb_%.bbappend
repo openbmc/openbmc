@@ -1,35 +1,46 @@
 EXTRA_OEMESON:append = " \
     -Dibm-management-console=enabled \
-    -Dredfish-dump-log=enabled \
     -Dredfish-oem-manager-fan-data=disabled \
-    -Dredfish-bmc-journal=disabled \
     -Dinsecure-enable-redfish-query=enabled \
-    -Dredfish-dbus-log=enabled \
     -Dhttp-body-limit=400 \
+"
+PACKAGECONFIG:append = " \
+    redfish-dbus-log \
+    redfish-dump-log \
+"
+
+PACKAGECONFIG:remove = " \
+    redfish-bmc-journal \
 "
 
 EXTRA_OEMESON:append:p10bmc = " \
-    -Dkvm=disabled \
     -Dvm-websocket=disabled \
-    -Dredfish-allow-deprecated-power-thermal=disabled \
     -Dhypervisor-computer-system=enabled \
 "
 
-EXTRA_OEMESON:append:system1 = " \
-    -Dredfish-allow-deprecated-power-thermal=disabled \
+PACKAGECONFIG:remove:system1 = " \
+    redfish-allow-deprecated-power-thermal \
 "
+
 EXTRA_OEMESON:append:sbp1 = " \
     -Dredfish-updateservice-use-dbus=disabled \
 "
 
-PACKAGECONFIG:remove:p10bmc = "mutual-tls-auth"
-
 EXTRA_OEMESON:append:witherspoon-tacoma = " \
-    -Dkvm=disabled \
     -Dvm-websocket=disabled \
     -Dhypervisor-computer-system=enabled \
 "
-PACKAGECONFIG:remove:witherspoon-tacoma = "mutual-tls-auth"
+
+PACKAGECONFIG:remove:p10bmc = " \
+    kvm \
+    redfish-allow-deprecated-power-thermal \
+    mutual-tls-auth \
+"
+
+PACKAGECONFIG:remove:witherspoon-tacoma = " \
+    kvm \
+    mutual-tls-auth \
+"
 
 inherit obmc-phosphor-discovery-service
 

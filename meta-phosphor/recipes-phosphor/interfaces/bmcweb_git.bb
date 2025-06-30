@@ -29,9 +29,23 @@ inherit systemd
 inherit useradd
 inherit pkgconfig meson ptest
 
-PACKAGECONFIG ??= "mutual-tls-auth"
+PACKAGECONFIG ??= " \
+    kvm \
+    mutual-tls-auth \
+    redfish-allow-deprecated-power-thermal \
+    redfish-bmc-journal \
+"
+
+PACKAGECONFIG[dbus-rest] = "-Drest=enabled,-Drest=disabled"
 PACKAGECONFIG[insecure-redfish-expand] = "-Dinsecure-enable-redfish-query=enabled"
+PACKAGECONFIG[kvm] = "-Dkvm=enabled,-Dkvm=disabled"
 PACKAGECONFIG[mutual-tls-auth] = "-Dmutual-tls-auth=enabled,-Dmutual-tls-auth=disabled"
+PACKAGECONFIG[redfish-allow-deprecated-power-thermal] = "-Dredfish-allow-deprecated-power-thermal=enabled,-Dredfish-allow-deprecated-power-thermal=disabled"
+PACKAGECONFIG[redfish-bmc-journal] = "-Dredfish-bmc-journal=enabled,-Dredfish-bmc-journal=disabled"
+PACKAGECONFIG[redfish-cpu-log] = "-Dredfish-cpu-log=enabled,-Dredfish-cpu-log=disabled"
+PACKAGECONFIG[redfish-dbus-log] = "-Dredfish-dbus-log=enabled,-Dredfish-dbus-log=disabled"
+PACKAGECONFIG[redfish-dump-log] = "-Dredfish-dump-log=enabled,-Dredfish-dump-log=disabled"
+PACKAGECONFIG[redfish-host-logger] = "-Dredfish-host-logger=enabled,-Dredfish-host-logger=disabled"
 
 MUTUAL_TLS_PARSING = "CommonName"
 

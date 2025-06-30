@@ -1,4 +1,5 @@
 EXTRA_OEMESON:append = " \
-    -Drest=enabled \
     -Dhttp-body-limit=65 \
-    "
+"
+
+PACKAGECONFIG:append = "dbus-rest"

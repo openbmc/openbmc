@@ -1,4 +1,7 @@
-EXTRA_OEMESON:append = " \
-    -Dredfish-dbus-log=enabled \
-    -Dkvm=disabled \
-    "
+PACKAGECONFIG:append = " \
+    redfish-dbus-log \
+"
+
+PACKAGECONFIG:remove= " \
+    kvm \
+"

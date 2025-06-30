@@ -1,9 +1,11 @@
 EXTRA_OEMESON:append = "\
-    -Dredfish-dbus-log=enabled \
-    -Dredfish-dump-log=enabled \
     -Dexperimental-redfish-dbus-log-subscription=enabled \
 "
 
-PACKAGECONFIG:append = " insecure-redfish-expand"
+PACKAGECONFIG:append = " \
+    insecure-redfish-expand \
+    redfish-dbus-log \
+    redfish-dump-log \
+"
 
 MUTUAL_TLS_PARSING = "UserPrincipalName"
