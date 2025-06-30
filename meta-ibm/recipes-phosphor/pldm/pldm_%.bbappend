@@ -6,6 +6,7 @@ PACKAGECONFIG:remove:huygens = " oem-ibm"
 
 EXTRA_OEMESON += " \
         -Dsoftoff-timeout-seconds=2700 \
+        -Dflightrecorder-max-entries=10 \
         "
 
 #5 second timeout defined inside PLDM has seen issues during reset reload
