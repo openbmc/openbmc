@@ -175,5 +175,205 @@
             "  default: SCM_TEMP_C+CAL_OFS[10];",
             "}"
         ]
+    },
+    {
+        "Desc": {
+            "Name": "RMC_CABLE_TSENSE_POSITIVE_INA_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_CTP_CURR",
+                    "Desc": {
+                        "Name": "RMC_CABLE_TSENSE_POSITIVE_INA_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],RMC_CTP_CURR,CURR[1]): TEMP[0]+((RMC_CTP_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],RMC_CTP_CURR,CURR[2]): TEMP[1]+((RMC_CTP_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],RMC_CTP_CURR,CURR[3]): TEMP[2]+((RMC_CTP_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],RMC_CTP_CURR,CURR[4]): TEMP[3]+((RMC_CTP_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],RMC_CTP_CURR,CURR[5]): TEMP[4]+((RMC_CTP_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],RMC_CTP_CURR,CURR[6]): TEMP[5]+((RMC_CTP_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],RMC_CTP_CURR,CURR[7]): TEMP[6]+((RMC_CTP_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],RMC_CTP_CURR,CURR[8]): TEMP[7]+((RMC_CTP_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],RMC_CTP_CURR,CURR[9]): TEMP[8]+((RMC_CTP_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],RMC_CTP_CURR,CURR[10]): TEMP[9]+((RMC_CTP_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],RMC_CTP_CURR,CURR[11]): TEMP[10]+((RMC_CTP_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],RMC_CTP_CURR,CURR[12]): TEMP[11]+((RMC_CTP_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],RMC_CTP_CURR,CURR[13]): TEMP[12]+((RMC_CTP_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case RMC_CTP_CURR>CURR[13]: TEMP[13];",
+            "  default : TEMP[0];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "RMC_CABLE_TSENSE_NEGATIVE_INA_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_CTN_CURR",
+                    "Desc": {
+                        "Name": "RMC_CABLE_TSENSE_NEGATIVE_INA_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],RMC_CTN_CURR,CURR[1]): TEMP[0]+((RMC_CTN_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],RMC_CTN_CURR,CURR[2]): TEMP[1]+((RMC_CTN_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],RMC_CTN_CURR,CURR[3]): TEMP[2]+((RMC_CTN_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],RMC_CTN_CURR,CURR[4]): TEMP[3]+((RMC_CTN_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],RMC_CTN_CURR,CURR[5]): TEMP[4]+((RMC_CTN_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],RMC_CTN_CURR,CURR[6]): TEMP[5]+((RMC_CTN_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],RMC_CTN_CURR,CURR[7]): TEMP[6]+((RMC_CTN_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],RMC_CTN_CURR,CURR[8]): TEMP[7]+((RMC_CTN_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],RMC_CTN_CURR,CURR[9]): TEMP[8]+((RMC_CTN_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],RMC_CTN_CURR,CURR[10]): TEMP[9]+((RMC_CTN_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],RMC_CTN_CURR,CURR[11]): TEMP[10]+((RMC_CTN_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],RMC_CTN_CURR,CURR[12]): TEMP[11]+((RMC_CTN_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],RMC_CTN_CURR,CURR[13]): TEMP[12]+((RMC_CTN_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case RMC_CTN_CURR>CURR[13]: TEMP[13];",
+            "  default : TEMP[0];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "RMC_CABLE_TSENSE_POSITIVE_ISL_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_CTP_CURR",
+                    "Desc": {
+                        "Name": "RMC_CABLE_TSENSE_POSITIVE_ISL_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],RMC_CTP_CURR,CURR[1]): (TEMP[0]+((RMC_CTP_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0])))*0.9817-0.0205;",
+            "  case inrange(CURR[1],RMC_CTP_CURR,CURR[2]): (TEMP[1]+((RMC_CTP_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1])))*0.9817-0.0205;",
+            "  case inrange(CURR[2],RMC_CTP_CURR,CURR[3]): (TEMP[2]+((RMC_CTP_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2])))*0.9817-0.0205;",
+            "  case inrange(CURR[3],RMC_CTP_CURR,CURR[4]): (TEMP[3]+((RMC_CTP_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3])))*0.9817-0.0205;",
+            "  case inrange(CURR[4],RMC_CTP_CURR,CURR[5]): (TEMP[4]+((RMC_CTP_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4])))*0.9817-0.0205;",
+            "  case inrange(CURR[5],RMC_CTP_CURR,CURR[6]): (TEMP[5]+((RMC_CTP_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5])))*0.9817-0.0205;",
+            "  case inrange(CURR[6],RMC_CTP_CURR,CURR[7]): (TEMP[6]+((RMC_CTP_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6])))*0.9817-0.0205;",
+            "  case inrange(CURR[7],RMC_CTP_CURR,CURR[8]): (TEMP[7]+((RMC_CTP_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7])))*0.9817-0.0205;",
+            "  case inrange(CURR[8],RMC_CTP_CURR,CURR[9]): (TEMP[8]+((RMC_CTP_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8])))*0.9817-0.0205;",
+            "  case inrange(CURR[9],RMC_CTP_CURR,CURR[10]): (TEMP[9]+((RMC_CTP_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9])))*0.9817-0.0205;",
+            "  case inrange(CURR[10],RMC_CTP_CURR,CURR[11]): (TEMP[10]+((RMC_CTP_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10])))*0.9817-0.0205;",
+            "  case inrange(CURR[11],RMC_CTP_CURR,CURR[12]): (TEMP[11]+((RMC_CTP_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11])))*0.9817-0.0205;",
+            "  case inrange(CURR[12],RMC_CTP_CURR,CURR[13]): (TEMP[12]+((RMC_CTP_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12])))*0.9817-0.0205;",
+            "  case RMC_CTP_CURR>CURR[13]: TEMP[13]*0.9817-0.0205;",
+            "  default : TEMP[0]*0.9817-0.0205;",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "RMC_CABLE_TSENSE_NEGATIVE_ISL_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_CTN_CURR",
+                    "Desc": {
+                        "Name": "RMC_CABLE_TSENSE_NEGATIVE_ISL_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],RMC_CTN_CURR,CURR[1]): TEMP[0]+((RMC_CTN_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],RMC_CTN_CURR,CURR[2]): TEMP[1]+((RMC_CTN_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],RMC_CTN_CURR,CURR[3]): TEMP[2]+((RMC_CTN_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],RMC_CTN_CURR,CURR[4]): TEMP[3]+((RMC_CTN_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],RMC_CTN_CURR,CURR[5]): TEMP[4]+((RMC_CTN_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],RMC_CTN_CURR,CURR[6]): TEMP[5]+((RMC_CTN_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],RMC_CTN_CURR,CURR[7]): TEMP[6]+((RMC_CTN_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],RMC_CTN_CURR,CURR[8]): TEMP[7]+((RMC_CTN_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],RMC_CTN_CURR,CURR[9]): TEMP[8]+((RMC_CTN_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],RMC_CTN_CURR,CURR[10]): TEMP[9]+((RMC_CTN_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],RMC_CTN_CURR,CURR[11]): TEMP[10]+((RMC_CTN_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],RMC_CTN_CURR,CURR[12]): TEMP[11]+((RMC_CTN_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],RMC_CTN_CURR,CURR[13]): TEMP[12]+((RMC_CTN_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case RMC_CTN_CURR>CURR[13]: TEMP[13];",
+            "  default : TEMP[0];",
+            "}"
+        ]
     }
 ]
