@@ -7,6 +7,8 @@ inherit native
 
 PROVIDES += "virtual/phosphor-led-manager-config-native"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/bletchley-led-manager-config/${MACHINE}:"
+
 SRC_URI += "file://led.yaml"
 
 S = "${WORKDIR}/sources"
