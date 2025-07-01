@@ -24,6 +24,9 @@ declare -A gbmc_br_gw_src_ips=()
 declare -A gbmc_br_gw_src_routes=()
 gbmc_br_gw_defgw=
 
+# higher than NCSI and NIC
+primary_rt_metric=700
+
 gbmc_br_set_router() {
   local defgw=
   local route
@@ -56,6 +59,21 @@ gbmc_br_set_router() {
   gbmc_net_networkd_reload
 }
 
+gbmc_br_config_primary_ip() {
+   local route=$1
+   local op=$2
+
+   local route_new
+   route_new=$(echo "$route" | sed -E 's/ metric [0-9]+//')
+   if [[ "$op" == "del" ]]; then
+     # shellcheck disable=SC2086
+     ip route "$op" $route_new metric "$primary_rt_metric" 2>/dev/null
+   else
+     # shellcheck disable=SC2086
+     ip route "$op" $route_new metric "$primary_rt_metric"
+   fi
+}
+
 gbmc_br_gw_src_update() {
   local route
   local ip
@@ -69,6 +87,8 @@ gbmc_br_gw_src_update() {
     local rt_metric="${BASH_REMATCH[2]}"
     dev_ip_to_metric["$rt_dev-$ip"]+="$rt_metric"
   done
+  local primary_ip
+  primary_ip=$(cat /var/google/gbmc-br-ip 2>/dev/null)
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
     local new_src
     local new_len=16
@@ -78,8 +98,8 @@ gbmc_br_gw_src_update() {
     for ip in "${!gbmc_br_gw_src_ips[@]}"; do
       # Prioritize the IP with the lowest route metric, as we want specific
       # source routes to take precedence in selection. If they are the same,
-      # pick the shortest address, we always want to use the most root level
-      # The order of preference looks roughly like
+      # pick the shortest address. We prefer primary IP address from DHCP.
+      # Types of IP are:
       #   1. Root /64 address (2620:15c:2c3:aaae::/64)
       #      This is generally used by the OOB RJ45 port and is our primary preference
       #   2. BMC subordonate root (2620:15c:2c3:aaae:fd01::/80)
@@ -94,24 +114,21 @@ gbmc_br_gw_src_update() {
         new_metric="$metric"
       elif (( metric == new_metric && ip_len == 9 && new_len == 9 )); then
         # 4. for hybrid mode we might get 2 ip with the same length and same
-        # metrics, but the oob one should have a 64 route without the suffix,
-        # since the route comes from the host BMC. We should priorize that.
-        local ip_bytes=()
-        ip_to_bytes ip_bytes "$ip"
-        ip_bytes[8]=0
-        ip_bytes[9]=0
-        local ip64
-        ip64=$(ip_bytes_to_str ip_bytes)/80
-        ip -6 route show "$ip64" | grep -q "$ip64" || continue
-        new_src="$ip"
+        # metrics, we prefer the primary IP here
+        if [[ "$ip" == "$primary_ip" ]]; then
+          new_src="$ip"
+        fi
       fi
     done
     (( new_len >= 16 )) && continue
+    if [[ "$new_src" == "$primary_ip" ]]; then
+      # Add primary src ip for the GW
+      gbmc_br_config_primary_ip "$route src $new_src" "replace"
+    fi
     [[ $route != *" src $new_src "* ]] || continue
     echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
     # shellcheck disable=SC2086
-    ip route change $route src "$new_src" && \
-      unset 'gbmc_br_gw_src_routes[$route]'
+    ip route change $route src "$new_src" && unset 'gbmc_br_gw_src_routes[$route]'
   done
 }
 
@@ -125,10 +142,15 @@ gbmc_br_gw_src_hook() {
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
     if [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
+      # ignore the extra route with primary metric
+      [[ $route == *" metric $primary_rt_metric "* ]] && return
       gbmc_br_gw_src_routes["$route"]=1
       gbmc_br_gw_src_update
       gbmc_br_set_router
     elif [[ $action == del && -n "${gbmc_br_gw_src_routes["$route"]}" ]]; then
+      if [[ $route =~ ' src '([^ ]+) ]]; then
+        gbmc_br_config_primary_ip "$route" "del"
+      fi
       unset 'gbmc_br_gw_src_routes[$route]'
       gbmc_br_gw_src_update
       gbmc_br_set_router
