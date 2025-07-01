@@ -2,10 +2,6 @@ inherit obmc-phosphor-systemd
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-DEPENDS:append = " bletchley-yaml-config"
-
-IPMI_FRU_YAML = "${STAGING_DIR_HOST}${datadir}/bletchley-yaml-config/ipmi-fru-read.yaml"
-
 EEPROM_NAMES = "bmc"
 
 EEPROMFMT = "system/chassis/{0}"
