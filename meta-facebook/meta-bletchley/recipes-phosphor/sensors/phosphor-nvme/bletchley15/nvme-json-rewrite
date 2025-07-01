@@ -1,0 +1,62 @@
+#!/bin/bash
+
+TARGET_FILE_NAME="/etc/nvme/nvme_config.json"
+
+export_gpio() {
+  if [ ! -d "/sys/class/gpio/gpio$1" ]; then
+    echo "$1" >/sys/class/gpio/export
+  fi
+}
+
+for i in {0..5}
+do
+    SLED_NVME_PCIE_EN[i]=0
+    for file in /sys/bus/i2c/drivers/pca953x/"$i"-0041/gpio/gpiochip*/base
+    do
+        if [ -f "$file" ]; then
+            GPIOCHIP_BASE="$(cat /sys/bus/i2c/drivers/pca953x/"$i"-0041/gpio/gpiochip*/base)"
+            SLED_NVME_PCIE_EN[i]=$((GPIOCHIP_BASE+3))
+            export_gpio "${SLED_NVME_PCIE_EN[i]}"
+            break
+        fi
+    done
+done
+
+cat > $TARGET_FILE_NAME << EOF1
+{
+    "maxSmbusErrorRetry": 3,
+    "config": [
+        {
+            "NVMeDriveIndex": 1,
+            "NVMeDriveBusID": 0,
+            "NVMeDrivePwrGoodPin": ${SLED_NVME_PCIE_EN[0]}
+        },
+        {
+            "NVMeDriveIndex": 2,
+            "NVMeDriveBusID": 1,
+            "NVMeDrivePwrGoodPin": ${SLED_NVME_PCIE_EN[1]}
+        },
+        {
+            "NVMeDriveIndex": 3,
+            "NVMeDriveBusID": 3,
+            "NVMeDrivePwrGoodPin": ${SLED_NVME_PCIE_EN[3]}
+        },
+        {
+            "NVMeDriveIndex": 4,
+            "NVMeDriveBusID": 4,
+            "NVMeDrivePwrGoodPin": ${SLED_NVME_PCIE_EN[4]}
+        }
+    ],
+    "threshold": [
+        {
+            "criticalHigh": 70,
+            "criticalLow": 0,
+            "warningHigh": 69,
+            "warningLow": 1,
+            "maxValue": 127,
+            "minValue": -127
+        }
+    ]
+}
+
+EOF1

@@ -1,0 +1,31 @@
+{
+    "maxSmbusErrorRetry": 3,
+    "config": [
+        {
+            "NVMeDriveIndex": 1,
+            "NVMeDriveBusID": 0
+        },
+        {
+            "NVMeDriveIndex": 2,
+            "NVMeDriveBusID": 1
+        },
+        {
+            "NVMeDriveIndex": 3,
+            "NVMeDriveBusID": 3
+        },
+        {
+            "NVMeDriveIndex": 4,
+            "NVMeDriveBusID": 4
+        }
+    ],
+    "threshold": [
+        {
+            "criticalHigh": 70,
+            "criticalLow": 0,
+            "warningHigh": 69,
+            "warningLow": 1,
+            "maxValue": 127,
+            "minValue": -127
+        }
+    ]
+}
