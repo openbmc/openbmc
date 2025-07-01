@@ -24,8 +24,11 @@ declare -A gbmc_br_gw_src_ips=()
 declare -A gbmc_br_gw_src_routes=()
 gbmc_br_gw_defgw=
 
-# higher than NCSI and NIC
+# primary IP priority should be higher than NCSI and NIC
 primary_rt_metric=700
+
+# For tray, priorize the route sent by host BMC
+primary_ip_from_br=""
 
 gbmc_br_set_router() {
   local defgw=
@@ -74,6 +77,44 @@ gbmc_br_config_primary_ip() {
    fi
 }
 
+# Notify the tray BMC with the preferred src ip
+primary_route_to_br_update() {
+  local rt
+  local need_reload=0
+  local new_src=""
+  local dev=""
+  # no need to notify if it does not have default gw
+  rt="$(ip -6 route get 2000:: 2>/dev/null)"
+
+  if [[ "$rt" =~ dev' '([^ ]+).*' src '([^ ]+) ]]; then
+    dev="${BASH_REMATCH[1]}"
+    [[ "$dev" != "gbmcbr" ]] && new_src="${BASH_REMATCH[2]}"
+  fi
+
+  if [[ -z "$new_src" ]]; then
+    for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
+      [ -f "$file" ] || continue
+      rm -rf "$file"
+      need_reload=1
+    done
+  else
+    read -r -d '' notify_route <<EOF
+[IPv6RoutePrefix]
+Route=$new_src/124
+LifetimeSec=90
+EOF
+    for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
+      grep -q "Route=$new_src/124" "$file" 2>/dev/null && continue
+      mkdir -p "$(dirname "$file")"
+      printf '%s\n' "$notify_route" >"$file"
+      need_reload=1
+    done
+  fi
+
+  # shellcheck disable=SC2119
+  (( need_reload == 1 )) && gbmc_net_networkd_reload
+}
+
 gbmc_br_gw_src_update() {
   local route
   local ip
@@ -114,9 +155,29 @@ gbmc_br_gw_src_update() {
         new_metric="$metric"
       elif (( metric == new_metric && ip_len == 9 && new_len == 9 )); then
         # 4. for hybrid mode we might get 2 ip with the same length and same
-        # metrics, we prefer the primary IP here
-        if [[ "$ip" == "$primary_ip" ]]; then
-          new_src="$ip"
+        # metrics, we prefer the primary IP here. For tray BMC, prefer the
+        # primary ip from the host BMC.
+        # Real OOB for tray should have higher metrics and that will be always
+        # priorized and is not affected by this.
+        if [[ -z "$primary_ip_from_br" ]]; then
+          [[ "$ip" == "$primary_ip" ]] && new_src="$ip"
+        else
+          # compare the first 8 bytes
+          local ip_bytes=()
+          local primary_ip_from_br_bytes=()
+          local i
+          local equal=1
+          ip_to_bytes ip_bytes "$ip"
+          ip_to_bytes primary_ip_from_br_bytes "$primary_ip_from_br"
+
+          for (( i=0; i<8; ++i )); do
+            if (( ip_bytes[i] != primary_ip_from_br_bytes[i] )); then
+              equal=0
+              break
+            fi
+          done
+
+          (( equal == 1 )) && new_src="$ip"
         fi
       fi
     done
@@ -130,6 +191,7 @@ gbmc_br_gw_src_update() {
     # shellcheck disable=SC2086
     ip route change $route src "$new_src" && unset 'gbmc_br_gw_src_routes[$route]'
   done
+  primary_route_to_br_update
 }
 
 gbmc_br_gw_src_hook() {
@@ -184,6 +246,28 @@ gbmc_br_gw_src_hook() {
       unset 'gbmc_br_gw_src_ips[$ip]'
     fi
     gbmc_br_gw_src_update
+  # check route on gbmcbr with /124 address
+  elif [[ $change == route && $route =~ ^[0-9a-f:]+'/124 '.*' dev gbmcbr ' ]]; then
+    local expires='0sec'
+    if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
+      route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+      expires="${BASH_REMATCH[2]}"
+    fi
+    local brip=${route%%/124 *}
+    if [[ $action == add ]]; then
+      [[ "$brip" == "$primary_ip_from_br" ]] && return
+      echo "Change preferred src from bridge RA: $route" >&2
+      primary_ip_from_br="$brip"
+      gbmc_br_gw_src_update
+    elif [[ $action == del ]]; then
+      # Every RA will trigger a delete and re-add. Only delete when the route is
+      # truly expired to prevent redundant config.
+      [[ "$expires" != "0sec" ]] && return
+      [[ "$brip" == "$primary_ip_from_br" ]] || return
+      echo "Remove preferred src from bridge RA: $route $expires" >&2
+      primary_ip_from_br=''
+      gbmc_br_gw_src_update
+    fi
   fi
 }
 
