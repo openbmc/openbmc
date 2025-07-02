@@ -22,6 +22,8 @@ source /usr/share/gbmc-net-lib.sh || exit
 
 gbmc_nic_neigh_intfs=(@IFS@)
 gbmc_nic_neigh_addr=
+GBMC_NIC_ROUTE_TABLE=800
+GBMC_NIC_ROUTE_PREF=$GBMC_NIC_ROUTE_TABLE
 
 gbmc_nic_neigh_set() {
   local act="$1"
@@ -30,23 +32,44 @@ gbmc_nic_neigh_set() {
   echo "gBMC NIC Neigh $act $ip: ${gbmc_nic_neigh_intfs[*]}" >&2
 
   local intf
+  local contents
   local failed_intfs=()
+  read -r -d '' contents <<EOF
+[RoutingPolicyRule]
+To=$ip/64
+Table=main
+Priority=$(( GBMC_NIC_ROUTE_PREF - 1 ))
+[RoutingPolicyRule]
+From=$ip/64
+Table=$GBMC_NIC_ROUTE_TABLE
+Priority=$GBMC_NIC_ROUTE_PREF
+[Network]
+IPv6ProxyNDP=yes
+IPv6ProxyNDPAddress=$ip
+EOF
   for intf in "${gbmc_nic_neigh_intfs[@]}"; do
     # Override any existing gateway information within files
     # Make sure we cover `00-*` and `-*` files
     for file in /run/systemd/network/{00,}-bmc-"$intf".network; do
       mkdir -p "$file.d"
       if [[ "$act" == add ]]; then
-        printf '[Network]\nIPv6ProxyNDP=yes\nIPv6ProxyNDPAddress=%s\n' \
-          "$ip" >"$file.d"/10-nic-neigh.conf
+        printf '%s' "$contents" >"$file.d"/10-nic-neigh-table.conf
       else
-        rm -f "$file.d"/10-nic-neigh.conf
+        rm -f "$file.d"/10-nic-neigh-table.conf
       fi
     done
 
-    sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null && \
-      ip -6 neigh "$act" proxy "$ip" dev "$intf" || \
-      failed_intfs+=("$intf")
+    local st=0
+    ip -6 rule del pref $(( GBMC_NIC_ROUTE_PREF - 1 )) table main 2>dev/null || true
+    ip -6 rule del pref "$GBMC_NIC_ROUTE_PREF" 2>/dev/null || true
+
+    if [[ "$act" == add ]]; then
+      sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null || st=$?
+      ip -6 neigh "$act" proxy "$ip" dev "$intf" || st=$?
+      ip -6 rule add from all to "$ip/64" pref $(( GBMC_NIC_ROUTE_PREF - 1 )) table main proto static || st=$?
+      ip -6 rule add pref "$GBMC_NIC_ROUTE_PREF" from "$ip/64" lookup "$GBMC_NIC_ROUTE_TABLE" || st=$?
+    fi
+    [[ "$st" == "0" ]] || failed_intfs+=("$intf")
 
     # Write the necessary firewall rules to forward IP traffic
     if [[ "$act" == add ]]; then
@@ -63,7 +86,6 @@ EOF
   done
   systemctl reset-failed nftables || true
   systemctl --no-block reload-or-restart nftables || true
-  [[ "$act" == del ]] && return
   if (( "${#failed_intfs[@]}" > 0 )); then
     gbmc_net_networkd_reload "${failed_intfs[@]}"
   fi

@@ -114,7 +114,7 @@ EOF
   done < <(ip -6 neigh show proxy dev @NCSI_IF@)
   ip -6 rule del pref $(( GBMC_NCSI_ROUTE_TABLE - 1 )) table main 2>dev/null || true
   ip -6 rule del pref $GBMC_NCSI_ROUTE_TABLE 2>/dev/null || true
-  ip -6 rule add from all to "$pfx/76" pref 499 table main proto static || st=$?
+  ip -6 rule add from all to "$pfx/76" pref $(( GBMC_NCSI_ROUTE_TABLE - 1 )) table main proto static || st=$?
   ip -6 rule add pref $GBMC_NCSI_ROUTE_TABLE from $pfx/76 \
       lookup $GBMC_NCSI_ROUTE_TABLE || st=$?
 

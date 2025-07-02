@@ -138,6 +138,8 @@ gbmc_br_gw_src_hook() {
   # source.
   # shellcheck disable=SC2154
   if [[ $change == route && $route == 'default '*':'* ]]; then
+    # ignore everything except main table
+    [[ $route == *" table "* ]] && return
     if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
