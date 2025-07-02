@@ -11,6 +11,19 @@ busnum=0
 # The Sentinel Dome BICs are after the I3C hub on I3C bus0 and bus1.
 while [ $busnum -le 1 ]
 do
+    for i in $(seq 1 4); do
+        slot=$((busnum * 4 + i))
+        eidBase=$((slot * 10))
+        lladdr=$(printf "0x07:ec:80:01:00:%02x" $(((slot - 1) * 5)))
+        mctp route add $((eidBase + 0)) via mctpi3c${busnum} mtu 68
+        mctp route add $((eidBase + 2)) via mctpi3c${busnum} mtu 68
+        mctp route add $((eidBase + 4)) via mctpi3c${busnum} mtu 68
+        mctp route add $((eidBase + 5)) via mctpi3c${busnum} mtu 68
+        mctp neigh add $((eidBase + 0)) dev mctpi3c${busnum} lladdr "$lladdr"
+        mctp neigh add $((eidBase + 2)) dev mctpi3c${busnum} lladdr "$lladdr"
+        mctp neigh add $((eidBase + 4)) dev mctpi3c${busnum} lladdr "$lladdr"
+        mctp neigh add $((eidBase + 5)) dev mctpi3c${busnum} lladdr "$lladdr"
+    done
     mctp link set mctpi3c${busnum} up
     mctp addr add ${localEid} dev mctpi3c${busnum}
     busnum=$((busnum+1))
