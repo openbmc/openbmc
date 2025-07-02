@@ -2658,6 +2658,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot0/pcie_card0/cxp_top",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot0/pcie_card0/cxp_bot"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
                 }
             ]
         },
@@ -2676,6 +2687,17 @@
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C1_Temp",
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C1_Local_Temp"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
+                    ]
                 }
             ]
         },
@@ -2693,6 +2715,17 @@
                     [
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C2_Temp",
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C2_Local_Temp"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu1"
                     ]
                 }
             ]
@@ -2724,6 +2757,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot3/pcie_card3/cxp_top",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot3/pcie_card3/cxp_bot"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
+                    ]
                 }
             ]
         },
@@ -2753,6 +2797,17 @@
                     [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot4/pcie_card4/cxp_top",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot4/pcie_card4/cxp_bot"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm1/cpu0"
                     ]
                 }
             ]
@@ -2790,6 +2845,17 @@
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C7_Temp",
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C7_Local_Temp"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1"
+                    ]
                 }
             ]
         },
@@ -2824,6 +2890,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8/c8_connector2",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot8/pcie_card8/c8_connector3"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1"
+                    ]
                 }
             ]
         },
@@ -2843,6 +2920,17 @@
                         "/xyz/openbmc_project/sensors/temperature/PCIe_Cable_Card_C9_Local_Temp",
                         "/xyz/openbmc_project/sensors/temperature/NVMe_JBOF_Card_C9_Temp",
                         "/xyz/openbmc_project/sensors/temperature/NVMe_JBOF_Card_C9_Local_Temp"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu1"
                     ]
                 }
             ]
@@ -2880,6 +2968,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10/cxp_top",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot10/pcie_card10/cxp_bot"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
                 }
             ]
         },
@@ -2913,6 +3012,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector1",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector2",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot11/pcie_card11/c11_connector3"
+                    ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
                     ]
                 }
             ]
@@ -3230,6 +3340,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme0/dp0_drive0",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane0/nvme0",
             "endpoints":
             [
@@ -3266,6 +3393,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme0/dp0_drive0"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme1/dp0_drive1",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3330,6 +3474,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme2/dp0_drive2",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane0/nvme2",
             "endpoints":
             [
@@ -3366,6 +3527,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme2/dp0_drive2"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme3/dp0_drive3",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3430,6 +3608,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme4/dp0_drive4",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane0/nvme4",
             "endpoints":
             [
@@ -3466,6 +3661,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme4/dp0_drive4"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme5/dp0_drive5",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3530,6 +3742,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme6/dp0_drive6",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane0/nvme6",
             "endpoints":
             [
@@ -3566,6 +3795,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme6/dp0_drive6"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane0/nvme7/dp0_drive7",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3630,6 +3876,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme0/dp1_drive0",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane1/nvme0",
             "endpoints":
             [
@@ -3666,6 +3929,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/nvme0/dp1_drive0"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme1/dp1_drive1",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3730,6 +4010,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme2/dp1_drive2",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane1/nvme2",
             "endpoints":
             [
@@ -3766,6 +4063,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/nvme2/dp1_drive2"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme3/dp1_drive3",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3830,6 +4144,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme4/dp1_drive4",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane1/nvme4",
             "endpoints":
             [
@@ -3866,6 +4197,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/nvme4/dp1_drive4"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme5/dp1_drive5",
+            "endpoints":
+            [
                 {
                     "types":
                     {
@@ -3930,6 +4278,23 @@
             ]
         },
         {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme1/dp1_drive6",
+            "endpoints":
+            [
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
             "path": "system/chassis/motherboard/disk_backplane1/nvme6",
             "endpoints":
             [
@@ -3966,6 +4331,23 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/nvme6/dp1_drive6"
                     ]
                 },
+                {
+                    "types":
+                    {
+                        "rType": "connecting",
+                        "fType": "connected_to"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/dcm0/cpu0"
+                    ]
+                }
+            ]
+        },
+        {
+            "path": "system/chassis/motherboard/disk_backplane1/nvme1/dp1_drive7",
+            "endpoints":
+            [
                 {
                     "types":
                     {
