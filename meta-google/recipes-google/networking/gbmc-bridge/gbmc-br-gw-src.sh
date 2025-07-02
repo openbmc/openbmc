@@ -106,7 +106,7 @@ gbmc_br_gw_src_update() {
       #      From the NIC over NCSI with the /64 shared with the CN
       #   3. BMC stateless (2620:15c:2c3:aaae:fd00:3c8d:20dc:263e/80)
       #      From the NIC, but derived from the MAC and typically never used
-      local metric="${dev_ip_to_metric["$dev-$ip"]-1024}"
+      local metric="${dev_ip_to_metric["$dev-$ip"]-4097}"
       local ip_len="${gbmc_br_gw_src_ips["$ip"]}"
       if (( metric < new_metric || (metric == new_metric && ip_len < new_len) )); then
         new_src="$ip"
