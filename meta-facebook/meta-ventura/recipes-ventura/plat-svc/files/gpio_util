@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# Get GPIO chip and line number by GPIO name
+# Args: $1 = GPIO name
+# Echo: "<chip> <line>"
+get_gpio_by_name() {
+  local name="${1:0:31}"  # match kernel's 31-char limit
+  gpioinfo 2>/dev/null | awk -v name="$name" '
+    /^gpiochip/ {chip=$1}
+    /^[ \t]*line/ && $0 ~ name {
+      sub(/:$/, "", $2)
+      print chip, $2
+      exit
+    }
+  '
+}
+
+# Get GPIO logic level (0/1) by GPIO name (first 31 chars match kernel limit)
+# Args: $1 = GPIO name
+get_gpio_val_by_name(){
+  local name="${1:0:31}"
+  local chip line gpio_val
+  read -r chip line < <(get_gpio_by_name "$name")
+
+  # primary: gpioget
+  if ! gpio_val="$(gpioget "$chip" "$line" 2>/dev/null)"; then
+    : # nop
+    # fallback: debugfs
+    if ! gpio_val=$(get_gpio_val_from_debugfs "$chip" "$line"); then
+      : # nop
+    fi
+  fi
+  [ -z "$gpio_val" ] && return 1
+  printf '%s\n' "$gpio_val"
+}
+
+# Get GPIO logic level (0/1) from /sys/kernel/debug/gpio by chip and line offset
+# Args: $1 = chip number/name, $2 = line offset
+get_gpio_val_from_debugfs() {
+  if [[ $chip =~ ^[0-9]+$ ]]; then
+    local chip="gpiochip$1"
+  else
+    local chip=$1
+  fi
+
+  local line=$2
+  local gpio_base gpio_id gpio_val
+
+  local want_name="$1"
+  [ -n "$want_name" ] || return 1
+  [ -r /sys/kernel/debug/gpio ] || return 1
+
+  gpio_base=$(grep "$chip" /sys/kernel/debug/gpio | sed -n 's/.*GPIOs \([0-9]\+\)-.*/\1/p')
+  gpio_id=$(("$gpio_base" + "$line"))
+  gpio_val=$(awk -v gpio_id="$gpio_id" '
+    $1 == "gpio-"gpio_id {
+      for (i = 1; i <= NF; i++) {
+        if ($i == "hi") {
+          print "1"
+          exit
+        }
+        else if ($i == "lo") {
+          print "0"
+          exit
+        }
+      }
+      print "unknown"
+    }
+  ' /sys/kernel/debug/gpio)
+
+  [[ $gpio_val =~ ^[0-9]+$ ]] || return 1
+  printf '%s\n' "$gpio_val"
+}

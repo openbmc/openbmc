@@ -18,6 +18,47 @@ EnableLeds()
         "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
 }
 
+# shellcheck source=meta-facebook/meta-ventura/recipes-ventura/plat-svc/files/gpio_util
+source "/usr/libexec/ventura/gpio_util"
+
+PSU_Off_with_VT_Check() {
+    # Timeout count
+    wait_counter=0
+    while true; do
+        if busctl get-property xyz.openbmc_project.EntityManager \
+            /xyz/openbmc_project/inventory/system/cable/ReturnValve \
+            xyz.openbmc_project.Inventory.Item.Cable Name >/dev/null 2>&1 ||
+            busctl get-property xyz.openbmc_project.EntityManager \
+                /xyz/openbmc_project/inventory/system/cable/SupplyValve \
+                xyz.openbmc_project.Inventory.Item.Cable Name >/dev/null 2>&1; then
+            if (($(get_gpio_val_by_name "RETURN_CNTL_FB_D_R") == 0 || $(get_gpio_val_by_name "SUPPLY_CNTL_FB_D_R") == 0)); then
+                PSU_Off "$DetectorName"
+                break
+            else
+                # Timeout for 150 seconds
+                wait_limit=150
+            fi
+        else
+            if (($(get_gpio_val_by_name "RPU_READY_PLD_R") == 0)); then
+                PSU_Off "$DetectorName"
+                break
+            else
+                # Timeout for 15 seconds
+                wait_limit=15
+            fi
+        fi
+
+        echo "Limit : $wait_limit"
+        wait_counter=$((wait_counter + 1))
+        if [ "$wait_counter" -ge "$wait_limit" ]; then
+            echo "Timeout - over $wait_limit seconds"
+            PSU_Off "$DetectorName"
+            break
+        fi
+        sleep 1
+    done
+}
+
 DetectorName=$1
 
 LeakType=$(echo "$DetectorName" | cut -d'_' -f2)
@@ -76,6 +117,6 @@ RACKPOWER_HOSTNAME=$(cat /mnt/data/etc/rackpower_hostname)
 RACKPOWER_IP=$(cat /mnt/data/etc/rackpower_ipaddr)
 RACKPOWER_URI="redfish/v1/Chassis/Rack/Actions/Chassis.Reset"
 
-PSU_Off "$1"
+PSU_Off_with_VT_Check
 
 fi
