@@ -77,6 +77,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * transformers
 * nvidia
   * gb200nvl-obmc
+  * nvl32-obmc
 * qualcomm
   * qcom-dc-scm-v1
 * quanta
