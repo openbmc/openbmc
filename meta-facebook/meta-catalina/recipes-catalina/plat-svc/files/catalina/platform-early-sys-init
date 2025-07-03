@@ -45,6 +45,17 @@ config_fan()
         echo "Configure MAX31790 fan controller"
         config_fan_max31790
     fi
+
+    # Set all fan pwm to 80%
+    pwm_value=204
+    for pwm_node in /sys/bus/i2c/devices/*/hwmon/*/pwm*
+    do
+        if [[ ! "$pwm_node" =~ _enable ]]; then
+            if ! echo $pwm_value > "$pwm_node"; then
+                echo "Set $pwm_node: failed"
+            fi
+        fi
+    done
 }
 
 config_ltc4287_hsc()
