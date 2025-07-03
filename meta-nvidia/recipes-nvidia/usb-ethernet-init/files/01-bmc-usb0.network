@@ -1,0 +1,11 @@
+[Match]
+Name=usb0
+
+[Address]
+Address=192.168.7.2/24
+
+[Network]
+LinkLocalAddressing=ipv6
+IPv6AcceptRA=no
+DHCP=no
+ConfigureWithoutCarrier=yes

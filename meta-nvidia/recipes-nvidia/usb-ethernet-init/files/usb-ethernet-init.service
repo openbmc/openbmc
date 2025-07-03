@@ -1,0 +1,10 @@
+[Unit]
+Description=Init USB Host Ethernet Gadget
+Before=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/usb-ethernet-init.sh
+
+[Install]
+WantedBy=multi-user.target
