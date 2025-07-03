@@ -153,24 +153,6 @@ do_gpio_assert_log()
     elif [ "$LINENAME" = "wAUX_SEQPWR_FLT_NIC0_N" ]; then
         LOG_MSG="NIC0 HP_LVC3_OCP_V3_1_PWRGD_PLD timeout assert, FSM stop at state 0x05"
 
-    # PDB CPLD IOEXP 14-0011, Port 0
-    elif [ "$LINENAME" = "FM_P12V_NIC1_FLTB_R_N" ]; then
-        LOG_MSG="NIC1 P12V_AUX Efuse fault assert"
-    elif [ "$LINENAME" = "FM_P3V3_NIC1_FAULT_R_N" ]; then
-        LOG_MSG="NIC1 P3V3_AUX Efuse fault assert"
-    elif [ "$LINENAME" = "FM_P12V_NIC0_FLTB_R_N" ]; then
-        LOG_MSG="NIC0 P12V_AUX Efuse fault assert"
-    elif [ "$LINENAME" = "FM_P3V3_NIC0_FAULT_R_N" ]; then
-        LOG_MSG="NIC0 P3V3_AUX Efuse fault assert"
-    elif [ "$LINENAME" = "P48V_HS2_FAULT_N_PLD" ]; then
-        LOG_MSG="Hotswap Controller 2 fault assert"
-    elif [ "$LINENAME" = "P48V_HS1_FAULT_N_PLD" ]; then
-        LOG_MSG="Hotswap Controller 1 fault assert"
-    elif [ "$LINENAME" = "P12V_AUX_FAN_OC_PLD_N" ]; then
-        LOG_MSG="P12V_AUX_FAN VR OC fault assert"
-    elif [ "$LINENAME" = "P12V_AUX_FAN_FAULT_PLD_N" ]; then
-        LOG_MSG="P12V_AUX_FAN VR fault assert"
-
     # PDB CPLD IOEXP 14-0011, Port 1
     elif [ "$LINENAME" = "FM_SYS_THROTTLE_N" ]; then
         LOG_MSG="System throttle assert"
@@ -250,24 +232,6 @@ do_gpio_deassert_log()
         LOG_MSG="NIC0 FM_OCP_SFF_PWR_GOOD_PLD timeout deassert"
     elif [ "$LINENAME" = "wAUX_SEQPWR_FLT_NIC0_N" ]; then
         LOG_MSG="NIC0 HP_LVC3_OCP_V3_1_PWRGD_PLD timeout deassert"
-
-    # PDB CPLD IOEXP 14-0011, Port 0
-    elif [ "$LINENAME" = "FM_P12V_NIC1_FLTB_R_N" ]; then
-        LOG_MSG="NIC1 P12V_AUX Efuse fault deassert"
-    elif [ "$LINENAME" = "FM_P3V3_NIC1_FAULT_R_N" ]; then
-        LOG_MSG="NIC1 P3V3_AUX Efuse fault deassert"
-    elif [ "$LINENAME" = "FM_P12V_NIC0_FLTB_R_N" ]; then
-        LOG_MSG="NIC0 P12V_AUX Efuse fault deassert"
-    elif [ "$LINENAME" = "FM_P3V3_NIC0_FAULT_R_N" ]; then
-        LOG_MSG="NIC0 P3V3_AUX Efuse fault deassert"
-    elif [ "$LINENAME" = "P48V_HS2_FAULT_N_PLD" ]; then
-        LOG_MSG="Hotswap Controller 2 fault deassert"
-    elif [ "$LINENAME" = "P48V_HS1_FAULT_N_PLD" ]; then
-        LOG_MSG="Hotswap Controller 1 fault deassert"
-    elif [ "$LINENAME" = "P12V_AUX_FAN_OC_PLD_N" ]; then
-        LOG_MSG="P12V_AUX_FAN VR OC fault deassert"
-    elif [ "$LINENAME" = "P12V_AUX_FAN_FAULT_PLD_N" ]; then
-        LOG_MSG="P12V_AUX_FAN VR fault deassert"
 
     # PDB CPLD IOEXP 14-0011, Port 1
     elif [ "$LINENAME" = "FM_SYS_THROTTLE_N" ]; then

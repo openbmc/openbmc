@@ -2,11 +2,17 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-systemd systemd
 
-SRC_URI += " \
+SRC_URI:append = " \
     file://phosphor-multi-gpio-monitor.json \
     file://phosphor-multi-gpio-presence.json \
     file://platform-gpio-monitor \
     file://set-uart-select-led \
+    file://power-rail-assert-log@.service \
+    file://power-rail-deassert-log@.service \
+    file://power-rail-event-logger \
+    file://vr-fault-assert-log@.service \
+    file://vr-fault-deassert-log@.service \
+    file://vr-fault-event-logger \
     "
 
 SRC_URI:append:catalina = " \
@@ -30,6 +36,10 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
     deassert-reset-button.service \
     deassert-run-power-pg.service \
     deassert-uart-select-led.service \
+    power-rail-assert-log@.service \
+    power-rail-deassert-log@.service \
+    vr-fault-assert-log@.service \
+    vr-fault-deassert-log@.service \
     platform-host-ready.target \
     "
 
@@ -49,6 +59,10 @@ do_install:append() {
                     ${D}${libexecdir}/${PN}/platform-gpio-monitor
     install -m 0755 ${UNPACKDIR}/set-uart-select-led \
                     ${D}${libexecdir}/${PN}/set-uart-select-led
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger \
+                    ${D}${libexecdir}/${PN}/power-rail-event-logger
+    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger \
+                    ${D}${libexecdir}/${PN}/vr-fault-event-logger
 }
 
 do_install:append:catalina() {

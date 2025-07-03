@@ -204,8 +204,8 @@
         "LineName": "FM_P12V_NIC1_FLTB_R_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@FM_P12V_NIC1_FLTB_R_N.service"],
-            "FALLING": ["assert-gpio-log@FM_P12V_NIC1_FLTB_R_N.service"]
+            "RISING": ["vr-fault-deassert-log@FM_P12V_NIC1_FLTB_R_N.service"],
+            "FALLING": ["vr-fault-assert-log@FM_P12V_NIC1_FLTB_R_N.service"]
         },
         "Continue": true
     },
@@ -214,8 +214,8 @@
         "LineName": "FM_P3V3_NIC1_FAULT_R_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@FM_P3V3_NIC1_FAULT_R_N.service"],
-            "FALLING": ["assert-gpio-log@FM_P3V3_NIC1_FAULT_R_N.service"]
+            "RISING": ["vr-fault-deassert-log@FM_P3V3_NIC1_FAULT_R_N.service"],
+            "FALLING": ["vr-fault-assert-log@FM_P3V3_NIC1_FAULT_R_N.service"]
         },
         "Continue": true
     },
@@ -224,8 +224,8 @@
         "LineName": "FM_P12V_NIC0_FLTB_R_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@FM_P12V_NIC0_FLTB_R_N.service"],
-            "FALLING": ["assert-gpio-log@FM_P12V_NIC0_FLTB_R_N.service"]
+            "RISING": ["vr-fault-deassert-log@FM_P12V_NIC0_FLTB_R_N.service"],
+            "FALLING": ["vr-fault-assert-log@FM_P12V_NIC0_FLTB_R_N.service"]
         },
         "Continue": true
     },
@@ -234,8 +234,8 @@
         "LineName": "FM_P3V3_NIC0_FAULT_R_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@FM_P3V3_NIC0_FAULT_R_N.service"],
-            "FALLING": ["assert-gpio-log@FM_P3V3_NIC0_FAULT_R_N.service"]
+            "RISING": ["vr-fault-deassert-log@FM_P3V3_NIC0_FAULT_R_N.service"],
+            "FALLING": ["vr-fault-assert-log@FM_P3V3_NIC0_FAULT_R_N.service"]
         },
         "Continue": true
     },
@@ -244,8 +244,8 @@
         "LineName": "P48V_HS2_FAULT_N_PLD",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@P48V_HS2_FAULT_N_PLD.service"],
-            "FALLING": ["assert-gpio-log@P48V_HS2_FAULT_N_PLD.service"]
+            "RISING": ["power-rail-deassert-log@P48V_HS2_FAULT_N_PLD.service"],
+            "FALLING": ["power-rail-assert-log@P48V_HS2_FAULT_N_PLD.service"]
         },
         "Continue": true
     },
@@ -254,8 +254,8 @@
         "LineName": "P48V_HS1_FAULT_N_PLD",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@P48V_HS1_FAULT_N_PLD.service"],
-            "FALLING": ["assert-gpio-log@P48V_HS1_FAULT_N_PLD.service"]
+            "RISING": ["power-rail-deassert-log@P48V_HS1_FAULT_N_PLD.service"],
+            "FALLING": ["power-rail-assert-log@P48V_HS1_FAULT_N_PLD.service"]
         },
         "Continue": true
     },
@@ -264,8 +264,8 @@
         "LineName": "P12V_AUX_FAN_OC_PLD_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@P12V_AUX_FAN_OC_PLD_N.service"],
-            "FALLING": ["assert-gpio-log@P12V_AUX_FAN_OC_PLD_N.service"]
+            "RISING": ["vr-fault-deassert-log@P12V_AUX_FAN_OC_PLD_N.service"],
+            "FALLING": ["vr-fault-assert-log@P12V_AUX_FAN_OC_PLD_N.service"]
         },
         "Continue": true
     },
@@ -274,8 +274,8 @@
         "LineName": "P12V_AUX_FAN_FAULT_PLD_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-gpio-log@P12V_AUX_FAN_FAULT_PLD_N.service"],
-            "FALLING": ["assert-gpio-log@P12V_AUX_FAN_FAULT_PLD_N.service"]
+            "RISING": ["vr-fault-deassert-log@P12V_AUX_FAN_FAULT_PLD_N.service"],
+            "FALLING": ["vr-fault-assert-log@P12V_AUX_FAN_FAULT_PLD_N.service"]
         },
         "Continue": true
     },

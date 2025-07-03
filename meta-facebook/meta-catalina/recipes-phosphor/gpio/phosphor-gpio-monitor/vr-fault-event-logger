@@ -1,0 +1,56 @@
+#!/bin/bash
+
+help_msg="
+Usage: vr-fault-event-logger <event> <gpio_name>
+<event> is the power rail event to log,
+e.g. assert / deassert.
+
+<gpio_name> is defined in json file,
+e.g. FM_P12V_NIC1_FLTB_R_N
+"
+
+gpio_name="$2"
+msg_id="xyz.openbmc_project.State.Power.VoltageRegulatorFault"
+device_path="/xyz/openbmc_project/inventory/system/board/Catalina_PDB/$gpio_name"
+stash_file="/run/${gpio_name}.log_entry"
+
+get_failure_data()
+{
+    if [ "$1" = "FM_P12V_NIC1_FLTB_R_N" ]; then
+        echo "NIC1 P12V_AUX Efuse fault assert"
+    elif [ "$1" = "FM_P3V3_NIC1_FAULT_R_N" ]; then
+        echo "NIC1 P3V3_AUX Efuse fault assert"
+    elif [ "$1" = "FM_P12V_NIC0_FLTB_R_N" ]; then
+        echo "NIC0 P12V_AUX Efuse fault assert"
+    elif [ "$1" = "FM_P3V3_NIC0_FAULT_R_N" ]; then
+        echo "NIC0 P3V3_AUX Efuse fault assert"
+    elif [ "$1" = "P12V_AUX_FAN_OC_PLD_N" ]; then
+        echo "P12V_AUX_FAN VR OC fault assert"
+    elif [ "$1" = "P12V_AUX_FAN_FAULT_PLD_N" ]; then
+        echo "P12V_AUX_FAN VR fault assert"
+    else
+        echo "GPIO $1 assert"
+    fi
+}
+
+case "$1" in
+    "-h")
+        echo "$help_msg"
+        ;;
+
+    "assert")
+        if [ ! -s "$stash_file" ]; then
+            /usr/bin/log-create "$msg_id" --json \
+                "{ \"VOLTAGE_REGULATOR\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$gpio_name")\"}" \
+                > "${stash_file}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${stash_file}" ]; then
+            log-resolve -p "$(< "${stash_file}")" && rm "${stash_file}"
+        fi
+        ;;
+esac
+
+exit 0
