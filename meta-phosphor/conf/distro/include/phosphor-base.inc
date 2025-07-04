@@ -71,6 +71,7 @@ TARGET_VENDOR = "-openbmc"
 
 
 VIRTUAL-RUNTIME_keymaps = ""
+VIRTUAL-RUNTIME_dbus = "dbus-broker"
 
 # Phosphor OpenBMC uses systemd and udev
 INIT_MANAGER = "systemd"
@@ -123,7 +124,7 @@ IMAGE_CLASSES:append = " image_types_phosphor phosphor-rootfs-postcommands"
 IMAGE_CLASSES:append:npcm7xx = " image_types_phosphor_nuvoton"
 IMAGE_CLASSES:append:npcm8xx = " image_types_phosphor_nuvoton_npcm8xx"
 
-IMAGE_INSTALL:append = " dbus-broker libnss-systemd"
+IMAGE_INSTALL:append = " libnss-systemd"
 
 # Skip the udev database by default.  It adds around 2MB
 # compressed to the root filesystem, and probably doesn't
