@@ -16,7 +16,7 @@ get_init_tray_sgpio()
     do
         if [ "$i" == "9" ] || [ "$i" == "10" ]; then
            sgpio_index=$((i*2 + 180));
-           sgpio_index=$(gpioget 2 $sgpio_index)
+           sgpio_value=$(gpioget 2 $sgpio_index)
         else
            sgpio_index=$((i*2 + 146));
            sgpio_value=$(gpioget 2 $sgpio_index)
@@ -35,7 +35,7 @@ get_init_tray_sgpio()
     do
         if [ "$j" == "1" ] || [ "$j" == "2" ]; then
            sgpio_index=$((j*2 + 162));
-           sgpio_index=$(gpioget 2 $sgpio_index)
+           sgpio_value=$(gpioget 2 $sgpio_index)
         else
            sgpio_index=$((j*2 + 178));
            sgpio_value=$(gpioget 2 $sgpio_index)
@@ -54,7 +54,7 @@ get_init_tray_sgpio()
     do
         if [ "$i" == "9" ] || [ "$i" == "10" ]; then
            sgpio_index=$((i*2 + 234));
-           sgpio_index=$(gpioget 2 $sgpio_index)
+           sgpio_value=$(gpioget 2 $sgpio_index)
         else
            sgpio_index=$((i*2 + 200));
            sgpio_value=$(gpioget 2 $sgpio_index)
@@ -73,7 +73,7 @@ get_init_tray_sgpio()
     do
         if [ "$j" == 1 ] || [ "$j" == 2 ]; then
            sgpio_index=$((j*2 + 216));
-           sgpio_index=$(gpioget 2 $sgpio_index)
+           sgpio_value=$(gpioget 2 $sgpio_index)
         else
            sgpio_index=$((j*2 + 232));
            sgpio_value=$(gpioget 2 $sgpio_index)
