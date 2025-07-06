@@ -81,16 +81,18 @@ bind_gpio_expanders()
 
 bind_fru_eeproms()
 {
-    # CBC 0 and 1 FRU
-    bind_i2c_device at24 12-0054
-    bind_i2c_device at24 12-0055
     # HMC FRU
     bind_i2c_device at24 13-0057
     # Module 0 FRU
     bind_i2c_device at24 13-0050
-    # CBC 2 and 3 FRU
+    # Module 1 FRU
+    bind_i2c_device at24 12-0050
+    # CBC 0 and 1 FRU
     bind_i2c_device at24 13-0054
     bind_i2c_device at24 13-0055
+    # CBC 2 and 3 FRU
+    bind_i2c_device at24 12-0054
+    bind_i2c_device at24 12-0055
     # Module 0 Aux
     bind_i2c_device at24 2-0050
     # Module 1 Aux
