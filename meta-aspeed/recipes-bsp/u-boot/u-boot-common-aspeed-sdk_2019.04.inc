@@ -21,6 +21,6 @@ B = "${WORKDIR}/build"
 do_configure[cleandirs] = "${B}"
 
 # We don't have 'u-boot-initial-env' target in our u-boot version
-UBOOT_INITIAL_ENV=""
+UBOOT_INITIAL_ENV = ""
 
 PV = "v2019.04+git${SRCPV}"
