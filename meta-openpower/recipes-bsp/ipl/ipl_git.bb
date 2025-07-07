@@ -21,3 +21,6 @@ DEPENDS = " \
 RDEPENDS:${PN} = "phal-devtree"
 
 EXTRA_OECONF = "CHIP=p10 --enable-libphal"
+
+ERROR_QA:remove = "buildpaths"
+WARNING_QA:append = "buildpaths"
