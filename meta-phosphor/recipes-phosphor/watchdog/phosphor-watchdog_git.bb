@@ -25,7 +25,7 @@ EXTRA_OEMESON = " \
         "
 
 # Copies config file having arguments for host watchdog
-SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/watchdog/poweron"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/watchdog/poweron"
 
 # Install the override to set up a Conflicts relation
 SYSTEMD_OVERRIDE:${PN} += "poweron.conf:phosphor-watchdog@poweron.service.d/poweron.conf"

@@ -48,7 +48,7 @@ inherit obmc-phosphor-utils
 inherit systemd
 inherit useradd
 
-_INSTALL_SD_UNITS=""
+_INSTALL_SD_UNITS = ""
 SYSTEMD_DEFAULT_TARGET ?= "multi-user.target"
 envfiledir ?= "${sysconfdir}/default"
 

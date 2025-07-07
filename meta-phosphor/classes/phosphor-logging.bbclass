@@ -1,1 +1,1 @@
-callouts_datadir="${datadir}/phosphor-logging/callouts"
+callouts_datadir = "${datadir}/phosphor-logging/callouts"

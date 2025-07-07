@@ -18,7 +18,7 @@ do_compile() {
     :
 }
 
-firmware_dir="${nonarch_base_libdir}/firmware/"
+firmware_dir = "${nonarch_base_libdir}/firmware/"
 
 do_install() {
     install -d ${D}${firmware_dir}

@@ -2,7 +2,7 @@
 
 inherit image_version
 
-FIT_IMAGE_INHERIT=""
+FIT_IMAGE_INHERIT = ""
 FIT_IMAGE_INHERIT:df-obmc-static-norootfs = "fit-image"
 inherit ${FIT_IMAGE_INHERIT}
 
@@ -92,7 +92,7 @@ VERSION_PURPOSE ?= "xyz.openbmc_project.Software.Version.VersionPurpose.BMC"
 
 UBOOT_SUFFIX ?= "bin"
 
-IMAGE_NAME_SUFFIX=""
+IMAGE_NAME_SUFFIX = ""
 
 python() {
     # Compute rwfs LEB count and LEB size.

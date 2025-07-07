@@ -13,8 +13,8 @@ BBCLASSEXTEND = "native nativesdk"
 do_compile () {
     DOLLAR="$"
     cat > ${WORKDIR}/redfish-schema-pack.pc <<EOF
-prefix=${prefix}
-schema_dir=${DOLLAR}{prefix}/share/redfish-schema-pack
+prefix = ${prefix}
+schema_dir = ${DOLLAR}{prefix}/share/redfish-schema-pack
 
 Name: redfish-schema-pack
 Description: DMTF Redfish Schema Pack

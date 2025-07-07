@@ -30,7 +30,7 @@ NOROOTFS_PERSISTENT_DIRS = "\
 inherit allarch
 inherit update-alternatives
 
-PKG_INSTALL_DIR="${libexecdir}/${BPN}"
+PKG_INSTALL_DIR = "${libexecdir}/${BPN}"
 FILES:${PN} += "${PKG_INSTALL_DIR}"
 
 do_install() {

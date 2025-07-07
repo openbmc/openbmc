@@ -1,1 +1,1 @@
-settings_datadir="${datadir}/phosphor-settings/default"
+settings_datadir = "${datadir}/phosphor-settings/default"

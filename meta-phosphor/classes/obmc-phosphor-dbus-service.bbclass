@@ -26,10 +26,10 @@ inherit obmc-phosphor-utils
 RDEPENDS:${PN}:append:class-target = " dbus-perms"
 DBUS_PACKAGES ?= "${PN}"
 
-_INSTALL_DBUS_CONFIGS=""
-_DEFAULT_DBUS_CONFIGS=""
-_INSTALL_DBUS_ACTIVATIONS=""
-_DEFAULT_DBUS_ACTIVATIONS=""
+_INSTALL_DBUS_CONFIGS = ""
+_DEFAULT_DBUS_CONFIGS = ""
+_INSTALL_DBUS_ACTIVATIONS = ""
+_DEFAULT_DBUS_ACTIVATIONS = ""
 
 
 python dbus_do_postinst() {
