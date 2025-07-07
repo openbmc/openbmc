@@ -17,15 +17,15 @@ OBMC_HOST_MONITOR_INSTANCES = "checkstop"
 
 # Copies config file having arguments for monitoring host checkstop
 # via GPIO assertion
-SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/gpio/checkstop"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/gpio/checkstop"
 
 # This package is not supplying the unit file and also this is not a native
 # recipe since state-mgmt needs this package at runtime. Unsetting this below
 # variable will let the build go through
-SYSTEMD_SERVICE:${PN} ?=""
+SYSTEMD_SERVICE:${PN} ?= ""
 
 # Install the override to set up a Conflicts relation
-SYSTEMD_OVERRIDE:${PN} +="checkstop.conf:phosphor-gpio-monitor@checkstop.service.d/checkstop.conf"
+SYSTEMD_OVERRIDE:${PN} += "checkstop.conf:phosphor-gpio-monitor@checkstop.service.d/checkstop.conf"
 
 STATES = "startmin"
 GPIO_MONITOR_TMPL = "phosphor-gpio-monitor@.service"

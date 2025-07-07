@@ -1,1 +1,1 @@
-YAML_DEST="${D}${datadir}/openpower-occ-control"
+YAML_DEST = "${D}${datadir}/openpower-occ-control"
