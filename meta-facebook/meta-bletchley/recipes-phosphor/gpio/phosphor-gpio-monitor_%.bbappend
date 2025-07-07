@@ -13,7 +13,7 @@ SYSTEMD_LINK:${PN}-presence:append = " ${@compose_list(d, 'FMT_PRESENT', 'OBMC_H
 SLED_PRESENT_ENV_FMT = "obmc/gpio/presence-sled{0}.conf"
 SYSTEMD_ENVIRONMENT_FILE:${PN}-presence = " ${@compose_list(d, 'SLED_PRESENT_ENV_FMT', 'OBMC_HOST_INSTANCES')}"
 
-GPIO_PRESENCE_SLED_CONF="/etc/default/obmc/gpio/%i.conf"
+GPIO_PRESENCE_SLED_CONF = "/etc/default/obmc/gpio/%i.conf"
 
 do_install:append(){
     # modify ConditionPathExists and EnvironmentFile to correct filepath

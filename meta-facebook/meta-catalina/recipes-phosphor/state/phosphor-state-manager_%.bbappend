@@ -116,10 +116,10 @@ SRC_URI:append = " \
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     "
-HARD_OFF_TMPL_CTRL=""
-HARD_OFF_TGTFMT_CTRL=""
-HARD_OFF_FMT_CTRL=""
-HARD_OFF_INSTFMT_CTRL=""
+HARD_OFF_TMPL_CTRL = ""
+HARD_OFF_TGTFMT_CTRL = ""
+HARD_OFF_FMT_CTRL = ""
+HARD_OFF_INSTFMT_CTRL = ""
 
 #Remove unexpected ChassisPowerOnStarted log at host first start
 RRECOMMENDS:${PN}-chassis:remove = " ${PN}-chassis-poweron-log"

@@ -30,6 +30,6 @@ do_install() {
 }
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"
-MOTOR_INIT_INSTFMT="../motor-init-calibration@.service:${TGT}.wants/motor-init-calibration@{0}.service"
+MOTOR_INIT_INSTFMT = "../motor-init-calibration@.service:${TGT}.wants/motor-init-calibration@{0}.service"
 SYSTEMD_SERVICE:${PN} += "motor-init-calibration@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'MOTOR_INIT_INSTFMT', 'OBMC_HOST_INSTANCES')}"

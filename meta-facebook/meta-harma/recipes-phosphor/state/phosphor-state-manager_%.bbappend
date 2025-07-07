@@ -65,10 +65,10 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     "
 
-HARD_OFF_TMPL_CTRL=""
-HARD_OFF_TGTFMT_CTRL=""
-HARD_OFF_FMT_CTRL=""
-HARD_OFF_INSTFMT_CTRL=""
+HARD_OFF_TMPL_CTRL = ""
+HARD_OFF_TGTFMT_CTRL = ""
+HARD_OFF_FMT_CTRL = ""
+HARD_OFF_INSTFMT_CTRL = ""
 
 
 SRC_URI:append = " \

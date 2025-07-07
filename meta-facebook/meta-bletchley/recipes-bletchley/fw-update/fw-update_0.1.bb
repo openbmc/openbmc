@@ -19,6 +19,6 @@ do_install() {
         install -m 0755 ${UNPACKDIR}/usb-controller-update ${D}${sbindir}
 }
 
-FLASH_USB_CONTROLLER_INSTFMT="flash-usb-controller@.service:flash-usb-controller@{0}.service"
+FLASH_USB_CONTROLLER_INSTFMT = "flash-usb-controller@.service:flash-usb-controller@{0}.service"
 SYSTEMD_SERVICE:${PN} += "flash-usb-controller@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FLASH_USB_CONTROLLER_INSTFMT', 'OBMC_HOST_INSTANCES')}"

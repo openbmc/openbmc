@@ -19,7 +19,7 @@ do_install() {
 }
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"
-NCSI_WAIT_IPV6_LL_INSTFMT="../network-wait-ipv6-ll@.service:${TGT}.wants/network-wait-ipv6-ll@{0}.service"
+NCSI_WAIT_IPV6_LL_INSTFMT = "../network-wait-ipv6-ll@.service:${TGT}.wants/network-wait-ipv6-ll@{0}.service"
 
 SYSTEMD_SERVICE:${PN} += "network-wait-ipv6-ll@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'NCSI_WAIT_IPV6_LL_INSTFMT', 'FB_ETH_INTF')}"

@@ -19,7 +19,7 @@ PACKAGECONFIG:fb-compute-multihost ??= "bic"
 
 PACKAGECONFIG[bic] = "-Dbic=enabled,-Dbic=disabled"
 
-EXTRA_OEMESON="\
+EXTRA_OEMESON = "\
     -Dtests=disabled \
     -Dmachine='${MACHINE}' \
     -Dhost-instances='${OBMC_HOST_INSTANCES}' \

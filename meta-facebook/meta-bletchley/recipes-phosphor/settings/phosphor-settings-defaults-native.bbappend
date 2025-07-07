@@ -7,7 +7,7 @@ SRC_URI:append = " \
 SETTINGS_HOST_TEMPLATES:append = " bletchley-host-acpi-power-state.yaml"
 SETTINGS_CHASSIS_TEMPLATES_ZERO_ONLY:append = " bletchley-frontpanel.yaml"
 
-OBMC_CHASSIS_ZERO_ONLY="0"
+OBMC_CHASSIS_ZERO_ONLY = "0"
 
 do_install:append() {
     DEST=${D}${settings_datadir}

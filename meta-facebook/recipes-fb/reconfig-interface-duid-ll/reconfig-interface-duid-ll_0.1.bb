@@ -19,7 +19,7 @@ do_install() {
 }
 
 TGT = "${SYSTEMD_DEFAULT_TARGET}"
-RECONF_DUID_LL_INSTFMT="../reconfig-interface-duid-ll@.service:${TGT}.wants/reconfig-interface-duid-ll@{0}.service"
+RECONF_DUID_LL_INSTFMT = "../reconfig-interface-duid-ll@.service:${TGT}.wants/reconfig-interface-duid-ll@{0}.service"
 
 SYSTEMD_SERVICE:${PN} += "reconfig-interface-duid-ll@.service"
 SYSTEMD_LINK:${PN} += "${@compose_list(d, 'RECONF_DUID_LL_INSTFMT', 'FB_ETH_INTF')}"
