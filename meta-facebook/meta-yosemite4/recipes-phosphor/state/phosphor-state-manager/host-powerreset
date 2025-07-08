@@ -8,16 +8,16 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 CHASSIS_ID=$1
 slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
 
-msg="Execute host$CHASSIS_ID power reset"
+msg="Execute host$CHASSIS_ID acpi reset"
 echo "${msg}"
-add_sel "${msg}"
+add_sel "${msg}" "Info"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
-    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
-    msg="Execute host$CHASSIS_ID power reset fail, power control is operating"
+    echo "Host $CHASSIS_ID is currently running a power control operation, skipping."
+    msg="Execute host$CHASSIS_ID acpi reset fail, power control is operating"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Error"
     exit 1
 fi
 
@@ -26,10 +26,10 @@ fi
 EID=$(($1*10))
 if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x04 -m "$EID"
 then
-    msg="Failed to set host$1 power reset"
+    msg="Failed to set host$1 acpi reset"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Error"
 else
     sleep 20
-    echo "Host$1 is power reset"
+    echo "Host$1 is acpi reset"
 fi

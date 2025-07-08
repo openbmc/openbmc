@@ -28,9 +28,9 @@ chassis-power-on()
 {
     if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=0
     then
-        msg="Failed to set chassis$1 power on"
+        msg="Failed to set chassis$1 AC power on"
         echo "${msg}"
-        add_sel "${msg}"
+        add_sel "${msg}" "Error"
     fi
     sleep 1
 
@@ -50,34 +50,34 @@ chassis-power-on()
         # Wait for standby sensors to be ready
         sleep 2
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-        echo "Chassis$CHASSIS_ID is power on"
+        echo "Chassis$CHASSIS_ID is AC power on"
     else
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-        msg="Failed to power on Chassis$CHASSIS_ID, Chassis$CHASSIS_ID is power off"
+        msg="Failed to AC power on Chassis$CHASSIS_ID, Chassis$CHASSIS_ID is AC power off"
         echo "${msg}"
-        add_sel "${msg}"
+        add_sel "${msg}" "Error"
         exit 0;
     fi
 }
 
-msg="Execute chassis$CHASSIS_ID power on"
+msg="Execute chassis$CHASSIS_ID AC power on"
 echo "${msg}"
-add_sel "${msg}"
+add_sel "${msg}" "Info"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
+    echo "Chassis $CHASSIS_ID is currently running a power control operation, skipping."
     chassis_status=$(gpio_get "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_STATUS")
     if [ "$chassis_status" == "$STATE_ON" ]; then
         # Chassis already on (e.g. due to AC on), skip power on, do not record SEL
-        msg="Chassis$1 is already on"
+        msg="Chassis$1 is already AC power on"
         echo "${msg}"
-        add_sel "${msg}"
+        add_sel "${msg}" "Info"
         exit 0
     else
-        echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
-        msg="Execute chassis$CHASSIS_ID power on fail, power control is operating"
+        msg="Execute chassis$CHASSIS_ID AC on fail, power control is operating"
         echo "${msg}"
-        add_sel "${msg}"
+        add_sel "${msg}" "Error"
         exit 1
     fi
 fi
@@ -103,9 +103,9 @@ then
     chassis-power-on
     /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
 else
-    msg="Chassis$1 is already on"
+    msg="Chassis$1 is already AC power on"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
 fi
 
 host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")

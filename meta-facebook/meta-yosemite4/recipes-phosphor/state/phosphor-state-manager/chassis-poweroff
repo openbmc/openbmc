@@ -85,9 +85,9 @@ chassis-power-off()
         disable_i3c_hub
         if ! gpio_set "$GPIOCHIP_IO_EXP_SLOT_PWR_CTRL" "$IO_EXP_SLOT_PWR_CTRL"=1
         then
-                msg="Failed to set chassis$CHASSIS_ID power off"
+                msg="Failed to set chassis$CHASSIS_ID AC power off"
                 echo "${msg}"
-                add_sel "${msg}"
+                add_sel "${msg}" "Error"
         fi
         sleep 20
 
@@ -96,26 +96,26 @@ chassis-power-off()
         if [ "$chassis_status" == "$STATE_OFF" ]
         then
                 busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-                echo "Chassis$CHASSIS_ID is power off"
+                echo "Chassis$CHASSIS_ID is AC power off"
         else
                 busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-                msg="Failed to power off Chassis$CHASSIS_ID, Chassis$CHASSIS_ID is power on"
+                msg="Failed to AC power off Chassis$CHASSIS_ID, Chassis$CHASSIS_ID is AC power on"
                 echo "${msg}"
-                add_sel "${msg}"
+                add_sel "${msg}" "Error"
                 exit 0;
         fi
 }
 
-msg="Execute chassis$CHASSIS_ID power off"
+msg="Execute chassis$CHASSIS_ID AC power off"
 echo "${msg}"
-add_sel "${msg}"
+add_sel "${msg}" "Info"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
-    echo "Slot $CHASSIS_ID is currently running a power control operation, skipping."
-    msg="Execute chassis$CHASSIS_ID power off fail, power control is operating"
+    echo "Chassis $CHASSIS_ID is currently running a power control operation, skipping."
+    msg="Execute chassis$CHASSIS_ID AC off fail, power control is operating"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Error"
     exit 1
 fi
 
@@ -149,6 +149,6 @@ then
         chassis-power-off
         exit 0;
 else
-        echo "Chassis$CHASSIS_ID is already off"
+        echo "Chassis$CHASSIS_ID is already AC power off"
         exit 0;
 fi

@@ -22,15 +22,15 @@ get_host_status() {
     fi
 }
 
-msg="Execute host$CHASSIS_ID power cycle"
+msg="Execute host$CHASSIS_ID DC power cycle"
 echo "${msg}"
-add_sel "${msg}"
+add_sel "${msg}" "Info"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
-    msg="Wait slot$CHASSIS_ID power control flock release for DC cycle."
+    msg="Wait power control flock release for host$CHASSIS_ID DC cycle"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
 fi
 flock -x 300
 trap 'flock -u 300' EXIT
@@ -47,7 +47,7 @@ if [ "$host_status" == "$STATE_ON" ]; then
     busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
     msg="Host$CHASSIS_ID system DC power is off"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
 
     # Wait for the host to power off
     sleep 10s
@@ -57,9 +57,9 @@ if [ "$host_status" == "$STATE_ON" ]; then
 
     if [ "$host_status" != "$STATE_OFF" ]; then
         busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
-        msg="Do power cycle fail, fail to set host$CHASSIS_ID power off"
+        msg="Host$CHASSIS_ID DC power cycle failed, fail to set host$CHASSIS_ID DC power off"
         echo "${msg}"
-        add_sel "${msg}"
+        add_sel "${msg}" "Error"
         exit 1
     fi
 fi
@@ -73,20 +73,20 @@ if [ "$host_status" != "$STATE_ON" ]; then
     get_host_status
 
     if [ "$host_status" != "$STATE_ON" ]; then
-        msg="Do power cycle, failed to set host$CHASSIS_ID power on"
+        msg="Host$CHASSIS_ID DC power cycle failed, fail to set host$CHASSIS_ID DC power on"
         echo "${msg}"
-        add_sel "${msg}"
+        add_sel "${msg}" "Error"
         exit 1
     fi
 
     msg="Host$CHASSIS_ID system DC power is on"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
     # Set host state to on
     busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
 fi
 
-msg="Host$1 power cycle success"
+msg="Host$1 DC power cycle success"
 echo "${msg}"
-add_sel "${msg}"
+add_sel "${msg}" "Info"
 exit 0;

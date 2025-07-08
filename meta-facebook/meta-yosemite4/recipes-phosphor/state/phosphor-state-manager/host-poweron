@@ -18,15 +18,15 @@ get_host_status() {
     fi
 }
 
-msg="Execute host$1 power on"
+msg="Execute host$1 DC power on"
 echo "${msg}"
-add_sel "${msg}"
+add_sel "${msg}" "Info"
 
 exec 300>"$slot_power_control_lock"
 if ! flock -n 300 ; then
-    msg="Wait slot$CHASSIS_ID power control flock release for DC on."
+    msg="Wait power control flock release for host$CHASSIS_ID DC on"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
 fi
 flock -x 300
 trap 'flock -u 300' EXIT
@@ -35,7 +35,7 @@ get_host_status
 
 if [ "$host_status" == "$STATE_ON" ]
 then
-    echo "Already host$1 power on."
+    echo "Already host$1 DC power on."
     exit 0;
 fi
 
@@ -82,14 +82,14 @@ get_host_status
 
 if [ "$host_status" == "$STATE_ON" ]
 then
-    echo "Host$1 power on success"
+    echo "Host$1 DC power on success"
     msg="Host$1 system DC power is on"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
     exit 0;
 else
-    msg="Failed to set host$1 power on"
+    msg="Failed to set host$1 DC power on"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Error"
     exit 1
 fi

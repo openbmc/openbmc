@@ -61,12 +61,26 @@ gpio_set()
 
 add_sel()
 {
-  MESSAGE="$*"
+  MESSAGE="$1"
+  LEVEL_STR="$2"
+  LEVEL_ENUM="xyz.openbmc_project.Logging.Entry.Level.Error"
+
+  case "$LEVEL_STR" in
+    "Error")
+      LEVEL_ENUM="xyz.openbmc_project.Logging.Entry.Level.Error"
+      ;;
+    "Info")
+      LEVEL_ENUM="xyz.openbmc_project.Logging.Entry.Level.Informational"
+      ;;
+    *)
+      echo "Unknown log level: $LEVEL_STR"
+      ;;
+  esac
 
   busctl call \
     xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-    xyz.openbmc_project.Logging.Create Create "ssa{ss}" "$MESSAGE" \
-    xyz.openbmc_project.Logging.Entry.Level.Error 0
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" \
+   "$MESSAGE" "$LEVEL_ENUM" 0
 }
 
 get_ac_on_status()

@@ -52,14 +52,14 @@ host_state=$(busctl get-property "$HOST_BUS_NAME$CHASSIS_ID" \
 
 if [[ "$chassis_gpio_status" == "$STATE_ON" && \
       "$host_gpio_status" == "$STATE_ON" ]]; then
-    msg="Chassis$CHASSIS_ID cycle success"
+    msg="Chassis$CHASSIS_ID AC power cycle success"
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Info"
     echo "D-Bus: Chassis=$chassis_state, Host=$host_state"
     echo "GPIO : AC=$chassis_gpio_status, DC=$host_gpio_status"
     exit 0
 else
-    msg="Chassis$CHASSIS_ID cycle failed"
+    msg="Chassis$CHASSIS_ID AC power cycle failed"
 
     if [ "$host_gpio_status" = "$STATE_OFF" ]; then
         # Set host state to off
@@ -70,10 +70,10 @@ else
     if [ "$chassis_gpio_status" = "$STATE_OFF" ]; then
         # Set chassis state to off
         busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_OFF_PROPERTY"
-        msg="$msg, Chassis$CHASSIS_ID power is off"
+        msg="$msg, Chassis$CHASSIS_ID AC power is off"
     fi
     echo "${msg}"
-    add_sel "${msg}"
+    add_sel "${msg}" "Error"
     echo "D-Bus: Chassis=$chassis_state, Host=$host_state"
     echo "GPIO : AC=$chassis_gpio_status, DC=$host_gpio_status"
     exit 1
