@@ -1,7 +1,7 @@
 MACHINE ??= "gb200nvl-obmc"
 DISTRO ?= "openbmc-phosphor"
 DISTRO_VERSION:append = ".${@time.time()}"
-PACKAGE_CLASSES ?= "package_rpm"
+PACKAGE_CLASSES ?= "package_ipk"
 SANITY_TESTED_DISTROS:append ?= " *"
 USER_CLASSES ?= "buildstats"
 PATCHRESOLVE = "noop"
