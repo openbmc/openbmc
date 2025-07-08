@@ -22,6 +22,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = "\
     wget \
 "
 
-IMAGE_LINGUAS="en-us"
+IMAGE_LINGUAS = "en-us"
 
 include recipes-phosphor/images/nvidia-${MACHINE}-phosphor-image.inc

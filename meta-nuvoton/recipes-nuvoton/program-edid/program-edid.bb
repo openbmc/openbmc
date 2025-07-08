@@ -16,7 +16,7 @@ SRC_URI = "file://program-edid.service \
 
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "program-edid.service"
-SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/edid/program_edid"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/edid/program_edid"
 FILES:${PN} += "/usr/share/edid/edid.bin"
 
 do_compile() {

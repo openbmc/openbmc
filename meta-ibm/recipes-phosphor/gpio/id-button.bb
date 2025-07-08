@@ -18,7 +18,7 @@ do_install() {
             ${D}${bindir}/toggle_identify_led.sh
 }
 
-SYSTEMD_ENVIRONMENT_FILE:${PN} +="obmc/gpio/id_button"
+SYSTEMD_ENVIRONMENT_FILE:${PN} += "obmc/gpio/id_button"
 
 ID_BUTTON_SERVICE = "id_button"
 

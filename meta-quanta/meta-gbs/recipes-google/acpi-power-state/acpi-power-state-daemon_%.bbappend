@@ -13,7 +13,7 @@ SRC_URI:append:gbs = " \
 
 RDEPENDS:${PN}:append:gbs = "bash"
 
-CHASSIS_INSTANCE="0"
+CHASSIS_INSTANCE = "0"
 
 SYSTEMD_SERVICE:${PN}:append:gbs = " \
     gbs-host-s0-set-failsafe.service \

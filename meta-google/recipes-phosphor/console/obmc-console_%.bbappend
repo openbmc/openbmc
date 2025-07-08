@@ -8,7 +8,7 @@ SRC_URI:append:gbmc = " \
   "
 
 SYSTEMD_SERVICE:${PN}:append:gbmc = " serial-to-bmc@.service"
-SYSTEMD_SERVICE:${PN}:append:gbmc= " serial-to-host@.service"
+SYSTEMD_SERVICE:${PN}:append:gbmc = " serial-to-host@.service"
 
 # Remove the default ssh package config
 PACKAGECONFIG:remove:gbmc = "ssh"

@@ -22,8 +22,8 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
 }
 
-FILES:${PN}:append= " ${systemd_system_unitdir}"
-FILES:${PN}:append= " ${libexecdir}/${PN}"
+FILES:${PN}:append = " ${systemd_system_unitdir}"
+FILES:${PN}:append = " ${libexecdir}/${PN}"
 
 # Because Bletchley does not have IPMI between Bmc & Host, the Host init
 # state will set to Off after Bmc booted. We require an extra service to

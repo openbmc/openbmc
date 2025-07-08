@@ -22,5 +22,5 @@ SYSTEMD_LINK:${PN}:append:gbs := " ${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}
 
 EXTRA_OECONF:append:gbs = ""
 
-IPMI_FRU_YAML:gbs="${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-fru-read.yaml"
-IPMI_FRU_PROP_YAML:gbs="${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-extra-properties.yaml"
+IPMI_FRU_YAML:gbs = "${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-fru-read.yaml"
+IPMI_FRU_PROP_YAML:gbs = "${STAGING_DIR_HOST}${datadir}/gbs-yaml-config/ipmi-extra-properties.yaml"

@@ -3,7 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SYSTEMD_SERVICE:${PN}:append:p10bmc = " obmc-led-create-virtual-leds@.service"
 
 # Copies config file having arguments for led-set-all-groups-asserted.sh
-SYSTEMD_ENVIRONMENT_FILE:${PN}:append:p10bmc =" obmc/led/set-all/groups/config"
+SYSTEMD_ENVIRONMENT_FILE:${PN}:append:p10bmc = " obmc/led/set-all/groups/config"
 
 # Use the JSON configuration file at runtime than the static led.yaml
 # Also, enable Lamp Test and OperationalStatus monitor feature for

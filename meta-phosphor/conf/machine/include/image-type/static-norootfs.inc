@@ -1,5 +1,5 @@
 INITRAMFS_CTYPE = "zst"
-INITRAMFS_CTYPE:flash-32768="xz"
+INITRAMFS_CTYPE:flash-32768 = "xz"
 
 IMAGE_FSTYPES += "cpio.${INITRAMFS_CTYPE}.fitImage mtd-static-norootfs"
 
