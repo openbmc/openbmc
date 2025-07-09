@@ -74,12 +74,47 @@ config_xdp710_hsc()
     i2cset -y -f 20 0x1c 0xe9 0x01ff w || echo "Failed to set TELEMETRY_AVG to HSC2 (20-001c)"
 }
 
+pec_enable_check()
+{
+    local driver_name="$1"
+    local dev="$2"
+
+    local driver_dir="/sys/bus/i2c/drivers/$driver_name"
+    local dev_link="$driver_dir/$dev"
+    local pec_file="$dev_link/pec"
+
+    for attempt in {1..10}
+    do
+        echo "$dev: Checking device (Attempt $attempt)"
+        # Bind driver if not already bound
+        if [ ! -L "$dev_link" ]; then
+            echo "$dev" > "$driver_dir"/bind
+        fi
+
+        if [ -f "$pec_file" ]; then
+            echo "$dev: set 1 to pec file (enable pec)"
+            echo 1 > "$pec_file"
+            break;
+        else
+            # pec sysfs attribute file not exist, rebind driver
+            echo "$dev: pec file not found, rebind required"
+            echo "$dev" > "$driver_dir"/unbind
+            echo "$dev" > "$driver_dir"/bind
+            sleep 1
+        fi
+    done
+}
+
 config_hsc()
 {
     if [ "$(i2cdetect -y -q 20 0x13 0x13 | grep "10:" | awk '{print $2}')" != "--" ]; then
         config_xdp710_hsc
+        pec_enable_check xdp710 20-0013
+        pec_enable_check xdp710 20-001c
     else
         config_ltc4287_hsc
+        pec_enable_check ltc4286 20-0042
+        pec_enable_check ltc4286 20-0043
     fi
 }
 
