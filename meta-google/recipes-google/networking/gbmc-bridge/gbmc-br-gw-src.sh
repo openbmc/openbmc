@@ -140,12 +140,12 @@ gbmc_br_gw_src_hook() {
   if [[ $change == route && $route == 'default '*':'* ]]; then
     # ignore everything except main table
     [[ $route == *" table "* ]] && return
+    # ignore the primary route as this script fully controls it
+    [[ $route == *" metric $primary_rt_metric "* ]] && return
     if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
     if [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
-      # ignore the extra route with primary metric
-      [[ $route == *" metric $primary_rt_metric "* ]] && return
       gbmc_br_gw_src_routes["$route"]=1
       gbmc_br_gw_src_update
       gbmc_br_set_router
