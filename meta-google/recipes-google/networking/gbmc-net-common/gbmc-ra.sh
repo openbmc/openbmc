@@ -77,7 +77,7 @@ default_update_rtr() {
     # Override any existing gateway information within files
     # Make sure we cover `00-*` and `-*` files
     for file in /run/systemd/network/{00,}-bmc-$RA_IF.network.d/10-gateway.conf; do
-      rm -rf file
+      rm -rf "$file"
     done
 
     # Fall back to reload if remove failed
