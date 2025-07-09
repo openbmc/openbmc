@@ -88,8 +88,8 @@ pkg_prerm:${PN}-obmc-targets:append() {
 pkg_postinst:${PN}-chassis:append() {
     for i in ${OBMC_CHASSIS_INSTANCES};
     do
-        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.Chassis@${i}.service"
         TARGET="../xyz.openbmc_project.State.Chassis@.service"
         ln -s $TARGET $LINK
     done
@@ -98,7 +98,7 @@ pkg_postinst:${PN}-chassis:append() {
 pkg_prerm:${PN}-chassis:append() {
     for i in ${OBMC_CHASSIS_INSTANCES};
     do
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Chassis@${i}.service"
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.Chassis@${i}.service"
         rm $LINK
     done
 }
@@ -142,14 +142,14 @@ pkg_prerm:${PN}-chassis-poweron-log:append() {
 pkg_postinst:${PN}-host:append() {
     for i in ${OBMC_HOST_INSTANCES};
     do
-        mkdir -p $D$systemd_system_unitdir/multi-user.target.requires
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
+        mkdir -p $D$systemd_system_unitdir/multi-user.target.wants
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.Host@${i}.service"
         TARGET="../xyz.openbmc_project.State.Host@.service"
         ln -s $TARGET $LINK
 
         if ${@bb.utils.contains('PACKAGECONFIG', 'host-gpio', 'true', 'false', d)}
         then
-            LINK="$D$systemd_system_unitdir/multi-user.target.requires/phosphor-host-condition-gpio@${i}.service"
+            LINK="$D$systemd_system_unitdir/multi-user.target.wants/phosphor-host-condition-gpio@${i}.service"
             TARGET="../phosphor-host-condition-gpio@.service"
             ln -s $TARGET $LINK
         fi
@@ -159,7 +159,7 @@ pkg_postinst:${PN}-host:append() {
 pkg_prerm:${PN}-host:append() {
     for i in ${OBMC_HOST_INSTANCES};
     do
-        LINK="$D$systemd_system_unitdir/multi-user.target.requires/xyz.openbmc_project.State.Host@${i}.service"
+        LINK="$D$systemd_system_unitdir/multi-user.target.wants/xyz.openbmc_project.State.Host@${i}.service"
         rm $LINK
     done
 }
