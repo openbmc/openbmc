@@ -66,7 +66,9 @@ do_compile:prepend() {
 
 RDEPENDS:${PN} += "bash"
 
-FILES:${PN}-faultmonitor += "${bindir}/phosphor-fru-fault-monitor"
+FILES:${PN} += "${datadir}/dbus-1/system.d"
+FILES:${PN}-faultmonitor += "${libexecdir}/phosphor-fru-fault-monitor"
+FILES:${PN}-faultmonitor += "${systemd_unitdir}/system/obmc-fru-fault-monitor.service"
 
 require ${PN}.inc
 
