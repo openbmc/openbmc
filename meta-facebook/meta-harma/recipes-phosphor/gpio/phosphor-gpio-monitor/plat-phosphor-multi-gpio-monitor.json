@@ -232,7 +232,7 @@
         "Targets": {
             "RISING": ["gpios-deassert-log@3_fcb2-activate.service"],
             "FALLING": [
-                "gpios-assert-log@3_fcb1-activate.service",
+                "gpios-assert-log@3_fcb2-activate.service",
                 "fan-reload.service"
             ]
         },
@@ -246,7 +246,7 @@
         "Targets": {
             "RISING": ["gpios-deassert-log@4_fcb1-activate.service"],
             "FALLING": [
-                "gpios-assert-log@4_fcb0-activate.service",
+                "gpios-assert-log@4_fcb1-activate.service",
                 "fan-reload.service"
             ]
         },
