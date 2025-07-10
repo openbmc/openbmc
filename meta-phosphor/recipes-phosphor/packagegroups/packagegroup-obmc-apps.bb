@@ -182,10 +182,13 @@ RRECOMMENDS:${PN}-user-mgmt = " \
         "
 
 SUMMARY:${PN}-user-mgmt-ldap = "LDAP users and groups support"
-RDEPENDS:${PN}-user-mgmt-ldap = " \
+LDAP_PACKAGE_SET = " \
         ${PN}-user-mgmt \
         nss-pam-ldapd \
         phosphor-ldap \
+        "
+RDEPENDS:${PN}-user-mgmt-ldap = " \
+        ${@bb.utils.contains('DISTRO_FEATURES', 'ldap', '${LDAP_PACKAGE_SET}', '', d)} \
         "
 
 SUMMARY:${PN}-dmtf-pmci = "DMTF PMCI Protocol Implementations"
