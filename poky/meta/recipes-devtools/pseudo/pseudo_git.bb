@@ -12,9 +12,9 @@ SRC_URI:append:class-nativesdk = " \
     file://older-glibc-symbols.patch"
 SRC_URI[prebuilt.sha256sum] = "ed9f456856e9d86359f169f46a70ad7be4190d6040282b84c8d97b99072485aa"
 
-SRCREV = "b4645cb30573c5b3d5e94b9d50e1e2f8beefe9be"
+SRCREV = "d1db9c219abf92f15303486a409292237f1fc790"
 S = "${WORKDIR}/git"
-PV = "1.9.2"
+PV = "1.9.2+git"
 
 # largefile and 64bit time_t support adds these macros via compiler flags globally
 # remove them for pseudo since pseudo intercepts some of the functions which will be
