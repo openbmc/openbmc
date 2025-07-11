@@ -1,0 +1,4 @@
+SUBSYSTEM=="tty",ENV{ID_PATH}=="platform-1e6a3000.usb-usb-0:1.2.1.6:1.0",SYMLINK+="ctrlcpnic1",ENV{SYSTEMD_WANTS}="obmc-console@ctrlcpnic1",TAG+="systemd"
+SUBSYSTEM=="tty",ENV{ID_PATH}=="platform-1e6a3000.usb-usb-0:1.2.2.6:1.0",SYMLINK+="ctrlcpnic2",ENV{SYSTEMD_WANTS}="obmc-console@ctrlcpnic2",TAG+="systemd"
+SUBSYSTEM=="tty",ENV{ID_PATH}=="platform-1e6a3000.usb-usb-0:1.2.3.6:1.0",SYMLINK+="ctrlcpnic3",ENV{SYSTEMD_WANTS}="obmc-console@ctrlcpnic3",TAG+="systemd"
+SUBSYSTEM=="tty",ENV{ID_PATH}=="platform-1e6a3000.usb-usb-0:1.2.4.6:1.0",SYMLINK+="ctrlcpnic4",ENV{SYSTEMD_WANTS}="obmc-console@ctrlcpnic4",TAG+="systemd"

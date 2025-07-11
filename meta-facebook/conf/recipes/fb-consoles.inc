@@ -22,3 +22,18 @@ fb_get_consoles[vardeps] += "OBMC_HOST_INSTANCES OBMC_CONSOLE_HOST_TTY OBMC_CONS
 OBMC_CONSOLE_TTYS = "${@fb_get_consoles(d)}"
 OBMC_CONSOLE_TTYS:fb-nohost = ""
 OBMC_CONSOLE_TTYS[vardeps] += "fb_get_consoles"
+
+# Calculate the TTY assignments for the NICs.
+def fb_get_consoles_nic(d):
+    nic_instances = d.getVar('OBMC_NIC_INSTANCES', True)
+    if not nic_instances:
+        return ""
+
+    consoles = \
+        [ f"ctrlcpnic{int(i) + 1}" for i in nic_instances.split()]
+
+    return " ".join(consoles)
+fb_get_consoles_nic[vardeps] += "OBMC_NIC_INSTANCES"
+
+OBMC_CONSOLE_TTYS_NIC = "${@fb_get_consoles_nic(d)}"
+OBMC_CONSOLE_TTYS_NIC[vardeps] += "fb_get_consoles_nic"
