@@ -750,6 +750,8 @@ elif [ "$ACTION" = "$ACTION_STATUS" ];then
     HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
     echo "$HOST_CURR_STATUS"
 else
+    renice -10 $$ >/dev/null 2>&1
+
     HOST_CURR_STATUS=$(get_host_status "$SLED_NUM")
 
     if [ "$ACTION" = "$ACTION_BOOT_MODE" ]; then

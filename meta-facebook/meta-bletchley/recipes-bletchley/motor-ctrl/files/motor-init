@@ -10,6 +10,8 @@ export PATH=$PATH:/usr/libexec
 # shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
 source /usr/libexec/bletchley-common-functions
 
+renice -10 $$ >/dev/null 2>&1
+
 PWM_CLASS_PATH="/sys/class/pwm/pwmchip0"
 #Sleld 1~6 using bmc pwm8~13 as motor driver stick
 PWM_NUM_OFFSET=7
