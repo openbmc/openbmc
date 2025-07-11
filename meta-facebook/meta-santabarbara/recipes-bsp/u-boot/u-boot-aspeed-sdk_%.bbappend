@@ -1,2 +1,2 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-SRC_URI +="file://santabarbara.cfg"
+SRC_URI += "file://santabarbara.cfg"
