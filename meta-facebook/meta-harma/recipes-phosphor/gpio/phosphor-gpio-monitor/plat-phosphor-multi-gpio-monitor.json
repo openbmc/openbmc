@@ -256,9 +256,13 @@
         "Name": "health-mmc",
         "ChipId": "5",
         "GpioNum": 7,
-        "EventMon": "RISING",
+        "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["mmc-recovery.service"]
+            "RISING": [
+                "mmc-recovery.service",
+                "smc-deassert-log@5_health-mmc.service"],
+            "FALLING": [
+                "smc-assert-log@5_health-mmc.timer"]
         },
         "Continue": true
     }

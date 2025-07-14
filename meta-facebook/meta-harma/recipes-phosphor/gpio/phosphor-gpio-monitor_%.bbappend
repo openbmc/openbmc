@@ -40,6 +40,10 @@ SRC_URI += "file://assert-post-end \
             file://power-rail-event-logger \
             file://prochot-assert-log.service \
             file://prochot-deassert-log.service \
+            file://smc-assert-log@.service \
+            file://smc-assert-log@.timer \
+            file://smc-deassert-log@.service \
+            file://smc-event-logger \
             file://thermtrip-assert-log.service \
             file://thermtrip-deassert-log.service \
             file://thermal-event-logger \
@@ -60,14 +64,17 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-post-end.service \
     deassert-reset-button.service \
     deassert-uart-switch-button.service \
-    mmc-recovery.service \
-    multi-gpios-sys-init.service \
     device-reinitial@.service \
     fan-reload.service \
-    thermtrip-assert-log.service \
-    thermtrip-deassert-log.service  \
+    mmc-recovery.service \
+    multi-gpios-sys-init.service \
     prochot-assert-log.service \
     prochot-deassert-log.service  \
+    smc-assert-log@.service \
+    smc-assert-log@.timer \
+    smc-deassert-log@.service \
+    thermtrip-assert-log.service \
+    thermtrip-deassert-log.service  \
     "
 
 do_install:append() {
@@ -82,10 +89,12 @@ do_install:append() {
 
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.timer ${D}${systemd_system_unitdir}
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/gpios-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
 
