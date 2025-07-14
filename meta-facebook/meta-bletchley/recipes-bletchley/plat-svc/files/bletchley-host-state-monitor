@@ -127,6 +127,8 @@ check_host_state()
     return 0
 }
 
+update_chassis_power_state "0" "On"
+
 while true
 do
     for i in $(seq 1 "$MAX_SLED_NUM")
