@@ -1,0 +1,7 @@
+/xyz/openbmc_project/software/chassis/Santabarbara_MB_cpld:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
