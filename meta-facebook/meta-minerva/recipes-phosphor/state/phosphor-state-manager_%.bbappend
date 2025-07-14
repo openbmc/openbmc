@@ -10,6 +10,8 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
 
 RDEPENDS:${PN}:append = " bash"
 
+RRECOMMENDS:${PN}-chassis:remove = " ${PN}-chassis-poweron-log"
+
 SRC_URI:append:minerva = " \
     file://chassis-powercycle \
     file://chassis-powercycle@.service \
