@@ -1,6 +1,7 @@
 [Unit]
 Wants=mapper-wait@-xyz-openbmc_project-state-host0.service
 After=mapper-wait@-xyz-openbmc_project-state-host0.service
+Before=xyz.openbmc_project.psusensor.service
 
 
 [Service]
