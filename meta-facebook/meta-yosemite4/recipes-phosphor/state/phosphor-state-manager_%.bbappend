@@ -70,6 +70,7 @@ SRC_URI:append = " \
     file://log-chassis-powercycle-sel@.service \
     file://policy-chassis-poweron \
     file://policy-chassis-poweron@.service \
+    file://yosemite4-dbus-timeout.conf \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -77,6 +78,11 @@ RDEPENDS:${PN}:append = " bash"
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
+    for s in ${D}${systemd_system_unitdir}/*.service; do
+        [ -e "$s" ] || continue
+        install -d "$s.d"
+        install -m 0644 ${UNPACKDIR}/yosemite4-dbus-timeout.conf "$s.d/"
+    done
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
@@ -97,4 +103,8 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/policy-chassis-poweron ${D}${libexecdir}/${PN}/
 }
 
-FILES:${PN} += " ${systemd_system_unitdir}/*.service"
+FILES:${PN} += " \
+    ${systemd_system_unitdir}/*.service \
+    ${systemd_system_unitdir}/*.service.d \
+    ${systemd_system_unitdir}/*.service.d/*.conf \
+"
