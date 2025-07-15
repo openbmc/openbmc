@@ -55,9 +55,13 @@ update_pfx() {
 
   # DHCP Relay workaround until alternate source port is supported
   # TODO: Remove this once internal relaying cleanups land
-  gbmc-ncsi-smartnic-wa.sh || true
+  gbmc-ncsi-smartnic-wa.sh "$RA_IF" || true
 
-  gbmc_br_set_runtime_ip ncsi-ra "$pfx"
+  # We need to know which NCSI path has which route
+  mkdir -p /run/ncsi-ips
+  echo "$pfx" >/run/ncsi-ips/"$RA_IF"
+
+  gbmc_br_set_runtime_ip "$RA_IF-ra" "$pfx"
 }
 
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-ra.sh

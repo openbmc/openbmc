@@ -33,12 +33,12 @@ gbmc_ncsi_nft_update() {
 
   local ip4="$gbmc_ncsi_nft_lastip4"
   if [ -n "$ip4" ]; then
-    contents+="        ip daddr $ip4 goto ncsi_legacy_input"$'\n'
+    contents+="        ip daddr $ip4 jump ncsi_legacy_input"$'\n'
   fi
 
   local ip6="$gbmc_ncsi_nft_lastip6"
   if [ -n "$ip6" ]; then
-    contents+="        ip6 daddr $ip6 goto ncsi_legacy_input"$'\n'
+    contents+="        ip6 daddr $ip6 jump ncsi_legacy_input"$'\n'
   fi
 
   contents+='    }'$'\n'

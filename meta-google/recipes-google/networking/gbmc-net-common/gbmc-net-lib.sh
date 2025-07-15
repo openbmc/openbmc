@@ -34,4 +34,12 @@ gbmc_net_networkd_reload() {
   done
 }
 
+GBMC_INTF_ROUTE_TABLE_BASE=1000
+gbmc_net_route_table_for_intf() {
+  local intf="$1"
+  local idx=
+  idx="$(cat /sys/class/net/"$intf"/ifindex)" || return
+  echo $((GBMC_INTF_ROUTE_TABLE_BASE + idx))
+}
+
 gbmc_net_lib_init=1

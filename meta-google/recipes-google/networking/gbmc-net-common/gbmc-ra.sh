@@ -29,8 +29,6 @@ old_mac=invalid
 old_pfx=invalid
 old_fqdn=invalid
 
-ROUTE_TABLE=$ROUTE_METRIC
-
 default_update_rtr() {
   local rtr="$1"
   local mac="$2"
@@ -41,6 +39,9 @@ default_update_rtr() {
     return 0
   fi
 
+  local route_table
+  route_table="$(gbmc_net_route_table_for_intf "$RA_IF")" || return
+
   # It's important that this happens before the main table default router is configured.
   # Otherwise, the IP source determination logic won't be able to pick the best route.
   # Also we don't need to remove the route per table.
@@ -49,10 +50,10 @@ default_update_rtr() {
     for file in /run/systemd/network/{00,}-bmc-$RA_IF.network; do
       mkdir -p "$file.d"
       printf '[Route]\nGateway=%s\nGatewayOnLink=true\nMetric=512\nTable=%d' \
-        "$rtr" "$ROUTE_TABLE" >"$file.d"/10-gateway-table.conf
+        "$rtr" "$route_table" >"$file.d"/10-gateway-table.conf
     done
 
-    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric 512 table "$ROUTE_TABLE" || \
+    ip -6 route replace default via "$rtr" onlink dev "$RA_IF" metric 512 table "$route_table" || \
       gbmc_net_networkd_reload "$RA_IF"
   fi
 

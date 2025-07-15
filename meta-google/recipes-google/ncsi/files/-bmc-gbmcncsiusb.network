@@ -1,0 +1,9 @@
+[Match]
+Property=ID_BUS=usb ID_VENDOR_ID=0424 ID_MODEL_ID=ec00
+[Network]
+DHCP=false
+IPv6AcceptRA=false
+LLMNR=false
+MulticastDNS=false
+LinkLocalAddressing=ipv6
+IgnoreCarrierLoss=yes

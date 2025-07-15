@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+[[ "$1" != "@NCSI_IF@" ]] && exit 0
+
 HAS_DHCRELAY='@GBMC_DHCP_RELAY@'
 
 if [ "$HAS_DHCRELAY" = 1 ]; then
@@ -33,11 +35,14 @@ fi
 read -r -d '' contents <<EOF
 table inet filter {
   chain ncsi_legacy_input {
-      udp dport {546,547} accept
+    udp dport {546,547} accept
+  }
+  chain ncsi_input {
+    jump ncsi_gbmc_br_pub_input
   }
 }
 EOF
-rfile=/run/nftables/60-gbmc-ncsi-ra.rules
+rfile=/run/nftables/40-gbmc-ncsi-smartnic.rules
 mkdir -p "$(dirname "$rfile")"
 printf '%s' "$contents" >"$rfile"
 systemctl reset-failed nftables

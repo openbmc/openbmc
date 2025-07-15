@@ -17,7 +17,7 @@ SRC_URI += " \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.network'} \
   file://50-gbmc-ncsi.rules.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.service.in'} \
-  file://gbmc-ncsi-ra.service.in \
+  file://gbmc-ncsi-ra@.service \
   file://gbmc-ncsi-ra.sh \
   file://gbmc-ncsi-smartnic-wa.sh.in \
   file://gbmc-ncsi-sslh.socket.in \
@@ -25,6 +25,7 @@ SRC_URI += " \
   file://gbmc-ncsi-nft.sh.in \
   file://gbmc-ncsi-br-pub-addr.sh.in \
   file://gbmc-ncsi-br-deprecated-ips.sh.in \
+  file://gbmc-ncsi-usb.sh \
   file://gbmc-ncsi-set-nicenabled.service.in \
   file://gbmc-ncsi-networkd-wait.target.in \
   file://gbmc-ncsi-alias.service.in \
@@ -32,6 +33,8 @@ SRC_URI += " \
   file://gbmc-ncsi-old.service.in \
   file://gbmc-ncsi-purge.service.in \
   file://00-bmc-ncsi.network.in \
+  file://-bmc-gbmcncsiusb.link \
+  file://-bmc-gbmcncsiusb.network \
   file://00-ncsi.conf \
   "
 
@@ -60,7 +63,6 @@ SYSTEMD_SERVICE:${PN} += " \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
   gbmc-ncsi-set-nicenabled.service \
-  gbmc-ncsi-ra.service \
   ${@'' if d.getVar('GBMC_NCSI_IF_OLD') == '' else 'gbmc-ncsi-old.service'} \
   ${@'' if d.getVar('GBMC_NCSI_PURGE_ETC') == '' else 'gbmc-ncsi-purge.service'} \
   "
@@ -91,6 +93,11 @@ do_install:append() {
       ${D}${systemd_unitdir}/network/
   fi
 
+  install -m0644 ${UNPACKDIR}/-bmc-gbmcncsiusb.link \
+    ${D}${systemd_unitdir}/network/
+  install -m0644 ${UNPACKDIR}/-bmc-gbmcncsiusb.network \
+    ${D}${systemd_unitdir}/network/
+
   netfile=${D}${systemd_unitdir}/network/00-bmc-$if_name.network
   sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/00-bmc-ncsi.network.in >$netfile
   install -d -m0755 $netfile.d
@@ -104,6 +111,7 @@ do_install:append() {
   wantdir=${D}${systemd_system_unitdir}/multi-user.target.wants
   install -d -m0755 "$wantdir"
   ln -sv ../ncsid@.service "$wantdir"/ncsid@$if_name.service
+  ln -sv ../gbmc-ncsi-ra@.service "$wantdir"/gbmc-ncsi-ra@$if_name.service
 
   sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-alias.service.in \
     >${D}${systemd_system_unitdir}/gbmc-ncsi-alias.service
@@ -127,6 +135,7 @@ do_install:append() {
   sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-br-deprecated-ips.sh.in \
     >${UNPACKDIR}/gbmc-ncsi-br-deprecated-ips.sh
   install -m644 ${UNPACKDIR}/gbmc-ncsi-br-deprecated-ips.sh $mondir
+  install -m644 ${UNPACKDIR}/gbmc-ncsi-usb.sh $mondir
 
   brlibdir=${D}${datadir}/gbmc-br-lib/
   install -d -m0755 $brlibdir
@@ -155,9 +164,7 @@ do_install:append() {
       >${D}${systemd_system_unitdir}/gbmc-ncsi-purge.service
   fi
 
-  sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-ra.service.in \
-    >${UNPACKDIR}/gbmc-ncsi-ra.service
-  install -m0644 ${UNPACKDIR}/gbmc-ncsi-ra.service ${D}${systemd_system_unitdir}
+  install -m0644 ${UNPACKDIR}/gbmc-ncsi-ra@.service ${D}${systemd_system_unitdir}
   install -d -m0755 ${D}${libexecdir}
   install -m0755 ${UNPACKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/
 

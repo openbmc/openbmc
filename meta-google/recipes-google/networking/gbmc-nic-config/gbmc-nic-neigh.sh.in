@@ -22,8 +22,6 @@ source /usr/share/gbmc-net-lib.sh || exit
 
 gbmc_nic_neigh_intfs=(@IFS@)
 gbmc_nic_neigh_addr=
-GBMC_NIC_ROUTE_TABLE=800
-GBMC_NIC_ROUTE_PREF=$GBMC_NIC_ROUTE_TABLE
 
 gbmc_nic_neigh_set() {
   local act="$1"
@@ -32,22 +30,24 @@ gbmc_nic_neigh_set() {
   echo "gBMC NIC Neigh $act $ip: ${gbmc_nic_neigh_intfs[*]}" >&2
 
   local intf
-  local contents
   local failed_intfs=()
-  read -r -d '' contents <<EOF
+  for intf in "${gbmc_nic_neigh_intfs[@]}"; do
+    local rt
+    rt="$(gbmc_net_route_table_for_intf "$intf")" || continue
+    local contents
+    read -r -d '' contents <<EOF
 [RoutingPolicyRule]
 To=$ip/64
 Table=main
-Priority=$(( GBMC_NIC_ROUTE_PREF - 1 ))
+Priority=$GBMC_INTF_ROUTE_TABLE_BASE
 [RoutingPolicyRule]
 From=$ip/64
-Table=$GBMC_NIC_ROUTE_TABLE
-Priority=$GBMC_NIC_ROUTE_PREF
+Table=$rt
+Priority=$rt
 [Network]
 IPv6ProxyNDP=yes
 IPv6ProxyNDPAddress=$ip
 EOF
-  for intf in "${gbmc_nic_neigh_intfs[@]}"; do
     # Override any existing gateway information within files
     # Make sure we cover `00-*` and `-*` files
     for file in /run/systemd/network/{00,}-bmc-"$intf".network; do
@@ -60,14 +60,14 @@ EOF
     done
 
     local st=0
-    ip -6 rule del pref $(( GBMC_NIC_ROUTE_PREF - 1 )) table main 2>dev/null || true
-    ip -6 rule del pref "$GBMC_NIC_ROUTE_PREF" 2>/dev/null || true
+    ip -6 rule del to "$ip/64" pref "$GBMC_INTF_ROUTE_TABLE_BASE" lookup main 2>dev/null || true
+    ip -6 rule del from "$ip/64" pref "$rt" lookup "$rt" 2>/dev/null || true
 
     if [[ "$act" == add ]]; then
       sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null || st=$?
       ip -6 neigh "$act" proxy "$ip" dev "$intf" || st=$?
-      ip -6 rule add from all to "$ip/64" pref $(( GBMC_NIC_ROUTE_PREF - 1 )) table main proto static || st=$?
-      ip -6 rule add pref "$GBMC_NIC_ROUTE_PREF" from "$ip/64" lookup "$GBMC_NIC_ROUTE_TABLE" || st=$?
+      ip -6 rule add to "$ip/64" pref "$GBMC_INTF_ROUTE_TABLE_BASE" lookup main || st=$?
+      ip -6 rule add from "$ip/64" pref "$rt" lookup "$rt" || st=$?
     fi
     [[ "$st" == "0" ]] || failed_intfs+=("$intf")
 
@@ -124,7 +124,7 @@ gbmc_nic_neigh_hook() {
     local gbmcintf
     for gbmcintf in "${gbmc_nic_neigh_intfs[@]}"; do
       if [[ $intf == "$gbmcintf" ]]; then
-	ip neigh replace proxy "$gbmc_nic_neigh_addr" dev "$intf"
+        ip neigh replace proxy "$gbmc_nic_neigh_addr" dev "$intf"
       fi
     done
   fi

@@ -6,6 +6,7 @@ table inet filter {
         udp dport {68,547} accept
         ip protocol icmp accept
         jump gbmc_br_pub_input
+        reject
     }
     chain gbmc_br_pub_input {
         ip6 nexthdr icmpv6 accept

@@ -1,0 +1,5 @@
+[Match]
+Property=ID_BUS=usb ID_VENDOR_ID=0424 ID_MODEL_ID=ec00
+[Link]
+Alias=ncsi-usb
+NamePolicy=keep kernel database onboard slot path
