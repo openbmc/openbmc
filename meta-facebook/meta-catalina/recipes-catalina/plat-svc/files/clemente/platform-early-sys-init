@@ -75,6 +75,12 @@ bind_i2c_device at24 21-0054
 bind_i2c_device at24 1-0050
 # rebind FIO FRU
 bind_i2c_device at24 23-0051
+# rebind Interposer CPLD IOEXP
+bind_i2c_device pca953x 14-0010
+bind_i2c_device pca953x 14-0011
+bind_i2c_device pca953x 14-0012
+bind_i2c_device pca953x 14-0013
+bind_i2c_device pca953x 14-0014
 
 # Set fan target and enable all fan input as early as possible
 config_fan
