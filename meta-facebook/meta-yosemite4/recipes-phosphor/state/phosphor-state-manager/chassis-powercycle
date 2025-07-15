@@ -86,13 +86,48 @@ disable_i3c_hub()
     } 100>$i3c_hub_lock
 }
 
+lock_cleanup() {
+    (
+        flock -x 200
+        count=$(cat "$counter_file")
+        count=$((count - 1))
+        [ "$count" -lt 0 ] && count=0
+        echo "$count" > "$counter_file"
+    ) 200>"$chassis_power_cycle_lock"
+}
+
+acquire_lock() {
+    (
+        flock -x 200 || exit 1
+
+        count=$(cat "$counter_file")
+        count=${count:-0}
+
+        if [ "$count" -lt "$max_allowed" ]; then
+            count=$((count + 1))
+            echo "$count" > "$counter_file"
+            exit 0
+        fi
+        exit 1
+    ) 200>"$chassis_power_cycle_lock"
+}
+
 chassis-power-cycle()
 {
     chassis_power_cycle_lock="/run/chassis_power_cycle.lock"
+    counter_file="/run/chassis_power_cycle.counter"
+    max_allowed=2
+    touch "$counter_file"
 
-    exec 200>"$chassis_power_cycle_lock"
-    flock -x 200
-    trap 'flock -u 200' EXIT
+    # Block until allowed
+    while true; do
+        if acquire_lock; then
+          break
+        fi
+        sleep 1
+    done
+    trap lock_cleanup EXIT
+    trap lock_cleanup SIGINT SIGTERM SIGHUP SIGQUIT
 
     if [ "$CHASSIS_ID" -le 8  ]
     then
@@ -151,7 +186,7 @@ chassis-power-cycle()
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
             msg="Chassis$CHASSIS_ID is AC power on"
             echo "${msg}"
-            flock -u 200
+            lock_cleanup
             exit 0;
         else
             # Set host state to off
@@ -160,13 +195,13 @@ chassis-power-cycle()
             msg="Chassis$CHASSIS_ID AC power cycle failed, Chassis$CHASSIS_ID is AC power off"
             echo "${msg}"
             add_sel "${msg}" "Error"
-            flock -u 200
+            lock_cleanup
             exit 1;
         fi
     fi
 
     echo "Invalid slot id"
-    flock -u 200
+    lock_cleanup
     exit 1;
 }
 
