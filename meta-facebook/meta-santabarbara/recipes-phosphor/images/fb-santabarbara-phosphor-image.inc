@@ -20,3 +20,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
+
+# Monitor the chassis power status
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-power-control \
+"
