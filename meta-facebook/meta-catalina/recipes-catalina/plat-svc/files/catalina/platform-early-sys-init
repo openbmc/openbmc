@@ -151,7 +151,12 @@ config_vr()
 }
 
 # Enable standby power and bind i2c components
-/usr/libexec/plat-svc/standby-power-enable
+echo "Attempting to enable standby power..."
+if /usr/libexec/plat-svc/standby-power-enable; then
+    echo "Standby power enable successful."
+else
+    echo "Error: Standby power enable failed."
+fi
 
 # Workaround, rebind PDB i2c mux
 bind_i2c_device pca954x 1-0070 3
