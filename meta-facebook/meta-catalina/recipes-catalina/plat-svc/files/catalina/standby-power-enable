@@ -40,58 +40,58 @@ bind_i2c_muxes()
 {
     # Module 0 I2C Mux
     # i2c24 - i2c27
-    bind_i2c_device pca954x 0-0071
+    bind_i2c_device pca954x 0-0071 3
     # i2c28 - i2c31
-    bind_i2c_device pca954x 0-0072
+    bind_i2c_device pca954x 0-0072 3
     # i2c32 - i2c35
-    bind_i2c_device pca954x 0-0073
+    bind_i2c_device pca954x 0-0073 3
 
     # Module 1 I2C Mux
     # i2c36 - i2c39
-    bind_i2c_device pca954x 0-0075
+    bind_i2c_device pca954x 0-0075 3
     # i2c40 - i2c43
-    bind_i2c_device pca954x 0-0076
+    bind_i2c_device pca954x 0-0076 3
     # i2c44 - i2c47
-    bind_i2c_device pca954x 0-0077
+    bind_i2c_device pca954x 0-0077 3
 
     # HDD Board I2C Mux, i2c48 - i2c55
-    bind_i2c_device pca954x 5-0070
+    bind_i2c_device pca954x 5-0070 3
 }
 
 bind_gpio_expanders()
 {
     # Module 0 IOEXP
-    bind_i2c_device pca953x 2-0020
+    bind_i2c_device pca953x 2-0020 3
     # Module 1 IOEXP
-    bind_i2c_device pca953x 2-0021
+    bind_i2c_device pca953x 2-0021 3
     # HMC IOEXP
-    bind_i2c_device pca953x 2-0027
+    bind_i2c_device pca953x 2-0027 3
     # BMC IOEXP
-    bind_i2c_device pca953x 6-0021
+    bind_i2c_device pca953x 6-0021 3
     # IO Mezz 0 IOEXP
-    bind_i2c_device pca953x 29-0020
+    bind_i2c_device pca953x 29-0020 3
     # IO Mezz 1 IOEXP
-    bind_i2c_device pca953x 41-0021
+    bind_i2c_device pca953x 41-0021 3
 }
 
 bind_fru_eeproms()
 {
     # Module 0 FRU
-    bind_i2c_device at24 13-0050
+    bind_i2c_device at24 13-0050 3
     # Module 1 FRU
-    bind_i2c_device at24 12-0050
+    bind_i2c_device at24 12-0050 3
     # HMC FRU
-    bind_i2c_device at24 13-0057
+    bind_i2c_device at24 13-0057 3
     # Left CBC FRU
-    bind_i2c_device at24 13-0054
+    bind_i2c_device at24 13-0054 3
     # Right CBC FRU
-    bind_i2c_device at24 13-0055
+    bind_i2c_device at24 13-0055 3
     # IO Mezz 0 FRU
-    bind_i2c_device at24 29-0050
+    bind_i2c_device at24 29-0050 3
     # IO Mezz 1 FRU
-    bind_i2c_device at24 41-0050
+    bind_i2c_device at24 41-0050 3
     # HDD Board FRU
-    bind_i2c_device at24 54-0052
+    bind_i2c_device at24 54-0052 3
 }
 
 reset_host_usb()
