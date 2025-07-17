@@ -7,11 +7,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-1.service",
-                "led-blue-assert@compute-tray-1.service"
+                "led-blue-assert@leakport1.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-1.service",
-                "led-blue-deassert@compute-tray-1.service"
+                "led-blue-deassert@leakport1.service"
             ]
         },
         "Continue": true
@@ -24,11 +24,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-2.service",
-                "led-blue-assert@compute-tray-2.service"
+                "led-blue-assert@leakport2.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-2.service",
-                "led-blue-deassert@compute-tray-2.service"
+                "led-blue-deassert@leakport2.service"
             ]
         },
         "Continue": true
@@ -41,11 +41,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-3.service",
-                "led-blue-assert@compute-tray-3.service"
+                "led-blue-assert@leakport3.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-3.service",
-                "led-blue-deassert@compute-tray-3.service"
+                "led-blue-deassert@leakport3.service"
             ]
         },
         "Continue": true
@@ -58,11 +58,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-4.service",
-                "led-blue-assert@compute-tray-4.service"
+                "led-blue-assert@leakport4.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-4.service",
-                "led-blue-deassert@compute-tray-4.service"
+                "led-blue-deassert@leakport4.service"
             ]
         },
         "Continue": true
@@ -75,11 +75,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-5.service",
-                "led-blue-assert@compute-tray-5.service"
+                "led-blue-assert@leakport5.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-5.service",
-                "led-blue-deassert@compute-tray-5.service"
+                "led-blue-deassert@leakport5.service"
             ]
         },
         "Continue": true
@@ -92,11 +92,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-6.service",
-                "led-blue-assert@compute-tray-6.service"
+                "led-blue-assert@leakport6.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-6.service",
-                "led-blue-deassert@compute-tray-6.service"
+                "led-blue-deassert@leakport6.service"
             ]
         },
         "Continue": true
@@ -109,11 +109,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-7.service",
-                "led-blue-assert@compute-tray-7.service"
+                "led-blue-assert@leakport7.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-7.service",
-                "led-blue-deassert@compute-tray-7.service"
+                "led-blue-deassert@leakport7.service"
             ]
         },
         "Continue": true
@@ -126,11 +126,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-8.service",
-                "led-blue-assert@compute-tray-8.service"
+                "led-blue-assert@leakport8.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-8.service",
-                "led-blue-deassert@compute-tray-8.service"
+                "led-blue-deassert@leakport8.service"
             ]
         },
         "Continue": true
@@ -143,11 +143,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-1.service",
-                "led-blue-assert@nvs-tray-1.service"
+                "led-blue-assert@leakport9.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-1.service",
-                "led-blue-deassert@nvs-tray-1.service"
+                "led-blue-deassert@leakport9.service"
             ]
         },
         "Continue": true
@@ -160,11 +160,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-2.service",
-                "led-blue-assert@nvs-tray-2.service"
+                "led-blue-assert@leakport10.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-2.service",
-                "led-blue-deassert@nvs-tray-2.service"
+                "led-blue-deassert@leakport10.service"
             ]
         },
         "Continue": true
@@ -177,11 +177,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-11.service",
-                "led-blue-assert@compute-tray-11.service"
+                "led-blue-assert@leakport20.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-11.service",
-                "led-blue-deassert@compute-tray-11.service"
+                "led-blue-deassert@leakport20.service"
             ]
         },
         "Continue": true
@@ -194,11 +194,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-12.service",
-                "led-blue-assert@compute-tray-12.service"
+                "led-blue-assert@leakport21.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-12.service",
-                "led-blue-deassert@compute-tray-12.service"
+                "led-blue-deassert@leakport21.service"
             ]
         },
         "Continue": true
@@ -211,11 +211,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-13.service",
-                "led-blue-assert@compute-tray-13.service"
+                "led-blue-assert@leakport22.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-13.service",
-                "led-blue-deassert@compute-tray-13.service"
+                "led-blue-deassert@leakport22.service"
             ]
         },
         "Continue": true
@@ -228,11 +228,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-14.service",
-                "led-blue-assert@compute-tray-14.service"
+                "led-blue-assert@leakport23.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-14.service",
-                "led-blue-deassert@compute-tray-14.service"
+                "led-blue-deassert@leakport23.service"
             ]
         },
         "Continue": true
@@ -245,11 +245,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-15.service",
-                "led-blue-assert@compute-tray-15.service"
+                "led-blue-assert@leakport24.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-15.service",
-                "led-blue-deassert@compute-tray-15.service"
+                "led-blue-deassert@leakport24.service"
             ]
         },
         "Continue": true
@@ -262,11 +262,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-16.service",
-                "led-blue-assert@compute-tray-16.service"
+                "led-blue-assert@leakport25.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-16.service",
-                "led-blue-deassert@compute-tray-16.service"
+                "led-blue-deassert@leakport25.service"
             ]
         },
         "Continue": true
@@ -279,11 +279,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-17.service",
-                "led-blue-assert@compute-tray-17.service"
+                "led-blue-assert@leakport26.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-17.service",
-                "led-blue-deassert@compute-tray-17.service"
+                "led-blue-deassert@leakport26.service"
             ]
         },
         "Continue": true
@@ -296,11 +296,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-18.service",
-                "led-blue-assert@compute-tray-18.service"
+                "led-blue-assert@leakport27.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-18.service",
-                "led-blue-deassert@compute-tray-18.service"
+                "led-blue-deassert@leakport27.service"
             ]
         },
         "Continue": true
@@ -313,11 +313,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-3.service",
-                "led-blue-assert@nvs-tray-3.service"
+                "led-blue-assert@leakport11.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-3.service",
-                "led-blue-deassert@nvs-tray-3.service"
+                "led-blue-deassert@leakport11.service"
             ]
         },
         "Continue": true
@@ -330,11 +330,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-4.service",
-                "led-blue-assert@nvs-tray-4.service"
+                "led-blue-assert@leakport12.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-4.service",
-                "led-blue-deassert@nvs-tray-4.service"
+                "led-blue-deassert@leakport12.service"
             ]
         },
         "Continue": true
@@ -347,11 +347,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-5.service",
-                "led-blue-assert@nvs-tray-5.service"
+                "led-blue-assert@leakport13.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-5.service",
-                "led-blue-deassert@nvs-tray-5.service"
+                "led-blue-deassert@leakport13.service"
             ]
         },
         "Continue": true
@@ -364,11 +364,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-6.service",
-                "led-blue-assert@nvs-tray-6.service"
+                "led-blue-assert@leakport14.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-6.service",
-                "led-blue-deassert@nvs-tray-6.service"
+                "led-blue-deassert@leakport14.service"
             ]
         },
         "Continue": true
@@ -381,11 +381,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-7.service",
-                "led-blue-assert@nvs-tray-7.service"
+                "led-blue-assert@leakport15.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-7.service",
-                "led-blue-deassert@nvs-tray-7.service"
+                "led-blue-deassert@leakport15.service"
             ]
         },
         "Continue": true
@@ -398,11 +398,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-8.service",
-                "led-blue-assert@nvs-tray-8.service"
+                "led-blue-assert@leakport16.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-8.service",
-                "led-blue-deassert@nvs-tray-8.service"
+                "led-blue-deassert@leakport16.service"
             ]
         },
         "Continue": true
@@ -415,11 +415,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@nvs-tray-9.service",
-                "led-blue-assert@nvs-tray-9.service"
+                "led-blue-assert@leakport17.service"
             ],
             "RISING": [
                 "power-good-deassert@nvs-tray-9.service",
-                "led-blue-deassert@nvs-tray-9.service"
+                "led-blue-deassert@leakport17.service"
             ]
         },
         "Continue": true
@@ -432,11 +432,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-9.service",
-                "led-blue-assert@compute-tray-9.service"
+                "led-blue-assert@leakport18.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-9.service",
-                "led-blue-deassert@compute-tray-9.service"
+                "led-blue-deassert@leakport18.service"
             ]
         },
         "Continue": true
@@ -449,11 +449,11 @@
         "Targets": {
             "FALLING": [
                 "power-good-assert@compute-tray-10.service",
-                "led-blue-assert@compute-tray-10.service"
+                "led-blue-assert@leakport19.service"
             ],
             "RISING": [
                 "power-good-deassert@compute-tray-10.service",
-                "led-blue-deassert@compute-tray-10.service"
+                "led-blue-deassert@leakport19.service"
             ]
         },
         "Continue": true

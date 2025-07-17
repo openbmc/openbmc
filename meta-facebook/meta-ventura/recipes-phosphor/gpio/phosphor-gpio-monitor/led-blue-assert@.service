@@ -1,6 +1,7 @@
 [Unit]
-Description=%i Leak Detect Assert
+Description=%i Power Good LED Assert
+
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/frontled "%i leak detect assert" "BLADE" "%i"
-SyslogIdentifier=%i-leak-detect-assert
+ExecStart=/usr/libexec/phosphor-gpio-monitor/frontled "%i" "power good LED" "assert"
+SyslogIdentifier=%i-power-good-led-assert

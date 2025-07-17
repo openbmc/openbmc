@@ -8,8 +8,6 @@ SERVICE_LIST = "power-good-assert@.service \
                 rpu-ready-deassert@.service \
                 led-blue-assert@.service \
                 led-blue-deassert@.service \
-                led-amber-assert@.service \
-                led-amber-deassert@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
