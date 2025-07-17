@@ -1,0 +1,7 @@
+[Unit]
+Description=Cooling Rack Toggle Boot Disabled
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/cr-toggle-boot-logger "xyz.openbmc_project.State.LockOut.LockOutDisabled" "Critical"
+SyslogIdentifier=cr-toggleboot-disabled

@@ -1474,5 +1474,15 @@
             "FALLING": ["power-fail-deassert@fcb_6_p48v_zone0.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "CR_TOGGLE_BOOT",
+        "LineName": "CR_TOGGLE_BOOT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["cr-toggle-boot-enabled.service"],
+            "FALLING": ["cr-toggle-boot-disabled.service"]
+        },
+        "Continue": true
     }
 ]

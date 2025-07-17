@@ -1,12 +1,5 @@
 [
     {
-        "Name": "CR_TOGGLE_BOOT",
-        "LineName": "CR_TOGGLE_BOOT_N",
-        "ActiveLow": true,
-        "Bias": "DISABLE",
-        "Inventory": "/system/board/Minerva_CMM/CR_TOGGLE_BOOT"
-    },
-    {
         "Name": "FAN1",
         "LineName": "FAN1_PRSNT",
         "Bias": "DISABLE",
