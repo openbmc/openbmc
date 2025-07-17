@@ -6,11 +6,26 @@ UNPACKDIR = "${S}"
 
 RDEPENDS:${PN} += " bash libgpiod-tools"
 
+FILES:${PN} += "${systemd_system_unitdir}/*"
+
 SRC_URI += " \
     file://yosemite4-common-functions \
+    file://FanboardPowerOff@.service \
+    file://FanboardPowerOn@.service \
+    file://fanboardpower \
     "
 
+SYSTEMD_SERVICE:${PN} += " \
+    FanboardPowerOff@.service \
+    FanboardPowerOn@.service \
+"
+
 do_install() {
-    install -d ${D}${libexecdir}
+    install -d ${D}${libexecdir}/plat-tool
     install -m 0755 ${UNPACKDIR}/yosemite4-common-functions ${D}${libexecdir}
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/FanboardPowerOff@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/FanboardPowerOn@.service ${D}${systemd_system_unitdir}/
+    install -m 0755 ${UNPACKDIR}/fanboardpower ${D}${libexecdir}/plat-tool/
 }

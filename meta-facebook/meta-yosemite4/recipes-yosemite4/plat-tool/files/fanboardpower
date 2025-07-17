@@ -1,0 +1,80 @@
+#!/bin/bash
+# Usage: fanboardpower.sh <on:0|off:1>
+
+ACTION=$1
+FANBOARD=$2
+
+if [[ "$ACTION" != "on" && "$ACTION" != "off" ]]; then
+    echo "Invalid action: $ACTION. Use 'on' or 'off'."
+    # exit 2: parameter error (invalid argument)
+    exit 2
+fi
+
+if [[ "$FANBOARD" -ne "0" && "$FANBOARD" -ne "1" ]]; then
+    echo "Invalid fanboard number: $FANBOARD. Use 0 or 1."
+    # exit 2: parameter error (invalid argument)
+    exit 2
+fi
+
+MEDUSA_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
+MEDUSA_INTERFACE="xyz.openbmc_project.Inventory.Decorator.Revision"
+
+get_medusa_type() {
+    local inventory_path="${MEDUSA_PATH}/MEDUSA_HSC${FANBOARD}_48V"
+    medusa_type=$(busctl introspect xyz.openbmc_project.EntityManager \
+        "$inventory_path" | grep "\.Type" | awk '{print $4}' | tr -d '"')
+    echo "$medusa_type"
+}
+
+get_hsc_addr() {
+    local medusa_type
+    local hsc_addr=16
+    medusa_type=$(get_medusa_type)
+    # Different hardware sources have different I2C addresses.
+    if [ "$medusa_type" = "XDP710" ]; then
+        hsc_addr=$((hsc_addr + 1))
+    fi
+    echo $((hsc_addr + FANBOARD * 2))
+}
+
+check_medusa_revision() {
+    #Get Medusa revision
+    local medusa_revision
+    medusa_revision="$(busctl get-property xyz.openbmc_project.EntityManager ${MEDUSA_PATH} ${MEDUSA_INTERFACE} Version | awk '{print $2}' | tr -d '"')"
+    if [[ "$medusa_revision" != "MP" && "$medusa_revision" != "PVT2" && "$medusa_revision" != "MP Pilot" ]]; then
+        echo "${medusa_revision} does not support this service"
+        # exit 1: runtime error
+        exit 1
+    fi
+}
+
+check_medusa_revision
+
+HSC_ADDR=$(get_hsc_addr)
+
+if [ "$ACTION" = "on" ]; then
+    echo "Fanboard $FANBOARD power on"
+    #Check if it is shut down due to over temperature
+    if [ $(( $(i2cget -f -y 11 "$HSC_ADDR" 0x7d) & 0x80 )) -ne 0 ]; then
+        #set 48vHSC to power off
+        i2ctransfer -f -y 11 w2@"$HSC_ADDR" 0x01 0x00
+    fi
+    #48vHSC Fanboard power on
+    i2ctransfer -f -y 11 w2@"$HSC_ADDR" 0x01 0x80
+    #Check if there is power on
+    if [ "$(i2cget -f -y 11 "$HSC_ADDR" 0x01)" == '0x80' ]; then
+        echo "Successfully power on Fanboard $FANBOARD"
+    else
+        echo "Failed power on Fanboard $FANBOARD"
+    fi
+else
+    echo "Fanboard $FANBOARD power off"
+    #48vHSC Fanboard power off
+    i2ctransfer -f -y 11 w2@"$HSC_ADDR" 0x01 0x00
+    #Check if there is power off
+    if [ "$(i2cget -f -y 11 "$HSC_ADDR" 0x01)" == '0x00' ]; then
+        echo "Successfully power off Fanboard $FANBOARD"
+    else
+        echo "Failed power off Fanboard $FANBOARD"
+    fi
+fi

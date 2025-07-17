@@ -1,0 +1,8 @@
+[Unit]
+Description=Power On Fanboard %i
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/plat-tool/fanboardpower on %i
+SyslogIdentifier=power-on-fanboard %i

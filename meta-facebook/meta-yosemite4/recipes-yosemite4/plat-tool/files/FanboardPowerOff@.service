@@ -1,0 +1,8 @@
+[Unit]
+Description=Power Off Fanboard %i
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/plat-tool/fanboardpower off %i
+SyslogIdentifier=power-off-fanboard %i
