@@ -188,6 +188,7 @@ gbmc_br_gw_src_update() {
     fi
     [[ $route != *" src $new_src "* ]] || continue
     echo "gBMC Bridge Updating GW source [$new_src]: $route" >&2
+    gbmc_br_config_primary_ip "$route" "del"
     # shellcheck disable=SC2086
     ip route change $route src "$new_src" && unset 'gbmc_br_gw_src_routes[$route]'
   done
