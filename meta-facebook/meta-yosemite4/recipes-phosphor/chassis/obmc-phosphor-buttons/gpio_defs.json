@@ -151,6 +151,49 @@
                     "action": "chassis-off"
                 }
             ]
+        },
+        {
+            "name": "HOST_SELECTOR",
+            "polling_mode": true,
+            "polling_interval_ms": 2000,
+            "group_gpio_config": [
+                {
+                "name": "host_select_sel_0",
+                "num": 2340,
+                "direction": "in",
+                "polarity": "active_low"
+                },
+                {
+                "name": "host_select_sel_1",
+                "num": 2341,
+                "direction": "in",
+                "polarity": "active_low"
+                },
+                {
+                "name": "host_select_sel_2",
+                "num": 2342,
+                "direction": "in",
+                "polarity": "active_low"
+                },
+                {
+                "name": "host_select_sel_3",
+                "num": 2343,
+                "direction": "in",
+                "polarity": "active_low"
+                }
+            ],
+            "max_position": 8,
+            "host_selector_map": {
+                "0": 0,
+                "1": 1,
+                "2": 2,
+                "3": 3,
+                "4": 4,
+                "5": 5,
+                "6": 6,
+                "7": 7,
+                "8": 8
+            }
         }
     ]
 }
