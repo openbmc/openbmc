@@ -33,6 +33,7 @@ HOST_AC_OFF="AC Off"
 ACTION_ON="on"
 ACTION_OFF="off"
 ACTION_DFU="dfu"
+ACTION_USB_PD_DFU="usb-pd-dfu"
 ACTION_RECOVERY="recovery"
 ACTION_CYCLE="cycle"
 ACTION_RESET="reset"
@@ -48,6 +49,7 @@ VALID_SLED_ACTIONS="
     $ACTION_AC_OFF
     $ACTION_STATUS
     $ACTION_DFU
+    $ACTION_USB_PD_DFU
     $ACTION_RECOVERY
     $ACTION_CYCLE
     $ACTION_RESET
@@ -441,6 +443,12 @@ function host_state_on_action_handler()
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
             ;;
+        "$ACTION_DFU")
+            do_action_dfu "$SLED_NUM"
+            ;;
+        "$ACTION_USB_PD_DFU")
+            do_action_usb_pd_dfu "$SLED_NUM"
+            ;;
         "$ACTION_RESET")
             do_action_reset "$SLED_NUM" "$HOST_ST_ON"
             ;;
@@ -471,6 +479,12 @@ function host_state_sleep_action_handler()
             ;;
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
+            ;;
+        "$ACTION_DFU")
+            do_action_dfu "$SLED_NUM"
+            ;;
+        "$ACTION_USB_PD_DFU")
+            do_action_usb_pd_dfu "$SLED_NUM"
             ;;
         "$ACTION_RESET")
             do_action_reset "$SLED_NUM" "$HOST_ST_ON"
@@ -601,6 +615,9 @@ function host_state_dfu_action_handler()
         "$ACTION_AC_OFF")
             do_action_ac_off "$SLED_NUM"
             ;;
+        "$ACTION_RESET")
+            do_action_reset "$SLED_NUM" "$HOST_ST_ON"
+            ;;
         "$ACTION_CYCLE")
             do_action_cycle "$SLED_NUM"
             ;;
@@ -630,6 +647,50 @@ function create_dev_mem()
     done
 
     echo "create /dev/mem failed"
+    return 1
+}
+
+function do_action_usb_pd_dfu()
+{
+    local SLED_INDEX="$1"
+    local I2C_BUS
+    I2C_BUS=$(get_bus_num "$1")
+    local RETRY_MAX=5
+    local INTERVAL=1  # Polling interval in seconds
+    local RETRY=0
+
+    local -a PORT_PATH=( /sys/bus/i2c/devices/"${I2C_BUS}"-0022/typec/port*/data_role )
+
+    # Check if the port exists
+    if [ ! -e "${PORT_PATH[0]}" ]; then
+        echo "Error: ${PORT_PATH[0]} not found"
+        return 1
+    fi
+
+    # Initial check for device role
+    local DATA_ROLE
+    DATA_ROLE=$(cat "${PORT_PATH[0]}")
+
+    if [[ "$DATA_ROLE" == *"[device]"* ]]; then
+        echo "Start to reboot Mac mini. Data role: $DATA_ROLE"
+        i2cset -f -y "$I2C_BUS" 0x22 0x43 0x12 0x16 0x16 0x1b 0x8e 0x4f 0x30 0x12 0x80 0xac 0x05 0x05 0x01 0x00 0x00 0x00 0x00 0x00 0x80 0xff 0x14 0xfe 0xa1 i
+        sleep "$INTERVAL"
+    fi
+
+    while [ "$RETRY" -lt "$RETRY_MAX" ]; do
+        DATA_ROLE=$(cat "${PORT_PATH[0]}")
+        if [[ "$DATA_ROLE" == *"[host]"* ]]; then
+            echo "Start to execute DFU command, Data role: $DATA_ROLE"
+            i2cset -f -y "$I2C_BUS" 0x22 0x43 0x12 0x16 0x1b 0x13 0x8e 0x6f 0x31 0x12 0x80 0xac 0x05 0x06 0x01 0x00 0x00 0x00 0x00 0x01 0x80 0xff 0x14 0xfe 0xa1 i
+            echo "$ACTION_DFU" > "/tmp/sled${SLED_NUM}-last-action"
+            return 0
+        fi
+        RETRY=$((RETRY + 1))
+        # echo "Waiting for role switch. Data role: $DATA_ROLE, Retry=$RETRY"
+        sleep "$INTERVAL"
+    done
+
+    echo "Timed out waiting for role switch to host"
     return 1
 }
 
