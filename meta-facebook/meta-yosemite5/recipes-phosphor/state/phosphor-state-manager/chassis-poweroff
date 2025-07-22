@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "no support chassis power off"
+exit 0

@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+# Power Good Status
+power_status() {
+    if [ "$(get_gpio "PWRGD_CPU_PWROK_1")" = "1" ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+# Force DC off
+force_power_off() {
+    if [ "$(power_status)" == "on" ]; then
+        set_gpio SYS_BMC_PWRBTN_N     0
+        sleep 6
+        set_gpio SYS_BMC_PWRBTN_N     1
+    fi
+}
+
+# Graceful DC off
+graceful_power_off() {
+    if [ "$(power_status)" == "on" ]; then
+        set_gpio SYS_BMC_PWRBTN_N     0
+        sleep 1
+        set_gpio SYS_BMC_PWRBTN_N     1
+        sleep 1
+
+        # wait host power off
+        for i in $(seq 1 20)
+        do
+            sleep 1
+            if [ "$(power_status)" == "off" ]; then
+               break
+            fi
+        done
+    fi
+}
+
+# DC on
+power_on() {
+    if [ "$(power_status)" == "off" ]; then
+        set_gpio SYS_BMC_PWRBTN_N 0
+        sleep 1
+        set_gpio SYS_BMC_PWRBTN_N 1
+        sleep 1
+
+        for i in $(seq 1 10)
+        do
+            sleep 1
+            if [ "$(power_status)" == "on" ]; then
+               return 0
+            fi
+
+            if [ "$i" -eq 10 ]; then
+               return 1
+            fi
+        done
+    fi
+    return 0
+}
+
+# Host reset
+power_reset() {
+    set_gpio SGPIO_RSTBTN_OUT 1
+    sleep 1
+    set_gpio SGPIO_RSTBTN_OUT 0
+    sleep 1
+    return 0
+}

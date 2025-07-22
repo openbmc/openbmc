@@ -1,0 +1,23 @@
+[Unit]
+Description=power on host:%i
+Wants=obmc-host-start-pre@%i.target
+After=obmc-host-start-pre@%i.target
+Wants=obmc-host-starting@%i.target
+Before=obmc-host-starting@%i.target
+Before=obmc-host-started@%i.target
+Wants=obmc-power-on@%i.target
+After=obmc-power-on@%i.target
+Conflicts=obmc-host-stop@%i.target
+Wants=phosphor-set-host-transition-to-running@service
+Before=phosphor-set-host-transition-to-running@service
+ConditionPathExists=!/run/openbmc/host@%i-on
+
+[Service]
+Restart=no
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/phosphor-state-manager/host-poweron %i
+ExecStartPost=/bin/systemctl stop host-graceful-poweroff@%i.service
+
+[Install]
+RequiredBy=obmc-host-startmin@%i.target

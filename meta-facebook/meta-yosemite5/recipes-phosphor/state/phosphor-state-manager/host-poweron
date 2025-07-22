@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# DC on
+echo "Starting Power on"
+
+power_on
+st=$?
+
+if [ "$st" -ne 0 ]; then
+   exit 1
+fi
+exit 0

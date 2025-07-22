@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Create /dev/mem
+if [ ! -c /dev/mem ]; then
+    /bin/mknod /dev/mem c 1 1
+fi
+
+#espi init
+echo "AST2600 eSPI init"
+devmem 0x1e6ee000 32 0xff00ba55
+devmem 0x1e6e2454 32 0xaa000000
+devmem 0x1e6e2094 32 0x00000003

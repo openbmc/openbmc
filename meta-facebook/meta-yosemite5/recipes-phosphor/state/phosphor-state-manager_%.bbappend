@@ -1,0 +1,120 @@
+#
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+PACKAGECONFIG:remove = "no-warm-reboot"
+
+CHASSIS_DEFAULT_TARGETS:remove = " \
+    obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
+    obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
+    obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
+    obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
+    "
+
+# TODO: Remove it when 69903 applied
+CHASSIS_DEFAULT_TARGETS:remove = " \
+    obmc-chassis-poweron@{}.target.wants/chassis-poweron@{}.service \
+    obmc-chassis-hard-poweroff@{}.target.wants/chassis-poweroff@{}.service \
+    obmc-chassis-powercycle@{}.target.wants/chassis-powercycle@{}.service \
+    "
+# TODO: Remove it when 69903 applied
+CHASSIS_DEFAULT_TARGETS:append = " \
+    obmc-chassis-poweron@{}.target.requires/chassis-poweron@{}.service \
+    obmc-chassis-powercycle@{}.target.requires/chassis-powercycle@{}.service \
+    "
+
+# Host Config
+# Host Reset
+HOST_DEFAULT_TARGETS:remove = " \
+    obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
+    obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
+    obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
+    obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
+    "
+
+HOST_DEFAULT_TARGETS:append = " \
+    obmc-host-warm-reboot@{}.target.wants/host-powerreset@{}.service \
+    "
+
+# Host On/Off
+HOST_DEFAULT_TARGETS:append = " \
+    obmc-host-startmin@{}.target.requires/host-poweron@{}.service \
+    "
+
+HOST_DEFAULT_TARGETS:append = " \
+    obmc-host-shutdown@{}.target.requires/host-graceful-poweroff@{}.service \
+    obmc-host-stop@{}.target.requires/host-force-poweroff@{}.service \
+    "
+
+HOST_DEFAULT_TARGETS:remove = " \
+    obmc-host-shutdown@{}.target.wants/host-poweroff@{}.service \
+    "
+
+# Host Cycle
+HOST_DEFAULT_TARGETS:remove = " \
+    obmc-host-reboot@{}.target.wants/host-powercycle@{}.service \
+    obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.service \
+    "
+
+#We need to ensure that the chassis power is always on.
+CHASSIS_DEFAULT_TARGETS:remove = " \
+    obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
+    "
+
+# The Yv5 chassis does not support power-off functionality.
+HARD_OFF_TMPL_CTRL = ""
+HARD_OFF_TGTFMT_CTRL = ""
+HARD_OFF_FMT_CTRL = ""
+HARD_OFF_INSTFMT_CTRL = ""
+
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-on@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-running@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-start@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-stop@.service"
+
+SRC_URI:append = " \
+    file://chassis-powercycle \
+    file://chassis-powercycle@.service \
+    file://chassis-poweron \
+    file://chassis-poweron@.service \
+    file://discover-sys-init.conf \
+    file://host-force-powercycle \
+    file://host-force-powercycle@.service \
+    file://host-force-poweroff \
+    file://host-force-poweroff@.service \
+    file://host-graceful-poweroff \
+    file://host-graceful-poweroff@.service \
+    file://host-poweron \
+    file://host-poweron@.service \
+    file://host-powerreset \
+    file://host-powerreset@.service \
+    file://power-cmd \
+    file://phosphor-state-manager-init.conf \
+    "
+
+SRC_URI:append:aspeed-g6 = " file://ast2600/phosphor-state-manager-init"
+SRC_URI:append:aspeed-g7 = " file://ast2700/phosphor-state-manager-init"
+
+RDEPENDS:${PN}:append = " bash"
+
+do_install:append() {
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -d ${D}${libexecdir}/${PN}
+    install -m 0755 ${UNPACKDIR}/chassis-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-force-powercycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
+}
+
+do_install:append:aspeed-g6() {
+    install -m 0755 ${UNPACKDIR}/ast2600/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+}
+do_install:append:aspeed-g7() {
+    install -m 0755 ${UNPACKDIR}/ast2700/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+}
+SYSTEMD_OVERRIDE:${PN}-discover += "discover-sys-init.conf:phosphor-discover-system-state@0.service.d/discover-sys-init.conf"
+SYSTEMD_OVERRIDE:${PN}-systemd-target-monitor += "phosphor-state-manager-init.conf:phosphor-systemd-target-monitor.service.d/phosphor-state-manager-init.conf"

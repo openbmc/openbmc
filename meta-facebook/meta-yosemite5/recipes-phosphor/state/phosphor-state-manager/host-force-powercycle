@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# DC cycle
+echo "Starting Power Cycle"
+
+force_power_off
