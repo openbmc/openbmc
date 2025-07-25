@@ -12,5 +12,19 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "reset-button",
+        "LineName": "reset-button",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-reset-button.service"
+            ],
+            "FALLING": [
+                "assert-reset-button.service"
+            ]
+        },
+        "Continue": true
     }
 ]

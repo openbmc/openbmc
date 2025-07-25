@@ -1,0 +1,8 @@
+[Unit]
+Description=Assert Reset Button
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/assert-reset-button
+
+SyslogIdentifier=assert-reset-button
