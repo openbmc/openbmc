@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+# shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# SGPIO Out Bit-83
+set_gpio CPU0_SYS_RESET_N 1
+
+# SGPIO Out Bit-85
+set_gpio RST_CPU0_KBRST_N 1
+
+# SGPIO Out Bit-101
+set_gpio SCM_USB_SEL 0
+
+# SGPIO Out Bit-81
+set_gpio BMC_SGPIO_READY 1
+
+exit 0
