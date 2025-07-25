@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -x
+
+# BMC_SYS_PWR_CYC0 (connects to CPLD and control the whole system power cycling) -> Maps to GPIOO0
+
+# Just "0" worked too, this is more readable though
+ASPEED_CHIP="gpiochip0"
+
+# Sourced from the fbdarwin image with: gpiocli --chip aspeed-gpio --pin-name GPIOO0 map-name-to-offset
+BMC_SYS_PWR_CYC0_OFFSET=112
+
+HIGH=1
+LOW=0
+
+
+# Force the buffers to flush
+echo "Force filesystem buffers flush..."
+sync
+mount -o ro,remount /run/mnt-persist
+
+
+# Drive the pin HIGH, triggering the chassis power cycle
+gpioset "$ASPEED_CHIP" "$BMC_SYS_PWR_CYC0_OFFSET=$HIGH"
+
+sleep 8
+
+# Control should never reach this point since the chassis should've reseted by now
+# If it does, it means something is wrong -_-
+echo "ERROR: unable to power cycle chassis!!!"
+gpioset "$ASPEED_CHIP" "$BMC_SYS_PWR_CYC0_OFFSET=$LOW"

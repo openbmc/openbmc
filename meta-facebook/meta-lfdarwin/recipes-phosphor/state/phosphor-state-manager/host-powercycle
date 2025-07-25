@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -x
+
+# There are two GPIO pins on the PSU (BMC) slot:
+# BMC_SYS_PWR_CYC0 (connects to CPLD and control the whole system power cycling) -> Maps to GPIOO0
+# BMC_SYS_PWR_CYC1 (to power cycle CPU through CPLD) -> Maps to GPIOO2
+# Mapping sourced from: meta-facebook/meta-fbdarwin/recipes-utils/openbmc-utils/files/setup-gpio.sh
+
+# Just "0" worked too, this is more readable though
+ASPEED_CHIP="gpiochip0"
+
+# Sourced from the fbdarwin image with: gpiocli --chip aspeed-gpio --pin-name GPIOO2 map-name-to-offset
+BMC_SYS_PWR_CYC1_OFFSET=114
+
+HIGH=1
+LOW=0
+
+
+# Drive the pin HIGH, triggering the x86 reset
+if ! gpioset "$ASPEED_CHIP" "$BMC_SYS_PWR_CYC1_OFFSET=$HIGH"; then
+    echo "GPIO Reset pin - drive-high failed"
+    exit 1
+else
+    echo "Reset initialized."
+    sleep 1
+    # The GPIO must be driven low before a subsequent reset can be issued
+    gpioset "$ASPEED_CHIP" "$BMC_SYS_PWR_CYC1_OFFSET=$LOW"
+
+    echo "Reset pin driven low."
+    echo "Done."
+fi
+
+exit 0
