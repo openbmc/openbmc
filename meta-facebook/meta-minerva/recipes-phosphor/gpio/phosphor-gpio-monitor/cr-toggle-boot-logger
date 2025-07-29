@@ -1,11 +1,29 @@
 #!/bin/bash
 
-EVENT=$1
-LOG_LEVEL=$2
+EVENT="$1"
 
-DEVICE_PATH="/xyz/openbmc_project/State/chassis0"
+IDENTIFIER_PATH="/xyz/openbmc_project/State/LockOut/Cooling_Rack/Chassis0"
+STASH_FILE="/run/CR_TOGGLE_BOOT_N.log_entry"
 
-busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-    xyz.openbmc_project.Logging.Create Create "$EVENT" --json \
-                        "{ \"DEVICE\": \"${DEVICE_PATH}\"}" \
-                            xyz.openbmc_project.Logging.Entry.Level."$LOG_LEVEL"
+case "$EVENT" in
+    LockOutEnabled)
+        if [ ! -s "$STASH_FILE" ]; then
+            /usr/bin/log-create "xyz.openbmc_project.State.LockOut.$EVENT" --json \
+                "{ \"IDENTIFIER\": \"$IDENTIFIER_PATH\" }" \
+                > "$STASH_FILE"
+        fi
+        ;;
+    LockOutDisabled)
+        if [ -e "$STASH_FILE" ]; then
+            log-resolve -p "$(< "$STASH_FILE")" && rm "$STASH_FILE"
+        fi
+        /usr/bin/log-create "xyz.openbmc_project.State.LockOut.$EVENT" --json \
+            "{ \"IDENTIFIER\": \"$IDENTIFIER_PATH\" }"
+        ;;
+    *)
+        echo "Unrecognized lockout event."
+        exit 1
+        ;;
+esac
+
+exit 0
