@@ -1,0 +1,13 @@
+[Unit]
+Description=%i Console Server
+ConditionPathExists=/etc/obmc-console/server.%i.conf
+
+[Service]
+# Instance ID is the VUART basename
+ExecStartPre=/bin/sh -c 'echo -n "uart4" > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart-routing/uart1'
+ExecStartPre=/bin/sh -c 'echo -n "uart1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart-routing/uart4'
+ExecStart=/usr/sbin/obmc-console-server --config /etc/obmc-console/server.%i.conf %i
+ExecStopPost=/bin/sh -c 'echo -n "io1" > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart-routing/uart1'
+ExecStopPost=/bin/sh -c 'echo -n "io4" > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart-routing/uart4'
+SyslogIdentifier=%i-console-server
+Restart=always
