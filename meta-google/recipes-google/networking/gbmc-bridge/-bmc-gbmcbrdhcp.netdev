@@ -1,0 +1,5 @@
+[NetDev]
+Name=gbmcbrdhcp
+Kind=veth
+[Peer]
+Name=gbmcdhcp

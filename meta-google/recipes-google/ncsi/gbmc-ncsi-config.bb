@@ -11,10 +11,6 @@ GBMC_NCSI_PURGE_ETC ??= ""
 GBMC_NCSI_DHCP_IMPERSONATE_HOST ??= "1"
 
 SRC_URI += " \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.netdev'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrncsidhcp.network'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.netdev'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcncsidhcp.network'} \
   file://50-gbmc-ncsi.rules.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.service.in'} \
   file://gbmc-ncsi-ra@.service \
@@ -81,17 +77,6 @@ do_install:append() {
     >>${D}${sysconfdir}/sysctl.d/25-gbmc-ncsi.conf
 
   install -d -m0755 ${D}${systemd_unitdir}/network
-
-  if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrncsidhcp.netdev \
-      ${D}${systemd_unitdir}/network/
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrncsidhcp.network \
-      ${D}${systemd_unitdir}/network/
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcncsidhcp.netdev \
-      ${D}${systemd_unitdir}/network/
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcncsidhcp.network \
-      ${D}${systemd_unitdir}/network/
-  fi
 
   install -m0644 ${UNPACKDIR}/-bmc-gbmcncsiusb.link \
     ${D}${systemd_unitdir}/network/

@@ -1,4 +1,4 @@
 [Match]
-Name=gbmcbrncsidhcp
+Name=gbmcbrdhcp
 [Network]
 Bridge=gbmcbr

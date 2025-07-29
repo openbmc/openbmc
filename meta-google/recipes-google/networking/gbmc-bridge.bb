@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit systemd
 
+GBMC_DHCP_RELAY ??= "${@'' if int(d.getVar('FLASH_SIZE')) < 65536 else '1'}"
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI += " \
   file://-bmc-gbmcbr.netdev \
@@ -31,6 +33,13 @@ SRC_URI += " \
   file://gbmc-br-load-ip.service \
   file://gbmc-start-dhcp.sh \
   file://50-gbmc-br-cn-redirect.rules \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-br-dhcrelay@.service'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-br-dhcrelay.sh'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://50-gbmc-br-dhcp.rules'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcdhcp.netdev'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcdhcp.network'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrdhcp.netdev'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrdhcp.network'} \
   "
 
 FILES:${PN}:append = " \
@@ -176,6 +185,16 @@ do_install() {
   sed 's,@IP_OFFSET@,${GBMC_BR_FIXED_OFFSET},' ${UNPACKDIR}/gbmc-br-ra.sh.in >${UNPACKDIR}/gbmc-br-ra.sh
   install -m0755 ${UNPACKDIR}/gbmc-br-ra.sh ${D}${libexecdir}/
   install -m0644 ${UNPACKDIR}/gbmc-br-ra.service ${D}${systemd_system_unitdir}/
+
+  if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
+    install -m0644 ${UNPACKDIR}/gbmc-br-dhcrelay@.service ${D}${systemd_system_unitdir}/
+    install -m0644 ${UNPACKDIR}/gbmc-br-dhcrelay.sh "$mondir"/
+    install -m0644 ${UNPACKDIR}/50-gbmc-br-dhcp.rules $nftables_dir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcdhcp.netdev $netdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcdhcp.network $netdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrdhcp.netdev $netdir/
+    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrdhcp.network $netdir/
+  fi
 }
 
 do_rm_work:prepend() {

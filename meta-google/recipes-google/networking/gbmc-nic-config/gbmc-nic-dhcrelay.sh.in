@@ -15,36 +15,11 @@
 
 [[ -n ${gbmc_nic_dhcrelay_lib-} ]] && return
 
-declare -A gbmc_nic_dhcrelay_intfs=()
+declare -A gbmc_br_dhcrelay_linkaddrs
 # shellcheck disable=SC2043
 for intf in @IFS@; do
   # shellcheck disable=SC2034
-  gbmc_nic_dhcrelay_intfs["$intf"]=0
+  gbmc_br_dhcrelay_linkaddrs["$intf"]=0
 done
-
-gbmc_nic_dhcrelay_hook() {
-  # shellcheck disable=SC2154
-  if [[ $change == addr && $scope == link && $fam == inet6 && $flags != *tentative* ]]; then
-    local -n numaddrs=gbmc_nic_dhcrelay_intfs["$intf"]
-    if [[ -z ${numaddrs+1} ]]; then
-      return 0
-    fi
-    if [[ $action == add ]]; then
-      (( numaddrs += 1 ))
-    else
-      (( numaddrs -= 1 ))
-    fi
-    local svc
-    svc=gbmc-nic-dhcrelay@"$(systemd-escape "$intf")".service
-    if (( numaddrs == 1 )); then
-      systemctl reset-failed "$svc"
-      systemctl restart --no-block "$svc"
-    elif (( numaddrs == 0 )); then
-      systemctl stop --no-block "$svc"
-    fi
-  fi
-}
-
-GBMC_IP_MONITOR_HOOKS+=(gbmc_nic_dhcrelay_hook)
 
 gbmc_nic_dhcrelay_lib=1

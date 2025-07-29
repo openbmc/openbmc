@@ -9,20 +9,14 @@ GBMC_DHCP_RELAY ??= "${@'' if int(d.getVar('FLASH_SIZE')) < 65536 else '1'}"
 inherit systemd
 
 SRC_URI += " \
-  file://50-gbmc-nic.rules \
   file://50-gbmc-nic.rules.in \
   file://10-dhcp4.conf \
   file://-bmc-nic.network.in \
-  file://gbmc-nic-dhcrelay.sh.in \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay.sh.in'} \
   file://gbmc-nic-neigh.sh.in \
   file://gbmc-nic-ra.sh \
   file://gbmc-nic-ra@.service \
   file://gbmc-nic-devlab-config.sh.in \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrnicdhcp.netdev'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcbrnicdhcp.network'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcnicdhcp.netdev'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://-bmc-gbmcnicdhcp.network'} \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay@.service'} \
   "
 S = "${WORKDIR}/sources"
 UNPACKDIR = "${S}"
@@ -69,13 +63,6 @@ do_install() {
   done
 
   if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrnicdhcp.network $netdir/
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcbrnicdhcp.netdev $netdir/
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcnicdhcp.network $netdir/
-    install -m0644 ${UNPACKDIR}/-bmc-gbmcnicdhcp.netdev $netdir/
-    install -m0644 ${UNPACKDIR}/50-gbmc-nic.rules $nftdir/
-    install -m0644 ${UNPACKDIR}/gbmc-nic-dhcrelay@.service $unitdir/
-
     sed 's,@IFS@,${GBMC_EXT_NICS},g' <${UNPACKDIR}/gbmc-nic-dhcrelay.sh.in \
       >$mondir/gbmc-nic-dhcrelay.sh
   fi
