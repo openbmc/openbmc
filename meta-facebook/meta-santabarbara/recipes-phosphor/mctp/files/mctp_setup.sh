@@ -4,7 +4,7 @@ dev="${1:-}"
 
 # Mapping table: "DeviceLabel:PhysicalAddress:EID"
 declare -a endpoint_map=(
-    "mb_nic0_mctp:0x32:9"
+    "mb_nic0_mctp:0x32:49"
     "rainbow0_mmc_mctp:0x21:10"
     "rainbow1_mmc_mctp:0x21:20"
     "rainbow2_mmc_mctp:0x21:30"
