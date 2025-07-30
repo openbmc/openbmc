@@ -2,4 +2,8 @@ table inet filter {
     chain gbmc_br_pub_input {
         tcp dport 23 accept
     }
+    chain output {
+        type filter hook output priority filter; policy accept;
+        tcp sport { 23 } tcp flags & (syn|ack) == (syn|ack) counter comment "tcp-server-23-synack"
+    }
 }
