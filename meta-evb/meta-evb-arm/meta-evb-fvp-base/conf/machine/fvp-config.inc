@@ -4,8 +4,8 @@ FVP_PROVIDER ?= "fvp-base-a-aem-native"
 FVP_EXE ?= "FVP_Base_RevC-2xAEMvA"
 
 # Network
-FVP_CONFIG[bp.hostbridge.interfaceName]="enp97s0"
-FVP_CONFIG[bp.hostbridge.userNetworking]="1"
+FVP_CONFIG[bp.hostbridge.interfaceName] = "enp97s0"
+FVP_CONFIG[bp.hostbridge.userNetworking] = "1"
 FVP_CONFIG[bp.virtio_net.hostbridge.interfaceName] = "tap1"
 
 # Ethernet controller
@@ -44,7 +44,7 @@ FVP_CONFIG[bp.virtio_rng.diagnostics] = "1"
 FVP_CONFIG[cache_state_modelled] ?= "0"
 
 # Enable MMC support
-FVP_CONFIG[bp.mmc.p_mmc_file]="obmc-phosphor-image-fvp.wic"
+FVP_CONFIG[bp.mmc.p_mmc_file] = "obmc-phosphor-image-fvp.wic"
 # use pad instead of silently truncate emmc image
-FVP_CONFIG[bp.mmc.support_unpadded_images]="1"
-FVP_CONFIG[bp.mmc.diagnostics]="0x1"
+FVP_CONFIG[bp.mmc.support_unpadded_images] = "1"
+FVP_CONFIG[bp.mmc.diagnostics] = "0x1"
