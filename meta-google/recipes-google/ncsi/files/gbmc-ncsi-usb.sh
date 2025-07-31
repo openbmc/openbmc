@@ -18,7 +18,6 @@
 gbmc_ncsi_dynamic_hook() {
   # shellcheck disable=SC2154
   if [[ "$change" = 'link' && "$action" = 'add' ]]; then
-    intf="${intf%%@*}"
     ip link show "$intf" | grep -q '^ *alias ncsi-usb$' || return
 
 read -r -d '' contents <<EOF

@@ -81,7 +81,7 @@ gbmc_ip_monitor_parse_line() {
     if [ -n "${BASH_REMATCH[1]}" ]; then
       action=del
     fi
-    intf="${BASH_REMATCH[2]}"
+    intf="${BASH_REMATCH[2]%%@*}"
     fam="${BASH_REMATCH[3]}"
     ip="${BASH_REMATCH[4]}"
     scope="${BASH_REMATCH[7]}"
@@ -112,7 +112,7 @@ gbmc_ip_monitor_parse_line() {
     if [ -n "${BASH_REMATCH[1]}" ]; then
       action=del
     fi
-    intf="${BASH_REMATCH[2]}"
+    intf="${BASH_REMATCH[2]%%@*}"
     carrier="${BASH_REMATCH[3]}"
     read -ra data || return
     mac="${data[1]}"

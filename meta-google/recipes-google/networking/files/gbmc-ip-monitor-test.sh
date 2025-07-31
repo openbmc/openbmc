@@ -129,7 +129,7 @@ testParseInit() {
 }
 
 testParseAddrAdd() {
-  expect_err 0 gbmc_ip_monitor_parse_line '[ADDR]2: eno2 inet6 fd01:ff2:5687:4:cf03:45f3:983a:96eb/128 metric 1024 scope global temporary dynamic'
+  expect_err 0 gbmc_ip_monitor_parse_line '[ADDR]2: eno2@extra inet6 fd01:ff2:5687:4:cf03:45f3:983a:96eb/128 metric 1024 scope global temporary dynamic'
   expect_streq "$change" 'addr'
   expect_streq "$action" 'add'
   expect_streq "$intf" 'eno2'
@@ -165,7 +165,7 @@ testParseRouteDel() {
 }
 
 testParseLinkAdd() {
-  expect_err 0 gbmc_ip_monitor_parse_line "[LINK]2: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000" \
+  expect_err 0 gbmc_ip_monitor_parse_line "[LINK]2: eno2@extra: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000" \
     < <(echo 'link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff')
   expect_streq "$change" 'link'
   expect_streq "$action" 'add'

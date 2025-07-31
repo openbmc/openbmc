@@ -247,7 +247,6 @@ gbmc_ncsi_br_deprecated_ips_hook() {
       gbmc_ncsi_br_deprecated_ips_add_neighs "$intf"
     fi
   elif [ "$change" = 'link' -a "$action" = 'add' -a "$carrier" = 'UP' ]; then
-    intf="${intf%%@*}"
     if ip link show "$intf" | grep -q '^ *alias ncsi-usb$'; then
       gbmc_ncsi_br_deprecated_ips_add_neighs "$intf"
     fi
