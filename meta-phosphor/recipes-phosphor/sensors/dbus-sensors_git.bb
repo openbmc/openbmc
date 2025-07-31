@@ -11,7 +11,7 @@ DEPENDS = " \
     phosphor-logging \
     sdbusplus \
     "
-SRCREV = "5e4d3051a941a83de29abeefe97798af4d9190ec"
+SRCREV = "3c63db63ced4e5f185c53ef052a7867e314ceafc"
 PACKAGECONFIG ??= " \
     adcsensor \
     exitairtempsensor \
