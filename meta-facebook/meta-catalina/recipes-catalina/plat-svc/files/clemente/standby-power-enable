@@ -61,14 +61,18 @@ bind_i2c_muxes()
 
 }
 
+bind_module_gpio_expanders()
+{
+    # Module 0 IOEXP
+    bind_i2c_device pca953x 2-0020 3
+    # Module 1 IOEXP
+    bind_i2c_device pca953x 2-0021 3
+}
+
 bind_gpio_expanders()
 {
     # BMC IOEXP
     bind_i2c_device pca953x 6-0021
-    # Module 0 IOEXP
-    bind_i2c_device pca953x 2-0020
-    # Module 1 IOEXP
-    bind_i2c_device pca953x 2-0021
     # HMC IOEXP
     bind_i2c_device pca953x 2-0027
     # HMC IOEXP
@@ -141,6 +145,15 @@ reset_host_usb()
     sleep 1
     set_gpio "USB2_HUB_RST_L-O" "$GPIO_HIGH"
     set_gpio "SEC_USB2_HUB_RST_L" "$GPIO_HIGH"
+}
+
+reset_i2c_mux()
+{
+    set_gpio "I2C_BUS_MUX_RESET_L-O" "$GPIO_LOW"
+    set_gpio "SEC_I2C_BUS_MUX_RESET_L" "$GPIO_LOW"
+    sleep 1
+    set_gpio "I2C_BUS_MUX_RESET_L-O" "$GPIO_HIGH"
+    set_gpio "SEC_I2C_BUS_MUX_RESET_L" "$GPIO_HIGH"
 }
 
 rebind_hmc_usb_network()
@@ -225,7 +238,13 @@ fi
 set_gpio "BMC_12V_CTRL" "$GPIO_HIGH"
 set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
 
+# bind module io expanders earily due to i2c mux reset pin needed
+bind_module_gpio_expanders
+
+reset_i2c_mux
 bind_i2c_muxes
+sleep 3 # This is to ensure that all downstream node drivers probe completed
+reset_i2c_mux
 bind_gpio_expanders
 
 set_gpio "HMC_PGOOD-O" "$GPIO_HIGH"
