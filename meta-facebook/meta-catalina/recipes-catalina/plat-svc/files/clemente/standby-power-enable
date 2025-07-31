@@ -137,10 +137,10 @@ bind_interposer_sensors()
 reset_host_usb()
 {
     set_gpio "USB2_HUB_RST_L-O" "$GPIO_LOW"
-    set_gpio "USB2_HUB4_RST_L-O" "$GPIO_LOW"
+    set_gpio "SEC_USB2_HUB_RST_L" "$GPIO_LOW"
     sleep 1
-    set_gpio "USB2_HUB_RST_L" "$GPIO_HIGH"
-    set_gpio "USB2_HUB4_RST_L" "$GPIO_HIGH"
+    set_gpio "USB2_HUB_RST_L-O" "$GPIO_HIGH"
+    set_gpio "SEC_USB2_HUB_RST_L" "$GPIO_HIGH"
 }
 
 rebind_hmc_usb_network()
