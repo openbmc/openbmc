@@ -113,6 +113,8 @@ bind_fru_eeproms()
     bind_i2c_device at24 10-0050
     # CX7 1 FRU
     bind_i2c_device at24 15-0052
+    # OSFP FRU
+    bind_i2c_device at24 29-0052
 }
 
 bind_hsc_sensors()
