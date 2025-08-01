@@ -34,6 +34,9 @@ do_install() {
 
 }
 
+#===============================================================================
+# Catalina
+#===============================================================================
 SRC_URI:append:catalina = " \
     file://iob-nic-temp-read \
     file://iob-nic-temp-read.service \
@@ -51,4 +54,22 @@ do_install:append:catalina() {
     install -d ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/iob-nic-temp-read ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/osfp-eeprom-driver-bind ${PLATSVC_LIBEXECDIR}
+}
+
+#===============================================================================
+# Clemente
+#===============================================================================
+SRC_URI:append:clemente = " \
+    file://backend-nic-driver-bind \
+    file://backend-nic-driver-bind.service \
+    "
+
+SYSTEMD_SERVICE:${PN}:append:clemente = " \
+    backend-nic-driver-bind.service \
+    "
+
+do_install:append:clemente() {
+    PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
+    install -d ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${PLATSVC_LIBEXECDIR}
 }
