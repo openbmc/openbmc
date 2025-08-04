@@ -29,6 +29,17 @@ gbmc_nic_neigh_set() {
 
   echo "gBMC NIC Neigh $act $ip: ${gbmc_nic_neigh_intfs[*]}" >&2
 
+  local pfx_bytes=()
+  ip_to_bytes pfx_bytes "$ip"
+  (( pfx_bytes[8] |= 0xfd ))
+  local neigh_ips=("$ip")
+  local i
+  for (( i=1; i<16; ++i )); do
+    (( pfx_bytes[9] &= 0xf0 ))
+    (( pfx_bytes[9] |= i ))
+    neigh_ips+=("$(ip_bytes_to_str pfx_bytes)")
+  done
+
   local intf
   local failed_intfs=()
   for intf in "${gbmc_nic_neigh_intfs[@]}"; do
@@ -46,8 +57,11 @@ Table=$rt
 Priority=$rt
 [Network]
 IPv6ProxyNDP=yes
-IPv6ProxyNDPAddress=$ip
 EOF
+    local neigh_ip
+    for neigh_ip in "${neigh_ips[@]}"; do
+      contents+=$'\n'"IPv6ProxyNDPAddress=$neigh_ip"
+    done
     # Override any existing gateway information within files
     # Make sure we cover `00-*` and `-*` files
     for file in /run/systemd/network/{00,}-bmc-"$intf".network; do
@@ -65,7 +79,9 @@ EOF
 
     if [[ "$act" == add ]]; then
       sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null || st=$?
-      ip -6 neigh "$act" proxy "$ip" dev "$intf" || st=$?
+      for neigh_ip in "${neigh_ips[@]}"; do
+        ip -6 neigh "$act" proxy "$neigh_ip" dev "$intf" || st=$?
+      done
       ip -6 rule add to "$ip/64" pref "$GBMC_INTF_ROUTE_TABLE_BASE" lookup main || st=$?
       ip -6 rule add from "$ip/64" pref "$rt" lookup "$rt" || st=$?
     fi
