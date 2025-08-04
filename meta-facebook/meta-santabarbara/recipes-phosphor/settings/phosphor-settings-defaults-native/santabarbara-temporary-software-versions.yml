@@ -5,3 +5,43 @@
         Default: '""'
       Purpose:
         Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/mb_nic0:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/swb_nic1:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/swb_nic2:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/swb_nic3:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/swb_nic4:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
