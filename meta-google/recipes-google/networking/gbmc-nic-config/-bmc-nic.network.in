@@ -1,7 +1,7 @@
 [Match]
 Name=@IF@
 [Network]
-DHCP=false
+DHCP=@DHCP@
 IPv6AcceptRA=false
 LLMNR=false
 MulticastDNS=false

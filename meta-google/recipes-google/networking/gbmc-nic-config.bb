@@ -37,6 +37,9 @@ RDEPENDS:${PN}:append = " \
   nftables-systemd \
   "
 
+DHCP = "false"
+DHCP:local = "ipv4"
+
 do_install() {
   netdir=${D}${systemd_unitdir}/network
   install -d -m0755 $netdir
@@ -58,7 +61,8 @@ do_install() {
 
   for intf in ${GBMC_EXT_NICS}; do
     sed "s,@IF@,$intf,g" <${UNPACKDIR}/50-gbmc-nic.rules.in >$nftdir/50-gbmc-$intf.rules
-    sed "s,@IF@,$intf,g" <${UNPACKDIR}/-bmc-nic.network.in >$netdir/-bmc-$intf.network
+    sed -e "s,@IF@,$intf,g" -e "s,@DHCP@,${DHCP},g" \
+      <${UNPACKDIR}/-bmc-nic.network.in >$netdir/-bmc-$intf.network
     ln -sv ../gbmc-nic-ra@.service $wantdir/gbmc-nic-ra@$intf.service
   done
 
