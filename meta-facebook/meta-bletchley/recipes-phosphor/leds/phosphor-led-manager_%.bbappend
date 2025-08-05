@@ -7,3 +7,12 @@ SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_START_INSTFMT', 'OBMC_HOST_I
 
 HOST_STOP_INSTFMT = "obmc-led-group-stop@.service:obmc-led-group-stop@sled{0}_good.service"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'HOST_STOP_INSTFMT', 'OBMC_HOST_INSTANCES')}"
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+SRC_URI:append = " file://led-group-config.json"
+
+do_install:append() {
+        install -m 0644 ${UNPACKDIR}/led-group-config.json ${D}${datadir}/phosphor-led-manager/
+}
+
