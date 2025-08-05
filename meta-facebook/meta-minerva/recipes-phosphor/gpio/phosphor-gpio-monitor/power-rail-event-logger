@@ -1,0 +1,78 @@
+#!/bin/bash
+
+HELP_MSG="
+Usage: power-rail-event-logger <event> <gpio_name>
+<event> is the power rail event to log,
+e.g. assert / deassert.
+
+<board>_<gpio_name> is defined in json file,
+e.g. mtia-blade-1_pwrgd
+"
+
+if [ "$#" -ne 2 ]; then
+    echo "$HELP_MSG"
+    exit 1
+fi
+
+message="$2"
+ASSERT_MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEASSERT_MSG_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
+
+# Extract board name and gpio name from the message
+# message format:
+#       <board_name>-<board_number>_<gpio_name>
+if [[ $message == fcb* ]]; then
+    board_name_with_num=${message}
+    # FCB only has one power rail gpio for AC signal
+    gpio_name="pwrgd"
+elif [[ $message == mtia-blade* || $message == network-blade* ]]; then
+    board_name_with_num="${message%%_*}"
+    gpio_name="${message#*_}"
+else
+    echo "Unknown message format: $message"
+    exit 1
+fi
+
+board_name="${board_name_with_num%%-*}"
+board_number="${board_name_with_num##*-}"
+
+if [[ $board_name == "mtia" ]]; then
+    device_path="/xyz/openbmc_project/inventory/system/board/Minerva_MTIA_Blade_${board_number}/${gpio_name}"
+elif [[ $board_name == "network" ]]; then
+    device_path="/xyz/openbmc_project/inventory/system/board/Minerva_Network_Blade_${board_number}/${gpio_name}"
+elif [[ $board_name == "fcb" ]]; then
+    device_path="/xyz/openbmc_project/inventory/system/board/Minerva_Fan_Board_${board_number}/${gpio_name}"
+else
+    echo "Unknown board name: $board_name"
+    exit 1
+fi
+
+stash_file="/run/${message}.log_entry"
+
+case "$1" in
+    "assert")
+        if [ ! -s "$stash_file" ]; then
+            /usr/bin/log-create "$ASSERT_MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"${gpio_name}\"}" \
+                > "${stash_file}"
+        fi
+        ;;
+
+    "deassert")
+        # If the stash file exists, resolve the log entry and remove the stash file
+        if [ -s "${stash_file}" ]; then
+            log-resolve -p "$(< "${stash_file}")" && rm "${stash_file}"
+        fi
+        # Always create a deassert log entry
+        /usr/bin/log-create "$DEASSERT_MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${device_path}\"}"
+        ;;
+
+    *)
+        echo "Not supported event: $1"
+        echo "$HELP_MSG"
+        exit 1
+        ;;
+esac
+
+exit 0

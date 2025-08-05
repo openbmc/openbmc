@@ -5,8 +5,8 @@
         "GpioNum": 56,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-1.service"],
-            "RISING": ["power-good-deassert@mtia-blade-1.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-1_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-1_pwrgd.service"]
         },
         "Continue": true
     },
@@ -16,8 +16,8 @@
         "GpioNum": 58,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-2.service"],
-            "RISING": ["power-good-deassert@mtia-blade-2.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-2_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-2_pwrgd.service"]
         },
         "Continue": true
     },
@@ -27,8 +27,8 @@
         "GpioNum": 60,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-3.service"],
-            "RISING": ["power-good-deassert@mtia-blade-3.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-3_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-3_pwrgd.service"]
         },
         "Continue": true
     },
@@ -38,8 +38,8 @@
         "GpioNum": 62,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-4.service"],
-            "RISING": ["power-good-deassert@mtia-blade-4.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-4_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-4_pwrgd.service"]
         },
         "Continue": true
     },
@@ -49,8 +49,8 @@
         "GpioNum": 64,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-5.service"],
-            "RISING": ["power-good-deassert@mtia-blade-5.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-5_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-5_pwrgd.service"]
         },
         "Continue": true
     },
@@ -60,8 +60,8 @@
         "GpioNum": 66,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-6.service"],
-            "RISING": ["power-good-deassert@mtia-blade-6.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-6_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-6_pwrgd.service"]
         },
         "Continue": true
     },
@@ -71,8 +71,8 @@
         "GpioNum": 68,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-7.service"],
-            "RISING": ["power-good-deassert@mtia-blade-7.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-7_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-7_pwrgd.service"]
         },
         "Continue": true
     },
@@ -82,8 +82,8 @@
         "GpioNum": 70,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-8.service"],
-            "RISING": ["power-good-deassert@mtia-blade-8.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-8_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-8_pwrgd.service"]
         },
         "Continue": true
     },
@@ -93,8 +93,8 @@
         "GpioNum": 72,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-9.service"],
-            "RISING": ["power-good-deassert@mtia-blade-9.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-9_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-9_pwrgd.service"]
         },
         "Continue": true
     },
@@ -104,8 +104,8 @@
         "GpioNum": 74,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-10.service"],
-            "RISING": ["power-good-deassert@mtia-blade-10.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-10_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-10_pwrgd.service"]
         },
         "Continue": true
     },
@@ -115,8 +115,8 @@
         "GpioNum": 76,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-11.service"],
-            "RISING": ["power-good-deassert@mtia-blade-11.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-11_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-11_pwrgd.service"]
         },
         "Continue": true
     },
@@ -126,8 +126,8 @@
         "GpioNum": 78,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-12.service"],
-            "RISING": ["power-good-deassert@mtia-blade-12.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-12_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-12_pwrgd.service"]
         },
         "Continue": true
     },
@@ -137,8 +137,8 @@
         "GpioNum": 80,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-13.service"],
-            "RISING": ["power-good-deassert@mtia-blade-13.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-13_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-13_pwrgd.service"]
         },
         "Continue": true
     },
@@ -148,8 +148,8 @@
         "GpioNum": 82,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-14.service"],
-            "RISING": ["power-good-deassert@mtia-blade-14.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-14_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-14_pwrgd.service"]
         },
         "Continue": true
     },
@@ -159,8 +159,8 @@
         "GpioNum": 84,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-15.service"],
-            "RISING": ["power-good-deassert@mtia-blade-15.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-15_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-15_pwrgd.service"]
         },
         "Continue": true
     },
@@ -170,8 +170,8 @@
         "GpioNum": 86,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@mtia-blade-16.service"],
-            "RISING": ["power-good-deassert@mtia-blade-16.service"]
+            "FALLING": ["power-rail-deassert-log@mtia-blade-16_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@mtia-blade-16_pwrgd.service"]
         },
         "Continue": true
     },
@@ -181,8 +181,8 @@
         "GpioNum": 88,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-1.service"],
-            "RISING": ["power-good-deassert@network-blade-1.service"]
+            "FALLING": ["power-rail-deassert-log@network-blade-1_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@network-blade-1_pwrgd.service"]
         },
         "Continue": true
     },
@@ -192,8 +192,8 @@
         "GpioNum": 90,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-2.service"],
-            "RISING": ["power-good-deassert@network-blade-2.service"]
+            "FALLING": ["power-rail-deassert-log@network-blade-2_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@network-blade-2_pwrgd.service"]
         },
         "Continue": true
     },
@@ -203,8 +203,8 @@
         "GpioNum": 92,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-3.service"],
-            "RISING": ["power-good-deassert@network-blade-3.service"]
+            "FALLING": ["power-rail-deassert-log@network-blade-3_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@network-blade-3_pwrgd.service"]
         },
         "Continue": true
     },
@@ -214,8 +214,8 @@
         "GpioNum": 94,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-4.service"],
-            "RISING": ["power-good-deassert@network-blade-4.service"]
+            "FALLING": ["power-rail-deassert-log@network-blade-4_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@network-blade-4_pwrgd.service"]
         },
         "Continue": true
     },
@@ -225,8 +225,8 @@
         "GpioNum": 96,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-5.service"],
-            "RISING": ["power-good-deassert@network-blade-5.service"]
+            "FALLING": ["power-rail-deassert-log@network-blade-5_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@network-blade-5_pwrgd.service"]
         },
         "Continue": true
     },
@@ -236,8 +236,8 @@
         "GpioNum": 98,
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["power-good-assert@network-blade-6.service"],
-            "RISING": ["power-good-deassert@network-blade-6.service"]
+            "FALLING": ["power-rail-deassert-log@network-blade-6_pwrgd.service"],
+            "RISING": ["power-rail-assert-log@network-blade-6_pwrgd.service"]
         },
         "Continue": true
     },
@@ -248,12 +248,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@fcb-1.service",
+                "power-rail-deassert-log@fcb-1.service",
                 "rescan-fru.service",
                 "fan-reload.service"
             ],
             "RISING": [
-                "power-good-deassert@fcb-1.service",
+                "power-rail-assert-log@fcb-1.service",
                 "rescan-fru.service"
             ]
         },
@@ -266,12 +266,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@fcb-2.service",
+                "power-rail-deassert-log@fcb-2.service",
                 "rescan-fru.service",
                 "fan-reload.service"
             ],
             "RISING": [
-                "power-good-deassert@fcb-2.service",
+                "power-rail-assert-log@fcb-2.service",
                 "rescan-fru.service"
             ]
         },
@@ -284,12 +284,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@fcb-3.service",
+                "power-rail-deassert-log@fcb-3.service",
                 "rescan-fru.service",
                 "fan-reload.service"
             ],
             "RISING": [
-                "power-good-deassert@fcb-3.service",
+                "power-rail-assert-log@fcb-3.service",
                 "rescan-fru.service"
             ]
         },
@@ -302,12 +302,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@fcb-4.service",
+                "power-rail-deassert-log@fcb-4.service",
                 "rescan-fru.service",
                 "fan-reload.service"
             ],
             "RISING": [
-                "power-good-deassert@fcb-4.service",
+                "power-rail-assert-log@fcb-4.service",
                 "rescan-fru.service"
             ]
         },
@@ -320,12 +320,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@fcb-6.service",
+                "power-rail-deassert-log@fcb-6.service",
                 "rescan-fru.service",
                 "fan-reload.service"
             ],
             "RISING": [
-                "power-good-deassert@fcb-6.service",
+                "power-rail-assert-log@fcb-6.service",
                 "rescan-fru.service"
             ]
         },
@@ -338,12 +338,12 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@fcb-5.service",
+                "power-rail-deassert-log@fcb-5.service",
                 "rescan-fru.service",
                 "fan-reload.service"
             ],
             "RISING": [
-                "power-good-deassert@fcb-5.service",
+                "power-rail-assert-log@fcb-5.service",
                 "rescan-fru.service"
             ]
         },
@@ -356,11 +356,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-1.service",
+                "power-rail-deassert-log@mtia-blade-1_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-1.service",
+                "power-rail-assert-log@mtia-blade-1_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -373,11 +373,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-2.service",
+                "power-rail-deassert-log@mtia-blade-2_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-2.service",
+                "power-rail-assert-log@mtia-blade-2_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -390,11 +390,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-3.service",
+                "power-rail-deassert-log@mtia-blade-3_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-3.service",
+                "power-rail-assert-log@mtia-blade-3_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -407,11 +407,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-4.service",
+                "power-rail-deassert-log@mtia-blade-4_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-4.service",
+                "power-rail-assert-log@mtia-blade-4_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -424,11 +424,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-5.service",
+                "power-rail-deassert-log@mtia-blade-5_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-5.service",
+                "power-rail-assert-log@mtia-blade-5_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -441,11 +441,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-6.service",
+                "power-rail-deassert-log@mtia-blade-6_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-6.service",
+                "power-rail-assert-log@mtia-blade-6_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -458,11 +458,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-7.service",
+                "power-rail-deassert-log@mtia-blade-7_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-7.service",
+                "power-rail-assert-log@mtia-blade-7_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -475,11 +475,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-8.service",
+                "power-rail-deassert-log@mtia-blade-8_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-8.service",
+                "power-rail-assert-log@mtia-blade-8_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -492,11 +492,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-9.service",
+                "power-rail-deassert-log@mtia-blade-9_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-9.service",
+                "power-rail-assert-log@mtia-blade-9_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -509,11 +509,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-10.service",
+                "power-rail-deassert-log@mtia-blade-10_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-10.service",
+                "power-rail-assert-log@mtia-blade-10_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -526,11 +526,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-11.service",
+                "power-rail-deassert-log@mtia-blade-11_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-11.service",
+                "power-rail-assert-log@mtia-blade-11_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -543,11 +543,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-12.service",
+                "power-rail-deassert-log@mtia-blade-12_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-12.service",
+                "power-rail-assert-log@mtia-blade-12_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -560,11 +560,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-13.service",
+                "power-rail-deassert-log@mtia-blade-13_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-13.service",
+                "power-rail-assert-log@mtia-blade-13_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -577,11 +577,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-14.service",
+                "power-rail-deassert-log@mtia-blade-14_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-14.service",
+                "power-rail-assert-log@mtia-blade-14_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -594,11 +594,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-15.service",
+                "power-rail-deassert-log@mtia-blade-15_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-15.service",
+                "power-rail-assert-log@mtia-blade-15_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -611,11 +611,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@mtia-blade-16.service",
+                "power-rail-deassert-log@mtia-blade-16_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@mtia-blade-16.service",
+                "power-rail-assert-log@mtia-blade-16_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -628,11 +628,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@network-blade-1.service",
+                "power-rail-deassert-log@network-blade-1_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@network-blade-1.service",
+                "power-rail-assert-log@network-blade-1_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -645,11 +645,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@network-blade-2.service",
+                "power-rail-deassert-log@network-blade-2_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@network-blade-2.service",
+                "power-rail-assert-log@network-blade-2_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -662,11 +662,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@network-blade-3.service",
+                "power-rail-deassert-log@network-blade-3_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@network-blade-3.service",
+                "power-rail-assert-log@network-blade-3_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -679,11 +679,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@network-blade-4.service",
+                "power-rail-deassert-log@network-blade-4_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@network-blade-4.service",
+                "power-rail-assert-log@network-blade-4_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -696,11 +696,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@network-blade-5.service",
+                "power-rail-deassert-log@network-blade-5_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@network-blade-5.service",
+                "power-rail-assert-log@network-blade-5_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -713,11 +713,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "ac-power-good-assert@network-blade-6.service",
+                "power-rail-deassert-log@network-blade-6_hsc-pwrgd.service",
                 "rescan-fru.service"
             ],
             "RISING": [
-                "ac-power-good-deassert@network-blade-6.service",
+                "power-rail-assert-log@network-blade-6_hsc-pwrgd.service",
                 "rescan-fru.service"
             ]
         },
@@ -750,8 +750,8 @@
         "LineName": "P12V_INA230_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@p12v-ina230-alert.service"],
-            "FALLING": ["power-fail-assert@p12v-ina230-alert.service"]
+            "RISING": ["vr-fault-deassert-log@cmm_p12v-ina230-alert.service"],
+            "FALLING": ["vr-fault-assert-log@cmm_p12v-ina230-alert.service"]
         },
         "Continue": true
     },
@@ -760,8 +760,8 @@
         "LineName": "P24V_INA230_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@p24v-ina230-alert.service"],
-            "FALLING": ["power-fail-assert@p24v-ina230-alert.service"]
+            "RISING": ["vr-fault-deassert-log@cmm_p24v-ina230-alert.service"],
+            "FALLING": ["vr-fault-assert-log@cmm_p24v-ina230-alert.service"]
         },
         "Continue": true
     },
@@ -770,8 +770,8 @@
         "LineName": "P48V_HSC_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@p48v-hsc-alert.service"],
-            "FALLING": ["power-fail-assert@p48v-hsc-alert.service"]
+            "RISING": ["vr-fault-deassert-log@cmm_p48v-hsc-alert.service"],
+            "FALLING": ["vr-fault-assert-log@cmm_p48v-hsc-alert.service"]
         },
         "Continue": true
     },
@@ -780,8 +780,8 @@
         "LineName": "P1V05_PWR_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@p1v05.service"],
-            "FALLING": ["power-fail-deassert@p1v05.service"]
+            "RISING": ["vr-fault-assert-log@cmm_p1v05.service"],
+            "FALLING": ["vr-fault-deassert-log@cmm_p1v05.service"]
         },
         "Continue": true
     },
@@ -790,8 +790,8 @@
         "LineName": "P1V5_PWR_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@p1v5.service"],
-            "FALLING": ["power-fail-deassert@p1v5.service"]
+            "RISING": ["vr-fault-assert-log@cmm_p1v5.service"],
+            "FALLING": ["vr-fault-deassert-log@cmm_p1v5.service"]
         },
         "Continue": true
     },
@@ -800,8 +800,8 @@
         "LineName": "P24V_PWR_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@p24v.service"],
-            "FALLING": ["power-fail-deassert@p24v.service"]
+            "RISING": ["vr-fault-assert-log@cmm_p24v.service"],
+            "FALLING": ["vr-fault-deassert-log@cmm_p24v.service"]
         },
         "Continue": true
     },
@@ -810,8 +810,8 @@
         "LineName": "P24V_SM_PWR_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@p24v-smart-valve.service"],
-            "FALLING": ["power-fail-deassert@p24v-smart-valve.service"]
+            "RISING": ["vr-fault-assert-log@cmm_p24v-smart-valve.service"],
+            "FALLING": ["vr-fault-deassert-log@cmm_p24v-smart-valve.service"]
         },
         "Continue": true
     },
@@ -820,8 +820,8 @@
         "LineName": "INA238_FAN1_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan1_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan1_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-1_ina238-fan1-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-1_ina238-fan1-alert.service"]
         },
         "Continue": true
     },
@@ -830,8 +830,8 @@
         "LineName": "INA238_FAN2_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan2_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan2_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-1_ina238-fan2-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-1_ina238-fan2-alert.service"]
         },
         "Continue": true
     },
@@ -840,8 +840,8 @@
         "LineName": "INA238_FAN3_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan3_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan3_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-1_ina238-fan3-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-1_ina238-fan3-alert.service"]
         },
         "Continue": true
     },
@@ -850,8 +850,8 @@
         "LineName": "INA238_FAN4_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan4_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan4_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-1_ina238-fan4-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-1_ina238-fan4-alert.service"]
         },
         "Continue": true
     },
@@ -860,8 +860,8 @@
         "LineName": "INA238_FAN5_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan5_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan5_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-2_ina238-fan5-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-2_ina238-fan5-alert.service"]
         },
         "Continue": true
     },
@@ -870,8 +870,8 @@
         "LineName": "INA238_FAN6_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan6_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan6_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-2_ina238-fan6-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-2_ina238-fan6-alert.service"]
         },
         "Continue": true
     },
@@ -880,8 +880,8 @@
         "LineName": "INA238_FAN7_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan7_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan7_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-2_ina238-fan7-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-2_ina238-fan7-alert.service"]
         },
         "Continue": true
     },
@@ -890,8 +890,8 @@
         "LineName": "INA238_FAN8_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan8_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan8_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-2_ina238-fan8-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-2_ina238-fan8-alert.service"]
         },
         "Continue": true
     },
@@ -900,8 +900,8 @@
         "LineName": "INA238_FAN9_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan9_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan9_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-3_ina238-fan9-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-3_ina238-fan9-alert.service"]
         },
         "Continue": true
     },
@@ -910,8 +910,8 @@
         "LineName": "INA238_FAN10_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan10_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan10_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-3_ina238-fan10-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-3_ina238-fan10-alert.service"]
         },
         "Continue": true
     },
@@ -920,8 +920,8 @@
         "LineName": "INA238_FAN11_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan11_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan11_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-3_ina238-fan11-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-3_ina238-fan11-alert.service"]
         },
         "Continue": true
     },
@@ -930,8 +930,8 @@
         "LineName": "INA238_FAN12_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan12_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan12_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-3_ina238-fan12-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-3_ina238-fan12-alert.service"]
         },
         "Continue": true
     },
@@ -940,8 +940,8 @@
         "LineName": "INA238_FAN13_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan13_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan13_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-4_ina238-fan13-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-4_ina238-fan13-alert.service"]
         },
         "Continue": true
     },
@@ -950,8 +950,8 @@
         "LineName": "INA238_FAN14_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan14_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan14_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-4_ina238-fan14-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-4_ina238-fan14-alert.service"]
         },
         "Continue": true
     },
@@ -960,8 +960,8 @@
         "LineName": "INA238_FAN15_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan15_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan15_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-4_ina238-fan15-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-4_ina238-fan15-alert.service"]
         },
         "Continue": true
     },
@@ -970,8 +970,8 @@
         "LineName": "INA238_FAN16_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan16_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan16_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-4_ina238-fan16-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-4_ina238-fan16-alert.service"]
         },
         "Continue": true
     },
@@ -980,8 +980,8 @@
         "LineName": "INA238_FAN17_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan17_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan17_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-5_ina238-fan17-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-5_ina238-fan17-alert.service"]
         },
         "Continue": true
     },
@@ -990,8 +990,8 @@
         "LineName": "INA238_FAN18_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan18_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan18_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-5_ina238-fan18-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-5_ina238-fan18-alert.service"]
         },
         "Continue": true
     },
@@ -1000,8 +1000,8 @@
         "LineName": "INA238_FAN19_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan19_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan19_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-5_ina238-fan19-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-5_ina238-fan19-alert.service"]
         },
         "Continue": true
     },
@@ -1010,8 +1010,8 @@
         "LineName": "INA238_FAN20_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan20_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan20_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-5_ina238-fan20-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-5_ina238-fan20-alert.service"]
         },
         "Continue": true
     },
@@ -1020,8 +1020,8 @@
         "LineName": "INA238_FAN21_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan21_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan21_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-6_ina238-fan21-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-6_ina238-fan21-alert.service"]
         },
         "Continue": true
     },
@@ -1030,8 +1030,8 @@
         "LineName": "INA238_FAN22_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan22_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan22_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-6_ina238-fan22-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-6_ina238-fan22-alert.service"]
         },
         "Continue": true
     },
@@ -1040,8 +1040,8 @@
         "LineName": "INA238_FAN23_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan23_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan23_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-6_ina238-fan23-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-6_ina238-fan23-alert.service"]
         },
         "Continue": true
     },
@@ -1050,8 +1050,8 @@
         "LineName": "INA238_FAN24_ALERT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-deassert@ina238_fan24_alert.service"],
-            "FALLING": ["power-fail-assert@ina238_fan24_alert.service"]
+            "RISING": ["vr-fault-deassert-log@fcb-6_ina238-fan24-alert.service"],
+            "FALLING": ["vr-fault-assert-log@fcb-6_ina238-fan24-alert.service"]
         },
         "Continue": true
     },
@@ -1060,8 +1060,8 @@
         "LineName": "FAN1_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan1.service"],
-            "FALLING": ["power-fail-deassert@fan1.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_fan1.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_fan1.service"]
         },
         "Continue": true
     },
@@ -1070,8 +1070,8 @@
         "LineName": "FAN2_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan2.service"],
-            "FALLING": ["power-fail-deassert@fan2.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_fan2.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_fan2.service"]
         },
         "Continue": true
     },
@@ -1080,8 +1080,8 @@
         "LineName": "FAN3_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan3.service"],
-            "FALLING": ["power-fail-deassert@fan3.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_fan3.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_fan3.service"]
         },
         "Continue": true
     },
@@ -1090,8 +1090,8 @@
         "LineName": "FAN4_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan4.service"],
-            "FALLING": ["power-fail-deassert@fan4.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_fan4.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_fan4.service"]
         },
         "Continue": true
     },
@@ -1100,8 +1100,8 @@
         "LineName": "FAN5_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan5.service"],
-            "FALLING": ["power-fail-deassert@fan5.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_fan5.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_fan5.service"]
         },
         "Continue": true
     },
@@ -1110,8 +1110,8 @@
         "LineName": "FAN6_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan6.service"],
-            "FALLING": ["power-fail-deassert@fan6.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_fan6.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_fan6.service"]
         },
         "Continue": true
     },
@@ -1120,8 +1120,8 @@
         "LineName": "FAN7_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan7.service"],
-            "FALLING": ["power-fail-deassert@fan7.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_fan7.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_fan7.service"]
         },
         "Continue": true
     },
@@ -1130,8 +1130,8 @@
         "LineName": "FAN8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan8.service"],
-            "FALLING": ["power-fail-deassert@fan8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_fan8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_fan8.service"]
         },
         "Continue": true
     },
@@ -1140,8 +1140,8 @@
         "LineName": "FAN9_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan9.service"],
-            "FALLING": ["power-fail-deassert@fan9.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_fan9.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_fan9.service"]
         },
         "Continue": true
     },
@@ -1150,8 +1150,8 @@
         "LineName": "FAN10_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan10.service"],
-            "FALLING": ["power-fail-deassert@fan10.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_fan10.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_fan10.service"]
         },
         "Continue": true
     },
@@ -1160,8 +1160,8 @@
         "LineName": "FAN11_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan11.service"],
-            "FALLING": ["power-fail-deassert@fan11.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_fan11.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_fan11.service"]
         },
         "Continue": true
     },
@@ -1170,8 +1170,8 @@
         "LineName": "FAN12_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan12.service"],
-            "FALLING": ["power-fail-deassert@fan12.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_fan12.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_fan12.service"]
         },
         "Continue": true
     },
@@ -1180,8 +1180,8 @@
         "LineName": "FAN13_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan13.service"],
-            "FALLING": ["power-fail-deassert@fan13.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_fan13.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_fan13.service"]
         },
         "Continue": true
     },
@@ -1190,8 +1190,8 @@
         "LineName": "FAN14_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan14.service"],
-            "FALLING": ["power-fail-deassert@fan14.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_fan14.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_fan14.service"]
         },
         "Continue": true
     },
@@ -1200,8 +1200,8 @@
         "LineName": "FAN15_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan15.service"],
-            "FALLING": ["power-fail-deassert@fan15.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_fan15.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_fan15.service"]
         },
         "Continue": true
     },
@@ -1210,8 +1210,8 @@
         "LineName": "FAN16_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan16.service"],
-            "FALLING": ["power-fail-deassert@fan16.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_fan16.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_fan16.service"]
         },
         "Continue": true
     },
@@ -1220,8 +1220,8 @@
         "LineName": "FAN17_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan17.service"],
-            "FALLING": ["power-fail-deassert@fan17.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_fan17.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_fan17.service"]
         },
         "Continue": true
     },
@@ -1230,8 +1230,8 @@
         "LineName": "FAN18_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan18.service"],
-            "FALLING": ["power-fail-deassert@fan18.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_fan18.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_fan18.service"]
         },
         "Continue": true
     },
@@ -1240,8 +1240,8 @@
         "LineName": "FAN19_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan19.service"],
-            "FALLING": ["power-fail-deassert@fan19.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_fan19.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_fan19.service"]
         },
         "Continue": true
     },
@@ -1250,8 +1250,8 @@
         "LineName": "FAN20_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan20.service"],
-            "FALLING": ["power-fail-deassert@fan20.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_fan20.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_fan20.service"]
         },
         "Continue": true
     },
@@ -1260,8 +1260,8 @@
         "LineName": "FAN21_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan21.service"],
-            "FALLING": ["power-fail-deassert@fan21.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_fan21.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_fan21.service"]
         },
         "Continue": true
     },
@@ -1270,8 +1270,8 @@
         "LineName": "FAN22_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan22.service"],
-            "FALLING": ["power-fail-deassert@fan22.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_fan22.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_fan22.service"]
         },
         "Continue": true
     },
@@ -1280,8 +1280,8 @@
         "LineName": "FAN23_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan23.service"],
-            "FALLING": ["power-fail-deassert@fan23.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_fan23.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_fan23.service"]
         },
         "Continue": true
     },
@@ -1290,8 +1290,8 @@
         "LineName": "FAN24_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fan24.service"],
-            "FALLING": ["power-fail-deassert@fan24.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_fan24.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_fan24.service"]
         },
         "Continue": true
     },
@@ -1300,8 +1300,8 @@
         "LineName": "FCB_1_P1V0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_1_p1v0.service"],
-            "FALLING": ["power-fail-deassert@fcb_1_p1v0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_p1v0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_p1v0.service"]
         },
         "Continue": true
     },
@@ -1310,8 +1310,8 @@
         "LineName": "FCB_2_P1V0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_2_p1v0.service"],
-            "FALLING": ["power-fail-deassert@fcb_2_p1v0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_p1v0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_p1v0.service"]
         },
         "Continue": true
     },
@@ -1320,8 +1320,8 @@
         "LineName": "FCB_3_P1V0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_3_p1v0.service"],
-            "FALLING": ["power-fail-deassert@fcb_3_p1v0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_p1v0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_p1v0.service"]
         },
         "Continue": true
     },
@@ -1330,8 +1330,8 @@
         "LineName": "FCB_4_P1V0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_4_p1v0.service"],
-            "FALLING": ["power-fail-deassert@fcb_4_p1v0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_p1v0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_p1v0.service"]
         },
         "Continue": true
     },
@@ -1340,8 +1340,8 @@
         "LineName": "FCB_5_P1V0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_5_p1v0.service"],
-            "FALLING": ["power-fail-deassert@fcb_5_p1v0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_p1v0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_p1v0.service"]
         },
         "Continue": true
     },
@@ -1350,8 +1350,8 @@
         "LineName": "FCB_6_P1V0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_6_p1v0.service"],
-            "FALLING": ["power-fail-deassert@fcb_6_p1v0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_p1v0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_p1v0.service"]
         },
         "Continue": true
     },
@@ -1360,8 +1360,8 @@
         "LineName": "FCB_1_P1V8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_1_p1v8.service"],
-            "FALLING": ["power-fail-deassert@fcb_1_p1v8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_p1v8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_p1v8.service"]
         },
         "Continue": true
     },
@@ -1370,8 +1370,8 @@
         "LineName": "FCB_2_P1V8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_2_p1v8.service"],
-            "FALLING": ["power-fail-deassert@fcb_2_p1v8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_p1v8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_p1v8.service"]
         },
         "Continue": true
     },
@@ -1380,8 +1380,8 @@
         "LineName": "FCB_3_P1V8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_3_p1v8.service"],
-            "FALLING": ["power-fail-deassert@fcb_3_p1v8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_p1v8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_p1v8.service"]
         },
         "Continue": true
     },
@@ -1390,8 +1390,8 @@
         "LineName": "FCB_4_P1V8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_4_p1v8.service"],
-            "FALLING": ["power-fail-deassert@fcb_4_p1v8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_p1v8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_p1v8.service"]
         },
         "Continue": true
     },
@@ -1400,8 +1400,8 @@
         "LineName": "FCB_5_P1V8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_5_p1v8.service"],
-            "FALLING": ["power-fail-deassert@fcb_5_p1v8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_p1v8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_p1v8.service"]
         },
         "Continue": true
     },
@@ -1410,8 +1410,8 @@
         "LineName": "FCB_6_P1V8_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_6_p1v8.service"],
-            "FALLING": ["power-fail-deassert@fcb_6_p1v8.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_p1v8.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_p1v8.service"]
         },
         "Continue": true
     },
@@ -1420,8 +1420,8 @@
         "LineName": "FCB_1_P48V_ZONE0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_1_p48v_zone0.service"],
-            "FALLING": ["power-fail-deassert@fcb_1_p48v_zone0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-1_p48v_zone0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-1_p48v_zone0.service"]
         },
         "Continue": true
     },
@@ -1430,8 +1430,8 @@
         "LineName": "FCB_2_P48V_ZONE0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_2_p48v_zone0.service"],
-            "FALLING": ["power-fail-deassert@fcb_2_p48v_zone0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-2_p48v_zone0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-2_p48v_zone0.service"]
         },
         "Continue": true
     },
@@ -1440,8 +1440,8 @@
         "LineName": "FCB_3_P48V_ZONE0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_3_p48v_zone0.service"],
-            "FALLING": ["power-fail-deassert@fcb_3_p48v_zone0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-3_p48v_zone0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-3_p48v_zone0.service"]
         },
         "Continue": true
     },
@@ -1450,8 +1450,8 @@
         "LineName": "FCB_4_P48V_ZONE0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_4_p48v_zone0.service"],
-            "FALLING": ["power-fail-deassert@fcb_4_p48v_zone0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-4_p48v_zone0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-4_p48v_zone0.service"]
         },
         "Continue": true
     },
@@ -1460,8 +1460,8 @@
         "LineName": "FCB_5_P48V_ZONE0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_5_p48v_zone0.service"],
-            "FALLING": ["power-fail-deassert@fcb_5_p48v_zone0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-5_p48v_zone0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-5_p48v_zone0.service"]
         },
         "Continue": true
     },
@@ -1470,8 +1470,8 @@
         "LineName": "FCB_6_P48V_ZONE0_POWER_FAIL",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["power-fail-assert@fcb_6_p48v_zone0.service"],
-            "FALLING": ["power-fail-deassert@fcb_6_p48v_zone0.service"]
+            "RISING": ["vr-fault-assert-log@fcb-6_p48v_zone0.service"],
+            "FALLING": ["vr-fault-deassert-log@fcb-6_p48v_zone0.service"]
         },
         "Continue": true
     },

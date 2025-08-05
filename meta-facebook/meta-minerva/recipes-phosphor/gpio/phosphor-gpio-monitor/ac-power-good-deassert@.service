@@ -1,7 +1,0 @@
-[Unit]
-Description=%i AC Power Good Status Deassert
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/logging "%i AC power good deassert" "BLADE" "%i"
-SyslogIdentifier=%i-AC-power-good-deassert

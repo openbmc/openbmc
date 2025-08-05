@@ -1,0 +1,71 @@
+#!/bin/bash
+
+HELP_MSG="
+Usage: vr-fault-event-logger <event> <gpio_name>
+<event> is the vr fault event to log,
+e.g. assert / deassert.
+
+<board>_<gpio_name> is defined in json file,
+e.g. cmm_p12v-ina230-alert
+"
+
+if [ "$#" -ne 2 ]; then
+    echo "$HELP_MSG"
+    exit 1
+fi
+
+message="$2"
+ASSERT_MSG_ID="xyz.openbmc_project.State.Power.VoltageRegulatorFault"
+DEASSERT_MSG_ID="xyz.openbmc_project.State.Power.VoltageRegulatorFaultRecovered"
+
+# Extract board name and gpio name from the message amd build device path
+# Supported message formats:
+#   1. <board_name>-<board_number>_<gpio_name>
+#      Example: fcb-1_ina238-fan1-alert
+#      Device path: /xyz/openbmc_project/inventory/system/board/Minerva_Fan_Board_1/ina238-fan1-alert
+#   2. <board_name>_<gpio_name>
+#      Example: cmm_p12v-ina230-alert
+#      Device path: /xyz/openbmc_project/inventory/system/board/Minerva_CMM/p12v-ina230-alert
+board="${message%%_*}"
+gpio_name="${message#*_}"
+
+if [[ $board == fcb* ]]; then
+    board_num="${board#fcb-}"
+    device_path="/xyz/openbmc_project/inventory/system/board/Minerva_Fan_Board_${board_num}/${gpio_name}"
+elif [[ $board == cmm* ]]; then
+    device_path="/xyz/openbmc_project/inventory/system/board/Minerva_CMM/${gpio_name}"
+else
+    echo "Unknown message format: $message"
+    exit 1
+fi
+
+stash_file="/run/${message}.log_entry"
+
+
+case "$1" in
+    "assert")
+        if [ ! -s "$stash_file" ]; then
+            /usr/bin/log-create "$ASSERT_MSG_ID" --json \
+                "{ \"VOLTAGE_REGULATOR\": \"${device_path}\", \"FAILURE_DATA\": \"${gpio_name}\"}" \
+                > "${stash_file}"
+        fi
+        ;;
+
+    "deassert")
+        # If the stash file exists, resolve the log entry and remove the stash file
+        if [ -s "${stash_file}" ]; then
+            log-resolve -p "$(< "${stash_file}")" && rm "${stash_file}"
+        fi
+        # Always create a deassert log entry
+        /usr/bin/log-create "$DEASSERT_MSG_ID" --json \
+            "{ \"VOLTAGE_REGULATOR\": \"${device_path}\"}"
+        ;;
+
+    *)
+        echo "Not supported event: $1"
+        echo "$HELP_MSG"
+        exit 1
+        ;;
+esac
+
+exit 0

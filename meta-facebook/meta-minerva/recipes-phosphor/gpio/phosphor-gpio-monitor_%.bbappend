@@ -2,14 +2,12 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-systemd systemd
 
-SERVICE_LIST = "power-good-assert@.service \
-                power-good-deassert@.service \
-                rpu-ready-assert@.service \
+SERVICE_LIST = "rpu-ready-assert@.service \
                 rpu-ready-deassert@.service \
-                ac-power-good-assert@.service \
-                ac-power-good-deassert@.service \
-                power-fail-assert@.service \
-                power-fail-deassert@.service \
+                power-rail-assert-log@.service \
+                power-rail-deassert-log@.service \
+                vr-fault-assert-log@.service \
+                vr-fault-deassert-log@.service \
                 rescan-fru.service \
                 fan-reload.service \
                 cr-toggle-boot-enabled.service \
@@ -23,6 +21,8 @@ SRC_URI += "file://minerva-phosphor-multi-gpio-monitor.json \
             file://logging \
             file://fan-reload \
             file://cr-toggle-boot-logger \
+            file://power-rail-event-logger \
+            file://vr-fault-event-logger \
             ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
             "
 
@@ -48,4 +48,6 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/fan-reload ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/cr-toggle-boot-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
 }
