@@ -11,7 +11,7 @@ DEPENDS = "boost \
            valijson \
            phosphor-dbus-interfaces \
 "
-SRCREV = "533d49096d1f45e8389f2349aef2b655945add52"
+SRCREV = "bc096dc5dfa8d3d5998a63b1d2ac247423ed34eb"
 PACKAGECONFIG ??= "ipmi-fru gpio-presence"
 
 PACKAGECONFIG[dts-vpd] = "-Ddevicetree-vpd=true, -Ddevicetree-vpd=false"
