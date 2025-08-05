@@ -23,6 +23,80 @@ phosphor_log_info() {
     phosphor_log "$msg" "$logInfo"
 }
 
+check_pdb_cpld_reg() {
+    local output
+    output=$(i2ctransfer -y -f 14 w1@0x1e 0x00 r16)
+    echo "Raw PDB CPLD reg[0:15]: $output"
+
+    # Clean and split the hex values into an array
+    local hex_array=()
+    read -ra hex_array <<< "$output"
+
+    for ((i = 0; i < ${#hex_array[@]}; i++)); do
+        reg[i]=$((16#${hex_array[i]#0x}))
+    done
+
+    local log_msg="PDB CPLD State: "
+    local master_state=""
+    master_state="0x$(printf "%02x" $(( reg[13] & 0x0F )))"
+
+    # Helper to convert 0/1 to "assert"/"deassert"
+    signal_state() {
+        [[ $1 -eq 1 ]] && echo "deassert" || echo "assert"
+    }
+
+    case "$master_state" in
+        0x0e)
+            log_msg+="System leak (0x0e)"
+            # reg[3], bit 3, wCHASSIS0_LEAK_Q_N_PLD_db
+            log_msg+=", wCHASSIS0_LEAK_Q_N_PLD_db $(signal_state $(( (reg[3] >> 3) & 0x01 )))"
+            # reg[3], bit 2, wCHASSIS1_LEAK_Q_N_PLD_db
+            log_msg+=", wCHASSIS1_LEAK_Q_N_PLD_db $(signal_state $(( (reg[3] >> 2) & 0x01 )))"
+            # reg[3], bit 1, wCHASSIS2_LEAK_Q_N_PLD_db
+            log_msg+=", wCHASSIS2_LEAK_Q_N_PLD_db $(signal_state $(( (reg[3] >> 1) & 0x01 )))"
+            # reg[3], bit 0, wCHASSIS3_LEAK_Q_N_PLD_db
+            log_msg+=", wCHASSIS3_LEAK_Q_N_PLD_db $(signal_state $(( (reg[3] >> 0) & 0x01 )))"
+            ;;
+        0x09)
+            log_msg+="Idle (0x09)"
+            # reg[11], bit 7, PWRGD_P3V3_AUX_PLD
+            log_msg+=", PWRGD_P3V3_AUX_PLD $(signal_state $(( (reg[11] >> 7) & 0x01 )))"
+            ;;
+        0x07)
+            log_msg+="Standby power ready (0x07)"
+            # reg[11], bit 6, PWRGD_P12V_AUX_PLD_ISO_R
+            log_msg+=", PWRGD_P12V_AUX_PLD_ISO_R $(signal_state $(( (reg[11] >> 6) & 0x01 )))"
+            ;;
+        0x05)
+            log_msg+="FANx enabled (0x05)"
+            # reg[11], bit 4, PWRGD_P12V_AUX_FAN_PLD
+            log_msg+=", PWRGD_P12V_AUX_FAN_PLD $(signal_state $(( (reg[11] >> 4) & 0x01 )))"
+            # reg[11], bit 3, wFM_MAIN_PWREN_RMC_EN_ISO_R_config
+            log_msg+=", wFM_MAIN_PWREN_RMC_EN_ISO_R_config $(signal_state $(( (reg[11] >> 3) & 0x01 )))"
+            # reg[11], bit 2, PDB_P12V_EN_N_ISO_PLD_R
+            log_msg+=", PDB_P12V_EN_N_ISO_PLD_R $(signal_state $(( (reg[11] >> 2) & 0x01 )))"
+            ;;
+        0x03)
+            log_msg+="Waiting for Main P12V power ready (0x03)"
+            # reg[12], bit 5, NODEA_NODEB_PWOK_PLD_ISO_R
+            log_msg+=", NODEA_NODEB_PWOK_PLD_ISO_R $(signal_state $(( (reg[12] >> 5) & 0x01 )))"
+            ;;
+        0x01)
+            log_msg+="Waiting for Host PERST Deassert (0x01)"
+            # reg[7], bit 1, OCP_SFF_PERST_FROM_HOST_ISO_PLD_N
+            log_msg+=", OCP_SFF_PERST_FROM_HOST_ISO_PLD_N $(signal_state $(( (reg[7] >> 1) & 0x01 )))"
+            # reg[9], bit 1, OCP_V3_2_PERST_FROM_HOST_ISO_PLD_N
+            log_msg+=", OCP_V3_2_PERST_FROM_HOST_ISO_PLD_N $(signal_state $(( (reg[9] >> 1) & 0x01 )))"
+            ;;
+        *)
+            log_msg+="Unexpected state ($master_state)"
+            ;;
+    esac
+
+    echo "$log_msg"
+    phosphor_log_err "$log_msg"
+}
+
 get_pdb_cpld_ver()
 {
     local pdb_cpld_ver=""
@@ -181,6 +255,7 @@ host_power_on()
     if [ "$(host_power_status)" == "off" ]; then
         press_host_power_button "on" 1
         if ! wait_host_power_change "on" 20; then
+            check_pdb_cpld_reg
             return 1
         fi
     fi
