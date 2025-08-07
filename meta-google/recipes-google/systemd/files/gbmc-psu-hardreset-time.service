@@ -1,0 +1,8 @@
+[Unit]
+Description=Power Cycle Delay
+
+[Service]
+Type=oneshot
+Environment=PSU_HARDRESET_DELAY=0
+EnvironmentFile=-/run/psu_timedelay
+ExecStart=/bin/sleep $PSU_HARDRESET_DELAY

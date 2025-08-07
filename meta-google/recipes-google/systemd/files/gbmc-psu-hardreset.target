@@ -1,0 +1,7 @@
+[Unit]
+Description=Sys PSU Hard Reset
+StopWhenUnneeded=true
+Wants=gbmc-psu-hardreset-pre.target
+After=gbmc-psu-hardreset-pre.target
+Conflicts=systemd-random-seed.service
+After=systemd-random-seed.service
