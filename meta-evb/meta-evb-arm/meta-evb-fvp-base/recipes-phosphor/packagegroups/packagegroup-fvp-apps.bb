@@ -38,4 +38,6 @@ RDEPENDS:${PN}-system = " \
         webui-vue \
         phosphor-host-postd \
         phosphor-post-code-manager \
+        smbios-mdr \
+        phosphor-ipmi-blobs \
         "
