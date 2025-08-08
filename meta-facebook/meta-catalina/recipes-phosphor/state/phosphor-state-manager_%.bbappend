@@ -124,6 +124,11 @@ HARD_OFF_INSTFMT_CTRL = ""
 #Remove unexpected ChassisPowerOnStarted log at host first start
 RRECOMMENDS:${PN}-chassis:remove = " ${PN}-chassis-poweron-log"
 
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-start@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-stop@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-on@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-running@.service"
+
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
