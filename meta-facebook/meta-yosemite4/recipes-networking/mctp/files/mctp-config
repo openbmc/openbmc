@@ -15,10 +15,10 @@ do
         slot=$((busnum * 4 + i))
         eidBase=$((slot * 10))
         lladdr=$(printf "0x07:ec:80:01:00:%02x" $(((slot - 1) * 5)))
-        mctp route add $((eidBase + 0)) via mctpi3c${busnum} mtu 68
-        mctp route add $((eidBase + 2)) via mctpi3c${busnum} mtu 68
-        mctp route add $((eidBase + 4)) via mctpi3c${busnum} mtu 68
-        mctp route add $((eidBase + 5)) via mctpi3c${busnum} mtu 68
+        mctp route add $((eidBase + 0)) via mctpi3c${busnum}
+        mctp route add $((eidBase + 2)) via mctpi3c${busnum}
+        mctp route add $((eidBase + 4)) via mctpi3c${busnum}
+        mctp route add $((eidBase + 5)) via mctpi3c${busnum}
         mctp neigh add $((eidBase + 0)) dev mctpi3c${busnum} lladdr "$lladdr"
         mctp neigh add $((eidBase + 2)) dev mctpi3c${busnum} lladdr "$lladdr"
         mctp neigh add $((eidBase + 4)) dev mctpi3c${busnum} lladdr "$lladdr"
