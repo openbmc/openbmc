@@ -46,6 +46,11 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
 "
 
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-on@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-running@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-start@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-stop@.service"
+
 HOST_DEFAULT_TARGETS:append = " \
     obmc-host-startmin@{}.target.wants/host-poweron@{}.service \
     obmc-host-stop@{}.target.wants/host-poweroff@{}.service \
