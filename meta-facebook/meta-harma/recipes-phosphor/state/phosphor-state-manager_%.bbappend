@@ -70,6 +70,10 @@ HARD_OFF_TGTFMT_CTRL = ""
 HARD_OFF_FMT_CTRL = ""
 HARD_OFF_INSTFMT_CTRL = ""
 
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-on@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-running@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-start@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-stop@.service"
 
 SRC_URI:append = " \
     file://chassis-powercycle \
