@@ -1,4 +1,12 @@
 #!/bin/bash
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+
+CHASSIS_BUS=$(($1 - 1))
+IO_EXP_P0_PWRGD_R_OUT=18
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
 
 # Function to check if CXL EID needs to be established for the slot
 check_slot_type() {
@@ -64,6 +72,16 @@ output_final_status() {
     exit 1
 }
 
+check_host_status() {
+    local slot_number="$1"
+    host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")
+    if [ "$host_status" != "$STATE_ON" ]
+    then
+        echo "Host$1 DC power is not on. Stopping CXL EID rescan."
+        output_final_status "$(check_eid "$cxl1_eid" && echo "yes" || echo "no")" "$(check_eid "$cxl2_eid" && echo "yes" || echo "no")" "${slot_number}"
+    fi
+}
+
 # Main script execution starts here
 check_slot_type "$1"
 wf_eid=$(($1 * 10 + 2))
@@ -78,6 +96,9 @@ cxl1_status="no"
 cxl2_status="no"
 
 for _ in $(seq 1 12); do
+
+    check_host_status "$1"
+
     if [ "$cxl1_status" == "no" ] && check_eid "$cxl1_eid"; then
         cxl1_status="yes"
         echo "CXL1 EID $cxl1_eid found successfully."
@@ -99,6 +120,9 @@ done
 
 # Retry to establish CXL EID connections, max 10 minutes
 for _ in $(seq 1 40); do
+
+    check_host_status "$1"
+
     output=$(pldmtool raw -m "$wf_eid" -d 0x80 0x02 0x3A 0x04 0x01)
     rx_line=$(echo "$output" | grep "Rx:")
     rx_data=$(echo "$rx_line" | awk '{print $4,$5,$6,$7,$8,$9,$10,$11,$12,$13}')
