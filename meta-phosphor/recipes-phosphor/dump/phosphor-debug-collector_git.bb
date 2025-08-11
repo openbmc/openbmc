@@ -74,13 +74,13 @@ RDEPENDS:${PN}-scripts += " \
 "
 
 FILES:${PN}-manager += " \
-    ${bindir}/phosphor-dump-manager \
+    ${libexecdir}/phosphor-debug-collector/phosphor-dump-manager \
     ${bindir}/phosphor-offload-handler \
     ${exec_prefix}/lib/tmpfiles.d/coretemp.conf \
     ${datadir}/dump/ \
     "
-FILES:${PN}-monitor += "${bindir}/phosphor-dump-monitor"
-FILES:${PN}-monitor += "${bindir}/phosphor-ramoops-monitor"
+FILES:${PN}-monitor += "${libexecdir}/phosphor-debug-collector/phosphor-dump-monitor"
+FILES:${PN}-monitor += "${libexecdir}/phosphor-debug-collector/phosphor-ramoops-monitor"
 FILES:${PN}-dreport += "${bindir}/dreport"
 FILES:${PN}-scripts += "${dreport_dir}"
 
