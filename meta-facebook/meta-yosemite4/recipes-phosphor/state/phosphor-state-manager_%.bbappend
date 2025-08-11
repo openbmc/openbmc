@@ -19,6 +19,11 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
     "
 
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-on@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "phosphor-reset-chassis-running@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-start@.service"
+SYSTEMD_SERVICE:${PN}-chassis:remove = "obmc-power-stop@.service"
+
 # When we power off the host, we do not want to do a full chassis power-off
 # because that will turn off power to the compute card standby domain (and
 # we lose communication with the BIC.
