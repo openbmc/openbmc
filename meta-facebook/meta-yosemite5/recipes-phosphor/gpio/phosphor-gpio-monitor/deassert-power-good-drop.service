@@ -1,0 +1,8 @@
+[Unit]
+Description=Deassert Power Good Drop
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/deassert-power-good-drop
+
+SyslogIdentifier=deassert-power-good-drop

@@ -9,6 +9,10 @@ SRC_URI += "file://yosemite5-phosphor-multi-gpio-monitor.json \
             file://multi-gpios-sys-init.service \
             file://assert-host-ready.service \
             file://deassert-host-ready.service \
+            file://assert-power-good-drop \
+            file://assert-power-good-drop.service \
+            file://deassert-power-good-drop \
+            file://deassert-power-good-drop.service \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -20,6 +24,8 @@ SYSTEMD_SERVICE:${PN} += " \
     multi-gpios-sys-init.service \
     assert-host-ready.service \
     deassert-host-ready.service \
+    assert-power-good-drop.service \
+    deassert-power-good-drop.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
