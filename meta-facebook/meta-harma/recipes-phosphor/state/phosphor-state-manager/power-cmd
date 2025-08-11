@@ -2,11 +2,12 @@
 
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
+renice -10 $$
 
 check_valid_sgpio() {
-    sgpio_vaild0=$(gpioget 2 146)
-    sgpio_vaild1=$(gpioget 2 198)
-    sgpio_vaild2=$(gpioget 2 18)
+    sgpio_vaild0=$(get_gpio "power-card-enable")
+    sgpio_vaild1=$(get_gpio "SLOT_ID_BCB_3")
+    sgpio_vaild2=$(get_gpio "power-pvdd33-s5")
 
     if [[ "$sgpio_vaild0" == "0" && "$sgpio_vaild1" == "0" && "$sgpio_vaild2" == "1" ]]; then
         return 0  # true
