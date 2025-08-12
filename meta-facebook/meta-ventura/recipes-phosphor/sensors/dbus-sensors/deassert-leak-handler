@@ -58,13 +58,33 @@ is_port_power_good() {
   fi
 }
 
-if [ "$LeakType" == "Big" ]; then
-  busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/leakport""$portnum""_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+if [ "$LeakType" = "Big" ] || [ "$LeakType" = "Small" ]; then
+  bigLeakStatus=$(busctl get-property xyz.openbmc_project.leakdetector \
+    /xyz/openbmc_project/state/leak/detector/LeakPort"${portnum}"_Big \
+    xyz.openbmc_project.State.Leak.Detector State \
+    | cut -d' ' -f2 | cut -d'.' -f6-7 | tr -d '"')
 
-  if is_port_power_good "leakport$portnum"; then
-      # If power is good, set blue LED to true
-      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/leakport""$portnum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
-  else
-      busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/leakport""$portnum""_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+  smallLeakStatus=$(busctl get-property xyz.openbmc_project.leakdetector \
+    /xyz/openbmc_project/state/leak/detector/LeakPort"${portnum}"_Small \
+    xyz.openbmc_project.State.Leak.Detector State \
+    | cut -d' ' -f2 | cut -d'.' -f6-7 | tr -d '"')
+
+  # Check the LeakDetector status to ensure both the Big and Small
+  # Leak Status are Normal before turning off the port’s Leak LED.
+  if [[ "$bigLeakStatus" == "DetectorState.Normal" && "$smallLeakStatus" == "DetectorState.Normal" ]]; then
+
+    busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+      "/xyz/openbmc_project/led/groups/leakport${portnum}_amber" \
+      "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+
+    if is_port_power_good "leakport${portnum}"; then
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+        "/xyz/openbmc_project/led/groups/leakport${portnum}_blue" \
+        "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+    else
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+        "/xyz/openbmc_project/led/groups/leakport${portnum}_blue" \
+        "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+    fi
   fi
 fi

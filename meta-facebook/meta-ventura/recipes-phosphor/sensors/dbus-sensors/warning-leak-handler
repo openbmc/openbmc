@@ -1,0 +1,29 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "Incorrect number of arguments. Expected 1, got $#."
+    exit 1
+fi
+
+EnableLeds()
+{
+    local portnum=$1
+
+    busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+        "/xyz/openbmc_project/led/groups/leakport""$portnum""_amber" \
+        "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+
+    busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+        "/xyz/openbmc_project/led/groups/leakport""$portnum""_blue" \
+        "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+}
+
+DetectorName=$1
+
+LeakType=$(echo "$DetectorName" | cut -d'_' -f2)
+temp=${DetectorName#*Port}
+portnum=${temp%%_*}
+
+if [ "$LeakType" == "Small" ]; then
+  EnableLeds "${portnum}"
+fi
