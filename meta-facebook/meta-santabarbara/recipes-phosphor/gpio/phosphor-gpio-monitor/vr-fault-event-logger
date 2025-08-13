@@ -1,0 +1,47 @@
+#!/bin/bash
+
+HELP="
+Usage: vr-fault-event-logger <event> <gpio-name>
+<event> is the power rail event to log,
+e.g. assert / deassert.
+
+<gpio-name> is defined in json file,
+e.g. FM_PVDDCR_CPU0_P0_OCP_N
+"
+
+# get assert or deassert message
+action=$1
+
+# get gpio name
+GPIO_NAME=$2
+
+MSG_ID="xyz.openbmc_project.State.Power.VoltageRegulatorFault"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Santabarbara_MB/$GPIO_NAME"
+STASH_FILE="/run/${GPIO_NAME}.log_entry"
+
+
+case $action in
+    "-h")
+        echo "$HELP"
+        ;;
+
+    "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"VOLTAGE_REGULATOR\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        MSG_ID="xyz.openbmc_project.State.Power.VoltageRegulatorFaultRecovered"
+        if [ -s "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+        fi
+        /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"VOLTAGE_REGULATOR\": \"${DEVICE_PATH}\"}"
+        ;;
+esac
+
+
+exit 0

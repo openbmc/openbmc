@@ -7,6 +7,8 @@ SERVICE_LIST = "assert-power-good-drop.service \
                 deassert-power-good-drop.service \
                 deassert-reset-button.service \
                 multi-gpios-sys-init.service \
+                vr-fault-assert-log@.service \
+                vr-fault-deassert-log@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -18,6 +20,7 @@ SRC_URI += " \
     file://deassert-reset-button \
     file://multi-gpios-sys-init \
     file://plat-phosphor-multi-gpio-monitor.json \
+    file://vr-fault-event-logger \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
 
@@ -43,6 +46,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"
