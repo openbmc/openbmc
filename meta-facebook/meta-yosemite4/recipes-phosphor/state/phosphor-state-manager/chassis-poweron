@@ -12,14 +12,12 @@ source /usr/libexec/yosemite4-common-functions
 #IO 8:16 output port for controlling slot 1:8 power status
 CHASSIS_ID=$1
 slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
-IO_EXP_P0_PWRGD_R_OUT=18
 IO_EXP_SLOT_PWR_STATUS=$((CHASSIS_ID - 1))
 IO_EXP_SLOT_PWR_CTRL=$((IO_EXP_SLOT_PWR_STATUS + 8))
 IO_EXP_SLOT_12V_STATUS=$((CHASSIS_ID + 23))
 
 GPIOCHIP_IO_EXP_SLOT_PWR_CTRL=$(basename "/sys/bus/i2c/devices/$SPIDER_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLOT_PWR_CTRL_ADDR/"*gpiochip*)
 GPIOCHIP_IO_EXP_SLOT_12V_STATUS_CTRL=$(basename "/sys/bus/i2c/devices/$MANAGEMENT_BOARD_IO_EXP_BUS_NUM-00$IO_EXP_SLED_PWR_CTRL_ADDR/"*gpiochip*)
-GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$IO_EXP_SLOT_PWR_STATUS-0023/"*gpiochip*)
 
 is_nuvoton_board="$(check_nuvoton_board)"
 
@@ -108,10 +106,4 @@ else
     add_sel "${msg}" "Info"
 fi
 
-host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")
-if [ "$host_status" != "$STATE_ON" ]
-then
-    systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
-    echo "Power on Host$CHASSIS_ID"
-fi
 exit 0;

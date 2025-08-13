@@ -1,10 +1,12 @@
 [Unit]
 Description=power on chassis:%i
 OnFailure=chassis-poweron-failure@%i.service check-i3c-hub@%i.service
+After=multi-user.target
 
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/phosphor-state-manager/chassis-poweron %i
+ExecStartPost=/bin/bash -c '/bin/systemctl --no-block restart policy-chassis-poweron@%i.service || true'
 
 [Install]
 WantedBy=obmc-chassis-poweron@%i.target

@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+CHASSIS_ID=$1
+TARGET_NAME="obmc-chassis-poweron@$CHASSIS_ID.target"
+RETRY=30
+count=0
+
+while [ $count -lt $RETRY ]; do
+    status=$(systemctl is-active "$TARGET_NAME")
+    if [ "$status" == "active" ]; then
+        systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
+        echo "Host$CHASSIS_ID doing Power Policy"
+        exit 0
+    else
+        echo "Waiting for $TARGET_NAME to become active..."
+    fi
+    sleep 1
+    count=$((count+1))
+done
+
+echo "Timeout waiting for $TARGET_NAME"
+exit 1

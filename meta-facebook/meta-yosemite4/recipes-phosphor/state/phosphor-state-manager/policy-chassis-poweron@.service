@@ -1,0 +1,7 @@
+[Unit]
+Description=Power Policy for Chassis Power On %i
+After=host-poweron@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/policy-chassis-poweron %i
