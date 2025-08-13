@@ -2,3 +2,5 @@
 SOFT_SVC = ""
 SOFT_TGTFMT = ""
 SOFT_FMT = ""
+
+PACKAGECONFIG:append = " arm-sbmr"
