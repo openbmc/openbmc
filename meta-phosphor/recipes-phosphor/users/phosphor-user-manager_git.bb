@@ -8,7 +8,7 @@ DEPENDS += "phosphor-logging"
 DEPENDS += "phosphor-dbus-interfaces"
 DEPENDS += "boost"
 DEPENDS += "systemd"
-SRCREV = "f21966594e9735887b3091616df643c24dd14979"
+SRCREV = "3ddb95af8f08638597a31dfa87d4d099a0dbd7d0"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
