@@ -68,6 +68,15 @@ check_slot_presence() {
     done
 }
 
+check_bmc_boot_flash() {
+    local flash
+    flash=$(cat /run/media/slot)
+
+    if [ "$flash" == "1" ]; then
+        /usr/bin/log-create xyz.openbmc_project.State.BMC.SecondaryFlashBoot
+    fi
+}
+
 # Function to calculate BIT(n)
 BIT() {
     echo $((1 << $1))
@@ -201,5 +210,8 @@ set_sd_bic_interface_to_i3c
 
 # Set I3C hub register
 set_I3C_hub
+
+# add sel for BMC boot from secondary flash
+check_bmc_boot_flash
 
 exit 0
