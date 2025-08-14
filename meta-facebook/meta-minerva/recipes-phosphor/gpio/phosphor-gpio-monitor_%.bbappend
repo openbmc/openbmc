@@ -17,7 +17,6 @@ SERVICE_LIST = "rpu-ready-assert@.service \
 SERVICE_FILE_FMT = "file://{0}"
 
 SRC_URI += "file://minerva-phosphor-multi-gpio-monitor.json \
-            file://minerva-phosphor-multi-gpio-presence.json \
             file://logging \
             file://fan-reload \
             file://cr-toggle-boot-logger \
@@ -36,8 +35,6 @@ do_install:append() {
     install -d ${D}${datadir}/phosphor-gpio-monitor
     install -m 0644 ${UNPACKDIR}/minerva-phosphor-multi-gpio-monitor.json \
                     ${D}${datadir}/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json
-    install -m 0644 ${UNPACKDIR}/minerva-phosphor-multi-gpio-presence.json \
-                    ${D}${datadir}/phosphor-gpio-monitor/phosphor-multi-gpio-presence.json
 
     for s in ${SERVICE_LIST}
     do
