@@ -1,0 +1,11 @@
+SUBSYSTEM=="tty", ATTRS{iomem_base}=="0x1E78E000", ENV{SYSTEMD_WANTS}="obmc-console@ttyS2", TAG+="systemd"
+
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.1.2.4:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_RB_0"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.2.2.4:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_RB_2"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.3.2.4:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_RB_3"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.4.2.4:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_RB_1"
+
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.1.2.1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_SITV_0"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.2.2.1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_SITV_2"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.3.2.1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_SITV_3"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", KERNELS=="1-1.4.2.1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="tty_SITV_1"
