@@ -4,7 +4,7 @@
 check_slot_type() {
     local slot_number="$1"
     local slot_type
-    slot_type=$(dbus-send --system --print-reply --dest=xyz.openbmc_project.ObjectMapper /xyz/openbmc_project/object_mapper xyz.openbmc_project.ObjectMapper.GetSubTreePaths string:"/xyz/openbmc_project/inventory/system/board" int32:1 array:string:"xyz.openbmc_project.Inventory.Item.Board" | grep -Eo "Yosemite_4_Sentinel_Dome_T[12]_(with_Retimer_)?Slot_$slot_number")
+    slot_type=$(busctl call xyz.openbmc_project.ObjectMapper /xyz/openbmc_project/object_mapper xyz.openbmc_project.ObjectMapper GetSubTreePaths sias "/xyz/openbmc_project/inventory/system/board" 1 1 "xyz.openbmc_project.Inventory.Item.Board.Motherboard" | grep -Eo "Yosemite_4_Sentinel_Dome_T[12]_(with_Retimer_)?Slot_$slot_number")
     if [[ $slot_type == *"T1"* ]]; then
         echo "Bypass the task of establishing CXL1 and CXL2 EIDs for $slot_type."
         exit 0
