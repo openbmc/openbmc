@@ -19,6 +19,7 @@ SRC_URI += "file://critical-leak-handler \
             file://${WARNING_LEAK_SERVICE} \
             file://${WARNING_DEASSERT_SERVICE} \
             "
+SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'cablemonitor', ' file://cable-config.json', '', d)}"
 
 RDEPENDS:${PN}:append: = " bash"
 
@@ -32,6 +33,11 @@ SYSTEMD_SERVICE:${PN} += "${WARNING_DEASSERT_SERVICE}"
 SYSTEMD_AUTO_ENABLE = "enable"
 
 do_install:append:() {
+    if ${@bb.utils.contains('PACKAGECONFIG', 'cablemonitor', 'true', 'false', d)}; then
+        install -d ${D}/var/lib/cablemonitor
+        install -m 0755 ${UNPACKDIR}/cable-config.json ${D}/var/lib/cablemonitor/cable-config.json
+    fi
+
     install -m 0755 ${UNPACKDIR}/critical-leak-handler ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-leak-handler ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/warning-leak-handler ${D}${libexecdir}/${PN}/
