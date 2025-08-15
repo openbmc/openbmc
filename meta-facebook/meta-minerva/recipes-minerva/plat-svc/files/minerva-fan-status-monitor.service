@@ -2,8 +2,8 @@
 Description=Minerva Fan Status Monitor
 Wants=xyz.openbmc_project.fansensor.service
 After=xyz.openbmc_project.fansensor.service
-Wants=phosphor-multi-gpio-presence.service
-After=phosphor-multi-gpio-presence.service
+Wants=xyz.openbmc_project.gpiopresence.service
+After=xyz.openbmc_project.gpiopresence.service
 
 [Service]
 ExecStartPre=/bin/sleep 10

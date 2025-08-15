@@ -78,15 +78,30 @@ do
     fan_status=$FAN_STATUS_NORMAL
     FAN_FAIL_REASON=""
 
+    # check presence service is active
+    presence_active=$(systemctl is-active xyz.openbmc_project.gpiopresence.service)
+    if [ "$presence_active" != "active" ]; then
+        echo "Presence service is not active"
+        continue
+    fi
+    # check fan sensor service is active
+    sensor_active=$(systemctl is-active xyz.openbmc_project.fansensor.service)
+    if [ "$sensor_active" != "active" ]; then
+        echo "Fan sensor service is not active"
+        continue
+    fi
+
     # FCB1 ~ FCB6
     for i in {1..6}
     do
         # Check the presence of each FCB
-        presence=$(busctl get-property xyz.openbmc_project.Inventory.Manager \
-            /xyz/openbmc_project/inventory/system/board/Minerva_CMM/FCB_"${i}" \
-            xyz.openbmc_project.Inventory.Item Present | awk '{print $NF}')
+        presence=$(
+            busctl introspect xyz.openbmc_project.gpiopresence \
+                /xyz/openbmc_project/GPIODeviceDetected/FanControlBoard"${i}" \
+                > /dev/null 2>&1; echo $?
+        )
 
-        if [ "$presence" != "true" ]; then
+        if [ "$presence" != "0" ]; then
             fan_status=$FAN_STATUS_ABNORMAL
             FAN_FAIL_REASON="FCB$i not present"
             break
