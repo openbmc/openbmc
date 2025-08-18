@@ -13,6 +13,7 @@ SOURCE_FILES = "\
     "
 SRC_URI += "\
     file://init \
+    file://remount-filesystem-readonly \
     ${@' '.join(\
         [ 'file://' + x for x in d.getVar('SOURCE_FILES', True).split()])} \
     "
@@ -36,6 +37,7 @@ FILES:${PN} += "${PKG_INSTALL_DIR}"
 do_install() {
     install -d ${D}${PKG_INSTALL_DIR}/initfiles
     install -m 0755 ${S}/init ${D}${PKG_INSTALL_DIR}/init
+    install -m 0755 ${S}/remount-filesystem-readonly ${D}${PKG_INSTALL_DIR}/remount-filesystem-readonly
 
     for f in ${SOURCE_FILES} ; do
         install -m 0755 ${S}/$f ${D}${PKG_INSTALL_DIR}/initfiles/$f

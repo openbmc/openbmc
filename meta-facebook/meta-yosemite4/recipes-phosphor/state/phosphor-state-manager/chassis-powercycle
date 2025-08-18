@@ -207,6 +207,16 @@ chassis-power-cycle()
 
 sled-cycle()
 {
+    # Remount file system as read-only before doing sled cycle
+    if ! /usr/libexec/phosphor-static-norootfs-init/remount-filesystem-readonly; then
+        msg="Failed to remount /run/mnt-persist as read-only"
+        echo "${msg}"
+        add_sel "${msg}" "Error"
+    else
+        # If the remount is succesful, add_sel will fail so we can't log this
+        echo "Succeeded to remount /run/mnt-persist as read-only"
+    fi
+
     if [ -z "$MANAGEMENT_BOARD_VERSION" ]; then
         set_gpio FM_BMC_SLED_CYCLE_R 1
     elif [ "$MANAGEMENT_BOARD_VERSION" = "DVT" ] || [ "$MANAGEMENT_BOARD_VERSION" = "EVT" ]; then
