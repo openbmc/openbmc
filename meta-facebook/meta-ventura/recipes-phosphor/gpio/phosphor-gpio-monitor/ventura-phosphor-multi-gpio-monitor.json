@@ -437,7 +437,9 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@rpu_ready.service"],
-            "RISING": ["rpu-ready-assert@rpu_ready.service"]
+            "RISING": ["rpu-ready-assert@rpu_ready.service"],
+            "INIT_LOW": ["rpu-ready-deassert@rpu_ready.service"],
+            "INIT_HIGH": ["rpu-ready-assert@rpu_ready.service"]
         },
         "Continue": true
     },
