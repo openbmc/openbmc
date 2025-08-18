@@ -1,2 +1,7 @@
 owners:
 - ed@tanous.net
+
+matchers:
+- partial_regex: meta-nvl32-obmc
+  reviewers:
+   - molberding@nvidia.com
