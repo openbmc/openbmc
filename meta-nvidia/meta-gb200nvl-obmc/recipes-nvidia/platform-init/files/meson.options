@@ -1,5 +1,0 @@
-option('init-p2020',
-       type: 'feature',
-       value: 'disabled',
-       description: 'Enable Init of P2020 add in card on gb200')
-
