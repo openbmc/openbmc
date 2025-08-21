@@ -164,7 +164,7 @@
         "Expression": [
             "var DUTY_AVG:=avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
-            "var CAL_OFS[11]:={-1.0, -1.0, -1.0, -1.5, -1.5, -2.5, -2.5, -3.0, -3.0, -3.0, -3.0};",
+            "var CAL_OFS[11]:={-0.8, -0.9, -1.0, -1.2, -1.3, -1.6, -2.0, -3.0, -4.8, -4.8, -4.8};",
             "switch {",
             "  case inrange(DUTY_OFS[1],DUTY_AVG,DUTY_OFS[0]): FIOBOARD_TEMP_C+(CAL_OFS[0]+((DUTY_AVG-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
             "  case inrange(DUTY_OFS[2],DUTY_AVG,DUTY_OFS[1]): FIOBOARD_TEMP_C+(CAL_OFS[1]+((DUTY_AVG-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",

@@ -1,9 +1,9 @@
 {
     "sensors": [
         {
-            "name": "FIOBOARD_TEMP_C",
+            "name": "VIRTUAL_FIOBOARD_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/FIOBOARD_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/VIRTUAL_FIOBOARD_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -50,6 +50,13 @@
             "ignoreDbusMinMax": true
         },
         {
+            "name": "BOOTDRIVE_TEMP_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/BOOTDRIVE_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
             "name": "PDB_VR_P12V_N1_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_TEMP_C",
@@ -57,9 +64,23 @@
             "ignoreDbusMinMax": true
         },
         {
+            "name": "PDB_VR_P12V_N1_TEMP1_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_TEMP1_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
             "name": "PDB_VR_P12V_N2_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_TEMP_C",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "PDB_VR_P12V_N2_TEMP1_C",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_TEMP1_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -282,7 +303,7 @@
                     "name": "STEPWISE_FIO",
                     "type": "stepwise",
                     "inputs": [
-                        "FIOBOARD_TEMP_C"
+                        "VIRTUAL_FIOBOARD_TEMP_C"
                     ],
                     "setpoint": 0.0,
                     "pid": {
@@ -338,7 +359,7 @@
                         "NIC0_TEMP_C",
                         "NIC1_TEMP_C"
                     ],
-                    "setpoint": 85.0,
+                    "setpoint": 95.0,
                     "pid": {
                         "samplePeriod": 1,
                         "proportionalCoeff": -3.0,
@@ -364,21 +385,22 @@
                         "HDDBOARD0_SSD0_TEMP_C",
                         "HDDBOARD0_SSD1_TEMP_C",
                         "HDDBOARD1_SSD0_TEMP_C",
-                        "HDDBOARD1_SSD1_TEMP_C"
+                        "HDDBOARD1_SSD1_TEMP_C",
+                        "BOOTDRIVE_TEMP_C"
                     ],
                     "setpoint": 0.0,
                     "pid": {
                         "samplePeriod": 1,
                         "isCeiling": false,
                         "reading": {
-                            "0": 45,
-                            "1": 55,
+                            "0": 50,
+                            "1": 60,
                             "2": 65
                         },
                         "output": {
                             "0": 35,
-                            "1": 50,
-                            "2": 80
+                            "1": 40,
+                            "2": 60
                         },
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2
@@ -391,9 +413,10 @@
                         "HDDBOARD0_SSD0_TEMP_C",
                         "HDDBOARD0_SSD1_TEMP_C",
                         "HDDBOARD1_SSD0_TEMP_C",
-                        "HDDBOARD1_SSD1_TEMP_C"
+                        "HDDBOARD1_SSD1_TEMP_C",
+                        "BOOTDRIVE_TEMP_C"
                     ],
-                    "setpoint": 60.0,
+                    "setpoint": 64.0,
                     "pid": {
                         "samplePeriod": 1,
                         "proportionalCoeff": -3.0,
@@ -417,7 +440,9 @@
                     "type": "stepwise",
                     "inputs": [
                         "PDB_VR_P12V_N1_TEMP_C",
+                        "PDB_VR_P12V_N1_TEMP1_C",
                         "PDB_VR_P12V_N2_TEMP_C",
+                        "PDB_VR_P12V_N2_TEMP1_C",
                         "PDB_HSC1_TEMP_C",
                         "PDB_HSC2_TEMP_C",
                         "PDB_INLET_TEMP_C"
@@ -427,12 +452,12 @@
                         "samplePeriod": 1,
                         "isCeiling": false,
                         "reading": {
-                            "0": 70,
-                            "1": 80,
+                            "0": 90,
+                            "1": 95,
                             "2": 105
                         },
                         "output": {
-                            "0": 35,
+                            "0": 40,
                             "1": 50,
                             "2": 80
                         },
@@ -445,12 +470,14 @@
                     "type": "temp",
                     "inputs": [
                         "PDB_VR_P12V_N1_TEMP_C",
+                        "PDB_VR_P12V_N1_TEMP1_C",
                         "PDB_VR_P12V_N2_TEMP_C",
+                        "PDB_VR_P12V_N2_TEMP1_C",
                         "PDB_HSC1_TEMP_C",
                         "PDB_HSC2_TEMP_C",
                         "PDB_INLET_TEMP_C"
                     ],
-                    "setpoint": 90.0,
+                    "setpoint": 92.0,
                     "pid": {
                         "samplePeriod": 1,
                         "proportionalCoeff": -3.0,
