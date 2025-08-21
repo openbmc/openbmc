@@ -12,7 +12,8 @@ GBMC_NCSI_DHCP_IMPERSONATE_HOST ??= "1"
 
 SRC_URI += " \
   file://50-gbmc-ncsi.rules.in \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.service.in'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://10-ncsi-dhcrelay.conf'} \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.sh.in'} \
   file://gbmc-ncsi-ra@.service \
   file://gbmc-ncsi-ra.sh \
   file://gbmc-ncsi-smartnic-wa.sh.in \
@@ -39,7 +40,6 @@ UNPACKDIR = "${S}"
 
 RDEPENDS:${PN} += " \
   bash \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'dhcp-relay'} \
   gbmc-ip-monitor \
   gbmc-net-common \
   ncsid \
@@ -55,7 +55,6 @@ FILES:${PN} += " \
   "
 
 SYSTEMD_SERVICE:${PN} += " \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'gbmc-ncsi-dhcrelay.service'} \
   gbmc-ncsi-sslh.service \
   gbmc-ncsi-sslh.socket \
   gbmc-ncsi-set-nicenabled.service \
@@ -135,8 +134,11 @@ do_install:append() {
     >${D}${systemd_system_unitdir}/gbmc-ncsi-networkd-wait.target
 
   if [ "${GBMC_DHCP_RELAY}" = "1" ]; then
-    sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-dhcrelay.service.in \
-      >${D}${systemd_system_unitdir}/gbmc-ncsi-dhcrelay.service
+    install -d -m0755 ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$NCSI_IF".service.d
+    install -m0644 ${UNPACKDIR}/10-ncsi-dhcrelay.conf ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$NCSI_IF".service.d/
+    sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh.in \
+      >${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh
+    install -m0644 ${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh $mondir/
   fi
 
   if [ -n "${GBMC_NCSI_IF_OLD}" ]; then
