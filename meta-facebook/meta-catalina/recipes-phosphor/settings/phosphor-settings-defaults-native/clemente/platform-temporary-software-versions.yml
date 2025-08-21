@@ -134,6 +134,22 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
+/xyz/openbmc_project/software/chassis/HGX_gpu_2:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/HGX_gpu_3:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
 /xyz/openbmc_project/software/chassis/HGX_erot_bmc:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
@@ -183,6 +199,22 @@
         Default: Version::VersionPurpose::Other
 
 /xyz/openbmc_project/software/chassis/HGX_inforom_gpu_1:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/HGX_inforom_gpu_2:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/HGX_inforom_gpu_3:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
