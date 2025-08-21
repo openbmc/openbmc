@@ -52,12 +52,12 @@
                 {
                     "Name": "fan0_amber",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan0_blue",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -67,12 +67,12 @@
                 {
                     "Name": "fan0_amber",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan0_blue",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -82,12 +82,12 @@
                 {
                     "Name": "fan1_amber",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan1_blue",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -97,12 +97,12 @@
                 {
                     "Name": "fan1_amber",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan1_blue",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -112,12 +112,12 @@
                 {
                     "Name": "fan2_amber",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan2_blue",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -127,12 +127,12 @@
                 {
                     "Name": "fan2_amber",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan2_blue",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -142,12 +142,12 @@
                 {
                     "Name": "fan3_amber",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan3_blue",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
@@ -157,12 +157,12 @@
                 {
                     "Name": "fan3_amber",
                     "Action": "Off",
-                    "Priority": "Blink"
+                    "Priority": "On"
                 },
                 {
                     "Name": "fan3_blue",
                     "Action": "On",
-                    "Priority": "Blink"
+                    "Priority": "Off"
                 }
             ]
         },
