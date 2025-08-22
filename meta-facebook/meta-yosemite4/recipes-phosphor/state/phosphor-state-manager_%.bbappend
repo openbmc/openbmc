@@ -13,6 +13,8 @@ HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     "
 
+SYSTEMD_SERVICE:${PN}-host:remove = "phosphor-reboot-host@.service"
+
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
