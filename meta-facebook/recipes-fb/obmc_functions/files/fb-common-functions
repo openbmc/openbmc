@@ -76,3 +76,23 @@ bind_i2c_device()
 
     return 1
 }
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    CMD=$1
+    shift
+    case "$CMD" in
+        get_gpio)
+            get_gpio "$@"
+            ;;
+        set_gpio)
+            set_gpio "$@"
+            ;;
+        bind_i2c_device)
+            bind_i2c_device "$@"
+            ;;
+        *)
+            echo "Usage: $0 {get_gpio|set_gpio|bind_i2c_device} args..."
+            exit 1
+            ;;
+    esac
+fi

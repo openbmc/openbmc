@@ -3,47 +3,42 @@
 # shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
-# Sync Led status to off
+# Check SGPIO validity
+if ! check_valid_sgpio; then
+    exit 0
+fi
+
+# Sync Led status to on
 systemctl start obmc-led-group-stop@power_on.service
 
-currentstate=$(busctl get-property \
+# Get current host state
+current_state=$(busctl get-property \
     xyz.openbmc_project.State.Host0 \
     /xyz/openbmc_project/state/host0 \
     xyz.openbmc_project.State.Host \
     CurrentHostState | awk '{print $2}' | tr -d '"')
 
-if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ]; then
+# Exit if host is already transitioning off
+if [ "$current_state" = "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ]; then
     exit 0
 fi
 
-active=$(systemctl is-active host-graceful-poweroff@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
-    exit 0
-fi
+# List of services that block power_off_sync
+block_services=(
+    host-graceful-poweroff@0.service
+    host-force-poweroff@0.service
+    host-powerreset@0.service
+)
 
-active=$(systemctl is-active host-force-poweroff@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
-    exit 0
-fi
+# Exit if any blocking service is not inactive
+for svc in "${block_services[@]}"; do
+    if [ "$(systemctl is-active "$svc")" != "inactive" ]; then
+        exit 0
+    fi
+done
 
-active=$(systemctl is-active host-powerreset@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
-    exit 0
-fi
+# Safe to power off
+# Wait 8 seconds, checking every second
+power_off_sync 8 1
 
-sleep 3
-# Sync power state to "off" for abnormal power lose.
-transition=$(busctl get-property \
-    xyz.openbmc_project.State.Host0 \
-    /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host \
-    RequestedHostTransition | awk '{print $2}' | tr -d '"')
-
-if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ] && [ "$(power_status)" == "off" ]; then
-    busctl set-property xyz.openbmc_project.State.Host0 \
-        /xyz/openbmc_project/state/host0 \
-        xyz.openbmc_project.State.Host \
-        RequestedHostTransition s \
-        xyz.openbmc_project.State.Host.Transition.Off
-fi
 exit 0

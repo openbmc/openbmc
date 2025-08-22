@@ -1,63 +1,45 @@
 #!/bin/bash
 
-# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
-source /usr/libexec/fb-common-functions
 # shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
-# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/gpio/phosphor-gpio-monitor/device-util
-source /usr/libexec/phosphor-gpio-monitor/device-util
 
-# The hardware disables the multiplexer in standby
-# to prevent sending a command by mistake to the retimer when it boots up.
-# Therefore, we need to rebind it when powered on.
-if [ ! -e "/sys/bus/i2c/drivers/pca954x/3-0070" ]; then
-  sleep 6
-  rebind_i2c_dev 3 70 "pca954x"
+# Check SGPIO validity
+if ! check_valid_sgpio; then
+    exit 0
 fi
 
-check_valid_sgpio
-valid_sgpio=$?
+# Sync Led status to on
+systemctl start obmc-led-group-start@power_on.service
 
-if [ "$valid_sgpio" -eq 0 ]; then
-    # Sync Led status to on
-    systemctl start obmc-led-group-start@power_on.service
 
-    currentstate=$(busctl get-property \
-        xyz.openbmc_project.State.Host0 \
-        /xyz/openbmc_project/state/host0 \
-        xyz.openbmc_project.State.Host \
-        CurrentHostState | awk '{print $2}' | tr -d '"')
+# Checking and Syncing power policy.
+# Get current host state
+current_state=$(busctl get-property \
+    xyz.openbmc_project.State.Host0 \
+    /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host \
+    CurrentHostState | awk '{print $2}' | tr -d '"')
 
-    if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningToRunning" ]; then
+# Exit if host is already transitioning to running
+if [ "$current_state" = "xyz.openbmc_project.State.Host.HostState.TransitioningToRunning" ]; then
+    exit 0
+fi
+
+# List of services that block power_on_sync
+block_services=(
+    host-poweron@0.service
+    host-powerreset@0.service
+)
+
+# Exit if any blocking service is not inactive
+for svc in "${block_services[@]}"; do
+    if [ "$(systemctl is-active "$svc")" != "inactive" ]; then
         exit 0
     fi
-fi
+done
 
-active=$(systemctl is-active host-poweron@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
-    exit 0
-fi
-
-active=$(systemctl is-active host-powerreset@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
-    exit 0
-fi
-
-# Sync power status to "On" for abnormal power-on scenarios.
-if [ "$valid_sgpio" -eq 0 ]; then
-    transition=$(busctl get-property \
-        xyz.openbmc_project.State.Host0 \
-        /xyz/openbmc_project/state/host0 \
-        xyz.openbmc_project.State.Host \
-        RequestedHostTransition | awk '{print $2}' | tr -d '"')
-
-    if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.On" ] && [ "$(power_status)" == "on" ]; then
-        busctl set-property xyz.openbmc_project.State.Host0 \
-            /xyz/openbmc_project/state/host0 \
-            xyz.openbmc_project.State.Host \
-            RequestedHostTransition s \
-            xyz.openbmc_project.State.Host.Transition.On
-    fi
-fi
+# Safe to power on
+# Wait 3 seconds, checking every second
+power_on_sync 3 1
 
 exit 0

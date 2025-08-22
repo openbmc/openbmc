@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/gpio/phosphor-gpio-monitor/device-util
+source /usr/libexec/phosphor-gpio-monitor/device-util
+
+# The hardware disables the multiplexer in standby
+# to prevent sending a command by mistake to the retimer when it boots up.
+# Therefore, we need to rebind it when powered on.
+if [ ! -e "/sys/bus/i2c/drivers/pca954x/3-0070" ]; then
+  sleep 6
+  rebind_i2c_dev 3 70 "pca954x"
+fi
+
+exit 0

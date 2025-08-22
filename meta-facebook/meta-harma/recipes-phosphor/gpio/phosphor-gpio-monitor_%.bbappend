@@ -29,6 +29,8 @@ SRC_URI += "file://assert-post-end \
             file://gpios-assert-log@.service \
             file://gpios-deassert-log@.service \
             file://gpios-event-logger \
+            file://initial-poweron-device \
+            file://initial-poweron-device.service \
             file://logging-util \
             file://mmc-recovery.service \
             file://multi-gpios-sys-init \
@@ -66,6 +68,7 @@ SYSTEMD_SERVICE:${PN} += " \
     deassert-uart-switch-button.service \
     device-reinitial@.service \
     fan-reload.service \
+    initial-poweron-device.service \
     mmc-recovery.service \
     multi-gpios-sys-init.service \
     prochot-assert-log.service \
@@ -120,6 +123,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/auto-poweron ${D}${libexecdir}/${PN}/
 
     install -m 0755 ${UNPACKDIR}/fan-reload ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/initial-poweron-device ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"

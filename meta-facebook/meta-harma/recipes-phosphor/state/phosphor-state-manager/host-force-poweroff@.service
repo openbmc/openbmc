@@ -9,6 +9,7 @@ Restart=no
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/libexec/phosphor-state-manager/host-force-poweroff %i
+ExecStop=/usr/libexec/fb-common-functions set_gpio power-host-control 1
 
 [Install]
 RequiredBy=obmc-host-stop@%i.target

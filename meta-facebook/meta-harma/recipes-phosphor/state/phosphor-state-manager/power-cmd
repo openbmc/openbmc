@@ -84,6 +84,8 @@ graceful_power_off() {
 
 # DC on
 power_on() {
+    set_gpio power-host-control 1
+    sleep 1
     if [ "$(power_status)" == "off" ]; then
         set_gpio power-host-control 0
         sleep 1
@@ -113,3 +115,95 @@ power_reset() {
     sleep 1
     return 0
 }
+
+# Sync power state to "off" for abnormal power loss.
+power_off_sync() {
+    local timeout=${1:-8}   # default 8 seconds if not provided
+    local delay=${2:-1}     # default 1 second interval if not provided
+
+    for ((i=0; i<timeout; i++)); do
+        local status
+        status=$(power_status)
+        if [ "$status" != "off" ]; then
+            return
+        fi
+        sleep "$delay"
+    done
+
+    local transition
+    transition=$(busctl get-property \
+        xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition | awk '{print $2}' | tr -d '"')
+
+    if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ] && [ "$(power_status)" == "off" ]; then
+        busctl set-property xyz.openbmc_project.State.Host0 \
+            /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host \
+            RequestedHostTransition s \
+            xyz.openbmc_project.State.Host.Transition.Off
+    fi
+}
+
+# Sync power status to "On" for abnormal power-on scenarios.
+power_on_sync() {
+    local timeout=${1:-3}   # default 3 seconds if not provided
+    local delay=${2:-1}     # default 1 second interval if not provided
+
+    for ((i=0; i<timeout; i++)); do
+        local status
+        status=$(power_status)
+        if [ "$status" != "on" ]; then
+            return
+        fi
+        sleep "$delay"
+    done
+
+    local transition
+    transition=$(busctl get-property \
+        xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition | awk '{print $2}' | tr -d '"')
+
+    if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.On" ] && [ "$(power_status)" == "on" ]; then
+        busctl set-property xyz.openbmc_project.State.Host0 \
+            /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host \
+            RequestedHostTransition s \
+            xyz.openbmc_project.State.Host.Transition.On
+    fi
+}
+
+# Main execution
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+    case "$1" in
+        force_off)
+            force_power_off
+            ;;
+        graceful_off)
+            graceful_power_off
+            ;;
+        power_on)
+            power_on
+            ;;
+        power_reset)
+            power_reset
+            ;;
+        off_sync)
+            power_off_sync "$2" "$3"
+            ;;
+        on_sync)
+            power_on_sync "$2" "$3"
+            ;;
+        status)
+            power_status
+            ;;
+        *)
+            echo "Usage: $0 {force_off|graceful_off|power_on|power_reset|off_sync|on_sync|status}"
+            exit 0
+            ;;
+    esac
+fi
+

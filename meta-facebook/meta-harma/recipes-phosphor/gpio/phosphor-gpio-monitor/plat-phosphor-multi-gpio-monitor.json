@@ -98,7 +98,8 @@
         "Targets": {
             "RISING": [
                 "deassert-power-good.service",
-                 "power-rail-deassert-log@2_power-host-good.service"
+                "initial-poweron-device.service",
+                "power-rail-deassert-log@2_power-host-good.service"
             ],
             "FALLING": [
                 "assert-power-good.service",
