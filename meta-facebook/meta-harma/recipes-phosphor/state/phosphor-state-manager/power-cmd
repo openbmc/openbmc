@@ -6,7 +6,7 @@ renice -10 $$
 
 check_valid_sgpio() {
     sgpio_vaild0=$(get_gpio "power-card-enable")
-    sgpio_vaild1=$(get_gpio "SLOT_ID_BCB_3")
+    sgpio_vaild1=$(get_gpio "power-12v-memory-good")
     sgpio_vaild2=$(get_gpio "power-pvdd33-s5")
 
     if [[ "$sgpio_vaild0" == "0" && "$sgpio_vaild1" == "0" && "$sgpio_vaild2" == "1" ]]; then
