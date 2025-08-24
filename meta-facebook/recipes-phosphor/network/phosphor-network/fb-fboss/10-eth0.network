@@ -1,0 +1,39 @@
+# Copyright 2014-present Facebook. All Rights Reserved.
+#
+# This program file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; version 2 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program in a file named COPYING; if not, write to the
+# Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor,
+# Boston, MA 02110-1301 USA
+#
+[Match]
+Name=eth0
+
+[Network]
+IPv6AcceptRA=yes
+DHCP=ipv6
+VLAN=eth0.4088
+
+[DHCP]
+UseDomains=yes
+UseNTP=yes
+# We've been seeing units not able to renew the lease after it expires
+# Set CriticalConnection=yes so we maintain the ip address even after
+# expiration. This might be a bug with systemd v234
+# XXX Try removing this after systemd gets updated >=234 
+CriticalConnection=yes
+VendorClassIdentifier=OpenBMC:VENDOR_SERIAL_HERE
+
+[DHCPv6]
+UseDomains=yes
+UseNTP=yes
+SendVendorOption=40981:1:string:OpenBMC:VENDOR_SERIAL_HERE
