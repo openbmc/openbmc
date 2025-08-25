@@ -64,6 +64,16 @@ Cost=85
 EOF
     fi
 
+    # Add standard l2 bridge configuration if this is a relevant device
+    if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22c )); then
+        cat >>/run/systemd/network/+-bmc-"${IFACE_NAME}".network <<EOF
+[Network]
+Bridge=l2br
+[Bridge]
+Cost=85
+EOF
+    fi
+
     # Ignore any failures due to systemd being unavailable at boot
     # shellcheck disable=SC2119
     gbmc_net_networkd_reload || true
