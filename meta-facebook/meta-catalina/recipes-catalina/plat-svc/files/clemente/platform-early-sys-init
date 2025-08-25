@@ -58,6 +58,51 @@ config_fan()
     done
 }
 
+config_hsc()
+{
+    echo "Configure LM5066i HSC"
+
+    # HSC1 address: 0x12
+    # HSC2 address: 0x14
+    HSC_ADDRS=(0x12 0x14)
+
+    # Configure each LM5066i device
+    for HSC_ADDR in "${HSC_ADDRS[@]}"; do
+        echo "Configuring HSC at address $HSC_ADDR"
+
+        # Set ADC SAMPLES_FOR_AVG register (0xDB) to 0x0A
+        # - Average 1024 samples per reading
+        i2cset -y -f 1 "$HSC_ADDR" 0xDB 0x0A || echo "Failed to set SAMPLES_FOR_AVG (DBh) on $HSC_ADDR"
+
+        # Set DEVICE_SETUP register (MFR_SPECIFIC_09, 0xD9)
+        # 0x10 = 0b00010000:
+        # - Retry setting: 001 (No retries)
+        # - Current limit: 50 mV (bit 4 = 1)
+        # - CB/CL ratio: 1.9x (bit 3 = 0)
+        # - Use SMBus settings (bit 2 = 0)
+        # - Bits 1:0 = unused (0)
+        i2cset -y -f 1 "$HSC_ADDR" 0xD9 0x10 || echo "Failed to set DEVICE_SETUP (D9h) on $HSC_ADDR"
+    done
+}
+
+rebind_hsc_lm5066i()
+{
+    echo "Rebinding LM5066i driver"
+    local DRIVER_NAME="$1"
+    local BUS_ADDR="$2"
+
+    if [[ -z "$DRIVER_NAME" || -z "$BUS_ADDR" ]]; then
+        echo "Usage: rebind_hsc_lm5066i <driver_name> <bus_address>"
+        return 1
+    fi
+
+    echo "Unbinding lm5066i at $BUS_ADDR"
+    echo "$BUS_ADDR" > /sys/bus/i2c/drivers/"$DRIVER_NAME"/unbind || echo "Failed to unbind $BUS_ADDR"
+
+    echo "Binding lm5066i at $BUS_ADDR"
+    echo "$BUS_ADDR" > /sys/bus/i2c/drivers/"$DRIVER_NAME"/bind || echo "Failed to bind $BUS_ADDR"
+}
+
 # Enable standby power and bind i2c components
 /usr/libexec/plat-svc/standby-power-enable
 
@@ -84,5 +129,11 @@ bind_i2c_device pca953x 14-0014
 
 # Set fan target and enable all fan input as early as possible
 config_fan
+
+# Set HSC
+config_hsc
+# rebind LM5066i
+rebind_hsc_lm5066i lm25066 1-0012
+rebind_hsc_lm5066i lm25066 1-0014
 
 exit 0
