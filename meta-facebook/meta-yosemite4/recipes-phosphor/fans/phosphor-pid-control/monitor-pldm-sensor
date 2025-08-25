@@ -13,12 +13,14 @@ PLDM_SERVICE="xyz.openbmc_project.PLDM"
 PLDM_PATH="/xyz/openbmc_project/inventory"
 
 # Slot path prefixes for T2
+ENTITY_MANAGER_SENTINEL_T2_WITH_RETIMER_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T2_with_Retimer_Slot_"
 ENTITY_MANAGER_SENTINEL_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T2_Slot_"
 ENTITY_MANAGER_WAILUA_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"
 PLDM_SENTINEL_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/SENTINEL_DOME_SLOT_"
 PLDM_WAILUA_T2_PREFIX="/xyz/openbmc_project/inventory/system/board/WAILUA_FALLS_SLOT_"
 
 # Slot path prefixes for T1
+ENTITY_MANAGER_SENTINEL_T1_WITH_RETIMER_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T1_with_Retimer_Slot_"
 ENTITY_MANAGER_SENTINEL_T1_PREFIX="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Sentinel_Dome_T1_Slot_"
 PLDM_SENTINEL_T1_PREFIX="/xyz/openbmc_project/inventory/system/board/SENTINEL_DOME_SLOT_"
 
@@ -49,12 +51,20 @@ detect_slot_configuration() {
     local slot=$2
 
     # Check for T2 slot prefix
+    if check_object_path "$entity_manager_data" "${ENTITY_MANAGER_SENTINEL_T2_WITH_RETIMER_PREFIX}${slot}"; then
+        echo "T2_RETIMER"
+        return 0
+    fi
     if check_object_path "$entity_manager_data" "${ENTITY_MANAGER_SENTINEL_T2_PREFIX}${slot}"; then
         echo "T2"
         return 0
     fi
 
     # Check for T1 slot prefix
+    if check_object_path "$entity_manager_data" "${ENTITY_MANAGER_SENTINEL_T1_WITH_RETIMER_PREFIX}${slot}"; then
+        echo "T1_RETIMER"
+        return 0
+    fi
     if check_object_path "$entity_manager_data" "${ENTITY_MANAGER_SENTINEL_T1_PREFIX}${slot}"; then
         echo "T1"
         return 0
@@ -73,31 +83,58 @@ check_slot() {
     # Detect the configuration for the current slot
     configuration=$(detect_slot_configuration "$entity_manager_data" "$slot")
 
-    if [ "$configuration" == "T2" ]; then
-        echo "Checking Sentinel Dome T2 slot $slot..."
-        entity_path="${ENTITY_MANAGER_SENTINEL_T2_PREFIX}${slot}"
-        pldm_path="${PLDM_SENTINEL_T2_PREFIX}${slot}"
-        if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
-            return 1
-        fi
+    case "$configuration" in
+        T2_RETIMER)
+            echo "Checking Sentinel Dome T2(with retimer) slot $slot..."
+            entity_path="${ENTITY_MANAGER_SENTINEL_T2_WITH_RETIMER_PREFIX}${slot}"
+            pldm_path="${PLDM_SENTINEL_T2_PREFIX}${slot}"
+            if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+                return 1
+            fi
 
-        echo "Checking Wailua Falls T2 slot $slot..."
-        entity_path="${ENTITY_MANAGER_WAILUA_T2_PREFIX}${slot}"
-        pldm_path="${PLDM_WAILUA_T2_PREFIX}${slot}"
-        if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
-            return 1
-        fi
-    elif [ "$configuration" == "T1" ]; then
-        echo "Checking Sentinel Dome T1 slot $slot..."
-        entity_path="${ENTITY_MANAGER_SENTINEL_T1_PREFIX}${slot}"
-        pldm_path="${PLDM_SENTINEL_T1_PREFIX}${slot}"
-        if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
-            return 1
-        fi
-    else
-        echo "Unknown configuration for slot $slot. Skipping..."
-        return 0
-    fi
+            echo "Checking Wailua Falls T2 slot $slot..."
+            entity_path="${ENTITY_MANAGER_WAILUA_T2_PREFIX}${slot}"
+            pldm_path="${PLDM_WAILUA_T2_PREFIX}${slot}"
+            if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+                return 1
+            fi
+            ;;
+        T2)
+            echo "Checking Sentinel Dome T2 slot $slot..."
+            entity_path="${ENTITY_MANAGER_SENTINEL_T2_PREFIX}${slot}"
+            pldm_path="${PLDM_SENTINEL_T2_PREFIX}${slot}"
+            if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+                return 1
+            fi
+
+            echo "Checking Wailua Falls T2 slot $slot..."
+            entity_path="${ENTITY_MANAGER_WAILUA_T2_PREFIX}${slot}"
+            pldm_path="${PLDM_WAILUA_T2_PREFIX}${slot}"
+            if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+                return 1
+            fi
+            ;;
+        T1_RETIMER)
+            echo "Checking Sentinel Dome T1(with retimer) slot $slot..."
+            entity_path="${ENTITY_MANAGER_SENTINEL_T1_WITH_RETIMER_PREFIX}${slot}"
+            pldm_path="${PLDM_SENTINEL_T1_PREFIX}${slot}"
+            if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+                return 1
+            fi
+            ;;
+        T1)
+            echo "Checking Sentinel Dome T1 slot $slot..."
+            entity_path="${ENTITY_MANAGER_SENTINEL_T1_PREFIX}${slot}"
+            pldm_path="${PLDM_SENTINEL_T1_PREFIX}${slot}"
+            if ! check_single_slot "$slot" "$entity_manager_data" "$pldm_data" "$entity_path" "$pldm_path"; then
+                return 1
+            fi
+            ;;
+        *)
+            echo "Unknown configuration for slot $slot. Skipping..."
+            return 0
+            ;;
+    esac
 
     return 0
 }
