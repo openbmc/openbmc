@@ -96,14 +96,14 @@ sled_remove_action()
 }
 
 
-dbus-monitor --system "type=signal,interface=${DBUS_PROPERTY_INTF},sender=${SERVICE_NAME},path=${PRESENT_OBJPATH}" |
+busctl monitor --system --match "type=signal,interface=${DBUS_PROPERTY_INTF},sender=${SERVICE_NAME},path=${PRESENT_OBJPATH}" |
 while read -r line; do
     case "$line" in
-        *"boolean false"*)
+        *"BOOLEAN false"*)
             echo "SLED${SLED_ID} Removal"
             sled_remove_action "$SLED_ID"
             ;;
-        *"boolean true"*)
+        *"BOOLEAN true"*)
             echo "SLED${SLED_ID} Insertion"
             sled_insert_action "$SLED_ID"
             ;;
