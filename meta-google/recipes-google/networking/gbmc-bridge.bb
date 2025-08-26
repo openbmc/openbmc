@@ -53,6 +53,7 @@ FILES:${PN}:append = " \
 
 RDEPENDS:${PN}:append = " \
   bash \
+  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'dhcp-relay'} \
   dhcp-done \
   gbmc-ip-monitor \
   gbmc-net-common \

@@ -31,7 +31,6 @@ FILES:${PN} += " \
 
 RDEPENDS:${PN}:append = " \
   bash \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'dhcp-relay'} \
   gbmc-ip-monitor \
   gbmc-net-common \
   nftables-systemd \
