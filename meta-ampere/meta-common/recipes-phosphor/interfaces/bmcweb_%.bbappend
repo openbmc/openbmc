@@ -7,7 +7,3 @@ EXTRA_OEMESON:append = " \
 PACKAGECONFIG:append = " \
      redfish-bmc-journal \
 "
-
-PACKAGECONFIG:remove = " \
-     redfish-allow-deprecated-power-thermal \
-"

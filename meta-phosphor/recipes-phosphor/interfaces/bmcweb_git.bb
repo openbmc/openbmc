@@ -33,7 +33,6 @@ PACKAGECONFIG ??= " \
     http-zstd \
     kvm \
     mutual-tls-auth \
-    redfish-allow-deprecated-power-thermal \
     redfish-bmc-journal \
 "
 
