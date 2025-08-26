@@ -65,7 +65,6 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * sbp1
   * system1
   * witherspoon
-  * witherspoon-tacoma
 * ieisystem
   * fp5280g3
   * nf5280m7

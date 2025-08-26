@@ -13,10 +13,4 @@ do_install:append:p10bmc() {
       install_mctp_configuration
 }
 
-SRC_URI:append:witherspoon-tacoma = " file://mctp"
-SRC_URI:append:witherspoon-tacoma = " file://service-override.conf"
-do_install:append:witherspoon-tacoma() {
-      install_mctp_configuration
-}
-
 FILES:${PN}:append = " ${systemd_system_unitdir}/mctp-demux.service.d/service-override.conf"

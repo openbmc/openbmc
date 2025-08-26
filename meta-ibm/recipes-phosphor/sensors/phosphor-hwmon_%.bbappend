@@ -17,19 +17,6 @@ CHIPS:witherspoon = " \
                bus@1e78a000/i2c@380/tmp275@4a \
                "
 
-CHIPS:witherspoon-tacoma = " \
-               bus@1e78a000/i2c@200/max31785@52 \
-               bus@1e78a000/i2c@200/power-supply@68 \
-               bus@1e78a000/i2c@200/power-supply@69 \
-               bus@1e78a000/i2c@200/bmp280@77 \
-               bus@1e78a000/i2c@200/dps310@76 \
-               bus@1e78a000/i2c@280/ir35221@70 \
-               bus@1e78a000/i2c@280/ir35221@71 \
-               bus@1e78a000/i2c@300/ir35221@70 \
-               bus@1e78a000/i2c@300/ir35221@71 \
-               bus@1e78a000/i2c@500/tmp275@4a \
-               "
-
 CHIPS:p10bmc = " \
                1e78a200.i2c/i2c-3/3-0068 \
                1e78a200.i2c/i2c-3/3-0069 \

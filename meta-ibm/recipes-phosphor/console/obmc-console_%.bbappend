@@ -45,23 +45,5 @@ do_install:append:p10bmc() {
         install_concurrent_console_config
 }
 
-SRC_URI:append:witherspoon-tacoma = " file://client.2201.conf"
-SRC_URI:append:witherspoon-tacoma = " file://server.ttyVUART1.conf"
-
-REGISTERED_SERVICES:${PN}:append:witherspoon-tacoma = " obmc_console_hypervisor:tcp:2201:"
-
-SYSTEMD_SERVICE:${PN}:append:witherspoon-tacoma = " obmc-console-ssh@2200.service \
-		obmc-console-ssh@2201.service \
-                "
-SYSTEMD_SERVICE:${PN}:remove:witherspoon-tacoma = "obmc-console-ssh.socket"
-
-FILES:${PN}:remove:witherspoon-tacoma = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
-
-EXTRA_OECONF:append:witherspoon-tacoma = " --enable-concurrent-servers"
-
-do_install:append:witherspoon-tacoma() {
-        install_concurrent_console_config
-}
-
 SRC_URI:append:sbp1 = " file://server.ttyVUART0.conf"
 SRC_URI:append:system1 = " file://server.ttyVUART0.conf"

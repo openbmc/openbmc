@@ -1,9 +1,6 @@
 DEPENDS:append:ibm-ac-server = " acx22-yaml-config"
 DEPENDS:append:p10bmc = " p10bmc-yaml-config"
 
-# host watchdog does not work with witherspoon-tacoma host firmware
-RDEPENDS:${PN}:remove:witherspoon-tacoma = "phosphor-watchdog"
-
 EXTRA_OEMESON:ibm-ac-server = " \
     -Dsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/acx22-yaml-config/ipmi-sensors.yaml \
     -Dinvsensor-yaml-gen=${STAGING_DIR_HOST}${datadir}/acx22-yaml-config/ipmi-inventory-sensors.yaml \

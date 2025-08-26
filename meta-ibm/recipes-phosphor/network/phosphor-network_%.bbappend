@@ -56,11 +56,6 @@ do_install:append:ibm-ac-server() {
     install_network_configuration
 }
 
-SRC_URI:append:witherspoon-tacoma = " file://ibm-basic-eth-map.json"
-do_install:append:witherspoon-tacoma(){
-    install_network_configuration
-}
-
 SRC_URI:append:genesis3 = " file://ibm-basic-eth-map.json"
 do_install:append:genesis3(){
     install_network_configuration
