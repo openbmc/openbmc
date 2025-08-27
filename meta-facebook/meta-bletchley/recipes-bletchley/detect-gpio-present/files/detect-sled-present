@@ -33,9 +33,6 @@ sled_insert_action()
     local I2C_BUS_NUM
     I2C_BUS_NUM=$(get_bus_num "$SLED_ID")
 
-    # 0022: fusb302
-    bind_i2c_driver "${I2C_BUS_NUM}-0022" "typec_fusb302"
-
     # 0045: ina230
     bind_i2c_driver "${I2C_BUS_NUM}-0045" "ina2xx"
 
@@ -45,7 +42,7 @@ sled_insert_action()
     # 0041: pca9536
     bind_i2c_driver "${I2C_BUS_NUM}-0041" "pca953x"
 
-    # 0076: pca9539
+    # 0076: pca9539. provides FUSB302 VBUS‑enable GPIO; fusb302 auto-binds after it probes
     bind_i2c_driver "${I2C_BUS_NUM}-0076" "pca953x"
 
     # 004f: tmp421
@@ -79,8 +76,8 @@ sled_remove_action()
     # # 0041: pca9536
     # unbind_i2c_driver "${I2C_BUS_NUM}-0041" "pca953x"
 
-    # # 0076: pca9539
-    # unbind_i2c_driver "${I2C_BUS_NUM}-0076" "pca953x"
+    # 0076: pca9539
+    unbind_i2c_driver "${I2C_BUS_NUM}-0076" "pca953x"
 
     # # 004f: tmp421
     # unbind_i2c_driver "${I2C_BUS_NUM}-004f" "tmp421"
