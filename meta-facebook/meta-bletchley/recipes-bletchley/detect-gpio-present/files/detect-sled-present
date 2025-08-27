@@ -33,6 +33,9 @@ sled_insert_action()
     local I2C_BUS_NUM
     I2C_BUS_NUM=$(get_bus_num "$SLED_ID")
 
+    # wait for standby power to stabilize
+    sleep 0.5
+
     # 0045: ina230
     bind_i2c_driver "${I2C_BUS_NUM}-0045" "ina2xx"
 
@@ -53,6 +56,10 @@ sled_insert_action()
 
     # 0054: 24c64
     bind_i2c_driver "${I2C_BUS_NUM}-0054" "at24"
+
+    # Clear LED group state
+    systemctl start obmc-led-group-stop@sled"${SLED_ID}"_good.service
+    systemctl start obmc-led-group-stop@sled"${SLED_ID}"_identify.service
 
     # start bletchley-sled-insertion target
     /bin/systemctl start bletchley-sled-insertion@"${SLED_ID}".target
