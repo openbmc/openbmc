@@ -14,7 +14,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/Clemente_PDB_cpld:
+/xyz/openbmc_project/software/chassis/Clemente_Interposer_cpld:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
