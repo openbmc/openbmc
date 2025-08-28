@@ -38,8 +38,8 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * bletchley15
   * catalina
   * clemente
+  * fbdarwin
   * harma
-  * lfdarwin
   * minerva
   * santabarbara
   * tiogapass

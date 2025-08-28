@@ -14,7 +14,7 @@
 #
 # Machine Selection
 #
-MACHINE ??= "lfdarwin"
+MACHINE ??= "fbdarwin"
 
 #
 # Where to place downloads

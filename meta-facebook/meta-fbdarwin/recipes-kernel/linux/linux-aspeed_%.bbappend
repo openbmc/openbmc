@@ -1,3 +1,3 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/linux-aspeed:"
-SRC_URI += "file://lfdarwin.cfg \
+SRC_URI += "file://fbdarwin.cfg \
             "

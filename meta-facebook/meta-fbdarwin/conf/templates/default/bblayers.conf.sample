@@ -14,5 +14,5 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-facebook \
-  ##OEROOT##/meta-facebook/meta-lfdarwin \
+  ##OEROOT##/meta-facebook/meta-fbdarwin \
   "
