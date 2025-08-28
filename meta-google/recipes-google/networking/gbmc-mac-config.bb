@@ -16,6 +16,7 @@ UNPACKDIR = "${S}"
 RDEPENDS:${PN} += " \
   bash \
   ipmi-fru-sh \
+  network-sh \
   "
 
 FILES:${PN} += "${systemd_unitdir}"

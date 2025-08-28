@@ -15,6 +15,7 @@
 
 # shellcheck source=meta-google/recipes-google/ipmi/ipmi-fru-sh/lib.sh
 source /usr/share/ipmi-fru/lib.sh || exit
+source /usr/share/network/lib.sh  || exit
 
 ipmi_fru_alloc '@EEPROM@' eeprom || exit
 
@@ -76,6 +77,18 @@ for (( i=0; i<num; i++ )); do
     for override in /run/systemd/network/{00,}-bmc-$intf.network.d; do
       mkdir -p "$override"
       printf '[Link]\nMACAddress=%s\n' "$macstr" >"$override"/50-mac.conf
+      # Add ula for standard l2br
+      if [[ "$intf" == "l2br" ]]; then
+        eui64=$(mac_to_eui64 "$macstr")
+        eui64="${eui64:2}"
+        printf '[Address]\nAddress=fdb5:0481:10ce:1:%s/64\nPreferredLifetime=0\n' "$eui64" > "$override"/60-ula.conf
+      fi
+      # Add ula for gbmcbr
+      if [[ "$intf" == "gbmcbr" ]]; then
+        eui64=$(mac_to_eui64 "$macstr")
+        eui64="${eui64:2}"
+        printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\nPreferredLifetime=0\n' "$eui64" > "$override"/60-ula.conf
+      fi
     done
     for override in /run/systemd/network/{00,}-bmc-$intf.netdev.d; do
       mkdir -p "$override"
