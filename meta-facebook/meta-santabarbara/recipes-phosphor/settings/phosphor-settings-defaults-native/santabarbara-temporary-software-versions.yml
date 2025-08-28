@@ -45,3 +45,11 @@
         Default: '""'
       Purpose:
         Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/swb_pcie_switch:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
