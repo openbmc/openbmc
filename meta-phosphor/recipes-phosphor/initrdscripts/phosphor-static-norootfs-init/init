@@ -2,11 +2,7 @@
 
 cd /
 
-for f in /usr/libexec/phosphor-static-norootfs-init/*; do
-    if [ "$(basename "$f")" = "init" ]; then
-        continue
-    fi
-
+for f in /usr/libexec/phosphor-static-norootfs-init/initfiles/*; do
     $f
 done
 
