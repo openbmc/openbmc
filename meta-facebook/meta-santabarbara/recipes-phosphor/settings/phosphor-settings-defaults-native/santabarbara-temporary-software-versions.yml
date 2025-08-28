@@ -53,3 +53,35 @@
         Default: '""'
       Purpose:
         Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/rainbow0_mmc:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/rainbow1_mmc:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/rainbow2_mmc:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
+
+/xyz/openbmc_project/software/chassis/rainbow3_mmc:
+- Interface: "xyz.openbmc_project.Software.Version"
+  Properties:
+      Version:
+        Default: '""'
+      Purpose:
+        Default: Version::VersionPurpose::Other
