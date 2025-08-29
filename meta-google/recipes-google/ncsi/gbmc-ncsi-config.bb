@@ -134,8 +134,8 @@ do_install:append() {
     >${D}${systemd_system_unitdir}/gbmc-ncsi-networkd-wait.target
 
   if [ "${GBMC_DHCP_RELAY}" = "1" ]; then
-    install -d -m0755 ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$NCSI_IF".service.d
-    install -m0644 ${UNPACKDIR}/10-ncsi-dhcrelay.conf ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$NCSI_IF".service.d/
+    install -d -m0755 ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$if_name".service.d
+    install -m0644 ${UNPACKDIR}/10-ncsi-dhcrelay.conf ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$if_name".service.d/
     sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh.in \
       >${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh
     install -m0644 ${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh $mondir/
