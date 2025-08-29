@@ -62,17 +62,21 @@ done
 
 # Write out each MAC override to the runtime networkd configuration
 lower=$(((mac[3] << 16) | (mac[4] << 8) | mac[5]))
+rm -f "/run/gbmc-mac-config/gbmc-mac-list"
+mkdir -p "/run/gbmc-mac-config"
 for (( i=0; i<num; i++ )); do
   if (( lower > 0xffffff )); then
     echo "MAC assignment too large: ${mac[*]}" >&2
     rc=2
     break
   fi
+  mac[3]=$(((lower >> 16) & 0xff))
+  mac[4]=$(((lower >> 8) & 0xff))
+  mac[5]=$(((lower >> 0) & 0xff))
+  macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
+
+  echo "$macstr" >> "/run/gbmc-mac-config/gbmc-mac-list"
   for intf in ${num_to_intfs[$i]}; do
-    mac[3]=$(((lower >> 16) & 0xff))
-    mac[4]=$(((lower >> 8) & 0xff))
-    mac[5]=$(((lower >> 0) & 0xff))
-    macstr=$(printf '%02x:%02x:%02x:%02x:%02x:%02x' "${mac[@]}")
     echo "Setting $intf to $macstr" >&2
     for override in /run/systemd/network/{00,}-bmc-$intf.network.d; do
       mkdir -p "$override"
