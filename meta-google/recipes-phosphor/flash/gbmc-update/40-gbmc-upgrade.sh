@@ -104,17 +104,20 @@ gbmc_upgrade_download() {
         # Tar failures when curl succeeds are hard errors to start over.
         # shellcheck disable=SC2143
         if (( st[1] != 0 )) && [[ -n $(grep -v '\(Exiting with failure status\|Not found in archive\|Cannot hard link\)' "$tmpdir"/tarerr) ]]; then
-          update_netboot_status "fetch_tar" "couldn't get TAR file, netboot fail" "FAIL"
+          update_netboot_status "$state" "couldn't get TAR file, netboot fail" "FAIL" "$retry"
           return 1
         fi
-        # Success should continue without retry
-        break
+        update_netboot_status "$state" "Succesfully fetched TAR" "SUCCESS" "$retry"
+        return 0
       fi
     else
-      if curl -LSsk --max-time "${single_deadline}" "${bootfile_url}${path}" -o "${output}"; then
-        # Success should continue without retry
-        update_netboot_status "$state" "Succesfully fetched" "SUCCESS" "$retry"
-        break
+      local http_code
+      if http_code="$(curl -LSsk --max-time "${single_deadline}" "${bootfile_url}${path}" -o "${output}" -w "%{http_code}")"; then
+        if (( http_code == 200 )); then
+          update_netboot_status "$state" "Succesfully fetched" "SUCCESS" "$retry"
+          return 0
+        fi
+        update_netboot_status "$state" "Got HTTP error code $http_code" "ONGOING" "$retry"
       fi
     fi
     if (( SECONDS + stime >= timeout )); then
@@ -125,7 +128,6 @@ gbmc_upgrade_download() {
     update_netboot_status "$state" "Failed to fetch $state, retrying" "RETRYING" "$retry"
     (( retry = retry + 1 ))
   done
-  return 0
 }
 
 gbmc_upgrade_dl_metadata() {
