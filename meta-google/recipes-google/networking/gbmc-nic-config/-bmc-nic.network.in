@@ -1,9 +1,11 @@
 [Match]
 Name=@IF@
 [Network]
+Description=bmc0
 DHCP=@DHCP@
 IPv6AcceptRA=false
 LLMNR=false
 MulticastDNS=false
 LinkLocalAddressing=ipv6
 IgnoreCarrierLoss=yes
+EmitLLDP=yes
