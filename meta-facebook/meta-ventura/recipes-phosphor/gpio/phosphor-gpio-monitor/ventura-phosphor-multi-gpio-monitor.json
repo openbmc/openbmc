@@ -1,8 +1,7 @@
 [
     {
         "Name": "PWRGD_COMPUTE_TRAY1_N",
-        "ChipId": "2",
-        "GpioNum": 148,
+        "LineName": "PWRGD_COMPUTE_TRAY1_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -18,8 +17,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY2_N",
-        "ChipId": "2",
-        "GpioNum": 150,
+        "LineName": "PWRGD_COMPUTE_TRAY2_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -35,8 +33,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY3_N",
-        "ChipId": "2",
-        "GpioNum": 152,
+        "LineName": "PWRGD_COMPUTE_TRAY3_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -52,8 +49,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY4_N",
-        "ChipId": "2",
-        "GpioNum": 154,
+        "LineName": "PWRGD_COMPUTE_TRAY4_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -69,8 +65,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY5_N",
-        "ChipId": "2",
-        "GpioNum": 156,
+        "LineName": "PWRGD_COMPUTE_TRAY5_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -86,8 +81,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY6_N",
-        "ChipId": "2",
-        "GpioNum": 158,
+        "LineName": "PWRGD_COMPUTE_TRAY6_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -103,8 +97,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY7_N",
-        "ChipId": "2",
-        "GpioNum": 160,
+        "LineName": "PWRGD_COMPUTE_TRAY7_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -120,8 +113,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY8_N",
-        "ChipId": "2",
-        "GpioNum": 162,
+        "LineName": "PWRGD_COMPUTE_TRAY8_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -137,8 +129,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY1_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 164,
+        "LineName": "PWRGD_NVS_TRAY1_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -154,8 +145,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY2_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 166,
+        "LineName": "PWRGD_NVS_TRAY2_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -171,8 +161,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY11_N",
-        "ChipId": "2",
-        "GpioNum": 168,
+        "LineName": "PWRGD_COMPUTE_TRAY11_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -188,8 +177,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY12_N",
-        "ChipId": "2",
-        "GpioNum": 170,
+        "LineName": "PWRGD_COMPUTE_TRAY12_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -205,8 +193,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY13_N",
-        "ChipId": "2",
-        "GpioNum": 172,
+        "LineName": "PWRGD_COMPUTE_TRAY13_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -222,8 +209,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY14_N",
-        "ChipId": "2",
-        "GpioNum": 174,
+        "LineName": "PWRGD_COMPUTE_TRAY14_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -239,8 +225,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY15_N",
-        "ChipId": "2",
-        "GpioNum": 176,
+        "LineName": "PWRGD_COMPUTE_TRAY15_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -256,8 +241,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY16_N",
-        "ChipId": "2",
-        "GpioNum": 178,
+        "LineName": "PWRGD_COMPUTE_TRAY16_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -273,8 +257,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY17_N",
-        "ChipId": "2",
-        "GpioNum": 180,
+        "LineName": "PWRGD_COMPUTE_TRAY17_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -290,8 +273,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY18_N",
-        "ChipId": "2",
-        "GpioNum": 182,
+        "LineName": "PWRGD_COMPUTE_TRAY18_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -307,8 +289,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY3_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 184,
+        "LineName": "PWRGD_NVS_TRAY3_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -324,8 +305,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY4_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 186,
+        "LineName": "PWRGD_NVS_TRAY4_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -341,8 +321,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY5_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 188,
+        "LineName": "PWRGD_NVS_TRAY5_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -358,8 +337,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY6_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 190,
+        "LineName": "PWRGD_NVS_TRAY6_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -375,8 +353,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY7_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 192,
+        "LineName": "PWRGD_NVS_TRAY7_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -392,8 +369,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY8_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 194,
+        "LineName": "PWRGD_NVS_TRAY8_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -409,8 +385,7 @@
     },
     {
         "Name": "PWRGD_NVS_TRAY9_PWROK_N",
-        "ChipId": "2",
-        "GpioNum": 196,
+        "LineName": "PWRGD_NVS_TRAY9_PWROK_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -426,8 +401,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY9_N",
-        "ChipId": "2",
-        "GpioNum": 198,
+        "LineName": "PWRGD_COMPUTE_TRAY9_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -443,8 +417,7 @@
     },
     {
         "Name": "PWRGD_COMPUTE_TRAY10_N",
-        "ChipId": "2",
-        "GpioNum": 200,
+        "LineName": "PWRGD_COMPUTE_TRAY10_N",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
@@ -459,9 +432,8 @@
         "Continue": true
     },
     {
-        "Name": "AALC_RPU_READY",
-        "ChipId": "2",
-        "GpioNum": 32,
+        "Name": "wAALC_RPU_READY",
+        "LineName": "wAALC_RPU_READY",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@rpu_ready.service"],
@@ -471,8 +443,7 @@
     },
     {
         "Name": "RPU_READY_PLD_R",
-        "ChipId": "2",
-        "GpioNum": 30,
+        "LineName": "RPU_READY_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@rpu0_ready.service"],
@@ -482,8 +453,7 @@
     },
     {
         "Name": "RPU_READY_SPARE_PLD_R",
-        "ChipId": "2",
-        "GpioNum": 28,
+        "LineName": "RPU_READY_SPARE_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@rpu0_ready_spare.service"],
@@ -493,8 +463,7 @@
     },
     {
         "Name": "RPU_2_READY_PLD_R",
-        "ChipId": "2",
-        "GpioNum": 26,
+        "LineName": "RPU_2_READY_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@rpu1_ready.service"],
@@ -504,8 +473,7 @@
     },
     {
         "Name": "RPU_2_READY_SPARE_PLD_R",
-        "ChipId": "2",
-        "GpioNum": 24,
+        "LineName": "RPU_2_READY_SPARE_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@rpu1_ready_spare.service"],
@@ -515,8 +483,7 @@
     },
     {
         "Name": "IT_STOP_PUMP",
-        "ChipId": "2",
-        "GpioNum": 22,
+        "LineName": "IT_STOP_PUMP",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@it_stop_pump0.service"],
@@ -526,8 +493,7 @@
     },
     {
         "Name": "IT_STOP_PUMP_SPARE",
-        "ChipId": "2",
-        "GpioNum": 20,
+        "LineName": "IT_STOP_PUMP_SPARE",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@it_stop_pump0_spare.service"],
@@ -537,8 +503,7 @@
     },
     {
         "Name": "IT_STOP_PUMP_2",
-        "ChipId": "2",
-        "GpioNum": 18,
+        "LineName": "IT_STOP_PUMP_2",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@it_stop_pump1.service"],
@@ -547,9 +512,8 @@
         "Continue": true
     },
     {
-        "Name": "IT_STOP_PUMP_SPARE",
-        "ChipId": "2",
-        "GpioNum": 16,
+        "Name": "IT_STOP_PUMP_SPARE_2",
+        "LineName": "IT_STOP_PUMP_SPARE_2",
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["rpu-ready-deassert@it_stop_pump1_spare.service"],
