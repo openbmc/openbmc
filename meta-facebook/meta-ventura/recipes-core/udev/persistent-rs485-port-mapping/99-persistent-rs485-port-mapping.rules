@@ -2,47 +2,75 @@
 ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ENV{UART_IC}="FT4232H"
 ATTRS{idVendor}=="04e2", ATTRS{idProduct}=="1424", ENV{UART_IC}="XR21B1424"
 
-# FT4232H #1 is used in the main source
+# FT4232H #1 is used in the main source (Case 1)
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="1-1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-1"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="1-1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyRS485-2"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="1-1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-3"
 
-# FT4232H #2 is used in the main source
+# FT4232H #1 is used in the main source (Case 2)
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-3"
+
+# FT4232H #2 is used in the main source (Case 1)
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyMETER-3"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyMETER-2"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyMETER-1"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.3", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyMETER-0"
+
+# FT4232H #2 is used in the main source (Case 2)
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyMETER-3"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyMETER-2"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyMETER-1"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.3", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyMETER-0"
 
-# FT4232H #3 is used in the main source
+# FT4232H #3 is used in the main source (Case 1)
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-6"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyRS485-4"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-7"
+ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.3", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyRS485-5"
+
+# FT4232H #3 is used in the main source (Case 2)
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-6"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyRS485-4"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-7"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.3", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyRS485-5"
 
-# FT4232H #2 is used only for fab2 (Case 1)
-ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyMETER-3"
-ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyMETER-2"
-ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyMETER-1"
-ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="2-1:1.3", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyMETER-0"
-
-# FT4232H #2 is used only for fab2 (Case 2)
+# FT4232H #2 is used only for fab2
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyMETER-3"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1:1.1", ATTRS{bInterfaceNumber}=="01", SYMLINK+="ttyMETER-2"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyMETER-1"
 ENV{UART_IC}=="FT4232H", SUBSYSTEMS=="usb", KERNELS=="3-1:1.3", ATTRS{bInterfaceNumber}=="03", SYMLINK+="ttyMETER-0"
 
-# XR21B1424 #1 is used in the 2nd source
+# XR21B1424 #1 is used in the 2nd source (Case 1)
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="1-1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="1-1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="1-1:1.4", ATTRS{bInterfaceNumber}=="04", SYMLINK+="ttyRS485-3"
+
+# XR21B1424 #1 is used in the 2nd source (Case 2)
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-1"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-2"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1:1.4", ATTRS{bInterfaceNumber}=="04", SYMLINK+="ttyRS485-3"
 
-# XR21B1424 #2 is used in the 2nd source
+# XR21B1424 #2 is used in the 2nd source (Case 1)
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyMETER-3"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyMETER-2"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.4", ATTRS{bInterfaceNumber}=="04", SYMLINK+="ttyMETER-1"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.1:1.6", ATTRS{bInterfaceNumber}=="06", SYMLINK+="ttyMETER-0"
+
+# XR21B1424 #2 is used in the 2nd source (Case 2)
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyMETER-3"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyMETER-2"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.4", ATTRS{bInterfaceNumber}=="04", SYMLINK+="ttyMETER-1"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.1:1.6", ATTRS{bInterfaceNumber}=="06", SYMLINK+="ttyMETER-0"
 
-# XR21B1424 #3 is used in the 2nd source
+# XR21B1424 #3 is used in the 2nd source (Case 1)
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-6"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-4"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.4", ATTRS{bInterfaceNumber}=="04", SYMLINK+="ttyRS485-7"
+ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="2-1.2:1.6", ATTRS{bInterfaceNumber}=="06", SYMLINK+="ttyRS485-5"
+
+# XR21B1424 #3 is used in the 2nd source (Case 2)
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.0", ATTRS{bInterfaceNumber}=="00", SYMLINK+="ttyRS485-6"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.2", ATTRS{bInterfaceNumber}=="02", SYMLINK+="ttyRS485-4"
 ENV{UART_IC}=="XR21B1424", SUBSYSTEMS=="usb", KERNELS=="3-1.2:1.4", ATTRS{bInterfaceNumber}=="04", SYMLINK+="ttyRS485-7"
