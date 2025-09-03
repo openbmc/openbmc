@@ -33,6 +33,9 @@ PACKAGECONFIG:remove:witherspoon = " \
     http-zstd \
 "
 
+PACKAGECONFIG:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'redundant-bmc', 'redundant-bmc', '', d)}"
+PACKAGECONFIG[redundant-bmc] = "-Dredfish-aggregation=enabled"
+
 inherit obmc-phosphor-discovery-service
 
 REGISTERED_SERVICES:${PN} += "obmc_redfish:tcp:443:"
