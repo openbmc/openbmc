@@ -12,11 +12,13 @@ DEPENDS = " \
     sdbusplus \
     systemd \
     "
-SRCREV = "0a95d918780602d6a88aaa9a1435c9c333f76d4a"
+SRCREV = "51ce6e39d3f2769cbec9f56b6256c5df750a3011"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/service-config-manager;branch=master;protocol=https"
+
+PACKAGECONFIG[persist-settings-to-file] = "-Dpersist-settings-to-file=enabled,-Dpersist-settings-to-file=disabled"
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} = "srvcfg-manager.service"
