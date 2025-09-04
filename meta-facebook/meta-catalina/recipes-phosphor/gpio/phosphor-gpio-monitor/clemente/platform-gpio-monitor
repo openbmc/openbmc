@@ -194,15 +194,15 @@ do_gpio_assert_log()
     # PDB CPLD IOEXP 14-0012, Port 1
     elif [ "$LINENAME" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
         LOG_MSG="RMC main power disabled"
-        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
     elif [ "$LINENAME" = "CHASSIS3_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Large leakage alert assert, leak cable 3"
-        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
     elif [ "$LINENAME" = "CHASSIS2_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Small leakage alert assert, leak cable 2"
     elif [ "$LINENAME" = "CHASSIS1_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Large leakage alert assert, leak cable 1"
-        busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
+        set_request_host_transition s "xyz.openbmc_project.State.Host.Transition.Off"
     elif [ "$LINENAME" = "CHASSIS0_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Small leakage alert assert, leak cable 0"
     elif [ "$LINENAME" = "SMB_RJ45_FIO_TMP_ALERT" ]; then
@@ -302,6 +302,7 @@ do_gpio_deassert_log()
     # PDB CPLD IOEXP 14-0012, Port 1
     elif [ "$LINENAME" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
         LOG_MSG="RMC main power enabled"
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
     elif [ "$LINENAME" = "CHASSIS3_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Large leakage alert deassert, leak cable 3"
     elif [ "$LINENAME" = "CHASSIS2_LEAK_Q_N_PLD" ]; then
