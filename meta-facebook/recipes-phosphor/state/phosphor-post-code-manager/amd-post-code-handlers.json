@@ -1,0 +1,41 @@
+[
+  {
+    "name": "ABL_NO_DIMM",
+    "description": "ABL Error for No Dimm Present error",
+    "primary": "0xEA00E2BC",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "ABL Error(EA00E2BC) DIMM Failure Event: No DIMM in System",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "ABL_NO_DIMM_ANY_CHANNEL",
+    "description": "ABL Error No Dimms On Any Channel in system",
+    "primary": "0xEA00E310",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "ABL Error(EA00E310) DIMM Failure Event: No DIMM in System",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "ABL_NO_DIMM_SMBUS",
+    "description": "ABL Error NO Dimm Smbus Info Error",
+    "primary": "0xEA00E2ED",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "ABL Error(EA00E2ED) DIMM Failure Event: No DIMM in System",
+	"RAW_EVENT": ""
+      }
+    }
+  }
+]

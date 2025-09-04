@@ -1,0 +1,1 @@
+MACHINEOVERRIDES =. "fb-compute-amd:"
