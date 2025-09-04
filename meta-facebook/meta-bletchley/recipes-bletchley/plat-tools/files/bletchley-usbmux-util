@@ -3,36 +3,51 @@
 source /usr/libexec/bletchley-common-functions
 
 CMD=$1
-SLED_INDEX=$(sled_mapping "$2")
+if [ "$#" -ge 2 ]; then
+    SLED_INDEX=$(sled_mapping "$2")
+fi
 
-CHIP_NUM=0
-USB2_SEL0_A_PIN_OFFSET=0
-USB2_SEL1_A_PIN_OFFSET=0
-USB2_SEL0_B_PIN_OFFSET=0
-USB2_SEL1_B_PIN_OFFSET=0
+DEVMEM_MUX_REG=0x1e780088
 
-init_gpio_pin_info()
-{
-    local pin_info
+declare -A MUX_NIBBLES=(
+    ["1"]="C"    # 1100 -> C
+    ["2"]="D"    # 1101 -> D
+    ["3"]="E"    # 1110 -> E
+    ["4"]="3"    # 0011 -> 3
+    ["5"]="7"    # 0111 -> 7
+    ["6"]="B"    # 1011 -> B
+    ["off"]="F"  # 1111 -> F
+)
 
-    read -r -a pin_info < <(gpiofind USB2_SEL0_A)
-    CHIP_NUM="${pin_info[0]}"
-    USB2_SEL0_A_PIN_OFFSET="${pin_info[1]}"
-    read -r -a pin_info < <(gpiofind USB2_SEL1_A)
-    USB2_SEL1_A_PIN_OFFSET="${pin_info[1]}"
-    read -r -a pin_info < <(gpiofind USB2_SEL0_B)
-    USB2_SEL0_B_PIN_OFFSET="${pin_info[1]}"
-    read -r -a pin_info < <(gpiofind USB2_SEL1_B)
-    USB2_SEL1_B_PIN_OFFSET="${pin_info[1]}"
+get_third_byte_upper_nibble() {
+    local value=$1
+    value=$(echo "$value" | sed -E 's/^(0x|0X)//i')
+    value=$(printf "%08s" "$value")
+    # Extract upper nibble of third byte (5th character from left)
+    echo "${value:4:1}" | tr '[:lower:]' '[:upper:]'
 }
 
-set_usbmux_gpio()
-{
-    gpioset "$CHIP_NUM" \
-    "$USB2_SEL0_A_PIN_OFFSET"="$1" \
-    "$USB2_SEL1_A_PIN_OFFSET"="$2" \
-    "$USB2_SEL0_B_PIN_OFFSET"="$3" \
-    "$USB2_SEL1_B_PIN_OFFSET"="$4"
+set_upper_nibble() {
+    local target_nibble=$1
+
+    current_value=$(devmem $DEVMEM_MUX_REG)
+    current_nibble=$(get_third_byte_upper_nibble "$current_value")
+
+    echo "Current register value: $current_value"
+
+    # Check if we need to change anything
+    if [ "$current_nibble" = "$target_nibble" ]; then
+        #echo "Upper nibble already set to 0x$target_nibble, no change needed"
+        exit 0
+    fi
+
+    current_value=$(echo "$current_value" | sed -E 's/^(0x|0X)//i')
+    current_value=$(printf "%08s" "$current_value")
+    # Replace only the upper nibble of third byte (5th character from left)
+    # Keep everything else the same: XXXX[N]YZZ -> XXXX[target]YZZ
+    new_value="0x${current_value:0:4}${target_nibble}${current_value:5:3}"
+    devmem "$DEVMEM_MUX_REG" 32 "$new_value"
+    echo "Register $DEVMEM_MUX_REG written with $new_value"
 }
 
 print_help()
@@ -47,52 +62,38 @@ print_help()
 
 usb_mux_off()
 {
-    set_usbmux_gpio 1 1 1 1
+    set_upper_nibble "${MUX_NIBBLES[off]}"
 }
 
 usb_mux_sled1()
 {
-    usb_mux_off
-    sleep 2
-    set_usbmux_gpio 0 0 1 1
+    set_upper_nibble "${MUX_NIBBLES[1]}"
 }
 
 usb_mux_sled2()
 {
-    usb_mux_off
-    sleep 2
-    set_usbmux_gpio 1 0 1 1
+    set_upper_nibble "${MUX_NIBBLES[2]}"
 }
 
 usb_mux_sled3()
 {
-    usb_mux_off
-    sleep 2
-    set_usbmux_gpio 0 1 1 1
+    set_upper_nibble "${MUX_NIBBLES[3]}"
 }
 
 usb_mux_sled4()
 {
-    usb_mux_off
-    sleep 2
-    set_usbmux_gpio 1 1 0 0
+    set_upper_nibble "${MUX_NIBBLES[4]}"
 }
 
 usb_mux_sled5()
 {
-    usb_mux_off
-    sleep 2
-    set_usbmux_gpio 1 1 1 0
+    set_upper_nibble "${MUX_NIBBLES[5]}"
 }
 
 usb_mux_sled6()
 {
-    usb_mux_off
-    sleep 2
-    set_usbmux_gpio 1 1 0 1
+    set_upper_nibble "${MUX_NIBBLES[6]}"
 }
-
-init_gpio_pin_info
 
 if [ "$CMD" == "off" ]; then
     usb_mux_off
@@ -114,11 +115,19 @@ elif [ "$CMD" == "on" ]; then
         print_help
         exit 1
     fi
-    sleep 1
 else
     echo "Invalid command: $CMD"
     print_help
     exit 1
+fi
+
+sleep 3
+
+if [ ! -d "/sys/bus/usb/devices/1-1" ]; then
+    # echo "sled$2 usb hub not found, rebinding usb hub..."
+    echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/unbind
+    sleep 3
+    echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/bind
 fi
 
 exit 0
