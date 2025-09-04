@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 DEPENDS = " \
     cli11 \
+    i2c-tools \
     libgpiod \
     systemd \
 "
