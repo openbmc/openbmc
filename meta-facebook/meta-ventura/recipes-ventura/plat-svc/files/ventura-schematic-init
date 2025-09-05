@@ -35,3 +35,8 @@ elif [ "$rmc_source" = "hsc-xdp fsc-nct p24vsen-isl gndsen-isl p12vbrick-flex" ]
 else
     echo "Failed to get RMC source ($rmc_board_stage) info..."
 fi
+
+# Due to the waveform failure of Bus 6 and Bus 7 Thigh & Tlow measurements,
+# Aspeed recommends adjusting the AC timing register settings instead of using the default settings.
+devmem 0x1e78a304 32 0x00EED003
+devmem 0x1e78a384 32 0x00EDE003
