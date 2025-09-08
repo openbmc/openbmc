@@ -1,0 +1,20 @@
+{
+    "ConnectedCables": [
+        "E1SBP_Cable_0A",
+        "SWB_Cable_0B",
+        "Rainbow_Cable_1A",
+        "Rainbow_Cable_1B",
+        "Rainbow_Cable_2A",
+        "Rainbow_Cable_2B",
+        "Rainbow_Cable_3A",
+        "Rainbow_Cable_3B",
+        "Rainbow_Cable_4A",
+        "Rainbow_Cable_4B",
+        "PDB_Cable_J311",
+        "PDB_Cable_J312",
+        "PDB_Cable_J313",
+        "PDB_Cable_J314",
+        "Leak_Cable_1",
+        "Leak_Cable_2"
+    ]
+}
