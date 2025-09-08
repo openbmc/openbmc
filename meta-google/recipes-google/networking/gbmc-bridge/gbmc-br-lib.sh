@@ -134,10 +134,10 @@ gbmc_br_reload_ips() {
 
 gbmc_br_set_ip() {
   local ip="${1-}"
-  local old_ip=
+  shift
+  local alt_ips=("$@")
+
   if [ -n "$ip" ]; then
-    old_ip="$(cat /var/google/gbmc-br-ip 2>/dev/null)"
-    [ "$old_ip" == "$ip" ] && return
     local pfx_bytes=()
     if ! ip_to_bytes pfx_bytes "$ip"; then
       echo "Not setting invalid IPv6: $ip" >&2
@@ -150,9 +150,18 @@ gbmc_br_set_ip() {
     rm -rf /var/google/gbmc-br-ip
   fi
 
-  gbmc_br_run_hooks GBMC_BR_LIB_SET_IP_HOOKS "$ip" || return
+  # Remove existing loaded configurations
+  (shopt -s nullglob; rm -rf /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-alt*.conf)
 
   gbmc_br_set_runtime_ip static "$ip" || return
+  local alt_ip
+  local i=0
+  for alt_ip in "${alt_ips[@]}"; do
+    gbmc_br_set_runtime_ip alt$i "$alt_ip" || return
+    (( i += 1 ))
+  done
+
+  gbmc_br_run_hooks GBMC_BR_LIB_SET_IP_HOOKS "$ip" || return
 }
 
 gbmc_br_lib_init=1
