@@ -24,18 +24,18 @@ set_chassis_state()
     busctl call "$BUS_NAME" "$OBJ_PATH" "$DBUS_PROPERTIES_INTF_NAME" Set ssv "$INTF_NAME" "$PROPERTY_NAME" s "$PROPERTY_VAL"
 }
 
-INSTENCE_ID="$1"
-HOST_PWR_STATUS=$(/usr/sbin/power-ctrl sled"$1" status)
-
+INSTANCE_ID="$1"
 CHASSIS_STATE_VAL="Off"
 HOST_STATE_VAL="Off"
 
-if [ "$HOST_PWR_STATUS" != "AC Off" ]; then
-    CHASSIS_STATE_VAL="On"
-    if [ "$HOST_PWR_STATUS" != "Off" ]; then
-        HOST_STATE_VAL="Running"
+if HOST_PWR_STATUS=$(/usr/sbin/power-ctrl sled"$1" status); then
+    if [ "$HOST_PWR_STATUS" != "AC Off" ]; then
+        CHASSIS_STATE_VAL="On"
+        if [ "$HOST_PWR_STATUS" != "Off" ]; then
+            HOST_STATE_VAL="Running"
+        fi
     fi
 fi
 
-set_chassis_state "$INSTENCE_ID" "$CHASSIS_STATE_VAL"
-set_host_state "$INSTENCE_ID" "$HOST_STATE_VAL"
+set_chassis_state "$INSTANCE_ID" "$CHASSIS_STATE_VAL"
+set_host_state "$INSTANCE_ID" "$HOST_STATE_VAL"
