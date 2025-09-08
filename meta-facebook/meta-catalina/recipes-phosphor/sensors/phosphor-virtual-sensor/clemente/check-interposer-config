@@ -1,0 +1,36 @@
+#!/bin/bash
+
+INTERPOSER_OBJ_PATH="/xyz/openbmc_project/inventory/system/board/Clemente_Interposer"
+INTERPOSER_CONF_PATH="/usr/share/phosphor-virtual-sensor/no-cable-tsense.json"
+CONFIG_DIR="/var/lib/phosphor-virtual-sensor"
+CONFIG_PATH="$CONFIG_DIR/virtual_sensor_config.json"
+
+
+has_cable_tsense()
+{
+  timeout 3 mapper wait "$INTERPOSER_OBJ_PATH/Interposer_CABLE_TSENSE_POSITIVE"
+  return $?
+}
+
+
+# create config folder if not exist
+if [ ! -d "$CONFIG_DIR" ]; then
+  mkdir -p "$CONFIG_DIR"
+fi
+
+# clean up exist link
+if [ -L "$CONFIG_PATH" ]; then
+  rm "$CONFIG_PATH"
+fi
+
+# check interposer board type
+for i in {1..10}
+do
+  echo "check interposer board type, attempt $i"
+  if timeout 3 mapper wait "$INTERPOSER_OBJ_PATH"; then
+    if ! has_cable_tsense; then
+      ln -s "$INTERPOSER_CONF_PATH" "$CONFIG_PATH"
+    fi
+    break
+  fi
+done

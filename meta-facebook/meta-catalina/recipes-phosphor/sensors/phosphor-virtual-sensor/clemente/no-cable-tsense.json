@@ -16,58 +16,58 @@
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "FAN0_PWM",
+                    "ParamName": "FAN0_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN0_PWM",
+                        "Name": "FAN0_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN1_PWM",
+                    "ParamName": "FAN1_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN1_PWM",
+                        "Name": "FAN1_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN2_PWM",
+                    "ParamName": "FAN2_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN2_PWM",
+                        "Name": "FAN2_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN3_PWM",
+                    "ParamName": "FAN3_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN3_PWM",
+                        "Name": "FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN4_PWM",
+                    "ParamName": "FAN4_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN4_PWM",
+                        "Name": "FAN4_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN5_PWM",
+                    "ParamName": "FAN5_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN5_PWM",
+                        "Name": "FAN5_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN6_PWM",
+                    "ParamName": "FAN6_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN6_PWM",
+                        "Name": "FAN6_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN7_PWM",
+                    "ParamName": "FAN7_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN7_PWM",
+                        "Name": "FAN7_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 }
@@ -75,8 +75,8 @@
         },
         "Expression": [
             "max(6.95927258, ",
-            "((2.825758 * (avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM)^2)) + ",
-            "(91.27348 * avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM)) - ",
+            "((2.825758 * (avg(FAN0_PWM_PCT, FAN1_PWM_PCT, FAN2_PWM_PCT, FAN3_PWM_PCT, FAN4_PWM_PCT, FAN5_PWM_PCT, FAN6_PWM_PCT, FAN7_PWM_PCT)^2)) + ",
+            "(91.27348 * avg(FAN0_PWM_PCT, FAN1_PWM_PCT, FAN2_PWM_PCT, FAN3_PWM_PCT, FAN4_PWM_PCT, FAN5_PWM_PCT, FAN6_PWM_PCT, FAN7_PWM_PCT)) - ",
             "2.196333))"
         ]
     },
@@ -104,65 +104,65 @@
                     }
                 },
                 {
-                    "ParamName": "FAN0_PWM",
+                    "ParamName": "FAN0_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN0_PWM",
+                        "Name": "FAN0_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN1_PWM",
+                    "ParamName": "FAN1_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN1_PWM",
+                        "Name": "FAN1_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN2_PWM",
+                    "ParamName": "FAN2_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN2_PWM",
+                        "Name": "FAN2_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN3_PWM",
+                    "ParamName": "FAN3_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN3_PWM",
+                        "Name": "FAN3_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN4_PWM",
+                    "ParamName": "FAN4_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN4_PWM",
+                        "Name": "FAN4_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN5_PWM",
+                    "ParamName": "FAN5_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN5_PWM",
+                        "Name": "FAN5_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN6_PWM",
+                    "ParamName": "FAN6_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN6_PWM",
+                        "Name": "FAN6_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 },
                 {
-                    "ParamName": "FAN7_PWM",
+                    "ParamName": "FAN7_PWM_PCT",
                     "Desc": {
-                        "Name": "FAN7_PWM",
+                        "Name": "FAN7_PWM_PCT",
                         "SensorType": "fan_pwm"
                     }
                 }
             ]
         },
         "Expression": [
-            "var DUTY_AVG:=avg(FAN0_PWM, FAN1_PWM, FAN2_PWM, FAN3_PWM, FAN4_PWM, FAN5_PWM, FAN6_PWM, FAN7_PWM);",
+            "var DUTY_AVG:=avg(FAN0_PWM_PCT, FAN1_PWM_PCT, FAN2_PWM_PCT, FAN3_PWM_PCT, FAN4_PWM_PCT, FAN5_PWM_PCT, FAN6_PWM_PCT, FAN7_PWM_PCT);",
             "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
             "var CAL_OFS[11]:={-0.8, -0.9, -1.0, -1.2, -1.3, -1.6, -2.0, -3.0, -4.8, -4.8, -4.8};",
             "switch {",
@@ -177,56 +177,6 @@
             "  case inrange(DUTY_OFS[9],DUTY_AVG,DUTY_OFS[8]): FIOBOARD_TEMP_C+(CAL_OFS[8]+((DUTY_AVG-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
             "  case inrange(DUTY_OFS[10],DUTY_AVG,DUTY_OFS[9]): FIOBOARD_TEMP_C+(CAL_OFS[9]+((DUTY_AVG-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
             "  default: FIOBOARD_TEMP_C+CAL_OFS[10];",
-            "}"
-        ]
-    },
-    {
-        "Desc": {
-            "Name": "Interposer_CABLE_TSENSE_POSITIVE_TEMP_C",
-            "SensorType": "temperature",
-            "MaxValue": 127,
-            "MinValue": -127
-        },
-        "Associations": [
-            [
-                "chassis",
-                "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Clemente_Interposer"
-            ]
-        ],
-        "Params": {
-            "DbusParam": [
-                {
-                    "ParamName": "Interposer_CTP_CURR",
-                    "Desc": {
-                        "Name": "Interposer_CABLE_TSENSE_POSITIVE_CURR_A",
-                        "SensorType": "current"
-                    }
-                }
-            ]
-        },
-        "Expression": [
-            "var CURR[14]:={",
-            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
-            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
-            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
-            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
-            "switch {",
-            "  case inrange(CURR[0],Interposer_CTP_CURR,CURR[1]): TEMP[0]+((Interposer_CTP_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
-            "  case inrange(CURR[1],Interposer_CTP_CURR,CURR[2]): TEMP[1]+((Interposer_CTP_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
-            "  case inrange(CURR[2],Interposer_CTP_CURR,CURR[3]): TEMP[2]+((Interposer_CTP_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
-            "  case inrange(CURR[3],Interposer_CTP_CURR,CURR[4]): TEMP[3]+((Interposer_CTP_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
-            "  case inrange(CURR[4],Interposer_CTP_CURR,CURR[5]): TEMP[4]+((Interposer_CTP_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
-            "  case inrange(CURR[5],Interposer_CTP_CURR,CURR[6]): TEMP[5]+((Interposer_CTP_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
-            "  case inrange(CURR[6],Interposer_CTP_CURR,CURR[7]): TEMP[6]+((Interposer_CTP_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
-            "  case inrange(CURR[7],Interposer_CTP_CURR,CURR[8]): TEMP[7]+((Interposer_CTP_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
-            "  case inrange(CURR[8],Interposer_CTP_CURR,CURR[9]): TEMP[8]+((Interposer_CTP_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
-            "  case inrange(CURR[9],Interposer_CTP_CURR,CURR[10]): TEMP[9]+((Interposer_CTP_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
-            "  case inrange(CURR[10],Interposer_CTP_CURR,CURR[11]): TEMP[10]+((Interposer_CTP_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
-            "  case inrange(CURR[11],Interposer_CTP_CURR,CURR[12]): TEMP[11]+((Interposer_CTP_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
-            "  case inrange(CURR[12],Interposer_CTP_CURR,CURR[13]): TEMP[12]+((Interposer_CTP_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
-            "  case Interposer_CTP_CURR>CURR[13]: TEMP[13];",
-            "  default : TEMP[0];",
             "}"
         ]
     },
@@ -295,3 +245,5 @@
         ]
     }
 ]
+
+
