@@ -182,7 +182,7 @@
     },
     {
         "Desc": {
-            "Name": "interposer_CABLE_TSENSE_POSITIVE_TEMP_C",
+            "Name": "INTERPOSER_CABLE_TSENSE_POSITIVE_TEMP_C",
             "SensorType": "temperature",
             "MaxValue": 127,
             "MinValue": -127
@@ -199,7 +199,7 @@
                 {
                     "ParamName": "Interposer_CTP_CURR",
                     "Desc": {
-                        "Name": "interposer_CABLE_TSENSE_POSITIVE_CURR_A",
+                        "Name": "INTERPOSER_CABLE_TSENSE_POSITIVE_CURR_A",
                         "SensorType": "current"
                     }
                 }
