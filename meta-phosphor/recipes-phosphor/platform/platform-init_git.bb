@@ -7,6 +7,7 @@ DEPENDS = " \
     cli11 \
     i2c-tools \
     libgpiod \
+    sdbusplus \
     systemd \
 "
 
