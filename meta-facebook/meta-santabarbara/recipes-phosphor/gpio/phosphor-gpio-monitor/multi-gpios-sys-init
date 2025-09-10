@@ -5,6 +5,18 @@ source /usr/libexec/fb-common-functions
 # shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+post_end_init() {
+  if [ "$(get_gpio BIOS_POST_CMPLT)" -eq 0 ]; then
+     busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 \
+     xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
+     xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby;
+  else
+     busctl set-property xyz.openbmc_project.State.Host0 \
+     /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s \
+     xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Inactive;
+  fi
+}
+
 # SGPIO Out Bit-83
 set_gpio CPU0_SYS_RESET_N 1
 
@@ -16,5 +28,8 @@ set_gpio SCM_USB_SEL 0
 
 # SGPIO Out Bit-81
 set_gpio BMC_SGPIO_READY 1
+
+# Initial host state
+post_end_init
 
 exit 0

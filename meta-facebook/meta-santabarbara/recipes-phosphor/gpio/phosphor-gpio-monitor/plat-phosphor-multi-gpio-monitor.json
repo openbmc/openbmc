@@ -112,5 +112,20 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "BIOS_POST_CMPLT",
+        "LineName": "BIOS_POST_CMPLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-post-end.service"
+            ],
+            "FALLING": [
+                "assert-post-end.service",
+                "platform-host-ready.target"
+            ]
+        },
+        "Continue": true
     }
 ]
