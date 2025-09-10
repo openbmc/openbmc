@@ -1,1 +1,1 @@
-SUBSYSTEM=="net", ACTION=="add", KERNEL=="mctpusb*",NAME="%E{INTERFACE}", RUN+="/bin/sh -c '/usr/bin/mctp addr add `expr $env{IFINDEX} + 30` dev $env{INTERFACE}; /usr/bin/mctp link set $env{INTERFACE} up;'"
+SUBSYSTEM=="net", ACTION=="add", KERNEL=="mctpusb*",NAME="%E{INTERFACE}", RUN+="/bin/sh -c '/usr/bin/mctp addr add 8 dev $env{INTERFACE}; /usr/bin/mctp link set $env{INTERFACE} up;'"
