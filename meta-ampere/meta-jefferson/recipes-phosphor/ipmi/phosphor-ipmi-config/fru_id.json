@@ -1,0 +1,42 @@
+[
+  {
+    "id" : 0,
+    "busIdx" : 4,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 1,
+    "busIdx" : 14,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 2,
+    "busIdx" : 20,
+    "addrIdx" : 82
+  },
+  {
+    "id" : 4,
+    "busIdx" : 9,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 5,
+    "busIdx" : 9,
+    "addrIdx" : 82
+  },
+  {
+    "id" : 9,
+    "busIdx" : 42,
+    "addrIdx" : 86
+  },
+  {
+    "id" : 12,
+    "busIdx" : 24,
+    "addrIdx" : 80
+  },
+  {
+    "id" : 13,
+    "busIdx" : 24,
+    "addrIdx" : 81
+  }
+]
