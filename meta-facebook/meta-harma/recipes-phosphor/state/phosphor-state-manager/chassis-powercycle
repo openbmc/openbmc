@@ -44,8 +44,19 @@ ChassisNumber=$1
 
 if [ "$ChassisNumber" == 0 ]
 then
-  echo "Starting Chassis Power Cycle"
+  echo "Starting Chassis Power Cycle" 
+  # According to JEDEC (JESD301-1A), the PMIC requires a minimum 
+  # Vin_Bulk voltage of 5 V and a duration of at least 200 ms after
+  # DIMM_CAMP assertion to guarantee successful writes to non-volatile 
+  # memory. However, the motherboard currently discharges too quickly.
+  # To address this, the gpio 129 signal is set to trigger the DC power
+  # drop, giving the CPLD enough time to inform the DIMM and CPU before
+  # the AC cycle, ensuring that the write operation completes reliably.
+  gpioset 2 129=1
+  sleep 0.3
   chassis-power-cycle
+  sleep 3
+  gpioset 2 129=0
 else
   echo "Starting Aegis Power Cycle"
   aegis-power-cycle
