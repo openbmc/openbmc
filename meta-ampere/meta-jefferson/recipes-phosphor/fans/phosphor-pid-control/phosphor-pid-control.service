@@ -5,6 +5,7 @@ Conflicts=obmc-chassis-powered-off@0.target
 
 [Service]
 Restart=always
+ExecCondition=/bin/bash -xc "! systemctl is-active --quiet ampere-fanctrl-manual.service"
 ExecStart=/usr/bin/swampd
 ExecReload=/bin/kill -HUP $MAINPID
 RestartSec=5
