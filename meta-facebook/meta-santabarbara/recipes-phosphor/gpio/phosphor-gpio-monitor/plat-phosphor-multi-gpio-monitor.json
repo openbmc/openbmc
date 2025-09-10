@@ -5,10 +5,26 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "deassert-power-good-drop.service"
+                "deassert-power-good-drop.service",
+                "power-rail-deassert-log@FM_PWRGD_CPU0_PWROK.service"
             ],
             "FALLING": [
-                "assert-power-good-drop.service"
+                "assert-power-good-drop.service",
+                "power-rail-assert-log@FM_PWRGD_CPU0_PWROK.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_RST_CPU0_RESETL_N",
+        "LineName": "FM_RST_CPU0_RESETL_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-deassert-log@FM_RST_CPU0_RESETL_N.service"
+            ],
+            "FALLING": [
+                "power-rail-assert-log@FM_RST_CPU0_RESETL_N.service"
             ]
         },
         "Continue": true
