@@ -30,6 +30,34 @@
         "Continue": true
     },
     {
+        "Name": "FM_CPU0_THERMTRIP_N",
+        "LineName": "FM_CPU0_THERMTRIP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@FM_CPU0_THERMTRIP_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@FM_CPU0_THERMTRIP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_CPU0_PROCHOT_N",
+        "LineName": "FM_CPU0_PROCHOT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@FM_CPU0_PROCHOT_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@FM_CPU0_PROCHOT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "FM_PVDDCR_CPU0_P0_OCP_N",
         "LineName": "FM_PVDDCR_CPU0_P0_OCP_N",
         "EventMon": "BOTH",

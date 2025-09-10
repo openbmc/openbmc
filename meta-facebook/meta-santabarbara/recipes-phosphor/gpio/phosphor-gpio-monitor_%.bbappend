@@ -8,6 +8,8 @@ SERVICE_LIST = "assert-power-good-drop.service \
                 deassert-reset-button.service \
                 power-rail-assert-log@.service \
                 power-rail-deassert-log@.service \
+                thermal-assert-log@.service \
+                thermal-deassert-log@.service \
                 multi-gpios-sys-init.service \
                 vr-fault-assert-log@.service \
                 vr-fault-deassert-log@.service \
@@ -23,6 +25,7 @@ SRC_URI += " \
     file://multi-gpios-sys-init \
     file://plat-phosphor-multi-gpio-monitor.json \
     file://power-rail-event-logger \
+    file://thermal-event-logger \
     file://vr-fault-event-logger \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
@@ -50,6 +53,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
 }
 
