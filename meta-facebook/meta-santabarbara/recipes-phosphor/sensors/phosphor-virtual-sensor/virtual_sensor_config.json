@@ -1,2 +1,102 @@
 [
+    {
+        "Desc": {
+            "Name": "PDB1_BUSBAR_TSENSE_P1_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Santa_Barbara_PDB1"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "PDB1_BTP1_CURR",
+                    "Desc": {
+                        "Name": "PDB1_BUSBAR_TSENSE_P1_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],PDB1_BTP1_CURR,CURR[1]): TEMP[0]+((PDB1_BTP1_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],PDB1_BTP1_CURR,CURR[2]): TEMP[1]+((PDB1_BTP1_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],PDB1_BTP1_CURR,CURR[3]): TEMP[2]+((PDB1_BTP1_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],PDB1_BTP1_CURR,CURR[4]): TEMP[3]+((PDB1_BTP1_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],PDB1_BTP1_CURR,CURR[5]): TEMP[4]+((PDB1_BTP1_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],PDB1_BTP1_CURR,CURR[6]): TEMP[5]+((PDB1_BTP1_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],PDB1_BTP1_CURR,CURR[7]): TEMP[6]+((PDB1_BTP1_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],PDB1_BTP1_CURR,CURR[8]): TEMP[7]+((PDB1_BTP1_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],PDB1_BTP1_CURR,CURR[9]): TEMP[8]+((PDB1_BTP1_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],PDB1_BTP1_CURR,CURR[10]): TEMP[9]+((PDB1_BTP1_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],PDB1_BTP1_CURR,CURR[11]): TEMP[10]+((PDB1_BTP1_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],PDB1_BTP1_CURR,CURR[12]): TEMP[11]+((PDB1_BTP1_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],PDB1_BTP1_CURR,CURR[13]): TEMP[12]+((PDB1_BTP1_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case PDB1_BTP1_CURR>CURR[13]: TEMP[13];",
+            "  default : TEMP[0];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "PDB1_BUSBAR_TSENSE_P2_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Santa_Barbara_PDB1"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "PDB1_BTP2_CURR",
+                    "Desc": {
+                        "Name": "PDB1_BUSBAR_TSENSE_P2_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],PDB1_BTP2_CURR,CURR[1]): TEMP[0]+((PDB1_BTP2_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0]));",
+            "  case inrange(CURR[1],PDB1_BTP2_CURR,CURR[2]): TEMP[1]+((PDB1_BTP2_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1]));",
+            "  case inrange(CURR[2],PDB1_BTP2_CURR,CURR[3]): TEMP[2]+((PDB1_BTP2_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2]));",
+            "  case inrange(CURR[3],PDB1_BTP2_CURR,CURR[4]): TEMP[3]+((PDB1_BTP2_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3]));",
+            "  case inrange(CURR[4],PDB1_BTP2_CURR,CURR[5]): TEMP[4]+((PDB1_BTP2_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4]));",
+            "  case inrange(CURR[5],PDB1_BTP2_CURR,CURR[6]): TEMP[5]+((PDB1_BTP2_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5]));",
+            "  case inrange(CURR[6],PDB1_BTP2_CURR,CURR[7]): TEMP[6]+((PDB1_BTP2_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6]));",
+            "  case inrange(CURR[7],PDB1_BTP2_CURR,CURR[8]): TEMP[7]+((PDB1_BTP2_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7]));",
+            "  case inrange(CURR[8],PDB1_BTP2_CURR,CURR[9]): TEMP[8]+((PDB1_BTP2_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8]));",
+            "  case inrange(CURR[9],PDB1_BTP2_CURR,CURR[10]): TEMP[9]+((PDB1_BTP2_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9]));",
+            "  case inrange(CURR[10],PDB1_BTP2_CURR,CURR[11]): TEMP[10]+((PDB1_BTP2_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10]));",
+            "  case inrange(CURR[11],PDB1_BTP2_CURR,CURR[12]): TEMP[11]+((PDB1_BTP2_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11]));",
+            "  case inrange(CURR[12],PDB1_BTP2_CURR,CURR[13]): TEMP[12]+((PDB1_BTP2_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12]));",
+            "  case PDB1_BTP2_CURR>CURR[13]: TEMP[13];",
+            "  default : TEMP[0];",
+            "}"
+        ]
+    }
 ]
