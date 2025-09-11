@@ -1,0 +1,111 @@
+#!/bin/bash
+# Copyright 2025 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+[[ -n ${gbmc_nic_cn_lib-} ]] && return
+
+# shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
+source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+
+gbmc_nic_cn_intfs=(@IFS@)
+gbmc_nic_cn_addr=
+
+gbmc_nic_cn_set() {
+  local act="$1"
+  local ip="$2"
+
+  echo "gBMC NIC CN $act $ip: ${gbmc_nic_cn_intfs[*]}" >&2
+  local pfx_bytes=()
+  ip_to_bytes pfx_bytes "$ip"
+
+  local cn_ips=()
+
+  local intf
+  local contents
+  read -r -d '' contents <<EOF
+[Route]
+Destination=$ip/65
+Metric=1024
+EOF
+  local i
+  local cn_ip
+  for (( i=1; i<8; ++i )); do
+    (( pfx_bytes[8] = i * 16 ))
+    cn_ips+=("$(ip_bytes_to_str pfx_bytes)")
+  done
+  for cn_ip in "${cn_ips[@]}"; do
+    contents+=$'\n'"IPv6ProxyNDPAddress=$cn_ip"
+  done
+  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network; do
+    mkdir -p "$file.d"
+    if [[ "$act" == add ]]; then
+      printf '%s' "$contents" >"$file.d"/10-nic-cn.conf
+    else
+      rm -f "$file.d"/10-nic-cn.conf
+    fi
+  done
+
+  local st=0
+  ip -6 route add "$ip/65" dev gbmcbr metric 1024 2>dev/null || true
+  for intf in "${gbmc_nic_cn_intfs[@]}"; do
+    if [[ "$act" == add ]]; then
+      for cn_ip in "${cn_ips[@]}"; do
+        ip -6 neigh "$act" proxy "$cn_ip" dev "$intf" || st=$?
+      done
+    fi
+    [[ "$st" == "0" ]] || failed_intfs+=("$intf")
+  done
+
+  if (( "${#failed_intfs[@]}" > 0 )); then
+    gbmc_net_networkd_reload "${failed_intfs[@]}"
+  fi
+}
+
+gbmc_nic_cn_hook() {
+  # shellcheck disable=SC2154
+  if [[ $change == addr && $intf == gbmcbr && $scope == global ]] &&
+       [[ $fam == inet6 && $flags != *tentative* ]]; then
+    local ip_bytes=()
+    if ! ip_to_bytes ip_bytes "$ip"; then
+      echo "gBMC NIC CN invalid IP: $ip" >&2
+      return 1
+    fi
+    # Ignore ULAs
+    if (( (ip_bytes[0] & 0xfe) == 0xfc )); then
+      return 0
+    fi
+    # Addresses must be /64 to the upstack switch
+    for (( i = 8; i < 16; ++i )); do
+      if (( ip_bytes[i] != 0 )); then
+        return 0
+      fi
+    done
+    if [[ $action == add && "$gbmc_nic_cn_addr" != "$ip" ]]; then
+      if [ -n "$gbmc_nic_cn_addr" ]; then
+        gbmc_nic_cn_set del "$gbmc_nic_cn_addr"
+      fi
+      gbmc_nic_cn_addr="$ip"
+      gbmc_nic_cn_set add "$ip"
+    elif [[ $action == del && "$gbmc_nic_cn_addr" == "$ip"  ]]; then
+      gbmc_nic_cn_addr=
+      gbmc_nic_cn_set del "$ip"
+    fi
+  fi
+}
+
+GBMC_IP_MONITOR_HOOKS+=(gbmc_nic_cn_hook)
+
+gbmc_nic_cn_lib=1

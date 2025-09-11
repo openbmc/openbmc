@@ -14,6 +14,7 @@ SRC_URI += " \
   file://-bmc-nic.network.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay.sh.in'} \
   file://gbmc-nic-neigh.sh.in \
+  file://gbmc-nic-cn.sh.in \
   file://gbmc-nic-ra.sh \
   file://gbmc-nic-ra@.service \
   file://gbmc-nic-devlab-config.sh.in \
@@ -77,6 +78,11 @@ do_install:append:local() {
     install -d -m0755 $netdir/-bmc-$intf.network.d
     install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-$intf.network.d/10-dhcp4.conf
   done
+
+  mondir=${D}${datadir}/gbmc-ip-monitor
+  install -d -m0755 $mondir
+  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${WORKDIR}/gbmc-nic-cn.sh.in \
+    >$mondir/gbmc-nic-cn.sh
 }
 
 do_install:append:dev() {
