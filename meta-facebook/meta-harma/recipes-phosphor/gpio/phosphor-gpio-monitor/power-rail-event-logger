@@ -17,9 +17,11 @@ MESSAGE=$2
 
 # remove prefix from 0_xxxxxx to xxxxxx
 GPIO_NAME="${MESSAGE#*_}"
+COMPONENT_NAME="${GPIO_NAME#power-}"
+COMPONENT_NAME="${COMPONENT_NAME%-good}"
 
 MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
-DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Harma_MB/host0"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Harma_MB/$COMPONENT_NAME"
 STASH_FILE="/run/${GPIO_NAME}.log_entry"
 
 if check_valid_sgpio; then
