@@ -1,0 +1,11 @@
+[Unit]
+Description=Run this service to update RS485 port mapping rules
+Before=rackmond.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/ventura/update-rs485-rules.sh
+
+[Install]
+WantedBy=multi-user.target

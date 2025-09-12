@@ -1,0 +1,48 @@
+# Identify whether the UART IC is FT4232H.
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ENV{UART_IC}="FT4232H"
+
+ENV{UART_IC}=="FT4232H", ATTRS{busnum}=="1", RUN+="/bin/touch /tmp/udev_ft4232h_bus1_exists"
+ENV{UART_IC}=="FT4232H", ATTRS{busnum}=="2", RUN+="/bin/touch /tmp/udev_ft4232h_bus2_exists"
+ENV{UART_IC}=="FT4232H", ATTRS{busnum}=="3", RUN+="/bin/touch /tmp/udev_ft4232h_bus3_exists"
+
+PROGRAM="/bin/bash -c '[ -f /tmp/udev_ft4232h_bus1_exists ]'", PROGRAM="/bin/bash -c '[ -f /tmp/udev_ft4232h_bus2_exists ]'", GOTO="case1"
+PROGRAM="/bin/bash -c '[ -f /tmp/udev_ft4232h_bus1_exists ]'", PROGRAM="/bin/bash -c '[ -f /tmp/udev_ft4232h_bus3_exists ]'", GOTO="case2"
+PROGRAM="/bin/bash -c '[ -f /tmp/udev_ft4232h_bus2_exists ]'", PROGRAM="/bin/bash -c '[ -f /tmp/udev_ft4232h_bus3_exists ]'", GOTO="case3"
+
+# FT4232H Case 1
+LABEL="case1"
+ENV{UART_IC}=="FT4232H", KERNELS=="1-1:1.0", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="FT4232H", KERNELS=="1-1:1.1", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="FT4232H", KERNELS=="1-1:1.2", SYMLINK+="ttyRS485-3"
+
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.0", SYMLINK+="ttyMETER-3"
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.1", SYMLINK+="ttyMETER-2"
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.2", SYMLINK+="ttyMETER-1"
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.3", SYMLINK+="ttyMETER-0"
+GOTO="end"
+
+# FT4232H Case 2
+LABEL="case2"
+ENV{UART_IC}=="FT4232H", KERNELS=="1-1:1.0", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="FT4232H", KERNELS=="1-1:1.1", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="FT4232H", KERNELS=="1-1:1.2", SYMLINK+="ttyRS485-3"
+
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.0", SYMLINK+="ttyMETER-3"
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.1", SYMLINK+="ttyMETER-2"
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.2", SYMLINK+="ttyMETER-1"
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.3", SYMLINK+="ttyMETER-0"
+GOTO="end"
+
+# FT4232H Case 3
+LABEL="case3"
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.0", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.1", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="FT4232H", KERNELS=="2-1:1.2", SYMLINK+="ttyRS485-3"
+
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.0", SYMLINK+="ttyMETER-3"
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.1", SYMLINK+="ttyMETER-2"
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.2", SYMLINK+="ttyMETER-1"
+ENV{UART_IC}=="FT4232H", KERNELS=="3-1:1.3", SYMLINK+="ttyMETER-0"
+GOTO="end"
+
+LABEL="end"
