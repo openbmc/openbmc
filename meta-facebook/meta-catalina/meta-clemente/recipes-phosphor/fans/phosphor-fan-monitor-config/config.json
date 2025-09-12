@@ -1,0 +1,312 @@
+{
+    "fans": [
+        {
+            "inventory": "/system/chassis/Clemente/Fan0",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN0_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN0_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan1",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN1_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN1_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan2",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN2_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN2_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan3",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN3_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN3_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan4",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN4_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN4_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan5",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN5_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN5_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan6",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN6_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN6_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM"
+            }
+        },
+        {
+            "inventory": "/system/chassis/Clemente/Fan7",
+            "method": "count",
+            "count_interval": 3,
+            "deviation": 15,
+            "num_sensors_nonfunc_for_fan_nonfunc": 1,
+            "monitor_start_delay": 10,
+            "fan_missing_error_delay": 5,
+            "nonfunc_rotor_error_delay": 3,
+            "set_func_on_present": false,
+            "sensors": [
+                {
+                     "name": "FAN7_TACH_IL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM",
+                     "factor": 137,
+                     "offset": -632
+                },
+                {
+                     "name": "FAN7_TACH_OL_SPEED_RPM",
+                     "has_target": true,
+                     "threshold": 5,
+                     "target_interface": "xyz.openbmc_project.Control.FanPwm",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM",
+                     "factor": 137,
+                     "offset": -632
+                }
+            ],
+            "control": {
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM"
+            }
+        }
+    ],
+    "sensor_trust_groups": [
+        {
+            "class": "nonzerospeed",
+            "group": [
+                {"name": "FAN0_TACH_IL_SPEED_RPM"},
+                {"name": "FAN0_TACH_OL_SPEED_RPM"},
+                {"name": "FAN1_TACH_IL_SPEED_RPM"},
+                {"name": "FAN1_TACH_OL_SPEED_RPM"},
+                {"name": "FAN2_TACH_IL_SPEED_RPM"},
+                {"name": "FAN2_TACH_OL_SPEED_RPM"},
+                {"name": "FAN3_TACH_IL_SPEED_RPM"},
+                {"name": "FAN3_TACH_OL_SPEED_RPM"},
+                {"name": "FAN4_TACH_IL_SPEED_RPM"},
+                {"name": "FAN4_TACH_OL_SPEED_RPM"},
+                {"name": "FAN5_TACH_IL_SPEED_RPM"},
+                {"name": "FAN5_TACH_OL_SPEED_RPM"},
+                {"name": "FAN6_TACH_IL_SPEED_RPM"},
+                {"name": "FAN6_TACH_OL_SPEED_RPM"},
+                {"name": "FAN7_TACH_IL_SPEED_RPM"},
+                {"name": "FAN7_TACH_OL_SPEED_RPM"}
+            ]
+        }
+    ],
+    "fault_handling": {
+        "num_nonfunc_rotors_before_warning": 2,
+        "num_nonfunc_rotors_before_fatal": 3,
+        "power_off_config": [
+            {
+                "type": "soft",
+                "cause": "nonfunc_fan_rotors",
+                "count": 3,
+                "delay": 10
+            }
+        ]
+    }
+}
+
