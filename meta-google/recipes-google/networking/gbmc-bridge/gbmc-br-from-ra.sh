@@ -53,8 +53,11 @@ gbmc_br_from_ra_update() {
       if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
         echo "gBMC Bridge RA Addr Add: $addr" >&2
         gbmc_br_from_ra_prev_addrs["$addr"]=1
+        ip addr replace "$addr" dev gbmcbr noprefixroute
+      elif ! ip addr show dev gbmcbr | grep -q "$addr"; then
+        echo "gBMC Bridge RA missing addr add: $addr" >&2
+        ip addr replace "$addr" dev gbmcbr noprefixroute
       fi
-      ip addr replace "$addr" dev gbmcbr noprefixroute
     else
       if [[ -n ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
         echo "gBMC Bridge RA Addr Del: $addr" >&2
