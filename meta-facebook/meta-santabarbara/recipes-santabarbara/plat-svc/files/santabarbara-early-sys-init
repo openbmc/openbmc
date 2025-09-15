@@ -1,0 +1,26 @@
+#!/bin/bash
+
+enable_all_fan_input()
+{
+    if find /sys/bus/i2c/devices/*/hwmon/*/fan*_enable -print -quit 2>/dev/null | grep -q .; then
+      for file in /sys/bus/i2c/devices/*/hwmon/*/fan*_enable
+      do
+        echo 1 > "${file}"
+      done
+    fi
+}
+
+set_bmc_ready()
+{
+    local bmc_ready="/sys/class/leds/bmc_ready_noled/brightness"
+    echo 1 > ${bmc_ready}
+
+    return 0
+}
+
+# Enable all fan input as early as possible
+enable_all_fan_input
+
+set_bmc_ready
+
+exit 0

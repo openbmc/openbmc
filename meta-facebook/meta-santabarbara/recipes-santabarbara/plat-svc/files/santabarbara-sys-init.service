@@ -1,0 +1,11 @@
+[Unit]
+Description=Santabarbara Early System Init
+Before=xyz.openbmc_project.EntityManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/santabarbara-early-sys-init
+SyslogIdentifier=Santabarbara Early Init
+
+[Install]
+WantedBy=multi-user.target
