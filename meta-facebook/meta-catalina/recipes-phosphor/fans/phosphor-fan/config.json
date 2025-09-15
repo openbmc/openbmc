@@ -1,0 +1,246 @@
+{
+  "fans": [
+    {
+      "inventory": "/system/chassis/Catalina/Fan0",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN0_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN0_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan1",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN1_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN1_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan2",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN2_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN2_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan3",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN3_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN3_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan4",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN4_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN4_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan5",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN5_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN5_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan6",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN6_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN6_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    },
+    {
+      "inventory": "/system/chassis/Catalina/Fan7",
+      "method": "count",
+      "count_interval": 3,
+      "deviation": 25,
+      "num_sensors_nonfunc_for_fan_nonfunc": 1,
+      "monitor_start_delay": 10,
+      "fan_missing_error_delay": 5,
+      "nonfunc_rotor_error_delay": 3,
+      "set_func_on_present": false,
+      "sensors": [
+        {
+          "name": "FAN7_TACH_IL_SPEED_RPM",
+          "has_target": true,
+          "threshold": 5,
+          "target_interface": "xyz.openbmc_project.Control.FanPwm",
+          "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
+          "factor": 119.61,
+          "ignore_above_max": true
+        },
+        {
+          "name": "FAN7_TACH_OL_SPEED_RPM",
+          "has_target": false,
+          "threshold": 5,
+          "factor": 96.47,
+          "ignore_above_max": true
+        }
+      ]
+    }
+  ],
+  "fault_handling": {
+    "power_off_config": [
+      {
+        "type": "soft",
+        "cause": "nonfunc_fan_rotors",
+        "count": 3,
+        "delay": 30
+      }
+    ]
+  }
+}
