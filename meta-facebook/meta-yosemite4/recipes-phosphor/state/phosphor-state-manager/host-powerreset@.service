@@ -1,5 +1,6 @@
 [Unit]
 Description=Host Power Reset: %i
+OnFailure=host-powerreset-failure@%i.service
 
 [Service]
 Type=oneshot

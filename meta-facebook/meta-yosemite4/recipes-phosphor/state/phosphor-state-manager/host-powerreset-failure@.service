@@ -1,0 +1,9 @@
+[Unit]
+Description=Handle host powerreset failure for instance %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/host-powerreset-failure %i
+
+[Install]
+WantedBy=multi-user.target

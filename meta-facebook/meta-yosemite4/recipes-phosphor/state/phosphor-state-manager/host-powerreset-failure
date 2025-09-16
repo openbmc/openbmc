@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Provide source directive to shellcheck.
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+CHASSIS_ID=$1
+CHASSIS_BUS=$(($1 - 1))
+IO_EXP_P0_PWRGD_R_OUT=18
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
+
+# Stop the target to avoid counting reboot times and changing the host state.
+/bin/systemctl stop phosphor-reboot-host@"${CHASSIS_ID}".service
+
+host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")
+if [ "$host_status" != "$STATE_ON" ]; then
+    # Set host state to off
+    busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_OFF_PROPERTY"
+else
+    # Set host state to on
+    busctl set-property "$HOST_BUS_NAME""$CHASSIS_ID" "$HOST_OBJ_PATH""$CHASSIS_ID" "$HOST_INTF_NAME" "$HOST_PROPERTY_NAME" s "$HOST_ON_PROPERTY"
+fi

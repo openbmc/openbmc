@@ -51,6 +51,7 @@ SRC_URI:append = " \
     file://host-poweron-failure@.service \
     file://host-powercycle@.service \
     file://host-powerreset@.service \
+    file://host-powerreset-failure@.service \
     file://check-i3c-hub@.service \
     file://chassis-poweroff \
     file://chassis-poweron \
@@ -61,6 +62,7 @@ SRC_URI:append = " \
     file://host-poweron-failure \
     file://host-powercycle \
     file://host-powerreset \
+    file://host-powerreset-failure \
     file://power-cmd \
     file://wait-until-mctp-connection-done \
     file://rescan-cxl-eid \
@@ -94,6 +96,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/host-poweron-failure ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-powercycle ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset-failure ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/wait-until-mctp-connection-done ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/wait-until-mctp-EID-remove ${D}${libexecdir}/${PN}/

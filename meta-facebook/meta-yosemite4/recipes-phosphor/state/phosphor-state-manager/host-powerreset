@@ -6,6 +6,9 @@
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 CHASSIS_ID=$1
+CHASSIS_BUS=$(($1 - 1))
+IO_EXP_P0_PWRGD_R_OUT=18
+GPIOCHIP_IO_EXP_HOST_POWER_STATUS=$(basename "/sys/bus/i2c/devices/$CHASSIS_BUS-0023/"*gpiochip*)
 slot_power_control_lock="/run/slot_power_control_${CHASSIS_ID}.lock"
 
 msg="Execute host$CHASSIS_ID acpi reset"
@@ -21,15 +24,27 @@ if ! flock -n 300 ; then
     exit 1
 fi
 
-# TODO: check power status before do power reset
-# Set state effecter state: Entity ID 0x0000 for host power control, 0x4 for power reset
-EID=$(($1*10))
-if ! pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x04 -m "$EID"
+# Check power status before do power reset
+host_status=$(gpio_get "$GPIOCHIP_IO_EXP_HOST_POWER_STATUS" "$IO_EXP_P0_PWRGD_R_OUT")
+if [ "$host_status" != "$STATE_ON" ]
 then
+    echo "Host$1 DC power is not on. Stopping acpi reset."
     msg="Failed to set host$1 acpi reset"
     echo "${msg}"
     add_sel "${msg}" "Error"
-else
+    exit 1
+fi
+
+# Set state effecter state: Entity ID 0x0000 for host power control, 0x4 for power reset
+EID=$(($1*10))
+resp=$(pldmtool raw -d 0x80 0x02 0x39 0x00 0x00 0x01 0x00 0x04 -m "$EID" | grep "39 00 $")
+# check BIC response with success return code
+if [ -n "$resp" ]; then
     sleep 20
     echo "Host$1 is acpi reset"
+else
+    msg="Failed to set host$1 acpi reset"
+    echo "${msg}"
+    add_sel "${msg}" "Error"
+    exit 1
 fi
