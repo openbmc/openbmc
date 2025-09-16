@@ -208,6 +208,9 @@ gbmc_br_gw_src_hook() {
     if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
+    if [[ $route =~ ^(.*)( +proto +[^ ]+)(.*)$ ]]; then
+      route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+    fi
     if [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
       gbmc_br_gw_src_routes["$route"]=1
       gbmc_br_gw_src_update
