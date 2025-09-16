@@ -50,16 +50,19 @@ check_fcb_fan_status()
     do
         local fan_number=$(((fcb_num * 2) + index ))
         local NoCritical=0
-        local object_path="/xyz/openbmc_project/sensors/fan_tach/FCB_${fcb_num}_FAN${fan_number}_TACH_${in_out[$io_index]}_SPEED_RPM"
 
-        for property in "${property_list[@]}"; do
-            tach_alarm=$(busctl get-property "$service" "$object_path" "$interface" "$property" | cut -d ' ' -f2)
-            if [ "$tach_alarm" = "true" ]; then
-                set_fan_led_abnormal "${fcb_num}" "${fan_number}"
-                ((NoCritical++))
-                echo "$FAN_STATUS_ABNORMAL"
-                break;
-            fi
+        for io in "${in_out[@]}"; do
+            local object_path="/xyz/openbmc_project/sensors/fan_tach/FCB_${fcb_num}_FAN${fan_number}_TACH_${io}_SPEED_RPM"
+
+            for property in "${property_list[@]}"; do
+                tach_alarm=$(busctl get-property "$service" "$object_path" "$interface" "$property" | cut -d ' ' -f2)
+                if [ "$tach_alarm" = "true" ]; then
+                    set_fan_led_abnormal "${fcb_num}" "${fan_number}"
+                    ((NoCritical++))
+                    echo "$FAN_STATUS_ABNORMAL"
+                    break;
+                fi
+            done
         done
 
         if [ "$NoCritical" = "0" ]; then
