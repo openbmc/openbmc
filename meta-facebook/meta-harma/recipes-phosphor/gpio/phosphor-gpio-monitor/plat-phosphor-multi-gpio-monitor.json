@@ -226,6 +226,28 @@
         "Continue": true
     },
     {
+        "Name": "irq-retimer0-0v9-alert",
+        "ChipId": "2",
+        "GpioNum": 230,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["vr-fault-deassert-log@2_irq-retimer0-0v9-alert.service"],
+            "FALLING": ["vr-fault-assert-log@2_irq-retimer0-0v9-alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "irq-retimer1-0v9-alert",
+        "ChipId": "2",
+        "GpioNum": 232,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["vr-fault-deassert-log@2_irq-retimer1-0v9-alert.service"],
+            "FALLING": ["vr-fault-assert-log@2_irq-retimer1-0v9-alert.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "fcb1-activate",
         "ChipId": "3",
         "GpioNum": 13,
