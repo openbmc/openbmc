@@ -24,7 +24,7 @@ do
         mctp neigh add $((eidBase + 4)) dev mctpi3c${busnum} lladdr "$lladdr"
         mctp neigh add $((eidBase + 5)) dev mctpi3c${busnum} lladdr "$lladdr"
     done
-    mctp link set mctpi3c${busnum} up
+    mctp link set mctpi3c${busnum} mtu 254 up
     mctp addr add ${localEid} dev mctpi3c${busnum}
     busnum=$((busnum+1))
 done
