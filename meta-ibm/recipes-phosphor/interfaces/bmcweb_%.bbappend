@@ -3,6 +3,7 @@ EXTRA_OEMESON:append = " \
     -Dredfish-oem-manager-fan-data=disabled \
     -Dinsecure-enable-redfish-query=enabled \
     -Dhttp-body-limit=400 \
+    -Dredfish-use-hardcoded-system-location-indicator=disabled \
 "
 PACKAGECONFIG:append = " \
     redfish-dbus-log \
