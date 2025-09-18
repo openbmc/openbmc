@@ -1,0 +1,7 @@
+[Unit]
+Description=%i SMC Deassert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/smc-event-logger "deassert" "%i"
+SyslogIdentifier=%i-smc-deassert

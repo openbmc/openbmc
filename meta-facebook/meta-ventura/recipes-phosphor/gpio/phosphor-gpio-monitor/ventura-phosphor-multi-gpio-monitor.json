@@ -5,11 +5,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-1.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY1_N.service",
                 "led-blue-assert@leakport1.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-1.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY1_N.service",
                 "led-blue-deassert@leakport1.service"
             ]
         },
@@ -21,11 +21,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-2.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY2_N.service",
                 "led-blue-assert@leakport2.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-2.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY2_N.service",
                 "led-blue-deassert@leakport2.service"
             ]
         },
@@ -37,11 +37,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-3.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY3_N.service",
                 "led-blue-assert@leakport3.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-3.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY3_N.service",
                 "led-blue-deassert@leakport3.service"
             ]
         },
@@ -53,11 +53,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-4.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY4_N.service",
                 "led-blue-assert@leakport4.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-4.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY4_N.service",
                 "led-blue-deassert@leakport4.service"
             ]
         },
@@ -69,11 +69,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-5.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY5_N.service",
                 "led-blue-assert@leakport5.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-5.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY5_N.service",
                 "led-blue-deassert@leakport5.service"
             ]
         },
@@ -85,11 +85,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-6.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY6_N.service",
                 "led-blue-assert@leakport6.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-6.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY6_N.service",
                 "led-blue-deassert@leakport6.service"
             ]
         },
@@ -101,11 +101,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-7.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY7_N.service",
                 "led-blue-assert@leakport7.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-7.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY7_N.service",
                 "led-blue-deassert@leakport7.service"
             ]
         },
@@ -117,11 +117,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-8.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY8_N.service",
                 "led-blue-assert@leakport8.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-8.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY8_N.service",
                 "led-blue-deassert@leakport8.service"
             ]
         },
@@ -133,11 +133,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-1.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY1_PWROK_N.service",
                 "led-blue-assert@leakport9.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-1.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY1_PWROK_N.service",
                 "led-blue-deassert@leakport9.service"
             ]
         },
@@ -149,11 +149,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-2.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY2_PWROK_N.service",
                 "led-blue-assert@leakport10.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-2.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY2_PWROK_N.service",
                 "led-blue-deassert@leakport10.service"
             ]
         },
@@ -165,11 +165,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-11.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY11_N.service",
                 "led-blue-assert@leakport20.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-11.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY11_N.service",
                 "led-blue-deassert@leakport20.service"
             ]
         },
@@ -181,11 +181,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-12.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY12_N.service",
                 "led-blue-assert@leakport21.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-12.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY12_N.service",
                 "led-blue-deassert@leakport21.service"
             ]
         },
@@ -197,11 +197,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-13.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY13_N.service",
                 "led-blue-assert@leakport22.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-13.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY13_N.service",
                 "led-blue-deassert@leakport22.service"
             ]
         },
@@ -213,11 +213,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-14.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY14_N.service",
                 "led-blue-assert@leakport23.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-14.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY14_N.service",
                 "led-blue-deassert@leakport23.service"
             ]
         },
@@ -229,11 +229,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-15.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY15_N.service",
                 "led-blue-assert@leakport24.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-15.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY15_N.service",
                 "led-blue-deassert@leakport24.service"
             ]
         },
@@ -245,11 +245,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-16.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY16_N.service",
                 "led-blue-assert@leakport25.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-16.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY16_N.service",
                 "led-blue-deassert@leakport25.service"
             ]
         },
@@ -261,11 +261,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-17.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY17_N.service",
                 "led-blue-assert@leakport26.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-17.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY17_N.service",
                 "led-blue-deassert@leakport26.service"
             ]
         },
@@ -277,11 +277,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-18.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY18_N.service",
                 "led-blue-assert@leakport27.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-18.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY18_N.service",
                 "led-blue-deassert@leakport27.service"
             ]
         },
@@ -293,11 +293,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-3.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY3_PWROK_N.service",
                 "led-blue-assert@leakport11.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-3.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY3_PWROK_N.service",
                 "led-blue-deassert@leakport11.service"
             ]
         },
@@ -309,11 +309,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-4.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY4_PWROK_N.service",
                 "led-blue-assert@leakport12.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-4.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY4_PWROK_N.service",
                 "led-blue-deassert@leakport12.service"
             ]
         },
@@ -325,11 +325,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-5.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY5_PWROK_N.service",
                 "led-blue-assert@leakport13.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-5.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY5_PWROK_N.service",
                 "led-blue-deassert@leakport13.service"
             ]
         },
@@ -341,11 +341,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-6.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY6_PWROK_N.service",
                 "led-blue-assert@leakport14.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-6.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY6_PWROK_N.service",
                 "led-blue-deassert@leakport14.service"
             ]
         },
@@ -357,11 +357,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-7.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY7_PWROK_N.service",
                 "led-blue-assert@leakport15.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-7.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY7_PWROK_N.service",
                 "led-blue-deassert@leakport15.service"
             ]
         },
@@ -373,11 +373,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-8.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY8_PWROK_N.service",
                 "led-blue-assert@leakport16.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-8.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY8_PWROK_N.service",
                 "led-blue-deassert@leakport16.service"
             ]
         },
@@ -389,11 +389,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@nvs-tray-9.service",
+                "power-rail-deassert-log@PWRGD_NVS_TRAY9_PWROK_N.service",
                 "led-blue-assert@leakport17.service"
             ],
             "RISING": [
-                "power-good-deassert@nvs-tray-9.service",
+                "power-rail-assert-log@PWRGD_NVS_TRAY9_PWROK_N.service",
                 "led-blue-deassert@leakport17.service"
             ]
         },
@@ -405,11 +405,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-9.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY9_N.service",
                 "led-blue-assert@leakport18.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-9.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY9_N.service",
                 "led-blue-deassert@leakport18.service"
             ]
         },
@@ -421,11 +421,11 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-good-assert@compute-tray-10.service",
+                "power-rail-deassert-log@PWRGD_COMPUTE_TRAY10_N.service",
                 "led-blue-assert@leakport19.service"
             ],
             "RISING": [
-                "power-good-deassert@compute-tray-10.service",
+                "power-rail-assert-log@PWRGD_COMPUTE_TRAY10_N.service",
                 "led-blue-deassert@leakport19.service"
             ]
         },
@@ -436,10 +436,10 @@
         "LineName": "wAALC_RPU_READY",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@rpu_ready.service"],
-            "RISING": ["rpu-ready-assert@rpu_ready.service"],
-            "INIT_LOW": ["rpu-ready-deassert@rpu_ready.service"],
-            "INIT_HIGH": ["rpu-ready-assert@rpu_ready.service"]
+            "FALLING": ["smc-assert-log@wAALC_RPU_READY.service"],
+            "RISING": ["smc-deassert-log@wAALC_RPU_READY.service"],
+            "INIT_LOW": ["smc-assert-log@wAALC_RPU_READY.service"],
+            "INIT_HIGH": ["smc-deassert-log@wAALC_RPU_READY.service"]
         },
         "Continue": true
     },
@@ -448,8 +448,8 @@
         "LineName": "RPU_READY_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@rpu0_ready.service"],
-            "RISING": ["rpu-ready-assert@rpu0_ready.service"]
+            "FALLING": ["smc-assert-log@RPU_READY_PLD_R.service"],
+            "RISING": ["smc-deassert-log@RPU_READY_PLD_R.service"]
         },
         "Continue": true
     },
@@ -458,8 +458,8 @@
         "LineName": "RPU_READY_SPARE_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@rpu0_ready_spare.service"],
-            "RISING": ["rpu-ready-assert@rpu0_ready_spare.service"]
+            "FALLING": ["smc-assert-log@RPU_READY_SPARE_PLD_R.service"],
+            "RISING": ["smc-deassert-log@RPU_READY_SPARE_PLD_R.service"]
         },
         "Continue": true
     },
@@ -468,8 +468,8 @@
         "LineName": "RPU_2_READY_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@rpu1_ready.service"],
-            "RISING": ["rpu-ready-assert@rpu1_ready.service"]
+            "FALLING": ["smc-assert-log@RPU_2_READY_PLD_R.service"],
+            "RISING": ["smc-deassert-log@RPU_2_READY_PLD_R.service"]
         },
         "Continue": true
     },
@@ -478,8 +478,8 @@
         "LineName": "RPU_2_READY_SPARE_PLD_R",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@rpu1_ready_spare.service"],
-            "RISING": ["rpu-ready-assert@rpu1_ready_spare.service"]
+            "FALLING": ["smc-assert-log@RPU_2_READY_SPARE_PLD_R.service"],
+            "RISING": ["smc-deassert-log@RPU_2_READY_SPARE_PLD_R.service"]
         },
         "Continue": true
     },
@@ -488,8 +488,8 @@
         "LineName": "IT_STOP_PUMP",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@it_stop_pump0.service"],
-            "RISING": ["rpu-ready-assert@it_stop_pump0.service"]
+            "FALLING": ["smc-deassert-log@IT_STOP_PUMP.service"],
+            "RISING": ["smc-assert-log@IT_STOP_PUMP.service"]
         },
         "Continue": true
     },
@@ -498,8 +498,8 @@
         "LineName": "IT_STOP_PUMP_SPARE",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@it_stop_pump0_spare.service"],
-            "RISING": ["rpu-ready-assert@it_stop_pump0_spare.service"]
+            "FALLING": ["smc-deassert-log@IT_STOP_PUMP_SPARE.service"],
+            "RISING": ["smc-assert-log@IT_STOP_PUMP_SPARE.service"]
         },
         "Continue": true
     },
@@ -508,8 +508,8 @@
         "LineName": "IT_STOP_PUMP_2",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@it_stop_pump1.service"],
-            "RISING": ["rpu-ready-assert@it_stop_pump1.service"]
+            "FALLING": ["smc-deassert-log@IT_STOP_PUMP_2.service"],
+            "RISING": ["smc-assert-log@IT_STOP_PUMP_2.service"]
         },
         "Continue": true
     },
@@ -518,8 +518,8 @@
         "LineName": "IT_STOP_PUMP_SPARE_2",
         "EventMon": "BOTH",
         "Targets": {
-            "FALLING": ["rpu-ready-deassert@it_stop_pump1_spare.service"],
-            "RISING": ["rpu-ready-assert@it_stop_pump1_spare.service"]
+            "FALLING": ["smc-deassert-log@IT_STOP_PUMP_SPARE_2.service"],
+            "RISING": ["smc-assert-log@IT_STOP_PUMP_SPARE_2.service"]
         },
         "Continue": true
     }

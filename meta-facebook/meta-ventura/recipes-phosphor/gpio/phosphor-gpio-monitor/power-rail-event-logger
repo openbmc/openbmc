@@ -1,0 +1,49 @@
+#!/bin/bash
+
+help_msg="
+Usage: power-rail-event-logger <event> <gpio_name>
+<event> is the power rail event to log,
+e.g. assert / deassert.
+
+<gpio_name> is defined in json file,
+e.g. PWRGD_COMPUTE_TRAY1_N
+"
+
+gpio_name="$2"
+device_path="/xyz/openbmc_project/inventory/system/board/Ventura_PDB/$gpio_name"
+stash_file="/run/${gpio_name}.log_entry"
+
+get_failure_data() {
+    if [[ $1 =~ ^PWRGD_COMPUTE_TRAY([0-9]+)_N$ ]]; then
+        echo "compute-tray-${BASH_REMATCH[1]} fault assert"
+    elif [[ $1 =~ ^PWRGD_NVS_TRAY([0-9]+)_PWROK_N$ ]]; then
+        echo "nvs-tray-${BASH_REMATCH[1]} fault assert"
+    else
+        echo "GPIO $1 assert"
+    fi
+}
+
+case "$1" in
+"-h")
+    echo "$help_msg"
+    ;;
+
+"assert")
+    if [ ! -s "$stash_file" ]; then
+        log-create "xyz.openbmc_project.State.Power.PowerRailFault" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$gpio_name")\"}" \
+            >"${stash_file}"
+    fi
+    ;;
+
+"deassert")
+    if [ -s "${stash_file}" ]; then
+        log-resolve -p "$(<"${stash_file}")" && rm "${stash_file}"
+        log-create "xyz.openbmc_project.State.Power.PowerRailFaultRecovered" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\"}"
+    fi
+
+    ;;
+esac
+
+exit 0

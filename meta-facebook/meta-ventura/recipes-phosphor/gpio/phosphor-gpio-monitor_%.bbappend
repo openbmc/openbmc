@@ -2,10 +2,10 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 inherit obmc-phosphor-systemd systemd
 
-SERVICE_LIST = "power-good-assert@.service \
-                power-good-deassert@.service \
-                rpu-ready-assert@.service \
-                rpu-ready-deassert@.service \
+SERVICE_LIST = "power-rail-assert-log@.service \
+                power-rail-deassert-log@.service \
+                smc-assert-log@.service \
+                smc-deassert-log@.service \
                 led-blue-assert@.service \
                 led-blue-deassert@.service \
                 "
@@ -13,6 +13,8 @@ SERVICE_LIST = "power-good-assert@.service \
 SERVICE_FILE_FMT = "file://{0}"
 
 SRC_URI += "file://ventura-phosphor-multi-gpio-monitor.json \
+            file://power-rail-event-logger \
+            file://smc-event-logger \
             file://logging \
             file://frontled \
             ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
@@ -37,4 +39,6 @@ do_install:append() {
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/logging ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/frontled ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${PN}/
 }
