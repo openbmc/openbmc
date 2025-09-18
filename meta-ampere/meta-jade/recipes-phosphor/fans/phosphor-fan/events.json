@@ -10,16 +10,16 @@
     ],
     "triggers": [
       {
-        "class": "init",
-        "method": "get_properties"
+        "class": "signal",
+        "signal": "interfaces_added"
       },
       {
         "class": "signal",
         "signal": "properties_changed"
       },
       {
-        "class": "signal",
-        "signal": "interfaces_added"
+        "class": "init",
+        "method": "get_properties"
       }
     ],
     "actions": [
@@ -78,16 +78,16 @@
     ],
     "triggers": [
       {
-        "class": "init",
-        "method": "get_properties"
+        "class": "signal",
+        "signal": "interfaces_added"
       },
       {
         "class": "signal",
         "signal": "properties_changed"
       },
       {
-        "class": "signal",
-        "signal": "interfaces_added"
+        "class": "init",
+        "method": "get_properties"
       }
     ],
     "actions": [
@@ -102,61 +102,61 @@
   {
     "name": "default_fan_floor_on_missing_service",
     "groups": [
-        {
+      {
         "name": "zone0_ambient",
         "interface": "xyz.openbmc_project.Sensor.Value",
         "property": { "name": "Value" }
-        },
-        {
-          "name": "zone0_cores",
-           "interface": "xyz.openbmc_project.Sensor.Value",
-           "property": { "name": "Value" }
-        },
-        {
-          "name": "zone0_dimms",
-          "interface": "xyz.openbmc_project.Sensor.Value",
-          "property": { "name": "Value" }
-        }
+      },
+      {
+        "name": "zone0_cores",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      },
+      {
+        "name": "zone0_dimms",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
     ],
     "triggers": [
-        {
-        "class": "init",
-        "method": "name_has_owner"
-        },
-        {
+      {
         "class": "signal",
         "signal": "name_owner_changed"
-        }
+      },
+      {
+        "class": "init",
+        "method": "name_has_owner"
+      }
     ],
     "actions": [
-        {
-          "name": "call_actions_based_on_timer",
-          "timer": {
-              "interval": 5000000,
-              "type": "oneshot"
-          },
-          "actions": [
-              {
-                "name": "default_floor_on_missing_owner",
-                "groups": [
-                    {
-                      "name": "zone0_ambient",
-                      "interface": "xyz.openbmc_project.Sensor.Value",
-                      "property": { "name": "Value" }
-                    },
-                    {
-                      "name": "zone0_cores",
-                      "interface": "xyz.openbmc_project.Sensor.Value",
-                      "property": { "name": "Value" }
-                    },
-                    {
-                      "name": "zone0_dimms",
-                      "interface": "xyz.openbmc_project.Sensor.Value",
-                      "property": { "name": "Value" }
-                    }
-                ]
-              }
-          ]
+      {
+        "name": "call_actions_based_on_timer",
+        "timer": {
+            "interval": 5000000,
+            "type": "oneshot"
+        },
+        "actions": [
+            {
+              "name": "default_floor_on_missing_owner",
+              "groups": [
+                  {
+                    "name": "zone0_ambient",
+                    "interface": "xyz.openbmc_project.Sensor.Value",
+                    "property": { "name": "Value" }
+                  },
+                  {
+                    "name": "zone0_cores",
+                    "interface": "xyz.openbmc_project.Sensor.Value",
+                    "property": { "name": "Value" }
+                  },
+                  {
+                    "name": "zone0_dimms",
+                    "interface": "xyz.openbmc_project.Sensor.Value",
+                    "property": { "name": "Value" }
+                  }
+              ]
+            }
+        ]
         }
     ]
   },
@@ -164,42 +164,42 @@
     "name": "high_speed_on_missing_service",
     "groups": [
       {
-         "name": "zone0_cores",
-          "interface": "xyz.openbmc_project.Sensor.Value",
-          "property": { "name": "Value" }
-       }
+        "name": "zone0_cores",
+        "interface": "xyz.openbmc_project.Sensor.Value",
+        "property": { "name": "Value" }
+      }
     ],
     "triggers": [
-       {
-          "class": "init",
-          "method": "name_has_owner"
-        },
-        {
-           "class": "signal",
-           "signal": "name_owner_changed"
-        }
+      {
+        "class": "signal",
+        "signal": "name_owner_changed"
+      },
+      {
+        "class": "init",
+        "method": "name_has_owner"
+      }
     ],
     "actions": [
-       {
-          "name": "call_actions_based_on_timer",
-          "timer": {
-             "interval": 5000000,
-             "type": "oneshot"
-          },
-          "actions": [
-             {
-                "name": "set_target_on_missing_owner",
-                "groups": [
-                   {
-                      "name": "zone0_cores",
-                      "interface": "xyz.openbmc_project.Sensor.Value",
-                      "property": { "name": "Value" }
-                   }
-                ],
-                "target": 255
-              }
-           ]
-        }
+      {
+        "name": "call_actions_based_on_timer",
+        "timer": {
+            "interval": 5000000,
+            "type": "oneshot"
+        },
+        "actions": [
+            {
+              "name": "set_target_on_missing_owner",
+              "groups": [
+                  {
+                    "name": "zone0_cores",
+                    "interface": "xyz.openbmc_project.Sensor.Value",
+                    "property": { "name": "Value" }
+                  }
+              ],
+              "target": 255
+            }
+          ]
+      }
      ]
   },
   {
