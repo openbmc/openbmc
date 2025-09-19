@@ -16,7 +16,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -25,13 +25,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT"
             }
         },
         {
@@ -50,7 +50,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -59,13 +59,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT"
             }
         },
         {
@@ -84,7 +84,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -93,13 +93,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT"
             }
         },
         {
@@ -118,7 +118,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -127,13 +127,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT"
             }
         },
         {
@@ -152,7 +152,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -161,13 +161,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT"
             }
         },
         {
@@ -186,7 +186,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -195,13 +195,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT"
             }
         },
         {
@@ -220,7 +220,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -229,13 +229,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT"
             }
         },
         {
@@ -254,7 +254,7 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 },
@@ -263,13 +263,13 @@
                      "has_target": true,
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
-                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM",
+                     "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
                      "factor": 137,
                      "offset": -632
                 }
             ],
             "control": {
-                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM"
+                "pwm": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT"
             }
         }
     ],
