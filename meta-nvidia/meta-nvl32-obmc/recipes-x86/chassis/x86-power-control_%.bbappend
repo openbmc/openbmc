@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI:append = "
+SRC_URI:append = " \
     file://power-config-host0.json \
 "
 POWER_CONFIG = "power-config-host0.json"
