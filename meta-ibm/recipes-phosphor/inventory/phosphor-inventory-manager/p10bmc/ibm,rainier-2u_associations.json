@@ -394,8 +394,8 @@
                 {
                     "types":
                     {
-                        "rType": "inventory",
-                        "fType": "assembly"
+                        "rType": "contained_by",
+                        "fType": "containing"
                     },
                     "paths":
                     [
@@ -408,46 +408,6 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector0",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector1",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector2",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector3",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector4",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector5",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector6",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector7",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector8",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector9",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector11",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector12",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector13",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector14",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector15",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector17",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/connector18",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/ebmc_card_bmc/ethernet0",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/ebmc_card_bmc/ethernet1",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/ebmc_card_bmc/usb0",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/ebmc_card_bmc/usb1",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/ebmc_card_bmc/displayport0",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector1",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector2",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector4",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector5",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/dp1_connector1",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/dp1_connector2",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/dp1_connector4",
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane1/dp1_connector5"
-                    ]
-                },
-                {
-                    "types":
-                    {
-                        "rType": "contained_by",
-                        "fType": "containing"
-                    },
-                    "paths":
-                    [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot0",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot1",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/pcieslot2",
