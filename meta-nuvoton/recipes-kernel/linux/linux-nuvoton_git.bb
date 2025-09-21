@@ -1,6 +1,6 @@
 KBRANCH ?= "dev-6.12"
-LINUX_VERSION ?= "6.12.47"
+LINUX_VERSION ?= "6.12.48"
 
-SRCREV = "7a62ecb4013d7a0fb620db910cff98a41c5a50f6"
+SRCREV = "be3db7e5b05c5553f921431303be66fb900a0df2"
 
 require linux-nuvoton.inc
