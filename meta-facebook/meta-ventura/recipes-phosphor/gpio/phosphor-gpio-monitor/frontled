@@ -1,16 +1,36 @@
 #!/bin/bash
 
-leakport=$1
+gpioname=$1
+init=$2
 power_state=$3
+
+get_leakport() {
+   if [[ $1 =~ ^PWRGD_COMPUTE_TRAY([0-9]+)_N$ ]]; then
+      index=${BASH_REMATCH[1]}
+      # Map PWRGD_COMPUTE_TRAY1_N–PWRGD_COMPUTE_TRAY8_N to leakport1–8
+      if ((index >= 1 && index <= 8)); then
+         echo "leakport$index"
+      # Map PWRGD_COMPUTE_TRAY9_N–PWRGD_COMPUTE_TRAY18_N to leakport18–27
+      elif ((index >= 9 && index <= 18)); then
+         echo "leakport$((index + 9))"
+      fi
+   elif [[ $1 =~ ^PWRGD_NVS_TRAY([0-9]+)_PWROK_N$ ]]; then
+      index=${BASH_REMATCH[1]}
+      # Map PWRGD_NVS_TRAY1_PWROK_N-PWRGD_NVS_TRAY9_PWROK_N to leakport9-17
+      if ((index >= 1 && index <= 9)); then
+         echo "leakport$((index + 8))"
+      fi
+   fi
+}
+leakport=$(get_leakport "$gpioname")
 portnum=${leakport#leakport}
 
 leak_state=$(busctl get-property xyz.openbmc_project.leakdetector "/xyz/openbmc_project/state/leak/detector/LeakPort${portnum}_Big" xyz.openbmc_project.State.Leak.Detector State | awk -F'.' '{print $NF}' | tr -d '"')
 
-
 if [ "$power_state" == "assert" ]; then
    # If power is asserted and leak state is Normal, turn on blue LED and turn off amber LED
    # Else do nothing control by the leak detector leakage service
-   if [ "$leak_state" == "Normal" ]; then
+   if [ "$leak_state" == "Normal" ] || [ "$init" == "true" ]; then
       busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/${leakport}_amber" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
       busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/${leakport}_blue" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
    fi

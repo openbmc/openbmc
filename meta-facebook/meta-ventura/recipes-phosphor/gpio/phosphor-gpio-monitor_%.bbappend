@@ -8,6 +8,8 @@ SERVICE_LIST = "power-rail-assert-log@.service \
                 smc-deassert-log@.service \
                 led-blue-assert@.service \
                 led-blue-deassert@.service \
+                led-blue-init-assert@.service \
+                led-blue-init-deassert@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"

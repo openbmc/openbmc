@@ -6,12 +6,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY1_N.service",
-                "led-blue-assert@leakport1.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY1_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY1_N.service",
-                "led-blue-deassert@leakport1.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY1_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY1_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY1_N.service"]
         },
         "Continue": true
     },
@@ -22,12 +24,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY2_N.service",
-                "led-blue-assert@leakport2.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY2_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY2_N.service",
-                "led-blue-deassert@leakport2.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY2_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY2_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY2_N.service"]
         },
         "Continue": true
     },
@@ -38,12 +42,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY3_N.service",
-                "led-blue-assert@leakport3.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY3_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY3_N.service",
-                "led-blue-deassert@leakport3.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY3_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY3_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY3_N.service"]
         },
         "Continue": true
     },
@@ -54,12 +60,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY4_N.service",
-                "led-blue-assert@leakport4.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY4_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY4_N.service",
-                "led-blue-deassert@leakport4.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY4_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY4_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY4_N.service"]
         },
         "Continue": true
     },
@@ -70,12 +78,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY5_N.service",
-                "led-blue-assert@leakport5.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY5_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY5_N.service",
-                "led-blue-deassert@leakport5.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY5_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY5_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY5_N.service"]
         },
         "Continue": true
     },
@@ -86,12 +96,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY6_N.service",
-                "led-blue-assert@leakport6.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY6_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY6_N.service",
-                "led-blue-deassert@leakport6.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY6_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY6_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY6_N.service"]
         },
         "Continue": true
     },
@@ -102,12 +114,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY7_N.service",
-                "led-blue-assert@leakport7.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY7_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY7_N.service",
-                "led-blue-deassert@leakport7.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY7_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY7_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY7_N.service"]
         },
         "Continue": true
     },
@@ -118,12 +132,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY8_N.service",
-                "led-blue-assert@leakport8.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY8_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY8_N.service",
-                "led-blue-deassert@leakport8.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY8_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY8_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY8_N.service"]
         },
         "Continue": true
     },
@@ -134,12 +150,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY1_PWROK_N.service",
-                "led-blue-assert@leakport9.service"
+                "led-blue-assert@PWRGD_NVS_TRAY1_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY1_PWROK_N.service",
-                "led-blue-deassert@leakport9.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY1_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY1_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY1_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -150,12 +168,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY2_PWROK_N.service",
-                "led-blue-assert@leakport10.service"
+                "led-blue-assert@PWRGD_NVS_TRAY2_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY2_PWROK_N.service",
-                "led-blue-deassert@leakport10.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY2_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY2_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY2_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -166,12 +186,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY11_N.service",
-                "led-blue-assert@leakport20.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY11_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY11_N.service",
-                "led-blue-deassert@leakport20.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY11_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY11_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY11_N.service"]
         },
         "Continue": true
     },
@@ -182,12 +204,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY12_N.service",
-                "led-blue-assert@leakport21.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY12_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY12_N.service",
-                "led-blue-deassert@leakport21.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY12_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY12_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY12_N.service"]
         },
         "Continue": true
     },
@@ -198,12 +222,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY13_N.service",
-                "led-blue-assert@leakport22.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY13_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY13_N.service",
-                "led-blue-deassert@leakport22.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY13_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY13_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY13_N.service"]
         },
         "Continue": true
     },
@@ -214,12 +240,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY14_N.service",
-                "led-blue-assert@leakport23.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY14_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY14_N.service",
-                "led-blue-deassert@leakport23.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY14_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY14_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY14_N.service"]
         },
         "Continue": true
     },
@@ -230,12 +258,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY15_N.service",
-                "led-blue-assert@leakport24.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY15_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY15_N.service",
-                "led-blue-deassert@leakport24.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY15_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY15_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY15_N.service"]
         },
         "Continue": true
     },
@@ -246,12 +276,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY16_N.service",
-                "led-blue-assert@leakport25.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY16_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY16_N.service",
-                "led-blue-deassert@leakport25.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY16_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY16_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY16_N.service"]
         },
         "Continue": true
     },
@@ -262,12 +294,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY17_N.service",
-                "led-blue-assert@leakport26.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY17_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY17_N.service",
-                "led-blue-deassert@leakport26.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY17_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY17_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY17_N.service"]
         },
         "Continue": true
     },
@@ -278,12 +312,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY18_N.service",
-                "led-blue-assert@leakport27.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY18_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY18_N.service",
-                "led-blue-deassert@leakport27.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY18_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY18_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY18_N.service"]
         },
         "Continue": true
     },
@@ -294,12 +330,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY3_PWROK_N.service",
-                "led-blue-assert@leakport11.service"
+                "led-blue-assert@PWRGD_NVS_TRAY3_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY3_PWROK_N.service",
-                "led-blue-deassert@leakport11.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY3_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY3_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY3_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -310,12 +348,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY4_PWROK_N.service",
-                "led-blue-assert@leakport12.service"
+                "led-blue-assert@PWRGD_NVS_TRAY4_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY4_PWROK_N.service",
-                "led-blue-deassert@leakport12.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY4_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY4_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY4_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -326,12 +366,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY5_PWROK_N.service",
-                "led-blue-assert@leakport13.service"
+                "led-blue-assert@PWRGD_NVS_TRAY5_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY5_PWROK_N.service",
-                "led-blue-deassert@leakport13.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY5_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY5_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY5_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -342,12 +384,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY6_PWROK_N.service",
-                "led-blue-assert@leakport14.service"
+                "led-blue-assert@PWRGD_NVS_TRAY6_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY6_PWROK_N.service",
-                "led-blue-deassert@leakport14.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY6_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY6_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY6_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -358,12 +402,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY7_PWROK_N.service",
-                "led-blue-assert@leakport15.service"
+                "led-blue-assert@PWRGD_NVS_TRAY7_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY7_PWROK_N.service",
-                "led-blue-deassert@leakport15.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY7_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY7_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY7_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -374,12 +420,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY8_PWROK_N.service",
-                "led-blue-assert@leakport16.service"
+                "led-blue-assert@PWRGD_NVS_TRAY8_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY8_PWROK_N.service",
-                "led-blue-deassert@leakport16.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY8_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY8_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY8_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -390,12 +438,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_NVS_TRAY9_PWROK_N.service",
-                "led-blue-assert@leakport17.service"
+                "led-blue-assert@PWRGD_NVS_TRAY9_PWROK_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_NVS_TRAY9_PWROK_N.service",
-                "led-blue-deassert@leakport17.service"
-            ]
+                "led-blue-deassert@PWRGD_NVS_TRAY9_PWROK_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_NVS_TRAY9_PWROK_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_NVS_TRAY9_PWROK_N.service"]
         },
         "Continue": true
     },
@@ -406,12 +456,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY9_N.service",
-                "led-blue-assert@leakport18.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY9_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY9_N.service",
-                "led-blue-deassert@leakport18.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY9_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY9_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY9_N.service"]
         },
         "Continue": true
     },
@@ -422,12 +474,14 @@
         "Targets": {
             "FALLING": [
                 "power-rail-deassert-log@PWRGD_COMPUTE_TRAY10_N.service",
-                "led-blue-assert@leakport19.service"
+                "led-blue-assert@PWRGD_COMPUTE_TRAY10_N.service"
             ],
             "RISING": [
                 "power-rail-assert-log@PWRGD_COMPUTE_TRAY10_N.service",
-                "led-blue-deassert@leakport19.service"
-            ]
+                "led-blue-deassert@PWRGD_COMPUTE_TRAY10_N.service"
+            ],
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_COMPUTE_TRAY10_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_COMPUTE_TRAY10_N.service"]
         },
         "Continue": true
     },
