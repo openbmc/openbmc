@@ -62,14 +62,18 @@ do_install:append:catalina() {
 SRC_URI:append:clemente = " \
     file://backend-nic-driver-bind \
     file://backend-nic-driver-bind.service \
+    file://check-bootdrive-led \
+    file://check-bootdrive-led.service \
     "
 
 SYSTEMD_SERVICE:${PN}:append:clemente = " \
     backend-nic-driver-bind.service \
+    check-bootdrive-led.service \
     "
 
 do_install:append:clemente() {
     PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
     install -d ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/check-bootdrive-led ${PLATSVC_LIBEXECDIR}
 }

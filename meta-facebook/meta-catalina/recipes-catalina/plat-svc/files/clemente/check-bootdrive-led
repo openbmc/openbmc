@@ -1,0 +1,51 @@
+#!/bin/bash
+# Check the Availability of BOOTDRIVE_TEMP_C and turn the hdd_led on/off accordingly
+
+BUS_NVME="xyz.openbmc_project.NVMeSensor"
+NVME_PATH="/xyz/openbmc_project/sensors/temperature/BOOTDRIVE_TEMP_C"
+AVAIL_IF="xyz.openbmc_project.State.Decorator.Availability"
+AVAIL_PROP="Available"
+
+LED_BUS="xyz.openbmc_project.LED.Controller"
+LED_PATH="/xyz/openbmc_project/led/physical/hdd_led"
+LED_IF="xyz.openbmc_project.Led.Physical"
+LED_PROP="State"
+LED_ON="xyz.openbmc_project.Led.Physical.Action.On"
+LED_OFF="xyz.openbmc_project.Led.Physical.Action.Off"
+
+# log tag
+LOGTAG="check-bootdrive-led"
+
+while true; do
+    # Retrieve availability
+    AVAIL_RAW=$(busctl get-property "$BUS_NVME" "$NVME_PATH" "$AVAIL_IF" "$AVAIL_PROP" 2>/dev/null || true)
+
+    # Retrieve LED status
+    LED_STATUS=$(busctl get-property "$LED_BUS" "$LED_PATH" "$LED_IF" "$LED_PROP")
+
+    # Parse to "true" / "false"
+    is_available=0
+    if [ -n "$AVAIL_RAW" ]; then
+        # busctl usually returns strings like 'b true' or 'b false'
+        case "$AVAIL_RAW" in
+            *true*|*1)
+                is_available=1
+                ;;
+            *)
+                is_available=0
+                ;;
+        esac
+    fi
+
+    # Set the LED according to the check result
+    if [ "$is_available" -eq 1 ] && [[ "$LED_STATUS" == *Off* ]]; then
+        logger -t "$LOGTAG" "BOOTDRIVE_TEMP_C available -> turning HDD LED ON"
+        busctl set-property "$LED_BUS" "$LED_PATH" "$LED_IF" "$LED_PROP" s "$LED_ON" 2>/dev/null || logger -t "$LOGTAG" "Failed to set HDD LED ON"
+    elif [ "$is_available" -eq 0 ] && [[ "$LED_STATUS" == *On* ]]; then
+        logger -t "$LOGTAG" "BOOTDRIVE_TEMP_C NOT available -> turning HDD LED OFF"
+        busctl set-property "$LED_BUS" "$LED_PATH" "$LED_IF" "$LED_PROP" s "$LED_OFF" 2>/dev/null || logger -t "$LOGTAG" "Failed to set HDD LED OFF"
+    fi
+    sleep 1
+done
+
+exit 0

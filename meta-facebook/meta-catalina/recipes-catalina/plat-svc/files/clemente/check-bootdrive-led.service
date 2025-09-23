@@ -1,0 +1,12 @@
+[Unit]
+Description=Check BOOTDRIVE_TEMP_C availability and set HDD LED accordingly
+Requires=xyz.openbmc_project.nvmesensor.service
+After=dbus.service xyz.openbmc_project.nvmesensor.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/plat-svc/check-bootdrive-led
+SyslogIdentifier=check-bootdrive-led
+
+[Install]
+WantedBy=multi-user.target
