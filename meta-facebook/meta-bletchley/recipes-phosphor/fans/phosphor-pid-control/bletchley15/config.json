@@ -1,0 +1,406 @@
+{
+    "sensors": [
+        {
+            "name": "Virtual_Inlet_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/Virtual_Inlet_Temp",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "MB_U402_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/MB_U402_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "MB_U19_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/MB_U19_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "SLED1_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/SLED1_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "SLED2_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/SLED2_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "SLED3_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/SLED3_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "SLED4_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/SLED4_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FRONT_PANEL_TEMP",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/FRONT_PANEL_TEMP",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "MB_U72_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/MB_U72_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "MB_U73_THERM_LOCAL",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/MB_U73_THERM_LOCAL",
+            "timeout": 0,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "nvme1",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme1",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "nvme2",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme2",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "nvme3",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme3",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "nvme4",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/nvme4",
+            "timeout": 0,
+            "ignoreDbusMinMax": true,
+            "unavailableAsFailed": false
+        },
+        {
+            "name": "FAN0_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN0_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN1_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN1_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN2_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN2_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN3_TACH_IL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_IL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        },
+        {
+            "name": "FAN3_TACH_OL",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_OL",
+            "writePath": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM",
+            "min": 0,
+            "max": 255,
+            "ignoreDbusMinMax": true
+        }
+    ],
+
+    "zones": [
+        {
+            "id": 1,
+            "failsafePercent": 60.0,
+            "minThermalOutput": 15.0,
+            "cycleTimeBaseMS": 1000,
+            "updateThermalsTimeMS": 1000,
+            "accumulateSetPoint": false,
+            "pids": [
+                {
+                    "name": "FAN_TACH",
+                    "type": "fan",
+                    "inputs": [
+                        "FAN0_TACH_IL",
+                        "FAN0_TACH_OL",
+                        "FAN1_TACH_IL",
+                        "FAN1_TACH_OL",
+                        "FAN2_TACH_IL",
+                        "FAN2_TACH_OL",
+                        "FAN3_TACH_IL",
+                        "FAN3_TACH_OL"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "derivativeCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0,
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "inlet_temp",
+                    "type": "stepwise",
+                    "inputs": ["Virtual_Inlet_Temp"],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 15,
+                            "1": 20,
+                            "2": 22,
+                            "3": 24,
+                            "4": 26,
+                            "5": 28,
+                            "6": 30,
+                            "7": 31,
+                            "8": 32,
+                            "9": 33,
+                            "10": 34,
+                            "11": 35,
+                            "12": 36,
+                            "13": 37,
+                            "14": 38,
+                            "15": 39,
+                            "16": 40
+                        },
+                        "output": {
+                            "0": 20,
+                            "1": 23,
+                            "2": 28,
+                            "3": 30,
+                            "4": 31,
+                            "5": 32,
+                            "6": 35,
+                            "7": 36,
+                            "8": 37,
+                            "9": 38,
+                            "10": 39,
+                            "11": 40,
+                            "12": 43,
+                            "13": 45,
+                            "14": 47,
+                            "15": 50,
+                            "16": 80
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "switch_temp",
+                    "type": "stepwise",
+                    "inputs": ["MB_U402_THERM_LOCAL"],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 48,
+                            "1": 49,
+                            "2": 50,
+                            "3": 51,
+                            "4": 52
+                        },
+                        "output": {
+                            "0": 0,
+                            "1": 15,
+                            "2": 20,
+                            "3": 25,
+                            "4": 40
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "retimer_temp",
+                    "type": "stepwise",
+                    "inputs": ["MB_U19_THERM_LOCAL"],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 42,
+                            "1": 43,
+                            "2": 44,
+                            "3": 45,
+                            "4": 46,
+                            "5": 47,
+                            "6": 48,
+                            "7": 49
+                        },
+                        "output": {
+                            "0": 20,
+                            "1": 40,
+                            "2": 42,
+                            "3": 44,
+                            "4": 46,
+                            "5": 48,
+                            "6": 50,
+                            "7": 80
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "sled_thermal_local",
+                    "type": "stepwise",
+                    "inputs": [
+                        "SLED1_THERM_LOCAL",
+                        "SLED2_THERM_LOCAL",
+                        "SLED3_THERM_LOCAL",
+                        "SLED4_THERM_LOCAL"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 46,
+                            "1": 47,
+                            "2": 48,
+                            "3": 49,
+                            "4": 50
+                        },
+                        "output": {
+                            "0": 20,
+                            "1": 45,
+                            "2": 46,
+                            "3": 47,
+                            "4": 50
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "ucr_temp",
+                    "type": "stepwise",
+                    "inputs": [
+                        "FRONT_PANEL_TEMP",
+                        "MB_U72_THERM_LOCAL",
+                        "MB_U73_THERM_LOCAL"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 46
+                        },
+                        "output": {
+                            "0": 20
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                },
+                {
+                    "name": "nvme_temp",
+                    "type": "stepwise",
+                    "inputs": [
+                        "nvme1",
+                        "nvme2",
+                        "nvme3",
+                        "nvme4"
+                    ],
+                    "setpoint": 0.0,
+                    "pid": {
+                        "samplePeriod": 1,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 46
+                        },
+                        "output": {
+                            "0": 20
+                        },
+                        "positiveHysteresis": 0,
+                        "negativeHysteresis": 0
+                    }
+                }
+            ]
+        }
+    ]
+}
