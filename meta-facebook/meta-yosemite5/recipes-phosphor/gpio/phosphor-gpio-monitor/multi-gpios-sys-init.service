@@ -1,0 +1,11 @@
+[Unit]
+Wants=mapper-wait@-xyz-openbmc_project-state-host0.service
+After=mapper-wait@-xyz-openbmc_project-state-host0.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/multi-gpios-sys-init
+SyslogIdentifier=Multi GPIOs System Init
+
+[Install]
+WantedBy=multi-user.target

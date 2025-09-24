@@ -5,6 +5,10 @@ inherit obmc-phosphor-systemd systemd
 SRC_URI += "file://yosemite5-phosphor-multi-gpio-monitor.json \
             file://reset_btn \
             file://reset_btn@.service \
+            file://multi-gpios-sys-init \
+            file://multi-gpios-sys-init.service \
+            file://assert-host-ready.service \
+            file://deassert-host-ready.service \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -13,6 +17,9 @@ FILES:${PN} += "${systemd_system_unitdir}/*"
 
 SYSTEMD_SERVICE:${PN} += " \
     reset_btn@.service \
+    multi-gpios-sys-init.service \
+    assert-host-ready.service \
+    deassert-host-ready.service \
     "
 
 SYSTEMD_AUTO_ENABLE = "enable"
@@ -21,7 +28,13 @@ do_install:append:() {
     install -d ${D}${datadir}/phosphor-gpio-monitor
     install -m 0644 ${UNPACKDIR}/yosemite5-phosphor-multi-gpio-monitor.json \
                     ${D}${datadir}/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json
-    install -m 0644 ${UNPACKDIR}/reset_btn@.service ${D}${systemd_system_unitdir}/
+
+    install -d ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
+
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/reset_btn ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
 }
+
+SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"

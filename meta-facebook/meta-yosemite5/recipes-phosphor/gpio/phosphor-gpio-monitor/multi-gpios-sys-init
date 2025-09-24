@@ -1,0 +1,22 @@
+#!/bin/bash
+
+host_os_status_init() {
+  local status
+
+  if [ "$(get_gpio host0-ready)" -eq 0 ]; then
+      status="Standby"
+  else
+      status="Inactive"
+  fi
+
+  busctl set-property \
+      xyz.openbmc_project.State.Host0 \
+      /xyz/openbmc_project/state/host0 \
+      xyz.openbmc_project.State.OperatingSystem.Status \
+      OperatingSystemState s \
+      "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.${status}"
+}
+
+host_os_status_init
+
+exit 0

@@ -8,5 +8,15 @@
             "FALLING": ["reset_btn@FALLING.service"]
         },
         "Continue": true
-    }
+    },
+    {
+        "Name": "host0-ready",
+        "LineName": "host0-ready",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-host-ready.service"],
+            "FALLING": ["assert-host-ready.service"]
+        },
+        "Continue": true
+     }
 ]
