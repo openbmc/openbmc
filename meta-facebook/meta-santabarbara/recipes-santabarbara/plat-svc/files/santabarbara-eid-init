@@ -1,0 +1,96 @@
+#!/bin/bash
+
+declare -A reg_map=(
+    [6]="0x40:0x00"
+    [13]="0x41:0x01"
+    [8]="0x42:0x02"
+    [10]="0x43:0x03"
+)
+
+declare -A check_map=(
+    [6]="0x00 0x0a:0x00"
+    [13]="0x01 0x14:0x01"
+    [8]="0x02 0x1e:0x02"
+    [10]="0x03 0x28:0x03"
+)
+
+retry_i2c_command() {
+    local cmd=$1
+    local slot=$2
+    local desc=$3
+
+    for i in {1..5}; do
+        if eval "$cmd" > /dev/null 2>&1; then
+            return 0
+        else
+            echo "Retry $i: Failed $desc on slot $slot"
+            sleep 1
+        fi
+    done
+    return 1
+}
+
+enable_hotjoin() {
+    local hotjoin_path="/sys/bus/i3c/devices/i3c-0/hotjoin"
+    if [[ -w "$hotjoin_path" ]]; then
+        echo 1 > "$hotjoin_path"
+        echo "I3C hotjoin enabled"
+    else
+        echo "WARN: $hotjoin_path not writable or missing" >&2
+    fi
+}
+
+main() {
+    for slot in "${!reg_map[@]}"; do
+        IFS=':' read -r sitv3_val rainbow_val <<< "${reg_map[$slot]}"
+        if i2cdetect -y "$slot" | grep -Eq "^50:[[:space:]]+(UU|[0-9a-f]{2})"; then
+            echo "Slot $slot: Detecting Rainbow card, add the $rainbow_val at 0x50"
+            cmd="i2ctransfer -y $slot w3@0x50 0x00 0x00 $rainbow_val"
+            if retry_i2c_command "$cmd" "$slot" "bus setup"; then
+                echo "Slot $slot setup success"
+            else
+                echo "FATAL: Slot $slot failed after max retries"
+            fi
+       elif i2cdetect -y "$slot" | grep -Eq "^20:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})"; then
+            echo "Slot $slot: Detecting SITv3 card, set the $sitv3_val at 0x21"
+            cmd="i2cset -y $slot 0x21 $sitv3_val"
+            if retry_i2c_command "$cmd" "$slot" "bus setup"; then
+                echo "Slot $slot setup success"
+            else
+                echo "FATAL: Slot $slot failed after max retries"
+            fi
+        else
+            echo "Slot $slot: No device found, skipping initialization"
+        fi
+    done
+
+    sleep 20
+
+    for slot in "${!check_map[@]}"; do
+        IFS=':' read -r sitv3_val _ <<< "${check_map[$slot]}"
+        read -r expected_lo expected_hi <<< "$sitv3_val"
+
+        if i2cdetect -y "$slot" | grep -Eq '^50:[[:space:]]+(UU|[0-9a-f]{2})'; then
+            echo "Slot $slot: Rainbow reboot check finished"
+        elif i2cdetect -y "$slot" | grep -Eq '^20:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})'; then
+            echo "Slot $slot: Verifying SITv3 register 0x50"
+            res=$(i2ctransfer -y "$slot" w1@0x21 0x50 r2 2>/dev/null || echo "FAIL")
+            if [[ "$res" == "FAIL" ]]; then
+                echo "ERROR: i2ctransfer failed on slot $slot"
+            else
+                # Compare the read result with expected sitv3_val
+                if [[ "$res" == "$expected_lo $expected_hi" ]]; then
+                    echo "Slot $slot: Read data: $res, matches expected value $expected_lo $expected_hi - PASSED"
+                else
+                    echo "Slot $slot: Read data: $res, expected $expected_lo $expected_hi - FAILED"
+                fi
+            fi
+        else
+            echo "Slot $slot: No device found, skipping check"
+        fi
+    done
+
+    enable_hotjoin
+}
+
+main "$@"

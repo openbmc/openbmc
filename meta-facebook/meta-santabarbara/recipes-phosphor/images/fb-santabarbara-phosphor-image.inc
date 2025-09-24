@@ -25,3 +25,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-power-control \
 "
+
+# Santabarbara platform service
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    plat-svc \
+"

@@ -1,0 +1,14 @@
+[Unit]
+Description=Set I2C EID at boot
+DefaultDependencies=no
+Before=xyz.openbmc_project.EntityManager.service
+Before=mctp_init.service
+Before=pldm.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/santabarbara-eid-init
+SyslogIdentifier=Santabarbara Eid Init
+
+[Install]
+WantedBy=multi-user.target
