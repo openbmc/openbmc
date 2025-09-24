@@ -1,5 +1,5 @@
 # TODO: Add i2c devices like
-# /sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0052: /system/chassis/motherboard
+# /sys/devices/platform/ahb/ahb:apb/ahb:apb:i2c@1e78a000/1e78a100.i2c/i2c-3/3-0052: /system/chassis/motherboard
 /sys/devices/platform/gpio-fsi/fsi0/slave@00:00/raw: /system/chassis/motherboard/cpu0
 /sys/devices/platform/gpio-fsi/fsi0/slave@00:00/00:00:00:0a/fsi1/slave@01:00/raw: /system/chassis/motherboard/cpu1
 

@@ -15,7 +15,7 @@ ZAIUS_CHIPS += " bus@1e78a000/i2c@340/vrm@41"
 ZAIUS_CHIPS += " bus@1e78a000/i2c@340/vrm@42"
 ZAIUS_CHIPS += " bus@1e78a000/i2c@340/vrm@60"
 ZAIUS_CHIPS += " bus@1e78a000/i2c@340/vrm@64"
-ZAIUS_ITEMSFMT = "ahb/apb@1e780000/{0}.conf"
+ZAIUS_ITEMSFMT = "ahb/apb/{0}.conf"
 
 ZAIUS_ITEMS = "${@compose_list(d, 'ZAIUS_ITEMSFMT', 'ZAIUS_CHIPS')}"
 ZAIUS_ITEMS += "iio-hwmon.conf iio-hwmon-battery.conf"

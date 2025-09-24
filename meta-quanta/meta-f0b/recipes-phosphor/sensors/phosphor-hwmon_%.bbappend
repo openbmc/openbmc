@@ -14,7 +14,7 @@ NAME = " \
         bus@1e78a000/i2c@180/ina219@40\
         bus@1e78a000/i2c@180/ina219@41\
         "
-ITEMSFMT = "ahb/apb@1e780000/{0}.conf"
+ITEMSFMT = "ahb/apb/{0}.conf"
 
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'NAME')}"
 

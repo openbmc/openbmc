@@ -30,8 +30,8 @@ CHIPS:p10bmc = " \
                1e78a780.i2c/i2c-14/i2c-30/30-0052 \
                "
 
-ITEMSFMT = "ahb/apb@1e780000/{0}.conf"
-ITEMSFMT:p10bmc = "devices/platform/ahb/1e780000.apb/1e780000.apb--bus@1e78a000/{0}.conf"
+ITEMSFMT = "ahb/apb/{0}.conf"
+ITEMSFMT:p10bmc = "devices/platform/ahb/ahb--apb/ahb--apb--bus@1e78a000/{0}.conf"
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 
 OCCS = " \

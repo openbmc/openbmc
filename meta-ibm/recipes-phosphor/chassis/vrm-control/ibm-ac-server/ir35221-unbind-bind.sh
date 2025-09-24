@@ -6,7 +6,7 @@
 status=0
 max_retries=3
 driver_path="/sys/bus/i2c/drivers/ir35221/"
-platform_path="/sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/"
+platform_path="/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/"
 
 unbind_driver () {
     echo "$1" > $driver_path/unbind

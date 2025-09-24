@@ -6,8 +6,8 @@ After=xyz.openbmc_project.State.Host@0.service
 
 [Service]
 ExecStart=/usr/sbin/obmc-uart-render-controller \
-	  /sys/devices/platform/ahb/1e6e0000.apb/1e6e6000.display/vga_pw \
-	  /sys/devices/platform/ahb/1e6e0000.apb/1e6e6000.display/dac_mux \
+	  /sys/devices/platform/ahb/ahb:apb/1e6e6000.display/vga_pw \
+	  /sys/devices/platform/ahb/ahb:apb/1e6e6000.display/dac_mux \
 	  fbterm.service
 
 [Install]

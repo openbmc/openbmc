@@ -6,7 +6,7 @@ CHIPS = " \
         bus@1e78a000/i2c@440/w83773g@4c \
         pwm-tacho-controller@1e786000 \
         "
-ITEMSFMT = "ahb/apb@1e780000/{0}.conf"
+ITEMSFMT = "ahb/apb/{0}.conf"
 
 ITEMS = "${@compose_list(d, 'ITEMSFMT', 'CHIPS')}"
 

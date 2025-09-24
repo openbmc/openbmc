@@ -3,7 +3,7 @@
   methods:
     - type: gpio
       key: 5
-      physpath: /sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
       devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
@@ -16,7 +16,7 @@
   methods:
     - type: gpio
       key: 6
-      physpath: /sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
       devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
@@ -29,7 +29,7 @@
   methods:
     - type: gpio
       key: 7
-      physpath: /sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
       devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
@@ -42,7 +42,7 @@
   methods:
     - type: gpio
       key: 8
-      physpath: /sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
       devpath: /dev/input/by-path/platform-gpio-keys-polled-event
     - type: tach
       sensors:
@@ -56,7 +56,7 @@
   methods:
     - type: gpio
       key: 9
-      physpath: /sys/devices/platform/ahb/1e780000.apb/1e780000.apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
+      physpath: /sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a100.i2c/i2c-3/3-0060
       devpath: /dev/input/by-path/platform-gpio-keys-polled-event
   rpolicy:
     type: anyof
