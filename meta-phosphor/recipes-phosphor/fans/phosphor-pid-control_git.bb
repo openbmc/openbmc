@@ -34,6 +34,7 @@ inherit systemd
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[offline-failsafe] = "-Doffline-failsafe-pwm=true,-Doffline-failsafe-pwm=false"
+PACKAGECONFIG[handle-missing-object-paths] = "-Dhandle-missing-object-paths=true,-Dhandle-missing-object-paths=false"
 
 EXTRA_OEMESON = " \
   -Dtests=disabled \
