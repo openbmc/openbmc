@@ -58,6 +58,9 @@ do_RUN_POWER_PG_change()
         host_state="$(get_current_host_state)"
         if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToRunning" ] ||
            [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Running" ]; then
+            if [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.On" ]; then
+                set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+            fi
             return 0
         fi
 
@@ -77,6 +80,9 @@ do_RUN_POWER_PG_change()
         host_state="$(get_current_host_state)"
         if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ] ||
            [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Off" ]; then
+            if [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.Off" ]; then
+                set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+            fi
             return 0
         fi
 
