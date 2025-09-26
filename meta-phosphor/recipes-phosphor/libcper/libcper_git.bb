@@ -8,7 +8,7 @@ DEPENDS = " \
     "
 
 PV = "1.0+git${SRCPV}"
-SRCREV = "da75128c6e2e9a9639d381441573d2e20e3a1ddf"
+SRCREV = "a5cc9a9227cdcb41dfdb1142990bf21f5804b553"
 
 SRC_URI = "git://github.com/openbmc/libcper.git;protocol=https;branch=main"
 
