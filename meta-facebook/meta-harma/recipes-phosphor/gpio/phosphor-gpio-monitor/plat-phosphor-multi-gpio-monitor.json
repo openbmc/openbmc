@@ -248,6 +248,17 @@
         "Continue": true
     },
     {
+        "Name": "irq-retimer-1v8-alert",
+        "ChipId": "2",
+        "GpioNum": 234,
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["vr-fault-deassert-log@2_irq-retimer-1v8-alert.service"],
+            "FALLING": ["vr-fault-assert-log@2_irq-retimer-1v8-alert.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "fcb1-activate",
         "ChipId": "3",
         "GpioNum": 13,
