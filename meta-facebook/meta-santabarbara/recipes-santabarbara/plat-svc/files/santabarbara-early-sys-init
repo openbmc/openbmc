@@ -10,6 +10,45 @@ enable_all_fan_input()
     fi
 }
 
+config_mcp9600()
+{
+    # Enable thermocouple sensor IC alert to prevent PTTV hardware damage from overheating.
+    # If heater > 95°C / 120°C, IC alerts CPLD -> CPLD shuts down VR modules to stop heating.
+
+    # Alert1 Limit(0x10) = Upper Byte * 16 + Lower Byte / 16
+    # Alert1 Hysteresis(0x0c) = uint8
+    # Alert1 Configuration(0x08)
+
+    for dev in /sys/bus/i2c/drivers/mcp9600/*-00*; do
+        if [ -d "$dev" ]; then
+            bus_addr=$(basename "$dev")     # e.g. "43-0021"
+            bus=${bus_addr%%-*}             # "43"
+            addr=0x${bus_addr#*-00}         # "0x21"
+            case $addr in
+                0x64|0x65)
+                    # set UBC L/R temp Alert1 Limit(0x10) to 95°C
+                    i2ctransfer -y -f "$bus" w3@"$addr" 0x10 0x05 0xf0
+                    # set UBC L/R temp Alert1 Hysteresis(0x0c) to 45°C
+                    i2ctransfer -y -f "$bus" w2@"$addr" 0x0c 0x2d
+                    # Enable Alert1(0x08)
+                    i2ctransfer -y -f "$bus" w2@"$addr" 0x08 0x01
+                    ;;
+                0x67)
+                    # set ASIC temp Alert1 Limit(0x10) to 120°C
+                    i2ctransfer -y -f "$bus" w3@"$addr" 0x10 0x07 0x80
+                    # set ASIC temp Alert1 Hysteresis(0x0c) to 80°C
+                    i2ctransfer -y -f "$bus" w2@"$addr" 0x0c 0x50
+                    # Enable Alert1(0x08)
+                    i2ctransfer -y -f "$bus" w2@"$addr" 0x08 0x01
+                    ;;
+                *)
+                    echo "Unexpected MCP9600: $bus - $addr"
+                    ;;
+            esac
+        fi
+    done
+}
+
 set_bmc_ready()
 {
     local bmc_ready="/sys/class/leds/bmc_ready_noled/brightness"
@@ -20,6 +59,9 @@ set_bmc_ready()
 
 # Enable all fan input as early as possible
 enable_all_fan_input
+
+# Enable MCP9600 IC alert to prevent hardware damage
+config_mcp9600
 
 set_bmc_ready
 
