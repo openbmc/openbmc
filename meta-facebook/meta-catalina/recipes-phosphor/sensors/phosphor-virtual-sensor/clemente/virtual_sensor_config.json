@@ -10,7 +10,7 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Clemente_PDB"
+                "/xyz/openbmc_project/inventory/system/board/NVIDIA_GB300_0"
             ]
         ],
         "Params": {
@@ -241,7 +241,7 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Catalina_PDB"
+                "/xyz/openbmc_project/inventory/system/board/Clemente_PDB"
             ]
         ],
         "Params": {
