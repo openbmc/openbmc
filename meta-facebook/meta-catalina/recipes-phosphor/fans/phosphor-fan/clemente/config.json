@@ -3,7 +3,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan0",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -37,7 +37,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan1",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -71,7 +71,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan2",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -105,7 +105,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan3",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -139,7 +139,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan4",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -173,7 +173,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan5",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -207,7 +207,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan6",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -241,7 +241,7 @@
         {
             "inventory": "/system/chassis/Clemente/Fan7",
             "method": "count",
-            "count_interval": 3,
+            "count_interval": 6,
             "deviation": 15,
             "num_sensors_nonfunc_for_fan_nonfunc": 1,
             "monitor_start_delay": 10,
@@ -297,16 +297,7 @@
         }
     ],
     "fault_handling": {
-        "num_nonfunc_rotors_before_warning": 2,
-        "num_nonfunc_rotors_before_fatal": 3,
-        "power_off_config": [
-            {
-                "type": "soft",
-                "cause": "nonfunc_fan_rotors",
-                "count": 3,
-                "delay": 10
-            }
-        ]
+        "num_nonfunc_rotors_before_warning": 2
     }
 }
 
