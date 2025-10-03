@@ -6,6 +6,8 @@ SRC_URI += "file://init"
 inherit allarch
 inherit update-alternatives
 
+S = "${UNPACKDIR}"
+
 do_install() {
         install -d ${D}/${base_sbindir}
         install -m 0755 ${UNPACKDIR}/init ${D}/${base_sbindir}/preinit-mounts
