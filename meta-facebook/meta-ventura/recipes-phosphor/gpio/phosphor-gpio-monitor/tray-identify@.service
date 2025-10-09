@@ -1,0 +1,10 @@
+[Unit]
+Description=Tray Identify Service for %i
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/tray-identify %i
+
+[Install]
+WantedBy=multi-user.target

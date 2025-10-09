@@ -1,0 +1,79 @@
+#!/bin/bash
+set -e
+
+lock_file="/var/lock/tray-identify.lock"
+
+declare -A I2C_CHANNELS=(
+    [PWRGD_TRAY_LEAK_PORT1_N]="24"
+    [PWRGD_TRAY_LEAK_PORT2_N]="25"
+    [PWRGD_TRAY_LEAK_PORT3_N]="26"
+    [PWRGD_TRAY_LEAK_PORT4_N]="27"
+    [PWRGD_TRAY_LEAK_PORT5_N]="28"
+    [PWRGD_TRAY_LEAK_PORT6_N]="29"
+    [PWRGD_TRAY_LEAK_PORT7_N]="30"
+    [PWRGD_TRAY_LEAK_PORT8_N]="31"
+    [PWRGD_TRAY_LEAK_PORT9_N]="32"
+    [PWRGD_TRAY_LEAK_PORT10_N]="33"
+    [PWRGD_TRAY_LEAK_PORT20_N]="34"
+    [PWRGD_TRAY_LEAK_PORT21_N]="35"
+    [PWRGD_TRAY_LEAK_PORT22_N]="36"
+    [PWRGD_TRAY_LEAK_PORT23_N]="37"
+    [PWRGD_TRAY_LEAK_PORT24_N]="38"
+    [PWRGD_TRAY_LEAK_PORT25_N]="39"
+    [PWRGD_TRAY_LEAK_PORT26_N]="40"
+    [PWRGD_TRAY_LEAK_PORT27_N]="41"
+    [PWRGD_TRAY_LEAK_PORT11_N]="42"
+    [PWRGD_TRAY_LEAK_PORT12_N]="43"
+    [PWRGD_TRAY_LEAK_PORT13_N]="44"
+    [PWRGD_TRAY_LEAK_PORT14_N]="45"
+    [PWRGD_TRAY_LEAK_PORT15_N]="46"
+    [PWRGD_TRAY_LEAK_PORT16_N]="47"
+    [PWRGD_TRAY_LEAK_PORT18_N]="21"
+    [PWRGD_TRAY_LEAK_PORT19_N]="22"
+)
+
+declare -A SLOT_ID=(
+    [PWRGD_TRAY_LEAK_PORT1_N]="0x01"
+    [PWRGD_TRAY_LEAK_PORT2_N]="0x02"
+    [PWRGD_TRAY_LEAK_PORT3_N]="0x03"
+    [PWRGD_TRAY_LEAK_PORT4_N]="0x04"
+    [PWRGD_TRAY_LEAK_PORT5_N]="0x05"
+    [PWRGD_TRAY_LEAK_PORT6_N]="0x06"
+    [PWRGD_TRAY_LEAK_PORT7_N]="0x07"
+    [PWRGD_TRAY_LEAK_PORT8_N]="0x08"
+    [PWRGD_TRAY_LEAK_PORT9_N]="0x09"
+    [PWRGD_TRAY_LEAK_PORT10_N]="0x0A"
+    [PWRGD_TRAY_LEAK_PORT11_N]="0x0B"
+    [PWRGD_TRAY_LEAK_PORT12_N]="0x0C"
+    [PWRGD_TRAY_LEAK_PORT13_N]="0x0D"
+    [PWRGD_TRAY_LEAK_PORT14_N]="0x0E"
+    [PWRGD_TRAY_LEAK_PORT15_N]="0x0F"
+    [PWRGD_TRAY_LEAK_PORT16_N]="0x10"
+    [PWRGD_TRAY_LEAK_PORT18_N]="0x12"
+    [PWRGD_TRAY_LEAK_PORT19_N]="0x13"
+    [PWRGD_TRAY_LEAK_PORT20_N]="0x14"
+    [PWRGD_TRAY_LEAK_PORT21_N]="0x15"
+    [PWRGD_TRAY_LEAK_PORT22_N]="0x16"
+    [PWRGD_TRAY_LEAK_PORT23_N]="0x17"
+    [PWRGD_TRAY_LEAK_PORT24_N]="0x18"
+    [PWRGD_TRAY_LEAK_PORT25_N]="0x19"
+    [PWRGD_TRAY_LEAK_PORT26_N]="0x1A"
+    [PWRGD_TRAY_LEAK_PORT27_N]="0x1B"
+)
+
+tray_leak_port="$1"
+i2c_channel=${I2C_CHANNELS[$tray_leak_port]}
+slot_id=${SLOT_ID[$tray_leak_port]}
+
+if [ -z "$i2c_channel" ] || [ -z "$slot_id" ]; then
+    echo "[tray-identify] Unknown tray leak port: $tray_leak_port"
+    exit 1
+fi
+
+(
+  flock -x 200
+  echo "[tray-identify] $tray_leak_port, Writing slot_id=$slot_id to i2c bus=$i2c_channel"
+  if ! i2cset -y -f "$i2c_channel" 0x20 0x03 "$slot_id"; then
+    echo "[tray-identify] Warning: Write failed"
+  fi
+) 200>"$lock_file"
