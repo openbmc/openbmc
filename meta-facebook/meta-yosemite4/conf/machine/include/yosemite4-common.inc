@@ -4,7 +4,7 @@ require conf/distro/include/phosphor-static-norootfs.inc
 require conf/distro/include/pldm.inc
 require conf/machine/include/facebook-compute-multihost.inc
 require conf/machine/include/obmc-bsp-common.inc
-require conf/machine/include/facebook-tpm2.inc
+require conf/machine/include/tpm2.inc
 require conf/machine/include/facebook-ncsi-nic.inc
 
 FLASH_SIZE = "131072"
