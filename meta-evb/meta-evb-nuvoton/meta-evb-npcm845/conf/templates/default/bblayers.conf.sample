@@ -19,4 +19,5 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-evb \
   ##OEROOT##/meta-evb/meta-evb-nuvoton \
   ##OEROOT##/meta-evb/meta-evb-nuvoton/meta-evb-npcm845 \
+  ##OEROOT##/meta-security/meta-tpm \
   "
