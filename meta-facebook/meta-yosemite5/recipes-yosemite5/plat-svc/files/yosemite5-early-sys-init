@@ -32,6 +32,7 @@ set_gpio FM_CLKMUX_0_SEL 1
 set_gpio FM_CLKMUX_1_SEL 1
 set_gpio FM_CLKMUX_2_SEL 1
 set_gpio FM_CLKMUX_3_SEL 1
+set_gpio FM_CLKGEN_GPIO2 1
 set_gpio FM_CLKGEN_GPIO4 0
 
 # SGPIO
