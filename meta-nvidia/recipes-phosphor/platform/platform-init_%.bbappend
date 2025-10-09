@@ -1,1 +1,1 @@
-EXTRA_OEMESON:append:nv-gpu-pcie-card = " -Dinit-p2020=enabled"
+EXTRA_OEMESON:append:nv-gpu-pcie-card = " -Dplatform-name=nvidia-gb200-with-p2020"
