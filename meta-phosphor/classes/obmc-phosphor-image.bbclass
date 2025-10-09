@@ -30,6 +30,7 @@
 # - obmc-user-mgmt                    - OpenBMC user management
 # - obmc-user-mgmt-ldap               - OpenBMC LDAP users
 # - obmc-webui                        - OpenBMC Web User Interface
+# - obmc-tpm                          - OpenBMC TPM Applications
 
 inherit core-image
 inherit obmc-phosphor-utils
@@ -64,6 +65,7 @@ FEATURE_PACKAGES_obmc-telemetry ?= "packagegroup-obmc-apps-telemetry"
 FEATURE_PACKAGES_obmc-user-mgmt ?= "packagegroup-obmc-apps-user-mgmt"
 FEATURE_PACKAGES_obmc-user-mgmt-ldap ?= "packagegroup-obmc-apps-user-mgmt-ldap"
 FEATURE_PACKAGES_obmc-dmtf-pmci ?= "packagegroup-obmc-apps-dmtf-pmci"
+FEATURE_PACKAGES_obmc-tpm ?= "packagegroup-obmc-apps-tpm"
 
 # Note that the webui is not included by default in OpenBMC
 # images due to its non-standard build process. It utilizes

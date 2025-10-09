@@ -32,6 +32,7 @@ PACKAGES = " \
         ${PN}-user-mgmt-ldap \
         ${PN}-dmtf-pmci \
         ${PN}-webui \
+        ${PN}-tpm \
         "
 
 SUMMARY:${PN}-bmc-state-mgmt = "BMC state management"
@@ -199,3 +200,8 @@ RDEPENDS:${PN}-dmtf-pmci:append:df-mctp = " mctp"
 SUMMARY:${PN}-webui = "Web User Interface support"
 RDEPENDS:${PN}-webui = "webui-vue"
 RDEPENDS:${PN}-webui:df-phosphor-no-webui = ""
+
+SUMMARY:${PN}-tpm = "TPM applications"
+RDEPENDS:${PN}-tpm:append = " \
+         ${@bb.utils.contains_any('MACHINE_FEATURES', 'tpm1 tpm2', 'packagegroup-openbmc-tpm', '', d)} \
+         "
