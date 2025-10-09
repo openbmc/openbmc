@@ -34,7 +34,38 @@ set_gpio FM_CLKMUX_2_SEL 1
 set_gpio FM_CLKMUX_3_SEL 1
 set_gpio FM_CLKGEN_GPIO4 0
 
-# set BMC ready
-# SGPIO todo
+# SGPIO
+set_gpio SGPIO_RSTBTN_OUT 0
+set_gpio IBB_BMC_SRST 1
+set_gpio FM_I3C_SPD_AH_SEL_R 0
+set_gpio FM_I3C_SPD_IP_SEL_R 0
+set_gpio FM_JTAG_BMC_MUX_S0_R 0
+set_gpio FM_JTAG_BMC_MUX_S1_R 0
+set_gpio FM_JTAG_BMC_OE_1_R_N 1
+set_gpio FM_JTAG_BMC_OE_R_N 1
+set_gpio FM_REMOTEJTAG_EN_R_N 1
+set_gpio FM_CPU_FORCE_SELFREFRESH_R 0
+set_gpio FM_CPU_NMI_SYNC_FLOOD_R_N 1
+set_gpio FM_CPU_TRIGGERTSC_OE_R_N 1
+set_gpio FM_PASSWORD_CLEAR_R_N 1
+set_gpio FM_BIOS_USB_RECOVERY_N 1
+set_gpio FM_USB_MUX_OE_R_N 1
+set_gpio FM_USB_MUX_SEL_R 0
+set_gpio RST_SMB_BOOT_R_N 1
+set_gpio RST_SMB_MCIO0A_R_N 1
+set_gpio RST_SMB_NIC_R_N 1
+set_gpio FM_PPS_NIC_IN_BUF_OE_R_N 1
+set_gpio FM_PPS_NIC_IN_EN_R 0
+set_gpio FM_PPS_NIC_IN_OE_R_N 1
+set_gpio FM_PPS_NIC_IN_S0_R 0
+set_gpio FM_PPS_NIC_IN_S1_R 0
+set_gpio FM_PPS_NIC_OUT_BUF_OE_R_N 1
+set_gpio FM_PPS_NIC_OUT_CPU_OE_R_N 1
+set_gpio FM_PPS_NIC_OUT_EN_R 0
+set_gpio JTAG_CPLD_DBREQ_R_N 1
+set_gpio HDT_HDR_RESET_R_N 1
+set_gpio FM_SMB_AUTH_MUX_OE_R_N 1
+set_gpio FM_SCM_LED_R_N 1
+set_gpio SGPIO_BMC_READY 1
 
 exit 0
