@@ -1480,8 +1480,8 @@
         "LineName": "CR_TOGGLE_BOOT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["cr-toggle-boot-enabled.service"],
-            "FALLING": ["cr-toggle-boot-disabled.service"]
+            "RISING": ["cr-toggle-boot-disabled.service"],
+            "FALLING": ["cr-toggle-boot-enabled.service"]
         },
         "Continue": true
     }
