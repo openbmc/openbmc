@@ -154,6 +154,7 @@
         },
         {
             "name": "HOST_SELECTOR",
+            "virtual_button": true,
             "polling_mode": true,
             "polling_interval_ms": 2000,
             "group_gpio_config": [
