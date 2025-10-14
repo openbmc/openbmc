@@ -254,7 +254,7 @@
     "zones": [
         {
             "id": 1,
-            "failsafePercent": 100.0,
+            "failsafePercent": 80.0,
             "minThermalOutput": 0.0,
             "cycleTimeBaseMS": 1000,
             "updateThermalsTimeMS": 1000,
