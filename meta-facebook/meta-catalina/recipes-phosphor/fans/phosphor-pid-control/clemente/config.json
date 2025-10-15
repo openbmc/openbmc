@@ -57,30 +57,30 @@
             "ignoreDbusMinMax": true
         },
         {
-            "name": "PDB_VR_P12V_N1_TEMP_C",
+            "name": "PDB_VR_P12V_N1_0_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_0_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "PDB_VR_P12V_N1_TEMP1_C",
+            "name": "PDB_VR_P12V_N1_1_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_TEMP1_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_1_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "PDB_VR_P12V_N2_TEMP_C",
+            "name": "PDB_VR_P12V_N2_0_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_0_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "PDB_VR_P12V_N2_TEMP1_C",
+            "name": "PDB_VR_P12V_N2_1_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_TEMP1_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_1_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -439,10 +439,10 @@
                     "name": "STEPWISE_PDB",
                     "type": "stepwise",
                     "inputs": [
-                        "PDB_VR_P12V_N1_TEMP_C",
-                        "PDB_VR_P12V_N1_TEMP1_C",
-                        "PDB_VR_P12V_N2_TEMP_C",
-                        "PDB_VR_P12V_N2_TEMP1_C",
+                        "PDB_VR_P12V_N1_0_TEMP_C",
+                        "PDB_VR_P12V_N1_1_TEMP_C",
+                        "PDB_VR_P12V_N2_0_TEMP_C",
+                        "PDB_VR_P12V_N2_1_TEMP_C",
                         "PDB_HSC1_TEMP_C",
                         "PDB_HSC2_TEMP_C",
                         "PDB_INLET_TEMP_C"
@@ -469,10 +469,10 @@
                     "name": "PID_PDB",
                     "type": "temp",
                     "inputs": [
-                        "PDB_VR_P12V_N1_TEMP_C",
-                        "PDB_VR_P12V_N1_TEMP1_C",
-                        "PDB_VR_P12V_N2_TEMP_C",
-                        "PDB_VR_P12V_N2_TEMP1_C",
+                        "PDB_VR_P12V_N1_0_TEMP_C",
+                        "PDB_VR_P12V_N1_1_TEMP_C",
+                        "PDB_VR_P12V_N2_0_TEMP_C",
+                        "PDB_VR_P12V_N2_1_TEMP_C",
                         "PDB_HSC1_TEMP_C",
                         "PDB_HSC2_TEMP_C",
                         "PDB_INLET_TEMP_C"
