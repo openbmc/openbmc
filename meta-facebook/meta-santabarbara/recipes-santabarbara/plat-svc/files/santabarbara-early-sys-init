@@ -10,6 +10,32 @@ enable_all_fan_input()
     fi
 }
 
+config_max31790()
+{
+    # Set fan tach sample count for each tach channel to highest value to avoid
+    # wrong fan tach reading.
+    #
+    # FanX_Dynamics
+    # - register offset: 0x08 (tach1) - 0x0d (tach6)
+    # |------------------------ -----------------------------------------------|
+    # | bit[7:5]         | 000b | 001b | 010b | 011b | 110b | 101b, 110b, 111b |
+    # |------------------------------------------------------------------------|
+    # | tach sample count|  1   |  2   |  4   |  8   |  16  |  32              |
+    # |------------------------------------------------------------------------|
+
+    for offset in $(seq 0x08 0x0d)
+    do
+        fan_dynam_val=$(printf "%d" "$(i2cget -y -f 43 0x21 "$offset")")
+        fan_dynam_val=$((fan_dynam_val | 0xe0))
+        i2cset -y -f 43 0x21 "$offset" "$fan_dynam_val"
+    done
+
+    # after manual set FanX_Dynamics, needs to rebind driver to ensure
+    # driver get correct setitngs
+    echo "43-0021" > /sys/bus/i2c/drivers/max31790/unbind
+    echo "43-0021" > /sys/bus/i2c/drivers/max31790/bind
+}
+
 config_mcp9600()
 {
     # Enable thermocouple sensor IC alert to prevent PTTV hardware damage from overheating.
@@ -56,6 +82,12 @@ set_bmc_ready()
 
     return 0
 }
+
+# Set MAX31790 fan tach sample count
+if [ -d "/sys/bus/i2c/drivers/max31790/43-0021/hwmon" ]; then
+    echo "Configure MAX31790 fan controller"
+    config_max31790
+fi
 
 # Enable all fan input as early as possible
 enable_all_fan_input
