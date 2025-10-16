@@ -17,8 +17,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN0_TACH_OL_SPEED_RPM",
@@ -26,8 +27,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN0_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -51,8 +53,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN1_TACH_OL_SPEED_RPM",
@@ -60,8 +63,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN1_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -85,8 +89,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN2_TACH_OL_SPEED_RPM",
@@ -94,8 +99,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN2_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -119,8 +125,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN3_TACH_OL_SPEED_RPM",
@@ -128,8 +135,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN3_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -153,8 +161,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN4_TACH_OL_SPEED_RPM",
@@ -162,8 +171,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN4_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -187,8 +197,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN5_TACH_OL_SPEED_RPM",
@@ -196,8 +207,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN5_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -221,8 +233,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN6_TACH_OL_SPEED_RPM",
@@ -230,8 +243,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN6_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -255,8 +269,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 132.54,
+                     "offset": -180,
+                     "ignore_above_max": true
                 },
                 {
                      "name": "FAN7_TACH_OL_SPEED_RPM",
@@ -264,8 +279,9 @@
                      "threshold": 5,
                      "target_interface": "xyz.openbmc_project.Control.FanPwm",
                      "target_path": "/xyz/openbmc_project/control/fanpwm/FAN7_PWM_PCT",
-                     "factor": 137,
-                     "offset": -632
+                     "factor": 119.61,
+                     "offset": -1115,
+                     "ignore_above_max": true
                 }
             ],
             "control": {
@@ -297,7 +313,16 @@
         }
     ],
     "fault_handling": {
-        "num_nonfunc_rotors_before_warning": 2
+        "num_nonfunc_rotors_before_warning": 2,
+        "num_nonfunc_rotors_before_fatal": 3,
+        "power_off_config": [
+            {
+                "type": "soft",
+                "cause": "nonfunc_fan_rotors",
+                "count": 3,
+                "delay": 10
+            }
+        ]
     }
 }
 
