@@ -58,8 +58,14 @@ do_RUN_POWER_PG_change()
         host_state="$(get_current_host_state)"
         if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToRunning" ] ||
            [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Running" ]; then
+            if [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.On" ]; then
+                set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+            fi
             return 0
         fi
+
+        # Add delay to prevent false RUN_POWER_PG when HMC unexpected reset
+        sleep 2
 
         # Sync power status to "On" for abnormal power-on scenarios.
         if [ "$(get_gpio "host0-ready")" -eq 1 ] && [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.On" ]; then
@@ -71,6 +77,9 @@ do_RUN_POWER_PG_change()
         host_state="$(get_current_host_state)"
         if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ] ||
            [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Off" ]; then
+            if [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.Off" ]; then
+                set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+            fi
             return 0
         fi
 
