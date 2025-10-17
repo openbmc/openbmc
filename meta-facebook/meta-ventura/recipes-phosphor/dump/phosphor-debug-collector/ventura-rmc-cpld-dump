@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# config: 2 99
+# @brief: Collect Ventura RMC CPLD registers over I2C.
+#
+
+# The sourced `functions` file is not
+# available during shellcheck linting
+#
+# shellcheck disable=SC1091
+. "$DREPORT_INCLUDE/functions"
+
+cmd="i2cdump -y 10 0x23"
+file_name="ventura-rmc-cpld-dump.log"
+desc="'$cmd' output"
+
+add_cmd_output "$cmd" "$file_name" "$desc"
