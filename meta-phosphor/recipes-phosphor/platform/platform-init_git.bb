@@ -13,7 +13,7 @@ DEPENDS = " \
 
 S = "${WORKDIR}/git"
 
-SRCREV = "c9c8612b9cdccc232311ca12ebd25b9f4a08491f"
+SRCREV = "4a943529d4d84cf45f72f32e8f25f16e29b7937b"
 
 SRC_URI += "git://github.com/openbmc/platform-init.git;branch=master;protocol=https;branch=main"
 
