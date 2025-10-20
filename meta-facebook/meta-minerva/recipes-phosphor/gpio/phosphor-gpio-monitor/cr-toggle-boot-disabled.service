@@ -3,5 +3,5 @@ Description=Cooling Rack Toggle Boot Disabled
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/cr-toggle-boot-logger LockOutDisabled
+ExecStart=/usr/libexec/phosphor-gpio-monitor/cr-toggle-boot-logger LockOutEnabled
 SyslogIdentifier=cr-toggleboot-disabled
