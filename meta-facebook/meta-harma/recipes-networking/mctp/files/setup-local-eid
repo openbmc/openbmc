@@ -2,9 +2,10 @@
 
 # Set mctpi2c link up and assign local address.
 localEid=8
-busNum=9
 maxRetries=5
 retryInterval=1
+bic_busnum=9
+nic_busnum=1
 
 retry_command() {
 
@@ -25,21 +26,38 @@ retry_command() {
 }
 
 # Retry mctp link command
-if ! retry_command "mctp link set mctpi2c${busNum} up"; then
+if ! retry_command "mctp link set mctpi2c${bic_busnum} up"; then
+    echo "Failed to set mctp link after $maxRetries attempts."
+    exit 1
+fi
+
+if ! retry_command "mctp link set mctpi2c${nic_busnum} up"; then
     echo "Failed to set mctp link after $maxRetries attempts."
     exit 1
 fi
 
 # Check if local EID is already set
 mctpOutput=$(mctp address show)
-if echo "$mctpOutput" | grep -q "mctpi2c${busNum}"; then
-    echo "mctpi2c${busNum} local EID already set"
+
+if echo "$mctpOutput" | grep -q "mctpi2c${bic_busnum}"; then
+    echo "mctpi2c${bic_busnum} local EID already set"
 else
     # Retry mctp addr add command
-    if ! retry_command "mctp addr add ${localEid} dev mctpi2c${busNum}"; then
+    if ! retry_command "mctp addr add ${localEid} dev mctpi2c${bic_busnum}"; then
         echo "Failed to add mctp address after $maxRetries attempts."
         exit 1
     fi
 fi
-echo "mctpi2c${busNum} local EID set to ${localEid}"
+echo "mctpi2c${bic_busnum} local EID set to ${localEid}"
+
+if echo "$mctpOutput" | grep -q "mctpi2c${nic_busnum}"; then
+    echo "mctpi2c${nic_busnum} local EID already set"
+else
+    # Retry mctp addr add command
+    if ! retry_command "mctp addr add ${localEid} dev mctpi2c${nic_busnum}"; then
+        echo "Failed to add mctp address after $maxRetries attempts."
+        exit 1
+    fi
+fi
+echo "mctpi2c${nic_busnum} local EID set to ${localEid}"
 exit 0

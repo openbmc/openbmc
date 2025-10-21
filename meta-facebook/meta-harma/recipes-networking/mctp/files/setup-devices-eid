@@ -1,7 +1,10 @@
 #!/bin/bash
 
 bic_addr=0x20
-busnum=9
+bic_busnum=9
+nic_addr=50
+nic_busnum=1
+nic_eid=90
 maxRetries=10
 
 # Retry a command with optional failover command
@@ -13,7 +16,7 @@ retry_command() {
     local retries=0
 
     while [ "$retries" -lt "$maxRetries" ]; do
-        if bash -c "$command" >/dev/null 2>&1; then
+        if bash -c "$command" 2>&1; then
             return 0
         else
             if [ -n "$failExecuteCmd" ]; then
@@ -31,11 +34,22 @@ retry_command() {
 
 # Learn BIC Endpoint
 learn_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
-    /au/com/codeconstruct/mctp1/interfaces/mctpi2c${busnum} \
+    /au/com/codeconstruct/mctp1/interfaces/mctpi2c${bic_busnum} \
     au.com.codeconstruct.MCTP.BusOwner1 LearnEndpoint ay 1 ${bic_addr}"
 
 if ! retry_command "$learn_endpoint_cmd" "$maxRetries" 1; then
     echo "[Error] Failed to learn BIC EID after $maxRetries attempts."
+    exit 1
+fi
+
+# Set local EID for NIC
+assign_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
+    /au/com/codeconstruct/mctp1/interfaces/mctpi2c${nic_busnum} \
+    au.com.codeconstruct.MCTP.BusOwner1 \
+    AssignEndpointStatic ayy 1 ${nic_addr} ${nic_eid}"
+
+if ! retry_command "$assign_endpoint_cmd" "$maxRetries" 1; then
+    echo "[Error] Failed to assign NIC EID after $maxRetries attempts."
     exit 1
 fi
 
