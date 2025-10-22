@@ -246,7 +246,8 @@ python systemd_populate_packages() {
                 if not systemd_service_exists(service, user, d):
                     continue
                 if '@' in service and '@.' not in service:
-                    (servicename, instance, service_type) = re.split('[@.]', service)
+                    (servicename, postfix) = service.split('@')
+                    (instance, service_type) = postfix.rsplit('.', 1)
                     template_services.setdefault(servicename + '@.' + service_type, []).append(instance)
                 else:
                     template_services.setdefault(service, [])
