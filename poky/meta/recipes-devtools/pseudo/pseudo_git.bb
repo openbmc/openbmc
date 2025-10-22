@@ -32,3 +32,4 @@ COMPATIBLE_HOST:libc-musl = 'null'
 #| ./ports/linux/pseudo_wrappers.c:80:57: error: use of unknown builtin '__builtin_apply_args' [-Wimplicit-function-declaration]
 #|         void *res = __builtin_apply((void (*)()) real_syscall, __builtin_apply_args(), sizeof(long) * 7);
 TOOLCHAIN = "gcc"
+TOOLCHAIN_NATIVE = "gcc"
