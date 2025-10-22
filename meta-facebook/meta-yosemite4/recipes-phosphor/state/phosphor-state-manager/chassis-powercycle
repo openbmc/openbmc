@@ -207,14 +207,14 @@ chassis-power-cycle()
 
 sled-cycle()
 {
-    # Remount file system as read-only before doing sled cycle
-    if ! /usr/libexec/phosphor-static-norootfs-init/remount-filesystem-readonly; then
-        msg="Failed to remount /run/mnt-persist as read-only"
+    # Detach file system before doing sled cycle
+    if ! umount --lazy /run/mnt-persist; then
+        msg="Failed to detach /run/mnt-persist"
         echo "${msg}"
         add_sel "${msg}" "Error"
     else
-        # If the remount is succesful, add_sel will fail so we can't log this
-        echo "Succeeded to remount /run/mnt-persist as read-only"
+        # If the detach is succesful, add_sel will fail so we can't log this
+        echo "Succeeded to detach run/mnt-persist"
     fi
 
     if [ -z "$MANAGEMENT_BOARD_VERSION" ]; then
