@@ -6,7 +6,7 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 #Sled cycle
 echo "Starting Chassis Power Cycle"
 
-chassis-power-cycle() {
+chassis-power-cycle-ltc4287() {
     # LTC4287 MFR_REBOOT_CONTROL (FDh) Read/Write
     # [3]:
     #       REBOOT 0 Write a 1 to reboot.
@@ -37,6 +37,39 @@ chassis-power-cycle() {
     fi
 
     return 0
+}
+
+chassis-power-cycle-xdp711() {
+    # XDP711 RESTART command (ECh)
+    # This command turns-off the hot-swap for 10 seconds. Then it is automatically turned back on.
+    # This command is write-only without a data byte.
+
+    if ! i2cset -f -y 47 0x14 0xec; then
+        echo "52V HSC1 set reboot bit failed"
+        return 1
+    fi
+
+    if ! i2cset -f -y 47 0x16 0xec; then
+        echo "52V HSC2 set reboot bit failed"
+        return 1
+    fi
+
+    return 0
+}
+
+chassis-power-cycle()
+{
+    if [ "$(i2cdetect -y -q 47 0x0f 0x0f | grep "00:" | awk '{print $2}')" != "--" ]; then
+        # run main source power cycle if 47-000f exist
+        chassis-power-cycle-ltc4287
+        ret=$?
+    else
+        # run 2nd source power cycle
+        chassis-power-cycle-xdp711
+        ret=$?
+    fi
+
+    return $ret
 }
 
 ChassisNumber=$1
