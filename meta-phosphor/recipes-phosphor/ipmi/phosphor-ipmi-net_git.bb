@@ -17,7 +17,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 DEPENDS += "cli11"
 DEPENDS += "systemd"
 DEPENDS += "phosphor-ipmi-host"
-SRCREV = "067d178bcc0c572afad75ceadf3c55f293639e8a"
+SRCREV = "d13c9c8ac4eb3138038146276103fda4ddbf8f84"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
