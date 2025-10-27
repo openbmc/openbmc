@@ -16,4 +16,7 @@ SUMMARY:${PN}-system = "OpenBMC System"
 RDEPENDS:${PN}-system = " \
         entity-manager \
         dbus-sensors \
+        x86-power-control \
+        platform-init \
+        phosphor-settings-manager \
         "
