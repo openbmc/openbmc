@@ -65,14 +65,20 @@ chassis_power_cycle_button()
 
 chassis_power_cycle()
 {
+    # Following the recommended AC power down sequence:
+    # Force shutdown of the host before cutting the HSC power.
+    # If turn HSC power off while main power is up (and not doing a proper shutdown
+    # before removing standby power), then the FPGA would see this as a power fault.
+    if [ "$(host_power_status)" == "on" ]; then
+        set_gpio "hard_shutdown_host" 0
+        if ! wait_host_power_change "off" 5; then
+            echo "[DEBUG] force-off host failed in power cycle"
+        fi
+    fi
     # There are HSCs(LM5066i) on the PDB board, and BMC configure the HPM board's Bianca IO Expander
     # then it starts standby-AC power cycling for the tray.
     # This behavior equal i2ctransfer -f -y 2 w2@0x20 0x06 0xd7 from NV.
-
-    set_gpio "HMC_PGOOD-O" 1
-    sleep 0.1
     set_gpio "BMC_STBY_CYCLE-O" 1
-
     return 0
 }
 
