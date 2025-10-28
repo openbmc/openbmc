@@ -1,0 +1,15 @@
+{
+    "gpio_definitions": [
+        {
+            "name": "POWER_BUTTON",
+            "pin": "P0",
+            "direction": "both"
+        },
+        {
+            "name": "RESET_BUTTON",
+            "pin": "P2",
+            "direction": "both"
+        }
+
+    ]
+}
