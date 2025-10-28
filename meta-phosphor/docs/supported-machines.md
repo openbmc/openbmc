@@ -34,6 +34,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * evb-npcm845
   * fvp
 * facebook
+  * anacapa
   * bletchley
   * bletchley15
   * catalina
