@@ -12,6 +12,7 @@ UNPACKDIR = "${S}"
 
 SRC_URI = " \
            file://ampere_add_redfishevent.sh \
+           file://ampere_redfish_utils.sh \
           "
 
 RDEPENDS:${PN} = "bash"
@@ -20,4 +21,5 @@ SYSTEMD_SERVICE:${PN} = ""
 do_install() {
     install -d ${D}/usr/sbin
     install -m 0755 ${UNPACKDIR}/ampere_add_redfishevent.sh ${D}/${sbindir}/
+    install -m 0755 ${UNPACKDIR}/ampere_redfish_utils.sh ${D}/${sbindir}/
 }
