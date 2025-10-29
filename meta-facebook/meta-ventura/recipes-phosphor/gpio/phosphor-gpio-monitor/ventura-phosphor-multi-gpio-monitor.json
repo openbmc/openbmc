@@ -167,15 +167,15 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-rail-deassert-log@TRAY_LEAK_PORT10.service",
-                "led-blue-assert@TRAY_LEAK_PORT10.service"
+                "power-rail-deassert-log@PWRGD_TRAY_LEAK_PORT10_N.service",
+                "led-blue-assert@PWRGD_TRAY_LEAK_PORT10_N.service"
             ],
             "RISING": [
-                "power-rail-assert-log@TRAY_LEAK_PORT10.service",
-                "led-blue-deassert@TRAY_LEAK_PORT10.service"
+                "power-rail-assert-log@PWRGD_TRAY_LEAK_PORT10_N.service",
+                "led-blue-deassert@PWRGD_TRAY_LEAK_PORT10_N.service"
             ],
-            "INIT_LOW": ["led-blue-init-assert@TRAY_LEAK_PORT10.service"],
-            "INIT_HIGH": ["led-blue-init-deassert@TRAY_LEAK_PORT10.service"]
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_TRAY_LEAK_PORT10_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_TRAY_LEAK_PORT10_N.service"]
         },
         "Continue": true
     },
@@ -347,15 +347,15 @@
         "EventMon": "BOTH",
         "Targets": {
             "FALLING": [
-                "power-rail-deassert-log@TRAY_LEAK_PORT20.service",
-                "led-blue-assert@TRAY_LEAK_PORT20.service"
+                "power-rail-deassert-log@PWRGD_TRAY_LEAK_PORT20_N.service",
+                "led-blue-assert@PWRGD_TRAY_LEAK_PORT20_N.service"
             ],
             "RISING": [
-                "power-rail-assert-log@TRAY_LEAK_PORT20.service",
-                "led-blue-deassert@TRAY_LEAK_PORT20.service"
+                "power-rail-assert-log@PWRGD_TRAY_LEAK_PORT20_N.service",
+                "led-blue-deassert@PWRGD_TRAY_LEAK_PORT20_N.service"
             ],
-            "INIT_LOW": ["led-blue-init-assert@TRAY_LEAK_PORT20.service"],
-            "INIT_HIGH": ["led-blue-init-deassert@TRAY_LEAK_PORT20.service"]
+            "INIT_LOW": ["led-blue-init-assert@PWRGD_TRAY_LEAK_PORT20_N.service"],
+            "INIT_HIGH": ["led-blue-init-deassert@PWRGD_TRAY_LEAK_PORT20_N.service"]
         },
         "Continue": true
     },
