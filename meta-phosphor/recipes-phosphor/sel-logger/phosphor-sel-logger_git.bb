@@ -27,6 +27,7 @@ PACKAGECONFIG[sel-delete] = "-Dsel-delete=true,-Dsel-delete=false"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/phosphor-sel-logger.git;protocol=https;branch=master"
+RDEPENDS:${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'send-to-logger', '', 'rsyslog', d)}"
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} += "xyz.openbmc_project.Logging.IPMI.service"
