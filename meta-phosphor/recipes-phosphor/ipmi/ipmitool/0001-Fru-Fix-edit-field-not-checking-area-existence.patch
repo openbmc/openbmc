@@ -63,17 +63,23 @@ change, the last 8 bytes of the FRU would be truncated which would
 result in the checksum of the final FRU area being lost which would thus
 trigger this FRU write failure.
 
+Fixed the record length of MultiRecord area as per the ipmi fru
+storage specification. The record length is not multiple of 8
+bytes, it is the exact number of bytes of data in the record.
+Added 5 to the length as header size is of 5 bytes.
+
 Upstream-Status: Pending
 
 Signed-off-by: Alex Schendel <alex.schendel@intel.com>
 Signed-off-by: Zhikui Ren <zhikui.ren@intel.com>
+Signed-off-by: Jitendra Tripathy <jitendra.kumarx.tripathy@intel.com>
 ---
  include/ipmitool/ipmi_fru.h |   1 +
  lib/ipmi_fru.c              | 170 +++++++++++++++++++++++-------------
  2 files changed, 110 insertions(+), 61 deletions(-)
 
 diff --git a/include/ipmitool/ipmi_fru.h b/include/ipmitool/ipmi_fru.h
-index c6b3a54..13f2958 100644
+index 2bda054..60f76b5 100644
 --- a/include/ipmitool/ipmi_fru.h
 +++ b/include/ipmitool/ipmi_fru.h
 @@ -46,6 +46,7 @@
@@ -85,7 +91,7 @@ index c6b3a54..13f2958 100644
  enum {
  	FRU_CHASSIS_PARTNO,
 diff --git a/lib/ipmi_fru.c b/lib/ipmi_fru.c
-index 4d1dbbb..effc1a8 100644
+index 04bd12f..d5ff482 100644
 --- a/lib/ipmi_fru.c
 +++ b/lib/ipmi_fru.c
 @@ -131,7 +131,8 @@ static int ipmi_fru_set_field_string(struct ipmi_intf * intf, unsigned
@@ -236,7 +242,7 @@ index 4d1dbbb..effc1a8 100644
 +				/* MultiRecord Area length is third byte rather than second. */
 +				if(header.offsets[i] == header.offset.multi)
 +				{
-+					length = *(fru_data_old + (header.offsets[i] * 8) + 2) * 8;
++					length = (*(fru_data_old + (header.offsets[i] * 8) + 2)) + 5;
 +				}
 +				memcpy(
 +					(fru_data_new + ((header.offsets[i] + change_size_by_8) * 8)),
@@ -307,5 +313,5 @@ index 4d1dbbb..effc1a8 100644
  
  	/* Update only if it's fits padding length as defined in the spec, otherwise, it's an internal
 -- 
-2.41.0
+2.34.1
 
