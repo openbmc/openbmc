@@ -29,8 +29,8 @@ label_to_iface["mb_nic0_mctp"]="mctpi2c11"
 declare -A hub0_port_mapping=(
     [".port0"]="rainbow0_mmc_mctp"
     [".port1"]="rainbow2_mmc_mctp"
-    [".port4"]="rainbow3_mmc_mctp"
-    [".port5"]="rainbow1_mmc_mctp"
+    [".port4"]="rainbow1_mmc_mctp"
+    [".port5"]="rainbow3_mmc_mctp"
 )
 
 declare -A hub1_port_mapping=(

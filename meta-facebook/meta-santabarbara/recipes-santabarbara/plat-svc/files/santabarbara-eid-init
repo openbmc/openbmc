@@ -2,16 +2,16 @@
 
 declare -A reg_map=(
     [6]="0x40:0x00"
-    [13]="0x41:0x01"
+    [10]="0x41:0x01"
     [8]="0x42:0x02"
-    [10]="0x43:0x03"
+    [13]="0x43:0x03"
 )
 
 declare -A check_map=(
     [6]="0x00 0x0a:0x00"
-    [13]="0x01 0x14:0x01"
+    [10]="0x01 0x14:0x01"
     [8]="0x02 0x1e:0x02"
-    [10]="0x03 0x28:0x03"
+    [13]="0x03 0x28:0x03"
 )
 
 retry_i2c_command() {
@@ -51,6 +51,13 @@ main() {
             else
                 echo "FATAL: Slot $slot failed after max retries"
             fi
+
+            sleep 1
+
+            # Ask Rainbow to reboot
+            i2cset -y "$slot" 0x21 1 0
+            i2cset -y "$slot" 0x21 1 1
+
        elif i2cdetect -y "$slot" | grep -Eq "^20:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})"; then
             echo "Slot $slot: Detecting SITv3 card, set the $sitv3_val at 0x21"
             cmd="i2cset -y $slot 0x21 $sitv3_val"
