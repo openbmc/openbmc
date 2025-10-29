@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
 dev="${1:-}"
 
 # Mapping table: "DeviceLabel:PhysicalAddress:EID"
@@ -63,6 +66,23 @@ if [[ -n "$hub_devices" ]]; then
 
         hub_index=$((hub_index + 1))
     done
+fi
+
+# Supports i3c hub for EVT 2A and later phases
+if [ "$(get_gpio "MB_REV_ID_1")" -ne 0 ] || [ "$(get_gpio "MB_REV_ID_2")" -ne 0 ]; then
+    hub_devices=$(i2cdetect -l | grep "hub2-" | grep -E "\.port[0-9]")
+    if [[ -n "$hub_devices" ]]; then
+        hub_id=$(echo "$hub_devices" | grep -oEm1 "hub2-[a-f0-9]+" | awk '!seen[$0]++')
+        hub_ports=$(echo "$hub_devices" | grep "$hub_id" | grep -oE "\.port[0-9]" | sort -n -t. -k2)
+        for port in $hub_ports; do
+            device_name="${hub1_port_mapping[$port]}"
+
+            if [[ -n "$device_name" ]]; then
+                i2c_num=$(echo "$hub_devices" | grep "$hub_id$port" | awk '{print $1}' | cut -d'-' -f2)
+                label_to_iface["$device_name"]="mctpi2c$i2c_num"
+            fi
+        done
+    fi
 fi
 
 is_eid_assigned() {

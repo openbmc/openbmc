@@ -13,7 +13,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
     mctp_setup.service \
 "
 
-RDEPENDS:${PN}:append = "bash"
+RDEPENDS:${PN}:append = " bash"
+RDEPENDS:${PN}:append = " fb-common-functions"
 
 do_install:append () {
     install -d ${D}${libexecdir}/mctp
