@@ -28,6 +28,13 @@ PACKAGECONFIG[openpower-pels] = " \
         libpldm python3, \
         python3, \
         "
+PACKAGECONFIG[use-bmc-pos-in-id] = " \
+        -Duse-bmc-pos-in-id=true, \
+        -Duse-bmc-pos-in-id=false \
+        "
+
+PACKAGECONFIG:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'redundant-bmc', 'use-bmc-pos-in-id', '', d)}"
+
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
