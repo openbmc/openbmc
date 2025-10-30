@@ -38,7 +38,7 @@ for svc in "${block_services[@]}"; do
 done
 
 # Safe to power off
-# Wait 8 seconds, checking every second
-power_off_sync 8 1
+# Wait 3 seconds, checking every second
+power_off_sync 3 1
 
 exit 0
