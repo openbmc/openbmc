@@ -26,12 +26,12 @@ PSU_Off_with_VT_Check() {
     wait_counter=0
     while true; do
         if busctl get-property xyz.openbmc_project.EntityManager \
-            /xyz/openbmc_project/inventory/system/cable/ReturnValve \
+            /xyz/openbmc_project/inventory/system/cable/ReturnValve_1_Port \
             xyz.openbmc_project.Inventory.Item.Cable Name >/dev/null 2>&1 ||
             busctl get-property xyz.openbmc_project.EntityManager \
-                /xyz/openbmc_project/inventory/system/cable/SupplyValve \
+                /xyz/openbmc_project/inventory/system/cable/SupplyValve_1_Port \
                 xyz.openbmc_project.Inventory.Item.Cable Name >/dev/null 2>&1; then
-            if (($(get_gpio_val_by_name "RETURN_CNTL_FB_D_R") == 0 || $(get_gpio_val_by_name "SUPPLY_CNTL_FB_D_R") == 0)); then
+            if (($(get_gpio_val_by_name "RETURN_CNTL_FB_D_R") == 0 && $(get_gpio_val_by_name "SUPPLY_CNTL_FB_D_R") == 0)); then
                 PSU_Off "$DetectorName"
                 break
             else
