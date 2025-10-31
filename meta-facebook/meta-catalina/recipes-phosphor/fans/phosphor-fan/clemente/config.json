@@ -313,8 +313,7 @@
         }
     ],
     "fault_handling": {
-        "num_nonfunc_rotors_before_warning": 2,
-        "num_nonfunc_rotors_before_fatal": 3,
+        "num_nonfunc_rotors_before_error": 3,
         "power_off_config": [
             {
                 "type": "soft",
