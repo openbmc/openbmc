@@ -11,6 +11,7 @@ inherit systemd
 SRC_URI += " \
   file://50-gbmc-nic.rules.in \
   file://10-dhcp4.conf \
+  file://10-l2br.conf \
   file://-bmc-nic.network.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-nic-dhcrelay.sh.in'} \
   file://gbmc-nic-neigh.sh.in \
@@ -72,22 +73,34 @@ do_install() {
   fi
 }
 
+do_install:append:mfg() {
+  # For mfg builds, enable l2 bridge on external interfaces.
+  for intf in ${GBMC_EXT_NICS}; do
+    install -d -m0755 $netdir/-bmc-$intf.network.d
+    install -m0644 ${UNPACKDIR}/10-l2br.conf $netdir/-bmc-$intf.network.d/10-l2br.conf
+  done
+}
+
+MFG_IMAGE = "${@'1' if "mfg" in d.getVar('OVERRIDES').split(':') else '0'}"
+
 do_install:append:local() {
+  # stop dhcp on external port as it will be on l2 bridge in mfg build
+  [ "${MFG_IMAGE}" = "1" ] && return
   # For local builds, enable DHCP4 on all external interfaces.
   for intf in ${GBMC_EXT_NICS}; do
     install -d -m0755 $netdir/-bmc-$intf.network.d
-    install -m0644 ${WORKDIR}/10-dhcp4.conf $netdir/-bmc-$intf.network.d/10-dhcp4.conf
+    install -m0644 ${UNPACKDIR}/10-dhcp4.conf $netdir/-bmc-$intf.network.d/10-dhcp4.conf
   done
 
   mondir=${D}${datadir}/gbmc-ip-monitor
   install -d -m0755 $mondir
-  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${WORKDIR}/gbmc-nic-cn.sh.in \
+  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${UNPACKDIR}/gbmc-nic-cn.sh.in \
     >$mondir/gbmc-nic-cn.sh
 }
 
 do_install:append:dev() {
   install -d -m0755 ${D}${bindir}
-  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${WORKDIR}/gbmc-nic-devlab-config.sh.in \
+  sed 's,@IFS@,${GBMC_EXT_NICS},g' <${UNPACKDIR}/gbmc-nic-devlab-config.sh.in \
       >${D}${bindir}/gbmc-nic-devlab-config.sh
   chmod 755 ${D}${bindir}/gbmc-nic-devlab-config.sh
 }

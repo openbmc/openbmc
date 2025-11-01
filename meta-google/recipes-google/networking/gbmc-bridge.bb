@@ -27,6 +27,8 @@ SRC_URI += " \
   file://50-gbmc-psu-hardreset.sh.in \
   file://51-gbmc-reboot.sh \
   file://gbmc-br-dhcp@.service \
+  file://l2-br-dhcp4.service \
+  file://l2-br-dhcp6.service \
   file://gbmc-br-dhcp-term.sh \
   file://gbmc-br-dhcp-term.service \
   file://gbmc-br-lib.sh \
@@ -235,6 +237,16 @@ do_install() {
     install -m0644 ${UNPACKDIR}/-bmc-gbmcbrdhcp.netdev $netdir/
     install -m0644 ${UNPACKDIR}/-bmc-gbmcbrdhcp.network $netdir/
   fi
+}
+
+SYSTEMD_SERVICE:${PN}:append:mfg = " \
+    l2-br-dhcp4.service \
+    l2-br-dhcp6.service \
+  "
+
+do_install:append:mfg() {
+  install -m0644 ${UNPACKDIR}/l2-br-dhcp4.service ${D}${systemd_system_unitdir}/
+  install -m0644 ${UNPACKDIR}/l2-br-dhcp6.service ${D}${systemd_system_unitdir}/
 }
 
 do_rm_work:prepend() {

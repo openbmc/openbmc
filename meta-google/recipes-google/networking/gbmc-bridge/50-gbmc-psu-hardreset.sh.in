@@ -34,7 +34,9 @@ gbmc_psu_hardreset_hook() {
   update_netboot_status "pwr_check" "Power cycle needed" "SUCCESS"
 
   update_netboot_status "pwr_req" "Starting power cycle request" "START"
-  if [[ "${COORDINATED_POWERCYCLE}" == "true" ]]; then
+  # Don't do coordinated powercycle for standard l2 dhcp
+  # shellcheck disable=SC2154
+  if [[ "${interface}" != "l2br" && "${COORDINATED_POWERCYCLE}" == "true" ]]; then
     update_netboot_status "pwr_req" "Requesting powercycle" "SUCCESS"
     update-dhcp-status 'POWERCYCLE' "netboot powercycle" || return
   else

@@ -82,61 +82,70 @@ if [ "$1" = bound ]; then
   update_netboot_status "netboot" "BMC netboot started" "START"
   # Variable is from the environment via udhcpc6
   # shellcheck disable=SC2154
-  update_netboot_status "dhcp" "Received dhcp response ${ipv6}, ${fqdn}, ${bootfile_url}" "START"
-
-  # Check for our multi-IP DHCP patch and emit messages about support
-  # we want to support both since the patch resides in a different layer
-  if [[ -n "${ipv6_0-}" ]]; then
-    update_netboot_status "dhcp" "Multi-IP is supported" "ONGOING"
-  else
-    update_netboot_status "dhcp" "Multi-IP not supported" "ONGOING"
-    ipv6_0="$ipv6"
+  if [ -z "${bootfile_url}" ]; then
+    # for ipv4 bootfile_url is bootfile
+    bootfile_url="${bootfile}"
   fi
-
-  ipv6s=()
-  for (( i=0;; ++i )); do
-    declare -n ip="ipv6_$i"
-    [[ -z "${ip-}" ]] && break
-
-    pfx_bytes=()
-    ip_to_bytes pfx_bytes "$ip"
-
-    # Ensure we are a BMC and have a suffix nibble, the 0th index is reserved
-    # Alternatively, we may also have received a /64 for the OOB address
-    if (( pfx_bytes[8] != 0xfd || (pfx_bytes[9] & 0xf) == 0 )) &&
-       (( pfx_bytes[8] != 0 || pfx_bytes[9] != 0 )); then
-      update_netboot_status "dhcp" "Invalid address prefix ${ip}" "ONGOING"
-      continue
+  # shellcheck disable=SC2154
+  update_netboot_status "dhcp" "Received dhcp response from ${interface}, ${ipv4} ${ipv6} ${hostname} ${fqdn} ${bootfile_url}" "START"
+  if [[ "$interface" != "l2br" ]]; then
+    # Check for our multi-IP DHCP patch and emit messages about support
+    # we want to support both since the patch resides in a different layer
+    if [[ -n "${ipv6_0-}" ]]; then
+      update_netboot_status "dhcp" "Multi-IP is supported" "ONGOING"
+    else
+      update_netboot_status "dhcp" "Multi-IP not supported" "ONGOING"
+      ipv6_0="$ipv6"
     fi
 
-    # Ensure we don't have more than a /80 address
-    for (( j = 10; j < 16; ++j )); do
-      if (( pfx_bytes[j] != 0 )); then
-        update_netboot_status "dhcp" "Invalid address ${ip}" "ONGOING"
+    ipv6s=()
+    for (( i=0;; ++i )); do
+      declare -n ip="ipv6_$i"
+      [[ -z "${ip-}" ]] && break
+
+      pfx_bytes=()
+      ip_to_bytes pfx_bytes "$ip"
+
+      # Ensure we are a BMC and have a suffix nibble, the 0th index is reserved
+      # Alternatively, we may also have received a /64 for the OOB address
+      if (( pfx_bytes[8] != 0xfd || (pfx_bytes[9] & 0xf) == 0 )) &&
+         (( pfx_bytes[8] != 0 || pfx_bytes[9] != 0 )); then
+        update_netboot_status "dhcp" "Invalid address prefix ${ip}" "ONGOING"
         continue
       fi
+
+      # Ensure we don't have more than a /80 address
+      for (( j = 10; j < 16; ++j )); do
+        if (( pfx_bytes[j] != 0 )); then
+          update_netboot_status "dhcp" "Invalid address ${ip}" "ONGOING"
+          continue
+        fi
+      done
+
+      ipv6s+=("$(ip_bytes_to_str pfx_bytes)")
     done
+    if (( ${#ipv6s[@]} == 0 )); then
+      update_netboot_status "dhcp" "No valid IPv6 Address" "FAIL"
+      exit 1
+    fi
+    # IPs are sent with the primary IP address last, re-order for our list so that the primary is the first address
+    ipv6s=("${ipv6s[-1]}" "${ipv6s[@]:0:${#ipv6s[@]}-1}")
 
-    ipv6s+=("$(ip_bytes_to_str pfx_bytes)")
-  done
-  if (( ${#ipv6s[@]} == 0 )); then
-    update_netboot_status "dhcp" "No valid IPv6 Address" "FAIL"
-    exit 1
+    # we need to set hostname first before IP so logging services report using proper name
+    if [ -n "${fqdn-}" ]; then
+      update_netboot_status "dhcp_name" "Attempting to set hostname ${fqdn}" "START"
+      hostnamectl set-hostname "$fqdn" || true
+      update_netboot_status "dhcp_name" "Succesfully set hostname ${fqdn}" "SUCCESS"
+    fi
+
+    update_netboot_status "dhcp_ip" "Attempt to set ips to ${ipv6s[*]}" "START"
+    gbmc_br_set_ip "${ipv6s[@]}" || exit
+    update_netboot_status "dhcp_ip" "Successfully set ips to ${ipv6s[*]}" "SUCCESS"
+    update_netboot_status "dhcp" "DHCP complete" "SUCCESS"
+  else
+    # skip ip/fqdn set as it is taken care of by networkd
+    update_netboot_status "dhcp" "skip ip/fqdn settings" "SUCCESS"
   fi
-  # IPs are sent with the primary IP address last, re-order for our list so that the primary is the first address
-  ipv6s=("${ipv6s[-1]}" "${ipv6s[@]:0:${#ipv6s[@]}-1}")
-
-  # we need to set hostname first before IP so logging services report using proper name
-  if [ -n "${fqdn-}" ]; then
-    update_netboot_status "dhcp_name" "Attempting to set hostname ${fqdn}" "START"
-    hostnamectl set-hostname "$fqdn" || true
-    update_netboot_status "dhcp_name" "Succesfully set hostname ${fqdn}" "SUCCESS"
-  fi
-
-  update_netboot_status "dhcp_ip" "Attempt to set ips to ${ipv6s[*]}" "START"
-  gbmc_br_set_ip "${ipv6s[@]}" || exit
-  update_netboot_status "dhcp_ip" "Successfully set ips to ${ipv6s[*]}" "SUCCESS"
-  update_netboot_status "dhcp" "DHCP complete" "SUCCESS"
 
   gbmc_br_run_hooks GBMC_BR_DHCP_HOOKS || exit
 

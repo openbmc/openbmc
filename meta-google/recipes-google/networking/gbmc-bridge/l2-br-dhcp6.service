@@ -1,0 +1,15 @@
+[Unit]
+Description=gBMC L2 Bridge DHCPv6 Client
+After=network.target dhcp-done.service
+Wants=dhcp-done.service
+StartLimitIntervalSec=10
+StartLimitBurst=3
+
+[Service]
+EnvironmentFile=/usr/share/br-dhcp-env
+Restart=on-failure
+RestartSec=5
+ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i l2br -s /usr/libexec/gbmc-br-dhcp.sh ${L2BR_VENDOR_CLASS_V6}
+
+[Install]
+WantedBy=multi-user.target
