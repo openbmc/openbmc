@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Workaround for non-standard usage: flashing Bletchley15 firmware on
+# BletchleyV1 hardware.
+# MAC address is in different FRU fields between platforms.
+# EntityManager creates baseboard inventory based on detected hardware.
+# phosphor-network-manager queries NetworkInterface and uses the MAC
+# without checking the object path when only one interface exists.
+# So this waits for the correct baseboard object before
+# phosphor-network-manager starts.
+
+PATHS=(
+    "/xyz/openbmc_project/inventory/system/board/Bletchley15_Baseboard"
+    "/xyz/openbmc_project/inventory/system/board/Bletchley_Baseboard"
+)
+
+for _ in {1..20}; do
+    for path in "${PATHS[@]}"; do
+        if mapper get-service "$path" >/dev/null 2>&1; then
+            echo "Found $path"
+            exit 0
+        fi
+    done
+    sleep 1
+done
+
+exit 1
