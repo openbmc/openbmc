@@ -247,16 +247,30 @@
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "VR_N1_TEMP",
+                    "ParamName": "VR_N1_0_TEMP",
                     "Desc": {
-                        "Name": "PDB_VR_P12V_N1_TEMP_C",
+                        "Name": "PDB_VR_P12V_N1_0_TEMP_C",
                         "SensorType": "temperature"
                     }
                 },
                 {
-                    "ParamName": "VR_N2_TEMP",
+                    "ParamName": "VR_N1_1_TEMP",
                     "Desc": {
-                        "Name": "PDB_VR_P12V_N2_TEMP_C",
+                        "Name": "PDB_VR_P12V_N1_1_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "VR_N2_0_TEMP",
+                    "Desc": {
+                        "Name": "PDB_VR_P12V_N2_0_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "VR_N2_1_TEMP",
+                    "Desc": {
+                        "Name": "PDB_VR_P12V_N2_1_TEMP_C",
                         "SensorType": "temperature"
                     }
                 },
@@ -291,7 +305,7 @@
             ]
         },
         "Expression": [
-            "max(0, VR_N1_TEMP, VR_N2_TEMP, BRICK0_N1_TEMP, BRICK1_N1_TEMP, BRICK0_N2_TEMP, BRICK1_N2_TEMP)"
+            "max(0, VR_N1_0_TEMP, VR_N1_1_TEMP, VR_N2_0_TEMP, VR_N2_1_TEMP, BRICK0_N1_TEMP, BRICK1_N1_TEMP, BRICK0_N2_TEMP, BRICK1_N2_TEMP)"
         ]
     }
 ]
