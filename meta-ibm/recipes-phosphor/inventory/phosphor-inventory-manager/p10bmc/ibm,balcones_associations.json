@@ -909,7 +909,7 @@
                 {
                     "types": {
                         "rType": "contained_by",
-                        "fType": "contains"
+                        "fType": "containing"
                     },
                     "paths": [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme0/dp0_drive0"
@@ -946,7 +946,7 @@
                 {
                     "types": {
                         "rType": "contained_by",
-                        "fType": "contains"
+                        "fType": "containing"
                     },
                     "paths": [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme1/dp0_drive1"
@@ -983,10 +983,10 @@
                 {
                     "types": {
                         "rType": "contained_by",
-                        "fType": "contains"
+                        "fType": "containing"
                     },
                     "paths": [
-                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane2/nvme2/dp0_drive2"
+                        "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme2/dp0_drive2"
                     ]
                 }
             ]
@@ -1020,7 +1020,7 @@
                 {
                     "types": {
                         "rType": "contained_by",
-                        "fType": "contains"
+                        "fType": "containing"
                     },
                     "paths": [
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/nvme3/dp0_drive3"
