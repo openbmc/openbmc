@@ -1,6 +1,11 @@
 #!/bin/sh
 
 export LC_ALL=en_US.UTF-8
+
+# The pipefail option is now part of POSIX (POSIX.1-2024) and available in more
+# and more shells. Enable it if available to make the SDK installer more robust.
+(set -o pipefail 2> /dev/null) && set -o pipefail
+
 #Make sure at least one python is installed
 INIT_PYTHON=$(which python3 2>/dev/null )
 [ -z "$INIT_PYTHON" ] && INIT_PYTHON=$(which python2 2>/dev/null)
@@ -164,7 +169,9 @@ else
 fi
 
 # limit the length for target_sdk_dir, ensure the relocation behaviour in relocate_sdk.py has right result.
-if [ ${#target_sdk_dir} -gt 2048 ]; then
+# This is due to ELF interpreter being set to 'a'*1024 in
+# meta/recipes-core/meta/uninative-tarball.bb
+if [ ${#target_sdk_dir} -gt 1024 ]; then
 	echo "Error: The target directory path is too long!!!"
 	exit 1
 fi
@@ -284,6 +291,10 @@ post_relocate="$target_sdk_dir/post-relocate-setup.sh"
 if [ -e "$post_relocate" ]; then
 	$SUDO_EXEC sed -e "s:@SDKPATH@:$target_sdk_dir:g" -i $post_relocate
 	$SUDO_EXEC /bin/sh $post_relocate "$target_sdk_dir" "@SDKPATH@"
+	if [ $? -ne 0 ]; then
+		echo "Executing $post_relocate failed"
+		exit 1
+	fi
 	$SUDO_EXEC rm -f $post_relocate
 fi
 

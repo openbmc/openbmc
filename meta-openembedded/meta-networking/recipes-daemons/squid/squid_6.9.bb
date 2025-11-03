@@ -20,6 +20,8 @@ SRC_URI = "http://www.squid-cache.org/Versions/v${MAJ_VER}/${BPN}-${PV}.tar.xz \
            file://volatiles.03_squid \
            file://0002-squid-make-squid-conf-tests-run-on-target-device.patch \
            file://squid.nm \
+           file://CVE-2024-37894.patch \
+           file://CVE-2025-59362.patch \
            "
 
 SRC_URI[sha256sum] = "1ad72d46e1cb556e9561214f0fb181adb87c7c47927ef69bc8acd68a03f61882"
@@ -146,3 +148,9 @@ FILES:${PN}-networkmanager = "${libdir}/NetworkManager/dispatcher.d"
 
 RDEPENDS:${PN} += "perl ${PN}-conf"
 RDEPENDS:${PN}-ptest += "perl make bash"
+
+python() {
+    # Only ESI feature is vulnerable
+    if not bb.utils.filter('PACKAGECONFIG', 'esi', d):
+        d.setVarFlag("CVE_STATUS", "CVE-2024-45802", "not-applicable-config: esi is disabled")
+}

@@ -52,19 +52,24 @@ for them for significant issues.
 Security-related discussions at the Yocto Project
 -------------------------------------------------
 
-We have set up two security-related mailing lists:
+We have set up two security-related emails/mailing lists:
 
-  -  Public List: yocto [dash] security [at] yoctoproject[dot] org
+  -  Public Mailing List: yocto [dash] security [at] yoctoproject[dot] org
 
-    This is a public mailing list for anyone to subscribe to. This list is an
-    open list to discuss public security issues/patches and security-related
-    initiatives. For more information, including subscription information,
-    please see the  :yocto_lists:`yocto-security mailing list info page </g/yocto-security>`.
+     This is a public mailing list for anyone to subscribe to. This list is an
+     open list to discuss public security issues/patches and security-related
+     initiatives. For more information, including subscription information,
+     please see the  :yocto_lists:`yocto-security mailing list info page
+     </g/yocto-security>`.
 
-  - Private List: security [at] yoctoproject [dot] org
+     This list requires moderator approval for new topics to be posted, to avoid
+     private security reports to be posted by mistake.
 
-    This is a private mailing list for reporting non-published potential
-    vulnerabilities. The list is monitored by the Yocto Project Security team.
+  -  Yocto Project Security Team: security [at] yoctoproject [dot] org
+
+     This is an email for reporting non-published potential vulnerabilities.
+     Emails sent to this address are forwarded to the Yocto Project Security
+     Team members.
 
 
 What you should do if you find a security vulnerability

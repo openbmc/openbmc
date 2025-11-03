@@ -13,6 +13,7 @@ SRC_URI = " \
     file://0001-Search-for-cython3.patch \
     file://0002-fix-fail-to-enable-bluetooth.patch \
     file://0001-meson-add-pythoninstalldir-option.patch \
+    file://0001-meson-DO-not-emit-absolute-path-when-S-B.patch \
 "
 S = "${WORKDIR}/git"
 SRCREV = "c85e7afb8d6547d4c35b7b639124de8e999c3650"

@@ -16,6 +16,7 @@ DEPENDS = " \
     gexiv2 \
     gnome-online-accounts \
     gsettings-desktop-schemas \
+    itstool-native \
     libdazzle \
     tracker \
     libhandy \

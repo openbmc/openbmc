@@ -16,6 +16,7 @@ DEPENDS = " \
     graphene \
     harfbuzz \
     jpeg \
+    libdrm \
     libepoxy \
     libpng \
     librsvg \

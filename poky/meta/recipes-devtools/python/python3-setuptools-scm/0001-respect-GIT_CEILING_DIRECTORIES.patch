@@ -1,0 +1,36 @@
+From a1cc419a118560d63e1ab8838c256a3622185750 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Thu, 13 Feb 2025 15:44:40 +0100
+Subject: [PATCH] respect GIT_CEILING_DIRECTORIES
+
+Fix for https://github.com/pypa/setuptools-scm/issues/1103
+
+When searching for the root-directory of the git repository e.g. with git rev-parse --show-toplevel,
+git stops the search when reaching $GIT_CEILING_DIRECTORIES. By ignoring this variable, the function
+_git_toplevel can go above the real git repository (e.g. when packaging a tarball without .git repository),
+and then runs "git archive" on an unrelated git repository.
+
+Upstream-Status: Pending
+
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ src/setuptools_scm/_run_cmd.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/setuptools_scm/_run_cmd.py b/src/setuptools_scm/_run_cmd.py
+index f2a8285..7e13d9f 100644
+--- a/src/setuptools_scm/_run_cmd.py
++++ b/src/setuptools_scm/_run_cmd.py
+@@ -98,7 +98,7 @@ def no_git_env(env: Mapping[str, str]) -> dict[str, str]:
+         k: v
+         for k, v in env.items()
+         if not k.startswith("GIT_")
+-        or k in ("GIT_EXEC_PATH", "GIT_SSH", "GIT_SSH_COMMAND")
++        or k in ("GIT_CEILING_DIRECTORIES", "GIT_EXEC_PATH", "GIT_SSH", "GIT_SSH_COMMAND")
+     }
+ 
+ 
+-- 
+2.43.0
+

@@ -15,7 +15,6 @@ KNOWN_NON_REPRO_META_NETWORKING = " \
     htpdate-doc \
     keepalived \
     keepalived-dbg \
-    kernel-module-mdio-netlink-6.6.17-yocto-standard \
     libbearssl-staticdev \
     libfko3 \
     libfko-client \
@@ -25,7 +24,6 @@ KNOWN_NON_REPRO_META_NETWORKING = " \
     libowfat-staticdev \
     libruli-staticdev \
     libsamba-util0 \
-    mdio-netlink-dbg \
     mosquitto \
     mosquitto-dbg \
     ncftp \

@@ -103,6 +103,11 @@ do_configure() {
         ${B}/examples/*.pl
 }
 
+do_install:append:class-native() {
+    # Replace the shebang line in cgi-demo.cgi
+    sed -i '1s|^.*$|#!/usr/bin/env rrdcgi|' ${D}${datadir}/rrdtool/examples/cgi-demo.cgi
+}
+
 PACKAGES =+ "${PN}-perl ${PN}-python"
 PACKAGES =+ "rrdcached"
 

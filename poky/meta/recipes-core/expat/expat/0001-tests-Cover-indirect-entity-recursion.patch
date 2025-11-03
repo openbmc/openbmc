@@ -1,0 +1,103 @@
+From 3d5fdbb44e80ed789e4f6510542d77d6284fbd0e Mon Sep 17 00:00:00 2001
+From: Sebastian Pipping <sebastian@pipping.org>
+Date: Sat, 23 Nov 2024 14:20:21 +0100
+Subject: [PATCH] tests: Cover indirect entity recursion
+
+Upstream-Status: Backport [https://github.com/libexpat/libexpat/commit/3d5fdbb44e80ed789e4f6510542d77d6284fbd0e]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ expat/tests/basic_tests.c | 74 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
+
+diff --git a/expat/tests/basic_tests.c b/expat/tests/basic_tests.c
+index d38b8fd1..d2306772 100644
+--- a/expat/tests/basic_tests.c
++++ b/expat/tests/basic_tests.c
+@@ -1202,6 +1202,79 @@ START_TEST(test_wfc_no_recursive_entity_refs) {
+ }
+ END_TEST
+ 
++START_TEST(test_no_indirectly_recursive_entity_refs) {
++  struct TestCase {
++    const char *doc;
++    bool usesParameterEntities;
++  };
++
++  const struct TestCase cases[] = {
++      // general entity + character data
++      {"<!DOCTYPE a [\n"
++       "  <!ENTITY e1 '&e2;'>\n"
++       "  <!ENTITY e2 '&e1;'>\n"
++       "]><a>&e2;</a>\n",
++       false},
++
++      // general entity + attribute value
++      {"<!DOCTYPE a [\n"
++       "  <!ENTITY e1 '&e2;'>\n"
++       "  <!ENTITY e2 '&e1;'>\n"
++       "]><a k1='&e2;' />\n",
++       false},
++
++      // parameter entity
++      {"<!DOCTYPE doc [\n"
++       "  <!ENTITY % p1 '&#37;p2;'>\n"
++       "  <!ENTITY % p2 '&#37;p1;'>\n"
++       "  <!ENTITY % define_g \"<!ENTITY g '&#37;p2;'>\">\n"
++       "  %define_g;\n"
++       "]>\n"
++       "<doc/>\n",
++       true},
++  };
++  for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
++    const char *const doc = cases[i].doc;
++    const bool usesParameterEntities = cases[i].usesParameterEntities;
++
++    set_subtest("[%i] %s", (int)i, doc);
++
++#ifdef XML_DTD // both GE and DTD
++    const bool rejection_expected = true;
++#elif XML_GE == 1 // GE but not DTD
++    const bool rejection_expected = ! usesParameterEntities;
++#else             // neither DTD nor GE
++    const bool rejection_expected = false;
++#endif
++
++    XML_Parser parser = XML_ParserCreate(NULL);
++
++#ifdef XML_DTD
++    if (usesParameterEntities) {
++      assert_true(
++          XML_SetParamEntityParsing(parser, XML_PARAM_ENTITY_PARSING_ALWAYS)
++          == 1);
++    }
++#else
++    UNUSED_P(usesParameterEntities);
++#endif // XML_DTD
++
++    const enum XML_Status status
++        = _XML_Parse_SINGLE_BYTES(parser, doc, (int)strlen(doc),
++                                  /*isFinal*/ XML_TRUE);
++
++    if (rejection_expected) {
++      assert_true(status == XML_STATUS_ERROR);
++      assert_true(XML_GetErrorCode(parser) == XML_ERROR_RECURSIVE_ENTITY_REF);
++    } else {
++      assert_true(status == XML_STATUS_OK);
++    }
++
++    XML_ParserFree(parser);
++  }
++}
++END_TEST
++
+ START_TEST(test_recursive_external_parameter_entity_2) {
+   struct TestCase {
+     const char *doc;
+@@ -5969,6 +6042,7 @@ make_basic_test_case(Suite *s) {
+   tcase_add_test(tc_basic, test_not_standalone_handler_reject);
+   tcase_add_test(tc_basic, test_not_standalone_handler_accept);
+   tcase_add_test__if_xml_ge(tc_basic, test_wfc_no_recursive_entity_refs);
++  tcase_add_test(tc_basic, test_no_indirectly_recursive_entity_refs);
+   tcase_add_test__ifdef_xml_dtd(tc_basic, test_ext_entity_invalid_parse);
+   tcase_add_test__if_xml_ge(tc_basic, test_dtd_default_handling);
+   tcase_add_test(tc_basic, test_dtd_attr_handling);

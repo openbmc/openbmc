@@ -1,0 +1,38 @@
+From 18af739fd96960bbc8c5db5dd290d2f9134cd347 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 14 Aug 2024 21:26:24 -0700
+Subject: [PATCH] meson: DO not emit absolute path when S != B
+
+build systems like OE build outside sourcetree in such cases it works
+ok but cython resolves the input file to absolute path and that gets
+emitted into genetate _blueman.c as module name, renders the build
+non-reproducible, wish cython had a better way to handle this but there
+is not, therefore tweak the meson build rule to account for specifying
+workdir to cython which will search the inputs correctly, and use
+meson's build_root to emit the output into build dir. This ensures that
+it becomes independent of source or build directories and cython does
+not generate the absolute paths into generate C code.
+
+See cython discussion on [1]
+
+[1] https://github.com/cython/cython/issues/5949
+
+Upstream-Status: Submitted [https://github.com/blueman-project/blueman/pull/2461]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ module/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/module/meson.build b/module/meson.build
+index 096ad7c8..e3d96f17 100644
+--- a/module/meson.build
++++ b/module/meson.build
+@@ -4,7 +4,7 @@ blueman_c = custom_target(
+     'blueman_c',
+     output: '_blueman.c',
+     input: '_blueman.pyx',
+-    command: [cython, '--output-file', '@OUTPUT@', '@INPUT@'])
++    command: [cython, '-w', meson.source_root(), '--output-file', meson.build_root() + '/' + '@OUTPUT@', '@INPUT@'])
+ 
+ sources = [
+     blueman_c,

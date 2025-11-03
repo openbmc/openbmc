@@ -1,0 +1,29 @@
+From dd03da772bfad6174425066ff9752b60e25ed183 Mon Sep 17 00:00:00 2001
+From: Sergey Ponomarev <stokito@gmail.com>
+Date: Sun, 7 Apr 2024 21:16:50 +0300
+Subject: [PATCH] cli-runopts.c add missing DROPBEAR_CLI_PUBKEY_AUTH
+
+Upstream-Status: Backport [https://github.com/mkj/dropbear/commit/dd03da772bfad6174425066ff9752b60e25ed183]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ cli-runopts.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cli-runopts.c b/cli-runopts.c
+index 219fc53..b853a13 100644
+--- a/cli-runopts.c
++++ b/cli-runopts.c
+@@ -541,11 +541,13 @@ static char* multihop_passthrough_args(void) {
+ 	if (cli_opts.proxycmd) {
+ 		len += strlen(cli_opts.proxycmd);
+ 	}
++#if DROPBEAR_CLI_PUBKEY_AUTH
+ 	for (iter = cli_opts.privkeys->first; iter; iter = iter->next)
+ 	{
+ 		sign_key * key = (sign_key*)iter->item;
+ 		len += 4 + strlen(key->filename);
+ 	}
++#endif
+ 
+ 	args = m_malloc(len);
+ 	total = 0;

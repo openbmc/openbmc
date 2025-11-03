@@ -2,7 +2,7 @@ SUMMARY = "User space daemon for extended IEEE 802.11 management"
 HOMEPAGE = "http://w1.fi/hostapd/"
 SECTION = "kernel/userland"
 LICENSE = "BSD-3-Clause"
-LIC_FILES_CHKSUM = "file://hostapd/README;md5=c905478466c90f1cefc0df987c40e172"
+LIC_FILES_CHKSUM = "file://hostapd/README;beginline=5;endline=47;md5=aa03b8bd6216d1a7ca01fd4b89863073"
 
 DEPENDS = "libnl openssl"
 
@@ -11,13 +11,23 @@ SRC_URI = " \
     file://defconfig \
     file://init \
     file://hostapd.service \
+    file://CVE-2024-3596_00.patch \
+    file://CVE-2024-3596_01.patch \
+    file://CVE-2024-3596_02.patch \
+    file://CVE-2024-3596_04.patch \
+    file://CVE-2024-3596_05.patch \
+    file://CVE-2024-3596_06.patch \
+    file://CVE-2024-3596_07.patch \
+    file://CVE-2024-3596_08.patch \
+    file://0001-SAE-Check-for-invalid-Rejected-Groups-element-length.patch \
+    file://0003-SAE-Reject-invalid-Rejected-Groups-element-in-the-pa.patch \
+    file://CVE-2023-52160.patch \
+    file://CVE-2025-24912_01.patch \
+    file://CVE-2025-24912_02.patch \
 "
 
 
 SRC_URI[sha256sum] = "206e7c799b678572c2e3d12030238784bc4a9f82323b0156b4c9466f1498915d"
-
-S = "${WORKDIR}/hostapd-${PV}"
-B = "${WORKDIR}/hostapd-${PV}/hostapd"
 
 inherit update-rc.d systemd pkgconfig features_check
 
@@ -29,20 +39,20 @@ SYSTEMD_SERVICE:${PN} = "hostapd.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
 do_configure:append() {
-    install -m 0644 ${WORKDIR}/defconfig ${B}/.config
+    install -m 0644 ${WORKDIR}/defconfig ${B}/hostapd/.config
 }
 
 do_compile() {
     export CFLAGS="-MMD -O2 -Wall -g"
     export EXTRA_CFLAGS="${CFLAGS}"
-    make V=1
+    make -C hostapd V=1
 }
 
 do_install() {
     install -d ${D}${sbindir} ${D}${sysconfdir}/init.d ${D}${systemd_unitdir}/system/
-    install -m 0644 ${B}/hostapd.conf ${D}${sysconfdir}
-    install -m 0755 ${B}/hostapd ${D}${sbindir}
-    install -m 0755 ${B}/hostapd_cli ${D}${sbindir}
+    install -m 0644 ${B}/hostapd/hostapd.conf ${D}${sysconfdir}
+    install -m 0755 ${B}/hostapd/hostapd ${D}${sbindir}
+    install -m 0755 ${B}/hostapd/hostapd_cli ${D}${sbindir}
     install -m 755 ${WORKDIR}/init ${D}${sysconfdir}/init.d/hostapd
     install -m 0644 ${WORKDIR}/hostapd.service ${D}${systemd_unitdir}/system/
     sed -i -e 's,@SBINDIR@,${sbindir},g' -e 's,@SYSCONFDIR@,${sysconfdir},g' ${D}${systemd_unitdir}/system/hostapd.service

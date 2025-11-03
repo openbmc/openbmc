@@ -28,6 +28,8 @@ SRC_URI = "git://git.kernel.dk/fio.git;branch=master"
 
 S = "${WORKDIR}/git"
 
+SRC_URI += "file://CVE-2025-10823.patch"
+
 # avoids build breaks when using no-static-libs.inc
 DISABLE_STATIC = ""
 

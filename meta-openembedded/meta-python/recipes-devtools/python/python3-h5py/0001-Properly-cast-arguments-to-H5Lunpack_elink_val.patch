@@ -1,0 +1,25 @@
+From 30a59c233fbe149109f378837642dc02b2caf3f5 Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Thu, 15 Feb 2024 20:47:50 -0700
+Subject: [PATCH] Properly cast arguments to H5Lunpack_elink_val
+
+Upstream-Status: Backport [https://github.com/h5py/h5py/pull/2380/commits/704e13ac83b42898514610c4df9f32f367e767e4]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ h5py/h5l.pyx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/h5py/h5l.pyx b/h5py/h5l.pyx
+index 60b252f..af725bd 100644
+--- a/h5py/h5l.pyx
++++ b/h5py/h5l.pyx
+@@ -184,7 +184,7 @@ cdef class LinkProxy:
+             if info.type == H5L_TYPE_SOFT:
+                 py_retval = buf
+             else:
+-                H5Lunpack_elink_val(buf, buf_size, &wtf, &ext_file_name, &ext_obj_name)
++                H5Lunpack_elink_val(buf, buf_size, &wtf, <const char **>&ext_file_name, <const char **>&ext_obj_name)
+                 py_retval = (bytes(ext_file_name), bytes(ext_obj_name))
+         finally:
+             efree(buf)

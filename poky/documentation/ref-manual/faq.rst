@@ -45,6 +45,28 @@ See :yocto_wiki:`Products that use the Yocto Project
 Wiki. Don't hesitate to contribute to this page if you know other such
 products.
 
+Why isn't systemd the default init system for OpenEmbedded-Core/Yocto Project or in Poky?
+-----------------------------------------------------------------------------------------
+
+`systemd <https://systemd.io/>`__ is a desktop Linux init system with a specific
+focus that is not entirely aligned with a customisable "embedded" build
+system/environment.
+
+It understandably mandates certain layouts and configurations which may
+or may not align with what the objectives and direction :term:`OpenEmbedded-Core
+(OE-Core)` or Yocto Project want to take. It doesn't support all of our targets.
+For example `musl <https://www.musl-libc.org/>`__ support in systemd is
+problematic.
+
+If it were our default, we would have to align with all their choices
+and this doesn't make sense. It is therefore a configuration option and
+available to anyone where the design goals align. But we are clear it
+is not the only way to handle init.
+
+Our automated testing includes it through the ``poky-altcfg`` :term:`DISTRO` and
+we don't really need it to be the default: it is tested, it works, and people
+can choose to use it.
+
 Building environment
 ====================
 
@@ -258,6 +280,25 @@ anything you want.
 Within the :term:`Build Directory`, is the ``tmp`` directory. To remove all the
 build output yet preserve any source code or downloaded files from
 previous builds, simply remove the ``tmp`` directory.
+
+Why isn't there a way to append bbclass files like bbappend for recipes?
+------------------------------------------------------------------------
+
+The Yocto Project has consciously chosen not to implement such functionality.
+Class code is designed to be shared and reused, and exposes some level of
+configuration to its users. We want to encourage people to share these changes
+so we can build the best classes.
+
+If the ``append`` functionality was available for classes, our evidence and
+experience suggest that people would create their custom changes in their
+layer instead of sharing and discussing the issues and/or limitations they
+encountered. This would lead to bizarre class interactions when new layers are
+included. We therefore consciously choose to have a natural pressure to share
+class code improvements or fixes.
+
+There are also technical considerations like which recipes a class append would
+apply to and how that would fit within the layer model. These are complications
+we think we can live without!
 
 Customizing generated images
 ============================

@@ -11,14 +11,14 @@ Known Issues in 3.4.1
 Security Fixes in 3.4.1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
--  glibc: Backport fix for :cve:`2021-43396`
--  vim: add patch number to :cve:`2021-3778` patch
--  vim: fix :cve:`2021-3796`, :cve:`2021-3872`, and :cve:`2021-3875`
--  squashfs-tools: follow-up fix for :cve:`2021-41072`
+-  glibc: Backport fix for :cve_nist:`2021-43396`
+-  vim: add patch number to :cve_nist:`2021-3778` patch
+-  vim: fix :cve_nist:`2021-3796`, :cve_nist:`2021-3872`, and :cve_nist:`2021-3875`
+-  squashfs-tools: follow-up fix for :cve_nist:`2021-41072`
 -  avahi: update CVE id fixed by local-ping.patch
--  squashfs-tools: fix :cve:`2021-41072`
--  ffmpeg: fix :cve:`2021-38114`
--  curl: fix :cve:`2021-22945`, :cve:`2021-22946` and :cve:`2021-22947`
+-  squashfs-tools: fix :cve_nist:`2021-41072`
+-  ffmpeg: fix :cve_nist:`2021-38114`
+-  curl: fix :cve_nist:`2021-22945`, :cve_nist:`2021-22946` and :cve_nist:`2021-22947`
 
 Fixes in 3.4.1
 ~~~~~~~~~~~~~~

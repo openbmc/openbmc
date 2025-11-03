@@ -65,6 +65,13 @@ use to identify your commits::
    git config --global user.name "Ada Lovelace"
    git config --global user.email "ada.lovelace@gmail.com"
 
+By default, Git adds a signature line at the end of patches containing the Git
+version. We suggest to remove it as it doesn't add useful information.
+
+Remove it with the following command::
+
+   git config --global format.signature ""
+
 Clone the Git repository for the component to modify
 ----------------------------------------------------
 
@@ -116,110 +123,116 @@ to add the upgraded version.
 
       $ git commit -s file1 file2 dir1 dir2 ...
 
-   To include **a**\ ll staged files::
+   To include all staged files::
 
       $ git commit -sa
 
-   -  The ``-s`` option of ``git commit`` adds a "Signed-off-by:" line
-      to your commit message. There is the same requirement for contributing
-      to the Linux kernel. Adding such a line signifies that you, the
-      submitter, have agreed to the `Developer's Certificate of Origin 1.1
-      <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign-your-work-the-developer-s-certificate-of-origin>`__
-      as follows:
+   #.  The ``-s`` option of ``git commit`` adds a "Signed-off-by:" line
+       to your commit message. There is the same requirement for contributing
+       to the Linux kernel. Adding such a line signifies that you, the
+       submitter, have agreed to the `Developer's Certificate of Origin 1.1
+       <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign-your-work-the-developer-s-certificate-of-origin>`__
+       as follows:
 
-      .. code-block:: none
+       .. code-block:: none
 
-         Developer's Certificate of Origin 1.1
+          Developer's Certificate of Origin 1.1
 
-         By making a contribution to this project, I certify that:
+          By making a contribution to this project, I certify that:
 
-         (a) The contribution was created in whole or in part by me and I
-             have the right to submit it under the open source license
-             indicated in the file; or
+          (a) The contribution was created in whole or in part by me and I
+              have the right to submit it under the open source license
+              indicated in the file; or
 
-         (b) The contribution is based upon previous work that, to the best
-             of my knowledge, is covered under an appropriate open source
-             license and I have the right under that license to submit that
-             work with modifications, whether created in whole or in part
-             by me, under the same open source license (unless I am
-             permitted to submit under a different license), as indicated
-             in the file; or
+          (b) The contribution is based upon previous work that, to the best
+              of my knowledge, is covered under an appropriate open source
+              license and I have the right under that license to submit that
+              work with modifications, whether created in whole or in part
+              by me, under the same open source license (unless I am
+              permitted to submit under a different license), as indicated
+              in the file; or
 
-         (c) The contribution was provided directly to me by some other
-             person who certified (a), (b) or (c) and I have not modified
-             it.
+          (c) The contribution was provided directly to me by some other
+              person who certified (a), (b) or (c) and I have not modified
+              it.
 
-         (d) I understand and agree that this project and the contribution
-             are public and that a record of the contribution (including all
-             personal information I submit with it, including my sign-off) is
-             maintained indefinitely and may be redistributed consistent with
-             this project or the open source license(s) involved.
+          (d) I understand and agree that this project and the contribution
+              are public and that a record of the contribution (including all
+              personal information I submit with it, including my sign-off) is
+              maintained indefinitely and may be redistributed consistent with
+              this project or the open source license(s) involved.
 
-   -  Provide a single-line summary of the change and, if more
-      explanation is needed, provide more detail in the body of the
-      commit. This summary is typically viewable in the "shortlist" of
-      changes. Thus, providing something short and descriptive that
-      gives the reader a summary of the change is useful when viewing a
-      list of many commits. You should prefix this short description
-      with the recipe name (if changing a recipe), or else with the
-      short form path to the file being changed.
+   #.  Provide a single-line summary of the change and, if more
+       explanation is needed, provide more detail in the description of the
+       commit. This summary is typically viewable in the "shortlist" of
+       changes. Thus, providing something short and descriptive that
+       gives the reader a summary of the change is useful when viewing a
+       list of many commits. You should prefix this short description
+       with the recipe name (if changing a recipe), or else with the
+       short form path to the file being changed.
+
+       .. note::
+
+          To find a suitable prefix for the commit summary, a good idea
+          is to look for prefixes used in previous commits touching the
+          same files or directories::
+
+             git log --oneline <paths>
+
+   #.  For the commit description, provide detailed information
+       that describes what you changed, why you made the change, and the
+       approach you used. It might also be helpful if you mention how you
+       tested the change. Provide as much detail as you can in the commit
+       description.
+
+       .. note::
+
+          If the single line summary is enough to describe a simple
+          change, the commit description can be left empty.
+
+   #.  If the change addresses a specific bug or issue that is associated
+       with a bug-tracking ID, include a reference to that ID in the body of the
+       commit message. For example, the Yocto Project uses a
+       specific convention for bug references --- any commit that addresses
+       a specific bug should use the following form for the body of the commit
+       message. Be sure to use the actual bug-tracking ID from
+       Bugzilla for bug-id::
+
+          single-line summary of change
+
+          Fixes [YOCTO #bug-id]
+
+          detailed description of change
+
+   #. If other people participated in this patch, add some tags to the commit
+      description to credit other contributors to the change:
+
+      -  ``Reported-by``: name and email of a person reporting a bug
+         that your commit is trying to fix. This is a good practice
+         to encourage people to go on reporting bugs and let them
+         know that their reports are taken into account.
+
+      -  ``Suggested-by``: name and email of a person to credit for the
+         idea of making the change.
+
+      -  ``Tested-by``, ``Reviewed-by``: name and email for people having
+         tested your changes or reviewed their code. These fields are
+         usually added by the maintainer accepting a patch, or by
+         yourself if you submitted your patches to early reviewers,
+         or are submitting an unmodified patch again as part of a
+         new iteration of your patch series.
+
+      -  ``Cc``: name and email of people you want to send a copy
+         of your changes to. This field will be used by ``git send-email``.
+
+      See `more guidance about using such tags
+      <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes>`__
+      in the Linux kernel documentation.
 
       .. note::
 
-         To find a suitable prefix for the commit summary, a good idea
-         is to look for prefixes used in previous commits touching the
-         same files or directories::
-
-            git log --oneline <paths>
-
-   -  For the body of the commit message, provide detailed information
-      that describes what you changed, why you made the change, and the
-      approach you used. It might also be helpful if you mention how you
-      tested the change. Provide as much detail as you can in the body
-      of the commit message.
-
-      .. note::
-
-         If the single line summary is enough to describe a simple
-         change, the body of the commit message can be left empty.
-
-   -  If the change addresses a specific bug or issue that is associated
-      with a bug-tracking ID, include a reference to that ID in your
-      detailed description. For example, the Yocto Project uses a
-      specific convention for bug references --- any commit that addresses
-      a specific bug should use the following form for the detailed
-      description. Be sure to use the actual bug-tracking ID from
-      Bugzilla for bug-id::
-
-         Fixes [YOCTO #bug-id]
-
-         detailed description of change
-
-#. *Crediting contributors:* By using the ``git commit --amend`` command,
-   you can add some tags to the commit description to credit other contributors
-   to the change:
-
-   -  ``Reported-by``: name and email of a person reporting a bug
-      that your commit is trying to fix. This is a good practice
-      to encourage people to go on reporting bugs and let them
-      know that their reports are taken into account.
-
-   -  ``Suggested-by``: name and email of a person to credit for the
-      idea of making the change.
-
-   -  ``Tested-by``, ``Reviewed-by``: name and email for people having
-      tested your changes or reviewed their code. These fields are
-      usually added by the maintainer accepting a patch, or by
-      yourself if you submitted your patches to early reviewers,
-      or are submitting an unmodified patch again as part of a
-      new iteration of your patch series.
-
-   -  ``CC:`` Name and email of people you want to send a copy
-      of your changes to. This field will be used by ``git send-email``.
-
-   See `more guidance about using such tags
-   <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes>`__
-   in the Linux kernel documentation.
+         One can amend an existing git commit message to add missing tags for
+         contributors with the ``git commit --amend`` command.
 
 Test your changes
 -----------------
@@ -483,7 +496,7 @@ typical usage of ``git send-email``::
    git send-email --to <mailing-list-address> *.patch
 
 Then, review each subject line and list of recipients carefully, and then
-and then allow the command to send each message.
+allow the command to send each message.
 
 You will see that ``git send-email`` will automatically copy the people listed
 in any commit tags such as ``Signed-off-by`` or ``Reported-by``.
@@ -769,6 +782,38 @@ argument to ``git format-patch`` with a version number::
 
    git format-patch -v2 <ref-branch>
 
+
+After generating updated patches (v2, v3, and so on) via ``git
+format-patch``, ideally developers will add a patch version changelog
+to each patch that describes what has changed between each revision of
+the patch. Add patch version changelogs after the ``---`` marker in the
+patch, indicating that this information is part of this patch, but is not
+suitable for inclusion in the commit message (i.e. the git history) itself.
+Providing a patch version changelog makes it easier for maintainers and
+reviewers to succinctly understand what changed in all versions of the
+patch, without having to consult alternate sources of information, such as
+searching through messages on a mailing list. For example::
+
+   <patch title>
+
+   <commit message>
+
+   <Signed-off-by/other trailers>
+   ---
+   changes in v4:
+   - provide a clearer commit message
+   - fix spelling mistakes
+
+   changes in v3:
+   - replace func() to use other_func() instead
+
+   changes in v2:
+   - this patch was added in v2
+   ---
+   <diffstat output>
+
+   <unified diff>
+
 Lastly please ensure that you also test your revised changes. In particular
 please don't just edit the patch file written out by ``git format-patch`` and
 resend it.
@@ -825,3 +870,52 @@ Other layers may have similar testing branches but there is no formal
 requirement or standard for these so please check the documentation for the
 layers you are contributing to.
 
+Acceptance of AI Generated Code
+===============================
+
+The Yocto Project and OpenEmbedded follow the guidance of the Linux Foundation
+in regards to the use of generative AI tools. See:
+https://www.linuxfoundation.org/legal/generative-ai.
+
+All of the existing guidelines in this document are expected to be followed,
+including in the :doc:`recipe-style-guide`, and contributing the changes with
+additional requirements to the items in section
+:ref:`contributor-guide/submit-changes:Implement and commit changes`.
+
+All AI Generated Code must be labeled as such in the commit message,
+prior to your ``Signed-off-by`` line. It is also strongly recommended,
+that any patches or code within the commit also have a comment or other
+indication that this code was AI generated.
+
+For example, here is a properly formatted commit message::
+
+   component: Add the ability to ...
+
+   AI-Generated: Uses GitHub Copilot
+
+   Signed-off-by: Your Name <your.name@domain>
+
+The ``Signed-off-by`` line must be written by you, and not the AI helper.
+As a reminder, when contributing a change, your ``Signed-off-by`` line is
+required and the stipulations in the `Developer's Statement of Origin
+1.1 <https://developercertificate.org/>`__ still apply.
+
+Additionally, you must stipulate AI contributions conform to the Linux
+Foundation policy, specifically:
+
+#. Contributors should ensure that the terms and conditions of the generative AI
+   tool do not place any contractual restrictions on how the tool's output can
+   be used that are inconsistent with the project's open source software
+   license, the project's intellectual property policies, or the Open Source
+   Definition.
+
+#. If any pre-existing copyrighted materials (including pre-existing open
+   source code) authored or owned by third parties are included in the AI tool's
+   output, prior to contributing such output to the project, the Contributor
+   should confirm that they have permission from the third party
+   owners -- such as the form of an open source license or public domain
+   declaration that complies with the project's licensing policies -- to use and
+   modify such pre-existing materials and contribute them to the project.
+   Additionally, the contributor should provide notice and attribution of such
+   third party rights, along with information about the applicable license
+   terms, with their contribution.

@@ -1,0 +1,124 @@
+From 62de06c7a443a5ac40ab2a4f2589625932bf9632 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Tue, 24 Sep 2024 09:50:34 +0300
+Subject: [PATCH 01/13] qtdemux: Skip zero-sized boxes instead of stopping to
+ look at further boxes
+
+A zero-sized box is not really a problem and can be skipped to look at any
+possibly following ones.
+
+BMD ATEM devices specifically write a zero-sized bmdc box in the sample
+description, followed by the avcC box in case of h264. Previously the avcC box
+would simply not be read at all and the file would be unplayable.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/7620>
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/62de06c7a443a5ac40ab2a4f2589625932bf9632]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 54 +++++++++++++++++++++++++++++---------------
+ 1 file changed, 36 insertions(+), 18 deletions(-)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index a53d61e649..2f2ca4459b 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -11666,9 +11666,12 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+               else
+                 size = len - 0x8;
+ 
+-              if (size < 1)
+-                /* No real data, so break out */
+-                break;
++              /* No real data, so skip */
++              if (size < 1) {
++                len -= 8;
++                avc_data += 8;
++                continue;
++              }
+ 
+               switch (QT_FOURCC (avc_data + 0x4)) {
+                 case FOURCC_avcC:
+@@ -11783,9 +11786,12 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+               else
+                 size = len - 0x8;
+ 
+-              if (size < 1)
+-                /* No real data, so break out */
+-                break;
++              /* No real data, so skip */
++              if (size < 1) {
++                len -= 8;
++                hevc_data += 8;
++                continue;
++              }
+ 
+               switch (QT_FOURCC (hevc_data + 0x4)) {
+                 case FOURCC_hvcC:
+@@ -12207,9 +12213,12 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+               else
+                 size = len - 8;
+ 
+-              if (size < 1)
+-                /* No real data, so break out */
+-                break;
++              /* No real data, so skip */
++              if (size < 1) {
++                len -= 8;
++                vc1_data += 8;
++                continue;
++              }
+ 
+               switch (QT_FOURCC (vc1_data + 0x4)) {
+                 case GST_MAKE_FOURCC ('d', 'v', 'c', '1'):
+@@ -12249,9 +12258,12 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+               else
+                 size = len - 0x8;
+ 
+-              if (size < 1)
+-                /* No real data, so break out */
+-                break;
++              /* No real data, so skip */
++              if (size < 1) {
++                len -= 8;
++                av1_data += 8;
++                continue;
++              }
+ 
+               switch (QT_FOURCC (av1_data + 0x4)) {
+                 case FOURCC_av1C:
+@@ -12359,9 +12371,12 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+               else
+                 size = len - 0x8;
+ 
+-              if (size < 1)
+-                /* No real data, so break out */
+-                break;
++              /* No real data, so skip */
++              if (size < 1) {
++                len -= 8;
++                vpcc_data += 8;
++                continue;
++              }
+ 
+               switch (QT_FOURCC (vpcc_data + 0x4)) {
+                 case FOURCC_vpcC:
+@@ -12861,9 +12876,12 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+             else
+               size = len - 8;
+ 
+-            if (size < 1)
+-              /* No real data, so break out */
+-              break;
++            /* No real data, so skip */
++            if (size < 1) {
++              len -= 8;
++              wfex_data += 8;
++              continue;
++            }
+ 
+             switch (QT_FOURCC (wfex_data + 4)) {
+               case GST_MAKE_FOURCC ('w', 'f', 'e', 'x'):
+-- 
+2.30.2
+

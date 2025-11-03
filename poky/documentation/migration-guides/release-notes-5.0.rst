@@ -217,7 +217,7 @@ New Features / Enhancements in 5.0
       state directory (i.e., ``/run``).
 
    -  Allow to disable colored text output through the
-      `NO_OUTPUT <https://no-color.org/>`__ environment variable.
+      `NO_COLOR <https://no-color.org/>`__ environment variable.
 
    -  ``git-make-shallow`` script: add support for Git's ``safe.bareRepository=explicit``
       configuration setting.
@@ -362,39 +362,39 @@ The following corrections have been made to the :term:`LICENSE` values set by re
 Security Fixes in 5.0
 ~~~~~~~~~~~~~~~~~~~~~
 
--  avahi: :cve:`2023-1981`, :cve:`2023-38469`, :cve:`2023-38470`, :cve:`2023-38471`, :cve:`2023-38469`, :cve:`2023-38470`, :cve:`2023-38471`, :cve:`2023-38472`, :cve:`2023-38473`
--  bind: :cve:`2023-4408`, :cve:`2023-5517`, :cve:`2023-5679`, :cve:`2023-50387`
--  bluez5: :cve:`2023-45866`
--  coreutils: :cve:`2024-0684`
--  cups: :cve:`2023-4504`
--  curl: :cve:`2023-46218`
--  expat: :cve:`2024-28757`
--  gcc: :cve:`2023-4039`
--  glibc: :cve:`2023-5156`, :cve:`2023-0687`
--  gnutls: :cve:`2024-0553`, :cve:`2024-0567`, :cve:`2024-28834`, :cve:`2024-28835`
--  go: :cve:`2023-45288`
--  grub: :cve:`2023-4692`, :cve:`2023-4693`
--  grub2: :cve:`2023-4001` (ignored), :cve:`2024-1048` (ignored)
--  libgit2: :cve:`2024-24575`, :cve:`2024-24577`
--  libsndfile1: :cve:`2022-33065`
--  libssh2: :cve:`2023-48795`
--  libuv: :cve:`2024-24806`
--  libxml2: :cve:`2023-45322` (ignored)
--  linux-yocto/6.6: :cve:`2020-16119`
--  openssh: :cve:`2023-48795`, :cve:`2023-51384`, :cve:`2023-51385`
--  openssl: :cve:`2023-5363`, :cve:`2023-5678`, :cve:`2023-6129`, :cve_mitre:`2023-6237`, :cve:`2024-0727`, :cve:`2024-2511`
--  perl: :cve:`2023-47100`
--  pixman: :cve:`2023-37769` (ignored)
--  python3-cryptography{-vectors}: :cve:`2023-49083`, :cve:`2024-26130`
--  python3-urllib3: :cve:`2023-45803`
--  shadow: :cve:`2023-4641`
--  sudo: :cve:`2023-42456`
--  tiff: :cve:`2023-6228`, :cve:`2023-6277`, :cve:`2023-52355`, :cve:`2023-52356`
--  vim: :cve:`2023-46246`, :cve:`2023-48231`, :cve:`2023-48232`, :cve:`2023-48233`, :cve:`2023-48234`, :cve:`2023-48235`, :cve:`2023-48236`, :cve:`2023-48237`, :cve:`2024-22667`
--  wpa-supplicant: :cve:`2023-52160`
--  xserver-xorg: :cve:`2023-5574`, :cve:`2023-6816`, :cve:`2024-0229`, :cve:`2024-0408`, :cve:`2024-0409`, :cve:`2024-21885`, :cve:`2024-21886`
--  xwayland: :cve:`2023-5367`, :cve:`2024-0408`, :cve:`2024-0409`, :cve:`2023-6816`, :cve:`2024-0229`, :cve:`2024-21885`, :cve:`2024-21886`
--  zlib: :cve:`2023-45853` (ignored), :cve:`2023-6992` (ignored)
+-  avahi: :cve_nist:`2023-1981`, :cve_nist:`2023-38469`, :cve_nist:`2023-38470`, :cve_nist:`2023-38471`, :cve_nist:`2023-38469`, :cve_nist:`2023-38470`, :cve_nist:`2023-38471`, :cve_nist:`2023-38472`, :cve_nist:`2023-38473`
+-  bind: :cve_nist:`2023-4408`, :cve_nist:`2023-5517`, :cve_nist:`2023-5679`, :cve_nist:`2023-50387`
+-  bluez5: :cve_nist:`2023-45866`
+-  coreutils: :cve_nist:`2024-0684`
+-  cups: :cve_nist:`2023-4504`
+-  curl: :cve_nist:`2023-46218`
+-  expat: :cve_nist:`2024-28757`
+-  gcc: :cve_nist:`2023-4039`
+-  glibc: :cve_nist:`2023-5156`, :cve_nist:`2023-0687`
+-  gnutls: :cve_nist:`2024-0553`, :cve_nist:`2024-0567`, :cve_nist:`2024-28834`, :cve_nist:`2024-28835`
+-  go: :cve_nist:`2023-45288`
+-  grub: :cve_nist:`2023-4692`, :cve_nist:`2023-4693`
+-  grub2: :cve_nist:`2023-4001` (ignored), :cve_nist:`2024-1048` (ignored)
+-  libgit2: :cve_nist:`2024-24575`, :cve_nist:`2024-24577`
+-  libsndfile1: :cve_nist:`2022-33065`
+-  libssh2: :cve_nist:`2023-48795`
+-  libuv: :cve_nist:`2024-24806`
+-  libxml2: :cve_nist:`2023-45322` (ignored)
+-  linux-yocto/6.6: :cve_nist:`2020-16119`
+-  openssh: :cve_nist:`2023-48795`, :cve_nist:`2023-51384`, :cve_nist:`2023-51385`
+-  openssl: :cve_nist:`2023-5363`, :cve_nist:`2023-5678`, :cve_nist:`2023-6129`, :cve_mitre:`2023-6237`, :cve_nist:`2024-0727`, :cve_nist:`2024-2511`
+-  perl: :cve_nist:`2023-47100`
+-  pixman: :cve_nist:`2023-37769` (ignored)
+-  python3-cryptography{-vectors}: :cve_nist:`2023-49083`, :cve_nist:`2024-26130`
+-  python3-urllib3: :cve_nist:`2023-45803`
+-  shadow: :cve_nist:`2023-4641`
+-  sudo: :cve_nist:`2023-42456`
+-  tiff: :cve_nist:`2023-6228`, :cve_nist:`2023-6277`, :cve_nist:`2023-52355`, :cve_nist:`2023-52356`
+-  vim: :cve_nist:`2023-46246`, :cve_nist:`2023-48231`, :cve_nist:`2023-48232`, :cve_nist:`2023-48233`, :cve_nist:`2023-48234`, :cve_nist:`2023-48235`, :cve_nist:`2023-48236`, :cve_nist:`2023-48237`, :cve_nist:`2024-22667`
+-  wpa-supplicant: :cve_nist:`2023-52160`
+-  xserver-xorg: :cve_nist:`2023-5574`, :cve_nist:`2023-6816`, :cve_nist:`2024-0229`, :cve_nist:`2024-0408`, :cve_nist:`2024-0409`, :cve_nist:`2024-21885`, :cve_nist:`2024-21886`
+-  xwayland: :cve_nist:`2023-5367`, :cve_nist:`2024-0408`, :cve_nist:`2024-0409`, :cve_nist:`2023-6816`, :cve_nist:`2024-0229`, :cve_nist:`2024-21885`, :cve_nist:`2024-21886`
+-  zlib: :cve_nist:`2023-45853` (ignored), :cve_nist:`2023-6992` (ignored)
 
 
 Recipe Upgrades in 5.0

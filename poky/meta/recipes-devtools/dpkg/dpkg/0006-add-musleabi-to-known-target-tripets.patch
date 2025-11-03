@@ -5,7 +5,7 @@ Subject: [PATCH] add musleabi to known target tripets
 
 helps compiling dpkg for musl/arm-softfloat
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>
 ---

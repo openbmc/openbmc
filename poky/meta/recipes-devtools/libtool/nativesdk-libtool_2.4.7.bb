@@ -1,4 +1,5 @@
 require libtool-${PV}.inc
+require remove-buildpaths.inc
 
 FILESEXTRAPATHS =. "${FILE_DIRNAME}/libtool:"
 

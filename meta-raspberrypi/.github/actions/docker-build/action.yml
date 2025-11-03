@@ -32,7 +32,7 @@ runs:
         n=1
         until [ "$n" -gt "$tries" ]; do
           echo "Building the docker image ${{ inputs.docker_image }}-${{ inputs.id }}... try $n..."
-          if docker build . -f "${{ inputs.docker_image }}/Dockerfile" -t "${{ inputs.docker_image }}-${{ inputs.id }}"; then
+          if docker build --no-cache . -f "${{ inputs.docker_image }}/Dockerfile" -t "${{ inputs.docker_image }}-${{ inputs.id }}"; then
             # This can fail if a dangling images cleaning job runs in
             # parallel. So we try this a couple of times to minimize
             # conflict. This is because while building, docker creates a

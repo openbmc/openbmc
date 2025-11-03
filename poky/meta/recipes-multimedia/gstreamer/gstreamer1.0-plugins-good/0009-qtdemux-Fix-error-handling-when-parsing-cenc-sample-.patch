@@ -1,0 +1,56 @@
+From da3b4e903ae990193988a873368bdd1865350521 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 27 Sep 2024 09:47:50 +0300
+Subject: [PATCH 09/13] qtdemux: Fix error handling when parsing cenc sample
+ groups fails
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-238, GHSL-2024-239, GHSL-2024-240
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3846
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47544
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/da3b4e903ae990193988a873368bdd1865350521]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index 94ce75b2d4..e7a79be45b 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -11400,12 +11400,15 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+       if (stream->subtype != FOURCC_soun) {
+         GST_ERROR_OBJECT (qtdemux,
+             "Unexpeced stsd type 'aavd' outside 'soun' track");
++        goto corrupt_file;
+       } else {
+         /* encrypted audio with sound sample description v0 */
+         GNode *enc = qtdemux_tree_get_child_by_type (stsd, fourcc);
+         stream->protected = TRUE;
+-        if (!qtdemux_parse_protection_aavd (qtdemux, stream, enc, &fourcc))
++        if (!qtdemux_parse_protection_aavd (qtdemux, stream, enc, &fourcc)) {
+           GST_ERROR_OBJECT (qtdemux, "Failed to parse protection scheme info");
++          goto corrupt_file;
++        }
+       }
+     }
+ 
+@@ -11414,8 +11417,10 @@ qtdemux_parse_trak (GstQTDemux * qtdemux, GNode * trak)
+        * with the same type */
+       GNode *enc = qtdemux_tree_get_child_by_type (stsd, fourcc);
+       stream->protected = TRUE;
+-      if (!qtdemux_parse_protection_scheme_info (qtdemux, stream, enc, &fourcc))
++      if (!qtdemux_parse_protection_scheme_info (qtdemux, stream, enc, &fourcc)) {
+         GST_ERROR_OBJECT (qtdemux, "Failed to parse protection scheme info");
++        goto corrupt_file;
++      }
+     }
+ 
+     if (stream->subtype == FOURCC_vide) {
+-- 
+2.30.2
+

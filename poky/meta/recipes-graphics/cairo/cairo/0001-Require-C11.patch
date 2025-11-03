@@ -1,0 +1,26 @@
+From de2452228814e804b103dfa7c2d37b3a216c6155 Mon Sep 17 00:00:00 2001
+From: Adrian Johnson <ajohnson@redneon.com>
+Date: Sun, 28 Apr 2024 21:31:41 +0930
+Subject: [PATCH] Require C11
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/cairo/cairo/-/commit/b60f47dfd5bbe98aec43f6c356ba3be9a1b7989e]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ meson.build | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 9100152..f8432fd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1,7 +1,8 @@
+ project('cairo', 'c', 'cpp',
+-  meson_version: '>= 0.59.0',
++  meson_version: '>= 1.3.0',
+   version: run_command(find_program('version.py'), check: true).stdout().strip(),
+-  default_options: ['warning_level=2'],
++  default_options: ['c_std=gnu11,c11',
++                    'warning_level=2'],
+ )
+ 
+ freetype_required_version = '>= 9.7.3'

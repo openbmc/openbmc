@@ -1,0 +1,37 @@
+From c72025cabdfcb2fe30d24eda7bb9d1d01a1b6555 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 4 Oct 2024 13:21:44 +0300
+Subject: [PATCH 4/7] wavparse: Check that at least 4 bytes are available
+ before parsing cue chunks
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8042>
+
+CVE: CVE-2024-47775
+CVE: CVE-2024-47776
+CVE: CVE-2024-47777
+CVE: CVE-2024-47778
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/c72025cabdfcb2fe30d24eda7bb9d1d01a1b6555]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/wavparse/gstwavparse.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gst/wavparse/gstwavparse.c b/gst/wavparse/gstwavparse.c
+index 6a0c44638e..5655ee3825 100644
+--- a/gst/wavparse/gstwavparse.c
++++ b/gst/wavparse/gstwavparse.c
+@@ -789,6 +789,11 @@ gst_wavparse_cue_chunk (GstWavParse * wav, const guint8 * data, guint32 size)
+     return TRUE;
+   }
+ 
++  if (size < 4) {
++    GST_WARNING_OBJECT (wav, "broken file %d", size);
++    return FALSE;
++  }
++
+   ncues = GST_READ_UINT32_LE (data);
+ 
+   if (size < 4 + ncues * 24) {
+-- 
+2.30.2
+

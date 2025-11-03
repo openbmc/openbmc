@@ -16,7 +16,8 @@ COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"
 
 DEPENDS = "m4-native flex-native bison-native"
 
-SRC_URI = "git://github.com/acpica/acpica;protocol=https;branch=master"
+SRC_URI = "git://github.com/acpica/acpica;protocol=https;branch=master \
+           file://CVE-2024-24856.patch"
 SRCREV = "170fc3076a86777077637f10b05c32ac21ac13aa"
 
 S = "${WORKDIR}/git"

@@ -19,6 +19,7 @@ SRCREV_video-parser = "138bbe048221d315962ddf8413aa6a08cc62a381"
 
 SRC_URI += "file://0001-cmake-Define-WAYLAND_SCANNER-and-WAYLAND_PROTOCOLS_D.patch \
             file://0001-vulkan-cts-include-missing-cstdint.patch \
+            file://0001-Allow-running-the-CTS-with-unknown-versions-of-Vulka.patch \
 "
 
 TOOLCHAIN = "gcc"

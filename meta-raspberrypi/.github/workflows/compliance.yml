@@ -23,7 +23,9 @@ jobs:
           id: ${{ github.event.number }}
       - name: Do DCO check
         run: |
-          docker run --rm -v "$GITHUB_WORKSPACE:/work:ro" \
+          docker run --rm --security-opt apparmor=unconfined \
+            --security-opt seccomp=unconfined \
+            -v "$GITHUB_WORKSPACE:/work:ro" \
             --env "BASE_REF=$GITHUB_BASE_REF" \
             "dco-check-${{ github.event.number }}"
       - name: Cleanup temporary docker image

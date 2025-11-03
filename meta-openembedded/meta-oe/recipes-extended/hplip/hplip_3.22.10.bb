@@ -49,7 +49,7 @@ EXTRA_OECONF += "\
         --with-cupsfilterdir=${libexecdir}/cups/filter \
 "
 
-EXTRA_OEMAKE = "rulessystemdir=${systemd_unitdir}/system/"
+EXTRA_OEMAKE = "CPPFLAGS='${CFLAGS}' rulessystemdir=${systemd_unitdir}/system/"
 
 do_install:append() {
     rm -rf ${D}${datadir}/hplip/upgrade.py

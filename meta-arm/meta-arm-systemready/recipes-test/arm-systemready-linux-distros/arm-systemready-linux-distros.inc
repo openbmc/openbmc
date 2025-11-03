@@ -2,7 +2,12 @@ SUMMARY = "Arm SystemReady Linux distros installation"
 DESCRIPTION = "Arm SystemReady Linux distro CD/DVD images and installation \
                target disk image"
 
-IMAGE_CLASSES:remove = "license_image testimage"
+DISTRO_UNATTENDED_INST_TESTS ?= "0"
+
+require ${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "arm-systemready-linux-distros-unattended.inc", "", d)}
+
+IMAGE_CLASSES:remove = "license_image"
+IMAGE_CLASSES:remove = "${@oe.utils.vartrue("DISTRO_UNATTENDED_INST_TESTS", "", "testimage", d)}"
 BUILDHISTORY_FEATURES:remove = "image"
 
 INHIBIT_DEFAULT_DEPS = "1"
@@ -15,7 +20,7 @@ do_configure[noexec] = "1"
 do_compile[noexec] = "1"
 
 ISO_IMAGE_NAME = "${PN}-${PV}"
-IMAGE_LINK_NAME = "${PN}-${PV}-${MACHINE}"
+IMAGE_LINK_NAME = "${PN}-${MACHINE}"
 
 ARM_SYSTEMREADY_LINUX_DISTRO_ISO_IMAGE = \
     "${DEPLOY_DIR_IMAGE}/${ISO_IMAGE_NAME}.iso"
@@ -44,7 +49,13 @@ python do_image_complete() {
     from oe.utils import execute_pre_post_process
     post_process_cmds = d.getVar("IMAGE_POSTPROCESS_COMMAND")
     execute_pre_post_process(d, post_process_cmds)
+
+    if d.getVar('DISTRO_UNATTENDED_INST_TESTS') == "1":
+        # Ensure an empty rootfs manifest exists (required by testimage)
+        fname = os.path.join(d.getVar('IMGDEPLOYDIR'), d.getVar('IMAGE_LINK_NAME') + ".manifest")
+        open(fname, 'w').close()
 }
+
 do_image_complete[nostamp] = "1"
 addtask image_complete after do_deploy before do_build
 

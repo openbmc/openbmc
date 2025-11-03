@@ -1,4 +1,4 @@
-From a071243763f4b06fc7e71f541c49cecf380b6f27 Mon Sep 17 00:00:00 2001
+From 8f582c0ea40ccdb2d439b7614459d752f3606e15 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
 Date: Sun, 11 Oct 2020 22:16:55 +0200
 Subject: [PATCH] wx-config.in: Disable cross magic - it does not work for us
@@ -18,10 +18,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/wx-config.in b/wx-config.in
-index d132e3182f..d0d162e8a3 100755
+index 4df8571d28..1173d89685 100755
 --- a/wx-config.in
 +++ b/wx-config.in
-@@ -396,7 +396,7 @@ get_mask()
+@@ -394,7 +394,7 @@ get_mask()
  }
  
  # Returns true if this script is for a cross compiled config.
@@ -31,5 +31,5 @@ index d132e3182f..d0d162e8a3 100755
  
  # Determine the base directories we require.
 -- 
-2.26.2
+2.25.1
 

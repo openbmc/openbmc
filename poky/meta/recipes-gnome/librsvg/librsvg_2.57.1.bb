@@ -21,6 +21,7 @@ require ${BPN}-crates.inc
 
 SRC_URI += " \
            file://0001-Makefile.am-pass-rust-target-to-cargo-also-when-not-.patch \
+           file://disable-rsvg-loader-test.patch \
            "
 
 SRC_URI[archive.sha256sum] = "074671a3ed6fbcd67cae2a40e539107f4f097ca8a4ab1a894c05e2524ff340ef"

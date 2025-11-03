@@ -1,0 +1,33 @@
+From bade7a1866618b9e46358b839fe5fdf16b1db2be Mon Sep 17 00:00:00 2001
+From: tjuhaszrh <tjuhasz@redhat.com>
+Date: Sat, 25 Jan 2025 10:34:54 +0100
+Subject: [PATCH] src: fix build with GCC 15
+
+Added cstdint to worker_inspector as on more recent version of gcc
+the build was failing due to changes to libstdc++ and the removal
+of transitive includes.
+
+PR-URL: https://github.com/nodejs/node/pull/56740
+Fixes: https://github.com/nodejs/node/issues/56731
+Reviewed-By: Antoine du Hamel <duhamelantoine1995@gmail.com>
+Reviewed-By: Chengzhong Wu <legendecas@gmail.com>
+Reviewed-By: Richard Lau <rlau@redhat.com>
+Reviewed-By: James M Snell <jasnell@gmail.com>
+
+Upstream-Status: Backport [https://github.com/nodejs/node/commit/bade7a1866618b9e46358b839fe5fdf16b1db2be]
+---
+ src/inspector/worker_inspector.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/inspector/worker_inspector.h b/src/inspector/worker_inspector.h
+index d3254d5aa0ebe4..24403bb1704c40 100644
+--- a/src/inspector/worker_inspector.h
++++ b/src/inspector/worker_inspector.h
+@@ -5,6 +5,7 @@
+ #error("This header can only be used when inspector is enabled")
+ #endif
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <unordered_map>

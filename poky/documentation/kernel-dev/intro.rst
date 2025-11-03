@@ -122,7 +122,7 @@ general information and references for further information.
    Using ``devtool`` requires that you have a clean build
    of the image. For
    more information, see the
-   ":ref:`kernel-dev/common:getting ready to develop using \`\`devtool\`\``"
+   ":ref:`kernel-dev/common:getting ready to develop using ``devtool```"
    section.
 
    Using traditional kernel development requires that you have the

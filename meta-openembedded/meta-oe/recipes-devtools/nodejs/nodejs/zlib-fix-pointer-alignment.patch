@@ -1,0 +1,64 @@
+From bbcd1f33161fd9874e8a61999d2739b177f99723 Mon Sep 17 00:00:00 2001
+From: Jeroen Hofstee <jhofstee@victronenergy.com>
+Date: Mon, 28 Apr 2025 14:21:44 +0000
+Subject: [PATCH] zlib: fix pointer alignment
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The function AllocForBrotli prefixes the allocated memory with its
+size, and returns a pointer to the region after it. This pointer can
+however no longer be suitably aligned. Correct this by allocating
+the maximum of the the size of the size_t and the max alignment.
+
+On Arm 32bits the size_t is 4 bytes long, but the alignment is 8 for
+some NEON instructions. When Brotli is compiled with optimizations
+enabled newer GCC versions will use the NEON instructions and trigger
+a bus error killing node.
+
+see https://github.com/google/brotli/issues/1159
+
+PR-URL: https://github.com/nodejs/node/pull/57727
+Reviewed-By: Shelley Vohr <shelley.vohr@gmail.com>
+Reviewed-By: Tobias Nießen <tniessen@tnie.de>
+Reviewed-By: Daniel Lemire <daniel@lemire.me>
+Reviewed-By: Gerhard Stöbich <deb2001-github@yahoo.de>
+
+Upstream-Status: Backport [https://github.com/nodejs/node/commit/dc035bbc9b310ff8067bc0dad22230978489c061]
+---
+ src/node_zlib.cc | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/node_zlib.cc b/src/node_zlib.cc
+index 66370e41..a537e766 100644
+--- a/src/node_zlib.cc
++++ b/src/node_zlib.cc
+@@ -493,20 +493,22 @@ class CompressionStream : public AsyncWrap, public ThreadPoolWork {
+   }
+ 
+   static void* AllocForBrotli(void* data, size_t size) {
+-    size += sizeof(size_t);
++    constexpr size_t offset = std::max(sizeof(size_t), alignof(max_align_t));
++    size += offset;
+     CompressionStream* ctx = static_cast<CompressionStream*>(data);
+     char* memory = UncheckedMalloc(size);
+     if (UNLIKELY(memory == nullptr)) return nullptr;
+     *reinterpret_cast<size_t*>(memory) = size;
+     ctx->unreported_allocations_.fetch_add(size,
+                                            std::memory_order_relaxed);
+-    return memory + sizeof(size_t);
++    return memory + offset;
+   }
+ 
+   static void FreeForZlib(void* data, void* pointer) {
+     if (UNLIKELY(pointer == nullptr)) return;
+     CompressionStream* ctx = static_cast<CompressionStream*>(data);
+-    char* real_pointer = static_cast<char*>(pointer) - sizeof(size_t);
++    constexpr size_t offset = std::max(sizeof(size_t), alignof(max_align_t));
++    char* real_pointer = static_cast<char*>(pointer) - offset;
+     size_t real_size = *reinterpret_cast<size_t*>(real_pointer);
+     ctx->unreported_allocations_.fetch_sub(real_size,
+                                            std::memory_order_relaxed);
+-- 
+2.43.0
+

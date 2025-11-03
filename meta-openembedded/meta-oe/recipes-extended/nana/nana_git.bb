@@ -42,3 +42,9 @@ do_configure:prepend:class-nativesdk() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+do_install:append() {
+    sed -i -e 's,--sysroot=${STAGING_DIR_TARGET},,g' ${D}${bindir}/nana-c++lg
+    sed -i -e 's,--sysroot=${STAGING_DIR_TARGET},,g' ${D}${bindir}/nana-clg
+    sed -i -e 's,--sysroot=${STAGING_DIR_TARGET},,g' ${D}${bindir}/nana
+}

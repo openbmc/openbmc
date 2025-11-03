@@ -1,0 +1,25 @@
+From 8b4de2f6946b1c1f68279ecadc05c2817ae82189 Mon Sep 17 00:00:00 2001
+From: Orion Poplawski <orion@nwra.com>
+Date: Thu, 22 Feb 2024 08:41:17 -0700
+Subject: [PATCH] Use libc.stdint instead of numpy
+
+Upstream-Status: Backport [https://github.com/h5py/h5py/pull/2382/commits/387a22b8c1513800c0401f496b4ed512c1639798]
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ h5py/api_types_ext.pxd | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/h5py/api_types_ext.pxd b/h5py/api_types_ext.pxd
+index 91acb12..55a239f 100644
+--- a/h5py/api_types_ext.pxd
++++ b/h5py/api_types_ext.pxd
+@@ -20,7 +20,7 @@ from libc.string cimport strlen, strchr, strcpy, strncpy, strcmp,\
+ ctypedef long size_t
+ from libc.time cimport time_t
+ 
+-from numpy cimport int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
++from libc.stdint cimport int8_t, uint8_t, int16_t, uint16_t, int32_t, uint32_t, int64_t, uint64_t
+ 
+ IF UNAME_SYSNAME != "Windows":
+     cdef extern from "unistd.h":

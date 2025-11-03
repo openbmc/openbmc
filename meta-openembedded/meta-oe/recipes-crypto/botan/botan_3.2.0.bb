@@ -18,8 +18,8 @@ CPU:armv7ve = "armv7"
 
 do_configure() {
 	python3 ${S}/configure.py \
-	--prefix="${D}${exec_prefix}" \
-	--libdir="${D}${libdir}" \
+	--prefix="${exec_prefix}" \
+	--libdir="${libdir}" \
 	--cpu="${CPU}" \
 	--cc-bin="${CXX}" \
 	--cxxflags="${CXXFLAGS}" \
@@ -39,8 +39,8 @@ do_compile() {
 	oe_runmake
 }
 do_install() {
-	oe_runmake install
-	sed -i -e "s|${D}||g" ${D}${libdir}/pkgconfig/botan-3.pc
+	oe_runmake DESTDIR=${D} install
+	sed -i -e 's|${WORKDIR}|<scrubbed>|g' ${D}${includedir}/botan-3/botan/build.h
 }
 
 PACKAGES += "${PN}-python3"

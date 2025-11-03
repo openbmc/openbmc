@@ -77,6 +77,10 @@ do_install:prepend() {
 	mkdir -p ${D}${sysconfdir}/default
 }
 
+do_install:append() {
+	sed -i -e 's#${S}##g' ${D}${includedir}/boinc/svn_version.h
+}
+
 SYSTEMD_SERVICE:${PN} = "boinc-client.service"
 
 FILES:${PN} += "${libdir}/systemd"

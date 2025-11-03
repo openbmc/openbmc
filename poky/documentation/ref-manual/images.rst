@@ -51,27 +51,6 @@ Here is a list of supported recipes:
 -  ``core-image-full-cmdline``: A console-only image with more
    full-featured Linux system functionality installed.
 
--  ``core-image-lsb``: An image that conforms to the Linux Standard Base
-   (LSB) specification. This image requires a distribution configuration
-   that enables LSB compliance (e.g. ``poky-lsb``). If you build
-   ``core-image-lsb`` without that configuration, the image will not be
-   LSB-compliant.
-
--  ``core-image-lsb-dev``: A ``core-image-lsb`` image that is suitable
-   for development work using the host. The image includes headers and
-   libraries you can use in a host development environment. This image
-   requires a distribution configuration that enables LSB compliance
-   (e.g. ``poky-lsb``). If you build ``core-image-lsb-dev`` without that
-   configuration, the image will not be LSB-compliant.
-
--  ``core-image-lsb-sdk``: A ``core-image-lsb`` that includes everything
-   in the cross-toolchain but also includes development headers and
-   libraries to form a complete standalone SDK. This image requires a
-   distribution configuration that enables LSB compliance (e.g.
-   ``poky-lsb``). If you build ``core-image-lsb-sdk`` without that
-   configuration, the image will not be LSB-compliant. This image is
-   suitable for development using the target.
-
 -  ``core-image-minimal``: A small image just capable of allowing a
    device to boot.
 
@@ -119,8 +98,8 @@ Here is a list of supported recipes:
    deployed to a separate partition so that you can boot into it and use
    it to deploy a second image to be tested. You can find more
    information about runtime testing in the
-   ":ref:`dev-manual/runtime-testing:performing automated runtime testing`"
-   section in the Yocto Project Development Tasks Manual.
+   ":ref:`test-manual/runtime-testing:performing automated runtime testing`"
+   section in the Yocto Project Test Environment Manual.
 
 -  ``core-image-testmaster-initramfs``: A RAM-based Initial Root
    Filesystem (:term:`Initramfs`) image tailored for use with the

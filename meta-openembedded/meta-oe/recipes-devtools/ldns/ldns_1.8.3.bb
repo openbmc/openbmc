@@ -19,5 +19,6 @@ do_install:append() {
     sed -e 's@[^ ]*-ffile-prefix-map=[^ "]*@@g' \
         -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
         -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
-        -i ${D}${libdir}/pkgconfig/*.pc
+        -e 's@${RECIPE_SYSROOT}@@g' \
+        -i ${D}${libdir}/pkgconfig/*.pc ${D}${bindir}/ldns-config
 }

@@ -58,32 +58,35 @@ Supported Linux Distributions
 Currently, the &DISTRO; release ("&DISTRO_NAME;") of the Yocto Project is
 supported on the following distributions:
 
--  Ubuntu 20.04 (LTS)
-
--  Ubuntu 22.04 (LTS)
-
--  Fedora 38
-
--  CentOS Stream 8
-
--  Debian GNU/Linux 11 (Bullseye)
-
--  Debian GNU/Linux 12 (Bookworm)
-
--  OpenSUSE Leap 15.4
+..
+   Can be generated with yocto-autobuilder-helper's scripts/yocto-supported-distros:
+   yocto-supported-distros --release scarthgap --config yocto-autobuilder2/config.py --output-format docs --poky-distros
 
 -  AlmaLinux 8
-
 -  AlmaLinux 9
-
--  Rocky 9
+-  Debian 11
+-  Debian 12
+-  Fedora 39
+-  Fedora 40
+-  Fedora 41
+-  Rocky Linux 8
+-  Rocky Linux 9
+-  Ubuntu 20.04 (LTS)
+-  Ubuntu 22.04 (LTS)
+-  Ubuntu 24.04 (LTS)
+-  Ubuntu 24.10
 
 The following distribution versions are still tested, even though the
 organizations publishing them no longer make updates publicly available:
 
--  Ubuntu 18.04 (LTS)
+..
+   This list contains EOL distros that are still tested on the Autobuilder
+   (meaning there are running workers).
+   See https://endoflife.date for information of EOL releases.
 
--  Ubuntu 23.04
+-  Fedora 39
+-  Fedora 40
+-  Ubuntu 20.04 (LTS)
 
 Note that the Yocto Project doesn't have access to private updates
 that some of these versions may have. Therefore, our testing has
@@ -92,7 +95,15 @@ limited value if you have access to such updates.
 Finally, here are the distribution versions which were previously
 tested on former revisions of "&DISTRO_NAME;", but no longer are:
 
-*This list is currently empty*
+..
+   Can be generated with yocto-autobuilder-helper's scripts/yocto-supported-distros.
+   yocto-supported-distros --release scarthgap --config yocto-autobuilder2/config.py --output-format docs --old-distros
+
+-  CentOS Stream 8
+-  Fedora 38
+-  OpenSUSE Leap 15.4
+-  Ubuntu 18.04
+-  Ubuntu 23.04
 
 .. note::
 
@@ -150,9 +161,26 @@ Ubuntu and Debian
 Here are the packages needed to build an image on a headless system
 with a supported Ubuntu or Debian Linux distribution::
 
-   $ sudo apt install &UBUNTU_HOST_PACKAGES_ESSENTIAL;
+   $ sudo apt install &UBUNTU_DEBIAN_HOST_PACKAGES_ESSENTIAL;
+
+You also need to ensure you have the ``en_US.UTF-8`` locale enabled::
+
+   $ locale --all-locales | grep en_US.utf8
+
+If this is not the case, you can reconfigure the ``locales`` package to add it
+(requires an interactive shell)::
+
+   $ sudo dpkg-reconfigure locales
 
 .. note::
+
+   -  If you are not in an interactive shell, ``dpkg-reconfigure`` will
+      not work as expected. To add the locale you will need to edit
+      ``/etc/locale.gen`` file to add/uncomment the ``en_US.UTF-8`` locale.
+      A naive way to do this as root is::
+
+         $ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+         $ locale-gen
 
    -  If your build system has the ``oss4-dev`` package installed, you
       might experience QEMU build failures due to the package installing
@@ -164,8 +192,12 @@ with a supported Ubuntu or Debian Linux distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo apt install git make inkscape texlive-latex-extra
-   $ sudo apt install sphinx python3-saneyaml python3-sphinx-rtd-theme
+   $ sudo apt install &UBUNTU_DEBIAN_HOST_PACKAGES_DOC;
+
+In addition to the previous packages, here are the packages needed to build the
+documentation in PDF format::
+
+   $ sudo apt install &UBUNTU_DEBIAN_HOST_PACKAGES_DOC_PDF;
 
 Fedora Packages
 ---------------
@@ -177,8 +209,13 @@ with a supported Fedora Linux distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo dnf install git make python3-pip which inkscape texlive-fncychap
-   &PIP3_HOST_PACKAGES_DOC;
+   $ sudo dnf install &FEDORA_HOST_PACKAGES_DOC;
+   $ sudo pip3 install &PIP3_HOST_PACKAGES_DOC;
+
+In addition to the previous packages, here are the packages needed to build the
+documentation in PDF format::
+
+   $ sudo dnf install &FEDORA_HOST_PACKAGES_DOC_PDF;
 
 openSUSE Packages
 -----------------
@@ -187,11 +224,17 @@ Here are the packages needed to build an image on a headless system
 with a supported openSUSE distribution::
 
    $ sudo zypper install &OPENSUSE_HOST_PACKAGES_ESSENTIAL;
+   $ sudo pip3 install &OPENSUSE_PIP3_HOST_PACKAGES_ESSENTIAL;
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo zypper install git make python3-pip which inkscape texlive-fncychap
-   &PIP3_HOST_PACKAGES_DOC;
+   $ sudo zypper install &OPENSUSE_HOST_PACKAGES_DOC;
+   $ sudo pip3 install &PIP3_HOST_PACKAGES_DOC;
+
+In addition to the previous packages, here are the packages needed to build the
+documentation in PDF format::
+
+   $ sudo zypper install &OPENSUSE_HOST_PACKAGES_DOC_PDF;
 
 
 AlmaLinux Packages
@@ -200,6 +243,10 @@ AlmaLinux Packages
 Here are the packages needed to build an image on a headless system
 with a supported AlmaLinux distribution::
 
+   $ sudo dnf install -y epel-release
+   $ sudo yum install dnf-plugins-core
+   $ sudo dnf config-manager --set-enabled crb
+   $ sudo dnf makecache
    $ sudo dnf install &ALMALINUX_HOST_PACKAGES_ESSENTIAL;
 
 .. note::
@@ -217,8 +264,20 @@ with a supported AlmaLinux distribution::
 
 Here are the packages needed to build Project documentation manuals::
 
-   $ sudo dnf install git make python3-pip which inkscape texlive-fncychap
-   &PIP3_HOST_PACKAGES_DOC;
+   $ sudo dnf install &ALMALINUX_HOST_PACKAGES_DOC;
+   $ sudo pip3 install &PIP3_HOST_PACKAGES_DOC;
+
+In addition to the previous packages, here are the packages needed to build the
+documentation in PDF format::
+
+   $ sudo dnf install &ALMALINUX_HOST_PACKAGES_DOC_PDF;
+
+.. warning::
+
+   Unlike Fedora or OpenSUSE, AlmaLinux does not provide the packages
+   ``texlive-collection-fontsextra``, ``texlive-collection-lang*`` and
+   ``texlive-collection-latexextra``, so you may run into issues. These may be
+   installed using `tlmgr <https://tug.org/texlive/tlmgr.html>`_.
 
 .. _system-requirements-buildtools:
 
@@ -319,7 +378,7 @@ If you would prefer not to use the ``install-buildtools`` script, you can instea
 download and run a pre-built :term:`buildtools` installer yourself with the following
 steps:
 
-#. Go to :yocto_dl:`/releases/yocto/yocto-&DISTRO;/buildtools/`, locate and
+#. Go to :yocto_dl:`/releases/yocto/&DISTRO_REL_LATEST_TAG;/buildtools/`, locate and
    download the ``.sh`` file corresponding to your host architecture
    and to :term:`buildtools`, :term:`buildtools-extended` or :term:`buildtools-make`.
 

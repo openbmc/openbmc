@@ -14,3 +14,6 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 MODEL_CODE = "FVP_Base_RevC-2xAEMvA"
 
 COMPATIBLE_HOST = "(aarch64|x86_64).*-linux"
+
+require remove-execstack.inc
+REMOVE_EXECSTACKS:x86-64 = "${FVPDIR}/models/${FVP_ARCH_DIR}*/libarmctmodel.so"

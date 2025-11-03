@@ -70,3 +70,10 @@ RDEPENDS:${PN} = " \
     python3-pillow \
     python3-pygments \
 "
+
+do_compile:append() {
+    for f in `find ${B} -name *.c`
+    do
+        sed -i -e "/BEGIN: Cython Metadata/,/END: Cython Metadata/d" $f
+    done
+}

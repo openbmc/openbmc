@@ -11,6 +11,7 @@ SRC_URI = "http://ftp.gnome.org/pub/gnome/sources/gtk+/2.24/gtk+-${PV}.tar.xz \
            file://strict-prototypes.patch \
            file://0001-Do-not-look-into-HOME-when-looking-for-gtk-modules.patch \
            file://0001-Fix-signature-of-create_menu-function.patch \
+           file://CVE-2024-6655.patch \
            "
 
 SRC_URI[sha256sum] = "ac2ac757f5942d318a311a54b0c80b5ef295f299c2a73c632f6bfb1ff49cc6da"

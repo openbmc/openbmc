@@ -24,6 +24,8 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https \
            file://0002-BaseTools-makefile-adjust-to-build-in-under-bitbake.patch \
            file://0003-debug-prefix-map.patch \
            file://0004-reproducible.patch \
+           file://0001-MdePkg-Fix-overflow-issue-in-BasePeCoffLib.patch \
+           file://0001-MdeModulePkg-Potential-UINT32-overflow-in-S3-ResumeC.patch \
            "
 
 PV = "edk2-stable202402"
@@ -223,6 +225,7 @@ do_compile:class-target() {
 
 do_install:class-native() {
     install -d ${D}/${bindir}/edk2_basetools
+    find ${S}/BaseTools -name \*.pyc -exec rm -rf \{\} \;
     cp -r ${S}/BaseTools ${D}/${bindir}/${EDK_TOOLS_DIR}
 }
 

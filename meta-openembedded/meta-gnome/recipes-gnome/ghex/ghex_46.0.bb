@@ -7,6 +7,7 @@ DEPENDS = " \
     desktop-file-utils-native  \
     glib-2.0-native \
     gtk4 \
+    itstool-native \
     libadwaita \
 "
 

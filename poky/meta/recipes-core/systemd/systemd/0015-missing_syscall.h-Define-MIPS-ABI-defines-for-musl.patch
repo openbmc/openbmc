@@ -1,7 +1,7 @@
-From 3dc9d9d410bcce54fddfd94f43f7f77f3aa8e281 Mon Sep 17 00:00:00 2001
+From 79f2f3e90229f4812d93c6965cb67385642dfcc4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 12 Apr 2021 23:44:53 -0700
-Subject: [PATCH 15/22] missing_syscall.h: Define MIPS ABI defines for musl
+Subject: [PATCH] missing_syscall.h: Define MIPS ABI defines for musl
 
 musl does not define _MIPS_SIM_ABI32, _MIPS_SIM_NABI32, _MIPS_SIM_ABI64
 unlike glibc where these are provided by libc headers, therefore define
@@ -16,7 +16,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  2 files changed, 7 insertions(+)
 
 diff --git a/src/basic/missing_syscall.h b/src/basic/missing_syscall.h
-index d795efd8f2..d6729d3c1d 100644
+index e2cd8b4e35..f2fe489de7 100644
 --- a/src/basic/missing_syscall.h
 +++ b/src/basic/missing_syscall.h
 @@ -20,6 +20,12 @@
@@ -31,9 +31,9 @@ index d795efd8f2..d6729d3c1d 100644
 +
  #include "macro.h"
  #include "missing_keyctl.h"
- #include "missing_stat.h"
+ #include "missing_sched.h"
 diff --git a/src/shared/base-filesystem.c b/src/shared/base-filesystem.c
-index 7ae921a113..0ef9d1fd39 100644
+index dc59a9582c..9e802ef5a5 100644
 --- a/src/shared/base-filesystem.c
 +++ b/src/shared/base-filesystem.c
 @@ -20,6 +20,7 @@
@@ -44,6 +44,3 @@ index 7ae921a113..0ef9d1fd39 100644
  
  typedef struct BaseFilesystem {
          const char *dir;      /* directory or symlink to create */
--- 
-2.34.1
-

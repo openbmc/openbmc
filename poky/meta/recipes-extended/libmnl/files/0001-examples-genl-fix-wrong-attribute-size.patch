@@ -1,0 +1,44 @@
+From 67ad7abf1fe888c650f9e8ed326a499e1456285c Mon Sep 17 00:00:00 2001
+From: Florian Westphal <fw@strlen.de>
+Date: Mon, 15 Sep 2025 14:40:30 +0200
+Subject: [PATCH] examples: genl: fix wrong attribute size
+
+This example no longer works on more recent kernels:
+
+genl-family-get
+error: Invalid argument
+
+dmesg says:
+netlink: 'genl-family-get': attribute type 1 has an invalid length.
+
+Fix this and also zero out the reserved field in the genl header,
+while not validated yet for dumps this could change.
+
+Upstream-Status: Backport [https://git.netfilter.org/libmnl/patch/?id=54dea548d796653534645c6e3c8577eaf7d77411]
+
+Reported-by: Divyanshu Rathore <Divyanshu.Rathore@bmwtechworks.in>
+Signed-off-by: Florian Westphal <fw@strlen.de>
+(cherry picked from commit 54dea548d796653534645c6e3c8577eaf7d77411)
+Signed-off-by: Divyanshu Rathore <divyanshu.rathore@bmwtechworks.in>
+---
+ examples/genl/genl-family-get.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/examples/genl/genl-family-get.c b/examples/genl/genl-family-get.c
+index ba8de12..0c20067 100644
+--- a/examples/genl/genl-family-get.c
++++ b/examples/genl/genl-family-get.c
+@@ -199,8 +199,9 @@ int main(int argc, char *argv[])
+ 	genl = mnl_nlmsg_put_extra_header(nlh, sizeof(struct genlmsghdr));
+ 	genl->cmd = CTRL_CMD_GETFAMILY;
+ 	genl->version = 1;
++	genl->reserved = 0;
+ 
+-	mnl_attr_put_u32(nlh, CTRL_ATTR_FAMILY_ID, GENL_ID_CTRL);
++	mnl_attr_put_u16(nlh, CTRL_ATTR_FAMILY_ID, GENL_ID_CTRL);
+ 	if (argc >= 2)
+ 		mnl_attr_put_strz(nlh, CTRL_ATTR_FAMILY_NAME, argv[1]);
+ 	else
+-- 
+2.34.1
+

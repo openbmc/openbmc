@@ -1,0 +1,455 @@
+From 1f266347b154ed90b8262126f04e8cc8f59fa617 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 22 Nov 2024 21:25:21 +0800
+Subject: [PATCH] Fix two buffer overflow vulnerabilities
+
+According to [1][2], Igor Pavlov, the author of 7-Zip, refused to
+provide an advisory or any related change log entries. We have to
+backport a part of ./CPP/7zip/Archive/NtfsHandler.cpp from upstream
+big commit
+
+Upstream-Status: Backport [https://github.com/ip7z/7zip/commit/fc662341e6f85da78ada0e443f6116b978f79f22]
+
+[1] https://dfir.ru/2024/06/19/vulnerabilities-in-7-zip-and-ntfs3/
+[2] https://dfir.ru/wp-content/uploads/2024/07/screenshot-2024-07-03-at-02-13-40-7-zip-_-bugs-_-2402-two-vulnerabilities-in-the-ntfs-handler.png
+
+CVE: CVE-2023-52169
+CVE: CVE-2023-52168
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ CPP/7zip/Archive/NtfsHandler.cpp | 229 ++++++++++++++++++++-----------
+ 1 file changed, 151 insertions(+), 78 deletions(-)
+
+diff --git a/CPP/7zip/Archive/NtfsHandler.cpp b/CPP/7zip/Archive/NtfsHandler.cpp
+index 93e9f88..2701439 100644
+--- a/CPP/7zip/Archive/NtfsHandler.cpp
++++ b/CPP/7zip/Archive/NtfsHandler.cpp
+@@ -71,8 +71,9 @@ struct CHeader
+ {
+   unsigned SectorSizeLog;
+   unsigned ClusterSizeLog;
++  unsigned MftRecordSizeLog;
+   // Byte MediaType;
+-  UInt32 NumHiddenSectors;
++  //UInt32 NumHiddenSectors;
+   UInt64 NumSectors;
+   UInt64 NumClusters;
+   UInt64 MftCluster;
+@@ -111,30 +112,42 @@ bool CHeader::Parse(const Byte *p)
+   if (memcmp(p + 3, "NTFS    ", 8) != 0)
+     return false;
+   {
+-    int t = GetLog(Get16(p + 11));
+-    if (t < 9 || t > 12)
+-      return false;
+-    SectorSizeLog = t;
+-    t = GetLog(p[13]);
+-    if (t < 0)
+-      return false;
+-    sectorsPerClusterLog = t;
+-    ClusterSizeLog = SectorSizeLog + sectorsPerClusterLog;
+-    if (ClusterSizeLog > 30)
+-      return false;
++    {
++      const int t = GetLog(Get16(p + 11));
++      if (t < 9 || t > 12)
++        return false;
++      SectorSizeLog = (unsigned)t;
++    }
++    {
++      const unsigned v = p[13];
++      if (v <= 0x80)
++      {
++        const int t = GetLog(v);
++        if (t < 0)
++          return false;
++        sectorsPerClusterLog = (unsigned)t;
++      }
++      else
++        sectorsPerClusterLog = 0x100 - v;
++      ClusterSizeLog = SectorSizeLog + sectorsPerClusterLog;
++      if (ClusterSizeLog > 30)
++        return false;
++    }
+   }
+ 
+   for (int i = 14; i < 21; i++)
+     if (p[i] != 0)
+       return false;
+ 
++  // F8 : a hard disk
++  // F0 : high-density 3.5-inch floppy disk
+   if (p[21] != 0xF8) // MediaType = Fixed_Disk
+     return false;
+   if (Get16(p + 22) != 0) // NumFatSectors
+     return false;
+-  G16(p + 24, SectorsPerTrack); // 63 usually
+-  G16(p + 26, NumHeads); // 255
+-  G32(p + 28, NumHiddenSectors); // 63 (XP) / 2048 (Vista and win7) / (0 on media that are not partitioned ?)
++  // G16(p + 24, SectorsPerTrack); // 63 usually
++  // G16(p + 26, NumHeads); // 255
++  // G32(p + 28, NumHiddenSectors); // 63 (XP) / 2048 (Vista and win7) / (0 on media that are not partitioned ?)
+   if (Get32(p + 32) != 0) // NumSectors32
+     return false;
+ 
+@@ -156,14 +169,47 @@ bool CHeader::Parse(const Byte *p)
+ 
+   NumClusters = NumSectors >> sectorsPerClusterLog;
+ 
+-  G64(p + 0x30, MftCluster);
++  G64(p + 0x30, MftCluster);   // $MFT.
+   // G64(p + 0x38, Mft2Cluster);
+-  G64(p + 0x48, SerialNumber);
+-  UInt32 numClustersInMftRec;
+-  UInt32 numClustersInIndexBlock;
+-  G32(p + 0x40, numClustersInMftRec); // -10 means 2 ^10 = 1024 bytes.
+-  G32(p + 0x44, numClustersInIndexBlock);
+-  return (numClustersInMftRec < 256 && numClustersInIndexBlock < 256);
++  G64(p + 0x48, SerialNumber); // $MFTMirr
++
++  /*
++    numClusters_per_MftRecord:
++    numClusters_per_IndexBlock:
++    only low byte from 4 bytes is used. Another 3 high bytes are zeros.
++      If the number is positive (number < 0x80),
++          then it represents the number of clusters.
++      If the number is negative (number >= 0x80),
++          then the size of the file record is 2 raised to the absolute value of this number.
++          example: (0xF6 == -10) means 2^10 = 1024 bytes.
++  */
++  {
++    UInt32 numClusters_per_MftRecord;
++    G32(p + 0x40, numClusters_per_MftRecord);
++    if (numClusters_per_MftRecord >= 0x100 || numClusters_per_MftRecord == 0)
++      return false;
++    if (numClusters_per_MftRecord < 0x80)
++    {
++      const int t = GetLog(numClusters_per_MftRecord);
++      if (t < 0)
++        return false;
++      MftRecordSizeLog = (unsigned)t + ClusterSizeLog;
++    }
++    else
++      MftRecordSizeLog = 0x100 - numClusters_per_MftRecord;
++    // what exact MFT record sizes are possible and supported by Windows?
++    // do we need to change this limit here?
++    const unsigned k_MftRecordSizeLog_MAX = 12;
++    if (MftRecordSizeLog > k_MftRecordSizeLog_MAX)
++      return false;
++    if (MftRecordSizeLog < SectorSizeLog)
++      return false;
++  }
++  {
++    UInt32 numClusters_per_IndexBlock;
++    G32(p + 0x44, numClusters_per_IndexBlock);
++    return (numClusters_per_IndexBlock < 0x100);
++  }
+ }
+ 
+ struct CMftRef
+@@ -235,7 +281,7 @@ struct CFileNameAttr
+   bool Parse(const Byte *p, unsigned size);
+ };
+ 
+-static void GetString(const Byte *p, unsigned len, UString2 &res)
++static void GetString(const Byte *p, const unsigned len, UString2 &res)
+ {
+   if (len == 0 && res.IsEmpty())
+     return;
+@@ -266,8 +312,8 @@ bool CFileNameAttr::Parse(const Byte *p, unsigned size)
+   G32(p + 0x38, Attrib);
+   // G16(p + 0x3C, PackedEaSize);
+   NameType = p[0x41];
+-  unsigned len = p[0x40];
+-  if (0x42 + len > size)
++  const unsigned len = p[0x40];
++  if (0x42 + len * 2 > size)
+     return false;
+   if (len != 0)
+     GetString(p + 0x42, len, Name);
+@@ -954,6 +1000,14 @@ struct CDataRef
+ static const UInt32 kMagic_FILE = 0x454C4946;
+ static const UInt32 kMagic_BAAD = 0x44414142;
+ 
++// 22.02: we support some rare case magic values:
++static const UInt32 kMagic_INDX = 0x58444e49;
++static const UInt32 kMagic_HOLE = 0x454c4f48;
++static const UInt32 kMagic_RSTR = 0x52545352;
++static const UInt32 kMagic_RCRD = 0x44524352;
++static const UInt32 kMagic_CHKD = 0x444b4843;
++static const UInt32 kMagic_FFFFFFFF = 0xFFFFFFFF;
++
+ struct CMftRec
+ {
+   UInt32 Magic;
+@@ -1030,6 +1084,26 @@ struct CMftRec
+ 
+   bool Parse(Byte *p, unsigned sectorSizeLog, UInt32 numSectors, UInt32 recNumber, CObjectVector<CAttr> *attrs);
+ 
++  bool Is_Magic_Empty() const
++  {
++    // what exact Magic values are possible for empty and unused records?
++    const UInt32 k_Magic_Unused_MAX = 5; // 22.02
++    return (Magic <= k_Magic_Unused_MAX);
++  }
++  bool Is_Magic_FILE() const { return (Magic == kMagic_FILE); }
++  // bool Is_Magic_BAAD() const { return (Magic == kMagic_BAAD); }
++  bool Is_Magic_CanIgnore() const
++  {
++    return Is_Magic_Empty()
++        || Magic == kMagic_BAAD
++        || Magic == kMagic_INDX
++        || Magic == kMagic_HOLE
++        || Magic == kMagic_RSTR
++        || Magic == kMagic_RCRD
++        || Magic == kMagic_CHKD
++        || Magic == kMagic_FFFFFFFF;
++  }
++
+   bool IsEmpty() const { return (Magic <= 2); }
+   bool IsFILE() const { return (Magic == kMagic_FILE); }
+   bool IsBAAD() const { return (Magic == kMagic_BAAD); }
+@@ -1141,9 +1215,8 @@ bool CMftRec::Parse(Byte *p, unsigned sectorSizeLog, UInt32 numSectors, UInt32 r
+     CObjectVector<CAttr> *attrs)
+ {
+   G32(p, Magic);
+-  if (!IsFILE())
+-    return IsEmpty() || IsBAAD();
+-
++  if (!Is_Magic_FILE())
++    return Is_Magic_CanIgnore();
+   
+   {
+     UInt32 usaOffset;
+@@ -1188,12 +1261,12 @@ bool CMftRec::Parse(Byte *p, unsigned sectorSizeLog, UInt32 numSectors, UInt32 r
+   G16(p + 0x10, SeqNumber);
+   // G16(p + 0x12, LinkCount);
+   // PRF(printf(" L=%d", LinkCount));
+-  UInt32 attrOffs = Get16(p + 0x14);
++  const UInt32 attrOffs = Get16(p + 0x14);
+   G16(p + 0x16, Flags);
+   PRF(printf(" F=%4X", Flags));
+ 
+-  UInt32 bytesInUse = Get32(p + 0x18);
+-  UInt32 bytesAlloc = Get32(p + 0x1C);
++  const UInt32 bytesInUse = Get32(p + 0x18);
++  const UInt32 bytesAlloc = Get32(p + 0x1C);
+   G64(p + 0x20, BaseMftRef.Val);
+   if (BaseMftRef.Val != 0)
+   {
+@@ -1667,68 +1740,57 @@ HRESULT CDatabase::Open()
+  
+   SeekToCluster(Header.MftCluster);
+ 
+-  CMftRec mftRec;
+-  UInt32 numSectorsInRec;
+-
++  // we use ByteBuf for records reading.
++  // so the size of ByteBuf must be >= mftRecordSize
++  const size_t recSize = (size_t)1 << Header.MftRecordSizeLog;
++  const size_t kBufSize = MyMax((size_t)(1 << 15), recSize);
++  ByteBuf.Alloc(kBufSize);
++  RINOK(ReadStream_FALSE(InStream, ByteBuf, recSize))
++  {
++    const UInt32 allocSize = Get32(ByteBuf + 0x1C);
++    if (allocSize != recSize)
++      return S_FALSE;
++  }
++  // MftRecordSizeLog >= SectorSizeLog
++  const UInt32 numSectorsInRec = 1u << (Header.MftRecordSizeLog - Header.SectorSizeLog);
+   CMyComPtr<IInStream> mftStream;
++  CMftRec mftRec;
+   {
+-    UInt32 blockSize = 1 << 12;
+-    ByteBuf.Alloc(blockSize);
+-    RINOK(ReadStream_FALSE(InStream, ByteBuf, blockSize));
+-    
+-    {
+-      UInt32 allocSize = Get32(ByteBuf + 0x1C);
+-      int t = GetLog(allocSize);
+-      if (t < (int)Header.SectorSizeLog)
+-        return S_FALSE;
+-      RecSizeLog = t;
+-      if (RecSizeLog > 15)
+-        return S_FALSE;
+-    }
+-
+-    numSectorsInRec = 1 << (RecSizeLog - Header.SectorSizeLog);
+     if (!mftRec.Parse(ByteBuf, Header.SectorSizeLog, numSectorsInRec, 0, NULL))
+       return S_FALSE;
+-    if (!mftRec.IsFILE())
++    if (!mftRec.Is_Magic_FILE())
+       return S_FALSE;
+     mftRec.ParseDataNames();
+     if (mftRec.DataRefs.IsEmpty())
+       return S_FALSE;
+-    RINOK(mftRec.GetStream(InStream, 0, Header.ClusterSizeLog, Header.NumClusters, &mftStream));
++    RINOK(mftRec.GetStream(InStream, 0, Header.ClusterSizeLog, Header.NumClusters, &mftStream))
+     if (!mftStream)
+       return S_FALSE;
+   }
+ 
+   // CObjectVector<CAttr> SecurityAttrs;
+ 
+-  UInt64 mftSize = mftRec.DataAttrs[0].Size;
++  const UInt64 mftSize = mftRec.DataAttrs[0].Size;
+   if ((mftSize >> 4) > Header.GetPhySize_Clusters())
+     return S_FALSE;
+ 
+-  const size_t kBufSize = (1 << 15);
+-  const size_t recSize = ((size_t)1 << RecSizeLog);
+-  if (kBufSize < recSize)
+-    return S_FALSE;
+-
+   {
+-    const UInt64 numFiles = mftSize >> RecSizeLog;
++    const UInt64 numFiles = mftSize >> Header.MftRecordSizeLog;
+     if (numFiles > (1 << 30))
+       return S_FALSE;
+     if (OpenCallback)
+     {
+       RINOK(OpenCallback->SetTotal(&numFiles, &mftSize));
+     }
+-    
+-    ByteBuf.Alloc(kBufSize);
+     Recs.ClearAndReserve((unsigned)numFiles);
+   }
+-  
++ 
+   for (UInt64 pos64 = 0;;)
+   {
+     if (OpenCallback)
+     {
+       const UInt64 numFiles = Recs.Size();
+-      if ((numFiles & 0x3FF) == 0)
++      if ((numFiles & 0x3FFF) == 0)
+       {
+         RINOK(OpenCallback->SetCompleted(&numFiles, &pos64));
+       }
+@@ -1817,12 +1879,18 @@ HRESULT CDatabase::Open()
+   for (i = 0; i < Recs.Size(); i++)
+   {
+     CMftRec &rec = Recs[i];
++    if (!rec.Is_Magic_FILE())
++      continue;
++
+     if (!rec.BaseMftRef.IsBaseItself())
+     {
+-      UInt64 refIndex = rec.BaseMftRef.GetIndex();
+-      if (refIndex > (UInt32)Recs.Size())
++      const UInt64 refIndex = rec.BaseMftRef.GetIndex();
++      if (refIndex >= Recs.Size())
+         return S_FALSE;
+       CMftRec &refRec = Recs[(unsigned)refIndex];
++      if (!refRec.Is_Magic_FILE())
++        continue;
++
+       bool moveAttrs = (refRec.SeqNumber == rec.BaseMftRef.GetNumber() && refRec.BaseMftRef.IsBaseItself());
+       if (rec.InUse() && refRec.InUse())
+       {
+@@ -1837,12 +1905,17 @@ HRESULT CDatabase::Open()
+   }
+ 
+   for (i = 0; i < Recs.Size(); i++)
+-    Recs[i].ParseDataNames();
++  {
++    CMftRec &rec = Recs[i];
++    if (!rec.Is_Magic_FILE())
++      continue;
++    rec.ParseDataNames();
++  }
+   
+   for (i = 0; i < Recs.Size(); i++)
+   {
+     CMftRec &rec = Recs[i];
+-    if (!rec.IsFILE() || !rec.BaseMftRef.IsBaseItself())
++    if (!rec.Is_Magic_FILE() || !rec.BaseMftRef.IsBaseItself())
+       continue;
+     if (i < kNumSysRecs && !_showSystemFiles)
+       continue;
+@@ -1864,7 +1937,7 @@ HRESULT CDatabase::Open()
+       FOR_VECTOR (di, rec.DataRefs)
+         if (rec.DataAttrs[rec.DataRefs[di].Start].Name.IsEmpty())
+         {
+-          indexOfUnnamedStream = di;
++          indexOfUnnamedStream = (int)di;
+           break;
+         }
+     }
+@@ -1922,14 +1995,14 @@ HRESULT CDatabase::Open()
+           indexOfUnnamedStream);
+       
+       if (rec.MyItemIndex < 0)
+-        rec.MyItemIndex = Items.Size();
+-      item.ParentHost = Items.Add(item);
++        rec.MyItemIndex = (int)Items.Size();
++      item.ParentHost = (int)Items.Add(item);
+       
+       /* we can use that code to reduce the number of alt streams:
+          it will not show how alt streams for hard links. */
+       // if (!isMainName) continue; isMainName = false;
+ 
+-      unsigned numAltStreams = 0;
++      // unsigned numAltStreams = 0;
+ 
+       FOR_VECTOR (di, rec.DataRefs)
+       {
+@@ -1947,9 +2020,9 @@ HRESULT CDatabase::Open()
+             continue;
+         }
+ 
+-        numAltStreams++;
++        // numAltStreams++;
+         ThereAreAltStreams = true;
+-        item.DataIndex = di;
++        item.DataIndex = (int)di;
+         Items.Add(item);
+       }
+     }
+@@ -1964,10 +2037,10 @@ HRESULT CDatabase::Open()
+       if (attr.Name == L"$SDS")
+       {
+         CMyComPtr<IInStream> sdsStream;
+-        RINOK(rec.GetStream(InStream, di, Header.ClusterSizeLog, Header.NumClusters, &sdsStream));
++        RINOK(rec.GetStream(InStream, (int)di, Header.ClusterSizeLog, Header.NumClusters, &sdsStream));
+         if (sdsStream)
+         {
+-          UInt64 size64 = attr.GetSize();
++          const UInt64 size64 = attr.GetSize();
+           if (size64 < (UInt32)1 << 29)
+           {
+             size_t size = (size_t)size64;
+@@ -1997,7 +2070,7 @@ HRESULT CDatabase::Open()
+     const CMftRec &rec = Recs[item.RecIndex];
+     const CFileNameAttr &fn = rec.FileNames[item.NameIndex];
+     const CMftRef &parentDirRef = fn.ParentDirRef;
+-    UInt64 refIndex = parentDirRef.GetIndex();
++    const UInt64 refIndex = parentDirRef.GetIndex();
+     if (refIndex == kRecIndex_RootDir)
+       item.ParentFolder = -1;
+     else
+@@ -2024,17 +2097,17 @@ HRESULT CDatabase::Open()
+   unsigned virtIndex = Items.Size();
+   if (_showSystemFiles)
+   {
+-    _systemFolderIndex = virtIndex++;
++    _systemFolderIndex = (int)(virtIndex++);
+     VirtFolderNames.Add(kVirtualFolder_System);
+   }
+   if (thereAreUnknownFolders_Normal)
+   {
+-    _lostFolderIndex_Normal = virtIndex++;
++    _lostFolderIndex_Normal = (int)(virtIndex++);
+     VirtFolderNames.Add(kVirtualFolder_Lost_Normal);
+   }
+   if (thereAreUnknownFolders_Deleted)
+   {
+-    _lostFolderIndex_Deleted = virtIndex++;
++    _lostFolderIndex_Deleted = (int)(virtIndex++);
+     VirtFolderNames.Add(kVirtualFolder_Lost_Deleted);
+   }
+ 
+-- 
+2.34.1
+

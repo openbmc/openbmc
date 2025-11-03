@@ -1,0 +1,31 @@
+From 22f70d5bd039b20bfdad522341412ca001c639db Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 19 Dec 2022 15:07:55 -0800
+Subject: [PATCH] Set HAVE_LARGEFILE_SUPPORT to 1 explicitly
+
+nothing sets this to 0, but for some reason it gets undef'd
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ build/cmake/setup.h.in | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/build/cmake/setup.h.in b/build/cmake/setup.h.in
+index fcc282980d..767adbf658 100644
+--- a/build/cmake/setup.h.in
++++ b/build/cmake/setup.h.in
+@@ -867,8 +867,7 @@
+ /*
+  * Define if large (64 bit file offsets) files are supported.
+  */
+-#cmakedefine HAVE_LARGEFILE_SUPPORT 1
+-
++#define HAVE_LARGEFILE_SUPPORT 1
+ /*
+  * Use OpenGL
+  */
+-- 
+2.25.1
+

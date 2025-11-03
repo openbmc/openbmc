@@ -9,6 +9,7 @@ require systemtap_git.inc
 SRC_URI += " \
            file://0001-improve-reproducibility-for-c-compiling.patch \
            file://0001-staprun-address-ncurses-6.3-failures.patch \
+           file://0001-Make-stp_task_work-compatible-with-6.11-kernels.patch \
            "
 
 DEPENDS = "elfutils"

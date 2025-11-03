@@ -56,3 +56,7 @@ FILES:${PN} += "${datadir}/dbus-1 \
                 ${systemd_user_unitdir} \
 "
 FILES:${PN}-nautilus-extension = "${libdir}/nautilus/*/*so"
+
+CVE_PRODUCT = "evince"
+CVE_STATUS[CVE-2011-0433] = "fixed-version: No action required. The current version (46.0) is not affected by the CVE which has been patched since version 3.1.2"
+CVE_STATUS[CVE-2011-5244] = "fixed-version: No action required. The current version (46.0) is not affected by the CVE which has been patched since version 3.1.2"

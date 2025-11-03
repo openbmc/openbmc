@@ -6,26 +6,26 @@ Release notes for Yocto-4.0.9 (Kirkstone)
 Security Fixes in Yocto-4.0.9
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  binutils: Fix :cve:`2023-22608`
--  curl: Fix :cve:`2023-23914`, :cve:`2023-23915` and :cve:`2023-23916`
--  epiphany: Fix :cve:`2023-26081`
--  git: Ignore :cve:`2023-22743`
--  glibc: Fix  :cve:`2023-0687`
--  gnutls: Fix :cve:`2023-0361`
--  go: Fix :cve:`2022-2879`, :cve:`2022-41720` and :cve:`2022-41723`
--  harfbuzz: Fix :cve:`2023-25193`
--  less: Fix :cve:`2022-46663`
--  libmicrohttpd: Fix :cve:`2023-27371`
--  libsdl2: Fix :cve:`2022-4743`
--  openssl: Fix :cve:`2022-3996`, :cve:`2023-0464`, :cve:`2023-0465` and :cve:`2023-0466`
--  pkgconf: Fix :cve:`2023-24056`
--  python3: Fix :cve:`2023-24329`
--  shadow: Ignore :cve:`2016-15024`
--  systemd: Fix :cve:`2022-4415`
--  tiff: Fix :cve:`2023-0800`, :cve:`2023-0801`, :cve:`2023-0802`, :cve:`2023-0803` and :cve:`2023-0804`
--  vim: Fix :cve:`2023-0433`, :cve:`2023-0512`, :cve:`2023-1127`, :cve:`2023-1170`, :cve:`2023-1175`, :cve:`2023-1264` and :cve:`2023-1355`
--  xserver-xorg: Fix :cve:`2023-0494`
--  xwayland: Fix :cve:`2023-0494`
+-  binutils: Fix :cve_nist:`2023-22608`
+-  curl: Fix :cve_nist:`2023-23914`, :cve_nist:`2023-23915` and :cve_nist:`2023-23916`
+-  epiphany: Fix :cve_nist:`2023-26081`
+-  git: Ignore :cve_nist:`2023-22743`
+-  glibc: Fix  :cve_nist:`2023-0687`
+-  gnutls: Fix :cve_nist:`2023-0361`
+-  go: Fix :cve_nist:`2022-2879`, :cve_nist:`2022-41720` and :cve_nist:`2022-41723`
+-  harfbuzz: Fix :cve_nist:`2023-25193`
+-  less: Fix :cve_nist:`2022-46663`
+-  libmicrohttpd: Fix :cve_nist:`2023-27371`
+-  libsdl2: Fix :cve_nist:`2022-4743`
+-  openssl: Fix :cve_nist:`2022-3996`, :cve_nist:`2023-0464`, :cve_nist:`2023-0465` and :cve_nist:`2023-0466`
+-  pkgconf: Fix :cve_nist:`2023-24056`
+-  python3: Fix :cve_nist:`2023-24329`
+-  shadow: Ignore :cve_nist:`2016-15024`
+-  systemd: Fix :cve_nist:`2022-4415`
+-  tiff: Fix :cve_nist:`2023-0800`, :cve_nist:`2023-0801`, :cve_nist:`2023-0802`, :cve_nist:`2023-0803` and :cve_nist:`2023-0804`
+-  vim: Fix :cve_nist:`2023-0433`, :cve_nist:`2023-0512`, :cve_nist:`2023-1127`, :cve_nist:`2023-1170`, :cve_nist:`2023-1175`, :cve_nist:`2023-1264` and :cve_nist:`2023-1355`
+-  xserver-xorg: Fix :cve_nist:`2023-0494`
+-  xwayland: Fix :cve_nist:`2023-0494`
 
 
 Fixes in Yocto-4.0.9
@@ -90,7 +90,7 @@ Fixes in Yocto-4.0.9
 -  pybootchartui: Fix python syntax issue
 -  python3-git: fix indent error
 -  python3-setuptools-rust-native: Add direct dependency of native python3 modules
--  qemu: Revert "fix :cve:`2021-3507`" as not applicable for qemu 6.2
+-  qemu: Revert "fix :cve_nist:`2021-3507`" as not applicable for qemu 6.2
 -  rsync: Add missing prototypes to function declarations
 -  rsync: Turn on -pedantic-errors at the end of 'configure'
 -  runqemu: kill qemu if it hangs

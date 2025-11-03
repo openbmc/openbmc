@@ -75,7 +75,7 @@ available. Follow these general steps to run QEMU:
       your :term:`Build Directory`.
 
    -  If you have not built an image, you can go to the
-      :yocto_dl:`machines/qemu </releases/yocto/yocto-&DISTRO;/machines/qemu/>` area and download a
+      :yocto_dl:`machines/qemu </releases/yocto/&DISTRO_REL_LATEST_TAG;/machines/qemu/>` area and download a
       pre-built image that matches your architecture and can be run on
       QEMU.
 
@@ -280,12 +280,11 @@ present, the toolchain is also automatically used.
       networking.
 
    -  SSH servers are available in some QEMU images. The ``core-image-sato``
-      QEMU image has a Dropbear secure shell (SSH) server that runs with
-      the root password disabled. The ``core-image-full-cmdline`` and
-      ``core-image-lsb`` QEMU images have OpenSSH instead of Dropbear.
-      Including these SSH servers allow you to use standard ``ssh`` and
-      ``scp`` commands. The ``core-image-minimal`` QEMU image, however,
-      contains no SSH server.
+      QEMU image has a Dropbear secure shell (SSH) server that runs with the
+      root password disabled. The ``core-image-full-cmdline`` QEMU image has
+      OpenSSH instead of Dropbear. Including these SSH servers allow you to use
+      standard ``ssh`` and ``scp`` commands. The ``core-image-minimal`` QEMU
+      image, however, contains no SSH server.
 
    -  You can use a provided, user-space NFS server to boot the QEMU
       session using a local copy of the root filesystem on the host. In

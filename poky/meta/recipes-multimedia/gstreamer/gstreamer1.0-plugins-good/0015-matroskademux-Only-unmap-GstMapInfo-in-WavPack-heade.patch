@@ -1,0 +1,60 @@
+From 008f0d52408f57f0704d5639b72db2f330b8f003 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 30 Sep 2024 16:32:48 +0300
+Subject: [PATCH 1/7] matroskademux: Only unmap GstMapInfo in WavPack header
+ extraction error paths if previously mapped
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-197
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3863
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8108>
+
+CVE: CVE-2024-47597
+CVE: CVE-2024-47601
+CVE: CVE-2024-47602
+CVE: CVE-2024-47603
+CVE: CVE-2024-47834
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/008f0d52408f57f0704d5639b72db2f330b8f003]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/matroska/matroska-demux.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gst/matroska/matroska-demux.c b/gst/matroska/matroska-demux.c
+index 9b3cf83adb..35e60b7147 100644
+--- a/gst/matroska/matroska-demux.c
++++ b/gst/matroska/matroska-demux.c
+@@ -3885,7 +3885,6 @@ gst_matroska_demux_add_wvpk_header (GstElement * element,
+   GstMatroskaTrackAudioContext *audiocontext =
+       (GstMatroskaTrackAudioContext *) stream;
+   GstBuffer *newbuf = NULL;
+-  GstMapInfo map, outmap;
+   guint8 *buf_data, *data;
+   Wavpack4Header wvh;
+ 
+@@ -3902,11 +3901,11 @@ gst_matroska_demux_add_wvpk_header (GstElement * element,
+ 
+   if (audiocontext->channels <= 2) {
+     guint32 block_samples, tmp;
++    GstMapInfo outmap;
+     gsize size = gst_buffer_get_size (*buf);
+ 
+     if (size < 4) {
+       GST_ERROR_OBJECT (element, "Too small wavpack buffer");
+-      gst_buffer_unmap (*buf, &map);
+       return GST_FLOW_ERROR;
+     }
+ 
+@@ -3944,6 +3943,7 @@ gst_matroska_demux_add_wvpk_header (GstElement * element,
+     *buf = newbuf;
+     audiocontext->wvpk_block_index += block_samples;
+   } else {
++    GstMapInfo map, outmap;
+     guint8 *outdata = NULL;
+     gsize buf_size, size;
+     guint32 block_samples, flags, crc;
+-- 
+2.30.2
+

@@ -7,7 +7,9 @@ SRC_URI = " \
     https://sourceforge.net/projects/${BPN}/files/srecord/${@oe.utils.trim_version('${PV}', 2)}/${BP}-Source.tar.gz \
     file://0001-Disable-doxygen.patch \
     file://0001-cmake-Do-not-try-to-compute-library-dependencies-dur.patch \
-    file://0001-cmake-respect-explicit-install-prefix.patch"
+    file://0001-cmake-respect-explicit-install-prefix.patch \
+    file://0001-fix-build-failure-with-gcc-15-by-adding-cstdint-head.patch \
+"
 SRC_URI[sha256sum] = "81c3d07cf15ce50441f43a82cefd0ac32767c535b5291bcc41bd2311d1337644"
 S = "${WORKDIR}/${BP}-Source"
 

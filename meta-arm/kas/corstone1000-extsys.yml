@@ -1,0 +1,6 @@
+header:
+  version: 14
+
+local_conf_header:
+  extsys: |
+    MACHINE_FEATURES += "corstone1000-extsys"

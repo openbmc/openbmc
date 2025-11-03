@@ -4,7 +4,10 @@ LIC_FILES_CHKSUM = "file://include/linux/can.h;endline=44;md5=a9e1169c6c9a114a61
 
 DEPENDS = "libsocketcan"
 
-SRC_URI = "git://github.com/linux-can/${BPN}.git;protocol=https;branch=master"
+SRC_URI = "git://github.com/linux-can/${BPN}.git;protocol=https;branch=master \
+           file://0001-timestamp-formatting-always-use-64-bit-for-timestamp.patch \
+           file://0001-lib-snprintf_can_error_frame-don-t-bail-out-if-CAN_E.patch \
+"
 
 SRCREV = "cfe41963f3425e9adb01a70cfaddedf5e5982720"
 

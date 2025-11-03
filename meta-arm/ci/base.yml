@@ -17,7 +17,7 @@ repos:
       meta-arm-toolchain:
 
   poky:
-    url: https://git.yoctoproject.org/git/poky
+    url: https://git.yoctoproject.org/poky
     layers:
       meta:
       meta-poky:

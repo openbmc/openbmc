@@ -1,0 +1,47 @@
+From 526d0eef0d850c8f2fa1bf0aef15a836797f1a67 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 4 Oct 2024 13:27:27 +0300
+Subject: [PATCH 6/7] wavparse: Fix clipping of size to the file size
+
+The size does not include the 8 bytes tag and length, so an additional 8 bytes
+must be removed here. 8 bytes are always available at this point because
+otherwise the parsing of the tag and length right above would've failed.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-260
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3888
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8042>
+
+CVE: CVE-2024-47775
+CVE: CVE-2024-47776
+CVE: CVE-2024-47777
+CVE: CVE-2024-47778
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/526d0eef0d850c8f2fa1bf0aef15a836797f1a67]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/wavparse/gstwavparse.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/gst/wavparse/gstwavparse.c b/gst/wavparse/gstwavparse.c
+index 8a04805ed4..998cbb276d 100644
+--- a/gst/wavparse/gstwavparse.c
++++ b/gst/wavparse/gstwavparse.c
+@@ -1337,10 +1337,11 @@ gst_wavparse_stream_headers (GstWavParse * wav)
+     }
+ 
+     /* Clip to upstream size if known */
+-    if (upstream_size > 0 && size + wav->offset > upstream_size) {
++    if (upstream_size > 0 && size + 8 + wav->offset > upstream_size) {
+       GST_WARNING_OBJECT (wav, "Clipping chunk size to file size");
+       g_assert (upstream_size >= wav->offset);
+-      size = upstream_size - wav->offset;
++      g_assert (upstream_size - wav->offset >= 8);
++      size = upstream_size - wav->offset - 8;
+     }
+ 
+     /* wav is a st00pid format, we don't know for sure where data starts.
+-- 
+2.30.2
+

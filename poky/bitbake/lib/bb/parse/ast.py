@@ -391,6 +391,14 @@ def finalize(fn, d, variant = None):
         if d.getVar("_FAILPARSINGERRORHANDLED", False) == True:
             raise bb.BBHandledException()
 
+        while True:
+            inherits = d.getVar('__BBDEFINHERITS', False) or []
+            if not inherits:
+                break
+            inherit, filename, lineno = inherits.pop(0)
+            d.setVar('__BBDEFINHERITS', inherits)
+            bb.parse.BBHandler.inherit(inherit, filename, lineno, d, deferred=True)
+
         for var in d.getVar('__BBHANDLERS', False) or []:
             # try to add the handler
             handlerfn = d.getVarFlag(var, "filename", False)
@@ -444,14 +452,6 @@ def multi_finalize(fn, d):
         logger.debug("Appending .bbappend file %s to %s", append, fn)
         bb.parse.BBHandler.handle(append, d, True)
 
-    while True:
-        inherits = d.getVar('__BBDEFINHERITS', False) or []
-        if not inherits:
-            break
-        inherit, filename, lineno = inherits.pop(0)
-        d.setVar('__BBDEFINHERITS', inherits)
-        bb.parse.BBHandler.inherit(inherit, filename, lineno, d, deferred=True)
-
     onlyfinalise = d.getVar("__ONLYFINALISE", False)
 
     safe_d = d
@@ -487,7 +487,9 @@ def multi_finalize(fn, d):
                 d.setVar("BBEXTENDVARIANT", variantmap[name])
             else:
                 d.setVar("PN", "%s-%s" % (pn, name))
-            bb.parse.BBHandler.inherit(extendedmap[name], fn, 0, d)
+            inherits = d.getVar('__BBDEFINHERITS', False) or []
+            inherits.append((extendedmap[name], fn, 0))
+            d.setVar('__BBDEFINHERITS', inherits)
 
         safe_d.setVar("BBCLASSEXTEND", extended)
         _create_variants(datastores, extendedmap.keys(), extendfunc, onlyfinalise)

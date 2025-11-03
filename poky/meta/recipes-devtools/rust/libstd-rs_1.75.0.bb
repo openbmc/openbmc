@@ -15,6 +15,8 @@ S = "${RUSTSRC}/library/sysroot"
 RUSTLIB_DEP = ""
 inherit cargo
 
+CVE_PRODUCT = "rust"
+
 DEPENDS:append:libc-musl = " libunwind"
 # rv32 does not have libunwind ported yet
 DEPENDS:remove:riscv32 = "libunwind"

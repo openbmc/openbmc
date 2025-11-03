@@ -10,6 +10,18 @@ SRC_URI = "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-ba
            file://0001-ENGR00312515-get-caps-from-src-pad-when-query-caps.patch \
            file://0003-viv-fb-Make-sure-config.h-is-included.patch \
            file://0002-ssaparse-enhance-SSA-text-lines-parsing.patch \
+           file://0004-vorbisdec-Set-at-most-64-channels-to-NONE-position.patch \
+           file://0005-opusdec-Set-at-most-64-channels-to-NONE-position.patch \
+           file://0006-vorbis_parse-check-writes-to-GstOggStream.vorbis_mod.patch \
+           file://0007-oggstream-review-and-fix-per-format-min_packet_size.patch \
+           file://0008-ssaparse-Search-for-closing-brace-after-opening-brac.patch \
+           file://0009-ssaparse-Don-t-use-strstr-on-strings-that-are-potent.patch \
+           file://0010-id3v2-Don-t-try-parsing-extended-header-if-not-enoug.patch \
+           file://0011-discoverer-Don-t-print-channel-layout-for-more-than-.patch \
+           file://0012-subparse-Check-for-NULL-return-of-strchr-when-parsin.patch \
+           file://CVE-2025-47808.patch \
+           file://CVE-2025-47806.patch \
+           file://CVE-2025-47807.patch \
            "
 SRC_URI[sha256sum] = "73cfadc3a6ffe77ed974cfd6fb391c605e4531f48db21dd6b9f42b8cb69bd8c1"
 

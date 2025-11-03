@@ -29,7 +29,7 @@ do_install() {
 	echo "DISTRIB_ID=${DISTRO}" >> ${D}${sysconfdir}/lsb-release
 	echo "DISTRIB_RELEASE=${DISTRO_VERSION}" >> ${D}${sysconfdir}/lsb-release
 	if [ -n "${DISTRO_CODENAME}" ]; then
-		echo "DISTRIB_CODENAME=${DISTRO_CODENAME}" >> ${D}${sysconfdir}/lsb-release
+		echo "DISTRIB_CODENAME=\"${DISTRO_CODENAME}\"" >> ${D}${sysconfdir}/lsb-release
 	fi
 	echo "DISTRIB_DESCRIPTION=\"${DISTRO_NAME} ${DISTRO_VERSION}\"" >> ${D}${sysconfdir}/lsb-release
 }

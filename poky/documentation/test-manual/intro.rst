@@ -51,13 +51,11 @@ fashion. Basically, during the development of a Yocto Project release,
 the Autobuilder tests if things work. The Autobuilder builds all test
 targets and runs all the tests.
 
-The Yocto Project uses now uses standard upstream
-Buildbot (`version 3.8 <https://docs.buildbot.net/3.8.0/>`__) to
-drive its integration and testing. Buildbot has a plug-in interface
-that the Yocto Project customizes using code from the
-``yocto-autobuilder2`` repository, adding its own console UI plugin. The
-resulting UI plug-in allows you to visualize builds in a way suited to
-the project's needs.
+The Yocto Project uses standard upstream Buildbot to drive its integration and
+testing. Buildbot has a plug-in interface that the Yocto Project customizes
+using code from the :yocto_git:`yocto-autobuilder2 </yocto-autobuilder2>`
+repository, adding its own console UI plugin. The resulting UI plug-in allows
+you to visualize builds in a way suited to the project's needs.
 
 A ``helper`` layer provides configuration and job management through
 scripts found in the ``yocto-autobuilder-helper`` repository. The
@@ -130,7 +128,9 @@ the following types of tests:
       $ bitbake image -c testimage
 
    The tests use the :ref:`ref-classes-testimage`
-   class and the :ref:`ref-tasks-testimage` task.
+   class and the :ref:`ref-tasks-testimage` task. See the
+   :ref:`test-manual/runtime-testing:Performing Automated Runtime Testing`
+   section of the Yocto Project Test Environment Manual for more information.
 
 -  *Layer Testing:* The Autobuilder has the possibility to test whether
    specific layers work with the test of the system. The layers tested
@@ -140,7 +140,7 @@ the following types of tests:
 -  *Package Testing:* A Package Test (ptest) runs tests against packages
    built by the OpenEmbedded build system on the target machine. See the
    :ref:`Testing Packages With
-   ptest <dev-manual/packages:Testing Packages With ptest>` section
+   ptest <test-manual/ptest:Testing Packages With ptest>` section
    in the Yocto Project Development Tasks Manual and the
    ":yocto_wiki:`Ptest </Ptest>`" Wiki page for more
    information on Ptest.

@@ -1,0 +1,38 @@
+From 12169aa269341753d491a69e9adb86c58dca039a Mon Sep 17 00:00:00 2001
+From: "G. Branden Robinson" <g.branden.robinson@gmail.com>
+Date: Thu, 10 Oct 2024 18:17:08 -0500
+Subject: [PATCH] [hdtbl]: Fix Savannah #66316 (missing `grn` dep).
+
+* hdtbl.am (HDTBLPROCESSEDEXAMPLEFILES): Declare dependency on `grn`;
+  because `-I` flags are used, it is dragged in even though not
+  explicitly needed.  Resolves race against `grn`'s availability in the
+  build tree.
+
+Fixes <https://savannah.gnu.org/bugs/?66316>.  Thanks to Ross Burton for
+the report.
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ contrib/hdtbl/ChangeLog | 10 ++++++++++
+ contrib/hdtbl/hdtbl.am  |  3 +--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/contrib/hdtbl/hdtbl.am b/contrib/hdtbl/hdtbl.am
+index b6c334c18..3c37174f2 100644
+--- a/contrib/hdtbl/hdtbl.am
++++ b/contrib/hdtbl/hdtbl.am
+@@ -119,9 +119,8 @@ SUFFIXES += .roff .in .ps
+ 	&& sed -e "s|[@]fontdir[@]|$(fontdir)|" \
+ 	       -e "s|[@]EGREP[@]|$(EGREP)|" $< >$@
+ 
+-
+ $(HDTBLPROCESSEDEXAMPLEFILES): $(DOC_GNU_EPS) groff troff eqn pic tbl \
+-  grops font/devps/stamp contrib/hdtbl/examples/common.roff
++  grops grn font/devps/stamp contrib/hdtbl/examples/common.roff
+ 
+ uninstall_groffdirs: uninstall-hdtbl-hook
+ uninstall-hdtbl-hook:
+-- 
+2.34.1
+

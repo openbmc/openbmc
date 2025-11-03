@@ -6,13 +6,13 @@ Release notes for Yocto-4.2.1 (Mickledore)
 Security Fixes in Yocto-4.2.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  connman: Fix :cve:`2023-28488`
--  linux-yocto: Ignore :cve:`2023-1652` and :cve:`2023-1829`
--  ghostscript: Fix :cve:`2023-28879`
--  qemu: Ignore :cve:`2023-0664`
--  ruby: Fix :cve:`2022-28738` and :cve:`2022-28739`
--  tiff: Fix :cve:`2022-4645`
--  xwayland: Fix :cve:`2023-1393`
+-  connman: Fix :cve_nist:`2023-28488`
+-  linux-yocto: Ignore :cve_nist:`2023-1652` and :cve_nist:`2023-1829`
+-  ghostscript: Fix :cve_nist:`2023-28879`
+-  qemu: Ignore :cve_nist:`2023-0664`
+-  ruby: Fix :cve_nist:`2022-28738` and :cve_nist:`2022-28739`
+-  tiff: Fix :cve_nist:`2022-4645`
+-  xwayland: Fix :cve_nist:`2023-1393`
 
 
 Fixes in Yocto-4.2.1

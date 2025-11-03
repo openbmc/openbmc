@@ -1,0 +1,49 @@
+From 20503e5dd90e21ef170488b2a8b8529ae8a4cab9 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 27 Sep 2024 10:38:50 +0300
+Subject: [PATCH 10/13] qtdemux: Make sure there are enough offsets to read
+ when parsing samples
+
+While this specific case is also caught when initializing co_chunk, the error
+is ignored in various places and calling into the function would lead to out of
+bounds reads if the error message doesn't cause the pipeline to be shut down
+fast enough.
+
+To avoid this, no matter what, make sure enough offsets are available when
+parsing them. While this is potentially slower, the same is already done in the
+non-chunks_are_samples case.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-245
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3847
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47597
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/20503e5dd90e21ef170488b2a8b8529ae8a4cab9]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index e7a79be45b..5277952c5e 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -10066,9 +10066,9 @@ qtdemux_parse_samples (GstQTDemux * qtdemux, QtDemuxStream * stream, guint32 n)
+           goto done;
+         }
+ 
+-        cur->offset =
+-            qt_atom_parser_get_offset_unchecked (&stream->co_chunk,
+-            stream->co_size);
++        if (!qt_atom_parser_get_offset (&stream->co_chunk,
++                stream->co_size, &cur->offset))
++          goto corrupt_file;
+ 
+         GST_LOG_OBJECT (qtdemux, "Created entry %d with offset "
+             "%" G_GUINT64_FORMAT, j, cur->offset);
+-- 
+2.30.2
+

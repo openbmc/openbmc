@@ -1,0 +1,127 @@
+From: Santiago Vila <sanvila@debian.org>
+Subject: Fix build with gcc-14
+Bug-Debian: https://bugs.debian.org/1075398
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+--- a/initmake
++++ b/initmake
+@@ -124,7 +124,7 @@ else
+ fi
+ 
+ cat >_autotst.c <<HERE
+-main()
++int main()
+ { return 0;
+ }
+ HERE
+@@ -200,7 +200,7 @@ cat >_autotst.c <<HERE
+ #include <sys/types.h>
+ #include <stdio.h>
+ #include <sys/stat.h>
+-main()
++int main()
+ { struct stat buf;return!&buf;
+ }
+ HERE
+--- a/src/autoconf
++++ b/src/autoconf
+@@ -414,6 +414,12 @@ cat >_autotst.c <<HERE
+ int dolock,child[NR_of_forks],timeout,fdcollect;
+ char dirlocktest[]="_locktest";
+ 
++#include <stdlib.h>
++int killchildren();
++int fdlock(int fd);
++int sfdlock(int fd);
++int fdunlock();
++
+ void stimeout()
+ { timeout=1;close(fdcollect);killchildren();
+ }
+@@ -435,7 +441,7 @@ unsigned sfork()
+   return pid;
+ }
+ 
+-int main(argc,argv)char*argv[];
++int main(int argc,char*argv[])
+ { int goodlock,testlock,i,pip[2],pipw[2];time_t otimet;unsigned dtimet;
+   static char filename[]="_locktst.l0";
+   close(0);goodlock=0;testlock=FIRST_lock;signal(SIGPIPE,SIG_DFL);
+@@ -585,13 +591,13 @@ int killchildren()
+   return 0;
+ }
+ 
+-int sfdlock(fd)
++int sfdlock(int fd)
+ { int i;unsigned gobble[GOBBLE>>2];
+   for(i=GOBBLE>>2;i;gobble[--i]=~(unsigned)0);		 /* SunOS crash test */
+   return fdlock(fd);
+ }
+ 
+-static oldfdlock;
++static int oldfdlock;
+ #ifdef F_SETLKW
+ static struct flock flck;		/* why can't it be a local variable? */
+ #endif
+@@ -599,7 +605,7 @@ static struct flock flck;		/* why can't
+ static off_t oldlockoffset;
+ #endif
+ 
+-int fdlock(fd)
++int fdlock(int fd)
+ { int i;unsigned gobble[GOBBLE>>2];
+   for(i=GOBBLE>>2;i;gobble[--i]=~(unsigned)0);		 /* SunOS crash test */
+   oldfdlock=fd;fd=0;
+@@ -993,11 +999,11 @@ int main(){int i;i=1;
+  i+=WIFEXITED(i);
+  i+=WIFSTOPPED(i);
+  i+=WEXITSTATUS(i);
+- i+=WSIGTERM(i);
++ i+=WTERMSIG(i);
+  return i;}
+ HERE
+ 
+-echo 'Testing for WIFEXITED(), WIFSTOPPED(), WEXITSTATUS() & WSIGTERM()'
++echo 'Testing for WIFEXITED(), WIFSTOPPED(), WEXITSTATUS() & WTERMSIG()'
+ if $MAKE _autotst.$O >_autotst.rrr 2>&1
+ then
+    $FGREP -v include/ <_autotst.rrr >_autotst.$O
+@@ -1029,6 +1035,8 @@ cat >_autotst.c <<HERE
+ #ifndef NO_COMSAT
+ #include "network.h"
+ #endif
++int setrgid();
++int setresgid();
+ int main(){char a[2];
+  endpwent();endgrent();memmove(a,"0",1);bcopy("0",a,1);strcspn(a,"0");
+  strtol("0",(char**)0,10);strchr("0",'0');strpbrk(a,"0");rename(a,"0");
+@@ -1059,7 +1067,7 @@ echo 'Testing for memmove, strchr, strpb
+ echo '	rename, setrgid, setegid, pow, opendir, mkdir, waitpid, fsync,'
+ echo '	ftruncate, strtod, strncasecmp, strerror, strlcat,'
+ echo '	memset, bzero, and _exit'
+-if $MAKE _autotst.$O >$DEVNULL 2>&1
++if $MAKE _autotst.$O >_autotst.rrr 2>&1
+ then
+ :
+ else
+@@ -1196,7 +1204,7 @@ unsigned long dobench(strstr,iter,haysta
+   return (unsigned long)clock()-to;
+ }
+ #endif
+-int main(argc,argv)int argc;const char*argv[];
++int main(int argc,const char*argv[])
+ { if(argc==1)
+    { char*haystack;
+ #ifdef BENCHSIZE
+--- a/src/mailfold.c
++++ b/src/mailfold.c
+@@ -378,7 +378,7 @@ void concon(ch)const int ch;   /* flip b
+    }
+ }
+ 
+-void readmail(rhead,tobesent)const long tobesent;
++void readmail(int rhead,const long tobesent)
+ { char*chp,*pastend;static size_t contlengthoffset;
+   ;{ long dfilled;
+      if(rhead==2)		  /* already read, just examine what we have */

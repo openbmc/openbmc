@@ -13,6 +13,7 @@ DEPENDS:class-native = "glib-2.0-native dbus-native"
 SRC_URI = "https://dbus.freedesktop.org/releases/dbus-glib/dbus-glib-${PV}.tar.gz \
            file://no-examples.patch \
            file://test-install-makefile.patch \
+           file://fix-build-with-gcc-15.patch \
 "
 SRC_URI[md5sum] = "021e6c8a288df02c227e4aafbf7e7527"
 SRC_URI[sha256sum] = "7d550dccdfcd286e33895501829ed971eeb65c614e73aadb4a08aeef719b143a"

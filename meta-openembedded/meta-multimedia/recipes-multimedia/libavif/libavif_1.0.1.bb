@@ -14,3 +14,5 @@ DEPENDS = "dav1d"
 inherit cmake
 
 EXTRA_OECMAKE += "-DAVIF_CODEC_DAV1D=ON"
+
+CVE_STATUS[CVE-2025-48175] = "cpe-incorrect: The current version (1.0.1) is not affected by the CVE"

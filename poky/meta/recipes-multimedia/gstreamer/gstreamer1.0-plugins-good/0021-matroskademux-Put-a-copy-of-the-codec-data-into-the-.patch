@@ -1,0 +1,44 @@
+From 98e4356be7afa869373f96b4e8ca792c5f9707ee Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Wed, 9 Oct 2024 11:52:52 -0400
+Subject: [PATCH 7/7] matroskademux: Put a copy of the codec data into the
+ A_MS/ACM caps
+
+The original codec data buffer is owned by matroskademux and does not
+necessarily live as long as the caps.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-280
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3894
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8108>
+
+CVE: CVE-2024-47540
+CVE: CVE-2024-47601
+CVE: CVE-2024-47602
+CVE: CVE-2024-47603
+CVE: CVE-2024-47834
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/98e4356be7afa869373f96b4e8ca792c5f9707ee]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/matroska/matroska-demux.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/gst/matroska/matroska-demux.c b/gst/matroska/matroska-demux.c
+index e0a4405dce..80da306731 100644
+--- a/gst/matroska/matroska-demux.c
++++ b/gst/matroska/matroska-demux.c
+@@ -7165,8 +7165,7 @@ gst_matroska_demux_audio_caps (GstMatroskaTrackAudioContext *
+ 
+       /* 18 is the waveformatex size */
+       if (size > 18) {
+-        codec_data = gst_buffer_new_wrapped_full (GST_MEMORY_FLAG_READONLY,
+-            data + 18, size - 18, 0, size - 18, NULL, NULL);
++        codec_data = gst_buffer_new_memdup (data + 18, size - 18);
+       }
+ 
+       if (riff_audio_fmt)
+-- 
+2.30.2
+

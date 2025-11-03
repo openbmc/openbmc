@@ -1,0 +1,62 @@
+From 9cf13cd1ecb7ae649394f4133d121a01e191560b Mon Sep 17 00:00:00 2001
+From: Byoungchan Lee <byoungchan.lee@gmx.com>
+Date: Mon, 9 Oct 2023 20:13:20 +0900
+Subject: [PATCH 1/2] Replace pipes.quote with shlex.quote in configure.py
+
+Python 3.12 deprecated the pipes module and it will be removed
+in Python 3.13. In configure.py, I have replaced the usage of pipes.quote
+with shlex.quote, which is the exactly same function as pipes.quote.
+
+For more details, refer to PEP 0594: https://peps.python.org/pep-0594
+
+Upstream-Status: Backport [https://github.com/ninja-build/ninja/commit/885b4efb41c039789b81f0dc0d67c1ed0faea17c]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ configure.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.py b/configure.py
+index 588250aa8a..c6973cd1a5 100755
+--- a/configure.py
++++ b/configure.py
+@@ -21,7 +21,7 @@
+ 
+ from optparse import OptionParser
+ import os
+-import pipes
++import shlex
+ import string
+ import subprocess
+ import sys
+@@ -262,7 +262,7 @@ def _run_command(self, cmdline):
+ env_keys = set(['CXX', 'AR', 'CFLAGS', 'CXXFLAGS', 'LDFLAGS'])
+ configure_env = dict((k, os.environ[k]) for k in os.environ if k in env_keys)
+ if configure_env:
+-    config_str = ' '.join([k + '=' + pipes.quote(configure_env[k])
++    config_str = ' '.join([k + '=' + shlex.quote(configure_env[k])
+                            for k in configure_env])
+     n.variable('configure_env', config_str + '$ ')
+ n.newline()
+
+From 0a9c9c5f50c60de4a7acfed8aaa048c74cd2f43b Mon Sep 17 00:00:00 2001
+From: Byoungchan Lee <byoungchan.lee@gmx.com>
+Date: Mon, 9 Oct 2023 20:13:50 +0900
+Subject: [PATCH 2/2] Remove unused module string in configure.py
+
+---
+ configure.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/configure.py b/configure.py
+index c6973cd1a5..939153df60 100755
+--- a/configure.py
++++ b/configure.py
+@@ -22,7 +22,6 @@
+ from optparse import OptionParser
+ import os
+ import shlex
+-import string
+ import subprocess
+ import sys
+ 

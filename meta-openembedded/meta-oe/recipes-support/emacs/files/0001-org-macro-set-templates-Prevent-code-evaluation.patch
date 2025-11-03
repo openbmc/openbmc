@@ -1,0 +1,47 @@
+From 7b1f10c152e69a32155c0291b9c8e83a8e28ebff Mon Sep 17 00:00:00 2001
+From: Ihor Radchenko <yantar92@posteo.net>
+Date: Tue, 20 Feb 2024 12:19:46 +0300
+Subject: [PATCH] org-macro--set-templates: Prevent code evaluation
+
+* lisp/org/org-macro.el (org-macro--set-templates): Get rid of any
+risk to evaluate code when `org-macro--set-templates' is called as a
+part of major mode initialization.  This way, no code evaluation is
+ever triggered when user merely opens the file or when
+`mm-display-org-inline' invokes Org major mode to fontify mime part
+preview in email messages.
+
+CVE: CVE-2024-30202
+
+Upstream-Status: Backport [https://cgit.git.savannah.gnu.org/cgit/emacs.git/commit/?h=emacs-29&id=befa9fcaae29a6c9a283ba371c3c5234c7f644eb]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ lisp/org/org-macro.el | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/lisp/org/org-macro.el b/lisp/org/org-macro.el
+index 481e431..a3b5c6e 100644
+--- a/lisp/org/org-macro.el
++++ b/lisp/org/org-macro.el
+@@ -109,6 +109,13 @@ previous one, unless VALUE is nil.  Return the updated list."
+   (let ((new-templates nil))
+     (pcase-dolist (`(,name . ,value) templates)
+       (let ((old-definition (assoc name new-templates)))
++        ;; This code can be evaluated unconditionally, as a part of
++        ;; loading Org mode.  We *must not* evaluate any code present
++        ;; inside the Org buffer while loading.  Org buffers may come
++        ;; from various sources, like received email messages from
++        ;; potentially malicious senders.  Org mode might be used to
++        ;; preview such messages and no code evaluation from inside the
++        ;; received Org text should ever happen without user consent.
+         (when (and (stringp value) (string-match-p "\\`(eval\\>" value))
+           ;; Pre-process the evaluation form for faster macro expansion.
+           (let* ((args (org-macro--makeargs value))
+@@ -121,7 +128,7 @@ previous one, unless VALUE is nil.  Return the updated list."
+ 		      (cadr (read value))
+ 		    (error
+                      (user-error "Invalid definition for macro %S" name)))))
+-	    (setq value (eval (macroexpand-all `(lambda ,args ,body)) t))))
++	    (setq value `(lambda ,args ,body))))
+         (cond ((and value old-definition) (setcdr old-definition value))
+ 	      (old-definition)
+ 	      (t (push (cons name (or value "")) new-templates)))))

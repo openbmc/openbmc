@@ -64,6 +64,8 @@ SRC_URI:append = " \
     file://0046-Corstone1000-Change-MMCOMM-buffer-location.patch		  \
     file://0047-corstone1000-dts-add-external-system-node.patch \
     file://0048-corstone1000-Enable-UEFI-Secure-boot.patch 			  \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000-extsys', \
+                         '', 'file://0049-corstone1000-purge-remoteproc-dts-node.patch' , d)} \
     "
 
 do_configure:append() {

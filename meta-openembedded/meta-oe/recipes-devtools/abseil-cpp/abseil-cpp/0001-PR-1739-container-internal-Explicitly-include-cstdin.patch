@@ -1,0 +1,34 @@
+From af8424e2788446224a8b790d4a87aa06f4193320 Mon Sep 17 00:00:00 2001
+From: Christopher Fore <csfore@posteo.net>
+Date: Mon, 5 Aug 2024 12:09:18 -0700
+Subject: [PATCH] PR #1739: container/internal: Explicitly include <cstdint>
+
+Imported from GitHub PR https://github.com/abseil/abseil-cpp/pull/1739
+
+GCC 15 will no longer include <cstdint> by default, resulting in build failures in projects that do not explicitly include it.
+
+Merge faf1b03a591f06933da02976119da5743f428e4f into 9cb5e5d15c142e5cc43a2c1db87c8e4e5b6d38a5
+
+Merging this change closes #1739
+
+COPYBARA_INTEGRATE_REVIEW=https://github.com/abseil/abseil-cpp/pull/1739 from csfore:gcc-15-fix faf1b03a591f06933da02976119da5743f428e4f
+PiperOrigin-RevId: 659637669
+Change-Id: If14cb0e3522774cb700bd5a74abffb75feb7a0f5
+
+Upstream-Status: Backport [20250127.0 809e5de7b92950849289236a5a09e9cb4f32c7b9]
+---
+ absl/container/internal/container_memory.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/absl/container/internal/container_memory.h b/absl/container/internal/container_memory.h
+index 3262d4eb..ac01989d 100644
+--- a/absl/container/internal/container_memory.h
++++ b/absl/container/internal/container_memory.h
+@@ -17,6 +17,7 @@
+ 
+ #include <cassert>
+ #include <cstddef>
++#include <cstdint>
+ #include <cstring>
+ #include <memory>
+ #include <new>

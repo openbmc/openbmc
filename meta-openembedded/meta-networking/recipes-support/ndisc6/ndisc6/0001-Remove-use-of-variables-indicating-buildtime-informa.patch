@@ -1,0 +1,85 @@
+From 7b3e78cf0348ea737609a2ace07c7c55aae36bcb Mon Sep 17 00:00:00 2001
+From: Santiago Vila <sanvila@debian.org>
+Date: Wed, 9 Oct 2024 22:05:09 -0700
+Subject: [PATCH] Remove use of variables indicating buildtime information
+
+We should not really care about the build date or the build host
+
+Sourced From: https://salsa.debian.org/debian/ndisc6/-/blob/master/debian/patches/reproducible-build.patch?ref_type=heads
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ rdnss/rdnssd.c   | 2 --
+ src/addrinfo.c   | 2 --
+ src/ndisc.c      | 2 --
+ src/tcpspray.c   | 2 --
+ src/traceroute.c | 2 --
+ 5 files changed, 10 deletions(-)
+
+diff --git a/rdnss/rdnssd.c b/rdnss/rdnssd.c
+index b87edb2..7201525 100644
+--- a/rdnss/rdnssd.c
++++ b/rdnss/rdnssd.c
+@@ -741,8 +741,6 @@ version (void)
+ {
+ 	printf (_("rdnssd: IPv6 Recursive DNS Server discovery Daemon %s (%s)\n"),
+ 	        VERSION, "$Rev$");
+-	printf (_(" built %s on %s\n"), __DATE__, PACKAGE_BUILD_HOSTNAME);
+-	printf (_("Configured with: %s\n"), PACKAGE_CONFIGURE_INVOCATION);
+ 	puts (_("Written by Pierre Ynard and Remi Denis-Courmont\n"));
+ 
+ 	printf (_("Copyright (C) %u-%u Pierre Ynard, Remi Denis-Courmont\n"),
+diff --git a/src/addrinfo.c b/src/addrinfo.c
+index cd73722..6316abd 100644
+--- a/src/addrinfo.c
++++ b/src/addrinfo.c
+@@ -148,8 +148,6 @@ static int quick_usage (const char *path)
+ static int version (void)
+ {
+         printf (_("addrinfo %s (%s)\n"), VERSION, "$Rev$");
+-	printf (_(" built %s on %s\n"), __DATE__, PACKAGE_BUILD_HOSTNAME);
+-        printf (_("Configured with: %s\n"), PACKAGE_CONFIGURE_INVOCATION);
+         puts (_("Written by Remi Denis-Courmont\n"));
+ 
+         printf (_("Copyright (C) %u-%u Remi Denis-Courmont\n"), 2002, 2007);
+diff --git a/src/ndisc.c b/src/ndisc.c
+index b190b18..6e222a0 100644
+--- a/src/ndisc.c
++++ b/src/ndisc.c
+@@ -920,9 +920,7 @@ version (void)
+ {
+ 	printf (_(
+ "ndisc6: IPv6 Neighbor/Router Discovery userland tool %s (%s)\n"), VERSION, "$Rev$");
+-	printf (_(" built %s on %s\n"), __DATE__, PACKAGE_BUILD_HOSTNAME);
+ 
+-	printf (_("Configured with: %s\n"), PACKAGE_CONFIGURE_INVOCATION);
+ 	puts (_("Written by Remi Denis-Courmont\n"));
+ 
+ 	printf (_("Copyright (C) %u-%u Remi Denis-Courmont\n"), 2004, 2007);
+diff --git a/src/tcpspray.c b/src/tcpspray.c
+index 39d8939..6347795 100644
+--- a/src/tcpspray.c
++++ b/src/tcpspray.c
+@@ -302,8 +302,6 @@ version (void)
+ {
+ 	printf (_(
+ "tcpspray6: TCP/IP bandwidth tester %s (%s)\n"), VERSION, "$Rev$");
+-	printf (_(" built %s on %s\n"), __DATE__, PACKAGE_BUILD_HOSTNAME);
+-	printf (_("Configured with: %s\n"), PACKAGE_CONFIGURE_INVOCATION);
+ 	puts (_("Written by Remi Denis-Courmont\n"));
+ 
+ 	printf (_("Copyright (C) %u-%u Remi Denis-Courmont\n"), 2005, 2007);
+diff --git a/src/traceroute.c b/src/traceroute.c
+index 489bc55..604b6af 100644
+--- a/src/traceroute.c
++++ b/src/traceroute.c
+@@ -1251,8 +1251,6 @@ version (void)
+ {
+ 	printf (_(
+ "traceroute6: TCP & UDP IPv6 traceroute tool %s (%s)\n"), VERSION, "$Rev$");
+-	printf (_(" built %s on %s\n"), __DATE__, PACKAGE_BUILD_HOSTNAME);
+-	printf (_("Configured with: %s\n"), PACKAGE_CONFIGURE_INVOCATION);
+ 	puts (_("Written by Remi Denis-Courmont\n"));
+ 
+ 	printf (_("Copyright (C) %u-%u Remi Denis-Courmont\n"), 2005, 2007);

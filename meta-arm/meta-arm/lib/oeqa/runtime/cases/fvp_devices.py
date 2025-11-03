@@ -1,16 +1,29 @@
 from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.data import skipIfNotInDataVar
 from oeqa.core.decorator.depends import OETestDepends
+from time import sleep
 
 
 class FvpDevicesTest(OERuntimeTestCase):
-    def run_cmd(self, cmd, check=True):
+    def run_cmd(self, cmd, check=True, retry=3):
         """
         A wrapper around self.target.run, which:
           * Fails the test on command failure by default
           * Allows the "run" behavior to be overridden in sub-classes
+          * Has a retry mechanism when SSH returns 255
         """
-        (status, output) = self.target.run(cmd)
+        status = 255
+        # The loop is retrying the self.target.run() which uses SSH only when
+        # the SSH return code is 255, which might be an issue with
+        # "Connection refused" because the port isn't open yet
+        while status == 255 and retry > 0:
+            (status, output) = self.target.run(cmd)
+            retry -= 1
+            # In case the status is 255, delay the next retry to give time to
+            # the system to settle
+            if status == 255:
+                sleep(30)
+
         if status and check:
             self.fail("Command '%s' returned non-zero exit "
                       "status %d:\n%s" % (cmd, status, output))

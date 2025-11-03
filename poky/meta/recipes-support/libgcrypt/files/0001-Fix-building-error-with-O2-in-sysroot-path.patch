@@ -1,0 +1,64 @@
+From b99952adc6ee611641709610d2e4dc90ba9acf37 Mon Sep 17 00:00:00 2001
+From: "simit.ghane" <simit.ghane@lge.com>
+Date: Tue, 7 May 2024 14:09:03 +0530
+Subject: [PATCH] Fix building error with '-O2' in sysroot path
+
+* cipher/Makefile.am (o_flag_munging): Tweak the sed script.
+* random/Makefile.am (o_flag_munging): Ditto.
+--
+
+Characters like '-O2' or '-Ofast' will be replaced by '-O1' and '-O0'
+respectively when compiling cipher and random in the filesystem
+paths as well if they happen to contain '-O2' or '-Ofast
+
+If we are cross compiling libgcrypt and sysroot contains such
+characters, we would
+get compile errors because the sysroot path has been modified.
+
+Fix this by adding blank spaces and tabs before the original matching
+pattern in the sed command.
+
+Signed-off-by: simit.ghane <simit.ghane@lge.com>
+
+ChangeLog entries added by wk
+
+Note that there is also the configure option --disable-O-flag-munging;
+see the README.
+
+Upstream-Status: Backport [https://dev.gnupg.org/rCb99952adc6ee611641709610d2e4dc90ba9acf37 https://dev.gnupg.org/rC5afadba008918d651afefb842ae123cc18454c74]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ cipher/Makefile.am | 2 +-
+ random/Makefile.am | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cipher/Makefile.am b/cipher/Makefile.am
+index 2c39586e..a914ed2b 100644
+--- a/cipher/Makefile.am
++++ b/cipher/Makefile.am
+@@ -168,7 +168,7 @@ gost-s-box$(EXEEXT_FOR_BUILD): gost-s-box.c
+ 
+ 
+ if ENABLE_O_FLAG_MUNGING
+-o_flag_munging = sed -e 's/-O\([2-9sgz][2-9sgz]*\)/-O1/' -e 's/-Ofast/-O1/g'
++o_flag_munging = sed -e 's/[[:blank:]]-O\([2-9sgz][2-9sgz]*\)/ -O1 /g' -e 's/[[:blank:]]-Ofast/ -O1 /g'
+ else
+ o_flag_munging = cat
+ endif
+diff --git a/random/Makefile.am b/random/Makefile.am
+index 0c935a05..340df38a 100644
+--- a/random/Makefile.am
++++ b/random/Makefile.am
+@@ -56,7 +56,7 @@ jitterentropy-base.c jitterentropy.h jitterentropy-base-user.h
+ 
+ # The rndjent module needs to be compiled without optimization.  */
+ if ENABLE_O_FLAG_MUNGING
+-o_flag_munging = sed -e 's/-O\([1-9sgz][1-9sgz]*\)/-O0/g' -e 's/-Ofast/-O0/g'
++o_flag_munging = sed -e 's/[[:blank:]]-O\([1-9sgz][1-9sgz]*\)/ -O0 /g' -e 's/[[:blank:]]-Ofast/ -O0 /g'
+ else
+ o_flag_munging = cat
+ endif
+-- 
+2.44.1
+

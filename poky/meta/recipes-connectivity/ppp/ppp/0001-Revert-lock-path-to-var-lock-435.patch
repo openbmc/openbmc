@@ -1,0 +1,63 @@
+From 99cbf5e269994482edaf64624be8b1c806f9587c Mon Sep 17 00:00:00 2001
+From: Dominique Martinet <asmadeus@codewreck.org>
+Date: Tue, 10 Oct 2023 10:05:50 +0900
+Subject: [PATCH] Revert lock path to /var/lock (#435)
+
+lock dir changed on linux from /var/lock to /run/pppd/lock with
+pppd-2.5.0, which makes pppd fail to start if the distribution does not
+pre-create the directory.
+
+This reverts it back to /var/lock.
+
+The paths for other OS should be identical as LOCALSTATEDIR should be
+/var, but also revert them back as well just in case.
+Since the variable is no longer used remove it from makefiles.
+
+Fixes: 66a8c74c3f73 ("Let ./configure control the paths for pppd")
+Fixes: #419
+
+Signed-off-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
+Co-authored-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
+
+Upstream-Status: Backport [https://github.com/ppp-project/ppp/commit/99cbf5e269994482edaf64624be8b1c806f9587c]
+---
+ pppd/Makefile.am | 2 +-
+ pppd/pathnames.h | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/pppd/Makefile.am b/pppd/Makefile.am
+index e5bedf2..7cb3005 100644
+--- a/pppd/Makefile.am
++++ b/pppd/Makefile.am
+@@ -83,7 +83,7 @@ pppd_SOURCES = \
+     upap.c \
+     utils.c
+ 
+-pppd_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -DLOCALSTATEDIR=\"${localstatedir}\" -DPPPD_RUNTIME_DIR='"@PPPD_RUNTIME_DIR@"' -DPPPD_LOGFILE_DIR='"@PPPD_LOGFILE_DIR@"'
++pppd_CPPFLAGS = -DSYSCONFDIR=\"${sysconfdir}\" -DPPPD_RUNTIME_DIR='"@PPPD_RUNTIME_DIR@"' -DPPPD_LOGFILE_DIR='"@PPPD_LOGFILE_DIR@"'
+ pppd_LDFLAGS =
+ pppd_LIBS =
+ 
+diff --git a/pppd/pathnames.h b/pppd/pathnames.h
+index de2fb68..12609a9 100644
+--- a/pppd/pathnames.h
++++ b/pppd/pathnames.h
+@@ -120,12 +120,12 @@
+ #define PPP_PATH_PPPDB          PPP_PATH_VARRUN  "/pppd2.tdb"
+ 
+ #ifdef __linux__
+-#define PPP_PATH_LOCKDIR        PPP_PATH_VARRUN  "/lock"
++#define PPP_PATH_LOCKDIR        "/var/lock"
+ #else
+ #ifdef SVR4
+-#define PPP_PATH_LOCKDIR        LOCALSTATEDIR "/spool/locks"
++#define PPP_PATH_LOCKDIR        "/var/spool/locks"
+ #else
+-#define PPP_PATH_LOCKDIR        LOCALSTATEDIR "/spool/lock"
++#define PPP_PATH_LOCKDIR        "/var/spool/lock"
+ #endif
+ #endif
+ 
+-- 
+2.43.0
+

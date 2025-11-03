@@ -37,7 +37,7 @@ SYMBOL TABLE:
 0000000000000000 l    d  .modname       0000000000000000 .modname
 --------------
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [workaround that needs investigation into @TARGET_STRIP@ behaviour in oe-core vs toolchain used by upstream]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 

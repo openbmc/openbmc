@@ -8,6 +8,7 @@ SRC_URI:append:libc-musl = "\
 
 SRC_URI += "\
     file://0001-kbuild-install_headers.sh-Strip-_UAPI-from-if-define.patch \
+    file://0001-connector-Fix-invalid-conversion-in-cn_proc.h.patch \
 "
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=6bc538ed5bd9a7fc9398086aedcd7e46"

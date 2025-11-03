@@ -6,28 +6,28 @@ Release notes for Yocto-4.0.6 (Kirkstone)
 Security Fixes in Yocto-4.0.6
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  bash: Fix :cve:`2022-3715`
--  curl: Fix :cve:`2022-32221`, :cve:`2022-42915` and :cve:`2022-42916`
--  dbus: Fix :cve:`2022-42010`, :cve:`2022-42011` and :cve:`2022-42012`
--  dropbear: Fix :cve:`2021-36369`
--  ffmpeg: Fix :cve:`2022-3964`, :cve:`2022-3965`
--  go: Fix :cve:`2022-2880`
--  grub2: Fix :cve:`2022-2601`, :cve:`2022-3775` and :cve:`2022-28736`
--  libarchive: Fix :cve:`2022-36227`
--  libpam: Fix :cve:`2022-28321`
--  libsndfile1: Fix :cve:`2021-4156`
--  lighttpd: Fix :cve:`2022-41556`
--  openssl: Fix :cve:`2022-3358`
--  pixman: Fix :cve:`2022-44638`
--  python3-mako: Fix :cve:`2022-40023`
--  python3: Fix :cve:`2022-42919`
--  qemu: Fix :cve:`2022-3165`
--  sysstat: Fix :cve:`2022-39377`
--  systemd: Fix :cve:`2022-3821`
--  tiff: Fix :cve:`2022-2953`, :cve:`2022-3599`, :cve:`2022-3597`, :cve:`2022-3626`, :cve:`2022-3627`, :cve:`2022-3570`, :cve:`2022-3598` and :cve:`2022-3970`
--  vim: Fix :cve:`2022-3352`, :cve:`2022-3705` and :cve:`2022-4141`
--  wayland: Fix :cve:`2021-3782`
--  xserver-xorg: Fix :cve:`2022-3550` and :cve:`2022-3551`
+-  bash: Fix :cve_nist:`2022-3715`
+-  curl: Fix :cve_nist:`2022-32221`, :cve_nist:`2022-42915` and :cve_nist:`2022-42916`
+-  dbus: Fix :cve_nist:`2022-42010`, :cve_nist:`2022-42011` and :cve_nist:`2022-42012`
+-  dropbear: Fix :cve_nist:`2021-36369`
+-  ffmpeg: Fix :cve_nist:`2022-3964`, :cve_nist:`2022-3965`
+-  go: Fix :cve_nist:`2022-2880`
+-  grub2: Fix :cve_nist:`2022-2601`, :cve_nist:`2022-3775` and :cve_nist:`2022-28736`
+-  libarchive: Fix :cve_nist:`2022-36227`
+-  libpam: Fix :cve_nist:`2022-28321`
+-  libsndfile1: Fix :cve_nist:`2021-4156`
+-  lighttpd: Fix :cve_nist:`2022-41556`
+-  openssl: Fix :cve_nist:`2022-3358`
+-  pixman: Fix :cve_nist:`2022-44638`
+-  python3-mako: Fix :cve_nist:`2022-40023`
+-  python3: Fix :cve_nist:`2022-42919`
+-  qemu: Fix :cve_nist:`2022-3165`
+-  sysstat: Fix :cve_nist:`2022-39377`
+-  systemd: Fix :cve_nist:`2022-3821`
+-  tiff: Fix :cve_nist:`2022-2953`, :cve_nist:`2022-3599`, :cve_nist:`2022-3597`, :cve_nist:`2022-3626`, :cve_nist:`2022-3627`, :cve_nist:`2022-3570`, :cve_nist:`2022-3598` and :cve_nist:`2022-3970`
+-  vim: Fix :cve_nist:`2022-3352`, :cve_nist:`2022-3705` and :cve_nist:`2022-4141`
+-  wayland: Fix :cve_nist:`2021-3782`
+-  xserver-xorg: Fix :cve_nist:`2022-3550` and :cve_nist:`2022-3551`
 
 
 Fixes in Yocto-4.0.6

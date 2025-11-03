@@ -19,7 +19,6 @@ import sys
 import threading
 import traceback
 
-import bb.exceptions
 import bb.utils
 
 # This is the pid for which we should generate the event. This is set when
@@ -195,7 +194,12 @@ def fire_ui_handlers(event, d):
         ui_queue.append(event)
         return
 
-    with bb.utils.lock_timeout(_thread_lock):
+    with bb.utils.lock_timeout_nocheck(_thread_lock) as lock:
+        if not lock:
+            # If we can't get the lock, we may be recursively called, queue and return
+            ui_queue.append(event)
+            return
+
         errors = []
         for h in _ui_handlers:
             #print "Sending event %s" % event
@@ -213,6 +217,9 @@ def fire_ui_handlers(event, d):
                 errors.append(h)
         for h in errors:
             del _ui_handlers[h]
+
+    while ui_queue:
+        fire_ui_handlers(ui_queue.pop(), d)
 
 def fire(event, d):
     """Fire off an Event"""
@@ -759,13 +766,7 @@ class LogHandler(logging.Handler):
 
     def emit(self, record):
         if record.exc_info:
-            etype, value, tb = record.exc_info
-            if hasattr(tb, 'tb_next'):
-                tb = list(bb.exceptions.extract_traceback(tb, context=3))
-            # Need to turn the value into something the logging system can pickle
-            record.bb_exc_info = (etype, value, tb)
-            record.bb_exc_formatted = bb.exceptions.format_exception(etype, value, tb, limit=5)
-            value = str(value)
+            record.bb_exc_formatted = traceback.format_exception(*record.exc_info)
             record.exc_info = None
         fire(record, None)
 

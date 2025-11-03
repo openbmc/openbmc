@@ -1,0 +1,57 @@
+From e131071769ee3df51b56b053ba6bfa06ae9eff25 Mon Sep 17 00:00:00 2001
+From: Dmitri Mokhov <dmitri.n.mokhov@intel.com>
+Date: Mon, 11 Sep 2023 10:35:07 -0500
+Subject: [PATCH] Fix/suppress new GCC 12/13 warnings (#1192)
+
+Upstream-Status: Backport [https://github.com/oneapi-src/oneTBB/commit/e131071769ee3df51b56b053ba6bfa06ae9eff25]
+Signed-off-by: Dmitri Mokhov <dmitri.n.mokhov@intel.com>
+---
+ .../oneapi/tbb/detail/_concurrent_unordered_base.h   |  2 +-
+ src/tbb/concurrent_monitor.h                         | 12 +++++++++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/include/oneapi/tbb/detail/_concurrent_unordered_base.h b/include/oneapi/tbb/detail/_concurrent_unordered_base.h
+index ade91c33..40829208 100644
+--- a/include/oneapi/tbb/detail/_concurrent_unordered_base.h
++++ b/include/oneapi/tbb/detail/_concurrent_unordered_base.h
+@@ -921,7 +921,7 @@ private:
+             node_allocator_traits::deallocate(dummy_node_allocator, node, 1);
+         } else {
+             // GCC 11.1 issues a warning here that incorrect destructor might be called for dummy_nodes
+-            #if (__TBB_GCC_VERSION >= 110100 && __TBB_GCC_VERSION < 130000 ) && !__clang__ && !__INTEL_COMPILER
++            #if (__TBB_GCC_VERSION >= 110100 && __TBB_GCC_VERSION < 140000 ) && !__clang__ && !__INTEL_COMPILER
+             volatile
+             #endif
+             value_node_ptr val_node = static_cast<value_node_ptr>(node);
+diff --git a/src/tbb/concurrent_monitor.h b/src/tbb/concurrent_monitor.h
+index 3d20ef5b..3e5c4beb 100644
+--- a/src/tbb/concurrent_monitor.h
++++ b/src/tbb/concurrent_monitor.h
+@@ -1,5 +1,5 @@
+ /*
+-    Copyright (c) 2005-2021 Intel Corporation
++    Copyright (c) 2005-2023 Intel Corporation
+ 
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+@@ -290,7 +290,17 @@ public:
+             n = my_waitset.front();
+             if (n != end) {
+                 my_waitset.remove(*n);
++
++// GCC 12.x-13.x issues a warning here that to_wait_node(n)->my_is_in_list might have size 0, since n is
++// a base_node pointer. (This cannot happen, because only wait_node pointers are added to my_waitset.)
++#if (__TBB_GCC_VERSION >= 120100 && __TBB_GCC_VERSION < 140000 ) && !__clang__ && !__INTEL_COMPILER
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wstringop-overflow"
++#endif
+                 to_wait_node(n)->my_is_in_list.store(false, std::memory_order_relaxed);
++#if (__TBB_GCC_VERSION >= 120100 && __TBB_GCC_VERSION < 140000 ) && !__clang__ && !__INTEL_COMPILER
++#pragma GCC diagnostic pop
++#endif
+             }
+         }
+ 
+-- 
+2.43.0
+

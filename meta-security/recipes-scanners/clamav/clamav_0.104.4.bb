@@ -20,6 +20,8 @@ SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/0.104;protocol=https \
     file://tmpfiles.clamav \
     file://headers_fixup.patch \
     file://oe_cmake_fixup.patch \
+    file://CVE-2024-20505.patch \
+    file://CVE-2024-20506.patch \
 "
 S = "${WORKDIR}/git"
 

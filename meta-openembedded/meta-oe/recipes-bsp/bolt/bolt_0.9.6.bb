@@ -18,5 +18,5 @@ inherit cmake pkgconfig meson features_check
 
 FILES:${PN} += "${datadir}/dbus-1/* \
                 ${datadir}/polkit-1/* \
-                ${libdir}/systemd/* \
-               "
+                ${systemd_system_unitdir} \
+"

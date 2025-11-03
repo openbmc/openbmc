@@ -1,0 +1,37 @@
+From 8c32bc9fa67513f46199bc31498dc1fecbb611bb Mon Sep 17 00:00:00 2001
+From: Simon McVittie <smcv@collabora.com>
+Date: Thu, 13 Mar 2025 14:19:28 +0000
+Subject: [PATCH] dbus-gvalue: Avoid using the reserved word 'bool'
+
+This is reserved in C23 for the equivalent of `<stdbool.h>`.
+
+Bug-Debian: https://bugs.debian.org/1096507
+Signed-off-by: Simon McVittie <smcv@collabora.com>
+Upstream-Status: Backport [https://gitlab.freedesktop.org/dbus/dbus-glib/-/commit/8c32bc9fa67513f46199bc31498dc1fecbb611bb]
+igned-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ dbus/dbus-gvalue.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/dbus/dbus-gvalue.c b/dbus/dbus-gvalue.c
+index 534e90a..788e360 100644
+--- a/dbus/dbus-gvalue.c
++++ b/dbus/dbus-gvalue.c
+@@ -545,11 +545,11 @@ demarshal_basic (DBusGValueMarshalCtx      *context,
+     {
+     case DBUS_TYPE_BOOLEAN:
+       {
+-	dbus_bool_t bool;
++	dbus_bool_t b;
+         if (!G_VALUE_HOLDS (value, G_TYPE_BOOLEAN))
+           goto invalid_type;
+-	dbus_message_iter_get_basic (iter, &bool);
+-	g_value_set_boolean (value, bool);
++	dbus_message_iter_get_basic (iter, &b);
++	g_value_set_boolean (value, b);
+ 	return TRUE;
+       }
+     case DBUS_TYPE_BYTE:
+-- 
+GitLab
+

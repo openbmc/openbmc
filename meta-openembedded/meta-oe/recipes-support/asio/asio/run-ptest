@@ -1,0 +1,19 @@
+#!/bin/sh
+
+ptestdir=$(dirname "$(readlink -f "$0")")
+cd "$ptestdir"/tests || exit
+
+tests=$(find * -type f -executable)
+
+rm -rf test.log
+
+for f in $tests
+do
+    if test -x ./"$f"; then
+        if ./"$f" > test.log 2>&1; then
+            echo "PASS: $f"
+        else
+            echo "FAIL: $f"
+        fi
+    fi
+done

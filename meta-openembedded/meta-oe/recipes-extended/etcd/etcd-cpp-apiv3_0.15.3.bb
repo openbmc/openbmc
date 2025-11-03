@@ -19,5 +19,9 @@ S = "${WORKDIR}/git"
 
 EXTRA_OECONF += "-DCPPREST_EXCLUDE_WEBSOCKETS=ON"
 
+do_install:append() {
+	sed -i -e 's#${RECIPE_SYSROOT}##g' ${D}${libdir}/cmake/etcd-cpp-api/etcd-targets.cmake
+}
+
 SOLIBS = ".so"
 FILES_SOLIBSDEV = ""

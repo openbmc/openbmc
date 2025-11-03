@@ -11,6 +11,10 @@ SRC_URI = "https://github.com/appneta/${BPN}/releases/download/v${PV}/${BP}.tar.
     file://0001-libopts.m4-set-POSIX_SHELL-to-bin-sh.patch \
     file://0001-configure.ac-unify-search-dirs-for-pcap-and-add-lib3.patch \
     file://0001-configure.ac-do-not-run-conftest-in-case-of-cross-co.patch \
+    file://CVE-2023-4256.patch \
+    file://CVE-2023-43279.patch \
+    file://CVE-2024-22654-0001.patch \
+    file://CVE-2024-22654-0002.patch \
 "
 
 SRC_URI[sha256sum] = "44f18fb6d3470ecaf77a51b901a119dae16da5be4d4140ffbb2785e37ad6d4bf"

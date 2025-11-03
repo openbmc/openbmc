@@ -1,0 +1,31 @@
+From c09d377cd3b91c4c4360ebfab5be37f6296ff26a Mon Sep 17 00:00:00 2001
+From: Jinfeng Wang <jinfeng.wang.cn@windriver.com>
+Date: Wed, 16 Jul 2025 02:54:28 +0000
+Subject: [PATCH] postfix: add preliminary setting
+
+post-install call postconf commands to modify main.cf. When multiple
+parameters to postconf, the order of those parameters in main.cf is random.
+Then it will reproduce random results in rootfs file(sample-main.cf). To
+fix this, add preliminary setting in main.cf.
+
+Upstream-Status: Inappropriate [this is the use of post-install,
+upstream is not affected]
+
+Signed-off-by: Jinfeng Wang <jinfeng.wang.cn@windriver.com>
+---
+ conf/main.cf | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/conf/main.cf b/conf/main.cf
+index 2ee7996..0c208e6 100644
+--- a/conf/main.cf
++++ b/conf/main.cf
+@@ -683,3 +683,5 @@ sample_directory =
+ #
+ readme_directory =
+ inet_protocols = ipv4
++shlib_directory =
++meta_directory =
+-- 
+2.31.3
+

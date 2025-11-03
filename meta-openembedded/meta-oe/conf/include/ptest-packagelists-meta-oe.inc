@@ -7,6 +7,7 @@
 #
 # ptests which take less than ~30s each
 PTESTS_FAST_META_OE = "\
+    asio \
     cmocka \
     cunit \
     duktape \

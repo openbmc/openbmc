@@ -7,6 +7,7 @@ SRCREV = "382aa2b0d53a87c27f2f647dfaf670375ba0b85f"
 PV = "2.4.2"
 
 SRC_URI = "git://github.com/FastCGI-Archives/fcgi2.git;protocol=https;branch=master \
+           file://CVE-2025-23016.patch \
           "
 
 S = "${WORKDIR}/git"

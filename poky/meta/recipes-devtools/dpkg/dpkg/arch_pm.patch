@@ -3,7 +3,7 @@ architecture for mips64, and possibly other arch's
 because of faulty code added to Arch.pm in the latest
 release from upstream.  We remove that code.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
 

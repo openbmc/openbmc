@@ -1,0 +1,68 @@
+From f2c892109a05db144e8b18bcbcf9c24fe8d977c4 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?=
+ <vesa.jaaskelainen@vaisala.com>
+Date: Sun, 1 Sep 2024 15:55:16 +0300
+Subject: [PATCH 4/5] Fix cross compilation issue with linux-ppc architecture
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When compiling under Yocto project for linux-ppc target architecture
+.so files were generated incorrectly as:
+
+  rpds.cpython-312-ppc-linux-gnu.so
+
+Where as platform and EXT_SUFFIX are defined as:
+
+  >>> sysconfig.get_platform()
+  'linux-ppc'
+  >>> sysconfig.get_config_vars()['EXT_SUFFIX']
+  '.cpython-312-powerpc-linux-gnu.so'
+
+Which should have caused the .so files as:
+
+  rpds.cpython-312-powerpc-linux-gnu.so
+
+Upstream-Status: Backport [https://github.com/PyO3/maturin/commit/f2c892109a05db144e8b18bcbcf9c24fe8d977c4]
+
+Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
+---
+ src/python_interpreter/config.rs | 8 ++++++++
+ src/target.rs                    | 2 ++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/src/python_interpreter/config.rs b/src/python_interpreter/config.rs
+index 938e9955..8f883887 100644
+--- a/src/python_interpreter/config.rs
++++ b/src/python_interpreter/config.rs
+@@ -424,6 +424,14 @@ mod test {
+             ".cpython-310-powerpc64le-linux-gnu.so"
+         );
+ 
++        let sysconfig = InterpreterConfig::lookup_one(
++            &Target::from_target_triple(Some("powerpc-unknown-linux-gnu".to_string())).unwrap(),
++            InterpreterKind::CPython,
++            (3, 10),
++        )
++        .unwrap();
++        assert_eq!(sysconfig.ext_suffix, ".cpython-310-powerpc-linux-gnu.so");
++
+         let sysconfig = InterpreterConfig::lookup_one(
+             &Target::from_target_triple(Some("s390x-unknown-linux-gnu".to_string())).unwrap(),
+             InterpreterKind::CPython,
+diff --git a/src/target.rs b/src/target.rs
+index ad8ebaba..93afd9bb 100644
+--- a/src/target.rs
++++ b/src/target.rs
+@@ -380,6 +380,8 @@ impl Target {
+             "ppc_64"
+         } else if matches!(self.target_arch(), Arch::X86) && python_impl == InterpreterKind::PyPy {
+             "x86"
++        } else if matches!(self.target_arch(), Arch::Powerpc) {
++            "powerpc"
+         } else {
+             self.get_python_arch()
+         }
+-- 
+2.34.1
+

@@ -1,0 +1,27 @@
+From 88351eca17dcc55189991ba60e50819b6d4193c1 Mon Sep 17 00:00:00 2001
+From: 90 <hi@90.gripe>
+Date: Fri, 5 Apr 2024 19:36:06 +0100
+Subject: [PATCH] Fix missing header for systemd notification
+
+Upstream-Status: Backport [88351eca17dcc55189991ba60e50819b6d4193c1]
+Signed-off-by: Jon Mason <jdmason@kudzu.us>
+
+---
+ openbsd-compat/port-linux.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/openbsd-compat/port-linux.c b/openbsd-compat/port-linux.c
+index df7290246df6..4c024c6d2d61 100644
+--- a/openbsd-compat/port-linux.c
++++ b/openbsd-compat/port-linux.c
+@@ -33,6 +33,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <time.h>
++#include <unistd.h>
+ 
+ #include "log.h"
+ #include "xmalloc.h"
+-- 
+2.39.2
+

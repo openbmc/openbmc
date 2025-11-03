@@ -4,6 +4,8 @@ Date: Fri, 9 Feb 2018 17:37:48 +0200
 Subject: [PATCH] Test patch here!
 
 This is an invalid patch used by oe-selftest
+
+Upstream-Status: Inappropriate [Test artefact]
 ---
  README | 1 +
  1 file changed, 1 insertion(+)

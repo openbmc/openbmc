@@ -1,0 +1,40 @@
+From 5e9725c1151e2b029066d61ef5dccf1f3e6cb323 Mon Sep 17 00:00:00 2001
+From: Kai Kang <kai.kang@windriver.com>
+Date: Sat, 12 Oct 2024 18:43:25 +0800
+Subject: [PATCH] don not append system name to lib name
+
+It appends system name to library names for cross compile. For example, the
+library name is libwx_baseu-3.1-Linux.so rather than libwx_baseu-3.1.so. It is
+not appropriate for oe.
+
+Upstream-Status: Pending [oe specific]
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for wxWidgets 3.2.1.
+
+Signed-off-by: Kai Kang <kai.kang@windriver.com>
+---
+ build/cmake/functions.cmake | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/build/cmake/functions.cmake b/build/cmake/functions.cmake
+index 81ede7d8ae..23eebeb914 100644
+--- a/build/cmake/functions.cmake
++++ b/build/cmake/functions.cmake
+@@ -243,9 +243,9 @@ function(wx_set_target_properties target_name)
+     endif()
+ 
+     set(cross_target)
+-    if (CMAKE_CROSSCOMPILING)
+-        set(cross_target "-${CMAKE_SYSTEM_NAME}")
+-    endif()
++    #if (CMAKE_CROSSCOMPILING)
++    #    set(cross_target "-${CMAKE_SYSTEM_NAME}")
++    #endif()
+ 
+     set(lib_prefix "lib")
+     if(MSVC OR (WIN32 AND wxBUILD_SHARED))
+-- 
+2.25.1
+

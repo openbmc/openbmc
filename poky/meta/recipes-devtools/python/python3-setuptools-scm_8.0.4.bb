@@ -6,6 +6,7 @@ argument or in a SCM managed file."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=838c366f69b72c5df05c96dff79b35f2"
 
+SRC_URI += "file://0001-respect-GIT_CEILING_DIRECTORIES.patch"
 SRC_URI[sha256sum] = "b5f43ff6800669595193fd09891564ee9d1d7dcb196cab4b2506d53a2e1c95c7"
 
 inherit pypi python_setuptools_build_meta

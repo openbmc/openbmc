@@ -4,6 +4,8 @@ Date: Wed, 24 Feb 2016 17:43:03 +1300
 Subject: [PATCH] Add a note line to the quick reference
 
 A test patch so we have a file to move around.
+
+Upstream-Status: Inappropriate [Test artefact]
 ---
  doc/quickref.1.in | 1 +
  1 file changed, 1 insertion(+)

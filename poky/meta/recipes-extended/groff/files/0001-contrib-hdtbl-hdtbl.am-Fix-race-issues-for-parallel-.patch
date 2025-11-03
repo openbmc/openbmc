@@ -1,0 +1,31 @@
+From 771686c042d5f494550d0399f36e00b1ca557b2d Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Mon, 11 Nov 2024 14:12:51 +0000
+Subject: [PATCH] contrib/hdtbl/hdtbl.am: Fix race issues for parallel build
+
+Fixed race issues for parallel build:
+groff: error: couldn't exec soelim: Permission
+
+And:
+groff: error: couldn't exec grn: Permission denied
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/groff/2024-11/msg00097.html]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ contrib/hdtbl/hdtbl.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/contrib/hdtbl/hdtbl.am b/contrib/hdtbl/hdtbl.am
+index 9384fac..70f7bc9 100644
+--- a/contrib/hdtbl/hdtbl.am
++++ b/contrib/hdtbl/hdtbl.am
+@@ -119,7 +119,7 @@ SUFFIXES += .roff .in .ps
+ 	       -e "s|[@]EGREP[@]|$(EGREP)|" $< >$@
+ 
+ $(HDTBLPROCESSEDEXAMPLEFILES): $(DOC_GNU_EPS) groff troff eqn pic tbl \
+-  grops grn font/devps/stamp contrib/hdtbl/examples/common.roff
++  grops grn soelim font/devps/stamp contrib/hdtbl/examples/common.roff
+ 
+ uninstall_groffdirs: uninstall-hdtbl-hook
+ uninstall-hdtbl-hook:

@@ -1,0 +1,49 @@
+From 8fc46d871639dbe799f6ff0a61b046412ef5dcc6 Mon Sep 17 00:00:00 2001
+From: Martin Jansa <martin.jansa@gmail.com>
+Date: Mon, 5 May 2025 08:16:30 +0200
+Subject: [PATCH] build_support: handle empty max_priority value as None
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When cross-compiling these tests they fail when the host cannot execute
+the binaries built for target.
+
+On my local ubuntu-22.04 docker container running
+build_support/src/sniff_mq_prio_max results in:
+posix_ipc-1.2.0 $ ./build_support/src/foo
+bash: ./build_support/src/foo: cannot execute binary file: Exec format error
+which triggers the Exception in compile_and_run and returns None
+
+While on some other ubuntu-22.04 containers I see:
+posix_ipc-1.2.0$ ./build_support/src/sniff_mq_prio_max
+/usr/lib/ld-linux-aarch64.so.1: No such file or directory
+
+and the compile_and_run returns
+b''
+which then causes
+posix_ipc-1.2.0/build_support/discover_system_info.py", line 244, in sniff_mq_prio_max
+    if max_priority < 0:
+       ^^^^^^^^^^^^^^^^
+
+Handle the empty value the same as None to avoid this.
+
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+Upstream-Status: Submitted [https://github.com/osvenskan/posix_ipc/pull/77]
+---
+ build_support/discover_system_info.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build_support/discover_system_info.py b/build_support/discover_system_info.py
+index 6d059d9..f8a3c83 100644
+--- a/build_support/discover_system_info.py
++++ b/build_support/discover_system_info.py
+@@ -223,7 +223,7 @@ def sniff_mq_prio_max():
+         except ValueError:
+             max_priority = None
+ 
+-    if max_priority is None:
++    if not max_priority:
+         # Looking for a #define didn't work; ask sysconf() instead.
+         # Note that sys.sysconf_names doesn't exist under Cygwin.
+         if hasattr(os, "sysconf_names") and \

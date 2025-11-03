@@ -14,7 +14,7 @@ machine: fvp-base
 
 defaults:
   repos:
-    refspec: master
+    refspec: scarthgap
 
 repos:
   meta-arm:

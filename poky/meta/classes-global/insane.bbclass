@@ -334,20 +334,15 @@ def package_qa_check_arch(path,name,d, elf, messages):
     if not elf:
         return
 
-    target_os   = d.getVar('HOST_OS')
-    target_arch = d.getVar('HOST_ARCH')
+    host_os   = d.getVar('HOST_OS')
+    host_arch = d.getVar('HOST_ARCH')
     provides = d.getVar('PROVIDES')
     bpn = d.getVar('BPN')
 
-    if target_arch == "allarch":
+    if host_arch == "allarch":
         pn = d.getVar('PN')
         oe.qa.add_message(messages, "arch", pn + ": Recipe inherits the allarch class, but has packaged architecture-specific binaries")
         return
-
-    # FIXME: Cross package confuse this check, so just skip them
-    for s in ['cross', 'nativesdk', 'cross-canadian']:
-        if bb.data.inherits_class(s, d):
-            return
 
     # avoid following links to /usr/bin (e.g. on udev builds)
     # we will check the files pointed to anyway...
@@ -356,12 +351,12 @@ def package_qa_check_arch(path,name,d, elf, messages):
 
     #if this will throw an exception, then fix the dict above
     (machine, osabi, abiversion, littleendian, bits) \
-        = oe.elf.machine_dict(d)[target_os][target_arch]
+        = oe.elf.machine_dict(d)[host_os][host_arch]
 
     # Check the architecture and endiannes of the binary
     is_32 = (("virtual/kernel" in provides) or bb.data.inherits_class("module", d)) and \
-            (target_os == "linux-gnux32" or target_os == "linux-muslx32" or \
-            target_os == "linux-gnu_ilp32" or re.match(r'mips64.*32', d.getVar('DEFAULTTUNE')))
+            (host_os == "linux-gnux32" or host_os == "linux-muslx32" or \
+            host_os == "linux-gnu_ilp32" or re.match(r'mips64.*32', d.getVar('DEFAULTTUNE')))
     is_bpf = (oe.qa.elf_machine_to_string(elf.machine()) == "BPF")
     if not ((machine == elf.machine()) or is_32 or is_bpf):
         oe.qa.add_message(messages, "arch", "Architecture did not match (%s, expected %s) in %s" % \
@@ -840,10 +835,6 @@ def prepopulate_objdump_p(elf, d):
 
 # Walk over all files in a directory and call func
 def package_qa_walk(warnfuncs, errorfuncs, package, d):
-    #if this will throw an exception, then fix the dict above
-    target_os   = d.getVar('HOST_OS')
-    target_arch = d.getVar('HOST_ARCH')
-
     warnings = {}
     errors = {}
     elves = {}

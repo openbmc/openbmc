@@ -6,28 +6,28 @@ Release notes for Yocto-4.0.10 (Kirkstone)
 Security Fixes in Yocto-4.0.10
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  binutils: Fix :cve:`2023-1579`, :cve:`2023-1972`, :cve_mitre:`2023-25584`, :cve_mitre:`2023-25585` and :cve_mitre:`2023-25588`
--  cargo : Ignore :cve:`2022-46176`
--  connman: Fix :cve:`2023-28488`
--  curl: Fix :cve:`2023-27533`, :cve:`2023-27534`, :cve:`2023-27535`, :cve:`2023-27536` and :cve:`2023-27538`
--  ffmpeg: Fix :cve:`2022-48434`
--  freetype: Fix :cve:`2023-2004`
+-  binutils: Fix :cve_nist:`2023-1579`, :cve_nist:`2023-1972`, :cve_mitre:`2023-25584`, :cve_mitre:`2023-25585` and :cve_mitre:`2023-25588`
+-  cargo : Ignore :cve_nist:`2022-46176`
+-  connman: Fix :cve_nist:`2023-28488`
+-  curl: Fix :cve_nist:`2023-27533`, :cve_nist:`2023-27534`, :cve_nist:`2023-27535`, :cve_nist:`2023-27536` and :cve_nist:`2023-27538`
+-  ffmpeg: Fix :cve_nist:`2022-48434`
+-  freetype: Fix :cve_nist:`2023-2004`
 -  ghostscript: Fix :cve_mitre:`2023-29979`
--  git: Fix :cve:`2023-25652` and :cve:`2023-29007`
--  go: Fix :cve:`2022-41722`, :cve:`2022-41724`, :cve:`2022-41725`, :cve:`2023-24534`, :cve:`2023-24537` and :cve:`2023-24538`
--  go: Ignore :cve:`2022-41716`
--  libxml2: Fix :cve:`2023-28484` and :cve:`2023-29469`
--  libxpm: Fix :cve:`2022-44617`, :cve:`2022-46285` and :cve:`2022-4883`
--  linux-yocto: Ignore :cve:`2021-3759`, :cve:`2021-4135`, :cve:`2021-4155`, :cve:`2022-0168`, :cve:`2022-0171`, :cve:`2022-1016`, :cve:`2022-1184`, :cve:`2022-1198`, :cve:`2022-1199`, :cve:`2022-1462`, :cve:`2022-1734`, :cve:`2022-1852`, :cve:`2022-1882`, :cve:`2022-1998`, :cve:`2022-2078`, :cve:`2022-2196`, :cve:`2022-2318`, :cve:`2022-2380`, :cve:`2022-2503`, :cve:`2022-26365`, :cve:`2022-2663`, :cve:`2022-2873`, :cve:`2022-2905`, :cve:`2022-2959`, :cve:`2022-3028`, :cve:`2022-3078`, :cve:`2022-3104`, :cve:`2022-3105`, :cve:`2022-3106`, :cve:`2022-3107`, :cve:`2022-3111`, :cve:`2022-3112`, :cve:`2022-3113`, :cve:`2022-3115`, :cve:`2022-3202`, :cve:`2022-32250`, :cve:`2022-32296`, :cve:`2022-32981`, :cve:`2022-3303`, :cve:`2022-33740`, :cve:`2022-33741`, :cve:`2022-33742`, :cve:`2022-33743`, :cve:`2022-33744`, :cve:`2022-33981`, :cve:`2022-3424`, :cve:`2022-3435`, :cve:`2022-34918`, :cve:`2022-3521`, :cve:`2022-3545`, :cve:`2022-3564`, :cve:`2022-3586`, :cve:`2022-3594`, :cve:`2022-36123`, :cve:`2022-3621`, :cve:`2022-3623`, :cve:`2022-3629`, :cve:`2022-3633`, :cve:`2022-3635`, :cve:`2022-3646`, :cve:`2022-3649`, :cve:`2022-36879`, :cve:`2022-36946`, :cve:`2022-3707`, :cve:`2022-39188`, :cve:`2022-39190`, :cve:`2022-39842`, :cve:`2022-40307`, :cve:`2022-40768`, :cve:`2022-4095`, :cve:`2022-41218`, :cve:`2022-4139`, :cve:`2022-41849`, :cve:`2022-41850`, :cve:`2022-41858`, :cve:`2022-42328`, :cve:`2022-42329`, :cve:`2022-42703`, :cve:`2022-42721`, :cve:`2022-42722`, :cve:`2022-42895`, :cve:`2022-4382`, :cve:`2022-4662`, :cve:`2022-47518`, :cve:`2022-47519`, :cve:`2022-47520`, :cve:`2022-47929`, :cve:`2023-0179`, :cve:`2023-0394`, :cve:`2023-0461`, :cve:`2023-0590`, :cve:`2023-1073`, :cve:`2023-1074`, :cve:`2023-1077`, :cve:`2023-1078`, :cve:`2023-1079`, :cve:`2023-1095`, :cve:`2023-1118`, :cve:`2023-1249`, :cve:`2023-1252`, :cve:`2023-1281`, :cve:`2023-1382`, :cve:`2023-1513`, :cve:`2023-1829`, :cve:`2023-1838`, :cve:`2023-1998`, :cve:`2023-2006`, :cve:`2023-2008`, :cve:`2023-2162`, :cve:`2023-2166`, :cve:`2023-2177`, :cve:`2023-22999`, :cve:`2023-23002`, :cve:`2023-23004`, :cve:`2023-23454`, :cve:`2023-23455`, :cve:`2023-23559`, :cve:`2023-25012`, :cve:`2023-26545`, :cve:`2023-28327` and :cve:`2023-28328`
--  nasm: Fix :cve:`2022-44370`
--  python3-cryptography: Fix :cve:`2023-23931`
--  qemu: Ignore :cve:`2023-0664`
--  ruby: Fix :cve:`2023-28755` and :cve:`2023-28756`
--  screen: Fix :cve:`2023-24626`
--  shadow: Fix :cve:`2023-29383`
--  tiff: Fix :cve:`2022-4645`
--  webkitgtk: Fix :cve:`2022-32888` and :cve:`2022-32923`
--  xserver-xorg: Fix :cve:`2023-1393`
+-  git: Fix :cve_nist:`2023-25652` and :cve_nist:`2023-29007`
+-  go: Fix :cve_nist:`2022-41722`, :cve_nist:`2022-41724`, :cve_nist:`2022-41725`, :cve_nist:`2023-24534`, :cve_nist:`2023-24537` and :cve_nist:`2023-24538`
+-  go: Ignore :cve_nist:`2022-41716`
+-  libxml2: Fix :cve_nist:`2023-28484` and :cve_nist:`2023-29469`
+-  libxpm: Fix :cve_nist:`2022-44617`, :cve_nist:`2022-46285` and :cve_nist:`2022-4883`
+-  linux-yocto: Ignore :cve_nist:`2021-3759`, :cve_nist:`2021-4135`, :cve_nist:`2021-4155`, :cve_nist:`2022-0168`, :cve_nist:`2022-0171`, :cve_nist:`2022-1016`, :cve_nist:`2022-1184`, :cve_nist:`2022-1198`, :cve_nist:`2022-1199`, :cve_nist:`2022-1462`, :cve_nist:`2022-1734`, :cve_nist:`2022-1852`, :cve_nist:`2022-1882`, :cve_nist:`2022-1998`, :cve_nist:`2022-2078`, :cve_nist:`2022-2196`, :cve_nist:`2022-2318`, :cve_nist:`2022-2380`, :cve_nist:`2022-2503`, :cve_nist:`2022-26365`, :cve_nist:`2022-2663`, :cve_nist:`2022-2873`, :cve_nist:`2022-2905`, :cve_nist:`2022-2959`, :cve_nist:`2022-3028`, :cve_nist:`2022-3078`, :cve_nist:`2022-3104`, :cve_nist:`2022-3105`, :cve_nist:`2022-3106`, :cve_nist:`2022-3107`, :cve_nist:`2022-3111`, :cve_nist:`2022-3112`, :cve_nist:`2022-3113`, :cve_nist:`2022-3115`, :cve_nist:`2022-3202`, :cve_nist:`2022-32250`, :cve_nist:`2022-32296`, :cve_nist:`2022-32981`, :cve_nist:`2022-3303`, :cve_nist:`2022-33740`, :cve_nist:`2022-33741`, :cve_nist:`2022-33742`, :cve_nist:`2022-33743`, :cve_nist:`2022-33744`, :cve_nist:`2022-33981`, :cve_nist:`2022-3424`, :cve_nist:`2022-3435`, :cve_nist:`2022-34918`, :cve_nist:`2022-3521`, :cve_nist:`2022-3545`, :cve_nist:`2022-3564`, :cve_nist:`2022-3586`, :cve_nist:`2022-3594`, :cve_nist:`2022-36123`, :cve_nist:`2022-3621`, :cve_nist:`2022-3623`, :cve_nist:`2022-3629`, :cve_nist:`2022-3633`, :cve_nist:`2022-3635`, :cve_nist:`2022-3646`, :cve_nist:`2022-3649`, :cve_nist:`2022-36879`, :cve_nist:`2022-36946`, :cve_nist:`2022-3707`, :cve_nist:`2022-39188`, :cve_nist:`2022-39190`, :cve_nist:`2022-39842`, :cve_nist:`2022-40307`, :cve_nist:`2022-40768`, :cve_nist:`2022-4095`, :cve_nist:`2022-41218`, :cve_nist:`2022-4139`, :cve_nist:`2022-41849`, :cve_nist:`2022-41850`, :cve_nist:`2022-41858`, :cve_nist:`2022-42328`, :cve_nist:`2022-42329`, :cve_nist:`2022-42703`, :cve_nist:`2022-42721`, :cve_nist:`2022-42722`, :cve_nist:`2022-42895`, :cve_nist:`2022-4382`, :cve_nist:`2022-4662`, :cve_nist:`2022-47518`, :cve_nist:`2022-47519`, :cve_nist:`2022-47520`, :cve_nist:`2022-47929`, :cve_nist:`2023-0179`, :cve_nist:`2023-0394`, :cve_nist:`2023-0461`, :cve_nist:`2023-0590`, :cve_nist:`2023-1073`, :cve_nist:`2023-1074`, :cve_nist:`2023-1077`, :cve_nist:`2023-1078`, :cve_nist:`2023-1079`, :cve_nist:`2023-1095`, :cve_nist:`2023-1118`, :cve_nist:`2023-1249`, :cve_nist:`2023-1252`, :cve_nist:`2023-1281`, :cve_nist:`2023-1382`, :cve_nist:`2023-1513`, :cve_nist:`2023-1829`, :cve_nist:`2023-1838`, :cve_nist:`2023-1998`, :cve_nist:`2023-2006`, :cve_nist:`2023-2008`, :cve_nist:`2023-2162`, :cve_nist:`2023-2166`, :cve_nist:`2023-2177`, :cve_nist:`2023-22999`, :cve_nist:`2023-23002`, :cve_nist:`2023-23004`, :cve_nist:`2023-23454`, :cve_nist:`2023-23455`, :cve_nist:`2023-23559`, :cve_nist:`2023-25012`, :cve_nist:`2023-26545`, :cve_nist:`2023-28327` and :cve_nist:`2023-28328`
+-  nasm: Fix :cve_nist:`2022-44370`
+-  python3-cryptography: Fix :cve_nist:`2023-23931`
+-  qemu: Ignore :cve_nist:`2023-0664`
+-  ruby: Fix :cve_nist:`2023-28755` and :cve_nist:`2023-28756`
+-  screen: Fix :cve_nist:`2023-24626`
+-  shadow: Fix :cve_nist:`2023-29383`
+-  tiff: Fix :cve_nist:`2022-4645`
+-  webkitgtk: Fix :cve_nist:`2022-32888` and :cve_nist:`2022-32923`
+-  xserver-xorg: Fix :cve_nist:`2023-1393`
 
 
 Fixes in Yocto-4.0.10

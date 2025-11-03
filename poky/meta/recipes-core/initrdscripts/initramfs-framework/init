@@ -117,7 +117,7 @@ if grep -q devtmpfs /proc/filesystems; then
 	mount -t devtmpfs devtmpfs /dev
 else
 	if [ ! -d /dev ]; then
-		fatal "ERROR: /dev doesn't exist and kernel doesn't has devtmpfs enabled."
+		fatal "ERROR: /dev doesn't exist and kernel doesn't have devtmpfs enabled."
 	fi
 fi
 

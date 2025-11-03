@@ -6,6 +6,9 @@ Subject: [PATCH] vulkan_av1: port to the new stable API
 Co-Authored-by: Dave Airlie <airlied@redhat.com>
 Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 Upstream-Status: Backport [https://git.ffmpeg.org/gitweb/ffmpeg.git/commitdiff/ecdc94b97f809d5f2b88640842fd0541951ad295]
+
+Comment: Patch is refreshed as per codebase of 6.1.2
+Signed-off-by: Divyanshu Rathore <divyanshu.rathore@kpit.com>
 ---
  configure                                     |   4 +-
  libavcodec/Makefile                           |   5 +-
@@ -26,7 +29,7 @@ diff --git a/configure b/configure
 index e853deb51d..9fa639fca6 100755
 --- a/configure
 +++ b/configure
-@@ -7300,8 +7300,8 @@ enabled vdpau &&
+@@ -7160,8 +7160,8 @@ enabled crystalhd && check_lib crystalhd
           "in maintaining it."
  
  if enabled vulkan; then
@@ -41,21 +44,19 @@ diff --git a/libavcodec/Makefile b/libavcodec/Makefile
 index 7ef2e03ca6..9ce6d445c1 100644
 --- a/libavcodec/Makefile
 +++ b/libavcodec/Makefile
-@@ -1258,8 +1258,7 @@ SKIPHEADERS                            += %_tablegen.h                  \
+@@ -1284,7 +1284,6 @@ SKIPHEADERS                            +
                                            aacenc_quantization.h         \
                                            aacenc_quantization_misc.h    \
                                            bitstream_template.h          \
--                                          vulkan_video_codec_av1std.h   \
--                                          $(ARCH)/vpx_arith.h          \
-+                                          $(ARCH)/vpx_arith.h           \
+-                                          vulkan_video_codec_av1std_mesa.h \
+                                           $(ARCH)/vpx_arith.h          \
  
  SKIPHEADERS-$(CONFIG_AMF)              += amfenc.h
- SKIPHEADERS-$(CONFIG_D3D11VA)          += d3d11va.h dxva2_internal.h
-@@ -1280,7 +1279,7 @@ SKIPHEADERS-$(CONFIG_QSVENC)           += qsvenc.h
+@@ -1306,7 +1305,7 @@ SKIPHEADERS-$(CONFIG_XVMC)             +
  SKIPHEADERS-$(CONFIG_VAAPI)            += vaapi_decode.h vaapi_hevc.h vaapi_encode.h
  SKIPHEADERS-$(CONFIG_VDPAU)            += vdpau.h vdpau_internal.h
  SKIPHEADERS-$(CONFIG_VIDEOTOOLBOX)     += videotoolbox.h vt_internal.h
--SKIPHEADERS-$(CONFIG_VULKAN)           += vulkan.h vulkan_video.h vulkan_decode.h vulkan_video_codec_av1std_decode.h
+-SKIPHEADERS-$(CONFIG_VULKAN)           += vulkan.h vulkan_video.h vulkan_decode.h vulkan_video_codec_av1std_decode_mesa.h
 +SKIPHEADERS-$(CONFIG_VULKAN)           += vulkan.h vulkan_video.h vulkan_decode.h
  SKIPHEADERS-$(CONFIG_V4L2_M2M)         += v4l2_buffers.h v4l2_context.h v4l2_m2m.h
  SKIPHEADERS-$(CONFIG_ZLIB)             += zlib_wrapper.h
@@ -866,19 +867,19 @@ diff --git a/libavcodec/vulkan_video.h b/libavcodec/vulkan_video.h
 index bb69e920bb..01a1de7d9d 100644
 --- a/libavcodec/vulkan_video.h
 +++ b/libavcodec/vulkan_video.h
-@@ -22,8 +22,6 @@
+@@ -23,8 +23,6 @@
  #include "vulkan.h"
  
  #include <vk_video/vulkan_video_codecs_common.h>
--#include "vulkan_video_codec_av1std.h"
--#include "vulkan_video_codec_av1std_decode.h"
+-#include "vulkan_video_codec_av1std_mesa.h"
+-#include "vulkan_video_codec_av1std_decode_mesa.h"
  
  #define CODEC_VER_MAJ(ver) (ver >> 22)
  #define CODEC_VER_MIN(ver) ((ver >> 12) & ((1 << 10) - 1))
-diff --git a/libavcodec/vulkan_video_codec_av1std_decode.h b/libavcodec/vulkan_video_codec_av1std_decode.h
+diff --git a/libavcodec/vulkan_video_codec_av1std_decode_mesa.h b/libavcodec/vulkan_video_codec_av1std_decode_mesa.h
 deleted file mode 100644
 index e2f37b4e6e..0000000000
---- a/libavcodec/vulkan_video_codec_av1std_decode.h
+--- a/libavcodec/vulkan_video_codec_av1std_decode_mesa.h
 +++ /dev/null
 @@ -1,36 +0,0 @@
 -/* Copyright 2023 Lynne
@@ -897,8 +898,8 @@ index e2f37b4e6e..0000000000
 - * limitations under the License.
 - */
 -
--#ifndef VULKAN_VIDEO_CODEC_AV1STD_DECODE_H_
--#define VULKAN_VIDEO_CODEC_AV1STD_DECODE_H_ 1
+-#ifndef VULKAN_VIDEO_CODEC_AV1STD_DECODE_MESA_H_
+-#define VULKAN_VIDEO_CODEC_AV1STD_DECODE_MESA_H_ 1
 -
 -/*
 -** This header is NOT YET generated from the Khronos Vulkan XML API Registry.
@@ -917,10 +918,10 @@ index e2f37b4e6e..0000000000
 -#endif
 -
 -#endif
-diff --git a/libavcodec/vulkan_video_codec_av1std.h b/libavcodec/vulkan_video_codec_av1std.h
+diff --git a/libavcodec/vulkan_video_codec_av1std_mesa.h b/libavcodec/vulkan_video_codec_av1std_mesa.h
 deleted file mode 100644
 index c91589eee2..0000000000
---- a/libavcodec/vulkan_video_codec_av1std.h
+--- a/libavcodec/vulkan_video_codec_av1std_mesa.h
 +++ /dev/null
 @@ -1,403 +0,0 @@
 -/* Copyright 2023 Lynne
@@ -939,8 +940,8 @@ index c91589eee2..0000000000
 - * limitations under the License.
 - */
 -
--#ifndef VULKAN_VIDEO_CODEC_AV1STD_H_
--#define VULKAN_VIDEO_CODEC_AV1STD_H_ 1
+-#ifndef VULKAN_VIDEO_CODEC_AV1STD_MESA_H_
+-#define VULKAN_VIDEO_CODEC_AV1STD_MESA_H_ 1
 -
 -/*
 -** This header is NOT YET generated from the Khronos Vulkan XML API Registry.
@@ -1379,4 +1380,3 @@ diff --git a/libavcodec/vulkan_video.c b/libavcodec/vulkan_video.c
  
 -- 
 2.25.1
-

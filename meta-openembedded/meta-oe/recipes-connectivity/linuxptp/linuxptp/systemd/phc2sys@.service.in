@@ -1,8 +1,8 @@
 [Unit]
 Description=Synchronize system clock or PTP hardware clock (PHC)
 Documentation=man:phc2sys
-Requires=ptp4l.service
-After=ptp4l.service
+Requires=ptp4l@%i.service
+After=ptp4l@%i.service
 Before=time-sync.target
 
 [Service]

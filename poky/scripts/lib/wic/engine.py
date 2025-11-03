@@ -359,7 +359,7 @@ class Disk:
         Remove files/dirs and their contents from the partition.
         This only applies to ext* partition.
         """
-        abs_path = re.sub('\/\/+', '/', path)
+        abs_path = re.sub(r'\/\/+', '/', path)
         cmd = "{} {} -wR 'rm \"{}\"'".format(self.debugfs,
                                             self._get_part_image(pnum),
                                             abs_path)

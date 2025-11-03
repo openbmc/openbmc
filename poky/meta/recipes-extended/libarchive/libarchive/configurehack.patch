@@ -10,7 +10,7 @@ diff --git a/configure.ac b/configure.ac
 index 5668d41..7e65e49 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -414,6 +414,19 @@ if test "x$with_bz2lib" != "xno"; then
+@@ -435,6 +435,19 @@ if test "x$with_bz2lib" != "xno"; then
    esac
  fi
  
@@ -30,7 +30,7 @@ index 5668d41..7e65e49 100644
  AC_ARG_WITH([libb2],
    AS_HELP_STRING([--without-libb2], [Don't build support for BLAKE2 through libb2]))
  
-@@ -678,19 +691,6 @@ fi
+@@ -694,19 +707,6 @@ fi
  
  AC_SUBST(DEAD_CODE_REMOVAL)
  

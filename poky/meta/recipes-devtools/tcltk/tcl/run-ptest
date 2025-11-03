@@ -15,6 +15,8 @@ SKIP="$SKIP cmdMZ-6.6"
 SKIP="$SKIP exit-1.\*"
 # 15407 15421
 SKIP="$SKIP \*io-46.1"
+# io-13.6 explicitly says it can fail on slow/loaded machines
+SKIP="$SKIP io-13.6"
 # 14825
 SKIP="$SKIP socket-\* socket_inet-\*"
 

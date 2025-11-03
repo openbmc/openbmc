@@ -42,7 +42,7 @@ PACKAGECONFIG[zlib] = "-DWITH_ZLIB=ON,-DWITH_ZLIB=OFF,zlib"
 PACKAGE_BEFORE_PN = "libvncclient"
 FILES:libvncclient = "${libdir}/libvncclient.*"
 
-inherit cmake
+inherit cmake pkgconfig
 
 SRC_URI = "git://github.com/LibVNC/libvncserver;branch=master;protocol=https"
 SRCREV = "10e9eb75f73e973725dc75c373de5d89807af028"
@@ -52,5 +52,5 @@ S = "${WORKDIR}/git"
 EXTRA_OECMAKE = "-DMAKE_INSTALL_LIBDIR=${libdir}"
 
 do_install:append() {
-    sed -i -e 's|${STAGING_DIR_HOST}||g' ${D}${libdir}/cmake/LibVNCServer/LibVNCServerTargets.cmake
+    sed -i -e 's|${STAGING_DIR_HOST}${libdir}/||g' ${D}${libdir}/cmake/LibVNCServer/LibVNCServerTargets.cmake
 }

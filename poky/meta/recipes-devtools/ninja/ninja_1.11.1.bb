@@ -8,7 +8,10 @@ DEPENDS = "re2c-native ninja-native"
 
 SRCREV = "a524bf3f6bacd1b4ad85d719eed2737d8562f27a"
 
-SRC_URI = "git://github.com/ninja-build/ninja.git;branch=release;protocol=https"
+SRC_URI = " \
+	git://github.com/ninja-build/ninja.git;branch=release;protocol=https \
+	file://885b4efb41c039789b81f0dc0d67c1ed0faea17c.patch \
+"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>.*)"
 
 S = "${WORKDIR}/git"

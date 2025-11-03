@@ -1,6 +1,6 @@
-From 889583912ddd7abc628f2703892ec4884db6419a Mon Sep 17 00:00:00 2001
-From: Soumya Sambu <soumya.sambu@windriver.com>
-Date: Tue, 7 May 2024 08:39:16 +0000
+From aa99f9db92817358d6b91040cc555f5ca31b727c Mon Sep 17 00:00:00 2001
+From: Yogita Urade <yogita.urade@windriver.com>
+Date: Mon, 25 Nov 2024 07:07:38 +0000
 Subject: [PATCH 01/11] ext/opcache/config.m4: enable opcache
 
 We can't use AC_TRY_RUN to run programs in a cross compile
@@ -23,12 +23,15 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 
 update patch to version 8.2.18
 Signed-off-by: Soumya Sambu <soumya.sambu@windriver.com>
+
+update patch to version 8.2.24
+Signed-off-by: Yogita Urade <yogita.urade@windriver.com>
 ---
  ext/opcache/config.m4 | 204 ++----------------------------------------
  1 file changed, 8 insertions(+), 196 deletions(-)
 
 diff --git a/ext/opcache/config.m4 b/ext/opcache/config.m4
-index 6bf07ad3..5d645b86 100644
+index b3929382..ba1a9aff 100644
 --- a/ext/opcache/config.m4
 +++ b/ext/opcache/config.m4
 @@ -113,209 +113,21 @@ if test "$PHP_OPCACHE" != "no"; then
@@ -247,8 +250,8 @@ index 6bf07ad3..5d645b86 100644
 +  have_shm_mmap_posix=yes
 +  PHP_CHECK_LIBRARY(rt, shm_unlink, [PHP_ADD_LIBRARY(rt,1,OPCACHE_SHARED_LIBADD)])
  
-   PHP_NEW_EXTENSION(opcache,
- 	ZendAccelerator.c \
+   AX_CHECK_COMPILE_FLAG([-Wno-implicit-fallthrough],
+     [PHP_OPCACHE_CFLAGS="$PHP_OPCACHE_CFLAGS -Wno-implicit-fallthrough"],,
 -- 
 2.40.0
 

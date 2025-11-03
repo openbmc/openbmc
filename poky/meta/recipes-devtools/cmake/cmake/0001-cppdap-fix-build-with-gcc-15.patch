@@ -1,0 +1,30 @@
+From f742c298a0d6b70059e5c98c89d301e62a3e2087 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christoph=20Gr=C3=BCninger?= <foss@grueninger.de>
+Date: Thu, 8 Aug 2024 20:26:35 +0200
+Subject: [PATCH] cppdap: include/dap/network.h: add <stdint.h> include for GCC
+ 15
+
+GCC 15 requires the include for the declaration of `uint32_t`.
+Backport [cppdap PR 133](https://github.com/google/cppdap/pull/133).
+
+Upstream-Status: Backport [https://gitlab.kitware.com/cmake/cmake/-/commit/f742c298a0d6b70059e5c98c89d301e62a3e2087]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ Utilities/cmcppdap/include/dap/network.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Utilities/cmcppdap/include/dap/network.h b/Utilities/cmcppdap/include/dap/network.h
+index 9d14f6b70fa..dd3e0062407 100644
+--- a/Utilities/cmcppdap/include/dap/network.h
++++ b/Utilities/cmcppdap/include/dap/network.h
+@@ -17,6 +17,7 @@
+ 
+ #include <functional>
+ #include <memory>
++#include <stdint.h>
+ 
+ namespace dap {
+ class ReaderWriter;
+-- 
+GitLab
+

@@ -15,6 +15,13 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.gz;name=a
            http://www.mneuroth.de/privat/zaurus/qtplot-0.2.tar.gz;name=qtplot \
            file://gnuplot.desktop \
            file://gnuplot.png \
+           file://CVE-2025-3359.patch \
+           file://CVE-2025-31176.patch \
+           file://CVE-2025-31177.patch \
+           file://CVE-2025-31178.patch \
+           file://CVE-2025-31179.patch \
+           file://CVE-2025-31180.patch \
+           file://CVE-2025-31181.patch \
            "
 SRC_URI:append:class-target = " \
     file://0002-do-not-build-demos.patch \

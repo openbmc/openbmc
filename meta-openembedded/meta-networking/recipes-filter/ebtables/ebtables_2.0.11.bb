@@ -6,8 +6,6 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=53b4a999993871a28ab1488fdbd2e73e"
 SECTION = "net"
 
-RDEPENDS:${PN} += "bash"
-
 RRECOMMENDS:${PN} += "kernel-module-ebtables \
     "
 

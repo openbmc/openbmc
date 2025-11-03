@@ -9,8 +9,8 @@ inherit pypi setuptools3
 
 do_install:append() {
     install -d ${D}${docdir}/${PN}
-    mv ${D}/usr/doc/* ${D}${docdir}/${PN}/
-    rmdir ${D}/usr/doc
+    mv ${D}${prefix}/doc/* ${D}${docdir}/${PN}/
+    rmdir ${D}${prefix}/doc
 }
 
 RDEPENDS:${PN} += " \

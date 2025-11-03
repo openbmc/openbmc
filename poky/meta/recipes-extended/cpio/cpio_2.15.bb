@@ -16,8 +16,12 @@ SRC_URI[sha256sum] = "efa50ef983137eefc0a02fdb51509d624b5e3295c980aa127ceee41834
 inherit autotools gettext texinfo ptest
 
 CVE_STATUS[CVE-2010-4226] = "not-applicable-platform: Issue applies to use of cpio in SUSE/OBS"
+CVE_STATUS[CVE-2023-7216] = "disputed: intended behaviour, see https://lists.gnu.org/archive/html/bug-cpio/2024-03/msg00000.html"
 
 EXTRA_OECONF += "DEFAULT_RMT_DIR=${sbindir}"
+
+CFLAGS += "-std=gnu17"
+BUILD_CFLAGS += "-std=gnu17"
 
 do_install () {
     autotools_do_install

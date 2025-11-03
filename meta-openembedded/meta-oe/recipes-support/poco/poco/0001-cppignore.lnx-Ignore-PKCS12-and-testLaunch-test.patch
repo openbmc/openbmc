@@ -40,18 +40,31 @@ There were 4 failures:
   Not found: POCO_BASE"
   │ │ in "<unknown>", line -1
 
+There was 1 error:
+ 1: CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM
+    "Poco::IOException:
+I/O error: error:1C800066:Provider routines::cipher operation failed"
+    in "<unknown>", line -1
+
+There was 1 error:
+ 1: CppUnit::TestCaller<HTTPSClientSessionTest>.testInterop
+    "Poco::Net::DNSException:
+DNS error: Temporary DNS error while resolving: secure.appinf.com"
+    in "<unknown>", line -1
+
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
 ---
- cppignore.lnx | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ cppignore.lnx | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/cppignore.lnx b/cppignore.lnx
 index 2c2376526..65df4af08 100644
 --- a/cppignore.lnx
 +++ b/cppignore.lnx
-@@ -28,3 +28,12 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
+@@ -28,3 +28,14 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
  CppUnit::TestCaller<HTTPSStreamFactoryTest>.testProxy
  CppUnit::TestCaller<DNSTest>.testHostByAddress
  CppUnit::TestCaller<DNSTest>.testHostByName
@@ -64,3 +77,5 @@ index 2c2376526..65df4af08 100644
 +CppUnit::TestCaller<PKCS12ContainerTest>.testCertsOnlyPKCS12
 +CppUnit::TestCaller<PKCS12ContainerTest>.testPEMReadWrite
 +CppUnit::TestCaller<MongoDBTest>.testArray
++CppUnit::TestCaller<CryptoTest>.testEncryptDecryptGCM
++CppUnit::TestCaller<HTTPSClientSessionTest>.testInterop

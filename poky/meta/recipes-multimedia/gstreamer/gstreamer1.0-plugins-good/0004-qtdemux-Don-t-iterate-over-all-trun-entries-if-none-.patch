@@ -1,0 +1,35 @@
+From 53464dd2cf1a03f838899f7355133766ff211fce Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Thu, 26 Sep 2024 18:41:39 +0300
+Subject: [PATCH 04/13] qtdemux: Don't iterate over all trun entries if none of
+ the flags are set
+
+Nothing would be printed anyway.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/53464dd2cf1a03f838899f7355133766ff211fce]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux_dump.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gst/isomp4/qtdemux_dump.c b/gst/isomp4/qtdemux_dump.c
+index 22da35e9e7..297b580ef0 100644
+--- a/gst/isomp4/qtdemux_dump.c
++++ b/gst/isomp4/qtdemux_dump.c
+@@ -836,6 +836,11 @@ qtdemux_dump_trun (GstQTDemux * qtdemux, GstByteReader * data, int depth)
+     GST_LOG ("%*s    first-sample-flags: %u", depth, "", first_sample_flags);
+   }
+ 
++  /* Nothing to print below */
++  if ((flags & (TR_SAMPLE_DURATION | TR_SAMPLE_SIZE | TR_SAMPLE_FLAGS |
++              TR_COMPOSITION_TIME_OFFSETS)) == 0)
++    return TRUE;
++
+   for (i = 0; i < samples_count; i++) {
+     if (flags & TR_SAMPLE_DURATION) {
+       if (!gst_byte_reader_get_uint32_be (data, &sample_duration))
+-- 
+2.30.2
+

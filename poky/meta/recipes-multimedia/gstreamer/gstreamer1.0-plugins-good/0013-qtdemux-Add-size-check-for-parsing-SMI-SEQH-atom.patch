@@ -1,0 +1,37 @@
+From 3ce1b812a9531611288af286b5dc6631a11e3f4a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 27 Sep 2024 00:31:36 +0300
+Subject: [PATCH 13/13] qtdemux: Add size check for parsing SMI / SEQH atom
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-244
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3853
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47596
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/3ce1b812a9531611288af286b5dc6631a11e3f4a]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index 8850d09321..dc70287a8a 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -10629,8 +10629,9 @@ qtdemux_parse_svq3_stsd_data (GstQTDemux * qtdemux,
+                 GST_WARNING_OBJECT (qtdemux, "Unexpected second SEQH SMI atom "
+                     " found, ignoring");
+               } else {
++                /* Note: The size does *not* include the fourcc and the size field itself */
+                 seqh_size = QT_UINT32 (data + 4);
+-                if (seqh_size > 0) {
++                if (seqh_size > 0 && seqh_size <= size - 8) {
+                   _seqh = gst_buffer_new_and_alloc (seqh_size);
+                   gst_buffer_fill (_seqh, 0, data + 8, seqh_size);
+                 }
+-- 
+2.30.2
+

@@ -1,0 +1,47 @@
+From b3282b301096253a11b1f887f915d0a2a2183597 Mon Sep 17 00:00:00 2001
+From: Frank de Brabander <debrabander@gmail.com>
+Date: Thu, 8 Aug 2024 08:04:48 +0200
+Subject: [PATCH] Dont embed RUSTFLAGS in final binary
+
+Upstream-Status: Backport [https://github.com/pydantic/pydantic-core/commit/e07c41b3bad75948201a2201387225694c2fb501]
+---
+ build.rs   | 9 +++++++++
+ src/lib.rs | 5 ++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/build.rs b/build.rs
+index 7f59e1f..7fe6490 100644
+--- a/build.rs
++++ b/build.rs
+@@ -35,6 +35,15 @@ fn main() {
+     if let Some(true) = version_check::supports_feature("coverage_attribute") {
+         println!("cargo:rustc-cfg=has_coverage_attribute");
+     }
++
++    if std::env::var("RUSTFLAGS")
++        .unwrap_or_default()
++        .contains("-Cprofile-use=")
++    {
++        println!("cargo:rustc-cfg=specified_profile_use");
++    }
++    println!("cargo:rustc-check-cfg=cfg(specified_profile_use)");
++
+     generate_self_schema();
+     println!("cargo:rustc-env=PROFILE={}", std::env::var("PROFILE").unwrap());
+ }
+diff --git a/src/lib.rs b/src/lib.rs
+index d55e836..206a7a1 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -111,7 +111,10 @@ pub fn build_info() -> String {
+     format!(
+         "profile={} pgo={}",
+         env!("PROFILE"),
+-        option_env!("RUSTFLAGS").unwrap_or("").contains("-Cprofile-use="),
++        // We use a `cfg!` here not `env!`/`option_env!` as those would
++        // embed `RUSTFLAGS` into the generated binary which causes problems
++        // with reproducable builds.
++        cfg!(specified_profile_use),
+     )
+ }
+ 

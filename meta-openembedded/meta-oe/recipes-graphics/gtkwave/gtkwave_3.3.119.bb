@@ -13,6 +13,7 @@ DEPENDS = " \
     gperf-native \
     gtk+3 \
     gdk-pixbuf \
+    libtirpc \
     tcl \
     tk \
     bzip2 \

@@ -1,0 +1,45 @@
+From 5c34e70b80e5fc539f96e029b56b95cdee556010 Mon Sep 17 00:00:00 2001
+From: Matt Johnston <matt@ucc.asn.au>
+Date: Sun, 8 Sep 2024 11:07:41 +0200
+Subject: Don't close channels when a PID hasn't started
+
+If check_close() ran prior to a server channel exec/shell
+request, it would send a close immediately.
+This fix changes it to exclude write_fd==FD_UNINIT from
+being closed there.
+
+When a channel was closed by the time shell/exec request
+was received, then data sent hits an assertion.
+This fixes #321 on Github.
+
+The "pid == 0" check was initially added to avoid waiting
+to close a channel when a process has never been launched
+(which is correct), but that isn't correct in the case
+of the closed-fd test.
+
+Fixes: 8e6f73e879ca ("- Remove "flushing" handling for exited processes)
+
+Upstream-Status: Backport [https://github.com/mkj/dropbear/commit/71521d1b78706a70d3570b860e65234cefdc8c81]
+
+Signed-off-by: Florian Kreutzer <florian.kreutzer.oss@rohde-schwarz.com>
+---
+ common-channel.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/common-channel.c b/common-channel.c
+index be5b57f..9926972 100644
+--- a/common-channel.c
++++ b/common-channel.c
+@@ -317,7 +317,8 @@ static void check_close(struct Channel *channel) {
+ 
+ 	if ((channel->recv_eof && !write_pending(channel))
+ 		/* have a server "session" and child has exited */
+-		|| (channel->type->check_close && close_allowed)) {
++		|| (channel->writefd != FD_UNINIT
++			&& channel->type->check_close && close_allowed)) {
+ 		close_chan_fd(channel, channel->writefd, SHUT_WR);
+ 	}
+ 
+-- 
+2.34.1
+

@@ -1,4 +1,4 @@
-Upstream-Status: Backport
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 * Mon Feb 10 2003 Harald Hoyer <harald@redhat.de> 7.6-29
 - added security patch tcp_wrappers-7.6-sig.patch

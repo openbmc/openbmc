@@ -6,24 +6,24 @@ Release notes for Yocto-4.0.15 (Kirkstone)
 Security Fixes in Yocto-4.0.15
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  avahi: Fix :cve:`2023-1981`, :cve:`2023-38469`, :cve:`2023-38470`, :cve:`2023-38471`, :cve:`2023-38472` and :cve:`2023-38473`
--  binutils: Fix :cve:`2022-47007`, :cve:`2022-47010` and :cve:`2022-48064`
--  bluez5: Fix :cve:`2023-45866`
--  ghostscript: Ignore GhostPCL :cve:`2023-38560`
--  gnutls: Fix :cve:`2023-5981`
--  go: Ignore :cve:`2023-45283` and :cve:`2023-45284`
--  grub: Fix :cve:`2023-4692` and :cve:`2023-4693`
+-  avahi: Fix :cve_nist:`2023-1981`, :cve_nist:`2023-38469`, :cve_nist:`2023-38470`, :cve_nist:`2023-38471`, :cve_nist:`2023-38472` and :cve_nist:`2023-38473`
+-  binutils: Fix :cve_nist:`2022-47007`, :cve_nist:`2022-47010` and :cve_nist:`2022-48064`
+-  bluez5: Fix :cve_nist:`2023-45866`
+-  ghostscript: Ignore GhostPCL :cve_nist:`2023-38560`
+-  gnutls: Fix :cve_nist:`2023-5981`
+-  go: Ignore :cve_nist:`2023-45283` and :cve_nist:`2023-45284`
+-  grub: Fix :cve_nist:`2023-4692` and :cve_nist:`2023-4693`
 -  gstreamer1.0-plugins-bad: Fix :cve_mitre:`2023-44429`
--  libsndfile: Fix :cve:`2022-33065`
--  libwebp: Fix :cve:`2023-4863`
--  openssl: Fix :cve:`2023-5678`
--  python3-cryptography: Fix :cve:`2023-49083`
--  qemu: Fix :cve:`2023-1544`
--  sudo: :cve:`2023-42456` and :cve_mitre:`2023-42465`
--  tiff: Fix :cve:`2023-41175`
--  vim: Fix :cve:`2023-46246`, :cve:`2023-48231`, :cve:`2023-48232`, :cve:`2023-48233`, :cve:`2023-48234`, :cve:`2023-48235`, :cve:`2023-48236`, :cve:`2023-48237` and :cve:`2023-48706`
--  xserver-xorg: Fix :cve:`2023-5367` and :cve:`2023-5380`
--  xwayland: Fix :cve:`2023-5367`
+-  libsndfile: Fix :cve_nist:`2022-33065`
+-  libwebp: Fix :cve_nist:`2023-4863`
+-  openssl: Fix :cve_nist:`2023-5678`
+-  python3-cryptography: Fix :cve_nist:`2023-49083`
+-  qemu: Fix :cve_nist:`2023-1544`
+-  sudo: :cve_nist:`2023-42456` and :cve_mitre:`2023-42465`
+-  tiff: Fix :cve_nist:`2023-41175`
+-  vim: Fix :cve_nist:`2023-46246`, :cve_nist:`2023-48231`, :cve_nist:`2023-48232`, :cve_nist:`2023-48233`, :cve_nist:`2023-48234`, :cve_nist:`2023-48235`, :cve_nist:`2023-48236`, :cve_nist:`2023-48237` and :cve_nist:`2023-48706`
+-  xserver-xorg: Fix :cve_nist:`2023-5367` and :cve_nist:`2023-5380`
+-  xwayland: Fix :cve_nist:`2023-5367`
 
 
 Fixes in Yocto-4.0.15

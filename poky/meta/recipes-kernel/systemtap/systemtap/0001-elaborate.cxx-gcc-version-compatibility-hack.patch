@@ -1,0 +1,52 @@
+From d11241bdd05bc4c745c8aef53a2725331e1a93b4 Mon Sep 17 00:00:00 2001
+From: "Frank Ch. Eigler" <fche@redhat.com>
+Date: Tue, 7 May 2024 14:25:12 -0400
+Subject: [PATCH] elaborate.cxx: gcc version compatibility hack
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Suppress -Wdangling-pointer for a construct that appears valid, but
+one particular GCC snapshot version complains about.
+
+In constructor ‘symresolution_info::symresolution_info(systemtap_session&, bool)’,
+inlined from ‘int semantic_pass_symbols(systemtap_session&)’ at ../systemtap/elaborate.cxx:1872:28:
+../systemtap/elaborate.cxx:2659:21: error: storing the address of local variable ‘sym’ in ‘*s.systemtap_session::symbol_resolver’ [-Werror=dangling-pointer=]
+ 2659 |   s.symbol_resolver = this; // save resolver for early PR25841 function resolution
+      |   ~~~~~~~~~~~~~~~~~~^~~~~~
+../systemtap/elaborate.cxx: In function ‘int semantic_pass_symbols(systemtap_session&)’:
+../systemtap/elaborate.cxx:1872:22: note: ‘sym’ declared here
+ 1872 |   symresolution_info sym (s);
+      |                      ^~~
+../systemtap/elaborate.cxx:1870:43: note: ‘s’ declared here
+ 1870 | semantic_pass_symbols (systemtap_session& s)
+      |                        ~~~~~~~~~~~~~~~~~~~^
+cc1plus: all warnings being treated as errors
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=systemtap.git;a=commit;h=d11241bdd05bc4c745c8aef53a2725331e1a93b4]
+Signed-off-by: Victor Kamensky <victor.kamensky7@gmail.com>
+---
+ elaborate.cxx | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/elaborate.cxx b/elaborate.cxx
+index 8bf9e6c06..88505559b 100644
+--- a/elaborate.cxx
++++ b/elaborate.cxx
+@@ -2655,8 +2655,13 @@ semantic_pass (systemtap_session& s)
+ symresolution_info::symresolution_info (systemtap_session& s, bool omniscient_unmangled):
+   session (s), unmangled_p(omniscient_unmangled), current_function (0), current_probe (0)
+ {
++  #pragma GCC diagnostic push
++  // c10s early snapshot GCC complains about this construct, which is
++  // made safe via our dtor usage
++  #pragma GCC diagnostic ignored "-Wdangling-pointer"
+   saved_session_symbol_resolver = s.symbol_resolver;
+   s.symbol_resolver = this; // save resolver for early PR25841 function resolution
++  #pragma GCC diagnostic pop
+ }
+ 
+ 
+-- 
+2.45.2
+

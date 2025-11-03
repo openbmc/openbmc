@@ -14,6 +14,7 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0002-Fix-ASoC-add-component-to-set_bias_level-events-in-l.patch \
            file://0003-Fix-mm_compaction_migratepages-changed-in-linux-6.9-.patch \
            file://0004-Fix-dev_base_lock-removed-in-linux-6.9-rc1.patch \
+           file://0001-Fix-sched_stat_runtime-changed-in-Linux-6.6.66.patch \
         "
 
 # Use :append here so that the patch is applied also when using devupstream

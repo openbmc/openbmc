@@ -1,0 +1,29 @@
+From 6e1852228a2aa38cc76b9a968bba6b603efa5b28 Mon Sep 17 00:00:00 2001
+From: Frank de Brabander <debrabander@gmail.com>
+Date: Thu, 25 Jul 2024 13:50:44 +0200
+Subject: [PATCH] Set rust version from 1.76 to 1.75 in Cargo.toml
+
+Current openembedded-core uses 1.75 and this packages doesn't actually
+require a newer version.
+
+Upstream-Status: Inappropriate
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 8f0ea44..10b277c 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -24,7 +24,7 @@ include = [
+     "!tests/.pytest_cache",
+     "!*.so",
+ ]
+-rust-version = "1.76"
++rust-version = "1.75"
+ 
+ [dependencies]
+ pyo3 = { version = "0.21.2", features = ["generate-import-lib", "num-bigint"] }
+-- 
+2.39.2
+

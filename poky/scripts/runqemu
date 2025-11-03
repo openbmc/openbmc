@@ -368,12 +368,13 @@ class BaseConfig(object):
         - Check whether it is an NFS dir
         - Check whether it is an OVMF flash file
         """
+        n = os.path.basename(p)
         if p.endswith('.qemuboot.conf'):
             self.qemuboot = p
             self.qbconfload = True
-        elif re.search('\\.bin$', p) or re.search('bzImage', p) or \
-             re.search('zImage', p) or re.search('vmlinux', p) or \
-             re.search('fitImage', p) or re.search('uImage', p):
+        elif re.search('\\.bin$', n) or re.search('bzImage', n) or \
+             re.search('zImage', n) or re.search('vmlinux', n) or \
+             re.search('fitImage', n) or re.search('uImage', n):
             self.kernel =  p
         elif os.path.isfile(p) and ('-image-' in os.path.basename(p) or '.rootfs.' in os.path.basename(p)):
             self.rootfs = p
@@ -1195,16 +1196,20 @@ to your build configuration.
             uid = os.getuid()
             logger.info("Setting up tap interface under sudo")
             cmd = ('sudo', self.qemuifup, str(gid))
-            try:
-                tap = subprocess.check_output(cmd).decode('utf-8').strip()
-            except subprocess.CalledProcessError as e:
-                logger.error('Setting up tap device failed:\n%s\nRun runqemu-gen-tapdevs to manually create one.' % str(e))
-                sys.exit(1)
-            lockfile = os.path.join(lockdir, tap)
-            self.taplock = lockfile + '.lock'
-            self.acquire_taplock()
-            self.cleantap = True
-            logger.debug('Created tap: %s' % tap)
+            for _ in range(5):
+                try:
+                    tap = subprocess.check_output(cmd).decode('utf-8').strip()
+                except subprocess.CalledProcessError as e:
+                    logger.error('Setting up tap device failed:\n%s\nRun runqemu-gen-tapdevs to manually create one.' % str(e))
+                    sys.exit(1)
+                lockfile = os.path.join(lockdir, tap)
+                self.taplock = lockfile + '.lock'
+                if self.acquire_taplock():
+                    self.cleantap = True
+                    logger.debug('Created tap: %s' % tap)
+                    break
+                else:
+                    tap = None
 
         if not tap:
             logger.error("Failed to setup tap device. Run runqemu-gen-tapdevs to manually create.")
@@ -1483,7 +1488,7 @@ to your build configuration.
         # If no serial or serialtcp options were specified, only ttyS0 is created
         # and sysvinit shows an error trying to enable ttyS1:
         #     INIT: Id "S1" respawning too fast: disabled for 5 minutes
-        serial_num = len(re.findall("-serial", self.qemu_opt))
+        serial_num = len(re.findall("(^| )-serial ", self.qemu_opt))
 
         # Assume if the user passed serial options, they know what they want
         # and pad to two devices
@@ -1503,7 +1508,7 @@ to your build configuration.
 
                 self.qemu_opt += " %s" % self.get("QB_SERIAL_OPT")
 
-        serial_num = len(re.findall("-serial", self.qemu_opt))
+        serial_num = len(re.findall("(^| )-serial ", self.qemu_opt))
         if serial_num < 2:
             self.qemu_opt += " -serial null"
 

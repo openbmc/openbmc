@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
 inherit autotools gettext update-alternatives
 
-SRC_URI = "http://sources.openembedded.org/${BP}.tar.gz \
+SRC_URI = "https://downloads.yoctoproject.org/mirror/sources/${BP}.tar.gz \
            file://eject-2.1.5-error-return.patch \
            file://eject-2.1.1-verbose.patch \
            file://eject-2.1.5-spaces.patch \

@@ -1,0 +1,64 @@
+From 537161868f36048571f400648ac7909f26c73d53 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Thu, 26 Sep 2024 13:43:06 +0300
+Subject: [PATCH] id3v2: Don't try parsing extended header if not enough data
+ is available
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-235
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3842
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8033>
+
+CVE: CVE-2024-47542
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/537161868f36048571f400648ac7909f26c73d53]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst-libs/gst/tag/id3v2.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/gst-libs/gst/tag/id3v2.c b/gst-libs/gst/tag/id3v2.c
+index 7db2cb7e12..70f975d133 100644
+--- a/gst-libs/gst/tag/id3v2.c
++++ b/gst-libs/gst/tag/id3v2.c
+@@ -29,7 +29,7 @@
+ 
+ #define HANDLE_INVALID_SYNCSAFE
+ 
+-static gboolean id3v2_frames_to_tag_list (ID3TagsWorking * work, guint size);
++static gboolean id3v2_frames_to_tag_list (ID3TagsWorking * work);
+ 
+ #ifndef GST_DISABLE_GST_DEBUG
+ 
+@@ -258,7 +258,7 @@ gst_tag_list_from_id3v2_tag (GstBuffer * buffer)
+     GST_MEMDUMP ("ID3v2 tag (un-unsyced)", uu_data, work.hdr.frame_data_size);
+   }
+ 
+-  id3v2_frames_to_tag_list (&work, work.hdr.frame_data_size);
++  id3v2_frames_to_tag_list (&work);
+ 
+   g_free (uu_data);
+ 
+@@ -440,12 +440,17 @@ id3v2_add_id3v2_frame_blob_to_taglist (ID3TagsWorking * work,
+ }
+ 
+ static gboolean
+-id3v2_frames_to_tag_list (ID3TagsWorking * work, guint size)
++id3v2_frames_to_tag_list (ID3TagsWorking * work)
+ {
+   guint frame_hdr_size;
+ 
+   /* Extended header if present */
+   if (work->hdr.flags & ID3V2_HDR_FLAG_EXTHDR) {
++    if (work->hdr.frame_data_size < 4) {
++      GST_DEBUG ("Tag has no extended header data. Broken tag");
++      return FALSE;
++    }
++
+     work->hdr.ext_hdr_size = id3v2_read_synch_uint (work->hdr.frame_data, 4);
+ 
+     /* In id3v2.4.x the header size is the size of the *whole*
+-- 
+2.30.2
+

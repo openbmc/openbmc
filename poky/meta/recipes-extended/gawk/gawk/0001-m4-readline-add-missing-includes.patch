@@ -14,7 +14,7 @@ conftest.c:146:14: error: implicit declaration of function 'open'; did you mean 
 Add the missing includes so that the check doesn't always fail due to
 these errors.
 
-Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bug-gawk/2024-05/msg00000.html]
+Upstream-Status: Backport [https://git.savannah.gnu.org/cgit/gawk.git/commit/?id=c1613c310d71b87f509458e0259ecd10eda2b140]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  m4/readline.m4 | 2 ++

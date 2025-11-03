@@ -28,6 +28,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/expect/Expect/${PV}/${BPN}${PV}.tar.gz \
            file://0001-fixline1-fix-line-1.patch \
            file://0001-Add-prototype-to-function-definitions.patch \
            file://expect-configure-c99.patch \
+           file://tcl840.patch \
            file://run-ptest \
            "
 SRC_URI[md5sum] = "00fce8de158422f5ccd2666512329bd2"
@@ -38,12 +39,14 @@ UPSTREAM_CHECK_REGEX = "/Expect/(?P<pver>(\d+[\.\-_]*)+)/"
 
 S = "${WORKDIR}/${BPN}${PV}"
 
+EXTRA_AUTORECONF += "--exclude=aclocal"
+
+CFLAGS:append = " -std=gnu17"
+
 do_install:append() {
-	install -d ${D}${libdir}
-        install -m 0755 ${D}${libdir}/expect${PV}/libexpect*.so   ${D}${libdir}/
-        install -m 0755 ${S}/fixline1           ${D}${libdir}/expect${PV}/
-        rm ${D}${libdir}/expect${PV}/libexpect*.so
-        sed -e 's|$dir|${libdir}|' -i ${D}${libdir}/expect${PV}/pkgIndex.tcl
+    mv ${D}${libdir}/expect${PV}/libexpect*.so ${D}${libdir}/
+    install -m 0755 ${S}/fixline1 ${D}${libdir}/expect${PV}/
+    sed -e 's|$dir|${libdir}|' -i ${D}${libdir}/expect${PV}/pkgIndex.tcl
 }
 
 do_install_ptest() {
@@ -62,7 +65,6 @@ EXTRA_OECONF += "--with-tcl=${STAGING_LIBDIR} \
                  --disable-rpath \
                  ${TCL_INCLUDE_PATH} \
                 "
-EXTRA_OEMAKE_install = " 'SCRIPTS=' "
 
 ALTERNATIVE:${PN}  = "mkpasswd"
 ALTERNATIVE_LINK_NAME[mkpasswd] = "${bindir}/mkpasswd"
@@ -82,7 +84,3 @@ FILES:${PN} += "${libdir}/libexpect${PV}.so \
                "
 
 BBCLASSEXTEND = "native nativesdk"
-
-# http://errors.yoctoproject.org/Errors/Details/766950/
-# expect5.45.4/exp_chan.c:62:5: error: initialization of 'struct Tcl_ChannelTypeVersion_ *' from incompatible pointer type 'int (*)(void *, int)' [-Wincompatible-pointer-types]
-CFLAGS += "-Wno-error=incompatible-pointer-types"

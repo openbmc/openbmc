@@ -237,7 +237,7 @@ class URI(object):
         # to RFC compliant URL format. E.g.:
         #   file://foo.diff -> file:foo.diff
         if urlp.scheme in self._netloc_forbidden:
-            uri = re.sub("(?<=:)//(?!/)", "", uri, 1)
+            uri = re.sub(r"(?<=:)//(?!/)", "", uri, count=1)
             reparse = 1
 
         if reparse:
@@ -499,30 +499,30 @@ def fetcher_init(d):
     Calls before this must not hit the cache.
     """
 
-    revs = bb.persist_data.persist('BB_URI_HEADREVS', d)
-    try:
-        # fetcher_init is called multiple times, so make sure we only save the
-        # revs the first time it is called.
-        if not bb.fetch2.saved_headrevs:
-            bb.fetch2.saved_headrevs = dict(revs)
-    except:
-        pass
+    with bb.persist_data.persist('BB_URI_HEADREVS', d) as revs:
+        try:
+            # fetcher_init is called multiple times, so make sure we only save the
+            # revs the first time it is called.
+            if not bb.fetch2.saved_headrevs:
+                bb.fetch2.saved_headrevs = dict(revs)
+        except:
+            pass
 
-    # When to drop SCM head revisions controlled by user policy
-    srcrev_policy = d.getVar('BB_SRCREV_POLICY') or "clear"
-    if srcrev_policy == "cache":
-        logger.debug("Keeping SRCREV cache due to cache policy of: %s", srcrev_policy)
-    elif srcrev_policy == "clear":
-        logger.debug("Clearing SRCREV cache due to cache policy of: %s", srcrev_policy)
-        revs.clear()
-    else:
-        raise FetchError("Invalid SRCREV cache policy of: %s" % srcrev_policy)
+        # When to drop SCM head revisions controlled by user policy
+        srcrev_policy = d.getVar('BB_SRCREV_POLICY') or "clear"
+        if srcrev_policy == "cache":
+            logger.debug("Keeping SRCREV cache due to cache policy of: %s", srcrev_policy)
+        elif srcrev_policy == "clear":
+            logger.debug("Clearing SRCREV cache due to cache policy of: %s", srcrev_policy)
+            revs.clear()
+        else:
+            raise FetchError("Invalid SRCREV cache policy of: %s" % srcrev_policy)
 
-    _checksum_cache.init_cache(d.getVar("BB_CACHEDIR"))
+        _checksum_cache.init_cache(d.getVar("BB_CACHEDIR"))
 
-    for m in methods:
-        if hasattr(m, "init"):
-            m.init(d)
+        for m in methods:
+            if hasattr(m, "init"):
+                m.init(d)
 
 def fetcher_parse_save():
     _checksum_cache.save_extras()
@@ -536,8 +536,8 @@ def fetcher_compare_revisions(d):
     when bitbake was started and return true if they have changed.
     """
 
-    headrevs = dict(bb.persist_data.persist('BB_URI_HEADREVS', d))
-    return headrevs != bb.fetch2.saved_headrevs
+    with dict(bb.persist_data.persist('BB_URI_HEADREVS', d)) as headrevs:
+        return headrevs != bb.fetch2.saved_headrevs
 
 def mirror_from_string(data):
     mirrors = (data or "").replace('\\n',' ').split()
@@ -1662,13 +1662,13 @@ class FetchMethod(object):
         if not hasattr(self, "_latest_revision"):
             raise ParameterError("The fetcher for this URL does not support _latest_revision", ud.url)
 
-        revs = bb.persist_data.persist('BB_URI_HEADREVS', d)
-        key = self.generate_revision_key(ud, d, name)
-        try:
-            return revs[key]
-        except KeyError:
-            revs[key] = rev = self._latest_revision(ud, d, name)
-            return rev
+        with bb.persist_data.persist('BB_URI_HEADREVS', d) as revs:
+            key = self.generate_revision_key(ud, d, name)
+            try:
+                return revs[key]
+            except KeyError:
+                revs[key] = rev = self._latest_revision(ud, d, name)
+                return rev
 
     def sortable_revision(self, ud, d, name):
         latest_rev = self._build_revision(ud, d, name)

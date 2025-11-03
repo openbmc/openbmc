@@ -1,4 +1,4 @@
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [last release before 2008, no vcs]
 
 Used the cross strip instead of host strip to avoid this build error:
 

@@ -13,8 +13,8 @@ DEPENDS = " \
     cairo \
     desktop-file-utils-native \
     glib-2.0 \
-    glib-2.0 \
     gtk4 \
+    itstool-native \
     libadwaita \
     librsvg \
     pango \

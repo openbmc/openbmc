@@ -8,6 +8,7 @@ SRC_URI = " \
     git://github.com/etcd-io/etcd;branch=release-3.5;protocol=https \
     file://0001-xxhash-bump-to-v2.1.2.patch;patchdir=src/${GO_IMPORT} \
     file://0001-test_lib.sh-remove-gobin-requirement-during-build.patch;patchdir=src/${GO_IMPORT} \
+    file://CVE-2023-32082.patch;patchdir=src/${GO_IMPORT} \
     file://etcd.service \
     file://etcd-existing.conf \
     file://etcd-new.service \

@@ -6,11 +6,11 @@ Release notes for 4.0.1 (kirkstone)
 Security Fixes in 4.0.1
 ~~~~~~~~~~~~~~~~~~~~~~~
 
--  linux-yocto/5.15: fix :cve:`2022-28796`
--  python3: ignore :cve:`2015-20107`
--  e2fsprogs: fix :cve:`2022-1304`
--  lua: fix :cve:`2022-28805`
--  busybox: fix :cve:`2022-28391`
+-  linux-yocto/5.15: fix :cve_nist:`2022-28796`
+-  python3: ignore :cve_nist:`2015-20107`
+-  e2fsprogs: fix :cve_nist:`2022-1304`
+-  lua: fix :cve_nist:`2022-28805`
+-  busybox: fix :cve_nist:`2022-28391`
 
 Fixes in 4.0.1
 ~~~~~~~~~~~~~~

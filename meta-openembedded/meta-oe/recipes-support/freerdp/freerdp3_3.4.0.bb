@@ -8,9 +8,22 @@ DEPENDS = "openssl libusb1 uriparser cairo icu pkcs11-helper zlib jpeg"
 inherit pkgconfig cmake
 
 SRCREV = "708f3764897e06297469a7b0507b3c9ecc041ad7"
-SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/FreeRDP/FreeRDP.git;branch=master;protocol=https \
+           file://CVE-2024-32039.patch \
+           file://CVE-2024-32040.patch \
+           file://CVE-2024-32458.patch \
+           file://CVE-2024-32459.patch \
+           file://CVE-2024-32460.patch \
+           file://CVE-2024-32658.patch \
+           file://CVE-2024-32659.patch \
+           file://CVE-2024-32660.patch \
+           file://CVE-2024-32661.patch \
+           file://CVE-2024-32662.patch \
+           "
 
 S = "${WORKDIR}/git"
+
+CVE_PRODUCT = "freerdp"
 
 PACKAGECONFIG ??= " \
     ${@bb.utils.filter('DISTRO_FEATURES', 'pam pulseaudio wayland x11', d)} \

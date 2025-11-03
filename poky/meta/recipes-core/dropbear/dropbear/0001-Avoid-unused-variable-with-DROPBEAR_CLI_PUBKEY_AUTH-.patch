@@ -1,0 +1,27 @@
+From d59436a4d56de58b856142a5d489a4a8fc7382ed Mon Sep 17 00:00:00 2001
+From: Matt Johnston <matt@ucc.asn.au>
+Date: Mon, 8 Apr 2024 22:01:21 +0800
+Subject: [PATCH] Avoid unused variable with DROPBEAR_CLI_PUBKEY_AUTH 0
+
+Fixes PR #291
+
+Upstream-Status: Backport [https://github.com/mkj/dropbear/commit/d59436a4d56de58b856142a5d489a4a8fc7382ed]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ cli-runopts.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/cli-runopts.c b/cli-runopts.c
+index b853a13..6668aee 100644
+--- a/cli-runopts.c
++++ b/cli-runopts.c
+@@ -533,7 +533,9 @@ static void loadidentityfile(const char* filename, int warnfail) {
+ static char* multihop_passthrough_args(void) {
+ 	char *args = NULL;
+ 	unsigned int len, total;
++#if DROPBEAR_CLI_PUBKEY_AUTH
+ 	m_list_elem *iter;
++#endif
+ 	/* Sufficient space for non-string args */
+ 	len = 100;
+ 

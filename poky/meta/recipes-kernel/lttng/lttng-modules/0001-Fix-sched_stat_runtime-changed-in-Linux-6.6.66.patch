@@ -1,0 +1,51 @@
+From a04234d63999f91405574928c80ded870dca157a Mon Sep 17 00:00:00 2001
+From: Kienan Stewart <kstewart@efficios.com>
+Date: Sun, 22 Dec 2024 17:39:35 +0800
+Subject: [PATCH] Fix: sched_stat_runtime changed in Linux 6.6.66
+
+The following commit has been backported into the 6.6.y branch.
+
+See upstream commit:
+
+    commit 5fe6ec8f6ab549b6422e41551abb51802bd48bc7
+    Author: Peter Zijlstra <peterz@infradead.org>
+    Date:   Mon Nov 6 13:41:43 2023 +0100
+
+        sched: Remove vruntime from trace_sched_stat_runtime()
+
+        Tracing the runtime delta makes sense, observer can sum over time.
+        Tracing the absolute vruntime makes less sense, inconsistent:
+        absolute-vs-delta, but also vruntime delta can be computed from
+        runtime delta.
+
+        Removing the vruntime thing also makes the two tracepoint sites
+        identical, allowing to unify the code in a later patch.
+
+Change-Id: I74acf0b8340c371e8411116e07e5c97b10f9c756
+Signed-off-by: Kienan Stewart <kstewart@efficios.com>
+
+Upstream-Status: Pending [https://review.lttng.org/c/lttng-modules/+/13813]
+
+[Xiangyu: BP to fix compile error on linux 6.6.66, Minor conflict resolution]
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ include/instrumentation/events/sched.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/sched.h b/include/instrumentation/events/sched.h
+index 24cf37c8..637a1e3a 100644
+--- a/include/instrumentation/events/sched.h
++++ b/include/instrumentation/events/sched.h
+@@ -646,7 +646,8 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(sched_stat_template, sched_stat_blocked,
+ 	     TP_ARGS(tsk, delay))
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,8,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,8,0) || \
++	LTTNG_KERNEL_RANGE(6,6,66, 6,7,0))
+ /*
+  * Tracepoint for accounting runtime (time the task is executing
+  * on a CPU).
+-- 
+2.43.0
+

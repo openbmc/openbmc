@@ -17,7 +17,7 @@ diff --git a/support/Makefile b/support/Makefile
 index 362a51f882..56d2b37058 100644
 --- a/support/Makefile
 +++ b/support/Makefile
-@@ -228,9 +228,9 @@ libsupport-inhibit-o += .o
+@@ -229,9 +229,9 @@ libsupport-inhibit-o += .o
  endif
  
  CFLAGS-support_paths.c = \

@@ -1,0 +1,76 @@
+From 0c6b8cc84eff72ed21098029aaba079b899dbee2 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?=
+ <vesa.jaaskelainen@vaisala.com>
+Date: Sun, 1 Sep 2024 09:23:40 +0300
+Subject: [PATCH 2/5] Fix cross compilation issue with linux-armv7l
+ architecture
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When compiling under Yocto project for linux-armv7l target architecture
+.so files were generated incorrectly as:
+
+  rpds.cpython-312-armv7l-linux-gnueabihf.so
+
+Where as platform and EXT_SUFFIX are defined as:
+
+  >>> sysconfig.get_platform()
+  'linux-armv7l'
+  >>> sysconfig.get_config_vars()['EXT_SUFFIX']
+  '.cpython-312-arm-linux-gnueabihf.so'
+
+Which should have caused the .so files as:
+
+  rpds.cpython-312-arm-linux-gnueabihf.so
+
+Upstream-Status: Backport [https://github.com/PyO3/maturin/commit/0c6b8cc84eff72ed21098029aaba079b899dbee2]
+
+Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
+---
+ src/python_interpreter/config.rs | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/python_interpreter/config.rs b/src/python_interpreter/config.rs
+index d76606f2..5736aedc 100644
+--- a/src/python_interpreter/config.rs
++++ b/src/python_interpreter/config.rs
+@@ -306,7 +306,7 @@ impl InterpreterConfig {
+                     format!(
+                         ".cpython-{}-{}-{}-{}.{}",
+                         abi_tag,
+-                        target.get_python_arch(),
++                        target.get_python_ext_arch(interpreter_kind),
+                         target.get_python_os(),
+                         target_env,
+                         file_ext,
+@@ -319,7 +319,7 @@ impl InterpreterConfig {
+                         major,
+                         minor,
+                         abi_tag,
+-                        target.get_python_arch(),
++                        target.get_python_ext_arch(interpreter_kind),
+                         target.get_python_os(),
+                         target_env,
+                         file_ext,
+@@ -330,7 +330,7 @@ impl InterpreterConfig {
+                     format!(
+                         ".{}-{}-{}.{}",
+                         abi_tag.replace('_', "-"),
+-                        target.get_python_arch(),
++                        target.get_python_ext_arch(interpreter_kind),
+                         target.get_python_os(),
+                         file_ext,
+                     )
+@@ -341,7 +341,7 @@ impl InterpreterConfig {
+                 format!(
+                     ".cpython-{}-{}-{}.{}",
+                     abi_tag,
+-                    target.get_python_arch(),
++                    target.get_python_ext_arch(interpreter_kind),
+                     target.get_python_os(),
+                     file_ext
+                 )
+-- 
+2.34.1
+

@@ -13,6 +13,7 @@ DEPENDS = "libusb1 virtual/libiconv udev"
 
 SRC_URI = "${KERNELORG_MIRROR}/linux/utils/usb/usbutils/usbutils-${PV}.tar.gz \
            file://0001-usbutils.pc.in-Fix-Cflags-entry.patch \
+           file://0001-usb-devices-Fix-usb-devices-with-busybox.patch \
           "
 SRC_URI[sha256sum] = "f704c4cb78a060db88b43aac6ebfd3d93c2c5cf1d6dd0e42936faaf00814ab00"
 

@@ -1,0 +1,47 @@
+From b079074048bc33b206b21f73fecb8173cf8adaf0 Mon Sep 17 00:00:00 2001
+From: Haixiao Yan <haixiao.yan.cn@windriver.com>
+Date: Mon, 15 Sep 2025 21:15:45 +0800
+Subject: [PATCH] build_support: handle runtime errors and return None for
+ invalid max_priority
+
+When cross-compiling, test binaries may fail to execute on the host system if
+the target toolchain was built against a newer glibc version than what is
+available on the host.
+
+For example, on Ubuntu 20.04 the following error occurs:
+
+./build_support/src/sniff_mq_prio_max: /lib/x86_64-linux-gnu/libc.so.6: version
+`GLIBC_2.34' not found (required by ./build_support/src/sniff_mq_prio_max)
+
+This change ensures that such runtime errors are gracefully handled, and
+max_priority is set to None when the test binary cannot be executed.
+
+Upstream-Status: Pending
+
+Signed-off-by: Haixiao Yan <haixiao.yan.cn@windriver.com>
+---
+ build_support/discover_system_info.py | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/build_support/discover_system_info.py b/build_support/discover_system_info.py
+index f6e6c8cbe6ba..4fec48b5529d 100644
+--- a/build_support/discover_system_info.py
++++ b/build_support/discover_system_info.py
+@@ -75,8 +75,12 @@ def compile_and_run(filename, linker_options=""):
+     if does_build_succeed(filename, linker_options=""):
+         try:
+             s = subprocess.Popen(["./build_support/src/%s" % filename[:-2]],
+-                                 stdout=subprocess.PIPE).communicate()[0]
+-            return s.strip().decode()
++                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
++            stdout, stderr = s.communicate()
++            if s.returncode != 0:
++                # runtime error
++                return None
++            return stdout.strip().decode()
+         except Exception:
+             # execution resulted in an error
+             return None
+-- 
+2.25.1
+

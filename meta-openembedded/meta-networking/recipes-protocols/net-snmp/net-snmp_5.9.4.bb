@@ -53,6 +53,8 @@ PACKAGECONFIG[perl] = "--enable-embedded-perl --with-perl-modules=yes, --disable
 PACKAGECONFIG[smux] = ""
 PACKAGECONFIG[systemd] = "--with-systemd, --without-systemd"
 
+SYSCONTACT_DISTRO ?= "no-contact-set@example.com"
+
 EXTRA_OECONF = " \
     --enable-shared \
     --disable-manuals \
@@ -61,6 +63,7 @@ EXTRA_OECONF = " \
     --with-persistent-directory=${localstatedir}/lib/net-snmp \
     --with-endianness=${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', 'little', 'big', d)} \
     --with-mib-modules='${MIB_MODULES}' \
+    --with-sys-contact='${SYSCONTACT_DISTRO}' \
 "
 
 MIB_MODULES = ""

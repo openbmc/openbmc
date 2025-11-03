@@ -1,0 +1,44 @@
+From 6cca274bf25a5679330debdd61a59840e50c68ab Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Thu, 26 Sep 2024 09:20:28 +0300
+Subject: [PATCH 06/13] qtdemux: Make sure only an even number of bytes is
+ processed when handling CEA608 data
+
+An odd number of bytes would lead to out of bound reads and writes, and doesn't
+make any sense as CEA608 comes in byte pairs.
+
+Strip off any leftover bytes and assume everything before that is valid.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-195
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3841
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47539
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/6cca274bf25a5679330debdd61a59840e50c68ab]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index d1aa9ee5a0..ce1a1b8d59 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -5784,6 +5784,11 @@ convert_to_s334_1a (const guint8 * ccpair, guint8 ccpair_size, guint field,
+   guint8 *storage;
+   gsize i;
+ 
++  /* Strip off any leftover odd bytes and assume everything before is valid */
++  if (ccpair_size % 2 != 0) {
++    ccpair_size -= 1;
++  }
++
+   /* We are converting from pairs to triplets */
+   *res = ccpair_size / 2 * 3;
+   storage = g_malloc (*res);
+-- 
+2.30.2
+

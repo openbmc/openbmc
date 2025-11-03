@@ -1,0 +1,43 @@
+From 455393ef0f2bb0a49c5bf32ef208af914c44e806 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 30 Sep 2024 18:25:53 +0300
+Subject: [PATCH 3/7] matroskademux: Check for big enough WavPack codec private
+ data before accessing it
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-250
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3866
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8108>
+
+CVE: CVE-2024-47597
+CVE: CVE-2024-47601
+CVE: CVE-2024-47602
+CVE: CVE-2024-47603
+CVE: CVE-2024-47834
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/455393ef0f2bb0a49c5bf32ef208af914c44e806]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/matroska/matroska-demux.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gst/matroska/matroska-demux.c b/gst/matroska/matroska-demux.c
+index 583fbbe6e6..91e66fefc3 100644
+--- a/gst/matroska/matroska-demux.c
++++ b/gst/matroska/matroska-demux.c
+@@ -3888,6 +3888,11 @@ gst_matroska_demux_add_wvpk_header (GstElement * element,
+   guint8 *buf_data, *data;
+   Wavpack4Header wvh;
+ 
++  if (!stream->codec_priv || stream->codec_priv_size < 2) {
++    GST_ERROR_OBJECT (element, "No or too small wavpack codec private data");
++    return GST_FLOW_ERROR;
++  }
++
+   wvh.ck_id[0] = 'w';
+   wvh.ck_id[1] = 'v';
+   wvh.ck_id[2] = 'p';
+-- 
+2.30.2
+

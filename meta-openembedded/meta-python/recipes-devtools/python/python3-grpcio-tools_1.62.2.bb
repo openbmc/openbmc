@@ -16,4 +16,8 @@ SRC_URI[sha256sum] = "5fd5e1582b678e6b941ee5f5809340be5e0724691df5299aae8226640f
 
 RDEPENDS:${PN} = "python3-grpcio"
 
+do_compile:prepend() {
+    export GRPC_PYTHON_BUILD_EXT_COMPILER_JOBS="${@oe.utils.parallel_make(d, False)}"
+}
+
 BBCLASSEXTEND = "native nativesdk"

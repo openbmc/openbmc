@@ -21,7 +21,7 @@ the required combination of "gnueabi-linux-armeb" was not found in
 the triplettable file thereby returning dpkg_arch as
 empty in configure script.
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 
 Signed-off-by: Krishnanjanappa, Jagadeesh <jagadeesh.krishnanjanappa@caviumnetworks.com>
 Signed-off-by: Aníbal Limón <anibal.limon@linux.intel.com>

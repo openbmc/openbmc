@@ -6,11 +6,11 @@ Release notes for 3.4.4 (honister)
 Security Fixes in 3.4.4
 ~~~~~~~~~~~~~~~~~~~~~~~
 
--  tiff: fix :cve:`2022-0865`, :cve:`2022-0891`, :cve:`2022-0907`, :cve:`2022-0908`, :cve:`2022-0909` and :cve:`2022-0924`
+-  tiff: fix :cve_nist:`2022-0865`, :cve_nist:`2022-0891`, :cve_nist:`2022-0907`, :cve_nist:`2022-0908`, :cve_nist:`2022-0909` and :cve_nist:`2022-0924`
 -  xz: fix `CVE-2022-1271 <https://security-tracker.debian.org/tracker/CVE-2022-1271>`__
 -  unzip: fix `CVE-2021-4217 <https://security-tracker.debian.org/tracker/CVE-2021-4217>`__
--  zlib: fix :cve:`2018-25032`
--  grub: ignore :cve:`2021-46705`
+-  zlib: fix :cve_nist:`2018-25032`
+-  grub: ignore :cve_nist:`2021-46705`
 
 Fixes in 3.4.4
 ~~~~~~~~~~~~~~

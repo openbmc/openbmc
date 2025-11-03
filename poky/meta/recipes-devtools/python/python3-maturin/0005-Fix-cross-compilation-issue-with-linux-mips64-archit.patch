@@ -1,0 +1,82 @@
+From 5fe643579bcc63d824f6a0f0936fff451c622903 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Vesa=20J=C3=A4=C3=A4skel=C3=A4inen?=
+ <vesa.jaaskelainen@vaisala.com>
+Date: Sun, 1 Sep 2024 15:55:54 +0300
+Subject: [PATCH 5/5] Fix cross compilation issue with linux-mips64
+ architecture
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When compiling under Yocto project for linux-mips64 target architecture
+.so files were generated incorrectly as:
+
+  rpds.cpython-312-mips64-linux-gnu.so
+
+Where as platform and EXT_SUFFIX are defined as:
+
+  >>> sysconfig.get_platform()
+  'linux-mips64'
+  >>> sysconfig.get_config_vars()['EXT_SUFFIX']
+  '.cpython-312-mips64-linux-gnuabi64.so'
+
+Which should have caused the .so files as:
+
+  rpds.cpython-312-mips64-linux-gnuabi64.so
+
+Upstream-Status: Backport [https://github.com/PyO3/maturin/commit/5fe643579bcc63d824f6a0f0936fff451c622903]
+
+Signed-off-by: Vesa Jääskeläinen <vesa.jaaskelainen@vaisala.com>
+---
+ src/python_interpreter/config.rs | 19 +++++++++++++++++++
+ src/target.rs                    |  4 +++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/src/python_interpreter/config.rs b/src/python_interpreter/config.rs
+index 8f883887..ef656010 100644
+--- a/src/python_interpreter/config.rs
++++ b/src/python_interpreter/config.rs
+@@ -432,6 +432,25 @@ mod test {
+         .unwrap();
+         assert_eq!(sysconfig.ext_suffix, ".cpython-310-powerpc-linux-gnu.so");
+ 
++        let sysconfig = InterpreterConfig::lookup_one(
++            &Target::from_target_triple(Some("mips64-unknown-linux-gnu".to_string())).unwrap(),
++            InterpreterKind::CPython,
++            (3, 10),
++        )
++        .unwrap();
++        assert_eq!(
++            sysconfig.ext_suffix,
++            ".cpython-310-mips64-linux-gnuabi64.so"
++        );
++
++        let sysconfig = InterpreterConfig::lookup_one(
++            &Target::from_target_triple(Some("mips-unknown-linux-gnu".to_string())).unwrap(),
++            InterpreterKind::CPython,
++            (3, 10),
++        )
++        .unwrap();
++        assert_eq!(sysconfig.ext_suffix, ".cpython-310-mips-linux-gnu.so");
++
+         let sysconfig = InterpreterConfig::lookup_one(
+             &Target::from_target_triple(Some("s390x-unknown-linux-gnu".to_string())).unwrap(),
+             InterpreterKind::CPython,
+diff --git a/src/target.rs b/src/target.rs
+index 93afd9bb..25fc6c07 100644
+--- a/src/target.rs
++++ b/src/target.rs
+@@ -396,7 +396,9 @@ impl Target {
+         match python_impl {
+             CPython => {
+                 // For musl handling see https://github.com/pypa/auditwheel/issues/349
+-                if python_version >= (3, 11) {
++                if matches!(self.target_arch(), Arch::Mips64 | Arch::Mips64el) && self.is_linux() {
++                    "gnuabi64".to_string()
++                } else if python_version >= (3, 11) {
+                     self.target_env().to_string()
+                 } else {
+                     self.target_env().to_string().replace("musl", "gnu")
+-- 
+2.34.1
+

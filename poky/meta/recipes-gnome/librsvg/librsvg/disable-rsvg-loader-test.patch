@@ -1,0 +1,40 @@
+From df94cfa4a637c229fef32c349b5c2dfee2dca3fc Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 27 Jun 2024 17:09:11 +0100
+Subject: [PATCH] Don't build rsvg-loader in cross builds
+
+This binary is a non-installed test binary that isn't any use in cross builds, and
+causes problems because it generates a gdk-pixbuf loader cache at build time using
+a mix of host and target libraries.
+
+As we don't install the binary, we can just not build it.
+
+Upstream-Status: Inappropriate [upstream has moved to Meson]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ gdk-pixbuf-loader/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gdk-pixbuf-loader/Makefile.am b/gdk-pixbuf-loader/Makefile.am
+index 44df9c6c..fb417d24 100644
+--- a/gdk-pixbuf-loader/Makefile.am
++++ b/gdk-pixbuf-loader/Makefile.am
+@@ -30,6 +30,7 @@ if PLATFORM_WIN32
+ libpixbufloader_svg_la_LDFLAGS += -no-undefined
+ endif
+ 
++if !CROSS_COMPILING
+ noinst_PROGRAMS = rsvg-loader
+ 
+ rsvg_loader_SOURCES = \
+@@ -52,6 +53,7 @@ EXTRA_rsvg_loader_DEPENDENCIES = libpixbufloader-svg.la gdk-pixbuf-loaders
+ 
+ gdk-pixbuf-loaders: Makefile
+ 	$(AM_V_GEN) ( $(GDK_PIXBUF_QUERYLOADERS) ./libpixbufloader-svg.la && GDK_PIXBUF_MODULEDIR=$(gdk_pixbuf_moduledir) $(GDK_PIXBUF_QUERYLOADERS)) > gdk-pixbuf.loaders 2>/dev/null
++endif
+ 
+ if CROSS_COMPILING
+ RUN_QUERY_LOADER_TEST=false
+-- 
+2.34.1
+

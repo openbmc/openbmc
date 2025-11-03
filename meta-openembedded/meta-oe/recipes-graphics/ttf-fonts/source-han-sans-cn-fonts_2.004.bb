@@ -11,13 +11,10 @@ inherit allarch fontcache
 #EXCLUDE_FROM_WORLD = "1"
 
 SRC_URI = " \
-    svn://github.com/adobe-fonts/source-han-sans;module=branches/release/SubsetOTF/CN;protocol=http;rev=82 \
+    https://github.com/adobe-fonts/source-han-sans/releases/download/2.004R/SourceHanSansCN.zip;subdir=${BP} \
     file://44-source-han-sans-cn.conf \
 "
-SRC_URI[md5sum] = "d16abc21f6575bb08894efedbed484a2"
-SRC_URI[sha256sum] = "0a0e1d8e52833bc352d454d8242da03b82c0efc41323fb66f7435e5b39734a4f"
-
-S = "${WORKDIR}/SourceHanSansCN"
+SRC_URI[sha256sum] = "6841fc13f1c0d255cfeb33d2a2c68d24bbebd94ae2c070347a2b2b200a1db4d6"
 
 do_install() {
     install -d ${D}${sysconfdir}/fonts/conf.d/

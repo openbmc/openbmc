@@ -1,0 +1,38 @@
+From aa07d94c10d71fac389dbbb264a59c1f6117eead Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 30 Sep 2024 18:19:30 +0300
+Subject: [PATCH] discoverer: Don't print channel layout for more than 64
+ channels
+
+64+ channels are always unpositioned / unknown layout.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-248
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3864
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8034>
+
+CVE: CVE-2024-47600
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/aa07d94c10d71fac389dbbb264a59c1f6117eead]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ tools/gst-discoverer.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/gst-discoverer.c b/tools/gst-discoverer.c
+index e3f048bed5..4a2a1b4bc4 100644
+--- a/tools/gst-discoverer.c
++++ b/tools/gst-discoverer.c
+@@ -222,7 +222,7 @@ format_channel_mask (GstDiscovererAudioInfo * ainfo)
+ 
+   channel_mask = gst_discoverer_audio_info_get_channel_mask (ainfo);
+ 
+-  if (channel_mask != 0) {
++  if (channel_mask != 0 && channels <= 64) {
+     gst_audio_channel_positions_from_mask (channels, channel_mask, position);
+ 
+     for (i = 0; i < channels; i++) {
+-- 
+2.30.2
+

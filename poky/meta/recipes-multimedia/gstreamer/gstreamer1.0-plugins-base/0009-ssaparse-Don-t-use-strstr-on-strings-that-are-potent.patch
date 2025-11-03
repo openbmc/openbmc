@@ -1,0 +1,99 @@
+From 403b10eba06679319aa2e35d310236234782102f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 30 Sep 2024 18:36:19 +0300
+Subject: [PATCH 2/2] ssaparse: Don't use strstr() on strings that are
+ potentially not NULL-terminated
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8036>
+
+CVE: CVE-2024-47541
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/403b10eba06679319aa2e35d310236234782102f]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/subparse/gstssaparse.c | 36 +++++++++++++++++++++++++++++++++++-
+ meson.build                |  1 +
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+
+diff --git a/gst/subparse/gstssaparse.c b/gst/subparse/gstssaparse.c
+index 37b892e928..c162a542f5 100644
+--- a/gst/subparse/gstssaparse.c
++++ b/gst/subparse/gstssaparse.c
+@@ -146,6 +146,35 @@ gst_ssa_parse_sink_event (GstPad * pad, GstObject * parent, GstEvent * event)
+   return res;
+ }
+ 
++#ifndef HAVE_MEMMEM
++// memmem() is a GNU extension so if it's not available we'll need
++// our own implementation here. Thanks C.
++static void *
++my_memmem (const void *haystack, size_t haystacklen, const void *needle,
++    size_t needlelen)
++{
++  const guint8 *cur, *end;
++
++  if (needlelen > haystacklen)
++    return NULL;
++  if (needlelen == 0)
++    return (void *) haystack;
++
++
++  cur = haystack;
++  end = cur + haystacklen - needlelen;
++
++  for (; cur <= end; cur++) {
++    if (memcmp (cur, needle, needlelen) == 0)
++      return (void *) cur;
++  }
++
++  return NULL;
++}
++#else
++#define my_memmem memmem
++#endif
++
+ static gboolean
+ gst_ssa_parse_setcaps (GstPad * sinkpad, GstCaps * caps)
+ {
+@@ -154,6 +183,7 @@ gst_ssa_parse_setcaps (GstPad * sinkpad, GstCaps * caps)
+   const GValue *val;
+   GstStructure *s;
+   const guchar bom_utf8[] = { 0xEF, 0xBB, 0xBF };
++  const guint8 header[] = "[Script Info]";
+   const gchar *end;
+   GstBuffer *priv;
+   GstMapInfo map;
+@@ -193,7 +223,7 @@ gst_ssa_parse_setcaps (GstPad * sinkpad, GstCaps * caps)
+     left -= 3;
+   }
+ 
+-  if (!strstr (ptr, "[Script Info]"))
++  if (!my_memmem (ptr, left, header, sizeof (header) - 1))
+     goto invalid_init;
+ 
+   if (!g_utf8_validate (ptr, left, &end)) {
+@@ -231,6 +261,10 @@ invalid_init:
+   }
+ }
+ 
++#ifdef my_memmem
++#undef my_memmem
++#endif
++
+ static gboolean
+ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
+ {
+diff --git a/meson.build b/meson.build
+index d1033bef4a..65d0944114 100644
+--- a/meson.build
++++ b/meson.build
+@@ -199,6 +199,7 @@ check_functions = [
+   ['HAVE_LRINTF', 'lrintf', '#include<math.h>'],
+   ['HAVE_MMAP', 'mmap', '#include<sys/mman.h>'],
+   ['HAVE_LOG2', 'log2', '#include<math.h>'],
++  ['HAVE_MEMMEM', 'memmem', '#include<string.h>'],
+ ]
+ 
+ libm = cc.find_library('m', required : false)
+-- 
+2.30.2
+

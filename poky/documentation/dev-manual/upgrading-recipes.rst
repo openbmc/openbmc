@@ -333,7 +333,7 @@ Manually Upgrading a Recipe
 
 If for some reason you choose not to upgrade recipes using
 :ref:`dev-manual/upgrading-recipes:Using the Auto Upgrade Helper (AUH)` or
-by :ref:`dev-manual/upgrading-recipes:Using \`\`devtool upgrade\`\``,
+by :ref:`dev-manual/upgrading-recipes:Using ``devtool upgrade```,
 you can manually edit the recipe files to upgrade the versions.
 
 .. note::

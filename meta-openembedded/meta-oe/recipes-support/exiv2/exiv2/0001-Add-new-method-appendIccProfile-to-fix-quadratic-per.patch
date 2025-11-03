@@ -1,0 +1,96 @@
+From 14a862213873b3f81941721a5972853fd269ca63 Mon Sep 17 00:00:00 2001
+From: Kevin Backhouse <kevinbackhouse@github.com>
+Date: Fri, 15 Aug 2025 12:08:49 +0100
+Subject: [PATCH] Add new method appendIccProfile to fix quadratic performance
+ issue.
+
+Upstream-Status: Backport [https://github.com/Exiv2/exiv2/pull/3345/commits/e5bf22e0cebeabeb2ffd40678344467a271be12d]
+CVE: CVE-2025-55304
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ include/exiv2/image.hpp | 10 ++++++++++
+ src/image.cpp           | 29 +++++++++++++++++++++--------
+ src/jpgimage.cpp        |  7 +------
+ 3 files changed, 32 insertions(+), 14 deletions(-)
+
+diff --git a/include/exiv2/image.hpp b/include/exiv2/image.hpp
+index 629a8a4fd..072016013 100644
+--- a/include/exiv2/image.hpp
++++ b/include/exiv2/image.hpp
+@@ -191,6 +191,16 @@ class EXIV2API Image {
+     @param bTestValid - tests that iccProfile contains credible data
+    */
+   virtual void setIccProfile(DataBuf&& iccProfile, bool bTestValid = true);
++  /*!
++    @brief Append more bytes to the iccProfile.
++    @param iccProfile DataBuf containing profile (binary)
++    @param bTestValid - tests that iccProfile contains credible data
++   */
++  virtual void appendIccProfile(const uint8_t* bytes, size_t size, bool bTestValid);
++  /*!
++    @brief Throw an exception if the size at the beginning of the iccProfile isn't correct.
++   */
++  virtual void checkIccProfile();
+   /*!
+     @brief Erase iccProfile. the profile is not removed from
+         the actual image until the writeMetadata() method is called.
+diff --git a/src/image.cpp b/src/image.cpp
+index f06660cf7..eb6b3eb0a 100644
+--- a/src/image.cpp
++++ b/src/image.cpp
+@@ -625,16 +625,29 @@ void Image::setComment(const std::string& comment) {
+ }
+ 
+ void Image::setIccProfile(Exiv2::DataBuf&& iccProfile, bool bTestValid) {
++  iccProfile_ = std::move(iccProfile);
+   if (bTestValid) {
+-    if (iccProfile.size() < sizeof(long)) {
+-      throw Error(ErrorCode::kerInvalidIccProfile);
+-    }
+-    const size_t size = iccProfile.read_uint32(0, bigEndian);
+-    if (size != iccProfile.size()) {
+-      throw Error(ErrorCode::kerInvalidIccProfile);
+-    }
++    checkIccProfile();
++  }
++}
++
++void Image::appendIccProfile(const uint8_t* bytes, size_t size, bool bTestValid) {
++  const size_t start = iccProfile_.size();
++  iccProfile_.resize(Safe::add(start, size));
++  memcpy(iccProfile_.data(start), bytes, size);
++  if (bTestValid) {
++    checkIccProfile();
++  }
++}
++
++void Image::checkIccProfile() {
++  if (iccProfile_.size() < sizeof(long)) {
++    throw Error(ErrorCode::kerInvalidIccProfile);
++  }
++  const size_t size = iccProfile_.read_uint32(0, bigEndian);
++  if (size != iccProfile_.size()) {
++    throw Error(ErrorCode::kerInvalidIccProfile);
+   }
+-  iccProfile_ = std::move(iccProfile);
+ }
+ 
+ void Image::clearIccProfile() {
+diff --git a/src/jpgimage.cpp b/src/jpgimage.cpp
+index 34187dc63..2c29135ae 100644
+--- a/src/jpgimage.cpp
++++ b/src/jpgimage.cpp
+@@ -268,12 +268,7 @@ void JpegBase::readMetadata() {
+         icc_size = s;
+       }
+ 
+-      DataBuf profile(Safe::add(iccProfile_.size(), icc_size));
+-      if (!iccProfile_.empty()) {
+-        std::copy(iccProfile_.begin(), iccProfile_.end(), profile.begin());
+-      }
+-      std::copy_n(buf.c_data(2 + 14), icc_size, profile.data() + iccProfile_.size());
+-      setIccProfile(std::move(profile), chunk == chunks);
++      appendIccProfile(buf.c_data(2 + 14), icc_size, chunk == chunks);
+     } else if (pixelHeight_ == 0 && inRange2(marker, sof0_, sof3_, sof5_, sof15_)) {
+       // We hit a SOFn (start-of-frame) marker
+       if (size < 8) {

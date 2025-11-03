@@ -1,0 +1,31 @@
+From e94c486c6c3473979ce5be627f030cc95ce165e6 Mon Sep 17 00:00:00 2001
+From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Date: Sun, 17 Aug 2025 17:27:21 +0200
+Subject: [PATCH 1/2] pyproject.toml: fix up license information
+
+Without this change, the Python tooling complains that you
+can't have both "license" and "license-files" settings in pyproject.toml.
+
+This issue doesn't happen any more with the Python tooling
+in master (as of August 2025), so it's irrelevant for upstream.
+
+Signed-off-by: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Upstream-Status: Inappropriate [oe specific]
+---
+ pyproject.toml | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index a0b75c3..79e710b 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -20,8 +20,7 @@ authors = [
+ maintainers = [
+   {name = "Alexander Popov", email = "alex.popov@linux.com"}
+ ]
+-license = "GPL-3.0-only"
+-license-files = ["LICENSE.txt"]
++license = { text = "GPL-3.0-only" }
+ classifiers = [
+     "Development Status :: 5 - Production/Stable",
+     "Topic :: Security",

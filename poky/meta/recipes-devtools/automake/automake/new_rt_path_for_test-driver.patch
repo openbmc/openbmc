@@ -5,7 +5,7 @@ Subject: [PATCH] Set relative to top_builddir path in Makefile to access
  test-driver
 
 Signed-off-by: Adrian Calianu <adrian.calianu@enea.com>
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [specific to oe-core target ptest installation]
 Bug-Report: http://debbugs.gnu.org/cgi/bugreport.cgi?bug=19042
 
 ---

@@ -29,6 +29,7 @@ SRC_URI:append:corstone1000 = " \
     file://0010-CC312-alignment-of-cc312-differences-between-fvp-and.patch \
     file://0011-Platform-corstone1000-Increase-buffers-for-EFI-vars.patch \
     file://0012-corstone1000-Remove-reset-after-capsule-update.patch \
+    file://0013-Platform-corstone1000-Fix-isolation-L2-memory-protection.patch \
     "
 
 # TF-M ships patches for external dependencies that needs to be applied

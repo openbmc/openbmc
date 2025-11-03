@@ -6,7 +6,7 @@ Subject: [PATCH] Fix build with clang
 Fix "error: non-void function 'fix_options' should return a value".
 Add function prototype to tcpd.c and miscd.c.
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [current release is from 1997; no vcs anywhere]
 
 Signed-off-by: Oleksiy Obitotskyy <oobitots@cisco.com>
 ---

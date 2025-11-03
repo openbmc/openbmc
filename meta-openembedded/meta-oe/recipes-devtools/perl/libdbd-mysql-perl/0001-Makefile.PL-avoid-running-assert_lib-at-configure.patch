@@ -1,0 +1,40 @@
+From 577cdd6a571cfed506ec902b9021e60a2b854e4a Mon Sep 17 00:00:00 2001
+From: Chen Qi <Qi.Chen@windriver.com>
+Date: Sun, 7 Jul 2024 22:32:30 -0700
+Subject: [PATCH] Makefile.PL: avoid running assert_lib at configure
+
+The assert_lib will run the generated binary. When cross compiling,
+e.g., for qemuarm64, we'll see error like below:
+
+  /usr/lib64/ld-linux-aarch64.so.1: No such file or directory
+
+We should just skip library checking, because in OE, if these libs are
+not available, the do_compile process will fail anyway.
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ Makefile.PL | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index a1b38f6..939cadc 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -206,11 +206,7 @@ To change these settings, see 'perl Makefile.PL --help' and
+ MSG
+ 
+ print "Checking if libs are available for compiling...\n";
+-
+-assert_lib(
+-  LIBS => ($opt->{'embedded'} ? $opt->{'embedded'} : $opt->{libs}),
+-);
+-
++print "Skip checking libs at configure stage as we are cross compiling.\n";
+ print "Looks good.\n\n";
+ 
+ sleep 1;
+-- 
+2.25.1
+

@@ -1,0 +1,39 @@
+From 531c6696d42953cd642dea7bf70153285c7949ae Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Kai=20Wasserb=C3=A4ch?= <kai@dev.carbon-project.org>
+Date: Tue, 6 May 2025 14:36:57 +0200
+Subject: [PATCH] fix(FTBFS): clc: switch to new non-owned `TargetOptions` for
+ LLVM 21
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream hid the `TargetOptions` in commit 985410f87f2d19910a8d327527fd30062b042b63
+
+Use the new `getTargetOpts()` to obtain the `TargetOptions` for
+`setTarget()`.
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34835]
+
+Signed-off-by: Kai Wasserbäch <kai@dev.carbon-project.org>
+Closes: https://gitlab.freedesktop.org/mesa/mesa/-/issues/13079
+Reference: https://github.com/llvm/llvm-project/commit/985410f87f2d19910a8d327527fd30062b042b63
+Reviewed-by: Karol Herbst <kherbst@redhat.com>
+Part-of: <https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/34835>
+---
+ src/compiler/clc/clc_helpers.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+--- a/src/compiler/clc/clc_helpers.cpp
++++ b/src/compiler/clc/clc_helpers.cpp
+@@ -874,7 +874,11 @@ clc_compile_to_llvm_module(LLVMContext &
+                            diag_opts));
+ 
+    c->setTarget(clang::TargetInfo::CreateTargetInfo(
++#if LLVM_VERSION_MAJOR >= 21
++                   c->getDiagnostics(), c->getInvocation().getTargetOpts()));
++#else
+                    c->getDiagnostics(), c->getInvocation().TargetOpts));
++#endif
+ 
+    c->getFrontendOpts().ProgramAction = clang::frontend::EmitLLVMOnly;
+ 

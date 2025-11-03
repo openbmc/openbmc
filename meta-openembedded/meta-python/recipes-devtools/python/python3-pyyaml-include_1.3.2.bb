@@ -26,4 +26,4 @@ RDEPENDS:${PN}-ptest += " \
     python3-pytest \
     python3-unittest-automake-output \
 "
-
+BBCLASSEXTEND = "native nativesdk"

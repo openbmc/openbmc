@@ -27,6 +27,7 @@ python do_collect_packagedata() {
     oe.copy_buildsystem.generate_locked_sigs(sigfile, d)
 }
 
+inherit nopackages
 deltask do_fetch
 deltask do_unpack
 deltask do_patch

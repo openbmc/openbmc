@@ -11,7 +11,7 @@ from bb.asyncrpc import InvokeError
 from .client import ClientPool
 import hashlib
 import logging
-import multiprocessing
+from bb import multiprocessing
 import os
 import sys
 import tempfile

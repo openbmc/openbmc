@@ -34,6 +34,8 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 GTKIMMODULES_PACKAGES = "uim-gtk2.0 uim-gtk3"
 
+CFLAGS += "-std=gnu17"
+
 EXTRA_OECONF += "--disable-emacs \
     --with-libedit=${STAGING_EXECPREFIXDIR} \
     --without-scim \

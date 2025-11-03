@@ -10,13 +10,16 @@ DEPENDS:append:class-native = " file-replacement-native"
 
 SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://serfmacro.patch \
-           "
+           file://CVE-2024-46901.patch \
+          "
 
 SRC_URI[sha256sum] = "949efd451a09435f7e8573574c71c7b71b194d844890fa49cd61d2262ea1a440"
 
 inherit autotools pkgconfig gettext python3native
 
 CVE_PRODUCT = "apache:subversion"
+
+CVE_STATUS[CVE-2024-45720] = "not-applicable-platform: Issue only applies on Windows"
 
 PACKAGECONFIG ?= ""
 

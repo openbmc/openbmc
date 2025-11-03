@@ -6,6 +6,9 @@ HOMEPAGE = "http://luajit.org"
 SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
            file://0001-Do-not-strip-automatically-this-leaves-the-stripping.patch \
            file://0001-Use-builtin-for-clear_cache.patch \
+           file://CVE-2024-25177.patch \
+           file://CVE-2024-25176.patch \
+           file://CVE-2024-25178.patch \
            "
 
 PV = "2.1"

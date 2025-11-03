@@ -103,16 +103,21 @@ have reached their End of Life (EOL) won't receive such updates.
 
 This started with version 3.1 ("Dunfell"), released in April 2020, which
 the project initially committed to supporting for two years, but this duration
-was later extended to four years. Similarly, the following :term:`LTS` release,
-version 4.0 ("Kirkstone"), was released two years later in May 2022 and the
-project committed to supporting it for four years too.
+was later extended to four years.
 
-Therefore, a new :term:`LTS` release is made every two years and is supported
-for four years. This offers more stability to project users and leaves more
-time to upgrade to the following :term:`LTS` release.
+A new :term:`LTS` release is made every two years and is supported for four
+years. This offers more stability to project users and leaves more time to
+upgrade to the following :term:`LTS` release.
+
+The currently supported :term:`LTS` releases are:
+
+-  Version 5.0 ("Scarthgap"), released in April 2024 and supported until April 2028.
+-  Version 4.0 ("Kirkstone"), released in May 2022 and supported until May 2026.
 
 See :yocto_wiki:`/Stable_Release_and_LTS` for details about the management
 of stable and :term:`LTS` releases.
+
+This documentation was built for the &DISTRO_NAME; release.
 
 .. image:: svg/releases.*
    :width: 100%
@@ -143,8 +148,8 @@ Additionally, because the test strategies are visible to you as a
 developer, you can validate your projects. This section overviews the
 available test infrastructure used in the Yocto Project. For information
 on how to run available tests on your projects, see the
-":ref:`dev-manual/runtime-testing:performing automated runtime testing`"
-section in the Yocto Project Development Tasks Manual.
+":ref:`test-manual/runtime-testing:performing automated runtime testing`"
+section in the Yocto Project Test Environment Manual.
 
 The QA/testing infrastructure is woven into the project to the point
 where core developers take some of it for granted. The infrastructure
@@ -170,7 +175,7 @@ consists of the following pieces:
    operation and functions. However, the test can also use the IP
    address of a machine to test.
 
--  :ref:`ptest <dev-manual/packages:testing packages with ptest>`:
+-  :ref:`ptest <test-manual/ptest:testing packages with ptest>`:
    Runs tests against packages produced during the build for a given
    piece of software. The test allows the packages to be run within a
    target image.
@@ -185,7 +190,7 @@ effort has been made to automate the tests so that more people can use
 them and the Yocto Project development team can run them faster and more
 efficiently.
 
-The Yocto Project's main Autobuilder (&YOCTO_AB_URL;) publicly tests each Yocto
+The Yocto Project's main :yocto_ab:`Autobuilder <>` publicly tests each Yocto
 Project release's code in the :oe_git:`openembedded-core </openembedded-core>`,
 :yocto_git:`poky </poky>` and :oe_git:`bitbake </bitbake>` repositories. The
 testing occurs for both the current state of the "master" branch and also for

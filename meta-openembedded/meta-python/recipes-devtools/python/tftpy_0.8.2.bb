@@ -11,3 +11,5 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=22770e72ae03c61f5bcc4e333b61368d"
 SRC_URI[sha256sum] = "e1d1a680efd88eba176b351175844253067392a9b0f8b81588e3ff2b9e7bbb5b"
 
 inherit pypi setuptools3
+
+SRC_URI += "file://CVE-2023-46566.patch"

@@ -17,9 +17,14 @@ class BuildCpioTest(OESDKTestCase):
     """
     Check that autotools will cross-compile correctly.
     """
+    def setUp(self):
+        libc = self.td.get("TCLIBC")
+        if libc in [ 'newlib' ]:
+            raise unittest.SkipTest("AutotoolsTest class: SDK doesn't contain a supported C library")
+
     def test_cpio(self):
         with tempfile.TemporaryDirectory(prefix="cpio-", dir=self.tc.sdk_dir) as testdir:
-            tarball = self.fetch(testdir, self.td["DL_DIR"], "https://ftp.gnu.org/gnu/cpio/cpio-2.15.tar.gz")
+            tarball = self.fetch(testdir, self.td["DL_DIR"], "https://ftpmirror.gnu.org/gnu/cpio/cpio-2.15.tar.gz")
 
             dirs = {}
             dirs["source"] = os.path.join(testdir, "cpio-2.15")

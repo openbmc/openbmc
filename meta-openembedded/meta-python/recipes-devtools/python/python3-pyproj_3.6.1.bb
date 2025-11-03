@@ -8,6 +8,8 @@ PYPI_PACKAGE = "pyproj"
 
 inherit pypi setuptools3
 
+SRC_URI += "file://rpath.patch"
+
 SRC_URI[sha256sum] = "44aa7c704c2b7d8fb3d483bbf75af6cb2350d30a63b144279a09b75fead501bf"
 
 RDEPENDS:${PN} = " \
@@ -21,3 +23,11 @@ RDEPENDS:${PN} = " \
 export PROJ_INCDIR = "${STAGING_INCDIR}"
 export PROJ_LIBDIR = "${STAGING_LIBDIR}"
 export PROJ_DIR = "${STAGING_BINDIR_NATIVE}/.."
+
+do_compile:append() {
+    for f in `find ${B} -name *.c`
+    do
+        sed -i -e "/BEGIN: Cython Metadata/,/END: Cython Metadata/d" $f
+    done
+    python_pep517_do_compile
+}

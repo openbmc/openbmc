@@ -12,7 +12,7 @@ FAIL: glib-networking/connection-openssl.test (Child process killed by signal 6)
 
 The test should probably retry in this situation so test a patch which does this.
 
-Upstream-Status: Pending [testing to see if patch resolves the issue]
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/glib-networking/-/merge_requests/253]
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 ---

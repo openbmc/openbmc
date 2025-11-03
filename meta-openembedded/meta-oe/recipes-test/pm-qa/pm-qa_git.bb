@@ -10,7 +10,7 @@ BRANCH ?= "master"
 
 SRCREV = "05710ec5032be4c8edafb4109d4d908d31243906"
 
-SRC_URI = "git://git.linaro.org/power/pm-qa.git;protocol=git;branch=${BRANCH}"
+SRC_URI = "git://git.linaro.org/power/pm-qa.git;protocol=https;branch=${BRANCH}"
 
 S = "${WORKDIR}/git"
 

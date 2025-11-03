@@ -11,6 +11,8 @@ PROVIDES = "virtual/librpc"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.bz2 \
 	file://ipv6.patch \
+        file://0001-Update-declarations-to-allow-compile-with-gcc-15.patch \
+        file://0002-update-signal-and-key_call-declarations-to-allow-com.patch \
 "
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/libtirpc/files/libtirpc/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)/"

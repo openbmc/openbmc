@@ -18,6 +18,7 @@ DEPENDS = " \
     gtk+3 \
     icu \
     iso-codes \
+    itstool-native \
     json-glib \
     libhandy \
     libical \

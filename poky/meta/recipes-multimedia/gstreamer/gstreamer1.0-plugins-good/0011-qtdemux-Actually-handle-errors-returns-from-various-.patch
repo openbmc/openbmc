@@ -1,0 +1,97 @@
+From ed254790331a3fba2f68255a8f072552d622aac1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 27 Sep 2024 10:39:30 +0300
+Subject: [PATCH 11/13] qtdemux: Actually handle errors returns from various
+ functions instead of ignoring them
+
+Ignoring them might cause the element to continue as if all is fine despite the
+internal state being inconsistent. This can lead to all kinds of follow-up
+issues, including memory safety issues.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-245
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3847
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47597
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/ed254790331a3fba2f68255a8f072552d622aac1]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index 5277952c5e..1de70f184f 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -4853,10 +4853,15 @@ gst_qtdemux_loop_state_header (GstQTDemux * qtdemux)
+ beach:
+   if (ret == GST_FLOW_EOS && (qtdemux->got_moov || qtdemux->media_caps)) {
+     /* digested all data, show what we have */
+-    qtdemux_prepare_streams (qtdemux);
++    ret = qtdemux_prepare_streams (qtdemux);
++    if (ret != GST_FLOW_OK)
++      return ret;
++
+     QTDEMUX_EXPOSE_LOCK (qtdemux);
+     ret = qtdemux_expose_streams (qtdemux);
+     QTDEMUX_EXPOSE_UNLOCK (qtdemux);
++    if (ret != GST_FLOW_OK)
++      return ret;
+ 
+     qtdemux->state = QTDEMUX_STATE_MOVIE;
+     GST_DEBUG_OBJECT (qtdemux, "switching state to STATE_MOVIE (%d)",
+@@ -7548,13 +7553,21 @@ gst_qtdemux_process_adapter (GstQTDemux * demux, gboolean force)
+             gst_qtdemux_stream_concat (demux,
+                 demux->old_streams, demux->active_streams);
+ 
+-            qtdemux_parse_moov (demux, data, demux->neededbytes);
++            if (!qtdemux_parse_moov (demux, data, demux->neededbytes)) {
++              ret = GST_FLOW_ERROR;
++              break;
++            }
+             qtdemux_node_dump (demux, demux->moov_node);
+             qtdemux_parse_tree (demux);
+-            qtdemux_prepare_streams (demux);
++            ret = qtdemux_prepare_streams (demux);
++            if (ret != GST_FLOW_OK)
++              break;
++
+             QTDEMUX_EXPOSE_LOCK (demux);
+-            qtdemux_expose_streams (demux);
++            ret = qtdemux_expose_streams (demux);
+             QTDEMUX_EXPOSE_UNLOCK (demux);
++            if (ret != GST_FLOW_OK)
++              break;
+ 
+             demux->got_moov = TRUE;
+ 
+@@ -7645,8 +7658,10 @@ gst_qtdemux_process_adapter (GstQTDemux * demux, gboolean force)
+             /* in MSS we need to expose the pads after the first moof as we won't get a moov */
+             if (demux->variant == VARIANT_MSS_FRAGMENTED && !demux->exposed) {
+               QTDEMUX_EXPOSE_LOCK (demux);
+-              qtdemux_expose_streams (demux);
++              ret = qtdemux_expose_streams (demux);
+               QTDEMUX_EXPOSE_UNLOCK (demux);
++              if (ret != GST_FLOW_OK)
++                goto done;
+             }
+ 
+             gst_qtdemux_check_send_pending_segment (demux);
+@@ -13760,8 +13775,10 @@ qtdemux_prepare_streams (GstQTDemux * qtdemux)
+ 
+     /* parse the initial sample for use in setting the frame rate cap */
+     while (sample_num == 0 && sample_num < stream->n_samples) {
+-      if (!qtdemux_parse_samples (qtdemux, stream, sample_num))
++      if (!qtdemux_parse_samples (qtdemux, stream, sample_num)) {
++        ret = GST_FLOW_ERROR;
+         break;
++      }
+       ++sample_num;
+     }
+   }
+-- 
+2.30.2
+

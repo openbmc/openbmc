@@ -8,9 +8,12 @@ LICENSE = "BSL-1.0"
 
 DEPENDS = "openssl"
 
-SRC_URI = "${SOURCEFORGE_MIRROR}/asio/${BP}.tar.bz2"
+SRC_URI = "${SOURCEFORGE_MIRROR}/asio/${BP}.tar.bz2 \
+           file://0001-tests-Remove-blocking_adaptation.cpp.patch \
+           file://run-ptest \
+"
 
-inherit autotools
+inherit autotools ptest
 
 ALLOW_EMPTY:${PN} = "1"
 
@@ -21,5 +24,17 @@ SRC_URI[sha256sum] = "9f12cef05c0477eace9c68ccabd19f9e3a04b875d4768c323714cbd3a5
 PACKAGECONFIG ??= "boost"
 
 PACKAGECONFIG[boost] = "--with-boost=${STAGING_LIBDIR},--without-boost,boost"
+
+TESTDIR = "src/tests"
+do_compile_ptest() {
+    echo 'buildtest-TESTS: $(check_PROGRAMS)' >> ${TESTDIR}/Makefile
+    oe_runmake -C ${TESTDIR} buildtest-TESTS
+}
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+    # copy executables
+    find ${B}/${TESTDIR}/unit -type f -executable -exec cp {} ${D}${PTEST_PATH}/tests/ \;
+}
 
 BBCLASSEXTEND = "native nativesdk"

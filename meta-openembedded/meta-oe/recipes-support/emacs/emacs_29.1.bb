@@ -5,6 +5,11 @@ LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
 SRC_URI = "https://ftp.gnu.org/pub/gnu/emacs/emacs-${PV}.tar.xz \
+           file://0001-org-macro-set-templates-Prevent-code-evaluation.patch \
+           file://0001-lisp-gnus-mm-view.el-mm-display-inline-fontify-Mark-.patch \
+           file://0001-org-latex-preview-Add-protection-when-untrusted-cont.patch \
+           file://0001-org-file-contents-Consider-all-remote-files-unsafe.patch \
+           file://0001-org-link-expand-abbrev-Do-not-evaluate-arbitrary-uns.patch \
           "
 SRC_URI:append:class-target = " \
     file://use-emacs-native-tools-for-cross-compiling.patch \

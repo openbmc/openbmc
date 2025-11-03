@@ -6,13 +6,13 @@ Release notes for Yocto-4.0.2 (Kirkstone)
 Security Fixes in Yocto-4.0.2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  libxslt: Mark :cve:`2022-29824` as not applying
--  tiff: Add jbig :term:`PACKAGECONFIG` and clarify IGNORE :cve:`2022-1210`
--  tiff: mark :cve:`2022-1622` and :cve:`2022-1623` as invalid
--  pcre2:fix :cve:`2022-1586` Out-of-bounds read
--  curl: fix :cve:`2022-22576`, :cve:`2022-27775`, :cve:`2022-27776`, :cve:`2022-27774`, :cve:`2022-30115`, :cve:`2022-27780`, :cve:`2022-27781`, :cve:`2022-27779` and :cve:`2022-27782`
--  qemu: fix :cve:`2021-4206` and :cve:`2021-4207`
--  freetype: fix :cve:`2022-27404`, :cve:`2022-27405` and :cve:`2022-27406`
+-  libxslt: Mark :cve_nist:`2022-29824` as not applying
+-  tiff: Add jbig :term:`PACKAGECONFIG` and clarify IGNORE :cve_nist:`2022-1210`
+-  tiff: mark :cve_nist:`2022-1622` and :cve_nist:`2022-1623` as invalid
+-  pcre2:fix :cve_nist:`2022-1586` Out-of-bounds read
+-  curl: fix :cve_nist:`2022-22576`, :cve_nist:`2022-27775`, :cve_nist:`2022-27776`, :cve_nist:`2022-27774`, :cve_nist:`2022-30115`, :cve_nist:`2022-27780`, :cve_nist:`2022-27781`, :cve_nist:`2022-27779` and :cve_nist:`2022-27782`
+-  qemu: fix :cve_nist:`2021-4206` and :cve_nist:`2021-4207`
+-  freetype: fix :cve_nist:`2022-27404`, :cve_nist:`2022-27405` and :cve_nist:`2022-27406`
 
 Fixes in Yocto-4.0.2
 ~~~~~~~~~~~~~~~~~~~~

@@ -7,7 +7,7 @@ SECTION = "libs"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=fad9b3332be894bab9bc501572864b29"
 
-SRC_URI = "https://hyperrealm.github.io/libconfig/dist/libconfig-${PV}.tar.gz"
+SRC_URI = "https://github.com/hyperrealm/libconfig/releases/download/v${PV}/libconfig-${PV}.tar.gz"
 
 UPSTREAM_CHECK_URI = "https://github.com/hyperrealm/libconfig/releases"
 UPSTREAM_CHECK_REGEX = "Version (?P<pver>\d+(\.\d+)+)"

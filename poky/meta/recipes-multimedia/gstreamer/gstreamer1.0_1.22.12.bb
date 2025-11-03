@@ -21,6 +21,7 @@ SRC_URI = "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-${PV}.tar.x
            file://0002-tests-add-support-for-install-the-tests.patch \
            file://0003-tests-use-a-dictionaries-for-environment.patch \
            file://0004-tests-add-helper-script-to-run-the-installed_tests.patch \
+           file://0005-allocator-Avoid-integer-overflow-when-allocating-sys.patch \
            "
 SRC_URI[sha256sum] = "ac352f3d02caa67f3b169daa9aa78b04dea0fc08a727de73cb28d89bd54c6f61"
 
@@ -70,5 +71,31 @@ FILES:${PN}-dbg += "${datadir}/gdb ${datadir}/gstreamer-1.0/gdb"
 RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-gconv-iso8859-5"
 
 CVE_PRODUCT = "gstreamer"
+
+CVE_STATUS[CVE-2024-0444] = "cpe-incorrect: this is patched in gstreamer1.0-plugins-bad in 1.22 branch since 1.22.9"
+
+CVE_STATUS_GROUPS += "CVE_STATUS_PLUGINS_BAD"
+CVE_STATUS_PLUGINS_BAD = " \
+    CVE-2025-3887 \
+"
+CVE_STATUS_PLUGINS_BAD[status] = "cpe-incorrect: this is patched in gstreamer1.0-plugins-bad"
+
+CVE_STATUS_GROUPS += "CVE_STATUS_PLUGINS_BASE"
+CVE_STATUS_PLUGINS_BASE = " \
+    CVE-2024-47538 CVE-2024-47541 CVE-2024-47542 CVE-2024-47600 CVE-2024-47607 CVE-2024-47615 CVE-2024-47835 \
+    CVE-2025-47806 CVE-2025-47807 CVE-2025-47808 \
+"
+CVE_STATUS_PLUGINS_BASE[status] = "cpe-incorrect: this is patched in gstreamer1.0-plugins-base"
+
+CVE_STATUS_GROUPS += "CVE_STATUS_PLUGINS_GOOD"
+CVE_STATUS_PLUGINS_GOOD = " \
+    CVE-2024-47537 CVE-2024-47539 CVE-2024-47540 CVE-2024-47543 CVE-2024-47544 CVE-2024-47545 \
+    CVE-2024-47546 CVE-2024-47596 CVE-2024-47597 CVE-2024-47598 CVE-2024-47599 CVE-2024-47601 \
+    CVE-2024-47602 CVE-2024-47603 CVE-2024-47613 CVE-2024-47774 CVE-2024-47775 CVE-2024-47776 \
+    CVE-2024-47777 CVE-2024-47778 CVE-2024-47834 CVE-2025-47183 CVE-2025-47219 \
+"
+CVE_STATUS_PLUGINS_GOOD[status] = "cpe-incorrect: this is patched in gstreamer1.0-plugins-good"
+
+CVE_STATUS[CVE-2025-2759] = "not-applicable-platform: affects installation packages for non Linux OSes"
 
 PTEST_BUILD_HOST_FILES = ""

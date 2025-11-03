@@ -1,0 +1,40 @@
+From 639cd8db63b07c958062bde4d3823dadbf469b0b Mon Sep 17 00:00:00 2001
+From: "brian m. carlson" <sandals@crustytoothpaste.net>
+Date: Sun, 17 Nov 2024 01:31:49 +0000
+Subject: [PATCH] reflog: rename unreachable
+
+In C23, "unreachable" is a macro that invokes undefined behavior if it
+is invoked.  To make sure that our code compiles on a variety of C
+versions, rename unreachable to "is_unreachable".
+
+Signed-off-by: brian m. carlson <sandals@crustytoothpaste.net>
+Signed-off-by: Junio C Hamano <gitster@pobox.com>
+
+Upstream-Status: Backport [v2.48.0 639cd8db63b07c958062bde4d3823dadbf469b0b]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ reflog.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/reflog.c b/reflog.c
+index 875ac1aa66..aeab78c9b7 100644
+--- a/reflog.c
++++ b/reflog.c
+@@ -210,7 +210,7 @@ static void mark_reachable(struct expire_reflog_policy_cb *cb)
+ 	cb->mark_list = leftover;
+ }
+ 
+-static int unreachable(struct expire_reflog_policy_cb *cb, struct commit *commit, struct object_id *oid)
++static int is_unreachable(struct expire_reflog_policy_cb *cb, struct commit *commit, struct object_id *oid)
+ {
+ 	/*
+ 	 * We may or may not have the commit yet - if not, look it
+@@ -265,7 +265,7 @@ int should_expire_reflog_ent(struct object_id *ooid, struct object_id *noid,
+ 			return 1;
+ 		case UE_NORMAL:
+ 		case UE_HEAD:
+-			if (unreachable(cb, old_commit, ooid) || unreachable(cb, new_commit, noid))
++			if (is_unreachable(cb, old_commit, ooid) || is_unreachable(cb, new_commit, noid))
+ 				return 1;
+ 			break;
+ 		}

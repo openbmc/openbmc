@@ -1,0 +1,38 @@
+From 15bb318416e1bf6b6b557006a37d1da86c3a76a8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Mon, 30 Sep 2024 21:40:44 +0300
+Subject: [PATCH 1/2] ssaparse: Search for closing brace after opening brace
+
+Otherwise removing anything between the braces leads to out of bound writes if
+there is a closing brace before the first opening brace.
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-228
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3870
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8036>
+
+CVE: CVE-2024-47541
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/15bb318416e1bf6b6b557006a37d1da86c3a76a8]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/subparse/gstssaparse.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst/subparse/gstssaparse.c b/gst/subparse/gstssaparse.c
+index 42fbb42b99..37b892e928 100644
+--- a/gst/subparse/gstssaparse.c
++++ b/gst/subparse/gstssaparse.c
+@@ -238,7 +238,7 @@ gst_ssa_parse_remove_override_codes (GstSsaParse * parse, gchar * txt)
+   gboolean removed_any = FALSE;
+ 
+   while ((t = strchr (txt, '{'))) {
+-    end = strchr (txt, '}');
++    end = strchr (t, '}');
+     if (end == NULL) {
+       GST_WARNING_OBJECT (parse, "Missing { for style override code");
+       return removed_any;
+-- 
+2.30.2
+

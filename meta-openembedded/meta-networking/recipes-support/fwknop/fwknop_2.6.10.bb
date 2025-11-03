@@ -14,7 +14,9 @@ SRC_URI[sha256sum] = "f6c09bec97ed8e474a98ae14f9f53e1bcdda33393f20667b6af3fb6bb8
 
 DEPENDS = "libpcap gpgme"
 
-EXTRA_OECONF = " --with-iptables=${sbindir}/iptables"
+EXTRA_OECONF = "--with-iptables=${sbindir}/iptables \
+                --with-gpg=${bindir}/gpg \
+                --with-wget=${base_bindir}/wget"
 
 do_configure:prepend () {
 	install -m 0755 ${STAGING_DATADIR_NATIVE}/gnu-config/config.guess ${S}/config

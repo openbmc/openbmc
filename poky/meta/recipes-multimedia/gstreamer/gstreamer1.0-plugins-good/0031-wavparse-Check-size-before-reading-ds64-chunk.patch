@@ -1,0 +1,41 @@
+From 4f381d15014471b026020d0990a5f5a9f420a22b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 4 Oct 2024 13:51:00 +0300
+Subject: [PATCH 7/7] wavparse: Check size before reading ds64 chunk
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-261
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3889
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8042>
+
+CVE: CVE-2024-47775
+CVE: CVE-2024-47776
+CVE: CVE-2024-47777
+CVE: CVE-2024-47778
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/4f381d15014471b026020d0990a5f5a9f420a22b]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/wavparse/gstwavparse.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gst/wavparse/gstwavparse.c b/gst/wavparse/gstwavparse.c
+index 998cbb276d..958868de6d 100644
+--- a/gst/wavparse/gstwavparse.c
++++ b/gst/wavparse/gstwavparse.c
+@@ -1087,6 +1087,11 @@ parse_ds64 (GstWavParse * wav, GstBuffer * buf)
+   guint32 sampleCountLow, sampleCountHigh;
+ 
+   gst_buffer_map (buf, &map, GST_MAP_READ);
++  if (map.size < 6 * 4) {
++    GST_WARNING_OBJECT (wav, "Too small ds64 chunk (%" G_GSIZE_FORMAT ")",
++        map.size);
++    return FALSE;
++  }
+   dataSizeLow = GST_READ_UINT32_LE (map.data + 2 * 4);
+   dataSizeHigh = GST_READ_UINT32_LE (map.data + 3 * 4);
+   sampleCountLow = GST_READ_UINT32_LE (map.data + 4 * 4);
+-- 
+2.30.2
+

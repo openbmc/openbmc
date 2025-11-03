@@ -1,0 +1,34 @@
+From 1fe7c1cfeea00ba4eb903fbb39b74361594d4835 Mon Sep 17 00:00:00 2001
+From: Jan Palus <jpalus@fastmail.com>
+Date: Wed, 10 Apr 2024 21:30:51 +0200
+Subject: [PATCH] Fix python path when invoking py-compile (#54)
+
+48eebb2 replaced custom PYTHON3 variable with PYTHON by using standard
+AM_PATH_PYTHON macro. Makefile however still referred to old one.
+There's no need to set PYTHON explicitly anymore so drop it.
+
+Fixes #53
+
+Upstream-Status: Backport
+[https://github.com/stevegrubb/libcap-ng/commit/1fe7c1cfeea00ba4eb903fbb39b74361594d4835]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ bindings/python3/Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/bindings/python3/Makefile.am b/bindings/python3/Makefile.am
+index 70a1dd8..6072fc2 100644
+--- a/bindings/python3/Makefile.am
++++ b/bindings/python3/Makefile.am
+@@ -27,7 +27,6 @@ AM_CPPFLAGS = -I. -I$(top_builddir) $(PYTHON3_INCLUDES)
+ LIBS = ${top_builddir}/src/libcap-ng.la
+ SWIG_FLAGS = -python
+ SWIG_INCLUDES = ${AM_CPPFLAGS}
+-PYTHON = $(PYTHON3)
+ pyexec_PYTHON = capng.py
+ pyexec_LTLIBRARIES = _capng.la
+ pyexec_SOLIBRARIES = _capng.so
+-- 
+2.25.1
+

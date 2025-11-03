@@ -18,7 +18,10 @@ GIDOCGEN_MESON_OPTION = "docs"
 
 inherit gnomebase gi-docgen features_check upstream-version-is-even gobject-introspection systemd vala
 
-SRC_URI += "file://0001-Add-W_EXITCODE-macro-for-non-glibc-systems.patch"
+SRC_URI += "file://0001-Add-W_EXITCODE-macro-for-non-glibc-systems.patch \
+            file://CVE-2024-37535-01.patch \
+            file://CVE-2024-37535-02.patch \
+            "
 SRC_URI[archive.sha256sum] = "a535fb2a98fea8a2449cd1a02cccf5190131dddff52e715afdace3feb536eae7"
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"

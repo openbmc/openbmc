@@ -1,0 +1,29 @@
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sun, 19 Mai 2025 15:34:46 +0100
+Subject: [PATCH] dont build clover frontend
+
+The clover frontend is deprecated and is always built with opencl, even if
+using rusticl. Additionally it adds a reproducibility issue.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+--- a/src/gallium/meson.build	2025-05-07 18:35:10.000000000 +0200
++++ b/src/gallium/meson.build	2025-05-18 17:05:23.677694272 +0200
+@@ -195,15 +195,11 @@
+ else
+   driver_d3d12 = declare_dependency()
+ endif
+-if with_gallium_clover or with_tests
++if with_tests
+   # At the moment, clover and gallium/tests are the only two consumers
+   # for pipe-loader
+   subdir('targets/pipe-loader')
+ endif
+-if with_gallium_clover
+-  subdir('frontends/clover')
+-  subdir('targets/opencl')
+-endif
+ if with_gallium_rusticl
+   subdir('frontends/rusticl')
+   subdir('targets/rusticl')

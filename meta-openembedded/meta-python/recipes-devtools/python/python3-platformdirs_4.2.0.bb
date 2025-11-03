@@ -1,6 +1,6 @@
 SUMMARY = "A small Python module for determining appropriate platform-specific dirs"
 HOMEPAGE = "https://github.com/platformdirs/platformdirs"
-LICENSE = "BSD-3-Clause"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ea4f5a41454746a9ed111e3d8723d17a"
 
 SRC_URI += " \

@@ -1,0 +1,448 @@
+From 51f1e56cc8b6843bf65ceadc5eca1545258bf020 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+Date: Sat, 22 Apr 2023 17:48:58 +0200
+Subject: [PATCH 1/3] tests: (functions.sh) create variable for test fstab
+ location
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
+(cherry picked from commit ed3d33faff17fb702a3acfca2f9f24e69f4920de)
+Upstream-Status: Backport [https://github.com/util-linux/util-linux/commit/ed3d33faff17fb702a3acfca2f9f24e69f4920de]
+Signed-off-by: Virendra Thakur <virendra.thakur@kpit.com>
+---
+ tests/functions.sh          | 13 +++++++------
+ tests/ts/mount/fstab-broken |  2 +-
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/tests/functions.sh b/tests/functions.sh
+index 5a562a39a..c2e2f33ae 100644
+--- a/tests/functions.sh
++++ b/tests/functions.sh
+@@ -386,6 +386,7 @@ function ts_init_env {
+ 		TS_ENABLE_UBSAN="yes"
+ 	fi
+ 
++	TS_FSTAB="/etc/fstab"
+ 	BLKID_FILE="$TS_OUTDIR/${TS_TESTNAME}.blkidtab"
+ 
+ 	declare -a TS_SUID_PROGS
+@@ -824,12 +825,12 @@ function ts_is_mounted {
+ }
+ 
+ function ts_fstab_open {
+-	echo "# <!-- util-linux test entry" >> /etc/fstab
++	echo "# <!-- util-linux test entry" >> "$TS_FSTAB"
+ }
+ 
+ function ts_fstab_close {
+-	echo "# -->" >> /etc/fstab
+-	sync /etc/fstab 2>/dev/null
++	echo "# -->" >> "$TS_FSTAB"
++	sync "$TS_FSTAB" 2>/dev/null
+ }
+ 
+ function ts_fstab_addline {
+@@ -838,7 +839,7 @@ function ts_fstab_addline {
+ 	local FS=${3:-"auto"}
+ 	local OPT=${4:-"defaults"}
+ 
+-	echo "$SPEC   $MNT   $FS   $OPT   0   0" >> /etc/fstab
++	echo "$SPEC   $MNT   $FS   $OPT   0   0" >> "$TS_FSTAB"
+ }
+ 
+ function ts_fstab_lock {
+@@ -862,9 +863,9 @@ function ts_fstab_clean {
+   ba
+ }
+ s/# <!-- util-linux.*-->//;
+-/^$/d" /etc/fstab
++/^$/d" "$TS_FSTAB"
+ 
+-	sync /etc/fstab 2>/dev/null
++	sync "$TS_FSTAB" 2>/dev/null
+ 	ts_unlock "fstab"
+ }
+ 
+diff --git a/tests/ts/mount/fstab-broken b/tests/ts/mount/fstab-broken
+index 19edc5fe3..3b7a1ee9d 100755
+--- a/tests/ts/mount/fstab-broken
++++ b/tests/ts/mount/fstab-broken
+@@ -34,7 +34,7 @@ mkdir -p $MNT
+ 
+ ts_fstab_lock
+ ts_fstab_open
+-echo "tmpd $MNT tmpfs" >> /etc/fstab
++echo "tmpd $MNT tmpfs" >> "$TS_FSTAB"
+ ts_fstab_close
+ 
+ ts_init_subtest "mount"
+-- 
+2.34.1
+
+
+From 1e4a9141ca7d310030311e09123a81591f994f83 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+Date: Sat, 22 Apr 2023 17:20:45 +0200
+Subject: [PATCH 2/3] tests: (functions.sh) use per-test fstab file
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
+(cherry picked from commit 6aa8d17b6b53b86a46c5da68c02a893113130496)
+Upstream-Status: Backport [https://github.com/util-linux/util-linux/commit/6aa8d17b6b53b86a46c5da68c02a893113130496]
+Signed-off-by: Virendra Thakur <virendra.thakur@kpit.com>
+---
+ tests/functions.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/functions.sh b/tests/functions.sh
+index c2e2f33ae..3089e8cda 100644
+--- a/tests/functions.sh
++++ b/tests/functions.sh
+@@ -386,7 +386,7 @@ function ts_init_env {
+ 		TS_ENABLE_UBSAN="yes"
+ 	fi
+ 
+-	TS_FSTAB="/etc/fstab"
++	TS_FSTAB="$TS_OUTDIR/${TS_TESTNAME}.fstab"
+ 	BLKID_FILE="$TS_OUTDIR/${TS_TESTNAME}.blkidtab"
+ 
+ 	declare -a TS_SUID_PROGS
+-- 
+2.34.1
+
+
+From 02c483f982e23a86d58cd7c6a4eb4b6e4d5def1a Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+Date: Sat, 22 Apr 2023 17:34:28 +0200
+Subject: [PATCH 3/3] mount: (tests) explicitly use test fstab location
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
+(cherry picked from commit b1580bd760519a2cf052f023057846e54de47484)
+Upstream-Status: Backport [https://github.com/util-linux/util-linux/commit/b1580bd760519a2cf052f023057846e54de47484]
+Signed-off-by: Virendra Thakur <virendra.thakur@kpit.com>
+---
+ tests/ts/mount/fslists             | 2 +-
+ tests/ts/mount/fstab-bind          | 2 +-
+ tests/ts/mount/fstab-broken        | 4 ++--
+ tests/ts/mount/fstab-btrfs         | 8 ++++----
+ tests/ts/mount/fstab-devname       | 4 ++--
+ tests/ts/mount/fstab-devname2label | 2 +-
+ tests/ts/mount/fstab-devname2uuid  | 2 +-
+ tests/ts/mount/fstab-label         | 6 +++---
+ tests/ts/mount/fstab-label2devname | 4 ++--
+ tests/ts/mount/fstab-label2uuid    | 4 ++--
+ tests/ts/mount/fstab-loop          | 4 ++--
+ tests/ts/mount/fstab-none          | 2 +-
+ tests/ts/mount/fstab-symlink       | 2 +-
+ tests/ts/mount/fstab-uuid          | 6 +++---
+ tests/ts/mount/fstab-uuid2devname  | 4 ++--
+ tests/ts/mount/fstab-uuid2label    | 4 ++--
+ 16 files changed, 30 insertions(+), 30 deletions(-)
+
+diff --git a/tests/ts/mount/fslists b/tests/ts/mount/fslists
+index 230186a1e..6ac72c3ce 100755
+--- a/tests/ts/mount/fslists
++++ b/tests/ts/mount/fslists
+@@ -61,7 +61,7 @@ ts_finalize_subtest
+ ts_init_subtest "more-types-fstab"
+ [ -d "$TS_MOUNTPOINT" ] || mkdir -p $TS_MOUNTPOINT
+ ts_fstab_add $DEVICE $TS_MOUNTPOINT "foo,bar,ext2"
+-$TS_CMD_MOUNT $TS_MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $TS_MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_fstab_clean
+ ts_is_mounted $DEVICE || ts_die "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $TS_MOUNTPOINT
+diff --git a/tests/ts/mount/fstab-bind b/tests/ts/mount/fstab-bind
+index 2c799df78..cae016dd2 100755
+--- a/tests/ts/mount/fstab-bind
++++ b/tests/ts/mount/fstab-bind
+@@ -20,7 +20,7 @@ ts_fstab_add $MY_SOURCE "$TS_MOUNTPOINT" "none" "bind,default,noauto"
+ mkdir -p $MY_SOURCE
+ mkdir -p $TS_MOUNTPOINT
+ 
+-$TS_CMD_MOUNT $TS_MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $TS_MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
+ [ "$?" = "0" ] || ts_log "error: mount $TS_MOUNTPOINT"
+ 
+ $TS_CMD_FINDMNT --mountpoint "$TS_MOUNTPOINT" &> /dev/null
+diff --git a/tests/ts/mount/fstab-broken b/tests/ts/mount/fstab-broken
+index 3b7a1ee9d..ec4c34241 100755
+--- a/tests/ts/mount/fstab-broken
++++ b/tests/ts/mount/fstab-broken
+@@ -38,7 +38,7 @@ echo "tmpd $MNT tmpfs" >> "$TS_FSTAB"
+ ts_fstab_close
+ 
+ ts_init_subtest "mount"
+-$TS_CMD_MOUNT $MNT &> /dev/null
++$TS_CMD_MOUNT -T "$TS_FSTAB" $MNT &> /dev/null
+ [ "$?" = "0" ] || ts_log "error: mount $MNT"
+ $TS_CMD_FINDMNT --kernel --mountpoint "$MNT" &> /dev/null
+ if [ "$?" != "0" ]; then
+@@ -57,7 +57,7 @@ ts_finalize_subtest
+ 
+ 
+ ts_init_subtest "mount-all"
+-$TS_CMD_MOUNT -a &> /dev/null
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a &> /dev/null
+ [ "$?" = "0" ] || ts_log "error: mount -a"
+ $TS_CMD_FINDMNT --kernel --mountpoint "$MNT" &> /dev/null
+ if [ "$?" != "0" ]; then
+diff --git a/tests/ts/mount/fstab-btrfs b/tests/ts/mount/fstab-btrfs
+index a1003ab52..8e76dbba6 100755
+--- a/tests/ts/mount/fstab-btrfs
++++ b/tests/ts/mount/fstab-btrfs
+@@ -94,8 +94,8 @@ ts_fstab_addline "$DEVICE" "$TS_MOUNTPOINT_SUBVOLID" "btrfs" "subvolid=$NON_DEFA
+ ts_fstab_addline "$TS_MOUNTPOINT_SUBVOLID" "$TS_MOUNTPOINT_BIND" "auto" "bind"
+ ts_fstab_close
+ 
+-$TS_CMD_MOUNT -a >> $TS_OUTPUT 2>> $TS_ERRLOG
+-$TS_CMD_MOUNT -a >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a >> $TS_OUTPUT 2>> $TS_ERRLOG
+ 
+ $TS_CMD_UMOUNT "$TS_MOUNTPOINT_BIND" >> $TS_OUTPUT 2>> $TS_ERRLOG
+ $TS_CMD_UMOUNT "$TS_MOUNTPOINT_DEFAULT" >> $TS_OUTPUT 2>> $TS_ERRLOG
+@@ -124,8 +124,8 @@ ts_fstab_addline "$DEVICE" "$TS_MOUNTPOINT_SUBVOLID" "auto" "subvolid=$NON_DEFAU
+ ts_fstab_addline "$TS_MOUNTPOINT_SUBVOL/bind-mnt" "$TS_MOUNTPOINT_BIND" "auto" "bind"
+ ts_fstab_close
+ 
+-$TS_CMD_MOUNT -a >> $TS_OUTPUT 2>> $TS_ERRLOG
+-$TS_CMD_MOUNT -a >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a >> $TS_OUTPUT 2>> $TS_ERRLOG
+ 
+ $TS_CMD_UMOUNT "$TS_MOUNTPOINT_BIND" >> $TS_OUTPUT 2>> $TS_ERRLOG
+ $TS_CMD_UMOUNT "$TS_MOUNTPOINT_DEFAULT" >> $TS_OUTPUT 2>> $TS_ERRLOG
+diff --git a/tests/ts/mount/fstab-devname b/tests/ts/mount/fstab-devname
+index 5b64a32a6..6ac03b5a7 100755
+--- a/tests/ts/mount/fstab-devname
++++ b/tests/ts/mount/fstab-devname
+@@ -42,13 +42,13 @@ MOUNTPOINT=$TS_MOUNTPOINT
+ ts_fstab_add $DEVICE
+ 
+ ts_init_subtest "mountpoint"
+-$TS_CMD_MOUNT $MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE || >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "device-name"
+-$TS_CMD_MOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+diff --git a/tests/ts/mount/fstab-devname2label b/tests/ts/mount/fstab-devname2label
+index 1d8562109..44066e153 100755
+--- a/tests/ts/mount/fstab-devname2label
++++ b/tests/ts/mount/fstab-devname2label
+@@ -41,7 +41,7 @@ ts_device_has "LABEL" $LABEL $DEVICE \
+ ts_fstab_add "LABEL=$LABEL"
+ ts_udevadm_settle "$DEVICE" "LABEL"
+ 
+-$TS_CMD_MOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_die "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE || ts_die "Cannot umount $DEVICE"
+ 
+diff --git a/tests/ts/mount/fstab-devname2uuid b/tests/ts/mount/fstab-devname2uuid
+index 8105fa028..503959103 100755
+--- a/tests/ts/mount/fstab-devname2uuid
++++ b/tests/ts/mount/fstab-devname2uuid
+@@ -39,7 +39,7 @@ UUID=$(ts_uuid_by_devname "$DEVICE") || ts_die "Cannot find UUID on $DEVICE"
+ ts_fstab_add "UUID=$UUID"
+ ts_udevadm_settle "$DEVICE" "UUID"
+ 
+-$TS_CMD_MOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_die "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE || ts_die "Cannot umount $DEVICE"
+ 
+diff --git a/tests/ts/mount/fstab-label b/tests/ts/mount/fstab-label
+index 4b23e7fee..a3cc06d52 100755
+--- a/tests/ts/mount/fstab-label
++++ b/tests/ts/mount/fstab-label
+@@ -42,19 +42,19 @@ ts_fstab_add "LABEL=$LABEL"
+ ts_udevadm_settle "$DEVICE" "LABEL"
+ 
+ ts_init_subtest "no-option"
+-$TS_CMD_MOUNT $MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "L-option"
+-$TS_CMD_MOUNT -L $LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -L $LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG 
+ ts_finalize_subtest
+ 
+ ts_init_subtest "LABEL-option"
+-$TS_CMD_MOUNT LABEL=$LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" LABEL=$LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+diff --git a/tests/ts/mount/fstab-label2devname b/tests/ts/mount/fstab-label2devname
+index 75ca05e8c..fddbfa0ba 100755
+--- a/tests/ts/mount/fstab-label2devname
++++ b/tests/ts/mount/fstab-label2devname
+@@ -44,13 +44,13 @@ ts_udevadm_settle "$DEVICE" "LABEL"
+ [ -d "$TS_MOUNTPOINT" ] || mkdir -p $TS_MOUNTPOINT
+ 
+ ts_init_subtest "L-option"
+-$TS_CMD_MOUNT -L $LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -L $LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "LABEL-option"
+-$TS_CMD_MOUNT "LABEL=$LABEL" >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" "LABEL=$LABEL" >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+diff --git a/tests/ts/mount/fstab-label2uuid b/tests/ts/mount/fstab-label2uuid
+index 4bfcae4b9..927cde9aa 100755
+--- a/tests/ts/mount/fstab-label2uuid
++++ b/tests/ts/mount/fstab-label2uuid
+@@ -46,13 +46,13 @@ ts_udevadm_settle "$DEVICE" "LABEL" "UUID"
+ [ -d "$TS_MOUNTPOINT" ] || mkdir -p $TS_MOUNTPOINT
+ 
+ ts_init_subtest "L-option"
+-$TS_CMD_MOUNT -L $LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -L $LABEL >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "LABEL-option"
+-$TS_CMD_MOUNT "LABEL=$LABEL" >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" "LABEL=$LABEL" >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+diff --git a/tests/ts/mount/fstab-loop b/tests/ts/mount/fstab-loop
+index 7cc589fd2..0541e3a74 100755
+--- a/tests/ts/mount/fstab-loop
++++ b/tests/ts/mount/fstab-loop
+@@ -39,10 +39,10 @@ ts_fstab_lock
+ ts_fstab_open
+ 
+ ts_fstab_addline "$IMG" "$TS_MOUNTPOINT-1" "ext2" "loop"
+-$TS_CMD_MOUNT -a >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a >> $TS_OUTPUT 2>> $TS_ERRLOG
+ 
+ ts_fstab_addline "$IMG" "$TS_MOUNTPOINT-2" "ext2" "loop"
+-$TS_CMD_MOUNT -a >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -a >> $TS_OUTPUT 2>> $TS_ERRLOG
+ 
+ ts_fstab_close
+ 
+diff --git a/tests/ts/mount/fstab-none b/tests/ts/mount/fstab-none
+index 6a4d05b62..95daa6cee 100755
+--- a/tests/ts/mount/fstab-none
++++ b/tests/ts/mount/fstab-none
+@@ -17,7 +17,7 @@ ts_fstab_add "none" "$TS_MOUNTPOINT" "tmpfs" "rw,nosuid,nodev,relatime"
+ 
+ mkdir -p $TS_MOUNTPOINT
+ 
+-$TS_CMD_MOUNT $TS_MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $TS_MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
+ [ "$?" = "0" ] || ts_log "error: mount $TS_MOUNTPOINT"
+ 
+ $TS_CMD_FINDMNT --mountpoint "$TS_MOUNTPOINT" &> /dev/null
+diff --git a/tests/ts/mount/fstab-symlink b/tests/ts/mount/fstab-symlink
+index 4d3e37b19..6d419f9fe 100755
+--- a/tests/ts/mount/fstab-symlink
++++ b/tests/ts/mount/fstab-symlink
+@@ -46,7 +46,7 @@ ln -s $DEVICE $LINKNAME
+ ts_fstab_add $LINKNAME $TS_MOUNTPOINT "auto" "defaults,user"
+ 
+ # variant A) -- UID=0
+-$TS_CMD_MOUNT $LINKNAME >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $LINKNAME >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_die "A) Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $LINKNAME || ts_die "A) Cannot umount $LINKNAME"
+ 
+diff --git a/tests/ts/mount/fstab-uuid b/tests/ts/mount/fstab-uuid
+index 03917b782..f51bb294e 100755
+--- a/tests/ts/mount/fstab-uuid
++++ b/tests/ts/mount/fstab-uuid
+@@ -42,19 +42,19 @@ ts_fstab_add "UUID=$UUID"
+ ts_udevadm_settle "$DEVICE" "UUID"
+ 
+ ts_init_subtest "no-option"
+-$TS_CMD_MOUNT $MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" $MOUNTPOINT >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "U-option"
+-$TS_CMD_MOUNT -U $UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -U $UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "UUID-option"
+-$TS_CMD_MOUNT UUID=$UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" UUID=$UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+diff --git a/tests/ts/mount/fstab-uuid2devname b/tests/ts/mount/fstab-uuid2devname
+index 9bf165e16..2b338acb1 100755
+--- a/tests/ts/mount/fstab-uuid2devname
++++ b/tests/ts/mount/fstab-uuid2devname
+@@ -42,13 +42,13 @@ ts_udevadm_settle "$DEVICE" "UUID"
+ [ -d "$TS_MOUNTPOINT" ] || mkdir -p $TS_MOUNTPOINT
+ 
+ ts_init_subtest "U-option"
+-$TS_CMD_MOUNT -U $UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -U $UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "UUID-option"
+-$TS_CMD_MOUNT "UUID=$UUID" >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" "UUID=$UUID" >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+diff --git a/tests/ts/mount/fstab-uuid2label b/tests/ts/mount/fstab-uuid2label
+index de10ff0b0..02eb6b985 100755
+--- a/tests/ts/mount/fstab-uuid2label
++++ b/tests/ts/mount/fstab-uuid2label
+@@ -45,13 +45,13 @@ ts_udevadm_settle "$DEVICE" "LABEL" "UUID"
+ [ -d "$TS_MOUNTPOINT" ] || mkdir -p $TS_MOUNTPOINT
+ 
+ ts_init_subtest "U-option"
+-$TS_CMD_MOUNT -U $UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" -U $UUID >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_finalize_subtest
+ 
+ ts_init_subtest "UUID-option"
+-$TS_CMD_MOUNT "UUID=$UUID" >> $TS_OUTPUT 2>> $TS_ERRLOG
++$TS_CMD_MOUNT -T "$TS_FSTAB" "UUID=$UUID" >> $TS_OUTPUT 2>> $TS_ERRLOG
+ ts_is_mounted $DEVICE || ts_log "Cannot find $DEVICE in /proc/mounts"
+ $TS_CMD_UMOUNT $DEVICE >> $TS_OUTPUT 2>>$TS_ERRLOG
+ ts_finalize_subtest
+-- 
+2.34.1
+

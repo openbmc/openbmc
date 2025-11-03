@@ -1,0 +1,38 @@
+From 8c7126b7b5dee0ed5433cf9265ccc79095d53939 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Date: Mon, 8 Jul 2024 11:48:27 +0200
+Subject: [PATCH] bindings: cxx: tests: set direction when reconfiguring lines
+
+Linux kernel commit b44039638741 ("gpiolib: cdev: Ignore reconfiguration
+without direction") made the direction setting mandatory for line config
+passed to the kernel when reconfiguring requested lines. Fix the C++ test
+case which doesn't do it and now fails due to the rest of the settings
+being ignored.
+
+Reviewed-by: Kent Gibson <warthog618@gmail.com>
+Link: https://lore.kernel.org/r/20240708094827.84986-1-brgl@bgdev.pl
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+Upstream-Status: Backport
+[https://web.git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/commit/?id=3e224d885b1de54fe5510b9c5e7296260a1a4507]
+
+Signed-off-by: Libo Chen <libo.chen.cn@windriver.com>
+---
+ bindings/cxx/tests/tests-line-request.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/bindings/cxx/tests/tests-line-request.cpp b/bindings/cxx/tests/tests-line-request.cpp
+index 9632ae0..6e29532 100644
+--- a/bindings/cxx/tests/tests-line-request.cpp
++++ b/bindings/cxx/tests/tests-line-request.cpp
+@@ -208,6 +208,7 @@ TEST_CASE("values can be read", "[line-request]")
+ 				.add_line_settings(
+ 					offs,
+ 					::gpiod::line_settings()
++						.set_direction(direction::INPUT)
+ 						.set_active_low(true))
+ 		);
+ 
+-- 
+2.44.1
+

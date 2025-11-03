@@ -16,6 +16,7 @@ SRC_URI = "http://netfilter.org/projects/iptables/files/iptables-${PV}.tar.xz \
            file://0001-configure-Add-option-to-enable-disable-libnfnetlink.patch \
            file://0002-iptables-xshared.h-add-missing-sys.types.h-include.patch \
            file://0004-configure.ac-only-check-conntrack-when-libnfnetlink-.patch \
+           file://0005-nft-ruleparse-Add-missing-braces-around-ternary.patch \
            "
 SRC_URI[sha256sum] = "5cc255c189356e317d070755ce9371eb63a1b783c34498fb8c30264f3cc59c9c"
 
@@ -75,6 +76,10 @@ do_install:append() {
     # if libnftnl is included, make the iptables symlink point to the nft-based binary by default
     if ${@bb.utils.contains('PACKAGECONFIG', 'libnftnl', 'true', 'false', d)} ; then
         ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables 
+        ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables-save
+        ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables-restore
+        # ethertypes is provided by the netbase package
+        rm -f ${D}${sysconfdir}/ethertypes
     fi
 }
 

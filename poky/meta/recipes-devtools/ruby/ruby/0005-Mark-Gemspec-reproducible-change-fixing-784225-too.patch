@@ -12,20 +12,20 @@ Upstream-Status: Backport [debian]
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/lib/rubygems/specification.rb b/lib/rubygems/specification.rb
-index 0d72cee..eb7bc25 100644
+index d6eac7f..4b2e95e 100644
 --- a/lib/rubygems/specification.rb
 +++ b/lib/rubygems/specification.rb
-@@ -1691,7 +1691,9 @@ class Gem::Specification < Gem::BasicSpecification
-         raise(Gem::InvalidSpecificationException,
-               "invalid date format in specification: #{date.inspect}")
-       end
--    when Time, DateLike then
-+    when Time then
-+      Time.utc(date.utc.year, date.utc.month, date.utc.day)
-+    when DateLike then
-       Time.utc(date.year, date.month, date.day)
-     else
-       TODAY
+@@ -1707,7 +1707,9 @@ class Gem::Specification < Gem::BasicSpecification
+                 raise(Gem::InvalidSpecificationException,
+                       "invalid date format in specification: #{date.inspect}")
+               end
+-            when Time, DateLike then
++            when Time then
++              Time.utc(date.utc.year, date.utc.month, date.utc.day)
++            when DateLike then
+               Time.utc(date.year, date.month, date.day)
+             else
+               TODAY
 -- 
-2.25.1
+2.40.0
 

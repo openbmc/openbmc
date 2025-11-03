@@ -86,7 +86,7 @@ ar = ${@meson_array('BUILD_AR', d)}
 nm = ${@meson_array('BUILD_NM', d)}
 strip = ${@meson_array('BUILD_STRIP', d)}
 readelf = ${@meson_array('BUILD_READELF', d)}
-pkgconfig = 'pkg-config-native'
+pkg-config = 'pkg-config-native'
 
 [built-in options]
 c_args = ['-isystem@{OECORE_NATIVE_SYSROOT}${includedir_native}' , ${@var_list2str('BUILD_OPTIMIZATION', d)}]
@@ -104,7 +104,7 @@ cpp = @CXX
 ar = @AR
 nm = @NM
 strip = @STRIP
-pkgconfig = 'pkg-config'
+pkg-config = 'pkg-config'
 
 [built-in options]
 c_args = @CFLAGS

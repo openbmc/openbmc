@@ -20,7 +20,7 @@ helps review and test patches and this is his testing tree).
 We have two broad categories of test builds, including "full" and
 "quick". On the Autobuilder, these can be seen as "a-quick" and
 "a-full", simply for ease of sorting in the UI. Use our Autobuilder
-:yocto_ab:`console view </typhoon/#/console>` to see where we manage most
+:yocto_ab:`console view </valkyrie/#/console>` to see where we manage most
 test-related items.
 
 Builds are triggered manually when the test branches are ready. The
@@ -69,7 +69,7 @@ box to "generate an email to QA" is also checked.
 When the build completes, an email is sent out using the ``send-qa-email``
 script in the :yocto_git:`yocto-autobuilder-helper </yocto-autobuilder-helper>`
 repository to the list of people configured for that release. Release builds
-are placed into a directory in https://autobuilder.yocto.io/pub/releases on the
+are placed into a directory in https://valkyrie.yocto.io/pub/releases on the
 Autobuilder which is included in the email. The process from here is
 more manual and control is effectively passed to release engineering.
 The next steps include:

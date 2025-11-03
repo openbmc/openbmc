@@ -3,7 +3,7 @@ From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 29 Apr 2020 22:02:23 -0700
 Subject: [PATCH] Add support for riscv32 CPU
 
-Upstream-Status: Pending
+Upstream-Status: Inappropriate [not a debian architecture]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  data/cputable                 | 1 +

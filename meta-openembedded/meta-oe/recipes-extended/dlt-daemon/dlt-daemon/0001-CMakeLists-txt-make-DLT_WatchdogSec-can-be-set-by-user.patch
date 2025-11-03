@@ -1,0 +1,40 @@
+From bc03f142507da92add8ba325fdf8187d47a7d719 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 13 Dec 2024 16:37:24 +0800
+Subject: [PATCH] CMakeLists.txt: make DLT_WatchdogSec can be set by user
+
+In my test env, WatchdogSec default value 2 is not enough, manually
+changed to 3 is ok. This makes dlt.service/dlt-system.service start
+failed during boot time. So, make DLT_WatchdogSec can be set by user, so
+user can set them to proper value at build time, then service can start
+successfully in boot time.
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
+Upstream-Status: Backport [https://github.com/COVESA/dlt-daemon/pull/720/commits/bc03f142507da92add8ba325fdf8187d47a7d719]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ systemd/CMakeLists.txt | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/systemd/CMakeLists.txt b/systemd/CMakeLists.txt
+index 16cbe86b5..659378d16 100644
+--- a/systemd/CMakeLists.txt
++++ b/systemd/CMakeLists.txt
+@@ -18,10 +18,14 @@ if(WITH_SYSTEMD)
+     set(SYSTEMD_CONFIGURATIONS_FILES_DIR ${SYSTEMD_UNITDIR} )
+ 
+     if(WITH_SYSTEMD_WATCHDOG)
+-        set( DLT_WatchdogSec 2 )
++        if(NOT DEFINED DLT_WatchdogSec)
++            set(DLT_WatchdogSec 2 CACHE STRING "Watchdog timeout in seconds")
++        endif()
+         message( STATUS "The systemd watchdog is enabled - timeout is set to ${DLT_WatchdogSec} seconds")
+     else(WITH_SYSTEMD_WATCHDOG)
+-        set( DLT_WatchdogSec 0 )
++        if(NOT DEFINED DLT_WatchdogSec)
++             set(DLT_WatchdogSec 0 CACHE STRING "Watchdog timeout in seconds")
++        endif()
+         message( STATUS "The systemd watchdog is disabled")
+     endif(WITH_SYSTEMD_WATCHDOG)

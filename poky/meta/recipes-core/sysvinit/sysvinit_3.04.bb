@@ -9,7 +9,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe \
 
 RDEPENDS:${PN} = "${PN}-inittab"
 
-SRC_URI = "${SAVANNAH_GNU_MIRROR}/sysvinit/sysvinit-${PV}.tar.xz \
+GITHUB_BASE_URI = "https://github.com/slicer69/${BPN}/releases/"
+SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/${BP}.tar.xz \
            file://install.patch \
            file://crypt-lib.patch \
            file://pidof-add-m-option.patch \
@@ -22,12 +23,13 @@ SRC_URI = "${SAVANNAH_GNU_MIRROR}/sysvinit/sysvinit-${PV}.tar.xz \
            file://bootlogd.init \
            file://01_bootlogd \
            file://0001-hddown-include-libgen.h-for-basename-API.patch \
+           file://0001-Accepted-patch-from-Mark-Hindley-which-avoids-cleari.patch \
            "
 SRC_URI[sha256sum] = "2a621fe6e4528bc91308b74867ddaaebbdf7753f02395c0c5bae817bd2b7e3a5"
 
 S = "${WORKDIR}/sysvinit-${PV}"
 
-inherit update-alternatives features_check
+inherit update-alternatives features_check github-releases
 DEPENDS:append = " update-rc.d-native base-passwd virtual/crypt"
 do_package_setscene[depends] = "${MLPREFIX}base-passwd:do_populate_sysroot"
 

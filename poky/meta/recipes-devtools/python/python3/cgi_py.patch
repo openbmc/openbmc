@@ -1,4 +1,4 @@
-From a56778372fe8dc7c42f5ffd911d89498c22dd064 Mon Sep 17 00:00:00 2001
+From 6ebd9de3505be0965cfc37e2e4d0d882d75f0ec2 Mon Sep 17 00:00:00 2001
 From: Mark Hatle <mark.hatle@windriver.com>
 Date: Wed, 21 Sep 2011 20:55:33 -0500
 Subject: [PATCH] Lib/cgi.py: Update the script as mentioned in the comment
@@ -6,7 +6,6 @@ Subject: [PATCH] Lib/cgi.py: Update the script as mentioned in the comment
 Upstream-Status: Inappropriate [distribution]
 
 Signed-off-by: Mark Hatle <mark.hatle@windriver.com>
-
 ---
  Lib/cgi.py | 11 +----------
  1 file changed, 1 insertion(+), 10 deletions(-)

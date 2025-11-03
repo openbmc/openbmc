@@ -34,16 +34,18 @@ do_install:append() {
 	    thin_delta \
 	    thin_dump \
 	    thin_ls \
-	    thin_repair \
-	    thin_restore \
-	    thin_rmap \
 	    thin_metadata_size \
 	    thin_metadata_pack \
 	    thin_metadata_unpack \
+	    thin_repair \
+	    thin_restore \
+	    thin_rmap \
+	    thin_shrink \
 	    thin_trim \
 	    era_check \
 	    era_dump \
 	    era_invalidate \
+	    era_repair \
 	    era_restore; do
                 ln -sf pdata_tools ${D}${sbindir}/$tool
             done

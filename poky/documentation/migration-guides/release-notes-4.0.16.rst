@@ -8,22 +8,22 @@ Security Fixes in Yocto-4.0.16
 
 -  cpio: Fix :cve_mitre:`2023-7207`
 -  curl: Revert "curl: Backport fix CVE-2023-32001"
--  curl: Fix :cve:`2023-46218`
--  dropbear:Fix :cve:`2023-48795`
--  ffmpeg: Fix :cve:`2022-3964` and :cve:`2022-3965`
--  ghostscript: Fix :cve:`2023-46751`
--  gnutls: Fix :cve:`2024-0553` and :cve:`2024-0567`
--  go: Fix :cve:`2023-39326`
--  openssh: Fix :cve:`2023-48795`, :cve:`2023-51384` and :cve:`2023-51385`
--  openssl: Fix :cve:`2023-6129` and :cve_mitre:`2023-6237`
+-  curl: Fix :cve_nist:`2023-46218`
+-  dropbear:Fix :cve_nist:`2023-48795`
+-  ffmpeg: Fix :cve_nist:`2022-3964` and :cve_nist:`2022-3965`
+-  ghostscript: Fix :cve_nist:`2023-46751`
+-  gnutls: Fix :cve_nist:`2024-0553` and :cve_nist:`2024-0567`
+-  go: Fix :cve_nist:`2023-39326`
+-  openssh: Fix :cve_nist:`2023-48795`, :cve_nist:`2023-51384` and :cve_nist:`2023-51385`
+-  openssl: Fix :cve_nist:`2023-6129` and :cve_mitre:`2023-6237`
 -  pam: Fix :cve_mitre:`2024-22365`
--  perl: Fix :cve:`2023-47038`
--  qemu: Fix :cve:`2023-5088`
--  sqlite3: Fix :cve:`2023-7104`
--  systemd: Fix :cve:`2023-7008`
--  tiff: Fix :cve:`2023-6228`
--  xserver-xorg: Fix :cve:`2023-6377`, :cve:`2023-6478`, :cve:`2023-6816`, :cve_mitre:`2024-0229`, :cve:`2024-0408`, :cve:`2024-0409`, :cve_mitre:`2024-21885` and :cve_mitre:`2024-21886`
--  zlib: Ignore :cve:`2023-6992`
+-  perl: Fix :cve_nist:`2023-47038`
+-  qemu: Fix :cve_nist:`2023-5088`
+-  sqlite3: Fix :cve_nist:`2023-7104`
+-  systemd: Fix :cve_nist:`2023-7008`
+-  tiff: Fix :cve_nist:`2023-6228`
+-  xserver-xorg: Fix :cve_nist:`2023-6377`, :cve_nist:`2023-6478`, :cve_nist:`2023-6816`, :cve_mitre:`2024-0229`, :cve_nist:`2024-0408`, :cve_nist:`2024-0409`, :cve_mitre:`2024-21885` and :cve_mitre:`2024-21886`
+-  zlib: Ignore :cve_nist:`2023-6992`
 
 
 Fixes in Yocto-4.0.16

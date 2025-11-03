@@ -4,7 +4,7 @@ Date: Wed, 27 Dec 2023 09:55:48 +0000
 Subject: [PATCH] Greet "OE-Core"
 
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
-Upstream-Status: Inappropriate
+Upstream-Status: Inappropriate [Test artefact]
 ---
  src/main.rs | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)

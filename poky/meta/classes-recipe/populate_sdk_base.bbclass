@@ -4,9 +4,16 @@
 # SPDX-License-Identifier: MIT
 #
 
+SDK_CLASSES += "${@bb.utils.contains("IMAGE_CLASSES", "testimage", "testsdk", "", d)}"
+inherit_defer ${SDK_CLASSES}
+
 PACKAGES = ""
 
-inherit image-postinst-intercepts image-artifact-names
+# This exists as an optimization for SPDX processing to only run in image and
+# SDK processing context.  This class happens to be common to these usages.
+SPDX_MULTILIB_SSTATE_ARCHS = "${@all_multilib_tune_values(d, 'SSTATE_ARCHS')}"
+
+inherit image-postinst-intercepts image-artifact-names nopackages
 
 # Wildcards specifying complementary packages to install for every package that has been explicitly
 # installed into the rootfs

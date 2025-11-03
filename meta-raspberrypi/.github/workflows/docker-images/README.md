@@ -17,5 +17,5 @@ passing the appropriate `-f` argument.
 Here is an example for building the `dco-check` image:
 
 ```
-docker build . -f dco-check/Dockerfile -t dco-check
+docker build --no-cache . -f dco-check/Dockerfile -t dco-check
 ```

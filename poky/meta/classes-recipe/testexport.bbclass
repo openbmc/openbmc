@@ -50,7 +50,7 @@ def testexport_main(d):
     from oeqa.runtime.context import OERuntimeTestContextExecutor
 
     image_name = ("%s/%s" % (d.getVar('DEPLOY_DIR_IMAGE'),
-                             d.getVar('IMAGE_LINK_NAME')))
+                             d.getVar('IMAGE_LINK_NAME') or d.getVar('IMAGE_NAME')))
 
     tdname = "%s.testdata.json" % image_name
     td = json.load(open(tdname, "r"))

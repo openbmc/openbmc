@@ -180,6 +180,12 @@ then run:
 
     kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml
 
+By default, the external system is disabled. To build the Corstone-1000 image with external system enabled, run:
+
+::
+
+    kas build meta-arm/kas/corstone1000-<fvp,mps3>.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-extsys.yml
+
 The initial clean build will be lengthy, given that all host utilities are to
 be built as well as the target images. This includes host executables (python,
 cmake, etc.) and the required toolchain(s).
@@ -1444,6 +1450,7 @@ The above commands will delete the Platform key (PK) and allow the normal system
 
 Testing the External System
 ---------------------------
+Before testing the external system, please make sure to build the Corstone-1000 image with external system enabled as mentioned in section `Building the software stack`_.
 
 During Linux boot the remoteproc subsystem automatically starts
 the external system.

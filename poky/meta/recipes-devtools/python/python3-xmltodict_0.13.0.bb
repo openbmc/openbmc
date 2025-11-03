@@ -13,6 +13,8 @@ inherit pypi setuptools3 ptest
 
 SRC_URI += " \
 	file://run-ptest \
+	file://CVE-2025-9375-1.patch \
+	file://CVE-2025-9375-2.patch \
 "
 
 RDEPENDS:${PN} += " \

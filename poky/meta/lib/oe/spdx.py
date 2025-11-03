@@ -355,3 +355,45 @@ class SPDXDocument(SPDXObject):
             if r.spdxDocument == namespace:
                 return r
         return None
+
+def is_compiled_source (filename, compiled_sources, types):
+    """
+    Check if the file is a compiled file
+    """
+    import os
+    # If we don't have compiled source, we assume all are compiled.
+    if not compiled_sources:
+        return True
+
+    # We return always true if the file type is not in the list of compiled files.
+    # Some files in the source directory are not compiled, for example, Makefiles,
+    # but also python .py file. We need to include them in the SPDX.
+    basename = os.path.basename(filename)
+    ext = basename.partition(".")[2]
+    if ext not in types:
+        return True
+    # Check that the file is in the list
+    return filename in compiled_sources
+
+def get_compiled_sources(d):
+    """
+    Get list of compiled sources from debug information and normalize the paths
+    """
+    import itertools
+    import oe.package
+    source_info = oe.package.read_debugsources_info(d)
+    if not source_info:
+        bb.debug(1, "Do not have debugsources.list. Skipping")
+        return [], []
+
+    # Sources are not split now in SPDX, so we aggregate them
+    sources = set(itertools.chain.from_iterable(source_info.values()))
+    # Check extensions of files
+    types = set()
+    for src in sources:
+        basename = os.path.basename(src)
+        ext = basename.partition(".")[2]
+        if ext not in types and ext:
+            types.add(ext)
+    bb.debug(1, f"Num of sources: {len(sources)} and types: {len(types)} {str(types)}")
+    return sources, types

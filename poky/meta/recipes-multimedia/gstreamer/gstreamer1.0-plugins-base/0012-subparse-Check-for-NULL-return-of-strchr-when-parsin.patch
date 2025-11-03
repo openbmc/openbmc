@@ -1,0 +1,39 @@
+From 4c40f73b7002967e824ef34a5435282f4a0ea363 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Wed, 9 Oct 2024 11:23:47 -0400
+Subject: [PATCH] subparse: Check for NULL return of strchr() when parsing LRC
+ subtitles
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-263
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3892
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8039>
+
+CVE: CVE-2024-47835
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/4c40f73b7002967e824ef34a5435282f4a0ea363]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/subparse/gstsubparse.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/gst/subparse/gstsubparse.c b/gst/subparse/gstsubparse.c
+index 8d925524a6..7d286ed318 100644
+--- a/gst/subparse/gstsubparse.c
++++ b/gst/subparse/gstsubparse.c
+@@ -1068,6 +1068,11 @@ parse_lrc (ParserState * state, const gchar * line)
+     return NULL;
+ 
+   start = strchr (line, ']');
++  // sscanf() does not check for the trailing ] but only up to the last
++  // placeholder, so there might be no ] at the end.
++  if (!start)
++    return NULL;
++
+   if (start - line == 9)
+     milli = 10;
+   else
+-- 
+2.30.2
+

@@ -9,6 +9,18 @@ SRC_URI = "http://poppler.freedesktop.org/${BP}.tar.xz \
            file://0001-cmake-Do-not-use-isystem.patch \
            file://jpeg-stdio.patch \
            file://CVE-2023-34872.patch \
+           file://CVE-2024-6239-0001.patch \
+           file://CVE-2024-6239-0002.patch \
+           file://CVE-2024-56378.patch \
+           file://CVE-2025-32364.patch \
+           file://CVE-2025-32365.patch \
+           file://CVE-2025-43903-0001.patch \
+           file://CVE-2025-43903-0002.patch \
+           file://CVE-2025-52886-0001.patch \
+           file://CVE-2025-52886-0002.patch \
+           file://CVE-2025-50420.patch \
+           file://CVE-2025-43718.patch \
+           file://CVE-2025-52885.patch \
            "
 SRC_URI[sha256sum] = "b6d893dc7dcd4138b9e9df59a13c59695e50e80dc5c2cacee0674670693951a1"
 

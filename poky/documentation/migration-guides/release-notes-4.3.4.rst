@@ -6,23 +6,23 @@ Release notes for Yocto-4.3.4 (Nanbield)
 Security Fixes in Yocto-4.3.4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  bind: Fix :cve:`2023-4408`, :cve:`2023-5517`, :cve:`2023-5679` and :cve:`2023-50387`
--  gcc: Update :term:`CVE_STATUS` for :cve:`2023-4039` as fixed
--  glibc: Fix :cve:`2023-6246`, :cve:`2023-6779` and :cve:`2023-6780`
--  gnutls: Fix :cve:`2024-0553` and :cve:`2024-0567`
+-  bind: Fix :cve_nist:`2023-4408`, :cve_nist:`2023-5517`, :cve_nist:`2023-5679` and :cve_nist:`2023-50387`
+-  gcc: Update :term:`CVE_STATUS` for :cve_nist:`2023-4039` as fixed
+-  glibc: Fix :cve_nist:`2023-6246`, :cve_nist:`2023-6779` and :cve_nist:`2023-6780`
+-  gnutls: Fix :cve_nist:`2024-0553` and :cve_nist:`2024-0567`
 -  gstreamer: Fix :cve_mitre:`2024-0444`
--  libssh2: fix :cve:`2023-48795`
--  libxml2: Fix :cve:`2024-25062`
--  linux-yocto/6.1: Fix :cve:`2023-6610`, :cve:`2023-6915`, :cve:`2023-46838`, :cve:`2023-50431`, :cve:`2024-1085`, :cve:`2024-1086` and :cve:`2024-23849`
--  linux-yocto/6.1: Ignore :cve:`2021-33630`, :cve:`2021-33631`, :cve:`2022-36402`, :cve:`2023-5717`, :cve:`2023-6200`, :cve:`2023-35827`, :cve:`2023-40791`, :cve:`2023-46343`, :cve:`2023-46813`, :cve:`2023-46862`, :cve:`2023-51042`, :cve:`2023-51043`, :cve_mitre:`2023-52340`, :cve:`2024-0562`, :cve:`2024-0565`, :cve:`2024-0582`, :cve:`2024-0584`, :cve:`2024-0607`, :cve:`2024-0639`, :cve:`2024-0641`, :cve:`2024-0646`, :cve:`2024-0775` and :cve:`2024-22705`
--  openssl: fix :cve:`2024-0727`
--  python3-jinja2: Fix :cve:`2024-22195`
--  tiff: Fix :cve:`2023-6228`, :cve:`2023-52355` and :cve:`2023-52356`
--  vim: Fix :cve:`2024-22667`
--  wpa-supplicant: Fix :cve:`2023-52160`
--  xserver-xorg: Fix :cve:`2023-6377`, :cve:`2023-6478`, :cve:`2023-6816`, :cve:`2024-0229`, :cve:`2024-0408`, :cve:`2024-0409`, :cve:`2024-21885` and :cve:`2024-21886`
--  xwayland: Fix :cve:`2023-6816`, :cve:`2024-0408` and :cve:`2024-0409`
--  zlib: Ignore :cve:`2023-6992`
+-  libssh2: fix :cve_nist:`2023-48795`
+-  libxml2: Fix :cve_nist:`2024-25062`
+-  linux-yocto/6.1: Fix :cve_nist:`2023-6610`, :cve_nist:`2023-6915`, :cve_nist:`2023-46838`, :cve_nist:`2023-50431`, :cve_nist:`2024-1085`, :cve_nist:`2024-1086` and :cve_nist:`2024-23849`
+-  linux-yocto/6.1: Ignore :cve_nist:`2021-33630`, :cve_nist:`2021-33631`, :cve_nist:`2022-36402`, :cve_nist:`2023-5717`, :cve_nist:`2023-6200`, :cve_nist:`2023-35827`, :cve_nist:`2023-40791`, :cve_nist:`2023-46343`, :cve_nist:`2023-46813`, :cve_nist:`2023-46862`, :cve_nist:`2023-51042`, :cve_nist:`2023-51043`, :cve_mitre:`2023-52340`, :cve_nist:`2024-0562`, :cve_nist:`2024-0565`, :cve_nist:`2024-0582`, :cve_nist:`2024-0584`, :cve_nist:`2024-0607`, :cve_nist:`2024-0639`, :cve_nist:`2024-0641`, :cve_nist:`2024-0646`, :cve_nist:`2024-0775` and :cve_nist:`2024-22705`
+-  openssl: fix :cve_nist:`2024-0727`
+-  python3-jinja2: Fix :cve_nist:`2024-22195`
+-  tiff: Fix :cve_nist:`2023-6228`, :cve_nist:`2023-52355` and :cve_nist:`2023-52356`
+-  vim: Fix :cve_nist:`2024-22667`
+-  wpa-supplicant: Fix :cve_nist:`2023-52160`
+-  xserver-xorg: Fix :cve_nist:`2023-6377`, :cve_nist:`2023-6478`, :cve_nist:`2023-6816`, :cve_nist:`2024-0229`, :cve_nist:`2024-0408`, :cve_nist:`2024-0409`, :cve_nist:`2024-21885` and :cve_nist:`2024-21886`
+-  xwayland: Fix :cve_nist:`2023-6816`, :cve_nist:`2024-0408` and :cve_nist:`2024-0409`
+-  zlib: Ignore :cve_nist:`2023-6992`
 
 
 Fixes in Yocto-4.3.4
@@ -59,7 +59,7 @@ Fixes in Yocto-4.3.4
 -  docs: use "manual page(s)"
 -  docs: Makefile: remove releases.rst in "make clean"
 -  externalsrc: fix task dependency for do_populate_lic
--  glibc: Remove duplicate :term:`CVE_STATUS` for :cve:`2023-4527`
+-  glibc: Remove duplicate :term:`CVE_STATUS` for :cve_nist:`2023-4527`
 -  glibc: stable 2.38 branch updates (2.38+gitd37c2b20a4)
 -  gnutls: Upgrade to 3.8.3
 -  gstreamer1.0: skip a test that is known to be flaky

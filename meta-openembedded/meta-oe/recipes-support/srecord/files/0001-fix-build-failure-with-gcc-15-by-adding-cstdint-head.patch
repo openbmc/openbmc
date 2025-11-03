@@ -1,0 +1,36 @@
+From 69290e4d727492a63a2a4424368a476b86ef8183 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Mon, 7 Apr 2025 17:18:34 +0900
+Subject: [PATCH] fix build failure with gcc 15 by adding cstdint header
+
+Fixes #79
+
+srecord/input/file/hp64k.h:82:21: error: ‘uint16_t’ has not been declared
+   82 |     bool read_u16be(uint16_t *dest);
+      |                     ^~~~~~~~
+/home/abuild/rpmbuild/BUILD/srecord-1.65.0-build/srecord-1.65.0-Source/./srecord/input/file/hp64k.h:1:1: note: ‘uint16_t’ is defined in header ‘<cstdint>’; this is probably fixable by adding ‘#include <cstdint>’
+  +++ |+#include <cstdint>
+    1 | //
+make[2]: *** [srecord/CMakeFiles/lib_srecord.dir/build.make:222: srecord/CMakeFiles/lib_srecord.dir/arglex/tool/input.cc.o] Error 1
+
+    * From gcc 13, cstdint header must be explicitly included for uint_X data types.
+    * See also: https://gcc.gnu.org/gcc-13/porting_to.html#header-dep-changes
+
+Upstream-Status: Submitted [https://github.com/sierrafoxtrot/srecord/pull/80]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ srecord/input/file/hp64k.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/srecord/input/file/hp64k.h b/srecord/input/file/hp64k.h
+index a3f8a6d..205e1e4 100644
+--- a/srecord/input/file/hp64k.h
++++ b/srecord/input/file/hp64k.h
+@@ -21,6 +21,7 @@
+ #define LIB_INPUT_FILE_HP64K
+ 
+ #include <srecord/input/file.h>
++#include <cstdint>
+ 
+ namespace srecord {
+ 

@@ -1,0 +1,63 @@
+From 0e58b2f7ad7b310201eada442a6782aaebe8e2bd Mon Sep 17 00:00:00 2001
+From: Antonio Morales <antonio-morales@github.com>
+Date: Thu, 26 Sep 2024 18:39:37 +0300
+Subject: [PATCH 02/13] qtdemux: Fix integer overflow when allocating the
+ samples table for fragmented MP4
+
+This can lead to out of bounds writes and NULL pointer dereferences.
+
+Fixes GHSL-2024-094, GHSL-2024-237, GHSL-2024-241
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3839
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47537
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/0e58b2f7ad7b310201eada442a6782aaebe8e2bd]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index 2ccc9f3595..54f2dfead3 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -3342,6 +3342,7 @@ qtdemux_parse_trun (GstQTDemux * qtdemux, GstByteReader * trun,
+   gint i;
+   guint8 *data;
+   guint entry_size, dur_offset, size_offset, flags_offset = 0, ct_offset = 0;
++  guint new_n_samples;
+   QtDemuxSample *sample;
+   gboolean ismv = FALSE;
+   gint64 initial_offset;
+@@ -3442,14 +3443,13 @@ qtdemux_parse_trun (GstQTDemux * qtdemux, GstByteReader * trun,
+     goto fail;
+   data = (guint8 *) gst_byte_reader_peek_data_unchecked (trun);
+ 
+-  if (stream->n_samples + samples_count >=
+-      QTDEMUX_MAX_SAMPLE_INDEX_SIZE / sizeof (QtDemuxSample))
++  if (!g_uint_checked_add (&new_n_samples, stream->n_samples, samples_count) ||
++      new_n_samples >= QTDEMUX_MAX_SAMPLE_INDEX_SIZE / sizeof (QtDemuxSample))
+     goto index_too_big;
+ 
+   GST_DEBUG_OBJECT (qtdemux, "allocating n_samples %u * %u (%.2f MB)",
+-      stream->n_samples + samples_count, (guint) sizeof (QtDemuxSample),
+-      (stream->n_samples + samples_count) *
+-      sizeof (QtDemuxSample) / (1024.0 * 1024.0));
++      new_n_samples, (guint) sizeof (QtDemuxSample),
++      (new_n_samples) * sizeof (QtDemuxSample) / (1024.0 * 1024.0));
+ 
+   /* create a new array of samples if it's the first sample parsed */
+   if (stream->n_samples == 0) {
+@@ -3458,7 +3458,7 @@ qtdemux_parse_trun (GstQTDemux * qtdemux, GstByteReader * trun,
+     /* or try to reallocate it with space enough to insert the new samples */
+   } else
+     stream->samples = g_try_renew (QtDemuxSample, stream->samples,
+-        stream->n_samples + samples_count);
++        new_n_samples);
+   if (stream->samples == NULL)
+     goto out_of_memory;
+ 
+-- 
+2.30.2
+

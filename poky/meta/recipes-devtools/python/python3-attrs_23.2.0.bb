@@ -20,7 +20,6 @@ DEPENDS += " \
 
 RDEPENDS:${PN}+= " \
     python3-compression \
-    python3-ctypes \
     python3-crypt \
 "
 

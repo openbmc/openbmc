@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/mirror/xmlrpc-c.git;branch=master;protocol=https \
            file://0002-fix-formatting-issues.patch \
            "
 #Release 1.59.01
-SRCREV = "352aeaa9ae49e90e55187cbda839f2113df06278"
+SRCREV = "08b052692b70171a6fcb437d4f52a46977eda62e"
 
 S = "${WORKDIR}/git/stable"
 

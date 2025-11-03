@@ -6,16 +6,16 @@ Release notes for Yocto-4.1.1 (Langdale)
 Security Fixes in Yocto-4.1.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  curl: Fix :cve:`2022-32221`, :cve:`2022-35260`, :cve:`2022-42915` and :cve:`2022-42916`
--  libx11: Fix :cve:`2022-3554`
--  lighttpd: Fix :cve:`2022-41556`
--  openssl: Fix :cve:`2022-3358`, :cve:`2022-3602` and :cve:`2022-3786`
--  pixman: Fix :cve:`2022-44638`
--  qemu: Fix :cve:`2022-3165`
--  sudo: Fix :cve:`2022-43995`
--  tiff: Fix :cve:`2022-3599`, :cve:`2022-3597`, :cve:`2022-3626`, :cve:`2022-3627`, :cve:`2022-3570` and :cve:`2022-3598`
--  xserver-xorg: Fix :cve:`2022-3550` and :cve:`2022-3551`
--  xserver-xorg: Ignore :cve:`2022-3553`
+-  curl: Fix :cve_nist:`2022-32221`, :cve_nist:`2022-35260`, :cve_nist:`2022-42915` and :cve_nist:`2022-42916`
+-  libx11: Fix :cve_nist:`2022-3554`
+-  lighttpd: Fix :cve_nist:`2022-41556`
+-  openssl: Fix :cve_nist:`2022-3358`, :cve_nist:`2022-3602` and :cve_nist:`2022-3786`
+-  pixman: Fix :cve_nist:`2022-44638`
+-  qemu: Fix :cve_nist:`2022-3165`
+-  sudo: Fix :cve_nist:`2022-43995`
+-  tiff: Fix :cve_nist:`2022-3599`, :cve_nist:`2022-3597`, :cve_nist:`2022-3626`, :cve_nist:`2022-3627`, :cve_nist:`2022-3570` and :cve_nist:`2022-3598`
+-  xserver-xorg: Fix :cve_nist:`2022-3550` and :cve_nist:`2022-3551`
+-  xserver-xorg: Ignore :cve_nist:`2022-3553`
 
 
 Fixes in Yocto-4.1.1
@@ -179,7 +179,7 @@ Fixes in Yocto-4.1.1
 -  shadow: update 4.12.1 -> 4.12.3
 -  systemd: add systemd-creds and systemd-cryptenroll to systemd-extra-utils
 -  test-manual: fix typo in machine name
--  tiff: fix a typo for :cve:`2022-2953`.patch
+-  tiff: fix a typo for :cve_nist:`2022-2953`.patch
 -  u-boot: Add savedefconfig task
 -  u-boot: Remove duplicate inherit of cml1
 -  uboot-sign: Fix using wrong KEY_REQ_ARGS

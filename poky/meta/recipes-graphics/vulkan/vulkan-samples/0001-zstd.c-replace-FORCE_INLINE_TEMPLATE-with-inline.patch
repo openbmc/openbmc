@@ -1,0 +1,52 @@
+From a7bfe82a311c713b12bb83b8488574ad5c784f89 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 9 Jul 2024 04:29:11 +0000
+Subject: [PATCH] zstd.c: replace FORCE_INLINE_TEMPLATE with inline
+
+Refer [1], always-inline is not suggested to be used if you have indirect
++calls. so replace FORCE_INLINE_TEMPLATE with inline to fix error:
+In function 'ZSTD_compressBlock_lazy_generic',
+    inlined from 'ZSTD_compressBlock_greedy' at TOPDIR/tmp-glibc/work/core2-32-wrs-linux/vulkan-samples/git/git/third_party/ktx/lib/basisu/zstd/zstd.c:21914:12:
+TOPDIR/tmp-glibc/work/core2-32-wrs-linux/vulkan-samples/git/git/third_party/ktx/lib/basisu/zstd/zstd.c:21551:30: error: inlining failed in call to 'always_inline' 'ZSTD_HcFindBestMatch_selectMLS': function not considered for inlining
+ | FORCE_INLINE_TEMPLATE size_t ZSTD_HcFindBestMatch_selectMLS (
+      |                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TOPDIR/tmp-glibc/work/core2-32-wrs-linux/vulkan-samples/git/git/third_party/ktx/lib/basisu/zstd/zstd.c:21736:32: note: called from here
+|             size_t const ml2 = searchMax(ms, ip, iend, &offsetFound);
+
+Upstream-Status: Inappropriate [ Latest upstream ktx don't have this part code ]
+
+Has report this issue to upstream Vulkan-Samples, refer [2]
+
+[1] https://gcc.gnu.org/bugzilla/show_bug.cgi?id=107931
+[2] https://github.com/KhronosGroup/Vulkan-Samples/issues/1089
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ lib/basisu/zstd/zstd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/basisu/zstd/zstd.c b/lib/basisu/zstd/zstd.c
+index eaf13738..423f149e 100644
+--- a/lib/basisu/zstd/zstd.c
++++ b/lib/basisu/zstd/zstd.c
+@@ -21548,7 +21548,7 @@ size_t ZSTD_HcFindBestMatch_generic (
+ }
+ 
+ 
+-FORCE_INLINE_TEMPLATE size_t ZSTD_HcFindBestMatch_selectMLS (
++static inline size_t ZSTD_HcFindBestMatch_selectMLS (
+                         ZSTD_matchState_t* ms,
+                         const BYTE* ip, const BYTE* const iLimit,
+                         size_t* offsetPtr)
+@@ -21596,7 +21596,7 @@ static size_t ZSTD_HcFindBestMatch_dedicatedDictSearch_selectMLS (
+ }
+ 
+ 
+-FORCE_INLINE_TEMPLATE size_t ZSTD_HcFindBestMatch_extDict_selectMLS (
++static inline size_t ZSTD_HcFindBestMatch_extDict_selectMLS (
+                         ZSTD_matchState_t* ms,
+                         const BYTE* ip, const BYTE* const iLimit,
+                         size_t* offsetPtr)
+-- 
+2.44.0
+

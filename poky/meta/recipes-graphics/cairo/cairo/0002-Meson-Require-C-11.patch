@@ -1,0 +1,23 @@
+From d9cc95b94b2bb1e67f2095cda484d4a8a63aba10 Mon Sep 17 00:00:00 2001
+From: Luca Bacci <luca.bacci982@gmail.com>
+Date: Thu, 16 Jan 2025 16:48:12 +0100
+Subject: [PATCH] Meson: Require C++11
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/cairo/cairo/-/commit/dfd06ab3884d79de3b5bac782d1e8b2a0bd791ab]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ meson.build | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meson.build b/meson.build
+index f8432fd..85434d2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2,6 +2,7 @@ project('cairo', 'c', 'cpp',
+   meson_version: '>= 1.3.0',
+   version: run_command(find_program('version.py'), check: true).stdout().strip(),
+   default_options: ['c_std=gnu11,c11',
++                    'cpp_std=gnu++11,c++11',
+                     'warning_level=2'],
+ )
+ 

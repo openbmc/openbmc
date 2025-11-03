@@ -1,0 +1,52 @@
+From d14c69a7f256a9444c5c64b808d8767e5a8ba68e Mon Sep 17 00:00:00 2001
+From: NIIBE Yutaka <gniibe@fsij.org>
+Date: Wed, 23 Oct 2024 08:48:06 +0900
+Subject: [PATCH] Avoid use of 'nullptr' for an identifier.
+
+* tests/t-printf.c (check_fprintf_sf): Use 'null_ptr'
+as an identifier.
+
+--
+
+GnuPG-bug-id: 7344
+Signed-off-by: NIIBE Yutaka <gniibe@fsij.org>
+
+Upstream-Status: Backport [libgpg-error-1.51 d14c69a7f256a9444c5c64b808d8767e5a8ba68e]
+Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+---
+ tests/t-printf.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/t-printf.c b/tests/t-printf.c
+index c1ad0b0..87c201d 100644
+--- a/tests/t-printf.c
++++ b/tests/t-printf.c
+@@ -449,7 +449,7 @@ string_filter (const char *string, int no, void *opaque)
+ static void
+ check_fprintf_sf (void)
+ {
+-  volatile char *nullptr = NULL; /* Avoid compiler warning.  */
++  volatile char *null_ptr = NULL; /* Avoid compiler warning.  */
+   struct sfstate_s sfstate = {NULL};
+   gpgrt_stream_t stream;
+   const char *expect;
+@@ -461,8 +461,8 @@ check_fprintf_sf (void)
+ 
+   gpgrt_fprintf_sf (stream, string_filter, &sfstate,
+                     "%s a=%d b=%s c=%d d=%.8s null=%s\n",
+-                    nullptr, 1, "foo\x01 bar", 2,
+-                    "a longer string", nullptr);
++                    null_ptr, 1, "foo\x01 bar", 2,
++                    "a longer string", null_ptr);
+   expect = "[==>Niente<==] a=1 b=foo\x01 bar c=2 d=a longer null=(null)\n";
+   result = stream_to_string (stream);
+   if (strcmp (result, expect))
+@@ -475,7 +475,7 @@ check_fprintf_sf (void)
+ 
+   gpgrt_fprintf_sf (stream, string_filter, &sfstate,
+                     "a=%d b=%s c=%d d=%.8s e=%s\n",
+-                    1, "foo\n bar", 2, nullptr, "");
++                    1, "foo\n bar", 2, null_ptr, "");
+   expect = "a=1 b=foo\n bar c=2 d=[==>Nien e=\n";
+   result = stream_to_string (stream);
+   if (strcmp (result, expect))

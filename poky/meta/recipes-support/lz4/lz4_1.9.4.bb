@@ -13,8 +13,9 @@ PE = "1"
 SRCREV = "5ff839680134437dbf4678f3d0c7b371d84f4964"
 
 SRC_URI = "git://github.com/lz4/lz4.git;branch=release;protocol=https \
-	   file://run-ptest \
-	   "
+           file://run-ptest \
+           file://CVE-2025-62813.patch \
+           "
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>.*)"
 
 S = "${WORKDIR}/git"

@@ -16,6 +16,7 @@ BRANCH = "onetbb_2021"
 SRCREV = "8b829acc65569019edb896c5150d427f288e8aba"
 SRC_URI = "git://github.com/oneapi-src/oneTBB.git;protocol=https;branch=${BRANCH} \
             file://0001-hwloc_detection.cmake-remove-cross-compiation-check.patch \
+            file://0001-Fix-suppress-new-GCC-12-13-warnings-1192.patch \
 "
 S = "${WORKDIR}/git"
 

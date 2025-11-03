@@ -8,8 +8,10 @@ inherit cmake pkgconfig mime
 
 DEPENDS = "highway brotli"
 
-SRC_URI = "gitsm://github.com/libjxl/libjxl.git;protocol=https;nobranch=1"
-
+SRC_URI = "gitsm://github.com/libjxl/libjxl.git;protocol=https;nobranch=1 \
+           file://CVE-2024-11403.patch \
+           file://CVE-2024-11498.patch \
+          "
 SRCREV = "e1489592a770b989303b0edc5cc1dc447bbe0515"
 S = "${WORKDIR}/git"
 

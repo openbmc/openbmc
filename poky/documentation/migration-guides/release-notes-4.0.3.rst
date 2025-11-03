@@ -6,21 +6,21 @@ Release notes for Yocto-4.0.3 (Kirkstone)
 Security Fixes in Yocto-4.0.3
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  binutils: fix :cve:`2019-1010204`
--  busybox: fix :cve:`2022-30065`
--  cups: ignore :cve:`2022-26691`
--  curl: Fix :cve:`2022-32205`, :cve:`2022-32206`, :cve:`2022-32207` and :cve:`2022-32208`
--  dpkg: fix :cve:`2022-1664`
--  ghostscript: fix :cve:`2022-2085`
--  harfbuzz: fix :cve:`2022-33068`
--  libtirpc: fix :cve:`2021-46828`
--  lua: fix :cve:`2022-33099`
--  nasm: ignore :cve:`2020-18974`
--  qemu: fix :cve:`2022-35414`
--  qemu: ignore :cve:`2021-20255` and :cve:`2019-12067`
--  tiff: fix :cve:`2022-1354`, :cve:`2022-1355`, :cve:`2022-2056`, :cve:`2022-2057` and :cve:`2022-2058`
--  u-boot: fix :cve:`2022-34835`
--  unzip: fix :cve:`2022-0529` and :cve:`2022-0530`
+-  binutils: fix :cve_nist:`2019-1010204`
+-  busybox: fix :cve_nist:`2022-30065`
+-  cups: ignore :cve_nist:`2022-26691`
+-  curl: Fix :cve_nist:`2022-32205`, :cve_nist:`2022-32206`, :cve_nist:`2022-32207` and :cve_nist:`2022-32208`
+-  dpkg: fix :cve_nist:`2022-1664`
+-  ghostscript: fix :cve_nist:`2022-2085`
+-  harfbuzz: fix :cve_nist:`2022-33068`
+-  libtirpc: fix :cve_nist:`2021-46828`
+-  lua: fix :cve_nist:`2022-33099`
+-  nasm: ignore :cve_nist:`2020-18974`
+-  qemu: fix :cve_nist:`2022-35414`
+-  qemu: ignore :cve_nist:`2021-20255` and :cve_nist:`2019-12067`
+-  tiff: fix :cve_nist:`2022-1354`, :cve_nist:`2022-1355`, :cve_nist:`2022-2056`, :cve_nist:`2022-2057` and :cve_nist:`2022-2058`
+-  u-boot: fix :cve_nist:`2022-34835`
+-  unzip: fix :cve_nist:`2022-0529` and :cve_nist:`2022-0530`
 
 
 Fixes in Yocto-4.0.3

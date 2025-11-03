@@ -35,9 +35,9 @@ EXTRA_OECONF = " \
 
 SETUPTOOLS_SETUP_PATH = "${S}/py"
 
-inherit ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3', '', d)}
+inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python', 'setuptools3', '', d)}
 
-PACKAGES =+ "${PN}-python"
+PACKAGES =+ "${@bb.utils.contains('PACKAGECONFIG', 'python', '${PN}-python', '', d)}"
 FILES:${PN}-python = "${PYTHON_SITEPACKAGES_DIR}"
 RDEPENDS:${PN}-python = "python3-core python3-json ${PN}"
 
@@ -64,7 +64,10 @@ do_install() {
     fi
 }
 
-RDEPENDS:${PN}-ptest += " ${PN}-python bash coreutils make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux"
+RDEPENDS:${PN}-ptest += " \
+    bash coreutils make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux \
+    ${@bb.utils.contains('PACKAGECONFIG', 'python', '${PN}-python', '', d)} \
+"
 
 RRECOMMENDS:${PN}-ptest += "\
 kernel-module-nft-chain-nat     kernel-module-nft-queue \

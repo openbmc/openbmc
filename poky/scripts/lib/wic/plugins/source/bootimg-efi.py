@@ -245,7 +245,7 @@ class BootimgEFIPlugin(SourcePlugin):
 
             # list of tuples (src_name, dst_name)
             deploy_files = []
-            for src_entry in re.findall(r'[\w;\-\./\*]+', boot_files):
+            for src_entry in re.findall(r'[\w;\-\.\+/\*]+', boot_files):
                 if ';' in src_entry:
                     dst_entry = tuple(src_entry.split(';'))
                     if not dst_entry[0] or not dst_entry[1]:
@@ -428,10 +428,10 @@ class BootimgEFIPlugin(SourcePlugin):
             elif source_params['loader'] == 'uefi-kernel':
                 kernel = get_bitbake_var("KERNEL_IMAGETYPE")
                 if not kernel:
-                    raise WicError("Empty KERNEL_IMAGETYPE %s\n" % target)
+                    raise WicError("Empty KERNEL_IMAGETYPE")
                 target = get_bitbake_var("TARGET_SYS")
                 if not target:
-                    raise WicError("Unknown arch (TARGET_SYS) %s\n" % target)
+                    raise WicError("Empty TARGET_SYS")
 
                 if re.match("x86_64", target):
                     kernel_efi_image = "bootx64.efi"

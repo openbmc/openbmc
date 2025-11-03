@@ -72,6 +72,11 @@ def add_module_functions(fn, functions, namespace):
             parser.parse_python(None, filename=fn, lineno=1, fixedhash=fixedhash+f)
             #bb.warn("Cached %s" % f)
         except KeyError:
+            targetfn = inspect.getsourcefile(functions[f])
+            if fn != targetfn:
+                # Skip references to other modules outside this file
+                #bb.warn("Skipping %s" % name)
+                continue
             lines, lineno = inspect.getsourcelines(functions[f])
             src = "".join(lines)
             parser.parse_python(src, filename=fn, lineno=lineno, fixedhash=fixedhash+f)
@@ -82,14 +87,14 @@ def add_module_functions(fn, functions, namespace):
             if e in functions:
                 execs.remove(e)
                 execs.add(namespace + "." + e)
-        modulecode_deps[name] = [parser.references.copy(), execs, parser.var_execs.copy(), parser.contains.copy()]
+        modulecode_deps[name] = [parser.references.copy(), execs, parser.var_execs.copy(), parser.contains.copy(), parser.extra]
         #bb.warn("%s: %s\nRefs:%s Execs: %s %s %s" % (name, fn, parser.references, parser.execs, parser.var_execs, parser.contains))
 
 def update_module_dependencies(d):
     for mod in modulecode_deps:
         excludes = set((d.getVarFlag(mod, "vardepsexclude") or "").split())
         if excludes:
-            modulecode_deps[mod] = [modulecode_deps[mod][0] - excludes, modulecode_deps[mod][1] - excludes, modulecode_deps[mod][2] - excludes, modulecode_deps[mod][3]]
+            modulecode_deps[mod] = [modulecode_deps[mod][0] - excludes, modulecode_deps[mod][1] - excludes, modulecode_deps[mod][2] - excludes, modulecode_deps[mod][3], modulecode_deps[mod][4]]
 
 # A custom getstate/setstate using tuples is actually worth 15% cachesize by
 # avoiding duplication of the attribute names!
@@ -112,21 +117,22 @@ class SetCache(object):
 codecache = SetCache()
 
 class pythonCacheLine(object):
-    def __init__(self, refs, execs, contains):
+    def __init__(self, refs, execs, contains, extra):
         self.refs = codecache.internSet(refs)
         self.execs = codecache.internSet(execs)
         self.contains = {}
         for c in contains:
             self.contains[c] = codecache.internSet(contains[c])
+        self.extra = extra
 
     def __getstate__(self):
-        return (self.refs, self.execs, self.contains)
+        return (self.refs, self.execs, self.contains, self.extra)
 
     def __setstate__(self, state):
-        (refs, execs, contains) = state
-        self.__init__(refs, execs, contains)
+        (refs, execs, contains, extra) = state
+        self.__init__(refs, execs, contains, extra)
     def __hash__(self):
-        l = (hash(self.refs), hash(self.execs))
+        l = (hash(self.refs), hash(self.execs), hash(self.extra))
         for c in sorted(self.contains.keys()):
             l = l + (c, hash(self.contains[c]))
         return hash(l)
@@ -155,7 +161,7 @@ class CodeParserCache(MultiProcessCache):
     # so that an existing cache gets invalidated. Additionally you'll need
     # to increment __cache_version__ in cache.py in order to ensure that old
     # recipe caches don't trigger "Taskhash mismatch" errors.
-    CACHE_VERSION = 11
+    CACHE_VERSION = 12
 
     def __init__(self):
         MultiProcessCache.__init__(self)
@@ -169,8 +175,8 @@ class CodeParserCache(MultiProcessCache):
         self.pythoncachelines = {}
         self.shellcachelines = {}
 
-    def newPythonCacheLine(self, refs, execs, contains):
-        cacheline = pythonCacheLine(refs, execs, contains)
+    def newPythonCacheLine(self, refs, execs, contains, extra):
+        cacheline = pythonCacheLine(refs, execs, contains, extra)
         h = hash(cacheline)
         if h in self.pythoncachelines:
             return self.pythoncachelines[h]
@@ -338,6 +344,7 @@ class PythonParser():
             self.contains = {}
             for i in codeparsercache.pythoncache[h].contains:
                 self.contains[i] = set(codeparsercache.pythoncache[h].contains[i])
+            self.extra = codeparsercache.pythoncache[h].extra
             return
 
         if h in codeparsercache.pythoncacheextras:
@@ -346,6 +353,7 @@ class PythonParser():
             self.contains = {}
             for i in codeparsercache.pythoncacheextras[h].contains:
                 self.contains[i] = set(codeparsercache.pythoncacheextras[h].contains[i])
+            self.extra = codeparsercache.pythoncacheextras[h].extra
             return
 
         if fixedhash and not node:
@@ -364,8 +372,11 @@ class PythonParser():
                 self.visit_Call(n)
 
         self.execs.update(self.var_execs)
+        self.extra = None
+        if fixedhash:
+            self.extra = bbhash(str(node))
 
-        codeparsercache.pythoncacheextras[h] = codeparsercache.newPythonCacheLine(self.references, self.execs, self.contains)
+        codeparsercache.pythoncacheextras[h] = codeparsercache.newPythonCacheLine(self.references, self.execs, self.contains, self.extra)
 
 class ShellParser():
     def __init__(self, name, log):

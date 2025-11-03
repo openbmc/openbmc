@@ -1,0 +1,37 @@
+From 61c0505634a6faacf9fa0723843408aa0d3fb90a Mon Sep 17 00:00:00 2001
+From: Andrew Hamilton <adhamilt@gmail.com>
+Date: Mon, 7 Jul 2025 10:35:54 +0900
+Subject: [PATCH] x509: reject zero-length version in certificate request
+
+Ensure zero size asn1 values are considered invalid in
+gnutls_x509_crq_get_version, this ensures crq version is not used
+uninitialized. Spotted by oss-fuzz at:
+https://issues.oss-fuzz.com/issues/42536706
+
+Signed-off-by: Andrew Hamilton <adhamilt@gmail.com>
+Signed-off-by: Daiki Ueno <ueno@gnu.org>
+
+Upstream-Status: Backport [https://gitlab.com/gnutls/gnutls/-/commit/61c0505634a6faacf9fa0723843408aa0d3fb90a]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ lib/x509/crq.c                                    |   7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/lib/x509/crq.c b/lib/x509/crq.c
+index 19e13623c..9e9801d2b 100644
+--- a/lib/x509/crq.c
++++ b/lib/x509/crq.c
+@@ -615,6 +615,13 @@ int gnutls_x509_crq_get_version(gnutls_x509_crq_t crq)
+ 		return _gnutls_asn2err(result);
+ 	}
+ 
++	/* Note that asn1_read_value can return success with */
++	/* len set to zero (without setting the data) in some */
++	/* conditions. */
++	if (unlikely(len <= 0)) {
++		return gnutls_assert_val(GNUTLS_E_ASN1_VALUE_NOT_VALID);
++	}
++
+ 	return (int)version[0] + 1;
+ }
+ 

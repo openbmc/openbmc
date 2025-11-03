@@ -1,0 +1,29 @@
+From 7c64511d2dcb58bc4d83dd41667c1f9295ca9712 Mon Sep 17 00:00:00 2001
+From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Date: Tue, 19 Aug 2025 21:47:05 +0200
+Subject: [PATCH 2/2] pyproject.toml: relax setuptool version requirement
+
+To match with what's available in Scarthgap
+It turns out that setuptools 69 is sufficient for building this tool.
+The developer may have aligned the version with his testing environment.
+
+This patch is not needed on meta-openembedded master which has a recent enough
+version.
+
+Signed-off-by: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Upstream-Status: Inappropriate [oe specific]
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 79e710b..a8b59d8 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools >= 77.0.3"]
++requires = ["setuptools >= 69"]
+ build-backend = "setuptools.build_meta"
+ 
+ [tool.setuptools.packages.find]

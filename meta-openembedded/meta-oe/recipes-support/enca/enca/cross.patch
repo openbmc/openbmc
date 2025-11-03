@@ -1,0 +1,68 @@
+From: Helmut Grohne <helmut@subdivi.de>
+Subject: build make_hash with the build arch compiler
+
+Also note that we cannot include config.h in make_hash.c, because it is
+specific to the host architecture.
+
+Sourced from debian - https://salsa.debian.org/debian/enca/-/blob/master/debian/patches/cross.patch?ref_type=heads
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: enca-1.19/configure.ac
+===================================================================
+--- enca-1.19.orig/configure.ac
++++ enca-1.19/configure.ac
+@@ -35,6 +35,7 @@
+ dnl Checks for programs.
+ AC_PROG_AWK
+ AC_PROG_CC
++AX_PROG_CC_FOR_BUILD
+ AC_GNU_SOURCE
+ AC_AIX
+ AC_ISC_POSIX
+Index: enca-1.19/tools/Makefile.am
+===================================================================
+--- enca-1.19.orig/tools/Makefile.am
++++ enca-1.19/tools/Makefile.am
+@@ -2,7 +2,8 @@
+ noinst_HEADERS = encodings.h
+ noinst_SCRIPTS = expand_table.pl
+ 
+-make_hash_SOURCES = make_hash.c
++make_hash$(EXEEXT): make_hash.c
++	$(CC_FOR_BUILD) $(CFLAGS_FOR_BUILD) -o $@ $<
+ 
+ BUILT_SOURCES = $(noinst_HEADERS)
+ 
+Index: enca-1.19/tools/make_hash.c
+===================================================================
+--- enca-1.19.orig/tools/make_hash.c
++++ enca-1.19/tools/make_hash.c
+@@ -17,25 +17,9 @@
+   with this program; if not, write to the Free Software Foundation, Inc.,
+   59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+ */
+-#ifdef HAVE_CONFIG_H
+-#  include "config.h"
+-#endif /* HAVE_CONFIG_H */
+-
+ #include <stdlib.h>
+ #include <stdio.h>
+-
+-#ifdef HAVE_STRING_H
+-#  include <string.h>
+-#else /* HAVE_STRING_H */
+-#  ifdef HAVE_STRINGS_H
+-#    include <strings.h>
+-#  endif /* HAVE_STRINGS_H */
+-#endif /* HAVE_STRING_H */
+-
+-#ifdef HAVE_MEMORY_H
+-#  include <memory.h>
+-#endif /* HAVE_MEMORY_H */
+-
++#include <string.h>
+ #include <unistd.h>
+ #include <ctype.h>
+ 

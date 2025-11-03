@@ -1,0 +1,88 @@
+From 4d3ebb03b89b122af490824ca73287954a35bd07 Mon Sep 17 00:00:00 2001
+From: Jamie Fox <jamie.fox@arm.com>
+Date: Thu, 22 Aug 2024 16:54:45 +0100
+Subject: [PATCH] Platform: corstone1000: Fix isolation L2 memory protection
+
+The whole of the SRAM was configured unprivileged on this platform, so
+the memory protection required for isolation level 2 was not present.
+
+This patch changes the S_DATA_START to S_DATA_LIMIT MPU region to be
+configured for privileged access only. It also reorders the MPU regions
+so that the App RoT sub-region overlapping S_DATA has a higher region
+number and so takes priority in the operation of the Armv6-M MPU.
+
+Signed-off-by: Jamie Fox <jamie.fox@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/30951]
+---
+ .../arm/corstone1000/tfm_hal_isolation.c      | 43 +++++++++----------
+ 1 file changed, 21 insertions(+), 22 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_isolation.c b/platform/ext/target/arm/corstone1000/tfm_hal_isolation.c
+index 39b19c535..498f14ed2 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_isolation.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_isolation.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2020-2023, Arm Limited. All rights reserved.
++ * Copyright (c) 2020-2024, Arm Limited. All rights reserved.
+  * Copyright (c) 2022 Cypress Semiconductor Corporation (an Infineon
+  * company) or an affiliate of Cypress Semiconductor Corporation. All rights
+  * reserved.
+@@ -99,6 +99,26 @@ enum tfm_hal_status_t tfm_hal_set_up_static_boundaries(
+         return ret;
+     }
+ 
++    /* Set the RAM attributes. It is needed because the first region overlaps the whole
++     * SRAM and it has to be overridden.
++     * The RAM_MPU_REGION_BLOCK_1_SIZE and RAM_MPU_REGION_BLOCK_2_SIZE are calculated manually
++     * and added to the platform_region_defs compile definitions.
++     */
++    base = S_DATA_START;
++    limit = S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE;
++    ret = configure_mpu(rnr++, base, limit,
++                            XN_EXEC_NOT_OK, AP_RW_PRIV_ONLY);
++    if (ret != TFM_HAL_SUCCESS) {
++        return ret;
++    }
++
++    base = S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE;
++    limit = S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE + RAM_MPU_REGION_BLOCK_2_SIZE;
++    ret = configure_mpu(rnr++, base, limit,
++                            XN_EXEC_NOT_OK, AP_RW_PRIV_ONLY);
++    if (ret != TFM_HAL_SUCCESS) {
++        return ret;
++    }
+ 
+     /* RW, ZI and stack as one region */
+     base = (uint32_t)&REGION_NAME(Image$$, TFM_APP_RW_STACK_START, $$Base);
+@@ -133,27 +153,6 @@ enum tfm_hal_status_t tfm_hal_set_up_static_boundaries(
+ 
+ #endif
+ 
+-    /* Set the RAM attributes. It is needed because the first region overlaps the whole
+-     * SRAM and it has to be overridden.
+-     * The RAM_MPU_REGION_BLOCK_1_SIZE and RAM_MPU_REGION_BLOCK_2_SIZE are calculated manually
+-     * and added to the platform_region_defs compile definitions.
+-     */
+-    base = S_DATA_START;
+-    limit = S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE;
+-    ret = configure_mpu(rnr++, base, limit,
+-                            XN_EXEC_NOT_OK, AP_RW_PRIV_UNPRIV);
+-    if (ret != TFM_HAL_SUCCESS) {
+-        return ret;
+-    }
+-
+-    base = S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE;
+-    limit = S_DATA_START + RAM_MPU_REGION_BLOCK_1_SIZE + RAM_MPU_REGION_BLOCK_2_SIZE;
+-    ret = configure_mpu(rnr++, base, limit,
+-                            XN_EXEC_NOT_OK, AP_RW_PRIV_UNPRIV);
+-    if (ret != TFM_HAL_SUCCESS) {
+-        return ret;
+-    }
+-
+     arm_mpu_enable();
+ 
+ #endif /* CONFIG_TFM_ENABLE_MEMORY_PROTECT */
+-- 
+2.25.1
+

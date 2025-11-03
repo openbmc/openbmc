@@ -1,0 +1,60 @@
+From c5cc03c196306372e53700553e0fb5135f6105e6 Mon Sep 17 00:00:00 2001
+From: Ihor Radchenko <yantar92@posteo.net>
+Date: Tue, 20 Feb 2024 12:47:24 +0300
+Subject: [PATCH] org-latex-preview: Add protection when `untrusted-content' is
+ non-nil
+
+* lisp/org/org.el (org--latex-preview-when-risky): New variable
+controlling how to handle LaTeX previews in Org files from untrusted
+origin.
+(org-latex-preview): Consult `org--latex-preview-when-risky' before
+generating previews.
+
+This patch adds a layer of protection when LaTeX preview is requested
+for an email attachment, where `untrusted-content' is set to non-nil.
+
+CVE: CVE-2024-30204
+
+Upstream-Status: Backport [https://cgit.git.savannah.gnu.org/cgit/emacs.git/commit/?h=emacs-29&id=6f9ea396f49cbe38c2173e0a72ba6af3e03b271c]
+Signed-off-by: Gyorgy Sarvari
+---
+ lisp/org/org.el | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/lisp/org/org.el b/lisp/org/org.el
+index d3e14fe..ab58978 100644
+--- a/lisp/org/org.el
++++ b/lisp/org/org.el
+@@ -1140,6 +1140,24 @@ the following lines anywhere in the buffer:
+   :package-version '(Org . "8.0")
+   :type 'boolean)
+ 
++(defvar untrusted-content) ; defined in files.el
++(defvar org--latex-preview-when-risky nil
++  "If non-nil, enable LaTeX preview in Org buffers from unsafe source.
++
++Some specially designed LaTeX code may generate huge pdf or log files
++that may exhaust disk space.
++
++This variable controls how to handle LaTeX preview when rendering LaTeX
++fragments that originate from incoming email messages.  It has no effect
++when Org mode is unable to determine the origin of the Org buffer.
++
++An Org buffer is considered to be from unsafe source when the
++variable `untrusted-content' has a non-nil value in the buffer.
++
++If this variable is non-nil, LaTeX previews are rendered unconditionally.
++
++This variable may be renamed or changed in the future.")
++
+ (defcustom org-insert-mode-line-in-empty-file nil
+   "Non-nil means insert the first line setting Org mode in empty files.
+ When the function `org-mode' is called interactively in an empty file, this
+@@ -15687,6 +15705,7 @@ fragments in the buffer."
+   (interactive "P")
+   (cond
+    ((not (display-graphic-p)) nil)
++   ((and untrusted-content (not org--latex-preview-when-risky)) nil)
+    ;; Clear whole buffer.
+    ((equal arg '(64))
+     (org-clear-latex-preview (point-min) (point-max))

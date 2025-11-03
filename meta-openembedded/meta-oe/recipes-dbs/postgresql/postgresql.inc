@@ -19,7 +19,7 @@ DESCRIPTION = "\
 "
 HOMEPAGE = "http://www.postgresql.com"
 LICENSE = "0BSD"
-DEPENDS = "libnsl2 readline tzcode-native"
+DEPENDS = "libnsl2 readline tzcode-native perl"
 
 ARM_INSTRUCTION_SET = "arm"
 
@@ -37,7 +37,7 @@ LEAD_SONAME = "libpq.so"
 export LDFLAGS_SL = "${LDFLAGS}"
 export LDFLAGS_EX_BE = "-Wl,--export-dynamic"
 
-inherit autotools pkgconfig perlnative python3native python3targetconfig useradd update-rc.d systemd gettext cpan-base multilib_header
+inherit autotools pkgconfig perlnative python3native python3targetconfig useradd update-rc.d systemd gettext perl-version multilib_header
 
 CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR} -I${STAGING_INCDIR}/tcl8.6"
 
@@ -121,6 +121,12 @@ python populate_packages:prepend() {
     bb.debug(1, "PACKAGES2=%s" % pack)
 
 }
+
+# Same as the function in cpan-base.bbclass (but without the perl RDEPENDS)
+def is_target(d):
+    if not bb.data.inherits_class('native', d):
+        return "yes"
+    return "no"
 
 # This will make native perl use target settings (for include dirs etc.)
 export PERLCONFIGTARGET = "${@is_target(d)}"

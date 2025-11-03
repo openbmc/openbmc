@@ -30,16 +30,9 @@ To make this happen, you must inherit the
 
    INHERIT += "create-spdx"
 
-Upon building an image, you will then get:
-
--  :term:`SPDX` output in JSON format as an ``IMAGE-MACHINE.spdx.json`` file in
-   ``tmp/deploy/images/MACHINE/`` inside the :term:`Build Directory`.
-
--  This toplevel file is accompanied by an ``IMAGE-MACHINE.spdx.index.json``
-   containing an index of JSON :term:`SPDX` files for individual recipes.
-
--  The compressed archive ``IMAGE-MACHINE.spdx.tar.zst`` contains the index
-   and the files for the single recipes.
+Upon building an image, you will then get the compressed archive
+``IMAGE-MACHINE.spdx.tar.zst`` contains the index and the files for the single
+recipes.
 
 The :ref:`ref-classes-create-spdx` class offers options to include
 more information in the output :term:`SPDX` data:
@@ -56,7 +49,7 @@ more information in the output :term:`SPDX` data:
 
 Though the toplevel :term:`SPDX` output is available in
 ``tmp/deploy/images/MACHINE/`` inside the :term:`Build Directory`, ancillary
-generated files are available in ``tmp/deploy/spdx/MACHINE`` too, such as:
+generated files are available in ``tmp/deploy/spdx`` too, such as:
 
 -  The individual :term:`SPDX` JSON files in the ``IMAGE-MACHINE.spdx.tar.zst``
    archive.

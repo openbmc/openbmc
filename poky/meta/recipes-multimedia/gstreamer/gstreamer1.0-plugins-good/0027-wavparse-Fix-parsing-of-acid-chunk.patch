@@ -1,0 +1,65 @@
+From 296e17b4ea81e5c228bb853f6037b654fdca7d47 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 4 Oct 2024 13:15:27 +0300
+Subject: [PATCH 3/7] wavparse: Fix parsing of acid chunk
+
+Simply casting the bytes to a struct can lead to crashes because of unaligned
+reads, and is also missing the endianness swapping that is necessary on big
+endian architectures.
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8042>
+
+CVE: CVE-2024-47775
+CVE: CVE-2024-47776
+CVE: CVE-2024-47777
+CVE: CVE-2024-47778
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/296e17b4ea81e5c228bb853f6037b654fdca7d47]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/wavparse/gstwavparse.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/gst/wavparse/gstwavparse.c b/gst/wavparse/gstwavparse.c
+index 21cb48c07e..6a0c44638e 100644
+--- a/gst/wavparse/gstwavparse.c
++++ b/gst/wavparse/gstwavparse.c
+@@ -1433,8 +1433,7 @@ gst_wavparse_stream_headers (GstWavParse * wav)
+         break;
+       }
+       case GST_RIFF_TAG_acid:{
+-        const gst_riff_acid *acid = NULL;
+-        const guint data_size = sizeof (gst_riff_acid);
++        const guint data_size = 24;
+         gfloat tempo;
+ 
+         GST_INFO_OBJECT (wav, "Have acid chunk");
+@@ -1448,13 +1447,13 @@ gst_wavparse_stream_headers (GstWavParse * wav)
+           break;
+         }
+         if (wav->streaming) {
++          const guint8 *data;
+           if (!gst_wavparse_peek_chunk (wav, &tag, &size)) {
+             goto exit;
+           }
+           gst_adapter_flush (wav->adapter, 8);
+-          acid = (const gst_riff_acid *) gst_adapter_map (wav->adapter,
+-              data_size);
+-          tempo = acid->tempo;
++          data = gst_adapter_map (wav->adapter, data_size);
++          tempo = GST_READ_FLOAT_LE (data + 20);
+           gst_adapter_unmap (wav->adapter);
+         } else {
+           GstMapInfo map;
+@@ -1465,8 +1464,7 @@ gst_wavparse_stream_headers (GstWavParse * wav)
+                       &buf)) != GST_FLOW_OK)
+             goto header_pull_error;
+           gst_buffer_map (buf, &map, GST_MAP_READ);
+-          acid = (const gst_riff_acid *) map.data;
+-          tempo = acid->tempo;
++          tempo = GST_READ_FLOAT_LE (map.data + 20);
+           gst_buffer_unmap (buf, &map);
+         }
+         /* send data as tags */
+-- 
+2.30.2
+

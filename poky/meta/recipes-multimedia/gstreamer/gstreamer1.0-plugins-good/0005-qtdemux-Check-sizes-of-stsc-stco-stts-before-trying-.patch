@@ -1,0 +1,63 @@
+From 1fac18a8fa269343dd43c9a4bca8d89f307fb7a0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian@centricular.com>
+Date: Fri, 27 Sep 2024 15:50:54 +0300
+Subject: [PATCH 05/13] qtdemux: Check sizes of stsc/stco/stts before trying to
+ merge entries
+
+Thanks to Antonio Morales for finding and reporting the issue.
+
+Fixes GHSL-2024-246
+Fixes https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/3854
+
+Part-of: <https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/8109>
+
+CVE: CVE-2024-47598
+Upstream-Status: Backport [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/commit/1fac18a8fa269343dd43c9a4bca8d89f307fb7a0]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ gst/isomp4/qtdemux.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/gst/isomp4/qtdemux.c b/gst/isomp4/qtdemux.c
+index 4bb24b1b80..d1aa9ee5a0 100644
+--- a/gst/isomp4/qtdemux.c
++++ b/gst/isomp4/qtdemux.c
+@@ -9476,6 +9476,21 @@ qtdemux_merge_sample_table (GstQTDemux * qtdemux, QtDemuxStream * stream)
+     return;
+   }
+ 
++  if (gst_byte_reader_get_remaining (&stream->stts) < 8) {
++    GST_DEBUG_OBJECT (qtdemux, "Too small stts");
++    return;
++  }
++
++  if (stream->stco.size < 8) {
++    GST_DEBUG_OBJECT (qtdemux, "Too small stco");
++    return;
++  }
++
++  if (stream->n_samples_per_chunk == 0) {
++    GST_DEBUG_OBJECT (qtdemux, "No samples per chunk");
++    return;
++  }
++
+   /* Parse the stts to get the sample duration and number of samples */
+   gst_byte_reader_skip_unchecked (&stream->stts, 4);
+   stts_duration = gst_byte_reader_get_uint32_be_unchecked (&stream->stts);
+@@ -9487,6 +9502,13 @@ qtdemux_merge_sample_table (GstQTDemux * qtdemux, QtDemuxStream * stream)
+   GST_DEBUG_OBJECT (qtdemux, "sample_duration %d, num_chunks %u", stts_duration,
+       num_chunks);
+ 
++  if (gst_byte_reader_get_remaining (&stream->stsc) <
++      stream->n_samples_per_chunk * 3 * 4 +
++      (stream->n_samples_per_chunk - 1) * 4) {
++    GST_DEBUG_OBJECT (qtdemux, "Too small stsc");
++    return;
++  }
++
+   /* Now parse stsc, convert chunks into single samples and generate a
+    * new stsc, stts and stsz from this information */
+   gst_byte_writer_init (&stsc);
+-- 
+2.30.2
+

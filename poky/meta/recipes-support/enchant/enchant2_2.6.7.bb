@@ -14,7 +14,7 @@ inherit autotools pkgconfig github-releases
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/enchant-${PV}.tar.gz"
 SRC_URI[sha256sum] = "a1c2e5b59acca000bbfb24810af4a1165733d407f2154786588e076c8cd57bfc"
 
-GITHUB_BASE_URI = "https://github.com/AbiWord/enchant/releases"
+GITHUB_BASE_URI = "https://github.com/rrthomas/enchant/releases"
 
 S = "${WORKDIR}/enchant-${PV}"
 

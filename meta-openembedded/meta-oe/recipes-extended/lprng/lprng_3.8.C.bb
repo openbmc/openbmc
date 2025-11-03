@@ -11,7 +11,9 @@ SRC_URI[sha256sum] = "694a1747a96385b89e93f43343bf35cee5c8c73353a83814106911c99f
 
 inherit autotools gettext
 
-EXTRA_OECONF = "--disable-ssl --disable-kerberos --enable-force_localhost"
+EXTRA_OECONF = "--disable-ssl --disable-kerberos --enable-force_localhost \
+				CHOWN=${base_bindir}/chown CHGRP=${base_bindir}/chgrp \
+				OPENSSL=${bindir}/openssl PRUTIL=${bindir}/pr"
 FILES:${PN}-dbg += "${libdir}/lprng/filters/.debug"
 
 # configure: WARNING: Program 'clear' is not found. Set environment CLEAR=no if you do not want to use it

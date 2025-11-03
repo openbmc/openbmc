@@ -276,6 +276,8 @@ def write_bblayers_conf(d, baseoutpath, sdkbblayers):
 def copy_uninative(d, baseoutpath):
     import shutil
 
+    uninative_checksum = None
+
     # Copy uninative tarball
     # For now this is where uninative.bbclass expects the tarball
     if bb.data.inherits_class('uninative', d):
@@ -288,6 +290,8 @@ def copy_uninative(d, baseoutpath):
     return uninative_checksum
 
 def write_local_conf(d, baseoutpath, derivative, core_meta_subdir, uninative_checksum):
+    import shutil
+
     #check if custome templateconf path is set
     use_custom_templateconf = d.getVar('SDK_CUSTOM_TEMPLATECONF')
 
@@ -730,7 +734,7 @@ sdk_ext_postinst() {
 		echo "# Save and reset OECORE_NATIVE_SYSROOT as buildtools may change it" >> $env_setup_script
 		echo "SAVED=\"\$OECORE_NATIVE_SYSROOT\"" >> $env_setup_script
 		echo ". $target_sdk_dir/buildtools/environment-setup*" >> $env_setup_script
-		echo "OECORE_NATIVE_SYSROOT=\"\$SAVED\"" >> $env_setup_script
+		echo "export OECORE_NATIVE_SYSROOT=\"\$SAVED\"" >> $env_setup_script
 	fi
 
 	# Allow bitbake environment setup to be ran as part of this sdk.

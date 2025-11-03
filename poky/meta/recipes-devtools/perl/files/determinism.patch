@@ -8,9 +8,9 @@ b) Sort the order of the module lists from configure_mods.sh since otherwise
    the result isn't the same leading to makefile differences.
    Reported upstream: https://github.com/arsv/perl-cross/issues/88
 
-c) Sort the Encode::Byte byte_t.fnm file output (and the makefile depends whilst 
+c) Sort the Encode::Byte byte_t.fnm file output (and the makefile depends whilst
    there for good measure)
-   This needs to go to upstream perl (not done)
+   Submitted to upstream perl: https://github.com/dankogai/p5-encode/pull/179
 
 d) Use bash for perl-cross configure since otherwise trnl gets set to "\n" with bash
    and "" with dash
@@ -18,7 +18,7 @@ d) Use bash for perl-cross configure since otherwise trnl gets set to "\n" with 
 
 RP 2020/2/7
 
-Upstream-Status: Pending [75% submitted]
+Upstream-Status: Submitted [see links above]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org
 
 Index: perl-5.30.1/cpan/Encode/Byte/Makefile.PL

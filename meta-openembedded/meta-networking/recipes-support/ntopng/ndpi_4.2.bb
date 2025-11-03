@@ -26,3 +26,5 @@ do_configure:prepend() {
 EXTRA_OEMAKE = " \
     libdir=${libdir} \
 "
+
+CVE_STATUS[CVE-2025-25066] = "cpe-incorrect: Current version (4.2) is not affected."
