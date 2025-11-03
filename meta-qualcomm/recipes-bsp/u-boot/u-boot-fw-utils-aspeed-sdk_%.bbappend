@@ -1,1 +1,0 @@
-u-boot-aspeed-sdk_%.bbappend

@@ -14,7 +14,7 @@
 #
 # Machine Selection
 #
-MACHINE ??= "qualcomm-dc-scm-v1"
+MACHINE ??= "qcom-bmc-ast2600"
 
 #
 # Where to place downloads
