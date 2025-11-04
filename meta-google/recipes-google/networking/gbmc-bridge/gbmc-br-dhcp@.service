@@ -6,10 +6,10 @@ StartLimitIntervalSec=10
 StartLimitBurst=3
 
 [Service]
-EnvironmentFile=/etc/os-release
+EnvironmentFile=/usr/share/br-dhcp-env
 Restart=on-failure
 RestartSec=5
-ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i %I -s /usr/libexec/gbmc-br-dhcp.sh -x search:${VERSION_ID}
+ExecStart=/usr/bin/udhcpc6 -f -q -O fqdn -O bootfile_url -O bootfile_param -i %I -s /usr/libexec/gbmc-br-dhcp.sh ${GBMCBR_VENDOR_CLASS_V6}
 
 [Install]
 WantedBy=multi-user.target
