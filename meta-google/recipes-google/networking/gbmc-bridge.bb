@@ -169,8 +169,8 @@ do_install() {
   if [ ! -z "${L2BR_DHCP_TYPE}" ]; then
     l2br_vc_opt_v4="${@build_vendor_option(1, d.getVar("L2BR_DHCP_TYPE"), d.getVar("MACHINE"), d.getVar("GBMC_VERSION"))}"
     l2br_vc_opt_v6="${@build_vendor_option(0, d.getVar("L2BR_DHCP_TYPE"), d.getVar("MACHINE"), d.getVar("GBMC_VERSION"))}"
-    l2br_env_v4="L2BR_VENDOR_CLASS_V4='-V $l2_vc_opt_v4'"
-    l2br_env_v6="L2BR_VENDOR_CLASS_V6='-x $l2_vc_opt_v6'"
+    l2br_env_v4="L2BR_VENDOR_CLASS_V4='-V $l2br_vc_opt_v4'"
+    l2br_env_v6="L2BR_VENDOR_CLASS_V6='-x $l2br_vc_opt_v6'"
   fi
   printf "%s\n%s\n%s\n%s\n" "$gbmcbr_env_v4" "$gbmcbr_env_v6" "$l2br_env_v4" "$l2br_env_v6" > ${UNPACKDIR}/br-dhcp-env
 
