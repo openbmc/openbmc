@@ -15,6 +15,7 @@ SRC_URI = " \
           "
 
 RDEPENDS:${PN} = "bash"
+SYSTEMD_SERVICE:${PN} = ""
 
 do_install() {
     install -d ${D}/usr/sbin
