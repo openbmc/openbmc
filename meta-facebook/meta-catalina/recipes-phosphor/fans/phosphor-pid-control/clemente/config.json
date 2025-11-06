@@ -85,23 +85,9 @@
             "ignoreDbusMinMax": true
         },
         {
-            "name": "PDB_HSC1_TEMP_C",
+            "name": "PDB_MAX_VR_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_HSC1_TEMP_C",
-            "timeout": 0,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "PDB_HSC2_TEMP_C",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_HSC2_TEMP_C",
-            "timeout": 0,
-            "ignoreDbusMinMax": true
-        },
-        {
-            "name": "PDB_INLET_TEMP_C",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_INLET_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_MAX_VR_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -443,9 +429,7 @@
                         "PDB_VR_P12V_N1_1_TEMP_C",
                         "PDB_VR_P12V_N2_0_TEMP_C",
                         "PDB_VR_P12V_N2_1_TEMP_C",
-                        "PDB_HSC1_TEMP_C",
-                        "PDB_HSC2_TEMP_C",
-                        "PDB_INLET_TEMP_C"
+                        "PDB_MAX_VR_TEMP_C"
                     ],
                     "setpoint": 0.0,
                     "pid": {
@@ -473,9 +457,7 @@
                         "PDB_VR_P12V_N1_1_TEMP_C",
                         "PDB_VR_P12V_N2_0_TEMP_C",
                         "PDB_VR_P12V_N2_1_TEMP_C",
-                        "PDB_HSC1_TEMP_C",
-                        "PDB_HSC2_TEMP_C",
-                        "PDB_INLET_TEMP_C"
+                        "PDB_MAX_VR_TEMP_C"
                     ],
                     "setpoint": 92.0,
                     "pid": {
