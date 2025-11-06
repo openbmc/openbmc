@@ -4,4 +4,4 @@ StartLimitIntervalSec=0
 
 [Service]
 Restart=no
-ExecStart=/usr/sbin/ampere_add_redfishevent.sh OpenBMC.0.1.AmpereEvent "CPU%i HighTemp deasserted"
+ExecStart=/usr/sbin/ampere_hightemp.sh %i deasserted
