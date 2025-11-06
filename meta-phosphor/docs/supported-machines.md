@@ -45,6 +45,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * santabarbara
   * tiogapass
   * ventura
+  * ventura2
   * yosemite4
   * yosemite4n
   * yosemite5
