@@ -9,6 +9,7 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         boost \
         nlohmann-json \
+        stdexec \
         systemd \
         "
 
