@@ -41,7 +41,6 @@ gbmc_nic_neigh_set() {
   done
 
   local intf
-  local failed_intfs=()
   for intf in "${gbmc_nic_neigh_intfs[@]}"; do
     local rt
     rt="$(gbmc_net_route_table_for_intf "$intf")" || continue
@@ -73,22 +72,9 @@ EOF
       fi
     done
 
-    local st=0
-    ip -6 rule del to "$ip/64" pref "$GBMC_INTF_ROUTE_TABLE_BASE" lookup main 2>dev/null || true
-    ip -6 rule del from "$ip/64" pref "$rt" lookup "$rt" 2>/dev/null || true
-
     if [[ "$act" == add ]]; then
-      sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null || st=$?
-      for neigh_ip in "${neigh_ips[@]}"; do
-        ip -6 neigh "$act" proxy "$neigh_ip" dev "$intf" || st=$?
-      done
-      ip -6 rule add to "$ip/64" pref "$GBMC_INTF_ROUTE_TABLE_BASE" lookup main || st=$?
-      ip -6 rule add from "$ip/64" pref "$rt" lookup "$rt" || st=$?
-    fi
-    [[ "$st" == "0" ]] || failed_intfs+=("$intf")
-
-    # Write the necessary firewall rules to forward IP traffic
-    if [[ "$act" == add ]]; then
+      sysctl net.ipv6.conf."$intf".proxy_ndp=1 >/dev/null
+      # Write the necessary firewall rules to forward IP traffic
       cat >/run/nftables/40-gbmc-"$intf"-br.rules <<EOF
 table inet filter {
   chain ${intf}_forward {
@@ -102,9 +88,8 @@ EOF
   done
   systemctl reset-failed nftables || true
   systemctl --no-block reload-or-restart nftables || true
-  if (( "${#failed_intfs[@]}" > 0 )); then
-    gbmc_net_networkd_reload "${failed_intfs[@]}"
-  fi
+  # shellcheck disable=SC2119
+  gbmc_net_networkd_reload
 }
 
 gbmc_nic_neigh_hook() {
