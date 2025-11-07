@@ -127,5 +127,19 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "FM_MAIN_PWREN_RMC_EN_ISO_R",
+        "LineName": "FM_MAIN_PWREN_RMC_EN_ISO_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-rmc-main-power-enable.service"
+            ],
+            "FALLING": [
+                "assert-rmc-main-power-enable.service"
+            ]
+        },
+        "Continue": true
     }
 ]

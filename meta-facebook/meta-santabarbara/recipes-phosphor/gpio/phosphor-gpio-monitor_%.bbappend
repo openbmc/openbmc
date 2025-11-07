@@ -5,9 +5,11 @@ inherit obmc-phosphor-systemd systemd
 SERVICE_LIST = "assert-post-end.service \
                 assert-power-good-drop.service \
                 assert-reset-button.service \
+                assert-rmc-main-power-enable.service \
                 deassert-post-end.service \
                 deassert-power-good-drop.service \
                 deassert-reset-button.service \
+                deassert-rmc-main-power-enable.service \
                 platform-host-ready.target \
                 power-rail-assert-log@.service \
                 power-rail-deassert-log@.service \
@@ -24,9 +26,11 @@ SRC_URI += " \
     file://assert-post-end \
     file://assert-power-good-drop \
     file://assert-reset-button \
+    file://assert-rmc-main-power-enable \
     file://deassert-post-end \
     file://deassert-power-good-drop \
     file://deassert-reset-button \
+    file://deassert-rmc-main-power-enable \
     file://multi-gpios-sys-init \
     file://plat-phosphor-multi-gpio-monitor.json \
     file://power-rail-event-logger \
@@ -55,9 +59,11 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/assert-post-end ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/assert-rmc-main-power-enable ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-post-end ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/deassert-rmc-main-power-enable ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
