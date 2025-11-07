@@ -32,25 +32,40 @@ retry_command() {
     return 1
 }
 
-# Learn BIC Endpoint
-learn_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
-    /au/com/codeconstruct/mctp1/interfaces/mctpi2c${bic_busnum} \
-    au.com.codeconstruct.MCTP.BusOwner1 LearnEndpoint ay 1 ${bic_addr}"
+setup_bic_eid() {
+    # Check if the endpoint exists
+    if busctl introspect au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/10; then
+        echo "[Info] BIC endpoint already exists, removing..."
+        busctl call au.com.codeconstruct.MCTP1 \
+            /au/com/codeconstruct/mctp1/networks/1/endpoints/10 \
+            au.com.codeconstruct.MCTP.Endpoint1 Remove
+    fi
 
-if ! retry_command "$learn_endpoint_cmd" "$maxRetries" 1; then
-    echo "[Error] Failed to learn BIC EID after $maxRetries attempts."
-    exit 1
-fi
+    # Learn BIC Endpoint
+    learn_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/interfaces/mctpi2c${bic_busnum} \
+        au.com.codeconstruct.MCTP.BusOwner1 LearnEndpoint ay 1 ${bic_addr}"
 
-# Set local EID for NIC
-assign_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
-    /au/com/codeconstruct/mctp1/interfaces/mctpi2c${nic_busnum} \
-    au.com.codeconstruct.MCTP.BusOwner1 \
-    AssignEndpointStatic ayy 1 ${nic_addr} ${nic_eid}"
+    if ! retry_command "$learn_endpoint_cmd" "$maxRetries" 1; then
+        echo "[Error] Failed to learn BIC EID after $maxRetries attempts."
+        exit 1
+    fi
+}
 
-if ! retry_command "$assign_endpoint_cmd" "$maxRetries" 1; then
-    echo "[Error] Failed to assign NIC EID after $maxRetries attempts."
-    exit 1
-fi
+setup_nic_eid() {
+    # Set local EID for NIC
+    assign_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/interfaces/mctpi2c${nic_busnum} \
+        au.com.codeconstruct.MCTP.BusOwner1 \
+        AssignEndpointStatic ayy 1 ${nic_addr} ${nic_eid}"
+
+    if ! retry_command "$assign_endpoint_cmd" "$maxRetries" 1; then
+        echo "[Error] Failed to assign NIC EID after $maxRetries attempts."
+        exit 1
+    fi
+}
+
+setup_bic_eid
+setup_nic_eid
 
 exit 0
