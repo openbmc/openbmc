@@ -1,21 +1,30 @@
 #!/bin/bash
 
+I2C_BUS=10
+DEV_ADDR=0x40
+
 is_valid_hdc1080()
 {
-    local I2C_BUS=$1
-    local DEV_ADDR=$2
+    local prev_id=""
+    local dev_id
 
-    MFR_ID=$(i2ctransfer -y -f "${I2C_BUS}" w1@"${DEV_ADDR}" 0xfe r2)
-    if [ "$MFR_ID" != "0x54 0x49" ]; then
-        return 1;
-    fi
+    for _ in {1..10}; do
+        if ! dev_id=$(i2ctransfer -y -f "$I2C_BUS" w1@"$DEV_ADDR" 0xff r2 2>/dev/null); then
+            prev_id=""
+            sleep 0.1
+            continue
+        fi
 
-    DEV_ID=$(i2ctransfer -y -f "${I2C_BUS}" w1@"${DEV_ADDR}" 0xff r2)
-    if [ "$DEV_ID" != "0x10 0x50" ]; then
-        return 1;
-    fi
+        if [ -n "$dev_id" ]; then
+            if [ "$dev_id" = "$prev_id" ]; then
+                [ "$dev_id" = "0x10 0x50" ] && return 0 || return 1
+            fi
+            prev_id="$dev_id"
+        fi
+        sleep 0.1
+    done
 
-    return 0;
+    return 1
 }
 
 set_frontpanel_model()
@@ -23,15 +32,12 @@ set_frontpanel_model()
     busctl set-property xyz.openbmc_project.Settings /xyz/openbmc_project/inventory/system/chassis0/frontpanel xyz.openbmc_project.Inventory.Decorator.Asset Model s "Bletchley_FPB_${1}"
 }
 
-I2C_BUS=10
-DEV_ADDR=0x40
-
 VIRT_SNR_CONF="/var/lib/phosphor-virtual-sensor/virtual_sensor_config.json"
 HDC1080_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_hdc1080.json"
 SI7021_VIRT_SNR_CONF="/usr/share/phosphor-virtual-sensor/virtual_sensor_config_si7021.json"
 
 # Check chip type
-if is_valid_hdc1080 "$I2C_BUS" "$DEV_ADDR"; then
+if is_valid_hdc1080; then
     CHIP_TYPE="HDC1080"
 else
     CHIP_TYPE="SI7021"
