@@ -17,25 +17,18 @@
 
 : "${GBMC_UPGRADE_SIG=/tmp/bmc.sig}"
 
-GBMC_UPGRADE_UNPACK_FILES=()
+GBMC_UPGRADE_UNPACK_FILES+=("*/firmware-gbmc/*")
 # shellcheck disable=SC2034
 GBMC_UPGRADE_HOOKS=(gbmc_upgrade_internal)
 
 # metadata stored in an array
 GBMC_UPGRADE_METADATA=()
 
-if machine="$(source /etc/os-release && echo "$GBMC_TARGET_MACHINE")"; then
-  GBMC_UPGRADE_UNPACK_FILES+=("*/firmware-gbmc/$machine")
-else
-  echo 'Failed to find GBMC machine type from /etc/os-release' >&2
-fi
-
 gbmc_upgrade_get_version(){
   local version_file
-  if ! version_file=$(gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/${machine}(/[^/]+)*/VERSION$"); then
+  if ! version_file=$(gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/[^/]+(/[^/]+)*/VERSION$"); then
     update_netboot_status "upgrade" "Couldn't find version file, trying regex" "ONGOING"
-    # we expect this regex to match something like: packages/firmware-gbmc/MACHINE/some-services/22.47.18.0/image
-    if gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/${machine}(/[^/]+)*/(([0-9]+[.]){3}[0-9]+)/[^/]+$" > /dev/null; then
+    if gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/[^/]+(/[^/]+)*/(([0-9]+[.]){3}[0-9]+)/[^/]+$" > /dev/null; then
       echo "${BASH_REMATCH[2]}"
       update_netboot_status "upgrade" "Obtained version from metadata filenames." "ONGOING"
       return 0
@@ -55,7 +48,7 @@ gbmc_upgrade_get_version(){
 gbmc_upgrade_download_image_and_sig(){
   local image
   local version=$1
-  if ! image=$(gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/${machine}(/[^/]+)*/${version}/image-gbmc-${machine}$"); then
+  if ! image=$(gbmc_upgrade_metadata_first_match "^.*/firmware-gbmc/[^/]+(/[^/]+)*/stage-msvfud/${version}/image-gbmc-[^/]+$"); then
      update_netboot_status "upgrade" "Could not find image" "FAIL"
      return 1
   fi
@@ -72,11 +65,16 @@ gbmc_upgrade_download_image_and_sig(){
 
 gbmc_upgrade_metadata_first_match() {
   local regex="$1"
+  local exclude_regex="${2-}"
 
   for item in "${GBMC_UPGRADE_METADATA[@]}"; do
     if [[ "$item" =~ $regex ]]; then
+      # If an exclusion regex is provided, skip matches that also match it
+      if [[ -n "$exclude_regex" && "$item" =~ $exclude_regex ]]; then
+        continue
+      fi
       echo "$item" # Return the whole line match
-      return 0 # Exit the function after the first match
+      return 0 # Exit the function after the first valid match
     fi
   done
   return 1 # Return 1 if no match is found
