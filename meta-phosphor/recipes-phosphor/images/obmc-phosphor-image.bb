@@ -44,6 +44,7 @@ IMAGE_FEATURES += " \
         obmc-settings-mgmt \
         obmc-telemetry \
         obmc-dmtf-pmci \
+        obmc-dmtf-spdm \
         obmc-webui \
         obmc-tpm \
         "

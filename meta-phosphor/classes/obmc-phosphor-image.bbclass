@@ -67,6 +67,7 @@ FEATURE_PACKAGES_obmc-user-mgmt-ldap ?= "packagegroup-obmc-apps-user-mgmt-ldap"
 FEATURE_PACKAGES_obmc-dmtf-pmci ?= "packagegroup-obmc-apps-dmtf-pmci"
 FEATURE_PACKAGES_obmc-tpm ?= "packagegroup-obmc-apps-tpm"
 FEATURE_PACKAGES_obmc-webui ?= "packagegroup-obmc-apps-webui"
+FEATURE_PACKAGES_obmc-dmtf-spdm ?= "packagegroup-obmc-apps-dmtf-spdm"
 
 # FIXME: phosphor-net-ipmi depends on phosphor-ipmi-host !?!? and
 # cannot be built on core-qemu machines because of the dependency

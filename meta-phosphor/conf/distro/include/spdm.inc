@@ -1,0 +1,2 @@
+DISTRO_FEATURES += "spdm"
+DISTROOVERRIDES .= ":df-spdm"
