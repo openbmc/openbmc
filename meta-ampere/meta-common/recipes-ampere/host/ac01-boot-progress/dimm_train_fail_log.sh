@@ -1,28 +1,14 @@
 #!/bin/bash
+
+# shellcheck source=meta-ampere/meta-common/recipes-ampere/platform/ampere-utils/ampere_redfish_utils.sh
+source /usr/sbin/ampere_redfish_utils.sh
+
 smpro_path() {
 	if [ "$1" == 0 ]; then
 		echo "/sys/bus/i2c/drivers/smpro-core/2-004f"
 	else
 		echo "/sys/bus/i2c/drivers/smpro-core/2-004e"
 	fi
-}
-
-function log_ampere_oem_redfish_event()
-{
-	msg=$1
-	priority=$2
-	severity=$3
-	msgID=$4
-	msgArgs1=$5
-	msgArgs2=$6
-
-logger --journald << EOF
-MESSAGE=${msg}
-PRIORITY=${priority}
-SEVERITY=${severity}
-REDFISH_MESSAGE_ID=${msgID}
-REDFISH_MESSAGE_ARGS=${msgArgs1},${msgArgs2}
-EOF
 }
 
 parse_phy_syndrome_s1_type() {
@@ -96,23 +82,22 @@ log_err_to_redfish_err() {
 	# PHY sysdrom errors
 	fType=""
 	redfisComp="DIMM"
-	redfisMsg=""
+	error=""
 	if [ $trErrType == 1 ]; then
 		fType="PHY training failure"
-		redfisMsg=$(parse_phy_syndrome $syndrome0 $syndrome1)
+		error=$(parse_phy_syndrome $syndrome0 $syndrome1)
 	# DIMM traning errors
 	elif [ $trErrType == 2 ]; then
 		fType="DIMM training failure"
-		redfisMsg=$(parse_dimm_syndrome $syndrome0)
+		error=$(parse_dimm_syndrome $syndrome0)
 	else
 		fType="Invalid DIMM Syndrome error type"
-		redfisMsg="NA"
+		error="NA"
 	fi
 
-	#smg=$("DDR training: MCU rank $rank: $fType: $redfisMsg")
-	log_ampere_oem_redfish_event \
-		"" 2 "" "OpenBMC.0.1.AmpereCritical" \
-		$redfisComp "Slot $channel MCU rank $rank: $fType: $redfisMsg"
+	redfisMsg="$redfisComp Slot $channel MCU rank $rank: $fType: $error"
+
+	add_ampere_critical_sel  "Smpro" "$redfisMsg"
 }
 
 log_err_to_sel_err() {
