@@ -1,0 +1,16 @@
+[
+    {
+        "Name": "FM_PWRGD_CPU0_PWROK",
+        "LineName": "FM_PWRGD_CPU0_PWROK",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-power-good-drop.service"
+            ],
+            "FALLING": [
+                "assert-power-good-drop.service"
+            ]
+        },
+        "Continue": true
+    }
+]

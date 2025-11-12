@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+# shellcheck source=meta-facebook/meta-anacapa/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# SGPIO Out
+set_gpio SYSTEM_Force_Run_AC_Cycle 0
+set_gpio Force_I3C_SEL 0
+set_gpio FM_CLR_CMOS_R_P0 0
+set_gpio FM_CPU0_PROCHOT_trigger_N 1
+set_gpio CPU0_KBRST_N 1
+set_gpio FM_CPU0_SYS_RESET_N 1
+
+set_gpio FM_CPU0_NMI_SYNC_FLOOD_N 1
+set_gpio FM_BRIDGE_JTAG_MUX_SEL 0
+set_gpio FM_SCM_JTAG_MUX_SEL 0
+set_gpio FM_CPU_FPGA_JTAG_MUX_SEL 1
+
+
+set_gpio Port80_b0 1
+set_gpio Port80_b1 1
+set_gpio Port80_b2 1
+set_gpio Port80_b3 1
+set_gpio Port80_b4 1
+set_gpio Port80_b5 1
+set_gpio Port80_b6 1
+set_gpio Port80_b7 1
+
+set_gpio NFC_VEN 1
+
+
+set_gpio SGPIO_READY 1
+
+#set_gpio FM_BMC_READY_PLD 1
+set_gpio BMC_READY 1
+
+# DCSCM power led control signal "wile and" between scm cpld and bmc
+# bmc set pin as input and let scm cpld control LED only
+get_gpio PWR_LED
+
+exit 0
