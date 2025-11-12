@@ -115,6 +115,16 @@ bind_fru_eeproms()
     bind_i2c_device at24 15-0052
     # OSFP FRU
     bind_i2c_device at24 29-0052
+    # Boot drive FRU
+    bind_i2c_device at24 45-0053
+    # Data drive 1 FRU
+    bind_i2c_device at24 48-0053
+    # Data drive 2 FRU
+    bind_i2c_device at24 50-0053
+    # Data drive 3 FRU
+    bind_i2c_device at24 52-0053
+    # Data drive 4 FRU
+    bind_i2c_device at24 54-0053
 }
 
 bind_hsc_sensors()
