@@ -6,7 +6,7 @@ Wants=xyz.openbmc_project.gpiopresence.service
 After=xyz.openbmc_project.gpiopresence.service
 
 [Service]
-ExecStartPre=/bin/sleep 10
+ExecStartPre=/bin/sleep 30
 ExecStart=/usr/libexec/minerva-fan-status-monitor
 SyslogIdentifier=Minerva Fan Status Monitor
 Type=simple
