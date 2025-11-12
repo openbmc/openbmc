@@ -16,7 +16,6 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
 # TODO: Remove it when 69903 applied
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-poweron@{}.target.wants/chassis-poweron@{}.service \
-    obmc-chassis-hard-poweroff@{}.target.wants/chassis-poweroff@{}.service \
     obmc-chassis-powercycle@{}.target.wants/chassis-powercycle@{}.service \
     "
 
