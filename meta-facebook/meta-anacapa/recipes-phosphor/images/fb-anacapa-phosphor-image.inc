@@ -6,7 +6,11 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     obmc-phosphor-buttons-handler \
 "
 
-# Monitor power status, e.g., handle power good and post-end signals
+# Monitor presence GPIO status
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-gpio-monitor-presence \
+"
+# Monitor power status, for example, add handling for power good and post-end signals to manage power status.
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
