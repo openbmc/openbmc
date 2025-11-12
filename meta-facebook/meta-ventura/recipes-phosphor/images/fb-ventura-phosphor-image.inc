@@ -45,3 +45,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     persistent-rs485-port-mapping \
 "
+
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-modbus \
+"
