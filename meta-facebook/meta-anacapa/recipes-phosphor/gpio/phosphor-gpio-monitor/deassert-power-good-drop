@@ -5,6 +5,9 @@ source /usr/libexec/fb-common-functions
 # shellcheck source=meta-facebook/meta-anacapa/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+# when host power on, bind pca9546 on bridge L/R board
+bind_i2c_device pca954x 0-0070 3
+bind_i2c_device pca954x 1-0070 3
 
 currentstate=$(busctl get-property \
     xyz.openbmc_project.State.Host0 \
