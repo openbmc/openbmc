@@ -26,7 +26,7 @@ setup_mctp_interface() {
         echo "$iface is already up, skipping"
     else
         echo "Setting up $iface"
-        mctp link set "$iface" up
+        mctp link set "$iface" mtu 68 up
     fi
 
     if is_eid_assigned "$iface" "$LOCAL_EID"; then
