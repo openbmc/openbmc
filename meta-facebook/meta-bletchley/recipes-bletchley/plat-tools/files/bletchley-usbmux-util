@@ -8,6 +8,7 @@ if [ "$#" -ge 2 ]; then
 fi
 
 DEVMEM_MUX_REG=0x1e780088
+DEVMEM_MUX_DIR_REG=0x1e78008C # mux gpio driection
 
 declare -A MUX_NIBBLES=(
     ["1"]="C"    # 1100 -> C
@@ -28,17 +29,18 @@ get_third_byte_upper_nibble() {
 }
 
 set_upper_nibble() {
-    local target_nibble=$1
+    local register=$1
+    local target_nibble=$2
 
-    current_value=$(devmem $DEVMEM_MUX_REG)
+    current_value=$(devmem "$register")
     current_nibble=$(get_third_byte_upper_nibble "$current_value")
 
-    echo "Current register value: $current_value"
+    echo "Register $register current value: $current_value"
 
     # Check if we need to change anything
     if [ "$current_nibble" = "$target_nibble" ]; then
         #echo "Upper nibble already set to 0x$target_nibble, no change needed"
-        exit 0
+        return 0
     fi
 
     current_value=$(echo "$current_value" | sed -E 's/^(0x|0X)//i')
@@ -46,8 +48,13 @@ set_upper_nibble() {
     # Replace only the upper nibble of third byte (5th character from left)
     # Keep everything else the same: XXXX[N]YZZ -> XXXX[target]YZZ
     new_value="0x${current_value:0:4}${target_nibble}${current_value:5:3}"
-    devmem "$DEVMEM_MUX_REG" 32 "$new_value"
-    echo "Register $DEVMEM_MUX_REG written with $new_value"
+    if devmem "$register" 32 "$new_value"; then
+        echo "Register $register written with $new_value"
+        return 0
+    else
+        echo "Register $register failed to set to $new_value"
+        return 1
+    fi
 }
 
 print_help()
@@ -60,43 +67,52 @@ print_help()
     echo ""
 }
 
+# set mux gpio driection to output
+set_mux_gpio_direction()
+{
+    set_upper_nibble "$DEVMEM_MUX_DIR_REG" "F"
+}
+
 usb_mux_off()
 {
-    set_upper_nibble "${MUX_NIBBLES[off]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[off]}"
 }
 
 usb_mux_sled1()
 {
-    set_upper_nibble "${MUX_NIBBLES[1]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[1]}"
 }
 
 usb_mux_sled2()
 {
-    set_upper_nibble "${MUX_NIBBLES[2]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[2]}"
 }
 
 usb_mux_sled3()
 {
-    set_upper_nibble "${MUX_NIBBLES[3]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[3]}"
 }
 
 usb_mux_sled4()
 {
-    set_upper_nibble "${MUX_NIBBLES[4]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[4]}"
 }
 
 usb_mux_sled5()
 {
-    set_upper_nibble "${MUX_NIBBLES[5]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[5]}"
 }
 
 usb_mux_sled6()
 {
-    set_upper_nibble "${MUX_NIBBLES[6]}"
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[6]}"
 }
+
+set_mux_gpio_direction
 
 if [ "$CMD" == "off" ]; then
     usb_mux_off
+    exit 0
 elif [ "$CMD" == "on" ]; then
     if [ "$SLED_INDEX" -eq 1 ]; then
         usb_mux_sled1
