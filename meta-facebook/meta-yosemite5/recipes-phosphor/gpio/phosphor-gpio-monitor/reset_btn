@@ -5,7 +5,7 @@ source /usr/libexec/yosemite5-common-functions
 input="$1"
 
 if [ "$input" == "RISING" ] ; then
-    set_gpio RST_BMC_RSTBTN_OUT_N       1
+    set_gpio SGPIO_RSTBTN_OUT       0
 elif [ "$input" == "FALLING" ] ; then
-    set_gpio RST_BMC_RSTBTN_OUT_N       0
+    set_gpio SGPIO_RSTBTN_OUT       1
 fi
