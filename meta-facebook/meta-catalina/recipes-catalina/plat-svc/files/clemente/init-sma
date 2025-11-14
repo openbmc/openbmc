@@ -1,0 +1,291 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+MAX_RETRY=5
+RETRY_DELAY_SEC=1
+REGEX_EIP_POOL="([0-9]?[0-9]) ([0-9]?[0-9])"
+cx_eids=()
+brd_map=()
+osfp_pr=()
+
+remove_eid()
+{
+    local eid=$1
+    if mapper get-service /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" 2>/dev/null; then
+        #echo removing eid ${eid}
+        busctl call au.com.codeconstruct.MCTP1 \
+        "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" \
+        au.com.codeconstruct.MCTP.Endpoint1 \
+        Remove
+    fi
+}
+
+is_cx8_ready()
+{
+    local iob_index=$1
+    local cur_retry=0
+    local cx_ready=0
+    local cx_boot=0
+    local line_names=(\
+             "CX_BOOT_CMPLT_CX0" \
+             "CX_BOOT_CMPLT_CX1" \
+             "SEC_CX_BOOT_CMPLT_CX0" \
+             "SEC_CX_BOOT_CMPLT_CX0"\
+          )
+    while [ $cur_retry -lt $MAX_RETRY ]
+    do
+        cur_retry=$((cur_retry+1))
+        if timeout 3 mapper wait "/xyz/openbmc_project/inventory/system/board/NVIDIA_GB300_IO_Board_${iob_index}"; then
+            for i in 0 1; do
+                local line_name=${line_names[${iob_index}*2+$i]}
+                cx_boot=$(get_gpio "$line_name")
+                echo "${line_name} --> ${cx_boot}"
+                if [[ ${cx_boot} -eq 1 ]]; then
+                    cx_ready=$((cx_ready+1))
+                fi
+            done
+            if [[ ${cx_ready} -eq 2 ]]; then
+                # extra delay is needed
+                sleep 5
+                echo "CX8 I/O Mezz ${iob_index} is ready"
+                return 0
+            fi
+        fi
+        echo "Retry $cur_retry/$MAX_RETRY"
+        sleep 10
+    done
+    return 1
+}
+
+get_sma_eid_pool()
+{
+    local eid=$1
+    local regex="y ([0-9]?[0-9])"
+    local pool_start=""
+    local pool_end=""
+    local ret=""
+    if busctl introspect au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" | \
+        grep -q au.com.codeconstruct.MCTP.Bridge1; then
+        ret=$(
+            busctl get-property au.com.codeconstruct.MCTP1 \
+            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
+            au.com.codeconstruct.MCTP.Bridge1 PoolStart
+        )
+        if [[ $ret =~ $regex ]]; then
+            pool_start=${BASH_REMATCH[1]}
+        fi
+        ret=$(
+            busctl get-property au.com.codeconstruct.MCTP1 \
+            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
+            au.com.codeconstruct.MCTP.Bridge1 PoolEnd
+        )
+        if [[ $ret =~ $regex ]]; then
+            pool_end=${BASH_REMATCH[1]}
+        fi
+        echo "$pool_start" "$pool_end"
+    fi
+}
+
+remove_sma_eid()
+{
+    local eid=$1
+    local eid_pool=""
+    eid_pool=$(get_sma_eid_pool "$eid")
+    echo "endpoint ${eid} eid pool: (${eid_pool})"
+    if [[ ${eid_pool} =~ ${REGEX_EIP_POOL} ]]; then
+        for ds_eid in $(seq "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
+        do
+            remove_eid "$ds_eid"
+        done
+    fi
+    remove_eid "$eid"
+}
+
+remove_sma()
+{
+    remove_sma_eid 9
+    remove_sma_eid 14
+}
+
+check_fw_version()
+{
+    local eid=$1
+    local regex="[0-9]+\.[0-9]+\.([0-9]+)\.[0-9]"
+    local version=""
+    version=$(
+        pldmtool fw_update GetFwParams -m "$eid" |
+            jq --raw-output \
+                '.ComponentParameterEntries | .[].ActiveComponentVersionString'
+    )
+    if [[ $version =~ $regex ]]; then
+        echo "eid ${eid} SMA firmware version ${version}"
+        if [[ $((10#${BASH_REMATCH[1]})) -lt 137 ]]; then
+            echo "Warning: SMA firmware is too old. Upgrade first!"
+            return 1
+        fi
+        return 0
+    fi
+    echo "Version format error"
+    return 1
+}
+
+enum_downstream()
+{
+    local eid=$1
+    local bid=$2
+    local has_osfp_tsense=0
+    if ! busctl call au.com.codeconstruct.MCTP1 \
+         /au/com/codeconstruct/mctp1/networks/1 \
+         au.com.codeconstruct.MCTP.Network1 \
+         LearnEndpoint y "$eid"; then
+        #echo "LearnEndpoint ${eid} Failed."
+        return 1
+    fi
+    has_osfp_tsense=$(
+        pldmtool platform GetPDR -m "$eid" -a |
+           jq --raw-output 'map(select(.sensorID == 500)) | length > 0'
+    )
+    if ${has_osfp_tsense}; then
+       osfp_pr+=(1)
+    else
+       osfp_pr+=(0)
+    fi
+    cx_eids+=("$eid")
+    brd_map+=("$bid")
+    return 0
+}
+
+setup_eid()
+{
+    local mctp_intf=$1
+    local mctp_eid=$2
+    local iob_index=$3
+    local cur_retry=0
+    local num_of_cx=0
+    local res=""
+    local eid_pool=""
+
+    while [ $cur_retry -lt $MAX_RETRY ]
+    do
+        cur_retry=$((cur_retry+1))
+        # Temporarily assign static endpoint to SMA for version checking and
+        # firmware upgrage if the version is older than 137.
+        if busctl call au.com.codeconstruct.MCTP1 \
+               "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" \
+               au.com.codeconstruct.MCTP.BusOwner1 \
+               AssignEndpointStatic ayy 0 "${mctp_eid}"; then
+            break
+        fi
+        echo "Set EID:${mctp_eid} at INTF:${mctp_intf} failed. Retry $cur_retry/$MAX_RETRY"
+        sleep "$RETRY_DELAY_SEC"
+    done
+    if check_fw_version "$mctp_eid"; then
+        remove_eid "${mctp_eid}"
+        local regex="[a-z]+ ([0-9]+) [0-9]+ \".+\" (true|false)"
+        # Assign EID to MCTP bridge and allocate a contiguous range of EIDs
+        # for the bridge's downstream endpoints.
+        res=$(
+            busctl call au.com.codeconstruct.MCTP1 \
+            "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" \
+            au.com.codeconstruct.MCTP.BusOwner1 \
+            AssignEndpoint ay 0
+        )
+        echo "$res"
+        if [[ $res =~ $regex ]]; then
+            mctp_eid=${BASH_REMATCH[1]}
+        fi
+        is_cx8_ready "$iob_index"
+        echo "Discovering bridged endpoints"
+        eid_pool=$(get_sma_eid_pool "$mctp_eid")
+        if [[ ${eid_pool} =~ ${REGEX_EIP_POOL} ]]; then
+            for bridged_eid in $(seq "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
+            do
+                if enum_downstream "$bridged_eid" "$iob_index"; then
+                    num_of_cx=$((num_of_cx+1))
+                fi
+            done
+        fi
+    fi
+    if [[ $num_of_cx -eq 0 ]]; then
+        return 1
+    fi
+    return 0
+}
+
+setup_sma()
+{
+    local res=0
+    if ! setup_eid mcu1u2u2 9 0; then
+        res=1
+    fi
+    if ! setup_eid mcu1u2u7u2 14 1; then
+        res=1
+    fi
+    # Signal the readiness of CXs and start pldmd.service
+    systemctl start cx-ready.target
+    systemctl start pldmd
+    return "$res"
+}
+
+###### Temporary functions ######
+get_numeric_sensor_by_eid()
+{
+    local eid=$1
+    local snr_id=$2
+    local pldmtool_out
+
+    pldmtool_out="$(pldmtool platform GetSensorReading -i "$snr_id" -r 0 -m "$eid")"
+    if echo "$pldmtool_out" | jq 'has("presentReading")' | grep -q true; then
+        echo "$pldmtool_out" | jq '.presentReading'
+        return 0
+    else
+        return 1
+    fi
+}
+
+update_numeric_sensor_value()
+{
+    local eid="$1"
+    local snr_id="$2"
+    local snr_name="$3"
+    local snr_val
+
+    if snr_val="$(get_numeric_sensor_by_eid "${eid}" "${snr_id}")"; then
+        # The sensor (ID 50) has "unitModifier" = -1 in PDR.
+        # The actual reading should be the original value * 0.1.
+        if [[ ${snr_id} -eq 50 ]]; then
+            snr_val="$((snr_val/10)).$((snr_val%10))"
+        fi
+    else
+        echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, snr_id: $snr_id, snr_name: $snr_name"
+        snr_val="nan"
+    fi
+    busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$snr_name" xyz.openbmc_project.Sensor.Value Value d "$snr_val"
+}
+###### End of Temporary functions ######
+
+
+remove_sma
+
+if ! setup_sma; then
+    exit 1
+fi
+
+###### Short term solution that is bound to be replaced by pldmd ######
+while systemctl is-active --quiet cx-ready.target
+do
+  sleep 2
+  for (( i=0; i<${#cx_eids[@]}; i++ ))
+  do
+      update_numeric_sensor_value "${cx_eids[$i]}" 300 temperature/IOB"${brd_map[$i]}"_NIC$((i%2))_TEMP_C
+      update_numeric_sensor_value "${cx_eids[$i]}" 50  power/IOB"${brd_map[$i]}"_NIC$((i%2))_PWR_W
+      if [[ ${osfp_pr[$i]} -ne 0 ]]; then
+          update_numeric_sensor_value "${cx_eids[$i]}" 500 temperature/IOB"${brd_map[$i]}"_NIC$((i%2))_OSFP_TEMP_C
+      fi
+  done
+done
+###### End of Short term solution ######
+
+exit 0

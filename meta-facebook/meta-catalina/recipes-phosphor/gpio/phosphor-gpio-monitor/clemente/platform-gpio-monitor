@@ -53,6 +53,10 @@ set_request_host_transition()
 do_RUN_POWER_PG_change()
 {
     if [ "$STATE" = "assert" ]; then
+        if ! systemctl is-active --quiet init-sma.service; then
+            echo "start init-sma"
+            systemctl start init-sma.service
+        fi
         set_gpio "PCI_MUX_SEL" "$GPIO_HIGH"
 
         host_state="$(get_current_host_state)"
@@ -72,6 +76,12 @@ do_RUN_POWER_PG_change()
             set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
         fi
     else
+        if systemctl is-active --quiet init-sma.service; then
+            echo "stop init-sma"
+            systemctl stop init-sma.service
+            systemctl stop cx-ready.target
+            systemctl stop pldmd
+        fi
         set_gpio "PCI_MUX_SEL" "$GPIO_LOW"
 
         host_state="$(get_current_host_state)"

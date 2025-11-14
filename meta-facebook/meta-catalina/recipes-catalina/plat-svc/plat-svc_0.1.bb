@@ -64,11 +64,15 @@ SRC_URI:append:clemente = " \
     file://backend-nic-driver-bind.service \
     file://check-bootdrive-led \
     file://check-bootdrive-led.service \
+    file://init-sma \
+    file://init-sma.service \
     "
 
 SYSTEMD_SERVICE:${PN}:append:clemente = " \
     backend-nic-driver-bind.service \
     check-bootdrive-led.service \
+    init-sma.service \
+    cx-ready.target \
     "
 
 do_install:append:clemente() {
@@ -76,4 +80,5 @@ do_install:append:clemente() {
     install -d ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/check-bootdrive-led ${PLATSVC_LIBEXECDIR}
+    install -m 0755 ${UNPACKDIR}/init-sma ${PLATSVC_LIBEXECDIR}
 }

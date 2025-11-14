@@ -136,4 +136,8 @@ config_hsc
 rebind_hsc_lm5066i lm25066 1-0012
 rebind_hsc_lm5066i lm25066 1-0014
 
+# Enable SMAs
+set_gpio "MCU_RST_N" 1
+set_gpio "SEC_MCU_RST_N" 1
+
 exit 0
