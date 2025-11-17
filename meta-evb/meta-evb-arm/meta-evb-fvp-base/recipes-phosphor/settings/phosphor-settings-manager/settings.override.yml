@@ -1,0 +1,5 @@
+/xyz/openbmc_project/ipmi/sol/eth0:
+    - Interface: xyz.openbmc_project.Ipmi.SOL
+      Properties:
+          Enable:
+              Default: 'true'
