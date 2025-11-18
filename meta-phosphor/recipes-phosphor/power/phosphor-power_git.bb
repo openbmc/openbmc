@@ -14,6 +14,7 @@ require ${BPN}.inc
 S = "${WORKDIR}/git"
 
 POWER_SERVICE_PACKAGES = " \
+    ${PN}-chassis \
     ${PN}-cold-redundancy \
     ${PN}-monitor \
     ${PN}-psu-monitor \
@@ -48,6 +49,7 @@ DEPENDS += " \
 PACKAGECONFIG[monitor] = "-Dsupply-monitor=true, -Dsupply-monitor=false"
 PACKAGECONFIG[monitor-ng] = "-Dsupply-monitor-ng=true, -Dsupply-monitor-ng=false"
 
+CHASSIS_POWER_SVC = "phosphor-chassis-power.service"
 SEQ_MONITOR_SVC = "pseq-monitor.service"
 SEQ_PGOOD_SVC = "pseq-monitor-pgood.service"
 PSU_MONITOR_TMPL = "power-supply-monitor@.service"
@@ -58,6 +60,7 @@ REGS_MON_ENA_SVC = "phosphor-regulators-monitor-enable.service"
 REGS_MON_DIS_SVC = "phosphor-regulators-monitor-disable.service"
 POWER_CONTROL_SVC = "phosphor-power-control.service"
 
+SYSTEMD_SERVICE:${PN}-chassis = "${CHASSIS_POWER_SVC}"
 SYSTEMD_SERVICE:${PN}-sequencer = "${SEQ_MONITOR_SVC} ${SEQ_PGOOD_SVC}"
 SYSTEMD_SERVICE:${PN}-monitor = "${@bb.utils.contains('PACKAGECONFIG', 'monitor', '${PSU_MONITOR_TMPL}', '', d)}"
 SYSTEMD_SERVICE:${PN}-psu-monitor = "${@bb.utils.contains('PACKAGECONFIG', 'monitor-ng', '${PSU_MONITOR_SVC}', '', d)}"
@@ -69,6 +72,7 @@ EXTRA_OEMESON:append = " -Dtests=disabled"
 # TODO: cold-redundancy is not installed in the repo yet
 # FILES:${PN}-cold-redundancy = "${bindir}/cold-redundancy"
 
+FILES:${PN}-chassis = "${libexecdir}/phosphor-power/phosphor-chassis-power"
 FILES:${PN}-monitor = "${bindir}/psu-monitor"
 FILES:${PN}-psu-monitor = "${bindir}/phosphor-psu-monitor ${datadir}/phosphor-psu-monitor"
 FILES:${PN}-regulators = "${bindir}/phosphor-regulators ${datadir}/phosphor-regulators"
