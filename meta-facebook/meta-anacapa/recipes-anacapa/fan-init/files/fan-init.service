@@ -1,0 +1,11 @@
+[Unit]
+Description = PWM Initialization
+Before=xyz.openbmc_project.fansensor.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/fan-init/fan-init
+
+[Install]
+WantedBy=multi-user.target
+

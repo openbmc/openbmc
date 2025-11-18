@@ -14,3 +14,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
+
+# Add temporary fan-init service.
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    fan-init \
+"

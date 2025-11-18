@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# Variables aren't actually unused, but are indirectly dereferenced.
+# shellcheck disable=SC2034
+
+#Fan I2C Bus & Address
+LPDB_BUS=33
+LPDB_ADDR1=0x2B
+LPDB_ADDR2=0x2F
+RPDB_BUS=32
+RPDB_ADDR1=0x2B
+
+#Fan Register Setting
+FREQ=0xBB
+CONFIG_LPDB1=(0x08 0x08 0x08 0x08 0x08 0x19)
+CONFIG_LPDB2=(0x08 0x08 0x08 0x00 0x00 0x00)
+CONFIG_RPDB1=(0x08 0x08 0x08 0x08 0x19 0x19)
+DYNAMICS=0x6C
+PWM=0xE6
+
+configure_fan_controller() {
+    local bus=$1
+    local addr=$2
+    local -n configs=$3
+
+    echo "Configuring controller at bus $bus addr $addr..."
+
+    # Set fan PWM frequency to 25kHz
+    i2cset -f -y "$bus" "$addr" 0x01 "$FREQ"
+
+    # Set fan config (registers 0x02 to 0x07)
+    for i in {0..5}; do
+        reg=$(printf "0x%02X" $((0x02 + i)))
+        i2cset -f -y "$bus" "$addr" "$reg" "${configs[$i]}"
+    done
+
+    # Set dynamics registers (0x08 to 0x0D)
+    for reg in {8..13}; do
+        i2cset -f -y "$bus" "$addr" "$reg" "$DYNAMICS"
+    done
+
+    # Set pwm to 90% (0x40, 0x42, 0x44, 0x46, 0x48)
+    for ((i=0; i<5; i++)); do
+        reg=$(printf "0x%X" $((0x40 + i * 2)))
+        i2cset -f -y "$bus" "$addr" "$reg" "$PWM"
+    done
+}
+
+register_device() {
+    local bus=$1
+    local addr=$2
+    echo max31790 "$addr" > "/sys/bus/i2c/devices/i2c-${bus}/new_device"
+}
+
+# ---- LPDB (Fan1~Fan5)----
+# Fan controller #1 (0x2b @ bus 33)
+
+configure_fan_controller $LPDB_BUS $LPDB_ADDR1 CONFIG_LPDB1
+
+# Fan controller #2 (0x2f @ bus 33)
+
+configure_fan_controller $LPDB_BUS $LPDB_ADDR2 CONFIG_LPDB2
+
+# ---- RPDB (Fan6~Fan9)----
+# Fan controller #1 (0x2b @ bus 32)
+
+configure_fan_controller $RPDB_BUS $RPDB_ADDR1 CONFIG_RPDB1
+
+# Device Registration
+register_device $RPDB_BUS $RPDB_ADDR1
+register_device $LPDB_BUS $LPDB_ADDR1
+register_device $LPDB_BUS $LPDB_ADDR2
+
+exit 0
