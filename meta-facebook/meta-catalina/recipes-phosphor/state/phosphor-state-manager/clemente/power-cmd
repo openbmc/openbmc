@@ -70,7 +70,7 @@ chassis_power_cycle()
     # If turn HSC power off while main power is up (and not doing a proper shutdown
     # before removing standby power), then the FPGA would see this as a power fault.
     if [ "$(host_power_status)" == "on" ]; then
-        set_gpio "hard_shutdown_host" 0
+        set_gpio "shdn_force_l_cpld" 0
         if ! wait_host_power_change "off" 5; then
             echo "[DEBUG] force-off host failed in power cycle"
         fi
