@@ -1,0 +1,7 @@
+[Unit]
+Description=GPIO BYPASS:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/gpio_bypass %i
+SyslogIdentifier=gpio_bypass%i

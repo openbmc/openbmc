@@ -34,5 +34,35 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "RST_PCIE_BOOT_PERST_N",
+        "LineName": "RST_PCIE_BOOT_PERST_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["gpio_bypass@RST_PCIE_BOOT_PERST_N:RISING.service"],
+            "FALLING": ["gpio_bypass@RST_PCIE_BOOT_PERST_N:FALLING.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "E1S_0_PRSNT_N",
+        "LineName": "E1S_0_PRSNT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["gpio_bypass@E1S_0_PRSNT_N:RISING.service"],
+            "FALLING": ["gpio_bypass@E1S_0_PRSNT_N:FALLING.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "E1S_1_PRSNT_N",
+        "LineName": "E1S_1_PRSNT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["gpio_bypass@E1S_1_PRSNT_N:RISING.service"],
+            "FALLING": ["gpio_bypass@E1S_1_PRSNT_N:FALLING.service"]
+        },
+        "Continue": true
     }
 ]

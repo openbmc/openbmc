@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+input="$1"
+if [[ "$input" != *":"* ]]; then
+    echo "Error: Invalid instance format, expected ':' separator"
+    exit 1
+fi
+
+GPIO_NET=$(echo "$input" | cut -d':' -f1)
+Event=$(echo "$input" | cut -d':' -f2)
+
+if [[ "$GPIO_NET" = "RST_PCIE_BOOT_PERST_N" ]]; then
+    if [[ "$Event" = "RISING" ]]; then
+        set_gpio RST_PCIE_E1S_0_PERST 1
+        set_gpio RST_PCIE_E1S_1_PERST 1
+    else
+        set_gpio RST_PCIE_E1S_0_PERST 0
+        set_gpio RST_PCIE_E1S_1_PERST 0
+    fi
+fi
+
+if [[ "$GPIO_NET" = "E1S_0_PRSNT_N" ]]; then
+    if [[ "$Event" = "RISING" ]]; then
+        set_gpio P12V_E1S_EN_0 0
+    else
+        set_gpio P12V_E1S_EN_0 1
+    fi
+fi
+
+if [[ "$GPIO_NET" = "E1S_1_PRSNT_N" ]]; then
+    if [[ "$Event" = "RISING" ]]; then
+        set_gpio P12V_E1S_EN_1 0
+    else
+        set_gpio P12V_E1S_EN_1 1
+    fi
+fi
+
+
+
+
+
