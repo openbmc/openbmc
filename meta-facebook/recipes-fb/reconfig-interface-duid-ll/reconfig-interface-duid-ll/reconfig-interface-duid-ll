@@ -4,23 +4,28 @@ INTF_NAME="$1"
 NET_CONFIG_FILE="/etc/systemd/network/00-bmc-${INTF_NAME}.network"
 DHCPv6_SETTING_ADD="ClientIdentifier=duid\nIAID=0\nDUIDType=link-layer"
 
-for i in {1..10}; do
-    if [ -f "$NET_CONFIG_FILE" ]; then
-        if ! grep -q "^DUIDType=" "$NET_CONFIG_FILE"; then
-            sed -i "/^\[DHCPv6\]/a $DHCPv6_SETTING_ADD" "$NET_CONFIG_FILE"
-            echo "Added LL settings to network configuration file."
-            echo "Restarting systemd-networkd service..."
-            systemctl restart systemd-networkd.service
-            exit 0
+# retry: wait for network manager to finish writing DHCPv6 section
+for round in {1..3}; do
+    for i in {1..10}; do
+        if [ -f "$NET_CONFIG_FILE" ]; then
+            if ! grep -q "^DUIDType=" "$NET_CONFIG_FILE"; then
+                sed -i "/^\[DHCPv6\]/a $DHCPv6_SETTING_ADD" "$NET_CONFIG_FILE"
+                echo "Added LL settings to network configuration file."
+                echo "Restarting systemd-networkd service..."
+                systemctl restart systemd-networkd.service
+                break
+            else
+                echo "'DUIDType' already exists in $NET_CONFIG_FILE. Exiting..."
+                break
+            fi
         else
-            echo "'DUIDType' already exists in $NET_CONFIG_FILE. Exiting..."
-            exit 0
+            echo "File $NET_CONFIG_FILE not present. Retrying... ($i/10)"
         fi
-    else
-        echo "File $NET_CONFIG_FILE not present. Retrying... ($i/10)"
-    fi
-    sleep 5
+        sleep 5
+    done
+    echo "Waiting for DHCPv6 section... ($round/3)"
+    sleep 25
 done
 
-echo "Failed to update $NET_CONFIG_FILE after 10 attempts."
+echo "Check $NET_CONFIG_FILE after 3 rounds."
 exit 1
