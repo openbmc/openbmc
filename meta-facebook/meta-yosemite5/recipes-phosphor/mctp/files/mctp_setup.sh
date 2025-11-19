@@ -5,7 +5,7 @@ dev="${1:-}"
 # Mapping table: "devname:iface:physaddr:eid"
 declare -a endpoint_map=(
     "nic_mctp:mctpi2c4:0x32:10"
-    "cxl_mctp:mctpi2c12:0x33:20"
+    "cxl_mctp:mctpi2c12:0x32:20"
 )
 
 is_eid_assigned() {

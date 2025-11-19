@@ -14,8 +14,8 @@
         "LineName": "host0-ready",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-host-ready.service"],
-            "FALLING": ["assert-host-ready.service"]
+            "RISING": ["deassert-host-ready.service", "mctp_remove.service"],
+            "FALLING": ["assert-host-ready.service", "mctp_setup@cxl_mctp.service"]
         },
         "Continue": true
     },

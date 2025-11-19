@@ -1,0 +1,6 @@
+[Unit]
+Description=Remove CXL MCTP Endpoint ID (EID)
+
+[Service]
+Type=oneshot
+ExecStart=busctl call au.com.codeconstruct.MCTP1 /au/com/codeconstruct/mctp1/networks/1/endpoints/20 au.com.codeconstruct.MCTP.Endpoint1 Remove
