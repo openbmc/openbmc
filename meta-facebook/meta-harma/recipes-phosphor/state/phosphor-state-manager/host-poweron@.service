@@ -17,7 +17,11 @@ ConditionPathExists=!/run/openbmc/host@%i-on
 Restart=no
 Type=oneshot
 RemainAfterExit=yes
+ExecStartPre=/bin/sleep 0.2
+ExecStartPre=-/usr/libexec/fb-common-functions set_gpio power-host-control 1
+ExecStartPre=/bin/sleep 0.2
 ExecStart=/usr/libexec/phosphor-state-manager/host-poweron %i
+ExecStop=-/usr/libexec/fb-common-functions set_gpio power-host-control 1
 
 [Install]
 RequiredBy=obmc-host-startmin@%i.target

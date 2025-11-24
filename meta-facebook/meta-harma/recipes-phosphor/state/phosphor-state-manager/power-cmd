@@ -84,8 +84,6 @@ graceful_power_off() {
 
 # DC on
 power_on() {
-    set_gpio power-host-control 1
-    sleep 1
     if [ "$(power_status)" == "off" ]; then
         set_gpio power-host-control 0
         sleep 1

@@ -8,8 +8,11 @@ Conflicts=obmc-host-startmin@%i.target
 Restart=no
 Type=oneshot
 RemainAfterExit=yes
+ExecStartPre=/bin/sleep 0.2
+ExecStartPre=-/usr/libexec/fb-common-functions set_gpio power-host-control 1
+ExecStartPre=/bin/sleep 0.2
 ExecStart=/usr/libexec/phosphor-state-manager/host-force-poweroff %i
-ExecStop=/usr/libexec/fb-common-functions set_gpio power-host-control 1
+ExecStop=-/usr/libexec/fb-common-functions set_gpio power-host-control 1
 
 [Install]
 RequiredBy=obmc-host-stop@%i.target
