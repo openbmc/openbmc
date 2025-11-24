@@ -64,6 +64,10 @@ setup_nic_eid() {
 }
 
 setup_bic_eid
+
+# The NIC only supports the minimum MTU.
+mctp link set mctpi2c1 mtu 68
+sleep 2
 setup_nic_eid
 
 exit 0
