@@ -19,6 +19,10 @@ SYSTEMD_SERVICE:${PN} = "phosphor-health-monitor.service"
 inherit meson pkgconfig
 inherit systemd
 
+SRC_URI:append:df-phosphor-mmc = " \
+    file://bmc_health_config.json \
+"
+
 do_install:append() {
   if [ -e "${UNPACKDIR}/bmc_health_config.json" ]; then
     install -d ${D}${sysconfdir}/healthMon
