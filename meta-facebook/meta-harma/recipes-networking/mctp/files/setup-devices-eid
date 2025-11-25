@@ -48,7 +48,6 @@ setup_bic_eid() {
 
     if ! retry_command "$learn_endpoint_cmd" "$maxRetries" 1; then
         echo "[Error] Failed to learn BIC EID after $maxRetries attempts."
-        exit 1
     fi
 }
 
@@ -61,7 +60,6 @@ setup_nic_eid() {
 
     if ! retry_command "$assign_endpoint_cmd" "$maxRetries" 1; then
         echo "[Error] Failed to assign NIC EID after $maxRetries attempts."
-        exit 1
     fi
 }
 
