@@ -12,4 +12,8 @@ PACKAGECONFIG:append = " \
     redfish-dump-log \
 "
 
+PACKAGECONFIG:remove = " \
+    redfish-oem-manager-fan-data \
+"
+
 MUTUAL_TLS_PARSING = "UserPrincipalName"

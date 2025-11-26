@@ -1,6 +1,5 @@
 EXTRA_OEMESON:append = " \
     -Dibm-management-console=enabled \
-    -Dredfish-oem-manager-fan-data=disabled \
     -Dinsecure-enable-redfish-query=enabled \
     -Dhttp-body-limit=400 \
     -Dredfish-use-hardcoded-system-location-indicator=disabled \
@@ -12,6 +11,7 @@ PACKAGECONFIG:append = " \
 
 PACKAGECONFIG:remove = " \
     redfish-bmc-journal \
+    redfish-oem-manager-fan-data \
 "
 
 EXTRA_OEMESON:append:p10bmc = " \
