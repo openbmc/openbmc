@@ -3,6 +3,9 @@
 # shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
 #Sled cycle
 echo "Starting Chassis Power Cycle"
 
@@ -72,10 +75,30 @@ chassis-power-cycle()
     return $ret
 }
 
+declare -A iris_map=(
+    [0]="FM_MODULE_PWR_EN_N_1B"
+    [1]="FM_MODULE_PWR_EN_N_3B"
+    [2]="FM_MODULE_PWR_EN_N_2B"
+    [3]="FM_MODULE_PWR_EN_N_4B"
+)
+
+iris-power-cycle() {
+    local gpio="${iris_map[$1]}"
+
+    set_gpio "$gpio" 1
+    sleep 5
+    set_gpio "$gpio" 0
+}
+
 ChassisNumber=$1
 
 if [ "$ChassisNumber" == 0 ]
 then
   echo "Starting Chassis Power Cycle"
   chassis-power-cycle
+elif [ "$ChassisNumber" == 1 ] || [ "$ChassisNumber" == 2 ] || 
+    [ "$ChassisNumber" == 3 ] || [ "$ChassisNumber" == 4 ]
+then
+  echo "Starting Iris Module $ChassisNumber Power Cycle"
+  iris-power-cycle $((ChassisNumber - 1))
 fi
