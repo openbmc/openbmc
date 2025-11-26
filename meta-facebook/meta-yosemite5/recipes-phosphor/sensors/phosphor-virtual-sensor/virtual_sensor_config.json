@@ -1,1 +1,286 @@
-[]
+[
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN0_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN0_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": "fan_vol / fan_imp"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN1_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN1_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": "fan_vol / fan_imp"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN2_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN2_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": "fan_vol / fan_imp"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN3_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN3_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": "fan_vol / fan_imp"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN0_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN0_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN1_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN1_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN2_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN2_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN3_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN3_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    }
+]
