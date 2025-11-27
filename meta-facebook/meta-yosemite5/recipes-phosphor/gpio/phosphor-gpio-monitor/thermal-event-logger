@@ -1,0 +1,66 @@
+#!/bin/bash
+
+HELP="
+Usage: thermal-event-logger <type> <gpio name>
+<event> is the event type,
+e.g. assert/deassert.
+
+<gpio-name> is defined in json file,
+e.g. FM_CPU0_THERMTRIP_N
+"
+
+# check if parameters are missing
+if [[ -z "$1" || -z "$2" ]]; then
+    echo "Missing required arguments: event type, gpio name."
+    echo "$HELP"
+    exit 1
+fi
+
+# get some parameters
+GPIO_NAME=$2
+case $1-$2 in
+    assert-FM_CPU_THERMTRIP_N)
+    MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOverOperatingTemperatureFault"
+    ;;
+    deassert-FM_CPU_THERMTRIP_N | assert-FM_CPU_PROCHOT_R_N)
+    MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOverOperatingTemperature"
+    ;;
+    deassert-FM_CPU_PROCHOT_R_N)
+    MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOperatingNormalTemperature"
+    ;;
+    *)
+    echo "Unrecognized event type or gpio name."
+    exit 1
+esac
+
+DEVICE_PATH="/xyz/openbmc_project/State/Thermal/cpu0"
+STASH_FILE="/run/${GPIO_NAME}.log_entry"
+
+case $1-$2 in
+    assert-*)
+        if [ ! -s "$STASH_FILE" ]; then
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"DEVICE\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${GPIO_NAME}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    deassert-FM_CPU_THERMTRIP_N)
+        if [ -e "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+        fi
+        ;;
+
+    deassert-FM_CPU_PROCHOT_R_N)
+        if [ -e "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+        fi
+        /usr/bin/log-create "$MSG_ID" --json \
+            "{ \"DEVICE\": \"${DEVICE_PATH}\"}"
+        ;;
+    *)
+        echo "Unrecognized thermal event."
+        exit 1
+esac
+
+exit 0

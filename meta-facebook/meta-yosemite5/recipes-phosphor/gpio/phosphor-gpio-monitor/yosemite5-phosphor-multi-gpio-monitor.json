@@ -58,5 +58,33 @@
             "FALLING": ["gpio_bypass@E1S_1_PRSNT_N:FALLING.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "FM_CPU_THERMTRIP_N",
+        "LineName": "FM_CPU_THERMTRIP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@FM_CPU_THERMTRIP_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@FM_CPU_THERMTRIP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_CPU_PROCHOT_R_N",
+        "LineName": "FM_CPU_PROCHOT_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@FM_CPU_PROCHOT_R_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@FM_CPU_PROCHOT_R_N.service"
+            ]
+        },
+        "Continue": true
     }
 ]
