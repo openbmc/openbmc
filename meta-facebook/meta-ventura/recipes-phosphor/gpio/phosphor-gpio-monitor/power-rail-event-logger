@@ -27,16 +27,14 @@ case "$1" in
     ;;
 
 "assert")
-    if [ ! -s "$stash_file" ]; then
-        log-create "xyz.openbmc_project.State.Power.PowerRailFault" --json \
-            "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$source")\"}" \
-            >"${stash_file}"
-    fi
+    log-create "xyz.openbmc_project.State.Power.PowerRailFault" --json \
+        "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$source")\"}" \
+        >"${stash_file}"
     ;;
 
 "deassert")
     if [ -s "${stash_file}" ]; then
-        log-resolve -p "$(<"${stash_file}")" && rm "${stash_file}"
+        log-resolve -p "$(<"${stash_file}")" ; rm "${stash_file}"
         log-create "xyz.openbmc_project.State.Power.PowerRailFaultRecovered" --json \
             "{ \"POWER_RAIL\": \"${device_path}\"}"
     fi

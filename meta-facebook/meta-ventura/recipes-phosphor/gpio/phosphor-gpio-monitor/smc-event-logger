@@ -66,16 +66,14 @@ case "$1" in
     ;;
 
 "assert")
-    if [ ! -s "$stash_file" ]; then
-        log-create "xyz.openbmc_project.State.SMC.SMCFailed" --json \
-            "{\"IDENTIFIER\": \"$(get_identifier "$gpio_name")\", \"FAILURE_TYPE\": \"$(get_failure_type "$gpio_name")\"}" \
-            >"${stash_file}"
-    fi
+    log-create "xyz.openbmc_project.State.SMC.SMCFailed" --json \
+        "{\"IDENTIFIER\": \"$(get_identifier "$gpio_name")\", \"FAILURE_TYPE\": \"$(get_failure_type "$gpio_name")\"}" \
+        >"${stash_file}"
     ;;
 
 "deassert")
     if [ -s "${stash_file}" ]; then
-        log-resolve -p "$(<"${stash_file}")" && rm "${stash_file}"
+        log-resolve -p "$(<"${stash_file}")" ; rm "${stash_file}"
         log-create "xyz.openbmc_project.State.SMC.SMCRestored" --json \
             "{\"IDENTIFIER\": \"$(get_identifier "$gpio_name")\"}"
     fi
