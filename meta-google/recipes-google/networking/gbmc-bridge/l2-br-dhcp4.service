@@ -7,7 +7,7 @@ StartLimitBurst=3
 
 [Service]
 EnvironmentFile=/usr/share/br-dhcp-env
-Restart=on-failure
+Restart=always
 RestartSec=5
 ExecStart=/usr/sbin/udhcpc -f -q -O hostname -O bootfile -i l2br -s /usr/libexec/gbmc-br-dhcp.sh ${L2BR_VENDOR_CLASS_V4}
 
