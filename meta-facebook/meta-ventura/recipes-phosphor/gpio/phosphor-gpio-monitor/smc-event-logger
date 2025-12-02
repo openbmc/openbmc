@@ -12,6 +12,16 @@ e.g. wAALC_RPU_READY
 gpio_name="$2"
 stash_file="/run/${gpio_name}.log_entry"
 
+# shellcheck source=meta-facebook/meta-ventura/recipes-ventura/plat-svc/files/gpio_util
+source "/usr/libexec/ventura/gpio_util"
+
+# For VT cooling systems, AALC-related signals should be ignored.
+if [[ "$gpio_name" == *RPU* || "$gpio_name" == *PUMP* ]] &&
+    [[ $(get_gpio_val_by_name "wPRSNT_RETURN_PLD_R_N") == 0 &&
+    $(get_gpio_val_by_name "wPRSNT_SUPPLY_PLD_R_N") == 0 ]]; then
+    exit 0
+fi
+
 get_failure_type() {
     if [ "$1" = "wAALC_RPU_READY" ]; then
         echo "Ready Timed-out"
