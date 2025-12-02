@@ -21,20 +21,27 @@ GBMC_UPGRADE_IMG=/run/initramfs/bmc-image
 
 gbmc_upgrade_internal() {
   local version
-  version="$(gbmc_upgrade_fetch)" || return
+  if [[ -n "${GBMC_UPGRADE_METADATA}" ]]; then
+    version="$(gbmc_upgrade_get_version)" || return
+  else
+    version="$(gbmc_upgrade_fetch)" || return
+  fi
 
-  echo "IMG Version: $version" >&2
+  update_netboot_status "bmc_flash" "Target firmware version is  $version" "START"
   local active_version
   active_version="$(inplace-gbmc-version.sh)" || return
-  echo "Active Version: $active_version" >&2
+  update_netboot_status "bmc_flash" "Running firmware version $active_version" "ONGOING"
   if [[ "$version" == "$active_version" ]]; then
-    echo 'Version already active' >&2
+    update_netboot_status "bmc_flash" "Version ${version} is already active" "SUCCESS"
     return 0
   fi
 
-  echo 'Verifying image' >&2
+  if [[ -n "${GBMC_UPGRADE_METADATA}" ]]; then
+    gbmc_upgrade_download_image_and_sig "$version"
+  fi
+  update_netboot_status "bmc_flash" "Verifying image $version" "ONGOING"
   systemctl start inplace-gbmc-verify || return
-  echo 'Rebooting to perform update' >&2
+  update_netboot_status "bmc_flash" "Rebooting to perform update to $version" "ONGOING"
   reboot || return
   # Ensure that we don't "complete" the netboot process until
   # after the update completes
