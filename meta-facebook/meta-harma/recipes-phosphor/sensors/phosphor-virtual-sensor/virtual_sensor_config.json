@@ -1,1 +1,150 @@
-[]
+[
+    {
+        "Desc": {
+            "Name": "VIRTUAL_FANBOARD1_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Harma_Fan_Board_1"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan1_vol",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN1_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan1_curr",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN1_CURR_A",
+                        "SensorType": "current"
+                    }
+                },
+                                {
+                    "ParamName": "fan2_vol",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN2_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan2_curr",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN2_CURR_A",
+                        "SensorType": "current"
+                    }
+                },
+                                {
+                    "ParamName": "fan3_vol",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN3_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan3_curr",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN3_CURR_A",
+                        "SensorType": "current"
+                    }
+                },
+                                {
+                    "ParamName": "fan4_vol",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN4_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan4_curr",
+                    "Desc": {
+                        "Name": "FAN_BP1_FAN4_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan1_vol * fan1_curr + fan2_vol * fan2_curr + fan3_vol * fan3_curr + fan4_vol * fan4_curr"
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_FANBOARD2_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Harma_Fan_Board_2"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan1_vol",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN1_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan1_curr",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN1_CURR_A",
+                        "SensorType": "current"
+                    }
+                },
+                                {
+                    "ParamName": "fan2_vol",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN2_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan2_curr",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN2_CURR_A",
+                        "SensorType": "current"
+                    }
+                },
+                                {
+                    "ParamName": "fan3_vol",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN3_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan3_curr",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN3_CURR_A",
+                        "SensorType": "current"
+                    }
+                },
+                                {
+                    "ParamName": "fan4_vol",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN4_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan4_curr",
+                    "Desc": {
+                        "Name": "FAN_BP2_FAN4_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan1_vol * fan1_curr + fan2_vol * fan2_curr + fan3_vol * fan3_curr + fan4_vol * fan4_curr"
+    }
+]
