@@ -1,10 +1,9 @@
 [Unit]
 Description=%i SMC Deassert
+Conflicts=smc-assert-log@%i.timer
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/systemctl stop smc-assert-log@%i.timer
 ExecStart=/usr/libexec/phosphor-gpio-monitor/smc-event-logger "deassert" "%i"
 SyslogIdentifier=%i-smc-deassert
 
-Conflicts=smc-assert-log@%i.timer

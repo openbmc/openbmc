@@ -1,7 +1,7 @@
 [Unit]
 Description=Timer to trigger SMC ready
 [Timer]
-OnActiveSec=5s
+OnActiveSec=15s
 Unit=smc-assert-log@%i.service
 [Install]
 WantedBy=timers.target
