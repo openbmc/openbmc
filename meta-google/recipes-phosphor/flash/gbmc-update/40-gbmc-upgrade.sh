@@ -84,6 +84,24 @@ gbmc_upgrade_metadata_first_match() {
   return 1 # Return 1 if no match is found
 }
 
+gbmc_upgrade_metadata_all_matches() {
+  local regex="$1"
+  local exclude_regex="${2-}"
+  local found_match=1 # Assume failure (no match)
+
+  for item in "${GBMC_UPGRADE_METADATA[@]}"; do
+    if [[ "$item" =~ $regex ]]; then
+      # If an exclusion regex is provided, skip matches that also match it
+      if [[ -n "$exclude_regex" && "$item" =~ $exclude_regex ]]; then
+        continue
+      fi
+      echo "$item" # Return the whole line match
+      found_match=0 # At least one match found
+    fi
+  done
+  return $found_match # Return 0 if any match was found, 1 otherwise
+}
+
 gbmc_upgrade_download() {
   local retry=0
   local path="$1"
