@@ -41,20 +41,12 @@ elif [ "$medusa_stage" = "POC" ]; then
     set_gpio DELTA_MODULE_TYPE    0
     set_gpio P12V_HSC_TYPE        0
 else
-    set_gpio P48V_OCP_GPIO1       0
-    set_gpio P48V_OCP_GPIO2       0
-    set_gpio P48V_OCP_GPIO3       0
+    set_hsc_ocp_values
     set_gpio RST_MUX_R_N          1
     set_gpio RST_LED_CONTROL_FAN_BOARD_0_N 1
     set_gpio RST_LED_CONTROL_FAN_BOARD_1_N 1
     set_gpio RST_IOEXP_FAN_BOARD_0_N       1
     set_gpio RST_IOEXP_FAN_BOARD_1_N       1
-    set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
-    set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
-    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
 fi
 
 # check if Fan_Board_0 exists

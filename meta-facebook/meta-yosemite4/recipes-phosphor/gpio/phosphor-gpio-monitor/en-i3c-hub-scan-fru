@@ -66,6 +66,7 @@ enable_i3c_hub()
 bmc_ready=$(busctl get-property xyz.openbmc_project.State.BMC /xyz/openbmc_project/state/bmc0 xyz.openbmc_project.State.BMC CurrentBMCState | awk '{print $2}' | tr -d '"')
 if [ "$bmc_ready" != "xyz.openbmc_project.State.BMC.BMCState.Ready" ]; then
     echo "BMC is not ready, exiting..."
+    set_hsc_ocp_values
     exit 0
 fi
 
@@ -78,27 +79,4 @@ sleep 5.5
 busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q $bus
 # wait for fru device to be ready
 sleep 10
-# check if Wailua Falls is present
-wailua_falls_present=$(busctl tree xyz.openbmc_project.FruDevice | grep Wailua_Falls)
-# set 48V/12V HSC OCP values
-if [ -n "$wailua_falls_present" ]; then
-    set_gpio P48V_OCP_GPIO1       0
-    set_gpio P48V_OCP_GPIO2       0
-    set_gpio P48V_OCP_GPIO3       0
-    set_gpio HSC_OCP_SLOT_ODD_GPIO1        1
-    set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
-    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       1
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
-else
-    set_gpio P48V_OCP_GPIO1       1
-    set_gpio P48V_OCP_GPIO2       0
-    set_gpio P48V_OCP_GPIO3       0
-    set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
-    set_gpio HSC_OCP_SLOT_ODD_GPIO2        1
-    set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO2       1
-    set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
-fi
+set_hsc_ocp_values

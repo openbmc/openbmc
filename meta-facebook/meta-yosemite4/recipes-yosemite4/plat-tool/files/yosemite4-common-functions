@@ -91,3 +91,152 @@ handle_service_window()
         return 0
     fi
 }
+
+set_hsc_ocp_values()
+{
+    local wailua_falls_present
+
+    # Check if Wailua Falls is present
+    wailua_falls_present=$(busctl tree xyz.openbmc_project.FruDevice | grep Wailua_Falls || true)
+
+    # Set 48V/12V HSC OCP values
+    if [ -n "$wailua_falls_present" ]; then
+        set_gpio P48V_OCP_GPIO1       0
+        set_gpio P48V_OCP_GPIO2       0
+        set_gpio P48V_OCP_GPIO3       0
+
+        for p48vhsc_position in {0..1}; do
+            local p48vhsc_bus=11
+            local p48vhsc_addr=0x10
+            local inventory_path="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_HSC${p48vhsc_position}_48V"
+            local medusa_type
+
+            medusa_type=$(busctl introspect xyz.openbmc_project.EntityManager \
+                "$inventory_path" | grep "\.Type" | awk '{print $4}' | tr -d '"' || true)
+
+            if [ "$medusa_type" = "XDP710" ]; then
+                p48vhsc_addr=$((p48vhsc_addr + 1 + (p48vhsc_position * 2)))
+                p48vhsc_addr=$(printf '0x%x' "$p48vhsc_addr")
+
+                # Check if HSC device responds before accessing
+                if ! i2cget -f -y "$p48vhsc_bus" "$p48vhsc_addr" 0x99 >/dev/null 2>&1; then
+                    echo "set_hsc_ocp_values: HSC$p48vhsc_position - 48VHSC-INF not responding on addr $p48vhsc_addr, skipping"
+                    continue
+                fi
+
+                # OC
+                i2ctransfer -f -y "$p48vhsc_bus" w3@"$p48vhsc_addr" 0xD5 0x69 0xA9 2>/dev/null || true
+                # OCW
+                i2ctransfer -f -y "$p48vhsc_bus" w3@"$p48vhsc_addr" 0x4A 0xEB 0x07 2>/dev/null || true
+                echo "set_hsc_ocp_values: HSC$p48vhsc_position - 48VHSC-INF OCP 1, OC=0xA969, OCW=0x07EB"
+            else
+                echo "set_hsc_ocp_values: HSC$p48vhsc_position - 48VHSC-ADI OCP 1"
+            fi
+        done
+
+        set_gpio HSC_OCP_SLOT_ODD_GPIO1        1
+        set_gpio HSC_OCP_SLOT_ODD_GPIO2        0
+        set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+        set_gpio HSC_OCP_SLOT_EVEN_GPIO1       1
+        set_gpio HSC_OCP_SLOT_EVEN_GPIO2       0
+        set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+
+        for slot_num in {1..8}; do
+            local p12vhsc_bus=$((slot_num - 1))
+            local p12vhsc_addr="0x40"
+            local mfr_id
+            local vendor="0x41 0x44 0x49"
+
+            # Check if HSC device responds before accessing
+            if ! i2cget -f -y "$p12vhsc_bus" "$p12vhsc_addr" 0x99 >/dev/null 2>&1; then
+                echo "set_hsc_ocp_values: slot $slot_num - 12VHSC not responding on bus $p12vhsc_bus, skipping"
+                continue
+            fi
+
+            # Check 12V HSC vendor
+            mfr_id=$(i2ctransfer -f -y "$p12vhsc_bus" w1@"$p12vhsc_addr" 0x99 r4 2>/dev/null || echo "")
+            if [[ $mfr_id == *"$vendor"* ]]; then
+                echo "set_hsc_ocp_values: slot $slot_num 12VHSC-ADI OCP 2"
+            else
+                # IOUT_CAL_GAIN
+                i2ctransfer -f -y "$p12vhsc_bus" w3@"$p12vhsc_addr" 0x38 0x0A 0x02 2>/dev/null || true
+                # IOUT_OC_FAULT_LIMIT
+                i2ctransfer -f -y "$p12vhsc_bus" w3@"$p12vhsc_addr" 0x46 0x4B 0x00 2>/dev/null || true
+                # OCW_SC_REF
+                i2ctransfer -f -y "$p12vhsc_bus" w3@"$p12vhsc_addr" 0xC5 0xD9 0x0F 2>/dev/null || true
+                # OC_REF
+                i2ctransfer -f -y "$p12vhsc_bus" w2@"$p12vhsc_addr" 0xC6 0x22 2>/dev/null || true
+                echo "set_hsc_ocp_values: slot $slot_num 12VHSC-MPS OCP 2, IOUT_CAL_GAIN=0x020A, IOUT_OC_FAULT_LIMIT=0x004B, OCW_SC_REF=0x0FD9, OC_REF=0x22"
+            fi
+        done
+    else
+        set_gpio P48V_OCP_GPIO1       1
+        set_gpio P48V_OCP_GPIO2       0
+        set_gpio P48V_OCP_GPIO3       0
+
+        for p48vhsc_position in {0..1}; do
+            local p48vhsc_bus=11
+            local p48vhsc_addr=0x10
+            local inventory_path="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board/MEDUSA_HSC${p48vhsc_position}_48V"
+            local medusa_type
+
+            medusa_type=$(busctl introspect xyz.openbmc_project.EntityManager \
+                "$inventory_path" | grep "\.Type" | awk '{print $4}' | tr -d '"' || true)
+
+            if [ "$medusa_type" = "XDP710" ]; then
+                p48vhsc_addr=$((p48vhsc_addr + 1 + (p48vhsc_position * 2)))
+                p48vhsc_addr=$(printf '0x%x' "$p48vhsc_addr")
+
+                # Check if HSC device responds before accessing
+                if ! i2cget -f -y "$p48vhsc_bus" "$p48vhsc_addr" 0x99 >/dev/null 2>&1; then
+                    echo "set_hsc_ocp_values: HSC$p48vhsc_position - 48VHSC-INF not responding on addr $p48vhsc_addr, skipping"
+                    continue
+                fi
+
+                # OC
+                i2ctransfer -f -y "$p48vhsc_bus" w3@"$p48vhsc_addr" 0xD5 0x69 0x90 2>/dev/null || true
+                # OCW
+                i2ctransfer -f -y "$p48vhsc_bus" w3@"$p48vhsc_addr" 0x4A 0xC9 0x06 2>/dev/null || true
+                echo "set_hsc_ocp_values: HSC$p48vhsc_position - 48VHSC-INF OCP 2, OC=0x9069, OCW=0x06C9"
+            else
+                echo "set_hsc_ocp_values: HSC$p48vhsc_position - 48VHSC-ADI OCP 2"
+            fi
+        done
+
+        set_gpio HSC_OCP_SLOT_ODD_GPIO1        0
+        set_gpio HSC_OCP_SLOT_ODD_GPIO2        1
+        set_gpio HSC_OCP_SLOT_ODD_GPIO3        0
+        set_gpio HSC_OCP_SLOT_EVEN_GPIO1       0
+        set_gpio HSC_OCP_SLOT_EVEN_GPIO2       1
+        set_gpio HSC_OCP_SLOT_EVEN_GPIO3       0
+
+        for slot_num in {1..8}; do
+            local p12vhsc_bus=$((slot_num - 1))
+            local p12vhsc_addr="0x40"
+            local mfr_id
+            local vendor="0x41 0x44 0x49"
+
+            # Check if HSC device responds before accessing
+            if ! i2cget -f -y "$p12vhsc_bus" "$p12vhsc_addr" 0x99 >/dev/null 2>&1; then
+                echo "set_hsc_ocp_values: slot $slot_num - 12VHSC not responding on bus $p12vhsc_bus, skipping"
+                continue
+            fi
+
+            # Check 12V HSC vendor
+            mfr_id=$(i2ctransfer -f -y "$p12vhsc_bus" w1@"$p12vhsc_addr" 0x99 r4 2>/dev/null || echo "")
+            if [[ $mfr_id == *"$vendor"* ]]; then
+                echo "set_hsc_ocp_values: slot $slot_num 12VHSC-ADI OCP 3"
+            else
+                # IOUT_CAL_GAIN
+                i2ctransfer -f -y "$p12vhsc_bus" w3@"$p12vhsc_addr" 0x38 0xE2 0x01 2>/dev/null || true
+                # IOUT_OC_FAULT_LIMIT
+                i2ctransfer -f -y "$p12vhsc_bus" w3@"$p12vhsc_addr" 0x46 0x41 0x00 2>/dev/null || true
+                # OCW_SC_REF
+                i2ctransfer -f -y "$p12vhsc_bus" w3@"$p12vhsc_addr" 0xC5 0xD5 0x0F 2>/dev/null || true
+                # OC_REF
+                i2ctransfer -f -y "$p12vhsc_bus" w2@"$p12vhsc_addr" 0xC6 0x1D 2>/dev/null || true
+                echo "set_hsc_ocp_values: slot $slot_num 12VHSC-MPS OCP 3, IOUT_CAL_GAIN=0x01E2, IOUT_OC_FAULT_LIMIT=0x0041, OCW_SC_REF=0x0FD5, OC_REF=0x1D"
+            fi
+        done
+    fi
+}
