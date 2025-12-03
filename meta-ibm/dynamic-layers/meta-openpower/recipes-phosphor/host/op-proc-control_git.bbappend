@@ -1,1 +1,1 @@
-PACKAGECONFIG:append:p10bmc = " phal"
+PACKAGECONFIG:append:ibm-enterprise = " phal"

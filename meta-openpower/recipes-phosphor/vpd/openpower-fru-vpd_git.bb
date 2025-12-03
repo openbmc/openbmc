@@ -22,6 +22,7 @@ DEPENDS += " \
         ${PYTHON_PN}-pyyaml-native \
         autoconf-archive-native \
         libgpiod \
+        phosphor-dbus-interfaces \
         "
 
 SYSTEMD_SERVICE:${PN} += "op-vpd-parser.service"
@@ -30,7 +31,7 @@ SYSTEMD_SERVICE:${PN} += "vpd-manager.service"
 S = "${WORKDIR}/git"
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG[ibm_system] = "-Dibm_system=enabled, -Dibm_system=disabled, libgpiod nlohmann-json cli11"
+PACKAGECONFIG[ibm_system] = "-Dibm_system=enabled, -Dibm_system=disabled, nlohmann-json cli11"
 
 EXTRA_OEMESON = " \
              -Dtests=disabled \

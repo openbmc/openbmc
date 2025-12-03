@@ -25,16 +25,16 @@ SYSTEMD_OVERRIDE:phosphor-fan-control:witherspoon += "fan-watchdog-monitor.conf:
 SYSTEMD_OVERRIDE:phosphor-fan-control:witherspoon += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE:phosphor-fan-monitor:witherspoon += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
 SYSTEMD_OVERRIDE:phosphor-fan-monitor:witherspoon += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE:phosphor-fan-control:p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-control-init@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE:phosphor-fan-control:p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE:phosphor-fan-monitor:p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
-SYSTEMD_OVERRIDE:phosphor-fan-monitor:p10bmc += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE:phosphor-fan-control:ibm-enterprise += "fan-watchdog-monitor.conf:phosphor-fan-control-init@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE:phosphor-fan-control:ibm-enterprise += "fan-watchdog-monitor.conf:phosphor-fan-control@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE:phosphor-fan-monitor:ibm-enterprise += "fan-watchdog-monitor.conf:phosphor-fan-monitor-init@0.service.d/fan-watchdog-monitor.conf"
+SYSTEMD_OVERRIDE:phosphor-fan-monitor:ibm-enterprise += "fan-watchdog-monitor.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-monitor.conf"
 
 #These services need to be stopped when watchdog expires
 SYSTEMD_OVERRIDE:phosphor-fan-control:witherspoon += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
 SYSTEMD_OVERRIDE:phosphor-fan-monitor:witherspoon += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
-SYSTEMD_OVERRIDE:phosphor-fan-control:p10bmc += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
-SYSTEMD_OVERRIDE:phosphor-fan-monitor:p10bmc += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
+SYSTEMD_OVERRIDE:phosphor-fan-control:ibm-enterprise += "fan-watchdog-conflicts.conf:phosphor-fan-control@0.service.d/fan-watchdog-conflicts.conf"
+SYSTEMD_OVERRIDE:phosphor-fan-monitor:ibm-enterprise += "fan-watchdog-conflicts.conf:phosphor-fan-monitor@0.service.d/fan-watchdog-conflicts.conf"
 
 # Witherspoon fan control service linking
 # Link fan control init service
@@ -51,7 +51,7 @@ SYSTEMD_LINK:${PN}-control:witherspoon += "${@compose_list(d, 'FMT_CONTROL_PWRON
 PACKAGECONFIG:append:witherspoon = " json"
 EXTRA_OEMESON:append:witherspoon = " -Djson-control=disabled"
 
-PACKAGECONFIG:append:p10bmc = " json sensor-monitor"
+PACKAGECONFIG:append:ibm-enterprise = " json sensor-monitor"
 PACKAGECONFIG:append:sbp1 = " json sensor-monitor"
 EXTRA_OEMESON:append:sbp1 = " -Duse-host-power-state=enabled"
 

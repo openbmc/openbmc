@@ -7,9 +7,9 @@ install_mctp_configuration() {
       install -D -m 0644 ${UNPACKDIR}/service-override.conf ${D}${systemd_system_unitdir}/mctp-demux.service.d/
 }
 
-SRC_URI:append:p10bmc = " file://mctp"
-SRC_URI:append:p10bmc = " file://service-override.conf"
-do_install:append:p10bmc() {
+SRC_URI:append:ibm-enterprise = " file://mctp"
+SRC_URI:append:ibm-enterprise = " file://service-override.conf"
+do_install:append:ibm-enterprise() {
       install_mctp_configuration
 }
 

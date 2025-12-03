@@ -1,3 +1,3 @@
-# P10 needs ibmtpm2tss which needs ibmswtpm2 which needs openssl
+# IBM enterprise needs ibmtpm2tss which needs ibmswtpm2 which needs openssl
 # camellia support
-DEPRECATED_CRYPTO_FLAGS:remove:p10bmc = " no-camellia"
+DEPRECATED_CRYPTO_FLAGS:remove:ibm-enterprise = " no-camellia"

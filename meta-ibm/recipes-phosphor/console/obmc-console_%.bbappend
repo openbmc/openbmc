@@ -27,21 +27,21 @@ install_concurrent_console_config() {
         install -m 0644 ${UNPACKDIR}/server.ttyVUART1.conf ${D}${sysconfdir}/${BPN}/
 }
 
-SRC_URI:append:p10bmc = " file://client.2201.conf"
-SRC_URI:append:p10bmc = " file://server.ttyVUART1.conf"
+SRC_URI:append:ibm-enterprise = " file://client.2201.conf"
+SRC_URI:append:ibm-enterprise = " file://server.ttyVUART1.conf"
 
-REGISTERED_SERVICES:${PN}:append:p10bmc = " obmc_console_hypervisor:tcp:2201:"
+REGISTERED_SERVICES:${PN}:append:ibm-enterprise = " obmc_console_hypervisor:tcp:2201:"
 
-SYSTEMD_SERVICE:${PN}:append:p10bmc = " obmc-console-ssh@2200.service \
+SYSTEMD_SERVICE:${PN}:append:ibm-enterprise = " obmc-console-ssh@2200.service \
 		obmc-console-ssh@2201.service \
                 "
-SYSTEMD_SERVICE:${PN}:remove:p10bmc = "obmc-console-ssh.socket"
+SYSTEMD_SERVICE:${PN}:remove:ibm-enterprise = "obmc-console-ssh.socket"
 
-FILES:${PN}:remove:p10bmc = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
+FILES:${PN}:remove:ibm-enterprise = "${systemd_system_unitdir}/obmc-console-ssh@.service.d/use-socket.conf"
 
-PACKAGECONFIG:append:p10bmc = " concurrent-servers"
+PACKAGECONFIG:append:ibm-enterprise = " concurrent-servers"
 
-do_install:append:p10bmc() {
+do_install:append:ibm-enterprise() {
         install_concurrent_console_config
 }
 

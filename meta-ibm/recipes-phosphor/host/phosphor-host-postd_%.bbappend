@@ -1,1 +1,1 @@
-SNOOP_DEVICE:p10bmc = ""
+SNOOP_DEVICE:ibm-enterprise = ""

@@ -1,4 +1,4 @@
-PACKAGECONFIG:append:p10bmc = " openpower-pels"
+PACKAGECONFIG:append:ibm-enterprise = " openpower-pels"
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 

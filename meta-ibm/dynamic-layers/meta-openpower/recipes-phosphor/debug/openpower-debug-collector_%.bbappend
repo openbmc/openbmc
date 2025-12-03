@@ -1,1 +1,1 @@
-EXTRA_OEMESON:append:p10bmc = " -Dhostboot-dump-collection=enabled "
+EXTRA_OEMESON:append:ibm-enterprise = " -Dhostboot-dump-collection=enabled "

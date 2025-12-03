@@ -1,1 +1,1 @@
-PACKAGECONFIG:append:p10bmc = " ibm-hypervisor-cert"
+PACKAGECONFIG:append:ibm-enterprise = " ibm-hypervisor-cert"
