@@ -11,7 +11,7 @@ DEPENDS += " \
   sdbusplus \
   phosphor-dbus-interfaces \
 "
-SRCREV = "bc942c6aa480a05f2c75207794154554e5a560d6"
+SRCREV = "2b1b2b1c02c610ad3955e676fc7d3da634a7a880"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
