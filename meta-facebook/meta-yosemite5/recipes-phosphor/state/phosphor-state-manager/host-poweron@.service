@@ -8,8 +8,8 @@ Before=obmc-host-started@%i.target
 Wants=obmc-power-on@%i.target
 After=obmc-power-on@%i.target
 Conflicts=obmc-host-stop@%i.target
-Wants=phosphor-set-host-transition-to-running@service
-Before=phosphor-set-host-transition-to-running@service
+Wants=phosphor-set-host-transition-to-running@%i.service
+Before=phosphor-set-host-transition-to-running@%i.service
 ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
