@@ -16,7 +16,6 @@ ADDITIONAL_CONSOLE_IDS = ""
 do_install:append() {
         install -m 0644 ${UNPACKDIR}/rotate-event-logs.service ${D}${systemd_system_unitdir}
         install -m 0644 ${UNPACKDIR}/rotate-event-logs.timer ${D}${systemd_system_unitdir}
-        rm ${D}${sysconfdir}/rsyslog.d/imjournal.conf
         for host in ${OBMC_HOST_INSTANCES}; do
             host_name="host${host}"
             conf=${D}${sysconfdir}/rsyslog.d/${host_name}.conf
