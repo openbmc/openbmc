@@ -17,6 +17,11 @@ POWER_SERVICE_PACKAGES_IBM_ENTERPRISE = " \
     phosphor-power-psu-monitor \
 "
 
+# These are the huygens-specific power service packages.
+POWER_SERVICE_PACKAGES_HUYGENS = " \
+    phosphor-power-chassis \
+"
+
 EXTRA_IBM_LOGGING_PKGS = ""
 EXTRA_IBM_LOGGING_PKGS:witherspoon = ""
 EXTRA_IBM_LOGGING_PKGS:ibm-enterprise = " \
@@ -37,6 +42,7 @@ RDEPENDS:${PN}-extras:append:ibm-enterprise = " ${POWER_SERVICE_PACKAGES_IBM_ENT
 RDEPENDS:${PN}-extras:append:ibm-enterprise = " pldm openpower-hw-diags srvcfg-manager biosconfig-manager phosphor-post-code-manager phosphor-host-postd debug-trigger libmctp"
 RDEPENDS:${PN}-extras:remove:ibm-enterprise = "obmc-ikvm liberation-fonts uart-render-controller"
 RDEPENDS:${PN}-extras:append:sbp1 = " phosphor-ipmi-ipmb "
+RDEPENDS:${PN}-extras:append:huygens = " ${POWER_SERVICE_PACKAGES_HUYGENS}"
 
 RDEPENDS:${PN}-software:append:ibm-ac-server = " phosphor-software-manager-sync"
 RDEPENDS:${PN}-software:append:ibm-enterprise = " phosphor-software-manager-usb"
