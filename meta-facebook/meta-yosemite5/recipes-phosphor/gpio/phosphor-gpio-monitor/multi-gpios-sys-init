@@ -20,24 +20,18 @@ host_os_status_init() {
       "xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.${status}"
 }
 
-e1s_board_init() {
-  if [[ "$(get_gpio RST_PCIE_BOOT_PERST_N)" = "0" ]]; then
-    set_gpio RST_PCIE_E1S_0_PERST 0
-    set_gpio RST_PCIE_E1S_1_PERST 0
-  else
-    set_gpio RST_PCIE_E1S_0_PERST 1
-    set_gpio RST_PCIE_E1S_1_PERST 1
-  fi
-
-  e1s_0_prsnt=$(get_gpio E1S_0_PRSNT_N)
-  if [[ "$e1s_0_prsnt" = "0" ]]; then
+e1s_pwr_init() {
+  reg0=$(i2ctransfer -fy 10 w1@0x21 0x0 r1)
+  reg1=$(i2ctransfer -fy 10 w1@0x21 0x1 r1)
+  E1S_0_PRSNT_N=$(( reg0 & 0x04 ))
+  E1S_1_PRSNT_N=$(( reg1 & 0x04 ))
+  if [[ "$E1S_0_PRSNT_N" = "0" && "$(get_gpio MASTER_PWR2_EN)" = "1" ]]; then
     set_gpio P12V_E1S_EN_0 1
   else
     set_gpio P12V_E1S_EN_0 0
   fi
 
-  e1s_1_prsnt=$(get_gpio E1S_1_PRSNT_N)
-  if [[ "$e1s_1_prsnt" = "0" ]]; then
+  if [[ "$E1S_1_PRSNT_N" = "0" && "$(get_gpio MASTER_PWR2_EN)" = "1" ]]; then
     set_gpio P12V_E1S_EN_1 1
   else
     set_gpio P12V_E1S_EN_1 0
@@ -46,6 +40,6 @@ e1s_board_init() {
 
 host_os_status_init
 
-e1s_board_init
+e1s_pwr_init
 
 exit 0

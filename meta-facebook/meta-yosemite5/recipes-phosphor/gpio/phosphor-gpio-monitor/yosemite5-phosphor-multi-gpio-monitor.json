@@ -86,5 +86,15 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "MASTER_PWR_EN",
+        "LineName": "MASTER_PWR_EN",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["gpio_bypass@MASTER_PWR_EN:RISING.service"],
+            "FALLING": ["gpio_bypass@MASTER_PWR_EN:FALLING.service"]
+        },
+        "Continue": true
     }
 ]

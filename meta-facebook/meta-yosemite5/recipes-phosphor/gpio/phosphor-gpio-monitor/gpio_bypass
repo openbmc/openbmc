@@ -23,21 +23,38 @@ if [[ "$GPIO_NET" = "RST_PCIE_BOOT_PERST_N" ]]; then
 fi
 
 if [[ "$GPIO_NET" = "E1S_0_PRSNT_N" ]]; then
-    if [[ "$Event" = "RISING" ]]; then
-        set_gpio P12V_E1S_EN_0 0
-    else
+    if [[ "$Event" = "FALLING" && "$(get_gpio MASTER_PWR2_EN)" = "1" ]]; then
         set_gpio P12V_E1S_EN_0 1
+    else
+        set_gpio P12V_E1S_EN_0 0
     fi
 fi
 
 if [[ "$GPIO_NET" = "E1S_1_PRSNT_N" ]]; then
-    if [[ "$Event" = "RISING" ]]; then
-        set_gpio P12V_E1S_EN_1 0
-    else
+    if [[ "$Event" = "FALLING" && "$(get_gpio MASTER_PWR2_EN)" = "1" ]]; then
         set_gpio P12V_E1S_EN_1 1
+    else
+        set_gpio P12V_E1S_EN_1 0
     fi
 fi
 
+if [[ "$GPIO_NET" = "MASTER_PWR_EN" ]]; then
+    if [[ "$Event" = "RISING" ]]; then
+        reg0=$(i2ctransfer -fy 10 w1@0x21 0x0 r1)
+        reg1=$(i2ctransfer -fy 10 w1@0x21 0x1 r1)
+        E1S_0_PRSNT_N=$(( reg0 & 0x04 ))
+        E1S_1_PRSNT_N=$(( reg1 & 0x04 ))
+        if [[ "$E1S_0_PRSNT_N" = "0" ]]; then
+            set_gpio P12V_E1S_EN_0 1
+        fi
+        if [[ "$E1S_1_PRSNT_N" = "0" ]]; then
+            set_gpio P12V_E1S_EN_1 1
+        fi
+    else
+        set_gpio P12V_E1S_EN_1 0
+        set_gpio P12V_E1S_EN_0 0
+    fi
+fi
 
 
 
