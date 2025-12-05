@@ -1,0 +1,1 @@
+# San Miguel Image configuration.
