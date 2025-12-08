@@ -1,5 +1,4 @@
 IMAGE_FEATURES:remove = "\
-    obmc-net-ipmi \
     obmc-user-mgmt-ldap \
     ssh-server-dropbear \
     "
