@@ -1,0 +1,2 @@
+SUBSYSTEM=="tty", KERNEL=="ttyUSB1", ENV{SYSTEMD_WANTS}="obmc-console@ttyUSB1", TAG+="systemd"
+SUBSYSTEM=="tty", KERNEL=="ttyUSB5", ENV{SYSTEMD_WANTS}="obmc-console@ttyUSB5", TAG+="systemd"
