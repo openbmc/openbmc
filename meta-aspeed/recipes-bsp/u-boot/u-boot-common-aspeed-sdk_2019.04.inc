@@ -15,6 +15,7 @@ SRC_URI = "git://git@github.com/openbmc/u-boot.git;nobranch=1;protocol=https"
 
 SRC_URI:append:uboot-flash-32768 = " file://u-boot_flash_32M.cfg"
 SRC_URI:append:uboot-flash-65536 = " file://u-boot_flash_64M.cfg"
+SRC_URI:append:uboot-flash-131072 = " file://u-boot_flash_128M.cfg"
 
 S = "${WORKDIR}/git"
 B = "${WORKDIR}/build"
