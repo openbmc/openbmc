@@ -10,4 +10,4 @@ SyslogIdentifier=nsci-failover
 Type=oneshot
 
 [Install]
-WantedBy=network.target
+# Handled by bitbake recipe

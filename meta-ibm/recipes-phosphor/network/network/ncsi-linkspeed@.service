@@ -11,4 +11,4 @@ SyslogIdentifier=nsci-linkspeed
 Type=oneshot
 
 [Install]
-WantedBy=network.target
+# Handled by bitbake recipe
