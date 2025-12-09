@@ -10,4 +10,4 @@ Type=dbus
 BusName={BUSNAME}
 
 [Install]
-WantedBy=multi-user.target
+# Handled by bitbake recipe

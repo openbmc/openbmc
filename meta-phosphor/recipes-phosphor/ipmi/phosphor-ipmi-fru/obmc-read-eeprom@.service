@@ -13,4 +13,4 @@ ExecStart=/usr/bin/env phosphor-read-eeprom --eeprom $SYSFS_PATH --fruid $FRUID
 SyslogIdentifier=phosphor-read-eeprom
 
 [Install]
-WantedBy=multi-user.target
+# Handled by bitbake recipe

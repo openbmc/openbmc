@@ -10,4 +10,4 @@ Type=oneshot
 RemainAfterExit=yes
 
 [Install]
-WantedBy=multi-user.target
+# Handled by bitbake recipe
