@@ -1,0 +1,32 @@
+[
+    {
+        "Name": "CPU-Boot-Done",
+        "LineName": "B0_M0_CPU_BOOT_COMPLETE_3V3-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cpu-boot-done-deassert.service"],
+            "RISING": ["cpu-boot-done-assert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM0-Run-Power-Good",
+        "LineName": "B0_M0_RUN_POWER_PG-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["run-power-good-deassert.service"],
+            "RISING": ["run-power-good-assert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM1-Run-Power-Good",
+        "LineName": "B1_M0_RUN_POWER_PG-I",
+          "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["run-power-good-deassert.service"],
+            "RISING": ["run-power-good-assert.service"]
+        },
+        "Continue": true
+    }
+]

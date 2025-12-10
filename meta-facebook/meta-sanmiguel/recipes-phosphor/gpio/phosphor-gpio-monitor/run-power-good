@@ -1,0 +1,76 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-harma/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+get_current_host_state()
+{
+    busctl get-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        CurrentHostState | awk '{print $2}' | tr -d '"'
+}
+
+get_request_host_transition()
+{
+    busctl get-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition | awk '{print $2}' | tr -d '"'
+}
+
+set_request_host_transition()
+{
+    busctl set-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s "$1"
+}
+
+gpio_state="$1"
+
+host_state="$(get_current_host_state)"
+
+if [ "$gpio_state" = "assert" ]; then
+    if [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.TransitioningToRunning" ] ||
+       [ "$host_state" == "xyz.openbmc_project.State.Host.HostState.Running" ]; then
+        if [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.On" ]; then
+            set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+        fi
+        exit 0
+    fi
+else
+    if [ "$host_state" = "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ] ||
+       [ "$host_state" = "xyz.openbmc_project.State.Host.HostState.Off" ]; then
+        if [ "$(get_request_host_transition)" != "xyz.openbmc_project.State.Host.Transition.Off" ]; then
+            set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+        fi
+        exit 0
+    fi
+fi
+
+
+sleep 3
+
+hpm0_run_pg_val=$(plat_get_gpio "B0_M0_RUN_POWER_PG-I")
+hpm1_run_pg_val=$(plat_get_gpio "B1_M0_RUN_POWER_PG-I")
+host_transition="$(get_request_host_transition)"
+
+echo "B0_M0_RUN_POWER_PG-I: $hpm0_run_pg_val"
+echo "B1_M0_RUN_POWER_PG-I: $hpm1_run_pg_val"
+echo "host transition: $host_transition"
+
+
+if [[ "$hpm0_run_pg_val" == "1" ]] && [[ "$hpm1_run_pg_val" == "1" ]]; then
+    if [[ "$host_transition" != "xyz.openbmc_project.State.Host.Transition.On" ]]; then
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+    fi
+elif [[ "$hpm0_run_pg_val" == "0" ]] && [[ "$hpm1_run_pg_val" == "0" ]]; then
+    if [[ "$host_transition" != "xyz.openbmc_project.State.Host.Transition.Off" ]]; then
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+    fi
+else
+    echo "HPM0 and HPM1 runt power good inconsistent"
+fi
+
+exit 0

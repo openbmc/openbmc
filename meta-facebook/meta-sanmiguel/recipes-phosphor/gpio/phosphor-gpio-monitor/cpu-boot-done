@@ -1,0 +1,20 @@
+#!/bin/bash
+
+STATE="$1"
+OS_STANDBY="xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby"
+OS_INACTIVE="xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Inactive"
+
+set_os_status()
+{
+    busctl set-property xyz.openbmc_project.State.Host0 \
+           /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status \
+           OperatingSystemState s "$1"
+}
+
+if [ "$STATE" = "assert" ]; then
+    set_os_status "$OS_STANDBY"
+elif [ "$STATE" = "deassert" ]; then
+    set_os_status "$OS_INACTIVE"
+fi
+
+exit 0

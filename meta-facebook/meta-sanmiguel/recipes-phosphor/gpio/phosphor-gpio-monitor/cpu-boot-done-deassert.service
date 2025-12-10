@@ -1,0 +1,9 @@
+[Unit]
+Description=Cpu Boot Done De-assert
+Conflicts=cpu-boot-done-assert.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/cpu-boot-done deassert
+
+SyslogIdentifier=cpu-boot-done-deassert
