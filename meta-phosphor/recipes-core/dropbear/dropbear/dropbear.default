@@ -1,1 +1,1 @@
-DROPBEAR_EXTRA_ARGS="-G priv-admin -r /etc/dropbear/dropbear_ecdsa_host_key -r /etc/dropbear/dropbear_ed25519_host_key"
+DROPBEAR_EXTRA_ARGS="-G priv-admin -r /etc/dropbear/dropbear_ecdsa_host_key -r /etc/dropbear/dropbear_ed25519_host_key -j -k"
