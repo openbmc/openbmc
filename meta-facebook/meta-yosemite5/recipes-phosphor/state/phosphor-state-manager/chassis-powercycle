@@ -28,7 +28,7 @@ blade-power-cycle() {
 
 ChassisNumber=$1
 
-if [ "$ChassisNumber" == 0 ]
+if [ "$ChassisNumber" == 1 ]
 then
   echo "Starting Chassis AC Cycle"
   chassis-power-cycle
