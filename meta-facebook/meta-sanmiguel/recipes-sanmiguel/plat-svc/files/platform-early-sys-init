@@ -1,0 +1,13 @@
+#!/bin/bash -e
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+# Enable standby power and bind i2c components
+echo "Attempting to enable standby power..."
+if /usr/libexec/plat-svc/standby-power-enable; then
+    echo "Standby power enable successful."
+else
+    echo "Error: Standby power enable failed."
+fi
+
+exit 0

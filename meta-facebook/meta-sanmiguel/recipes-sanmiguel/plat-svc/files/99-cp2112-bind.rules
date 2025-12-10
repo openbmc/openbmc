@@ -1,0 +1,11 @@
+# Automatically bind NVIDIA 0955:CF11 devices to cp2112 instead of hid-generic
+# This rule prevents hid-generic from claiming the device and ensures cp2112 gets it
+
+SUBSYSTEM=="hid", ATTRS{idVendor}=="0955", ATTRS{idProduct}=="cf11", \
+    RUN+="/bin/sh -c 'echo 3 0955 CF11 > /sys/bus/hid/drivers/cp2112/new_id'"
+
+SUBSYSTEM=="hid", ATTRS{idVendor}=="0955", ATTRS{idProduct}=="cf11", \
+    RUN+="/bin/sh -c 'echo %k > /sys/bus/hid/drivers/hid-generic/unbind 2>/dev/null || true'"
+
+SUBSYSTEM=="hid", ATTRS{idVendor}=="0955", ATTRS{idProduct}=="cf11", \
+    RUN+="/bin/sh -c 'echo %k > /sys/bus/hid/drivers/cp2112/bind 2>/dev/null || true'"

@@ -1,0 +1,224 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+GPIO_HIGH=1
+GPIO_LOW=0
+
+wait_gpio_value()
+{
+    local net_name=$1
+    local expd_val=$2
+    local max_retries=$3
+    local delay_secs=$4
+
+
+    local gpio_val=0
+    local trycnt=1
+
+    until [[ $gpio_val -gt 0 || $trycnt -gt $max_retries ]]
+    do
+        gpio_val=$(get_gpio "$net_name")
+        rc=$?
+        if [[ $rc -ne 0 ]]; then
+            err_msg="Unable to read $net_name"
+            echo "$err_msg"
+            return 1
+        fi
+        if [[ $gpio_val -eq $expd_val ]]; then
+            return 0
+        fi
+        sleep "$delay_secs"
+        ((trycnt++))
+    done
+
+    err_msg="wait_gpio_value failed, gpio_val=$gpio_val,  exp_val=$expd_val"
+    echo "$err_msg"
+    return 1
+}
+
+bmc_set_initial_gpio_out()
+{
+    echo "Setting GPIO Initial State"
+    set_gpio "GLOBAL_WP_BMC-O" "$GPIO_LOW"
+    set_gpio "EEDO_LED2-O" "$GPIO_HIGH"
+    sleep 1
+}
+
+bind_gpio_expanders()
+{
+    bind_i2c_device pca953x 2-0020 3
+    bind_i2c_device pca953x 2-0021 3
+
+    bind_i2c_device pca953x 7-0020 3
+    bind_i2c_device pca953x 7-0021 3
+}
+
+hmc_bypass()
+{
+    if [ "$(get_gpio "HMC_PRSNT_R-I")" -eq 1 ];then
+        echo "HMC is present, disabling HMC I2C_MGMT1 bypass"
+        set_gpio "BMC_HMC_MUX_SEL-O" "$GPIO_HIGH"
+    else
+        echo "HMC is not present, setting HMC I2C_MGMT1 bypass"
+        set_gpio "BMC_HMC_MUX_SEL-O" "$GPIO_LOW"
+    fi
+}
+
+check_ttyusb()
+{
+    # Define the physical sysfs device paths as lowercase locals
+    local b0_phys="/sys/bus/usb/devices/1-1.2.1.2:1.0"
+    local b1_phys="/sys/bus/usb/devices/1-1.2.2.2:1.0"
+
+    local actual_b0=""
+    local actual_b1=""
+    local dev
+
+    # Find ttyUSB for board 0
+    for dev in "$b0_phys"/ttyUSB*; do
+        [ -e "$dev" ] || continue
+        actual_b0=${dev##*/}
+        break
+    done
+
+    # Find ttyUSB for board 1
+    for dev in "$b1_phys"/ttyUSB*; do
+        [ -e "$dev" ] || continue
+        actual_b1=${dev##*/}
+        break
+    done
+
+    echo "Checking USB sequence..."
+    echo "  Board 0 Physical -> Currently: ${actual_b0:-MISSING}"
+    echo "  Board 1 Physical -> Currently: ${actual_b1:-MISSING}"
+
+    # Logic: Reset if b0 is not ttyUSB0 OR b1 is not ttyUSB4
+    if [[ "$actual_b0" != "ttyUSB0" || "$actual_b1" != "ttyUSB4" ]]; then
+        echo "Incorrect sequence detected..."
+        echo "Resetting USB Hubs via GPIO..."
+
+        # Trigger Reset (Pull Low)
+        set_gpio "B0_M0_USB_HUB0_RST_L-O" "$GPIO_LOW"
+        set_gpio "B1_M0_USB_HUB0_RST_L-O" "$GPIO_LOW"
+        sleep 1
+
+        # Release Reset (Pull High)
+        set_gpio "B0_M0_USB_HUB0_RST_L-O" "$GPIO_HIGH"
+        sleep 1
+        set_gpio "B1_M0_USB_HUB0_RST_L-O" "$GPIO_HIGH"
+    fi
+
+    echo "USB Sequence is correct."
+}
+
+#===============================================================================
+# Start Here
+#===============================================================================
+
+# Initialize GPIO out state
+if [ "$(get_gpio "B0_M0_STBY_POWER_PG-I")" -eq 0 ];then
+    bmc_set_initial_gpio_out
+fi
+
+# Bind PDB IOX
+bind_i2c_device pca953x 9-0020 3
+
+# This turns on STBY power to the PDB
+# Enables standby power to HPM Board 0 and 1, CPX modules, and N/S NIC.
+set_gpio "STBY_POWER_EN-O" "$GPIO_HIGH"
+
+# Wait for standby power good
+if ! wait_gpio_value "STBY_POWER_PG-I" 1 20 1; then
+    err_msg="wait BMC STBY_POWER_PG-I failed, exiting w/ failure"
+    echo "$err_msg"
+    exit 1
+fi
+
+# Pull the HMC Out of Reset.
+set_gpio "HMC_RST_R_L-O" "$GPIO_HIGH"
+
+# Wait PDB standby power ok
+if ! wait_gpio_value "STBY_PWR_OK-I" 1 20 1; then
+    err_msg="wait PDB STBY_PWR_OK-I failed, exiting w/ failure"
+    echo "$err_msg"
+    exit 1
+fi
+
+# Check HMC present and set HMC bypass
+hmc_bypass
+
+# Bind IO Expander driver after STBY_POWER
+bind_gpio_expanders
+
+
+HPM_BOARDS=("B0_M0" "B1_M0")
+
+# Wait for HPM STBY_POWER_PG Assertions (default 20 seconds)
+TOTAL_FAILURE=0
+for BOARD_ID in "${HPM_BOARDS[@]}"; do
+    GPIO_NAME="${BOARD_ID}_STBY_POWER_PG-I"
+
+    if ! wait_gpio_value "$GPIO_NAME" 1 20 1; then
+        ERROR_MESSAGE="${GPIO_NAME} failed to assert after 20 seconds. Exiting w/ failure."
+        echo "$ERROR_MESSAGE"
+        TOTAL_FAILURE=1
+    fi
+done
+
+if [[ $TOTAL_FAILURE -ne 0 ]]; then
+    exit 1
+fi
+
+echo "All HPM board Standby Power Good assertions successful."
+
+
+# Wait for HPM HPM_MCU_OK assertions (default 10 seconds)
+TOTAL_FAILURE=0
+for BOARD_ID in "${HPM_BOARDS[@]}"; do
+    GPIO_NAME="${BOARD_ID}_HPM_MCU_OK-I"
+
+    if ! wait_gpio_value "$GPIO_NAME" 1 10 1; then
+        ERROR_MESSAGE="${GPIO_NAME} failed to assert after 10 seconds. Exiting w/ failure."
+        echo "$ERROR_MESSAGE"
+        TOTAL_FAILURE=1
+    fi
+done
+
+if [[ $TOTAL_FAILURE -ne 0 ]]; then
+    exit 1
+fi
+
+echo "All HPM board MCU OK assertions successful."
+
+
+# Wait for HPM CPLD_READY assertions (default 10 seconds)
+TOTAL_FAILURE=0
+for BOARD_ID in "${HPM_BOARDS[@]}"; do
+    GPIO_NAME="${BOARD_ID}_CPLD_READY-I"
+
+    if ! wait_gpio_value "$GPIO_NAME" 1 10 1; then
+        ERROR_MESSAGE="${GPIO_NAME} failed to assert after 10 seconds. Exiting w/ failure."
+        echo "$ERROR_MESSAGE"
+        TOTAL_FAILURE=1
+    fi
+done
+
+if [[ $TOTAL_FAILURE -ne 0 ]]; then
+    exit 1
+fi
+
+echo "All HPM board CPLD Ready assertions successful."
+
+# Check ttyUSB devices is created with correct sequqnce
+check_ttyusb
+
+echo "Wait HMC Ready"
+if ! wait_gpio_value "HMC_READY-I" 1 120 1; then
+    ERROR_MESSAGE="HMC_READY-I failed to assert after 120 seconds."
+    echo "$ERROR_MESSAGE"
+else
+    echo "HMC_READY-I asserted."
+fi
+
+exit 0
