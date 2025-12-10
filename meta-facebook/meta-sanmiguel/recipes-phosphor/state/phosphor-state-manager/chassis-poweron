@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-sanmiguel/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+if ! chassis_power_on; then
+    exit 1
+fi
+
+exit 0
