@@ -1,0 +1,12 @@
+[Unit]
+Description=Provide tray location to ASICs
+DefaultDependencies=no
+Before=santabarbara-eid-init.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/plat-svc/santabarbara-tray-location-init
+SyslogIdentifier=Santabarbara Tray Location Init
+
+[Install]
+WantedBy=multi-user.target

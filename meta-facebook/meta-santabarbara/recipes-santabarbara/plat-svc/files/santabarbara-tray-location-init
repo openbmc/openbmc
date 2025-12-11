@@ -1,0 +1,65 @@
+#!/bin/bash
+
+get_gpio_val() {
+    name="$1"
+
+    chip_line=$(gpiofind "$name" 2>/dev/null)
+    if [ -z "$chip_line" ]; then
+        echo "Error: gpiofind $name failed or returned empty" >&2
+        exit 1
+    fi
+
+
+    chip=$(echo "$chip_line" | cut -d' ' -f1)
+    line=$(echo "$chip_line" | cut -d' ' -f2)
+    val=$(gpioget "$chip" "$line" 2>/dev/null)
+    if [ -z "$val" ]; then
+        echo "Error: gpioget $name ($chip_line) failed" >&2
+        exit 1
+    fi
+
+    echo "$val"
+}
+
+id0=$(get_gpio_val TRAY_SLOT_ID0)
+id1=$(get_gpio_val TRAY_SLOT_ID1)
+id2=$(get_gpio_val TRAY_SLOT_ID2)
+id3=$(get_gpio_val TRAY_SLOT_ID3)
+id4=$(get_gpio_val TRAY_SLOT_ID4)
+
+binary="${id4}${id3}${id2}${id1}${id0}"
+
+echo "Binary = $binary"
+
+dec=$((2#$binary))
+
+Hex=$(printf "0x%02X" "$dec")
+echo "Hex = $Hex"
+
+BUS_LIST="6 8 10 13"
+
+for bus in $BUS_LIST; do
+    echo "Sending to I2C bus $bus ..."
+    if ! raw="$(i2ctransfer -y "$bus" w2@0x50 0x03 0xFF r1 2>/dev/null)"; then
+        echo "i2ctransfer read failed on bus $bus" >&2
+        continue
+    fi
+    if [ -z "$raw" ]; then
+        echo "i2ctransfer read failed on bus $bus" >&2
+        continue
+    fi
+    buffer="${raw:2}"
+    buffer="0x${buffer^^}"
+    if [[ "$buffer" == "$Hex" ]]; then
+        echo "The location already exists on bus $bus"
+        continue
+    fi
+
+    # CPLD-emulated EEPROM for MMC: write tray_loc at 0x3FF (loc).
+    # Not using EEPROM driver to avoid duplicate sensor registration on this bus.
+    if ! i2ctransfer -y "$bus" w3@0x50 0x03 0xFF "$Hex"; then
+        echo "i2ctransfer failed on bus $bus" >&2
+    else
+        echo "Done on bus $bus"
+    fi
+done
