@@ -1,0 +1,9 @@
+[Unit]
+Description=Bind I3C drivers for APML
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/bind-apml-driver on
+ExecStop=/usr/libexec/phosphor-gpio-monitor/bind-apml-driver off
+SyslogIdentifier=bind-apml-driver
+RemainAfterExit=true

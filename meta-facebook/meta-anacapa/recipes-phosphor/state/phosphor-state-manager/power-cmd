@@ -58,6 +58,7 @@ graceful_power_off() {
 # DC on
 power_on() {
     if [ "$(power_status)" == "off" ]; then
+        systemctl stop bind-apml-driver.service
         set_gpio SYS_BMC_PWRBTN_N 0
         sleep 1
         set_gpio SYS_BMC_PWRBTN_N 1

@@ -43,4 +43,6 @@ if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ] && [ "$(
         RequestedHostTransition s \
         xyz.openbmc_project.State.Host.Transition.Off
 fi
+
+systemctl stop bind-apml-driver.service
 exit 0

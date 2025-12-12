@@ -4,10 +4,15 @@
         "LineName": "FM_PWRGD_CPU0_PWROK",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-power-good-drop.service"],
-            "FALLING": ["assert-power-good-drop.service"]
-        },
-        "Continue": true
+            "RISING": [
+                "deassert-power-good-drop.service",
+                "bind-apml-driver.service"
+            ],
+            "FALLING": [
+                "assert-power-good-drop.service"
+            ]
+	},
+	"Continue": true
     },
     {
         "Name": "BRIDGE_L_STBY_PG_R",

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+case "$1" in
+  on)
+    sleep 120
+    if [ -d "/sys/bus/platform/drivers/ast2600-i3c-master/1e7a2000.i3c" ]; then
+        echo "1e7a2000.i3c" > /sys/bus/platform/drivers/ast2600-i3c-master/unbind
+    fi
+    echo 1e7a2000.i3c > /sys/bus/platform/drivers/ast2600-i3c-master/bind
+    ;;
+  off)
+    if [ -d "/sys/bus/platform/drivers/ast2600-i3c-master/1e7a2000.i3c" ]; then
+        echo "1e7a2000.i3c" > /sys/bus/platform/drivers/ast2600-i3c-master/unbind
+    fi
+    ;;
+  *)
+    echo "Invalid parameter"
+    exit 1
+    ;;
+esac

@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit obmc-phosphor-systemd systemd
 
 SERVICE_LIST = "assert-power-good-drop.service \
+                bind-apml-driver.service \
                 deassert-power-good-drop.service \
                 multi-gpios-sys-init.service \
                 power-rail-logger@.service \
@@ -12,6 +13,7 @@ SERVICE_FILE_FMT = "file://{0}"
 
 SRC_URI += " \
     file://assert-power-good-drop \
+    file://bind-apml-driver \
     file://deassert-power-good-drop \
     file://multi-gpios-sys-init \
     file://plat-phosphor-multi-gpio-monitor.json \
@@ -37,6 +39,7 @@ do_install:append() {
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/bind-apml-driver ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
