@@ -65,10 +65,10 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "thermal-deassert-log@FM_CPU_THERMTRIP_N.service"
+                "thermal-deassert-log@thermtrip_FM_CPU_THERMTRIP_N.service"
             ],
             "FALLING": [
-                "thermal-assert-log@FM_CPU_THERMTRIP_N.service"
+                "thermal-assert-log@thermtrip_FM_CPU_THERMTRIP_N.service"
             ]
         },
         "Continue": true
@@ -79,10 +79,444 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": [
-                "thermal-deassert-log@FM_CPU_PROCHOT_R_N.service"
+                "thermal-deassert-log@prochot_FM_CPU_PROCHOT_R_N.service"
             ],
             "FALLING": [
-                "thermal-assert-log@FM_CPU_PROCHOT_R_N.service"
+                "thermal-assert-log@prochot_FM_CPU_PROCHOT_R_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_DIMM_0_N",
+        "LineName": "ALERT_INA230_DIMM_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_DIMM_0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_DIMM_0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_DIMM_1_N",
+        "LineName": "ALERT_INA230_DIMM_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_DIMM_1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_DIMM_1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_E1S_0_N",
+        "LineName": "ALERT_INA230_E1S_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_E1S_0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_E1S_0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_E1S_1_N",
+        "LineName": "ALERT_INA230_E1S_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_E1S_1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_E1S_1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN0_N",
+        "LineName": "ALERT_INA230_FAN0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_FAN0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_FAN0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN1_N",
+        "LineName": "ALERT_INA230_FAN1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_FAN1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_FAN1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN2_N",
+        "LineName": "ALERT_INA230_FAN2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_FAN2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_FAN2_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN3_N",
+        "LineName": "ALERT_INA230_FAN3_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_FAN3_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_FAN3_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_NIC_N",
+        "LineName": "ALERT_INA230_NIC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_NIC_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_NIC_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_SCM_N",
+        "LineName": "ALERT_INA230_SCM_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_INA230_SCM_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_INA230_SCM_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_IRQ_PMBUS_PWR11_N",
+        "LineName": "ALERT_IRQ_PMBUS_PWR11_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@pad_ALERT_IRQ_PMBUS_PWR11_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@pad_ALERT_IRQ_PMBUS_PWR11_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_OC_PADDLE2_N",
+        "LineName": "ALERT_OC_PADDLE2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@pad_ALERT_OC_PADDLE2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@pad_ALERT_OC_PADDLE2_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_THERMALTRIP_MCIO4A_N",
+        "LineName": "ALERT_THERMALTRIP_MCIO4A_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_ALERT_THERMALTRIP_MCIO4A_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_ALERT_THERMALTRIP_MCIO4A_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_UV_PADDLE2_N",
+        "LineName": "ALERT_UV_PADDLE2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@pad_ALERT_UV_PADDLE2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@pad_ALERT_UV_PADDLE2_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_VR_SMB_N",
+        "LineName": "ALERT_VR_SMB_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_ALERT_VR_SMB_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_ALERT_VR_SMB_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAULT_P3V3_E1S_0_N",
+        "LineName": "FAULT_P3V3_E1S_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_FAULT_P3V3_E1S_0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_FAULT_P3V3_E1S_0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAULT_P3V3_E1S_1_N",
+        "LineName": "FAULT_P3V3_E1S_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_FAULT_P3V3_E1S_1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_FAULT_P3V3_E1S_1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAULT_P3V3_NIC_N",
+        "LineName": "FAULT_P3V3_NIC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_FAULT_P3V3_NIC_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_FAULT_P3V3_NIC_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAULT_P12V_NIC_N",
+        "LineName": "FAULT_P12V_NIC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_FAULT_P12V_NIC_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_FAULT_P12V_NIC_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FAULT_P12V_SCM_N",
+        "LineName": "FAULT_P12V_SCM_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_FAULT_P12V_SCM_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_FAULT_P12V_SCM_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INLET_TEMP_N",
+        "LineName": "ALERT_INLET_TEMP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_ALERT_INLET_TEMP_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_ALERT_INLET_TEMP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_OUTLET_TEMP_N",
+        "LineName": "ALERT_OUTLET_TEMP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_ALERT_OUTLET_TEMP_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_ALERT_OUTLET_TEMP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PVDDCR_CPU0_P0_OCP_N",
+        "LineName": "PVDDCR_CPU0_P0_OCP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_PVDDCR_CPU0_P0_OCP_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_PVDDCR_CPU0_P0_OCP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PVDDCR_CPU1_P0_OCP_N",
+        "LineName": "PVDDCR_CPU1_P0_OCP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_PVDDCR_CPU1_P0_OCP_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_PVDDCR_CPU1_P0_OCP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PVDDCR_SOC_P0_OCP_N",
+        "LineName": "PVDDCR_SOC_P0_OCP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@mb_PVDDCR_SOC_P0_OCP_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@mb_PVDDCR_SOC_P0_OCP_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_IRQ_PMBUS_PWR2_N",
+        "LineName": "ALERT_IRQ_PMBUS_PWR2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@pad_ALERT_IRQ_PMBUS_PWR2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@pad_ALERT_IRQ_PMBUS_PWR2_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "Fault",
+        "LineName": "Fault",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-assert-log@mb_Fault.service"
+            ],
+            "FALLING": [
+                "smc-deassert-log@mb_Fault.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_0_LOSS_N",
+        "LineName": "ALERT_CLKMUX_0_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_0_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_0_LOSS_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_1_LOSS_N",
+        "LineName": "ALERT_CLKMUX_1_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_1_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_1_LOSS_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_2_LOSS_N",
+        "LineName": "ALERT_CLKMUX_2_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_2_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_2_LOSS_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_3_LOSS_N",
+        "LineName": "ALERT_CLKMUX_3_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_3_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_3_LOSS_N.service"
             ]
         },
         "Continue": true

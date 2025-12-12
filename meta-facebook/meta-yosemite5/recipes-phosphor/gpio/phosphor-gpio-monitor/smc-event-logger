@@ -1,0 +1,59 @@
+#!/bin/bash
+
+HELP="
+Usage: smc-event-logger <event> <board>_<gpio_name>
+<event> is the vr fault event to log,
+e.g. assert / deassert.
+
+<board>_<gpio_name> is defined in json file,
+e.g. mb_Fault
+"
+
+# get assert or deassert message
+if [ "$1" == "assert" ]; then
+  action="SMCFailed"
+elif [ "$1" == "deassert" ]; then
+  action="SMCRestored"
+fi
+
+# Extract board name and gpio name from the message amd build device path
+message=$2
+BOARD="${message%%_*}"
+GPIO_NAME="${message#*_}"
+
+if [[ $BOARD == mb* ]]; then
+    DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite5_MB/${GPIO_NAME}"
+else
+    echo "Unknown message format: $message"
+    exit 1
+fi
+
+MSG_ID="xyz.openbmc_project.State.SMC.$action"
+STASH_FILE="/run/$GPIO_NAME.log_entry"
+
+
+case $1 in
+    "-h")
+        echo "$HELP"
+        ;;
+
+    "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+                /usr/bin/log-create "$MSG_ID" --json \
+                    "{ \"IDENTIFIER\": \"${DEVICE_PATH}\", \"FAILURE_TYPE\": \"${GPIO_NAME}\"}" \
+                    > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")"
+            rm "${STASH_FILE}"
+        fi
+        /usr/bin/log-create "$MSG_ID" --json \
+            "{ \"IDENTIFIER\": \"${DEVICE_PATH}\"}"
+        ;;
+esac
+
+
+exit 0

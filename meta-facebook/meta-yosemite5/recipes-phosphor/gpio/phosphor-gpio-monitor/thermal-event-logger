@@ -16,16 +16,23 @@ if [[ -z "$1" || -z "$2" ]]; then
     exit 1
 fi
 
-# get some parameters
-GPIO_NAME=$2
-case $1-$2 in
-    assert-FM_CPU_THERMTRIP_N)
+# Extract type and gpio name from the message amd build device path
+# Supported message formats:
+#   <type>_<gpio_name>
+#      Example: thermtrip_FM_CPU_THERMTRIP_N
+MESSAGE="$2"
+
+TYPE="${MESSAGE%%_*}"
+GPIO_NAME="${MESSAGE#*_}"
+
+case $1-$TYPE in
+    assert-thermtrip)
     MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOverOperatingTemperatureFault"
     ;;
-    deassert-FM_CPU_THERMTRIP_N | assert-FM_CPU_PROCHOT_R_N)
+    deassert-thermtrip | assert-prochot)
     MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOverOperatingTemperature"
     ;;
-    deassert-FM_CPU_PROCHOT_R_N)
+    deassert-prochot)
     MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOperatingNormalTemperature"
     ;;
     *)
@@ -33,10 +40,10 @@ case $1-$2 in
     exit 1
 esac
 
-DEVICE_PATH="/xyz/openbmc_project/State/Thermal/cpu0"
+DEVICE_PATH="/xyz/openbmc_project/State/Thermal/${GPIO_NAME}"
 STASH_FILE="/run/${GPIO_NAME}.log_entry"
 
-case $1-$2 in
+case $1-$TYPE in
     assert-*)
         if [ ! -s "$STASH_FILE" ]; then
             /usr/bin/log-create "$MSG_ID" --json \
@@ -45,13 +52,13 @@ case $1-$2 in
         fi
         ;;
 
-    deassert-FM_CPU_THERMTRIP_N)
+    deassert-thermtrip)
         if [ -e "${STASH_FILE}" ]; then
             log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
         fi
         ;;
 
-    deassert-FM_CPU_PROCHOT_R_N)
+    deassert-prochot)
         if [ -e "${STASH_FILE}" ]; then
             log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
         fi
