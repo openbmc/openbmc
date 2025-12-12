@@ -282,5 +282,70 @@
             ]
         },
         "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "SCM_VIRTUAL_CALIBRATED_INLET_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 45
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_SCM"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "INLET_TEMP",
+                    "Desc": {
+                        "Name": "SCM_INLET_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
+            "var CAL_OFS[11]:={-0.7, -0.8, -0.8, -1.0, -1.1, -1.3, -1.5, -1.9, -2.8, -3.9, -4.0};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    INLET_TEMP+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    INLET_TEMP+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    INLET_TEMP+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    INLET_TEMP+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    INLET_TEMP+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    INLET_TEMP+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    INLET_TEMP+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    INLET_TEMP+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    INLET_TEMP+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    INLET_TEMP+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  default: INLET_TEMP+CAL_OFS[10];",
+            "}"
+        ]
     }
 ]
