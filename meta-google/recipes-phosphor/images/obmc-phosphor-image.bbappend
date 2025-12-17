@@ -27,7 +27,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = \
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " ipmitool"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " lrzsz"
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " tcpdump"
-OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " mmc-utils"
 
 # Add gBMC update recipes
 OBMC_IMAGE_EXTRA_INSTALL:append:gbmc = " dummy-gbmc-update"
