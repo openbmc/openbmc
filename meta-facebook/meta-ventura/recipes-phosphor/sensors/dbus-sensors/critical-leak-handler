@@ -65,11 +65,16 @@ LeakType=$(echo "$DetectorName" | cut -d'_' -f2)
 temp=${DetectorName#*Port}
 portnum=${temp%%_*}
 
+# Addr 0x1F, Reg 0x02 bit7 and bit6 are Leak Config Bit, when they are 0x11 or 0x10, RMC need to do AC
+raw_val=$(i2cget -f -y 10 0x1f 0x02)
+LeakConfig=$(( (raw_val >> 6) & 0x03 ))
+
 if [ "$LeakType" == "Big" ]; then
   EnableLeds "${portnum}"
 fi
 
-if [[ "$DetectorName" == "RackDripPan" || "$DetectorName" == "RackRightManifold" || "$DetectorName" == "RackLeftManifold" ]]; then
+if [[ "$DetectorName" == "RackDripPan" || "$DetectorName" == "RackRightManifold" || "$DetectorName" == "RackLeftManifold" ]] &&
+   (( LeakConfig == 2 || LeakConfig == 3 )); then
 
 PSU_Off ()
 {
