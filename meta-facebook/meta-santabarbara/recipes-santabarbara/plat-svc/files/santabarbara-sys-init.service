@@ -4,7 +4,7 @@ Before=xyz.openbmc_project.EntityManager.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/santabarbara-early-sys-init
+ExecStart=/usr/libexec/plat-svc/santabarbara-early-sys-init
 SyslogIdentifier=Santabarbara Early Init
 
 [Install]

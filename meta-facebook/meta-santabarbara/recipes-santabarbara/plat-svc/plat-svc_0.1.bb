@@ -23,7 +23,8 @@ SYSTEMD_SERVICE:${PN} = " \
 
 do_install() {
     install -d ${D}${libexecdir}
-    install -m 0755 ${UNPACKDIR}/santabarbara-early-sys-init ${D}${libexecdir}
-    install -m 0755 ${UNPACKDIR}/santabarbara-eid-init ${D}${libexecdir}
+    install -d ${D}${libexecdir}/plat-svc
+    install -m 0755 ${UNPACKDIR}/santabarbara-early-sys-init ${D}${libexecdir}/plat-svc
+    install -m 0755 ${UNPACKDIR}/santabarbara-eid-init ${D}${libexecdir}/plat-svc
 }
 

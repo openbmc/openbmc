@@ -7,7 +7,7 @@ Before=pldm.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/santabarbara-eid-init
+ExecStart=/usr/libexec/plat-svc/santabarbara-eid-init
 SyslogIdentifier=Santabarbara Eid Init
 
 [Install]
