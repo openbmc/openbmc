@@ -5,11 +5,11 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 PR = "r1"
 
 SOURCE_FILES = "\
-    10-early-mounts \
-    20-udev \
-    21-factory-reset \
-    30-ubiattach-or-format \
-    50-mount-persistent \
+    010-early-mounts \
+    020-udev \
+    025-factory-reset \
+    030-ubiattach-or-format \
+    100-mount-persistent \
     "
 SRC_URI += "\
     file://init \
@@ -49,7 +49,7 @@ do_install() {
         touch ${D}/$mountpoint/.keep.mount-persistent
     done
     sed -i "s#@NOROOTFS_PERSISTENT_DIRS@#${NOROOTFS_PERSISTENT_DIRS}#" \
-        ${D}${PKG_INSTALL_DIR}/initfiles/50-mount-persistent
+        ${D}${PKG_INSTALL_DIR}/initfiles/100-mount-persistent
 }
 
 RDEPENDS:${PN} += " \
