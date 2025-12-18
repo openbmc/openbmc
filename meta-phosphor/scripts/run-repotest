@@ -106,7 +106,7 @@ meta-phosphor/recipes-support/nss-pam-ldapd/files/nslcd.init
 
 types=(json shell)
 # shellcheck disable=SC2034
-check_json="eslint --resolve-plugins-relative-to /usr/local/lib/node_modules"
+check_json="eslint"
 # shellcheck disable=SC2034
 check_shell="shellcheck -x"
 
