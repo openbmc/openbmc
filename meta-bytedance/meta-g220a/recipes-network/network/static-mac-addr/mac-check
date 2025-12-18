@@ -63,7 +63,7 @@ read_eeprom_mac() {
 }
 
 create_macdir() {
-if [ -a ${SOFS_MACDIR} ]; then
+if [ -e ${SOFS_MACDIR} ]; then
 	if [ ! -d ${SOFS_MACDIR} ]; then
 		rm -rf ${SOFS_MACDIR}
 		mkdir -p ${SOFS_MACDIR}
