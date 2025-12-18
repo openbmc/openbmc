@@ -19,6 +19,7 @@ source "$(dirname "$0")/lib.sh" || exit
 
 (
   echo '## Test Pass' >&2
+  # shellcheck disable=SC2329
   test_pass() {
     return 0
   }
@@ -28,15 +29,18 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Fail' >&2
   i=0
+  # shellcheck disable=SC2329
   test_pass1() {
     (( i++ ))
     return 0
   }
+  # shellcheck disable=SC2329
   test_fail() {
     return 1
     (( i++ ))
     return 0
   }
+  # shellcheck disable=SC2329
   test_pass2() {
     (( i++ ))
     return 0
@@ -48,11 +52,13 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Deferred Fail' >&2
   i=0
+  # shellcheck disable=SC2329
   test_expect_fail() {
     test_err=1 || return
     (( i++ ))
     return 0
   }
+  # shellcheck disable=SC2329
   test_pass() {
     (( i++ ))
     return 0
@@ -64,6 +70,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Fail' >&2
   i=0
+  # shellcheck disable=SC2329
   test_fail() {
     fail 'Failed' || return
     (( i++ ))
@@ -76,6 +83,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Expect Err' >&2
   i=0
+  # shellcheck disable=SC2329
   test_expect_err() {
     expect_err 1 false || return
     (( i++ ))
@@ -88,6 +96,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Expect Err Error' >&2
   i=0
+  # shellcheck disable=SC2329
   test_expect_err() {
     expect_err 0 false || return
     (( i++ ))
@@ -100,6 +109,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Num EQ' >&2
   i=0
+  # shellcheck disable=SC2329
   test_num_eq() {
     expect_numeq 15 0xf || return
     expect_numeq 1 1 || return
@@ -113,6 +123,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Num EQ Error' >&2
   i=0
+  # shellcheck disable=SC2329
   test_num_eq() {
     expect_numeq 15 10 || return
     (( i++ ))
@@ -125,6 +136,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Str EQ' >&2
   i=0
+  # shellcheck disable=SC2329
   test_str_eq() {
     expect_streq abz abz || return
     (( i++ ))
@@ -137,6 +149,7 @@ source "$(dirname "$0")/lib.sh" || exit
 (
   echo '## Test Str EQ Error' >&2
   i=0
+  # shellcheck disable=SC2329
   test_str_eq() {
     expect_streq 15 0xf || return
     (( i++ ))

@@ -126,6 +126,7 @@ gbmc_ip_monitor_parse_line() {
 
 return 0 2>/dev/null
 
+# shellcheck disable=SC2329
 cleanup() {
   local st="$?"
   trap - HUP INT QUIT ABRT TERM EXIT

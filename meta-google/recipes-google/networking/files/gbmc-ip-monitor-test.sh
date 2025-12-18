@@ -25,6 +25,7 @@ fi
 # shellcheck source=meta-google/recipes-google/networking/files/gbmc-ip-monitor.sh
 source gbmc-ip-monitor.sh
 
+# shellcheck disable=SC2329
 test_init_empty() {
   ip() {
     return 0
@@ -33,6 +34,7 @@ test_init_empty() {
   expect_streq "$str" '[INIT]'
 }
 
+# shellcheck disable=SC2329
 test_init_link_populated() {
   ip() {
     if [ "$1" = 'link' ]; then
@@ -57,6 +59,7 @@ EOF
 EOF
 }
 
+# shellcheck disable=SC2329
 test_init_addr_populated() {
   ip() {
     if [ "$1" = 'addr' ]; then
@@ -88,6 +91,7 @@ EOF
 EOF
 }
 
+# shellcheck disable=SC2329
 test_init_route_populated() {
   ip() {
     if [[ "$1" == "-4" && "${2-}" == 'route' ]]; then
@@ -115,6 +119,7 @@ EOF
 EOF
 }
 
+# shellcheck disable=SC2329
 testParseNonTag() {
   expect_err 2 gbmc_ip_monitor_parse_line ''
   expect_err 2 gbmc_ip_monitor_parse_line '  '
@@ -123,11 +128,13 @@ testParseNonTag() {
   expect_err 2 gbmc_ip_monitor_parse_line '  [ROUTE]'
 }
 
+# shellcheck disable=SC2329
 testParseInit() {
   expect_err 0 gbmc_ip_monitor_parse_line '[INIT]'
   expect_streq "$change" 'init'
 }
 
+# shellcheck disable=SC2329
 testParseAddrAdd() {
   expect_err 0 gbmc_ip_monitor_parse_line '[ADDR]2: eno2@extra inet6 fd01:ff2:5687:4:cf03:45f3:983a:96eb/128 metric 1024 scope global temporary dynamic'
   expect_streq "$change" 'addr'
@@ -139,6 +146,7 @@ testParseAddrAdd() {
   expect_streq "$flags" 'temporary dynamic'
 }
 
+# shellcheck disable=SC2329
 testParseAddrDel() {
   expect_err 0 gbmc_ip_monitor_parse_line '[ADDR]Deleted 2: eno2 inet6 fe80::aaaa:aaff:feaa:aaaa/64 scope link'
   expect_streq "$change" 'addr'
@@ -150,6 +158,7 @@ testParseAddrDel() {
   expect_streq "$flags" ''
 }
 
+# shellcheck disable=SC2329
 testParseRouteAdd() {
   expect_err 0 gbmc_ip_monitor_parse_line "[ROUTE]fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium"
   expect_streq "$change" 'route'
@@ -157,6 +166,7 @@ testParseRouteAdd() {
   expect_streq "$route" 'fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium'
 }
 
+# shellcheck disable=SC2329
 testParseRouteDel() {
   expect_err 0 gbmc_ip_monitor_parse_line "[ROUTE]Deleted fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium"
   expect_streq "$change" 'route'
@@ -164,6 +174,7 @@ testParseRouteDel() {
   expect_streq "$route" 'fd01:ff2:5687:4::/64 dev eno2 proto ra metric 100 pref medium'
 }
 
+# shellcheck disable=SC2329
 testParseLinkAdd() {
   expect_err 0 gbmc_ip_monitor_parse_line "[LINK]2: eno2@extra: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000" \
     < <(echo 'link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff')
@@ -174,6 +185,7 @@ testParseLinkAdd() {
   expect_streq "$carrier" 'UP'
 }
 
+# shellcheck disable=SC2329
 testParseLinkDel() {
   expect_err 0 gbmc_ip_monitor_parse_line "[LINK]Deleted 2: eno2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000" \
     < <(echo 'link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff')
@@ -184,6 +196,7 @@ testParseLinkDel() {
   expect_streq "$carrier" 'UP'
 }
 
+# shellcheck disable=SC2329
 testParseLinkUsb() {
   expect_err 0 gbmc_ip_monitor_parse_line "[LINK]20: gusbem0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master gbmcbr state UP" \
     < <(echo 'link/ether aa:aa:aa:aa:aa:aa brd ff:ff:ff:ff:ff:ff')
