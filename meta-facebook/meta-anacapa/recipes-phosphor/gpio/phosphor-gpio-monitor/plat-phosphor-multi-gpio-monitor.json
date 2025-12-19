@@ -243,6 +243,20 @@
             "FALLING":  ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:assert.service"],
             "RISING":   ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:deassert.service"]
         },
+	"Continue": true
+    },
+    {
+        "Name": "FM_BIOS_POST_CMPLT_R_N",
+        "LineName": "FM_BIOS_POST_CMPLT_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "deassert-post-end.service"
+            ],
+            "FALLING": [
+                "assert-post-end.service"
+            ]
+        },
         "Continue": true
     }
 ]
