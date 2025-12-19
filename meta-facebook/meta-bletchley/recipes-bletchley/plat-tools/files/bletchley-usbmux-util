@@ -3,6 +3,7 @@
 source /usr/libexec/bletchley-common-functions
 
 CMD=$1
+SLED_INDEX=""
 if [ "$#" -ge 2 ]; then
     SLED_INDEX=$(sled_mapping "$2")
 fi
@@ -20,39 +21,33 @@ declare -A MUX_NIBBLES=(
     ["off"]="F"  # 1111 -> F
 )
 
-get_third_byte_upper_nibble() {
-    local value=$1
-    value=$(echo "$value" | sed -E 's/^(0x|0X)//i')
-    value=$(printf "%08s" "$value")
-    # Extract upper nibble of third byte (5th character from left)
-    echo "${value:4:1}" | tr '[:lower:]' '[:upper:]'
-}
-
 set_upper_nibble() {
-    local register=$1
-    local target_nibble=$2
+    local reg=$1
+    local target_nibble=$((0x$2))
+    local current_val
+    local current_nibble
+    local new_val
+    local new_val_hex
+    local mask=0xFFFF0FFF
+    local verify_val
 
-    current_value=$(devmem "$register")
-    current_nibble=$(get_third_byte_upper_nibble "$current_value")
+    current_val=$(devmem "$reg")
+    current_nibble=$(( (current_val >> 12) & 0xF ))
 
-    echo "Register $register current value: $current_value"
-
-    # Check if we need to change anything
-    if [ "$current_nibble" = "$target_nibble" ]; then
-        #echo "Upper nibble already set to 0x$target_nibble, no change needed"
+    if [ "$current_nibble" -eq "$target_nibble" ]; then
         return 0
     fi
 
-    current_value=$(echo "$current_value" | sed -E 's/^(0x|0X)//i')
-    current_value=$(printf "%08s" "$current_value")
-    # Replace only the upper nibble of third byte (5th character from left)
-    # Keep everything else the same: XXXX[N]YZZ -> XXXX[target]YZZ
-    new_value="0x${current_value:0:4}${target_nibble}${current_value:5:3}"
-    if devmem "$register" 32 "$new_value"; then
-        echo "Register $register written with $new_value"
+    new_val=$(( (current_val & mask) | (target_nibble << 12 ) ))
+    new_val_hex=$(printf "0x%08X" "$new_val")
+
+    devmem "$reg" 32 "$new_val_hex"
+    verify_val=$(devmem "$reg")
+    if (( new_val == verify_val )); then
+        echo "Register $reg is written from $current_val to $new_val_hex"
         return 0
     else
-        echo "Register $register failed to set to $new_value"
+        echo "Register $reg failed to set from $current_val to $new_val_hex"
         return 1
     fi
 }
@@ -76,36 +71,20 @@ set_mux_gpio_direction()
 usb_mux_off()
 {
     set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[off]}"
+    sleep 3
+    if [ -d "/sys/bus/usb/devices/1-1" ]; then
+        echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/unbind
+        sleep 3
+        echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/bind
+        sleep 3
+    fi
 }
 
-usb_mux_sled1()
+usb_mux_sled()
 {
-    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[1]}"
-}
-
-usb_mux_sled2()
-{
-    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[2]}"
-}
-
-usb_mux_sled3()
-{
-    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[3]}"
-}
-
-usb_mux_sled4()
-{
-    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[4]}"
-}
-
-usb_mux_sled5()
-{
-    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[5]}"
-}
-
-usb_mux_sled6()
-{
-    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[6]}"
+    local sled_num=$1
+    usb_mux_off
+    set_upper_nibble "$DEVMEM_MUX_REG" "${MUX_NIBBLES[$sled_num]}"
 }
 
 set_mux_gpio_direction
@@ -114,18 +93,13 @@ if [ "$CMD" == "off" ]; then
     usb_mux_off
     exit 0
 elif [ "$CMD" == "on" ]; then
-    if [ "$SLED_INDEX" -eq 1 ]; then
-        usb_mux_sled1
-    elif [ "$SLED_INDEX" -eq 2 ]; then
-        usb_mux_sled2
-    elif [ "$SLED_INDEX" -eq 3 ]; then
-        usb_mux_sled3
-    elif [ "$SLED_INDEX" -eq 4 ]; then
-        usb_mux_sled4
-    elif [ "$SLED_INDEX" -eq 5 ]; then
-        usb_mux_sled5
-    elif [ "$SLED_INDEX" -eq 6 ]; then
-        usb_mux_sled6
+    if [[ -z "$SLED_INDEX" ]]; then
+        echo "SLED index is required"
+        exit 1
+    fi
+
+    if (( $2 >= 1 && $2 <= MAX_SLED_NUM )); then
+        usb_mux_sled "$SLED_INDEX"
     else
         echo "Invalid SLED index: $2"
         print_help
@@ -140,10 +114,8 @@ fi
 sleep 3
 
 if [ ! -d "/sys/bus/usb/devices/1-1" ]; then
-    # echo "sled$2 usb hub not found, rebinding usb hub..."
     echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/unbind
     sleep 3
     echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/bind
+    sleep 3
 fi
-
-exit 0
