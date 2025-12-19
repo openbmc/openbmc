@@ -1,21 +1,15 @@
-#bin/sh
+#!/bin/sh
+
+"$INIT_HOME/enable-devmem"
+
 # shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
-source /usr/libexec/yosemite4-common-functions
+. /usr/libexec/yosemite4-common-functions
 
 is_nuvoton_board="$(check_nuvoton_board)"
 
-# Create /dev/mem
-if [ ! -c /dev/mem ]; then
-    /bin/mknod /dev/mem c 1 1
-fi
-
 if [ -z "$is_nuvoton_board" ]
 then
-    # Disable FMC_WDT2
-    FMC_WDT2_CTRL_VAL=$(/sbin/devmem 0x1e620064)
-    FMC_WDT2_CTRL_VAL=$((16#${FMC_WDT2_CTRL_VAL#"0x"}))
-    SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
-    /sbin/devmem 0x1e620064 32 "$SET_VAL"
+    FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
 else
     # Read INTCR2.WDC register, 0 for primary, 1 for alternate.
     INTRC2_WDC_VAL=$(/sbin/devmem 0xf0800060)

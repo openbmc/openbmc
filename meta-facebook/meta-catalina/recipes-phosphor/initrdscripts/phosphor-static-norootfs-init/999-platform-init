@@ -1,5 +1,7 @@
 #!/bin/sh
 
+"$INIT_HOME/enable-devmem"
+
 set_pdb_cpld_leak_config()
 {
     if ! GPIOCHIP_NUM="$(basename "$(ls -d /sys/bus/i2c/devices/14-0014/gpiochip*)")"; then
@@ -31,15 +33,7 @@ set_pdb_cpld_leak_config()
     esac
 }
 
-# Create /dev/mem
-if [ ! -c /dev/mem ]; then
-    /bin/mknod /dev/mem c 1 1
-fi
-
-# Disable FMC_WDT2
 FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
-SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
-/sbin/devmem 0x1e620064 32 "$SET_VAL"
 
 # Detect boot flash source
 SLOT_FILE="/run/media/slot"

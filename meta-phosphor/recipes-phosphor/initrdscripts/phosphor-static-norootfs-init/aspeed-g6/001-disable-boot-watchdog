@@ -1,0 +1,8 @@
+#!/bin/sh
+
+"$INIT_HOME/enable-devmem"
+
+# Disable WDT2.
+FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
+SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
+/sbin/devmem 0x1e620064 32 "$SET_VAL"

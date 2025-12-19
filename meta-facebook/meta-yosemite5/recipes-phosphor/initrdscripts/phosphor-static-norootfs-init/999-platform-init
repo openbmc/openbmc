@@ -1,15 +1,8 @@
-#bin/sh
+#!/bin/sh
 
-# Create /dev/mem
-if [ ! -c /dev/mem ]; then
-    /bin/mknod /dev/mem c 1 1
-fi
+"$INIT_HOME/enable-devmem"
 
-# This
-# Disable FMC_WDT2
 FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
-SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
-/sbin/devmem 0x1e620064 32 "$SET_VAL"
 
 # Detect boot flash source
 SLOT_FILE="/run/media/slot"

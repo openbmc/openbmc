@@ -1,15 +1,8 @@
-#bin/sh
+#!/bin/sh
 
-# Create /dev/mem
-if [ ! -c /dev/mem ]; then
-    /bin/mknod /dev/mem c 1 1
-fi
+"$INIT_HOME/enable-devmem"
 
-# Disable FMC_WDT2
-FMC_WDT2_CTRL_VAL=$(/sbin/devmem 0x1e620064)
-FMC_WDT2_CTRL_VAL=$((16#${FMC_WDT2_CTRL_VAL#"0x"}))
-SET_VAL=$((FMC_WDT2_CTRL_VAL & 0xFFFFFFFE))
-/sbin/devmem 0x1e620064 32 "$SET_VAL"
+FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
 
 # Detect boot flash source
 SLOT_FILE="/run/media/slot"
@@ -53,6 +46,7 @@ POE_DEV="/dev/ttyPOE"
 # Set baud rate to 19200 and raw mode
 stty -F $POE_DEV 19200 raw
 # Send Power Source Configuration Command (0x18) to STM32F for enable PoE
+# shellcheck disable=3037
 echo -e '\x18\x00\x00\x2c\x01\x00\x00\xff\xff\xff\xff\x41' > $POE_DEV
 
 exit 0
