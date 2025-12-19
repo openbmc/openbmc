@@ -1,0 +1,15 @@
+#!/bin/sh
+
+"$INIT_HOME/enable-devmem"
+
+
+MEDIA_DIR="/run/media"
+mkdir -p $MEDIA_DIR
+
+# Detect boot flash source
+FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
+if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
+    echo "1" > "$MEDIA_DIR/slot"
+else
+    echo "0" > "$MEDIA_DIR/slot"
+fi

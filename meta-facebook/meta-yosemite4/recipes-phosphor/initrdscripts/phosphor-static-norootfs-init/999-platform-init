@@ -1,34 +1,3 @@
 #!/bin/sh
 
-"$INIT_HOME/enable-devmem"
-
-# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
-. /usr/libexec/yosemite4-common-functions
-
-is_nuvoton_board="$(check_nuvoton_board)"
-
-if [ -z "$is_nuvoton_board" ]
-then
-    FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
-else
-    # Read INTCR2.WDC register, 0 for primary, 1 for alternate.
-    INTRC2_WDC_VAL=$(/sbin/devmem 0xf0800060)
-fi
-
-# Detect boot flash source
-SLOT_FILE="/run/media/slot"
-mkdir -p "$(dirname "${SLOT_FILE}")"
-echo "0" > "$SLOT_FILE"
-
-if [ -z "$is_nuvoton_board" ]
-    then
-    if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
-        echo "1" > "$SLOT_FILE"
-    fi
-else
-    if [ "$((INTRC2_WDC_VAL & 0x00200000))" != "0" ]; then
-        echo "1" > "$SLOT_FILE"
-    fi
-fi
-
 exit 0

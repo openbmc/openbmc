@@ -1,0 +1,5 @@
+#!/bin/sh
+
+MEDIA_DIR="/run/media"
+mkdir -p $MEDIA_DIR
+echo "Unknown" > "$MEDIA_DIR/slot"

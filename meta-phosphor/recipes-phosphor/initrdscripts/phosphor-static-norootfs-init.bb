@@ -7,6 +7,7 @@ PR = "r1"
 SOURCE_FILES = "\
     001-disable-boot-watchdog \
     010-early-mounts \
+    011-detect-nor-bank \
     020-udev \
     025-factory-reset \
     030-ubiattach-or-format \

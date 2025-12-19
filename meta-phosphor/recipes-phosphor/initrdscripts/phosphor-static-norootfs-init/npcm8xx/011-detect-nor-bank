@@ -1,0 +1,15 @@
+#!/bin/sh
+
+"$INIT_HOME/enable-devmem"
+
+
+MEDIA_DIR="/run/media"
+mkdir -p $MEDIA_DIR
+
+# Read INTCR2.WDC register, 0 for primary, 1 for alternate.
+INTRC2_WDC_VAL=$(/sbin/devmem 0xf0800060)
+if [ "$((INTRC2_WDC_VAL & 0x00200000))" != "0" ]; then
+    echo "1" > "$MEDIA_DIR/slot"
+else
+    echo "0" > "$MEDIA_DIR/slot"
+fi

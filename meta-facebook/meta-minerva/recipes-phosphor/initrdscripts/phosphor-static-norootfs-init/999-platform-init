@@ -1,18 +1,5 @@
 #!/bin/sh
 
-"$INIT_HOME/enable-devmem"
-
-FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
-
-# Detect boot flash source
-SLOT_FILE="/run/media/slot"
-mkdir -p "$(dirname "${SLOT_FILE}")"
-if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
-    echo "1" > "$SLOT_FILE"
-else
-    echo "0" > "$SLOT_FILE"
-fi
-
 # Below is the diagram of the smart valve implemtation on the CMM.
 # There are two end-device for smart valve and two communication interfaces.
 # One is Modbus (RS485) interface connected to FT4232H channel 1, 2.
