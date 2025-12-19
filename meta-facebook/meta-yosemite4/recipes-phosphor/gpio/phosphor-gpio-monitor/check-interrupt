@@ -48,6 +48,30 @@ check_power_control_is_executed() {
     exit 0
 }
 
+check_cpu_power_status() {
+    local slot_num=$1
+    local host_id=$2
+    local log_type=$3
+    local allow_force_off=$4  # true or false
+
+    read -r PWR_STATUS_BYTE <<< "$(i2ctransfer -f -y "$slot_num" w1@0x23 0x02 r1)"
+    if (( (PWR_STATUS_BYTE >> 2) & 1 == 1 )); then
+        if [ "$(host_power_status "$host_id")" == "off" ]; then
+            echo "$log_type, the CPU is powered on, but the host state is Off in D-Bus"
+        fi
+    else
+        if [ "$(host_power_status "$host_id")" == "on" ]; then
+            if [ "$allow_force_off" = "true" ]; then
+                echo "$log_type, Host$host_id power status change to off"
+                busctl set-property xyz.openbmc_project.State.Host"$host_id" /xyz/openbmc_project/state/host"$host_id" \
+                    xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
+            else
+                echo "$log_type, the CPU is powered off, but host state is On in D-Bus"
+            fi
+
+        fi
+    fi
+}
 # Sleep for 10ms to ignore GPIO instability during blade hot-plug
 usleep 10000
 
@@ -110,6 +134,7 @@ do
             # call logging function
             if [ -n "$COMBINED_INFO" ]; then
                 log_message $slot_num "AC" "$COMBINED_INFO"
+                check_cpu_power_status $slot_num $host_id "AC Power Fault" "true"
             fi
 
             # clean
@@ -133,6 +158,7 @@ do
             # call logging function
             if [ -n "$COMBINED_INFO" ]; then
                 log_message $slot_num "DC" $COMBINED_INFO
+                check_cpu_power_status $slot_num $host_id "DC Power Fault" "true"
             fi
 
 
@@ -140,19 +166,7 @@ do
             result=$(check_power_control_is_executed $host_id)
             if [ "$result" == "false" ]; then
                 echo "Power state changes not caused by power-control on Host$host_id"
-
-                # Check CPU power status
-                read -r PWR_STATUS_BYTE <<< "$(i2ctransfer -f -y $slot_num w1@0x23 0x02 r1)"
-                if (( (PWR_STATUS_BYTE >> 2) & 1 == 1 )); then
-                    if [ "$(host_power_status $host_id)" == "off" ]; then
-                        echo "Currently, the CPU is powered on, but the host state is off in D-Bus"
-                    fi
-                else
-                    if [ "$(host_power_status $host_id)" == "on" ]; then
-                        echo "Host$host_id power status change to off"
-                        busctl set-property xyz.openbmc_project.State.Host$host_id /xyz/openbmc_project/state/host$host_id xyz.openbmc_project.State.Host RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.Off"
-                    fi
-                fi
+                check_cpu_power_status $slot_num $host_id "Power state changes" "false"
             else
                 echo "Power state changes caused by power-control on Host$host_id, just clear interrupt"
             fi
