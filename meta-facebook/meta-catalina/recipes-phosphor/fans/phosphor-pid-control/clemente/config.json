@@ -120,16 +120,16 @@
             "ignoreDbusMinMax": true
         },
         {
-            "name": "HGX_CPU0_EXHAUST_TEMP_C",
+            "name": "HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/HGX_CPU0_EXHAUST_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
         {
-            "name": "HGX_CPU1_EXHAUST_TEMP_C",
+            "name": "HGX_PROCESSORMODULE1_EXHAUST_TEMP_C",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/HGX_CPU1_EXHAUST_TEMP_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/HGX_PROCESSORMODULE1_EXHAUST_TEMP_C",
             "timeout": 0,
             "ignoreDbusMinMax": true
         },
@@ -584,11 +584,11 @@
                     }
                 },
                 {
-                    "name": "STEPWISE_HGX_CPU_EXHAUST",
+                    "name": "STEPWISE_HGX_PROCESSORMODULE_EXHAUST",
                     "type": "stepwise",
                     "inputs": [
-                        "HGX_CPU0_EXHAUST_TEMP_C",
-                        "HGX_CPU1_EXHAUST_TEMP_C"
+                        "HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
+                        "HGX_PROCESSORMODULE1_EXHAUST_TEMP_C"
                     ],
                     "setpoint": 0.0,
                     "pid": {
@@ -609,11 +609,11 @@
                     }
                 },
                 {
-                    "name": "HGX_CPU_EXHAUST",
+                    "name": "HGX_PROCESSORMODULE_EXHAUST",
                     "type": "temp",
                     "inputs": [
-                        "HGX_CPU0_EXHAUST_TEMP_C",
-                        "HGX_CPU1_EXHAUST_TEMP_C"
+                        "HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
+                        "HGX_PROCESSORMODULE1_EXHAUST_TEMP_C"
                     ],
                     "setpoint": 82.0,
                     "pid": {
