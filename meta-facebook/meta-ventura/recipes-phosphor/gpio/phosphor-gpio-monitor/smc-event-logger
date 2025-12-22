@@ -10,7 +10,7 @@ e.g. wAALC_RPU_READY
 "
 
 gpio_name="$2"
-stash_file="/run/${gpio_name}.log_entry"
+stash_file="/var/lib/phosphor-gpio-monitor/${gpio_name}.log_entry"
 
 # shellcheck source=meta-facebook/meta-ventura/recipes-ventura/plat-svc/files/gpio_util
 source "/usr/libexec/ventura/gpio_util"

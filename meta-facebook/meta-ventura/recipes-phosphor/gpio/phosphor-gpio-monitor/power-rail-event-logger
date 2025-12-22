@@ -11,7 +11,7 @@ e.g. PWRGD_COMPUTE_TRAY1_N
 
 source="$2"
 device_path="/xyz/openbmc_project/inventory/system/board/Ventura_PDB/$source"
-stash_file="/run/${source}.log_entry"
+stash_file="/var/lib/phosphor-gpio-monitor/${source}.log_entry"
 
 get_failure_data() {
     if [[ $1 =~ ^PWRGD_TRAY_LEAK_PORT([0-9]+)_N$ ]]; then
