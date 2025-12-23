@@ -91,7 +91,7 @@ primary_route_to_br_update() {
     [[ "$dev" != "gbmcbr" ]] && new_src="${BASH_REMATCH[2]}"
   fi
 
-  if [[ -z "$new_src" ]]; then
+  if [[ -z "$new_src" || ${#gbmc_br_gw_src_ips[@]} -eq 0 ]]; then
     for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
       [ -f "$file" ] || continue
       rm -rf "$file"
