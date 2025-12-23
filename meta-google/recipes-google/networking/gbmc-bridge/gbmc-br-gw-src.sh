@@ -115,6 +115,23 @@ EOF
   (( need_reload == 1 )) && gbmc_net_networkd_reload
 }
 
+gbmc_br_deprioritize_l2br() {
+  # return success if no l2br
+  [ -d "/sys/class/net/l2br" ] || return 0
+  local fpath="/run/systemd/network/00-bmc-l2br.network.d/50-ra-metric.conf"
+
+  [ -f "$fpath" ] && return
+
+  read -r -d '' ra_metric <<EOF
+[IPv6AcceptRA]
+RouteMetric=2048
+EOF
+  printf '%s\n' "$ra_metric" >"$fpath"
+
+  # shellcheck disable=SC2119
+  gbmc_net_networkd_reload l2br
+}
+
 gbmc_br_gw_src_update() {
   local route
   local ip
@@ -205,6 +222,8 @@ gbmc_br_gw_src_hook() {
     [[ $route == *" table "* ]] && return
     # ignore the primary route as this script fully controls it
     [[ $route == *" metric $primary_rt_metric "* ]] && return
+    # ignore RA from systemd on standard RA
+    [[ $route == *" proto ra "* && $route == *" dev l2br "* ]] && return
     if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
@@ -262,6 +281,7 @@ gbmc_br_gw_src_hook() {
       [[ "$brip" == "$primary_ip_from_br" ]] && return
       echo "Change preferred src from bridge RA: $route" >&2
       primary_ip_from_br="$brip"
+      gbmc_br_deprioritize_l2br
       gbmc_br_gw_src_update
     elif [[ $action == del ]]; then
       # Every RA will trigger a delete and re-add. Only delete when the route is
