@@ -159,6 +159,8 @@ set_gpio bmc-ready-n 0
 # SGPIO Out Bit-85
 set_gpio bmc-ready-sgpio 1
 
+gpioset 2 129=0
+
 # Create /dev/mem
 if [ ! -c /dev/mem ]; then
     /bin/mknod /dev/mem c 1 1
