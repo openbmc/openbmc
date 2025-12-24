@@ -36,29 +36,30 @@ wait_gpio_value()
     return 1
 }
 
-bind_i2c_muxes()
+bind_i2c_muxes_module_0()
 {
     # Module 0 I2C Mux
     # i2c24 - i2c27
     bind_i2c_device pca954x 0-0071
+    # E1S 0 Board I2C Mux, i2c48 - i2c51
+    bind_i2c_device pca954x 25-0074
     # i2c28 - i2c31
     bind_i2c_device pca954x 0-0072
     # i2c32 - i2c35
     bind_i2c_device pca954x 0-0073
+}
 
+bind_i2c_muxes_module_1()
+{
     # Module 1 I2C Mux
     # i2c36 - i2c39
     bind_i2c_device pca954x 0-0075
+    # E1S 1 Board I2C Mux, i2c52 - i2c55
+    bind_i2c_device pca954x 37-0074
     # i2c40 - i2c43
     bind_i2c_device pca954x 0-0076
     # i2c44 - i2c47
     bind_i2c_device pca954x 0-0077
-
-    # E1S 0 Board I2C Mux, i2c48 - i2c51
-    bind_i2c_device pca954x 25-0074
-    # E1S 1 Board I2C Mux, i2c52 - i2c55
-    bind_i2c_device pca954x 37-0074
-
 }
 
 bind_module_gpio_expanders()
@@ -254,7 +255,10 @@ set_gpio "stby_power_gd_cpld" "$GPIO_HIGH"
 bind_module_gpio_expanders
 
 reset_i2c_mux
-bind_i2c_muxes
+bind_i2c_muxes_module_0
+sleep 3
+reset_i2c_mux
+bind_i2c_muxes_module_1
 sleep 3 # This is to ensure that all downstream node drivers probe completed
 reset_i2c_mux
 bind_gpio_expanders
