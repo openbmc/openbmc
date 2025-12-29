@@ -211,7 +211,7 @@ do_gpio_assert_log()
         LOG_MSG="Small leakage alert assert, leak cable 2"
     elif [ "$LINENAME" = "CHASSIS1_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Large leakage alert assert, leak cable 1"
-        set_request_host_transition s "xyz.openbmc_project.State.Host.Transition.Off"
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
     elif [ "$LINENAME" = "CHASSIS0_LEAK_Q_N_PLD" ]; then
         LOG_MSG="Small leakage alert assert, leak cable 0"
     elif [ "$LINENAME" = "SMB_RJ45_FIO_TMP_ALERT" ]; then
