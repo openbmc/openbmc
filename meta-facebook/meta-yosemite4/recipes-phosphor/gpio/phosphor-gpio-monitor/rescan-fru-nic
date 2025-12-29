@@ -1,0 +1,24 @@
+#!/bin/bash
+
+action=$1
+slot=$2
+
+if [ "$#" -lt 2 ]; then
+    echo "Usage: $0 <add|remove> <slot 0-3>"
+    exit 1
+fi
+
+# NIC buses are 24~27 for slots 0~3
+bus=$((24 + slot))
+
+echo "Start NIC slot $slot ($action) FRU rescan on bus $bus"
+
+# Wait for power stabilization
+if [ "$action" = "add" ]; then
+    sleep 2
+fi
+
+busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q "$bus"
+
+echo "End NIC slot $slot ($action) FRU rescan on bus $bus"
+

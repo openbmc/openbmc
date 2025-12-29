@@ -125,11 +125,15 @@
         "LineName": "PRSNT_NIC0_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@0.service"],
+            "RISING": [
+                "remove-nic-endpoint-slot@0.service",
+                "rescan-fru-nic-remove@0.service"
+            ],
             "FALLING": [
                 "obmc-chassis-powercycle@1.target",
                 "obmc-chassis-powercycle@2.target",
-                "setup-nic-endpoint-slot@0.service"
+                "setup-nic-endpoint-slot@0.service",
+                "rescan-fru-nic-add@0.service"
             ]
         },
         "Continue": true
@@ -139,12 +143,16 @@
         "LineName": "PRSNT_NIC1_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@1.service"],
+            "RISING": [
+                "remove-nic-endpoint-slot@1.service",
+                "rescan-fru-nic-remove@1.service"
+            ],
             "FALLING": [
                 "obmc-chassis-powercycle@3.target",
                 "obmc-chassis-powercycle@4.target",
                 "setup-nic-endpoint-slot@1.service",
-                "reconfig-net-interface@eth0.service"
+                "reconfig-net-interface@eth0.service",
+                "rescan-fru-nic-add@1.service"
             ]
         },
         "Continue": true
@@ -154,12 +162,16 @@
         "LineName": "PRSNT_NIC2_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@2.service"],
+            "RISING": [
+                "remove-nic-endpoint-slot@2.service",
+                "rescan-fru-nic-remove@2.service"
+            ],
             "FALLING": [
                 "obmc-chassis-powercycle@5.target",
                 "obmc-chassis-powercycle@6.target",
                 "setup-nic-endpoint-slot@2.service",
-                "reconfig-net-interface@eth1.service"
+                "reconfig-net-interface@eth1.service",
+                "rescan-fru-nic-add@2.service"
             ]
         },
         "Continue": true
@@ -169,11 +181,15 @@
         "LineName": "PRSNT_NIC3_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["remove-nic-endpoint-slot@3.service"],
+            "RISING": [
+                "remove-nic-endpoint-slot@3.service",
+                "rescan-fru-nic-remove@3.service"
+            ],
             "FALLING": [
                 "obmc-chassis-powercycle@7.target",
                 "obmc-chassis-powercycle@8.target",
-                "setup-nic-endpoint-slot@3.service"
+                "setup-nic-endpoint-slot@3.service",
+                "rescan-fru-nic-add@3.service"
             ]
         },
         "Continue": true

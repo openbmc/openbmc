@@ -4,6 +4,9 @@ inherit systemd
 
 SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
             file://configure-nic-mctp-endpoint \
+            file://rescan-fru-nic \
+            file://rescan-fru-nic-remove@.service \
+            file://rescan-fru-nic-add@.service \
             file://setup-nic-endpoint-slot@.service \
             file://remove-nic-endpoint-slot@.service \
             file://set-button-sled.service \
@@ -53,6 +56,8 @@ SYSTEMD_SERVICE:${PN} += " \
     slot-hot-plug@.service \
     setup-nic-endpoint-slot@.service \
     remove-nic-endpoint-slot@.service \
+    rescan-fru-nic-remove@.service \
+    rescan-fru-nic-add@.service \
     rescan-wf-bic@.service \
     slot-hsc-fault@.service \
     fan-board-efuse-fault@.service \
@@ -82,6 +87,8 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/setup-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/reconfig-net-interface@.service  ${D}${systemd_system_unitdir}/reconfig-net-interface@.service
     install -m 0644 ${UNPACKDIR}/remove-nic-endpoint-slot@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/rescan-fru-nic-remove@.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/rescan-fru-nic-add@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/rescan-wf-bic@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/slot-hsc-fault@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/fan-board-efuse-fault@.service ${D}${systemd_system_unitdir}/
@@ -100,6 +107,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/reconfig-net-interface ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/rescan-fru-ocp-setting ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/rescan-fru-nic ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/rescan-wf-bic ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/slot-hsc-fault ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/fan-board-efuse-fault ${D}${libexecdir}/${PN}/

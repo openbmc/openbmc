@@ -1,0 +1,9 @@
+[Unit]
+Description=Rescan FRU on NIC Slot%i insertion
+After=xyz.openbmc_project.FruDevice.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rescan-fru-nic add %i
+SyslogIdentifier=rescan-fru-nic-add%i
+
