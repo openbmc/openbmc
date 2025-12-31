@@ -3,7 +3,7 @@ DESCRIPTION = "This package provides a library for the BMC and host for core blo
 HOMEPAGE = "http://github.com/openbmc/ipmi-blob-tool"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-SRCREV = "fae994be9921c780f41f713bab41c83e73bc1247"
+SRCREV = "f213ecdbba449d195ccd8f16b080c555cf8dcdd6"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
