@@ -6,4 +6,7 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 # DC off
 echo "Starting Graceful Power off"
 
-graceful_power_off
+if ! graceful_power_off; then
+    echo "Graceful Power off failed."
+    exit 1
+fi

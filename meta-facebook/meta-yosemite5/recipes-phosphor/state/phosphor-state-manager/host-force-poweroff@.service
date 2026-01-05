@@ -11,4 +11,4 @@ RemainAfterExit=yes
 ExecStart=/usr/libexec/phosphor-state-manager/host-force-poweroff %i
 
 [Install]
-RequiredBy=obmc-host-stop@%i.target
+RequiredBy=obmc-host-shutdown@%i.target

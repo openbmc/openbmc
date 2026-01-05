@@ -39,15 +39,13 @@ CHASSIS_DEFAULT_TARGETS:append = " \
 "
 
 # Host Reset
-HOST_DEFAULT_TARGETS:remove = " \
-    obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
-    obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
-    obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
-    obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
+HOST_DEFAULT_TARGETS:append = " \
+    obmc-host-warm-reboot@{}.target.requires/host-graceful-poweroff@{}.service \
 "
 
-HOST_DEFAULT_TARGETS:append = " \
-    obmc-host-warm-reboot@{}.target.wants/host-powerreset@{}.service \
+HOST_DEFAULT_TARGETS:remove = " \
+    obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
+    obmc-host-graceful-quiesce@{}.target.wants/pldmSoftPowerOff.service \
 "
 
 # Host On
@@ -57,8 +55,7 @@ HOST_DEFAULT_TARGETS:append = " \
 
 # Host Off
 HOST_DEFAULT_TARGETS:append = " \
-    obmc-host-shutdown@{}.target.requires/host-graceful-poweroff@{}.service \
-    obmc-host-stop@{}.target.requires/host-force-poweroff@{}.service \
+    obmc-host-shutdown@{}.target.requires/host-force-poweroff@{}.service \
 "
 
 HOST_DEFAULT_TARGETS:remove = " \
@@ -103,10 +100,10 @@ SRC_URI:append = " \
     file://host-force-poweroff@.service \
     file://host-graceful-poweroff \
     file://host-graceful-poweroff@.service \
+    file://host-graceful-poweroff-failure \
+    file://host-graceful-poweroff-failure@.service \
     file://host-poweron \
     file://host-poweron@.service \
-    file://host-powerreset \
-    file://host-powerreset@.service \
     file://power-cmd \
     file://phosphor-state-manager-init.conf \
 "
@@ -125,8 +122,8 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/chassis-poweron ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-force-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-graceful-poweroff-failure ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
 }
 

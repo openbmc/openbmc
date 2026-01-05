@@ -1,0 +1,9 @@
+[Unit]
+Description=Handle host graceful poweroff failure for instance %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-state-manager/host-graceful-poweroff-failure %i
+
+[Install]
+WantedBy=multi-user.target

@@ -4,6 +4,7 @@ Wants=obmc-host-stop-pre@%i.target
 Before=obmc-host-stop-pre@%i.target
 Conflicts=obmc-host-start@%i.target
 ConditionPathExists=!/run/openbmc/host@%i-request
+OnFailure=host-graceful-poweroff-failure@%i.service
 
 [Service]
 Restart=no
@@ -12,4 +13,4 @@ RemainAfterExit=yes
 ExecStart=/usr/libexec/phosphor-state-manager/host-graceful-poweroff %i
 
 [Install]
-WantedBy=obmc-host-shutdown@%i.target
+WantedBy=obmc-host-warm-reboot@%i.target
