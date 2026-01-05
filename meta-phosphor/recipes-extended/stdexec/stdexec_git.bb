@@ -11,4 +11,4 @@ S = "${WORKDIR}/git"
 inherit pkgconfig meson
 
 SRC_URI += "git://github.com/NVIDIA/stdexec;branch=main;protocol=https"
-SRCREV = "36a92fd776c835abd4dc5e62d43cf040c20a9add"
+SRCREV = "250f35737790392d666fd157e0af9be16d0c789f"
