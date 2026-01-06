@@ -1,0 +1,100 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+plat_get_gpio() {
+    local net_name="$1"
+
+    case "$net_name" in
+        "B0_M0_RUN_POWER_PG-I")
+            get_ioexp_gpio 2 0x20 9
+            ;;
+        "B1_M0_RUN_POWER_PG-I")
+            get_ioexp_gpio 7 0x20 9
+            ;;
+        *)
+            get_gpio "$net_name"
+            ;;
+    esac
+}
+
+get_ioexp_gpio()
+{
+    local bus="$1"
+    local addr="$2"
+    local pin_num="$3"
+    local byte_offset=$((pin_num / 8))
+    local bit_offset=$((pin_num % 8))
+    local byte_val
+    local bit_val
+
+    if [[ -z "$bus" || -z "$addr" || -z "$pin_num" ]]; then
+        echo "Error: Missing required arguments." >&2
+        return 1
+    fi
+
+    if ! byte_val=$(i2cget -y -f "$bus" "$addr" "$byte_offset" b); then
+        echo "Error: i2cget failed for bus $bus, address $addr, offset $byte_offset" >&2
+        return 2
+    fi
+
+    bit_val=$(( (byte_val >> bit_offset) & 0x01 ))
+    echo "$bit_val"
+    return 0
+}
+
+wait_gpios_value()
+{
+    local expd_val=$1           # Expected value (e.g., 1)
+    local max_retries=$2        # Maximum number of retries (e.g., 50)
+    local delay_secs=$3         # Delay in seconds between retries (e.g., 1)
+    local net_names=("${@:4}")  # The list of GPIO names.
+
+    if [ ${#net_names[@]} -eq 0 ]; then
+        echo "Error: Missing GPIO names for checking."
+        return 1
+    fi
+
+    declare -A last_values
+    local gpio_val=0
+    local trycnt=1
+    local all_match=1
+    local rc=0
+
+    until [[ $trycnt -gt $max_retries ]]; do
+        all_match=1
+
+        # Iterate through all input GPIO names
+        for net_name in "${net_names[@]}"; do
+            gpio_val=$(plat_get_gpio "$net_name")
+            rc=$?
+
+            if [[ $rc -ne 0 ]]; then
+                echo "Error: Unable to read GPIO $net_name (plat_get_gpio returned $rc)."
+                return 1
+            fi
+
+            if [[ $gpio_val -ne $expd_val ]]; then
+                all_match=0
+            fi
+
+            #echo "${net_name}: ${gpio_val}"
+            last_values["$net_name"]="$gpio_val"
+        done
+
+        if [[ $all_match -eq 1 ]]; then
+            return 0
+        fi
+
+        sleep "$delay_secs"
+        ((trycnt++))
+    done
+
+    echo "Failure: wait_gpios_value() timeout, retry: $max_retries, delay: $delay_secs"
+    echo "--- Last GPIO Readings (Expected: $expd_val) ---"
+    for net_name in "${net_names[@]}"; do
+        printf "  %s: %s\n" "$net_name" "${last_values["$net_name"]}"
+    done
+    echo "------------------------------------------------"
+    return 1
+}
