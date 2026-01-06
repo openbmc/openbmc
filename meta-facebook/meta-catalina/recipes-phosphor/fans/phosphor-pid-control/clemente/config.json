@@ -556,7 +556,7 @@
                     }
                 },
                 {
-                    "name": "IOB_OSFP",
+                    "name": "PID_IOB_OSFP",
                     "type": "temp",
                     "inputs": [
                         "IOB0_NIC0_OSFP_TEMP_C",
@@ -609,7 +609,7 @@
                     }
                 },
                 {
-                    "name": "HGX_PROCESSORMODULE_EXHAUST",
+                    "name": "PID_HGX_PROCESSORMODULE_EXHAUST",
                     "type": "temp",
                     "inputs": [
                         "HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
