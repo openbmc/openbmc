@@ -92,6 +92,12 @@ for (( i=0; i<num; i++ )); do
         eui64=$(mac_to_eui64 "$macstr")
         eui64="${eui64:2}"
         printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\nPreferredLifetime=0\n' "$eui64" > "$override"/60-ula.conf
+        dhcp_override="/run/systemd/network/-bmc-gbmcdhcp.network.d"
+
+        eui64_tweak=$(mac_to_eui64 "$macstr" "0xff" "0xfd")
+        eui64_tweak="${eui64_tweak:2}"
+        mkdir -p "$dhcp_override"
+        printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\n' "$eui64_tweak" > "$dhcp_override"/10-ula.conf
       fi
     done
     for override in /run/systemd/network/{00,}-bmc-$intf.netdev.d; do

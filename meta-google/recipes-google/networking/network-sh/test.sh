@@ -63,6 +63,11 @@ test_mac_to_eui64() {
   expect_streq "$str" '::1034:56ff:fe78:90af'
 }
 
+test_mac_to_eui64_tweak() {
+  str="$(mac_to_eui64 '12:34:56:78:90:af' '0x11' '0x22')" || fail
+  expect_streq "$str" '::1034:5611:2278:90af'
+}
+
 test_ip4_to_bytes() {
   out=()
   expect_err 1 ip_to_bytes out ''

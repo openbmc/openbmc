@@ -43,15 +43,20 @@ mac_to_eui48() {
 mac_to_eui64() {
   local mac_bytes=()
   mac_to_bytes mac_bytes "$1" || return
+  mid_byte1="$2"
+  mid_byte2="$3"
+  [[ -z "$mid_byte1" ]] && mid_byte1="0xff"
+  [[ -z "$mid_byte2" ]] && mid_byte2="0xfe"
 
   # Using EUI-64 conversion rules, create the suffix bytes from MAC bytes
   # Invert bit-1 of the first byte, and insert 0xfffe in the middle.
+  # Also support customized mid bytes.
   # shellcheck disable=SC2034
   local suffix_bytes=(
     0 0 0 0 0 0 0 0
     $((mac_bytes[0] ^ 2))
     "${mac_bytes[@]:1:2}"
-    $((0xff)) $((0xfe))
+    $(( mid_byte1 )) $(( mid_byte2 ))
     "${mac_bytes[@]:3:3}"
   )
 
