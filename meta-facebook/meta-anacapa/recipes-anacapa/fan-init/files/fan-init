@@ -12,11 +12,18 @@ RPDB_ADDR1=0x2B
 
 #Fan Register Setting
 FREQ=0xBB
-CONFIG_LPDB1=(0x08 0x08 0x08 0x08 0x08 0x19)
+CONFIG_LPDB1_EVT1=(0x08 0x08 0x08 0x08 0x08 0x19)
+CONFIG_LPDB1=(0x08 0x08 0x08 0x08 0x19 0x19)
 CONFIG_LPDB2=(0x08 0x08 0x08 0x00 0x00 0x00)
 CONFIG_RPDB1=(0x08 0x08 0x08 0x08 0x19 0x19)
 DYNAMICS=0x6C
 PWM=0xE6
+
+SERVICE="xyz.openbmc_project.EntityManager"
+PDBL_OBJECT_PATH="/xyz/openbmc_project/inventory/system/board/PDB_L"
+ASSET_INTERFACE="xyz.openbmc_project.Inventory.Decorator.Asset"
+
+MAX_RETRY=10
 
 configure_fan_controller() {
     local bus=$1
@@ -55,7 +62,25 @@ register_device() {
 # ---- LPDB (Fan1~Fan5)----
 # Fan controller #1 (0x2b @ bus 33)
 
-configure_fan_controller $LPDB_BUS $LPDB_ADDR1 CONFIG_LPDB1
+# Check if PDB_L object path exists
+retry=0
+while ! busctl introspect "$SERVICE" "$PDBL_OBJECT_PATH" >/dev/null 2>&1; do
+    retry=$((retry + 1))
+    if [ "$retry" -ge "$MAX_RETRY" ]; then
+        echo "PDB_L not found after ${MAX_RETRY} retries, skip LPDB 0x2b fan configuration"
+    fi
+    sleep 1
+done
+
+echo "PDB_L already exist, select EVT1 or later version to set fan configuration"
+
+if busctl get-property "$SERVICE" "$PDBL_OBJECT_PATH" "$ASSET_INTERFACE" Model | grep -q "EVT1"; then
+    # Left PDB EVT1
+    configure_fan_controller "$LPDB_BUS" "$LPDB_ADDR1" CONFIG_LPDB1_EVT1
+else
+    # Left PDB EVT2 or later version
+    configure_fan_controller "$LPDB_BUS" "$LPDB_ADDR1" CONFIG_LPDB1
+fi
 
 # Fan controller #2 (0x2f @ bus 33)
 

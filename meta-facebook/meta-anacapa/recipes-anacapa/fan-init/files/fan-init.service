@@ -1,5 +1,7 @@
 [Unit]
 Description = PWM Initialization
+After=xyz-openbmc_project.EntityManager.service
+Requires=xyz.openbmc_project.EntityManager.service
 Before=xyz.openbmc_project.fansensor.service
 
 [Service]
