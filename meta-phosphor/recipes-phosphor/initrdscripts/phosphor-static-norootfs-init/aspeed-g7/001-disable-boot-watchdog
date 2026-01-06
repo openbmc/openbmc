@@ -1,0 +1,9 @@
+#!/bin/sh
+
+"$INIT_HOME/enable-devmem"
+
+# Disable WDTA
+WDTA_CTRL_REG="0x14c3740c"
+WDTA_CTRL_VAL=$(printf "%d" "$(/sbin/devmem "$WDTA_CTRL_REG")")
+SET_VAL=$((WDTA_CTRL_VAL & 0xFFFFFFFE))
+/sbin/devmem "$WDTA_CTRL_REG" 32 "$SET_VAL"
