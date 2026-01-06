@@ -64,7 +64,7 @@ EOF
       systemctl reset-failed nftables && \
       systemctl --no-block reload-or-restart nftables || true
     systemctl stop --no-block gbmc-ncsi-ra@"$intf" || true
-    systemctl stop --no-block gbmc-br-dhcrelay@"$intf" || true
+    rm -f /run/gbmc-br-dhcrelay/uppers/"$intf"
     unset numaddrs
   fi
 }

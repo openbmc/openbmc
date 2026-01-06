@@ -30,16 +30,19 @@ gbmc_br_dhcrelay_hook() {
     else
       (( numaddrs -= 1 ))
     fi
-    local svc
-    svc=gbmc-br-dhcrelay@"$(systemd-escape "$intf")".service
+    local svc=
+    svc=gbmc-br-dhcrelay.service
+    file=/run/gbmc-br-dhcrelay/uppers/"$intf"
     if (( numaddrs == 1 )); then
-      echo "Starting $svc" >&2
-      systemctl reset-failed "$svc"
-      systemctl restart --no-block "$svc"
+      mkdir -p "$(dirname "$file")"
+      printf 'ff02::1:2%%%s' "$intf" >"$file"
+      echo "Adding dhcrelay upper $intf" >&2
     elif (( numaddrs == 0 )); then
-      echo "Stop $svc" >&2
-      systemctl stop --no-block "$svc"
+      rm -f "$file"
+      echo "Removing dhcrelay upper $intf" >&2
     fi
+    systemctl reset-failed "$svc"
+    systemctl restart --no-block "$svc"
   fi
 }
 

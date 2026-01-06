@@ -20,6 +20,7 @@ table inet filter {
         udp dport 3959 accept
         tcp dport 3967 accept
         udp dport 3967 accept
+        udp dport 547 accept
     }
     chain ncsi_brd_input {
         jump ncsi_any_input
@@ -35,5 +36,15 @@ table inet filter {
         oifname != gbmcbr drop
         ip6 daddr fdb5:0481:10ce::/64 drop
         ip6 saddr fdb5:0481:10ce::/64 drop
+    }
+}
+table inet raw {
+    chain ncsi_dhcrelay_output {
+        type filter hook output priority raw; policy accept;
+        oifname @NCSI_IF@ meta l4proto udp th sport 547 udp sport set 3967 notrack
+    }
+    chain ncsi_dhcrelay_input {
+        type filter hook input priority raw; policy accept;
+        iifname @NCSI_IF@ meta l4proto udp th dport 3967 udp dport set 547 notrack
     }
 }

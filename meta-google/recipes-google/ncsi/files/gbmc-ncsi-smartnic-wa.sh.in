@@ -15,16 +15,8 @@
 
 [[ "$1" != "@NCSI_IF@" ]] && exit 0
 
+# shellcheck disable=SC2034
 HAS_DHCRELAY='@GBMC_DHCP_RELAY@'
-
-if [ "$HAS_DHCRELAY" = 1 ]; then
-  # Remove the source relay port from the relay, bringing it back to run on
-  # the default port 547. Our relays don't support the source port option needed
-  # to run on 3967 for our legacy NICs.
-  echo 'RP_FLAG=' >/run/gbmc-ncsi-dhcrelay.env
-  systemctl reset-failed gbmc-ncsi-dhcrelay
-  systemctl restart --no-block gbmc-ncsi-dhcrelay
-fi
 
 echo '@NCSI_IF@' >>/run/gbmc-br-dhcp-intfs
 if systemctl is-active --quiet gbmc-br-dhcp@gbmcbr; then
@@ -35,7 +27,7 @@ fi
 read -r -d '' contents <<EOF
 table inet filter {
   chain ncsi_legacy_input {
-    udp dport {546,547} accept
+    udp dport 546 accept
   }
   chain ncsi_input {
     jump ncsi_gbmc_br_pub_input
@@ -43,6 +35,18 @@ table inet filter {
 }
 EOF
 rfile=/run/nftables/40-gbmc-ncsi-smartnic.rules
+mkdir -p "$(dirname "$rfile")"
+printf '%s' "$contents" >"$rfile"
+
+read -r -d '' contents <<EOF
+table inet raw {
+  chain ncsi_dhcrelay_output {
+    type filter hook output priority raw; policy accept;
+    return
+  }
+}
+EOF
+rfile=/run/nftables/75-gbmc-ncsi-smartnic.rules
 mkdir -p "$(dirname "$rfile")"
 printf '%s' "$contents" >"$rfile"
 systemctl reset-failed nftables

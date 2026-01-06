@@ -1,0 +1,13 @@
+#!/bin/bash
+shopt -s nullglob
+args=(-d --no-pid -l gbmcdhcp)
+upper=
+for file in /{usr/share,run}/gbmc-br-dhcrelay/uppers/*; do
+  upper=1
+  args+=(-u "$(<"$file")")
+done
+if [ -n "$upper" ]; then
+  exec dhcrelay "${args[@]}"
+else
+  sleep infinity
+fi

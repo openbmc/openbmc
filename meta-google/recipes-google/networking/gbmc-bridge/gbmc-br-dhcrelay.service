@@ -7,7 +7,7 @@ StartLimitBurst=3
 [Service]
 Restart=always
 RestartSec=5
-ExecStart=/usr/sbin/dhcrelay -d --no-pid -l gbmcdhcp -u ff02::1:2%%%I
+ExecStart=/usr/libexec/gbmc-br-dhcrelay
 
 [Install]
 WantedBy=multi-user.target

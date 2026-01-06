@@ -12,7 +12,6 @@ GBMC_NCSI_DHCP_IMPERSONATE_HOST ??= "1"
 
 SRC_URI += " \
   file://50-gbmc-ncsi.rules.in \
-  ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://10-ncsi-dhcrelay.conf'} \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.sh.in'} \
   file://gbmc-ncsi-ra@.service \
   file://gbmc-ncsi-ra.sh \
@@ -134,11 +133,9 @@ do_install:append() {
     >${D}${systemd_system_unitdir}/gbmc-ncsi-networkd-wait.target
 
   if [ "${GBMC_DHCP_RELAY}" = "1" ]; then
-    install -d -m0755 ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$if_name".service.d
-    install -m0644 ${UNPACKDIR}/10-ncsi-dhcrelay.conf ${D}${systemd_system_unitdir}/gbmc-br-dhcrelay@"$if_name".service.d/
     sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh.in \
-      >${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh
-    install -m0644 ${UNPACKDIR}/gbmc-ncsi-dhcrelay.sh $mondir/
+      >${WORKDIR}/gbmc-ncsi-dhcrelay.sh
+    install -m0644 ${WORKDIR}/gbmc-ncsi-dhcrelay.sh $mondir/
   fi
 
   if [ -n "${GBMC_NCSI_IF_OLD}" ]; then
