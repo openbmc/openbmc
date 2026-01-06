@@ -1,7 +1,6 @@
 [Unit]
 Description=Reconfig %i to get the IPv6 LL
-Requires=xyz.openbmc_project.Network.service
-After=xyz.openbmc_project.Network.service
+Before=xyz.openbmc_project.Network.service
 
 [Service]
 ExecStart=/usr/libexec/reconfig-interface-duid-ll %i

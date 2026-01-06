@@ -1,0 +1,12 @@
+[Unit]
+Description=Watch for %i network configuration changes
+Before=xyz.openbmc_project.Network.service
+
+[Path]
+# PathChanged triggers only when the file is closed after being written to.
+# This ensures we don't edit it while phosphor-networkd is still writing.
+PathChanged=/etc/systemd/network/00-bmc-%i.network
+Unit=reconfig-interface-duid-ll@%i.service
+
+[Install]
+WantedBy=multi-user.target
