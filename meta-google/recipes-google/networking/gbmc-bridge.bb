@@ -68,7 +68,6 @@ RDEPENDS:${PN}:append = " \
 
 SYSTEMD_SERVICE:${PN} += " \
   gbmc-br-hostname.service \
-  gbmc-br-dhcrelay.service \
   gbmc-br-dhcp-term.service \
   gbmc-br-load-ip.service \
   gbmc-br-ra.service \
@@ -232,6 +231,7 @@ do_install() {
 
   if [ "${GBMC_DHCP_RELAY}" = 1 ]; then
     install -m0644 ${UNPACKDIR}/gbmc-br-dhcrelay.service ${D}${systemd_system_unitdir}/
+    ln -sv ../gbmc-br-dhcrelay.service $wantdir/
     install -m0755 ${UNPACKDIR}/gbmc-br-dhcrelay ${D}${libexecdir}/
     install -m0644 ${UNPACKDIR}/gbmc-br-dhcrelay.sh "$mondir"/
     install -m0644 ${UNPACKDIR}/50-gbmc-br-dhcp.rules $nftables_dir/
