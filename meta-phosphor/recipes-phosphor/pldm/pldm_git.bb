@@ -22,7 +22,7 @@ RRECOMMENDS:${PN}:append = "pldmtool"
 
 S = "${WORKDIR}/git"
 SYSTEMD_SERVICE:${PN} += "pldmd.service"
-SYSTEMD_SERVICE:${PN} += "pldmSoftPowerOff.service"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'softoff', 'pldmSoftPowerOff.service', '', d)}"
 
 FILES:pldmtool = "${bindir}/pldmtool"
 FILES:pldm-libs = "${libdir}/lib*${SOLIBS}"
@@ -37,7 +37,8 @@ PACKAGECONFIG[oem-ampere] = "-Doem-ampere=enabled, -Doem-ampere=disabled, libcpe
 PACKAGECONFIG[oem-meta] = "-Doem-meta=enabled, -Doem-meta=disabled"
 PACKAGECONFIG[system-specific-bios-json] = "-Dsystem-specific-bios-json=enabled, -Dsystem-specific-bios-json=disabled"
 PACKAGECONFIG[fw-update-pkg-inotify] = "-Dfw-update-pkg-inotify=enabled, -Dfw-update-pkg-inotify=disabled"
-PACKAGECONFIG ??= ""
+PACKAGECONFIG[softoff] = "-Dsoftoff=enabled, -Dsoftoff=disabled"
+PACKAGECONFIG ??= "softoff"
 PACKAGECONFIG:append:df-mctp = " transport-af-mctp"
 
 EXTRA_OEMESON = " \
