@@ -3,9 +3,7 @@
 # The ALERT pin doesn't trigger when HSC or power module loses ENABLE with VCC present,
 # leading to Vout dropping to 0V. Need to record STATUS in this case.
 
-found_match=false
-
-dbus-monitor --system "type='signal',interface='xyz.openbmc_project.Sensor.Threshold.Critical'" |
+busctl monitor --system --match "type='signal',interface='xyz.openbmc_project.Sensor.Threshold.Critical'" --json=short 2>/dev/null |
 while IFS= read -r LINE; do
     script_to_run=""
     arg=""
@@ -15,42 +13,31 @@ while IFS= read -r LINE; do
         HSC_NUM=${BASH_REMATCH[1]}
         script_to_run="/usr/libexec/phosphor-gpio-monitor/medusa-hsc-alert"
         arg="$HSC_NUM"
-        found_match=true
 
-    # Power module:  MEDUSA_DELTA0_12V, MEDUSA_DELTA1_12V...
+    # Power module: MEDUSA_DELTA0_12V, MEDUSA_DELTA1_12V...
     elif [[ "$LINE" =~ MEDUSA_DELTA([0-3])_12V ]]; then
         DELTA_NUM=${BASH_REMATCH[1]}
         script_to_run="/usr/libexec/phosphor-gpio-monitor/medusa-power-module-fault"
         arg="$DELTA_NUM"
-        found_match=true
 
-    # 12V HSC: MEDUSA_MB0_HSC_12V, MEDUSA_MB1_HSC_12V...
+    # 12V HSC: MEDUSA_MB1_HSC_12V, MEDUSA_MB2_HSC_12V...
     elif [[ "$LINE" =~ MEDUSA_MB([1-8])_HSC_12V ]]; then
         MB_NUM=${BASH_REMATCH[1]}
         script_to_run="/usr/libexec/phosphor-gpio-monitor/slot-hsc-fault"
         arg="$MB_NUM"
-        found_match=true
     fi
 
-    if [[ "$found_match" == "true" ]]; then
+    if [[ -n "$script_to_run" ]]; then
+
         # CALIBRATED_MEDUSA sensors
         if [[ "$LINE" =~ CriticalLowAlarmAsserted || "$LINE" =~ CriticalHighAlarmAsserted ]]; then
             "$script_to_run" "$arg" # Send the event
 
-        # Other MEDUSA sensors
-        elif [[ "$LINE" =~ ThresholdAsserted ]]; then
-            while IFS= read -r NEXT_LINE; do
-                # "boolean true" means LCR asserted
-                if [[ "$NEXT_LINE" =~ boolean\ true ]]; then
-                    "$script_to_run" "$arg" # Send the event
-                    break
-                elif [[ "$NEXT_LINE" =~ boolean\ false ]]; then
-                    break
-                elif [[ "$NEXT_LINE" =~ signal ]]; then
-                    break
-                fi
-            done
+        # Other MEDUSA sensors - check boolean in JSON payload
+        # JSON payload format: [..., true, 22.028] or [..., false, 22.028]
+        # "true" means LCR asserted
+        elif [[ "$LINE" =~ \"member\":\"ThresholdAsserted\" ]] && [[ "$LINE" =~ ,true, ]]; then
+            "$script_to_run" "$arg"
         fi
     fi
-    found_match=false
 done
