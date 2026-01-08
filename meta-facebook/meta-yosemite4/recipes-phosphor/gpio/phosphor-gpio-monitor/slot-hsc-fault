@@ -25,13 +25,19 @@ read_mfr_id() {
     local bus=$1
     local addr=$2
     local mfr_id
-    mfr_id=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x99 r4)
+
+    # Try to read MFR_ID, return error if I2C fails
+    if ! mfr_id=$(i2ctransfer -f -y "$bus" w1@"$addr" 0x99 r4 2>/dev/null); then
+        return 1  # I2C failed
+    fi
+
     local vendor="0x41 0x44 0x49"
     if [[ $mfr_id == *"$vendor"* ]]; then
         echo "adi"
     else
         echo "mps"
     fi
+    return 0
 }
 
 read_12v_hsc() {
@@ -39,10 +45,19 @@ read_12v_hsc() {
     local addr=$2
     local slot_num=$3
     local module_vendor
-    module_vendor=$(read_mfr_id "$bus" "$addr")
-
     local failure_data="SLOT${slot_num} HSC Fault"
     local power_rail="${HSC_PATH}${slot_num}_HSC_12V"
+
+
+    # Try to read vendor ID to check I2C communication
+    if ! module_vendor=$(read_mfr_id "$bus" "$addr"); then
+        # I2C failed - log simplified message and return early
+        log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+            "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data - I2C failed\"}"
+        return
+    fi
+
+    # I2C communication OK - continue reading all registers
 
     # Read STATUS_VOUT (0x7A) if adi type
     if [ "$module_vendor" == "adi" ]; then

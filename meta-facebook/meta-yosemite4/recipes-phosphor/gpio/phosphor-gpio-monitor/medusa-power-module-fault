@@ -44,15 +44,15 @@ read_power_module() {
     local addr=$2
     local pu_num=$3
     local module_vendor
-
-    if ! module_vendor=$(read_mfr_id "$bus" "$addr"); then
-        log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
-            "{\"POWER_RAIL\": \"${MODULE_PATH}${pu_num}_12V\", \"FAILURE_DATA\": \"Medusa Power Module ${pu_num} Fault\"}"
-        return # Return if read_mfr_id failed
-    fi
-
     local failure_data="Medusa Power Module ${pu_num} Fault"
     local power_rail="${MODULE_PATH}${pu_num}_12V"
+
+    if ! module_vendor=$(read_mfr_id "$bus" "$addr"); then
+        # I2C failed - log simplified message and return early
+        log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+            "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data - I2C failed\"}"
+        return
+    fi
 
     # Read STATUS_BYTE (0x78) and STATUS_OTHER (0x7F) if flex type
     if [ "$module_vendor" == "flex" ]; then

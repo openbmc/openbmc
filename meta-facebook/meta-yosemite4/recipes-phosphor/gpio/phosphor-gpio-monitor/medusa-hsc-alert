@@ -35,9 +35,16 @@ read_medusa_hsc_module() {
     local addr=$2
     local hsc_alert_position=$3
     local medusa_type=$4
-
     local failure_data="Medusa 48V HSC${hsc_alert_position} Alert"
     local power_rail="${HSC_PATH}${hsc_alert_position}_48V"
+
+    # Try first I2C read to check communication
+    if ! i2ctransfer -f -y "$bus" w1@"$addr" 0x79 r2 >/dev/null 2>&1; then
+        # I2C failed - log simplified message and return early
+        log-create xyz.openbmc_project.State.Power.PowerRailFault --json \
+            "{\"POWER_RAIL\": \"$power_rail\", \"FAILURE_DATA\": \"$failure_data - I2C failed\"}"
+        return
+    fi
 
     # Read STATUS_CML (0x7E) if XDP710 type
     if [ "$medusa_type" == "XDP710" ]; then
