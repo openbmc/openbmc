@@ -5,18 +5,24 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 source /usr/libexec/fb-common-functions
 
 # Remove EID for SWB
-# Supports i3c hub for EVT 2A and later phases
-if [ "$(get_gpio "MB_REV_ID_1")" -ne 0 ] || [ "$(get_gpio "MB_REV_ID_2")" -ne 0 ]; then
+rev_id_1=$(get_gpio "MB_REV_ID_1")
+rev_id_2=$(get_gpio "MB_REV_ID_2")
+
+if [ "$rev_id_1" -eq 0 ] && [ "$rev_id_2" -eq 0 ]; then
+    hub_devices=$(i2cdetect -l | grep "hub0-" | grep "\.port2")
+    target_device=$(echo "$hub_devices" | sed -n '2p')
+else
     hub_devices=$(i2cdetect -l | grep "hub2-" | grep "\.port2")
-    if [[ -n "$hub_devices" ]]; then
-        hub_id=$(echo "$hub_devices" | grep -oEm1 "hub2-[a-f0-9]+" | awk '!seen[$0]++')
-        i2c_num=$(echo "$hub_devices" | grep "$hub_id\.port2" | awk '{print $1}' | cut -d'-' -f2)
-        eid=$(mctp route | grep "mctpi2c$i2c_num" | grep -oE "eid min [0-9]+" | awk '{print $3}' | head -n1)
-        if [[ -n "$eid" ]]; then
-            busctl call au.com.codeconstruct.MCTP1 \
-                /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
-                au.com.codeconstruct.MCTP.Endpoint1 Remove 2>/dev/null || true
-        fi
+    target_device=$(echo "$hub_devices" | head -n 1)
+fi
+
+if [[ -n "$target_device" ]]; then
+    i2c_num=$(echo "$target_device" | awk '{print $1}' | cut -d'-' -f2)
+    eid=$(mctp route | grep "mctpi2c$i2c_num" | grep -oE "eid min [0-9]+" | awk '{print $3}' | head -n1)
+    if [[ -n "$eid" ]]; then
+        busctl call au.com.codeconstruct.MCTP1 \
+            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
+            au.com.codeconstruct.MCTP.Endpoint1 Remove 2>/dev/null || true
     fi
 fi
 
