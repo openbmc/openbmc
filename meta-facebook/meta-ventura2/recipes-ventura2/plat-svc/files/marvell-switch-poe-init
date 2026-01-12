@@ -1,0 +1,85 @@
+#!/bin/bash
+
+transmit_with_checksum() {
+    local fd="$1"
+    shift
+
+    CHECKSUM=0
+    local payload=""
+    local byte value hex
+
+    # build payload + checksum
+    for byte in "$@"; do
+        if [[ "$byte" =~ ^0x ]]; then
+            value=$((16#${byte#0x}))
+        else
+            value=$((16#$byte))
+        fi
+
+        CHECKSUM=$((CHECKSUM + value))
+        printf -v hex '\\x%02x' "$value"
+        payload+="$hex"
+    done
+
+    CHECKSUM=$((CHECKSUM & 0xff))
+    printf -v hex '\\x%02x' "$CHECKSUM"
+    payload+="$hex"
+
+    # transmit binary payload over UART
+    printf '%b' "$payload" >&"$fd"
+}
+
+marvell_switch_poe_init() {
+    local MAX_RETRY="$1"
+    [ -z "$MAX_RETRY" ] && MAX_RETRY=3
+
+    local POE_CTL="/dev/ttyPOE"
+    # Set PoE total power budget to 30 W with a 0 W guard band.
+    # The command format is defined in the Broadcom PoE controller specification.
+    local POE_SET_POWER_CMD=(18 00 00 2c 01 00 00 ff ff ff ff)
+    local POE_SET_POWER_RESP=(18 00 00 00 FF FF FF FF FF FF FF 11)
+
+    local retry RX_HEX success=0
+
+    stty -F "$POE_CTL" 19200 raw -echo min 0 time 0 || {
+        echo "Failed to configure UART on $POE_CTL" >&2
+        return 1
+    }
+
+    exec 3<>"$POE_CTL" || {
+        echo "Failed to open $POE_CTL" >&2
+        return 1
+    }
+
+    retry=1
+    while [ "$retry" -le "$MAX_RETRY" ]; do
+        transmit_with_checksum 3 "${POE_SET_POWER_CMD[@]}"
+        printf "TX[%d]: %s %02X\n" "$retry" "${POE_SET_POWER_CMD[*]}" "$CHECKSUM"
+        sleep 0.05
+        RX_HEX=$(cat <&3 | hexdump -v -e '1/1 "%02X "' | sed 's/[[:space:]]*$//')
+
+        if [ "$RX_HEX" = "${POE_SET_POWER_RESP[*]}" ]; then
+            echo "RX OK"
+            success=1
+            break
+        fi
+
+        echo "RX MISMATCH (retry $retry)"
+        echo "RX: $RX_HEX"
+
+        retry=$((retry + 1))
+    done
+
+    exec 3>&-
+
+    if [ "$success" -eq 1 ]; then
+        return 0
+    else
+        echo "PoE power configuration failed after $MAX_RETRY attempts" >&2
+        return 1
+    fi
+}
+
+marvell_switch_poe_init 3
+
+exit 0

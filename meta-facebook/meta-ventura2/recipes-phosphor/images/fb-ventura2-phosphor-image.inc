@@ -1,5 +1,15 @@
 # Ventura2 Image Configuration
 
+# Enable mdio-tools for communication with the PHY chip
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    mdio-tools \
+"
+
+# Add plat-svc for system initialization
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    plat-svc \
+"
+
 # Enable for debug card function
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-ipmi-ipmb \

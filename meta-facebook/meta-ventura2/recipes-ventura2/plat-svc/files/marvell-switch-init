@@ -1,0 +1,27 @@
+#!/bin/bash
+
+marvell_switch_init() {
+    # Clear PHY detect on Port 0
+    mdio 1* 0x00 0x00 0x04
+
+    # Configure Port 9 and Port 10 for SGMII mode
+    mdio 1* 0x09 0x00 0x0a
+    mdio 1* 0x0a 0x00 0x0a
+
+    # Configure the external PHY on Port 9 and Port 10 for SGMII mode
+    mdio 1* 0x1C 0x19 18
+    mdio 1* 0x1C 0x18 $((0xB400 | (0 << 5) | 22))
+
+    mdio 1* 0x1C 0x19 0x8001
+    mdio 1* 0x1C 0x18 $((0xB400 | (0 << 5) | 20))
+
+    mdio 1* 0x1C 0x19 18
+    mdio 1* 0x1C 0x18 $((0xB400 | (1 << 5) | 22))
+
+    mdio 1* 0x1C 0x19 0x8001
+    mdio 1* 0x1C 0x18 $((0xB400 | (1 << 5) | 20))
+}
+
+marvell_switch_init
+
+exit 0

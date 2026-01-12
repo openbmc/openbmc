@@ -1,0 +1,14 @@
+[Unit]
+Description=Marvell Switch PoE Power Initialization
+Requires=dev-ttyPOE.device
+After=dev-ttyPOE.device
+Requires=marvell-switch-init.service
+After=marvell-switch-init.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/plat-svc/marvell-switch-poe-init
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,12 @@
+[Unit]
+Description=Marvell Switch Initialization
+After=basic.target
+Before=systemd-networkd.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/libexec/plat-svc/marvell-switch-init
+
+[Install]
+WantedBy=multi-user.target
