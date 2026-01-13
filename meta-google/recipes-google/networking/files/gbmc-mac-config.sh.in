@@ -91,7 +91,7 @@ for (( i=0; i<num; i++ )); do
       if [[ "$intf" == "gbmcbr" ]]; then
         eui64=$(mac_to_eui64 "$macstr")
         eui64="${eui64:2}"
-        printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\nPreferredLifetime=0\n' "$eui64" > "$override"/60-ula.conf
+        printf '[Address]\nAddress=fdb5:0481:10ce:0:%s/64\n' "$eui64" > "$override"/60-ula.conf
         dhcp_override="/run/systemd/network/-bmc-gbmcdhcp.network.d"
 
         eui64_tweak=$(mac_to_eui64 "$macstr" "0xff" "0xfd")
