@@ -12,7 +12,7 @@ SRC_URI:append:class-nativesdk = " \
     file://older-glibc-symbols.patch"
 SRC_URI[prebuilt.sha256sum] = "ed9f456856e9d86359f169f46a70ad7be4190d6040282b84c8d97b99072485aa"
 
-SRCREV = "9ce8c09980af23ebd4ebf072010469882d0459a6"
+SRCREV = "125b020dd2bc46baa37a80784704e382732357b4"
 S = "${WORKDIR}/git"
 PV = "1.9.2+git"
 
