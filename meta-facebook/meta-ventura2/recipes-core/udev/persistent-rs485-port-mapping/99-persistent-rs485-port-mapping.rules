@@ -1,0 +1,35 @@
+# Identify whether the UART IC is FT4232H (main source) or XR21B1424 (2nd source).
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6011", ENV{UART_IC}="FT4232H"
+ATTRS{idVendor}=="04e2", ATTRS{idProduct}=="1424", ENV{UART_IC}="XR21B1424"
+
+# FT4232H is used in the main source 
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.0", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.1", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.2", SYMLINK+="ttyRS485-3"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.3", SYMLINK+="ttyPOE"
+
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.0", SYMLINK+="ttyRS485-4"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.1", SYMLINK+="ttyRS485-5"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.2", SYMLINK+="ttyRS485-6"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.3", SYMLINK+="ttyRS485-7"
+
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.0", SYMLINK+="ttyRS485-8"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.1", SYMLINK+="ttyRS485-9"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.2", SYMLINK+="ttyRS485-10"
+ENV{UART_IC}=="FT4232H", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.3", SYMLINK+="ttyRS485-11"
+
+# XR21B1424 is used in the 2nd source
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.0", SYMLINK+="ttyRS485-1"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.2", SYMLINK+="ttyRS485-2"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.4", SYMLINK+="ttyRS485-3"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.1:1.6", SYMLINK+="ttyPOE"
+
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.0", SYMLINK+="ttyRS485-4"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.2", SYMLINK+="ttyRS485-5"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.4", SYMLINK+="ttyRS485-6"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.2:1.6", SYMLINK+="ttyRS485-7"
+
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.0", SYMLINK+="ttyRS485-8"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.2", SYMLINK+="ttyRS485-9"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.4", SYMLINK+="ttyRS485-10"
+ENV{UART_IC}=="XR21B1424", ENV{ID_PATH}=="platform-1e6a1000.usb-usb-0:1.3:1.6", SYMLINK+="ttyRS485-11"
