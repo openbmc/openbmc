@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-harma/recipes-networking/mctp/files/check-eid
+source /usr/libexec/mctp/check-eid
+
+mmc_addr=0x20
+mmc_busnum=9
+nic_addr=50
+nic_busnum=1
+nic_eid=90
+
+setup_mmc_eid() {
+    learn_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/interfaces/mctpi2c${mmc_busnum} \
+        au.com.codeconstruct.MCTP.BusOwner1 LearnEndpoint ay 1 ${mmc_addr}"
+
+    if ! retry_command "$learn_endpoint_cmd" "$maxRetries" 1; then
+        echo "[Error] Failed to learn MMC EID after $maxRetries attempts."
+    fi
+}
+
+setup_nic_eid() {
+    # Set local EID for NIC
+    assign_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/interfaces/mctpi2c${nic_busnum} \
+        au.com.codeconstruct.MCTP.BusOwner1 \
+        AssignEndpointStatic ayy 1 ${nic_addr} ${nic_eid}"
+
+    if ! retry_command "$assign_endpoint_cmd" "$maxRetries" 1; then
+        echo "[Error] Failed to assign NIC EID after $maxRetries attempts."
+    fi
+}
+
+# The NIC only supports the minimum MTU.
+mctp link set mctpi2c1 mtu 68
+sleep 2
+setup_nic_eid
+
+# Retry to check MMC EID, if not exist, setup it.
+for attempt in {1..10}; do
+    if check_mmc_eid; then
+        break
+    fi
+
+    if [ "$attempt" -eq 10 ]; then
+        setup_mmc_eid
+    fi
+
+    sleep 2
+done
+
+sleep 2
+exit 0

@@ -1,8 +1,8 @@
 [Unit]
-Description=mmc recovery
+Description=mmc recovery service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/mctp/setup-devices-eid
+ExecStart=/usr/libexec/phosphor-gpio-monitor/mmc-recovery
 
 SyslogIdentifier=mmc-recovery

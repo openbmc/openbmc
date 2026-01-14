@@ -1,0 +1,73 @@
+#!/bin/bash
+
+SERVICE="xyz.openbmc_project.MCTPReactor"
+ROOT="/au/com/codeconstruct/mctp1"
+DEFAULT_EID="10"
+
+# Internal cache to avoid redundant DBus calls
+_CACHED_MMC_EID=""
+
+# Retry a command with optional failover command
+retry_command() {
+    local command="$1"
+    local maxRetries=${2:-10}
+    local retryInterval=${3:-1}
+    local failExecuteCmd=${4:-""}
+    local retries=0
+
+    while [ "$retries" -lt "$maxRetries" ]; do
+        if bash -c "$command" 2>&1; then
+            return 0
+        else
+            if [ -n "$failExecuteCmd" ]; then
+                bash -c "$failExecuteCmd"
+            fi
+
+            retries=$((retries + 1))
+            sleep "$retryInterval"
+        fi
+    done
+
+    echo "[Error] Command failed after $maxRetries retries." >&2
+    return 1
+}
+
+# Check if the MMC endpoint exists and cache its EID
+check_mmc_eid() {
+    local ret
+    local found_eid
+
+    _CACHED_MMC_EID=""
+
+    # GetManagedObjects is a heavy call; we do it once
+    ret=$(busctl call "${SERVICE}" "${ROOT}" \
+        org.freedesktop.DBus.ObjectManager GetManagedObjects 2>/dev/null)
+
+    # Extract EID via path parsing
+    found_eid=$(printf '%s' "${ret}" | tr '"' '\n' | awk '
+        /\/endpoints\// { ep=$0 }
+        /\/MMC/ {
+            if (ep != "") {
+                n=split(ep, a, "/");
+                print a[n];
+                exit
+            }
+        }')
+
+    if [[ -z "${found_eid}" ]]; then
+        return 1
+    fi
+
+    _CACHED_MMC_EID="${found_eid}"
+    return 0
+}
+
+# Return the EID or the default value
+get_mmc_eid() {
+    # If check_mmc_eid succeeds, use the cached value
+    if check_mmc_eid; then
+        printf '%s\n' "${_CACHED_MMC_EID}"
+    else
+        printf '%s\n' "${DEFAULT_EID}"
+    fi
+}

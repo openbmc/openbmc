@@ -4,7 +4,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 SRC_URI += " \
     file://setup-eid.conf \
     file://setup-local-eid \
-    file://setup-devices-eid \
+    file://check-eid \
 "
 
 RDEPENDS:${PN} += " bash"
@@ -21,6 +21,6 @@ do_install:append () {
 
     install -m 0755 ${UNPACKDIR}/setup-local-eid \
               ${D}${libexecdir}/mctp/
-    install -m 0755 ${UNPACKDIR}/setup-devices-eid \
+    install -m 0755 ${UNPACKDIR}/check-eid \
               ${D}${libexecdir}/mctp/
 }

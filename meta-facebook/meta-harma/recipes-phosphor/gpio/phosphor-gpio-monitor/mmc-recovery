@@ -1,0 +1,37 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-harma/recipes-networking/mctp/files/check-eid
+source /usr/libexec/mctp/check-eid
+
+mmc_addr=0x20
+mmc_busnum=9
+
+re_setup_mmc_eid() {
+    mmc_eid=$(get_mmc_eid)
+
+    # Check if the endpoint exists
+    if busctl introspect au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/networks/1/endpoints/"$mmc_eid"; then
+
+        echo "[Info] MMC endpoint already exists, removing..."
+        busctl call au.com.codeconstruct.MCTP1 \
+            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$mmc_eid" \
+            au.com.codeconstruct.MCTP.Endpoint1 Remove
+    fi
+
+    # Wait for mctp reactor to create the endpoint again
+    sleep 10
+    # Using Learn command to get MMC EID if MMC not support assigning static EID
+    if ! check_mmc_eid; then
+        learn_endpoint_cmd="busctl call au.com.codeconstruct.MCTP1 \
+            /au/com/codeconstruct/mctp1/interfaces/mctpi2c${mmc_busnum} \
+            au.com.codeconstruct.MCTP.BusOwner1 LearnEndpoint ay 1 ${mmc_addr}"
+
+        if ! retry_command "$learn_endpoint_cmd" "$maxRetries" 1; then
+            echo "[Error] Failed to learn MMC EID after $maxRetries attempts."
+        fi
+    fi
+}
+
+re_setup_mmc_eid
+
+exit 0

@@ -32,6 +32,7 @@ SRC_URI += "file://assert-post-end \
             file://initial-poweron-device \
             file://initial-poweron-device.service \
             file://logging-util \
+            file://mmc-recovery \
             file://mmc-recovery.service \
             file://multi-gpios-sys-init \
             file://multi-gpios-sys-init.service \
@@ -124,6 +125,7 @@ do_install:append() {
 
     install -m 0755 ${UNPACKDIR}/fan-reload ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/initial-poweron-device ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/mmc-recovery ${D}${libexecdir}/${PN}/
 }
 
 SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"
