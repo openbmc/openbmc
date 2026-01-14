@@ -208,13 +208,13 @@ chassis-power-cycle()
 sled-cycle()
 {
     # Detach file system before doing sled cycle
-    if ! umount --lazy /run/mnt-persist; then
-        msg="Failed to detach /run/mnt-persist"
+    if ! /usr/libexec/phosphor-static-norootfs-init/umount-filesystem; then
+        msg="Failed to unmount /run/mnt-persist"
         echo "${msg}"
         add_sel "${msg}" "Error"
     else
         # If the detach is succesful, add_sel will fail so we can't log this
-        echo "Succeeded to detach run/mnt-persist"
+        echo "Succeeded to detach /run/mnt-persist"
     fi
 
     if [ -z "$MANAGEMENT_BOARD_VERSION" ]; then

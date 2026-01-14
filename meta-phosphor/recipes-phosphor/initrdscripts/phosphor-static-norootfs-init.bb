@@ -17,7 +17,7 @@ SOURCE_FILES = "\
 
 INIT_HELPERS = "\
     enable-devmem \
-    remount-filesystem-readonly \
+    umount-filesystem \
     "
 
 SRC_URI += "\

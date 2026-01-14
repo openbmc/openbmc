@@ -4,10 +4,10 @@ sync
 mount_point="/run/mnt-persist"
 retries=3
 
-echo "Attempting to remount $mount_point as read-only with a number of $retries retries"
+echo "Attempting to unmount $mount_point with $retries retries"
 
 while [ "$retries" -gt 0 ]; do
-    if mount -o ro,remount "$mount_point"; then
+    if umount --lazy "$mount_point"; then
         exit 0
     fi
     retries=$((retries - 1))
