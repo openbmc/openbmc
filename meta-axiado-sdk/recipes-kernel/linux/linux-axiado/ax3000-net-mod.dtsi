@@ -1,0 +1,76 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * DTSI file for Axiado AX3000-SCM
+ * Copyright (c) 2025 Axiado Corporation.
+ */
+
+/ {
+	eip-197@83000000 {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "Security-ip-197";
+		interrupt-parent = <&gic500>;
+		interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 34 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 35 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>;
+		reg = <0x0 0x83000000 0 0x100000>;
+	};
+
+	/* SHIM HCP Memory */
+	shim@83100000 {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "shim_hcp";
+		reg = <0x0 0x83100000 0x0 0x4000>,  /* SHIM Regs */
+			<0x0 0x87000000 0x0 0x50000>, /* ETH_PHY CSR */
+			<0x0 0x80620800 0x0 0x900>,   /* IOCTL_1 CSR */
+			<0x0 0x80200000 0x0 0x100000>; /* OCM Memory */
+		interrupt-parent = <&gic500>;
+		interrupts = <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 8 IRQ_TYPE_LEVEL_HIGH>,
+			<GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
+
+		reg-names = "shim_regs", "phy_csr", "ioctl1_csr","ocm_mem";
+
+		mac0: mac_0 {
+			reg = <0x0>;
+			compatible = "axiado, mac";
+			phy-mode = "rxaui";
+			status = "disabled";
+		};
+		mac1: mac_1 {
+			reg = <0x1>;
+			compatible = "axiado, mac";
+			phy-mode = "sgmii";
+			status = "disabled";
+		};
+		mac2: mac_2 {
+			reg = <0x2>;
+			compatible = "axiado, mac";
+			phy-mode = "sgmii";
+			status = "disabled";
+		};
+		mac3: mac_3 {
+			reg = <0x3>;
+			compatible = "axiado, mac";
+			phy-mode = "sgmii";
+			status = "disabled";
+		};
+		mac4: mac_4 {
+			reg = <0x4>;
+			compatible = "axiado, mac";
+			phy-mode = "sgmii";
+			status = "disabled";
+		};
+		mdio: mdio {
+			compatible = "axiado, ax-mii, ax-mdio";
+			reg = <0x0 0x0>;//Dummy resource
+			#address-cells = <1>;
+			#size-cells = <0>;
+		};
+	};
+};

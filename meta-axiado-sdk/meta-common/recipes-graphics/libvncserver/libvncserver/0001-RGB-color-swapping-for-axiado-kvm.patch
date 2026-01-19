@@ -1,0 +1,33 @@
+From efa8d5223ee76edc14e459d5ea2a56db94366ac5 Mon Sep 17 00:00:00 2001
+From: Vijay Khemka <axiado1321@axiado.com>
+Date: Wed, 21 May 2025 14:14:54 -0700
+Subject: [PATCH] RGB color swapping for axiado kvm
+
+Upstream-Status: Pending
+
+This patch swaps RGB color as per Axiado IP
+
+Signed-off-by: Vijay Khemka <axiado1321@axiado.com>
+---
+ libvncserver/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/libvncserver/main.c b/libvncserver/main.c
+index 32519f14..eec13e40 100644
+--- a/libvncserver/main.c
++++ b/libvncserver/main.c
+@@ -898,9 +898,9 @@ static void rfbInitServerFormat(rfbScreenInfoPtr screen, int bitsPerSample)
+      format->greenMax = (1 << bitsPerSample) - 1;
+      format->blueMax = (1 << bitsPerSample) - 1;
+      if(rfbEndianTest) {
+-       format->redShift = 0;
++       format->blueShift = 0;
+        format->greenShift = bitsPerSample;
+-       format->blueShift = bitsPerSample * 2;
++       format->redShift = bitsPerSample * 2;
+      } else {
+        if(format->bitsPerPixel==8*3) {
+ 	 format->redShift = bitsPerSample*2;
+-- 
+2.25.1
+

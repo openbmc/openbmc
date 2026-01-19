@@ -1,0 +1,16 @@
+[Unit]
+Description=NVIDIA Run Power Monitor Service for USB
+Requires=bmc-boot-complete.service
+After=bmc-boot-complete.service
+StartLimitIntervalSec=1
+
+[Service]
+Restart=always
+Type=notify
+ExecStart=/usr/bin/env /etc/usb/power_monitor_usb.sh
+ExecStartPost=/bin/sleep 4
+ExecStop=/usr/bin/env rm /run/bmc-state/RUN_POWER_PG
+SyslogIdentifier=power-mon-usb
+
+[Install]
+WantedBy=multi-user.target

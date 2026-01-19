@@ -1,0 +1,9 @@
+[Unit]
+Description=Use ax3000-fw-update for TCU reset
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/tcu-reset.sh
+RemainAfterExit=no
+

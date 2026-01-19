@@ -1,0 +1,130 @@
+[
+    {
+        "Exposes": [
+            {
+                "Address": "0x48",
+                "Bus": 7,
+                "Name": "DCSCM 0 Temp",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "TMP75"
+            }
+        ],
+        "Name": "MTAHOE",
+        "Probe": "xyz.openbmc_project.FruDevice({'BUS': 7, 'ADDRESS': 80, 'PRODUCT_PRODUCT_NAME': 'MTAHOE'})",
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "Manufacturer": "$PRODUCT_MANUFACTURER",
+            "Model": "$PRODUCT_PRODUCT_NAME",
+            "PartNumber": "$PRODUCT_PART_NUMBER",
+            "SerialNumber": "$PRODUCT_SERIAL_NUMBER"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Revision": {
+            "Version": "$PRODUCT_VERSION"
+        }
+    },
+    {
+        "Exposes": [
+            {
+                "Address": "0x48",
+                "Bus": 7,
+                "Name": "DCSCM 0 Temp",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "TMP75"
+            },
+            {
+                "Address": "0x49",
+                "Bus": 7,
+                "Name": "DCSCM 1 Temp",
+                "Thresholds": [
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper critical",
+                        "Severity": 1,
+                        "Value": 90
+                    },
+                    {
+                        "Direction": "greater than",
+                        "Name": "upper non critical",
+                        "Severity": 0,
+                        "Value": 75
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower non critical",
+                        "Severity": 0,
+                        "Value": 5
+                    },
+                    {
+                        "Direction": "less than",
+                        "Name": "lower critical",
+                        "Severity": 1,
+                        "Value": 0
+                    }
+                ],
+                "Type": "TMP75"
+            }
+        ],
+        "Name": "SNOWBIRD",
+        "Probe": "xyz.openbmc_project.FruDevice({'BUS': 7, 'ADDRESS': 80, 'PRODUCT_PRODUCT_NAME': 'SNOWBIRD'})",
+        "Type": "Board",
+        "xyz.openbmc_project.Inventory.Decorator.Asset": {
+            "Manufacturer": "$PRODUCT_MANUFACTURER",
+            "Model": "$PRODUCT_PRODUCT_NAME",
+            "PartNumber": "$PRODUCT_PART_NUMBER",
+            "SerialNumber": "$PRODUCT_SERIAL_NUMBER"
+        },
+        "xyz.openbmc_project.Inventory.Decorator.Revision": {
+            "Version": "$PRODUCT_VERSION"
+        }
+    }
+]

@@ -1,0 +1,26 @@
+From 90d3de92e56d6563504a7c8a5084bafc9e66962e Mon Sep 17 00:00:00 2001
+From: Kuan-Jui Chiu <kchiu@axiado.com>
+Date: Thu, 7 Aug 2025 02:24:40 -0700
+Subject: [PATCH] Remove Aspeed ABR function
+
+Upstream-Status: Pending
+---
+ obmc-flash-bmc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/obmc-flash-bmc b/obmc-flash-bmc
+index 18f915f..e4a8b12 100644
+--- a/bmc/obmc-flash-bmc
++++ b/bmc/obmc-flash-bmc
+@@ -628,6 +628,8 @@ function mmc_setprimary() {
+ }
+ 
+ function mmc_mirroruboot() {
++    return 0
++
+     # Get current boot device; 0-primary_bootdev device; 1 - alt_bootdev
+     bootdev=$(cat /sys/kernel/debug/aspeed/sbc/abr_image)
+     if [[ "${bootdev}" == "0" ]]; then
+-- 
+2.34.1
+

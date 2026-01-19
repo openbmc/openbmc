@@ -1,0 +1,12 @@
+[Unit]
+Description=Disable GPIO-IPC at startup
+DefaultDependencies=no
+Before=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'echo 0 > /sys/kernel/gpio_ctrl/use_ipc'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target

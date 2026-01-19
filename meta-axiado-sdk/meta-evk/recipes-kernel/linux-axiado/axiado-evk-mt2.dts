@@ -1,0 +1,35 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright (c) 2021-25 Axiado Corporation (or its affiliates).
+ */
+
+/dts-v1/;
+
+#include "mt2.dts"
+
+/ {
+	model = "Axiado mini Tahoe2";
+	aliases {
+		i2c0 = &i3c0;
+		i2c1 = &i3c1;
+		i2c2 = &i3c2;
+		i2c3 = &i3c3;
+		i2c4 = &i3c4;
+		i2c5 = &i3c5;
+		i2c6 = &i3c6;
+		i2c7 = &i3c7;
+		i2c8 = &i3c8;
+		i2c9 = &i3c9;
+		i2c10 = &i3c10;
+		i2c11 = &i3c11;
+		i2c12 = &i3c12;
+		i2c13 = &i3c13;
+		i2c14 = &i3c14;
+		i2c15 = &i3c15;
+		i2c16 = &i3c16;
+	};
+};
+
+&usb2_2 {
+	compatible = "axiado,ax3000-gen2-xhci", "generic-xhci";
+};

@@ -1,0 +1,11 @@
+[Unit]
+Description=Setup USB RNDIS gadget function
+Requires=bmc-boot-complete.service
+After=bmc-boot-complete.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/create-usb-rndis.sh
+
+[Install]
+WantedBy=multi-user.target

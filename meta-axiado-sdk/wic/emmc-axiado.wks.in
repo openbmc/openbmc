@@ -1,0 +1,24 @@
+# Copyright (c) 2021-24 Axiado Corporation (or its affiliates). All rights reserved.
+#
+# Description: Create an image for eMMC
+#
+#  --- - ----- -------- -------- -------- -------- ------
+# |GPT| | env | boot-a | boot-b | rofs-a | rofs-b | rwfs |
+#  --- - ----- -------- -------- -------- -------- ------
+#         1MB    64MB     64MB    384MB    384MB    100MB
+
+bootloader --ptable gpt
+
+#env
+part --align 4 --fixed-size 1M --source rawcopy --sourceparams="file=${DEPLOY_DIR_IMAGE}/u-boot-env.bin"
+
+#boot a/b
+part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-a
+part --fstype=ext4 --fixed-size 64M --source bootimg-partition --label boot-b
+
+#rofs a/b
+part --fstype=ext4 --fixed-size 384M --source rootfs --label rofs-a
+part --fstype=ext4 --fixed-size 384M --source rootfs --label rofs-b
+
+#rwfs
+part --fstype=ext4 --fixed-size 100M --label rwfs

@@ -1,0 +1,25 @@
+# Must be in the root directory of meta-oem repository
+# Every rule line is a file pattern that is followed by one or more Code Owners.
+
+@@@DevOps @mkhan @rajas @rmalhotra
+@@@SeniorReviewers  @nhsu @blai @hctsai @axiado-2505
+@@@AdditionalReviewers @alee @echeng @cchen @kyu @chung @sgupta
+@@@JenkinsReviewer @jenkins
+
+Jenkinsfile              @@DevOps
+ci/*                     @@DevOps
+
+* @@SeniorReviewers @@AdditionalReviewers
+
+# CODEOWNERS is active only for develop and release branches
+CODEOWNERS.destination_branch_pattern release/*
+CODEOWNERS.destination_branch_pattern develop
+
+# At least a senior and two code owners in total must approve.
+OverallCheck(3)
+Check(@@SeniorReviewers >= 1)
+Check(@@JenkinsReviewers >= 1)
+
+# It is important to protect CODEOWNERS file as well because otherwise it can get deleted
+# or moved within a pull request; so we want to assign a code owner to it which can prevent this
+CODEOWNERS               @@DevOps @nhsu

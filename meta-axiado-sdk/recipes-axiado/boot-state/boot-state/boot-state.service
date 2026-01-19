@@ -1,0 +1,12 @@
+[Unit]
+Description=Mark current boot slot as successful
+After=multi-user.target
+ConditionPathExists=/usr/bin/fw_setenv
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "fw_setenv bootcount 0"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

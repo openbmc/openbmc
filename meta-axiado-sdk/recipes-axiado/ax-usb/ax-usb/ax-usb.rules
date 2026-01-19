@@ -1,0 +1,5 @@
+SUBSYSTEM=="hid", ACTION=="add", RUN+="/bin/bash /etc/usb/usbgadget.sh '--start' %p %k 'hid' %n"
+SUBSYSTEM=="hid", ACTION=="remove", RUN+="/bin/bash /etc/usb/usbgadget.sh '--stop' %p %k 'hid' %n"
+
+SUBSYSTEM=="block", ACTION=="add", KERNEL=="sd[a-z]", RUN+="/bin/bash /etc/usb/usbgadget.sh '--start' %p %k 'mass' %n"
+SUBSYSTEM=="block", ACTION=="remove", KERNEL=="sd[a-z]", RUN+="/bin/bash /etc/usb/usbgadget.sh '--stop' %p %k 'mass' %n"

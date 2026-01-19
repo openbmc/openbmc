@@ -1,0 +1,34 @@
+From 6df94942744ef89004536974c97b39f179ac05db Mon Sep 17 00:00:00 2001
+From: Kuan-Jui Chiu <kchiu@axiado.com>
+Date: Tue, 10 Jun 2025 19:07:49 -0700
+Subject: [PATCH] Add support to update u-boot within NOR flash
+
+Upstream-Status: Pending
+---
+ bmc/obmc-flash-bmc | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
+
+diff --git a/bmc/obmc-flash-bmc b/bmc/obmc-flash-bmc
+index f9cc4e2..dfd37bd 100644
+--- a/bmc/obmc-flash-bmc
++++ b/bmc/obmc-flash-bmc
+@@ -575,15 +575,10 @@ function mmc_mount() {
+ }
+ 
+ function mmc_update() {
+-    # Update u-boot if needed
+-    bootPartition="mmcblk0boot0"
+-    devUBoot="/dev/${bootPartition}"
+-    imgUBoot="${imgpath}/${version}/image-u-boot"
+-    if [ "$(cmp_uboot "${devUBoot}" "${imgUBoot}")" != "0" ]; then
+-        echo 0 > "/sys/block/${bootPartition}/force_ro"
+-        dd if="${imgUBoot}" of="${devUBoot}"
+-        echo 1 > "/sys/block/${bootPartition}/force_ro"
+-    fi
++    # Update u-boot within NOR flash
++    imgDir="${imgpath}/${version}"
++    cp ${imgDir}/image-u-boot ${imgDir}/FLASH_UPDATE.bin
++    ax3000-fw-update -t ${imgDir}
+ 
+     # Update the secondary (non-running) boot and rofs partitions.
+     label="$(mmc_get_secondary_label)"

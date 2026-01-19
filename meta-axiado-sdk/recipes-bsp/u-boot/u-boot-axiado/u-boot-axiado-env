@@ -1,0 +1,19 @@
+bootargs=console=ttyPS3,115200 earlyprintk maxcpus=4 nr_cpus=4 earlycon hugepages=16
+bootdelay=2
+baudrate=115200
+preboot=
+bootm_size=0x20000000
+fdtaddr=0x3EF00000
+loadaddr=0x3D000000
+bootside=a
+bootcount=0
+bootlimit=3
+show_dtbs=echo "Loading FIT image to check available DTB configurations..."; if test "${bootside}" = "a"; then load mmc 0:2 ${loadaddr} ${image_path}; if test $? -ne 0; then load mmc 0:2 ${loadaddr} ${image_path}.asi; else true; fi; else load mmc 0:3 ${loadaddr} ${image_path}; if test $? -ne 0; then load mmc 0:3 ${loadaddr} ${image_path}.asi; else true; fi; fi; if test $? -eq 0; then setexpr newladdr $loadaddr + 0x10; echo ""; echo "Available DTB configurations:"; echo "---------------------------"; fdt addr ${newladdr}; fdt list /configurations; echo ""; echo "Current configuration: ${fdt_conf}"; echo ""; echo "To change configuration: setenv fdt_conf <config-name>"; echo "Then save with: saveenv"; else echo "Error: Could not load FIT image from current slot."; echo "Make sure bootable media is inserted."; fi
+show_dtbs_bkup=echo "Listing files to check available DTB configurations..."; echo ""; echo "Select DTB configuration file from below available DTB files. Ex: scm3000db_sb.asi."; echo "---------------------------"; if test "${bootside}" = "a"; then ls mmc 0:2; if test $? -ne 0; then echo "Error: Could not list files from slot A."; echo "Make sure bootable media is inserted."; exit; fi; else ls mmc 0:3; if test $? -ne 0; then echo "Error: Could not list files from slot B."; echo "Make sure bootable media is inserted."; exit; fi; fi; echo ""; echo "Current configuration: ${fdt_conf}"; echo ""; echo "To change configuration: setenv fdt_conf <config-name>"; echo "Then save with: saveenv"; 
+set_dtb=if test $# -eq 1; then setenv fdt_conf $1; saveenv; echo "Set DTB configuration to: $1"; echo "This will be used on next boot."; else echo "Usage: run set_dtb <config-name>"; echo "Available configurations can be viewed with: run show_dtbs"; fi
+image_path=fitImage
+bootcmd=ax3000_secure_boot
+secure_boot=0
+default_bootcmd=ax3000_secure_boot
+
+

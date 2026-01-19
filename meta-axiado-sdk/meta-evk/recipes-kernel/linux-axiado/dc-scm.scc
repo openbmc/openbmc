@@ -1,0 +1,3 @@
+define KFEATURE_DESCRIPTION "Enable EEPROM/TMP75 support"
+
+kconf non-hardware dc-scm.cfg

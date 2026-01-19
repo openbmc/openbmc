@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: GPL-2.0+
+ /*
+  * DTS file for Axiado AX3000-SCM3002-evk
+  * Copyright (c) 2025 Axiado Corporation.
+  */
+
+#include "ax3000-scm3002.dtsi"
+#include "ax3000-net-mod.dtsi"
+
+/ {
+	compatible = "axiado,ax3000-evk", "axiado,ax3000";
+};
+
+&mac0 {
+	phy-handle = <&phy0>;
+	status = "okay";
+};
+
+&mac3 {
+	status = "okay";
+};
+
+&mac4 {
+	phy-handle = <&phy4>;
+	status = "okay";
+};
+
+&mdio {
+	phy0: phy0@0 {
+		reg = <0>;
+		compatible = "ethernet-phy-ieee802.3-c45";
+		status = "okay";
+	};
+	phy4: phy4@4 {
+		reg = <4>;
+		compatible = "ethernet-phy-ieee802.3-c22";
+		status = "okay";
+	};
+};

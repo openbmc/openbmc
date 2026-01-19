@@ -1,0 +1,105 @@
+From 0b0182fb8f9a9c9e247938355b58e5474a5c6482 Mon Sep 17 00:00:00 2001
+From: Kuan-Jui Chiu <kchiu@axiado.com>
+Date: Thu, 22 May 2025 20:05:51 -0700
+Subject: [PATCH] Workaround to fix crash issue during FW update
+
+Upstream-Status: Pending
+---
+ bmc/activation.cpp              |  1 +
+ bmc/item_updater.cpp            | 20 ++++++++++++++++++--
+ bmc/item_updater.hpp            |  5 +++++
+ bmc/mmc/item_updater_helper.cpp | 10 +++++-----
+ 4 files changed, 29 insertions(+), 7 deletions(-)
+
+diff --git a/bmc/activation.cpp b/bmc/activation.cpp
+index a09b580..dafd292 100644
+--- a/bmc/activation.cpp
++++ b/bmc/activation.cpp
+@@ -221,6 +221,7 @@ void Activation::onFlashWriteSuccess()
+ 
+     // Create Update Object for this version.
+     parent.createUpdateObject(versionId, path);
++    parent.deleteUpdateObject(parent.getBackupId());
+ 
+     activation(softwareServer::Activation::Activations::Active);
+ }
+diff --git a/bmc/item_updater.cpp b/bmc/item_updater.cpp
+index 2e889fb..103d1e5 100644
+--- a/bmc/item_updater.cpp
++++ b/bmc/item_updater.cpp
+@@ -541,13 +541,29 @@ void ItemUpdater::erase(std::string entryId)
+     }
+ 
+     // Removing entry in updateManagers map
++//  auto updateManagerIt = updateManagers.find(entryId);
++//  if (updateManagerIt != updateManagers.end())
++//  {
++//      updateManagers.erase(entryId);
++//  }
++    backupId = entryId;
++
++    return;
++}
++
++std::string ItemUpdater::getBackupId()
++{
++    return backupId;
++}
++
++void ItemUpdater::deleteUpdateObject(const std::string& entryId)
++{
++    // Removing entry in updateManagers map
+     auto updateManagerIt = updateManagers.find(entryId);
+     if (updateManagerIt != updateManagers.end())
+     {
+         updateManagers.erase(entryId);
+     }
+-
+-    return;
+ }
+ 
+ void ItemUpdater::deleteAll()
+diff --git a/bmc/item_updater.hpp b/bmc/item_updater.hpp
+index 6274abe..723e456 100644
+--- a/bmc/item_updater.hpp
++++ b/bmc/item_updater.hpp
+@@ -202,6 +202,9 @@ class ItemUpdater : public ItemUpdaterInherit
+      */
+     void erase(std::string entryId);
+ 
++    std::string getBackupId(void);
++    void deleteUpdateObject(const std::string& id);
++
+     /**
+      * @brief Deletes all versions except for the current one
+      */
+@@ -377,6 +380,8 @@ class ItemUpdater : public ItemUpdaterInherit
+     /** @brief Persistent map of Update D-Bus objects and their SwIds */
+     std::map<std::string, std::unique_ptr<UpdateManager>> updateManagers;
+ 
++    std::string backupId;
++
+ #ifdef HOST_BIOS_UPGRADE
+     /** @brief Create the BIOS object without knowing the version.
+      *
+diff --git a/bmc/mmc/item_updater_helper.cpp b/bmc/mmc/item_updater_helper.cpp
+index db271ab..f19b288 100644
+--- a/bmc/mmc/item_updater_helper.cpp
++++ b/bmc/mmc/item_updater_helper.cpp
+@@ -64,11 +64,11 @@ void Helper::updateUbootVersionId(const std::string& flashId)
+ 
+ void Helper::mirrorAlt()
+ {
+-    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+-                                      SYSTEMD_INTERFACE, "StartUnit");
+-    auto serviceFile = "obmc-flash-mmc-mirroruboot.service";
+-    method.append(serviceFile, "replace");
+-    bus.call_noreply(method);
++//    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++//                                      SYSTEMD_INTERFACE, "StartUnit");
++//    auto serviceFile = "obmc-flash-mmc-mirroruboot.service";
++//    method.append(serviceFile, "replace");
++//    bus.call_noreply(method);
+ }
+ 
+ } // namespace updater

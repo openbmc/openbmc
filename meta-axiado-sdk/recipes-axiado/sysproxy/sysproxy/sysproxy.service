@@ -1,0 +1,12 @@
+[Unit]
+Description=Sysproxy Service
+After=eip_fwl.service
+
+[Service]
+ExecStart=/usr/bin/sysmgr_proxy
+Restart=always
+StandardOutput=tty
+TTYPath=/dev/ttyPS3
+
+[Install]
+WantedBy=multi-user.target
