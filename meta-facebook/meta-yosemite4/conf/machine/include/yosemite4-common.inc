@@ -19,5 +19,3 @@ FB_ETH_INTF = "eth0 eth1"
 
 VIRTUAL-RUNTIME_obmc-host-state-manager = "phosphor-state-manager-host"
 VIRTUAL-RUNTIME_obmc-chassis-state-manager = "phosphor-state-manager-chassis"
-
-PREFERRED_PROVIDER_virtual/phosphor-led-manager-config-native = "yosemite4-led-manager-config-native"

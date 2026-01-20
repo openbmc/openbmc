@@ -16,3 +16,9 @@ SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'FAN_OK_STOP_INSTFMT', 'FAN_INSTAN
 
 FAN_FAIL_STOP_INSTFMT = "obmc-led-group-stop@.service:obmc-led-group-stop@fan{0}_fail.service"
 SYSTEMD_LINK:${PN} += "${@compose_list_zip(d, 'FAN_FAIL_STOP_INSTFMT', 'FAN_INSTANCES')}"
+
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+SRC_URI:append = " file://led-group-config.json"
+do_install:append() {
+    install -D -m 0644 ${UNPACKDIR}/led-group-config.json ${D}${datadir}/phosphor-led-manager/led-group-config.json
+}
