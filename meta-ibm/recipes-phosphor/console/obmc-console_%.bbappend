@@ -25,6 +25,11 @@ install_concurrent_console_config() {
         # Install configuration for remaining servers - the base recipe
         # installs the configuration for the first.
         install -m 0644 ${UNPACKDIR}/server.ttyVUART1.conf ${D}${sysconfdir}/${BPN}/
+
+        # Install the services in the multi-user.target
+        install -m 0644 -d ${D}${systemd_unitdir}/system/multi-user.target.wants
+        ln -s ../obmc-console-ssh@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/obmc-console-ssh@2200.service
+        ln -s ../obmc-console-ssh@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/obmc-console-ssh@2201.service
 }
 
 SRC_URI:append:ibm-enterprise = " file://client.2201.conf"
