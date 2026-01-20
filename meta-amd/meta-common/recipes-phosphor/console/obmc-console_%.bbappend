@@ -18,6 +18,11 @@ do_install:append() {
         # Install the server configuration
         install -m 0755 -d ${D}${sysconfdir}/${BPN}
         install -m 0644 ${UNPACKDIR}/*.conf ${D}${sysconfdir}/${BPN}/
+
+        # Install the services in the multi-user.target
+        install -m 0644 -d ${D}${systemd_unitdir}/system/multi-user.target.wants
+        ln -s ../obmc-console-ssh@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/obmc-console-ssh@2200.service
+        ln -s ../obmc-console-ssh@.service ${D}${systemd_unitdir}/system/multi-user.target.wants/obmc-console-ssh@2201.service
 }
 
 EXTRA_OECONF:append = " --enable-concurrent-servers"
