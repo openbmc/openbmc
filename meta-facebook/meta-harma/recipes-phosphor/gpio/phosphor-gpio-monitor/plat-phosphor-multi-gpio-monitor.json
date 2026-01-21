@@ -294,7 +294,10 @@
                 "mmc-recovery.service",
                 "smc-deassert-log@5_health-mmc.service"],
             "FALLING": [
-                "smc-assert-log@5_health-mmc.timer"]
+                "smc-assert-log@5_health-mmc.timer"],
+            "INIT_LOW": [
+                "smc-assert-log@5_health-mmc.service"
+            ]
         },
         "Continue": true
     }
