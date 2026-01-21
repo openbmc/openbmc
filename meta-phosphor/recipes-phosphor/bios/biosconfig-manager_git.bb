@@ -14,7 +14,7 @@ DEPENDS = " boost \
             phosphor-logging \
             sdbusplus \
             systemd "
-SRCREV = "60385e0277b64519c5e59df5ff3bb65b4e0ac498"
+SRCREV = "b11a3055019e4a58d21a9d96a7762f39651c82ef"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
