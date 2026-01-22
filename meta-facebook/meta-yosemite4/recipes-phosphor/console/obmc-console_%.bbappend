@@ -3,14 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SRC_URI:append = " \
     file://plat-80-obmc-console-uart.rules \
     file://99-terminus-usb-serial.rules \
-    file://10-host-console-dependency@ttyS0.conf \
-    file://10-host-console-dependency@ttyS1.conf \
-    file://10-host-console-dependency@ttyS2.conf \
-    file://10-host-console-dependency@ttyS3.conf \
-    file://10-host-console-dependency@ttyS5.conf \
-    file://10-host-console-dependency@ttyS6.conf \
-    file://10-host-console-dependency@ttyS7.conf \
-    file://10-host-console-dependency@ttyS8.conf \
+    file://10-host-console-dependency.conf.in \
 "
 
 do_install:append() {
@@ -24,7 +17,9 @@ do_install:append() {
         for console in ${OBMC_CONSOLE_TTYS}; do
             dstdir=${D}${libdir}/systemd/system/obmc-console@${console}.service.d
             install -d "${dstdir}"
-            install -m 0644 ${UNPACKDIR}/10-host-console-dependency@${console}.conf ${dstdir}/10-host-console-dependency@${console}.conf
+
+            sed "s/@HOST_ID@/${host}/g" ${UNPACKDIR}/10-host-console-dependency.conf.in > ${dstdir}/10-host-console-dependency@${console}.conf
+            chmod 0644 ${dstdir}/10-host-console-dependency@${console}.conf
 
             wantedby_units="obmc-host-starting@${host}.target \
                             obmc-host-reboot@${host}.target \

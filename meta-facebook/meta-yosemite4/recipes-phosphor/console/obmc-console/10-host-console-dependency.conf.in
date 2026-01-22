@@ -1,0 +1,7 @@
+[Unit]
+After=obmc-host-start-pre@@HOST_ID@.target
+Conflicts=obmc-host-stop@@HOST_ID@.target slot-unplug@@HOST_ID@.service
+PartOf=obmc-host-started@@HOST_ID@.target
+
+[Install]
+WantedBy=obmc-host-starting@@HOST_ID@.target obmc-host-reboot@@HOST_ID@.target slot-plug-in@@HOST_ID@.service
