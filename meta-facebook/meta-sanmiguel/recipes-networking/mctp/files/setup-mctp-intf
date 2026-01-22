@@ -1,0 +1,71 @@
+#!/bin/bash
+
+MAX_RETRIES=30
+RETRY_DELAY=1
+DEFAULT_EID=8
+
+declare -A MCTP_INTF_LIST=(
+    [0]="mctpi2c13"
+    [1]="mcu1u2u1u1"
+    [2]="mcu1u2u2u1"
+    [3]="mcu1u2u1u4u1"
+    [4]="mcu1u2u1u3u1"
+    [5]="mcu1u2u2u3u1"
+    [6]="mcu1u2u2u4u1"
+    [7]="mcu1u1u4u1"
+)
+
+is_mctp_interface_exist()
+{
+    local intf_name="$1"
+    mctp link show "$intf_name" &> /dev/null
+    return $?
+}
+
+reconfig_mctp_interface()
+{
+    local intf_name="$1"
+
+    mctp link set "$intf_name" down
+    mctp addr del "$DEFAULT_EID" dev "$intf_name" 2>/dev/null
+
+    mctp link set "$intf_name" up
+    mctp addr add "$DEFAULT_EID" dev "$intf_name"
+}
+
+echo "Waiting for all MCTP interfaces to initialize..."
+for ((attempt=1; attempt<=MAX_RETRIES; attempt++))
+do
+    all_interfaces_found=true
+
+    echo "Check MCTP interfaces, attempt $attempt."
+    for index in "${!MCTP_INTF_LIST[@]}"
+    do
+        if ! is_mctp_interface_exist "${MCTP_INTF_LIST[$index]}"; then
+            echo "${MCTP_INTF_LIST[$index]} not exist"
+            all_interfaces_found=false
+        fi
+    done
+
+    if [ "$all_interfaces_found" = true ]; then
+        echo "All interfaces detected on attempt $attempt."
+        break
+    fi
+
+    if [ "$attempt" -eq "$MAX_RETRIES" ]; then
+        echo "Error: Timeout. Not all MCTP interfaces are available."
+        break
+    fi
+
+    echo "Some interfaces not exist, retry..."
+    sleep "$RETRY_DELAY"
+done
+
+for index in "${!MCTP_INTF_LIST[@]}"
+do
+    cur_intf="${MCTP_INTF_LIST[$index]}"
+    echo "Processing $cur_intf..."
+    reconfig_mctp_interface "$cur_intf"
+done
+
+echo "MCTP configuration complete."
