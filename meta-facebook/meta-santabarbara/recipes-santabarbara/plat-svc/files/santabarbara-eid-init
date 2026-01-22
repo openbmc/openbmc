@@ -58,9 +58,9 @@ main() {
             i2cset -y "$slot" 0x21 1 0
             i2cset -y "$slot" 0x21 1 1
 
-       elif i2cdetect -y "$slot" | grep -Eq "^20:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})"; then
-            echo "Slot $slot: Detecting SITv3 card, set the $sitv3_val at 0x21"
-            cmd="i2cset -y $slot 0x21 $sitv3_val"
+       elif i2cdetect -y "$slot" | grep -Eq "^50:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})"; then
+            echo "Slot $slot: Detecting SITv3 card, set the $sitv3_val at 0x51"
+            cmd="i2cset -y $slot 0x51 $sitv3_val"
             if retry_i2c_command "$cmd" "$slot" "bus setup"; then
                 echo "Slot $slot setup success"
             else
@@ -79,9 +79,9 @@ main() {
 
         if i2cdetect -y "$slot" | grep -Eq '^50:[[:space:]]+(UU|[0-9a-f]{2})'; then
             echo "Slot $slot: Rainbow reboot check finished"
-        elif i2cdetect -y "$slot" | grep -Eq '^20:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})'; then
+        elif i2cdetect -y "$slot" | grep -Eq '^50:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})'; then
             echo "Slot $slot: Verifying SITv3 register 0x50"
-            res=$(i2ctransfer -y "$slot" w1@0x21 0x50 r2 2>/dev/null || echo "FAIL")
+            res=$(i2ctransfer -y "$slot" w1@0x51 0x50 r2 2>/dev/null || echo "FAIL")
             if [[ "$res" == "FAIL" ]]; then
                 echo "ERROR: i2ctransfer failed on slot $slot"
             else
