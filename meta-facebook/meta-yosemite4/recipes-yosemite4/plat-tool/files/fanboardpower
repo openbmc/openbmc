@@ -41,7 +41,7 @@ check_medusa_revision() {
     #Get Medusa revision
     local medusa_revision
     medusa_revision="$(busctl get-property xyz.openbmc_project.EntityManager ${MEDUSA_PATH} ${MEDUSA_INTERFACE} Version | awk '{print $2}' | tr -d '"')"
-    if [[ "$medusa_revision" != "MP" && "$medusa_revision" != "PVT2" && "$medusa_revision" != "MP Pilot" ]]; then
+    if [[ "$medusa_revision" != "MP" && "$medusa_revision" != "PVT2/MP" ]]; then
         echo "${medusa_revision} does not support this service"
         # exit 1: runtime error
         exit 1
