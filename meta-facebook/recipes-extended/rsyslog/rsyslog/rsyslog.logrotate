@@ -10,3 +10,28 @@
         systemctl restart rsyslog 2> /dev/null || true
     endscript
 }
+
+/run/log/rsyslog/logrotate-trigger.log {
+    # Run the rotation check every hour
+    hourly
+    size 0
+    rotate 0
+    missingok
+    copytruncate
+    ifempty
+
+    postrotate
+        # Directory where rsyslog stores imfile state files
+        STATE_DIR="/run/log/rsyslog"
+
+        # Count the current number of imfile-state files
+        COUNT=$(ls -1 $STATE_DIR/imfile-state:* 2>/dev/null | wc -l)
+
+        # If there are more than 20 state files, delete the older ones
+        if [ "$COUNT" -gt 20 ]; then
+            # Sort files by modification time (newest first)
+            # tail -n +21 selects everything from the 21st file onwards for deletion
+            ls -t $STATE_DIR/imfile-state:* 2>/dev/null | tail -n +21 | xargs rm -f 2>/dev/null
+        fi
+    endscript
+}
