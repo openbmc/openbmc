@@ -1,9 +1,8 @@
 # allarch is required because the files this recipe produces (html and
 # javascript) are valid for any target, regardless of architecture.  The allarch
 # class removes your compiler definitions, as it assumes that anything that
-# requires a compiler is platform specific.  Unfortunately, one of the build
-# tools uses libsass for compiling the css templates, and it needs a compiler to
-# build the library that it then uses to compress the scss into normal css.
+# requires a compiler is platform specific.  Unfortunately, the sass package
+# may need a compiler for native bindings on some platforms.
 # Enabling allarch, then re-adding the compiler flags was the best of the bad
 # options
 LICENSE = "Apache-2.0"
@@ -46,16 +45,14 @@ do_compile () {
     cd ${S}
     rm -rf node_modules
     npm --loglevel info --proxy=${http_proxy} --https-proxy=${https_proxy} install
-    # vue-cli-plugin-i18n isn't needed in build and causes a segv in node 22.12.
-    npm uninstall vue-cli-plugin-i18n
     npm run build ${EXTRA_OENPM}
 }
 do_install () {
    # create directory structure
    install -d ${D}${datadir}/www
-   cp -r ${S}/dist/** ${D}${datadir}/www
+   cp -r ${S}/dist/. ${D}${datadir}/www
    find ${D}${datadir}/www -type f -exec chmod a=r,u+w '{}' +
    find ${D}${datadir}/www -type d -exec chmod a=rx,u+w '{}' +
 }
 
-FILES:${PN} += "${datadir}/www/*"
+FILES:${PN} += "${datadir}/www"
