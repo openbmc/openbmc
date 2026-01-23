@@ -1,6 +1,9 @@
 #!/bin/bash
 # Usage: fanboardpower.sh <on:0|off:1>
 
+# shellcheck source=meta-facebook/meta-yosemite4/recipes-yosemite4/plat-tool/files/yosemite4-common-functions
+source /usr/libexec/yosemite4-common-functions
+
 ACTION=$1
 FANBOARD=$2
 
@@ -18,6 +21,7 @@ fi
 
 MEDUSA_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Medusa_Board"
 MEDUSA_INTERFACE="xyz.openbmc_project.Inventory.Decorator.Revision"
+FAN_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite_4_Fan_Board_"
 
 get_medusa_type() {
     local inventory_path="${MEDUSA_PATH}/MEDUSA_HSC${FANBOARD}_48V"
@@ -48,9 +52,73 @@ check_medusa_revision() {
     fi
 }
 
+get_fan_type() {
+    local fan_board_product
+    fan_board_product=$(busctl get-property xyz.openbmc_project.EntityManager \
+        "${FAN_PATH}${FANBOARD}" xyz.openbmc_project.Inventory.Decorator.Asset Model)
+    local fan_type="MAX"
+    if echo "$fan_board_product" | grep -q "NCT"; then
+        fan_type="NCT"
+    fi
+    echo "$fan_type"
+}
+
+get_fan_bus() {
+    if [[ "$FANBOARD" == "0" ]]; then
+        echo "30"
+    else
+        echo "31"
+    fi
+}
+
+enable_fan() {
+    local addr=$1
+    hw_num=$(ls "/sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}/hwmon")
+
+    echo "Enabling fan inputs on /sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}/hwmon/${hw_num}/"
+    for ((i = 1; i <= 6; i++)); do
+        echo 1 > "/sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}/hwmon/${hw_num}/fan${i}_enable"
+    done
+    echo 1 > "/sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}/hwmon/${hw_num}/fan10_enable"
+    echo 1 > "/sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}/hwmon/${hw_num}/fan11_enable"
+}
+
+set_fan_speed_to_full (){
+    local fan_number=2
+    local set_fanboard=1
+    if [ "$FANBOARD" = "1" ];then
+        fan_number=0
+        set_fanboard=0
+    fi
+    echo "Set the fan speed of Fanboard${FANBOARD} to 100"
+    for ((i = 0; i < 3; i++)) do
+        busctl set-property xyz.openbmc_project.FanSensor  /xyz/openbmc_project/control/fanpwm/FANBOARD${set_fanboard}_FAN${fan_number}_PWM_PCT xyz.openbmc_project.Control.FanPwm Target t 255
+        busctl set-property xyz.openbmc_project.FanSensor  /xyz/openbmc_project/control/fanpwm/FANBOARD${set_fanboard}_FAN$((fan_number+1))_PWM_PCT xyz.openbmc_project.Control.FanPwm Target t 255
+        fan_number=$((fan_number+4))
+    done
+}
+
+set_chassis_power() {
+    for ((i = 1; i <= 8; i++)); do
+        if [ "$ACTION" = "off" ];then
+            echo "Request Chassis slot$i off"
+            busctl set-property "xyz.openbmc_project.State.Chassis${i}" \
+                "/xyz/openbmc_project/state/chassis${i}" \
+                xyz.openbmc_project.State.Chassis "RequestedPowerTransition" s "xyz.openbmc_project.State.Chassis.Transition.Off"
+        else
+            echo "Request Chassis slot$i on"
+            busctl set-property "xyz.openbmc_project.State.Chassis${i}" \
+                "/xyz/openbmc_project/state/chassis${i}" \
+                xyz.openbmc_project.State.Chassis "RequestedPowerTransition" s "xyz.openbmc_project.State.Chassis.Transition.On"
+        fi
+    done
+}
+
 check_medusa_revision
 
 HSC_ADDR=$(get_hsc_addr)
+FAN_TYPE=$(get_fan_type)
+FAN_BUS=$(get_fan_bus)
 
 if [ "$ACTION" = "on" ]; then
     echo "Fanboard $FANBOARD power on"
@@ -62,19 +130,91 @@ if [ "$ACTION" = "on" ]; then
     #48vHSC Fanboard power on
     i2ctransfer -f -y 11 w2@"$HSC_ADDR" 0x01 0x80
     #Check if there is power on
-    if [ "$(i2cget -f -y 11 "$HSC_ADDR" 0x01)" == '0x80' ]; then
+    if [ "$(i2cget -f -y 11 "$HSC_ADDR" 0x01)" = '0x80' ]; then
         echo "Successfully power on Fanboard $FANBOARD"
+        #Waiting for the board to power back on
+        sleep 3
+        RESTART_NEEDED=0
+        #Bind FSC driver
+        if [ "$FAN_TYPE" = "MAX" ]; then
+            for addr in 20 2f; do
+                if [[ ! -e "/sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}" ]]; then
+                    echo "Bind max31790 driver at ${FAN_BUS}-00${addr}"
+                    echo "${FAN_BUS}-00${addr}">"/sys/bus/i2c/drivers/max31790/bind"
+                    enable_fan "${addr}"
+                    RESTART_NEEDED=1
+                fi
+            done
+        else
+            for addr in 21 23; do
+                if [[ ! -e "/sys/bus/i2c/drivers/nct7363/${FAN_BUS}-00${addr}" ]]; then
+                    echo "Bind nct7363 driver at ${FAN_BUS}-00${addr}"
+                    echo "${FAN_BUS}-00${addr}">"/sys/bus/i2c/drivers/nct7363/bind"
+                    RESTART_NEEDED=1
+                fi
+            done
+        fi
+        #Restart Fansensor to re-register the sensor.
+        if [ "$RESTART_NEEDED" -eq 1 ]; then
+            sleep 5
+            echo "Restart fansensor"
+            systemctl restart xyz.openbmc_project.fansensor.service
+        fi
+        set_chassis_power
+        if ! set_sentinel_dome_slot_present_percentage "100"; then
+            exit 1
+        fi
+        exit 0
     else
         echo "Failed power on Fanboard $FANBOARD"
+        exit 1
     fi
 else
     echo "Fanboard $FANBOARD power off"
     #48vHSC Fanboard power off
     i2ctransfer -f -y 11 w2@"$HSC_ADDR" 0x01 0x00
     #Check if there is power off
-    if [ "$(i2cget -f -y 11 "$HSC_ADDR" 0x01)" == '0x00' ]; then
+    if [ "$(i2cget -f -y 11 "$HSC_ADDR" 0x01)" = '0x00' ]; then
         echo "Successfully power off Fanboard $FANBOARD"
+        RESTART_NEEDED=0
+        #Unbind FSC driver
+        if [ "$FAN_TYPE" = "MAX" ]; then
+            for addr in 20 2f; do
+                if [[ -e "/sys/bus/i2c/drivers/max31790/${FAN_BUS}-00${addr}" ]]; then
+                    echo "${FAN_BUS}-00${addr}">"/sys/bus/i2c/drivers/max31790/unbind"
+                    echo "UnBind max31790 driver at ${FAN_BUS}-00${addr}"
+                    RESTART_NEEDED=1
+                fi
+            done
+        else
+            for addr in 21 23; do
+                if [[ -e "/sys/bus/i2c/drivers/nct7363/${FAN_BUS}-00${addr}" ]]; then
+                    echo "${FAN_BUS}-00${addr}">"/sys/bus/i2c/drivers/nct7363/unbind"
+                    echo "UnBind nct7363 driver at ${FAN_BUS}-00${addr}"
+                    RESTART_NEEDED=1
+                fi
+            done
+        fi
+        # Restart the service to prevent a powered-off sensor from remaining registered on the fan sensor.
+        if [ "$RESTART_NEEDED" -eq 1 ]; then
+            sleep 5
+            echo "Restart fansensor"
+            systemctl restart xyz.openbmc_project.fansensor.service
+        fi
+        # Waiting for the fan sensor to start.
+        sleep 5
+        # After power is turned off, the driver can’t read sensor values, causing dbus-sensor to hang while reading.
+        # As a result, phosphor-pid-control delays resetting the fan, so it is set manually first.
+        set_fan_speed_to_full
+        # When 48hsc is turned off, the chassis and host status on D-Bus are displayed incorrectly.
+        set_chassis_power
+        # Ensure the fan speed remains at 100.
+        if ! set_sentinel_dome_slot_present_percentage "50"; then
+            exit 1
+        fi
+        exit 0
     else
         echo "Failed power off Fanboard $FANBOARD"
+        exit 1
     fi
 fi
