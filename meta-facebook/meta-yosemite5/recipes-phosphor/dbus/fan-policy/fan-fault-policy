@@ -1,0 +1,121 @@
+#!/bin/bash
+
+SVC="xyz.openbmc_project.FanSensor"
+
+CRITICAL_THRESHOLD_IF="xyz.openbmc_project.Sensor.Threshold.Critical"
+CRITICAL_HIGH_PROP="CriticalAlarmHigh"
+CRITICAL_LOW_PROP="CriticalAlarmLow"
+
+VALUE_IF="xyz.openbmc_project.Sensor.Value"
+VALUE_PROP="Value"
+
+INVENTORY_IF="xyz.openbmc_project.Inventory.Item"
+PRESENT_PROP="Present"
+
+FAN_COUNT=4
+FAN_MISSING_THRESHOLD=2
+ROTOR_FAULT_THRESHOLD=3
+
+get_property() {
+    local svc="$1"
+    local path="$2"
+    local intf="$3"
+    local prop="$4"
+
+    busctl get-property "$svc" "$path" "$intf" "$prop" 2>/dev/null | awk '{print $2}'
+}
+
+add_sel() {
+    local message="$1"
+    busctl call \
+        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create Create \
+        "ssa{ss}" "$message" \
+        xyz.openbmc_project.Logging.Entry.Level.Error 0 \
+        >/dev/null 2>&1
+}
+
+check_fan_missing() {
+    local missing=0
+
+    for i in $(seq 0 $((FAN_COUNT - 1))); do
+        il_path="/xyz/openbmc_project/inventory/FAN${i}_TACH_IL_SPEED_RPM"
+        ol_path="/xyz/openbmc_project/inventory/FAN${i}_TACH_OL_SPEED_RPM"
+
+        il_present=$(get_property "$SVC" "$il_path" "$INVENTORY_IF" "$PRESENT_PROP")
+        ol_present=$(get_property "$SVC" "$ol_path" "$INVENTORY_IF" "$PRESENT_PROP")
+
+        # Count fan as missing only if BOTH IL and OL are false
+        if [[ "$il_present" == "false" && "$ol_present" == "false" ]]; then
+            echo "Fan missing detected: FAN${i}" >&2
+            missing=$((missing + 1))
+        fi
+    done
+
+    echo "$missing"
+}
+
+check_rotor_faults() {
+    # Yosemite5 fan rotor fault conditions:
+    # - Fan RPM < LCR (including 0 or NaN for fan removal)
+    # - Fan RPM > UCR
+
+    local faults=0
+
+    for i in $(seq 0 $((FAN_COUNT - 1))); do
+        for side in IL OL; do
+            path="/xyz/openbmc_project/sensors/fan_tach/FAN${i}_TACH_${side}_SPEED_RPM"
+
+            value=$(get_property "$SVC" "$path" "$VALUE_IF" "$VALUE_PROP")
+            crit_high=$(get_property "$SVC" "$path" "$CRITICAL_THRESHOLD_IF" "$CRITICAL_HIGH_PROP")
+            crit_low=$(get_property "$SVC" "$path" "$CRITICAL_THRESHOLD_IF" "$CRITICAL_LOW_PROP")
+
+            if [[ "$value" == "0" || "$value" == "nan" || \
+                  "$crit_high" == "true" || "$crit_low" == "true" ]]; then
+                echo "Fan rotor fault detected: $path (value=$value, CH=$crit_high, CL=$crit_low)" >&2
+                faults=$((faults + 1))
+            fi
+        done
+    done
+
+    echo "$faults"
+}
+
+power_off_host() {
+    echo "Host powering off" >&2
+
+    if busctl set-property \
+        xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s \
+        xyz.openbmc_project.State.Host.Transition.Off >/dev/null 2>&1; then
+        return 0
+    else
+        echo "Failed to request host power off" >&2
+        return 1
+    fi
+}
+
+fan_missing=$(check_fan_missing)
+echo "Fan missing count: $fan_missing"
+
+if (( fan_missing >= FAN_MISSING_THRESHOLD )); then
+    if power_off_host; then
+        add_sel "Host is being shut down due to ${fan_missing} fans missing"
+    fi
+    exit 0
+fi
+
+rotor_faults=$(check_rotor_faults)
+echo "Fan rotor fault count: $rotor_faults"
+
+if (( rotor_faults >= ROTOR_FAULT_THRESHOLD )); then
+    if power_off_host; then
+        add_sel "Host is being shut down due to ${rotor_faults} fan rotors failing"
+    fi
+    exit 0
+fi
+
+echo "Fan status normal."
+exit 0

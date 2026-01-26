@@ -16,3 +16,10 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     obmc-phosphor-buttons-signals \
     obmc-phosphor-buttons-handler \
 "
+
+# Enable dbus monitor for host power off policy
+IMAGE_FEATURES:append = " obmc-dbus-monitor"
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    fan-policy \
+    thermal-policy \
+"

@@ -1,0 +1,67 @@
+# Fan rotor missing detection
+# Fan inventory paths to monitor for presence
+- name: fan presence path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN0_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN0_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN1_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN1_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN2_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN2_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN3_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/FAN3_TACH_OL_SPEED_RPM
+
+# Fan presence property to monitor (true = present, false = missing)
+- name: fan present property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PROPERTY
+      property: Present
+
+# Monitor fan presence changes and check threshold
+- name: fan missing detect
+  class: watch
+  watch: property
+  paths: fan presence path group
+  properties: fan present property
+  callback: check fan missing threshold
+
+# Trigger if >= 2 fan rotors report Present == false (missing)
+- name: check fan missing threshold
+  class: condition
+  condition: count
+  paths: fan presence path group
+  properties: fan present property
+  defer: 10000000us
+  callback: fan missing callback
+  countop: ">="
+  countbound: 2
+  op: "=="
+  bound: false
+
+# Start fan fault policy service when missing fans detected
+- name: fan missing callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: fan-fault-policy.service
+        type: string
+      - value: replace
+        type: string

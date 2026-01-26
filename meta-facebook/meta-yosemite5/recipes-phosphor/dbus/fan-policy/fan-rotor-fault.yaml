@@ -1,0 +1,70 @@
+# Fan rotor fault detection
+# Fan tachometer sensor paths to monitor
+- name: fan rpm path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_OL_SPEED_RPM
+
+# Fan RPM critical alarm properties to monitor
+- name: fan rpm critical alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+      meta: PROPERTY
+      property: CriticalAlarmHigh
+    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+      meta: PROPERTY
+      property: CriticalAlarmLow
+
+# Watch fan RPM critical alarm assertions
+- name: fan rpm critical alarm assert
+  class: watch
+  watch: property
+  paths: fan rpm path group
+  properties: fan rpm critical alarm property
+  callback: check fan rpm critical threshold
+
+# Trigger fault if >= 1 fan reports a critical RPM alarm
+- name: check fan rpm critical threshold
+  class: condition
+  condition: count
+  paths: fan rpm path group
+  properties: fan rpm critical alarm property
+  defer: 10000000us
+  callback: fan rpm fault callback
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+# Start fan fault policy service when a fault is detected
+- name: fan rpm fault callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: fan-fault-policy.service
+        type: string
+      - value: replace
+        type: string

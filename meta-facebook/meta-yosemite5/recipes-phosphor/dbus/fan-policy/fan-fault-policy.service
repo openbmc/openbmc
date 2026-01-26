@@ -1,0 +1,6 @@
+[Unit]
+Description=Fan fault handler service for host protection
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/fan-policy/fan-fault-policy
