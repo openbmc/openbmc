@@ -24,6 +24,13 @@
                         "Name": "PDB_ADC_FAN0_52V_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ],
             "ConstParam": [
@@ -33,7 +40,54 @@
                 }
             ]
         },
-        "Expression": "fan_vol / fan_imp"
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
     },
     {
         "Desc": {
@@ -60,6 +114,13 @@
                         "Name": "PDB_ADC_FAN1_52V_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ],
             "ConstParam": [
@@ -69,7 +130,54 @@
                 }
             ]
         },
-        "Expression": "fan_vol / fan_imp"
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
     },
     {
         "Desc": {
@@ -96,6 +204,13 @@
                         "Name": "PDB_ADC_FAN2_52V_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ],
             "ConstParam": [
@@ -105,7 +220,54 @@
                 }
             ]
         },
-        "Expression": "fan_vol / fan_imp"
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
     },
     {
         "Desc": {
@@ -132,6 +294,13 @@
                         "Name": "PDB_ADC_FAN3_52V_IMON_VOLT_V",
                         "SensorType": "voltage"
                     }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
                 }
             ],
             "ConstParam": [
@@ -141,7 +310,54 @@
                 }
             ]
         },
-        "Expression": "fan_vol / fan_imp"
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
     },
     {
         "Desc": {
