@@ -26,6 +26,19 @@
     }
   },
   {
+    "name": "ABL_NO_DIMM_ANY_CHANNEL",
+    "description": "ABL Error No Dimms On Any Channel in system",
+    "primary": "0xE5020F1D",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "ABL Error(E5020F1D) DIMM Failure Event: No DIMM in System",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
     "name": "ABL_NO_DIMM_SMBUS",
     "description": "ABL Error NO Dimm Smbus Info Error",
     "primary": "0xEA00E2ED",
