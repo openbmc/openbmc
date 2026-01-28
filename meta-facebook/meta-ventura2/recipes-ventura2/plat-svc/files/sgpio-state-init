@@ -1,0 +1,57 @@
+#!/bin/bash
+
+wait_for_fpga_i2c_ready() {
+    local timeout=600
+    while [ "$timeout" -gt 0 ]; do
+        if i2cget -y 10 0x29 0x00 >/dev/null 2>&1; then
+            echo "FPGA I2C is ready"
+            return 0
+        fi
+        sleep 0.1
+        timeout=$((timeout - 1))
+    done
+
+    echo "Error: failed to wait for FPGA I2C to be ready within 60 seconds" >&2
+    return 1
+}
+
+declare -A SGPIO_I2C_REG=(
+    [0x00]="10:0x29:0x00" #PORT_A
+    [0x01]="10:0x29:0x01" #PORT_B
+)
+
+sgpio_state_sync() {
+    for port in $(printf "%s\n" "${!SGPIO_I2C_REG[@]}" | sort); do
+        i2c_reg="${SGPIO_I2C_REG[$port]}"
+        IFS=':' read -r bus addr reg <<<"$i2c_reg"
+        if ! value=$(i2cget -f -y "$bus" "$addr" "$reg" 2>/dev/null); then
+            echo "Error: Failed to read I2C (bus=$bus, addr=$addr, reg=$reg) for $port" >&2
+            return 1
+        fi
+        value=$((value))
+        port_idx=$((port))
+
+        printf "SGPIO_PORT[0x%02X]=0x%02X\n" "$port" "$value"
+        args=(--mode=exit gpiochip2)
+        for i in {0..7}; do
+            line=$(((port_idx * 8 + i) * 2 + 1))
+            bit=$(((value >> i) & 0x1))
+            args+=("$line=$bit")
+        done
+
+        gpioset "${args[@]}"
+    done
+
+    # Set SGPIO_REG_VALID(SGPIO[124:127])=0b0101
+    gpioset --mode=exit gpiochip2 249=0
+    gpioset --mode=exit gpiochip2 251=1
+    gpioset --mode=exit gpiochip2 253=0
+    gpioset --mode=exit gpiochip2 255=1
+
+    echo "SGPIO sync completed"
+}
+
+wait_for_fpga_i2c_ready
+sgpio_state_sync
+
+exit 0
