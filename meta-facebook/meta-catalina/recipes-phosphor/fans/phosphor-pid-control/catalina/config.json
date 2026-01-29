@@ -382,7 +382,7 @@
                         "slewPos": 0.0,
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2,
-                        "checkHysterWithSetpt": true
+                        "checkHysteresisWithSetpoint": true
                     }
                 },
                 {
@@ -427,7 +427,7 @@
                         "slewPos": 0.0,
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2,
-                        "checkHysterWithSetpt": true
+                        "checkHysteresisWithSetpoint": true
                     }
                 },
                 {
@@ -488,7 +488,7 @@
                         "slewPos": 0.0,
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2,
-                        "checkHysterWithSetpt": true
+                        "checkHysteresisWithSetpoint": true
                     }
                 },
                 {
@@ -545,7 +545,7 @@
                         "slewPos": 0.0,
                         "positiveHysteresis": 0,
                         "negativeHysteresis": 2,
-                        "checkHysterWithSetpt": true
+                        "checkHysteresisWithSetpoint": true
                     }
                 }
             ]
