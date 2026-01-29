@@ -7,6 +7,7 @@ FACEBOOK_REMOVED_DBUS_SENSORS = " \
     intrusionsensor \
     ipmbsensor \
     mcutempsensor \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'fb-fanless', 'fansensor', '',d)} \
 "
 PACKAGECONFIG:remove = " \
     ${FACEBOOK_REMOVED_DBUS_SENSORS} \

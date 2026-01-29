@@ -32,7 +32,7 @@ RDEPENDS:${PN}-extras:tiogapass = "phosphor-nvme"
 
 SUMMARY:${PN}-fans = "Facebook Fans"
 RDEPENDS:${PN}-fans = " \
-        phosphor-pid-control \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'fb-fanless', '', 'phosphor-pid-control',d)} \
         "
 
 SUMMARY:${PN}-flash = "Facebook Flash"
