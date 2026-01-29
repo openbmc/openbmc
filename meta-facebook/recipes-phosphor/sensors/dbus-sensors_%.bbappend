@@ -15,3 +15,7 @@ PACKAGECONFIG:remove = " \
 PACKAGECONFIG:append:mf-fb-liquid-cooled = " \
     leakdetector \
 "
+
+PACKAGECONFIG:append:fb-compute-nvidia = " \
+    smbpbi \
+"
