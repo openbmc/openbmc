@@ -8,7 +8,6 @@ FACEBOOK_REMOVED_DBUS_SENSORS:remove = " \
 
 PACKAGECONFIG:append = " \
     nvmesensor \
-    smbpbi \
 "
 
 SYSTEMD_OVERRIDE:${PN}:append = "\
