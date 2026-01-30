@@ -1,0 +1,11 @@
+[Unit]
+Description=Ventura2 Early System Init
+Before=xyz.openbmc_project.EntityManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/plat-svc/ventura2-early-sys-init
+SyslogIdentifier=Ventura2 Early Init
+
+[Install]
+WantedBy=multi-user.target

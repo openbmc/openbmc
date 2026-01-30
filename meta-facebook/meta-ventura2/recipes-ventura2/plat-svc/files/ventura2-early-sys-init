@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+#Set fixed PWM to 80% before power brick.
+set_fan_pwm_fixed() {
+	local main_bus=23 main_addr=0x20
+	local second_bus=23 second_addr=0x23
+	local bus_addr i2c_dev_path mainsource
+	mainsource=$(i2cget -y -f "$main_bus" "$main_addr")
+	#Set PWM to 80%
+	local pwm_val=$((255 * 80 / 100))
+
+	if [[ -n "$mainsource" && "$mainsource" =~ ^0[xX][0-9a-fA-F]+$ ]]; then
+		#Set fixed max31790 PWM to 80%
+		bus_addr="$(printf "%d-%04x" "$main_bus" "$main_addr")"
+		i2c_dev_path="/sys/class/i2c-dev/i2c-${main_bus}/device/${bus_addr}"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm1"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm3"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm4"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm6"
+		sleep 2
+	else
+		#Set fixed nct7363 PWM to 80%
+		bus_addr="$(printf "%d-%04x" "$second_bus" "$second_addr")"
+		i2c_dev_path="/sys/class/i2c-dev/i2c-${second_bus}/device/${bus_addr}"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm1"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm5"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm7"
+		eval "echo ${pwm_val} > ${i2c_dev_path}/hwmon/hwmon*/pwm11"
+		sleep 2
+	fi
+}
+
+config_fan_max31790() {
+	# Set fan tack sample count for each tach channel to highest value to avoid
+	# wrong fan tach reading.
+	#
+	# FanX_Dynamics
+	# - register offset: 0x08 (tach1) - 0x0d (tach6)
+	# |------------------------ -----------------------------------------------|
+	# | bit[7:5]         | 000b | 001b | 010b | 011b | 110b | 101b, 110b, 111b |
+	# |------------------------------------------------------------------------|
+	# | tach sample count|  1   |  2   |  4   |  8   |  16  |  32              |
+	# |------------------------------------------------------------------------|
+	local bus=23 addr=0x20 bus_addr
+
+	for offset in $(seq 0x08 0x0d); do
+		fan_dynam_val=$(printf "%d" "$(i2cget -y -f "$bus" "$addr" "$offset")")
+		fan_dynam_val=$((fan_dynam_val | 0xe0))
+		i2cset -y -f "$bus" "$addr" "$offset" "$fan_dynam_val"
+	done
+
+	# after manual set FanX_Dynamics, needs to rebind driver to ensure
+	# driver get correct setitngs
+	bus_addr="$(printf "%d-%04x" "$bus" "$addr")"
+	echo "$bus_addr" >/sys/bus/i2c/drivers/max31790/unbind
+	echo "$bus_addr" >/sys/bus/i2c/drivers/max31790/bind
+
+	# set fan enable
+	if find /sys/bus/i2c/devices/*/hwmon/*/fan*_enable -print -quit 2>/dev/null | grep -q .; then
+		for file in /sys/bus/i2c/devices/*/hwmon/*/fan*_enable; do
+			echo 1 >"${file}"
+		done
+	fi
+}
+
+config_fan() {
+	local bus=23 addr=0x20 bus_addr
+	bus_addr="$(printf "%d-%04x" "$bus" "$addr")"
+
+	if [ -d "/sys/bus/i2c/drivers/max31790/${bus_addr}/hwmon" ]; then
+		echo "Configure MAX31790 fan controller"
+		config_fan_max31790
+	fi
+}
+
+# DC_SCM Power LED
+power_on_led_init() {
+	systemctl start obmc-led-group-start@power_on.service
+}
+
+set_fan_pwm_fixed
+
+power_on_led_init
+
+# Set fan target and enable all fan input as early as possible
+config_fan
+
+exit 0
