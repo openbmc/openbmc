@@ -1,0 +1,458 @@
+[
+    {
+        "Desc": {
+            "Name": "FCB_0_FAN_0_CURR_A",
+            "SensorType": "current"
+        },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_Fan_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FCB_0_FAN_0_IMON_VOLT_V",
+                    "Desc": {
+                        "Name": "FCB_0_FAN_0_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "FCB_0_FAN_0_IMON_VOLT_V / 0.2"
+    },
+    {
+        "Desc": {
+            "Name": "FCB_0_FAN_1_CURR_A",
+            "SensorType": "current"
+        },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_Fan_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FCB_0_FAN_1_IMON_VOLT_V",
+                    "Desc": {
+                        "Name": "FCB_0_FAN_1_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "FCB_0_FAN_1_IMON_VOLT_V / 0.2"
+    },
+    {
+        "Desc": {
+            "Name": "FCB_0_FAN_2_CURR_A",
+            "SensorType": "current"
+        },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_Fan_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FCB_0_FAN_2_IMON_VOLT_V",
+                    "Desc": {
+                        "Name": "FCB_0_FAN_2_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "FCB_0_FAN_2_IMON_VOLT_V / 0.2"
+    },
+    {
+        "Desc": {
+            "Name": "FCB_0_FAN_3_CURR_A",
+            "SensorType": "current"
+        },
+        "Associations": [
+            [
+                "board",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_Fan_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FCB_0_FAN_3_IMON_VOLT_V",
+                    "Desc": {
+                        "Name": "FCB_0_FAN_3_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "FCB_0_FAN_3_IMON_VOLT_V / 0.2"
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_SCM_INLET_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 60,
+            "CriticalLow": 5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_SCM"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "SCM_INLET_TEMP_C",
+                    "Desc": {
+                        "Name": "SCM_INLET_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN0_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN0_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN1_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN1_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN2_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN2_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN3_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN3_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
+            "var CAL_OFS[11]:={-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -2.0, -2.5, -2.5, -2.5, -2.5};",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_AVG,DUTY_OFS[0]): SCM_INLET_TEMP_C+CAL_OFS[0];",
+            "  case inrange(DUTY_OFS[2],DUTY_AVG,DUTY_OFS[1]): SCM_INLET_TEMP_C+CAL_OFS[1];",
+            "  case inrange(DUTY_OFS[3],DUTY_AVG,DUTY_OFS[2]): SCM_INLET_TEMP_C+CAL_OFS[2];",
+            "  case inrange(DUTY_OFS[4],DUTY_AVG,DUTY_OFS[3]): SCM_INLET_TEMP_C+CAL_OFS[3];",
+            "  case inrange(DUTY_OFS[5],DUTY_AVG,DUTY_OFS[4]): SCM_INLET_TEMP_C+CAL_OFS[4];",
+            "  case inrange(DUTY_OFS[6],DUTY_AVG,DUTY_OFS[5]): SCM_INLET_TEMP_C+CAL_OFS[5];",
+            "  case inrange(DUTY_OFS[7],DUTY_AVG,DUTY_OFS[6]): SCM_INLET_TEMP_C+CAL_OFS[6];",
+            "  case inrange(DUTY_OFS[8],DUTY_AVG,DUTY_OFS[7]): SCM_INLET_TEMP_C+CAL_OFS[7];",
+            "  case inrange(DUTY_OFS[9],DUTY_AVG,DUTY_OFS[8]): SCM_INLET_TEMP_C+CAL_OFS[8];",
+            "  case inrange(DUTY_OFS[10],DUTY_AVG,DUTY_OFS[9]): SCM_INLET_TEMP_C+CAL_OFS[9];",
+            "  default: SCM_INLET_TEMP_C+CAL_OFS[10];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_RMC_VR1_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 125,
+            "CriticalLow": 5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_VR1_TEMP_C",
+                    "Desc": {
+                        "Name": "RMC_VR1_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN0_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN0_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN1_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN1_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN2_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN2_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN3_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN3_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
+            "var CAL_OFS[11]:={2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5, 2.5};",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_AVG,DUTY_OFS[0]): RMC_VR1_TEMP_C+CAL_OFS[0];",
+            "  case inrange(DUTY_OFS[2],DUTY_AVG,DUTY_OFS[1]): RMC_VR1_TEMP_C+CAL_OFS[1];",
+            "  case inrange(DUTY_OFS[3],DUTY_AVG,DUTY_OFS[2]): RMC_VR1_TEMP_C+CAL_OFS[2];",
+            "  case inrange(DUTY_OFS[4],DUTY_AVG,DUTY_OFS[3]): RMC_VR1_TEMP_C+CAL_OFS[3];",
+            "  case inrange(DUTY_OFS[5],DUTY_AVG,DUTY_OFS[4]): RMC_VR1_TEMP_C+CAL_OFS[4];",
+            "  case inrange(DUTY_OFS[6],DUTY_AVG,DUTY_OFS[5]): RMC_VR1_TEMP_C+CAL_OFS[5];",
+            "  case inrange(DUTY_OFS[7],DUTY_AVG,DUTY_OFS[6]): RMC_VR1_TEMP_C+CAL_OFS[6];",
+            "  case inrange(DUTY_OFS[8],DUTY_AVG,DUTY_OFS[7]): RMC_VR1_TEMP_C+CAL_OFS[7];",
+            "  case inrange(DUTY_OFS[9],DUTY_AVG,DUTY_OFS[8]): RMC_VR1_TEMP_C+CAL_OFS[8];",
+            "  case inrange(DUTY_OFS[10],DUTY_AVG,DUTY_OFS[9]): RMC_VR1_TEMP_C+CAL_OFS[9];",
+            "  default: RMC_VR1_TEMP_C+CAL_OFS[10];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_RMC_VR2_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold" :
+        {
+            "CriticalHigh": 125,
+            "CriticalLow": 5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_VR2_TEMP_C",
+                    "Desc": {
+                        "Name": "RMC_VR2_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN0_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN0_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN1_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN1_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN2_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN2_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN3_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN3_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
+            "var CAL_OFS[11]:={3.5, 3.5, 3.5, 4.0, 4.0, 4.0, 4.5, 4.5, 4.5, 4.5, 4.5};",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_AVG,DUTY_OFS[0]): RMC_VR2_TEMP_C+CAL_OFS[0];",
+            "  case inrange(DUTY_OFS[2],DUTY_AVG,DUTY_OFS[1]): RMC_VR2_TEMP_C+CAL_OFS[1];",
+            "  case inrange(DUTY_OFS[3],DUTY_AVG,DUTY_OFS[2]): RMC_VR2_TEMP_C+CAL_OFS[2];",
+            "  case inrange(DUTY_OFS[4],DUTY_AVG,DUTY_OFS[3]): RMC_VR2_TEMP_C+CAL_OFS[3];",
+            "  case inrange(DUTY_OFS[5],DUTY_AVG,DUTY_OFS[4]): RMC_VR2_TEMP_C+CAL_OFS[4];",
+            "  case inrange(DUTY_OFS[6],DUTY_AVG,DUTY_OFS[5]): RMC_VR2_TEMP_C+CAL_OFS[5];",
+            "  case inrange(DUTY_OFS[7],DUTY_AVG,DUTY_OFS[6]): RMC_VR2_TEMP_C+CAL_OFS[6];",
+            "  case inrange(DUTY_OFS[8],DUTY_AVG,DUTY_OFS[7]): RMC_VR2_TEMP_C+CAL_OFS[7];",
+            "  case inrange(DUTY_OFS[9],DUTY_AVG,DUTY_OFS[8]): RMC_VR2_TEMP_C+CAL_OFS[8];",
+            "  case inrange(DUTY_OFS[10],DUTY_AVG,DUTY_OFS[9]): RMC_VR2_TEMP_C+CAL_OFS[9];",
+            "  default: RMC_VR2_TEMP_C+CAL_OFS[10];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_RMC_HSC_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_HSC_TEMP_C",
+                    "Desc": {
+                        "Name": "RMC_HSC_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "RMC_HSC_TEMP_C + 7.5"
+    },
+    {
+        "Desc": {
+            "Name": "RMC_CABLE_TSENSE_POSITIVE_INA_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_CTP_CURR",
+                    "Desc": {
+                        "Name": "RMC_CABLE_TSENSE_POSITIVE_INA_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],RMC_CTP_CURR,CURR[1]): 0.9594*(TEMP[0]+((RMC_CTP_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0])))-0.0167;",
+            "  case inrange(CURR[1],RMC_CTP_CURR,CURR[2]): 0.9594*(TEMP[1]+((RMC_CTP_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1])))-0.0167;",
+            "  case inrange(CURR[2],RMC_CTP_CURR,CURR[3]): 0.9594*(TEMP[2]+((RMC_CTP_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2])))-0.0167;",
+            "  case inrange(CURR[3],RMC_CTP_CURR,CURR[4]): 0.9594*(TEMP[3]+((RMC_CTP_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3])))-0.0167;",
+            "  case inrange(CURR[4],RMC_CTP_CURR,CURR[5]): 0.9594*(TEMP[4]+((RMC_CTP_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4])))-0.0167;",
+            "  case inrange(CURR[5],RMC_CTP_CURR,CURR[6]): 0.9594*(TEMP[5]+((RMC_CTP_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5])))-0.0167;",
+            "  case inrange(CURR[6],RMC_CTP_CURR,CURR[7]): 0.9594*(TEMP[6]+((RMC_CTP_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6])))-0.0167;",
+            "  case inrange(CURR[7],RMC_CTP_CURR,CURR[8]): 0.9594*(TEMP[7]+((RMC_CTP_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7])))-0.0167;",
+            "  case inrange(CURR[8],RMC_CTP_CURR,CURR[9]): 0.9594*(TEMP[8]+((RMC_CTP_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8])))-0.0167;",
+            "  case inrange(CURR[9],RMC_CTP_CURR,CURR[10]): 0.9594*(TEMP[9]+((RMC_CTP_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9])))-0.0167;",
+            "  case inrange(CURR[10],RMC_CTP_CURR,CURR[11]): 0.9594*(TEMP[10]+((RMC_CTP_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10])))-0.0167;",
+            "  case inrange(CURR[11],RMC_CTP_CURR,CURR[12]): 0.9594*(TEMP[11]+((RMC_CTP_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11])))-0.0167;",
+            "  case inrange(CURR[12],RMC_CTP_CURR,CURR[13]): 0.9594*(TEMP[12]+((RMC_CTP_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12])))-0.0167;",
+            "  case RMC_CTP_CURR>CURR[13]: 0.9594*(TEMP[13])-0.0167;",
+            "  default : 0.9594*(TEMP[0])-0.0167;",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "RMC_CABLE_TSENSE_NEGATIVE_INA_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "RMC_CTN_CURR",
+                    "Desc": {
+                        "Name": "RMC_CABLE_TSENSE_NEGATIVE_INA_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var CURR[14]:={",
+            "    0.000103096, 0.000167266, 0.000264678, 0.000409074, 0.000618325,",
+            "    0.000914888, 0.001326367, 0.001885714, 0.002631579, 0.003606557,",
+            "    0.004860088, 0.006432749, 0.008375635, 0.009510086};",
+            "var TEMP[14]:={0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 125};",
+            "switch {",
+            "  case inrange(CURR[0],RMC_CTN_CURR,CURR[1]): 0.9507*(TEMP[0]+((RMC_CTN_CURR-CURR[0])*(TEMP[1]-TEMP[0])/(CURR[1]-CURR[0])))-0.0013;",
+            "  case inrange(CURR[1],RMC_CTN_CURR,CURR[2]): 0.9507*(TEMP[1]+((RMC_CTN_CURR-CURR[1])*(TEMP[2]-TEMP[1])/(CURR[2]-CURR[1])))-0.0013;",
+            "  case inrange(CURR[2],RMC_CTN_CURR,CURR[3]): 0.9507*(TEMP[2]+((RMC_CTN_CURR-CURR[2])*(TEMP[3]-TEMP[2])/(CURR[3]-CURR[2])))-0.0013;",
+            "  case inrange(CURR[3],RMC_CTN_CURR,CURR[4]): 0.9507*(TEMP[3]+((RMC_CTN_CURR-CURR[3])*(TEMP[4]-TEMP[3])/(CURR[4]-CURR[3])))-0.0013;",
+            "  case inrange(CURR[4],RMC_CTN_CURR,CURR[5]): 0.9507*(TEMP[4]+((RMC_CTN_CURR-CURR[4])*(TEMP[5]-TEMP[4])/(CURR[5]-CURR[4])))-0.0013;",
+            "  case inrange(CURR[5],RMC_CTN_CURR,CURR[6]): 0.9507*(TEMP[5]+((RMC_CTN_CURR-CURR[5])*(TEMP[6]-TEMP[5])/(CURR[6]-CURR[5])))-0.0013;",
+            "  case inrange(CURR[6],RMC_CTN_CURR,CURR[7]): 0.9507*(TEMP[6]+((RMC_CTN_CURR-CURR[6])*(TEMP[7]-TEMP[6])/(CURR[7]-CURR[6])))-0.0013;",
+            "  case inrange(CURR[7],RMC_CTN_CURR,CURR[8]): 0.9507*(TEMP[7]+((RMC_CTN_CURR-CURR[7])*(TEMP[8]-TEMP[7])/(CURR[8]-CURR[7])))-0.0013;",
+            "  case inrange(CURR[8],RMC_CTN_CURR,CURR[9]): 0.9507*(TEMP[8]+((RMC_CTN_CURR-CURR[8])*(TEMP[9]-TEMP[8])/(CURR[9]-CURR[8])))-0.0013;",
+            "  case inrange(CURR[9],RMC_CTN_CURR,CURR[10]): 0.9507*(TEMP[9]+((RMC_CTN_CURR-CURR[9])*(TEMP[10]-TEMP[9])/(CURR[10]-CURR[9])))-0.0013;",
+            "  case inrange(CURR[10],RMC_CTN_CURR,CURR[11]): 0.9507*(TEMP[10]+((RMC_CTN_CURR-CURR[10])*(TEMP[11]-TEMP[10])/(CURR[11]-CURR[10])))-0.0013;",
+            "  case inrange(CURR[11],RMC_CTN_CURR,CURR[12]): 0.9507*(TEMP[11]+((RMC_CTN_CURR-CURR[11])*(TEMP[12]-TEMP[11])/(CURR[12]-CURR[11])))-0.0013;",
+            "  case inrange(CURR[12],RMC_CTN_CURR,CURR[13]): 0.9507*(TEMP[12]+((RMC_CTN_CURR-CURR[12])*(TEMP[13]-TEMP[12])/(CURR[13]-CURR[12])))-0.0013;",
+            "  case RMC_CTN_CURR>CURR[13]: 0.9507*(TEMP[13])-0.0013;",
+            "  default : 0.9507*(TEMP[0])-0.0013;",
+            "}"
+        ]
+    }
+]
