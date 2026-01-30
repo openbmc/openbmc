@@ -114,6 +114,27 @@ mdio_LED_setting_for_marvell_chip()
     mdio '1*' 10 0x16 $led_port9
 }
 
+config_for_hsc()
+{
+    local scp_reg=0xd5
+    local expected_val=(0x65 0x74)
+    local read_val=""
+
+    if [ -d "/sys/bus/i2c/devices/i2c-10/10-0014/hwmon" ]; then
+        # set SCP to 50A
+        i2ctransfer -f -y 10 w3@0x14 "$scp_reg" "${expected_val[@]}"
+
+        # confirm with a read
+        read_val=$(i2ctransfer -f -y 10 w1@0x14 "$scp_reg" r2 | xargs)
+
+        if [ "$read_val" = "${expected_val[*]}" ]; then
+            echo "HSC XDP710 SCP config success. Value matches: $read_val"
+        else
+            echo "HSC XDP710 SCP config failed. Expected ${expected_val[*]} but got $read_val"
+        fi
+    fi
+}
+
 # Change the i2c path to the eeprom to the 88E6393X
 set_gpio FM_88E6393X_BIN_UPDATE_EN_N 1
 # Sleep 2s
@@ -130,5 +151,8 @@ mdio_LED_setting_for_marvell_chip
 # Set fan target and enable all fan input as early as possible
 config_fan
 check_cpld_state
+
+#set SCP to 50A for XDP710
+config_for_hsc
 
 exit 0
