@@ -15,6 +15,8 @@ SRC_URI += " \
     file://sgpio-state-init \
     file://sgpio-state-init.service \
     file://99-sgpio-state-init.rules \
+    file://ventura2-fan-status-monitor \
+    file://ventura2-fan-status-monitor.service \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -22,6 +24,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
     marvell-switch-init.service \
     marvell-switch-poe-init.service \
     sgpio-state-init.service \
+    ventura2-fan-status-monitor.service \
     "
 
 do_install() {
@@ -33,4 +36,5 @@ do_install() {
 
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${UNPACKDIR}/99-sgpio-state-init.rules ${D}${sysconfdir}/udev/rules.d
+    install -m 0755 ${UNPACKDIR}/ventura2-fan-status-monitor ${LIBEXECDIR_PN}
 }
