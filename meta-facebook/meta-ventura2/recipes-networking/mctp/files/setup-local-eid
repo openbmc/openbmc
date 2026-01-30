@@ -1,0 +1,15 @@
+#!/bin/bash
+
+MCTP_INTF="mctpi2c38"
+
+echo "Setting ${MCTP_INTF}..."
+
+mctp link set "${MCTP_INTF}" down
+mctp addr del 10 dev "${MCTP_INTF}"
+
+mctp link set "${MCTP_INTF}" up
+mctp addr add 10 dev "${MCTP_INTF}"
+
+echo "${MCTP_INTF} SET Complete。"
+
+exit 0
