@@ -11,6 +11,7 @@ PACKAGECONFIG:append = " \
     insecure-redfish-expand \
     redfish-dbus-log \
     redfish-dump-log \
+    redfish-eventlog-managers \
 "
 
 PACKAGECONFIG:remove = " \
