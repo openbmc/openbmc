@@ -20,6 +20,7 @@ DEPENDS += '${@oe.utils.conditional("SOCSEC_SIGN_ENABLE", "1", " socsec-native",
 
 # Signs the SPL binary with a pre-established key
 sign_spl_helper() {
+    export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
     signing_helper_args=""
 
     if [ "${SOC_FAMILY}" != "aspeed-g6" ] ; then
