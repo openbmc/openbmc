@@ -3,6 +3,37 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+is_amc_ready() {
+    # 48 min = 2880 sec   every 10 sec to check GPIO
+    # timeout of cpld is 46 min,
+    # cpld set to high when
+    #   1. timeout
+    #   2. amc is ready for host power on
+
+    local MAX_RETRIES=288
+    local INTERVAL=10
+    local RETRY_COUNT=0
+
+    echo "Starting RSMRST_N check (Timeout: 48 minutes)..."
+
+    while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+
+        if [ "$(get_gpio "RSMRST_N")" -eq 1 ] ; then
+            echo "Success: RSMRST_N is 1 at $((RETRY_COUNT * INTERVAL))s."
+            return 0
+        fi
+
+        echo "RSMRST_N isnot 1. Wait ${INTERVAL}s... (Attempt $((RETRY_COUNT+1))/$MAX_RETRIES)"
+
+        sleep $INTERVAL
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+
+    done
+
+    echo "Error: RSMRST_N check timed out after 48 minutes."
+    return 1
+}
+
 # Power Good Status
 power_status() {
     if [ "$(get_gpio "FM_CPU0_PWRGD")" -eq 1 ] ; then
@@ -58,7 +89,13 @@ graceful_power_off() {
 # DC on
 power_on() {
     if [ "$(power_status)" == "off" ]; then
+        if ! is_amc_ready; then
+            echo "AMC is not ready, abort power on"
+            return 1
+        fi
+
         systemctl stop bind-apml-driver.service
+
         set_gpio SYS_BMC_PWRBTN_N 0
         sleep 1
         set_gpio SYS_BMC_PWRBTN_N 1
