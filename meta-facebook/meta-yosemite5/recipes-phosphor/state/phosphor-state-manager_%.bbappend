@@ -2,6 +2,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG:remove = "no-warm-reboot"
 
+PACKAGECONFIG:append = " check-fwupdate-before-do-transition"
+
 # NOTE: The YV5 SCM shares the blade/chassis standby power rail.
 # As a result, the chassis is always powered on and does not support
 # independent chassis power on/off control; only chassis power cycle
