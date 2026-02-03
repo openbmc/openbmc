@@ -22,7 +22,7 @@ for the latest requirements
 
 ```sh
 sudo apt install git gcc g++ make file wget \
-    gawk diffstat bzip2 cpio chrpath zstd lz4 bzip2
+    gawk diffstat bzip2 cpio chrpath zstd lz4
 ```
 
 #### Fedora
