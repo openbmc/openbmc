@@ -1,1 +1,1 @@
-PACKAGECONFIG:append = " jffs-workaround"
+PACKAGECONFIG:append = " jffs-workaround dump-rotate-config"

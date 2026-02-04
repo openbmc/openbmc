@@ -33,6 +33,11 @@ PACKAGECONFIG[xz] = "-Ddump-compression-algorithm=xz,,,,gzip zstd"
 PACKAGECONFIG[gzip] = "-Ddump-compression-algorithm=gzip,,,,xz zstd"
 PACKAGECONFIG[zstd] = "-Ddump-compression-algorithm=zstd,,,zstd,xz gzip"
 
+PACKAGECONFIG[dump-rotate-config] = " \
+      -Ddump-rotate-config=enabled, \
+      -Ddump-rotate-config=disabled \
+"
+
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
