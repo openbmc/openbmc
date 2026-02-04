@@ -16,7 +16,7 @@ DEPENDS += " \
         ${PYTHON_PN}-mako-native \
         nlohmann-json \
 "
-PACKAGECONFIG ??= "${@bb.utils.contains_any('DISTRO_FEATURES', \
+PACKAGECONFIG ??= "xz ${@bb.utils.contains_any('DISTRO_FEATURES', \
          'obmc-ubi-fs phosphor-mmc obmc-static-norootfs', '', 'jffs-workaround', d)}"
 PACKAGECONFIG[jffs-workaround] = "-Djffs-workaround=enabled, \
         -Djffs-workaround=disabled"
@@ -28,10 +28,9 @@ PACKAGECONFIG[openpower-dumps-extension] = " \
        -Dopenpower-dumps-extension=enabled, \
        -Dopenpower-dumps-extension=disabled  \
 "
-PACKAGECONFIG ??= "xz"
-PACKAGECONFIG[xz] = "-Ddump-compression-algorithm=xz,,,,gzip zstd"
-PACKAGECONFIG[gzip] = "-Ddump-compression-algorithm=gzip,,,,xz zstd"
-PACKAGECONFIG[zstd] = "-Ddump-compression-algorithm=zstd,,,zstd,xz gzip"
+PACKAGECONFIG[xz] = "-Ddump-compression-algorithm=xz,,,,,gzip zstd"
+PACKAGECONFIG[gzip] = "-Ddump-compression-algorithm=gzip,,,,,xz zstd"
+PACKAGECONFIG[zstd] = "-Ddump-compression-algorithm=zstd,,,,zstd,xz gzip"
 
 PACKAGECONFIG[dump-rotate-config] = " \
       -Ddump-rotate-config=enabled, \
@@ -78,6 +77,7 @@ RDEPENDS:${PN}-dreport += " \
         ${VIRTUAL-RUNTIME_base-utils} \
         bash \
         xz \
+        ${@bb.utils.filter('PACKAGECONFIG', 'zstd', d)} \
 "
 RDEPENDS:${PN}-scripts += " \
         bash \
