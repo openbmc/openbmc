@@ -114,24 +114,57 @@ mdio_LED_setting_for_marvell_chip()
     mdio '1*' 10 0x16 $led_port9
 }
 
-config_for_hsc()
+config_hsc()
 {
+    local i2c_bus=10
+    local i2c_addr=0x14
     local scp_reg=0xd5
+    local mtp_reg=(0xea 0x05)
     local expected_val=(0x65 0x74)
-    local read_val=""
+    local expected_str="${expected_val[*]}"
+    local hwmon_path="/sys/bus/i2c/devices/i2c-$i2c_bus/$i2c_bus-00${i2c_addr#0x}/hwmon"
 
-    if [ -d "/sys/bus/i2c/devices/i2c-10/10-0014/hwmon" ]; then
-        # set SCP to 50A
-        i2ctransfer -f -y 10 w3@0x14 "$scp_reg" "${expected_val[@]}"
+    # Check if the device exists
+    if [ ! -d "$hwmon_path" ]; then
+        echo "config_hsc: Device path $hwmon_path not found."
+        return 1
+    fi
 
-        # confirm with a read
-        read_val=$(i2ctransfer -f -y 10 w1@0x14 "$scp_reg" r2 | xargs)
+    # Read current value
+    local read_val
+    read_val=$(i2ctransfer -f -y "$i2c_bus" w1@"$i2c_addr" "$scp_reg" r2 | xargs)
 
-        if [ "$read_val" = "${expected_val[*]}" ]; then
-            echo "HSC XDP710 SCP config success. Value matches: $read_val"
-        else
-            echo "HSC XDP710 SCP config failed. Expected ${expected_val[*]} but got $read_val"
-        fi
+    # Decision Logic
+    if [ "$read_val" = "$expected_str" ]; then
+        echo "config_hsc: HSC XDP710 SCP/SOC is already configured correctly ($read_val). No write needed."
+        return 0
+    fi
+
+    echo "config_hsc: Current value ($read_val) differs from expected. Writing configuration..."
+
+    # Set SCP/SOC to 50A
+    if ! i2ctransfer -f -y "$i2c_bus" w3@"$i2c_addr" "$scp_reg" "${expected_val[@]}"; then
+        echo "config_hsc: Failed to write SCP/SOC configuration."
+        return 1
+    fi
+
+    # Store to MTP (Non-volatile memory)
+    echo "config_hsc: Storing configuration to MTP..."
+    if ! i2ctransfer -f -y "$i2c_bus" w2@"$i2c_addr" "${mtp_reg[@]}"; then
+        echo "config_hsc: Failed to execute MTP store command."
+    fi
+
+    # Critical: MTP writing needs a short cooldown
+    sleep 0.1
+
+    # Final Read-back Verification
+    read_val=$(i2ctransfer -f -y "$i2c_bus" w1@"$i2c_addr" "$scp_reg" r2 | xargs)
+
+    if [ "$read_val" = "$expected_str" ]; then
+        echo "config_hsc: HSC XDP710 SCP/SOC configuration successful. Value matches: $read_val"
+    else
+        echo "config_hsc: HSC XDP710 SCP/SOC configuration failed. Expected $expected_str but got $read_val"
+        return 1
     fi
 }
 
@@ -152,7 +185,7 @@ mdio_LED_setting_for_marvell_chip
 config_fan
 check_cpld_state
 
-#set SCP to 50A for XDP710
-config_for_hsc
+# Set SCP/SOC to 50A for XDP710
+config_hsc
 
 exit 0
