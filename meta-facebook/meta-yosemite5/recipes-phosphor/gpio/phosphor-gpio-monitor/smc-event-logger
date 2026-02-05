@@ -21,6 +21,13 @@ message=$2
 BOARD="${message%%_*}"
 GPIO_NAME="${message#*_}"
 
+if [[ $GPIO_NAME == ALERT_CLKMUX_*_LOSS_N ]];then
+    if [[ "$(busctl get-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState)" != *Standby* ]]; then
+        echo "Host not ready, skip log."
+        exit 1
+    fi
+fi
+
 if [[ $BOARD == mb* ]]; then
     DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite5_MB/${GPIO_NAME}"
 else
