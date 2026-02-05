@@ -1,1 +1,2 @@
-PACKAGECONFIG:append = " jffs-workaround dump-rotate-config"
+PACKAGECONFIG:remove = "xz"
+PACKAGECONFIG:append = " jffs-workaround dump-rotate-config zstd"
