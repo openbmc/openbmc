@@ -1,0 +1,45 @@
+#!/bin/bash
+
+# Wait for all cable inventory objects to be created by EntityManager
+# before starting cable monitor. This prevents race condition
+# where cable-monitor detects all cables as missing during boot.
+
+CONFIG_FILE="/var/lib/cablemonitor/cable-config.json"
+
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Config file not found: $CONFIG_FILE"
+    exit 1
+fi
+
+CABLE_NAMES=$(jq -r '.ConnectedCables[]' "$CONFIG_FILE" 2>/dev/null)
+
+if [ -z "$CABLE_NAMES" ]; then
+    echo "No cables found in config"
+    exit 0
+fi
+
+PATHS=()
+while IFS= read -r cable; do
+    PATHS+=("/xyz/openbmc_project/inventory/system/cable/${cable}")
+done <<< "$CABLE_NAMES"
+
+echo "Waiting for ${#PATHS[@]} cable inventory objects..."
+
+for _ in {1..20}; do
+    all_found=true
+    for path in "${PATHS[@]}"; do
+        if ! mapper get-service "$path" >/dev/null 2>&1; then
+            all_found=false
+            break
+        fi
+    done
+
+    if [ "$all_found" = true ]; then
+        echo "Found all cable inventory"
+        exit 0
+    fi
+    sleep 1
+done
+
+echo "Timeout waiting for cable inventory"
+exit 0
