@@ -12,6 +12,52 @@ power_status() {
     fi
 }
 
+add_sel()
+{
+    local MSG_ID=$1
+    local DEVICE_PATH=$2
+    local LOG_TYPE=$3
+    local LOG_CONTENT=$4
+
+    /usr/bin/log-create "$MSG_ID" --json \
+    "{ \"${LOG_TYPE}\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${LOG_CONTENT}\"}"
+}
+
+declare -A ERROR_MAP=(
+    ["11"]="S5_PVDD33 Fault(no power good)"
+    ["12"]="S5_PVDD18 Fault"
+    ["13"]="Wait SLP_S3 Fault"
+    ["14"]="S0_PVDDIO Fault"
+    ["15"]="PVDDCR_SOC_P0 Fault"
+    ["16"]="PVDDCR_CPU0_P0 Fault"
+    ["17"]="PVDDCR_CPU1_P0 Fault"
+
+    ["21"]="P12V_E1S_0 Power dropped"
+    ["22"]="ASIC0 Power dropped"
+    ["23"]="ASIC1 Power dropped"
+    ["24"]="ASIC2 Power dropped"
+    ["25"]="ASIC3 Power dropped"
+    ["26"]="SWB Power dropped"
+    ["27"]="PVDDIO_MEM_S3_P0 Power dropped"
+    ["28"]="PVDDIO_P0 Power dropped"
+    ["29"]="PVDDCR_SOC_P0 Power dropped"
+    ["2A"]="PVDDCR_CPU0_P0 Power dropped"
+    ["2B"]="PVDDCR_CPU1_P0 Power dropped"
+
+    ["30"]="System Leak"
+    ["40"]="System power disable by RMC"
+    ["50"]="STBY Fault"
+    ["60"]="SLP_S5 Fault"
+    ["70"]="No RMC power enable"
+
+    ["80"]="ASIC0 Fault"
+    ["81"]="ASIC1 Fault"
+    ["82"]="ASIC2 Fault"
+    ["83"]="ASIC3 Fault"
+
+    ["90"]="SWB Fault"
+)
+
 # Force DC off
 force_power_off() {
     if [ "$(power_status)" == "on" ]; then
@@ -71,6 +117,14 @@ power_on() {
             fi
 
             if [ "$i" -eq 10 ]; then
+                raw=$(i2cget -fy 21 0x33 0x20)
+                error_code=${raw:2}
+                decode=${ERROR_MAP[$error_code]:-"Unknown Error Code ($error_code)"}
+                MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+                DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Santabarbara_MB/power_on_sequence_fail"
+                LOG_TYPE="POWER_RAIL"
+                LOG_CONTENT="POWER_ON_SEQUENCE_FAIL - [$decode]"
+                add_sel $MSG_ID $DEVICE_PATH $LOG_TYPE "$LOG_CONTENT"
                return 1
             fi
         done
