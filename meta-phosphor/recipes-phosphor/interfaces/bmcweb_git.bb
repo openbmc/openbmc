@@ -47,6 +47,7 @@ PACKAGECONFIG[redfish-bmc-journal] = "-Dredfish-bmc-journal=enabled,-Dredfish-bm
 PACKAGECONFIG[redfish-cpu-log] = "-Dredfish-cpu-log=enabled,-Dredfish-cpu-log=disabled"
 PACKAGECONFIG[redfish-dbus-log] = "-Dredfish-dbus-log=enabled,-Dredfish-dbus-log=disabled"
 PACKAGECONFIG[redfish-dump-log] = "-Dredfish-dump-log=enabled,-Dredfish-dump-log=disabled"
+PACKAGECONFIG[redfish-eventlog-managers] = "-Dredfish-eventlog-location=managers,-Dredfish-eventlog-location=systems"
 PACKAGECONFIG[redfish-host-logger] = "-Dredfish-host-logger=enabled,-Dredfish-host-logger=disabled"
 PACKAGECONFIG[redfish-oem-manager-fan-data] = "-Dredfish-oem-manager-fan-data=enabled,-Dredfish-oem-manager-fan-data=disabled"
 
