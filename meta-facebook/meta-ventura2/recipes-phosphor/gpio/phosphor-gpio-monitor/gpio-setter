@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+gpio_name="${1:-}"
+gpio_value="${2:-}"
+
+if [[ -z "$gpio_name" || -z "$gpio_value" ]]; then
+    echo "Usage: $0 <gpio_name> <gpio_value>" >&2
+    exit 2
+fi
+
+set_gpio "$gpio_name" "$gpio_value"

@@ -1,0 +1,382 @@
+[
+    {
+        "Name": "PWRGD_P24V_AUX_R",
+        "LineName": "PWRGD_P24V_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P24V_AUX_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P24V_AUX_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P24V_AUX_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P24V_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P24V_AUX_2_R",
+        "LineName": "PWRGD_P24V_AUX_2_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P24V_AUX_2_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P24V_AUX_2_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P24V_AUX_2_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P24V_AUX_2_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P12V_SCM_R",
+        "LineName": "PWRGD_P12V_SCM_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P12V_SCM_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P12V_SCM_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P12V_SCM_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P12V_SCM_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P12V_AUX_R2",
+        "LineName": "PWRGD_P12V_AUX_R2",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P12V_AUX_R2.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P12V_AUX_R2.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P12V_AUX_R2.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P12V_AUX_R2.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "STBY_POWER_PG_3V3",
+        "LineName": "STBY_POWER_PG_3V3",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P3V3_AUX_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P3V3_AUX_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P3V3_AUX_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P3V3_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P5V_AUX_R2",
+        "LineName": "PWRGD_P5V_AUX_R2",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P5V_AUX_R2.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P5V_AUX_R2.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P5V_AUX_R2.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P5V_AUX_R2.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P1V05_AUX_R",
+        "LineName": "PWRGD_P1V05_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P1V05_AUX_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P1V05_AUX_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P1V05_AUX_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P1V05_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P1V5_AUX_R",
+        "LineName": "PWRGD_P1V5_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P1V5_AUX_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P1V5_AUX_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P1V5_AUX_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P1V5_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_P52V_HSC_PWROK_R",
+        "LineName": "PWRGD_P52V_HSC_PWROK_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_PWRGD_P52V_HSC_PWROK_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_PWRGD_P52V_HSC_PWROK_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_PWRGD_P52V_HSC_PWROK_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_PWRGD_P52V_HSC_PWROK_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY23_PWRGD_BUF_R",
+        "LineName": "TRAY23_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY23_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY23_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY23_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY23_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY24_PWRGD_BUF_R",
+        "LineName": "TRAY24_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY24_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY24_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY24_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY24_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY29_PWRGD_BUF_R",
+        "LineName": "TRAY29_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY29_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY29_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY29_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY29_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY30_PWRGD_BUF_R",
+        "LineName": "TRAY30_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY30_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY30_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY30_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY30_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY31_PWRGD_BUF_R",
+        "LineName": "TRAY31_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY31_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY31_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY31_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY31_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY32_PWRGD_BUF_R",
+        "LineName": "TRAY32_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY32_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY32_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY32_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY32_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY37_PWRGD_BUF_R",
+        "LineName": "TRAY37_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY37_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY37_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY37_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY37_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY38_PWRGD_BUF_R",
+        "LineName": "TRAY38_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY38_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY38_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY38_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY38_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY39_PWRGD_BUF_R",
+        "LineName": "TRAY39_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY39_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY39_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY39_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY39_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY40_PWRGD_BUF_R",
+        "LineName": "TRAY40_PWRGD_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "gpio-set-high@FPGA_TRAY40_PWRGD_BUF_R.service"
+            ],
+            "INIT_HIGH": [
+                "gpio-set-high@FPGA_TRAY40_PWRGD_BUF_R.service"
+            ],
+            "FALLING": [
+                "gpio-set-low@FPGA_TRAY40_PWRGD_BUF_R.service"
+            ],
+            "INIT_LOW": [
+                "gpio-set-low@FPGA_TRAY40_PWRGD_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    }
+]

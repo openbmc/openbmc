@@ -1,0 +1,7 @@
+[Unit]
+Description=%i GPIO Set Low
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/gpio-setter "%i" 0
+SyslogIdentifier=%i-gpio-set-low

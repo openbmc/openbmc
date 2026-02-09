@@ -27,3 +27,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-state-manager \
 "
 
+# Monitor GPIOs on the system and trigger actions.
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-gpio-monitor \
+"
