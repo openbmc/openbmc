@@ -378,5 +378,697 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD1_N_BUF_R",
+        "LineName": "TRAY_PWRGD1_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD1_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD1_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD2_N_BUF_R",
+        "LineName": "TRAY_PWRGD2_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD2_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD2_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD3_N_BUF_R",
+        "LineName": "TRAY_PWRGD3_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD3_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD3_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD4_N_BUF_R",
+        "LineName": "TRAY_PWRGD4_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD4_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD4_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD5_N_BUF_R",
+        "LineName": "TRAY_PWRGD5_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD5_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD5_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD6_N_BUF_R",
+        "LineName": "TRAY_PWRGD6_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD6_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD6_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD7_N_BUF_R",
+        "LineName": "TRAY_PWRGD7_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD7_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD7_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD8_N_BUF_R",
+        "LineName": "TRAY_PWRGD8_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD8_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD8_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD9_N_BUF_R",
+        "LineName": "TRAY_PWRGD9_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD9_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD9_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD10_N_BUF_R",
+        "LineName": "TRAY_PWRGD10_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD10_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD10_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD11_N_BUF_R",
+        "LineName": "TRAY_PWRGD11_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD11_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD11_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD12_N_BUF_R",
+        "LineName": "TRAY_PWRGD12_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD12_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD12_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD13_N_BUF_R",
+        "LineName": "TRAY_PWRGD13_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD13_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD13_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD14_N_BUF_R",
+        "LineName": "TRAY_PWRGD14_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD14_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD14_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD15_N_BUF_R",
+        "LineName": "TRAY_PWRGD15_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD15_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD15_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD16_N_BUF_R",
+        "LineName": "TRAY_PWRGD16_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD16_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD16_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD17_N_BUF_R",
+        "LineName": "TRAY_PWRGD17_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD17_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD17_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD18_N_BUF_R",
+        "LineName": "TRAY_PWRGD18_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD18_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD18_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD19_N_BUF_R",
+        "LineName": "TRAY_PWRGD19_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD19_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD19_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD20_N_BUF_R",
+        "LineName": "TRAY_PWRGD20_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD20_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD20_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD21_N_BUF_R",
+        "LineName": "TRAY_PWRGD21_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD21_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD21_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD22_N_BUF_R",
+        "LineName": "TRAY_PWRGD22_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD22_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD22_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD23_N_BUF_R",
+        "LineName": "TRAY_PWRGD23_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD23_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD23_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD24_N_BUF_R",
+        "LineName": "TRAY_PWRGD24_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD24_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD24_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD25_N_BUF_R",
+        "LineName": "TRAY_PWRGD25_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD25_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD25_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD26_N_BUF_R",
+        "LineName": "TRAY_PWRGD26_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD26_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD26_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD27_N_BUF_R",
+        "LineName": "TRAY_PWRGD27_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD27_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD27_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD28_N_BUF_R",
+        "LineName": "TRAY_PWRGD28_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD28_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD28_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD29_N_BUF_R",
+        "LineName": "TRAY_PWRGD29_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD29_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD29_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD30_N_BUF_R",
+        "LineName": "TRAY_PWRGD30_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD30_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD30_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD31_N_BUF_R",
+        "LineName": "TRAY_PWRGD31_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD31_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD31_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD32_N_BUF_R",
+        "LineName": "TRAY_PWRGD32_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD32_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD32_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD33_N_BUF_R",
+        "LineName": "TRAY_PWRGD33_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD33_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD33_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD34_N_BUF_R",
+        "LineName": "TRAY_PWRGD34_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD34_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD34_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD35_N_BUF_R",
+        "LineName": "TRAY_PWRGD35_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD35_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD35_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD36_N_BUF_R",
+        "LineName": "TRAY_PWRGD36_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD36_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD36_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD37_N_BUF_R",
+        "LineName": "TRAY_PWRGD37_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD37_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD37_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD38_N_BUF_R",
+        "LineName": "TRAY_PWRGD38_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD38_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD38_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD39_N_BUF_R",
+        "LineName": "TRAY_PWRGD39_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD39_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD39_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "TRAY_PWRGD40_N_BUF_R",
+        "LineName": "TRAY_PWRGD40_N_BUF_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@TRAY_PWRGD40_N_BUF_R.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@TRAY_PWRGD40_N_BUF_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "AALC_RPU_READY",
+        "LineName": "AALC_RPU_READY",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-assert-log@AALC_RPU_READY.service"
+            ],
+            "INIT_LOW": [
+                "smc-assert-log@AALC_RPU_READY.service"
+            ],
+            "RISING": [
+                "smc-deassert-log@AALC_RPU_READY.service"
+            ],
+            "INIT_HIGH": [
+                "smc-deassert-log@AALC_RPU_READY.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_READY_PLD_R",
+        "LineName": "RPU_READY_PLD_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-assert-log@RPU_READY_PLD_R.service"
+            ],
+            "RISING": [
+                "smc-deassert-log@RPU_READY_PLD_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_READY_SPARE_PLD_R",
+        "LineName": "RPU_READY_SPARE_PLD_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-assert-log@RPU_READY_SPARE_PLD_R.service"
+            ],
+            "RISING": [
+                "smc-deassert-log@RPU_READY_SPARE_PLD_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_2_READY_PLD_R",
+        "LineName": "RPU_2_READY_PLD_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-assert-log@RPU_2_READY_PLD_R.service"
+            ],
+            "RISING": [
+                "smc-deassert-log@RPU_2_READY_PLD_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPU_2_READY_SPARE_PLD_R",
+        "LineName": "RPU_2_READY_SPARE_PLD_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-assert-log@RPU_2_READY_SPARE_PLD_R.service"
+            ],
+            "RISING": [
+                "smc-deassert-log@RPU_2_READY_SPARE_PLD_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_R_CPLD",
+        "LineName": "IT_STOP_PUMP_R_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-deassert-log@IT_STOP_PUMP_R_CPLD.service"
+            ],
+            "RISING": [
+                "smc-assert-log@IT_STOP_PUMP_R_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_SPARE_R_CPLD",
+        "LineName": "IT_STOP_PUMP_SPARE_R_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-deassert-log@IT_STOP_PUMP_SPARE_R_CPLD.service"
+            ],
+            "RISING": [
+                "smc-assert-log@IT_STOP_PUMP_SPARE_R_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_2_R_CPLD",
+        "LineName": "IT_STOP_PUMP_2_R_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-deassert-log@IT_STOP_PUMP_2_R_CPLD.service"
+            ],
+            "RISING": [
+                "smc-assert-log@IT_STOP_PUMP_2_R_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IT_STOP_PUMP_SPARE_2_R_CPLD",
+        "LineName": "IT_STOP_PUMP_SPARE_2_R_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "smc-deassert-log@IT_STOP_PUMP_SPARE_2_R_CPLD.service"
+            ],
+            "RISING": [
+                "smc-assert-log@IT_STOP_PUMP_SPARE_2_R_CPLD.service"
+            ]
+        },
+        "Continue": true
     }
 ]

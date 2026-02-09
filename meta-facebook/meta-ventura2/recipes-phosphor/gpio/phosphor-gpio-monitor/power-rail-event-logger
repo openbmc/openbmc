@@ -1,0 +1,46 @@
+#!/bin/bash
+
+help_msg="
+Usage: power-rail-event-logger <event> <source>
+<event> is the power rail event to log,
+e.g. assert / deassert.
+
+<source> is defined in json file,
+e.g. PWRGD_COMPUTE_TRAY1_N
+"
+
+source="$2"
+device_path="/xyz/openbmc_project/inventory/system/board/Ventura2_PDB/$source"
+stash_file="/var/lib/phosphor-gpio-monitor/${source}.log_entry"
+
+get_failure_data() {
+    if [[ $1 =~ ^TRAY_PWRGD([0-9]+)_N_BUF_R$ ]]; then
+        echo "tray-leak-${BASH_REMATCH[1]} fault assert"
+    else
+        echo "GPIO $1 assert"
+    fi
+}
+
+case "$1" in
+"-h")
+    echo "$help_msg"
+    ;;
+
+"assert")
+    log-create "xyz.openbmc_project.State.Power.PowerRailFault" --json \
+        "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$source")\"}" \
+        >"${stash_file}"
+    ;;
+
+"deassert")
+    if [ -s "${stash_file}" ]; then
+        log-resolve -p "$(<"${stash_file}")"
+        rm "${stash_file}"
+        log-create "xyz.openbmc_project.State.Power.PowerRailFaultRecovered" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\"}"
+    fi
+
+    ;;
+esac
+
+exit 0

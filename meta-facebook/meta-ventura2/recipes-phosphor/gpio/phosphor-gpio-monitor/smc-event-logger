@@ -1,0 +1,93 @@
+#!/bin/bash
+
+help_msg="
+Usage: smc-event-logger <event> <gpio_name>
+<event> is the smc event to log,
+e.g. assert / deassert.
+
+<gpio_name> is defined in json file,
+e.g. AALC_RPU_READY
+"
+
+gpio_name="$2"
+stash_file="/var/lib/phosphor-gpio-monitor/${gpio_name}.log_entry"
+
+# For VT cooling systems, AALC-related signals should be ignored.
+if [[ "$gpio_name" == *RPU* || "$gpio_name" == *PUMP* ]] &&
+    { busctl introspect xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/cable/ReturnValve_1_Port >/dev/null 2>&1 ||
+    busctl introspect xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/cable/ReturnValve_2_Port >/dev/null 2>&1 ||
+    busctl introspect xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/cable/ReturnValve_3_Port >/dev/null 2>&1; }; then
+    exit 0
+fi
+
+get_failure_type() {
+    if [ "$1" = "AALC_RPU_READY" ]; then
+        echo "Ready Timed-out"
+    elif [ "$1" = "RPU_READY_PLD_R" ]; then
+        echo "Ready Timed-out"
+    elif [ "$1" = "RPU_READY_SPARE_PLD_R" ]; then
+        echo "Ready Timed-out"
+    elif [ "$1" = "RPU_2_READY_PLD_R" ]; then
+        echo "Ready Timed-out"
+    elif [ "$1" = "RPU_2_READY_SPARE_PLD_R" ]; then
+        echo "Ready Timed-out"
+    elif [ "$1" = "IT_STOP_PUMP_R_CPLD" ]; then
+        echo "Undefined"
+    elif [ "$1" = "IT_STOP_PUMP_SPARE_R_CPLD" ]; then
+        echo "Undefined"
+    elif [ "$1" = "IT_STOP_PUMP_2_R_CPLD" ]; then
+        echo "Undefined"
+    elif [ "$1" = "IT_STOP_PUMP_SPARE_2_R_CPLD" ]; then
+        echo "Undefined"
+    else
+        echo "Undefined"
+    fi
+}
+
+get_identifier() {
+    if [ "$1" = "AALC_RPU_READY" ]; then
+        echo "AALC RPU Ready"
+    elif [ "$1" = "RPU_READY_PLD_R" ]; then
+        echo "RPU0 Ready"
+    elif [ "$1" = "RPU_READY_SPARE_PLD_R" ]; then
+        echo "RPU0 Ready Spare"
+    elif [ "$1" = "RPU_2_READY_PLD_R" ]; then
+        echo "RPU1 Ready"
+    elif [ "$1" = "RPU_2_READY_SPARE_PLD_R" ]; then
+        echo "RPU1 Ready Spare"
+    elif [ "$1" = "IT_STOP_PUMP_R_CPLD" ]; then
+        echo "IT Stop Pump0"
+    elif [ "$1" = "IT_STOP_PUMP_SPARE_R_CPLD" ]; then
+        echo "IT Stop Pump0 Spare"
+    elif [ "$1" = "IT_STOP_PUMP_2_R_CPLD" ]; then
+        echo "IT Stop Pump1"
+    elif [ "$1" = "IT_STOP_PUMP_SPARE_2_R_CPLD" ]; then
+        echo "IT Stop Pump1 Spare"
+    else
+        echo "$1"
+    fi
+}
+
+case "$1" in
+"-h")
+    echo "$help_msg"
+    ;;
+
+"assert")
+    log-create "xyz.openbmc_project.State.SMC.SMCFailed" --json \
+        "{\"IDENTIFIER\": \"$(get_identifier "$gpio_name")\", \"FAILURE_TYPE\": \"$(get_failure_type "$gpio_name")\"}" \
+        >"${stash_file}"
+    ;;
+
+"deassert")
+    if [ -s "${stash_file}" ]; then
+        log-resolve -p "$(<"${stash_file}")"
+        rm "${stash_file}"
+        log-create "xyz.openbmc_project.State.SMC.SMCRestored" --json \
+            "{\"IDENTIFIER\": \"$(get_identifier "$gpio_name")\"}"
+    fi
+
+    ;;
+esac
+
+exit 0
