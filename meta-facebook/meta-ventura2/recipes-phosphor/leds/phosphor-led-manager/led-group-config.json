@@ -31,6 +31,146 @@
                     "Priority": "Blink"
                 }
             ]
+        },
+        {
+            "group": "fcb0fan0_blue",
+            "members": [
+                {
+                    "Name": "fcb0fan0_ledd1_blue",
+                    "Action": "On",
+                    "Priority": "Off"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan0_amber",
+            "members": [
+                {
+                    "Name": "fcb0fan0_ledd1_amber",
+                    "Action": "On",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan1_blue",
+            "members": [
+                {
+                    "Name": "fcb0fan1_ledd2_blue",
+                    "Action": "On",
+                    "Priority": "Off"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan1_amber",
+            "members": [
+                {
+                    "Name": "fcb0fan1_ledd2_amber",
+                    "Action": "On",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan2_blue",
+            "members": [
+                {
+                    "Name": "fcb0fan2_ledd3_blue",
+                    "Action": "On",
+                    "Priority": "Off"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan2_amber",
+            "members": [
+                {
+                    "Name": "fcb0fan2_ledd3_amber",
+                    "Action": "On",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan3_blue",
+            "members": [
+                {
+                    "Name": "fcb0fan3_ledd4_blue",
+                    "Action": "On",
+                    "Priority": "Off"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan3_amber",
+            "members": [
+                {
+                    "Name": "fcb0fan3_ledd4_amber",
+                    "Action": "On",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan0_identify",
+            "members": [
+                {
+                    "Name": "fcb0fan0_ledd1_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fcb0fan0_ledd1_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan1_identify",
+            "members": [
+                {
+                    "Name": "fcb0fan1_ledd2_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fcb0fan1_ledd2_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan2_identify",
+            "members": [
+                {
+                    "Name": "fcb0fan2_ledd3_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fcb0fan2_ledd3_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
+        },
+        {
+            "group": "fcb0fan3_identify",
+            "members": [
+                {
+                    "Name": "fcb0fan3_ledd4_blue",
+                    "Action": "Off",
+                    "Priority": "Off"
+                },
+                {
+                    "Name": "fcb0fan3_ledd4_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink"
+                }
+            ]
         }
     ]
 }
