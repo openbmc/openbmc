@@ -10,6 +10,7 @@ After=systemd-networkd.service
 
 [Service]
 Type=oneshot
+RemainAfterExit=true
 ExecStart=/usr/libexec/plat-svc/platform-early-sys-init
 SyslogIdentifier=Catalina Early Init
 
