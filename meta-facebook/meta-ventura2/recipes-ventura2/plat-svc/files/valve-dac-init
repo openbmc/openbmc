@@ -1,0 +1,51 @@
+#!/bin/bash
+I2C_DEV="$1"
+VOLT=10
+
+BUS=${I2C_DEV%%-*}
+ADDR=${I2C_DEV##*-}
+
+if ! i2cget -y -f "$BUS" "0x$ADDR" 0x00 >/dev/null 2>&1; then
+    echo "[$I2C_DEV] I2C device not responding" >&2
+    exit 1
+fi
+
+dac_volt_set() {
+    local dev="$1" volt="$2"
+    local iio raw
+
+    if ! iio=$(ls -d /sys/bus/i2c/devices/"$dev"/iio:device* 2>/dev/null); then
+        echo "[$dev] IIO device not ready" >&2
+        return 1
+    fi
+
+    raw=$(awk -v r="$volt" 'BEGIN { printf "%d", (r-1.05)/0.008826979 }')
+    [ "$raw" -lt 0 ] && raw=0
+    echo "[$dev] volt=$volt raw=$raw"
+
+    if ! echo 0 > "$iio/out_voltage0_powerdown" 2>/dev/null; then
+        echo "[$dev] write powerdown failed" >&2
+        return 1
+    fi
+
+    if ! echo "$raw" > "$iio/out_voltage0_raw" 2>/dev/null; then
+        echo "[$dev] write raw failed" >&2
+        return 1
+    fi
+
+    echo "[$dev] DAC set request sent"
+    return 0
+}
+
+retry=5
+while [ $retry -gt 0 ]; do
+    if dac_volt_set "$I2C_DEV" "$VOLT"; then
+        echo "[$I2C_DEV] DAC init success"
+        exit 0
+    fi
+    retry=$((retry - 1))
+    sleep 0.1
+done
+
+echo "[$I2C_DEV] DAC init failed after retry" >&2
+exit 1
