@@ -1,10 +1,14 @@
 #!/bin/bash
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+# shellcheck disable=SC2317
+
 source /usr/libexec/fb-common-functions
 
 MAX_RETRY=5
 RETRY_DELAY_SEC=1
 REGEX_EIP_POOL="([0-9]?[0-9]) ([0-9]?[0-9])"
+FW_UPDATE_LOCK="/tmp/pldm-fw-update.lock"
+sma_eids=("9" "14")
 cx_eids=()
 brd_map=()
 osfp_pr=()
@@ -13,7 +17,7 @@ remove_eid()
 {
     local eid=$1
     if mapper get-service /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" 2>/dev/null; then
-        #echo removing eid ${eid}
+        echo removing eid "$eid"
         busctl call au.com.codeconstruct.MCTP1 \
         "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" \
         au.com.codeconstruct.MCTP.Endpoint1 \
@@ -105,6 +109,7 @@ remove_sma_eid()
 
 remove_sma()
 {
+    systemctl stop cx-ready.target
     remove_sma_eid 9
     remove_sma_eid 14
 }
@@ -195,6 +200,7 @@ setup_eid()
         echo "$res"
         if [[ $res =~ $regex ]]; then
             mctp_eid=${BASH_REMATCH[1]}
+            sma_eids["$iob_index"]="$mctp_eid"
         fi
         is_cx8_ready "$iob_index"
         echo "Discovering bridged endpoints"
@@ -229,6 +235,33 @@ setup_sma()
     return "$res"
 }
 
+reset_sma()
+{
+    echo "Resetting SMA ..."
+    systemctl stop pldmd
+    systemctl stop cx-ready.target
+    for eid in "${cx_eids[@]}"; do
+        remove_eid "$eid"
+    done
+    cx_eids=()
+    for eid in "${sma_eids[@]}"; do
+        remove_eid "$eid"
+    done
+    set_gpio "MCU_RST_N" 0
+    set_gpio "SEC_MCU_RST_N" 0
+    sleep 1
+    set_gpio "MCU_RST_N" 1
+    set_gpio "SEC_MCU_RST_N" 1
+    sleep 3
+    mctp link set mcu1u2u2 up
+    mctp link set mcu1u2u7u2 up
+    mctp link
+    mctp addr add 8 dev mcu1u2u2
+    mctp addr add 8 dev mcu1u2u7u2
+    mctp addr
+    sleep 1
+}
+
 ###### Temporary functions ######
 get_numeric_sensor_by_eid()
 {
@@ -244,6 +277,8 @@ get_numeric_sensor_by_eid()
         return 1
     fi
 }
+
+err_count=0
 
 update_numeric_sensor_value()
 {
@@ -261,13 +296,14 @@ update_numeric_sensor_value()
     else
         echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, snr_id: $snr_id, snr_name: $snr_name"
         snr_val="nan"
+        err_count=$((err_count+1))
     fi
     busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$snr_name" xyz.openbmc_project.Sensor.Value Value d "$snr_val"
 }
 ###### End of Temporary functions ######
 
 
-remove_sma
+trap remove_sma SIGTERM
 
 if ! setup_sma; then
     exit 1
@@ -276,7 +312,7 @@ fi
 ###### Short term solution that is bound to be replaced by pldmd ######
 while systemctl is-active --quiet cx-ready.target
 do
-  sleep 2
+  err_count=0
   for (( i=0; i<${#cx_eids[@]}; i++ ))
   do
       update_numeric_sensor_value "${cx_eids[$i]}" 300 temperature/IOB"${brd_map[$i]}"_NIC$((i%2))_TEMP_C
@@ -285,6 +321,14 @@ do
           update_numeric_sensor_value "${cx_eids[$i]}" 500 temperature/IOB"${brd_map[$i]}"_NIC$((i%2))_OSFP_TEMP_C
       fi
   done
+  # Check for sensor errors only if a PLDM firmware update is NOT in progress
+  if [[ "$err_count" -ne 0 ]] && ( [[ ! -f "$FW_UPDATE_LOCK" ]] || flock -n "$FW_UPDATE_LOCK" -c "true" ); then
+    # Recover SMA if it becomes irresponsive to PLDM requests
+    reset_sma
+    setup_sma
+  else
+    sleep 2
+  fi
 done
 ###### End of Short term solution ######
 
