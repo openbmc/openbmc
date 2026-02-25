@@ -1,7 +1,4 @@
 [Match]
-Driver=cdc_ether
-
-[Link]
 Name=hmcusb0
 
 [Network]
