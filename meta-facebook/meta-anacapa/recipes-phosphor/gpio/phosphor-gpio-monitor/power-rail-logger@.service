@@ -1,0 +1,7 @@
+[Unit]
+Description=Power Rail Event Log
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/power-rail-event-logger "%i"
+SyslogIdentifier=power-rail-event-logger

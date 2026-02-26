@@ -1,0 +1,39 @@
+#!/bin/bash
+set -euo pipefail
+
+inst="${1:-}"
+IFS=":" read -r line action <<< "${inst}"
+
+if [[ -z "${action}" || -z "${line}" ]]; then
+  echo "Usage: gpio-power-rail-event-logger <GPIO_LINE_NAME>:<assert|deassert>" >&2
+  exit 1
+fi
+
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Anacapa_MB/${line}"
+RECOVER_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
+STASH_FILE="/run/${line}.log_entry"
+
+case "${action}" in
+  "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${line}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+        fi
+        /usr/bin/log-create "$RECOVER_ID" --json \
+                "{ \"POWER_RAIL\": \"${DEVICE_PATH}\"}"
+        ;;
+  *)
+    echo "Invalid action: ${action}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0

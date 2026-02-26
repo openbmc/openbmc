@@ -4,12 +4,173 @@
         "LineName": "FM_PWRGD_CPU0_PWROK",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "deassert-power-good-drop.service"
-            ],
-            "FALLING": [
-                "assert-power-good-drop.service"
-            ]
+            "RISING": ["deassert-power-good-drop.service"],
+            "FALLING": ["assert-power-good-drop.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "BRIDGE_L_STBY_PG_R",
+        "LineName": "BRIDGE_L_STBY_PG_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@BRIDGE_L_STBY_PG_R:assert.service"],
+            "FALLING":  ["power-rail-logger@BRIDGE_L_STBY_PG_R:assert.service"],
+            "RISING":   ["power-rail-logger@BRIDGE_L_STBY_PG_R:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "BRIDGE_R_STBY_PG_R",
+        "LineName": "BRIDGE_R_STBY_PG_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@BRIDGE_R_STBY_PG_R:assert.service"],
+            "FALLING":  ["power-rail-logger@BRIDGE_R_STBY_PG_R:assert.service"],
+            "RISING":   ["power-rail-logger@BRIDGE_R_STBY_PG_R:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "AMC_STBY_PGOOD_R",
+        "LineName": "AMC_STBY_PGOOD_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@AMC_STBY_PGOOD_R:assert.service"],
+            "FALLING":  ["power-rail-logger@AMC_STBY_PGOOD_R:assert.service"],
+            "RISING":   ["power-rail-logger@AMC_STBY_PGOOD_R:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "DIMM_PMIC_PG_TIMEOUT",
+        "LineName": "DIMM_PMIC_PG_TIMEOUT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@DIMM_PMIC_PG_TIMEOUT:assert.service"],
+            "FALLING":  ["power-rail-logger@DIMM_PMIC_PG_TIMEOUT:assert.service"],
+            "RISING":   ["power-rail-logger@DIMM_PMIC_PG_TIMEOUT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_RTM_SW_FLT",
+        "LineName": "L_RTM_SW_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@L_RTM_SW_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@L_RTM_SW_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@L_RTM_SW_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_BNIC0_FLT",
+        "LineName": "L_BNIC0_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@L_BNIC0_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@L_BNIC0_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@L_BNIC0_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_BNIC1_FLT",
+        "LineName": "L_BNIC1_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@L_BNIC1_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@L_BNIC1_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@L_BNIC1_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_BNIC2_FLT",
+        "LineName": "L_BNIC2_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@L_BNIC2_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@L_BNIC2_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@L_BNIC2_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_BNIC3_FLT",
+        "LineName": "L_BNIC3_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@L_BNIC3_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@L_BNIC3_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@L_BNIC3_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_BNIC0_FLT",
+        "LineName": "R_BNIC0_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@R_BNIC0_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@R_BNIC0_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@R_BNIC0_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_BNIC1_FLT",
+        "LineName": "R_BNIC1_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@R_BNIC1_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@R_BNIC1_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@R_BNIC1_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_BNIC2_FLT",
+        "LineName": "R_BNIC2_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@R_BNIC2_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@R_BNIC2_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@R_BNIC2_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_BNIC3_FLT",
+        "LineName": "R_BNIC3_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@R_BNIC3_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@R_BNIC3_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@R_BNIC3_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_FNIC_FLT",
+        "LineName": "L_FNIC_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@L_FNIC_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@L_FNIC_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@L_FNIC_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_FNIC_FLT",
+        "LineName": "R_FNIC_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@R_FNIC_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@R_FNIC_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@R_FNIC_FLT:deassert.service"]
         },
         "Continue": true
     }
