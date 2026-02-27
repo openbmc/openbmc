@@ -5,21 +5,21 @@
   group: path
   members:
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_IL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN0_TACH_IL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_OL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN0_TACH_OL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_IL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN1_TACH_IL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN1_TACH_OL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN1_TACH_OL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_IL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN2_TACH_IL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN2_TACH_OL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN2_TACH_OL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_IL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN3_TACH_IL_SPEED_RPM
     - meta: PATH
-      path: /xyz/openbmc_project/sensors/fan_tach/FAN3_TACH_OL_SPEED_RPM
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN3_TACH_OL_SPEED_RPM
 
 # Fan RPM critical alarm properties to monitor
 - name: fan rpm critical alarm property

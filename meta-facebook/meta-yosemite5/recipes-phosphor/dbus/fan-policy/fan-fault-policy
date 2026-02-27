@@ -39,8 +39,8 @@ check_fan_missing() {
     local missing=0
 
     for i in $(seq 0 $((FAN_COUNT - 1))); do
-        il_path="/xyz/openbmc_project/inventory/FAN${i}_TACH_IL_SPEED_RPM"
-        ol_path="/xyz/openbmc_project/inventory/FAN${i}_TACH_OL_SPEED_RPM"
+        il_path="/xyz/openbmc_project/inventory/PDB_FAN${i}_TACH_IL_SPEED_RPM"
+        ol_path="/xyz/openbmc_project/inventory/PDB_FAN${i}_TACH_OL_SPEED_RPM"
 
         il_present=$(get_property "$SVC" "$il_path" "$INVENTORY_IF" "$PRESENT_PROP")
         ol_present=$(get_property "$SVC" "$ol_path" "$INVENTORY_IF" "$PRESENT_PROP")
@@ -64,7 +64,7 @@ check_rotor_faults() {
 
     for i in $(seq 0 $((FAN_COUNT - 1))); do
         for side in IL OL; do
-            path="/xyz/openbmc_project/sensors/fan_tach/FAN${i}_TACH_${side}_SPEED_RPM"
+            path="/xyz/openbmc_project/sensors/fan_tach/PDB_FAN${i}_TACH_${side}_SPEED_RPM"
 
             value=$(get_property "$SVC" "$path" "$VALUE_IF" "$VALUE_PROP")
             crit_high=$(get_property "$SVC" "$path" "$CRITICAL_THRESHOLD_IF" "$CRITICAL_HIGH_PROP")
