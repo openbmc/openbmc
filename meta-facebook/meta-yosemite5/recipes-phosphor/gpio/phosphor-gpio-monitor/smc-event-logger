@@ -24,7 +24,7 @@ GPIO_NAME="${message#*_}"
 if [[ $GPIO_NAME == ALERT_CLKMUX_*_LOSS_N ]];then
     if [[ "$(busctl get-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState)" != *Standby* ]]; then
         echo "Host not ready, skip log."
-        exit 1
+        exit 0
     fi
 fi
 
