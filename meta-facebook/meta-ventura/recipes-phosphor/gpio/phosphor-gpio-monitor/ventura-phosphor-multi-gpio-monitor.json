@@ -590,6 +590,188 @@
         "Continue": true
     },
     {
+        "Name": "wP24V_SM_INA230_ALERT_N_R",
+        "LineName": "wP24V_SM_INA230_ALERT_N_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wP24V_SM_INA230_ALERT_N_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wP24V_SM_INA230_ALERT_N_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP24V_AUX_INA230_ALERT_N_R",
+        "LineName": "wP24V_AUX_INA230_ALERT_N_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wP24V_AUX_INA230_ALERT_N_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wP24V_AUX_INA230_ALERT_N_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wP48V_HSC_ALERT_N",
+        "LineName": "wP48V_HSC_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wP48V_HSC_ALERT_N.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wP48V_HSC_ALERT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wSMB_TMC75_TEMP_ALERT_N_R",
+        "LineName": "wSMB_TMC75_TEMP_ALERT_N_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wSMB_TMC75_TEMP_ALERT_N_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wSMB_TMC75_TEMP_ALERT_N_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P52V_HSC_PWROK_R",
+        "LineName": "wPWRGD_P52V_HSC_PWROK_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P52V_HSC_PWROK_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P52V_HSC_PWROK_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P24V_AUX_R",
+        "LineName": "wPWRGD_P24V_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P24V_AUX_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P24V_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P12V_AUX_R",
+        "LineName": "wPWRGD_P12V_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P12V_AUX_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P12V_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P12V_SCM_R",
+        "LineName": "wPWRGD_P12V_SCM_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P12V_SCM_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P12V_SCM_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P5V_AUX_R",
+        "LineName": "wPWRGD_P5V_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P5V_AUX_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P5V_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P3V3_AUX_R",
+        "LineName": "wPWRGD_P3V3_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P3V3_AUX_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P3V3_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P1V5_AUX_R",
+        "LineName": "wPWRGD_P1V5_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P1V5_AUX_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P1V5_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P1V05_AUX_R",
+        "LineName": "wPWRGD_P1V05_AUX_R",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P1V05_AUX_R.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P1V05_AUX_R.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "wPWRGD_P24V_SMPWROK",
+        "LineName": "wPWRGD_P24V_SMPWROK",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-assert-log@wPWRGD_P24V_SMPWROK.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@wPWRGD_P24V_SMPWROK.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "wAALC_RPU_READY",
         "LineName": "wAALC_RPU_READY",
         "EventMon": "BOTH",
