@@ -1,0 +1,51 @@
+#!/bin/bash
+
+readonly HMC_IP="172.31.13.251"
+readonly REDFISH_ENDPOINT="http://${HMC_IP}/redfish/v1/Managers/HGX_BMC_0"
+readonly CURL_TIMEOUT=3
+readonly MAX_RETRIES=30
+readonly RETRY_DELAY=5
+
+set_hmc_datetime() {
+    local bmc_datetime
+    bmc_datetime=$(date -u +"%Y-%m-%dT%H:%M:%S+00:00")
+
+    local curl_opts=(
+        "curl"
+        "--connect-timeout" "${CURL_TIMEOUT}"
+        "--silent"
+        "--show-error"
+        "--fail"
+        "-X" "PATCH"
+        "${REDFISH_ENDPOINT}"
+        "-H" "Content-Type: application/json"
+        "-d" "{\"DateTime\":\"${bmc_datetime}\"}"
+    )
+
+    if "${curl_opts[@]}" > /dev/null; then
+        echo "[INFO] HMC datetime successfully set to: ${bmc_datetime}"
+        return 0
+    else
+        echo "[ERROR] Failed to PATCH DateTime to ${HMC_IP}" >&2
+        return 1
+    fi
+}
+
+sync_hmc_datetime() {
+    echo "[INFO] Starting HMC time synchronization..."
+
+    for i in $(seq 1 "${MAX_RETRIES}"); do
+        if set_hmc_datetime; then
+            echo "[SUCCESS] Synchronization complete."
+            return 0
+        fi
+
+        echo "[WARN] Attempt $i/${MAX_RETRIES} failed. Retrying in ${RETRY_DELAY}s..."
+        sleep "${RETRY_DELAY}"
+    done
+
+    echo "[FATAL] Failed to sync HMC time after ${MAX_RETRIES} attempts." >&2
+    return 1
+}
+
+sync_hmc_datetime

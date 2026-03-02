@@ -34,6 +34,9 @@ OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-ncsi-nic = " \
 OBMC_IMAGE_EXTRA_INSTALL:append:mf-fb-fixed-nic = " \
     reconfig-interface-duid-ll \
     "
+OBMC_IMAGE_EXTRA_INSTALL:append:fb-compute-nvidia = " \
+    hmc-datetime-sync \
+    "
 
 IMAGE_LINGUAS = "en-us"
 

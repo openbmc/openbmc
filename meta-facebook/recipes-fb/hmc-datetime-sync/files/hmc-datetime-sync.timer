@@ -1,0 +1,8 @@
+[Unit]
+Description=Periodic HMC DateTime Sync Timer
+
+[Timer]
+OnUnitActiveSec=1h
+
+[Install]
+WantedBy=timers.target

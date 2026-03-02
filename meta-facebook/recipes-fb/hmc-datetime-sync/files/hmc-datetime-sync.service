@@ -1,0 +1,9 @@
+[Unit]
+Description=Sync HMC DateTime via Redfish
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/hmc-datetime-sync/hmc-datetime-sync
+
+[Install]
+WantedBy=multi-user.target
