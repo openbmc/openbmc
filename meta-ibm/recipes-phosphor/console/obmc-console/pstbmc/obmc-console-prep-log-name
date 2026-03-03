@@ -1,0 +1,122 @@
+#!/bin/bash
+
+set -e
+
+# Update logfile name in the obmc-console-server config file for
+# redundant BMC. Include the bmc position value in the log file
+# name. Read this information from /run/openbmc/bmc_position file.
+
+# Constants
+readonly CONFIG_DIR="/etc/obmc-console"
+readonly BMC_POS_FILE="/run/openbmc/bmc_position"
+readonly LOG_DIR="/var/log"
+
+# Simple logging
+log_error() {
+    echo "[ERROR] $*" >&2
+}
+
+log_info() {
+    echo "[INFO] $*" >&2
+}
+
+# Get arguments
+tty_dev="$1"
+config_file="${CONFIG_DIR}/server.${tty_dev}.conf"
+backup_file="${config_file}.backup.$$"
+
+# Cleanup function
+cleanup() {
+    if [[ -f "$backup_file" ]]; then
+        rm -f "$backup_file"
+    fi
+}
+
+# Set trap to cleanup on exit
+trap cleanup EXIT
+
+# Validate TTY device argument
+if [[ -z "$tty_dev" ]]; then
+    log_error "TTY device not specified"
+    echo "Usage: $(basename "$0") <tty_device>" >&2
+    exit 1
+fi
+
+# Check config file exists and is writable
+if [[ ! -f "$config_file" ]]; then
+    log_error "Config file not found: $config_file"
+    exit 1
+fi
+
+if [[ ! -w "$config_file" ]]; then
+    log_error "Config file is not writable: $config_file"
+    exit 1
+fi
+
+# Check if BMC position file exists
+if [[ ! -f "$BMC_POS_FILE" ]]; then
+    log_info "Not a redundant BMC, using default log file name"
+    exit 0
+fi
+
+# Read and validate BMC position
+bmc_pos=$(< "$BMC_POS_FILE" tr -d '[:space:]')
+
+if [[ -z "$bmc_pos" ]] || ! [[ "$bmc_pos" =~ ^[0-9]+$ ]]; then
+    log_error "Invalid BMC position: '$bmc_pos'"
+    exit 1
+fi
+
+if [[ "$bmc_pos" -lt 0 ]] || [[ "$bmc_pos" -gt 1 ]]; then
+    log_error "BMC position out of range (0-1): '$bmc_pos'"
+    exit 1
+fi
+
+# Generate new log file name based on TTY device
+case "$tty_dev" in
+    ttyVUART0)
+        new_log_file="${LOG_DIR}/obmc-console.bmc${bmc_pos}.log"
+        ;;
+    ttyVUART1)
+        new_log_file="${LOG_DIR}/obmc-console1.bmc${bmc_pos}.log"
+        ;;
+    *)
+        log_error "Unknown TTY device: '$tty_dev'"
+        exit 1
+        ;;
+esac
+
+# Check if the log file name is already correct
+current_logfile=$(grep "^logfile[[:space:]]*=" "$config_file" | sed 's/^logfile[[:space:]]*=[[:space:]]*//' | tr -d '[:space:]')
+
+if [[ "$current_logfile" == "$new_log_file" ]]; then
+    log_info "Using log file name: $new_log_file"
+    exit 0
+fi
+
+# Create backup
+if ! cp "$config_file" "$backup_file"; then
+    log_error "Failed to create backup of config file"
+    exit 1
+fi
+
+# Remove old logfile entry and add new one
+if ! sed -i "/^logfile[[:space:]]*=/d" "$config_file"; then
+    log_error "Failed to remove old logfile entry"
+    exit 1
+fi
+
+if ! echo "logfile = $new_log_file" >> "$config_file"; then
+    log_error "Failed to add new logfile entry"
+    exit 1
+fi
+
+# Verify the update
+if grep -q "^logfile[[:space:]]*=[[:space:]]*${new_log_file}$" "$config_file"; then
+    log_info "Successfully updated log file to: $new_log_file"
+    # Backup will be cleaned up by trap
+else
+    mv "$backup_file" "$config_file"
+    log_error "Config update verification failed, restored backup"
+    exit 1
+fi
