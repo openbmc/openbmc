@@ -18,7 +18,6 @@ do_install:append() {
                         ${D}${systemd_system_unitdir}/rsyslog.service.d/rsyslog-override.conf
         install -d ${D}${bindir}
         install -m 0755 ${UNPACKDIR}/rotate-event-logs.sh ${D}/${bindir}/rotate-event-logs.sh
-        rm ${D}${sysconfdir}/rsyslog.d/imjournal.conf
 }
 
 SYSTEMD_SERVICE:${PN} += " rotate-event-logs.service"
