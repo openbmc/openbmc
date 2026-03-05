@@ -1,0 +1,25 @@
+#!/bin/sh
+
+PATHS="/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+
+for i in $(seq 1 20); do
+    ALL_FOUND=true
+
+    for path in $PATHS; do
+        if ! mapper get-service "$path" >/dev/null 2>&1; then
+            ALL_FOUND=false
+            break
+        fi
+    done
+
+    if [ "$ALL_FOUND" = "true" ]; then
+        echo "All inventory paths found. Proceeding..."
+        exit 0
+    fi
+
+    echo "Waiting for all inventory paths to be ready... (Attempt $i)"
+    sleep 1
+done
+
+echo "Timeout: Not all inventory paths are ready."
+exit 0
