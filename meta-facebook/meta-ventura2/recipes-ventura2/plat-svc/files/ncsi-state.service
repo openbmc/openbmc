@@ -1,0 +1,11 @@
+[Unit]
+Description=Ventura2 NCSI state for e810
+After=systemd-networkd.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/libexec/plat-svc/ncsi-state
+
+[Install]
+WantedBy=multi-user.target

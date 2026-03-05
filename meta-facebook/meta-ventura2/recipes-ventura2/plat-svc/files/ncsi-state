@@ -1,0 +1,28 @@
+#!/bin/bash
+
+INTERFACE="eth1"
+INDEX=$(cat /sys/class/net/$INTERFACE/ifindex)
+MAX_RETRIES=3
+RETRY_COUNT=0
+WAIT_TIME=15
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    state=$(timeout 2 ncsi-cmd -i "$INDEX" discover 2> /dev/null)
+    ret=$?
+
+    if [ $ret -eq 0 ] && echo "$state" | grep -q Found; then
+        echo "NCSI Found E810"
+        exit 0
+    fi
+
+    ip link set $INTERFACE down
+    sleep 2
+    ip link set $INTERFACE up
+
+    echo "Wait $WAIT_TIME seconds for NCSI state"
+    sleep $WAIT_TIME
+
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+done
+
+exit 1
