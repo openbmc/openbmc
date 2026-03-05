@@ -54,6 +54,8 @@ is_cx8_ready()
                 sleep 5
                 echo "CX8 I/O Mezz ${iob_index} is ready"
                 return 0
+            else
+                cx_ready=0
             fi
         fi
         echo "Retry $cur_retry/$MAX_RETRY"
@@ -303,7 +305,7 @@ update_numeric_sensor_value()
 ###### End of Temporary functions ######
 
 
-trap remove_sma SIGTERM
+trap "remove_sma; exit 0" SIGTERM
 
 if ! setup_sma; then
     exit 1
@@ -327,7 +329,8 @@ do
     reset_sma
     setup_sma
   else
-    sleep 2
+    sleep 2 &
+    wait $!
   fi
 done
 ###### End of Short term solution ######
