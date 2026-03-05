@@ -26,6 +26,9 @@ SRC_URI += "file://phosphor-multi-gpio-monitor.json \
             file://smc-deassert-log@.service \
             file://smc-event-logger \
             file://phosphor-multi-gpio-monitor.conf \
+            file://power-rail-assert-log@.service \
+            file://power-rail-deassert-log@.service \
+            file://power-rail-event-logger \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -46,6 +49,8 @@ SYSTEMD_SERVICE:${PN} += " \
     vr-fault-deassert-log@.service \
     smc-assert-log@.service \
     smc-deassert-log@.service \
+    power-rail-assert-log@.service \
+    power-rail-deassert-log@.service \
     "
 
 do_install:append() {
@@ -67,6 +72,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/smc-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

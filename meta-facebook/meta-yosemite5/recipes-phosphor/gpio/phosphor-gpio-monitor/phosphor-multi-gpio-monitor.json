@@ -398,12 +398,8 @@
         "LineName": "Fault",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": [
-                "smc-assert-log@mb_Fault.service"
-            ],
-            "FALLING": [
-                "smc-deassert-log@mb_Fault.service"
-            ]
+            "RISING": ["power-rail-assert-log@mb_Fault.service"],
+            "FALLING": ["power-rail-deassert-log@mb_Fault.service"]
         },
         "Continue": true
     },
@@ -460,6 +456,66 @@
             "FALLING": [
                 "smc-assert-log@mb_ALERT_CLKMUX_3_LOSS_N.service"
             ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SLOT1_HSC_FAULT",
+        "LineName": "FM_SLOT1_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-deassert-log@pdb_FM_SLOT1_HSC_FAULT.service"],
+            "FALLING": ["power-rail-assert-log@pdb_FM_SLOT1_HSC_FAULT.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SLOT2_HSC_FAULT",
+        "LineName": "FM_SLOT2_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-deassert-log@pdb_FM_SLOT2_HSC_FAULT.service"],
+            "FALLING": ["power-rail-assert-log@pdb_FM_SLOT2_HSC_FAULT.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SLOT3_HSC_FAULT",
+        "LineName": "FM_SLOT3_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-deassert-log@pdb_FM_SLOT3_HSC_FAULT.service"],
+            "FALLING": ["power-rail-assert-log@pdb_FM_SLOT3_HSC_FAULT.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SLOT4_HSC_FAULT",
+        "LineName": "FM_SLOT4_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-deassert-log@pdb_FM_SLOT4_HSC_FAULT.service"],
+            "FALLING": ["power-rail-assert-log@pdb_FM_SLOT4_HSC_FAULT.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SLOT5_HSC_FAULT",
+        "LineName": "FM_SLOT5_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-deassert-log@pdb_FM_SLOT5_HSC_FAULT.service"],
+            "FALLING": ["power-rail-assert-log@pdb_FM_SLOT5_HSC_FAULT.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_SLOT6_HSC_FAULT",
+        "LineName": "FM_SLOT6_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-deassert-log@pdb_FM_SLOT6_HSC_FAULT.service"],
+            "FALLING": ["power-rail-assert-log@pdb_FM_SLOT6_HSC_FAULT.service"]
         },
         "Continue": true
     }
