@@ -65,3 +65,38 @@
         type: string
       - value: replace
         type: string
+
+# Host state watch to re-check fan missing threshold
+- name: fan missing host state watch
+  class: watch
+  watch: property
+  paths: host state path
+  properties: host state property
+  callback: fan missing check host state running
+
+- name: fan missing check host state running
+  class: condition
+  condition: count
+  paths: host state path
+  properties: host state property
+  callback: check fan missing threshold
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: xyz.openbmc_project.State.Host.HostState.Running
+
+- name: host state path
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/state/host0
+
+- name: host state property
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Host
+      meta: PROPERTY
+      property: CurrentHostState
