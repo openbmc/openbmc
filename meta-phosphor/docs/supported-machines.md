@@ -50,6 +50,7 @@ covered by [Jenkins](https://jenkins.openbmc.org/job/ci-openbmc/) CI testing.
   * yosemite4
   * yosemite4n
   * yosemite5
+  * yosemite5a7
 * fii
   * kudo
   * mori

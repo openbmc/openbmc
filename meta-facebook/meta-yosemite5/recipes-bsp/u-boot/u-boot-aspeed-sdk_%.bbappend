@@ -1,2 +1,2 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
-SRC_URI += "file://yosemite5.cfg"
+SRC_URI:append:aspeed-g6 = " file://yosemite5.cfg"
