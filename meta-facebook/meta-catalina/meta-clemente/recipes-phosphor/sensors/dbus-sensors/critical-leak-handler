@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set_request_host_transition()
+{
+    busctl set-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s "$1"
+}
+
+set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+
+exit 0
