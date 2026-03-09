@@ -1,0 +1,2 @@
+Common targets are:
+     obmc-phosphor-image
