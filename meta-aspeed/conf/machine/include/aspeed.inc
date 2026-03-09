@@ -6,8 +6,10 @@ PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-fw-utils-aspeed-sdk"
 
 # Build a FIT image and stuff core-image-minimal in it by default.
 # FIT images are now built by the linux-yocto-fitimage recipe
-# The kernel itself builds a standard image type (zImage for ARM)
+# The kernel itself builds a standard image type (zImage for ARM, Image for ARM64)
 KERNEL_IMAGETYPE ?= "zImage"
+KERNEL_IMAGETYPE:aarch64 ?= "Image"
+KERNEL_IMAGETYPES:aarch64 ?= "Image"
 KERNEL_CLASSES ?= "kernel-fit-extra-artifacts"
 INITRAMFS_IMAGE ?= "aspeed-image-initramfs"
 INITRAMFS_FSTYPES ?= "cpio.xz"
