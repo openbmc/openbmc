@@ -1,0 +1,9 @@
+{
+    "gpio_definitions": [
+        {
+            "name": "POWER_BUTTON",
+            "line_name": "PWR_BTN_L-I",
+            "direction": "both"
+        }
+    ]
+}
