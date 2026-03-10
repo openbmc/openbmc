@@ -28,7 +28,7 @@
                 {
                     "ParamName": "FAN_DUTY",
                     "Desc": {
-                        "Name": "FAN_PWM",
+                        "Name": "PDB_FAN_PWM",
                         "SensorType": "fan_pwm"
                     }
                 }
@@ -118,7 +118,7 @@
                 {
                     "ParamName": "FAN_DUTY",
                     "Desc": {
-                        "Name": "FAN_PWM",
+                        "Name": "PDB_FAN_PWM",
                         "SensorType": "fan_pwm"
                     }
                 }
@@ -208,7 +208,7 @@
                 {
                     "ParamName": "FAN_DUTY",
                     "Desc": {
-                        "Name": "FAN_PWM",
+                        "Name": "PDB_FAN_PWM",
                         "SensorType": "fan_pwm"
                     }
                 }
@@ -298,7 +298,7 @@
                 {
                     "ParamName": "FAN_DUTY",
                     "Desc": {
-                        "Name": "FAN_PWM",
+                        "Name": "PDB_FAN_PWM",
                         "SensorType": "fan_pwm"
                     }
                 }
@@ -529,7 +529,7 @@
                 {
                     "ParamName": "FAN_DUTY",
                     "Desc": {
-                        "Name": "FAN_PWM",
+                        "Name": "PDB_FAN_PWM",
                         "SensorType": "fan_pwm"
                     }
                 }
