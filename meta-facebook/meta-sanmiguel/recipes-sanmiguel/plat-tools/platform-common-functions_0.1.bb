@@ -3,8 +3,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 RDEPENDS:${PN} += " bash libgpiod-tools fb-common-functions"
 
-S = "${WORKDIR}/sources"
-UNPACKDIR = "${S}"
+S = "${UNPACKDIR}/sources"
 
 SRC_URI += " \
     file://platform-common-functions \
