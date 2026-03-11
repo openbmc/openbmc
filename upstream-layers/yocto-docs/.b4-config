@@ -1,0 +1,3 @@
+[b4]
+  send-series-to = docs@lists.yoctoproject.org
+  prep-pre-flight-checks = disable-needs-auto-to-cc, disable-needs-checking
