@@ -1,2 +1,0 @@
-FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
-

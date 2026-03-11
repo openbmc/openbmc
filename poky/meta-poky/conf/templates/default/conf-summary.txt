@@ -1,1 +1,0 @@
-This is the default build configuration for the Poky reference distribution.

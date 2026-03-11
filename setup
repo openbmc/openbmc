@@ -46,7 +46,7 @@ machine() {
         configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
     fi
     # Add qemu machines.
-    configs="$configs $(ls -1 poky/meta/conf/machine/qemu*.conf)"
+    configs="$configs $(ls -1 meta/conf/machine/qemu*.conf)"
 
     for cfg in $configs; do
         name=${cfg##*/}

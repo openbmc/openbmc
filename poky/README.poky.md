@@ -1,1 +1,0 @@
-meta-poky/README.poky.md

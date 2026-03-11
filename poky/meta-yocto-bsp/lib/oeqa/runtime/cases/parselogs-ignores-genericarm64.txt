@@ -1,4 +1,0 @@
-# safe to ignore minor firmware issue
-zynqmp-pinctrl firmware:zynqmp-firmware:pinctrl: failed to set: pin
-# safe to ignore initrd warning
-Can't lookup blockdev

@@ -1,1 +1,0 @@
-meta-yocto-bsp/README.hardware.md
