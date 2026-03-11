@@ -1,0 +1,35 @@
+
+- Interfaces
+  - Add an interactive mode to knotty (similar to the interactive mode we dropped)
+  - Fix up or drop the ncurses interface? Currently too limited to be useful.
+  - Concerns about whether teamcity interface works. No testing.
+
+- Improve exception handling:
+  - dropping fatal/SystemExit/sys.exit usage in favor of raising
+    appropriate exceptions
+  - Audit bb.fatal usage - these should all be able to be replaced with
+    exceptions
+
+- Continue pylint / pyflakes / pychecker / pep8 fixups - focus on real issues
+  or performance issues, not cosmetic ones.
+
+- Drop os.system usage in favor of direct subprocess usage or a subprocess
+  wrapper
+
+- BUG: if you chmod 000 local.conf, it silently doesn't parse it, when it
+  should really fail, so the user can fix the problem.
+
+
+Long term, high impact:
+
+  - Consider changing the behavior when a variable is referenced and is unset
+    Today, it evaluates to ${FOO} and then shell has a chance to expand it, but
+    this is far from ideal.  We had considered evaluating it to the empty string,
+    but that has other potential problems.  Frans Meulenbroeks has proposed just
+    erroring when this occurs, as we can always define default values for the
+    variables in bitbake.conf.  This seems reasonable.  My only concern with
+    that is the case where you want to reference a shell variable with odd
+    characters in it -- where you'd have to use ${} style shell variable
+    expansion rather than normal $.  To handle that case, we'd really need a
+    way to escape / disable bitbake variable expansion, \${} perhaps.
+

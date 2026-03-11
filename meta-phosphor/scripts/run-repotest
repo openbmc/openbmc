@@ -6,10 +6,10 @@ obmc_dir=${script_dir}/../../
 
 cd "$obmc_dir"
 
-# openbmc doesn't control what upstream poky, or any of the other layers do,
-# which do use patches as part of their upstreaming process.
-# meta-phosphor is also included such that patches that the community agrees to
-# hold onto will be allowed in that layer.
+# openbmc doesn't control what upstream layers do, which do use patches as
+# part of their upstreaming process.  meta-phosphor is also included such
+# that patches that the community agrees to hold onto will be allowed in
+# that layer.
 
 patch_files_tmp=$(mktemp)
 allowed_patches_tmp=$(mktemp)
@@ -17,6 +17,7 @@ trap 'rm $patch_files_tmp $allowed_patches_tmp' exit
 
 git ls-files -- \
   '*.patch' '*.dts' \
+  ':!:upstream-layers/**' \
   ':!:poky/**' \
   ':!:meta-arm/**' \
   ':!:meta-security/**' \
@@ -75,6 +76,7 @@ trap 'rm $dts_files_tmp $allowed_dts_tmp' exit
 
 git ls-files -- \
   '*.dts' \
+  ':!:upstream-layers/**' \
   ':!:poky/**' \
   ':!:meta-arm/**' \
   ':!:meta-security/**' \
@@ -117,6 +119,7 @@ for t in "${types[@]}"; do
 done
 
 non_bbfiles=$(git ls-files -- \
+  ':!:upstream-layers/**' \
   ':!:poky/**' \
   ':!:meta-arm/**' \
   ':!:meta-security/**' \

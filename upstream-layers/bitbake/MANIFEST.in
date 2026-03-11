@@ -1,0 +1,12 @@
+include ChangeLog
+include AUTHORS
+include LICENSE
+include LICENSE.GPL-2.0-only
+include LICENSE.MIT
+include contrib/*
+include contrib/vim/*/*
+include conf/*
+include classes/*
+include doc/*
+include doc/manual/*
+include ez_setup.py

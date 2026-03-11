@@ -1,0 +1,3 @@
+bitbake/**/*.pyc
+bitbake/**/*.pyo
+pyshtables.py
