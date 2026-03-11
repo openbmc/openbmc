@@ -19,7 +19,6 @@ git ls-files -- \
   '*.patch' '*.dts' \
   ':!:upstream-layers/**' \
   ':!:meta-arm/**' \
-  ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
   ':!:meta-phosphor/**' \
   | sort > "$patch_files_tmp"
@@ -76,7 +75,6 @@ git ls-files -- \
   '*.dts' \
   ':!:upstream-layers/**' \
   ':!:meta-arm/**' \
-  ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
   | sort > "$dts_files_tmp"
 
@@ -117,7 +115,6 @@ done
 non_bbfiles=$(git ls-files -- \
   ':!:upstream-layers/**' \
   ':!:meta-arm/**' \
-  ':!:meta-raspberrypi/**' \
   ':!:meta-openembedded/**' \
   | grep -v -e "\.patch$" -e "\.bb$" -e "\.bbappend$")
 
