@@ -1,0 +1,6 @@
+Subdirectories here are intended to be pristine imports of repositories owned
+by other organizations.  They are managed with tooling from the
+openbmc/openbmc-config repository.
+
+Changes should not be made here unless they have been submitted to those
+upstream repositories first and are then backported.
