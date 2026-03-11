@@ -18,7 +18,6 @@ trap 'rm $patch_files_tmp $allowed_patches_tmp' exit
 git ls-files -- \
   '*.patch' '*.dts' \
   ':!:upstream-layers/**' \
-  ':!:meta-arm/**' \
   ':!:meta-phosphor/**' \
   | sort > "$patch_files_tmp"
 
@@ -73,7 +72,6 @@ trap 'rm $dts_files_tmp $allowed_dts_tmp' exit
 git ls-files -- \
   '*.dts' \
   ':!:upstream-layers/**' \
-  ':!:meta-arm/**' \
   | sort > "$dts_files_tmp"
 
 # There is a single dts currently in the tree that we will exempt for now
@@ -112,7 +110,6 @@ done
 
 non_bbfiles=$(git ls-files -- \
   ':!:upstream-layers/**' \
-  ':!:meta-arm/**' \
   | grep -v -e "\.patch$" -e "\.bb$" -e "\.bbappend$")
 
 for f in $non_bbfiles; do
