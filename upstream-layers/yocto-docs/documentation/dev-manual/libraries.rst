@@ -68,8 +68,8 @@ libraries and other binaries to use a different set of libraries. The
 libraries could differ in architecture, compiler options, or other
 optimizations.
 
-There are several examples in the ``meta-skeleton`` layer found in the
-:term:`Source Directory`:
+There are several examples in the ``meta-skeleton`` layer found in
+:term:`OpenEmbedded-Core (OE-Core)`:
 
 -  :oe_git:`conf/multilib-example.conf </openembedded-core/tree/meta-skeleton/conf/multilib-example.conf>`
    configuration file.
@@ -90,8 +90,8 @@ meet your needs.
 In order to enable Multilib, you first need to ensure your recipe is
 extended to support multiple libraries. Many standard recipes are
 already extended and support multiple libraries. You can check in the
-``meta/conf/multilib.conf`` configuration file in the
-:term:`Source Directory` to see how this is
+``meta/conf/multilib.conf`` configuration file in
+:term:`OpenEmbedded-Core (OE-Core)` to see how this is
 done using the
 :term:`BBCLASSEXTEND` variable.
 Eventually, all recipes will be covered and this list will not be

@@ -9,6 +9,9 @@ verify_ssl = true
 sphinx = "*"
 sphinx-rtd-theme = "*"
 pyyaml = "*"
+sphinx-copybutton = "*"
+# SVG to PNG only supported since 2.0.0
+sphinxcontrib-svg2pdfconverter = ">=2.0.0"
 
 [requires]
 python_version = "3"

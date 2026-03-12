@@ -82,7 +82,7 @@ Custom Interfaces File (netbase change)
 If you have created your own custom ``etc/network/interfaces`` file by
 creating an append file for the ``netbase`` recipe, you now need to
 create an append file for the ``init-ifupdown`` recipe instead, which
-you can find in the :term:`Source Directory` at
+you can find in :term:`OpenEmbedded-Core (OE-Core)` at
 ``meta/recipes-core/init-ifupdown``. For information on how to use
 append files, see the
 ":ref:`dev-manual/layers:appending other layers metadata with your layer`"

@@ -1,0 +1,90 @@
+#!/usr/bin/env python3
+
+import argparse
+import difflib
+import os
+import re
+
+from pathlib import Path
+
+
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Print supported distributions")
+
+    parser.add_argument("-d", "--docs-dir",
+                        type=Path,
+                        default=Path(os.path.dirname(os.path.realpath(__file__))) / "documentation",
+                        help="Path to documentation/ directory in yocto-docs")
+
+    return parser.parse_args()
+
+
+glossaries = (
+    'ref-manual/variables.rst',
+    'ref-manual/terms.rst',
+)
+
+
+def main():
+
+    args = parse_arguments()
+    in_glossary = False
+    # Pattern to match:
+    # :term:`A <ABIEXTENSION>` :term:`B` :term:`C <CACHE>`
+    glossary_re = re.compile(r":term:`(?P<letter>[A-Z]{1})( <(?P<varname>[A-Z_]+)>)?`")
+    entry_re = re.compile(r"^   :term:`(?P<entry>.+)`\s*$")
+
+    for rst in glossaries:
+
+        glossary = {}
+        rst_path = Path(args.docs_dir) / rst
+
+        with open(rst_path, "r") as f:
+            for line in f.readlines():
+                if "check_glossary_begin" in line:
+                    in_glossary = True
+                    continue
+                if in_glossary:
+                    for m in re.finditer(glossary_re, line.strip()):
+                        letter = m.group("letter")
+                        varname = m.group("varname")
+                        if varname is None:
+                            varname = letter
+                        glossary[letter] = varname
+                if "check_glossary_end" in line:
+                    in_glossary = False
+                    break
+
+        entries = []
+
+        with open(rst_path, "r") as f:
+            for line in f.readlines():
+                m = re.match(entry_re, line)
+                if m:
+                    entries.append(m.group("entry"))
+
+        # We lower here because underscore (_) come before lowercase letters
+        # (the natural way) but after uppercase letters (which is not natural)
+        sorted_entries = sorted(entries, key=lambda t: t.lower())
+        diffs = list(difflib.unified_diff(entries,
+                                          sorted_entries,
+                                          fromfile="original_list",
+                                          tofile="sorted_list"))
+
+        if diffs:
+            print(f"WARNING: {rst}: entries are not properly sorted:")
+            print('\n'.join(diffs))
+
+        for letter in glossary:
+            try:
+                index = entries.index(glossary[letter])
+            except ValueError:
+                print(f"WARNING: {rst}: variable "
+                      f"{glossary[letter]} in glossary does not exist")
+            if index > 0 and entries[index - 1].startswith(letter[0]):
+                print(f"WARNING: {rst}: The variable {glossary[letter]} shouldn't be in "
+                     "the glossary.")
+
+
+if __name__ == "__main__":
+    main()

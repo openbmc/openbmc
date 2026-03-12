@@ -123,110 +123,116 @@ to add the upgraded version.
 
       $ git commit -s file1 file2 dir1 dir2 ...
 
-   To include **a**\ ll staged files::
+   To include all staged files::
 
       $ git commit -sa
 
-   -  The ``-s`` option of ``git commit`` adds a "Signed-off-by:" line
-      to your commit message. There is the same requirement for contributing
-      to the Linux kernel. Adding such a line signifies that you, the
-      submitter, have agreed to the `Developer's Certificate of Origin 1.1
-      <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign-your-work-the-developer-s-certificate-of-origin>`__
-      as follows:
+   #.  The ``-s`` option of ``git commit`` adds a "Signed-off-by:" line
+       to your commit message. There is the same requirement for contributing
+       to the Linux kernel. Adding such a line signifies that you, the
+       submitter, have agreed to the `Developer's Certificate of Origin 1.1
+       <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign-your-work-the-developer-s-certificate-of-origin>`__
+       as follows:
 
-      .. code-block:: none
+       .. code-block:: none
 
-         Developer's Certificate of Origin 1.1
+          Developer's Certificate of Origin 1.1
 
-         By making a contribution to this project, I certify that:
+          By making a contribution to this project, I certify that:
 
-         (a) The contribution was created in whole or in part by me and I
-             have the right to submit it under the open source license
-             indicated in the file; or
+          (a) The contribution was created in whole or in part by me and I
+              have the right to submit it under the open source license
+              indicated in the file; or
 
-         (b) The contribution is based upon previous work that, to the best
-             of my knowledge, is covered under an appropriate open source
-             license and I have the right under that license to submit that
-             work with modifications, whether created in whole or in part
-             by me, under the same open source license (unless I am
-             permitted to submit under a different license), as indicated
-             in the file; or
+          (b) The contribution is based upon previous work that, to the best
+              of my knowledge, is covered under an appropriate open source
+              license and I have the right under that license to submit that
+              work with modifications, whether created in whole or in part
+              by me, under the same open source license (unless I am
+              permitted to submit under a different license), as indicated
+              in the file; or
 
-         (c) The contribution was provided directly to me by some other
-             person who certified (a), (b) or (c) and I have not modified
-             it.
+          (c) The contribution was provided directly to me by some other
+              person who certified (a), (b) or (c) and I have not modified
+              it.
 
-         (d) I understand and agree that this project and the contribution
-             are public and that a record of the contribution (including all
-             personal information I submit with it, including my sign-off) is
-             maintained indefinitely and may be redistributed consistent with
-             this project or the open source license(s) involved.
+          (d) I understand and agree that this project and the contribution
+              are public and that a record of the contribution (including all
+              personal information I submit with it, including my sign-off) is
+              maintained indefinitely and may be redistributed consistent with
+              this project or the open source license(s) involved.
 
-   -  Provide a single-line summary of the change and, if more
-      explanation is needed, provide more detail in the body of the
-      commit. This summary is typically viewable in the "shortlist" of
-      changes. Thus, providing something short and descriptive that
-      gives the reader a summary of the change is useful when viewing a
-      list of many commits. You should prefix this short description
-      with the recipe name (if changing a recipe), or else with the
-      short form path to the file being changed.
+   #.  Provide a single-line summary of the change and, if more
+       explanation is needed, provide more detail in the description of the
+       commit. This summary is typically viewable in the "shortlist" of
+       changes. Thus, providing something short and descriptive that
+       gives the reader a summary of the change is useful when viewing a
+       list of many commits. You should prefix this short description
+       with the recipe name (if changing a recipe), or else with the
+       short form path to the file being changed.
+
+       .. note::
+
+          To find a suitable prefix for the commit summary, a good idea
+          is to look for prefixes used in previous commits touching the
+          same files or directories::
+
+             git log --oneline <paths>
+
+   #.  For the commit description, provide detailed information
+       that describes what you changed, why you made the change, and the
+       approach you used. It might also be helpful if you mention how you
+       tested the change. Provide as much detail as you can in the commit
+       description.
+
+       .. note::
+
+          If the single line summary is enough to describe a simple
+          change, the commit description can be left empty.
+
+   #.  If the change addresses a specific bug or issue that is associated
+       with a bug-tracking ID, include a reference to that ID in the body of the
+       commit message. For example, the Yocto Project uses a
+       specific convention for bug references --- any commit that addresses
+       a specific bug should use the following form for the body of the commit
+       message. Be sure to use the actual bug-tracking ID from
+       Bugzilla for bug-id::
+
+          single-line summary of change
+
+          Fixes [YOCTO #bug-id]
+
+          detailed description of change
+
+   #. If other people participated in this patch, add some tags to the commit
+      description to credit other contributors to the change:
+
+      -  ``Reported-by``: name and email of a person reporting a bug
+         that your commit is trying to fix. This is a good practice
+         to encourage people to go on reporting bugs and let them
+         know that their reports are taken into account.
+
+      -  ``Suggested-by``: name and email of a person to credit for the
+         idea of making the change.
+
+      -  ``Tested-by``, ``Reviewed-by``: name and email for people having
+         tested your changes or reviewed their code. These fields are
+         usually added by the maintainer accepting a patch, or by
+         yourself if you submitted your patches to early reviewers,
+         or are submitting an unmodified patch again as part of a
+         new iteration of your patch series.
+
+      -  ``Cc``: name and email of people you want to send a copy
+         of your changes to. This field will be used by ``git send-email``.
+
+      See `more guidance about using such tags
+      <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes>`__
+      in the Linux kernel documentation.
 
       .. note::
 
-         To find a suitable prefix for the commit summary, a good idea
-         is to look for prefixes used in previous commits touching the
-         same files or directories::
-
-            git log --oneline <paths>
-
-   -  For the body of the commit message, provide detailed information
-      that describes what you changed, why you made the change, and the
-      approach you used. It might also be helpful if you mention how you
-      tested the change. Provide as much detail as you can in the body
-      of the commit message.
-
-      .. note::
-
-         If the single line summary is enough to describe a simple
-         change, the body of the commit message can be left empty.
-
-   -  If the change addresses a specific bug or issue that is associated
-      with a bug-tracking ID, include a reference to that ID in your
-      detailed description. For example, the Yocto Project uses a
-      specific convention for bug references --- any commit that addresses
-      a specific bug should use the following form for the detailed
-      description. Be sure to use the actual bug-tracking ID from
-      Bugzilla for bug-id::
-
-         Fixes [YOCTO #bug-id]
-
-         detailed description of change
-
-#. *Crediting contributors:* By using the ``git commit --amend`` command,
-   you can add some tags to the commit description to credit other contributors
-   to the change:
-
-   -  ``Reported-by``: name and email of a person reporting a bug
-      that your commit is trying to fix. This is a good practice
-      to encourage people to go on reporting bugs and let them
-      know that their reports are taken into account.
-
-   -  ``Suggested-by``: name and email of a person to credit for the
-      idea of making the change.
-
-   -  ``Tested-by``, ``Reviewed-by``: name and email for people having
-      tested your changes or reviewed their code. These fields are
-      usually added by the maintainer accepting a patch, or by
-      yourself if you submitted your patches to early reviewers,
-      or are submitting an unmodified patch again as part of a
-      new iteration of your patch series.
-
-   -  ``CC:`` Name and email of people you want to send a copy
-      of your changes to. This field will be used by ``git send-email``.
-
-   See `more guidance about using such tags
-   <https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes>`__
-   in the Linux kernel documentation.
+         One can amend an existing git commit message to add missing tags for
+         contributors with the ``git commit --amend`` command.
 
 Test your changes
 -----------------
@@ -323,10 +329,10 @@ Validating Patches with Patchtest
 
 ``patchtest`` is available in ``openembedded-core`` as a tool for making
 sure that your patches are well-formatted and contain important info for
-maintenance purposes, such as ``Signed-off-by`` and ``Upstream-Status``
-tags. Note that no functional testing of the changes will be performed by ``patchtest``.
-Currently, it only supports testing patches for ``openembedded-core`` branches.
-To setup, perform the following::
+maintenance purposes, such as the ``Signed-off-by`` presence. Note that no
+functional testing of the changes will be performed by ``patchtest``. Currently,
+it only supports testing patches for ``openembedded-core`` branches. To setup,
+perform the following::
 
     pip install -r meta/lib/patchtest/requirements.txt
     source oe-init-build-env
@@ -423,38 +429,8 @@ and then based on successful testing, merges them.
 In general, each component (e.g. layer) should have a ``README`` file
 that indicates where to send the changes and which process to follow.
 
-The "poky" repository, which is the Yocto Project's reference build
-environment, is a hybrid repository that contains several individual
-pieces (e.g. BitBake, Metadata, documentation, and so forth) built using
-the combo-layer tool. The upstream location used for submitting changes
-varies by component:
-
--  *Core Metadata:* Send your patches to the
-   :oe_lists:`openembedded-core </g/openembedded-core>`
-   mailing list. For example, a change to anything under the ``meta`` or
-   ``scripts`` directories should be sent to this mailing list.
-
--  *BitBake:* For changes to BitBake (i.e. anything under the
-   ``bitbake`` directory), send your patches to the
-   :oe_lists:`bitbake-devel </g/bitbake-devel>`
-   mailing list.
-
--  *meta-poky* and *meta-yocto-bsp* trees: These trees contain Metadata. Use the
-   :yocto_lists:`poky </g/poky>` mailing list.
-
--  *Documentation*: For changes to the Yocto Project documentation, use the
-   :yocto_lists:`docs </g/docs>` mailing list.
-
-For changes to other layers and tools hosted in the Yocto Project source
-repositories (i.e. :yocto_git:`git.yoctoproject.org <>`), use the
-:yocto_lists:`yocto-patches </g/yocto-patches/>` general mailing list.
-
-For changes to other layers hosted in the OpenEmbedded source
-repositories (i.e. :oe_git:`git.openembedded.org <>`), use
-the :oe_lists:`openembedded-devel </g/openembedded-devel>`
-mailing list, unless specified otherwise in the layer's ``README`` file.
-
-If you intend to submit a new recipe that neither fits into the core Metadata,
+If you intend to submit a new recipe that neither fits in
+:term:`OpenEmbedded-Core (OE-Core)`,
 nor into :oe_git:`meta-openembedded </meta-openembedded/>`, you should
 look for a suitable layer in https://layers.openembedded.org. If similar
 recipes can be expected, you may consider :ref:`dev-manual/layers:creating your own layer`.
@@ -614,7 +590,7 @@ have been followed:
    methods to find out:
 
    -  *Maintenance File:* Examine the ``maintainers.inc`` file, which is
-      located in the :term:`Source Directory` at
+      located in :term:`OpenEmbedded-Core (OE-Core)` at
       ``meta/conf/distro/include``, to see who is responsible for code.
 
    -  *Search by File:* Using :ref:`overview-manual/development-environment:git`, you can
@@ -639,9 +615,8 @@ have been followed:
    The Yocto Project provides two scripts that conveniently let you
    generate and send pull requests to the Yocto Project. These scripts
    are ``create-pull-request`` and ``send-pull-request``. You can find
-   these scripts in the ``scripts`` directory within the
-   :term:`Source Directory` (e.g.
-   ``poky/scripts``).
+   these scripts in the ``scripts`` directory within
+   :term:`OpenEmbedded-Core (OE-Core)`.
 
    Using these scripts correctly formats the requests without
    introducing any whitespace or HTML formatting. The maintainer that
@@ -654,7 +629,7 @@ have been followed:
    directory into which you pushed the change, and provides a subject
    line in the created patch files::
 
-      $ poky/scripts/create-pull-request -u meta-intel-contrib -s "Updated Manual Section Reference in README"
+      $ ./scripts/create-pull-request -u meta-intel-contrib -s "Updated Manual Section Reference in README"
 
    Running this script forms ``*.patch`` files in a folder named
    ``pull-``\ `PID` in the current directory. One of the patch files is a
@@ -667,7 +642,7 @@ have been followed:
    and email address. In this example, the email address is a mailing
    list::
 
-      $ poky/scripts/send-pull-request -p ~/meta-intel/pull-10565 -t meta-intel@lists.yoctoproject.org
+      $ ./scripts/send-pull-request -p ~/meta-intel/pull-10565 -t meta-intel@lists.yoctoproject.org
 
    You need to follow the prompts as the script is interactive.
 
@@ -676,8 +651,8 @@ have been followed:
       For help on using these scripts, simply provide the ``-h``
       argument as follows::
 
-              $ poky/scripts/create-pull-request -h
-              $ poky/scripts/send-pull-request -h
+              $ ./scripts/create-pull-request -h
+              $ ./scripts/send-pull-request -h
 
 Submitting Changes to Stable Release Branches
 =============================================
@@ -691,8 +666,8 @@ backported to a stable branch unless the bug in question does not affect the
 master branch or the fix on the master branch is unsuitable for backporting.
 
 The list of stable branches along with the status and maintainer for each
-branch can be obtained from the
-:yocto_wiki:`Releases wiki page </Releases>`.
+branch can be obtained from the :yocto_home:`Releases </development/releases/>`
+page.
 
 .. note::
 
@@ -705,7 +680,7 @@ follows:
 #. *Identify the bug or CVE to be fixed:* This information should be
    collected so that it can be included in your submission.
 
-   See :ref:`dev-manual/vulnerabilities:checking for vulnerabilities`
+   See :ref:`security-manual/vulnerabilities:checking for vulnerabilities`
    for details about CVE tracking.
 
 #. *Check if the fix is already present in the master branch:* This will
@@ -851,14 +826,17 @@ used testing branches for OpenEmbedded-Core are as follows:
    :oe_git:`openembedded-core </openembedded-core/>` repository and contains
    proposed changes to the core metadata.
 
--  *poky "master-next" branch:* This branch is part of the
-   :yocto_git:`poky </poky/>` repository and combines proposed
-   changes to BitBake, the core metadata and the poky distro.
+-  *bitbake "master-next" branch:* This branch is part of the :oe_git:`bitbake
+   </bitbake/>` repository and contains changes to :term:`BitBake`.
+
+-  *meta-yocto "master-next" branch:* This branch is part of the
+   :yocto_git:`meta-yocto </meta-yocto/>` repository and contains proposed
+   changes to meta-yocto.
 
 Similarly, stable branches maintained by the project may have corresponding
 ``-next`` branches which collect proposed changes. For example,
 ``&DISTRO_NAME_NO_CAP;-next`` and ``&DISTRO_NAME_NO_CAP_MINUS_ONE;-next``
-branches in both the "openembdedded-core" and "poky" repositories.
+branches in both the "openembedded-core" and "meta-yocto" repositories.
 
 Other layers may have similar testing branches but there is no formal
 requirement or standard for these so please check the documentation for the

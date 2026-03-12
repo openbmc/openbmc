@@ -91,6 +91,25 @@ test. Here is what you have to do for each recipe:
       cd test
       make -k runtest-TESTS
 
+-  *Return an appropriate exit code*: The ``run-ptest`` script must return 0 on
+   success, 1 on failure. This is needed by ``ptest-runner`` to keep track of
+   the successful and failed tests.
+
+-  *Make sure the test prints at least one test result*: The execution of the
+   ``run-ptest`` script must result in at least one test result output on the
+   console, with the following format::
+
+      result: testname
+
+   Where ``result`` can be one of ``PASS``, ``SKIP``, or ``FAIL``. ``testname``
+   can be any name.
+
+   There can be as many test results as desired.
+
+   This information is read by the :ref:`ref-classes-testimage` class and
+   :oe_git:`logparser </openembedded-core/tree/meta/lib/oeqa/utils/logparser.py>`
+   module.
+
 -  *Ensure dependencies are met:* If the test adds build or runtime
    dependencies that normally do not exist for the package (such as
    requiring "make" to run the test suite), use the

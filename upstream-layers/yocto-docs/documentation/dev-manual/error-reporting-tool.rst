@@ -7,8 +7,7 @@ The error reporting tool allows you to submit errors encountered during
 builds to a central database. Outside of the build environment, you can
 use a web interface to browse errors, view statistics, and query for
 errors. The tool works using a client-server system where the client
-portion is integrated with the installed Yocto Project
-:term:`Source Directory` (e.g. ``poky``).
+portion is integrated in :term:`OpenEmbedded-Core (OE-Core)`.
 The server receives the information collected and saves it in a
 database.
 

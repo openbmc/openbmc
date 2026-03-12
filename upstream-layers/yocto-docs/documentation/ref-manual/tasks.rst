@@ -191,7 +191,7 @@ that either directly or indirectly depend on the installed files (e.g.
 
    -  The ``tar`` command with the ``--no-same-owner`` option. See the
       ``bin_package.bbclass`` file in the ``meta/classes-recipe``
-      subdirectory of the :term:`Source Directory` for an example.
+      subdirectory of :term:`OpenEmbedded-Core (OE-Core)` for an example.
 
 .. _ref-tasks-install_ptest_base:
 
@@ -225,7 +225,7 @@ section in the Yocto Project Overview and Concepts Manual.
 -----------------
 
 Runs QA checks on packaged files. For more information on these checks,
-see the :ref:`ref-classes-insane` class.
+see the :doc:`/ref-manual/qa-checks` document.
 
 .. _ref-tasks-package_write_deb:
 
@@ -288,14 +288,14 @@ to locate and apply patch files to the source code.
 Patch files, by default, are ``*.patch`` and ``*.diff`` files created
 and kept in a subdirectory of the directory holding the recipe file. For
 example, consider the
-:yocto_git:`bluez5 </poky/tree/meta/recipes-connectivity/bluez5>`
-recipe from the OE-Core layer (i.e. ``poky/meta``)::
+:oe_git:`bluez5 </openembedded-core/tree/meta/recipes-connectivity/bluez5>`
+recipe from the :term:`OpenEmbedded-Core (OE-Core)` layer::
 
-   poky/meta/recipes-connectivity/bluez5
+   meta/recipes-connectivity/bluez5
 
 This recipe has two patch files located here::
 
-   poky/meta/recipes-connectivity/bluez5/bluez5
+   meta/recipes-connectivity/bluez5/bluez5
 
 In the ``bluez5`` recipe, the :term:`SRC_URI` statements point to the source
 and patch files needed to build the package.
@@ -396,6 +396,17 @@ Installs the files into the individual recipe specific sysroots (i.e.
 ``${``\ :term:`WORKDIR`\ ``}`` based upon the
 dependencies specified by :term:`DEPENDS`). See the
 ":ref:`ref-classes-staging`" class for more information.
+
+.. _ref-tasks-recipe-qa:
+
+``do_recipe_qa``
+----------------
+
+Performs QA check on recipes that can operate entirely from recipe metadata and
+do not need any of the build artefacts or source code.
+
+The list of QA checks that this tasks defines are documented in
+:doc:`/ref-manual/qa-checks`.
 
 .. _ref-tasks-rm_work:
 
@@ -554,6 +565,14 @@ Starts a shell whose environment is set up for development, debugging,
 or both. See the ":ref:`dev-manual/development-shell:using a development shell`" section in the
 Yocto Project Development Tasks Manual for more information about using
 ``devshell``.
+
+.. _ref-tasks-list_image_features:
+
+``do_list_image_features``
+--------------------------
+
+Lists the available features for an image recipe. These features can be set
+in the :term:`IMAGE_FEATURES` variable.
 
 .. _ref-tasks-listtasks:
 

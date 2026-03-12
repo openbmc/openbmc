@@ -372,7 +372,7 @@ There is a command-line tool called ``buildhistory-diff``, though,
 that queries the Git repository and prints just the differences that
 might be significant in human-readable form. Here is an example::
 
-   $ poky/poky/scripts/buildhistory-diff . HEAD^
+   $ bitbake-builds/layers/openembedded-core/scripts/buildhistory-diff . HEAD^
    Changes to images/qemux86_64/glibc/core-image-minimal (files-in-image.txt):
       /etc/anotherpkg.conf was added
       /sbin/anotherpkg was added

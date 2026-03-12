@@ -20,7 +20,6 @@ Welcome to the Yocto Project Documentation
    Yocto Project Software Overview <https://www.yoctoproject.org/software-overview/>
    Tips and Tricks Wiki <https://wiki.yoctoproject.org/wiki/TipsAndTricks>
 
-
 .. toctree::
    :maxdepth: 1
    :caption: Manuals
@@ -31,11 +30,18 @@ Welcome to the Yocto Project Documentation
    Board Support Package (BSP) Developer's guide <bsp-guide/index>
    Development Tasks Manual <dev-manual/index>
    Linux Kernel Development Manual <kernel-dev/index>
+   Security Manual <security-manual/index>
    Profile and Tracing Manual <profile-manual/index>
    Application Development and the Extensible SDK (eSDK) <sdk-manual/index>
    Toaster Manual <toaster-manual/index>
    Test Environment Manual <test-manual/index>
    bitbake
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Security
+
+   Yocto Project Security Reference <security-reference/index>
 
 .. toctree::
    :maxdepth: 1

@@ -9,7 +9,7 @@ notice new recipe changes added to the SCM and then build the resulting
 packages that depend on the new recipes by using the latest versions.
 This only works for SCMs from which it is possible to get a sensible
 revision number for changes. Currently, you can do this with Apache
-Subversion (SVN), Git, and Bazaar (BZR) repositories.
+Subversion (SVN) and Git.
 
 To enable this behavior, the :term:`PV` of
 the recipe needs to include a ``+`` sign in its assignment.

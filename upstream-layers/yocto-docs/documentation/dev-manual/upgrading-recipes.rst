@@ -84,12 +84,12 @@ The following steps describe how to set up the AUH utility:
    AUH is not part of the :term:`OpenEmbedded-Core (OE-Core)` or
    :term:`Poky` repositories.
 
-#. *Create a Dedicated Build Directory:* Run the :ref:`structure-core-script`
+#. *Create a Dedicated Build Directory:* Create a new :term:`bitbake:Setup` with
+   ``bitbake-setup`` or manually run the :ref:`structure-core-script`
    script to create a fresh :term:`Build Directory` that you use exclusively
    for running the AUH utility::
 
-      $ cd poky
-      $ source oe-init-build-env your_AUH_build_directory
+      $ source layers/openembedded-core/oe-init-build-env your_AUH_build_directory
 
    Re-using an existing :term:`Build Directory` and its configurations is not
    recommended as existing settings could cause AUH to fail or behave
@@ -121,7 +121,7 @@ The following steps describe how to set up the AUH utility:
 
       .. note::
 
-         If your distro does not enable by default ptest, which Poky
+         If your distro does not enable by default ptest, which :term:`Poky`
          does, you need the following in your ``local.conf`` file::
 
                  DISTRO_FEATURES:append = " ptest"
@@ -143,7 +143,7 @@ The following steps describe how to set up the AUH utility:
    described earlier, you must enable it in ``upgrade-helper.conf``.
 
    Also, if you are using the default ``maintainers.inc`` file supplied
-   with Poky and located in ``meta-yocto`` and you do not set a
+   in :term:`OpenEmbedded-Core (OE-Core)` and you do not set a
    "maintainers_whitelist" or "global_maintainer_override" in the
    ``upgrade-helper.conf`` configuration, and you specify "-e all" on
    the AUH command-line, the utility automatically sends out emails to
@@ -242,12 +242,12 @@ script. For example, suppose you use the ``nano.bb`` recipe from the
 ``meta-oe`` layer in the ``meta-openembedded`` repository. For this
 example, assume that the layer has been cloned into following area::
 
-   /home/scottrif/meta-openembedded
+   /home/scottrif/bitbake-builds/layers/meta-openembedded
 
 The following command from your :term:`Build Directory` adds the layer to
 your build configuration (i.e. ``${BUILDDIR}/conf/bblayers.conf``)::
 
-   $ bitbake-layers add-layer /home/scottrif/meta-openembedded/meta-oe
+   $ bitbake-layers add-layer /home/scottrif/bitbake-builds/layers/meta-openembedded/meta-oe
    NOTE: Starting bitbake server...
    Parsing recipes: 100% |##########################################| Time: 0:00:55
    Parsing of 1431 .bb files complete (0 cached, 1431 parsed). 2040 targets, 56 skipped, 0 masked, 0 errors.
@@ -263,7 +263,7 @@ directory automatically upgrades the recipe for you::
 
    $ devtool upgrade nano -V 2.9.3
    NOTE: Starting bitbake server...
-   NOTE: Creating workspace layer in /home/scottrif/poky/build/workspace
+   NOTE: Creating workspace layer in /home/scottrif/bitbake-builds/build/workspace
    Parsing recipes: 100% |##########################################| Time: 0:00:46
    Parsing of 1431 .bb files complete (0 cached, 1431 parsed). 2040 targets, 56 skipped, 0 masked, 0 errors.
    NOTE: Extracting current version source...
@@ -275,8 +275,8 @@ directory automatically upgrades the recipe for you::
    NOTE: Executing RunQueue Tasks
    NOTE: Tasks Summary: Attempted 74 tasks of which 72 didn't need to be rerun and all succeeded.
    Adding changed files: 100% |#####################################| Time: 0:00:00
-   NOTE: Upgraded source extracted to /home/scottrif/poky/build/workspace/sources/nano
-   NOTE: New recipe is /home/scottrif/poky/build/workspace/recipes/nano/nano_2.9.3.bb
+   NOTE: Upgraded source extracted to /home/scottrif/bitbake-builds/build/workspace/sources/nano
+   NOTE: New recipe is /home/scottrif/bitbake-builds/build/workspace/recipes/nano/nano_2.9.3.bb
 
 .. note::
 
@@ -298,7 +298,7 @@ newly upgraded recipe::
           .
    NOTE: Executing SetScene Tasks
    NOTE: Executing RunQueue Tasks
-   NOTE: nano: compiling from external source tree /home/scottrif/poky/build/workspace/sources/nano
+   NOTE: nano: compiling from external source tree /home/scottrif/bitbake-builds/build/workspace/sources/nano
    NOTE: Tasks Summary: Attempted 520 tasks of which 304 didn't need to be rerun and all succeeded.
 
 Within the ``devtool upgrade`` workflow, you can
@@ -319,9 +319,9 @@ directory::
    Parsing of 1432 .bb files complete (1431 cached, 1 parsed). 2041 targets, 56 skipped, 0 masked, 0 errors.
    NOTE: Adding new patch 0001-nano.bb-Stuff-I-changed-when-upgrading-nano.bb.patch
    NOTE: Updating recipe nano_2.9.3.bb
-   NOTE: Removing file /home/scottrif/meta-openembedded/meta-oe/recipes-support/nano/nano_2.7.4.bb
-   NOTE: Moving recipe file to /home/scottrif/meta-openembedded/meta-oe/recipes-support/nano
-   NOTE: Leaving source tree /home/scottrif/poky/build/workspace/sources/nano as-is; if you no longer need it then please delete it manually
+   NOTE: Removing file /home/scottrif/bitbake-builds/layers/meta-openembedded/meta-oe/recipes-support/nano/nano_2.7.4.bb
+   NOTE: Moving recipe file to /home/scottrif/bitbake-builds/layers/meta-openembedded/meta-oe/recipes-support/nano
+   NOTE: Leaving source tree /home/scottrif/bitbake-builds/build/workspace/sources/nano as-is; if you no longer need it then please delete it manually
 
 
 Using the ``devtool finish`` command cleans up the workspace and creates a patch

@@ -14,18 +14,6 @@ section in the Yocto Project Overview and Concepts Manual.
 Creating Your Own Layer
 =======================
 
-.. note::
-
-   It is very easy to create your own layers to use with the OpenEmbedded
-   build system, as the Yocto Project ships with tools that speed up creating
-   layers. This section describes the steps you perform by hand to create
-   layers so that you can better understand them. For information about the
-   layer-creation tools, see the
-   ":ref:`bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
-   section in the Yocto Project Board Support Package (BSP) Developer's
-   Guide and the ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`"
-   section further down in this manual.
-
 Follow these general steps to create your layer without using tools:
 
 #. *Check Existing Layers:* Before creating a new layer, you should be
@@ -35,10 +23,22 @@ Follow these general steps to create your layer without using tools:
    the Yocto Project. You could find a layer that is identical or close
    to what you need.
 
-#. *Create a Directory:* Create the directory for your layer. When you
-   create the layer, be sure to create the directory in an area not
-   associated with the Yocto Project :term:`Source Directory`
-   (e.g. the cloned ``poky`` repository).
+   .. note::
+
+      For information on BSP layers, see the ":ref:`bsp-guide/bsp:bsp layers`"
+      section in the Yocto Project Board Specific (BSP) Developer's Guide.
+
+#. *Create a new Layer:* Create the directory for your layer. The
+   ``bitbake-layers`` script with the ``create-layer`` subcommand simplifies
+   creating a new general layer. Place it next to the other layers in your
+   :term:`Source Directory`.
+
+   In its simplest form, you can use the following command to create a
+   layer named "your_layer_name" in the current directory:
+
+   .. code-block:: console
+
+      $ bitbake-layers create-layer your_layer_name
 
    While not strictly required, prepend the name of the directory with
    the string "meta-". For example::
@@ -58,89 +58,96 @@ Follow these general steps to create your layer without using tools:
    "meta-" string are appended to several variables used in the
    configuration.
 
-#. *Create a Layer Configuration File:* Inside your new layer folder,
-   you need to create a ``conf/layer.conf`` file. It is easiest to take
-   an existing layer configuration file and copy that to your layer's
-   ``conf`` directory and then modify the file as needed.
+   As an example, the following command creates a layer named ``meta-scottrif``
+   in your home directory:
 
-   The ``meta-yocto-bsp/conf/layer.conf`` file in the Yocto Project
-   :yocto_git:`Source Repositories </poky/tree/meta-yocto-bsp/conf>`
-   demonstrates the required syntax. For your layer, you need to replace
-   "yoctobsp" with a unique identifier for your layer (e.g. "machinexyz"
-   for a layer named "meta-machinexyz")::
+   .. code-block:: console
 
-      # We have a conf and classes directory, add to BBPATH
-      BBPATH .= ":${LAYERDIR}"
+      $ bitbake-layers create-layer meta-scottrif
+      NOTE: Starting bitbake server...
+      Add your new layer with 'bitbake-layers add-layer meta-scottrif'
 
-      # We have recipes-* directories, add to BBFILES
-      BBFILES += "${LAYERDIR}/recipes-*/*/*.bb \
-                  ${LAYERDIR}/recipes-*/*/*.bbappend"
+   In order to use a layer with the :term:`OpenEmbedded Build System`, you
+   need to add the layer to your ``bblayers.conf`` configuration
+   file, as hinted by the previous command. See the
+   ":ref:`dev-manual/layers:adding a layer using the \`\`bitbake-layers\`\`
+   script`" section for more information.
 
-      BBFILE_COLLECTIONS += "yoctobsp"
-      BBFILE_PATTERN_yoctobsp = "^${LAYERDIR}/"
-      BBFILE_PRIORITY_yoctobsp = "5"
-      LAYERVERSION_yoctobsp = "4"
-      LAYERSERIES_COMPAT_yoctobsp = "walnascar"
+   By default, the ``bitbake-layers create-layer`` command creates a layer
+   with the following:
 
-   Here is an explanation of the layer configuration file:
+   -  A ``conf/layer.conf`` configuration file with default definitions.
 
-   -  :term:`BBPATH`: Adds the layer's
-      root directory to BitBake's search path. Through the use of the
-      :term:`BBPATH` variable, BitBake locates class files (``.bbclass``),
-      configuration files, and files that are included with ``include``
-      and ``require`` statements. For these cases, BitBake uses the
-      first file that matches the name found in :term:`BBPATH`. This is
-      similar to the way the ``PATH`` variable is used for binaries. It
-      is recommended, therefore, that you use unique class and
-      configuration filenames in your custom layer.
+      Here is an explanation of the typical content of the layer configuration file:
 
-   -  :term:`BBFILES`: Defines the
-      location for all recipes in the layer.
+      -  :term:`BBPATH`: Adds the layer's root directory to BitBake's search
+         path. Through the use of the :term:`BBPATH` variable, BitBake locates
+         class files (``.bbclass``), configuration files, and files that are
+         included with ``include`` and ``require`` statements. For these cases,
+         BitBake uses the first file that matches the name found in
+         :term:`BBPATH`. This is similar to the way the ``PATH`` variable is
+         used for binaries. It is recommended, therefore, that you use unique
+         class and configuration filenames in your custom layer.
 
-   -  :term:`BBFILE_COLLECTIONS`:
-      Establishes the current layer through a unique identifier that is
-      used throughout the OpenEmbedded build system to refer to the
-      layer. In this example, the identifier "yoctobsp" is the
-      representation for the container layer named "meta-yocto-bsp".
+         See the :ref:`bitbake:bitbake-user-manual/bitbake-user-manual-metadata:Locating Include
+         Files` section of the BitBake User Manual for more details on how
+         files are included with :term:`BitBake`.
 
-   -  :term:`BBFILE_PATTERN`:
-      Expands immediately during parsing to provide the directory of the
-      layer.
+      -  :term:`BBFILES`: Defines the location for all recipes in the layer.
 
-   -  :term:`BBFILE_PRIORITY`:
-      Establishes a priority to use for recipes in the layer when the
-      OpenEmbedded build finds recipes of the same name in different
-      layers.
+      -  :term:`BBFILE_COLLECTIONS`: Establishes the current layer through a
+         unique identifier that is used throughout the :term:`OpenEmbedded Build
+         System` to refer to the layer. In this example, the identifier
+         "yoctobsp" is the representation for the container layer named
+         "meta-yocto-bsp".
 
-   -  :term:`LAYERVERSION`:
-      Establishes a version number for the layer. You can use this
-      version number to specify this exact version of the layer as a
-      dependency when using the
-      :term:`LAYERDEPENDS`
-      variable.
+         This name is used by other layers when specifying the layer
+         dependencies via the :term:`LAYERDEPENDS` variable.
 
-   -  :term:`LAYERDEPENDS`:
-      Lists all layers on which this layer depends (if any).
+      -  :term:`BBFILE_PATTERN`: Expands immediately during parsing to provide
+         the directory of the layer.
 
-   -  :term:`LAYERSERIES_COMPAT`:
-      Lists the :yocto_wiki:`Yocto Project </Releases>`
-      releases for which the current version is compatible. This
-      variable is a good way to indicate if your particular layer is
-      current.
+      -  :term:`BBFILE_PRIORITY`: Establishes a priority to use for recipes in
+         the layer when the :term:`OpenEmbedded Build System` finds recipes of
+         the same name in different layers.
+
+      -  :term:`LAYERVERSION`: Establishes a version number for the layer. You
+         can use this version number to specify this exact version of the layer
+         as a dependency when using the :term:`LAYERDEPENDS` variable.
+
+      -  :term:`LAYERDEPENDS`: Lists all layers on which this layer depends (if
+         any). It uses the layer names specified by the
+         :term:`BBFILE_COLLECTIONS` variable.
+
+      -  :term:`LAYERSERIES_COMPAT`: Lists the :yocto_home:`Yocto Project
+         release </development/releases/>` codenames (in lowercase) this layer is
+         compatible with. For example: "&DISTRO_NAME_NO_CAP;".
+
+         This variable is a good way to indicate if a particular layer is
+         current. 
+
+   -  A ``recipes-example`` subdirectory that itself contains a
+      subdirectory named ``example``, which contains an ``example.bb``
+      recipe file.
+
+   -  A ``COPYING.MIT``, which is the license statement for the layer. The
+      script assumes you want to use the MIT license, which is typical for
+      most layers, for the contents of the layer itself.
+
+   -  A ``README`` file, which is a file describing the contents of your
+      new layer.
 
 
-   .. note::
+   If you want to set the priority of the layer to other than the default value
+   of "6", you can either use the ``--priority`` option or you can edit the
+   :term:`BBFILE_PRIORITY` value in the ``conf/layer.conf`` after the script
+   creates it. Furthermore, if you want to give the example recipe file some
+   name other than the default, you can use the ``--example-recipe-name``
+   option.
 
-      A layer does not have to contain only recipes ``.bb`` or append files
-      ``.bbappend``. Generally, developers create layers using
-      ``bitbake-layers create-layer``.
-      See ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`",
-      explaining how the ``layer.conf`` file is created from a template located in
-      ``meta/lib/bblayers/templates/layer.conf``.
-      In fact, none of the variables set in ``layer.conf`` are mandatory,
-      except when :term:`BBFILE_COLLECTIONS` is present. In this case
-      :term:`LAYERSERIES_COMPAT` and :term:`BBFILE_PATTERN` have to be
-      defined too.
+   The easiest way to see how the ``bitbake-layers create-layer`` command
+   works is to experiment with the script. You can also read the usage
+   information by running ``bitbake-layers create-layer --help``.
 
 #. *Add Content:* Depending on the type of layer, add the content. If
    the layer adds support for a machine, add the machine configuration
@@ -283,7 +290,7 @@ following list:
    repository that use the ``meta-layer_name`` format.
 
 -  *Group Your Layers Locally:* Clone your repository alongside other
-   cloned ``meta`` directories from the :term:`Source Directory`.
+   layers in your :term:`Source Directory`.
 
 Making Sure Your Layer is Compatible With Yocto Project
 =======================================================
@@ -376,12 +383,32 @@ directory::
 Be sure to provide the actual directory for your
 layer as part of the command.
 
+You should pass the dependencies of your layer using the ``--dependency``
+argument::
+
+   $ source oe-init-build-env
+   $ yocto-check-layer --dependency <layer1_directory> <layer2_directory> ... -- your_layer_directory
+
+For :term:`BSP <Board Support Package (BSP)>` layers, the ``--machines``
+argument should be passed as part of the command::
+
+   $ source oe-init-build-env
+   $ yocto-check-layer --machines <machine1> <machine2> ... -- your_layer_directory
+
+These machines are the ones present in your BSP layer, in the ``conf/machine/``
+directory.
+
 Entering the command causes the script to determine the type of layer
-and then to execute a set of specific tests against the layer. The
-following list overviews the test:
+and then to execute a set of specific tests against the layer.
+
+The following list overviews the test:
 
 -  ``common.test_readme``: Tests if a ``README`` file exists in the
    layer and the file is not empty.
+
+-  ``common.test_security``: Tests that the layer has a ``SECURITY.md``
+   (or similar) file, either in the layer itself or at the top of the containing
+   git repository.
 
 -  ``common.test_parse``: Tests to make sure that BitBake can parse the
    files without error (i.e. ``bitbake -p``).
@@ -390,6 +417,13 @@ following list overviews the test:
    environment is in order without errors (i.e. ``bitbake -e``).
 
 -  ``common.test_world``: Verifies that ``bitbake world`` works.
+
+-  ``common.test_world_inherit_class``: Verifies that ``bitbake world`` works
+   when the :ref:`ref-classes-yocto-check-layer` class is inherited.
+
+-  ``common.test_patches_upstream_status``: Verifies that all the patch files
+   included in the layer contain a
+   :ref:`contributor-guide/recipe-style-guide:Patch Upstream Status`.
 
 -  ``common.test_signatures``: Tests to be sure that BSP and DISTRO
    layers do not come with recipes that change signatures.
@@ -415,6 +449,10 @@ following list overviews the test:
 
 -  ``distro.test_distro_no_set_distros``: Tests to ensure a DISTRO layer
    does not set the distribution when the layer is added.
+
+For a complete list of tests, see the :oe_git:`scripts/lib/checklayer/cases
+</openembedded-core/tree/scripts/lib/checklayer/cases>` directory in
+:term:`OpenEmbedded-Core (OE-Core)`.
 
 Enabling Your Layer
 ===================
@@ -491,10 +529,10 @@ possible.
 Overlaying a File Using Your Layer
 ----------------------------------
 
-As an example, consider the main formfactor recipe and a corresponding
-formfactor append file both from the :term:`Source Directory`.
+As an example, consider the main ``formfactor`` recipe and a corresponding
+``formfactor`` append file both from :term:`OpenEmbedded-Core (OE-Core)`.
 Here is the main
-formfactor recipe, which is named ``formfactor_0.0.bb`` and located in
+``formfactor`` recipe, which is named ``formfactor_0.0.bb`` and located in
 the "meta" layer at ``meta/recipes-bsp/formfactor``::
 
    SUMMARY = "Device formfactor information"
@@ -571,8 +609,8 @@ Installing Additional Files Using Your Layer
 --------------------------------------------
 
 As another example, consider the main ``xserver-xf86-config`` recipe and a
-corresponding ``xserver-xf86-config`` append file both from the :term:`Source
-Directory`.  Here is the main ``xserver-xf86-config`` recipe, which is named
+corresponding ``xserver-xf86-config`` append file both from
+:term:`OpenEmbedded-Core (OE-Core)`.  Here is the main ``xserver-xf86-config`` recipe, which is named
 ``xserver-xf86-config_0.1.bb`` and located in the "meta" layer at
 ``meta/recipes-graphics/xorg-xserver``::
 
@@ -609,7 +647,7 @@ file is in the layer at ``recipes-graphics/xorg-xserver``::
        file://xorg.conf.d/99-calibration.conf \
    "
    do_install:append:rpi () {
-       PITFT="${@bb.utils.contains("MACHINE_FEATURES", "pitft", "1", "0", d)}"
+       PITFT = "${@bb.utils.contains("MACHINE_FEATURES", "pitft", "1", "0", d)}"
        if [ "${PITFT}" = "1" ]; then
            install -d ${D}/${sysconfdir}/X11/xorg.conf.d/
            install -m 0644 ${UNPACKDIR}/xorg.conf.d/98-pitft.conf ${D}/${sysconfdir}/X11/xorg.conf.d/
@@ -842,84 +880,7 @@ The following list describes the available commands:
    can replicate the directory structure and revisions of the layers in a current build.
    For more information, see ":ref:`dev-manual/layers:saving and restoring the layers setup`".
 
-Creating a General Layer Using the ``bitbake-layers`` Script
-============================================================
-
-The ``bitbake-layers`` script with the ``create-layer`` subcommand
-simplifies creating a new general layer.
-
-.. note::
-
-   -  For information on BSP layers, see the ":ref:`bsp-guide/bsp:bsp layers`"
-      section in the Yocto
-      Project Board Specific (BSP) Developer's Guide.
-
-   -  In order to use a layer with the OpenEmbedded build system, you
-      need to add the layer to your ``bblayers.conf`` configuration
-      file. See the ":ref:`dev-manual/layers:adding a layer using the \`\`bitbake-layers\`\` script`"
-      section for more information.
-
-The default mode of the script's operation with this subcommand is to
-create a layer with the following:
-
--  A layer priority of 6.
-
--  A ``conf`` subdirectory that contains a ``layer.conf`` file.
-
--  A ``recipes-example`` subdirectory that contains a further
-   subdirectory named ``example``, which contains an ``example.bb``
-   recipe file.
-
--  A ``COPYING.MIT``, which is the license statement for the layer. The
-   script assumes you want to use the MIT license, which is typical for
-   most layers, for the contents of the layer itself.
-
--  A ``README`` file, which is a file describing the contents of your
-   new layer.
-
-In its simplest form, you can use the following command form to create a
-layer. The command creates a layer whose name corresponds to
-"your_layer_name" in the current directory::
-
-   $ bitbake-layers create-layer your_layer_name
-
-As an example, the following command creates a layer named ``meta-scottrif``
-in your home directory::
-
-   $ cd /usr/home
-   $ bitbake-layers create-layer meta-scottrif
-   NOTE: Starting bitbake server...
-   Add your new layer with 'bitbake-layers add-layer meta-scottrif'
-
-If you want to set the priority of the layer to other than the default
-value of "6", you can either use the ``--priority`` option or you
-can edit the
-:term:`BBFILE_PRIORITY` value
-in the ``conf/layer.conf`` after the script creates it. Furthermore, if
-you want to give the example recipe file some name other than the
-default, you can use the ``--example-recipe-name`` option.
-
-The easiest way to see how the ``bitbake-layers create-layer`` command
-works is to experiment with the script. You can also read the usage
-information by entering the following::
-
-   $ bitbake-layers create-layer --help
-   NOTE: Starting bitbake server...
-   usage: bitbake-layers create-layer [-h] [--priority PRIORITY]
-                                      [--example-recipe-name EXAMPLERECIPE]
-                                      layerdir
-
-   Create a basic layer
-
-   positional arguments:
-     layerdir              Layer directory to create
-
-   optional arguments:
-     -h, --help            show this help message and exit
-     --priority PRIORITY, -p PRIORITY
-                           Layer directory to create
-     --example-recipe-name EXAMPLERECIPE, -e EXAMPLERECIPE
-                           Filename of the example recipe
+-  ``show-machines``: Lists the machines available in the currently configured layers.
 
 Adding a Layer Using the ``bitbake-layers`` Script
 ==================================================
@@ -936,7 +897,9 @@ Add your layer by using the ``bitbake-layers add-layer`` command::
 Here is an example that adds a
 layer named ``meta-scottrif`` to the configuration file. Following the
 command that adds the layer is another ``bitbake-layers`` command that
-shows the layers that are in your ``bblayers.conf`` file::
+shows the layers that are in your ``bblayers.conf`` file:
+
+.. code-block:: console
 
    $ bitbake-layers add-layer meta-scottrif
    NOTE: Starting bitbake server...
@@ -944,14 +907,13 @@ shows the layers that are in your ``bblayers.conf`` file::
    Parsing of 1441 .bb files complete (0 cached, 1441 parsed). 2055 targets, 56 skipped, 0 masked, 0 errors.
    $ bitbake-layers show-layers
    NOTE: Starting bitbake server...
-   layer                 path                                      priority
-   ==========================================================================
-   meta                  /home/scottrif/poky/meta                  5
-   meta-poky             /home/scottrif/poky/meta-poky             5
-   meta-yocto-bsp        /home/scottrif/poky/meta-yocto-bsp        5
-   workspace             /home/scottrif/poky/build/workspace       99
-   meta-scottrif         /home/scottrif/poky/build/meta-scottrif   6
-
+   layer                 path                                                            priority
+   ==============================================================================================
+   meta                  /home/scottrif/bitbake-builds/layers/openembedded-core/meta           5
+   meta-poky             /home/scottrif/bitbake-builds/layers/meta-yocto/meta-poky             5
+   meta-yocto-bsp        /home/scottrif/bitbake-builds/layers/meta-yocto/meta-yocto-bsp        5
+   workspace             /home/scottrif/bitbake-builds/build/workspace                         99
+   meta-scottrif         /home/scottrif/bitbake-builds/build/meta-scottrif                     6
 
 Adding the layer to this file
 enables the build system to locate the layer during the build.

@@ -23,7 +23,7 @@ set -eu -o pipefail
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 CONTAINERCMD=${CONTAINERCMD:-docker}
 DOCS_DIR="$SCRIPT_DIR/../.."
-SH_DIR="$SCRIPT_DIR/host_packages_scripts"
+INCLUDE_ESSENTIAL_PACKAGES=${INCLUDE_ESSENTIAL_PACKAGES:-0}
 
 function usage()
 {
@@ -33,19 +33,38 @@ $0 OCI_IMAGE [make arguments...]
 
    OCI_IMAGE is an image:tag of an OCI image hosted on hub.docker.com. It is one
    of:
+     - almalinux:8
+     - almalinux:9
+     - centos:stream9
      - debian:12
-     - fedora:38
+     - debian:13
      - fedora:39
      - fedora:40
-     - leap:15.4
+     - fedora:41
+     - fedora:42
      - leap:15.5
+     - leap:15.6
+     - rockylinux:8
+     - rockylinux:9
      - ubuntu:22.04
      - ubuntu:24.04
+     - ubuntu:25.04
+     - ubuntu:25.10
 
    [make arguments] is one or more argument to pass to the make command of
    documentation/Makefile, see that file for what's supported. This is typically
    intended to be used to provide specific make targets.
    Default: publish
+
+   Environment variables:
+
+   - CONTAINERCMD can be set to 'docker' or 'podman' to select the
+     container engine (default: 'docker').
+
+   - INCLUDE_ESSENTIAL_PACKAGES can be set to 0 or 1 to also include essential
+     packages listed in documentation/tools/host_packages_scripts/*_essential.sh.
+     This is not required to build the documentation but can be useful to validate
+     the installation of packages listed in these files (default: 0).
 "
 }
 
@@ -68,66 +87,72 @@ main ()
   local version
   version=$(echo "$image" | awk -F: '{print $NF}')
 
+  # Default to docker.io unless overwritten below
+  local repo=docker.io
+
   case $image in
-    # Missing latexmk texlive-gnu-freefont packages at the very least
-    # "almalinux:8"*|\
-    # "almalinux:9"*)
-    #   containerfile=Containerfile.almalinux
-    #   docs=almalinux_docs.sh
-    #   docs_pdf=almalinux_docs_pdf.sh
-    #   pip3=pip3_docs.sh
-    #   ;;
+    "almalinux:8"*|\
+    "almalinux:9"*)
+      containerfile=Containerfile.almalinux
+      essential=almalinux_essential.sh
+      docs=almalinux_docs.sh
+      docs_pdf=tlmgr_docs_pdf.sh
+      pip3=pip3_docs.sh
+      ;;
+    "centos:stream9"*)
+      containerfile=Containerfile.stream
+      essential=centosstream_essential.sh
+      docs=centosstream_docs.sh
+      docs_pdf=tlmgr_docs_pdf.sh
+      pip3=pip3_docs.sh
+      repo=quay.io/centos
+      ;;
     # Missing python3-saneyaml
     # "debian:11"*|\
-    "debian:12"*)
+    "debian:12"*|\
+    "debian:13"*)
       containerfile=Containerfile.debian
+      essential=ubuntu_essential.sh
       docs=ubuntu_docs.sh
       docs_pdf=ubuntu_docs_pdf.sh
+      pip3=pip3_docs.sh
       ;;
-    "fedora:38"*|\
     "fedora:39"*|\
-    "fedora:40"*)
+    "fedora:40"*|\
+    "fedora:41"*|\
+    "fedora:42"*)
       containerfile=Containerfile.fedora
+      essential=fedora_essential.sh
       docs=fedora_docs.sh
       docs_pdf=fedora_docs_pdf.sh
       pip3=pip3_docs.sh
       ;;
-    "leap:15.4"*|\
-    "leap:15.5"*)
-    # Seems like issue with permissions package, c.f.
-    #
-    # Updating /etc/sysconfig/security ...
-    # /dev/zero: chown: Permission denied
-    # /dev/null: chown: Permission denied
-    # /dev/full: chown: Permission denied
-    # ERROR: not all operations were successful.
-    # Checking permissions and ownerships - using the permissions files
-    # 	/etc/permissions
-    # 	/etc/permissions.easy
-    # 	/etc/permissions.local
-    # setting / to root:root 0755. (wrong permissions 0555)
-    # setting /dev/zero to root:root 0666. (wrong owner/group 65534:65534)
-    # setting /dev/null to root:root 0666. (wrong owner/group 65534:65534)
-    # setting /dev/full to root:root 0666. (wrong owner/group 65534:65534)
-    # warning: %post(permissions-20240826-150600.10.12.1.x86_64) scriptlet failed, exit status 1
-    #
-    # "leap:15.6"*)
+    "leap:15.5"*|\
+    "leap:15.6"*)
       image=opensuse/leap:$version
       containerfile=Containerfile.zypper
+      essential=opensuse_essential.sh
       docs=opensuse_docs.sh
       docs_pdf=opensuse_docs_pdf.sh
       pip3=pip3_docs.sh
       ;;
-    # Missing python3-saneyaml
-    # "ubuntu:18.04"*|\
-    # "ubuntu:20.04"*|\
-    # Cannot fetch packages anymore
-    # "ubuntu:23.04"*|\
+    "rockylinux:8"*|\
+    "rockylinux:9"*)
+      containerfile=Containerfile.rocky
+      essential=rockylinux_essential.sh
+      docs=rockylinux_docs.sh
+      docs_pdf=tlmgr_docs_pdf.sh
+      pip3=pip3_docs.sh
+      ;;
     "ubuntu:22.04"*|\
-    "ubuntu:24.04"*)
+    "ubuntu:24.04"*|\
+    "ubuntu:25.04"*|\
+    "ubuntu:25.10"*)
       containerfile=Containerfile.ubuntu
+      essential=ubuntu_essential.sh
       docs=ubuntu_docs.sh
       docs_pdf=ubuntu_docs_pdf.sh
+      pip3=pip3_docs.sh
       ;;
     *)
       echo "$image not supported!"
@@ -138,12 +163,14 @@ main ()
 
   $OCI build \
     --tag "yocto-docs-$sanitized_dockername:latest" \
-    --build-arg ARG_FROM="docker.io/$image" \
-    --build-arg DOCS="$docs" \
-    --build-arg DOCS_PDF="$docs_pdf" \
-    --build-arg PIP3="${pip3:-}" \
-    --file "$SCRIPT_DIR/$containerfile" \
-    "$SH_DIR/"
+    --build-arg ARG_FROM="$repo/$image" \
+    --build-arg INCLUDE_ESSENTIAL_PACKAGES="${INCLUDE_ESSENTIAL_PACKAGES}" \
+    --build-arg ESSENTIAL="host_packages_scripts/$essential" \
+    --build-arg DOCS="host_packages_scripts/$docs" \
+    --build-arg DOCS_PDF="host_packages_scripts/$docs_pdf" \
+    --build-arg PIP3="host_packages_scripts/$pip3" \
+    --file "$SCRIPT_DIR/containerfiles/$containerfile" \
+    "$SCRIPT_DIR"
 
   local -a args_run=(
     --rm
@@ -154,11 +181,11 @@ main ()
     --security-opt label=disable
   )
 
-  if [ "$OCI" = "docker" ]; then
+  if [ "$(basename "$OCI")" = "docker" ]; then
     args_run+=(
       --user="$(id -u)":"$(id -g)"
     )
-  elif [ "$OCI" = "podman" ]; then
+  elif [ "$(basename "$OCI")" = "podman" ]; then
     # we need net access to fetch bitbake terms
     args_run+=(
       --cap-add=NET_RAW

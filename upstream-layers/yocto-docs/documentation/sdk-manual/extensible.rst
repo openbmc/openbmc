@@ -71,7 +71,9 @@ Setting up the Extensible SDK environment directly in a Yocto build
 #. Set up all the needed layers and a Yocto :term:`Build Directory`, e.g. a regular Yocto
    build where ``bitbake`` can be executed.
 
-#. Run::
+#. Run:
+
+.. code-block:: console
 
       $ bitbake meta-ide-support
       $ bitbake -c populate_sysroot gtk+3
@@ -98,30 +100,27 @@ The names of the tarball installer scripts are such that a string
 representing the host system appears first in the filename and then is
 immediately followed by a string representing the target architecture.
 An extensible SDK has the string "-ext" as part of the name. Following
-is the general form::
+is the general form:
 
-   poky-glibc-host_system-image_type-arch-toolchain-ext-release_version.sh
+.. parsed-literal::
 
-   Where:
-       host_system is a string representing your development system:
+   poky-glibc-*host_system*-*image_type*-*arch*-toolchain-ext-*release_version*.sh
 
-                  i686 or x86_64.
+Where:
 
-       image_type is the image for which the SDK was built:
+-  *host_system* is a string representing your development system: ``i686`` or ``x86_64``.
 
-                  core-image-sato or core-image-minimal
+-  *image_type* is the image for which the SDK was built: ``core-image-sato`` or ``core-image-minimal``.
 
-       arch is a string representing the tuned target architecture:
+-  *arch* is a string representing the tuned target architecture: ``aarch64``, ``armv5e``, ``core2-64``, ``i586``, ``mips32r2``, ``mips64``, ``ppc7400``, or ``cortexa8hf-neon``.
 
-                  aarch64, armv5e, core2-64, i586, mips32r2, mips64, ppc7400, or cortexa8hf-neon
-
-       release_version is a string representing the release number of the Yocto Project:
-
-                  &DISTRO;, &DISTRO;+snapshot
+-  *release_version* is a string representing the release number of the Yocto Project: ``&DISTRO;``, ``&DISTRO;+snapshot``.
 
 For example, the following SDK installer is for a 64-bit
 development host system and a i586-tuned target architecture based off
-the SDK for ``core-image-sato`` and using the current &DISTRO; snapshot::
+the SDK for ``core-image-sato`` and using the current &DISTRO; snapshot:
+
+.. code-block:: text
 
    poky-glibc-x86_64-core-image-sato-i586-toolchain-ext-&DISTRO;.sh
 
@@ -142,7 +141,9 @@ must be writable for whichever users need to use the SDK.
 The following command shows how to run the installer given a toolchain
 tarball for a 64-bit x86 development host system and a 64-bit x86 target
 architecture. The example assumes the SDK installer is located in
-``~/Downloads/`` and has execution rights::
+``~/Downloads/`` and has execution rights:
+
+.. code-block:: console
 
    $ ./Downloads/poky-glibc-x86_64-core-image-minimal-core2-64-toolchain-ext-2.5.sh
    Poky (Yocto Project Reference Distro) Extensible SDK installer version 2.5
@@ -192,7 +193,9 @@ begin with the string "``environment-setup``" and include as part of
 their name the tuned target architecture. As an example, the following
 commands set the working directory to where the SDK was installed and
 then source the environment setup script. In this example, the setup
-script is for an IA-based target machine using i586 tuning::
+script is for an IA-based target machine using i586 tuning:
+
+.. code-block:: console
 
    $ cd /home/scottrif/poky_sdk
    $ source environment-setup-core2-64-poky-linux
@@ -200,7 +203,9 @@ script is for an IA-based target machine using i586 tuning::
    Run devtool --help for further details.
 
 When using the environment script directly in a Yocto build, it can
-be run similarly::
+be run similarly:
+
+.. code-block:: console
 
    $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
 
@@ -270,7 +275,9 @@ populated on-demand. Sometimes you must explicitly install extra items
 into the SDK. If you need these extra items, you can first search for
 the items using the ``devtool search`` command. For example, suppose you
 need to link to libGL but you are not sure which recipe provides libGL.
-You can use the following command to find out::
+You can use the following command to find out:
+
+.. code-block:: console
 
    $ devtool search libGL mesa
    A free implementation of the OpenGL API
@@ -283,7 +290,9 @@ When using the extensible SDK directly in a Yocto build
 
 In this scenario, the Yocto build tooling, e.g. ``bitbake``
 is directly accessible to build additional items, and it
-can simply be executed directly::
+can simply be executed directly:
+
+.. code-block:: console
 
    $ bitbake curl-native
    # Add newly built native items to native sysroot
@@ -295,14 +304,16 @@ can simply be executed directly::
 When using a standalone installer for the Extensible SDK
 --------------------------------------------------------
 
-::
+.. code-block:: console
 
    $ devtool sdk-install mesa
 
 By default, the ``devtool sdk-install`` command assumes
 the item is available in pre-built form from your SDK provider. If the
 item is not available and it is acceptable to build the item from
-source, you can add the "-s" option as follows::
+source, you can add the "-s" option as follows:
+
+.. code-block:: console
 
    $ devtool sdk-install -s mesa
 
@@ -318,7 +329,9 @@ If you are working with an installed extensible SDK that gets
 occasionally updated (e.g. a third-party SDK), then you will need to
 manually "pull down" the updates into the installed SDK.
 
-To update your installed SDK, use ``devtool`` as follows::
+To update your installed SDK, use ``devtool`` as follows:
+
+.. code-block:: console
 
    $ devtool sdk-update
 
@@ -326,7 +339,9 @@ The previous command assumes your SDK provider has set the default update URL
 for you through the :term:`SDK_UPDATE_URL` variable as described in the
 ":ref:`sdk-manual/appendix-customizing:Providing Updates to the Extensible SDK After Installation`"
 section. If the SDK provider has not set that default URL, you need to
-specify it yourself in the command as follows::
+specify it yourself in the command as follows:
+
+.. code-block:: console
 
    $ devtool sdk-update path_to_update_directory
 

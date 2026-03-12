@@ -38,7 +38,7 @@ Benefits
 and flexible: it gives users the ultimate power to change pretty much any
 aspect of the system but as with most things, power comes with responsibility.
 The Yocto Project would like to see people able to mix and match BSPs with
-distro configs or software stacks and be able to merge succesfully.
+distro configs or software stacks and be able to merge successfully.
 Over time, the project identified characteristics in layers that allow them
 to operate well together. "anti-patterns" were also found, preventing layers
 from working well together.

@@ -273,7 +273,7 @@ New Features / Enhancements in 4.2
 
 -  Prominent documentation updates:
 
-   -  Substantially expanded the ":doc:`/dev-manual/vulnerabilities`" section.
+   -  Substantially expanded the ":doc:`/security-manual/vulnerabilities`" section.
    -  Added a new ":doc:`/dev-manual/sbom`" section about SPDX SBoM generation.
    -  Expanded ":ref:`init-manager`" documentation.
    -  New section about :ref:`ref-long-term-support-releases`.

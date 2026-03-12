@@ -20,12 +20,3 @@ If the issue is in the core metadata layer (OpenEmbedded-Core) or in BitBake,
 issues can be reported in the :yocto_bugs:`Yocto Project Bugzilla <>`. The
 :yocto_lists:`yocto </g/yocto>` mailing list is a general “catch-all” location
 where questions can be sent if you can’t work out where something should go.
-
-:term:`Poky` is a commonly used “combination” repository where multiple
-components have been combined (:oe_git:`bitbake </bitbake>`,
-:oe_git:`openembedded-core </openembedded-core>`,
-:yocto_git:`meta-yocto </meta-yocto>` and
-:yocto_git:`yocto-docs </yocto-docs>`). Patches should be submitted against the
-appropriate individual component rather than :term:`Poky` itself as detailed in
-the appropriate ``README`` file.
-

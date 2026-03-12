@@ -53,12 +53,13 @@ available. Follow these general steps to run QEMU:
 #. *Setting Up the Environment:* How you set up the QEMU environment
    depends on how you installed QEMU:
 
-   -  If you cloned the ``poky`` repository or you downloaded and
-      unpacked a Yocto Project release tarball, you can source the build
-      environment script (i.e. :ref:`structure-core-script`)::
+   -  If you followed :doc:`/dev-manual/start`, either use ``bitbake-setup`` or source
+      the environment setup script manually:
 
-         $ cd poky
-         $ source oe-init-build-env
+      .. code-block:: console
+
+         $ cd bitbake-builds
+         $ source layers/openembedded-core/oe-init-build-env
 
    -  If you installed a cross-toolchain, you can run the script that
       initializes the toolchain. For example, the following commands run
@@ -118,6 +119,17 @@ available. Follow these general steps to run QEMU:
       and root filesystem type::
 
          $ runqemu qemux86-64 core-image-minimal ext4
+
+   -  This example starts QEMU in a temporary root filesystem ("snapshot") with
+      no graphical environment ("nographic"), meaning QEMU is started in the
+      current shell:
+
+      .. code-block:: console
+
+         $ runqemu qemux86-64 snapshot nographic
+
+      Running in "snapshot" mode means that changes in root filesystem will not
+      remain after quitting QEMU.
 
    -  This example specifies to boot an :term:`Initramfs` image and to
       enable audio in QEMU. For this case, ``runqemu`` sets the internal
@@ -424,9 +436,9 @@ command line:
    in the :term:`Build Directory` ``deploy/image`` directory.
    Examples::
 
-      QB_SLIRP_OPT="-netdev user,id=net0,hostfwd=tcp::8080-:80"
+      QB_SLIRP_OPT = "-netdev user,id=net0,hostfwd=tcp::8080-:80"
 
-      QB_SLIRP_OPT="-netdev user,id=net0,hostfwd=tcp::8080-:80,hostfwd=tcp::2222-:22"
+      QB_SLIRP_OPT = "-netdev user,id=net0,hostfwd=tcp::8080-:80,hostfwd=tcp::2222-:22"
 
    The first example forwards TCP port 80 from the emulated system to
    port 8080 (or the next free port) on the host system,

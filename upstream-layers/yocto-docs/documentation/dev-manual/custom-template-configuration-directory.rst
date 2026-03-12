@@ -15,10 +15,10 @@ This can be done by using ``bitbake-layers save-build-conf``::
 
    $ bitbake-layers save-build-conf ../../meta-alex/ test-1
    NOTE: Starting bitbake server...
-   NOTE: Configuration template placed into /srv/work/alex/meta-alex/conf/templates/test-1
-   Please review the files in there, and particularly provide a configuration description in /srv/work/alex/meta-alex/conf/templates/test-1/conf-notes.txt
+   NOTE: Configuration template placed into /srv/bitbake-builds/layers/meta-alex/conf/templates/test-1
+   Please review the files in there, and particularly provide a configuration description in /srv/bitbake-builds/meta-alex/conf/templates/test-1/conf-notes.txt
    You can try out the configuration with
-   TEMPLATECONF=/srv/work/alex/meta-alex/conf/templates/test-1 . /srv/work/alex/poky/oe-init-build-env build-try-test-1
+   TEMPLATECONF=/srv/bitbake-builds/layers/meta-alex/conf/templates/test-1 . /srv/bitbake-builds/layers/openembedded-core/oe-init-build-env build-try-test-1
 
 The above command takes the config files from the currently active :term:`Build Directory` under ``conf``,
 replaces site-specific paths in ``bblayers.conf`` with ``##OECORE##``-relative paths, and copies
@@ -27,7 +27,7 @@ the config files into a specified layer under a specified template name.
 To use those saved templates as a starting point for a build, users should point
 to one of them with :term:`TEMPLATECONF` environment variable::
 
-   TEMPLATECONF=/srv/work/alex/meta-alex/conf/templates/test-1 . /srv/work/alex/poky/oe-init-build-env build-try-test-1
+   TEMPLATECONF=/srv/bitbake-builds/layers/meta-alex/conf/templates/test-1 . /srv/bitbake-builds/layers/openembedded-core/oe-init-build-env build-try-test-1
 
 The OpenEmbedded build system uses the environment variable
 :term:`TEMPLATECONF` to locate the directory from which it gathers

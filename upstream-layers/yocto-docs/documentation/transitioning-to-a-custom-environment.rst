@@ -39,7 +39,7 @@ Transitioning to a custom environment for systems development
    that you've downloaded. Be aware that some BSPs may not be immediately
    supported on the very latest release, but they will be eventually.
 
-   You might want to start with the build specification that Poky provides
+   You might want to start with the build specification that :term:`Poky` provides
    (which is reference embedded distribution) and then add your newly chosen
    layers to that. Here is the information :ref:`about adding layers
    <dev-manual/layers:Understanding and Creating Layers>`.
@@ -48,18 +48,15 @@ Transitioning to a custom environment for systems development
    configuration**.
    For instance, you've chosen a machine type and added in the corresponding BSP
    layer. You'll then need to change the value of the :term:`MACHINE` variable in your
-   configuration file (build/local.conf) to point to that same machine
-   type. There could be other layer-specific settings you need to change as
-   well. Each layer has a ``README`` document that you can look at for this type of
-   usage information.
+   configuration (using the :ref:`ref-fragments-builtin-core-machine`
+   fragment) to point to that same machine type. There could be other
+   layer-specific settings you need to change as well. Each layer has a
+   ``README`` document that you can look at for this type of usage information.
 
 #. **Add a new layer for any custom recipes and metadata you create**.
-   Use the ``bitbake-layers create-layer`` tool for Yocto Project 2.4+
-   releases. If you are using a Yocto Project release earlier than 2.4, use the
-   ``yocto-layer create`` tool. The ``bitbake-layers`` tool also provides a number
-   of other useful layer-related commands. See
-   :ref:`dev-manual/layers:creating a general layer using the
-   \`\`bitbake-layers\`\` script` section.
+   Use the ``bitbake-layers create-layer`` command. The ``bitbake-layers`` tool
+   also provides a number of other useful layer-related commands. See
+   :ref:`dev-manual/layers:Creating Your Own Layer` section.
 
 #. **Create your own layer for the BSP you're going to use**.
    It is not common that you would need to create an entire BSP from scratch
@@ -99,7 +96,7 @@ Transitioning to a custom environment for systems development
 
    Distribution settings define the packaging back-end (e.g. rpm or other) as
    well as the package feed and possibly the update solution. You would create
-   your own distribution in a new layer inheriting from Poky but overriding what
+   your own distribution in a new layer inheriting from :term:`Poky` but overriding what
    needs to change for your distribution. If you find yourself adding a lot of
    configuration to your local.conf file aside from paths and other typical
    local settings, it's time to :ref:`consider creating your own distribution

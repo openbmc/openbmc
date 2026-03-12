@@ -7,3 +7,4 @@ Release 5.3 (whinlatter)
 
    migration-5.3
    release-notes-5.3
+   release-notes-5.3.1

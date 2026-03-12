@@ -112,8 +112,8 @@ commercial or other special licensing requirements. Such requirements
 are defined on a recipe-by-recipe basis through the
 :term:`LICENSE_FLAGS` variable
 definition in the affected recipe. For instance, the
-``poky/meta/recipes-multimedia/gstreamer/gst-plugins-ugly`` recipe
-contains the following statement::
+``meta/recipes-multimedia/gstreamer/gstreamer1.0-plugins-ugly`` recipe of
+:term:`OpenEmbedded-Core (OE-Core)` contains the following statement::
 
    LICENSE_FLAGS = "commercial"
 
@@ -136,7 +136,8 @@ needs to have a matching entry in the global
 :term:`LICENSE_FLAGS_ACCEPTED`
 variable, which is a variable typically defined in your ``local.conf``
 file. For example, to enable the
-``poky/meta/recipes-multimedia/gstreamer/gst-plugins-ugly`` package, you
+``meta/recipes-multimedia/gstreamer/gstreamer1.0-plugins-ugly`` package of
+:term:`OpenEmbedded-Core (OE-Core)`, you
 could add either the string "commercial_gst-plugins-ugly" or the more
 general string "commercial" to :term:`LICENSE_FLAGS_ACCEPTED`. See the
 ":ref:`dev-manual/licenses:license flag matching`" section for a full
@@ -244,7 +245,7 @@ Other Variables Related to Commercial Licenses
 
 There are other helpful variables related to commercial license handling,
 defined in the
-``poky/meta/conf/distro/include/default-distrovars.inc`` file::
+``meta/conf/distro/include/default-distrovars.inc`` file in :term:`OpenEmbedded-Core (OE-Core)`::
 
    COMMERCIAL_AUDIO_PLUGINS ?= ""
    COMMERCIAL_VIDEO_PLUGINS ?= ""
@@ -460,23 +461,12 @@ and the source code modifications in one step.
 
 If the deployment team has a :ref:`overview-manual/concepts:bsp layer`
 and a distro layer, and those
-those layers are used to patch, compile, package, or modify (in any way)
+layers are used to patch, compile, package, or modify (in any way)
 any open source software included in your released images, you might be
 required to release those layers under section 3 of GPLv2 or section 1
 of GPLv3. One way of doing that is with a clean checkout of the version
-of the Yocto Project and layers used during your build. Here is an
-example:
-
-.. code-block:: shell
-
-   # We built using the dunfell branch of the poky repo
-   $ git clone -b dunfell git://git.yoctoproject.org/poky
-   $ cd poky
-   # We built using the release_branch for our layers
-   $ git clone -b release_branch git://git.mycompany.com/meta-my-bsp-layer
-   $ git clone -b release_branch git://git.mycompany.com/meta-my-software-layer
-   # clean up the .git repos
-   $ find . -name ".git" -type d -exec rm -rf {} \;
+of the Yocto Project and layers used during your build. Archiving a Git
+repository can be done with the :manpage:`git-archive <git-archive(1)>` command.
 
 One thing a development organization might want to consider for end-user
 convenience is to modify
@@ -494,9 +484,9 @@ automatically::
 
    BBLAYERS ?= " \
      ##OEROOT##/meta \
-     ##OEROOT##/meta-poky \
-     ##OEROOT##/meta-yocto-bsp \
-     ##OEROOT##/meta-mylayer \
+     ##OEROOT##/../meta-yocto/meta-poky \
+     ##OEROOT##/../meta-yocto/meta-yocto-bsp \
+     ##OEROOT##/../meta-mylayer \
      "
 
 Creating and

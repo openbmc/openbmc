@@ -2,6 +2,12 @@
 # Macros used in the documentation
 #
 
+#
+# Automatically replaced by set_versions.py, no manual update required
+# Values below are placeholders to give an idea on how to use them in the
+# documentation.
+#
+
 # The DISTRO variable represents the current docs version. It should be used
 # when referring to the current docs version. See also DISTRO_LATEST_TAG.
 DISTRO : "5.2"
@@ -11,15 +17,22 @@ DISTRO : "5.2"
 # represent the latest HEAD revision on the branch). DISTRO_LATEST_TAG should
 # always point to an existing tag.
 DISTRO_LATEST_TAG : "5.2"
+# The DISTRO_RELEASE_SERIES omits the patch version (so always X.Y).
+DISTRO_RELEASE_SERIES : "5.2"
 DISTRO_NAME_NO_CAP : "walnascar"
 DISTRO_NAME : "Walnascar"
 DISTRO_NAME_NO_CAP_MINUS_ONE : "styhead"
 DISTRO_NAME_NO_CAP_LTS : "scarthgap"
 YOCTO_DOC_VERSION : "5.2"
-DISTRO_REL_TAG : "yocto-$DISTRO;"
-DISTRO_REL_LATEST_TAG : "yocto-&DISTRO_LATEST_TAG;"
 DOCCONF_VERSION : "dev"
 BITBAKE_SERIES : ""
+
+#
+# Not automatically replaced, manual updates required
+#
+
+DISTRO_REL_TAG : "yocto-$DISTRO;"
+DISTRO_REL_LATEST_TAG : "yocto-&DISTRO_LATEST_TAG;"
 YOCTO_DL_URL : "https://downloads.yoctoproject.org"
 YOCTO_RELEASE_DL_URL : "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;"
 MIN_PYTHON_VERSION : "3.9.0"
@@ -27,9 +40,9 @@ MIN_TAR_VERSION : "1.28"
 MIN_GIT_VERSION : "1.8.3.1"
 MIN_GCC_VERSION : "10.1"
 MIN_MAKE_VERSION : "4.0"
-# Disk space (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64), rounded up from 87
-MIN_DISK_SPACE : "90"
-# Disk space (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64) with "rm_work", rounded up from 38
+# Disk space (Gbytes) needed to generate qemux86-64 core-image-sato image with poky distro on Ubuntu 22.04 (x86-64), rounded up from 133
+MIN_DISK_SPACE : "140"
+# Disk space (Gbytes) needed to generate qemux86-64 core-image-sato image with poky distro on Ubuntu 22.04 (x86-64) with "rm_work", rounded up from 39
 MIN_DISK_SPACE_RM_WORK : "40"
 # RAM (Gbytes) needed to generate qemux86-64 core-image-sato on Ubuntu 22.04 (x86-64) on a 4 core system
 MIN_RAM : "32"

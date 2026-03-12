@@ -15,8 +15,8 @@ your changes in the form of patches.
 During a build, the unpacked temporary source code used by recipes to
 build packages is available in the :term:`Build Directory` as defined by the
 :term:`S` variable. Below is the default value for the :term:`S` variable as
-defined in the ``meta/conf/bitbake.conf`` configuration file in the
-:term:`Source Directory`::
+defined in the ``meta/conf/bitbake.conf`` configuration file in
+:term:`OpenEmbedded-Core (OE-Core)`::
 
    S = "${UNPACKDIR}/${BP}"
 
@@ -43,11 +43,11 @@ In turn, the path to the work directory for the recipe
 (:term:`WORKDIR`) is defined as
 follows::
 
-   ${TMPDIR}/work/${MULTIMACH_TARGET_SYS}/${PN}/${EXTENDPE}${PV}-${PR}
+   ${BASE_WORKDIR}/${MULTIMACH_TARGET_SYS}/${PN}/${PV}
 
 The actual directory depends on several things:
 
--  :term:`TMPDIR`: The top-level build
+-  :term:`BASE_WORKDIR`: The top-level build
    output directory.
 
 -  :term:`MULTIMACH_TARGET_SYS`:
@@ -55,19 +55,13 @@ The actual directory depends on several things:
 
 -  :term:`PN`: The recipe name.
 
--  :term:`EXTENDPE`: The epoch --- if
-   :term:`PE` is not specified, which is
-   usually the case for most recipes, then :term:`EXTENDPE` is blank.
-
 -  :term:`PV`: The recipe version.
 
--  :term:`PR`: The recipe revision.
-
 As an example, assume a Source Directory top-level folder named
-``poky``, a default :term:`Build Directory` at ``poky/build``, and a
+``project``, a default :term:`Build Directory` at ``project/build``, and a
 ``qemux86-poky-linux`` machine target system. Furthermore, suppose your
 recipe is named ``foo_1.3.0.bb``. In this case, the work directory the
 build system uses to build the package would be as follows::
 
-   poky/build/tmp/work/qemux86-poky-linux/foo/1.3.0-r0
+   project/build/tmp/work/qemux86-poky-linux/foo/1.3.0
 

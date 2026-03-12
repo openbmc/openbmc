@@ -102,9 +102,9 @@ roughly consist of:
 #. *Call scripts/shared-repo-unpack*
 
    This is a call into the Helper scripts to set up a checkout of all
-   the pieces this build might need. It might clone the BitBake
-   repository and the OpenEmbedded-Core repository. It may clone the
-   Poky repository, as well as additional layers. It will use the data
+   the pieces this build might need. It might clone the :term:`BitBake`
+   repository, the :term:`OpenEmbedded-Core (OE-Core)` repository as well as
+   additional layers. It will use the data
    from the ``layerinfo.json`` file to help understand the
    configuration. It will also use a local cache of repositories to
    speed up the clone checkouts. For additional information, see

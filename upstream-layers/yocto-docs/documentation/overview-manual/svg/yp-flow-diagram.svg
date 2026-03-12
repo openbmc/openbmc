@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 13.0.2, SVG Export Plug-In . SVG Version: 6.00 Build 14948)  -->
+
+<svg
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="760.50098"
+   height="352.582"
+   viewBox="0 0 760.50095 352.582"
+   enable-background="new 0 0 758.189 424.276"
+   xml:space="preserve"
+   sodipodi:docname="yp-flow-diagram.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs86">
+		
+	</defs><sodipodi:namedview
+   id="namedview86"
+   pagecolor="#ffffff"
+   bordercolor="#000000"
+   borderopacity="0.25"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   inkscape:zoom="2.8284271"
+   inkscape:cx="296.80807"
+   inkscape:cy="212.83914"
+   inkscape:window-width="1906"
+   inkscape:window-height="934"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="Layer_1" />
+<g
+   id="g17"
+   transform="matrix(1,0,0,1.0035497,-2.0824824,-11.037238)"><rect
+     style="opacity:1;fill:#00b6de;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11"
+     width="484.25"
+     height="249"
+     x="90"
+     y="112.5" /><rect
+     style="fill:#00b6de;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-8"
+     width="12"
+     height="12"
+     x="507.56818"
+     y="-301.10004"
+     ry="0"
+     transform="rotate(44.313856)" /><rect
+     style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-8-1"
+     width="12"
+     height="12"
+     x="361.46231"
+     y="-89.463524"
+     ry="0"
+     transform="rotate(44.313856)" /><rect
+     style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-8-1-1"
+     width="12"
+     height="12"
+     x="389.40585"
+     y="-60.842598"
+     ry="0"
+     transform="rotate(44.313856)" /><rect
+     style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-8-1-1-0"
+     width="12"
+     height="12"
+     x="416.47607"
+     y="-33.116081"
+     ry="0"
+     transform="rotate(44.313856)" /></g><rect
+   style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+   id="rect11-9"
+   width="87"
+   height="216"
+   x="193.91776"
+   y="119.24599" /><rect
+   style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+   id="rect11-8-1-4"
+   width="12"
+   height="12"
+   x="487.27533"
+   y="-296.15897"
+   ry="0"
+   transform="rotate(44.313856)" /><rect
+   style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+   id="rect11-9-3"
+   width="85.75"
+   height="219.75"
+   x="470.16751"
+   y="119.49599" /><g
+   id="g2"
+   transform="translate(2.3119996,-71.694)">
+	<g
+   id="g1">
+		<polygon
+   fill="#00b6de"
+   points="703.77,340.194 712.852,349.277 721.934,340.194 758.189,340.194 758.189,256.861 723.582,256.861 713.171,267.274 702.758,256.861 628.582,256.861 618.171,267.274 607.758,256.861 561.523,256.861 561.523,340.194 609.104,340.194 618.186,349.277 627.268,340.194 "
+   id="polygon1" />
+	</g>
+</g>
+<g
+   id="g4"
+   transform="translate(2.3119996,-71.694)">
+	<g
+   id="g3">
+		<polygon
+   fill="#e6e6e6"
+   points="712.837,278.274 707.221,272.658 676.557,272.658 676.557,333.657 706.983,333.657 713.055,339.729 719.128,333.657 751.557,333.657 751.557,272.658 718.452,272.658 "
+   id="polygon2" />
+	</g>
+</g>
+<g
+   id="g6"
+   transform="translate(2.3119996,-71.694)">
+	<g
+   id="g5">
+		<polygon
+   fill="#e6e6e6"
+   points="618.171,278.274 611.555,271.658 581.558,271.658 581.558,332.657 611.983,332.657 618.056,338.729 624.128,332.657 656.558,332.657 656.558,271.658 624.786,271.658 "
+   id="polygon4" />
+	</g>
+</g>
+<g
+   id="g8"
+   transform="translate(2.3119996,-71.694)"
+   style="fill:#000080">
+	<g
+   id="g7"
+   style="fill:#000080">
+		<polygon
+   fill="#ed1849"
+   points="722.166,349.277 712.504,358.941 702.84,349.277 670.523,349.277 670.523,424.276 757.523,424.276 757.523,349.277 "
+   id="polygon6"
+   style="fill:#000080" />
+	</g>
+</g>
+<g
+   id="g10"
+   transform="translate(2.3119996,-71.694)"
+   style="fill:#000080">
+	<g
+   id="g9"
+   style="fill:#000080">
+		<polygon
+   fill="#ed1849"
+   points="628.371,348.611 618.043,358.941 607.713,348.611 575.523,348.611 575.523,423.61 662.523,423.61 662.523,348.611 "
+   id="polygon8"
+   style="fill:#000080" />
+	</g>
+</g>
+
+<g
+   id="g14"
+   transform="translate(2.3119996,-71.694)">
+	<g
+   id="g13">
+		<polygon
+   fill="#c1d82f"
+   points="575.428,217.35 575.428,250.526 610.09,250.526 618.171,258.607 626.251,250.526 705.09,250.526 713.171,258.607 721.251,250.526 757.427,250.526 757.427,173.527 575.428,173.527 575.428,199.703 584.252,208.525 "
+   id="polygon12" />
+	</g>
+</g>
+
+
+
+
+
+<g
+   id="g26"
+   transform="translate(0.4155534,-73.944)">
+	<g
+   id="g25">
+		<polygon
+   fill="#4a4a30"
+   points="177.974,133.944 125.111,133.944 118.043,141.013 110.974,133.944 86.834,133.944 86.834,166.944 178.263,166.944 184.834,173.514 191.403,166.944 281.833,166.944 281.833,133.944 258.611,133.944 251.543,141.013 244.474,133.944 192.111,133.944 185.043,141.013 "
+   id="polygon24" />
+	</g>
+</g>
+<g
+   id="g28"
+   transform="matrix(0.93986241,0,0,1,-22.331287,-17.694)">
+	<g
+   id="g27">
+		<polygon
+   fill="#e6e6e6"
+   points="330.188,290.202 330.188,296.444 511.188,296.444 511.188,289.015 517.259,282.942 511.188,276.87 511.188,268.444 330.188,268.444 330.188,277.683 336.447,283.942 "
+   id="polygon26" />
+	</g>
+</g>
+<g
+   id="g30"
+   transform="matrix(0.93986241,0,0,1,-22.331287,-17.694)">
+	<g
+   id="g29">
+		<polygon
+   fill="#e6e6e6"
+   points="330.188,251.536 330.188,257.944 511.188,257.944 511.188,250.515 517.259,244.442 511.188,238.37 511.188,229.944 330.188,229.944 330.188,239.016 336.447,245.276 "
+   id="polygon28" />
+	</g>
+</g>
+<g
+   id="g32"
+   transform="matrix(0.93986241,0,0,1,-22.331287,-17.694)">
+	<g
+   id="g31">
+		<polygon
+   fill="#e6e6e6"
+   points="330.188,211.18 330.188,218.444 511.188,218.444 511.188,211.015 517.259,204.942 511.188,198.87 511.188,190.444 330.188,190.444 330.188,199.372 336.092,205.276 "
+   id="polygon30" />
+	</g>
+</g>
+<g
+   id="g34"
+   transform="translate(-40.188,-71.694)">
+	<g
+   id="g33">
+		<polygon
+   fill="#e6e6e6"
+   points="144.188,342.944 144.188,406.944 225.188,406.944 225.188,381.515 231.259,375.442 225.188,369.37 225.188,342.944 190.445,342.944 184.043,349.348 177.639,342.944 "
+   id="polygon32" />
+	</g>
+</g>
+<g
+   id="g36"
+   transform="translate(-40.188,-71.694)">
+	<g
+   id="g35">
+		<polygon
+   fill="#e6e6e6"
+   points="177.618,330.944 184.188,337.514 190.757,330.944 225.188,330.944 225.188,266.944 190.778,266.944 183.71,274.014 176.64,266.944 144.188,266.944 144.188,330.944 "
+   id="polygon34" />
+	</g>
+</g>
+<g
+   id="g38"
+   transform="translate(-40.188,-71.694)">
+	<g
+   id="g37">
+		<polygon
+   fill="#e6e6e6"
+   points="177.118,254.944 183.688,261.514 190.257,254.944 224.688,254.944 224.688,190.944 191.445,190.944 184.376,198.014 177.306,190.944 143.688,190.944 143.688,254.944 "
+   id="polygon36" />
+	</g>
+</g>
+<g
+   id="g40"
+   transform="matrix(1,0,0,0.86327911,0.062,-77.645148)">
+	<g
+   id="g39">
+		<polygon
+   fill="#4a4a30"
+   points="81.188,221.611 0.188,221.611 0.188,285.61 81.188,285.61 81.188,260.181 87.259,254.109 81.188,248.037 "
+   id="polygon38" />
+	</g>
+</g><g
+   id="g40-0"
+   transform="matrix(1,0,0,0.86327911,0.312,-18.368819)">
+	<g
+   id="g39-6">
+		<polygon
+   fill="#4a4a30"
+   points="87.259,254.109 81.188,248.037 81.188,221.611 0.188,221.611 0.188,285.61 81.188,285.61 81.188,260.181 "
+   id="polygon38-4" />
+	</g>
+</g><g
+   id="g40-0-2"
+   transform="matrix(1,0,0,0.86327911,0.062,40.907511)">
+	<g
+   id="g39-6-5">
+		<polygon
+   fill="#4a4a30"
+   points="87.259,254.109 81.188,248.037 81.188,221.611 0.188,221.611 0.188,285.61 81.188,285.61 81.188,260.181 "
+   id="polygon38-4-8" />
+	</g>
+</g><g
+   id="g40-0-28"
+   transform="matrix(1,0,0,0.86327911,-0.188,100.18384)">
+	<g
+   id="g39-6-4">
+		<polygon
+   fill="#4a4a30"
+   points="81.188,285.61 81.188,260.181 87.259,254.109 81.188,248.037 81.188,221.611 0.188,221.611 0.188,285.61 "
+   id="polygon38-4-7" />
+	</g>
+</g>
+<g
+   id="g42"
+   transform="translate(0.062,-71.944)"
+   style="fill:#ff7f2a">
+	<g
+   id="g41"
+   style="fill:#ff7f2a">
+		<polygon
+   fill="#7e8082"
+   points="178.618,123.944 185.188,130.514 191.757,123.944 215.188,123.944 215.188,71.944 154.188,71.944 154.188,123.944 "
+   id="polygon40"
+   style="fill:#ff7f2a" />
+	</g>
+</g>
+<rect
+   x="126.062"
+   y="75.334"
+   fill="none"
+   width="116.666"
+   height="21.333"
+   id="rect42" />
+<text
+   fill="#ffffff"
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text42"
+   x="139.47949"
+   y="82.440079"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Source Materials</text>
+<rect
+   x="155.41699"
+   y="10.834001"
+   fill="none"
+   width="58.666"
+   height="40.667"
+   id="rect43" />
+<text
+   id="text44"
+   x="190.00726"
+   y="29.10741"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:49.6985"
+   transform="translate(-5.5244746,-7.8775879)"
+   xml:space="preserve"><tspan
+     x="190.00726"
+     y="29.10741"
+     id="tspan1">Local<tspan
+   y="29.10741"
+   id="tspan2"> </tspan></tspan><tspan
+     x="190.00726"
+     y="42.440787"
+     id="tspan3">Projects</tspan></text>
+<g
+   id="g45"
+   transform="translate(0.062,-71.944)"
+   style="fill:#ff7f2a">
+	<g
+   id="g44"
+   style="fill:#ff7f2a">
+		<polygon
+   fill="#7e8082"
+   points="245.118,123.944 251.688,130.514 258.257,123.944 281.688,123.944 281.688,71.944 220.688,71.944 220.688,123.944 "
+   id="polygon44"
+   style="fill:#ff7f2a" />
+	</g>
+</g>
+<rect
+   x="221.91699"
+   y="7.8340006"
+   fill="none"
+   width="58.666"
+   height="40.667"
+   id="rect45" />
+<text
+   id="text47"
+   x="258.17291"
+   y="26.10741"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:56.5275;fill:#000000"
+   transform="translate(-6.4360358,-3.6326896)"
+   xml:space="preserve"><tspan
+     x="258.17291"
+     y="26.10741"
+     id="tspan4">SCMs<tspan
+   y="26.10741"
+   id="tspan5"> </tspan></tspan><tspan
+     x="258.17291"
+     y="39.440787"
+     id="tspan6">(optional)</tspan></text>
+<g
+   id="g48"
+   transform="translate(0.062,-71.944)"
+   style="fill:#ff7f2a">
+	<g
+   id="g47"
+   style="fill:#ff7f2a">
+		<polygon
+   fill="#7e8082"
+   points="111.618,123.944 118.188,130.514 124.757,123.944 148.188,123.944 148.188,71.944 87.188,71.944 87.188,123.944 "
+   id="polygon47"
+   style="fill:#ff7f2a" />
+	</g>
+</g>
+<rect
+   x="88.417007"
+   y="10.834001"
+   fill="none"
+   width="58.666"
+   height="40.667"
+   id="rect48" />
+<text
+   id="text49"
+   x="125.51399"
+   y="29.10741"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:64.823"
+   transform="translate(-8.2169997,-13.75401)"
+   xml:space="preserve"><tspan
+     x="125.51399"
+     y="29.10741"
+     id="tspan7">Upstream<tspan
+   y="29.10741"
+   id="tspan8"> </tspan></tspan><tspan
+     x="125.51399"
+     y="42.440787"
+     id="tspan9">Project<tspan
+   y="42.440787"
+   id="tspan10"> </tspan></tspan><tspan
+     x="125.51399"
+     y="55.774165"
+     id="tspan11">Releases</tspan></text>
+<rect
+   x="115.167"
+   y="137.084"
+   fill="none"
+   width="58.666"
+   height="40.667"
+   id="rect49" />
+<text
+   id="text51"
+   x="128.34723"
+   y="147.37112"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+     x="128.34723"
+     y="147.37112"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan50"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Source </tspan><tspan
+     x="123.54125"
+     y="161.77113"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan51"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Fetching</tspan></text>
+<rect
+   x="115.167"
+   y="215.08401"
+   fill="none"
+   width="58.666"
+   height="40.666"
+   id="rect51" />
+<text
+   id="text53"
+   x="131.82678"
+   y="224.31099"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+     x="131.82678"
+     y="224.31099"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan52"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Patch </tspan><tspan
+     x="117.00081"
+     y="238.70999"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan53"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Application</tspan></text>
+<rect
+   x="107.167"
+   y="279.08401"
+   fill="none"
+   width="74.166"
+   height="69.237"
+   id="rect53" />
+<text
+   id="text57"
+   x="149.00055"
+   y="297.35791"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:74.8743"
+   transform="translate(-3.496696,4.953096)"
+   xml:space="preserve"><tspan
+     x="149.00055"
+     y="297.35791"
+     id="tspan12">Configuration /<tspan
+   y="297.35791"
+   id="tspan13"> </tspan></tspan><tspan
+     x="149.00055"
+     y="310.69127"
+     id="tspan14">Compile</tspan></text>
+<rect
+   x="201.16699"
+   y="184.084"
+   fill="none"
+   width="74.166"
+   height="89.237"
+   id="rect57" />
+<text
+   id="text63"
+   x="221.86859"
+   y="192.60429"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+     x="221.86859"
+     y="192.60429"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan58"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Output </tspan><tspan
+     x="211.42859"
+     y="207.0043"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan59"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Analysis for </tspan><tspan
+     x="218.94058"
+     y="221.4043"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan60"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">package </tspan><tspan
+     x="207.54759"
+     y="235.80429"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan61"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">splitting plus </tspan><tspan
+     x="218.94058"
+     y="250.2043"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan62"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">package </tspan><tspan
+     x="207.81059"
+     y="264.60431"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan63"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">relationships</tspan></text><text
+   id="text63-1"
+   x="555.48315"
+   y="202.90402"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:31.0495"
+   transform="translate(-42.334211,23.629617)"
+   xml:space="preserve"><tspan
+     x="555.48315"
+     y="202.90402"
+     id="tspan15">QA<tspan
+   y="202.90402"
+   id="tspan16"> </tspan></tspan><tspan
+     x="555.48315"
+     y="216.2374"
+     id="tspan18">Tests</tspan></text>
+<rect
+   x="319.146"
+   y="127.084"
+   fill="none"
+   width="116.666"
+   height="21.333"
+   id="rect63" />
+<text
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text64"
+   x="335.19238"
+   y="189.60429"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">.rpm generation</text>
+<rect
+   x="319.146"
+   y="166.584"
+   fill="none"
+   width="116.666"
+   height="21.333"
+   id="rect64" />
+<text
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text65"
+   x="335.76849"
+   y="229.10429"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">.deb generation</text>
+<rect
+   x="319.146"
+   y="205.08401"
+   fill="none"
+   width="116.666"
+   height="21.333"
+   id="rect65" />
+<text
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text66"
+   x="337.9404"
+   y="267.60391"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">.ipk generation</text>
+<rect
+   x="296.16699"
+   y="307.08401"
+   fill="none"
+   width="77.166"
+   height="30.237"
+   id="rect66" />
+
+<rect
+   x="299.66699"
+   y="261.08401"
+   fill="none"
+   width="71.853996"
+   height="33.664001"
+   id="rect67" />
+
+<rect
+   x="395.97998"
+   y="261.08401"
+   fill="none"
+   width="71.853996"
+   height="33.664001"
+   id="rect69" />
+
+<rect
+   x="390.66699"
+   y="307.08401"
+   fill="none"
+   width="77.166"
+   height="30.237"
+   id="rect71" />
+
+<rect
+   y="133"
+   fill="none"
+   width="81.666"
+   height="39.334"
+   id="rect73"
+   x="0.061999973" />
+<text
+   id="text75"
+   x="64.610138"
+   y="186.94585"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:66.7773"
+   transform="translate(-23.458902,-49.50401)"
+   xml:space="preserve"><tspan
+     x="64.610138"
+     y="186.94585"
+     id="tspan20"><tspan
+   style="fill:#ffffff"
+   id="tspan19">User</tspan>
+</tspan><tspan
+     x="64.610138"
+     y="200.27922"
+     id="tspan22"><tspan
+       style="fill:#ffffff"
+       id="tspan21">Configuration</tspan></tspan></text><text
+   id="text75-4"
+   x="64.610138"
+   y="186.94585"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:66.7773"
+   transform="translate(-24.603766,70.32617)"
+   xml:space="preserve"><tspan
+     x="64.610138"
+     y="186.94585"
+     id="tspan24"><tspan
+   style="fill:#ffffff"
+   id="tspan23">Machine BSP</tspan>
+</tspan><tspan
+     x="64.610138"
+     y="200.27922"
+     id="tspan26"><tspan
+       style="fill:#ffffff"
+       id="tspan25">Configuration</tspan></tspan></text><text
+   id="text75-4-6"
+   x="64.610138"
+   y="186.94585"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:66.7773"
+   transform="translate(-25.353766,128.82617)"
+   xml:space="preserve"><tspan
+     x="64.610138"
+     y="186.94585"
+     id="tspan28"><tspan
+   style="fill:#ffffff"
+   id="tspan27">Policy</tspan>
+</tspan><tspan
+     x="64.610138"
+     y="200.27922"
+     id="tspan30"><tspan
+       style="fill:#ffffff"
+       id="tspan29">Configuration</tspan></tspan></text>
+
+<rect
+   y="211.16798"
+   fill="none"
+   width="81.666"
+   height="39.333"
+   id="rect76"
+   x="0.061999973" />
+<text
+   id="text78"
+   x="70.02713"
+   y="265.4418"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:89.4625"
+   transform="translate(-28.848315,-69.549143)"
+   xml:space="preserve"><tspan
+     x="70.02713"
+     y="265.4418"
+     id="tspan32"><tspan
+       style="fill:#ffffff"
+       id="tspan31">Metadata
+</tspan></tspan><tspan
+     x="70.02713"
+     y="278.77516"
+     id="tspan34"><tspan
+       style="fill:#ffffff"
+       id="tspan33">(.bb + patches)</tspan></tspan></text>
+<rect
+   x="612.83502"
+   y="131.418"
+   fill="none"
+   width="112.186"
+   height="20.163"
+   id="rect78" />
+<text
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text79"
+   x="629.87451"
+   y="142.68779"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Package Feeds</text>
+<rect
+   x="579.98102"
+   y="306.25101"
+   fill="none"
+   width="81.666"
+   height="39.332001"
+   id="rect79" />
+<text
+   fill="#ffffff"
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text80"
+   x="604.24854"
+   y="319.7699"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Images</text>
+<rect
+   x="584.14703"
+   y="216.08499"
+   fill="none"
+   width="71.853996"
+   height="33.664001"
+   id="rect80" />
+<text
+   id="text81"
+   x="606.88434"
+   y="227.1058"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+     x="606.88434"
+     y="227.1058"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan80"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Image </tspan><tspan
+     x="594.48834"
+     y="241.50479"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan81"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Generation</tspan></text>
+<rect
+   x="678.83301"
+   y="215.08499"
+   fill="none"
+   width="77.166"
+   height="30.237"
+   id="rect81" />
+<text
+   id="text83"
+   x="708.21045"
+   y="228.6058"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+     x="708.21045"
+     y="228.6058"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan82"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">SDK </tspan><tspan
+     x="690.33142"
+     y="243.00479"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="tspan83"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Generation</tspan></text>
+<rect
+   x="379.06299"
+   y="86.834"
+   fill="none"
+   width="199.03999"
+   height="21.164"
+   id="rect83" />
+<text
+   fill="#333333"
+   font-family="MyriadPro-Regular"
+   font-size="12px"
+   id="text84"
+   x="426.28253"
+   y="26.005543"
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333">OpenEmbedded Architecture Workflow</text><g
+   id="g18"
+   transform="translate(-10.254525,-9.75401)"><rect
+     style="fill:#00b6de;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-5"
+     width="10"
+     height="9.9646282"
+     x="442.00568"
+     y="76.711205"
+     transform="matrix(1,0,0,1.0035497,0,-1.2832284)" /><text
+     fill="#333333"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="text84-6"
+     x="456.48013"
+     y="84.126945"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan17">Build System</tspan></text></g><g
+   id="g18-4"
+   transform="translate(-10.254525,-25.970712)"><rect
+     style="fill:#4a4a30;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-5-8"
+     width="10"
+     height="9.9646282"
+     x="442.00568"
+     y="76.711205"
+     transform="matrix(1,0,0,1.0035497,0,-1.2832284)" /><text
+     fill="#333333"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="text84-6-0"
+     x="456.48013"
+     y="84.126945"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan17-4">Metadata/Inputs</tspan></text></g><g
+   id="g18-4-9"
+   transform="translate(-10.254525,-42.187414)"><rect
+     style="fill:#ff7f2a;fill-opacity:1;stroke:#ff631a;stroke-width:0.49911493;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-5-8-6"
+     width="10"
+     height="9.9646282"
+     x="442.00568"
+     y="76.711205"
+     transform="matrix(1,0,0,1.0035497,0,-1.2832284)" /><text
+     fill="#333333"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="text84-6-0-1"
+     x="456.48013"
+     y="84.126945"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan17-4-0">Upstream Source</tspan></text></g><g
+   id="g18-4-9-2"
+   transform="translate(101.50803,-40.934366)"><rect
+     style="fill:#c1d82f;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-5-8-6-2"
+     width="10"
+     height="9.9646282"
+     x="442.00568"
+     y="76.711205"
+     transform="matrix(1,0,0,1.0035497,0,-1.2832284)" /><text
+     fill="#333333"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="text84-6-0-1-2"
+     x="456.48013"
+     y="84.126945"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan17-4-0-0">Output Packages</tspan></text></g><g
+   id="g18-4-9-2-5"
+   transform="translate(101.50803,-24.709046)"><rect
+     style="fill:#e6e6e6;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-5-8-6-2-2"
+     width="10"
+     height="9.9646282"
+     x="442.00568"
+     y="76.711205"
+     transform="matrix(1,0,0,1.0035497,0,-1.2832284)" /><text
+     fill="#333333"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="text84-6-0-1-2-9"
+     x="456.48013"
+     y="84.126945"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan17-4-0-0-0">Process steps (tasks)</tspan></text></g><g
+   id="g18-4-9-2-5-8"
+   transform="translate(101.50803,-8.4837252)"><rect
+     style="fill:#000080;fill-opacity:1;stroke:#ff631a;stroke-width:0;stroke-linejoin:bevel;stroke-miterlimit:0;stroke-dasharray:none"
+     id="rect11-5-8-6-2-2-3"
+     width="10"
+     height="9.9646282"
+     x="442.00568"
+     y="76.711205"
+     transform="matrix(1,0,0,1.0035497,0,-1.2832284)" /><text
+     fill="#333333"
+     font-family="MyriadPro-Regular"
+     font-size="12px"
+     id="text84-6-0-1-2-9-8"
+     x="456.48013"
+     y="84.126945"
+     style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#333333"><tspan
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.33333px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan17-4-0-0-0-0">Output Imaga Data</tspan></text></g>
+
+
+<rect
+   x="675.64801"
+   y="304.91699"
+   fill="none"
+   width="81.666"
+   height="39.332001"
+   id="rect85" />
+<text
+   id="text86"
+   x="720.58508"
+   y="322.93991"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.6667px;font-family:'Nimbus Sans L';-inkscape-font-specification:'Nimbus Sans L, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;white-space:pre;inline-size:65.518"
+   transform="translate(-2.5824824,-12.25401)"
+   xml:space="preserve"><tspan
+     x="720.58508"
+     y="322.93991"
+     id="tspan36"><tspan
+   style="fill:#ffffff"
+   id="tspan35">Application</tspan><tspan
+   y="322.93991"
+   id="tspan37"> </tspan></tspan><tspan
+     x="720.58508"
+     y="336.27327"
+     id="tspan39"><tspan
+   style="fill:#ffffff"
+   id="tspan38">Development</tspan><tspan
+   y="336.27327"
+   id="tspan40"> </tspan></tspan><tspan
+     x="720.58508"
+     y="349.60665"
+     id="tspan42"><tspan
+       style="fill:#ffffff"
+       id="tspan41">SDK</tspan></tspan></text>
+</svg>

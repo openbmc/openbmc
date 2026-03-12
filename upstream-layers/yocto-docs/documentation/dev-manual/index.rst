@@ -16,6 +16,8 @@ Yocto Project Development Tasks Manual
    new-machine
    upgrading-recipes
    temporary-source-code
+   creating-fragments
+   poky-manual-setup
    quilt.rst
    development-shell
    python-development-shell
@@ -31,7 +33,6 @@ Yocto Project Development Tasks Manual
    external-toolchain
    wic
    bmaptool
-   securing-images
    custom-distribution
    custom-template-configuration-directory
    disk-space
@@ -40,16 +41,14 @@ Yocto Project Development Tasks Manual
    init-manager
    device-manager
    external-scm
-   read-only-rootfs
    build-quality
    debugging
    licenses
-   security-subjects
-   vulnerabilities
    sbom
    error-reporting-tool
    wayland
    qemu
    bblock
+   hashequivserver
 
 .. include:: /boilerplate.rst

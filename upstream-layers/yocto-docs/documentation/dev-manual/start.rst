@@ -76,7 +76,7 @@ particular working environment and set of practices.
     :term:`Metadata` (i.e. recipes,
     configuration files, classes, and so forth) and any software you are
     developing under the control of an SCM system that is compatible
-    with the OpenEmbedded build system is advisable. Of all of the SCMs
+    with the :term:`OpenEmbedded build system` is advisable. Of all of the SCMs
     supported by BitBake, the Yocto Project team strongly recommends using
     :ref:`overview-manual/development-environment:git`.
     Git is a distributed system
@@ -218,7 +218,7 @@ particular working environment and set of practices.
        repositories. See the ":ref:`overview-manual/development-environment:yocto project source repositories`"
        section in the Yocto Project Overview and Concepts Manual for
        information on these repositories. See the
-       ":ref:`dev-manual/start:locating yocto project source files`"
+       ":doc:`/dev-manual/poky-manual-setup`"
        section for information on how to set up local Git repositories
        for related upstream Yocto Project Git repositories.
 
@@ -228,16 +228,15 @@ particular working environment and set of practices.
        used by developers in the same organization and share the same
        source directories on their machines.
 
-    -  Set up a local :ref:`overview-manual/concepts:Hash Equivalence` server
-       with :term:`BB_HASHSERVE` and :term:`BB_SIGNATURE_HANDLER`. A basic setup
-       would be::
-
-          BB_HASHSERVE = "auto"
-          BB_SIGNATURE_HANDLER = "OEEquivHash"
+    -  Set up a local :ref:`overview-manual/concepts:Hash Equivalence` server.
 
        See the :ref:`overview-manual/concepts:Hash Equivalence` section of the
        Yocto Project Overview and Concepts Manual for more details on the hash
        equivalence feature.
+
+       See the :doc:`/dev-manual/hashequivserver` section of the Yocto Project
+       Development Tasks Manual for details on how to setup a
+       :ref:`overview-manual/concepts:Hash Equivalence` server.
 
     -  Set up an Autobuilder and have it populate the sstate cache and
        source directories.
@@ -339,7 +338,7 @@ Project Build Host:
 Once you have completed the previous steps, you are ready to continue
 using a given development path on your native Linux machine. If you are
 going to use BitBake, see the
-":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`"
+":ref:`dev-manual/start:preparing the poky reference distro`"
 section. If you are going
 to use the Extensible SDK, see the ":doc:`/sdk-manual/extensible`" Chapter in the Yocto
 Project Application Development and the Extensible Software Development
@@ -434,7 +433,7 @@ as your Yocto Project build host:
 Once you have a container set up, everything is in place to develop just
 as if you were running on a native Linux machine. If you are going to
 use the Poky container, see the
-":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`"
+":ref:`dev-manual/start:preparing the Poky reference distro`"
 section. If you are going to use the Extensible SDK container, see the
 ":doc:`/sdk-manual/extensible`" Chapter in the Yocto
 Project Application Development and the Extensible Software Development
@@ -554,6 +553,7 @@ your Yocto Project build host:
          DISKPART> select vdisk file="<path_to_VHDX_file>"
          DISKPART> attach vdisk readonly
          DISKPART> compact vdisk
+         DISKPART> detach
          DISKPART> exit
 
 .. note::
@@ -576,302 +576,60 @@ the `Yocto Project BitBake
 <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`__
 extension accordingly.
 
-Locating Yocto Project Source Files
-===================================
+Preparing the Poky Reference Distro
+-----------------------------------
 
-This section shows you how to locate, fetch, unpack, patch and configure the source
-files you'll need to work with the Yocto Project.
+Now that the :term:`Build Host` has been prepared to build images, the next step
+can be to build the :term:`Poky` reference distro. There are two ways of setting
+up the :term:`Poky` reference distro:
 
-.. note::
+-  Using the ``bitbake-setup`` command-line utility from :term:`BitBake`.
+   Follow:
 
-   -  For concepts and introductory information about Git as it is used
-      in the Yocto Project, see the ":ref:`overview-manual/development-environment:git`"
-      section in the Yocto Project Overview and Concepts Manual.
+   :doc:`Setting Up The Environment With bitbake-setup <bitbake:bitbake-user-manual/bitbake-user-manual-environment-setup>`
 
-   -  For concepts on Yocto Project source repositories, see the
-      ":ref:`overview-manual/development-environment:yocto project source repositories`"
-      section in the Yocto Project Overview and Concepts Manual."
+-  Manually cloning the required repositories. Follow:
 
-Accessing Source Repositories
------------------------------
-
-Working from a copy of the upstream :ref:`dev-manual/start:accessing source repositories` is the
-preferred method for obtaining and using a Yocto Project release. You
-can view the Yocto Project Source Repositories at
-:yocto_git:`/`. In particular, you can find the ``poky``
-repository at :yocto_git:`/poky`.
-
-Use the following procedure to locate the latest upstream copy of the
-``poky`` Git repository:
-
-#. *Access Repositories:* Open a browser and go to
-   :yocto_git:`/` to access the GUI-based interface into the
-   Yocto Project source repositories.
-
-#. *Select the Repository:* Click on the repository in which you are
-   interested (e.g. ``poky``).
-
-#. *Find the URL Used to Clone the Repository:* At the bottom of the
-   page, note the URL used to clone that repository
-   (e.g. :yocto_git:`/poky`).
-
-   .. note::
-
-      For information on cloning a repository, see the
-      ":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`" section.
-
-Accessing Source Archives
--------------------------
-
-The Yocto Project also provides source archives of its releases, which
-are available on :yocto_dl:`/releases/yocto/`. Then, choose the subdirectory
-containing the release you wish to use, for example
-:yocto_dl:`&DISTRO_REL_LATEST_TAG; </releases/yocto/&DISTRO_REL_LATEST_TAG;/>`.
-
-You will find there source archives of individual components (if you wish
-to use them individually), and of the corresponding Poky release bundling
-a selection of these components.
+   :doc:`/dev-manual/poky-manual-setup`
 
 .. note::
 
-   The recommended method for accessing Yocto Project components is to
-   use Git to clone the upstream repository and work from within that
-   locally cloned repository.
-
-Using the Downloads Page
-------------------------
-
-The :yocto_home:`Yocto Project Website <>` uses a "RELEASES" page
-from which you can locate and download tarballs of any Yocto Project
-release. Rather than Git repositories, these files represent snapshot
-tarballs similar to the tarballs located in the Index of Releases
-described in the ":ref:`dev-manual/start:accessing source archives`" section.
-
-#. *Go to the Yocto Project Website:* Open The
-   :yocto_home:`Yocto Project Website <>` in your browser.
-
-#. *Get to the Downloads Area:* Select the "RELEASES" item from the
-   pull-down "DEVELOPMENT" tab menu near the top of the page.
-
-#. *Select a Yocto Project Release:* On the top of the "RELEASE" page currently
-   supported releases are displayed, further down past supported Yocto Project
-   releases are visible. The "Download" links in the rows of the table there
-   will lead to the download tarballs for the release.
-
-   .. note::
-
-      For a "map" of Yocto Project releases to version numbers, see the
-      :yocto_wiki:`Releases </Releases>` wiki page.
-
-   You can use the "RELEASE ARCHIVE" link to reveal a menu of all Yocto
-   Project releases.
-
-#. *Download Tools or Board Support Packages (BSPs):* Next to the tarballs you
-   will find download tools or BSPs as well. Just select a Yocto Project
-   release and look for what you need.
-
-Cloning and Checking Out Branches
-=================================
-
-To use the Yocto Project for development, you need a release locally
-installed on your development system. This locally installed set of
-files is referred to as the :term:`Source Directory`
-in the Yocto Project documentation.
-
-The preferred method of creating your Source Directory is by using
-:ref:`overview-manual/development-environment:git` to clone a local copy of the upstream
-``poky`` repository. Working from a cloned copy of the upstream
-repository allows you to contribute back into the Yocto Project or to
-simply work with the latest software on a development branch. Because
-Git maintains and creates an upstream repository with a complete history
-of changes and you are working with a local clone of that repository,
-you have access to all the Yocto Project development branches and tag
-names used in the upstream repository.
-
-Cloning the ``poky`` Repository
--------------------------------
-
-Follow these steps to create a local version of the upstream
-:term:`Poky` Git repository.
-
-#. *Set Your Directory:* Change your working directory to where you want
-   to create your local copy of ``poky``.
-
-#. *Clone the Repository:* The following example command clones the
-   ``poky`` repository and uses the default name "poky" for your local
-   repository::
-
-      $ git clone git://git.yoctoproject.org/poky
-      Cloning into 'poky'...
-      remote: Counting objects: 432160, done.
-      remote: Compressing objects: 100% (102056/102056), done.
-      remote: Total 432160 (delta 323116), reused 432037 (delta 323000)
-      Receiving objects: 100% (432160/432160), 153.81 MiB | 8.54 MiB/s, done.
-      Resolving deltas: 100% (323116/323116), done.
-      Checking connectivity... done.
-
-   Unless you
-   specify a specific development branch or tag name, Git clones the
-   "master" branch, which results in a snapshot of the latest
-   development changes for "master". For information on how to check out
-   a specific development branch or on how to check out a local branch
-   based on a tag name, see the
-   ":ref:`dev-manual/start:checking out by branch in poky`" and
-   ":ref:`dev-manual/start:checking out by tag in poky`" sections, respectively.
-
-   Once the local repository is created, you can change to that
-   directory and check its status. The ``master`` branch is checked out
-   by default::
-
-      $ cd poky
-      $ git status
-      On branch master
-      Your branch is up-to-date with 'origin/master'.
-      nothing to commit, working directory clean
-      $ git branch
-      * master
-
-   Your local repository of poky is initially identical to the
-   upstream poky repository from which it was cloned. As you
-   work with the local branch, you can periodically use the
-   ``git pull`` command to be sure you stay up-to-date
-   with the upstream poky branch.
-
-Checking Out by Branch in Poky
-------------------------------
-
-When you clone the upstream poky repository, you have access to all its
-development branches. Each development branch in a repository is unique
-as it forks off the "master" branch. To see and use the files of a
-particular development branch locally, you need to know the branch name
-and then specifically check out that development branch.
-
-.. note::
-
-   Checking out an active development branch by branch name gives you a
-   snapshot of that particular branch at the time you check it out.
-   Further development on top of the branch that occurs after check it
-   out can occur.
-
-#. *Switch to the Poky Directory:* If you have a local poky Git
-   repository, switch to that directory. If you do not have the local
-   copy of poky, see the
-   ":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`"
-   section.
-
-#. *Determine Existing Branch Names:*
-   ::
-
-      $ git branch -a
-      * master
-      remotes/origin/1.1_M1
-      remotes/origin/1.1_M2
-      remotes/origin/1.1_M3
-      remotes/origin/1.1_M4
-      remotes/origin/1.2_M1
-      remotes/origin/1.2_M2
-      remotes/origin/1.2_M3
-      . . .
-      remotes/origin/thud
-      remotes/origin/thud-next
-      remotes/origin/warrior
-      remotes/origin/warrior-next
-      remotes/origin/zeus
-      remotes/origin/zeus-next
-      ... and so on ...
-
-#. *Check out the Branch:* Check out the development branch in which you
-   want to work. For example, to access the files for the Yocto Project
-   &DISTRO; Release (&DISTRO_NAME;), use the following command::
-
-      $ git checkout -b &DISTRO_NAME_NO_CAP; origin/&DISTRO_NAME_NO_CAP;
-      Branch &DISTRO_NAME_NO_CAP; set up to track remote branch &DISTRO_NAME_NO_CAP; from origin.
-      Switched to a new branch '&DISTRO_NAME_NO_CAP;'
-
-   The previous command checks out the "&DISTRO_NAME_NO_CAP;" development
-   branch and reports that the branch is tracking the upstream
-   "origin/&DISTRO_NAME_NO_CAP;" branch.
-
-   The following command displays the branches that are now part of your
-   local poky repository. The asterisk character indicates the branch
-   that is currently checked out for work::
-
-      $ git branch
-        master
-        * &DISTRO_NAME_NO_CAP;
-
-Checking Out by Tag in Poky
----------------------------
-
-Similar to branches, the upstream repository uses tags to mark specific
-commits associated with significant points in a development branch (i.e.
-a release point or stage of a release). You might want to set up a local
-branch based on one of those points in the repository. The process is
-similar to checking out by branch name except you use tag names.
-
-.. note::
-
-   Checking out a branch based on a tag gives you a stable set of files
-   not affected by development on the branch above the tag.
-
-#. *Switch to the Poky Directory:* If you have a local poky Git
-   repository, switch to that directory. If you do not have the local
-   copy of poky, see the
-   ":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`"
-   section.
-
-#. *Fetch the Tag Names:* To checkout the branch based on a tag name,
-   you need to fetch the upstream tags into your local repository::
-
-      $ git fetch --tags
-      $
-
-#. *List the Tag Names:* You can list the tag names now::
-
-      $ git tag
-      1.1_M1.final
-      1.1_M1.rc1
-      1.1_M1.rc2
-      1.1_M2.final
-      1.1_M2.rc1
-         .
-         .
-         .
-      yocto-2.5
-      yocto-2.5.1
-      yocto-2.5.2
-      yocto-2.5.3
-      yocto-2.6
-      yocto-2.6.1
-      yocto-2.6.2
-      yocto-2.7
-      yocto_1.5_M5.rc8
-
-
-#. *Check out the Branch:*
-   ::
-
-      $ git checkout tags/yocto-&DISTRO; -b my_yocto_&DISTRO;
-      Switched to a new branch 'my_yocto_&DISTRO;'
-      $ git branch
-        master
-      * my_yocto_&DISTRO;
-
-   The previous command creates and
-   checks out a local branch named "my_yocto_&DISTRO;", which is based on
-   the commit in the upstream poky repository that has the same tag. In
-   this example, the files you have available locally as a result of the
-   ``checkout`` command are a snapshot of the "&DISTRO_NAME_NO_CAP;"
-   development branch at the point where Yocto Project &DISTRO; was
-   released.
+   The :term:`Poky` distro is a reference distro. It can be used to try the
+   Yocto Project but should not be used in a production environment. Instead, it
+   is recommended to create your own distro, see the
+   :doc:`/dev-manual/custom-distribution` section of the Yocto Project
+   Development Tasks Manual.
 
 Initializing the Build Environment
-==================================
+----------------------------------
 
-Before you can use Yocto you need to setup the build environment.
-From within the ``poky`` directory, source the :ref:`ref-manual/structure:``oe-init-build-env``` environment
-setup script to define Yocto Project's build environment on your build host::
+Initializing the build environment is a common task, as it needs to be done for
+each new instance of the shell where the :term:`Poky` reference distro was set up:
 
-   $ source oe-init-build-env
+-  If ``bitbake-setup`` was used to setup the :term:`Poky` reference distro, you
+   need to source the ``init-build-env`` file of the :term:`bitbake:Setup`
+   directory that was created after the :ref:`bitbake:ref-bbsetup-command-init`
+   command execution:
 
-Note, that this step will have to be repeated every time you open a new shell.
+   .. code-block:: console
+
+      $ source <setup-dir>/build/init-build-env
+
+
+-  If the :term:`Poky` distro was setup using manual clones of the layers, you
+   need to source the ``oe-init-build-env`` script present in the
+   :term:`OpenEmbedded-Core (OE-Core)` layer:
+
+   .. code-block:: console
+
+      $ source openembedded-core/oe-init-build-env
+
+This will setup your current shell and change the current working directory to
+the :term:`Build Directory`.
+
+Where To Go From Here
+---------------------
+
+-  Configure your build: follow :ref:`overview-manual/concepts:User Configuration`.
+
+-  Learn how and what to build with :term:`BitBake`: follow :doc:`/dev-manual/building`.

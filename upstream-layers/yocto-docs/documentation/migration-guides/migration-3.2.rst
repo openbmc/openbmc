@@ -166,7 +166,7 @@ be indicators of genuine underlying problems and are therefore now treated as
 errors:
 
 - :ref:`already-stripped <qa-check-already-stripped>`
-- :ref:`compile-host-path <qa-check-compile-host-path>`
+- ``compile-host-path``
 - :ref:`installed-vs-shipped <qa-check-installed-vs-shipped>`
 - :ref:`ldflags <qa-check-ldflags>`
 - :ref:`pn-overrides <qa-check-pn-overrides>`

@@ -162,7 +162,7 @@ The following diagram represents the high-level workflow of a build. The
 remainder of this section expands on the fundamental input, output,
 process, and metadata logical blocks that make up the workflow.
 
-.. image:: figures/YP-flow-diagram.png
+.. image:: svg/yp-flow-diagram.*
    :width: 100%
 
 In general, the build's workflow consists of several functional areas:
@@ -211,62 +211,28 @@ figure <overview-manual/concepts:openembedded build system concepts>`:
 BitBake needs some basic configuration files in order to complete a
 build. These files are ``*.conf`` files. The minimally necessary ones
 reside as example files in the ``build/conf`` directory of the
-:term:`Source Directory`. For simplicity,
-this section refers to the Source Directory as the "Poky Directory."
+:term:`Build Directory`.
 
-When you clone the :term:`Poky` Git repository
-or you download and unpack a Yocto Project release, you can set up the
-Source Directory to be named anything you want. For this discussion, the
-cloned repository uses the default name ``poky``.
+When you :ref:`initialize the build environment <dev-manual/start:Initializing
+the Build Environment>`, you can specify which directory will be the
+:term:`Source Directory`.
 
-.. note::
-
-   The Poky repository is primarily an aggregation of existing
-   repositories. It is not a canonical upstream source.
-
-The ``meta-poky`` layer inside Poky contains a ``conf`` directory that
-has example configuration files. These example files are used as a basis
-for creating actual configuration files when you source
-:ref:`structure-core-script`, which is the
-build environment script.
-
-Sourcing the build environment script creates a :term:`Build Directory`
+Setting up the build environment creates a :term:`Build Directory`
 if one does not already exist. BitBake uses the :term:`Build Directory`
 for all its work during builds. The Build Directory has a ``conf`` directory
 that contains default versions of your ``local.conf`` and ``bblayers.conf``
-configuration files. These default configuration files are created only
-if versions do not already exist in the :term:`Build Directory` at the time you
-source the build environment setup script.
+configuration files. These default :term:`configuration files <Configuration
+File>` are created only if they do not already exist in the :term:`Build
+Directory` at the time you source the build environment setup script.
 
-Because the Poky repository is fundamentally an aggregation of existing
-repositories, some users might be familiar with running the
-:ref:`structure-core-script` script in the context of separate
-:term:`OpenEmbedded-Core (OE-Core)` and BitBake
-repositories rather than a single Poky repository. This discussion
-assumes the script is executed from within a cloned or unpacked version
-of Poky.
+:term:`Configuration files <Configuration File>` provide many basic variables
+that define a build environment. To show a list of possible variables to
+configure from :term:`configuration files <Configuration File>`, see the
+:yocto_git:`local.conf.sample
+</meta-yocto/tree/meta-poky/conf/templates/default/local.conf.sample>` in the
+``meta-poky`` layer:
 
-Depending on where the script is sourced, different sub-scripts are
-called to set up the :term:`Build Directory` (Yocto or OpenEmbedded).
-Specifically, the script ``scripts/oe-setup-builddir`` inside the poky
-directory sets up the :term:`Build Directory` and seeds the directory (if
-necessary) with configuration files appropriate for the Yocto Project
-development environment.
-
-.. note::
-
-   The
-   ``scripts/oe-setup-builddir``
-   script uses the
-   ``$TEMPLATECONF``
-   variable to determine which sample configuration files to locate.
-
-The ``local.conf`` file provides many basic variables that define a
-build environment. Here is a list of a few. To see the default
-configurations in a ``local.conf`` file created by the build environment
-script, see the
-:yocto_git:`local.conf.sample </poky/tree/meta-poky/conf/templates/default/local.conf.sample>`
-in the ``meta-poky`` layer:
+Here is a non-exhaustive list:
 
 -  *Target Machine Selection:* Controlled by the
    :term:`MACHINE` variable.
@@ -370,19 +336,19 @@ figure <overview-manual/concepts:openembedded build system concepts>`:
    "BSP Layer" in the following figure) providing machine-specific
    configurations. This type of information is specific to a particular
    target architecture. A good example of a BSP layer from the
-   :ref:`overview-manual/yp-intro:reference distribution (poky)` is the
-   :yocto_git:`meta-yocto-bsp </poky/tree/meta-yocto-bsp>`
+   :ref:`overview-manual/yp-intro:reference embedded distribution (Poky)` is the
+   :yocto_git:`meta-yocto-bsp </meta-yocto/tree/meta-yocto-bsp>`
    layer.
 
 -  *Policy Configuration:* Distribution Layers (i.e. "Distro Layer" in
    the following figure) providing top-level or general policies for the
    images or SDKs being built for a particular distribution. For
    example, in the Poky Reference Distribution the distro layer is the
-   :yocto_git:`meta-poky </poky/tree/meta-poky>`
+   :yocto_git:`meta-poky </meta-yocto/tree/meta-poky>`
    layer. Within the distro layer is a ``conf/distro`` directory that
    contains distro configuration files (e.g.
-   :yocto_git:`poky.conf </poky/tree/meta-poky/conf/distro/poky.conf>`
-   that contain many policy configurations for the Poky distribution.
+   :yocto_git:`poky.conf </meta-yocto/tree/meta-poky/conf/distro/poky.conf>`
+   that contain many policy configurations for the :term:`Poky` distribution.
 
 The following figure shows an expanded representation of these three
 layers from the :ref:`general workflow figure
@@ -840,7 +806,7 @@ This step in the build process consists of the following tasks:
    :term:`PACKAGECONFIG_CONFARGS`
    variables. For information on how this variable works within that
    class, see the :ref:`ref-classes-autotools` class
-   :yocto_git:`here </poky/tree/meta/classes-recipe/autotools.bbclass>`.
+   :oe_git:`here </openembedded-core/tree/meta/classes-recipe/autotools.bbclass>`.
 
 -  *do_compile*: Once a configuration task has been satisfied,
    BitBake compiles the source using the
@@ -1041,7 +1007,7 @@ stage of package installation, post installation scripts that are part
 of the packages are run. Any scripts that fail to run on the build host
 are run on the target when the target system is first booted. If you are
 using a
-:ref:`read-only root filesystem <dev-manual/read-only-rootfs:creating a read-only root filesystem>`,
+:ref:`read-only root filesystem <security-manual/read-only-rootfs:creating a read-only root filesystem>`,
 all the post installation scripts must succeed on the build host during
 the package installation phase since the root filesystem on the target
 is read-only.
@@ -1466,58 +1432,53 @@ build images and generally work within the Yocto Project
 environment. When you run
 :term:`BitBake` to create an image, the
 OpenEmbedded build system uses the host ``gcc`` compiler to bootstrap a
-cross-compiler named ``gcc-cross``. The ``gcc-cross`` compiler is what
-BitBake uses to compile source files when creating the target image. You
-can think of ``gcc-cross`` simply as an automatically generated
+cross-compiler named ``gcc-cross`` (or ``clang-cross`` if Clang is used). This
+compiler is what BitBake uses to compile source files when creating the target
+image. You can think of it simply as an automatically generated
 cross-compiler that is used internally within BitBake only.
-
-.. note::
-
-   The extensible SDK does not use ``gcc-cross-canadian``
-   since this SDK ships a copy of the OpenEmbedded build system and the
-   sysroot within it contains ``gcc-cross``.
 
 The chain of events that occurs when the standard toolchain is bootstrapped::
 
-   binutils-cross -> linux-libc-headers -> gcc-cross -> libgcc-initial -> glibc -> libgcc -> gcc-runtime
+   gcc -> virtual/cross-binutils -> linux-libc-headers -> virtual/cross-cc -> libgcc-initial -> virtual/libc -> libgcc -> virtual/compilerlibs
 
--  ``gcc``: The compiler, GNU Compiler Collection (GCC).
+-  ``gcc``: The compiler, GNU Compiler Collection (GCC), provided by the
+   :term:`Build Host`, or by a :term:`buildtools` tarball.
 
--  ``binutils-cross``: The binary utilities needed in order
-   to run the ``gcc-cross`` phase of the bootstrap operation and build the
-   headers for the C library.
+-  ``virtual/cross-binutils``: The binary utilities needed in order
+   to run the ``virtual/cross-cc`` phase of the bootstrap operation and
+   build the headers for the C library.
 
 -  ``linux-libc-headers``: Headers needed for the cross-compiler and C library build.
 
--  ``libgcc-initial``: An initial version of the gcc support library needed
-   to bootstrap ``glibc``.
-
--  ``libgcc``: The final version of the gcc support library which
-   can only be built once there is a C library to link against.
-
--  ``glibc``: The GNU C Library.
-
--  ``gcc-cross``: The final stage of the bootstrap process for the
+-  ``virtual/cross-cc``: The final stage of the bootstrap process for the
    cross-compiler. This stage results in the actual cross-compiler that
    BitBake uses when it builds an image for a targeted device.
 
    This tool is a "native" tool (i.e. it is designed to run on
    the build host).
 
--  ``gcc-runtime``: Runtime libraries resulting from the toolchain
-   bootstrapping process. This tool produces a binary that consists of
-   the runtime libraries need for the targeted device.
+-  ``libgcc-initial``: An initial version of the GCC support library needed
+   to bootstrap ``virtual/libc``.
+
+-  ``virtual/libc``: An provider of the C Standard Library (for example, the GNU C Library).
+
+-  ``libgcc``: The final version of the GCC support library which
+   can only be built once there is a C library to link against.
+
+-  ``virtual/compilerlibs``: Runtime libraries resulting from the toolchain
+   bootstrapping process. This tool produces a binary that consists of the
+   runtime libraries need for the targeted device.
 
 You can use the OpenEmbedded build system to build an installer for the
 relocatable SDK used to develop applications. When you run the
 installer, it installs the toolchain, which contains the development
-tools (e.g., ``gcc-cross-canadian``, ``binutils-cross-canadian``, and
-other ``nativesdk-*`` tools), which are tools native to the SDK (i.e.
-native to :term:`SDK_ARCH`), you need to cross-compile and test your
-software. The figure shows the commands you use to easily build out
-this toolchain. This cross-development toolchain is built to execute on the
-:term:`SDKMACHINE`, which might or might not be the same machine as
-the Build Host.
+tools (e.g., ``gcc-cross-canadian``, ``clang-cross-canadian``,
+``binutils-cross-canadian``, and other ``nativesdk-*`` tools), which are tools
+native to the SDK (i.e. native to :term:`SDK_ARCH`), you need to cross-compile
+and test your software. The figure shows the commands you use to easily build
+out this toolchain. This cross-development toolchain is built to execute on the
+:term:`SDKMACHINE`, which might or might not be the same machine as the Build
+Host.
 
 .. note::
 
@@ -1527,43 +1488,26 @@ the Build Host.
 
 Here is the bootstrap process for the relocatable toolchain::
 
-   gcc -> binutils-crosssdk -> gcc-crosssdk-initial -> linux-libc-headers -> glibc-initial -> nativesdk-glibc -> gcc-crosssdk -> gcc-cross-canadian
+   gcc -> virtual/cross-binutils -> linux-libc-headers -> virtual/cross-cc -> libgcc-initial -> virtual/libc -> gcc-cross-canadian/clang-cross-canadian
 
--  ``gcc``: The build host's GNU Compiler Collection (GCC).
+The chain is the same as the standard toolchain, except for the last item:
+``gcc-cross-canadian`` (or ``clang-cross-canadian``) is the final relocatable
+cross-compiler. When run on the :term:`SDKMACHINE`, this tool produces
+executable code that runs on the target device. Only one cross-canadian compiler
+is produced per architecture since they can be targeted at different processor
+optimizations using configurations passed to the compiler through the compile
+commands. This circumvents the need for multiple compilers and thus reduces the
+size of the toolchains.
 
--  ``binutils-crosssdk``: The bare minimum binary utilities needed in
-   order to run the ``gcc-crosssdk-initial`` phase of the bootstrap
-   operation.
+.. note::
 
--  ``gcc-crosssdk-initial``: An early stage of the bootstrap process for
-   creating the cross-compiler. This stage builds enough of the
-   ``gcc-crosssdk`` and supporting pieces so that the final stage of the
-   bootstrap process can produce the finished cross-compiler. This tool
-   is a "native" binary that runs on the build host.
+   The extensible SDK does not use ``gcc-cross-canadian`` or ``clang-cross-canadian``
+   since this SDK ships a copy of the OpenEmbedded build system and the
+   sysroot within it contains ``gcc-cross``.
 
--  ``linux-libc-headers``: Headers needed for the cross-compiler.
+.. note::
 
--  ``glibc-initial``: An initial version of the Embedded GLIBC needed to
-   bootstrap ``nativesdk-glibc``.
-
--  ``nativesdk-glibc``: The Embedded GLIBC needed to bootstrap the
-   ``gcc-crosssdk``.
-
--  ``gcc-crosssdk``: The final stage of the bootstrap process for the
-   relocatable cross-compiler. The ``gcc-crosssdk`` is a transitory
-   compiler and never leaves the build host. Its purpose is to help in
-   the bootstrap process to create the eventual ``gcc-cross-canadian``
-   compiler, which is relocatable. This tool is also a "native" package
-   (i.e. it is designed to run on the build host).
-
--  ``gcc-cross-canadian``: The final relocatable cross-compiler. When
-   run on the :term:`SDKMACHINE`,
-   this tool produces executable code that runs on the target device.
-   Only one cross-canadian compiler is produced per architecture since
-   they can be targeted at different processor optimizations using
-   configurations passed to the compiler through the compile commands.
-   This circumvents the need for multiple compilers and thus reduces the
-   size of the toolchains.
+   To learn how to use Clang for the SDK, see :term:`PREFERRED_TOOLCHAIN_SDK`.
 
 .. note::
 
@@ -2064,19 +2008,9 @@ on a Hash Equivalence server on a network, by setting::
 
    BB_HASHSERVE = "<HOSTNAME>:<PORT>"
 
-.. note::
-
-   The shared Hash Equivalence server needs to be maintained together with the
-   Shared State cache. Otherwise, the server could report Shared State hashes
-   that only exist on specific clients.
-
-   We therefore recommend that one Hash Equivalence server be set up to
-   correspond with a given Shared State cache, and to start this server
-   in *read-only mode*, so that it doesn't store equivalences for
-   Shared State caches that are local to clients.
-
-   See the :term:`BB_HASHSERVE` reference for details about starting
-   a Hash Equivalence server.
+Setting up a Hash Equivalence server is described in the
+:doc:`/dev-manual/hashequivserver` section of the Yocto Project Development
+Tasks Manual.
 
 See the `video <https://www.youtube.com/watch?v=zXEdqGS62Wc>`__
 of Joshua Watt's `Hash Equivalence and Reproducible Builds

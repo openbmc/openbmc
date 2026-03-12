@@ -274,8 +274,23 @@ with a number. The number used depends on the state of the PR Service:
 
    .. code-block:: none
 
-      hello-world-git_0.0+git0+b6558dd387-r0.0_armv7a-neon.ipk
-      hello-world-git_0.0+git1+dd2f5c3565-r0.0_armv7a-neon.ipk
+      hello-world-git_1.0+git0+b6558dd387-r0.0_armv7a-neon.ipk
+      hello-world-git_1.0+git1+dd2f5c3565-r0.1_armv7a-neon.ipk
+
+   Two numbers got incremented here:
+
+   -  ``gitX`` changed from ``git0`` to ``git1``. This is because there was a
+      change in the source code (``SRCREV``).
+
+   -  ``r0.X`` changed from ``r0.0`` to ``r0.1``. This is because the hash of
+      the :ref:`ref-tasks-package` task changed.
+
+      The reason for this change can be many. To understand why the hash of the
+      :ref:`ref-tasks-package` task changed, you can run the following command:
+
+      .. code-block:: console
+
+         $ bitbake-diffsigs -t hello-world package
 
 -  If PR Service is not enabled, the build system replaces the
    ``AUTOINC`` placeholder with zero (i.e. "0"). This results in
@@ -285,8 +300,8 @@ with a number. The number used depends on the state of the PR Service:
 
    .. code-block:: none
 
-      hello-world-git_0.0+git0+b6558dd387-r0.0_armv7a-neon.ipk
-      hello-world-git_0.0+git0+dd2f5c3565-r0.0_armv7a-neon.ipk
+      hello-world-git_1.0+git0+b6558dd387-r0_armv7a-neon.ipk
+      hello-world-git_1.0+git0+dd2f5c3565-r0_armv7a-neon.ipk
 
 In summary, the OpenEmbedded build system does not track the history of
 binary package versions for this purpose. ``AUTOINC``, in this case, is
@@ -361,8 +376,9 @@ package. It is also perfectly acceptable to call ``do_split_packages``
 multiple times if you have more than one set of modules to package.
 
 For more examples that show how to use ``do_split_packages``, see the
-``connman.inc`` file in the ``meta/recipes-connectivity/connman/``
-directory of the ``poky`` :ref:`source repository <overview-manual/development-environment:yocto project source repositories>`. You can
+``connman.inc`` file in the :oe_git:`meta/recipes-connectivity/connman/
+</openembedded-core/tree/meta/recipes-connectivity/connman/>`
+directory of :term:`OpenEmbedded-Core (OE-Core)`. You can
 also find examples in ``meta/classes-recipe/kernel.bbclass``.
 
 Here is a reference that shows ``do_split_packages`` mandatory and
@@ -543,18 +559,18 @@ to use. In your configuration, you use the
 variable to specify the format:
 
 #. Open the ``local.conf`` file inside your :term:`Build Directory` (e.g.
-   ``poky/build/conf/local.conf``).
+   ``bitbake-builds/build/conf/local.conf``).
 
 #. Select the desired package format as follows::
 
       PACKAGE_CLASSES ?= "package_packageformat"
 
-   where packageformat can be "ipk", "rpm",
-   "deb", or "tar" which are the supported package formats.
+   where packageformat can be "ipk", "rpm", or
+   "deb" which are the supported package formats.
 
    .. note::
 
-      Because the Yocto Project supports four different package formats,
+      Because the Yocto Project supports three different package formats,
       you can set the variable with more than one argument. However, the
       OpenEmbedded build system only uses the first argument when
       creating an image or Software Development Kit (SDK).
@@ -637,10 +653,10 @@ Lighttpd, or Nginx), take the appropriate steps to do so.
 
 From within the :term:`Build Directory` where you have built an image based on
 your packaging choice (i.e. the :term:`PACKAGE_CLASSES` setting), simply start
-the server. The following example assumes a :term:`Build Directory` of ``poky/build``
+the server. The following example assumes a :term:`Build Directory` of ``bitbake-builds/build``
 and a :term:`PACKAGE_CLASSES` setting of ":ref:`ref-classes-package_rpm`"::
 
-   $ cd poky/build/tmp/deploy/rpm
+   $ cd bitbake-builds/build/tmp/deploy/rpm
    $ python3 -m http.server
 
 Target Setup

@@ -33,7 +33,9 @@ project:
 
 #. *Create a Working Directory and Populate It:* Create a clean
    directory for your project and then make that directory your working
-   location::
+   location:
+
+   .. code-block:: console
 
       $ mkdir $HOME/helloworld
       $ cd $HOME/helloworld
@@ -45,23 +47,30 @@ project:
    respectively.
 
    Use the following command to create an empty README file, which is
-   required by GNU Coding Standards::
+   required by GNU Coding Standards:
+
+   .. code-block:: console
 
       $ touch README
 
    Create the remaining
    three files as follows:
 
-   -  ``hello.c``::
+   -  ``hello.c``:
+
+      .. code-block:: c
 
          #include <stdio.h>
 
-         main()
+         int main()
              {
                  printf("Hello World!\n");
+                 return 0;
              }
 
-   -  ``configure.ac``::
+   -  ``configure.ac``:
+
+      .. code-block:: none
 
          AC_INIT(hello,0.1)
          AM_INIT_AUTOMAKE([foreign])
@@ -69,7 +78,9 @@ project:
          AC_CONFIG_FILES(Makefile)
          AC_OUTPUT
 
-   -  ``Makefile.am``::
+   -  ``Makefile.am``:
+
+      .. code-block:: none
 
          bin_PROGRAMS = hello
          hello_SOURCES = hello.c
@@ -83,17 +94,23 @@ project:
    which is followed by the string "poky-linux". For this example, the
    command sources a script from the default SDK installation directory
    that uses the 32-bit Intel x86 Architecture and the &DISTRO; Yocto
-   Project release::
+   Project release:
+
+   .. code-block:: console
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
    Another example is sourcing the environment setup directly in a Yocto
-   build::
+   build:
+
+   .. code-block:: console
 
       $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
 
 #. *Create the configure Script:* Use the ``autoreconf`` command to
-   generate the ``configure`` script::
+   generate the ``configure`` script:
+
+   .. code-block:: console
 
       $ autoreconf
 
@@ -112,7 +129,9 @@ project:
    the cross-compiler. The
    :term:`CONFIGURE_FLAGS`
    environment variable provides the minimal arguments for GNU
-   configure::
+   configure:
+
+   .. code-block:: console
 
       $ ./configure ${CONFIGURE_FLAGS}
 
@@ -125,12 +144,16 @@ project:
    ``armv5te-poky-linux-gnueabi``. You will notice that the name of the
    script is ``environment-setup-armv5te-poky-linux-gnueabi``. Thus, the
    following command works to update your project and rebuild it using
-   the appropriate cross-toolchain tools::
+   the appropriate cross-toolchain tools:
+
+   .. code-block:: console
 
      $ ./configure --host=armv5te-poky-linux-gnueabi --with-libtool-sysroot=sysroot_dir
 
 #. *Make and Install the Project:* These two commands generate and
-   install the project into the destination directory::
+   install the project into the destination directory:
+
+   .. code-block:: console
 
       $ make
       $ make install DESTDIR=./tmp
@@ -145,13 +168,17 @@ project:
    This next command is a simple way to verify the installation of your
    project. Running the command prints the architecture on which the
    binary file can run. This architecture should be the same
-   architecture that the installed cross-toolchain supports::
+   architecture that the installed cross-toolchain supports:
+
+   .. code-block:: console
 
       $ file ./tmp/usr/local/bin/hello
 
 #. *Execute Your Project:* To execute the project, you would need to run
    it on your target hardware. If your target hardware happens to be
-   your build host, you could run the project as follows::
+   your build host, you could run the project as follows:
+
+   .. code-block:: console
 
       $ ./tmp/usr/local/bin/hello
 
@@ -197,7 +224,9 @@ regarding variable behavior:
 .. note::
 
    Regardless of how you set your variables, if you use the "-e" option
-   with ``make``, the variables from the SDK setup script take precedence::
+   with ``make``, the variables from the SDK setup script take precedence:
+
+   .. code-block:: console
 
       $ make -e target
 
@@ -208,7 +237,9 @@ demonstrates these variable behaviors.
 In a new shell environment variables are not established for the SDK
 until you run the setup script. For example, the following commands show
 a null value for the compiler variable (i.e.
-:term:`CC`)::
+:term:`CC`):
+
+.. code-block:: console
 
    $ echo ${CC}
 
@@ -218,7 +249,9 @@ Running the
 SDK setup script for a 64-bit build host and an i586-tuned target
 architecture for a ``core-image-sato`` image using the current &DISTRO;
 Yocto Project release and then echoing that variable shows the value
-established through the script::
+established through the script:
+
+.. code-block:: console
 
    $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
    $ echo ${CC}
@@ -229,7 +262,9 @@ example:
 
 #. *Create a Working Directory and Populate It:* Create a clean
    directory for your project and then make that directory your working
-   location::
+   location:
+
+   .. code-block:: console
 
       $ mkdir $HOME/helloworld
       $ cd $HOME/helloworld
@@ -242,7 +277,9 @@ example:
 
    Create the three files as follows:
 
-   -  ``main.c``::
+   -  ``main.c``:
+
+      .. code-block:: c
 
          #include "module.h"
          void sample_func();
@@ -252,12 +289,16 @@ example:
              return 0;
          }
 
-   -  ``module.h``::
+   -  ``module.h``:
+
+      .. code-block:: c
 
          #include <stdio.h>
          void sample_func();
 
-   -  ``module.c``::
+   -  ``module.c``:
+
+      .. code-block:: c
 
          #include "module.h"
          void sample_func()
@@ -275,12 +316,16 @@ example:
    which is followed by the string "poky-linux". For this example, the
    command sources a script from the default SDK installation directory
    that uses the 32-bit Intel x86 Architecture and the &DISTRO_NAME; Yocto
-   Project release::
+   Project release:
+
+   .. code-block:: console
 
       $ source /opt/poky/&DISTRO;/environment-setup-i586-poky-linux
 
    Another example is sourcing the environment setup directly in a Yocto
-   build::
+   build:
+
+   .. code-block:: console
 
       $ source tmp/deploy/images/qemux86-64/environment-setup-core2-64-poky-linux
 
@@ -288,7 +333,9 @@ example:
    two lines that can be used to set the :term:`CC` variable. One line is
    identical to the value that is set when you run the SDK environment
    setup script, and the other line sets :term:`CC` to "gcc", the default
-   GNU compiler on the build host::
+   GNU compiler on the build host:
+
+   .. code-block:: Makefile
 
       # CC=i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux
       # CC="gcc"
@@ -305,7 +352,9 @@ example:
 #. *Make the Project:* Use the ``make`` command to create the binary
    output file. Because variables are commented out in the Makefile, the
    value used for :term:`CC` is the value set when the SDK environment setup
-   file was run::
+   file was run:
+
+   .. code-block:: console
 
       $ make
       i586-poky-linux-gcc -m32 -march=i586 --sysroot=/opt/poky/2.5/sysroots/i586-poky-linux -I . -c main.c
@@ -318,7 +367,9 @@ example:
 
    You can override the :term:`CC` environment variable with the same
    variable as set from the Makefile by uncommenting the line in the
-   Makefile and running ``make`` again::
+   Makefile and running ``make`` again:
+
+   .. code-block:: console
 
       $ make clean
       rm -rf *.o
@@ -339,7 +390,9 @@ example:
    variable as part of the command line. Go into the Makefile and
    re-insert the comment character so that running ``make`` uses the
    established SDK compiler. However, when you run ``make``, use a
-   command-line argument to set :term:`CC` to "gcc"::
+   command-line argument to set :term:`CC` to "gcc":
+
+   .. code-block:: console
 
       $ make clean
       rm -rf *.o
@@ -363,7 +416,9 @@ example:
    environment variable.
 
    In this last case, edit Makefile again to use the "gcc" compiler but
-   then use the "-e" option on the ``make`` command line::
+   then use the "-e" option on the ``make`` command line:
+
+   .. code-block:: console
 
       $ make clean
       rm -rf *.o
@@ -388,7 +443,9 @@ example:
    Makefile.
 
 #. *Execute Your Project:* To execute the project (i.e. ``target_bin``),
-   use the following command::
+   use the following command:
+
+   .. code-block:: console
 
       $ ./target_bin
       Hello World!

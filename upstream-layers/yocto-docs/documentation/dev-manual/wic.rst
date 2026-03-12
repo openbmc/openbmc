@@ -276,8 +276,8 @@ existing file provided by the Wic installation. As shipped, kickstart
 files can be found in the :ref:`overview-manual/development-environment:yocto project source repositories` in the
 following two locations::
 
-   poky/meta-yocto-bsp/wic
-   poky/scripts/lib/wic/canned-wks
+   meta-yocto/meta-yocto-bsp/wic
+   openembedded-core/scripts/lib/wic/canned-wks
 
 Use the following command to list the available kickstart files::
 
@@ -309,7 +309,7 @@ Here are the actual partition language commands used in the
 
    # short-description: Create an EFI disk image for genericx86*
    # long-description: Creates a partitioned EFI disk image for genericx86* machines
-   part /boot --source bootimg-efi --sourceparams="loader=grub-efi" --ondisk sda --label msdos --active --align 1024
+   part /boot --source bootimg_efi --sourceparams="loader=grub-efi" --ondisk sda --label msdos --active --align 1024
    part / --source rootfs --ondisk sda --fstype=ext4 --label platform --align 1024 --use-uuid
    part swap --ondisk sda --size 44 --label swap1 --fstype=swap
 
@@ -342,13 +342,13 @@ partition.
 Source plugins are subclasses defined in plugin files. As shipped, the
 Yocto Project provides several plugin files. You can see the source
 plugin files that ship with the Yocto Project
-:yocto_git:`here </poky/tree/scripts/lib/wic/plugins/source>`.
+:oe_git:`here </openembedded-core/tree/scripts/lib/wic/plugins/source>`.
 Each of these plugin files contains source plugins that are designed to
 populate a specific Wic image partition.
 
 Source plugins are subclasses of the ``SourcePlugin`` class, which is
-defined in the ``poky/scripts/lib/wic/pluginbase.py`` file. For example,
-the ``BootimgEFIPlugin`` source plugin found in the ``bootimg-efi.py``
+defined in the ``openembedded-core/scripts/lib/wic/pluginbase.py`` file. For example,
+the ``BootimgEFIPlugin`` source plugin found in the ``bootimg_efi.py``
 file is a subclass of the ``SourcePlugin`` class, which is found in the
 ``pluginbase.py`` file.
 
@@ -365,14 +365,14 @@ implementation, it looks for the plugin with the same name as the
 partition. For example, if the partition is set up using the following
 command in a kickstart file::
 
-   part /boot --source bootimg-pcbios --ondisk sda --label boot --active --align 1024
+   part /boot --source bootimg_pcbios --ondisk sda --label boot --active --align 1024
 
 The methods defined as class
-members of the matching source plugin (i.e. ``bootimg-pcbios``) in the
-``bootimg-pcbios.py`` plugin file are used.
+members of the matching source plugin (i.e. ``bootimg_pcbios``) in the
+``bootimg_pcbios.py`` plugin file are used.
 
 To be more concrete, here is the corresponding plugin definition from
-the ``bootimg-pcbios.py`` file for the previous command along with an
+the ``bootimg_pcbios.py`` file for the previous command along with an
 example method called by the Wic implementation when it needs to prepare
 a partition using an implementation-specific function::
 
@@ -384,7 +384,7 @@ a partition using an implementation-specific function::
        Create MBR boot partition and install syslinux on it.
        """
 
-      name = 'bootimg-pcbios'
+      name = 'bootimg_pcbios'
                 .
                 .
                 .
@@ -527,8 +527,8 @@ This next example demonstrates that through modification of the
 As mentioned earlier, you can use the command ``wic list images`` to
 show the list of existing kickstart files. The directory in which the
 ``directdisk-gpt.wks`` file resides is
-``scripts/lib/image/canned-wks/``, which is located in the
-:term:`Source Directory` (e.g. ``poky``).
+``scripts/lib/image/canned-wks/``, which is located in
+:term:`OpenEmbedded-Core (OE-Core)`.
 Because available files reside in this directory, you can create and add
 your own custom files to the directory. Subsequent use of the
 ``wic list images`` command would then include your kickstart files.
@@ -542,15 +542,15 @@ The example begins by making a copy of the ``directdisk-gpt.wks`` file
 in the ``scripts/lib/image/canned-wks`` directory and then by changing
 the lines that specify the target disk from which to boot::
 
-   $ cp /home/stephano/yocto/poky/scripts/lib/wic/canned-wks/directdisk-gpt.wks \
-        /home/stephano/yocto/poky/scripts/lib/wic/canned-wks/directdisksdb-gpt.wks
+   $ cp /home/stephano/yocto/openembedded-core/scripts/lib/wic/canned-wks/directdisk-gpt.wks \
+        /home/stephano/yocto/openembedded-core/scripts/lib/wic/canned-wks/directdisksdb-gpt.wks
 
 Next, the example modifies the ``directdisksdb-gpt.wks`` file and
 changes all instances of "``--ondisk sda``" to "``--ondisk sdb``". The
 example changes the following two lines and leaves the remaining lines
 untouched::
 
-   part /boot --source bootimg-pcbios --ondisk sdb --label boot --active --align 1024
+   part /boot --source bootimg_pcbios --ondisk sdb --label boot --active --align 1024
    part / --source rootfs --ondisk sdb --fstype=ext4 --label platform --align 1024 --use-uuid
 
 Once the lines are changed, the
@@ -580,7 +580,7 @@ Computing (nuc) :term:`MACHINE` the
      NATIVE_SYSROOT:               /home/stephano/yocto/build/tmp-glibc/work/i586-oe-linux/wic-tools/1.0-r0/recipe-sysroot-native
 
    INFO: The image(s) were created using OE kickstart file:
-     /home/stephano/yocto/poky/scripts/lib/wic/canned-wks/directdisksdb-gpt.wks
+     /home/stephano/yocto/openembedded-core/scripts/lib/wic/canned-wks/directdisksdb-gpt.wks
 
 Continuing with the example, you can now directly ``dd`` the image to a
 USB stick, or whatever media for which you built your image, and boot
@@ -717,7 +717,7 @@ the existing kernel, and then inserts a new kernel:
    kernel::
 
       $ wic cp poky_sdk/tmp/work/qemux86-poky-linux/linux-yocto/4.12.12+git999-r0/linux-yocto-4.12.12+git999/arch/x86/boot/bzImage \
-               poky/build/tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1/vmlinuz
+               build/tmp/deploy/images/qemux86/core-image-minimal-qemux86.wic:1/vmlinuz
 
    Once the new kernel is added back into the image, you can use the
    ``dd`` command or :ref:`bmaptool

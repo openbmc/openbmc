@@ -24,9 +24,8 @@ grouped under the "Yocto Linux Kernel" heading in the
 Kernel development tools ("kern-tools") are also available in the Yocto Project
 Source Repositories under the "Yocto Linux Kernel" heading in the
 ``yocto-kernel-tools`` Git repository. The recipe that builds these
-tools is ``meta/recipes-kernel/kern-tools/kern-tools-native_git.bb`` in
-the :term:`Source Directory` (e.g.
-``poky``).
+tools is ``recipes-kernel/kern-tools/kern-tools-native_git.bb`` in
+:term:`OpenEmbedded-Core (OE-Core)`.
 
 Using Kernel Metadata in a Recipe
 =================================
@@ -357,9 +356,9 @@ kernel of a specific type (e.g. a real-time kernel). Syntactically, kernel
 types are no different than features as described in the
 ":ref:`kernel-dev/advanced:features`" section. The :term:`LINUX_KERNEL_TYPE`
 variable in the kernel recipe selects the kernel type. For example, in the
-``linux-yocto_4.12.bb`` kernel recipe found in ``poky/meta/recipes-kernel/linux``, a
+``linux-yocto_4.12.bb`` kernel recipe found in ``meta/recipes-kernel/linux``, a
 :ref:`require <bitbake-user-manual/bitbake-user-manual-metadata:\`\`require\`\` directive>`
-directive includes the ``poky/meta/recipes-kernel/linux/linux-yocto.inc`` file,
+directive includes the ``meta/recipes-kernel/linux/linux-yocto.inc`` file,
 which has the following statement that defines the default kernel type::
 
    LINUX_KERNEL_TYPE ??= "standard"
@@ -373,8 +372,7 @@ type as follows::
 .. note::
 
    You can find kernel recipes in the ``meta/recipes-kernel/linux`` directory
-   of the :ref:`overview-manual/development-environment:yocto project source repositories`
-   (e.g. ``poky/meta/recipes-kernel/linux/linux-yocto_4.12.bb``). See the
+   of the :ref:`overview-manual/development-environment:yocto project source repositories`. See the
    ":ref:`kernel-dev/advanced:using kernel metadata in a recipe`"
    section for more information.
 

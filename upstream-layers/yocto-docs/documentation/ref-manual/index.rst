@@ -17,6 +17,7 @@ Yocto Project Reference Manual
    structure
    classes
    tasks
+   fragments
    devtool-reference
    kickstart
    qa-checks

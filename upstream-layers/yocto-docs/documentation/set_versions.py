@@ -16,26 +16,19 @@ import collections
 import sys
 import os
 import itertools
-import re
 
-ourversion = None
-if len(sys.argv) == 2:
-    ourversion = sys.argv[1]
-
-ourversion = None
-if len(sys.argv) == 2:
-    ourversion = sys.argv[1]
-
-activereleases = ["walnascar", "scarthgap", "kirkstone"]
-devbranch = "whinlatter"
-ltsseries = ["scarthgap", "kirkstone"]
+# Order matters: most recent to least recent
+activereleases = ["whinlatter", "scarthgap", "kirkstone"]
+devbranch = "wrynose"
+ltsseries = ["wrynose", "scarthgap", "kirkstone"]
 
 # used by run-docs-builds to get the default page
-if ourversion == "getlatest":
+if len(sys.argv) > 1 and sys.argv[1] == "getlatest":
     print(activereleases[0])
     sys.exit(0)
 
 release_series = collections.OrderedDict()
+release_series["wrynose"] = "6.0"
 release_series["whinlatter"] = "5.3"
 release_series["walnascar"] = "5.2"
 release_series["styhead"] = "5.1"
@@ -71,7 +64,8 @@ release_series["laverne"] = "0.9"
 
 
 bitbake_mapping = {
-    "whinlatter" : "2.14",
+    "wrynose" : "2.18",
+    "whinlatter" : "2.16",
     "walnascar" : "2.12",
     "styhead" : "2.10",
     "scarthgap" : "2.8",
@@ -94,10 +88,21 @@ poky_mapping = {
     "3.1" : "23.0",
 }
 
+ourversion = None
 ourseries = None
 ourbranch = None
 bitbakeversion = None
 docconfver = None
+head_commit = None
+is_branch_tip = False
+
+# Test that we are building from a Git repository
+try:
+    subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+except subprocess.CalledProcessError:
+    sys.exit("Building yocto-docs must be done from its Git repository.\n"
+             "Clone the documentation repository with the following command:\n"
+             "git clone https://git.yoctoproject.org/yocto-docs ")
 
 # Test tags exist and inform the user to fetch if not
 try:
@@ -110,29 +115,30 @@ tags = subprocess.run(["git", "tag", "--points-at", "HEAD"], stdout=subprocess.P
 for t in tags.split():
     if t.startswith("yocto-"):
         ourversion = t[6:]
+        seriesversion = ".".join(ourversion.split(".")[0:2])
+        for series in release_series:
+            if release_series[series] == seriesversion:
+                ourseries = series
+                bitbakeversion = bitbake_mapping[ourseries]
+                break
+        break
 
-if ourversion:
-    # We're a tagged release
-    components = ourversion.split(".")
-    baseversion = components[0] + "." + components[1]
-    docconfver = ourversion
-    for i in release_series:
-        if release_series[i] == baseversion:
-            ourseries = i
-            ourbranch = i
-            if i in bitbake_mapping:
-                bitbakeversion = bitbake_mapping[i]
-else:
+if ourversion is None:
     # We're floating on a branch
-    branch = subprocess.run(["git", "branch", "--show-current"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout.strip()
-    ourbranch = branch
-    if branch != "master" and branch not in release_series:
-        # We're not on a known release branch so we have to guess. Compare the numbers of commits
-        # from each release branch and assume the smallest number of commits is the one we're based off
+    branch = subprocess.run(["git", "branch", "--show-current"],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            universal_newlines=True).stdout.strip()
+
+    if branch == "" or branch not in list(release_series.keys()) + ["master", "master-next"]:
+        # We're not on a known release branch so we have to guess. Compare the
+        # numbers of commits from each release branch and assume the smallest
+        # number of commits is the one we're based off
         possible_branch = None
         branch_count = 0
         for b in itertools.chain(release_series.keys(), ["master"]):
-            result = subprocess.run(["git", "log", "--format=oneline",  "HEAD..origin/" + b], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+            result = subprocess.run(["git", "log", "--format=oneline", "HEAD..origin/" + b],
+                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                    universal_newlines=True)
             if result.returncode == 0:
                 count = result.stdout.count('\n')
                 if not possible_branch or count < branch_count:
@@ -144,35 +150,36 @@ else:
         else:
             branch = "master"
         print("Nearest release branch estimated to be %s" % branch)
+
     if branch == "master":
+        ourversion = "dev"
         ourseries = devbranch
-        docconfver = "dev"
-        bitbakeversion = "dev"
-    elif branch in release_series:
+        bitbakeversion = ourversion
+    elif branch == "master-next":
+        ourversion = "next"
+        ourseries = devbranch
+        bitbakeversion = ourversion
+    else:
         ourseries = branch
-        if branch in bitbake_mapping:
-            bitbakeversion = bitbake_mapping[branch]
-    else:
-        sys.exit("Unknown series for branch %s" % branch)
-
-    previoustags = subprocess.run(["git", "tag", "--merged", "HEAD"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
-    previoustags = [t[6:] for t in previoustags.split() if t.startswith("yocto-" + release_series[ourseries])]
-    futuretags = subprocess.run(["git", "tag", "--merged", ourbranch], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
-    futuretags = [t[6:] for t in futuretags.split() if t.startswith("yocto-" + release_series[ourseries])]
-
-    # Append .999 against the last known version
-    if len(previoustags) != len(futuretags):
-        ourversion = previoustags[-1] + ".999"
-    else:
-        ourversion = release_series[ourseries] + ".999"
-    if not docconfver:
-        docconfver = ourversion
+        bitbakeversion = bitbake_mapping[ourseries]
+        ourversion = release_series[branch]
+        head_commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                     universal_newlines=True).stdout.strip()
+        branch_commit = subprocess.run(["git", "rev-parse", "--short", branch],
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        universal_newlines=True).stdout.strip()
+        if head_commit != branch_commit:
+            ourversion += f"-{head_commit}"
+        else:
+            is_branch_tip = True
+            ourversion += "-tip"
 
 series = [k for k in release_series]
 previousseries = series[series.index(ourseries)+1:] or [""]
 lastlts = [k for k in previousseries if k in ltsseries] or "dunfell"
 
-latestreltag = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "--match", "yocto-*"], capture_output=True, text=True).stdout
+latestreltag = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "--match", "yocto-*"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
 latestreltag = latestreltag.strip()
 if latestreltag:
     if latestreltag.startswith("yocto-"):
@@ -186,16 +193,38 @@ else:
 print("Version calculated to be %s" % ourversion)
 print("Latest release tag found is %s" % latestreltag)
 print("Release series calculated to be %s" % ourseries)
+print("Bitbake version calculated to be %s" % bitbakeversion)
+
+# The &DISTRO; replacement will be mostly right when just equaling ourversion.
+# When we're on a random commit, in that case the DISTRO value will
+# contain the hash. This would for example be "5.3-4d2acc043".
+# This will not happen when publishing the documentation from the
+# autobuilder as we don't build specific commits - this should only happen
+# for development.
+distro = ourversion
+# Few exceptions though:
+if is_branch_tip:
+    # we're on a branch tip, in that case the closest match is the latest tag
+    # from that branch. Some instructions rely on DISTRO to provide tag names,
+    # etc. so it makes sense provide the latest tag from that branch.
+    distro = latesttag
+elif distro in ["dev", "next"]:
+    # When building on master or master-next, make the distro the version of the
+    # devbranch.
+    distro = release_series[devbranch]
+
+print(f"DISTRO calculated to be {distro}")
 
 replacements = {
-    "DISTRO" : ourversion,
+    "DISTRO" : distro,
     "DISTRO_LATEST_TAG": latesttag,
+    "DISTRO_RELEASE_SERIES": release_series[ourseries],
     "DISTRO_NAME_NO_CAP" : ourseries,
     "DISTRO_NAME" : ourseries.capitalize(),
     "DISTRO_NAME_NO_CAP_MINUS_ONE" : previousseries[0],
     "DISTRO_NAME_NO_CAP_LTS" : lastlts[0],
     "YOCTO_DOC_VERSION" : ourversion,
-    "DOCCONF_VERSION" : docconfver,
+    "DOCCONF_VERSION" : ourversion,
     "BITBAKE_SERIES" : bitbakeversion,
 }
 
@@ -220,39 +249,51 @@ if os.path.exists("poky.yaml.in"):
 
     print("poky.yaml generated from poky.yaml.in")
 
+def get_latest_tag(branch: str) -> str:
+    """
+    Get the latest tag of `branch`.
+    """
+    branch_versions = subprocess.run(["git", "tag", "--list", f'yocto-{release_series[branch]}*'],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                     universal_newlines=True).stdout.split()
+    branch_versions = sorted(
+        [v.replace("yocto-" +  release_series[branch] + ".", "")\
+         .replace("yocto-" + release_series[branch], "0") for v in branch_versions],
+        key=int)
+    if not branch_versions:
+        return ""
 
-# In the switcher list of versions we display:
-#  - latest dev
-#  - latest stable release
-#  - latest LTS
-#  - latest for each releases listed as active
-#  - latest doc version in current series
-#  - current doc version
-# (with duplicates removed)
+    version = release_series[branch]
+    if branch_versions[-1] != "0":
+        version = version + "." + branch_versions[-1]
+    return version
+
+def get_abbrev_hash(ref: str) -> str:
+    """
+    Get the abbreviated hash of 
+    """
+    return subprocess.run(["git", "rev-parse", "--short", ref],
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          universal_newlines=True).stdout.strip()
 
 versions = []
 with open("sphinx-static/switchers.js.in", "r") as r, open("sphinx-static/switchers.js", "w") as w:
     lines = r.readlines()
     for line in lines:
-        if "ALL_RELEASES_PLACEHOLDER" in line:
-            w.write(str(list(release_series.keys())))
-            continue
         if "VERSIONS_PLACEHOLDER" in line:
-            w.write("    'dev': { 'title': 'Unstable (dev)', 'obsolete': false,},\n")
-            for branch in activereleases + ([ourseries] if ourseries not in activereleases else []):
-                if branch == devbranch:
-                    continue
-                branch_versions = subprocess.run('git tag --list yocto-%s*' % (release_series[branch]), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout.split()
-                branch_versions = sorted([v.replace("yocto-" +  release_series[branch] + ".", "").replace("yocto-" +  release_series[branch], "0") for v in branch_versions], key=int)
-                if not branch_versions:
-                    continue
-                version = release_series[branch]
-                if branch_versions[-1] != "0":
-                    version = version + "." + branch_versions[-1]
-                versions.append(version)
-                w.write("    '%s': {'title': '%s (%s)', 'obsolete': %s,},\n" % (version, branch.capitalize(), version, str(branch not in activereleases).lower()))
-            if ourversion not in versions and ourseries != devbranch:
-                w.write("    '%s': {'title': '%s (%s)', 'obsolete': %s,},\n" % (ourversion, ourseries.capitalize(), ourversion, str(ourseries not in activereleases).lower()))
+            w.write(f"    'dev': {{'title': 'Unstable (dev)', 'hash': '{get_abbrev_hash('master')}'}},\n")
+            for branch in activereleases:
+                series = release_series[branch]
+                w.write(f"    '{series}-tip': {{'title': '{branch.capitalize()} ({get_latest_tag(branch)})', "
+                        f"'hash': '{get_abbrev_hash(branch)}'}},\n")
+        elif "ALL_RELEASES_PLACEHOLDER" in line:
+            for series in release_series:
+                w.write(f"    '{release_series[series]}': "
+                        f"{{'codename': '{series.capitalize()}', "
+                        f"'latest_tag': '{get_latest_tag(series)}'}},\n")
+        elif "LATEST_VERSION_PLACEHOLDER" in line:
+            latest_series = release_series[activereleases[0]]
+            w.write(f"    '{latest_series}-tip'\n")
         else:
             w.write(line)
 
@@ -260,35 +301,7 @@ print("switchers.js generated from switchers.js.in")
 
 # generate releases.rst
 
-# list missing tags in yocto-docs
-missing_tags = [
-        'yocto-0.9',
-        'yocto-1.0', 'yocto-1.0.1',
-        'yocto-1.1', 'yocto-1.1.1',
-        'yocto-1.2',
-        'yocto-1.4.4', 'yocto-1.4.5',
-        'yocto-1.5', 'yocto-1.5.2', 'yocto-1.5.3', 'yocto-1.5.4',
-        'yocto-1.6', 'yocto-1.6.1', 'yocto-1.6.2',
-        'yocto-1.7', 'yocto-1.7.1',
-        'yocto-1.9',
-        'yocto-2.5.3',
-        'yocto-3.1', 'yocto-3.1.1', 'yocto-3.1.2', 'yocto-3.1.3',
-        ]
-
-semver = re.compile(r'yocto-(\d+)\.(\d+)(?:\.)?(\d*)')
-
-# git is able to properly order semver versions but not python
-# instead of adding a dependency on semver module, let's convert the version
-# into a decimal number, e.g. 11.23.1 will be 112301 and 1.5 will be 010500 so
-# it can be used as a key for the sorting algorithm.
-# This can be removed once all the old tags are re-created.
-def tag_to_semver_like(v):
-    v_semver = semver.search(v)
-    v_maj, v_min, v_patch = v_semver.groups('0')
-    return int("{:0>2}{:0>2}{:0>2}".format(v_maj, v_min, v_patch), 10)
-
-yocto_tags = subprocess.run(["git", "tag", "--list", "--sort=version:refname", "yocto-*"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
-yocto_tags = sorted(yocto_tags.split() + missing_tags, key=tag_to_semver_like)
+yocto_tags = subprocess.run(["git", "tag", "--list", "--sort=version:refname", "yocto-*"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout.split()
 tags = [tag[6:] for tag in yocto_tags]
 
 with open('releases.rst', 'w') as f:

@@ -21,7 +21,7 @@ follows:
 The toolchain configuration is very flexible and customizable. It
 is primarily controlled with the :term:`TCMODE` variable. This variable
 controls which ``tcmode-*.inc`` file to include from the
-``meta/conf/distro/include`` directory within the :term:`Source Directory`.
+``meta/conf/distro/include`` directory within :term:`OpenEmbedded-Core (OE-Core)`.
 
 The default value of :term:`TCMODE` is "default", which tells the
 OpenEmbedded build system to use its internally built toolchain (i.e.

@@ -58,53 +58,56 @@ Supported Linux Distributions
 Currently, the &DISTRO; release ("&DISTRO_NAME;") of the Yocto Project is
 supported on the following distributions:
 
--  Ubuntu 22.04 (LTS)
-
--  Ubuntu 24.04 (LTS)
-
--  Ubuntu 24.10
-
--  Fedora 39
-
--  Fedora 40
-
--  Fedora 41
-
--  CentOS Stream 9
-
--  Debian GNU/Linux 11 (Bullseye)
-
--  Debian GNU/Linux 12 (Bookworm)
-
--  OpenSUSE Leap 15.5
-
--  OpenSUSE Leap 15.6
+..
+   Can be generated with yocto-autobuilder-helper's scripts/yocto-supported-distros.
+   yocto-supported-distros --release master --config yocto-autobuilder2/config.py --output-format docs
 
 -  AlmaLinux 8
-
 -  AlmaLinux 9
-
--  Rocky 8
-
--  Rocky 9
+-  CentOS Stream 9
+-  Debian GNU/Linux 11 (Bullseye)
+-  Debian GNU/Linux 12 (Bookworm)
+-  Debian GNU/Linux 13 (Trixie)
+-  Fedora 39
+-  Fedora 40
+-  Fedora 41
+-  Fedora 42
+-  OpenSUSE Leap 15.5
+-  OpenSUSE Leap 15.6
+-  Rocky Linux 8
+-  Rocky Linux 9
+-  Ubuntu 22.04 (LTS)
+-  Ubuntu 24.04 (LTS)
+-  Ubuntu 25.04
+-  Ubuntu 25.10
 
 The following distribution versions are still tested, even though the
 organizations publishing them no longer make updates publicly available:
 
--  Ubuntu 18.04 (LTS)
+..
+   This list contains EOL distros that are still tested on the Autobuilder
+   (meaning there are running workers).
+   See https://endoflife.date for information of EOL releases.
 
--  Ubuntu 20.04 (LTS)
-
--  Ubuntu 23.04
+-  Fedora 39
+-  Fedora 40
+-  OpenSUSE Leap 15.5
 
 Note that the Yocto Project doesn't have access to private updates
 that some of these versions may have. Therefore, our testing has
 limited value if you have access to such updates.  Also, :term:`buildtools`
 may have to be used on older releases in order to get current enough
-tools, such as python.
+tools, such as Python.
 
 Finally, here are the distribution versions which were previously
 tested on former revisions of "&DISTRO_NAME;", but no longer are:
+
+..
+   On the master branch it does not really make sense to fill this list. We
+   should maintain the list below on stable branches once we drop support for
+   distributions.
+   The list can be generated with yocto-autobuilder-helper's scripts/yocto-supported-distros:
+   yocto-supported-distros --release <release> --config yocto-autobuilder2/config.py --output-format docs --old-distros
 
 *This list is currently empty*
 
@@ -161,42 +164,14 @@ function.
 Ubuntu and Debian
 -----------------
 
-Here are the packages needed to build an image on a headless system
-with a supported Ubuntu or Debian Linux distribution:
-
-.. literalinclude:: ../tools/host_packages_scripts/ubuntu_essential.sh
-   :language: shell
-
-You also need to ensure you have the ``en_US.UTF-8`` locale enabled::
-
-   $ locale --all-locales | grep en_US.utf8
-
-If this is not the case, you can reconfigure the ``locales`` package to add it
-(requires an interactive shell)::
-
-   $ sudo dpkg-reconfigure locales
-
-.. note::
-
-   -  If you are not in an interactive shell, ``dpkg-reconfigure`` will
-      not work as expected. To add the locale you will need to edit
-      ``/etc/locale.gen`` file to add/uncomment the ``en_US.UTF-8`` locale.
-      A naive way to do this as root is::
-
-         $ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
-         $ locale-gen
-
-   -  If your build system has the ``oss4-dev`` package installed, you
-      might experience QEMU build failures due to the package installing
-      its own custom ``/usr/include/linux/soundcard.h`` on the Debian
-      system. If you run into this situation, try either of these solutions::
-
-         $ sudo apt build-dep qemu
-         $ sudo apt remove oss4-dev
+.. include:: ubuntu-debian-host-packages-nodocs.rst
 
 Here are the packages needed to build Project documentation manuals:
 
 .. literalinclude:: ../tools/host_packages_scripts/ubuntu_docs.sh
+   :language: shell
+
+.. literalinclude:: ../tools/host_packages_scripts/pip3_docs.sh
    :language: shell
 
 In addition to the previous packages, here are the packages needed to build the
@@ -281,18 +256,109 @@ Here are the packages needed to build Project documentation manuals:
 .. literalinclude:: ../tools/host_packages_scripts/pip3_docs.sh
    :language: shell
 
+In addition to the previous packages, the following TeX Live packages
+are needed to build the documentation in PDF format and can be installed with
+the `TeX Live package manager <https://tug.org/texlive/tlmgr.html>`__:
+
+.. literalinclude:: ../tools/host_packages_scripts/tlmgr_docs_pdf.sh
+   :language: shell
+
 .. warning::
 
-   Unlike Fedora or OpenSUSE, AlmaLinux does not provide the packages
-   ``texlive-collection-fontsextra``, ``texlive-collection-lang*`` and
-   ``texlive-collection-latexextra``, so you may run into issues. These may be
-   installed using `tlmgr <https://tug.org/texlive/tlmgr.html>`_.
+   The Tex Live installation above is only valid for `x86_64` hosts.
 
-In addition to the previous packages, here are the packages needed to build the
-documentation in PDF format:
+Before building the documentation PDF, setup the ``PATH`` to use the installed
+packages (with ``${textooldir}`` pointing to the TeX Live installation from the
+previous step):
 
-.. literalinclude:: ../tools/host_packages_scripts/almalinux_docs_pdf.sh
+.. code-block:: console
+
+   $ export PATH="${PATH}:${textooldir}/tl/bin/x86_64-linux"
+
+CentOS Stream Packages
+----------------------
+
+Here are the packages needed to build an image on a headless system
+with a supported CentOS Stream distribution:
+
+.. literalinclude:: ../tools/host_packages_scripts/centosstream_essential.sh
    :language: shell
+
+Here are the packages needed to build Project documentation manuals:
+
+.. literalinclude:: ../tools/host_packages_scripts/centosstream_docs.sh
+   :language: shell
+
+.. literalinclude:: ../tools/host_packages_scripts/pip3_docs.sh
+   :language: shell
+
+In addition to the previous packages, the following TeX Live packages
+are needed to build the documentation in PDF format and can be installed with
+the `TeX Live package manager <https://tug.org/texlive/tlmgr.html>`__:
+
+.. literalinclude:: ../tools/host_packages_scripts/tlmgr_docs_pdf.sh
+   :language: shell
+
+.. warning::
+
+   The Tex Live installation above is only valid for `x86_64` hosts.
+
+Before building the documentation PDF, setup the ``PATH`` to use the installed
+packages (with ``${textooldir}`` pointing to the TeX Live installation from the
+previous step):
+
+.. code-block:: console
+
+   $ export PATH="${PATH}:${textooldir}/tl/bin/x86_64-linux"
+
+RockyLinux Packages
+-------------------
+
+Here are the packages needed to build an image on a headless system
+with a supported RockyLinux distribution:
+
+.. literalinclude:: ../tools/host_packages_scripts/rockylinux_essential.sh
+   :language: shell
+
+.. note::
+
+   -  Extra Packages for Enterprise Linux (i.e. ``epel-release``) is
+      a collection of packages from Fedora built on RHEL/CentOS for
+      easy installation of packages not included in enterprise Linux
+      by default. You need to install these packages separately.
+
+   -  The ``PowerTools/CRB`` repo provides additional packages such as
+      ``rpcgen`` and ``texinfo``.
+
+   -  The ``makecache`` command consumes additional Metadata from
+      ``epel-release``.
+
+Here are the packages needed to build Project documentation manuals:
+
+.. literalinclude:: ../tools/host_packages_scripts/rockylinux_docs.sh
+   :language: shell
+
+.. literalinclude:: ../tools/host_packages_scripts/pip3_docs.sh
+   :language: shell
+
+In addition to the previous packages, the following TeX Live packages
+are needed to build the documentation in PDF format and can be installed with
+the `TeX Live package manager <https://tug.org/texlive/tlmgr.html>`__:
+
+.. literalinclude:: ../tools/host_packages_scripts/tlmgr_docs_pdf.sh
+   :language: shell
+
+.. warning::
+
+   The Tex Live installation above is only valid for `x86_64` hosts.
+
+Before building the documentation PDF, setup the ``PATH`` to use the installed
+packages (with ``${textooldir}`` pointing to the TeX Live installation from the
+previous step):
+
+.. code-block:: console
+
+   $ export PATH="${PATH}:${textooldir}/tl/bin/x86_64-linux"
 
 .. _system-requirements-buildtools:
 
@@ -342,8 +408,8 @@ installer and automatically installs the tools for you:
 
 #. Execute the ``install-buildtools`` script. Here is an example::
 
-      $ cd poky
-      $ scripts/install-buildtools \
+      $ cd /path/to/bitbake-builds
+      $ ./layers/openembedded-core/scripts/install-buildtools \
         --without-extended-buildtools \
         --base-url &YOCTO_DL_URL;/releases/yocto \
         --release yocto-&DISTRO; \
@@ -357,26 +423,26 @@ installer and automatically installs the tools for you:
    To avoid the need of ``sudo`` privileges, the ``install-buildtools``
    script will by default tell the installer to install in::
 
-      /path/to/poky/buildtools
+      /path/to/bitbake-builds/buildtools
 
    If your host development system needs the additional tools provided
    in the :term:`buildtools-extended` tarball, you can instead execute the
    ``install-buildtools`` script with the default parameters::
 
-      $ cd poky
-      $ scripts/install-buildtools
+      $ cd /path/to/bitbake-builds
+      $ ./layers/openembedded-core/scripts/install-buildtools
 
    Alternatively if your host development system has a broken ``make``
    version such that you only need a known good version of ``make``,
    you can use the ``--make-only`` option::
 
-      $ cd poky
-      $ scripts/install-buildtools --make-only
+      $ cd /path/to/bitbake-builds
+      $ ./layers/openembedded-core/scripts/install-buildtools --make-only
 
 #. Source the tools environment setup script by using a command like the
    following::
 
-      $ source /path/to/poky/buildtools/environment-setup-x86_64-pokysdk-linux
+      $ source /path/to/bitbake-builds/buildtools/environment-setup-x86_64-pokysdk-linux
 
    After you have sourced the setup script, the tools are added to
    ``PATH`` and any other environment variables required to run the

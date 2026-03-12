@@ -4,29 +4,26 @@
 # You can set these variables from the command line, and also
 # from the environment for the first two.
 SPHINXOPTS     ?= -W --keep-going -j auto
-SPHINXBUILD    ?= sphinx-build
+SPHINXBUILD    ?= python3 -m sphinx
 # Release notes are excluded because they contain contributor names and commit messages which can't be modified
 VALEOPTS       ?= --no-wrap --glob '!migration-guides/release-notes-*.rst'
 SOURCEDIR      = .
 VALEDOCS       ?= $(SOURCEDIR)
 SPHINXLINTDOCS ?= $(SOURCEDIR)
-IMAGEDIRS      = */svg
 BUILDDIR       = _build
 DESTDIR        = final
-SVG2PNG        = rsvg-convert
-SVG2PDF        = rsvg-convert
 
-ifeq ($(shell if which $(SPHINXBUILD) >/dev/null 2>&1; then echo 1; else echo 0; fi),0)
-$(error "The '$(SPHINXBUILD)' command was not found. Make sure you have Sphinx installed")
+ifeq ($(shell if $(SPHINXBUILD) --version >/dev/null 2>&1; then echo 1; else echo 0; fi),0)
+$(error "Sphinx was not found. Make sure you have it installed")
 endif
 
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: all help Makefile clean stylecheck publish epub latexpdf
+.PHONY: all checks help Makefile clean stylecheck publish latexpdf
 
-publish: Makefile epub latexpdf html singlehtml
+publish: Makefile checks epub latexpdf html singlehtml
 	rm -rf $(BUILDDIR)/$(DESTDIR)/
 	mkdir -p $(BUILDDIR)/$(DESTDIR)/
 	cp -r $(BUILDDIR)/html/* $(BUILDDIR)/$(DESTDIR)/
@@ -35,22 +32,11 @@ publish: Makefile epub latexpdf html singlehtml
 	cp $(BUILDDIR)/singlehtml/index.html $(BUILDDIR)/$(DESTDIR)/singleindex.html
 	sed -i -e 's@index.html#@singleindex.html#@g' $(BUILDDIR)/$(DESTDIR)/singleindex.html
 
-# Build a list of SVG files to convert to PDFs
-PDFs := $(foreach dir, $(IMAGEDIRS), $(patsubst %.svg,%.pdf,$(wildcard $(SOURCEDIR)/$(dir)/*.svg)))
-
-# Build a list of SVG files to convert to PNGs
-PNGs := $(foreach dir, $(IMAGEDIRS), $(patsubst %.svg,%.png,$(wildcard $(SOURCEDIR)/$(dir)/*.svg)))
-
-# Pattern rule for converting SVG to PDF
-%.pdf : %.svg
-	$(SVG2PDF) --format=Pdf --output=$@ $<
-
-# Pattern rule for converting SVG to PNG
-%.png : %.svg
-	$(SVG2PNG) --format=Png --output=$@ $<
-
 clean:
-	@rm -rf $(BUILDDIR) $(PNGs) $(PDFs) poky.yaml sphinx-static/switchers.js releases.rst
+	@rm -rf $(BUILDDIR) poky.yaml sphinx-static/switchers.js releases.rst
+
+checks:
+	$(SOURCEDIR)/tools/check-glossaries --docs-dir $(SOURCEDIR)
 
 stylecheck:
 	vale sync
@@ -59,16 +45,12 @@ stylecheck:
 sphinx-lint:
 	sphinx-lint $(SPHINXLINTDOCS)
 
-epub: $(PNGs)
-	$(SOURCEDIR)/set_versions.py
-	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
-
 # Note: we need to pass buf_size here (which is also configurable from
 # texmf.cnf), to avoid following error:
 #   Unable to read an entire line---bufsize=200000. Please increase buf_size in texmf.cnf.
-latexpdf: $(PDFs)
+latexpdf:
 	$(SOURCEDIR)/set_versions.py
-	buf_size=10000000 $(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	buf_size=10000000 LATEXMKOPTS="-silent" $(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 all: html epub latexpdf
 

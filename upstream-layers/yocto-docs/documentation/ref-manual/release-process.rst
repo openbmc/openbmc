@@ -45,6 +45,45 @@ release process validates the content of the new branch.
    Realize that there can be patches merged onto the stable release
    branches as and when they become available.
 
+.. _ref-yp-development-cycle:
+
+Development Cycle
+=================
+
+As explained in the previous :ref:`ref-manual/release-process:Major and Minor
+Release Cadence` section, a new release comes out every six months.
+
+During this six-months period of time, the Yocto Project releases four
+"Milestone" releases which represent distinct points of time. The milestone
+releases are tested through the :ref:`ref-manual/release-process:Testing and
+Quality Assurance` process and helps spotting issues before the actual release
+is out.
+
+The time span between milestone releases can vary, but they are in general
+evenly spaced out during this six-months period of time.
+
+These milestone releases are tagged with a capital "M" after the future release
+tag name. For example, the milestone tags "&DISTRO_RELEASE_SERIES;M1",
+"&DISTRO_RELEASE_SERIES;M2", and "&DISTRO_RELEASE_SERIES;M3" are released before
+the actual "&DISTRO_RELEASE_SERIES;" release.
+
+.. note::
+
+   The fourth milestone (M4) is not actually released and announced, but
+   represents a point of time for the Quality Assurance team to start the
+   :ref:`ref-manual/release-process:Testing and Quality Assurance` process
+   before tagging and delivering the final release.
+
+After the third milestone release (M3), the Yocto Project enters **Feature
+Freeze**. This means that the maintainers of :term:`OpenEmbedded-Core
+(OE-Core)`, :term:`BitBake` and other core repositories stop accepting
+significant changes on the "master" branch. Changes that may be accepted are
+minor upgrades to core components and security/bug fixes.
+
+During feature freeze, a new branch is created and maintained separately to
+test new features and enhancements received from contributors, but these changes
+will only make it to the master branch after the release is out.
+
 Major Release Codenames
 =======================
 
@@ -62,7 +101,8 @@ codename are likely to be compatible and thus work together.
 
 Releases are given a nominal release version as well but the codename is
 used in repositories for this reason. You can find information on Yocto
-Project releases and codenames at :yocto_wiki:`/Releases`.
+Project releases and codenames in the :yocto_home:`Releases page
+</development/releases/>`.
 
 Our :doc:`/migration-guides/index` detail how to migrate from one release of
 the Yocto Project to the next.
@@ -192,10 +232,12 @@ efficiently.
 
 The Yocto Project's main :yocto_ab:`Autobuilder <>` publicly tests each Yocto
 Project release's code in the :oe_git:`openembedded-core </openembedded-core>`,
-:yocto_git:`poky </poky>` and :oe_git:`bitbake </bitbake>` repositories. The
+:yocto_git:`meta-yocto </meta-yocto>` and :oe_git:`bitbake </bitbake>` repositories. The
 testing occurs for both the current state of the "master" branch and also for
-submitted patches. Testing for submitted patches usually occurs in the
-in the "master-next" branch in the :yocto_git:`poky </poky>` repository.
+submitted patches. Testing for submitted patches usually occurs
+in the "master-next" branch in the :oe_git:`openembedded-core
+</openembedded-core>`, :yocto_git:`meta-yocto </meta-yocto>` and
+:oe_git:`bitbake </bitbake>` repository.
 
 .. note::
 

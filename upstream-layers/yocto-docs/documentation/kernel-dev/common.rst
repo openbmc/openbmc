@@ -22,21 +22,13 @@ Preparing the Build Host to Work on the Kernel
 Before you can do any kernel development, you need to be sure your build
 host is set up to use the Yocto Project. For information on how to get
 set up, see the ":doc:`/dev-manual/start`" section in
-the Yocto Project Development Tasks Manual. Part of preparing the system
-is creating a local Git repository of the
-:term:`Source Directory` (``poky``) on your system. Follow the steps in the
-":ref:`dev-manual/start:cloning the \`\`poky\`\` repository`"
-section in the Yocto Project Development Tasks Manual to set up your
-Source Directory.
+the Yocto Project Development Tasks Manual.
 
 .. note::
 
    Be sure you check out the appropriate development branch or you
    create your local branch by checking out a specific tag to get the
-   desired version of Yocto Project. See the
-   ":ref:`dev-manual/start:checking out by branch in poky`" and
-   ":ref:`dev-manual/start:checking out by tag in poky`"
-   sections in the Yocto Project Development Tasks Manual for more information.
+   desired version of Yocto Project.
 
 Kernel development is best accomplished using
 :ref:`devtool <sdk-manual/extensible:using \`\`devtool\`\` in your sdk workflow>`
@@ -52,25 +44,15 @@ image and ready to make modifications as described in the
 ":ref:`kernel-dev/common:using \`\`devtool\`\` to patch the kernel`"
 section:
 
-#. *Initialize the BitBake Environment:*
-   you need to initialize the BitBake build environment by sourcing
-   the build environment script (i.e. :ref:`structure-core-script`)::
-
-      $ cd poky
-      $ source oe-init-build-env
-
-   .. note::
-
-      The previous commands assume the
-      :ref:`overview-manual/development-environment:yocto project source repositories`
-      (i.e. ``poky``) have been cloned using Git and the local repository is named
-      "poky".
+#. *Initialize the Build Environment:* Follow the :doc:`/dev-manual/start`
+   section of the Yocto Project Development Tasks Manual in order to have a
+   ready-to-use shell that can execute ``devtool``.
 
 #. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable
    is set to "qemux86-64", which is fine if you are building for the QEMU
    emulator in 64-bit mode. However, if you are not, you need to set the
    :term:`MACHINE` variable appropriately in your ``conf/local.conf`` file
-   found in the :term:`Build Directory` (i.e.  ``poky/build`` in this example).
+   found in the :term:`Build Directory` (i.e.  ``bitbake-builds/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
    to set the :term:`MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS` variable to include
@@ -87,10 +69,10 @@ section:
    patches created for the kernel image. You can use the
    ``bitbake-layers create-layer`` command as follows::
 
-      $ cd poky/build
-      $ bitbake-layers create-layer ../../meta-mylayer
+      $ cd bitbake-builds/build
+      $ bitbake-layers create-layer ../layers/meta-mylayer
       NOTE: Starting bitbake server...
-      Add your new layer with 'bitbake-layers add-layer ../../meta-mylayer'
+      Add your new layer with 'bitbake-layers add-layer ../layers/meta-mylayer'
       $
 
    .. note::
@@ -103,7 +85,7 @@ section:
       Support (BSP) Developer's Guide, respectively. For information on how to
       use the ``bitbake-layers create-layer`` command to quickly set up a layer,
       see the
-      ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`"
+      ":ref:`dev-manual/layers:Creating Your Own Layer`"
       section in the Yocto Project Development Tasks Manual.
 
 #. *Inform the BitBake Build Environment About Your Layer:* As directed
@@ -111,7 +93,7 @@ section:
    :term:`BBLAYERS` variable in the
    ``bblayers.conf`` file as follows::
 
-      $ cd poky/build
+      $ cd bitbake-builds/build
       $ bitbake-layers add-layer ../../meta-mylayer
       NOTE: Starting bitbake server...
       $
@@ -158,34 +140,14 @@ this procedure leaves you ready to make modifications to the kernel
 source as described in the ":ref:`kernel-dev/common:using traditional kernel development to patch the kernel`"
 section:
 
-#. *Initialize the BitBake Environment:* Before you can do anything
-   using BitBake, you need to initialize the BitBake build environment
-   by sourcing the build environment script (i.e.
-   :ref:`structure-core-script`).
-   Also, for this example, be sure that the local branch you have
-   checked out for ``poky`` is the Yocto Project &DISTRO_NAME; branch. If
-   you need to checkout out the &DISTRO_NAME; branch, see the
-   ":ref:`dev-manual/start:checking out by branch in poky`"
-   section in the Yocto Project Development Tasks Manual::
-
-      $ cd poky
-      $ git branch
-      master
-      * &DISTRO_NAME_NO_CAP;
-      $ source oe-init-build-env
-
-   .. note::
-
-      The previous commands assume the
-      :ref:`overview-manual/development-environment:yocto project source repositories`
-      (i.e. ``poky``) have been cloned using Git and the local repository is named
-      "poky".
+#. *Initialize the BitBake Environment:* Follow the steps in the
+   :doc:`/dev-manual/start` section of the Yocto Project Development Tasks Manual.
 
 #. *Prepare Your local.conf File:* By default, the :term:`MACHINE` variable is
    set to "qemux86-64", which is fine if you are building for the QEMU emulator
    in 64-bit mode. However, if you are not, you need to set the :term:`MACHINE`
    variable appropriately in your ``conf/local.conf`` file found in the
-   :term:`Build Directory` (i.e.  ``poky/build`` in this example).
+   :term:`Build Directory` (i.e.  ``bitbake-builds/build`` in this example).
 
    Also, since you are preparing to work on the kernel image, you need
    to set the
@@ -203,7 +165,7 @@ section:
    patches created for the kernel image. You can use the
    ``bitbake-layers create-layer`` command as follows::
 
-      $ cd poky/build
+      $ cd bitbake-builds/build
       $ bitbake-layers create-layer ../../meta-mylayer
       NOTE: Starting bitbake server...
       Add your new layer with 'bitbake-layers add-layer ../../meta-mylayer'
@@ -218,7 +180,7 @@ section:
       Support (BSP) Developer's Guide, respectively. For information on how to
       use the ``bitbake-layers create-layer`` command to quickly set up a layer,
       see the
-      ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`"
+      ":ref:`dev-manual/layers:Creating Your Own Layer`"
       section in the Yocto Project Development Tasks Manual.
 
 #. *Inform the BitBake Build Environment About Your Layer:* As directed
@@ -226,7 +188,7 @@ section:
    :term:`BBLAYERS` variable in the
    ``bblayers.conf`` file as follows::
 
-      $ cd poky/build
+      $ cd bitbake-builds/build
       $ bitbake-layers add-layer ../../meta-mylayer
       NOTE: Starting bitbake server ...
       $
@@ -238,8 +200,7 @@ section:
 
    For simplicity, it is recommended that you create your copy of the
    kernel Git repository outside of the
-   :term:`Source Directory`, which is
-   usually named ``poky``. Also, be sure you are in the
+   :term:`Source Directory`. Also, be sure you are in the
    ``standard/base`` branch.
 
    The following commands show how to create a local copy of the
@@ -265,8 +226,7 @@ section:
 #. *Create a Local Copy of the Kernel Cache Git Repository:* For
    simplicity, it is recommended that you create your copy of the kernel
    cache Git repository outside of the
-   :term:`Source Directory`, which is
-   usually named ``poky``. Also, for this example, be sure you are in
+   :term:`Source Directory`. Also, for this example, be sure you are in
    the ``yocto-4.12`` branch.
 
    The following commands show how to create a local copy of the
@@ -304,7 +264,7 @@ section in the Yocto Project Development Tasks Manual.
    The Yocto Project comes with many tools that simplify tasks you need
    to perform. One such tool is the ``bitbake-layers create-layer``
    command, which simplifies creating a new layer. See the
-   ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`"
+   ":ref:`dev-manual/layers:Creating Your Own Layer`"
    section in the Yocto Project Development Tasks Manual for
    information on how to use this script to quick set up a new layer.
 
@@ -362,8 +322,7 @@ Modifying an Existing Recipe
 In many cases, you can customize an existing linux-yocto recipe to meet
 the needs of your project. Each release of the Yocto Project provides a
 few Linux kernel recipes from which you can choose. These are located in
-the :term:`Source Directory` in
-``meta/recipes-kernel/linux``.
+:term:`OpenEmbedded-Core (OE-Core)` in ``meta/recipes-kernel/linux``.
 
 Modifying an existing recipe can consist of the following:
 
@@ -458,9 +417,8 @@ Although this particular example does not use it, the
 :term:`KERNEL_FEATURES`
 variable could be used to enable features specific to the kernel. The
 append file points to specific commits in the
-:term:`Source Directory` Git repository and
-the ``meta`` Git repository branches to identify the exact kernel needed
-to build the BSP.
+:term:`OpenEmbedded-Core (OE-Core)` Git repository branches to identify the
+exact kernel needed to build the BSP.
 
 One thing missing in this particular BSP, which you will typically need
 when developing a BSP, is the kernel configuration file (``.config``)
@@ -650,13 +608,9 @@ the Broadcom 2708/2709 chipset::
 
    KBUILD_DEFCONFIG:raspberrypi2 ?= "bcm2709_defconfig"
 
-Aside from modifying your kernel recipe and providing your own
-``defconfig`` file, you need to be sure no files or statements set
-:term:`SRC_URI` to use a ``defconfig`` other than your "in-tree" file (e.g.
-a kernel's ``linux-``\ `machine`\ ``.inc`` file). In other words, if the
-build system detects a statement that identifies an "out-of-tree"
-``defconfig`` file, that statement will override your
-:term:`KBUILD_DEFCONFIG` variable.
+If the build system detects a statement that identifies an "out-of-tree"
+``defconfig`` file, your :term:`KBUILD_DEFCONFIG` variable will take precedence
+over it.
 
 See the
 :term:`KBUILD_DEFCONFIG`
@@ -709,7 +663,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
 
               ERROR: Taskhash mismatch 2c793438c2d9f8c3681fd5f7bc819efa versus
                      be3a89ce7c47178880ba7bf6293d7404 for
-                     /path/to/esdk/layers/poky/meta/recipes-kernel/linux/linux-yocto_4.10.bb.do_unpack
+                     /path/to/esdk/layers/openembedded-core/meta/recipes-kernel/linux/linux-yocto_4.10.bb.do_unpack
 
 
       You can safely ignore these messages. The source code is correctly
@@ -720,11 +674,11 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
 
    #. *Change the working directory*: In the previous step, the output
       noted where you can find the source files (e.g.
-      ``poky_sdk/workspace/sources/linux-yocto``). Change to where the
+      ``build/workspace/sources/linux-yocto``). Change to where the
       kernel source code is before making your edits to the
       ``calibrate.c`` file::
 
-         $ cd poky_sdk/workspace/sources/linux-yocto
+         $ cd build/workspace/sources/linux-yocto
 
    #. *Edit the source file*: Edit the ``init/calibrate.c`` file to have
       the following changes::
@@ -790,7 +744,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
    your working directory to where you modified the ``calibrate.c`` file
    and use these Git commands to stage and commit your changes::
 
-      $ cd poky_sdk/workspace/sources/linux-yocto
+      $ cd build/workspace/sources/linux-yocto
       $ git status
       $ git add init/calibrate.c
       $ git commit -m "calibrate: Add printk example"
@@ -816,7 +770,7 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
    command from your :term:`Build Directory` in the terminal
    set up to run BitBake::
 
-      $ cd poky/build
+      $ cd bitbake-builds/build
       $ bitbake core-image-minimal
 
 Using Traditional Kernel Development to Patch the Kernel
@@ -900,7 +854,7 @@ Section.
    :term:`SRCREV` statements similar
    to the following to your ``local.conf``::
 
-      $ cd poky/build/conf
+      $ cd bitbake-builds/build/conf
 
    Add the following to the ``local.conf``::
 
@@ -920,14 +874,14 @@ Section.
    committed, and the ``local.conf`` file pointing to the kernel files,
    you can now use BitBake to build the image::
 
-      $ cd poky/build
+      $ cd bitbake-builds/build
       $ bitbake core-image-minimal
 
 #. *Boot the image*: Boot the modified image in the QEMU emulator using
    this command. When prompted to login to the QEMU console, use "root"
    with no password::
 
-      $ cd poky/build
+      $ cd bitbake-builds/build
       $ runqemu qemux86
 
 #. *Look for Your Changes:* As QEMU booted, you might have seen your
@@ -991,14 +945,14 @@ Section.
 
       To build ``core-image-minimal`` again and see the effects of your patch,
       you can essentially eliminate the temporary source files saved in
-      ``poky/build/tmp/work/...`` and residual effects of the build by entering
+      ``bitbake-builds/build/tmp/work/...`` and residual effects of the build by entering
       the following sequence of commands::
 
-              $ cd poky/build
-              $ bitbake -c cleanall linux-yocto
-              $ bitbake core-image-minimal -c cleanall
-              $ bitbake core-image-minimal
-              $ runqemu qemux86
+         $ cd bitbake-builds/build
+         $ bitbake -c cleanall linux-yocto
+         $ bitbake core-image-minimal -c cleanall
+         $ bitbake core-image-minimal
+         $ runqemu qemux86
 
 
 Configuring the Kernel
@@ -1045,10 +999,10 @@ environment, you must do the following:
 The following commands initialize the BitBake environment, run the
 :ref:`ref-tasks-kernel_configme`
 task, and launch ``menuconfig``. These commands assume the Source
-Directory's top-level folder is ``poky``::
+Directory's top-level folder is ``work``::
 
-   $ cd poky
-   $ source oe-init-build-env
+   $ cd work
+   $ source layers/openembedded-core/oe-init-build-env
    $ bitbake linux-yocto -c kernel_configme -f
    $ bitbake linux-yocto -c menuconfig
 
@@ -1095,7 +1049,7 @@ the ``.config`` file would be:
 
 .. code-block:: none
 
-   poky/build/tmp/work/qemux86-poky-linux/linux-yocto/4.12.12+gitAUTOINC+eda4d18...
+   bitbake-builds/build/tmp/work/qemux86-poky-linux/linux-yocto/4.12.12+gitAUTOINC+eda4d18...
    ...967-r0/linux-qemux86-standard-build/.config
 
 .. note::
@@ -1195,10 +1149,12 @@ appear in the ``.config`` file, which is in the :term:`Build Directory`.
 
 It is simple to create a configuration fragment. One method is to use
 shell commands. For example, issuing the following from the shell
-creates a configuration fragment file named ``my_smp.cfg`` that enables
-multi-processor support within the kernel::
+creates a configuration fragment file named ``my_changes.cfg`` that enables
+multi-processor support within the kernel and disables the FPGA
+Configuration Framework::
 
-   $ echo "CONFIG_SMP=y" >> my_smp.cfg
+   $ echo "CONFIG_SMP=y" >> my_changes.cfg
+   $ echo "# CONFIG_FPGA is not set" >> my_changes.cfg
 
 .. note::
 
@@ -1309,32 +1265,32 @@ Here is sample output from the :ref:`ref-tasks-kernel_configcheck` task:
 
    ---------- CONFIG_X86_TSC -----------------
    Config: CONFIG_X86_TSC
-   From: /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc-cpu.cfg
+   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc-cpu.cfg
    Requested value:  CONFIG_X86_TSC=y
    Actual value:
 
 
    ---------- CONFIG_X86_BIGSMP -----------------
    Config: CONFIG_X86_BIGSMP
-   From: /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
-         /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
+   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
+         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
    Requested value:  # CONFIG_X86_BIGSMP is not set
    Actual value:
 
 
    ---------- CONFIG_NR_CPUS -----------------
    Config: CONFIG_NR_CPUS
-   From: /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
-         /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc.cfg
-         /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
+   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
+         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/bsp/common-pc/common-pc.cfg
+         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
    Requested value:  CONFIG_NR_CPUS=8
    Actual value:     CONFIG_NR_CPUS=1
 
 
    ---------- CONFIG_SCHED_SMT -----------------
    Config: CONFIG_SCHED_SMT
-   From: /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
-         /home/scottrif/poky/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
+   From: /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/cfg/smp.cfg
+         /home/scottrif/bitbake-builds/build/tmp/work-shared/qemux86/kernel-source/.kernel-meta/configs/standard/defconfig
    Requested value:  CONFIG_SCHED_SMT=y
    Actual value:
 
@@ -1435,15 +1391,13 @@ Expanding Variables
 ===================
 
 Sometimes it is helpful to determine what a variable expands to during a
-build. You can examine the values of variables by examining the
-output of the ``bitbake -e`` command. The output is long and is more
-easily managed in a text file, which allows for easy searches::
+build. You can examine the value of a variable by running the ``bitbake-getvar``
+command::
 
-   $ bitbake -e virtual/kernel > some_text_file
+   $ bitbake-getvar -r virtual/kernel VARIABLE
 
-Within the text file, you can see
-exactly how each variable is expanded and used by the OpenEmbedded build
-system.
+The output of the command explains exactly how the variable is expanded and used
+by the :term:`OpenEmbedded Build System`.
 
 Working with a "Dirty" Kernel Version String
 ============================================
@@ -1491,11 +1445,9 @@ Maintaining format compatibility facilitates converging with linux-yocto
 on a future, mutually-supported kernel version.
 
 To help you use your own sources, the Yocto Project provides a
-linux-yocto custom recipe that uses ``kernel.org`` sources and
-the Yocto Project Linux kernel tools for managing kernel Metadata.
-You can find this recipe in the ``poky`` Git repository:
-:yocto_git:`meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb
-</poky/tree/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb>`.
+:oe_git:`linux-yocto custom recipe </openembedded-core/tree/meta-skeleton/recipes-kernel/linux/linux-yocto-custom.bb>`
+that uses ``kernel.org`` sources and the Yocto Project Linux kernel tools for
+managing kernel Metadata.
 
 Here are some basic steps you can use to work with your own sources:
 
@@ -1629,13 +1581,9 @@ Incorporating Out-of-Tree Modules
 
 While it is always preferable to work with sources integrated into the
 Linux kernel sources, if you need an external kernel module, the
-``hello-mod.bb`` recipe is available as a template from which you can
-create your own out-of-tree Linux kernel module recipe.
-
-This template recipe is located in the ``poky`` Git repository of the
-Yocto Project:
-:yocto_git:`meta-skeleton/recipes-kernel/hello-mod/hello-mod_0.1.bb
-</poky/tree/meta-skeleton/recipes-kernel/hello-mod/hello-mod_0.1.bb>`.
+:oe_git:`hello-mod </openembedded-core/tree/meta-skeleton/recipes-kernel/hello-mod/>`
+recipe is available as a template from which you can create your own out-of-tree
+Linux kernel module recipe.
 
 To get started, copy this recipe to your layer and give it a meaningful
 name (e.g. ``mymodule_1.0.bb``). In the same directory, create a new

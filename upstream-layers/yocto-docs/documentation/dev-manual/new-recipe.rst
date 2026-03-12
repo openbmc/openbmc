@@ -83,19 +83,20 @@ command::
    OpenEmbedded recipe tool
 
    options:
-     -d, --debug     Enable debug output
-     -q, --quiet     Print only errors
-     --color COLOR   Colorize output (where COLOR is auto, always, never)
-     -h, --help      show this help message and exit
+     -d, --debug       Enable debug output
+     -q, --quiet       Print only errors
+     --color COLOR     Colorize output (where COLOR is auto, always, never)
+     -h, --help        show this help message and exit
 
    subcommands:
-     create          Create a new recipe
-     newappend       Create a bbappend for the specified target in the specified
-                       layer
-     setvar          Set a variable within a recipe
-     appendfile      Create/update a bbappend to replace a target file
-     appendsrcfiles  Create/update a bbappend to add or replace source files
-     appendsrcfile   Create/update a bbappend to add or replace a source file
+     newappend         Create a bbappend for the specified target in the specified layer
+     create            Create a new recipe
+     setvar            Set a variable within a recipe
+     appendfile        Create/update a bbappend to replace a target file
+     appendsrcfiles    Create/update a bbappend to add or replace source files
+     appendsrcfile     Create/update a bbappend to add or replace a source file
+     edit              Edit the recipe and appends for the specified target. This obeys $VISUAL if set,
+                       otherwise $EDITOR, otherwise vi.
    Use recipetool <subcommand> --help to get help on a specific command
 
 Running ``recipetool create -o OUTFILE`` creates the base recipe and
@@ -219,18 +220,27 @@ compilation and packaging files, and so forth.
 
 The path to the per-recipe temporary work directory depends on the
 context in which it is being built. The quickest way to find this path
-is to have BitBake return it by running the following::
+is to use the ``bitbake-getvar`` utility::
 
-   $ bitbake -e basename | grep ^WORKDIR=
+   $ bitbake-getvar -r basename WORKDIR
 
-As an example, assume a Source Directory
-top-level folder named ``poky``, a default :term:`Build Directory` at
-``poky/build``, and a ``qemux86-poky-linux`` machine target system.
+As an example, assume a :term:`Source Directory`
+top-level folder named ``bitbake-builds``, a default :term:`Build Directory` at
+``bitbake-builds/build``, a ``cortexa57`` :term:`PACKAGE_ARCH`, ``poky``
+:term:`DISTRO` and ``linux`` as :term:`TARGET_OS`.
+
 Furthermore, suppose your recipe is named ``foo_1.3.0.bb``. In this
 case, the work directory the build system uses to build the package
 would be as follows::
 
-   poky/build/tmp/work/qemux86-poky-linux/foo/1.3.0-r0
+   bitbake-builds/build/tmp/work/cortexa57-poky-linux/foo/1.3.0
+
+.. note::
+
+   This covers the case when the :term:`PACKAGE_ARCH` variable is set to its
+   default value, :term:`TUNE_PKGARCH`. This variable is sometimes set to
+   :term:`MACHINE_ARCH`. See the documentation of the :term:`PACKAGE_ARCH`
+   variable for more information.
 
 Inside this directory you can find sub-directories such as ``image``,
 ``packages-split``, and ``temp``. After the build, you can examine these
@@ -239,7 +249,7 @@ to determine how well the build went.
 .. note::
 
    You can find log files for each task in the recipe's ``temp``
-   directory (e.g. ``poky/build/tmp/work/qemux86-poky-linux/foo/1.3.0-r0/temp``).
+   directory (e.g. ``bitbake-builds/build/tmp/work/cortexa57-poky-linux/foo/1.3.0/temp``).
    Log files are named ``log.taskname`` (e.g. ``log.do_configure``,
    ``log.do_fetch``, and ``log.do_compile``).
 
@@ -298,7 +308,7 @@ a ``+`` sign in its definition. Here is an example from the recipe
    SRC_URI = "git://github.com/stevenhoneyman/l3afpad.git;branch=master;protocol=https"
 
    PV = "0.8.18.1.11+git"
-   SRCREV ="3cdccdc9505643e50f8208171d9eee5de11a42ff"
+   SRCREV = "3cdccdc9505643e50f8208171d9eee5de11a42ff"
 
 If your :term:`SRC_URI` statement includes URLs pointing to individual files
 fetched from a remote server other than a version control system,
@@ -439,7 +449,7 @@ Licensing
 =========
 
 Your recipe needs to define variables related to the license
-under whith the software is distributed. See the
+under which the software is distributed. See the
 :ref:`contributor-guide/recipe-style-guide:recipe license fields`
 section in the Contributor Guide for details.
 
@@ -829,7 +839,7 @@ different ways:
 
    To enable a service using systemd, your recipe needs to inherit the
    :ref:`ref-classes-systemd` class. See the ``systemd.bbclass`` file
-   located in your :term:`Source Directory` section for more information.
+   located in :term:`OpenEmbedded-Core (OE-Core)` section for more information.
 
 Packaging
 =========
@@ -973,8 +983,8 @@ being able to provide the ``virtual/kernel`` item.
 Now comes the time to actually build an image and you need a kernel
 recipe, but which one? You can configure your build to call out the
 kernel recipe you want by using the :term:`PREFERRED_PROVIDER` variable. As
-an example, consider the :yocto_git:`x86-base.inc
-</poky/tree/meta/conf/machine/include/x86/x86-base.inc>` include file, which is a
+an example, consider the :oe_git:`x86-base.inc
+</openembedded-core/tree/meta/conf/machine/include/x86/x86-base.inc>` include file, which is a
 machine (i.e. :term:`MACHINE`) configuration file. This include file is the
 reason all x86-based machines use the ``linux-yocto`` kernel. Here are the
 relevant lines from the include file::
@@ -1461,8 +1471,10 @@ chapter of the BitBake User Manual.
       do_install () {
           autotools_do_install
           install -d ${D}${base_bindir}
-          mv ${D}${bindir}/sed ${D}${base_bindir}/sed
-          rmdir ${D}${bindir}/
+          if [ ! ${D}${bindir} -ef ${D}${base_bindir} ]; then
+              mv ${D}${bindir}/sed ${D}${base_bindir}/sed
+              rmdir ${D}${bindir}/
+          fi
       }
 
    It is

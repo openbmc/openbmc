@@ -133,12 +133,8 @@ your application or image. QEMU is not part of the SDK but is
 automatically installed and available if you have done any one of
 the following:
 
--  cloned the ``poky`` Git repository to create a
-   :term:`Source Directory` and sourced the environment setup script.
-
--  downloaded a Yocto Project release and unpacked it to
-   create a Source Directory and sourced the environment setup
-   script.
+-  Setup your :term:`Build Host` as described in the :doc:`/dev-manual/start`
+   section of the Yocto Project Development Tasks Manual.
 
 -  installed the cross-toolchain tarball and
    sourced the toolchain's setup environment script.
@@ -148,7 +144,7 @@ SDK Development Model
 
 Fundamentally, the SDK fits into the development process as follows:
 
-.. image:: figures/sdk-environment.png
+.. image:: svg/sdk-environment.*
    :width: 100%
 
 The SDK is installed on any machine and can be used to develop applications,

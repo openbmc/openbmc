@@ -1,0 +1,1 @@
+almalinux_essential.sh

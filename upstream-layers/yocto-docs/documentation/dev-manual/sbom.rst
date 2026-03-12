@@ -6,7 +6,7 @@ Creating a Software Bill of Materials
 Once you are able to build an image for your project, once the licenses for
 each software component are all identified (see
 ":ref:`dev-manual/licenses:working with licenses`") and once vulnerability
-fixes are applied (see ":ref:`dev-manual/vulnerabilities:checking
+fixes are applied (see ":ref:`security-manual/vulnerabilities:checking
 for vulnerabilities`"), the OpenEmbedded build system can generate
 a description of all the components you used, their licenses, their dependencies,
 their sources, the changes that were applied to them and the known
@@ -24,19 +24,12 @@ users can read in standardized format.
 :term:`SBOM` information is also critical to performing vulnerability exposure
 assessments, as all the components used in the Software Supply Chain are listed.
 
-The OpenEmbedded build system doesn't generate such information by default,
-though the :term:`Poky` reference distribution has it enabled out of the box.
+The OpenEmbedded build system generates such information by default (by
+inheriting the :ref:`ref-classes-create-spdx` class in :term:`INHERIT_DISTRO`).
 
-To enable it, inherit the :ref:`ref-classes-create-spdx` class from a
-configuration file::
+If needed, it can be disabled from a :term:`configuration file`::
 
-   INHERIT += "create-spdx"
-
-In the :term:`Poky` reference distribution, :term:`SPDX` generation does
-consume some build time resources and thus if needed it can be disabled from a
-:term:`configuration file`::
-
-   INHERIT:remove = "create-spdx"
+   INHERIT_DISTRO:remove = "create-spdx"
 
 Upon building an image, you will then get:
 
@@ -62,6 +55,12 @@ more information in the output :term:`SPDX` data:
 
 -  Add a description of the **compiled** source files used to generate host tools
    and target packages (:term:`SPDX_INCLUDE_COMPILED_SOURCES`)
+
+-  Export the Linux kernel configuration (``CONFIG_*`` parameters) into the
+   SPDX document (:term:`SPDX_INCLUDE_KERNEL_CONFIG`).
+
+-  Export the recipe's ``PACKAGECONFIG`` features (enabled/disabled) into the
+   SPDX document (:term:`SPDX_INCLUDE_PACKAGECONFIG`).
 
 -  Add archives of these source files themselves (:term:`SPDX_ARCHIVE_SOURCES`).
 

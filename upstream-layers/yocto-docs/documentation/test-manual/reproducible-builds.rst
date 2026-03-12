@@ -81,10 +81,10 @@ it always depends upon the paths it is built in.
 
 .. note::
 
-   Only BitBake and :term:`OpenEmbedded-Core (OE-Core)`, which is the ``meta``
-   layer in Poky, guarantee complete reproducibility. The moment you add
-   another layer, this warranty is voided, because of additional configuration
-   files, ``bbappend`` files, overridden classes, etc.
+   Only BitBake and :term:`OpenEmbedded-Core (OE-Core)` guarantee complete
+   reproducibility. The moment you add another layer, this warranty is voided,
+   because of additional configuration files, ``bbappend`` files, overridden
+   classes, etc.
 
 To run our automated selftest, as we use in our CI on the Autobuilder, you can
 run::
@@ -113,7 +113,7 @@ If ``OEQA_DEBUGGING_SAVED_OUTPUT`` is set, any differing packages will be saved
 here. The test is also able to run the ``diffoscope`` command on the output to
 generate HTML files showing the differences between the packages, to aid
 debugging. On the Autobuilder, these appear under
-https://autobuilder.yocto.io/pub/repro-fail/ in the form ``oe-reproducible +
+https://valkyrie.yocto.io/pub/repro-fail/ in the form ``oe-reproducible +
 <date> + <random ID>``, e.g. ``oe-reproducible-20200202-1lm8o1th``.
 
 The project's current reproducibility status can be seen at

@@ -69,7 +69,7 @@ box to "generate an email to QA" is also checked.
 When the build completes, an email is sent out using the ``send-qa-email``
 script in the :yocto_git:`yocto-autobuilder-helper </yocto-autobuilder-helper>`
 repository to the list of people configured for that release. Release builds
-are placed into a directory in https://autobuilder.yocto.io/pub/releases on the
+are placed into a directory in https://valkyrie.yocto.io/pub/releases on the
 Autobuilder which is included in the email. The process from here is
 more manual and control is effectively passed to release engineering.
 The next steps include:

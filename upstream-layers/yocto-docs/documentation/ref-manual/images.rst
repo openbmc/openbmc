@@ -26,9 +26,8 @@ image you want.
 
        INCOMPATIBLE_LICENSE:pn-your-image-name = "GPL-3.0* LGPL-3.0*"
 
-From within the ``poky`` Git repository, you can use the following
-command to display the list of directories within the :term:`Source Directory`
-that contain image recipe files::
+From within the :term:`OpenEmbedded-Core (OE-Core)` Git repository, you can use the following
+command to display the list of directories that contain image recipe files::
 
    $ ls meta*/recipes*/images/*.bb
 

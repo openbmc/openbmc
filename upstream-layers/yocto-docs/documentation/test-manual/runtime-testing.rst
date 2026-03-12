@@ -338,8 +338,8 @@ You can start the tests automatically or manually:
 
       bitbake -c testimage image
 
-All test files reside in ``meta/lib/oeqa/runtime/cases`` in the
-:term:`Source Directory`. A test name maps
+All test files reside in ``meta/lib/oeqa/runtime/cases`` in
+:term:`OpenEmbedded-Core (OE-Core)`. A test name maps
 directly to a Python module. Each test module may contain a number of
 individual tests. Tests are usually grouped together by the area tested
 (e.g tests for systemd reside in ``meta/lib/oeqa/runtime/cases/systemd.py``).
@@ -403,7 +403,7 @@ defined in :term:`TEST_SUITES`.
 If your image is already built, make sure the following are set in your
 ``local.conf`` file::
 
-   INHERIT += "testexport"
+   IMAGE_CLASSES += "testexport"
    TEST_TARGET_IP = "IP-address-for-the-test-target"
    TEST_SERVER_IP = "IP-address-for-the-test-server"
 
@@ -413,18 +413,23 @@ following BitBake command form::
    $ bitbake image -c testexport
 
 Exporting the tests places them in the :term:`Build Directory` in
-``tmp/testexport/``\ image, which is controlled by the :term:`TEST_EXPORT_DIR`
+``tmp/testimage/``\ image, which is controlled by the :term:`TEST_EXPORT_DIR`
 variable.
 
 You can now run the tests outside of the build environment::
 
-   $ cd tmp/testexport/image
-   $ ./runexported.py testdata.json
+   $ cd tmp/testimage/image
+   $ ./oe-test runtime
+
+.. note::
+
+   You might need to run the image under QEMU or deploy it to your
+   hardware before you can run the tests.
 
 Here is a complete example that shows IP addresses and uses the
 ``core-image-sato`` image::
 
-   INHERIT += "testexport"
+   IMAGE_CLASSES += "testexport"
    TEST_TARGET_IP = "192.168.7.2"
    TEST_SERVER_IP = "192.168.7.1"
 
@@ -435,8 +440,8 @@ Use BitBake to export the tests::
 Run the tests outside of
 the build environment using the following::
 
-   $ cd tmp/testexport/core-image-sato
-   $ ./runexported.py testdata.json
+   $ cd tmp/testimage/core-image-sato
+   $ ./oe-test runtime
 
 Writing New Tests
 =================

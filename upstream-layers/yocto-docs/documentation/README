@@ -1,33 +1,14 @@
 documentation
 =============
 
-This is the directory that contains the Yocto Project documentation.  The Yocto
-Project source repositories at https://git.yoctoproject.org/cgit.cgi have two
-instances of the "documentation" directory.  You should understand each of
-these instances.
+This is the directory that contains the Yocto Project documentation. The Yocto
+Project documentation is hosted at https://git.yoctoproject.org/yocto-docs:
 
-  poky/documentation - The directory within the poky Git repository containing
-                       the set of Yocto Project manuals.  When you clone the
-                       poky Git repository, the documentation directory
-                       contains the manuals.  The state of the manuals in this
-                       directory is guaranteed to reflect the latest Yocto
-                       Project release.  The manuals at the tip of this
-                       directory will also likely contain most manual
-                       development changes.
+This repository is where manual development occurs. If you plan on contributing
+back to the Yocto Project documentation, you should set up a local Git
+repository based on this upstream repository as follows:
 
-  yocto-docs/documentation - The Git repository for the Yocto Project manuals.
-                             This repository is where manual development
-                             occurs.  If you plan on contributing back to the
-                             Yocto Project documentation, you should set up
-                             a local Git repository based on this upstream
-                             repository as follows:
-
-                               git clone git://git.yoctoproject.org/yocto-docs
-
-                             Changes and patches are first pushed to the
-                             yocto-docs Git repository.  Later, they make it
-                             into the poky Git repository found at
-                             git://git.yoctoproject.org/poky.
+  git clone git://git.yoctoproject.org/yocto-docs
 
 Manual Organization
 ===================
@@ -261,14 +242,14 @@ For example, the following .rst content will produce the 'expected'
 content:
 
   .. code-block::
-      $ mkdir poky-&DISTRO;
+      $ mkdir bitbake-builds-&DISTRO;
       or
-      $ git clone &YOCTO_GIT_URL;/git/poky -b &DISTRO_NAME_NO_CAP;
+      $ git clone https://git.yoctoproject.org/yocto-docs -b &DISTRO_NAME_NO_CAP;
 
 Variables can be nested, like it was the case for DocBook:
 
-  YOCTO_HOME_URL : "https://www.yoctoproject.org"
-  YOCTO_DOCS_URL : "&YOCTO_HOME_URL;/docs"
+  DISTRO : "5.2"
+  DISTRO_REL_TAG : "yocto-$DISTRO;"
 
 Note directive
 ==============

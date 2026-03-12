@@ -23,12 +23,12 @@ comes to delivering embedded software stacks. The project allows
 software customizations and build interchange for multiple hardware
 platforms as well as software stacks that can be maintained and scaled.
 
-.. image:: figures/key-dev-elements.png
+.. image:: svg/key-dev-elements.*
     :width: 100%
 
 For further introductory information on the Yocto Project, you might be
 interested in this
-`article <https://www.embedded.com/electronics-blogs/say-what-/4458600/Why-the-Yocto-Project-for-my-IoT-Project->`__
+`article <https://www.embedded.com/why-the-yocto-project-for-my-iot-project/>`__
 by Drew Moseley and in this short introductory
 `video <https://www.youtube.com/watch?v=utZpKM7i5Z4>`__.
 
@@ -44,7 +44,7 @@ Here are features and advantages of the Yocto Project:
    system, software, and service vendors adopt and support the Yocto
    Project in their products and services. For a look at the Yocto
    Project community and the companies involved with the Yocto Project,
-   see the "COMMUNITY" and "ECOSYSTEM" tabs on the
+   see the "COMMUNITY" and "ABOUT" tabs on the
    :yocto_home:`Yocto Project <>` home page.
 
 -  *Architecture Agnostic:* Yocto Project supports Intel, ARM, MIPS, AMD, PPC,
@@ -62,10 +62,9 @@ Here are features and advantages of the Yocto Project:
    move between architectures without moving to new development
    environments. Additionally, if you have used the Yocto Project to
    create an image or application and you find yourself not able to
-   support it, commercial Linux vendors such as Wind River, Mentor
-   Graphics, Timesys, and ENEA could take it and provide ongoing
-   support. These vendors have offerings that are built using the Yocto
-   Project.
+   support it, commercial Linux vendors listed on :yocto_home:`/members/` and
+   :yocto_home:`/about/participants/` could take it and provide ongoing
+   support.
 
 -  *Flexibility:* Corporations use the Yocto Project many different
    ways. One example is to create an internal Linux distribution as a
@@ -174,11 +173,12 @@ Here are challenges you might encounter when developing using the Yocto Project:
    changes on the development system within the BitBake environment and
    then deploying only the updated packages to the target.
 
-   The Yocto Project :term:`OpenEmbedded Build System`
-   produces packages
-   in standard formats (i.e. RPM, DEB, IPK, and TAR). You can deploy
-   these packages into the running system on the target by using
-   utilities on the target such as ``rpm`` or ``ipk``.
+   The Yocto Project :term:`OpenEmbedded Build System` produces packages
+   in standard formats (i.e. RPM, DEB and/or IPK). If you included
+   :ref:`runtime package management<dev-manual/packages:using runtime package management>`
+   in your image, you can deploy these packages into the running system on the target
+   by using the corresponding utilities on the target such as
+   ``rpm``/``dnf``, ``dpkg``/``apt`` or ``opkg``.
 
 -  *Initial Build Times Can be Significant:* Long initial build times
    are unfortunately unavoidable due to the large number of packages
@@ -264,10 +264,9 @@ with the string ``meta-``.
    ``meta-``, but it is a commonly accepted standard in the Yocto Project
    community.
 
-For example, if you were to examine the :yocto_git:`tree view </poky/tree/>`
-of the ``poky`` repository, you will see several layers: ``meta``,
-``meta-skeleton``, ``meta-selftest``, ``meta-poky``, and
-``meta-yocto-bsp``. Each of these repositories represents a distinct
+For example, if you were to examine the :oe_git:`tree view </openembedded-core/tree/>`
+of the ``openembedded-core`` repository, you will see several layers: ``meta``,
+``meta-skeleton``, and ``meta-selftest``. Each of these repositories represents a distinct
 layer.
 
 For procedures on how to create layers, see the
@@ -385,7 +384,8 @@ Yocto Project:
 
 -  *AutoBuilder:* AutoBuilder is a project that automates build tests
    and quality assurance (QA). By using the public AutoBuilder, anyone
-   can determine the status of the current development branch of Poky.
+   can determine the status of the current development branch of the core
+   repositories (:term:`OpenEmbedded-Core (OE-Core)` and :term:`BitBake`).
 
    .. note::
 
@@ -437,12 +437,12 @@ Here are components associated with the :term:`OpenEmbedded Build System`:
    You can learn more about BitBake in the :doc:`BitBake User
    Manual <bitbake:index>`.
 
--  *OpenEmbedded-Core:* OpenEmbedded-Core (OE-Core) is a common layer of
+-  *OpenEmbedded-Core:* :term:`OpenEmbedded-Core (OE-Core)` is a common layer of
    metadata (i.e. recipes, classes, and associated files) used by
    OpenEmbedded-derived systems, which includes the Yocto Project. The
    Yocto Project and the OpenEmbedded Project both maintain the
-   OpenEmbedded-Core. You can find the OE-Core metadata in the Yocto
-   Project :yocto_git:`Source Repositories </poky/tree/meta>`.
+   OpenEmbedded-Core. You can find the OE-Core metadata in the OpenEmbedded
+   :oe_git:`Source Repositories </openembedded-core/>`.
 
    Historically, the Yocto Project integrated the OE-Core metadata
    throughout the Yocto Project source repository reference system
@@ -455,34 +455,10 @@ Here are components associated with the :term:`OpenEmbedded Build System`:
    Project objective of achieving a smaller number of fully featured
    tools as compared to many different ones.
 
-   Sharing a core set of metadata results in Poky as an integration
-   layer on top of OE-Core. You can see that in this
-   :ref:`figure <overview-manual/yp-intro:what is the yocto project?>`.
-   The Yocto Project combines various components such as BitBake, OE-Core,
-   script "glue", and documentation for its build system.
-
-Reference Distribution (Poky)
------------------------------
-
-Poky is the Yocto Project reference distribution. It contains the
-:term:`OpenEmbedded Build System`
-(BitBake and OE-Core) as well as a set of metadata to get you started
-building your own distribution. See the figure in
-":ref:`overview-manual/yp-intro:what is the yocto project?`"
-section for an illustration that shows Poky and its relationship with
-other parts of the Yocto Project.
-
-To use the Yocto Project tools and components, you can download
-(``clone``) Poky and use it to bootstrap your own distribution.
-
-.. note::
-
-   Poky does not contain binary files. It is a working example of how to
-   build your own custom Linux distribution from source.
-
-You can read more about Poky in the
-":ref:`overview-manual/yp-intro:reference embedded distribution (poky)`"
-section.
+   Nowadays, the :term:`Poky` **repository** is no longer updated as
+   :doc:`bitbake-setup <bitbake:bitbake-user-manual/bitbake-user-manual-environment-setup>`
+   became the preferred way of setting up the repositories in order to build the
+   :term:`Poky` distro.
 
 Packages for Finished Targets
 -----------------------------
@@ -631,103 +607,18 @@ Reference Embedded Distribution (Poky)
 ======================================
 
 "Poky", which is pronounced *Pock*-ee, is the name of the Yocto
-Project's reference distribution or Reference OS Kit. Poky contains the
-:term:`OpenEmbedded Build System` (:term:`BitBake` and
-:term:`OpenEmbedded-Core (OE-Core)`) as well as a set of
-:term:`Metadata` to get you started building your own distro. In other
-words, Poky is a base specification of the functionality needed for a
-typical embedded system as well as the components from the Yocto Project
-that allow you to build a distribution into a usable binary image.
+Project's reference distribution or Reference OS Kit. This reference
+distribution is represented by a :term:`DISTRO` configuration file found in
+:yocto_git:`meta-poky </meta-yocto>`.
 
-Poky is a combined repository of BitBake, OpenEmbedded-Core (which is
-found in ``meta``), ``meta-poky``, ``meta-yocto-bsp``, and documentation
-provided all together and known to work well together. You can view
-these items that make up the Poky repository in the
-:yocto_git:`Source Repositories </poky/tree/>`.
-
-.. note::
-
-   If you are interested in all the contents of the
-   poky
-   Git repository, see the ":ref:`ref-manual/structure:top-level core components`"
-   section in the Yocto Project Reference Manual.
-
-The following figure illustrates what generally comprises Poky:
-
-.. image:: figures/poky-reference-distribution.png
-    :width: 100%
-
--  BitBake is a task executor and scheduler that is the heart of the
-   OpenEmbedded build system.
-
--  ``meta-poky``, which is Poky-specific metadata.
-
--  ``meta-yocto-bsp``, which are Yocto Project-specific Board Support
-   Packages (BSPs).
-
--  OpenEmbedded-Core (OE-Core) metadata, which includes shared
-   configurations, global variable definitions, shared classes,
-   packaging, and recipes. Classes define the encapsulation and
-   inheritance of build logic. Recipes are the logical units of software
-   and images to be built.
-
--  Documentation, which contains the Yocto Project source files used to
-   make the set of user manuals.
-
-.. note::
+.. warning::
 
    While Poky is a "complete" distribution specification and is tested
    and put through QA, you cannot use it as a product "out of the box"
    in its current form.
 
-To use the Yocto Project tools, you can use Git to clone (download) the
-Poky repository then use your local copy of the reference distribution
-to bootstrap your own distribution.
-
-.. note::
-
-   Poky does not contain binary files. It is a working example of how to
-   build your own custom Linux distribution from source.
-
-Poky has a regular, well established, six-month release cycle under its
-own version. Major releases occur at the same time major releases (point
-releases) occur for the Yocto Project, which are typically in the Spring
-and Fall. For more information on the Yocto Project release schedule and
-cadence, see the ":doc:`/ref-manual/release-process`" chapter in the
-Yocto Project Reference Manual.
-
-Much has been said about Poky being a "default configuration". A default
-configuration provides a starting image footprint. You can use Poky out
-of the box to create an image ranging from a shell-accessible minimal
-image all the way up to a Linux Standard Base-compliant image that uses
-a GNOME Mobile and Embedded (GMAE) based reference user interface called
-Sato.
-
-One of the most powerful properties of Poky is that every aspect of a
-build is controlled by the metadata. You can use metadata to augment
-these base image types by adding metadata :ref:`layers
-<overview-manual/yp-intro:the yocto project layer model>` that extend
-functionality.
-These layers can provide, for example, an additional software stack for
-an image type, add a board support package (BSP) for additional
-hardware, or even create a new image type.
-
-Metadata is loosely grouped into configuration files or package recipes.
-A recipe is a collection of non-executable metadata used by BitBake to
-set variables or define additional build-time tasks. A recipe contains
-fields such as the recipe description, the recipe version, the license
-of the package and the upstream source repository. A recipe might also
-indicate that the build process uses autotools, make, distutils or any
-other build process, in which case the basic functionality can be
-defined by the classes it inherits from the OE-Core layer's class
-definitions in ``./meta/classes``. Within a recipe you can also define
-additional tasks as well as task prerequisites. Recipe syntax through
-BitBake also supports both ``:prepend`` and ``:append`` operators as a
-method of extending task functionality. These operators inject code into
-the beginning or end of a task. For information on these BitBake
-operators, see the
-":ref:`bitbake-user-manual/bitbake-user-manual-metadata:appending and prepending (override style syntax)`"
-section in the BitBake User's Manual.
+Poky has a regular, well established, six-month release cycle detailed in the
+:doc:`/ref-manual/release-process` of the Yocto Project Reference Manual.
 
 The OpenEmbedded Build System Workflow
 ======================================
@@ -736,7 +627,7 @@ The :term:`OpenEmbedded Build System` uses a "workflow" to
 accomplish image and SDK generation. The following figure overviews that
 workflow:
 
-.. image:: figures/YP-flow-diagram.png
+.. image:: svg/yp-flow-diagram.*
     :width: 100%
 
 Here is a brief summary of the "workflow":
@@ -762,7 +653,8 @@ Here is a brief summary of the "workflow":
    package feed that is used to create the final root file image.
 
 #. The build system generates the file system image and a customized
-   Extensible SDK (eSDK) for application development in parallel.
+   :doc:`SDK </sdk-manual/index>` (Software Development Kit) for application
+   development in parallel.
 
 For a very detailed look at this workflow, see the
 ":ref:`overview-manual/concepts:openembedded build system concepts`" section.
@@ -868,20 +760,14 @@ helpful for getting started:
 -  *Poky:* Poky is a reference embedded distribution and a reference
    test configuration. Poky provides the following:
 
-   -  A base-level functional distro used to illustrate how to customize
-      a distribution.
+   -  A base-level functional distro (:term:`DISTRO`) used to illustrate how to
+      customize a distribution.
 
    -  A means by which to test the Yocto Project components (i.e. Poky
       is used to validate the Yocto Project).
 
-   -  A vehicle through which you can download the Yocto Project.
-
    Poky is not a product level distro. Rather, it is a good starting
    point for customization.
-
-   .. note::
-
-      Poky is an integration layer on top of OE-Core.
 
 -  *Recipe:* The most common form of metadata. A recipe contains a list
    of settings and tasks (i.e. instructions) for building packages that

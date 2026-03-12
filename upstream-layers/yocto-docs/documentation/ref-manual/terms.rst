@@ -63,36 +63,39 @@ universal, the list includes them just in case:
       This term refers to the area used by the OpenEmbedded build system for
       builds. The area is created when you ``source`` the setup environment
       script that is found in the Source Directory
-      (i.e. :ref:`ref-manual/structure:``oe-init-build-env```). The
+      (i.e. :ref:`structure-core-script`, or
+      ``init-build-env`` when using :doc:`bitbake-setup
+      <bitbake:bitbake-user-manual/bitbake-user-manual-environment-setup>`). The
       :term:`TOPDIR` variable points to the :term:`Build Directory`.
 
-      You have a lot of flexibility when creating the :term:`Build Directory`.
+      When setting up the build manually (see :doc:`/dev-manual/poky-manual-setup`),
+      you have a lot of flexibility when creating the :term:`Build Directory`.
       Here are some examples that show how to create the directory.  The
-      examples assume your :term:`Source Directory` is named ``poky``:
+      examples assume your :term:`Source Directory` is named ``bitbake-builds``:
 
-         -  Create the :term:`Build Directory` inside your Source Directory and let
-            the name of the :term:`Build Directory` default to ``build``:
+      -  Create the :term:`Build Directory` inside your Source Directory and let
+         the name of the :term:`Build Directory` default to ``build``:
 
-            .. code-block:: shell
+         .. code-block:: console
 
-               $ cd poky
-               $ source oe-init-build-env
+            $ cd bitbake-builds
+            $ source layers/openembedded-core/oe-init-build-env
 
-         -  Create the :term:`Build Directory` inside your home directory and
-            specifically name it ``test-builds``:
+      -  Or provide a path to the :term:`Build Directory` when sourcing
+         ``oe-init-build-env``. Any intermediate folders in the pathname must
+         exist. This next example creates a :term:`Build Directory` named
+         ``YP-&DISTRO;`` within the existing directory ``mybuilds``:
 
-            .. code-block:: shell
+         .. code-block:: console
 
-               $ source poky/oe-init-build-env test-builds
+            $ source bitbake-builds/layers/openembedded-core/oe-init-build-env mybuilds/YP-&DISTRO;
 
-         -  Provide a directory path and specifically name the
-            :term:`Build Directory`. Any intermediate folders in the pathname
-            must exist.  This next example creates a :term:`Build Directory`
-            named ``YP-&DISTRO;`` within the existing directory ``mybuilds``:
+         This path can also be an absolute path and be outside of the current
+         working directory:
 
-            .. code-block:: shell
+         .. code-block:: console
 
-               $ source poky/oe-init-build-env mybuilds/YP-&DISTRO;
+            $ source bitbake-builds/layers/openembedded-core/oe-init-build-env /opt/mybuilds/YP-&DISTRO;
 
       .. note::
 
@@ -100,9 +103,10 @@ universal, the list includes them just in case:
          temporary directory the build system uses for its work. :term:`TMPDIR` cannot
          be under NFS. Thus, by default, the :term:`Build Directory` cannot be under
          NFS. However, if you need the :term:`Build Directory` to be under NFS, you can
-         set this up by setting :term:`TMPDIR` in your ``local.conf`` file to use a local
-         drive. Doing so effectively separates :term:`TMPDIR` from :term:`TOPDIR`, which is the
-         :term:`Build Directory`.
+         set this up by setting :term:`TMPDIR` in your
+         :ref:`structure-build-conf-site.conf` file to use a local drive. Doing
+         so effectively separates :term:`TMPDIR` from :term:`TOPDIR`, which is
+         the :term:`Build Directory`.
 
    :term:`Build Host`
       The system used to build images in a Yocto Project Development
@@ -131,6 +135,53 @@ universal, the list includes them just in case:
       A variant of :term:`buildtools`, just providing the required
       version of ``make`` to run the OpenEmbedded build system.
 
+   :term:`Built-in Fragment`
+      A built-in fragment is a specific kind of :term:`Configuration Fragment`
+      that affects the value of a single variable globally. :term:`Built-in
+      Fragments <Built-in Fragment>` do not require a separate configuration
+      file, but like a standard :term:`Configuration Fragment`, Built-in
+      Fragments can be enabled or disabled using the :oe_git:`bitbake-config-build
+      </bitbake/tree/bin/bitbake-config-build>` command-line utility.
+
+      When declared, a built-in fragment follows the following naming
+      convention::
+
+         <fragment>:<variable name>
+
+      Where:
+
+      -  ``<fragment>`` is the name of the built-in fragment.
+      -  ``<variable name>`` is the name of the variable to be modified by this
+         fragment.
+
+      For example::
+
+         machine:MACHINE
+
+      Will setup the ``machine`` Built-in Fragment for modifying the value of
+      the :term:`MACHINE` variable.
+
+      Setting the :term:`MACHINE` variable through this fragment must follow
+      this syntax::
+
+         machine/qemux86-64
+
+      This sets the value of :term:`MACHINE` to ``qemux86-64``.
+
+      In :term:`OpenEmbedded-Core (OE-Core)`, the list of available
+      :term:`Built-in Fragments <Built-in Fragment>` can be obtained from the
+      :term:`OE_FRAGMENTS_BUILTIN` variable.
+
+      For more details on fragments, see:
+
+      -  The :doc:`/ref-manual/fragments` section of the Yocto Project Reference
+         Manual for a list of fragments the :term:`OpenEmbedded Build System`
+         supports, and a quick reference guide on how to manage fragments.
+
+      -  The :doc:`/dev-manual/creating-fragments` section of the Yocto Project
+         Development Tasks Manual for details on how to create new fragments
+         in your build.
+
    :term:`Classes`
       Files that provide for logic encapsulation and inheritance so that
       commonly used patterns can be defined once and then easily used in
@@ -154,6 +205,51 @@ universal, the list includes them just in case:
       only used when building for that target (e.g. the
       :file:`machine/beaglebone.conf` configuration file defines variables for
       the Texas Instruments ARM Cortex-A8 development board).
+      :term:`Configuration Fragments <Configuration Fragment>` such as
+      :ref:`ref-fragments-core-yocto-sstate-mirror-cdn` define snippets of
+      configuration that can be enabled from the command-line.
+
+   :term:`Configuration Fragment`
+      A :term:`Configuration Fragment` (also called Standard :term:`Configuration
+      Fragment`) is a :term:`configuration file` that contains configuration
+      statements such as variable assignments, affecting the build at a
+      global-level when the fragment is enabled. By default, configuration
+      fragments are located in the :file:`conf/fragments/` directory of a
+      :term:`Layer`.
+
+      .. note::
+
+         Another form of fragment not to be confounded with Standard
+         :term:`Configuration Fragments <Configuration Fragment>` are
+         :term:`Built-in Fragments <Built-in Fragment>` which are used to assign
+         a single variable value globally.
+
+      A fragment :term:`configuration file` must contain a summary
+      (:term:`BB_CONF_FRAGMENT_SUMMARY`) and a description
+      (:term:`BB_CONF_FRAGMENT_DESCRIPTION`) explaining the purpose of the
+      fragment.
+
+      In :term:`OpenEmbedded-Core (OE-Core)`, the location of fragments and what
+      variables are required in a fragment is specified in :oe_git:`bitbake.conf
+      </openembedded-core/tree/meta/conf/bitbake.conf>` thanks to the
+      :ref:`addfragments <bitbake-user-manual/bitbake-user-manual-metadata:\`\`addfragments\`\`
+      directive>` directive and the :term:`OE_FRAGMENTS`,
+      :term:`OE_FRAGMENTS_METADATA_VARS` and :term:`OE_FRAGMENTS_BUILTIN`
+      variables.
+
+      Fragments can be listed, enabled and disabled with the
+      :oe_git:`bitbake-config-build </bitbake/tree/bin/bitbake-config-build>`
+      command-line utility.
+
+      For more details on fragments, see:
+
+      -  The :doc:`/ref-manual/fragments` section of the Yocto Project Reference
+         Manual for a list of fragments the :term:`OpenEmbedded Build System`
+         supports, and a quick reference guide on how to manage fragments.
+
+      -  The :doc:`/dev-manual/creating-fragments` section of the Yocto Project
+         Development Tasks Manual for details on how to create new fragments
+         in your build.
 
    :term:`Container Layer`
       A flexible definition that typically refers to a single Git checkout
@@ -304,6 +400,17 @@ universal, the list includes them just in case:
       :term:`LTS` release. See the :ref:`ref-long-term-support-releases`
       section for details.
 
+   :term:`OpenEmbedded Build System`
+      The build system used by the Yocto Project, using :term:`Bitbake` as the
+      task executor. Throughout the Yocto Project documentation, the
+      OpenEmbedded build system is sometimes referred to simply as "the build
+      system". If other build systems, such as a host or target build system are
+      referenced, the documentation clearly states the difference.
+
+      .. note::
+
+         For some historical information about Poky, see the :term:`Poky` term.
+
    :term:`OpenEmbedded-Core (OE-Core)`
       OE-Core is metadata comprised of
       foundational recipes, classes, and associated files that are meant to
@@ -314,22 +421,8 @@ universal, the list includes them just in case:
       recipes. The result is a tightly controlled and an quality-assured
       core set of recipes.
 
-      You can see the Metadata in the ``meta`` directory of the Yocto
-      Project :yocto_git:`Source Repositories </poky>`.
-
-   :term:`OpenEmbedded Build System`
-      The build system specific to the Yocto
-      Project. The OpenEmbedded build system is based on another project
-      known as "Poky", which uses :term:`BitBake` as the task
-      executor. Throughout the Yocto Project documentation set, the
-      OpenEmbedded build system is sometimes referred to simply as "the
-      build system". If other build systems, such as a host or target build
-      system are referenced, the documentation clearly states the
-      difference.
-
-      .. note::
-
-         For some historical information about Poky, see the :term:`Poky` term.
+      You can browse the source of :term:`OpenEmbedded-Core (OE-Core)` at
+      :oe_git:`openembedded-core </openembedded-core>`.
 
    :term:`Package`
       In the context of the Yocto Project, this term refers to a
@@ -369,10 +462,25 @@ universal, the list includes them just in case:
       -  A means by which to test the Yocto Project components (i.e. Poky
          is used to validate the Yocto Project).
 
-      -  A vehicle through which you can download the Yocto Project.
-
       Poky is not a product level distro. Rather, it is a good starting
       point for customization.
+
+      .. note::
+
+         Poky also used to be a repository containing the combination of
+         :term:`BitBake`, :term:`OpenEmbedded-Core (OE-Core)`, the
+         :yocto_git:`meta-yocto </meta-yocto>` repository and the Yocto Project
+         documentation -- which were combined with the :yocto_git:`combo-layer
+         </poky-config>` tool.
+
+         This repository is still hosted at :yocto_git:`/poky` and is still
+         updated for maintained releases that are older than Whinlatter (5.3).
+         Newer releases now use ``bitbake-setup`` to clone and setup the initial
+         :term:`OpenEmbedded Build System` environment. For more information on
+         how to use ``bitbake-setup``, see the :doc:`/brief-yoctoprojectqs/index`
+         document. An alternative can be to setup the above repositories
+         manually, by following the :doc:`/dev-manual/poky-manual-setup`
+         section of the Yocto Project Development Tasks Manual.
 
       .. note::
 
@@ -415,20 +523,36 @@ universal, the list includes them just in case:
       a software bill of materials`" section of the Development Tasks manual.
 
    :term:`Source Directory`
-     This term refers to the directory structure
-     created as a result of creating a local copy of the ``poky`` Git
-     repository ``git://git.yoctoproject.org/poky`` or expanding a
-     released ``poky`` tarball.
+     This term refers to the directory structure created as a result of setting
+     up your environment to build images with the Yocto Project, which can be
+     done in two ways:
 
-     .. note::
+     -  Using the ``bitbake-setup`` command-line utility (see :doc:`Setting Up
+        The Environment With bitbake-setup
+        <bitbake:bitbake-user-manual/bitbake-user-manual-environment-setup>`).
 
-        Creating a local copy of the
-        poky
-        Git repository is the recommended method for setting up your
-        Source Directory.
+     -  Or manually setting up the :term:`Layers <Layer>` (see
+        :doc:`/dev-manual/poky-manual-setup`).
 
-     Sometimes you might hear the term "poky directory" used to refer to
-     this directory structure.
+     In either case, the result will be a set of :term:`Layers <Layer>` and a
+     :term:`Build Directory`: this is the Source Directory for your build. The
+     documentation usually denotes this directory with the name "bitbake-builds".
+
+     A typical layout for the :term:`Source Directory` would be:
+
+     .. code-block:: text
+
+        bitbake-builds/
+        ├── build/
+        └── layers/
+
+     Where the ``layers/`` directory corresponds to the directory containing
+     :term:`layers <Layer>` for your project, and the ``build/`` directory
+     corresponds to the :term:`Build Directory`.
+
+     We present a :term:`Source Directory` structure and its components in
+     details in the :doc:`/ref-manual/structure` section of the Yocto Project
+     Reference Manual.
 
      .. note::
 
@@ -436,43 +560,12 @@ universal, the list includes them just in case:
         names that contain spaces. Be sure that the Source Directory you
         use does not contain these types of names.
 
-     The Source Directory contains BitBake, Documentation, Metadata and
-     other files that all support the Yocto Project. Consequently, you
-     must have the Source Directory in place on your development system in
-     order to do any development using the Yocto Project.
+     The :term:`Source Directory` contains :term:`BitBake`,
+     :term:`OpenEmbedded-Core (OE-Core)`, and other files that all support the
+     Yocto Project.
 
-     When you create a local copy of the Git repository, you can name the
-     repository anything you like. Throughout much of the documentation,
-     "poky" is used as the name of the top-level folder of the local copy
-     of the poky Git repository. So, for example, cloning the ``poky`` Git
-     repository results in a local Git repository whose top-level folder
-     is also named "poky".
-
-     While it is not recommended that you use tarball extraction to set up
-     the Source Directory, if you do, the top-level directory name of the
-     Source Directory is derived from the Yocto Project release tarball.
-     For example, downloading and unpacking poky tarballs from
-     :yocto_dl:`/releases/yocto/&DISTRO_REL_LATEST_TAG;/`
-     results in a Source Directory whose root folder is named poky.
-
-
-     It is important to understand the differences between the Source
-     Directory created by unpacking a released tarball as compared to
-     cloning ``git://git.yoctoproject.org/poky``. When you unpack a
-     tarball, you have an exact copy of the files based on the time of
-     release --- a fixed release point. Any changes you make to your local
-     files in the Source Directory are on top of the release and will
-     remain local only. On the other hand, when you clone the ``poky`` Git
-     repository, you have an active development repository with access to
-     the upstream repository's branches and tags. In this case, any local
-     changes you make to the local Source Directory can be later applied
-     to active development branches of the upstream ``poky`` Git
-     repository.
-
-     For more information on concepts related to Git repositories,
-     branches, and tags, see the
-     ":ref:`overview-manual/development-environment:repositories, tags, and branches`"
-     section in the Yocto Project Overview and Concepts Manual.
+     Consequently, you must have the :term:`Source Directory` in place on your
+     development system in order to do any development using the Yocto Project.
 
    :term:`SPDX`
       This term means *Software Package Data Exchange*, and is used as an open

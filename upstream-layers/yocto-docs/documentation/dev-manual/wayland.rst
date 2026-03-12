@@ -14,7 +14,7 @@ might otherwise achieve.
 The Yocto Project provides the Wayland protocol libraries and the
 reference :wikipedia:`Weston <Wayland_(display_server_protocol)#Weston>`
 compositor as part of its release. You can find the integrated packages
-in the ``meta`` layer of the :term:`Source Directory`.
+in the ``meta`` layer of :term:`OpenEmbedded-Core (OE-Core)`.
 Specifically, you
 can find the recipes that build both Wayland and Weston at
 ``meta/recipes-graphics/wayland``.

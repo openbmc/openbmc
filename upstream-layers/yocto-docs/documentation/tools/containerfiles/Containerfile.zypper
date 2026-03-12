@@ -1,0 +1,51 @@
+ARG ARG_FROM=opensuse/leap:15.4 # default value to avoid warning
+FROM $ARG_FROM
+
+# RUN . ./yocto-docs-venv/bin/activate doesn't work because env variables set
+# in RUN don't persist, so set up the virtualenv manually ahead of time.
+# Unsetting env variables in Containerfile is difficult, so we hope it works
+# fine without doing that for PYTHONHOME (see activate script content).
+# Note that the actual location depends on WORKDIR at this layer in the
+# container, and it must match the pwd when pip3_docs.sh is run in a later
+# layer. This *must* be outside of any mount point otherwise it won't be
+# available within the container.
+ENV VIRTUAL_ENV=/yocto-docs-venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Set the WORKDIR to / so the pip3_docs.sh script will find our virtual env
+# when calling '. ./yocto-docs-venv/bin/activate'.
+WORKDIR /
+
+ARG INCLUDE_ESSENTIAL_PACKAGES=0
+ARG ESSENTIAL=opensuse_essential.sh
+ARG DOCS=opensuse_docs.sh
+ARG DOCS_PDF=opensuse_docs_pdf.sh
+ARG PIP3=pip3_docs.sh
+
+# relative to the location of the dockerfile
+COPY --chmod=777 ${ESSENTIAL} /temp/host_packages_essential.sh
+COPY --chmod=777 ${DOCS} /temp/host_packages_docs.sh
+COPY --chmod=777 ${DOCS_PDF} /temp/host_packages_docs_pdf.sh
+COPY --chmod=777 ${PIP3} /temp/pip3_docs.sh
+
+# Zypper doesn't have environment variables to specify whether to run in
+# non-interactive mode like Debian does with DEBIAN_FRONTEND and piping yes to
+# the scripts doesn't need to be enough as well, so let's force all zypper calls
+# to be non-interactive by adding the appropriate flag in the scripts.
+RUN for script in /temp/*.sh; do \
+	sed -i 's/zypper/zypper --non-interactive/' $script; \
+    done
+
+RUN zypper update -y \
+ && zypper install -y sudo \
+ && if [ "$INCLUDE_ESSENTIAL_PACKAGES" = "1" ]; then yes | /temp/host_packages_essential.sh; fi \
+ && yes | /temp/host_packages_docs.sh \
+ && yes | /temp/host_packages_docs_pdf.sh \
+ && yes | /temp/pip3_docs.sh \
+ && zypper clean --all \
+ && rm -rf /temp
+
+RUN git config --global --add safe.directory /docs
+
+ENTRYPOINT ["/usr/bin/env", "make", "-C", "documentation/"]
+CMD ["publish"]

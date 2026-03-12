@@ -9,13 +9,17 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
 (function() {
   'use strict';
 
-  var all_releases =
+  var all_releases = {
 	ALL_RELEASES_PLACEHOLDER
-  ;
+  };
 
   var switcher_versions = {
     VERSIONS_PLACEHOLDER
   };
+
+  var latest_version =
+    LATEST_VERSION_PLACEHOLDER
+  ;
 
   var all_doctypes = {
       'single': 'Individual Webpages',
@@ -66,23 +70,58 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
     return 0;
   }
 
-  function build_version_select(current_series, current_version) {
+  function build_version_select(current_version) {
     var buf = ['<select>'];
 
-    $.each(switcher_versions, function(version, vers_data) {
-      var series = version.substr(0, 3);
-      if (series == current_series) {
-        if (version == current_version)
-            buf.push('<option value="' + version + '" selected="selected">' + vers_data["title"] + '</option>');
-	      else
-            buf.push('<option value="' + version + '">' + vers_data["title"] + '</option>');
-      } else {
-        buf.push('<option value="' + version + '">' + vers_data["title"] + '</option>');
+    // Start by pushing the versions from the the switcher_versions array,
+    // unless our current version matches one of them, in which case this is
+    // done last.
+    $.each(switcher_versions, function (version, vers_data) {
+      if (current_version != version) {
+        buf.push(
+          '<option value="' +
+          version +
+          '" selected="selected">' +
+          vers_data['title'] +
+          "</option>",
+        );
       }
     });
 
-    buf.push('</select>');
-    return buf.join('');
+    var current_title = current_version;
+    var current_series = current_version.split("-")[0].split(".").slice(0, 2).join(".");
+    if (current_version in switcher_versions) {
+      current_title = switcher_versions[current_version]['title'];
+    } else if (current_series in all_releases) {
+      current_title = all_releases[current_series]['codename'] + ' (' + current_version + ')';
+    }
+
+    buf.push(
+      '<option value="' +
+        current_version +
+        '" selected="selected">' +
+        current_title +
+        "</option>",
+    );
+
+    buf.push("</select>");
+    return buf.join("");
+  }
+
+  function get_docs_meta_info(current_version) {
+    if (current_version in switcher_versions) {
+      // Display the commit id of the documentation, as we're browsing a branch tip
+      var meta_info = ' (commit <a href="https://git.yoctoproject.org/yocto-docs/log?id=';
+      meta_info = meta_info + switcher_versions[current_version]['hash'];
+      meta_info = meta_info + '"> ' + switcher_versions[current_version]['hash'];
+    } else {
+      // Display the tag
+      var meta_info = ' (tag <a href="https://git.yoctoproject.org/yocto-docs/log?id=yocto-';
+      meta_info = meta_info + current_version;
+      meta_info = meta_info + '"> ' + current_version;
+    }
+    meta_info = meta_info + '</a>)';
+    return meta_info;
   }
 
   function build_doctype_select(current_doctype) {
@@ -158,23 +197,35 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
     var current_version = DOCUMENTATION_OPTIONS.VERSION;
     var docroot = get_docroot_url()
 
-    var new_versionpath = selected_version + '/';
+    // If the current_version is X.Y-tip, we are currently browsing a branch
+    // tip, and we need to convert it to the branch name.
+    var current_version_split = current_version.split("-");
+    if ((current_version_split.length > 1) && (current_version_split[1] == "tip")) {
+      current_version = all_releases[current_version_split[0]]['codename'].toLowerCase();
+    }
 
-    // latest tag is also the default page (without version information)
-    if (docroot.endsWith(current_version + '/') == false) {
-        var new_url = docroot + new_versionpath + url.replace(docroot, "");
-        var fallback_url = docroot + new_versionpath;
+    if (selected_version == latest_version) {
+      // default landing page selected, empty the version
+      var new_versionpath = '';
+    } else if (selected_version.includes("-tip")) {
+      var branch_name = all_releases[selected_version.split("-")[0]]['codename'].toLowerCase();
+      var new_versionpath = branch_name + '/';
     } else {
-	// check for named releases (e.g. dunfell) in the subpath
-        $.each(all_releases, function(idx, release) {
-		if (docroot.endsWith('/' + release + '/')) {
-			current_version = release;
-			return false;
-		}
-	});
+      var new_versionpath = selected_version + '/';
+    }
 
-        var new_url = url.replace('/' + current_version + '/', '/' + new_versionpath);
-        var fallback_url = new_url.replace(url.replace(docroot, ""), "");
+    if (docroot.endsWith("dev/")) {
+      var new_url = url.replace("/dev/", "/" + new_versionpath);
+      var fallback_url = new_url.replace(url.replace(docroot, ""), "");
+    } else if (docroot.endsWith(current_version + "/") == false) {
+      var new_url = docroot + new_versionpath + url.replace(docroot, "");
+      var fallback_url = docroot + new_versionpath;
+    } else {
+      var new_url = url.replace(
+        "/" + current_version + "/",
+        "/" + new_versionpath,
+      );
+      var fallback_url = new_url.replace(url.replace(docroot, ""), "");
     }
 
     console.log(get_docroot_url())
@@ -222,35 +273,51 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
   }
 
   $(document).ready(function() {
-    var release = DOCUMENTATION_OPTIONS.VERSION;
+    var current_version = DOCUMENTATION_OPTIONS.VERSION;
     var current_doctype = doctype_segment_from_url(window.location.href);
-    var current_series = release.substr(0, 3);
-    var version_select = build_version_select(current_series, release);
+    var version_select = build_version_select(current_version);
 
     $('.version_switcher_placeholder').html(version_select);
     $('.version_switcher_placeholder select').bind('change', on_version_switch);
+
+    var docs_meta_info = get_docs_meta_info(current_version);
+    $('.docs_meta_info_placeholder').html(docs_meta_info);
 
     var doctype_select = build_doctype_select(current_doctype);
 
     $('.doctype_switcher_placeholder').html(doctype_select);
     $('.doctype_switcher_placeholder select').bind('change', on_doctype_switch);
 
-    if (release != "dev") {
+    // First, check that the version is not one of: dev, next, or any "*-tip"
+    if (!(["dev", "next"].includes(current_version)) && !(current_version.includes("-tip"))) {
+      // We could be either: a fixed tag (X.Y[.Z]) or a floating commit (X.Y[.Z]-<hash>)
+      var current_version_split = current_version.split("-");
+      var current_version_no_hash = current_version_split[0];
+      if (current_version_split.length > 1) {
+        // We're on a floating commit, we don't care
+        return;
+      }
+      var current_series = current_version_no_hash.split(".").slice(0, 2).join(".");
+      var match = false;
       $.each(switcher_versions, function(version, vers_data) {
-        var series = version.substr(0, 3);
-        if (series == current_series) {
-          if (version != release && release.endsWith('.999') == false) {
-            $('#outdated-warning').html('This document is for outdated version ' + release + ', you should select the latest release version in this series, ' + version + '.');
-            $('#outdated-warning').css('padding', '.5em');
-            return false;
+        var series = version.split("-")[0];
+        if (current_series == series) {
+          // Our version is part of the supported releases (switcher_versions)
+          match = true;
+          if (ver_compare(current_version_no_hash, all_releases[series]['latest_tag']) >= 0) {
+            // Our version is higher or equal to the latest_tag from our series
+            return;
           }
-          if (vers_data["obsolete"]) {
-            $('#outdated-warning').html('Version ' + release + ' of the project is now considered obsolete, please select and use a more recent version');
-            $('#outdated-warning').css('padding', '.5em');
-            return false;
-          }
+          $('#outdated-warning').html('This document is for an outdated tag ' + current_version + ', you should select version ' + all_releases[series]['codename'] + ' (' + all_releases[series]['latest_tag'] + ').');
+          $('#outdated-warning').css('padding', '.5em');
+          return;
         }
       });
+      if (!match) {
+        // Our version is not part of the supported releases (switcher_versions)
+        $('#outdated-warning').html('This document is for obsolete release ' + current_version + ', you should select a supported release.');
+        $('#outdated-warning').css('padding', '.5em');
+      }
     }
   });
 })();

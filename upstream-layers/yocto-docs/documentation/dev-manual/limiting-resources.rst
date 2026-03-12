@@ -112,11 +112,22 @@ details.
        pressure evolves during the build. You can take a value below the maximum
        printed value as a starting point.
 
-   After setting initial values, :term:`BitBake` will print messages on the
-   console in the following format each time the current pressure exceeds of the
-   limit set by the above variables::
+   After setting initial values, you can monitor when the pressure exceeds of the
+   limit set by the above variables by running :term:`BitBake` with the
+   ``--verbose`` and ``--log-domains`` flag:
 
-      Pressure status changed to CPU: True, IO: False, Mem: False (CPU: 1105.9/2.0, IO: 0.0/2.0, Mem: 0.0/2.0) - using 1/64 bitbake threads
+   .. code-block:: console
+
+      $ bitbake virtual/kernel -c compile -f --verbose --log-domains BitBake.RunQueue.PSI
+
+   In parallel, you can monitor the pressure information by tracking the output
+   log file:
+
+   .. code-block:: console
+
+      $ tail -F tmp/log/cooker/<machine>/console-latest.log | grep "Pressure status changed"
+      NOTE: Pressure status changed to CPU: False, IO: None, Mem: None (CPU: 1105.9/2.0, IO: 0.0/2.0, Mem: 0.0/2.0) - using 1/64 bitbake threads
+      ...
 
    Take a look at the value between parenthesis: ``CPU: 1105.9/2.0, IO: 0.0/2.0,
    Mem: 0.0/2.0``. They correspond to the current pressure value for the CPU, IO

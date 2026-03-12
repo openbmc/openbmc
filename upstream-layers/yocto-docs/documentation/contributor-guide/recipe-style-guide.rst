@@ -221,6 +221,20 @@ Recipes need to define both the :term:`LICENSE` and
    ``meta/files/common-licenses/`` or the :term:`SPDXLICENSEMAP` flag names
    defined in ``meta/conf/licenses.conf``.
 
+   .. note::
+
+      Setting a :term:`LICENSE` in a recipe applies to the software to be built
+      by this recipe, not to the recipe file itself. The license of recipes,
+      configuration files and scripts should also be clearly specified, for
+      example via comments or via a license found in the :term:`layer` that
+      holds these files. These license files are usually found at the root of
+      the layer. Exceptions should be clearly stated in the layer README or
+      LICENSE file.
+
+      For example, the :term:`OpenEmbedded-Core (OE-Core)` layer provides both
+      the GPL-2.0-only and MIT license files, and a "LICENSE" file to explain
+      how these two licenses are attributed to files found in the layer.
+
 -  :term:`LIC_FILES_CHKSUM`: The OpenEmbedded build system uses this
    variable to make sure the license text has not changed. If it has,
    the build produces an error and it affords you the chance to figure

@@ -16,7 +16,7 @@ the following are useful when exploring the data store and running
 functions::
 
    pydevshell> d.getVar("STAGING_DIR")
-   '/media/build1/poky/build/tmp/sysroots'
+   '/media/build1/bitbake-builds/build/tmp/sysroots'
    pydevshell> d.getVar("STAGING_DIR", False)
    '${TMPDIR}/sysroots'
    pydevshell> d.setVar("FOO", "bar")

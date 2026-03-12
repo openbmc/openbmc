@@ -158,10 +158,20 @@ the ``part`` and ``partition`` commands:
    excludes the given relative path from the resulting image. This
    option is only effective with the rootfs source plugin.
 
--  ``--extra-space``: This option is a Wic-specific option that adds
+-  ``--extra-filesystem-space``: This option is a Wic-specific option that adds
    extra space after the space filled by the content of the partition.
    The final size can exceed the size specified by the ``--size``
    option. The default value is 10M. Specify as an integer value
+   optionally followed by one of the units "k" / "K" for kibibyte, "M"
+   for mebibyte and "G" for gibibyte. The default unit if none is given
+   is "M".
+
+-  ``--extra-partition-space``: This option is a Wic-specific option that adds
+   extra empty space after the space filled by the filesystem.
+   With ``--fixed-size`` option, the extra partition space is removed from the
+   filesystem size. Otherwise (with or without ``--size`` flag), the extra
+   partition space is added to the final partition size.
+   The default value is 0M. Specify as an integer value
    optionally followed by one of the units "k" / "K" for kibibyte, "M"
    for mebibyte and "G" for gibibyte. The default unit if none is given
    is "M".

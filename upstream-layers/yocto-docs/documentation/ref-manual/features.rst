@@ -28,7 +28,7 @@ a particular feature is contained or not is to ``grep`` through the
 discovers the recipes whose build is potentially changed based on a
 given feature::
 
-   $ cd poky
+   $ cd openembedded-core
    $ git grep 'contains.*MACHINE_FEATURES.*feature'
 
 .. _ref-features-machine:
@@ -53,6 +53,11 @@ Project metadata:
 -  *alsa:* Hardware has ALSA audio drivers
 
 -  *bluetooth:* Hardware has integrated BT
+
+-  *coresight:* Support for the `Coresight
+   <https://docs.kernel.org/trace/coresight/coresight.html>`__ Linux Kernel
+   feature on Arm processors. This feature depends on the ``opencsd`` recipe
+   which is present in the :yocto_git:`meta-arm </meta-arm>` :term:`layer`.
 
 -  *efi:* Support for booting through EFI
 
@@ -179,6 +184,9 @@ metadata, as extra layers can define their own:
    device).
 
 -  *nls:* Include National Language Support (NLS).
+
+-  *opencl:* Include support for the :wikipedia:`OpenCL (Open Computing
+   Language) <OpenCL>` framework.
 
 -  *opengl:* Include the Open Graphics Library, which is a
    cross-language, multi-platform application programming interface used
@@ -325,7 +333,7 @@ The image features available for all images are:
 
 -  *read-only-rootfs:* Creates an image whose root filesystem is
    read-only. See the
-   ":ref:`dev-manual/read-only-rootfs:creating a read-only root filesystem`"
+   ":ref:`security-manual/read-only-rootfs:creating a read-only root filesystem`"
    section in the Yocto Project Development Tasks Manual for more
    information.
 

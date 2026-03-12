@@ -66,6 +66,8 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.extlinks',
     'sphinx.ext.intersphinx',
+    'sphinx_copybutton',
+    'sphinxcontrib.rsvgconverter',
     'yocto-vars'
 ]
 autosectionlabel_prefix_document = True
@@ -122,6 +124,9 @@ intersphinx_mapping = {
 
 # Suppress "WARNING: unknown mimetype for ..."
 suppress_warnings = ['epub.unknown_project_files']
+
+# sphinx-copybutton configuration
+copybutton_prompt_text = "$ "
 
 # -- Options for HTML output -------------------------------------------------
 

@@ -60,8 +60,9 @@ contact us with other suggestions.
    layers, on the other hand, helps keep simplify future customizations and
    reuse.
 
-#. **Never modify the POKY layer. Never. Ever. When you update to the next
-   release, you'll lose all of your work. ALL OF IT.**
+#. **Never modify the core layers** (:term:`BitBake`, :term:`OpenEmbedded-Core
+   (OE-Core)` and possibly :yocto_git:`meta-yocto </meta-yocto>`). Never. Ever.
+   When you update to the next release, you'll lose all of your work. ALL OF IT.**
 
 #. **Don't be fooled by documentation searching results:**
    Yocto Project documentation is always being updated. Unfortunately, when you
@@ -98,7 +99,7 @@ contact us with other suggestions.
    function of a particular part of the workflow gives you an idea of what might
    be going wrong.
 
-   .. image:: figures/yp-how-it-works-new-diagram.png
+   .. image:: overview-manual/svg/yp-flow-diagram.*
       :width: 100%
 
 #. **Know that you can generate a dependency graph and learn how to do it:**

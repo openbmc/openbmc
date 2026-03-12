@@ -54,7 +54,7 @@ Using SysVinit with udev
 =========================
 
 SysVinit with the udev device manager corresponds to the
-default setting in Poky. This corresponds to setting::
+default setting in :term:`Poky`. This corresponds to setting::
 
    INIT_MANAGER = "sysvinit"
 
@@ -77,8 +77,8 @@ for more complex systems::
    INIT_MANAGER = "systemd"
 
 This will enable systemd and remove sysvinit components from the image.
-See :yocto_git:`meta/conf/distro/include/init-manager-systemd.inc
-</poky/tree/meta/conf/distro/include/init-manager-systemd.inc>` for exact
+See :oe_git:`meta/conf/distro/include/init-manager-systemd.inc
+</openembedded-core/tree/meta/conf/distro/include/init-manager-systemd.inc>` for exact
 details on what this does.
 
 Controling systemd from the target command line

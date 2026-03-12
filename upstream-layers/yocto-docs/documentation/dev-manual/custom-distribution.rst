@@ -3,8 +3,10 @@
 Creating Your Own Distribution
 ******************************
 
-When you build an image using the Yocto Project and do not alter any
-distribution :term:`Metadata`, you are using the Poky distribution.
+When you build an image using the Yocto Project and follow the default setup
+showcased in :doc:`/dev-manual/start`, you are using the :term:`Poky` reference
+distribution.
+
 Poky is explicitly a *reference* distribution for testing and
 development purposes. It enables most hardware and software features
 so that they can be tested, but this also means that from a security
@@ -27,7 +29,7 @@ layer. The following steps provide some more detail:
    just placing configurations in a ``local.conf`` configuration file
    makes it easier to reproduce the same build configuration when using
    multiple build machines. See the
-   ":ref:`dev-manual/layers:creating a general layer using the \`\`bitbake-layers\`\` script`"
+   ":ref:`dev-manual/layers:Creating Your Own Layer`"
    section for information on how to quickly set up a layer.
 
 -  *Create the distribution configuration file:* The distribution
