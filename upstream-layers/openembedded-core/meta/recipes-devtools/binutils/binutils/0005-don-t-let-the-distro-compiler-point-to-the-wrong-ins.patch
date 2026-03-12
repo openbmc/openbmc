@@ -1,4 +1,4 @@
-From 340d2cf058b373ed4fbf6bcea4f6674eab23c73a Mon Sep 17 00:00:00 2001
+From 7e78955c1995a39c847013b909627f77c41ca232 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:39:01 +0000
 Subject: [PATCH] don't let the distro compiler point to the wrong installation
@@ -17,10 +17,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/libiberty/Makefile.in b/libiberty/Makefile.in
-index b11df756b4b..f47269fdc0e 100644
+index d507f27a9ef..462d47b2eb1 100644
 --- a/libiberty/Makefile.in
 +++ b/libiberty/Makefile.in
-@@ -385,7 +385,8 @@ install-strip: install
+@@ -387,7 +387,8 @@ install-strip: install
  # multilib-specific flags, it's overridden by FLAGS_TO_PASS from the
  # default multilib, so we have to take CFLAGS into account as well,
  # since it will be passed the multilib flags.

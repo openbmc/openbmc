@@ -15,7 +15,10 @@ SRCREV = "9a6d6b8e963935f145f3a1ef446552de6996dada"
 
 inherit meson pkgconfig gettext python3native mime
 
-EXTRA_OEMESON = "-Dupdate-mimedb=true"
+EXTRA_OEMESON = " \
+                 -Dupdate-mimedb=true \
+                 -Dbuild-translations=${@'false' if d.getVar('USE_NLS') == 'no' else 'true'} \
+                "
 
 FILES:${PN} += "${datadir}/mime"
 FILES:${PN}-dev += "${datadir}/pkgconfig/shared-mime-info.pc ${datadir}/gettext/its"

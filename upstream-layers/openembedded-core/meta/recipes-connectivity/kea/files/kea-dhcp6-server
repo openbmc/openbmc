@@ -12,8 +12,9 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="kea-dhcp6-server"
 NAME=kea-dhcp6
-DAEMON=/usr/sbin/keactrl
-DAEMON_ARGS=" -s dhcp6"
+DAEMON=/usr/sbin/kea-dhcp6
+DAEMON_ARGS="-c /etc/kea/kea-dhcp6.conf"
+PIDFILE=/var/run/kea/kea-dhcp6.kea-dhcp6.pid
 
 set -e
 
@@ -26,13 +27,12 @@ set -e
 case "$1" in
   start)
         echo -n "Starting $DESC: "
-        start-stop-daemon -S -b -n $NAME -x $DAEMON -- start $DAEMON_ARGS
+        start-stop-daemon -S -b -n $NAME -p $PIDFILE -x $DAEMON -- $DAEMON_ARGS
         echo "done."
         ;;
   stop)
         echo -n "Stopping $DESC: "
-        kpid=`pidof $NAME`
-        kill $kpid
+        start-stop-daemon -K -p $PIDFILE -x $DAEMON
         echo "done."
         ;;
   restart|force-reload)
@@ -40,8 +40,12 @@ case "$1" in
         $0 stop
         $0 start
         ;;
+  status)
+        status $DAEMON
+        exit $?
+        ;;
   *)
-        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+        echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
         exit 1
         ;;
 esac

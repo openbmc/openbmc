@@ -371,6 +371,8 @@ def extents(options, xscale, trace):
             h += 30 + bar_h
         if trace.mem_stats:
             h += meminfo_bar_h
+        if trace.net_stats:
+            h += (30 + bar_h) * len(trace.net_stats)
 
     # Allow for width of process legend and offset
     if w < (720 + off_x):
@@ -844,7 +846,7 @@ def draw_header (ctx, headers, duration):
     toshow = [
       ('system.uname', 'uname', lambda s: s),
       ('system.release', 'release', lambda s: s),
-      ('system.cpu', 'CPU', lambda s: re.sub('model name\s*:\s*', '', s, 1)),
+      ('system.cpu', 'CPU', lambda s: re.sub(r'model name\s*:\s*', '', s, 1)),
       ('system.kernel.options', 'kernel options', lambda s: s),
     ]
 

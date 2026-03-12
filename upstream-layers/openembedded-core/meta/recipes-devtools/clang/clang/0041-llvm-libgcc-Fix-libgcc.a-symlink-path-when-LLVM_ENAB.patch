@@ -1,0 +1,83 @@
+From 919fcd11ad53bdfab9a14d5df6de0895bf24e456 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Oct 2025 19:02:44 -0700
+Subject: [PATCH] [llvm-libgcc] Fix libgcc.a symlink path when LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF
+
+The llvm-libgcc installation was creating incorrect symlinks for libgcc.a
+when built with LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF, particularly seen with
+Yocto cross-compilation environments.
+
+Issues seen:
+
+-  Absolute path in symlink: The previous code didn't handle absolute paths
+   returned by get_compiler_rt_install_dir() in staging/sysroot environments,
+   resulting in symlinks like:
+   libgcc.a -> /absolute/path/to/sysroot/usr/lib/clang/.../libclang_rt.builtins.a
+
+-  Missing architecture suffix: When the install path contained "clang", the
+   code would skip setting builtins_suffix, creating:
+   libgcc.a -> clang/21.1.4/lib/linux/libclang_rt.builtins.a
+   instead of:
+   libgcc.a -> clang/21.1.4/lib/linux/libclang_rt.builtins-aarch64.a
+
+-  Incorrect relative path calculation: The original regex stripped too much
+   or too little of the path, either creating symlinks pointing to non-existent
+   locations or stripping the clang/ directory prefix entirely.
+
+Solution:
+
+- Extract the relative path starting from 'clang/' when present in absolute
+  paths, ensuring the symlink points to the correct location within the
+  installation hierarchy
+- Always append the architecture suffix to the builtins library name
+- Only prepend '../' to the path when LLVM_ENABLE_PER_TARGET_RUNTIME_DIR is
+  enabled, as this is when the builtins are in a different directory level
+
+The symlink now correctly points to the existing compiler-rt builtins library
+without creating duplicate copies.
+
+Tested with LLVM_ENABLE_PER_TARGET_RUNTIME_DIR=OFF in cross-compilation
+environments (aarch64 target).
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/165487]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ llvm-libgcc/CMakeLists.txt | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/llvm-libgcc/CMakeLists.txt b/llvm-libgcc/CMakeLists.txt
+index cd9c5011d410..ee7fe768bda0 100644
+--- a/llvm-libgcc/CMakeLists.txt
++++ b/llvm-libgcc/CMakeLists.txt
+@@ -124,11 +124,27 @@ target_link_libraries(unwind_shared PUBLIC
+ #===============================================================================
+
+ get_compiler_rt_install_dir(${COMPILER_RT_DEFAULT_TARGET_ARCH} install_dir_builtins)
+-string(REGEX REPLACE "^lib/" "" install_dir_builtins "${install_dir_builtins}")
+-string(FIND "${install_dir_builtins}" "clang" install_path_contains_triple)
+-if(install_path_contains_triple EQUAL -1)
+-  set(builtins_suffix "-${COMPILER_RT_DEFAULT_TARGET_ARCH}")
++
++# Extract the relative path starting from 'clang' or after 'lib/'
++if(IS_ABSOLUTE "${install_dir_builtins}")
++  # For absolute paths, extract starting from 'clang/' if it exists
++  string(REGEX MATCH "clang/.*$" install_dir_builtins_temp "${install_dir_builtins}")
++  if(install_dir_builtins_temp)
++    set(install_dir_builtins "${install_dir_builtins_temp}")
++  else()
++    # Fallback: strip up to first lib/
++    string(REGEX REPLACE "^.*/lib/" "" install_dir_builtins "${install_dir_builtins}")
++  endif()
+ else()
++  string(REGEX REPLACE "^lib/" "" install_dir_builtins "${install_dir_builtins}")
++endif()
++
++# Always add the architecture suffix
++set(builtins_suffix "-${COMPILER_RT_DEFAULT_TARGET_ARCH}")
++
++# Only prepend ../ when using per-target runtime directories
++string(FIND "${install_dir_builtins}" "clang" install_path_contains_triple)
++if(install_path_contains_triple GREATER -1 AND LLVM_ENABLE_PER_TARGET_RUNTIME_DIR)
+   string(PREPEND install_dir_builtins "../")
+ endif()
+ set(LLVM_LIBGCC_COMPILER_RT ${install_dir_builtins}/libclang_rt.builtins${builtins_suffix}.a)

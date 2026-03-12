@@ -23,7 +23,7 @@ diff --git a/src/cmd/dist/build.go b/src/cmd/dist/build.go
 index 1f467647f5..b62e518030 100644
 --- a/src/cmd/dist/build.go
 +++ b/src/cmd/dist/build.go
-@@ -280,7 +280,9 @@ func xinit() {
+@@ -271,7 +271,9 @@ func xinit() {
  	}
  	xatexit(rmworkdir)
  
@@ -33,12 +33,12 @@ index 1f467647f5..b62e518030 100644
 +	}
  
  	goversion := findgoversion()
- 	isRelease = strings.HasPrefix(goversion, "release.") || strings.HasPrefix(goversion, "go")
+ 	isRelease = (strings.HasPrefix(goversion, "release.") || strings.HasPrefix(goversion, "go")) &&
 diff --git a/src/cmd/go/internal/cfg/cfg.go b/src/cmd/go/internal/cfg/cfg.go
 index 3b9f27e91d..ec043c1530 100644
 --- a/src/cmd/go/internal/cfg/cfg.go
 +++ b/src/cmd/go/internal/cfg/cfg.go
-@@ -248,7 +248,11 @@ func SetGOROOT(goroot string, isTestGo bool) {
+@@ -279,7 +279,11 @@ func SetGOROOT(goroot string, isTestGo bool) {
  			// This matches the initialization of ToolDir in go/build, except for
  			// using ctxt.GOROOT and the installed GOOS and GOARCH rather than the
  			// GOROOT, GOOS, and GOARCH reported by the runtime package.

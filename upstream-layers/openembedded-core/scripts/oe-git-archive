@@ -106,7 +106,7 @@ def main(argv=None):
         gitarchive.gitarchive(args.data_dir, args.git_dir, args.no_create, args.bare,
                               args.commit_msg_subject.strip(), args.commit_msg_body, args.branch_name,
                               args.no_tag, args.tag_name, args.tag_msg_subject, args.tag_msg_body,
-                              args.exclude, args.notes, args.push, keywords, log)
+                              args.exclude, args.notes, bool(args.push), args.push, keywords, log)
 
     except gitarchive.ArchiveError as err:
         log.error(str(err))

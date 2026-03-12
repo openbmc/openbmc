@@ -77,6 +77,8 @@ def llvm_features_from_tune(d):
         f.append("+a15")
     if 'cortexa17' in feat:
         f.append("+a17")
+    if 'cortexa57' in feat:
+        f.append("+v8a")
     if 'rv' in feat:
         if 'm' in feat:
             f.append("+m")
@@ -248,14 +250,14 @@ TARGET_C_INT_WIDTH[powerpc] = "32"
 MAX_ATOMIC_WIDTH[powerpc] = "32"
 
 ## powerpc64-unknown-linux-{gnu, musl}
-DATA_LAYOUT[powerpc64] = "E-m:e-Fi64-i64:64-n32:64-S128-v256:256:256-v512:512:512"
+DATA_LAYOUT[powerpc64] = "E-m:e-Fi64-i64:64-i128:128-n32:64-S128-v256:256:256-v512:512:512"
 TARGET_ENDIAN[powerpc64] = "big"
 TARGET_POINTER_WIDTH[powerpc64] = "64"
 TARGET_C_INT_WIDTH[powerpc64] = "32"
 MAX_ATOMIC_WIDTH[powerpc64] = "64"
 
 ## powerpc64le-unknown-linux-{gnu, musl}
-DATA_LAYOUT[powerpc64le] = "e-m:e-Fn32-i64:64-n32:64-S128-v256:256:256-v512:512:512"
+DATA_LAYOUT[powerpc64le] = "e-m:e-Fn32-i64:64-i128:128-n32:64-S128-v256:256:256-v512:512:512"
 TARGET_ENDIAN[powerpc64le] = "little"
 TARGET_POINTER_WIDTH[powerpc64le] = "64"
 TARGET_C_INT_WIDTH[powerpc64le] = "32"
@@ -349,6 +351,7 @@ def rust_gen_target(d, thing, wd, arch):
     sys = d.getVar('{}_SYS'.format(thing))
     prefix = d.getVar('{}_PREFIX'.format(thing))
     rustsys = d.getVar('RUST_{}_SYS'.format(thing))
+    os = d.getVar('{}_OS'.format(thing))
 
     abi = None
     cpu = "generic"
@@ -384,11 +387,11 @@ def rust_gen_target(d, thing, wd, arch):
     if tspec['data-layout'] is None:
         bb.fatal("No rust target defined for %s" % arch_abi)
     tspec['max-atomic-width'] = int(d.getVarFlag('MAX_ATOMIC_WIDTH', arch_abi))
-    tspec['target-pointer-width'] = d.getVarFlag('TARGET_POINTER_WIDTH', arch_abi)
-    tspec['target-c-int-width'] = d.getVarFlag('TARGET_C_INT_WIDTH', arch_abi)
+    tspec['target-pointer-width'] = int(d.getVarFlag('TARGET_POINTER_WIDTH', arch_abi))
+    tspec['target-c-int-width'] = int(d.getVarFlag('TARGET_C_INT_WIDTH', arch_abi))
     tspec['target-endian'] = d.getVarFlag('TARGET_ENDIAN', arch_abi)
     tspec['arch'] = arch_to_rust_target_arch(rust_arch)
-    if "baremetal" in d.getVar('TCLIBC'):
+    if "elf" in os:
         tspec['os'] = "none"
     else:
         tspec['os'] = "linux"
@@ -402,6 +405,10 @@ def rust_gen_target(d, thing, wd, arch):
         tspec['llvm-abiname'] = d.getVar('TUNE_RISCV_ABI')
     if "loongarch64" in tspec['llvm-target']:
         tspec['llvm-abiname'] = "lp64d"
+    if "powerpc64le" in tspec['llvm-target']:
+        tspec['llvm-abiname'] = "elfv2"
+    elif "powerpc64" in tspec['llvm-target']:
+        tspec['llvm-abiname'] = "elfv1"
     tspec['vendor'] = "unknown"
     tspec['target-family'] = "unix"
     tspec['linker'] = "{}{}gcc".format(d.getVar('CCACHE'), prefix)
@@ -409,15 +416,17 @@ def rust_gen_target(d, thing, wd, arch):
     if features != "":
         tspec['features'] = features
     fpu = d.getVar('TARGET_FPU')
-    if fpu == "soft":
+    if fpu in ["soft", "softfp"]:
         tspec['llvm-floatabi'] = "soft"
     elif fpu == "hard":
         tspec['llvm-floatabi'] = "hard"
+    tspec['default-uwtable'] = True
     tspec['dynamic-linking'] = True
     tspec['executables'] = True
     tspec['linker-is-gnu'] = True
     tspec['linker-flavor'] = "gcc"
     tspec['has-rpath'] = True
+    tspec['has-thread-local'] = True
     tspec['position-independent-executables'] = True
     tspec['panic-strategy'] = d.getVar("RUST_PANIC_STRATEGY")
 
@@ -425,8 +434,10 @@ def rust_gen_target(d, thing, wd, arch):
     with open(wd + rustsys + '.json', 'w') as f:
         json.dump(tspec, f, indent=4)
 
-# These are accounted for in tmpdir path names so don't need to be in the task sig
-rust_gen_target[vardepsexclude] += "ABIEXTENSION llvm_cpu"
+RUSTCONFIG_EXCLUDEVARS = ""
+RUSTCONFIG_EXCLUDEVARS:class-native = "ABIEXTENSION llvm_cpu TUNE_RISCV_ABI"
+RUSTCONFIG_EXCLUDEVARS:class-nativesdk = "ABIEXTENSION llvm_cpu TUNE_RISCV_ABI"
+rust_gen_target[vardepsexclude] += "${RUSTCONFIG_EXCLUDEVARS}"
 
 do_rust_gen_targets[vardeps] += "DATA_LAYOUT TARGET_ENDIAN TARGET_POINTER_WIDTH TARGET_C_INT_WIDTH MAX_ATOMIC_WIDTH FEATURES"
 
@@ -441,7 +452,7 @@ python do_rust_gen_targets () {
     rust_gen_target(d, 'TARGET', wd, d.getVar('TARGET_ARCH'))
 }
 
-addtask rust_gen_targets after do_patch before do_compile
+addtask rust_gen_targets after do_patch before do_configure
 do_rust_gen_targets[dirs] += "${RUST_TARGETS_DIR}"
 
 # For building target C dependecies use only compiler parameters defined in OE

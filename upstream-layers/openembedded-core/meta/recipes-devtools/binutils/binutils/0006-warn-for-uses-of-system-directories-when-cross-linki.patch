@@ -1,4 +1,4 @@
-From e9297b35595d7dd6c50ce6ff7282eee248b7e479 Mon Sep 17 00:00:00 2001
+From 05dcd732a4b91ecd77f37fabd8a1a14209467816 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 15 Jan 2016 06:31:09 +0000
 Subject: [PATCH] warn for uses of system directories when cross linking
@@ -52,21 +52,21 @@ Signed-off-by: Scott Garman <scott.a.garman@intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  ld/config.in    |  3 +++
- ld/configure    | 16 ++++++++++++++++
+ ld/configure    | 20 ++++++++++++++++++--
  ld/configure.ac | 10 ++++++++++
  ld/ld.h         |  8 ++++++++
  ld/ld.texi      | 12 ++++++++++++
  ld/ldfile.c     | 17 +++++++++++++++++
  ld/ldlex.h      |  2 ++
- ld/ldmain.c     |  6 ++++--
+ ld/ldmain.c     |  2 ++
  ld/lexsup.c     | 15 +++++++++++++++
  9 files changed, 87 insertions(+), 2 deletions(-)
 
 diff --git a/ld/config.in b/ld/config.in
-index 2d7b6406d2b..37cd12d20fa 100644
+index 7fac3b5ca36..630190b5ef0 100644
 --- a/ld/config.in
 +++ b/ld/config.in
-@@ -78,6 +78,9 @@
+@@ -86,6 +86,9 @@
     language is requested. */
  #undef ENABLE_NLS
  
@@ -77,27 +77,45 @@ index 2d7b6406d2b..37cd12d20fa 100644
  #undef EXTRA_SHLIB_EXTENSION
  
 diff --git a/ld/configure b/ld/configure
-index 597d110f57a..d537ec391d2 100755
+index 855844025c2..71567a92601 100755
 --- a/ld/configure
 +++ b/ld/configure
-@@ -844,6 +844,7 @@ with_lib_path
+@@ -843,6 +843,7 @@ enable_checking
+ with_lib_path
  enable_targets
- enable_64_bit_bfd
  with_sysroot
 +enable_poison_system_directories
  enable_gold
  enable_got
  enable_compressed_debug_sections
 @@ -1537,6 +1538,8 @@ Optional Features:
+   --disable-largefile     omit support for large files
    --enable-checking       enable run-time checks
    --enable-targets        alternative target configurations
-   --enable-64-bit-bfd     64-bit support (on hosts with narrower word sizes)
 +  --enable-poison-system-directories
 +                          warn for use of native system library directories
    --enable-gold[=ARG]     build gold [ARG={default,yes,no}]
    --enable-got=<type>     GOT handling scheme (target, single, negative,
                            multigot)
-@@ -15571,6 +15574,19 @@ fi
+@@ -11894,7 +11897,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11897 "configure"
++#line 11900 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -12000,7 +12003,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 12003 "configure"
++#line 12006 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -15747,6 +15750,19 @@ fi
  
  
  
@@ -118,10 +136,10 @@ index 597d110f57a..d537ec391d2 100755
  if test "${enable_gold+set}" = set; then :
    enableval=$enable_gold; case "${enableval}" in
 diff --git a/ld/configure.ac b/ld/configure.ac
-index 228f2ee4089..50a4b0f4db1 100644
+index 8c5e9606ac0..8cfd6f77e94 100644
 --- a/ld/configure.ac
 +++ b/ld/configure.ac
-@@ -102,6 +102,16 @@ AC_SUBST(use_sysroot)
+@@ -115,6 +115,16 @@ AC_SUBST(use_sysroot)
  AC_SUBST(TARGET_SYSTEM_ROOT)
  AC_SUBST(TARGET_SYSTEM_ROOT_DEFINE)
  
@@ -139,7 +157,7 @@ index 228f2ee4089..50a4b0f4db1 100644
  dnl "install_as_default" is set to false if gold is the default linker.
  dnl "installed_linker" is the installed BFD linker name.
 diff --git a/ld/ld.h b/ld/ld.h
-index 254f0a097bb..daf777c65c8 100644
+index 76825e4253c..e43c847ad0f 100644
 --- a/ld/ld.h
 +++ b/ld/ld.h
 @@ -166,6 +166,14 @@ typedef struct
@@ -158,10 +176,10 @@ index 254f0a097bb..daf777c65c8 100644
    enum endian_enum endian;
  
 diff --git a/ld/ld.texi b/ld/ld.texi
-index f6384ad82dd..26479a6a232 100644
+index 3dc76a1f8c6..f0b30d3fc0e 100644
 --- a/ld/ld.texi
 +++ b/ld/ld.texi
-@@ -3279,6 +3279,18 @@ creation of the metadata note, if one had been enabled by an earlier
+@@ -3391,6 +3391,18 @@ creation of the metadata note, if one had been enabled by an earlier
  occurrence of the --package-metadata option.
  If the linker has been built with libjansson, then the JSON string
  will be validated.
@@ -181,10 +199,10 @@ index f6384ad82dd..26479a6a232 100644
  
  @c man end
 diff --git a/ld/ldfile.c b/ld/ldfile.c
-index 12551504ae6..8bea4e7048f 100644
+index f47e860d437..83381fa431a 100644
 --- a/ld/ldfile.c
 +++ b/ld/ldfile.c
-@@ -328,6 +328,23 @@ ldfile_add_library_path (const char *name, bool cmdline)
+@@ -326,6 +326,23 @@ ldfile_add_library_path (const char *name, bool cmdline)
      new_dirs->name = concat (ld_sysroot, name + strlen ("$SYSROOT"), (const char *) NULL);
    else
      new_dirs->name = xstrdup (name);
@@ -197,11 +215,11 @@ index 12551504ae6..8bea4e7048f 100644
 +      || (!strncmp (name, "/usr/X11R6/lib", 14))))
 +   {
 +     if (command_line.error_poison_system_directories)
-+       einfo (_("%X%P: error: library search path \"%s\" is unsafe for "
-+            "cross-compilation\n"), name);
++	einfo (_("%X%P: error: library search path \"%s\" is unsafe for "
++	    "cross-compilation\n"), name);
 +     else
-+       einfo (_("%P: warning: library search path \"%s\" is unsafe for "
-+            "cross-compilation\n"), name);
++	einfo (_("%P: warning: library search path \"%s\" is unsafe for "
++	    "cross-compilation\n"), name);
 +   }
 +#endif
 +
@@ -209,23 +227,23 @@ index 12551504ae6..8bea4e7048f 100644
  
  static void
 diff --git a/ld/ldlex.h b/ld/ldlex.h
-index b8b7d6b6829..a8faeb635c4 100644
+index 85e06b6fcc4..0faec16e82a 100644
 --- a/ld/ldlex.h
 +++ b/ld/ldlex.h
-@@ -150,6 +150,8 @@ enum option_values
+@@ -149,6 +149,8 @@ enum option_values
+   OPTION_PLUGIN,
    OPTION_PLUGIN_OPT,
    OPTION_PLUGIN_SAVE_TEMPS,
- #endif /* BFD_SUPPORTS_PLUGINS */
 +  OPTION_NO_POISON_SYSTEM_DIRECTORIES,
 +  OPTION_ERROR_POISON_SYSTEM_DIRECTORIES,
    OPTION_DEFAULT_SCRIPT,
    OPTION_PRINT_OUTPUT_FORMAT,
    OPTION_PRINT_SYSROOT,
 diff --git a/ld/ldmain.c b/ld/ldmain.c
-index cce4991b25a..1859465635d 100644
+index a2711d230ea..551f2388909 100644
 --- a/ld/ldmain.c
 +++ b/ld/ldmain.c
-@@ -352,6 +352,8 @@ main (int argc, char **argv)
+@@ -749,6 +749,8 @@ main (int argc, char **argv)
    command_line.warn_mismatch = true;
    command_line.warn_search_mismatch = true;
    command_line.check_section_addresses = -1;
@@ -234,29 +252,11 @@ index cce4991b25a..1859465635d 100644
  
    /* We initialize DEMANGLING based on the environment variable
       COLLECT_NO_DEMANGLE.  The gcc collect2 program will demangle the
-@@ -1500,7 +1502,7 @@ undefined_symbol (struct bfd_link_info *info,
-       argv[1] = "undefined-symbol";
-       argv[2] = (char *) name;
-       argv[3] = NULL;
--      
-+
-       if (verbose)
- 	einfo (_("%P: About to run error handling script '%s' with arguments: '%s' '%s'\n"),
- 	       argv[0], argv[1], argv[2]);
-@@ -1521,7 +1523,7 @@ undefined_symbol (struct bfd_link_info *info,
- 	 carry on to issue the normal error message.  */
-     }
- #endif /* SUPPORT_ERROR_HANDLING_SCRIPT */
--  
-+
-   if (section != NULL)
-     {
-       if (error_count < MAX_ERRORS_IN_A_ROW)
 diff --git a/ld/lexsup.c b/ld/lexsup.c
-index 5399aa45b72..8f9a221bfba 100644
+index 158abb6dd8f..7ac3c0d9340 100644
 --- a/ld/lexsup.c
 +++ b/ld/lexsup.c
-@@ -650,6 +650,14 @@ static const struct ld_option ld_options[] =
+@@ -643,6 +643,14 @@ static const struct ld_option ld_options[] =
  		   "                                <method> is: share-unconflicted (default),\n"
  		   "                                             share-duplicated"),
      TWO_DASHES },
@@ -285,3 +285,5 @@ index 5399aa45b72..8f9a221bfba 100644
  	  break;
  
  	case OPTION_DEPENDENCY_FILE:
+--
+2.49.0

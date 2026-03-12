@@ -1,0 +1,70 @@
+From 3f43a0554c73287973047b44ae5e196b7c995c60 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 21 Aug 2025 12:42:20 +0100
+Subject: [PATCH] src: explicitly only build shared plugins
+
+For some reason, libtool builds static libraries for libs which have
+been marked as modules. These are pointless: you can't dlopen() a static
+library.
+
+Avoid wasting compile time and disk space by passing -shared to libtool
+so that the static libraries are not built.
+
+Upstream-Status: Submitted [https://github.com/efficios/babeltrace/pull/121]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/Makefile.am | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 0567131b..7aa46b20 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -619,7 +619,7 @@ nodist_EXTRA_python_plugin_provider_babeltrace2_python_plugin_provider_la_SOURCE
+ python_plugin_provider_babeltrace2_python_plugin_provider_la_LDFLAGS = \
+ 	$(AM_LDFLAGS) \
+ 	$(LT_NO_UNDEFINED) \
+-	-avoid-version -module \
++	-avoid-version -module -shared \
+ 	$(PYTHON_LDFLAGS)
+ 
+ python_plugin_provider_babeltrace2_python_plugin_provider_la_CPPFLAGS = \
+@@ -669,7 +669,7 @@ plugins_utils_babeltrace_plugin_utils_la_SOURCES = \
+ plugins_utils_babeltrace_plugin_utils_la_LDFLAGS = \
+ 	$(AM_LDFLAGS) \
+ 	$(LT_NO_UNDEFINED) \
+-	-avoid-version -module $(LD_NOTEXT)
++	-avoid-version -module -shared $(LD_NOTEXT)
+ 
+ plugins_utils_babeltrace_plugin_utils_la_LIBADD = \
+ 	plugins/common/muxing/libmuxing.la
+@@ -775,7 +775,7 @@ plugins_ctf_babeltrace_plugin_ctf_la_SOURCES = \
+ plugins_ctf_babeltrace_plugin_ctf_la_LDFLAGS = \
+ 	$(AM_LDFLAGS) \
+ 	$(LT_NO_UNDEFINED) \
+-	-avoid-version -module $(LD_NOTEXT)
++	-avoid-version -module -shared $(LD_NOTEXT)
+ 
+ plugins_ctf_babeltrace_plugin_ctf_la_LIBADD = \
+ 	plugins/ctf/common/metadata/libctf-parser.la \
+@@ -816,7 +816,7 @@ plugins_text_babeltrace_plugin_text_la_SOURCES = \
+ plugins_text_babeltrace_plugin_text_la_LDFLAGS = \
+ 	$(AM_LDFLAGS) \
+ 	$(LT_NO_UNDEFINED) \
+-	-avoid-version -module $(LD_NOTEXT)
++	-avoid-version -module -shared $(LD_NOTEXT)
+ 
+ plugins_text_babeltrace_plugin_text_la_LIBADD =
+ 
+@@ -840,7 +840,7 @@ plugins_lttng_utils_babeltrace_plugin_lttng_utils_la_SOURCES = \
+ plugins_lttng_utils_babeltrace_plugin_lttng_utils_la_LDFLAGS = \
+ 	$(AM_LDFLAGS) \
+ 	$(LT_NO_UNDEFINED) \
+-	-avoid-version -module $(LD_NOTEXT) \
++	-avoid-version -module -shared $(LD_NOTEXT) \
+ 	$(ELFUTILS_LIBS)
+ 
+ plugins_lttng_utils_babeltrace_plugin_lttng_utils_la_LIBADD = \
+-- 
+2.43.0
+

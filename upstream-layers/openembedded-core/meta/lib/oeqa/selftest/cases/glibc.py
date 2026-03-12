@@ -20,6 +20,36 @@ def parse_values(content):
                 break
 
 class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
+    """
+    Base class for running the glibc test suite (bitbake glibc-testsuite -c check).
+
+    The glibc-testsuite recipe cross-compiles the glibc tests, which are then
+    executed via Autotools' make check. The check-test-wrapper script dispatches
+    each individual test to either QEMU user-space emulation or a remote SSH
+    target, depending on TOOLCHAIN_TEST_TARGET. For more details see the
+    do_check task of the glibc-testsuite recipe.
+
+    Unlike ptests, the glibc tests are not installed via do_install but instead
+    run in-place directly from the build directory (B). This is true for both
+    execution modes implemented by this base class via run_check():
+
+    User-space mode (ssh=None):
+        TOOLCHAIN_TEST_TARGET is left at its default ("user"), so
+        check-test-wrapper runs each test binary under QEMU user-space
+        emulation against the target sysroot. Results are collected under
+        the ptest suite name "glibc-user".
+
+    SSH/system mode (ssh=<ip>):
+        TOOLCHAIN_TEST_TARGET is set to "ssh" and the SSH connection details
+        (host, user, port) are configured so check-test-wrapper forwards each
+        test to the remote target over SSH. Since the tests run from the build
+        directory, that directory must be accessible on the target, which is
+        achieved by NFS-mounting it into the QEMU system running core-image-minimal.
+        Results are collected under the ptest suite name "glibc".
+
+    In both modes, results are parsed from the tests.sum file produced by
+    make check and recorded via the OEPTestResultTestCase ptest helpers.
+    """
     def run_check(self, ssh = None):
         # configure ssh target
         features = []
@@ -70,7 +100,7 @@ class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
             bitbake("core-image-minimal")
 
             # start runqemu
-            qemu = s.enter_context(runqemu("core-image-minimal", runqemuparams = "nographic", qemuparams = "-m 1024"))
+            qemu = s.enter_context(runqemu("core-image-minimal", runqemuparams = "nographic", qemuparams = "-m 2048"))
 
             # validate that SSH is working
             status, _ = qemu.run("uname")
@@ -79,7 +109,7 @@ class GlibcSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
             # setup nfs mount
             if qemu.run("mkdir -p \"{0}\"".format(tmpdir))[0] != 0:
                 raise Exception("Failed to setup NFS mount directory on target")
-            mountcmd = "mount -o noac,nfsvers=3,port={0},mountport={1} \"{2}:{3}\" \"{3}\"".format(nfsport, mountport, qemu.server_ip, tmpdir)
+            mountcmd = "mount -o noac,nfsvers=3,local_lock=all,port={0},mountport={1} \"{2}:{3}\" \"{3}\"".format(nfsport, mountport, qemu.server_ip, tmpdir)
             status, output = qemu.run(mountcmd)
             if status != 0:
                 raise Exception("Failed to setup NFS mount on target ({})".format(repr(output)))

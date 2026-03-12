@@ -1,0 +1,58 @@
+From f98a739032dd863ba8dd315729ded7ad0c86473c Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Sun, 12 Oct 2025 23:32:46 +0200
+Subject: [PATCH] Add option to disable zlib
+
+Autotools allowed to disable zlib by preconfiguring variable
+'ac_cv_search_deflate=no'.
+Autosetup does not seem to offer this option, so implement real option.
+
+Note that configuring sqlite without zlib is virtually impossible zlib
+normally gets into the system with toolchain. So the only option is to
+configure it out.
+
+This change is being done for Yocto project, where it's currently
+important to avoid additional dependencies having to restore chain of
+dependencies in "restore build from cache" scenario.
+
+Note about upstream status:
+Submitting patches to sqlite is problematic because of their policy of
+public domain declaration.
+This patch or a at least request to make zlib dependency optional
+should be submitted to their forum, however I was not able to register
+there.
+
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+Upstream-Status: Inappropriate [oe-specific]
+---
+ autosetup/sqlite-config.tcl | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/autosetup/sqlite-config.tcl b/autosetup/sqlite-config.tcl
+index 85fe414382..77190a7053 100644
+--- a/autosetup/sqlite-config.tcl
++++ b/autosetup/sqlite-config.tcl
+@@ -287,6 +287,14 @@ proc sqlite-configure {buildMode configScript} {
+       }
+     }
+ 
++    # Other options for CLI shell
++    cli-shell {
++      {*} {
++        zlib=1
++          => {Disable zlib support}
++      }
++    }
++
+     # Options for ICU: International Components for Unicode
+     icu {
+       {*} {
+@@ -656,7 +664,7 @@ proc sqlite-check-common-system-deps {} {
+     string.h strings.h \
+     inttypes.h
+ 
+-  if {[cc-check-includes zlib.h] && [proj-check-function-in-lib deflate z]} {
++  if {[opt-bool zlib] && [cc-check-includes zlib.h] && [proj-check-function-in-lib deflate z]} {
+     # TODO? port over the more sophisticated zlib search from the fossil auto.def
+     define HAVE_ZLIB 1
+     define LDFLAGS_ZLIB -lz

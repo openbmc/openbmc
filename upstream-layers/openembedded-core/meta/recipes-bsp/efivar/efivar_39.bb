@@ -9,6 +9,7 @@ COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64|riscv64).*-linux"
 
 SRC_URI = "git://github.com/rhinstaller/efivar.git;branch=main;protocol=https \
            file://0001-docs-do-not-build-efisecdb-manpage.patch \
+           file://0002-efivarfs-backport-patch-to-update-file-variable-store-on-SetVariableRT.patch \
            "
 SRCREV = "c47820c37ac26286559ec004de07d48d05f3308c"
 

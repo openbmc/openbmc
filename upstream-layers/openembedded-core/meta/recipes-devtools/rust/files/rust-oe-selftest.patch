@@ -4,11 +4,14 @@ ignore them during rust oe-selftest.
 Upstream-Status: Inappropriate [OE testing specific]
 
 Signed-off-by: Yash Shinde <Yash.Shinde@windriver.com>
+# added executable-no-mangle-strip.rs ignore
+Signed-off-by: Peter Tatrai <Peter.Tatrai@siemens.com>
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
 ---
 diff --git a/compiler/rustc_errors/src/markdown/tests/term.rs b/compiler/rustc_errors/src/markdown/tests/term.rs
 --- a/compiler/rustc_errors/src/markdown/tests/term.rs
 +++ b/compiler/rustc_errors/src/markdown/tests/term.rs
-@@ -61,6 +61,7 @@ fn test_wrapping_write() {
+@@ -60,6 +60,7 @@ fn test_wrapping_write() {
  }
 
  #[test]
@@ -19,7 +22,7 @@ diff --git a/compiler/rustc_errors/src/markdown/tests/term.rs b/compiler/rustc_e
 diff --git a/compiler/rustc_interface/src/tests.rs b/compiler/rustc_interface/src/tests.rs
 --- a/compiler/rustc_interface/src/tests.rs
 +++ b/compiler/rustc_interface/src/tests.rs
-@@ -137,6 +137,7 @@ fn assert_non_crate_hash_different(x: &Options, y: &Options) {
+@@ -147,6 +147,7 @@ fn assert_non_crate_hash_different(x: &Options, y: &Options) {
 
  // When the user supplies --test we should implicitly supply --cfg test
  #[test]
@@ -27,7 +30,7 @@ diff --git a/compiler/rustc_interface/src/tests.rs b/compiler/rustc_interface/sr
  fn test_switch_implies_cfg_test() {
      sess_and_cfg(&["--test"], |_sess, cfg| {
          assert!(cfg.contains(&(sym::test, None)));
-@@ -145,6 +146,7 @@ fn test_switch_implies_cfg_test() {
+@@ -155,6 +156,7 @@ fn test_switch_implies_cfg_test() {
 
  // When the user supplies --test and --cfg test, don't implicitly add another --cfg test
  #[test]
@@ -35,7 +38,7 @@ diff --git a/compiler/rustc_interface/src/tests.rs b/compiler/rustc_interface/sr
  fn test_switch_implies_cfg_test_unless_cfg_test() {
      sess_and_cfg(&["--test", "--cfg=test"], |_sess, cfg| {
          let mut test_items = cfg.iter().filter(|&&(name, _)| name == sym::test);
-@@ -154,6 +156,7 @@ fn test_switch_implies_cfg_test_unless_cfg_test() {
+@@ -164,6 +166,7 @@ fn test_switch_implies_cfg_test_unless_cfg_test() {
  }
 
  #[test]
@@ -47,7 +50,7 @@ diff --git a/library/std/tests/sync/rwlock.rs b/library/std/tests/sync/rwlock.rs
 index 1a9d3d3f12f..0a9cfc48806 100644
 --- a/library/std/tests/sync/rwlock.rs
 +++ b/library/std/tests/sync/rwlock.rs
-@@ -74,6 +74,7 @@
+@@ -605,6 +605,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -55,7 +58,7 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  fn test_rw_arc_poison_wr() {
      let arc = Arc::new(RwLock::new(1));
      let arc2 = arc.clone();
-@@ -87,6 +88,7 @@
+@@ -618,6 +619,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -63,7 +66,7 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  fn test_rw_arc_poison_mapped_w_r() {
      let arc = Arc::new(RwLock::new(1));
      let arc2 = arc.clone();
-@@ -101,6 +103,7 @@
+@@ -632,6 +634,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -71,7 +74,7 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  fn test_rw_arc_poison_ww() {
      let arc = Arc::new(RwLock::new(1));
      assert!(!arc.is_poisoned());
-@@ -115,6 +118,7 @@
+@@ -646,6 +649,7 @@
  }
  
  #[test]
@@ -79,7 +82,7 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
  fn test_rw_arc_poison_mapped_w_w() {
      let arc = Arc::new(RwLock::new(1));
-@@ -131,6 +135,7 @@
+@@ -662,6 +666,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -87,7 +90,7 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  fn test_rw_arc_no_poison_rr() {
      let arc = Arc::new(RwLock::new(1));
      let arc2 = arc.clone();
-@@ -160,6 +165,7 @@
+@@ -691,6 +696,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -95,42 +98,18 @@ index 1a9d3d3f12f..0a9cfc48806 100644
  fn test_rw_arc_no_poison_rw() {
      let arc = Arc::new(RwLock::new(1));
      let arc2 = arc.clone();
-@@ -227,6 +233,7 @@
- 
- #[test]
- #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
-+#[ignore]
- fn test_rw_arc_access_in_unwind() {
-     let arc = Arc::new(RwLock::new(1));
-     let arc2 = arc.clone();
-@@ -326,6 +333,7 @@
- 
- #[test]
- #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
-+#[ignore]
- fn test_into_inner_poison() {
-     let m = new_poisoned_rwlock(NonCopy(10));
- 
-@@ -362,6 +370,7 @@
- 
- #[test]
- #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
-+#[ignore]
- fn test_get_mut_poison() {
-     let mut m = new_poisoned_rwlock(NonCopy(10));
- 
-@@ -567,6 +576,7 @@
+@@ -794,6 +800,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
 +#[ignore]
  fn panic_while_mapping_write_unlocked_poison() {
      let lock = RwLock::new(());
-
+ 
 diff --git a/library/test/src/tests.rs b/library/test/src/tests.rs
 --- a/library/test/src/tests.rs
 +++ b/library/test/src/tests.rs
-@@ -424,6 +424,7 @@
+@@ -414,6 +414,7 @@
  }
 
  #[test]
@@ -141,7 +120,7 @@ diff --git a/library/test/src/tests.rs b/library/test/src/tests.rs
 diff --git a/library/std/tests/sync/mutex.rs b/library/std/tests/sync/mutex.rs
 --- a/library/std/tests/sync/mutex.rs
 +++ b/library/std/tests/sync/mutex.rs
-@@ -312,6 +312,7 @@
+@@ -440,6 +440,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -149,7 +128,7 @@ diff --git a/library/std/tests/sync/mutex.rs b/library/std/tests/sync/mutex.rs
  fn test_mutex_arc_poison_mapped() {
      let arc = Arc::new(Mutex::new(1));
      assert!(!arc.is_poisoned());
-@@ -391,6 +392,7 @@
+@@ -457,6 +458,7 @@
  
  #[test]
  #[cfg_attr(not(panic = "unwind"), ignore = "test requires unwinding support")]
@@ -173,7 +152,7 @@ diff --git a/compiler/rustc_data_structures/src/tagged_ptr/tests.rs b/compiler/r
 index 160af8a65d..686f4607bb 100644
 --- a/compiler/rustc_data_structures/src/tagged_ptr/tests.rs
 +++ b/compiler/rustc_data_structures/src/tagged_ptr/tests.rs
-@@ -5,6 +5,7 @@ use crate::stable_hasher::{HashStable, StableHasher};
+@@ -39,6 +39,7 @@ use crate::stable_hasher::{HashStable, StableHasher};
  }
 
  #[test]
@@ -185,19 +164,19 @@ diff --git a/library/std/tests/thread_local/tests.rs b/library/std/tests/thread_
 index 9d4f52a092..d425e5f7b7 100644
 --- a/library/std/tests/thread_local/tests.rs
 +++ b/library/std/tests/thread_local/tests.rs
-@@ -346,6 +346,7 @@ fn join_orders_after_tls_destructors() {
-
- // Test that thread::current is still available in TLS destructors.
+@@ -363,6 +363,7 @@ fn join_orders_after_tls_destructors() {
+ // ** musl: https://github.com/kraj/musl/blob/1880359b54ff7dd9f5016002bfdae4b136007dde/src/thread/pthread_key_create.c#L87
+ #[cfg(target_thread_local)]
  #[test]
 +#[ignore]
  fn thread_current_in_dtor() {
-     // Go through one round of TLS destruction first.
-     struct Defer;
+     use std::thread::Builder;
+
 diff --git a/library/alloctests/tests/sort/tests.rs b/library/alloctests/tests/sort/tests.rs
 index 14e6013f96..b670f27ab4 100644
 --- a/library/alloctests/tests/sort/tests.rs
 +++ b/library/alloctests/tests/sort/tests.rs
-@@ -915,12 +915,14 @@ gen_sort_test_fns_with_default_patterns_3_ty!(
+@@ -922,12 +922,14 @@ gen_sort_test_fns_with_default_patterns_3_ty!(
  macro_rules! instantiate_sort_test_inner {
      ($sort_impl:ty, miri_yes, $test_fn_name:ident) => {
          #[test]
@@ -224,59 +203,79 @@ index a05f274136..0e69b4cb98 100644
  fn sparse_inserts() {
      let cache: VecCache<u32, u8, u32> = VecCache::default();
      let end = if cfg!(target_pointer_width = "64") && cfg!(target_os = "linux") {
-diff --git a/tests/assembly/dwarf-mixed-versions-lto.rs b/tests/assembly/dwarf-mixed-versions-lto.rs
-index 5b8e5ff4f4a..e558fbd7bd7 100644
---- a/tests/assembly/dwarf-mixed-versions-lto.rs
-+++ b/tests/assembly/dwarf-mixed-versions-lto.rs
-@@ -2,6 +2,11 @@
- // will choose the highest DWARF version for the final binary. This matches Clang's behavior.
- // Note: `.2byte` directive is used on MIPS.
- 
-+//@ only-x86
-+//@ only-x86_64
-+//@ only-arm
-+//@ only-aarch64
-+
- //@ only-linux
- //@ aux-build:dwarf-mixed-versions-lto-aux.rs
- //@ compile-flags: -C lto -g -Zdwarf-version=5
-diff --git a/tests/codegen/dont-shuffle-bswaps.rs b/tests/codegen/dont-shuffle-bswaps.rs
-index 0e712bc3a4e..93965d990d0 100644
---- a/tests/codegen/dont-shuffle-bswaps.rs
-+++ b/tests/codegen/dont-shuffle-bswaps.rs
-@@ -1,3 +1,8 @@
-+//@ only-x86
-+//@ only-x86_64
-+//@ only-arm
-+//@ only-aarch64
-+
- //@ revisions: OPT2 OPT3
- //@[OPT2] compile-flags: -Copt-level=2
- //@[OPT3] compile-flags: -C opt-level=3
-diff --git a/tests/codegen/uninhabited-transparent-return-abi.rs b/tests/codegen/uninhabited-transparent-return-abi.rs
-index face1577c3f..d69e5e34a7b 100644
---- a/tests/codegen/uninhabited-transparent-return-abi.rs
-+++ b/tests/codegen/uninhabited-transparent-return-abi.rs
-@@ -1,4 +1,8 @@
- //@ compile-flags: -Copt-level=3
-+//@ only-x86
-+//@ only-x86_64
-+//@ only-arm
-+//@ only-aarch64
- 
- // See https://github.com/rust-lang/rust/issues/135802
-
 diff --git a/tests/ui/abi/rust-cold-works-with-rustic-args.rs b/tests/ui/abi/rust-cold-works-with-rustic-args.rs
-index 57027364699..3faa7ea035e 100644
+index 551485469d3..575db924968 100644
 --- a/tests/ui/abi/rust-cold-works-with-rustic-args.rs
 +++ b/tests/ui/abi/rust-cold-works-with-rustic-args.rs
-@@ -1,5 +1,9 @@
- //@build-pass
- //@compile-flags: -Clink-dead-code=true --crate-type lib
-+//@ only-x86
-+//@ only-x86_64
-+//@ only-arm
-+//@ only-aarch64
+@@ -1,6 +1,7 @@
+ //@ add-minicore
+ //@ build-pass
+ //@ compile-flags: -Clink-dead-code=true
++//@ ignore-riscv64
  // We used to not handle all "rustic" ABIs in a (relatively) uniform way,
  // so we failed to fix up arguments for actually passing through the ABI...
  #![feature(rust_cold_cc)]
+diff --git a/tests/ui/linking/executable-no-mangle-strip.rs b/tests/ui/linking/executable-no-mangle-strip.rs
+index cc283dc53..73cbab9c0 100644
+--- a/tests/ui/linking/executable-no-mangle-strip.rs
++++ b/tests/ui/linking/executable-no-mangle-strip.rs
+@@ -1,5 +1,7 @@
+ //@ run-pass
+ //@ ignore-windows-gnu: only statics marked with used can be GC-ed on windows-gnu
++//@ ignore-powerpc: this test is not working on powerpc
++//  bug report: https://github.com/rust-lang/rust/issues/144777
+ 
+ // Regression test for <https://github.com/rust-lang/rust/issues/139744>.
+ // Functions in the binary marked with no_mangle should be GC-ed if they
+diff --git a/library/std_detect/src/detect/os/linux/aarch64/tests.rs b/library/std_detect/src/detect/os/linux/aarch64/tests.rs
+index a3562f2fd93..d4e52ed91be 100644
+--- a/library/std_detect/src/detect/os/linux/aarch64/tests.rs
++++ b/library/std_detect/src/detect/os/linux/aarch64/tests.rs
+@@ -23,6 +23,7 @@ fn baseline_hwcaps() -> AtHwcap {
+ }
+
+ #[test]
++#[ignore]
+ fn linux_empty_hwcap2_aarch64() {
+     let file = concat!(
+         env!("CARGO_MANIFEST_DIR"),
+@@ -35,6 +36,7 @@ fn linux_empty_hwcap2_aarch64() {
+     assert_eq!(AtHwcap::from(v), baseline_hwcaps());
+ }
+ #[test]
++#[ignore]
+ fn linux_no_hwcap2_aarch64() {
+     let file =
+         concat!(env!("CARGO_MANIFEST_DIR"), "/src/detect/test_data/linux-no-hwcap2-aarch64.auxv");
+@@ -45,6 +47,7 @@ fn linux_no_hwcap2_aarch64() {
+     assert_eq!(AtHwcap::from(v), baseline_hwcaps());
+ }
+ #[test]
++#[ignore]
+ fn linux_hwcap2_aarch64() {
+     let file =
+         concat!(env!("CARGO_MANIFEST_DIR"), "/src/detect/test_data/linux-hwcap2-aarch64.auxv");
+diff --git a/tests/ui/no_std/simple-runs.rs b/tests/ui/no_std/simple-runs.rs
+index af44dfe..e6674e5 100644
+--- a/tests/ui/no_std/simple-runs.rs
++++ b/tests/ui/no_std/simple-runs.rs
+@@ -2,6 +2,7 @@
+ 
+ //@ run-pass
+ //@ compile-flags: -Cpanic=abort
++//@ ignore-arm FIXME(#146996)
+ //@ ignore-wasm different `main` convention
+ 
+ #![feature(lang_items)]
+diff --git a/compiler/rustc/src/main.rs b/compiler/rustc/src/main.rs
+index 89c61cd..144ea0e 100644
+--- a/compiler/rustc/src/main.rs
++++ b/compiler/rustc/src/main.rs
+@@ -38,6 +38,7 @@
+ #[cfg(feature = "jemalloc")]
+ use tikv_jemalloc_sys as _;
+
++#[cfg(not(test))]
+ fn main() {
+     rustc_driver::main()
+ }

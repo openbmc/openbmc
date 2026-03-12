@@ -33,5 +33,5 @@ Index: gst-examples/playback/player/gtk/meson.build
         'gtk-video-renderer.c'],
        c_args :  extra_c_args,
 +      install: true,
-       dependencies : [gst_dep, gsttag_dep, gstplay_dep, gtk_dep, x11_dep])
+       dependencies : [gst_dep, gsttag_dep, gstplay_dep, gtk_dep, x11_dep, gmodule_dep])
  endif

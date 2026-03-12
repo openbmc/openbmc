@@ -20,7 +20,7 @@ function validate_lttng_modules_present()
 	return 1
 }
 
-export LD_LIBRARY_PATH=FIXMEPTESTPATH/tests/utils/testapp/userspace-probe-elf-binary/.libs
+export LD_LIBRARY_PATH=FIXMEPTESTPATH/tests/utils/testapp/userspace-probe-elf-binary/.libs:FIXMEPTESTPATH/tests/utils/testapp/gen-ust-events-constructor/.libs
 makeargs="LOG_DRIVER_FLAGS=--ignore-exit top_srcdir=FIXMEPTESTPATH top_builddir=FIXMEPTESTPATH"
 
 #If current system doesn't have lttng kernel modules, disable lttng kernel related tests.
@@ -31,7 +31,7 @@ validate_lttng_modules_present || {
 make -k -t all >error.log 2>&1
 # Can specify a test e.g.:
 # -C tests/regression/ check TESTS='kernel/test_callstack'
-make -k -s $makeargs check 2>error.log | sed -e 's#/tmp/tmp\...........#/tmp/tmp.XXXXXXXXXX#g'
+make -k -s $makeargs check 2>error.log
 exitcode=$?
 if [ -e error.log ]; then
     cat error.log

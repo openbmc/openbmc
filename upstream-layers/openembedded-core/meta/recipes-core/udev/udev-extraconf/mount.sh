@@ -178,7 +178,7 @@ rm_dir() {
 
 get_label_name() {
 	# Get the LABEL or PARTLABEL
-	LABEL=`/sbin/blkid | grep "$1:" | grep -o 'LABEL=".*"' | cut -d '"' -f2`
+	LABEL=`/sbin/blkid "$1" | grep -o 'LABEL=".*"' | cut -d '"' -f2 | sed 's,/,_,g'`
 	# If the $DEVNAME has a LABEL or a PARTLABEL
 	if [ -n "$LABEL" ]; then
 	        # Set the mount location dir name to LABEL appended

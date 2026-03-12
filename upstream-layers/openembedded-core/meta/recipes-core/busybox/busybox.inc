@@ -4,6 +4,7 @@ HOMEPAGE = "https://www.busybox.net"
 BUGTRACKER = "https://bugs.busybox.net/"
 
 DEPENDS += "kern-tools-native virtual/crypt"
+DEPENDS += "${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'libselinux', '', d)}"
 
 # bzip2 applet in busybox is based on lightly-modified bzip2-1.0.4 source
 # the GPL is version 2 only
@@ -86,6 +87,7 @@ def features_to_busybox_settings(d):
     busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv4', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV4', cnf, rem)
     busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'ipv6', True, False, d), 'CONFIG_FEATURE_IFUPDOWN_IPV6', cnf, rem)
     busybox_cfg(bb.utils.contains_any('DISTRO_FEATURES', 'bluetooth wifi', True, False, d), 'CONFIG_RFKILL', cnf, rem)
+    busybox_cfg(bb.utils.contains('DISTRO_FEATURES', 'selinux', True, False, d), 'CONFIG_SELINUX', cnf, rem)
     return "\n".join(cnf), "\n".join(rem)
 
 # X, Y = ${@features_to_busybox_settings(d)}
@@ -358,8 +360,10 @@ do_install () {
 	fi
 
 	# Remove the sysvinit specific configuration file for systemd systems to avoid confusion
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'false', 'true', d)}; then
+	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'false', 'true', d)} &&
+		${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
 		rm -f ${D}${sysconfdir}/syslog-startup.conf
+		rm -f ${D}${sysconfdir}/syslog.conf
 	fi
 }
 
@@ -371,6 +375,7 @@ do_install_ptest () {
         rm -rf ${D}${PTEST_PATH}/testsuite/wget
 	sort ${B}/.config > ${D}${PTEST_PATH}/.config
 	ln -s ${base_bindir}/busybox   ${D}${PTEST_PATH}/busybox
+	sed -i -e 's|LIBC="<libc>"|LIBC=${TCLIBC}|g' ${D}${PTEST_PATH}/run-ptest
 }
 
 inherit update-alternatives
@@ -450,7 +455,7 @@ pkg_postinst:${PN}:prepend () {
         # Need path to saved utils, but they may have be removed on upgrade of busybox
         # Only use shell to get paths. Also capture if busybox was saved.
         BUSYBOX=""
-        if [ "x$D" = "x" ] ; then 
+        if [ "x$D" = "x" ] ; then
            for busybox_rmdir in /tmp/busyboxrm-*; do
                if [ "$busybox_rmdir" != '/tmp/busyboxrm-*' ] ; then
                   export PATH=$busybox_rmdir:$PATH
@@ -470,7 +475,7 @@ pkg_postinst:${PN}:append () {
               rm -f $BUSYBOX
            fi
         fi
-} 
+}
 
 pkg_prerm:${PN} () {
 	# This is so you can make busybox commit suicide - removing busybox with no other packages
@@ -498,7 +503,7 @@ pkg_prerm:${PN} () {
         if [ -n "$(readlink -f /bin/sh | grep busybox)" ] ; then
            BUSYBOX=$(readlink -f /bin/sh)
            cp $BUSYBOX $tmpdir/$(basename $BUSYBOX)
-           update-alternatives --install /bin/sh sh $tmpdir/$(basename $BUSYBOX) 1 
+           update-alternatives --install /bin/sh sh $tmpdir/$(basename $BUSYBOX) 1
         fi
 }
 

@@ -12,19 +12,19 @@ LIC_FILES_CHKSUM = "file://lldb/LICENSE.TXT;md5=2e0d44968471fcde980034dbb826bea9
 
 inherit cmake pkgconfig python3native python3targetconfig
 
-# This actually just depends on LLVM but right now llvm and clang are built together
 DEPENDS = "llvm-tblgen-native clang"
 
 OECMAKE_SOURCEPATH = "${S}/lldb"
 
-EXTRA_OECMAKE = "-DLLDB_INCLUDE_TESTS=OFF \
-                 -DLLDB_ENABLE_LUA=OFF \
-                 -DLLDB_PYTHON_RELATIVE_PATH=${PYTHON_SITEPACKAGES_DIR} \
-                 -DLLDB_PYTHON_EXE_RELATIVE_PATH=${PYTHON_PN} \
-                 -DLLDB_PYTHON_EXT_SUFFIX=${SOLIBSDEV} \
-                 -DLLVM_DIR=${STAGING_LIBDIR}/cmake/llvm/ \
-                 -DLLVM_TABLEGEN=${STAGING_BINDIR_NATIVE}/llvm-tblgen \
-                 -DLLDB_TABLEGEN_EXE=${STAGING_BINDIR_NATIVE}/lldb-tblgen \
+EXTRA_OECMAKE += "-DLLDB_INCLUDE_TESTS=OFF \
+                  -DLLDB_ENABLE_LUA=OFF \
+                  -DLLDB_PYTHON_RELATIVE_PATH=${PYTHON_SITEPACKAGES_DIR} \
+                  -DLLDB_PYTHON_EXE_RELATIVE_PATH=${PYTHON_PN} \
+                  -DLLDB_PYTHON_EXT_SUFFIX=${SOLIBSDEV} \
+                  -DLLVM_DIR=${STAGING_LIBDIR}/cmake/llvm/ \
+                  -DLLVM_TABLEGEN=${STAGING_BINDIR_NATIVE}/llvm-tblgen \
+                  -DLLDB_TABLEGEN_EXE=${STAGING_BINDIR_NATIVE}/lldb-tblgen \
+                  -DLLDB_NO_INSTALL_DEFAULT_RPATH=ON \
 "
 
 PACKAGECONFIG ??= "libedit libxml2 lzma"

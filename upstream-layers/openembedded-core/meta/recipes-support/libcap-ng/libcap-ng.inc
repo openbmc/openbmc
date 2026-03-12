@@ -7,12 +7,10 @@ LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
 		    file://COPYING.LIB;md5=e3eda01d9815f8d24aae2dbd89b68b06"
 
-SRC_URI = "git://github.com/stevegrubb/libcap-ng.git;protocol=https;branch=master \
-           file://0001-Fix-python-path-when-invoking-py-compile-54.patch \
-           "
-SRCREV = "f5d39702622208b3ada064d7b2eaeaf1454c9bd3"
+SRC_URI = "git://github.com/stevegrubb/libcap-ng.git;protocol=https;branch=master;tag=v${PV}"
+SRCREV = "427ed6d2c2b16e9b48f12953e55febfead3ef2e2"
 
-inherit lib_package autotools
+inherit lib_package autotools pkgconfig
 
 do_configure:prepend() {
     touch ${S}/NEWS

@@ -37,6 +37,7 @@ ESDK_LOCALCONF_REMOVE ?= "CONF_VERSION \
                              SSTATE_MIRRORS \
                              DL_DIR \
                              SSTATE_DIR \
+                             BB_HASHSERVE_DB_DIR \
                              TMPDIR \
                              BB_SERVER_TIMEOUT \
                             "
@@ -317,15 +318,10 @@ def write_local_conf(d, baseoutpath, derivative, core_meta_subdir, uninative_che
                 return origvalue, op, 0, True
         varlist = ['[^#=+ ]*']
         oldlines = []
-        if os.path.exists(builddir + '/conf/site.conf'):
-            with open(builddir + '/conf/site.conf', 'r') as f:
-                oldlines += f.readlines()
-        if os.path.exists(builddir + '/conf/auto.conf'):
-            with open(builddir + '/conf/auto.conf', 'r') as f:
-                oldlines += f.readlines()
-        if os.path.exists(builddir + '/conf/local.conf'):
-            with open(builddir + '/conf/local.conf', 'r') as f:
-                oldlines += f.readlines()
+        for conffile in ['site.conf', 'auto.conf', 'toolcfg.conf', 'local.conf']:
+            if os.path.exists(builddir + '/conf/' + conffile):
+                with open(builddir + '/conf/' + conffile, 'r') as f:
+                    oldlines += f.readlines()
         (updated, newlines) = bb.utils.edit_metadata(oldlines, varlist, handle_var)
 
         with open(baseoutpath + '/conf/local.conf', 'w') as f:
@@ -345,7 +341,13 @@ def write_local_conf(d, baseoutpath, derivative, core_meta_subdir, uninative_che
             if bb.data.inherits_class('uninative', d):
                f.write('INHERIT += "%s"\n' % 'uninative')
                f.write('UNINATIVE_CHECKSUM[%s] = "%s"\n\n' % (d.getVar('BUILD_ARCH'), uninative_checksum))
-            f.write('CONF_VERSION = "%s"\n\n' % d.getVar('CONF_VERSION', False))
+
+            # CONF_VERSION may not be set, for example when using an empty local.conf
+            # generated with bitbake-setup, and it is not otherwise required to exist.
+            # Write it out only if it's defined.
+            conf_version = d.getVar('CONF_VERSION', False)
+            if conf_version is not None:
+                f.write('CONF_VERSION = "%s"\n\n' % conf_version)
 
             # Some classes are not suitable for SDK, remove them from INHERIT
             f.write('INHERIT:remove = "%s"\n' % d.getVar('ESDK_CLASS_INHERIT_DISABLE', False))

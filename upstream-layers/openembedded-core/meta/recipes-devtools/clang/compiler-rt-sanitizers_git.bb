@@ -12,7 +12,7 @@ require common-source.inc
 
 BPN = "compiler-rt-sanitizers"
 
-inherit cmake pkgconfig python3native
+inherit cmake pkgconfig
 
 def get_compiler_rt_arch(bb, d):
     if bb.utils.contains('TUNE_FEATURES', 'armv5 thumb dsp', True, False, d):
@@ -25,24 +25,20 @@ def get_compiler_rt_arch(bb, d):
 
 LIC_FILES_CHKSUM = "file://compiler-rt/LICENSE.TXT;md5=d846d1d65baf322d4c485d6ee54e877a"
 
-TUNE_CCARGS:remove = "-no-integrated-as"
-COMPILER_RT ??= "-rtlib=libgcc -unwindlib=libgcc"
-LIBCPLUSPLUS ??= "-stdlib=libstdc++"
-
 CC = "${CCACHE}${HOST_PREFIX}clang ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
 CXX = "${CCACHE}${HOST_PREFIX}clang++ ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
 BUILD_CC = "${CCACHE}${HOST_PREFIX}clang ${BUILD_CC_ARCH}"
 BUILD_CXX = "${CCACHE}${HOST_PREFIX}clang++ ${BUILD_CC_ARCH}$"
-CFLAGS += "${COMPILER_RT}"
-CXXFLAGS += "${COMPILER_RT} ${LIBCPLUSPLUS}"
 
 TOOLCHAIN = "clang"
 TOOLCHAIN_NATIVE = "clang"
 
-DEPENDS += "ninja-native virtual/crypt compiler-rt"
+DEPENDS += "virtual/crypt compiler-rt"
 DEPENDS:append:class-native = " clang-native libxcrypt-native libcxx-native"
-DEPENDS:append:class-nativesdk = " virtual/cross-c++ clang-native clang-crosssdk-${SDK_SYS} nativesdk-libxcrypt nativesdk-gcc-runtime"
-DEPENDS:append:class-target = " virtual/cross-c++ clang-cross-${TARGET_ARCH} virtual/${MLPREFIX}libc gcc-runtime"
+DEPENDS:append:class-nativesdk = " virtual/cross-c++ clang-native clang-crosssdk-${SDK_SYS} nativesdk-libxcrypt"
+DEPENDS:append:class-nativesdk = " ${@bb.utils.contains("TC_CXX_RUNTIME", "llvm", "nativesdk-libcxx", "nativesdk-gcc-runtime", d)}"
+DEPENDS:append:class-target = " virtual/cross-c++ ${MLPREFIX}clang-cross-${TARGET_ARCH} virtual/${MLPREFIX}libc"
+DEPENDS:append:class-target = " ${@bb.utils.contains("TC_CXX_RUNTIME", "llvm", "libcxx", "gcc-runtime", d)}"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[crt] = "-DCOMPILER_RT_BUILD_CRT:BOOL=ON,-DCOMPILER_RT_BUILD_CRT:BOOL=OFF"
@@ -52,11 +48,9 @@ PACKAGECONFIG[ctx-profile] = "-DCOMPILER_RT_BUILD_CTX_PROFILE=ON,-DCOMPILER_RT_B
 
 CXXFLAGS:append:libc-musl = " -D_LARGEFILE64_SOURCE"
 
-OECMAKE_TARGET_COMPILE = "compiler-rt"
-OECMAKE_TARGET_INSTALL = "install-compiler-rt install-compiler-rt-headers"
-OECMAKE_SOURCEPATH = "${S}/llvm"
+OECMAKE_SOURCEPATH = "${S}/runtimes"
 
-INSTALL_VER ?= "${MAJOR_VER}.${MINOR_VER}.${PATCH_VER}"
+INSTALL_VER ?= "${MAJOR_VER}.${MINOR_VER}.${PATCH_VER}${VER_SUFFIX}"
 INSTALL_VER:class-native = "${@oe.utils.trim_version("${PV}", 1)}"
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=RelWithDebInfo \
@@ -75,7 +69,6 @@ EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=RelWithDebInfo \
                   -DLLVM_LIBDIR_SUFFIX=${LLVM_LIBDIR_SUFFIX} \
                   -DLLVM_APPEND_VC_REV=OFF \
                   -DCOMPILER_RT_INSTALL_PATH=${nonarch_libdir}/clang/${INSTALL_VER} \
-                  -S ${S}/runtimes \
 "
 
 EXTRA_OECMAKE:append:class-native = "\
@@ -105,12 +98,6 @@ EXTRA_OECMAKE:append:class-nativesdk = "\
 "
 
 EXTRA_OECMAKE:append:libc-musl = " -DLIBCXX_HAS_MUSL_LIBC=ON "
-
-do_install:append () {
-    # Already shipped with compile-rt Orc support
-    rm -rf ${D}${nonarch_libdir}/clang/${MAJOR_VER}/lib/linux/liborc_rt-*.a
-    rm -rf ${D}${nonarch_libdir}/clang/${MAJOR_VER}/include/orc/
-}
 
 FILES_SOLIBSDEV = ""
 FILES:${PN} += "${nonarch_libdir}/clang/${INSTALL_VER} \

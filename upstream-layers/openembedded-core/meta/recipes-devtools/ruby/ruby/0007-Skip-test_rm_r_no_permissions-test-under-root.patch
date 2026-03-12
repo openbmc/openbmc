@@ -1,4 +1,4 @@
-From 9c4748aae4f69390a36875aa27d70c3c632ae944 Mon Sep 17 00:00:00 2001
+From eb5a5db74d29fd6369e9871ba1bb254aa0f22f42 Mon Sep 17 00:00:00 2001
 From: Jiaying Song <jiaying.song.cn@windriver.com>
 Date: Mon, 7 Jul 2025 15:05:57 +0800
 Subject: [PATCH] Skip test_rm_r_no_permissions test under root
@@ -27,6 +27,3 @@ index d2096a0..80e3368 100644
  
      mkdir 'tmpdatadir'
      touch 'tmpdatadir/tmpdata'
--- 
-2.34.1
-

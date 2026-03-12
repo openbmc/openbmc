@@ -23,7 +23,6 @@ CVE_STATUS[CVE-2008-1033] = "not-applicable-platform: Issue only applies to MacO
 CVE_STATUS[CVE-2009-0032] = "cpe-incorrect: Issue affects pdfdistiller plugin used with but not part of cups"
 CVE_STATUS[CVE-2018-6553] = "not-applicable-platform: This is an Ubuntu only issue"
 CVE_STATUS[CVE-2022-26691] = "fixed-version: This is fixed in 2.4.2 but the cve-check class still reports it"
-CVE_STATUS[CVE-2021-25317] = "not-applicable-config: This concerns /var/log/cups having lp ownership, our /var/log/cups is root:root, so this doesn't apply."
 
 LEAD_SONAME = "libcupsdriver.so"
 

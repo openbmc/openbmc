@@ -1,0 +1,126 @@
+From d2f528aa09a9001e63710470f6b700d122494961 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Thu, 14 Aug 2025 12:27:16 -0400
+Subject: [PATCH babeltrace] bindings/python: Allow tests to be run externally
+
+Upstream doesn't officially support running their tests externally. The python
+bindings need some tweaks to work in this configuration.
+
+The patch was created by Michael Jeanson <mjeanson@efficios.com> and is under
+discussion with upstream to see if there is a way to support OE's ue case.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Change-Id: I89555a3fbd821baa7088acc154e81665102286b8
+---
+ .../python/bt2/test_component_descriptor.py   |   2 +-
+ tests/bindings/python/bt2/test_graph.py       |   2 +-
+ tests/bindings/python/bt2/test_plugin.py      |  10 +-
+ .../python/bt2/test_query_executor.py         |   2 +-
+ tests/utils/utils.sh                          |   2 +-
+ 6 files changed, 117 insertions(+), 9 deletions(-)
+ create mode 100644 tests/0001-wip-tests-yocto.patch
+
+diff --git a/tests/bindings/python/bt2/test_component_descriptor.py b/tests/bindings/python/bt2/test_component_descriptor.py
+index dcad514eb..49a3c054d 100644
+--- a/tests/bindings/python/bt2/test_component_descriptor.py
++++ b/tests/bindings/python/bt2/test_component_descriptor.py
+@@ -19,7 +19,7 @@ class ComponentDescriptorTestCase(unittest.TestCase):
+         self._comp_descr = bt2.ComponentDescriptor(_DummySink, {"zoom": -23}, self._obj)
+ 
+     def _get_comp_cls_from_plugin(self):
+-        plugin = bt2.find_plugin("text", find_in_user_dir=False, find_in_sys_dir=False)
++        plugin = bt2.find_plugin("text", find_in_user_dir=False, find_in_sys_dir=True)
+         assert plugin is not None
+         cc = plugin.source_component_classes["dmesg"]
+         assert cc is not None
+diff --git a/tests/bindings/python/bt2/test_graph.py b/tests/bindings/python/bt2/test_graph.py
+index 9661667a9..7fe247bd9 100644
+--- a/tests/bindings/python/bt2/test_graph.py
++++ b/tests/bindings/python/bt2/test_graph.py
+@@ -113,7 +113,7 @@ class GraphTestCase(unittest.TestCase):
+         del comp_obj
+ 
+     def test_add_component_obj_non_python_comp_cls(self):
+-        plugin = bt2.find_plugin("text", find_in_user_dir=False, find_in_sys_dir=False)
++        plugin = bt2.find_plugin("text", find_in_user_dir=False, find_in_sys_dir=True)
+         assert plugin is not None
+         cc = plugin.source_component_classes["dmesg"]
+         assert cc is not None
+diff --git a/tests/bindings/python/bt2/test_plugin.py b/tests/bindings/python/bt2/test_plugin.py
+index 0d7a9e775..39451f93a 100644
+--- a/tests/bindings/python/bt2/test_plugin.py
++++ b/tests/bindings/python/bt2/test_plugin.py
+@@ -41,7 +41,7 @@ class FindPluginsTestCase(unittest.TestCase):
+             )
+ 
+     def test_find_none_existing_dir(self):
+-        plugins = bt2.find_plugins_in_path(_TEST_PLUGIN_PLUGINS_PATH, recurse=False)
++        plugins = bt2.find_plugins_in_path(os.environ["BT_TESTS_BUILDDIR"], recurse=False)
+         self.assertIsNone(plugins)
+ 
+     def test_find_dir(self):
+@@ -53,7 +53,7 @@ class FindPluginsTestCase(unittest.TestCase):
+             os.environ["BT_TESTS_OS_TYPE"], "so"
+         )
+         plugin_name = "babeltrace-plugin-utils.{}".format(extension)
+-        path = os.path.join(_TEST_PLUGIN_PLUGINS_PATH, "utils", ".libs", plugin_name)
++        path = os.path.join(_TEST_PLUGIN_PLUGINS_PATH, plugin_name)
+         pset = bt2.find_plugins_in_path(path)
+         self.assertTrue(len(pset) == 1)
+ 
+@@ -66,14 +66,14 @@ class FindPluginTestCase(unittest.TestCase):
+         self.assertIsNone(plugin)
+ 
+     def test_find_existing(self):
+-        plugin = bt2.find_plugin("ctf", find_in_user_dir=False, find_in_sys_dir=False)
++        plugin = bt2.find_plugin("ctf", find_in_user_dir=False, find_in_sys_dir=True)
+         self.assertIsNotNone(plugin)
+ 
+ 
+ class PluginTestCase(unittest.TestCase):
+     def setUp(self):
+         self._plugin = bt2.find_plugin(
+-            "ctf", find_in_user_dir=False, find_in_sys_dir=False
++            "ctf", find_in_user_dir=False, find_in_sys_dir=True
+         )
+ 
+     def tearDown(self):
+@@ -125,7 +125,7 @@ class PluginTestCase(unittest.TestCase):
+         self.assertEqual(plugins["lttng-live"].name, "lttng-live")
+ 
+     def test_filter_comp_classes_len(self):
+-        plugin = bt2.find_plugin("utils", find_in_user_dir=False, find_in_sys_dir=False)
++        plugin = bt2.find_plugin("utils", find_in_user_dir=False, find_in_sys_dir=True)
+         self.assertEqual(len(plugin.filter_component_classes), 2)
+ 
+     def test_sink_comp_classes_len(self):
+diff --git a/tests/bindings/python/bt2/test_query_executor.py b/tests/bindings/python/bt2/test_query_executor.py
+index 099457197..9bbfd417a 100644
+--- a/tests/bindings/python/bt2/test_query_executor.py
++++ b/tests/bindings/python/bt2/test_query_executor.py
+@@ -129,7 +129,7 @@ class QueryExecutorTestCase(unittest.TestCase):
+         del query_method_obj
+ 
+     def test_query_with_method_obj_non_python_comp_cls(self):
+-        plugin = bt2.find_plugin("text", find_in_user_dir=False, find_in_sys_dir=False)
++        plugin = bt2.find_plugin("text", find_in_user_dir=False, find_in_sys_dir=True)
+         assert plugin is not None
+         cc = plugin.source_component_classes["dmesg"]
+         assert cc is not None
+diff --git a/tests/utils/utils.sh b/tests/utils/utils.sh
+index 28db595d1..05b87f64e 100644
+--- a/tests/utils/utils.sh
++++ b/tests/utils/utils.sh
+@@ -143,7 +143,7 @@ export BT_TESTS_BT2_BIN
+ # bt_run_in_py_env() to use it.
+ #
+ # TODO: Remove when `tests/bindings/python/bt2/test_plugin.py` is fixed.
+-_bt_tests_plugins_path=$BT_TESTS_BUILDDIR/../src/plugins
++_bt_tests_plugins_path=/usr/lib/babeltrace2/plugins
+ 
+ # Colon-separated list of project plugin paths, if not set
+ _bt_tests_set_var_def BT_TESTS_BABELTRACE_PLUGIN_PATH \
+-- 
+2.47.2
+

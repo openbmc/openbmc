@@ -40,22 +40,39 @@ do_install() {
     install -m 0755 ${S}/network.sh ${D}${sysconfdir}/udev/scripts
 }
 
-pkg_postinst:${PN} () {
+PACKAGES =+ "${PN}-automount ${PN}-autonet"
+
+FILES:${PN}-automount = " \
+    ${sysconfdir}/udev/rules.d/automount.rules \
+    ${sysconfdir}/udev/scripts/mount.sh \
+    ${sysconfdir}/udev/mount.ignorelist \
+"
+
+RDEPENDS:${PN}-automount = "udev util-linux-blkid ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'util-linux-lsblk', '', d)}"
+CONFFILES:${PN}-automount = "${sysconfdir}/udev/mount.ignorelist"
+
+pkg_postinst:${PN}-automount () {
 	if [ -e $D${systemd_unitdir}/system/systemd-udevd.service ]; then
 		sed -i "/\[Service\]/aMountFlags=shared" $D${systemd_unitdir}/system/systemd-udevd.service
 	fi
 }
 
-pkg_postrm:${PN} () {
+pkg_postrm:${PN}-automount () {
 	if [ -e $D${systemd_unitdir}/system/systemd-udevd.service ]; then
 		sed -i "/MountFlags=shared/d" $D${systemd_unitdir}/system/systemd-udevd.service
 	fi
 }
 
-RDEPENDS:${PN} = "udev util-linux-blkid ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'util-linux-lsblk', '', d)}"
-CONFFILES:${PN} = "${sysconfdir}/udev/mount.ignorelist"
+FILES:${PN}-autonet = " \
+    ${sysconfdir}/udev/rules.d/autonet.rules \
+    ${sysconfdir}/udev/scripts/network.sh \
+"
+
+RDEPENDS:${PN}-autonet = "udev"
 
 # to replace udev-extra-rules from meta-oe
 RPROVIDES:${PN} = "udev-extra-rules"
 RREPLACES:${PN} = "udev-extra-rules"
 RCONFLICTS:${PN} = "udev-extra-rules"
+
+RDEPENDS:${PN} = "${PN}-automount ${PN}-autonet"

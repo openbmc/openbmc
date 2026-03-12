@@ -71,7 +71,7 @@ class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
 
     def run_check_emulated(self, *args, **kwargs):
         # build core-image-minimal with required packages
-        default_installed_packages = ["libgcc", "libstdc++", "libatomic", "libgomp"]
+        default_installed_packages = ["libgcc", "libstdc++", "libatomic", "libgomp", "libitm"]
         features = []
         features.append('IMAGE_FEATURES += "ssh-server-openssh"')
         features.append('CORE_IMAGE_EXTRA_INSTALL += "{0}"'.format(" ".join(default_installed_packages)))
@@ -79,7 +79,8 @@ class GccSelfTestBase(OESelftestTestCase, OEPTestResultTestCase):
         bitbake("core-image-minimal")
 
         # wrap the execution with a qemu instance
-        with runqemu("core-image-minimal", runqemuparams = "nographic") as qemu:
+        # Increase RAM to 4GB to accommodate some GCC tests that require more than 3GB 
+        with runqemu("core-image-minimal", runqemuparams = "nographic", qemuparams=" -m 4096") as qemu:
             # validate that SSH is working
             status, _ = qemu.run("uname")
             self.assertEqual(status, 0)

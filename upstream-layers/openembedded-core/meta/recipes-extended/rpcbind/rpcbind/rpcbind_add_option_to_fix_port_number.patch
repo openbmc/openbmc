@@ -1,6 +1,6 @@
-From 76f8598fd20727908e760cbb497dd6a17eda4af5 Mon Sep 17 00:00:00 2001
+From 285c193dc94b53763ac8d6f91229eaab37d45fc6 Mon Sep 17 00:00:00 2001
 From: Roy Li <rongqing.li@windriver.com>
-Date: Wed, 17 Sep 2014 13:22:14 +0800
+Date: Wed, 27 Aug 2025 11:24:53 +0800
 Subject: [PATCH] add option to make users able to use fixed port number
 
 Upstream-Status: Submitted [https://sourceforge.net/p/rpcbind/discussion/716839/thread/32af721d/]
@@ -8,6 +8,7 @@ Upstream-Status: Submitted [https://sourceforge.net/p/rpcbind/discussion/716839/
 Signed-off-by: Li Wang <li.wang@windriver.com>
 Signed-off-by: Roy Li <rongqing.li@windriver.com>
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  man/rpcbind.8      |  4 +++-
  src/rpcb_svc_com.c | 17 +++++++++++++++++
@@ -15,15 +16,15 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  3 files changed, 26 insertions(+), 3 deletions(-)
 
 diff --git a/man/rpcbind.8 b/man/rpcbind.8
-index fbf0ace..66f7c08 100644
+index 15b70f9..4a6ffbc 100644
 --- a/man/rpcbind.8
 +++ b/man/rpcbind.8
 @@ -11,7 +11,7 @@
  .Nd universal addresses to RPC program number mapper
  .Sh SYNOPSIS
  .Nm
--.Op Fl adhiLls
-+.Op Fl adhpiLls
+-.Op Fl adfhilsvw
++.Op Fl adfhpilsvw
  .Sh DESCRIPTION
  The
  .Nm
@@ -86,10 +87,10 @@ index 1743dad..07a1c75 100644
  	if (xprt == NULL) {
  		if (debugging)
 diff --git a/src/rpcbind.c b/src/rpcbind.c
-index 25d8a90..36a95b9 100644
+index bf7b499..7268907 100644
 --- a/src/rpcbind.c
 +++ b/src/rpcbind.c
-@@ -111,6 +111,7 @@ int runasdaemon = 0;
+@@ -112,6 +112,7 @@ int runasdaemon = 0;
  int insecure = 0;
  int oldstyle_local = 0;
  int verboselog = 0;
@@ -97,16 +98,16 @@ index 25d8a90..36a95b9 100644
  
  char **hosts = NULL;
  int nhosts = 0;
-@@ -884,7 +885,7 @@ parseargs(int argc, char *argv[])
+@@ -959,7 +960,7 @@ parseargs(int argc, char *argv[])
  {
  	int c;
  	oldstyle_local = 1;
--	while ((c = getopt(argc, argv, "adh:ilswf")) != -1) {
-+	while ((c = getopt(argc, argv, "adh:p:ilswf")) != -1) {
+-	while ((c = getopt(argc, argv, "adfh:ilsvw")) != -1) {
++	while ((c = getopt(argc, argv, "adfh:p:ilsvw")) != -1) {
  		switch (c) {
  		case 'a':
  			doabort = 1;	/* when debugging, do an abort on */
-@@ -902,6 +903,9 @@ parseargs(int argc, char *argv[])
+@@ -977,6 +978,9 @@ parseargs(int argc, char *argv[])
  			if (hosts[nhosts - 1] == NULL)
  				errx(1, "Out of memory");
  			break;
@@ -116,15 +117,15 @@ index 25d8a90..36a95b9 100644
  		case 'i':
  			insecure = 1;
  			break;
-@@ -920,7 +924,7 @@ parseargs(int argc, char *argv[])
+@@ -999,7 +1003,7 @@ parseargs(int argc, char *argv[])
  			break;
  #endif
  		default:	/* error */
--			fprintf(stderr,	"usage: rpcbind [-adhilswf]\n");
-+			fprintf(stderr, "usage: rpcbind [-adhpilswf]\n");
+-			fprintf(stderr,	"usage: rpcbind [-adfhilsvw]\n");
++			fprintf(stderr,	"usage: rpcbind [-adfhpilsvw]\n");
  			exit (1);
  		}
  	}
 -- 
-2.25.1
+2.34.1
 

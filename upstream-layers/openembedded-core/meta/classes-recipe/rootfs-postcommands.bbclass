@@ -47,7 +47,7 @@ ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "systemd"
 
 ROOTFS_POSTPROCESS_COMMAND += 'empty_var_volatile'
 
-ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "overlayfs", "overlayfs_qa_check overlayfs_postprocess", "", d)}'
+ROOTFS_POSTPROCESS_COMMAND += '${@bb.utils.contains("DISTRO_FEATURES", "overlayfs", "overlayfs_qa_check", "", d)}'
 
 inherit image-artifact-names
 
@@ -57,6 +57,9 @@ inherit image-artifact-names
 # the command can be overridden.
 SORT_PASSWD_POSTPROCESS_COMMAND ??= "tidy_shadowutils_files"
 ROOTFS_POSTPROCESS_COMMAND += '${SORT_PASSWD_POSTPROCESS_COMMAND}'
+
+# Check and add 'no root password' banner.
+ROOTFS_POSTPROCESS_COMMAND += "add_empty_root_password_note"
 
 #
 # Note that useradd-staticids.bbclass has to be used to ensure that
@@ -252,6 +255,20 @@ zap_empty_root_password () {
         fi
 	if [ -e ${IMAGE_ROOTFS}/etc/passwd ]; then
 		sed --follow-symlinks -i 's%^root::%root:*:%' ${IMAGE_ROOTFS}/etc/passwd
+	fi
+}
+
+#
+# This function adds a note to the login banner that the system is configured for root logins without password
+#
+add_empty_root_password_note () {
+	if [ -e ${IMAGE_ROOTFS}/etc/shadow -a -e ${IMAGE_ROOTFS}/etc/issue ]; then
+		rootpw="`grep '^root:' ${IMAGE_ROOTFS}/etc/shadow | cut -d':' -f2`"
+		rootpw_lastchanged="`grep "^root:" ${IMAGE_ROOTFS}/etc/shadow | cut -d: -f3`"
+		if [ -z "$rootpw" -a "$rootpw_lastchanged" != "0" ]; then
+			echo "Type 'root' to login with superuser privileges (no password will be asked)." >> ${IMAGE_ROOTFS}/etc/issue
+			echo "" >> ${IMAGE_ROOTFS}/etc/issue
+		fi
 	fi
 }
 
@@ -552,15 +569,4 @@ python overlayfs_qa_check() {
 
     if not allUnitExist:
         bb.fatal('Not all mount paths and units are installed in the image')
-}
-
-python overlayfs_postprocess() {
-    import shutil
-
-    # install helper script
-    helperScriptName = "overlayfs-create-dirs.sh"
-    helperScriptSource = oe.path.join(d.getVar("COREBASE"), "meta/files", helperScriptName)
-    helperScriptDest = oe.path.join(d.getVar("IMAGE_ROOTFS"), "/usr/sbin/", helperScriptName)
-    shutil.copyfile(helperScriptSource, helperScriptDest)
-    os.chmod(helperScriptDest, 0o755)
 }

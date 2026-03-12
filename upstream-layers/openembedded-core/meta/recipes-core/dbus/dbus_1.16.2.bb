@@ -20,7 +20,6 @@ SRC_URI[sha256sum] = "0ba2a1a4b16afe7bceb2c07e9ce99a8c2c3508e5dec290dbb643384bd6
 EXTRA_OEMESON = "-Dxml_docs=disabled \
                  -Ddoxygen_docs=disabled \
                  -Dsystem_socket=/run/dbus/system_bus_socket \
-                 -Dmodular_tests=enabled \
                  -Dchecks=true \
                  -Druntime_dir=${runtimedir} \
                  -Dtest_socket_dir=/tmp \
@@ -28,33 +27,30 @@ EXTRA_OEMESON = "-Dxml_docs=disabled \
                 "
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd x11', d)} \
-                   user-session \
+                   message-bus traditional-activation user-session \
                   ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)} \
                   "
 PACKAGECONFIG:class-native = ""
 PACKAGECONFIG:class-nativesdk = ""
 
+PACKAGECONFIG[message-bus] = "-Dmessage_bus=true,-Dmessage_bus=false,expat"
 PACKAGECONFIG[systemd] = "-Dsystemd=enabled -Dsystemd_system_unitdir=${systemd_system_unitdir},-Dsystemd=disabled,systemd"
 PACKAGECONFIG[x11] = "-Dx11_autolaunch=enabled,-Dx11_autolaunch=disabled, virtual/libx11 libsm"
+PACKAGECONFIG[traditional-activation] = "-Dtraditional_activation=true,-Dtraditional_activation=false"
 PACKAGECONFIG[user-session] = "-Duser_session=true -Dsystemd_user_unitdir=${systemd_user_unitdir},-Duser_session=false"
 PACKAGECONFIG[verbose-mode] = "-Dverbose_mode=true,-Dverbose_mode=false,,"
 PACKAGECONFIG[audit] = "-Dlibaudit=enabled,-Dlibaudit=disabled,audit"
 PACKAGECONFIG[selinux] = "-Dselinux=enabled,-Dselinux=disabled,libselinux"
-PACKAGECONFIG[tests] = "-Dinstalled_tests=true,-Dinstalled_tests=false"
+PACKAGECONFIG[tests] = "-Dmodular_tests=enabled -Dinstalled_tests=true,-Dmodular_tests=disabled -Dinstalled_tests=false,glib-2.0"
 
-DEPENDS = "expat virtual/libintl autoconf-archive-native glib-2.0"
+DEPENDS = "virtual/libintl"
 RDEPENDS:${PN} += "${PN}-common ${PN}-tools"
 RDEPENDS:${PN}:class-native = ""
 
-inherit useradd update-rc.d
+inherit systemd useradd update-rc.d
 
 INITSCRIPT_NAME = "dbus-1"
 INITSCRIPT_PARAMS = "start 02 5 3 2 . stop 20 0 1 6 ."
-
-python __anonymous() {
-    if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
-        d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
-}
 
 PACKAGES =+ "${PN}-lib ${PN}-common ${PN}-tools"
 
@@ -103,16 +99,7 @@ FILES:${PN}-dev += "${libdir}/dbus-1.0/include ${bindir}/dbus-test-tool ${datadi
 
 RDEPENDS:${PN}-ptest += "bash make dbus"
 
-PACKAGE_WRITE_DEPS += "${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','systemd-systemctl-native','',d)}"
 pkg_postinst:dbus() {
-	# If both systemd and sysvinit are enabled, mask the dbus-1 init script
-        if ${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','true','false',d)}; then
-		if [ -n "$D" ]; then
-			OPTS="--root=$D"
-		fi
-		systemctl $OPTS mask dbus-1.service
-	fi
-
 	if [ -z "$D" ] && [ -e /etc/init.d/populate-volatile.sh ] ; then
 		/etc/init.d/populate-volatile.sh update
 	fi
@@ -129,56 +116,42 @@ systemctl = '${bindir}/systemctl'
 EOF
 }
 
-do_install:append:class-target() {
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
-		install -d ${D}${sysconfdir}/init.d
-		sed 's:@bindir@:${bindir}:' < ${UNPACKDIR}/dbus-1.init > ${S}/dbus-1.init.sh
-		install -m 0755 ${S}/dbus-1.init.sh ${D}${sysconfdir}/init.d/dbus-1
-		install -d ${D}${sysconfdir}/default/volatiles
-		echo "d messagebus messagebus 0755 /run/dbus none" \
-		     > ${D}${sysconfdir}/default/volatiles/99_dbus
+do_install:append() {
+	if ${@bb.utils.contains('PACKAGECONFIG', 'message-bus', 'true', 'false', d)}; then
+		if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+			install -d ${D}${sysconfdir}/init.d
+			sed 's:@bindir@:${bindir}:' < ${UNPACKDIR}/dbus-1.init > ${S}/dbus-1.init.sh
+			install -m 0755 ${S}/dbus-1.init.sh ${D}${sysconfdir}/init.d/dbus-1
+
+			install -d ${D}${sysconfdir}/default/volatiles
+			echo "d messagebus messagebus 0755 /run/dbus none" \
+			    > ${D}${sysconfdir}/default/volatiles/99_dbus
+
+			if ${@bb.utils.contains('PACKAGECONFIG', 'systemd', 'true', 'false', d)}; then
+				# symlink dbus-1.service to /dev/null to "mask" the service, This ensures
+				# that if systemd and sysv init systems are both enabled, systemd doesn't
+				# start two system buses (one from init.d/dbus-1, one from dbus.service).
+				ln -s /dev/null ${D}${systemd_system_unitdir}/dbus-1.service
+			fi
+		fi
+
+		mkdir -p ${D}${localstatedir}/lib/dbus
+		chown messagebus:messagebus ${D}${localstatedir}/lib/dbus
+	else
+		# This gets installed even if the bus is disabled
+		rm -rf ${D}${localstatedir}
 	fi
 
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-		for i in dbus.target.wants sockets.target.wants multi-user.target.wants; do \
-			install -d ${D}${systemd_system_unitdir}/$i; done
-		install -m 0644 ${B}/bus/dbus.service ${B}/bus/dbus.socket ${D}${systemd_system_unitdir}/
-		ln -fs ../dbus.socket ${D}${systemd_system_unitdir}/dbus.target.wants/dbus.socket
-		ln -fs ../dbus.socket ${D}${systemd_system_unitdir}/sockets.target.wants/dbus.socket
-		ln -fs ../dbus.service ${D}${systemd_system_unitdir}/multi-user.target.wants/dbus.service
+	if [ "${@bb.utils.contains('PACKAGECONFIG', 'traditional-activation', '1', '0', d)}" = "1" ]
+	then
+		chown root:messagebus ${D}${libexecdir}/dbus-daemon-launch-helper
+		chmod 4755 ${D}${libexecdir}/dbus-daemon-launch-helper
 	fi
-
-	mkdir -p ${D}${localstatedir}/lib/dbus
-
-	chown messagebus:messagebus ${D}${localstatedir}/lib/dbus
-
-	chown root:messagebus ${D}${libexecdir}/dbus-daemon-launch-helper
-	chmod 4755 ${D}${libexecdir}/dbus-daemon-launch-helper
-
-	# Remove Red Hat initscript
-	rm -rf ${D}${sysconfdir}/rc.d
-
-	# Remove empty testexec directory as we don't build tests
-	rm -rf ${D}${libdir}/dbus-1.0/test
 
 	# Remove /run as it is created on startup
 	rm -rf ${D}${runtimedir}
 }
 
-do_install:append:class-native() {
-	# dbus-launch has no X support so lets not install it in case the host
-	# has a more featured and useful version
-	rm -f ${D}${bindir}/dbus-launch
-}
-
-do_install:append:class-nativesdk() {
-	# dbus-launch has no X support so lets not install it in case the host
-	# has a more featured and useful version
-	rm -f ${D}${bindir}/dbus-launch
-
-	# Remove /run to avoid QA error
-	rm -rf ${D}${runtimedir}
-}
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_PRODUCT += "d-bus_project:d-bus freedesktop:dbus freedesktop:libdbus"

@@ -26,9 +26,11 @@ for x in $CMDLINE; do
         esac
 done
 
-[ -d $PSPLASH_FIFO_DIR ] || mkdir -p $PSPLASH_FIFO_DIR
-if ! mountpoint -q $PSPLASH_FIFO_DIR; then
-	mount tmpfs -t tmpfs $PSPLASH_FIFO_DIR -o,size=40k
+if [ -n "${PSPLASH_FIFO_DIR}" ]; then
+        [ -d $PSPLASH_FIFO_DIR ] || mkdir -p $PSPLASH_FIFO_DIR
+        if ! mountpoint -q $PSPLASH_FIFO_DIR ; then
+                mount tmpfs -t tmpfs $PSPLASH_FIFO_DIR -o,size=40k
+        fi
 fi
 
 rotation=0

@@ -208,6 +208,13 @@ do_install() {
         fi
 
         if [ "${ARCH}" = "powerpc" ]; then
+            # Copy scripts that are needed by powperpc build, but don't error if they aren't present in the source.
+            # 4.18+ needs gcc-check-mprofile-kernel.sh for MPROFILE_KERNEL, for example.
+            # See https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=abba759796f9b73eb24df9b734dd063839fc62e0
+            for script in gcc-check-mprofile-kernel.sh gcc-check-fpatchable-function-entry.sh head_check.sh relocs_check.sh unrel_branch_check.sh; do
+                cp -a --parents arch/powerpc/tools/$script $kerneldir/build/ 2>/dev/null || :
+            done
+
             # 5.0 needs these files, but don't error if they aren't present in the source
             cp -a --parents arch/${ARCH}/kernel/syscalls/syscall.tbl $kerneldir/build/ 2>/dev/null || :
             cp -a --parents arch/${ARCH}/kernel/syscalls/syscalltbl.sh $kerneldir/build/ 2>/dev/null || :
@@ -327,6 +334,16 @@ do_install() {
         cp -a --parents kernel/time/timeconst.bc $kerneldir/build 2>/dev/null || :
         cp -a --parents kernel/bounds.c $kerneldir/build 2>/dev/null || :
 
+        # v6.18+ rq offset generation needs these scheduler sources/headers
+        cp -a --parents kernel/sched/rq-offsets.c $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/sched.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/cpudeadline.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/cpupri.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/features.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/stats.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/sched/ext.h $kerneldir/build 2>/dev/null || :
+        cp -a --parents kernel/workqueue_internal.h $kerneldir/build 2>/dev/null || :
+
         if [ "${ARCH}" = "mips" ]; then
             cp -a --parents arch/mips/Kbuild.platforms $kerneldir/build/
             cp --parents $(find -type f -name "Platform") $kerneldir/build
@@ -393,7 +410,7 @@ do_install() {
     for ss in $(find $kerneldir/build/scripts -type f -name '*'); do
         sed -i 's,/usr/bin/python2,/usr/bin/env python3,' "$ss"
         sed -i 's,/usr/bin/env python2,/usr/bin/env python3,' "$ss"
-        sed -i 's,/usr/bin/python,/usr/bin/env python3,' "$ss"
+        sed -i 's,/usr/bin/python$,/usr/bin/env python3,' "$ss"
     done
 
     chown -R root:root ${D}

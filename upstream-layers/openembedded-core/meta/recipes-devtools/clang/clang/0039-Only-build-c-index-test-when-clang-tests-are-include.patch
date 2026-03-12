@@ -1,0 +1,43 @@
+From de5737078972d8ba89bc6194fc0f50421c8d5631 Mon Sep 17 00:00:00 2001
+From: David Spickett <david.spickett@linaro.org>
+Date: Tue, 29 Jul 2025 14:17:56 +0000
+Subject: [PATCH] Only build c-index-test when clang tests are included
+
+c-index-test is only used for testing, and it's used in tests
+that are already guarded by CLANG_INCLUDE_TESTS in clang/CMakeLists.txt.
+
+This change enables us to do builds with LLVM_INSTALL_TOOLCHAIN_ONLY=OFF,
+and CLANG_INCLUDE_TESTS=OFF, which contain the required files
+to build other bits of llvm-project standalone, but does not
+include c-index-test which we have no need for.
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/151157]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/tools/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/clang/tools/CMakeLists.txt b/clang/tools/CMakeLists.txt
+index 50e3d694236a..196dcb1e8466 100644
+--- a/clang/tools/CMakeLists.txt
++++ b/clang/tools/CMakeLists.txt
+@@ -2,7 +2,6 @@ create_subdirectory_options(CLANG TOOL)
+ 
+ add_clang_subdirectory(diagtool)
+ add_clang_subdirectory(driver)
+-add_clang_subdirectory(apinotes-test)
+ if(CLANG_ENABLE_CIR)
+   add_clang_subdirectory(cir-opt)
+   add_clang_subdirectory(cir-translate)
+@@ -23,7 +22,10 @@ if(HAVE_CLANG_REPL_SUPPORT)
+   add_clang_subdirectory(clang-repl)
+ endif()
+ 
++if(CLANG_INCLUDE_TESTS)
++add_clang_subdirectory(apinotes-test)
+ add_clang_subdirectory(c-index-test)
++endif()
+ 
+ add_clang_subdirectory(clang-refactor)
+ # For MinGW/Cygwin we only enable shared library if LLVM_LINK_LLVM_DYLIB=ON.

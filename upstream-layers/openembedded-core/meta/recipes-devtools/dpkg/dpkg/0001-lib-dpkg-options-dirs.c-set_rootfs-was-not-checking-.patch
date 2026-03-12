@@ -1,0 +1,46 @@
+From c036cfa1ee53a900b4ed45bc91e45a0792547eea Mon Sep 17 00:00:00 2001
+From: Mark Hatle <mark.hatle@kernel.crashing.org>
+Date: Sat, 17 Jan 2026 20:20:23 +0000
+Subject: [PATCH] lib/dpkg/options-dirs.c: set_rootfs was not checking
+ environment
+
+The set_rootfs function was using the hardcoded ADMINDIR (define).  It
+should be checking the environment, and then falling back to the define
+if not set.
+
+This matches the behavior in db_dir.c.
+
+Upstream-Status: Submitted [https://lists.debian.org/debian-dpkg/2026/01/maillist.html]]
+
+Signed-off-by: Mark Hatle <mark.hatle@kernel.crashing.org>
+---
+ lib/dpkg/options-dirs.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/lib/dpkg/options-dirs.c b/lib/dpkg/options-dirs.c
+index 9b7a122fe..34869d792 100644
+--- a/lib/dpkg/options-dirs.c
++++ b/lib/dpkg/options-dirs.c
+@@ -49,13 +49,18 @@ set_admindir(const struct cmdinfo *cip, const char *value)
+ void
+ set_root(const struct cmdinfo *cip, const char *value)
+ {
++	const char *env;
+ 	char *db_dir;
+ 
+ 	/* Initialize the root directory. */
+ 	dpkg_fsys_set_dir(value);
+ 
+ 	/* Set the database directory based on the new root directory. */
+-	db_dir = dpkg_fsys_get_path(ADMINDIR);
++	env = getenv("DPKG_ADMINDIR");
++	if (env)
++		db_dir = dpkg_fsys_get_path(env);
++	else
++		db_dir = dpkg_fsys_get_path(ADMINDIR);
+ 	dpkg_db_set_dir(db_dir);
+ 	free(db_dir);
+ }
+-- 
+2.30.2
+

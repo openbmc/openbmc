@@ -1,6 +1,6 @@
-From 067992f2d0b0ff6ca114031636eb0e1eac791892 Mon Sep 17 00:00:00 2001
-From: Paul Eggleton <paul.eggleton@linux.microsoft.com>
-Date: Tue, 16 Jun 2020 03:57:25 +0000
+From 5014728695639f33895feff9cabad199b0612c45 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@microsoft.com>
+Date: Sun, 8 Feb 2026 21:34:54 -0800
 Subject: [PATCH] build.c: ignore return of 1 from tar -cf
 
 When running do_package_write_deb, we have trees of hardlinked files
@@ -23,30 +23,36 @@ Upstream-Status: Inappropriate [OE specific]
 Original patch by RP 2015/3/27, rebased by Paul Eggleton
 
 Signed-off-by: Paul Eggleton <paul.eggleton@microsoft.com>
+
+Rebase to 1.23.5
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  src/deb/build.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/src/deb/build.c b/src/deb/build.c
-index 87bd4142e..e85fd7d0f 100644
+index f7a0156f1..67e758185 100644
 --- a/src/deb/build.c
 +++ b/src/deb/build.c
-@@ -481,6 +481,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+@@ -526,6 +526,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
  {
-   int pipe_filenames[2], pipe_tarball[2];
-   pid_t pid_tar, pid_comp;
-+  int rc;
+ 	int pipe_filenames[2], pipe_tarball[2];
+ 	pid_t pid_tar, pid_comp;
++	int rc;
  
-   /* Fork off a tar. We will feed it a list of filenames on stdin later. */
-   m_pipe(pipe_filenames);
-@@ -533,7 +534,9 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
-   /* All done, clean up wait for tar and <compress> to finish their job. */
-   close(pipe_filenames[1]);
-   subproc_reap(pid_comp, _("<compress> from tar -cf"), 0);
--  subproc_reap(pid_tar, "tar -cf", 0);
-+  rc = subproc_reap(pid_tar, "tar -cf", SUBPROC_RETERROR);
-+  if (rc && rc != 1)
-+    ohshite(_("subprocess %s returned error exit status %d"), "tar -cf", rc);
+ 	/* Fork off a tar. We will feed it a list of filenames on stdin
+ 	 * later. */
+@@ -591,7 +592,9 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+ 	 * job. */
+ 	close(pipe_filenames[1]);
+ 	subproc_reap(pid_comp, _("<compress> from tar -cf"), 0);
+-	subproc_reap(pid_tar, "tar -cf", 0);
++	rc = subproc_reap(pid_tar, "tar -cf", SUBPROC_RETERROR);
++	if (rc && rc != 1)
++		ohshite(_("subprocess %s returned error exit status %d"), "tar -cf", rc);
  }
  
  static intmax_t
+-- 
+2.49.0
+

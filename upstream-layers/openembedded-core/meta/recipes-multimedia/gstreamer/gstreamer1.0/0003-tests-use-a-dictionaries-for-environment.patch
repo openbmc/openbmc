@@ -1,4 +1,4 @@
-From d24110809da4588354ad3df4ae99556e8c62838a Mon Sep 17 00:00:00 2001
+From 374c6ace83e9697aae0b21ba26f316b79279c39c Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sat, 24 Apr 2021 10:34:47 +0100
 Subject: [PATCH] tests: use a dictionaries for environment
@@ -14,10 +14,10 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index f290e2e..a3ffcb6 100644
+index e4df289..b840005 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
-@@ -164,14 +164,19 @@ foreach t : core_tests
+@@ -169,14 +169,19 @@ foreach t : core_tests
        install: installed_tests_enabled,
      )
  

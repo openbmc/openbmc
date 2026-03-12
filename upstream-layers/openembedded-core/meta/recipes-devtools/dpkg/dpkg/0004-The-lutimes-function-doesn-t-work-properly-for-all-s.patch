@@ -1,27 +1,34 @@
-From 0fc90a3ed01a7fce34de925979460638b8a57402 Mon Sep 17 00:00:00 2001
+From 541260d2d954d53b2fddd20863cf473d53017de2 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Wed, 26 Aug 2015 16:27:45 +0300
+Date: Sun, 8 Feb 2026 21:21:43 -0800
 Subject: [PATCH] The lutimes function doesn't work properly for all systems.
 
 Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
 
 Upstream-Status: Inappropriate [embedded specific]
+
+Rebase to 1.23.5
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  src/main/archives.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/src/main/archives.c b/src/main/archives.c
-index d7279e1f5..f9c6facc9 100644
+index b5c6f0356..6db2c712c 100644
 --- a/src/main/archives.c
 +++ b/src/main/archives.c
-@@ -490,8 +490,9 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
+@@ -526,9 +526,10 @@ tarobject_set_mtime(struct tar_entry *te, const char *path)
  
-   if (te->type == TAR_FILETYPE_SYMLINK) {
+ 	if (te->type == TAR_FILETYPE_SYMLINK) {
  #ifdef HAVE_LUTIMES
--    if (lutimes(path, tv) && errno != ENOSYS)
-+/*    if (lutimes(path, tv) && errno != ENOSYS)
-       ohshite(_("error setting timestamps of '%.255s'"), path);
+-		if (lutimes(path, tv) && errno != ENOSYS)
++/*		if (lutimes(path, tv) && errno != ENOSYS)
+ 			ohshite(_("error setting timestamps of '%s'"),
+ 			        path);
 +*/
  #endif
-   } else {
-     if (utimes(path, tv))
+ 	} else {
+ 		if (utimes(path, tv))
+-- 
+2.49.0
+

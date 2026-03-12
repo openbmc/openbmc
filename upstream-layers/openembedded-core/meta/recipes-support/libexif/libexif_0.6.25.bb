@@ -23,25 +23,16 @@ do_compile_ptest() {
 }
 
 do_install_ptest() {
-    install ${B}/test/test*[!\.o] ${D}${PTEST_PATH}
-    for f in ${D}${PTEST_PATH}/test*; do
-        sed -i "s/\(LD_LIBRARY_PATH=\).*\(:\$LD_LIBRARY_PATH\)\"/\1.\2/" $f
-    done
-
-    install ${B}/test/Makefile ${D}${PTEST_PATH}
-    sed -i -e "/^srcdir/c srcdir = \$\{PWD\}" ${D}${PTEST_PATH}/Makefile
-
-    install -d ${D}${PTEST_PATH}/nls
-    install ${B}/test/nls/*[!\.o] ${D}${PTEST_PATH}/nls
-    install -d ${D}${PTEST_PATH}/.libs
-    install ${B}/test/.libs/* ${D}${PTEST_PATH}/.libs
-
     install ${S}/test/*.sh ${D}${PTEST_PATH}
+
+    for file in $(find ${B}/test/test-* -executable -type f); do
+        ${B}/libtool --mode=install install $file ${D}/${PTEST_PATH}
+    done
 
     install -d ${D}${PTEST_PATH}/testdata
     install ${S}/test/testdata/* ${D}${PTEST_PATH}/testdata
-}
 
-RDEPENDS:${PN}-ptest += "make bash"
+    sed -i -e "s/@TESTS@/$(makefile-getvar ${B}/test/Makefile TESTS)/" ${D}${PTEST_PATH}/run-ptest
+}
 
 BBCLASSEXTEND = "native nativesdk"

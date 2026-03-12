@@ -23,10 +23,10 @@ EXTRA_OECONF = "--enable-shared"
 
 do_install_ptest() {
 	t=${D}${PTEST_PATH}
-	cp ${S}/util/check.sh $t
-	cp ${B}/minilzo/testmini $t
-	for i in tests/align tests/chksum lzotest/lzotest examples/simple
-		do cp ${B}/`dirname $i`/.libs/`basename $i` $t; \
+	install ${S}/util/check.sh $t
+	install ${B}/minilzo/testmini $t
+	for i in tests/align tests/chksum lzotest/lzotest examples/simple; do
+		${B}/libtool --mode=install install ${B}/$i $t
 	done
 }
 

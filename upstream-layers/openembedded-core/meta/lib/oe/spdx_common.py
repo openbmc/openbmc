@@ -230,6 +230,11 @@ def fetch_data_to_uri(fd, name):
     Translates a bitbake FetchData to a string URI
     """
     uri = fd.type
+
+    # crate: is not a valid URL.  Use url field instead if exist
+    if uri == "crate" and hasattr(fd,"url"):
+       return fd.url
+
     # Map gitsm to git, since gitsm:// is not a valid URI protocol
     if uri == "gitsm":
         uri = "git"

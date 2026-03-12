@@ -336,20 +336,20 @@ class SStateCacheManagement(SStateBase):
     def test_sstate_cache_management_script_using_pr_3(self):
         global_config = []
         target_config = []
-        global_config.append('MACHINE = "qemux86-64"')
+        global_config.append('MACHINE:forcevariable = "qemux86-64"')
         target_config.append('PR = "0"')
         global_config.append(global_config[0])
         target_config.append('PR = "1"')
-        global_config.append('MACHINE = "qemux86"')
+        global_config.append('MACHINE:forcevariable = "qemux86"')
         target_config.append('PR = "1"')
         self.run_test_sstate_cache_management_script('m4', global_config,  target_config, ignore_patterns=['populate_lic'])
 
     def test_sstate_cache_management_script_using_machine(self):
         global_config = []
         target_config = []
-        global_config.append('MACHINE = "qemux86-64"')
+        global_config.append('MACHINE:forcevariable = "qemux86-64"')
         target_config.append('')
-        global_config.append('MACHINE = "qemux86"')
+        global_config.append('MACHINE:forcevariable = "qemux86"')
         target_config.append('')
         self.run_test_sstate_cache_management_script('m4', global_config,  target_config, ignore_patterns=['populate_lic'])
 
@@ -357,7 +357,7 @@ class SStateHashSameSigs(SStateBase):
     def sstate_hashtest(self, sdkmachine):
 
         self.write_config("""
-MACHINE = "qemux86"
+MACHINE:forcevariable = "qemux86"
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash"
 BUILD_ARCH = "x86_64"
 BUILD_OS = "linux"
@@ -368,7 +368,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash")
         bitbake("core-image-weston -S none")
         self.write_config("""
-MACHINE = "qemux86"
+MACHINE:forcevariable = "qemux86"
 TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
 BUILD_ARCH = "i686"
 BUILD_OS = "linux"
@@ -454,13 +454,13 @@ class SStateHashSameSigs2(SStateBase):
 
         configA = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-MACHINE = \"qemux86-64\"
+MACHINE:forcevariable = \"qemux86-64\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
         #OLDEST_KERNEL is arch specific so set to a different value here for testing
         configB = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-MACHINE = \"qemuarm\"
+MACHINE:forcevariable = \"qemuarm\"
 OLDEST_KERNEL = \"3.3.0\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 ERROR_QA:append = " somenewoption"
@@ -475,7 +475,7 @@ WARN_QA:append = " someotheroption"
 
         configA = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-MACHINE = \"qemux86-64\"
+MACHINE:forcevariable = \"qemux86-64\"
 require conf/multilib.conf
 MULTILIBS = \"multilib:lib32\"
 DEFAULTTUNE:virtclass-multilib-lib32 = \"x86\"
@@ -483,7 +483,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 """
         configB = """
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-MACHINE = \"qemuarm\"
+MACHINE:forcevariable = \"qemuarm\"
 require conf/multilib.conf
 MULTILIBS = \"\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
@@ -500,7 +500,7 @@ class SStateHashSameSigs3(SStateBase):
 
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-MACHINE = \"qemux86\"
+MACHINE:forcevariable = \"qemux86\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
 DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
@@ -510,7 +510,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         bitbake("world meta-toolchain -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-MACHINE = \"qemux86copy\"
+MACHINE:forcevariable = \"qemux86copy\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
 DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
@@ -546,7 +546,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
 
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash\"
-MACHINE = \"qemux86\"
+MACHINE:forcevariable = \"qemux86\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
 DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
@@ -556,7 +556,7 @@ BB_SIGNATURE_HANDLER = "OEBasicHash"
         bitbake("binutils-native  -S none")
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstatesamehash2\"
-MACHINE = \"qemux86copy\"
+MACHINE:forcevariable = \"qemux86copy\"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """)
         self.track_for_cleanup(self.topdir + "/tmp-sstatesamehash2")
@@ -707,7 +707,7 @@ class SStateFindSiginfo(SStateBase):
         """
         self.write_config("""
 TMPDIR = \"${TOPDIR}/tmp-sstates-findsiginfo\"
-MACHINE = \"qemux86-64\"
+MACHINE:forcevariable = \"qemux86-64\"
 require conf/multilib.conf
 MULTILIBS = "multilib:lib32"
 DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
@@ -957,13 +957,13 @@ class SStateMirrors(SStateCheckObjectPresence):
         if check_cdn:
             self.config_sstate(True)
             self.append_config("""
-MACHINE = "{}"
+MACHINE:forcevariable = "{}"
 BB_HASHSERVE_UPSTREAM = "hashserv.yoctoproject.org:8686"
 SSTATE_MIRRORS ?= "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
 """.format(machine))
         else:
             self.append_config("""
-MACHINE = "{}"
+MACHINE:forcevariable = "{}"
 """.format(machine))
         result = bitbake("-DD -n {}".format(targets))
         bitbake("-S none {}".format(targets))

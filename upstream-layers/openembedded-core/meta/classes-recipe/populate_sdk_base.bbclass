@@ -24,6 +24,7 @@ COMPLEMENTARY_GLOB[dbg-pkgs] = '*-dbg'
 COMPLEMENTARY_GLOB[src-pkgs] = '*-src'
 COMPLEMENTARY_GLOB[ptest-pkgs] = '*-ptest ${MLPREFIX}ptest-runner'
 COMPLEMENTARY_GLOB[bash-completion-pkgs] = '*-bash-completion'
+COMPLEMENTARY_GLOB[zsh-completion-pkgs] = '*-zsh-completion'
 
 def complementary_globs(featurevar, d):
     all_globs = d.getVarFlags('COMPLEMENTARY_GLOB')
@@ -62,6 +63,11 @@ SDK_TOOLCHAIN_LANGS ??= ""
 SDK_TOOLCHAIN_LANGS:remove:sdkmingw32 = "rust"
 # libstd-rs doesn't build for mips n32 with compiler constraint errors
 SDK_TOOLCHAIN_LANGS:remove:mipsarchn32 = "rust"
+# go will not build for x86-x32 or mingw
+SDK_TOOLCHAIN_LANGS:remove:linux-gnux32 = "go"
+SDK_TOOLCHAIN_LANGS:remove:riscv32 = "go"
+SDK_TOOLCHAIN_LANGS:remove:sdkmingw32 = "go"
+SDK_TOOLCHAIN_LANGS:remove:powerpc = "go"
 
 TOOLCHAIN_HOST_TASK ?= " \
     nativesdk-packagegroup-sdk-host \
@@ -86,7 +92,7 @@ SDK_XZ_OPTIONS ?= "${XZ_DEFAULTS} ${SDK_XZ_COMPRESSION_LEVEL}"
 SDK_ZIP_OPTIONS ?= "-y"
 SDK_7ZIP_OPTIONS ?= "-mx=9 -mm=BZip2"
 SDK_7ZIP_TYPE ?= "7z"
-SDK_ZSTD_COMPRESSION_LEVEL = "-17"
+SDK_ZSTD_COMPRESSION_LEVEL ?= "-17"
 
 # To support different sdk type according to SDK_ARCHIVE_TYPE, now support zip and tar.xz
 python () {

@@ -64,7 +64,6 @@ def deb_write_pkg(pkg, d):
     import textwrap
     import subprocess
     import collections
-    import codecs
 
     outdir = d.getVar('PKGWRITEDIRDEB')
     pkgdest = d.getVar('PKGDEST')
@@ -107,7 +106,7 @@ def deb_write_pkg(pkg, d):
         bb.utils.mkdirhier(controldir)
         os.chmod(controldir, 0o755)
 
-        ctrlfile = codecs.open(os.path.join(controldir, 'control'), 'w', 'utf-8')
+        ctrlfile = open(os.path.join(controldir, 'control'), mode='w', encoding='utf-8')
 
         fields = []
         pe = d.getVar('PKGE')

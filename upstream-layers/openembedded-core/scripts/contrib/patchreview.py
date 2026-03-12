@@ -253,7 +253,8 @@ if __name__ == "__main__":
 
     if args.json:
         if os.path.isfile(args.json):
-            data = json.load(open(args.json))
+            with open(args.json) as f:
+                data = json.load(f)
         else:
             data = []
 

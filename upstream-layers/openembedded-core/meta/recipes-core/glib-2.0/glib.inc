@@ -28,9 +28,11 @@ PACKAGES += "${PN}-codegen ${PN}-utils"
 
 LEAD_SONAME = "libglib-2.0.*"
 
-inherit meson gettext gi-docgen pkgconfig ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages gobject-introspection-data
+GNOMEBN = "glib"
 
-S = "${UNPACKDIR}/glib-${PV}"
+inherit gettext gi-docgen gnomebase ptest-gnome upstream-version-is-even bash-completion gio-module-cache manpages gobject-introspection-data
+
+S = "${UNPACKDIR}/${GNOMEBN}-${PV}"
 
 GIDOCGEN_MESON_OPTION = "documentation"
 
@@ -157,6 +159,8 @@ CODEGEN_PYTHON_RDEPENDS:mingw32 = ""
 
 RDEPENDS:${PN}-codegen += "${CODEGEN_PYTHON_RDEPENDS}"
 
+RDEPENDS:${PN}-dev += "${PN}-utils"
+
 RDEPENDS:${PN}-ptest += "\
             coreutils \
             libgcc \
@@ -217,9 +221,7 @@ RDEPENDS:${PN}-ptest:append:libc-glibc = "\
 
 PE = "1"
 
-SHRT_VER = "${@oe.utils.trim_version("${PV}", 2)}"
-
-SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
+SRC_URI += "\
            file://run-ptest \
            file://0001-Fix-DATADIRNAME-on-uclibc-Linux.patch \
            file://0001-Remove-the-warning-about-deprecated-paths-in-schemas.patch \
@@ -229,12 +231,13 @@ SRC_URI = "${GNOME_MIRROR}/glib/${SHRT_VER}/glib-${PV}.tar.xz \
            file://0001-gio-tests-resources.c-comment-out-a-build-host-only-.patch \
            file://0010-Do-not-hardcode-python-path-into-various-tools.patch \
            file://skip-timeout.patch \
+           file://CVE-2026-0988.patch \
            "
-SRC_URI:append:class-native = " file://relocate-modules.patch \ 
+SRC_URI:append:class-native = " file://relocate-modules.patch \
                                 file://0001-meson.build-do-not-enable-pidfd-features-on-native-g.patch \
                               "
 
-SRC_URI[sha256sum] = "88e960dd937057407d61fcb3b45a860704b25923c37ae2478b85f2ecb5a4021f"
+SRC_URI[archive.sha256sum] = "d4e2b5d791d5015ffd8c6971ad8e975a0a55c1a14926cdb25cf843ff00682260"
 
 # Find any meson cross files in FILESPATH that are relevant for the current
 # build (using siteinfo) and add them to EXTRA_OEMESON.

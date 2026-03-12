@@ -35,7 +35,7 @@ CHECKLAYER_REQUIRED_TESTS = "\
     packages-list patch-fuzz patch-status perllocalpod perm-config perm-line perm-link recipe-naming \
     pkgconfig pkgvarcheck pkgv-undefined pn-overrides shebang-size src-uri-bad symlink-to-sysroot \
     unhandled-features-check unknown-configure-option unlisted-pkg-lics uppercase-pn useless-rpaths \
-    var-undefined virtual-slash xorg-driver-abi"
+    virtual-slash xorg-driver-abi"
 
 # Elect whether a given type of error is a warning or error, they may
 # have been set by other files.
@@ -1305,9 +1305,7 @@ python do_qa_patch() {
         return False
 
     srcdir = d.getVar('S')
-    if not bb.utils.contains('DISTRO_FEATURES', 'ptest', True, False, d):
-        pass
-    elif not (bb.utils.contains('ERROR_QA', 'unimplemented-ptest', True, False, d) or bb.utils.contains('WARN_QA', 'unimplemented-ptest', True, False, d)):
+    if not (bb.utils.contains('ERROR_QA', 'unimplemented-ptest', True, False, d) or bb.utils.contains('WARN_QA', 'unimplemented-ptest', True, False, d)):
         pass
     elif bb.data.inherits_class('ptest', d):
         bb.note("Package %s QA: skipping unimplemented-ptest: ptest implementation detected" % d.getVar('PN'))

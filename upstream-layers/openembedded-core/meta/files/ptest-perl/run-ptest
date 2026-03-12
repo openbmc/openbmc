@@ -1,10 +1,12 @@
 #!/bin/sh
 
+result=0
 for case in `find t -type f -name '*.t'`; do
     perl -I . $case >$case.output 2>&1
     ret=$?
     cat $case.output
     if [ $ret -ne 0 ]; then
+        result=1
         echo "FAIL: ${case%.t}"
     elif grep -i 'SKIP' $case.output; then
         echo "SKIP: ${case%.t}"
@@ -14,3 +16,5 @@ for case in `find t -type f -name '*.t'`; do
 
     rm -f $case.output
 done
+
+exit $result

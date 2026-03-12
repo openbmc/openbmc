@@ -14,6 +14,8 @@ import shutil
 import stat
 import subprocess
 import sys
+import shlex
+import glob
 from argparse import RawTextHelpFormatter
 from enum import Enum
 
@@ -22,6 +24,7 @@ import bb
 from devtool import exec_build_env_command, setup_tinfoil, check_workspace_recipe, DevtoolError, parse_recipe
 from devtool.standard import get_real_srctree
 from devtool.ide_plugins import BuildTool
+from oe.kernel_module import kernel_module_os_env
 
 
 logger = logging.getLogger('devtool')
@@ -46,17 +49,17 @@ class TargetDevice:
     """SSH remote login parameters"""
 
     def __init__(self, args):
-        self.extraoptions = ''
+        self.extraoptions = []
         if args.no_host_check:
-            self.extraoptions += '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+            self.extraoptions += ['-o', 'UserKnownHostsFile=/dev/null', '-o', 'StrictHostKeyChecking=no']
         self.ssh_sshexec = 'ssh'
         if args.ssh_exec:
             self.ssh_sshexec = args.ssh_exec
         self.ssh_port = ''
         if args.port:
-            self.ssh_port = "-p %s" % args.port
+            self.ssh_port = ['-p', args.port]
         if args.key:
-            self.extraoptions += ' -i %s' % args.key
+            self.extraoptions += ['-i', args.key]
 
         self.target = args.target
         target_sp = args.target.split('@')
@@ -104,7 +107,7 @@ class RecipeNative:
 
 
 class RecipeGdbCross(RecipeNative):
-    """Handle handle gdb-cross on the host and the gdbserver on the target device"""
+    """Handle gdb-cross on the host and the gdbserver on the target device"""
 
     def __init__(self, args, target_arch, target_device):
         super().__init__('gdb-cross-' + target_arch, target_arch)
@@ -265,10 +268,117 @@ class RecipeNotModified:
         self.name = name
         self.bootstrap_tasks = [name + ':do_populate_sysroot']
 
+class ExecutableBinary:
+    """Represent an installed executable binary of a modified recipe"""
+
+    def __init__(self, image_dir_d, binary_path,
+                 systemd_services, init_scripts):
+        self.image_dir_d = image_dir_d
+        self.binary_path = binary_path
+        self.init_script = None
+        self.systemd_service = None
+
+        self._init_service_for_binary(systemd_services)
+        self._init_init_script_for_binary(init_scripts)
+
+    def _init_service_for_binary(self, systemd_services):
+        """Find systemd service file that handles this binary"""
+        service_dirs = [
+            'etc/systemd/system',
+            'lib/systemd/system',
+            'usr/lib/systemd/system'
+        ]
+        for _, services in systemd_services.items():
+            for service in services:
+                for service_dir in service_dirs:
+                    service_path = os.path.join(self.image_dir_d, service_dir, service)
+                    if os.path.exists(service_path):
+                        try:
+                            with open(service_path, 'r') as f:
+                                for line in f:
+                                    if line.strip().startswith('ExecStart='):
+                                        exec_start = line.strip()[10:].strip()  # Remove 'ExecStart='
+                                        # Remove any leading modifiers like '-' or '@'
+                                        exec_start = exec_start.lstrip('-@')
+                                        # Get the first word (the executable path)
+                                        exec_binary = exec_start.split()[0] if exec_start.split() else ''
+                                        if exec_binary == self.binary_path or exec_binary.endswith('/' + self.binary_path.lstrip('/')):
+                                            logger.debug("Found systemd service for binary %s: %s" % (self.binary_path, service))
+                                            self.systemd_service = service
+                        except (IOError, OSError):
+                            continue
+
+    def _init_init_script_for_binary(self, init_scripts):
+        """Find SysV init script that handles this binary"""
+        init_dirs = [
+            'etc/init.d',
+            'etc/rc.d/init.d'
+        ]
+        for _, init_scripts in init_scripts.items():
+            for init_script in init_scripts:
+                for init_dir in init_dirs:
+                    init_path = os.path.join(self.image_dir_d, init_dir, init_script)
+                    if os.path.exists(init_path):
+                        init_script_path = os.path.join("/", init_dir, init_script)
+                        binary_name = os.path.basename(self.binary_path)
+                        # if the init script file name is equal to the binary file name, return it directly
+                        if os.path.basename(init_script) == binary_name:
+                            logger.debug("Found SysV init script for binary %s: %s" % (self.binary_path, init_script_path))
+                            self.init_script = init_script_path
+                        # Otherwise check if the script containes a reference to the binary
+                        try:
+                            with open(init_path, 'r') as f:
+                                content = f.read()
+                                pattern = r'\b' + re.escape(binary_name) + r'\b'
+                                if re.search(pattern, content):
+                                    logger.debug("Found SysV init script for binary %s: %s" % (self.binary_path, init_script_path))
+                                    self.init_script = init_script_path
+                                    return
+                        except (IOError, OSError):
+                            continue
+
+    @property
+    def binary_host_path(self):
+        """Get the absolute path of this binary on the host"""
+        return os.path.join(self.image_dir_d, self.binary_path.lstrip('/'))
+
+    @property
+    def runs_as_service(self):
+        """Check if this binary is run by a service or init script"""
+        return self.systemd_service is not None or self.init_script is not None
+
+    @property
+    def start_command(self):
+        """Get the command to start this binary"""
+        if self.systemd_service:
+            return "systemctl start %s" % self.systemd_service
+        if self.init_script:
+            return "%s start" % self.init_script
+        return None
+
+    @property
+    def stop_command(self):
+        """Get the command to stop this binary"""
+        if self.systemd_service:
+            return "systemctl stop %s" % self.systemd_service
+        if self.init_script:
+            return "%s stop" % self.init_script
+        return None
+
+    @property
+    def pid_command(self):
+        """Get the command to get the PID of this binary"""
+        if self.systemd_service:
+            return "systemctl show --property MainPID --value %s" % self.systemd_service
+        if self.init_script:
+            return "pidof %s" % os.path.basename(self.binary_path)
+        return None
+
 
 class RecipeModified:
     """Handling of recipes in the workspace created by devtool modify"""
     OE_INIT_BUILD_ENV = 'oe-init-build-env'
+    INIT_BUILD_ENV = 'init-build-env'
 
     VALID_BASH_ENV_NAME_CHARS = re.compile(r"^[a-zA-Z0-9_]*$")
 
@@ -286,9 +396,11 @@ class RecipeModified:
         self.b = None
         self.base_libdir = None
         self.bblayers = None
+        self.bitbakepath = None
         self.bpn = None
         self.d = None
         self.debug_build = None
+        self.reverse_debug_prefix_map = {}
         self.fakerootcmd = None
         self.fakerootenv = None
         self.libdir = None
@@ -297,21 +409,30 @@ class RecipeModified:
         self.package_debug_split_style = None
         self.path = None
         self.pn = None
+        self.recipe_id = None
         self.recipe_sysroot = None
         self.recipe_sysroot_native = None
+        self.s = None
         self.staging_incdir = None
         self.strip_cmd = None
         self.target_arch = None
-        self.target_dbgsrc_dir = None
+        self.tcoverride = None
         self.topdir = None
         self.workdir = None
-        self.recipe_id = None
+        # Service management
+        self.systemd_services = {}
+        self.init_scripts = {}
         # replicate bitbake build environment
         self.exported_vars = None
         self.cmd_compile = None
         self.__oe_init_dir = None
         # main build tool used by this recipe
         self.build_tool = BuildTool.UNDEFINED
+        # Whether this recipe benefits from gdbserver and rootfs-dbg in the image.
+        self.wants_gdbserver = True
+        # Whether to warn when DEBUG_BUILD is not set.  Kernel modules are built
+        # by the kernel's build system and DEBUG_BUILD does not influence them.
+        self.wants_debug_build = True
         # build_tool = cmake
         self.oecmake_generator = None
         self.cmake_cache_vars = None
@@ -321,6 +442,15 @@ class RecipeModified:
         self.mesonopts = None
         self.extra_oemeson = None
         self.meson_cross_file = None
+        # kernel module
+        self.make_targets = None
+        self.extra_oemake = None
+        self.kernel_cc = None
+        self.staging_kernel_dir = None
+
+        # Populated after bitbake built all the recipes
+        self._installed_binaries = None
+        self._gdb_pretty_print_scripts = None
 
     def initialize(self, config, workspace, tinfoil):
         recipe_d = parse_recipe(
@@ -346,6 +476,7 @@ class RecipeModified:
         self.b = recipe_d.getVar('B')
         self.base_libdir = recipe_d.getVar('base_libdir')
         self.bblayers = recipe_d.getVar('BBLAYERS').split()
+        self.bitbakepath = recipe_d.getVar('BITBAKEPATH')
         self.bpn = recipe_d.getVar('BPN')
         self.cxx = recipe_d.getVar('CXX')
         self.d = recipe_d.getVar('D')
@@ -364,17 +495,20 @@ class RecipeModified:
             recipe_d.getVar('RECIPE_SYSROOT'))
         self.recipe_sysroot_native = os.path.realpath(
             recipe_d.getVar('RECIPE_SYSROOT_NATIVE'))
+        self.s = recipe_d.getVar('S')
         self.staging_bindir_toolchain = os.path.realpath(
             recipe_d.getVar('STAGING_BINDIR_TOOLCHAIN'))
         self.staging_incdir = os.path.realpath(
             recipe_d.getVar('STAGING_INCDIR'))
         self.strip_cmd = recipe_d.getVar('STRIP')
         self.target_arch = recipe_d.getVar('TARGET_ARCH')
-        self.target_dbgsrc_dir = recipe_d.getVar('TARGET_DBGSRC_DIR')
+        self.tcoverride = recipe_d.getVar('TCOVERRIDE')
         self.topdir = recipe_d.getVar('TOPDIR')
         self.workdir = os.path.realpath(recipe_d.getVar('WORKDIR'))
 
         self.__init_exported_variables(recipe_d)
+        self.__init_systemd_services(recipe_d)
+        self.__init_init_scripts(recipe_d)
 
         if bb.data.inherits_class('cmake', recipe_d):
             self.oecmake_generator = recipe_d.getVar('OECMAKE_GENERATOR')
@@ -386,6 +520,32 @@ class RecipeModified:
             self.extra_oemeson = recipe_d.getVar('EXTRA_OEMESON')
             self.meson_cross_file = recipe_d.getVar('MESON_CROSS_FILE')
             self.build_tool = BuildTool.MESON
+        elif bb.data.inherits_class('module', recipe_d):
+            self.build_tool = BuildTool.KERNEL_MODULE
+            self.wants_gdbserver = False
+            self.wants_debug_build = False
+            make_targets = recipe_d.getVar('MAKE_TARGETS')
+            if make_targets:
+                self.make_targets = shlex.split(make_targets)
+            else:
+                self.make_targets = ["all"]
+            extra_oemake = recipe_d.getVar('EXTRA_OEMAKE')
+            if extra_oemake:
+                self.extra_oemake = shlex.split(extra_oemake)
+            else:
+                self.extra_oemake = []
+            self.kernel_cc = recipe_d.getVar('KERNEL_CC')
+            self.staging_kernel_dir = recipe_d.getVar('STAGING_KERNEL_DIR')
+            # Export up the environment for building kernel modules
+            kernel_module_os_env(recipe_d, self.exported_vars)
+
+        # For the kernel the KERNEL_CC variable contains the prefix-map arguments
+        if self.build_tool is BuildTool.KERNEL_MODULE:
+            self.reverse_debug_prefix_map = self._init_reverse_debug_prefix_map(
+                self.kernel_cc)
+        else:
+            self.reverse_debug_prefix_map = self._init_reverse_debug_prefix_map(
+                recipe_d.getVar('DEBUG_PREFIX_MAP'))
 
         # Recipe ID is the identifier for IDE config sections
         self.recipe_id = self.bpn + "-" + self.package_arch
@@ -446,6 +606,92 @@ class RecipeModified:
         """Return a : separated list of paths usable by GDB's set solib-search-path"""
         return ':'.join(self.solib_search_path(image))
 
+    def _init_reverse_debug_prefix_map(self, debug_prefix_map):
+        """Parses GCC map options and returns a mapping of target to host paths.
+
+        This function scans a string containing GCC options such as -fdebug-prefix-map,
+        -fmacro-prefix-map, and -ffile-prefix-map (in both '--option value' and '--option=value'
+        forms), extracting all mappings from target paths (used in debug info) to host source
+        paths. If multiple mappings for the same target path are found, the most suitable
+        host path is selected (preferring 'sources' over 'build' directories).
+        """
+        prefixes = ("-fdebug-prefix-map", "-fmacro-prefix-map", "-ffile-prefix-map")
+        all_mappings = {}
+        args = shlex.split(debug_prefix_map)
+        i = 0
+
+        # Collect all mappings, storing potentially multiple host paths per target path
+        while i < len(args):
+            arg = args[i]
+            mapping = None
+            for prefix in prefixes:
+                if arg == prefix:
+                    i += 1
+                    mapping = args[i]
+                    break
+                elif arg.startswith(prefix + '='):
+                    mapping = arg[len(prefix)+1:]
+                    break
+            if mapping:
+                host_path, target_path = mapping.split('=', 1)
+                if target_path:
+                    if target_path not in all_mappings:
+                        all_mappings[target_path] = []
+                    all_mappings[target_path].append(os.path.realpath(host_path))
+            i += 1
+
+        # Select the best host path for each target path (only 1:1 mappings are supported by GDB)
+        mappings = {}
+        unused_host_paths = []
+        for target_path, host_paths in all_mappings.items():
+            if len(host_paths) == 1:
+                mappings[target_path] = host_paths[0]
+            else:
+                # First priority path for sources is the source directory S
+                # Second priority path is any other directory
+                # Least priority is the build directory B, which probably contains only generated source files
+                sources_paths = [path for path in host_paths if os.path.realpath(path).startswith(os.path.realpath(self.s))]
+                if sources_paths:
+                    mappings[target_path] = sources_paths[0]
+                    unused_host_paths.extend([path for path in host_paths if path != sources_paths[0]])
+                else:
+                    # If no 'sources' path, prefer non-'build' paths
+                    non_build_paths = [path for path in host_paths if not os.path.realpath(path).startswith(os.path.realpath(self.b))]
+                    if non_build_paths:
+                        mappings[target_path] = non_build_paths[0]
+                        unused_host_paths.extend([path for path in host_paths if path != non_build_paths[0]])
+                    else:
+                        # Fall back to first path if all are build paths
+                        mappings[target_path] = host_paths[0]
+                        unused_host_paths.extend(host_paths[1:])
+
+        if unused_host_paths:
+            logger.info("Some source directories mapped by -fdebug-prefix-map are not included in the debugger search paths. Ignored host paths: %s", unused_host_paths)
+
+        return mappings
+
+    @property
+    def gdb_pretty_print_scripts(self):
+        if self._gdb_pretty_print_scripts is None:
+            if self.tcoverride == "toolchain-gcc":
+                gcc_python_helpers_pattern = os.path.join(self.recipe_sysroot, "usr", "share", "gcc-*", "python")
+                gcc_python_helpers_dirs = glob.glob(gcc_python_helpers_pattern)
+                if gcc_python_helpers_dirs:
+                    gcc_python_helpers = gcc_python_helpers_dirs[0]
+                else:
+                    logger.warning("Could not find gcc python helpers directory matching: %s", gcc_python_helpers_pattern)
+                    gcc_python_helpers = ""
+                pretty_print_scripts = [
+                    "import sys",
+                    "sys.path.insert(0, '" + gcc_python_helpers + "')",
+                    "from libstdcxx.v6.printers import register_libstdcxx_printers",
+                    "register_libstdcxx_printers(None)"
+                ]
+                self._gdb_pretty_print_scripts = pretty_print_scripts
+            else:
+                self._gdb_pretty_print_scripts = ""
+        return self._gdb_pretty_print_scripts
+
     def __init_exported_variables(self, d):
         """Find all variables with export flag set.
 
@@ -494,6 +740,41 @@ class RecipeModified:
                 continue
 
         self.exported_vars = exported_vars
+
+    def __init_systemd_services(self, d):
+        """Find all systemd service files for the recipe."""
+        services = {}
+        if bb.data.inherits_class('systemd', d):
+            systemd_packages = d.getVar('SYSTEMD_PACKAGES')
+            if systemd_packages:
+                for package in systemd_packages.split():
+                    services[package] = d.getVar('SYSTEMD_SERVICE:' + package).split()
+        self.systemd_services = services
+
+    def __init_init_scripts(self, d):
+        """Find all SysV init scripts for the recipe."""
+        init_scripts = {}
+        if bb.data.inherits_class('update-rc.d', d):
+            script_packages = d.getVar('INITSCRIPT_PACKAGES')
+            if script_packages:
+                for package in script_packages.split():
+                    initscript_name = d.getVar('INITSCRIPT_NAME:' + package)
+                    if initscript_name:
+                        # Handle both single script and multiple scripts
+                        scripts = initscript_name.split()
+                        if scripts:
+                            init_scripts[package] = scripts
+            else:
+                # If INITSCRIPT_PACKAGES is not set, check for default INITSCRIPT_NAME
+                initscript_name = d.getVar('INITSCRIPT_NAME')
+                if initscript_name:
+                    scripts = initscript_name.split()
+                    if scripts:
+                        # Use PN as the default package name when INITSCRIPT_PACKAGES is not set
+                        pn = d.getVar('PN')
+                        if pn:
+                            init_scripts[pn] = scripts
+        self.init_scripts = init_scripts
 
     def __init_cmake_preset_cache(self, d):
         """Get the arguments passed to cmake
@@ -659,9 +940,12 @@ class RecipeModified:
             return True
         return False
 
-    def find_installed_binaries(self):
+    @property
+    def installed_binaries(self):
         """find all executable elf files in the image directory"""
-        binaries = []
+        if self._installed_binaries:
+            return self._installed_binaries
+        binaries = {}
         d_len = len(self.d)
         re_so = re.compile(r'.*\.so[.0-9]*$')
         for root, _, files in os.walk(self.d, followlinks=False):
@@ -672,8 +956,12 @@ class RecipeModified:
                     continue
                 abs_name = os.path.join(root, file)
                 if os.access(abs_name, os.X_OK) and RecipeModified.is_elf_file(abs_name):
-                    binaries.append(abs_name[d_len:])
-        return sorted(binaries)
+                    binary_path = abs_name[d_len:]
+                    binary = ExecutableBinary(self.d, binary_path,
+                                              self.systemd_services, self.init_scripts)
+                    binaries[binary_path] = binary
+        self._installed_binaries = dict(sorted(binaries.items()))
+        return self._installed_binaries
 
     def gen_deploy_target_script(self, args):
         """Generate a script which does what devtool deploy-target does
@@ -700,6 +988,9 @@ class RecipeModified:
         cmd_lines.append('        for key in my_dict:')
         cmd_lines.append('            setattr(self, key, my_dict[key])')
         cmd_lines.append('filtered_args = Dict2Class(filtered_args_dict)')
+        cmd_lines.append('if len(sys.argv) > 2:')
+        cmd_lines.append('    if sys.argv[1] == "-t" or sys.argv[1] == "--target":')
+        cmd_lines.append('        setattr(filtered_args, "target", sys.argv[2])')
         cmd_lines.append(
             'setattr(filtered_args, "recipename", "%s")' % self.bpn)
         cmd_lines.append('deploy_no_d("%s", "%s", "%s", "%s", "%s", "%s", %d, "%s", "%s", filtered_args)' %
@@ -710,21 +1001,22 @@ class RecipeModified:
 
     def gen_install_deploy_script(self, args):
         """Generate a script which does install and deploy"""
-        cmd_lines = ['#!/bin/bash']
+        cmd_lines = ['#!/bin/sh']
 
-        # . oe-init-build-env $BUILDDIR
-        # Note: Sourcing scripts with arguments requires bash
+        # . oe-init-build-env $BUILDDIR $BITBAKEDIR
+        # Using 'set' to pass the build directory to oe-init-build-env in sh syntax
         cmd_lines.append('cd "%s" || { echo "cd %s failed"; exit 1; }' % (
             self.oe_init_dir, self.oe_init_dir))
-        cmd_lines.append('. "%s" "%s" || { echo ". %s %s failed"; exit 1; }' % (
-            self.oe_init_build_env, self.topdir, self.oe_init_build_env, self.topdir))
+        cmd_lines.append('set %s %s' % (self.topdir, self.bitbakepath.rstrip('/bin')))
+        cmd_lines.append('. "%s" || { echo ". %s %s failed"; exit 1; }' % (
+            self.oe_init_build_env, self.oe_init_build_env, self.topdir))
 
         # bitbake -c install
         cmd_lines.append(
             'bitbake %s -c install --force || { echo "bitbake %s -c install --force failed"; exit 1; }' % (self.bpn, self.bpn))
 
         # Self contained devtool deploy-target
-        cmd_lines.append(self.gen_deploy_target_script(args))
+        cmd_lines.append(self.gen_deploy_target_script(args) + ' "$@"')
 
         return self.write_script(cmd_lines, 'install_and_deploy')
 
@@ -740,7 +1032,13 @@ class RecipeModified:
 
     @property
     def oe_init_build_env(self):
-        """Find the oe-init-build-env used for this setup"""
+        """Find the init-build-env used for this setup"""
+        # bitbake-setup mode
+        bb_setup_init = os.path.join(self.topdir, RecipeModified.INIT_BUILD_ENV)
+        if os.path.exists(bb_setup_init):
+            return os.path.abspath(bb_setup_init)
+
+        # poky mode
         oe_init_dir = self.oe_init_dir
         if oe_init_dir:
             return os.path.join(oe_init_dir, RecipeModified.OE_INIT_BUILD_ENV)
@@ -892,12 +1190,14 @@ def ide_setup(args, config, basepath, workspace):
             exec_build_env_command(
                 config.init_path, basepath, bb_cmd_late, watch=True)
 
+    wants_gdbserver = any(
+        r.wants_gdbserver for r in recipes_modified)
     for recipe_image in recipes_images:
-        if (recipe_image.gdbserver_missing):
+        if wants_gdbserver and recipe_image.gdbserver_missing:
             logger.warning(
                 "gdbserver not installed in image %s. Remote debugging will not be available" % recipe_image)
 
-        if recipe_image.combine_dbg_image is False:
+        if wants_gdbserver and recipe_image.combine_dbg_image is False:
             logger.warning(
                 'IMAGE_CLASSES += "image-combined-dbg" is missing for image %s. Remote debugging will not find debug symbols from rootfs-dbg.' % recipe_image)
 
@@ -914,7 +1214,7 @@ def ide_setup(args, config, basepath, workspace):
             ide.setup_modified_recipe(
                 args, recipe_image, recipe_modified)
 
-            if recipe_modified.debug_build != '1':
+            if recipe_modified.wants_debug_build and recipe_modified.debug_build != '1':
                 logger.warn(
                     'Recipe %s is compiled with release build configuration. '
                     'You might want to add DEBUG_BUILD = "1" to %s. '

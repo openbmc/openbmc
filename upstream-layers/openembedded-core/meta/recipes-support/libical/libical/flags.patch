@@ -1,0 +1,40 @@
+From a5642fa1cd8c835209b39ec99e534d341779c985 Mon Sep 17 00:00:00 2001
+From: Milan Crha <mcrha@redhat.com>
+Date: Wed, 10 Sep 2025 09:52:37 +0200
+Subject: [PATCH] libical-glib: Hide some target options in the installed CMake
+ files
+
+The build paths could be shown in the installed .cmake files, thus
+hide them from there, because they are needed.
+
+Closes https://github.com/libical/libical/issues/532
+
+Upstream-Status: Submitted [https://github.com/libical/libical/pull/1010]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/libical-glib/CMakeLists.txt | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/libical-glib/CMakeLists.txt b/src/libical-glib/CMakeLists.txt
+index 9f69e9c5..aa55e013 100644
+--- a/src/libical-glib/CMakeLists.txt
++++ b/src/libical-glib/CMakeLists.txt
+@@ -8,8 +8,8 @@ add_executable(ical-glib-src-generator
+   tools/xml-parser.h
+ )
+
+-target_compile_options(ical-glib-src-generator PUBLIC ${GLIB_CFLAGS} ${LIBXML_CFLAGS} -DG_LOG_DOMAIN=\"src-generator\")
+-target_link_libraries(ical-glib-src-generator ${GLIB_LIBRARIES} ${LIBXML_LIBRARIES})
++target_compile_options(ical-glib-src-generator PRIVATE ${GLIB_CFLAGS} ${LIBXML_CFLAGS} -DG_LOG_DOMAIN=\"src-generator\")
++target_link_libraries(ical-glib-src-generator PRIVATE ${GLIB_LIBRARIES} ${LIBXML_LIBRARIES})
+
+ install(
+   TARGETS ical-glib-src-generator
+@@ -130,7 +130,7 @@ target_link_libraries(ical-glib PRIVATE ical ${GLIB_LIBRARIES})
+ if(NOT SHARED_ONLY AND NOT STATIC_ONLY)
+   add_library(ical-glib-static STATIC ${LIBICAL_GLIB_SOURCES})
+   add_dependencies(ical-glib-static ical-header)
+-  target_compile_options(ical-glib-static PUBLIC ${GLIB_CFLAGS} -DG_LOG_DOMAIN="libical-glib" -DLIBICAL_GLIB_COMPILATION)
++  target_compile_options(ical-glib-static PRIVATE ${GLIB_CFLAGS} -DG_LOG_DOMAIN="libical-glib" -DLIBICAL_GLIB_COMPILATION)
+   target_link_libraries(ical-glib-static ${GLIB_LIBRARIES})
+ endif()

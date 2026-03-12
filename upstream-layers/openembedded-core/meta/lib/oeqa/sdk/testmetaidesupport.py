@@ -21,7 +21,8 @@ class TestSDK(object):
 
         sdk_envs = OESDKTestContextExecutor._get_sdk_environs(d.getVar("DEPLOY_DIR_IMAGE"))
         tdname = d.expand("${DEPLOY_DIR_IMAGE}/${PN}.testdata.json")
-        test_data = json.load(open(tdname, "r"))
+        with open(tdname, "r") as f:
+            test_data = json.load(f)
 
         host_pkg_manifest = {"cmake-native":"", "gcc-cross":"", "gettext-native":"", "meson-native":"", "perl-native":"", "python3-core-native":"", }
         target_pkg_manifest = {"gtk+3":""}

@@ -36,7 +36,7 @@ class PingTest(OERuntimeTestCase):
                     count = 0
                     sleep(1)
         except OEQATimeoutError:
-            run_network_serialdebug(self.target.runner)
+            run_network_serialdebug(self.target)
             self.fail("Ping timeout error for address %s, count %s, output: %s" % (self.target.ip, count, output))
         msg = ('Expected 5 consecutive, got %d.\n'
                'ping output is:\n%s' % (count,output))

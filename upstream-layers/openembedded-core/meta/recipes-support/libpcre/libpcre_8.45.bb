@@ -59,11 +59,11 @@ do_install_ptest() {
 	t=${D}${PTEST_PATH}
 	cp ${UNPACKDIR}/Makefile $t
 	cp -r ${S}/testdata $t
-	for i in pcre_stringpiece_unittest pcregrep pcretest; \
-	  do cp ${B}/.libs/$i $t; \
+	for i in pcre_stringpiece_unittest pcregrep pcretest; do
+		${B}/libtool --mode=install install ${B}/$i $t/
 	done
-	for i in RunTest RunGrepTest test-driver; \
-	  do cp ${S}/$i $t; \
+	for i in RunTest RunGrepTest test-driver; do
+		install ${S}/$i $t
 	done
 	# Skip the fr_FR locale test. If the locale fr_FR is found, it is tested.
 	# If not found, the test is skipped. The test program assumes fr_FR is non-UTF-8

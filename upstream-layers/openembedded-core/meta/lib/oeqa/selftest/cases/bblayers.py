@@ -20,6 +20,12 @@ class BitbakeLayers(OESelftestTestCase):
         bitbake("python3-jsonschema-native")
         bitbake("-c addto_recipe_sysroot python3-jsonschema-native")
 
+        # Fetch variables used in multiple test cases
+        bb_vars = get_bb_vars(['COREBASE', 'BITBAKEPATH'])
+        cls.corebase = bb_vars['COREBASE']
+        cls.bitbakepath = bb_vars['BITBAKEPATH']
+        cls.jsonschema_staging_bindir = get_bb_var('STAGING_BINDIR', 'python3-jsonschema-native')
+
     def test_bitbakelayers_layerindexshowdepends(self):
         result = runCmd('bitbake-layers layerindex-show-depends meta-poky')
         find_in_contents = re.search("openembedded-core", result.output)
@@ -58,7 +64,7 @@ class BitbakeLayers(OESelftestTestCase):
         self.assertTrue(find_in_contents, msg = "Flattening layers did not work. bitbake-layers flatten output: %s" % result.output)
 
     def test_bitbakelayers_add_remove(self):
-        test_layer = os.path.join(get_bb_var('COREBASE'), 'meta-skeleton')
+        test_layer = os.path.join(self.corebase, 'meta-skeleton')
         result = runCmd('bitbake-layers show-layers')
         self.assertNotIn('meta-skeleton', result.output, "This test cannot run with meta-skeleton in bblayers.conf. bitbake-layers show-layers output: %s" % result.output)
         result = runCmd('bitbake-layers add-layer %s' % test_layer)
@@ -136,15 +142,38 @@ class BitbakeLayers(OESelftestTestCase):
         self.assertTrue(os.path.isfile(recipe_file), msg = "Can't find recipe file for %s" % recipe)
         return os.path.basename(recipe_file)
 
+    def validate_json(self, json, jsonschema):
+        python = os.path.join(self.jsonschema_staging_bindir, 'nativepython3')
+        jsonvalidator = os.path.join(self.jsonschema_staging_bindir, 'jsonschema')
+        schemas_dir = os.path.join(self.bitbakepath, "..", "setup-schema")
+        if not os.path.isabs(jsonschema):
+            jsonschema = os.path.join(schemas_dir, jsonschema)
+
+        result = runCmd(
+            "{} {} -i {} --base-uri file://{}/ {}".format(
+                python, jsonvalidator, json, schemas_dir, jsonschema
+            )
+        )
+
     def validate_layersjson(self, json):
-        python = os.path.join(get_bb_var('STAGING_BINDIR', 'python3-jsonschema-native'), 'nativepython3')
-        jsonvalidator = os.path.join(get_bb_var('STAGING_BINDIR', 'python3-jsonschema-native'), 'jsonschema')
-        jsonschema = os.path.join(get_bb_var('COREBASE'), 'meta/files/layers.schema.json')
-        result = runCmd("{} {} -i {} {}".format(python, jsonvalidator, json, jsonschema))
+        self.validate_json(json, "layers.schema.json")
 
     def test_validate_examplelayersjson(self):
-        json = os.path.join(get_bb_var('COREBASE'), "meta/files/layers.example.json")
+        json = os.path.join(self.corebase, "meta/files/layers.example.json")
         self.validate_layersjson(json)
+
+    def test_validate_bitbake_setup_default_registry(self):
+        jsonschema = "bitbake-setup.schema.json"
+
+        default_registry_path = os.path.join(self.bitbakepath, "..", "default-registry", "configurations")
+
+        for root, _, files in os.walk(default_registry_path):
+            for f in files:
+                if not f.endswith(".conf.json"):
+                    continue
+                json = os.path.join(root, f)
+                self.logger.debug("Validating %s", json)
+                self.validate_json(json, jsonschema)
 
     def test_bitbakelayers_setup(self):
         result = runCmd('bitbake-layers create-layers-setup {}'.format(self.testlayer_path))
@@ -157,7 +186,12 @@ class BitbakeLayers(OESelftestTestCase):
         with open(jsonfile) as f:
             data = json.load(f)
         for s in data['sources']:
-            data['sources'][s]['git-remote']['rev'] = '5200799866b92259e855051112520006e1aaaac0'
+            if s == 'poky' or s == 'build':
+                data['sources'][s]['git-remote']['rev'] = '5200799866b92259e855051112520006e1aaaac0'
+            elif s == 'meta-yocto':
+                data['sources'][s]['git-remote']['rev'] = '913bd8ba4dd1d5d2a38261bde985b64a36e36281'
+            elif s == 'openembedded-core':
+                data['sources'][s]['git-remote']['rev'] = '744a2277844ec9a384a9ca7dae2a634d5a0d3590'
         with open(jsonfile, 'w') as f:
             json.dump(data, f)
 
@@ -168,7 +202,7 @@ class BitbakeLayers(OESelftestTestCase):
 
         # As setup-layers checkout out an old revision of poky, there is no setup-build symlink,
         # and we need to run oe-setup-build directly from the current poky tree under test
-        oe_setup_build = os.path.join(get_bb_var('COREBASE'), 'scripts/oe-setup-build')
+        oe_setup_build = os.path.join(self.corebase, 'scripts/oe-setup-build')
         oe_setup_build_l = os.path.join(testcheckoutdir, 'setup-build')
         os.symlink(oe_setup_build,oe_setup_build_l)
 
@@ -271,3 +305,61 @@ class BitbakeConfigBuild(OESelftestTestCase):
         runCmd('bitbake-config-build disable-fragment selftest/more-fragments-here/test-another-fragment')
         self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_VARIABLE'), None)
         self.assertEqual(get_bb_var('SELFTEST_FRAGMENT_ANOTHER_VARIABLE'), None)
+
+    def test_enable_disable_builtin_fragments(self):
+        """
+        Tests that the meta-selftest properly adds a new built-in fragment from
+        its layer.conf configuration file.
+        The test sequence goes as follows:
+        1. Verify that SELFTEST_BUILTIN_FRAGMENT_VARIABLE is not set yet.
+        2. Verify that SELFTEST_BUILTIN_FRAGMENT_VARIABLE is set after setting
+           the fragment.
+        3. Verify that SELFTEST_BUILTIN_FRAGMENT_VARIABLE is set after setting
+           the fragment with another value that replaces the first one.
+        4. Repeat steps 2 and 3 to verify that going back and forth between values
+           works.
+        5. Verify that SELFTEST_BUILTIN_FRAGMENT_VARIABLE is not set after
+           removing the final assignment.
+        """
+        self.assertEqual(get_bb_var('SELFTEST_BUILTIN_FRAGMENT_VARIABLE'), None)
+
+        runCmd('bitbake-config-build enable-fragment selftest-fragment/somevalue')
+        self.assertEqual(get_bb_var('SELFTEST_BUILTIN_FRAGMENT_VARIABLE'), 'somevalue')
+
+        runCmd('bitbake-config-build enable-fragment selftest-fragment/someothervalue')
+        self.assertEqual(get_bb_var('SELFTEST_BUILTIN_FRAGMENT_VARIABLE'), 'someothervalue')
+
+        runCmd('bitbake-config-build enable-fragment selftest-fragment/somevalue')
+        self.assertEqual(get_bb_var('SELFTEST_BUILTIN_FRAGMENT_VARIABLE'), 'somevalue')
+
+        runCmd('bitbake-config-build enable-fragment selftest-fragment/someothervalue')
+        self.assertEqual(get_bb_var('SELFTEST_BUILTIN_FRAGMENT_VARIABLE'), 'someothervalue')
+
+        runCmd('bitbake-config-build disable-fragment selftest-fragment/someothervalue')
+        self.assertEqual(get_bb_var('SELFTEST_BUILTIN_FRAGMENT_VARIABLE'), None)
+
+    def test_show_fragment(self):
+        """
+        Test that bitbake-config-build show-fragment returns the expected
+        output. Use bitbake-config-build list-fragments --verbose to get the
+        path to the fragment.
+        """
+        result = runCmd('bitbake-config-build --quiet list-fragments --verbose')
+        test_fragment_re = re.compile(r'^Path: .*conf/fragments/test-fragment.conf$')
+        fragment_path, fragment_content = '', ''
+
+        for line in result.output.splitlines():
+            m = re.match(test_fragment_re, line)
+            if m:
+                fragment_path = ' '.join(line.split()[1:])
+                break
+
+        if not fragment_path:
+            raise Exception("Couldn't find the fragment")
+
+        with open(fragment_path, 'r') as f:
+            fragment_content = f'{fragment_path}:\n\n{f.read()}'.strip()
+
+        result = runCmd('bitbake-config-build --quiet show-fragment selftest/test-fragment')
+
+        self.assertEqual(result.output.strip(), fragment_content)

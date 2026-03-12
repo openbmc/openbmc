@@ -1,3 +1,0 @@
-#
-# Default preferred versions
-#

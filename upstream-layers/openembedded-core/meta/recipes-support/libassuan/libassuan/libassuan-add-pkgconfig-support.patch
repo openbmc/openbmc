@@ -1,3 +1,4 @@
+
 From 9d28122b7e7ae3f17364e1ab97355cf5eaf14cb8 Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Wed, 7 Aug 2024 11:36:26 -0400
@@ -14,14 +15,30 @@ Refactor to apply on top of 3.0.1, including reformatting as an mbox for
 easier use.
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+
+Remove $prefix/bin (/usr/bin) from search path to avoid executing gpgrt-config
+installed on the build system. At the very least it leads to warnings
+about mis-matched architectures in the config logs.
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+
 ---
- src/libassuan.m4 | 81 ++----------------------------------------------
- 1 file changed, 3 insertions(+), 78 deletions(-)
+ src/libassuan.m4 | 83 +++---------------------------------------------
+ 1 file changed, 4 insertions(+), 79 deletions(-)
 
 diff --git a/src/libassuan.m4 b/src/libassuan.m4
-index 4d7da17..f4692ab 100644
+index 4d7da17..81b495a 100644
 --- a/src/libassuan.m4
 +++ b/src/libassuan.m4
+@@ -17,7 +17,7 @@ dnl (minimum pkg-config functionality, supporting cross build)
+ dnl
+ dnl _AM_PATH_GPGRT_CONFIG
+ AC_DEFUN([_AM_PATH_GPGRT_CONFIG],[dnl
+-  AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no, [$prefix/bin:$PATH])
++  AC_PATH_PROG(GPGRT_CONFIG, gpgrt-config, no, [$PATH])
+   if test "$GPGRT_CONFIG" != "no"; then
+     # Determine gpgrt_libdir
+     #
 @@ -103,27 +103,6 @@ dnl
  AC_DEFUN([_AM_PATH_LIBASSUAN_COMMON],
  [ AC_REQUIRE([AC_CANONICAL_HOST])dnl
@@ -136,6 +153,3 @@ index 4d7da17..f4692ab 100644
      ifelse([$3], , :, [$3])
    fi
    AC_SUBST(LIBASSUAN_CFLAGS)
--- 
-2.43.0
-

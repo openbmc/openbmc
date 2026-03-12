@@ -167,12 +167,18 @@
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/gzip.py",
             "${libdir}/python${PYTHON_MAJMIN}/tarfile.py",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/gzip.py",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/tarfile.py",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/_common/_streams.py",
             "${libdir}/python${PYTHON_MAJMIN}/zipfile",
             "${libdir}/python${PYTHON_MAJMIN}/zipfile/_path"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/gzip.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tarfile.*.pyc"
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tarfile.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/__pycache__/gzip.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/__pycache__/tarfile.*.pyc",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/_common/__pycache__/_streams.*.pyc"
         ]
     },
     "core": {
@@ -188,18 +194,21 @@
             "${libdir}/python${PYTHON_MAJMIN}/UserString.py",
             "${libdir}/python${PYTHON_MAJMIN}/__future__.py",
             "${libdir}/python${PYTHON_MAJMIN}/_abcoll.py",
+            "${libdir}/python${PYTHON_MAJMIN}/_ast_unparse.py",
             "${libdir}/python${PYTHON_MAJMIN}/_bootlocale.py",
             "${libdir}/python${PYTHON_MAJMIN}/_collections_abc.py",
             "${libdir}/python${PYTHON_MAJMIN}/_colorize.py",
             "${libdir}/python${PYTHON_MAJMIN}/_compression.py",
             "${libdir}/python${PYTHON_MAJMIN}/_markupbase.py",
             "${libdir}/python${PYTHON_MAJMIN}/_opcode_metadata.py",
+            "${libdir}/python${PYTHON_MAJMIN}/_py_warnings.py",
             "${libdir}/python${PYTHON_MAJMIN}/_pyrepl",
             "${libdir}/python${PYTHON_MAJMIN}/_pyrepl/pager.py",
             "${libdir}/python${PYTHON_MAJMIN}/_sitebuiltins.py",
             "${libdir}/python${PYTHON_MAJMIN}/_sysconfigdata*.py",
             "${libdir}/python${PYTHON_MAJMIN}/_weakrefset.py",
             "${libdir}/python${PYTHON_MAJMIN}/abc.py",
+            "${libdir}/python${PYTHON_MAJMIN}/annotationlib.py",
             "${libdir}/python${PYTHON_MAJMIN}/argparse.py",
             "${libdir}/python${PYTHON_MAJMIN}/ast.py",
             "${libdir}/python${PYTHON_MAJMIN}/bisect.py",
@@ -1040,7 +1049,8 @@
             "core"
         ],
         "files": [
-            "${libdir}/python${PYTHON_MAJMIN}/string.py"
+            "${libdir}/python${PYTHON_MAJMIN}/string/__init__.py",
+            "${libdir}/python${PYTHON_MAJMIN}/string/templatelib.py"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/string.*.pyc"

@@ -9,21 +9,23 @@ import os
 import re
 import shutil
 import tempfile
+import time
 import glob
 import fnmatch
 import unittest
 import json
+import logging
+import shlex
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import runCmd, bitbake, get_bb_var, create_temp_layer
+from oeqa.utils.commands import runCmd, Command, bitbake, get_bb_var, create_temp_layer
 from oeqa.utils.commands import get_bb_vars, runqemu, runqemu_check_taps, get_test_layer
 from oeqa.core.decorator import OETestTag
+from bb.utils import mkdirhier, edit_bblayers_conf
 
 oldmetapath = None
 
 def setUpModule():
-    import bb.utils
-
     global templayerdir
     templayerdir = tempfile.mkdtemp(prefix='devtoolqa')
     corecopydir = os.path.join(templayerdir, 'core-copy')
@@ -79,12 +81,12 @@ def setUpModule():
                             shutil.copytree(pth, destdir, ignore=shutil.ignore_patterns('*.pyc', '__pycache__'))
                         else:
                             destdir = os.path.join(corecopydir, os.path.dirname(relpth))
-                            bb.utils.mkdirhier(destdir)
+                            mkdirhier(destdir)
                             shutil.copy2(pth, destdir)
             return newmetapath
         else:
             return layerpath
-    bb.utils.edit_bblayers_conf(bblayers_conf, None, None, bblayers_edit_cb)
+    edit_bblayers_conf(bblayers_conf, None, None, bblayers_edit_cb)
 
 def tearDownModule():
     if oldmetapath:
@@ -96,7 +98,7 @@ def tearDownModule():
             else:
                 return layerpath
         bblayers_conf = os.path.join(os.environ['BUILDDIR'], 'conf', 'bblayers.conf')
-        bb.utils.edit_bblayers_conf(bblayers_conf, None, None, bblayers_edit_cb)
+        edit_bblayers_conf(bblayers_conf, None, None, bblayers_edit_cb)
     shutil.rmtree(templayerdir)
 
 class DevtoolTestCase(OESelftestTestCase):
@@ -404,7 +406,7 @@ class DevtoolAddTests(DevtoolBase):
         test_file_content = "TEST CONTENT"
         test_file_package_root = os.path.join(tempdir, pn)
         test_file_dir_full = os.path.join(test_file_package_root, test_file_dir)
-        bb.utils.mkdirhier(test_file_dir_full)
+        mkdirhier(test_file_dir_full)
         with open(os.path.join(test_file_dir_full, test_file_name), "w") as f:
             f.write(test_file_content)
         bin_package_path = os.path.join(tempdir, "%s.tar.gz" % pn)
@@ -470,8 +472,8 @@ class DevtoolAddTests(DevtoolBase):
         version = 'v3.1.0'
         pn = 'mbedtls'
         # this will trigger reformat_git_uri with branch parameter in url
-        git_url = "'git://git@github.com/ARMmbed/mbedtls.git;branch=mbedtls-2.28;protocol=https'"
-        resulting_src_uri = "git://git@github.com/ARMmbed/mbedtls.git;branch=mbedtls-2.28;protocol=https"
+        git_url = "'git://git@github.com/Mbed-TLS/mbedtls.git;branch=archive/mbedtls-2.28;protocol=https'"
+        resulting_src_uri = "git://git@github.com/Mbed-TLS/mbedtls.git;branch=archive/mbedtls-2.28;protocol=https"
         self._test_devtool_add_git_url(git_url, version, pn, resulting_src_uri)
 
     def test_devtool_add_git_style2(self):
@@ -479,8 +481,8 @@ class DevtoolAddTests(DevtoolBase):
         srcrev = 'v3.1.0'
         pn = 'mbedtls'
         # this will trigger reformat_git_uri with branch parameter in url
-        git_url = "'git://git@github.com/ARMmbed/mbedtls.git;protocol=https'"
-        resulting_src_uri = "git://git@github.com/ARMmbed/mbedtls.git;protocol=https;branch=master"
+        git_url = "'git://git@github.com/Mbed-TLS/mbedtls.git;protocol=https'"
+        resulting_src_uri = "git://git@github.com/Mbed-TLS/mbedtls.git;protocol=https;branch=master"
         self._test_devtool_add_git_url(git_url, version, pn, resulting_src_uri, srcrev)
 
     def test_devtool_add_library(self):
@@ -1154,6 +1156,31 @@ class DevtoolModifyTests(DevtoolBase):
         result = bitbake(testrecipe)
         self.assertEqual(result.status, 0, "Bitbake failed, exit code %s, output %s" % (result.status, result.output))
 
+    def test_devtool_modify_nested_gitsm(self):
+        """Checks that a recipe with multiple sources including a git repo with a nested git repo with
+        submodules can be used with devtool modify
+        """
+        testrecipe = 'devtool-test-git-gitsm'
+        src_uri = get_bb_var('SRC_URI', testrecipe)
+        self.assertIn('git://', src_uri, 'This test expects the %s recipe to fetch a git source' % testrecipe)
+        self.assertIn('gitsm://', src_uri, 'This test expects the %s recipe to fetch a gitsm source' % testrecipe)
+        # Try modifying a recipe
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
+        self.assertEqual(result.status, 0, "Could not modify recipe %s. Output: %s" % (testrecipe, result.output))
+        # Test devtool status
+        result = runCmd('devtool status')
+        self.assertIn(testrecipe, result.output)
+        self.assertIn(tempdir, result.output)
+        # Submodules in repo-gitsm should be extracted
+        source_repo_gitsm_gitmodules = os.path.join(tempdir, 'nested/repo-gitsm')
+        self.assertExists(source_repo_gitsm_gitmodules, 'Nested repo repo-gitsm not found')
+        self.assertExists(os.path.join(source_repo_gitsm_gitmodules, 'bitbake'), 'Submodule not found')
+        self.assertExists(os.path.join(source_repo_gitsm_gitmodules, 'bitbake-gitsm-test1'), 'Submodule not found')
+
 class DevtoolUpdateTests(DevtoolBase):
 
     def test_devtool_update_recipe(self):
@@ -1725,7 +1752,7 @@ class DevtoolUpdateTests(DevtoolBase):
         self.assertNotIn(recipe, result.output, 'Recipe should have been reset by finish but wasn\'t')
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after finish')
         expected_status = [(' M', '.*/%s$' % os.path.basename(oldrecipefile)),
-                           ('??', '.*/.*-Adding-a-new-file.patch$')]
+                           ('??', '.*/vulkan/vulkan-samples/$')]
         self._check_repo_status(recipedir, expected_status)
         # Make sure the patch is added to the recipe with the correct "patchdir" option
         result = runCmd('git diff .', cwd=recipedir)
@@ -1844,11 +1871,12 @@ class DevtoolDeployTargetTests(DevtoolBase):
                 result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, testcommand))
                 # Check if it deployed all of the files with the right ownership/perms
                 # First look on the host - need to do this under pseudo to get the correct ownership/perms
-                bb_vars = get_bb_vars(['D', 'FAKEROOTENV', 'FAKEROOTCMD'], testrecipe)
+                bb_vars = get_bb_vars(['D', 'FAKEROOTENV', 'FAKEROOTCMD', 'PATH'], testrecipe)
                 installdir = bb_vars['D']
                 fakerootenv = bb_vars['FAKEROOTENV']
                 fakerootcmd = bb_vars['FAKEROOTCMD']
-                result = runCmd('%s %s find . -type f -exec ls -l {} \\;' % (fakerootenv, fakerootcmd), cwd=installdir)
+                path = bb_vars['PATH']
+                result = runCmd('PATH="%s" %s %s find . -type f -exec ls -l {} \\;' % (path, fakerootenv, fakerootcmd), cwd=installdir)
                 filelist1 = self._process_ls_output(result.output)
 
                 # Now look on the target
@@ -1958,13 +1986,11 @@ class DevtoolUpgradeTests(DevtoolBase):
         self.assertNotIn(recipe, result.output)
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after resetting')
 
-    def test_devtool_upgrade_git(self):
+    def _test_devtool_upgrade_git_by_recipe(self, recipe, commit):
         # Check preconditions
         self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
         self.track_for_cleanup(self.workspacedir)
         self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
-        recipe = 'devtool-upgrade-test2'
-        commit = '6cc6077a36fe2648a5f993fe7c16c9632f946517'
         oldrecipefile = get_bb_var('FILE', recipe)
         tempdir = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir)
@@ -1993,6 +2019,12 @@ class DevtoolUpgradeTests(DevtoolBase):
         result = runCmd('devtool status')
         self.assertNotIn(recipe, result.output)
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after resetting')
+
+    def test_devtool_upgrade_git(self):
+        self._test_devtool_upgrade_git_by_recipe('devtool-upgrade-test2', '6cc6077a36fe2648a5f993fe7c16c9632f946517')
+
+    def test_devtool_upgrade_gitsm(self):
+        self._test_devtool_upgrade_git_by_recipe('devtool-upgrade-test5', 'a2885dd7d25380d23627e7544b7bbb55014b16ee')
 
     def test_devtool_upgrade_drop_md5sum(self):
         # Check preconditions
@@ -2282,6 +2314,11 @@ class DevtoolUpgradeTests(DevtoolBase):
         result = runCmd('git status --porcelain', cwd=tempdir)
         self.assertIn('M maps.c', result.output)
         result = runCmd('git commit maps.c -m "Add a comment to the code"', cwd=tempdir)
+        # Make another change to the source
+        result = runCmd('sed -i \'/^#include "mdadm.h"/a \\/* Here is another comment *\\/\' maps.c', cwd=tempdir)
+        result = runCmd('git status --porcelain', cwd=tempdir)
+        self.assertIn('M maps.c', result.output)
+        result = runCmd('git commit maps.c -m "Add another comment to the code"', cwd=tempdir)
         for entry in os.listdir(recipedir):
             filesdir = os.path.join(recipedir, entry)
             if os.path.isdir(filesdir):
@@ -2301,8 +2338,15 @@ class DevtoolUpgradeTests(DevtoolBase):
         self.assertNotIn(recipe, result.output, 'Recipe should have been reset by finish but wasn\'t')
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after finish')
         expected_status = [(' M', '.*/%s$' % os.path.basename(oldrecipefile)),
-                           ('??', '.*/.*-Add-a-comment-to-the-code.patch$')]
+                           ('??', '.*/.*-Add-a-comment-to-the-code.patch$'),
+                           ('??', '.*/.*-Add-another-comment-to-the-code.patch$')]
         self._check_repo_status(recipedir, expected_status)
+        result = runCmd('git diff %s' % os.path.basename(oldrecipefile), cwd=os.path.dirname(oldrecipefile))
+        # Check that the recipe got updated as expected
+        # Can't use self._check_diff() as the order of the added files matter.
+        result = result.output.splitlines()
+        self.assertEqual('+           file://0001-Add-a-comment-to-the-code.patch \\', result[8])
+        self.assertEqual('+           file://0002-Add-another-comment-to-the-code.patch \\', result[9])
 
     def test_devtool_finish_modify_otherlayer(self):
         recipe, oldrecipefile, recipedir, filesdir = self._setup_test_devtool_finish_modify()
@@ -2311,7 +2355,7 @@ class DevtoolUpgradeTests(DevtoolBase):
         relpth = os.path.relpath(recipedir, os.path.join(get_bb_var('COREBASE'), 'meta'))
         appenddir = os.path.join(get_test_layer(), relpth)
         self.track_for_cleanup(appenddir)
-        # Try finish to the original layer
+        # Try finish to another layer than the original layer
         self.add_command_to_tearDown('rm -rf %s ; cd %s ; git checkout %s' % (recipedir, os.path.dirname(recipedir), recipedir))
         result = runCmd('devtool finish %s meta-selftest' % recipe)
         result = runCmd('devtool status')
@@ -2324,15 +2368,19 @@ class DevtoolUpgradeTests(DevtoolBase):
         recipefn = recipefn.split('_')[0] + '_%'
         appendfile = os.path.join(appenddir, recipefn + '.bbappend')
         self.assertExists(appendfile, 'bbappend %s should have been created but wasn\'t' % appendfile)
+        # Check that the bbappend got created as expected
+        with open(appendfile, 'r') as f:
+            newlines = f.readlines()
+        self.assertEqual('SRC_URI += "file://0001-Add-a-comment-to-the-code.patch file://0002-Add-another-comment-to-the-code.patch"\n', newlines[2])
         newdir = os.path.join(appenddir, recipe)
         files = os.listdir(newdir)
-        foundpatch = None
-        for fn in files:
-            if fnmatch.fnmatch(fn, '*-Add-a-comment-to-the-code.patch'):
-                foundpatch = fn
+        foundpatch = False
+        for fn in files[:]:
+            if fnmatch.fnmatch(fn, '*-Add-a*-comment-to-the-code.patch'):
+                files.remove(fn)
+                foundpatch = True
         if not foundpatch:
             self.fail('No patch file created next to bbappend')
-        files.remove(foundpatch)
         if files:
             self.fail('Unexpected file(s) copied next to bbappend: %s' % ', '.join(files))
 
@@ -2519,7 +2567,29 @@ class DevtoolUpgradeTests(DevtoolBase):
         runCmd("grep %s %s" % (modconfopt, codeconfigfile))
 
 
+
+class RunCmdBackground:
+    """Context manager to manage a background subprocess"""
+    def __init__(self, command, output_log=None, **options):
+        self.cmd = Command(command, bg=True, output_log=output_log, **options)
+
+    def __enter__(self):
+        self.cmd.run()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cmd.stop()
+
+
 class DevtoolIdeSdkTests(DevtoolBase):
+
+    MAGIC_STRING_ORIG = "Magic: 123456789"
+
+    def setUp(self):
+        super().setUp()
+        self._cmd_logger = None
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self._cmd_logger = self.logger
+
     def _write_bb_config(self, recipe_names):
         """Helper to write the bitbake local.conf file"""
         conf_lines = [
@@ -2544,6 +2614,9 @@ class DevtoolIdeSdkTests(DevtoolBase):
     def _sources_scripts_dir(self, src_dir):
         return os.path.realpath(os.path.join(src_dir, 'oe-scripts'))
 
+    def _sources_workdir_dir(self, src_dir):
+        return os.path.realpath(os.path.join(src_dir, 'oe-workdir'))
+
     def _workspace_gdbinit_dir(self, recipe_name):
         return os.path.realpath(os.path.join(self.builddir, 'workspace', 'ide-sdk', recipe_name, 'scripts', 'gdbinit'))
 
@@ -2559,7 +2632,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.track_for_cleanup(tempdir)
         self.add_command_to_tearDown('bitbake -c clean %s' % recipe_name)
 
-        result = runCmd('devtool modify %s -x %s --debug-build' % (recipe_name, tempdir))
+        result = runCmd('devtool modify %s -x %s --debug-build' % (recipe_name, tempdir), output_log=self._cmd_logger)
         self.assertExists(os.path.join(tempdir, build_file),
                           'Extracted source could not be found')
         self.assertExists(os.path.join(self.workspacedir, 'conf',
@@ -2569,7 +2642,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertTrue(matches, 'bbappend not created %s' % result.output)
 
         # Test devtool status
-        result = runCmd('devtool status')
+        result = runCmd('devtool status', output_log=self._cmd_logger)
         self.assertIn(recipe_name, result.output)
         self.assertIn(tempdir, result.output)
         self._check_src_repo(tempdir)
@@ -2612,7 +2685,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
             self._workspace_scripts_dir(recipe_name), i_and_d_script)
         self.assertExists(i_and_d_script_path)
 
-    def _devtool_ide_sdk_qemu(self, tempdir, qemu, recipe_name, example_exe):
+    def _devtool_ide_sdk_qemu(self, tempdir, qemu, recipe_name, example_exe, compile_cmd):
         """Verify deployment and execution in Qemu system work for one recipe.
 
         This function checks the entire SDK workflow: changing the code, recompiling
@@ -2625,9 +2698,8 @@ class DevtoolIdeSdkTests(DevtoolBase):
             self._workspace_scripts_dir(recipe_name), i_and_d_script)
         self.assertExists(install_deploy_cmd,
                           '%s script not found' % install_deploy_cmd)
-        runCmd(install_deploy_cmd)
+        runCmd(install_deploy_cmd, output_log=self._cmd_logger)
 
-        MAGIC_STRING_ORIG = "Magic: 123456789"
         MAGIC_STRING_NEW = "Magic: 987654321"
         ptest_cmd = "ptest-runner " + recipe_name
 
@@ -2640,7 +2712,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
         status, output = qemu.run(example_exe)
         self.assertEqual(status, 0, msg="%s failed: %s" %
                          (example_exe, output))
-        self.assertIn(MAGIC_STRING_ORIG, output)
+        self.assertIn(DevtoolIdeSdkTests.MAGIC_STRING_ORIG, output)
 
         # Verify the unmodified ptests work
         status, output = qemu.run(ptest_cmd)
@@ -2648,23 +2720,24 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertIn("PASS: cpp-example-lib", output)
 
         # Verify remote debugging works
-        self._gdb_cross_debugging(
-            qemu, recipe_name, example_exe, MAGIC_STRING_ORIG)
+        self._gdb_cross_debugging_multi(
+            qemu, recipe_name, example_exe, DevtoolIdeSdkTests.MAGIC_STRING_ORIG)
 
         # Replace the Magic String in the code, compile and deploy to Qemu
         cpp_example_lib_hpp = os.path.join(tempdir, 'cpp-example-lib.hpp')
         with open(cpp_example_lib_hpp, 'r') as file:
             cpp_code = file.read()
-            cpp_code = cpp_code.replace(MAGIC_STRING_ORIG, MAGIC_STRING_NEW)
+            cpp_code = cpp_code.replace(DevtoolIdeSdkTests.MAGIC_STRING_ORIG, MAGIC_STRING_NEW)
         with open(cpp_example_lib_hpp, 'w') as file:
             file.write(cpp_code)
-        runCmd(install_deploy_cmd, cwd=tempdir)
+        runCmd(compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
+        runCmd(install_deploy_cmd, cwd=tempdir, output_log=self._cmd_logger)
 
         # Verify the modified example prints the modified magic string
         status, output = qemu.run(example_exe)
         self.assertEqual(status, 0, msg="%s failed: %s" %
                          (example_exe, output))
-        self.assertNotIn(MAGIC_STRING_ORIG, output)
+        self.assertNotIn(DevtoolIdeSdkTests.MAGIC_STRING_ORIG, output)
         self.assertIn(MAGIC_STRING_NEW, output)
 
         # Verify the modified example ptests work
@@ -2673,7 +2746,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertIn("PASS: cpp-example-lib", output)
 
         # Verify remote debugging works wit the modified magic string
-        self._gdb_cross_debugging(
+        self._gdb_cross_debugging_multi(
             qemu, recipe_name, example_exe, MAGIC_STRING_NEW)
 
     def _gdb_cross(self):
@@ -2685,11 +2758,40 @@ class DevtoolIdeSdkTests(DevtoolBase):
 
         native_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", gdb_recipe)
         r = runCmd("%s --version" % gdb_binary,
-                   native_sysroot=native_sysroot, target_sys=target_sys)
+                   native_sysroot=native_sysroot, target_sys=target_sys, output_log=self._cmd_logger)
         self.assertEqual(r.status, 0)
         self.assertIn("GNU gdb", r.output)
 
-    def _gdb_cross_debugging(self, qemu, recipe_name, example_exe, magic_string):
+    def _gdb_debug_cpp_example(self, magic_string, gdb_start_cmd="run"):
+        """Get a series of gdb commands to debug the cpp-example-lib example"""
+        gdb_batch_cmd = " -ex 'break main' -ex '%s'" % gdb_start_cmd
+        gdb_batch_cmd += " -ex 'break CppExample::print_json()' -ex 'continue'"
+        gdb_batch_cmd += " -ex 'print CppExample::test_string.compare(\"cpp-example-lib %s\")'" % magic_string
+        gdb_batch_cmd += " -ex 'print CppExample::test_string.compare(\"cpp-example-lib %saaa\")'" % magic_string
+        gdb_batch_cmd += " -ex 'list cpp-example-lib.hpp:14,14'"
+
+        # check if resolving std::vector works with python scripts
+        gdb_batch_cmd += " -ex 'list cpp-example.cpp:55,55'"
+        gdb_batch_cmd += " -ex 'break cpp-example.cpp:55'"
+        gdb_batch_cmd += " -ex 'continue'"
+        gdb_batch_cmd += " -ex 'print numbers'"
+        gdb_batch_cmd += " -ex 'continue'"
+        return gdb_batch_cmd
+
+    def _gdb_debug_cpp_example_check(self, gdb_output, magic_string):
+        self.assertIn("Breakpoint 1, main", gdb_output)
+        self.assertIn("$1 = 0", gdb_output)  # test.string.compare equal
+        self.assertIn("$2 = -3", gdb_output)  # test.string.compare longer
+        self.assertIn(
+            'inline static const std::string test_string = "cpp-example-lib %s";' % magic_string, gdb_output)
+
+        # check if resolving std::vector works with python scripts
+        self.assertRegex(gdb_output, r"55\s+std::vector<int> numbers = \{1, 2, 3\};")
+        self.assertIn("$3 = std::vector of length 3, capacity 3 = {1, 2, 3}", gdb_output)
+
+        self.assertIn("exited normally", gdb_output)
+
+    def _gdb_cross_debugging_multi(self, qemu, recipe_name, example_exe, magic_string):
         """Verify gdb-cross is working
 
         Test remote debugging:
@@ -2702,56 +2804,48 @@ class DevtoolIdeSdkTests(DevtoolBase):
         $1 = 0
         print CppExample::test_string.compare("cpp-example-lib Magic: 123456789aaa")
         $2 = -3
-        list cpp-example-lib.hpp:13,13
+        list cpp-example-lib.hpp:14,14
         13	    inline static const std::string test_string = "cpp-example-lib Magic: 123456789";
         continue
         """
         sshargs = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
         gdbserver_script = os.path.join(self._workspace_scripts_dir(
-            recipe_name), 'gdbserver_1234_usr-bin-' + example_exe + '_m')
+            recipe_name), 'gdbserver_1234_usr-bin-' + example_exe + '_multi')
         gdb_script = os.path.join(self._workspace_scripts_dir(
             recipe_name), 'gdb_1234_usr-bin-' + example_exe)
 
         # Start a gdbserver
-        r = runCmd(gdbserver_script)
+        r = runCmd(gdbserver_script, output_log=self._cmd_logger)
         self.assertEqual(r.status, 0)
 
         # Check there is a gdbserver running
-        r = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'ps'))
+        r = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'ps'), output_log=self._cmd_logger)
         self.assertEqual(r.status, 0)
         self.assertIn("gdbserver ", r.output)
 
         # Check the pid file is correct
-        test_cmd = "cat /proc/$(cat /tmp/gdbserver_1234_usr-bin-" + \
-            example_exe + "/pid)/cmdline"
-        r = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, test_cmd))
+        test_cmd = "'cat /proc/$(cat /tmp/gdbserver_1234_usr-bin-" + \
+            example_exe + "_multi/gdbserver.pid)/cmdline'"
+        r = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, test_cmd), output_log=self._cmd_logger)
         self.assertEqual(r.status, 0)
         self.assertIn("gdbserver", r.output)
+        self.assertIn("--multi", r.output)
+        self.assertIn("1234", r.output)
 
         # Test remote debugging works
-        gdb_batch_cmd = " --batch -ex 'break main' -ex 'run'"
-        gdb_batch_cmd += " -ex 'break CppExample::print_json()' -ex 'continue'"
-        gdb_batch_cmd += " -ex 'print CppExample::test_string.compare(\"cpp-example-lib %s\")'" % magic_string
-        gdb_batch_cmd += " -ex 'print CppExample::test_string.compare(\"cpp-example-lib %saaa\")'" % magic_string
-        gdb_batch_cmd += " -ex 'list cpp-example-lib.hpp:13,13'"
-        gdb_batch_cmd += " -ex 'continue'"
-        r = runCmd(gdb_script + gdb_batch_cmd)
+        gdb_batch_cmd = " --batch " + self._gdb_debug_cpp_example(magic_string)
+        r = runCmd(gdb_script + gdb_batch_cmd, output_log=self._cmd_logger)
         self.logger.debug("%s %s returned: %s", gdb_script,
                           gdb_batch_cmd, r.output)
         self.assertEqual(r.status, 0)
-        self.assertIn("Breakpoint 1, main", r.output)
-        self.assertIn("$1 = 0", r.output)  # test.string.compare equal
-        self.assertIn("$2 = -3", r.output)  # test.string.compare longer
-        self.assertIn(
-            'inline static const std::string test_string = "cpp-example-lib %s";' % magic_string, r.output)
-        self.assertIn("exited normally", r.output)
+        self._gdb_debug_cpp_example_check(r.output, magic_string=magic_string)
 
         # Stop the gdbserver
-        r = runCmd(gdbserver_script + ' stop')
+        r = runCmd(gdbserver_script + ' stop', output_log=self._cmd_logger)
         self.assertEqual(r.status, 0)
 
         # Check there is no gdbserver running
-        r = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'ps'))
+        r = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'ps'), output_log=self._cmd_logger)
         self.assertEqual(r.status, 0)
         self.assertNotIn("gdbserver ", r.output)
 
@@ -2767,36 +2861,84 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self.assertEqual(len(config_presets), 1)
         cmake_exe = config_presets[0]["cmakeExecutable"]
         preset_name = config_presets[0]["name"]
+        compile_cmd = '%s --build --preset %s' % (cmake_exe, preset_name)
 
         # Verify the wrapper for cmake native is available
         self.assertExists(cmake_exe)
 
         # Verify the cmake preset generated by devtool ide-sdk is available
-        result = runCmd('%s --list-presets' % cmake_exe, cwd=tempdir)
+        result = runCmd('%s --list-presets' % cmake_exe, cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn(preset_name, result.output)
 
         # Verify cmake re-uses the o files compiled by bitbake
-        result = runCmd('%s --build --preset %s' %
-                        (cmake_exe, preset_name), cwd=tempdir)
+        result = runCmd(compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("ninja: no work to do.", result.output)
 
         # Verify the unit tests work (in Qemu user mode)
-        result = runCmd('%s --build --preset %s --target test' %
-                        (cmake_exe, preset_name), cwd=tempdir)
+        result = runCmd('%s --target test' % compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("100% tests passed", result.output)
 
         # Verify re-building and testing works again
-        result = runCmd('%s --build --preset %s --target clean' %
-                        (cmake_exe, preset_name), cwd=tempdir)
+        result = runCmd('%s --target clean' % compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("Cleaning", result.output)
-        result = runCmd('%s --build --preset %s' %
-                        (cmake_exe, preset_name), cwd=tempdir)
+        result = runCmd(compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("Building", result.output)
         self.assertIn("Linking", result.output)
-        result = runCmd('%s --build --preset %s --target test' %
-                        (cmake_exe, preset_name), cwd=tempdir)
+        result = runCmd('%s --target test' % compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("Running tests...", result.output)
         self.assertIn("100% tests passed", result.output)
+
+        return compile_cmd
+
+    def _verify_meson_build(self, tempdir, recipe_name):
+        """Verify meson works as expected
+
+        Check if compiling works
+        Check if unit tests can be executed in qemu (not qemu-system)
+        """
+        meson_exe = os.path.join(self._workspace_scripts_dir(recipe_name), "meson")
+        self.assertExists(meson_exe)
+        build_dir = os.path.join(self._sources_workdir_dir(tempdir), recipe_name + "-1.0")
+        compile_cmd = '%s compile -C %s' % (meson_exe, build_dir)
+
+        # Verify meson re-uses the o files compiled by bitbake
+        result = runCmd(compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
+        self.assertIn("ninja: no work to do.", result.output)
+
+        # Verify the unit tests work (in Qemu user mode)
+        result = runCmd('%s test -C %s' % (meson_exe, build_dir),
+                        cwd=tempdir, output_log=self._cmd_logger)
+        self.assertEqual(result.status, 0)
+        self.assertIn("Fail:              0", result.output)
+
+        # Verify re-building and testing works again
+        result = runCmd('%s compile -C %s --clean' % (meson_exe, build_dir),
+                        cwd=tempdir, output_log=self._cmd_logger)
+        self.assertIn("Cleaning...", result.output)
+        result = runCmd(compile_cmd, cwd=tempdir, output_log=self._cmd_logger)
+        self.assertIn("Linking target", result.output)
+        result = runCmd('%s test -C %s' % (meson_exe, build_dir),
+                        cwd=tempdir, output_log=self._cmd_logger)
+        self.assertEqual(result.status, 0)
+        self.assertIn("Fail:              0", result.output)
+
+        return compile_cmd
+
+    def _verify_service_running(self, qemu, service_name):
+        """Helper to verify a service is running in Qemu"""
+        status, output = qemu.run("pgrep %s" % service_name)
+        self.assertEqual(status, 0, msg="%s service not running: %s" %
+                         (service_name, output))
+        self.assertTrue(output.strip().isdigit(),
+                        f"pgrep output should be a PID integer, got: {output.strip()}")
+
+    def _verify_conf_file(self, qemu, conf_file, owner, group):
+        """Helper to verify a configuration file is owned by the proper user and group"""
+        ls_cmd = "ls -l %s" % conf_file
+        status, output = qemu.run(ls_cmd)
+        self.assertEqual(status, 0, msg="Failed to ls %s: %s" % (conf_file, output))
+        self.assertRegex(output, rf"^-.+ {owner} {group} .+ {re.escape(conf_file)}$",
+                         msg="%s not owned by %s:%s: %s" % (conf_file, owner, group, output))
 
     @OETestTag("runqemu")
     def test_devtool_ide_sdk_none_qemu(self):
@@ -2814,50 +2956,326 @@ class DevtoolIdeSdkTests(DevtoolBase):
             # cmake-example recipe
             recipe_name = "cmake-example"
             example_exe = "cmake-example"
+            example_user_group = "cmake-example"
+            conf_file = "/etc/cmake-example.conf"
             build_file = "CMakeLists.txt"
+
+            # Verify the cmake-example service is running on the target
+            self._verify_service_running(qemu, example_exe)
+            # Verify /etc/cmake-example.conf is owned by the cmake-example user
+            self._verify_conf_file(qemu, conf_file, example_user_group, example_user_group)
+
+            # Setup the recipe with devtool ide-sdk cmake-example ...
             tempdir = self._devtool_ide_sdk_recipe(
                 recipe_name, build_file, testimage)
             bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@%s -c --ide=none' % (
                 recipe_name, testimage, qemu.ip)
-            runCmd(bitbake_sdk_cmd)
+            runCmd(bitbake_sdk_cmd, output_log=self._cmd_logger)
+
             self._gdb_cross()
-            self._verify_cmake_preset(tempdir)
-            self._devtool_ide_sdk_qemu(tempdir, qemu, recipe_name, example_exe)
+            compile_cmd = self._verify_cmake_preset(tempdir)
+            self._devtool_ide_sdk_qemu(tempdir, qemu, recipe_name, example_exe, compile_cmd)
+
             # Verify the oe-scripts sym-link is valid
             self.assertEqual(self._workspace_scripts_dir(
                 recipe_name), self._sources_scripts_dir(tempdir))
+
+            # Verify /etc/meson-example.conf is still owned by the cmake-example user
+            # after the install and deploy scripts updated the file
+            self._verify_conf_file(qemu, conf_file, example_exe, example_exe)
+
 
             # meson-example recipe
             recipe_name = "meson-example"
             example_exe = "mesonex"
+            example_user_group = "meson-example"
+            conf_file = "/etc/meson-example.conf"
             build_file = "meson.build"
+
+            # Verify the meson-example service is running on the target
+            self._verify_service_running(qemu, example_exe)
+            # Verify /etc/meson-example.conf is owned by the meson-example user
+            self._verify_conf_file(qemu, conf_file, example_user_group, example_user_group)
+
+            # Setup the recipe with devtool ide-sdk meson-example ...
             tempdir = self._devtool_ide_sdk_recipe(
                 recipe_name, build_file, testimage)
             bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@%s -c --ide=none' % (
                 recipe_name, testimage, qemu.ip)
-            runCmd(bitbake_sdk_cmd)
+            runCmd(bitbake_sdk_cmd, output_log=self._cmd_logger)
+
             self._gdb_cross()
-            self._devtool_ide_sdk_qemu(tempdir, qemu, recipe_name, example_exe)
+            compile_cmd = self._verify_meson_build(tempdir, recipe_name)
+            self._devtool_ide_sdk_qemu(tempdir, qemu, recipe_name, example_exe, compile_cmd)
+
             # Verify the oe-scripts sym-link is valid
             self.assertEqual(self._workspace_scripts_dir(
                 recipe_name), self._sources_scripts_dir(tempdir))
 
+            # Verify /etc/meson-example.conf is still owned by the meson-example user
+            # after the install and deploy scripts updated the file
+            self._verify_conf_file(qemu, conf_file, example_user_group, example_user_group)
+
+    def _verify_launch_json(self, tempdir):
+        """Verify the launch.json file created is valid and contains proper debug configurations"""
+        launch_json_path = os.path.join(tempdir, '.vscode', 'launch.json')
+        self.assertTrue(os.path.exists(launch_json_path), "launch.json file should exist")
+
+        with open(launch_json_path) as launch_j:
+            launch_d = json.load(launch_j)
+
+        self.assertIn("configurations", launch_d)
+        configurations = launch_d["configurations"]
+        self.assertEqual(len(configurations), 3, "Should have exactly three debug configurations")
+
+        # Track configurations found
+        once_configs = []
+        attach_configs = []
+
+        for config in configurations:
+            # Verify required fields exist
+            required_fields = ["name", "type", "request", "program", "cwd", "MIMode",
+                             "miDebuggerPath", "miDebuggerServerAddress"]
+            for field in required_fields:
+                self.assertIn(field, config, f"Configuration '{config.get('name', 'Unknown')}' missing required field: {field}")
+
+            # Verify common configuration values
+            self.assertEqual(config["type"], "cppdbg", f"Configuration '{config['name']}' should use cppdbg type")
+            self.assertEqual(config["request"], "launch", f"Configuration '{config['name']}' should be launch type")
+            self.assertEqual(config["cwd"], "${workspaceFolder}", f"Configuration '{config['name']}' should use workspaceFolder as cwd")
+            self.assertEqual(config["MIMode"], "gdb", f"Configuration '{config['name']}' should use gdb MIMode")
+            self.assertEqual(config.get("externalConsole", False), False, f"Configuration '{config['name']}' should not use external console")
+            self.assertEqual(config.get("stopAtEntry", True), True, f"Configuration '{config['name']}' should stop at entry")
+
+            # Verify program path is absolute and exists conceptually
+            program = config["program"]
+            self.assertTrue(program.startswith("/"), f"Configuration '{config['name']}' program path should be absolute: {program}")
+            self.assertIn("/image/usr/bin/", program, f"Configuration '{config['name']}' program should be in image/usr/bin")
+
+            # Verify debugger path
+            debugger_path = config["miDebuggerPath"]
+            self.assertTrue(debugger_path.endswith("-gdb"), f"Configuration '{config['name']}' debugger should end with -gdb: {debugger_path}")
+            self.assertIn("/recipe-sysroot-native/usr/bin/", debugger_path, f"Configuration '{config['name']}' debugger should be in sysroot-native")
+
+            # Verify server address format
+            server_addr = config["miDebuggerServerAddress"]
+            self.assertRegex(server_addr, r"^\d+\.\d+\.\d+\.\d+:\d+$", f"Configuration '{config['name']}' server address should be IP:PORT format: {server_addr}")
+
+            # Verify additional SO lib search path exists and contains debug paths
+            so_paths = config.get("additionalSOLibSearchPath", [])
+            self.assertIn("/.debug", so_paths, f"Configuration '{config['name']}' should include debug symbol paths")
+            self.assertIn("/rootfs-dbg/", so_paths, f"Configuration '{config['name']}' should include rootfs-dbg paths")
+
+            # Verify source file mappings
+            source_map = config.get("sourceFileMap", {})
+            self.assertIsInstance(source_map, dict, f"Configuration '{config['name']}' sourceFileMap should be a dictionary")
+            self.assertIn("/usr/src/debug", source_map, f"Configuration '{config['name']}' should map /usr/src/debug")
+            self.assertIn("${workspaceFolder}", str(source_map), f"Configuration '{config['name']}' should map to workspaceFolder")
+
+            # Verify setup commands for sysroot
+            setup_commands = config.get("setupCommands", [])
+            self.assertTrue(len(setup_commands) >= 1, f"Configuration '{config['name']}' should have setup commands")
+            sysroot_cmd = setup_commands[0]
+            self.assertIn("sysroot", sysroot_cmd.get("text", ""), f"Configuration '{config['name']}' should set sysroot in setup commands")
+
+            # Verify preLaunchTask exists and matches name pattern
+            task = config.get("preLaunchTask", "")
+            self.assertTrue(task, f"Configuration '{config['name']}' preLaunchTask should not be empty")
+            # Task should contain port number and executable name from config name
+            config_name = config["name"]
+            if "_once" in config_name:
+                self.assertIn("_once", task, f"once configuration '{config_name}' should have once preLaunchTask")
+            elif "_attach" in config_name:
+                self.assertIn("_attach", task, f"attach configuration '{config_name}' should have attach preLaunchTask")
+                # Verify postDebugTask exists for attach configurations (kill gdbserver)
+                self.assertIn("postDebugTask", config, f"attach configuration '{config_name}' should have postDebugTask")
+
+            # Categorize configurations
+            config_name = config["name"]
+            if "_once" in config_name:
+                once_configs.append(config_name)
+            elif "_attach" in config_name:
+                attach_configs.append(config_name)
+
+        # Verify we have expected configuration types
+        self.assertEqual(len(once_configs), 2, f"Should have two once configuration, found: {once_configs}")
+        self.assertEqual(len(attach_configs), 1, f"Should have one attach configuration, found: {attach_configs}")
+
+    def _verify_launch_json_debugging(self, tempdir, qemu, recipe_name, example_exe):
+        """Verify remote debugging and deployment works using launch.json configurations
+
+        This method tests the VSCode debug configurations by:
+        1. Starting gdbserver on target using tasks.json commands
+        2. Running gdb debugging session with batch commands
+            $BUILDDIR/tmp/work/x86_64-linux/gdb-cross-x86_64/16.3/recipe-sysroot-native/usr/bin/x86_64-poky-linux/x86_64-poky-linux-gdb --batch  \
+            -ex 'set sysroot $BUILDDIR/tmp/work/x86-64-v3-poky-linux/cmake-example/1.0/image'  \
+            -ex 'set substitute-path /usr/include $BUILDDIR/tmp/work/x86-64-v3-poky-linux/cmake-example/1.0/recipe-sysroot/usr/include'  \
+            -ex 'set substitute-path /usr/src/debug/cmake-example/1.0 $BUILDDIR/workspace/sources/cmake-example'  \
+            -ex 'set substitute-path /usr/src/debug $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs-dbg/usr/src/debug'  \
+            -ex 'set solib-search-path $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs-dbg/lib/.debug:\
+                $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs-dbg/usr/lib/.debug:\
+                $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs-dbg/usr/lib/debug:\
+                $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs-dbg/lib:\
+                $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs-dbg/usr/lib:\
+                $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs/lib:\
+                $BUILDDIR/tmp/work/qemux86_64-poky-linux/oe-selftest-image/1.0/rootfs/usr/lib'  \
+            -ex 'file $BUILDDIR/tmp/work/x86-64-v3-poky-linux/cmake-example/1.0/image/usr/bin/cmake-example'  \
+            -ex 'target remote 192.168.7.2:1234'  \
+            -ex 'break main'  \
+            -ex 'continue'  \
+            -ex 'break CppExample::print_json()'  \
+            -ex 'continue'  \
+            -ex 'print CppExample::test_string.compare("cpp-example-lib Magic: 123456789")'  \
+            -ex 'print CppExample::test_string.compare("cpp-example-lib Magic: 123456789aaa")'  \
+            -ex 'list cpp-example-lib.hpp:14,14'  \
+            -ex 'continue'
+        3. Verifying debug output and stopping gdbserver
+        """
+        with open(os.path.join(tempdir, '.vscode', 'launch.json')) as launch_j:
+            launch_d = json.load(launch_j)
+        with open(os.path.join(tempdir, '.vscode', 'tasks.json')) as tasks_j:
+            tasks_d = json.load(tasks_j)
+
+        configurations = launch_d["configurations"]
+        tasks = tasks_d["tasks"]
+
+        # Test one configuration for remote debugging
+        once_config_count = 0
+        for config in configurations:
+            if f"usr-bin-{recipe_name}_once" in config["name"]:
+                once_config_count += 1
+                self._verify_launch_config(tempdir, config, tasks, qemu, example_exe,
+                                           self._gdb_debug_cpp_example, self._gdb_debug_cpp_example_check)
+            # It works but is not 100% reliable in VSCode
+            # This one: https://github.com/microsoft/vscode-cpptools/issues/4243 ?
+            # elif f"usr-bin-{recipe_name}_attach" in config["name"]
+            #     self._verify_launch_config(tempdir, config, tasks, qemu, example_exe)
+            else:
+                continue
+        self.assertEqual(once_config_count, 1, f"Should have one once configuration, found: {once_config_count}")
+
+    def _verify_launch_config(self, tempdir, launch_config, tasks, qemu, example_exe, debug_func=None, debug_check_func=None):
+        self.assertIsNotNone(launch_config, "Should have at least one launch debug configuration")
+
+        # Extract configuration values for launch.json
+        debugger_path = launch_config["miDebuggerPath"]
+        server_addr = launch_config["miDebuggerServerAddress"]
+        prelaunch_task_name = launch_config["preLaunchTask"]
+        program = launch_config["program"]
+        additional_so_lib_search_path = launch_config["additionalSOLibSearchPath"]
+        source_file_map = launch_config["sourceFileMap"]
+        setup_commands = launch_config["setupCommands"]
+
+        # Find the preLaunchTask in tasks.json
+        prelaunch_task = next(
+            (task for task in tasks if task["label"] == prelaunch_task_name), None)
+        self.assertIsNotNone(prelaunch_task, f"PreLaunchTask '{prelaunch_task_name}' not found in tasks.json")
+
+        # Find the dependsOn task if exists (install and deploy-target)
+        if "dependsOn" in prelaunch_task:
+            depends_task_names = prelaunch_task["dependsOn"]
+            for depends_task_name in depends_task_names:
+                depends_task = next(
+                    (task for task in tasks if task["label"] == depends_task_name), None)
+                self.assertIsNotNone(depends_task, f"DependsOn task '{depends_task_name}' not found in tasks.json")
+                # For simplicity, we assume the dependsOn task is a prerequisite and does not affect the main command
+                self.logger.debug(f"PreLaunchTask '{prelaunch_task_name}' depends on '{depends_task_name}'")
+
+                # Extract command details from dependsOn task
+                depends_task_command = depends_task["command"]
+                depends_task_args = depends_task.get("args", [])
+                self.logger.debug(f"Would execute dependsOn task: {depends_task_command} {' '.join(depends_task_args)}")
+                runCmd(f"{depends_task_command} {' '.join(depends_task_args)}", output_log=self._cmd_logger)
+
+        # Verify task structure and extract command details
+        self.assertEqual(prelaunch_task["type"], "shell", f"Task '{prelaunch_task_name}' should be shell type")
+        task_command = prelaunch_task["command"]
+        task_args = prelaunch_task["args"]
+
+        # The command should be ssh for remote execution
+        self.assertEqual(task_command, "ssh", f"Task '{prelaunch_task_name}' should use ssh command")
+        self.assertTrue(len(task_args) >= 2, f"Task '{prelaunch_task_name}' should have at least 2 args (ssh options and remote command)")
+
+        sshargs = '-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+        result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'test -x /usr/bin/gdbserver'),
+                        output_log=self._cmd_logger)
+        self.assertEqual(result.status, 0, "gdbserver should be installed on target")
+        result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'test -x ' + os.path.join('/usr/bin', example_exe)),
+                        output_log=self._cmd_logger)
+        self.assertEqual(result.status, 0, "Example binary should be installed on target")
+
+        # Start gdbserver on target using the task command (keep the ssh connection open while debugging)
+        ssh_gdbserver_cmd = [task_command] + task_args
+        # Fix shell command escaping - remove extra quotes from the last argument
+        # The task_args likely contains a quoted shell command that needs to be unquoted
+        if len(ssh_gdbserver_cmd) > 0 and ssh_gdbserver_cmd[-1].startswith('"') and ssh_gdbserver_cmd[-1].endswith('"'):
+            ssh_gdbserver_cmd[-1] = ssh_gdbserver_cmd[-1][1:-1]  # Remove surrounding quotes
+        self.logger.debug(f"Starting gdbserver with command: {' '.join(ssh_gdbserver_cmd)}")
+        with RunCmdBackground(ssh_gdbserver_cmd, output_log=self._cmd_logger):
+            # Give gdbserver a moment to start
+            time.sleep(1)
+
+            # Verify gdbserver is running on target and listening on expected port
+            result = runCmd('ssh %s root@%s %s' % (sshargs, qemu.ip, 'ps'), output_log=self._cmd_logger)
+            self.assertEqual(result.status, 0, "Failed to check processes on target")
+            self.assertIn("gdbserver", result.output, "gdbserver should be running on target")
+            _, server_port = server_addr.split(':')
+            self.assertIn(server_port, result.output, f"gdbserver should be listening on port {server_port}")
+
+            if debug_func and debug_check_func:
+                # Do a gdb remote session using the once configuration
+                gdb_batch_cmd = debugger_path + " --batch"
+                for setup_command in setup_commands:
+                    # What VSCode does, for tracing add "logging": {"engineLogging": true } to launch.json
+                    setup_cmd = setup_command["text"].strip()
+                    if setup_cmd.startswith("-"):
+                        # Ignore commands starting with '-' as they are VSCode internal commands?
+                        continue
+                    else:
+                        gdb_batch_cmd += ' -ex ' + shlex.quote(setup_cmd)
+                for k, v in source_file_map.items():
+                    gdb_batch_cmd += " -ex 'set substitute-path %s %s'" % (k, v.replace("${workspaceFolder}", tempdir))
+                gdb_batch_cmd += " -ex 'set solib-search-path %s'" % additional_so_lib_search_path
+                gdb_batch_cmd += " -ex 'file %s'" % program
+                gdb_batch_cmd += " -ex 'target remote %s'" % server_addr
+                # Add a basic set of command performing a simple debugging session
+                gdb_batch_cmd += debug_func(DevtoolIdeSdkTests.MAGIC_STRING_ORIG, "continue")
+                self.logger.debug(f"Starting gdb session with command: {gdb_batch_cmd}")
+                r = runCmd(gdb_batch_cmd, output_log=self._cmd_logger)
+                self.logger.debug("%s %s returned: %s", debugger_path, gdb_batch_cmd, r.output)
+                self.assertEqual(r.status, 0)
+                debug_check_func(r.output, DevtoolIdeSdkTests.MAGIC_STRING_ORIG)
+
+    @OETestTag("runqemu")
     def test_devtool_ide_sdk_code_cmake(self):
         """Verify a cmake recipe works with ide=code mode"""
         recipe_name = "cmake-example"
+        example_exe = "cmake-example"
         build_file = "CMakeLists.txt"
         testimage = "oe-selftest-image"
+        build_file = "CMakeLists.txt"
 
         self._check_workspace()
         self._write_bb_config([recipe_name])
-        tempdir = self._devtool_ide_sdk_recipe(
-            recipe_name, build_file, testimage)
-        bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@192.168.17.17 -c --ide=code' % (
-            recipe_name, testimage)
-        runCmd(bitbake_sdk_cmd)
-        self._verify_cmake_preset(tempdir)
-        self._verify_install_script_code(tempdir,  recipe_name)
-        self._gdb_cross()
+
+        # Verify deployment to Qemu (system mode) works
+        self._check_runqemu_prerequisites()
+        bitbake(testimage)
+        with runqemu(testimage, runqemuparams="nographic") as qemu:
+            tempdir = self._devtool_ide_sdk_recipe(
+                recipe_name, build_file, testimage)
+            bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@%s -c --ide=code' % (
+                recipe_name, testimage, qemu.ip)
+            runCmd(bitbake_sdk_cmd, output_log=self._cmd_logger)
+            self._verify_cmake_preset(tempdir)
+            self._verify_install_script_code(tempdir,  recipe_name)
+            self._gdb_cross()
+
+            # Verify the launch.json file created is valid
+            self._verify_launch_json(tempdir)
+
+            # Verify deployment and remote debugging works
+            self._verify_launch_json_debugging(tempdir, qemu, recipe_name, example_exe)
 
     def test_devtool_ide_sdk_code_meson(self):
         """Verify a meson recipe works with ide=code mode"""
@@ -2871,7 +3289,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
             recipe_name, build_file, testimage)
         bitbake_sdk_cmd = 'devtool ide-sdk %s %s -t root@192.168.17.17 -c --ide=code' % (
             recipe_name, testimage)
-        runCmd(bitbake_sdk_cmd)
+        runCmd(bitbake_sdk_cmd, output_log=self._cmd_logger)
 
         with open(os.path.join(tempdir, '.vscode', 'settings.json')) as settings_j:
             settings_d = json.load(settings_j)
@@ -2883,23 +3301,240 @@ class DevtoolIdeSdkTests(DevtoolBase):
 
         # Verify meson re-uses the o files compiled by bitbake
         result = runCmd('%s compile -C  %s' %
-                        (meson_exe, meson_build_folder), cwd=tempdir)
+                        (meson_exe, meson_build_folder), cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("ninja: no work to do.", result.output)
 
         # Verify the unit tests work (in Qemu)
-        runCmd('%s test -C %s' % (meson_exe, meson_build_folder), cwd=tempdir)
+        runCmd('%s test -C %s' % (meson_exe, meson_build_folder), cwd=tempdir,
+               output_log=self._cmd_logger)
 
         # Verify re-building and testing works again
         result = runCmd('%s compile -C  %s --clean' %
-                        (meson_exe, meson_build_folder), cwd=tempdir)
+                        (meson_exe, meson_build_folder), cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("Cleaning...", result.output)
         result = runCmd('%s compile -C  %s' %
-                        (meson_exe, meson_build_folder), cwd=tempdir)
+                        (meson_exe, meson_build_folder), cwd=tempdir, output_log=self._cmd_logger)
         self.assertIn("Linking target", result.output)
-        runCmd('%s test -C %s' % (meson_exe, meson_build_folder), cwd=tempdir)
+        runCmd('%s test -C %s' % (meson_exe, meson_build_folder), cwd=tempdir,
+               output_log=self._cmd_logger)
 
         self._verify_install_script_code(tempdir,  recipe_name)
         self._gdb_cross()
+
+    @OETestTag("runqemu")
+    def test_devtool_ide_sdk_code_kernel_module(self):
+        """Verify a kernel module recipe works with ide=code mode
+
+        Test flow:
+        1. devtool modify  — extract sources into a temporary directory
+        2. devtool ide-sdk (no -t) — generate VSCode config files with the
+           default target; verify settings.json, extensions.json,
+           c_cpp_properties.json, and the install && deploy-target task
+        3. Boot Qemu, then re-run devtool ide-sdk with -t and --skip-bitbake
+           to update the deploy scripts with the real target address
+        4. Deploy the .ko and load it with insmod; read the initial magic
+           string from the sysfs attribute exposed by the module
+        5. Modify the magic string in the source tree, rebuild with the make
+           command and environment taken from settings.json (mirroring what
+           VSCode's Makefile Tools extension would invoke), and redeploy
+        6. Reload the module and verify the updated string appears in sysfs
+        """
+        recipe_name = "selftest-kmodule"
+        build_file = "Makefile"
+        testimage = "oe-selftest-image"
+
+        self._check_workspace()
+        self._check_runqemu_prerequisites()
+
+        # Setup source tree with devtool modify
+        tempdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempdir)
+        self.add_command_to_tearDown('bitbake -c clean %s' % recipe_name)
+        result = runCmd('devtool modify %s -x %s' % (recipe_name, tempdir),
+                        output_log=self._cmd_logger)
+        self.assertExists(os.path.join(tempdir, build_file),
+                          'Extracted source could not be found')
+        self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'),
+                          'Workspace directory not created')
+        matches = glob.glob(os.path.join(
+            self.workspacedir, 'appends', recipe_name + '.bbappend'))
+        self.assertTrue(matches, 'bbappend not created %s' % result.output)
+
+        # Test devtool status
+        result = runCmd('devtool status', output_log=self._cmd_logger)
+        self.assertIn(recipe_name, result.output)
+        self.assertIn(tempdir, result.output)
+
+        # Generate VSCode configuration with the default target address; this step
+        # does not require Qemu to be running and produces the settings/tasks files
+        # that we verify first before booting the image.
+        bitbake_sdk_cmd = 'devtool ide-sdk %s %s -c --ide=code' % (recipe_name, testimage)
+        runCmd(bitbake_sdk_cmd, output_log=self._cmd_logger)
+
+        # Verify the install && deploy-target script and tasks.json entry exist
+        self._verify_install_script_code(tempdir, recipe_name)
+
+        # --- Verify settings.json ---
+        with open(os.path.join(tempdir, '.vscode', 'settings.json')) as settings_j:
+            settings_d = json.load(settings_j)
+
+        # Verify make configurations are generated (build + clean)
+        make_configs = settings_d.get('makefile.configurations', [])
+        self.assertTrue(len(make_configs) >= 2,
+                        'makefile.configurations should have at least two entries (build + clean)')
+        build_config = next((c for c in make_configs if c.get('name') != 'clean'), None)
+        self.assertIsNotNone(build_config,
+                             'A build configuration should be present in makefile.configurations')
+        clean_config = next((c for c in make_configs if c.get('name') == 'clean'), None)
+        self.assertIsNotNone(clean_config,
+                             'A clean configuration should be present in makefile.configurations')
+
+        # Verify make executable is set and exists
+        make_exe = build_config.get('makePath', '')
+        self.assertTrue(make_exe.endswith('/make'),
+                        'makePath should point to a make binary: %s' % make_exe)
+        self.assertExists(make_exe)
+
+        # Verify that the Makefile path points inside the source tree
+        self.assertEqual(build_config.get('makeDirectory'), tempdir,
+                         'makeDirectory should be the source tree')
+        self.assertEqual(build_config.get('makefilePath'),
+                         os.path.join(tempdir, 'Makefile'),
+                         'makefilePath should point to the Makefile in the source tree')
+
+        # Verify kernel sources are set read-only
+        readonly_includes = settings_d.get('files.readonlyInclude', {})
+        self.assertTrue(
+            any(k for k in readonly_includes if 'staging_kernel' in k.lower() or 'linux' in k.lower()),
+            'Kernel staging dir should be set read-only in files.readonlyInclude: %s' % readonly_includes)
+
+        # Verify the cross-build environment is exported for the terminal
+        self.assertIn('terminal.integrated.env.linux', settings_d,
+                      'terminal.integrated.env.linux should be set for kernel modules')
+        terminal_env = settings_d['terminal.integrated.env.linux']
+        self.assertIn('KERNEL_SRC', terminal_env,
+                      'KERNEL_SRC should be in the exported terminal environment')
+        self.assertIn('KERNEL_VERSION', terminal_env,
+                      'KERNEL_VERSION should be in the exported terminal environment')
+        self.assertIn('CC', terminal_env,
+                      'CC (kernel compiler) should be in the exported terminal environment')
+
+        # Verify kernel-specific file exclude patterns are present
+        files_exclude = settings_d.get('files.exclude', {})
+        self.assertIn('**/.*.cmd', files_exclude,
+                      'Kernel build artifacts (.*.cmd) should be excluded from view')
+        self.assertIn('**/*.o', files_exclude,
+                      'Kernel build artifacts (*.o) should be excluded from view')
+
+        # --- Verify extensions.json ---
+        with open(os.path.join(tempdir, '.vscode', 'extensions.json')) as ext_j:
+            ext_d = json.load(ext_j)
+        recommendations = ext_d.get('recommendations', [])
+        self.assertIn('ms-vscode.makefile-tools', recommendations,
+                      'ms-vscode.makefile-tools should be recommended for kernel modules')
+        self.assertIn('ms-vscode.cpptools', recommendations,
+                      'ms-vscode.cpptools should be recommended for kernel modules')
+        # cmake-tools and mesonbuild should not be recommended for kernel modules
+        self.assertNotIn('ms-vscode.cmake-tools', recommendations,
+                         'ms-vscode.cmake-tools should not be recommended for kernel modules')
+        self.assertNotIn('mesonbuild.mesonbuild', recommendations,
+                         'mesonbuild.mesonbuild should not be recommended for kernel modules')
+
+        # --- Verify c_cpp_properties.json ---
+        with open(os.path.join(tempdir, '.vscode', 'c_cpp_properties.json')) as props_j:
+            props_d = json.load(props_j)
+        configurations = props_d.get('configurations', [])
+        self.assertTrue(len(configurations) > 0,
+                        'c_cpp_properties.json should have at least one configuration')
+        # Kernel modules use gnu11 as the C standard
+        self.assertEqual(configurations[0].get('cStandard'), 'gnu11',
+                         'Kernel modules should use gnu11 C standard in c_cpp_properties.json')
+        # Kernel include paths should be present
+        include_path = configurations[0].get('includePath', [])
+        self.assertTrue(
+            any('kernel' in p.lower() for p in include_path),
+            'Kernel include path should be present in c_cpp_properties.json: %s' % include_path)
+
+        # Build the make environment and command from settings.json so the
+        # rebuild step below uses the exact same invocation that VSCode would
+        # use via the Makefile Tools extension.
+        make_args = build_config.get('makeArgs', [])
+        make_dir = build_config.get('makeDirectory', tempdir)
+        make_env = dict(os.environ)
+        make_env.update(terminal_env)
+
+        recipe_id, _ = self._get_recipe_ids(recipe_name)
+        install_deploy_cmd = os.path.join(
+            self._workspace_scripts_dir(recipe_name), 'install_and_deploy_' + recipe_id)
+
+        SYSFS_MAGIC = '/sys/kernel/selftest_kmodule/magic'
+        MODULE_NAME = 'selftest_kmodule'
+        MAGIC_STRING_ORIG = 'Hello from selftest-kmodule'
+        MAGIC_STRING_NEW  = 'Goodbye from selftest-kmodule'
+
+        deploy_dir_image = get_bb_var('DEPLOY_DIR_IMAGE')
+        self.add_command_to_tearDown('bitbake -c clean %s' % testimage)
+        self.add_command_to_tearDown('rm -f %s/%s*' % (deploy_dir_image, testimage))
+        with runqemu(testimage, runqemuparams="nographic") as qemu:
+            # Re-run ide-sdk with the Qemu target address to update the
+            # install && deploy scripts; --skip-bitbake avoids a rebuild.
+            bitbake_sdk_cmd = (
+                'devtool ide-sdk %s %s -t root@%s -c --skip-bitbake --ide=code' % (
+                    recipe_name, testimage, qemu.ip))
+            runCmd(bitbake_sdk_cmd, output_log=self._cmd_logger)
+
+            # Deploy the initial .ko to the target
+            runCmd(install_deploy_cmd, output_log=self._cmd_logger)
+
+            # Out-of-tree modules land in updates/ after modules_install;
+            # use insmod with the full path to avoid needing depmod -a.
+            status, output = qemu.run(
+                'find /lib/modules -name "selftest-kmodule.ko" 2>/dev/null')
+            self.assertEqual(status, 0)
+            ko_path = output.strip()
+            self.assertTrue(ko_path.endswith('selftest-kmodule.ko'),
+                            'selftest-kmodule.ko not found on target: %s' % output)
+
+            status, output = qemu.run('insmod %s' % ko_path)
+            self.assertEqual(status, 0, msg='insmod failed: %s' % output)
+
+            # Verify the sysfs interface exposes the expected magic string
+            status, output = qemu.run('cat %s' % SYSFS_MAGIC)
+            self.assertEqual(status, 0, msg='reading sysfs magic failed: %s' % output)
+            self.assertIn(MAGIC_STRING_ORIG, output,
+                          'Initial magic string not found in sysfs: %s' % output)
+
+            # Modify the magic string in the source tree
+            kmodule_c = os.path.join(tempdir, 'selftest-kmodule.c')
+            with open(kmodule_c) as f:
+                src = f.read()
+            self.assertIn(MAGIC_STRING_ORIG, src,
+                          'SELFTEST_MAGIC_STRING not found in source; cannot modify it')
+            with open(kmodule_c, 'w') as f:
+                f.write(src.replace(MAGIC_STRING_ORIG, MAGIC_STRING_NEW))
+
+            # Rebuild using the make command and environment from settings.json,
+            # mirroring what VSCode would invoke via the Makefile Tools extension.
+            runCmd([make_exe] + make_args, cwd=make_dir, env=make_env,
+                   output_log=self._cmd_logger)
+            runCmd(install_deploy_cmd, output_log=self._cmd_logger)
+
+            # Reload the updated module and verify the sysfs string changed
+            status, output = qemu.run('rmmod %s' % MODULE_NAME)
+            self.assertEqual(status, 0, msg='rmmod failed: %s' % output)
+            status, output = qemu.run(
+                'find /lib/modules -name "selftest-kmodule.ko" 2>/dev/null')
+            self.assertEqual(status, 0)
+            ko_path = output.strip()
+            status, output = qemu.run('insmod %s' % ko_path)
+            self.assertEqual(status, 0, msg='insmod of modified module failed: %s' % output)
+
+            status, output = qemu.run('cat %s' % SYSFS_MAGIC)
+            self.assertEqual(status, 0, msg='reading sysfs magic (modified) failed: %s' % output)
+            self.assertNotIn(MAGIC_STRING_ORIG, output,
+                             'Old magic string still present in sysfs after rebuild')
+            self.assertIn(MAGIC_STRING_NEW, output,
+                          'New magic string not found in sysfs after rebuild: %s' % output)
 
     def test_devtool_ide_sdk_shared_sysroots(self):
         """Verify the shared sysroot SDK"""
@@ -2908,7 +3543,8 @@ class DevtoolIdeSdkTests(DevtoolBase):
         self._check_workspace()
 
         result_init = runCmd(
-            'devtool ide-sdk -m shared oe-selftest-image cmake-example meson-example --ide=code')
+            'devtool ide-sdk -m shared oe-selftest-image cmake-example meson-example --ide=code',
+            output_log=self._cmd_logger)
         bb_vars = get_bb_vars(
             ['REAL_MULTIMACH_TARGET_SYS', 'DEPLOY_DIR_IMAGE', 'COREBASE'], "meta-ide-support")
         environment_script = 'environment-setup-%s' % bb_vars['REAL_MULTIMACH_TARGET_SYS']
@@ -2920,21 +3556,25 @@ class DevtoolIdeSdkTests(DevtoolBase):
         # Verify the cross environment script is available
         self.assertExists(environment_script_path)
 
-        def runCmdEnv(cmd, cwd):
+        def runCmdEnv(cmd, cwd, output_log=self._cmd_logger):
             cmd = '/bin/sh -c ". %s > /dev/null && %s"' % (
                 environment_script_path, cmd)
-            return runCmd(cmd, cwd)
+            return runCmd(cmd, cwd, output_log=output_log)
 
         # Verify building the C++ example works with CMake
         tempdir_cmake = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir_cmake)
 
-        result_cmake = runCmdEnv("which cmake", cwd=tempdir_cmake)
+        result_cmake = runCmdEnv("which cmake", cwd=tempdir_cmake, output_log=self._cmd_logger)
         cmake_native = os.path.normpath(result_cmake.output.strip())
         self.assertExists(cmake_native)
 
-        runCmdEnv('cmake %s' % cpp_example_src, cwd=tempdir_cmake)
-        runCmdEnv('cmake --build %s' % tempdir_cmake, cwd=tempdir_cmake)
+        result_cmake = runCmdEnv('cmake -S %s -B %s' % (cpp_example_src, tempdir_cmake),
+                                 cwd=tempdir_cmake, output_log=self._cmd_logger)
+        self.assertIn("Build files have been written to: %s" % tempdir_cmake, result_cmake.output)
+        result_cmake = runCmdEnv('cmake --build %s' % tempdir_cmake,
+                                 cwd=tempdir_cmake, output_log=self._cmd_logger)
+        self.assertIn("Built target", result_cmake.output)
 
         # Verify the printed note really referres to a cmake executable
         cmake_native_code = ""
@@ -2950,12 +3590,12 @@ class DevtoolIdeSdkTests(DevtoolBase):
         tempdir_meson = tempfile.mkdtemp(prefix='devtoolqa')
         self.track_for_cleanup(tempdir_meson)
 
-        result_cmake = runCmdEnv("which meson", cwd=tempdir_meson)
+        result_cmake = runCmdEnv("which meson", cwd=tempdir_meson, output_log=self._cmd_logger)
         meson_native = os.path.normpath(result_cmake.output.strip())
         self.assertExists(meson_native)
 
-        runCmdEnv('meson setup %s' % tempdir_meson, cwd=cpp_example_src)
-        runCmdEnv('meson compile', cwd=tempdir_meson)
+        runCmdEnv('meson setup %s' % tempdir_meson, cwd=cpp_example_src, output_log=self._cmd_logger)
+        runCmdEnv('meson compile', cwd=tempdir_meson, output_log=self._cmd_logger)
 
     def test_devtool_ide_sdk_plugins(self):
         """Test that devtool ide-sdk can use plugins from other layers."""
@@ -2978,7 +3618,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
             return m.group(1).split(',')
 
         # verify the default plugins are available but the foo plugin is not
-        result = runCmd('devtool ide-sdk -h')
+        result = runCmd('devtool ide-sdk -h', output_log=self._cmd_logger)
         found_ides = get_ides_from_help(result.output)
         self.assertIn('code', found_ides)
         self.assertIn('none', found_ides)
@@ -3009,7 +3649,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
             plugin_file.write(plugin_code)
 
         # Verify the foo plugin is available as well
-        result = runCmd('devtool ide-sdk -h')
+        result = runCmd('devtool ide-sdk -h', output_log=self._cmd_logger)
         found_ides = get_ides_from_help(result.output)
         self.assertIn('code', found_ides)
         self.assertIn('none', found_ides)
@@ -3017,14 +3657,15 @@ class DevtoolIdeSdkTests(DevtoolBase):
 
         # Verify the foo plugin generates a shared config
         result = runCmd(
-            'devtool ide-sdk -m shared --skip-bitbake --ide foo %s' % shared_recipe_name)
+            'devtool ide-sdk -m shared --skip-bitbake --ide foo %s' % shared_recipe_name,
+            output_log=self._cmd_logger)
         with open(shared_config_file) as shared_config:
             shared_config_new = shared_config.read()
         self.assertEqual(shared_config_str, shared_config_new)
 
         # Verify the foo plugin generates a modified config
         result = runCmd('devtool ide-sdk --skip-bitbake --ide foo %s %s' %
-                        (modified_recipe_name, testimage))
+                        (modified_recipe_name, testimage), output_log=self._cmd_logger)
         with open(modified_config_file) as modified_config:
             modified_config_new = modified_config.read()
         self.assertEqual(modified_config_str, modified_config_new)

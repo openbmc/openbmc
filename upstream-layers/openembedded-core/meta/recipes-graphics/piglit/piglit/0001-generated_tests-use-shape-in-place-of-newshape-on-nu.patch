@@ -1,0 +1,105 @@
+From ad6ee4d7c4d3b882ef6196832ed2bbc78b7cb10a Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 11 Feb 2026 03:42:24 +0000
+Subject: [PATCH] generated_tests: use 'shape' in place of 'newshape' on
+ numpy>=2.1
+
+The 'newshape' parameter was deprecated upstream but kept for backwards
+compatibility reasons. It was finally removed as of numpy 2.4.0, so
+transition to using 'shape' in its place when available.
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/mesa/piglit/-/commit/c1dd58ff61fe6b713af795e2680c16371c1cb98c]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ generated_tests/builtin_function.py      | 17 +++++++++++++++--
+ generated_tests/builtin_function_fp64.py | 17 +++++++++++++++--
+ 2 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/generated_tests/builtin_function.py b/generated_tests/builtin_function.py
+index eb7e078..f87236f 100644
+--- a/generated_tests/builtin_function.py
++++ b/generated_tests/builtin_function.py
+@@ -58,6 +58,11 @@ import numpy as np
+ if np.lib.NumpyVersion(np.__version__) >= '2.0.0b1':
+     np.set_printoptions(legacy = "1.25")
+ 
++if np.lib.NumpyVersion(np.__version__) >= '2.1.0':
++    np_reshape_shape = 'shape'
++else:
++    np_reshape_shape = 'newshape'
++
+ # Floating point types used by Python and numpy
+ FLOATING_TYPES = (float, np.float64, np.float32)
+ 
+@@ -293,7 +298,11 @@ def column_major_values(value):
+     """Given a native numpy value, return a list of the scalar values
+     comprising it, in column-major order."""
+     if isinstance(value, np.ndarray):
+-        return list(np.reshape(value, newshape=-1, order='F'))
++        reshape_args = {
++            np_reshape_shape: -1,
++            'order': 'F',
++        }
++        return list(np.reshape(value, **reshape_args))
+     else:
+         return [value]
+ 
+@@ -301,7 +310,11 @@ def column_major_values(value):
+ def glsl_constant(value):
+     """Given a native numpy value, return GLSL code that constructs
+     it."""
+-    column_major = np.reshape(np.array(value), newshape=-1, order='F')
++    reshape_args = {
++        np_reshape_shape: -1,
++        'order': 'F',
++    }
++    column_major = np.reshape(np.array(value), **reshape_args)
+     if column_major.dtype == bool:
+         values = ['true' if x else 'false' for x in column_major]
+     elif column_major.dtype == np.int64:
+diff --git a/generated_tests/builtin_function_fp64.py b/generated_tests/builtin_function_fp64.py
+index 84d939c..06fe987 100644
+--- a/generated_tests/builtin_function_fp64.py
++++ b/generated_tests/builtin_function_fp64.py
+@@ -57,6 +57,11 @@ import numpy as np
+ if np.lib.NumpyVersion(np.__version__) >= '2.0.0b1':
+     np.set_printoptions(legacy = "1.25")
+ 
++if np.lib.NumpyVersion(np.__version__) >= '2.1.0':
++    np_reshape_shape = 'shape'
++else:
++    np_reshape_shape = 'newshape'
++
+ # Floating point types used by Python and numpy
+ DOUBLE_TYPES = (float, np.float64, np.float32)
+ 
+@@ -254,7 +259,11 @@ def column_major_values(value):
+     """Given a native numpy value, return a list of the scalar values
+     comprising it, in column-major order."""
+     if isinstance(value, np.ndarray):
+-        return list(np.reshape(value, newshape=-1, order='F'))
++        reshape_args = {
++            np_reshape_shape: -1,
++            'order': 'F',
++        }
++        return list(np.reshape(value, **reshape_args))
+     else:
+         return [value]
+ 
+@@ -262,7 +271,11 @@ def column_major_values(value):
+ def glsl_constant(value):
+     """Given a native numpy value, return GLSL code that constructs
+     it."""
+-    column_major = np.reshape(np.array(value), newshape=-1, order='F')
++    reshape_args = {
++        np_reshape_shape: -1,
++        'order': 'F',
++    }
++    column_major = np.reshape(np.array(value), **reshape_args)
+     if column_major.dtype == bool:
+         values = ['true' if x else 'false' for x in column_major]
+     else:
+-- 
+2.43.0
+

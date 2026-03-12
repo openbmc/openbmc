@@ -11,9 +11,5 @@ UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += " \
-    python3-pkg-resources \
-"
-
 BBCLASSEXTEND = "native nativesdk"
 

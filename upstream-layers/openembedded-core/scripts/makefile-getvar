@@ -11,8 +11,19 @@
 
 set -eu
 
+if [ $# -lt 2 ]; then
+	echo "Get a variable's value from a Makefile:"
+	echo "$ makefile-getvar Makefile VARIABLE VARIABLE ..."
+	exit 0
+fi
+
 MAKEFILE=$1
 shift
+
+if [ ! -f $MAKEFILE ]; then
+	echo $MAKEFILE is not a file
+	exit 1
+fi
 
 for VARIABLE in $*; do
 	make -f - $VARIABLE.var <<EOF

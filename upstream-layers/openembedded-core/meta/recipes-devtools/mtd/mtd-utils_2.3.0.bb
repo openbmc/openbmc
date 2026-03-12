@@ -83,7 +83,7 @@ PACKAGES =+ "${@bb.utils.contains("PACKAGECONFIG", "ubifs", "mtd-utils-ubifs", "
 
 FILES:mtd-utils-jffs2 = "${sbindir}/mkfs.jffs2 ${sbindir}/jffs2dump ${sbindir}/jffs2reader ${sbindir}/sumtool"
 FILES:mtd-utils-ubifs = "\
-    ${sbindir}/mkfs.ubifs \
+    ${sbindir}/*.ubifs \
     ${sbindir}/ubi* \
     ${@bb.utils.contains('PACKAGECONFIG', 'ubihealthd-service', '${systemd_system_unitdir}/ubihealthd.service', '', d)} \
     "

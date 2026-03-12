@@ -32,7 +32,7 @@ diff --git a/src/cmd/go/internal/work/action.go b/src/cmd/go/internal/work/actio
 index 44bb9f8c1e..87ac4e30e5 100644
 --- a/src/cmd/go/internal/work/action.go
 +++ b/src/cmd/go/internal/work/action.go
-@@ -837,6 +837,9 @@ func (b *Builder) addTransitiveLinkDeps(a, a1 *Action, shlib string) {
+@@ -1076,6 +1076,9 @@ func (b *Builder) addTransitiveLinkDeps(s *modload.State, a, a1 *Action, shlib s
  			if p1 == nil || p1.Shlib == "" || haveShlib[filepath.Base(p1.Shlib)] {
  				continue
  			}
@@ -47,17 +47,17 @@ index 3508d51fbb..77f5e7241a 100644
 --- a/src/cmd/go/internal/work/build.go
 +++ b/src/cmd/go/internal/work/build.go
 @@ -238,6 +238,8 @@ See also: go install, go get, go clean.
- 
- const concurrentGCBackendCompilationEnabledByDefault = true
+ 	`,
+ }
  
 +var goRootPrecious bool = true
 +
  func init() {
  	// break init cycle
  	CmdBuild.Run = runBuild
-@@ -251,6 +253,10 @@ func init() {
- 		AddCoverFlags(CmdBuild, nil)
- 		AddCoverFlags(CmdInstall, nil)
+@@ -292,6 +294,10 @@ func init() {
+ 	case "gc", "gccgo":
+ 		buildCompiler{}.Set(build.Default.Compiler)
  	}
 +
 +	if x := os.Getenv("GOROOT_OVERRIDE"); x != "" {
@@ -65,13 +65,13 @@ index 3508d51fbb..77f5e7241a 100644
 +	}
  }
  
- // Note that flags consulted by other parts of the code
+ type BuildFlagMask int
 diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
 index 1f618be0bb..651fa64582 100644
 --- a/src/cmd/go/internal/work/exec.go
 +++ b/src/cmd/go/internal/work/exec.go
-@@ -552,6 +552,23 @@ func (b *Builder) build(ctx context.Context, a *Action) (err error) {
- 		return err
+@@ -605,6 +605,23 @@ func (b *Builder) checkCacheForBuild(a, buildAction *Action, covMetaFileName str
+ 		return nil, err
  	}
  
 +	if goRootPrecious && (a.Package.Standard || a.Package.Goroot) {
@@ -82,19 +82,19 @@ index 1f618be0bb..651fa64582 100644
 +			a.buildID = b.fileHash(a.Package.Target)
 +			a.Package.Stale = false
 +			a.Package.StaleReason = "GOROOT-resident package"
-+			return nil
++			return nil, err
 +		}
 +		a.Package.Stale = true
 +		a.Package.StaleReason = "missing or invalid GOROOT-resident package"
 +		if b.IsCmdList {
-+			return nil
++			return nil, err
 +		}
 +	}
 +
- 	if err := sh.Mkdir(a.Objdir); err != nil {
- 		return err
+ 	if err := sh.Mkdir(buildAction.Objdir); err != nil {
+ 		return nil, err
  	}
-@@ -1747,6 +1764,14 @@ func (b *Builder) linkShared(ctx context.Context, a *Action) (err error) {
+@@ -1891,6 +1908,14 @@ func (b *Builder) linkShared(ctx context.Context, a *Action) (err error) {
  		return err
  	}
  

@@ -1,4 +1,4 @@
-From 1967fbe2cbbb039e3b54666b55f6456325c58e91 Mon Sep 17 00:00:00 2001
+From 524d582f3a904f42ff2f70b7d3d1b015ebe59e15 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:42:38 +0000
 Subject: [PATCH] Fix rpath in libtool when sysroot is enabled
@@ -47,3 +47,5 @@ index 09693d7b99b..39f0a5bde46 100644
  	  if test -n "$hardcode_libdir_separator"; then
  	    if test -z "$hardcode_libdirs"; then
  	      hardcode_libdirs="$libdir"
+--
+2.49.0

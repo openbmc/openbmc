@@ -1,0 +1,26 @@
+From 761aa7fab4a82dc01daa28799f4f1d6ae17a4c26 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 18 Aug 2025 11:31:32 -0700
+Subject: [PATCH] test-c32ispunct: Check for musl along with glibc
+
+This check crashes on musl based locales, other libcs
+e.g. glibc ignore it too.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/m4-patches/2025-08/msg00000.html]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/test-c32ispunct.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/tests/test-c32ispunct.c
++++ b/tests/test-c32ispunct.c
+@@ -255,7 +255,7 @@ main (int argc, char *argv[])
+           is = for_character ("\360\235\204\200", 4);
+           ASSERT (is != 0);
+         #endif
+-        #if !(defined __GLIBC__ || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__ || defined _AIX || defined __sun || defined __CYGWIN__ || (defined _WIN32 && !defined __CYGWIN__) || defined __ANDROID__)
++        #if !(defined __GLIBC__ || defined MUSL_LIBC || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__ || defined _AIX || defined __sun || defined __CYGWIN__ || (defined _WIN32 && !defined __CYGWIN__) || defined __ANDROID__)
+           /* U+E003A TAG COLON */
+           is = for_character ("\363\240\200\272", 4);
+           ASSERT (is == 0);

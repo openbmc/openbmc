@@ -19,6 +19,7 @@ class GdbServerTest(OESelftestTestCase):
 
         features = """
 IMAGE_GEN_DEBUGFS = "1"
+IMAGE_FSTYPES += "tar.bz2"
 IMAGE_FSTYPES_DEBUGFS = "tar.bz2"
 CORE_IMAGE_EXTRA_INSTALL = "gdbserver"
         """

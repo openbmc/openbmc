@@ -1,0 +1,32 @@
+From ba4126955f3e145d3a70171b5e8a23aafa157052 Mon Sep 17 00:00:00 2001
+From: Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
+Date: Fri, 23 Jan 2026 15:26:17 +0530
+Subject: [PATCH 01/02] ucm2: Qualcomm: sa8775p: Remove Fixed channel setting
+ for lemans-evk
+
+Remove Fixed channel setting for lemans-evk to support stereo
+capture.
+
+Upstream-Status: Backport
+[https://github.com/alsa-project/alsa-ucm-conf/commit/ba4126955f3e145d3a70171b5e8a23aafa157052]
+Closes: https://github.com/alsa-project/alsa-ucm-conf/pull/694
+Signed-off-by: Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+---
+ ucm2/Qualcomm/sa8775p/lemans-evk/HiFi.conf | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/ucm2/Qualcomm/sa8775p/lemans-evk/HiFi.conf b/ucm2/Qualcomm/sa8775p/lemans-evk/HiFi.conf
+index 5915d1c..f2be928 100644
+--- a/ucm2/Qualcomm/sa8775p/lemans-evk/HiFi.conf
++++ b/ucm2/Qualcomm/sa8775p/lemans-evk/HiFi.conf
+@@ -25,6 +25,5 @@ SectionDevice."Mic" {
+ 	Value {
+ 		CapturePriority 100
+ 		CapturePCM "hw:${CardId},1"
+-		CaptureChannels 1
+ 	}
+ }
+-- 
+2.34.1
+

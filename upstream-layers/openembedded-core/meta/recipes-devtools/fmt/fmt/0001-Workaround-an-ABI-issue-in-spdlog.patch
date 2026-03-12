@@ -1,4 +1,4 @@
-From 5a5637c306c617ddb3726c76d3f7490a2dc0a5cd Mon Sep 17 00:00:00 2001
+From 32f4a4a634c99d4e00cc6149786a9180ad651f76 Mon Sep 17 00:00:00 2001
 From: Victor Zverovich <viz@meta.com>
 Date: Sat, 22 Mar 2025 06:57:04 -0700
 Subject: [PATCH] Workaround an ABI issue in spdlog
@@ -10,10 +10,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/include/fmt/format.h b/include/fmt/format.h
-index 287e7163..61cb2825 100644
+index 4a653007..82f80efd 100644
 --- a/include/fmt/format.h
 +++ b/include/fmt/format.h
-@@ -774,7 +774,9 @@ enum { inline_buffer_size = 500 };
+@@ -793,7 +793,9 @@ enum { inline_buffer_size = 500 };
   * converted to `std::string` with `to_string(out)`.
   */
  template <typename T, size_t SIZE = inline_buffer_size,
@@ -24,7 +24,7 @@ index 287e7163..61cb2825 100644
  class basic_memory_buffer : public detail::buffer<T> {
   private:
    T store_[SIZE];
-@@ -2594,7 +2596,7 @@ class bigint {
+@@ -2746,7 +2748,7 @@ class bigint {
    }
  
   public:

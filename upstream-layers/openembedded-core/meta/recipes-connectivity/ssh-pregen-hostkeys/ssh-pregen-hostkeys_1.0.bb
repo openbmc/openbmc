@@ -1,4 +1,5 @@
 SUMMARY = "Pre generated host keys mainly for speeding up our qemu tests"
+HOMEPAGE = "https://www.yoctoproject.org/"
 
 SRC_URI = "file://dropbear_rsa_host_key \
            file://openssh"

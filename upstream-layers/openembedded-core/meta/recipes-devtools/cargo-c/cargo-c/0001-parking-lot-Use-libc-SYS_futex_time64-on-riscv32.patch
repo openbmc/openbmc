@@ -1,0 +1,51 @@
+From 7ebddca7070742bbb9cce471a93d699ad70ee371 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Jul 2025 10:15:06 -0700
+Subject: [PATCH] Use libc::SYS_futex_time64 on riscv32/musl
+
+On RISC-V 32-bit (riscv32), the SYS_futex system call is
+often handled indirectly due to the use of a 64-bit time_t
+type. Specifically, while SYS_futex is not directly defined,
+a related syscall like SYS_futex_time64 can be used on target
+e.g. riscv32
+
+Upstream-Status: Submitted [https://github.com/Amanieu/parking_lot/pull/485]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/thread_parker/linux.rs | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/src/thread_parker/linux.rs b/src/thread_parker/linux.rs
+index 92601f6..0952db4 100644
+--- a/src/thread_parker/linux.rs
++++ b/src/thread_parker/linux.rs
+@@ -108,9 +108,13 @@ impl ThreadParker {
+             .as_ref()
+             .map(|ts_ref| ts_ref as *const _)
+             .unwrap_or(ptr::null());
++        #[cfg(not(all(target_arch = "riscv32", target_env = "musl")))]
++        let futex_num = libc::SYS_futex;
++        #[cfg(all(target_arch = "riscv32", target_env = "musl",))]
++        let futex_num = libc::SYS_futex_time64;
+         let r = unsafe {
+             libc::syscall(
+-                libc::SYS_futex,
++                futex_num,
+                 &self.futex,
+                 libc::FUTEX_WAIT | libc::FUTEX_PRIVATE_FLAG,
+                 1,
+@@ -137,8 +141,13 @@ impl super::UnparkHandleT for UnparkHandle {
+     unsafe fn unpark(self) {
+         // The thread data may have been freed at this point, but it doesn't
+         // matter since the syscall will just return EFAULT in that case.
++        #[cfg(not(all(target_arch = "riscv32", target_env = "musl",)))]
++        let futex_num = libc::SYS_futex;
++        #[cfg(all(target_arch = "riscv32", target_env = "musl",))]
++        let futex_num = libc::SYS_futex_time64;
++
+         let r = libc::syscall(
+-            libc::SYS_futex,
++            futex_num,
+             self.futex,
+             libc::FUTEX_WAKE | libc::FUTEX_PRIVATE_FLAG,
+             1,

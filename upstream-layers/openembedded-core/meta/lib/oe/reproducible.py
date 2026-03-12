@@ -74,52 +74,44 @@ def get_source_date_epoch_from_known_files(d, sourcedir):
         bb.debug(1, "SOURCE_DATE_EPOCH taken from: %s" % newest_file)
     return source_date_epoch
 
-def find_git_folder(d, sourcedir):
-    # First guess: UNPACKDIR/BB_GIT_DEFAULT_DESTSUFFIX
-    # This is the default git fetcher unpack path
+def find_git_repositories(d, sourcedir):
     unpackdir = d.getVar('UNPACKDIR')
-    default_destsuffix = d.getVar('BB_GIT_DEFAULT_DESTSUFFIX')
-    gitpath = os.path.join(unpackdir, default_destsuffix, ".git")
-    if os.path.isdir(gitpath):
-        return gitpath
+    git_repositories = []
 
-    # Second guess: ${S}
-    gitpath = os.path.join(sourcedir, ".git")
-    if os.path.isdir(gitpath):
-        return gitpath
+    for mainpath in (sourcedir, unpackdir):
+        for root, dirs, files in os.walk(mainpath, topdown=True):
+            if '.git' in dirs or '.git' in files:
+                git_repositories.append(root)
 
-    # Perhaps there was a subpath or destsuffix specified.
-    # Go looking in the UNPACKDIR
-    for root, dirs, files in os.walk(unpackdir, topdown=True):
-        if '.git' in dirs:
-            return os.path.join(root, ".git")
+    if not git_repositories:
+        bb.warn('Failed to find any git repositories in UNPACKDIR or S')
 
-    for root, dirs, files in os.walk(sourcedir, topdown=True):
-        if '.git' in dirs:
-            return os.path.join(root, ".git")
-
-    bb.warn("Failed to find a git repository in UNPACKDIR: %s" % unpackdir)
-    return None
+    return git_repositories
 
 def get_source_date_epoch_from_git(d, sourcedir):
     if not "git://" in d.getVar('SRC_URI') and not "gitsm://" in d.getVar('SRC_URI'):
         return None
 
-    gitpath = find_git_folder(d, sourcedir)
-    if not gitpath:
-        return None
+    # Get an epoch from all valid git repositories
+    source_dates = []
+    for repo_path in find_git_repositories(d, sourcedir):
+        # Check that the repository has a valid HEAD; it may not if subdir is used
+        # in SRC_URI
+        p = subprocess.run(['git', '-C', repo_path, 'rev-parse', 'HEAD'],
+                           check=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if p.returncode != 0:
+            bb.debug(1, "%s does not have a valid HEAD: %s" % (repo_path, p.stdout.decode('utf-8')))
+            continue
 
-    # Check that the repository has a valid HEAD; it may not if subdir is used
-    # in SRC_URI
-    p = subprocess.run(['git', '--git-dir', gitpath, 'rev-parse', 'HEAD'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    if p.returncode != 0:
-        bb.debug(1, "%s does not have a valid HEAD: %s" % (gitpath, p.stdout.decode('utf-8')))
-        return None
+        bb.debug(1, "git repository: %s" % repo_path)
+        p = subprocess.run(['git', '-C', repo_path, 'log', '-1', '--pretty=%ct'],
+                           check=True, stdout=subprocess.PIPE)
+        source_dates.append(int(p.stdout.decode('utf-8')))
 
-    bb.debug(1, "git repository: %s" % gitpath)
-    p = subprocess.run(['git', '-c', 'log.showSignature=false', '--git-dir', gitpath, 'log', '-1', '--pretty=%ct'],
-                       check=True, stdout=subprocess.PIPE)
-    return int(p.stdout.decode('utf-8'))
+    if source_dates:
+        return max(source_dates)
+
+    return None
 
 def get_source_date_epoch_from_youngest_file(d, sourcedir):
     if sourcedir == d.getVar('UNPACKDIR'):

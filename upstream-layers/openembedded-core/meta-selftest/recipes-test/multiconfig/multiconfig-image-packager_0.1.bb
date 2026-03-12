@@ -3,7 +3,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384
 
 MCMACHINE:virtclass-mcextend-musl = "qemux86-64"
 MCMACHINE:virtclass-mcextend-tiny = "qemux86"
-MCIMGTYPE:virtclass-mcextend-musl = "ext4"
+MCIMGTYPE:virtclass-mcextend-musl = "ext4.zst"
 MCIMGTYPE:virtclass-mcextend-tiny = "cpio.gz"
 
 MC_DEPLOY_DIR_IMAGE = "${TOPDIR}/tmp-mc-${MCNAME}/deploy/images/${MCMACHINE}"

@@ -20,6 +20,7 @@ DEPENDS += "virtual/cross-binutils virtual/cross-cc kmod-native bc-native bison-
 DEPENDS += "${@bb.utils.contains("INITRAMFS_FSTYPES", "cpio.lzo", "lzop-native", "", d)}"
 DEPENDS += "${@bb.utils.contains("INITRAMFS_FSTYPES", "cpio.lz4", "lz4-native", "", d)}"
 DEPENDS += "${@bb.utils.contains("INITRAMFS_FSTYPES", "cpio.zst", "zstd-native", "", d)}"
+DEPENDS += "${@bb.utils.contains("KERNEL_IMAGETYPES", "Image.lz4", "lz4-native", "", d)}"
 PACKAGE_WRITE_DEPS += "depmodwrapper-cross"
 
 do_deploy[depends] += "depmodwrapper-cross:do_populate_sysroot gzip-native:do_populate_sysroot"
@@ -148,16 +149,13 @@ set -e
 """ % (type, type, type))
 
 
-    image = d.getVar('INITRAMFS_IMAGE')
-    # If the INTIRAMFS_IMAGE is set but the INITRAMFS_IMAGE_BUNDLE is set to 0,
-    # the do_bundle_initramfs does nothing, but the INITRAMFS_IMAGE is built
-    # standalone for use by wic and other tools.
-    if image:
+    if d.getVar('INITRAMFS_IMAGE') and bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
         if d.getVar('INITRAMFS_MULTICONFIG'):
             d.appendVarFlag('do_bundle_initramfs', 'mcdepends', ' mc:${BB_CURRENT_MC}:${INITRAMFS_MULTICONFIG}:${INITRAMFS_IMAGE}:do_image_complete')
         else:
             d.appendVarFlag('do_bundle_initramfs', 'depends', ' ${INITRAMFS_IMAGE}:do_image_complete')
-    if image and bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
+
+        bb.build.addtask('do_bundle_initramfs', 'do_deploy', 'do_install', d)
         bb.build.addtask('do_transform_bundled_initramfs', 'do_deploy', 'do_bundle_initramfs', d)
 
     # NOTE: setting INITRAMFS_TASK is for backward compatibility
@@ -250,7 +248,6 @@ KERNEL_EXTRA_ARGS ?= ""
 EXTRA_OEMAKE += ' CC="${KERNEL_CC}" LD="${KERNEL_LD}" OBJCOPY="${KERNEL_OBJCOPY}" STRIP="${KERNEL_STRIP}"'
 EXTRA_OEMAKE += ' HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLDFLAGS="${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}"'
 EXTRA_OEMAKE += ' HOSTCXX="${BUILD_CXX}" HOSTCXXFLAGS="${BUILD_CXXFLAGS}"'
-# Only for newer kernels (5.19+), native pkg-config variables are set for older kernels when building kernel and modules
 EXTRA_OEMAKE += ' HOSTPKG_CONFIG="pkg-config-native"'
 
 KERNEL_ALT_IMAGETYPE ??= ""
@@ -304,39 +301,37 @@ copy_initramfs() {
 }
 
 do_bundle_initramfs () {
-	if [ ! -z "${INITRAMFS_IMAGE}" -a x"${INITRAMFS_IMAGE_BUNDLE}" = x1 ]; then
-		echo "Creating a kernel image with a bundled initramfs..."
-		copy_initramfs
-		# Backing up kernel image relies on its type(regular file or symbolic link)
-		tmp_path=""
-		for imageType in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
-			if [ -h ${KERNEL_OUTPUT_DIR}/$imageType ] ; then
-				linkpath=`readlink -n ${KERNEL_OUTPUT_DIR}/$imageType`
-				realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType`
-				mv -f $realpath $realpath.bak
-				tmp_path=$tmp_path" "$imageType"#"$linkpath"#"$realpath
-			elif [ -f ${KERNEL_OUTPUT_DIR}/$imageType ]; then
-				mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.bak
-				tmp_path=$tmp_path" "$imageType"##"
-			fi
-		done
-		use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio
-		kernel_do_compile
-		# Restoring kernel image
-		for tp in $tmp_path ; do
-			imageType=`echo $tp|cut -d "#" -f 1`
-			linkpath=`echo $tp|cut -d "#" -f 2`
-			realpath=`echo $tp|cut -d "#" -f 3`
-			if [ -n "$realpath" ]; then
-				mv -f $realpath $realpath.initramfs
-				mv -f $realpath.bak $realpath
-				ln -sf $linkpath.initramfs ${B}/${KERNEL_OUTPUT_DIR}/$imageType.initramfs
-			else
-				mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.initramfs
-				mv -f ${KERNEL_OUTPUT_DIR}/$imageType.bak ${KERNEL_OUTPUT_DIR}/$imageType
-			fi
-		done
-	fi
+	echo "Creating a kernel image with a bundled initramfs..."
+	copy_initramfs
+	# Backing up kernel image relies on its type(regular file or symbolic link)
+	tmp_path=""
+	for imageType in ${KERNEL_IMAGETYPE_FOR_MAKE} ; do
+		if [ -h ${KERNEL_OUTPUT_DIR}/$imageType ] ; then
+			linkpath=`readlink -n ${KERNEL_OUTPUT_DIR}/$imageType`
+			realpath=`readlink -fn ${KERNEL_OUTPUT_DIR}/$imageType`
+			mv -f $realpath $realpath.bak
+			tmp_path=$tmp_path" "$imageType"#"$linkpath"#"$realpath
+		elif [ -f ${KERNEL_OUTPUT_DIR}/$imageType ]; then
+			mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.bak
+			tmp_path=$tmp_path" "$imageType"##"
+		fi
+	done
+	use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio
+	kernel_do_compile
+	# Restoring kernel image
+	for tp in $tmp_path ; do
+		imageType=`echo $tp|cut -d "#" -f 1`
+		linkpath=`echo $tp|cut -d "#" -f 2`
+		realpath=`echo $tp|cut -d "#" -f 3`
+		if [ -n "$realpath" ]; then
+			mv -f $realpath $realpath.initramfs
+			mv -f $realpath.bak $realpath
+			ln -sf $linkpath.initramfs ${B}/${KERNEL_OUTPUT_DIR}/$imageType.initramfs
+		else
+			mv -f ${KERNEL_OUTPUT_DIR}/$imageType ${KERNEL_OUTPUT_DIR}/$imageType.initramfs
+			mv -f ${KERNEL_OUTPUT_DIR}/$imageType.bak ${KERNEL_OUTPUT_DIR}/$imageType
+		fi
+	done
 }
 do_bundle_initramfs[dirs] = "${B}"
 
@@ -356,18 +351,10 @@ python do_devshell:prepend () {
     os.environ["LDFLAGS"] = ''
 }
 
-addtask bundle_initramfs after do_install before do_deploy
-
 KERNEL_DEBUG_TIMESTAMPS ??= "0"
 
 kernel_do_compile() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
-
-	# setup native pkg-config variables (kconfig scripts call pkg-config directly, cannot generically be overriden to pkg-config-native)
-	export PKG_CONFIG_DIR="${STAGING_DIR_NATIVE}${libdir_native}/pkgconfig"
-	export PKG_CONFIG_PATH="$PKG_CONFIG_DIR:${STAGING_DATADIR_NATIVE}/pkgconfig"
-	export PKG_CONFIG_LIBDIR="$PKG_CONFIG_DIR"
-	export PKG_CONFIG_SYSROOT_DIR=""
 
 	if [ "${KERNEL_DEBUG_TIMESTAMPS}" != "1" ]; then
 		# kernel sources do not use do_unpack, so SOURCE_DATE_EPOCH may not
@@ -418,12 +405,6 @@ addtask transform_kernel after do_compile before do_install
 
 do_compile_kernelmodules() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
-
-	# setup native pkg-config variables (kconfig scripts call pkg-config directly, cannot generically be overriden to pkg-config-native)
-	export PKG_CONFIG_DIR="${STAGING_DIR_NATIVE}${libdir_native}/pkgconfig"
-	export PKG_CONFIG_PATH="$PKG_CONFIG_DIR:${STAGING_DATADIR_NATIVE}/pkgconfig"
-	export PKG_CONFIG_LIBDIR="$PKG_CONFIG_DIR"
-	export PKG_CONFIG_SYSROOT_DIR=""
 
 	if [ "${KERNEL_DEBUG_TIMESTAMPS}" != "1" ]; then
 		# kernel sources do not use do_unpack, so SOURCE_DATE_EPOCH may not
@@ -859,9 +840,76 @@ kernel_do_deploy() {
 # ensure we get the right values for both
 do_deploy[prefuncs] += "read_subpackage_metadata"
 
-addtask deploy after do_populate_sysroot do_packagedata
+addtask deploy after do_install do_populate_sysroot do_packagedata
 
 EXPORT_FUNCTIONS do_deploy
+
+do_create_spdx:append() {
+    def create_kernel_config_spdx(d):
+        if not bb.data.inherits_class("create-spdx-3.0", d):
+            return
+        if d.getVar("SPDX_INCLUDE_KERNEL_CONFIG", True) != "1":
+            return
+
+        import oe.spdx30
+        import oe.spdx30_tasks
+        from pathlib import Path
+        from datetime import datetime, timezone
+
+        pkg_arch = d.getVar("SSTATE_PKGARCH")
+        deploydir = Path(d.getVar("SPDXDEPLOY"))
+        pn = d.getVar("PN")
+
+        config_path = d.expand("${B}/.config")
+        kernel_params = []
+        if not os.path.exists(config_path):
+            bb.warn(f"SPDX: Kernel config file not found at: {config_path}")
+            return
+
+        try:
+            with open(config_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    if "=" in line:
+                        key, value = line.split("=", 1)
+                        kernel_params.append(oe.spdx30.DictionaryEntry(
+                            key=key,
+                            value=value.strip('"')
+                        ))
+            bb.note(f"Parsed {len(kernel_params)} kernel config entries from {config_path}")
+        except Exception as e:
+            bb.error(f"Failed to parse kernel config file: {e}")
+
+        path = oe.sbom30.jsonld_arch_path(d, pkg_arch, "recipes", f"recipe-{pn}", deploydir=deploydir)
+        build_objset = oe.sbom30.load_jsonld(d, path, required=True)
+        build = build_objset.find_root(oe.spdx30.build_Build)
+        if not build:
+            bb.fatal("No root %s found in %s" % (oe.spdx30.build_Build.__name__, path))
+
+        kernel_build = build_objset.add_root(
+            oe.spdx30.build_Build(
+                _id=build_objset.new_spdxid("kernel-config"),
+                creationInfo=build_objset.doc.creationInfo,
+                build_buildType="https://openembedded.org/kernel-configuration",
+                build_parameter=kernel_params
+            )
+        )
+
+        oe.spdx30_tasks.set_timestamp_now(d, kernel_build, "build_buildStartTime")
+
+        build_objset.new_relationship(
+            [build],
+            oe.spdx30.RelationshipType.ancestorOf,
+            [kernel_build]
+        )
+
+        oe.sbom30.write_jsonld_doc(d, build_objset, path)
+
+    create_kernel_config_spdx(d)
+}
+do_create_spdx[depends] += "virtual/kernel:do_configure"
 
 # Add using Device Tree support
 inherit kernel-devicetree

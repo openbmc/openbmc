@@ -1,4 +1,4 @@
-From d58bdaca3d5379afcb954bb57c690c7736807ec5 Mon Sep 17 00:00:00 2001
+From 4d25e9ce0b2795009dd066d7959cf51c4292a343 Mon Sep 17 00:00:00 2001
 From: Lucas Kanashiro <kanashiro@debian.org>
 Date: Fri, 1 Nov 2019 15:25:17 -0300
 Subject: [PATCH] Make gemspecs reproducible
@@ -7,18 +7,21 @@ Without an explicit date, they will get the current date and make the
 build unreproducible
 
 Upstream-Status: Backport [debian]
+
+Rebase to version 4.0.1
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
- .bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec | 1 +
- ext/fiddle/fiddle.gemspec                        | 1 +
+ .bundle/gems/bigdecimal-4.0.1/bigdecimal.gemspec | 1 +
+ .bundle/gems/fiddle-1.1.8/fiddle.gemspec         | 1 +
+ .bundle/gems/rdoc-7.0.3/rdoc.gemspec             | 1 +
  ext/io/console/io-console.gemspec                | 1 +
  lib/ipaddr.gemspec                               | 1 +
- lib/rdoc/rdoc.gemspec                            | 1 +
  5 files changed, 5 insertions(+)
 
-diff --git a/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec b/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec
+diff --git a/.bundle/gems/bigdecimal-4.0.1/bigdecimal.gemspec b/.bundle/gems/bigdecimal-4.0.1/bigdecimal.gemspec
 index b6ef8fd..596b8bb 100644
---- a/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec
-+++ b/.bundle/gems/bigdecimal-3.1.8/bigdecimal.gemspec
+--- a/.bundle/gems/bigdecimal-4.0.1/bigdecimal.gemspec
++++ b/.bundle/gems/bigdecimal-4.0.1/bigdecimal.gemspec
 @@ -14,6 +14,7 @@ Gem::Specification.new do |s|
    s.name          = name
    s.version       = source_version
@@ -27,10 +30,10 @@ index b6ef8fd..596b8bb 100644
    s.email         = ["mrkn@mrkn.jp"]
  
    s.summary       = "Arbitrary-precision decimal floating-point number library."
-diff --git a/ext/fiddle/fiddle.gemspec b/ext/fiddle/fiddle.gemspec
+diff --git a/.bundle/gems/fiddle-1.1.8/fiddle.gemspec b/.bundle/gems/fiddle-1.1.8/fiddle.gemspec
 index 0092f52..f77c224 100644
---- a/ext/fiddle/fiddle.gemspec
-+++ b/ext/fiddle/fiddle.gemspec
+--- a/.bundle/gems/fiddle-1.1.8/fiddle.gemspec
++++ b/.bundle/gems/fiddle-1.1.8/fiddle.gemspec
 @@ -8,6 +8,7 @@ end
  Gem::Specification.new do |spec|
    spec.name          = "fiddle"
@@ -39,6 +42,18 @@ index 0092f52..f77c224 100644
    spec.authors       = ["Aaron Patterson", "SHIBATA Hiroshi"]
    spec.email         = ["aaron@tenderlovemaking.com", "hsbt@ruby-lang.org"]
  
+diff --git a/.bundle/gems/rdoc-7.0.3/rdoc.gemspec b/.bundle/gems/rdoc-7.0.3/rdoc.gemspec
+index ada9341..5871ec2 100644
+--- a/.bundle/gems/rdoc-7.0.3/rdoc.gemspec
++++ b/.bundle/gems/rdoc-7.0.3/rdoc.gemspec
+@@ -7,6 +7,7 @@ end
+ 
+ Gem::Specification.new do |s|
+   s.name = "rdoc"
++  s.date = RUBY_RELEASE_DATE
+   s.version = RDoc::VERSION
+ 
+   s.authors = [
 diff --git a/ext/io/console/io-console.gemspec b/ext/io/console/io-console.gemspec
 index 0a19992..4a80529 100644
 --- a/ext/io/console/io-console.gemspec
@@ -52,7 +67,7 @@ index 0a19992..4a80529 100644
    s.email = "nobu@ruby-lang.org"
    s.description = "add console capabilities to IO instances."
 diff --git a/lib/ipaddr.gemspec b/lib/ipaddr.gemspec
-index 5719f83..fe76260 100644
+index cabc916..f9581b8 100644
 --- a/lib/ipaddr.gemspec
 +++ b/lib/ipaddr.gemspec
 @@ -18,6 +18,7 @@ end
@@ -63,15 +78,6 @@ index 5719f83..fe76260 100644
    spec.authors       = ["Akinori MUSHA", "Hajimu UMEMOTO"]
    spec.email         = ["knu@idaemons.org", "ume@mahoroba.org"]
  
-diff --git a/lib/rdoc/rdoc.gemspec b/lib/rdoc/rdoc.gemspec
-index 3144df5..65c313f 100644
---- a/lib/rdoc/rdoc.gemspec
-+++ b/lib/rdoc/rdoc.gemspec
-@@ -7,6 +7,7 @@ end
- 
- Gem::Specification.new do |s|
-   s.name = "rdoc"
-+  s.date = RUBY_RELEASE_DATE
-   s.version = RDoc::VERSION
- 
-   s.authors = [
+-- 
+2.34.1
+

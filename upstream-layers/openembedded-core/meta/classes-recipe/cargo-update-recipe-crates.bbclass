@@ -38,7 +38,8 @@ def get_crates(f):
     crates_candidates = list(filter(lambda c: 'crates.io' in c.get('source', ''), crates['package']))
 
     if not crates_candidates:
-        raise ValueError("Unable to find any candidate crates that use crates.io")
+        print("WARNING: Unable to find any candidate crates that use crates.io")
+        return None
 
     # Update crates uri and their checksum, to avoid name clashing on the checksum
     # we need to rename crates with name and version to have a unique key
@@ -65,16 +66,14 @@ for root, dirs, files in os.walk('${CARGO_LOCK_SRC_DIR}'):
         continue
     for file in files:
         if file == 'Cargo.lock':
-            try:
-                cargo_lock_path = os.path.join(root, file)
-                crates += get_crates(os.path.join(root, file))
-            except Exception as e:
-                raise ValueError("Cannot parse '%s'" % cargo_lock_path) from e
-            else:
-                found = True
-if not found:
+            cargo_lock_path = os.path.join(root, file)
+            c = get_crates(cargo_lock_path)
+            if c is not None:
+                crates += c
+if crates is None:
     raise ValueError("Unable to find any Cargo.lock in ${CARGO_LOCK_SRC_DIR}")
-open("${TARGET_FILE}", 'w').write(crates)
+with open("${TARGET_FILE}", 'w') as f:
+    f.write(crates)
 EOF
 
     bbnote "Successfully update crates inside '${TARGET_FILE}'"

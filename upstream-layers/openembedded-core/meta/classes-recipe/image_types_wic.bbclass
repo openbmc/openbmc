@@ -17,6 +17,7 @@ WICVARS ?= "\
 	IMAGE_BOOT_FILES \
 	IMAGE_CLASSES \
 	IMAGE_EFI_BOOT_FILES \
+	IMAGE_EXTRA_PARTITION_FILES \
 	IMAGE_LINK_NAME \
 	IMAGE_ROOTFS \
 	IMGDEPLOYDIR \
@@ -189,6 +190,18 @@ python () {
                 d.setVar('_WKS_TEMPLATE', body)
                 bb.build.addtask('do_write_wks_template', 'do_image_wic', 'do_image', d)
         bb.build.addtask('do_image_wic', 'do_image_complete', None, d)
+
+        # If the INITRAMFS_IMAGE is set and the INITRAMFS_IMAGE_BUNDLE is set to 1, the initramfs
+        # image is expected to be built as part of the kernel. Otherwise, the standalone image
+        # must be requestd to be in the deployed artifacts for the wic image to be built.
+        initramfs_image = d.getVar('INITRAMFS_IMAGE')
+        if initramfs_image and not bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')):
+            initramfs_multiconfig = d.getVar('INITRAMFS_MULTICONFIG')
+            if initramfs_multiconfig:
+                d.appendVarFlag('do_image_wic', 'mcdepends', ' mc:%s:%s:%s:do_image_complete' %
+                                (d.getVar('BB_CURRENT_MC'), initramfs_multiconfig, initramfs_image))
+            else:
+                d.appendVarFlag('do_image_wic', 'depends', ' %s:do_image_complete' % initramfs_image)
 }
 
 #

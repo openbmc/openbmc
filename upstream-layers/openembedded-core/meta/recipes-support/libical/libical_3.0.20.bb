@@ -14,6 +14,7 @@ SECTION = "libs"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/${BP}.tar.gz \
            file://0001-cmake-Do-not-export-CC-into-gir-compiler.patch \
+           file://flags.patch \
           "
 SRC_URI[sha256sum] = "e73de92f5a6ce84c1b00306446b290a2b08cdf0a80988eca0a2c9d5c3510b4c2"
 
@@ -45,11 +46,13 @@ EXTRA_OECMAKE:append:class-target = " -DIMPORT_ICAL_GLIB_SRC_GENERATOR=${STAGING
 
 do_install:append () {
     # Remove build host references (https://github.com/libical/libical/issues/532)
-    sed -i \
-       -e 's,${STAGING_LIBDIR},${libdir},g' \
-       -e 's,${STAGING_INCDIR},${includedir},g' \
-       ${D}${libdir}/cmake/LibIcal/LibIcal*.cmake \
-       ${D}${libdir}/cmake/LibIcal/Ical*.cmake
+    sed -i -e 's,${STAGING_LIBDIR},${libdir},g' ${D}${libdir}/cmake/LibIcal/LibIcalTargets.cmake
+}
+
+# This tool is only needed to cross-compile, delete it from the target packages
+do_install:append:class-target() {
+    rm -f ${D}${libexecdir}/libical/ical-glib-src-generator
+    rm -f ${D}${libdir}/cmake/LibIcal/IcalGlibSrcGenerator*.cmake
 }
 
 BBCLASSEXTEND = "native"

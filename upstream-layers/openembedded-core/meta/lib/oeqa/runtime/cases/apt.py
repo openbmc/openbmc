@@ -54,7 +54,14 @@ class AptRepoTest(AptTest):
     def setup_key(self):
         # the key is found on the target /etc/pki/packagefeed-gpg/
         # named PACKAGEFEED-GPG-KEY-poky-branch
-        self.target.run('cd %s; apt-key add P*' % ('/etc/pki/packagefeed-gpg'))
+        # copy it to /etc/apt/keyrings/PACKAGEFEED-GPG-KEY-poky-branch.asc, and
+        # set it as the signing key for the repos
+        cmd =  "KEY_FILE_PATH=`realpath /etc/pki/packagefeed-gpg/P*`; "
+        cmd += "KEY_FILE_NAME=`basename $KEY_FILE_PATH`; "
+        cmd += "mkdir -p /etc/apt/keyrings; "
+        cmd += "cp $KEY_FILE_PATH /etc/apt/keyrings/${KEY_FILE_NAME}.asc; "
+        cmd += 'sed -i "s|^deb |deb \[signed-by=/etc/apt/keyrings/${KEY_FILE_NAME}.asc\] |g" /etc/apt/sources.list'
+        self.target.run(cmd)
 
     @skipIfNotFeature('package-management',
                       'Test requires package-management to be in IMAGE_FEATURES')

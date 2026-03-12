@@ -173,18 +173,14 @@ class SourceMirroring(OESelftestTestCase):
     def test_yocto_source_mirror(self):
         self.write_config("""
 BB_ALLOWED_NETWORKS = "downloads.yoctoproject.org"
-MIRRORS = ""
+MIRRORS:forcevariable = ""
 DL_DIR = "${TMPDIR}/test_downloads"
 STAMPS_DIR = "${TMPDIR}/test_stamps"
 SSTATE_DIR = "${TMPDIR}/test_sstate-cache"
-PREMIRRORS = "\\
-    bzr://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
-    cvs://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
+PREMIRRORS:forcevariable = "\\
     git://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
     gitsm://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \\n \\
     hg://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \\n \\
-    osc://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
-    p4://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \\n \\
     svn://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \\n \\
     ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \\n \\
     http://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \\n \\

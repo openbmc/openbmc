@@ -94,3 +94,7 @@ BBCLASSEXTEND = "native nativesdk"
 # Avoid false positives from CVEs in node-tar package
 # For example CVE-2021-{32803,32804,37701,37712,37713}
 CVE_PRODUCT = "gnu:tar"
+
+# A test uses cmp to compare two 8GB files. Busybox's cmp does the job usually, but it is much slower than
+# diffutils' cmp, and the test times out when there is a high load on the host machine.
+RDEPENDS:${PN}-ptest += "diffutils"

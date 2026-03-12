@@ -1,0 +1,47 @@
+From 6464ca567ca012b56bdae127758a118fa193a211 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 4 Mar 2026 16:57:31 +0800
+Subject: [PATCH] do not create symlink to terminfo under /usr/lib
+
+Due to commit [1], it hardcoded `lib` to create symlink
+...
+ ** sym-linked tmp/work/x86-64-v3-oe-linux/ncurses/6.6/image/usr/lib/terminfo for compatibility
+...
+
+It is not necessary for Yocto
+
+Upstream-Status: Inappropriate [Yocto specific]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ misc/run_tic.in | 15 ---------------
+ 1 file changed, 15 deletions(-)
+
+diff --git a/misc/run_tic.in b/misc/run_tic.in
+index 60fbdcc7..fa40b33c 100644
+--- a/misc/run_tic.in
++++ b/misc/run_tic.in
+@@ -215,21 +215,6 @@ if test "$OLD_DIR" != "$TICDIR" ; then
+ 		fi
+ 	else
+ 		cd "${INSTALL_PREFIX}" || exit
+-		# Construct a symbolic link that only assumes $ticdir has the
+-		# same $prefix as the other installed directories.
+-		SOURCE=`echo "$ticdir"|sed -e 's%^'"$prefix"'/%%'`
+-		if test "$SOURCE" != "$ticdir" ; then
+-			SOURCE=../`echo "$ticdir"|sed -e 's%^'"$prefix"'/%%' -e 's%^/%%'`
+-		fi
+-		test -d lib || mkdir lib
+-		cd lib || exit
+-		TARGET=`pwd`/terminfo
+-		if ( @LN_S@ "$SOURCE" terminfo )
+-		then
+-			echo "** sym-linked $TARGET for compatibility"
+-		else
+-			echo "** could not sym-link $TARGET for compatibility"
+-		fi
+ 	fi
+ fi
+ # vile:shmode ts=4 sw=4
+-- 
+2.34.1
+

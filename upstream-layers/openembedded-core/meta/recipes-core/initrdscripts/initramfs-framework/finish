@@ -35,13 +35,14 @@ finish_run() {
 			mount -n --move "$dir" "${ROOTFS_DIR}/media/${dir##*/}"
 		done
 
-		debug "Moving /dev, /proc and /sys onto rootfs..."
+		debug "Moving /dev, /proc, /sys and /run onto rootfs..."
 		mount --move /dev $ROOTFS_DIR/dev
 		mount --move /proc $ROOTFS_DIR/proc
 		mount --move /sys $ROOTFS_DIR/sys
+		mount --move /run $ROOTFS_DIR/run
 
 		cd $ROOTFS_DIR
-		exec switch_root $ROOTFS_DIR ${bootparam_init:-/sbin/init}
+		exec switch_root $ROOTFS_DIR ${bootparam_init:-/sbin/init} "$@"
 	else
 		debug "No rootfs has been set"
 	fi

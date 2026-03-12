@@ -22,7 +22,7 @@ from oeqa.utils import get_artefact_dir
 def get_target_disk_usage(d, tc, artifacts_list, outputdir):
     output_file = os.path.join(outputdir, "target_disk_usage.txt")
     try:
-        (status, output) = tc.target.run('df -h')
+        (status, output) = tc.target.run('df -h', ignore_ssh_fails=True)
         with open(output_file, 'w') as f:
             f.write(output)
             f.write("\n")
@@ -49,7 +49,7 @@ def get_artifacts_list(target, raw_list):
     for raw_path in raw_list.split():
         cmd = f"for p in {raw_path}; do if [ -e $p ]; then echo $p; fi; done"
         try:
-            status, output = target.run(cmd)
+            status, output = target.run(cmd, ignore_ssh_fails=True)
             if status != 0 or not output:
                 raise Exception()
             result += output.split()

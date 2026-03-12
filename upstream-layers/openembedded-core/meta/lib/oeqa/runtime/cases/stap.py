@@ -16,8 +16,12 @@ class StapTest(OERuntimeTestCase):
     @OEHasPackage(['gcc-symlinks'])
     @OEHasPackage(['kernel-devsrc'])
     def test_stap(self):
+        from oe.utils import parallel_make_value
+        pmv = parallel_make_value((self.td.get('PARALLEL_MAKE') or '').split())
+        parallel_make = "-j %d" % (pmv) if pmv else ""
+
         try:
-            cmd = 'make -j -C /usr/src/kernel scripts prepare'
+            cmd = 'make %s -C /usr/src/kernel scripts prepare' % (parallel_make)
             status, output = self.target.run(cmd, 900)
             self.assertEqual(status, 0, msg='\n'.join([cmd, output]))
 

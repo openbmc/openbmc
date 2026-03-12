@@ -1,0 +1,49 @@
+From a6b024ceb71c43977838d625f5ac64b7e4815a56 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Thu, 28 Aug 2025 08:11:58 +0200
+Subject: [PATCH] fix compilation with musl
+
+The basename() function requires the libgen.h header when
+compiling with musl-libc, otherwise it complains:
+
+error: 'basename' was not declared in this scope; did you mean 'rename'?
+
+Also, musl's basename requires char* instead of const char* argument:
+
+error: invalid conversion from 'const char*' to 'char*' [-fpermissive]
+
+The musl implementation of basename modifies the argument only in case
+it is a folder path (it cuts off the trailing slashes). In our case,
+when argv[0] is passed, it is always a filename without a trailing
+slash, so just cast the argument.
+
+Upstream-Status: Submitted [https://salsa.debian.org/apt-team/apt/-/merge_requests/508]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ cmdline/apt-internal-solver.cc | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/cmdline/apt-internal-solver.cc b/cmdline/apt-internal-solver.cc
+index ceedd96c7..74ed38c50 100644
+--- a/cmdline/apt-internal-solver.cc
++++ b/cmdline/apt-internal-solver.cc
+@@ -35,6 +35,7 @@
+ #include <list>
+ #include <sstream>
+ #include <string>
++#include <libgen.h>
+ #include <unistd.h>
+ 
+ #include <apti18n.h>
+@@ -119,7 +120,7 @@ int main(int argc,const char *argv[])					/*{{{*/
+ 		_config->Set("Debug::EDSP::WriteSolution", true);
+ 
+ 	_config->Set("APT::System", "Debian APT solver interface");
+-	if (strcmp(basename(argv[0]), "solver3") == 0)
++	if (strcmp(basename((char*)argv[0]), "solver3") == 0)
+ 	   _config->Set("APT::Solver", "3.0");
+ 	else if (_config->Find("APT::Solver") != "3.0")
+ 	   _config->Set("APT::Solver", "internal");
+-- 
+2.39.5
+

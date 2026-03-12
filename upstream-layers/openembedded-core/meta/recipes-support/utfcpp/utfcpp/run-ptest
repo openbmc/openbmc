@@ -1,0 +1,23 @@
+#!/bin/sh
+RET=0
+cd tests
+
+for t in $(find . -type f -executable); do
+  case $t in
+    *negative)
+      ./$t ./test_data/utf8_invalid.txt
+      ;;
+    *)
+      ./$t
+      ;;
+  esac
+
+  if [ $? -eq 0 ]; then
+    echo PASS: $t
+  else
+    echo FAIL: $t
+    RET=1
+  fi
+done
+
+exit $RET

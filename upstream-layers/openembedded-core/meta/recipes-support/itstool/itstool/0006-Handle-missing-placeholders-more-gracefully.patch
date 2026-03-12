@@ -1,0 +1,36 @@
+From 5ed7af9560ecd72e008ca76ac31369e4378f60bd Mon Sep 17 00:00:00 2001
+From: Nick Wellnhofer <wellnhofer@aevum.de>
+Date: Wed, 28 May 2025 19:46:44 +0200
+Subject: [PATCH 6/6] Handle missing placeholders more gracefully
+
+Print a warning to stderr instead of crashing.
+
+This is not related to the lxml migration but to issue #1.
+
+Upstream-Status: Submitted [https://github.com/itstool/itstool/pull/57]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ itstool.in | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/itstool.in b/itstool.in
+index c7729fd..eebd181 100755
+--- a/itstool.in
++++ b/itstool.in
+@@ -1008,7 +1008,12 @@ class Document (object):
+                     continue
+                 qname = etree.QName(child.tag)
+                 if qname.namespace == NS_BLANK:
+-                    ph_node = msg.get_placeholder(qname.localname).node
++                    ph = msg.get_placeholder(qname.localname)
++                    if ph is None:
++                        sys.stderr.write('Warning: Could not find placeholder %s\n' % (
++                            qname.localname))
++                        continue
++                    ph_node = ph.node
+                     if len(ph_node):
+                         self.merge_translations(translations, None, ph_node, strict=strict)
+                         newnode = deepcopy(ph_node)
+-- 
+2.49.0
+

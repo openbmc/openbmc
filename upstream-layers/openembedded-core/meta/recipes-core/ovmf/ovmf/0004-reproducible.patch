@@ -1,7 +1,7 @@
-From fc2d3c17ff2a7b39e8d47b788eeaac5e1487cdee Mon Sep 17 00:00:00 2001
+From 8b218dffa0368fbc2bfb5d8051b358476266fcb4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 14 Jun 2021 19:57:30 +0200
-Subject: [PATCH 4/4] reproducible
+Subject: [PATCH 4/5] reproducible
 
 This patch fixes various things which make the build more reproducible. Some changes
 here only change intermediate artefacts but that means when you have two build trees
@@ -34,9 +34,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  .../Source/Python/AutoGen/ModuleAutoGen.py    |  5 +++-
  4 files changed, 24 insertions(+), 16 deletions(-)
 
+diff --git a/BaseTools/Source/C/GenFw/Elf64Convert.c b/BaseTools/Source/C/GenFw/Elf64Convert.c
+index 83f1b285c2..e2f582f8fb 100644
 --- a/BaseTools/Source/C/GenFw/Elf64Convert.c
 +++ b/BaseTools/Source/C/GenFw/Elf64Convert.c
-@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-2-Clause-Pa
+@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
  #include <windows.h>
  #undef RUNTIME_FUNCTION
  #include <io.h>
@@ -45,7 +47,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  #endif
  #include <assert.h>
  #include <stdio.h>
-@@ -990,7 +992,7 @@ ScanSections64 (
+@@ -995,7 +997,7 @@ ScanSections64 (
    }
    mCoffOffset = mDebugOffset + sizeof(EFI_IMAGE_DEBUG_DIRECTORY_ENTRY) +
                  sizeof(EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY) +
@@ -54,7 +56,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    //
    // Add more space in the .debug data region for the DllCharacteristicsEx
-@@ -2310,7 +2312,7 @@ WriteDebug64 (
+@@ -2329,7 +2331,7 @@ WriteDebug64 (
    EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY         *Nb10;
    EFI_IMAGE_DEBUG_EX_DLLCHARACTERISTICS_ENTRY *DllEntry;
  
@@ -63,7 +65,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    NtHdr = (EFI_IMAGE_OPTIONAL_HEADER_UNION *)(mCoffFile + mNtHdrOffset);
    DataDir = &NtHdr->Pe32Plus.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG];
-@@ -2343,7 +2345,7 @@ WriteDebug64 (
+@@ -2362,7 +2364,7 @@ WriteDebug64 (
  
    Nb10 = (EFI_IMAGE_DEBUG_CODEVIEW_NB10_ENTRY*)(Dir + 1);
    Nb10->Signature = CODEVIEW_SIGNATURE_NB10;
@@ -72,6 +74,8 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  }
  
  STATIC
+diff --git a/BaseTools/Source/Python/AutoGen/BuildEngine.py b/BaseTools/Source/Python/AutoGen/BuildEngine.py
+index b829a2503c..afe826b78f 100644
 --- a/BaseTools/Source/Python/AutoGen/BuildEngine.py
 +++ b/BaseTools/Source/Python/AutoGen/BuildEngine.py
 @@ -70,6 +70,9 @@ class TargetDescBlock(object):
@@ -84,9 +88,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
      def AddInput(self, Input):
          if Input not in self.Inputs:
              self.Inputs.append(Input)
+diff --git a/BaseTools/Source/Python/AutoGen/GenMake.py b/BaseTools/Source/Python/AutoGen/GenMake.py
+index e5f282c4ac..27a34ef7c6 100755
 --- a/BaseTools/Source/Python/AutoGen/GenMake.py
 +++ b/BaseTools/Source/Python/AutoGen/GenMake.py
-@@ -576,7 +576,7 @@ cleanlib:
+@@ -571,7 +571,7 @@ cleanlib:
                  os.remove(RespFileList)
  
          # convert source files and binary files to build targets
@@ -95,7 +101,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
          if len(self.ResultFileList) == 0 and len(MyAgo.SourceFileList) != 0:
              EdkLogger.error("build", AUTOGEN_ERROR, "Nothing to build",
                              ExtraData="[%s]" % str(MyAgo))
-@@ -727,7 +727,7 @@ cleanlib:
+@@ -722,7 +722,7 @@ cleanlib:
          OutputFile = ''
          DepsFileList = []
  
@@ -104,7 +110,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
              if Cmd[2]:
                  for CopyCmd in Cmd[2]:
                      Src, Dst = CopyCmd
-@@ -760,7 +760,7 @@ cleanlib:
+@@ -755,7 +755,7 @@ cleanlib:
              self.BuildTargetList.append('\t%s' % CmdString)
  
              self.ParseSecCmd(DepsFileList, Cmd[1])
@@ -113,7 +119,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
                  self.BuildTargetList.append('%s : %s' % (self.ReplaceMacro(SecOutputFile), self.ReplaceMacro(SecDepsFile)))
                  self.BuildTargetList.append('\t%s' % self.ReplaceMacro(SecCmd))
              self.FfsOutputFileList = []
-@@ -799,13 +799,13 @@ cleanlib:
+@@ -794,13 +794,13 @@ cleanlib:
  
      def CommandExceedLimit(self):
          FlagDict = {
@@ -134,7 +140,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
                     }
  
          RespDict = {}
-@@ -1019,9 +1019,9 @@ cleanlib:
+@@ -1014,9 +1014,9 @@ cleanlib:
                  if not self.ObjTargetDict.get(T.Target.SubDir):
                      self.ObjTargetDict[T.Target.SubDir] = set()
                  self.ObjTargetDict[T.Target.SubDir].add(NewFile)
@@ -146,9 +152,11 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
                  # Generate related macros if needed
                  if T.GenFileListMacro and T.FileListMacro not in self.FileListMacros:
                      self.FileListMacros[T.FileListMacro] = []
+diff --git a/BaseTools/Source/Python/AutoGen/ModuleAutoGen.py b/BaseTools/Source/Python/AutoGen/ModuleAutoGen.py
+index 764c51789b..40aadbcfbc 100755
 --- a/BaseTools/Source/Python/AutoGen/ModuleAutoGen.py
 +++ b/BaseTools/Source/Python/AutoGen/ModuleAutoGen.py
-@@ -1474,6 +1474,9 @@ class ModuleAutoGen(AutoGen):
+@@ -1429,6 +1429,9 @@ class ModuleAutoGen(AutoGen):
              for File in Files:
                  if File.lower().endswith('.pdb'):
                      AsBuiltInfDict['binary_item'].append('DISPOSABLE|' + File)
@@ -158,7 +166,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
          HeaderComments = self.Module.HeaderComments
          StartPos = 0
          for Index in range(len(HeaderComments)):
-@@ -1749,7 +1752,7 @@ class ModuleAutoGen(AutoGen):
+@@ -1704,7 +1707,7 @@ class ModuleAutoGen(AutoGen):
              if os.path.exists (self.TimeStampPath):
                  os.remove (self.TimeStampPath)
  
@@ -167,3 +175,6 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
          # Ignore generating makefile when it is a binary module
          if self.IsBinaryModule:
+-- 
+2.47.3
+

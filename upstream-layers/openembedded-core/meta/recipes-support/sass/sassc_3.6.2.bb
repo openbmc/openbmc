@@ -7,7 +7,7 @@ DEPENDS = "libsass"
 
 inherit autotools pkgconfig
 
-SRC_URI = "git://github.com/sass/sassc.git;protocol=https;branch=master \
+SRC_URI = "git://github.com/sass/sassc.git;protocol=https;branch=master;tag=${PV} \
            file://0001-Remove-sassc_version.h-from-source-directory.patch"
 
 SRCREV = "66f0ef37e7f0ad3a65d2f481eff09d09408f42d0"

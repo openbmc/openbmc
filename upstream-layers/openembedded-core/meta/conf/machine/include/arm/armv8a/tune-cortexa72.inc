@@ -6,13 +6,17 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexa72', ' -mcpu=corte
 require conf/machine/include/arm/arch-armv8a.inc
 
 # Little Endian base configs
-AVAILTUNES += "cortexa72 cortexa72-crypto"
+AVAILTUNES += "cortexa72 cortexa72-crypto cortexa72-nocrypto"
 ARMPKGARCH:tune-cortexa72             = "cortexa72"
 ARMPKGARCH:tune-cortexa72-crypto      = "cortexa72"
+ARMPKGARCH:tune-cortexa72-nocrypto    = "cortexa72"
 # We do not want -march since -mcpu is added above to cover for it
 TUNE_FEATURES:tune-cortexa72          = "aarch64 crc cortexa72"
 TUNE_FEATURES:tune-cortexa72-crypto   = "${TUNE_FEATURES:tune-cortexa72} crypto"
+TUNE_FEATURES:tune-cortexa72-nocrypto = "${TUNE_FEATURES:tune-cortexa72} nocrypto"
 PACKAGE_EXTRA_ARCHS:tune-cortexa72        = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc} cortexa72"
 PACKAGE_EXTRA_ARCHS:tune-cortexa72-crypto = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc-crypto} cortexa72 cortexa72-crypto"
+PACKAGE_EXTRA_ARCHS:tune-cortexa72-nocrypto = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc} cortexa72 cortexa72-nocrypto"
 BASE_LIB:tune-cortexa72            = "lib64"
 BASE_LIB:tune-cortexa72-crypto     = "lib64"
+BASE_LIB:tune-cortexa72-nocrypto   = "lib64"

@@ -1,4 +1,4 @@
-From eb3a5bc4d5a212da64c0f9396c7f31f83aa6f36c Mon Sep 17 00:00:00 2001
+From 254821a620c1f7d6542c23dbe555e7c02637a3f8 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Fri, 9 Sep 2022 11:13:37 +0100
 Subject: [PATCH] libgcrypt: disable bench-slope test case
@@ -15,12 +15,12 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 1 deletion(-)
 
 diff --git a/tests/testdrv.c b/tests/testdrv.c
-index 634b718..1e9dddb 100644
+index bffa3cc..a228a28 100644
 --- a/tests/testdrv.c
 +++ b/tests/testdrv.c
-@@ -76,7 +76,6 @@ static struct {
-    { "t-x448"      },
-    { "t-ed448"     },
+@@ -79,7 +79,6 @@ static struct {
+    { "t-mlkem"     },
+    { "t-mldsa"     },
     { "benchmark"   },
 -   { "bench-slope" },
     { "hashtest-6g", "hashtest", "--hugeblock --gigs 6 SHA1 SHA256 SHA512 "

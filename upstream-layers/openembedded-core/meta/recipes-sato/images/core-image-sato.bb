@@ -8,7 +8,9 @@ IMAGE_FEATURES += "splash package-management x11-base x11-sato ssh-server-dropbe
 
 LICENSE = "MIT"
 
-inherit core-image
+inherit core-image features_check
+
+REQUIRED_DISTRO_FEATURES = "x11"
 
 TOOLCHAIN_HOST_TASK:append = " nativesdk-intltool nativesdk-glib-2.0-utils"
 TOOLCHAIN_HOST_TASK:remove:task-populate-sdk-ext = " nativesdk-intltool nativesdk-glib-2.0-utils"

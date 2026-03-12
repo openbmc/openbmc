@@ -46,6 +46,7 @@ SECURITY_LDFLAGS:pn-sysklogd = ""
 # Recipes which fail to compile when elevating -Wformat-security to an error
 SECURITY_STRINGFORMAT:pn-busybox = ""
 SECURITY_STRINGFORMAT:pn-gcc = ""
+SECURITY_STRINGFORMAT:pn-gn = ""
 
 TARGET_CC_ARCH:append:class-target = " ${SECURITY_CFLAGS}"
 TARGET_LDFLAGS:append:class-target = " ${SECURITY_LDFLAGS}"

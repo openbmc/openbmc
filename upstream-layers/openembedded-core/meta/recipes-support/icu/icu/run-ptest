@@ -2,7 +2,7 @@
 
 TOPDIR=$(dirname "$(realpath $0)")
 cd ${TOPDIR}/test/tests
-TESTS=$(find . -executable -type f)
+TESTS=$(find . -executable -type f ! -path "*/.debug/*")
 for t in ${TESTS}; do
 	./$t
 	if [ "$?" = "0" ]; then

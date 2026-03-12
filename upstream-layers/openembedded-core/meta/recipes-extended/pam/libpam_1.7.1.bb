@@ -1,8 +1,8 @@
 DISABLE_STATIC = ""
 SUMMARY = "Linux-PAM (Pluggable Authentication Modules)"
 DESCRIPTION = "Linux-PAM (Pluggable Authentication Modules for Linux), a flexible mechanism for authenticating users"
-HOMEPAGE = "https://fedorahosted.org/linux-pam/"
-BUGTRACKER = "https://fedorahosted.org/linux-pam/newticket"
+HOMEPAGE = "https://github.com/linux-pam/linux-pam"
+BUGTRACKER = "https://github.com/linux-pam/linux-pam/issues"
 SECTION = "base"
 # PAM is dual licensed under GPL and BSD.
 # /etc/pam.d comes from Debian libpam-runtime in 2009-11 (at that time
@@ -29,6 +29,8 @@ SRC_URI[sha256sum] = "21dbcec6e01dd578f14789eac9024a18941e6f2702a05cf91b28c232ee
 DEPENDS = "bison-native flex-native libxml2-native virtual/crypt"
 
 EXTRA_OEMESON = "-Ddocs=disabled -Dsecuredir=${base_libdir}/security"
+
+LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"
 
 S = "${UNPACKDIR}/Linux-PAM-${PV}"
 
@@ -168,3 +170,5 @@ CONFFILES:${PN}-runtime += "${sysconfdir}/security/limits.conf"
 GITHUB_BASE_URI = "https://github.com/linux-pam/linux-pam/releases"
 
 CVE_PRODUCT = "linux-pam"
+
+CVE_STATUS[CVE-2024-10041] = "fixed-version: fixed since v1.6.1"

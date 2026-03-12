@@ -1,0 +1,25 @@
+Ensure that directories are created before files are compiled into them.
+
+This is a hacky workaround, upstream have been informed and a better
+solution proposed:
+
+https://lists.apache.org/thread/nr0w8hcpr9my2gkys09kj89rlxgd84of
+
+Upstream-Status: Inappropriate [discussion upstream]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git i/Makefile.in w/Makefile.in
+index 0fb9e39602..8bae2cc3d2 100644
+--- i/Makefile.in
++++ w/Makefile.in
+@@ -424,7 +424,9 @@ ECHO_N = @ECHO_N@
+ 
+ TESTS = $(TEST_PROGRAMS) @BDB_TEST_PROGRAMS@
+ 
+-all: mkdir-init local-all
++all: mkdir-init
++	$(MAKE) local-all
++
+ clean: local-clean
+ distclean: local-distclean
+ extraclean: local-extraclean

@@ -1,4 +1,4 @@
-From e7491f9874411fd9855957812ba9bac948a61356 Mon Sep 17 00:00:00 2001
+From 52f928686da5ef699dec7f7a296c5226d82180c1 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Fri, 23 Sep 2016 01:04:50 -0700
 Subject: [PATCH] boost-math: disable pch for gcc
@@ -14,7 +14,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/libs/math/build/Jamfile.v2 b/libs/math/build/Jamfile.v2
-index 500c77363..504d7d8c6 100644
+index 80c99384d..38461c25f 100644
 --- a/libs/math/build/Jamfile.v2
 +++ b/libs/math/build/Jamfile.v2
 @@ -15,7 +15,7 @@ project

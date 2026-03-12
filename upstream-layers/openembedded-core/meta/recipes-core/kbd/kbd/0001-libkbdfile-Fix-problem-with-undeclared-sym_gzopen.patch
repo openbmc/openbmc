@@ -1,0 +1,57 @@
+From 2f9a4e56c2ef245fbe840677aad9d5932e17f50d Mon Sep 17 00:00:00 2001
+From: Alexey Gladkov <legion@kernel.org>
+Date: Mon, 8 Dec 2025 11:28:24 +0100
+Subject: [PATCH] libkbdfile: Fix problem with undeclared sym_gzopen
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A compile error occurs on certain systems:
+
+kbdfile-zlib.c: In function 'dlopen_note':
+elf-note.h:27:30: error: 'sym_gzopen' undeclared (first use in this function); did you mean 'sym_gzopen64'?
+   27 | #define DLSYM_ARG(symbol__) &sym_##symbol__, STRINGIFY(symbol__),
+
+kbdfile-zlib.c: In function 'kbdfile_decompressor_zlib': kbdfile-zlib.c:61:15: error: implicit declaration of function 'sym_gzopen'; did you mean 'sym_gzopen64'?
+ [-Wimplicit-function-declaration]
+   61 |         gzf = sym_gzopen(file->pathname, "rb");
+
+The problem arises because if -D_FILE_OFFSET_BITS=64 is specified, which
+in zlib ultimately makes gzopen a macro that expands to gzopen64.
+DECLARE_SYM(gzopen) from elf-note.h then expands gzopen to gzopen64,
+resulting in sym_gzopen64 declared. That's why no sym_gzopen exists.
+
+Link: https://github.com/legionus/kbd/pull/150
+Suggested-by: Jan Čermák <sairon@sairon.cz>
+Signed-off-by: Bernd Kuhls <bernd@kuhls.net>
+Signed-off-by: Alexey Gladkov <legion@kernel.org>
+
+Upstream-Status: Backport [https://github.com/legionus/kbd/commit/2f9a4e56c2ef245fbe840677aad9d5932e17f50d]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ src/libkbdfile/elf-note.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/src/libkbdfile/elf-note.h b/src/libkbdfile/elf-note.h
+index a0fd9e2..d3b8d5c 100644
+--- a/src/libkbdfile/elf-note.h
++++ b/src/libkbdfile/elf-note.h
+@@ -26,14 +26,11 @@ int dlsym_many(void **dlp, const char *filename, ...);
+  */
+ #define DLSYM_ARG(symbol__) &sym_##symbol__, STRINGIFY(symbol__),
+ 
+-/* For symbols being dynamically loaded */
+-#define DECLARE_DLSYM(symbol) static typeof(symbol) *sym_##symbol
+-
+ /*
+  * Helper defines, to be done locally before including this header to switch between
+  * implementations
+  */
+-#define DECLARE_SYM(sym__) DECLARE_DLSYM(sym__);
++#define DECLARE_SYM(sym__) static typeof(sym__) *sym_##sym__;
+ 
+ /*
+  * Originally from systemd codebase.
+-- 
+2.49.0
+

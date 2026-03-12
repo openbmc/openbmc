@@ -1,4 +1,4 @@
-From f992d781e05b61489bdf5a2a9aee6cc616f1742a Mon Sep 17 00:00:00 2001
+From a5c27826e7561eafcb8dab061e07349232457f10 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 25 Jan 2022 20:29:14 -0800
 Subject: [PATCH] vm_dump.c: Define REG_S1 and REG_S2 for musl/riscv
@@ -14,7 +14,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 5 insertions(+)
 
 diff --git a/vm_dump.c b/vm_dump.c
-index 5873e52..9eb4db1 100644
+index 99339fd..8c5bb03 100644
 --- a/vm_dump.c
 +++ b/vm_dump.c
 @@ -40,6 +40,11 @@

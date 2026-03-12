@@ -1,0 +1,110 @@
+From 6f345f658a7012bca0859d23436a11b9902711ae Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Fri, 6 Feb 2026 01:53:23 +0000
+Subject: [PATCH] Make test_parsing more resilient to changes in
+ pycparser  (#224)
+
+* Make test_parsing more resilient to changes in pycparser
+
+Several tests expect precise error messages from pycparser, which pycparser
+doesn't guarantee. While testing CFFI with pycparser 3.0, some tests needed
+to be made more resilient. I've used the .startswith() approach already used
+in this file, instead of exact string matching.
+
+Ref #223
+
+* Loosen error message assertion even more
+
+Upstream-Status: Backport [https://github.com/python-cffi/cffi/commit/c36c02fa6f4f1d12a9cead81861c6f42af47da22]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ testing/cffi0/test_parsing.py | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/testing/cffi0/test_parsing.py b/testing/cffi0/test_parsing.py
+index f10b989..7009e34 100644
+--- a/testing/cffi0/test_parsing.py
++++ b/testing/cffi0/test_parsing.py
+@@ -197,7 +197,7 @@ def test_dont_remove_comment_in_line_directives():
+ 
+         some syntax error here
+     """)
+-    assert str(e.value) == "parse error\nbaz.c:9:14: before: syntax"
++    assert str(e.value).startswith("parse error\nbaz.c:9:")
+     #
+     e = pytest.raises(CDefError, ffi.cdef, """
+         #line 7 "foo//bar.c"
+@@ -205,21 +205,21 @@ def test_dont_remove_comment_in_line_directives():
+         some syntax error here
+     """)
+     #
+-    assert str(e.value) == "parse error\nfoo//bar.c:8:14: before: syntax"
++    assert str(e.value).startswith("parse error\nfoo//bar.c:8:")
+     ffi = FFI(backend=FakeBackend())
+     e = pytest.raises(CDefError, ffi.cdef, """
+         \t # \t 8 \t "baz.c" \t
+ 
+         some syntax error here
+     """)
+-    assert str(e.value) == "parse error\nbaz.c:9:14: before: syntax"
++    assert str(e.value).startswith("parse error\nbaz.c:9:")
+     #
+     e = pytest.raises(CDefError, ffi.cdef, """
+         # 7 "foo//bar.c"
+ 
+         some syntax error here
+     """)
+-    assert str(e.value) == "parse error\nfoo//bar.c:8:14: before: syntax"
++    assert str(e.value).startswith("parse error\nfoo//bar.c:8:")
+ 
+ def test_multiple_line_directives():
+     ffi = FFI(backend=FakeBackend())
+@@ -233,7 +233,7 @@ def test_multiple_line_directives():
+         #line 8 "yadda.c"
+         extern int zz;
+     """)
+-    assert str(e.value) == "parse error\nbaz.c:7:14: before: syntax"
++    assert str(e.value).startswith("parse error\nbaz.c:7:")
+     #
+     e = pytest.raises(CDefError, ffi.cdef,
+     """ # 5 "foo.c"
+@@ -245,7 +245,7 @@ def test_multiple_line_directives():
+         # 8 "yadda.c"
+         extern int zz;
+     """)
+-    assert str(e.value) == "parse error\nbaz.c:7:14: before: syntax"
++    assert str(e.value).startswith("parse error\nbaz.c:7:")
+ 
+ def test_commented_line_directive():
+     ffi = FFI(backend=FakeBackend())
+@@ -262,7 +262,7 @@ def test_commented_line_directive():
+         some syntax error
+     """)
+     #
+-    assert str(e.value) == "parse error\nbar.c:9:14: before: syntax"
++    assert str(e.value).startswith("parse error\nbar.c:9:")
+     e = pytest.raises(CDefError, ffi.cdef, """
+         /*
+         # 5 "foo.c"
+@@ -275,7 +275,7 @@ def test_commented_line_directive():
+         */
+         some syntax error
+     """)
+-    assert str(e.value) == "parse error\nbar.c:9:14: before: syntax"
++    assert str(e.value).startswith("parse error\nbar.c:9:")
+ 
+ def test_line_continuation_in_defines():
+     ffi = FFI(backend=FakeBackend())
+@@ -365,7 +365,7 @@ def test_unknown_name():
+     e = pytest.raises(CDefError, ffi.cast, "foobarbazunknown*", 0)
+     assert str(e.value).startswith('cannot parse "foobarbazunknown*"')
+     e = pytest.raises(CDefError, ffi.cast, "int(*)(foobarbazunknown)", 0)
+-    assert str(e.value).startswith('cannot parse "int(*)(foobarbazunknown)"')
++    assert 'foobarbazunknown' in str(e.value)
+ 
+ def test_redefine_common_type():
+     prefix = "" if sys.version_info < (3,) else "b"
+-- 
+2.43.0
+

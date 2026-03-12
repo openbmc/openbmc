@@ -155,7 +155,7 @@ do_install:append() {
 }
 
 USERADD_PACKAGES = "pulseaudio-server"
-GROUPADD_PARAM:pulseaudio-server = "--system pulse"
+GROUPADD_PARAM:pulseaudio-server = "--system audio; --system pulse"
 USERADD_PARAM:pulseaudio-server = "--system --home /var/run/pulse \
                               --no-create-home --shell /bin/false \
                               --groups audio,pulse --gid pulse pulse"
@@ -192,7 +192,7 @@ FILES:libpulse = "${libdir}/libpulse.so.* ${sysconfdir}/pulse/client.conf"
 FILES:libpulse-simple = "${libdir}/libpulse-simple.so.*"
 FILES:libpulse-mainloop-glib = "${libdir}/libpulse-mainloop-glib.so.*"
 
-FILES:${PN}-dev += "${libdir}/pulse-${PV}/modules/*.la ${datadir}/vala"
+FILES:${PN}-dev += "${datadir}/vala"
 FILES:${PN}-bin += "${sysconfdir}/default/volatiles/04_pulse"
 FILES:${PN}-pa-info = "${bindir}/pa-info"
 FILES:${PN}-server = "${bindir}/pulseaudio ${bindir}/start-* ${sysconfdir} ${bindir}/pactl */udev/rules.d/*.rules */*/udev/rules.d/*.rules ${systemd_user_unitdir}/*"
@@ -232,7 +232,7 @@ python populate_packages:prepend() {
 RDEPENDS:${PN}-pa-info = "\
                           alsa-utils-amixer \
                           alsa-utils-aplay \
-                          alsa-utils-scripts \
+                          alsa-utils-alsa-info \
                           bash \
                           ${PN}-server \
                           "
@@ -290,3 +290,5 @@ RDEPENDS:pulseaudio-server += "\
 RDEPENDS:pulseaudio-server += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', \
                                   bb.utils.contains('DISTRO_FEATURES', 'systemd', 'pulseaudio-module-systemd-login', 'pulseaudio-module-console-kit', d), \
                                   '', d)}"
+
+CVE_STATUS[CVE-2024-11586] = "not-applicable-platform: specific to Ubuntu 16.04"

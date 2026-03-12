@@ -10,6 +10,8 @@
 # This class will build a wheel in do_compile, and use pypa/installer to install
 # it in do_install.
 
+inherit python3native python3-dir setuptools3-base
+
 DEPENDS:append = " python3-build-native python3-installer-native"
 
 # Where to execute the build process from
@@ -37,7 +39,7 @@ python_pep517_do_configure () {
 # When we have Python 3.11 we can parse pyproject.toml to determine the build
 # API entry point directly
 python_pep517_do_compile () {
-    nativepython3 -m build --no-isolation --wheel --outdir ${PEP517_WHEEL_PATH} ${PEP517_SOURCE_PATH} ${PEP517_BUILD_OPTS}
+    pyproject-build --no-isolation --wheel --outdir ${PEP517_WHEEL_PATH} ${PEP517_SOURCE_PATH} ${PEP517_BUILD_OPTS}
 }
 do_compile[cleandirs] += "${PEP517_WHEEL_PATH}"
 
@@ -49,7 +51,7 @@ python_pep517_do_install () {
         bbfatal More than one wheel found in ${PEP517_WHEEL_PATH}, this should not happen
     fi
 
-    nativepython3 -m installer ${INSTALL_WHEEL_COMPILE_BYTECODE} --interpreter "${USRBINPATH}/env ${PEP517_INSTALL_PYTHON}" --destdir=${D} ${PEP517_WHEEL_PATH}/*.whl
+    nativepython3 -m installer ${INSTALL_WHEEL_COMPILE_BYTECODE} --interpreter "${USRBINPATH}/env ${PEP517_INSTALL_PYTHON}" --prefix=${prefix} --destdir=${D} ${PEP517_WHEEL_PATH}/*.whl
 
     find ${D} -path *.dist-info/RECORD -delete
 }
@@ -61,3 +63,6 @@ python_pep517_do_bootstrap_install () {
 }
 
 EXPORT_FUNCTIONS do_configure do_compile do_install
+
+# Tell externalsrc this changing means it needs to reconfigure
+CONFIGURE_FILES += "pyproject.toml"

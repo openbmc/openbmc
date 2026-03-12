@@ -25,25 +25,8 @@ python do_package:prepend () {
 }
 
 python do_devshell:prepend () {
-    os.environ['CFLAGS'] = ''
-    os.environ['CPPFLAGS'] = ''
-    os.environ['CXXFLAGS'] = ''
-    os.environ['LDFLAGS'] = ''
-
-    os.environ['KERNEL_PATH'] = d.getVar('STAGING_KERNEL_DIR')
-    os.environ['KERNEL_SRC'] = d.getVar('STAGING_KERNEL_DIR')
-    os.environ['KERNEL_VERSION'] = d.getVar('KERNEL_VERSION')
-    os.environ['CC'] = d.getVar('KERNEL_CC')
-    os.environ['LD'] = d.getVar('KERNEL_LD')
-    os.environ['AR'] = d.getVar('KERNEL_AR')
-    os.environ['OBJCOPY'] = d.getVar('KERNEL_OBJCOPY')
-    os.environ['STRIP'] = d.getVar('KERNEL_STRIP')
-    os.environ['O'] = d.getVar('STAGING_KERNEL_BUILDDIR')
-    kbuild_extra_symbols = d.getVar('KBUILD_EXTRA_SYMBOLS')
-    if kbuild_extra_symbols:
-        os.environ['KBUILD_EXTRA_SYMBOLS'] = kbuild_extra_symbols
-    else:
-        os.environ['KBUILD_EXTRA_SYMBOLS'] = ''
+    import oe.kernel_module
+    oe.kernel_module.kernel_module_os_env(d, os.environ)
 }
 
 module_do_compile() {

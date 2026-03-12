@@ -1,4 +1,4 @@
-From 7e8c2b6bd87d221158f43bc1d770e04ddeed4176 Mon Sep 17 00:00:00 2001
+From c5f21e8444dba266ca2519c5da34d6b1ff316592 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 08:37:11 +0400
 Subject: [PATCH] gcc-4.3.1: ARCH_FLAGS_FOR_TARGET

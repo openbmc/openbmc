@@ -15,7 +15,7 @@ do_update_modules[network] = "1"
 python do_update_modules() {
     import subprocess, tempfile, json, re, urllib.parse
     from oe.license import tidy_licenses
-    from oe.license_finder import find_licenses
+    from oe.license_finder import find_licenses_up
 
     def unescape_path(path):
         """Unescape capital letters using exclamation points."""
@@ -47,12 +47,10 @@ python do_update_modules() {
 """
 
         env = dict(os.environ, GOMODCACHE=mod_cache_dir)
-
         source = d.expand("${UNPACKDIR}/${GO_SRCURI_DESTSUFFIX}")
-        output = subprocess.check_output(("go", "mod", "edit", "-json"), cwd=source, env=env, text=True)
-        go_mod = json.loads(output)
-
-        output = subprocess.check_output(("go", "list", "-json=Dir,Module", "-deps", f"{go_mod['Module']['Path']}/..."), cwd=source, env=env, text=True)
+        go_install = d.getVar("GO_INSTALL").split()
+        output = subprocess.check_output(("go", "list", "-json=Dir,Module", "-deps", *go_install),
+                                         cwd=source, env=env, text=True)
 
         #
         # Licenses
@@ -66,26 +64,22 @@ python do_update_modules() {
         # Very frustrating that the json parser in python can't repeatedly
         # parse from a stream.
         pkgs = json.loads('[' + output.replace('}\n{', '},\n{') + ']')
+
         # Collect licenses for the dependencies.
-        licenses = set()
-        lic_files_chksum = []
         lic_files = {}
-
         for pkg in pkgs:
-            mod = pkg.get('Module', None)
-            if not mod or mod.get('Main', False):
+            pkg_dir = pkg['Dir']
+            if not pkg_dir.startswith(mod_cache_dir):
                 continue
 
-            mod_dir = mod['Dir']
-
-            if not mod_dir.startswith(mod_cache_dir):
-                continue
-
+            mod_dir = pkg['Module']['Dir']
             path = os.path.relpath(mod_dir, mod_cache_dir)
 
-            for license_name, license_file, license_md5 in find_licenses(mod['Dir'], d, first_only=True, extra_hashes=extra_hashes):
-                lic_files[os.path.join(path, license_file)] = (license_name, license_md5)
+            for name, file, md5 in find_licenses_up(pkg_dir, mod_dir, d, first_only=True, extra_hashes=extra_hashes):
+                lic_files[os.path.join(path, file)] = (name, md5)
 
+        licenses = set()
+        lic_files_chksum = []
         for lic_file in lic_files:
             license_name, license_md5 = lic_files[lic_file]
             if license_name == "Unknown":

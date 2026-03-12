@@ -1,7 +1,9 @@
-From 20ba7fd8939e97bec3d70a67c0aac76ddc67898d Mon Sep 17 00:00:00 2001
-From: =?UTF-8?q?An=C3=ADbal=20Lim=C3=B3n?= <anibal.limon@linux.intel.com>
-Date: Tue, 21 Feb 2017 11:23:27 -0600
+From 5c9c44274ecf0e704e1aadb1001d6df9f3ce403a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sun, 8 Feb 2026 21:25:06 -0800
 Subject: [PATCH] dpkg-deb/build.c: Remove usage of --clamp-mtime in tar
+ MIME-Version: 1.0 Content-Type: text/plain; charset=UTF-8
+ Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -22,20 +24,25 @@ Upstream-Status: Inappropriate [Configuration]
 Update patch context for dpkg 1.19.4.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase to 1.23.5
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/deb/build.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/deb/build.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/src/deb/build.c b/src/deb/build.c
-index a418dd122..87bd4142e 100644
+index 259c6251c..f7a0156f1 100644
 --- a/src/deb/build.c
 +++ b/src/deb/build.c
-@@ -504,7 +504,7 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
- 
-     command_init(&cmd, TAR, "tar -cf");
-     command_add_args(&cmd, "tar", "-cf", "-", "--format=gnu",
--                           "--mtime", mtime, "--clamp-mtime", NULL);
-+                           "--mtime", mtime, NULL);
-     /* Mode might become a positional argument, pass it before -T. */
-     if (options->mode)
-       command_add_args(&cmd, "--mode", options->mode, NULL);
+@@ -553,7 +553,6 @@ tarball_pack(const char *dir, filenames_feed_func *tar_filenames_feeder,
+ 		                 "-cf", "-",
+ 		                 "--format=gnu",
+ 		                 "--mtime", mtime,
+-		                 "--clamp-mtime",
+ 		                 NULL);
+ 		/* Mode might become a positional argument, pass it
+ 		 * before -T. */
+-- 
+2.49.0
+

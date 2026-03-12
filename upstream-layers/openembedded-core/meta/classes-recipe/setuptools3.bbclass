@@ -23,20 +23,27 @@ python do_check_backend() {
             msg = f"inherits setuptools3 but has pyproject.toml with {match[1]}, use the correct class"
             if "pep517-backend" not in (d.getVar("INSANE_SKIP") or "").split():
                 oe.qa.handle_error("pep517-backend", msg, d)
+    oe.qa.exit_if_errors(d)
 }
 addtask check_backend after do_patch before do_configure
 
 setuptools3_do_configure() {
     :
 }
+# This isn't nice, but is the best solutions to ensure clean builds for now.
+# https://github.com/pypa/setuptools/issues/4732
+do_configure[cleandirs] = "${SETUPTOOLS_SETUP_PATH}/build"
 
 setuptools3_do_compile() {
         cd ${SETUPTOOLS_SETUP_PATH}
-        STAGING_INCDIR=${STAGING_INCDIR} \
-        STAGING_LIBDIR=${STAGING_LIBDIR} \
-        ${STAGING_BINDIR_NATIVE}/python3-native/python3 setup.py \
-        bdist_wheel --verbose --dist-dir ${PEP517_WHEEL_PATH} ${SETUPTOOLS_BUILD_ARGS} || \
-        bbfatal_log "'python3 setup.py bdist_wheel ${SETUPTOOLS_BUILD_ARGS}' execution failed."
+
+        export STAGING_INCDIR=${STAGING_INCDIR}
+        export STAGING_LIBDIR=${STAGING_LIBDIR}
+
+        nativepython3 setup.py --verbose \
+            build ${@oe.utils.parallel_make_argument(d, "-j %d")} \
+            bdist_wheel --dist-dir ${PEP517_WHEEL_PATH} \
+            ${SETUPTOOLS_BUILD_ARGS}
 }
 setuptools3_do_compile[vardepsexclude] = "MACHINE"
 do_compile[cleandirs] += "${PEP517_WHEEL_PATH}"

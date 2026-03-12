@@ -1,0 +1,40 @@
+From a0a4c011c0c5e598c5b51cbf81d3b4501fa72e0c Mon Sep 17 00:00:00 2001
+From: Chet Ramey <chet.ramey@case.edu>
+Date: Thu, 30 Oct 2025 14:19:41 -0300
+Subject: [PATCH] fix for caller setting rl_prompt to NULL
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The original patch came from [1, 2] and it has been integrated into
+readline git repository, commit (488d7edc22894d30b6de7f2d4190bf7403f63ffd)
+
+This patch has only the fix needed to solve the follow issues [3,4].
+
+I added the original author as this patch has been sent through readline mail
+list.
+    
+1: https://lists.gnu.org/archive/html/bug-readline/2025-07/msg00007.html
+2: https://lists.gnu.org/archive/html/bug-readline/2025-07/txtmA7rksnmmi.txt
+3: https://lore.kernel.org/connman/20251018212411.181909-1-jsbronder@cold-front.org/
+4: https://gitlab.archlinux.org/archlinux/packaging/packages/readline/-/issues/1
+
+Upstream-Status: Backport [https://cgit.git.savannah.gnu.org/cgit/readline.git/commit/display.c?h=devel&id=488d7edc22894d30b6de7f2d4190bf7403f63ffd]
+Signed-off-by: João Henrique Ferreira de Freitas <joaohf@gmail.com>
+---
+ display.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/display.c b/display.c
+index 9aa8c7b..edb525d 100644
+--- a/display.c
++++ b/display.c
+@@ -783,7 +783,7 @@ _rl_optimize_redisplay (void)
+ 
+ /* Useful shorthand used by rl_redisplay, update_line, rl_move_cursor_relative */
+ #define INVIS_FIRST()	(local_prompt_invis_chars[0])
+-#define WRAP_OFFSET(line, offset)  ((line <= prompt_last_screen_line) ? local_prompt_invis_chars[line] : 0)
++#define WRAP_OFFSET(line, offset)  ((line <= prompt_last_screen_line && local_prompt_invis_chars) ? local_prompt_invis_chars[line] : 0)
+ 
+ #define W_OFFSET(line, offset) ((line) == 0 ? offset : 0)
+ #define VIS_LLEN(l)	((l) > _rl_vis_botlin ? 0 : (vis_lbreaks[l+1] - vis_lbreaks[l]))

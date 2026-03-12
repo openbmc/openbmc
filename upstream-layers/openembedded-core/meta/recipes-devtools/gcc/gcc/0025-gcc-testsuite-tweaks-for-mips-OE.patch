@@ -1,4 +1,4 @@
-From 62e25edd60d45eaec331a3273880f6ff3248ef62 Mon Sep 17 00:00:00 2001
+From e67441867de1b636e0983e0f893bcb2bba43d9eb Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 17 Aug 2023 09:01:40 -0700
 Subject: [PATCH] gcc testsuite tweaks for mips/OE
@@ -92,7 +92,7 @@ index 6dd8fa3fce9..95672008219 100644
  	"preprocess" {
  	    set compile_type "preprocess"
 diff --git a/gcc/testsuite/lib/target-supports.exp b/gcc/testsuite/lib/target-supports.exp
-index a62f459ad7e..6886cfeee49 100644
+index c0376b04551..5d053dfe726 100644
 --- a/gcc/testsuite/lib/target-supports.exp
 +++ b/gcc/testsuite/lib/target-supports.exp
 @@ -2949,14 +2949,7 @@ proc check_mips_loongson_mmi_hw_available { } {
@@ -142,7 +142,7 @@ index a62f459ad7e..6886cfeee49 100644
      }
    }]
  }
-@@ -10354,6 +10325,7 @@ proc is-effective-target-keyword { arg } {
+@@ -10371,6 +10342,7 @@ proc is-effective-target-keyword { arg } {
  
  proc et-dg-runtest { runtest testcases flags default-extra-flags } {
      global dg-do-what-default
@@ -150,7 +150,7 @@ index a62f459ad7e..6886cfeee49 100644
      global EFFECTIVE_TARGETS
      global et_index
  
-@@ -10361,6 +10333,7 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+@@ -10378,6 +10350,7 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
  	foreach target $EFFECTIVE_TARGETS {
  	    set target_flags $flags
  	    set dg-do-what-default compile
@@ -158,7 +158,7 @@ index a62f459ad7e..6886cfeee49 100644
  	    set et_index [lsearch -exact $EFFECTIVE_TARGETS $target]
  	    if { [info procs add_options_for_${target}] != [list] } {
  		set target_flags [add_options_for_${target} "$flags"]
-@@ -10368,8 +10341,10 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
+@@ -10385,8 +10358,10 @@ proc et-dg-runtest { runtest testcases flags default-extra-flags } {
  	    if { [info procs check_effective_target_${target}_runtime]
  		 != [list] && [check_effective_target_${target}_runtime] } {
  		set dg-do-what-default run
@@ -169,7 +169,7 @@ index a62f459ad7e..6886cfeee49 100644
  	}
      } else {
  	set et_index 0
-@@ -12155,6 +12130,7 @@ proc check_effective_target_sigsetjmp {} {
+@@ -12172,6 +12147,7 @@ proc check_effective_target_sigsetjmp {} {
  proc check_vect_support_and_set_flags { } {
      global DEFAULT_VECTCFLAGS
      global dg-do-what-default
@@ -177,7 +177,7 @@ index a62f459ad7e..6886cfeee49 100644
      global EFFECTIVE_TARGETS
  
      if [istarget powerpc*-*-*] {
-@@ -12186,6 +12162,7 @@ proc check_vect_support_and_set_flags { } {
+@@ -12203,6 +12179,7 @@ proc check_vect_support_and_set_flags { } {
  		set DEFAULT_VECTCFLAGS [linsert $DEFAULT_VECTCFLAGS 0 "-mcpu=970"]
  	    }
  	    set dg-do-what-default compile
@@ -185,7 +185,7 @@ index a62f459ad7e..6886cfeee49 100644
  	}
      } elseif { [check_effective_target_x86] } {
  	lappend DEFAULT_VECTCFLAGS "-msse2"
-@@ -12193,6 +12170,7 @@ proc check_vect_support_and_set_flags { } {
+@@ -12210,6 +12187,7 @@ proc check_vect_support_and_set_flags { } {
  	    set dg-do-what-default run
  	} else {
  	    set dg-do-what-default compile
@@ -193,7 +193,7 @@ index a62f459ad7e..6886cfeee49 100644
  	}
      } elseif { [istarget mips*-*-*]
  	       && [check_effective_target_nomips16] } {
-@@ -12212,6 +12190,7 @@ proc check_vect_support_and_set_flags { } {
+@@ -12229,6 +12207,7 @@ proc check_vect_support_and_set_flags { } {
  	    set dg-do-what-default run
  	} else {
  	    set dg-do-what-default compile
@@ -201,7 +201,7 @@ index a62f459ad7e..6886cfeee49 100644
  	}
      } elseif [istarget alpha*-*-*] {
  	# Alpha's vectorization capabilities are extremely limited.
-@@ -12225,6 +12204,7 @@ proc check_vect_support_and_set_flags { } {
+@@ -12242,6 +12221,7 @@ proc check_vect_support_and_set_flags { } {
  	    set dg-do-what-default run
  	} else {
  	    set dg-do-what-default compile
@@ -209,7 +209,7 @@ index a62f459ad7e..6886cfeee49 100644
  	}
      } elseif [istarget ia64-*-*] {
  	set dg-do-what-default run
-@@ -12238,6 +12218,7 @@ proc check_vect_support_and_set_flags { } {
+@@ -12255,6 +12235,7 @@ proc check_vect_support_and_set_flags { } {
  	    set dg-do-what-default run
  	} else {
  	    set dg-do-what-default compile
@@ -217,7 +217,7 @@ index a62f459ad7e..6886cfeee49 100644
  	}
      } elseif [istarget aarch64*-*-*] {
  	set dg-do-what-default run
-@@ -12262,6 +12243,7 @@ proc check_vect_support_and_set_flags { } {
+@@ -12279,6 +12260,7 @@ proc check_vect_support_and_set_flags { } {
  	} else {
  	    lappend DEFAULT_VECTCFLAGS "-march=z14" "-mzarch"
  	    set dg-do-what-default compile

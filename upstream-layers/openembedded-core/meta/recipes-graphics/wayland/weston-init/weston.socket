@@ -1,11 +1,11 @@
 [Unit]
 Description=Weston socket
-RequiresMountsFor=/run
+RequiresMountsFor=@runtimedir@
 
 [Socket]
-ListenStream=/run/wayland-0
+ListenStream=@runtimedir@/wayland-0
 SocketMode=0775
-SocketUser=weston
+SocketUser=@WESTON_USER@
 SocketGroup=wayland
 RemoveOnStop=yes
 

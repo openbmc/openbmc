@@ -1,0 +1,31 @@
+From d00ad09688e9dcc42020949e276741d3ae58c10d Mon Sep 17 00:00:00 2001
+From: Dan Yeaw <dan@yeaw.me>
+Date: Mon, 13 Oct 2025 21:45:22 -0400
+Subject: [PATCH] Fix syntax error for missing ;
+
+This fixes a compile error with older GCC, for example GCC 10 on Debian 11:
+
+  gi/pygi-resulttuple.c:337:1: error: label at end of compound statement
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ gi/pygi-resulttuple.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gi/pygi-resulttuple.c b/gi/pygi-resulttuple.c
+index 8b793e4d0..4d892e94d 100644
+--- a/gi/pygi-resulttuple.c
++++ b/gi/pygi-resulttuple.c
+@@ -335,7 +335,7 @@ resulttuple_dealloc (PyObject *self)
+     Py_TYPE (self)->tp_free (self);
+ 
+ done:
+-    CPy_TRASHCAN_END (self)
++    CPy_TRASHCAN_END (self);
+ }
+ #endif
+ 
+-- 
+GitLab
+

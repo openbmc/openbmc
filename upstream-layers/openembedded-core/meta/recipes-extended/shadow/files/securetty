@@ -8,6 +8,8 @@ ttyS1
 ttyS2
 ttyS3
 ttyS4
+ttyS5
+ttyS6
 
 # ARM AMBA SoCs
 ttyAM0

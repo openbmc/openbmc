@@ -1,0 +1,10 @@
+%echo Generating test signing GPG Keys
+Key-Type: RSA
+Key-Length: 4096
+Name-Real: testuser
+Name-Email: testuser@email.com
+Name-Comment: nocomment
+Expire-Date: 0
+passphrase: test123
+%commit
+%echo done

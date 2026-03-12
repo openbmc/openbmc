@@ -1,6 +1,6 @@
-From 447fd26a43f40ccb071cd19198ee43fdfce87e3a Mon Sep 17 00:00:00 2001
+From 4b4e6fc898dd249387bbed4924fa22c1c494327a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Tue, 26 Nov 2024 23:04:52 -0800
+Date: Mon, 21 Jul 2025 12:43:29 +0800
 Subject: [PATCH] pkgconfig
 
 Update gpgme to use pkgconfig instead of -config files since its
@@ -17,6 +17,8 @@ Rebase to 1.17.0
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
 Rebase to 1.24.0
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+Rebase to 2.0.0
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  configure.ac            |   1 +
  src/Makefile.am         |   4 +-
@@ -27,19 +29,19 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index c34f700..4eddc3d 100644
+index d4dcb1c..293fcc2 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1176,6 +1176,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -844,6 +844,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+                 src/gpgme.pc
                  src/gpgme-glib.pc
                  src/gpgme.h)
- AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
 +AC_CONFIG_FILES(src/gpgme-pthread.pc)
- AC_CONFIG_FILES(lang/cpp/Makefile lang/cpp/src/Makefile)
- AC_CONFIG_FILES(lang/cpp/tests/Makefile)
- AC_CONFIG_FILES(lang/cpp/src/gpgmepp.pc)
+ AC_CONFIG_FILES(src/gpgme-config, chmod +x src/gpgme-config)
+ AC_CONFIG_FILES([lang/Makefile lang/cl/Makefile lang/cl/gpgme.asd])
+ AC_CONFIG_FILES([lang/js/Makefile lang/js/src/Makefile
 diff --git a/src/Makefile.am b/src/Makefile.am
-index 0370862..e716ce4 100644
+index edc239b..d427044 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@
@@ -293,3 +295,6 @@ index 9ddef5c..932645b 100644
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lgpgme
  URL: https://www.gnupg.org/software/gpgme/index.html
+-- 
+2.34.1
+

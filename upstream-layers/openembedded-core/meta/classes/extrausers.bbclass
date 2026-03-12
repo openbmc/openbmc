@@ -23,7 +23,7 @@ inherit useradd_base
 PACKAGE_INSTALL:append = " ${@['', 'base-passwd shadow'][bool(d.getVar('EXTRA_USERS_PARAMS'))]}"
 
 # Image level user / group settings
-ROOTFS_POSTPROCESS_COMMAND:append = " set_user_group"
+ROOTFS_POSTPROCESS_COMMAND += "set_user_group"
 
 # Image level user / group settings
 set_user_group () {

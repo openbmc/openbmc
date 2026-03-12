@@ -1,4 +1,4 @@
-From 24a0d767251b81810767e03aa1db8cc497408db3 Mon Sep 17 00:00:00 2001
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Fri, 16 Oct 2015 16:35:16 +0300
 Subject: [PATCH] Do not try to initialize GL without libGL
@@ -20,12 +20,12 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  docs/tools/meson.build           |  7 +++++--
  docs/tools/widgets.c             |  6 +++++-
  gdk/gdkconfig.h.meson            |  1 +
- gdk/gdkdisplay.c                 |  4 ++++
+ gdk/gdkdisplay.c                 |  8 ++++++++
  gdk/gdkgl.c                      | 11 ++++++++++-
  gdk/gdkglcontext.c               |  6 ++++++
  gdk/gdkwindow.c                  | 13 +++++++++++++
  gdk/meson.build                  |  8 +++++++-
- gdk/x11/gdkdisplay-x11.c         |  6 +++++-
+ gdk/x11/gdkdisplay-x11.c         |  4 ++++
  gdk/x11/gdkvisual-x11.c          |  5 +++++
  gdk/x11/gdkwindow-x11.c          |  4 ++++
  gdk/x11/gdkx-autocleanups.h      |  2 ++
@@ -37,10 +37,10 @@ Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
  meson_options.txt                |  2 ++
  tests/meson.build                |  9 +++++++--
  testsuite/gtk/objects-finalize.c |  2 ++
- 21 files changed, 128 insertions(+), 14 deletions(-)
+ 21 files changed, 131 insertions(+), 13 deletions(-)
 
 diff --git a/demos/gtk-demo/meson.build b/demos/gtk-demo/meson.build
-index 252da16..4b57cff 100644
+index 252da16d05..4b57cff6ac 100644
 --- a/demos/gtk-demo/meson.build
 +++ b/demos/gtk-demo/meson.build
 @@ -28,7 +28,6 @@ demos = files([
@@ -63,7 +63,7 @@ index 252da16..4b57cff 100644
    demos += files('pagesetup.c')
  endif
 diff --git a/docs/tools/meson.build b/docs/tools/meson.build
-index 05621ee..3d0a333 100644
+index 05621ee7ed..3d0a333b32 100644
 --- a/docs/tools/meson.build
 +++ b/docs/tools/meson.build
 @@ -2,10 +2,13 @@ if x11_enabled
@@ -83,7 +83,7 @@ index 05621ee..3d0a333 100644
                             include_directories: [ confinc, gdkinc, gtkinc, testinc, ],
                             dependencies: libgtk_dep)
 diff --git a/docs/tools/widgets.c b/docs/tools/widgets.c
-index 932daf1..348807e 100644
+index 932daf1746..348807e133 100644
 --- a/docs/tools/widgets.c
 +++ b/docs/tools/widgets.c
 @@ -8,7 +8,9 @@
@@ -110,7 +110,7 @@ index 932daf1..348807e 100644
  
    return info;
 diff --git a/gdk/gdkconfig.h.meson b/gdk/gdkconfig.h.meson
-index 7db19e0..088651b 100644
+index 7db19e0470..088651bafa 100644
 --- a/gdk/gdkconfig.h.meson
 +++ b/gdk/gdkconfig.h.meson
 @@ -15,6 +15,7 @@ G_BEGIN_DECLS
@@ -122,10 +122,22 @@ index 7db19e0..088651b 100644
  G_END_DECLS
  
 diff --git a/gdk/gdkdisplay.c b/gdk/gdkdisplay.c
-index fd5e9ea..87b45e7 100644
+index 5c41a48fd0..920bb18ce8 100644
 --- a/gdk/gdkdisplay.c
 +++ b/gdk/gdkdisplay.c
-@@ -2420,7 +2420,11 @@ gboolean
+@@ -2412,7 +2412,11 @@ gboolean
+ gdk_display_is_gl_context_current (GdkDisplay   *display,
+                                    GdkGLContext *context)
+ {
++#ifdef HAVE_OPENGL
+   return GDK_DISPLAY_GET_CLASS (display)->is_gl_context_current (display, context);
++#else
++  return FALSE;
++#endif
+ }
+ 
+ /*< private >
+@@ -2427,7 +2431,11 @@ gboolean
  gdk_display_make_gl_context_current (GdkDisplay   *display,
                                       GdkGLContext *context)
  {
@@ -138,7 +150,7 @@ index fd5e9ea..87b45e7 100644
  
  GdkRenderingMode
 diff --git a/gdk/gdkgl.c b/gdk/gdkgl.c
-index 0940c06..4b56614 100644
+index 0940c06c71..4b56614f9f 100644
 --- a/gdk/gdkgl.c
 +++ b/gdk/gdkgl.c
 @@ -21,8 +21,9 @@
@@ -215,7 +227,7 @@ index 0940c06..4b56614 100644
 +#endif
  }
 diff --git a/gdk/gdkglcontext.c b/gdk/gdkglcontext.c
-index cb0ed90..7ed74f3 100644
+index 52c7bce692..fa544794ac 100644
 --- a/gdk/gdkglcontext.c
 +++ b/gdk/gdkglcontext.c
 @@ -85,7 +85,9 @@
@@ -261,7 +273,7 @@ index cb0ed90..7ed74f3 100644
  
  /**
 diff --git a/gdk/gdkwindow.c b/gdk/gdkwindow.c
-index 62e0cf8..b8bda71 100644
+index 62e0cf816f..b8bda7140d 100644
 --- a/gdk/gdkwindow.c
 +++ b/gdk/gdkwindow.c
 @@ -45,7 +45,9 @@
@@ -321,7 +333,7 @@ index 62e0cf8..b8bda71 100644
            cairo_region_destroy (opaque_region);
  
 diff --git a/gdk/meson.build b/gdk/meson.build
-index 297c38c..fc71f8f 100644
+index 297c38c68e..fc71f8f49d 100644
 --- a/gdk/meson.build
 +++ b/gdk/meson.build
 @@ -56,7 +56,6 @@ gdk_gir_public_headers = files(
@@ -354,7 +366,7 @@ index 297c38c..fc71f8f 100644
  gdkconfig = configure_file(
    input  : 'gdkconfig.h.meson',
 diff --git a/gdk/x11/gdkdisplay-x11.c b/gdk/x11/gdkdisplay-x11.c
-index 7e08f47..30fd7b6 100644
+index c6d1f53d70..9793cb4329 100644
 --- a/gdk/x11/gdkdisplay-x11.c
 +++ b/gdk/x11/gdkdisplay-x11.c
 @@ -37,7 +37,9 @@
@@ -367,19 +379,19 @@ index 7e08f47..30fd7b6 100644
  #include "gdk-private.h"
  #include "gdkprofilerprivate.h"
  
-@@ -3191,7 +3193,9 @@ gdk_x11_display_class_init (GdkX11DisplayClass * class)
+@@ -3191,8 +3193,10 @@ gdk_x11_display_class_init (GdkX11DisplayClass * class)
    display_class->text_property_to_utf8_list = _gdk_x11_display_text_property_to_utf8_list;
    display_class->utf8_to_string_target = _gdk_x11_display_utf8_to_string_target;
  
--  display_class->make_gl_context_current = gdk_x11_display_make_gl_context_current;
 +#ifdef HAVE_OPENGL
-+   display_class->make_gl_context_current = gdk_x11_display_make_gl_context_current;
+   display_class->is_gl_context_current = gdk_x11_display_is_gl_context_current;
+   display_class->make_gl_context_current = gdk_x11_display_make_gl_context_current;
 +#endif
  
    display_class->get_default_seat = gdk_x11_display_get_default_seat;
  
 diff --git a/gdk/x11/gdkvisual-x11.c b/gdk/x11/gdkvisual-x11.c
-index 81479d8..3c8c5c0 100644
+index 81479d81f4..3c8c5c02ff 100644
 --- a/gdk/x11/gdkvisual-x11.c
 +++ b/gdk/x11/gdkvisual-x11.c
 @@ -306,7 +306,12 @@ _gdk_x11_screen_init_visuals (GdkScreen *screen)
@@ -396,7 +408,7 @@ index 81479d8..3c8c5c0 100644
  
  gint
 diff --git a/gdk/x11/gdkwindow-x11.c b/gdk/x11/gdkwindow-x11.c
-index 89f0666..d3e1440 100644
+index 0c59ad464e..ad3244f152 100644
 --- a/gdk/x11/gdkwindow-x11.c
 +++ b/gdk/x11/gdkwindow-x11.c
 @@ -36,7 +36,9 @@
@@ -409,7 +421,7 @@ index 89f0666..d3e1440 100644
  #include "gdkprivate-x11.h"
  #include "gdk-private.h"
  
-@@ -5906,7 +5908,9 @@ gdk_window_impl_x11_class_init (GdkWindowImplX11Class *klass)
+@@ -5916,7 +5918,9 @@ gdk_window_impl_x11_class_init (GdkWindowImplX11Class *klass)
    impl_class->set_opaque_region = gdk_x11_window_set_opaque_region;
    impl_class->set_shadow_width = gdk_x11_window_set_shadow_width;
    impl_class->show_window_menu = gdk_x11_window_show_window_menu;
@@ -420,7 +432,7 @@ index 89f0666..d3e1440 100644
    impl_class->get_unscaled_size = gdk_x11_window_get_unscaled_size;
  }
 diff --git a/gdk/x11/gdkx-autocleanups.h b/gdk/x11/gdkx-autocleanups.h
-index edb0ea7..a317d61 100644
+index edb0ea7dbf..a317d61cca 100644
 --- a/gdk/x11/gdkx-autocleanups.h
 +++ b/gdk/x11/gdkx-autocleanups.h
 @@ -30,7 +30,9 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11DeviceXI2, g_object_unref)
@@ -434,7 +446,7 @@ index edb0ea7..a317d61 100644
  G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11Screen, g_object_unref)
  G_DEFINE_AUTOPTR_CLEANUP_FUNC(GdkX11Visual, g_object_unref)
 diff --git a/gdk/x11/gdkx.h b/gdk/x11/gdkx.h
-index 1f64bcc..4db6c18 100644
+index 1f64bccb6d..4db6c18351 100644
 --- a/gdk/x11/gdkx.h
 +++ b/gdk/x11/gdkx.h
 @@ -43,7 +43,9 @@
@@ -448,7 +460,7 @@ index 1f64bcc..4db6c18 100644
  #include <gdk/x11/gdkx11monitor.h>
  #include <gdk/x11/gdkx11property.h>
 diff --git a/gdk/x11/meson.build b/gdk/x11/meson.build
-index 754ae0a..0318c83 100644
+index 754ae0a615..0318c83877 100644
 --- a/gdk/x11/meson.build
 +++ b/gdk/x11/meson.build
 @@ -14,7 +14,6 @@ gdk_x11_sources = files(
@@ -480,7 +492,7 @@ index 754ae0a..0318c83 100644
  install_headers('gdkx.h', subdir: 'gtk-3.0/gdk/')
  
 diff --git a/gtk/gtkglarea.c b/gtk/gtkglarea.c
-index 802303e..6439d77 100644
+index 802303ea9f..6439d7745d 100644
 --- a/gtk/gtkglarea.c
 +++ b/gtk/gtkglarea.c
 @@ -29,7 +29,9 @@
@@ -568,7 +580,7 @@ index 802303e..6439d77 100644
  
  static gboolean
 diff --git a/gtk/inspector/general.c b/gtk/inspector/general.c
-index a3a3419..274600e 100644
+index a3a341956b..274600e74a 100644
 --- a/gtk/inspector/general.c
 +++ b/gtk/inspector/general.c
 @@ -35,8 +35,10 @@
@@ -615,7 +627,7 @@ index a3a3419..274600e 100644
    if (GDK_IS_WAYLAND_DISPLAY (gdk_display_get_default ()))
      {
 diff --git a/meson.build b/meson.build
-index 67b24e5..c1cc09a 100644
+index 04d54a8e2c..324915c9ee 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -137,6 +137,7 @@ wayland_enabled        = get_option('wayland_backend')
@@ -673,7 +685,7 @@ index 67b24e5..c1cc09a 100644
    gtk_private_packages += ['pangoft2']
  endif
 diff --git a/meson_options.txt b/meson_options.txt
-index 94099aa..8bd0968 100644
+index 94099aa01e..8bd096896d 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
 @@ -19,6 +19,8 @@ option('profiler', type: 'boolean', value: false,
@@ -686,7 +698,7 @@ index 94099aa..8bd0968 100644
  # Print backends
  option('print_backends', type : 'string', value : 'auto',
 diff --git a/tests/meson.build b/tests/meson.build
-index 6ff249f..f2a9fba 100644
+index 6ff249f8a1..f2a9fbad6d 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
 @@ -5,7 +5,6 @@ gtk_tests = [
@@ -720,7 +732,7 @@ index 6ff249f..f2a9fba 100644
    gtk_tests += [['testfontchooserdialog']]
  endif
 diff --git a/testsuite/gtk/objects-finalize.c b/testsuite/gtk/objects-finalize.c
-index 95b565c..7f340c3 100644
+index 95b565c591..7f340c3775 100644
 --- a/testsuite/gtk/objects-finalize.c
 +++ b/testsuite/gtk/objects-finalize.c
 @@ -109,7 +109,9 @@ main (int argc, char **argv)

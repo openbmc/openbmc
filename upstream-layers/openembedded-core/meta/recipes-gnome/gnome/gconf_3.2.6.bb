@@ -9,20 +9,18 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
 
 DEPENDS = "glib-2.0 glib-2.0-native dbus dbus-glib libxml2 intltool-native"
 
+GNOMEBN = "GConf"
 GNOMEBASEBUILDCLASS = "autotools"
 inherit gnomebase gtk-doc gettext gobject-introspection gio-module-cache
 
-SRC_URI = "${GNOME_MIRROR}/GConf/${@gnome_verdir("${PV}")}/GConf-${PV}.tar.xz;name=archive \
+SRC_URI += "\
            file://remove_plus_from_invalid_characters_list.patch \
            file://unable-connect-dbus.patch \
            file://create_config_directory.patch \
            file://python3.patch \
 "
 
-SRC_URI[archive.md5sum] = "2b16996d0e4b112856ee5c59130e822c"
 SRC_URI[archive.sha256sum] = "1912b91803ab09a5eed34d364bf09fe3a2a9c96751fde03a4e0cfa51a04d784c"
-
-S = "${UNPACKDIR}/GConf-${PV}"
 
 EXTRA_OECONF = "--enable-shared --disable-static \
                 --disable-orbit --with-openldap=no --disable-gtk"

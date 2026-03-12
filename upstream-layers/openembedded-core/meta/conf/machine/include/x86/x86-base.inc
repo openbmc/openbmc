@@ -8,7 +8,7 @@
 MACHINE_FEATURES += "screen keyboard pci usbhost ext2 ext3 x86 \
                      acpi serial usbgadget alsa"
 
-IMAGE_FSTYPES ?= "wic"
+IMAGE_FSTYPES ?= "wic.zst"
 
 KERNEL_IMAGETYPE ?= "bzImage"
 

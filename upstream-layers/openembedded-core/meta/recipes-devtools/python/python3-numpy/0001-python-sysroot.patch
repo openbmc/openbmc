@@ -1,0 +1,34 @@
+From c40218577305f5953ef63d943c26a27c5a931770 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 21 Jan 2026 14:12:36 +0000
+Subject: [PATCH] Add sysroot to pkgconfig libdir
+
+When Meson uses pkg-config to introspect the Python install it resets PKG_CONFIG_PATH
+and PKG_CONFIG_LIBDIR. However, when it writes to PKG_CONFIG_LIBDIR it uses the
+_target_ library directory without prefixing this with the sysroot, which breaks 
+the build if _LIBDIR is the primary search path.
+
+This has been fixed in Meson since 1.10.0[1] but numpy has a vendored fork of Meson
+that is currently at 1.9.2, so backport the specific fix to solve this problem.
+
+[1] meson 59c3dd1fd ("python: add a python.build_config option (PEP 739)")
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ vendored-meson/meson/mesonbuild/dependencies/python.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/vendored-meson/meson/mesonbuild/dependencies/python.py b/vendored-meson/meson/mesonbuild/dependencies/python.py
+index 7f9bd20..fdcf714 100644
+--- a/vendored-meson/meson/mesonbuild/dependencies/python.py
++++ b/vendored-meson/meson/mesonbuild/dependencies/python.py
+@@ -412,6 +412,8 @@ def python_factory(env: 'Environment', for_machine: 'MachineChoice',
+     if DependencyMethods.PKGCONFIG in methods:
+         if from_installation:
+             pkg_libdir = installation.info['variables'].get('LIBPC')
++            sysroot = env.properties[for_machine].get_sys_root() or ''
++            pkg_libdir = sysroot + pkg_libdir
+             pkg_embed = '-embed' if embed and mesonlib.version_compare(installation.info['version'], '>=3.8') else ''
+             pkg_name = f'python-{pkg_version}{pkg_embed}'
+ 

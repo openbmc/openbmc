@@ -1,4 +1,4 @@
-From 3b9ae399b57cfb6e332fac6a90997a3abd33c819 Mon Sep 17 00:00:00 2001
+From e31ab477eed061cc72ed6795b483795d53af6dfc Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 2 May 2021 01:58:01 +0100
 Subject: [PATCH] tests: add helper script to run the installed_tests
@@ -18,10 +18,10 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100755 tests/check/template.sh.in
 
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index a3ffcb6..b907dcf 100644
+index b840005..252da14 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
-@@ -188,6 +188,23 @@ foreach t : core_tests
+@@ -193,6 +193,23 @@ foreach t : core_tests
          install_dir: installed_tests_metadir,
          configuration: test_conf
        )

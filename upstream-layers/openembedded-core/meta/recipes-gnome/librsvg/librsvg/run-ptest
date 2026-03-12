@@ -1,0 +1,17 @@
+#!/bin/sh
+export CARGO_MANIFEST_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd $CARGO_MANIFEST_DIR
+
+ln -sf `which rsvg-convert` ./rsvg-convert
+
+./api_test/bin/api
+
+if [ $? = 0 ]; then
+  echo PASS: /usr/lib/librsvg/ptest/api_test/bin/api
+  rc=0
+else
+  echo FAIL: /usr/lib/librsvg/ptest/api_test/bin/api
+  rc=1
+fi
+
+# rust tests are appended here by ptest-cargo class

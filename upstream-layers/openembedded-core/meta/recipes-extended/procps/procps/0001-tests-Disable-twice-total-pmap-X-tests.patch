@@ -1,0 +1,55 @@
+From 56505e2ac9b703aac979f0849814ab7c83af57e2 Mon Sep 17 00:00:00 2001
+From: Craig Small <csmall@dropbear.xyz>
+Date: Mon, 9 Feb 2026 18:19:35 +1100
+Subject: [PATCH] tests: Disable twice total pmap -X tests
+
+Sometimes the memory count can be just a little different
+but the test is equal, i.e. must be the exact number.
+This means sometimes the test fails.
+
+This removes the pmap -XX pid pid and pmap -X pid pid tests
+for checking the result is the same.
+
+Debian buildds this test never works and has been removed
+for a while.
+
+References:
+ #409
+
+Signed-off-by: Craig Small <csmall@dropbear.xyz>
+
+Upstream-Status: Backport [https://gitlab.com/procps-ng/procps/-/commit/bbe21e141b77398586c90884a43ff75996b83843]
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ testsuite/pmap.test/pmap.exp | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
+
+diff --git a/testsuite/pmap.test/pmap.exp b/testsuite/pmap.test/pmap.exp
+index d37b55e5..6fb6fa1e 100644
+--- a/testsuite/pmap.test/pmap.exp
++++ b/testsuite/pmap.test/pmap.exp
+@@ -93,13 +93,14 @@ proc expect_twice_total { test } {
+     }
+ }
+ 
+-set test "pmap X pid pid has same total"
+-spawn $pmap -X $mypid $mypid
+-expect_twice_total "$test"
+-
+-set test "pmap XX pid pid has same total"
+-spawn $pmap -XX $mypid $mypid
+-expect_twice_total "$test"
++# Disabled twice total as there can be a small change issue #409
++#set test "pmap X pid pid has same total"
++#spawn $pmap -X $mypid $mypid
++#expect_twice_total "$test"
++
++#set test "pmap XX pid pid has same total"
++#spawn $pmap -XX $mypid $mypid
++#expect_twice_total "$test"
+ 
+ set test "pmap finding shm"
+ make_testshm_proc
+-- 
+2.34.1
+

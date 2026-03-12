@@ -14,10 +14,6 @@ import time
 class WestonTest(OERuntimeTestCase):
     weston_log_file = '/tmp/weston-2.log'
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.tc.target.run('rm %s' % cls.weston_log_file)
-
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['weston'])
     def test_weston_running(self):
@@ -67,6 +63,10 @@ class WestonTest(OERuntimeTestCase):
         existing_wl_processes = self.get_processes_of('weston-desktop-shell', 'existing')
         existing_weston_processes = self.get_processes_of('weston', 'existing')
 
+        # weston log file should be removed, except if test_weston_supports_xwayland() test has to be run.
+        if 'x11' not in self.td.get('DISTRO_FEATURES'):
+            self.addCleanup(self.target.run, 'rm -f %s' % self.weston_log_file)
+
         weston_thread = threading.Thread(target=self.run_weston_init)
         weston_thread.start()
         new_wl_processes, try_cnt = self.get_new_wayland_processes(existing_wl_processes)
@@ -83,6 +83,7 @@ class WestonTest(OERuntimeTestCase):
     @skipIfNotFeature('x11', 'Test requires x11 to be in DISTRO_FEATURES')
     @OEHasPackage(['weston'])
     def test_weston_supports_xwayland(self):
+        self.addCleanup(self.target.run, 'rm -f %s' % self.weston_log_file)
         cmd ='cat %s | grep "xserver listening on display"' % self.weston_log_file
         status, output = self.target.run(cmd)
         msg = ('xwayland does not appear to be running')

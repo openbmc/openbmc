@@ -6,13 +6,17 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexa53', ' -mcpu=corte
 require conf/machine/include/arm/arch-armv8a.inc
 
 # Little Endian base configs
-AVAILTUNES += "cortexa53 cortexa53-crypto"
+AVAILTUNES += "cortexa53 cortexa53-crypto cortexa53-nocrypto"
 ARMPKGARCH:tune-cortexa53             = "cortexa53"
 ARMPKGARCH:tune-cortexa53-crypto      = "cortexa53-crypto"
+ARMPKGARCH:tune-cortexa53-nocrypto    = "cortexa53-nocrypto"
 # We do not want -march since -mcpu is added above to cover for it
 TUNE_FEATURES:tune-cortexa53          = "aarch64 crc cortexa53"
 TUNE_FEATURES:tune-cortexa53-crypto   = "${TUNE_FEATURES:tune-cortexa53} crypto"
+TUNE_FEATURES:tune-cortexa53-nocrypto = "${TUNE_FEATURES:tune-cortexa53} nocrypto"
 PACKAGE_EXTRA_ARCHS:tune-cortexa53             = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc} cortexa53"
 PACKAGE_EXTRA_ARCHS:tune-cortexa53-crypto      = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc-crypto} cortexa53 cortexa53-crypto"
+PACKAGE_EXTRA_ARCHS:tune-cortexa53-nocrypto    = "${PACKAGE_EXTRA_ARCHS:tune-armv8a-crc} cortexa53 cortexa53-nocrypto"
 BASE_LIB:tune-cortexa53               = "lib64"
 BASE_LIB:tune-cortexa53-crypto        = "lib64"
+BASE_LIB:tune-cortexa53-nocrypto      = "lib64"

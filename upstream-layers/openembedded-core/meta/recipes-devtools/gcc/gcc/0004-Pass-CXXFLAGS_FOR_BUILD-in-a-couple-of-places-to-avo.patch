@@ -1,4 +1,4 @@
-From bcc97c2c8558cd5d3879a907a216eb0e2008c976 Mon Sep 17 00:00:00 2001
+From f59aa22697ddfa42b812c7b8e232abcde6122d9a Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Thu, 28 Oct 2021 11:33:40 +0100
 Subject: [PATCH] Pass CXXFLAGS_FOR_BUILD in a couple of places to avoid these

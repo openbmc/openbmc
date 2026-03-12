@@ -18,6 +18,8 @@ RUST_DEBUG_REMAP = "--remap-path-prefix=${WORKDIR}=${TARGET_DBGSRC_DIR}"
 RUSTFLAGS += "${RUSTLIB} ${RUST_DEBUG_REMAP}"
 RUSTLIB_DEP ??= "libstd-rs"
 RUST_PANIC_STRATEGY ??= "unwind"
+# See https://bugzilla.yoctoproject.org/show_bug.cgi?id=15976
+DEBUG_PREFIX_MAP_EXTRA:toolchain-gcc = ""
 
 def target_is_armv7(d):
     '''Determine if target is armv7'''

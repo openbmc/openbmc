@@ -102,7 +102,7 @@ class RawCopyPlugin(SourcePlugin):
             sparse_copy(src, dst)
 
         # get the size in the right units for kickstart (kB)
-        du_cmd = "du -Lbks %s" % dst
+        du_cmd = "du --apparent-size -Lks %s" % dst
         out = exec_cmd(du_cmd)
         filesize = int(out.split()[0])
 

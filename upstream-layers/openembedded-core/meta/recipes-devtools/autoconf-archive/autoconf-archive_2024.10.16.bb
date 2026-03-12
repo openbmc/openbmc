@@ -6,6 +6,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=11cc2d3ee574f9d6b7ee797bdce4d423 \
     file://COPYING.EXCEPTION;md5=fdef168ebff3bc2f13664c365a5fb515"
 
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BPN}-${PV}.tar.xz"
+SRC_URI += "file://427e226a2fe3980388abffd6de25ed6b9591cce3.patch"
+SRC_URI += "file://3a23daa3da0eb1a256fda631867e19345d5f6e3a.patch"
+SRC_URI += "file://e25f8d9e3ead52f998535b86c763065c5b45cc59.patch"
 SRC_URI[sha256sum] = "7bcd5d001916f3a50ed7436f4f700e3d2b1bade3ed803219c592d62502a57363"
 
 inherit autotools allarch texinfo

@@ -1,0 +1,90 @@
+From c9060d3385b65e9a3d514801c68da7aa41647c5b Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 14 May 2024 22:04:43 -0700
+Subject: [PATCH] llvm: Add libunwind.pc.in and llvm-config scripts
+
+These are added by OE project
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libunwind/libunwind.pc.in          |  9 ++++++
+ llvm/tools/llvm-config/llvm-config | 52 ++++++++++++++++++++++++++++++
+ 2 files changed, 61 insertions(+)
+ create mode 100644 libunwind/libunwind.pc.in
+ create mode 100644 llvm/tools/llvm-config/llvm-config
+
+diff --git a/libunwind/libunwind.pc.in b/libunwind/libunwind.pc.in
+new file mode 100644
+index 000000000000..a93d676604f9
+--- /dev/null
++++ b/libunwind/libunwind.pc.in
+@@ -0,0 +1,9 @@
++prefix=/usr
++exec_prefix=/usr
++libdir=@LIBDIR@
++includedir=/usr/include
++
++Name: libunwind
++Description: libunwind base library
++Version: @VERSION@
++Libs: -lunwind
+diff --git a/llvm/tools/llvm-config/llvm-config b/llvm/tools/llvm-config/llvm-config
+new file mode 100644
+index 000000000000..6a0dd54b8eab
+--- /dev/null
++++ b/llvm/tools/llvm-config/llvm-config
+@@ -0,0 +1,52 @@
++#!/bin/bash
++#
++# Wrapper script for llvm-config. Supplies the right environment variables
++# for the target and delegates to the native llvm-config for anything else. This
++# is needed because arguments like --ldflags, --cxxflags, etc. are set by the
++# native compile rather than the target compile.
++#
++SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
++NEXT_LLVM_CONFIG="$(which -a llvm-config | sed -n 2p)"
++export YOCTO_ALTERNATE_EXE_PATH="${YOCTO_ALTERNATE_EXE_PATH:="$(readlink -f "$SCRIPT_DIR/../llvm-config")"}"
++if [ -n "$( echo $base_libdir | sed -n '/lib64/p')" ]; then
++    export YOCTO_ALTERNATE_LIBDIR="${YOCTO_ALTERNATE_LIBDIR:="/lib64"}"
++else
++    export YOCTO_ALTERNATE_LIBDIR="${YOCTO_ALTERNATE_LIBDIR:="/lib"}"
++fi
++if [[ $# == 0 ]]; then
++  exec "$NEXT_LLVM_CONFIG"
++fi
++
++remain=""
++output=""
++for arg in "$@"; do
++  case "$arg" in
++    --cppflags)
++      output="${output} ${CPPFLAGS}"
++      ;;
++    --cflags)
++      output="${output} ${CFLAGS}"
++      ;;
++    --cxxflags)
++      output="${output} ${CXXFLAGS}"
++      ;;
++    --ldflags)
++      output="${output} ${LDFLAGS}"
++      ;;
++    --shared-mode)
++      output="${output} shared"
++      ;;
++    --link-shared)
++      break
++      ;;
++    *)
++      remain="${remain} ${arg}"
++      ;;
++  esac
++done
++
++if [ "${remain}" != "" ]; then
++      output="${output} "$("$NEXT_LLVM_CONFIG" ${remain})
++fi
++
++echo "${output}"

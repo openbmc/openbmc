@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# run-ptest - Execute libyaml test suite
+
+cd tests || exit 1
+
+TOTAL=0
+PASS=0
+FAIL=0
+
+run_test() {
+    test_name="$1"
+    test_bin="./${test_name}"
+
+    TOTAL=$((TOTAL + 1))
+
+    if ${test_bin}; then
+        echo "PASS: ${test_name}"
+        PASS=$((PASS + 1))
+    else
+        echo "FAIL: ${test_name}"
+        FAIL=$((FAIL + 1))
+        return 1
+    fi
+}
+
+for test_bin in ./test-*; do
+    if [ -x "${test_bin}" ]; then
+        test_name=$(basename "${test_bin}")
+        run_test "${test_name}"
+    fi
+done
+
+echo "# TOTAL: ${TOTAL}"
+echo "# PASS:  ${PASS}"
+echo "# FAIL:  ${FAIL}"
+
+test ${FAIL} -eq 0

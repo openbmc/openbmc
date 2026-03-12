@@ -1,0 +1,30 @@
+From 0524821f8fcbdea2fbd90f199e7fb4950f50530f Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Tue, 3 Mar 2026 09:27:10 -0500
+Subject: [PATCH] test_only_active_thread: skip problematic test
+
+This test hangs frequently when run on the Autobuilder. Disable it in
+testing for now.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_external_inspection.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_external_inspection.py b/Lib/test/test_external_inspection.py
+index a709b837161..7a87092c10e 100644
+--- a/Lib/test/test_external_inspection.py
++++ b/Lib/test/test_external_inspection.py
+@@ -1111,6 +1111,7 @@ def test_self_trace(self):
+             ],
+         )
+ 
++    @unittest.skip("skipping problematic test")
+     @skip_if_not_supported
+     @unittest.skipIf(
+         sys.platform == "linux" and not PROCESS_VM_READV_SUPPORTED,
+-- 
+2.53.0
+

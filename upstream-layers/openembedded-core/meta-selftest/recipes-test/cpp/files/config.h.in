@@ -1,0 +1,10 @@
+/*
+ * Copyright OpenEmbedded Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#pragma once
+
+/* Configuration file path */
+#define EXAMPLE_CONFIG_PATH "@CPP_EXAMPLE_CONFIG_PATH@"

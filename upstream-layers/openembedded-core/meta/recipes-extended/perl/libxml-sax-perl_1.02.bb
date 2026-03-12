@@ -1,5 +1,5 @@
 SUMMARY = "Perl module for using and building Perl SAX2 XML processors"
-HOMEPAGE = "http://search.cpan.org/dist/XML-SAX/"
+HOMEPAGE = "https://metacpan.org/dist/XML-SAX"
 DESCRIPTION = "XML::SAX consists of several framework classes for using and \
 building Perl SAX2 XML parsers, filters, and drivers.  It is designed \ 
 around the need to be able to "plug in" different SAX parsers to an \
@@ -15,7 +15,7 @@ RDEPENDS:${PN} += "libxml-namespacesupport-perl libxml-sax-base-perl perl-module
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=65c4cd8f39c24c7135ed70dacbcb09e3"
 
-SRC_URI = "http://search.cpan.org/CPAN/authors/id/G/GR/GRANTM/XML-SAX-${PV}.tar.gz"
+SRC_URI = "${CPAN_MIRROR}/authors/id/G/GR/GRANTM/XML-SAX-${PV}.tar.gz"
 
 SRC_URI[sha256sum] = "4506c387043aa6a77b455f00f57409f3720aa7e553495ab2535263b4ed1ea12a"
 

@@ -33,7 +33,7 @@ closed   = 'CLOSED'
 lictag_re  = pyparsing.AtLineStart("License-Update:")
 lic_chksum_added = pyparsing.AtLineStart("+" + metadata_chksum)
 lic_chksum_removed = pyparsing.AtLineStart("-" + metadata_chksum)
-add_mark = pyparsing.Regex('\\+ ')
+add_mark = pyparsing.Regex(r'\+ ')
 patch_max_line_length = 200
 metadata_src_uri = "SRC_URI"
 metadata_summary = "SUMMARY"
@@ -51,20 +51,20 @@ auh_email = 'auh@yoctoproject.org'
 
 invalid_submitters = [pyparsing.Regex("^Upgrade Helper.+"),
             pyparsing.Regex(auh_email),
-            pyparsing.Regex("uh@not\.set"),
-            pyparsing.Regex("\S+@example\.com")]
+            pyparsing.Regex(r"uh@not\.set"),
+            pyparsing.Regex(r"\S+@example\.com")]
 
-mbox_bugzilla = pyparsing.Regex('\[\s?YOCTO.*\]')
-mbox_bugzilla_validation = pyparsing.Regex('\[(\s?YOCTO\s?#\s?(\d+)\s?,?)+\]')
-mbox_revert_shortlog_regex = pyparsing.Regex('Revert\s+".*"')
+mbox_bugzilla = pyparsing.Regex(r'\[\s?YOCTO.*\]')
+mbox_bugzilla_validation = pyparsing.Regex(r'\[(\s?YOCTO\s?#\s?(\d+)\s?,?)+\]')
+mbox_revert_shortlog_regex = pyparsing.Regex(r'Revert\s+".*"')
 mbox_shortlog_maxlength = 90
 # based on https://stackoverflow.com/questions/30281026/regex-parsing-github-usernames-javascript
-mbox_github_username = pyparsing.Regex('\B@([a-z0-9](?:-(?=[a-z0-9])|[a-z0-9]){0,38}(?<=[a-z0-9]))')
+mbox_github_username = pyparsing.Regex(r'\B(?<!\${)@([a-z0-9](?:-(?=[a-z0-9])|[a-z0-9]){0,38}(?<=[a-z0-9]))')
 
 # patch
 
-cve = pyparsing.Regex("CVE\-\d{4}\-\d+")
-cve_payload_tag = pyparsing.Regex("\+CVE:(\s+CVE\-\d{4}\-\d+)+")
+cve = pyparsing.Regex(r"CVE\-\d{4}\-\d+")
+cve_payload_tag = pyparsing.Regex(r"\+CVE:(\s+CVE\-\d{4}\-\d+)+")
 upstream_status_regex = pyparsing.AtLineStart("+" + "Upstream-Status")
 
 # shortlog
@@ -78,7 +78,7 @@ shortlog = line_start + shortlog_target + colon + shortlog_summary + line_end
 email_pattern = pyparsing.Regex(r"(?P<user>[A-Za-z0-9._%+-]+)@(?P<hostname>[A-Za-z0-9.-]+)\.(?P<domain>[A-Za-z]{2,})")
 
 signed_off_by_prefix = pyparsing.Literal("Signed-off-by:")
-signed_off_by_name = pyparsing.Regex('\S+.*(?= <)')
+signed_off_by_name = pyparsing.Regex(r'\S+.*(?= <)')
 signed_off_by_email = lessthan + email_pattern + greaterthan
 signed_off_by = pyparsing.AtLineStart(signed_off_by_prefix + signed_off_by_name + signed_off_by_email)
 patch_signed_off_by = pyparsing.AtLineStart("+" + signed_off_by_prefix + signed_off_by_name + signed_off_by_email)

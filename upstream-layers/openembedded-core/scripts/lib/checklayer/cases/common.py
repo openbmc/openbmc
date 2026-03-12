@@ -12,6 +12,16 @@ from checklayer.case import OECheckLayerTestCase
 
 class CommonCheckLayer(OECheckLayerTestCase):
     def test_readme(self):
+        """
+        Test that the layer contains a valid README file and that is meets
+        the following criteria:
+        1. A README file exists in the layer's root directory (case-insensitive)
+        2. The README file is not empty
+        3. The README contains maintainer information (checks for the word "maintainer")
+        4. The README contains patching instructions (checks for the word "patch")
+        5. The README contains at least one email address
+        If the README references another README file, steps 3, 4, and 5 are skipped.
+        """
         if self.tc.layer['type'] == LayerType.CORE:
             raise unittest.SkipTest("Core layer's README is top level")
 
@@ -32,13 +42,14 @@ class CommonCheckLayer(OECheckLayerTestCase):
 
         # If a layer's README references another README, then the checks below are not valid
         if re.search('README', data, re.IGNORECASE):
+            print("Layer README references another README; skipping further README checks.")
             return
 
-        self.assertIn('maintainer', data.lower())
-        self.assertIn('patch', data.lower())
+        self.assertIn('maintainer', data.lower(), msg="No maintainer info found in README.")
+        self.assertIn('patch', data.lower(), msg="No patching information found in README.")
         # Check that there is an email address in the README
         email_regex = re.compile(r"[^@]+@[^@]+")
-        self.assertTrue(email_regex.match(data))
+        self.assertTrue(email_regex.search(data), msg="No email address found in README.")
 
     def find_file_by_name(self, globs):
         """

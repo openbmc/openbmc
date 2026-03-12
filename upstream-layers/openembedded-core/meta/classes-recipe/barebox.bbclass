@@ -16,6 +16,8 @@ DEPENDS += "bison-native flex-native lz4-native"
 
 S = "${UNPACKDIR}/barebox-${PV}"
 B = "${WORKDIR}/build"
+KBUILD_OUTPUT = "${B}"
+OE_TERMINAL_EXPORTS += "KBUILD_OUTPUT"
 
 require conf/image-uefi.conf
 

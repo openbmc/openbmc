@@ -20,15 +20,25 @@ set(CMAKE_CXX_EXTENSIONS Off)
 
 include(GNUInstallDirs)
 
+# Define the config file path as a constant
+set(CPP_EXAMPLE_CONFIG_PATH "${CMAKE_INSTALL_FULL_SYSCONFDIR}/cmake-example.conf")
+
+# Generate config.h from config.h.in
+configure_file(config.h.in config.h @ONLY)
+
 # Linking a small library makes the example more useful for testing.
 find_package(json-c)
 
 # A simple library linking json-c library found by pkgconfig
 add_library(cmake-example-lib cpp-example-lib.cpp cpp-example-lib.hpp)
-set_target_properties(cmake-example-lib PROPERTIES 
+set_target_properties(cmake-example-lib PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
 )
+
+# Add the build directory to include path for config.h
+target_include_directories(cmake-example-lib PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
 target_link_libraries(cmake-example-lib PRIVATE json-c::json-c)
 
 install(TARGETS cmake-example-lib
@@ -39,6 +49,7 @@ install(TARGETS cmake-example-lib
 
 # A simple executable linking the library
 add_executable(cmake-example cpp-example.cpp)
+target_include_directories(cmake-example PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(cmake-example PRIVATE cmake-example-lib)
 
 install(TARGETS cmake-example
@@ -47,6 +58,7 @@ install(TARGETS cmake-example
 
 # A simple test executable for testing the library
 add_executable(test-cmake-example test-cpp-example.cpp)
+target_include_directories(test-cmake-example PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(test-cmake-example PRIVATE cmake-example-lib)
 
 if (FAILING_TEST)

@@ -1,0 +1,47 @@
+From 8c2313226de5171dd6724c1878a679b556b6cab4 Mon Sep 17 00:00:00 2001
+From: Alyssa Ross <hi@alyssa.is>
+Date: Sun, 2 Nov 2025 16:43:47 +0100
+Subject: [PATCH v2] Avoid Glibc-specific ino64_t/off64_t
+
+The *64_t types are transitional APIs for applications that do not yet
+fully support large files on 32-bit platforms.  musl no longer
+suppotrs them, so building this test for musl now fails.  Since this
+is for a raw syscall anyway, it doesn't make sense to use
+libc-specific types here anyway, so I've changed this to match the
+definition of the struct used in the kernel (except there the
+kernel-specific u64 and s64 typedefs are used instead).
+
+Fixes: b2c27072b ("Deal with linux arches that don't have getdents, only getdents64")
+
+Upstream-Status: Submitted [https://bugs.kde.org/show_bug.cgi?id=511548]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ none/tests/linux/getdents_filter.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/none/tests/linux/getdents_filter.c b/none/tests/linux/getdents_filter.c
+index 361659f51..4f46a6ea2 100644
+--- a/none/tests/linux/getdents_filter.c
++++ b/none/tests/linux/getdents_filter.c
+@@ -2,6 +2,7 @@
+ 
+ #define _GNU_SOURCE
+ #include <stdio.h>
++#include <stdint.h>
+ #include <stdlib.h>
+ #include <unistd.h>
+ #include <dirent.h>
+@@ -14,8 +15,8 @@
+ #include <sys/types.h>
+ 
+ struct linux_dirent64 {
+-    ino64_t  d_ino;
+-    off64_t  d_off;
++    uint64_t d_ino;
++    int64_t  d_off;
+     unsigned short d_reclen;
+     unsigned char  d_type;
+     char           d_name[];
+-- 
+2.51.0

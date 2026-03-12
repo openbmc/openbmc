@@ -48,11 +48,6 @@ export OEROOT
     return 1
 }
 
-# Generate an initial configuration for VSCode and the yocto-bitbake plugin.
-if command -v code > /dev/null && [ ! -d "$OEROOT/.vscode" ]; then
-    oe-setup-vscode "$OEROOT" "$BUILDDIR"
-fi
-
 unset OEROOT
 
 [ -z "$BUILDDIR" ] || cd "$BUILDDIR"

@@ -1,4 +1,4 @@
-From c11fba9bcb8d55568067e626bd959841c05081e5 Mon Sep 17 00:00:00 2001
+From 24ddd2afb4fcdb8b7c88af5caec0c18ec9e7ff4e Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 5 Sep 2016 22:25:44 +0100
 Subject: [PATCH] Use native pkg-config when looking for gtk-doc.

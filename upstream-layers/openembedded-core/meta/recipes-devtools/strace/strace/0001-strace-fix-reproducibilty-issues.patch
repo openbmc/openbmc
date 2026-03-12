@@ -1,4 +1,4 @@
-From d5f681c2de834110de260f4d071c7bc1fb0d7564 Mon Sep 17 00:00:00 2001
+From d0bbbf170f70746b2b8e9bb6129b0b9441a1c4b5 Mon Sep 17 00:00:00 2001
 From: Jeremy Puhlman <jpuhlman@mvista.com>
 Date: Wed, 11 Mar 2020 19:56:55 +0000
 Subject: [PATCH] strace: fix reproducibilty issues
@@ -13,7 +13,7 @@ Signed-off-by: Jeremy Puhlman <jpuhlman@mvista.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/tests/gen_tests.sh b/tests/gen_tests.sh
-index 8f47651..65267db 100755
+index 3c6228a..43b94ea 100755
 --- a/tests/gen_tests.sh
 +++ b/tests/gen_tests.sh
 @@ -46,7 +46,7 @@ while read -r name arg0 args; do {
@@ -25,7 +25,7 @@ index 8f47651..65267db 100755
  
  	case "$arg0" in
  		+*)
-@@ -91,7 +91,7 @@ while read -r name arg0 args; do {
+@@ -102,7 +102,7 @@ while read -r name arg0 args; do {
  
  if [ -n "$names" ]; then
  	{

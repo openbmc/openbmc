@@ -1,0 +1,38 @@
+From ce2d518fd685adf6e69a045ac37fa03d3b54ae53 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 3 Dec 2025 15:05:12 +0000
+Subject: [PATCH] gcc/testsuite/g++/bad-mapper-3.C: localhost might not be
+ known
+
+The module-mapper uses Cody::OpenInet6 to open the connection to the
+host. However, some distributions (such as Ubuntu 24.04) only have a v4
+address for localhost:
+
+  $ grep localhost /etc/hosts
+  127.0.0.1  localhost
+  ::1        ip6-localhost ip6-loopback
+
+On these systems this test fails with "Name or service not known", so
+add that to the list of allowed error messages.
+
+Upstream-Status: Submitted [https://gcc.gnu.org/pipermail/gcc-patches/2025-December/702846.html]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ gcc/testsuite/g++.dg/modules/bad-mapper-3.C | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/testsuite/g++.dg/modules/bad-mapper-3.C b/gcc/testsuite/g++.dg/modules/bad-mapper-3.C
+index 2a57956afc87..ca7eec2e1df5 100644
+--- a/gcc/testsuite/g++.dg/modules/bad-mapper-3.C
++++ b/gcc/testsuite/g++.dg/modules/bad-mapper-3.C
+@@ -1,6 +1,6 @@
+ //  { dg-additional-options "-fmodules-ts -fmodule-mapper=localhost:172477262" }
+ import unique3.bob;
+-// { dg-error {failed (socket|connecting|disabled) mapper 'localhost:172477262'} "" { target *-*-* } 0 }
++// { dg-error {failed (socket|connecting|disabled|Name or service not known) mapper 'localhost:172477262'} "" { target *-*-* } 0 }
+ // { dg-prune-output "fatal error:" }
+ // { dg-prune-output "failed to read" }
+ // { dg-prune-output "compilation terminated" }
+-- 
+2.43.0
+

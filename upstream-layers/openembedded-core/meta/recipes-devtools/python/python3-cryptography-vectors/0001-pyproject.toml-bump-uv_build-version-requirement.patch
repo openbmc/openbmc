@@ -1,0 +1,22 @@
+From 6d4c14a2781fb02903fd4d59f638cf72ee370b8d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 18 Dec 2025 20:20:13 +0100
+Subject: [PATCH] pyproject.toml: bump uv_build version requirement
+
+Upstream-Status: Backport [partial https://github.com/pyca/cryptography/pull/13617]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 2ed12a3..f01d2c1 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["uv_build>=0.7.19,<0.9.0"]
++requires = ["uv_build>=0.7.19,<0.10.0"]
+ build-backend = "uv_build"
+ 
+ [project]

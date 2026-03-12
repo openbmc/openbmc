@@ -14,7 +14,7 @@ diff --git a/lib/Makefile.am b/lib/Makefile.am
 index a50d311..193ea19 100644
 --- a/lib/Makefile.am
 +++ b/lib/Makefile.am
-@@ -272,8 +272,7 @@ hmac_file = .libs/.$(gnutls_so).hmac
+@@ -275,8 +275,7 @@ hmac_file = .libs/.$(gnutls_so).hmac
  
  all-local: $(hmac_file)
  

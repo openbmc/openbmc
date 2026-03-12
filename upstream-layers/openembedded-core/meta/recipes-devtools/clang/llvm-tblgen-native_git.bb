@@ -16,12 +16,10 @@ OECMAKE_SOURCEPATH = "${S}/llvm"
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS='llvm;clang;lldb'"
 
-BINARIES = "llvm-min-tblgen llvm-tblgen clang-tblgen lldb-tblgen"
-
-OECMAKE_TARGET_COMPILE = "${BINARIES}"
+OECMAKE_TARGET_COMPILE = "llvm-tblgen clang-tblgen lldb-tblgen"
 
 do_install() {
-    for f in ${BINARIES}; do
-        install -D ${B}/bin/$f ${D}${bindir}/$f
+    for TARGET in ${OECMAKE_TARGET_COMPILE}; do
+        DESTDIR=${D} cmake --install ${B} --component $TARGET
     done
 }

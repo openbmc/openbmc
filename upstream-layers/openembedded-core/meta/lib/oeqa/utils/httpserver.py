@@ -6,7 +6,7 @@
 
 import http.server
 import logging
-import multiprocessing
+from bb import multiprocessing
 import os
 import signal
 from socketserver import ThreadingMixIn

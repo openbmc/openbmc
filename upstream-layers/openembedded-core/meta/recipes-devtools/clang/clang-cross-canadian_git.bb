@@ -3,21 +3,15 @@
 
 SUMMARY = "Clang/LLVM based C/C++ compiler (cross-canadian for ${TARGET_ARCH} target)"
 HOMEPAGE = "http://clang.llvm.org/"
-LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/Apache-2.0-with-LLVM-exception;md5=0bcd48c3bdfef0c9d9fd17726e4b7dab"
+LICENSE = "MIT"
+LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda2f7b4f302"
 SECTION = "devel"
 
 PN = "clang-cross-canadian-${TRANSLATED_TARGET_ARCH}"
-BPN = "clang"
 
-require common-clang.inc
-require common-source.inc
 inherit cross-canadian
 
-DEPENDS += "nativesdk-clang binutils-cross-canadian-${TRANSLATED_TARGET_ARCH} virtual/nativesdk-cross-binutils virtual/nativesdk-libc"
-# We have to point gcc at a sysroot but we don't need to rebuild if this changes
-# e.g. we switch between different machines with different tunes.
-EXTRA_OECONF_PATHS[vardepsexclude] = "TUNE_PKGARCH"
-TARGET_ARCH[vardepsexclude] = "TUNE_ARCH"
+DEPENDS = "nativesdk-clang binutils-cross-canadian-${TRANSLATED_TARGET_ARCH} virtual/nativesdk-cross-binutils virtual/nativesdk-libc ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', 'nativesdk-lld', '', d)}"
 
 do_install() {
 	install -d ${D}${bindir}
@@ -28,10 +22,7 @@ do_install() {
 		ln -sf ../$tool ${D}${bindir}/${TARGET_PREFIX}$tool
 	done
 }
-SSTATE_SCAN_FILES += "*-clang *-clang++ *-llvm-profdata *-llvm-ar \
-                      *-llvm-ranlib *-llvm-nm *-lld *-ld.lld *-llvm-as *-llvm-strip \
-                      *-llvm-objcopy *-llvm-objdump *-llvm-readelf *-llvm-addr2line \
-                      *-llvm-dwp *-llvm-size *-llvm-strings *-llvm-cov"
+
 do_install:append() {
 	cross_canadian_bindirlinks
 }

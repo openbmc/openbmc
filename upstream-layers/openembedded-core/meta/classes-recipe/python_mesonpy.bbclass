@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit meson setuptools3-base python3targetconfig python_pep517
+inherit meson python_pep517
 
 # meson_do_qa_configure does the wrong thing here because
 # mesonpy runs "meson setup ..." in do_compile context.
@@ -16,8 +16,6 @@ meson_do_qa_configure () {
 # This prevents the meson error:
 # ERROR: Got argument buildtype as both -Dbuildtype and --buildtype. Pick one.
 MESONOPTS:remove = "--buildtype ${MESON_BUILDTYPE}"
-
-CONFIGURE_FILES = "pyproject.toml"
 
 DEPENDS += "python3-wheel-native python3-meson-python-native"
 

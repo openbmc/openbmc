@@ -34,39 +34,42 @@ class MesonTestBase(OESDKTestCase):
         """
         log = self._run(f"meson setup --warnlevel 1 {builddir} {sourcedir} {options}")
 
+        # Check that the build directory now exists
+        self.assertTrue(os.path.isdir(builddir))
+
         # Check that Meson thinks we're doing a cross build and not a native
         self.assertIn("Build type: cross build", log)
 
         # Check that the cross-compiler used is the one we set.
         data = json.loads(self._run(f"meson introspect --compilers {builddir}"))
-        self.assertIn(self.td.get("CC").split()[0], data["host"]["c"]["exelist"])
+        self.assertIn(self._run("echo $CC").split()[0], data["host"]["c"]["exelist"])
 
         # Check that the target architectures was set correctly.
         data = json.loads(self._run(f"meson introspect --machines {builddir}"))
-        self.assertEqual(data["host"]["cpu"], self.td["HOST_ARCH"])
+        self.assertEqual(data["host"]["cpu"], self._run("echo -n $OECORE_MESON_HOST_CPU"))
 
         self._run(f"meson compile -C {builddir} -v")
 
         if installdir:
             self._run(f"meson install -C {builddir} --destdir {installdir}")
+            # Check that the install directory now exists
+            self.assertTrue(os.path.isdir(installdir))
 
 class MesonTest(MesonTestBase):
     """
     Test that Meson builds correctly.
     """
 
-    def test_epoxy(self):
-        with tempfile.TemporaryDirectory(prefix="epoxy", dir=self.tc.sdk_dir) as testdir:
-            tarball = self.fetch(testdir, self.td["DL_DIR"], "https://github.com/anholt/libepoxy/releases/download/1.5.3/libepoxy-1.5.3.tar.xz")
+    def test_iputils(self):
+        with tempfile.TemporaryDirectory(prefix="iputils", dir=self.tc.sdk_dir) as testdir:
+            tarball = self.fetch(testdir, self.td["DL_DIR"], "https://github.com/iputils/iputils/releases/download/20250605/iputils-20250605.tar.gz")
 
-            sourcedir = os.path.join(testdir, "libepoxy-1.5.3")
+            sourcedir = os.path.join(testdir, "iputils-20250605")
             builddir = os.path.join(testdir, "build")
             installdir = os.path.join(testdir, "install")
 
             subprocess.check_output(["tar", "xf", tarball, "-C", testdir], stderr=subprocess.STDOUT)
             self.assertTrue(os.path.isdir(sourcedir))
 
-            os.makedirs(builddir)
-            self.build_meson(sourcedir, builddir, installdir, "-Degl=no -Dglx=no -Dx11=false")
-            self.assertTrue(os.path.isdir(installdir))
-            self.check_elf(os.path.join(installdir, "usr", "local", "lib", "libepoxy.so"))
+            self.build_meson(sourcedir, builddir, installdir, "-DUSE_CAP=false -DUSE_IDN=false")
+            self.check_elf(os.path.join(installdir, "usr", "local", "bin", "ping"))

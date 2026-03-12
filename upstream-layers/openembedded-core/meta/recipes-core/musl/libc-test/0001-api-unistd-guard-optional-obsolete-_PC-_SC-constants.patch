@@ -1,0 +1,44 @@
+From 90515d553d03d1f0bec8a4bdf03d02626d3968bb Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 19 Aug 2025 23:32:52 -0700
+Subject: [PATCH] api/unistd: guard optional/obsolete *_PC/*_SC constants for
+ musl
+
+musl does not define some POSIX option macros:
+- _SC_XOPEN_UUCP is obsolete and absent on musl
+- _PC_TIMESTAMP_RESOLUTION is optional and may be undefined
+
+Build currently fails when these are referenced unconditionally.
+Wrap the checks in #ifdef so the test compiles on musl without
+claiming support for unavailable names.
+
+Upstream-Status: Submitted [https://www.openwall.com/lists/musl/2025/08/20/3]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/api/unistd.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/api/unistd.c b/src/api/unistd.c
+index 522ccdc..0de547b 100644
+--- a/src/api/unistd.c
++++ b/src/api/unistd.c
+@@ -114,7 +114,9 @@ C(_PC_REC_MIN_XFER_SIZE)
+ C(_PC_REC_XFER_ALIGN)
+ C(_PC_SYMLINK_MAX)
+ C(_PC_SYNC_IO)
++#ifdef _PC_TIMESTAMP_RESOLUTION
+ C(_PC_TIMESTAMP_RESOLUTION)
++#endif
+ C(_PC_VDISABLE)
+ C(_SC_2_C_BIND)
+ C(_SC_2_C_DEV)
+@@ -235,7 +237,9 @@ C(_SC_XOPEN_REALTIME_THREADS)
+ C(_SC_XOPEN_SHM)
+ C(_SC_XOPEN_STREAMS)
+ C(_SC_XOPEN_UNIX)
++#ifdef _SC_XOPEN_UUCP
+ C(_SC_XOPEN_UUCP)
++#endif
+ C(_SC_XOPEN_VERSION)
+ C(STDERR_FILENO)
+ C(STDIN_FILENO)

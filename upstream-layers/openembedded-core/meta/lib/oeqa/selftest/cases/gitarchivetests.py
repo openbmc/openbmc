@@ -74,7 +74,7 @@ class GitArchiveTests(OESelftestTestCase):
                               "Results of {branch}:{commit}", "branch: {branch}\ncommit: {commit}", "{branch}",
                               False, "{branch}/{commit_count}-g{commit}/{tag_number}",
                               'Test run #{tag_number} of {branch}:{commit}', '',
-                              [], [], False, keywords, logger)
+                              [], [], False, None, keywords, logger)
         self.assertTrue(tag_exists(git_obj, target_tag), msg=f"Tag {target_tag} has not been created")
         delete_fake_repository(path)
 
@@ -88,7 +88,7 @@ class GitArchiveTests(OESelftestTestCase):
                               "Results of {branch}:{commit}", "branch: {branch}\ncommit: {commit}", "{branch}",
                               False, "{branch}/{commit_count}-g{commit}/{tag_number}",
                               'Test run #{tag_number} of {branch}:{commit}', '',
-                              [], [], False, keywords, logger)
+                              [], [], False, None, keywords, logger)
         self.assertTrue(tag_exists(git_obj, second_tag), msg=f"Second tag {second_tag} has not been created")
         delete_fake_repository(path)
 

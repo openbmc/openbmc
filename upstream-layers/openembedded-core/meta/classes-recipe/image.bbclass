@@ -481,6 +481,7 @@ python () {
             for ctype in sorted(ctypes):
                 if bt.endswith("." + ctype):
                     type = bt[0:-len(ctype) - 1]
+                    original_type = type
                     if type.startswith("debugfs_"):
                         type = type[8:]
                     # Create input image first.
@@ -493,7 +494,7 @@ python () {
                     subimage = type + "." + ctype
                     if subimage not in subimages:
                         subimages.append(subimage)
-                    if type not in alltypes:
+                    if original_type not in alltypes:
                         rm_tmp_images.add(localdata.expand("${IMAGE_NAME}.${type}"))
 
         for bt in basetypes[t]:
@@ -700,5 +701,28 @@ reproducible_final_image_task () {
 }
 
 IMAGE_PREPROCESS_COMMAND:append = " reproducible_final_image_task "
+
+python do_list_image_features() {
+    """
+    Task to list the available values for IMAGE_FEATURES for a specific image.
+    """
+    features = set()
+
+    for var in d:
+        if var.startswith("FEATURE_PACKAGES_"):
+            features.add(var.replace("FEATURE_PACKAGES_", ""))
+
+    for flag in d.getVarFlags("COMPLEMENTARY_GLOB"):
+        if flag != "doc":
+            features.add(flag)
+
+    for feat in d.getVarFlag("IMAGE_FEATURES", "validitems").split():
+        features.add(feat)
+
+    bb.plain("Available features for IMAGE_FEATURES:")
+    for feature in sorted(features):
+        bb.plain(" - " + feature)
+}
+addtask list_image_features
 
 CVE_PRODUCT = ""

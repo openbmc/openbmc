@@ -1,4 +1,4 @@
-From e1f9b0b531c6ddb11a85c0664051e2e4efc589fb Mon Sep 17 00:00:00 2001
+From 2e31c7045a8ced15972c7ff53d3720a713f11af3 Mon Sep 17 00:00:00 2001
 From: Ming Liu <ming.liu@toradex.com>
 Date: Sun, 5 May 2019 11:55:14 +0200
 Subject: [PATCH] Drop x11 dependencies
@@ -10,12 +10,16 @@ Signed-off-by: Ming Liu <ming.liu@toradex.com>
 Rebase for version 1.8.3.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebase for version 1.8.12.
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
 ---
  configure.ac | 44 --------------------------------------------
  1 file changed, 44 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 33d0102..50e2d93 100644
+index c3f23e2..ce8af3e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -76,27 +76,8 @@ fi
@@ -44,9 +48,9 @@ index 33d0102..50e2d93 100644
 -XTRANS_CONNECTION_FLAGS
 -
  # Check for dlopen
- AC_MSG_CHECKING([if run-time linking is supported])
  AC_SEARCH_LIBS(dlopen,[dl svld])
-@@ -255,30 +236,6 @@ AC_SUBST(USE_THREAD_LIBS)
+ if test "x$ac_cv_search_dlopen" != xno; then
+@@ -248,30 +229,6 @@ AC_SUBST(USE_THREAD_LIBS)
  
  AC_CHECK_FUNC(poll, [AC_DEFINE(USE_POLL, 1, [poll() function is available])], )
  
@@ -55,7 +59,7 @@ index 33d0102..50e2d93 100644
 -#
 -AC_MSG_CHECKING([keysym definitions])
 -AC_ARG_WITH([keysymdefdir],
--        [AC_HELP_STRING([--with-keysymdefdir=DIR], [The location of keysymdef.h (defaults to xproto include dir)])],
+-        [AS_HELP_STRING([--with-keysymdefdir=DIR], [The location of keysymdef.h (defaults to xproto include dir)])],
 -        [KEYSYMDEFDIR=$withval],
 -        [KEYSYMDEFDIR=`$PKG_CONFIG --variable=includedir xproto`/X11])
 -
@@ -77,7 +81,7 @@ index 33d0102..50e2d93 100644
  AC_ARG_ENABLE(xcms,
                AS_HELP_STRING([--disable-xcms],
                  [Disable Xlib support for CMS *EXPERIMENTAL*]),
-@@ -358,7 +315,6 @@ X11_LIBDIR="${libdir}/X11"
+@@ -351,7 +308,6 @@ X11_LIBDIR="${libdir}/X11"
  AX_DEFINE_DIR(X11_LIBDIR, X11_LIBDIR, [Location of libX11 library data])
  AC_SUBST(X11_LIBDIR)
  
@@ -85,6 +89,3 @@ index 33d0102..50e2d93 100644
  X11_CFLAGS="$X11_CFLAGS $XTHREAD_CFLAGS"
  
  #
--- 
-2.7.4
-

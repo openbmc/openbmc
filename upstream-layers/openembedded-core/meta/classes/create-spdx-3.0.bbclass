@@ -50,6 +50,17 @@ SPDX_INCLUDE_TIMESTAMPS[doc] = "Include time stamps in SPDX output. This is \
     useful if you want to know when artifacts were produced and when builds \
     occurred, but will result in non-reproducible SPDX output"
 
+SPDX_INCLUDE_KERNEL_CONFIG ??= "0"
+SPDX_INCLUDE_KERNEL_CONFIG[doc] = "If set to '1', the .config file for the kernel will be parsed \
+and each CONFIG_* value will be included in the Build.build_parameter list as DictionaryEntry \
+items. Set to '0' to disable exporting kernel configuration to improve performance or reduce \
+SPDX document size."
+
+SPDX_INCLUDE_PACKAGECONFIG ??= "0"
+SPDX_INCLUDE_PACKAGECONFIG[doc] = "If set to '1', each PACKAGECONFIG feature is recorded in the \
+build_Build object's build_parameter list as a DictionaryEntry with key \
+'PACKAGECONFIG:<feature>' and value 'enabled' or 'disabled'"
+
 SPDX_IMPORTS ??= ""
 SPDX_IMPORTS[doc] = "SPDX_IMPORTS is the base variable that describes how to \
     reference external SPDX ids. Each import is defined as a key in this \
@@ -120,7 +131,16 @@ SPDX_PACKAGE_VERSION[doc] = "The version of a package, software_packageVersion \
 SPDX_PACKAGE_URL ??= ""
 SPDX_PACKAGE_URL[doc] = "Provides a place for the SPDX data creator to record \
 the package URL string (in accordance with the Package URL specification) for \
-a software Package."
+a software Package. DEPRECATED - use SPDX_PACKAGE_URLS instead"
+
+SPDX_PACKAGE_URLS ?= "${SPDX_PACKAGE_URL} ${@oe.purl.get_base_purl(d)}"
+SPDX_PACKAGE_URLS[doc] = "A space separated list of Package URLs (purls) for \
+    the software Package. The first item in this list will be listed as the \
+    packageUrl property of the packages, and all purls (including the first \
+    one) will be listed as external references. The default value is an auto \
+    generated pkg:yocto purl based on the recipe name, version, and layer name. \
+    Override this variable to replace the default, otherwise append or prepend \
+    to add additional purls."
 
 IMAGE_CLASSES:append = " create-spdx-image-3.0"
 SDK_CLASSES += "create-spdx-sdk-3.0"
@@ -133,9 +153,10 @@ oe.spdx30_tasks.collect_dep_objsets[vardepsexclude] = "SPDX_MULTILIB_SSTATE_ARCH
 # SPDX library code makes heavy use of classes, which bitbake cannot easily
 # parse out dependencies. As such, the library code files that make use of
 # classes are explicitly added as file checksum dependencies.
-SPDX3_LIB_DEP_FILES = "\
+SPDX3_DEP_FILES = "\
     ${COREBASE}/meta/lib/oe/sbom30.py:True \
     ${COREBASE}/meta/lib/oe/spdx30.py:True \
+    ${SPDX_LICENSES}:True \
     "
 
 python do_create_spdx() {
@@ -159,7 +180,7 @@ addtask do_create_spdx after \
 SSTATETASKS += "do_create_spdx"
 do_create_spdx[sstate-inputdirs] = "${SPDXDEPLOY}"
 do_create_spdx[sstate-outputdirs] = "${DEPLOY_DIR_SPDX}"
-do_create_spdx[file-checksums] += "${SPDX3_LIB_DEP_FILES}"
+do_create_spdx[file-checksums] += "${SPDX3_DEP_FILES}"
 
 python do_create_spdx_setscene () {
     sstate_setscene(d)
@@ -183,7 +204,7 @@ addtask do_create_package_spdx after do_create_spdx before do_build do_rm_work
 SSTATETASKS += "do_create_package_spdx"
 do_create_package_spdx[sstate-inputdirs] = "${SPDXRUNTIMEDEPLOY}"
 do_create_package_spdx[sstate-outputdirs] = "${DEPLOY_DIR_SPDX}"
-do_create_package_spdx[file-checksums] += "${SPDX3_LIB_DEP_FILES}"
+do_create_package_spdx[file-checksums] += "${SPDX3_DEP_FILES}"
 
 python do_create_package_spdx_setscene () {
     sstate_setscene(d)

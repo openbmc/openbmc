@@ -1,0 +1,58 @@
+From 9fb565a0a70c6985fa1efde13cfe7fb4851588ce Mon Sep 17 00:00:00 2001
+From: Benjamin Robin <benjamin.robin@bootlin.com>
+Date: Tue, 24 Feb 2026 10:59:25 +0100
+Subject: [PATCH] generate-bindings: allow to use local files
+
+shacl2code needs to download the following URLs during build time:
+ - https://spdx.org/rdf/3.0.1/spdx-model.ttl
+ - https://spdx.org/rdf/3.0.1/spdx-json-serialize-annotations.ttl
+ - https://spdx.org/rdf/3.0.1/spdx-context.jsonld
+
+There are a lot of package build tools that do not allow to download
+a file during the build. So provide a way to use local file:
+If the environment variable SHACL2CODE_SPDX_DIR is defined, load
+the SPDX model and SPDX context from the directory specified by this
+environment variable.
+
+Upstream-Status: Submitted [https://github.com/spdx/spdx-python-model/pull/19]
+
+Signed-off-by: Benjamin Robin <benjamin.robin@bootlin.com>
+---
+ gen/generate-bindings | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/gen/generate-bindings b/gen/generate-bindings
+index b963c55a3bc9..bc7041ee3bb9 100755
+--- a/gen/generate-bindings
++++ b/gen/generate-bindings
+@@ -14,12 +14,22 @@ echo "# Import all versions" > __init__.py
+ for v in $SPDX_VERSIONS; do
+     MODNAME="v$(echo "$v" | sed 's/[^a-zA-Z0-9_]/_/g')"
+
+-    shacl2code generate --input https://spdx.org/rdf/$v/spdx-model.ttl \
+-        --input https://spdx.org/rdf/$v/spdx-json-serialize-annotations.ttl \
+-        --context https://spdx.org/rdf/$v/spdx-context.jsonld \
+-        --license Apache-2.0 \
+-        python \
+-        -o "$MODNAME.py"
++    if [ -n "${SHACL2CODE_SPDX_DIR}" ] && [ -d "${SHACL2CODE_SPDX_DIR}/$v" ]
++    then
++        shacl2code generate --input "file://${SHACL2CODE_SPDX_DIR}/$v/spdx-model.ttl" \
++            --input "file://${SHACL2CODE_SPDX_DIR}/$v/spdx-json-serialize-annotations.ttl" \
++            --context-url "file://${SHACL2CODE_SPDX_DIR}/$v/spdx-context.jsonld" https://spdx.org/rdf/$v/spdx-context.jsonld  \
++            --license Apache-2.0 \
++            python \
++            -o "$MODNAME.py"
++    else
++        shacl2code generate --input https://spdx.org/rdf/$v/spdx-model.ttl \
++            --input https://spdx.org/rdf/$v/spdx-json-serialize-annotations.ttl \
++            --context https://spdx.org/rdf/$v/spdx-context.jsonld \
++            --license Apache-2.0 \
++            python \
++            -o "$MODNAME.py"
++    fi
+
+     echo "from . import $MODNAME" >> __init__.py
+ done
+--
+2.53.0

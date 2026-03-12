@@ -11,7 +11,7 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
-index 2dc352d479e..e95270adaeb 100644
+index 0ffe7308ba..bd8f4245a2 100644
 --- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 +++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
 @@ -3,8 +3,6 @@ SECTION = "examples"
@@ -20,9 +20,6 @@ index 2dc352d479e..e95270adaeb 100644
  
 -SRC_URI = "file://helloworld.c"
 -
- S = "${WORKDIR}/sources"
- UNPACKDIR = "${S}"
+ S = "${UNPACKDIR}"
  
--- 
-2.45.1
-
+ do_compile() {

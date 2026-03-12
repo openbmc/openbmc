@@ -1073,9 +1073,9 @@ def get_recipe_upstream_version(rd):
             upversion = None
             revision = None
             try:
-                revision = ud.method.latest_revision(ud, rd, 'default')
+                revision = ud.method.latest_revision(ud, rd, ud.name)
                 upversion = pv
-                if revision != rd.getVar("SRCREV"):
+                if revision != ud.revision:
                     upversion = upversion + "-new-commits-available"
             except bb.fetch2.FetchError as e:
                 bb.warn("Unable to obtain latest revision: {}".format(e))
@@ -1139,13 +1139,10 @@ def get_recipe_upgrade_status(recipes=None):
                  'RECIPE_UPSTREAM_VERSION',
                  'RECIPE_UPSTREAM_DATE',
                  'CHECK_DATE',
-                 'FETCHCMD_bzr',
                  'FETCHCMD_ccrc',
-                 'FETCHCMD_cvs',
                  'FETCHCMD_git',
                  'FETCHCMD_hg',
                  'FETCHCMD_npm',
-                 'FETCHCMD_osc',
                  'FETCHCMD_p4',
                  'FETCHCMD_repo',
                  'FETCHCMD_s3',

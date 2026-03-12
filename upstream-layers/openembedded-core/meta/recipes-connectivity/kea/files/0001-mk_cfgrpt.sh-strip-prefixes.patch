@@ -1,0 +1,54 @@
+From 920e4895c679a5bfda29e66fa199ad8e889659d0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 28 Aug 2025 17:31:39 -0700
+Subject: [PATCH] mk_cfgrpt.sh: strip prefixes
+
+Add support for a STRIP_PREFIXES env var (colon-separated list).
+The script will pipe its output through sed to remove any of those prefixes.
+
+Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/issues/4087]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tools/mk_cfgrpt.sh | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
+
+diff --git a/tools/mk_cfgrpt.sh b/tools/mk_cfgrpt.sh
+index bc0cc41..8f41ce1 100755
+--- a/tools/mk_cfgrpt.sh
++++ b/tools/mk_cfgrpt.sh
+@@ -43,6 +43,26 @@ then
+     exit 2
+ fi
+ 
++# Optional: strip absolute path prefixes from generated output to make
++# cross-builds reproducible (e.g. Yocto sysroot/work dirs).
++# Provide colon-separated prefixes via STRIP_PREFIXES.
++strip_paths() {
++    if [ -z "${STRIP_PREFIXES:-}" ]; then
++        cat
++        return
++    fi
++    # Build a sed script that removes each prefix wherever it appears.
++    SED_SCRIPT=
++    IFS=':'; for p in $STRIP_PREFIXES; do
++        [ -n "$p" ] || continue
++        # Escape forward slashes
++        ep=$(printf '%s' "$p" | sed 's,/,\\/,g')
++        SED_SCRIPT="${SED_SCRIPT}s/${ep}//g;"
++    done
++    IFS=' '
++    sed -e "$SED_SCRIPT"
++}
++
+ # Header
+ cat >> "${dest}" << END
+ // config_report.cc. Generated from config.report by tools/mk_cfgrpt.sh
+@@ -55,7 +75,7 @@ END
+ 
+ # Body: escape '\'s and '"'s, preprend '    ";;;; ' and append '",'
+ sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' -e 's/^/    ";;;; /' -e 's/$/",/' \
+-    < "${report_file}" >> "${dest}"
++    < "${report_file}" | strip_paths >> "${dest}"
+ 
+ # Trailer
+ cat >> "${dest}" <<END

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit python_pep517 python3native python3-dir setuptools3-base
+inherit python_pep517
 
 DEPENDS += "python3-hatchling-native"
 

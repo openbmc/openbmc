@@ -155,3 +155,10 @@ do_install:append:class-nativesdk () {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+# Setscene tasks which run under fakeroot must not be executed before
+# pseudo-native and *all* its runtime dependencies are available in the
+# sysroot.
+PSEUDO_SETSCENE_DEPS = ""
+PSEUDO_SETSCENE_DEPS:class-native = "sqlite3-native:do_populate_sysroot"
+do_populate_sysroot_setscene[depends] += "${PSEUDO_SETSCENE_DEPS}"

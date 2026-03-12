@@ -1,0 +1,2 @@
+d root root 0750 /var/run/kea none
+d root root 0644 /var/lib/kea none

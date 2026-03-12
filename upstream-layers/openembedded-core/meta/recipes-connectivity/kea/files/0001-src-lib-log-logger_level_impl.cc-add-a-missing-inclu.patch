@@ -1,0 +1,24 @@
+From 1ad52a9bbec644e653cc67a596b811b70787c2dd Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 17 Dec 2025 12:36:24 +0100
+Subject: [PATCH] src/lib/log/logger_level_impl.cc: add a missing include to
+ address failures with boost 1.90.0
+
+Upstream-Status: Inappropriate [a different, more invasive fix is being developed upstream https://gitlab.isc.org/isc-projects/kea/-/issues/4266]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/lib/log/logger_level_impl.cc | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib/log/logger_level_impl.cc b/src/lib/log/logger_level_impl.cc
+index a4aba73..c2e4ee5 100644
+--- a/src/lib/log/logger_level_impl.cc
++++ b/src/lib/log/logger_level_impl.cc
+@@ -10,6 +10,7 @@
+ #include <string.h>
+ #include <iostream>
+ #include <boost/lexical_cast.hpp>
++#include <boost/static_assert.hpp>
+ 
+ #include <log4cplus/logger.h>
+ 

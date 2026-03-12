@@ -72,6 +72,7 @@ CPPFLAGS = ""
 SYSTEMHEADERS = "${target_includedir}"
 SYSTEMLIBS = "${target_base_libdir}/"
 SYSTEMLIBS1 = "${target_libdir}/"
+SYSTEMLOCALHEADERS = "${target_prefix}/local/include"
 
 do_configure:prepend () {
 	# teach gcc to find correct target includedir when checking libc ssp support
@@ -83,6 +84,7 @@ do_configure:prepend () {
 #define STANDARD_STARTFILE_PREFIX_1 "${SYSTEMLIBS}"
 #define STANDARD_STARTFILE_PREFIX_2 "${SYSTEMLIBS1}"
 #define SYSTEMLIBS_DIR "${SYSTEMLIBS}"
+#define LOCAL_INCLUDE_DIR "${SYSTEMLOCALHEADERS}"
 #endif /* ! GCC_DEFAULTS_H */
 _EOF
 	mv ${B}/gcc/defaults.h.new ${B}/gcc/defaults.h

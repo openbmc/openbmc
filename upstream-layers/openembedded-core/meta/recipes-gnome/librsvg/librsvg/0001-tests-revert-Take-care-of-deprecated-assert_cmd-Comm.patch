@@ -1,0 +1,42 @@
+From bc089af8ce38ad268bc4283040ec28241c5064a6 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 18 Dec 2025 18:43:20 +0100
+Subject: [PATCH] tests: revert 'Take care of deprecated
+ assert_cmd::Command::cargo_bin'
+
+This reverts https://gitlab.gnome.org/GNOME/librsvg/-/commit/fdc004ac6304f2cd7206541b9a7bf901cf6a9dd6
+back to the deprecated API, as the new API writes an absolute build path
+of the requested command into the resulting binary.
+
+Upstream is not yet convinced the tests should be made installable
+so before discussing a fix for this issue in particular we need
+to convince them first:
+https://gitlab.gnome.org/GNOME/librsvg/-/issues/1119#note_2644649
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ rsvg_convert/tests/rsvg_convert.rs | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/rsvg_convert/tests/rsvg_convert.rs b/rsvg_convert/tests/rsvg_convert.rs
+index 3d0a340..90a4c2f 100644
+--- a/rsvg_convert/tests/rsvg_convert.rs
++++ b/rsvg_convert/tests/rsvg_convert.rs
+@@ -3,7 +3,6 @@ mod internal_predicates;
+ use internal_predicates::file;
+ 
+ use assert_cmd::assert::IntoOutputPredicate;
+-use assert_cmd::cargo::cargo_bin_cmd;
+ use assert_cmd::Command;
+ #[cfg(system_deps_have_cairo_pdf)]
+ use chrono::{TimeZone, Utc};
+@@ -50,7 +49,7 @@ impl RsvgConvert {
+         let path_str = config_file_path.to_str().unwrap();
+         eprintln!("FONTCONFIG_FILE={path_str}");
+ 
+-        let mut command = cargo_bin_cmd!("rsvg-convert");
++        let mut command = Command::cargo_bin("rsvg-convert").unwrap();
+         command.env("FONTCONFIG_FILE", config_file_path);
+ 
+         RsvgConvert {

@@ -1,0 +1,47 @@
+From 27fd94beadfc29ea4ad82f660dbdb2540d0b6b97 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 18 Dec 2025 15:45:11 +0100
+Subject: [PATCH] lib/meson.build: do not hardcode the build directory into the
+ installable library
+
+This breaks reproducibility, and is not otherwise appropriate, as the
+original directory may not exist. If there's a use case for referring to
+it, the location should be passed in with a command line switch or
+environment variable.
+
+imgdir is set elsewhere in meson.build to:
+
+imgdir = join_paths(build_root, 'data')
+
+and them IGT_IMGDIR is used thusly in lib/igt_core.h:
+
+/**
+ * igt_fopen_data:
+ * @filename: filename to open.
+ *
+ * Open a datafile for test, first try from installation directory,
+ * then from build directory, and finally from current directory.
+ */
+#define igt_fopen_data(filename) \
+        __igt_fopen_data(IGT_SRCDIR, IGT_DATADIR, IGT_IMGDIR, filename)
+
+
+Upstream-Status: Inappropriate [hack patching in a bogus dir; issue reported at https://gitlab.freedesktop.org/drm/igt-gpu-tools/-/issues/190]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ lib/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/meson.build b/lib/meson.build
+index d0487fb3c..f6452e970 100644
+--- a/lib/meson.build
++++ b/lib/meson.build
+@@ -292,7 +292,7 @@ foreach f: lib_sources
+ 	    '-DIGT_DATADIR="@0@"'.format(join_paths(prefix, datadir)),
+ 	    '-DIGT_SRCDIR="@0@"'.format(srcdir),
+ 	    '-DIGT_LOG_DOMAIN="@0@"'.format(f.split('.')[0]),
+-            '-DIGT_IMGDIR="@0@"'.format(imgdir),
++            '-DIGT_IMGDIR="/this/is/a/bogus/dir"',
+ 	])
+ 
+     lib_intermediates += lib

@@ -9,6 +9,7 @@ SUMMARY ?= "${MCNAME} ptest image."
 HOMEPAGE = "https://www.yoctoproject.org/"
 
 PTESTS = "${PTESTS_SLOW} ${PTESTS_FAST}"
+PTEST_RUNNER_TIMEOUT:virtclass-mcextend-python3-cffi = "600"
 
 IMAGE_INSTALL:append = " ${MCNAME}-ptest openssh"
 
@@ -40,9 +41,6 @@ QB_MEM:virtclass-mcextend-python3-numpy = "-m 4096"
 QB_MEM:virtclass-mcextend-tcl = "-m 5100"
 
 TEST_SUITES = "ping ssh parselogs ptest"
-
-# Sadly at the moment the full set of ptests is not robust enough and sporadically fails in random places
-PTEST_EXPECT_FAILURE = "1"
 
 python () {
     if not d.getVar("MCNAME"):

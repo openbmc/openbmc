@@ -13,12 +13,14 @@ Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- Lib/test/test_readline.py | 2 ++
- 1 file changed, 2 insertions(+)
+ Lib/test/test_readline.py | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/Lib/test/test_readline.py b/Lib/test/test_readline.py
+index 537a9fb..ddf0323 100644
 --- a/Lib/test/test_readline.py
 +++ b/Lib/test/test_readline.py
-@@ -70,6 +70,7 @@ class TestHistoryManipulation (unittest.
+@@ -71,6 +71,7 @@ class TestHistoryManipulation (unittest.TestCase):
  
      @unittest.skipUnless(hasattr(readline, "append_history_file"),
                           "append_history not available")
@@ -26,7 +28,7 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
      def test_write_read_append(self):
          hfile = tempfile.NamedTemporaryFile(delete=False)
          hfile.close()
-@@ -141,6 +142,7 @@ class TestHistoryManipulation (unittest.
+@@ -142,6 +143,7 @@ class TestHistoryManipulation (unittest.TestCase):
          self.assertEqual(readline.get_history_item(1), "entrée 1")
          self.assertEqual(readline.get_history_item(2), "entrée 22")
  
@@ -34,7 +36,7 @@ Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
      def test_write_read_limited_history(self):
          previous_length = readline.get_history_length()
          self.addCleanup(readline.set_history_length, previous_length)
-@@ -382,6 +384,7 @@ readline.write_history_file(history_file
+@@ -390,6 +392,7 @@ readline.write_history_file(history_file)
          self.assertIn(b"done", output)
  
  

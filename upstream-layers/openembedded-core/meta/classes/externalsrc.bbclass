@@ -188,7 +188,7 @@ python externalsrc_configure_prefunc() {
             git_exclude_file = os.path.join(git_dir, 'info/exclude')
             if os.path.exists(git_exclude_file):
                 with open(git_exclude_file, 'r+') as efile:
-                    elines = efile.readlines()
+                    elines = [line.strip() for line in efile]
                     for link in newlinks:
                         if link in elines or '/'+link in elines:
                             continue

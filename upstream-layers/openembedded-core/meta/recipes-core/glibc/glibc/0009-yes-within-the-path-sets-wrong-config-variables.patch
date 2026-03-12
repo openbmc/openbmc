@@ -1,4 +1,4 @@
-From 4a1ff3c313645aa425a0a87459c907dad1b9ca4b Mon Sep 17 00:00:00 2001
+From 8a67937e136ba22f062802c1df276604b3f58579 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
 Subject: [PATCH] 'yes' within the path sets wrong config variables
@@ -31,7 +31,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  mode change 100644 => 100755 sysdeps/unix/sysv/linux/powerpc/powerpc64/configure
 
 diff --git a/sysdeps/aarch64/configure b/sysdeps/aarch64/configure
-index 4bd5496a4a..6c051369fb 100755
+index f364e65fe7..258a344620 100755
 --- a/sysdeps/aarch64/configure
 +++ b/sysdeps/aarch64/configure
 @@ -157,12 +157,12 @@ else case e in #(
@@ -50,7 +50,7 @@ index 4bd5496a4a..6c051369fb 100755
    libc_cv_aarch64_be=yes
  else case e in #(
 diff --git a/sysdeps/aarch64/configure.ac b/sysdeps/aarch64/configure.ac
-index 56d12d661d..80fca20873 100644
+index a9a1b747f1..879db7c57c 100644
 --- a/sysdeps/aarch64/configure.ac
 +++ b/sysdeps/aarch64/configure.ac
 @@ -13,8 +13,8 @@ AC_DEFINE(SUPPORT_STATIC_PIE)

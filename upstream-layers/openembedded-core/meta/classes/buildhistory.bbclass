@@ -187,10 +187,7 @@ python buildhistory_emit_pkghistory() {
             return None
 
     def sortpkglist(string):
-        pkgiter = re.finditer(r'[a-zA-Z0-9.+-]+( \([><=]+[^)]+\))?', string, 0)
-        pkglist = [p.group(0) for p in pkgiter]
-        pkglist.sort()
-        return ' '.join(pkglist)
+        return bb.utils.join_deps(bb.utils.explode_dep_versions2(string), False)
 
     def sortlist(string):
         items = string.split(' ')
@@ -797,7 +794,7 @@ result: $result
 metadata revisions:
 END
 	cat ${BUILDHISTORY_DIR}/metadata-revs >> $commitmsgfile
-	git commit $commitopts -F $commitmsgfile --author "${BUILDHISTORY_COMMIT_AUTHOR}" > /dev/null
+	git commit --no-gpg-sign $commitopts -F $commitmsgfile --author "${BUILDHISTORY_COMMIT_AUTHOR}" > /dev/null
 	rm $commitmsgfile
 }
 

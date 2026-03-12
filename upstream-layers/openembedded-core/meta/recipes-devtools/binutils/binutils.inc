@@ -129,8 +129,6 @@ export CXX_FOR_HOST = "${CCACHE}${HOST_PREFIX}gcc ${HOST_CC_ARCH}"
 # to unset LD_LIBRARY_PATH.
 export CC_FOR_BUILD = "LD_LIBRARY_PATH= ${BUILD_CC}"
 
-MULTIARCH := "${@bb.utils.contains("DISTRO_FEATURES", "multiarch", "yes", "no", d)}"
-do_configure[vardeps] += "MULTIARCH"
 do_configure () {
 	(cd ${S} && gnu-configize)
 

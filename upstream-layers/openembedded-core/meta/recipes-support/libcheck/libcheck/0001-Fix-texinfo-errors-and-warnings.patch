@@ -1,0 +1,60 @@
+From 6cc46c8ac0bfc012fcb6b0fd27e20d8c06c50919 Mon Sep 17 00:00:00 2001
+From: Jerry James <loganjerry@gmail.com>
+Date: Thu, 16 Jan 2025 09:42:41 -0700
+Subject: [PATCH] Fix texinfo errors and warnings
+
+A missing "@end verbatim" is an error with texinfo 7.2.
+The warnings are due to menu and navigation mistakes.
+
+Upstream-Status: Submitted [https://github.com/libcheck/check/pull/361]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ doc/check.texi | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/doc/check.texi b/doc/check.texi
+index f6852bc..b241961 100644
+--- a/doc/check.texi
++++ b/doc/check.texi
+@@ -112,6 +112,11 @@ Test Fixtures
+ * Test Fixture Examples::       
+ * Checked vs Unchecked Fixtures::  
+ 
++Selective Running of Tests
++
++* Selecting Tests by Suite or Test Case::
++* Selecting Tests Based on Arbitrary Tags::
++
+ Test Logging
+ 
+ * XML Logging::                 
+@@ -974,8 +979,6 @@ easier for the developer to write, run, and analyze tests.
+ * Test Fixtures::               
+ * Multiple Suites in one SRunner::  
+ * Selective Running of Tests::
+-* Selecting Tests by Suite or Test Case::
+-* Selecting Tests Based on Arbitrary Tags::
+ * Testing Signal Handling and Exit Values::  
+ * Looping Tests::               
+ * Test Timeouts::               
+@@ -2048,7 +2051,7 @@ If both plain text and XML log files are specified, by any of above methods,
+ then check will log to both files. In other words logging in plain text and XML
+ format simultaneously is supported.
+ 
+-@node TAP Logging,  , Test Logging, Test Logging
++@node TAP Logging,  , XML Logging, Test Logging
+ @subsection TAP Logging
+ 
+ @findex srunner_set_tap
+@@ -2255,6 +2258,7 @@ your CMake build how to find it:
+ 
+ @verbatim
+ cmake -Dcheck_ROOT=${INSTALL_PREFIX}
++@end verbatim
+ 
+ Then use Check in your @file{CMakeLists.txt} like this:
+ 
+-- 
+2.49.0
+

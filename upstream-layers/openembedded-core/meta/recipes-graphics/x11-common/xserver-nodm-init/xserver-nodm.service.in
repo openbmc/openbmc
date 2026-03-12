@@ -1,5 +1,7 @@
 [Unit]
 Description=Xserver startup without a display manager
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
 
 [Service]
 EnvironmentFile=/etc/default/xserver-nodm

@@ -13,6 +13,8 @@ SECTION ?= "x11/gnome"
 GNOMEBN ?= "${BPN}"
 SRC_URI = "${GNOME_MIRROR}/${GNOMEBN}/${@gnome_verdir("${PV}")}/${GNOMEBN}-${PV}.tar.${GNOME_COMPRESS_TYPE};name=archive"
 
+S = "${UNPACKDIR}/${GNOMEBN}-${PV}"
+
 FILES:${PN} += "${datadir}/application-registry  \
                 ${datadir}/mime-info \
                 ${datadir}/mime/packages \

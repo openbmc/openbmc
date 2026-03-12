@@ -80,10 +80,12 @@ EFI_DIR=/sys/firmware/efi  # place to store device firmware information
 # make mount stop complaining about missing /etc/fstab
 touch /etc/fstab
 
-# initialize /proc, /sys, /run/lock and /var/lock
-mkdir -p /proc /sys /run/lock /var/lock
+# initialize /proc, /sys and /run/lock
+mkdir -p /proc /sys /run
 mount -t proc proc /proc
 mount -t sysfs sysfs /sys
+mount -t tmpfs tmpfs /run
+mkdir -p /run/lock
 
 if [ -d $EFI_DIR ];then
 	mount -t efivarfs none /sys/firmware/efi/efivars
@@ -152,7 +154,7 @@ for m in $MODULES_DIR/*; do
 	fi
 
 	debug "Running ${module}_run"
-	eval "${module}_run"
+	eval "${module}_run" "$@"
 
 	# post hooks
 	for h in $MODULE_POST_HOOKS; do

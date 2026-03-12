@@ -16,7 +16,7 @@ class BuildhistoryTests(OESelftestTestCase):
 
     def config_buildhistory(self, tmp_bh_location=False):
         bb_vars = get_bb_vars(['USER_CLASSES', 'INHERIT'])
-        if (not 'buildhistory' in bb_vars['USER_CLASSES']) and (not 'buildhistory' in bb_vars['INHERIT']):
+        if (not bb_vars['USER_CLASSES'] or not 'buildhistory' in bb_vars['USER_CLASSES']) and (not 'buildhistory' in bb_vars['INHERIT']):
             add_buildhistory_config = 'INHERIT += "buildhistory"\nBUILDHISTORY_COMMIT = "1"'
             self.append_config(add_buildhistory_config)
 

@@ -137,9 +137,12 @@ def results_xml_to_json(elem):
 
 def aggregate_metadata(metadata):
     """Aggregate metadata into one, basically a sanity check"""
-    mutable_keys = ('pretty_name', 'version_id')
 
-    def aggregate_obj(aggregate, obj, assert_str=True):
+    # A given OE-Core commit may point at different meta-yocto/bitbake commits so we have
+    # to ignore commit/commit_count/commit_time differences
+    mutable_keys = ('pretty_name', 'version_id', 'commit', 'commit_count', 'commit_time')
+
+    def aggregate_obj(aggregate, obj, assert_obj=True):
         """Aggregate objects together"""
         assert type(aggregate) is type(obj), \
                 "Type mismatch: {} != {}".format(type(aggregate), type(obj))
@@ -151,7 +154,7 @@ def aggregate_metadata(metadata):
             assert len(aggregate) == len(obj)
             for i, val in enumerate(obj):
                 aggregate_obj(aggregate[i], val)
-        elif not isinstance(obj, str) or (isinstance(obj, str) and assert_str):
+        elif assert_obj:
             assert aggregate == obj, "Data mismatch {} != {}".format(aggregate, obj)
 
     if not metadata:

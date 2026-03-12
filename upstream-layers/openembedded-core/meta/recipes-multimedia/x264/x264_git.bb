@@ -8,11 +8,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f"
 
 DEPENDS = "nasm-native"
 
-SRC_URI = "git://code.videolan.org/videolan/x264.git;branch=stable;protocol=https \
+SRC_URI = "git://code.videolan.org/videolan/x264.git;branch=master;protocol=https \
            "
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRCREV = "31e19f92f00c7003fa115047ce50978bc98c3a0d"
+SRCREV = "0480cb05fa188d37ae87e8f4fd8f1aea3711f7ee"
 
 PV = "r3039+git"
 
@@ -25,6 +25,13 @@ X264_DISABLE_ASM:armv5 = "--disable-asm"
 X264_DISABLE_ASM:powerpc = "${@bb.utils.contains("TUNE_FEATURES", "spe", "--disable-asm", "", d)}"
 X264_DISABLE_ASM:mipsarch = "${@bb.utils.contains("TUNE_FEATURES", "r6", "", "--disable-asm", d)}"
 
+PACKAGECONFIG ?= " \
+    ffmpeg \
+    ${@bb.utils.filter("DISTRO_FEATURES", "opencl", d)} \
+"
+PACKAGECONFIG[ffmpeg] = "--enable-lavf --enable-swscale,--disable-lavf --disable-swscale,ffmpeg"
+PACKAGECONFIG[opencl] = "--enable-opencl,--disable-opencl,"
+
 EXTRA_OECONF = '--prefix=${prefix} \
                 --host=${HOST_SYS} \
                 --libdir=${libdir} \
@@ -32,9 +39,6 @@ EXTRA_OECONF = '--prefix=${prefix} \
                 --sysroot=${STAGING_DIR_TARGET} \
                 --enable-shared \
                 --enable-static \
-                --disable-lavf \
-                --disable-swscale \
-                --disable-opencl \
                 --enable-pic \
                 ${X264_DISABLE_ASM} \
                 --extra-cflags="${TUNE_CCARGS}" \

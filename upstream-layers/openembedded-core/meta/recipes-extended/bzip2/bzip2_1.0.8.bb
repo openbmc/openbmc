@@ -38,7 +38,7 @@ PACKAGES =+ "libbz2"
 
 CFLAGS += "-fPIC -fpic -Winline -fno-strength-reduce -D_FILE_OFFSET_BITS=64"
 
-inherit autotools update-alternatives ptest relative_symlinks
+inherit autotools update-alternatives ptest
 
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE:${PN} = "bunzip2 bzcat bzip2"

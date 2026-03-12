@@ -4,6 +4,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit python_pep517 python3native setuptools3-base
+inherit python_pep517
 
 DEPENDS += "python3-poetry-core-native"

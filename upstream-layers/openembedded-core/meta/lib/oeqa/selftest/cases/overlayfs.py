@@ -58,7 +58,8 @@ inherit overlayfs
 
         config = """
 IMAGE_INSTALL:append = " overlayfs-user"
-DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
+INIT_MANAGER = "systemd"
+DISTRO_FEATURES:append = " overlayfs"
 """
 
         self.write_config(config)
@@ -79,7 +80,8 @@ DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
 
         config = """
 IMAGE_INSTALL:append = " overlayfs-user"
-DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
+INIT_MANAGER = "systemd"
+DISTRO_FEATURES:append = " overlayfs"
 OVERLAYFS_QA_SKIP[mnt-overlay] = "mount-configured"
 """
 
@@ -97,7 +99,8 @@ OVERLAYFS_QA_SKIP[mnt-overlay] = "mount-configured"
 
         config = """
 IMAGE_INSTALL:append = " overlayfs-user"
-DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
+INIT_MANAGER = "systemd"
+DISTRO_FEATURES:append = " overlayfs"
 """
 
         self.write_config(config)
@@ -115,7 +118,8 @@ DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
 
         config = """
 IMAGE_INSTALL:append = " overlayfs-user"
-DISTRO_FEATURES:append = " systemd overlayfs usrmerge"
+INIT_MANAGER = "systemd"
+DISTRO_FEATURES:append = " overlayfs"
 """
 
         wrong_machine_config = """

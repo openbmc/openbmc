@@ -1,0 +1,105 @@
+From 4779f798463d673dd74623979ec93141eb60d07a Mon Sep 17 00:00:00 2001
+From: Jiaying Song <jiaying.song.cn@windriver.com>
+Date: Fri, 21 Nov 2025 10:47:59 +0800
+Subject: [PATCH] Make ICU test output compatible with Automake format
+
+Update ICU test output to print each test result in the Automake "simple
+test" format[1]:
+
+result: testname
+
+Where `result` is one of PASS, FAIL, or SKIP.
+
+[1] https://wiki.yoctoproject.org/wiki/Ptest
+
+Upstream-Status: Submitted [https://github.com/unicode-org/icu/pull/3764]
+
+Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
+---
+ configure.ac               | 17 +++++++++++++++++
+ test/intltest/intltest.cpp | 10 +++++++++-
+ tools/ctestfw/ctest.c      |  9 ++++++++-
+ 3 files changed, 34 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index da4f170..514fa0c 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1165,6 +1165,21 @@ If set, it will REPLACE any automatic list of libraries.],
+ 		*) AC_MSG_ERROR(bad value ${enableval} for --enable-samples) ;;
+ 		esac],
+ 	samples=true)
++
++# Enable Automake-compatible test output format
++AC_ARG_ENABLE([automake-test-format],
++    AS_HELP_STRING([--enable-automake-test-format],
++                   [Generate test output in Automake format (PASS / FAIL: testname) ]),
++    [
++        if test "x$enableval" = "xyes"; then
++            UCONFIG_CPPFLAGS="${UCONFIG_CPPFLAGS} -DU_AUTOMAKE_TEST__FORMAT=1"
++            AC_MSG_RESULT([Automake test format is enabled])
++        else
++            AC_MSG_RESULT([Automake test format is disabled])
++        fi
++    ],
++    [enable_automake_test_format=no])
++
+ ICU_CONDITIONAL(SAMPLES, test "$samples" = true)
+ 
+ ICUDATA_CHAR=$U_ENDIAN_CHAR
+@@ -1428,3 +1443,5 @@ then
+ fi
+ 
+ $as_unset _CXX_CXXSUFFIX
++
++
+diff --git a/test/intltest/intltest.cpp b/test/intltest/intltest.cpp
+index 33829b0..bf3ef56 100644
+--- a/test/intltest/intltest.cpp
++++ b/test/intltest/intltest.cpp
+@@ -830,11 +830,19 @@ UBool IntlTest::runTestLoop( char* testname, char* par, char *baseName )
+             saveBaseLoc[0]=0; /* reset path */
+             
+             if (lastErrorCount == errorCount) {
+-                snprintf( msg, sizeof(msg),  "   } OK:   %s ", name );
++            #ifdef U_AUTOMAKE_TEST__FORMAT
++                snprintf(msg, sizeof(msg), "PASS: %s\n   }", name);
++            #else
++                snprintf(msg, sizeof(msg),  "   } OK:   %s ", name );
++            #endif
+                 if(!no_time) str_timeDelta(msg+strlen(msg),timeStop-timeStart);
+                 lastTestFailed = false;
+             }else{
++            #ifdef U_AUTOMAKE_TEST__FORMAT
++                snprintf(msg, sizeof(msg), "FAIL: %s\n   } (ERRORS: %li)", name, static_cast<long>(errorCount - lastErrorCount));
++            #else
+                 snprintf(msg, sizeof(msg), "   } ERRORS (%li) in %s", static_cast<long>(errorCount - lastErrorCount), name);
++            #endif
+                 if(!no_time) str_timeDelta(msg+strlen(msg),timeStop-timeStart);
+ 
+                 for(int i=0;i<LL_indentlevel;i++) {
+diff --git a/tools/ctestfw/ctest.c b/tools/ctestfw/ctest.c
+index 7634526..c2e11dd 100644
+--- a/tools/ctestfw/ctest.c
++++ b/tools/ctestfw/ctest.c
+@@ -413,9 +413,16 @@ static void iterateTestsWithLevel ( const TestNode* root,
+         ctest_xml_testcase(pathToFunction, pathToFunction, timeSeconds, (myERROR_COUNT!=ERROR_COUNT)?"error":NULL);
+ 
+         if (myERROR_COUNT != ERROR_COUNT) {
+-          log_testinfo_i("} ---[%d ERRORS in %s] ", ERROR_COUNT - myERROR_COUNT, pathToFunction);
++        #ifdef U_AUTOMAKE_TEST__FORMAT
++          log_testinfo_i("\nFAIL: %s\n} ---[ERRORS: %d]", root->name,ERROR_COUNT - myERROR_COUNT);
++        #else
++          log_testinfo_i("} ---[%d ERRORS in %s] ", ERROR_COUNT - myERROR_COUNT,pathToFunction);
++        #endif
+           strcpy(ERROR_LOG[ERRONEOUS_FUNCTION_COUNT++], pathToFunction);
+         } else {
++        #ifdef U_AUTOMAKE_TEST__FORMAT
++          log_testinfo_i("\nPASS: %s\n", root->name);
++        #endif
+           if(!ON_LINE) { /* had some output */
+             int spaces = FLAG_INDENT-(depth-1);
+             log_testinfo_i("} %*s[OK] ", spaces, "---");
+-- 
+2.34.1
+

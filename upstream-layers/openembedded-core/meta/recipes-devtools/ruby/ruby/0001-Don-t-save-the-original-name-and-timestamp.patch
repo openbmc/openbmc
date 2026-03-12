@@ -1,0 +1,33 @@
+From 2cedad6b2beb908a8fb80da0e45e5055dca65e99 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 27 Feb 2026 16:59:24 +0800
+Subject: [PATCH] Don't save the original name and timestamp
+
+Explictly pass -n option to not save the original name and timestamp for
+improving reproducibility. In our test, always set mantype to man, but
+the output like erb.1.gz is not stable, sometimes, "last modified: xxx"
+is added to the file type, which make the build not reproducible.
+
+Upstream-Status: Submitted [https://github.com/ruby/ruby/pull/16265]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ tool/rbinstall.rb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tool/rbinstall.rb b/tool/rbinstall.rb
+index 874c3ef..eb99a70 100755
+--- a/tool/rbinstall.rb
++++ b/tool/rbinstall.rb
+@@ -173,7 +173,7 @@ def parse_args(argv = ARGV)
+   end
+ end
+ 
+-Compressors = {".gz"=>"gzip", ".bz2"=>"bzip2"}
++Compressors = {".gz"=>%w"gzip -n", ".bz2"=>%w"bzip2"}
+ def Compressors.for(type)
+   ext = File.extname(type)
+   if compress = fetch(ext, nil)
+-- 
+2.34.1
+

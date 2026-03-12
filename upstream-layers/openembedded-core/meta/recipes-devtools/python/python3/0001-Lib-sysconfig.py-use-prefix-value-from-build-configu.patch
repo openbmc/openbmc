@@ -1,4 +1,4 @@
-From 3f4f3e917950e286d5729ea949ca342995eb3c3e Mon Sep 17 00:00:00 2001
+From e3c6e770e73e1329958db0a73883e42b01763ae3 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 17 Nov 2023 14:26:32 +0100
 Subject: [PATCH] Lib/sysconfig.py: use prefix value from build configuration
@@ -9,23 +9,36 @@ native python.
 
 Upstream-Status: Inappropriate [oe-core cross builds]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+
+Refresh to apply on top of Python 3.14.0.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
- Lib/sysconfig/__init__.py | 5 +++++
- 1 file changed, 5 insertions(+)
+ Lib/sysconfig/__init__.py | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/Lib/sysconfig/__init__.py b/Lib/sysconfig/__init__.py
-index f8e1c7d..0882526 100644
+index 2ecbff222fe..cec54cb23dc 100644
 --- a/Lib/sysconfig/__init__.py
 +++ b/Lib/sysconfig/__init__.py
-@@ -494,6 +494,11 @@ def _init_config_vars():
-         _CONFIG_VARS['VPATH'] = sys._vpath
-     if os.name == 'posix':
-         _init_posix(_CONFIG_VARS)
+@@ -538,12 +538,12 @@ def _init_config_vars():
+     _CONFIG_VARS['py_version'] = _PY_VERSION
+     _CONFIG_VARS['py_version_short'] = _PY_VERSION_SHORT
+     _CONFIG_VARS['py_version_nodot'] = _PY_VERSION_SHORT_NO_DOT
+-    _CONFIG_VARS['installed_base'] = base_prefix
+-    _CONFIG_VARS['base'] = prefix
+-    _CONFIG_VARS['installed_platbase'] = base_exec_prefix
+-    _CONFIG_VARS['platbase'] = exec_prefix
 +    _CONFIG_VARS['installed_base'] = _CONFIG_VARS['prefix']
 +    _CONFIG_VARS['base'] = _CONFIG_VARS['prefix']
 +    _CONFIG_VARS['installed_platbase'] = _CONFIG_VARS['prefix']
 +    _CONFIG_VARS['platbase'] = _CONFIG_VARS['prefix']
 +    _CONFIG_VARS['platlibdir'] = _CONFIG_VARS['PLATLIBDIR']
-     if _HAS_USER_BASE:
-         # Setting 'userbase' is done below the call to the
-         # init function to enable using 'get_config_var' in
+     _CONFIG_VARS['projectbase'] = _PROJECT_BASE
+-    _CONFIG_VARS['platlibdir'] = sys.platlibdir
+     _CONFIG_VARS['implementation'] = _get_implementation()
+     _CONFIG_VARS['implementation_lower'] = _get_implementation().lower()
+     _CONFIG_VARS['abiflags'] = abiflags
+-- 
+2.51.0
+

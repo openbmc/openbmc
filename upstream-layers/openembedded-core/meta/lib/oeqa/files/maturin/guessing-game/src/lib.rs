@@ -7,7 +7,7 @@ use std::io;
 fn guess_the_number() {
     println!("Guess the number!");
 
-    let secret_number = rand::thread_rng().gen_range(1..101);
+    let secret_number = rand::rng().random_range(1..101);
 
     loop {
         println!("Please input your guess.");
@@ -40,7 +40,7 @@ fn guess_the_number() {
 /// the `lib.name` setting in the `Cargo.toml`, else Python will not be able to
 /// import the module.
 #[pymodule]
-fn guessing_game(_py: Python, m: &PyModule) -> PyResult<()> {
+fn guessing_game(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(guess_the_number, m)?)?;
 
     Ok(())

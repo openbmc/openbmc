@@ -18,13 +18,14 @@ DEPENDS = "libgpg-error"
 UPSTREAM_CHECK_URI = "https://gnupg.org/download/index.html"
 SRC_URI = "${GNUPG_MIRROR}/libassuan/libassuan-${PV}.tar.bz2 \
            file://libassuan-add-pkgconfig-support.patch \
+           file://run-ptest \
           "
 
 SRC_URI[sha256sum] = "d2931cdad266e633510f9970e1a2f346055e351bb19f9b78912475b8074c36f6"
 
 BINCONFIG = "${bindir}/libassuan-config"
 
-inherit autotools texinfo binconfig-disabled pkgconfig multilib_header
+inherit autotools texinfo binconfig-disabled pkgconfig multilib_header ptest
 
 require recipes-support/gnupg/drop-unknown-suffix.inc
 
@@ -35,6 +36,21 @@ do_configure:prepend () {
 
 do_install:append () {
     oe_multilib_header assuan.h
+}
+
+do_compile_ptest() {
+    oe_runmake -C tests check TESTS=
+}
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+
+    for test in version pipeconnect fdpassing; do
+            ${B}/libtool --mode=install install -m 0755 ${B}/tests/$test ${D}${PTEST_PATH}/tests/
+    done
+
+    install -m 0755 ${S}/tests/fdpassing-socket.sh ${D}${PTEST_PATH}/tests/
+    install -m 0644 ${S}/tests/motd ${D}${PTEST_PATH}/tests/
 }
 
 BBCLASSEXTEND = "native nativesdk"

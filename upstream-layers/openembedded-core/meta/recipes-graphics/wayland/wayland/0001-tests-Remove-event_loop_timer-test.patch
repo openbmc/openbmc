@@ -1,0 +1,42 @@
+From 61fa7e7d9c282798988907cf3b8928c88d7a7930 Mon Sep 17 00:00:00 2001
+From: Joshua Watt <JPEWhacker@gmail.com>
+Date: Thu, 6 Nov 2025 08:35:26 -0700
+Subject: [PATCH] tests: Remove event_loop_timer test
+
+The event_loop_timer tests relies on very precise timing of the
+execution (10's of milliseconds). However, on the Yocto Autobuilder qemu
+testing, this sort of precise timing is not possible, resulting in
+spurious test failures.
+
+Remove this test to prevent these failures, since there isn't a simple
+way to increase the timing constraints.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
+---
+ tests/event-loop-test.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/event-loop-test.c b/tests/event-loop-test.c
+index a51ba8f..0c39b09 100644
+--- a/tests/event-loop-test.c
++++ b/tests/event-loop-test.c
+@@ -238,6 +238,7 @@ TEST(event_loop_multiple_same_signals)
+ 	wl_event_loop_destroy(loop);
+ }
+ 
++#if 0 /* Timing requirements are too tight for qemu testing */
+ static int
+ timer_callback(void *data)
+ {
+@@ -280,6 +281,7 @@ TEST(event_loop_timer)
+ 	wl_event_source_remove(source2);
+ 	wl_event_loop_destroy(loop);
+ }
++#endif
+ 
+ #define MSEC_TO_USEC(msec) ((msec) * 1000)
+ 
+-- 
+2.51.1
+

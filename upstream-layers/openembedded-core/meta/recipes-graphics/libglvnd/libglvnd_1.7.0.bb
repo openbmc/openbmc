@@ -34,4 +34,12 @@ PROVIDES = " \
     ${@bb.utils.contains('PACKAGECONFIG', 'egl', 'virtual/egl', '', d)} \
 "
 
-RPROVIDES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'egl', 'libegl', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'egl', 'libegl libegl1', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'glx', 'libgl libgl1', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'gles1', 'libgles1 libglesv1-cm1', '', d)}"
+RPROVIDES:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'gles2', 'libgles2 libglesv2-2 libgles3', '', d)}"
+
+RPROVIDES:${PN}-dev += "${@bb.utils.contains('PACKAGECONFIG', 'egl', 'libegl-dev', '', d)}"
+RPROVIDES:${PN}-dev += "${@bb.utils.contains('PACKAGECONFIG', 'glx', 'libgl-dev', '', d)}"
+RPROVIDES:${PN}-dev += "${@bb.utils.contains('PACKAGECONFIG', 'gles1', 'libgles1-dev', '', d)}"
+RPROVIDES:${PN}-dev += "${@bb.utils.contains('PACKAGECONFIG', 'gles2', 'libgles2-dev libgles3-dev', '', d)}"

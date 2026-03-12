@@ -1,0 +1,33 @@
+From a87f346189ffdc7559771c20961a7c294ed8ba5c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Maksim=20=C5=9Aciepanienka?= <msciepanienka@gmail.com>
+Date: Tue, 20 Jan 2026 04:19:06 +0100
+Subject: [PATCH] config2setopts: fix for --disable-aws build configuration
+
+Closes #20368
+
+Upstream-Status: Backport [https://github.com/curl/curl/commit/a87f346189ffdc7559771c20961a7c294ed8ba5c]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ src/config2setopts.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/config2setopts.c b/src/config2setopts.c
+index 5e1722c3ee..a023287834 100644
+--- a/src/config2setopts.c
++++ b/src/config2setopts.c
+@@ -486,12 +486,14 @@ static CURLcode ssl_setopts(struct OperationConfig *config, CURL *curl)
+ /* only called for HTTP transfers */
+ static CURLcode http_setopts(struct OperationConfig *config, CURL *curl)
+ {
+-  CURLcode result;
++  CURLcode result = CURLE_OK;
+   long postRedir = 0;
+ 
+   my_setopt_long(curl, CURLOPT_FOLLOWLOCATION, config->followlocation);
+   my_setopt_long(curl, CURLOPT_UNRESTRICTED_AUTH, config->unrestricted_auth);
++#ifndef CURL_DISABLE_AWS
+   MY_SETOPT_STR(curl, CURLOPT_AWS_SIGV4, config->aws_sigv4);
++#endif
+   my_setopt_long(curl, CURLOPT_AUTOREFERER, config->autoreferer);
+ 
+   if(config->proxyheaders) {

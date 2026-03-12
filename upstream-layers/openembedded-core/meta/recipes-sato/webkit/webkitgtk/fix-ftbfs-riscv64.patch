@@ -1,13 +1,23 @@
+From 9d09d47c01b8ee92a02662d58d2570160064fa5d Mon Sep 17 00:00:00 2001
 From: Alberto Garcia <berto@igalia.com>
-Description: Use WTF_CPU_UNKNOWN when building for riscv64
- WebKitGTK doesn't build on riscv64 even with the JIT disabled.
- Treating the CPU as unknown is perhaps a bit severe, but it allows us
- to get the build done until someone steps up to maintain this
- properly.
+Date: Fri, 19 Dec 2025 10:10:41 +0000
+Subject: Use WTF_CPU_UNKNOWN when building for riscv64
+
+WebKitGTK doesn't build on riscv64 even with the JIT disabled.
+Treating the CPU as unknown is perhaps a bit severe, but it allows us
+to get the build done until someone steps up to maintain this
+properly.
 Bug: https://bugs.webkit.org/show_bug.cgi?id=271371
 
 Upstream-Status: Submitted [https://bugs.webkit.org/show_bug.cgi?id=271371#c1]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Source/WTF/wtf/PlatformCPU.h    | 8 --------
+ Source/cmake/WebKitCommon.cmake | 2 --
+ 2 files changed, 10 deletions(-)
+
+diff --git a/Source/WTF/wtf/PlatformCPU.h b/Source/WTF/wtf/PlatformCPU.h
+index 8aac1024..d9d69a40 100644
 --- a/Source/WTF/wtf/PlatformCPU.h
 +++ b/Source/WTF/wtf/PlatformCPU.h
 @@ -286,14 +286,6 @@
@@ -25,9 +35,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #if !CPU(KNOWN)
  #define WTF_CPU_UNKNOWN 1
  #endif
+diff --git a/Source/cmake/WebKitCommon.cmake b/Source/cmake/WebKitCommon.cmake
+index 98ee788a..3861c0a4 100644
 --- a/Source/cmake/WebKitCommon.cmake
 +++ b/Source/cmake/WebKitCommon.cmake
-@@ -125,8 +125,6 @@ if (NOT HAS_RUN_WEBKIT_COMMON)
+@@ -129,8 +129,6 @@ if (NOT HAS_RUN_WEBKIT_COMMON)
          set(WTF_CPU_PPC64 1)
      elseif (LOWERCASE_CMAKE_SYSTEM_PROCESSOR MATCHES "ppc64le")
          set(WTF_CPU_PPC64LE 1)

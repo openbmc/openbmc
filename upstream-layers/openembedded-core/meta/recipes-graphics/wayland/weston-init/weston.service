@@ -33,19 +33,19 @@ ConditionPathExists=/dev/tty0
 [Service]
 # Requires systemd-notify.so Weston plugin.
 Type=notify
-EnvironmentFile=/etc/default/weston
-ExecStart=/usr/bin/weston --modules=systemd-notify.so
+EnvironmentFile=@sysconfdir@/default/weston
+ExecStart=@bindir@/weston --modules=systemd-notify.so
 
 # Optional watchdog setup
 #TimeoutStartSec=60
 #WatchdogSec=20
 
 # The user to run Weston as.
-User=weston
-Group=weston
+User=@WESTON_USER@
+Group=@WESTON_USER@
 
 # Make sure the working directory is the users home directory
-WorkingDirectory=/home/weston
+WorkingDirectory=@WESTON_USER_HOME@
 
 # Set up a full user session for the user, required by Weston.
 PAMName=weston-autologin

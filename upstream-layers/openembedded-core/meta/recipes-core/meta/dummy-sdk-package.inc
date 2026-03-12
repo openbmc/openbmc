@@ -5,6 +5,8 @@ PACKAGE_ARCH = "all"
 
 inherit allarch
 
+INHIBIT_DEFAULT_DEPS = "1"
+
 python() {
     # Put the package somewhere separate to ensure it's never used except
     # when we want it

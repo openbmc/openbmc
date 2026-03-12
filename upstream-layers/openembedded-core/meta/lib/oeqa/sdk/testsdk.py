@@ -103,7 +103,8 @@ class TestSDK(TestSDKBase):
             bb.fatal("The toolchain %s is not built. Build it before running the tests: 'bitbake <image> -c populate_sdk' ." % tcname)
 
         tdname = d.expand("${SDK_DEPLOY}/${TOOLCHAIN_OUTPUTNAME}.testdata.json")
-        test_data = json.load(open(tdname, "r"))
+        with open(tdname, "r") as f:
+            test_data = json.load(f)
 
         target_pkg_manifest = self.context_executor_class._load_manifest(
             d.expand("${SDK_DEPLOY}/${TOOLCHAIN_OUTPUTNAME}.target.manifest"))

@@ -1,0 +1,34 @@
+From aebbf87ca7311f543bd849020b97402c49f3cf24 Mon Sep 17 00:00:00 2001
+From: Miaoqing Pan <miaoqing.pan@oss.qualcomm.com>
+Date: Thu, 18 Dec 2025 09:39:39 +0800
+Subject: [PATCH 2/3] defconfig: Document IEEE 802.11be as a published
+ amendment
+
+The comment about the IEEE 802.11be functionality being experimental
+and based on a not yet finalized standard is not accurate anymore
+since IEEE Std 802.11be-2024 has already been published. Remove this
+outdated comment.
+
+Signed-off-by: Miaoqing Pan <miaoqing.pan@oss.qualcomm.com>
+Upstream-Status: Backport [https://git.w1.fi/cgit/hostap/commit/?id=2887a975b12de9256ed6fdbd0da1dbb78c7a25c4]
+---
+ wpa_supplicant/defconfig | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/wpa_supplicant/defconfig b/wpa_supplicant/defconfig
+index 044604a..7efb9e6 100644
+--- a/wpa_supplicant/defconfig
++++ b/wpa_supplicant/defconfig
+@@ -507,9 +507,6 @@ CONFIG_IEEE80211AX=y
+ 
+ # IEEE 802.11be EHT support (mainly for AP mode)
+ # CONFIG_IEEE80211AX is mandatory for setting CONFIG_IEEE80211BE.
+-# Note: This is experimental and work in progress. The definitions are still
+-# subject to change and this should not be expected to interoperate with the
+-# final IEEE 802.11be version.
+ #CONFIG_IEEE80211BE=y
+ 
+ # Wireless Network Management (IEEE Std 802.11v-2011)
+-- 
+2.34.1
+

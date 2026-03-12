@@ -11,7 +11,7 @@ RDEPENDS:${PN}:class-native = ""
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>(\d+(\.\d+)+))"
 
-inherit autotools gettext perlnative pkgconfig perl-version update-alternatives bash-completion
+inherit autotools gettext perlnative pkgconfig perl-version ptest update-alternatives bash-completion
 
 PERL:class-native = "${STAGING_BINDIR_NATIVE}/perl-native/perl"
 
@@ -50,10 +50,22 @@ do_install:append () {
 	if [ "${PN}" = "dpkg-native" ]; then
 		# update-alternatives doesn't have an offline mode
 		rm ${D}${bindir}/update-alternatives
-		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-* ${D}${sbindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env nativeperl|' ${D}${bindir}/dpkg-*
 	else
-		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-* ${D}${sbindir}/dpkg-*
+		sed -i -e 's|^#!.*${STAGING_BINDIR_NATIVE}/perl-native.*/perl|#!/usr/bin/env perl|' ${D}${bindir}/dpkg-*
 	fi
+}
+
+do_install_ptest () {
+        install -d ${D}${PTEST_PATH}/tests ${D}${PTEST_PATH}/src/sh
+        install -m 0755 ${S}/src/sh/dpkg-error.sh ${D}${PTEST_PATH}/src/sh/
+        cp --preserve=mode,timestamps -R ${S}/tests/* ${D}${PTEST_PATH}/tests
+
+        # The folder has a number of test folders called DEBIAN, but these are
+        # explicitly omitted from some packages, e.g. from rpm.
+        # However these are essential for the tests, so rename them to DEBIAN-ptest, and at runtime
+        # from the run-ptest script restore their names
+        find ${D}${PTEST_PATH}/tests -name DEBIAN -type d | xargs -n1 -I{} mv "{}" "{}-ptest"
 }
 
 PROV = "virtual/update-alternatives"
@@ -89,6 +101,8 @@ RDEPENDS:${PN}-perl += "perl-module-carp perl-module-constant \
                         perl-module-tie-hash perl-module-storable \
                         perl-module-time-hires perl-module-time-piece \
                         perl-module-xsloader"
+
+RDEPENDS:${PN}-ptest += "make coreutils findutils"
 
 # Split out start-stop-daemon to its own package.  Note that it
 # is installed in a different directory than the one used for

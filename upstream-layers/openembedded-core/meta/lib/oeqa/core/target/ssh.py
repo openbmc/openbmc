@@ -55,7 +55,7 @@ class OESSHTarget(OETarget):
     def stop(self, **kwargs):
         pass
 
-    def _run(self, command, timeout=None, ignore_status=True, raw=False):
+    def _run(self, command, timeout=None, ignore_status=True, raw=False, ignore_ssh_fails=False):
         """
             Runs command in target using SSHProcess.
         """
@@ -66,13 +66,17 @@ class OESSHTarget(OETarget):
         self.logger.debug("[Command returned '%d' after %.2f seconds]"
                  "" % (status, time.time() - starttime))
 
-        if status and not ignore_status:
+        if status == 255 and not ignore_ssh_fails:
+            raise AssertionError("ssh exited with status '255' for command "
+                                 "'%s': this is likely an SSH failure\n%s"
+                                 % (command, output))
+        elif status and not ignore_status:
             raise AssertionError("Command '%s' returned non-zero exit "
                                  "status %d:\n%s" % (command, status, output))
 
         return (status, output)
 
-    def run(self, command, timeout=None, ignore_status=True, raw=False):
+    def run(self, command, timeout=None, ignore_status=True, raw=False, ignore_ssh_fails=False):
         """
             Runs command in target.
 
@@ -91,7 +95,7 @@ class OESSHTarget(OETarget):
         else:
             processTimeout = self.timeout
 
-        status, output = self._run(sshCmd, processTimeout, ignore_status, raw)
+        status, output = self._run(sshCmd, processTimeout, ignore_status, raw, ignore_ssh_fails)
         if len(output) > (64 * 1024):
             self.logger.debug('Command: %s\nStatus: %d Output length:  %s\n' % (command, status, len(output)))
         else:

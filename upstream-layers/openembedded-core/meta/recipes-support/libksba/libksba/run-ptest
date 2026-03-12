@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd tests
+
+for t in cert-basic t-cms-parser t-crl-parser t-der-builder t-dnparser t-ocsp t-oid t-reader; do
+    ./$t
+    if [ $? -eq 0 ]; then
+        echo "PASS: $t"
+    else
+        echo "FAIL: $t"
+    fi
+done

@@ -10,6 +10,7 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-python3-sphinx-argparse \
     nativesdk-python3-sphinx-copybutton \
     nativesdk-python3-sphinx-rtd-theme \
+    nativesdk-python3-sphinxcontrib-svg2pdfconverter \
     nativesdk-python3-pyyaml \
     nativesdk-rsvg \
     "

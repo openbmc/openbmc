@@ -62,7 +62,7 @@ LINUX_VERSION_EXTENSION:append = "-custom"
 # Modify SRCREV to a different commit hash in a copy of this recipe to
 # build a different release of the Linux kernel.
 # tag: v4.2 64291f7db5bd8150a74ad2036f1037e6a0428df2
-SRCREV_machine="64291f7db5bd8150a74ad2036f1037e6a0428df2"
+SRCREV_machine = "64291f7db5bd8150a74ad2036f1037e6a0428df2"
 
 PV = "${LINUX_VERSION}+git"
 

@@ -1,0 +1,116 @@
+From c9f1af117557ad5d75df9e37bf3fbb1185f67de2 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 18 Jul 2025 10:26:06 -0700
+Subject: [PATCH] Do not rely on std::char_traits template from stdlib
+
+standard never required the base template for
+char_traits to any type but it was given for
+convenience purposes. Nowadays, at least in LLVM's
+libcxx version 19+ it got removed [1].
+
+GCC might follow the same path at some point so
+porting it away from char_traits might be a good
+idea.
+
+The fix is applied to FreeBSD [2] [3]
+
+Reported issue [4]
+
+[1] https://reviews.llvm.org/D138307
+[2] https://cgit.freebsd.org/ports/commit/archivers/pbzip2/files/patch-BZ2StreamScanner.cpp?id=29c80f114ea6cc60be39502339572af8c35ac440
+[3] https://cgit.freebsd.org/ports/commit/archivers/pbzip2/files/patch-BZ2StreamScanner.cpp?id=89f872ec2ccf488f24cd9daca2e0d1f80e7ee429
+[4] https://github.com/ruanhuabin/pbzip2/issues/1
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2015-12-17]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ BZ2StreamScanner.cpp | 21 +++++++++++----------
+ BZ2StreamScanner.h   |  6 +++---
+ 2 files changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/BZ2StreamScanner.cpp b/BZ2StreamScanner.cpp
+index a134712..f32a321 100644
+--- a/BZ2StreamScanner.cpp
++++ b/BZ2StreamScanner.cpp
+@@ -42,15 +42,15 @@ int BZ2StreamScanner::init( int hInFile, size_t inBuffCapacity )
+ {
+ 	dispose();
+ 
+-	CharType bz2header[] = "BZh91AY&SY";
+-	// zero-terminated string
++	CharType bz2header[] =
++		{ 'B', 'Z', 'h', '9', '1', 'A', 'Y', '&', 'S', 'Y' };
+ 	CharType bz2ZeroHeader[] =
+-		{ 'B', 'Z', 'h', '9', 0x17, 0x72, 0x45, 0x38, 0x50, 0x90, 0 };
++		{ 'B', 'Z', 'h', '9', 0x17, 0x72, 0x45, 0x38, 0x50, 0x90 };
+ 
+ 	_hInFile = hInFile;
+ 	_eof = false;
+-	_bz2Header = bz2header;
+-	_bz2HeaderZero = bz2ZeroHeader;
++	_bz2Header.assign(begin(bz2header), end(bz2header));
++	_bz2HeaderZero.assign(begin(bz2ZeroHeader), end(bz2ZeroHeader));
+ 	_bz2HeaderFound = false;
+ 	_inBuffCapacity = 0;
+ 	_errState = 0;
+@@ -361,7 +361,7 @@ BZ2StreamScanner::CharType * BZ2StreamScanner::locateHeaderPrefixInBuff()
+ 			_errState |= ERR_INVALID_FILE_FORMAT;
+ 			_inBuffSearchPtr = getInBuffEnd();
+ 		}
+-		else if ( _bz2Header.compare( 0, prefixLen, getInBuffSearchPtr(), prefixLen ) == 0 )
++		else if ( equal( _bz2Header.begin(), _bz2Header.begin() + prefixLen, getInBuffSearchPtr() ) )
+ 		{
+ 			// header prefix found
+ 		}
+@@ -416,7 +416,7 @@ BZ2StreamScanner::CharType * BZ2StreamScanner::searchNextHeaderInBuff()
+ 	while ( !failed() && ( getUnsearchedCount() >= getHeaderSize() ) )
+ 	{
+ 		// _inBuffSearchPtr += prefixLen;
+-		basic_string<CharType> * pHdr = NULL;
++		vector<CharType> * pHdr = NULL;
+ 
+ 		if ( getInBuffSearchPtr()[hsp] == _bz2Header[hsp] )
+ 		{
+@@ -441,13 +441,14 @@ BZ2StreamScanner::CharType * BZ2StreamScanner::searchNextHeaderInBuff()
+ 				(*pHdr)[prefixLen] = bwtSizeChar;
+ 
+ 				// compare the remaining part of magic header
+-				int cmpres = pHdr->compare( hsp, pHdr->size() - hsp,
+-						getInBuffSearchPtr() + hsp, pHdr->size() - hsp );
++				bool cmpres = equal( pHdr->begin() + hsp, pHdr->end(),
++						getInBuffSearchPtr() + hsp );
++
+ 
+ 				#ifdef PBZIP_DEBUG
+ 				fprintf( stderr, "   searchNextHeaderInBuff:cmpres=%d\n", cmpres );
+ 				#endif
+-				if ( cmpres == 0 )
++				if ( cmpres )
+ 				{
+ 					_searchStatus = true;
+ 					#ifdef PBZIP_DEBUG
+diff --git a/BZ2StreamScanner.h b/BZ2StreamScanner.h
+index d3729fe..32697cb 100644
+--- a/BZ2StreamScanner.h
++++ b/BZ2StreamScanner.h
+@@ -44,7 +44,7 @@ public:
+ 
+ 	size_t getInBuffSize() const { return ( _inBuffEnd - _inBuff ); }
+ 	size_t getInBuffCapacity() const { return _inBuffCapacity; }
+-	const basic_string<CharType> & getHeader() const { return _bz2Header; }
++	const vector<CharType> & getHeader() const { return _bz2Header; }
+ 	size_t getHeaderSize() const { return _bz2Header.size(); }
+ 	int getErrState() const { return _errState; }
+ 	bool failed() { return ( _errState != 0 ); }
+@@ -125,8 +125,8 @@ private:
+ 	int _hInFile; // input file descriptor
+ 	bool _eof;
+ 
+-	basic_string<CharType> _bz2Header;
+-	basic_string<CharType> _bz2HeaderZero;
++	vector<CharType> _bz2Header;
++	vector<CharType> _bz2HeaderZero;
+ 	bool _bz2HeaderFound;
+ 	bool _searchStatus;
+ 

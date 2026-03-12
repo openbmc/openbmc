@@ -275,16 +275,6 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
             branches_to_rebase = [branch] + stdout.split()
             target_branch = revs[os.path.relpath(path, srctree)]
 
-            # There is a bug (or feature?) in git rebase where if a commit with
-            # a note is fully rebased away by being part of an old commit, the
-            # note is still attached to the old commit. Avoid this by making
-            # sure all old devtool related commits have a note attached to them
-            # (this assumes git config notes.rewriteMode is set to ignore).
-            (stdout, _) = __run('git rev-list devtool-base..%s' % target_branch)
-            for rev in stdout.splitlines():
-                if not oe.patch.GitApplyTree.getNotes(path, rev):
-                    oe.patch.GitApplyTree.addNote(path, rev, "dummy")
-
             for b in branches_to_rebase:
                 logger.info("Rebasing {} onto {}".format(b, target_branch))
                 _run('git checkout %s' % b, cwd=path)
@@ -296,11 +286,6 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
                         _run('git rebase --abort', cwd=path)
                     else:
                         logger.warning('Command \'%s\' failed:\n%s' % (e.command, e.stdout))
-
-            # Remove any dummy notes added above.
-            (stdout, _) = __run('git rev-list devtool-base..%s' % target_branch)
-            for rev in stdout.splitlines():
-                oe.patch.GitApplyTree.removeNote(path, rev, "dummy")
 
             _run('git checkout %s' % branch, cwd=path)
 

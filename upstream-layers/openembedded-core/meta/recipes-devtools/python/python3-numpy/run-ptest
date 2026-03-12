@@ -5,11 +5,13 @@
 # the tests to report "no space left on device" errors. Create a custom
 # directory for these and point pytest at it so we can take advantage of the
 # storage provided in the rootfs.
-export PYTEST_DEBUG_TEMPROOT="/usr/lib/python3-numpy/ptest/tmp"
+export PYTEST_DEBUG_TEMPROOT="@PTEST_PATH@/tmp"
 mkdir -p "$PYTEST_DEBUG_TEMPROOT"
 
 # test_mem_policy fails if there's no C compiler present, but we don't want to
 # include gcc as a ptest dependency, so skip that. test_big_arrays uses up a
 # large amount of storage, so skip that too.
-pytest --automake -m "not slow" -k "not test_mem_policy and not test_big_arrays" /usr/lib/python3.*/site-packages/numpy
+# remove test_validate_transcendentals if
+# https://github.com/numpy/numpy/issues/27460 is resolved
+pytest --automake -m "not slow" -k "not test_mem_policy and not test_big_arrays and not test_validate_transcendentals" @PYTHON_SITEPACKAGES_DIR@/numpy
 rm -rf "$PYTEST_DEBUG_TEMPROOT"

@@ -12,11 +12,11 @@ work as a drop-in replacement for sysvinit."
 
 LICENSE = "GPL-2.0-only & LGPL-2.1-or-later"
 LICENSE:libsystemd = "LGPL-2.1-or-later"
-LIC_FILES_CHKSUM = "file://LICENSE.GPL2;md5=751419260aa954499f7abaabaa882bbe \
-                    file://LICENSE.LGPL2.1;md5=4fbd65380cdd255951079008b364516c"
+LIC_FILES_CHKSUM = "file://LICENSE.GPL2;md5=c09786363500a9acc29b147e6e72d2c6 \
+                    file://LICENSE.LGPL2.1;md5=be0aaf4a380f73f7e00b420a007368f2"
 
-SRCREV = "00a12c234e2506f5cab683460199575f13c454db"
-SRCBRANCH = "v257-stable"
+SRCREV = "32bc9ae9f58aed3fa06e111b55fc157a3fe1322b"
+SRCBRANCH = "v259-stable"
 SRC_URI = "git://github.com/systemd/systemd.git;protocol=https;branch=${SRCBRANCH};tag=v${PV}"
 
 CVE_PRODUCT = "systemd"

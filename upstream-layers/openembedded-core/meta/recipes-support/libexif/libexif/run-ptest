@@ -1,3 +1,33 @@
-#!/bin/sh
+#! /bin/sh
 
-make -o Makefile runtest-TESTS
+all=0
+passed=0
+failed=0
+skipped=0
+
+for t in @TESTS@; do
+    "./$t"
+    case "$?" in
+        0)
+            echo "PASS: $t"
+            passed=$((passed + 1))
+            ;;
+        77)
+            echo "SKIP: $t"
+            skipped=$((skipped + 1))
+            ;;
+        *)
+            echo "FAIL: $t"
+            failed=$((failed + 1))
+            ;;
+    esac
+    all=$((all + 1))
+done
+
+if [ "$failed" -eq 0 ]; then
+    echo "All $all tests passed ($skipped skipped)"
+    exit 0
+else
+    echo "$failed of $all tests failed ($skipped skipped)"
+    exit 1
+fi

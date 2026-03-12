@@ -8,14 +8,14 @@
 do_populate_sdk[recrdeptask] += "do_create_spdx do_create_package_spdx"
 do_populate_sdk[cleandirs] += "${SPDXSDKWORK}"
 do_populate_sdk[postfuncs] += "sdk_create_sbom"
-do_populate_sdk[file-checksums] += "${SPDX3_LIB_DEP_FILES}"
+do_populate_sdk[file-checksums] += "${SPDX3_DEP_FILES}"
 POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk = " sdk_host_create_spdx"
 POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk = " sdk_target_create_spdx"
 
 do_populate_sdk_ext[recrdeptask] += "do_create_spdx do_create_package_spdx"
 do_populate_sdk_ext[cleandirs] += "${SPDXSDKEXTWORK}"
 do_populate_sdk_ext[postfuncs] += "sdk_ext_create_sbom"
-do_populate_sdk_ext[file-checksums] += "${SPDX3_LIB_DEP_FILES}"
+do_populate_sdk_ext[file-checksums] += "${SPDX3_DEP_FILES}"
 POPULATE_SDK_POST_HOST_COMMAND:append:task-populate-sdk-ext = " sdk_ext_host_create_spdx"
 POPULATE_SDK_POST_TARGET_COMMAND:append:task-populate-sdk-ext = " sdk_ext_target_create_spdx"
 

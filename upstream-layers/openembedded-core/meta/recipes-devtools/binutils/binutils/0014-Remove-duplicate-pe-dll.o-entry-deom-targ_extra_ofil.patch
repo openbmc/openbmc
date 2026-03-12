@@ -1,4 +1,4 @@
-From f40157cc203a8c8348fb9a39d9fd830d6b4b23f7 Mon Sep 17 00:00:00 2001
+From dc32d1fa52c8de6bdf24a2b38eff43b246af5e1e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Jan 2023 19:35:07 -0800
 Subject: [PATCH] Remove duplicate pe-dll.o entry deom targ_extra_ofiles
@@ -18,10 +18,10 @@ Cc: Zac Walker <zac.walker@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index ea01ccf9a1b..923d6009f9a 100644
+index 3e158913b89..be62b312a8e 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -1063,7 +1063,7 @@ x86_64-*-cygwin)	targ_emul=i386pep ;
+@@ -1008,7 +1008,7 @@ x86_64-*-cygwin)	targ_emul=i386pep ;
  			;;
  x86_64-*-mingw*)	targ_emul=i386pep ;
  			targ_extra_emuls=i386pe
@@ -29,4 +29,6 @@ index ea01ccf9a1b..923d6009f9a 100644
 +			targ_extra_ofiles="deffilep.o pdb.o pe-dll.o"
  			;;
  x86_64-*-gnu*)		targ_emul=elf_x86_64
- 			targ_extra_emuls="elf32_x86_64 elf_iamcu elf_i386"
+			targ_extra_emuls=elf_iamcu
+--
+2.49.0

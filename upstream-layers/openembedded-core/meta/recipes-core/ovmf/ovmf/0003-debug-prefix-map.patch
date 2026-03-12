@@ -1,7 +1,7 @@
-From 96fa2a7f2f54f1e6330275b5eba07e1efdbd865b Mon Sep 17 00:00:00 2001
+From 640b1e443a1b400d32d9af0c478abbbaebd491f1 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Mon, 14 Jun 2021 19:56:28 +0200
-Subject: [PATCH 3/4] debug prefix map
+Subject: [PATCH 3/5] debug prefix map
 
 We want to pass ${DEBUG_PREFIX_MAP} to gcc commands and also pass in
  --debug-prefix-map to nasm (we carry a patch to nasm for this). The
@@ -21,29 +21,31 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  BaseTools/Conf/tools_def.template | 18 +++++++++---------
  1 file changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/BaseTools/Conf/tools_def.template b/BaseTools/Conf/tools_def.template
+index 90a389bdff..1e134b299a 100755
 --- a/BaseTools/Conf/tools_def.template
 +++ b/BaseTools/Conf/tools_def.template
-@@ -920,7 +920,7 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --a
+@@ -833,7 +833,7 @@ NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink="$(DEBUG_DIR)/$(MODULE_
  *_*_*_DTC_PATH                     = DEF(DTC_BIN)
  
  # All supported GCC archs except LOONGARCH64 support -mstack-protector-guard=global, so set that on everything except LOONGARCH64
 -DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common -fstack-protector
 +DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common -fstack-protector ENV(GCC_PREFIX_MAP)
  DEFINE GCC_IA32_X64_CC_FLAGS       = -mstack-protector-guard=global
- DEFINE GCC_ARM_CC_FLAGS            = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -mabi=aapcs -fno-short-enums -funsigned-char -ffunction-sections -fdata-sections -fomit-frame-pointer -Wno-address -mthumb -fno-pic -fno-pie -mstack-protector-guard=global
  DEFINE GCC_LOONGARCH64_CC_FLAGS    = DEF(GCC_ALL_CC_FLAGS) -mabi=lp64d -fno-asynchronous-unwind-tables -Wno-address -fno-short-enums -fsigned-char -ffunction-sections -fdata-sections
-@@ -941,8 +941,8 @@ DEFINE GCC_ARM_ASLDLINK_FLAGS      = DEF
- DEFINE GCC_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_AARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) DEF(GCC_ARM_AARCH64_ASLDLINK_FLAGS)
+ DEFINE GCC_AARCH64_CC_FLAGS        = DEF(GCC_ALL_CC_FLAGS) -mlittle-endian -fno-short-enums -fverbose-asm -funsigned-char  -ffunction-sections -fdata-sections -Wno-address -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-pic -fno-pie -ffixed-x18 -mstack-protector-guard=global
+@@ -845,8 +845,8 @@ DEFINE GCC_AARCH64_DLINK_FLAGS     = -Wl,--emit-relocs -nostdlib -Wl,--gc-sectio
+ DEFINE GCC_LOONGARCH64_DLINK_FLAGS = DEF(GCC_LOONGARCH64_DLINK_COMMON) -z common-page-size=0x20
+ DEFINE GCC_AARCH64_ASLDLINK_FLAGS  = DEF(GCC_AARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT) -Wl,--defsym=PECOFF_HEADER_SIZE=0 DEF(GCC_DLINK2_FLAGS_COMMON) -z common-page-size=0x20
  DEFINE GCC_LOONGARCH64_ASLDLINK_FLAGS = DEF(GCC_LOONGARCH64_DLINK_FLAGS) -Wl,--entry,ReferenceAcpiTable -u $(IMAGE_ENTRY_POINT)
- DEFINE GCC_IA32_X64_DLINK_FLAGS    = DEF(GCC_IA32_X64_DLINK_COMMON) --entry _$(IMAGE_ENTRY_POINT) --file-alignment 0x20 --section-alignment 0x20 -Map $(DEST_DIR_DEBUG)/$(BASE_NAME).map
--DEFINE GCC_ASM_FLAGS               = -c -x assembler -imacros AutoGen.h
+-DEFINE GCC_ASM_FLAGS               = -c -x assembler
 -DEFINE GCC_PP_FLAGS                = -E -x assembler-with-cpp -include AutoGen.h
-+DEFINE GCC_ASM_FLAGS               = -c -x assembler -imacros AutoGen.h ENV(GCC_PREFIX_MAP)
++DEFINE GCC_ASM_FLAGS               = -c -x assembler ENV(GCC_PREFIX_MAP)
 +DEFINE GCC_PP_FLAGS                = -E -x assembler-with-cpp -include AutoGen.h ENV(GCC_PREFIX_MAP)
- DEFINE GCC_VFRPP_FLAGS             = -x c -E -P -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
+ DEFINE GCC_VFRPP_FLAGS             = -x c -E -DVFRCOMPILE --include $(MODULE_NAME)StrDefs.h
  DEFINE GCC_ASLPP_FLAGS             = -x c -E -include AutoGen.h
- DEFINE GCC_ASLCC_FLAGS             = -x c
-@@ -1095,7 +1095,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS
+ DEFINE GCC_ASLCC_FLAGS             = -x c -include AutoGen.h -fshort-wchar
+@@ -980,7 +980,7 @@ DEFINE GCC5_LOONGARCH64_PP_FLAGS           = -mabi=lp64d -march=loongarch64 DEF(
  *_GCC48_IA32_DLINK2_FLAGS         = DEF(GCC48_IA32_DLINK2_FLAGS)
  *_GCC48_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
  *_GCC48_IA32_OBJCOPY_FLAGS        =
@@ -52,7 +54,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    DEBUG_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS)
  RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Wno-unused-but-set-variable
-@@ -1123,7 +1123,7 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(
+@@ -1008,7 +1008,7 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Wno-unused-but-set
  *_GCC48_X64_DLINK2_FLAGS         = DEF(GCC48_X64_DLINK2_FLAGS)
  *_GCC48_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
  *_GCC48_X64_OBJCOPY_FLAGS        =
@@ -61,7 +63,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS)
  RELEASE_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Wno-unused-but-set-variable
-@@ -1232,7 +1232,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(G
+@@ -1087,7 +1087,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
  *_GCC49_IA32_DLINK2_FLAGS         = DEF(GCC49_IA32_DLINK2_FLAGS)
  *_GCC49_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
  *_GCC49_IA32_OBJCOPY_FLAGS        =
@@ -70,7 +72,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    DEBUG_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS)
  RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable
-@@ -1260,7 +1260,7 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(
+@@ -1115,7 +1115,7 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Wno-unused-but-set
  *_GCC49_X64_DLINK2_FLAGS         = DEF(GCC49_X64_DLINK2_FLAGS)
  *_GCC49_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
  *_GCC49_X64_OBJCOPY_FLAGS        =
@@ -79,7 +81,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS)
  RELEASE_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Wno-unused-but-set-variable -Wno-unused-const-variable
-@@ -1519,7 +1519,7 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS
+@@ -1314,7 +1314,7 @@ RELEASE_GCCNOLTO_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
  *_GCC5_IA32_DLINK2_FLAGS         = DEF(GCC5_IA32_DLINK2_FLAGS) -no-pie
  *_GCC5_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
  *_GCC5_IA32_OBJCOPY_FLAGS        =
@@ -88,7 +90,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    DEBUG_GCC5_IA32_CC_FLAGS       = DEF(GCC5_IA32_CC_FLAGS) -flto
    DEBUG_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,-m,elf_i386,--oformat=elf32-i386
-@@ -1551,7 +1551,7 @@ RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(G
+@@ -1346,7 +1346,7 @@ RELEASE_GCC5_IA32_DLINK_FLAGS    = DEF(GCC5_IA32_X64_DLINK_FLAGS) -flto -Os -Wl,
  *_GCC5_X64_DLINK2_FLAGS          = DEF(GCC5_X64_DLINK2_FLAGS)
  *_GCC5_X64_RC_FLAGS              = DEF(GCC_X64_RC_FLAGS)
  *_GCC5_X64_OBJCOPY_FLAGS         =
@@ -97,3 +99,6 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  
    DEBUG_GCC5_X64_CC_FLAGS        = DEF(GCC5_X64_CC_FLAGS) -flto -DUSING_LTO
    DEBUG_GCC5_X64_DLINK_FLAGS     = DEF(GCC5_X64_DLINK_FLAGS) -flto -Os
+-- 
+2.47.3
+

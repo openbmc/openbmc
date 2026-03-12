@@ -1,0 +1,43 @@
+From 6cd4855ea3dd62e6eb36c0796f8cd7bd4aaae05c Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 11 Dec 2025 19:55:46 +0100
+Subject: [PATCH] ffbuild/common.mak: ensure target directories are created
+ before running shell redirects into them
+
+Otherwise, occasional build races have been observed:
+https://autobuilder.yoctoproject.org/valkyrie/#/builders/37/builds/3001/steps/13/logs/stdio
+
+/bin/sh: 4: cannot create fftools/resources/graph.css.min: Directory nonexistent
+mkdir -p fftools/graph
+/bin/sh: 1: cannot create fftools/resources/graph.html.gz: Directory nonexistent
+make: *** [/srv/pokybuild/.../ffmpeg-8.0.1/ffbuild/common.mak:165: fftools/resources/graph.html.gz] Error 2
+make: *** Waiting for unfinished jobs....
+make: *** [/srv/pokybuild/.../ffmpeg-8.0.1/ffbuild/common.mak:145: fftools/resources/graph.css.min] Error 2
+
+There's a separate rule for making those directories, but unfortunately
+it's racing with the rules that expect the directories to exist. Rather
+than add a Makefile dependency, I've injected the dir creation directly
+in front of commands that can otherwise fail - a proper fix would probably
+add the rule rather.
+
+Upstream-Status: Submitted [by email to ffmpeg-devel@ffmpeg.org,softworkz@hotmail.com,kasper93@gmail.com]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ ffbuild/common.mak | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/ffbuild/common.mak b/ffbuild/common.mak
+index 0a60d01..346bb0a 100644
+--- a/ffbuild/common.mak
++++ b/ffbuild/common.mak
+@@ -116,8 +116,8 @@ $(BIN2CEXE): ffbuild/bin2c_host.o
+ 	$(HOSTLD) $(HOSTLDFLAGS) $(HOSTLD_O) $^ $(HOSTEXTRALIBS)
+ 
+ RUN_BIN2C = $(BIN2C) $(patsubst $(SRC_PATH)/%,$(SRC_LINK)/%,$<) $@ $(subst .,_,$(basename $(notdir $@)))
+-RUN_GZIP  = $(M)gzip -nc9 $(patsubst $(SRC_PATH)/%,$(SRC_LINK)/%,$<) >$@
+-RUN_MINIFY = $(M)sed 's!/\\*.*\\*/!!g' $< | tr '\n' ' ' | tr -s ' ' | sed 's/^ //; s/ $$//' > $@
++RUN_GZIP  = mkdir -p $(dir $@) && $(M)gzip -nc9 $(patsubst $(SRC_PATH)/%,$(SRC_LINK)/%,$<) >$@
++RUN_MINIFY = mkdir -p $(dir $@) && $(M)sed 's!/\\*.*\\*/!!g' $< | tr '\n' ' ' | tr -s ' ' | sed 's/^ //; s/ $$//' > $@
+ %.gz: TAG = GZIP
+ %.min: TAG = MINIFY
+ 

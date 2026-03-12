@@ -18,7 +18,7 @@ index f733797..1013fcf 100644
 @@ -76,7 +76,7 @@
  endif
  endif
-   SUBDIRS += install-info po po_document tp Pod-Simple-Texinfo \
+   SUBDIRS += install-info po po_document tta Pod-Simple-Texinfo \
 -             texindex util doc man
 +             texindex util doc
    SUBDIRS += js

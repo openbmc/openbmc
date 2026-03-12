@@ -23,29 +23,26 @@ Upstream-Status: Submitted [https://go-review.googlesource.com/c/go/+/653895]
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/cmd/go/internal/work/gc.go | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ src/cmd/go/internal/work/gc.go | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/src/cmd/go/internal/work/gc.go b/src/cmd/go/internal/work/gc.go
 index 3a173efee8..8b7a44e031 100644
 --- a/src/cmd/go/internal/work/gc.go
 +++ b/src/cmd/go/internal/work/gc.go
-@@ -728,7 +728,14 @@ func (gcToolchain) ldShared(b *Builder, root *Action, toplevelactions []*Action,
+@@ -717,6 +717,12 @@ func (gcToolchain) ldShared(b *Builder, root *Action, toplevelactions []*Action,
  	// the output file path is recorded in the .gnu.version_d section.
  	dir, targetPath := filepath.Split(targetPath)
  
--	return b.Shell(root).run(dir, targetPath, nil, cfg.BuildToolexec, base.Tool("link"), "-o", targetPath, "-importcfg", importcfg, ldflags)
-+	env := []string{}
 +	// When -trimpath is used, GOROOT is cleared
 +	if cfg.BuildTrimpath {
-+		env = append(env, "GOROOT=")
++		cfgChangedEnv = append(cfgChangedEnv, "GOROOT=")
 +	} else {
-+		env = append(env, "GOROOT="+cfg.GOROOT)
++		cfgChangedEnv = append(cfgChangedEnv, "GOROOT="+cfg.GOROOT)
 +	}
-+	return b.Shell(root).run(dir, targetPath, env, cfg.BuildToolexec, base.Tool("link"), "-o", targetPath, "-importcfg", importcfg, ldflags)
+ 	return b.Shell(root).run(dir, targetPath, cfgChangedEnv, cfg.BuildToolexec, base.Tool("link"), "-o", targetPath, "-importcfg", importcfg, ldflags)
  }
  
- func (gcToolchain) cc(b *Builder, a *Action, ofile, cfile string) error {
 -- 
 2.25.1
 

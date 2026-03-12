@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd tests
+
+for t in version pipeconnect fdpassing fdpassing-socket.sh; do
+    ./$t
+    if [ $? -eq 0 ]; then
+        echo "PASS: $t"
+    else
+        echo "FAIL: $t"
+    fi
+done

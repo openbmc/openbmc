@@ -1,4 +1,4 @@
-From b931ab5282cc11627b6f68a6477b79f41ae80b3a Mon Sep 17 00:00:00 2001
+From e5f2c9886934ad9a05f66e0e09e92ee7dd5c9e94 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:22:00 +0400
 Subject: [PATCH] cpp: honor sysroot.

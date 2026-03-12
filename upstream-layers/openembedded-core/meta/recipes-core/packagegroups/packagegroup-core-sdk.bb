@@ -14,6 +14,8 @@ TARGET_TOOLCHAIN_LANGS ??= "${SDK_TOOLCHAIN_LANGS}"
 TARGET_TOOLCHAIN_LANGS:remove:sdkmingw32 = "rust"
 # libstd-rs doesn't build for mips n32 with compiler constraint errors
 TARGET_TOOLCHAIN_LANGS:remove:mipsarchn32 = "rust"
+TARGET_TOOLCHAIN_LANGS:remove:riscv32 = "go"
+TARGET_TOOLCHAIN_LANGS:remove:powerpc = "go"
 
 RDEPENDS:packagegroup-core-sdk = "\
     packagegroup-core-buildessential \

@@ -1,0 +1,28 @@
+These tests take too long to run for our default output timeout in ptest-runner (450s).
+We could change that to 900s but it is a global setting so skip these tests for
+now. Ideally tests.serial would have occasional output when running to show activity.
+
+Upstream-Status: Inappropriate [workaround for slow tests]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: lttng-tools-2.14.0/tests/regression/Makefile.am
+===================================================================
+--- lttng-tools-2.14.0.orig/tests/regression/Makefile.am
++++ lttng-tools-2.14.0/tests/regression/Makefile.am
+@@ -26,7 +26,6 @@ SERIAL_TESTS = tools/base-path/test_ust
+ 	tools/tracefile-limits/test_tracefile_count \
+ 	tools/tracefile-limits/test_tracefile_size \
+ 	tools/exclusion/test_exclusion \
+-	tools/snapshots/test_kernel \
+ 	tools/snapshots/test_ust_fast \
+ 	tools/snapshots/test_ust_streaming \
+ 	tools/snapshots/test_kernel_streaming \
+@@ -47,8 +46,6 @@ SERIAL_TESTS = tools/base-path/test_ust
+ 	tools/rotation/test_schedule_api \
+ 	tools/metadata/test_kernel \
+ 	tools/working-directory/test_relayd_working_directory \
+-	tools/clear/test_ust \
+-	tools/clear/test_kernel \
+ 	tools/clear/test_live_hang.py \
+ 	tools/tracker/test_event_tracker \
+ 	tools/trigger/start-stop/test_start_stop \

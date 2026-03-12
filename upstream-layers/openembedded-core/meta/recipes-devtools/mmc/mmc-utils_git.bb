@@ -12,7 +12,7 @@ PV = "1.0"
 SRC_URI = "git://git.kernel.org/pub/scm/utils/mmc/mmc-utils.git;branch=${SRCBRANCH};protocol=https;tag=v${PV}"
 
 DEPENDS = "python3-sphinx-native"
-EXTRA_OEMAKE = "C="
+EXTRA_OEMAKE = "C=0"
 
 CFLAGS:append:powerpc64 = " -D__SANE_USERSPACE_TYPES__"
 CFLAGS:append:mipsarchn64 = " -D__SANE_USERSPACE_TYPES__"

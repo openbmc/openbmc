@@ -1,4 +1,4 @@
-From f2649410d2eb1c3983054020c9238887bd31273f Mon Sep 17 00:00:00 2001
+From 5a8604544b9a1fc4ae512f648165de22ce125d66 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 6 Jun 2018 12:10:22 -0700
 Subject: [PATCH] Re-introduce spe commandline options

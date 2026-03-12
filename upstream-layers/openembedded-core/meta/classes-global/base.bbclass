@@ -111,6 +111,22 @@ def get_lic_checksum_file_list(d):
             bb.fatal(d.getVar('PN') + ": LIC_FILES_CHKSUM contains an invalid URL: " + url)
     return " ".join(filelist)
 
+# Please see https://bugzilla.yoctoproject.org/show_bug.cgi?id=16087 for details
+# This can be removed after host distributions with kernels < 5.18
+# (e.g. rhel 8/9 and derivatives) are taken out of testing and support.
+def write_ld_wrapper(srctool, desttool):
+    wrapper = "#!/bin/sh\n{} --no-rosegment $@".format(srctool)
+
+    stdout, _ = bb.process.run("{} --help".format(srctool))
+    if "--no-rosegment" in stdout:
+        with open(desttool, 'w') as f:
+            f.write(wrapper)
+        import stat
+        st = os.stat(desttool)
+        os.chmod(desttool, st.st_mode | stat.S_IEXEC)
+    else:
+        os.symlink(srctool, desttool)
+
 def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
     tools = d.getVar(toolsvar).split()
     origbbenv = d.getVar("BB_ORIGENV", False)
@@ -127,7 +143,11 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
             # clean up dead symlink
             if os.path.islink(desttool):
                 os.unlink(desttool)
-            srctool = bb.utils.which(path, tool, executable=True)
+
+            # Prefer gnu-prefixed binaries, if available
+            srctool = (bb.utils.which(path, "gnu" + tool, executable=True) or
+                       bb.utils.which(path, tool, executable=True))
+
             # gcc/g++ may link to ccache on some hosts, e.g.,
             # /usr/local/bin/ccache/gcc -> /usr/bin/ccache, then which(gcc)
             # would return /usr/local/bin/ccache/gcc, but what we need is
@@ -135,7 +155,10 @@ def setup_hosttools_dir(dest, toolsvar, d, fatal=True):
             if os.path.islink(srctool) and os.path.basename(os.readlink(srctool)) == 'ccache':
                 srctool = bb.utils.which(path, tool, executable=True, direction=1)
             if srctool:
-                os.symlink(srctool, desttool)
+                if tool == "ld" or tool.startswith("ld."):
+                    write_ld_wrapper(srctool, desttool)
+                else:
+                    os.symlink(srctool, desttool)
             else:
                 notfound.append(tool)
 
@@ -279,8 +302,6 @@ def buildcfg_neededvars(d):
 addhandler base_eventhandler
 base_eventhandler[eventmask] = "bb.event.ConfigParsed bb.event.MultiConfigParsed bb.event.BuildStarted bb.event.RecipePreFinalise bb.event.RecipeParsed bb.event.RecipePreDeferredInherits"
 python base_eventhandler() {
-    import bb.runqueue
-
     if isinstance(e, bb.event.RecipePreDeferredInherits):
         # Use this to snoop on class extensions and set these up before the deferred inherits
         # are processed which allows overrides on conditional variables.

@@ -252,7 +252,7 @@ python do_ar_original() {
         _, _, local, _, _, parm = bb.fetch.decodeurl(patch)
         patchdir = parm.get('patchdir')
         if patchdir:
-            series = os.path.join(ar_outdir, 'series.subdir.%s' % patchdir.replace('/', '_'))
+            series = os.path.join(ar_outdir, 'series.subdir.%s' % patchdir.replace(d.getVar('WORKDIR'), '').replace('/', '_'))
         else:
             series = os.path.join(ar_outdir, 'series')
 

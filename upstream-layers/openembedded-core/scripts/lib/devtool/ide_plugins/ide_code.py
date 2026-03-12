@@ -9,17 +9,41 @@ import json
 import logging
 import os
 import shutil
-from devtool.ide_plugins import BuildTool, IdeBase, GdbCrossConfig, get_devtool_deploy_opts
+from devtool.ide_plugins import BuildTool, IdeBase, GdbCrossConfig, GdbServerModes, get_devtool_deploy_opts
 
 logger = logging.getLogger('devtool')
 
 
 class GdbCrossConfigVSCode(GdbCrossConfig):
-    def __init__(self, image_recipe, modified_recipe, binary):
-        super().__init__(image_recipe, modified_recipe, binary, False)
+    def __init__(self, image_recipe, modified_recipe, binary,
+                 gdbserver_default_mode=GdbServerModes.ONCE):
+        super().__init__(image_recipe, modified_recipe, binary,
+                         gdbserver_default_mode)
+
+    def target_ssh_gdbserver_start_args(self, gdbserver_mode=None):
+        """Get the ssh command arguments to start gdbserver on the target device
+
+        returns something like:
+          ['-p', '2222', 'root@target', '"/bin/sh -c \'/usr/bin/gdbserver --once :1234 /usr/bin/cmake-example\'"']
+        """
+        if gdbserver_mode is None:
+            gdbserver_mode = self.gdbserver_default_mode
+        return self._target_ssh_gdbserver_args() + [
+            self._target_gdbserver_start_cmd(gdbserver_mode)
+        ]
+
+    def target_ssh_gdbserver_kill_args(self):
+        """Get the ssh command arguments to kill gdbserver on the target device
+
+        returns something like:
+          ['-p', '2222', 'root@target', '"kill $(pgrep -o -f \'gdbserver --attach :1234\') 2>/dev/null || true"']
+        """
+        return self._target_ssh_gdbserver_args() + [
+            self._target_gdbserver_kill_cmd()
+        ]
 
     def initialize(self):
-        self._gen_gdbserver_start_script()
+        pass
 
 
 class IdeVSCode(IdeBase):
@@ -125,6 +149,62 @@ class IdeVSCode(IdeBase):
         settings_dict["cmake.configureOnOpen"] = True
         settings_dict["cmake.sourceDirectory"] = modified_recipe.real_srctree
 
+    def __vscode_settings_kernel_module(self, settings_dict, modified_recipe):
+        if modified_recipe.build_tool is not BuildTool.KERNEL_MODULE:
+            return
+
+        # Define kernel exclude patterns once
+        kernel_exclude_patterns = [
+            "*.cache/**",
+            "*.ko",
+            "*.mod.c",
+            "*.mod",
+            "**/.*.cmd",
+            "**/.*.d",
+            "**/.*.S",
+            "**/.tmp*",
+            "**/*.a",
+            "**/*.builtin",
+            "**/*.map",
+            "**/*.modinfo",
+            "**/*.o",
+            "**/*.order",
+            "**/*.orig",
+            "**/*.symvers",
+            "**/*.tmp"
+        ]
+        files_excludes_kernel = {pattern: True for pattern in kernel_exclude_patterns}
+
+        settings_dict["files.exclude"].update(files_excludes_kernel)
+        settings_dict["files.watcherExclude"].update(files_excludes_kernel)
+        settings_dict["python.analysis.exclude"] += kernel_exclude_patterns
+
+        # protect the kernel sources
+        settings_dict["files.readonlyInclude"][modified_recipe.staging_kernel_dir + '/**'] = True
+
+        # Export the complete cross-build environment
+        settings_dict["terminal.integrated.env.linux"] = modified_recipe.exported_vars
+
+        # and the make configuration
+        make_executable = os.path.join(
+            modified_recipe.recipe_sysroot_native, 'usr', 'bin', 'make')
+        settings_dict["makefile.configurations"] = [
+            {
+                "name": ' '.join(modified_recipe.make_targets),
+                "makePath": make_executable,
+                "makeDirectory": modified_recipe.srctree,
+                "makefilePath": os.path.join(modified_recipe.srctree, "Makefile"),
+                "makeArgs": modified_recipe.extra_oemake + modified_recipe.make_targets
+            },
+            {
+                "name": "clean",
+                "makePath": make_executable,
+                "makeDirectory": modified_recipe.srctree,
+                "makefilePath": os.path.join(modified_recipe.srctree, "Makefile"),
+                "makeArgs": modified_recipe.extra_oemake + ["clean"]
+            }
+        ]
+
     def vscode_settings(self, modified_recipe, image_recipe):
         files_excludes = {
             "**/.git/**": True,
@@ -152,35 +232,27 @@ class IdeVSCode(IdeBase):
         }
         self.__vscode_settings_cmake(settings_dict, modified_recipe)
         self.__vscode_settings_meson(settings_dict, modified_recipe)
+        self.__vscode_settings_kernel_module(settings_dict, modified_recipe)
 
         settings_file = 'settings.json'
         IdeBase.update_json_file(
             self.dot_code_dir(modified_recipe), settings_file, settings_dict)
 
-    def __vscode_extensions_cmake(self, modified_recipe, recommendations):
-        if modified_recipe.build_tool is not BuildTool.CMAKE:
-            return
-        recommendations += [
-            "ms-vscode.cmake-tools",
-            "ms-vscode.cpptools",
-            "ms-vscode.cpptools-extension-pack",
-            "ms-vscode.cpptools-themes"
-        ]
-
-    def __vscode_extensions_meson(self, modified_recipe, recommendations):
-        if modified_recipe.build_tool is not BuildTool.MESON:
-            return
-        recommendations += [
-            'mesonbuild.mesonbuild',
-            "ms-vscode.cpptools",
-            "ms-vscode.cpptools-extension-pack",
-            "ms-vscode.cpptools-themes"
-        ]
-
     def vscode_extensions(self, modified_recipe):
         recommendations = []
-        self.__vscode_extensions_cmake(modified_recipe, recommendations)
-        self.__vscode_extensions_meson(modified_recipe, recommendations)
+        if modified_recipe.build_tool.is_c_cpp_kernel:
+            recommendations += [
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack",
+                "ms-vscode.cpptools-themes"
+            ]
+        if modified_recipe.build_tool is BuildTool.CMAKE:
+            recommendations.append("ms-vscode.cmake-tools")
+        if modified_recipe.build_tool is BuildTool.MESON:
+            recommendations.append("mesonbuild.mesonbuild")
+        if modified_recipe.build_tool is BuildTool.KERNEL_MODULE:
+            recommendations.append("ms-vscode.makefile-tools")
+
         extensions_file = 'extensions.json'
         IdeBase.update_json_file(
             self.dot_code_dir(modified_recipe), extensions_file, {"recommendations": recommendations})
@@ -194,6 +266,15 @@ class IdeVSCode(IdeBase):
         elif modified_recipe.build_tool is BuildTool.MESON:
             properties_dict["configurationProvider"] = "mesonbuild.mesonbuild"
             properties_dict["compilerPath"] = os.path.join(modified_recipe.staging_bindir_toolchain, modified_recipe.cxx.split()[0])
+        elif modified_recipe.build_tool is BuildTool.KERNEL_MODULE:
+            # Using e.g. configurationProvider = "ms-vscode.makefile-tools" was not successful
+            properties_dict["compilerPath"] = os.path.join(modified_recipe.staging_bindir_toolchain, modified_recipe.kernel_cc.split()[0])
+            properties_dict["includePath"] = [
+                "${workspaceFolder}/**",
+                os.path.join(modified_recipe.staging_kernel_dir, "include", "**")
+            ]
+            # https://www.kernel.org/doc/html/next/process/programming-language.html
+            properties_dict["cStandard"] = "gnu11"
         else:  # no C/C++ build
             return
 
@@ -207,20 +288,20 @@ class IdeVSCode(IdeBase):
         IdeBase.update_json_file(
             self.dot_code_dir(modified_recipe), prop_file, properties_dicts)
 
-    def vscode_launch_bin_dbg(self, gdb_cross_config):
+    def vscode_launch_bin_dbg(self, gdb_cross_config, gdbserver_mode):
         modified_recipe = gdb_cross_config.modified_recipe
 
         launch_config = {
-            "name": gdb_cross_config.id_pretty,
+            "name": gdb_cross_config.id_pretty_mode(gdbserver_mode),
             "type": "cppdbg",
             "request": "launch",
-            "program": os.path.join(modified_recipe.d, gdb_cross_config.binary.lstrip('/')),
+            "program": gdb_cross_config.binary.binary_host_path,
             "stopAtEntry": True,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": False,
             "MIMode": "gdb",
-            "preLaunchTask": gdb_cross_config.id_pretty,
+            "preLaunchTask": gdb_cross_config.id_pretty_mode(gdbserver_mode),
             "miDebuggerPath": modified_recipe.gdb_cross.gdb,
             "miDebuggerServerAddress": "%s:%d" % (modified_recipe.gdb_cross.host, gdb_cross_config.gdbserver_port)
         }
@@ -242,33 +323,69 @@ class IdeVSCode(IdeBase):
             launch_config['additionalSOLibSearchPath'] = modified_recipe.solib_search_path_str(
                 gdb_cross_config.image_recipe)
             # First: Search for sources of this recipe in the workspace folder
-            if modified_recipe.pn in modified_recipe.target_dbgsrc_dir:
-                src_file_map[modified_recipe.target_dbgsrc_dir] = "${workspaceFolder}"
-            else:
-                logger.error(
-                    "TARGET_DBGSRC_DIR must contain the recipe name PN.")
+            # If compiled with DEBUG_PREFIX_MAP = "", no reverse map is is needed. The binaries
+            # contain the full path to the source files. But by default there is a reverse map.
+            for target_path, host_path in modified_recipe.reverse_debug_prefix_map.items():
+                if host_path.startswith(modified_recipe.real_srctree):
+                    src_file_map[target_path] = "${workspaceFolder}" + host_path[len(modified_recipe.real_srctree):]
+                else:
+                    src_file_map[target_path] = host_path
+
             # Second: Search for sources of other recipes in the rootfs-dbg
-            if modified_recipe.target_dbgsrc_dir.startswith("/usr/src/debug"):
+            # We expect that /usr/src/debug/${PN}/${PV} or no mapping is used for the recipes
+            # own sources and we can use the key "/usr/src/debug" for the rootfs-dbg.
+            if "/usr/src/debug" in src_file_map:
+                logger.error(
+                    'Key "/usr/src/debug" already exists in src_file_map. '
+                    'Something with DEBUG_PREFIX_MAP looks unexpected and finding '
+                    'sources in the rootfs-dbg will not work as expected.'
+                )
+            else:
                 src_file_map["/usr/src/debug"] = os.path.join(
                     gdb_cross_config.image_recipe.rootfs_dbg, "usr", "src", "debug")
-            else:
-                logger.error(
-                    "TARGET_DBGSRC_DIR must start with /usr/src/debug.")
         else:
             logger.warning(
                 "Cannot setup debug symbols configuration for GDB. IMAGE_GEN_DEBUGFS is not enabled.")
 
+        # Enable pretty-printing for gdb for resolving STL types with help of python scripts
+        pretty_printing_cmd = modified_recipe.gdb_pretty_print_scripts
+        if pretty_printing_cmd:
+            setup_commands += [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "python " +";".join(pretty_printing_cmd)
+                },
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing"
+                }
+            ]
+
         launch_config['sourceFileMap'] = src_file_map
         launch_config['setupCommands'] = setup_commands
+
+        # Add postDebugTask for attach mode to clean up gdbserver
+        if gdbserver_mode == GdbServerModes.ATTACH:
+            kill_task_label = "kill_gdbserver_" + gdb_cross_config.id_pretty_mode(gdbserver_mode)
+            launch_config["postDebugTask"] = kill_task_label
+
         return launch_config
 
-    def vscode_launch(self, modified_recipe):
-        """GDB Launch configuration for binaries (elf files)"""
+    def vscode_launch(self, args, modified_recipe):
+        """GDB launch configurations for user-space binaries.
+
+        Kernel modules are not debugged via gdbserver and have no launch entry.
+        Their deployment workflow is driven entirely by tasks.json:
+          install && deploy-target  ->  reload module (rmmod + insmod)  ->  verify module
+        These tasks can be triggered from the Tasks menu (Ctrl+Shift+P > Run Task)
+        or via the default build task (Ctrl+Shift+B for install && deploy-target).
+        """
 
         configurations = []
         for gdb_cross_config in self.gdb_cross_configs:
             if gdb_cross_config.modified_recipe is modified_recipe:
-                configurations.append(self.vscode_launch_bin_dbg(gdb_cross_config))
+                for gdbserver_mode in gdb_cross_config.gdbserver_modes():
+                    configurations.append(self.vscode_launch_bin_dbg(gdb_cross_config, gdbserver_mode))
         launch_dict = {
             "version": "0.2.0",
             "configurations": configurations
@@ -287,6 +404,10 @@ class IdeVSCode(IdeBase):
                     "label": install_task_name,
                     "type": "shell",
                     "command": run_install_deploy,
+                    "args": [
+                        "--target",
+                        args.target
+                    ],
                     "problemMatcher": []
                 }
             ]
@@ -294,15 +415,13 @@ class IdeVSCode(IdeBase):
         for gdb_cross_config in self.gdb_cross_configs:
             if gdb_cross_config.modified_recipe is not modified_recipe:
                 continue
-            tasks_dict['tasks'].append(
-                {
-                    "label": gdb_cross_config.id_pretty,
+            for gdbserver_mode in gdb_cross_config.gdbserver_modes():
+                new_task = {
+                    "label": gdb_cross_config.id_pretty_mode(gdbserver_mode),
                     "type": "shell",
                     "isBackground": True,
-                    "dependsOn": [
-                        install_task_name
-                    ],
-                    "command": gdb_cross_config.gdbserver_script,
+                    "command": gdb_cross_config.gdb_cross.target_device.ssh_sshexec,
+                    "args": gdb_cross_config.target_ssh_gdbserver_start_args(gdbserver_mode),
                     "problemMatcher": [
                         {
                             "pattern": [
@@ -320,7 +439,111 @@ class IdeVSCode(IdeBase):
                             }
                         }
                     ]
-                })
+                }
+                # Deploy the artifacts to the target before starting gdbserver if not already running
+                if gdbserver_mode != GdbServerModes.ATTACH:
+                    new_task['dependsOn'] = [
+                        install_task_name
+                    ]
+
+                tasks_dict['tasks'].append(new_task)
+
+                # For attach mode, add a kill task to stop a previously running gdbserver
+                # This is a known issue with gdbserver --attach that it does not terminate
+                # after detaching. With this helper task, it is possible to:
+                # 1. Start debugging in attach mode
+                # 2. Add breakpoints, step, continue, etc.
+                # 3. Press the Continue button
+                # 4. Press the Stop button which detaches gdbserver from the debugged process
+                # 5. Start debugging again in attach mode
+                # Without this kill task, step 5 would fail because gdbserver is still running
+                if gdbserver_mode == GdbServerModes.ATTACH:
+                    new_task_kill_label = "kill_gdbserver_"+ gdb_cross_config.id_pretty_mode(gdbserver_mode)
+                    new_task_kill = {
+                        "label": new_task_kill_label,
+                        "type": "shell",
+                        "command": gdb_cross_config.gdb_cross.target_device.ssh_sshexec,
+                        "args": gdb_cross_config.target_ssh_gdbserver_kill_args(),
+                        "presentation": {
+                            "close": True
+                        },
+                        "problemMatcher": []
+                    }
+                    tasks_dict['tasks'].append(new_task_kill)
+
+        tasks_file = 'tasks.json'
+        IdeBase.update_json_file(
+            self.dot_code_dir(modified_recipe), tasks_file, tasks_dict)
+
+    @staticmethod
+    def _ssh_args(target_device, remote_cmd):
+        """Build a VS Code task 'args' list for an ssh command to the target."""
+        args = list(target_device.extraoptions)
+        if target_device.ssh_port:
+            args += list(target_device.ssh_port)
+        args += [target_device.target, remote_cmd]
+        return args
+
+    def vscode_tasks_kernel_module(self, args, modified_recipe):
+        """Generate tasks.json for kernel module recipes.
+
+        Three tasks are generated and chained in sequence:
+          1. install && deploy-target  - run bitbake do_install and push the
+             freshly built .ko to the target via devtool deploy-target.
+          2. reload module  - single SSH call: rmmod (errors ignored) then insmod
+             using the path reported by find so depmod is not required.
+          3. verify module  - SSH call: lsmod | grep <module> to confirm the new
+             module is loaded; output is visible in the task terminal.
+
+        The tasks are linked via dependsOn / dependsOrder: sequence so that
+        running the verify task automatically executes the full chain.  The
+        launch.json 'reload kernel module' entry uses preLaunchTask: verify,
+        providing a single F5 / click action for the complete reload cycle.
+        """
+        td = modified_recipe.gdb_cross.target_device
+        ko_name = modified_recipe.bpn + '.ko'
+        # rmmod / lsmod use the kernel module name (- replaced by _ per kernel convention)
+        mod_name = modified_recipe.bpn.replace('-', '_')
+        install_task_name = "install && deploy-target %s" % modified_recipe.recipe_id_pretty
+        reload_task_name = "reload module %s" % modified_recipe.recipe_id_pretty
+        verify_task_name = "verify module %s" % modified_recipe.recipe_id_pretty
+        run_install_deploy = modified_recipe.gen_install_deploy_script(args)
+        tasks_dict = {
+            "version": "2.0.0",
+            "tasks": [
+                {
+                    "label": install_task_name,
+                    "type": "shell",
+                    "command": run_install_deploy,
+                    "args": [
+                        "--target",
+                        args.target
+                    ],
+                    "problemMatcher": []
+                },
+                {
+                    "label": reload_task_name,
+                    "type": "shell",
+                    "command": td.ssh_sshexec,
+                    "args": self._ssh_args(
+                        td,
+                        "rmmod %(mod)s 2>/dev/null; insmod $(find /lib/modules -name '%(ko)s' | head -n 1)"
+                        % {"mod": mod_name, "ko": ko_name}),
+                    "dependsOn": [install_task_name],
+                    "dependsOrder": "sequence",
+                    "problemMatcher": []
+                },
+                {
+                    "label": verify_task_name,
+                    "type": "shell",
+                    "command": td.ssh_sshexec,
+                    "args": self._ssh_args(td, "lsmod | grep %s" % mod_name),
+                    "dependsOn": [reload_task_name],
+                    "dependsOrder": "sequence",
+                    "problemMatcher": []
+                }
+            ]
+        }
         tasks_file = 'tasks.json'
         IdeBase.update_json_file(
             self.dot_code_dir(modified_recipe), tasks_file, tasks_dict)
@@ -410,15 +633,13 @@ class IdeVSCode(IdeBase):
             for gdb_cross_config in self.gdb_cross_configs:
                 if gdb_cross_config.modified_recipe is not modified_recipe:
                     continue
-                tasks_dict['tasks'].append(
-                    {
-                        "label": gdb_cross_config.id_pretty,
+                for gdbserver_mode in gdb_cross_config.gdbserver_modes():
+                    new_task = {
+                        "label": gdb_cross_config.id_pretty(gdbserver_mode),
                         "type": "shell",
                         "isBackground": True,
-                        "dependsOn": [
-                            dt_build_deploy_label
-                        ],
-                        "command": gdb_cross_config.gdbserver_script,
+                        "command": gdb_cross_config.gdb_cross.target_device.ssh_sshexec,
+                        "args": gdb_cross_config.target_ssh_gdbserver_start_args(gdbserver_mode),
                         "problemMatcher": [
                             {
                                 "pattern": [
@@ -436,7 +657,12 @@ class IdeVSCode(IdeBase):
                                 }
                             }
                         ]
-                    })
+                    }
+                    if gdbserver_mode != GdbServerModes.ATTACH:
+                        new_task['dependsOn'] = [
+                            dt_build_deploy_label
+                        ]
+                    tasks_dict['tasks'].append(new_task)
         tasks_file = 'tasks.json'
         IdeBase.update_json_file(
             self.dot_code_dir(modified_recipe), tasks_file, tasks_dict)
@@ -444,6 +670,8 @@ class IdeVSCode(IdeBase):
     def vscode_tasks(self, args, modified_recipe):
         if modified_recipe.build_tool.is_c_ccp:
             self.vscode_tasks_cpp(args, modified_recipe)
+        elif modified_recipe.build_tool == BuildTool.KERNEL_MODULE:
+            self.vscode_tasks_kernel_module(args, modified_recipe)
         else:
             self.vscode_tasks_fallback(args, modified_recipe)
 
@@ -453,8 +681,8 @@ class IdeVSCode(IdeBase):
         self.vscode_c_cpp_properties(modified_recipe)
         if args.target:
             self.initialize_gdb_cross_configs(
-                image_recipe, modified_recipe, gdb_cross_config_class=GdbCrossConfigVSCode)
-            self.vscode_launch(modified_recipe)
+                image_recipe, modified_recipe, GdbCrossConfigVSCode)
+            self.vscode_launch(args, modified_recipe)
             self.vscode_tasks(args, modified_recipe)
 
 

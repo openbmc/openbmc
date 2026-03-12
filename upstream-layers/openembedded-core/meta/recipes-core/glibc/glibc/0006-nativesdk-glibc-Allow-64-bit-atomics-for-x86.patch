@@ -1,4 +1,4 @@
-From 9b408439eb042c4fc5cb33c8929dea419bf25b41 Mon Sep 17 00:00:00 2001
+From 2152334c3be94993763c5abfb2911ace0b191cd1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 31 Dec 2015 14:35:35 -0800
 Subject: [PATCH] nativesdk-glibc: Allow 64 bit atomics for x86

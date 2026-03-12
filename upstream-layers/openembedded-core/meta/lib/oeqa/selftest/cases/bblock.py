@@ -122,11 +122,11 @@ class BBLock(OESelftestTestCase):
         else:
             machine = "qemux86-64"
 
-        self.write_config('MACHINE = "%s"\n' % machine)
+        self.write_config('MACHINE:forcevariable = "%s"\n' % machine)
 
         self.lock_recipes(recipes, tasks)
 
-        self.write_config('MACHINE = "%s"\n' % self.td["MACHINE"])
+        self.write_config('MACHINE:forcevariable = "%s"\n' % self.td["MACHINE"])
         # modify quilt's do_compile task
         self.modify_tasks(recipes, tasks)
 

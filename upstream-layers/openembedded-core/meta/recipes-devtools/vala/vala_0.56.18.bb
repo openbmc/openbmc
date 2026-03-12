@@ -16,15 +16,15 @@ BBCLASSEXTEND = "native"
 LICENSE = "LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 
-SHRT_VER = "${@d.getVar('PV').split('.')[0]}.${@d.getVar('PV').split('.')[1]}"
+GNOMEBASEBUILDCLASS = "autotools"
 
-SRC_URI = "http://ftp.gnome.org/pub/GNOME/sources/${BPN}/${SHRT_VER}/${BP}.tar.xz"
-SRC_URI[sha256sum] = "f2affe7d40ab63db8e7b9ecc3f6bdc9c2fc7e3134c84ff2d795f482fe926a382"
+inherit gnomebase upstream-version-is-even
 
-inherit autotools pkgconfig upstream-version-is-even
+SRC_URI[archive.sha256sum] = "f2affe7d40ab63db8e7b9ecc3f6bdc9c2fc7e3134c84ff2d795f482fe926a382"
+
+SHRT_VER = "${@gnome_verdir("${PV}")}"
 
 FILES:${PN} += "${datadir}/${BPN}-${SHRT_VER}/vapi ${libdir}/${BPN}-${SHRT_VER}/"
-FILES:${PN}-doc += "${datadir}/devhelp"
 
 # .gir files from gobject-introspection are installed to ${libdir} when multilib is enabled
 GIRDIR_OPT = "${@'--girdir=${STAGING_LIBDIR}/gir-1.0' if d.getVar('MULTILIBS') else ''}"

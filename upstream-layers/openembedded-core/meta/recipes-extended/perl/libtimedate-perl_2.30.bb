@@ -6,7 +6,7 @@ SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=21;md5=576b7cb41e5e821501a01ed66f0f9d9e"
 
-SRC_URI = "http://search.cpan.org/CPAN/authors/id/G/GB/GBARR/TimeDate-${PV}.tar.gz"
+SRC_URI = "${CPAN_MIRROR}/authors/id/G/GB/GBARR/TimeDate-${PV}.tar.gz"
 
 S = "${UNPACKDIR}/TimeDate-${PV}"
 

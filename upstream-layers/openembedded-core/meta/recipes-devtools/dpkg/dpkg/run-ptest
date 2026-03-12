@@ -1,0 +1,35 @@
+#!/bin/sh
+
+rm -f dpkg-test.log
+cd tests
+
+FAILED_TESTS=0
+ALL_TESTS=0
+
+# During installation the "DEBIAN" folders are renamed to avoid
+# problems with packaging. Restore their names here.
+for d in $(find . -name DEBIAN-ptest -type d); do
+        dname=$(dirname "$d")
+        mv ${d} ${dname}/DEBIAN
+done
+
+# This allows running tests that require root access (which we have)
+export DPKG_AS_ROOT=1
+
+for test in $(grep "TESTS_PASS +=" Makefile | cut -f3 -d" "); do
+    ALL_TESTS=$((ALL_TESTS + 1))
+    make ${test}-test >> ../dpkg-test.log 2>&1
+
+    if [ $? -eq 0 ]; then
+        echo PASS: $test
+    else
+        echo FAIL: $test
+        FAILED_TESTS=$((FAILED_TESTS + 1))
+    fi
+done
+
+if [ $FAILED_TESTS -eq 0 ]; then
+    echo All $ALL_TESTS tests passed
+else
+    echo $FAILED_TESTS of $ALL_TESTS tests failed
+fi

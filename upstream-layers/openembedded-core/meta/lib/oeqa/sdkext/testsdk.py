@@ -35,7 +35,8 @@ class TestSDKExt(TestSDKBase):
                     " tests: 'bitbake <image> -c populate_sdk_ext' ." % tcname)
 
         tdname = d.expand("${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.testdata.json")
-        test_data = json.load(open(tdname, "r"))
+        with open(tdname, "r") as f:
+            test_data = json.load(f)
 
         target_pkg_manifest = OESDKExtTestContextExecutor._load_manifest(
             d.expand("${SDK_DEPLOY}/${TOOLCHAINEXT_OUTPUTNAME}.target.manifest"))

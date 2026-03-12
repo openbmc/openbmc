@@ -28,7 +28,7 @@ LTO:pn-grub-efi = ""
 # Custom LTO flags
 # disable partitioning/streaming algorithm since its uses ASM
 # constructs not compatible with lto
-LTOEXTRA:pn-alsa-lib = "-flto-partition=none"
+LTOEXTRA:pn-alsa-lib:toolchain-gcc = "-flto-partition=none"
 
 LTOEXTRA ?= ""
 
@@ -43,7 +43,11 @@ LTOEXTRA ?= ""
 # -fuse-linker-plugin
 # ensures that libraries participate in LTO by supplying intermediate
 # code from .a files to linker
-LTO ?= "-flto -ffat-lto-objects -fuse-linker-plugin ${LTOEXTRA}"
+LTO_DEFAULT = "-flto -ffat-lto-objects -fuse-linker-plugin ${LTOEXTRA}"
+
+LTO_DEFAULT:toolchain-clang = "${@bb.utils.contains('DISTRO_FEATURES', 'thin-lto', '-flto=thin ${LTOEXTRA}', '-flto ${LTOEXTRA}', d)}"
+
+LTO ?= "${LTO_DEFAULT}"
 
 SELECTED_OPTIMIZATION:append = "${@bb.utils.contains('DISTRO_FEATURES', 'lto', ' ${LTO}', '', d)}"
 TARGET_LDFLAGS:append:class-target = "${@bb.utils.contains('DISTRO_FEATURES', 'lto', ' ${LTO}', '', d)}"

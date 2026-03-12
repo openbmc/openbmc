@@ -1,5 +1,6 @@
 SUMMARY = "Keyboard maps"
 DESCRIPTION = "Keymaps and initscript to set the keymap on bootup."
+HOMEPAGE = "https://www.yoctoproject.org/"
 SECTION = "base"
 
 RDEPENDS:${PN} = "kbd"

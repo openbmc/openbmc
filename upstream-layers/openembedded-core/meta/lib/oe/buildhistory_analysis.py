@@ -13,6 +13,7 @@
 import sys
 import os.path
 import difflib
+import functools
 import git
 import re
 import shlex
@@ -26,14 +27,14 @@ import bb.tinfoil
 list_fields = ['DEPENDS', 'RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RREPLACES', 'RCONFLICTS', 'FILES', 'FILELIST', 'USER_CLASSES', 'IMAGE_CLASSES', 'IMAGE_FEATURES', 'IMAGE_LINGUAS', 'IMAGE_INSTALL', 'BAD_RECOMMENDATIONS', 'PACKAGE_EXCLUDE']
 list_order_fields = ['PACKAGES']
 defaultval_map = {'PKG': 'PKG', 'PKGE': 'PE', 'PKGV': 'PV', 'PKGR': 'PR'}
-numeric_fields = ['PKGSIZE', 'IMAGESIZE']
+numeric_fields = ['PKGSIZE', 'IMAGESIZE', 'SDKSIZE']
 # Fields to monitor
-monitor_fields = ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RREPLACES', 'RCONFLICTS', 'PACKAGES', 'FILELIST', 'PKGSIZE', 'IMAGESIZE', 'PKG']
+monitor_fields = ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RREPLACES', 'RCONFLICTS', 'PACKAGES', 'FILELIST', 'PKGSIZE', 'IMAGESIZE', 'SDKSIZE', 'PKG']
 ver_monitor_fields = ['PKGE', 'PKGV', 'PKGR']
 # Percentage change to alert for numeric fields
 monitor_numeric_threshold = 10
 # Image files to monitor (note that image-info.txt is handled separately)
-img_monitor_files = ['installed-package-names.txt', 'files-in-image.txt']
+img_monitor_files = ['installed-package-names.txt', 'files-in-image.txt', 'files-in-sdk.txt']
 
 colours = {
     'colour_default': '',
@@ -149,10 +150,10 @@ class ChangeRecord:
                         lines.append('removed "{colour_remove}{value}{colour_default}"'.format(value=' '.join(removed), **colours))
                     if added:
                         lines.append('added "{colour_add}{value}{colour_default}"'.format(value=' '.join(added), **colours))
-            else:
+            elif not renamed_dirs:
                 lines.append('changed order')
 
-            if not (removed or added or changed_order):
+            if not (removed or added or changed_order or renamed_dirs):
                 out = ''
             else:
                 out = '%s: %s' % (self.fieldname, ', '.join(lines))
@@ -206,6 +207,7 @@ class ChangeRecord:
 
         return '%s%s' % (prefix, out) if out else ''
 
+@functools.total_ordering
 class FileChange:
     changetype_add = 'A'
     changetype_remove = 'R'
@@ -256,6 +258,12 @@ class FileChange:
             return '%s moved to %s' % (self.path, self.oldvalue)
         else:
             return '%s changed (unknown)' % self.path
+
+    def __eq__(self, other):
+        return (self.path, self.changetype, self.oldvalue, self.oldvalue) == (other.path, other.changetype, other.oldvalue, other.oldvalue)
+
+    def __lt__(self, other):
+        return (self.path, self.changetype, self.oldvalue, self.oldvalue) < (other.path, other.changetype, other.oldvalue, other.oldvalue)
 
 def blob_to_dict(blob):
     alines = [line for line in blob.data_stream.read().decode('utf-8').splitlines()]
@@ -662,7 +670,7 @@ def process_changes(repopath, revision1, revision2='HEAD', report_all=False, rep
                     filechanges = compare_lists(alines,blines)
                     if filechanges:
                         chg = ChangeRecord(path, filename, None, None, True)
-                        chg.filechanges = filechanges
+                        chg.filechanges = sorted(filechanges)
                         changes.append(chg)
                 else:
                     chg = ChangeRecord(path, filename, d.a_blob.data_stream.read().decode('utf-8'), d.b_blob.data_stream.read().decode('utf-8'), True)
@@ -672,6 +680,31 @@ def process_changes(repopath, revision1, revision2='HEAD', report_all=False, rep
             elif '/image-files/' in path:
                 chg = ChangeRecord(path, filename, d.a_blob.data_stream.read().decode('utf-8'), d.b_blob.data_stream.read().decode('utf-8'), True)
                 changes.append(chg)
+
+        elif path.startswith('sdk/'):
+            filename = os.path.basename(d.a_blob.path)
+            if filename in img_monitor_files:
+                if filename == 'files-in-sdk.txt':
+                    alines = d.a_blob.data_stream.read().decode('utf-8').splitlines()
+                    blines = d.b_blob.data_stream.read().decode('utf-8').splitlines()
+                    filechanges = compare_file_lists(alines,blines)
+                    if filechanges:
+                        chg = ChangeRecord(path, filename, None, None, True)
+                        chg.filechanges = filechanges
+                        changes.append(chg)
+                elif filename == 'installed-package-names.txt':
+                    alines = d.a_blob.data_stream.read().decode('utf-8').splitlines()
+                    blines = d.b_blob.data_stream.read().decode('utf-8').splitlines()
+                    filechanges = compare_lists(alines,blines)
+                    if filechanges:
+                        chg = ChangeRecord(path, filename, None, None, True)
+                        chg.filechanges = sorted(filechanges)
+                        changes.append(chg)
+                else:
+                    chg = ChangeRecord(path, filename, d.a_blob.data_stream.read().decode('utf-8'), d.b_blob.data_stream.read().decode('utf-8'), True)
+                    changes.append(chg)
+            elif filename == 'sdk-info.txt':
+                changes.extend(compare_dict_blobs(path, d.a_blob, d.b_blob, report_all, report_ver))
 
     # Look for added preinst/postinst/prerm/postrm
     # (without reporting newly added recipes)

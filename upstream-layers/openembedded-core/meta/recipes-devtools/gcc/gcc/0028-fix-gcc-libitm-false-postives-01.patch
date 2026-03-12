@@ -1,0 +1,187 @@
+From b129ff0880c6d10e0379b46889d01255ee8d1f82 Mon Sep 17 00:00:00 2001
+From: Pietro Monteiro <pietro@sociotechnical.xyz>
+Date: Fri, 30 Jan 2026 20:22:49 -0500
+Subject: libitm: testsuite: don't include libstdc++ paths in test names
+ [PR69018]
+
+Libitm C++ tests pass -B/full/path/to/build/libstc++/src/.libs on the
+options argument to dg-runtest and the libstdc++ include paths as
+the default-extra-options.  This causes 2 problems:
+
+1) If a test uses `dg-options' then the libstdc++ include paths are
+not passed to the compiler.
+
+2) The `-B/full/path/to/build/libstc++/src/.libs' gets added to the
+test name.  This makes comparing build done in different directories
+harder because the hardcoded full path.
+
+Stop passing options and default-extra-options to dg-runtest and move
+dealing with the path-releated flags to libitm_target_compile in
+libitm.exp, where they are added to additional_flags.
+
+Also change the FSF address to the website in the license text.
+
+libitm/ChangeLog:
+	PR libitm/69018
+	* testsuite/lib/libitm.exp (libitm_target_compile): Add
+	lang_include_flags and `-B${blddir}/${lang_library_paths}' to
+	additional_flags.
+	* testsuite/libitm.c++/c++.exp: Set lang_library_paths and lang_include_flags.
+
+Upstream-Status: Backport [https://gcc.gnu.org/cgit/gcc/patch/?id=b129ff0880c6d10e0379b46889d01255ee8d1f82]
+
+Signed-off-by: Pietro Monteiro <pietro@sociotechnical.xyz>
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+---
+ libitm/testsuite/lib/libitm.exp     | 25 ++++++++++----
+ libitm/testsuite/libitm.c++/c++.exp | 67 +++++++++++++++++--------------------
+ 2 files changed, 48 insertions(+), 44 deletions(-)
+
+diff --git a/libitm/testsuite/lib/libitm.exp b/libitm/testsuite/lib/libitm.exp
+index 0b3301537cee..69a49906d338 100644
+--- a/libitm/testsuite/lib/libitm.exp
++++ b/libitm/testsuite/lib/libitm.exp
+@@ -9,8 +9,7 @@
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++# along with this program; if not, see <http://www.gnu.org/licenses/>.
+ 
+ # Damn dejagnu for not having proper library search paths for load_lib.
+ # We have to explicitly load everything that gcc-dg.exp wants to load.
+@@ -193,14 +192,24 @@ proc libitm_target_compile { source dest type options } {
+     global gluefile wrap_flags
+     global ALWAYS_CFLAGS
+     global GCC_UNDER_TEST
+-    global lang_test_file
+-    global lang_library_path
++    global lang_library_paths
+     global lang_link_flags
++    global lang_include_flags
+ 
+-    if { [info exists lang_test_file] } {
+-	if { $blddir != "" } {
++    if { [info exists lang_include_flags] } {
++	lappend options "additional_flags=${lang_include_flags}"
++    }
++
++    if { [info exists lang_library_paths] } {
++	foreach lang_library_path $lang_library_paths {
++	    # targets that use lib[...].a%s in their specs need a -B option
++	    # for uninstalled testing.
++	    lappend options "additional_flags=-B${blddir}/${lang_library_path}"
+ 	    lappend options "ldflags=-L${blddir}/${lang_library_path}"
+ 	}
++    }
++
++    if { [info exists lang_link_flags] } {
+ 	lappend options "ldflags=${lang_link_flags}"
+     }
+ 
+@@ -219,7 +228,9 @@ proc libitm_target_compile { source dest type options } {
+ 	set options [concat "$ALWAYS_CFLAGS" $options]
+     }
+ 
+-    set options [dg-additional-files-options $options $source $dest $type]
++    if { $source != "" } {
++        set options [dg-additional-files-options $options $source $dest $type]
++    }
+ 
+     set result [target_compile $source $dest $type $options]
+ 
+diff --git a/libitm/testsuite/libitm.c++/c++.exp b/libitm/testsuite/libitm.c++/c++.exp
+index a1ce7ce4062e..90f3058e7249 100644
+--- a/libitm/testsuite/libitm.c++/c++.exp
++++ b/libitm/testsuite/libitm.c++/c++.exp
+@@ -11,8 +11,7 @@
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License
+-# along with this program; if not, write to the Free Software
+-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++# along with this program; if not, see <http://www.gnu.org/licenses/>.
+ 
+ load_lib libitm-dg.exp
+ load_gcc_lib gcc-dg.exp
+@@ -33,48 +32,42 @@ set blddir [lookfor_file [get_multilibs] libitm]
+ 
+ 
+ if { $blddir != "" } {
+-    # Look for a static libstdc++ first.
+-    if [file exists "${blddir}/${lang_library_path}/libstdc++.a"] {
+-	set lang_test_file "${lang_library_path}/libstdc++.a"
+-	set lang_test_file_found 1
+-	# We may have a shared only build, so look for a shared libstdc++.
+-    } elseif [file exists "${blddir}/${lang_library_path}/libstdc++.${shlib_ext}"] {
+-	set lang_test_file "${lang_library_path}/libstdc++.${shlib_ext}"
+-	set lang_test_file_found 1
+-    } else {
+-	puts "No libstdc++ library found, will not execute c++ tests"
++    if { ![file exists "${blddir}/${lang_library_path}/libstdc++.a"]
++	 && ![file exists "${blddir}/${lang_library_path}/libstdc++.${shlib_ext}"] } {
++	verbose -log "No libstdc++ library found, will not execute c++ tests"
++	unset lang_library_path
++	return
+     }
+-} elseif { [info exists GXX_UNDER_TEST] } {
+-    set lang_test_file_found 1
+-    # Needs to exist for libitm.exp.
+-    set lang_test_file ""
++    lappend lang_library_paths ${lang_library_path}
++} elseif { ![info exists GXX_UNDER_TEST] } {
++    verbose -log "GXX_UNDER_TEST not defined, will not execute c++ tests"
++    return
++}
++
++# Gather a list of all tests.
++set tests [lsort [glob -nocomplain $srcdir/$subdir/*.C]]
++
++if { $blddir != "" } {
++    set ld_library_path "$always_ld_library_path:${blddir}/${lang_library_path}"
+ } else {
+-    puts "GXX_UNDER_TEST not defined, will not execute c++ tests"
++    set ld_library_path "$always_ld_library_path"
+ }
+ 
+-if { $lang_test_file_found } {
+-    # Gather a list of all tests.
+-    set tests [lsort [glob -nocomplain $srcdir/$subdir/*.C]]
++append ld_library_path [gcc-set-multilib-library-path $GCC_UNDER_TEST]
++set_ld_library_path_env_vars
+ 
+-    set stdcxxadder ""
+-    if { $blddir != "" } {
+-	set ld_library_path "$always_ld_library_path:${blddir}/${lang_library_path}"
+-	set stdcxxadder "-B ${blddir}/${lang_library_path}"
+-    } else {
+-	set ld_library_path "$always_ld_library_path"
+-    }
+-    append ld_library_path [gcc-set-multilib-library-path $GCC_UNDER_TEST]
+-    set_ld_library_path_env_vars
++set flags_file "${blddir}/../libstdc++-v3/scripts/testsuite_flags"
++if { [file exists $flags_file] } {
++    set lang_include_flags [exec sh $flags_file --build-includes]
++}
+ 
+-    set flags_file "${blddir}/../libstdc++-v3/scripts/testsuite_flags"
+-    if { [file exists $flags_file] } {
+-	set libstdcxx_includes [exec sh $flags_file --build-includes]
+-    } else {
+-	set libstdcxx_includes ""
+-    }
++# Main loop.
++dg-runtest $tests "" ""
+ 
+-    # Main loop.
+-    dg-runtest $tests $stdcxxadder $libstdcxx_includes
++if { $blddir != "" } {
++    unset lang_include_flags
++    unset lang_library_path
++    unset lang_library_paths
+ }
+ 
+ # All done.
+-- 
+cgit 

@@ -220,17 +220,19 @@ apply_cfgfile() {
 }
 
 clearcache=0
-exec 9</proc/cmdline
-while read -r line <&9
-do
-	case "$line" in
-		*clearcache*)  clearcache=1
-			       ;;
-		*)	       continue
-			       ;;
-	esac
-done
-exec 9>&-
+if test -z "$ROOT_DIR"; then
+	exec 9</proc/cmdline
+	while read -r line <&9
+	do
+		case "$line" in
+			*clearcache*)  clearcache=1
+					;;
+			*)	       continue
+					;;
+		esac
+	done
+	exec 9>&-
+fi
 
 if test -e "${ROOT_DIR}/etc/volatile.cache" -a "$VOLATILE_ENABLE_CACHE" = "yes" -a "x$1" != "xupdate" -a "x$clearcache" = "x0"
 then

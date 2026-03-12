@@ -156,6 +156,7 @@ class ItsNodeRootKernel(ItsNode):
     def __init__(self, description, address_cells, host_prefix, arch, conf_prefix,
                  sign_enable=False, sign_keydir=None,
                  mkimage=None, mkimage_dtcopts=None,
+                 mkimage_extra_opts=None,
                  mkimage_sign=None, mkimage_sign_args=None,
                  hash_algo=None, sign_algo=None, pad_algo=None,
                  sign_keyname_conf=None,
@@ -177,6 +178,7 @@ class ItsNodeRootKernel(ItsNode):
         self._sign_keydir = sign_keydir
         self._mkimage = mkimage
         self._mkimage_dtcopts = mkimage_dtcopts
+        self._mkimage_extra_opts = shlex.split(mkimage_extra_opts) if mkimage_extra_opts else []
         self._mkimage_sign = mkimage_sign
         self._mkimage_sign_args = mkimage_sign_args
         self._hash_algo = hash_algo
@@ -193,6 +195,7 @@ class ItsNodeRootKernel(ItsNode):
         self._ramdisk = None
         self._bootscr = None
         self._setup = None
+        self._loadables = []
 
     def _sanitize_sign_config(self):
         if self._sign_enable:
@@ -331,7 +334,6 @@ class ItsNodeRootKernel(ItsNode):
         dtb_id = os.path.basename(dtb_path)
         dtb_alias_node = ItsNodeDtbAlias("fdt-" + dtb_id, dtb_alias_id, compatible)
         self._dtb_alias.append(dtb_alias_node)
-        bb.warn(f"compatible: {compatible}, dtb_alias_id: {dtb_alias_id}, dtb_id: {dtb_id}, dtb_path: {dtb_path}")
 
     def fitimage_emit_section_boot_script(self, bootscr_id, bootscr_path):
         """Emit the fitImage ITS u-boot script section"""
@@ -395,6 +397,29 @@ class ItsNodeRootKernel(ItsNode):
         )
         self._ramdisk = ramdisk_node
 
+    def fitimage_emit_section_loadable(self, name, filepath, type=None, description=None, compression=None, arch=None, os=None, load=None, entry=None):
+        """Emit one fitImage ITS loadable section"""
+        opt_props = {
+            "data": '/incbin/("' + filepath + '")',
+            "arch": arch if arch is not None else self._arch,
+            "os": os if os is not None else "linux",
+        }
+
+        if load:
+            opt_props["load"] = f"<{load}>"
+        if entry:
+            opt_props["entry"] = f"<{entry}>"
+
+        loadable_node = self.its_add_node_image(
+            name,
+            description if description is not None else name,
+            type if type is not None else "firmware",
+            compression if compression is not None else "none",
+            opt_props
+        )
+
+        self._loadables.append(loadable_node)
+
     def _fitimage_emit_one_section_config(self, conf_node_name, dtb=None):
         """Emit the fitImage ITS configuration section"""
         opt_props = {}
@@ -433,6 +458,12 @@ class ItsNodeRootKernel(ItsNode):
             if self._sign_enable:
                 sign_entries.append("setup")
 
+        if len(self._loadables) > 0:
+            conf_desc.append("loadables")
+            opt_props["loadables"] = [ loadable.name for loadable in self._loadables ]
+            if self._sign_enable:
+                sign_entries.append("loadables")
+
         # First added configuration is the default configuration
         default_flag = "0"
         if len(self.configurations.sub_nodes) == 0:
@@ -462,15 +493,63 @@ class ItsNodeRootKernel(ItsNode):
                 }
             )
 
-    def fitimage_emit_section_config(self, default_dtb_image=None):
+    def fitimage_emit_section_config(self, default_dtb_image=None, mappings=None):
         if self._dtbs:
+            dtb_extra_confs = []
+            dtb_confs = {}
+            if mappings:
+                for mapping in mappings.split():
+                    try:
+                        mapping_type, dtb_name, alt_name = mapping.split(':')
+                    except ValueError:
+                        bb.fatal("FIT configuration mapping '%s' is invalid. Expected format: 'mapping_type:dtb_name:alternative_name'" % mapping)
+                    if mapping_type == "dtb-conf":
+                        if dtb_name in dtb_confs:
+                            bb.fatal("FIT configuration mapping 'dtb-conf:%s' specified multiple times" % dtb_name)
+                        dtb_confs[dtb_name] = alt_name
+                    elif mapping_type == "dtb-extra-conf":
+                        dtb_extra_confs.append((dtb_name, alt_name))
+                    else:
+                        bb.fatal("FIT configuration mapping-type '%s' is invalid" % mapping_type)
+
+            # Process regular DTBs
             for dtb in self._dtbs:
                 dtb_name = dtb.name
                 if dtb.name.startswith("fdt-"):
                     dtb_name = dtb.name[len("fdt-"):]
-                self._fitimage_emit_one_section_config(self._conf_prefix + dtb_name, dtb)
-            for dtb in self._dtb_alias:
-                self._fitimage_emit_one_section_config(self._conf_prefix + dtb.alias_name, dtb)
+
+                dtb_renamed = dtb_name
+                if dtb_name in dtb_confs:
+                    dtb_renamed = dtb_confs.pop(dtb_name)
+                self._fitimage_emit_one_section_config(self._conf_prefix + dtb_renamed, dtb)
+
+                # Process extra configurations for this DTB
+                for dtb_extra_name, dtb_extra_alias in dtb_extra_confs[:]:
+                    if dtb_name == dtb_extra_name:
+                        dtb_extra_confs.remove((dtb_extra_name, dtb_extra_alias))
+                        self._fitimage_emit_one_section_config(self._conf_prefix + dtb_extra_alias, dtb)
+
+            # Process external DTB sym-link aliases
+            for dtb_alias in self._dtb_alias:
+                alias_name = dtb_alias.alias_name
+                dtb_renamed = alias_name
+                if alias_name in dtb_confs:
+                    dtb_renamed = dtb_confs.pop(alias_name)
+                self._fitimage_emit_one_section_config(self._conf_prefix + dtb_renamed, dtb_alias)
+
+                # Process extra configurations for this DTB alias
+                for dtb_extra_name, dtb_extra_alias in dtb_extra_confs[:]:
+                    if alias_name == dtb_extra_name:
+                        dtb_extra_confs.remove((dtb_extra_name, dtb_extra_alias))
+                        self._fitimage_emit_one_section_config(self._conf_prefix + dtb_extra_alias, dtb_alias)
+
+            # Verify all mappings were used
+            if dtb_confs or dtb_extra_confs:
+                unused_conf = (
+                    ["dtb-conf:%s:%s" % (name, alt) for name, alt in dtb_confs.items()] +
+                    ["dtb-extra-conf:%s:%s" % (name, alias) for name, alias in dtb_extra_confs]
+                )
+                bb.fatal("FIT configuration mapping(s) not matched with any DTB: %s" % ', '.join(unused_conf))
         else:
             # Currently exactly one kernel is supported.
             self._fitimage_emit_one_section_config(self._conf_prefix + "1")
@@ -483,6 +562,7 @@ class ItsNodeRootKernel(ItsNode):
     def run_mkimage_assemble(self, itsfile, fitfile):
         cmd = [
             self._mkimage,
+            *self._mkimage_extra_opts,
             '-f', itsfile,
             fitfile
         ]

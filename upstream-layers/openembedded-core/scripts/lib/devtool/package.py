@@ -7,7 +7,6 @@
 """Devtool plugin containing the package subcommands"""
 
 import os
-import subprocess
 import logging
 from bb.process import ExecutionError
 from devtool import exec_build_env_command, setup_tinfoil, check_workspace_recipe, DevtoolError

@@ -36,11 +36,8 @@ EXTRA_OECONF = "--enable-xim \
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[startup] = "--enable-startup-notification,--disable-startup-notification,startup-notification,"
 
-do_configure:prepend () {
-	if [ ! -e ${S}/acinclude.m4 ]; then
-		cp ${S}/aclocal.m4 ${S}/acinclude.m4
-	fi
-}
+# Ensure we don't delete the shipped aclocal.m4
+EXTRA_AUTORECONF += "--exclude=aclocal"
 
 do_compile:prepend () {
 	echo '#define UTMP_FILE "${localstatedir}/run/utmp"' >> config.h

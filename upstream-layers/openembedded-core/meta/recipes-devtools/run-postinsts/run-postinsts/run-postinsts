@@ -62,26 +62,33 @@ if [ "$POSTINST_LOGGING" = "1" ]; then
 fi
 
 exec_postinst_scriptlets() {
-	for i in `ls $pi_dir`; do
-		i=$pi_dir/$i
+	ret=0
+	for i in "$pi_dir"/*; do
 		echo "Running postinst $i..."
 		[ "$POSTINST_LOGGING" = "1" ] && eval echo "Running postinst $i..." $append_log
-		if [ -x $i ]; then
-			(sh -c $i $append_log)
-			rm $i
+		if [ -x "$i" ]; then
+			(sh -c "$i $append_log")
+			status=$?
+			if [ $status -ne 0 ]; then
+				echo "ERROR: postinst $i failed with exit code $status."
+				[ "$POSTINST_LOGGING" = "1" ] && eval echo "ERROR: postinst $i failed with exit code $status." $append_log
+				ret=1
+			else
+				rm -f "$i"
+			fi
 		else
-			echo "ERROR: postinst $i failed."
-			[ "$POSTINST_LOGGING" = "1" ] && eval echo "ERROR: postinst $i failed." $append_log
-			remove_rcsd_link=0
+			echo "ERROR: postinst $i is not executable."
+			[ "$POSTINST_LOGGING" = "1" ] && eval echo "ERROR: postinst $i is not executable." $append_log
+			ret=1
 		fi
 	done
+	return $ret
 }
 
-remove_rcsd_link=1
 if $pm_installed; then
 	case $pm in
 		"ipk")
-			if ! `fcntl-lock --wait 30 /run/opkg.lock true`; then
+			if ! `flock --fcntl --wait 30 /run/opkg.lock true`; then
 				eval echo "Unable to obtain the opkg lock, deadlock?" $append_log
 			fi
 			if ! eval "opkg configure $append_log"; then
@@ -96,10 +103,9 @@ if $pm_installed; then
 			;;
 	esac
 else
-	exec_postinst_scriptlets
-fi
-
-# since all postinstalls executed successfully, remove the rcS.d link
-if [ $remove_rcsd_link = 1 ]; then
+	if ! exec_postinst_scriptlets; then
+		exit 1
+	fi
+	# since all postinstalls executed successfully, remove the rcS.d link
 	remove_rcsd_link
 fi

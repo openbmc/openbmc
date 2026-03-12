@@ -28,7 +28,8 @@ class Partition():
         self.align = args.align
         self.disk = args.disk
         self.device = None
-        self.extra_space = args.extra_space
+        self.extra_filesystem_space = args.extra_filesystem_space
+        self.extra_partition_space = args.extra_partition_space
         self.exclude_path = args.exclude_path
         self.include_path = args.include_path
         self.change_directory = args.change_directory
@@ -91,21 +92,20 @@ class Partition():
     def get_rootfs_size(self, actual_rootfs_size=0):
         """
         Calculate the required size of rootfs taking into consideration
-        --size/--fixed-size flags as well as overhead and extra space, as
-        specified in kickstart file. Raises an error if the
-        `actual_rootfs_size` is larger than fixed-size rootfs.
-
+        --size/--fixed-size and --extra-partition-space flags as well as overhead
+        and extra space, as specified in kickstart file. Raises an error
+        if the `actual_rootfs_size` is larger than fixed-size rootfs.
         """
         if self.fixed_size:
-            rootfs_size = self.fixed_size
+            rootfs_size = self.fixed_size - self.extra_partition_space
             if actual_rootfs_size > rootfs_size:
                 raise WicError("Actual rootfs size (%d kB) is larger than "
                                "allowed size %d kB" %
                                (actual_rootfs_size, rootfs_size))
         else:
             extra_blocks = self.get_extra_block_count(actual_rootfs_size)
-            if extra_blocks < self.extra_space:
-                extra_blocks = self.extra_space
+            if extra_blocks < self.extra_filesystem_space:
+                extra_blocks = self.extra_filesystem_space
 
             rootfs_size = actual_rootfs_size + extra_blocks
             rootfs_size = int(rootfs_size * self.overhead_factor)
@@ -119,10 +119,18 @@ class Partition():
     def disk_size(self):
         """
         Obtain on-disk size of partition taking into consideration
-        --size/--fixed-size options.
+        --size/--fixed-size and --extra-partition-space options.
 
         """
-        return self.fixed_size if self.fixed_size else self.size
+        return self.fixed_size if self.fixed_size else self.size + self.extra_partition_space
+
+    @property
+    def fs_size(self):
+        """
+        Obtain on-disk size of filesystem inside the partition taking into
+        consideration --size/--fixed-size and --extra-partition-space options.
+        """
+        return self.fixed_size - self.extra_partition_space if self.fixed_size else self.size
 
     def prepare(self, creator, cr_workdir, oe_builddir, rootfs_dir,
                 bootimg_dir, kernel_dir, native_sysroot, updated_fstab_path):
@@ -170,7 +178,7 @@ class Partition():
         if self.source not in plugins:
             raise WicError("The '%s' --source specified for %s doesn't exist.\n\t"
                            "See 'wic list source-plugins' for a list of available"
-                           " --sources.\n\tSee 'wic help source-plugins' for "
+                           " --sources.\n\tSee 'wic help plugins' for "
                            "details on adding a new source plugin." %
                            (self.source, self.mountpoint))
 
@@ -202,10 +210,10 @@ class Partition():
                            "This a bug in source plugin %s and needs to be fixed." %
                            (self.mountpoint, self.source))
 
-        if self.fixed_size and self.size > self.fixed_size:
+        if self.fixed_size and self.size + self.extra_partition_space > self.fixed_size:
             raise WicError("File system image of partition %s is "
-                           "larger (%d kB) than its allowed size %d kB" %
-                           (self.mountpoint, self.size, self.fixed_size))
+                           "larger (%d kB + %d kB extra part space) than its allowed size %d kB" %
+                           (self.mountpoint, self.size, self.extra_partition_space, self.fixed_size))
 
     def prepare_rootfs(self, cr_workdir, oe_builddir, rootfs_dir,
                        native_sysroot, real_rootfs = True, pseudo_dir = None):
@@ -267,7 +275,7 @@ class Partition():
         self.source_file = rootfs
 
         # get the rootfs size in the right units for kickstart (kB)
-        du_cmd = "du -Lbks %s" % rootfs
+        du_cmd = "du --apparent-size -Lks %s" % rootfs
         out = exec_cmd(du_cmd)
         self.size = int(out.split()[0])
 
@@ -381,7 +389,7 @@ class Partition():
         """
         Prepare content for a msdos/vfat rootfs partition.
         """
-        du_cmd = "du -bks %s" % rootfs_dir
+        du_cmd = "du --apparent-size -ks %s" % rootfs_dir
         out = exec_cmd(du_cmd)
         blocks = int(out.split()[0])
 
@@ -440,7 +448,7 @@ class Partition():
         """
         Prepare an empty ext2/3/4 partition.
         """
-        size = self.disk_size
+        size = self.fs_size
         with open(rootfs, 'w') as sparse:
             os.ftruncate(sparse.fileno(), size * 1024)
 
@@ -464,7 +472,7 @@ class Partition():
         """
         Prepare an empty btrfs partition.
         """
-        size = self.disk_size
+        size = self.fs_size
         with open(rootfs, 'w') as sparse:
             os.ftruncate(sparse.fileno(), size * 1024)
 
@@ -482,7 +490,7 @@ class Partition():
         """
         Prepare an empty vfat partition.
         """
-        blocks = self.disk_size
+        blocks = self.fs_size
 
         label_str = "-n boot"
         if self.label:

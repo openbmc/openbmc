@@ -8,12 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING.LESSER;md5=a6f89e2100d9b6cdffcea4f398e37343"
 # Python 3.11+ is needed to build fedora-crypto-policies
 inherit allarch python3native
 
-SRC_URI = " \
-    git://gitlab.com/redhat-crypto/fedora-crypto-policies.git;protocol=https;branch=master \
-    file://0001-libreswan-Allow-skipping-test_config-for-old-ipsec.patch \
-"
+SRC_URI = "git://gitlab.com/redhat-crypto/fedora-crypto-policies.git;protocol=https;branch=master"
 
-SRCREV = "032b418a6db842f0eab330eb5909e4604e888728"
+SRCREV = "f3f5fa454345b03039ee3d904964fc14829637ce"
 UPSTREAM_CHECK_COMMITS = "1"
 
 do_compile () {

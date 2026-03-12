@@ -1,0 +1,39 @@
+From bcd6e2535cb0dbf72b677eb6bddb644cb035ed51 Mon Sep 17 00:00:00 2001
+From: Colin McAllister <colinmca242@gmail.com>
+Date: Fri, 13 Feb 2026 11:17:53 -0600
+Subject: [PATCH 1/1] gh-144787: [tests] Allow TLS v1.2 to be minimum version
+ (GH-144790)
+
+Allow TLS v1.2 to be minimum version
+
+Updates test_min_max_version to allow TLS v1.2 to be minimum version if
+TLS 1.0 and 1.1 are disabled in OpenSSL.
+
+Upstream-Status: Backport [https://github.com/python/cpython/commit/f24009feeb78f605a3ee177d9e7cfb63d5890ee1]
+
+Signed-off-by: Colin Pinnell McAllister <colinmca242@gmail.com>
+---
+ Lib/test/test_ssl.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index 6023c89bca..7e9ba735b3 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -1156,7 +1156,12 @@ def test_min_max_version(self):
+         ctx.maximum_version = ssl.TLSVersion.MINIMUM_SUPPORTED
+         self.assertIn(
+             ctx.maximum_version,
+-            {ssl.TLSVersion.TLSv1, ssl.TLSVersion.TLSv1_1, ssl.TLSVersion.SSLv3}
++            {
++                ssl.TLSVersion.TLSv1,
++                ssl.TLSVersion.TLSv1_1,
++                ssl.TLSVersion.TLSv1_2,
++                ssl.TLSVersion.SSLv3,
++            }
+         )
+ 
+         ctx.minimum_version = ssl.TLSVersion.MAXIMUM_SUPPORTED
+-- 
+2.49.1
+

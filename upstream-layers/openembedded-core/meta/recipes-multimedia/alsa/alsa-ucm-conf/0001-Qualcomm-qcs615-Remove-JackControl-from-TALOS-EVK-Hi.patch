@@ -1,0 +1,43 @@
+From 3e414225c90de8a9371076bcdd33693dfe8e54c2 Mon Sep 17 00:00:00 2001
+From: Le Qi <le.qi@oss.qualcomm.com>
+Date: Thu, 12 Feb 2026 15:16:41 +0800
+Subject: [PATCH] Qualcomm: qcs615: Remove JackControl from TALOS EVK HiFi
+ config
+
+The EVK board does not support headset or jack detection.
+Keeping JackControl entries prevents PipeWire (wpctl) from
+exposing sinks and sources correctly.
+
+Remove JackControl from Headphones and Headset devices so
+PipeWire can enumerate playback and capture nodes normally.
+
+Signed-off-by: Le Qi <le.qi@oss.qualcomm.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+Upstream-Status: Backport [https://github.com/alsa-project/alsa-ucm-conf/commit/e513b19d223f1559f43579e881ba86c618c142a9]
+---
+ ucm2/Qualcomm/qcs615/HiFi.conf | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/ucm2/Qualcomm/qcs615/HiFi.conf b/ucm2/Qualcomm/qcs615/HiFi.conf
+index 8978b2cb539d..a20fc89fa8f4 100644
+--- a/ucm2/Qualcomm/qcs615/HiFi.conf
++++ b/ucm2/Qualcomm/qcs615/HiFi.conf
+@@ -20,7 +20,6 @@ SectionDevice."Headphones" {
+ 		PlaybackPCM "hw:${CardId},0"
+ 		PlaybackMixer "default:${CardId}"
+ 		PlaybackMixerElem "HP Digital"
+-		JackControl "Headphone Jack"
+ 	}
+ }
+ 
+@@ -33,7 +32,6 @@ SectionDevice."Headset" {
+ 	Value {
+ 		CapturePriority 100
+ 		CapturePCM "hw:${CardId},1"
+-		JackControl "Mic Jack"
+ 		JackHWMute "Mic"
+ 	}
+ }
+-- 
+2.34.1
+

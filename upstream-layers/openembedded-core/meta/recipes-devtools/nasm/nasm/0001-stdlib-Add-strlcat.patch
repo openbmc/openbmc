@@ -12,64 +12,64 @@ Signed-off-by: Joshua Watt <JPEWhacker@gmail.com>
  Makefile.in        |  2 +-
  configure.ac       |  2 ++
  include/compiler.h |  4 ++++
- stdlib/strlcat.c   | 43 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 50 insertions(+), 1 deletion(-)
+ stdlib/strlcat.c   | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 49 insertions(+), 1 deletion(-)
  create mode 100644 stdlib/strlcat.c
 
 diff --git a/Makefile.in b/Makefile.in
-index b85ebee..045fabe 100644
+index fcf33ab..d91f7ab 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -104,7 +104,7 @@ PROGOBJ = $(NASM) $(NDISASM)
- PROGS   = nasm$(X) ndisasm$(X)
- 
- LIBOBJ_NW = stdlib/snprintf.$(O) stdlib/vsnprintf.$(O) stdlib/strlcpy.$(O) \
+@@ -174,7 +174,7 @@ LIBOBJ_W = \
+ # files to LIBOBJ_W, notably $(OUTPUTOBJ)
+ LIBOBJ_NW = \
+ 	stdlib/snprintf.$(O) stdlib/vsnprintf.$(O) stdlib/strlcpy.$(O) \
 -	stdlib/strnlen.$(O) stdlib/strrchrnul.$(O) \
 +	stdlib/strnlen.$(O) stdlib/strrchrnul.$(O) stdlib/strlcat.$(O) \
  	\
- 	nasmlib/ver.$(O) \
- 	nasmlib/alloc.$(O) nasmlib/asprintf.$(O) nasmlib/errfile.$(O) \
+ 	asm/directbl.$(O) \
+ 	asm/pptok.$(O) \
 diff --git a/configure.ac b/configure.ac
-index 42cd198..e206338 100644
+index 448eeb2..f79c96c 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -236,6 +236,7 @@ PA_FUNC_SNPRINTF
+@@ -229,6 +229,7 @@ PA_FUNC_SNPRINTF
  PA_FUNC_VSNPRINTF
  AC_CHECK_FUNCS([strlcpy])
  AC_CHECK_FUNCS([strrchrnul])
 +AC_CHECK_FUNCS([strlcat])
  
  dnl These types are POSIX-specific, and Windows does it differently...
- AC_CHECK_TYPES([struct _stati64])
-@@ -255,6 +256,7 @@ AC_CHECK_DECLS(strsep)
+ AC_CHECK_TYPES([struct stat], [AC_CHECK_FUNCS([stat fstat])])
+@@ -246,6 +247,7 @@ AC_CHECK_DECLS(strsep)
  AC_CHECK_DECLS(strlcpy)
  AC_CHECK_DECLS(strnlen)
  AC_CHECK_DECLS(strrchrnul)
 +AC_CHECK_DECLS(strlcat)
  
  dnl Check for missing types
- AC_TYPE_UINTPTR_T
+ AC_TYPE_UINTMAX_T
 diff --git a/include/compiler.h b/include/compiler.h
-index 407c160..b64da6a 100644
+index 0ecd4e8..41c1cbf 100644
 --- a/include/compiler.h
 +++ b/include/compiler.h
-@@ -169,6 +169,10 @@ size_t strlcpy(char *, const char *, size_t);
- char *strrchrnul(const char *, int);
+@@ -181,6 +181,10 @@ size_t strlcpy(char *, const char *, size_t);
+ char * pure_func strrchrnul(const char *, int);
  #endif
  
 +#if !defined(HAVE_STRLCAT) || !HAVE_DECL_STRLCAT
 +size_t strlcat(char *, const char *, size_t);
 +#endif
 +
- #ifndef __cplusplus		/* C++ has false, true, bool as keywords */
+ #if !defined(__cplusplus) || (__STDC_VERSION >= 202311L)
+ /* C++ and C23 have bool, false, and true as proper keywords */
  # ifdef HAVE_STDBOOL_H
- #  include <stdbool.h>
 diff --git a/stdlib/strlcat.c b/stdlib/strlcat.c
 new file mode 100644
-index 0000000..7084d46
+index 0000000..c7cbd59
 --- /dev/null
 +++ b/stdlib/strlcat.c
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,42 @@
 +/*
 + * Copyright (c) 2019 Garmin Ltd. or its subsidiaries
 + *
@@ -112,4 +112,3 @@ index 0000000..7084d46
 +}
 +
 +#endif
-+

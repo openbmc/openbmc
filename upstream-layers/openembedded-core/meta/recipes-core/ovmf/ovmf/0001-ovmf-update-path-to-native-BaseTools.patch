@@ -1,7 +1,7 @@
-From 61583b59620946683551f43c6110e656604a252f Mon Sep 17 00:00:00 2001
+From 89a7bfe82c9dea89fa7d859eb392aa414a365578 Mon Sep 17 00:00:00 2001
 From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
 Date: Thu, 9 Jun 2016 02:23:01 -0700
-Subject: [PATCH 1/4] ovmf: update path to native BaseTools
+Subject: [PATCH 1/5] ovmf: update path to native BaseTools
 
 BaseTools is a set of utilities to build EDK-based firmware. These utilities
 are used during the build process. Thus, they need to be built natively.
@@ -16,7 +16,7 @@ Upstream-Status: Inappropriate [oe-core cross compile specific]
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/OvmfPkg/build.sh b/OvmfPkg/build.sh
-index 279f0d099a..285f061bf4 100755
+index 30f4830173..ce4ffb20ab 100755
 --- a/OvmfPkg/build.sh
 +++ b/OvmfPkg/build.sh
 @@ -24,7 +24,7 @@ then
@@ -29,5 +29,5 @@ index 279f0d099a..285f061bf4 100755
    source edksetup.sh BaseTools
  else
 -- 
-2.39.5
+2.47.3
 

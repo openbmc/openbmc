@@ -1,6 +1,6 @@
-From 5e5f06d396fe631990474ba6df83428987855365 Mon Sep 17 00:00:00 2001
+From 756513b01ba2d4f0ecfc95955dbe598591ad2d9e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Wed, 26 Aug 2015 16:25:45 +0300
+Date: Sun, 8 Feb 2026 21:17:43 -0800
 Subject: [PATCH] script.c: avoid use of chroot
 
 Our pre/postinsts expect $D to be set when running in a sysroot and
@@ -17,22 +17,25 @@ KKang 2019/02/20
 Refresh to apply on top of v1.22.10.
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+
+Rebase to 1.23.5
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- src/main/script.c | 52 +++--------------------------------------------
- 1 file changed, 3 insertions(+), 49 deletions(-)
+ src/main/script.c | 56 +++--------------------------------------------
+ 1 file changed, 3 insertions(+), 53 deletions(-)
 
 diff --git a/src/main/script.c b/src/main/script.c
-index e9aee0bf9..181e7c710 100644
+index dd3f3a4bb..9782d0140 100644
 --- a/src/main/script.c
 +++ b/src/main/script.c
-@@ -97,57 +97,11 @@ static const char *
+@@ -99,60 +99,10 @@ static const char *
  maintscript_pre_exec(struct command *cmd)
  {
  	const char *instdir = dpkg_fsys_get_dir();
 -	const char *admindir = dpkg_db_get_dir();
 -	const char *changedir;
 -	size_t instdirlen = strlen(instdir);
- 
+-
 -	if (instdirlen > 0 && in_force(FORCE_SCRIPT_CHROOTLESS))
 -		changedir = instdir;
 -	else
@@ -54,12 +57,14 @@ index e9aee0bf9..181e7c710 100644
 -			         "directory with --force-not-root, consider "
 -			         "using --force-script-chrootless?"));
 -		else if (rc)
--			ohshite(_("failed to chroot to '%.250s'"), instdir);
+-			ohshite(_("failed to chroot to '%s'"), instdir);
 -	}
+-
 -	/* Switch to a known good directory to give the maintainer script
 -	 * a saner environment, also needed after the chroot(). */
 -	if (chdir(changedir))
--		ohshite(_("failed to chdir to '%.255s'"), changedir);
+-		ohshite(_("failed to chdir to '%s'"), changedir);
+-
 -	if (debug_has_flag(dbg_scripts)) {
 -		struct varbuf args = VARBUF_INIT;
 -		const char **argv = cmd->argv;
@@ -68,12 +73,13 @@ index e9aee0bf9..181e7c710 100644
 -			varbuf_add_char(&args, ' ');
 -			varbuf_add_str(&args, *argv);
 -		}
--		debug(dbg_scripts, "fork/exec %s (%s )", cmd->filename,
--		      varbuf_str(&args));
+-		debug(dbg_scripts, "fork/exec %s (%s )",
+-		      cmd->filename, varbuf_str(&args));
 -		varbuf_destroy(&args);
-+        if (*instdir) {
-+                setenv("D", instdir, 1);
++	if (*instdir) {
++		setenv("D", instdir, 1);
  	}
+-
 -	if (instdirlen == 0 || in_force(FORCE_SCRIPT_CHROOTLESS))
 -		return cmd->filename;
 -
@@ -86,3 +92,6 @@ index e9aee0bf9..181e7c710 100644
  }
  
  /**
+-- 
+2.49.0
+

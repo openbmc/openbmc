@@ -1,6 +1,6 @@
-From 812dbb64f2805a3257ef9c9a61abbd10e0b3a08c Mon Sep 17 00:00:00 2001
+From 961482eef79e90f9be6f60f48a063b66221a8ea1 Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
-Date: Mon, 26 Aug 2013 23:38:45 +0000
+Date: Sun, 8 Feb 2026 21:06:44 -0800
 Subject: [PATCH] dpkg: fix configuration issue for mips64
 
 configure cannot determine the proper cpu, os, or
@@ -11,21 +11,27 @@ release from upstream.  We remove that code.
 Upstream-Status: Inappropriate [not a debian architecture]
 
 Signed-off-by: Joe Slater <jslater@windriver.com>
+
+Rebase to 1.23.5
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  scripts/Dpkg/Arch.pm | 3 ---
  1 file changed, 3 deletions(-)
 
 diff --git a/scripts/Dpkg/Arch.pm b/scripts/Dpkg/Arch.pm
-index 0d352eeb9..4ef5fa307 100644
+index 3d9e3e975..05c6debc3 100644
 --- a/scripts/Dpkg/Arch.pm
 +++ b/scripts/Dpkg/Arch.pm
-@@ -326,9 +326,6 @@ sub _load_tupletable()
- 		    (my $dt = $debtuple) =~ s/<cpu>/$_cpu/;
- 		    (my $da = $debarch) =~ s/<cpu>/$_cpu/;
+@@ -326,9 +326,6 @@ sub _load_tupletable
+                     (my $dt = $debtuple) =~ s/<cpu>/$_cpu/;
+                     (my $da = $debarch) =~ s/<cpu>/$_cpu/;
  
--		    next if exists $debarch_to_debtuple{$da}
--		         or exists $debtuple_to_debarch{$dt};
+-                    next if exists $debarch_to_debtuple{$da}
+-                         or exists $debtuple_to_debarch{$dt};
 -
- 		    $debarch_to_debtuple{$da} = $dt;
- 		    $debtuple_to_debarch{$dt} = $da;
- 		}
+                     $debarch_to_debtuple{$da} = $dt;
+                     $debtuple_to_debarch{$dt} = $da;
+                 }
+-- 
+2.49.0
+

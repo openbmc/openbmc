@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-ROOTFS_LICENSE_DIR = "${IMAGE_ROOTFS}/usr/share/common-licenses"
+ROOTFS_LICENSE_DIR = "/usr/share/common-licenses"
 
 # This requires LICENSE_CREATE_PACKAGE=1 to work too
 COMPLEMENTARY_GLOB[lic-pkgs] = "*-lic"
@@ -15,6 +15,26 @@ python() {
         if 'lic-pkgs' in features:
             bb.error("'lic-pkgs' in IMAGE_FEATURES but LICENSE_CREATE_PACKAGE not enabled to generate -lic packages")
 }
+
+python write_sdk_host_package_manifest() {
+    write_sdk_package_manifest(d, 'host')
+}
+python write_sdk_target_package_manifest() {
+    write_sdk_package_manifest(d, 'target')
+}
+
+def write_sdk_package_manifest(d, sysroot):
+    # Get list of installed packages
+    license_sdk_dir = os.path.join(d.getVar('LICENSE_DIRECTORY'),
+        d.getVar('SSTATE_PKGARCH'), d.getVar('SDK_NAME'), sysroot)
+    bb.utils.mkdirhier(license_sdk_dir)
+    from oe.sdk import sdk_list_installed_packages
+    from oe.utils import format_pkg_list
+
+    pkgs = sdk_list_installed_packages(d, sysroot == 'target')
+    output = format_pkg_list(pkgs)
+    with open(os.path.join(license_sdk_dir, 'package.manifest'), "w+") as package_manifest:
+        package_manifest.write(output)
 
 python write_package_manifest() {
     # Get list of installed packages
@@ -28,6 +48,40 @@ python write_package_manifest() {
     with open(os.path.join(license_image_dir, 'package.manifest'), "w+") as package_manifest:
         package_manifest.write(output)
 }
+
+python license_create_sdk_host_manifest() {
+    pkgdata_dir = d.getVar('PKGDATA_DIR_SDK')
+    rootfs = d.expand('${SDK_OUTPUT}/${SDKPATHNATIVE}')
+    license_create_sdk_manifest(d, 'host', pkgdata_dir, rootfs)
+}
+python license_create_sdk_target_manifest() {
+    pkgdata_dir = d.getVar('PKGDATA_DIR')
+    rootfs = d.expand('${SDK_OUTPUT}/${SDKTARGETSYSROOT}')
+    license_create_sdk_manifest(d, 'target', pkgdata_dir, rootfs)
+}
+
+def license_create_sdk_manifest(d, sysroot, pkgdata_dir, rootfs):
+    import oe.packagedata
+    from oe.sdk import sdk_list_installed_packages
+
+    build_images_from_feeds = d.getVar('BUILD_IMAGES_FROM_FEEDS')
+    if build_images_from_feeds == "1":
+        return 0
+
+    pkg_dic = {}
+    for pkg in sorted(sdk_list_installed_packages(d, sysroot == 'target')):
+        pkg_info = os.path.join(pkgdata_dir,
+                                'runtime-reverse', pkg)
+        pkg_name = os.path.basename(os.readlink(pkg_info))
+
+        pkg_dic[pkg_name] = oe.packagedata.read_pkgdatafile(pkg_info)
+        if not "LICENSE" in pkg_dic[pkg_name].keys():
+            pkg_lic_name = "LICENSE:" + pkg_name
+            pkg_dic[pkg_name]["LICENSE"] = pkg_dic[pkg_name][pkg_lic_name]
+
+    rootfs_license_manifest = os.path.join(d.getVar('LICENSE_DIRECTORY'),
+                        d.getVar('SSTATE_PKGARCH'), d.getVar('SDK_NAME'), sysroot, 'license.manifest')
+    write_license_files(d, rootfs_license_manifest, pkg_dic, rootfs)
 
 python license_create_manifest() {
     import oe.packagedata
@@ -50,10 +104,11 @@ python license_create_manifest() {
 
     rootfs_license_manifest = os.path.join(d.getVar('LICENSE_DIRECTORY'),
                         d.getVar('SSTATE_PKGARCH'), d.getVar('IMAGE_NAME'), 'license.manifest')
-    write_license_files(d, rootfs_license_manifest, pkg_dic, rootfs=True)
+    rootfs = d.getVar('IMAGE_ROOTFS')
+    write_license_files(d, rootfs_license_manifest, pkg_dic, rootfs)
 }
 
-def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
+def write_license_files(d, license_manifest, pkg_dic, rootfs):
     import re
     import stat
 
@@ -61,6 +116,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     bad_licenses = oe.license.expand_wildcard_licenses(d, bad_licenses)
     pkgarchs = d.getVar("SSTATE_ARCHS").split()
     pkgarchs.reverse()
+    incompatible_packages = []
 
     exceptions = (d.getVar("INCOMPATIBLE_LICENSE_EXCEPTIONS") or "").split()
     with open(license_manifest, "w") as license_file:
@@ -68,7 +124,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
             remaining_bad_licenses = oe.license.apply_pkg_license_exception(pkg, bad_licenses, exceptions)
             incompatible_licenses = oe.license.incompatible_pkg_license(d, remaining_bad_licenses, pkg_dic[pkg]["LICENSE"])
             if incompatible_licenses:
-                bb.fatal("Package %s cannot be installed into the image because it has incompatible license(s): %s" %(pkg, ' '.join(incompatible_licenses)))
+                incompatible_packages.append("%s (%s)" % (pkg, ' '.join(incompatible_licenses)))
             else:
                 incompatible_licenses = oe.license.incompatible_pkg_license(d, bad_licenses, pkg_dic[pkg]["LICENSE"])
                 if incompatible_licenses:
@@ -116,6 +172,9 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
                                        "The license listed %s was not in the "\
                                        "licenses collected for recipe %s"
                                        % (lic, pkg_dic[pkg]["PN"]), d)
+    if incompatible_packages:
+        bb.fatal("Some packages cannot be installed into the image because they have incompatible licenses:\n\t%s" % ("\n\t".join(incompatible_packages)))
+
     oe.qa.exit_if_errors(d)
 
     # Two options here:
@@ -125,7 +184,7 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs=True):
     copy_lic_manifest = d.getVar('COPY_LIC_MANIFEST')
     copy_lic_dirs = d.getVar('COPY_LIC_DIRS')
     if rootfs and copy_lic_manifest == "1":
-        rootfs_license_dir = d.getVar('ROOTFS_LICENSE_DIR')
+        rootfs_license_dir = rootfs + d.getVar('ROOTFS_LICENSE_DIR')
         bb.utils.mkdirhier(rootfs_license_dir)
         rootfs_license_manifest = os.path.join(rootfs_license_dir,
                 os.path.split(license_manifest)[1])
@@ -295,7 +354,10 @@ def get_deployed_files(man_file):
     return dep_files
 
 ROOTFS_POSTPROCESS_COMMAND:prepend = "write_package_manifest license_create_manifest "
+POPULATE_SDK_POST_HOST_COMMAND:prepend = "write_sdk_host_package_manifest license_create_sdk_host_manifest "
+POPULATE_SDK_POST_TARGET_COMMAND:prepend = "write_sdk_target_package_manifest license_create_sdk_target_manifest "
 do_rootfs[recrdeptask] += "do_populate_lic"
+do_populate_sdk[recrdeptask] += "do_populate_lic"
 
 python do_populate_lic_deploy() {
     license_deployed_manifest(d)

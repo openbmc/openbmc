@@ -25,3 +25,5 @@ do_run_tests () {
 do_run_tests[doc] = "Run meson test using qemu-user"
 
 addtask do_run_tests after do_compile
+
+EX_BINARY_NAME = "mesonex"

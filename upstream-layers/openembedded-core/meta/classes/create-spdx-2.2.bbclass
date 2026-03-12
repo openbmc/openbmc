@@ -480,6 +480,11 @@ python do_create_spdx() {
     # save the CVEs fixed by patches to source information field in the SPDX.
     patched_cves = oe.cve_check.get_patched_cves(d)
     patched_cves = list(patched_cves)
+
+    ignored_cves = d.getVar("CVE_CHECK_IGNORE")
+    if ignored_cves:
+        patched_cves.extend(ignored_cves.split())
+
     patched_cves = ' '.join(patched_cves)
     if patched_cves:
         recipe.sourceInfo = "CVEs fixed: " + patched_cves
@@ -489,7 +494,7 @@ python do_create_spdx() {
         for cpe_id in cpe_ids:
             cpe = oe.spdx.SPDXExternalReference()
             cpe.referenceCategory = "SECURITY"
-            cpe.referenceType = "http://spdx.org/rdf/references/cpe23Type"
+            cpe.referenceType = "cpe23Type"
             cpe.referenceLocator = cpe_id
             recipe.externalRefs.append(cpe)
 

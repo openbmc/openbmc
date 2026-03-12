@@ -1,0 +1,43 @@
+From 1d38887185c0424a82bcf05efbd8585df1bba8cf Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@pbarker.dev>
+Date: Mon, 5 Jan 2026 09:56:41 +0000
+Subject: [PATCH] tests: script: Disable size option test
+
+The test case for the --output-limit / -o option to `script` is flaky
+due to the way the output limit is handled. Depending on how buffer
+boundaries line up, the command may output different numbers of
+characters, but the test case expects the output to always be identical.
+
+This has been raised upstream [1], as there are multiple options for
+fixing this - we can change the behaviour of script, or we can relax the
+test case. Changing the behaviour of script may impact users so we don't
+want to rush ahead and do that.
+
+For now, we're going to disable the test case.
+
+[1]: https://msgid.link/978c83bdf7596879458f39f1789da016150a72d4.camel@pbarker.dev
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Paul Barker <paul@pbarker.dev>
+---
+ tests/ts/script/options | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/tests/ts/script/options b/tests/ts/script/options
+index 3cbd5c8ab463..4da51cd83c66 100755
+--- a/tests/ts/script/options
++++ b/tests/ts/script/options
+@@ -57,10 +57,4 @@ $TS_HELPER_SCRIPT --return --append -c "exit 127" $TS_OUTPUT </dev/null >/dev/nu
+ echo $? >> $TS_OUTPUT
+ ts_finalize_subtest
+ 
+-ts_init_subtest "size"
+-$TS_HELPER_SCRIPT --output-limit 9 --command "echo 1:1234567890" $TS_OUTPUT </dev/null >/dev/null 2>&1
+-$TS_HELPER_SCRIPT -a -o 9 --command "echo 2:1234567890" $TS_OUTPUT </dev/null >/dev/null 2>&1
+-echo $? >> $TS_OUTPUT
+-ts_finalize_subtest
+-
+ ts_finalize
+-- 
+2.43.0
+

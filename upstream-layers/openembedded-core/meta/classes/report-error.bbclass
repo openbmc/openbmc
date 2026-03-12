@@ -10,19 +10,17 @@
 ERR_REPORT_DIR ?= "${LOG_DIR}/error-report"
 
 def errorreport_getdata(e):
-    import codecs
     logpath = e.data.getVar('ERR_REPORT_DIR')
     datafile = os.path.join(logpath, "error-report.txt")
-    with codecs.open(datafile, 'r', 'utf-8') as f:
+    with open(datafile, mode='r', encoding='utf-8', errors='strict') as f:
         data = f.read()
     return data
 
 def errorreport_savedata(e, newdata, file):
     import json
-    import codecs
     logpath = e.data.getVar('ERR_REPORT_DIR')
     datafile = os.path.join(logpath, file)
-    with codecs.open(datafile, 'w', 'utf-8') as f:
+    with open(datafile, mode='w', encoding='utf-8', errors='strict') as f:
         json.dump(newdata, f, indent=4, sort_keys=True)
     return datafile
 
@@ -86,7 +84,7 @@ python errorreport_handler () {
             taskdata['task'] = task
             if log:
                 try:
-                    with codecs.open(log, encoding='utf-8') as logFile:
+                    with open(log, encoding='utf-8') as logFile:
                         logdata = logFile.read()
                     # Replace host-specific paths so the logs are cleaner
                     for d in ("TOPDIR", "TMPDIR"):

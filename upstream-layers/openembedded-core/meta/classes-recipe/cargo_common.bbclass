@@ -110,6 +110,10 @@ cargo_common_do_configure () {
 	# Put build output in build directory preferred by bitbake instead of
 	# inside source directory unless they are the same
 	if [ "${B}" != "${S}" ]; then
+		# We should consider mandating out-of-tree builds and just using [cleandirs]
+		rm -rf ${B}/target
+		mkdir -p ${B}
+
 		cat <<- EOF >> ${CARGO_HOME}/config.toml
 
 		[build]

@@ -19,14 +19,6 @@ deltask install
 deltask populate_sysroot
 deltask recipe_qa
 
-do_build_warn () {
-    bbwarn "Native or target sysroot population needs to be explicitly selected; please use
-bitbake -c build_native_sysroot build-sysroots
-bitbake -c build_target_sysroot build-sysroots
-or both."
-}
-addtask do_build_warn before do_build
-
 python do_build_native_sysroot () {
     targetsysroot = d.getVar("STANDALONE_SYSROOT")
     nativesysroot = d.getVar("STANDALONE_SYSROOT_NATIVE")
@@ -36,7 +28,8 @@ python do_build_native_sysroot () {
 }
 do_build_native_sysroot[cleandirs] = "${STANDALONE_SYSROOT_NATIVE}"
 do_build_native_sysroot[nostamp] = "1"
-addtask do_build_native_sysroot
+do_build_native_sysroot[lockfiles] = "${WORKDIR}/build-sysroots.lock"
+addtask do_build_native_sysroot before do_build
 
 python do_build_target_sysroot () {
     targetsysroot = d.getVar("STANDALONE_SYSROOT")
@@ -47,6 +40,7 @@ python do_build_target_sysroot () {
 }
 do_build_target_sysroot[cleandirs] = "${STANDALONE_SYSROOT}"
 do_build_target_sysroot[nostamp] = "1"
-addtask do_build_target_sysroot
+do_build_target_sysroot[lockfiles] = "${WORKDIR}/build-sysroots.lock"
+addtask do_build_target_sysroot before do_build
 
 do_clean[cleandirs] += "${STANDALONE_SYSROOT} ${STANDALONE_SYSROOT_NATIVE}"

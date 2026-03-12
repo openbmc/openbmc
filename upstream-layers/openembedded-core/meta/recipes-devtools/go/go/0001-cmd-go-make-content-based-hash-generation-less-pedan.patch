@@ -39,7 +39,7 @@ diff --git a/src/cmd/go/internal/envcmd/env.go b/src/cmd/go/internal/envcmd/env.
 index 7c370d427f..c2441f7695 100644
 --- a/src/cmd/go/internal/envcmd/env.go
 +++ b/src/cmd/go/internal/envcmd/env.go
-@@ -219,7 +219,7 @@ func ExtraEnvVarsCostly() []cfg.EnvVar {
+@@ -219,7 +219,7 @@ func ExtraEnvVarsCostly(loaderstate *modload.State) []cfg.EnvVar {
  		}
  	}()
  
@@ -52,7 +52,7 @@ diff --git a/src/cmd/go/internal/work/exec.go b/src/cmd/go/internal/work/exec.go
 index 7b073165d5..1f618be0bb 100644
 --- a/src/cmd/go/internal/work/exec.go
 +++ b/src/cmd/go/internal/work/exec.go
-@@ -237,6 +237,8 @@ func (b *Builder) Do(ctx context.Context, root *Action) {
+@@ -257,6 +257,8 @@ func (b *Builder) Do(ctx context.Context, root *Action) {
  	writeActionGraph()
  }
  
@@ -61,7 +61,7 @@ index 7b073165d5..1f618be0bb 100644
  // buildActionID computes the action ID for a build action.
  func (b *Builder) buildActionID(a *Action) cache.ActionID {
  	p := a.Package
-@@ -258,7 +260,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
+@@ -278,7 +280,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  		if p.Module != nil {
  			fmt.Fprintf(h, "module %s@%s\n", p.Module.Path, p.Module.Version)
  		}
@@ -70,7 +70,7 @@ index 7b073165d5..1f618be0bb 100644
  		// The Go compiler always hides the exact value of $GOROOT
  		// when building things in GOROOT.
  		//
-@@ -293,9 +295,9 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
+@@ -313,9 +315,9 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  	}
  	if len(p.CgoFiles)+len(p.SwigFiles)+len(p.SwigCXXFiles) > 0 {
  		fmt.Fprintf(h, "cgo %q\n", b.toolID("cgo"))
@@ -82,8 +82,8 @@ index 7b073165d5..1f618be0bb 100644
  		fmt.Fprintf(h, "CC=%q %q %q %q\n", ccExe, cppflags, cflags, ldflags)
  		// Include the C compiler tool ID so that if the C
  		// compiler changes we rebuild the package.
-@@ -303,14 +305,14 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
- 			fmt.Fprintf(h, "CC ID=%q\n", ccID)
+@@ -325,7 +327,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
+ 			fmt.Fprintf(h, "CC ID ERROR=%q\n", err)
  		}
  		if len(p.CXXFiles)+len(p.SwigCXXFiles) > 0 {
 -			cxxExe := b.cxxExe()
@@ -91,6 +91,7 @@ index 7b073165d5..1f618be0bb 100644
  			fmt.Fprintf(h, "CXX=%q %q\n", cxxExe, cxxflags)
  			if cxxID, _, err := b.gccToolID(cxxExe[0], "c++"); err == nil {
  				fmt.Fprintf(h, "CXX ID=%q\n", cxxID)
+@@ -334,7 +336,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  			}
  		}
  		if len(p.FFiles) > 0 {
@@ -99,7 +100,7 @@ index 7b073165d5..1f618be0bb 100644
  			fmt.Fprintf(h, "FC=%q %q\n", fcExe, fflags)
  			if fcID, _, err := b.gccToolID(fcExe[0], "f95"); err == nil {
  				fmt.Fprintf(h, "FC ID=%q\n", fcID)
-@@ -327,7 +329,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
+@@ -353,7 +355,7 @@ func (b *Builder) buildActionID(a *Action) cache.ActionID {
  		}
  	}
  	if p.Internal.BuildInfo != nil {
@@ -108,7 +109,7 @@ index 7b073165d5..1f618be0bb 100644
  	}
  
  	// Configuration specific to compiler toolchain.
-@@ -2659,8 +2661,25 @@ func envList(key, def string) []string {
+@@ -2807,8 +2809,25 @@ func envList(key, def string) []string {
  	return args
  }
  
@@ -135,7 +136,7 @@ index 7b073165d5..1f618be0bb 100644
  	if cppflags, err = buildFlags("CPPFLAGS", "", p.CgoCPPFLAGS, checkCompilerFlags); err != nil {
  		return
  	}
-@@ -2676,6 +2695,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
+@@ -2824,6 +2843,13 @@ func (b *Builder) CFlags(p *load.Package) (cppflags, cflags, cxxflags, fflags, l
  	if ldflags, err = buildFlags("LDFLAGS", DefaultCFlags, p.CgoLDFLAGS, checkLinkerFlags); err != nil {
  		return
  	}
@@ -149,23 +150,23 @@ index 7b073165d5..1f618be0bb 100644
  
  	return
  }
-@@ -2693,7 +2719,7 @@ func (b *Builder) cgo(a *Action, cgoExe, objdir string, pcCFLAGS, pcLDFLAGS, cgo
- 	p := a.Package
- 	sh := b.Shell(a)
+@@ -2912,7 +2938,7 @@ func (b *Builder) runCgo(ctx context.Context, a *Action) error {
+ 	cgoExe := base.Tool("cgo")
+ 	cgofiles = mkAbsFiles(p.Dir, cgofiles)
  
 -	cgoCPPFLAGS, cgoCFLAGS, cgoCXXFLAGS, cgoFFLAGS, cgoLDFLAGS, err := b.CFlags(p)
 +	cgoCPPFLAGS, cgoCFLAGS, cgoCXXFLAGS, cgoFFLAGS, cgoLDFLAGS, err := b.CFlags(p, false)
  	if err != nil {
- 		return nil, nil, err
+ 		return err
  	}
-@@ -3256,7 +3282,7 @@ func (b *Builder) swigOne(a *Action, file, objdir string, pcCFLAGS []string, cxx
+@@ -3461,7 +3487,7 @@ func (b *Builder) swigOne(a *Action, file, objdir string, pcCFLAGS []string, cxx
  	p := a.Package
  	sh := b.Shell(a)
  
 -	cgoCPPFLAGS, cgoCFLAGS, cgoCXXFLAGS, _, _, err := b.CFlags(p)
 +	cgoCPPFLAGS, cgoCFLAGS, cgoCXXFLAGS, _, _, err := b.CFlags(p, false)
  	if err != nil {
- 		return "", "", err
+ 		return err
  	}
 -- 
 2.25.1

@@ -1,0 +1,48 @@
+From 6a5ac5476207fa745f9a2890042cc98dd892b999 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@intel.com>
+Date: Tue, 9 Aug 2016 12:12:02 +0100
+Subject: [PATCH] connman: disable version-scripts to fix crashes at startup
+
+With binutils 2.27 on at least PowerPC, connmand will crash on `connmand --help`.
+This appears to be due to the symbol visibilty scripts hiding symbols that stdio
+looks up at runtime, resulting in it segfaulting.
+
+This certainly appears to be a bug in binutils 2.27 although the problem has
+been known about for some time:
+
+https://sourceware.org/bugzilla/show_bug.cgi?id=17908
+
+As the version scripts are only used to hide symbols from plugins we can safely
+remove the scripts to work around the problem until binutils is fixed.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Ross Burton <ross.burton@intel.com>
+Signed-off-by: Peter Tatrai <peter.tatrai.ext@siemens.com>
+---
+ Makefile.am | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 1e44314..f5366ad 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -142,8 +142,7 @@ src_connmand_LDADD = gdbus/libgdbus-internal.la $(builtin_libadd) \
+ 			@GIO_LIBS@ @GLIB_LIBS@ @DBUS_LIBS@ @GNUTLS_LIBS@ \
+ 			-lresolv -ldl -lrt
+ 
+-src_connmand_LDFLAGS = -Wl,--export-dynamic \
+-				-Wl,--version-script=$(srcdir)/src/connman.ver
++src_connmand_LDFLAGS = -Wl,--export-dynamic
+ 
+ src_connmand_wait_online_SOURCES = src/connmand-wait-online.c
+ 
+@@ -186,8 +185,7 @@ vpn_connman_vpnd_LDADD = gdbus/libgdbus-internal.la $(builtin_vpn_libadd) \
+ 				@GIO_LIBS@ @GLIB_LIBS@ @DBUS_LIBS@ @GNUTLS_LIBS@ \
+ 				-lresolv -ldl
+ 
+-vpn_connman_vpnd_LDFLAGS = -Wl,--export-dynamic \
+-				-Wl,--version-script=$(srcdir)/vpn/vpn.ver
++vpn_connman_vpnd_LDFLAGS = -Wl,--export-dynamic
+ endif
+ 
+ BUILT_SOURCES = $(local_headers) src/builtin.h $(service_files) \

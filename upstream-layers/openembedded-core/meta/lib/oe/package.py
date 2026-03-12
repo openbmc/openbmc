@@ -770,6 +770,14 @@ def parse_debugsources_from_dwarfsrcfiles_output(dwarfsrcfiles_output):
     return debugfiles.keys()
 
 def source_info(file, d, fatal=True):
+    # Skip static libraries when using Clang toolchain with LTO enabled.
+    # In this case, .a files contain LLVM bitcode instead of ELF objects,
+    # and dwarfsrcfiles cannot process them.
+    if is_static_lib(file):
+        if d.getVar('TOOLCHAIN') == "clang" and bb.utils.contains('DISTRO_FEATURES', 'lto', True, False, d):
+            bb.debug(1, "Skipping dwarfsrcfiles for Clang LTO archive: %s" % file)
+            return []
+
     cmd = ["dwarfsrcfiles", file]
     try:
         output = subprocess.check_output(cmd, universal_newlines=True, stderr=subprocess.STDOUT)
@@ -1016,7 +1024,7 @@ def copydebugsources(debugsrcdir, sources, d):
             cmd += "fgrep -zw '%s' | " % prefixmap[pmap]
             # Remove prefix in the source paths
             cmd += "sed 's#%s/##g' | " % (prefixmap[pmap])
-            cmd += "(cd '%s' ; cpio -pd0mlL --no-preserve-owner '%s%s' 2>/dev/null)" % (pmap, dvar, prefixmap[pmap])
+            cmd += "(cd '%s' ; cpio -pd0mlLu --no-preserve-owner '%s%s' 2>/dev/null)" % (pmap, dvar, prefixmap[pmap])
 
             try:
                 subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)

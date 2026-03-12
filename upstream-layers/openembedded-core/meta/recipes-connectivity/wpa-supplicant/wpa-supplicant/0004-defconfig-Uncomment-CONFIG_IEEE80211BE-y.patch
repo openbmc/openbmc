@@ -1,0 +1,32 @@
+From be5ffd2084b8690f5b974c5b6ff7409fbfaacfb7 Mon Sep 17 00:00:00 2001
+From: Miaoqing Pan <miaoqing.pan@oss.qualcomm.com>
+Date: Thu, 11 Dec 2025 15:07:31 +0800
+Subject: [PATCH 3/3] defconfig: Uncomment CONFIG_IEEE80211BE=y
+
+wpa_supplicant has supported IEEE 802.11be (Wi-Fi 7) for over three
+years. With growing market demand for Wi-Fi 7, it is now an appropriate
+time to enable IEEE 802.11be support. This is needed mainly to enable AP
+mode functionality in wpa_supplicant.
+
+Signed-off-by: Miaoqing Pan <miaoqing.pan@oss.qualcomm.com>
+Upstream-Status: Backport [https://git.w1.fi/cgit/hostap/commit/?id=e623edd9b73a521b8a4438c600c9a8fb0ac5febe]
+---
+ wpa_supplicant/defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpa_supplicant/defconfig b/wpa_supplicant/defconfig
+index 7efb9e6..84ac8ba 100644
+--- a/wpa_supplicant/defconfig
++++ b/wpa_supplicant/defconfig
+@@ -507,7 +507,7 @@ CONFIG_IEEE80211AX=y
+ 
+ # IEEE 802.11be EHT support (mainly for AP mode)
+ # CONFIG_IEEE80211AX is mandatory for setting CONFIG_IEEE80211BE.
+-#CONFIG_IEEE80211BE=y
++CONFIG_IEEE80211BE=y
+ 
+ # Wireless Network Management (IEEE Std 802.11v-2011)
+ # Note: This is experimental and not complete implementation.
+-- 
+2.34.1
+

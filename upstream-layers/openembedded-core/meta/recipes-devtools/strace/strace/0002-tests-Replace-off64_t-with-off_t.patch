@@ -1,4 +1,4 @@
-From 1891db87da3b204c512f47155aaa4e692008f1bf Mon Sep 17 00:00:00 2001
+From f487e2a0f1568c989a0294f4335f3dc9a6012d8d Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 15 Dec 2022 15:56:13 -0800
 Subject: [PATCH] tests: Replace off64_t with off_t

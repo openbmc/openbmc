@@ -32,7 +32,6 @@ def tinfoil_init(instance):
     tinfoil = instance
 
 
-
 class GoRecipeHandler(RecipeHandler):
     """Class to handle the go recipe creation"""
 
@@ -85,41 +84,40 @@ class GoRecipeHandler(RecipeHandler):
         classes.append("go-mod-update-modules")
         extravalues["run_tasks"] = "update_modules"
 
-        with tempfile.TemporaryDirectory(prefix="go-mod-") as tmp_mod_dir:
-            env = dict(os.environ)
-            env["PATH"] += f":{go_bindir}"
-            env['GOMODCACHE'] = tmp_mod_dir
+        env = dict(os.environ)
+        env["PATH"] += f":{go_bindir}"
 
-            stdout = subprocess.check_output(["go", "mod", "edit", "-json"], cwd=srctree, env=env, text=True)
-            go_mod = json.loads(stdout)
-            go_import = re.sub(r'/v([0-9]+)$', '', go_mod['Module']['Path'])
+        stdout = subprocess.check_output(("go", "mod", "edit", "-json"),
+                                         cwd=srctree, env=env, text=True)
+        go_mod = json.loads(stdout)
+        go_import = re.sub(r'/v([0-9]+)$', '', go_mod['Module']['Path'])
 
-            localfilesdir = tempfile.mkdtemp(prefix='recipetool-go-')
-            extravalues.setdefault('extrafiles', {})
+        localfilesdir = tempfile.mkdtemp(prefix='recipetool-go-')
+        extravalues.setdefault('extrafiles', {})
 
-            # Write the stub ${BPN}-licenses.inc and ${BPN}-go-mods.inc files
-            basename = "{pn}-licenses.inc"
-            filename = os.path.join(localfilesdir, basename)
-            with open(filename, "w") as f:
-                f.write("# FROM RECIPETOOL\n")
-            extravalues['extrafiles'][f"../{basename}"] = filename
+        # Write the stub ${BPN}-licenses.inc and ${BPN}-go-mods.inc files
+        basename = "{pn}-licenses.inc"
+        filename = os.path.join(localfilesdir, basename)
+        with open(filename, "w") as f:
+            f.write("# FROM RECIPETOOL\n")
+        extravalues['extrafiles'][f"../{basename}"] = filename
 
-            basename = "{pn}-go-mods.inc"
-            filename = os.path.join(localfilesdir, basename)
-            with open(filename, "w") as f:
-                f.write("# FROM RECIPETOOL\n")
-            extravalues['extrafiles'][f"../{basename}"] = filename
+        basename = "{pn}-go-mods.inc"
+        filename = os.path.join(localfilesdir, basename)
+        with open(filename, "w") as f:
+            f.write("# FROM RECIPETOOL\n")
+        extravalues['extrafiles'][f"../{basename}"] = filename
 
-            # Do generic license handling
-            d = bb.data.createCopy(tinfoil.config_data)
-            handle_license_vars(srctree, lines_before, handled, extravalues, d)
-            self.__rewrite_lic_vars(lines_before)
+        # Do generic license handling
+        d = bb.data.createCopy(tinfoil.config_data)
+        handle_license_vars(srctree, lines_before, handled, extravalues, d)
+        self.__rewrite_lic_vars(lines_before)
 
-            self.__rewrite_src_uri(lines_before)
+        self.__rewrite_src_uri(lines_before)
 
-            lines_before.append('require ${BPN}-licenses.inc')
-            lines_before.append('require ${BPN}-go-mods.inc')
-            lines_before.append(f'GO_IMPORT = "{go_import}"')
+        lines_before.append('require ${BPN}-licenses.inc')
+        lines_before.append('require ${BPN}-go-mods.inc')
+        lines_before.append(f'GO_IMPORT = "{go_import}"')
 
     def __update_lines_before(self, updated, newlines, lines_before):
         if updated:

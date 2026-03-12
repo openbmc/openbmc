@@ -1,4 +1,4 @@
-From d9513f8c3fa3f228358fd4d0716941e84bda413e Mon Sep 17 00:00:00 2001
+From cbfcad913793498d1a5b24622662a777f4a412b0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:24:50 +0400
 Subject: [PATCH] Define GLIBC_DYNAMIC_LINKER and UCLIBC_DYNAMIC_LINKER

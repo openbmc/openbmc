@@ -1,0 +1,29 @@
+From b6af0a5b42adfbebaca1ee673d4c1d9d10fbacfb Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 29 Sep 2025 14:44:05 +0100
+Subject: [PATCH] Don't expose LLVM_HAVE_OPT_VIEWER_MODULES externally
+
+This variable states whether at build-time some python modules were present,
+which is meaningless and simply introduces non-deterministic behaviour.
+
+Upstream-Status: Pending [https://github.com/llvm/llvm-project/issues/161199]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ llvm/cmake/modules/LLVMConfig.cmake.in | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/llvm/cmake/modules/LLVMConfig.cmake.in b/llvm/cmake/modules/LLVMConfig.cmake.in
+index c15b9576cd5d..9cff70e4ef8e 100644
+--- a/llvm/cmake/modules/LLVMConfig.cmake.in
++++ b/llvm/cmake/modules/LLVMConfig.cmake.in
+@@ -135,7 +135,6 @@ set(LLVM_DEFINITIONS "@LLVM_DEFINITIONS@")
+ set(LLVM_BINARY_DIR "@LLVM_CONFIG_BINARY_DIR@")
+ set(LLVM_CMAKE_DIR "@LLVM_CONFIG_CMAKE_DIR@")
+ set(LLVM_TOOLS_BINARY_DIR "@LLVM_CONFIG_TOOLS_BINARY_DIR@")
+-set(LLVM_HAVE_OPT_VIEWER_MODULES @LLVM_HAVE_OPT_VIEWER_MODULES@)
+ set(LLVM_CONFIGURATION_TYPES @CMAKE_CONFIGURATION_TYPES@)
+ set(LLVM_ENABLE_SHARED_LIBS @BUILD_SHARED_LIBS@)
+ 
+-- 
+2.43.0
+

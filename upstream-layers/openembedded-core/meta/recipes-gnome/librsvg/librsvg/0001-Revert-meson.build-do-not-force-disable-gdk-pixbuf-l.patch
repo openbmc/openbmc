@@ -1,0 +1,49 @@
+From 33ece256bf7c156a34ab1ee3709718e38829cc9e Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Wed, 6 Aug 2025 13:50:21 +0200
+Subject: [PATCH] Revert "meson.build: do not force-disable gdk-pixbuf-loader
+ in cross builds"
+
+This reverts commit 994582cfa995d00f9472dc22f8237b6571b4c510.
+
+The commit that enabled gdk-pixbuf-loader for non-cross builds, references
+a commit that enabled other binaries, claiming that they can be executed with
+a qemu wrapper.
+
+There is one difference - the projects that were enabled by that commit support such
+wrappers officially (see `gi_cross_binary_wrapper` and related build options for g-i).
+However such support is missing from gdk-pixbuf-loader unfortunately, which can cause
+build failures when cross compiling.
+
+To avoid this, revert back to disable gdk-pixbuf-loader for cross-builds
+(until it gains a similar feature).
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1123]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ gdk-pixbuf-loader/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gdk-pixbuf-loader/meson.build b/gdk-pixbuf-loader/meson.build
+index 6fa10a6..c51d803 100644
+--- a/gdk-pixbuf-loader/meson.build
++++ b/gdk-pixbuf-loader/meson.build
+@@ -36,7 +36,7 @@ pixbuf_thumbnailer = configure_file(
+   install_dir: get_option('datadir') / 'thumbnailers'
+ )
+ 
+-if meson.can_run_host_binaries()
++if not meson.is_cross_build()
+   gdk_pixbuf_query_loaders = find_program(pixbuf_dep.get_variable(pkgconfig: 'gdk_pixbuf_query_loaders', default_value: 'gdk-pixbuf-query-loaders'))
+ endif
+ 
+@@ -48,7 +48,7 @@ pixbufloader_svg_install_args = [
+ ]
+ 
+ # Tell people to run gdk-pixbuf-query-loaders manually for cross builds
+-if not meson.can_run_host_binaries()
++if meson.is_cross_build()
+   pixbufloader_svg_install_args += '--show-cross-message'
+ endif
+ 

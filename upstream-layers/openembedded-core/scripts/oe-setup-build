@@ -21,7 +21,10 @@ def discover_templates(layers_file):
         raise Exception("List of layers {} does not exist; were the layers set up using the setup-layers script or bitbake-setup tool?".format(layers_file))
 
     templates = []
-    layers_list = json.load(open(layers_file))["layers"]
+
+    with open(layers_file) as f:
+        layers_list = json.load(f)["layers"]
+
     for layer in layers_list:
         template_dir = os.path.join(os.path.dirname(layers_file), layer, 'conf','templates')
         if os.path.exists(template_dir):
@@ -89,7 +92,7 @@ def setup_build_env(args):
     builddir = args.b if args.b else template["buildpath"]
     no_shell = args.no_shell
     coredir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), '..'))
-    cmd_base = ". {} {}".format(os.path.join(coredir, 'oe-init-build-env'), os.path.abspath(builddir))
+    cmd_base = "cd {}\nset {}\n. ./oe-init-build-env\n".format(coredir, os.path.abspath(builddir))
 
     initbuild = os.path.join(builddir, 'init-build-env')
     if not os.path.exists(initbuild):
@@ -98,7 +101,7 @@ def setup_build_env(args):
             f.write(cmd_base)
     print("\nRun '. {}' to initialize the build in a current shell session.\n".format(initbuild))
 
-    cmd = "TEMPLATECONF={} {}".format(template["templatepath"], cmd_base)
+    cmd = "TEMPLATECONF={}\n{}".format(template["templatepath"], cmd_base)
     if not no_shell:
         cmd = cmd + " && {}".format(os.environ.get('SHELL','bash'))
     print("Running:", cmd)

@@ -42,8 +42,12 @@ python () {
         if required_features:
             missing = set.difference(required_features, features)
             if missing:
-                raise bb.parse.SkipRecipe("missing required %s feature%s '%s' (not in %s_FEATURES)"
-                    % (kind.lower(), 's' if len(missing) > 1 else '', ' '.join(missing), kind))
+                if kind == 'DISTRO':
+                    raise bb.parse.SkipRecipe("using %s '%s', which is missing required %s_FEATURES: '%s'"
+                        % (kind, d.getVar(kind), kind, ' '.join(missing)))
+                else:
+                    raise bb.parse.SkipRecipe("missing required %s feature%s '%s' (not in %s_FEATURES)"
+                        % (kind.lower(), 's' if len(missing) > 1 else '', ' '.join(missing), kind))
 
         conflict_features = set((d.getVar('CONFLICT_' + kind + '_FEATURES') or '').split())
         if conflict_features:

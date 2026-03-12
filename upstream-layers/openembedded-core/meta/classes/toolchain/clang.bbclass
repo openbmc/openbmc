@@ -26,12 +26,15 @@ PREFERRED_PROVIDER_virtual/nativesdk-cross-c++:class-crosssdk = "clang-crosssdk-
 PREFERRED_PROVIDER_virtual/nativesdk-cross-cc:class-cross-canadian = "clang-crosssdk-${SDK_SYS}"
 PREFERRED_PROVIDER_virtual/nativesdk-cross-c++:class-cross-canadian = "clang-crosssdk-${SDK_SYS}"
 
-
-BASE_DEFAULT_DEPS:append:class-target = " compiler-rt libcxx"
+BASE_DEFAULT_DEPS:append = " compiler-rt libcxx"
 
 TUNE_CCARGS += "${@bb.utils.contains("DISTRO_FEATURES", "usrmerge", " --dyld-prefix=/usr", "", d)}"
 
 LDFLAGS:append:class-nativesdk:x86-64 = " -Wl,-dynamic-linker,${base_libdir}/ld-linux-x86-64.so.2"
 LDFLAGS:append:class-nativesdk:aarch64 = " -Wl,-dynamic-linker,${base_libdir}/ld-linux-aarch64.so.1"
+LDFLAGS:append:class-cross-canadian = " -Wl,-dynamic-linker,${base_libdir}/placeholder/to/be/rewritten/by/sdk/installer"
+
+# do_populate_sysroot needs STRIP, do_package_qa needs OBJDUMP
+POPULATESYSROOTDEPS:append:class-target = " llvm-native:do_populate_sysroot"
 
 TCOVERRIDE = "toolchain-clang"

@@ -1,0 +1,36 @@
+From cc7c8ef7b92849ad97f402f51d88bc6136a1eb9b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Fri, 19 Dec 2025 15:00:16 +0100
+Subject: [PATCH] src/ws-egl.cpp: add missing unistd.h header
+
+This addresses build failures with musl:
+
+| ../../../../../../workspace/sources/wpebackend-fdo/src/ws-egl.cpp: In destructor 'virtual WS::ImplEGL::~ImplEGL()':
+| ../../../../../../workspace/sources/wpebackend-fdo/src/ws-egl.cpp:83:9: error: 'close' was not declared in this scope; did you mean 'clone'?
+|    83 |         close(m_dmabuf.formatTable.fd);
+|       |         ^~~~~
+|       |         clone
+| ../../../../../../workspace/sources/wpebackend-fdo/src/ws-egl.cpp: In member function 'void WS::ImplEGL::initFormatTable()':
+| ../../../../../../workspace/sources/wpebackend-fdo/src/ws-egl.cpp:397:15: error: 'ftruncate' was not declared in this scope; did you mean 'strncat'?
+|   397 |         ret = ftruncate(fd, size);
+|       |               ^~~~~~~~~
+|       |               strncat
+
+Upstream-Status: Submitted [https://github.com/Igalia/WPEBackend-fdo/pull/203]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/ws-egl.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ws-egl.cpp b/src/ws-egl.cpp
+index 76d6194..cc7a8f2 100644
+--- a/src/ws-egl.cpp
++++ b/src/ws-egl.cpp
+@@ -33,6 +33,7 @@
+ #include <vector>
+ #include <sys/mman.h>
+ #include <sys/stat.h>
++#include <unistd.h>
+ 
+ #ifndef EGL_WL_bind_wayland_display
+ #define EGL_WAYLAND_BUFFER_WL 0x31D5

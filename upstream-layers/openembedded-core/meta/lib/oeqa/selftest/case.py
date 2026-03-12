@@ -4,9 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-import sys
 import os
-import glob
 import errno
 from unittest.util import safe_repr
 

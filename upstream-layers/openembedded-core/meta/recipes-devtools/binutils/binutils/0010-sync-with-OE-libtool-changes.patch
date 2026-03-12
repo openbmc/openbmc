@@ -1,4 +1,4 @@
-From 6b37e476ee9f7feac837063cd0ca8e634fb76f90 Mon Sep 17 00:00:00 2001
+From a876af7b3e426b746890b8b8c0e7dcea4fcdc4b9 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Mon, 6 Mar 2017 23:33:27 -0800
 Subject: [PATCH] sync with OE libtool changes

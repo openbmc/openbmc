@@ -1,6 +1,6 @@
-From 95d0bae453b2b5a7d25b92d99565d27407fffa1b Mon Sep 17 00:00:00 2001
+From 6ad1ac8c03ae3acc0539fc1566070e2468c7df0a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
-Date: Fri, 10 May 2019 14:18:04 +0800
+Date: Tue, 14 Oct 2025 14:12:55 +0800
 Subject: [PATCH] Revert "build: Make gpgme.m4 use gpgrt-config with *.pc."
 
 This reverts commit 60828a505a1c74fd34476c181df2a588ea6f9c83.
@@ -15,7 +15,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 8 insertions(+), 46 deletions(-)
 
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 4cfe899..5f689e1 100644
+index acbfc1c..5f689e1 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
 @@ -122,24 +122,10 @@ AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
@@ -23,7 +23,7 @@ index 4cfe899..5f689e1 100644
    fi
  
 -  use_gpgrt_config=""
--  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-  if test x"$GPGRT_CONFIG" != x && test "$GPGRT_CONFIG" != "no"; then
 -    if $GPGRT_CONFIG gpgme --exists; then
 -      GPGME_CONFIG="$GPGRT_CONFIG gpgme"
 -      AC_MSG_NOTICE([Use gpgrt-config as gpgme-config])
@@ -113,3 +113,6 @@ index 4cfe899..5f689e1 100644
      AC_MSG_RESULT(yes)
      ifelse([$2], , :, [$2])
      _AM_PATH_GPGME_CONFIG_HOST_CHECK
+-- 
+2.34.1
+

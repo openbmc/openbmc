@@ -1,0 +1,48 @@
+From c4e8df6a492de2d98be18093de2fe0d97e221d48 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 7 Jul 2025 19:22:07 -0700
+Subject: [PATCH] clang: Use sysroot relative paths for getArchSpecificLibPaths
+ and getRuntimePath
+
+Clang's default sysroot implementation differs that what we do in OE,
+and we do it with gcc as well where we install c++ runtime headers in
+target sysroot, clang does not by default it puts them relative to its
+own installation and uses resourcedir to point to it. In order to solve
+this we have to raise this question with respective upstreams or rethink
+about how we package compiler runtime.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/lib/Driver/ToolChain.cpp | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+index ec28b899f829..f4aafa7996a9 100644
+--- a/clang/lib/Driver/ToolChain.cpp
++++ b/clang/lib/Driver/ToolChain.cpp
+@@ -1001,7 +1001,10 @@ ToolChain::getTargetSubDirPath(StringRef BaseDir) const {
+ }
+ 
+ std::optional<std::string> ToolChain::getRuntimePath() const {
+-  SmallString<128> P(D.ResourceDir);
++  SmallString<128> P(D.SysRoot);
++  StringRef ClangLibdirBasename(CLANG_INSTALL_LIBDIR_BASENAME);
++  llvm::sys::path::append(P, "/usr/", ClangLibdirBasename, "clang",
++                          CLANG_VERSION_STRING);
+   llvm::sys::path::append(P, "lib");
+   if (auto Ret = getTargetSubDirPath(P))
+     return Ret;
+@@ -1029,7 +1032,10 @@ ToolChain::path_list ToolChain::getArchSpecificLibPaths() const {
+   path_list Paths;
+ 
+   auto AddPath = [&](const ArrayRef<StringRef> &SS) {
+-    SmallString<128> Path(getDriver().ResourceDir);
++    SmallString<128> Path(getDriver().SysRoot);
++    StringRef ClangLibdirBasename(CLANG_INSTALL_LIBDIR_BASENAME);
++    llvm::sys::path::append(Path, "/usr/", ClangLibdirBasename, "clang",
++                            CLANG_VERSION_STRING);
+     llvm::sys::path::append(Path, "lib");
+     for (auto &S : SS)
+       llvm::sys::path::append(Path, S);

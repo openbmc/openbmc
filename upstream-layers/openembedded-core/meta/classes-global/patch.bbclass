@@ -150,12 +150,12 @@ python patch_do_patch() {
             patchset.Import({"file":local, "strippath": parm['striplevel']}, True)
         except Exception as exc:
             bb.utils.remove(process_tmpdir, True)
-            bb.fatal("Importing patch '%s' with striplevel '%s'\n%s" % (parm['patchname'], parm['striplevel'], repr(exc).replace("\\n", "\n")))
+            bb.fatal("Importing patch '%s' with striplevel '%s'\n%s" % (local, parm['striplevel'], repr(exc).replace("\\n", "\n")))
         try:
             resolver.Resolve()
         except bb.BBHandledException as e:
             bb.utils.remove(process_tmpdir, True)
-            bb.fatal("Applying patch '%s' on target directory '%s'\n%s" % (parm['patchname'], patchdir, repr(e).replace("\\n", "\n")))
+            bb.fatal("Applying patch '%s' on target directory '%s'\n%s" % (local, patchdir, repr(e).replace("\\n", "\n")))
 
     bb.utils.remove(process_tmpdir, True)
     del os.environ['TMPDIR']

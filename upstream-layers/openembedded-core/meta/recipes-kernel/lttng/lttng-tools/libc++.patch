@@ -1,0 +1,48 @@
+sessiond: avoid std::vector range-ctor on non-standard iterators (libc++)
+
+libc++ SFINAE-gates std::vector(It, It) behind standard iterator requirements.
+The events_view/channels_ht_view iterators don’t model Input/Forward, so the
+range constructor is not viable and the build fails under clang+libc++.
+Populate the vectors via a simple loop instead, which only relies on !=, ++,
+and dereference. No functional change; fixes clang/libc++ builds while keeping
+libstdc++ behavior unchanged.
+
+Upstream-Status: Submitted [https://review.lttng.org/c/lttng-tools/+/15163]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-channel.cpp
+===================================================================
+--- lttng-tools-2.14.0.orig/src/bin/lttng-sessiond/ust-registry-channel.cpp
++++ lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-channel.cpp
+@@ -529,8 +529,11 @@ void lsu::registry_channel::_accept_on_e
+ 		events_view(*_events->ht);
+ 
+ 	/* Copy the event ptrs from the _events ht to this vector which we'll sort. */
+-	std::vector<const lttng::sessiond::ust::registry_event *> sorted_event_classes(
+-		events_view.begin(), events_view.end());
++  std::vector<const lttng::sessiond::ust::registry_event *> sorted_event_classes;
++  /* Avoid libc++’s range-ctor SFINAE on non-standard iterators. */
++  for (auto it = events_view.begin(); it != events_view.end(); ++it) {
++  	sorted_event_classes.push_back(*it);
++  }
+ 
+ 	std::sort(sorted_event_classes.begin(),
+ 		  sorted_event_classes.end(),
+Index: lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-session.cpp
+===================================================================
+--- lttng-tools-2.14.0.orig/src/bin/lttng-sessiond/ust-registry-session.cpp
++++ lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-session.cpp
+@@ -586,8 +586,11 @@ void lsu::registry_session::_accept_on_s
+ 						  decltype(lsu::registry_channel::_node),
+ 						  &lsu::registry_channel::_node>
+ 		channels_ht_view(*_channels->ht);
+-	std::vector<const lttng::sessiond::ust::registry_channel *> sorted_stream_classes(
+-		channels_ht_view.begin(), channels_ht_view.end());
++  std::vector<const lttng::sessiond::ust::registry_channel *> sorted_stream_classes;
++  /* Avoid libc++’s range-ctor SFINAE on non-standard iterators. */
++  for (auto it = channels_ht_view.begin(); it != channels_ht_view.end(); ++it) {
++  	sorted_stream_classes.push_back(*it);
++  }
+ 
+ 	std::sort(sorted_stream_classes.begin(),
+ 		  sorted_stream_classes.end(),

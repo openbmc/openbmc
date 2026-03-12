@@ -26,6 +26,10 @@ EXTRA_OECONF = "--disable-oggtest \
                 --without-libiconv-prefix \
                 "
 
+# /usr/src/debug/flac/1.5.0/src/libFLAC++/metadata.cpp:913:
+# (.text+0x2032): undefined reference to `__stack_chk_fail_local'
+LDFLAGS:append:libc-musl = " -lssp_nonshared"
+
 PACKAGECONFIG ??= " \
     ogg \
 "

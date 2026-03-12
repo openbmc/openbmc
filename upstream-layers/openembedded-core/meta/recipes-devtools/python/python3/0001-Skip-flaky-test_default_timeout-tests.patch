@@ -1,0 +1,49 @@
+From baf2dda48e51fcb17a716e52cc5c4e162a6bb7d3 Mon Sep 17 00:00:00 2001
+From: Antonin Godard <antonin.godard@bootlin.com>
+Date: Mon, 19 Jan 2026 11:38:36 +0100
+Subject: [PATCH] Skip flaky test_default_timeout tests
+
+We have been observing issues with this test on the Autobuilder:
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=15885
+
+The logs on the ticket above do not allow us to know which of the two
+"test_default_timeout" tests is failing, so disable both with
+self.skipTest().
+
+Excerpt from `ptest-runner python3`:
+
+  test_default_timeout (test.test_multiprocessing_fork.test_manager.WithManagerTestBarrier.test_default_timeout)
+  SKIP: Test the barrier's default timeout 'skip flaky timeout test'
+
+Upstream-Status: Inappropriate [OE specific, but might be related to https://github.com/python/cpython/issues/129266#issuecomment-2613058866]
+
+Signed-off-by: Antonin Godard <antonin.godard@bootlin.com>
+---
+ Lib/test/_test_multiprocessing.py | 1 +
+ Lib/test/lock_tests.py            | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.py
+index e8064e7..9ab1f9e 100644
+--- a/Lib/test/_test_multiprocessing.py
++++ b/Lib/test/_test_multiprocessing.py
+@@ -2259,6 +2259,7 @@ class _TestBarrier(BaseTestCase):
+         """
+         Test the barrier's default timeout
+         """
++        self.skipTest('skip flaky timeout test')
+         barrier = self.Barrier(self.N, timeout=0.5)
+         results = self.DummyList()
+         self.run_threads(self._test_default_timeout_f, (barrier, results))
+diff --git a/Lib/test/lock_tests.py b/Lib/test/lock_tests.py
+index 8c8f890..43e9b90 100644
+--- a/Lib/test/lock_tests.py
++++ b/Lib/test/lock_tests.py
+@@ -1165,6 +1165,7 @@ class BarrierTests(BaseTestCase):
+         """
+         Test the barrier's default timeout
+         """
++        self.skipTest('skip flaky timeout test')
+         timeout = 0.100
+         barrier = self.barriertype(2, timeout=timeout)
+         def f():

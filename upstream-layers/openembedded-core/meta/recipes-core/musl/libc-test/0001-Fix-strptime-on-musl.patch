@@ -1,0 +1,53 @@
+From df26c5206c3234fd2df924cff7ef540af1f2077c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 19 Aug 2025 23:11:40 -0700
+Subject: [PATCH libc-test] Fix strptime on musl
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+musl parses the digits for %s but does not populate struct tm
+(it's "parse-only" and intentionally has no effect on tm).
+That's why you get a zeroed-out date like 1900-01-00T00:00:00.
+This is current upstream behavior:
+
+case 's': /* Parse only. Effect on tm is unspecified and presently no effect is implemented.. */
+
+musl's strptime only accepts ±hhmm for %z (e.g., -0600).
+It does not accept ±hh or ±hh:mm. So '-06' fails by design.
+It can be seen that upstream only checks 4 digits after the sign.
+
+Upstream-Status: Submitted [https://www.openwall.com/lists/musl/2025/08/20/2]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ AUTHORS                   | 1 +
+ src/functional/strptime.c | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/AUTHORS b/AUTHORS
+index cf2a394..5e78ef7 100644
+--- a/AUTHORS
++++ b/AUTHORS
+@@ -6,3 +6,4 @@ Jens Gustedt
+ Alexander Monakov
+ Julien Ramseier
+ Alyssa Ross
++Khem Raj
+diff --git a/src/functional/strptime.c b/src/functional/strptime.c
+index b5f8977..f76fa68 100644
+--- a/src/functional/strptime.c
++++ b/src/functional/strptime.c
+@@ -109,10 +109,12 @@ int main() {
+ 
+ 	/* Glibc */
+ 	checkStrptime("1856-07-10", "%F", &tm4);
++#ifdef __GLIBC__
+ 	checkStrptime("683078400", "%s", &tm2);
++#endif
+ 	checkStrptimeTz("+0200", 2, 0);
+ 	checkStrptimeTz("-0530", -5, -30);
+-	checkStrptimeTz("-06", -6, 0);
++	checkStrptimeTz("-0600", -6, 0);
+ 
+ 	return t_status;
+ }

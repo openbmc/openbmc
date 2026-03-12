@@ -1,13 +1,19 @@
 #!/bin/sh
 
-export TCL_LIBRARY=@libdir@/tcl/ptest/library
-export ERROR_ON_FAILURES=1
+set -u
+
 export LANG=en-US.UTF-8
+
+# Tell all.tcl to exit with an error code if there are failing tests
+export ERROR_ON_FAILURES=1
 
 # Some tests are overly strict with timings and fail on loaded systems.
 SKIP=""
 # 15321
 SKIP="$SKIP async-\* event-\*"
+# This test behaves differently when using a system tzdata, skip until fixed upstream
+# https://core.tcl-lang.org/tcl/tktview/51aa53616067cb63900b17ca1d71f07b094ffa1a
+SKIP="$SKIP clock-59.2\*"
 # 14882
 SKIP="$SKIP cmdMZ-6.6"
 # 15081
@@ -15,18 +21,31 @@ SKIP="$SKIP exit-1.\*"
 # 15407 15421
 SKIP="$SKIP \*io-46.1"
 # io-13.6 explicitly says it can fail on slow/loaded machines
-SKIP="$SKIP io-13.6"
-# 14825
-SKIP="$SKIP socket-\* socket_inet-\*"
+SKIP="$SKIP \*io-13.6"
+# Has race conditions and is missing cleanup
+SKIP="$SKIP interp-36.7"
+# The socket tests seem to be problematic with tight timing conditions, skip them all.
+# 14825 15495
+SKIP="$SKIP socket-\* socket_inet\* socket_inet6\*"
+# These tests seem to be unreliable:
+# https://core.tcl-lang.org/tcl/tktview/3764f4e81f1483ab554c6d60f8483887bde28221
+SKIP="$SKIP http11-\*"
 # tries to access google.com
 SKIP="$SKIP httpProxy-\*"
 
-for i in tests/*.test; do
-    i=$(basename $i)
-    ./tcltest tests/all.tcl -file $i -skip "$SKIP"
+# Run all tests in tests/*.test unless tests are specified as arguments
+TESTS=${*:-tests/*.test}
+
+exitcode=0
+for name in $TESTS; do
+    ./tcltest tests/all.tcl -file $(basename $name) -skip "$SKIP"
     if [ $? -eq 0 ]; then
-        echo "PASS: $i"
+        echo "PASS: $name"
     else
-        echo "FAIL: $i"
+        echo "FAIL: $name"
+        exitcode=1
     fi
+    echo
 done
+
+exit $exitcode

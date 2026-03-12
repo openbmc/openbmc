@@ -19,7 +19,7 @@ diff --git a/src/cmd/dist/buildgo.go b/src/cmd/dist/buildgo.go
 index 884e9d729a..2f52edacfe 100644
 --- a/src/cmd/dist/buildgo.go
 +++ b/src/cmd/dist/buildgo.go
-@@ -51,8 +51,8 @@ func mkzdefaultcc(dir, file string) {
+@@ -50,8 +50,8 @@ func mkzdefaultcc(dir, file string) {
  		fmt.Fprintf(&buf, "package cfg\n")
  		fmt.Fprintln(&buf)
  		fmt.Fprintf(&buf, "const DefaultPkgConfig = `%s`\n", defaultpkgconfig)
@@ -30,7 +30,7 @@ index 884e9d729a..2f52edacfe 100644
  		writefile(buf.String(), file, writeSkipSame)
  		return
  	}
-@@ -62,8 +62,8 @@ func mkzdefaultcc(dir, file string) {
+@@ -61,8 +61,8 @@ func mkzdefaultcc(dir, file string) {
  	fmt.Fprintf(&buf, "package main\n")
  	fmt.Fprintln(&buf)
  	fmt.Fprintf(&buf, "const defaultPkgConfig = `%s`\n", defaultpkgconfig)

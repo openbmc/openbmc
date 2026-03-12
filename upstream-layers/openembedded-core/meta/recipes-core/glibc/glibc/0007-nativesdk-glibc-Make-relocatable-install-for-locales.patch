@@ -1,4 +1,4 @@
-From 1a57ab6f7d602401396a18b0270498ff9228cf64 Mon Sep 17 00:00:00 2001
+From bfd7e42968f20a8c46716c4319def621e8c75d1e Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 3 Aug 2018 09:55:12 -0700
 Subject: [PATCH] nativesdk-glibc: Make relocatable install for locales
@@ -54,10 +54,10 @@ index 058a467cde..af62f3c304 100644
  /* Size of initial mapping window, optimal if large enough to
     cover the header plus the initial locale.  */
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index ab1b5e5659..92aef8d58e 100644
+index f503792d04..c71be7f4d9 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
-@@ -347,7 +347,7 @@ _nl_lookup_word (locale_t l, int category, int item)
+@@ -346,7 +346,7 @@ _nl_lookup_word (locale_t l, int category, int item)
  }
  
  /* Default search path if no LOCPATH environment variable.  */

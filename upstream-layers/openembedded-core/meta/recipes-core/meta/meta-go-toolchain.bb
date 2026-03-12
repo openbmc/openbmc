@@ -10,3 +10,6 @@ TOOLCHAIN_HOST_TASK:append = " \
 TOOLCHAIN_TARGET_TASK:append = " \
     ${@multilib_pkg_extend(d, 'packagegroup-go-sdk-target')} \
 "
+# rv32/ppc32 do not support go
+COMPATIBLE_HOST:riscv32 = "null"
+COMPATIBLE_HOST:powerpc = "null"

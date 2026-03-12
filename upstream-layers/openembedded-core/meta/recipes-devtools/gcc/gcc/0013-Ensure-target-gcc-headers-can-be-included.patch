@@ -1,4 +1,4 @@
-From 860aae0d1f5dce7a879690d53a6ab54c6a32107e Mon Sep 17 00:00:00 2001
+From b04c28e5a2d6ea62775e10496d661cc02cefe491 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 20 Feb 2015 10:25:11 +0000
 Subject: [PATCH] Ensure target gcc headers can be included

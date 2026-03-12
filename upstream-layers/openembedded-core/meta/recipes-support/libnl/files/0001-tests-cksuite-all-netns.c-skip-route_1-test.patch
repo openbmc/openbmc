@@ -1,0 +1,27 @@
+From 2b9a8ad1fa06cc15b301f18a16e4ad1d30a5d1f7 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 13 Jan 2026 16:55:41 +0100
+Subject: [PATCH] tests/cksuite-all-netns.c: skip route_1 test
+
+It was found to be unstable on arm64:
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=16118
+
+Upstream-Status: Inappropriate [issue reported at https://github.com/thom311/libnl/issues/450]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tests/cksuite-all-netns.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/cksuite-all-netns.c b/tests/cksuite-all-netns.c
+index 4714db2..d5ca6a1 100644
+--- a/tests/cksuite-all-netns.c
++++ b/tests/cksuite-all-netns.c
+@@ -341,7 +341,7 @@ Suite *make_nl_netns_suite(void)
+ 				  nltst_netns_fixture_teardown);
+ 	tcase_add_test(tc, cache_and_clone);
+ 	tcase_add_loop_test(tc, test_create_iface, 0, 17);
+-	tcase_add_test(tc, route_1);
++	//tcase_add_test(tc, route_1);
+ 	suite_add_tcase(suite, tc);
+ 
+ 	return suite;

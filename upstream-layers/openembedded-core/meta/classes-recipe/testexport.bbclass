@@ -52,7 +52,8 @@ def testexport_main(d):
                              d.getVar('IMAGE_LINK_NAME') or d.getVar('IMAGE_NAME')))
 
     tdname = "%s.testdata.json" % image_name
-    td = json.load(open(tdname, "r"))
+    with open(tdname, "r") as f:
+        td = json.load(f)
 
     logger = logging.getLogger("BitBake")
 
@@ -84,6 +85,7 @@ def copy_needed_files(d, tc):
     from oeqa.core.utils.test import getSuiteCasesFiles
 
     export_path = d.getVar('TEST_EXPORT_DIR')
+    bitbake_path = d.getVar('BITBAKEPATH')
     corebase_path = d.getVar('COREBASE')
     bblayers = d.getVar('BBLAYERS').split()
 
@@ -91,9 +93,18 @@ def copy_needed_files(d, tc):
     oe.path.remove(export_path)
     bb.utils.mkdirhier(os.path.join(export_path, 'lib', 'oeqa'))
 
-    # The source of files to copy are relative to 'COREBASE' directory
-    # The destination is relative to 'TEST_EXPORT_DIR'
-    # core files/dirs first
+    # The source of files to copy are relative to 'BITBAKEPATH' and 'COREBASE'
+    # directory. The destination is relative to 'TEST_EXPORT_DIR'.
+    # bitbake and core files/dirs first.
+    bitbake_files_to_copy = [os.path.join('..', 'lib')]
+    for f in bitbake_files_to_copy:
+        src = os.path.join(bitbake_path, f)
+        dst = os.path.join(export_path, 'bitbake', f.split('/', 1)[-1])
+        if os.path.isdir(src):
+            oe.path.copytree(src, dst)
+        else:
+            shutil.copy2(src, dst)
+
     core_files_to_copy = [ os.path.join('scripts', 'oe-test'),
                       os.path.join('scripts', 'lib', 'argparse_oe.py'),
                       os.path.join('scripts', 'lib', 'scriptutils.py'), ]

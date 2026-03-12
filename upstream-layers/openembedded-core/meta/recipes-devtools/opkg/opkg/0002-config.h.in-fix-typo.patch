@@ -1,0 +1,27 @@
+From 5a81faadbc2397d554bc598d535fd2d44cbc8d10 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Mon, 20 Oct 2025 18:57:56 +0200
+Subject: [PATCH] config.h.in: fix typo
+
+Upstream-Status: Backport [https://git.yoctoproject.org/opkg/commit/?id=d723a90bfe6409c7ad983ed911225d4aefbfd09e]
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ config.h.in | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config.h.in b/config.h.in
+index 4fa9842..877b8c7 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -2,7 +2,7 @@
+ #cmakedefine01 WITH_XZ
+ #cmakedefine01 WITH_BZIP2
+ #cmakedefine01 WITH_LZ4
+-#cmakedefine01 WITH_LZSTD
++#cmakedefine01 WITH_ZSTD
+ #cmakedefine01 WITH_CURL
+ #cmakedefine01 WITH_SSLCURL
+ #cmakedefine01 WITH_ACL
+-- 
+2.43.0
+

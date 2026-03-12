@@ -1,0 +1,28 @@
+From fe8166164170465458561581afd55c325d8e138b Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 17 Dec 2025 12:54:20 +0100
+Subject: [PATCH] libweston/backend-drm/meson.build: allow libdisplay-info
+ 0.3.0
+
+The patch in the main branch is against top level meson.build,
+so I manually edited in the same tweak in the 14.x codebase.
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/wayland/weston/-/merge_requests/1815]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ libweston/backend-drm/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libweston/backend-drm/meson.build b/libweston/backend-drm/meson.build
+index 002669e..a8f2ea5 100644
+--- a/libweston/backend-drm/meson.build
++++ b/libweston/backend-drm/meson.build
+@@ -4,7 +4,7 @@ endif
+ 
+ dep_libdisplay_info = dependency(
+ 	'libdisplay-info',
+-	version: ['>= 0.1.1', '< 0.3.0'],
++	version: ['>= 0.1.1', '< 0.4.0'],
+ 	fallback: ['display-info', 'di_dep'],
+ 	default_options: [
+ 		'werror=false',

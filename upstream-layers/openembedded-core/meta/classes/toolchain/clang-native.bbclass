@@ -15,4 +15,4 @@ BUILD_READELF = "${BUILD_PREFIX}llvm-readelf"
 
 DEPENDS += "clang-native libcxx-native compiler-rt-native"
 
-LDFLAGS += " --rtlib=libgcc --unwindlib=libgcc"
+BUILD_LDFLAGS += " --rtlib=libgcc --unwindlib=libgcc"

@@ -1,0 +1,29 @@
+From 223ba6978ee5d198e4dd792e702e5049d53bde37 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Mar 2025 00:30:38 -0700
+Subject: [PATCH] compiler-rt: Do not pass --target to clang compiler
+
+In OE we use <tuple>-clang and <tuple>-clang++ which
+should resolve the --target correctly.
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ compiler-rt/lib/fuzzer/CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/compiler-rt/lib/fuzzer/CMakeLists.txt b/compiler-rt/lib/fuzzer/CMakeLists.txt
+index 6db24610df1f..692e194c2a98 100644
+--- a/compiler-rt/lib/fuzzer/CMakeLists.txt
++++ b/compiler-rt/lib/fuzzer/CMakeLists.txt
+@@ -140,10 +140,6 @@ if(OS_NAME MATCHES "Android|Linux|Fuchsia" AND
+    COMPILER_RT_LIBCXXABI_PATH)
+   macro(partially_link_libcxx name dir arch)
+     get_target_flags_for_arch(${arch} target_cflags)
+-    if(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+-      get_compiler_rt_target(${arch} target)
+-      set(target_cflags --target=${target} ${target_cflags})
+-    endif()
+     set(cxx_${arch}_merge_dir "${CMAKE_CURRENT_BINARY_DIR}/cxx_${arch}_merge.dir")
+     file(MAKE_DIRECTORY ${cxx_${arch}_merge_dir})
+     add_custom_command(TARGET clang_rt.${name}-${arch} POST_BUILD

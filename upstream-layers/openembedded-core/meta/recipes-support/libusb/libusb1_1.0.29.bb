@@ -42,7 +42,7 @@ do_compile_ptest() {
 }
 
 do_install_ptest() {
-    install -m 755 ${B}/tests/stress ${D}${PTEST_PATH}
+    ${B}/libtool --mode=install install ${B}/tests/stress ${D}${PTEST_PATH}
 }
 
 FILES:${PN} += "${base_libdir}/*.so.*"

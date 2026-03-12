@@ -360,12 +360,15 @@ def get_depgraph(targets=['world'], failsafe=False):
     depgraph = None
     with bb.tinfoil.Tinfoil() as tinfoil:
         tinfoil.prepare(config_only=False)
-        tinfoil.set_event_mask(['bb.event.NoProvider', 'bb.event.DepTreeGenerated', 'bb.command.CommandCompleted'])
+        tinfoil.set_event_mask(['bb.event.NoProvider', 'bb.event.DepTreeGenerated', 'bb.command.CommandCompleted', 'bb.command.CommandFailed'])
         if not tinfoil.run_command('generateDepTreeEvent', targets, 'do_build'):
             raise RuntimeError('starting generateDepTreeEvent failed')
+        timeouts = 0
+        max_timeouts = 300
         while True:
             event = tinfoil.wait_event(timeout=1000)
             if event:
+                timeouts = 0
                 if isinstance(event, bb.command.CommandFailed):
                     raise RuntimeError('Generating dependency information failed: %s' % event.error)
                 elif isinstance(event, bb.command.CommandCompleted):
@@ -382,6 +385,10 @@ def get_depgraph(targets=['world'], failsafe=False):
                         raise RuntimeError('Nothing provides %s.' % (event._item))
                 elif isinstance(event, bb.event.DepTreeGenerated):
                     depgraph = event._depgraph
+            else:
+                timeouts += 1
+                if timeouts > max_timeouts:
+                    raise RuntimeError('Timed out waiting for dependency graph generation to complete after %d seconds' % max_timeouts)
 
     if depgraph is None:
         raise RuntimeError('Could not retrieve the depgraph.')

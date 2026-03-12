@@ -114,8 +114,8 @@ Reduce the .dot file packages only, no tasks:
                 if key == "meta-world-pkgdata":
                     continue
                 dep = m.group(2)
-                key = key.split('.')[0]
-                dep = dep.split('.')[0]
+                key = key.rsplit('.', 1)[0]
+                dep = dep.rsplit('.', 1)[0]
                 if key == dep:
                     continue
                 if key in depends:

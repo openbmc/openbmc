@@ -98,7 +98,6 @@ do_populate_sysroot[sstate-outputdirs] = "${COMPONENTS_DIR}/${PACKAGE_ARCH}/${PN
 # Since we actually install these into situ there is no staging prefix
 STAGING_DIR_HOST = ""
 STAGING_DIR_TARGET = ""
-PKG_CONFIG_DIR = "${libdir}/pkgconfig"
 
 EXTRA_NATIVE_PKGCONFIG_PATH ?= ""
 PKG_CONFIG_PATH .= "${EXTRA_NATIVE_PKGCONFIG_PATH}"
@@ -118,84 +117,55 @@ PATH:prepend = "${COREBASE}/scripts/native-intercept:"
 # reused if we manipulate the paths.
 SSTATE_SCAN_CMD ?= "${SSTATE_SCAN_CMD_NATIVE}"
 
-# No strip sysroot when DEBUG_BUILD is enabled
-INHIBIT_SYSROOT_STRIP ?= "${@oe.utils.vartrue('DEBUG_BUILD', '1', '', d)}"
+INHIBIT_SYSROOT_STRIP ??= ""
 
 python native_virtclass_handler () {
     import re
-    pn = e.data.getVar("PN")
+    pn = d.getVar("PN")
     if not pn.endswith("-native"):
         return
-    bpn = e.data.getVar("BPN")
+    bpn = d.getVar("BPN")
 
     # Set features here to prevent appends and distro features backfill
     # from modifying native distro features
     features = set(d.getVar("DISTRO_FEATURES_NATIVE").split())
+    oe.utils.features_backfill("DISTRO_FEATURES", d)
     filtered = set(bb.utils.filter("DISTRO_FEATURES", d.getVar("DISTRO_FEATURES_FILTER_NATIVE"), d).split())
     d.setVar("DISTRO_FEATURES", " ".join(sorted(features | filtered)))
+    d.setVar("DISTRO_FEATURES_BACKFILL", "")
 
-    classextend = e.data.getVar('BBCLASSEXTEND') or ""
+    classextend = d.getVar('BBCLASSEXTEND') or ""
     if "native" not in classextend:
         return
 
-    def map_dependencies(varname, d, suffix = "", selfref=True, regex=False):
-        if suffix:
-            varname = varname + ":" + suffix
-        deps = d.getVar(varname)
-        if not deps:
-            return
-        deps = bb.utils.explode_deps(deps)
-        newdeps = []
-        for dep in deps:
-            if regex and dep.startswith("^") and dep.endswith("$"):
-                newdeps.append(dep[:-1].replace(pn, bpn) + "-native$")
-            elif dep == pn:
-                if not selfref:
-                    continue
-                newdeps.append(dep)
-            elif "-cross-" in dep:
-                newdeps.append(dep.replace("-cross", "-native"))
-            elif not dep.endswith("-native"):
-                # Replace ${PN} with ${BPN} in the dependency to make sure
-                # dependencies on, e.g., ${PN}-foo become ${BPN}-foo-native
-                # rather than ${BPN}-native-foo-native.
-                newdeps.append(dep.replace(pn, bpn) + "-native")
-            else:
-                newdeps.append(dep)
-        output_varname = varname
+    def map_dependencies(varname, d, suffix, selfref=True, regex=False):
+        varname = varname + ":" + suffix
         # Handle ${PN}-xxx -> ${BPN}-xxx-native
         if suffix != "${PN}" and "${PN}" in suffix:
             output_varname = varname.replace("${PN}", "${BPN}") + "-native"
             d.renameVar(varname, output_varname)
-        d.setVar(output_varname, " ".join(newdeps))
 
-    map_dependencies("DEPENDS", e.data, selfref=False)
+    d.setVarFilter("DEPENDS", "native_filter(val, '" + pn + "', '" + bpn + "', selfref=False)")
+
+    for varname in ["RDEPENDS", "RRECOMMENDS", "RSUGGESTS", "RPROVIDES", "RREPLACES"]:
+        d.setVarFilter(varname, "native_filter(val, '" + pn + "', '" + bpn + "')")
+
     # We need to handle things like ${@bb.utils.contains('PTEST_ENABLED', '1', '${PN}-ptest', '', d)}
     # and not pass ${PN}-test since in the native case it would be ignored. This does mean we ignore
     # anonymous python derived PACKAGES entries.
     for pkg in re.split(r"\${@(?:{.*?}|.)+?}|\s", d.getVar("PACKAGES", False)):
         if not pkg:
             continue
-        map_dependencies("RDEPENDS", e.data, pkg)
-        map_dependencies("RRECOMMENDS", e.data, pkg)
-        map_dependencies("RSUGGESTS", e.data, pkg)
-        map_dependencies("RPROVIDES", e.data, pkg)
-        map_dependencies("RREPLACES", e.data, pkg)
-    map_dependencies("PACKAGES", e.data)
-    map_dependencies("PACKAGES_DYNAMIC", e.data, regex=True)
+        map_dependencies("RDEPENDS", d, pkg)
+        map_dependencies("RRECOMMENDS", d, pkg)
+        map_dependencies("RSUGGESTS", d, pkg)
+        map_dependencies("RPROVIDES", d, pkg)
+        map_dependencies("RREPLACES", d, pkg)
 
-    provides = e.data.getVar("PROVIDES")
-    nprovides = []
-    for prov in provides.split():
-        if prov.find(pn) != -1:
-            nprovides.append(prov)
-        elif not prov.endswith("-native"):
-            nprovides.append(prov + "-native")
-        else:
-            nprovides.append(prov)
-    e.data.setVar("PROVIDES", ' '.join(nprovides))
+    d.setVarFilter("PACKAGES", "native_filter(val, '" + pn + "', '" + bpn + "')")
+    d.setVarFilter("PACKAGES_DYNAMIC", "native_filter(val, '" + pn + "', '" + bpn + "', regex=True)")
 
-
+    d.setVarFilter("PROVIDES", "native_filter(val, '" + pn + "', '" + bpn + "')")
 }
 
 addhandler native_virtclass_handler

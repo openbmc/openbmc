@@ -1,4 +1,4 @@
-From 8942cfa25f5822d88f990c3a939c0a4f7832a0e2 Mon Sep 17 00:00:00 2001
+From 9bad9efbe713d72ca7ba01b19dcd5c34031ff6b1 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 15 Apr 2020 14:17:20 -0700
 Subject: [PATCH] Check for clang before checking gcc version

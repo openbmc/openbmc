@@ -162,7 +162,7 @@ def expand_tag_strings(repo, name_pattern, msg_subj_pattern, msg_body_pattern,
     msg_body = format_str(msg_body_pattern, keyws)
     return tag_name, msg_subj + '\n\n' + msg_body
 
-def gitarchive(data_dir, git_dir, no_create, bare, commit_msg_subject, commit_msg_body, branch_name, no_tag, tagname, tag_msg_subject, tag_msg_body, exclude, notes, push, keywords, log):
+def gitarchive(data_dir, git_dir, no_create, bare, commit_msg_subject, commit_msg_body, branch_name, no_tag, tagname, tag_msg_subject, tag_msg_body, exclude, notes, push, push_remote, keywords, log):
 
     if not os.path.isdir(data_dir):
         raise ArchiveError("Not a directory: {}".format(data_dir))
@@ -179,7 +179,7 @@ def gitarchive(data_dir, git_dir, no_create, bare, commit_msg_subject, commit_ms
         tag_name, tag_msg = expand_tag_strings(data_repo, tagname,
                                                tag_msg_subject,
                                                tag_msg_body,
-                                               push, log, keywords)
+                                               push_remote, log, keywords)
 
     # Commit data
     commit = git_commit_data(data_repo, data_dir, branch_name,
@@ -195,10 +195,10 @@ def gitarchive(data_dir, git_dir, no_create, bare, commit_msg_subject, commit_ms
         cmd = ['push', '--tags']
         # If no remote is given we push with the default settings from
         # gitconfig
-        if push is not True:
+        if push_remote is not None:
             notes_refs = ['refs/notes/' + ref.format(branch_name=branch_name)
                            for ref, _ in notes]
-            cmd.extend([push, branch_name] + notes_refs)
+            cmd.extend([push_remote, branch_name] + notes_refs)
         log.info("Pushing data to remote")
         data_repo.run_cmd(cmd)
 

@@ -19,7 +19,7 @@ from .qemurunner import QemuRunner
 
 class QemuTinyRunner(QemuRunner):
 
-    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, kernel, boottime, logger, tmpfsdir=None):
+    def __init__(self, machine, rootfs, display, tmpdir, deploy_dir_image, logfile, kernel, boottime, logger, tmpfsdir=None, native_sysroot=None):
 
         # Popen object for runqemu
         self.runqemu = None
@@ -44,6 +44,7 @@ class QemuTinyRunner(QemuRunner):
         self.server_socket = None
         self.kernel = kernel
         self.logger = logger
+        self.native_sysroot = native_sysroot
 
 
     def create_socket(self):

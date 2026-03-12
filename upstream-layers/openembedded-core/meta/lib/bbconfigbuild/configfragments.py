@@ -28,10 +28,10 @@ class ConfigFragmentsPlugin(LayerPlugin):
         summary = d.getVar('BB_CONF_FRAGMENT_SUMMARY')
         description = d.getVar('BB_CONF_FRAGMENT_DESCRIPTION')
         if not summary:
-            raise Exception('Please add a one-line summary as BB_CONF_FRAGMENT_SUMMARY = \"...\" variable at the beginning of {}'.format(path))
+            bb.fatal('Please add a one-line summary as BB_CONF_FRAGMENT_SUMMARY = "..." variable at the beginning of {}'.format(path))
 
         if not description:
-            raise Exception('Please add a description as BB_CONF_FRAGMENT_DESCRIPTION = \"...\" variable at the beginning of {}'.format(path))
+            bb.fatal('Please add a description as BB_CONF_FRAGMENT_DESCRIPTION = "..." variable at the beginning of {}'.format(path))
 
         return summary, description
 
@@ -75,11 +75,13 @@ class ConfigFragmentsPlugin(LayerPlugin):
                  print('{}\tSets {} = "{}"'.format(f, builtin_dict[prefix], value))
             print('')
 
+        allfragments = self.discover_fragments()
+
         all_enabled_fragments = (self.tinfoil.config_data.getVar('OE_FRAGMENTS') or "").split()
         all_builtin_fragments = (self.tinfoil.config_data.getVar('OE_FRAGMENTS_BUILTIN') or "").split()
         print_builtin_fragments(all_builtin_fragments, all_enabled_fragments)
 
-        for layername, layerdata in self.discover_fragments().items():
+        for layername, layerdata in allfragments.items():
             layerdir = layerdata['layerdir']
             fragments = layerdata['fragments']
             enabled_fragments = [f for f in fragments if f['name'] in all_enabled_fragments]
@@ -97,22 +99,29 @@ class ConfigFragmentsPlugin(LayerPlugin):
                     print_fragment(f, args.verbose, is_enabled=False)
             print('')
 
-    def fragment_exists(self, fragmentname):
-        for layername, layerdata in self.discover_fragments().items():
+    def get_fragment(self, fragmentname, fragments):
+        for layername, layerdata in fragments.items():
             for f in layerdata['fragments']:
               if f['name'] == fragmentname:
-                  return True
-        return False
+                  return f
+        return None
+
+    def fragment_prefix(self, fragmentname):
+        return fragmentname.split("/",1)[0]
 
     def builtin_fragment_exists(self, fragmentname):
-        fragment_prefix = fragmentname.split("/",1)[0]
+        fragment_prefix = self.fragment_prefix(fragmentname)
         fragment_prefix_defs = set([f.split(':')[0] for f in self.tinfoil.config_data.getVar('OE_FRAGMENTS_BUILTIN').split()])
         return fragment_prefix in fragment_prefix_defs
 
     def create_conf(self, confpath):
         if not os.path.exists(confpath):
             with open(confpath, 'w') as f:
-                f.write('')
+                f.write("""# Automated config file controlled by tools
+#
+# Run 'bitbake-config-build enable-fragment <fragment-name>' to enable additional fragments
+# or replace built-in ones (e.g. machine/<name> or distro/<name> to change MACHINE or DISTRO).
+""")
         with open(confpath, 'r') as f:
             lines = f.read()
         if "OE_FRAGMENTS += " not in lines:
@@ -128,33 +137,52 @@ class ConfigFragmentsPlugin(LayerPlugin):
                 if f in enabled_fragments:
                     print("Fragment {} already included in {}".format(f, args.confpath))
                 else:
+                    # first filter out all built-in fragments with the same prefix as the one that is being enabled
+                    enabled_fragments = [fragment for fragment in enabled_fragments if not(self.builtin_fragment_exists(fragment) and self.fragment_prefix(fragment) == self.fragment_prefix(f))]
                     enabled_fragments.append(f)
             return " ".join(enabled_fragments), None, 0, True
 
+        fragments = self.discover_fragments()
         for f in args.fragmentname:
-            if not self.fragment_exists(f) and not self.builtin_fragment_exists(f):
-                raise Exception("Fragment {} does not exist; use 'list-fragments' to see the full list.".format(f))
+            if not self.get_fragment(f, fragments) and not self.builtin_fragment_exists(f):
+                bb.fatal("Fragment {} does not exist; use 'list-fragments' to see the full list.".format(f))
 
         self.create_conf(args.confpath)
         modified = bb.utils.edit_metadata_file(args.confpath, ["OE_FRAGMENTS"], enable_helper)
         if modified:
-            print("Fragment {} added to {}.".format(", ".join(args.fragmentname), args.confpath))
+            for f in args.fragmentname:
+                print("Fragment {} added to {}.".format(f, args.confpath))
+                f_info = self.get_fragment(f, fragments)
+                if f_info and not args.quiet:
+                    print('\nFragment summary: {}\n\nFragment description:\n{}\n'.format(f_info['summary'],f_info['description']))
 
     def do_disable_fragment(self, args):
         """ Disable a fragment in the local build configuration """
         def disable_helper(varname, origvalue, op, newlines):
             enabled_fragments = origvalue.split()
             for f in args.fragmentname:
-                if f in enabled_fragments:
-                    enabled_fragments.remove(f)
-                else:
-                    print("Fragment {} not currently enabled in {}".format(f, args.confpath))
+                for e in enabled_fragments[:]:
+                    if (f.endswith('/') and e.startswith(f)) or f==e:
+                        print("Removing fragment {} from {}".format(e, args.confpath))
+                        enabled_fragments.remove(e)
             return " ".join(enabled_fragments), None, 0, True
 
         self.create_conf(args.confpath)
         modified = bb.utils.edit_metadata_file(args.confpath, ["OE_FRAGMENTS"], disable_helper)
-        if modified:
-            print("Fragment {} removed from {}.".format(", ".join(args.fragmentname), args.confpath))
+        if not modified:
+            print("Fragment names or prefixes {} matched nothing in {}.".format(", ".join(args.fragmentname), args.confpath))
+
+    def do_show_fragment(self, args):
+        """ Show the content of a fragment """
+        for layername, layerdata in self.discover_fragments().items():
+            fragments = layerdata['fragments']
+            for fragment in fragments:
+                if fragment['name'] == args.fragmentname:
+                    print(f"{fragment['path']}:")
+                    print()
+                    with open(fragment['path']) as fd:
+                        print(fd.read())
+                    return
 
     def do_disable_all_fragments(self, args):
         """ Disable all fragments in the local build configuration """
@@ -167,7 +195,7 @@ class ConfigFragmentsPlugin(LayerPlugin):
             print("All fragments removed from {}.".format(args.confpath))
 
     def register_commands(self, sp):
-        default_confpath = os.path.join(os.environ["BBPATH"], "conf/auto.conf")
+        default_confpath = os.path.join(os.environ["BBPATH"], "conf/toolcfg.conf")
 
         parser_list_fragments = self.add_command(sp, 'list-fragments', self.do_list_fragments, parserecipes=False)
         parser_list_fragments.add_argument("--confpath", default=default_confpath, help='Configuration file which contains a list of enabled fragments (default is {}).'.format(default_confpath))
@@ -175,11 +203,17 @@ class ConfigFragmentsPlugin(LayerPlugin):
 
         parser_enable_fragment = self.add_command(sp, 'enable-fragment', self.do_enable_fragment, parserecipes=False)
         parser_enable_fragment.add_argument("--confpath", default=default_confpath, help='Configuration file which contains a list of enabled fragments (default is {}).'.format(default_confpath))
+        # Store the quiet argument in quiet_dummy. This is because --quiet is a
+        # global option and this one is only here to add an entry for --help.
+        parser_enable_fragment.add_argument('--quiet', '-q', action='store_true', dest='quiet_dummy', help='Do not print descriptions of the newly enabled fragments')
         parser_enable_fragment.add_argument('fragmentname', help='The name of the fragment (use list-fragments to see them)', nargs='+')
 
         parser_disable_fragment = self.add_command(sp, 'disable-fragment', self.do_disable_fragment, parserecipes=False)
         parser_disable_fragment.add_argument("--confpath", default=default_confpath, help='Configuration file which contains a list of enabled fragments (default is {}).'.format(default_confpath))
-        parser_disable_fragment.add_argument('fragmentname', help='The name of the fragment', nargs='+')
+        parser_disable_fragment.add_argument('fragmentname', help='The name of the fragment, or a name prefix (ending with "/") to match', nargs='+')
+
+        parser_show_fragment = self.add_command(sp, 'show-fragment', self.do_show_fragment, parserecipes=False)
+        parser_show_fragment.add_argument('fragmentname', help='The name of the fragment')
 
         parser_disable_all = self.add_command(sp, 'disable-all-fragments', self.do_disable_all_fragments, parserecipes=False)
         parser_disable_all.add_argument("--confpath", default=default_confpath, help='Configuration file which contains a list of enabled fragments (default is {}).'.format(default_confpath))

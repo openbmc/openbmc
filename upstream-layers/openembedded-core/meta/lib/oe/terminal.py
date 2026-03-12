@@ -240,6 +240,7 @@ def spawn(name, sh_cmd, title=None, env=None, d=None):
     import tempfile
     import time
     pidfile = tempfile.NamedTemporaryFile(delete = False).name
+    start_time = None
     try:
         sh_cmd = bb.utils.which(os.getenv('PATH'), "oe-gnome-terminal-phonehome") + " " + pidfile + " " + sh_cmd
         pipe = terminal(sh_cmd, title, env, d)
@@ -249,6 +250,7 @@ def spawn(name, sh_cmd, title=None, env=None, d=None):
         if pipe.returncode != 0:
             raise ExecutionError(sh_cmd, pipe.returncode, output)
 
+        start_time = time.time()
         while os.stat(pidfile).st_size <= 0:
             time.sleep(0.01)
             continue
@@ -262,7 +264,10 @@ def spawn(name, sh_cmd, title=None, env=None, d=None):
             os.kill(pid, 0)
             time.sleep(0.1)
         except OSError:
-           return
+            if start_time and (time.time() - start_time < 1):
+                bb.warn("Terminal \"%s\" started but stopped after only %.2fs while running \"%s\""
+                        % (name, time.time() - start_time, sh_cmd))
+            return
 
 def check_tmux_version(desired):
     vernum = check_terminal_version("tmux")

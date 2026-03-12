@@ -17,7 +17,6 @@ CLASSOVERRIDE = "class-nativesdk"
 MACHINEOVERRIDES = ""
 
 MACHINE_FEATURES = "${SDK_MACHINE_FEATURES}"
-DISTRO_FEATURES_BACKFILL = ""
 MACHINE_FEATURES_BACKFILL = ""
 
 MULTILIBS = ""
@@ -74,9 +73,6 @@ exec_prefix = "${SDKPATHNATIVE}${prefix_nativesdk}"
 baselib = "lib"
 sbindir = "${bindir}"
 
-export PKG_CONFIG_DIR = "${STAGING_DIR_HOST}${libdir}/pkgconfig"
-export PKG_CONFIG_SYSROOT_DIR = "${STAGING_DIR_HOST}"
-
 python nativesdk_virtclass_handler () {
     pn = e.data.getVar("PN")
     if not (pn.endswith("-nativesdk") or pn.startswith("nativesdk-")):
@@ -85,8 +81,10 @@ python nativesdk_virtclass_handler () {
     # Set features here to prevent appends and distro features backfill
     # from modifying nativesdk distro features
     features = set(d.getVar("DISTRO_FEATURES_NATIVESDK").split())
+    oe.utils.features_backfill("DISTRO_FEATURES", d)
     filtered = set(bb.utils.filter("DISTRO_FEATURES", d.getVar("DISTRO_FEATURES_FILTER_NATIVESDK"), d).split())
     d.setVar("DISTRO_FEATURES", " ".join(sorted(features | filtered)))
+    d.setVar("DISTRO_FEATURES_BACKFILL", "")
 
     e.data.setVar("MLPREFIX", "nativesdk-")
     e.data.setVar("PN", "nativesdk-" + e.data.getVar("PN").replace("-nativesdk", "").replace("nativesdk-", ""))
@@ -99,15 +97,16 @@ python () {
 
     import oe.classextend
 
-    clsextend = oe.classextend.NativesdkClassExtender("nativesdk", d)
-    clsextend.rename_packages()
+    clsextend = oe.classextend.ClassExtender("nativesdk", [], d)
     clsextend.rename_package_variables((d.getVar("PACKAGEVARS") or "").split())
 
-    clsextend.map_depends_variable("DEPENDS")
-    clsextend.map_depends_variable("PACKAGE_WRITE_DEPS")
-    clsextend.map_packagevars()
-    clsextend.map_variable("PROVIDES")
-    clsextend.map_regexp_variable("PACKAGES_DYNAMIC")
+    clsextend.set_filter("DEPENDS", deps=True)
+    clsextend.set_filter("PACKAGE_WRITE_DEPS", deps=False)
+    clsextend.set_filter("PROVIDES", deps=False)
+
+    if "nativesdk" in (d.getVar("BBCLASSEXTEND") or ""):
+        clsextend.map_packagevars()
+
     d.setVar("LIBCEXTENSION", "")
     d.setVar("ABIEXTENSION", "")
 }

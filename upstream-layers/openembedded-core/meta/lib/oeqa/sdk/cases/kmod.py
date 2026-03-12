@@ -21,9 +21,13 @@ class KernelModuleTest(OESDKTestCase):
         if isinstance(self.tc, OESDKExtTestContext):
             self.skipTest(f"{self.id()} does not support eSDK (https://bugzilla.yoctoproject.org/show_bug.cgi?id=15850)")
 
+        from oe.utils import parallel_make_value
+        pmv = parallel_make_value((self.td.get('PARALLEL_MAKE') or '').split())
+        parallel_make = "-j %d" % (pmv) if pmv else ""
+
         self.ensure_target_package("kernel-devsrc")
         # These targets need to be built before kernel modules can be built.
-        self._run("make -j -C $OECORE_TARGET_SYSROOT/usr/src/kernel prepare scripts")
+        self._run("make %s -C $OECORE_TARGET_SYSROOT/usr/src/kernel prepare scripts" % (parallel_make))
 
         with tempfile.TemporaryDirectory(prefix="cryptodev", dir=self.tc.sdk_dir) as testdir:
             git_url = "https://github.com/cryptodev-linux/cryptodev-linux"

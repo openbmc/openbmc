@@ -28,19 +28,15 @@ diff --git a/tests/Makefile.am b/tests/Makefile.am
 index eb071ac..9d14fe8 100644
 --- a/tests/Makefile.am
 +++ b/tests/Makefile.am
-@@ -145,3 +145,15 @@ d_creat_ce_LDADD = ../src/libgdbm.la ../compat/libgdbm_compat.la
- t_wordwrap_LDADD = ../tools/libgdbmapp.a
+@@ -150,3 +150,11 @@
+ t_wordwrap_LDADD = ../tools/libgdbmapp.a @LTLIBINTL@
  
- SUBDIRS = gdbmtool
+ SUBDIRS = dejagnu
 +
 +buildtests: $(check_PROGRAMS) $(TESTSUITE)
 +
 +install-ptest: $(check_PROGRAMS) $(TESTSUITE)
 +	@$(INSTALL) -d $(DESTDIR)
 +	@for file in $^; do \
-+		if [ -x .libs/$$file ]; then \
-+			$(INSTALL_PROGRAM) .libs/$$file $(DESTDIR)/$$file; \
-+		else \
-+			$(INSTALL_PROGRAM) $$file $(DESTDIR) ; \
-+		fi \
++			$(LIBTOOL) --mode=install $(INSTALL_PROGRAM) $$file $(DESTDIR) ; \
 +	done

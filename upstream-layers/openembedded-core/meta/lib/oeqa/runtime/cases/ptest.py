@@ -22,7 +22,7 @@ class PtestRunnerTest(OERuntimeTestCase):
     @OEHasPackage(['ptest-runner'])
     @unittest.expectedFailure
     def test_ptestrunner_expectfail(self):
-        if not self.td.get('PTEST_EXPECT_FAILURE'):
+        if not bb.utils.to_boolean(self.td.get('PTEST_EXPECT_FAILURE'), default=False):
             self.skipTest('Cannot run ptests with @expectedFailure as ptests are required to pass')
         self.do_ptestrunner()
 
@@ -30,12 +30,12 @@ class PtestRunnerTest(OERuntimeTestCase):
     @OETestDepends(['ssh.SSHTest.test_ssh'])
     @OEHasPackage(['ptest-runner'])
     def test_ptestrunner_expectsuccess(self):
-        if self.td.get('PTEST_EXPECT_FAILURE'):
+        if bb.utils.to_boolean(self.td.get('PTEST_EXPECT_FAILURE'), default=False):
             self.skipTest('Cannot run ptests without @expectedFailure as ptests are expected to fail')
         self.do_ptestrunner()
 
     def do_ptestrunner(self):
-        status, output = self.target.run('which ptest-runner', 0)
+        status, output = self.target.run('which ptest-runner')
         if status != 0:
             self.skipTest("No -ptest packages are installed in the image")
 
@@ -59,7 +59,8 @@ class PtestRunnerTest(OERuntimeTestCase):
         ptest_dirs = [ '/usr/lib' ]
         if not libdir in ptest_dirs:
             ptest_dirs.append(libdir)
-        status, output = self.target.run('ptest-runner -t 450 -d \"{}\"'.format(' '.join(ptest_dirs)), 0)
+        ptest_timeout = self.td.get('PTEST_RUNNER_TIMEOUT', '450')
+        status, output = self.target.run('ptest-runner -t {} -d \"{}\"'.format(ptest_timeout, ' '.join(ptest_dirs)), timeout=int(ptest_timeout)+30)
         os.makedirs(ptest_log_dir)
         with open(ptest_runner_log, 'w') as f:
             f.write(output)

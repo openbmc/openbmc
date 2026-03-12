@@ -1,0 +1,28 @@
+From 1bcc784f5c2406eb1898f1b935ad0f534cc281ad Mon Sep 17 00:00:00 2001
+From: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+Date: Thu, 5 Mar 2026 08:06:54 +0100
+Subject: [PATCH] include/color.h: add missing include for types
+
+Fix `musl` build error
+
+Upstream-Status: Submitted [https://lore.kernel.org/netdev/20260305082507.896700-1-andrej.kozemcak@siemens.com/T/#u]
+Signed-off-by: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+---
+ include/color.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/color.h b/include/color.h
+index b543c267..3794a2aa 100644
+--- a/include/color.h
++++ b/include/color.h
+@@ -3,6 +3,7 @@
+ #define __COLOR_H__ 1
+ 
+ #include <stdbool.h>
++#include <linux/types.h>
+ 
+ enum color_attr {
+ 	COLOR_IFNAME,
+-- 
+2.47.3
+

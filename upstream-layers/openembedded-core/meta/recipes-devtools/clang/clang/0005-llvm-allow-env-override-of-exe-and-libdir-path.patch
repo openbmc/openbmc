@@ -1,4 +1,4 @@
-From 13a9ce5a34060abaa6d5da5176eb1dab271dac4e Mon Sep 17 00:00:00 2001
+From fb846030137c14f4f64937f0bfad5a6aad9bb523 Mon Sep 17 00:00:00 2001
 From: Martin Kelly <mkelly@xevo.com>
 Date: Fri, 19 May 2017 00:22:57 -0700
 Subject: [PATCH] llvm: allow env override of exe and libdir path
@@ -19,10 +19,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 19 insertions(+), 6 deletions(-)
 
 diff --git a/llvm/tools/llvm-config/llvm-config.cpp b/llvm/tools/llvm-config/llvm-config.cpp
-index d5b76b1bb6c1..a739f0d8dbea 100644
+index 49df8fdcb7f7..c092db81bb8f 100644
 --- a/llvm/tools/llvm-config/llvm-config.cpp
 +++ b/llvm/tools/llvm-config/llvm-config.cpp
-@@ -246,6 +246,13 @@ Typical components:\n\
+@@ -245,6 +245,13 @@ Typical components:\n\
  
  /// Compute the path to the main executable.
  std::string GetExecutablePath(const char *Argv0) {
@@ -36,7 +36,7 @@ index d5b76b1bb6c1..a739f0d8dbea 100644
    // This just needs to be some symbol in the binary; C++ doesn't
    // allow taking the address of ::main however.
    void *P = (void *)(intptr_t)GetExecutablePath;
-@@ -325,7 +332,7 @@ int main(int argc, char **argv) {
+@@ -324,7 +331,7 @@ int main(int argc, char **argv) {
    // Compute various directory locations based on the derived location
    // information.
    std::string ActivePrefix, ActiveBinDir, ActiveIncludeDir, ActiveLibDir,
@@ -45,7 +45,7 @@ index d5b76b1bb6c1..a739f0d8dbea 100644
    std::string ActiveIncludeOption;
    if (IsInDevelopmentTree) {
      ActiveIncludeDir = std::string(LLVM_SRC_ROOT) + "/include";
-@@ -366,12 +373,18 @@ int main(int argc, char **argv) {
+@@ -365,12 +372,18 @@ int main(int argc, char **argv) {
        sys::fs::make_absolute(ActivePrefix, Path);
        ActiveBinDir = std::string(Path);
      }

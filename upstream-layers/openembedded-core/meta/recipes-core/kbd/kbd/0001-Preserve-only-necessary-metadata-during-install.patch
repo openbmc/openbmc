@@ -1,0 +1,54 @@
+From d9d1c22592b6ce21bf455a22bca9000bf9b3fe61 Mon Sep 17 00:00:00 2001
+From: Alexey Gladkov <legion@kernel.org>
+Date: Wed, 10 Sep 2025 10:45:25 +0200
+Subject: [PATCH] Preserve only necessary metadata during install
+
+"cp -a" tries to preserve all attributes if possible. This implies
+preserving mode, any ACL, xattr permissions, and security context.
+
+In some cases (such as fakeroot), it is not possible to preserve that
+all attributes are preserved.
+
+  cp: failed to preserve ownership for /tmp/.pkgmk/pkg/usr/share/kbd/keymaps/i386/qwertz/sr-latin.map.gz: Operation not supported
+
+To avoid this, we will require that only the necessary attributes be
+preserved. It is important for us to preserve the simlinks.
+
+Signed-off-by: Alexey Gladkov <legion@kernel.org>
+Upstream-Status: Backport [https://github.com/legionus/kbd/commit/db82eb6f86e6c0b8ac4260e88b88d66e1cd7c077]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ data/Makefile.am | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/data/Makefile.am b/data/Makefile.am
+index a730062..4d2ae3d 100644
+--- a/data/Makefile.am
++++ b/data/Makefile.am
+@@ -44,21 +44,21 @@ endif
+ 
+ install-consolefonts: $(SRC_FONTDIR) $(SRC_PARTIALDIR)
+ 	mkdir -p -m 755 -- $(DESTDIR)$(datadir)/$(FONTDIR)
+-	cp -a -- $(SRC_FONTDIR)/* $(DESTDIR)$(datadir)/$(FONTDIR)/
++	cp -dPR -- $(SRC_FONTDIR)/* $(DESTDIR)$(datadir)/$(FONTDIR)/
+ 	mkdir -p -m 755 -- $(DESTDIR)$(datadir)/$(FONTDIR)/$(PARTIALDIR)
+-	cp -a -- $(SRC_PARTIALDIR)/* $(DESTDIR)$(datadir)/$(FONTDIR)/$(PARTIALDIR)/
++	cp -dPR -- $(SRC_PARTIALDIR)/* $(DESTDIR)$(datadir)/$(FONTDIR)/$(PARTIALDIR)/
+ 
+ install-consoletrans:
+ 	mkdir -p -m 755 -- $(DESTDIR)$(datadir)/$(TRANSDIR)
+-	cp -a -- $(srcdir)/$(TRANSDIR)/* $(DESTDIR)$(datadir)/$(TRANSDIR)/
++	cp -dPR -- $(srcdir)/$(TRANSDIR)/* $(DESTDIR)$(datadir)/$(TRANSDIR)/
+ 
+ install-unimaps:
+ 	mkdir -p -m 755 -- $(DESTDIR)$(datadir)/$(UNIMAPDIR)
+-	cp -a -- $(srcdir)/$(UNIMAPDIR)/* $(DESTDIR)$(datadir)/$(UNIMAPDIR)/
++	cp -dPR -- $(srcdir)/$(UNIMAPDIR)/* $(DESTDIR)$(datadir)/$(UNIMAPDIR)/
+ 
+ install-keymaps: $(SRC_KEYMAPDIR)
+ 	mkdir -p -m 755 -- $(DESTDIR)$(datadir)/$(KEYMAPDIR)
+-	cp -ar -- $(SRC_KEYMAPDIR)/* $(DESTDIR)$(datadir)/$(KEYMAPDIR)/
++	cp -dPR -- $(SRC_KEYMAPDIR)/* $(DESTDIR)$(datadir)/$(KEYMAPDIR)/
+ 	cd "$(DESTDIR)$(datadir)/$(KEYMAPDIR)"; \
+ 	  for f in $(IGNORE_KEYMAPS); do ! test -e "$$f" || rm -f -- "$$f"; done
+ 	rm -f $(DESTDIR)$(datadir)/$(KEYMAPDIR)/ppc

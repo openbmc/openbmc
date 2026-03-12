@@ -1,0 +1,41 @@
+From 203d8f2187bb7f483290e0f8b7b48b152b1d027f Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 5 Mar 2026 11:33:57 +0000
+Subject: [PATCH] configure: make the C99 detection more resiliant
+
+autoconf 2.73 will default to C23 by default, which means that the >C99
+detection logic in configure.ac will fail because it only handles c11
+and c99.
+
+Instead of adding c23 to the list and then breaking again in the future,
+flip the logic around (as suggested by Zack Weinberg) and check
+explicitly for just c89.
+
+Closes #1806.
+
+Upstream-Status: Submitted [https://gitlab.com/gnutls/gnutls/-/merge_requests/2081]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 740fb6339..c708d8f5e 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -54,9 +54,9 @@ AC_USE_SYSTEM_EXTENSIONS
+ # Require C99 support
+ #
+ AS_CASE([$ac_prog_cc_stdc],
+-  [c11 | c99], [AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])],
+-  [AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])]
+-)
++  [c89],
++  [AC_MSG_WARN([[Compiler does not support C99. It may not be able to compile the project.]])],
++  [AC_DEFINE([C99_MACROS], 1, [C99 macros are supported])])
+ 
+ AM_CONDITIONAL(CROSS_COMPILING, test "$cross_compiling" = yes)
+ 
+-- 
+2.43.0
+

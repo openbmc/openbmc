@@ -1,4 +1,4 @@
-From 3105d7ecc3f16d66c19985a6557cd1e9becfab55 Mon Sep 17 00:00:00 2001
+From 905024346b1f99e98b2cd83d43d4e962f8e43373 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 6 Mar 2017 23:37:05 -0800
 Subject: [PATCH] binutils-cross: Do not generate linker script directories
@@ -18,19 +18,18 @@ RP 2017/01/30
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- ld/genscripts.sh | 25 -------------------------
- 1 file changed, 25 deletions(-)
-
+ ld/genscripts.sh | 27 +--------------------------
+ 1 file changed, 1 insertion(+), 26 deletions(-)
 diff --git a/ld/genscripts.sh b/ld/genscripts.sh
-index 5b51c23e141..5d2c54706f8 100755
+index ce95ac9f410..fb9f3ffa047 100755
 --- a/ld/genscripts.sh
 +++ b/ld/genscripts.sh
-@@ -244,31 +244,6 @@ append_to_lib_path()
+@@ -245,31 +245,6 @@ append_to_lib_path()
    fi
  }
  
 -# Always search $(tooldir)/lib, aka /usr/local/TARGET/lib when native
--# except when LIBPATH=":".
+-# except when LIB_PATH=":".
 -if [ "${LIB_PATH}" != ":" ] ; then
 -  libs=
 -  if [ "x${TOOL_LIB}" = "x" ] ; then

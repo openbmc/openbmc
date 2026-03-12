@@ -1,4 +1,4 @@
-From 3529df77cd20253ce2a9c1962d7a72058a04fd98 Mon Sep 17 00:00:00 2001
+From fdc0b6f84bae7cd6eea18712049da62cdfd5e630 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 21 Aug 2024 20:03:29 -0700
 Subject: [PATCH] support pkgconfig
@@ -20,7 +20,7 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 5 insertions(+), 195 deletions(-)
 
 diff --git a/src/gpg-error.m4 b/src/gpg-error.m4
-index 2d24071..c561725 100644
+index 263f21b..e54ab38 100644
 --- a/src/gpg-error.m4
 +++ b/src/gpg-error.m4
 @@ -15,196 +15,14 @@
@@ -167,11 +167,11 @@ index 2d24071..c561725 100644
 -[ AC_REQUIRE([AC_CANONICAL_HOST])dnl
 -  AC_REQUIRE([_AM_PATH_POSSIBLE_GPG_ERROR_CONFIG])dnl
 -  AC_REQUIRE([_AM_PATH_GPGRT_CONFIG])dnl
--  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-  if test x"$GPGRT_CONFIG" != x && test "$GPGRT_CONFIG" != "no"; then
 -    GPG_ERROR_CONFIG="$GPGRT_CONFIG gpg-error"
 -    AC_MSG_NOTICE([Use gpgrt-config with $gpgrt_libdir as gpg-error-config])
 -    gpg_error_config_version=`$GPG_ERROR_CONFIG --modversion`
--  elif test x"$GPG_ERROR_CONFIG" != x -a "$GPG_ERROR_CONFIG" != "no"; then
+-  elif test x"$GPG_ERROR_CONFIG" != x && test "$GPG_ERROR_CONFIG" != "no"; then
 -    gpg_error_config_version=`$GPG_ERROR_CONFIG --version`
 -  else
 -    gpg_error_config_version="0.0"
@@ -241,3 +241,6 @@ index 2d24071..c561725 100644
 -  AC_SUBST(GPG_ERROR_MT_LIBS)
  ])
 +
+-- 
+2.34.1
+

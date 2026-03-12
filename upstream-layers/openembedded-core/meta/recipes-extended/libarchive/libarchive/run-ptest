@@ -1,0 +1,11 @@
+#!/bin/sh
+
+for t in libarchive_test bsdtar_test bsdcpio_test bsdcat_test bsdunzip_test; do
+    ./$t
+    if [ $? -eq 0 ]; then
+        echo "PASS: $t"
+    else
+        echo "FAIL: $t"
+    fi
+done
+

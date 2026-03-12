@@ -1,4 +1,4 @@
-From 1fbd24512e8fce64b92efa846c301e45a7371ed2 Mon Sep 17 00:00:00 2001
+From 05cf8ed6cc42a2f6ff53009d0ae2713fe63f1245 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 14 Dec 2021 12:34:04 +0000
 Subject: [PATCH] lttng-tools: Disable problem tests
@@ -18,12 +18,12 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 12 deletions(-)
 
 diff --git a/tests/regression/Makefile.am b/tests/regression/Makefile.am
-index e556223..756fb98 100644
+index 7076488..e5be904 100644
 --- a/tests/regression/Makefile.am
 +++ b/tests/regression/Makefile.am
-@@ -29,18 +29,6 @@ TESTS = tools/base-path/test_ust \
- 	tools/crash/test_crash \
+@@ -40,18 +40,6 @@ SERIAL_TESTS = tools/base-path/test_ust \
  	tools/regen-metadata/test_ust \
+ 	tools/regen-statedump/test_kernel \
  	tools/regen-statedump/test_ust \
 -	tools/notification/test_notification_ust_error \
 -	tools/notification/test_notification_ust_buffer_usage \
@@ -39,4 +39,4 @@ index e556223..756fb98 100644
 -	tools/notification/test_notification_multi_app \
  	tools/rotation/test_ust \
  	tools/rotation/test_kernel \
- 	tools/rotation/test_save_load_mi \
+ 	tools/rotation/test_ust_kernel \

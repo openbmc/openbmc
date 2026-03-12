@@ -1,0 +1,29 @@
+From 7de6d35aeea2d06b1597539c47f6af30d2798d73 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 19 Sep 2025 16:33:55 +0100
+Subject: [PATCH] Install lldb-tblgen
+
+In keeping with the llvm-tblgen and clang-tblgen binaries, allow
+lldb-tblgen to be installed by cmake so that cross builds are easier.
+
+Upstream-Status: Backport [https://github.com/llvm/llvm-project/commit/0ce6052a0c08035a07fcabb05271be7313308db3]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ lldb/utils/TableGen/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lldb/utils/TableGen/CMakeLists.txt b/lldb/utils/TableGen/CMakeLists.txt
+index 0ac010bcda35..ce96dddd4420 100644
+--- a/lldb/utils/TableGen/CMakeLists.txt
++++ b/lldb/utils/TableGen/CMakeLists.txt
+@@ -8,6 +8,7 @@ if (NOT DEFINED LLDB_TABLEGEN_EXE)
+     set(LLVM_LINK_COMPONENTS Support)
+ 
+     add_tablegen(lldb-tblgen LLDB
++      DESTINATION "${CMAKE_INSTALL_BINDIR}"
+       LLDBOptionDefEmitter.cpp
+       LLDBPropertyDefEmitter.cpp
+       LLDBTableGen.cpp
+-- 
+2.43.0
+

@@ -6,5 +6,5 @@ if id -u glib2-test; then
 fi
 useradd glib2-test
 cd /tmp
-su glib2-test -c 'G_TEST_TMPDIR=`readlink -f /tmp` gnome-desktop-testing-runner glib'
+su glib2-test -c 'G_TEST_TMPDIR=`readlink -f /tmp` gnome-desktop-testing-runner -t 600 glib'
 userdel glib2-test

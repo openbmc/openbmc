@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=393a5ca445f6965873eca0259a17f833"
 
 DEPENDS = "libaio"
 
-SRC_URI = "git://git.kernel.dk/blktrace.git;protocol=https;branch=master \
+SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/axboe/blktrace.git;protocol=https;branch=master \
            file://0001-bno_plot.py-btt_plot.py-Ask-for-python3-specifically.patch \
           "
 

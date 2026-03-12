@@ -16,11 +16,11 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  src/Makefile | 14 ++++----------
  1 file changed, 4 insertions(+), 10 deletions(-)
 
-Index: git/src/Makefile
-===================================================================
---- git.orig/src/Makefile
-+++ git/src/Makefile
-@@ -3101,16 +3101,10 @@ auto/pathdef.c: Makefile auto/config.mk
+diff --git a/src/Makefile b/src/Makefile
+index 32c0d97d1..97c754673 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -3143,16 +3143,10 @@ auto/pathdef.c: Makefile auto/config.mk
  	-@echo '#include "vim.h"' >> $@
  	-@echo 'char_u *default_vim_dir = (char_u *)"$(VIMRCLOC)";' | $(QUOTESED) >> $@
  	-@echo 'char_u *default_vimruntime_dir = (char_u *)"$(VIMRUNTIMEDIR)";' | $(QUOTESED) >> $@
@@ -29,7 +29,7 @@ Index: git/src/Makefile
 -	-@echo 'char_u *compiled_user = (char_u *)"' | tr -d $(NL) >> $@
 -	-@if test -n "$(COMPILEDBY)"; then \
 -		echo "$(COMPILEDBY)" | tr -d $(NL) >> $@; \
--		else ((logname) 2>/dev/null || whoami) | tr -d $(NL) >> $@; fi
+-		else (logname 2>/dev/null || whoami) | tr -d $(NL) >> $@; fi
 -	-@echo '";' >> $@
 -	-@echo 'char_u *compiled_sys = (char_u *)"' | tr -d $(NL) >> $@
 -	-@if test -z "$(COMPILEDBY)"; then hostname | tr -d $(NL) >> $@; fi

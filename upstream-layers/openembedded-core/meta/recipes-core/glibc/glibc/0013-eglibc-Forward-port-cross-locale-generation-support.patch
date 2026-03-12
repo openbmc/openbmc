@@ -1,4 +1,4 @@
-From 68dcae2527a64a4448334fdfe27c7b6014589aae Mon Sep 17 00:00:00 2001
+From ac8410f1f87a9b93107a0d6a46707fbe4532d154 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
 Subject: [PATCH] eglibc: Forward port cross locale generation support
@@ -87,10 +87,10 @@ index 0000000000..538f3f5edb
 +    [LC_ALL] = sizeof ("LC_ALL") - 1
 +  };
 diff --git a/locale/localeinfo.h b/locale/localeinfo.h
-index 92aef8d58e..ae23b2f7fe 100644
+index c71be7f4d9..7e3cf2b920 100644
 --- a/locale/localeinfo.h
 +++ b/locale/localeinfo.h
-@@ -246,7 +246,7 @@ __libc_tsd_define (extern, locale_t, LOCALE)
+@@ -245,7 +245,7 @@ extern __thread locale_t __libc_tsd_LOCALE
     unused.  We can manage this playing some tricks with weak references.
     But with thread-local locale settings, it becomes quite ungainly unless
     we can use __thread variables.  So only in that case do we attempt this.  */

@@ -36,9 +36,6 @@ index 2dc352d479e..e95270adaeb 100644
  
 -SRC_URI = "file://helloworld.c"
 -
- S = "${WORKDIR}/sources"
- UNPACKDIR = "${S}"
+ S = "${UNPACKDIR}"
  
--- 
-2.45.1
-
+ do_compile() {

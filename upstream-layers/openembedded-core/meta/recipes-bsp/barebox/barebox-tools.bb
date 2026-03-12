@@ -39,6 +39,7 @@ BAREBOX_TOOLS = " \
          omap3-usb-loader \
          omap4_usbboot \
          imx/imx-usb-loader \
+         rk-usb-loader \
          "
 
 BAREBOX_TOOLS_SUFFIX = ""

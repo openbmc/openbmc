@@ -1,0 +1,41 @@
+From fdd02ac61cb909711f56f1e990f45439b0beef7b Mon Sep 17 00:00:00 2001
+From: Serge Pavlov <sepavloff@gmail.com>
+Date: Fri, 25 Jul 2025 13:35:19 +0700
+Subject: [PATCH] Prevent revisiting block when searching for noreturn vars
+
+When searching for noreturn variable initializations, do not visit CFG
+blocks that are already visited, it prevents hanging  the analysis.
+
+It must fix Ihttps://github.com/llvm/llvm-project/issues/150336.
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/150582]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ clang/test/SemaCXX/noreturn-vars.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/clang/test/SemaCXX/noreturn-vars.cpp b/clang/test/SemaCXX/noreturn-vars.cpp
+index ca65fcf5ca31..1bf074149f04 100644
+--- a/clang/test/SemaCXX/noreturn-vars.cpp
++++ b/clang/test/SemaCXX/noreturn-vars.cpp
+@@ -225,3 +225,20 @@ extern void abc_02(func_type *);
+   abc_02(&func_ptr);
+   func_ptr();
+ } // expected-warning {{function declared 'noreturn' should not return}}
++
++namespace Issue150336 {
++void free(void *);
++typedef void (*sel_freefunc)(void *);
++struct gmx_ana_selmethod_t {
++  sel_freefunc free;
++  int nparams;
++  int *param;
++};
++void gmx_selelem_free_method(struct gmx_ana_selmethod_t* method, void* mdata) {
++    sel_freefunc free_func = 0;
++    for (int i = 0; i < method->nparams; ++i)
++        free(&method->param[i]);
++    if (mdata && free_func)
++        free_func(mdata);
++}
++}

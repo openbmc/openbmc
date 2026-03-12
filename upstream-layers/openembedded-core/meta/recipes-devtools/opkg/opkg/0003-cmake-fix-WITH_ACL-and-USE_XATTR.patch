@@ -1,0 +1,95 @@
+From 6d2eb69bb7b8f1ada6232eba4eb9c223be386d29 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Thu, 27 Nov 2025 19:05:16 +0100
+Subject: [PATCH] cmake: fix WITH_ACL and USE_XATTR
+
+- CMakeLists.txt was using USE_ACL, but config.h.in was using WITH_ACL.
+  Use the consistent logic that optional dependencies use the prefix HAVE_,
+  and thus since use WITH_ACL consistently (build dependency libacl).
+
+- opkg_archive.c was using ifdef instead of if for both USE_ACL and USE_XATTR.
+
+- ENABLE_XATTR and ENABLE_ACL were both "no" per default in autoconf, and this default
+  value was mistakenly changed during the cmake migration. Change it back to OFF per default.
+
+Upstream-Status: Backport [https://git.yoctoproject.org/opkg/commit/?id=6d2eb69bb7b8f1ada6232eba4eb9c223be386d29]
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+Signed-off-by: Alex Stewart <alex.stewart@emerson.com>
+---
+ CMakeLists.txt         | 6 ++++--
+ config.h.in            | 2 +-
+ libopkg/CMakeLists.txt | 2 +-
+ libopkg/opkg_archive.c | 4 ++--
+ 4 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f2c01b1..316e343 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -13,6 +13,7 @@ set(PROJECT_VERSION "${PROJECT_VERSION}+git")
+ set(VERSION ${PROJECT_VERSION})
+ 
+ option(STATIC_LIBOPKG "Statically link libopkg into opkg" OFF)
++# Options which add optional dependencies are prefixed with "WITH_"
+ # The current libopkg API is deprecated so only build it if requested
+ option(WITH_LIBOPKG_API "Enable deprecated libopkg API" OFF)
+ option(WITH_XZ "Enable xz compressor support" ON)
+@@ -23,8 +24,9 @@ option(WITH_CURL "Enable downloading with curl" ON)
+ include(CMakeDependentOption)
+ cmake_dependent_option(WITH_SSLCURL "Enable certificate authentication with curl" ON "WITH_CURL" OFF)
+ option(WITH_SHA256 "Enable sha256sum check" OFF)
+-option(USE_ACL "Enable ACL support" ON)
+-option(USE_XATTR "Enable xattr support" ON)
++option(WITH_ACL "Enable ACL support" OFF)
++# Options which don't add optional dependencies are prefixed with "USE_"
++option(USE_XATTR "Enable xattr support" OFF)
+ option(USE_SOLVER_LIBSOLV "Enable libsolv solver support if true. Enable the internal solver if false." ON)
+ if(USE_SOLVER_LIBSOLV)
+     set(USE_SOLVER_INTERNAL OFF CACHE BOOL "Disable internal solver")
+diff --git a/config.h.in b/config.h.in
+index 877b8c7..f2d74c5 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -6,7 +6,7 @@
+ #cmakedefine01 WITH_CURL
+ #cmakedefine01 WITH_SSLCURL
+ #cmakedefine01 WITH_ACL
+-#cmakedefine01 WITH_XATTR
++#cmakedefine01 USE_XATTR
+ #cmakedefine01 USE_SOLVER_LIBSOLV
+ #cmakedefine01 USE_SOLVER_INTERNAL
+ #cmakedefine01 WITH_GPGME
+diff --git a/libopkg/CMakeLists.txt b/libopkg/CMakeLists.txt
+index 628cb8c..39064c2 100644
+--- a/libopkg/CMakeLists.txt
++++ b/libopkg/CMakeLists.txt
+@@ -182,7 +182,7 @@ if(WITH_SSLCURL)
+     target_link_libraries(libopkg OpenSSL::Crypto OpenSSL::SSL)
+ endif()
+ 
+-if(USE_ACL)
++if(WITH_ACL)
+     pkg_check_modules(acl REQUIRED IMPORTED_TARGET libacl)
+     target_link_libraries(libopkg PkgConfig::acl)
+ endif()
+diff --git a/libopkg/opkg_archive.c b/libopkg/opkg_archive.c
+index 48f80c0..fb40db3 100644
+--- a/libopkg/opkg_archive.c
++++ b/libopkg/opkg_archive.c
+@@ -914,11 +914,11 @@ struct opkg_ar *ar_open_pkg_data_archive(const char *filename)
+     ar->extract_flags = ARCHIVE_EXTRACT_OWNER | ARCHIVE_EXTRACT_PERM |
+         ARCHIVE_EXTRACT_TIME | ARCHIVE_EXTRACT_UNLINK | ARCHIVE_EXTRACT_NO_OVERWRITE;
+ 
+-#ifdef USE_ACL
++#if WITH_ACL
+     ar->extract_flags |= ARCHIVE_EXTRACT_ACL;
+ #endif
+ 
+-#ifdef USE_XATTR
++#if USE_XATTR
+     ar->extract_flags |= ARCHIVE_EXTRACT_FFLAGS | ARCHIVE_EXTRACT_XATTR;
+ #endif
+ 
+-- 
+2.43.0
+

@@ -10,3 +10,5 @@ DEPENDS += " libxi libxrandr libxinerama"
 
 SRC_URI_EXT = "xz"
 SRC_URI[sha256sum] = "ad04d00d656884d133110eeddc34e9c69e626ebebbbab04dc95791c2907057c8"
+
+BBCLASSEXTEND = "native nativesdk"

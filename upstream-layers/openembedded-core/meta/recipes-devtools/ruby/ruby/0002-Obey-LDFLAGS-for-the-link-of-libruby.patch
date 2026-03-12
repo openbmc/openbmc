@@ -1,4 +1,4 @@
-From 2625f6c155105d352d6a1ff3a722e7896431ff91 Mon Sep 17 00:00:00 2001
+From 3949b3ff01c642b6b9ada9b12dd3083cc930544a Mon Sep 17 00:00:00 2001
 From: Christopher Larson <chris_larson@mentor.com>
 Date: Thu, 5 May 2016 10:59:07 -0700
 Subject: [PATCH] Obey LDFLAGS for the link of libruby
@@ -10,7 +10,7 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/template/Makefile.in b/template/Makefile.in
-index 8f996b8..c708b64 100644
+index 6b97279..a49b53d 100644
 --- a/template/Makefile.in
 +++ b/template/Makefile.in
 @@ -120,7 +120,7 @@ ENABLE_SHARED = @ENABLE_SHARED@

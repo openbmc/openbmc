@@ -1,0 +1,40 @@
+From 679e24f5a751663998ff7202149a749e0f7251f9 Mon Sep 17 00:00:00 2001
+From: Harish Sadineni <Harish.Sadineni@windriver.com>
+Date: Sun, 10 Aug 2025 20:28:00 +0800
+Subject: [PATCH] testsuite: i386: Fix gcc.target/i386/pr90579.c when PIE is
+ enabled [PR118885]
+
+When gcc build with --enable-deafult-pie the following tests
+were getting failed:
+ FAIL: gcc.target/i386/pr90579.c scan-assembler vaddsd\tr\\+40
+ FAIL: gcc.target/i386/pr90579.c scan-assembler vaddsd\tr\\+32
+ FAIL: gcc.target/i386/pr90579.c scan-assembler vaddsd\tr\\+24
+ FAIL: gcc.target/i386/pr90579.c scan-assembler vaddsd\tr\\+16
+
+    PR target/118885
+
+gcc/testsuite/ChangeLog:
+
+    * gcc.target/i386/pr90579.c: add -fno-pie to dg-options
+    to fix tests when PIE is enabled.
+
+Upstream-Status: Backport [https://gcc.gnu.org/cgit/gcc/commit/?id=679e24f5a751663998ff7202149a749e0f7251f9]
+
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+---
+ gcc/testsuite/gcc.target/i386/pr90579.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gcc/testsuite/gcc.target/i386/pr90579.c b/gcc/testsuite/gcc.target/i386/pr90579.c
+index ab48a44063c..19081ec9fdf 100644
+--- a/gcc/testsuite/gcc.target/i386/pr90579.c
++++ b/gcc/testsuite/gcc.target/i386/pr90579.c
+@@ -1,5 +1,5 @@
+ /* { dg-do compile } */
+-/* { dg-options "-O3 -mavx2 -mfpmath=sse" } */
++/* { dg-options "-O3 -mavx2 -mfpmath=sse -fno-pie" } */
+ 
+ extern double r[6];
+ extern double a[];
+-- 
+2.49.0

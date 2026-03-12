@@ -12,15 +12,9 @@ LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://src/lzop.c;beginline=5;endline=21;md5=23d767de7754eb24b9e900b025cf7fc8"
 
-SRC_URI = "http://www.lzop.org/download/${BP}.tar.gz \
-           file://acinclude.m4 \
-          "
+SRC_URI = "http://www.lzop.org/download/${BP}.tar.gz"
 SRC_URI[sha256sum] = "7e72b62a8a60aff5200a047eea0773a8fb205caf7acbe1774d95147f305a2f41"
 
 inherit autotools
-
-do_configure:prepend () {
-    install -Dm 0644 ${UNPACKDIR}/acinclude.m4 ${S}/acinclude.m4
-}
 
 BBCLASSEXTEND = "native nativesdk"

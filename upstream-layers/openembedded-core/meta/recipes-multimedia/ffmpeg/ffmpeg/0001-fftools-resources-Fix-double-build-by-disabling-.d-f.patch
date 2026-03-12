@@ -1,0 +1,78 @@
+From a789ffae9de93eb70c355a81f9dd2ebf5d6b17a7 Mon Sep 17 00:00:00 2001
+From: softworkz <softworkz@hotmail.com>
+Date: Mon, 23 Jun 2025 14:56:19 +0200
+Subject: [PATCH] fftools/resources: Fix double-build by disabling .d file
+ generation
+
+Signed-off-by: softworkz <softworkz@hotmail.com>
+
+Upstream-Status: Backport [https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/f52d9dd8693bc4628520258f18f89b4a3bf85533]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ ffbuild/common.mak         |  6 ++----
+ fftools/Makefile           |  1 +
+ fftools/resources/Makefile | 12 +++++++++---
+ 3 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/ffbuild/common.mak b/ffbuild/common.mak
+index ddf4892..81e8a46 100644
+--- a/ffbuild/common.mak
++++ b/ffbuild/common.mak
+@@ -229,11 +229,9 @@ SKIPHEADERS += $(ARCH_HEADERS:%=$(ARCH)/%) $(SKIPHEADERS-)
+ SKIPHEADERS := $(SKIPHEADERS:%=$(SUBDIR)%)
+ HOBJS        = $(filter-out $(SKIPHEADERS:.h=.h.o),$(ALLHEADERS:.h=.h.o))
+ PTXOBJS      = $(filter %.ptx.o,$(OBJS))
+-RESOURCEOBJS = $(filter %.css.o %.html.o,$(OBJS))
+ $(HOBJS):     CCFLAGS += $(CFLAGS_HEADERS)
+ checkheaders: $(HOBJS)
+-.SECONDARY:   $(HOBJS:.o=.c) $(PTXOBJS:.o=.c) $(PTXOBJS:.o=.gz) $(PTXOBJS:.o=) $(RESOURCEOBJS:.o=.c) $(RESOURCEOBJS:%.css.o=%.css.min) $(RESOURCEOBJS:%.css.o=%.css.min.gz) $(RESOURCEOBJS:%.html.o=%.html.gz) $(RESOURCEOBJS:.o=)
+-
++.SECONDARY:   $(HOBJS:.o=.c) $(PTXOBJS:.o=.c) $(PTXOBJS:.o=.gz) $(PTXOBJS:.o=)
+ alltools: $(TOOLS)
+ 
+ $(HOSTOBJS): %.o: %.c
+@@ -252,7 +250,7 @@ $(TOOLOBJS): | tools
+ 
+ OUTDIRS := $(OUTDIRS) $(dir $(OBJS) $(HOBJS) $(HOSTOBJS) $(SHLIBOBJS) $(STLIBOBJS) $(TESTOBJS))
+ 
+-CLEANSUFFIXES     = *.d *.gcda *.gcno *.h.c *.ho *.map *.o *.objs *.pc *.ptx *.ptx.gz *.ptx.c *.ver *.version *.html.gz *.html.c *.css.gz *.css.c  *$(DEFAULT_X86ASMD).asm *~ *.ilk *.pdb
++CLEANSUFFIXES     = *.d *.gcda *.gcno *.h.c *.ho *.map *.o *.objs *.pc *.ptx *.ptx.gz *.ptx.c *.ver *.version *.html.gz *.html.c *.css.min.gz *.css.min *.css.c  *$(DEFAULT_X86ASMD).asm *~ *.ilk *.pdb
+ LIBSUFFIXES       = *.a *.lib *.so *.so.* *.dylib *.dll *.def *.dll.a
+ 
+ define RULES
+diff --git a/fftools/Makefile b/fftools/Makefile
+index b3c08ae..bdb44fc 100644
+--- a/fftools/Makefile
++++ b/fftools/Makefile
+@@ -36,6 +36,7 @@ OBJS-ffmpeg +=                  \
+     fftools/textformat/tw_buffer.o    \
+     fftools/textformat/tw_stdout.o    \
+     $(OBJS-resman)                    \
++    $(RESOBJS)                        \
+ 
+ OBJS-ffprobe +=                       \
+     fftools/textformat/avtextformat.o \
+diff --git a/fftools/resources/Makefile b/fftools/resources/Makefile
+index 8579a52..3c93648 100644
+--- a/fftools/resources/Makefile
++++ b/fftools/resources/Makefile
+@@ -4,10 +4,16 @@ clean::
+ vpath %.html $(SRC_PATH)
+ vpath %.css  $(SRC_PATH)
+ 
+-# Uncomment to prevent deletion during build
+-#.PRECIOUS: %.css.c %.css.min %.css.gz %.css.min.gz %.html.gz %.html.c
+-
+ OBJS-resman +=                     \
+     fftools/resources/resman.o     \
++
++
++RESOBJS +=                         \
+     fftools/resources/graph.html.o \
+     fftools/resources/graph.css.o  \
++
++
++$(RESOBJS): CCDEP       =
++$(RESOBJS): CC_DEPFLAGS =
++
++.SECONDARY: $(RESOBJS:.o=.gz) $(RESOBJS:.o=.c) $(RESOBJS:%.css.o=%.css.min) $(RESOBJS:%.css.o=%.css.min.gz) $(RESOBJS:%.html.o=%.html.gz) $(RESOBJS:.o=)

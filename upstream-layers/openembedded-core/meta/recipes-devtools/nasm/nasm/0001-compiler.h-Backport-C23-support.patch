@@ -1,0 +1,96 @@
+From e402e82d34569b4642ffbb3344c7240d1ea07776 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 9 Dec 2025 17:17:36 -0800
+Subject: [PATCH] compiler.h: Backport C23 support
+
+These is a collection of changes done to compiler.h post
+3.01 release. It fixes build with non-glibc ( musl )
+builds especially with clang compiler which is more
+fussy
+
+Brings in squashed changed for compiler.h from
+
+https://github.com/netwide-assembler/nasm/commit/44e89ba9b650b5e1533bca43682e167f51a3511f
+https://github.com/netwide-assembler/nasm/commit/746e7c9efa37cec9a44d84a1e96b8c38f385cc1f
+https://github.com/netwide-assembler/nasm/commit/44ec97993a28ba109f98c4514e27cef813720399#diff-8e3e9367147ea2bbe07af8d84c1e07f80f5e19ca23282426324e396ee05947ba
+https://github.com/netwide-assembler/nasm/commit/f4f7d18c06449a1859a62a10e7e24ca644032dff#diff-8e3e9367147ea2bbe07af8d84c1e07f80f5e19ca23282426324e396ee05947ba
+
+Upstream-Status: Backport [Above patches from master branch]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/compiler.h | 42 ++++++++++++++++++------------------------
+ 1 file changed, 18 insertions(+), 24 deletions(-)
+
+--- a/include/compiler.h
++++ b/include/compiler.h
+@@ -185,19 +185,10 @@ char * pure_func strrchrnul(const char *
+ size_t strlcat(char *, const char *, size_t);
+ #endif
+
+-#if !defined(__cplusplus) || (__STDC_VERSION >= 202311L)
+ /* C++ and C23 have bool, false, and true as proper keywords */
++#if !defined(__cplusplus) && (__STDC_VERSION__ < 202311L)
+ # ifdef HAVE_STDBOOL_H
+-/* If <stdbool.h> exists, include it explicitly to prevent it from
+-   begin included later, causing the "bool" macro to be defined. */
+ #  include <stdbool.h>
+-#  ifdef bool
+-/* Force bool to be a typedef instead of a macro. What a "clever" hack
+-   this is... */
+-    typedef bool                /* The macro definition of bool */
+-#  undef bool
+-        bool;                   /* No longer the macro definition */
+-#  endif
+ # elif defined(HAVE___BOOL)
+    typedef _Bool bool;
+ #  define false 0
+@@ -205,14 +196,10 @@ size_t strlcat(char *, const char *, siz
+ # else
+ /* This is a bit dangerous, because casting to this ersatz bool
+    will not produce the same result as the standard (bool) cast.
+-   Instead, use the bool() constructor-style macro defined below. */
++   Instead, use the explicit construct !!x instead of relying on
++   implicit conversions or casts. */
+ typedef enum bool { false, true } bool;
+ # endif
+-/* This amounts to a C++-style conversion cast to bool.  This works
+-   because C ignores an argument-taking macro when used without an
+-   argument and because bool was redefined as a typedef if it previously
+-   was defined as a macro (see above.) */
+-# define bool(x) ((bool)!!(x))
+ #endif
+
+ /* Create a NULL pointer of the same type as the address of
+@@ -325,11 +312,11 @@ static inline void *mempset(void *dst, i
+  * less likely to be taken.
+  */
+ #ifdef HAVE___BUILTIN_EXPECT
+-# define likely(x)	__builtin_expect(bool(x), true)
+-# define unlikely(x)	__builtin_expect(bool(x), false)
++# define likely(x)	__builtin_expect(!!(x), true)
++# define unlikely(x)	__builtin_expect(!!(x), false)
+ #else
+-# define likely(x)	bool(x)
+-# define unlikely(x)	bool(x)
++# define likely(x)	(!!(x))
++# define unlikely(x)	(!!(x))
+ #endif
+
+ #ifdef HAVE___BUILTIN_PREFETCH
+@@ -486,4 +473,15 @@ static inline unsigned int watcom_switch
+ # define default case BOGUS_CASE: default
+ #endif
+
++#ifndef unreachable              /* C23 defines as a macro in <stddef.h> */
++# ifdef HAVE___BUILTIN_UNREACHABLE
++#  define unreachable() __builtin_unreachable()
++# else
++#  define unreachable() do { abort(); } while(1)
++# endif
++#endif
++
++/* This should be set from main() */
++extern const char *_progname;
++
+ #endif	/* NASM_COMPILER_H */

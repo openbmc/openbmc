@@ -1,4 +1,4 @@
-From 55ed199fdb55a1a600616ba14ad0feedcf828d86 Mon Sep 17 00:00:00 2001
+From 1a7e177a7315c856a2f0e3c2a17ee0fd9e297bc9 Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Mon, 26 May 2025 21:11:14 +0200
 Subject: [PATCH] Revert "cmake: Fix installation directories in
@@ -15,10 +15,10 @@ Signed-off-by: Peter Marko <peter.marko@siemens.com>
  3 files changed, 7 insertions(+), 18 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 40e75151..d21ebfe5 100644
+index aaa02e3..fb241bb 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1061,17 +1061,6 @@ AC_SUBST(XML_PRIVATE_LIBS)
+@@ -1065,17 +1065,6 @@ AC_SUBST(XML_PRIVATE_LIBS)
  AC_SUBST(XML_PRIVATE_CFLAGS)
  AC_SUBST(XML_INCLUDEDIR)
  
@@ -37,7 +37,7 @@ index 40e75151..d21ebfe5 100644
  AC_DEFINE_UNQUOTED([XML_SYSCONFDIR], ["$XML_SYSCONFDIR"],
                     [System configuration directory (/etc)])
 diff --git a/libxml2-config.cmake.in b/libxml2-config.cmake.in
-index 4945dda4..31036805 100644
+index e040a75..dc0d6b8 100644
 --- a/libxml2-config.cmake.in
 +++ b/libxml2-config.cmake.in
 @@ -24,17 +24,20 @@
@@ -66,7 +66,7 @@ index 4945dda4..31036805 100644
  set(LIBXML2_LIBRARIES ${LIBXML2_LIBRARY})
  set(LIBXML2_INCLUDE_DIRS ${LIBXML2_INCLUDE_DIR})
 diff --git a/meson.build b/meson.build
-index 4c59211d..3e5f25d3 100644
+index 98bc6e3..3ef0bd0 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -599,9 +599,6 @@ config_cmake = configuration_data()
@@ -77,5 +77,5 @@ index 4c59211d..3e5f25d3 100644
 -config_cmake.set('INSTALL_INCLUDEDIR', dir_include)
 -config_cmake.set('INSTALL_LIBDIR', dir_lib)
  config_cmake.set('VERSION', meson.project_version())
- config_cmake.set('WITH_HTTP', want_http.to_int().to_string())
- config_cmake.set('WITH_ICONV', want_iconv.to_int().to_string())
+ config_cmake.set10('BUILD_SHARED_LIBS',
+                    get_option('default_library') != 'static')

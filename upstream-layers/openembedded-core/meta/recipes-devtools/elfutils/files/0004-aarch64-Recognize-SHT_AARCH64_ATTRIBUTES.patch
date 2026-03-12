@@ -1,0 +1,60 @@
+From: Mark Wielaard <mark@klomp.org>
+To: elfutils-devel@sourceware.org
+Cc: Mark Wielaard <mark@klomp.org>
+Subject: [PATCH] aarch64: Recognize SHT_AARCH64_ATTRIBUTES
+Date: Tue, 24 Feb 2026 22:32:26 +0100   [thread overview]
+Message-ID: <20260224213226.3212482-1-mark@klomp.org> (raw)
+
+Recognize SHT_AARCH64_ATTRIBUTES. This is enough to stop elflint
+complaining about unknown section types. But doesn't implement parsing
+the attributes.
+
+        * backends/aarch64_symbol.c (aarch64_section_type_name):
+        New function.
+        * backends/aarch64_init.c (aarch64_init): Hook
+        section_type_name.
+
+Upstream-Status: Submitted [https://inbox.sourceware.org/elfutils-devel/20260224213226.3212482-1-mark@klomp.org/]
+
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+
+diff --git a/backends/aarch64_init.c b/backends/aarch64_init.c
+index bed929548dcd..c61767d56636 100644
+--- a/backends/aarch64_init.c
++++ b/backends/aarch64_init.c
+@@ -54,6 +54,7 @@ aarch64_init (Elf *elf __attribute__ ((unused)),
+   HOOK (eh, dynamic_tag_check);
+   HOOK (eh, data_marker_symbol);
+   HOOK (eh, abi_cfi);
++  HOOK (eh, section_type_name);
+
+   /* X0-X30 (31 regs) + SP + 1 Reserved + ELR, 30 Reserved regs (34-43)
+      + V0-V31 (32 regs, least significant 64 bits only)
+diff --git a/backends/aarch64_symbol.c b/backends/aarch64_symbol.c
+index 15e0805b7604..af9322fda561 100644
+--- a/backends/aarch64_symbol.c
++++ b/backends/aarch64_symbol.c
+@@ -134,3 +134,21 @@ aarch64_dynamic_tag_check (int64_t tag)
+	  || tag == DT_AARCH64_PAC_PLT
+	  || tag == DT_AARCH64_VARIANT_PCS);
+ }
++
++/* Return symbolic representation of section type.  */
++const char *
++aarch64_section_type_name (int type,
++			   char *buf __attribute__ ((unused)),
++			   size_t len __attribute__ ((unused)))
++{
++  switch (type)
++    {
++#ifndef SHT_AARCH64_ATTRIBUTES
++#define SHT_AARCH64_ATTRIBUTES 0x70000003
++#endif
++    case SHT_AARCH64_ATTRIBUTES:
++      return "AARCH64_ATTRIBUTES";
++    }
++
++  return NULL;
++}
+--
+2.52.0

@@ -20,6 +20,10 @@ REQUIRED_DISTRO_FEATURES = "opengl x11"
 
 EXTRA_OEMESON = "-Dwith-system-data-files=true"
 
+PACKAGE_BEFORE_PN = "${PN}-info"
+RDEPENDS:${PN} += " ${PN}-info"
+FILES:${PN}-info = "${bindir}/*info"
+
 # Note: wayland is not included as the feature requires libdecor recipe,
 # which is not currently in core
 PACKAGECONFIG ?= "drm egl gles1 gles2 \

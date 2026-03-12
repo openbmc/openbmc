@@ -3,3 +3,8 @@
 
 TUNEVALID[crypto] = "Enable cryptographic instructions for ARMv8"
 TUNE_CCARGS_MARCH_OPTS .= "${@bb.utils.contains('TUNE_FEATURES', 'crypto', '+crypto', '', d)}"
+TUNECONFLICTS[crypto] = "nocrypto"
+
+TUNEVALID[nocrypto] = "Disable cryptographic instructions for ARMv8"
+TUNE_CCARGS_MARCH_OPTS .= "${@bb.utils.contains('TUNE_FEATURES', 'nocrypto', '+nocrypto', '', d)}"
+TUNECONFLICTS[nocrypto] = "crypto"

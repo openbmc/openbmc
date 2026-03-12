@@ -1,0 +1,46 @@
+From 66a806ea05ecaf483753de3719041944daae42b0 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Mon, 27 Oct 2025 13:21:14 -0400
+Subject: [PATCH] test_pyrepl: skip test_unix_console.test_cursor_back_write
+
+This test was not run prior to 3.14 due to Python not having access to
+the curses resource. In 3.14, PyREPL's dependency on curses has been
+removed, instead relying on the terminfo module. This results in a
+terminal capability list that does not include ICH1, resulting in an
+"optimization" occurring from PyREPL's side that causes
+test_cursor_back_write() to fail. Specifically, the test tests the
+following writes in sequence:
+
+1. b"1"
+2. TERM_CAPABILITIES["cub"] + b":1"
+3. ANY, b"2"
+
+The first two writes are read correctly, but the result for the third
+write is seeing the equivalent of:
+
+ANY, b"21"
+
+Skip this test.
+
+Upstream-Status: Inappropriate [embedded-specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_pyrepl/test_unix_console.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_pyrepl/test_unix_console.py b/Lib/test/test_pyrepl/test_unix_console.py
+index 3b0d2637dab..5a3c8952f61 100644
+--- a/Lib/test/test_pyrepl/test_unix_console.py
++++ b/Lib/test/test_pyrepl/test_unix_console.py
+@@ -172,6 +172,7 @@ def test_cursor_up_down(self, _os_write):
+         _os_write.assert_any_call(ANY, TERM_CAPABILITIES["cud"] + b":1")
+         con.restore()
+ 
++    @unittest.skip('no ich1 support in vt102 terminfo')
+     def test_cursor_back_write(self, _os_write):
+         events = itertools.chain(
+             code_to_events("1"),
+-- 
+2.51.0
+

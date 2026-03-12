@@ -8,7 +8,7 @@ MACHINE_FEATURES = "alsa bluetooth usbgadget screen vfat"
 
 MACHINEOVERRIDES =. "qemuall:"
 
-IMAGE_FSTYPES += "tar.bz2 ext4"
+IMAGE_FSTYPES += "tar.zst ext4.zst"
 
 # Don't include kernels in standard images
 RDEPENDS:${KERNEL_PACKAGE_NAME}-base = ""

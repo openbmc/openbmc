@@ -12,4 +12,4 @@ __path__ = extend_path(__path__, __name__)
 BBIMPORTS = ["qa", "data", "path", "utils", "types", "package", "packagedata", \
              "packagegroup", "sstatesig", "lsb", "cachedpath", "license", "qemu", \
              "reproducible", "rust", "buildcfg", "go", "spdx30_tasks", "spdx_common", \
-             "cve_check", "tune"]
+             "cve_check", "tune", "classextend", "purl"]

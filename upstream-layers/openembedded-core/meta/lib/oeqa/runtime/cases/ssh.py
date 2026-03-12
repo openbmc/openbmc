@@ -17,7 +17,7 @@ class SSHTest(OERuntimeTestCase):
     @OEHasPackage(['dropbear', 'openssh-sshd'])
     def test_ssh(self):
         for i in range(5):
-          status, output = self.target.run("uname -a", timeout=30)
+          status, output = self.target.run("uname -a", timeout=30, ignore_ssh_fails=True)
           if status == 0:
               break
           elif status == 255 or status == -signal.SIGTERM:
@@ -32,7 +32,7 @@ class SSHTest(OERuntimeTestCase):
               time.sleep(5)
               continue
           else:
-              run_network_serialdebug(self.target.runner)
+              run_network_serialdebug(self.target)
               self.fail("uname failed with \"%s\" (exit code %s)" % (output, status))
         if status != 0:
             self.fail("ssh failed with \"%s\" (exit code %s)" % (output, status))

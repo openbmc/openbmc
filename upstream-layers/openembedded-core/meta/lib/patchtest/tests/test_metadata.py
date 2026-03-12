@@ -110,7 +110,7 @@ class TestMetadata(base.Metadata):
 
     def pretest_src_uri_left_files(self):
         # these tests just make sense on patches that can be merged
-        if not PatchtestParser.repo.canbemerged:
+        if not PatchtestParser.repo.canbemerged():
             self.skip("Patch cannot be merged")
         if not self.modified:
             self.skip('No modified recipes, skipping pretest')
@@ -127,7 +127,7 @@ class TestMetadata(base.Metadata):
 
     def test_src_uri_left_files(self):
         # these tests just make sense on patches that can be merged
-        if not PatchtestParser.repo.canbemerged:
+        if not PatchtestParser.repo.canbemerged():
             self.skip("Patch cannot be merged")
         if not self.modified:
             self.skip('No modified recipes, skipping pretest')
@@ -150,8 +150,8 @@ class TestMetadata(base.Metadata):
                 "%s-%s-%s" % (self.shortid(), patchtest_patterns.metadata_src_uri, pn)
             ].split()
 
-            pretest_files = set([os.path.basename(patch) for patch in pretest_src_uri if patch.startswith('file://')])
-            test_files    = set([os.path.basename(patch) for patch in test_src_uri    if patch.startswith('file://')])
+            pretest_files = set([os.path.basename(patch.split(';')[0]) for patch in pretest_src_uri if patch.startswith('file://')])
+            test_files    = set([os.path.basename(patch.split(';')[0]) for patch in test_src_uri    if patch.startswith('file://')])
 
             # check if files were removed
             if len(test_files) < len(pretest_files):

@@ -6,11 +6,10 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48aa35cefb768436223a6e7f18dc2a2a"
 
 SRC_URI = "gitsm://github.com/KhronosGroup/Vulkan-Samples.git;branch=main;protocol=https;lfs=0 \
-           file://0001-SPIRV-SpvBuilder.h-add-missing-cstdint-include.patch;patchdir=third_party/glslang \
            "
 
 UPSTREAM_CHECK_COMMITS = "1"
-SRCREV = "d27205d14d01ea7d33efc8ba2862478612370182"
+SRCREV = "3abbdf8b5a3bf250f6475f9fe674567b14e9b1ad"
 
 UPSTREAM_CHECK_GITTAGREGEX = "These are not the releases you're looking for"
 

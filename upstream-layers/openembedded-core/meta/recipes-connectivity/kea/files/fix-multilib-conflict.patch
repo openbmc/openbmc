@@ -1,6 +1,6 @@
-From 06ebd1b2ced426c420ed162980eca194f9f918ae Mon Sep 17 00:00:00 2001
+From 00e2905dc622f98f608d253b1148a3d778131cad Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
-Date: Tue, 22 Sep 2020 15:02:33 +0800
+Date: Tue, 14 Oct 2025 01:37:35 +0000
 Subject: [PATCH] There are conflict of config files between kea and lib32-kea:
 
 | Error: Transaction test error:
@@ -17,18 +17,18 @@ Because they are all commented out, replace the expanded libdir path with
 Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/issues/2602]
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
-
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
  src/bin/keactrl/kea-ctrl-agent.conf.pre | 3 ++-
- src/bin/keactrl/kea-dhcp4.conf.pre      | 4 ++--
- src/bin/keactrl/kea-dhcp6.conf.pre      | 4 ++--
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ src/bin/keactrl/kea-dhcp4.conf.pre      | 6 +++---
+ src/bin/keactrl/kea-dhcp6.conf.pre      | 6 +++---
+ 3 files changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/src/bin/keactrl/kea-ctrl-agent.conf.pre b/src/bin/keactrl/kea-ctrl-agent.conf.pre
-index e6ae8b8..50a3092 100644
+index 29d8111..de71f41 100644
 --- a/src/bin/keactrl/kea-ctrl-agent.conf.pre
 +++ b/src/bin/keactrl/kea-ctrl-agent.conf.pre
-@@ -51,7 +51,8 @@
+@@ -85,7 +85,8 @@
      // Agent will fail to start.
      "hooks-libraries": [
  //  {
@@ -39,7 +39,7 @@ index e6ae8b8..50a3092 100644
  //          "param1": "foo"
  //      }
 diff --git a/src/bin/keactrl/kea-dhcp4.conf.pre b/src/bin/keactrl/kea-dhcp4.conf.pre
-index 6edb8a1..b2a7385 100644
+index 2a58507..86b5abf 100644
 --- a/src/bin/keactrl/kea-dhcp4.conf.pre
 +++ b/src/bin/keactrl/kea-dhcp4.conf.pre
 @@ -255,7 +255,7 @@
@@ -49,9 +49,9 @@ index 6edb8a1..b2a7385 100644
 -    //       "library": "@libdir@/kea/hooks/libdhcp_legal_log.so",
 +    //       "library": "$libdir/kea/hooks/libdhcp_legal_log.so",
      //       "parameters": {
-     //           "path": "/var/lib/kea",
      //           "base-name": "kea-forensic4"
-@@ -272,7 +272,7 @@
+     //       }
+@@ -271,14 +271,14 @@
      //       // of specific options or perhaps even a combination of several
      //       // options and fields to uniquely identify a client. Those scenarios
      //       // are addressed by the Flexible Identifiers hook application.
@@ -60,8 +60,16 @@ index 6edb8a1..b2a7385 100644
      //       "parameters": {
      //           "identifier-expression": "relay4[2].hex"
      //       }
+     //   },
+     //   {
+     //       // the MySQL host backend hook library required for host storage.
+-    //       "library": "@libdir@/kea/hooks/libdhcp_mysql.so"
++    //       "library": "$libdir/kea/hooks/libdhcp_mysql.so"
+     //   }
+     // ],
+ 
 diff --git a/src/bin/keactrl/kea-dhcp6.conf.pre b/src/bin/keactrl/kea-dhcp6.conf.pre
-index 271021b..5b85854 100644
+index c69a508..2bb488f 100644
 --- a/src/bin/keactrl/kea-dhcp6.conf.pre
 +++ b/src/bin/keactrl/kea-dhcp6.conf.pre
 @@ -201,7 +201,7 @@
@@ -71,9 +79,9 @@ index 271021b..5b85854 100644
 -    //       "library": "@libdir@/kea/hooks/libdhcp_legal_log.so",
 +    //       "library": "$libdir/kea/hooks/libdhcp_legal_log.so",
      //       "parameters": {
-     //           "path": "/var/lib/kea",
      //           "base-name": "kea-forensic6"
-@@ -218,7 +218,7 @@
+     //       }
+@@ -217,14 +217,14 @@
      //       // of specific options or perhaps even a combination of several
      //       // options and fields to uniquely identify a client. Those scenarios
      //       // are addressed by the Flexible Identifiers hook application.
@@ -82,3 +90,11 @@ index 271021b..5b85854 100644
      //       "parameters": {
      //           "identifier-expression": "relay6[0].option[37].hex"
      //       }
+     //   },
+     //   {
+     //       // the MySQL host backend hook library required for host storage.
+-    //       "library": "@libdir@/kea/hooks/libdhcp_mysql.so"
++    //       "library": "$libdir/kea/hooks/libdhcp_mysql.so"
+     //   }
+     // ],
+ 

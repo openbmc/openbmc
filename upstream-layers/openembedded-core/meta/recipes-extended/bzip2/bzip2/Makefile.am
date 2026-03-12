@@ -60,12 +60,12 @@ install-ptest:
 	ln -s $(bindir)/bzip2		$(DESTDIR)/bzip2
 
 install-exec-hook:
-	ln -s $(bindir)/bzip2$(EXEEXT) $(DESTDIR)$(bindir)/bunzip2$(EXEEXT)
-	ln -s $(bindir)/bzip2$(EXEEXT) $(DESTDIR)$(bindir)/bzcat$(EXEEXT)
-	ln -s $(bindir)/bzgrep$(EXEEXT) $(DESTDIR)$(bindir)/bzegrep$(EXEEXT)
-	ln -s $(bindir)/bzgrep$(EXEEXT) $(DESTDIR)$(bindir)/bzfgrep$(EXEEXT)
-	ln -s $(bindir)/bzmore$(EXEEXT) $(DESTDIR)$(bindir)/bzless$(EXEEXT)
-	ln -s $(bindir)/bzdiff$(EXEEXT) $(DESTDIR)$(bindir)/bzcmp$(EXEEXT)
+	ln -s bzip2$(EXEEXT) $(DESTDIR)$(bindir)/bunzip2$(EXEEXT)
+	ln -s bzip2$(EXEEXT) $(DESTDIR)$(bindir)/bzcat$(EXEEXT)
+	ln -s bzgrep$(EXEEXT) $(DESTDIR)$(bindir)/bzegrep$(EXEEXT)
+	ln -s bzgrep$(EXEEXT) $(DESTDIR)$(bindir)/bzfgrep$(EXEEXT)
+	ln -s bzmore$(EXEEXT) $(DESTDIR)$(bindir)/bzless$(EXEEXT)
+	ln -s bzdiff$(EXEEXT) $(DESTDIR)$(bindir)/bzcmp$(EXEEXT)
 
 install-data-hook:
 	echo ".so man1/bzgrep.1" > $(DESTDIR)$(mandir)/man1/bzegrep.1

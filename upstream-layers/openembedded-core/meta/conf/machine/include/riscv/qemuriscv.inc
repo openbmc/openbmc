@@ -11,7 +11,7 @@ KEEPUIMAGE = "no"
 
 SERIAL_CONSOLES ?= "115200;ttyS0 115200;hvc0"
 
-IMAGE_FSTYPES += "ext4 wic.qcow2"
+IMAGE_FSTYPES += "ext4.zst wic.qcow2"
 
 WKS_FILE ?= "qemuriscv.wks"
 
@@ -27,7 +27,7 @@ UBOOT_ENTRYPOINT:riscv64 = "0x80200000"
 # qemuboot options
 QB_SMP ?= "-smp 4"
 QB_KERNEL_CMDLINE_APPEND = "earlycon=sbi"
-QB_CPU:riscv64 ?= "-cpu rva22s64"
+QB_CPU:riscv64 ?= "-cpu rva23s64,pmp=true"
 QB_MACHINE = "-machine virt"
 QB_DEFAULT_BIOS = "fw_jump.elf"
 QB_TAP_OPT = "-netdev tap,id=net0,ifname=@TAP@,script=no,downscript=no"

@@ -2,7 +2,7 @@ DESCRIPTION = "libxml-perl is a collection of smaller Perl modules, scripts, and
 documents for working with XML in Perl.  libxml-perl software \
 works in combination with XML::Parser, PerlSAX, XML::DOM, \
 XML::Grove and others."
-HOMEPAGE = "http://search.cpan.org/dist/libxml-perl/"
+HOMEPAGE = "https://metacpan.org/dist/libxml-perl/"
 SUMMARY = "Collection of Perl modules for working with XML"
 SECTION = "libs"
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"

@@ -277,16 +277,19 @@ SKIP_RECIPE[busybox] = "Don't build this"
         """
       
         image = 'core-image-minimal'
-        image_fstypes_debugfs = 'tar.bz2'
-        features = 'IMAGE_GEN_DEBUGFS = "1"\n'
-        features += 'IMAGE_FSTYPES_DEBUGFS = "%s"\n' % image_fstypes_debugfs
-        self.write_config(features)
+        config = """
+IMAGE_GEN_DEBUGFS = "1"
+IMAGE_FSTYPES_DEBUGFS = "tar.bz2 tar.bz2.sha256sum"
+"""
+        self.write_config(config)
 
         bitbake(image)
         bb_vars = get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_LINK_NAME'], image)
 
-        dbg_tar_file = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s-dbg.%s" % (bb_vars['IMAGE_LINK_NAME'], image_fstypes_debugfs))
+        dbg_tar_file = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s-dbg.tar.bz2" % bb_vars['IMAGE_LINK_NAME'])
         self.assertTrue(os.path.exists(dbg_tar_file), 'debug filesystem not generated at %s' % dbg_tar_file)
+        dbg_tar_sha_file = os.path.join(bb_vars['DEPLOY_DIR_IMAGE'], "%s-dbg.tar.bz2.sha256sum" % bb_vars['IMAGE_LINK_NAME'])
+        self.assertTrue(os.path.exists(dbg_tar_sha_file), 'debug filesystem sha256sum not generated at %s' % dbg_tar_sha_file)
         result = runCmd('cd %s; tar xvf %s' % (bb_vars['DEPLOY_DIR_IMAGE'], dbg_tar_file))
         self.assertEqual(result.status, 0, msg='Failed to extract %s: %s' % (dbg_tar_file, result.output))
         result = runCmd('find %s -name %s' % (bb_vars['DEPLOY_DIR_IMAGE'], "udevadm"))

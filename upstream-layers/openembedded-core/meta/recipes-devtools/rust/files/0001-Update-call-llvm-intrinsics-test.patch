@@ -1,0 +1,86 @@
+From 1d678f6b0859ea25c2abc22eb4104a025a5737e4 Mon Sep 17 00:00:00 2001
+From: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+Date: Mon, 2 Mar 2026 04:22:23 -0800
+Subject: [PATCH] Update call-llvm-intrinsics test for Rust 1.94.0 IR and
+ multi-target CI
+
+Rust 1.94 now passes constants directly to llvm.sqrt.f32 instead of
+storing/loading via the stack.
+
+- Updated the FileCheck pattern to match the new IR:
+    // CHECK: call float @llvm.sqrt.f32(float 4.000000e+00)
+  The test intent is unchanged: it still ensures the intrinsic is
+  emitted as a 'call' (not 'invoke').
+
+- Removed unnecessary local variables and Drop usage to work in
+  `#![no_core]` mode with minicore.
+
+- Added required crate attributes:
+    #![feature(no_core, lang_items)]
+    #![no_std]
+    #![no_core]
+
+- Replaced `//@ only-riscv64` (host-based execution) with explicit
+  revisions for:
+      riscv32gc-unknown-linux-gnu
+      riscv64gc-unknown-linux-gnu
+  This ensures deterministic multi-target coverage in CI without
+  relying on the host architecture.
+
+- Added `//@ needs-llvm-components: riscv` and
+  `//@ min-llvm-version: 21` for CI compatibility.
+
+Upstream-Status: Backport [https://github.com/rust-lang/rust/pull/153285]
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+---
+ .../riscv-abi/call-llvm-intrinsics.rs         | 26 +++++++++----------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/tests/codegen-llvm/riscv-abi/call-llvm-intrinsics.rs b/tests/codegen-llvm/riscv-abi/call-llvm-intrinsics.rs
+index e72a649a530..fb520d38df3 100644
+--- a/tests/codegen-llvm/riscv-abi/call-llvm-intrinsics.rs
++++ b/tests/codegen-llvm/riscv-abi/call-llvm-intrinsics.rs
+@@ -1,17 +1,20 @@
++//@ add-minicore
+ //@ compile-flags: -C no-prepopulate-passes
+-
+-//@ only-riscv64
++//@ revisions: riscv32gc riscv64gc
++//@ [riscv32gc] compile-flags: --target riscv32gc-unknown-linux-gnu
++//@ [riscv32gc] needs-llvm-components: riscv
++//@ [riscv64gc] compile-flags: --target riscv64gc-unknown-linux-gnu
++//@ [riscv64gc] needs-llvm-components: riscv
++//@ min-llvm-version: 21
+
+ #![feature(link_llvm_intrinsics)]
++#![feature(no_core, lang_items)]
++#![no_std]
++#![no_core]
+ #![crate_type = "lib"]
+
+-struct A;
+-
+-impl Drop for A {
+-    fn drop(&mut self) {
+-        println!("A");
+-    }
+-}
++extern crate minicore;
++use minicore::*;
+
+ extern "C" {
+     #[link_name = "llvm.sqrt.f32"]
+@@ -19,12 +22,9 @@ fn drop(&mut self) {
+ }
+
+ pub fn do_call() {
+-    let _a = A;
+-
+     unsafe {
+         // Ensure that we `call` LLVM intrinsics instead of trying to `invoke` them
+-        // CHECK: store float 4.000000e+00, ptr %{{.}}, align 4
+-        // CHECK: call float @llvm.sqrt.f32(float %{{.}}
++        // CHECK: call float @llvm.sqrt.f32(float 4.000000e+00)
+         sqrt(4.0);
+     }
+ }

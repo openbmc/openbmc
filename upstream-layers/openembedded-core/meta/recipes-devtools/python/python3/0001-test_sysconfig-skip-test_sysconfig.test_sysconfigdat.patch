@@ -1,0 +1,32 @@
+From ac5635821ed9bead45a5bcddc3828e50647fbe77 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Mon, 27 Oct 2025 14:24:24 -0400
+Subject: [PATCH] test_sysconfig: skip test_sysconfig.test_sysconfigdata_json
+
+This test seems new as of 3.14.0 and fails due to various path and flag
+differences in variables like CFLAGS. Since the test already has the
+precedent of a skip put in place for Android builds due to prefix
+changes, skip it for our situation too.
+
+Upstream-Status: Inappropriate [embedded-specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_sysconfig.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_sysconfig.py b/Lib/test/test_sysconfig.py
+index 09eff11179e..14fcdedccba 100644
+--- a/Lib/test/test_sysconfig.py
++++ b/Lib/test/test_sysconfig.py
+@@ -685,6 +685,7 @@ def test_makefile_overwrites_config_vars(self):
+         self.assertNotEqual(data['prefix'], data['base_prefix'])
+         self.assertNotEqual(data['exec_prefix'], data['base_exec_prefix'])
+ 
++    @unittest.skip('OE adds/modifies various flags and paths/prefixes')
+     @unittest.skipIf(os.name != 'posix', '_sysconfig-vars JSON file is only available on POSIX')
+     @unittest.skipIf(is_wasi, "_sysconfig-vars JSON file currently isn't available on WASI")
+     @unittest.skipIf(is_android or is_apple_mobile, 'Android and iOS change the prefix')
+-- 
+2.51.0
+

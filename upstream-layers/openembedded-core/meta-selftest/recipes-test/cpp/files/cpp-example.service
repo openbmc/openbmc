@@ -1,0 +1,12 @@
+[Unit]
+Description=C++ Example Service
+After=network.target
+
+[Service]
+Type=simple
+User=@USER@
+Group=@GROUP@
+ExecStart=@BINDIR@/@BINARY_NAME@ --endless
+
+[Install]
+WantedBy=multi-user.target

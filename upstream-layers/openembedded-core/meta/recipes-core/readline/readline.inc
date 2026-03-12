@@ -17,16 +17,12 @@ SRC_URI += "file://inputrc"
 
 inherit autotools texinfo
 
-EXTRA_AUTORECONF += "--exclude=autoheader"
+# Ensure we don't delete the shipped aclocal.m4 or config.h.in
+EXTRA_AUTORECONF += "--exclude=autoheader,aclocal"
+
 EXTRA_OECONF += "bash_cv_termcap_lib=ncurses --with-shared-termcap-library"
 
 LEAD_SONAME = "libreadline.so"
-
-do_configure:prepend () {
-	if [ ! -e ${S}/acinclude.m4 ]; then
-		cat ${S}/aclocal.m4 > ${S}/acinclude.m4
-	fi
-}
 
 do_install:append () {
 	# Make install doesn't properly install these

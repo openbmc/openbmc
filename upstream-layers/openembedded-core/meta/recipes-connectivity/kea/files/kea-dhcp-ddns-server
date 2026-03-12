@@ -11,8 +11,9 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="kea-dhcp-ddns-server"
 NAME=kea-dhcp-ddns
-DAEMON=/usr/sbin/keactrl
-DAEMON_ARGS=" -s dhcp_ddns"
+DAEMON=/usr/sbin/kea-dhcp-ddns
+DAEMON_ARGS="-c /etc/kea/kea-dhcp-ddns.conf"
+PIDFILE=/var/run/kea/kea-dhcp-ddns.kea-dhcp-ddns.pid
 
 set -e
 
@@ -25,13 +26,12 @@ set -e
 case "$1" in
   start)
         echo -n "Starting $DESC: "
-        start-stop-daemon -S -b -n $NAME -x $DAEMON -- start $DAEMON_ARGS
+        start-stop-daemon -S -b -n $NAME -p $PIDFILE -x $DAEMON -- $DAEMON_ARGS
         echo "done."
         ;;
   stop)
         echo -n "Stopping $DESC: "
-        kpid=`pidof $NAME`
-        kill $kpid
+        start-stop-daemon -K -p $PIDFILE -x $DAEMON
         echo "done."
         ;;
   restart|force-reload)
@@ -39,8 +39,12 @@ case "$1" in
         $0 stop
         $0 start
         ;;
+  status)
+        status $DAEMON
+        exit $?
+        ;;
   *)
-        echo "Usage: $SCRIPTNAME {start|stop|restart|force-reload}" >&2
+        echo "Usage: $SCRIPTNAME {start|stop|status|restart|force-reload}" >&2
         exit 1
         ;;
 esac

@@ -25,24 +25,22 @@ MESON_TARGET ?= ""
 # Since 0.60.0 you can specify custom tags to install
 MESON_INSTALL_TAGS ?= ""
 
-def noprefix(var, d):
-    return d.getVar(var).replace(d.getVar('prefix') + '/', '', 1)
-
 MESON_BUILDTYPE ?= "${@oe.utils.vartrue('DEBUG_BUILD', 'debug', 'plain', d)}"
 MESON_BUILDTYPE[vardeps] += "DEBUG_BUILD"
-MESONOPTS = " --prefix ${prefix} \
-              --buildtype ${MESON_BUILDTYPE} \
-              --bindir ${@noprefix('bindir', d)} \
-              --sbindir ${@noprefix('sbindir', d)} \
-              --datadir ${@noprefix('datadir', d)} \
-              --libdir ${@noprefix('libdir', d)} \
-              --libexecdir ${@noprefix('libexecdir', d)} \
-              --includedir ${@noprefix('includedir', d)} \
-              --mandir ${@noprefix('mandir', d)} \
-              --infodir ${@noprefix('infodir', d)} \
-              --sysconfdir ${sysconfdir} \
+
+MESONOPTS = " --buildtype ${MESON_BUILDTYPE} \
+              --prefix ${prefix} \
+              --bindir ${bindir} \
+              --datadir ${datadir} \
+              --includedir ${includedir} \
+              --infodir ${infodir} \
+              --libdir ${libdir} \
+              --libexecdir ${libexecdir} \
               --localstatedir ${localstatedir} \
+              --mandir ${mandir} \
+              --sbindir ${sbindir} \
               --sharedstatedir ${sharedstatedir} \
+              --sysconfdir ${sysconfdir} \
               --wrap-mode nodownload \
               --native-file ${WORKDIR}/meson.native"
 
@@ -51,9 +49,6 @@ EXTRA_OEMESON:append = " ${PACKAGECONFIG_CONFARGS}"
 MESON_CROSS_FILE = ""
 MESON_CROSS_FILE:class-target = "--cross-file ${WORKDIR}/meson.cross"
 MESON_CROSS_FILE:class-nativesdk = "--cross-file ${WORKDIR}/meson.cross"
-
-# Needed to set up qemu wrapper below
-export STAGING_DIR_HOST
 
 def rust_tool(d, target_var):
     rustc = d.getVar('RUSTC')
@@ -78,6 +73,7 @@ do_write_config() {
 [binaries]
 c = ${@meson_array('CC', d)}
 cpp = ${@meson_array('CXX', d)}
+ld = ${@meson_array('LD', d)}
 cython = 'cython3'
 ar = ${@meson_array('AR', d)}
 nm = ${@meson_array('NM', d)}
@@ -120,6 +116,7 @@ EOF
 [binaries]
 c = ${@meson_array('BUILD_CC', d)}
 cpp = ${@meson_array('BUILD_CXX', d)}
+ld = ${@meson_array('BUILD_LD', d)}
 cython = 'cython3'
 ar = ${@meson_array('BUILD_AR', d)}
 nm = ${@meson_array('BUILD_NM', d)}
@@ -141,7 +138,7 @@ EOF
 write_qemuwrapper() {
     # Write out a qemu wrapper that will be used as exe_wrapper so that meson
     # can run target helper binaries through that.
-    qemu_binary="${@qemu_wrapper_cmdline(d, '$STAGING_DIR_HOST', ['$STAGING_DIR_HOST/${libdir}','$STAGING_DIR_HOST/${base_libdir}'])}"
+    qemu_binary="${@qemu_wrapper_cmdline(d, '${STAGING_DIR_HOST}', ['${STAGING_LIBDIR}','${STAGING_BASELIBDIR}'])}"
     cat > ${WORKDIR}/meson-qemuwrapper << EOF
 #!/bin/sh
 # Use a modules directory which doesn't exist so we don't load random things
@@ -168,25 +165,17 @@ do_write_config:append:class-nativesdk() {
 CONFIGURE_FILES = "meson.build"
 
 meson_do_configure() {
-    # Meson requires this to be 'bfd, 'lld' or 'gold' from 0.53 onwards
-    # https://github.com/mesonbuild/meson/commit/ef9aeb188ea2bc7353e59916c18901cde90fa2b3
-    unset LD
-
     bbnote Executing meson ${EXTRA_OEMESON}...
     if ! meson setup ${MESONOPTS} "${MESON_SOURCEPATH}" "${B}" ${MESON_CROSS_FILE} ${EXTRA_OEMESON}; then
-        bbfatal_log meson failed
+        MESON_LOG=${B}/meson-logs/meson-log.txt
+        if test -f $MESON_LOG; then
+            printf "\nLast 10 lines of meson-log.txt:\n"
+            tail --lines=10 $MESON_LOG
+            printf "\n"
+        fi
+        bbfatal_log meson setup failed
     fi
 }
-
-python meson_do_qa_configure() {
-    import re
-    warn_re = re.compile(r"^WARNING: Cross property (.+) is using default value (.+)$", re.MULTILINE)
-    with open(d.expand("${B}/meson-logs/meson-log.txt")) as logfile:
-        log = logfile.read()
-    for (prop, value) in warn_re.findall(log):
-        bb.warn("Meson cross property %s used without explicit assignment, defaulting to %s" % (prop, value))
-}
-do_configure[postfuncs] += "meson_do_qa_configure"
 
 do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 meson_do_compile() {

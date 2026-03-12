@@ -1,4 +1,4 @@
-From 777963807e14a091c263d603cebfd7bb02f63b24 Mon Sep 17 00:00:00 2001
+From 248ef30a93ff6f962651ebf592f4511b31adf7fe Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 27 Jun 2017 18:10:54 -0700
 Subject: [PATCH] Add ssp_nonshared to link commandline for musl targets

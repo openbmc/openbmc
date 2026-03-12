@@ -71,7 +71,7 @@ class TestMbox(base.Base):
     def test_shortlog_length(self):
         for commit in self.commits:
             # no reason to re-check on revert shortlogs
-            shortlog = re.sub('^(\[.*?\])+ ', '', commit.shortlog)
+            shortlog = re.sub(r'^(\[.*?\])+ ', '', commit.shortlog)
             if shortlog.startswith('Revert "'):
                 continue
             l = len(shortlog)
@@ -90,7 +90,7 @@ class TestMbox(base.Base):
                 " for master branch. Target detected is %s"
                 % PatchtestParser.repo.patch.branch
             )
-        if not PatchtestParser.repo.canbemerged:
+        if not PatchtestParser.repo.canbemerged():
             commithash, author, date, shortlog = headlog()
             self.fail(
                 "Series does not apply on top of target branch %s"
@@ -109,7 +109,7 @@ class TestMbox(base.Base):
 
         # a meta project may be indicted in the message subject, if this is the case, just fail
         # TODO: there may be other project with no-meta prefix, we also need to detect these
-        project_regex = pyparsing.Regex("\[(?P<project>meta-.+)\]")
+        project_regex = pyparsing.Regex(r"\[(?P<project>meta-.+)\]")
         for commit in self.commits:
             match = project_regex.search_string(commit.subject)
             if match:

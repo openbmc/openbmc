@@ -9,7 +9,7 @@ fix the race issue:
 src/genbuiltin nfctype1 nfctype2 nfctype3 nfctype4 p2p > src/builtin.h
 /bin/sh: src/builtin.h: No such file or directory
 
-Upstream-Status: Pending
+Upstream-Status: Backport [d39f8c0eee659743b4425d395c2f7ab1949e9c71]
 
 Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
 ---

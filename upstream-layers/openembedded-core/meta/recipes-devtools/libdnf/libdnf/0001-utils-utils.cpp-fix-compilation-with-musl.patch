@@ -1,0 +1,51 @@
+From 699608a4c03ebbf64c1d7b6f56d9811492175daa Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Mon, 17 Nov 2025 00:05:14 +0000
+Subject: [PATCH] utils/utils.cpp: fix compilation with musl
+
+The basename() function requires the libgen.h header when
+compiling with musl-libc, otherwise it complains:
+error: 'basename' was not declared in this scope; did you mean 'g_basename'?
+Also, musl's basename requires char* instead of const char* argument:
+error: invalid conversion from 'const char*' to 'char*' [-fpermissive]
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/1737/commits/8720d5eeb0d348686d4c5f2ccb5a6c73d66eeff5]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ libdnf/utils/utils.cpp | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/libdnf/utils/utils.cpp b/libdnf/utils/utils.cpp
+index f5d200b8a..501bc0ed2 100644
+--- a/libdnf/utils/utils.cpp
++++ b/libdnf/utils/utils.cpp
+@@ -9,6 +9,7 @@
+ #include <sys/stat.h>
+ #include <dirent.h>
+ #include <cstring>
++#include <libgen.h>
+ #include <glob.h>
+ #include <stdexcept>
+ 
+@@ -311,7 +312,7 @@ std::vector<std::string> createSortedFileList(
+             auto * path_fname = basename(path);
+             bool found{false};
+             for (const auto & path_in_list : paths) {
+-                if (strcmp(path_fname, basename(path_in_list.c_str())) == 0) {
++                if (strcmp(path_fname, basename((char*)path_in_list.c_str())) == 0) {
+                     found = true;
+                     break;
+                 }
+@@ -325,7 +326,7 @@ std::vector<std::string> createSortedFileList(
+ 
+     // sort all drop-in configuration files alphabetically by their names
+     std::sort(paths.begin(), paths.end(), [](const std::string & p1, const std::string & p2) {
+-        return strcmp(basename(p1.c_str()), basename(p2.c_str())) < 0;
++        return strcmp(basename((char*)p1.c_str()), basename((char*)p2.c_str())) < 0;
+     });
+ 
+     return paths;
+-- 
+2.43.0
+

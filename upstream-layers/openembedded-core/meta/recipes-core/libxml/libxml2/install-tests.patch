@@ -1,34 +1,38 @@
-From 8c1054eacb430472068f21e4840749c384e8e866 Mon Sep 17 00:00:00 2001
+From 3381232bab7217b9cb47e7cc765c8380192069b0 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
-Date: Mon, 5 Dec 2022 17:02:32 +0000
+Date: Fri, 17 Oct 2025 14:15:36 +0800
 Subject: [PATCH] add yocto-specific install-ptest target
 
 Add a target to install the test suite.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+Do not install python test cases
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
- Makefile.am | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ Makefile.am | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 4cb9a5c..8adcd7e 100644
+index 19ec305..64bf28a 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -26,6 +26,16 @@ check_PROGRAMS = \
+@@ -29,6 +29,14 @@ check_PROGRAMS = \
  	testparser \
  	testrecurse
  
 +ptestdir=$(libexecdir)
 +install-test-data: $(check_PROGRAMS)
-+	install -d $(DESTDIR)$(ptestdir) $(DESTDIR)$(ptestdir)/python/
 +	for T in $(check_PROGRAMS); do \
 +		$(LIBTOOL) --mode=install $(INSTALL_PROGRAM) $$T $(DESTDIR)$(ptestdir) ;\
 +	done
 +	cp -r $(srcdir)/test $(DESTDIR)$(ptestdir)
 +	cp -r $(srcdir)/result $(DESTDIR)$(ptestdir)
-+	cp -r $(srcdir)/python/tests $(DESTDIR)$(ptestdir)/python
 +
  bin_PROGRAMS = xmllint
  
  bin_SCRIPTS = xml2-config
+-- 
+2.34.1
+

@@ -40,7 +40,7 @@ do_install_ptest() {
 
     [ ! -d ${D}/${PTEST_PATH}/test ] && mkdir -p ${D}/${PTEST_PATH}/test
     for i in $test_binaries; do
-        install -m 0755 ${B}/test/.libs/$i ${D}${PTEST_PATH}/test
+        ${B}/libtool --mode=install install -m 0755 ${B}/test/$i ${D}${PTEST_PATH}/test
     done
 
     local test_scripts="checktopology checkaffinity printcpu regress regress2 \
@@ -50,7 +50,7 @@ do_install_ptest() {
     done
 
     install -m 0755 ${UNPACKDIR}/Makefile ${D}${PTEST_PATH}/
-    install -m 0755 ${B}/.libs/numactl ${D}${PTEST_PATH}/
+    ${B}/libtool --mode=install install -m 0755 ${B}/numactl ${D}${PTEST_PATH}/
 }
 
 RDEPENDS:${PN}-ptest = "bash"

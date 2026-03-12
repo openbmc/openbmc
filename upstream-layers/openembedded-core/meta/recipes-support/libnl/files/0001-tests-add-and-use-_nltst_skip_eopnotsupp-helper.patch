@@ -1,0 +1,81 @@
+From 193bd72d1ca66f7c97fdc78782617302b7724c52 Mon Sep 17 00:00:00 2001
+From: Thomas Haller <thom311@gmail.com>
+Date: Tue, 23 Dec 2025 21:31:06 +0100
+Subject: [PATCH] tests: add and use _nltst_skip_eopnotsupp() helper
+
+Upstream-Status: Backport [https://github.com/thom311/libnl/commit/f680f27]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tests/cksuite-all-netns.c |  3 +--
+ tests/cksuite-route-nh.c  |  4 +---
+ tests/nl-test-util.c      | 11 +++++++++++
+ tests/nl-test-util.h      |  4 ++++
+ 4 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/tests/cksuite-all-netns.c b/tests/cksuite-all-netns.c
+index ff6fd65..4714db2 100644
+--- a/tests/cksuite-all-netns.c
++++ b/tests/cksuite-all-netns.c
+@@ -273,8 +273,7 @@ START_TEST(test_create_iface)
+ 	}
+ 
+ 	r = rtnl_link_add(sk, link, NLM_F_CREATE);
+-	if (r == -NLE_OPNOTSUPP) {
+-		/* Hm, no kernel module? Skip the test. */
++	if (_nltst_skip_eopnotsupp(r)) {
+ 		_nltst_assert_link_not_exists(IFNAME);
+ 		IFNAME = NULL;
+ 		return;
+diff --git a/tests/cksuite-route-nh.c b/tests/cksuite-route-nh.c
+index 07a7a83..8409e18 100644
+--- a/tests/cksuite-route-nh.c
++++ b/tests/cksuite-route-nh.c
+@@ -1054,10 +1054,8 @@ START_TEST(test_kernel_roundtrip_encap_ila)
+ 	ck_assert_int_eq(rtnl_nh_set_oif(nh, (uint32_t)ifindex_dummy), 0);
+ 	ck_assert_int_eq(rtnl_nh_set_family(nh, AF_INET6), 0);
+ 	ret = rtnl_nh_add(sk, nh, NLM_F_CREATE);
+-	if (ret == -NLE_OPNOTSUPP) {
+-		/* ila module is not loaded - skipping */
++	if (_nltst_skip_eopnotsupp(ret))
+ 		return;
+-	}
+ 	ck_assert_int_eq(ret, 0);
+ 
+ 	ck_assert_int_eq(rtnl_nh_alloc_cache(sk, AF_UNSPEC, &cache), 0);
+diff --git a/tests/nl-test-util.c b/tests/nl-test-util.c
+index 51c04c6..75bb540 100644
+--- a/tests/nl-test-util.c
++++ b/tests/nl-test-util.c
+@@ -838,6 +838,17 @@ bool _nltst_skip_no_iproute2(const char *msg)
+ 
+ /*****************************************************************************/
+ 
++bool _nltst_skip_eopnotsupp(int err)
++{
++	if (err != -NLE_OPNOTSUPP)
++		return false;
++
++	printf("skip test after operation failed with NLE_OPNOTSUPP. This indicates missing kernel support");
++	return true;
++}
++
++/*****************************************************************************/
++
+ void _nltst_add_dummy_and_up(struct nl_sock *sk, const char *ifname,
+ 			     int *out_ifindex)
+ {
+diff --git a/tests/nl-test-util.h b/tests/nl-test-util.h
+index ecae885..a2c0e3b 100644
+--- a/tests/nl-test-util.h
++++ b/tests/nl-test-util.h
+@@ -449,6 +449,10 @@ bool _nltst_skip_no_iproute2(const char *msg);
+ 
+ /*****************************************************************************/
+ 
++bool _nltst_skip_eopnotsupp(int err);
++
++/*****************************************************************************/
++
+ typedef struct {
+ 	int addr_family;
+ 	int ifindex;

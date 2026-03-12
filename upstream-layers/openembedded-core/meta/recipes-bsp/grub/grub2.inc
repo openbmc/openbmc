@@ -14,37 +14,21 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 CVE_PRODUCT = "grub2"
 
 SRC_URI = "${GNU_MIRROR}/grub/grub-${PV}.tar.gz \
-           file://autogen.sh-exclude-pc.patch \
-           file://grub-module-explicitly-keeps-symbole-.module_license.patch \
-           file://0001-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
-           file://0001-RISC-V-Restore-the-typcast-to-long.patch \
-           file://0001-misc-Implement-grub_strlcpy.patch \
-           file://CVE-2024-45781.patch \
-           file://CVE-2024-45782_CVE-2024-56737.patch \
-           file://CVE-2024-45780.patch \
-           file://CVE-2024-45783.patch \
-           file://CVE-2025-0624.patch \
-           file://CVE-2024-45774.patch \
-           file://CVE-2024-45775.patch \
-           file://CVE-2025-0622-01.patch \
-           file://CVE-2025-0622-02.patch \
-           file://CVE-2025-0622-03.patch \
-           file://CVE-2024-45776.patch \
-           file://CVE-2024-45777.patch \
-           file://CVE-2025-0690.patch \
-           file://CVE-2025-1118.patch \
-           file://CVE-2024-45778_CVE-2024-45779.patch \
-           file://CVE-2025-0677_CVE-2025-0684_CVE-2025-0685_CVE-2025-0686_CVE-2025-0689.patch \
-           file://CVE-2025-0678_CVE-2025-1125.patch \
+           file://0001-autogen.sh-exclude-.pc-from-po-POTFILES.in.patch \
+           file://0002-grub-module-explicitly-keeps-symbole-.module_license.patch \
+           file://0003-grub.d-10_linux.in-add-oe-s-kernel-name.patch \
+           file://0001-Revert-configure-Check-linker-for-image-base-support.patch \
+           file://0002-Revert-configure-Print-a-more-helpful-error-if-autoc.patch \
 "
 
-SRC_URI[sha256sum] = "b30919fa5be280417c17ac561bb1650f60cfb80cc6237fa1e2b6f56154cb9c91"
+SRC_URI[sha256sum] = "d0415fbb3e739237064e173743a6e5f60c33a81ec02a069cc9152d80efff4967"
 
 CVE_STATUS[CVE-2019-14865] = "not-applicable-platform: applies only to RHEL"
 CVE_STATUS[CVE-2023-4001]  = "not-applicable-platform: Applies only to RHEL/Fedora"
 CVE_STATUS[CVE-2024-1048]  = "not-applicable-platform: Applies only to RHEL/Fedora"
+CVE_STATUS[CVE-2024-2312]  = "not-applicable-platform: Applies only to Ubuntu"
 
-DEPENDS = "flex-native bison-native gettext-native"
+DEPENDS = "flex-native bison-native gettext-native gawk-replacement-native"
 
 GRUB_COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|loongarch64.*|riscv.*)-(linux.*|freebsd.*)'
 COMPATIBLE_HOST = "${GRUB_COMPATIBLE_HOST}"
@@ -64,13 +48,14 @@ GRUBPLATFORM:riscv32 = "efi"
 GRUBPLATFORM:riscv64 = "efi"
 GRUBPLATFORM ??= "pc"
 
-inherit autotools gettext texinfo pkgconfig
+inherit autotools gettext texinfo pkgconfig bash-completion
 
 CFLAGS:remove = "-O2"
 # It doesn't support sse, its make.defaults sets:
 # CFLAGS += -mno-mmx -mno-sse
 # So also remove -mfpmath=sse from TUNE_CCARGS
 TUNE_CCARGS:remove = "-mfpmath=sse"
+TUNE_CCARGS:append:toolchain-clang = " -fuse-ld=bfd -Wno-error=unused-command-line-argument"
 
 EXTRA_OECONF = "--with-platform=${GRUBPLATFORM} \
                 --disable-grub-mkfont \
@@ -98,11 +83,6 @@ export PYTHON = "python3"
 
 do_configure:prepend() {
 	cd ${S}
-
-	# Remove in next version.
-	# See: https://git.savannah.gnu.org/cgit/grub.git/commit/?id=b835601c7639ed1890f2d3db91900a8506011a8e
-	echo "depends bli part_gpt" > ${S}/grub-core/extra_deps.lst
-
 	FROM_BOOTSTRAP=1 ${S}/autogen.sh
 	cd ${B}
 }

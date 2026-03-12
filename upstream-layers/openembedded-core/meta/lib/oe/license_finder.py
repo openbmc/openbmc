@@ -120,14 +120,34 @@ def _crunch_license(licfile):
     return md5val
 
 
-def find_license_files(srctree, first_only=False):
+def find_license_files(srctree, first_only=False, bottom=""):
     """
     Search srctree for files that look like they could be licenses.
     If first_only is True, only return the first file found.
+    If bottom is not empty, start at bottom and continue upwards to the top.
     """
     licspecs = ['*LICEN[CS]E*', 'COPYING*', '*[Ll]icense*', 'LEGAL*', '[Ll]egal*', '*GPL*', 'README.lic*', 'COPYRIGHT*', '[Cc]opyright*', 'e[dp]l-v10']
     skip_extensions = (".html", ".js", ".json", ".svg", ".ts", ".go", ".sh")
     licfiles = []
+    if bottom:
+        srcdir = bottom
+        while srcdir.startswith(srctree):
+            files = []
+            with os.scandir(srcdir) as it:
+                for entry in it:
+                    if entry.is_file():
+                        files.append(entry.name)
+            for name in sorted(files):
+                if name.endswith(skip_extensions):
+                    continue
+                for spec in licspecs:
+                    if fnmatch.fnmatch(name, spec):
+                        licfiles.append(os.path.join(srcdir, name))
+                        if first_only:
+                            return licfiles
+            srcdir = os.path.dirname(srcdir)
+        return licfiles
+
     for root, dirs, files in os.walk(srctree):
         # Sort files so that LICENSE is before LICENSE.subcomponent, which is
         # meaningful if first_only is set.
@@ -177,3 +197,8 @@ def find_licenses(srctree, d, first_only=False, extra_hashes={}):
     # FIXME should we grab at least one source file with a license header and add that too?
 
     return licenses
+
+
+def find_licenses_up(srcdir, topdir, d, first_only=False, extra_hashes={}):
+    licfiles = find_license_files(topdir, first_only, srcdir)
+    return match_licenses(licfiles, topdir, d, extra_hashes)

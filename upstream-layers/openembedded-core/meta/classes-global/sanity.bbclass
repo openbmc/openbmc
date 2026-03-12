@@ -368,6 +368,8 @@ def check_connectivity(d):
                 msg += "    CONNECTIVITY_CHECK_URIS = \"https://www.example.com/\""
                 msg += "    You could also set BB_NO_NETWORK = \"1\" to disable network\n"
                 msg += "    access if all required sources are on local disk.\n"
+            else:
+                msg = "%s.\n%s" % (err, msg)
             retval = msg
 
     return retval
@@ -434,11 +436,14 @@ def check_sanity_validmachine(sanity_data):
 def check_patch_version(sanity_data):
     import re, subprocess
 
+    patch_minimum_version = "2.7"
+
     try:
         result = subprocess.check_output(["patch", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
         version = re.search(r"[0-9.]+", result.splitlines()[0]).group()
-        if bb.utils.vercmp_string_op(version, "2.7", "<"):
-            return "Your version of patch is older than 2.7 and has bugs which will break builds. Please install a newer version of patch.\n"
+        if bb.utils.vercmp_string_op(version, patch_minimum_version, "<"):
+            return ("Your version of patch is older than %s and has bugs which will break builds. "
+                "Please install a newer version of patch.\n" % patch_minimum_version)
         else:
             return None
     except subprocess.CalledProcessError as e:
@@ -446,6 +451,7 @@ def check_patch_version(sanity_data):
 
 # Glibc needs make 4.0 or later, we may as well match at this point
 def check_make_version(sanity_data):
+    make_minimum_version = "4.0"
     import subprocess
 
     try:
@@ -453,8 +459,8 @@ def check_make_version(sanity_data):
     except subprocess.CalledProcessError as e:
         return "Unable to execute make --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
-    if bb.utils.vercmp_string_op(version, "4.0", "<"):
-        return "Please install a make version of 4.0 or later.\n"
+    if bb.utils.vercmp_string_op(version, make_minimum_version, "<"):
+        return "Please install a make version of %s or later.\n" % make_minimum_version
 
     if bb.utils.vercmp_string_op(version, "4.2.1", "=="):
         distro = oe.lsb.distro_identifier()
@@ -505,18 +511,18 @@ def check_userns():
                  "See https://discourse.ubuntu.com/t/ubuntu-24-04-lts-noble-numbat-release-notes/39890#unprivileged-user-namespace-restrictions for more information.")
 
 
-# Require at least gcc version 8.0
-#
-# This can be fixed on CentOS-7 with devtoolset-6+
-# https://www.softwarecollections.org/en/scls/rhscl/devtoolset-6/
+# Require at least gcc version 10.1
 #
 # A less invasive fix is with scripts/install-buildtools (or with user
 # built buildtools-extended-tarball)
 #
 def check_gcc_version(sanity_data):
+    gcc_minimum_version = "10.1"
     version = oe.utils.get_host_gcc_version(sanity_data)
-    if bb.utils.vercmp_string_op(version, "8.0", "<"):
-        return "Your version of gcc is older than 8.0 and will break builds. Please install a newer version of gcc (you could use the project's buildtools-extended-tarball or use scripts/install-buildtools).\n"
+    if bb.utils.vercmp_string_op(version, gcc_minimum_version, "<"):
+        return ("Your version of gcc is older than %s and will break builds. Please install a newer "
+            "version of gcc (you could use the project's buildtools-extended-tarball or use "
+            "scripts/install-buildtools).\n" % gcc_minimum_version)
     return None
 
 # Tar version 1.24 and onwards handle overwriting symlinks correctly
@@ -524,6 +530,7 @@ def check_gcc_version(sanity_data):
 # Version 1.28 is needed so opkg-build works correctly when reproducible builds are enabled
 # Gtar is assumed at to be used as tar in poky
 def check_tar_version(sanity_data):
+    tar_minimum_version = "1.28"
     import subprocess
     try:
         result = subprocess.check_output(["tar", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
@@ -532,8 +539,10 @@ def check_tar_version(sanity_data):
     if not "GNU" in result:
         return "Your version of tar is not gtar. Please install gtar (you could use the project's buildtools-tarball from our last release or use scripts/install-buildtools).\n"
     version = result.split()[3]
-    if bb.utils.vercmp_string_op(version, "1.28", "<"):
-        return "Your version of tar is older than 1.28 and does not have the support needed to enable reproducible builds. Please install a newer version of tar (you could use the project's buildtools-tarball from our last release or use scripts/install-buildtools).\n"
+    if bb.utils.vercmp_string_op(version, tar_minimum_version, "<"):
+        return ("Your version of tar is older than %s and does not have the support needed to enable reproducible "
+            "builds. Please install a newer version of tar (you could use the project's buildtools-tarball from "
+            "our last release or use scripts/install-buildtools).\n" % tar_minimum_version)
 
     try:
         result = subprocess.check_output(["tar", "--help"], stderr=subprocess.STDOUT).decode('utf-8')
@@ -548,14 +557,16 @@ def check_tar_version(sanity_data):
 # The kernel tools assume git >= 1.8.3.1 (verified needed > 1.7.9.5) see #6162 
 # The git fetcher also had workarounds for git < 1.7.9.2 which we've dropped
 def check_git_version(sanity_data):
+    git_minimum_version = "1.8.3.1"
     import subprocess
     try:
         result = subprocess.check_output(["git", "--version"], stderr=subprocess.DEVNULL).decode('utf-8')
     except subprocess.CalledProcessError as e:
         return "Unable to execute git --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
-    if bb.utils.vercmp_string_op(version, "1.8.3.1", "<"):
-        return "Your version of git is older than 1.8.3.1 and has bugs which will break builds. Please install a newer version of git.\n"
+    if bb.utils.vercmp_string_op(version, git_minimum_version, "<"):
+        return ("Your version of git is older than %s and has bugs which will break builds. "
+            "Please install a newer version of git.\n" % git_minimum_version)
     return None
 
 # Check the required perl modules which may not be installed by default
@@ -942,12 +953,21 @@ def check_sanity_everybuild(status, d):
         if val.find('%') != -1:
             status.addresult("Error, you have an invalid character (%) in your %s directory path which causes problems with python string formatting. Please move the installation to a directory which doesn't include any % characters." % checkdir)
 
+    # Redundant slashes (trailing slash or consecutive slashes) in TMPDIR
+    # break the sstate staging machinery which relies on exact string matching
+    # of manifest paths.  Reject any TMPDIR that differs from its normalised form.
+    tmpdir = d.getVar('TMPDIR')
+    if tmpdir and tmpdir != os.path.normpath(tmpdir):
+        status.addresult("Error, TMPDIR (%s) contains redundant slashes. "
+            "Please set TMPDIR to a clean path with no trailing slash or "
+            "consecutive slashes (e.g. %s).\n" % (tmpdir, os.path.normpath(tmpdir)))
+
     # Check the format of MIRRORS, PREMIRRORS and SSTATE_MIRRORS
     import re
     mirror_vars = ['MIRRORS', 'PREMIRRORS', 'SSTATE_MIRRORS']
     protocols = ['http', 'ftp', 'file', 'https', \
-                 'git', 'gitsm', 'hg', 'osc', 'p4', 'svn', \
-                 'bzr', 'cvs', 'npm', 'sftp', 'ssh', 's3', \
+                 'git', 'gitsm', 'hg', 'p4', 'svn', \
+                 'npm', 'sftp', 'ssh', 's3', \
                  'az', 'ftps', 'crate', 'gs']
     for mirror_var in mirror_vars:
         mirrors = (d.getVar(mirror_var) or '').replace('\\n', ' ').split()
@@ -990,6 +1010,29 @@ def check_sanity_everybuild(status, d):
     hashserv = d.getVar("BB_HASHSERVE")
     if d.getVar("SSTATE_MIRRORS") and hashserv and hashserv.startswith("unix://") and not d.getVar("BB_HASHSERVE_UPSTREAM"):
         bb.warn("You are using a local hash equivalence server but have configured an sstate mirror. This will likely mean no sstate will match from the mirror. You may wish to disable the hash equivalence use (BB_HASHSERVE), or use a hash equivalence server alongside the sstate mirror.")
+
+    # Check that when SSTATE_DIR is shared between builds, hashserve database is not private to a build
+    hashserv_proto,_,hashserv_path,_,_,_ = bb.fetch2.decodeurl(hashserv)
+    if hashserv_proto == "unix":
+        dbdir = d.getVar("BB_HASHSERVE_DB_DIR") or d.getVar("PERSISTENT_DIR") or d.getVar("CACHE")
+        topdir = d.getVar("TOPDIR")
+        sstatedir = d.getVar("SSTATE_DIR")
+
+        if (hashserv_path.startswith(topdir) and dbdir.startswith(topdir) and not sstatedir.startswith(topdir)):
+            if bb.utils.is_path_on_nfs(sstatedir):
+                bb.warn("""Sstate directory is on a shared NFS (it is set via SSTATE_DIR to {}),
+    but hash equivalency database is inside this particular build directory {}.
+
+    This will prevent sstate reuse, and it is recommended to set up a permanently running hash equivalency server
+    according to https://docs.yoctoproject.org/dev-manual/hashequivserver.html""".format(sstatedir, topdir))
+            else:
+                bb.warn("""Sstate directory is shared between several builds (it is set via SSTATE_DIR to {}),
+    but hash equivalency database is inside this particular build directory {}.
+
+    This will prevent sstate reuse, and it is recommended to set the location for the database to a common path
+    via BB_HASHSERVE_DB_DIR, for example:
+
+    BB_HASHSERVE_DB_DIR = \"${{SSTATE_DIR}}\"""".format(sstatedir, topdir))
 
     # Check that TMPDIR hasn't changed location since the last time we were run
     tmpdir = d.getVar('TMPDIR')

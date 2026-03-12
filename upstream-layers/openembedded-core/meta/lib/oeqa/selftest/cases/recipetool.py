@@ -595,6 +595,51 @@ class RecipetoolCreateTests(RecipetoolBase):
 
         self._test_recipe_contents(recipefile, checkvars, inherits)
 
+    def test_recipetool_create_python3_pep517_setuptools_build_meta_license_prepep639(self):
+        # Test pre-PEP639 where the license field is a table
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
+
+        # Test creating python3 package from tarball (using setuptools.build_meta class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pv = '1.37.1'
+        pn = 'yamllint'
+        recipefile = os.path.join(temprecipe, 'python3-%s_%s.bb' % (pn, pv))
+        srcuri = 'https://files.pythonhosted.org/packages/46/f2/cd8b7584a48ee83f0bc94f8a32fea38734cefcdc6f7324c4d3bfc699457b//%s-%s.tar.gz' % (pn, pv)
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'A linter for YAML files.'
+        checkvars['LICENSE'] = set(['GPL-3.0-only'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464'
+        checkvars['SRC_URI[sha256sum]'] = '81f7c0c5559becc8049470d86046b36e96113637bcbe4753ecef06977c00245d'
+        inherits = ['python_setuptools_build_meta', 'pypi']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
+    def test_recipetool_create_python3_pep517_setuptools_build_meta_license_pep639(self):
+        # Test PEP639 where the license field is an SPDX license expression string
+        # This test require python 3.11 or above for the tomllib module or tomli module to be installed
+        needTomllib(self)
+
+        # Test creating python3 package from tarball (using setuptools.build_meta class)
+        temprecipe = os.path.join(self.tempdir, 'recipe')
+        os.makedirs(temprecipe)
+        pv = '2.0.0'
+        recipefile = os.path.join(temprecipe, 'python3-sphinxcontrib-svg2pdfconverter_%s.bb' % pv)
+        srcuri = 'https://files.pythonhosted.org/packages/21/7a/21930ae148f94c458ca2f8f554d4e737e17c1db8b152238f530fc0c89e32/sphinxcontrib_svg2pdfconverter-%s.tar.gz' % pv
+        result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
+        self.assertTrue(os.path.isfile(recipefile))
+        checkvars = {}
+        checkvars['SUMMARY'] = 'Sphinx SVG to PDF or PNG converter extension'
+        checkvars['LICENSE'] = set(['BSD-2-Clause'])
+        checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE.txt;md5=b11cf936853a71258d4b57bb1849a3f9'
+        checkvars['SRC_URI[sha256sum]'] = 'ab9c8f1080391e231812d20abf2657a69ee35574563b1014414f953964a95fa3'
+        inherits = ['python_setuptools_build_meta', 'pypi']
+
+        self._test_recipe_contents(recipefile, checkvars, inherits)
+
     def test_recipetool_create_python3_pep517_poetry_core_masonry_api(self):
         # This test require python 3.11 or above for the tomllib module or tomli module to be installed
         needTomllib(self)

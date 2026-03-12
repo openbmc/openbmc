@@ -73,8 +73,6 @@ require ../conf/image-uefi.conf
 
 INITRAMFS_IMAGE ?= "core-image-minimal-initramfs"
 
-INITRD_ARCHIVE ?= "${INITRAMFS_IMAGE}-${MACHINE}.${INITRAMFS_FSTYPES}"
-
 do_image_complete[depends] += "${INITRAMFS_IMAGE}:do_image_complete"
 
 UKIFY_CMD ?= "ukify build"
@@ -127,7 +125,8 @@ python do_uki() {
     ukify_cmd += " --stub %s" % (stub)
 
     # initrd
-    initramfs_image = "%s" % (d.getVar('INITRD_ARCHIVE'))
+    uki_fstype = d.getVar("INITRAMFS_FSTYPES").split()[0]
+    initramfs_image = "%s-%s.%s" % (d.getVar('INITRAMFS_IMAGE'), d.getVar('MACHINE'), uki_fstype)
     ukify_cmd += " --initrd=%s" % (os.path.join(deploy_dir_image, initramfs_image))
 
     # kernel
@@ -152,7 +151,9 @@ python do_uki() {
     # dtb
     if d.getVar('KERNEL_DEVICETREE'):
         for dtb in d.getVar('KERNEL_DEVICETREE').split():
-            dtb_path = "%s/%s" % (deploy_dir_image, dtb)
+            # DTBs are without sub-directories in deploy_dir
+            dtb_name = os.path.basename(dtb)
+            dtb_path = "%s/%s" % (deploy_dir_image, dtb_name)
             if not os.path.exists(dtb_path):
                 bb.fatal(f"ERROR: cannot find {dtb_path}.")
             ukify_cmd += " --devicetree %s" % (dtb_path)

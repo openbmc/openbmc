@@ -1,6 +1,6 @@
-From 6e88e8b7b6924751112966f329525956735de9b4 Mon Sep 17 00:00:00 2001
+From 3d27ccbc3409c473a4acba56df15e6b7e71f83fb Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Wed, 26 Aug 2015 16:16:16 +0300
+Date: Sun, 8 Feb 2026 21:11:56 -0800
 Subject: [PATCH] Adapt to linux-wrs kernel version, which has character '_'
  inside. Remove the first-char-digit-check (as the 1.15.8.5 version does).
 
@@ -8,28 +8,38 @@ Signed-off-by: Dongxiao Xu <dongxiao.xu@intel.com>
 Signed-off-by: Constantin Musca <constantinx.musca@intel.com>
 
 Upstream-Status: Inappropriate [embedded specific]
+
+Rebase to 1.23.5
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  lib/dpkg/parsehelp.c | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/lib/dpkg/parsehelp.c b/lib/dpkg/parsehelp.c
-index a999b5e78..7be0378ab 100644
+index 307b7705a..82713c008 100644
 --- a/lib/dpkg/parsehelp.c
 +++ b/lib/dpkg/parsehelp.c
-@@ -291,14 +291,12 @@ parseversion(struct dpkg_version *rversion, const char *string,
-   ptr = rversion->version;
-   if (!*ptr)
-     return dpkg_put_error(err, _("version number is empty"));
--  if (!c_isdigit(*ptr++))
--    return dpkg_put_warn(err, _("version number does not start with digit"));
-   for (; *ptr; ptr++) {
--    if (!c_isdigit(*ptr) && !c_isalpha(*ptr) && strchr(".-+~:", *ptr) == NULL)
-+    if (!c_isdigit(*ptr) && !c_isalpha(*ptr) && strchr(".-+~:_", *ptr) == NULL)
-       return dpkg_put_warn(err, _("invalid character in version number"));
-   }
-   for (ptr = rversion->revision; *ptr; ptr++) {
--    if (!c_isdigit(*ptr) && !c_isalpha(*ptr) && strchr(".+~", *ptr) == NULL)
-+    if (!c_isdigit(*ptr) && !c_isalpha(*ptr) && strchr(".-+~_", *ptr) == NULL)
-       return dpkg_put_warn(err, _("invalid character in revision number"));
-   }
+@@ -303,18 +303,16 @@ parseversion(struct dpkg_version *rversion, const char *string,
+ 	ptr = rversion->version;
+ 	if (!*ptr)
+ 		return dpkg_put_error(err, _("version number is empty"));
+-	if (!c_isdigit(*ptr++))
+-		return dpkg_put_warn(err, _("version number does not start with digit"));
+ 	for (; *ptr; ptr++) {
+ 		if (!c_isdigit(*ptr) &&
+ 		    !c_isalpha(*ptr) &&
+-		    strchr(".-+~:", *ptr) == NULL)
++		    strchr(".-+~:_", *ptr) == NULL)
+ 			return dpkg_put_warn(err, _("invalid character in version number"));
+ 	}
+ 	for (ptr = rversion->revision; *ptr; ptr++) {
+ 		if (!c_isdigit(*ptr) &&
+ 		    !c_isalpha(*ptr) &&
+-		    strchr(".+~", *ptr) == NULL)
++		    strchr(".-+~_", *ptr) == NULL)
+ 			return dpkg_put_warn(err, _("invalid character in revision number"));
+ 	}
  
+-- 
+2.49.0
+

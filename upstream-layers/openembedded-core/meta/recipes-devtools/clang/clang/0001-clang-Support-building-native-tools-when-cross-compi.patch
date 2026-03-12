@@ -1,0 +1,63 @@
+From 2ff1134d1d2b9f3c207e3ebd98de922f9ef6c15a Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 24 Sep 2025 17:02:57 +0100
+Subject: [PATCH] [clang] Support building native tools when cross-compiling
+ standalone clang
+
+When cross-compiling the LLVM project as a whole (from llvm/), if it
+cannot find presupplied tools it will create a native build environment
+to build the tools it needs.
+
+However, when doing a standalone build of clang (that is, from clang/
+and linking against an existing libLLVM) this doesn't work. Instead
+a _target_ binary is built which predictably then fails.
+
+The conventional workaround for this is to build the native tools in a
+separate native compile phase and pass the paths to the cross build, for
+example see OpenEmbedded[1] or Nix[2]. But we can do better!
+
+The first problem is that LLVM_USE_HOST_TOOLS is only set in the llvm/
+CMakeLists.txt, so setup_host_tool() will never consider building a
+native binary.  This can be solved by setting LLVM_USE_HOST_TOOLS based
+on CMAKE_CROSSCOMPILING in clang/CMakeLists.txt in the standalone case.
+
+Now setup_host_tool() will try to build a native tool, but it needs
+build_native_tool() from CrossCompile.cmake, so that also needs to be
+included.
+
+Finally, the native binary then fails because there's no provider for
+the dependency "CONFIGURE_Clang_NATIVE", so use llvm_create_cross_target
+to create the native environment.
+
+These few lines mirror what the lldb CMakeLists.txt does in the
+standalone case, so there is prior art for this.
+
+[1] https://git.openembedded.org/openembedded-core/tree/meta/recipes-devtools/clang/clang_git.bb?id=e18d697e92b55e57124e80234369d46575226386#n212
+[2] https://github.com/NixOS/nixpkgs/blob/3354d448f2a26117a74638957b0131ce3da9c8c4/pkgs/development/compilers/llvm/common/tblgen.nix#L54
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/160605]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ clang/CMakeLists.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/clang/CMakeLists.txt b/clang/CMakeLists.txt
+index 1bb73599970c..4eaa71289985 100644
+--- a/clang/CMakeLists.txt
++++ b/clang/CMakeLists.txt
+@@ -80,6 +80,12 @@ if(CLANG_BUILT_STANDALONE)
+   include(GetErrcMessages)
+   include(LLVMDistributionSupport)
+ 
++  if(CMAKE_CROSSCOMPILING)
++    set(LLVM_USE_HOST_TOOLS ON)
++    include(CrossCompile)
++    llvm_create_cross_target(Clang NATIVE "" Release)
++  endif()
++
+   set(PACKAGE_VERSION "${LLVM_PACKAGE_VERSION}")
+   set(BUG_REPORT_URL "${LLVM_PACKAGE_BUGREPORT}" CACHE STRING
+     "Default URL where bug reports are to be submitted.")
+-- 
+2.43.0
+

@@ -1,0 +1,33 @@
+From 4204fd1b62de30418433139fea1b7dad4fff9c59 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Oct 2025 15:44:49 -0700
+Subject: [PATCH] [llvm-libgcc] Fix symlink path for libgcc
+
+The symlink for libgcc_so.1.0 is made to point to libunwind.so
+which is functionally correct but it fails some linux distro packaging
+complain because libunwind.so is made part of -dev package but
+libgcc_so.1.0 ends up in the real package, and creates an unneeded
+package -> dev dependency
+
+create the symlink to point to libunwind.so.1 instead then the boundaries
+of packaging are not crossed and all is well.
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/165487]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ llvm-libgcc/CMakeLists.txt | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/llvm-libgcc/CMakeLists.txt b/llvm-libgcc/CMakeLists.txt
+index 47208fc19869..54009c1104c3 100644
+--- a/llvm-libgcc/CMakeLists.txt
++++ b/llvm-libgcc/CMakeLists.txt
+@@ -137,7 +147,7 @@ add_custom_target(llvm-libgcc ALL
+   DEPENDS unwind_shared unwind_static clang_rt.builtins-${COMPILER_RT_DEFAULT_TARGET_ARCH}
+   COMMAND ${CMAKE_COMMAND} -E create_symlink ${LLVM_LIBGCC_COMPILER_RT} libgcc.a
+   COMMAND ${CMAKE_COMMAND} -E create_symlink libunwind.a libgcc_eh.a
+-  COMMAND ${CMAKE_COMMAND} -E create_symlink libunwind.so libgcc_s.so.1.0
++  COMMAND ${CMAKE_COMMAND} -E create_symlink libunwind.so.1 libgcc_s.so.1.0
+   COMMAND ${CMAKE_COMMAND} -E create_symlink libgcc_s.so.1.0 libgcc_s.so.1
+   COMMAND ${CMAKE_COMMAND} -E create_symlink libgcc_s.so.1 libgcc_s.so
+ )

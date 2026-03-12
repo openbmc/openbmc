@@ -1,4 +1,4 @@
-From 540765b148d942a2339affa6c0d11445e9d0f26c Mon Sep 17 00:00:00 2001
+From 9c9aac87f48eaece5b99ea347b639c21eea84e6d Mon Sep 17 00:00:00 2001
 From: Trevor Gamblin <tgamblin@baylibre.com>
 Date: Thu, 13 Jun 2024 10:54:31 -0400
 Subject: [PATCH] test_active_children: skip problematic test
@@ -9,19 +9,26 @@ similar nature to other failing/hanging tests, disable it for now.
 Upstream-Status: Inappropriate [OE-Specific]
 
 Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+
+Refresh to apply on top of Python 3.14.0.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
 ---
  Lib/test/_test_multiprocessing.py | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.py
-index 23eb971..b1295b2 100644
+index 008e6a505a5..746de8945f0 100644
 --- a/Lib/test/_test_multiprocessing.py
 +++ b/Lib/test/_test_multiprocessing.py
-@@ -585,6 +585,7 @@ class _TestProcess(BaseTestCase):
-         self.assertTrue(type(cpus) is int)
-         self.assertTrue(cpus >= 1)
+@@ -615,6 +615,7 @@ def test_cpu_count(self):
+         self.assertIsInstance(cpus, int)
+         self.assertGreaterEqual(cpus, 1)
  
 +    @unittest.skip("skipping problematic test")
      def test_active_children(self):
          self.assertEqual(type(self.active_children()), list)
  
+-- 
+2.51.0
+

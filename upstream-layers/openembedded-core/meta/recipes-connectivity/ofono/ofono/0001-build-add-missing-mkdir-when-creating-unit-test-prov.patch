@@ -1,0 +1,27 @@
+From e473db4ef4e418e78d04b8de712b5d280f762b43 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 18 Dec 2025 18:00:28 +0000
+Subject: [PATCH] build: add missing mkdir when creating unit/test-provision.db
+
+Upstream-Status: Submitted [https://lore.kernel.org/ofono/20251218180056.235274-1-ross.burton@arm.com/T/#u]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index cf51cdf1..3bd414d6 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -947,6 +947,7 @@ unit_test_qmimodem_qmi_LDADD = @GLIB_LIBS@ $(ell_ldadd) -ldl
+ unit_objects += $(unit_test_qmimodem_qmi_OBJECTS)
+ 
+ unit/test-provision.db: unit/test-provision.json
++	$(AM_V_at)$(MKDIR_P) unit
+ 	$(AM_V_GEN)$(srcdir)/tools/provisiontool generate \
+ 		--infile $< --outfile $@
+ 
+-- 
+2.43.0
+

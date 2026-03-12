@@ -5,8 +5,7 @@
 Patchtest is a test framework for community patches based on the standard
 unittest python module. As input, it needs three elements to work properly:
 
-- a patch in mbox format (either created with `git format-patch` or fetched
-from 'patchwork')
+- one or more patches in separate, mbox-formated files
 - a test suite
 - a target repository
 
@@ -18,42 +17,91 @@ baseline for development of similar suites for other layers as needed.
 Patchtest can either run on a host or a guest machine, depending on
 which environment you prefer. If you plan to test your own patches (a
 good practice before these are sent to the mailing list), the easiest
-way is to install and execute on your local host; in the other hand, if
+way is to install and execute on your local host; on the other hand, if
 automatic testing is intended, the guest method is strongly recommended.
-The guest method requires the use of the patchtest layer, in addition to
-the tools available in oe-core: https://git.yoctoproject.org/patchtest/
+The guest method requires the use of the meta-patchtest layer, in
+addition to the tools available in oe-core:
+https://git.yoctoproject.org/meta-patchtest/
 
 ## Installation
 
-As a tool for use with the Yocto Project, the [quick start
-guide](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html)
-contains the necessary prerequisites. In addition, patchtest relies on
-several Python modules for parsing and analysis, which can be installed
-by running `pip install -r meta/lib/patchtest/requirements.txt`. Note
-that git-pw is not automatically added to the user's PATH; by default,
-it is installed at ~/.local/bin/git-pw.
+Patchtest checks patches which are expected to be applied to
+Yocto layers. Therefore, familiarity with the Yocto Project, its
+functionality, and image-build processes is assumed. Otherwise the
+[quick start guide](https://docs.yoctoproject.org/brief-yoctoprojectqs/index.html)
+contains the necessary information.
 
-For git-pw (and therefore scripts such as patchtest-get--series) to work, you need
-to provide a Patchwork instance in your user's .gitconfig, like so (the project
-can be specified using the --project argument):
+As a Python application, the recommended way it should be installed
+(following Python best practices) is to use a virtual environment. A
+Python virtual environment provides a convenient sandbox into which its
+requirements can also be installed with out affecting a user's entire
+system at large. Patchtest makes use of a test suite found in oe-core,
+so it needs to be available as well.
+
+For example, to install patchtest into a Python virtual environment
+called "patchtest.venv" located at some/where in your filesystem:
+
+    $ mkdir -p some/where
+    $ cd some/where
+    $ mkdir yocto
+    $ pushd yocto
+    $ git clone https://git.openembedded.org/openembedded-core
+    $ git clone https://git.openembedded.org/bitbake
+    $ git clone https://git.yoctoproject.org/meta-patchtest
+    $ popd
+    $ . yocto/openembedded-core/oe-init-build-env build yocto/bitbake
+    $ cd ..
+    $ python3 -m venv patchtest.venv
+    $ . patchtest.venv/bin/activate
+    (patchtest.venv) $ pip install -r yocto/openembedded-core/meta/lib/patchtest/requirements.txt
+
+In the above list of cloned repositories, the meta-patchtest layer is
+only needed if you intend to use patchtest in "guest" mode. Also the
+oe-core + bitbake clones can be replaced with poky instead.
+
+If "guest" mode will be used, the meta-patchtest layer needs to be added
+to the conf/bblayers.conf file generated above.
+
+If you would like to run the patchtest selftest found in oe-core, the
+openembedded-core/meta-selftest (or poky/meta-selftest, if using poky)
+layer also needs to be added to bblayers.conf.
+
+Once the installation is done, your directory layout will look like:
+    .
+    ├── build
+    │   └── conf
+    ├── yocto
+    │   ├── bitbake
+    │   ├── meta-patchtest
+    │   └── openembedded-core
+    └── patchtest.venv
+        ├── bin
+        ├── include
+        ├── lib
+        ├── lib64 -> lib
+        ├── pyvenv.cfg
+        └── share
+
+For git-pw (and therefore scripts such as patchtest-get-series) to work, you need
+to provide a Patchwork instance in your user's .gitconfig, like so (alternatively
+the project can be specified using the --project argument to git-pw on its
+cmdline):
 
     git config --global pw.server "https://patchwork.yoctoproject.org/api/1.2/"
-
-To work with patchtest, you should have the following repositories cloned:
-
-1. https://git.openembedded.org/openembedded-core/ (or https://git.yoctoproject.org/poky/)
-2. https://git.openembedded.org/bitbake/ (if not using poky)
-3. https://git.yoctoproject.org/patchtest (if using guest mode)
 
 ## Usage
 
 ### Obtaining Patches
 
-Patch files can be obtained directly from cloned repositories using `git
-format-patch -N` (where N is the number of patches starting from HEAD to
-generate). git-pw can also be used with filters for users, patch/series IDs,
-and timeboxes if specific patches are desired. For more information, see the
-git-pw [documentation](https://patchwork.readthedocs.io/projects/git-pw/en/latest/).
+Separate, mbox-formatted patch files can be obtained in a number of
+ways:
+
+    - using b4 to obtain patches from a lore server
+    - using git-pw to obtain patches from a patchwork server
+    - using "git format-patch ..." to create patches from a git
+      repository
+    - using an email program, such as mutt or thunderbird, to obtain
+      patches from a mailing list
 
 Alternatively, `scripts/patchtest-get-series` can be used to pull mbox files from
 the Patchwork instance configured previously in .gitconfig. It uses a log file
@@ -64,29 +112,111 @@ the target project, but these parameters can be configured using the `--limit`,
 `--interval`, and `--project` arguments respectively. For more information, run
 `patchtest-get-series -h`.
 
+#### git-pw
+
+git-pw can be used with filters for users, patch/series IDs, and
+timeboxes if specific patches are desired. For more information, see the
+git-pw [documentation](https://patchwork.readthedocs.io/projects/git-pw/en/latest/).
+
+For example, to download a single patch from the Yocto Project's
+Patchwork server (and to demonstrate not having modified ~/.gitconfig):
+
+    (patchtest.venv) $ mkdir gawk
+    (patchtest.venv) $ git-pw --server https://patchwork.yoctoproject.org/api/1.2/ --project oe-core patch download --mbox 70101 gawk/
+
+To download a series, for example, try:
+
+    (patchtest.venv) $ mkdir clang
+    (patchtest.venv) $ git-pw --server https://patchwork.yoctoproject.org/api/1.2 --project oe-core series download --separate 38107 clang/
+
+#### git format-patch
+
+Patch files can be obtained directly from a git repository using `git
+format-patch -N` (where N is the number of patches starting from HEAD to
+generate) or using any other way of specifying a range of commit SHAs to
+git.
+
+This method would be the most likely used when testing patches in local
+mode before emailing them for review.
+
+#### b4
+
+In order to use b4, it needs to be installed. Fortunately it is a Python
+program that is hosted on pypi and can easily be installed into the same
+Python virtual environment that was created to run patchwork:
+
+    (patchtest.venv) $ pip install b4
+    (patchtest.venv) $ b4 --version
+    0.14.2
+
+To fetch the same single patch using b4 that was fetched with git-pw
+earlier, use:
+
+    (patchtest.venv) $ mkdir gawk-2
+    (patchtest.venv) $ b4 am -o gawk-2 https://lore.kernel.org/openembedded-core/20250912200740.2873851-1-Randy.MacLeod@windriver.com
+
+Fetching a patch series with b4 is a little more involved since b4 will
+create one mbox file with all the patches in the series in it. Given an
+mbox file with more than one patch in it, patchtest will only test the
+first one. So there needs to be a separate step to break apart the
+multiple patches into separate files:
+
+    (patchtest.venv) $ mkdir clang-2
+    (patchtest.venv) $ b4 am -o ross https://lore.kernel.org/openembedded-core/20250914133258.2625735-1-ross.burton@arm.com
+    (patchtest.venv) $ cat clang-2/v2_20250914_ross_burton_clang_improve_opt_viewer_packageconfig.mbx | formail -ds sh -c 'cat > ross/msg.$FILENO'
+
+NOTE: the formail utility is part of the procmail package for most Linux
+      distributions.
+
+#### mail user agents (MUA)
+
+Most email applications have a way of saving patch emails. Details for
+each MUA is beyond the scope of this document, but it is possible in
+most cases. The only catch is that each patch has to be saved in mbox
+format in its own individual file. Some client applications prefer to
+save emails in the Maildir format, and some programs will save a set of
+patches into one mbox file. The formail program from the procmail
+package is useful for manipulating and converting between formats and
+storage formats.
+
 ### Host Mode
 
-To run patchtest on the host, do the following:
+To run patchtest in "host" mode, do the following:
 
-1. In openembedded-core/poky, do `source oe-init-build-env`
-2. Generate patch files from the target repository by doing `git format-patch -N`,
-   where N is the number of patches starting at HEAD, or by using git-pw
-   or patchtest-get-series
-3. Run patchtest on a patch file by doing the following:
+1. Using openembedded-core or poky, do the following if re-using the
+   installation given in the installation procedure above:
 
-        patchtest --patch /path/to/patch/file
+    $ . yocto/openembedded-core/oe-init-build-env build yocto/bitbake
+
+   or
+
+    $ . yocto/poky/oe-init-build-env
+
+2. Activate the Python virtual environment that was created using the
+   steps from the installation procedure given above:
+
+    $ . patchtest.venv/bin/activate
+
+3. Obtain one or more patches (see section above)
+
+4. Run patchtest on a patch file by doing the following:
+
+        (patchtest.venv) $ patchtest --patch /path/to/patch/file
 
     or, if you have stored the patch files in a directory, do:
 
-        patchtest --directory /path/to/patch/directory
+        (patchtest.venv) $ patchtest --directory /path/to/patch/directory
 
-    For example, to test `master-gcc-Fix--fstack-protector-issue-on-aarch64.patch` against the oe-core test suite:
+    For example, to test
+    `master-gcc-Fix--fstack-protector-issue-on-aarch64.patch` against the
+    oe-core test suite:
         
-        patchtest --patch master-gcc-Fix--fstack-protector-issue-on-aarch64.patch
+        (patchtest.venv) $ patchtest --patch master-gcc-Fix--fstack-protector-issue-on-aarch64.patch
 
-    If you want to use a different test suite or target repository, you can use the --testdir and --repodir flags:
+    If you want to use a different test suite or target repository, you
+    can use the --testdir and --repodir flags:
     
-        patchtest --patch /path/to/patch/file --repodir /path/to/repo --testdir /path/to/test/dir
+        (patchtest.venv) $ patchtest --patch /path/to/patch/file --repodir /path/to/repo --testdir /path/to/test/dir
 
 ### Guest Mode
 
@@ -98,8 +228,8 @@ from the mailing lists. When executed this way, the test process is
 essentially running random code from the internet and could be
 catastrophic if malicious bits or even poorly-handled edge cases aren't
 protected against. In order to use this mode, the
-https://git.yoctoproject.org/patchtest/ repository must be cloned and
-the meta-patchtest layer added to bblayers.conf.
+https://git.yoctoproject.org/meta-patchtest/ repository must be cloned
+and added to bblayers.conf.
 
 The general flow of guest mode is:
 
@@ -136,6 +266,18 @@ recommended to set BB_SERVER_TIMEOUT (and thus enable memory-resident
 bitbake) in local.conf to reduce runtime, as the bitbake startup process
 will otherwise add to it significantly when restarted for each test
 patch.
+
+If you have setup a Python virtual environment and sourced the
+oe-init-build-env script to run patchtest following the directions
+provided above in the "Installation" section, and you have added the
+meta-selftest layer (from oe-core or poky) to your build, running the
+patchtest selftest is as simple as:
+
+    (patchtest.venv) $ yocto/openembedded-core/meta/lib/patchtest/selftest/selftest
+
+or:
+
+    (patchtest.venv) $ yocto/poky/meta/lib/patchtest/selftest/selftest
 
 ## Contributing
 

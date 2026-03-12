@@ -166,13 +166,6 @@ autotools_do_configure() {
 		cd ${AUTOTOOLS_SCRIPT_PATH}
 		# aclocal looks in the native sysroot by default, so tell it to also look in the target sysroot.
 		ACLOCAL="aclocal --aclocal-path=${STAGING_DATADIR}/aclocal/"
-		# autoreconf is too shy to overwrite aclocal.m4 if it doesn't look
-		# like it was auto-generated.  Work around this by blowing it away
-		# by hand, unless the package specifically asked not to run aclocal.
-		if ! echo ${EXTRA_AUTORECONF} | grep -q "aclocal"; then
-			bbnote Removing existing aclocal.m4
-			rm -f aclocal.m4
-		fi
 		if [ -e configure.in ]; then
 			CONFIGURE_AC=configure.in
 		else
@@ -186,13 +179,34 @@ autotools_do_configure() {
 				echo "no" | glib-gettextize --force --copy
 			fi
 		elif [ "${BPN}" != "gettext" ] && grep -q "^[[:space:]]*AM_GNU_GETTEXT" $CONFIGURE_AC; then
-			# We'd call gettextize here if it wasn't so broken...
+			# Gettextize could be called here, however it doesn't make the job much easier:
+			# It doesn't discover relevant po folders on its own, so they still need to be
+			# found by some heurestics. Also, it would require always the full gettext
+			# package always, instead of gettext-minimal-native.
 			cp ${STAGING_DATADIR_NATIVE}/gettext/config.rpath ${AUTOTOOLS_AUXDIR}/
-			if [ -d ${S}/po/ ]; then
-				cp -f ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${S}/po/
-				if [ ! -e ${S}/po/remove-potcdate.sed ]; then
-					cp ${STAGING_DATADIR_NATIVE}/gettext/po/remove-potcdate.sed ${S}/po/
+			if [ -d ${S}/po ]; then
+				# Copy the latest Makefile.in.in to the /po folder, regardless if it exists or not
+				# If it exists, then also look for identical Makefile.in.in files, and update them too
+				makefiles_to_update="./po/Makefile.in.in"
+				if [ -f ${S}/po/Makefile.in.in ]; then
+					# search for all Makefile.in.in files that are identical to ./po/Makefile.in.in, by md5sum
+					base_makefile_hash=`md5sum ${S}/po/Makefile.in.in | tr -s ' ' | cut -f1 -d' '`
+					makefiles_to_update=`find ${S} -name Makefile.in.in -exec md5sum {} \+ | grep $base_makefile_hash | tr -s ' ' | cut -d' ' -f2`
 				fi
+				bbnote List of Makefile.in.ins to update: $makefiles_to_update
+				for makefile in ${makefiles_to_update}; do
+					makefile_dir=$(dirname $makefile)
+					bbnote Executing: cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${makefile_dir}/
+					cp ${STAGING_DATADIR_NATIVE}/gettext/po/Makefile.in.in ${makefile_dir}/
+					if [ ! -e ${makefile_dir}/remove-potcdate.sed ]; then
+						cp ${STAGING_DATADIR_NATIVE}/gettext/po/remove-potcdate.sed ${makefile_dir}/
+					fi
+				done
+				for makevars in `find ${S} -name Makevars`; do
+					bbnote Concatenating Makevars: $makevars
+					cat ${STAGING_DATADIR_NATIVE}/gettext/po/Makevars.template.minimal ${makevars} >> ${makevars}.yocto_temp
+					mv ${makevars}.yocto_temp ${makevars}
+				done
 			fi
 			PRUNE_M4="$PRUNE_M4 gettext.m4 iconv.m4 lib-ld.m4 lib-link.m4 lib-prefix.m4 nls.m4 po.m4 progtest.m4"
 		fi

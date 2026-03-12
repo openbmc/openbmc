@@ -1,0 +1,24 @@
+From 159ad0e19f4c5d7fe357378c00db19c1106e62c4 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex.kanavin@gmail.com>
+Date: Fri, 30 Dec 2016 18:22:09 +0200
+Subject: [PATCH] Do not set PYTHON_INSTALL_DIR by running python.
+
+Upstream-Status: Inappropriate [oe-core specific]
+Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+---
+ libcomps/src/python/src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libcomps/src/python/src/CMakeLists.txt b/libcomps/src/python/src/CMakeLists.txt
+index d22b84e..ad67309 100644
+--- a/libcomps/src/python/src/CMakeLists.txt
++++ b/libcomps/src/python/src/CMakeLists.txt
+@@ -85,7 +85,7 @@ IF (SKBUILD)
+     INSTALL(FILES libcomps/__init__.py DESTINATION libcomps/src/python/src/libcomps)
+     INSTALL(TARGETS pycomps LIBRARY DESTINATION libcomps/src/python/src/libcomps)
+ ELSE ()
+-    EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from sysconfig import get_path; stdout.write(get_path('platlib'))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
++    #EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from sysconfig import get_path; stdout.write(get_path('platlib'))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+ 
+     INSTALL(FILES ${pycomps_SRCDIR}/libcomps/__init__.py DESTINATION ${PYTHON_INSTALL_DIR}/libcomps)
+     #INSTALL(FILES ${pycomps_SRCDIR}/tests/__test.py DESTINATION

@@ -35,6 +35,7 @@ logger = scriptutils.logger_create(PROGNAME, stream=sys.stdout)
 def test_layer(td, layer, test_software_layer_signatures):
     from checklayer.context import CheckLayerTestContext
     logger.info("Starting to analyze: %s" % layer['name'])
+    logger.info('Distro: %s' % td['bbvars']["DISTRO"])
     logger.info("----------------------------------------------------------------------")
 
     tc = CheckLayerTestContext(td=td, logger=logger, layer=layer, test_software_layer_signatures=test_software_layer_signatures)

@@ -7,7 +7,6 @@ PTESTS_FAST = "\
     acl \
     apr-util \
     attr \
-    babeltrace \
     babeltrace2 \
     bc \
     bluez5 \
@@ -20,6 +19,7 @@ PTESTS_FAST = "\
     expect \
     findutils \
     flex \
+    fmt \
     gawk \
     gdbm \
     gdk-pixbuf \
@@ -28,11 +28,19 @@ PTESTS_FAST = "\
     icu \
     json-c \
     json-glib \
+    libarchive \
+    libassuan \
+    libcheck \
+    libconfig \
     libconvert-asn1-perl \
     libexif \
     libgpg-error\
+    libksba \
+    libmd \
     libnl \
     libpcre \
+    librsvg \
+    libsolv \
     libssh2 \
     libtest-fatal-perl \
     libtest-needs-perl \
@@ -48,6 +56,7 @@ PTESTS_FAST = "\
     libxml-simple-perl \
     libxml2 \
     libxmlb \
+    libyaml \
     logrotate \
     lua \
     lzo \
@@ -55,6 +64,7 @@ PTESTS_FAST = "\
     nettle \
     opkg \
     popt \
+    procps \
     python3-atomicwrites \
     python3-attrs \
     python3-bcrypt \
@@ -74,6 +84,7 @@ PTESTS_FAST = "\
     python3-pyasn1 \
     python3-pytz \
     python3-pyyaml \
+    python3-pyzstd \
     python3-rpds-py \
     python3-trove-classifiers \
     python3-uritools \
@@ -85,6 +96,7 @@ PTESTS_FAST = "\
     rpm-sequoia \
     sed \
     slang \
+    utfcpp \
     wayland \
     xz \
     zlib \
@@ -93,6 +105,7 @@ PTESTS_FAST:remove:mips64 = "qemu"
 PTESTS_PROBLEMS:append:mips64 = " qemu"
 PTESTS_FAST:remove:riscv32 = "qemu"
 PTESTS_PROBLEMS:append:riscv32 = " qemu"
+PTESTS_FAST:remove:libc-musl = "procps"
 
 PTESTS_SLOW = "\
     apr \
@@ -101,6 +114,7 @@ PTESTS_SLOW = "\
     curl \
     dbus \
     dosfstools \
+    dpkg \
     e2fsprogs \
     elfutils \
     gettext \
@@ -112,7 +126,7 @@ PTESTS_SLOW = "\
     libgcrypt \
     libmodule-build-perl \
     libpng \
-    libseccomp \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'seccomp', 'libseccomp', '',d)} \
     lttng-tools \
     lz4 \
     openssh \

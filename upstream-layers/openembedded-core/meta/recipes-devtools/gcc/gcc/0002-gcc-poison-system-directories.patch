@@ -1,4 +1,4 @@
-From f7c26bbbf0496d179f5e71107fe6cf1320b25901 Mon Sep 17 00:00:00 2001
+From bc3769af87e98d59a27daf0c46c79aadd7b968c4 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 23 Jan 2025 17:12:51 -0800
 Subject: [PATCH] gcc: poison-system-directories
@@ -35,7 +35,7 @@ index e3fa0dacec4..bea1adc0940 100644
  
 +Wpoison-system-directories
 +Common Var(flag_poison_system_directories) Init(1) Warning
-+Warn for -I and -L options using system directories if cross compiling
++Warn for -I and -L options using system directories if cross compiling.
 +
  Wshadow
  Common Var(warn_shadow) Warning
@@ -133,7 +133,7 @@ index 9f67e62950a..b0e3615e5aa 100644
  AC_SUBST(subdirs)
  AC_SUBST(srcdir)
 diff --git a/gcc/doc/invoke.texi b/gcc/doc/invoke.texi
-index c2e1bf8031b..d33e2042f38 100644
+index 64a3131c190..d068b390d18 100644
 --- a/gcc/doc/invoke.texi
 +++ b/gcc/doc/invoke.texi
 @@ -405,6 +405,7 @@ Objective-C and Objective-C++ Dialects}.

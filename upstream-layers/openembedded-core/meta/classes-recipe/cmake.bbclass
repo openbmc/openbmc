@@ -56,7 +56,7 @@ OECMAKE_NATIVE_C_COMPILER_LAUNCHER ?= "${@oecmake_map_compiler('BUILD_CC', d)[1]
 OECMAKE_NATIVE_CXX_COMPILER ?= "${@oecmake_map_compiler('BUILD_CXX', d)[0]}"
 OECMAKE_NATIVE_CXX_COMPILER_LAUNCHER ?= "${@oecmake_map_compiler('BUILD_CXX', d)[1]}"
 OECMAKE_NATIVE_AR ?= "${BUILD_AR}"
-OECMAKE_NATIVE_RANLIB ?= "${BUILD_RANLIB}"
+OECMAKE_NATIVE_RANLIB ?= "${@d.getVar('BUILD_RANLIB').split()[0]}"
 OECMAKE_NATIVE_NM ?= "${BUILD_NM}"
 
 # Native compiler flags
@@ -122,6 +122,7 @@ cmake_do_generate_toolchain_file() {
 	if [ "${BUILD_SYS}" = "${HOST_SYS}" ]; then
 		cmake_crosscompiling="set( CMAKE_CROSSCOMPILING FALSE )"
 	else
+		cmake_crosscompiling="set( CMAKE_CROSSCOMPILING TRUE )"
 		cmake_sysroot="set( CMAKE_SYSROOT \"${RECIPE_SYSROOT}\" )"
 	fi
 
@@ -211,6 +212,15 @@ set( CMAKE_LIBRARY_PATH ${STAGING_BASE_LIBDIR_NATIVE} ${STAGING_LIBDIR_NATIVE})
 list(APPEND CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES ${STAGING_INCDIR_NATIVE})
 list(APPEND CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES ${STAGING_INCDIR_NATIVE})
 
+# The assignmens above override CFLAGS and CXXFLAGS from the environment but
+# not LDFLAGS, which ends up in CMAKE_EXE_LINKER_FLAGS. This then means our
+# native builds use target flags, and can fail.
+#
+# As there are a number of variables that are set from LDFLAGS,
+# clear it at source.
+#
+# https://cmake.org/cmake/help/latest/envvar/LDFLAGS.html
+unset(ENV{LDFLAGS})
 EOF
 }
 

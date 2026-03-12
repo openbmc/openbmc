@@ -1,0 +1,46 @@
+From 7e6be0f4068a2158af3c97e873edb33fa4d5c6b8 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Mon, 3 Nov 2025 09:56:52 +0100
+Subject: [PATCH 5/5] UefiCpuPkg/CpuExceptionHandlerLib: fix push instructions
+
+Nasm 3.0 complains about 'dword' being invalid.  The comment talks about
+a '8-byte value' so 'qword' should be correct here.
+
+With this change the extra comment explaining that the instruction
+actually pushes an 8-byte value despite the 'dword' keyword is not
+needed any more.  Drop it.
+
+Fixes: https://github.com/tianocore/edk2/issues/11635
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Upstream-Status: Backport [https://github.com/tianocore/edk2/commit/9ccf8751a74f26142e584c7b7c7572a182b67997]
+(cherry picked from commit 9ccf8751a74f26142e584c7b7c7572a182b67997)
+Signed-off-by: Ankur Tyagi <ankur.tyagi@navicogroup.com>
+---
+ .../CpuExceptionHandlerLib/X64/ExceptionHandlerAsm.nasm       | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ExceptionHandlerAsm.nasm b/UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ExceptionHandlerAsm.nasm
+index 3d64ac9080..671ed98f85 100644
+--- a/UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ExceptionHandlerAsm.nasm
++++ b/UefiCpuPkg/Library/CpuExceptionHandlerLib/X64/ExceptionHandlerAsm.nasm
+@@ -57,7 +57,7 @@ ALIGN   8
+ AsmIdtVectorBegin:
+ %assign Vector 0
+ %rep  256
+-    push    strict dword %[Vector] ; This instruction pushes sign-extended 8-byte value on stack
++    push    strict qword %[Vector]
+     push    rax
+ %ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+     mov     rax, strict qword 0    ; mov     rax, ASM_PFX(CommonInterruptEntry)
+@@ -70,7 +70,7 @@ AsmIdtVectorBegin:
+ AsmIdtVectorEnd:
+ 
+ HookAfterStubHeaderBegin:
+-    push    strict dword 0      ; 0 will be fixed
++    push    strict qword 0      ; 0 will be fixed
+ VectorNum:
+     push    rax
+ %ifdef NO_ABSOLUTE_RELOCS_IN_TEXT
+-- 
+2.47.3
+

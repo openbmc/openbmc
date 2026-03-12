@@ -1,19 +1,20 @@
-From da528d5d60137f13202102b53cf178aba45849a5 Mon Sep 17 00:00:00 2001
+From 87a9931e4aa97d7b6eb3b25f26444e30e45e3e41 Mon Sep 17 00:00:00 2001
 From: Stefan Agner <stefan.agner@toradex.com>
-Date: Sun, 6 Oct 2019 00:05:54 +0200
+Date: Wed, 27 Aug 2025 11:30:48 +0800
 Subject: [PATCH] systemd: use EnvironmentFile
 
 Use OE specific environment file.
 
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Stefan Agner <stefan.agner@toradex.com>
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 ---
  configure.ac               | 2 ++
- systemd/rpcbind.service.in | 1 +
- 2 files changed, 3 insertions(+)
+ systemd/rpcbind.service.in | 6 +++---
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 8f4cef3..4705413 100644
+index 6ede0af..d1ae5e4 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -86,5 +86,7 @@ AC_CHECK_HEADERS([nss.h])
@@ -25,14 +26,19 @@ index 8f4cef3..4705413 100644
  
  AC_OUTPUT([Makefile systemd/rpcbind.service systemd/rpcbind.socket])
 diff --git a/systemd/rpcbind.service.in b/systemd/rpcbind.service.in
-index c892ca8..e0511bd 100644
+index 771b944..5992098 100644
 --- a/systemd/rpcbind.service.in
 +++ b/systemd/rpcbind.service.in
-@@ -12,6 +12,7 @@ Wants=rpcbind.target
- [Service]
+@@ -23,9 +23,9 @@ ProtectControlGroups=true
+ RestrictRealtime=true
  Type=notify
  # distro can provide a drop-in adding EnvironmentFile=-/??? if needed.
+-EnvironmentFile=-/etc/rpcbind.conf
+-EnvironmentFile=-/etc/default/rpcbind
+-EnvironmentFile=-/etc/sysconfig/rpcbind
 +EnvironmentFile=-@_sysconfdir@/rpcbind.conf
++EnvironmentFile=-@_sysconfdir@/default/rpcbind
++EnvironmentFile=-@_sysconfdir@/sysconfig/rpcbind
  ExecStart=@_sbindir@/rpcbind $RPCBIND_OPTIONS @warmstarts_opt@ -f
  
  [Install]

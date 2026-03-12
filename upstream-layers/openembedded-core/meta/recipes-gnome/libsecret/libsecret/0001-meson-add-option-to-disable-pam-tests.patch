@@ -15,11 +15,15 @@ diff --git a/meson_options.txt b/meson_options.txt
 index 936eff8..2ae14f2 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -8,3 +8,4 @@ option('bashcompdir', type: 'string', value: '', description: 'Override default
- option('bash_completion', type: 'feature', value: 'auto', description: 'Install bash completion files')
- option('tpm2', type: 'boolean', value: false, description: 'With TPM2 Software Stack')
- option('pam', type: 'boolean', value: false, description: 'Build PAM module')
-+option('pam-tests', type: 'boolean', value: true, description: 'Build PAM Tests')
+@@ -61,3 +61,8 @@
+   description: 'Build PAM module',
+ )
+
++option('pam-tests',
++  type: 'boolean',
++  value: true,
++  description: 'Build PAM Tests'
++)
 diff --git a/pam/meson.build b/pam/meson.build
 index 8413b58..5155329 100644
 --- a/pam/meson.build

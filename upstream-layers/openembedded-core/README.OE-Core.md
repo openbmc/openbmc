@@ -18,6 +18,10 @@ Contributing
 Please refer to our contributor guide here: <https://docs.yoctoproject.org/dev/contributor-guide/>
 for full details on how to submit changes.
 
+For any files containing sorted lists (such as recipe maintainers), please ensure
+alphabetical order is maintained using the C locale. For example, use:
+`LC_ALL=C sort` to sort the list.
+
 As a quick guide, patches should be sent to openembedded-core@lists.openembedded.org
 The git command to do that would be:
 

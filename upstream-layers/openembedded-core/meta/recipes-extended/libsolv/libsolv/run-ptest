@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd test
+
+for t in testcases/*; do
+    ./runtestcases.sh ../tools/testsolv $t
+    if [ $? -eq 0 ]; then
+        echo "PASS: $t"
+    else
+        echo "FAIL: $t"
+    fi
+done

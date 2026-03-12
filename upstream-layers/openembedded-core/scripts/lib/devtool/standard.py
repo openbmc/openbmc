@@ -971,7 +971,12 @@ def modify(args, config, basepath, workspace):
                         continue
                     f.write('# patches_%s: %s\n' % (branch, ','.join(branch_patches[branch])))
             if args.debug_build:
-                f.write('\nDEBUG_BUILD = "1"\n')
+                f.write('\n# Optimize for debugging. Use e.g. -Og instead of -O2\n')
+                f.write('DEBUG_BUILD = "1"\n')
+                f.write('\n# Keep the paths to the source files for remote debugging\n')
+                f.write('# DEBUG_PREFIX_MAP = ""\n')
+                f.write('# WARN_QA:remove = "buildpaths"\n')
+                f.write('# ERROR_QA:remove = "buildpaths"\n')
 
         update_unlockedsigs(basepath, workspace, args.fixed_setup, [pn])
 
@@ -1320,60 +1325,60 @@ def _export_patches(srctree, rd, start_revs, destdir, changed_revs=None):
 
     # Generate patches from Git, exclude local files directory
     patch_pathspec = _git_exclude_path(srctree, 'oe-local-files')
-    GitApplyTree.extractPatches(srctree, start_revs, destdir, patch_pathspec)
-    for dirpath, dirnames, filenames in os.walk(destdir):
-        new_patches = filenames
-        reldirpath = os.path.relpath(dirpath, destdir)
-        for new_patch in new_patches:
-            # Strip numbering from patch names. If it's a git sequence named patch,
-            # the numbers might not match up since we are starting from a different
-            # revision This does assume that people are using unique shortlog
-            # values, but they ought to be anyway...
-            new_basename = seqpatch_re.match(new_patch).group(2)
-            match_name = None
-            old_patch = None
-            for old_patch in existing_patches:
-                old_basename = seqpatch_re.match(old_patch).group(2)
-                old_basename_splitext = os.path.splitext(old_basename)
-                if old_basename.endswith(('.gz', '.bz2', '.Z')) and old_basename_splitext[0] == new_basename:
-                    old_patch_noext = os.path.splitext(old_patch)[0]
-                    match_name = old_patch_noext
-                    break
-                elif new_basename == old_basename:
-                    match_name = old_patch
-                    break
-            if match_name:
-                # Rename patch files
-                if new_patch != match_name:
-                    bb.utils.rename(os.path.join(destdir, new_patch),
-                              os.path.join(destdir, match_name))
-                # Need to pop it off the list now before checking changed_revs
-                oldpath = existing_patches.pop(old_patch)
-                if changed_revs is not None and dirpath in changed_revs:
-                    # Avoid updating patches that have not actually changed
-                    with open(os.path.join(dirpath, match_name), 'r') as f:
-                        firstlineitems = f.readline().split()
-                        # Looking for "From <hash>" line
-                        if len(firstlineitems) > 1 and len(firstlineitems[1]) == 40:
-                            if not firstlineitems[1] in changed_revs[dirpath]:
-                                continue
-                # Recompress if necessary
-                if oldpath.endswith(('.gz', '.Z')):
-                    bb.process.run(['gzip', match_name], cwd=destdir)
-                    if oldpath.endswith('.gz'):
-                        match_name += '.gz'
-                    else:
-                        match_name += '.Z'
-                elif oldpath.endswith('.bz2'):
-                    bb.process.run(['bzip2', match_name], cwd=destdir)
-                    match_name += '.bz2'
-                updated[match_name] = {'path' : oldpath}
-                if reldirpath != ".":
-                    updated[match_name]['patchdir'] = reldirpath
-            else:
-                added[new_patch] = {}
-                if reldirpath != ".":
-                    added[new_patch]['patchdir'] = reldirpath
+    new_patches = GitApplyTree.extractPatches(srctree, start_revs, destdir, patch_pathspec)
+    for patch_path in new_patches:
+        new_patch = os.path.basename(patch_path)
+        dirpath = os.path.dirname(patch_path)
+        patchdir = os.path.basename(dirpath)
+
+        # Strip numbering from patch names. If it's a git sequence named patch,
+        # the numbers might not match up since we are starting from a different
+        # revision This does assume that people are using unique shortlog
+        # values, but they ought to be anyway...
+        new_basename = seqpatch_re.match(new_patch).group(2)
+        match_name = None
+        old_patch = None
+        for old_patch in existing_patches:
+            old_basename = seqpatch_re.match(old_patch).group(2)
+            old_basename_splitext = os.path.splitext(old_basename)
+            if old_basename.endswith(('.gz', '.bz2', '.Z')) and old_basename_splitext[0] == new_basename:
+                old_patch_noext = os.path.splitext(old_patch)[0]
+                match_name = old_patch_noext
+                break
+            elif new_basename == old_basename:
+                match_name = old_patch
+                break
+        if match_name:
+            # Rename patch files
+            if new_patch != match_name:
+                bb.utils.rename(patch_path, os.path.join(dirpath, match_name))
+            # Need to pop it off the list now before checking changed_revs
+            oldpath = existing_patches.pop(old_patch)
+            if changed_revs is not None and dirpath in changed_revs:
+                # Avoid updating patches that have not actually changed
+                with open(os.path.join(dirpath, match_name), 'r') as f:
+                    firstlineitems = f.readline().split()
+                    # Looking for "From <hash>" line
+                    if len(firstlineitems) > 1 and len(firstlineitems[1]) == 40:
+                        if not firstlineitems[1] in changed_revs[dirpath]:
+                            continue
+            # Recompress if necessary
+            if oldpath.endswith(('.gz', '.Z')):
+                bb.process.run(['gzip', match_name], cwd=destdir)
+                if oldpath.endswith('.gz'):
+                    match_name += '.gz'
+                else:
+                    match_name += '.Z'
+            elif oldpath.endswith('.bz2'):
+                bb.process.run(['bzip2', match_name], cwd=destdir)
+                match_name += '.bz2'
+            updated[match_name] = {'path' : oldpath}
+            if patchdir != '.':
+                updated[match_name]['patchdir'] = patchdir
+        else:
+            added[new_patch] = {}
+            if patchdir != '.':
+                added[new_patch]['patchdir'] = patchdir
 
     return (updated, added, existing_patches)
 
@@ -1735,7 +1740,7 @@ def _update_recipe_patch(recipename, workspace, srctree, rd, appendlayerdir, wil
                         patchdir_param['patchdir'] = patchdir
                 patchfn = os.path.join(patches_dir, patchdir, basepath)
                 if os.path.dirname(path) + '/' == dl_dir:
-                    # This is a a downloaded patch file - we now need to
+                    # This is a downloaded patch file - we now need to
                     # replace the entry in SRC_URI with our local version
                     logger.info('Replacing remote patch %s with updated local version' % basepath)
                     path = os.path.join(files_dir, basepath)

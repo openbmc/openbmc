@@ -1,4 +1,4 @@
-From 06dd2eec0d57e1e2702069ee4c970c68fc4d3bcb Mon Sep 17 00:00:00 2001
+From 7c5d4f1c2161c0ff4fc0057ff0f1382bd784e06a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Sun, 29 Aug 2021 20:49:16 +0800
 Subject: [PATCH] fix create thread failed in unprivileged process [BZ #28287]

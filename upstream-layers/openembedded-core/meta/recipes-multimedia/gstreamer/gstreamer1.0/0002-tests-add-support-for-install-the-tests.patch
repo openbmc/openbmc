@@ -1,4 +1,4 @@
-From bfb530d2f0761f28c2645e2c45de5147b0528e4d Mon Sep 17 00:00:00 2001
+From c33063360791e178de138304e29ab2264582d917 Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 11 Apr 2021 19:48:13 +0100
 Subject: [PATCH] tests: add support for install the tests
@@ -19,7 +19,7 @@ Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
  create mode 100644 tests/check/template.test.in
 
 diff --git a/meson.build b/meson.build
-index ba50005..09c7212 100644
+index 0a77e90..cadfaeb 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -664,6 +664,10 @@ if bashcomp_dep.found()
@@ -46,10 +46,10 @@ index 39255cf..78af552 100644
  # Feature options
  option('check', type : 'feature', value : 'auto', description : 'Build unit test libraries')
 diff --git a/tests/check/meson.build b/tests/check/meson.build
-index 4cc4618..f290e2e 100644
+index e3cb966..e4df289 100644
 --- a/tests/check/meson.build
 +++ b/tests/check/meson.build
-@@ -128,10 +128,16 @@ test_defines = [
+@@ -133,10 +133,16 @@ test_defines = [
    '-UG_DISABLE_ASSERT',
    '-UG_DISABLE_CAST_CHECKS',
    '-DGST_CHECK_TEST_ENVIRONMENT_BEACON="GST_STATE_IGNORE_ELEMENTS"',
@@ -67,7 +67,7 @@ index 4cc4618..f290e2e 100644
  # sanity checking
  if get_option('check').disabled()
    if get_option('tests').enabled()
-@@ -154,6 +160,8 @@ foreach t : core_tests
+@@ -159,6 +165,8 @@ foreach t : core_tests
        include_directories : [configinc],
        link_with : link_with_libs,
        dependencies : gst_deps + test_deps,
@@ -76,7 +76,7 @@ index 4cc4618..f290e2e 100644
      )
  
      env = environment()
-@@ -165,6 +173,18 @@ foreach t : core_tests
+@@ -170,6 +178,18 @@ foreach t : core_tests
      env.set('GST_PLUGIN_SCANNER_1_0', gst_scanner_dir + '/gst-plugin-scanner')
      env.set('GST_PLUGIN_LOADING_WHITELIST', 'gstreamer')
  

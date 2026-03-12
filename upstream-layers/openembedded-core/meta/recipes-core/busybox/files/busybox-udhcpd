@@ -15,12 +15,12 @@ case "$1" in
 		echo "error: /etc/udhcpd.conf is missing."
 		exit 1
 	fi
-	/sbin/start-stop-daemon -S -b -n $NAME -a $DAEMON -- $ARGS
+	/usr/sbin/start-stop-daemon -S -b -n $NAME -a $DAEMON -- $ARGS
 	echo "done."
 	;;
     stop)
         echo -n "stopping $DESC: $NAME... "
-	/sbin/start-stop-daemon -K -n $NAME
+	/usr/sbin/start-stop-daemon -K -n $NAME
 	echo "done."
 	;;
     restart)

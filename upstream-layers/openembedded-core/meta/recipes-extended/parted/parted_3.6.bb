@@ -45,8 +45,8 @@ do_install_ptest() {
 	    -e "s|^Makefile:.*|Makefile:|g" \
 	    -e "/^BUILDINFO.*$/d" \
 	    -i $t/tests/Makefile
-	for i in print-align print-max print-flags dup-clobber duplicate fs-resize; \
-	  do cp ${B}/tests/.libs/$i $t/tests/; \
+	for i in print-align print-max print-flags dup-clobber duplicate fs-resize; do
+		${B}/libtool --mode=install install ${B}/tests/$i $t/tests/
 	done
 	sed -e 's| ../parted||' -i $t/tests/*.sh
 }

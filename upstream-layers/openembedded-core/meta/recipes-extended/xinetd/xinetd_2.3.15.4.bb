@@ -26,9 +26,6 @@ SYSTEMD_SERVICE:${PN} = "xinetd.service"
 INITSCRIPT_NAME = "xinetd"
 INITSCRIPT_PARAMS = "defaults"
 
-PACKAGECONFIG ??= "tcp-wrappers"
-PACKAGECONFIG[tcp-wrappers] = "--with-libwrap,,tcp-wrappers"
-
 CFLAGS += "-D_GNU_SOURCE -std=gnu17"
 
 CONFFILES:${PN} = "${sysconfdir}/xinetd.conf"

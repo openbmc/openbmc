@@ -12,6 +12,8 @@ SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/libsndfile-${PV}.tar.xz \
            file://cve-2022-33065.patch \
            file://CVE-2024-50612.patch \
            file://0001-Include-stdbool.h-instead-of-redefining-bool-true-an.patch \
+           file://CVE-2025-56226-01.patch \
+           file://CVE-2025-56226-02.patch \
           "
 GITHUB_BASE_URI = "https://github.com/libsndfile/libsndfile/releases/"
 

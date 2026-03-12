@@ -1,0 +1,32 @@
+From c7000672296f4c367341aa3415f26c4d9f5e4749 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Thu, 23 Oct 2025 11:24:36 +0200
+Subject: [PATCH] extend check_cwm test timeout
+
+The default, 3s long test timeout isn't always enough for this
+particular test in case there is a high load on the host machine
+(assuming it is running in qemu). Extend the default timeout to 6s
+for the check_cwm test to avoid timeouts.
+
+Upstream-Status: Inappropriate [upstream issue: https://github.com/openssl/openssl/issues/28983]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ test/radix/main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/test/radix/main.c b/test/radix/main.c
+index 4a1e886a71..39f8c61ef9 100644
+--- a/test/radix/main.c
++++ b/test/radix/main.c
+@@ -25,6 +25,11 @@ static int test_script(int idx)
+     int testresult;
+     TERP_CONFIG cfg = { 0 };
+ 
++    // check_cwm test sometimes times out, the default 3000ms is
++    // not enough if the test execution starves for CPU
++    if (!strncmp("check_cwm", script_info->name, strlen("check_cwm")))
++        cfg.max_execution_time = ossl_ms2time(6000);
++
+     if (!TEST_true(bindings_process_init(0, 0)))
+         return 0;
+ 

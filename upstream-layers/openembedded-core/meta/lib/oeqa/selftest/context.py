@@ -44,9 +44,13 @@ class NonConcurrentTestSuite(unittest.TestSuite):
         self.bb_vars = bb_vars
 
     def run(self, result):
+        origenv = os.environ.copy()
         (builddir, newbuilddir) = self.setupfunc("-st", None, self.suite)
         ret = super().run(result)
+        # In forks we don't have to restore but in a single process, restore cwd and the env
         os.chdir(builddir)
+        for e in origenv:
+            os.environ[e] = origenv[e]
         if newbuilddir and ret.wasSuccessful() and self.removefunc:
             self.removefunc(newbuilddir)
 

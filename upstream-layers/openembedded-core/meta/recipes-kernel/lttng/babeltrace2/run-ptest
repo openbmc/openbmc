@@ -6,6 +6,9 @@
 # test plan to raise ERRORs; this is just noise.
 makeargs="LOG_DRIVER_FLAGS=--ignore-exit abs_top_srcdir=$PWD abs_top_builddir=$PWD"
 
+declare -x BT_TESTS_BABELTRACE_PLUGIN_PATH="/usr/lib/babeltrace2/ptest/tests/utils/python"
+declare -x BT_TESTS_PROVIDER_DIR="/usr/lib/babeltrace2/plugin-providers"
+
 exec 2> error.log
 make -C tests -k -s $makeargs $target
 exitcode=$?

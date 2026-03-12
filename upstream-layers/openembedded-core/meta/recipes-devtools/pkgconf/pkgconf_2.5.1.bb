@@ -24,8 +24,6 @@ SRC_URI[sha256sum] = "cd05c9589b9f86ecf044c10a2269822bc9eb001eced2582cfffd658b0a
 
 inherit autotools
 
-EXTRA_OECONF += "--with-pkg-config-dir='${libdir}/pkgconfig:${datadir}/pkgconfig'"
-
 do_install:append () {
     # Install a wrapper which deals, as much as possible with pkgconf vs
     # pkg-config compatibility issues.
@@ -36,12 +34,22 @@ do_install:append:class-native () {
     # Install a pkg-config-native wrapper that will use the native sysroot instead
     # of the MACHINE sysroot, for using pkg-config when building native tools.
     sed -e "s|@PATH_NATIVE@|${PKG_CONFIG_PATH}|" \
+        -e "s|@LIBDIR_NATIVE@|${PKG_CONFIG_LIBDIR}|" \
         < ${UNPACKDIR}/pkg-config-native.in > ${B}/pkg-config-native
     install -m755 ${B}/pkg-config-native ${D}${bindir}/pkg-config-native
     sed -e "s|@PATH_NATIVE@|${PKG_CONFIG_PATH}|" \
         -e "s|@LIBDIR_NATIVE@|${PKG_CONFIG_LIBDIR}|" \
         < ${UNPACKDIR}/pkg-config-esdk.in > ${B}/pkg-config-esdk
     install -m755 ${B}/pkg-config-esdk ${D}${bindir}/pkg-config-esdk
+}
+
+do_install:append:class-nativesdk () {
+    # Install a pkg-config-native wrapper that will use the native sysroot instead
+    # of the MACHINE sysroot, for using pkg-config when building native tools.
+    sed -e "s|@PATH_NATIVE@|\$OECORE_NATIVE_SYSROOT|" \
+        -e "s|@LIBDIR_NATIVE@|\$OECORE_NATIVE_SYSROOT/usr/lib/pkgconfig|" \
+        < ${UNPACKDIR}/pkg-config-native.in > ${B}/pkg-config-native
+    install -m755 ${B}/pkg-config-native ${D}${bindir}/pkg-config-native
 }
 
 # When using the RPM generated automatic package dependencies, some packages
@@ -53,7 +61,7 @@ RPROVIDES:${PN} += "pkgconfig(pkg-config)"
 FILES:${PN}-dev:remove = "${datadir}/aclocal"
 FILES:${PN} += "${datadir}/aclocal"
 
-BBCLASSEXTEND += "native nativesdk"
+BBCLASSEXTEND = "native nativesdk"
 
 pkgconf_sstate_fixup_esdk () {
    if [ "${BB_CURRENTTASK}" = "populate_sysroot_setscene" -a "${WITHIN_EXT_SDK}" = "1" ] ; then

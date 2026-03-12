@@ -16,16 +16,17 @@ Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
 ---
- src/Kbuild | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ src/Kbuild | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/src/Kbuild b/src/Kbuild
-index 7137874..04eb5c9 100644
---- a/src/Kbuild
-+++ b/src/Kbuild
-@@ -2,10 +2,13 @@
+Index: lttng-modules-2.14.0/src/Kbuild
+===================================================================
+--- lttng-modules-2.14.0.orig/src/Kbuild
++++ lttng-modules-2.14.0/src/Kbuild
+@@ -3,10 +3,13 @@
  
- ifdef CONFIG_LOCALVERSION	# Check if dot-config is included.
+-ifdef CONFIG_LOCALVERSION	# Check if dot-config is included.
++ifneq ($(CONFIG_LOCALVERSION)$(CONFIG_LOCALVERSION_AUTO),)	# Check if dot-config is included.
    ifeq ($(CONFIG_TRACEPOINTS),)
 -    $(error The option CONFIG_TRACEPOINTS needs to be enabled in your kernel configuration)
 +    $(warning The option CONFIG_TRACEPOINTS needs to be enabled in your kernel configuration)
@@ -38,9 +39,9 @@ index 7137874..04eb5c9 100644
  TOP_LTTNG_MODULES_DIR := $(shell dirname $(lastword $(MAKEFILE_LIST)))/..
  
  lttng_check_linux_version = $(shell pwd)/include/linux/version.h
-@@ -150,3 +153,5 @@ lttng-statedump-objs := lttng-statedump-impl.o
- obj-$(CONFIG_LTTNG) += probes/
- obj-$(CONFIG_LTTNG) += lib/
- obj-$(CONFIG_LTTNG) += tests/
+@@ -168,3 +171,5 @@
+ obj-$(CONFIG_LTTNG_SYSCALLS_EXTRACTOR) += lttng-syscalls-extractor.o
+ 
+ # vim:syntax=make
 +
 +endif # DISABLE_MODULE

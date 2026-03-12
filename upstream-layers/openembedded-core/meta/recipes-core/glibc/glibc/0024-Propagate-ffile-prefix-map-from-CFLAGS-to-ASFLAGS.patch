@@ -1,0 +1,28 @@
+From 111cb0b1f7410eea49ed8869c74352a11cdcbf0f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 16 Apr 2025 19:51:01 -0700
+Subject: [PATCH] Propagate -ffile-prefix-map from CFLAGS to ASFLAGS.
+
+-ffile-prefix-map also implies -fdebug-prefix-map
+and some systems may use --ffile-prefix-map for building
+reprodubile systems
+
+Upstream-Status: Submitted [https://patchwork.sourceware.org/project/glibc/patch/20250429064632.2048954-1-raj.khem@gmail.com/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makeconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makeconfig b/Makeconfig
+index 38a0b4a569..21a6ee94c1 100644
+--- a/Makeconfig
++++ b/Makeconfig
+@@ -1191,7 +1191,7 @@ endif
+ 
+ # The assembler can generate debug information too.
+ ifndef ASFLAGS
+-ASFLAGS := $(filter -g% -fdebug-prefix-map=%,$(CFLAGS))
++ASFLAGS := $(filter -g% -fdebug-prefix-map=% -ffile-prefix-map=%,$(CFLAGS))
+ endif
+ override ASFLAGS += -Werror=undef $(ASFLAGS-config) $(asflags-cpu) $(as-sframe)
+ 

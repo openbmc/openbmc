@@ -12,4 +12,5 @@ IMAGE_INSTALL += "kernel-devsrc"
 
 # Compiling stuff, specifically SystemTap probes, can require lots of memory
 # See https://bugzilla.yoctoproject.org/show_bug.cgi?id=14673
-QB_MEM = "-m 768"
+# qemuarm64 was OOM with 768
+QB_MEM = "-m 1024"

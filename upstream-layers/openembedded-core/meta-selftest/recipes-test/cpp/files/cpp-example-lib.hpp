@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include "config.h"
 
 struct CppExample
 {
@@ -18,4 +19,6 @@ struct CppExample
     const char *get_json_c_version();
     /* Call a more advanced function from a library */
     void print_json();
+    /* Read hello world message from config file */
+    std::string read_config_message(const std::string &config_path = EXAMPLE_CONFIG_PATH);
 };

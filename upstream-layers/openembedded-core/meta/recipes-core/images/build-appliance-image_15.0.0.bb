@@ -22,12 +22,18 @@ APPEND += "rootfstype=ext4 quiet"
 DEPENDS = "zip-native python3-pip-native"
 IMAGE_FSTYPES = "wic.vmdk wic.vhd wic.vhdx"
 
-inherit core-image setuptools3 features_check
+inherit core-image features_check
 
 REQUIRED_DISTRO_FEATURES += "xattr"
 
-SRCREV ?= "b1b3318eff36d4d9b2d3a935dee607c4f012f992"
-SRC_URI = "git://git.yoctoproject.org/poky;branch=master;destsuffix=poky \
+SRCREV_bitbake ?= "bc8be83aef0a6de85cd33a6f132f281d518594f7"
+SRCREV_oe-core ?= "4a388406acf0210e8a47c4733979256b10e078ff"
+SRCREV_yocto ?= "f3b63d0d6882af61020bd6f7150fae68a0322f63"
+SRCREV_FORMAT = "bitbake_oe-core_yocto"
+
+SRC_URI = "git://git.openembedded.org/bitbake;name=bitbake;branch=master;destsuffix=bitbake \
+           git://git.openembedded.org/openembedded-core;name=oe-core;branch=master;destsuffix=openembedded-core \
+           git://git.yoctoproject.org/meta-yocto;name=yocto;branch=master;destsuffix=meta-yocto \
            file://Yocto_Build_Appliance.vmx \
            file://Yocto_Build_Appliance.vmxf \
            file://README_VirtualBox_Guest_Additions.txt \
@@ -44,17 +50,20 @@ IMAGE_CMD:ext4:append () {
 fakeroot do_populate_poky_src () {
 	# Because fetch2's git's unpack uses -s cloneflag, the unpacked git repo
 	# will become invalid in the target.
-	rm -rf ${UNPACKDIR}/poky/.git
-	rm -f ${UNPACKDIR}/poky/.gitignore
+	for d in bitbake openembedded-core meta-yocto; do
+		rm -rf ${UNPACKDIR}/$d/.git
+		rm -f ${UNPACKDIR}/$d/.gitignore
+		cp -R ${UNPACKDIR}/$d ${IMAGE_ROOTFS}/home/builder/
+	done
 
-	cp -R ${UNPACKDIR}/poky ${IMAGE_ROOTFS}/home/builder/poky
+	mkdir -p ${IMAGE_ROOTFS}/home/builder/openembedded-core/build/conf
+	echo "INHERIT += \"rm_work\"" >> ${IMAGE_ROOTFS}/home/builder/openembedded-core/build/conf/auto.conf
 
-	mkdir -p ${IMAGE_ROOTFS}/home/builder/poky/build/conf
-	mkdir -p ${IMAGE_ROOTFS}/home/builder/poky/build/downloads
 	if [ ${BA_INCLUDE_SOURCES} != 0 ]; then
-		cp -RpL ${DL_DIR}/* ${IMAGE_ROOTFS}/home/builder/poky/build/downloads/
+		mkdir -p ${IMAGE_ROOTFS}/home/builder/openembedded-core/build/downloads
+		cp -RpL ${DL_DIR}/* ${IMAGE_ROOTFS}/home/builder/openembedded-core/build/downloads/
 		# Remove the git2_* tarballs -- this is ok since we still have the git2/.
-		rm -rf ${IMAGE_ROOTFS}/home/builder/poky/build/downloads/git2_*
+		rm -rf ${IMAGE_ROOTFS}/home/builder/openembedded-core/build/downloads/git2_*
 	fi
 
 	# Place the README_VirtualBox_Guest_Additions file in builders home folder.
@@ -63,7 +72,6 @@ fakeroot do_populate_poky_src () {
 	# Place the README_VirtualBox_Toaster file in builders home folder.
 	cp ${UNPACKDIR}/README_VirtualBox_Toaster.txt ${IMAGE_ROOTFS}/home/builder/
 
-	echo "INHERIT += \"rm_work\"" >> ${IMAGE_ROOTFS}/home/builder/poky/build/conf/auto.conf
 	echo "export LC_ALL=en_US.utf8" >> ${IMAGE_ROOTFS}/home/builder/.bashrc
 	echo "export TERM=xterm-color" >> ${IMAGE_ROOTFS}/home/builder/.bashrc
 
@@ -79,8 +87,8 @@ fakeroot do_populate_poky_src () {
 	echo "# export ALL_PROXY=https://proxy.example.com:8080" >> ${IMAGE_ROOTFS}/home/builder/.bashrc
 	echo "# export ALL_PROXY=socks://socks.example.com:1080" >> ${IMAGE_ROOTFS}/home/builder/.bashrc
 
-	chown -R builder:builder ${IMAGE_ROOTFS}/home/builder/poky
-	chmod -R ug+rw ${IMAGE_ROOTFS}/home/builder/poky
+	chown -R builder:builder ${IMAGE_ROOTFS}/home/builder/
+	chmod -R ug+rw ${IMAGE_ROOTFS}/home/builder/
 
 	# Assume we will need CDROM to install guest additions
 	mkdir -p ${IMAGE_ROOTFS}/media/cdrom
@@ -102,7 +110,7 @@ fakeroot do_populate_poky_src () {
 	export STAGING_INCDIR=${STAGING_INCDIR_NATIVE}
 	export HOME=${IMAGE_ROOTFS}/home/builder
 	mkdir -p ${IMAGE_ROOTFS}/home/builder/.cache/pip
-	pip3_install_params="--user -I -U -v -r ${IMAGE_ROOTFS}/home/builder/poky/bitbake/toaster-requirements.txt"
+	pip3_install_params="--user -I -U -v -r ${IMAGE_ROOTFS}/home/builder/bitbake/toaster-requirements.txt"
 	if [ -n "${http_proxy}" ]; then
 	   pip3_install_params="${pip3_install_params} --proxy ${http_proxy}"
 	fi

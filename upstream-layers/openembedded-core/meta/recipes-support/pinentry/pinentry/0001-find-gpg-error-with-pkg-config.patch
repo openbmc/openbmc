@@ -1,0 +1,40 @@
+From 2e90424eb1518083133a79f2737152c83289bc99 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Wed, 3 Sep 2025 20:24:01 +0200
+Subject: [PATCH] find gpg-error with pkg-config
+
+This patch is a simplification of a previous patch, which
+added support to find gpg-error with pkg-config, adapted
+to the changes that are made to the gpg-error .pc file
+in its recipe.
+
+Instead of using upstream's custom solution from
+m4/gpg-error.m4 file, use just the standard pkg-config macro
+to see if gpg-error is present.
+
+This patch hasn't been submitted for upstream, due to their
+historical reluctance to accept such patches.[1]
+
+[1]: https://lists.gnupg.org/pipermail/gnupg-devel/2018-October/033985.html (whole thread)
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ configure.ac | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index ec46162..2b2e16d 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -238,8 +238,7 @@ dnl Checks for libgpg-error
+ NEED_GPG_ERROR_VERSION=1.16
+ have_gpg_error=no
+ 
+-AM_PATH_GPG_ERROR("$NEED_GPG_ERROR_VERSION",
+-                  have_gpg_error=yes,have_gpg_error=no)
++PKG_CHECK_MODULES([GPG_ERROR], [gpg-error >= $NEED_GPG_ERROR_VERSION], [have_gpg_error=yes], [have_gpg_error=no])
+ COMMON_CFLAGS="$GPG_ERROR_CFLAGS $COMMON_CFLAGS"
+ COMMON_LIBS="$GPG_ERROR_LIBS $COMMON_LIBS"
+ 

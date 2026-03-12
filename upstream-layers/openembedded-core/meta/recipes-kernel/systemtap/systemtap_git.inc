@@ -5,11 +5,12 @@ SRC_URI = "git://sourceware.org/git/systemtap.git;protocol=https;branch=master;t
            file://0001-Do-not-let-configure-write-a-python-location-into-th.patch \
            file://0001-Install-python-modules-to-correct-library-dir.patch \
            file://0001-staprun-stapbpf-don-t-support-installing-a-non-root.patch \
+           file://0001-elaborate.cxx-fix-32-bit-build.patch \
            "
 
-SRCREV = "c4fc655170b534478a6b131292b987630c7c0865"
+SRCREV = "911a1354aac264651fda932061e7f20d2ecc2471"
 
-COMPATIBLE_HOST = '(x86_64|i.86|powerpc|arm|aarch64|microblazeel|mips|riscv64).*-linux'
+COMPATIBLE_HOST = '(x86_64|i.86|powerpc|arm|aarch64|microblazeel|mips|riscv64|riscv32).*-linux'
 COMPATIBLE_HOST:libc-musl = 'null'
 
 # systemtap can't be built without optimization, if someone tries to compile an

@@ -83,7 +83,7 @@ class CreatePlugin(LayerPlugin):
         parser_create_layer = self.add_command(sp, 'create-layer', self.do_create_layer, parserecipes=False)
         parser_create_layer.add_argument('layerdir', help='Layer directory to create')
         parser_create_layer.add_argument('--add-layer', '-a', action='store_true', help='Add the layer to bblayers.conf after creation')
-        parser_create_layer.add_argument('--layerid', '-i', help='Layer id to use if different from layername')
+        parser_create_layer.add_argument('--layerid', '-i', help='Layer ID to use in BBFILE_COLLECTIONS, if different from the layerdir basename')
         parser_create_layer.add_argument('--priority', '-p', default=6, help='Priority of recipes in layer')
         parser_create_layer.add_argument('--example-recipe-name', '-e', dest='examplerecipe', default='example', help='Filename of the example recipe')
         parser_create_layer.add_argument('--example-recipe-version', '-v', dest='version', default='0.1', help='Version number for the example recipe')

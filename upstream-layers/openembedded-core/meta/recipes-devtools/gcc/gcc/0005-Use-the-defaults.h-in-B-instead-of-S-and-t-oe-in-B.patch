@@ -1,4 +1,4 @@
-From fd6aa3c3ff5361a738b31d6127cb05910cd6b8c0 Mon Sep 17 00:00:00 2001
+From f1acffaa783ee6e5e567e594df16a1f0286b1295 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Fri, 29 Mar 2013 09:17:25 +0400
 Subject: [PATCH] Use the defaults.h in ${B} instead of ${S}, and t-oe in ${B}

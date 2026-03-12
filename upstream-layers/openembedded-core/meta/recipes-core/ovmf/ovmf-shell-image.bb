@@ -6,7 +6,7 @@ COMPATIBLE_HOST:class-target = '(i.86|x86_64).*'
 # boot loader and no rootfs partition, not additional
 # tools are needed for this .wks file.
 IMAGE_FSTYPES:forcevariable = 'wic'
-WKS_FILE = "ovmf/ovmf-shell-image.wks"
+WKS_FILE = "ovmf-shell-image/ovmf-shell-image.wks"
 WKS_FILE_DEPENDS = ""
 
 inherit image

@@ -8,12 +8,16 @@ Closes python/importlib_metadata#489
 
 Upstream-Status: Backport [https://github.com/python/importlib_metadata/commit/a65c29adc027b3615154cab73aaedd58a6aa23da]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ Lib/importlib/metadata/__init__.py   | 14 +++-
+ Lib/importlib/metadata/_itertools.py | 98 ++++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+), 2 deletions(-)
 
-diff --git i/Lib/importlib/metadata/__init__.py w/Lib/importlib/metadata/__init__.py
-index 8ce62dd864f..085378caabc 100644
---- i/Lib/importlib/metadata/__init__.py
-+++ w/Lib/importlib/metadata/__init__.py
-@@ -21,7 +21,7 @@
+diff --git a/Lib/importlib/metadata/__init__.py b/Lib/importlib/metadata/__init__.py
+index 8ce62dd..085378c 100644
+--- a/Lib/importlib/metadata/__init__.py
++++ b/Lib/importlib/metadata/__init__.py
+@@ -21,7 +21,7 @@ import collections
  from . import _meta
  from ._collections import FreezableDefaultDict, Pair
  from ._functools import method_cache, pass_none
@@ -22,7 +26,7 @@ index 8ce62dd864f..085378caabc 100644
  from ._meta import PackageMetadata, SimplePath
  
  from contextlib import suppress
-@@ -404,7 +404,7 @@ def from_name(cls, name: str) -> Distribution:
+@@ -404,7 +404,7 @@ class Distribution(DeprecatedNonAbstract):
          if not name:
              raise ValueError("A distribution name is required.")
          try:
@@ -31,7 +35,7 @@ index 8ce62dd864f..085378caabc 100644
          except StopIteration:
              raise PackageNotFoundError(name)
  
-@@ -428,6 +428,16 @@ def discover(
+@@ -428,6 +428,16 @@ class Distribution(DeprecatedNonAbstract):
              resolver(context) for resolver in cls._discover_resolvers()
          )
  
@@ -48,10 +52,10 @@ index 8ce62dd864f..085378caabc 100644
      @staticmethod
      def at(path: str | os.PathLike[str]) -> Distribution:
          """Return a Distribution for the indicated metadata path.
-diff --git i/Lib/importlib/metadata/_itertools.py w/Lib/importlib/metadata/_itertools.py
-index d4ca9b9140e..79d37198ce7 100644
---- i/Lib/importlib/metadata/_itertools.py
-+++ w/Lib/importlib/metadata/_itertools.py
+diff --git a/Lib/importlib/metadata/_itertools.py b/Lib/importlib/metadata/_itertools.py
+index d4ca9b9..79d3719 100644
+--- a/Lib/importlib/metadata/_itertools.py
++++ b/Lib/importlib/metadata/_itertools.py
 @@ -1,3 +1,4 @@
 +from collections import defaultdict, deque
  from itertools import filterfalse

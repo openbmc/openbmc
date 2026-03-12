@@ -18,8 +18,8 @@ sys.path = sys.path + [lib_path]
 class TestResultsQueryTests(OESelftestTestCase):
     def test_get_sha1(self):
         test_data_get_sha1 = [
-            {"input": "yocto-4.0", "expected": "00cfdde791a0176c134f31e5a09eff725e75b905"},
-            {"input": "4.1_M1", "expected": "95066dde6861ee08fdb505ab3e0422156cc24fae"},
+            {"input": "yocto-4.0", "expected": "92fcb6570bddd0c5717d8cfdf38ecf3e44942b0f"},
+            {"input": "yocto-5.2", "expected": "6ec2c52b938302b894f119f701ffcf0a847eee85"},
         ]
         for data in test_data_get_sha1:
             test_name = data["input"]

@@ -307,9 +307,21 @@ class OpkgPM(OpkgDpkgPM):
             if failed_pkgs:
                 failed_postinsts_abort(failed_pkgs, self.d.expand("${T}/log.do_${BB_CURRENTTASK}"))
         except subprocess.CalledProcessError as e:
+            e_output = e.output.decode("utf-8")
+            extra_info = ""
+            unmatched_pkgs = []
+            for e_line in e_output.split('\n'):
+                if "error: opkg_solver_install: No candidates to install" in e_line:
+                    unmatched_pkg = re.search(r"error: opkg_solver_install: No candidates to install ([a-z0-9+\-\._]+)", e_line).group(1)
+                    unmatched_pkgs.append(unmatched_pkg)
+                elif "error: opkg_prepare_url_for_install: Couldn't find anything to satisfy" in e_line:
+                    unmatched_pkg = re.search(r"error: opkg_prepare_url_for_install: Couldn't find anything to satisfy '([a-z0-9+\-\._]+)'", e_line).group(1)
+                    unmatched_pkgs.append(unmatched_pkg)
+            for pkg in unmatched_pkgs:
+                extra_info += self.get_missing_pkg_reason(pkg)
             (bb.fatal, bb.warn)[attempt_only]("Unable to install packages. "
-                                              "Command '%s' returned %d:\n%s" %
-                                              (cmd, e.returncode, e.output.decode("utf-8")))
+                                              "Command '%s' returned %d:\n%s%s" %
+                                              (cmd, e.returncode, e_output, extra_info))
 
     def remove(self, pkgs, with_dependencies=True):
         if not pkgs:

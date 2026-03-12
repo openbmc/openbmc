@@ -17,6 +17,7 @@ import oe.utils
 import oe.path
 import string
 from oe.gpg_sign import get_signer
+import oe.packagedata
 import hashlib
 import fnmatch
 
@@ -447,6 +448,27 @@ class PackageManager(object, metaclass=ABCMeta):
             return res
         return _append(uris, base_paths)
 
+    def get_missing_pkg_reason(self, pkg):
+        """
+        Return a string describing the possible reason of a missing package.
+        """
+        reason = ""
+        if not oe.packagedata.packaged(pkg, self.d):
+            if oe.packagedata.has_pkgdata(pkg, self.d):
+                packaged_pkgs = []
+                recipe_data = oe.packagedata.read_pkgdata(pkg, self.d)
+                for subpkg in recipe_data.get("PACKAGES", "").split():
+                    if oe.packagedata.packaged(subpkg, self.d):
+                        packaged_pkgs.append(subpkg)
+                reason = "%s is a recipe. Its generated packages are: %s\n" % (pkg, packaged_pkgs)
+                reason += "Either specify a generated package or set ALLOW_EMPTY:${PN} = \"1\" in %s recipe\n" % pkg
+            else:
+                reason = "%s is neither a recipe nor a generated package.\n" % pkg
+        else:
+            reason = "%s is a generated package.\n" % pkg
+            reason += "The reason it's not found might be that it's not in %s\n" % oe.path.join(self.d.getVar('WORKDIR'), "oe-rootfs-repo")
+        return reason
+
 def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencies, include_self=False):
     """
     Go through our do_package_write_X dependencies and hardlink the packages we depend
@@ -513,10 +535,7 @@ def create_packages_dir(d, subrepo_dir, deploydir, taskname, filterbydependencie
             for l in f:
                 l = l.strip()
                 deploydir = os.path.normpath(deploydir)
-                if bb.data.inherits_class('packagefeed-stability', d):
-                    dest = l.replace(deploydir + "-prediff", "")
-                else:
-                    dest = l.replace(deploydir, "")
+                dest = l.replace(deploydir, "")
                 dest = subrepo_dir + dest
                 if l.endswith("/"):
                     if dest not in seendirs:

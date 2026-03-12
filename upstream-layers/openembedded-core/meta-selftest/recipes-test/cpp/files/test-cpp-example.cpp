@@ -22,4 +22,6 @@ int main() {
         std::cout << "FAIL: " << ret_string << " != " << CppExample::test_string << std::endl;
         return 1;
     }
+
+    return 0;
 }

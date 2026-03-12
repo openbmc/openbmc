@@ -8,7 +8,7 @@ compiler rather than just CC variable, therefore let it use the default
 values from environment and not synthesize it from CMAKE_C_COMPILER just
 for this case.
 
-Upstream-Status: Submitted [https://github.com/libical/libical/pull/552]
+Upstream-Status: Backport [https://github.com/libical/libical/pull/552]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  cmake/modules/GObjectIntrospectionMacros.cmake | 3 +--

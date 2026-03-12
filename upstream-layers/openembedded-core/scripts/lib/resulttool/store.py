@@ -82,9 +82,14 @@ def store(args, logger):
                                   "Results of {branch}:{commit}", "branch: {branch}\ncommit: {commit}", "{branch}",
                                   False, "{branch}/{commit_count}-g{commit}/{tag_number}",
                                   'Test run #{tag_number} of {branch}:{commit}', '',
-                                  excludes, [], False, keywords, logger)
+                                  excludes, [], args.push_tags, None, keywords, logger)
 
             if args.logfile_archive:
+                if not args.push_tags:
+                    # As no tag was pushed, we can't guarantee there "tagname"
+                    # is uniq and so we might have several builds trying to use
+                    # the same "logdir" target.
+                    logger.warning("Archiving log files but the %s tag was not pushed: this may result in target folder conflicts")
                 logdir = args.logfile_archive + "/" + tagname
                 shutil.copytree(tempdir, logdir)
                 os.chmod(logdir, 0o755)
@@ -123,3 +128,5 @@ def register_commands(subparsers):
                               help='only store data for the specified revision')
     parser_build.add_argument('-l', '--logfile-archive', default='',
                               help='directory to separately archive log files along with a copy of the results')
+    parser_build.add_argument('-p', '--push-tags', action='store_true',
+                              help='push created tags to remote git')

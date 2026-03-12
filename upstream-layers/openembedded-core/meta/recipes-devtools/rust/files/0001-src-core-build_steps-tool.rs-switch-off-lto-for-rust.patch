@@ -24,31 +24,32 @@ diff --git a/src/bootstrap/src/core/build_steps/tool.rs b/src/bootstrap/src/core
 index 087df2f8a..00790affb 100644
 --- a/src/bootstrap/src/core/build_steps/tool.rs
 +++ b/src/bootstrap/src/core/build_steps/tool.rs
-@@ -15,14 +15,12 @@
- #[cfg(feature = "tracing")]
- use tracing::instrument;
- 
+@@ -13,14 +13,12 @@ use std::ffi::OsStr;
+ use std::path::PathBuf;
+ use std::{env, fs};
+
 -use crate::core::build_steps::compile::is_lto_stage;
  use crate::core::build_steps::toolstate::ToolState;
  use crate::core::build_steps::{compile, llvm};
  use crate::core::builder;
 -use crate::core::builder::{
--    Builder, Cargo as CargoCommand, RunConfig, ShouldRun, Step, cargo_profile_var,
+-    Builder, Cargo as CargoCommand, RunConfig, ShouldRun, Step, StepMetadata, cargo_profile_var,
 -};
 -use crate::core::config::{DebuginfoLevel, RustcLto, TargetSelection};
 +
-+use crate::core::builder::{Builder, Cargo as CargoCommand, RunConfig, ShouldRun, Step};
++use crate::core::builder::{Builder, Cargo as CargoCommand, RunConfig, ShouldRun, Step, StepMetadata};
 +use crate::core::config::{DebuginfoLevel, TargetSelection};
- use crate::utils::channel::GitInfo;
  use crate::utils::exec::{BootstrapCommand, command};
  use crate::utils::helpers::{add_dylib_path, exe, t};
-@@ -148,20 +146,7 @@
-             &self.extra_features,
-         );
- 
--        if path.ends_with("/rustdoc") &&
--            // rustdoc is performance sensitive, so apply LTO to it.
--            is_lto_stage(&self.compiler)
+ use crate::{Compiler, FileType, Kind, Mode};
+@@ -121,22 +119,7 @@ impl Step for ToolBuild {
+             cargo.env("RUSTC_WRAPPER", ccache);
+         }
+
+-        // RustcPrivate tools (miri, clippy, rustfmt, rust-analyzer) and cargo
+-        // could use the additional optimizations.
+-        if is_lto_stage(&self.build_compiler)
+-            && (self.mode == Mode::ToolRustcPrivate || self.path == "src/tools/cargo")
 -        {
 -            let lto = match builder.config.rust_lto {
 -                RustcLto::Off => Some("off"),
@@ -60,19 +61,20 @@ index 087df2f8a..00790affb 100644
 -                cargo.env(cargo_profile_var("LTO", &builder.config), lto);
 -            }
 -        }
+-
 +        cargo.rustflag("-Clto=off");
- 
          if !self.allow_features.is_empty() {
              cargo.allow_features(self.allow_features);
+         }
 diff --git a/src/bootstrap/src/core/builder/mod.rs b/src/bootstrap/src/core/builder/mod.rs
 --- a/src/bootstrap/src/core/builder/mod.rs
 +++ b/src/bootstrap/src/core/builder/mod.rs
-@@ -13,7 +13,7 @@
+@@ -13,7 +13,7 @@ use clap::ValueEnum;
  #[cfg(feature = "tracing")]
  use tracing::instrument;
  
 -pub use self::cargo::{Cargo, cargo_profile_var};
 +pub use self::cargo::Cargo;
  pub use crate::Compiler;
- use crate::core::build_steps::{
-     check, clean, clippy, compile, dist, doc, gcc, install, llvm, run, setup, test, tool, vendor,
+ use crate::core::build_steps::compile::{Std, StdLink};
+ use crate::core::build_steps::tool::RustcPrivateCompilers;

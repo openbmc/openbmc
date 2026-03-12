@@ -1,0 +1,31 @@
+From 0bba79bfd3d8a216794d15af97ce4abefd4b8748 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Florian=20=22sp1rit=22=E2=80=8B?= <sp1rit@disroot.org>
+Date: Sat, 9 Aug 2025 20:22:43 +0200
+Subject: [PATCH] build: Added missing target rule-dependencies
+
+02b835b62 did not appropriately ensure, that the patternlib_internal
+target waits until the {ft_,}alias_headers have finished generating the
+headers that it depends on.
+
+Upstream-Status: Backport [0bba79bfd3d8a216794d15af97ce4abefd4b8748]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index c4d65d6c..10866aa8 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -9,7 +9,7 @@ endif
+ # Factor our pattern manipulation code into its own library
+ # to break the depedency cycle:
+ # FontConfig pattern handling - Fontations code - FontConfig.
+-pattern_sources = [ 'fcpat.c', fcstdint_h, fclang_h ]
++pattern_sources = [ 'fcpat.c', fcstdint_h, fclang_h, alias_headers, ft_alias_headers ]
+ pattern_lib = static_library('patternlib_internal',
+                                     pattern_sources,
+                                     include_directories: incbase,
+-- 
+2.43.0
+

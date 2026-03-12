@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# This script doesn't seem to do much, but the recipe uses
+# the ptest-cargo bbclass, which appends its content to
+# the run-ptest script, if it can find an existing one.
+
+# The test that ptest-cargo class generates requires the
+# TEST_DONT_BUILD_LIB environment variable to be set before
+# it would be executed, and this is what this script does.
+export TEST_DONT_BUILD_LIB=1

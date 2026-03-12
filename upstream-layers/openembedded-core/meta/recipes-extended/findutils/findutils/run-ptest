@@ -13,6 +13,9 @@ export built_programs="find xargs locate updatedb"
 # this gets substituted by sed during build
 export VERSION="__run_ptest_version__"
 
+# Force ASCII quotes so exp vs err comparisons are stable across locales.
+export LC_ALL=C
+
 for f in tests/*/*.sh; do
 	bash $f ;
 	case $? in

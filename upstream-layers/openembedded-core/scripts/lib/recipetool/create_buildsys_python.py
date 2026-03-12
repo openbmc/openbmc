@@ -858,10 +858,16 @@ class PythonPyprojectTomlRecipeHandler(PythonRecipeHandler):
             if metadata:
                 for field, values in metadata.items():
                     if field == "license":
-                        # For setuptools.build_meta and flit, licence is a table
-                        # but for poetry licence is a string
+                        # for flit, licence is a table
+                        # for setuptools.build_meta, license is either:
+                        # - a table, pre-PEP639,
+                        # - an SPDX license expression as string, since PEP639
+                        # for poetry licence is a string
                         # for hatchling, both table (jsonschema) and string (iniconfig) have been used
-                        if build_backend == "poetry.core.masonry.api":
+                        # TODO: support license-files array of glob paths since PEP639
+                        if build_backend == "poetry.core.masonry.api" or \
+                                (build_backend == "setuptools.build_meta" and
+                                 isinstance(values, str)):
                             value = values
                         else:
                             value = values.get("text", "")

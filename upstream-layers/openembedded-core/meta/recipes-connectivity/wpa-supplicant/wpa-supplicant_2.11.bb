@@ -16,6 +16,11 @@ SRC_URI = "http://w1.fi/releases/wpa_supplicant-${PV}.tar.gz \
            file://wpa_supplicant.conf-sane \
            file://99_wpa_supplicant \
            file://0001-macsec_linux-Hardware-offload-requires-Linux-headers.patch \
+           file://0002-defconfig-Update-Opportunistic-Wireless-Encryption-O.patch \
+           file://0003-defconfig-Document-IEEE-802.11be-as-a-published-amen.patch \
+           file://0004-defconfig-Uncomment-CONFIG_IEEE80211BE-y.patch \
+           file://CVE-2025-24912-01.patch \
+           file://CVE-2025-24912-02.patch \
            "
 SRC_URI[sha256sum] = "912ea06f74e30a8e36fbb68064d6cdff218d8d591db0fc5d75dee6c81ac7fc0a"
 
@@ -41,9 +46,10 @@ do_configure () {
 		echo 'CONFIG_TLS=openssl' >>wpa_supplicant/.config
 	elif ${@ bb.utils.contains('PACKAGECONFIG', 'gnutls', 'true', 'false', d) }; then
 		echo 'CONFIG_TLS=gnutls' >>wpa_supplicant/.config
-        sed -i -e 's/\(^CONFIG_DPP=\)/#\1/' \
-               -e 's/\(^CONFIG_EAP_PWD=\)/#\1/' \
-               -e 's/\(^CONFIG_SAE=\)/#\1/' wpa_supplicant/.config
+		sed -i -e 's/\(^CONFIG_DPP=\)/#\1/' \
+		    -e 's/\(^CONFIG_EAP_PWD=\)/#\1/' \
+		    -e 's/\(^CONFIG_SAE=\)/#\1/' \
+		    -e 's/\(^CONFIG_OWE=\)/#\1/' wpa_supplicant/.config
 	fi
 
 	# For rebuild

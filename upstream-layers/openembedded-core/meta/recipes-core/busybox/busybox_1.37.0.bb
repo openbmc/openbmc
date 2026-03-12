@@ -55,7 +55,12 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0003-start-stop-false.patch \
            file://0001-archival-disallow-path-traversals-CVE-2023-39810.patch \
            file://0001-hwclock-Check-for-SYS_settimeofday-before-calling-sy.patch \
+           file://0001-busybox-Add-awk-gsub-erroneous-word-start-match-test.patch \
+           file://CVE-2025-46394-01.patch \
+           file://CVE-2025-46394-02.patch \
+           file://CVE-2025-60876.patch \
            "
 SRC_URI:append:libc-musl = " file://musl.cfg"
 SRC_URI:append:x86-64 = " file://sha_accel.cfg"
+
 SRC_URI[tarball.sha256sum] = "3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4"

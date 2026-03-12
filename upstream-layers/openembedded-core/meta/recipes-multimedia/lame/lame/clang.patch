@@ -1,0 +1,99 @@
+Don't use -march=native when building with clang
+
+Because of a logic error, lame's configure always passes -march=native
+when building with clang.
+
+This is a terrible idea in general as it's not often your build machine
+and target hardware aligns, and leads to some amusing errors:
+
+	unknown target CPU 'neoverse-n1'
+	note: valid target CPU values are: i386, i486, ...
+
+Move the HAVE_CLANG block up into the FULL_OPTIMIZATION case, alongside
+HAVE_GCC.  This option is never enabled (as it's basically "use native")
+so resolves the build failure.
+
+Upstream-Status: Pending
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git i/configure.in w/configure.in
+index 5e43179..d51b017 100644
+--- i/configure.in
++++ w/configure.in
+@@ -960,45 +960,43 @@ if test "x$HAVE_GCC" = "xyes" -o "x$HAVE_CLANG" = "xyes"; then
+ 				;;
+ 			esac
+ 		fi
++
++		if test "x${HAVE_CLANG}" = "xyes"; then
++			case "${CLANG_VERSION}" in
++			3.[89]*|[45].*)
++				OPTIMIZATION="-Ofast"
++				;;
++			*)
++				OPTIMIZATION="-O3"
++				;;
++			esac
++
++			# generic CPU specific options
++			case ${host_cpu} in
++			*486)
++				OPTIMIZATION="${OPTIMIZATION} -march=i486"
++				;;
++			*586)
++				OPTIMIZATION="${OPTIMIZATION} -march=i586 \
++					-mtune=native"
++				;;
++			*686)
++				OPTIMIZATION="${OPTIMIZATION} -march=i686 \
++					-mtune=native"
++				;;
++			*86)
++				OPTIMIZATION="${OPTIMIZATION} -march=native \
++					-mtune=native"
++				;;
++			esac
++
++		fi
+ 		;;
+ 	*)
+ 		AC_MSG_ERROR(bad value �${CONFIG_EXPOPT}� for expopt option)
+ 		;;
+ 	esac
+ 
+-
+-	if test "x${HAVE_CLANG}" = "xyes"; then
+-		case "${CLANG_VERSION}" in
+-		3.[89]*|[45].*)
+-			OPTIMIZATION="-Ofast"
+-			;;
+-		*)
+-			OPTIMIZATION="-O3"
+-			;;
+-		esac
+-
+-		# generic CPU specific options
+-		case ${host_cpu} in
+-		*486)
+-			OPTIMIZATION="${OPTIMIZATION} -march=i486"
+-			;;
+-		*586)
+-			OPTIMIZATION="${OPTIMIZATION} -march=i586 \
+-				-mtune=native"
+-			;;
+-		*686)
+-			OPTIMIZATION="${OPTIMIZATION} -march=i686 \
+-				-mtune=native"
+-			;;
+-		*86)
+-			OPTIMIZATION="${OPTIMIZATION} -march=native \
+-				-mtune=native"
+-			;;
+-		esac
+-
+-	fi
+-
+-
+ 	if test "${expopt_msg_result_printed}" = "no" ; then
+ 		AC_MSG_RESULT(${CONFIG_EXPOPT})
+ 	fi

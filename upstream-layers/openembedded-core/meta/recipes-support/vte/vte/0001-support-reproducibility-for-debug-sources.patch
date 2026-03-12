@@ -1,0 +1,48 @@
+From 0959004adbe46f88d558d2ce61b496c662c196f5 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 3 Nov 2025 06:13:11 +0000
+Subject: [PATCH] support reproducibility for debug sources
+
+While option --debug-sources is used, the generated source file contains
+build path comments which caused the build is not reproducible [1]
+...subprojects/simdutf/simdutf.h...
+ 1 /* auto-generated on 2025-03-17 16:13:41 -0400. Do not edit! */
+ 2 /* begin file include/simdutf.h */
+ 3 // /build-dir/vte-0.82.1/subprojects/simdutf/include/simdutf.h:1
+ 4 #ifndef SIMDUTF_H
+...subprojects/simdutf/simdutf.h...
+
+After apply this commit, use relative path to instead
+...subprojects/simdutf/simdutf.h...
+ 1 /* auto-generated on 2025-03-17 16:13:41 -0400. Do not edit! */
+ 2 /* begin file include/simdutf.h */
+ 3 // include/simdutf.h:1
+ 4 #ifndef SIMDUTF_H
+...subprojects/simdutf/simdutf.h...
+
+[1] https://reproducible-builds.org/
+
+Upstream-Status: Submitted [https://github.com/simdutf/simdutf/pull/848]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ singleheader/amalgamate.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/singleheader/amalgamate.py b/singleheader/amalgamate.py
+index 190b2f6..75e0d78 100755
+--- a/singleheader/amalgamate.py
++++ b/singleheader/amalgamate.py
+@@ -385,7 +385,8 @@ def filter_features(file):
+                 current_features = None
+             elif enabled:
+                 if context.args.debug_sources and not prev_line.endswith('\\'):
+-                    yield f"// {file}:{lineno}"
++                    RELFILE = os.path.relpath(file, PROJECTPATH)
++                    yield f"// {RELFILE}:{lineno}"
+ 
+                 if line or (not line and prev_line):
+                     yield line
+-- 
+2.48.1
+

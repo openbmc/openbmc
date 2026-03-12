@@ -1,0 +1,31 @@
+From 614e3aefec85b51a611f85a55b6760f12e29b953 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Mon, 27 Oct 2025 09:52:46 -0400
+Subject: [PATCH] test_cmd: skip bang completion test
+
+We compile Python3 with editline support by default, which has tab completion
+but not bang completion. If building with readline,
+test_bang_completion_without_do_shell() passes. Skip the test because of this.
+
+Upstream-Status: Inappropriate [embedded-specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ Lib/test/test_cmd.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/Lib/test/test_cmd.py b/Lib/test/test_cmd.py
+index dbfec42fc21..c33dab8d10d 100644
+--- a/Lib/test/test_cmd.py
++++ b/Lib/test/test_cmd.py
+@@ -295,6 +295,7 @@ def do_tab_completion_test(self, args):
+         self.assertIn(b'ab_completion_test', output)
+         self.assertIn(b'tab completion success', output)
+ 
++    @unittest.skip('no bang completion without readline')
+     def test_bang_completion_without_do_shell(self):
+         script = textwrap.dedent("""
+             import cmd
+-- 
+2.51.0
+

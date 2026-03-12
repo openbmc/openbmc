@@ -37,6 +37,7 @@ is_disallowed() {
 # currently not exported to target.
 
 test_disallowlist=""
+test_disallowlist="${test_disallowlist} compress-cert-conf"
 test_disallowlist="${test_disallowlist} dtls-stress"
 test_disallowlist="${test_disallowlist} handshake-large-cert"
 test_disallowlist="${test_disallowlist} id-on-xmppAddr"

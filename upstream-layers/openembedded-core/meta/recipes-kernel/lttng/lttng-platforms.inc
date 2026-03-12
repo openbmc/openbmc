@@ -1,7 +1,7 @@
 #
 # Whether the platform supports kernel tracing
 #
-LTTNGMODULES = "lttng-modules"
+LTTNGMODULES ?= "lttng-modules"
 LTTNGMODULES:arc = ""
 LTTNGMODULES:riscv64 = ""
 

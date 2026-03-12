@@ -1,12 +1,28 @@
+# An overview of Y2038 issues, and how to prepare a yocto-based
+# product for that date is available at
+# https://www.youtube.com/watch?v=eaOHJHFMobw
+# https://osseu2024.sched.com/event/1ej4C/
+#
 # To simulate Y2038 occurring in qemu, add to your build configuration:
 # QB_OPT_APPEND:append = " -rtc base=2040-02-02"
 #
 # Note that this does result in ptest failures on qemux86:
-# perl python3 dbus openssl glibc-tests openssh curl glib-2.0 tcl libmodule-build-perl
-# and a subset of those occurs in qemux86-64 as well:
-# curl python3 openssl openssl tcl python3-cryptography
+#
+#   (none known at this point)
+#
+# and some ptest failures appear in qemux86-64 as well:
+#
+#   openssl https://github.com/openssl/openssl/issues/21671
 #
 # Working to address those (before Y2038 rolls in) will be appreciated.
+#
+# Note: some issues occur on 32 bit regardless of the date set:
+#
+#   lttng-tools:
+#   https://bugs.lttng.org/issues/1436
+#   FAIL: tests.serial 59 - Test script 'ust/blocking/test_blocking' returned code 255.
+#   (due to lack of space on /tmp, which is due to a non-highmem kernel, which allocates only 800M of RAM to userspace)
+#
 
 GLIBC_64BIT_TIME_FLAGS = "${GLIBC_64BIT_TIME_FLAGS_WHEN_NEEDED}"
 
@@ -21,16 +37,8 @@ TARGET_CC_ARCH:append:x86 = "${@bb.utils.contains('TUNE_FEATURES', 'm32', '${GLI
 
 GLIBC_64BIT_TIME_FLAGS:pn-glibc = ""
 GLIBC_64BIT_TIME_FLAGS:pn-glibc-testsuite = ""
-# pipewire-v4l2 explicitly sets _FILE_OFFSET_BITS=32 to get access to
-# both 32 and 64 bit file APIs.  But it does not handle the time side?
-# Needs further investigation
-GLIBC_64BIT_TIME_FLAGS:pn-pipewire = ""
-# Undefines _FILE_OFFSET_BITS on purpose in
-# libsanitizer/sanitizer_common/sanitizer_platform_limits_posix.cpp
-GLIBC_64BIT_TIME_FLAGS:pn-gcc-sanitizers = ""
 
 # Caused by the flags exceptions above
-INSANE_SKIP:append:pn-gcc-sanitizers = " 32bit-time"
 INSANE_SKIP:append:pn-glibc = " 32bit-time"
 
 # Strace has tests that call 32 bit API directly, which is fair enough, e.g.

@@ -26,7 +26,7 @@ class DevtoolError(Exception):
 
 def exec_build_env_command(init_path, builddir, cmd, watch=False, **options):
     """Run a program in bitbake build context"""
-    import bb
+    import bb.process
     if not 'cwd' in options:
         options["cwd"] = builddir
     if init_path:
@@ -50,7 +50,7 @@ def exec_build_env_command(init_path, builddir, cmd, watch=False, **options):
 
 def exec_watch(cmd, **options):
     """Run program with stdout shown on sys.stdout"""
-    import bb
+    import bb.process
     if isinstance(cmd, str) and not "shell" in options:
         options["shell"] = True
 
@@ -66,7 +66,7 @@ def exec_watch(cmd, **options):
             sys.stdout.write(out)
             sys.stdout.flush()
             buf += out
-        elif out == '' and process.poll() != None:
+        elif out == '' and process.poll() is not None:
             break
 
     if process.returncode != 0:
@@ -74,19 +74,13 @@ def exec_watch(cmd, **options):
 
     return buf, None
 
-def exec_fakeroot(d, cmd, **kwargs):
-    """Run a command under fakeroot (pseudo, in fact) so that it picks up the appropriate file permissions"""
-    # Grab the command and check it actually exists
-    fakerootcmd = d.getVar('FAKEROOTCMD')
-    fakerootenv = d.getVar('FAKEROOTENV')
-    exec_fakeroot_no_d(fakerootcmd, fakerootenv, cmd, kwargs)
-
-def exec_fakeroot_no_d(fakerootcmd, fakerootenv, cmd, **kwargs):
+def exec_fakeroot_no_d(fakerootcmd, fakerootenv, path, cmd, **kwargs):
     if not os.path.exists(fakerootcmd):
         logger.error('pseudo executable %s could not be found - have you run a build yet? pseudo-native should install this and if you have run any build then that should have been built')
         return 2
     # Set up the appropriate environment
     newenv = dict(os.environ)
+    newenv['PATH'] = path
     for varvalue in fakerootenv.split():
         if '=' in varvalue:
             splitval = varvalue.split('=', 1)
@@ -122,6 +116,7 @@ def setup_tinfoil(config_only=False, basepath=None, tracking=False):
 
 def parse_recipe(config, tinfoil, pn, appends, filter_workspace=True):
     """Parse the specified recipe"""
+    import bb.providers
     try:
         recipefile = tinfoil.get_recipe_file(pn)
     except bb.providers.NoProvider as e:
@@ -178,6 +173,7 @@ def use_external_build(same_dir, no_same_dir, d):
     """
     Determine if we should use B!=S (separate build and source directories) or not
     """
+    import bb.data
     b_is_s = True
     if no_same_dir:
         logger.info('Using separate build directory since --no-same-dir specified')
@@ -253,6 +249,10 @@ def setup_git_repo(repodir, version, devbranch, basetag='devtool-base', d=None):
                     remote_url = stdout.splitlines()[0]
                     logger.error(os.path.relpath(os.path.join(root, ".."), root))
                     bb.process.run('git submodule add %s %s' % (remote_url, os.path.relpath(root, os.path.join(root, ".."))), cwd=os.path.join(root, ".."))
+                    # Do not descend into nested git repos that have submodules themselves.
+                    if ".gitmodules" in files:
+                        logger.warning('Nested git repository with submodules %s; devtool will not recurse into it', root)
+                        dirs[:] = []
                     found = True
                 if found:
                     oe.patch.GitApplyTree.commitIgnored("Add additional submodule from SRC_URI", dir=os.path.join(root, ".."), d=d)
@@ -300,31 +300,18 @@ def get_bbclassextend_targets(recipefile, pn):
 
 def replace_from_file(path, old, new):
     """Replace strings on a file"""
-
-    def read_file(path):
-        data = None
-        with open(path) as f:
-            data = f.read()
-        return data
-
-    def write_file(path, data):
-        if data is None:
-            return
-        wdata = data.rstrip() + "\n"
-        with open(path, "w") as f:
-            f.write(wdata)
-
-    # In case old is None, return immediately
     if old is None:
         return
+
     try:
-        rdata = read_file(path)
+        with open(path) as f:
+            rdata = f.read()
     except IOError as e:
+        import errno
         # if file does not exit, just quit, otherwise raise an exception
         if e.errno == errno.ENOENT:
             return
-        else:
-            raise
+        raise
 
     old_contents = rdata.splitlines()
     new_contents = []
@@ -333,12 +320,16 @@ def replace_from_file(path, old, new):
             new_contents.append(old_content.replace(old, new))
         except ValueError:
             pass
-    write_file(path, "\n".join(new_contents))
+
+    wdata = ("\n".join(new_contents)).rstrip() + "\n"
+    with open(path, "w") as f:
+        f.write(wdata)
 
 
 def update_unlockedsigs(basepath, workspace, fixed_setup, extra=None):
     """ This function will make unlocked-sigs.inc match the recipes in the
     workspace plus any extras we want unlocked. """
+    import bb.utils
 
     if not fixed_setup:
         # Only need to write this out within the eSDK
@@ -390,11 +381,13 @@ def check_prerelease_version(ver, operation):
 
 def check_git_repo_dirty(repodir):
     """Check if a git repository is clean or not"""
+    import bb.process
     stdout, _ = bb.process.run('git status --porcelain', cwd=repodir)
     return stdout
 
 def check_git_repo_op(srctree, ignoredirs=None):
     """Check if a git repository is in the middle of a rebase"""
+    import bb.process
     stdout, _ = bb.process.run('git rev-parse --show-toplevel', cwd=srctree)
     topleveldir = stdout.strip()
     if ignoredirs and topleveldir in ignoredirs:

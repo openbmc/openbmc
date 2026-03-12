@@ -21,7 +21,12 @@ class PatchTestRepo(object):
         self.repodir = repodir
         self.repo = git.Repo.init(repodir)
         self.patch = mbox.PatchSeries(patch)
-        self.current_branch = self.repo.active_branch.name
+
+        if self.repo.head.is_detached:
+            self.current_commit = self.repo.head.commit.hexsha
+            self.current_branch = None
+        else:
+            self.current_branch = self.repo.active_branch.name
 
         # targeted branch defined on the patch may be invalid, so make sure there
         # is a corresponding remote branch
@@ -52,7 +57,7 @@ class PatchTestRepo(object):
         self._patchcanbemerged = True
         try:
             # Make sure to get the absolute path of the file
-            self.repo.git.execute(['git', 'apply', '--check', os.path.abspath(self.patch.path)], with_exceptions=True)
+            self.repo.git.execute(['git', '-C', self.repodir, 'apply', '--check', os.path.abspath(self.patch.path)], with_exceptions=True)
         except git.exc.GitCommandError as ce:
             self._patchcanbemerged = False
 
@@ -76,10 +81,10 @@ class PatchTestRepo(object):
 
     def merge(self):
         if self._patchcanbemerged:
-            self.repo.git.execute(['git', 'am', '--keep-cr', os.path.abspath(self.patch.path)])
+            self.repo.git.execute(['git', '-C', self.repodir, 'am', '--keep-cr', os.path.abspath(self.patch.path)])
             self._patchmerged = True
 
     def clean(self):
-        self.repo.git.execute(['git', 'checkout', self.current_branch])
+        self.repo.git.execute(['git', 'checkout', self.current_branch if self.current_branch else self.current_commit])
         self.repo.git.execute(['git', 'branch', '-D', self._workingbranch])
         self._patchmerged = False

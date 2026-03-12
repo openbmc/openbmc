@@ -2,7 +2,7 @@ SUMMARY = "The New Curses library"
 DESCRIPTION = "SVr4 and XSI-Curses compatible curses library and terminfo tools including tic, infocmp, captoinfo. Supports color, multiple highlights, forms-drawing characters, and automatic recognition of keypad and function-key sequences. Extensions include resizable windows and mouse support on both xterm and Linux console using the gpm library."
 HOMEPAGE = "http://www.gnu.org/software/ncurses/ncurses.html"
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://COPYING;md5=6f291ee54551d9d8d992ecd623fe4bc7;endline=27"
+LIC_FILES_CHKSUM = "file://COPYING;endline=27;md5=c534844fa5a74d14ae8fa3d9b3b42138"
 SECTION = "libs"
 DEPENDS = "ncurses-native"
 DEPENDS:class-native = ""
@@ -182,7 +182,7 @@ do_install() {
 
         # include some basic terminfo files
         # stolen ;) from gentoo and modified a bit
-        for x in alacritty ansi console dumb linux rxvt screen screen-256color sun vt52 vt100 vt102 vt200 vt220 xterm-color xterm-xfree86 xterm-256color
+        for x in alacritty ansi console dumb linux rxvt screen screen-256color sun tmux tmux-256color vt52 vt100 vt102 vt200 vt220 xterm-color xterm-xfree86 xterm-256color
         do
                 local termfile="$(find "${D}${datadir}/terminfo/" -name "${x}" 2>/dev/null)"
                 local basedir="$(basename $(dirname "${termfile}"))"
@@ -200,11 +200,6 @@ do_install() {
         then
                 ln -sf xterm-color ${D}${sysconfdir}/terminfo/x/xterm
         fi
-
-        # When changing ${libdir} to e.g. /usr/lib/myawesomelib/ ncurses 
-        # still installs '/usr/lib/terminfo', so try to rm both 
-        # the proper path and a slightly hardcoded one
-        rm -f ${D}${libdir}/terminfo ${D}${prefix}/lib/terminfo
 
         # create linker scripts for libcurses.so and libncurses to
         # link against -ltinfo when needed. Some builds might break

@@ -1,0 +1,38 @@
+From 1913bb541447f82eab984270f1b430c27fbc0059 Mon Sep 17 00:00:00 2001
+From: Nick Wellnhofer <wellnhofer@aevum.de>
+Date: Tue, 27 May 2025 21:45:06 +0200
+Subject: [PATCH 5/6] Fix extraction of namespaced attributes from langPointer
+
+Upstream-Status: Submitted [https://github.com/itstool/itstool/pull/57]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ itstool.in | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/itstool.in b/itstool.in
+index 78887ca..c7729fd 100755
+--- a/itstool.in
++++ b/itstool.in
+@@ -677,8 +677,18 @@ class Document (object):
+                     # language information. Technically, langPointer could be
+                     # any XPath expression. But if it looks like an attribute
+                     # accessor, just use the attribute name.
++                    # TODO: This should probably be skipped if langPointer
++                    # equals '@xml:lang' which is the default.
+                     if lp[0] == '@':
+-                        self._itst_lang_attr[node] = lp[1:]
++                        name = lp[1:]
++                        if ':' in name:
++                            prefix, lname = name.split(':', 2)
++                            nsuri = node.nsmap.get(prefix)
++                            if nsuri is None:
++                                name = lname
++                            else:
++                                name = '{' + nsuri + '}' + lname
++                        self._itst_lang_attr[node] = name
+         elif rule.tag == '{' + NS_ITST + '}credits':
+             sel = rule.get('appendTo')
+             if sel is not None:
+-- 
+2.49.0
+

@@ -1,4 +1,4 @@
-From 7372848f22d7edc01e40b0533047b34f41f6cf71 Mon Sep 17 00:00:00 2001
+From e713f4d6ce2ee198eabcc31bc734e84cdb20ea32 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Mon, 12 Dec 2022 15:42:42 +0100
 Subject: [PATCH] remove hardcoded path
@@ -14,7 +14,7 @@ Upstream-Status: Inappropriate [oe-specific]
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 7e89ab0..c34ea74 100644
+index ee5b179..8a06e75 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -194,10 +194,10 @@ endif

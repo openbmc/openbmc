@@ -1,0 +1,27 @@
+From 04b21743980c4e236ca5e8de18173fbd3848573b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
+Date: Sat, 8 Jun 2024 17:59:40 +0200
+Subject: [PATCH] test: avoid locale dependent errno string
+
+String representations of errno values are locale dependent, thus avoid
+using them.
+
+Upstream-Status: Backport [https://github.com/logrotate/logrotate/commit/04b21743980c4e236ca5e8de18173fbd3848573b]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ test/test-0112.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/test-0112.sh b/test/test-0112.sh
+index 812632b..fa9eed6 100755
+--- a/test/test-0112.sh
++++ b/test/test-0112.sh
+@@ -23,7 +23,7 @@ test_reg.log.1.gz 1 zero
+ test_reg.log.2.gz 1 first
+ EOF
+ 
+-grep "test_fifo.log.1 (read-only) for compression: Operation not supported" error.log >/dev/null
++grep "^error: unable to open .*/test_fifo\.log\.1 (read-only) for compression: " error.log >/dev/null
+ if [ $? != 0 ]; then
+ 	echo "No error printed, but there should be one."
+ 	exit 3

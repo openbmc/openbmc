@@ -498,9 +498,7 @@ def create_spdx(d):
     build_objset.set_is_native(is_native)
 
     for var in (d.getVar("SPDX_CUSTOM_ANNOTATION_VARS") or "").split():
-        new_annotation(
-            d,
-            build_objset,
+        build_objset.new_annotation(
             build,
             "%s=%s" % (var, d.getVar(var)),
             oe.spdx30.AnnotationType.other,
@@ -641,12 +639,21 @@ def create_spdx(d):
             set_var_field("SUMMARY", spdx_package, "summary", package=package)
             set_var_field("DESCRIPTION", spdx_package, "description", package=package)
 
-            if d.getVar("SPDX_PACKAGE_URL:%s" % package) or d.getVar("SPDX_PACKAGE_URL"):
-                set_var_field(
-                    "SPDX_PACKAGE_URL",
-                    spdx_package,
-                    "software_packageUrl",
-                    package=package
+            purls = (
+                d.getVar("SPDX_PACKAGE_URLS:%s" % package)
+                or d.getVar("SPDX_PACKAGE_URLS")
+                or ""
+            ).split()
+
+            if purls:
+                spdx_package.software_packageUrl = purls[0]
+
+            for p in sorted(set(purls)):
+                spdx_package.externalIdentifier.append(
+                    oe.spdx30.ExternalIdentifier(
+                        externalIdentifierType=oe.spdx30.ExternalIdentifierType.packageUrl,
+                        identifier=p,
+                    )
                 )
 
             pkg_objset.new_scoped_relationship(
@@ -696,9 +703,23 @@ def create_spdx(d):
 
             pkg_objset.new_relationship(
                 [spdx_package],
-                oe.spdx30.RelationshipType.hasConcludedLicense,
+                oe.spdx30.RelationshipType.hasDeclaredLicense,
                 [oe.sbom30.get_element_link_id(package_spdx_license)],
             )
+
+            # Add concluded license relationship if manually set
+            # Only add when license analysis has been explicitly performed
+            concluded_license_str = d.getVar("SPDX_CONCLUDED_LICENSE:%s" % package) or d.getVar("SPDX_CONCLUDED_LICENSE")
+            if concluded_license_str:
+                concluded_spdx_license = add_license_expression(
+                    d, build_objset, concluded_license_str, license_data
+                )
+
+                pkg_objset.new_relationship(
+                    [spdx_package],
+                    oe.spdx30.RelationshipType.hasConcludedLicense,
+                    [oe.sbom30.get_element_link_id(concluded_spdx_license)],
+                )
 
             # NOTE: CVE Elements live in the recipe collection
             all_cves = set()
@@ -814,6 +835,28 @@ def create_spdx(d):
             oe.spdx30.LifecycleScopeType.build,
             sorted(list(build_inputs)) + sorted(list(debug_source_ids)),
         )
+
+    if d.getVar("SPDX_INCLUDE_PACKAGECONFIG", True) != "0":
+        packageconfig = (d.getVar("PACKAGECONFIG") or "").split()
+        all_features = set((d.getVarFlags("PACKAGECONFIG") or {}).keys())
+        blacklisted_features = {"doc"}
+
+        if all_features:
+            enabled = set(packageconfig)
+            disabled = all_features - enabled
+            all_features -= disabled & blacklisted_features
+            disabled -= blacklisted_features
+
+            for feature in sorted(all_features):
+                status = "enabled" if feature in enabled else "disabled"
+                build.build_parameter.append(
+                    oe.spdx30.DictionaryEntry(
+                        key=f"PACKAGECONFIG:{feature}",
+                        value=status
+                    )
+                )
+
+            bb.note(f"Added PACKAGECONFIG entries: {len(enabled)} enabled, {len(disabled)} disabled")
 
     oe.sbom30.write_recipe_jsonld_doc(d, build_objset, "recipes", deploydir)
 

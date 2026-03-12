@@ -1,4 +1,4 @@
-From 0ff4f23d3521a45835eaa03731c0b3351a50d8ba Mon Sep 17 00:00:00 2001
+From 94c43a338e789b32a31e830c971ac52332c3fe5a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 2 Mar 2015 01:09:58 +0000
 Subject: [PATCH] Point scripts location to libdir

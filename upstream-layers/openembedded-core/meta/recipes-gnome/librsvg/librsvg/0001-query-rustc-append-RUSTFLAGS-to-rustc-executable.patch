@@ -1,0 +1,37 @@
+From e89982e61e50c7d25d563f2fa0481f9bba481f04 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sat, 2 Aug 2025 20:57:49 +0200
+Subject: [PATCH] query-rustc: append RUSTFLAGS to rustc executable
+
+The RUSTFLAGS environment variable is parsed by cargo, however the
+query-rustc script invokes rustc directly, in which case these
+flags are ignored, which can cause build failures in case
+the target specification is not in the target location, and is specified
+amongst the RUSTFLAGS.
+
+This change appends the content of RUSTFLAGS environment variable
+to the rustc command, if it's not empty, when the static native
+libraries are queried.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/librsvg/-/merge_requests/1121]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ meson/query-rustc.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/meson/query-rustc.py b/meson/query-rustc.py
+index f97cb69..fc7369a 100755
+--- a/meson/query-rustc.py
++++ b/meson/query-rustc.py
+@@ -78,6 +78,10 @@ if __name__ == "__main__":
+         
+     if query == 'native-static-libs':
+         query_arg = ['--print=%s' % query]
++        rustflags = os.getenv('RUSTFLAGS')
++        if rustflags:
++            rustc_cmd.extend(rustflags.split())
++
+     else:
+         query_arg = ['--version', '--verbose']
+     rustc_cmd.extend(query_arg)

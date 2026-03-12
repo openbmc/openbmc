@@ -22,10 +22,9 @@ do_compile_ptest() {
 }
 
 do_install_ptest() {
-    install ${B}/tests/.libs/test* ${D}/${PTEST_PATH}
-    install ${B}/tests/.libs/tdict ${D}/${PTEST_PATH}
-    install ${B}/tests/testit.sh ${D}/${PTEST_PATH}
-    install ${B}/tests/test-poptrc ${D}/${PTEST_PATH}
+    for f in test1 test2 tdict test3 testit.sh test-poptrc; do
+        ${B}/libtool --mode=install install ${B}/tests/$f ${D}/${PTEST_PATH}
+    done
 }
 
 BBCLASSEXTEND = "native nativesdk"

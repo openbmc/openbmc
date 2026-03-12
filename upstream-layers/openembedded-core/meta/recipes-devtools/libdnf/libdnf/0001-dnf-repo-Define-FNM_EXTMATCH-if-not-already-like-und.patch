@@ -1,0 +1,39 @@
+From 486d1c7826efb9e42bbb18b6537fd23a0a33b324 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Sun, 16 Nov 2025 23:29:18 +0000
+Subject: [PATCH] dnf-repo: Define FNM_EXTMATCH if not already (like under
+ musl).
+
+With musl, FNM_EXTMATCH is not defined:
+dnf-repo.cpp
+| dnf-repo.cpp: In function 'void dnf_repo_conf_load_overrides(DnfRepo*, const char*)':
+| dnf-repo.cpp:971:50: error: 'FNM_EXTMATCH' was not declared in this scope; did you mean 'FNM_NOMATCH'?
+|   971 |             if (fnmatch(repo_id_pattern, repoId, FNM_EXTMATCH) != 0) {
+|       |                                                  ^~~~~~~~~~~~
+|       |                                                  FNM_NOMATCH
+
+Upstream-Status: Submitted [https://github.com/rpm-software-management/libdnf/pull/1737/commits/47ed831c1fdb32519f2d66fee91bc47f9521d1d4]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ libdnf/dnf-repo.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/libdnf/dnf-repo.cpp b/libdnf/dnf-repo.cpp
+index 44c0f8758..d53959414 100644
+--- a/libdnf/dnf-repo.cpp
++++ b/libdnf/dnf-repo.cpp
+@@ -69,6 +69,10 @@
+ #include <string>
+ #include <vector>
+ 
++#if !defined(FNM_EXTMATCH)
++#define FNM_EXTMATCH 0
++#endif
++
+ typedef struct
+ {
+     DnfRepoEnabled   enabled;
+-- 
+2.43.0
+

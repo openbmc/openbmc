@@ -1,0 +1,35 @@
+When running glibc tests under user mode NFS, tst-syslog was causing a hang. The
+hang was traced to unfsd exitting with a buffer overflow being detected.
+
+This was traced down to mksocket() where we'd see:
+
+socket path '/media/build/poky/build/build-st-2118464/tmp/work/x86-64-v3-poky-linux/glibc-testsuite/2.42+git/build-x86_64-poky-linux/testroot.root/dev/log' is too long at 141 vs 108
+
+There is a length check in mknod_args() but obj may not be setup at this point by
+cat_name() since the functions can be executed out of order according to C.
+
+To avoid this, make the order explict. This means the length is checked and we
+avoid the buffer overflow. This will likely cause the glibc test to fail however
+it won't hang, which is a win.
+
+Upstream-Status: Pending
+
+Index: unfs3-0.11.0/nfs.c
+===================================================================
+--- unfs3-0.11.0.orig/nfs.c
++++ unfs3-0.11.0/nfs.c
+@@ -776,9 +776,11 @@ MKNOD3res *nfsproc3_mknod_3_svc(MKNOD3ar
+ 
+     PREP(path, argp->where.dir);
+     pre = get_pre_cached();
+-    result.status =
+-        join3(cat_name(path, argp->where.name, obj),
+-              mknod_args(argp->what, obj, &new_mode, &dev), exports_rw());
++    result.status = cat_name(path, argp->where.name, obj);
++    if (result.status == NFS3_OK)
++        result.status = mknod_args(argp->what, obj, &new_mode, &dev);
++    if (result.status == NFS3_OK)
++        result.status = exports_rw();
+ 
+     cluster_create(obj, rqstp, &result.status);
+ 

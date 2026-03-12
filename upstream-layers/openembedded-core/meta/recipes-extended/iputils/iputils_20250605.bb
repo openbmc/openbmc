@@ -14,6 +14,7 @@ SRCREV = "6e1cb146547eb6fbb127ffc8397a9241be0d33c2"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>20\d+)"
 
+# these currently don't show up in CVE metrics for FKIE (as 2000 is not covered by it), but they would show for NVD2
 CVE_STATUS[CVE-2000-1213] = "fixed-version: Fixed in 2000-10-10, but the versioning of iputils breaks the version order."
 CVE_STATUS[CVE-2000-1214] = "fixed-version: Fixed in 2000-10-10, but the versioning of iputils breaks the version order."
 
@@ -25,7 +26,7 @@ PACKAGECONFIG[docs] = "-DBUILD_HTML_MANS=true -DBUILD_MANS=true,-DBUILD_HTML_MAN
 
 inherit meson update-alternatives pkgconfig
 
-EXTRA_OEMESON += "--prefix=${root_prefix}/ -DSKIP_TESTS=true"
+EXTRA_OEMESON += "--bindir=${base_bindir} -DSKIP_TESTS=true"
 
 ALTERNATIVE_PRIORITY = "100"
 

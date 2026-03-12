@@ -1,4 +1,5 @@
 SUMMARY = "Startup script and systemd unit file for the Weston Wayland compositor"
+HOMEPAGE = "https://www.yoctoproject.org/"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/COPYING.MIT;md5=3da9cfbcb788c80a0384361b4de20420"
 
@@ -25,6 +26,8 @@ PACKAGECONFIG[use-pixman] = ",,"
 
 DEFAULTBACKEND ??= ""
 DEFAULTBACKEND:qemuall ?= "drm"
+WESTON_USER ??= "weston"
+WESTON_USER_HOME ??= "/home/${WESTON_USER}"
 
 do_install() {
 	# Install weston-start script
@@ -41,10 +44,15 @@ do_install() {
 		install -D -p -m0644 ${S}/weston.service ${D}${systemd_system_unitdir}/weston.service
 		install -D -p -m0644 ${S}/weston.socket ${D}${systemd_system_unitdir}/weston.socket
 		install -D -p -m0644 ${S}/weston-socket.sh ${D}${sysconfdir}/profile.d/weston-socket.sh
-		sed -i -e s:/etc:${sysconfdir}:g \
-			-e s:/usr/bin:${bindir}:g \
-			-e s:/var:${localstatedir}:g \
-			${D}${systemd_system_unitdir}/weston.service
+		sed -i -e s:@sysconfdir@:${sysconfdir}:g \
+			-e s:@bindir@:${bindir}:g \
+			-e s:@localstatedir@:${localstatedir}:g \
+			-e s:@runtimedir@:${runtimedir}:g \
+			-e s:@WESTON_USER@:${WESTON_USER}:g \
+			-e s:@WESTON_USER_HOME@:${WESTON_USER_HOME}:g \
+			${D}${systemd_system_unitdir}/weston.service \
+			${D}${systemd_system_unitdir}/weston.socket \
+			${D}${sysconfdir}/profile.d/weston-socket.sh
 	fi
 
 	if [ "${@bb.utils.filter('DISTRO_FEATURES', 'pam', d)}" ]; then
@@ -70,7 +78,7 @@ do_install() {
 		sed -i -e "/^\[core\]/a use-pixman=true" ${D}${sysconfdir}/xdg/weston/weston.ini
 	fi
 
-	install -dm 755 -o weston -g weston ${D}/home/weston
+	install -dm 755 -o ${WESTON_USER} -g ${WESTON_USER} ${D}/${WESTON_USER_HOME}
 }
 
 INHIBIT_UPDATERCD_BBCLASS = "${@oe.utils.conditional('VIRTUAL-RUNTIME_init_manager', 'systemd', '1', '', d)}"
@@ -95,11 +103,11 @@ FILES:${PN} += "\
     ${systemd_system_unitdir}/weston.socket \
     ${sysconfdir}/default/weston \
     ${sysconfdir}/pam.d/ \
-    /home/weston \
+    ${WESTON_USER_HOME} \
     "
 
 CONFFILES:${PN} += "${sysconfdir}/xdg/weston/weston.ini ${sysconfdir}/default/weston"
 
 SYSTEMD_SERVICE:${PN} = "weston.service weston.socket"
-USERADD_PARAM:${PN} = "--home /home/weston --shell /bin/sh --user-group -G video,input,render,seat,wayland weston"
+USERADD_PARAM:${PN} = "--home ${WESTON_USER_HOME} --shell /bin/sh --user-group -G video,input,render,seat,wayland ${WESTON_USER}"
 GROUPADD_PARAM:${PN} = "-r wayland; -r render; -r seat"

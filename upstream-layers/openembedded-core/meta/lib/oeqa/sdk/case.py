@@ -44,7 +44,10 @@ class OESDKTestCase(OETestCase):
             if isinstance(self.tc, OESDKExtTestContext):
                 recipe = (recipe or packages[0]) + "-native"
                 print("Trying to install %s..." % recipe)
-                self._run('devtool sdk-install %s' % recipe)
+                try:
+                    self._run('devtool sdk-install %s' % recipe)
+                except subprocess.CalledProcessError:
+                    raise unittest.SkipTest("Test %s needs one of %s" % (self.id(), ", ".join(packages)))
             else:
                 raise unittest.SkipTest("Test %s needs one of %s" % (self.id(), ", ".join(packages)))
 

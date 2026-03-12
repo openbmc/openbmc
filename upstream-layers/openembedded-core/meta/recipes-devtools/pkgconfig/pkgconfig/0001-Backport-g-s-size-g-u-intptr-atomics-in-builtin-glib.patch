@@ -1,0 +1,157 @@
+From 5fb4ae80ae13ae134a33804b1938af0e9f27a222 Mon Sep 17 00:00:00 2001
+From: Dan Fuhry <dan@fuhry.com>
+Date: Sun, 26 Oct 2025 09:09:07 -0700
+Subject: [PATCH] Backport g(s)size -> g(u)intptr atomics in builtin glib for
+ gcc14 and clang15
+
+pkg-config 0.29.2 doesn't build on clang 15 and up and
+gcc 14 and up, due to -Wint-conversion now defaulting to being an error in
+both compilers. The old version of glib 2.36 bundled with pkg-config uses
+gssize/gssize as the return type of the g_atomic_pointer_* functions, which
+newer versions of gcc and clang complain (rightly) is not portable (as
+these are aliased to long and ulong, respectively).
+
+This was previously addressed in glib upstream commit c762d511 [1] by Alex
+Richardson on Dec 14, 2022. The attached patch backports Alex's change to
+glib 2.36 bundled with pkg-config, and also switches to the newer
+__atomic_* intrinsics from commit 2eb37622 [2] (Philip Withnall).
+
+This patch has been tested on clang 17 and only clang 17.
+
+[1]
+https://gitlab.gnome.org/GNOME/glib/-/commit/c762d511346d3cb84cea3557a246ccf8873b4a1c
+[2]
+https://gitlab.gnome.org/GNOME/glib/-/commit/2eb37622418a5c9f31a9d728a99bc621d3157ab0
+
+Upstream-Status: Submitted [https://lists.freedesktop.org/archives/pkg-config/2024-May/001122.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ glib/glib/gatomic.c | 14 +++++++-------
+ glib/glib/gatomic.h | 34 ++++++++++++++++++++--------------
+ 2 files changed, 27 insertions(+), 21 deletions(-)
+
+diff --git a/glib/glib/gatomic.c b/glib/glib/gatomic.c
+index eb2fe46..c0609eb 100644
+--- a/glib/glib/gatomic.c
++++ b/glib/glib/gatomic.c
+@@ -385,7 +385,7 @@ gboolean
+  *
+  * Since: 2.30
+  **/
+-gssize
++gintptr
+ (g_atomic_pointer_add) (volatile void *atomic,
+                         gssize         val)
+ {
+@@ -409,11 +409,11 @@ gssize
+  *
+  * Since: 2.30
+  **/
+-gsize
++guintptr
+ (g_atomic_pointer_and) (volatile void *atomic,
+                         gsize          val)
+ {
+-  return g_atomic_pointer_and ((volatile gpointer *) atomic, val);
++  return g_atomic_pointer_and ((gpointer *) atomic, val);
+ }
+
+ /**
+@@ -433,11 +433,11 @@ gsize
+  *
+  * Since: 2.30
+  **/
+-gsize
++guintptr
+ (g_atomic_pointer_or) (volatile void *atomic,
+                        gsize          val)
+ {
+-  return g_atomic_pointer_or ((volatile gpointer *) atomic, val);
++  return g_atomic_pointer_or ((gpointer *) atomic, val);
+ }
+
+ /**
+@@ -457,11 +457,11 @@ gsize
+  *
+  * Since: 2.30
+  **/
+-gsize
++guintptr
+ (g_atomic_pointer_xor) (volatile void *atomic,
+                         gsize          val)
+ {
+-  return g_atomic_pointer_xor ((volatile gpointer *) atomic, val);
++  return g_atomic_pointer_xor ((gpointer *) atomic, val);
+ }
+
+ #elif defined (G_PLATFORM_WIN32)
+diff --git a/glib/glib/gatomic.h b/glib/glib/gatomic.h
+index e7fd1f2..124a3dd 100644
+--- a/glib/glib/gatomic.h
++++ b/glib/glib/gatomic.h
+@@ -66,16 +66,16 @@ gboolean                g_atomic_pointer_compare_and_exchange (volatile void  *a
+                                                                gpointer        oldval,
+                                                                gpointer        newval);
+ GLIB_AVAILABLE_IN_ALL
+-gssize                  g_atomic_pointer_add                  (volatile void  *atomic,
++gintptr                 g_atomic_pointer_add                  (volatile void  *atomic,
+                                                                gssize          val);
+ GLIB_AVAILABLE_IN_2_30
+-gsize                   g_atomic_pointer_and                  (volatile void  *atomic,
++guintptr                g_atomic_pointer_and                  (volatile void  *atomic,
+                                                                gsize           val);
+ GLIB_AVAILABLE_IN_2_30
+-gsize                   g_atomic_pointer_or                   (volatile void  *atomic,
++guintptr                g_atomic_pointer_or                   (volatile void  *atomic,
+                                                                gsize           val);
+ GLIB_AVAILABLE_IN_ALL
+-gsize                   g_atomic_pointer_xor                  (volatile void  *atomic,
++guintptr                g_atomic_pointer_xor                  (volatile void  *atomic,
+                                                                gsize           val);
+
+ GLIB_DEPRECATED_IN_2_30_FOR(g_atomic_add)
+@@ -167,28 +167,34 @@ G_END_DECLS
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+     (void) (0 ? (gpointer) *(atomic) : 0);                                   \
+     (void) (0 ? (val) ^ (val) : 0);                                          \
+-    (gssize) __sync_fetch_and_add ((atomic), (val));                         \
++    (guintptr) __atomic_fetch_add ((atomic), (val), __ATOMIC_SEQ_CST);        \
+   }))
+ #define g_atomic_pointer_and(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                          \
++    guintptr *gapa_atomic = (guintptr *) atomic;                             \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+-    (void) (0 ? (gpointer) *(atomic) : 0);                                   \
+-    (void) (0 ? (val) ^ (val) : 0);                                          \
+-    (gsize) __sync_fetch_and_and ((atomic), (val));                          \
++    G_STATIC_ASSERT (sizeof *(atomic) == sizeof (guintptr));                 \
++    (void) (0 ? (gpointer) *(atomic) : NULL);                                   \
++    (void) (0 ? (val) ^ (val) : 1);                                          \
++    (guintptr) __atomic_fetch_and (gapa_atomic, (val), __ATOMIC_SEQ_CST);        \
+   }))
+ #define g_atomic_pointer_or(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                          \
++    guintptr *gapa_atomic = (guintptr *) atomic;                             \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+-    (void) (0 ? (gpointer) *(atomic) : 0);                                   \
+-    (void) (0 ? (val) ^ (val) : 0);                                          \
+-    (gsize) __sync_fetch_and_or ((atomic), (val));                           \
++    G_STATIC_ASSERT (sizeof *(atomic) == sizeof (guintptr));                 \
++    (void) (0 ? (gpointer) *(atomic) : NULL);                                   \
++    (void) (0 ? (val) ^ (val) : 1);                                          \
++    (guintptr) __atomic_fetch_or (gapa_atomic, (val), __ATOMIC_SEQ_CST);        \
+   }))
+ #define g_atomic_pointer_xor(atomic, val) \
+   (G_GNUC_EXTENSION ({                                                          \
++    guintptr *gapa_atomic = (guintptr *) atomic;                             \
+     G_STATIC_ASSERT (sizeof *(atomic) == sizeof (gpointer));                 \
+-    (void) (0 ? (gpointer) *(atomic) : 0);                                   \
+-    (void) (0 ? (val) ^ (val) : 0);                                          \
+-    (gsize) __sync_fetch_and_xor ((atomic), (val));                          \
++    G_STATIC_ASSERT (sizeof *(atomic) == sizeof (guintptr));                 \
++    (void) (0 ? (gpointer) *(atomic) : NULL);                                   \
++    (void) (0 ? (val) ^ (val) : 1);                                          \
++    (guintptr) __atomic_fetch_xor (gapa_atomic, (val), __ATOMIC_SEQ_CST);        \
+   }))
+
+ #else /* defined(G_ATOMIC_LOCK_FREE) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) */

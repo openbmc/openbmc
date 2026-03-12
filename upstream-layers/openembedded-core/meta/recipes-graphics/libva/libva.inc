@@ -16,13 +16,14 @@ BUGTRACKER = "https://github.com/intel/libva/issues"
 SECTION = "x11"
 LICENSE = "MIT"
 
-SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/libva-${PV}.tar.bz2"
 LIC_FILES_CHKSUM = "file://COPYING;md5=2e48940f94acb0af582e5ef03537800f"
-SRC_URI[sha256sum] = "e3da2250654c8d52b3f59f8cb3f3d8e7fb1a2ee64378dbc400fbc5663de7edb8"
+
+SRC_URI = "git://github.com/intel/libva.git;branch=v2.23-branch;protocol=https;tag=${PV}"
+SRCREV = "dbf83dc3b1ce6bad46e1628aaf2da5ef731157b8"
+
+UPSTREAM_CHECK_GITTAGREGEX = "^(?P<pver>(\d+(\.\d+)+))$"
 
 S = "${UNPACKDIR}/libva-${PV}"
-
-GITHUB_BASE_URI = "https://github.com/intel/libva/releases"
 
 DEPENDS = "libdrm"
 

@@ -18,18 +18,16 @@ SYSTEMD_AUTO_ENABLE ??= "enable"
 # even if systemd is not in DISTRO_FEATURES.  As such don't make any changes
 # directly but check the DISTRO_FEATURES first.
 python __anonymous() {
-    # If the distro features have systemd but not sysvinit, inhibit update-rcd
-    # from doing any work so that pure-systemd images don't have redundant init
-    # files.
+    # Inhibit update-rcd from doing any work so that systemd images don't have
+    # redundant init files.
     if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d):
         d.appendVar("DEPENDS", " systemd-systemctl-native")
         d.appendVar("PACKAGE_WRITE_DEPS", " systemd-systemctl-native")
-        if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
-            d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
+        d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
 }
 
 systemd_postinst() {
-if systemctl >/dev/null 2>/dev/null; then
+if type systemctl >/dev/null 2>/dev/null; then
 	OPTS=""
 
 	if [ -n "$D" ]; then
@@ -46,7 +44,7 @@ if systemctl >/dev/null 2>/dev/null; then
 		done
 	fi
 
-	if [ -z "$D" ]; then
+	if [ -z "$D" ] && systemctl >/dev/null 2>/dev/null; then
 		# Reload only system service manager
 		# --global for daemon-reload is not supported: https://github.com/systemd/systemd/issues/19284
 		systemctl daemon-reload
@@ -66,16 +64,17 @@ fi
 }
 
 systemd_prerm() {
-if systemctl >/dev/null 2>/dev/null; then
-	if [ -z "$D" ]; then
+if type systemctl >/dev/null 2>/dev/null; then
+	if [ -z "$D" ] && systemctl >/dev/null 2>/dev/null; then
 		if [ -n "${@systemd_filter_services("${SYSTEMD_SERVICE_ESCAPED}", False, d)}" ]; then
 			systemctl stop ${@systemd_filter_services("${SYSTEMD_SERVICE_ESCAPED}", False, d)}
 			systemctl disable ${@systemd_filter_services("${SYSTEMD_SERVICE_ESCAPED}", False, d)}
 		fi
 
 		# same as above, --global flag is not supported for stop so do disable only
-		[ -n "${@systemd_filter_services("${SYSTEMD_SERVICE_ESCAPED}", True, d)}" ] && \
+		if [ -n "${@systemd_filter_services("${SYSTEMD_SERVICE_ESCAPED}", True, d)}" ]; then
 			systemctl --global disable ${@systemd_filter_services("${SYSTEMD_SERVICE_ESCAPED}", True, d)}
+		fi
 	fi
 fi
 }
@@ -294,9 +293,5 @@ rm_sysvinit_initddir() {
 }
 
 do_install[postfuncs] += "${RMINITDIR}"
-RMINITDIR = " \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '', 'rm_systemd_unitdir', d)} \
-    ${@'rm_sysvinit_initddir' if bb.utils.contains('DISTRO_FEATURES', 'systemd', True, False, d) and \
-                                 not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d) else ''} \
-"
+RMINITDIR = "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'rm_sysvinit_initddir', 'rm_systemd_unitdir', d)}"
 RMINITDIR:class-native = ""

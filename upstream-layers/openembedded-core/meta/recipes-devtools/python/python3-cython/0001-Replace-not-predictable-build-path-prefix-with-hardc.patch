@@ -1,0 +1,69 @@
+From 77c73d8c317224f66af66521f8cfe7a8e5491136 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 17 Sep 2025 01:42:08 -0700
+Subject: [PATCH] Replace not predictable build path prefix with hardcode
+ string in the generated output file
+
+The build path may contain tmp dir which is not predictable, it caused
+the generated output file is not stable at each build and made
+the generated library is not reproducible [1] between builds
+
+vim frozenlist/_frozenlist.cpp
+...
+/* BEGIN: Cython Metadata
+{
+    "distutils": {
+        "depends": [],
+        "language": "c++",
+        "name": "frozenlist._frozenlist",
+        "sources": [
+            "/tmp/.tmp-frozenlist-pep517-cfdvygni/src/frozenlist/_frozenlist.pyx"
+        ]
+    },
+    "module_name": "frozenlist._frozenlist"
+}
+END: Cython Metadata */
+...
+
+Replace build path prefix with hardcode `build_path', it is no harm to
+tweak comments in source file, after applied this commit,
+vim frozenlist/_frozenlist.cpp
+...
+/* BEGIN: Cython Metadata
+{
+    "distutils": {
+        "depends": [],
+        "language": "c++",
+        "name": "frozenlist._frozenlist",
+        "sources": [
+            "build_path/frozenlist/_frozenlist.pyx"
+        ]
+    },
+    "module_name": "frozenlist._frozenlist"
+}
+END: Cython Metadata */
+...
+
+[1] https://reproducible-builds.org/
+
+Upstream-Status: Submitted [https://github.com/cython/cython/pull/7162]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Cython/Compiler/ModuleNode.py | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Cython/Compiler/ModuleNode.py b/Cython/Compiler/ModuleNode.py
+index c1d8783..f24b2d9 100644
+--- a/Cython/Compiler/ModuleNode.py
++++ b/Cython/Compiler/ModuleNode.py
+@@ -877,7 +877,9 @@ class ModuleNode(Nodes.Node, Nodes.BlockNode):
+         code.put_generated_by()
+         if metadata:
+             code.putln("/* BEGIN: Cython Metadata")
+-            code.putln(json.dumps(metadata, indent=4, sort_keys=True))
++            _metadata = json.dumps(metadata, indent=4, sort_keys=True)
++            _metadata = _metadata.replace(os.getcwd(), 'build_path')
++            code.putln(_metadata)
+             code.putln("END: Cython Metadata */")
+             code.putln("")
+ 

@@ -55,37 +55,27 @@ REQUIRED_DISTRO_FEATURES += "systemd overlayfs"
 
 inherit systemd features_check
 
-OVERLAYFS_CREATE_DIRS_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-create-dirs.service.in"
 OVERLAYFS_MOUNT_UNIT_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-unit.mount.in"
 OVERLAYFS_ALL_OVERLAYS_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-all-overlays.service.in"
 
 python do_create_overlayfs_units() {
     from oe.overlayfs import mountUnitName
 
-    with open(d.getVar("OVERLAYFS_CREATE_DIRS_TEMPLATE"), "r") as f:
-        CreateDirsUnitTemplate = f.read()
     with open(d.getVar("OVERLAYFS_MOUNT_UNIT_TEMPLATE"), "r") as f:
         MountUnitTemplate = f.read()
     with open(d.getVar("OVERLAYFS_ALL_OVERLAYS_TEMPLATE"), "r") as f:
         AllOverlaysTemplate = f.read()
 
     def prepareUnits(data, lower):
-        from oe.overlayfs import helperUnitName
-
         args = {
             'DATA_MOUNT_POINT': data,
             'DATA_MOUNT_UNIT': mountUnitName(data),
-            'CREATE_DIRS_SERVICE': helperUnitName(lower),
             'LOWERDIR': lower,
         }
 
         bb.debug(1, "Generate systemd unit %s" % mountUnitName(lower))
         with open(os.path.join(d.getVar('WORKDIR'), mountUnitName(lower)), 'w') as f:
             f.write(MountUnitTemplate.format(**args))
-
-        bb.debug(1, "Generate helper systemd unit %s" % helperUnitName(lower))
-        with open(os.path.join(d.getVar('WORKDIR'), helperUnitName(lower)), 'w') as f:
-            f.write(CreateDirsUnitTemplate.format(**args))
 
     def prepareGlobalUnit(dependentUnits):
         from oe.overlayfs import allOverlaysUnitName

@@ -1,0 +1,120 @@
+From 09330c29d3322881d0215013962bff7549ca885c Mon Sep 17 00:00:00 2001
+From: Thomas Haller <thom311@gmail.com>
+Date: Tue, 23 Dec 2025 21:35:06 +0100
+Subject: [PATCH] tests: skip various tests when kernel returns EOPNOTSUPP
+ (NLE_OPNOTSUPP)
+
+https://github.com/thom311/libnl/issues/448
+
+Upstream-Status: Backport [https://github.com/thom311/libnl/commit/1ac4b32]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tests/cksuite-link-ip6tnl.c   |  2 ++
+ tests/cksuite-route-nexthop.c |  6 +++++-
+ tests/cksuite-route-nh.c      | 21 ++++++++++++++++++---
+ 3 files changed, 25 insertions(+), 4 deletions(-)
+
+diff --git a/tests/cksuite-link-ip6tnl.c b/tests/cksuite-link-ip6tnl.c
+index ea785b8..c5dc353 100644
+--- a/tests/cksuite-link-ip6tnl.c
++++ b/tests/cksuite-link-ip6tnl.c
+@@ -97,6 +97,8 @@ START_TEST(test_kernel_roundtrip_all)
+ 	 * This tests the netlink-message construction.
+ 	 */
+ 	r = rtnl_link_add(sk, link, NLM_F_CREATE);
++	if (_nltst_skip_eopnotsupp(r))
++		return;
+ 	ck_assert_int_eq(r, 0);
+ 
+ 	/* Now, query it and check whether all the attributes passed.
+diff --git a/tests/cksuite-route-nexthop.c b/tests/cksuite-route-nexthop.c
+index 34fc1d3..971a580 100644
+--- a/tests/cksuite-route-nexthop.c
++++ b/tests/cksuite-route-nexthop.c
+@@ -416,6 +416,7 @@ START_TEST(test_kernel_route_roundtrip_nh_mpls_encap_v4)
+ 	struct rtnl_nh_encap *encap2;
+ 	struct rtnl_nexthop *nh = NULL;
+ 	int ifindex_dummy;
++	int r;
+ 
+ 	if (_nltst_skip_no_netns())
+ 		return;
+@@ -447,7 +448,10 @@ START_TEST(test_kernel_route_roundtrip_nh_mpls_encap_v4)
+ 	ck_assert_int_eq(rtnl_route_nh_set_encap(nh, encap2), 0);
+ 	rtnl_route_add_nexthop(route, nh);
+ 
+-	ck_assert_int_eq(rtnl_route_add(sk, route, NLM_F_CREATE), 0);
++	r = rtnl_route_add(sk, route, NLM_F_CREATE);
++	if (_nltst_skip_eopnotsupp(r))
++		return;
++	ck_assert_int_eq(r, 0);
+ 
+ 	/* Retrieve the route back by its prefix and validate MPLS encap on nexthop */
+ 	ck_assert_int_eq(nltst_route_get_by_dst(sk, dst, &got), 0);
+diff --git a/tests/cksuite-route-nh.c b/tests/cksuite-route-nh.c
+index 8409e18..500768b 100644
+--- a/tests/cksuite-route-nh.c
++++ b/tests/cksuite-route-nh.c
+@@ -91,6 +91,7 @@ START_TEST(test_kernel_roundtrip_encap_mpls)
+ 	_nl_auto_nl_addr struct nl_addr *labels = NULL;
+ 	struct rtnl_nh_encap *encap = NULL;
+ 	int ifindex_dummy;
++	int r;
+ 
+ 	if (_nltst_skip_no_netns())
+ 		return;
+@@ -127,7 +128,11 @@ START_TEST(test_kernel_roundtrip_encap_mpls)
+ 	ck_assert_int_eq(rtnl_nh_add(sk, nh, NLM_F_CREATE), -NLE_INVAL);
+ 
+ 	ck_assert_int_eq(rtnl_nh_set_family(nh, AF_INET), 0);
+-	ck_assert_int_eq(rtnl_nh_add(sk, nh, NLM_F_CREATE), 0);
++
++	r = rtnl_nh_add(sk, nh, NLM_F_CREATE);
++	if (_nltst_skip_eopnotsupp(r))
++		return;
++	ck_assert_int_eq(r, 0);
+ 
+ 	/* Query and verify */
+ 	ck_assert_int_eq(rtnl_nh_alloc_cache(sk, AF_UNSPEC, &cache), 0);
+@@ -944,6 +949,7 @@ START_TEST(test_kernel_roundtrip_encap_ip6)
+ 	_nl_auto_rtnl_nh_encap struct rtnl_nh_encap *encap = NULL;
+ 	uint16_t flags;
+ 	int ifindex_dummy;
++	int r;
+ 
+ 	if (_nltst_skip_no_netns())
+ 		return;
+@@ -980,7 +986,11 @@ START_TEST(test_kernel_roundtrip_encap_ip6)
+ 	/* Set required attributes and add */
+ 	ck_assert_int_eq(rtnl_nh_set_oif(nh, (uint32_t)ifindex_dummy), 0);
+ 	ck_assert_int_eq(rtnl_nh_set_family(nh, AF_INET6), 0);
+-	ck_assert_int_eq(rtnl_nh_add(sk, nh, NLM_F_CREATE), 0);
++
++	r = rtnl_nh_add(sk, nh, NLM_F_CREATE);
++	if (_nltst_skip_eopnotsupp(r))
++		return;
++	ck_assert_int_eq(r, 0);
+ 
+ 	/* Query and verify */
+ 	ck_assert_int_eq(rtnl_nh_alloc_cache(sk, AF_UNSPEC, &cache), 0);
+@@ -1097,6 +1107,7 @@ START_TEST(test_kernel_roundtrip_encap_ip)
+ 	_nl_auto_rtnl_nh_encap struct rtnl_nh_encap *encap = NULL;
+ 	int ifindex_dummy;
+ 	uint64_t id = 0;
++	int r;
+ 
+ 	if (_nltst_skip_no_netns())
+ 		return;
+@@ -1132,7 +1143,11 @@ START_TEST(test_kernel_roundtrip_encap_ip)
+ 	/* Set required attributes and add */
+ 	ck_assert_int_eq(rtnl_nh_set_oif(nh, (uint32_t)ifindex_dummy), 0);
+ 	ck_assert_int_eq(rtnl_nh_set_family(nh, AF_INET), 0);
+-	ck_assert_int_eq(rtnl_nh_add(sk, nh, NLM_F_CREATE), 0);
++
++	r = rtnl_nh_add(sk, nh, NLM_F_CREATE);
++	if (_nltst_skip_eopnotsupp(r))
++		return;
++	ck_assert_int_eq(r, 0);
+ 
+ 	/* Query and verify */
+ 	ck_assert_int_eq(rtnl_nh_alloc_cache(sk, AF_UNSPEC, &cache), 0);

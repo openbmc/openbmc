@@ -10,8 +10,8 @@ ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian/20250101T023759Z/pool
 ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian-archive/20120328T092752Z/debian/pool \
 ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian-archive/20110127T084257Z/debian/pool \
 ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian-archive/20090802T004153Z/debian/pool \
-${GNU_MIRROR}	https://mirrors.kernel.org/gnu \
-${KERNELORG_MIRROR}	http://www.kernel.org/pub \
+${GNU_MIRROR}	https://mirrors.edge.kernel.org/gnu \
+${KERNELORG_MIRROR}	http://www.edge.kernel.org/pub \
 ${GNUPG_MIRROR}	ftp://ftp.gnupg.org/gcrypt \
 ${GNUPG_MIRROR}	ftp://ftp.franken.de/pub/crypt/mirror/ftp.gnupg.org/gcrypt \
 ${GNUPG_MIRROR}	ftp://mirrors.dotsrc.org/gcrypt \
@@ -26,34 +26,26 @@ ${APACHE_MIRROR}  http://archive.apache.org/dist \
 http://downloads.sourceforge.net/watchdog/ http://fossies.org/linux/misc/ \
 ${SAVANNAH_GNU_MIRROR} http://download-mirror.savannah.gnu.org/releases \
 ${SAVANNAH_NONGNU_MIRROR} http://download-mirror.savannah.nongnu.org/releases \
-ftp://sourceware.org/pub http://mirrors.kernel.org/sourceware \
+ftp://sourceware.org/pub http://mirrors.edge.kernel.org/sourceware \
 ftp://sourceware.org/pub http://gd.tuwien.ac.at/gnu/sourceware \
 ftp://sourceware.org/pub http://ftp.gwdg.de/pub/linux/sources.redhat.com/sourceware \
-cvs://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 svn://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 git://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 gitsm://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \
 hg://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \
-bzr://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
-p4://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \
-osc://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 https?://.*/.*  http://downloads.yoctoproject.org/mirror/sources/ \
 ftp://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \
 npm://.*/?.*    http://downloads.yoctoproject.org/mirror/sources/ \
-cvs://.*/.*     http://sources.openembedded.org/ \
 svn://.*/.*     http://sources.openembedded.org/ \
 git://.*/.*     http://sources.openembedded.org/ \
 gitsm://.*/.*   http://sources.openembedded.org/ \
 hg://.*/.*      http://sources.openembedded.org/ \
-bzr://.*/.*     http://sources.openembedded.org/ \
-p4://.*/.*      http://sources.openembedded.org/ \
-osc://.*/.*     http://sources.openembedded.org/ \
 https?://.*/.*  http://sources.openembedded.org/ \
 ftp://.*/.*     http://sources.openembedded.org/ \
 npm://.*/?.*    http://sources.openembedded.org/ \
 ${CPAN_MIRROR}  https://cpan.metacpan.org/ \
-https?://downloads.yoctoproject.org/releases/uninative/ https://mirrors.kernel.org/yocto/uninative/ \
-https?://downloads.yoctoproject.org/mirror/sources/ https://mirrors.kernel.org/yocto-sources/ \
+https?://downloads.yoctoproject.org/releases/uninative/ https://mirrors.edge.kernel.org/yocto/uninative/ \
+https?://downloads.yoctoproject.org/mirror/sources/ https://mirrors.edge.kernel.org/yocto-sources/ \
 "
 
 # Use MIRRORS to provide git repo fallbacks using the https protocol, for cases

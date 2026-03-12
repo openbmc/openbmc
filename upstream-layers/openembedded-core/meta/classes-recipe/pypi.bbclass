@@ -51,7 +51,7 @@ UPSTREAM_CHECK_PYPI_PACKAGE ?= "${@pypi_normalize(d)}"
 # https://packaging.python.org/en/latest/specifications/simple-repository-api/
 #
 # NOTE: All URLs for the simple API MUST request canonical normalized URLs per the spec
-UPSTREAM_CHECK_URI ?= "https://pypi.org/simple/${@pypi_normalize(d)}"
+UPSTREAM_CHECK_URI ?= "https://pypi.org/simple/${@pypi_normalize(d)}/"
 UPSTREAM_CHECK_REGEX ?= "${UPSTREAM_CHECK_PYPI_PACKAGE}-(?P<pver>(\d+[\.\-_]*)+).(tar\.gz|tgz|zip|tar\.bz2)"
 
 CVE_PRODUCT ?= "python:${PYPI_PACKAGE}"

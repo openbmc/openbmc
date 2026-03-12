@@ -60,13 +60,41 @@ def _write_layer_list(dest, repodirs):
     with open(layers_f, 'w') as f:
         json.dump({"version":"1.0","layers":layers}, f, sort_keys=True, indent=4)
 
+def _get_remotes(r_remote):
+    remotes = {}
+
+    if not 'remotes' in r_remote and not 'uri' in r_remote:
+        raise Exception("Expected key(s): 'remotes', 'uri'")
+
+    if 'remotes' in r_remote:
+        remotes = r_remote['remotes'].copy()
+
+    if 'uri' in r_remote:
+        r_name = ''
+
+        if 'remotes' in r_remote:
+            if not 'origin' in r_remote['remotes']:
+                r_name = 'origin'
+            else:
+                import itertools
+                for i in itertools.count(start=1):
+                    if not 'origin-{}'.format(i) in r_remote['remotes']:
+                        r_name = 'origin-{}'.format(i)
+                        break
+        else:
+            r_name = 'origin'
+
+        remotes.update({r_name: {'uri': r_remote['uri']}})
+
+    return remotes
+
 def _do_checkout(args, json):
     repos = json['sources']
     repodirs = []
     oesetupbuild = None
     for r_name in repos:
         r_data = repos[r_name]
-        repodir = os.path.abspath(os.path.join(args['destdir'], r_data['path']))
+        repodir = os.path.abspath(os.path.join(args['destdir'], r_data.get('path', r_name)))
         repodirs.append(repodir)
 
         if 'contains_this_file' in r_data.keys():
@@ -80,7 +108,8 @@ def _do_checkout(args, json):
         if not desc:
             desc = rev[:10]
         branch = r_remote['branch']
-        remotes = r_remote['remotes']
+
+        remotes = _get_remotes(r_remote)
 
         print('\nSetting up source {}, revision {}, branch {}'.format(r_name, desc, branch))
         if not _is_repo_git_repo(repodir):

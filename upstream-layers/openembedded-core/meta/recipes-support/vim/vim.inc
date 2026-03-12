@@ -12,14 +12,14 @@ RSUGGESTS:${PN} = "diffutils"
 LICENSE = "Vim"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d1a651ab770b45d41c0f8cb5a8ca930e"
 
-SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https;tag=v${PV} \
            file://disable_acl_header_check.patch \
            file://0001-src-Makefile-improve-reproducibility.patch \
            file://no-path-adjust.patch \
            "
 
-PV .= ".1198"
-SRCREV = "f209dcd3defb95bae21b2740910e6aa7bb940531"
+PV .= ".0110"
+SRCREV = "7ba60f17c22ef81680f25f8c3225b4edb55ddd7c"
 
 # Do not consider .z in x.y.z, as that is updated with every commit
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+)\.0"
@@ -35,7 +35,7 @@ CLEANBROKEN = "1"
 # vim configure.in contains functions which got 'dropped' by autotools.bbclass
 do_configure () {
     cd src
-    rm -f auto/*
+    rm -rf auto/*
     touch auto/config.mk
     # git timestamps aren't reliable, so touch the shipped .po files so they aren't regenerated
     touch -c po/cs.cp1250.po po/ja.euc-jp.po po/ja.sjis.po po/ko.po po/pl.UTF-8.po po/pl.cp1250.po po/ru.cp1251.po po/sk.cp1250.po po/uk.cp1251.po po/zh_CN.po po/zh_CN.cp936.po po/zh_TW.po
@@ -74,6 +74,7 @@ EXTRA_OECONF = " \
     --disable-desktop-database-update \
     --with-tlib=ncurses \
     --with-modified-by='${MAINTAINER}' \
+    --with-wayland=no \
     ac_cv_small_wchar_t=no \
     ac_cv_path_GLIB_COMPILE_RESOURCES=no \
     vim_cv_getcwd_broken=no \

@@ -1,0 +1,84 @@
+#!/bin/sh
+#
+# cpp-example        C++ Example Service
+#
+# chkconfig: 35 99 99
+# description: C++ Example Service daemon
+#
+
+USER="@USER@"
+DAEMON="@BINARY_NAME@"
+DAEMON_PATH="@BINDIR@/$DAEMON"
+DAEMON_ARGS="--endless"
+PIDFILE="/var/run/$DAEMON.pid"
+LOCK_FILE="/var/lock/subsys/$DAEMON"
+
+start() {
+    if [ -f $PIDFILE ]; then
+        echo "$DAEMON is already running."
+        return 1
+    fi
+
+    echo -n "Starting $DAEMON: "
+    start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile \
+        --background --chuid $USER --exec $DAEMON_PATH -- $DAEMON_ARGS
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        echo "OK"
+        touch $LOCK_FILE
+    else
+        echo "FAILED"
+    fi
+    return $RETVAL
+}
+
+stop() {
+    echo -n "Stopping $DAEMON: "
+    start-stop-daemon --stop --quiet --pidfile $PIDFILE
+    RETVAL=$?
+    if [ $RETVAL -eq 0 ]; then
+        echo "OK"
+        rm -f $PIDFILE $LOCK_FILE
+    else
+        echo "FAILED"
+    fi
+    return $RETVAL
+}
+
+status() {
+    if [ -f $PIDFILE ]; then
+        PID=$(cat $PIDFILE)
+        if ps -p $PID > /dev/null 2>&1; then
+            echo "$DAEMON is running (PID: $PID)"
+            return 0
+        else
+            echo "$DAEMON is not running (stale PID file)"
+            return 1
+        fi
+    else
+        echo "$DAEMON is not running"
+        return 1
+    fi
+}
+
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    status)
+        status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+        ;;
+esac
+
+exit $?

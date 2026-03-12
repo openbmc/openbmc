@@ -112,11 +112,12 @@ python __anonymous () {
         variant = d.getVar("BBEXTENDVARIANT")
         import oe.classextend
 
-        clsextend = oe.classextend.ClassExtender(variant, d)
-
-        clsextend.map_depends_variable("PACKAGE_INSTALL")
-        clsextend.map_depends_variable("LINGUAS_INSTALL")
-        clsextend.map_depends_variable("RDEPENDS")
+        prefixes = (d.getVar("MULTILIB_VARIANTS") or "").split()
+        clsextend = oe.classextend.ClassExtender(variant, prefixes, d)
+        clsextend.set_filter("PACKAGE_INSTALL", deps=False)
+        clsextend.set_filter("LINGUAS_INSTALL", deps=False)
+        clsextend.set_filter("ROOTFS_RO_UNNEEDED", deps=False)
+        clsextend.set_filter("RDEPENDS", deps=True)
         pinstall = d.getVar("LINGUAS_INSTALL") + " " + d.getVar("PACKAGE_INSTALL")
         d.setVar("PACKAGE_INSTALL", pinstall)
         d.setVar("LINGUAS_INSTALL", "")
@@ -136,27 +137,28 @@ python multilib_virtclass_handler_postkeyexp () {
 
     import oe.classextend
 
-    clsextend = oe.classextend.ClassExtender(variant, d)
-
     if bb.data.inherits_class('image', d):
         return
 
-    clsextend.map_depends_variable("DEPENDS")
-    clsextend.map_depends_variable("PACKAGE_WRITE_DEPS")
-    clsextend.map_variable("PROVIDES")
+    prefixes = (d.getVar("MULTILIB_VARIANTS") or "").split()
+    clsextend = oe.classextend.ClassExtender(variant, prefixes, d)
+
+    clsextend.set_filter("DEPENDS", deps=True)
+    clsextend.set_filter("PACKAGE_WRITE_DEPS", deps=False)
+
+    clsextend.set_filter("PROVIDES", deps=False)
 
     if bb.data.inherits_class('cross-canadian', d):
         return
 
-    clsextend.rename_packages()
     clsextend.rename_package_variables((d.getVar("PACKAGEVARS") or "").split())
 
     clsextend.map_packagevars()
-    clsextend.map_regexp_variable("PACKAGES_DYNAMIC")
-    clsextend.map_variable("INITSCRIPT_PACKAGES")
-    clsextend.map_variable("USERADD_PACKAGES")
-    clsextend.map_variable("SYSTEMD_PACKAGES")
-    clsextend.map_variable("UPDATERCPN")
+
+    clsextend.set_filter("INITSCRIPT_PACKAGES", deps=False)
+    clsextend.set_filter("USERADD_PACKAGES", deps=False)
+    clsextend.set_filter("SYSTEMD_PACKAGES", deps=False)
+    clsextend.set_filter("UPDATERCPN", deps=False)
 
     reset_alternative_priority(d)
 }

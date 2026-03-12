@@ -1,0 +1,6 @@
+# Volatile entries to match systemd
+# https://github.com/systemd/systemd/blob/main/tmpfiles.d/x11.conf
+d root root 1777 /tmp/.X11-unix none
+d root root 1777 /tmp/.ICE-unix none
+d root root 1777 /tmp/.XIM-unix none
+d root root 1777 /tmp/.font-unix none

@@ -30,7 +30,8 @@ class RpmIndexer(Indexer):
             signer.detach_sign(os.path.join(deploy_dir, 'repodata', 'repomd.xml'),
                                self.d.getVar('PACKAGE_FEED_GPG_NAME'),
                                self.d.getVar('PACKAGE_FEED_GPG_PASSPHRASE_FILE'),
-                               armor=is_ascii_sig)
+                               armor=is_ascii_sig,
+                               use_sha256=True)
 
 class RpmSubdirIndexer(RpmIndexer):
     def write_index(self):
@@ -330,8 +331,15 @@ class RpmPM(PackageManager):
             return output
         except subprocess.CalledProcessError as e:
             if print_output:
+                e_output = e.output.decode("utf-8")
+                extra_info = ""
+                if "install" in dnf_args:
+                    if "Error: Unable to find a match:" in e_output:
+                        no_match_pkgs = re.search(r'Error: Unable to find a match: ([a-z0-9+\-\._\s]+)', e_output).group(1).split()
+                        for pkg in no_match_pkgs:
+                            extra_info += self.get_missing_pkg_reason(pkg)
                 (bb.note, bb.fatal)[fatal]("Could not invoke dnf. Command "
-                     "'%s' returned %d:\n%s" % (' '.join(cmd), e.returncode, e.output.decode("utf-8")))
+                     "'%s' returned %d:\n%s%s" % (' '.join(cmd), e.returncode, e_output, extra_info))
             else:
                 (bb.note, bb.fatal)[fatal]("Could not invoke dnf. Command "
                      "'%s' returned %d:" % (' '.join(cmd), e.returncode))

@@ -1,0 +1,42 @@
+From c333f9c4ee212297f3b9a8a6ef62396a63c48e61 Mon Sep 17 00:00:00 2001
+From: Jim MacArthur <jim.macarthur@linaro.org>
+Date: Tue, 6 Jan 2026 15:40:48 +0000
+Subject: [PATCH] linux-user/elfload.c: Correction to HWCAP2 accessor
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+get_elf_hwcap was used when get_elf_hwcap2 should have been.
+
+Cc: qemu-stable@nongnu.org
+Fixes: fcac98d0ba8b ("linux-user: Remove ELF_HWCAP2")
+Resolves: https://gitlab.com/qemu-project/qemu/-/issues/3259
+Signed-off-by: Jim MacArthur <jim.macarthur@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <20260106-fix-hwcap2-sve2-v1-1-1d70dff63370@linaro.org>
+
+Upstream-Status: Backport [https://gitlab.com/qemu-project/qemu/-/commit/c333f9c4ee212297f3b9a8a6ef62396a63c48e61]
+
+Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
+---
+ linux-user/elfload.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 0002d5be2f..35471c0c9a 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -708,7 +708,7 @@ static abi_ulong create_elf_tables(abi_ulong p, int argc, int envc,
+     NEW_AUX_ENT(AT_EXECFN, info->file_string);
+ 
+     if (HAVE_ELF_HWCAP2) {
+-        NEW_AUX_ENT(AT_HWCAP2, get_elf_hwcap(thread_cpu));
++        NEW_AUX_ENT(AT_HWCAP2, get_elf_hwcap2(thread_cpu));
+     }
+     if (u_base_platform) {
+         NEW_AUX_ENT(AT_BASE_PLATFORM, u_base_platform);
+-- 
+2.34.1
+

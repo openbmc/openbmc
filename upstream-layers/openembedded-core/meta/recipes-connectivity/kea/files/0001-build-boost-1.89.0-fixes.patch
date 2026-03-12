@@ -1,0 +1,59 @@
+From c7d1036c6476ddca79a6beb03604a2364d7c469e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 27 Aug 2025 22:20:09 -0700
+Subject: [PATCH] build: boost 1.89.0 fixes
+
+Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/merge_requests/2771/]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build                        | 4 ++--
+ src/lib/asiodns/io_fetch.cc        | 1 +
+ src/lib/asiolink/interval_timer.cc | 1 +
+ 3 files changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 8ed5b2d..d5723ba 100644
+--- a/meson.build
++++ b/meson.build
+@@ -189,7 +189,7 @@ message(f'Detected system "@SYSTEM@".')
+ 
+ #### Dependencies
+ 
+-boost_dep = dependency('boost', version: '>=1.66', modules: ['system'])
++boost_dep = dependency('boost', version: '>=1.66')
+ dl_dep = dependency('dl')
+ threads_dep = dependency('threads')
+ add_project_dependencies(boost_dep, dl_dep, threads_dep, language: ['cpp'])
+@@ -1094,7 +1094,7 @@ pkg.generate(
+ if TARGETS_GEN_MESSAGES.length() > 0
+     alias_target('messages', TARGETS_GEN_MESSAGES)
+ else
+-    error(
++    warning(
+         'No messages to generate. This is probably an error in the meson.build files.',
+     )
+ endif
+diff --git a/src/lib/asiodns/io_fetch.cc b/src/lib/asiodns/io_fetch.cc
+index c140676..94f46fa 100644
+--- a/src/lib/asiodns/io_fetch.cc
++++ b/src/lib/asiodns/io_fetch.cc
+@@ -22,6 +22,7 @@
+ #include <dns/rcode.h>
+ #include <util/io.h>
+ 
++#include <boost/asio/deadline_timer.hpp>
+ #include <boost/scoped_ptr.hpp>
+ #include <boost/date_time/posix_time/posix_time_types.hpp>
+ 
+diff --git a/src/lib/asiolink/interval_timer.cc b/src/lib/asiolink/interval_timer.cc
+index fa0d9e1..1410a85 100644
+--- a/src/lib/asiolink/interval_timer.cc
++++ b/src/lib/asiolink/interval_timer.cc
+@@ -9,6 +9,7 @@
+ #include <asiolink/interval_timer.h>
+ #include <asiolink/io_service.h>
+ 
++#include <boost/asio/deadline_timer.hpp>
+ #include <boost/enable_shared_from_this.hpp>
+ #include <boost/noncopyable.hpp>
+ #include <boost/shared_ptr.hpp>

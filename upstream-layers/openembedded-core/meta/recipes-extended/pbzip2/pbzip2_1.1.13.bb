@@ -13,6 +13,7 @@ DEPENDS:append:class-native = " bzip2-replacement-native"
 
 SRC_URI = "https://launchpad.net/${BPN}/1.1/${PV}/+download/${BP}.tar.gz \
            file://0001-pbzip2-Fix-invalid-suffix-on-literal-C-11-warning.patch \
+           file://0001-Do-not-rely-on-std-char_traits-template-from-stdlib.patch \
            "
 
 SRC_URI[sha256sum] = "8fd13eaaa266f7ee91f85c1ea97c86d9c9cc985969db9059cdebcb1e1b7bdbe6"
