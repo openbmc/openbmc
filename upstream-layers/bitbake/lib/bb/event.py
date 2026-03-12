@@ -90,7 +90,7 @@ def disable_heartbeat():
 # In long running code, this function should be called periodically
 # to check if we should exit due to an interuption (.e.g Ctrl+C from the UI)
 #
-def check_for_interrupts(d):
+def check_for_interrupts():
     global _should_exit
     if _should_exit.is_set():
         bb.warn("Exiting due to interrupt.")

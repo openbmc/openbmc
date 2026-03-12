@@ -158,39 +158,6 @@ class URITest(unittest.TestCase):
             'query': {},
             'relative': False
         },
-        "cvs://anoncvs@cvs.handhelds.org/cvs;module=familiar/dist/ipkg" : {
-            'uri': 'cvs://anoncvs@cvs.handhelds.org/cvs;module=familiar/dist/ipkg',
-            'scheme': 'cvs',
-            'hostname': 'cvs.handhelds.org',
-            'port': None,
-            'hostport': 'cvs.handhelds.org',
-            'path': '/cvs',
-            'userinfo': 'anoncvs',
-            'username': 'anoncvs',
-            'password': '',
-            'params': {
-                'module': 'familiar/dist/ipkg'
-            },
-            'query': {},
-            'relative': False
-        },
-        "cvs://anoncvs:anonymous@cvs.handhelds.org/cvs;tag=V0-99-81;module=familiar/dist/ipkg": {
-            'uri': 'cvs://anoncvs:anonymous@cvs.handhelds.org/cvs;tag=V0-99-81;module=familiar/dist/ipkg',
-            'scheme': 'cvs',
-            'hostname': 'cvs.handhelds.org',
-            'port': None,
-            'hostport': 'cvs.handhelds.org',
-            'path': '/cvs',
-            'userinfo': 'anoncvs:anonymous',
-            'username': 'anoncvs',
-            'password': 'anonymous',
-            'params': collections.OrderedDict([
-                ('tag', 'V0-99-81'),
-                ('module', 'familiar/dist/ipkg')
-            ]),
-            'query': {},
-            'relative': False
-        },
         "file://example.diff": { # NOTE: Not RFC compliant!
             'uri': 'file:example.diff',
             'scheme': 'file',
@@ -1417,8 +1384,6 @@ class URLHandle(unittest.TestCase):
     password = urllib.parse.quote(r"!#$%^&*()-_={}[]\|:?,.<>~`", r"!$&'/()*+,;=")
     datatable = {
        "http://www.google.com/index.html" : ('http', 'www.google.com', '/index.html', '', '', {}),
-       "cvs://anoncvs@cvs.handhelds.org/cvs;module=familiar/dist/ipkg" : ('cvs', 'cvs.handhelds.org', '/cvs', 'anoncvs', '', {'module': 'familiar/dist/ipkg'}),
-       "cvs://anoncvs:anonymous@cvs.handhelds.org/cvs;tag=V0-99-81;module=familiar/dist/ipkg" : ('cvs', 'cvs.handhelds.org', '/cvs', 'anoncvs', 'anonymous', collections.OrderedDict([('tag', 'V0-99-81'), ('module', 'familiar/dist/ipkg')])),
        "git://git.openembedded.org/bitbake;branch=@foo;protocol=https" : ('git', 'git.openembedded.org', '/bitbake', '', '', {'branch': '@foo', 'protocol' : 'https'}),
        "file://somelocation;someparam=1": ('file', '', 'somelocation', '', '', {'someparam': '1'}),
        "file://example@.service": ('file', '', 'example@.service', '', '', {}),
@@ -1614,8 +1579,6 @@ class FetchCheckStatusTest(FetcherTest):
                       "https://downloads.yoctoproject.org/releases/opkg/opkg-0.1.7.tar.gz",
                       "https://downloads.yoctoproject.org/releases/opkg/opkg-0.3.0.tar.gz",
                       "ftp://sourceware.org/pub/libffi/libffi-1.20.tar.gz",
-                      # GitHub releases are hosted on Amazon S3, which doesn't support HEAD
-                      "https://github.com/kergoth/tslib/releases/download/1.1/tslib-1.1.tar.xz"
                       ]
 
     @skipIfNoNetwork()
@@ -2123,6 +2086,29 @@ class GitShallowTest(FetcherTest):
         bb.utils.remove(self.gitdir, recurse=True)
         self.fetch_and_unpack()
         self.assertRevCount(1)
+
+    @skipIfNoNetwork()
+    def test_shallow_mirrors_with_multiple_same_urls(self):
+        url = "git://git.openembedded.org/bitbake;branch=master;protocol=https;rev=82ea737a0b42a8b53e11c9cde141e9e9c0bd8c40"
+
+        d = self.d.createCopy()
+        d.delVar('AUTOREV')
+        d.delVar('SRCREV')
+
+        # prepare premirror
+        premirror = os.path.join(self.tempdir, "premirror")
+        os.mkdir(premirror)
+        d.setVar("DL_DIR", premirror)
+        fetcher = bb.fetch.Fetch([url], d)
+        fetcher.download()
+
+        # set PREMIRRORS
+        d.setVar('PREMIRRORS', 'git://.*/.* file://%s/' % premirror)
+
+        # set DL_DIR back and use the same url multiple times to fetch
+        d.setVar("DL_DIR", self.dldir)
+        fetcher2 = bb.fetch.Fetch([url, url], d)
+        fetcher2.download()
 
     def test_shallow_invalid_depth(self):
         self.add_empty_file('a')
@@ -2647,6 +2633,50 @@ class GitURLWithSpacesTest(FetcherTest):
             self.assertEqual(ud.fullmirror, os.path.join(self.dldir, "git2_" + ref['gitsrcname'] + '.tar.gz'))
             self.assertEqual(ud.method._get_repo_url(ud), ref['repo_url'])
 
+
+class FetchLocallyMissingTagFromRemote(FetcherTest):
+    def setUp(self):
+        FetcherTest.setUp(self)
+        self.gitdir = os.path.join(self.tempdir, 'git')
+        self.srcdir = os.path.join(self.tempdir, 'gitsource')
+
+        bb.utils.mkdirhier(self.srcdir)
+        self.git_init(cwd=self.srcdir)
+        self.d.setVar('WORKDIR', self.tempdir)
+        self.d.setVar('S', self.gitdir)
+
+        uri = 'git://%s;protocol=file;subdir=${S};branch=master' % self.srcdir
+        self.d.setVar('SRC_URI', uri)
+
+        open(os.path.join(self.srcdir, 'dummyfile'), 'w').close()
+        self.git(['add', 'dummyfile'], self.srcdir)
+        self.git(['commit', '-m', 'dummymsg', 'dummyfile'], self.srcdir)
+
+    def _fetch_and_unpack(self, uri_to_fetch):
+        fetcher = bb.fetch2.Fetch([uri_to_fetch], self.d)
+        fetcher.download()
+        fetcher.unpack(self.d.getVar('WORKDIR'))
+
+    def test_tag_present_in_remote_but_not_local(self):
+        # fetch a repo that has no tag in it
+        # then add a tag to this repo, and fetch it again, without
+        # changing SRC_REV, but by adding ';tag=tag1` to SRC_URI
+        # the new tag should be fetched and unpacked
+        srcrev = self.git('rev-parse HEAD', cwd=self.srcdir).strip()
+        self.d.setVar('SRCREV', srcrev)
+        src_uri = self.d.getVar('SRC_URI')
+        self._fetch_and_unpack(src_uri)
+
+        self.git('tag -m -a tag1', cwd=self.srcdir)
+
+        src_uri = '%s;tag=tag1' % self.d.getVar('SRC_URI').split()[0]
+        self.d.setVar('SRC_URI', src_uri)
+        self._fetch_and_unpack(src_uri)
+
+        output = self.git('log --pretty=oneline -n 1 refs/tags/tag1', cwd=self.gitdir)
+        assert "fatal: ambiguous argument" not in output
+
+
 class CrateTest(FetcherTest):
     @skipIfNoNetwork()
     def test_crate_url(self):
@@ -2767,6 +2797,7 @@ class CrateTest(FetcherTest):
 
 class NPMTest(FetcherTest):
     def skipIfNoNpm():
+        return unittest.skip('npm disabled due to security issues')
         if not shutil.which('npm'):
             return unittest.skip('npm not installed')
         return lambda f: f
@@ -2893,6 +2924,7 @@ class NPMTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(unpackdir, 'package.json')))
 
     def test_npm_no_network_no_tarball(self):
+        return unittest.skip('npm disabled due to security issues')
         urls = ['npm://registry.npmjs.org;package=@savoirfairelinux/node-server-example;version=1.0.0']
         self.d.setVar('BB_NO_NETWORK', '1')
         fetcher = bb.fetch.Fetch(urls, self.d)
@@ -2989,6 +3021,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw(self):
+        return unittest.skip('npm disabled due to security issues')
         swfile = self.create_shrinkwrap_file({
             'packages': {
                 'node_modules/array-flatten': {
@@ -3025,6 +3058,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw_git(self):
+        return unittest.skip('npm disabled due to security issues')
         swfile = self.create_shrinkwrap_file({
             'packages': {
                 'node_modules/cookie': {
@@ -3038,6 +3072,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw_dev(self):
+        return unittest.skip('npm disabled due to security issues')
         swfile = self.create_shrinkwrap_file({
             'packages': {
                 'node_modules/array-flatten': {
@@ -3066,6 +3101,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw_destsuffix(self):
+        return unittest.skip('npm disabled due to security issues')
         swfile = self.create_shrinkwrap_file({
             'packages': {
                 'node_modules/array-flatten': {
@@ -3081,6 +3117,7 @@ class NPMTest(FetcherTest):
         self.assertTrue(os.path.exists(os.path.join(self.unpackdir, 'foo', 'bar', 'node_modules', 'array-flatten', 'package.json')))
 
     def test_npmsw_no_network_no_tarball(self):
+        return unittest.skip('npm disabled due to security issues')
         swfile = self.create_shrinkwrap_file({
             'packages': {
                 'node_modules/array-flatten': {
@@ -3120,6 +3157,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw_npm_reusability(self):
+        return unittest.skip('npm disabled due to security issues')
         # Fetch once with npmsw
         swfile = self.create_shrinkwrap_file({
             'packages': {
@@ -3142,6 +3180,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw_bad_checksum(self):
+        return unittest.skip('npm disabled due to security issues')
         # Try to fetch with bad checksum
         swfile = self.create_shrinkwrap_file({
             'packages': {
@@ -3238,6 +3277,7 @@ class NPMTest(FetcherTest):
 
     @skipIfNoNetwork()
     def test_npmsw_bundled(self):
+        return unittest.skip('npm disabled due to security issues')
         swfile = self.create_shrinkwrap_file({
             'packages': {
                 'node_modules/array-flatten': {
@@ -3290,30 +3330,30 @@ class GitTagVerificationTests(FetcherTest):
     @skipIfNoNetwork()
     def test_tag_rev_match(self):
         # Test a url with rev= and tag= set works
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=aa0e540fc31a1c26839efd2c7785a751ce24ebfb;tag=2.8.7"], self.d)
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=5b4e20377eea8d428edf1aeb2187c18f82ca6757;tag=2.12.0"], self.d)
         fetcher.download()
         fetcher.unpack(self.unpackdir)
 
     def test_annotated_tag_rev_match(self):
         # Test a url with rev= and tag= set works
         # rev is the annotated tag revision in this case
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=6d363159e4b7dc566fc40d069b2615e61774a7d8;tag=2.8.7"], self.d)
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=fa30183549bd09f33fd4eebf56771ca5393526a6;tag=2.12.0"], self.d)
         fetcher.download()
         fetcher.unpack(self.unpackdir)
 
     @skipIfNoNetwork()
     def test_tag_rev_match2(self):
         # Test a url with SRCREV and tag= set works
-        self.d.setVar('SRCREV', 'aa0e540fc31a1c26839efd2c7785a751ce24ebfb')
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;tag=2.8.7"], self.d)
+        self.d.setVar('SRCREV', '5b4e20377eea8d428edf1aeb2187c18f82ca6757')
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;tag=2.12.0"], self.d)
         fetcher.download()
         fetcher.unpack(self.unpackdir)
 
     @skipIfNoNetwork()
     def test_tag_rev_match3(self):
         # Test a url with SRCREV, rev= and tag= set works
-        self.d.setVar('SRCREV', 'aa0e540fc31a1c26839efd2c7785a751ce24ebfb')
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=aa0e540fc31a1c26839efd2c7785a751ce24ebfb;tag=2.8.7"], self.d)
+        self.d.setVar('SRCREV', '5b4e20377eea8d428edf1aeb2187c18f82ca6757')
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=5b4e20377eea8d428edf1aeb2187c18f82ca6757;tag=2.12.0"], self.d)
         fetcher.download()
         fetcher.unpack(self.unpackdir)
 
@@ -3322,14 +3362,14 @@ class GitTagVerificationTests(FetcherTest):
         # Test a url with SRCREV and rev= mismatching errors
         self.d.setVar('SRCREV', 'bade540fc31a1c26839efd2c7785a751ce24ebfb')
         with self.assertRaises(bb.fetch2.FetchError):
-            fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=aa0e540fc31a1c26839efd2c7785a751ce24ebfb;tag=2.8.7"], self.d)
+            fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=5b4e20377eea8d428edf1aeb2187c18f82ca6757;tag=2.12.0"], self.d)
 
     @skipIfNoNetwork()
     def test_tag_rev_match5(self):
         # Test a url with SRCREV, rev= and tag= set works when using shallow clones
         self.d.setVar('BB_GIT_SHALLOW', '1')
-        self.d.setVar('SRCREV', 'aa0e540fc31a1c26839efd2c7785a751ce24ebfb')
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=aa0e540fc31a1c26839efd2c7785a751ce24ebfb;tag=2.8.7"], self.d)
+        self.d.setVar('SRCREV', '5b4e20377eea8d428edf1aeb2187c18f82ca6757')
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=5b4e20377eea8d428edf1aeb2187c18f82ca6757;tag=2.12.0"], self.d)
         fetcher.download()
         fetcher.unpack(self.unpackdir)
 
@@ -3337,7 +3377,7 @@ class GitTagVerificationTests(FetcherTest):
     def test_tag_rev_match6(self):
         # Test a url with SRCREV, rev= and a mismatched tag= when using shallow clones
         self.d.setVar('BB_GIT_SHALLOW', '1')
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=aa0e540fc31a1c26839efd2c7785a751ce24ebfb;tag=2.8.6"], self.d)
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=5b4e20377eea8d428edf1aeb2187c18f82ca6757;tag=2.8.0"], self.d)
         fetcher.download()
         with self.assertRaises(bb.fetch2.FetchError):
             fetcher.unpack(self.unpackdir)
@@ -3345,8 +3385,8 @@ class GitTagVerificationTests(FetcherTest):
     @skipIfNoNetwork()
     def test_tag_rev_match7(self):
         # Test a url with SRCREV, rev= and a mismatched tag=
-        self.d.setVar('SRCREV', 'aa0e540fc31a1c26839efd2c7785a751ce24ebfb')
-        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.8;protocol=https;rev=aa0e540fc31a1c26839efd2c7785a751ce24ebfb;tag=2.8.6"], self.d)
+        self.d.setVar('SRCREV', '5b4e20377eea8d428edf1aeb2187c18f82ca6757')
+        fetcher = bb.fetch.Fetch(["git://git.openembedded.org/bitbake;branch=2.12;protocol=https;rev=5b4e20377eea8d428edf1aeb2187c18f82ca6757;tag=2.8.0"], self.d)
         fetcher.download()
         with self.assertRaises(bb.fetch2.FetchError):
             fetcher.unpack(self.unpackdir)

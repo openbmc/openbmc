@@ -14,12 +14,12 @@ endif
 au BufNewFile,BufRead *.{bb,bbappend,bbclass}  setfiletype bitbake
 
 " .inc -- meanwhile included upstream
-if !has("patch-9.0.0055")
+if !has("patch-9.1.1732")
     au BufNewFile,BufRead *.inc                call s:BBIncDetect()
     def s:BBIncDetect()
-        l:lines = getline(1) .. getline(2) .. getline(3)
-        if l:lines =~# '\<\%(require\|inherit\)\>' || lines =~# '[A-Z][A-Za-z0-9_:${}]*\s\+\%(??\|[?:+]\)\?= '
-            set filetype bitbake
+        var lines = getline(1) .. getline(2) .. getline(3)
+        if lines =~# '\<\%(require\|inherit\)\>' || lines =~# '[A-Z][A-Za-z0-9_:${}/]*\s\+\%(??\|[?:+.]\)\?=.\? '
+            set filetype=bitbake
         endif
     enddef
 endif

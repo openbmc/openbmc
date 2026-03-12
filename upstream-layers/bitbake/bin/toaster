@@ -164,14 +164,20 @@ fi
 # in the local layers that currently make using an arbitrary
 # toasterconf.json difficult.
 
-. $OE_ROOT/.templateconf
-if [ -n "$TEMPLATECONF" ]; then
-    if [ ! -d "$TEMPLATECONF" ]; then
-        # Allow TEMPLATECONF=meta-xyz/conf as a shortcut
-        if [ -d "$OE_ROOT/$TEMPLATECONF" ]; then
-            TEMPLATECONF="$OE_ROOT/$TEMPLATECONF"
+# BBSETUP no longer supports .templateconf
+if [ -f $OE_ROOT/.templateconf ] ; then 
+    . $OE_ROOT/.templateconf
+    if [ -n "$TEMPLATECONF" ]; then
+        if [ ! -d "$TEMPLATECONF" ]; then
+            # Allow TEMPLATECONF=meta-xyz/conf as a shortcut
+            if [ -d "$OE_ROOT/$TEMPLATECONF" ]; then
+                TEMPLATECONF="$OE_ROOT/$TEMPLATECONF"
+            fi
         fi
     fi
+else
+    # Force poky
+    TEMPLATECONF="layers/meta-yocto/meta-poky/conf/templates/default"
 fi
 
 unset OE_ROOT
@@ -255,7 +261,8 @@ fi
 # 2) the build dir (in build)
 # 3) the sqlite db if that is being used.
 # 4) pid's we need to clean up on exit/shutdown
-export TOASTER_DIR=$TOASTERDIR
+# By default we move this all into the Toaster's parent build directory
+export TOASTER_DIR=$BUILDDIR
 export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS TOASTER_DIR"
 
 # Determine the action. If specified by arguments, fine, if not, toggle it

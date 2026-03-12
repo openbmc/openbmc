@@ -23,8 +23,9 @@ import queue
 import shlex
 import subprocess
 import fcntl
-from multiprocessing import Lock
 from threading import Thread
+
+Lock = bb.multiprocessing.Lock
 
 # Remove when we have a minimum of python 3.10
 if not hasattr(fcntl, 'F_SETPIPE_SZ'):

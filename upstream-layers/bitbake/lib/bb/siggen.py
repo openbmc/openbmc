@@ -1263,7 +1263,10 @@ def dump_sigfile(a):
     else:
         output.append("Unable to compute base hash")
 
-    computed_taskhash = calc_taskhash(a_data)
-    output.append("Computed task hash is %s" % computed_taskhash)
+    if 'runtaskdeps' in a_data:
+        computed_taskhash = calc_taskhash(a_data)
+        output.append("Computed task hash is %s" % computed_taskhash)
+    else:
+        output.append("Unable to compute task hash")
 
     return output

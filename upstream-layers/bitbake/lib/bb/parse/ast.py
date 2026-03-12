@@ -351,6 +351,9 @@ class AddFragmentsNode(AstNode):
         self.builtin_fragments_variable = builtin_fragments_variable
 
     def eval(self, data):
+        if data.getVar('_BB_SKIP_FRAGMENTS') == '1':
+            return
+
         # No need to use mark_dependency since we would only match a fragment
         # from a specific layer and there can only be a single layer with a
         # given namespace.
@@ -364,7 +367,22 @@ class AddFragmentsNode(AstNode):
         def check_and_set_builtin_fragment(fragment, data, builtin_fragments):
             prefix, value = fragment.split('/', 1)
             if prefix in builtin_fragments.keys():
-                data.setVar(builtin_fragments[prefix], value)
+                if data.getVar(builtin_fragments[prefix], noweakdefault=True) != None:
+                    bb.fatal(
+                        ("A builtin fragment '%s' is used while %s has already got an assignment.\n"
+                         "Please either disable the fragment or remove the value assignment.\n"
+                         "To disable the fragment, use 'bitbake-config-build disable-fragment %s'."
+                         ) % (fragment, builtin_fragments[prefix], fragment))
+                fragment_history = data.varhistory.variable(self.fragments_variable)
+                loginfo={}
+                for fh in fragment_history[::-1]:
+                    if fh['op'] in ("set", "append") and fragment in fh["detail"]:
+                        loginfo["file"]   = fh["file"]
+                        loginfo["line"]   = fh["line"]
+                        loginfo["detail"] = f"{value} ({self.fragments_variable} contains \"{fragment}\")"
+                        break
+                # parsing=True since we want to emulate X=Y and allow X:override=Z to continue to exist
+                data.setVar(builtin_fragments[prefix], value, parsing=True, **loginfo)
                 return True
             return False
 
@@ -375,6 +393,27 @@ class AddFragmentsNode(AstNode):
 
         if not fragments:
             return
+
+        # Check for multiple builtin fragments setting the same variable
+        for builtin_fragment_key in builtin_fragments.keys():
+            builtin_fragments_list = list(
+                filter(
+                    lambda f: f.startswith(builtin_fragment_key + "/"),
+                    fragments.split(),
+                )
+            )
+            if len(builtin_fragments_list) > 1:
+                bb.warn(
+                    ("Multiple builtin fragments are enabled for %s via variable %s: %s. "
+                     "This likely points to a mis-configuration in the metadata, as only "
+                     "one of them should be set. The build will use the last value.")
+                    % (
+                        builtin_fragment_key,
+                        self.fragments_variable,
+                        " ".join(builtin_fragments_list),
+                    )
+                )
+
         for f in fragments.split():
             if check_and_set_builtin_fragment(f, data, builtin_fragments):
                 continue
@@ -388,7 +427,7 @@ class AddFragmentsNode(AstNode):
                     data.setVarFlag(flagged_var, f, val)
                     data.setVar(flagged_var, None)
             else:
-                bb.error("Could not find fragment {} in enabled layers: {}".format(f, layers))
+                bb.fatal("Could not find fragment {} in enabled layers:\n\t{}".format(f, "\n\t".join(layers.split())))
 
 def handleInclude(statements, filename, lineno, m, force):
     statements.append(IncludeNode(filename, lineno, m.group(1), force))

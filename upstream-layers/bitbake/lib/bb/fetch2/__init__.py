@@ -877,6 +877,7 @@ FETCH_EXPORT_VARS = ['HOME', 'PATH',
                      'FTPS_PROXY', 'ftps_proxy',
                      'NO_PROXY', 'no_proxy',
                      'ALL_PROXY', 'all_proxy',
+                     'GIT_CONFIG_GLOBAL',
                      'GIT_PROXY_COMMAND',
                      'GIT_SSH',
                      'GIT_SSH_COMMAND',
@@ -1067,10 +1068,10 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
     # Return of None or a value means we're finished
     # False means try another url
 
-    if ud.lockfile and ud.lockfile != origud.lockfile:
-        lf = bb.utils.lockfile(ud.lockfile)
-
     try:
+        if ud.lockfile and ud.lockfile != origud.lockfile:
+            lf = bb.utils.lockfile(ud.lockfile)
+
         if check:
             found = ud.method.checkstatus(fetch, ud, ld)
             if found:
@@ -1864,10 +1865,10 @@ class Fetch(object):
             m = ud.method
             done = False
 
-            if ud.lockfile:
-                lf = bb.utils.lockfile(ud.lockfile)
-
             try:
+                if ud.lockfile:
+                    lf = bb.utils.lockfile(ud.lockfile)
+
                 self.d.setVar("BB_NO_NETWORK", network)
                 if m.verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
                     done = True
@@ -2000,18 +2001,20 @@ class Fetch(object):
         unpack_tracer.start(root, self.ud, self.d)
 
         for u in urls:
-            ud = self.ud[u]
-            ud.setup_localpath(self.d)
+            try:
+                ud = self.ud[u]
+                ud.setup_localpath(self.d)
 
-            if ud.lockfile:
-                lf = bb.utils.lockfile(ud.lockfile)
+                if ud.lockfile:
+                    lf = bb.utils.lockfile(ud.lockfile)
 
-            unpack_tracer.start_url(u)
-            ud.method.unpack(ud, root, self.d)
-            unpack_tracer.finish_url(u)
+                unpack_tracer.start_url(u)
+                ud.method.unpack(ud, root, self.d)
+                unpack_tracer.finish_url(u)
 
-            if ud.lockfile:
-                bb.utils.unlockfile(lf)
+            finally:
+                if ud.lockfile:
+                    bb.utils.unlockfile(lf)
 
         unpack_tracer.complete()
 
@@ -2024,23 +2027,25 @@ class Fetch(object):
             urls = self.urls
 
         for url in urls:
-            if url not in self.ud:
-                self.ud[url] = FetchData(url, self.d)
-            ud = self.ud[url]
-            ud.setup_localpath(self.d)
+            try:
+                if url not in self.ud:
+                    self.ud[url] = FetchData(url, self.d)
+                ud = self.ud[url]
+                ud.setup_localpath(self.d)
 
-            if not ud.localfile and ud.localpath is None:
-                continue
+                if not ud.localfile and ud.localpath is None:
+                    continue
 
-            if ud.lockfile:
-                lf = bb.utils.lockfile(ud.lockfile)
+                if ud.lockfile:
+                    lf = bb.utils.lockfile(ud.lockfile)
 
-            ud.method.clean(ud, self.d)
-            if ud.donestamp:
-                bb.utils.remove(ud.donestamp)
+                ud.method.clean(ud, self.d)
+                if ud.donestamp:
+                    bb.utils.remove(ud.donestamp)
 
-            if ud.lockfile:
-                bb.utils.unlockfile(lf)
+            finally:
+                if ud.lockfile:
+                    bb.utils.unlockfile(lf)
 
     def expanded_urldata(self, urls=None):
         """
@@ -2096,7 +2101,6 @@ class FetchConnectionCache(object):
             self.cache[cn].close()
             del self.cache[cn]
 
-from . import cvs
 from . import git
 from . import gitsm
 from . import gitannex
@@ -2107,9 +2111,7 @@ from . import ssh
 from . import sftp
 from . import s3
 from . import perforce
-from . import bzr
 from . import hg
-from . import osc
 from . import repo
 from . import clearcase
 from . import npm
@@ -2125,14 +2127,11 @@ methods.append(svn.Svn())
 methods.append(git.Git())
 methods.append(gitsm.GitSM())
 methods.append(gitannex.GitANNEX())
-methods.append(cvs.Cvs())
 methods.append(ssh.SSH())
 methods.append(sftp.SFTP())
 methods.append(s3.S3())
 methods.append(perforce.Perforce())
-methods.append(bzr.Bzr())
 methods.append(hg.Hg())
-methods.append(osc.Osc())
 methods.append(repo.Repo())
 methods.append(clearcase.ClearCase())
 methods.append(npm.Npm())

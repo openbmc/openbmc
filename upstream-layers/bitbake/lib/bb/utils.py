@@ -34,6 +34,7 @@ from contextlib import contextmanager
 from ctypes import cdll
 import bb
 import bb.msg
+import bb.filter
 
 logger = logging.getLogger("BitBake.Util")
 python_extensions = importlib.machinery.all_suffixes()
@@ -184,6 +185,7 @@ def vercmp_string_op(a, b, op):
     else:
         raise VersionStringException('Unsupported comparison operator "%s"' % op)
 
+@bb.filter.filter_proc(name="bb.utils.explode_deps")
 def explode_deps(s):
     """
     Takes an RDEPENDS style string of format::
@@ -2262,3 +2264,16 @@ def lock_timeout_nocheck(lock):
         if l:
             lock.release()
         sigmask(signal.SIG_SETMASK, s)
+
+def is_path_on_nfs(path):
+    """
+    Returns True if ``path`` argument is on a NFS mount.
+    """
+    # strip not existing path
+    if os.path.isabs(path):
+        while not os.path.exists(path):
+            path = os.path.dirname(path)
+
+    import bb.process
+    fstype = bb.process.run("stat -f -c %T {}".format(path))[0].strip()
+    return fstype == "nfs"

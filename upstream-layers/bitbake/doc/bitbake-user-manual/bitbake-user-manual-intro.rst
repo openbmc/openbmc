@@ -198,13 +198,42 @@ Class files, which are denoted by the ``.bbclass`` extension, contain
 information that is useful to share between metadata files. The BitBake
 source tree currently comes with one class metadata file called
 ``base.bbclass``. You can find this file in the ``classes`` directory.
-The ``base.bbclass`` class files is special since it is always included
+The ``base.bbclass`` class file is special since it is always included
 automatically for all recipes and classes. This class contains
 definitions for standard basic tasks such as fetching, unpacking,
 configuring (empty by default), compiling (runs any Makefile present),
 installing (empty by default) and packaging (empty by default). These
 tasks are often overridden or extended by other classes added during the
 project development process.
+
+Class Types
+~~~~~~~~~~~
+
+BitBake supports class files installed in three different directories:
+
+-  ``classes-global/``: these classes must be inherited globally through the
+   :term:`INHERIT` variable in a :ref:`configuration file
+   <bitbake-user-manual/bitbake-user-manual-intro:Configuration Files>`. These
+   classes are included for every recipe being built. For example, you would use
+   the global class named ``myclass`` like so::
+
+      INHERIT += "myclass"
+
+-  ``classes-recipe/``: these classes must be inherited from a recipe using the
+   :ref:`inherit <ref-bitbake-user-manual-metadata-inherit>` or
+   :ref:`inherit_defer <ref-bitbake-user-manual-metadata-inherit-defer>`
+   directive. They do not support being inherited globally. For example, you
+   would use the recipe class named ``myclass`` like so::
+
+      inherit myclass
+
+-  ``classes/``: this final directory is meant for classes that can be used in
+   the two contexts explained above. In other words, they can be inherited either
+   globally or in a recipe.
+
+For details on how BitBake locates class files, see the
+:ref:`bitbake-user-manual/bitbake-user-manual-metadata:Locating Class Files`
+section of the BitBake User Manual.
 
 Layers
 ------
@@ -242,12 +271,9 @@ same root filename. The filenames can differ only in the file type
 suffix used (e.g. ``formfactor_0.0.bb`` and
 ``formfactor_0.0.bbappend``).
 
-Information in append files extends or overrides the information in the
-underlying, similarly-named recipe files.
-
 When you name an append file, you can use the "``%``" wildcard character
-to allow for matching recipe names. For example, suppose you have an
-append file named as follows::
+to allow for a less strict recipe name matching. For example, suppose you have
+an append file named as follows::
 
   busybox_1.21.%.bbappend
 
@@ -258,12 +284,8 @@ the append file would match the following recipe names::
   busybox_1.21.1.bb
   busybox_1.21.2.bb
   busybox_1.21.3.bb
-
-.. note::
-
-   The use of the " % " character is limited in that it only works directly in
-   front of the .bbappend portion of the append file's name. You cannot use the
-   wildcard character in any other location of the name.
+  busybox_1.21.10.bb
+  busybox_1.21.11.bb
 
 If the ``busybox`` recipe was updated to ``busybox_1.3.0.bb``, the
 append name would not match. However, if you named the append file
@@ -271,6 +293,47 @@ append name would not match. However, if you named the append file
 
 In the most general case, you could name the append file something as
 simple as ``busybox_%.bbappend`` to be entirely version independent.
+
+A recipe named without a version may only be appended by an append file named
+exactly the same. That is, a recipe named::
+
+   mesa.bb
+
+can only be appended by an append file named::
+
+   mesa.bbappend
+
+That is, ``mesa_%.bbappend`` append file will not match a ``mesa.bb`` recipe.
+
+.. note::
+
+   The "``%``" character is a marker for BitBake, and everything after that
+   marker will not be used for matching recipe names. That is, an append file
+   named::
+
+      busybox_1.%.11.bbappend
+
+   will match recipes named::
+
+      busybox_1.0.11.bb
+      busybox_1.2.bb
+      busybox_1.3.48.bb
+
+   Note that the "``%``" character is not specific to the version part of the
+   recipe name. That is, an append file named::
+
+      linux-yocto%.bbappend
+
+   will match recipes named::
+
+      linux-yocto.bb
+      linux-yocto_6.18.bb
+      linux-yocto-tiny_6.12.bb
+      linux-yocto-rt_6.16.bb
+
+   While it can be useful to append to similar recipes with slightly different
+   names, it is highly discouraged to do so as recipes from other layers may be
+   named similarly enough that the append file would unwittingly match them.
 
 Obtaining BitBake
 =================
@@ -476,7 +539,7 @@ Following is the usage and syntax for BitBake::
                            make dependency graphs more appealing.
 
 ..
-    Bitbake help output generated with "stty columns 80; bin/bitbake -h"
+    BitBake help output generated with "stty columns 80; bin/bitbake -h"
 
 .. _bitbake-examples:
 
@@ -507,7 +570,7 @@ The following command runs the clean task on the ``foo.bb`` recipe file::
 
 .. note::
 
-   The "-b" option explicitly does not handle recipe dependencies. Other
+   The ``-b`` option explicitly does not handle recipe dependencies. Other
    than for debugging purposes, it is instead recommended that you use
    the syntax presented in the next section.
 
@@ -522,7 +585,7 @@ dependencies, both for build-time and runtime. There must be a way for
 you to express recipe preferences when multiple recipes provide the same
 functionality, or when there are multiple versions of a recipe.
 
-The ``bitbake`` command, when not using "--buildfile" or "-b" only
+The ``bitbake`` command, when not using ``--buildfile`` or ``-b`` only
 accepts a "PROVIDES". You cannot provide anything else. By default, a
 recipe file generally "PROVIDES" its "packagename" as shown in the
 following example::
@@ -530,7 +593,7 @@ following example::
   $ bitbake foo
 
 This next example "PROVIDES" the
-package name and also uses the "-c" option to tell BitBake to just
+package name and also uses the ``-c`` option to tell BitBake to just
 execute the ``do_clean`` task::
 
   $ bitbake -c clean foo

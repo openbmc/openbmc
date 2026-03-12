@@ -36,6 +36,14 @@ overview of their function and contents.
       when specified allows for the Git binary from the host to be used
       rather than building ``git-native``.
 
+   :term:`AUTOREV`
+      This is a special variable used during fetching. When :term:`SRCREV` is
+      set to the value of this variable, the latest revision from the version
+      controlled source code repository is used.
+      It should be set as follows::
+
+         SRCREV = "${AUTOREV}"
+
    :term:`AZ_SAS`
       Azure Storage Shared Access Signature, when using the
       :ref:`Azure Storage fetcher <bitbake-user-manual/bitbake-user-manual-fetching:fetchers>`
@@ -108,6 +116,10 @@ overview of their function and contents.
       Specifies if SSL certificates should be checked when fetching. The default
       value is ``1`` and certificates are not checked if the value is set to ``0``.
 
+   :term:`BB_CMDLINE`
+      :term:`BB_CMDLINE` is an internal variable and is read-only. It captures
+      the exact command line used for the current invocation of BitBake.
+
    :term:`BB_HASH_CODEPARSER_VALS`
       Specifies values for variables to use when populating the codeparser cache.
       This can be used selectively to set dummy values for variables to avoid
@@ -140,6 +152,25 @@ overview of their function and contents.
    :term:`BB_DEFAULT_UMASK`
       The default umask to apply to tasks if specified and no task specific
       umask flag is set.
+
+   :term:`BB_DEFER_BBCLASSES`
+      The classes listed in this variable have their :ref:`inherit
+      <ref-bitbake-user-manual-metadata-inherit>` calls automatically promoted
+      to deferred inherits. See :ref:`inherit_defer
+      <ref-bitbake-user-manual-metadata-inherit-defer>` for more information on
+      deferred inherits.
+
+      This means that if :term:`BB_DEFER_BBCLASSES` is set as follows::
+
+         BB_DEFER_BBCLASSES = "foo"
+
+      The following statement::
+
+         inherit foo
+
+      Will automatically be equal to calling::
+
+         inherit_defer foo
 
    :term:`BB_DISKMON_DIRS`
       Monitors disk space and available inodes during the build and allows
@@ -255,8 +286,8 @@ overview of their function and contents.
       Specifies the internal list of variables to allow through from
       the external environment into BitBake's datastore. If the value of
       this variable is not specified (which is the default), the following
-      list is used: :term:`BBPATH`, :term:`BB_PRESERVE_ENV`,
-      :term:`BB_ENV_PASSTHROUGH`, and :term:`BB_ENV_PASSTHROUGH_ADDITIONS`.
+      list is used: :term:`BBPATH`, :term:`BB_PRESERVE_ENV`, and
+      :term:`BB_ENV_PASSTHROUGH_ADDITIONS`.
 
       .. note::
 
@@ -311,9 +342,9 @@ overview of their function and contents.
       For example usage, see :term:`BB_GIT_SHALLOW`.
 
    :term:`BB_GIT_DEFAULT_DESTSUFFIX`
-      The default destination directory where the Git fetcher unpacks the
-      source code. If this variable is not set, the source code is unpacked in a
-      directory named "git".
+      The default destination directory where the :ref:`Git fetcher
+      <git-fetcher>` unpacks the source code. If this variable is not set, the
+      source code is unpacked in a directory named "git".
 
    :term:`BB_GIT_SHALLOW`
       Setting this variable to "1" enables the support for fetching, using and
@@ -372,6 +403,23 @@ overview of their function and contents.
 
       For example usage, see :term:`BB_GIT_SHALLOW`.
 
+   :term:`BB_GIT_SHALLOW_EXTRA_REFS`
+      With :term:`BB_GIT_SHALLOW` enabled, by default, all unused refs (branches
+      and tags) are removed from the repository, as shallow processing scales
+      with the number of refs it has to process.
+
+      :term:`BB_GIT_SHALLOW_EXTRA_REFS` allows to explicitly specify additional
+      refs to keep. This is particularly useful for recipes with custom checkout
+      processes, or whose Git-based versioning requires a tag be available (i.e.
+      for ``git describe --tags``). The :term:`BB_GIT_SHALLOW_EXTRA_REFS`
+      variable is a space-separated list of refs, fully specified, and supports
+      wildcards.
+
+      Example usage::
+
+         BB_GIT_SHALLOW_EXTRA_REFS = "refs/tags/v1.0"
+         BB_GIT_SHALLOW_EXTRA_REFS += "refs/heads/*"
+
    :term:`BB_GLOBAL_PYMODULES`
       Specifies the list of Python modules to place in the global namespace.
       It is intended that only the core layer should set this and it is meant
@@ -426,6 +474,29 @@ overview of their function and contents.
       to start the server in read-only mode, to avoid accepting
       equivalences that correspond to Share State caches that are
       only available on specific clients.
+
+   :term:`BB_HASHSERVE_DB_DIR`
+      When :term:`BB_HASHSERVE` is set to ``auto``, bitbake will use
+      a private location inside a particular build directory for the sqlite
+      database file that holds hash equivalency data.
+
+      This variable allows using a different path, which can be shared
+      between multiple build directories and bitbake instances
+      that operate on them. This enables using a common ``${SSTATE_DIR}``
+      together with common hash equivalency data for local builds, without having to
+      separately manage a hash equivalency server.
+
+      .. note::
+
+         This variable cannot be set to a NFS mount and bitbake will error out then.
+         The reason is that NFS implementations can have file locking issues, which
+         can cause data loss and corruption when there are multiple writers operating
+         on a file at the same time as explained in https://sqlite.org/faq.html#q5
+
+         If you'd like to share hash equivalency data between multiple computers, you
+         need to set up a hash equivalency server separately and point :term:`BB_HASHSERVE`
+         to it. See https://docs.yoctoproject.org/dev-manual/hashequivserver.html for
+         additional information.
 
    :term:`BB_HASHSERVE_UPSTREAM`
       Specifies an upstream Hash Equivalence server.
@@ -547,19 +618,23 @@ overview of their function and contents.
          BB_PRESSURE_MAX_CPU = "15000"
 
       Multiple values should be tested on the build host to determine what suits
-      best, depending on the need for performances versus load average during
+      best, depending on the need for performance versus load average during
       the build.
 
       .. note::
 
-         You may see numerous messages printed by BitBake in the case the
-         :term:`BB_PRESSURE_MAX_CPU` is too low:
+         You can track the pressure information while a build is running with:
 
-            Pressure status changed to CPU: True, IO: False, Mem: False (CPU: 1105.9/2.0, IO: 0.0/2.0, Mem: 0.0/2.0) - using 1/64 bitbake threads
+         .. code-block:: console
 
-         This means that the :term:`BB_PRESSURE_MAX_CPU` should be increased to
-         a reasonable value for limiting the CPU pressure on the system.
-         Monitor the varying value after ``IO:`` above to set a sensible value.
+            $ tail -F tmp/log/cooker/<machine>/console-latest.log | grep "Pressure status changed"
+            NOTE: Pressure status changed to CPU: True, IO: False, Mem: False (CPU: 1105.9/2.0, IO: 0.0/2.0, Mem: 0.0/2.0) - using 1/64 bitbake threads
+            ...
+
+         If these messages are printed a lot, it means that the :term:`BB_PRESSURE_MAX_CPU`
+         should be increased to a reasonable value for limiting the CPU pressure
+         on the system. Monitor the varying value after ``CPU:`` above to set a
+         sensible value.
 
    :term:`BB_PRESSURE_MAX_IO`
       Specifies a maximum I/O pressure threshold, above which BitBake's
@@ -584,19 +659,23 @@ overview of their function and contents.
          BB_PRESSURE_MAX_IO = "15000"
 
       Multiple values should be tested on the build host to determine what suits
-      best, depending on the need for performances versus I/O usage during the
+      best, depending on the need for performance versus I/O usage during the
       build.
 
       .. note::
 
-         You may see numerous messages printed by BitBake in the case the
-         :term:`BB_PRESSURE_MAX_IO` is too low::
+         You can track the pressure information while a build is running with:
 
-            Pressure status changed to CPU: None, IO: True, Mem: False (CPU: 2236.0/None, IO: 153.6/2.0, Mem: 0.0/2.0) - using 19/64 bitbake threads
+         .. code-block:: console
 
-         This means that the :term:`BB_PRESSURE_MAX_IO` should be increased to
-         a reasonable value for limiting the I/O pressure on the system.
-         Monitor the varying value after ``IO:`` above to set a sensible value.
+            $ tail -F tmp/log/cooker/<machine>/console-latest.log | grep "Pressure status changed"
+            NOTE: Pressure status changed to CPU: None, IO: True, Mem: False (CPU: 2236.0/None, IO: 153.6/2.0, Mem: 0.0/2.0) - using 19/64 bitbake threads
+            ...
+
+         If these messages are printed a lot, it means that the :term:`BB_PRESSURE_MAX_IO` 
+         should be increased to a reasonable value for limiting the I/O pressure
+         on the system. Monitor the varying value after ``IO:`` above to set a
+         sensible value.
 
    :term:`BB_PRESSURE_MAX_MEMORY`
       Specifies a maximum memory pressure threshold, above which BitBake's
@@ -623,19 +702,23 @@ overview of their function and contents.
          BB_PRESSURE_MAX_MEMORY = "15000"
 
       Multiple values should be tested on the build host to determine what suits
-      best, depending on the need for performances versus memory consumption
+      best, depending on the need for performance versus memory consumption
       during the build.
 
       .. note::
 
-         You may see numerous messages printed by BitBake in the case the
-         :term:`BB_PRESSURE_MAX_MEMORY` is too low::
+         You can track the pressure information while a build is running with:
 
-            Pressure status changed to CPU: None, IO: False, Mem: True (CPU: 29.5/None, IO: 0.0/2.0, Mem: 2553.3/2.0) - using 17/64 bitbake threads
+         .. code-block:: console
 
-         This means that the :term:`BB_PRESSURE_MAX_MEMORY` should be increased to
-         a reasonable value for limiting the memory pressure on the system.
-         Monitor the varying value after ``Mem:`` above to set a sensible value.
+            $ tail -F tmp/log/cooker/<machine>/console-latest.log | grep "Pressure status changed"
+            NOTE: Pressure status changed to CPU: None, IO: False, Mem: True (CPU: 29.5/None, IO: 0.0/2.0, Mem: 2553.3/2.0) - using 17/64 bitbake threads
+            ...
+
+         If these messages are printed a lot, it means that the :term:`BB_PRESSURE_MAX_MEMORY`
+         should be increased to a reasonable value for limiting the memory
+         pressure on the system. Monitor the varying value after ``Mem:`` above
+         to set a sensible value.
 
    :term:`BB_RUNFMT`
       Specifies the name of the executable script files (i.e. run files)
@@ -751,11 +834,11 @@ overview of their function and contents.
       .. note::
 
          In order for your I/O priority settings to take effect, you need the
-         Completely Fair Queuing (CFQ) Scheduler selected for the backing block
+         Budget Fair Queuing (BFQ) Scheduler selected for the backing block
          device. To select the scheduler, use the following command form where
          device is the device (e.g. sda, sdb, and so forth)::
 
-            $ sudo sh -c "echo cfq > /sys/block/device/queu/scheduler"
+            $ sudo sh -c "echo bfq > /sys/block/device/queue/scheduler"
 
    :term:`BB_TASK_NICE_LEVEL`
       Allows specific tasks to change their priority (i.e. nice level).
@@ -965,28 +1048,101 @@ overview of their function and contents.
       compiler. Consequently, the syntax follows Python's Regular
       Expression (re) syntax. The expressions are compared against the full
       paths to the files. For complete syntax information, see Python's
-      documentation at http://docs.python.org/3/library/re.html.
+      documentation at https://docs.python.org/3/library/re.html.
 
       The following example uses a complete regular expression to tell
-      BitBake to ignore all recipe and recipe append files in the
-      ``meta-ti/recipes-misc/`` directory::
+      BitBake to ignore all recipe and recipe append files in
+      ``recipes-bsp`` directory (recursively) of ``meta-ti-bsp``::
 
-         BBMASK = "meta-ti/recipes-misc/"
+         BBMASK = "${BBFILE_PATTERN_meta-ti-bsp}/recipes-bsp/"
 
       If you want to mask out multiple directories or recipes, you can
       specify multiple regular expression fragments. This next example
       masks out multiple directories and individual recipes::
 
-         BBMASK += "/meta-ti/recipes-misc/ meta-ti/recipes-ti/packagegroup/"
-         BBMASK += "/meta-oe/recipes-support/"
-         BBMASK += "/meta-foo/.*/openldap"
-         BBMASK += "opencv.*\.bbappend"
-         BBMASK += "lzma"
+         BBMASK += "${BBFILE_PATTERN_meta-ti-bsp}/recipes-graphics/libgal/"
+         BBMASK += "${BBFILE_PATTERN_openembedded-layer}/recipes-support/"
+         BBMASK += "${BBFILE_PATTERN_openembedded-layer}/.*/openldap"
+         BBMASK += "${BBFILE_PATTERN_meta-ti-bsp}/.*/optee.*\.bbappend"
+
+      This masks:
+
+      - everything under the ``recipes-graphics/libgal/`` directory from
+        ``meta-ti-bsp``,
+      - everything under the ``recipes-support/`` directory in ``meta-oe``,
+      - everything under a directory whose name starts with ``openldap``, and
+        every file with the same naming scheme, in ``meta-oe`` at any directory
+        depth > 1 (e.g. in ``meta-oe``, ``recipes-foo/openldap-stuff/`` or
+        ``recipes-bar/baz/openldap_0.1.bb`` but not ``openldap/``),
+      - every append file whose name starts with ``optee`` in ``meta-ti-bsp`` at
+        any directory depth > 1 (e.g. ``optee/optee-examples_%.bbappend`` and
+        ``recipes-security/optee/optee-client_%.bbappend``).
 
       .. note::
 
-         When specifying a directory name, use the trailing slash character
-         to ensure you match just that directory name.
+         Because these are complete regular expressions, if you want to match a
+         directory and not a file, you must end the expression with a trailing
+         slash. That is::
+
+            BBMASK += "${BBFILE_PATTERN_meta-ti-bsp}/recipes-graphics/libgal/"
+
+         Will match anything under ``recipes-graphics/ligbal/`` directory of
+         ``meta-ti-bsp``. And::
+
+            BBMASK += "${BBFILE_PATTERN_meta-ti-bsp}/recipes-graphics/libgal"
+
+         Will match in ``meta-ti-bsp`` any file prefixed with ``libgal`` in
+         ``recipes-graphics/`` and any directory (recursively; and its
+         recipes and recipe append files regardless how they are named) prefixed
+         with ``libgal`` in ``recipes-graphics/``. That is, provided your layers
+         are available at ``/bitbake-builds/poky-master/layers/``, it'll match::
+
+            /bitbake-builds/poky-master/layers/meta-ti/meta-ti-bsp/recipes-graphics/libgal.bb
+            /bitbake-builds/poky-master/layers/meta-ti/meta-ti-bsp/recipes-graphics/libgal_%.bbappend
+            /bitbake-builds/poky-master/layers/meta-ti/meta-ti-bsp/recipes-graphics/libgal-foo/foo.bb
+            /bitbake-builds/poky-master/layers/meta-ti/meta-ti-bsp/recipes-graphics/libgal-foo/foo/bz.bbappend
+            /bitbake-builds/poky-master/layers/meta-ti/meta-ti-bsp/recipes-graphics/libgal/bar.bb
+
+      .. note::
+
+         Because these are complete regular expressions, failing to start the
+         pattern with a ``^`` sign (which is usually the first character in
+         :term:`BBFILE_PATTERN`) means it can match *any* portion of a path.
+         Take the following as an example::
+
+            BBMASK = "recipes-graphics/libgal/"
+
+         This will match subdirectories and files in any path containing
+         ``recipes-graphics/libgal/``, meaning (considering your layers are
+         available at ``/bitbake-builds/poky-master/layers/``)::
+
+            /bitbake-builds/poky-master/layers/meta-ti/meta-ti-bsp/recipes-graphics/libgal/
+            /bitbake-builds/poky-master/layers/my-layer/foo-recipes-graphics/libgal/
+
+         will be both matched. This may be a more relaxed way of matching
+         directories, recipes and recipe append files from any third party layer
+         but is generally discouraged as it may be casting too wide of a net.
+
+      .. note::
+
+         Because these are complete regular expressions, a leading slash does
+         not mean the path is absolute. It simply forces the directory to be
+         named exactly that. Take::
+
+            BBMASK = "recipes-graphics/libgal/"
+
+         If you happen to have a directory ``foo-recipes-graphics/libgal/``, it
+         will be matched.
+
+         Leading with a slash::
+
+            BBMASK = "/recipes-graphics/libgal/"
+
+         makes sure that doesn't happen. However, this doesn't prevent matching
+         a directory ``recipes-graphics/libgal/`` from another layer.
+
+         Again, we highly recommend using :term:`BBFILE_PATTERN` in the
+         expressions to specify absolute paths specific to one layer.
 
    :term:`BBMULTICONFIG`
       Enables BitBake to perform multiple configuration builds and lists
@@ -1044,17 +1200,9 @@ overview of their function and contents.
       A name assigned to the build. The name defaults to a datetime stamp
       of when the build was started but can be defined by the metadata.
 
-   :term:`BZRDIR`
-      The directory in which files checked out of a Bazaar system are
-      stored.
-
    :term:`CACHE`
       Specifies the directory BitBake uses to store a cache of the metadata
       so it does not need to be parsed every time BitBake is started.
-
-   :term:`CVSDIR`
-      The directory in which files checked out under the CVS system are
-      stored.
 
    :term:`DEFAULT_PREFERENCE`
       Specifies a weak bias for recipe selection priority.
@@ -1181,9 +1329,17 @@ overview of their function and contents.
 
    :term:`INHERIT`
       Causes the named class or classes to be inherited globally. Anonymous
-      functions in the class or classes are not executed for the base
-      configuration and in each individual recipe. The OpenEmbedded build
-      system ignores changes to :term:`INHERIT` in individual recipes.
+      functions in the class or classes are executed in two disjoint situations:
+
+      -  When only the
+         :ref:`base configuration <bitbake-user-manual/bitbake-user-manual-execution:parsing the base configuration metadata>`
+         is parsed. For example as a result of the following BitBake invocation::
+
+            $ bitbake -e
+
+      -  When recipes are parsed - then for each parsed recipe.
+
+      BitBake ignores changes to :term:`INHERIT` in individual recipes.
 
       For more information on :term:`INHERIT`, see the
       ":ref:`bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` configuration directive`"
@@ -1294,8 +1450,13 @@ overview of their function and contents.
    :term:`PERSISTENT_DIR`
       Specifies the directory BitBake uses to store data that should be
       preserved between builds. In particular, the data stored is the data
-      that uses BitBake's persistent data API and the data used by the PR
-      Server and PR Service.
+      that uses BitBake's persistent data API, the data used by the PR
+      Server and PR Service, and the default location of the Hash Equivalence
+      database (when :term:`BB_HASHSERVE` is set to ``auto``).
+
+      This directory should not be shared between different builds. If you need
+      to share the Hash Equivalence database, you should setup a Hash
+      Equivalence server instead.
 
    :term:`PF`
       Specifies the recipe or package name and includes all version and
@@ -1541,13 +1702,7 @@ overview of their function and contents.
 
       -  ``az://``: Fetches files from an Azure Storage account using HTTPS.
 
-      -  ``bzr://``: Fetches files from a Bazaar revision control
-         repository.
-
       -  ``ccrc://``: Fetches files from a ClearCase repository.
-
-      -  ``cvs://``: Fetches files from a CVS revision control
-         repository.
 
       -  ``file://``: Fetches files, which are usually files shipped
          with the Metadata, from the local machine.
@@ -1583,9 +1738,6 @@ overview of their function and contents.
 
       -  ``npm://``: Fetches JavaScript modules from a registry.
 
-      -  ``osc://``: Fetches files from an OSC (OpenSUSE Build service)
-         revision control repository.
-
       -  ``p4://``: Fetches files from a Perforce (``p4``) revision
          control repository.
 
@@ -1603,7 +1755,8 @@ overview of their function and contents.
 
       -  ``name``: Specifies a name to be used for association with
          :term:`SRC_URI` checksums or :term:`SRCREV` when you have more than one
-         file or git repository specified in :term:`SRC_URI`. For example::
+         file or source control repository specified in :term:`SRC_URI`.
+         For example::
 
             SRC_URI = "git://example.com/foo.git;branch=main;name=first \
                        git://example.com/bar.git;branch=main;name=second \
@@ -1616,7 +1769,8 @@ overview of their function and contents.
       -  ``subdir``: Places the file (or extracts its contents) into the
          specified subdirectory. This option is useful for unusual tarballs
          or other archives that do not have their files already in a
-         subdirectory within the archive.
+         subdirectory within the archive. This path can be further modified
+         by fetcher specific parameters.
 
       -  ``subpath``: Limits the checkout to a specific subpath of the
          tree when using the Git fetcher is used.
@@ -1631,18 +1785,18 @@ overview of their function and contents.
 
    :term:`SRCREV`
       The revision of the source code used to build the package. This
-      variable applies only when using Subversion, Git, Mercurial and
-      Bazaar. If you want to build a fixed revision and you want to avoid
+      variable applies only when using Subversion, Git and Mercurial.
+      If you want to build a fixed revision and you want to avoid
       performing a query on the remote repository every time BitBake parses
       your recipe, you should specify a :term:`SRCREV` that is a full revision
       identifier and not just a tag.
 
    :term:`SRCREV_FORMAT`
-      Helps construct valid :term:`SRCREV` values when
+      Helps construct a valid package version string when
       multiple source controlled URLs are used in
       :term:`SRC_URI`.
 
-      The system needs help constructing these values under these
+      The system needs help constructing this value under these
       circumstances. Each component in the :term:`SRC_URI` is assigned a name
       and these are referenced in the :term:`SRCREV_FORMAT` variable. Consider
       an example with URLs named "machine" and "meta". In this case,
@@ -1650,6 +1804,12 @@ overview of their function and contents.
       would have the SCM versions substituted into each position. Only one
       ``AUTOINC`` placeholder is added and if needed. And, this placeholder
       is placed at the start of the returned string.
+
+      The :term:`SRCREV_FORMAT` can also take the form "_component2".
+      This assumes that there is a component in the :term:`SRC_URI` that does not
+      have a name assigned. While this is not considered good practice, it can be
+      usefull if a ``.bbappend`` file needs to extend the :term:`SRC_URI` with
+      an additional repository.
 
    :term:`STAMP`
       Specifies the base path used to create recipe stamp files. The path

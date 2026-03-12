@@ -64,11 +64,11 @@ data itself is of various types:
    together.
 
 The ``layer.conf`` files are used to construct key variables such as
-:term:`BBPATH` and :term:`BBFILES`.
-:term:`BBPATH` is used to search for configuration and class files under the
-``conf`` and ``classes`` directories, respectively. :term:`BBFILES` is used
-to locate both recipe and recipe append files (``.bb`` and
-``.bbappend``). If there is no ``bblayers.conf`` file, it is assumed the
+:term:`BBPATH` and :term:`BBFILES`. :term:`BBPATH` is used to search for
+configuration files under the ``conf`` directory and class files under the
+``classes-global``, ``classes-recipe`` and ``classes`` directories.
+:term:`BBFILES` is used to locate both recipe and recipe append files (``.bb``
+and ``.bbappend``). If there is no ``bblayers.conf`` file, it is assumed the
 user has set the :term:`BBPATH` and :term:`BBFILES` directly in the environment.
 
 Next, the ``bitbake.conf`` file is located using the :term:`BBPATH` variable
@@ -337,21 +337,22 @@ file that BitBake parses, you can change that preference::
 
 .. note::
 
-   It is common for a recipe to provide two versions -- a stable,
-   numbered (and preferred) version, and a version that is automatically
-   checked out from a source code repository that is considered more
-   "bleeding edge" but can be selected only explicitly.
+   It is not uncommon for a given recipe to provide more than one
+   version -- a stable (and preferred) version that should be selected
+   by default, and a newer, development or "bleeding edge" version that
+   will be selected only explicitly by the developer.
 
-   For example, in the OpenEmbedded codebase, there is a standard,
-   versioned recipe file for BusyBox, ``busybox_1.22.1.bb``, but there
-   is also a Git-based version, ``busybox_git.bb``, which explicitly
-   contains the line ::
+   For example, at the moment, in the OpenEmbedded codebase, there are
+   two versions of the ``nginx`` webserver: a stable "1.28.0" version
+   that would be selected by default, and a newer "1.29.1" development
+   version that a developer would need to choose explicitly.
 
-     DEFAULT_PREFERENCE = "-1"
+   This can be seen based on this snippet from the ``nginx`` 1.29.1
+   recipe file::
 
-   to ensure that the
-   numbered, stable version is always preferred unless the developer
-   selects otherwise.
+      # 1.28.x branch is the current stable branch, the recommended default
+      # 1.29.x is the current mainline branches containing all new features
+      DEFAULT_PREFERENCE = "-1"
 
 .. _bb-bitbake-dependencies:
 

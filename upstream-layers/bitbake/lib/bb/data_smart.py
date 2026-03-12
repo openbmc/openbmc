@@ -24,6 +24,7 @@ from collections.abc import MutableMapping
 import logging
 import hashlib
 import bb, bb.codeparser
+import bb.filter
 from bb   import utils
 from bb.COW  import COWDictBase
 
@@ -427,6 +428,7 @@ class DataSmart(MutableMapping):
 
         self.inchistory = IncludeHistory()
         self.varhistory = VariableHistory(self)
+        self.filters = {}
         self._tracking = False
         self._var_renames = {}
         self._var_renames.update(bitbake_renamed_vars)
@@ -678,6 +680,7 @@ class DataSmart(MutableMapping):
 
         srcflags = self.getVarFlags(key, False, True) or {}
         for i in srcflags:
+
             if i not in (__setvar_keyword__):
                 continue
             src = srcflags[i]
@@ -778,10 +781,10 @@ class DataSmart(MutableMapping):
                 return None
             cachename = var + "[" + flag + "]"
 
-        if not expand and retparser and cachename in self.expand_cache:
+        if not expand and retparser and cachename in self.expand_cache and not noweakdefault:
             return self.expand_cache[cachename].unexpanded_value, self.expand_cache[cachename]
 
-        if expand and cachename in self.expand_cache:
+        if expand and cachename in self.expand_cache and not noweakdefault:
             return self.expand_cache[cachename].value
 
         local_var = self._findVar(var)
@@ -895,7 +898,13 @@ class DataSmart(MutableMapping):
                 if expand:
                     value = parser.value
 
-        if parser:
+        if value and expand and flag == "_content":
+            basevar = var.split(":")[0]
+            if basevar in self.filters:
+                value = bb.filter.apply_filters(value, [self.filters[basevar],])
+                parser.value = value
+
+        if parser and not noweakdefault:
             self.expand_cache[cachename] = parser
 
         if retparser:
@@ -1000,6 +1009,7 @@ class DataSmart(MutableMapping):
         data.varhistory = self.varhistory.copy()
         data.varhistory.dataroot = data
         data.inchistory = self.inchistory.copy()
+        data.filters = self.filters.copy()
 
         data._tracking = self._tracking
         data._var_renames = self._var_renames
@@ -1027,6 +1037,15 @@ class DataSmart(MutableMapping):
             referrervalue = self.getVar(key, False)
             if referrervalue and isinstance(referrervalue, str) and ref in referrervalue:
                 self.setVar(key, referrervalue.replace(ref, value))
+
+    def setVarFilter(self, var, filter):
+        if filter:
+            self.filters[var] = filter
+        else:
+            try:
+                del self.filters[var]
+            except KeyError:
+                pass
 
     def localkeys(self):
         for key in self.dict:

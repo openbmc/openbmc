@@ -32,7 +32,7 @@ verbose = False
 # It is also policy to include all active LTS releases.
 #
 
-# [Codename, Yocto Project Version, Release Date, Current Version, Support Level, Poky Version, BitBake branch]
+# [0=Codename, 1=Yocto Project Version, 2=Release Date, 3=Current Version, 4=Support Level, 5=Poky Version, 6=BitBake branch]
 current_releases = [
     # Release slot #1
     ['Scarthgap','5.0','April 2024','5.0.0 (April 2024)','Long Term Support (until April 2028)','','2.8'],
@@ -81,9 +81,9 @@ prolog_template = '''\
 bitbakeversion_poky_template = '''\
   <object model="orm.bitbakeversion" pk="{{bitbake_id}}">
     <field type="CharField" name="name">{{name}}</field>
-    <field type="CharField" name="giturl">git://git.yoctoproject.org/poky</field>
+    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">{{branch}}</field>
-    <field type="CharField" name="dirpath">bitbake</field>
+    <field type="CharField" name="dirpath"></field>
   </object>
 '''
 bitbakeversion_oecore_template = '''\
@@ -224,7 +224,7 @@ def generate_poky():
             params['release'] = params['release'][0].lower() + params['release'][1:]
         params['name'] = params['release']
         params['bitbake_id'] = str(i+1)
-        params['branch'] = params['release']
+        params['branch'] = release[6]   # Bitbake branch
         print_template(bitbakeversion_poky_template,params,fd)
     print_str('',fd)
 

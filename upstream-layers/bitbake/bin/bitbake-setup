@@ -1,0 +1,1202 @@
+#!/usr/bin/env python3
+
+#
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+import logging
+import os
+import sys
+import argparse
+import json
+import shutil
+import time
+import configparser
+import datetime
+import glob
+import subprocess
+import copy
+import textwrap
+import signal
+import functools
+import string
+
+bindir = os.path.abspath(os.path.dirname(__file__))
+sys.path[0:0] = [os.path.join(os.path.dirname(bindir), 'lib')]
+
+import bb.msg
+import bb.process
+
+logger = bb.msg.logger_create('bitbake-setup', sys.stdout)
+
+# These settings can only be set in the global context
+GLOBAL_ONLY_SETTINGS = (
+    "top-dir-prefix",
+    "top-dir-name",
+)
+
+def color_enabled() -> bool:
+    """
+    Our logger has a BBLogFormatter formatter which holds whether color is
+    enabled or not. Return this value.
+    """
+    return logger.handlers[0].formatter.color_enabled
+
+def get_diff_color_param() -> str:
+    return "--color=always" if color_enabled() else "--color=never"
+
+def print_configs(prompt: str, choices: list[str], descriptions: list[str] = []):
+    """
+    Helper function to print a list of choices and align the output.
+    Each option name is made bold to stand out, unless color is not enabled in
+    our logger.
+    """
+    if not prompt.endswith(':'):
+        prompt += ":"
+    logger.plain(prompt)
+
+    if not descriptions:
+        descriptions = ["" for _ in choices]
+
+    # maximum size of all choices, for alignment
+    cmax = max([len(c) for c in choices]) + 1
+
+    for n, c in enumerate(choices):
+        msg = f"{n + 1}. "
+        if color_enabled():
+            # make it bold
+            msg += "\033[1m"
+        msg += f"{c:<{cmax}}"
+        if color_enabled():
+            msg += "\033[0m"
+        msg += f" {descriptions[n]}"
+        logger.plain(msg)
+
+# If bitbake is from a release tarball or somewhere like pypi where
+# updates may not be straightforward, prefer to use the git repo as the
+# default registry
+def get_default_registry():
+    internal_registry = os.path.normpath(os.path.dirname(__file__) + "/../default-registry")
+    git_registry = "git://git.openembedded.org/bitbake;protocol=https;branch=master;rev=master"
+    if os.path.exists(os.path.dirname(__file__) + "/../.git"):
+        return internal_registry
+    else:
+        return git_registry
+
+def cache_dir(top_dir):
+    return os.path.join(top_dir, '.bitbake-setup-cache')
+
+def init_bb_cache(top_dir, settings, args):
+    dldir = settings["default"]["dl-dir"]
+    bb_cachedir = os.path.join(cache_dir(top_dir), 'bitbake-cache')
+    os.makedirs(bb_cachedir, exist_ok=True)
+
+    d = bb.data.init()
+    d.setVar("DL_DIR", dldir)
+    d.setVar("BB_CACHEDIR", bb_cachedir)
+    d.setVar("__BBSRCREV_SEEN", "1")
+    if args.no_network:
+        d.setVar("BB_SRCREV_POLICY", "cache")
+    bb.fetch.fetcher_init(d)
+    return d
+
+def save_bb_cache():
+    bb.fetch2.fetcher_parse_save()
+    bb.fetch2.fetcher_parse_done()
+
+def get_config_name(config):
+    suffix = '.conf.json'
+    config_file = os.path.basename(config)
+    if config_file.endswith(suffix):
+        return config_file[:-len(suffix)]
+    else:
+        raise Exception("Config file {} does not end with {}, please rename the file.".format(config, suffix))
+
+def write_upstream_config(config_dir, config_data):
+    with open(os.path.join(config_dir, "config-upstream.json"),'w') as s:
+        json.dump(config_data, s, sort_keys=True, indent=4)
+
+def write_sources_fixed_revisions(config_dir, layer_dir, config_data):
+    json_path = os.path.join(config_dir, "sources-fixed-revisions.json")
+    json_link = os.path.join(layer_dir, "sources-fixed-revisions.json")
+    sources = {}
+    sources['sources'] = config_data
+    with open(os.path.join(config_dir, "sources-fixed-revisions.json"),'w') as s:
+        json.dump(sources, s, sort_keys=True, indent=4)
+    if not os.path.lexists(json_link):
+        os.symlink(os.path.relpath(json_path ,layer_dir), json_link)
+
+def commit_config(config_dir):
+    bb.process.run("git -C {} add .".format(config_dir))
+    bb.process.run("git -C {} commit --allow-empty --no-verify -a -m 'Configuration at {}'".format(config_dir, time.asctime()))
+
+def _write_layer_list(dest, repodirs):
+    layers = []
+    for r in repodirs:
+        for root, dirs, files in os.walk(os.path.join(dest,r)):
+            if os.path.basename(root) == 'conf' and 'layer.conf' in files:
+                layers.append(os.path.relpath(os.path.dirname(root), dest))
+    layers_f = os.path.join(dest, ".oe-layers.json")
+    with open(layers_f, 'w') as f:
+        json.dump({"version":"1.0","layers":layers}, f, sort_keys=True, indent=4)
+
+def add_unique_timestamp_to_path(path):
+    timestamp = time.strftime("%Y%m%d%H%M%S")
+    path_unique = "{}.{}".format(path, timestamp)
+    if os.path.exists(path_unique):
+        import itertools
+        for i in itertools.count(start=1):
+            path_unique = "{}.{}.{}".format(path, timestamp, i)
+            if not os.path.exists(path_unique):
+                break
+    return path_unique
+
+def _get_remotes(r_remote):
+    remotes = []
+
+    if not 'remotes' in r_remote and not 'uri' in r_remote:
+        raise Exception("Expected key(s): 'remotes', 'uri'")
+
+    if 'remotes' in r_remote:
+        for remote in r_remote['remotes']:
+            remotes.append(r_remote['remotes'][remote]['uri'])
+
+    if 'uri' in r_remote:
+        remotes.append(r_remote['uri'])
+
+    return remotes
+
+def checkout_layers(layers, confdir, layerdir, d):
+    def _checkout_git_remote(r_remote, repodir, layers_fixed_revisions):
+        rev = r_remote['rev']
+        branch = r_remote.get('branch', None)
+
+        remotes = _get_remotes(r_remote)
+
+        for remote in remotes:
+            prot,host,path,user,pswd,params = bb.fetch.decodeurl(remote)
+            fetchuri = bb.fetch.encodeurl(('git',host,path,user,pswd,params))
+            logger.plain("    {}".format(r_name))
+            if branch:
+                src_uri = f"{fetchuri};protocol={prot};rev={rev};branch={branch};destsuffix={repodir}"
+            else:
+                src_uri = f"{fetchuri};protocol={prot};rev={rev};nobranch=1;destsuffix={repodir}"
+            fetcher = bb.fetch.Fetch([src_uri], d)
+            do_fetch(fetcher, layerdir)
+            urldata = fetcher.ud[src_uri]
+            revision = urldata.revision
+            layers_fixed_revisions[r_name]['git-remote']['rev'] = revision
+
+    def _symlink_local(src, dst):
+        logger.plain("Making a symbolic link {} pointing to {}".format(dst, src))
+        os.symlink(src, dst)
+
+    def _has_local_modifications(r_name, r_path):
+        fixed_revisions = json.load(open(os.path.join(confdir, "sources-fixed-revisions.json")))
+
+        if not r_name in fixed_revisions['sources']:
+            logger.warning("""Source {} is added with path {}.
+This path already exists, but it has no entry in a fixed revisions
+record. To ensure possible local modifications are not lost, it will
+be preserved in a backup directory.""".format(r_name, r_path))
+            return True
+
+        rev = fixed_revisions['sources'][r_name]['git-remote']['rev']
+        status = bb.process.run('git -C {} status --porcelain'.format(r_path))[0]
+        if status:
+            return True
+        diff = bb.process.run('git -C {} diff {} {}'.format(r_path, get_diff_color_param(), rev))[0]
+        if diff:
+            return True
+        return False
+
+    def _restrict_commits(r_name, r_path):
+        hook_path = os.path.join(r_path, '.git', 'hooks', 'pre-commit')
+        restrict_hook = """#!/bin/sh
+echo "This repository is managed by bitbake-setup, and making commits is restricted.
+If you wish to make local modifications, clone it separately, and re-initialize using
+bitbake-setup init -L {} /path/to/repo/checkout"
+exit 1
+""".format(r_name)
+        with open(hook_path, 'w') as f:
+            f.write(restrict_hook)
+        import stat
+        st = os.stat(hook_path)
+        os.chmod(hook_path, st.st_mode | stat.S_IEXEC)
+
+    layers_fixed_revisions = copy.deepcopy(layers)
+    repodirs = []
+    oesetupbuild = None
+    logger.plain("Fetching layer/tool repositories into {}".format(layerdir))
+    for r_name in layers:
+        r_data = layers[r_name]
+        repodir = r_data.get("path", r_name)
+        repodirs.append(repodir)
+
+        r_remote = r_data.get('git-remote')
+        r_local = r_data.get('local')
+        if r_remote and r_local:
+            raise Exception("Source {} contains both git-remote and local properties.".format(r_name))
+
+        repodir_path = os.path.join(layerdir, repodir)
+        if os.path.lexists(repodir_path):
+            if os.path.islink(repodir_path):
+                os.remove(repodir_path)
+            elif _has_local_modifications(r_name, repodir_path):
+                backup_path = add_unique_timestamp_to_path(repodir_path + '-backup')
+                logger.warning("""Source {} in {} contains local modifications. Renaming to {} to preserve them.
+For local development work it is recommended to clone the needed layers separately and re-initialize using -L option:
+bitbake-setup init -L {} /path/to/repo/checkout""".format(
+                    r_name, repodir_path, backup_path, r_name))
+                os.rename(repodir_path, backup_path)
+            else:
+                shutil.rmtree(repodir_path)
+
+        if r_remote:
+            _checkout_git_remote(r_remote, repodir, layers_fixed_revisions)
+            _restrict_commits(r_name, repodir_path)
+        if r_local:
+            _symlink_local(os.path.expanduser(r_local["path"]), repodir_path)
+
+        if os.path.exists(os.path.join(layerdir, repodir, 'scripts/oe-setup-build')):
+            oesetupbuild = os.path.join(layerdir, repodir, 'scripts/oe-setup-build')
+            oeinitbuildenvdir = os.path.join(layerdir, repodir)
+
+    logger.plain("        ")
+    _write_layer_list(layerdir, repodirs)
+
+    if oesetupbuild:
+        links = {'setup-build': oesetupbuild, 'oe-scripts': os.path.dirname(oesetupbuild), 'oe-init-build-env-dir': oeinitbuildenvdir}
+        for l,t in links.items():
+            symlink = os.path.join(layerdir, l)
+            if os.path.lexists(symlink):
+                os.remove(symlink)
+            os.symlink(os.path.relpath(t,layerdir),symlink)
+
+    return layers_fixed_revisions
+
+def setup_bitbake_build(bitbake_config, layerdir, setupdir, thisdir, update_bb_conf):
+    def _setup_build_conf(layers, filerelative_layers, build_conf_dir):
+        os.makedirs(build_conf_dir)
+        layers_s = []
+
+        for l in layers:
+            l = os.path.join(layerdir, l)
+            layers_s.append("  {} \\".format(l))
+
+        for l in filerelative_layers:
+            if thisdir:
+                l = os.path.join(thisdir, l)
+            else:
+                raise Exception("Configuration is using bb-layers-file-relative to specify " \
+                "a layer path relative to itself. This can be done only " \
+                "when the configuration is specified by its path on local " \
+                "disk, not when it's in a registry or is fetched over http.")
+            layers_s.append("  {} \\".format(l))
+
+        layers_s = "\n".join(layers_s)
+        bblayers_conf = """BBLAYERS ?= " \\
+{}
+  "
+""".format(layers_s)
+        with open(os.path.join(build_conf_dir, "bblayers.conf"), 'w') as f:
+            f.write(bblayers_conf)
+
+        local_conf = """#
+# This file is intended for local configuration tweaks.
+#
+# If you would like to publish and share changes made to this file,
+# it is recommended to put them into a distro config, or to create
+# layer fragments from changes made here.
+#
+"""
+        with open(os.path.join(build_conf_dir, "local.conf"), 'w') as f:
+            f.write(local_conf)
+
+        with open(os.path.join(build_conf_dir, "templateconf.cfg"), 'w') as f:
+            f.write("")
+
+        with open(os.path.join(build_conf_dir, "conf-summary.txt"), 'w') as f:
+            f.write(bitbake_config["description"] + "\n")
+
+        with open(os.path.join(build_conf_dir, "conf-notes.txt"), 'w') as f:
+            f.write("")
+
+    def _make_init_build_env(builddir, oeinitbuildenvdir):
+        builddir = os.path.realpath(builddir)
+        cmd = 'cd {}\nset {}\n. ./oe-init-build-env\nset --\n'.format(oeinitbuildenvdir, builddir)
+        initbuild_in_builddir = os.path.join(builddir, 'init-build-env')
+
+        with open(initbuild_in_builddir, 'w') as f:
+            f.write("# init-build-env wrapper created by bitbake-setup\n")
+            f.write(cmd + '\n')
+
+    def _prepend_passthrough_to_init_build_env(builddir):
+        env = bitbake_config.get("bb-env-passthrough-additions")
+        if not env:
+            return
+
+        initbuild_in_builddir = os.path.join(builddir, 'init-build-env')
+        with open(initbuild_in_builddir) as f:
+            content = f.read()
+
+        joined = " \\\n".join(env)
+        env = "export BB_ENV_PASSTHROUGH_ADDITIONS=\" \\\n"
+        env += "${BB_ENV_PASSTHROUGH_ADDITIONS} \\\n"
+        env += joined
+        env += '"'
+
+        with open(initbuild_in_builddir, 'w') as f:
+            f.write("# environment passthrough added by bitbake-setup\n")
+            f.write(env + '\n')
+            f.write('\n')
+            f.write(content)
+
+    bitbake_builddir = os.path.join(setupdir, "build")
+    logger.plain("Setting up bitbake configuration in\n    {}\n".format(bitbake_builddir))
+
+    template = bitbake_config.get("oe-template")
+    layers = bitbake_config.get("bb-layers")
+    if not template and not layers:
+        logger.error("Bitbake configuration does not contain a reference to an OpenEmbedded build template via 'oe-template' or a list of layers via 'bb-layers'; please use oe-setup-build, oe-init-build-env or another mechanism manually to complete the setup.")
+        return
+    oesetupbuild = os.path.join(layerdir, 'setup-build')
+    if template and not os.path.exists(oesetupbuild):
+        raise Exception("Cannot complete setting up a bitbake build directory from OpenEmbedded template '{}' as oe-setup-build was not found in any layers; please use oe-init-build-env manually.".format(template))
+
+    bitbake_confdir = os.path.join(bitbake_builddir, 'conf')
+    backup_bitbake_confdir = add_unique_timestamp_to_path(os.path.join(bitbake_builddir, 'conf-backup'))
+    upstream_bitbake_confdir = add_unique_timestamp_to_path(os.path.join(bitbake_builddir, 'conf-upstream'))
+
+    if os.path.exists(bitbake_confdir):
+        os.rename(bitbake_confdir, backup_bitbake_confdir)
+
+    if layers:
+        filerelative_layers = bitbake_config.get("bb-layers-file-relative") or []
+        _setup_build_conf(layers, filerelative_layers, bitbake_confdir)
+
+    if template:
+        bb.process.run("{} setup -c {} -b {} --no-shell".format(oesetupbuild, template, bitbake_builddir))
+    else:
+        oeinitbuildenvdir = os.path.join(layerdir, 'oe-init-build-env-dir')
+        if not os.path.exists(os.path.join(oeinitbuildenvdir, "oe-init-build-env")):
+            logger.error("Could not find oe-init-build-env in any of the layers; please use another mechanism to initialize the bitbake environment")
+            return
+        _make_init_build_env(bitbake_builddir, os.path.realpath(oeinitbuildenvdir))
+
+    _prepend_passthrough_to_init_build_env(bitbake_builddir)
+
+    siteconf_symlink = os.path.join(bitbake_confdir, "site.conf")
+    siteconf = os.path.normpath(os.path.join(setupdir, '..', "site.conf"))
+    if os.path.lexists(siteconf_symlink):
+        os.remove(siteconf_symlink)
+    os.symlink(os.path.relpath(siteconf, bitbake_confdir), siteconf_symlink)
+
+
+    init_script = os.path.join(bitbake_builddir, "init-build-env")
+    shell = "bash"
+    fragments = bitbake_config.get("oe-fragments", []) + sorted(bitbake_config.get("oe-fragment-choices",{}).values())
+    if fragments:
+        bb.process.run("{} -c '. {} && bitbake-config-build enable-fragment {}'".format(shell, init_script, " ".join(fragments)))
+
+    if os.path.exists(backup_bitbake_confdir):
+        conf_diff = get_diff(backup_bitbake_confdir, bitbake_confdir)
+        if not conf_diff:
+            logger.plain('New bitbake configuration from upstream is the same as the current one, no need to update it.')
+            shutil.rmtree(bitbake_confdir)
+            os.rename(backup_bitbake_confdir, bitbake_confdir)
+            return
+
+        logger.plain('Upstream bitbake configuration changes were found:')
+        logger.plain(conf_diff)
+
+        if update_bb_conf == 'prompt':
+            y_or_n = input('Apply these changes to the current configuration? (y/N): ')
+            if y_or_n != 'y':
+                update_bb_conf = 'no'
+
+        if update_bb_conf == 'no':
+            logger.plain('Ignoring upstream bitbake configuration changes')
+            logger.plain(f'Leaving the upstream configuration in {upstream_bitbake_confdir}')
+            os.rename(bitbake_confdir, upstream_bitbake_confdir)
+            os.rename(backup_bitbake_confdir, bitbake_confdir)
+            return
+
+        logger.plain('Applying upstream bitbake configuration changes')
+        logger.plain(f'Leaving the previous configuration in {backup_bitbake_confdir}')
+
+    fragment_note = "Run 'bitbake-config-build enable-fragment <fragment-name>' to enable additional fragments or replace built-in ones (e.g. machine/<name> or distro/<name> to change MACHINE or DISTRO)."
+
+    readme = """{}\n\nAdditional information is in {} and {}\n
+Source the environment using '. {}' to run builds from the command line.\n
+{}\n
+The bitbake configuration files (local.conf, bblayers.conf and more) can be found in {}/conf
+""".format(
+        bitbake_config["description"],
+        os.path.join(bitbake_builddir,'conf/conf-summary.txt'),
+        os.path.join(bitbake_builddir,'conf/conf-notes.txt'),
+        init_script,
+        fragment_note,
+        bitbake_builddir
+        )
+    readme_file = os.path.join(bitbake_builddir, "README")
+    with open(readme_file, 'w') as f:
+        f.write(readme)
+
+    logger.plain("This bitbake configuration provides:\n    {}\n".format(bitbake_config["description"]))
+    logger.plain("Usage instructions and additional information are in\n     {}\n".format(readme_file))
+    logger.plain("To run builds, source the environment using\n    . {}\n".format(init_script))
+    logger.plain("{}\n".format(fragment_note))
+    logger.plain("The bitbake configuration files (local.conf, bblayers.conf and more) can be found in\n    {}/conf\n".format(bitbake_builddir))
+
+def get_registry_config(registry_path, id):
+    for root, dirs, files in os.walk(registry_path):
+        for f in files:
+            if f.endswith('.conf.json') and id == get_config_name(f):
+                return os.path.join(root, f)
+    raise Exception("Unable to find {} in available configurations; use 'list' sub-command to see what is available".format(id))
+
+def merge_overrides_into_sources(sources, overrides):
+    layers = copy.deepcopy(sources)
+    for k,v in overrides.items():
+        if k in layers:
+            layers[k] = v
+    return layers
+
+def update_build(config, confdir, setupdir, layerdir, d, update_bb_conf="prompt"):
+    layer_config = merge_overrides_into_sources(config["data"]["sources"], config["source-overrides"]["sources"])
+    sources_fixed_revisions = checkout_layers(layer_config, confdir, layerdir, d)
+    bitbake_config = config["bitbake-config"]
+    thisdir = os.path.dirname(config["path"]) if config["type"] == 'local' else None
+    setup_bitbake_build(bitbake_config, layerdir, setupdir, thisdir, update_bb_conf)
+    write_sources_fixed_revisions(confdir, layerdir, sources_fixed_revisions)
+    commit_config(confdir)
+
+def int_input(allowed_values, prompt=''):
+    n = None
+    while n is None:
+        try:
+            n = int(input(prompt))
+        except ValueError:
+            prompt = 'Not a valid number, please try again: '
+            continue
+        if n not in allowed_values:
+            prompt = 'Number {} not one of {}, please try again: '.format(n, allowed_values)
+            n = None
+    return n
+
+def flatten_bitbake_configs(configs):
+    def merge_configs(c1,c2):
+        c_merged = {}
+        for k,v in c2.items():
+            if k not in c1.keys():
+                c_merged[k] = v
+        for k,v in c1.items():
+            if k not in c2.keys():
+                c_merged[k] = v
+            else:
+               c_merged[k] = c1[k] + c2[k]
+        del c_merged['configurations']
+        return c_merged
+
+    flattened_configs = []
+    for c in configs:
+        if 'configurations' not in c:
+            flattened_configs.append(c)
+        else:
+            for sub_c in flatten_bitbake_configs(c['configurations']):
+                flattened_configs.append(merge_configs(c, sub_c))
+    return flattened_configs
+
+def choose_bitbake_config(configs, parameters, non_interactive):
+    flattened_configs = flatten_bitbake_configs(configs)
+    configs_dict = {i["name"]:i for i in flattened_configs}
+
+    if parameters:
+        config_id = parameters[0]
+        if config_id not in configs_dict:
+            raise Exception("Bitbake configuration {} not found; replace with one of {}".format(config_id, configs_dict))
+        return configs_dict[config_id]
+
+    enumerated_configs = list(enumerate(flattened_configs, 1))
+    if len(enumerated_configs) == 1:
+        only_config = flattened_configs[0]
+        logger.plain("\nSelecting the only available bitbake configuration {}".format(only_config["name"]))
+        return only_config
+
+    if non_interactive:
+        raise Exception("Unable to choose from bitbake configurations in non-interactive mode: {}".format(configs_dict))
+
+    logger.plain("")
+    print_configs("Available bitbake configurations",
+                  [c["name"] for c in flattened_configs],
+                  [c["description"] for c in flattened_configs])
+    config_n = int_input([i[0] for i in enumerated_configs],
+                         "\nPlease select one of the above bitbake configurations by its number: ") - 1
+    return flattened_configs[config_n]
+
+def choose_config(configs, non_interactive):
+    not_expired_configs = [k for k in sorted(configs.keys()) if not has_expired(configs[k].get("expires", None))]
+    if len(not_expired_configs) == 1:
+        only_config = not_expired_configs[0]
+        logger.plain("\nSelecting the only available configuration {}\n".format(only_config))
+        return only_config
+
+    if non_interactive:
+        raise Exception("Unable to choose from configurations in non-interactive mode: {}".format(not_expired_configs))
+
+    descs = []
+    for c in not_expired_configs:
+        d = configs[c]["description"]
+        expiry_date = configs[c].get("expires", None)
+        if expiry_date:
+            d += f" (supported until {expiry_date})"
+        descs.append(d)
+
+    logger.plain("")
+    print_configs("Available Configuration Templates",
+                  [c for c in not_expired_configs],
+                  descs)
+    config_n = int_input([i[0] for i in list(enumerate(not_expired_configs, 1))],
+                         "\nPlease select one of the above configurations by its number: ") - 1
+    return not_expired_configs[config_n]
+
+def choose_fragments(possibilities, parameters, non_interactive, skip_selection):
+    choices = {}
+    for k,v in possibilities.items():
+        if skip_selection and k in skip_selection:
+            logger.info("Skipping a selection of {}, as requested on command line. The resulting bitbake configuration may require further manual adjustments.".format(k))
+            continue
+
+        # options can be a list of strings or a list of dicts
+        options = v["options"]
+        if len(options) > 0 and isinstance(v["options"][0], str):
+            options = [{"name": o, "description": ""} for o in v["options"]]
+
+        choice = [o["name"] for o in options if o["name"] in parameters]
+        if len(choice) > 1:
+            raise Exception("Options specified on command line do not allow a single selection "
+                            f"from possibilities {[o['name'] for o in options]}, please "
+                            f"remove one or more from {parameters}")
+        if len(choice) == 1:
+            choices[k] = choice[0]
+            continue
+
+        if non_interactive:
+            raise Exception(f"Unable to choose from options in non-interactive mode: {[o['name'] for o in options]}")
+
+        logger.plain("")
+        print_configs(v["description"],
+                     [o['name'] for o in options],
+                     [o['description'] for o in options])
+        options_enumerated = list(enumerate(options, 1))
+        option_n = int_input([i[0] for i in options_enumerated],
+                             "\nPlease select one of the above options by its number: ") - 1
+        choices[k] = options_enumerated[option_n][1]["name"]
+    return choices
+
+def obtain_config(top_dir, registry, args, source_overrides, d):
+    if args.config:
+        config_id = args.config[0]
+        config_parameters = args.config[1:]
+        if os.path.exists(config_id):
+            config_id = os.path.abspath(config_id)
+            logger.info("Reading configuration from local file\n    {}".format(config_id))
+            upstream_config = {'type':'local',
+                               'path':config_id,
+                               'name':get_config_name(config_id),
+                               'data':json.load(open(config_id))
+                               }
+        elif config_id.startswith("http://") or config_id.startswith("https://"):
+            logger.info("Reading configuration from network URI\n    {}".format(config_id))
+            import urllib.request
+            try:
+                with urllib.request.urlopen(config_id) as f:
+                    json_data = json.load(f)
+                upstream_config = {'type':'network','uri':config_id,'name':get_config_name(config_id),'data':json_data}
+            except json.JSONDecodeError as e:
+                raise Exception ("Invalid JSON from {}. Are you pointing to an HTML page? {}".format(config_id, e))
+        else:
+            logger.info("Looking up config {} in configuration registry".format(config_id))
+            registry_path = update_registry(registry, cache_dir(top_dir), d)
+            registry_configs = list_registry(registry_path, with_expired=True)
+            if config_id not in registry_configs:
+                raise Exception("Config {} not found in configuration registry, re-run 'init' without parameters to choose from available configurations.".format(config_id))
+            upstream_config = {'type':'registry','registry':registry,'name':config_id,'data':json.load(open(get_registry_config(registry_path,config_id)))}
+        expiry_date = upstream_config['data'].get("expires", None)
+        if has_expired(expiry_date):
+            logger.warning("This configuration is no longer supported after {}. Please consider changing to a supported configuration.".format(expiry_date))
+    else:
+        registry_path = update_registry(registry, cache_dir(top_dir), d)
+        registry_configs = list_registry(registry_path, with_expired=True)
+        config_id = choose_config(registry_configs, args.non_interactive)
+        config_parameters = []
+        upstream_config = {'type':'registry','registry':registry,'name':config_id,'data':json.load(open(get_registry_config(registry_path,config_id)))}
+
+    upstream_config['bitbake-config'] = choose_bitbake_config(upstream_config['data']['bitbake-setup']['configurations'], config_parameters, args.non_interactive)
+    upstream_config['bitbake-config']['oe-fragment-choices'] = choose_fragments(upstream_config['bitbake-config'].get('oe-fragments-one-of',{}), config_parameters[1:], args.non_interactive, args.skip_selection)
+    upstream_config['non-interactive-cmdline-options'] = [config_id, upstream_config['bitbake-config']['name']] + sorted(upstream_config['bitbake-config']['oe-fragment-choices'].values())
+    upstream_config['source-overrides'] = source_overrides
+    upstream_config['skip-selection'] = args.skip_selection
+    return upstream_config
+
+def obtain_overrides(args):
+    overrides = {'sources':{}}
+    if args.source_overrides:
+        overrides = json.load(open(args.source_overrides))
+        overrides_dir = os.path.dirname(os.path.abspath(args.source_overrides))
+        for s,v in overrides['sources'].items():
+            local = v.get('local')
+            if local:
+                path = os.path.expanduser(local['path'])
+                if not os.path.isabs(path):
+                    overrides['sources'][s]['local']['path'] = os.path.join(overrides_dir, path)
+
+    for local_name, local_path in args.use_local_source:
+        overrides['sources'][local_name] = {'local':{'path':os.path.abspath(os.path.expanduser(local_path))}}
+
+    return overrides
+
+
+def init_config(top_dir, settings, args):
+    create_siteconf(top_dir, args.non_interactive, settings)
+
+    d = init_bb_cache(top_dir, settings, args)
+    stdout = sys.stdout
+    def handle_task_progress(event, d):
+        rate = event.rate if event.rate else ''
+        progress = event.progress if event.progress > 0 else 0
+        logger.handlers[0].terminator = '\r'
+        logger.plain("{}% {}                ".format(progress, rate))
+        logger.handlers[0].terminator = '\n'
+
+    source_overrides = obtain_overrides(args)
+    upstream_config = obtain_config(top_dir, settings["default"]["registry"], args, source_overrides, d)
+    logger.info("Run 'bitbake-setup init --non-interactive {}' to select this configuration non-interactively.\n".format(" ".join(upstream_config['non-interactive-cmdline-options'])))
+
+    if args.setup_dir_name:
+        setup_dir_name = args.setup_dir_name
+    else:
+        setup_dir_name = "{}-{}".format(upstream_config['name']," ".join(upstream_config['non-interactive-cmdline-options'][1:]).replace(" ","-").replace("/","_"))
+        if 'setup-dir-name' in upstream_config['bitbake-config']:
+            mapping = {
+                    k: v.partition("/")[2].replace(" ", "-").replace("/", "_")
+                    for k, v in upstream_config['bitbake-config']['oe-fragment-choices'].items()
+            }
+            config_setup_dir_name = string.Template(upstream_config['bitbake-config']['setup-dir-name']).substitute(mapping)
+            config_setup_dir = os.path.join(top_dir, config_setup_dir_name)
+            if os.path.exists(config_setup_dir):
+                logger.info("Setup directory {} (as suggested by configuration) already exists, using the full name instead.\n".format(config_setup_dir))
+            elif settings['default']['use-full-setup-dir-name'] != 'no':
+                logger.info("Using the full setup directory name instead of {} suggested by configuration, as set in the settings.\n".format(config_setup_dir))
+            else:
+                setup_dir_name = config_setup_dir_name
+
+        if not args.non_interactive:
+            n = input(f"Enter setup directory name [{setup_dir_name}]: ")
+            if n:
+                setup_dir_name = n
+
+    setupdir = os.path.join(os.path.abspath(top_dir), setup_dir_name)
+    if os.path.exists(os.path.join(setupdir, "layers")):
+        logger.info(f"Setup already initialized in:\n    {setupdir}\nUse 'bitbake-setup status' to check if it needs to be updated, or 'bitbake-setup update' to perform the update.\nIf you would like to start over and re-initialize in this directory, remove it, and run 'bitbake-setup init' again.")
+        return
+
+    logger.plain("Initializing a setup directory in\n    {}".format(setupdir))
+    if not args.non_interactive:
+        y_or_n = input('Continue? (y/N): ')
+        if y_or_n != 'y':
+            exit()
+        logger.plain("")
+
+    os.makedirs(setupdir, exist_ok=True)
+
+    confdir = os.path.join(setupdir, "config")
+    layerdir = os.path.join(setupdir, "layers")
+
+    os.makedirs(confdir)
+    os.makedirs(layerdir)
+
+    bb.process.run("git -C {} init -b main".format(confdir))
+    # Make sure commiting doesn't fail if no default git user is configured on the machine
+    bb.process.run("git -C {} config user.name bitbake-setup".format(confdir))
+    bb.process.run("git -C {} config user.email bitbake-setup@not.set".format(confdir))
+    bb.process.run("git -C {} commit --no-verify --allow-empty -m 'Initial commit'".format(confdir))
+
+    bb.event.register("bb.build.TaskProgress", handle_task_progress, data=d)
+
+    write_upstream_config(confdir, upstream_config)
+    update_build(upstream_config, confdir, setupdir, layerdir, d, update_bb_conf="yes")
+
+    bb.event.remove("bb.build.TaskProgress", None)
+
+def get_diff(file1, file2):
+    try:
+        bb.process.run('diff {} -uNr {} {}'.format(get_diff_color_param(), file1, file2))
+    except bb.process.ExecutionError as e:
+        if e.exitcode == 1:
+            return e.stdout
+        else:
+            raise e
+    return None
+
+def are_layers_changed(layers, layerdir, d):
+    def _is_git_remote_changed(r_remote, repodir):
+        from bb.fetch2.git import sha1_re
+
+        rev = r_remote['rev']
+        branch = r_remote.get('branch', None)
+
+        rev_parse_result = bb.process.run('git -C {} rev-parse HEAD'.format(os.path.join(layerdir, repodir)))
+        local_revision = rev_parse_result[0].strip()
+        if sha1_re.match(rev):
+            if rev != local_revision:
+                logger.info('Layer repository checked out into {} is at revision {} but should be at {}'.format(os.path.join(layerdir, repodir),local_revision, rev))
+                return True
+            return False
+
+        remotes = _get_remotes(r_remote)
+        changed = False
+        for remote in remotes:
+            type,host,path,user,pswd,params = bb.fetch.decodeurl(remote)
+            fetchuri = bb.fetch.encodeurl(('git',host,path,user,pswd,params))
+            if branch:
+                fetcher = bb.fetch.FetchData("{};protocol={};rev={};branch={};destsuffix={}".format(fetchuri,type,rev,branch,repodir), d)
+            else:
+                fetcher = bb.fetch.FetchData("{};protocol={};rev={};nobranch=1;destsuffix={}".format(fetchuri,type,rev,repodir), d)
+            upstream_revision = fetcher.method.latest_revision(fetcher, d, 'default')
+            if upstream_revision != local_revision:
+                changed = True
+                logger.info('Layer repository {} checked out into {} updated revision {} from {} to {}'.format(remote, os.path.join(layerdir, repodir), rev, local_revision, upstream_revision))
+        return changed
+
+    changed = False
+    for r_name in layers:
+        r_data = layers[r_name]
+        repodir = r_data.get("path", r_name)
+
+        git_remote = r_data.get('git-remote')
+        if git_remote:
+            changed = changed | _is_git_remote_changed(git_remote, repodir)
+
+    return changed
+
+def build_status(top_dir, settings, args, d, update=False):
+    setupdir = args.setup_dir
+
+    confdir = os.path.join(setupdir, "config")
+    layerdir = os.path.join(setupdir, "layers")
+
+    current_upstream_config = json.load(open(os.path.join(confdir, "config-upstream.json")))
+
+    args.config = current_upstream_config['non-interactive-cmdline-options']
+    args.non_interactive = True
+    args.skip_selection = current_upstream_config['skip-selection']
+    source_overrides = current_upstream_config["source-overrides"]
+    registry = current_upstream_config.get("registry")
+    new_upstream_config = obtain_config(top_dir, registry, args, source_overrides, d)
+
+    write_upstream_config(confdir, new_upstream_config)
+    config_diff = bb.process.run('git -C {} diff {}'.format(confdir, get_diff_color_param()))[0]
+
+    if config_diff:
+        logger.plain('\nConfiguration in {} has changed:\n{}'.format(setupdir, config_diff))
+        if update:
+            update_build(new_upstream_config, confdir, setupdir, layerdir, d,
+                         update_bb_conf=args.update_bb_conf)
+        else:
+            bb.process.run('git -C {} restore config-upstream.json'.format(confdir))
+        return
+
+    layer_config = merge_overrides_into_sources(current_upstream_config["data"]["sources"], current_upstream_config["source-overrides"]["sources"])
+    if are_layers_changed(layer_config, layerdir, d):
+        if update:
+            update_build(current_upstream_config, confdir, setupdir, layerdir,
+                         d, update_bb_conf=args.update_bb_conf)
+        return
+
+    logger.plain("\nConfiguration in {} has not changed.".format(setupdir))
+
+def build_update(top_dir, settings, args, d):
+    build_status(top_dir, settings, args, d, update=True)
+
+def do_fetch(fetcher, dir):
+    # git fetcher simply dumps git output to stdout; in bitbake context that is redirected to temp/log.do_fetch
+    # and we need to set up smth similar here
+    fetchlogdir = os.path.join(dir, 'logs')
+    os.makedirs(fetchlogdir, exist_ok=True)
+    fetchlog = os.path.join(fetchlogdir, 'fetch_log.{}'.format(datetime.datetime.now().strftime("%Y%m%d%H%M%S")))
+    with open(fetchlog, 'a') as f:
+        oldstdout = sys.stdout
+        sys.stdout = f
+        fetcher.download()
+        fetcher.unpack(dir)
+        sys.stdout = oldstdout
+
+def update_registry(registry, cachedir, d):
+    registrydir = 'configurations'
+    if registry.startswith("."):
+        full_registrydir = os.path.join(os.getcwd(), registry, registrydir)
+    elif registry.startswith("/"):
+        full_registrydir = os.path.join(registry, registrydir)
+    else:
+        full_registrydir = os.path.join(cachedir, registrydir)
+        logger.info("Fetching configuration registry\n    {}\ninto\n    {}".format(registry, full_registrydir))
+        fetcher = bb.fetch.Fetch(["{};destsuffix={}".format(registry, registrydir)], d)
+        do_fetch(fetcher, cachedir)
+    return full_registrydir
+
+def has_expired(expiry_date):
+    if expiry_date:
+        return datetime.datetime.now() > datetime.datetime.fromisoformat(expiry_date)
+    return False
+
+def list_registry(registry_path, with_expired):
+    json_data = {}
+
+    for root, dirs, files in os.walk(registry_path):
+        for f in files:
+            if f.endswith('.conf.json'):
+                config_name = get_config_name(f)
+                config_data = json.load(open(os.path.join(root, f)))
+                config_desc = config_data["description"]
+                expiry_date = config_data.get("expires", None)
+                if expiry_date:
+                    if with_expired or not has_expired(expiry_date):
+                        json_data[config_name] = {"description": config_desc, "expires": expiry_date}
+                else:
+                    json_data[config_name] = {"description": config_desc}
+    return json_data
+
+def list_configs(settings, args):
+    import tempfile
+    top_dir = tempfile.mkdtemp(prefix="bitbake-setup-list-")
+    settings['default']['dl-dir'] = os.path.join(top_dir, '.bitbake-setup-downloads')
+    d = init_bb_cache(top_dir, settings, args)
+    registry_path = update_registry(settings["default"]["registry"], cache_dir(top_dir), d)
+    json_data = list_registry(registry_path, args.with_expired)
+    shutil.rmtree(top_dir)
+
+    logger.plain("Available configurations:")
+    for config_name, config_data in sorted(json_data.items()):
+        expiry_date = config_data.get("expires", None)
+        config_desc = config_data["description"]
+        if expiry_date:
+           if args.with_expired or not has_expired(expiry_date):
+               logger.plain("{}\t{} (supported until {})".format(config_name, config_desc, expiry_date))
+        else:
+           logger.plain("{}\t{}".format(config_name, config_desc))
+    logger.plain("\nRun 'init' with one of the above configuration identifiers to set up a build.")
+
+    if args.write_json:
+        with open(args.write_json, 'w') as f:
+            json.dump(json_data, f, sort_keys=True, indent=4)
+        logger.plain("Available configurations written into {}".format(args.write_json))
+
+def install_buildtools(top_dir, settings, args, d):
+    buildtools_install_dir = os.path.join(args.setup_dir, 'buildtools')
+    if os.path.exists(buildtools_install_dir):
+        if not args.force:
+            logger.plain("Buildtools are already installed in {}.".format(buildtools_install_dir))
+            env_scripts = glob.glob(os.path.join(buildtools_install_dir, 'environment-setup-*'))
+            if env_scripts:
+                logger.plain("If you wish to use them, you need to source the environment setup script e.g.")
+                for s in env_scripts:
+                    logger.plain("$ . {}".format(s))
+            logger.plain("You can also re-run bitbake-setup install-buildtools with --force option to force a reinstallation.")
+            return
+        shutil.rmtree(buildtools_install_dir)
+
+    install_buildtools = os.path.join(args.setup_dir, 'layers/oe-scripts/install-buildtools')
+    buildtools_download_dir = add_unique_timestamp_to_path(os.path.join(args.setup_dir, 'buildtools-downloads/buildtools'))
+    logger.plain("Buildtools archive is downloaded into {} and its content installed into {}".format(buildtools_download_dir, buildtools_install_dir))
+    subprocess.check_call("{} -d {} --downloads-directory {}".format(install_buildtools, buildtools_install_dir, buildtools_download_dir), shell=True)
+
+def create_siteconf(top_dir, non_interactive, settings):
+    siteconfpath = os.path.join(top_dir, 'site.conf')
+    if os.path.exists(siteconfpath):
+        logger.info('A site.conf file already exists. Please remove it if you would like to replace it with a default one')
+    else:
+        logger.plain(f'{top_dir} looks like a new top directory. If you would like to use a different directory, answer "n" below and either:')
+        logger.plain('\t1) Change the default bitbake-setup settings:')
+        logger.plain('\t\tbitbake-setup settings set default top-dir-prefix <PATH>')
+        logger.plain('\t\tbitbake-setup settings set default top-dir-name <NAME>')
+        logger.plain('\t2) Pass one or more options on the command line to change the top level directory in that invocation only:')
+        logger.plain('\t\tbitbake-setup --setting default top-dir-prefix <PATH> ...')
+        logger.plain('\t\tbitbake-setup --setting default top-dir-name <NAME> ...')
+        logger.plain('')
+
+        logger.plain('A common site.conf file will be created, please check it is correct before running builds\n    {}\n'.format(siteconfpath))
+        if not non_interactive:
+            y_or_n = input('Proceed? (y/N): ')
+            if y_or_n != 'y':
+                exit()
+
+        os.makedirs(top_dir, exist_ok=True)
+        with open(siteconfpath, 'w') as siteconffile:
+            siteconffile.write(
+                textwrap.dedent(
+                    """\
+                    # This file is intended for build host-specific bitbake settings
+
+                    # Where to place downloads
+                    #
+                    # During a first build the system will download many different source code
+                    # tarballs from various upstream projects. This can take a while, particularly
+                    # if your network connection is slow. These are all stored in DL_DIR. When
+                    # wiping and rebuilding you can preserve this directory to speed up this part of
+                    # subsequent builds. This directory is safe to share between multiple builds on
+                    # the same machine too.
+                    DL_DIR = "{dl_dir}"
+                    """.format(
+                        dl_dir=settings["default"]["dl-dir"],
+                    )
+                )
+            )
+
+
+def topdir_settings_path(top_dir):
+    return os.path.join(top_dir, 'settings.conf')
+
+def global_settings_path(args):
+    return os.path.abspath(args.global_settings) if args.global_settings else os.path.join(os.path.expanduser('~'), '.config', 'bitbake-setup', 'settings.conf')
+
+def load_settings(settings_path):
+    settings = configparser.ConfigParser()
+    if os.path.exists(settings_path):
+        logger.info('Loading settings from {}'.format(settings_path))
+        settings.read_file(open(settings_path))
+
+        for section in settings.sections():
+            for key, value in settings[section].items():
+                settings[section][key] = value.strip('\"\'')
+
+    return settings
+
+def change_setting(top_dir, args):
+    if vars(args)['global']:
+        settings_path = global_settings_path(args)
+    elif args.setting in GLOBAL_ONLY_SETTINGS:
+        logger.info(f"{args.setting} can only be set in the global config; '--global' is implied")
+        settings_path = global_settings_path(args)
+    else:
+        settings_path = topdir_settings_path(top_dir)
+    settings = load_settings(settings_path)
+
+    if args.subcommand == 'set':
+        if args.section not in settings.keys():
+            settings[args.section] = {}
+        settings[args.section][args.setting] = args.value
+        logger.plain(f"From section '{args.section}' the setting '{args.setting}' was changed to '{args.value}'")
+    if args.subcommand == 'unset':
+        if args.section in settings.keys() and args.setting in settings[args.section].keys():
+            del settings[args.section][args.setting]
+            logger.plain(f"From section '{args.section}' the setting '{args.setting}' has been removed")
+
+    os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+    with open(settings_path, 'w') as settingsfile:
+        settings.write(settingsfile)
+    logger.info(f"Settings written to {settings_path}")
+
+def list_settings(all_settings):
+    for section, section_settings in all_settings.items():
+        for key, value in section_settings.items():
+            logger.plain("{} {} {}".format(section, key, value))
+
+def settings_func(top_dir, all_settings, args):
+    if args.subcommand == 'list':
+        list_settings(all_settings)
+    elif args.subcommand == 'set' or args.subcommand == 'unset':
+        change_setting(top_dir, args)
+
+def get_setup_dir_via_bbpath():
+    bbpath = os.environ.get('BBPATH')
+    if bbpath:
+        bitbake_dir = os.path.normpath(bbpath.split(':')[0])
+        if os.path.exists(os.path.join(bitbake_dir,'init-build-env')):
+            setup_dir = os.path.dirname(bitbake_dir)
+            return setup_dir
+    return None
+
+def get_top_dir(args, settings):
+    setup_dir_via_bbpath = get_setup_dir_via_bbpath()
+    if setup_dir_via_bbpath:
+        top_dir = os.path.dirname(setup_dir_via_bbpath)
+        if os.path.exists(cache_dir(top_dir)):
+            return top_dir
+
+    if hasattr(args, 'setup_dir'):
+        top_dir = os.path.dirname(os.path.normpath(args.setup_dir))
+        return top_dir
+
+    top_dir_prefix = settings['default']['top-dir-prefix']
+    top_dir_name = settings['default']['top-dir-name']
+    return os.path.join(top_dir_prefix, top_dir_name)
+
+def merge_settings(builtin_settings, global_settings, topdir_settings, cmdline_settings):
+    all_settings = builtin_settings
+
+    for s in (global_settings, topdir_settings):
+        for section, section_settings in s.items():
+            for setting, value in section_settings.items():
+                if section not in all_settings.keys():
+                    all_settings[section] = {}
+                all_settings[section][setting] = value
+
+    for (section, setting, value) in cmdline_settings:
+        if section not in all_settings.keys():
+            all_settings[section] = {}
+        all_settings[section][setting] = value
+
+    return all_settings
+
+def sigint_handler(sig, frame, func, top_dir):
+    logger.plain(f'\nShutting down...')
+    if isinstance(top_dir, str) and os.path.exists(top_dir):
+        if func in [init_config, build_update]:
+            logger.warning(f'{top_dir} may contain an incomplete setup!')
+        elif func == install_buildtools:
+            logger.warning(f'{top_dir} may contain an incomplete buildtools installation!')
+    exit()
+
+def main():
+    def add_setup_dir_arg(parser):
+        setup_dir = get_setup_dir_via_bbpath()
+        if setup_dir:
+            parser.add_argument('--setup-dir', default=setup_dir, help="Path to the setup, default is %(default)s via BBPATH")
+        else:
+            parser.add_argument('--setup-dir', required=True, help="Path to the setup")
+
+    parser = argparse.ArgumentParser(
+        description="BitBake setup utility. Run with 'init' argument to get started.",
+        epilog="Use %(prog)s <subcommand> --help to get help on a specific command"
+        )
+    parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
+    parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+    parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Colorize output (where %(metavar)s is %(choices)s)', metavar='COLOR')
+    parser.add_argument('--no-network', action='store_true', help='Do not check whether configuration repositories and layer repositories have been updated; use only the local cache.')
+    parser.add_argument('--global-settings', action='store', metavar='PATH', help='Path to the global settings file.')
+    parser.add_argument('--setting', default=[], action='append', dest='cmdline_settings',
+                        nargs=3, metavar=('SECTION', 'SETTING', 'VALUE'),
+                        help='Modify a setting (for this bitbake-setup invocation only), for example "--setting default top-dir-prefix /path/to/top/dir".')
+
+    subparsers = parser.add_subparsers()
+
+    parser_list = subparsers.add_parser('list', help='List available configurations')
+    parser_list.add_argument('--with-expired', action='store_true', help='List also configurations that are no longer supported due to reaching their end-of-life dates.')
+    parser_list.add_argument('--write-json', action='store', help='Write available configurations into a json file so they can be programmatically processed.')
+    parser_list.set_defaults(func=list_configs)
+
+    parser_init = subparsers.add_parser('init', help='Select a configuration and initialize a setup from it')
+    parser_init.add_argument('config', nargs='*', help="path/URL/id to a configuration file (use 'list' command to get available ids), followed by configuration options. Bitbake-setup will ask to choose from available choices if command line doesn't completely specify them.")
+    parser_init.add_argument('--non-interactive', action='store_true', help='Do not ask to interactively choose from available options; if bitbake-setup cannot make a decision it will stop with a failure.')
+    parser_init.add_argument('--source-overrides', action='store', help='Override sources information (repositories/revisions) with values from a local json file.')
+    parser_init.add_argument('--setup-dir-name', action='store', help='A custom setup directory name under the top directory.')
+    parser_init.add_argument('--skip-selection', action='append', help='Do not select and set an option/fragment from available choices; the resulting bitbake configuration may be incomplete.')
+    parser_init.add_argument('-L', '--use-local-source', default=[], action='append', nargs=2, metavar=('SOURCE_NAME', 'PATH'),
+                        help='Symlink local source into a build, instead of getting it as prescribed by a configuration (useful for local development).')
+    parser_init.set_defaults(func=init_config)
+
+    parser_status = subparsers.add_parser('status', help='Check if the setup needs to be synchronized with configuration')
+    add_setup_dir_arg(parser_status)
+    parser_status.set_defaults(func=build_status)
+
+    parser_update = subparsers.add_parser('update', help='Update a setup to be in sync with configuration')
+    add_setup_dir_arg(parser_update)
+    parser_update.add_argument('--update-bb-conf', choices=['prompt', 'yes', 'no'], default='prompt', help='Update bitbake configuration files (bblayers.conf, local.conf) (default: prompt)')
+    parser_update.set_defaults(func=build_update)
+
+    parser_install_buildtools = subparsers.add_parser('install-buildtools', help='Install buildtools which can help fulfil missing or incorrect dependencies on the host machine')
+    add_setup_dir_arg(parser_install_buildtools)
+    parser_install_buildtools.add_argument('--force', action='store_true', help='Force a reinstall of buildtools over the previous installation.')
+    parser_install_buildtools.set_defaults(func=install_buildtools)
+
+    parser_settings_arg_global = argparse.ArgumentParser(add_help=False)
+    parser_settings_arg_global.add_argument('--global', action='store_true', help="Modify the setting in a global settings file, rather than one specific to a top directory")
+
+    parser_settings = subparsers.add_parser('settings',
+                                            help='List current settings, or set or unset a setting in a settings file (e.g. the default prefix and name of the top directory, the location of configuration registry, downloads directory and other settings specific to a top directory)')
+    parser_settings.set_defaults(func=settings_func)
+
+    subparser_settings = parser_settings.add_subparsers(dest="subcommand", required=True, help="The action to perform on the settings file")
+
+    parser_settings_list = subparser_settings.add_parser('list',
+                                                         help="List all settings with their values")
+
+    parser_settings_set = subparser_settings.add_parser('set', parents=[parser_settings_arg_global],
+                                                        help="In a Section, set a setting to a certain value")
+    parser_settings_set.add_argument("section", metavar="<section>", help="Section in a settings file, typically 'default'")
+    parser_settings_set.add_argument("setting", metavar="<setting>", help="Name of a setting")
+    parser_settings_set.add_argument("value", metavar="<value>", help="The setting value")
+
+    parser_settings_unset = subparser_settings.add_parser('unset', parents=[parser_settings_arg_global],
+                                                          help="Unset a setting, e.g. 'bitbake-setup settings unset default registry' would revert to the registry setting in a global settings file")
+    parser_settings_unset.add_argument("section", metavar="<section>", help="Section in a settings file, typically 'default'")
+    parser_settings_unset.add_argument("setting", metavar="<setting>", help="The setting to remove")
+
+    args = parser.parse_args()
+
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+    elif args.quiet:
+        logger.setLevel(logging.ERROR)
+
+    # Need to re-run logger_create with color argument
+    # (will be the same logger since it has the same name)
+    bb.msg.logger_create('bitbake-setup', output=sys.stdout,
+                         color=args.color,
+                         level=logger.getEffectiveLevel())
+
+    if 'func' in args:
+        if hasattr(args, 'setup_dir'):
+            if not os.path.exists(os.path.join(args.setup_dir,'build', 'init-build-env')):
+                logger.error("Not a valid setup directory: build/init-build-env does not exist in {}".format(args.setup_dir))
+                return
+
+        if not hasattr(args, 'non_interactive'):
+            args.non_interactive = True
+
+        builtin_settings = {}
+        builtin_settings['default'] = {
+                         'top-dir-prefix':os.getcwd(),
+                         'top-dir-name':'bitbake-builds',
+                         'registry':get_default_registry(),
+                         'use-full-setup-dir-name':'no',
+                         }
+
+        global_settings = load_settings(global_settings_path(args))
+        top_dir = get_top_dir(args, merge_settings(builtin_settings, global_settings, {}, args.cmdline_settings))
+
+        # register handler now to pass top_dir
+        _handler = functools.partial(sigint_handler,
+                                     func=args.func,
+                                     top_dir=os.path.abspath(top_dir))
+        signal.signal(signal.SIGINT, _handler)
+
+        # This cannot be set with the rest of the builtin settings as top_dir needs to be determined first
+        builtin_settings['default']['dl-dir'] = os.path.join(top_dir, '.bitbake-setup-downloads')
+
+        topdir_settings = load_settings(topdir_settings_path(top_dir))
+        all_settings = merge_settings(builtin_settings, global_settings, topdir_settings, args.cmdline_settings)
+
+        if args.func == settings_func:
+            settings_func(top_dir, all_settings, args)
+            return
+        if args.func == list_configs:
+            list_configs(all_settings, args)
+            return
+
+        logger.info('Bitbake-setup is using {} as top directory.'.format(top_dir, global_settings_path(args)))
+
+        if args.func == init_config:
+            init_config(top_dir, all_settings, args)
+        else:
+            d = init_bb_cache(top_dir, all_settings, args)
+            args.func(top_dir, all_settings, args, d)
+
+        save_bb_cache()
+    else:
+        from argparse import Namespace
+        parser.print_help()
+
+main()

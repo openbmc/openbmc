@@ -106,22 +106,29 @@ class ProgressBar(object):
         if widgets is None:
             widgets = list(self._DEFAULT_WIDGETS)
 
-        self.maxval = maxval
+        self.maxval = maxval if maxval != 0 else self._DEFAULT_MAXVAL
         self.widgets = widgets
         self.fd = fd
         self.left_justify = left_justify
+        self._fd_console = None
 
         self.signal_set = False
         if term_width is not None:
             self.term_width = term_width
         else:
             try:
+                # Check if given file descriptor is resizable for example belong
+                # to a terminal/console as STDOUT or STDERR. If file descriptor
+                # is resizable, let's allow to use for self._handle_resize()
+                # in a dedicated self._fd_console in order to be able to set
+                # temporarily/permanently self.fd to any StringIO or other
+                # file descriptor later.
+                self._fd_console = fd
                 self._handle_resize(None, None)
                 signal.signal(signal.SIGWINCH, self._handle_resize)
                 self.signal_set = True
             except (SystemExit, KeyboardInterrupt): raise
             except Exception as e:
-                print("DEBUG 5 %s" % e)
                 self.term_width = self._env_size()
 
         self.__iterable = None
@@ -182,7 +189,7 @@ class ProgressBar(object):
     def _handle_resize(self, signum=None, frame=None):
         """Tries to catch resize signals sent from the terminal."""
 
-        h, w = array('h', ioctl(self.fd, termios.TIOCGWINSZ, '\0' * 8))[:2]
+        h, w = array('h', ioctl(self._fd_console, termios.TIOCGWINSZ, '\0' * 8))[:2]
         self.term_width = w
 
 

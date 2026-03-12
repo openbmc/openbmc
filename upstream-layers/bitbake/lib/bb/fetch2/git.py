@@ -163,7 +163,7 @@ class Git(FetchMethod):
             bb.warn("URL: %s uses git protocol which is no longer supported by github. Please change to ;protocol=https in the url." % ud.url)
 
         if not ud.proto in ('git', 'file', 'ssh', 'http', 'https', 'rsync'):
-            raise bb.fetch2.ParameterError("Invalid protocol type", ud.url)
+            raise bb.fetch2.ParameterError(f"Invalid protocol type: '{ud.proto}'", ud.url)
 
         ud.nocheckout = ud.parm.get("nocheckout","0") == "1"
 
@@ -323,6 +323,8 @@ class Git(FetchMethod):
             return True
         if not self._contains_ref(ud, d, ud.name, ud.clonedir):
             return True
+        if 'tag' in ud.parm and not self._contains_ref(ud, d, ud.name, ud.clonedir, tag=True):
+            return True
         return False
 
     def lfs_need_update(self, ud, d):
@@ -354,7 +356,7 @@ class Git(FetchMethod):
         super().update_mirror_links(ud, origud)
         # When using shallow mode, add a symlink to the original fullshallow
         # path to ensure a valid symlink even in the `PREMIRRORS` case
-        if ud.shallow and not os.path.exists(origud.fullshallow):
+        if origud.shallow and not os.path.exists(origud.fullshallow):
             self.ensure_symlink(ud.localpath, origud.fullshallow)
 
     def try_premirror(self, ud, d):
@@ -775,14 +777,16 @@ class Git(FetchMethod):
     def supports_srcrev(self):
         return True
 
-    def _contains_ref(self, ud, d, name, wd):
+    def _contains_ref(self, ud, d, name, wd, tag=False):
         cmd = ""
+        git_ref_name = 'refs/tags/%s' % ud.parm['tag'] if tag else ud.revision
+
         if ud.nobranch:
             cmd = "%s log --pretty=oneline -n 1 %s -- 2> /dev/null | wc -l" % (
-                ud.basecmd, ud.revision)
+                ud.basecmd, git_ref_name)
         else:
             cmd =  "%s branch --contains %s --list %s 2> /dev/null | wc -l" % (
-                ud.basecmd, ud.revision, ud.branch)
+                ud.basecmd, git_ref_name, ud.branch)
         try:
             output = runfetchcmd(cmd, d, quiet=True, workdir=wd)
         except bb.fetch2.FetchError:
@@ -829,7 +833,7 @@ class Git(FetchMethod):
         """
         Check if the repository has 'lfs' (large file) content
         """
-        cmd = "%s grep lfs %s:.gitattributes | wc -l" % (
+        cmd = "%s grep '^[^#].*lfs' %s:.gitattributes | wc -l" % (
             ud.basecmd, ud.revision)
 
         try:

@@ -1,0 +1,142 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "Schema for bitbake-setup configuration files",
+    "type": "object",
+    "required": [
+        "description",
+        "bitbake-setup",
+        "version"
+    ],
+    "properties": {
+        "description": {
+            "type": "string",
+            "description": "Description of the bitbake-setup configuration file"
+        },
+        "sources": {
+            "$ref": "layers.schema.json#/properties/sources"
+        },
+        "expires": {
+            "type": "string",
+            "description": "End of life date for this configuration, in ISO 8601 format (YYYY-MM-DD)"
+        },
+        "bitbake-setup": {
+            "type": "object",
+            "description": "BitBake-setup configurations",
+            "required": [
+                "configurations"
+            ],
+            "properties": {
+                "configurations": {
+                    "type": "array",
+                    "minItems": 1,
+                    "$anchor": "configurations",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "Name of the configuration"
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "Human-readable description of the configuration"
+                            },
+                            "bb-layers": {
+                                "type": "array",
+                                "description": "List of BitBake layer paths to include, relative to the layers download directory",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "bb-layers-file-relative": {
+                                "type": "array",
+                                "description": "List of BitBake layers paths to include, relative to the directory with the configuration file",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "oe-template": {
+                                "type": "string",
+                                "description": "OE-template configuration"
+                            },
+                            "oe-fragments": {
+                                "$anchor": "oe-fragments",
+                                "type": "array",
+                                "description": "List of BitBake configuration fragments to enable",
+                                "items": {
+                                    "oneOf": [
+                                        {
+                                            "type": "string",
+                                            "description": "Configuration fragment name"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "description": "Dictionary of BitBake configuration fragments to enable (with description)",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "Configuration fragment name"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "description": "Human-readable description of the fragment"
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "oe-fragments-one-of": {
+                                "type": "object",
+                                "description": "Mutually exclusive bitbake configuration fragment",
+                                "patternProperties": {
+                                    ".*": {
+                                        "type": "object",
+                                        "required": [
+                                            "description",
+                                            "options"
+                                        ],
+                                        "properties": {
+                                            "description": {
+                                                "type": "string",
+                                                "description": "Human-readable description of the fragment category"
+                                            },
+                                            "options": {
+                                                "$ref": "#oe-fragments"
+                                            }
+                                        },
+                                        "additionalProperties": false
+                                    }
+                                },
+                                "additionalProperties": false
+                            },
+                            "configurations": {
+                                "$ref": "#configurations"
+                            },
+                            "bb-env-passthrough-additions": {
+                                "type": "array",
+                                "description": "List of environment variables to include in BB_ENV_PASSTHROUGH_ADDITIONS",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "setup-dir-name": {
+                                "type": "string",
+                                "description": "A suggestion for the setup directory name, $-prefixed keys from oe-fragments-one-of will be substituted with user selections."
+                            }
+                        },
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "version": {
+            "description": "The version of this document; currently '1.0'",
+            "enum": [
+                "1.0"
+            ]
+        }
+    },
+    "additionalProperties": false
+}

@@ -11,6 +11,7 @@ import unittest
 import bb
 import bb.data
 import bb.parse
+import io
 import logging
 import os
 
@@ -617,4 +618,108 @@ class Serialize(unittest.TestCase):
         self.assertEqual(newd.getVar('HELLO'), 'world')
         self.assertEqual(newd.getVarFlag('HELLO', 'other'), 'planet')
 
+class EmitVar(unittest.TestCase):
+    def setUp(self):
+        self.d = bb.data.init()
 
+        self.d.setVar("foo", "value of foo")
+
+        self.d.setVar("foo_exported", "value of foo_exported")
+        self.d.setVarFlag("foo_exported", "export", "1")
+
+        self.d.setVar("foo_unexported", "value of foo_unexported")
+        self.d.setVarFlag("foo_unexported", "unexport", "1")
+
+        self.d.setVar("test_func", "echo test_func_l1\necho test_func_l2")
+        self.d.setVarFlag("test_func", "func", "1")
+
+        self.d.setVar("bad_chars", 'a"b\nc`d\ne$f')
+
+    @staticmethod
+    def get_output(out):
+        lines = [line for line in out.getvalue().splitlines()
+                 if len(line) == 0 or line[0] != '#'
+                 ]
+        out.truncate(0)
+        out.seek(0)
+        return lines
+
+    def test_simple_variable(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('foo', out, self.d, all=True)
+        self.assertEqual(self.get_output(out), ['foo="value of foo"'])
+
+    def test_exported(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('foo_exported', out, self.d)
+        self.assertEqual(self.get_output(out),
+                         ['export foo_exported="value of foo_exported"'])
+
+    def test_unexported(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('foo_unexported', out, self.d)
+        self.assertEqual(self.get_output(out), ['unset foo_unexported'])
+
+    def test_function(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('test_func', out, self.d)
+        self.assertEqual(self.get_output(out), ['test_func() {',
+                                                'echo test_func_l1',
+                                                'echo test_func_l2',
+                                                '}'])
+
+    def test_all(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('foo', out, self.d, all=True)
+        self.assertEqual(self.get_output(out), ['foo="value of foo"'])
+
+        bb.data.emit_var('foo_exported', out, self.d, all=True)
+        self.assertEqual(self.get_output(out),
+                         ['export foo_exported="value of foo_exported"'])
+        bb.data.emit_var('foo_unexported', out, self.d, all=True)
+
+        self.assertEqual(self.get_output(out), ['unset foo_unexported'])
+
+        bb.data.emit_var('test_func', out, self.d, all=True)
+        self.assertEqual(self.get_output(out), ['test_func() {',
+                                                'echo test_func_l1',
+                                                'echo test_func_l2',
+                                                '}'])
+
+    def test_not_all(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('foo', out, self.d)
+        self.assertEqual(self.get_output(out), [])
+
+        bb.data.emit_var('foo_exported', out, self.d)
+        self.assertEqual(self.get_output(out),
+                         ['export foo_exported="value of foo_exported"'])
+
+        bb.data.emit_var('foo_unexported', out, self.d)
+        self.assertEqual(self.get_output(out), ['unset foo_unexported'])
+
+        bb.data.emit_var('test_func', out, self.d)
+        self.assertEqual(self.get_output(out), ['test_func() {',
+                                                'echo test_func_l1',
+                                                'echo test_func_l2',
+                                                '}'])
+
+    def test_not_set(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('random_name', out, self.d)
+        self.assertEqual(self.get_output(out), [])
+
+    def test_bad_chars(self):
+        out = io.StringIO()
+
+        bb.data.emit_var('bad_chars', out, self.d, all=True)
+        self.assertEqual(self.get_output(out), ['bad_chars="a\\"b \\',
+                                                'c\\`d \\',
+                                                'e\\$f"'])

@@ -138,9 +138,7 @@ class Command(BaseCommand):
                 l.summary = index.layerItems[id].summary
                 l.description = index.layerItems[id].description
 
-                if created:
-                    # predefined layers in the fixtures (for example poky.xml)
-                    # always preempt the Layer Index for these values
+                if True: # (if created:) always override fixture defaults now that poky distro is stripped
                     l.vcs_url = index.layerItems[id].vcs_url
                     l.vcs_web_url = index.layerItems[id].vcs_web_url
                     l.vcs_web_tree_base_url = index.layerItems[id].vcs_web_tree_base_url
@@ -179,7 +177,7 @@ class Command(BaseCommand):
                     index.layerBranches[id].layer_id)
                 continue
 
-            if created:
+            if True: # (if created:) always override fixture defaults now that poky distro is stripped
                 lv.release = li_branch_id_to_toaster_release[index.layerBranches[id].branch_id]
                 lv.up_date = index.layerBranches[id].updated
                 lv.commit = index.layerBranches[id].actual_branch

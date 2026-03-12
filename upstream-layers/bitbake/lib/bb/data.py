@@ -171,6 +171,7 @@ def emit_var(var, o=sys.__stdout__, d = init(), all=False):
     # if we're going to output this within doublequotes,
     # to a shell, we need to escape the quotes in the var
     alter = re.sub('"', '\\"', val)
+    alter = re.sub('`', '\\`', alter)
     alter = re.sub('\n', ' \\\n', alter)
     alter = re.sub('\\$', '\\\\$', alter)
     o.write('%s="%s"\n' % (varExpanded, alter))

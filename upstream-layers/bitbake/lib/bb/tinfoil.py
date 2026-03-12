@@ -91,23 +91,23 @@ def wait_for(f):
                             if isinstance(event, bb.event.ProcessStarted):
                                 if self.quiet > 1:
                                     continue
+                                if parseprogress:
+                                    parseprogress.finish()
                                 parseprogress = bb.ui.knotty.new_progress(event.processname, event.total)
                                 parseprogress.start(False)
                                 continue
                             if isinstance(event, bb.event.ProcessProgress):
                                 if self.quiet > 1:
                                     continue
-                                if parseprogress:
+                                if parseprogress and parseprogress.id == event.processname:
                                     parseprogress.update(event.progress)
-                                else:
-                                    bb.warn("Got ProcessProgress event for something that never started?")
                                 continue
                             if isinstance(event, bb.event.ProcessFinished):
                                 if self.quiet > 1:
                                     continue
-                                if parseprogress:
+                                if parseprogress and parseprogress.id == event.processname:
                                     parseprogress.finish()
-                                parseprogress = None
+                                    parseprogress = None
                                 continue
                             if isinstance(event, bb.command.CommandCompleted):
                                 result = True
@@ -685,7 +685,14 @@ class Tinfoil:
             if skipreasons:
                 raise bb.providers.NoProvider('%s is unavailable:\n  %s' % (pn, '  \n'.join(skipreasons)))
             else:
-                raise bb.providers.NoProvider('Unable to find any recipe file matching "%s"' % pn)
+                msg = f'Unable to find any recipe file matching "{pn}"'
+                import difflib
+                providers = self.get_all_providers()
+                close_matches = difflib.get_close_matches(pn, providers, cutoff=0.7)
+                if close_matches:
+                    close_matches = "\n  ".join(close_matches)
+                    msg += f'. Close matches:\n  {close_matches}'
+                raise bb.providers.NoProvider(msg)
         return best[3]
 
     def get_file_appends(self, fn, mc=''):

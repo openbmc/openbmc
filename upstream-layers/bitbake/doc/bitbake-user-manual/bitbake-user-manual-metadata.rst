@@ -753,25 +753,15 @@ share the task.
 
 This section presents the mechanisms BitBake provides to allow you to
 share functionality between recipes. Specifically, the mechanisms
-include ``include``, ``inherit``, :term:`INHERIT`, and ``require``
+include :ref:`inherit<ref-bitbake-user-manual-metadata-inherit>`,
+:ref:`inherit_defer<ref-bitbake-user-manual-metadata-inherit-defer>`,
+:ref:`include<ref-include-directive>`,
+:ref:`include_all<ref-include-all-directive>`,
+:ref:`require<require-inclusion>` and
+:ref:`INHERIT<bitbake-user-manual/bitbake-user-manual-metadata:\`\`INHERIT\`\` configuration directive>`
 directives. There is also a higher-level abstraction called
-``configuration fragments`` that is enabled with ``addfragments``
-directive.
-
-Locating Include and Class Files
---------------------------------
-
-BitBake uses the :term:`BBPATH` variable to locate
-needed include and class files. Additionally, BitBake searches the
-current directory for ``include`` and ``require`` directives.
-
-.. note::
-
-   The BBPATH variable is analogous to the environment variable PATH .
-
-In order for include and class files to be found by BitBake, they need
-to be located in a "classes" subdirectory that can be found in
-:term:`BBPATH`.
+`configuration fragments` that is enabled with the
+:ref:`bitbake-user-manual/bitbake-user-manual-metadata:\`\`addfragments\`\` directive`.
 
 .. _ref-bitbake-user-manual-metadata-inherit:
 
@@ -823,7 +813,7 @@ evaluated at the end of parsing.
 .. _ref-bitbake-user-manual-metadata-inherit-defer:
 
 ``inherit_defer`` Directive
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 The :ref:`inherit_defer <ref-bitbake-user-manual-metadata-inherit-defer>`
 directive works like the :ref:`inherit
@@ -871,61 +861,81 @@ In all cases, if the expression evaluates to an
 empty string, the statement does not trigger a syntax error because it
 becomes a no-op.
 
+See also :term:`BB_DEFER_BBCLASSES` for automatically promoting classes
+``inherit`` calls to ``inherit_defer``.
+
+.. _ref-include-directive:
+
 ``include`` Directive
 ---------------------
 
-BitBake understands the ``include`` directive. This directive causes
-BitBake to parse whatever file you specify, and to insert that file at
-that location. The directive is much like its equivalent in Make except
-that if the path specified on the include line is a relative path,
-BitBake locates the first file it can find within :term:`BBPATH`.
+The ``include`` directive causes BitBake to parse a given file,
+and to include that file's contents at the location of the
+``include`` statement. This directive is similar to its equivalent
+in Make, except that if the path specified on the BitBake ``include``
+line is a relative path, BitBake will search for it on the path designated
+by :term:`BBPATH` and will include *only the first matching file*.
 
-The include directive is a more generic method of including
+The ``include`` directive is a more generic method of including
 functionality as compared to the :ref:`inherit <bitbake-user-manual/bitbake-user-manual-metadata:\`\`inherit\`\` directive>`
 directive, which is restricted to class (i.e. ``.bbclass``) files. The
-include directive is applicable for any other kind of shared or
+``include`` directive is applicable for any other kind of shared or
 encapsulated functionality or configuration that does not suit a
 ``.bbclass`` file.
 
-As an example, suppose you needed a recipe to include some self-test
-definitions::
+For example, if you needed a recipe to include some self-test definitions,
+you might write::
 
    include test_defs.inc
 
+The ``include`` directive does not produce an error if the specified file
+cannot be found. If the included file *must* exist, then you should use
+use :ref:`require <require-inclusion>` instead, which will generate an error
+if the file cannot be found.
+
 .. note::
 
-   The include directive does not produce an error when the file cannot be
-   found.  Consequently, it is recommended that if the file you are including is
-   expected to exist, you should use :ref:`require <require-inclusion>` instead
-   of include . Doing so makes sure that an error is produced if the file cannot
-   be found.
+   Note well that the ``include`` directive will include the first matching
+   file and nothing further (which is almost always the behaviour you want).
+   If you need to include all matching files, you need to use the
+   ``include_all`` directive, explained below.
+
+.. _ref-include-all-directive:
 
 ``include_all`` Directive
 -------------------------
 
 The ``include_all`` directive works like the :ref:`include
 <bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`
-directive but will include all of the files that match the specified path in
+directive but will include *all* of the files that match the specified path in
 the enabled layers (layers part of :term:`BBLAYERS`).
 
-For example, let's say a ``maintainers.inc`` file is present in different layers
-and is conventionally placed in the ``conf/distro/include`` directory of each
-layer. In that case the ``include_all`` directive can be used to include
-the ``maintainers.inc`` file for all of these layers::
+Note that only :term:`BBPATH` will be searched, the parent directory of the file
+with the ``include_all`` directive will not be searched (unlike for the
+``include`` directive).
+
+.. note::
+
+   This behaviour is rarely what you want in normal operation, and should
+   be reserved for only those situations when you explicitly want to parse
+   and include all matching files found across all layers, as the following
+   example shows.
+
+As a realistic example of this directive, imagine that all of your active
+layers contain a file ``conf/distro/include/maintainers.inc``, containing
+maintainer information for the recipes in that layer, and you wanted to
+collect all of the content from all of those files across all of those layers.
+You could use the statement::
 
    include_all conf/distro/include/maintainers.inc
 
-In other words, the ``maintainers.inc`` file for each layer is included through
-the :ref:`include <bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`
-directive.
+In this case, BitBake will iterate through all of the directories in
+the colon-separated :term:`BBPATH` (from left to right) and collect the
+contents of all matching files, so you end up with the maintainer
+information of all of your active layers, not just the first one.
 
-BitBake will iterate through the colon-separated :term:`BBPATH` list to look for
-matching files to include, from left to right. As a consequence, matching files
-are included in that order.
-
-As the ``include_all`` directive uses the :ref:`include
-<bitbake-user-manual/bitbake-user-manual-metadata:\`\`include\`\` directive>`
-directive in the background, no error is produced if no files are matched.
+As the ``include_all`` directive uses the ``include`` directive in the
+background, as with ``include``, no error is produced if no files are matched.
 
 .. _require-inclusion:
 
@@ -998,7 +1008,7 @@ This directive allows fine-tuning local configurations with configuration
 snippets contained in layers in a structured, controlled way. Typically it would
 go into ``bitbake.conf``, for example::
 
-   addfragments conf/fragments OE_FRAGMENTS OE_FRAGMENTS_METADATA_VARS OE_BUILTIN_FRAGMENTS
+   addfragments conf/fragments OE_FRAGMENTS OE_FRAGMENTS_METADATA_VARS OE_FRAGMENTS_BUILTIN
 
 ``addfragments`` takes four parameters:
 
@@ -1039,7 +1049,7 @@ each other when several fragments are enabled.
 
 The variable containing a built-in fragment definitions could look like this::
 
-   OE_BUILTIN_FRAGMENTS = "someprefix:SOMEVARIABLE anotherprefix:ANOTHERVARIABLE"
+   OE_FRAGMENTS_BUILTIN = "someprefix:SOMEVARIABLE anotherprefix:ANOTHERVARIABLE"
 
 and then if 'someprefix/somevalue' is added to the variable that holds the list
 of enabled fragments:
@@ -1049,6 +1059,138 @@ of enabled fragments:
 bitbake will treat that as direct value assignment in its configuration::
 
   SOMEVARIABLE = "somevalue"
+
+Locating Include Files
+----------------------
+
+BitBake first searches the current directory for needed include files for
+:ref:`include <ref-include-directive>` and :ref:`require <require-inclusion>`
+directives.
+BitBake also uses the :term:`BBPATH` variable.
+
+.. note::
+
+   The :term:`BBPATH` variable is analogous to the environment variable ``PATH``.
+
+For these two directives, BitBake includes the first file it finds.
+
+Let's consider the following statement called from a recipe file located in
+``/layers/meta-custom2/recipes-example/example/example_0.1.bb``::
+
+   require myfile.inc
+
+Where ``myfile.inc`` is located in ``/layers/meta-custom2/recipes-example/example``.
+
+And let's assume that the value of :term:`BBPATH` is
+``/layers/meta-custom1:/layers/meta-custom2``. Then BitBake will try to find
+``myfile.inc`` in this order::
+
+   /layers/meta-custom2/recipes-example/example/myfile.inc
+   /layers/meta-custom1/myfile.inc
+   /layers/meta-custom2/myfile.inc
+
+In this case the first path of the list matches and BitBake includes this file
+in ``example_0.1.bb``.
+
+Another common example would be::
+
+   require recipes-other/other/otherfile.inc
+
+Where ``otherfile.inc`` is located in
+``/layers/meta-custom1/recipes-other/other/``.
+
+In this case, the following paths would be searched::
+
+   /layers/meta-custom2/recipes-example/example/recipes-other/other/otherfile.inc
+   /layers/meta-custom1/recipes-other/other/otherfile.inc
+   /layers/meta-custom2/recipes-other/other/otherfile.inc
+
+This time, the second item of this list would be matched.
+
+Note that the first path is based on the location of the file with the
+``require`` (or ``include``) directive. Imagine there's a
+``/layers/meta-custom2/recipes-bbappend/example/example_0.1.bbappend`` with::
+
+   require myappend.inc
+
+In this case, the following paths would be searched::
+
+   /layers/meta-custom2/recipes-bbappend/example/myappend.inc
+   /layers/meta-custom1/myappend.inc
+   /layers/meta-custom2/myappend.inc
+
+.. note::
+
+   In the above examples, the exact same search order applies for the
+   :ref:`include <ref-include-directive>` directive.
+
+It is also possible to include *all* occurences of a file with the same name
+with the :ref:`include_all <ref-include-all-directive>` directive.
+
+Let's consider the following statement called from a recipe file located in
+``/layers/meta-custom2/recipes-example/example/exampleall_0.1.bb``::
+
+   include_all all.inc
+
+Where multiple ``all.inc`` are in located in ``/layers/meta-custom2`` and
+``/layers/meta-custom1``.
+
+And let's assume that the value of :term:`BBPATH` is
+``/layers/meta-custom1:/layers/meta-custom2``. Then BitBake will try to include
+all ``all.inc`` in this order::
+
+   /layers/meta-custom1/all.inc
+   /layers/meta-custom2/all.inc
+
+In this case the first ``/layers/meta-custom1/all.inc`` would be included, and
+then ``/layers/meta-custom2/all.inc`` if both are found.
+
+.. note::
+
+   The same logic as for the :ref:`ref-include-directive` applies, except that
+   the path relative to the file where the directive is specified is not
+   searched when using the ``include_all`` directive.
+
+Locating Class Files
+--------------------
+
+Like include files, class files are located using the :term:`BBPATH` variable.
+The classes can be included in the ``classes-recipe``, ``classes-global`` and
+``classes`` directories, as explained in the
+:ref:`bitbake-user-manual/bitbake-user-manual-intro:Class types` section of the
+BitBake User Manual. Like for the :ref:`include <ref-include-directive>` and
+:ref:`require <require-inclusion>` directives, BitBake stops and inherits the
+first class that it finds.
+
+For classes inherited with the :ref:`inherit
+<ref-bitbake-user-manual-metadata-inherit>` directive, BitBake will try to
+locate the class under each ``classes-recipe`` directory for each path in
+:term:`BBPATH`, and then do the same for each ``classes`` directory for each
+path in :term:`BBPATH`.
+
+For example, if the value :term:`BBPATH` is
+``/layers/meta-custom1:/layers/meta-custom2`` then the ``hello`` class
+would be searched in this order::
+
+   /layers/meta-custom1/classes-recipe/hello.bbclass
+   /layers/meta-custom2/classes-recipe/hello.bbclass
+   /layers/meta-custom1/classes/hello.bbclass
+   /layers/meta-custom2/classes/hello.bbclass
+
+.. note::
+
+   Note that the order of the list above does not depend on where the class is
+   inherited from.
+
+Likewise, for classes inherited with the :term:`INHERIT` variable, the
+``classes-global`` directory is searched first, and the ``classes`` directory is
+searched second. Taking the above example, this would result in the following
+list::
+
+   /layers/meta-custom1/classes-global/hello.bbclass
+   /layers/meta-custom2/classes-global/hello.bbclass
+   /layers/meta-custom1/classes/hello.bbclass
+   /layers/meta-custom2/classes/hello.bbclass
 
 Functions
 =========
@@ -1089,7 +1231,9 @@ When you create these types of functions in
 your recipe or class files, you need to follow the shell programming
 rules. The scripts are executed by ``/bin/sh``, which may not be a bash
 shell but might be something such as ``dash``. You should not use
-Bash-specific script (bashisms).
+Bash-specific script (bashisms), such as ``[[`` (use ``[`` instead). The BitBake
+shell parser also has further
+:ref:`limitations <bitbake-user-manual/bitbake-user-manual-metadata:limitations>`.
 
 Overrides and override-style operators like ``:append`` and ``:prepend``
 can also be applied to shell functions. Most commonly, this application
@@ -1129,6 +1273,20 @@ Running ``do_foo`` prints the following::
 
 You can use the ``bitbake -e recipename`` command to view the final
 assembled function after all overrides have been applied.
+
+Limitations
+^^^^^^^^^^^
+
+Shell functions must be parsable by BitBake, which cannot handle all
+syntax supported by POSIX shells. In particular:
+
+#. Arithmetic expansion is not supported. This means you cannot do:
+
+    .. code-block:: shell
+
+       VAR=$(( i + 1 ))
+
+    See https://bugzilla.yoctoproject.org/show_bug.cgi?id=11314.
 
 BitBake-Style Python Functions
 ------------------------------
@@ -2130,12 +2288,12 @@ OpenEmbedded metadata-based example.
 These checksums are stored in :term:`STAMP`. You can
 examine the checksums using the following BitBake command::
 
-   $ bitbake-dumpsigs
+   $ bitbake-dumpsig
 
 This command returns the signature data in a readable
 format that allows you to examine the inputs used when the OpenEmbedded
 build system generates signatures. For example, using
-``bitbake-dumpsigs`` allows you to examine the ``do_compile`` task's
+``bitbake-dumpsig`` allows you to examine the ``do_compile`` task's
 "sigdata" for a C application (e.g. ``bash``). Running the command also
 reveals that the "CC" variable is part of the inputs that are hashed.
 Any changes to this variable would invalidate the stamp and cause the

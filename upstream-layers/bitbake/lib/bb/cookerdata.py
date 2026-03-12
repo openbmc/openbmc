@@ -137,6 +137,7 @@ class CookerConfiguration(object):
         self.build_verbose_stdout = False
         self.dry_run = False
         self.tracking = False
+        self.skip_fragments = False
         self.writeeventlog = False
         self.limited_deps = False
         self.runall = []
@@ -226,12 +227,15 @@ class CookerDataBuilder(object):
         self.prefiles = cookercfg.prefile
         self.postfiles = cookercfg.postfile
         self.tracking = cookercfg.tracking
+        self.skip_fragments = cookercfg.skip_fragments
 
         bb.utils.set_context(bb.utils.clean_context())
         bb.event.set_class_handlers(bb.event.clean_class_handlers())
         self.basedata = bb.data.init()
         if self.tracking:
             self.basedata.enableTracking()
+        if self.skip_fragments:
+            self.basedata.setVar("_BB_SKIP_FRAGMENTS", "1")
 
         # Keep a datastore of the initial environment variables and their
         # values from when BitBake was launched to enable child processes
@@ -255,7 +259,11 @@ class CookerDataBuilder(object):
         self.data = self.basedata
         self.mcdata = {}
 
-    def calc_datastore_hashes(self):
+    def calc_datastore_hashes(self, clean=True):
+        if not clean:
+            self.data_hash = None
+            return
+
         data_hash = hashlib.sha256()
         data_hash.update(self.data.get_hash().encode('utf-8'))
         multiconfig = (self.data.getVar("BBMULTICONFIG") or "").split()
@@ -503,6 +511,8 @@ class CookerDataBuilder(object):
     def _parse_recipe(bb_data, bbfile, appends, mc, layername):
         bb_data.setVar("__BBMULTICONFIG", mc)
         bb_data.setVar("FILE_LAYERNAME", layername)
+
+        bb_data.setVar("__BB_RECIPE_FILE", bbfile)
 
         bbfile_loc = os.path.abspath(os.path.dirname(bbfile))
         bb.parse.cached_mtime_noerror(bbfile_loc)

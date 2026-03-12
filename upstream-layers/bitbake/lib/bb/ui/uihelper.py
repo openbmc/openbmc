@@ -6,6 +6,7 @@
 #
 
 import bb.build
+import bb.runqueue
 import time
 
 class BBUIHelper:
@@ -13,17 +14,17 @@ class BBUIHelper:
         self.needUpdate = False
         self.running_tasks = {}
         # Running PIDs preserves the order tasks were executed in
-        self.running_pids = []
         self.failed_tasks = []
         self.pidmap = {}
         self.tasknumber_current = 0
         self.tasknumber_total = 0
+        self.pressure_state = (False, False, False)
+        self.pressure_values = None
 
     def eventHandler(self, event):
         # PIDs are a bad idea as they can be reused before we process all UI events.
         # We maintain a 'fuzzy' match for TaskProgress since there is no other way to match
         def removetid(pid, tid):
-            self.running_pids.remove(tid)
             del self.running_tasks[tid]
             if self.pidmap[pid] == tid:
                 del self.pidmap[pid]
@@ -35,7 +36,6 @@ class BBUIHelper:
                 self.running_tasks[tid] = { 'title' : "mc:%s:%s %s" % (event._mc, event._package, event._task), 'starttime' : time.time(), 'pid' : event.pid }
             else:
                 self.running_tasks[tid] = { 'title' : "%s %s" % (event._package, event._task), 'starttime' : time.time(), 'pid' : event.pid }
-            self.running_pids.append(tid)
             self.pidmap[event.pid] = tid
             self.needUpdate = True
         elif isinstance(event, bb.build.TaskSucceeded):
@@ -60,6 +60,10 @@ class BBUIHelper:
                 self.running_tasks[self.pidmap[event.pid]]['progress'] = event.progress
                 self.running_tasks[self.pidmap[event.pid]]['rate'] = event.rate
                 self.needUpdate = True
+        elif isinstance(event, bb.runqueue.PSIEvent):
+            self.pressure_state = event.pressure_state
+            self.pressure_values = event.pressure_values
+            self.needUpdate = True
         else:
             return False
         return True

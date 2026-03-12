@@ -63,7 +63,11 @@ class NpmShrinkWrap(FetchMethod):
 
     def supports(self, ud, d):
         """Check if a given url can be fetched with npmsw"""
-        return ud.type in ["npmsw"]
+        #return ud.type in ["npmsw"]
+        if ud.type in ["npmsw"]:
+            from bb.parse import SkipRecipe
+            raise SkipRecipe("The npmsw fetcher has been disabled due to security issues and there is no maintainer to address them")
+        return False
 
     def urldata_init(self, ud, d):
         """Init npmsw specific variables within url data"""

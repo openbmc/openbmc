@@ -55,13 +55,15 @@ class LayerIndexPlugin(ActionPlugin):
             switching branches if necessary and possible.
             """
             base_cmd = ['git', '--git-dir=%s/.git' % repodir, '--work-tree=%s' % repodir]
-            cmd = base_cmd + ['branch']
+            # Get current branch name
+            cmd = base_cmd + ['name-rev', '--name-only', 'HEAD']
             completed_proc = subprocess.run(cmd, text=True, capture_output=True)
             if completed_proc.returncode:
-                logger.error("Unable to validate repo %s (%s)" % (repodir, stderr))
+                logger.error("Unable to validate repo %s (%s)" % (repodir, completed_proc.stderr))
                 return None, None, None
             else:
-                if branch != completed_proc.stdout[2:-1]:
+                current_branch = completed_proc.stdout.strip()
+                if branch != current_branch:
                     cmd = base_cmd + ['status', '--short']
                     completed_proc = subprocess.run(cmd, text=True, capture_output=True)
                     if completed_proc.stdout.count('\n') != 0:

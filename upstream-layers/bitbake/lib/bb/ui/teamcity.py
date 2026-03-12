@@ -200,6 +200,7 @@ def main(server, eventHandler, params):
         logger.error("XMLRPC Fault getting commandline: {0}".format(x))
         return 1
 
+    active_process = None
     active_process_total = None
     is_tasks_running = False
 
@@ -300,16 +301,23 @@ def main(server, eventHandler, params):
 
             if isinstance(event, bb.event.ProcessStarted):
                 if event.processname in ["Initialising tasks", "Checking sstate mirror object availability"]:
+                    if active_process:
+                        ui.progress(active_process, 100)
+                        ui.block_end()
+                    active_process = event.processname
                     active_process_total = event.total
                     ui.block_start(event.processname)
             if isinstance(event, bb.event.ProcessFinished):
                 if event.processname in ["Initialising tasks", "Checking sstate mirror object availability"]:
-                    ui.progress(event.processname, 100)
-                    ui.block_end()
+                    if active_process and active_process == event.processname:
+                        ui.progress(event.processname, 100)
+                        ui.block_end()
+                        active_process = None
             if isinstance(event, bb.event.ProcessProgress):
                 if event.processname in ["Initialising tasks",
                                          "Checking sstate mirror object availability"] and active_process_total != 0:
-                    ui.progress(event.processname, event.progress * 100 / active_process_total)
+                    if active_process and active_process == event.processname:
+                        ui.progress(event.processname, event.progress * 100 / active_process_total)
             if isinstance(event, bb.event.CacheLoadStarted):
                 ui.block_start("Loading cache")
             if isinstance(event, bb.event.CacheLoadProgress):

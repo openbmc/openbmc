@@ -150,7 +150,11 @@ class Npm(FetchMethod):
 
     def supports(self, ud, d):
         """Check if a given url can be fetched with npm"""
-        return ud.type in ["npm"]
+        #return ud.type in ["npm"]
+        if ud.type in ["npm"]:
+            from bb.parse import SkipRecipe
+            raise SkipRecipe("The npm fetcher has been disabled due to security issues and there is no maintainer to address them")
+        return False
 
     def urldata_init(self, ud, d):
         """Init npm specific variables within url data"""

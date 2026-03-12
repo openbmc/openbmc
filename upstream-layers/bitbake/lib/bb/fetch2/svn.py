@@ -34,7 +34,7 @@ class Svn(FetchMethod):
         if not "module" in ud.parm:
             raise MissingParameterError('module', ud.url)
 
-        ud.basecmd = d.getVar("FETCHCMD_svn") or "/usr/bin/env svn --non-interactive --trust-server-cert"
+        ud.basecmd = d.getVar("FETCHCMD_svn") or "/usr/bin/env svn --non-interactive"
 
         ud.module = ud.parm["module"]
 

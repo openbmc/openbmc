@@ -79,7 +79,7 @@ class SkippedPackage:
 
 
 class CookerFeatures(object):
-    _feature_list = [HOB_EXTRA_CACHES, BASEDATASTORE_TRACKING, SEND_SANITYEVENTS, RECIPE_SIGGEN_INFO] = list(range(4))
+    _feature_list = [HOB_EXTRA_CACHES, BASEDATASTORE_TRACKING, SEND_SANITYEVENTS, RECIPE_SIGGEN_INFO, SKIP_FRAGMENTS] = list(range(5))
 
     def __init__(self):
         self._features=set()
@@ -89,6 +89,11 @@ class CookerFeatures(object):
         if f not in CookerFeatures._feature_list:
             return
         self._features.add(f)
+
+    def delFeature(self, f):
+        if f not in self._features:
+            return
+        self._features.remove(f)
 
     def __contains__(self, f):
         return f in self._features
@@ -237,8 +242,12 @@ class BBCooker:
         original_featureset = list(self.featureset)
         for feature in features:
             self.featureset.setFeature(feature)
-        bb.debug(1, "Features set %s (was %s)" % (original_featureset, list(self.featureset)))
+        for orig_feature in original_featureset:
+            if orig_feature not in features:
+                self.featureset.delFeature(orig_feature)
+        bb.debug(1, "Features set %s (was %s)" % (list(self.featureset), original_featureset))
         if (original_featureset != list(self.featureset)) and self.state != State.ERROR and hasattr(self, "data"):
+            bb.server.process.serverlog("Reseting due to feature chanages")
             self.reset()
 
     def initConfigurationData(self):
@@ -250,7 +259,11 @@ class BBCooker:
             if mod not in self.orig_sysmodules:
                 del sys.modules[mod]
 
+        self._baseconfig_set(False)
+        self._parsecache_set(False)
+
         self.configwatched = {}
+        self.revalidateCaches()
 
         # Need to preserve BB_CONSOLELOG over resets
         consolelog = None
@@ -278,6 +291,11 @@ class BBCooker:
                 logger.critical("Unable to import extra RecipeInfo '%s' from '%s': %s" % (cache_name, module_name, exc))
                 raise bb.BBHandledException()
 
+        if CookerFeatures.SKIP_FRAGMENTS in self.featureset:
+            self.enableSkipFragments()
+        else:
+            self.disableSkipFragments()
+
         self.databuilder = bb.cookerdata.CookerDataBuilder(self.configuration, False)
         self.databuilder.parseBaseConfiguration()
         self.data = self.databuilder.data
@@ -299,7 +317,6 @@ class BBCooker:
             self.add_filewatch(mc.getVar("__base_depends", False), configwatcher=True)
 
         self._baseconfig_set(True)
-        self._parsecache_set(False)
 
     def handlePRServ(self):
         # Setup a PR Server based on the new configuration
@@ -311,7 +328,16 @@ class BBCooker:
         if self.data.getVar("BB_HASHSERVE") == "auto":
             # Create a new hash server bound to a unix domain socket
             if not self.hashserv:
-                dbfile = (self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")) + "/hashserv.db"
+                bb_hashserve_db_dir = self.data.getVar("BB_HASHSERVE_DB_DIR")
+                if bb_hashserve_db_dir and utils.is_path_on_nfs(bb_hashserve_db_dir):
+                    bb.fatal("""Hash equivalency database location (set via BB_HASHSERVE_DB_DIR to {})
+cannot be on a NFS mount due to potential NFS locking issues between sqlite clients, per https://sqlite.org/faq.html#q5
+
+If you need to share the database between several computers, set up a permanently running hash equivalency server
+according to https://docs.yoctoproject.org/dev-manual/hashequivserver.html""".format(bb_hashserve_db_dir))
+                dbdir = bb_hashserve_db_dir or self.data.getVar("PERSISTENT_DIR") or self.data.getVar("CACHE")
+                os.makedirs(dbdir, exist_ok=True)
+                dbfile = dbdir + "/hashserv.db"
                 upstream = self.data.getVar("BB_HASHSERVE_UPSTREAM") or None
                 if upstream:
                     try:
@@ -320,7 +346,10 @@ class BBCooker:
                     except ImportError as e:
                         bb.fatal(""""Unable to use hash equivalence server at '%s' due to missing or incorrect python module:
 %s
-Please install the needed module on the build host, or use an environment containing it (e.g a pip venv or OpenEmbedded's buildtools tarball).
+Please install the needed module on the build host, or use an environment containing it:
+ - if you are using bitbake-setup, run 'bitbake-setup install-buildtools'
+ - openembedded-core layer contains 'scripts/install-buildtools' that can also be used
+ - or set up pip venv
 You can also remove the BB_HASHSERVE_UPSTREAM setting, but this may result in significantly longer build times as bitbake will be unable to reuse prebuilt sstate artefacts."""
                                  % (upstream, repr(e)))
                     except ConnectionError as e:
@@ -352,17 +381,34 @@ You can also remove the BB_HASHSERVE_UPSTREAM setting, but this may result in si
         if hasattr(self, "data"):
             self.data.disableTracking()
 
+    def enableSkipFragments(self):
+        self.configuration.skip_fragments = True
+
+    def disableSkipFragments(self):
+        self.configuration.skip_fragments = False
+
     def revalidateCaches(self):
         bb.parse.clear_cache()
+
+        if not self.baseconfig_valid:
+            bb.parse.BBHandler.cached_statements = {}
+            if hasattr(self, "databuilder"):
+                self.databuilder.calc_datastore_hashes(clean=False)
+            return
 
         clean = True
         for f in self.configwatched:
             if not bb.parse.check_mtime(f, self.configwatched[f]):
                 bb.server.process.serverlog("Found %s changed, invalid cache" % f)
+                if self.state not in (State.SHUTDOWN, State.FORCE_SHUTDOWN, State.ERROR):
+                    self.state = State.INITIAL
                 self._baseconfig_set(False)
                 self._parsecache_set(False)
                 clean = False
-                break
+                bb.parse.BBHandler.cached_statements = {}
+                if hasattr(self, "databuilder"):
+                    self.databuilder.calc_datastore_hashes(clean=False)
+                return
 
         if clean:
             for f in self.parsewatched:
@@ -370,15 +416,13 @@ You can also remove the BB_HASHSERVE_UPSTREAM setting, but this may result in si
                     bb.server.process.serverlog("Found %s changed, invalid cache" % f)
                     self._parsecache_set(False)
                     clean = False
+                    bb.parse.BBHandler.cached_statements = {}
                     break
-
-        if not clean:
-            bb.parse.BBHandler.cached_statements = {}
 
         # If writes were made to any of the data stores, we need to recalculate the data
         # store cache
         if hasattr(self, "databuilder"):
-            self.databuilder.calc_datastore_hashes()
+            self.databuilder.calc_datastore_hashes(clean=True)
 
     def parseConfiguration(self):
         self.updateCacheSync()
@@ -1434,8 +1478,7 @@ You can also remove the BB_HASHSERVE_UPSTREAM setting, but this may result in si
                 if quietlog:
                     bb.runqueue.logger.setLevel(rqloglevel)
                 return bb.server.process.idleFinish(msg)
-            if retval is True:
-                return True
+
             return retval
 
         self.idleCallBackRegister(buildFileIdle, rq)
@@ -1504,8 +1547,6 @@ You can also remove the BB_HASHSERVE_UPSTREAM setting, but this may result in si
                     bb.event.disable_heartbeat()
                 return bb.server.process.idleFinish(msg)
 
-            if retval is True:
-                return True
             return retval
 
         self.reset_mtime_caches()
@@ -2195,6 +2236,11 @@ class CookerParser(object):
                    self.result_queue.get(timeout=0.25)
                 except queue.Empty:
                     break
+                except KeyError:
+                    # The restore state from SiggenRecipeInfo in cache.py can
+                    # fail here if this is an unclean shutdown since the state may have been
+                    # reset. Ignore key errors for that reason, we don't care.
+                    pass
 
         def sync_caches():
             for c in self.bb_caches.values():

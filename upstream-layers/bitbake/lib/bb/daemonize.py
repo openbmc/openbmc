@@ -15,8 +15,11 @@ import os
 import sys
 import io
 import traceback
+import warnings
 
 import bb
+
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=".*use.of.fork.*may.lead.to.deadlocks.in.the.child.*")
 
 def createDaemon(function, logfile):
     """

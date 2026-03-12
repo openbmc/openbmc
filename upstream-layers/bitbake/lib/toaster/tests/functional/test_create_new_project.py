@@ -53,7 +53,7 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
           - Release: Yocto Project 4.0 "Kirkstone" (option value: 6)
           - Merge Toaster settings: True
         """
-        release = '7'
+        release = '6'
         release_title = 'Yocto Project 4.0 "Kirkstone"'
         project_name = 'projectkirkstone'
         self.create_new_project(

@@ -4,11 +4,11 @@
 BitBake Supported Release Manuals
 =================================
 
-******************************
-Release Series 5.2 (walnascar)
-******************************
+*******************************
+Release Series 5.3 (whinlatter)
+*******************************
 
-- :yocto_docs:`BitBake 2.12 User Manual </bitbake/2.12/>`
+- :yocto_docs:`BitBake 2.16 User Manual </bitbake/2.16/>`
 
 *******************************
 Release Series 5.0 (scarthgap)
@@ -25,6 +25,12 @@ Release Series 4.0 (kirkstone)
 ================================
 BitBake Outdated Release Manuals
 ================================
+
+******************************
+Release Series 5.2 (walnascar)
+******************************
+
+- :yocto_docs:`BitBake 2.12 User Manual </bitbake/2.12/>`
 
 ****************************
 Release Series 5.1 (styhead)
