@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 # Read The Docs specific
-jinja2==3.1.1
+jinja2==3.1.6
 
 # Required to build the documentation
 sphinx==7.1.2
