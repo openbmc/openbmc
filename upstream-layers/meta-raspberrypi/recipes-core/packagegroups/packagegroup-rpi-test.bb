@@ -16,7 +16,6 @@ RDEPENDS:${PN} = "\
     raspi-gpio \
     rpio \
     rpi-gpio \
-    pi-blaster \
     python3-adafruit-circuitpython-register \
     python3-adafruit-platformdetect \
     python3-adafruit-pureio \
@@ -26,6 +25,9 @@ RDEPENDS:${PN} = "\
     wireless-regdb-static \
     bluez5 \
 "
+
+RDEPENDS:${PN}:append:rpi:armv7a = " pi-blaster"
+RDEPENDS:${PN}:append:rpi:armv7ve = " pi-blaster"
 
 RRECOMMENDS:${PN} = "\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "meta-multimedia", "bigbuckbunny-1080p bigbuckbunny-480p bigbuckbunny-720p", "", d)} \

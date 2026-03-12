@@ -24,7 +24,9 @@ TEMP_DIR="$(mktemp -d)"
 cd "$TEMP_DIR"
 
 REPOS=" \
-    git://git.yoctoproject.org/poky.git \
+    git://git.openembedded.org/openembedded-core \
+    git://git.openembedded.org/bitbake \
+    git://git.yoctoproject.org/meta-yocto \
 "
 for repo in $REPOS; do
     log "Cloning $repo on branch $BASE_REF..."
@@ -32,7 +34,7 @@ for repo in $REPOS; do
 done
 
 # shellcheck disable=SC1091,SC2240
-. ./poky/oe-init-build-env build
+. ./openembedded-core/oe-init-build-env build
 
 # Build configuration
 printf "\n# ------ ci ------\n" >> conf/local.conf
@@ -52,6 +54,8 @@ LICENSE_FLAGS_ACCEPTED = "synaptics-killswitch"
 EOCONF
 
 # Add the BSP layer
+bitbake-layers add-layer "../meta-yocto/meta-poky"
+bitbake-layers add-layer "../meta-yocto/meta-yocto-bsp"
 bitbake-layers add-layer "$META_RASPBERRYPI_PATH"
 
 # Log configs for debugging purposes

@@ -16,6 +16,10 @@ INITSCRIPT_PACKAGES = "${PN}"
 INITSCRIPT_NAME:${PN} = "${PN}.boot.sh"
 INITSCRIPT_PARAMS:${PN} = "defaults 15 85"
 
-COMPATIBLE_MACHINE = "^rpi$"
+# only works on 32-bit targets
+# https://github.com/sarfata/pi-blaster/issues/114
+COMPATIBLE_MACHINE = "(^$)"
+COMPATIBLE_MACHINE:rpi:armv7a = "(.*)"
+COMPATIBLE_MACHINE:rpi:armv7ve = "(.*)"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

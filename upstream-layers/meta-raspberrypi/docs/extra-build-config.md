@@ -354,6 +354,12 @@ Tested modules:
 * WaveShare RS485 CAN HAT (8 MHz or 12 MHz crystal): <https://www.waveshare.com/rs485-can-hat.htm>
 * PiCAN2 Duo (16 MHz crystal): <http://skpang.co.uk/catalog/pican2-duo-canbus-board-for-raspberry-pi-23-p-1480.html>
 
+To enable the 2-Channel CAN-BUS(FD) Shield (MCP2518FD), set:
+
+    ENABLE_DUAL_CAN_SEED_FD_HAT_V2 = "1"
+
+* Seed Studio (2-Channel CAN-BUS(FD) Shield): <https://wiki.seeedstudio.com/2-Channel-CAN-BUS-FD-Shield-for-Raspberry-Pi/>
+
 ## Enable infrared
 
 Users who want to enable infrared support, for example for using LIRC (Linux

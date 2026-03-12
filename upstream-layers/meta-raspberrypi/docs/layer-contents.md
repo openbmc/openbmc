@@ -7,6 +7,7 @@
 * raspberrypi0-wifi
 * raspberrypi0-2w-64
 * raspberrypi2
+* raspberrypi2-64 (64 bit kernel & userspace)
 * raspberrypi3
 * raspberrypi3-64 (64 bit kernel & userspace)
 * raspberrypi4
@@ -14,6 +15,9 @@
 * raspberrypi5
 * raspberrypi-cm (dummy alias for raspberrypi)
 * raspberrypi-cm3
+
+Note: The raspberrypi2-64 machine includes 64-bit support for Raspberry Pi 2B
+V1.2.
 
 Note: The raspberrypi3 machines include support for Raspberry Pi 3B+.
 

@@ -1,0 +1,79 @@
+From 20741d848c32e0fb2e4841cf8bbc9ec3d198bb6b Mon Sep 17 00:00:00 2001
+From: Omri Sarig <omri.sarig@prevas.dk>
+Date: Thu, 9 Jan 2025 19:00:10 +0100
+Subject: [PATCH 2/2] Default all RPi 43455 boards to standard variant
+
+As the patch above explains, the symlink that is being used by the
+brcmfmac43455-sdio.* files is one that is created by the Debian system,
+which we do not have in our implementation. Therefore, when the system
+tries to load these files, an error message is generated.
+
+By changing the symlinks to be to the standard variant, the problem is
+solved for the build.
+
+The code is also working without this patch - when the driver is unable
+to load the board-specific file (such as
+brcmfmac43455-sdio.raspberrypi,3-model-a-plus.bin), it reverts to using
+the base file (brcmfmac43455-sdio.bin), which is a correct link (as it
+is fixed in the patch above). However, the driver is still generating an
+error message in this case, which is being solved by linking the
+board-specific files to the standard variant as well.
+
+Upstream-Status: Inappropriate [issue reported at https://github.com/RPi-Distro/firmware-nonfree/issues/26]
+Signed-off-by: Omri Sarig <omri.sarig@prevas.dk>
+---
+ .../brcm/brcmfmac43455-sdio.raspberrypi,3-model-a-plus.bin      | 2 +-
+ .../brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.bin      | 2 +-
+ .../brcm/brcmfmac43455-sdio.raspberrypi,4-compute-module.bin    | 2 +-
+ .../brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.bin | 2 +-
+ .../brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-a-plus.bin b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-a-plus.bin
+index 9c39208..b914838 120000
+--- a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-a-plus.bin
++++ b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-a-plus.bin
+@@ -1 +1 @@
+-../cypress/cyfmac43455-sdio.bin
+\ No newline at end of file
++../cypress/cyfmac43455-sdio-standard.bin
+\ No newline at end of file
+diff --git a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.bin b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.bin
+index 9c39208..b914838 120000
+--- a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.bin
++++ b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.bin
+@@ -1 +1 @@
+-../cypress/cyfmac43455-sdio.bin
+\ No newline at end of file
++../cypress/cyfmac43455-sdio-standard.bin
+\ No newline at end of file
+diff --git a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-compute-module.bin b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-compute-module.bin
+index 9c39208..b914838 120000
+--- a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-compute-module.bin
++++ b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-compute-module.bin
+@@ -1 +1 @@
+-../cypress/cyfmac43455-sdio.bin
+\ No newline at end of file
++../cypress/cyfmac43455-sdio-standard.bin
+\ No newline at end of file
+diff --git a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.bin b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.bin
+index 9c39208..b914838 120000
+--- a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.bin
++++ b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.bin
+@@ -1 +1 @@
+-../cypress/cyfmac43455-sdio.bin
+\ No newline at end of file
++../cypress/cyfmac43455-sdio-standard.bin
+\ No newline at end of file
+diff --git a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin
+index 9c39208..b914838 120000
+--- a/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin
++++ b/debian/config/brcm80211/brcm/brcmfmac43455-sdio.raspberrypi,5-model-b.bin
+@@ -1 +1 @@
+-../cypress/cyfmac43455-sdio.bin
+\ No newline at end of file
++../cypress/cyfmac43455-sdio-standard.bin
+\ No newline at end of file
+-- 
+2.34.1
+

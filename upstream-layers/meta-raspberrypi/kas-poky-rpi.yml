@@ -9,12 +9,25 @@ target:
 repos:
   meta-raspberry:
 
-  poky:
-    url: https://git.yoctoproject.org/git/poky
-    path: layers/poky
+  bitbake:
+    url: https://git.openembedded.org/bitbake
+    path: layers/bitbake
+    branch: master
+    layers:
+      bitbake: disabled
+
+  openembedded-core:
+    url: https://git.openembedded.org/openembedded-core
+    path: layers/openembedded-core
     branch: master
     layers:
       meta:
+
+  meta-yocto:
+    url: https://git.yoctoproject.org/meta-yocto
+    path: layers/meta-yocto
+    branch: master
+    layers:
       meta-poky:
       meta-yocto-bsp:
 

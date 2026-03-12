@@ -200,6 +200,12 @@ do_deploy() {
         esac
     fi
 
+    if [ "${ENABLE_UART}"  = "1" ] && [ "${MACHINE}" = "raspberrypi-cm5-io-board" ]; then
+        # Enable UART on the 40-pin header of the CM5 IO Board
+        echo "dtoverlay=uart0" >>$CONFIG
+        echo "dtparam=uart0_console" >>$CONFIG
+    fi
+
     # Infrared support
     if [ "${ENABLE_IR}" = "1" ]; then
         echo "# Enable infrared" >>$CONFIG
@@ -270,6 +276,10 @@ do_deploy() {
         echo "# Enable DUAL CAN" >>$CONFIG
         echo "dtoverlay=mcp2515-can0,oscillator=${CAN_OSCILLATOR},interrupt=${CAN0_INTERRUPT_PIN}" >>$CONFIG
         echo "dtoverlay=mcp2515-can1,oscillator=${CAN_OSCILLATOR},interrupt=${CAN1_INTERRUPT_PIN}" >>$CONFIG
+    # Enable DUAL CAN FOR SEED CAN FD HAT V2
+    elif [ "${ENABLE_DUAL_CAN_SEED_FD_HAT_V2}" = "1" ]; then
+        echo "# Enable DUAL CAN FOR SEED CAN FD HAT V2" >>$CONFIG
+        echo "dtoverlay=seeed-can-fd-hat-v2" >>$CONFIG
     # ENABLE CAN
     elif [ "${ENABLE_CAN}" = "1" ]; then
         echo "# Enable CAN" >>$CONFIG

@@ -7,7 +7,7 @@ SECTION = "kernel"
 
 LICENSE = "GPL-2.0-only & binary-redist-Cypress-rpidistro & Synaptics-rpidistro"
 LIC_FILES_CHKSUM = "\
-    file://debian/copyright;md5=291ee5385b4cf74b10c5fb5a46a7bbc6 \
+    file://debian/copyright;md5=454e44c688dc909e16223e4aee63568c \
 "
 # Where these are no common licenses, set NO_GENERIC_LICENSE so that the
 # license files will be copied from the fetched source.
@@ -16,10 +16,10 @@ NO_GENERIC_LICENSE[Synaptics-rpidistro] = "debian/copyright"
 LICENSE_FLAGS = "synaptics-killswitch"
 
 SRC_URI = "git://github.com/RPi-Distro/firmware-nonfree;branch=bookworm;protocol=https \
-    file://0001-Default-43455-firmware-to-standard-variant.patch \
+    file://0002-Default-all-RPi-43455-boards-to-standard-variant.patch \
 "
-SRCREV = "4b356e134e8333d073bd3802d767a825adec3807"
-PV = "20230625-2+rpt3"
+SRCREV = "c9d3ae6584ab79d19a4f94ccf701e888f9f87a53"
+PV = "20240709-2~bpo12+1+rpt3"
 
 inherit allarch
 
@@ -50,6 +50,9 @@ do_install() {
     ln -s cyfmac43455-sdio-${CYFMAC43455_SDIO_FIRMWARE}.bin ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.bin
 
     rm ${D}${nonarch_base_libdir}/firmware/cypress/README.txt
+
+    install -d ${D}${sysconfdir}/modprobe.d
+    install -m 0644 debian/rpi-brcmfmac.conf ${D}${sysconfdir}/modprobe.d/
 }
 
 PACKAGES = "\
@@ -60,6 +63,7 @@ PACKAGES = "\
     ${PN}-bcm43455 \
     ${PN}-bcm43456 \
     ${PN}-license \
+    ${PN}-module-conf \
 "
 
 LICENSE:${PN}-bcm43430 = "binary-redist-Cypress-rpidistro"
@@ -90,13 +94,14 @@ FILES:${PN}-bcm43455 = " \
 "
 FILES:${PN}-bcm43456 = "${nonarch_base_libdir}/firmware/brcm/brcmfmac43456*"
 FILES:${PN}-license = "${nonarch_base_libdir}/firmware/copyright.firmware-nonfree-rpidistro"
+FILES:${PN}-module-conf = "${sysconfdir}/modprobe.d"
 
-RDEPENDS:${PN}-bcm43430 += "${PN}-license"
-RDEPENDS:${PN}-bcm43436 += "${PN}-license"
-RDEPENDS:${PN}-bcm43436s += "${PN}-license"
-RDEPENDS:${PN}-bcm43439 += "${PN}-license"
-RDEPENDS:${PN}-bcm43455 += "${PN}-license"
-RDEPENDS:${PN}-bcm43456 += "${PN}-license"
+RDEPENDS:${PN}-bcm43430 += "${PN}-license ${PN}-module-conf"
+RDEPENDS:${PN}-bcm43436 += "${PN}-license ${PN}-module-conf"
+RDEPENDS:${PN}-bcm43436s += "${PN}-license ${PN}-module-conf"
+RDEPENDS:${PN}-bcm43439 += "${PN}-license ${PN}-module-conf"
+RDEPENDS:${PN}-bcm43455 += "${PN}-license ${PN}-module-conf"
+RDEPENDS:${PN}-bcm43456 += "${PN}-license ${PN}-module-conf"
 
 RCONFLICTS:${PN}-bcm43430 = "linux-firmware-raspbian-bcm43430"
 RCONFLICTS:${PN}-bcm43436 = "linux-firmware-bcm43436"

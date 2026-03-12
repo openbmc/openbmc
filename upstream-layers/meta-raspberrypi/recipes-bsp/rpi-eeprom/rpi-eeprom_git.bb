@@ -8,8 +8,8 @@ SRC_URI = " \
     git://github.com/raspberrypi/rpi-eeprom.git;protocol=https;branch=master \
 "
 
-SRCREV = "1bd0a1052b2e74d7af04de18d30b5edb12d8a423"
-PV = "v2025.03.10-2712"
+SRCREV = "2349daafacfb7a7abe2cfecf30a49ae837bdf2c6"
+PV = "v2025.07.17-2712"
 
 RDEPENDS:${PN} += " \
     coreutils \

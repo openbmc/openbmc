@@ -20,7 +20,8 @@ TEMP_DIR="$(mktemp -d)"
 cd "$TEMP_DIR"
 
 REPOS=" \
-    git://git.yoctoproject.org/poky.git \
+    git://git.openembedded.org/openembedded-core \
+    git://git.openembedded.org/bitbake \
 "
 for repo in $REPOS; do
     log "Cloning $repo on branch $BASE_REF..."
@@ -28,6 +29,6 @@ for repo in $REPOS; do
 done
 
 # shellcheck disable=SC1091,SC2240
-. ./poky/oe-init-build-env build
+. ./openembedded-core/oe-init-build-env build
 yocto-check-layer --with-software-layer-signature-check --debug \
     "$GIT_REPO_PATH"

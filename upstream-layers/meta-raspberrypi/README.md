@@ -53,14 +53,21 @@ Layers Program`. You can find details of that on the official Yocto Project
 ## Dependencies
 
 This layer depends on:
+* URI: https://git.openembedded.org/bitbake
+  * branch: master
+  * revision: HEAD
 
-* URI: git://git.yoctoproject.org/poky
+* URI: https://git.openembedded.org/openembedded-core
+  * branch: master
+  * revision: HEAD
+
+* URI: https://git.yoctoproject.org/meta-yocto
   * branch: master
   * revision: HEAD
 
 ## Quick Start
 
-1. source poky/oe-init-build-env rpi-build
+1. source openembedded-core/oe-init-build-env rpi-build
 2. Add this layer to bblayers.conf and the dependencies above
 3. Set MACHINE in local.conf to one of the supported boards
 4. bitbake core-image-base

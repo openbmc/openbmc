@@ -28,6 +28,7 @@ SRC_URI = "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', '', 'file://3008-vo-Makefile.am-exclude-libgl_plugin.patch', d)} \
     file://3009-vo-converter_vaapi-Fix-EGL-macro-undeclared.patch \
     file://3010-po-Fix-typos-in-oc.po-for-gettext-compatibility.patch \
+    file://3011-fix_whinlatter_compilation.patch \
     "
 
 SRCREV = "b276eb0d7bc3213363e97dbb681ef7c927be6c73"
@@ -36,7 +37,7 @@ PROVIDES = "vlc"
 RPROVIDES:${PN} = "${PROVIDES}"
 DEPENDS = "coreutils-native fribidi libtool libgcrypt libgcrypt-native \
            dbus libxml2 gnutls tremor faad2 ffmpeg flac alsa-lib libidn \
-           jpeg xz libmodplug mpeg2dec libmtp libopus orc libsamplerate0 \
+           jpeg xz libmodplug libmtp libopus orc libsamplerate0 \
            avahi libusb1 schroedinger taglib tiff"
 
 inherit autotools gettext pkgconfig mime-xdg
@@ -67,10 +68,10 @@ PACKAGECONFIG ?= "\
     ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'gles2', '', d)} \
     ${@bb.utils.contains_any('DISTRO_FEATURES', 'x11', 'notify', '', d)} \
     live555 dv1394 fontconfig fluidsynth freetype png udev \
-    x264 alsa harfbuzz jack neon fribidi dvbpsi a52 v4l2 \
+    x264 alsa harfbuzz jack neon fribidi dvbpsi v4l2 \
     "
 
-PACKAGECONFIG[mmal] = "--enable-omxil --enable-omxil-vout --enable-rpi-omxil --enable-mmal --enable-mmal-avcodec,,userland"
+PACKAGECONFIG[mmal] = "--enable-omxil --enable-omxil-vout --enable-rpi-omxil --enable-mmal --disable-mmal-avcodec,,userland"
 PACKAGECONFIG[x264] = "--enable-x264,--disable-x264,x264"
 PACKAGECONFIG[mad] = "--enable-mad,--disable-mad,libmad"
 PACKAGECONFIG[a52] = "--enable-a52,--disable-a52,liba52"
@@ -161,3 +162,4 @@ COMPATIBLE_HOST = "null"
 COMPATIBLE_HOST:rpi = "(.*)"
 
 INSANE_SKIP:${PN} = "dev-so"
+INSANE_SKIP:libvlc += "buildpaths"

@@ -1,0 +1,24 @@
+add missing header
+
+When compiling with gcc15, compiliation fails with the following error:
+
+| In file included from ../sources/libcamera-apps-1.9.0/post_processing_stages/segmentation_tf_stage.cpp:8:
+| ../sources/libcamera-apps-1.9.0/post_processing_stages/segmentation.hpp:15:82: error: 'uint8_t' was not declared in this scope
+|    15 |         Segmentation(int w, int h, std::vector<std::string> l, const std::vector<uint8_t> &s)
+
+To avoid it, add the cstdint header to the offending file.
+
+Upstream-Status: Submitted [https://github.com/raspberrypi/rpicam-apps/pull/861]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+diff --git a/post_processing_stages/segmentation.hpp b/post_processing_stages/segmentation.hpp
+index ac87228..82d7939 100644
+--- a/post_processing_stages/segmentation.hpp
++++ b/post_processing_stages/segmentation.hpp
+@@ -7,6 +7,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <string>
+ #include <vector>
+ 

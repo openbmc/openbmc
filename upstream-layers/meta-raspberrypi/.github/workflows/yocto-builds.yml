@@ -20,6 +20,7 @@ jobs:
           - raspberrypi0-2w
           - raspberrypi0
           - raspberrypi0-wifi
+          - raspberrypi2-64
           - raspberrypi2
           - raspberrypi3-64
           - raspberrypi3

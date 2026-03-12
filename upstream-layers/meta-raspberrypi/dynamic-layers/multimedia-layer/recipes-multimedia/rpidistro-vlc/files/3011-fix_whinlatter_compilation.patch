@@ -1,0 +1,278 @@
+Upstream-Status: Pending
+
+diff --git a/include/vlc_common.h b/include/vlc_common.h
+index 84fb6164e..69d94383e 100644
+--- a/include/vlc_common.h
++++ b/include/vlc_common.h
+@@ -112,7 +112,6 @@
+ #ifdef __GNUC__
+ # define likely(p)     __builtin_expect(!!(p), 1)
+ # define unlikely(p)   __builtin_expect(!!(p), 0)
+-# define unreachable() __builtin_unreachable()
+ #else
+ # define likely(p)     (!!(p))
+ # define unlikely(p)   (!!(p))
+diff --git a/modules/codec/spudec/spudec.c b/modules/codec/spudec/spudec.c
+index 3abdbf49d..160c46eb0 100644
+--- a/modules/codec/spudec/spudec.c
++++ b/modules/codec/spudec/spudec.c
+@@ -160,7 +160,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
+     block_ChainRelease( p_spu_block );
+ 
+     /* Parse and decode */
+-    ParsePacket( p_dec, decoder_QueueSub );
++    ParsePacket( p_dec, (void (*)(decoder_t *, subpicture_t *))decoder_QueueSub );
+ 
+     /* reinit context */
+     p_sys->i_spu_size = 0;
+diff --git a/modules/demux/mpeg/ts_pid.c b/modules/demux/mpeg/ts_pid.c
+index 7a7084fd5..a08e79281 100644
+--- a/modules/demux/mpeg/ts_pid.c
++++ b/modules/demux/mpeg/ts_pid.c
+@@ -101,7 +101,7 @@ ts_pid_t * ts_pid_Get( ts_pid_list_t *p_list, uint16_t i_pid )
+         pidkey.pp_last = NULL;
+ 
+         ts_pid_t **pp_pidk = bsearch( &pidkey, p_list->pp_all, p_list->i_all,
+-                                      sizeof(ts_pid_t *), ts_bsearch_searchkey_Compare );
++                                      sizeof(ts_pid_t *), (int (*)(const void *, const void *))ts_bsearch_searchkey_Compare );
+         if ( pp_pidk )
+             p_pid = *pp_pidk;
+         else
+diff --git a/modules/hw/mmal/mmal_cma.c b/modules/hw/mmal/mmal_cma.c
+index 1a35b1896..fcde00035 100644
+--- a/modules/hw/mmal/mmal_cma.c
++++ b/modules/hw/mmal/mmal_cma.c
+@@ -419,7 +419,7 @@ static void * cma_pool_alloc_cb(void * v, size_t size)
+         return NULL;
+ 
+     *cb = (cma_buf_t){
+-        .ref_count = ATOMIC_VAR_INIT(0),
++        .ref_count = (0),
+         .cbp = cbp,
+         .in_flight = 0,
+         .size = size,
+diff --git a/modules/meta_engine/taglib.cpp b/modules/meta_engine/taglib.cpp
+index ffe712e29..9059db253 100644
+--- a/modules/meta_engine/taglib.cpp
++++ b/modules/meta_engine/taglib.cpp
+@@ -122,7 +122,11 @@ VLCTagLib::ExtResolver<T>::ExtResolver(const std::string & ext) : FileTypeResolv
+ template <class T>
+ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProperties::ReadStyle) const
+ {
++#if defined(_WIN32) && TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    std::string filename = fileName.toString().to8Bit(true);
++#else
+     std::string filename = std::string(fileName);
++#endif
+     std::size_t namesize = filename.size();
+ 
+     if (namesize > ext.length())
+@@ -177,12 +181,16 @@ public:
+         return m_stream->psz_location;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    ByteVector readBlock(size_t length)
++#else
+     ByteVector readBlock(ulong length)
++#endif
+     {
+         ByteVector res(length, 0);
+         ssize_t i_read = vlc_stream_Read( m_stream, res.data(), length);
+         if (i_read < 0)
+-            return ByteVector::null;
++            return {};
+         else if ((size_t)i_read != length)
+             res.resize(i_read);
+         return res;
+@@ -193,11 +201,19 @@ public:
+         // Let's stay Read-Only for now
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void insert(const ByteVector&, offset_t, size_t)
++#else
+     void insert(const ByteVector&, ulong, ulong)
++#endif
+     {
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void removeBlock(offset_t, size_t)
++#else
+     void removeBlock(ulong, ulong)
++#endif
+     {
+     }
+ 
+@@ -211,7 +227,11 @@ public:
+         return true;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void seek(offset_t offset, Position p)
++#else
+     void seek(long offset, Position p)
++#endif
+     {
+         uint64_t pos = 0;
+         switch (p)
+@@ -234,12 +254,20 @@ public:
+         return;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    offset_t tell() const
++#else
+     long tell() const
++#endif
+     {
+         return m_previousPos;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    offset_t length()
++#else
+     long length()
++#endif
+     {
+         uint64_t i_size;
+         if (vlc_stream_GetSize( m_stream, &i_size ) != VLC_SUCCESS)
+@@ -247,7 +275,11 @@ public:
+         return i_size;
+     }
+ 
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++    void truncate(offset_t)
++#else
+     void truncate(long)
++#endif
+     {
+     }
+ 
+@@ -778,15 +810,15 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
+ {
+     MP4::Item list;
+ #define SET( keyName, metaName )                                                             \
+-    if( tag->itemListMap().contains(keyName) )                                               \
++    if( tag->contains(keyName) )                                                             \
+     {                                                                                        \
+-        list = tag->itemListMap()[keyName];                                                  \
++        list = tag->item(keyName);                                                           \
+         vlc_meta_Set##metaName( p_meta, list.toStringList().front().toCString( true ) );     \
+     }
+ #define SET_EXTRA( keyName, metaName )                                                   \
+-    if( tag->itemListMap().contains(keyName) )                                  \
+-    {                                                                                \
+-        list = tag->itemListMap()[keyName];                                     \
++    if( tag->contains(keyName) )                                                         \
++    {                                                                                    \
++        list = tag->item(keyName);                                                       \
+         vlc_meta_AddExtra( p_meta, metaName, list.toStringList().front().toCString( true ) ); \
+     }
+ 
+@@ -796,17 +828,17 @@ static void ReadMetaFromMP4( MP4::Tag* tag, demux_meta_t *p_demux_meta, vlc_meta
+ #undef SET
+ #undef SET_EXTRA
+ 
+-    if( tag->itemListMap().contains("covr") )
++    if( tag->contains("covr") )
+     {
+-        MP4::CoverArtList list = tag->itemListMap()["covr"].toCoverArtList();
+-        const char *psz_format = list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
++        MP4::CoverArtList cover_list = tag->item("covr").toCoverArtList();
++        const char *psz_format = cover_list[0].format() == MP4::CoverArt::PNG ? "image/png" : "image/jpeg";
+ 
+         msg_Dbg( p_demux_meta, "Found embedded art (%s) is %i bytes",
+-                 psz_format, list[0].data().size() );
++                 psz_format, cover_list[0].data().size() );
+ 
+         input_attachment_t *p_attachment =
+                 vlc_input_attachment_New( "cover", psz_format, "cover",
+-                                          list[0].data().data(), list[0].data().size() );
++                                          cover_list[0].data().data(), cover_list[0].data().size() );
+         if( p_attachment )
+         {
+             TAB_APPEND_CAST( (input_attachment_t**),
+@@ -894,7 +926,7 @@ static int ReadMeta( vlc_object_t* p_this)
+     Tag* p_tag = f.tag();
+ 
+ #define SET( tag, meta )                                                       \
+-    if( !p_tag->tag().isNull() && !p_tag->tag().isEmpty() )                    \
++    if( !p_tag->tag().isEmpty() )                                              \
+         vlc_meta_Set##meta( p_meta, p_tag->tag().toCString(true) )
+ #define SETINT( tag, meta )                                                    \
+     if( p_tag->tag() )                                                         \
+@@ -971,7 +1003,7 @@ static int ReadMeta( vlc_object_t* p_this)
+         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
+             ReadMetaFromId3v2( riff_aiff->tag(), p_demux_meta, p_meta );
+         else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
+-            ReadMetaFromId3v2( riff_wav->tag(), p_demux_meta, p_meta );
++            ReadMetaFromId3v2( riff_wav->ID3v2Tag(), p_demux_meta, p_demux_meta->p_meta );
+     }
+     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
+     {
+@@ -1295,7 +1327,11 @@ static int WriteMeta( vlc_object_t *p_this )
+         if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
+             WriteMetaToId3v2( riff_aiff->tag(), p_item );
+         else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
++#if TAGLIB_VERSION >= VERSION_INT(2, 0, 0)
++            WriteMetaToId3v2( riff_wav->ID3v2Tag(), p_item );
++#else
+             WriteMetaToId3v2( riff_wav->tag(), p_item );
++#endif
+     }
+     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
+     {
+diff --git a/modules/spu/dynamicoverlay/dynamicoverlay_commands.c b/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
+index 0fd255fe5..d37bb4f96 100644
+--- a/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
++++ b/modules/spu/dynamicoverlay/dynamicoverlay_commands.c
+@@ -231,7 +231,7 @@ static int parser_SetTextAlpha( char *psz_command, char *psz_end,
+     skip_space( &psz_command );
+     if( isdigit( (unsigned char)*psz_command ) )
+     {
+-        if( parse_digit( &psz_command, &p_params->fontstyle.i_font_alpha ) == VLC_EGENERIC )
++        if( parse_digit( &psz_command, (int32_t *)&p_params->fontstyle.i_font_alpha ) == VLC_EGENERIC )
+             return VLC_EGENERIC;
+     }
+     return VLC_SUCCESS;
+diff --git a/modules/video_chroma/swscale.c b/modules/video_chroma/swscale.c
+index 1f0c6ba51..64afc3d00 100644
+--- a/modules/video_chroma/swscale.c
++++ b/modules/video_chroma/swscale.c
+@@ -607,7 +607,7 @@ static void Convert( filter_t *p_filter, struct SwsContext *ctx,
+                p_dst, i_plane_count, b_swap_uvo );
+ 
+ #if LIBSWSCALE_VERSION_INT  >= ((0<<16)+(5<<8)+0)
+-    sws_scale( ctx, src, src_stride, 0, i_height,
++    sws_scale( ctx, (const uint8_t * const*)src, src_stride, 0, i_height,
+                dst, dst_stride );
+ #else
+     sws_scale_ordered( ctx, src, src_stride, 0, i_height,
+diff --git a/modules/video_filter/deinterlace/algo_yadif.c b/modules/video_filter/deinterlace/algo_yadif.c
+index 4d130cb27..7d2189fe9 100644
+--- a/modules/video_filter/deinterlace/algo_yadif.c
++++ b/modules/video_filter/deinterlace/algo_yadif.c
+@@ -134,7 +134,7 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
+             filter = yadif_filter_line_c;
+ 
+         if( p_sys->chroma->pixel_size == 2 )
+-            filter = yadif_filter_line_c_16bit;
++            filter = (void (*)(uint8_t *, uint8_t *, uint8_t *, uint8_t *, int,  int,  int,  int,  int))yadif_filter_line_c_16bit;
+ 
+         for( int n = 0; n < p_dst->i_planes; n++ )
+         {
+diff --git a/src/input/input.c b/src/input/input.c
+index d2f006587..e48902f1a 100644
+--- a/src/input/input.c
++++ b/src/input/input.c
+@@ -906,7 +906,7 @@ static void InitTitle( input_thread_t * p_input )
+     vlc_mutex_lock( &priv->p_item->lock );
+     /* Create global title (from master) */
+     priv->i_title = p_master->i_title;
+-    priv->title   = p_master->title;
++    priv->title   = (const input_title_t **)p_master->title;
+     priv->i_title_offset = p_master->i_title_offset;
+     priv->i_seekpoint_offset = p_master->i_seekpoint_offset;
+     if( priv->i_title > 0 )

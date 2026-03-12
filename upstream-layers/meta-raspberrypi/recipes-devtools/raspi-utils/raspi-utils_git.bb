@@ -13,7 +13,7 @@ PV = "1.0+git"
 
 SRC_URI = "git://github.com/raspberrypi/utils;protocol=https;branch=master"
 
-SRCREV = "b9c63214c535d7df2b0fa6743b7b3e508363c25a"
+SRCREV = "e923ccad57d2a22f606c8fe0d1096e782a090fc9"
 
 FILES:${PN}:append = " \
     ${datadir}/bash-completion/completions/pinctrl \

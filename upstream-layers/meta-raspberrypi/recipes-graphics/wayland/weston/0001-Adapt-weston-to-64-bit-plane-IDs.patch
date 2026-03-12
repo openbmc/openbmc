@@ -1,0 +1,72 @@
+From 845682f33511da676bfe9237102b6979efa11f93 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Fri, 21 Nov 2025 18:07:00 +0100
+Subject: [PATCH] Adapt weston to 64-bit plane IDs
+
+The raspberry pi kernel has changed the plane IDs in their drm
+driver[1], which causes weston to crash upon mouse movement.
+
+This patch adapts the relevant variable sizes from 32-bit to
+64-bit.
+
+[1]: https://github.com/raspberrypi/linux/commit/8181e682d6f4ef209845ec24f0a1eb37764d6731
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/wayland/weston/-/merge_requests/1902]
+---
+ libweston/backend-drm/drm-internal.h  |  4 ++--
+ libweston/backend-drm/state-propose.c | 10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+--- a/libweston/backend-drm/drm-internal.h
++++ b/libweston/backend-drm/drm-internal.h
+@@ -296,7 +296,7 @@ struct drm_fb {
+ 	int width, height;
+ 	int fd;
+ 
+-	uint32_t plane_mask;
++	uint64_t plane_mask;
+ 
+ 	/* Used by gbm fbs */
+ 	struct gbm_bo *bo;
+--- a/libweston/backend-drm/state-propose.c
++++ b/libweston/backend-drm/state-propose.c
+@@ -412,7 +412,7 @@ drm_output_find_plane_for_view(struct dr
+ 	                               current_lowest_zpos_overlay;
+ 
+ 	bool view_matches_entire_output, scanout_has_view_assigned;
+-	uint32_t possible_plane_mask = 0;
++	uint64_t possible_plane_mask = 0;
+ 
+ 	pnode->try_view_on_plane_failure_reasons = FAILURE_REASONS_NONE;
+ 
+@@ -461,7 +461,7 @@ drm_output_find_plane_for_view(struct dr
+ 			return NULL;
+ 		}
+ 
+-		possible_plane_mask = (1 << output->cursor_plane->plane_idx);
++		possible_plane_mask = (1UL << output->cursor_plane->plane_idx);
+ 	} else {
+ 		if (mode == DRM_OUTPUT_PROPOSE_STATE_RENDERER_ONLY) {
+ 			drm_debug(b, "\t\t\t\t[view] not assigning view %p "
+@@ -474,7 +474,7 @@ drm_output_find_plane_for_view(struct dr
+ 				continue;
+ 
+ 			if (drm_paint_node_transform_supported(pnode, plane))
+-				possible_plane_mask |= 1 << plane->plane_idx;
++				possible_plane_mask |= 1UL << plane->plane_idx;
+ 		}
+ 
+ 		if (!possible_plane_mask) {
+@@ -508,10 +508,10 @@ drm_output_find_plane_for_view(struct dr
+ 		if (possible_plane_mask == 0)
+ 			break;
+ 
+-		if (!(possible_plane_mask & (1 << plane->plane_idx)))
++		if (!(possible_plane_mask & (1UL << plane->plane_idx)))
+ 			continue;
+ 
+-		possible_plane_mask &= ~(1 << plane->plane_idx);
++		possible_plane_mask &= ~(1UL << plane->plane_idx);
+ 		mm_has_underlay =
+ 			drm_mixed_mode_check_underlay(mode, scanout_state, plane->zpos_max);
+ 

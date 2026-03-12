@@ -16,6 +16,7 @@ XSERVER = " \
 
 RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/overlay_map.dtb \
+    overlays/hat_map.dtb \
     overlays/at86rf233.dtbo \
     overlays/disable-bt.dtbo \
     overlays/disable-bt-pi5.dtbo \
@@ -51,6 +52,7 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/iqaudio-dacplus.dtbo \
     overlays/mcp2515-can0.dtbo \
     overlays/mcp2515-can1.dtbo \
+    overlays/seeed-can-fd-hat-v2.dtbo \
     overlays/mcp3008.dtbo \
     overlays/miniuart-bt.dtbo \
     overlays/pitft22.dtbo \
@@ -78,8 +80,11 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/vc4-kms-v3d-pi5.dtbo \
     overlays/vc4-kms-dsi-7inch.dtbo \
     overlays/vc4-kms-dsi-ili9881-7inch.dtbo \
+    overlays/vc4-kms-dsi-ili9881-5inch.dtbo \
+    overlays/rpi-backlight.dtbo \
     overlays/w1-gpio.dtbo \
     overlays/w1-gpio-pullup.dtbo \
+    overlays/w1-gpio-pi5.dtbo \
     overlays/wm8960-soundcard.dtbo \
     overlays/bcm2712d0.dtbo \
     "
@@ -148,7 +153,7 @@ def make_dtb_boot_files(d):
 
     def transform(dtb):
         base = os.path.basename(dtb)
-        if dtb.endswith('dtbo') or base == 'overlay_map.dtb':
+        if dtb.endswith('dtbo') or base == 'overlay_map.dtb' or base == 'hat_map.dtb':
             # overlay dtb:
             # eg: overlays/hifiberry-amp.dtbo has:
             #     DEPLOYDIR file: hifiberry-amp.dtbo

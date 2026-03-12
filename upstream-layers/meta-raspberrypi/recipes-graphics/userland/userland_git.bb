@@ -13,11 +13,11 @@ COMPATIBLE_MACHINE = "^rpi$"
 
 SRCBRANCH = "master"
 SRCFORK = "raspberrypi"
-SRCREV = "cc1ca18fb0689b01cc2ca2aa4b400dcee624a213"
+SRCREV = "a54a0dbb2b8dcf9bafdddfc9a9374fb51d97e976"
 
 # Use the date of the above commit as the package version. Update this when
 # SRCREV is changed.
-PV = "20230419"
+PV = "20242312"
 
 SRC_URI = "\
     git://github.com/${SRCFORK}/userland.git;protocol=https;branch=${SRCBRANCH} \
@@ -47,6 +47,7 @@ SRC_URI = "\
     file://0023-hello_pi-optionally-build-wayland-specific-app.patch \
     file://0024-userland-Sync-needed-defines-for-weston-build.patch \
     file://0025-CMakeLists.txt-.pc-respect-CMAKE_INSTALL_LIBDIR.patch \
+    file://0026-fix_callback_types.patch \
 "
 
 SRC_URI:remove:toolchain-clang = "file://0021-cmake-Disable-format-overflow-warning-as-error.patch"
@@ -57,7 +58,9 @@ ASNEEDED = ""
 
 EXTRA_OECMAKE = "-DCMAKE_BUILD_TYPE=Release -DCMAKE_EXE_LINKER_FLAGS='-Wl,--no-as-needed' \
                  -DVMCS_INSTALL_PREFIX=${exec_prefix} \
+                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
 "
+
 
 EXTRA_OECMAKE:append:aarch64 = " -DARM64=ON "
 

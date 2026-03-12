@@ -1,10 +1,4 @@
-PACKAGECONFIG:remove:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', 'fbdev', 'egl clients', d)}"
+PACKAGECONFIG:remove:rpi = "${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', 'egl clients', d)}"
 
-EXTRA_OECONF:append:rpi = " \
-    --disable-xwayland-test \
-    --disable-simple-egl-clients \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'vc4graphics', '', ' \
-        --disable-resize-optimization \
-        --disable-setuid-install \
-    ', d)} \
-"
+FILESEXTRAPATHS:prepend := "${THISDIR}/weston:"
+SRC_URI:append:rpi = " file://0001-Adapt-weston-to-64-bit-plane-IDs.patch"
