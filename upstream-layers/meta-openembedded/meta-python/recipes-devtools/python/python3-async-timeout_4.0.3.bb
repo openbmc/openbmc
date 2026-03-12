@@ -16,3 +16,5 @@ inherit pypi python_setuptools_build_meta
 RDEPENDS:${PN} = "\
     python3-asyncio \
 "
+
+BBCLASSEXTEND = "native nativesdk"

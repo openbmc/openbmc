@@ -1,0 +1,10 @@
+#!/bin/sh
+RET=0
+cd tests/scripts
+if ./run_tests.sh; then
+    echo PASS: run_tests.sh
+else
+    echo FAIL: run_tests.sh
+    RET=1
+fi
+exit $RET

@@ -14,17 +14,14 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 diff --git a/m4/want_unwind.m4 b/m4/want_unwind.m4
 index cadb62b..5517314 100644
---- a/m4/want_unwind.m4
-+++ b/m4/want_unwind.m4
-@@ -2,7 +2,7 @@ AC_DEFUN([DOVECOT_WANT_UNWIND], [
+--- ./m4/want_unwind.m4	2025-10-04 22:57:09.371034202 +0200
++++ ./m4/want_unwind.m4	2025-10-04 22:57:30.954794164 +0200
+@@ -2,7 +2,7 @@
    have_libunwind=no
+ 
    AS_IF([test "$want_libunwind" != "no"], [
-     PKG_CHECK_EXISTS([libunwind], [
--      PKG_CHECK_MODULES([LIBUNWIND], [libunwind-generic],[
-+      PKG_CHECK_MODULES([LIBUNWIND], [libunwind],[
-         have_libunwind=yes
- 	AC_DEFINE([HAVE_LIBUNWIND],,[Define this if you have libunwind])
-       ])
--- 
-2.31.1
-
+-    PKG_CHECK_MODULES([LIBUNWIND], [libunwind-generic], [have_libunwind=yes], [
++    PKG_CHECK_MODULES([LIBUNWIND], [libunwind], [have_libunwind=yes], [
+       have_libunwind=no
+ 
+       AS_IF([test "$want_libunwind" = "yes"], [

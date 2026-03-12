@@ -1,0 +1,13 @@
+#!/bin/sh
+RET=0
+
+cd test
+for t in $(find . -type f -executable); do
+    if ./$t; then
+        echo PASS: $t
+    else
+        echo FAIL: $t
+        RET=1
+    fi
+done
+exit $RET

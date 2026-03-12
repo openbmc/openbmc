@@ -8,6 +8,8 @@ SRC_URI = "http://sg.danny.cz/scsi/${BP}.tgz"
 
 SRC_URI[sha256sum] = "0a800e9e94dca2ab702d65d72777ae8cae078e3d74d0bcbed64ba0849e8029a1"
 
+PE = "1"
+
 inherit autotools
 
 S = "${UNPACKDIR}/lsscsi-${PV}"

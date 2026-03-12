@@ -1,4 +1,4 @@
-From d1fb37569b5a8c21968f69164e8bc6e4bb0185eb Mon Sep 17 00:00:00 2001
+From 220b65291734b81a3c232877cf5fced20fe773e3 Mon Sep 17 00:00:00 2001
 From: Manoj Saun <manojsingh.saun@windriver.com>
 Date: Wed, 22 Mar 2023 08:07:26 +0000
 Subject: [PATCH] postgresql: fix ptest failure of sysviews
@@ -44,6 +44,3 @@ index b047fb5..d1e3999 100644
  
  -- We expect no cursors in this test; see also portals.sql
  select count(*) = 0 as ok from pg_cursors;
--- 
-2.34.1
-

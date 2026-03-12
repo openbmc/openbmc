@@ -58,7 +58,6 @@ RDEPENDS:packagegroup-meta-perl = "\
     libtext-diff-perl \
     libtext-charwidth-perl \
     libtext-wrapi18n-perl \
-    libxml-libxml-perl \
     libxml-filter-buffertext-perl \
     libxml-sax-writer-perl \
     libextutils-config-perl \

@@ -96,4 +96,5 @@ do_install_ptest () {
 }
 
 RDEPENDS:${PN} = "ppp ppp-l2tp bash"
-RDEPENDS:${PN}-ptest += "rpcbind kernel-module-l2tp-ppp procps-ps tcl"
+RDEPENDS:${PN}-ptest += "rpcbind procps-ps tcl"
+RRECOMMENDS:${PN}-ptest = "kernel-module-l2tp-ppp"

@@ -12,6 +12,8 @@ PYPI_PACKAGE = "myst_parser"
 RDEPENDS:${PN} = "\
     python3-docutils \
     python3-jinja2 \
+    python3-markdown-it-py \
+    python3-mdit-py-plugins \
     python3-pyyaml \
     python3-sphinx \
     "

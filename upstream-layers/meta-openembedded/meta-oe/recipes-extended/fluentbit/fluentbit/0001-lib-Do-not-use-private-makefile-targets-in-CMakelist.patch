@@ -1,4 +1,4 @@
-From 7e6295f14ea057562a235fbf6762d867e739a181 Mon Sep 17 00:00:00 2001
+From 4b47a8f0e3d1d429356cdda8efa7682ab88d344a Mon Sep 17 00:00:00 2001
 From: Niko Mauno <niko.mauno@vaisala.com>
 Date: Sun, 29 Sep 2024 12:00:00 +0000
 Subject: [PATCH] lib: Do not use private makefile targets in CMakelists.txt
@@ -28,6 +28,8 @@ Upstream-Status: Submitted [https://github.com/fluent/fluent-bit/pull/9450]
  lib/monkey/CMakeLists.txt   | 4 +---
  4 files changed, 7 insertions(+), 21 deletions(-)
 
+diff --git a/lib/cfl/CMakeLists.txt b/lib/cfl/CMakeLists.txt
+index 489570026..06d99cbbe 100644
 --- a/lib/cfl/CMakeLists.txt
 +++ b/lib/cfl/CMakeLists.txt
 @@ -40,12 +40,8 @@ if(NOT MSVC)
@@ -45,6 +47,8 @@ Upstream-Status: Submitted [https://github.com/fluent/fluent-bit/pull/9450]
  
  
  
+diff --git a/lib/cmetrics/CMakeLists.txt b/lib/cmetrics/CMakeLists.txt
+index 5421f8c80..0dcf7645c 100644
 --- a/lib/cmetrics/CMakeLists.txt
 +++ b/lib/cmetrics/CMakeLists.txt
 @@ -60,12 +60,8 @@ if(NOT MSVC)
@@ -61,11 +65,13 @@ Upstream-Status: Submitted [https://github.com/fluent/fluent-bit/pull/9450]
 +set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__CMT_FILENAME__=__FILE__")
  
  # Configuration options
- option(CMT_DEV                       "Enable development mode"                   No)
+ option(CMT_DEV                       "Enable development mode"                    No)
+diff --git a/lib/ctraces/CMakeLists.txt b/lib/ctraces/CMakeLists.txt
+index 73723433d..9f60699d5 100644
 --- a/lib/ctraces/CMakeLists.txt
 +++ b/lib/ctraces/CMakeLists.txt
 @@ -30,12 +30,8 @@ set(CTR_VERSION_MINOR  6)
- set(CTR_VERSION_PATCH  4)
+ set(CTR_VERSION_PATCH  6)
  set(CTR_VERSION_STR "${CTR_VERSION_MAJOR}.${CTR_VERSION_MINOR}.${CTR_VERSION_PATCH}")
  
 -# Define __FILENAME__ consistently across Operating Systems
@@ -79,6 +85,8 @@ Upstream-Status: Submitted [https://github.com/fluent/fluent-bit/pull/9450]
  
  # Configuration options
  option(CTR_DEV             "Enable development mode"                   No)
+diff --git a/lib/monkey/CMakeLists.txt b/lib/monkey/CMakeLists.txt
+index 3fbace595..1c6ad031c 100644
 --- a/lib/monkey/CMakeLists.txt
 +++ b/lib/monkey/CMakeLists.txt
 @@ -15,10 +15,8 @@ include(GNUInstallDirs)

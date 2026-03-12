@@ -1,0 +1,40 @@
+From 74c6e762097ad8016d1410bd1beaef1398f02901 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Wed, 5 Nov 2025 22:17:14 +0800
+Subject: [PATCH] Do not treat warnings as errors with clang
+
+There are some warnings when building with clang which are treated as
+errors and fails the build.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ddc1eed8..62b096e7 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -73,7 +73,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+     # This is only relevant for GCC and causes warnings on Clang
+     set(EXPORTSYMBOLS "-Wl,-export-dynamic -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exportmap.gcc")
+-    set(OS_CXX_FLAGS "${OS_CXX_FLAGS} -Wno-tsan -Wl,-z,relro,-z,now")
++    set(OS_CXX_FLAGS "${OS_CXX_FLAGS} -Wno-tsan -Wl,-z,relro,-z,now -Werror")
+ endif()
+ 
+     set(NO_DEPRECATED "")
+@@ -82,7 +82,7 @@ endif()
+     if(NOT DEFINED _FORTIFY_SOURCE)
+         set(_FORTIFY_SOURCE 2)
+     endif()
+-    set(OS_CXX_FLAGS "${OS_CXX_FLAGS} -D_GLIBCXX_USE_NANOSLEEP -pthread -O -Wall -Wextra -Wformat -Wformat-security -Wconversion -fexceptions -fstrict-aliasing -fstack-protector-strong -fasynchronous-unwind-tables -fno-omit-frame-pointer -D_FORTIFY_SOURCE=${_FORTIFY_SOURCE} -Wformat -Wformat-security -Wpedantic -Werror -Wno-inconsistent-missing-override")
++    set(OS_CXX_FLAGS "${OS_CXX_FLAGS} -D_GLIBCXX_USE_NANOSLEEP -pthread -O -Wall -Wextra -Wformat -Wformat-security -Wconversion -fexceptions -fstrict-aliasing -fstack-protector-strong -fasynchronous-unwind-tables -fno-omit-frame-pointer -D_FORTIFY_SOURCE=${_FORTIFY_SOURCE} -Wformat -Wformat-security -Wpedantic -Wno-inconsistent-missing-override")
+ 
+     # force all use of std::mutex and std::recursive_mutex to use runtime init
+     # instead of static initialization so mutexes can be hooked to enable PI as needed
+-- 
+2.34.1
+

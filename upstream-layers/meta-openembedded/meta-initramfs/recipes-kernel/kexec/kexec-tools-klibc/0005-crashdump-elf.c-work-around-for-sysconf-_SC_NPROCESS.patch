@@ -21,8 +21,6 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/crashdump-elf.c | 92 +++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 92 insertions(+)
 
-diff --git a/kexec/crashdump-elf.c b/kexec/crashdump-elf.c
-index b8bb686..7e6767c 100644
 --- a/kexec/crashdump-elf.c
 +++ b/kexec/crashdump-elf.c
 @@ -25,6 +25,94 @@ do {									\

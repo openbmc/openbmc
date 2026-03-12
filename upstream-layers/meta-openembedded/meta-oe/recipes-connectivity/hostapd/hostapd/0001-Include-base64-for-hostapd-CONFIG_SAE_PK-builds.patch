@@ -1,0 +1,40 @@
+From 430bc89b9a29537d9d22bb42406f3d14072a01d4 Mon Sep 17 00:00:00 2001
+From: Jouni Malinen <j@w1.fi>
+Date: Sun, 22 Dec 2024 18:53:12 +0200
+Subject: [PATCH] Include base64 for hostapd CONFIG_SAE_PK builds
+
+CONFIG_SAE_PK=y needs base64 functionality, so set NEED_BASE64
+automatically for it.
+
+Signed-off-by: Jouni Malinen <j@w1.fi>
+Upstream-Status: Backport [https://git.w1.fi/cgit/hostap/commit/?id=430bc89b9a29537d9d22bb42406f3d14072a01d4]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ hostapd/Android.mk | 1 +
+ hostapd/Makefile   | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/hostapd/Android.mk b/hostapd/Android.mk
+index e6c2fbf18..6e0d77d28 100644
+--- a/hostapd/Android.mk
++++ b/hostapd/Android.mk
+@@ -260,6 +260,7 @@ OBJS += src/common/sae.c
+ ifdef CONFIG_SAE_PK
+ L_CFLAGS += -DCONFIG_SAE_PK
+ NEED_AES_SIV=y
++NEED_BASE64=y
+ OBJS += src/common/sae_pk.c
+ endif
+ NEED_ECC=y
+diff --git a/hostapd/Makefile b/hostapd/Makefile
+index fa0d366a8..c3419c10e 100644
+--- a/hostapd/Makefile
++++ b/hostapd/Makefile
+@@ -299,6 +299,7 @@ OBJS += ../src/common/sae.o
+ ifdef CONFIG_SAE_PK
+ CFLAGS += -DCONFIG_SAE_PK
+ NEED_AES_SIV=y
++NEED_BASE64=y
+ OBJS += ../src/common/sae_pk.o
+ endif
+ NEED_ECC=y

@@ -1,0 +1,10 @@
+#!/bin/sh
+RET=0
+cd tests
+if ./mediaart-test; then
+  echo PASS: mediaart-test
+else
+  echo FAIL: mediaart-test
+  RET=1
+fi
+exit $RET

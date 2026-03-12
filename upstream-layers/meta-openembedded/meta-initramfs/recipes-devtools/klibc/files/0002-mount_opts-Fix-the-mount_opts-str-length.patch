@@ -1,0 +1,41 @@
+From eaecc37c86fff0ff951e1930abdb9e51364c2d14 Mon Sep 17 00:00:00 2001
+From: Florent Revest <revest@chromium.org>
+Date: Thu, 10 Jul 2025 19:39:11 +0200
+Subject: [PATCH 2/2] mount_opts: Fix the mount_opts str length
+
+Newer versions of LLVM report:
+
+usr/utils/mount_opts.c:20:3: error: initializer-string for character array is too long, array size is 8 but initializer has size 9 (including the null terminating character); did you mean to use the 'nonstring' attribute? [-Werror,-Wunterminated-string-initialization]
+   20 |         {"diratime", MS_NODIRATIME, 0, MS_NODIRATIME},
+      |          ^~~~~~~~~~
+
+This is indeed a bit odd. "diratime" is 9 bytes long with the \0
+terminator but placed into a struct that uses a static length of 8 bytes
+for that buffer. I suppose this can cause all sorts of undefined
+behaviors in theory but that in practice this never caused anything bad
+because the next field is an unsigned long containing 2048 so the upper
+bytes are 0 and act as string terminators by chance.
+
+Anyway, fixing this helps unblock builds with newer toolchains.
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/libs/klibc/klibc.git/commit/?id=f7d9399d1035d2a70067fa6995db7ea02ed0c311]
+Signed-off-by: Florent Revest <revest@chromium.org>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/utils/mount_opts.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/usr/utils/mount_opts.h b/usr/utils/mount_opts.h
+index cf47cae..5195c88 100644
+--- a/usr/utils/mount_opts.h
++++ b/usr/utils/mount_opts.h
+@@ -2,7 +2,7 @@
+ #define UTILS_MOUNT_OPTS_H
+ 
+ struct mount_opts {
+-	const char str[8];
++	const char str[9];
+ 	unsigned long rwmask;
+ 	unsigned long rwset;
+ 	unsigned long rwnoset;

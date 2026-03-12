@@ -26,27 +26,28 @@ Upstream-Status: Pending
 
 --- a/kexec/arch/mips/include/arch/options.h
 +++ b/kexec/arch/mips/include/arch/options.h
-@@ -5,6 +5,7 @@
- #define OPT_APPEND	(OPT_ARCH_MAX+0)
- #define OPT_DTB		(OPT_ARCH_MAX+1)
- #define OPT_RAMDISK	(OPT_ARCH_MAX+2)
-+#define OPT_NO_DTB	(OPT_ARCH_MAX+3)
+@@ -6,6 +6,7 @@
+ #define OPT_DTB 		(OPT_ARCH_MAX+1)
+ #define OPT_RAMDISK		(OPT_ARCH_MAX+2)
+ #define OPT_REUSE_CMDLINE	(OPT_ARCH_MAX+3)
++#define OPT_NO_DTB	(OPT_ARCH_MAX+4)
  
  /* Options relevant to the architecture (excluding loader-specific ones),
   * in this case none:
-@@ -14,7 +15,8 @@
- 	{"command-line", 1, 0, OPT_APPEND}, \
+@@ -16,8 +17,8 @@
  	{"append",	 1, 0, OPT_APPEND}, \
  	{"dtb",		1, 0, OPT_DTB }, \
--	{"initrd",	1, 0, OPT_RAMDISK },
-+	{"initrd",	1, 0, OPT_RAMDISK }, \
+ 	{"initrd",	1, 0, OPT_RAMDISK }, \
+-	{ "reuse-cmdline", 0, NULL, OPT_REUSE_CMDLINE },
+-
++	{ "reuse-cmdline", 0, NULL, OPT_REUSE_CMDLINE }, \
 +	{"no-dtb",	0, 0, OPT_NO_DTB },
  
- 
  #define KEXEC_ARCH_OPT_STR KEXEC_OPT_STR ""
+ 
 --- a/kexec/arch/mips/kexec-elf-mips.c
 +++ b/kexec/arch/mips/kexec-elf-mips.c
-@@ -141,45 +141,49 @@ int elf_mips_load(int argc, char **argv,
+@@ -196,36 +196,38 @@ int elf_mips_load(int argc, char **argv,
  	else
  		cmdline_addr = 0;
  
@@ -64,10 +65,10 @@ Upstream-Status: Pending
 -
 -	if (arch_options.initrd_file) {
 -		initrd_buf = slurp_file(arch_options.initrd_file, &initrd_size);
- 
+-
 -		/* Create initrd entries in dtb - although at this time
 -		 * they would not point to the correct location */
--		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_buf, initrd_buf + initrd_size);
+-		dtb_set_initrd(&dtb_buf, &dtb_length, (off_t)initrd_buf, (off_t)initrd_buf + initrd_size);
 -
 -		initrd_base = add_buffer(info, initrd_buf, initrd_size,
 -					initrd_size, sizeof(void *),
@@ -77,6 +78,9 @@ Upstream-Status: Pending
 -		/* Now that the buffer for initrd is prepared, update the dtb
 -		 * with an appropriate location */
 -		dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
+-
+-		/* Add the initrd parameters to cmdline */
+-		patch_initrd_info(cmdline_buf, initrd_base, initrd_size);
 +	if (!arch_options.no_dtb) {
 +		/* MIPS systems that have been converted to use device tree
 +		 * passed through UHI will use commandline in the DTB and
@@ -94,7 +98,7 @@ Upstream-Status: Pending
 +			initrd_buf = slurp_file(arch_options.initrd_file, &initrd_size);
 +
 +			/* Create initrd entries in dtb - although at this time
-+			 * they would not point to the correct location */
++		 	 * they would not point to the correct location */
 +			dtb_set_initrd(&dtb_buf, &dtb_length, (off_t)initrd_buf, (off_t)initrd_buf + initrd_size);
 +
 +			initrd_base = add_buffer(info, initrd_buf, initrd_size,
@@ -103,40 +107,42 @@ Upstream-Status: Pending
 +							pagesize), 0x0fffffff, 1);
 +
 +			/* Now that the buffer for initrd is prepared, update the dtb
-+			 * with an appropriate location */
++		 	 * with an appropriate location */
 +			dtb_set_initrd(&dtb_buf, &dtb_length, initrd_base, initrd_base + initrd_size);
++
++			/* Add the initrd parameters to cmdline */
++			patch_initrd_info(cmdline_buf, initrd_base, initrd_size);
 +		}
  	}
- 
--
  	/* This is a legacy method for commandline passing used
  	 * currently by Octeon CPUs only */
- 	add_buffer(info, cmdline_buf, sizeof(cmdline_buf),
+@@ -233,10 +235,11 @@ int elf_mips_load(int argc, char **argv,
  			sizeof(cmdline_buf), sizeof(void *),
  			cmdline_addr, 0x0fffffff, 1);
  
 -	add_buffer(info, dtb_buf, dtb_length, dtb_length, 0,
 -		_ALIGN_UP(kernel_addr + kernel_size, pagesize),
 -		0x0fffffff, 1);
+-
 +	if (!arch_options.no_dtb) {
 +		add_buffer(info, dtb_buf, dtb_length, dtb_length, 0,
 +			_ALIGN_UP(kernel_addr + kernel_size, pagesize),
 +			0x0fffffff, 1);
 +	}
- 
  	return 0;
  }
+ 
 --- a/kexec/arch/mips/kexec-mips.c
 +++ b/kexec/arch/mips/kexec-mips.c
-@@ -89,6 +89,7 @@ void arch_usage(void)
- 	"    --append=STRING       Set the kernel command line to STRING.\n"
+@@ -90,6 +90,7 @@ void arch_usage(void)
  	"    --dtb=FILE            Use FILE as the device tree blob.\n"
  	"    --initrd=FILE         Use FILE as initial ramdisk.\n"
-+	"    --no-dtb              Don't try to find device tree\n"
+ 	"    --reuse-cmdline       Use kernel command line from running system.\n"
++	"    --no-dtb              Don't try to find device tree.\n"
  	);
  }
  
-@@ -121,6 +122,9 @@ int arch_process_options(int argc, char
+@@ -127,6 +128,9 @@ int arch_process_options(int argc, char
  		case OPT_RAMDISK:
  			arch_options.initrd_file = optarg;
  			break;

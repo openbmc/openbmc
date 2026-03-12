@@ -68,6 +68,7 @@ RDEPENDS:packagegroup-meta-networking-connectivity = "\
 "
 
 RDEPENDS:packagegroup-meta-networking-connectivity:remove:libc-musl = "rdist"
+RDEPENDS:packagegroup-meta-networking-connectivity:remove:riscv32 = "samba"
 
 RDEPENDS:packagegroup-meta-networking-daemons = "\
     atftp \
@@ -246,6 +247,7 @@ RDEPENDS:packagegroup-meta-networking-support = "\
 "
 RDEPENDS:packagegroup-meta-networking-support:remove:mipsarch = "memcached"
 RDEPENDS:packagegroup-meta-networking-support:remove:riscv64 = "memcached"
+RDEPENDS:packagegroup-meta-networking-support:remove:riscv32 = "memcached"
 RDEPENDS:packagegroup-meta-networking-support:remove:libc-musl = "ypbind-mt"
 
 EXCLUDE_FROM_WORLD = "1"

@@ -5,7 +5,7 @@ Subject: [PATCH] dns-sd: Include missing headers
 
 Fixes build on Musl
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  mDNSPosix/nss_mdns.c | 3 +++

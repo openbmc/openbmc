@@ -1,0 +1,70 @@
+From 5054d110fbc05141e0c2287ba19676e7c1e0286e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Dec 2025 12:14:54 -0800
+Subject: [PATCH 3/5] kexec/riscv: Add endian conversion macros for klibc
+ builds
+
+klibc doesn't provide the standard endian conversion functions
+(le16toh, le32toh, le64toh, htole*, be*toh, htobe*) that are
+normally available in glibc's endian.h.
+
+Add macro implementations for these functions when building with
+klibc, using the existing bswap_* functions from byteswap.h for
+byte swapping when needed based on the host byte order.
+
+This fixes build errors when using RISC-V image headers with klibc.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kexec/arch/riscv/image-header.h | 36 +++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/kexec/arch/riscv/image-header.h b/kexec/arch/riscv/image-header.h
+index a677546..892f77f 100644
+--- a/kexec/arch/riscv/image-header.h
++++ b/kexec/arch/riscv/image-header.h
+@@ -9,6 +9,42 @@
+ #include <endian.h>
+ #include <stdint.h>
+ 
++#ifdef __KLIBC__
++#include <byteswap.h>
++
++/* klibc doesn't provide endian conversion functions, define them */
++#ifndef le64toh
++# if __BYTE_ORDER == __LITTLE_ENDIAN
++#  define le16toh(x) ((uint16_t)(x))
++#  define le32toh(x) ((uint32_t)(x))
++#  define le64toh(x) ((uint64_t)(x))
++#  define htole16(x) ((uint16_t)(x))
++#  define htole32(x) ((uint32_t)(x))
++#  define htole64(x) ((uint64_t)(x))
++#  define be16toh(x) bswap_16(x)
++#  define be32toh(x) bswap_32(x)
++#  define be64toh(x) bswap_64(x)
++#  define htobe16(x) bswap_16(x)
++#  define htobe32(x) bswap_32(x)
++#  define htobe64(x) bswap_64(x)
++# elif __BYTE_ORDER == __BIG_ENDIAN
++#  define le16toh(x) bswap_16(x)
++#  define le32toh(x) bswap_32(x)
++#  define le64toh(x) bswap_64(x)
++#  define htole16(x) bswap_16(x)
++#  define htole32(x) bswap_32(x)
++#  define htole64(x) bswap_64(x)
++#  define be16toh(x) ((uint16_t)(x))
++#  define be32toh(x) ((uint32_t)(x))
++#  define be64toh(x) ((uint64_t)(x))
++#  define htobe16(x) ((uint16_t)(x))
++#  define htobe32(x) ((uint32_t)(x))
++#  define htobe64(x) ((uint64_t)(x))
++# else
++#  error "Unknown byte order"
++# endif
++#endif /* le64toh */
++#endif /* __KLIBC__ */
+ /**
+  * struct riscv_image_header - riscv kernel image header.
+  *

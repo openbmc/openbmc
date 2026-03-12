@@ -145,6 +145,7 @@ python do_image_verity () {
         k, v = line.split(':', 1)
         k = k.strip().upper().replace(' ', '_')
         v = v.strip()
+        v = v.removesuffix(' [bytes]')
         bb.debug(1, f"{k} {v}")
         params.append('VERITY_{}={}'.format(k, v))
 

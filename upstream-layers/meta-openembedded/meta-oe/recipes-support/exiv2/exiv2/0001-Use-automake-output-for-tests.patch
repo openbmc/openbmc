@@ -1,0 +1,35 @@
+From 09e5f783b3d1dcb7db6e975e9662c8401a614539 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sun, 23 Nov 2025 11:35:50 +0100
+Subject: [PATCH] Use automake output for tests
+
+Convert the Python unittest output to automake output so ptest can
+ingest it.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ tests/runner.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/tests/runner.py b/tests/runner.py
+index adebf83ba..9800cf971 100755
+--- a/tests/runner.py
++++ b/tests/runner.py
+@@ -4,6 +4,7 @@
+ import argparse
+ import functools
+ import os
++import putao.unittest
+ import sys
+ import unittest
+ from fnmatch import fnmatchcase
+@@ -93,7 +94,7 @@ if __name__ == '__main__':
+             DEFAULT_ROOT
+         )
+ 
+-    test_res = unittest.runner.TextTestRunner(verbosity=args.verbose)\
++    test_res = putao.unittest.TestRunner()\
+                               .run(discovered_tests)
+ 
+     sys.exit(0 if len(test_res.failures) + len(test_res.errors) == 0 else 1)

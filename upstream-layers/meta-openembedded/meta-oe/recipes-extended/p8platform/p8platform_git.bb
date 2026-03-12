@@ -2,17 +2,17 @@ SUMMARY = "Platform support library used by libCEC and binary add-ons for Kodi"
 HOMEPAGE = "http://libcec.pulse-eight.com/"
 
 LICENSE = "GPL-2.0-or-later"
-LIC_FILES_CHKSUM = "file://src/os.h;md5=752555fa94e82005d45fd201fee5bd33"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=b3a719e97f49e4841e90573f9b1a98ac"
 
 PV = "2.1.0.1+git"
 
 SRC_URI = "git://github.com/Pulse-Eight/platform.git;branch=master;protocol=https"
-SRCREV = "a7cd0d5780ed80a4e70480d1650749f29e8a1fb2"
+SRCREV = "2748be52ae27e6007ef548b697d4a03ff7de4291"
 
 
 inherit cmake pkgconfig
 
-EXTRA_OECMAKE += "-DCMAKE_INSTALL_LIBDIR=${libdir} -DCMAKE_INSTALL_LIBDIR_NOARCH=${libdir} -DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+EXTRA_OECMAKE += "-DCMAKE_INSTALL_LIBDIR=${libdir} -DCMAKE_INSTALL_LIBDIR_NOARCH=${libdir}"
 
 FILES:${PN}-dev += "${libdir}/p8-platform"
 

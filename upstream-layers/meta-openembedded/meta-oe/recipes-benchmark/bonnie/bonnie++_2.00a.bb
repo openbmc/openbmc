@@ -12,6 +12,9 @@ SRC_URI = "\
 "
 SRC_URI[sha256sum] = "a8d33bbd81bc7eb559ce5bf6e584b9b53faea39ccfb4ae92e58f27257e468f0e"
 
+UPSTREAM_CHECK_URI = "https://doc.coker.com.au/projects/bonnie/"
+UPSTREAM_CHECK_REGEX = "bonnie\+\+-(?P<pver>\d+(\.\d+)+[a-z]?).tgz"
+
 # force lfs to skip configure's check, because we are cross-building
 PACKAGECONFIG ?= "lfs"
 PACKAGECONFIG[lfs] = "--enable-lfs,--disable-lfs"

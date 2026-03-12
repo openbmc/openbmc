@@ -1,0 +1,43 @@
+From 7509f5d4bfcd8ba8bc0ad8c2054b2b336d8c0c9f Mon Sep 17 00:00:00 2001
+From: Minjae Kim <mj.kim@mercedes-benz.com>
+Date: Mon, 9 Feb 2026 20:34:53 +0000
+Subject: [PATCH] Findzstd.cmake: support pkg-config based zstd detection
+
+In Yocto builds, zstd is built via Makefile and does not install
+CMake package configuration files. As a result, Findzstd.cmake
+fails to detect ZSTD_INCLUDE_DIRS.
+
+Add pkg-config based detection as a fallback to properly locate
+zstd headers and libraries.
+
+fix error:
+|   Could NOT find zstd (missing: ZSTD_INCLUDE_DIRS)
+| Call Stack (most recent call first):
+
+
+Upstream-Status: Submitted [https://github.com/facebook/rocksdb/pull/14308]
+
+Signed-off-by: Minjae Kim <flowergom@gmail.com>
+
+---
+ cmake/modules/Findzstd.cmake | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/cmake/modules/Findzstd.cmake b/cmake/modules/Findzstd.cmake
+index e82fa148c8..f160be9ae0 100644
+--- a/cmake/modules/Findzstd.cmake
++++ b/cmake/modules/Findzstd.cmake
+@@ -14,6 +14,10 @@ find_library(ZSTD_LIBRARIES
+   HINTS ${zstd_ROOT_DIR}/lib)
+ 
+ include(FindPackageHandleStandardArgs)
++find_package(PkgConfig QUIET)
++if(PKG_CONFIG_FOUND)
++  pkg_check_modules(ZSTD QUIET libzstd)
++endif()
+ find_package_handle_standard_args(zstd DEFAULT_MSG ZSTD_LIBRARIES ZSTD_INCLUDE_DIRS)
+ 
+ mark_as_advanced(
+-- 
+2.43.0
+

@@ -1,0 +1,41 @@
+From bed0eb57c3294bac1c743cbe4404168c1007287d Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 13 Nov 2025 17:00:59 -0800
+Subject: [PATCH] test/sign.cpp: Fix C++ narrowing errors
+
+The error is because -kMinInt32 is both overflowing and a narrowing conversion in a brace initializer.
+Fix it by doing the negation in a wider type and explicitly casting to uint32_t in the initializer.
+
+Fixes
+
+../../sources/audiofile-0.3.6/test/Sign.cpp:160:39: error: non-constant-expression cannot be narrowed from type 'int32_t' (aka 'int') to 'uint32_t' (aka 'unsigned int') in initializer list [-Wc++11-narrowing]
+  160 |         const uint32_t expectedData[] = { 0, -kMinInt32, kMaxUInt32 };
+      |                                              ^~~~~~~~~~
+../../sources/audiofile-0.3.6/test/Sign.cpp:160:39: note: insert an explicit cast to silence this issue
+  160 |         const uint32_t expectedData[] = { 0, -kMinInt32, kMaxUInt32 };
+      |                                              ^~~~~~~~~~
+      |                                              static_cast<uint32_t>( )
+../../sources/audiofile-0.3.6/test/Sign.cpp:160:39: warning: overflow in expression; result is -2'147'483'648 with type 'int32_t' (aka 'int') [-Winteger-overflow]
+  160 |         const uint32_t expectedData[] = { 0, -kMinInt32, kMaxUInt32 };
+      |                                              ^~~~~~~~~~
+1 warning and 1 error generated.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/Sign.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/Sign.cpp b/test/Sign.cpp
+index c339514..0d80fe6 100644
+--- a/test/Sign.cpp
++++ b/test/Sign.cpp
+@@ -157,7 +157,7 @@ TEST_F(SignConversionTest, Int32)
+ 	AFframecount framesRead = afReadFrames(file, AF_DEFAULT_TRACK, readData, frameCount);
+ 	ASSERT_EQ(framesRead, frameCount);
+ 	afCloseFile(file);
+-	const uint32_t expectedData[] = { 0, -kMinInt32, kMaxUInt32 };
++	const uint32_t expectedData[] = { 0, static_cast<uint32_t>(-static_cast<int64_t>(kMinInt32)), kMaxUInt32 };
+ 	for (int i=0; i<frameCount; i++)
+ 		EXPECT_EQ(readData[i], expectedData[i]);
+ }

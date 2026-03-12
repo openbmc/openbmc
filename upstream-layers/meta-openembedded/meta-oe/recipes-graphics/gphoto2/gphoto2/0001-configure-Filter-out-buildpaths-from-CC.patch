@@ -1,0 +1,26 @@
+From 06be633b8f4e2241bd37d4faf62b49606ad778e7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 25 May 2023 19:01:36 -0700
+Subject: [PATCH] configure: Filter out buildpaths from CC
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac                 | 4 +++-
+ libgphoto2_port/configure.ac | 6 ++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,7 +26,9 @@ AC_PROG_INSTALL
+ AC_SYS_LARGEFILE
+ 
+ GP_CONFIG_MSG([Compiler],[${CC}])
+-AC_DEFINE_UNQUOTED([HAVE_CC],"$CC",[The C compiler we're using])
++CC_NO_SYSROOT=`echo $CC | sed -e \
++	's|--sysroot=.*\b||g'`
++AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC_NO_SYSROOT"], [The C compiler we're using])
+ 
+ dnl AC_STRUCT_TIMEZONE
+ 

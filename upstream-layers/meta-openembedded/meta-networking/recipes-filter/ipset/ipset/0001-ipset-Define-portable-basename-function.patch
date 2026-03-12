@@ -19,9 +19,9 @@ diff --git a/src/ipset.c b/src/ipset.c
 index 162f477..7b5d580 100644
 --- a/src/ipset.c
 +++ b/src/ipset.c
-@@ -16,6 +16,16 @@
- #include <libipset/ipset.h>		/* ipset library */
+@@ -17,6 +17,16 @@
  #include <libipset/xlate.h>		/* translate to nftables */
+ #include <libgen.h>
  
 +/* basename is implemented differently across different C libraries. This
 + * implementation matches the one provided by the GNU libc, and does not
@@ -36,7 +36,7 @@ index 162f477..7b5d580 100644
  int
  main(int argc, char *argv[])
  {
-@@ -32,7 +42,7 @@ main(int argc, char *argv[])
+@@ -33,7 +43,7 @@ main(int argc, char *argv[])
  		exit(1);
  	}
  

@@ -1,0 +1,60 @@
+From a63a5faea54055973bf5f0a514444532563cc20d Mon Sep 17 00:00:00 2001
+From: Telukula Jeevan Kumar Sahu <j-sahu@ti.com>
+Date: Fri, 27 Feb 2026 20:58:43 +0530
+Subject: [PATCH] llhttp: fix NEON header value __builtin_ctzll undefined
+ behavior
+
+When all 16 bytes match the allowed range, match_mask becomes 0 after
+the bitwise NOT. Calling __builtin_ctzll(0) is undefined behavior per
+the C standard.
+
+The code expects match_len == 16 when all bytes match (so the branch
+is skipped and p += 16 continues the loop), but this relied on
+ctzll(0) returning 64, which is not guaranteed.
+
+GCC at -O2 exploits this UB by deducing that __builtin_ctzll() result
+is always in range [0, 63], and after >> 2 always in [0, 15], which
+is never equal to 16. The compiler then optimizes
+"if (match_len != 16)" to always-true, causing every valid 16-byte
+chunk to be falsely rejected as containing an invalid character.
+
+This manifests as HTTP 400 Bad Request (HPE_INVALID_HEADER_TOKEN) for
+any HTTP header value longer than 16 characters on ARM targets with
+NEON enabled.
+
+Fix by explicitly checking for match_mask == 0 and setting
+match_len = 16, avoiding the undefined behavior entirely. This bug
+affects both aarch64 and armv7 NEON targets.
+
+The fix has been merged upstream in llparse 7.3.1 [1] and is included
+in llhttp 9.3.1. This patch can be dropped when nodejs updates its
+bundled llhttp to >= 9.3.1.
+
+[1]: https://github.com/nodejs/llparse/pull/83
+
+Upstream-Status: Inappropriate
+Signed-off-by: Telukula Jeevan Kumar Sahu <j-sahu@ti.com>
+---
+ deps/llhttp/src/llhttp.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/deps/llhttp/src/llhttp.c b/deps/llhttp/src/llhttp.c
+index 14b731e..b0a46c6 100644
+--- a/deps/llhttp/src/llhttp.c
++++ b/deps/llhttp/src/llhttp.c
+@@ -2651,7 +2651,11 @@ static llparse_state_t llhttp__internal__run(
+         mask = vorrq_u8(mask, single);
+         narrow = vshrn_n_u16(vreinterpretq_u16_u8(mask), 4);
+         match_mask = ~vget_lane_u64(vreinterpret_u64_u8(narrow), 0);
+-        match_len = __builtin_ctzll(match_mask) >> 2;
++        if (match_mask == 0) {
++          match_len = 16;
++        } else {
++          match_len = __builtin_ctzll(match_mask) >> 2;
++        }
+         if (match_len != 16) {
+           p += match_len;
+           goto s_n_llhttp__internal__n_header_value_otherwise;
+-- 
+2.34.1
+

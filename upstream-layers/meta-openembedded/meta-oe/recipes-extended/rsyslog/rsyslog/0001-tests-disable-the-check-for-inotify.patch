@@ -23,19 +23,19 @@ diff --git a/tests/diag.sh b/tests/diag.sh
 index a9c2a75..0b017c5 100755
 --- a/tests/diag.sh
 +++ b/tests/diag.sh
-@@ -2979,7 +2979,7 @@ case $1 in
+@@ -3683,7 +3683,7 @@
  		fi
  		;;
- 	'check-inotify') # Check for inotify/fen support 
+ 	'check-inotify') # Check for inotify/fen support
 -		if [ -n "$(find /usr/include -name 'inotify.h' -print -quit)" ]; then
 +		if true; then
  			echo [inotify mode]
  		elif [ -n "$(find /usr/include/sys/ -name 'port.h' -print -quit)" ]; then
  			grep -qF "PORT_SOURCE_FILE" < /usr/include/sys/port.h
-@@ -2994,7 +2994,7 @@ case $1 in
+@@ -3698,7 +3698,7 @@
  		fi
  		;;
- 	'check-inotify-only') # Check for ONLY inotify support 
+ 	'check-inotify-only') # Check for ONLY inotify support
 -		if [ -n "$(find /usr/include -name 'inotify.h' -print -quit)" ]; then
 +		if true; then
  			echo [inotify mode]

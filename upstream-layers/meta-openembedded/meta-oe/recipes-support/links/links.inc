@@ -14,4 +14,6 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[bzip2] = "--with-bzip2,--without-bzip2,bzip2"
 PACKAGECONFIG[lzma] = "--with-lzma,--without-lzma,xz"
 
+CVE_PRODUCT = "twibright_labs:links twibright:links links:links"
+
 inherit autotools pkgconfig

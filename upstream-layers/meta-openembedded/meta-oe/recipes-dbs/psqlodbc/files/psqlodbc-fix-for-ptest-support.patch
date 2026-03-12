@@ -1,4 +1,4 @@
-From 96896b88776d0080609ec830cf9538d2babe665a Mon Sep 17 00:00:00 2001
+From b0175d6124ae0460fbeaf34c964aff587fa978c2 Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Tue, 5 Sep 2017 10:24:10 +0800
 Subject: [PATCH] psqlodbc: fixes for ptest support
@@ -12,13 +12,14 @@ Subject: [PATCH] psqlodbc: fixes for ptest support
 Upstream-Status: Inappropriate [OE ptest specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
-
 ---
  test/Makefile.in    |  2 +-
- test/odbcini-gen.sh |  8 ++++----
+ test/odbcini-gen.sh | 10 +++++-----
  test/runsuite.c     | 20 ++++++++++----------
- 3 files changed, 15 insertions(+), 15 deletions(-)
+ 3 files changed, 16 insertions(+), 16 deletions(-)
 
+diff --git a/test/Makefile.in b/test/Makefile.in
+index 3f9a9af..09406ae 100644
 --- a/test/Makefile.in
 +++ b/test/Makefile.in
 @@ -19,7 +19,7 @@ CPPFLAGS = @CPPFLAGS@ -I..	# config.h
@@ -30,6 +31,8 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  
  all: $(TESTBINS) runsuite reset-db
  
+diff --git a/test/odbcini-gen.sh b/test/odbcini-gen.sh
+index 2eaba35..d7c03ba 100755
 --- a/test/odbcini-gen.sh
 +++ b/test/odbcini-gen.sh
 @@ -6,7 +6,7 @@
@@ -64,6 +67,8 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  ReadOnly                = No
  RowVersioning           = No
  ShowSystemTables                = No
+diff --git a/test/runsuite.c b/test/runsuite.c
+index 6ac3709..023ac1d 100644
 --- a/test/runsuite.c
 +++ b/test/runsuite.c
 @@ -55,7 +55,7 @@ bailout(const char *fmt, ...)
@@ -75,7 +80,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  {
  	const char *basename;
  #ifdef WIN32
-@@ -69,7 +69,7 @@ parse_argument(const char *in, char *tes
+@@ -69,7 +69,7 @@ parse_argument(const char *in, char *testname, char *binname)
  	if (strchr(in, DIR_SEP) == NULL)
  	{
  		strcpy(testname, in);
@@ -93,7 +98,7 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  		if (runtest(binname, testname, i, inputdir) != 0)
  			failures++;
  	}
-@@ -161,29 +161,29 @@ runtest(const char *binname, const char
+@@ -161,29 +161,29 @@ runtest(const char *binname, const char *testname, int testno, const char *input
  #ifndef WIN32
  	snprintf(cmdline, sizeof(cmdline),
  			 "ODBCSYSINI=. ODBCINSTINI=./odbcinst.ini ODBCINI=./odbc.ini "

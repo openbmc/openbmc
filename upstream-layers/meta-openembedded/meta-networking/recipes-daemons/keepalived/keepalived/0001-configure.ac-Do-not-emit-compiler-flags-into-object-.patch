@@ -15,8 +15,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1013,8 +1013,7 @@ if test "$enable_hardening" != no; then
- 	  "-Wp,-D_FORTIFY_SOURCE=$FORTIFY_SOURCE" \
+@@ -1066,8 +1066,7 @@ if test "$enable_hardening" != no; then
+ 	  "-Wformat -Werror=format-security" \
  	  "-fexceptions" \
  	  "-fstack-protector-strong" \
 -	  "--param=ssp-buffer-size=4" \

@@ -25,3 +25,6 @@ do_configure:prepend() {
 EXTRA_OEMAKE = " \
     libdir=${libdir} \
 "
+
+# remove this CVE_STATUS, when the recipe is updated to 4.12 or newer
+CVE_STATUS[CVE-2025-25066] = "cpe-incorrect: Version 4.2 is not vulnerable yet"

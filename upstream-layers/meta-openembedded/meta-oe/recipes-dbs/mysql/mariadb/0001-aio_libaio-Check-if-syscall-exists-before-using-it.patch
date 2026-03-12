@@ -1,0 +1,49 @@
+From a30e52fdb6507dd39b081b1218d95eb8582b81fb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zolt=C3=A1n=20B=C3=B6sz=C3=B6rm=C3=A9nyi?=
+ <zboszor@gmail.com>
+Date: Mon, 13 Oct 2025 08:57:05 +0200
+Subject: [PATCH] aio_libaio: Check if syscall exists before using it
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Return -ENOSYS if not implememented, fixes build on arches like RISCV32
+Fixes
+tpool/aio_libaio.cc:61:20:
+error: use of undeclared identifier '
+   ↪ __NR_io_getevents'; did you mean 'io_getevents'?
+   |    61 |   int ret= syscall(__NR_io_getevents, reinterpret_cast<long>(ctx),
+   |       |                    ^~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+---
+ tpool/aio_libaio.cc | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/tpool/aio_libaio.cc b/tpool/aio_libaio.cc
+index 2ce69384cde..60f558afa87 100644
+--- a/tpool/aio_libaio.cc
++++ b/tpool/aio_libaio.cc
+@@ -58,6 +58,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 - 1301 USA*/
+ static int my_getevents(io_context_t ctx, long min_nr, long nr, io_event *ev)
+   noexcept
+ {
++#ifdef __NR_io_getevents
+   int saved_errno= errno;
+   int ret= syscall(__NR_io_getevents, reinterpret_cast<long>(ctx),
+                    min_nr, nr, ev, 0);
+@@ -67,6 +68,9 @@ static int my_getevents(io_context_t ctx, long min_nr, long nr, io_event *ev)
+     errno= saved_errno;
+   }
+   return ret;
++#else
++  return -ENOSYS;
++#endif
+ }
+ 
+ 
+-- 
+2.51.0
+

@@ -18,12 +18,7 @@ Index: emacs-29.1/src/Makefile.in
 ===================================================================
 --- emacs-29.1.orig/src/Makefile.in
 +++ emacs-29.1/src/Makefile.in
-@@ -1,3 +1,4 @@
-+
- ### @configure_input@
- 
- # Copyright (C) 1985, 1987-1988, 1993-1995, 1999-2023 Free Software
-@@ -508,7 +509,7 @@ ifeq ($(CHECK_STRUCTS),true)
+@@ -542,7 +542,7 @@ ifeq ($(CHECK_STRUCTS),true)
  pdumper.o: dmpstruct.h
  endif
  dmpstruct.h: $(srcdir)/dmpstruct.awk
@@ -32,17 +27,17 @@ Index: emacs-29.1/src/Makefile.in
  	$(AM_V_GEN)POSIXLY_CORRECT=1 awk -f $(srcdir)/dmpstruct.awk \
  		$(dmpstruct_headers) > $@
  
-@@ -610,8 +611,7 @@ SYSTEM_TYPE = @SYSTEM_TYPE@
+@@ -651,8 +651,7 @@
  ## Strictly speaking, emacs does not depend directly on all of $lisp,
  ## since not all pieces are used on all platforms.  But DOC depends
  ## on all of $lisp, and emacs depends on DOC, so it is ok to use $lisp here.
 -emacs$(EXEEXT): temacs$(EXEEXT) \
--                lisp.mk $(etc)/DOC $(lisp) \
-+emacs$(EXEEXT): lisp.mk $(etc)/DOC $(lisp) \
+-                $(abs_top_builddir)/src/lisp.mk $(etc)/DOC $(lisp) \
++emacs$(EXEEXT): $(abs_top_builddir)/src/lisp.mk $(etc)/DOC $(lisp) \
                  $(lispsource)/international/charprop.el ${charsets}
  ifeq ($(SYSTEM_TYPE),cygwin)
  	find ${top_builddir} -name '*.eln' | rebase -v -O -T -
-@@ -654,7 +654,7 @@ endif
+@@ -695,7 +695,7 @@ endif
  $(etc)/DOC: $(libsrc)/make-docfile$(EXEEXT) $(doc_obj)
  	$(AM_V_GEN)$(MKDIR_P) $(etc)
  	$(AM_V_at)rm -f $(etc)/DOC
@@ -51,7 +46,7 @@ Index: emacs-29.1/src/Makefile.in
  	  $(SOME_MACHINE_OBJECTS) $(doc_obj) > $(etc)/DOC
  
  $(libsrc)/make-docfile$(EXEEXT) $(libsrc)/make-fingerprint$(EXEEXT): \
-@@ -671,7 +671,7 @@ buildobj.h: Makefile
+@@ -712,7 +712,7 @@ buildobj.h: Makefile
  GLOBAL_SOURCES = $(base_obj:.o=.c) $(NS_OBJC_OBJ:.o=.m)
  
  gl-stamp: $(libsrc)/make-docfile$(EXEEXT) $(GLOBAL_SOURCES)
@@ -60,7 +55,7 @@ Index: emacs-29.1/src/Makefile.in
  	$(AM_V_at)$(top_srcdir)/build-aux/move-if-change globals.tmp globals.h
  	$(AM_V_at)echo timestamp > $@
  
-@@ -685,7 +685,7 @@ $(LIBEGNU_ARCHIVE): $(config_h)
+@@ -726,7 +726,7 @@ $(LIBEGNU_ARCHIVE): $(config_h)
  	$(MAKE) -C $(dir $@) all
  
  ifeq ($(HAVE_PDUMPER),yes)

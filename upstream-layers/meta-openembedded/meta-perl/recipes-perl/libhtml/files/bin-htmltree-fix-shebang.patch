@@ -17,9 +17,9 @@ index 8bf3db2..f9927e5 100755
 @@ -1,4 +1,4 @@
 -#!/usr/bin/perl
 +#!/usr/bin/env perl
- # Time-stamp: "2000-10-02 14:48:15 MDT"
- #
- # Parse the given HTML file(s) and dump the parse tree
+ 
+ use warnings;
+ use strict;
 -- 
 1.9.1
 

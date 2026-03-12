@@ -1,0 +1,55 @@
+From 0f80d5813679320b69ae1d2aefb58af1e0e2d269 Mon Sep 17 00:00:00 2001
+From: Jiaying Song <jiaying.song.cn@windriver.com>
+Date: Wed, 10 Dec 2025 14:22:00 +0800
+Subject: [PATCH] Fix 2038 year problem in timestamp handling
+
+The minicoredumper uses 'long' type for timestamp which causes
+overflow on 32-bit systems after 2038-01-19. This leads to
+incorrect timestamp formatting in core dump directory names.
+
+Change timestamp variable from 'long' to 'time_t' and use
+'strtoll' instead of 'strtol' to handle 64-bit timestamps
+properly on 32-bit systems.
+
+Upstream-Status: Submitted
+[https://github.com/diamon/minicoredumper/pull/24]
+
+Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
+---
+ src/minicoredumper/corestripper.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/minicoredumper/corestripper.c b/src/minicoredumper/corestripper.c
+index e9e3936..e52802e 100644
+--- a/src/minicoredumper/corestripper.c
++++ b/src/minicoredumper/corestripper.c
+@@ -617,7 +617,7 @@ static int init_di(struct dump_info *di, int argc, char *argv[])
+ 	if (*p != 0)
+ 		return 1;
+ 
+-	di->timestamp = strtol(argv[5], &p, 10);
++	di->timestamp = (time_t)strtoll(argv[5], &p, 10);
+ 	if (*p != 0)
+ 		return 1;
+ 
+@@ -3715,7 +3715,7 @@ static int do_all_dumps(struct dump_info *di, int argc, char *argv[])
+ 	bool live_dumper;
+ 	char *comm_base;
+ 	pid_t core_pid;
+-	long timestamp;
++	time_t timestamp;
+ 	char *comm;
+ 	char *exe;
+ 	char *p;
+@@ -3750,7 +3750,7 @@ static int do_all_dumps(struct dump_info *di, int argc, char *argv[])
+ 	if (*p != 0)
+ 		return 1;
+ 
+-	timestamp = strtol(argv[5], &p, 10);
++	timestamp = (time_t)strtoll(argv[5], &p, 10);
+ 	if (*p != 0)
+ 		return 1;
+ 
+-- 
+2.34.1
+

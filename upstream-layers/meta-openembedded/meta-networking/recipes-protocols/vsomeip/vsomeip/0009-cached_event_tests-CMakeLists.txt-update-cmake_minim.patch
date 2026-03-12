@@ -1,0 +1,40 @@
+From 7dec71178aee905fac28712594f91969c6070b81 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 20 Nov 2025 17:26:27 +0800
+Subject: [PATCH] cached_event_tests/CMakeLists.txt: update
+ cmake_minimum_required
+
+Update cmake_minimum_required to make it consistent with the others.
+
+Fix configuration error in higher versions of CMake:
+CMake Error at test/network_tests/cached_event_tests/CMakeLists.txt:6
+(cmake_minimum_required):
+  Compatibility with CMake < 3.5 has been removed from CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+
+Upstream-Status: Submitted [https://github.com/COVESA/vsomeip/pull/977]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ test/network_tests/cached_event_tests/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test/network_tests/cached_event_tests/CMakeLists.txt b/test/network_tests/cached_event_tests/CMakeLists.txt
+index 4a68ae29..a2fbff86 100644
+--- a/test/network_tests/cached_event_tests/CMakeLists.txt
++++ b/test/network_tests/cached_event_tests/CMakeLists.txt
+@@ -3,7 +3,7 @@
+ # License, v. 2.0. If a copy of the MPL was not distributed with this
+ # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ 
+-cmake_minimum_required(VERSION 3.4)
++cmake_minimum_required(VERSION 3.4...3.22)
+ 
+ # Configure necessary files into the build folder.
+ set(configuration_files
+-- 
+2.34.1
+

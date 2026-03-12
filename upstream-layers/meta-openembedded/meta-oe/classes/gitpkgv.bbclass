@@ -21,6 +21,11 @@
 # v1.2, xtest, v2.0" will force you to increment PE to get upgradeable
 # path to v2.0 revisions
 #
+# Another WARNING: Since Walnascar release BB_SHALLOW_GIT will actually
+# perform a shallow initial checkout, which makes it impossible to determine
+# the correct number of commits in the repository - thus using this class
+# is not recommended when shallow cloning is enabled.
+#
 # use example:
 #
 # inherit gitpkgv
@@ -59,6 +64,9 @@ def get_git_pkgv(d, use_tags):
     from shlex import quote
 
     src_uri = d.getVar('SRC_URI').split()
+    unpackdir = d.getVar('UNPACKDIR')
+    def_destsuffix = (d.getVar("BB_GIT_DEFAULT_DESTSUFFIX") or "git") + "/"
+
     fetcher = bb.fetch2.Fetch(src_uri, d)
     ud = fetcher.ud
 
@@ -78,20 +86,27 @@ def get_git_pkgv(d, use_tags):
     found = False
     for url in ud.values():
         if url.type == 'git' or url.type == 'gitsm':
-            if not os.path.exists(url.localpath):
+            destsuffix = url.parm.get("destsuffix", def_destsuffix)
+            subdir = url.parm.get('subdir', '')
+            destdir = os.path.join(unpackdir, destsuffix, subdir)
+
+            if not os.path.exists(destdir):
                 return None
+
+            if d.getVar('BB_GIT_SHALLOW') == '1':
+                bb.warnonce('%s: Shallow cloning enabled - gitpkgv.bbclass will not generate sortable versions' % d.getVar('PN'))
 
             found = True
 
-            vars = { 'repodir' : quote(url.localpath),
+            vars = { 'repodir' : quote(destdir),
                      'rev' : quote(url.revision) }
 
             rev = bb.fetch2.get_srcrev(d).split('+')[1]
-            rev_file = os.path.join(url.localpath, "oe-gitpkgv_" + url.revision)
+            rev_file = os.path.join(destdir, "oe-gitpkgv_" + url.revision)
 
             if not os.path.exists(rev_file) or os.path.getsize(rev_file)==0:
                 commits = bb.fetch2.runfetchcmd(
-                    "git --git-dir=%(repodir)s rev-list %(rev)s -- 2>/dev/null | wc -l"
+                    "git -C %(repodir)s rev-list %(rev)s -- 2>/dev/null | wc -l"
                     % vars, d, quiet=True).strip().lstrip('0')
 
                 if commits != "":
@@ -107,7 +122,7 @@ def get_git_pkgv(d, use_tags):
             if use_tags:
                 try:
                     output = bb.fetch2.runfetchcmd(
-                        "git --git-dir=%(repodir)s describe %(rev)s --tags --exact-match 2>/dev/null"
+                        "git -C %(repodir)s describe %(rev)s --tags --exact-match 2>/dev/null"
                         % vars, d, quiet=True).strip()
                     ver = gitpkgv_drop_tag_prefix(d, output)
                 except Exception:

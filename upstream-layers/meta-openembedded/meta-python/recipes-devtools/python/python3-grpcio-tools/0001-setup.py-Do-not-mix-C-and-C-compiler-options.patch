@@ -1,4 +1,4 @@
-From f1bf68aaa5417bcb7ad4996f1be8d2c0f53c521c Mon Sep 17 00:00:00 2001
+From 1f1f174ed3ca28bdf8bbb479eb1d948d934dcc53 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 17 Feb 2021 13:38:55 -0800
 Subject: [PATCH] setup.py: Do not mix C and C++ compiler options
@@ -27,7 +27,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 1a997df..86e3ad1 100644
+index ff27e67..964baf4 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -90,9 +90,11 @@ def check_linker_need_libatomic():
@@ -54,6 +54,3 @@ index 1a997df..86e3ad1 100644
          stdin=PIPE,
          stdout=PIPE,
          stderr=PIPE,
--- 
-2.43.0
-

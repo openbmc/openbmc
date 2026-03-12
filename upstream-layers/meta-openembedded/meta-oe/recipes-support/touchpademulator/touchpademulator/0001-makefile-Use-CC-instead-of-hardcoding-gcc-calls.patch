@@ -1,0 +1,29 @@
+From 37284f7208e43da34cac64b419219c5d4e20b36e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 2 Oct 2025 15:25:50 -0700
+Subject: [PATCH] makefile: Use CC instead of hardcoding gcc calls
+
+This helps to cross-compile it using infrastructure like yocto
+
+Upstream-Status: Submitted [https://gitlab.com/CalcProgrammer1/TouchpadEmulator/-/merge_requests/4]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index adf39a6..4cebaa6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,9 @@
++CC ?= gcc
++
+ default:			TouchpadEmulator
+ 
+ TouchpadEmulator:	TouchpadEmulator.c
+-					gcc -Wall $(shell pkg-config --cflags dbus-1 dbus-glib-1) TouchpadEmulator.c -ldbus-1 -ldbus-glib-1 -lpthread -o TouchpadEmulator
++					$(CC) -Wall $(shell pkg-config --cflags dbus-1 dbus-glib-1) TouchpadEmulator.c -ldbus-1 -ldbus-glib-1 -lpthread -o TouchpadEmulator
+ 
+ clean:
+ 					git clean -dfx

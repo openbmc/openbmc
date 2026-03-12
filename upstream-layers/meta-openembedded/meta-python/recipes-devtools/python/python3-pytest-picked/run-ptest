@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# need to explicitly call the correct fixture as of pytest 8.x
+
+pytest -p pytester --automake

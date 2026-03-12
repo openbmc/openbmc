@@ -46,6 +46,7 @@ RDEPENDS:${PN} += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
+    perl-module-extutils-mm-unix \
     perl-module-if \
     perl-module-lib \
     perl-module-test-more \

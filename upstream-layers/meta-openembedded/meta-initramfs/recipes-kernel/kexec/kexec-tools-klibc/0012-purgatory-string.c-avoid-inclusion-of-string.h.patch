@@ -14,8 +14,6 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  purgatory/string.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/purgatory/string.c b/purgatory/string.c
-index f06c460..c5e978a 100644
 --- a/purgatory/string.c
 +++ b/purgatory/string.c
 @@ -1,5 +1,7 @@

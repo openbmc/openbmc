@@ -21,6 +21,7 @@ RDEPENDS:${PN}-ptest = "kernel-devsrc packagegroup-core-buildessential cmake bas
 SRC_URI = "gitsm://github.com/iovisor/bcc;branch=master;protocol=https;tag=v${PV} \
            file://0001-CMakeLists.txt-override-the-PY_CMD_ESCAPED.patch \
            file://0001-Vendor-just-enough-extra-headers-to-allow-libbpf-to-.patch \
+           file://0001-Fix-a-build-failure-with-clang21-5369.patch \
            file://run-ptest \
            file://ptest_wrapper.sh \
            file://fix_for_memleak.patch \

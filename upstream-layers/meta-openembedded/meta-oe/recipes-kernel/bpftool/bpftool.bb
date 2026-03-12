@@ -27,7 +27,6 @@ SECURITY_CFLAGS = ""
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
 COMPATIBLE_HOST = "(x86_64|aarch64|riscv64).*-linux"
-COMPATIBLE_HOST:libc-musl = 'null'
 
 do_compile() {
     oe_runmake
@@ -47,4 +46,4 @@ B = "${WORKDIR}/${BPN}-${PV}"
 
 FILES:${PN} += "${exec_prefix}/sbin/*"
 
-BBCLASSEXTEND = "native nativesdk"
+BBCLASSEXTEND = "nativesdk"

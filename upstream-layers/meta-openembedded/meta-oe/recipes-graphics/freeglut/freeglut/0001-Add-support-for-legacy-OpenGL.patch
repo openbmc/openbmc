@@ -1,0 +1,45 @@
+From a4c51ae7897f1ad82d10e593344511b3d7b81dbc Mon Sep 17 00:00:00 2001
+From: Jan Vermaete <jan.vermaete@gmail.com>
+Date: Wed, 24 Dec 2025 12:58:36 +0100
+Subject: [PATCH 1/1] Add support for legacy OpenGL
+
+Upstream-Status: Pending
+
+Signed-off-by: Rob Woolley <rob.woolley@windriver.com>
+Commited-by: Jan Vermaete <jan.vermaete@gmail.com>
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 23741bf..31b3ac8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -378,13 +378,13 @@ IF(FREEGLUT_GLES)
+       FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL GLES2 OpenGL)
+       CMAKE_PATH(GET OPENGL_gles2_LIBRARY PARENT_PATH _OPENGL_LIBDIR)
+       FIND_LIBRARY(GLES1_LIBRARY GLESv1_CM HINTS ${_OPENGL_LIBDIR} REQUIRED)
+-      LIST(APPEND LIBS ${GLES1_LIBRARY} OpenGL::EGL OpenGL::GLES2 OpenGL::OpenGL)
++      LIST(APPEND LIBS ${GLES1_LIBRARY} OpenGL::EGL OpenGL::GLES2 OpenGL::GL)
+     elseif(NOT CMAKE_VERSION VERSION_LESS "3.10")
+       FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL OpenGL)
+       GET_FILENAME_COMPONENT(_OPENGL_LIBDIR ${OPENGL_egl_LIBRARY} DIRECTORY)
+       FIND_LIBRARY(GLES1_LIBRARY GLESv1_CM HINTS ${_OPENGL_LIBDIR})
+       FIND_LIBRARY(GLES2_LIBRARY GLESv2 HINTS ${_OPENGL_LIBDIR})
+-      LIST(APPEND LIBS ${GLES1_LIBRARY} ${GLES2_LIBRARY} OpenGL::EGL OpenGL::OpenGL)
++      LIST(APPEND LIBS ${GLES1_LIBRARY} ${GLES2_LIBRARY} OpenGL::EGL OpenGL::GL)
+     else()
+       FIND_PACKAGE(OpenGL REQUIRED)
+       LIST(GET ${OPENGL_LIBRARIES} 0 _OPENGL_LIB)
+@@ -433,7 +433,7 @@ IF(FREEGLUT_WAYLAND)
+   INCLUDE(FindPkgConfig)
+   if(NOT CMAKE_VERSION VERSION_LESS "3.10")
+     FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL OpenGL)
+-    LIST(APPEND LIBS OpenGL::EGL OpenGL::OpenGL)
++    LIST(APPEND LIBS OpenGL::EGL OpenGL::GL)
+   else()
+     FIND_PACKAGE(OpenGL REQUIRED)
+     LIST(GET ${OPENGL_LIBRARIES} 0 _OPENGL_LIB)
+-- 
+2.47.3
+

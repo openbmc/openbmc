@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2699a9fb0d71d5eafd75d8d7c302f7df"
 
 SRC_URI[sha256sum] = "0f0f8aa759826a193cf66c12ea1af1637f87b9b4622d46e866952bb022e538c9"
 
+CVE_PRODUCT = "oauthlib"
+
 inherit pypi setuptools3
 
 # The following configs & dependencies are from setuptools extras_require.

@@ -1,0 +1,56 @@
+From 4588a3d34f574619c6f3a4290d53e2ac063ab56a Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Thu, 25 Dec 2025 20:04:49 +0100
+Subject: [PATCH] meson.build: dont look for flatpak http_backend variable
+
+flatpak 1.17.1 release dropped libsoup2 support:
+[https://github.com/flatpak/flatpak/blob/c324778b0720cb2d01c217fdc70358e232c38b4d/NEWS#L20]
+
+* Drop libsoup2 support in favor of libcurl. The `http_backend` build option has
+  been dropped as well. (#6395)
+
+gnome-software still searches for the http_backend variable and fails:
+ ../sources/gnome-software-49.1/meson.build:218:32: ERROR: Could not get pkg-config variable and no default provided for <PkgConfigDependency flatpak: True ['>= 1.14.1']>
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate
+---
+ meson.build | 20 +-------------------
+ 1 file changed, 1 insertion(+), 19 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 3704e2abc..7e0496a22 100644
+--- a/meson.build
++++ b/meson.build
+@@ -212,26 +212,8 @@ if get_option('fwupd')
+ endif
+ 
+ if get_option('flatpak')
+-  flatpak = dependency('flatpak', version : '>= 1.14.1')
++  flatpak = dependency('flatpak', version : '>= 1.17.1')
+   ostree = dependency('ostree-1')
+-
+-  flatpak_httpbackend = flatpak.get_variable('httpbackend')
+-  if flatpak_httpbackend == 'soup'
+-    flatpak_soupapiversion = flatpak.get_variable('soupapiversion', default_value: '2')
+-    if flatpak_soupapiversion.version_compare('< 3')
+-      error('''Flatpak library has been built with 'libsoup2' http backend, which conflicts with 'libsoup3' used by gnome-software.
+-
+-You can either:
+-
+-1. Build gnome-software without flatpak support (with -Dflatpak=false) or
+-2. Rebuild flatpak library with http backend other than 'libsoup2'.''')
+-    else
+-      flatpak_summary = '@0@ (@1@)'.format(flatpak_httpbackend, flatpak_soupapiversion)
+-    endif
+-  else
+-    flatpak_summary = flatpak_httpbackend
+-  endif
+-  summary('Flatpak http backend', '@0@'.format(flatpak_summary), section : 'Misc')
+ endif
+ 
+ if get_option('malcontent')
+-- 
+2.52.0
+

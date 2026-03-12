@@ -1,0 +1,27 @@
+From 0019af6eb5188f5111a0f2008c0002b545382b67 Mon Sep 17 00:00:00 2001
+From: Daniel Klauer <daniel.klauer@gin.de>
+Date: Fri, 6 Feb 2026 17:14:53 +0100
+Subject: [PATCH] sysinfo.sh: Fix typo in rm command
+
+Upstream-Status: Inactive-Upstream [lastrelease 2003, no vcs]
+Signed-off-by: Daniel Klauer <daniel.klauer@gin.de>
+---
+ sysinfo.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sysinfo.sh b/sysinfo.sh
+index 57754fe..1373699 100755
+--- a/sysinfo.sh
++++ b/sysinfo.sh
+@@ -61,7 +61,7 @@ if ($* hello.c -o hello) >/dev/null 2>&1; then
+   fi
+ fi
+ 
+-rm -f sysinfo.crm sysinfoc.c hello
++rm -f sysinfo.c sysinfoc.c hello
+ 
+ # this bombs out on Ultrix which expect "cut -d"
+ 
+-- 
+2.43.0
+

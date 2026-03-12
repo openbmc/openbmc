@@ -1,7 +1,8 @@
-From eba852316735daec27d4ff11483018ca596312d0 Mon Sep 17 00:00:00 2001
+From 9908274a3555fe2abb3596d917cecfafcb4fbf7a Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Oct 2021 02:11:49 -0700
 Subject: [PATCH] Fix a lot of -Werror=format-security errors with
+
  mvprintw/mvwprintw
 
 In all these places a non-constant is used as a format string which
@@ -10,14 +11,14 @@ compiler complains about. Fix by using "%s" as format.
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- lmon16m.c | 86 +++++++++++++++++++++++++++----------------------------
- 1 file changed, 43 insertions(+), 43 deletions(-)
+ lmon16n.c | 88 +++++++++++++++++++++++++++----------------------------
+ 1 file changed, 44 insertions(+), 44 deletions(-)
 
-diff --git a/lmon16m.c b/lmon16m.c
-index 7e46642..1d53367 100644
---- a/lmon16m.c
-+++ b/lmon16m.c
-@@ -5475,20 +5475,20 @@ int main(int argc, char **argv)
+diff --git a/lmon16n.c b/lmon16n.c
+index 8a5d35c..cec409a 100644
+--- a/lmon16n.c
++++ b/lmon16n.c
+@@ -5489,20 +5489,20 @@ int main(int argc, char **argv)
  		    /*
  		     *mvwprintw(padsmp,2, 0, "CPU  User%%  Sys%% Wait%% Idle|0          |25         |50          |75       100|");
  		     */
@@ -45,7 +46,7 @@ index 7e46642..1d53367 100644
  		    }
  		    COLOUR wattrset(padsmp, COLOR_PAIR(0));
  		    mvwprintw(padsmp, 2, 27,
-@@ -5579,8 +5579,8 @@ int main(int argc, char **argv)
+@@ -5593,8 +5593,8 @@ int main(int argc, char **argv)
  			/* lparcfg gathered above */
  			if (lparcfg.smt_mode > 1
  			    && i % lparcfg.smt_mode == 0) {
@@ -56,7 +57,7 @@ index 7e46642..1d53367 100644
  			}
  #endif
  
-@@ -5597,7 +5597,7 @@ int main(int argc, char **argv)
+@@ -5611,7 +5611,7 @@ int main(int argc, char **argv)
  				    100.0);
  		    }
  		}		/* for (i = 0; i < cpus; i++) */
@@ -65,7 +66,7 @@ index 7e46642..1d53367 100644
  #ifdef POWER
  		/* proc_lparcfg called above in previous ifdef
  		 */
-@@ -5673,7 +5673,7 @@ int main(int argc, char **argv)
+@@ -5687,7 +5687,7 @@ int main(int argc, char **argv)
  				 100.0);
  		    }
  
@@ -74,10 +75,10 @@ index 7e46642..1d53367 100644
  		    i = i + 2;
  		}		/* if (cpus > 1 || !cursed) */
  		smp_first_time = 0;
-@@ -5704,16 +5704,16 @@ int main(int argc, char **argv)
- 		    char *wide10 =
- 			" 10%%-|                                                                |-10%%";
- 
+@@ -5697,17 +5697,17 @@ int main(int argc, char **argv)
+ 		if (cursed) {
+ 		    int rows = 0;
+ 		    BANNER(padwide, "CPU Utilisation Wide View");
 -		    mvwprintw(padwide, 1, 0, wide1);
 -		    mvwprintw(padwide, 2, 0, wide2);
 -		    mvwprintw(padwide, 3, 0, wide3);
@@ -88,6 +89,7 @@ index 7e46642..1d53367 100644
 -		    mvwprintw(padwide, 8, 0, wide8);
 -		    mvwprintw(padwide, 9, 0, wide9);
 -		    mvwprintw(padwide, 10, 0, wide10);
+-		    mvwprintw(padwide, 11, 0, wide_1_64);
 +		    mvwprintw(padwide, 1, 0, "%s", wide1);
 +		    mvwprintw(padwide, 2, 0, "%s", wide2);
 +		    mvwprintw(padwide, 3, 0, "%s", wide3);
@@ -98,10 +100,11 @@ index 7e46642..1d53367 100644
 +		    mvwprintw(padwide, 8, 0, "%s", wide8);
 +		    mvwprintw(padwide, 9, 0, "%s", wide9);
 +		    mvwprintw(padwide, 10, 0, "%s", wide10);
- 		    mvwprintw(padwide, 11, 0,
- 			      " CPU +1--------+10-------+20-------+30-------+40-------+50-------+60--+--0%%");
++		    mvwprintw(padwide, 11, 0, "%s", wide_1_64);
  		    mvwprintw(padwide, 1, 6, "CPU(s)=%d", cpus);
-@@ -5755,16 +5755,16 @@ int main(int argc, char **argv)
+ 		    if (wide_first_time) {
+ 			mvwprintw(padwide, 3, 7,
+@@ -5747,17 +5747,17 @@ int main(int argc, char **argv)
  			rows = 12;
  		    }
  		    if (cpus > 63) {
@@ -115,6 +118,7 @@ index 7e46642..1d53367 100644
 -			mvwprintw(padwide, rows + 7, 0, wide8);
 -			mvwprintw(padwide, rows + 8, 0, wide9);
 -			mvwprintw(padwide, rows + 9, 0, wide10);
+-			mvwprintw(padwide, rows + 10, 0, wide_65_128);
 +			mvwprintw(padwide, rows + 0, 0, "%s", wide1);
 +			mvwprintw(padwide, rows + 1, 0, "%s", wide2);
 +			mvwprintw(padwide, rows + 2, 0, "%s", wide3);
@@ -125,10 +129,11 @@ index 7e46642..1d53367 100644
 +			mvwprintw(padwide, rows + 7, 0, "%s", wide8);
 +			mvwprintw(padwide, rows + 8, 0, "%s", wide9);
 +			mvwprintw(padwide, rows + 9, 0, "%s", wide10);
- 			mvwprintw(padwide, rows + 10, 0,
- 				  " CPU +65---+70-------+80-------+90-------+100------+110------+120-----+--0%%");
++ 			mvwprintw(padwide, rows + 10, 0, "%s", wide_65_128);
  			if (wide_first_time) {
-@@ -5813,16 +5813,16 @@ int main(int argc, char **argv)
+ 			    mvwprintw(padwide, rows + 3, 7,
+ 				      " Please wait gathering CPU statistics");
+@@ -5804,17 +5804,17 @@ int main(int argc, char **argv)
  			rows = 23;
  		    }
  		    if (cpus > 127) {
@@ -142,6 +147,7 @@ index 7e46642..1d53367 100644
 -			mvwprintw(padwide, rows + 7, 0, wide8);
 -			mvwprintw(padwide, rows + 8, 0, wide9);
 -			mvwprintw(padwide, rows + 9, 0, wide10);
+-			mvwprintw(padwide, rows + 10, 0,wide_129_192);
 +			mvwprintw(padwide, rows + 0, 0, "%s", wide1);
 +			mvwprintw(padwide, rows + 1, 0, "%s", wide2);
 +			mvwprintw(padwide, rows + 2, 0, "%s", wide3);
@@ -152,24 +158,7 @@ index 7e46642..1d53367 100644
 +			mvwprintw(padwide, rows + 7, 0, "%s", wide8);
 +			mvwprintw(padwide, rows + 8, 0, "%s", wide9);
 +			mvwprintw(padwide, rows + 9, 0, "%s", wide10);
- 			mvwprintw(padwide, rows + 10, 0,
- 				  " CPU +129--------+140------+150------+160------+170------+180------+190--0%%");
++			mvwprintw(padwide, rows + 10, 0, "%s", wide_129_192);
  			if (wide_first_time) {
-@@ -8274,7 +8274,7 @@ I/F Name Recv=KB/s Trans=KB/s packin packout insize outsize Peak->Recv Trans
- 			    formatstring =
- 				"  PID    %%CPU  Size   Res   Res   Res   Res Shared   Faults  Command";
- 		    }
--		    CURSE mvwprintw(padtop, 1, y, formatstring);
-+		    CURSE mvwprintw(padtop, 1, y, "%s", formatstring);
- 
- 		    if (show_args == ARGS_ONLY) {
- 			formatstring =
-@@ -8294,7 +8294,7 @@ I/F Name Recv=KB/s Trans=KB/s packin packout insize outsize Peak->Recv Trans
- 			    formatstring =
- 				"         Used    KB   Set  Text  Data   Lib    KB  Min  Maj ";
- 		    }
--		    CURSE mvwprintw(padtop, 2, 1, formatstring);
-+		    CURSE mvwprintw(padtop, 2, 1, "%s", formatstring);
- 		    for (j = 0; j < max_sorted; j++) {
- 			i = topper[j].index;
- 			if (!show_all) {
+ 			    mvwprintw(padwide, rows + 3, 7,
+ 				      " Please wait gathering CPU statistics");

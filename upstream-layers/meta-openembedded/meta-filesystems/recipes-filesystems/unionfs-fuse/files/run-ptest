@@ -1,0 +1,9 @@
+#!/bin/sh
+# not all tests can run with root, so create a test user
+# if it doesn't exist yet
+
+if ! grep ptestuser /etc/shadow; then
+    useradd ptestuser
+fi
+
+su ptestuser -c "python3 -m putao.unittest"

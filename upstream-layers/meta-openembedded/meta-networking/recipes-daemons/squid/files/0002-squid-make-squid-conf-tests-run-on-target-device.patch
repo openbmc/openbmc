@@ -7,20 +7,46 @@ Subject: [PATCH] squid: make squid-conf-tests run on target device
 * Allow the tests to run on read-only root
   * Don't overwrite tests with true on success
   * Change logfile path to /var/log
+* skip testHeaders since it's not split to prepare/execute parts
 
 Upstream-Status: Inappropriate [cross compile specific]
 
 Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
-
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
 ---
- test-suite/Makefile.am        | 16 ++++++++--------
- test-suite/test-squid-conf.sh |  2 +-
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ src/TestHeaders.am            |  6 +++---
+ test-suite/Makefile.am        | 26 +++++++++++++-------------
+ test-suite/test-squid-conf.sh |  4 ++--
+ 3 files changed, 18 insertions(+), 18 deletions(-)
 
+diff --git a/src/TestHeaders.am b/src/TestHeaders.am
+index 0ed5f56..d668876 100644
+--- a/src/TestHeaders.am
++++ b/src/TestHeaders.am
+@@ -14,8 +14,8 @@ EXCLUDE_FROM_HDR_TESTING =
+ # add an empty target named 'testHeaders' depending on the additional
+ # headers to test
+ 
+-testHeaders: $(SOURCES) $(noinst_HEADERS) $(EXTRA_DIST) $(top_srcdir)/test-suite/testHeader.cc.in
+-	$(MAKE) $(^:.h=.hdrtest) && cp $(TRUE) $@
++testHeaders: $(SOURCES) $(noinst_HEADERS) $(top_srcdir)/test-suite/testHeader.cc.in
++	$(MAKE) $(^:.h=.hdrtest)
+ 
+ .h.hdrtest:
+ 	@SrcFilePath=`echo $< | $(SED) 's%^$(top_srcdir)/%%'`; \
+@@ -31,5 +31,5 @@ testHeaders: $(SOURCES) $(noinst_HEADERS) $(EXTRA_DIST) $(top_srcdir)/test-suite
+ 		then echo "header-test: ok - $$SrcFilePath"; $(RM) "$$TargetFileName.cc" "$$TargetFileName"; \
+ 		else echo "header-test: not ok - $$SrcFilePath"; exit 1; fi
+ 
+-TESTS += testHeaders
++#TESTS += testHeaders
+ CLEANFILES += testHeaders
+diff --git a/test-suite/Makefile.am b/test-suite/Makefile.am
+index 0da5844..0bc381a 100644
 --- a/test-suite/Makefile.am
 +++ b/test-suite/Makefile.am
-@@ -21,7 +21,7 @@ LDADD = \
- EXTRA_PROGRAMS = mem_node_test splay
+@@ -11,7 +11,7 @@ include $(top_srcdir)/src/Common.am
+ AM_CPPFLAGS += -I$(srcdir)
  
  EXTRA_DIST = \
 -	$(srcdir)/squidconf/* \
@@ -28,14 +54,27 @@ Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
  	test-functionality.sh \
  	test-sources.sh \
  	test-squid-conf.sh \
-@@ -134,21 +134,21 @@ VirtualDeleteOperator_SOURCES = \
+@@ -124,37 +124,37 @@ VirtualDeleteOperator_LDADD = \
  
  installcheck-local: squid-conf-tests
  
 -squid-conf-tests: $(srcdir)/test-squid-conf.sh $(top_builddir)/src/squid.conf.default $(srcdir)/squidconf/*
--	@failed=0; cfglist="$(top_builddir)/src/squid.conf.default $(srcdir)/squidconf/*.conf"; rm -f $@ || $(TRUE); \
+-	@instructionFiles="$(srcdir)/squidconf/*.conf.instructions"; \
 +squid-conf-tests: test-squid-conf.sh $(top_builddir)/src/squid.conf.default squidconf/*
-+	@failed=0; cfglist="$(top_builddir)/src/squid.conf.default squidconf/*.conf"; rm -f $@ || $(TRUE); \
++	@instructionFiles="squidconf/*.conf.instructions"; \
+ 	for instructionFile in $$instructionFiles; do \
+ 		cfgBasename=`basename $$instructionFile .instructions`; \
+-		cfg=$(srcdir)/squidconf/$$cfgBasename; \
++		cfg=squidconf/$$cfgBasename; \
+ 		if ! test -f $$cfg; then \
+ 			echo "FAIL: $$instructionFile has no matching $$cfg"; \
+ 			exit 1; \
+ 		fi; \
+ 	done; \
+ 	failed=0; \
+-	cfglist="$(top_builddir)/src/squid.conf.default $(srcdir)/squidconf/*.conf"; \
++	cfglist="$(top_builddir)/src/squid.conf.default squidconf/*.conf"; \
+ 	rm -f $@ || $(TRUE); \
  	for cfg in $$cfglist ; do \
 -		$(srcdir)/test-squid-conf.sh $(top_builddir) $(sbindir) $$cfg || \
 +		./test-squid-conf.sh $(top_builddir) $(sbindir) $$cfg || \
@@ -55,11 +94,30 @@ Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
 -	if test "$$failed" -eq 0; then cp $(TRUE) $@ ; else exit 1; fi
 +	exit "$$failed"
  
--CLEANFILES += squid-conf-tests squid-stderr.log
-+CLEANFILES += squid-conf-tests /var/log/squid-stderr.log
+ CLEANFILES += \
+ 	squid-conf-tests \
+-	squid-expected-messages \
+-	squid-stderr.log \
+-	squid-stderr.log.next \
+-	squid-stderr.log.unmatched
++	/var/log/quid-expected-messages \
++	/var/log/squid-stderr.log \
++	/var/log/squid-stderr.log.next \
++	/var/log/squid-stderr.log.unmatched
+diff --git a/test-suite/test-squid-conf.sh b/test-suite/test-squid-conf.sh
+index 413a927..f678c5a 100755
 --- a/test-suite/test-squid-conf.sh
 +++ b/test-suite/test-squid-conf.sh
-@@ -111,7 +111,7 @@ then
+@@ -76,7 +76,7 @@ expectMessages()
+         exit 1
+     fi
+ 
+-    messageRegexFilename="squid-expected-messages"
++    messageRegexFilename="/var/log/squid-expected-messages"
+     if ! :> $messageRegexFilename
+     then
+         echo "$where: ERROR: Cannot create a temporary file named $messageRegexFilename"
+@@ -241,7 +241,7 @@ then
      done < $instructionsFile
  fi
  

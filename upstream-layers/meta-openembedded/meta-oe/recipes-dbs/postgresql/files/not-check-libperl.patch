@@ -1,4 +1,4 @@
-From 1a9416bae71aa935797add3fa11407732ad010c0 Mon Sep 17 00:00:00 2001
+From 29e76cad362c7154920aa49aa0137e1773c4d3ec Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 27 Nov 2018 13:25:15 +0800
 Subject: [PATCH] not check libperl under cross compiling
@@ -20,10 +20,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index f398184..493d5cd 100644
+index ce0966f..856b091 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2336,7 +2336,7 @@ Use --without-tcl to disable building PL/Tcl.])
+@@ -2340,7 +2340,7 @@ Use --without-tcl to disable building PL/Tcl.])
  fi
  
  # check for <perl.h>

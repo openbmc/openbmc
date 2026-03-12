@@ -1,0 +1,28 @@
+From 496b0ffd7cd685a1adb48b150157fdea14f5f159 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 9 Dec 2025 08:53:53 -0800
+Subject: [PATCH] systemd: Fix out-of-tree builds
+
+The systemd unit file installation does not work when the build directory
+differs from the source directory because cp cannot find the source file.
+Prefix the unit files with $(srcdir) to reference files from the source tree.
+
+This fixes out-of-tree builds which use separate build directories (B != S).
+
+Upstream-Status: Submitted [https://github.com/oracle/ktls-utils/pull/134]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ systemd/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/systemd/Makefile.am b/systemd/Makefile.am
+index d2f8e25..d6435ad 100644
+--- a/systemd/Makefile.am
++++ b/systemd/Makefile.am
+@@ -24,5 +24,5 @@ MAINTAINERCLEANFILES	= Makefile.in
+ if INSTALL_SYSTEMD
+ install-data-hook: $(unit_files)
+ 	mkdir -p $(DESTDIR)/$(unitdir)
+-	cp $(unit_files) $(DESTDIR)/$(unitdir)
++	cp $(addprefix $(srcdir)/,$(unit_files)) $(DESTDIR)/$(unitdir)
+ endif

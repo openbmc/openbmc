@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://README;md5=97d739900be6e852830f55aa3c07d4a0"
 
 RPROVIDES:${PN} = "virtual-japanese-font"
 
-SRC_URI = "http://osdn.dl.sourceforge.jp/efont/10087/sazanami-20040629.tar.bz2"
+SRC_URI = "https://src.fedoraproject.org/repo/pkgs/sazanami-fonts/sazanami-20040629.tar.bz2/ceef10579a75c92483171f3bd7f77df2/sazanami-20040629.tar.bz2"
 S = "${UNPACKDIR}/sazanami-20040629"
 
 PACKAGES = "ttf-sazanami-gothic ttf-sazanami-mincho"

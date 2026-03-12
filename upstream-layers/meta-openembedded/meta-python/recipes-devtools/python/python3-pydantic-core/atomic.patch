@@ -1,0 +1,39 @@
+Fix ambiguous import of marker::Atomic crate
+
+The problem is that Atomic is being imported from two different places:
+
+As a type alias from sync::atomic::*
+As a trait from crate::marker::*
+
+This creates ambiguity when the code tries to use T: Atomic + PartialEq as a trait bound.
+adds explicit imports to radium-1.1.0/src/lib.rs
+
+Fixes
+error[E0404]: expected trait, found type alias `Atomic`
+error[E0659]: `Atomic` is ambiguous 
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Index: radium-1.1.0/src/lib.rs
+===================================================================
+--- radium-1.1.0.orig/src/lib.rs
++++ radium-1.1.0/src/lib.rs
+@@ -12,6 +12,8 @@ use core::{
+ };
+ 
+ use crate::marker::*;
++use crate::marker::Atomic as AtomicTrait;
++
+ pub use crate::types::{
+ 	Atom,
+ 	Isotope,
+@@ -801,7 +803,7 @@ radium! {
+ 
+ unsafe impl<T> Radium for Atom<T>
+ where
+-	T: Atomic + PartialEq,
++	T: AtomicTrait + PartialEq,
+ 	T::Atom: Radium<Item = T>,
+ {
+ 	type Item = T;

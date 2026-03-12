@@ -1,12 +1,12 @@
 LICENSE = "Apache-2.0 & BSD-3-Clause & MIT & Zlib"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=d2572d98547d43906b53615f856a8c2d \
+LIC_FILES_CHKSUM = "file://LICENSE;md5=c0c9924c5c63b4834b8b1959816c8e3b \
                     file://buildtools/libcxx/LICENSE.TXT;md5=55d89dd7eec8d3b4204b680e27da3953 \
                     file://buildtools/libcxxabi/LICENSE.TXT;md5=7b9334635b542c56868400a46b272b1e \
                     file://buildtools/libunwind/LICENSE.TXT;md5=f66970035d12f196030658b11725e1a1 \
                     file://buildtools/protobuf/LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b \
                     file://buildtools/zlib/LICENSE;md5=8c75f2b4df47a77f9445315a9500cd1c \
-                    file://debian/copyright;md5=4e08364c82141f181de69d0a2b89d612 \
+                    file://debian/copyright;md5=55b18749ff89714316c007d06f305c4a \
                     file://python/LICENSE;md5=c602a632c34ade9c78a976734077bce7"
 
 # Dependencies from perfetto/tools/install-build-deps
@@ -21,14 +21,12 @@ SRC_URI:append = " \
            git://android.googlesource.com/platform/system/libprocinfo.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/android-libprocinfo;name=libprocinfo \
            git://android.googlesource.com/platform/system/core.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/android-core;name=core \
            git://android.googlesource.com/platform/bionic.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/bionic;name=bionic \
-           git://android.googlesource.com/platform/external/zlib.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zlib;name=zlib \
+           git://chromium.googlesource.com/chromium/src/third_party/zlib.git;nobranch=1;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zlib;name=zlib \
            git://android.googlesource.com/platform/external/lzma.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/lzma;name=lzma \
            git://android.googlesource.com/platform/external/zstd.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zstd;name=zstd \
            https://storage.googleapis.com/perfetto/gn-linux64-1968-0725d782;subdir=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/;name=gn \
            \
            file://0001-Remove-check_build_deps-build-steps.patch \
-           file://0002-traced-fix-missing-include.patch \
-           file://0001-add-missing-includes-for-the-build-with-use_libcxx_m.patch \
            "
 
 SRCREV_bionic = "a0d0355105cb9d4a4b5384897448676133d7b8e2"
@@ -42,7 +40,7 @@ SRCREV_libbase = "78f1c2f83e625bdf66d55b48bdb3a301c20d2fb3"
 SRCREV_libcxx = "852bc6746f45add53fec19f3a29280e69e358d44"
 SRCREV_libcxxabi = "a37a3aa431f132b02a58656f13984d51098330a2"
 SRCREV_libunwind = "419b03c0b8f20d6da9ddcb0d661a94a97cdd7dad"
-SRCREV_zlib = "6d3f6aa0f87c9791ca7724c279ef61384f331dfd"
+SRCREV_zlib = "6f9b4e61924021237d474569027cfb8ac7933ee6"
 SRCREV_zstd = "77211fcc5e08c781734a386402ada93d0d18d093"
 
 SRCREV_FORMAT .= "_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib_zstd"
@@ -51,8 +49,11 @@ SRC_URI[gn.sha256sum] = "f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa23581
 
 require perfetto.inc
 
-DEPENDS += " ninja-native"
+DEPENDS += " ninja-native gn-native"
 
+# Use clang in order to enable traced_perf ( see https://github.com/google/perfetto/blob/092d0ceace6fa516fac1bd4e715c226eaaebe26e/gn/perfetto.gni#L177 ,
+# enable_perfetto_traced_perf depends on "is_clang")
+TOOLCHAIN = "clang"
 COMPATIBLE_HOST = "(i.86|x86_64|aarch64|arm).*-linux*"
 
 CCACHE_DISABLE = "1"
@@ -72,8 +73,8 @@ do_configure () {
     cd ${S}
     # Rename a few build tools if they have not been renamed
     cd buildtools
-    x="gn-linux64-1968-0725d782"
-    [ -f $x ] && mkdir linux64 && mv $x linux64/gn
+
+    mkdir linux64 && cp ${RECIPE_SYSROOT_NATIVE}${bindir}/gn linux64/gn
     chmod +x linux64/gn
     cd ..
 

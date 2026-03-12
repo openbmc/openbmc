@@ -23,6 +23,9 @@ SRC_URI = "http://v6web.litech.org/radvd/dist/radvd-${PV}.tar.gz \
            "
 SRC_URI[sha256sum] = "af37c5a81d59f3bdc00d83056606ffa1810d4550beed6caa4f81181246494220"
 
+UPSTREAM_CHECK_URI = "https://github.com/radvd-project/radvd/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
+
 inherit autotools useradd pkgconfig systemd
 
 SYSTEMD_SERVICE:${PN} = "radvd.service"

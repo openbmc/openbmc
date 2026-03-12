@@ -1,4 +1,4 @@
-From 69ee17207574ca032c3cb46a3db99736de3eedf8 Mon Sep 17 00:00:00 2001
+From edb01d9a3c29d31493a0435ab35e9d438f391267 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 25 May 2020 23:22:55 -0700
 Subject: [PATCH] add explicit dependency on libraries
@@ -35,6 +35,3 @@ index 690dc050..b775f949 100644
  
  DEPS_ON_MULTIPATH := \
  	multipath \
--- 
-2.25.1
-

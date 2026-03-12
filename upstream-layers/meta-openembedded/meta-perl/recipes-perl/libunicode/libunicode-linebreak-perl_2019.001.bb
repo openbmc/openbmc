@@ -40,6 +40,7 @@ RDEPENDS:${PN} += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
+    perl-module-encode-encoding \
     perl-module-findbin \
     perl-module-lib \
     perl-module-strict \

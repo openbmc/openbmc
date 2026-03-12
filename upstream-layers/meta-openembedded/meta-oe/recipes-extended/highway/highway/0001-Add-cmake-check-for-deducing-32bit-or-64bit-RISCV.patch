@@ -9,10 +9,13 @@ RVV as well
 
 Upstream-Status: Submitted [https://github.com/google/highway/pull/2330]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
----
- CMakeLists.txt | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
 
+---
+ CMakeLists.txt | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 795408c5..9ddd92cd 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -59,6 +59,33 @@ if(CHECK_PIE_SUPPORTED)
@@ -49,27 +52,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  include(GNUInstallDirs)
  
  if (NOT CMAKE_BUILD_TYPE)
-@@ -72,7 +99,7 @@ set(HWY_CMAKE_ARM7 OFF CACHE BOOL "Set c
- # skipped. For GCC 13.1+, you can also build with -fexcess-precision=standard.
- set(HWY_CMAKE_SSE2 OFF CACHE BOOL "Set SSE2 as baseline for 32-bit x86?")
- 
--# Currently this will compile the entire codebase with `-march=rv64gcv1p0`:
-+# Currently this will compile the entire codebase with `-march=rv<XLEN>gcv1p0`:
- set(HWY_CMAKE_RVV ON CACHE BOOL "Set copts for RISCV with RVV?")
- 
- # Unconditionally adding -Werror risks breaking the build when new warnings
-@@ -378,7 +405,13 @@ else()
-     # we add the gcv compiler flag, which then requires the CPU (now when using
-     # either compiler) to support V.
-     if(HWY_CMAKE_RVV)
--      list(APPEND HWY_FLAGS -march=rv64gcv1p0)
-+      if(RISCV_XLEN EQUAL 64)
-+        list(APPEND HWY_FLAGS -march=rv64gcv1p0)
-+        add_link_options(-march=rv64gcv1p0)
-+      elseif(RISCV_XLEN EQUAL 32)
-+        list(APPEND HWY_FLAGS -march=rv32gcv1p0)
-+        add_link_options(-march=rv32gcv1p0)
-+      endif()
-       if(${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-         list(APPEND HWY_FLAGS -menable-experimental-extensions)
-       endif()
+-- 
+2.43.0
+

@@ -32,8 +32,6 @@ Upstream-Status: Pending
  create mode 100644 kexec/if_nameindex.c
  create mode 100644 kexec/if_nameindex.h
 
-diff --git a/kexec/Makefile b/kexec/Makefile
-index 4db84d8..fb7520b 100644
 --- a/kexec/Makefile
 +++ b/kexec/Makefile
 @@ -11,7 +11,7 @@ KEXEC_SRCS = $(KEXEC_SRCS_base)
@@ -45,9 +43,6 @@ index 4db84d8..fb7520b 100644
  KEXEC_SRCS_base += kexec/kexec-elf.c
  KEXEC_SRCS_base += kexec/kexec-elf-exec.c
  KEXEC_SRCS_base += kexec/kexec-elf-core.c
-diff --git a/kexec/if_nameindex.c b/kexec/if_nameindex.c
-new file mode 100644
-index 0000000..e586e41
 --- /dev/null
 +++ b/kexec/if_nameindex.c
 @@ -0,0 +1,64 @@
@@ -115,9 +110,6 @@ index 0000000..e586e41
 +	errno = ENOBUFS;
 +	return p;
 +}
-diff --git a/kexec/if_nameindex.h b/kexec/if_nameindex.h
-new file mode 100644
-index 0000000..cf1c061
 --- /dev/null
 +++ b/kexec/if_nameindex.h
 @@ -0,0 +1,15 @@
@@ -136,11 +128,9 @@ index 0000000..cf1c061
 +void if_freenameindex (struct if_nameindex *);
 +
 +#endif
-diff --git a/kexec/ifdown.c b/kexec/ifdown.c
-index 82c6141..cc3ca9f 100644
 --- a/kexec/ifdown.c
 +++ b/kexec/ifdown.c
-@@ -18,6 +18,9 @@ char *v_ifdown = "@(#)ifdown.c  1.11  02-Jun-1998  miquels@cistron.nl";
+@@ -18,6 +18,9 @@ char *v_ifdown = "@(#)ifdown.c  1.11  02
  
  #include <netinet/in.h>
  #include <net/if.h>

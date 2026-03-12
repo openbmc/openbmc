@@ -3,20 +3,19 @@ SUMMARY = "Kexec tools, statically compiled against klibc"
 HOMEPAGE = "http://kernel.org/pub/linux/utils/kernel/kexec/"
 SECTION = "kernel/userland"
 LICENSE = "GPL-2.0-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=ea5bed2f60d357618ca161ad539f7c0a \
+LIC_FILES_CHKSUM = "file://COPYING;md5=570a9b3749dd0463a1778803b12a6dce \
                     file://kexec/kexec.c;beginline=1;endline=20;md5=af10f6ae4a8715965e648aa687ad3e09"
-PV = "2.0.18+git"
+PV = "2.0.32"
 
 DEPENDS = "zlib xz"
 
 inherit klibc autotools siteinfo
 
 SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kexec/kexec-tools.git;branch=master"
-SRCREV = "5750980cdbbc33ef75bfba6660295b932376ce15"
+SRCREV = "15d78e5799eea7ec5ea9c5897ae95aaa0ce8970c"
 
 BUILD_PATCHES = "file://0001-force-static-build.patch \
                  file://0002-Adjust-the-order-of-headers-to-fix-build-for-musl.patch \
-                 file://Fix-building-on-x86_64-with-binutils-2.41.patch \
                  "
 
 KLIBC_PATCHES += " \
@@ -26,21 +25,23 @@ KLIBC_PATCHES += " \
             file://0006-kexec-syscall.h-work-around-missing-syscall-wrapper.patch \
             file://0007-kexec.c-add-guard-around-ENOTSUP.patch \
             file://0008-kexec.c-replace-mising-BLKGETSIZE64.patch \
-            file://0009-vmcore-dmesg.c-work-around-missing-imaxdiv.patch \
             file://0010-fs2dt.c-work-around-missing-getline.patch \
             file://0011-purgatory-Makefile-adapt-to-klcc.patch \
             file://0012-purgatory-string.c-avoid-inclusion-of-string.h.patch \
             file://0013-sha256.h-avoid-inclusion-of-sys-types.h.patch \
             file://0014-add-if_nameindex-from-musl.patch \
-            file://0015-vmcore-dmesg-fix-warning.patch \
             file://klibc-reboot.patch \
             file://include_next.patch \
+            file://0001-kexec-Provide-local-implementation-of-mkstemp-for-kl.patch \
+            file://0002-kexec-Add-imaxdiv-implementation-for-klibc-builds.patch \
+            file://0003-kexec-riscv-Add-endian-conversion-macros-for-klibc-b.patch \
+            file://0004-exec-Define-EM_RISCV-for-klibc-builds.patch \
+            file://0005-kexec-Disable-memfd_create-for-klibc-builds.patch \
             "
 
 WARNING_FIXES = ""
-FROM_OE_CORE = "file://arm_crashdump-fix-buffer-align.patch \
-                file://powerpc_change-the-memory-size-limit.patch \
-                file://kexec-x32.patch"
+FROM_OE_CORE = "file://powerpc_change-the-memory-size-limit.patch \
+                "
 
 SRC_URI += "${BUILD_PATCHES} ${KLIBC_PATCHES} ${WARNING_FIXES} ${FROM_OE_CORE}"
 
@@ -91,4 +92,4 @@ FILES:vmcore-dmesg-klibc = "${sbindir}/vmcore-dmesg"
 
 INSANE_SKIP:${PN} = "arch"
 
-COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|powerpc.*|mips.*)-(linux|freebsd.*)'
+COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|powerpc.*|mips.*|riscv64.*)-(linux|freebsd.*)'

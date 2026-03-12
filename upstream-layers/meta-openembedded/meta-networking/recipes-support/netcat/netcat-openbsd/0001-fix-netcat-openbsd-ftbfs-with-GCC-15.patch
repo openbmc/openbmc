@@ -28,19 +28,19 @@ Signed-off-by: mark.yang <mark.yang@lge.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/netcat.c b/netcat.c
-index d70598a..b8ba959 100644
+index 62d01d8..7367f47 100644
 --- a/netcat.c
 +++ b/netcat.c
-@@ -238,7 +238,7 @@ char *proto_name(int uflag, int dccpflag);
- static int connect_with_timeout(int fd, const struct sockaddr *sa,
-         socklen_t salen, int ctimeout);
+@@ -237,7 +237,7 @@ ssize_t fillbuf(int, unsigned char *, size_t *);
  
+ char *proto_name(int, int);
+ static int connect_with_timeout(int, const struct sockaddr *, socklen_t, int);
 -static void quit();
 +static void quit(int sig);
  
  int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
  int    b64_pton(char const *src, u_char *target, size_t targsize);
-@@ -2235,7 +2235,7 @@ usage(int ret)
+@@ -2347,7 +2347,7 @@ usage(int ret)
   * quit()
   * handler for a "-q" timeout (exit 0 instead of 1)
   */

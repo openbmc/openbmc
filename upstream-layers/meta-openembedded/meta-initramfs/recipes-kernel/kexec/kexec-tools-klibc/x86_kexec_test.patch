@@ -13,12 +13,10 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  Makefile.in | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index dbf1fb6..440730d 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -173,8 +173,8 @@ PSRCS:=$(foreach s, $(SRCS), $(PACKAGE_NAME)-$(PACKAGE_VERSION)/$(s))
- PGSRCS:=$(foreach s, $(GENERATED_SRCS), $(PACKAGE_NAME)-$(PACKAGE_VERSION)/$(s))
+@@ -181,8 +181,8 @@ TARBALL.gz=$(TARBALL).gz
+ SRCS:= $(dist)
  
  MAN_PAGES:=$(KEXEC_MANPAGE) $(VMCORE_DMESG_MANPAGE)
 -BINARIES_i386:=$(KEXEC_TEST)

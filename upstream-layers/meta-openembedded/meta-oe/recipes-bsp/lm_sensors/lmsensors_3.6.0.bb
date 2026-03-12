@@ -18,6 +18,8 @@ SRC_URI = "git://github.com/lm-sensors/lm-sensors.git;protocol=https;branch=mast
 "
 SRCREV = "1667b850a1ce38151dae17156276f981be6fb557"
 
+UPSTREAM_CHECK_GITTAGREGEX = "V(?P<pver>\d+(-\d+)+)"
+
 inherit update-rc.d systemd
 
 RDEPENDS:${PN}-dev = ""

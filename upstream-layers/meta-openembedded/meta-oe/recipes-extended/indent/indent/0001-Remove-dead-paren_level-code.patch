@@ -18,14 +18,10 @@ diff --git a/src/output.c b/src/output.c
 index ee01bcc..5b92167 100644
 --- a/src/output.c
 +++ b/src/output.c
-@@ -798,37 +798,6 @@ static int dump_line_label(void)
-    return cur_col;
- }
+@@ -802,37 +802,6 @@
+  *
+  */
  
--/**
-- *
-- */
--
 -static int count_parens(
 -    const char * string)
 -{
@@ -53,10 +49,14 @@ index ee01bcc..5b92167 100644
 -    return paren_level;
 -}
 -
- /**
-  *
-  */
-@@ -840,8 +809,6 @@ static void dump_line_code(
+-/**
+- *
+- */
+-
+ static void dump_line_code(
+     int     * pcur_col,
+     int     * pnot_truncated,
+@@ -840,8 +809,6 @@
      BOOLEAN * pbreak_line,
      int       target_col_break)
  {
@@ -65,7 +65,7 @@ index ee01bcc..5b92167 100644
     if (s_code != e_code)
     {                       /* print code section, if any */
        int i;
-@@ -928,8 +895,6 @@ static void dump_line_code(
+@@ -928,8 +895,6 @@
  
           *pcur_col = count_columns (*pcur_col, s_code, NULL_CHAR);
  
@@ -74,6 +74,3 @@ index ee01bcc..5b92167 100644
           s_code[buf_break->offset] = c;
  
           *pnot_truncated = 0;
--- 
-2.31.1
-

@@ -10,3 +10,4 @@ inherit pypi python_setuptools_build_meta
 RDEPENDS:${PN} = "python3-pytest"
 
 PYPI_PACKAGE = "pytest_timeout"
+UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"

@@ -1,4 +1,4 @@
-From 779bbfebcd414a2cb4ab73ff1c4eb987cfdab456 Mon Sep 17 00:00:00 2001
+From 3d547c043f772fe1352c7beb0e3331e35c77e63e Mon Sep 17 00:00:00 2001
 From: Pablo Saavedra <psaavedra@igalia.com>
 Date: Mon, 11 Nov 2024 13:05:15 +0100
 Subject: [PATCH] meson: Check for libunwind instead of libunwind-generic
@@ -18,11 +18,11 @@ Signed-off-by: Pablo Saavedra <psaavedra@igalia.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 96c1d09..86b9df4 100644
+index 3907354..783f558 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -107,7 +107,7 @@ polkit_dep = dependency('polkit-gobject-1', version: polkit_req_version, require
- config_h.set10('HAVE_POLKIT', polkit_dep.found())
+@@ -114,7 +114,7 @@ if cc.has_header('asm/perf_regs.h')
+ endif
  
  if need_libsysprof
 -  libunwind_dep = dependency('libunwind-generic', required: true)

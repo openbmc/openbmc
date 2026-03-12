@@ -17,11 +17,11 @@ diff --git a/Makefile.am b/Makefile.am
 index e0c4ad6..0449321 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -35,3 +35,4 @@ rpmcvs: preparerpm
+@@ -30,3 +30,5 @@ rpm: preparerpm
+ rpmcvs: preparerpm
  	@LN_S@ -f `pwd`/@PACKAGE@-@VERSION@.tar.gz ${RPMDIR}/SOURCES/@PACKAGE@-@VERSION@_cvs_`date +"%Y%m%d"`.tar.gz
  	cd ${RPMDIR}/SPECS && @RPMBUILD@ -ba @PACKAGE@.spec --define 'cvs 1'
- 
++
 +README: README.md
 -- 
 2.7.4
-

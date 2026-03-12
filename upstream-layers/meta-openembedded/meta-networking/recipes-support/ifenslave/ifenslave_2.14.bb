@@ -1,5 +1,5 @@
 SUMMARY = "Configure network interfaces for parallel routing"
-HOMEPAGE = "http://www.linuxfoundation.org/collaborate/workgroups/networking/bonding"
+HOMEPAGE = "https://wiki.linuxfoundation.org/networking/bonding"
 SECTION = "net"
 
 LICENSE = "GPL-3.0-only"

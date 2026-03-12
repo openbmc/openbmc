@@ -1,4 +1,4 @@
-From 68425b541e88f9f03a418cfda052b46b2a185e4e Mon Sep 17 00:00:00 2001
+From 219920476d7b23370bfb456ee4ac1cf9b21479c6 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 25 Jul 2024 20:18:17 -0700
 Subject: [PATCH] libsysprof: Check for unw_set_caching_policy before using

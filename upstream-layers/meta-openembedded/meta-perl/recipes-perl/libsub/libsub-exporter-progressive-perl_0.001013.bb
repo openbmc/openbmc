@@ -8,7 +8,7 @@ features, like renaming exports, if they try to use them."
 
 SECTION = "libs"
 
-HOMEPAGE = "https://metacpan.org/pod/Sub-Exporter-Progressive/"
+HOMEPAGE = "https://metacpan.org/pod/Sub::Exporter::Progressive/"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=003fa970662359a43ac2c2961108b0f1"

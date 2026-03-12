@@ -164,3 +164,9 @@ do_install() {
     install -d ${D}/${sbindir}
     install ${S}/src/${GO_IMPORT}/mc ${D}/${sbindir}/mc
 }
+
+CVE_STATUS_GROUPS += "CVE_STATUS_WRONG_CPE"
+CVE_STATUS_WRONG_CPE[status] = "cpe-incorrect: The vulnerability is in minio server, not in minio client-tools"
+CVE_STATUS_WRONG_CPE = "CVE-2018-1000538 CVE-2020-11012 CVE-2021-21287 CVE-2021-21362 \
+                        CVE-2021-21390 CVE-2021-43858 CVE-2022-35919 CVE-2023-28433 \
+                        CVE-2023-28434 CVE-2024-36107"

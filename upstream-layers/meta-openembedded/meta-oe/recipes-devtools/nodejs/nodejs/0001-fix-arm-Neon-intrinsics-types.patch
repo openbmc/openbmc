@@ -1,0 +1,59 @@
+From 3f4283dac7d88a89b42f1f2966a862cee5afe486 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Thu, 12 Feb 2026 11:03:53 +0100
+Subject: [PATCH 1/2] fix arm Neon intrinsics types
+
+The current code calls these intrinsics with incorrect datatypes
+(it uses a vector of uint16 instead of uint8), causing compilation
+to fail with the following error:
+
+| ../deps/llhttp/src/llhttp.c: In function 'llhttp__internal__run':
+| ../deps/llhttp/src/llhttp.c:2645:9: note: use '-flax-vector-conversions' to permit conversions between vectors with differing element types or numbers of subparts
+|  2645 |         );
+|       |         ^
+| ../deps/llhttp/src/llhttp.c:2643:11: error: incompatible type for argument 1 of 'vandq_u16'
+|  2643 |           vcgeq_u8(input, vdupq_n_u8(' ')),
+
+To avoid this, set the correct intrinsics call that matches the
+actual arguments.
+
+The code that this patch modifies is generated code, so in itself
+this change isn't appropriate for upstream. The actual problem
+is in the code generator itself, for which a PR is already pending
+for merging[1]. This patch is a port of that PR.
+
+[1]: https://github.com/nodejs/llparse/pull/79
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ deps/llhttp/src/llhttp.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/deps/llhttp/src/llhttp.c b/deps/llhttp/src/llhttp.c
+index aa4c4682..887603fd 100644
+--- a/deps/llhttp/src/llhttp.c
++++ b/deps/llhttp/src/llhttp.c
+@@ -2639,17 +2639,17 @@ static llparse_state_t llhttp__internal__run(
+         /* Find first character that does not match `ranges` */
+         single = vceqq_u8(input, vdupq_n_u8(0x9));
+         mask = single;
+-        single = vandq_u16(
++        single = vandq_u8(
+           vcgeq_u8(input, vdupq_n_u8(' ')),
+           vcleq_u8(input, vdupq_n_u8('~'))
+         );
+-        mask = vorrq_u16(mask, single);
+-        single = vandq_u16(
++        mask = vorrq_u8(mask, single);
++        single = vandq_u8(
+           vcgeq_u8(input, vdupq_n_u8(0x80)),
+           vcleq_u8(input, vdupq_n_u8(0xff))
+         );
+-        mask = vorrq_u16(mask, single);
+-        narrow = vshrn_n_u16(mask, 4);
++        mask = vorrq_u8(mask, single);
++        narrow = vshrn_n_u16(vreinterpretq_u16_u8(mask), 4);
+         match_mask = ~vget_lane_u64(vreinterpret_u64_u8(narrow), 0);
+         match_len = __builtin_ctzll(match_mask) >> 2;
+         if (match_len != 16) {

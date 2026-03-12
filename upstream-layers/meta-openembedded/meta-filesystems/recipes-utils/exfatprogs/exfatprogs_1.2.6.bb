@@ -11,14 +11,22 @@ SECTION = "universe/otherosfs"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.xz"
+SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.xz \
+           file://run-ptest"
 SRC_URI[sha256sum] = "89d05b7a9537f2413079b724ec8d02d7a2e291c29c52e7256303e9456200fb0f"
 
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"
 
-inherit autotools
+inherit autotools ptest
 
 RPROVIDES:${PN} = "exfat-utils"
 RCONFLICTS:${PN} = "exfat-utils"
 RREPLACES:${PN} = "exfat-utils"
+RDEPENDS:${PN}-ptest += "bash xz"
+
+do_install_ptest(){
+    cp -r ${S}/tests ${D}${PTEST_PATH}
+    sed -i "s,Passed,PASS:," ${D}${PTEST_PATH}/tests/test_fsck.sh
+    sed -i "s,Failed,FAIL:," ${D}${PTEST_PATH}/tests/test_fsck.sh
+}

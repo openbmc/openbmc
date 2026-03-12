@@ -1,0 +1,51 @@
+From 41ec2d5302b77be27ca972102c29ce12471ed4b0 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Thu, 12 Feb 2026 11:09:44 +0100
+Subject: [PATCH 2/2] detect aarch64 Neon correctly
+
+The llhttp vendored dependency of nodejs takes advantage of Arm NEON
+instructions when they are available, however they are detected by
+checking for an outdated CPU feature macro: it checks for __ARM_NEON__,
+however it is not defined by new compilers for aarch64, rather they
+set __ARM_NEON. The Arm C extension guide[1] refers to __ARM_NEON macro
+aswell.
+
+This patch changes the detection to check for both macros when detecting
+the availability of NEON instructions.
+
+The code this patch modifies is generated, so the patch itself isn't
+suitable for upstream submission, as the root cause of the error is
+in the generator itself. A PR has been submitted[2] to the generator
+project to rectify this issue.
+
+[1]: https://developer.arm.com/documentation/ihi0053/d/ - pdf, section 6.9
+[2]: https://github.com/nodejs/llparse/pull/84
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ deps/llhttp/src/llhttp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/deps/llhttp/src/llhttp.c b/deps/llhttp/src/llhttp.c
+index a0e59e50..b069bbbb 100644
+--- a/deps/llhttp/src/llhttp.c
++++ b/deps/llhttp/src/llhttp.c
+@@ -10,7 +10,7 @@
+  #endif  /* _MSC_VER */
+ #endif  /* __SSE4_2__ */
+ 
+-#ifdef __ARM_NEON__
++#if defined(__ARM_NEON__) || defined(__ARM_NEON)
+  #include <arm_neon.h>
+ #endif  /* __ARM_NEON__ */
+ 
+@@ -2625,7 +2625,7 @@ static llparse_state_t llhttp__internal__run(
+         goto s_n_llhttp__internal__n_header_value_otherwise;
+       }
+       #endif  /* __SSE4_2__ */
+-      #ifdef __ARM_NEON__
++      #if defined(__ARM_NEON__) || defined(__ARM_NEON)
+       while (endp - p >= 16) {
+         uint8x16_t input;
+         uint8x16_t single;

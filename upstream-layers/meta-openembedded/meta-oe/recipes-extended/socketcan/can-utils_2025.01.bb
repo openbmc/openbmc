@@ -1,4 +1,5 @@
 SUMMARY = "Linux CAN network development utilities"
+HOMEPAGE = "https://github.com/linux-can/can-utils"
 LICENSE = "GPL-2.0-only & BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://include/linux/can.h;endline=44;md5=a9e1169c6c9a114a61329e99f86fdd31"
 

@@ -1,0 +1,56 @@
+From 2584c0de5651bd694499449f9da5321b15597270 Mon Sep 17 00:00:00 2001
+From: adelplanque <alaindelplanque@mailoo.org>
+Date: Wed, 17 Dec 2025 22:22:28 +0100
+Subject: [PATCH] Allow install over python 3.14 (#329)
+
+All tests pass over python 3.14.2
+
+Upstream-Status: Submitted [https://github.com/jazzband/geojson/pull/240]
+
+Backport the relevant parts of an upstream PR to allow build with Python 3.14.
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ README.rst                 | 2 +-
+ setup.py                   | 5 +++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/README.rst b/README.rst
+index 26dc790..e3ac38a 100644
+--- a/README.rst
++++ b/README.rst
+@@ -29,7 +29,7 @@ This Python library contains:
+ Installation
+ ------------
+ 
+-geojson is compatible with Python 3.7 - 3.13. The recommended way to install is via pip_:
++geojson is compatible with Python 3.7 - 3.14. The recommended way to install is via pip_:
+ 
+ .. code::
+ 
+diff --git a/setup.py b/setup.py
+index 004d3eb..db277f1 100644
+--- a/setup.py
++++ b/setup.py
+@@ -17,8 +17,8 @@ else:
+ 
+ 
+ major_version, minor_version = sys.version_info[:2]
+-if not (major_version == 3 and 7 <= minor_version <= 13):
+-    sys.stderr.write("Sorry, only Python 3.7 - 3.13 are "
++if not (major_version == 3 and 7 <= minor_version <= 14):
++    sys.stderr.write("Sorry, only Python 3.7 - 3.14 are "
+                      "supported at this time.\n")
+     exit(1)
+ 
+@@ -54,6 +54,7 @@ setup(
+         "Programming Language :: Python :: 3.11",
+         "Programming Language :: Python :: 3.12",
+         "Programming Language :: Python :: 3.13",
++        "Programming Language :: Python :: 3.14",
+         "Topic :: Scientific/Engineering :: GIS",
+     ]
+ )
+-- 
+2.52.0
+

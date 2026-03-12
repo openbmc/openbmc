@@ -1,0 +1,58 @@
+From bf552c479a0c0b0ef2d52d8456030c56b8cc6dbb Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Fri, 26 Dec 2025 19:33:54 +0100
+Subject: [PATCH] fix debug ioctl call
+
+When calling the ioctl to set a debug file, the ioctl expects to receive a datatype
+that is specified in the ioctl definition: char[PATHLEN_MAX]
+
+However when passing the pointer from getopts, this is only true if the passed path
+has the maximal allowed length. Since usually this path is shorter than the max,
+the kernel is trying to read over the end of the argument, and returns "EFAULT/Bad address".
+
+To solve this, copy the argument to a buffer that has the exact size of what the ioctl
+expects, and pass this buffer to the ioctl.
+
+Upstream-Status: Submitted [https://github.com/rpodgorny/unionfs-fuse/pull/164]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ src/unionfsctl.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/src/unionfsctl.c b/src/unionfsctl.c
+index 74c4d33..efed505 100644
+--- a/src/unionfsctl.c
++++ b/src/unionfsctl.c
+@@ -44,25 +44,28 @@ int main(int argc, char **argv) {
+ 
+ 	int opt;
+ 	const char* argument_param;
++	char debug_file[PATHLEN_MAX];
+ 	int debug_on_off;
+ 	int ioctl_res;
+ 	while ((opt = getopt(argc, argv, "d:p:")) != -1) {
+ 		switch (opt) {
+ 		case 'p':
+-			argument_param = optarg;
+-			if (strlen(argument_param) < 1) {
++			if (strlen(optarg) < 1) {
+ 				fprintf(stderr,
+ 					"Not a valid debug path given!\n");
+ 				print_help(progname);
+ 				exit(1);
+ 			}
+ 
+-			if (strlen(argument_param) > PATHLEN_MAX) {
++			if (strlen(optarg) > PATHLEN_MAX) {
+ 				fprintf(stderr, "Debug path too long!\n");
+ 				exit(1);
+ 			}
+ 
+-			ioctl_res = ioctl(fd, UNIONFS_SET_DEBUG_FILE, argument_param);
++			memset(debug_file, 0, PATHLEN_MAX);
++			strncpy(debug_file, optarg, PATHLEN_MAX - 1);
++
++			ioctl_res = ioctl(fd, UNIONFS_SET_DEBUG_FILE, debug_file);
+ 			if (ioctl_res == -1) {
+ 				fprintf(stderr, "debug-file ioctl failed: %s\n",
+ 					strerror(errno) );

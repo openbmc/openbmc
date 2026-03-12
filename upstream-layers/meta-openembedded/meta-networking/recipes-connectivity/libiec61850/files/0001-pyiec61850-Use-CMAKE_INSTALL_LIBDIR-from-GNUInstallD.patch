@@ -7,7 +7,7 @@ Subject: [PATCH] pyiec61850: Use CMAKE_INSTALL_LIBDIR from GNUInstallDirs in
 This ensures that it gets installed in platform specified system libdir
 all platforms do not use /usr/lib as assumed here e.g. ppc64 uses lib64
 
-Upstream-Status: Submitted [https://github.com/mz-automation/libiec61850/pull/376]
+Upstream-Status: Denied [https://github.com/mz-automation/libiec61850/pull/376 - closed without a word]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  pyiec61850/CMakeLists.txt | 6 ++++--
@@ -15,15 +15,21 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/pyiec61850/CMakeLists.txt
 +++ b/pyiec61850/CMakeLists.txt
-@@ -31,7 +31,9 @@ endif()
+@@ -31,14 +31,9 @@ swig_add_library(pyiec61850
  
- swig_link_libraries(iec61850 ${PYTHON_LIBRARIES} ${LIBS})
+ swig_link_libraries(pyiec61850 ${LIBS})
  
--install(FILES ${CMAKE_CURRENT_BINARY_DIR}/iec61850.py DESTINATION /usr/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
--install(TARGETS _iec61850 LIBRARY DESTINATION /usr/lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
+-# Finding python modules install path
+-execute_process(
+-	COMMAND ${Python_EXECUTABLE} -c
+-	"from sysconfig import get_path; import sys; sys.stdout.write(get_path('platlib'))"
+-	OUTPUT_VARIABLE PYTHON_SITE_DIR
+-)
 +include(GNUInstallDirs)
-+
-+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/iec61850.py DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
-+install(TARGETS _iec61850 LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}//python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages)
  
- add_test(test_pyiec61850 ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/test_pyiec61850.py)
+-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pyiec61850.py DESTINATION ${PYTHON_SITE_DIR})
+-install(TARGETS pyiec61850 LIBRARY DESTINATION ${PYTHON_SITE_DIR})
++install(FILES ${CMAKE_CURRENT_BINARY_DIR}/pyiec61850.py DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python${PYTHON_BASEVERSION}/site-packages)
++install(TARGETS pyiec61850 LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/python${PYTHON_BASEVERSION}/site-packages)
+ 
+ add_test(test_pyiec61850 ${Python_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/test_pyiec61850.py)

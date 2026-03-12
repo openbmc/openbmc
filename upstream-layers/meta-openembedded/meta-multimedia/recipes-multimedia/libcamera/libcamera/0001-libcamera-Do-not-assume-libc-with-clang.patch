@@ -1,0 +1,68 @@
+From 0c68347365ec4c0bd3f84e1d2f9f51eb3c2405c8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 24 Oct 2025 11:10:59 -0700
+Subject: [PATCH] libcamera: Do not assume libc++ with clang
+
+Clang on linux can be defaulting to use libstdc++, it
+should be using default platform C++ runtime library which the
+toolchain should be configured to do the right thing
+
+Add logic in meson file to detect C++ runtime used by toolchain
+and defile -stdlib= parameter accordingly
+
+Upstream-Status: Submitted [https://lists.libcamera.org/pipermail/libcamera-devel/2025-October/054151.html]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ meson.build | 32 +++++++++++++++++++++-----------
+ 1 file changed, 21 insertions(+), 11 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index fa6487f6..89294936 100644
+--- a/meson.build
++++ b/meson.build
+@@ -118,7 +118,24 @@ cpp_arguments = [
+     '-Wnon-virtual-dtor',
+ ]
+ 
+-cxx_stdlib = 'libstdc++'
++# Try to detect libc++
++libcxx_ver = cxx.get_define('_LIBCPP_VERSION',
++  prefix: '#include <vector>\n')
++
++# Try to detect libstdc++
++glibcxx_ver = cxx.get_define('__GLIBCXX__',
++  prefix: '#include <vector>\n')
++
++stdlib_msg = 'unknown'
++
++if libcxx_ver != ''
++  cxx_stdlib = 'libc++'
++elif glibcxx_ver != ''
++  # __GLIBCXX__ is usually a yyyymmdd date code
++  cxx_stdlib = 'libstdc++'
++endif
++
++message('Detected C++ standard library: ' + cxx_stdlib)
+ 
+ if cc.get_id() == 'clang'
+     if cc.version().version_compare('<9')
+@@ -138,16 +155,9 @@ if cc.get_id() == 'clang'
+             ]
+         endif
+     endif
+-
+-    # Use libc++ by default if available instead of libstdc++ when compiling
+-    # with clang.
+-    if cc.find_library('c++', required : false).found()
+-        cpp_arguments += [
+-            '-stdlib=libc++',
+-        ]
+-        cxx_stdlib = 'libc++'
+-    endif
+-
++    cpp_arguments += [
++        '-stdlib=' + cxx_stdlib,
++    ]
+     cpp_arguments += [
+         '-Wextra-semi',
+         '-Wthread-safety',

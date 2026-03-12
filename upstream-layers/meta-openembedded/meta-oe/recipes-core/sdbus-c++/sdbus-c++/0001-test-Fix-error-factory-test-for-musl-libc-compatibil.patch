@@ -1,0 +1,29 @@
+From da0d6595c48905ec7d99f1a75878fbeb17972d75 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 26 Nov 2025 23:29:53 -0800
+Subject: [PATCH] test: Fix error factory test for musl libc compatibility
+
+It uses errno value 123456 in test handling of unknown errors. This works
+on glibc which accepts any errno value, but musl libc validates
+errno ranges more strictly (typically 1-133).
+
+Ignore test on non-glibc systems
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/unittests/Types_test.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/tests/unittests/Types_test.cpp
++++ b/tests/unittests/Types_test.cpp
+@@ -488,7 +488,7 @@ TEST(AnErrorFactory, CanCreateAnErrorFro
+     EXPECT_TRUE(error.isValid());
+ }
+ 
+-#ifndef SDBUS_basu // Creating error from invalid errno is not supported on basu backend
++#if !defined(S0DBUS_basu) && defined(__GLIBC__)  // Creating error from invalid errno is not supported on basu backend
+ TEST(AnErrorFactory, CreatesGenericErrorWhenErrnoIsUnknown)
+ {
+     auto error = sdbus::createError(123456, "custom message");

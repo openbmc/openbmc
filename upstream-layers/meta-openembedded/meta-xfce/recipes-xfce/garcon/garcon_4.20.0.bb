@@ -1,4 +1,5 @@
 DESCRIPTION = "Xfce Menu Library"
+HOMEPAGE = "https://docs.xfce.org/xfce/garcon/start"
 SECTION = "x11/libs"
 LICENSE = "LGPL-2.0-only & GFDL-1.1-no-invariants-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=04a01abcbdabffae1ca26335a293276b"

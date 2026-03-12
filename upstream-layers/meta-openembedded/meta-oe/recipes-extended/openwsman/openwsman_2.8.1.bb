@@ -20,6 +20,8 @@ SRCREV = "20efbccaf804a5a27a914eb8802b806416c03ece"
 SRC_URI = "git://github.com/Openwsman/openwsman.git;branch=main;protocol=https;tag=v${PV} \
            file://openwsmand.service \
            file://0001-lock.c-Define-PTHREAD_MUTEX_RECURSIVE_NP-if-undefine.patch \
+           file://0001-Fix-to-build-with-GCC-15.patch \
+           file://0001-cmake-Avoid-using-absolute-paths-in-dlopen.patch \
            "
 
 LICENSE = "BSD-3-Clause"
@@ -29,20 +31,15 @@ inherit systemd cmake pkgconfig python3native perlnative
 
 SYSTEMD_SERVICE:${PN} = "openwsmand.service"
 SYSTEMD_AUTO_ENABLE = "disable"
-
 EXTRA_OECMAKE = "-DBUILD_BINDINGS=NO \
                  -DBUILD_LIBCIM=NO \
                  -DBUILD_PERL=YES \
                  -DBUILD_PYTHON3=YES \
                  -DBUILD_PYTHON=NO \
                  -DCMAKE_INSTALL_PREFIX=${prefix} \
+                 -DPACKAGE_ARCHITECTURE='${HOST_ARCH}' \
                  -DLIB=${baselib} \
                 "
-
-do_configure:prepend() {
-    export STAGING_INCDIR=${STAGING_INCDIR}
-    export STAGING_LIBDIR=${STAGING_LIBDIR}
-}
 
 do_install:append() {
     install -d ${D}/${sysconfdir}/init.d

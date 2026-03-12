@@ -1,0 +1,52 @@
+From 72b53f2d5c6e1b462a288cef3d84dd302fe603d6 Mon Sep 17 00:00:00 2001
+From: Sasi Kumar Maddineni <quic_sasikuma@quicinc.com>
+Date: Wed, 29 Oct 2025 11:58:20 +0530
+Subject: [PATCH] android-tools: scope 'write' macro to prevent conflict with
+ std::basic_ostream::write
+
+The build fails with a compiler error due to a macro redefinition of 'write'
+to '___xxx_write'. This macro substitution interferes with the standard C++
+library's definition of std::basic_ostream::write, leading to a mismatch
+between function declarations and definitions in <ostream.tcc>.
+
+Wrap the `#undef write` and `#define write ___xxx_write` directives with
+`#if defined(__ANDROID__)` to ensure they are only applied when building
+for
+Android.
+
+Upstream-Status: Pending
+
+Signed-off-by: Sasi Kumar Maddineni <quic_sasikuma@quicinc.com>
+---
+ system/core/adb/sysdeps.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/system/core/adb/sysdeps.h b/system/core/adb/sysdeps.h
+index a4827b8a..ff51d574 100644
+--- a/system/core/adb/sysdeps.h
++++ b/system/core/adb/sysdeps.h
+@@ -127,8 +127,10 @@ static __inline__ int unix_read(borrowed_fd fd, void* buf, size_t len) {
+ static __inline__ int unix_write(borrowed_fd fd, const void* buf, size_t len) {
+     return write(fd.get(), buf, len);
+ }
++#if defined(__ANDROID__)
+ #undef   write
+ #define  write  ___xxx_write
++#endif
+ 
+ #undef pwrite
+ #define pwrite ___xxx_pwrite
+@@ -463,8 +465,10 @@ static __inline__ int adb_pwrite(int fd, const void* buf, size_t len, off64_t of
+ #endif
+ }
+ 
++#if defined(__ANDROID__)
+ #undef   write
+ #define  write  ___xxx_write
++#endif
+ #undef pwrite
+ #define pwrite ___xxx_pwrite
+ 
+-- 
+2.34.1
+

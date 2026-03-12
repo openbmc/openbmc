@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Some tests require non-root
+useradd tester || echo test user exists already
+
+su tester -c "pytest --automake"

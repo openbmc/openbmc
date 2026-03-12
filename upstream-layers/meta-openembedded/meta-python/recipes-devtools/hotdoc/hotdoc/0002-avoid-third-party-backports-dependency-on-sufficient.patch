@@ -1,0 +1,72 @@
+Subject: [PATCH 2/2] avoid third-party backports dependency on sufficiently
+ new python
+
+`backports.entry_points_selectable` backports functionality from python
+3.10 to older versions of python.
+
+Backport this patch to solve runtime backports import problem as following:
+  File "/usr/lib/python3.14/site-packages/hotdoc/utils/utils.py", line 38, in <module>
+  from backports.entry_points_selectable import entry_points
+ModuleNotFoundError: No module named 'backports'
+
+Upstream-Status: Backport [https://github.com/hotdoc/hotdoc/commit/51043c3ef889e36c8232280581598b875073ded7]
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ hotdoc/extensions/gi/utils.py | 6 +++++-
+ hotdoc/utils/utils.py         | 6 +++++-
+ setup.py                      | 2 +-
+ 3 files changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/hotdoc/extensions/gi/utils.py b/hotdoc/extensions/gi/utils.py
+index 159c2b6..91902cb 100644
+--- a/hotdoc/extensions/gi/utils.py
++++ b/hotdoc/extensions/gi/utils.py
+@@ -1,9 +1,13 @@
+ import os
+ from collections import namedtuple
+ import pathlib
++import sys
+ import traceback
+ 
+-from backports.entry_points_selectable import entry_points
++if sys.version_info >= (3, 10):
++    from importlib.metadata import entry_points
++else:
++    from backports.entry_points_selectable import entry_points
+ 
+ from hotdoc.core.links import Link
+ from hotdoc.utils.loggable import info, debug
+diff --git a/hotdoc/utils/utils.py b/hotdoc/utils/utils.py
+index 518d308..aef657a 100644
+--- a/hotdoc/utils/utils.py
++++ b/hotdoc/utils/utils.py
+@@ -35,7 +35,11 @@ import importlib.util
+ from urllib.request import urlretrieve
+ from pathlib import Path
+ 
+-from backports.entry_points_selectable import entry_points
++if sys.version_info >= (3, 10):
++    from importlib.metadata import entry_points
++else:
++    from backports.entry_points_selectable import entry_points
++
+ try:
+     import importlib.metadata as meta
+ except ImportError:
+diff --git a/setup.py b/setup.py
+index 5d7f131..9ee504d 100644
+--- a/setup.py
++++ b/setup.py
+@@ -300,7 +300,7 @@ INSTALL_REQUIRES = [
+     'wheezy.template',
+     'toposort>=1.4',
+     'importlib_metadata; python_version<"3.10"',
+-    'backports.entry_points_selectable',
++    'backports.entry_points_selectable; python_version<"3.10"',
+ ]
+ 
+ # dbus-deviation requires sphinx, which requires python 3.5
+-- 
+2.43.0
+

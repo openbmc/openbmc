@@ -8,7 +8,7 @@ we tried to fix by using pthread_t but it also needs to make changes in
 libgphoto and these changes can be invasive, therefore lets revert to
 older types and to fix musl problem fix it via type casts
 
-Upstream-Status: Submitted [https://github.com/gphoto/gphoto2/pull/569]
+Upstream-Status: Backport [https://github.com/gphoto/gphoto2/pull/569]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  gphoto2/main.c | 8 ++++----

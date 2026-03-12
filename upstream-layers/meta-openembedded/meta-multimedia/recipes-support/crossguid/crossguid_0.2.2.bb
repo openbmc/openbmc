@@ -9,11 +9,16 @@ DEPENDS += "util-linux"
 
 SRCREV = "ca1bf4b810e2d188d04cb6286f957008ee1b7681"
 SRC_URI = "git://github.com/graeme-hill/crossguid;protocol=https;branch=master \
+           file://run-ptest \
            file://0001-include-missing-cstdint.patch"
 
 
-inherit cmake
+inherit cmake ptest
 
 do_install:append() {
     sed -i -e 's|${STAGING_DIR_HOST}||g' ${D}${datadir}/crossguid/cmake/crossguid-config.cmake
+}
+
+do_install_ptest() {
+    install -D ${B}/crossguid-test ${D}${PTEST_PATH}/tests/crossguid-test
 }

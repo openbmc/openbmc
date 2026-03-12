@@ -1,4 +1,4 @@
-From 9eb453283a7ac8a9b1dd3eac86d936c7a430476b Mon Sep 17 00:00:00 2001
+From 21b8f74c3d0006c80549452743d50e6f012aa7ef Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Tue, 11 Oct 2022 17:37:01 -0700
 Subject: [PATCH] _setuputils.py: Do not add sys_inc_dir
@@ -10,7 +10,6 @@ we really do not need setuptools to deduce it for us.
 
 Upstream-Status: Inappropriate [ Cross-compile specific ]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  _setuputils.py | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)

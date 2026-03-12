@@ -1,0 +1,44 @@
+From b0792ce24c28abb88835c3e0d77cfd8d24da1131 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Dec 2025 12:19:14 -0800
+Subject: [PATCH 5/5] kexec: Disable memfd_create for klibc builds
+
+klibc doesn't provide the syscall() wrapper function needed to
+invoke the memfd_create system call. Since klibc is typically used
+for minimal early-boot environments where memfd_create is not
+essential for kexec functionality, return ENOSYS to allow kexec
+to fall back to alternative methods.
+
+This fixes the build error:
+  error: call to undeclared function 'syscall'
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kexec/kexec.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/kexec/kexec.c b/kexec/kexec.c
+index c9e4bcb..1fd2062 100644
+--- a/kexec/kexec.c
++++ b/kexec/kexec.c
+@@ -649,11 +649,16 @@ char *slurp_decompress_file(const char *filename, off_t *r_size)
+ 	}
+ 	return kernel_buf;
+ }
+-
+ #ifndef HAVE_MEMFD_CREATE
+ static int memfd_create(const char *name, unsigned int flags)
+ {
+-	return syscall(SYS_memfd_create, name, flags);
++#ifdef __KLIBC__
++/* klibc doesn't provide syscall() or memfd_create */
++		errno = ENOSYS;
++		return -1;
++#else
++     return syscall(SYS_memfd_create, name, flags);
++#endif
+ }
+ #endif
+ 

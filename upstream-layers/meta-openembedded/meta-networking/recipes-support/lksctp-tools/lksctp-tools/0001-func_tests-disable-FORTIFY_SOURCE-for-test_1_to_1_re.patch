@@ -1,0 +1,47 @@
+From 824fc568c39a682f180a34a6f581c6255f8cfc95 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 19 Nov 2025 11:49:10 -0800
+Subject: [PATCH] func_tests: disable FORTIFY_SOURCE for test_1_to_1_recvfrom
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+When built with glibc hardening (_FORTIFY_SOURCE), recvfrom() is wrapped by
+__recvfrom_chk(). The test_1_to_1_recvfrom test deliberately calls
+recvfrom() with an invalid buffer pointer ((char *)-1) to verify that
+EFAULT is returned.
+
+On fortified builds, __recvfrom_chk() sees a buffer size of 0 and a
+non-zero length, treats this as a buffer overflow, and aborts with:
+
+  *** buffer overflow detected ***: terminated
+
+This causes the test to fail with SIGABRT instead of exercising the
+kernel’s EFAULT path as intended.
+
+Compile test_1_to_1_recvfrom without _FORTIFY_SOURCE
+so that the test can run to completion and correctly validate the
+EFAULT behavior, while keeping fortify enabled for the rest of code
+
+Upstream-Status: Submitted [https://github.com/sctp/lksctp-tools/pull/67]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/func_tests/Makefile.am | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/func_tests/Makefile.am b/src/func_tests/Makefile.am
+index 54e1627..e001d17 100644
+--- a/src/func_tests/Makefile.am
++++ b/src/func_tests/Makefile.am
+@@ -160,6 +160,11 @@ test_1_to_1_events_SOURCES = test_1_to_1_events.c
+ test_1_to_1_threads_SOURCES = test_1_to_1_threads.c
+ test_1_to_1_initmsg_connect_SOURCES = test_1_to_1_initmsg_connect.c
+
++#
++# Disable _FORTIFY_SOURCE for this test so that the EFAULT case works
++#
++test_1_to_1_recvfrom_CFLAGS = $(AM_CFLAGS) -U_FORTIFY_SOURCE
++
+ #
+ # Specifying objects rules for "v6test"
+ #

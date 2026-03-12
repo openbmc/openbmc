@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.LIB;md5=a6f89e2100d9b6cdffcea4f398e37343 \
 "
 
-SECTION = "x11/gnome"
+SECTION = "gnome"
 
 DEPENDS = " \
     udev \
@@ -23,7 +23,7 @@ GTKIC_VERSION = "4"
 
 inherit features_check gnomebase gtk-icon-cache gtk-doc gobject-introspection
 
-REQUIRED_DISTRO_FEATURES = "x11 opengl"
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 SRC_URI[archive.sha256sum] = "03e3e7403a15108ffc1496210a1da5c2961b2834a5c07eccc7a3f493195daba3"
 

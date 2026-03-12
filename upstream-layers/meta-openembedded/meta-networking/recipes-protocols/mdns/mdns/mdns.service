@@ -3,11 +3,9 @@ Description=Zero-configuration networking
 After=network.target
 
 [Service]
-Type=forking
-ExecStartPre=/bin/rm -f /var/run/mdnsd.pid
-ExecStart=/usr/sbin/mdnsd
+Type=exec
+ExecStart=/usr/sbin/mdnsd -foreground
 ExecReload=/bin/kill -HUP $MAINPID
-PIDFile=/var/run/mdnsd.pid
 Restart=always
 RestartSec=10s
 

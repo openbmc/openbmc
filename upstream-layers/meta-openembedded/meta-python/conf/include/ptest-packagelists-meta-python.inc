@@ -19,6 +19,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-cachetools \
     python3-cbor2 \
     python3-configobj \
+    python3-pyconnman \
     python3-click \
     python3-dasbus \
     python3-dominate \
@@ -27,6 +28,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-execnet \
     python3-fastjsonschema \
     python3-fastnumbers \
+    python3-filelock \
     python3-flask \
     python3-flexcache \
     python3-flexparser \
@@ -37,8 +39,11 @@ PTESTS_FAST_META_PYTHON = "\
     python3-gpiod \
     python3-gpt-image \
     python3-gunicorn \
+    python3-h2 \
+    python3-hpack \
     python3-html2text \
     python3-httptools \
+    python3-hyperframe \
     python3-inflection \
     python3-inotify \
     python3-intervals \
@@ -54,35 +59,44 @@ PTESTS_FAST_META_PYTHON = "\
     python3-outcome \
     python3-parse \
     python3-parse-type \
+    python3-parsimonious \
+    python3-pendulum \
     python3-platformdirs \
     python3-polyline \
     python3-portalocker \
     python3-portion \
     python3-precise-runner \
     python3-prettytable \
+    python3-priority \
     python3-propcache \
     python3-pyais \
     python3-pydantic \
     python3-pydantic-core \
     python3-pylint \
+    python3-python-dotenv \
     python3-python-multipart \
     python3-ptyprocess \
     python3-py-cpuinfo \
     python3-pyasn1-modules \
+    python3-pyasyncore \
     python3-pyroute2 \
     python3-pyserial \
+    python3-pytest-env \
+    python3-pytest-httpx \
     python3-pytest-mock \
+    python3-pytest-picked \
     python3-pytest-sugar \
     python3-pytoml \
     python3-pyyaml-include \
     python3-pydbus \
     python3-pyzmq \
-    python3-pyzstd \
     python3-rapidjson \
     python3-requests-file \
     python3-requests-toolbelt \
+    python3-rich-toolkit \
     python3-schedule \
     python3-semver \
+    python3-send2trash \
     python3-serpent \
     python3-service-identity \
     python3-setproctitle \
@@ -91,6 +105,10 @@ PTESTS_FAST_META_PYTHON = "\
     python3-soupsieve \
     python3-sqlparse \
     python3-starlette \
+    python3-tblib \
+    python3-tenacity \
+    python3-time-machine \
+    python3-tokenize-rt \
     python3-tomli-w \
     python3-tomlkit \
     python3-trustme \
@@ -103,6 +121,7 @@ PTESTS_FAST_META_PYTHON = "\
     python3-unidiff \
     python3-uritemplate \
     python3-validators \
+    python3-waitress \
     python3-wrapt \
     python3-wsproto \
     python3-xlrd \
@@ -113,21 +132,32 @@ PTESTS_FAST_META_PYTHON = "\
 
 PTESTS_SLOW_META_PYTHON = "\
     python3-arrow \
+    python3-django \
     python3-ecdsa \
+    python3-faker \
+    python3-fastapi \
     python3-google-auth \
     python3-lz4 \
     python3-marshmallow \
+    python3-orjson \
     python3-pillow \
     python3-pint \
     python3-pykickstart \
+    python3-pyro5 \
     python3-pytest-localserver \
     python3-scrypt \
     python3-traitlets \
     python3-typer \
+    python3-uvicorn \
     python3-yappi \
 "
 
 PTESTS_PROBLEMS_META_PYTHON = "\
-    python3-pyasyncore \
-    tftpy \
+"
+
+PTESTS_FAST_META_PYTHON:remove:libc-musl = "\
+    python3-waitress \
+"
+PTESTS_PROBLEMS_META_PYTHON:append:libc-musl = "\
+    python3-waitress \
 "

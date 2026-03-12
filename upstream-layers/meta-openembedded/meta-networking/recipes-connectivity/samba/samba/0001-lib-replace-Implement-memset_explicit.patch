@@ -1,0 +1,91 @@
+From fba2c1dfb3b1f474a78e2613f150a9efc6d9b6c2 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 16 Oct 2025 11:06:56 +0200
+Subject: [PATCH 1/4] lib:replace: Implement memset_explicit()
+
+The memset_s() implementation is a bit obscure, as it requires a
+constraint handler to be set up. You don't really find any
+implmentations out there.
+
+With C23 memset_explicit() was added and this has been implemented
+for glibc 2.43 and also in FreeBSD.
+
+See https://sourceware.org/bugzilla/show_bug.cgi?id=32378
+See https://reviews.freebsd.org/D47286
+
+Upstream-Status: Backport [https://gitlab.com/samba-team/samba/-/commit/ef08be24e9114b4477cc2b3f7a28a816ec66802c]
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/replace/README    |  1 +
+ lib/replace/replace.c | 13 +++++++++++++
+ lib/replace/replace.h |  5 +++++
+ lib/replace/wscript   |  2 +-
+ 4 files changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/lib/replace/README b/lib/replace/README
+index 6612eab..bb9d008 100644
+--- a/lib/replace/README
++++ b/lib/replace/README
+@@ -73,6 +73,7 @@ symlink
+ realpath
+ poll
+ setproctitle
++memset_explicit
+ memset_s
+ 
+ Types:
+diff --git a/lib/replace/replace.c b/lib/replace/replace.c
+index 68829f2..8615899 100644
+--- a/lib/replace/replace.c
++++ b/lib/replace/replace.c
+@@ -952,6 +952,19 @@ void rep_setproctitle_init(int argc, char *argv[], char *envp[])
+ }
+ #endif
+ 
++#ifndef HAVE_MEMSET_EXPLICIT
++void *rep_memset_explicit(void *block, int c, size_t size)
++{
++	void *ptr = memset(block, c, size);
++#ifdef HAVE_GCC_VOLATILE_MEMORY_PROTECTION
++	/* See http://llvm.org/bugs/show_bug.cgi?id=15495 */
++	__asm__ volatile("" : : "g"(block) : "memory");
++#endif /* HAVE_GCC_VOLATILE_MEMORY_PROTECTION */
++
++	return ptr;
++}
++#endif
++
+ #ifndef HAVE_MEMSET_S
+ # ifndef RSIZE_MAX
+ #  define RSIZE_MAX (SIZE_MAX >> 1)
+diff --git a/lib/replace/replace.h b/lib/replace/replace.h
+index 25e6e14..1a8336d 100644
+--- a/lib/replace/replace.h
++++ b/lib/replace/replace.h
+@@ -994,6 +994,11 @@ void rep_setproctitle(const char *fmt, ...) PRINTF_ATTRIBUTE(1, 2);
+ void rep_setproctitle_init(int argc, char *argv[], char *envp[]);
+ #endif
+ 
++#ifndef HAVE_MEMSET_EXPLICIT
++#define memset_explicit rep_memset_explicit
++void *rep_memset_explicit(void *block, int c, size_t size);
++#endif
++
+ #ifndef HAVE_MEMSET_S
+ #define memset_s rep_memset_s
+ int rep_memset_s(void *dest, size_t destsz, int ch, size_t count);
+diff --git a/lib/replace/wscript b/lib/replace/wscript
+index a22ae59..574740a 100644
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -881,7 +881,7 @@ REPLACEMENT_FUNCTIONS = {
+                   'utime', 'utimes', 'dup2', 'chown', 'link', 'readlink',
+                   'symlink', 'lchown', 'realpath', 'memmem', 'vdprintf',
+                   'dprintf', 'get_current_dir_name', 'copy_file_range',
+-                  'strerror_r', 'clock_gettime', 'memset_s'],
++                  'strerror_r', 'clock_gettime', 'memset_explicit', 'memset_s'],
+     'timegm.c': ['timegm'],
+     # Note: C99_VSNPRINTF is not a function, but a special condition
+     # for replacement

@@ -17,8 +17,6 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  storage/rocksdb/rocksdb/util/string_util.h                      | 1 +
  4 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h b/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h
-index 7fb9d489..f7b4e6f0 100644
 --- a/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h
 +++ b/storage/rocksdb/rocksdb/include/rocksdb/utilities/checkpoint.h
 @@ -8,6 +8,7 @@
@@ -29,8 +27,6 @@ index 7fb9d489..f7b4e6f0 100644
  #include <string>
  #include <vector>
  #include "rocksdb/status.h"
-diff --git a/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h b/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h
-index f356395f..32152217 100644
 --- a/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h
 +++ b/storage/rocksdb/rocksdb/table/block_based/data_block_hash_index.h
 @@ -5,6 +5,7 @@
@@ -41,8 +37,6 @@ index f356395f..32152217 100644
  #include <string>
  #include <vector>
  
-diff --git a/storage/rocksdb/rocksdb/util/slice.cc b/storage/rocksdb/rocksdb/util/slice.cc
-index 3c3656de..b18d7f5d 100644
 --- a/storage/rocksdb/rocksdb/util/slice.cc
 +++ b/storage/rocksdb/rocksdb/util/slice.cc
 @@ -12,7 +12,7 @@
@@ -54,8 +48,6 @@ index 3c3656de..b18d7f5d 100644
  #include "rocksdb/convenience.h"
  #include "rocksdb/slice_transform.h"
  #include "rocksdb/utilities/object_registry.h"
-diff --git a/storage/rocksdb/rocksdb/util/string_util.h b/storage/rocksdb/rocksdb/util/string_util.h
-index 7794dbb0..b480177e 100644
 --- a/storage/rocksdb/rocksdb/util/string_util.h
 +++ b/storage/rocksdb/rocksdb/util/string_util.h
 @@ -6,6 +6,7 @@
@@ -66,5 +58,33 @@ index 7794dbb0..b480177e 100644
  #include <sstream>
  #include <string>
  #include <unordered_map>
---
-2.40.0
+--- a/storage/rocksdb/rocksdb/include/rocksdb/trace_record.h
++++ b/storage/rocksdb/rocksdb/include/rocksdb/trace_record.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <memory>
+ #include <string>
+ #include <vector>
+--- a/storage/rocksdb/rocksdb/db/blob/blob_file_meta.h
++++ b/storage/rocksdb/rocksdb/db/blob/blob_file_meta.h
+@@ -6,6 +6,7 @@
+ #pragma once
+ 
+ #include <cassert>
++#include <cstdint>
+ #include <iosfwd>
+ #include <memory>
+ #include <string>
+--- a/storage/rocksdb/rocksdb/include/rocksdb/utilities/transaction_db_mutex.h
++++ b/storage/rocksdb/rocksdb/include/rocksdb/utilities/transaction_db_mutex.h
+@@ -6,6 +6,7 @@
+ #pragma once
+ #ifndef ROCKSDB_LITE
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "rocksdb/status.h"

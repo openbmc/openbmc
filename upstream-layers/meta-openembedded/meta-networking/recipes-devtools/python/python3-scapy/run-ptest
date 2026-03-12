@@ -1,4 +1,11 @@
 #!/bin/sh
-python3 UTscapy.py -t regression.uts -f text -l -C \
+
+if ! nslookup example.com; then
+  mv /etc/resolv.conf /etc/resolv.conf.bak
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf
+  trap "mv /etc/resolv.conf.bak /etc/resolv.conf" INT EXIT
+fi
+
+python3 UTscapy.py -t regression.uts -f text -l -C -K skipped_ptest \
     -o @PTEST_PATH@/scapy_ptest_$(date +%Y%m%d-%H%M%S).log \
     2>&1 | sed -e 's/^passed None/PASS:/' -e 's/^failed None/FAIL:/'

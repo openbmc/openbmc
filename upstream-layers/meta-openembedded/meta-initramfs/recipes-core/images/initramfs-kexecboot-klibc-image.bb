@@ -9,4 +9,6 @@ IMAGE_INSTALL = "kexecboot-klibc kexec-klibc ubiattach-klibc"
 python () {
     if d.getVar('TARGET_ARCH') == "nios2":
         raise bb.parse.SkipRecipe("'nios2' not supported arch")
+    if d.getVar('TARGET_ARCH') == "riscv32":
+        raise bb.parse.SkipRecipe("'riscv32' not supported arch")
 }

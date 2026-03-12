@@ -1,4 +1,4 @@
-From 8622490d650ba4d107561a0e8f3cf881fa0247c7 Mon Sep 17 00:00:00 2001
+From 13a050b263ab53c1dc8d05b12e65c21da7c054b3 Mon Sep 17 00:00:00 2001
 From: Alper Ak <alperyasinak1@gmail.com>
 Date: Tue, 8 Jul 2025 15:09:11 +0300
 Subject: [PATCH] cmake: Set minimum required version to 3.5 for CMake 4+
@@ -26,7 +26,7 @@ Signed-off-by: Alper Ak <alperyasinak1@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 36a6cb5..9428da5 100644
+index c7ca27f..59e4af5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -1,5 +1,5 @@
@@ -35,7 +35,4 @@ index 36a6cb5..9428da5 100644
 +cmake_minimum_required(VERSION 3.5)
  
  project(cJSON
-     VERSION 1.7.18
--- 
-2.43.0
-
+     VERSION 1.7.19

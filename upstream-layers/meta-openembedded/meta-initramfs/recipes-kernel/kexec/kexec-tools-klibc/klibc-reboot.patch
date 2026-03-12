@@ -8,16 +8,73 @@ Upstream-Status: Pending
  kexec/kexec.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kexec/kexec.c b/kexec/kexec.c
-index 157c577..5da0d67 100644
 --- a/kexec/kexec.c
 +++ b/kexec/kexec.c
-@@ -901,7 +901,7 @@ static int my_exec(void)
- 	if (xen_present())
- 		xen_kexec_exec();
- 	else
+@@ -222,8 +222,8 @@ int sort_segments(struct kexec_info *inf
+ }
+ 
+ unsigned long locate_hole(struct kexec_info *info,
+-	unsigned long hole_size, unsigned long hole_align, 
+-	unsigned long hole_min, unsigned long hole_max, 
++	unsigned long hole_size, unsigned long hole_align,
++	unsigned long hole_min, unsigned long hole_max,
+ 	int hole_end)
+ {
+ 	int i, j;
+@@ -247,7 +247,7 @@ unsigned long locate_hole(struct kexec_i
+ 	max_mem_ranges = info->memory_ranges + info->nr_segments;
+ 	mem_range = xmalloc(max_mem_ranges *sizeof(struct memory_range));
+ 	mem_ranges = 0;
+-		
++
+ 	/* Perform a merge on the 2 sorted lists of memory ranges  */
+ 	for (j = 0, i = 0; i < info->memory_ranges; i++) {
+ 		unsigned long long sstart, send;
+@@ -401,7 +401,7 @@ unsigned long add_buffer_phys_virt(struc
+ 	if (base == ULONG_MAX) {
+ 		die("locate_hole failed\n");
+ 	}
+-	
++
+ 	add_segment_phys_virt(info, buf, bufsz, base, memsz, phys);
+ 	return base;
+ }
+@@ -847,7 +847,7 @@ static int my_load(const char *type, int
+ 		if (!valid_memory_segment(&info, info.segment +i)) {
+ 			fprintf(stderr, "Invalid memory segment %p - %p\n",
+ 				info.segment[i].mem,
+-				((char *)info.segment[i].mem) + 
++				((char *)info.segment[i].mem) +
+ 				info.segment[i].memsz);
+ 			return -1;
+ 		}
+@@ -874,9 +874,9 @@ static int my_load(const char *type, int
+ 				    info.kexec_flags);
+ 	if (result != 0) {
+ 		/* The load failed, print some debugging information */
+-		fprintf(stderr, "kexec_load failed: %s\n", 
++		fprintf(stderr, "kexec_load failed: %s\n",
+ 			strerror(errno));
+-		fprintf(stderr, "entry       = %p flags = 0x%lx\n", 
++		fprintf(stderr, "entry       = %p flags = 0x%lx\n",
+ 			info.entry, info.kexec_flags);
+ 		print_segments(stderr, &info);
+ 	}
+@@ -973,9 +973,9 @@ static int my_exec(void)
+ 		if ((kexec_flags & KEXEC_LIVE_UPDATE) && !ret)
+ 			return 0;
+ 	} else
 -		reboot(LINUX_REBOOT_CMD_KEXEC);
 +		reboot(LINUX_REBOOT_CMD_KEXEC, NULL);
  	/* I have failed if I make it here */
- 	fprintf(stderr, "kexec failed: %s\n", 
+-	fprintf(stderr, "kexec failed: %s\n", 
++	fprintf(stderr, "kexec failed: %s\n",
  		strerror(errno));
+ 	return -1;
+ }
+@@ -1805,4 +1805,4 @@ int main(int argc, char *argv[])
+ 	fflush(stdout);
+ 	fflush(stderr);
+ 	return result;
+-} 
++}

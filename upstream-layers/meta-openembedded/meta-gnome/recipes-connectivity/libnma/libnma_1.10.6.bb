@@ -6,7 +6,7 @@ DEPENDS = "glib-2.0 gtk+3 gtk4 networkmanager"
 
 inherit gnomebase gobject-introspection gtk-doc gettext vala features_check
 
-REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG','gcr','x11','',d)} opengl"
+REQUIRED_DISTRO_FEATURES = "opengl"
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 SRC_URI[archive.sha256sum] = "53a6fb2b190ad37c5986caed3e98bede7c3c602399ee4f93c8fc054303d76dab"

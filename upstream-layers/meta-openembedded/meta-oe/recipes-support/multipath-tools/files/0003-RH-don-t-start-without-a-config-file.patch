@@ -1,4 +1,4 @@
-From 2fe1037b8198bd00961d8df48e684296758127d1 Mon Sep 17 00:00:00 2001
+From 2cb4657779cbb6ba2309f158366df4cb32f32785 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 23 Nov 2018 17:25:15 +0800
 Subject: [PATCH] RH: don't start without a config file
@@ -101,11 +101,11 @@ index 7bc8806e..315884eb 100644
  .
  .\" ----------------------------------------------------------------------------
 diff --git a/multipathd/multipathd.service.in b/multipathd/multipathd.service.in
-index b6a25b31..f78bb91b 100644
+index eb58943c..553e27f9 100644
 --- a/multipathd/multipathd.service.in
 +++ b/multipathd/multipathd.service.in
 @@ -5,6 +5,7 @@ Before=local-fs-pre.target blk-availability.service shutdown.target
- Wants=systemd-udevd-kernel.socket @MODPROBE_UNIT@
+ Wants=systemd-udevd-kernel.socket multipathd-queueing.service @MODPROBE_UNIT@
  After=systemd-udevd-kernel.socket @MODPROBE_UNIT@
  After=multipathd.socket systemd-remount-fs.service
 +ConditionPathExists=/etc/multipath.conf

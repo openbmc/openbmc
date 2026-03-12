@@ -1,0 +1,27 @@
+From 1bb758374500e247ffab150205d05b72bf21b561 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Alberts=20Muktup=C4=81vels?= <alberts.muktupavels@gmail.com>
+Date: Thu, 23 Jan 2025 14:22:33 +0200
+Subject: [PATCH] input-sources: use correct function to get attribute type
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ gnome-flashback/libinput-sources/gf-candidate-popup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gnome-flashback/libinput-sources/gf-candidate-popup.c b/gnome-flashback/libinput-sources/gf-candidate-popup.c
+index a8bf5825..2c31e71a 100644
+--- a/gnome-flashback/libinput-sources/gf-candidate-popup.c
++++ b/gnome-flashback/libinput-sources/gf-candidate-popup.c
+@@ -121,7 +121,7 @@ update_preedit_text_cb (IBusPanelService *service,
+       guint start;
+       guint end;
+ 
+-      if (ibus_attribute_get_type (attribute) != IBUS_ATTR_TYPE_BACKGROUND)
++      if (ibus_attribute_get_attr_type (attribute) != IBUS_ATTR_TYPE_BACKGROUND)
+         continue;
+ 
+       start = ibus_attribute_get_start_index (attribute);
+-- 
+GitLab
+

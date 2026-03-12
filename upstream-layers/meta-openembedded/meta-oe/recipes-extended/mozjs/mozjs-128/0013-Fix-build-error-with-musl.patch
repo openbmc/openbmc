@@ -1,0 +1,30 @@
+From 0f903fa0be39e39083599306018fa7bd724dba9d Mon Sep 17 00:00:00 2001
+From: Ankur Tyagi <ankur.tyagi85@gmail.com>
+Date: Wed, 7 Jan 2026 20:26:53 +1300
+Subject: [PATCH] Fix build error with musl
+
+_Unwind_GetIP symbol is not implemented by musl, so use it only with libc.
+
+mozglue/misc/StackWalk.o: in function `unwind_callback(_Unwind_Context*, void*)':
+| /usr/src/debug/mozjs-128/128.5.2/mozglue/misc/StackWalk.cpp:810:(.text._ZL15unwind_callbackP15_Unwind_ContextPv+0x4): undefined reference to `_Unwind_GetIP'
+
+Reference: https://github.com/OSSystems/meta-browser/commit/bb8662912354dae13634c0ec35c3803c344b1e72
+Upstream-Status: Inappropriate [musl-specific]
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ mozglue/misc/StackWalk.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mozglue/misc/StackWalk.cpp b/mozglue/misc/StackWalk.cpp
+index d3d9208fdb..9f7155a4f7 100644
+--- a/mozglue/misc/StackWalk.cpp
++++ b/mozglue/misc/StackWalk.cpp
+@@ -696,7 +696,7 @@ MFBT_API bool MozDescribeCodeAddress(void* aPC,
+ //
+ // Changes to to OS/Architecture support here should be reflected in
+ // build/moz.configure/memory.configure
+-#elif HAVE_DLADDR &&                                           \
++#elif defined(__GLIBC__) && HAVE_DLADDR &&                     \
+     (HAVE__UNWIND_BACKTRACE || MOZ_STACKWALK_SUPPORTS_LINUX || \
+      MOZ_STACKWALK_SUPPORTS_MACOSX)
+ 

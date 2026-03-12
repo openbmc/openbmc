@@ -1,0 +1,33 @@
+From 3e5b6732b936883d895638a3098a29dd254a7be4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 21 Dec 2019 12:09:51 -0800
+Subject: [PATCH] Define _GNU_SOURCE to get PTHREAD_MUTEX_INITIALIZER
+
+Fixes
+| zmalloc.c:87:37: error: 'PTHREAD_MUTEX_DEFAULT' undeclared here (not in a function)
+|    87 | pthread_mutex_t used_memory_mutex = PTHREAD_MUTEX_INITIALIZER;
+|       |                                     ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Reworked for 8.0.0
+Signed-off-by: Eric Meyers <eric.meyers@arthrex.com>
+
+---
+ src/zmalloc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/zmalloc.c b/src/zmalloc.c
+index b2f5718..913be90 100644
+--- a/src/zmalloc.c
++++ b/src/zmalloc.c
+@@ -12,6 +12,7 @@
+ #include "config.h"
+ #include "solarisfixes.h"
+ 
++#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <stdint.h>

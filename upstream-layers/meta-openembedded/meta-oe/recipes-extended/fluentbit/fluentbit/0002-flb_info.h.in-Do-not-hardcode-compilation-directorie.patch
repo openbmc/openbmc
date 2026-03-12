@@ -1,4 +1,4 @@
-From c8c9dd3aeb49ab2ec94c3ab081e2368736a5da20 Mon Sep 17 00:00:00 2001
+From 596a53c35166e6cc5c20fb1d28bb5c92a248f695 Mon Sep 17 00:00:00 2001
 From: Paulo Neves <ptsneves@gmail.com>
 Date: Thu, 28 Jul 2022 11:42:31 +0200
 Subject: [PATCH] flb_info.h.in: Do not hardcode compilation directories
@@ -7,12 +7,14 @@ Including the source dir in the header makes the header not
 reproducible and contaminates it with host builder paths. Instead
 make it take CMAKE_DEBUG_SRCDIR that can be set to a known
 reproducible value
----
-Upstream-Status: Pending
 
+Upstream-Status: Pending
+---
  include/fluent-bit/flb_info.h.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/include/fluent-bit/flb_info.h.in b/include/fluent-bit/flb_info.h.in
+index 3a08f8051..aa6a48f29 100644
 --- a/include/fluent-bit/flb_info.h.in
 +++ b/include/fluent-bit/flb_info.h.in
 @@ -23,7 +23,7 @@

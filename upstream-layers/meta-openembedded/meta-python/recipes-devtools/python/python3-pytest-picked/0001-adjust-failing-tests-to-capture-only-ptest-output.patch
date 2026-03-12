@@ -1,0 +1,51 @@
+From b9341394314e5dcaca0aa1d91fc3af28c64db387 Mon Sep 17 00:00:00 2001
+From: Tom Geelen <t.f.g.geelen@gmail.com>
+Date: Tue, 25 Nov 2025 20:42:15 +0100
+Subject: [PATCH] adjust failing tests to capture only ptest output
+
+The tests should only check for warnings emitted by the plugin itself,
+not for any other warnings that may be emitted by other plugins or pytest
+itself. This behavior is caused by the fact that pytest might throw some deprecation warnings
+or other warnings that are unrelated to the plugin being tested.
+
+Signed-off-by: Tom Geelen <t.f.g.geelen@gmail.com>
+Upstream-Status: Inappropriate [OE specific]
+---
+ tests/test_pytest_picked.py | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_pytest_picked.py b/tests/test_pytest_picked.py
+index fb2bedb..947b43a 100644
+--- a/tests/test_pytest_picked.py
++++ b/tests/test_pytest_picked.py
+@@ -182,8 +182,13 @@ def test_should_accept_branch_as_mode(testdir, tmpdir, recwarn):
+                 "Changed test folders... 0. []",
+             ]
+         )
+-        assert len(recwarn) == 1
+-        assert str(recwarn[0].message) == "Now `main` is the default parent branch"
++    # Only count the plugin's own UserWarning about default parent branch
++    plugin_warnings = [
++        w
++        for w in recwarn
++        if w.category is UserWarning and "default parent branch" in str(w.message)
++    ]
++    assert len(plugin_warnings) == 1
+ 
+ 
+ def test_should_accept_unstaged_as_mode(testdir, tmpdir, recwarn):
+@@ -211,7 +216,13 @@ def test_should_accept_unstaged_as_mode(testdir, tmpdir, recwarn):
+                 "Changed test folders... 0. []",
+             ]
+         )
+-        assert len(recwarn) == 0
++    # Ignore unrelated deprecation warnings from other plugins
++    plugin_warnings = [
++        w
++        for w in recwarn
++        if w.category is UserWarning and "default parent branch" in str(w.message)
++    ]
++    assert len(plugin_warnings) == 0
+ 
+ 
+ def test_should_not_run_the_tests_if_mode_is_invalid(testdir, tmpdir):

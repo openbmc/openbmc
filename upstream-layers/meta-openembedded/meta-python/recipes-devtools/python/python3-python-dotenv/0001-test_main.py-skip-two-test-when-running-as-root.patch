@@ -1,0 +1,39 @@
+From 68e4f05ece6b20e8a7d914d047185483373db759 Mon Sep 17 00:00:00 2001
+From: Jan Vermaete <jan.vermaete@gmail.com>
+Date: Mon, 10 Nov 2025 18:04:27 +0100
+Subject: [PATCH 1/1] test_main.py: skip two test when running as root
+
+Upstream-Status: Inappropriate [oe-specific]
+
+The patch will only work for Linux and not for Windows.
+And it's not common to run the tests of a Python module as root in the
+not Yocto world.
+
+Signed-off-by: Jan Vermaete <jan.vermaete@gmail.com>
+---
+ tests/test_main.py | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/test_main.py b/tests/test_main.py
+index 4496111..182bc33 100644
+--- a/tests/test_main.py
++++ b/tests/test_main.py
+@@ -61,6 +61,7 @@ def test_set_key_encoding(dotenv_path):
+     assert dotenv_path.read_text(encoding=encoding) == "a='é'\n"
+ 
+ 
++@pytest.mark.skipif(os.geteuid() == 0, reason="Skipping becuase user is root")
+ def test_set_key_permission_error(dotenv_path):
+     dotenv_path.chmod(0o000)
+ 
+@@ -167,6 +168,7 @@ def test_unset_encoding(dotenv_path):
+     assert dotenv_path.read_text(encoding=encoding) == ""
+ 
+ 
++@pytest.mark.skipif(os.geteuid() == 0, reason="Skipping becuase user is root")
+ def test_set_key_unauthorized_file(dotenv_path):
+     dotenv_path.chmod(0o000)
+ 
+-- 
+2.47.3
+

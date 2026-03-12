@@ -1,0 +1,25 @@
+From 5b715a6741a7a2fcd0dc04e31c682a0183a49fa6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 2 Oct 2025 15:27:09 -0700
+Subject: [PATCH] LaunchTouchpadEmulator.sh: Demand sh instead of bash
+
+This script does not really use any bash specific extentions
+so asking for simple /bin/sh should be good and makes it more
+portable
+
+Upstream-Status: Submitted [https://gitlab.com/CalcProgrammer1/TouchpadEmulator/-/merge_requests/4]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ LaunchTouchpadEmulator.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/LaunchTouchpadEmulator.sh b/LaunchTouchpadEmulator.sh
+index d12fc27..63134cd 100755
+--- a/LaunchTouchpadEmulator.sh
++++ b/LaunchTouchpadEmulator.sh
+@@ -1,4 +1,4 @@
+-#! /bin/bash
++#! /bin/sh
+ 
+ if [ "$1" = "--autostart" ] ; then
+     mkdir -p ~/.config/autostart

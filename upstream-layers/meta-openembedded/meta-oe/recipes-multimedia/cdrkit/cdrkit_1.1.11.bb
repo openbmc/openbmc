@@ -24,8 +24,10 @@ SRC_URI[sha256sum] = "d1c030756ecc182defee9fe885638c1785d35a2c2a297b4604c0e0dcc7
 inherit cmake
 
 DEPENDS = "libcap file bzip2"
-RDEPENDS:dirsplit = "perl"
 
+EXTRA_OECMAKE = "-DCMAKE_SKIP_BUILD_RPATH=ON"
+
+RDEPENDS:dirsplit = "perl"
 RDEPENDS:${PN}-dev = ""
 
 PACKAGES =+ "dirsplit genisoimage icedax wodim"

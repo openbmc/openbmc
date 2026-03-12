@@ -1,0 +1,38 @@
+From 1ca5cf52db05a44e5e469bc394c0a1b32fb943f6 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 4 Nov 2025 22:10:33 +0800
+Subject: [PATCH] Replace address::from_string with make_address
+
+boost::asio::ip::address::from_string is deprecated since boost 1.87[1].
+Replace it with make_address.
+
+Fix:
+implementation/routing/src/routing_manager_impl.cpp:1406:98: error: 'from_string' is not a member of 'boost::asio::ip::address_v4'
+ 1406 |  _remote_address.is_v4() ?  _remote_address.to_v4() : boost::asio::ip::address_v4::from_string("6.6.6.6");
+      |                                                                                    ^~~~~~~~~~~
+
+[1] https://github.com/boostorg/asio/commit/c0d1cfce7767599c4cf00df36f8017a1073339ae
+
+Upstream-Status: Submitted [https://github.com/COVESA/vsomeip/pull/973]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ implementation/routing/src/routing_manager_impl.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/implementation/routing/src/routing_manager_impl.cpp b/implementation/routing/src/routing_manager_impl.cpp
+index a3dc5242..7b9619c9 100644
+--- a/implementation/routing/src/routing_manager_impl.cpp
++++ b/implementation/routing/src/routing_manager_impl.cpp
+@@ -1421,7 +1421,7 @@ void routing_manager_impl::on_message(const byte_t* _data, length_t _size, endpo
+     if (is_forwarded) {
+         trace::header its_header;
+         const boost::asio::ip::address_v4 its_remote_address =
+-                _remote_address.is_v4() ? _remote_address.to_v4() : boost::asio::ip::address_v4::from_string("6.6.6.6");
++                _remote_address.is_v4() ? _remote_address.to_v4() : boost::asio::ip::make_address_v4("6.6.6.6");
+         trace::protocol_e its_protocol = _receiver->is_local() ? trace::protocol_e::local
+                 : _receiver->is_reliable()                     ? trace::protocol_e::tcp
+                                                                : trace::protocol_e::udp;
+-- 
+2.34.1
+

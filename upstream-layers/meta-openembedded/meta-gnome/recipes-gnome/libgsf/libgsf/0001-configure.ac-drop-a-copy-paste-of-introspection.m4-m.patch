@@ -5,18 +5,21 @@ Subject: [PATCH] configure.ac: drop a copy-paste of introspection.m4 macros
 
 Upstream-Status: Pending
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+
+Update for 1.14.54.
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
- configure.ac | 78 +-----------------------------------------------------------
+ configure.ac | 78 +---------------------------------------------------
  1 file changed, 1 insertion(+), 77 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 54f7663..3038535 100644
+index 5cdb5fe..32df491 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -77,83 +77,7 @@ libgsf_reqs="
- "
+@@ -81,83 +81,7 @@ PKG_CHECK_MODULES(LIBGSF, $libgsf_reqs)
+ AC_DEFINE(GLIB_VERSION_MIN_REQUIRED, [GLIB_VERSION_2_62], [GLib symbol visibility])
+ AC_DEFINE(GLIB_VERSION_MAX_ALLOWED, [GLIB_VERSION_2_62], [GLib symbol visibility])
  
- PKG_CHECK_MODULES(LIBGSF, $libgsf_reqs)
 -# GObject Introspection
 -GIR_REQ=1.0.0
 -AC_ARG_ENABLE(introspection,
@@ -99,5 +102,5 @@ index 54f7663..3038535 100644
  AC_ARG_WITH([gir-dir],
  	AS_HELP_STRING(
 -- 
-2.7.0
+2.43.0
 

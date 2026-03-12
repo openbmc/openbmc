@@ -1,4 +1,4 @@
-From bd65cdc704666dd4153779c74cdbb2cac6efea71 Mon Sep 17 00:00:00 2001
+From 95f4611621ed7cc5144c68c51adc58409210ad1d Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Thu, 26 Sep 2019 16:29:48 +0800
 Subject: [PATCH] RH: add wwids from kernel cmdline mpath.wwids with -A
@@ -90,6 +90,3 @@ index ee47ad9f..1ed0d85e 100644
  
  enum {
  	WWID_IS_NOT_FAILED = 0,
--- 
-2.25.1
-

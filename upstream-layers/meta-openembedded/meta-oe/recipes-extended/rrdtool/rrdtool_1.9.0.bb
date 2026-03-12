@@ -25,7 +25,11 @@ AUTOTOOLS_AUXDIR = "${S}/conftools"
 
 EXTRA_AUTORECONF = "-I m4 --exclude=autopoint"
 
-PACKAGECONFIG ??= "perl graph ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"
+PACKAGECONFIG ??= " \
+    perl \
+    ${@bb.utils.contains_any('DISTRO_FEATURES', 'x11 wayland', 'graph', '', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
+"
 
 PACKAGECONFIG[python] = "--enable-python=yes \
 am_cv_python_pythondir=${STAGING_LIBDIR}/python${PYTHON_BASEVERSION}/site-packages \

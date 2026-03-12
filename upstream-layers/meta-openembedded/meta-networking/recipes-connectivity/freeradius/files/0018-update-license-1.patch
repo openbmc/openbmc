@@ -1,0 +1,175 @@
+From 82d874c638c80fbbf1eca7c51aca095fbbf40024 Mon Sep 17 00:00:00 2001
+From: "Alan T. DeKok" <aland@freeradius.org>
+Date: Mon, 27 Oct 2025 06:31:22 -0400
+Subject: [PATCH] update license
+
+Upstream-Status: Backport
+[https://github.com/FreeRADIUS/freeradius-server/commit/82d874c638c80fbbf1eca7c51aca095fbbf40024]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ src/modules/rlm_dpsk/rlm_dpsk.c               | 25 +++++++---------
+ .../rlm_eap/types/rlm_eap_teap/eap_teap.c     | 29 +++++++------------
+ .../rlm_eap/types/rlm_eap_teap/eap_teap.h     | 29 +++++++------------
+ .../rlm_eap/types/rlm_eap_teap/rlm_eap_teap.c | 29 +++++++------------
+ 4 files changed, 44 insertions(+), 68 deletions(-)
+
+diff --git a/src/modules/rlm_dpsk/rlm_dpsk.c b/src/modules/rlm_dpsk/rlm_dpsk.c
+index 4b818d08a5..aa07415540 100644
+--- a/src/modules/rlm_dpsk/rlm_dpsk.c
++++ b/src/modules/rlm_dpsk/rlm_dpsk.c
+@@ -1,20 +1,17 @@
+ /*
+- * Copyright (C) 2023 Network RADIUS SARL (legal@networkradius.com)
++ *   This program is is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or (at
++ *   your option) any later version.
+  *
+- * This software may not be redistributed in any form without the prior
+- * written consent of Network RADIUS.
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
+  *
+- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ 
+ /**
+diff --git a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.c b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.c
+index 20646c5ba1..33512788c2 100644
+--- a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.c
++++ b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.c
+@@ -1,24 +1,17 @@
+ /*
+- * eap_teap.c  contains the interfaces that are called from the main handler
++ *   This program is is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or (at
++ *   your option) any later version.
+  *
+- * Version:     $Id$
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
+  *
+- * Copyright (C) 2022 Network RADIUS SARL <legal@networkradius.com>
+- *
+- * This software may not be redistributed in any form without the prior
+- * written consent of Network RADIUS.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ 
+ RCSID("$Id$")
+diff --git a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.h b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.h
+index 59f7835a26..69f4b1ebba 100644
+--- a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.h
++++ b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap.h
+@@ -1,24 +1,17 @@
+ /*
+- * eap_teap.h
++ *   This program is is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or (at
++ *   your option) any later version.
+  *
+- * Version:     $Id$
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
+  *
+- * Copyright (C) 2022 Network RADIUS SARL <legal@networkradius.com>
+- *
+- * This software may not be redistributed in any form without the prior
+- * written consent of Network RADIUS.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ #ifndef _EAP_TEAP_H
+ #define _EAP_TEAP_H
+diff --git a/src/modules/rlm_eap/types/rlm_eap_teap/rlm_eap_teap.c b/src/modules/rlm_eap/types/rlm_eap_teap/rlm_eap_teap.c
+index fcf9717257..13c709b287 100644
+--- a/src/modules/rlm_eap/types/rlm_eap_teap/rlm_eap_teap.c
++++ b/src/modules/rlm_eap/types/rlm_eap_teap/rlm_eap_teap.c
+@@ -1,24 +1,17 @@
+ /*
+- * rlm_eap_teap.c  contains the interfaces that are called from eap
++ *   This program is is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or (at
++ *   your option) any later version.
+  *
+- * Version:     $Id$
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
+  *
+- * Copyright (C) 2022 Network RADIUS SARL <legal@networkradius.com>
+- *
+- * This software may not be redistributed in any form without the prior
+- * written consent of Network RADIUS.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+ 
+ RCSID("$Id$")
+-- 
+2.43.0
+

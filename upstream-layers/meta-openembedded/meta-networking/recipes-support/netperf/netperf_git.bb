@@ -17,6 +17,7 @@ SRC_URI = "git://github.com/HewlettPackard/netperf.git;branch=master;protocol=ht
            file://netserver_permissions.patch \
            file://0001-Makefile.am-add-ACLOCAL_AMFLAGS.patch \
            file://0001-Fix-too-many-arguments-error-occurring-in-gcc-15.patch \
+           file://0001-Fix-multiple-definitions-with-enable-intervals.patch \
            "
 
 SRCREV = "3bc455b23f901dae377ca0a558e1e32aa56b31c4"

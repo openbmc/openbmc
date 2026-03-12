@@ -1,0 +1,14 @@
+#!/bin/sh
+
+RES=0
+cd test
+for t in *; do
+  if ./$t; then
+    echo PASS: $t
+  else
+    echo FAIL: $t
+    RES=1
+  fi
+done
+
+exit $RES

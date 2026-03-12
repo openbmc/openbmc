@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# ignore the test from the tutorial
+# those depends on python packages that are not part of OE
+pytest --automake --ignore tests/test_tutorial

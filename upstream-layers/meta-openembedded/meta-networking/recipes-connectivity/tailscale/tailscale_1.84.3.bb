@@ -22,7 +22,9 @@ GO_LINKSHARED = ""
 GOBUILDFLAGS:prepend = "-tags=${@','.join(d.getVar('PACKAGECONFIG_CONFARGS').split())} "
 GO_EXTRA_LDFLAGS = "-X tailscale.com/version.longStamp=${PV}-${SRCREV_SHORT} -X tailscale.com/version.shortStamp=${PV}"
 
-inherit go-mod update-rc.d
+inherit go-mod \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'update-rc.d', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', '', d)}
 
 PACKAGECONFIG ??= "aws bird capture cli kube ssh tap wakeonlan"
 PACKAGECONFIG[aws] = "ts_aws,ts_omit_aws"
@@ -39,6 +41,9 @@ INITSCRIPT_PACKAGES = "${PN}d"
 INITSCRIPT_NAME:${PN}d = "tailscaled"
 INITSCRIPT_PARAMS:${PN}d = "defaults 91 9"
 
+SYSTEMD_PACKAGES = "${BPN}d"
+SYSTEMD_SERVICE:${BPN}d = "${BPN}d.service"
+
 # override do_install, since it installs in bin instead of sbin
 do_install() {
     install -d ${D}/${sbindir}
@@ -49,22 +54,34 @@ do_install() {
         ln -sr ${D}${sbindir}/tailscaled ${D}${bindir}/tailscale
     fi
 
-    install -d ${D}${sysconfdir}/default
-    install -m 644 ${UNPACKDIR}/default ${D}${sysconfdir}/default/${BPN}d
-
     if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
         install -d ${D}${sysconfdir}/init.d
         install -m 0755 ${UNPACKDIR}/tailscaled.init ${D}${sysconfdir}/init.d/tailscaled
+        install -d ${D}${sysconfdir}/default
+        install -m 644 ${UNPACKDIR}/default ${D}${sysconfdir}/default/${BPN}d
     fi
+
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+        install -d ${D}${systemd_system_unitdir}
+        install -m 644 ${B}/src/tailscale.com/cmd/tailscaled/tailscaled.service ${D}${systemd_system_unitdir}/${BPN}d.service
+        install -d ${D}${sysconfdir}/default
+        install -m 644 ${B}/src/tailscale.com/cmd/tailscaled/tailscaled.defaults ${D}${sysconfdir}/default/${BPN}d
+    fi
+
 }
 
 PACKAGES =+ "${PN}d"
 
 # mark these as src, since there are bash script etc in there and QA will complain otherwise
 FILES:${PN}-src += "${libdir}/go/src"
-FILES:${PN}d = "${sysconfdir}"
+FILES:${PN}d = "${sysconfdir} ${systemd_system_unitdir}"
 
 RDEPENDS:${PN} = "${@bb.utils.contains('PACKAGECONFIG', 'completion', 'bash-completion', '', d)}"
 RDEPENDS:${PN}d = "iptables"
 
-RRECOMMENDS:${PN}d = "kernel-module-wireguard"
+RRECOMMENDS:${PN}d = "\
+    kernel-module-wireguard \
+    kernel-module-tun \
+    kernel-module-xt-mark \
+    kernel-module-xt-tcpudp \
+    kernel-module-xt-masquerade"

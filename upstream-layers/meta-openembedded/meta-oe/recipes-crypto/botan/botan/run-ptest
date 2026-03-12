@@ -1,0 +1,2 @@
+#!/bin/sh
+botan-test --data-dir=/usr/share/botan/tests/data/ | tee ./test.out | grep " ran " | sed 's/^\(.*\) ran .* all ok$/PASS: \1/; s/^\(.*\) ran .* FAILED$/FAIL: \1/'

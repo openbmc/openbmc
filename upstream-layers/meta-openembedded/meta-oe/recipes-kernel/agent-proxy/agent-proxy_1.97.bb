@@ -14,6 +14,8 @@ SRC_URI = "git://git.kernel.org/pub/scm/utils/kernel/kgdb/agent-proxy.git;protoc
            file://0001-Makefile-Add-LDFLAGS-variable.patch \
 "
 
+TARGET_LDFLAGS:append = " ${DEBUG_PREFIX_MAP}"
+
 BBCLASSEXTEND = "native nativesdk"
 
 

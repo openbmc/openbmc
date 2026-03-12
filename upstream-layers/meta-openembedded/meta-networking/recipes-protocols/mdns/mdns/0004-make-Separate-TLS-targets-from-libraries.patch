@@ -6,7 +6,7 @@ Subject: [PATCH] make: Separate TLS targets from libraries
 There are dependencies on TLSOBJS, which fails when `-lmbedtls` is
 listed as a dependency, so separate it out.
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 ---
  mDNSPosix/Makefile | 14 ++++++++------

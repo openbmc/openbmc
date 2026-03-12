@@ -1,0 +1,6 @@
+#!/bin/sh
+cd tests
+python3 ./runner.py
+
+cd ..
+./build/bin/unit_tests --gtest_print_time=0 | sed -E  '/^\[ RUN/d ; s/\[       OK \]/PASS: / ; s/\[ DISABLED \]/SKIP: / ; s/\[ FAILED \]/FAIL: /'

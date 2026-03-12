@@ -1,4 +1,5 @@
 DESCRIPTION = "Xfce4 Window Manager"
+HOMEPAGE = "https://docs.xfce.org/xfce/xfwm4/start"
 SECTION = "x11/wm"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d791728a073bc009b4ffaf00b7599855"

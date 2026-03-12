@@ -1,0 +1,42 @@
+From 2a5c3fbfd863a69eafce6a13b273f5c17cbf4062 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Mon, 3 Nov 2025 23:06:35 +0800
+Subject: [PATCH] Fix build with boost 1.89
+
+The Boost.System stub library has been removed in Boost 1.89.0[1], which
+causes a CMake error:
+
+CMake Error at Boost-1.89.0/BoostConfig.cmake:141 (find_package):
+  Could not find a package configuration file provided by "boost_system"
+  (requested version 1.89.0) with any of the following names:
+    boost_systemConfig.cmake
+    boost_system-config.cmake
+
+Drop 'system' from the COMPONENTS in find_package to fix this issue[2].
+
+[1] https://github.com/boostorg/system/commit/7a495bb46d7ccd808e4be2a6589260839b0fd3a3
+[2] https://github.com/boostorg/system/issues/132
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c39184e9..ddc1eed8 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -189,7 +189,7 @@ add_definitions(-DVSOMEIP_INTERNAL_SUPPRESS_DEPRECATED)
+ find_package(Threads REQUIRED)
+ 
+ # Boost
+-find_package( Boost 1.66 COMPONENTS system thread filesystem REQUIRED )
++find_package( Boost 1.66 COMPONENTS thread filesystem REQUIRED )
+ if(${CMAKE_SYSTEM_NAME} MATCHES "QNX")
+     include_directories(${Boost_INCLUDE_DIR} )
+ else()
+-- 
+2.34.1
+

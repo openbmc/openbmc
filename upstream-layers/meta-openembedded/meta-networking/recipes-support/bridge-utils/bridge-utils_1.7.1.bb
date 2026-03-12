@@ -1,5 +1,5 @@
 SUMMARY = "Tools for ethernet bridging"
-HOMEPAGE = "http://www.linuxfoundation.org/collaborate/workgroups/networking/bridge"
+HOMEPAGE = "https://wiki.linuxfoundation.org/networking/bridge"
 SECTION = "net"
 LICENSE = "GPL-2.0-only"
 

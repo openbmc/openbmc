@@ -18,3 +18,5 @@ RDEPENDS:${PN} += " \
     python3-pynacl \
     python3-unixadmin \
 "
+
+CVE_PRODUCT = "paramiko:paramiko python_software_foundation:paramiko"

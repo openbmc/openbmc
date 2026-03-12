@@ -210,7 +210,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-jsonref \
     python3-jsonschema \
     python3-jstyleson \
-    python3-kconfiglib \
     python3-keras-applications \
     python3-keras-preprocessing \
     ${@bb.utils.contains("DISTRO_FEATURES", "x11 opengl", "python3-kivy", "", d)} \
@@ -336,7 +335,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pyperclip \
     python3-pyperf \
     python3-pyrad \
-    python3-pyro4 \
+    python3-pyro5 \
     python3-pyroute2 \
     python3-pyrsistent \
     python3-pyscaffold \
@@ -349,8 +348,10 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-pytest-forked \
     python3-pytest-helpers-namespace \
     python3-pytest-html \
+    python3-pytest-httpx \
     python3-pytest-lazy-fixtures \
     python3-pytest-metadata \
+    python3-pytest-picked\
     python3-pytest-tempdir \
     python3-pytest-timeout \
     python3-pytest-xdist \

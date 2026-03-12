@@ -1,0 +1,19 @@
+Upstream unexports some environment variables to avoid contamination,
+however OE sets these variables specifically to help the build in the
+recipe, and they should not be unexported.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+
+--- ./leim/Makefile.in.orig	2025-10-05 20:22:56.062508393 +0200
++++ ./leim/Makefile.in	2025-10-05 20:23:05.581046818 +0200
+@@ -42,7 +42,7 @@
+ -include ${top_builddir}/src/verbose.mk
+ 
+ # Prevent any settings in the user environment causing problems.
+-unexport EMACSDATA EMACSDOC EMACSLOADPATH EMACSPATH
++# unexport EMACSDATA EMACSDOC EMACSLOADPATH EMACSPATH
+ 
+ # Which Emacs to use to convert TIT files to Emacs Lisp files,
+ # and generate the file leim-list.el.

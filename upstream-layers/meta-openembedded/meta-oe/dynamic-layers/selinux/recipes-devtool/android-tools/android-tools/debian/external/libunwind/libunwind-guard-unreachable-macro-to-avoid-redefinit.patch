@@ -1,0 +1,42 @@
+From e64495a109eefaf87235729f4dd79fc9121c16a6 Mon Sep 17 00:00:00 2001
+From: Sasi Kumar Maddineni <quic_sasikuma@quicinc.com>
+Date: Mon, 27 Oct 2025 19:39:05 +0530
+Subject: [PATCH] libunwind: guard unreachable() macro to avoid redefinition
+ with stddef.h
+
+The build fails due to a macro redefinition conflict for `unreachable()`.
+GCC 15.2.0 defines `unreachable()` in `stddef.h`, and `libunwind_i.h` also
+defines it based on the presence of `HAVE__BUILTIN_UNREACHABLE`. This causes
+a redefinition error when building with `-Werror`.
+
+Added a guard around the `unreachable()` macro definition in `libunwind_i.h`
+to ensure it is only defined if not already present.
+
+Upstream-Status: Pending
+
+Signed-off-by: Sasi Kumar Maddineni <quic_sasikuma@quicinc.com>
+---
+ external/libunwind/include/libunwind_i.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/external/libunwind/include/libunwind_i.h b/external/libunwind/include/libunwind_i.h
+index c06912a6..59a462df 100644
+--- a/external/libunwind/include/libunwind_i.h
++++ b/external/libunwind/include/libunwind_i.h
+@@ -88,11 +88,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
+ # endif
+ #endif
+ 
++#if !defined(unreachable)
+ #if defined(HAVE__BUILTIN_UNREACHABLE)
+ # define unreachable() __builtin_unreachable()
+ #else
+ # define unreachable() do { } while (1)
+ #endif
++#endif
+ 
+ #ifdef DEBUG
+ # define UNW_DEBUG	1
+-- 
+2.34.1
+

@@ -1,7 +1,7 @@
-From 28eac38566327091221aabbc164ea8e433c66e7e Mon Sep 17 00:00:00 2001
+From 7c7ceea53138eefbe522f8881f1c4281083a2d68 Mon Sep 17 00:00:00 2001
 From: Tim Orling <tim.orling@konsulko.com>
 Date: Sun, 24 Dec 2023 09:27:50 -0800
-Subject: [PATCH 2/2] Fix import of tests.utils to enable pytest
+Subject: [PATCH] Fix import of tests.utils to enable pytest
 
 Running the test cases with pytest leads to importlib errors
 because the "utils" module cannot be found.
@@ -19,7 +19,7 @@ Signed-off-by: Tim Orling <tim.orling@konsulko.com>
  6 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/tests/test_asyncio.py b/tests/test_asyncio.py
-index 8e9e631..bb36f4a 100644
+index a48b6ca..76e99a7 100644
 --- a/tests/test_asyncio.py
 +++ b/tests/test_asyncio.py
 @@ -2,7 +2,7 @@ import unittest
@@ -30,7 +30,7 @@ index 8e9e631..bb36f4a 100644
 +from tests.utils import YappiUnitTestCase, find_stat_by_name, burn_cpu, burn_io
  
  
- async def async_sleep(sec):
+ try:
 diff --git a/tests/test_asyncio_context_vars.py b/tests/test_asyncio_context_vars.py
 index 5bd750c..9a253c0 100644
 --- a/tests/test_asyncio_context_vars.py
@@ -96,6 +96,3 @@ index b0b531d..b5a4016 100644
  
  
  class MultiThreadTests(YappiUnitTestCase):
--- 
-2.34.1
-

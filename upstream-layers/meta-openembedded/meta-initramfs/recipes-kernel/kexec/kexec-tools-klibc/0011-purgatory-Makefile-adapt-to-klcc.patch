@@ -12,16 +12,16 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
 
 --- a/purgatory/Makefile
 +++ b/purgatory/Makefile
-@@ -47,7 +47,7 @@ purgatory/sha256.o: $(srcdir)/util_lib/s
+@@ -49,7 +49,7 @@ purgatory/sha256.o: $(srcdir)/util_lib/s
  $(PURGATORY): CC=$(TARGET_CC)
- $(PURGATORY): CFLAGS+=$(PURGATORY_EXTRA_CFLAGS) \
+ $(PURGATORY): CFLAGS=$(PURGATORY_EXTRA_CFLAGS) \
  		      $($(ARCH)_PURGATORY_EXTRA_CFLAGS) \
 -		      -Os -fno-builtin -ffreestanding \
 +		      -Os -fno-builtin -ffreestanding -nostdinc \
  		      -fno-zero-initialized-in-bss \
- 		      -fno-PIC -fno-PIE -fno-stack-protector
+ 		      -fno-PIC -fno-PIE -fno-stack-protector -fno-tree-vectorize
  
-@@ -59,8 +59,8 @@ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATO
+@@ -61,8 +61,8 @@ $(PURGATORY): CPPFLAGS=$($(ARCH)_PURGATO
  			-Iinclude \
  			-I$(shell $(CC) -print-file-name=include)
  $(PURGATORY): LDFLAGS=$($(ARCH)_PURGATORY_EXTRA_CFLAGS)\

@@ -1,0 +1,30 @@
+From 2483e51df6e02ad0ad5ae636767279fa230da44f Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sun, 23 Nov 2025 11:52:24 +0100
+Subject: [PATCH] Allow test data path configuration
+
+The unittests expect to the executed in the source folder before/after build,
+and they expect the test data to be in the source folder. However for ptests
+these folders are not available.
+
+This patch allows the test data folders to be configuration during build time.
+
+Upstream-Status: Inappropriate [ptest-specific]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ unitTests/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/unitTests/CMakeLists.txt b/unitTests/CMakeLists.txt
+index 51040c0e2..e2604d4a7 100644
+--- a/unitTests/CMakeLists.txt
++++ b/unitTests/CMakeLists.txt
+@@ -42,7 +42,7 @@ add_executable(unit_tests
+ target_compile_definitions(unit_tests
+   PRIVATE
+     exiv2lib_STATIC
+-    TESTDATA_PATH="${PROJECT_SOURCE_DIR}/test/data"
++    TESTDATA_PATH="${TEST_FOLDER}/test/data"
+ )
+ 
+ target_link_libraries(unit_tests

@@ -12,11 +12,9 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/arch/i386/x86-linux-setup.c | 11 ++++++++++-
  1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/kexec/arch/i386/x86-linux-setup.c b/kexec/arch/i386/x86-linux-setup.c
-index 5514c1c..bdb28c6 100644
 --- a/kexec/arch/i386/x86-linux-setup.c
 +++ b/kexec/arch/i386/x86-linux-setup.c
-@@ -200,6 +200,8 @@ static int file_scanf(const char *dir, const char *file, const char *scanf_line,
+@@ -215,6 +215,8 @@ static int file_scanf(const char *dir, c
  	FILE *fp;
  	int retno;
  	char filename[PATH_MAX];
@@ -25,7 +23,7 @@ index 5514c1c..bdb28c6 100644
  
  	snprintf(filename, PATH_MAX, "%s/%s", dir, file);
  	filename[PATH_MAX-1] = 0;
-@@ -210,7 +212,14 @@ static int file_scanf(const char *dir, const char *file, const char *scanf_line,
+@@ -225,7 +227,14 @@ static int file_scanf(const char *dir, c
  	}
  
  	va_start(argptr, scanf_line);

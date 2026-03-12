@@ -21,12 +21,12 @@ diff --git a/tests/tcpflood.c b/tests/tcpflood.c
 index 5e6f13a..09cedbb 100644
 --- a/tests/tcpflood.c
 +++ b/tests/tcpflood.c
-@@ -836,7 +836,7 @@ int sendMessages(struct instdata *inst)
- 			}
- 			lenSend = sendPlainTCP(socknum, buf, lenBuf, &error_number);
- 		} else if(transport == TP_UDP) {
--			lenSend = sendto(udpsockout, buf, lenBuf, 0, &udpRcvr, sizeof(udpRcvr));
-+			lenSend = sendto(udpsockout, buf, lenBuf, 0, (const struct sockaddr *)&udpRcvr, sizeof(udpRcvr));
- 			error_number = errno;
- 		} else if(transport == TP_TLS) {
- 			if(sockArray[socknum] == -1) {
+@@ -865,7 +865,7 @@
+             }
+             lenSend = sendPlainTCP(socknum, buf, lenBuf, &error_number);
+         } else if (transport == TP_UDP) {
+-            lenSend = sendto(udpsockout, buf, lenBuf, 0, &udpRcvr, sizeof(udpRcvr));
++            lenSend = sendto(udpsockout, buf, lenBuf, 0, (const struct sockaddr *)&udpRcvr, sizeof(udpRcvr));
+             error_number = errno;
+         } else if (transport == TP_TLS) {
+             if (sockArray[socknum] == -1) {

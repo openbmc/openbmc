@@ -1,0 +1,60 @@
+SUMMARY = "An HTTP and WebDAV client library with a C interface"
+HOMEPAGE = "https://notroj.github.io/neon/"
+SECTION = "libs"
+LICENSE = "LGPL-2.0-or-later"
+LIC_FILES_CHKSUM = "file://src/COPYING.LIB;md5=f30a9716ef3762e3467a2f62bf790f0a \
+                    file://src/ne_utils.h;beginline=1;endline=20;md5=34c8e338bfa0237561e68d30c3c71133"
+
+SRC_URI = "https://notroj.github.io/neon/neon-${PV}.tar.gz \
+           file://pkgconfig.patch \
+           file://0001-Disable-installing-documentation.patch \
+           file://run-ptest \
+           "
+
+SRC_URI[sha256sum] = "f98ce3c74300be05eddf05dccbdca498b14d40c289f773195dd1a559cffa5856"
+
+inherit autotools-brokensep binconfig-disabled lib_package pkgconfig ptest gettext
+
+EXTRA_AUTORECONF += "-I macros"
+
+# Enable gnutls or openssl, not both
+PACKAGECONFIG ?= "expat gnutls libproxy webdav zlib"
+PACKAGECONFIG:class-native = "expat gnutls webdav zlib"
+
+PACKAGECONFIG[expat] = "--with-expat,--without-expat,expat"
+PACKAGECONFIG[gnutls] = "--with-ssl=gnutls,,gnutls"
+PACKAGECONFIG[gssapi] = "--with-gssapi,--without-gssapi,krb5"
+PACKAGECONFIG[libproxy] = "--with-libproxy,--without-libproxy,libproxy"
+PACKAGECONFIG[libxml2] = "--with-libxml2,--without-libxml2,libxml2"
+PACKAGECONFIG[openssl] = "--with-ssl=openssl,,openssl"
+PACKAGECONFIG[webdav] = "--enable-webdav,--disable-webdav,"
+PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
+
+EXTRA_OECONF += "--enable-shared --enable-threadsafe-ssl=posix"
+
+do_configure:prepend() {
+    echo "${PV}" > ${S}/.version
+}
+
+do_compile:append() {
+    if ${@bb.utils.contains('USE_NLS', 'yes', 'true', 'false', d)}; then
+        oe_runmake compile-gmo
+    fi
+    oe_runmake -C test
+}
+
+do_install_ptest(){
+    BASIC_TESTS="auth basic redirect request session socket string-tests \
+                 stubs uri-tests util-tests"
+    DAV_TESTS="acl3744 lock oldacl props xml xmlreq"
+    mkdir "${D}${PTEST_PATH}/test"
+    for i in ${BASIC_TESTS} ${DAV_TESTS}
+    do
+        install -m 0755 "${B}/test/${i}" \
+        "${D}${PTEST_PATH}/test"
+    done
+}
+
+BINCONFIG = "${bindir}/neon-config"
+
+BBCLASSEXTEND = "native"

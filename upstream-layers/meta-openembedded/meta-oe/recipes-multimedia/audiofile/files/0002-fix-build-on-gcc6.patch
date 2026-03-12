@@ -10,7 +10,7 @@ Stolen from [1]
 
 [1] http://pkgs.fedoraproject.org/cgit/rpms/audiofile.git/tree/audiofile-0.3.6-narrowing.patch
 
-Upstrem-Status: Pending
+Upstream-Status: Pending
 
 Signed-off-by: Andreas Müller <schnitzeltony@googlemail.com>
 ---

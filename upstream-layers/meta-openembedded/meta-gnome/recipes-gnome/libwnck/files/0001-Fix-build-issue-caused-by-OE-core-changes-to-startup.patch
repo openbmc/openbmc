@@ -1,4 +1,4 @@
-From 1df0f4ae8fd54bc1ae940dfafa701c84d068674d Mon Sep 17 00:00:00 2001
+From fd075074182f756e2872569925f70f5f4e2386c2 Mon Sep 17 00:00:00 2001
 From: Koen Kooi <koen@dominion.thruhere.net>
 Date: Sun, 25 May 2025 12:24:16 +0000
 Subject: [PATCH] Fix build issue caused by OE-core changes to
@@ -21,23 +21,30 @@ It is caused by a patch of startup-notification in oe-core which is backported f
 Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Koen Kooi <koen@dominion.thruhere.net>
+
+Refresh the patch
+Don't use explicit type cast to avoid truncation, use time_t for tv_sec.
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+
 ---
- libwnck/tasklist.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ libwnck/tasklist.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/libwnck/tasklist.c b/libwnck/tasklist.c
-index 7418f89..460e11d 100644
+index 7418f89..f0f30b2 100644
 --- a/libwnck/tasklist.c
 +++ b/libwnck/tasklist.c
-@@ -5031,7 +5031,7 @@ sequence_timeout_callback (void *user_data)
-       WnckTask *task = WNCK_TASK (tmp->data);
+@@ -5019,7 +5019,8 @@ sequence_timeout_callback (void *user_data)
+   WnckTasklist *tasklist = user_data;
+   GList *tmp;
+   gint64 now;
+-  long tv_sec, tv_usec;
++  time_t tv_sec;
++  long tv_usec;
+   double elapsed;
  
-       sn_startup_sequence_get_last_active_time (task->startup_sequence,
--                                                &tv_sec, &tv_usec);
-+                                                (time_t *) &tv_sec, &tv_usec);
- 
-       elapsed = (now - (tv_sec * G_USEC_PER_SEC + tv_usec)) / 1000.0;
- 
+   now = g_get_real_time ();
 -- 
-2.33.0
+2.34.1
 

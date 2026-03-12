@@ -1,0 +1,118 @@
+From 24c140dee30304668ecc829ed8a672f3439f4f1c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Dec 2025 11:24:10 -0800
+Subject: [PATCH 1/5] kexec: Provide local implementation of mkstemp for klibc
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kexec/kexec-pe-zboot.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ kexec/kexec-uki.c      | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 84 insertions(+)
+
+diff --git a/kexec/kexec-pe-zboot.c b/kexec/kexec-pe-zboot.c
+index c09f2ae..fd86820 100644
+--- a/kexec/kexec-pe-zboot.c
++++ b/kexec/kexec-pe-zboot.c
+@@ -29,6 +29,48 @@
+ #include <fcntl.h>
+ #include "kexec.h"
+ #include <pe.h>
++#ifdef __KLIBC__
++/* klibc doesn't provide mkstemp(), implement a simple version */
++#include <string.h>
++#include <errno.h>
++#include <time.h>
++
++static int mkstemp(char *template)
++{
++	char *p;
++	int len, fd;
++	unsigned long val;
++	unsigned int n;
++
++	if (!template) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	len = strlen(template);
++	if (len < 6) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	p = template + len - 6;
++	if (strcmp(p, "XXXXXX") != 0) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	val = ((unsigned long)getpid() << 16) ^ (unsigned long)time(NULL);
++
++	for (n = 0; n < 100; n++) {
++		snprintf(p, 7, "%06lu", (val + n) % 1000000);
++		fd = open(template, O_RDWR | O_CREAT | O_EXCL, 0600);
++		if (fd >= 0 || errno != EEXIST)
++			return fd;
++	}
++	return -1;
++}
++#endif /* __KLIBC__ */
++
+ #include <kexec-pe-zboot.h>
+ 
+ #define FILENAME_IMAGE		"/tmp/ImageXXXXXX"
+diff --git a/kexec/kexec-uki.c b/kexec/kexec-uki.c
+index 9888d7e..ecd3f17 100644
+--- a/kexec/kexec-uki.c
++++ b/kexec/kexec-uki.c
+@@ -20,6 +20,48 @@
+ static int embeded_linux_format_index = -1;
+ static int kernel_fd = -1;
+ 
++#ifdef __KLIBC__
++/* klibc doesn't provide mkstemp(), implement a simple version */
++#include <string.h>
++#include <errno.h>
++#include <time.h>
++
++static int mkstemp(char *template)
++{
++	char *p;
++	int len, fd;
++	unsigned long val;
++	unsigned int n;
++
++	if (!template) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	len = strlen(template);
++	if (len < 6) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	p = template + len - 6;
++	if (strcmp(p, "XXXXXX") != 0) {
++		errno = EINVAL;
++		return -1;
++	}
++
++	val = ((unsigned long)getpid() << 16) ^ (unsigned long)time(NULL);
++
++	for (n = 0; n < 100; n++) {
++		snprintf(p, 7, "%06lu", (val + n) % 1000000);
++		fd = open(template, O_RDWR | O_CREAT | O_EXCL, 0600);
++		if (fd >= 0 || errno != EEXIST)
++			return fd;
++	}
++	return -1;
++}
++#endif /* __KLIBC__ */
++
+ static int create_tmpfd(const char *template, char *buf, int buf_sz, int *tmpfd)
+ {
+ 	char *fname;

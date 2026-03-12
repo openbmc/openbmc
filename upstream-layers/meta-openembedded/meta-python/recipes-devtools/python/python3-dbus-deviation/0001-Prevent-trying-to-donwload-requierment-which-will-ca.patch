@@ -1,0 +1,27 @@
+Subject: [PATCH] Prevent trying to donwload requierment which will cause
+ network error.
+
+'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f1e83062ad0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/setuptools-git/
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com> 
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 245193f..d899e4c 100755
+--- a/setup.py
++++ b/setup.py
+@@ -92,7 +92,6 @@ setuptools.setup(
+     exclude_package_data={'': ['.gitignore']},
+     zip_safe=True,
+     setup_requires=[
+-        'setuptools_git >= 0.3',
+         'sphinx',
+     ],
+     install_requires=['lxml'],
+-- 
+2.43.0
+

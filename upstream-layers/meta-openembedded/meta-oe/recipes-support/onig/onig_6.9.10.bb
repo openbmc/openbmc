@@ -35,3 +35,6 @@ do_install_ptest() {
 }
 
 PROVIDES += "oniguruma"
+
+# Add CVE_PRODUCT to match the NVD CPE product name
+CVE_PRODUCT = "oniguruma_project:oniguruma"

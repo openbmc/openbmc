@@ -7,7 +7,7 @@ Description=User-space, libgpiod-based compatibility layer for linux GPIO sysfs 
 [Service]
 RuntimeDirectory=gpio
 Type=simple
-ExecStart=/usr/bin/gpiod-sysfs-proxy @mountpoint@ -f -o nonempty -o allow_other -o default_permissions -o entry_timeout=0
+ExecStart=/usr/bin/gpiod-sysfs-proxy @mountpoint@ -f -o nonempty -o allow_other -o default_permissions -o entry_timeout=0 -o attr_timeout=0
 ExecStop=/bin/umount @mountpoint@
 Restart=always
 

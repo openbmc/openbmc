@@ -1,0 +1,34 @@
+From 7ef16220caaa82f7a90047c8c9b5ff2eeb15b9ce Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Thu, 29 Jan 2026 10:22:31 -0800
+Subject: [PATCH 2/2] Guard x86 feature detection macro in pystrref/object.rs
+
+The std::is_x86_feature_detected! macro only works on x86/x86_64
+targets. This patch wraps the feature detection and AVX-512 code path
+with cfg guards to allow compilation on non-x86 architectures.
+
+On non-x86 targets, the code will fall through to the generic
+implementation instead of attempting AVX-512 optimizations.
+
+Upstream-Status: Inappropriate [Rejected by upstream https://github.com/ijl/orjson/pull/609]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ src/ffi/pystrref/object.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/ffi/pystrref/object.rs b/src/ffi/pystrref/object.rs
+index 9ef12eb..7c2c046 100644
+--- a/src/ffi/pystrref/object.rs
++++ b/src/ffi/pystrref/object.rs
+@@ -29,6 +29,7 @@ static mut STR_CREATE_FN: StrDeserializer = super::scalar::str_impl_kind_scalar;
+ 
+ pub fn set_str_create_fn() {
+     unsafe {
++        #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+         #[cfg(all(CPython, feature = "avx512"))]
+         if std::is_x86_feature_detected!("avx512vl") {
+             STR_CREATE_FN = super::avx512::create_str_impl_avx512vl;
+-- 
+2.39.5
+

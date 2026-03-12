@@ -144,7 +144,7 @@ SRC_URI += "\
     gomod://github.com/mwitkow/go-conntrack;version=v0.0.0-20161129095857-cc309e4a2223;mod=1;sha256sum=3f15a518f37228f2d08c6b43762d43869a5ab8ae7ba3b5124bf961035e71cc18 \
     gomod://github.com/opentracing/opentracing-go;version=v1.0.2;mod=1;sha256sum=5b59c67ddd6e8f240a0008f739d14875c1af800b8e1b23d95c10c8bea49655d7 \
     gomod://github.com/opentracing/opentracing-go;version=v1.0.3-0.20180606204148-bd9c31933947;sha256sum=9f713f45fe865453738633a69f35c8279ecb88f130ca2a140a7b44385656f776 \
-    gomod://github.com/paulbellamy/ratecounter;version=v0.2.0;sha256sum=fb012856582335cdac02ee17c08692d75d539158a82eda3a26fb8a51d4ef27e6 \
+    gomod://github.com/paulbellamy/ratecounter;version=v0.2.0;mod=1;sha256sum=775c317e0e805101aacf9509f43a700e945f81a5348fd963b4db1a47d7c1b3bd \
     gomod://github.com/peterh/liner;version=v1.0.1-0.20180619022028-8c1271fcf47f;sha256sum=0d96c450f9c55a8102f4ae7fd8a583ebfaeba23e3939d6b6284306a82a21430f \
     gomod://github.com/philhofer/fwd;version=v1.0.0;sha256sum=b4e79b1f5fdfe8c44bf6dae3dd593c62862930114411a30968f304084de1d0b3 \
     gomod://github.com/pierrec/lz4;version=v2.0.5+incompatible;mod=1;sha256sum=2a50cf1993308244414372349e500770dde0671ee259159cf305f4b1f84ebae9 \
@@ -161,7 +161,7 @@ SRC_URI += "\
     gomod://github.com/prometheus/common;version=v0.6.0;sha256sum=6fb74cce1a5bd84cf36954493d6157b1bd2231b20ba2587c224df9737b579314 \
     gomod://github.com/prometheus/procfs;version=v0.0.0-20181005140218-185b4288413d;mod=1;sha256sum=52ded709607588200eff4bcfbd61fce32bb0c3f0efdd32d846e3ea150b196352 \
     gomod://github.com/prometheus/procfs;version=v0.0.2;sha256sum=d5e9430b0a3209ccd75569f7c6f9c9fcfc48f554557f44562352adab9c617464 \
-    gomod://github.com/retailnext/hllpp;version=v1.0.1-0.20180308014038-101a6d2f8b52;sha256sum=7863938cb01dfe9d4495df3c6608bedceec2d1195da05612f3c1b0e27d37729d \
+    gomod://github.com/retailnext/hllpp;version=v1.0.1-0.20180308014038-101a6d2f8b52;mod=1;sha256sum=57ec187307e4b0d0457a8a28a6a32f683e4cfa374d2449fa72838a18b1230e2e \
     gomod://github.com/rogpeppe/go-internal;version=v1.3.0;mod=1;sha256sum=33b55e839b0754283c3eeec1f33e16cc66432dffb8b8a96d24f536d01e51495b \
     gomod://github.com/segmentio/kafka-go;version=v0.1.0;mod=1;sha256sum=02ca00937516b509446c5eb0bd0a4e613b76388af2a65e58f9669434ca0668b6 \
     gomod://github.com/segmentio/kafka-go;version=v0.2.0;sha256sum=b2a88eb5b65fbb75dac0ba5e721cd2cb8e39275d1702a0f97e3c4807d78e8b48 \
@@ -170,7 +170,7 @@ SRC_URI += "\
     gomod://github.com/smartystreets/assertions;version=v0.0.0-20180927180507-b2de0cb4f26d;mod=1;sha256sum=75ccd8771f23a04379e7631044c4fb70b49b27a09650299752ee712f08a6add7 \
     gomod://github.com/smartystreets/goconvey;version=v1.6.4;mod=1;sha256sum=37e964c8dc1be33116055227dc75838037c5b5cbbe1b7923d6c6270d0eeafd05 \
     gomod://github.com/spaolacci/murmur3;version=v0.0.0-20180118202830-f09979ecbc72;mod=1;sha256sum=55565ffdc59d315a952774815afa98668ab9011e8cc11e35be5243e63a23260d \
-    gomod://github.com/spf13/cast;version=v1.3.0;sha256sum=001ed519a3ec007e76e639f72bd9560be70497d499acbf1a32ccf32dc4647d91 \
+    gomod://github.com/spf13/cast;version=v1.3.0;mod=1;sha256sum=b98f2c1774e0b7c0c5747531a6a0c6c8c25a37cf397ff05f1971bbdd97d52fae \
     gomod://github.com/spf13/cobra;version=v0.0.3;mod=1;sha256sum=41ec7f1a12f7934ac349ac6b87d99bc43a8ec4405ef968f3bf0bd0a32625d76a \
     gomod://github.com/spf13/pflag;version=v1.0.3;mod=1;sha256sum=c0119b5dfbbf3c0cb02b168ce0fcc19e7edefa73c9844c4609ebcb57f4394d14 \
     gomod://github.com/stretchr/objx;version=v0.1.0;mod=1;sha256sum=1350354d52d2287a62336ecc0d56232d4c47699af9bba49c67c2b48254da98f1 \

@@ -1,0 +1,10 @@
+#!/bin/sh
+if [ -d /usr/libexec/installed-tests/manette-0.2 ]; then
+	cd /usr/libexec/installed-tests/manette-0.2
+	for t in ./*; do
+		$t && echo PASS: $t || echo FAIL: $t
+	done
+	cd -
+else
+	echo FAIL: no tests found
+fi

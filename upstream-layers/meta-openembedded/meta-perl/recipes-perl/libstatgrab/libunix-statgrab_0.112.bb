@@ -32,7 +32,9 @@ SRC_URI[sha256sum] = "16a29f7acaeec081bf0e7303ba5ee24fda1d21a1104669b837745f3ea6
 
 S = "${UNPACKDIR}/Unix-Statgrab-${PV}"
 
-export LD = "${CCLD}"
-
 inherit cpan pkgconfig ptest-perl
 
+do_configure:prepend() {
+    # Toolchains forcibly define LD, so override it in the task
+    export LD="${CCLD}"
+}

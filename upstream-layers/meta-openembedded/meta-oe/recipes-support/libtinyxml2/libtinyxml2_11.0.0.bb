@@ -9,14 +9,13 @@ SRCREV = "9148bdf719e997d1f474be6bcc7943881046dba1"
 SRC_URI = "git://github.com/leethomason/tinyxml2.git;branch=master;protocol=https \
            file://run-ptest"
 
+inherit cmake ptest
 
-inherit meson ptest
+EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-Dtinyxml2_BUILD_TESTING=ON', '', d)}"
 
-EXTRA_OEMESON += " \
-    ${@bb.utils.contains('PTEST_ENABLED', '1', '-Dtests=true', '', d)} \
-    -Ddefault_library=both \
-"
-
+PACKAGECONFIG ?= "shared-libs"
+PACKAGECONFIG[shared-libs] = "-DBUILD_SHARED_LIBS=ON,-DBUILD_SHARED_LIBS=OFF" 
+ 
 CXXFLAGS:append:libc-musl = " -D_LARGEFILE64_SOURCE"
 
 do_install_ptest() {

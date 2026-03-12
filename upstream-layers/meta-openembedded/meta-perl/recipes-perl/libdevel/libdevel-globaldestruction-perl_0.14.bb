@@ -4,7 +4,7 @@ WRT finalizers because it's not ordered and objects can sometimes disappear."
 
 SECTION = "libs"
 
-HOMEPAGE = "https://metacpan.org/pod/Devel-GlobalDestruction/"
+HOMEPAGE = "https://metacpan.org/pod/Devel::GlobalDestruction/"
 
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=53;endline=55;md5=935dadb9423774f53548e5cd5055d41a"

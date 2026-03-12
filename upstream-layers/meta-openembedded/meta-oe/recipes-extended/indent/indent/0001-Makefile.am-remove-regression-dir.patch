@@ -47,13 +47,13 @@ index ba37a42..548fea7 100644
  ## Process this file with automake to produce Makefile.in
  AUTOMAKE_OPTIONS = no-texinfo.tex
  
--SUBDIRS = intl src doc po man regression
-+SUBDIRS = intl src doc po man
+-SUBDIRS = src doc po man regression
++SUBDIRS = src doc po man
  
  BUILT_SOURCES = 
  
-@@ -13,8 +13,7 @@ EXTRA_DIST = 	README.md \
- 		aclocal/UTIMBUF.m4 \
+@@ -13,8 +13,7 @@
+ 		m4/UTIMBUF.m4 \
  		miscel/Makefile.mingw32 \
  		miscel/README.vc++ \
 -		bootstrap \
@@ -62,6 +62,3 @@ index ba37a42..548fea7 100644
  
  DISTCLEANFILES=config/config.cache config/config.log config.h
  
--- 
-2.17.1
-

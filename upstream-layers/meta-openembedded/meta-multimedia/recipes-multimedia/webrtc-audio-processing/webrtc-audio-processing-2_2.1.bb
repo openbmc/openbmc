@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=da08a38a32a340c5d91e13ee86a118f2"
 SRC_URI = " \
     http://freedesktop.org/software/pulseaudio/webrtc-audio-processing/webrtc-audio-processing-${PV}.tar.xz \
     file://e9c78dc4712fa6362b0c839ad57b6b46dce1ba83.patch \
+    file://60.patch \
 "
 SRC_URI[sha256sum] = "ae9302824b2038d394f10213cab05312c564a038434269f11dbf68f511f9f9fe"
 S = "${UNPACKDIR}/webrtc-audio-processing-${PV}"

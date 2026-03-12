@@ -10,8 +10,6 @@ Upstream-Status: Submitted [https://github.com/eclipse-mosquitto/mosquitto/pull/
  service/systemd/mosquitto.service.simple | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/service/systemd/mosquitto.service.simple b/service/systemd/mosquitto.service.simple
-index 15ee0d6..c2a330b 100644
 --- a/service/systemd/mosquitto.service.simple
 +++ b/service/systemd/mosquitto.service.simple
 @@ -1,8 +1,8 @@
@@ -25,3 +23,16 @@ index 15ee0d6..c2a330b 100644
  
  [Service]
  ExecStart=/usr/sbin/mosquitto -c /etc/mosquitto/mosquitto.conf
+--- a/service/systemd/mosquitto.service.notify
++++ b/service/systemd/mosquitto.service.notify
+@@ -1,8 +1,8 @@
+ [Unit]
+ Description=Mosquitto MQTT Broker
+ Documentation=man:mosquitto.conf(5) man:mosquitto(8)
+-After=network.target
+-Wants=network.target
++After=network-online.target
++Wants=network-online.target
+ 
+ [Service]
+ Type=notify

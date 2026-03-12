@@ -1,0 +1,55 @@
+#!/bin/sh
+RET=0
+
+export HOME=/invalid
+export XDG_RUNTIME_DIR=/invalid
+export PIPEWIRE_RUNTIME_DIR=/tmp
+export XDG_CONFIG_HOME=$(pwd)/.config
+export XDG_STATE_HOME=$(pwd)/.local/state
+export FILE_MONITOR_DIR=$(pwd)/.local/file_monitor
+export WIREPLUMBER_MODULE_DIR=/usr/lib/wireplumber-0.5
+export G_TEST_SRCDIR=/usr/lib/wireplumber/ptest/data
+
+run_scripted_test(){
+    test_dir=$(dirname $1)
+    cd $test_dir
+    while read line; do
+        arg1=$(echo $line | cut -f1 -d" ")
+        arg2=$(echo $line | cut -f2 -d" ")
+        if ./script-tester $arg1 scripts/$arg2 > $arg2.out 2>&1; then
+            echo PASS: $arg2
+        else
+            echo FAIL: $arg2
+            RET=1
+        fi
+    done < ./ptest-list
+    cd -
+}
+
+run_regular_test(){
+  if ./$1 > $1.out 2>&1; then
+    echo PASS: $1
+  else
+    echo FAIL: $1
+    RET=1
+  fi
+}
+
+run_test(){
+    case $1 in
+      *run-ptest)
+        ;;
+      *script-tester)
+        run_scripted_test $1
+        ;;
+      *)
+        run_regular_test $1
+        ;;
+    esac
+}
+
+
+for t in $(find . -type f -executable); do
+    run_test $t
+done
+exit $RET

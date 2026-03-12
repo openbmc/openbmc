@@ -1,0 +1,49 @@
+From d4c19c3c88200c49d48c9d47971977627f98f51b Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Thu, 20 Nov 2025 11:43:45 +0800
+Subject: [PATCH] support reproducible builds
+
+In order to support reproducible builds [1], while using bison to generate
+source code, add COMPILE_FLAGS --file-prefix-map [2] to remove build path
+prefix and source path prefix in the generated header file.
+
+[1] https://reproducible-builds.org/
+[2] https://cgit.git.savannah.gnu.org/cgit/bison.git/commit/?id=dd878d18519689c7bbcd72de4c9f9e53085a3cbf
+
+Upstream-Status: Submitted [https://github.com/apache/thrift/pull/3246]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ compiler/cpp/CMakeLists.txt       | 2 +-
+ compiler/cpp/tests/CMakeLists.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/compiler/cpp/CMakeLists.txt b/compiler/cpp/CMakeLists.txt
+index 4c1c2c5..a1a8fcb 100644
+--- a/compiler/cpp/CMakeLists.txt
++++ b/compiler/cpp/CMakeLists.txt
+@@ -30,7 +30,7 @@ find_package(BISON REQUIRED)
+ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thrift/)
+ 
+ # Create flex and bison files and build the lib parse static library
+-BISON_TARGET(thrifty ${CMAKE_CURRENT_SOURCE_DIR}/src/thrift/thrifty.yy ${CMAKE_CURRENT_BINARY_DIR}/thrift/thrifty.cc)
++BISON_TARGET(thrifty ${CMAKE_CURRENT_SOURCE_DIR}/src/thrift/thrifty.yy ${CMAKE_CURRENT_BINARY_DIR}/thrift/thrifty.cc COMPILE_FLAGS "--file-prefix-map=${CMAKE_BINARY_DIR}='' --file-prefix-map=${CMAKE_SOURCE_DIR}=''")
+ FLEX_TARGET(thriftl ${CMAKE_CURRENT_SOURCE_DIR}/src/thrift/thriftl.ll ${CMAKE_CURRENT_BINARY_DIR}/thrift/thriftl.cc)
+ ADD_FLEX_BISON_DEPENDENCY(thriftl thrifty)
+ 
+diff --git a/compiler/cpp/tests/CMakeLists.txt b/compiler/cpp/tests/CMakeLists.txt
+index 6a078ec..39f5bb2 100644
+--- a/compiler/cpp/tests/CMakeLists.txt
++++ b/compiler/cpp/tests/CMakeLists.txt
+@@ -45,7 +45,7 @@ find_package(BISON REQUIRED)
+ file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/thrift/)
+ 
+ # Create flex and bison files and build the lib parse static library
+-BISON_TARGET(thrifty ${THRIFT_COMPILER_SOURCE_DIR}/src/thrift/thrifty.yy ${CMAKE_CURRENT_BINARY_DIR}/thrift/thrifty.cc)
++BISON_TARGET(thrifty ${THRIFT_COMPILER_SOURCE_DIR}/src/thrift/thrifty.yy ${CMAKE_CURRENT_BINARY_DIR}/thrift/thrifty.cc COMPILE_FLAGS "--file-prefix-map=${CMAKE_BINARY_DIR}='' --file-prefix-map=${CMAKE_SOURCE_DIR}=''")
+ FLEX_TARGET(thriftl ${THRIFT_COMPILER_SOURCE_DIR}/src/thrift/thriftl.ll ${CMAKE_CURRENT_BINARY_DIR}/thrift/thriftl.cc)
+ ADD_FLEX_BISON_DEPENDENCY(thriftl thrifty)
+ 
+-- 
+2.34.1
+

@@ -15,23 +15,20 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/kexec.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/kexec/kexec.c b/kexec/kexec.c
-index 32ae56c..0764e85 100644
 --- a/kexec/kexec.c
 +++ b/kexec/kexec.c
-@@ -1517,6 +1517,7 @@ int main(int argc, char *argv[])
- 					 */
- 				case -EINVAL:
- 				case -ENOEXEC:
+@@ -1421,12 +1421,14 @@ static int do_kexec_file_load(int filein
+ 			 */
+ 		case EINVAL:
+ 		case ENOEXEC:
 +#ifndef __KLIBC__
- 					 /*
- 					  * ENOTSUP can be unsupported image
- 					  * type or unsupported PE signature
-@@ -1529,6 +1530,7 @@ int main(int argc, char *argv[])
- 					  * kernel bug
- 					  */
- 				case -ENOTSUP:
+ 			/*
+ 			 * ENOTSUP can be unsupported image
+ 			 * type or unsupported PE signature
+ 			 * wrapper type, duh.
+ 			 */
+ 		case ENOTSUP:
 +#endif
- 					do_kexec_file_syscall = 0;
- 					break;
- 			}
+ 			ret = EFALLBACK;
+ 			break;
+ 		}

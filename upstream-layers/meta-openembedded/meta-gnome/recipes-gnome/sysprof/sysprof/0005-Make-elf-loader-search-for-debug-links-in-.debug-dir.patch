@@ -1,0 +1,47 @@
+From 9c35912dba0597a241e9af4fe5c87bfc0931c46c Mon Sep 17 00:00:00 2001
+From: Pawel Lampe <plampe@igalia.com>
+Date: Fri, 16 May 2025 14:31:29 +0200
+Subject: [PATCH] Make elf loader search for debug links in .debug dirs
+
+When the distribution is built using yocto project, it's possible
+to specify 'dbg-pkgs' image feature, see:
+https://docs.yoctoproject.org/dev/ref-manual/features.html
+This image feature makes files with package debug symbols being
+placed under .debug directories accompanying the original binary
+directories and mentioned in the .gnu_debuglink of the original binary.
+Effectively the symbols of e.g. /x/y/libz.so will be placed in
+/x/y/.debug/libz.so.
+
+This change makes sysprof's elf loader to search for debug links
+in such a .debug directories.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/sysprof/-/merge_requests/140]
+---
+ src/libsysprof/sysprof-elf-loader.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/libsysprof/sysprof-elf-loader.c b/src/libsysprof/sysprof-elf-loader.c
+index 2e52e26..e0b4089 100644
+--- a/src/libsysprof/sysprof-elf-loader.c
++++ b/src/libsysprof/sysprof-elf-loader.c
+@@ -336,6 +336,7 @@ sysprof_elf_loader_annotate (SysprofElfLoader      *self,
+           g_autofree char *directory_name = NULL;
+           g_autofree char *debug_path = NULL;
+           g_autofree char *short_debug_path = NULL;
++          g_autofree char *shorter_debug_path = NULL;
+           const char *short_directory_name;
+           const char *debug_dir = self->debug_dirs[i];
+           const char *build_id;
+@@ -360,6 +361,12 @@ sysprof_elf_loader_annotate (SysprofElfLoader      *self,
+               sysprof_elf_set_debug_link_elf (elf, get_deepest_debuglink (debug_link_elf));
+               return;
+             }
++          shorter_debug_path = g_build_filename (directory_name, ".debug", debug_link, NULL);
++          if ((debug_link_elf = sysprof_elf_loader_load (self, mount_namespace, shorter_debug_path, build_id, 0, NULL)))
++            {
++              sysprof_elf_set_debug_link_elf (elf, get_deepest_debuglink (debug_link_elf));
++              return;
++            }
+         }
+     }
+ 

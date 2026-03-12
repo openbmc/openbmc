@@ -1,4 +1,4 @@
-From cc0c0b518d46bf82ad34eeea8d40496c9ad971dd Mon Sep 17 00:00:00 2001
+From 58619c59e72c796aa2686bc6ffbfa07a23dbc14d Mon Sep 17 00:00:00 2001
 From: Carlos Alberto Lopez Perez <clopez@igalia.com>
 Date: Wed, 24 Jul 2024 15:51:05 +0100
 Subject: [PATCH] meson: Do not invoke the commands to update the icon caches
@@ -15,10 +15,10 @@ Signed-off-by: Carlos Alberto Lopez Perez <clopez@igalia.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 86b9df4..fe75ef9 100644
+index 783f558..8775fe6 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -269,7 +269,7 @@ configure_file(
+@@ -276,7 +276,7 @@ configure_file(
    configuration: config_h
  )
  

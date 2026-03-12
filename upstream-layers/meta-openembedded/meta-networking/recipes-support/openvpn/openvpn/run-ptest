@@ -1,5 +1,8 @@
 #!/bin/sh
-for x in `find ./ -name Makefile`;
-do
-	make -C `dirname ${x}` -k runtest-TESTS
+
+find ./ -name Makefile | while read -r x; do
+    make -C "$(dirname "${x}")" -k runtest-TESTS | sed \
+        -e 's/^\(\[       OK \].*\)$/PASS: \1/' \
+        -e 's/^\(\[  FAILED  \].*\)$/FAIL: \1/' \
+        -e 's/^\(\[  SKIPPED \].*\)$/SKIP: \1/'
 done

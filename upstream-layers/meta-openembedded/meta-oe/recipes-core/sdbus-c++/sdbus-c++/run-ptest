@@ -1,6 +1,11 @@
 #!/bin/sh
 set -e
 
+# the integration tests require some machine id
+if [ ! -f /etc/machine-id ]; then
+  echo 12345678901234567890123456789012 > /etc/machine-id
+fi
+
 ./sdbus-c++-unit-tests 2>&1 && echo "PASS: sdbus-c++-unit-tests" || echo "FAIL: sdbus-c++-unit-tests"
 
 ./sdbus-c++-integration-tests 2>&1 && echo "PASS: sdbus-c++-integration-tests" || echo "FAIL: sdbus-c++-integration-tests"

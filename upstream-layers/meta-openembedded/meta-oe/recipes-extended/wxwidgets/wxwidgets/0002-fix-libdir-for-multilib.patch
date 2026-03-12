@@ -1,4 +1,4 @@
-From 9487fe5cd271a4bee96ab590509ef38f6972887a Mon Sep 17 00:00:00 2001
+From 42b1d9e8138b8b4f7160f208a5d15fe25d0223a3 Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Sat, 12 Oct 2024 18:43:25 +0800
 Subject: [PATCH] fix libdir for multilib
@@ -16,15 +16,17 @@ in this patch that LIB_SUFFIX has been passed to cmake in cmake.bbclass.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 ---
- CMakeLists.txt              |  2 +-
- build/cmake/config.cmake    |  2 +-
- build/cmake/functions.cmake |  4 ++--
- build/cmake/install.cmake   | 12 ++++++------
- 4 files changed, 10 insertions(+), 10 deletions(-)
+ CMakeLists.txt                         |  2 +-
+ build/cmake/config.cmake               |  2 +-
+ build/cmake/install.cmake              | 12 ++++++------
+ build/cmake/lib/webview/CMakeLists.txt |  2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d6a4b49..9e86b87 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -43,7 +43,7 @@ include(build/cmake/policies.cmake NO_PO
+@@ -43,7 +43,7 @@ include(build/cmake/policies.cmake NO_POLICY_SCOPE)
  # Initialize variables for quick access to wx root dir in sub dirs
  set(wxSOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
  set(wxBINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -33,6 +35,8 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  
  # parse the version number from wx/version.h and include in wxMAJOR_VERSION and wxMINOR_VERSION
  file(READ "${wxSOURCE_DIR}/include/wx/version.h" WX_VERSION_H_CONTENTS)
+diff --git a/build/cmake/config.cmake b/build/cmake/config.cmake
+index addd8d6..9ec6775 100644
 --- a/build/cmake/config.cmake
 +++ b/build/cmake/config.cmake
 @@ -100,7 +100,7 @@ function(wx_write_config_inplace)
@@ -44,6 +48,8 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
          "${wxBINARY_DIR}/wx-config"
          )
  endfunction()
+diff --git a/build/cmake/install.cmake b/build/cmake/install.cmake
+index 202d054..e255e0b 100644
 --- a/build/cmake/install.cmake
 +++ b/build/cmake/install.cmake
 @@ -44,11 +44,11 @@ if(WIN32_MSVC_NAMING)
@@ -90,3 +96,19 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  )
  
  # uninstall target
+diff --git a/build/cmake/lib/webview/CMakeLists.txt b/build/cmake/lib/webview/CMakeLists.txt
+index 2cb35e7..7977a84 100644
+--- a/build/cmake/lib/webview/CMakeLists.txt
++++ b/build/cmake/lib/webview/CMakeLists.txt
+@@ -146,7 +146,7 @@ if(WXGTK AND wxUSE_WEBVIEW_WEBKIT2)
+         ${WEBKIT2_LIBRARIES}
+         )
+ 
+-    wx_install(TARGETS wxwebkit2_ext LIBRARY DESTINATION "lib/wx/${WX_WEB_EXT_VERSION}/web-extensions")
++    wx_install(TARGETS wxwebkit2_ext LIBRARY DESTINATION "lib${LIB_SUFFIX}/wx/${WX_WEB_EXT_VERSION}/web-extensions")
+ 
+     wx_add_dependencies(wxwebview wxwebkit2_ext)
+ endif()
+-- 
+2.49.0
+

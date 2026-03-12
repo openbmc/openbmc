@@ -7,7 +7,7 @@ inherit pypi python_setuptools_build_meta
 
 SRC_URI[sha256sum] = "e5d7ccc08ba089c06e2f5629c660388ef1fee708444f1dee0b9203fa031dee03"
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"
 
 DEPENDS += " \
     python3-mypy-extensions-native \
@@ -20,5 +20,6 @@ DEPENDS += " \
 RDEPENDS:${PN} += " \
     python3-modules \
     python3-mypy-extensions \
+    python3-pathspec \
     python3-typing-extensions \
 "

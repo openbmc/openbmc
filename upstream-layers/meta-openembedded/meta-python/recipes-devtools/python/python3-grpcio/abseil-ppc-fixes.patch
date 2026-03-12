@@ -1,5 +1,5 @@
-From a2ec96a96ff7ba016e800212a942b9f29f255415 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com> 
+From 42b215f964b2c13db4adb0ee72f024607f74e6d1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 13 Mar 2021 10:26:25 -0800
 Subject: [PATCH] An all-in-one patch that fixes several issues:
 
@@ -22,7 +22,7 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  4 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
-index a0bf3a6..103b4f6 100644
+index 68f9273..5dbfaab 100644
 --- a/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 +++ b/third_party/abseil-cpp/absl/base/internal/unscaledcycleclock.cc
 @@ -20,7 +20,7 @@
@@ -85,10 +85,10 @@ index 3dd6ba1..9f0601c 100644
      return reinterpret_cast<void*>(context->uc_mcontext.__gregs[REG_PC]);
  #elif defined(__s390__) && !defined(__s390x__)
 diff --git a/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h b/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h
-index 3929b1b..23d5e50 100644
+index 88949fe..4e26a6b 100644
 --- a/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h
 +++ b/third_party/abseil-cpp/absl/debugging/internal/stacktrace_config.h
-@@ -60,7 +60,7 @@
+@@ -67,7 +67,7 @@
  #elif defined(__i386__) || defined(__x86_64__)
  #define ABSL_STACKTRACE_INL_HEADER \
    "absl/debugging/internal/stacktrace_x86-inl.inc"
@@ -97,6 +97,3 @@ index 3929b1b..23d5e50 100644
  #define ABSL_STACKTRACE_INL_HEADER \
    "absl/debugging/internal/stacktrace_powerpc-inl.inc"
  #elif defined(__aarch64__)
--- 
-2.43.0
-

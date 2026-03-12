@@ -1,0 +1,29 @@
+Subject: [PATCH] Use flex with --noline option to prevent adding #line to c file
+
+To fix following do_package QA Issue:
+
+do_package_qa:QA Issue: File /usr/src/debug/hotdoc/0.17.4/hotdoc/parsers/c_comment_scanner/scanner.c in package hotdoc-src contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index 9ee504d..9bbc744 100644
+--- a/setup.py
++++ b/setup.py
+@@ -365,7 +365,7 @@ class FlexExtension (Extension):
+ 
+         self.sources.append(built_scanner_path)
+         if newer_group(self.__flex_sources, built_scanner_path):
+-            cmd = ['flex', '-o', built_scanner_path]
++            cmd = ['flex', '--noline', '-o', built_scanner_path]
+             for s in self.__flex_sources:
+                 cmd.append(s)
+             spawn.spawn(cmd, verbose=1)
+-- 
+2.43.0
+

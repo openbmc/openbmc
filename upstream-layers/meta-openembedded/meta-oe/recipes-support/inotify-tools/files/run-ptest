@@ -1,0 +1,23 @@
+#!/bin/sh
+# run-ptest for inotify-tools
+
+set -e
+
+# Run the test binary and capture output
+output=$(./test 2>&1)
+status=$?
+
+# Print the output for logging
+echo "$output"
+
+# Evaluate result based on exit code
+if [ $status -eq 0 ]; then
+    echo "All tests passed successfully."
+    echo "PASS: inotify-tools"
+    exit 0
+else
+    echo "Test program exited with status $status."
+    echo "Some tests may have failed. See output above for details."
+    echo "FAIL: inotify-tools"
+    exit 1
+fi

@@ -1,0 +1,31 @@
+From ee35b6507993e79fc594e3b7ad50174e33e68daa Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Wed, 24 Sep 2025 11:22:29 +0200
+Subject: [PATCH] Don't overwrite systemwide cflags
+
+Instead of overriding the cflags from the system, just append to them.
+
+Upstream-Status: Submitted [https://github.com/HardySimpson/zlog/pull/306]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8981934..f2bd574 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -33,9 +33,9 @@ SET(ZLOG_SO_VERSION ${CPACK_PACKAGE_VERSION_MAJOR})
+ message(STATUS "platform : ${CMAKE_SYSTEM}")
+ 
+ add_definitions("-g -Wall -Wstrict-prototypes")
+-set(CMAKE_C_FLAGS "-std=c99 -pedantic -D_DEFAULT_SOURCE")
+-set(CMAKE_C_FLAGS_DEBUG "-ggdb3 -DDEBUG")
+-set(CMAKE_C_FLAGS_RELEASE "-O2")
++set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -pedantic -D_DEFAULT_SOURCE")
++set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -ggdb3 -DDEBUG")
++set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2")
+ 
+ if (WIN32)
+     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DWINVER=0x0500 -D_WIN32_WINNT=0x0500 ")

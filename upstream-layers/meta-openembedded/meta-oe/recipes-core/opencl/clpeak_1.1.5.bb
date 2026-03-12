@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRCREV = "b2e647ffb8f42aa22ce4b0194d6ef6d16d5002b0"
 
+inherit cmake features_check
 
-inherit cmake
+REQUIRED_DISTRO_FEATURES = "opencl"
 
-DEPENDS += "opencl-clhpp virtual/opencl-icd"
+DEPENDS += "opencl-clhpp virtual/libopencl1"

@@ -61,6 +61,7 @@ RDEPENDS:${PN} += " \
 "
 
 RDEPENDS:${PN}-ptest += " \
+    cpan-requirements-dynamic \
     packagegroup-core-buildessential \
     perl-dev \
     perl-module-blib \

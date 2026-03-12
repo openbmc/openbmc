@@ -12,6 +12,7 @@ SRCREV = "37d5f1225573b91d706a5e547d081f79963a9deb"
 
 SRC_URI = " \
     git://github.com/sctp/lksctp-tools.git;branch=master;protocol=https \
+    file://0001-func_tests-disable-FORTIFY_SOURCE-for-test_1_to_1_re.patch \
     file://run-ptest \
     file://v4test.sh \
     file://v6test.sh \

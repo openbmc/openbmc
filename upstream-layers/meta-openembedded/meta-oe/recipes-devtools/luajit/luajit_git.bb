@@ -95,3 +95,7 @@ COMPATIBLE_HOST:powerpc64 = "null"
 COMPATIBLE_HOST:powerpc64le = "null"
 COMPATIBLE_HOST:riscv64 = "null"
 COMPATIBLE_HOST:riscv32 = "null"
+
+CVE_STATUS[CVE-2024-25176] = "fixed-version: The used revision contains the fix already."
+CVE_STATUS[CVE-2024-25177] = "fixed-version: The used revision contains the fix already."
+CVE_STATUS[CVE-2024-25178] = "fixed-version: The used revision contains the fix already."

@@ -1,4 +1,4 @@
-From 698361847e6fae321bc277a5fc518b2bd55751b8 Mon Sep 17 00:00:00 2001
+From 85c4bdd939b7f77a773d24fcc5330fc35542d7d3 Mon Sep 17 00:00:00 2001
 From: Wang Mingyu <wangmy@cn.fujitsu.com>
 Date: Sun, 10 May 2020 21:22:53 +0800
 Subject: [PATCH] fix bug of do_compile and do_install
@@ -38,6 +38,3 @@ index f06f7faa..690dc050 100644
  libmultipath/checkers.install \
  	libmultipath/prioritizers.install \
  	libmultipath/foreign.install: libmultipath.install
--- 
-2.25.1
-

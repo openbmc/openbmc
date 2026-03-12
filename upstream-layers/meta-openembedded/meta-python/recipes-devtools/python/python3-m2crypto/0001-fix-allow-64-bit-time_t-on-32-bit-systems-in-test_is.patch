@@ -1,0 +1,40 @@
+From d123b4ddce99c44f2c290fb3d6cc887de98778e6 Mon Sep 17 00:00:00 2001
+From: Haixiao Yan <haixiao.yan.cn@windriver.com>
+Date: Wed, 22 Oct 2025 15:23:56 +0800
+Subject: [PATCH 1/2] fix: allow 64-bit time_t on 32-bit systems in
+ test_is32bit
+
+Some modern 32-bit Linux systems (e.g. with glibc >= 2.34 or musl time64 ABI)
+use 64-bit time_t by default when _TIME_BITS=64 is enabled. The original test
+assumed time_t was always 32-bit on 32-bit architectures, which is no longer
+true.
+
+Relax the check to accept both 32-bit and 64-bit time_t values:
+
+    self.assertIn(bit32, (32, 64))
+
+This makes the test compatible with both legacy and time64 ABIs.
+
+Upstream-Status: Backport [https://gitlab.com/m2crypto/m2crypto/-/commit/818c3dfda6ea]
+
+Signed-off-by: Haixiao Yan <haixiao.yan.cn@windriver.com>
+---
+ tests/test_util.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/test_util.py b/tests/test_util.py
+index e925d03b090c..233fb7a099d9 100644
+--- a/tests/test_util.py
++++ b/tests/test_util.py
+@@ -26,7 +26,7 @@ class UtilTestCase(unittest.TestCase):
+                 not in ["true", "1", "yes"]
+             )
+         ):
+-            self.assertEqual(bit32, 32)
++            self.assertIn(bit32, (32, 64))
+         else:
+             self.assertNotEqual(bit32, 32)
+         self.assertIsInstance(bit32, int)
+-- 
+2.34.1
+

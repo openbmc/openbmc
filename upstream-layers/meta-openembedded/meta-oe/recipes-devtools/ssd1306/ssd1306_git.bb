@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7b694e603a996c3bfdc6093ed1f70c8f"
 SRC_URI = " \
     git://github.com/armlabs/ssd1306_linux.git;protocol=https;branch=master \
 "
-SRCREV = "34b42992a43fda69c6ba2557b718601cafe16251"
+SRCREV = "19128ed4b6108408fea05b9d0551236b6d638dbc"
 
 
 # coreutils provides fmt which is used in the Makefile

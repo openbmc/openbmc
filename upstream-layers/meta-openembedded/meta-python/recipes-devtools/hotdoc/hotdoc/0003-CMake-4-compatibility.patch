@@ -1,0 +1,44 @@
+Subject: [PATCH] CMake 4 compatibility
+
+All CMake versions older than 3.10 are deprecated.
+
+Upstream-Status: Backport [https://github.com/MathieuDuponchelle/cmark/commit/bd78193dbff98c3860e77629b5c7bfee6169d1da]
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ CMakeLists.txt            | 11 ++---------
+ extensions/CMakeLists.txt |  2 +-
+ 2 files changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ff97419..45fdf6c 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,12 +1,5 @@
+-cmake_minimum_required(VERSION 2.8.9)
+-
+-# prevent ugly developer warnings because version is set directly, not through project()
+-# it should be redone properly by using VERSION in project() if on CMake 3.x
+-if(CMAKE_MAJOR_VERSION GREATER 2)
+-    cmake_policy(SET CMP0048 OLD)
+-endif()
+-
+-project(cmark)
++cmake_minimum_required(VERSION 3.10)
++project(cmark VERSION 0.28.3)
+ 
+ include("FindAsan.cmake")
+ 
+diff --git a/extensions/CMakeLists.txt b/extensions/CMakeLists.txt
+index e62d155..b6a1556 100644
+--- a/extensions/CMakeLists.txt
++++ b/extensions/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.10)
+ set(LIBRARY "cmarkextensions")
+ set(LIBRARY_SOURCES
+     core-extensions.c
+-- 
+2.43.0
+

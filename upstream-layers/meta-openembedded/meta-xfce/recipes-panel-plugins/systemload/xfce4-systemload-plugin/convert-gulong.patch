@@ -14,15 +14,15 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/panel-plugin/network.cc
 +++ b/panel-plugin/network.cc
-@@ -114,6 +114,7 @@ read_netload_proc (gulong *bytes)
+@@ -118,6 +118,7 @@ read_netload_proc (gulong *bytes)
  gint
  read_netload (gulong *net, gulong *NTotal)
  {
 +    gulong tbytes[2];
-     static guint64 bytes[2];
+     static gulong bytes[2];
      static gint64 time[2];
  
-@@ -122,10 +123,12 @@ read_netload (gulong *net, gulong *NTota
+@@ -123,10 +124,12 @@ read_netload (gulong *net, gulong *NTota
  
      time[1] = g_get_monotonic_time ();
  

@@ -14,7 +14,7 @@ SRC_URI[sha256sum] = "f5b29137f845bb08b77ec60584fdb728b4e58f1023e6f249a464efa49a
 
 UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/cunit/files/releases"
 
-inherit autotools-brokensep ptest
+inherit autotools-brokensep ptest sourceforge-releases
 
 EXTRA_OECONF = "--enable-memtrace --enable-automated --enable-basic --enable-console"
 

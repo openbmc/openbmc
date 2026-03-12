@@ -70,3 +70,4 @@ RDEPENDS:${PN} = "bash"
 RDEPENDS:${PN}-dev = "bash"
 
 CVE_STATUS[CVE-2019-10329] = "cpe-incorrect: Version does not match and only the Jenkins plugin is affected."
+CVE_STATUS[CVE-2024-30896] = "not-applicable-config: vulnerability only exists in version 2.x"

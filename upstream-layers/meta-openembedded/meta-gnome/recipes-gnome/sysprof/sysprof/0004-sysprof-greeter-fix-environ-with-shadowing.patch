@@ -1,0 +1,37 @@
+From f65c492e93db122ac9623c7b0ee590801f90e366 Mon Sep 17 00:00:00 2001
+From: Christian Hergert <chergert@redhat.com>
+Date: Mon, 11 Aug 2025 14:10:08 -0700
+Subject: [PATCH] sysprof/greeter: fix environ with shadowing
+
+Fixes: #150
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/sysprof/-/issues/150]
+Signed-off-by: Pablo Saavedra <psaavedra@igalia.com>
+---
+ src/sysprof/sysprof-greeter.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/sysprof/sysprof-greeter.c b/src/sysprof/sysprof-greeter.c
+index 5f44cb6..80e07ae 100644
+--- a/src/sysprof/sysprof-greeter.c
++++ b/src/sysprof/sysprof-greeter.c
+@@ -626,14 +626,14 @@ sysprof_greeter_init (SysprofGreeter *self)
+ 
+   if (self->recording_template)
+     {
+-      g_auto(GStrv) environ = NULL;
++      g_auto(GStrv) environ_ = NULL;
+       g_object_get (self->recording_template,
+-                    "environ", &environ,
++                    "environ", &environ_,
+                     NULL);
+-      if (environ)
++      if (environ_)
+         {
+-          for (guint i = 0; environ[i]; i++)
+-            gtk_string_list_append (self->envvars, environ[i]);            
++          for (guint i = 0; environ_[i]; i++)
++            gtk_string_list_append (self->envvars, environ_[i]);            
+         }
+     }
+ 

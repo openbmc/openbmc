@@ -1,0 +1,43 @@
+From 83ad73024c69d41fda302f39acf50c381684890e Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Tue, 21 Oct 2025 02:39:36 -0700
+Subject: [PATCH] workaround build racing
+
+There is a racing issue in world build while multilib enabled:
+
+...log.do_install...
+CMake Error at utils/po/ca/cmake_install.cmake:46 (file):
+  file INSTALL cannot find
+  "TOPDIR/tmp/work/core2-32-wrs-linux/poppler/25.08.0/build/utils/po/ca/pdfsig.gmo":
+  No such file or directory.
+Call Stack (most recent call first):
+  utils/po/cmake_install.cmake:47 (include)
+  utils/cmake_install.cmake:243 (include)
+  cmake_install.cmake:229 (include)
+...log.do_install...
+
+Revert "pdfsig: Catalan translation" to workaround
+
+This reverts commit 99f5416d9bfb6a34bbc5cbcb368e258b98fd3f08.
+
+Upstream-Status: Inappropriate [Yocto specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ utils/po/ca/CMakeLists.txt | 4 ----
+ 1 file changed, 4 deletions(-)
+ delete mode 100644 utils/po/ca/CMakeLists.txt
+
+diff --git a/utils/po/ca/CMakeLists.txt b/utils/po/ca/CMakeLists.txt
+deleted file mode 100644
+index 3225131c..00000000
+--- a/utils/po/ca/CMakeLists.txt
++++ /dev/null
+@@ -1,4 +0,0 @@
+-get_filename_component(_lang ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+-gettext_process_po_files(${_lang} ALL INSTALL_DESTINATION ${CMAKE_INSTALL_LOCALEDIR} PO_FILES
+-  pdfsig.po
+-)
+-- 
+2.49.0
+

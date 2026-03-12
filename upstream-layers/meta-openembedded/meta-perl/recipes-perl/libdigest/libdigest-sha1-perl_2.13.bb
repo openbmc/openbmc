@@ -19,6 +19,7 @@ do_install_ptest () {
     cp -r ${B}/t ${D}${PTEST_PATH}
 }
 
+RDEPENDS:${PN}-ptest += "perl-module-dynaloader perl-module-exporter perl-module-test"
 BBCLASSEXTEND = "native"
 
 FILES:${PN}-dbg =+ "${libdir}/perl/vendor_perl/*/auto/Digest/SHA1/.debug/"

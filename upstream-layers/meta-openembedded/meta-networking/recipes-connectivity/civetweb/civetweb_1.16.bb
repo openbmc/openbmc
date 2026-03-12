@@ -2,14 +2,16 @@ SUMMARY = "Civetweb embedded web server"
 HOMEPAGE = "https://github.com/civetweb/civetweb"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ce6ce6eb1b2fd59ee6bab219470442a3"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=e5f28949b2d9ec1f4da8bb00aff8b6d4"
 
-SRCREV = "5864b55a94f4b5238155cbf2baec707f0fa2ba6d"
+SRCREV = "b6ef58f4c4c7fbe90fd1065bccf45b143345f1a6"
 PV .= "+git"
 SRC_URI = "git://github.com/civetweb/civetweb.git;branch=master;protocol=https \
            file://0001-Unittest-Link-librt-and-libm-using-l-option.patch \
            "
 
+CVE_STATUS[CVE-2025-55763] = "fixed-version: The vulnerability is fixed in the used revision"
+CVE_STATUS[CVE-2025-9648] = "fixed-version: The vulnerability is fixed in the used revision"
 
 # civetweb supports building with make or cmake (although cmake lacks few features)
 inherit cmake

@@ -1,4 +1,31 @@
 #!/bin/sh
+
+# configure dns
+if ! nslookup secure.appinf.com >/dev/null 2>&1; then
+  trap 'mv /etc/resolv.conf.backup /etc/resolv.conf' INT EXIT
+  mv /etc/resolv.conf /etc/resolv.conf.backup
+  echo 'nameserver 8.8.8.8' > /etc/resolv.conf
+fi
+
+setup_test() {
+  case "$1" in
+    "DataPostgreSQL-testrunner")
+      if [ "$2" = "start" ]; then
+        # init database
+        postgresql-setup initdb
+        # do not require authentication for tests
+        mv /var/lib/postgresql/data/pg_hba.conf /var/lib/postgresql/data/pg_hba.conf.backup
+        sed s:ident$:trust: /var/lib/postgresql/data/pg_hba.conf.backup > /var/lib/postgresql/data/pg_hba.conf
+        # start as in combination of posgresql.service and posgresql.init
+        su -l postgres -c 'pg_ctl start -D /var/lib/postgresql/data -s -o "-p 5432" -w -t 300'
+      else
+        su -l postgres -c 'pg_ctl stop -D /var/lib/postgresql/data -s -m fast'
+        mv /var/lib/postgresql/data/pg_hba.conf.backup /var/lib/postgresql/data/pg_hba.conf
+      fi
+      ;;
+  esac
+}
+
 export POCO_BASE=/usr/lib/poco/ptest
 export LD_LIBRARY_PATH=${POCO_BASE}/bin:${LD_LIBRARY_PATH}
 i=0
@@ -6,7 +33,9 @@ while read runner; do
   oldpath=`pwd` >/dev/null
   cd bin
   echo Testing $runner
+  setup_test $runner start
   ./$runner -ignore $oldpath/cppignore.lnx -all
+  setup_test $runner stop
   export res$((i++))=$?
   cd $oldpath >/dev/null
 done < testrunners

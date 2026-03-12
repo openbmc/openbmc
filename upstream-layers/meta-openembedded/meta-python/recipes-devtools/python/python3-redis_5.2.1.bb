@@ -19,3 +19,5 @@ RDEPENDS:${PN} += " \
     python3-json \
     python3-packaging \
 "
+
+CVE_PRODUCT = "redis-py"

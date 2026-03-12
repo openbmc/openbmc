@@ -11,8 +11,8 @@ RDEPENDS:${PN} += " \
     python3-twisted \
 "
 
-SRC_URI = "git://github.com/MostAwesomeDude/txWS.git;branch=master;protocol=https"
-SRCREV = "88cf6d9b9b685ffa1720644bd53c742afb10a414"
+inherit setuptools3 pypi
 
+PYPI_PACKAGE = "txWS"
 
-inherit setuptools3
+SRC_URI[sha256sum] = "cb93086095d04a5d70f53a75053f7df478ff37e972c3637fb55ca4a9e6b94679"

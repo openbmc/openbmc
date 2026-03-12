@@ -15,11 +15,9 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/kexec-syscall.h | 21 +++++++++++++++++++++
  1 file changed, 21 insertions(+)
 
-diff --git a/kexec/kexec-syscall.h b/kexec/kexec-syscall.h
-index b96e02a..2a3794d 100644
 --- a/kexec/kexec-syscall.h
 +++ b/kexec/kexec-syscall.h
-@@ -77,11 +77,16 @@
+@@ -96,11 +96,16 @@
  
  struct kexec_segment;
  
@@ -36,7 +34,7 @@ index b96e02a..2a3794d 100644
  
  static inline int is_kexec_file_load_implemented(void) {
  	if (__NR_kexec_file_load != 0xffffffff)
-@@ -89,6 +94,21 @@ static inline int is_kexec_file_load_implemented(void) {
+@@ -108,6 +113,21 @@ static inline int is_kexec_file_load_imp
  	return 0;
  }
  
@@ -58,7 +56,7 @@ index b96e02a..2a3794d 100644
  static inline long kexec_file_load(int kernel_fd, int initrd_fd,
  			unsigned long cmdline_len, const char *cmdline_ptr,
  			unsigned long flags)
-@@ -96,6 +116,7 @@ static inline long kexec_file_load(int kernel_fd, int initrd_fd,
+@@ -115,6 +135,7 @@ static inline long kexec_file_load(int k
  	return (long) syscall(__NR_kexec_file_load, kernel_fd, initrd_fd,
  				cmdline_len, cmdline_ptr, flags);
  }

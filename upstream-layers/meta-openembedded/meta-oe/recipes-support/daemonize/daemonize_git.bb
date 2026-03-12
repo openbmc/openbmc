@@ -6,10 +6,9 @@ PV = "1.7.8"
 
 inherit autotools
 
-SRCREV = "18869a797dab12bf1c917ba3b4782fef484c407c"
+SRCREV = "58237626e6999e68b9583ed1b4b08136f118f68c"
 SRC_URI = " \
     git://github.com/bmc/daemonize.git;branch=master;protocol=https \
-    file://0001-fix-getopt.c-too-many-arguments-to-function-write-er.patch \
 "
 
 

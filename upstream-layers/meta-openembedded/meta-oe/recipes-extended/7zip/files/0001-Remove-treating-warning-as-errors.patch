@@ -1,0 +1,31 @@
+From 4d12624e7d6f09d07816d3d0007465c8533af192 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Aug 2025 15:29:13 -0700
+Subject: [PATCH] Remove treating warning as errors
+
+clang finds additional warnings with new versions e.g.
+Clang 21 added a new warning, -Wimplicit-void-ptr-cast
+(grouped under -Wc++-compat), which fires whenever a
+void* is implicitly converted to another pointer
+type (or returned as such).
+
+Upstream-Status: Inappropriate [Distro-specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ CPP/7zip/7zip_gcc.mak | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CPP/7zip/7zip_gcc.mak b/CPP/7zip/7zip_gcc.mak
+index 2722c93..b7db06a 100644
+--- a/CPP/7zip/7zip_gcc.mak
++++ b/CPP/7zip/7zip_gcc.mak
+@@ -24,7 +24,7 @@ PROGPATH_STATIC = $(O)/$(PROG)s
+ 
+ 
+ ifneq ($(CC), xlc)
+-CFLAGS_WARN_WALL = -Werror -Wall -Wextra
++CFLAGS_WARN_WALL = -Wall -Wextra
+ endif
+ 
+ # for object file

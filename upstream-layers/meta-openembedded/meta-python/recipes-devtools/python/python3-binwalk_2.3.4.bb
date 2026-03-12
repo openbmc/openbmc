@@ -10,6 +10,7 @@ SRC_URI = "git://github.com/ReFirmLabs/binwalk;protocol=https;branch=master"
 
 SRCREV = "cddfede795971045d99422bd7a9676c8803ec5ee"
 
+CVE_PRODUCT = "binwalk"
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 

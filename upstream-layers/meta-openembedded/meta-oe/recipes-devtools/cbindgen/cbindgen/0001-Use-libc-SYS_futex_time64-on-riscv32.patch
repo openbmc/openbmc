@@ -1,0 +1,53 @@
+From a552c6891070bf400d4fe1f7c39c50b1a0b17748 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 22 Jul 2025 09:46:03 -0700
+Subject: [PATCH] Use libc::SYS_futex_time64 on riscv32
+
+On RISC-V 32-bit (riscv32), the SYS_futex system call is
+often handled indirectly due to the use of a 64-bit time_t
+type. Specifically, while SYS_futex is not directly defined,
+a related syscall like SYS_futex_time64 can be used,
+
+Upstream-Status: Backport [https://github.com/rust-random/getrandom/pull/698/commits/03d2c9f164099a714c3141c53221ccb68101c460]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/backends/use_file.rs | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/src/backends/use_file.rs b/src/backends/use_file.rs
+index 7b48d43..baa0c66 100644
+--- a/src/backends/use_file.rs
++++ b/src/backends/use_file.rs
+@@ -158,7 +158,18 @@ mod sync {
+     pub(super) fn wait() {
+         let op = libc::FUTEX_WAIT | libc::FUTEX_PRIVATE_FLAG;
+         let timeout_ptr = core::ptr::null::<libc::timespec>();
++        #[cfg(not(target_arch = "riscv32"))]
+         let ret = unsafe { libc::syscall(libc::SYS_futex, &FD, op, FD_ONGOING_INIT, timeout_ptr) };
++        #[cfg(target_arch = "riscv32")]
++        let ret = unsafe {
++            libc::syscall(
++                libc::SYS_futex_time64,
++                &FD,
++                op,
++                FD_ONGOING_INIT,
++                timeout_ptr,
++            )
++        };
+         // FUTEX_WAIT should return either 0 or EAGAIN error
+         debug_assert!({
+             match ret {
+@@ -172,7 +183,13 @@ mod sync {
+     /// Wake up all threads which wait for value of atomic `FD` to change.
+     pub(super) fn wake() {
+         let op = libc::FUTEX_WAKE | libc::FUTEX_PRIVATE_FLAG;
++
++        #[cfg(not(target_arch = "riscv32"))]
+         let ret = unsafe { libc::syscall(libc::SYS_futex, &FD, op, libc::INT_MAX) };
++
++        #[cfg(target_arch = "riscv32")]
++        let ret = unsafe { libc::syscall(libc::SYS_futex_time64, &FD, op, libc::INT_MAX) };
++
+         debug_assert!(ret >= 0);
+     }
+

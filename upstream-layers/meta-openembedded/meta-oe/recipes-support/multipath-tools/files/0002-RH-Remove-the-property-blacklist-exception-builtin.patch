@@ -1,4 +1,4 @@
-From e3449e163d7fe9bf1e188f0e28962f0659e9652d Mon Sep 17 00:00:00 2001
+From 14716a10c22206722ee48b44b88f0eec5203f228 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 1 Mar 2024 10:34:06 +0800
 Subject: [PATCH] RH: Remove the property blacklist exception builtin
@@ -58,6 +58,3 @@ index 17e1b54a..2cfb18b8 100644
  }
  
  static void free_ble(struct blentry *ble)
--- 
-2.25.1
-

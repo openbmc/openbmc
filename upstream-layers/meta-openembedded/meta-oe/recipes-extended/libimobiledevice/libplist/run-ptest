@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for t in `ls test/*.test`; do
+	top_srcdir=$(pwd)/input top_builddir=$(pwd)/test ./$t && echo PASS: $t || echo FAIL: $t
+	rm $(pwd)/test/test/data/* 2>/dev/null
+done

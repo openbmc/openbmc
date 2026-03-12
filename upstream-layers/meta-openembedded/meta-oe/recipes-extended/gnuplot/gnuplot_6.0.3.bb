@@ -1,0 +1,74 @@
+SUMMARY = "Gnuplot is a portable command-line driven graphing utility"
+DESCRIPTION = "Gnuplot is a portable command-line driven interactive datafile \
+(text or binary) and function plotting utility."
+HOMEPAGE = "http://www.gnuplot.info/"
+SECTION = "console/scientific"
+LICENSE = "gnuplot"
+LIC_FILES_CHKSUM = "file://Copyright;md5=243a186fc2fd3b992125d60d5b1bab8f"
+DEPENDS = "${BPN}-native gd readline"
+
+inherit autotools pkgconfig
+# depends on virtual/libx11
+
+SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BPN}/${PV}/${BP}.tar.gz;name=archive \
+           http://www.mneuroth.de/privat/zaurus/qtplot-0.2.tar.gz;name=qtplot \
+           file://gnuplot.desktop \
+           file://gnuplot.png \
+           "
+SRC_URI:append:class-target = " \
+    file://0002-do-not-build-demos.patch \
+    file://0003-Use-native-tools-to-build-docs.patch \
+    file://0004-Add-configure-option-to-find-qt5-and-qt6-native-tools.patch \
+"
+
+SRC_URI[archive.sha256sum] = "ec52e3af8c4083d4538152b3f13db47f6d29929a3f6ecec5365c834e77f251ab"
+SRC_URI[qtplot.sha256sum] = "6df317183ff62cc82f3dcf88207a267cd6478cb5147f55d7530c94f1ad5f4132"
+
+# for building docs (they deserve it) we need *doc2* tools native
+BBCLASSEXTEND = "native"
+DEPENDS:class-native = "readline-native"
+PACKAGECONFIG:class-native = ""
+
+SRC_URI:append:class-native = " file://0001-reduce-build-to-conversion-tools-for-native-build.patch"
+
+do_install:class-native() {
+    install -d ${D}${bindir}
+	install ${B}/docs/*doc* ${D}${bindir}
+    rm ${D}${bindir}/*.o
+}
+
+PACKAGECONFIG ??= "cairo ${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
+PACKAGECONFIG[cairo] = "--with-cairo,--without-cairo,cairo pango"
+PACKAGECONFIG[lua] = "--with-lua,--without-lua,lua lua-native"
+# qt5 requires meta-qt5 layer, qt6 requires meta-qt6 layer
+PACKAGECONFIG[qt5] = "--with-qt=qt5 --with-qt5nativesysroot=${STAGING_DIR_NATIVE},,qtbase-native qtbase qtsvg qttools-native,,,qt6"
+PACKAGECONFIG[qt6] = "--with-qt --with-qt6nativesysroot=${STAGING_DIR_NATIVE},,qtbase-native qtbase qtsvg qttools-native qt5compat,,,qt5"
+PACKAGECONFIG[x11] = "--with-x,--without-x,virtual/libx11"
+
+EXTRA_OECONF = " \
+    --with-readline=${STAGING_LIBDIR}/.. \
+    --disable-wxwidgets \
+    --without-libcerf \
+    ${@bb.utils.contains_any('PACKAGECONFIG', 'qt5 qt6', '', '--without-qt', d)} \
+"
+
+do_compile:prepend() {
+    install -m 0644 ${UNPACKDIR}/qtplot-0.2/qtopia.trm ${S}/term/
+}
+
+do_install:append:class-target() {
+    install -d ${D}${datadir}/applications/
+    install -m 0644 ${UNPACKDIR}/gnuplot.desktop ${D}${datadir}/applications/
+    install -d ${D}${datadir}/pixmaps/
+    install -m 0644 ${UNPACKDIR}/gnuplot.png ${D}${datadir}/pixmaps/
+}
+
+PACKAGES =+ "${PN}-x11"
+
+RPROVIDES:${PN}-dbg += "${PN}-x11-dbg"
+
+DESCRIPTION:${PN}-x11 = "X11 display terminal for Gnuplot."
+SECTION:${PN}-x11 = "x11/scientific"
+FILES:${PN}-x11 = "${libexecdir} ${datadir}/applications ${datadir}/pixmaps ${libdir}/X11 "
+
+FILES:${PN} += "${datadir}/texmf"

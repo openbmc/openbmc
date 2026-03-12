@@ -14,9 +14,8 @@ SRC_URI = "git://git.code.sf.net/p/atftp/code;branch=master;protocol=https \
 
 inherit autotools update-rc.d systemd
 
-PACKAGECONFIG ??= "tcp-wrappers"
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[pcre] = "--enable-libpcre,--disable-libpcre,libpcre"
-PACKAGECONFIG[tcp-wrappers] = "--enable-libwrap,--disable-libwrap,tcp-wrappers"
 PACKAGECONFIG[readline] = "--enable-libreadline,--disable-libreadline,readline"
 
 INITSCRIPT_PACKAGES = "${PN}d"

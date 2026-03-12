@@ -1,0 +1,39 @@
+From 989dcd297223d6896c5892532d14984326fa093d Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 18 Jul 2025 16:52:57 +0800
+Subject: [PATCH] ufs_cmds: fix full_path buffer size in find_bsg_device
+
+The full_path buffer consists of: path + '/' + files->d_name + '\0'
+So the buffer size should be: strlen(path) + strlen(files->d_name) + 2
+
+Fix crash when running 32-bit binary on 64-bit system:
+$ ufs-utils list_bsg
+malloc(): invalid next size (unsorted)
+Aborted (core dumped)
+
+Fix #58
+
+Upstream-Status: Backport
+[https://github.com/SanDisk-Open-Source/ufs-utils/commit/989dcd297223d6896c5892532d14984326fa093d]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ ufs_cmds.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ufs_cmds.c b/ufs_cmds.c
+index ddb037c..a6faa27 100644
+--- a/ufs_cmds.c
++++ b/ufs_cmds.c
+@@ -1520,7 +1520,7 @@ static int find_bsg_device(char* path, int *counter) {
+ 			if ((strcmp(files->d_name, ".") != 0) &&
+ 			    (strcmp(files->d_name, "..") != 0)) {
+ 				char *full_path = (char *)malloc(strlen(path) +
+-						   strlen(files->d_name) + 1);
++						   strlen(files->d_name) + 2);
+ 				sprintf(full_path, "%s/%s",
+ 					path, files->d_name);
+ 				rc = find_bsg_device(full_path, counter);
+-- 
+2.34.1
+

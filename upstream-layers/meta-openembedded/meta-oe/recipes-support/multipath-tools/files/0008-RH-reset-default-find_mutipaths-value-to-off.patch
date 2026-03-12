@@ -1,4 +1,4 @@
-From 87e19d273c46fe78933627fc4e8046e3a76da47a Mon Sep 17 00:00:00 2001
+From 261ef06a4fb24f533c240a0a747a165eec0ee0dd Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 11:12:01 +0800
 Subject: [PATCH] RH: reset default find_mutipaths value to off
@@ -29,6 +29,3 @@ index 02f7e57c..98dd66f7 100644
  #define DEFAULT_FAST_IO_FAIL	5
  #define DEFAULT_DEV_LOSS_TMO	600
  #define DEFAULT_RETAIN_HWHANDLER RETAIN_HWHANDLER_ON
--- 
-2.25.1
-

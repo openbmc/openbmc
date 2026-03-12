@@ -10,6 +10,9 @@ So remove it because there are no option to disable the instalation.
 Upstream-Status: Pending
 
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
+
+Rebased on latest version.
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
 ---
  CMakeLists.txt | 1 -
  1 file changed, 1 deletion(-)
@@ -18,11 +21,20 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index ed6e603..ef53dc5 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -1224,7 +1224,6 @@ if (ENABLE_UNITTESTS AND ENABLE_CXX11)
+@@ -1548,16 +1548,6 @@ if (ENABLE_UNITTESTS AND ENABLE_CXX11)
+ 	enable_testing()
  endif()
  
- 
--install(PROGRAMS scripts/srt-ffplay DESTINATION ${CMAKE_INSTALL_BINDIR})
- 
- 
+-
+-if(NOT NEED_DESTINATION)
+-	install(PROGRAMS scripts/srt-ffplay TYPE BIN)
+-elseif (DEFINED CMAKE_INSTALL_BINDIR)
+-	install(PROGRAMS scripts/srt-ffplay DESTINATION ${CMAKE_INSTALL_BINDIR})
+-else()
+-	message(WARNING "No location to install scripts/srt-ffplay")
+-endif()
+-
+-
  if (DEFINED SRT_EXTRA_APPS_INC)
+ 	include(${SRT_EXTRA_APPS_INC}.cmake)
+ 	# No extra variables expected. Just use the variables

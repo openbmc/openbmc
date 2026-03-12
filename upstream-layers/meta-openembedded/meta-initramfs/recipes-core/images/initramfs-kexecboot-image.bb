@@ -27,4 +27,8 @@ IMAGE_ROOTFS_EXTRA_SPACE = "0"
 
 # disable runtime dependency on run-postinsts -> update-rc.d
 ROOTFS_BOOTSTRAP_INSTALL = ""
-
+# Match what kexec supports in core
+COMPATIBLE_HOST = '(x86_64.*|i.86.*|arm.*|aarch64.*|powerpc.*|mips.*|riscv64.*)-(linux|freebsd.*)'
+# makedumpfile would not compile on mips/rv32
+COMPATIBLE_HOST:mipsarcho32 = "null"
+COMPATIBLE_HOST:riscv32 = "null"

@@ -6,16 +6,19 @@ Subject: [PATCH] add missing dynamic library to FLTK_LIBRARIES
 Upstream-Status: Pending
 
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Update for 1.16.0
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
  CMakeLists.txt | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 80c2762c..eb581600 100644
+index a5981938..dd13d0df 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -315,6 +315,8 @@ if(BUILD_VIEWER)
-   set(CMAKE_REQUIRED_LIBRARIES)
+   endif()
  endif()
  
 +set(FLTK_LIBRARIES ${FLTK_LIBRARIES} -lm -ldl -lpng -ljpeg)
@@ -24,5 +27,5 @@ index 80c2762c..eb581600 100644
  trioption(ENABLE_GNUTLS "Enable protocol encryption and advanced authentication")
  if(ENABLE_GNUTLS)
 -- 
-2.25.1
+2.43.0
 

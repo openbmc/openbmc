@@ -1,0 +1,15 @@
+#!/bin/sh
+
+execute_test() {
+    eval "./$1" && echo "PASS: $1" || echo "FAIL: $1"
+}
+
+execute_test "case"
+execute_test "custom"
+execute_test "iterate"
+execute_test "misc"
+execute_test "printproperty"
+execute_test "valid"
+execute_test "charwidth"
+execute_test "graphemetest data/GraphemeBreakTest.txt"
+execute_test "normtest data/NormalizationTest.txt"

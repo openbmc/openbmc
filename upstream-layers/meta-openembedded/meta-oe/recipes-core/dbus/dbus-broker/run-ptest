@@ -1,0 +1,19 @@
+#!/bin/sh
+RET=0
+
+run_tests(){
+  for t in *; do
+    if ./$t; then
+      echo PASS: $t
+    else
+      echo FAIL: $t
+      RET=1
+    fi
+  done
+}
+
+cd /usr/lib/dbus-broker/tests/dbus
+run_tests
+cd /usr/lib/dbus-broker/tests/unit
+run_tests
+exit $RET

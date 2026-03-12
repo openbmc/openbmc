@@ -16,13 +16,12 @@ SRCREV = "00a12c234e2506f5cab683460199575f13c454db"
 SRCBRANCH = "v257-stable"
 SRC_URI = "git://github.com/systemd/systemd.git;protocol=https;branch=${SRCBRANCH}"
 
-
 DEPENDS = " \
     cryptsetup-native \
     gperf-native \
-    libcap \
+    libcap-native \
     python3-jinja2-native \
-    util-linux \
+    util-linux-native \
 "
 
 inherit meson pkgconfig gettext native

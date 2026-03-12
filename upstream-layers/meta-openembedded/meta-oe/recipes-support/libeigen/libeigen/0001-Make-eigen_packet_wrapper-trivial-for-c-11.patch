@@ -1,0 +1,26 @@
+From 0295f81a835ef69e2bacd9e75ab5782eca398720 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Antonio=20S=C3=A1nchez?= <cantonios@google.com>
+Date: Thu, 2 Oct 2025 17:53:19 +0000
+Subject: [PATCH] Make `eigen_packet_wrapper` trivial for c++11.
+
+Upstream-Status: Backport [https://gitlab.com/libeigen/eigen/-/commit/0295f81a835ef69e2bacd9e75ab5782eca398720]
+---
+ Eigen/src/Core/GenericPacketMath.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Eigen/src/Core/GenericPacketMath.h b/Eigen/src/Core/GenericPacketMath.h
+index af45f3936..4aeb77de8 100644
+--- a/Eigen/src/Core/GenericPacketMath.h
++++ b/Eigen/src/Core/GenericPacketMath.h
+@@ -160,7 +160,11 @@ struct eigen_packet_wrapper
+ {
+   EIGEN_ALWAYS_INLINE operator T&() { return m_val; }
+   EIGEN_ALWAYS_INLINE operator const T&() const { return m_val; }
++#if EIGEN_HAS_CXX11
++  EIGEN_ALWAYS_INLINE eigen_packet_wrapper() = default;
++#else
+   EIGEN_ALWAYS_INLINE eigen_packet_wrapper() {};
++#endif
+   EIGEN_ALWAYS_INLINE eigen_packet_wrapper(const T &v) : m_val(v) {}
+   EIGEN_ALWAYS_INLINE eigen_packet_wrapper& operator=(const T &v) {
+     m_val = v;

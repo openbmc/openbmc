@@ -1,4 +1,4 @@
-From f0d8240dbf594e6dfab31fd7d70ce340ac365a65 Mon Sep 17 00:00:00 2001
+From ab23817b4f4a02de21f63800adc30d6236c15c8b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sun, 3 Nov 2024 15:50:50 -0800
 Subject: [PATCH] tcl.m4: Recognize tclsh9

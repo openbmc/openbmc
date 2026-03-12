@@ -104,6 +104,7 @@ signing_import_prepare() {
 
     export _SIGNING_ENV_FILE_="${B}/meta-signing.env"
     rm -f "$_SIGNING_ENV_FILE_"
+    install -m 600 /dev/null "$_SIGNING_ENV_FILE_"
 
     export SOFTHSM2_CONF="${B}/softhsm2.conf"
     export SOFTHSM2_DIR="${B}/softhsm2.tokens"
@@ -331,7 +332,7 @@ signing_import_install() {
     install -d ${D}${localstatedir}/lib/softhsm/tokens/${PN}
     install -m 600 -t ${D}${localstatedir}/lib/softhsm/tokens/${PN} ${B}/softhsm2.tokens/*/*
     install -d ${D}${localstatedir}/lib/meta-signing.env.d
-    install -m 644 "${B}/meta-signing.env" ${D}${localstatedir}/lib/meta-signing.env.d/${PN}
+    install -m 600 "${B}/meta-signing.env" ${D}${localstatedir}/lib/meta-signing.env.d/${PN}
 }
 
 signing_prepare() {

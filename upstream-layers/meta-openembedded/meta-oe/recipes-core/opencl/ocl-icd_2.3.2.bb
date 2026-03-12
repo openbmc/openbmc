@@ -9,11 +9,11 @@ SRC_URI = "git://github.com/OCL-dev/ocl-icd.git;protocol=https;branch=master"
 
 SRCREV = "fdde6677b21329432db8b481e2637cd10f7d3cb2"
 
+inherit autotools features_check
 
-inherit autotools
+REQUIRED_DISTRO_FEATURES = "opencl"
 
 DEPENDS = "ruby-native"
-PROVIDES = "virtual/opencl-icd"
-RPROVIDES:${PN} = "virtual-opencl-icd"
+PROVIDES = "virtual/libopencl1"
 
 BBCLASSEXTEND = "native nativesdk"

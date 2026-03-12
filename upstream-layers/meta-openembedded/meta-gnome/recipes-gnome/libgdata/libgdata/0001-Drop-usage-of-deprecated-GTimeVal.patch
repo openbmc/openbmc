@@ -1,0 +1,1134 @@
+From ef8722baa444958601bfddfee3a977ccf4f7c02c Mon Sep 17 00:00:00 2001
+From: Daniel Kolesa <dkolesa@igalia.com>
+Date: Tue, 16 Mar 2021 17:22:08 +0100
+Subject: [PATCH] drop usage of deprecated GTimeVal
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/libgdata/-/commit/ef8722baa444958601bfddfee3a977ccf4f7c02c]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+
+---
+ demos/calendar/calendar-cli.c                 | 90 ++++++++++++-------
+ demos/tasks/tasks-cli.c                       | 31 ++++---
+ demos/youtube/youtube-cli.c                   |  9 +-
+ gdata/gdata-access-rule.c                     |  4 +-
+ gdata/gdata-batch-operation.c                 |  8 +-
+ gdata/gdata-oauth1-authorizer.c               |  6 +-
+ gdata/gdata-parser.c                          | 48 +++++-----
+ gdata/gdata-service.c                         |  5 +-
+ .../services/calendar/gdata-calendar-event.c  | 18 ++--
+ .../services/calendar/gdata-calendar-query.c  |  6 +-
+ .../contacts/gdata-contacts-contact.c         |  4 +-
+ .../services/contacts/gdata-contacts-group.c  |  4 +-
+ .../documents/gdata-documents-query.c         |  8 +-
+ .../picasaweb/gdata-picasaweb-album.c         |  8 +-
+ .../services/picasaweb/gdata-picasaweb-file.c |  8 +-
+ gdata/services/youtube/gdata-youtube-query.c  | 18 ++--
+ .../services/youtube/gdata-youtube-service.c  | 10 ++-
+ gdata/tests/calendar.c                        | 60 +++++++------
+ gdata/tests/contacts.c                        | 22 +++--
+ gdata/tests/general.c                         |  7 +-
+ gdata/tests/perf.c                            | 15 ++--
+ gdata/tests/picasaweb.c                       | 14 +--
+ gdata/tests/youtube.c                         | 14 +--
+ 23 files changed, 231 insertions(+), 186 deletions(-)
+
+diff --git a/demos/calendar/calendar-cli.c b/demos/calendar/calendar-cli.c
+index a1d84f67..4f601f48 100644
+--- a/demos/calendar/calendar-cli.c
++++ b/demos/calendar/calendar-cli.c
+@@ -38,13 +38,13 @@ print_usage (char *argv[])
+ 	return -1;
+ }
+ 
+-/* Convert a GTimeVal to an ISO 8601 date string (without a time component). */
++/* Convert a unix time to an ISO 8601 date string (without a time component). */
+ static gchar *
+-tv_to_iso8601_date (GTimeVal *tv)
++tv_to_iso8601_date (gint64 tv)
+ {
+ 	struct tm *tm;
+ 
+-	tm = gmtime (&tv->tv_sec);
++	tm = gmtime (&tv);
+ 
+ 	return g_strdup_printf ("%04d-%02d-%02d",
+ 	                        tm->tm_year + 1900,
+@@ -81,8 +81,9 @@ print_event (GDataCalendarEvent *event)
+ {
+ 	const gchar *title, *id, *description, *status, *visibility;
+ 	const gchar *transparency, *uid;
+-	GTimeVal date_published_tv = { 0, };
+-	GTimeVal date_edited_tv = { 0, };
++	GDateTime *tmp;
++	gint64 date_published_tv;
++	gint64 date_edited_tv;
+ 	gchar *date_published = NULL;  /* owned */
+ 	gchar *date_edited = NULL;  /* owned */
+ 	guint sequence;
+@@ -95,10 +96,14 @@ print_event (GDataCalendarEvent *event)
+ 	title = gdata_entry_get_title (GDATA_ENTRY (event));
+ 	id = gdata_entry_get_id (GDATA_ENTRY (event));
+ 	description = gdata_entry_get_content (GDATA_ENTRY (event));
+-	date_published_tv.tv_sec = gdata_entry_get_published (GDATA_ENTRY (event));
+-	date_published = g_time_val_to_iso8601 (&date_published_tv);
+-	date_edited_tv.tv_sec = gdata_calendar_event_get_edited (event);
+-	date_edited = g_time_val_to_iso8601 (&date_edited_tv);
++	date_published_tv = gdata_entry_get_published (GDATA_ENTRY (event));
++	tmp = g_date_time_new_from_unix_utc (date_published_tv);
++	date_published = g_date_time_format_iso8601 (tmp);
++	g_date_time_unref (tmp);
++	date_edited_tv = gdata_calendar_event_get_edited (event);
++	tmp = g_date_time_new_from_unix_utc (date_edited_tv);
++	date_edited = g_date_time_format_iso8601 (tmp);
++	g_date_time_unref (tmp);
+ 	status = gdata_calendar_event_get_status (event);
+ 	visibility = gdata_calendar_event_get_visibility (event);
+ 	transparency = gdata_calendar_event_get_transparency (event);
+@@ -155,20 +160,25 @@ print_event (GDataCalendarEvent *event)
+ 
+ 	for (; times != NULL; times = times->next) {
+ 		GDataGDWhen *when;
+-		GTimeVal start_time = { 0, }, end_time = { 0, };
++		gint64 start_time, end_time;
+ 		gchar *start = NULL, *end = NULL;  /* owned */
+ 
+ 		when = GDATA_GD_WHEN (times->data);
+ 
+-		start_time.tv_sec = gdata_gd_when_get_start_time (when);
+-		end_time.tv_sec = gdata_gd_when_get_end_time (when);
++		start_time = gdata_gd_when_get_start_time (when);
++		end_time = gdata_gd_when_get_end_time (when);
+ 
+ 		if (gdata_gd_when_is_date (when)) {
+-			start = tv_to_iso8601_date (&start_time);
+-			end = tv_to_iso8601_date (&end_time);
++			start = tv_to_iso8601_date (start_time);
++			end = tv_to_iso8601_date (end_time);
+ 		} else {
+-			start = g_time_val_to_iso8601 (&start_time);
+-			end = g_time_val_to_iso8601 (&end_time);
++			GDateTime *tmp;
++			tmp = g_date_time_new_from_unix_utc (start_time);
++			start = g_date_time_format_iso8601 (tmp);
++			g_date_time_unref (tmp);
++			tmp = g_date_time_new_from_unix_utc (end_time);
++			end = g_date_time_format_iso8601 (tmp);
++			g_date_time_unref (tmp);
+ 		}
+ 
+ 		g_print ("    • %s to %s (%s)\n",
+@@ -416,8 +426,7 @@ command_insert_event (int argc, char *argv[])
+ 	GDataAuthorizer *authorizer = NULL;
+ 	GDataGDWhen *when = NULL;
+ 	gboolean is_date;
+-	gchar *start_with_time = NULL, *end_with_time = NULL;
+-	GTimeVal start_tv = { 0, }, end_tv = { 0, };
++	GDateTime *start_tv = NULL, *end_tv = NULL;
+ 	gint i;
+ 
+ 	if (argc < 7) {
+@@ -454,25 +463,38 @@ command_insert_event (int argc, char *argv[])
+ 	event = gdata_calendar_event_new (NULL);
+ 	gdata_entry_set_title (GDATA_ENTRY (event), title);
+ 
+-	start_with_time = g_strconcat (start, "T00:00:00Z", NULL);
+-	end_with_time = g_strconcat (end, "T00:00:00Z", NULL);
+-
+-	if (g_time_val_from_iso8601 (start, &start_tv) &&
+-	    g_time_val_from_iso8601 (end, &end_tv)) {
++	start_tv = g_date_time_new_from_iso8601 (start, NULL);
++	end_tv = g_date_time_new_from_iso8601 (end, NULL);
++	if (start_tv && end_tv) {
+ 		/* Includes time. */
+ 		is_date = FALSE;
+-	} else if (g_time_val_from_iso8601 (start_with_time, &start_tv) &&
+-	           g_time_val_from_iso8601 (end_with_time, &end_tv)) {
+-		/* Does not include time. */
+-		is_date = TRUE;
+ 	} else {
+-		g_printerr ("%s: Could not parse start time ‘%s’ and end time "
+-		            "‘%s’ as ISO 8601.\n", argv[0], start, end);
+-		retval = 1;
+-		goto done;
++		gchar *start_with_time, *end_with_time;
++
++		g_clear_pointer (&start_tv, g_date_time_unref);
++		g_clear_pointer (&end_tv, g_date_time_unref);
++
++		start_with_time = g_strconcat (start, "T00:00:00Z", NULL);
++		end_with_time = g_strconcat (end, "T00:00:00Z", NULL);
++
++		start_tv = g_date_time_new_from_iso8601 (start_with_time, NULL);
++		end_tv = g_date_time_new_from_iso8601 (end_with_time, NULL);
++
++		g_free (start_with_time);
++		g_free (end_with_time);
++
++		if (start_tv && end_tv) {
++			/* Does not include time. */
++			is_date = TRUE;
++		} else {
++			g_printerr ("%s: Could not parse start time ‘%s’ and end time "
++			            "‘%s’ as ISO 8601.\n", argv[0], start, end);
++			retval = 1;
++			goto done;
++		}
+ 	}
+ 
+-	when = gdata_gd_when_new (start_tv.tv_sec, end_tv.tv_sec, is_date);
++	when = gdata_gd_when_new (g_date_time_to_unix (start_tv), g_date_time_to_unix (end_tv), is_date);
+ 	gdata_calendar_event_add_time (event, when);
+ 	g_object_unref (when);
+ 
+@@ -507,8 +529,8 @@ command_insert_event (int argc, char *argv[])
+ 	print_event (inserted_event);
+ 
+ done:
+-	g_free (start_with_time);
+-	g_free (end_with_time);
++	g_clear_pointer (&start_tv, g_date_time_unref);
++	g_clear_pointer (&end_tv, g_date_time_unref);
+ 	g_clear_object (&inserted_event);
+ 	g_clear_object (&event);
+ 	g_clear_object (&authorizer);
+diff --git a/demos/tasks/tasks-cli.c b/demos/tasks/tasks-cli.c
+index c795761a..ef4ae900 100644
+--- a/demos/tasks/tasks-cli.c
++++ b/demos/tasks/tasks-cli.c
+@@ -67,35 +67,42 @@ print_task (GDataTasksTask *task)
+ {
+ 	const gchar *title, *id, *description, *parent_id, *position, *notes;
+ 	const gchar *status;
+-	GTimeVal date_published_tv = { 0, };
++	GDateTime *tmp;
++	gint64 date_published_tv;
+ 	gchar *date_published = NULL;  /* owned */
+-	GTimeVal due_tv = { 0, };
++	gint64 due_tv;
+ 	gchar *due = NULL;  /* owned */
+-	GTimeVal completed_tv = { 0, };
++	gint64 completed_tv;
+ 	gchar *completed = NULL;  /* owned */
+ 	gboolean is_deleted, is_hidden;
+ 
+ 	title = gdata_entry_get_title (GDATA_ENTRY (task));
+ 	id = gdata_entry_get_id (GDATA_ENTRY (task));
+ 	description = gdata_entry_get_content (GDATA_ENTRY (task));
+-	date_published_tv.tv_sec = gdata_entry_get_published (GDATA_ENTRY (task));
+-	date_published = g_time_val_to_iso8601 (&date_published_tv);
++	date_published_tv = gdata_entry_get_published (GDATA_ENTRY (task));
++	tmp = g_date_time_new_from_unix_utc (date_published_tv);
++	date_published = g_date_time_format_iso8601 (tmp);
++	g_date_time_unref (tmp);
+ 	parent_id = gdata_tasks_task_get_parent (task);
+ 	position = gdata_tasks_task_get_position (task);
+ 	notes = gdata_tasks_task_get_notes (task);
+ 	status = gdata_tasks_task_get_status (task);
+-	due_tv.tv_sec = gdata_tasks_task_get_due (task);
+-	due = g_time_val_to_iso8601 (&due_tv);
+-	completed_tv.tv_sec = gdata_tasks_task_get_completed (task);
+-	completed = g_time_val_to_iso8601 (&completed_tv);
++	due_tv = gdata_tasks_task_get_due (task);
++	tmp = g_date_time_new_from_unix_utc (due_tv);
++	due = g_date_time_format_iso8601 (tmp);
++	g_date_time_unref (tmp);
++	completed_tv = gdata_tasks_task_get_completed (task);
++	tmp = g_date_time_new_from_unix_utc (completed_tv);
++	completed = g_date_time_format_iso8601 (tmp);
++	g_date_time_unref (tmp);
+ 	is_deleted = gdata_tasks_task_is_deleted (task);
+ 	is_hidden = gdata_tasks_task_is_hidden (task);
+ 
+ 	g_print ("%s — %s\n", id, title);
+-	g_print ("   Published: %s\n", date_published_tv.tv_sec != 0 ? date_published : "unknown");
++	g_print ("   Published: %s\n", date_published_tv != 0 ? date_published : "unknown");
+ 	g_print ("   Status: %s\n", format_status (status));
+-	g_print ("   Due: %s\n", due_tv.tv_sec != 0 ? due : "not set");
+-	g_print ("   Completed: %s\n", completed_tv.tv_sec != 0 ? completed : "not yet");
++	g_print ("   Due: %s\n", due_tv != 0 ? due : "not set");
++	g_print ("   Completed: %s\n", completed_tv != 0 ? completed : "not yet");
+ 	g_print ("   Deleted? %s\n", is_deleted ? "Yes" : "No");
+ 	g_print ("   Hidden? %s\n", is_hidden ? "Yes" : "No");
+ 	g_print ("   Position: %s\n", position);
+diff --git a/demos/youtube/youtube-cli.c b/demos/youtube/youtube-cli.c
+index 37ff4afc..e3e0e3dc 100644
+--- a/demos/youtube/youtube-cli.c
++++ b/demos/youtube/youtube-cli.c
+@@ -46,7 +46,8 @@ print_video (GDataYouTubeVideo *video)
+ {
+ 	const gchar *title, *player_uri, *id, *description;
+ 	GList/*<unowned GDataMediaThumbnail>*/ *thumbnails;
+-	GTimeVal date_published_tv = { 0, };
++	GDateTime *tmp;
++	gint64 date_published_tv;
+ 	gchar *date_published = NULL;  /* owned */
+ 	guint duration;  /* seconds */
+ 	guint rating_min = 0, rating_max = 0, rating_count = 0;
+@@ -57,8 +58,10 @@ print_video (GDataYouTubeVideo *video)
+ 	id = gdata_entry_get_id (GDATA_ENTRY (video));
+ 	description = gdata_youtube_video_get_description (video);
+ 	thumbnails = gdata_youtube_video_get_thumbnails (video);
+-	date_published_tv.tv_sec = gdata_entry_get_published (GDATA_ENTRY (video));
+-	date_published = g_time_val_to_iso8601 (&date_published_tv);
++	date_published_tv = gdata_entry_get_published (GDATA_ENTRY (video));
++	tmp = g_date_time_new_from_unix_utc (date_published_tv);
++	date_published = g_date_time_format_iso8601 (tmp);
++	g_date_time_unref (tmp);
+ 	duration = gdata_youtube_video_get_duration (video);
+ 	gdata_youtube_video_get_rating (video, &rating_min, &rating_max,
+ 	                                &rating_count, &rating_average);
+diff --git a/gdata/gdata-access-rule.c b/gdata/gdata-access-rule.c
+index 9fd1ce95..0064623f 100644
+--- a/gdata/gdata-access-rule.c
++++ b/gdata/gdata-access-rule.c
+@@ -257,12 +257,10 @@ gdata_access_rule_constructor (GType type, guint n_construct_params, GObjectCons
+ 	/* We can't create these in init, or they would collide with the group and control created when parsing the XML */
+ 	if (_gdata_parsable_is_constructed_from_xml (GDATA_PARSABLE (object)) == FALSE) {
+ 		GDataAccessRulePrivate *priv = GDATA_ACCESS_RULE (object)->priv;
+-		GTimeVal time_val;
+ 
+ 		/* Set the edited property to the current time (creation time). We don't do this in *_init() since that would cause
+ 		 * setting it from parse_xml() to fail (duplicate element). */
+-		g_get_current_time (&time_val);
+-		priv->edited = time_val.tv_sec;
++		priv->edited = g_get_real_time () / G_USEC_PER_SEC;
+ 
+ 		/* Set up the role and scope type */
+ 		priv->role = g_strdup (GDATA_ACCESS_ROLE_NONE);
+diff --git a/gdata/gdata-batch-operation.c b/gdata/gdata-batch-operation.c
+index f78801ed..212fcb0b 100644
+--- a/gdata/gdata-batch-operation.c
++++ b/gdata/gdata-batch-operation.c
+@@ -598,7 +598,7 @@ gdata_batch_operation_run (GDataBatchOperation *self, GCancellable *cancellable,
+ 	GDataBatchOperationPrivate *priv = self->priv;
+ 	SoupMessage *message;
+ 	GDataFeed *feed;
+-	GTimeVal updated;
++	gint64 updated;
+ 	gchar *upload_data;
+ 	guint status;
+ 	GHashTableIter iter;
+@@ -638,9 +638,9 @@ gdata_batch_operation_run (GDataBatchOperation *self, GCancellable *cancellable,
+ 	message = _gdata_service_build_message (priv->service, priv->authorization_domain, SOUP_METHOD_POST, priv->feed_uri, NULL, TRUE);
+ 
+ 	/* Build the request */
+-	g_get_current_time (&updated);
++	updated = g_get_real_time () / G_USEC_PER_SEC;
+ 	feed = _gdata_feed_new (GDATA_TYPE_FEED, "Batch operation feed",
+-	                        "batch1", updated.tv_sec);
++	                        "batch1", updated);
+ 
+ 	g_hash_table_iter_init (&iter, priv->operations);
+ 	while (g_hash_table_iter_next (&iter, &op_id, (gpointer*) &op) == TRUE) {
+@@ -658,7 +658,7 @@ gdata_batch_operation_run (GDataBatchOperation *self, GCancellable *cancellable,
+ 			g_free (entry_uri);
+ 
+ 			gdata_entry_set_title (entry, "Batch operation query");
+-			_gdata_entry_set_updated (entry, updated.tv_sec);
++			_gdata_entry_set_updated (entry, updated);
+ 
+ 			_gdata_entry_set_batch_data (entry, op->id, op->type);
+ 			_gdata_feed_add_entry (feed, entry);
+diff --git a/gdata/gdata-oauth1-authorizer.c b/gdata/gdata-oauth1-authorizer.c
+index 7b857ac0..6d5fd5ec 100644
+--- a/gdata/gdata-oauth1-authorizer.c
++++ b/gdata/gdata-oauth1-authorizer.c
+@@ -471,7 +471,7 @@ sign_message (GDataOAuth1Authorizer *self, SoupMessage *message, const gchar *to
+ 	gchar *uri, *signature, *timestamp;
+ 	char *nonce;
+ 	gboolean is_first = TRUE;
+-	GTimeVal time_val;
++	gint64 time_val;
+ 	guchar signature_buf[HMAC_SHA1_LEN];
+ 	gsize signature_buf_len;
+ 	GHmac *signature_hmac;
+@@ -494,8 +494,8 @@ sign_message (GDataOAuth1Authorizer *self, SoupMessage *message, const gchar *to
+ 
+ 	/* Add various standard parameters to the list (note: this modifies the hash table belonging to the caller) */
+ 	nonce = oauth_gen_nonce ();
+-	g_get_current_time (&time_val);
+-	timestamp = g_strdup_printf ("%li", time_val.tv_sec);
++	time_val = g_get_real_time () / G_USEC_PER_SEC;
++	timestamp = g_strdup_printf ("%li", time_val);
+ 
+ 	if (parameters == NULL) {
+ 		parameters = g_hash_table_new (g_str_hash, g_str_equal);
+diff --git a/gdata/gdata-parser.c b/gdata/gdata-parser.c
+index c1cfe00d..d6ab92e2 100644
+--- a/gdata/gdata-parser.c
++++ b/gdata/gdata-parser.c
+@@ -207,21 +207,22 @@ gboolean
+ gdata_parser_int64_from_date (const gchar *date, gint64 *_time)
+ {
+ 	gchar *iso8601_date;
+-	gboolean success;
+-	GTimeVal time_val;
++	g_autoptr(GDateTime) time_val = NULL;
+ 
+ 	if (strlen (date) != 10 && strlen (date) != 8)
+ 		return FALSE;
+ 
+ 	/* Note: This doesn't need translating, as it's outputting an ISO 8601 time string */
+ 	iso8601_date = g_strdup_printf ("%sT00:00:00Z", date);
+-	success = g_time_val_from_iso8601 (iso8601_date, &time_val);
++	time_val = g_date_time_new_from_iso8601 (iso8601_date, NULL);
+ 	g_free (iso8601_date);
+ 
+-	if (success == TRUE)
+-		*_time = time_val.tv_sec;
++	if (time_val) {
++		*_time = g_date_time_to_unix (time_val);
++		return TRUE;
++	}
+ 
+-	return success;
++	return FALSE;
+ }
+ 
+ gchar *
+@@ -240,21 +241,24 @@ gdata_parser_date_from_int64 (gint64 _time)
+ gchar *
+ gdata_parser_int64_to_iso8601 (gint64 _time)
+ {
+-	GTimeVal time_val;
++	g_autoptr(GDateTime) time_val = NULL;
++
++	time_val = g_date_time_new_from_unix_utc (_time);
+ 
+-	time_val.tv_sec = _time;
+-	time_val.tv_usec = 0;
++	if (!time_val)
++		return NULL;
+ 
+-	return g_time_val_to_iso8601 (&time_val);
++	return g_date_time_format_iso8601 (time_val);
+ }
+ 
+ gboolean
+ gdata_parser_int64_from_iso8601 (const gchar *date, gint64 *_time)
+ {
+-	GTimeVal time_val;
++	g_autoptr(GDateTime) time_val = NULL;
+ 
+-	if (g_time_val_from_iso8601 (date, &time_val) == TRUE) {
+-		*_time = time_val.tv_sec;
++	time_val = g_date_time_new_from_iso8601 (date, NULL);
++	if (time_val) {
++		*_time = g_date_time_to_unix (time_val);
+ 		return TRUE;
+ 	}
+ 
+@@ -479,7 +483,7 @@ gdata_parser_int64_time_from_element (xmlNode *element, const gchar *element_nam
+                                       gint64 *output, gboolean *success, GError **error)
+ {
+ 	xmlChar *text;
+-	GTimeVal time_val;
++	g_autoptr(GDateTime) time_val = NULL;
+ 
+ 	/* Check it's the right element */
+ 	if (xmlStrcmp (element->name, (xmlChar*) element_name) != 0)
+@@ -499,14 +503,15 @@ gdata_parser_int64_time_from_element (xmlNode *element, const gchar *element_nam
+ 		return TRUE;
+ 	}
+ 
+-	/* Attempt to parse the string as a GTimeVal */
+-	if (g_time_val_from_iso8601 ((gchar*) text, &time_val) == FALSE) {
++	/* Attempt to parse the string as a GDateTune */
++	time_val = g_date_time_new_from_iso8601 ((gchar *) text, NULL);
++	if (!time_val) {
+ 		*success = gdata_parser_error_not_iso8601_format (element, (gchar*) text, error);
+ 		xmlFree (text);
+ 		return TRUE;
+ 	}
+ 
+-	*output = time_val.tv_sec;
++	*output = g_date_time_to_unix (time_val);
+ 
+ 	/* Success! */
+ 	xmlFree (text);
+@@ -911,7 +916,7 @@ gdata_parser_int64_time_from_json_member (JsonReader *reader, const gchar *membe
+                                           gint64 *output, gboolean *success, GError **error)
+ {
+ 	const gchar *text;
+-	GTimeVal time_val;
++	g_autoptr(GDateTime) time_val = NULL;
+ 	const GError *child_error = NULL;
+ 
+ 	/* Check if there's such element */
+@@ -935,14 +940,15 @@ gdata_parser_int64_time_from_json_member (JsonReader *reader, const gchar *membe
+ 		return TRUE;
+ 	}
+ 
+-	/* Attempt to parse the string as a GTimeVal */
+-	if (g_time_val_from_iso8601 ((gchar*) text, &time_val) == FALSE) {
++	/* Attempt to parse the string as a GDateTime */
++	time_val = g_date_time_new_from_iso8601 (text, NULL);
++	if (!time_val) {
+ 		*success = gdata_parser_error_not_iso8601_format_json (reader, text, error);
+ 		return TRUE;
+ 	}
+ 
+ 	/* Success! */
+-	*output = time_val.tv_sec;
++	*output = g_date_time_to_unix (time_val);
+ 	*success = TRUE;
+ 
+ 	return TRUE;
+diff --git a/gdata/gdata-service.c b/gdata/gdata-service.c
+index fce970ec..40fbaf84 100644
+--- a/gdata/gdata-service.c
++++ b/gdata/gdata-service.c
+@@ -956,12 +956,9 @@ __gdata_service_query (GDataService *self, GDataAuthorizationDomain *domain, con
+ 
+ 	/* Are we off the end of the final page? */
+ 	if (query != NULL && _gdata_query_is_finished (query)) {
+-		GTimeVal updated;
+-
+ 		/* Build an empty dummy feed to signify the end of the list. */
+-		g_get_current_time (&updated);
+ 		return _gdata_feed_new (klass->feed_type, "Empty feed", "feed1",
+-		                        updated.tv_sec);
++		                        g_get_real_time () / G_USEC_PER_SEC);
+ 	}
+ 
+ 	/* Send the request. */
+diff --git a/gdata/services/calendar/gdata-calendar-event.c b/gdata/services/calendar/gdata-calendar-event.c
+index a3a4d713..4cdf2700 100644
+--- a/gdata/services/calendar/gdata-calendar-event.c
++++ b/gdata/services/calendar/gdata-calendar-event.c
+@@ -37,7 +37,7 @@
+  *	GDataGDWhere *where;
+  *	GDataGDWho *who;
+  *	GDataGDWhen *when;
+- *	GTimeVal current_time;
++ *	gint64 current_time;
+  *	GError *error = NULL;
+  *
+  *	/<!-- -->* Create a service *<!-- -->/
+@@ -58,8 +58,8 @@
+  *	gdata_calendar_event_add_person (event, who);
+  *	g_object_unref (who);
+  *
+- *	g_get_current_time (&current_time);
+- *	when = gdata_gd_when_new (current_time.tv_sec, current_time.tv_sec + 3600, FALSE);
++ *	current_time = g_get_real_time () / G_USEC_PER_SEC;
++ *	when = gdata_gd_when_new (current_time, current_time + 3600, FALSE);
+  *	gdata_calendar_event_add_time (event, when);
+  *	g_object_unref (when);
+  *
+@@ -374,12 +374,10 @@ gdata_calendar_event_constructor (GType type, guint n_construct_params, GObjectC
+ 
+ 	if (_gdata_parsable_is_constructed_from_xml (GDATA_PARSABLE (object)) == FALSE) {
+ 		GDataCalendarEventPrivate *priv = GDATA_CALENDAR_EVENT (object)->priv;
+-		GTimeVal time_val;
+ 
+ 		/* Set the edited property to the current time (creation time). We don't do this in *_init() since that would cause
+ 		 * setting it from parse_xml() to fail (duplicate element). */
+-		g_get_current_time (&time_val);
+-		priv->edited = time_val.tv_sec;
++		priv->edited = g_get_real_time () / G_USEC_PER_SEC;
+ 	}
+ 
+ 	return object;
+@@ -554,7 +552,7 @@ date_object_from_json (JsonReader *reader,
+ 	if (json_reader_read_member (reader, "dateTime")) {
+ 		const gchar *date_string;
+ 		const GError *child_error;
+-		GTimeVal time_val;
++		GDateTime *time_val;
+ 
+ 		date_string = json_reader_get_string_value (reader);
+ 		child_error = json_reader_get_error (reader);
+@@ -567,13 +565,15 @@ date_object_from_json (JsonReader *reader,
+ 			return TRUE;
+ 		}
+ 
+-		if (!g_time_val_from_iso8601 (date_string, &time_val)) {
++		time_val = g_date_time_new_from_iso8601 (date_string, NULL);
++		if (!time_val) {
+ 			*success = gdata_parser_error_not_iso8601_format_json (reader, date_string, error);
+ 			json_reader_end_member (reader);
+ 			return TRUE;
+ 		}
+ 
+-		date_time = time_val.tv_sec;
++		date_time = g_date_time_to_unix (time_val);
++		g_date_time_unref (time_val);
+ 		is_date = FALSE;
+ 		found_member = TRUE;
+ 	}
+diff --git a/gdata/services/calendar/gdata-calendar-query.c b/gdata/services/calendar/gdata-calendar-query.c
+index 37779bbe..dd019529 100644
+--- a/gdata/services/calendar/gdata-calendar-query.c
++++ b/gdata/services/calendar/gdata-calendar-query.c
+@@ -37,7 +37,7 @@
+  *	GDataCalendarCalendar *calendar;
+  *	GDataCalendarQuery *query;
+  *	GDataFeed *feed;
+- *	GTimeVal current_time;
++ *	gint64 current_time;
+  *	GList *i;
+  *	GError *error = NULL;
+  *
+@@ -47,8 +47,8 @@
+  *
+  *	/<!-- -->* Create the query to use. We're going to query for events within the next week which match the search term "party",
+  *	 * ordered by last modification time (descending). *<!-- -->/
+- *	g_get_current_time (&current_time);
+- *	query = gdata_calendar_query_new_with_limits ("party", current_time.tv_sec, current_time.tv_sec + 7 * 24 * 60 * 60);
++ *	current_time = g_get_real_time () / G_USEC_PER_SEC;
++ *	query = gdata_calendar_query_new_with_limits ("party", current_time, current_time + 7 * 24 * 60 * 60);
+  *	gdata_calendar_query_set_order_by (query, "lastmodified");
+  *
+  *	/<!-- -->* Execute the query *<!-- -->/
+diff --git a/gdata/services/contacts/gdata-contacts-contact.c b/gdata/services/contacts/gdata-contacts-contact.c
+index 4f511315..eb4148d0 100644
+--- a/gdata/services/contacts/gdata-contacts-contact.c
++++ b/gdata/services/contacts/gdata-contacts-contact.c
+@@ -582,12 +582,10 @@ gdata_contacts_contact_constructor (GType type, guint n_construct_params, GObjec
+ 
+ 	if (_gdata_parsable_is_constructed_from_xml (GDATA_PARSABLE (object)) == FALSE) {
+ 		GDataContactsContactPrivate *priv = GDATA_CONTACTS_CONTACT (object)->priv;
+-		GTimeVal time_val;
+ 
+ 		/* Set the edited property to the current time (creation time). We don't do this in *_init() since that would cause
+ 		 * setting it from parse_xml() to fail (duplicate element). */
+-		g_get_current_time (&time_val);
+-		priv->edited = time_val.tv_sec;
++		priv->edited = g_get_real_time () / G_USEC_PER_SEC;
+ 	}
+ 
+ 	return object;
+diff --git a/gdata/services/contacts/gdata-contacts-group.c b/gdata/services/contacts/gdata-contacts-group.c
+index 055f4255..2059369a 100644
+--- a/gdata/services/contacts/gdata-contacts-group.c
++++ b/gdata/services/contacts/gdata-contacts-group.c
+@@ -266,12 +266,10 @@ gdata_contacts_group_constructor (GType type, guint n_construct_params, GObjectC
+ 
+ 	if (_gdata_parsable_is_constructed_from_xml (GDATA_PARSABLE (object)) == FALSE) {
+ 		GDataContactsGroupPrivate *priv = GDATA_CONTACTS_GROUP (object)->priv;
+-		GTimeVal time_val;
+ 
+ 		/* Set the edited property to the current time (creation time). We don't do this in *_init() since that would cause setting it from
+ 		 * parse_xml() to fail (duplicate element). */
+-		g_get_current_time (&time_val);
+-		priv->edited = time_val.tv_sec;
++		priv->edited = g_get_real_time () / G_USEC_PER_SEC;
+ 	}
+ 
+ 	return object;
+diff --git a/gdata/services/documents/gdata-documents-query.c b/gdata/services/documents/gdata-documents-query.c
+index e589b524..4797718f 100644
+--- a/gdata/services/documents/gdata-documents-query.c
++++ b/gdata/services/documents/gdata-documents-query.c
+@@ -37,7 +37,7 @@
+  *	GDataDocumentsService *service;
+  *	GDataDocumentsQuery *query;
+  *	GDataFeed *feed;
+- *	GTimeVal current_time;
++ *	gint64 current_time;
+  *	GList *i;
+  *	GError *error = NULL;
+  *
+@@ -51,9 +51,9 @@
+  *	gdata_documents_query_add_collaborator (query, "example@gmail.com");
+  *	gdata_documents_query_set_show_deleted (query, TRUE);
+  *
+- *	g_get_current_time (&current_time);
+- *	gdata_query_set_updated_min (GDATA_QUERY (query), current_time.tv_sec - 7 * 24 * 60 * 60);
+- *	gdata_query_set_updated_max (GDATA_QUERY (query), current_time.tv_sec);
++ *	current_time = g_get_real_time () / G_USEC_PER_SEC;
++ *	gdata_query_set_updated_min (GDATA_QUERY (query), current_time - 7 * 24 * 60 * 60);
++ *	gdata_query_set_updated_max (GDATA_QUERY (query), current_time);
+  *
+  *	/<!-- -->* Execute the query *<!-- -->/
+  *	feed = gdata_documents_service_query_documents (service, query, NULL, NULL, NULL, &error);
+diff --git a/gdata/services/picasaweb/gdata-picasaweb-album.c b/gdata/services/picasaweb/gdata-picasaweb-album.c
+index 40fd8cfb..fd6d0abc 100644
+--- a/gdata/services/picasaweb/gdata-picasaweb-album.c
++++ b/gdata/services/picasaweb/gdata-picasaweb-album.c
+@@ -507,13 +507,13 @@ gdata_picasaweb_album_constructor (GType type, guint n_construct_params, GObject
+ 
+ 	if (_gdata_parsable_is_constructed_from_xml (GDATA_PARSABLE (object)) == FALSE) {
+ 		GDataPicasaWebAlbumPrivate *priv = GDATA_PICASAWEB_ALBUM (object)->priv;
+-		GTimeVal time_val;
++		gint64 time_val;
+ 
+ 		/* Set the edited and timestamp properties to the current time (creation time). bgo#599140
+ 		 * We don't do this in *_init() since that would cause setting it from parse_xml() to fail (duplicate element). */
+-		g_get_current_time (&time_val);
+-		priv->timestamp = (gint64) time_val.tv_sec * 1000;
+-		priv->edited = time_val.tv_sec;
++		time_val = g_get_real_time () / G_USEC_PER_SEC;
++		priv->timestamp = time_val * 1000;
++		priv->edited = time_val;
+ 	}
+ 
+ 	return object;
+diff --git a/gdata/services/picasaweb/gdata-picasaweb-file.c b/gdata/services/picasaweb/gdata-picasaweb-file.c
+index 53aab33b..96db23a6 100644
+--- a/gdata/services/picasaweb/gdata-picasaweb-file.c
++++ b/gdata/services/picasaweb/gdata-picasaweb-file.c
+@@ -690,13 +690,13 @@ gdata_picasaweb_file_constructor (GType type, guint n_construct_params, GObjectC
+ 
+ 	if (_gdata_parsable_is_constructed_from_xml (GDATA_PARSABLE (object)) == FALSE) {
+ 		GDataPicasaWebFilePrivate *priv = GDATA_PICASAWEB_FILE (object)->priv;
+-		GTimeVal time_val;
++		gint64 time_val;
+ 
+ 		/* Set the edited and timestamp properties to the current time (creation time). bgo#599140
+ 		 * We don't do this in *_init() since that would cause setting it from parse_xml() to fail (duplicate element). */
+-		g_get_current_time (&time_val);
+-		priv->timestamp = (gint64) time_val.tv_sec * 1000;
+-		priv->edited = time_val.tv_sec;
++		time_val = g_get_real_time () / G_USEC_PER_SEC;
++		priv->timestamp = time_val * 1000;
++		priv->edited = time_val;
+ 	}
+ 
+ 	return object;
+diff --git a/gdata/services/youtube/gdata-youtube-query.c b/gdata/services/youtube/gdata-youtube-query.c
+index 212a0d10..bb5cff15 100644
+--- a/gdata/services/youtube/gdata-youtube-query.c
++++ b/gdata/services/youtube/gdata-youtube-query.c
+@@ -572,22 +572,20 @@ get_query_uri (GDataQuery *self, const gchar *feed_uri, GString *query_uri, gboo
+ 
+ 	if (priv->age != GDATA_YOUTUBE_AGE_ALL_TIME) {
+ 		gchar *after;
+-		GTimeVal tv = { 0, };
++		GDateTime *tv, *tv2;
+ 
+-		g_get_current_time (&tv);
+-
+-		/* Squash the microseconds; they’re not useful. */
+-		tv.tv_usec = 0;
++		/* don't use g_date_time_new_now_utc (squash microseconds) */
++		tv2 = g_date_time_new_from_unix_utc (g_get_real_time () / G_USEC_PER_SEC);
+ 
+ 		switch (priv->age) {
+ 		case GDATA_YOUTUBE_AGE_TODAY:
+-			tv.tv_sec -= 24 * 60 * 60;
++			tv = g_date_time_add_days (tv2, -1);
+ 			break;
+ 		case GDATA_YOUTUBE_AGE_THIS_WEEK:
+-			tv.tv_sec -= 7 * 24 * 60 * 60;
++			tv = g_date_time_add_weeks (tv2, -1);
+ 			break;
+ 		case GDATA_YOUTUBE_AGE_THIS_MONTH:
+-			tv.tv_sec -= 31 * 24 * 60 * 60;
++			tv = g_date_time_add_months (tv2, -1);
+ 			break;
+ 		case GDATA_YOUTUBE_AGE_ALL_TIME:
+ 		default:
+@@ -596,9 +594,11 @@ get_query_uri (GDataQuery *self, const gchar *feed_uri, GString *query_uri, gboo
+ 
+ 		APPEND_SEP
+ 
+-		after = g_time_val_to_iso8601 (&tv);
++		after = g_date_time_format_iso8601 (tv);
+ 		g_string_append_printf (query_uri, "publishedAfter=%s", after);
+ 		g_free (after);
++		g_date_time_unref (tv);
++		g_date_time_unref (tv2);
+ 	}
+ 
+ 	/* We don’t need to use APPEND_SEP below here, as this parameter is
+diff --git a/gdata/services/youtube/gdata-youtube-service.c b/gdata/services/youtube/gdata-youtube-service.c
+index 75134e57..35994c54 100644
+--- a/gdata/services/youtube/gdata-youtube-service.c
++++ b/gdata/services/youtube/gdata-youtube-service.c
+@@ -684,14 +684,16 @@ standard_feed_type_to_feed_uri (GDataYouTubeStandardFeedType feed_type)
+ 	case GDATA_YOUTUBE_RECENTLY_FEATURED_FEED:
+ 	case GDATA_YOUTUBE_WATCH_ON_MOBILE_FEED: {
+ 		gchar *date, *out;
+-		GTimeVal tv;
++		GDateTime *tv, *tv2;
+ 
+ 		/* All feed types except MOST_POPULAR have been deprecated for
+ 		 * a while, and fall back to MOST_POPULAR on the server anyway.
+ 		 * See: https://developers.google.com/youtube/2.0/developers_guide_protocol_video_feeds#Standard_feeds */
+-		g_get_current_time (&tv);
+-		tv.tv_sec -= 24 * 60 * 60;  /* 1 day ago */
+-		date = g_time_val_to_iso8601 (&tv);
++		tv = g_date_time_new_now_utc ();
++		tv2 = g_date_time_add_days (tv, -1);
++		g_date_time_unref (tv);
++		date = g_date_time_format_iso8601 (tv2);
++		g_date_time_unref (tv2);
+ 		out = _gdata_service_build_uri ("https://www.googleapis.com/youtube/v3/videos"
+ 		                                "?part=snippet"
+ 		                                "&chart=mostPopular"
+diff --git a/gdata/tests/calendar.c b/gdata/tests/calendar.c
+index 4d70d1b7..87fb0b81 100644
+--- a/gdata/tests/calendar.c
++++ b/gdata/tests/calendar.c
+@@ -495,7 +495,7 @@ test_event_insert (InsertEventData *data, gconstpointer service)
+ 	GDataGDWhere *where;
+ 	GDataGDWho *who;
+ 	GDataGDWhen *when;
+-	GTimeVal start_time, end_time;
++	GDateTime *start_time, *end_time;
+ 	GError *error = NULL;
+ 
+ 	gdata_test_mock_server_start_trace (mock_server, "event-insert");
+@@ -512,11 +512,13 @@ test_event_insert (InsertEventData *data, gconstpointer service)
+ 	who = gdata_gd_who_new (GDATA_GD_WHO_EVENT_ORGANIZER, "John Smith‽", "john.smith@example.com");
+ 	gdata_calendar_event_add_person (event, who);
+ 	g_object_unref (who);
+-	g_time_val_from_iso8601 ("2009-04-17T15:00:00.000Z", &start_time);
+-	g_time_val_from_iso8601 ("2009-04-17T17:00:00.000Z", &end_time);
+-	when = gdata_gd_when_new (start_time.tv_sec, end_time.tv_sec, FALSE);
++	start_time = g_date_time_new_from_iso8601 ("2009-04-17T15:00:00.000Z", NULL);
++	end_time = g_date_time_new_from_iso8601 ("2009-04-17T17:00:00.000Z", NULL);
++	when = gdata_gd_when_new (g_date_time_to_unix (start_time), g_date_time_to_unix (end_time), FALSE);
+ 	gdata_calendar_event_add_time (event, when);
+ 	g_object_unref (when);
++	g_date_time_unref (start_time);
++	g_date_time_unref (end_time);
+ 
+ 	/* Insert the event */
+ 	new_event = data->new_event = gdata_calendar_service_insert_calendar_event (GDATA_CALENDAR_SERVICE (service),
+@@ -540,8 +542,8 @@ G_STMT_START {
+ 	GDataGDWhere *where;
+ 	GDataGDWho *who;
+ 	GDataGDWhen *when;
+-	GTimeVal start_time;
+-	GTimeVal end_time;
++	GDateTime *start_time;
++	GDateTime *end_time;
+ 
+ 	event = gdata_calendar_event_new (NULL);
+ 
+@@ -555,11 +557,13 @@ G_STMT_START {
+ 	who = gdata_gd_who_new (GDATA_GD_WHO_EVENT_ORGANIZER, "John Smith‽", "john.smith@example.com");
+ 	gdata_calendar_event_add_person (event, who);
+ 	g_object_unref (who);
+-	g_time_val_from_iso8601 ("2009-04-17T15:00:00.000Z", &start_time);
+-	g_time_val_from_iso8601 ("2009-04-17T17:00:00.000Z", &end_time);
+-	when = gdata_gd_when_new (start_time.tv_sec, end_time.tv_sec, FALSE);
++	start_time = g_date_time_new_from_iso8601 ("2009-04-17T15:00:00.000Z", NULL);
++	end_time = g_date_time_new_from_iso8601 ("2009-04-17T17:00:00.000Z", NULL);
++	when = gdata_gd_when_new (g_date_time_to_unix (start_time), g_date_time_to_unix (end_time), FALSE);
+ 	gdata_calendar_event_add_time (event, when);
+ 	g_object_unref (when);
++	g_date_time_unref (start_time);
++	g_date_time_unref (end_time);
+ 
+ 	/* Insert the event */
+ 	gdata_calendar_service_insert_calendar_event_async (GDATA_CALENDAR_SERVICE (service),
+@@ -587,7 +591,7 @@ test_event_json (void)
+ 	GDataGDWhere *where;
+ 	GDataGDWho *who;
+ 	GDataGDWhen *when;
+-	GTimeVal start_time, end_time;
++	GDateTime *start_time, *end_time;
+ 
+ 	event = gdata_calendar_event_new (NULL);
+ 
+@@ -601,11 +605,13 @@ test_event_json (void)
+ 	who = gdata_gd_who_new (GDATA_GD_WHO_EVENT_ORGANIZER, "John Smith‽", "john.smith@example.com");
+ 	gdata_calendar_event_add_person (event, who);
+ 	g_object_unref (who);
+-	g_time_val_from_iso8601 ("2009-04-17T15:00:00.000Z", &start_time);
+-	g_time_val_from_iso8601 ("2009-04-17T17:00:00.000Z", &end_time);
+-	when = gdata_gd_when_new (start_time.tv_sec, end_time.tv_sec, FALSE);
++	start_time = g_date_time_new_from_iso8601 ("2009-04-17T15:00:00.000Z", NULL);
++	end_time = g_date_time_new_from_iso8601 ("2009-04-17T17:00:00.000Z", NULL);
++	when = gdata_gd_when_new (g_date_time_to_unix (start_time), g_date_time_to_unix (end_time), FALSE);
+ 	gdata_calendar_event_add_time (event, when);
+ 	g_object_unref (when);
++	g_date_time_unref (start_time);
++	g_date_time_unref (end_time);
+ 
+ 	/* Check the JSON */
+ 	gdata_test_assert_json (event, "{"
+@@ -1099,7 +1105,7 @@ static void
+ test_query_uri (void)
+ {
+ 	gint64 _time;
+-	GTimeVal time_val;
++	GDateTime *time_val;
+ 	gchar *query_uri;
+ 	GDataCalendarQuery *query = gdata_calendar_query_new ("q");
+ 
+@@ -1111,15 +1117,15 @@ test_query_uri (void)
+ 	g_assert_cmpstr (gdata_calendar_query_get_order_by (query), ==, "starttime");
+ 
+ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+-	g_time_val_from_iso8601 ("2009-04-17T15:00:00.000Z", &time_val);
+-	gdata_calendar_query_set_recurrence_expansion_start (query, time_val.tv_sec);
++	time_val = g_date_time_new_from_iso8601 ("2009-04-17T15:00:00.000Z", NULL);
++	gdata_calendar_query_set_recurrence_expansion_start (query, g_date_time_to_unix (time_val));
+ 	_time = gdata_calendar_query_get_recurrence_expansion_start (query);
+-	g_assert_cmpint (_time, ==, time_val.tv_sec);
++	g_assert_cmpint (_time, ==, g_date_time_to_unix (time_val));
+ 
+-	g_time_val_from_iso8601 ("2010-04-17T15:00:00.000Z", &time_val);
+-	gdata_calendar_query_set_recurrence_expansion_end (query, time_val.tv_sec);
++	time_val = g_date_time_new_from_iso8601 ("2010-04-17T15:00:00.000Z", NULL);
++	gdata_calendar_query_set_recurrence_expansion_end (query, g_date_time_to_unix (time_val));
+ 	_time = gdata_calendar_query_get_recurrence_expansion_end (query);
+-	g_assert_cmpint (_time, ==, time_val.tv_sec);
++	g_assert_cmpint (_time, ==, g_date_time_to_unix (time_val));
+ G_GNUC_END_IGNORE_DEPRECATIONS
+ 
+ 	gdata_calendar_query_set_single_events (query, TRUE);
+@@ -1130,15 +1136,17 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+ 	g_assert_cmpstr (gdata_calendar_query_get_sort_order (query), ==, "descending");
+ G_GNUC_END_IGNORE_DEPRECATIONS
+ 
+-	g_time_val_from_iso8601 ("2009-04-17T15:00:00.000Z", &time_val);
+-	gdata_calendar_query_set_start_min (query, time_val.tv_sec);
++	time_val = g_date_time_new_from_iso8601 ("2009-04-17T15:00:00.000Z", NULL);
++	gdata_calendar_query_set_start_min (query, g_date_time_to_unix (time_val));
+ 	_time = gdata_calendar_query_get_start_min (query);
+-	g_assert_cmpint (_time, ==, time_val.tv_sec);
++	g_assert_cmpint (_time, ==, g_date_time_to_unix (time_val));
++	g_date_time_unref (time_val);
+ 
+-	g_time_val_from_iso8601 ("2010-04-17T15:00:00.000Z", &time_val);
+-	gdata_calendar_query_set_start_max (query, time_val.tv_sec);
++	time_val = g_date_time_new_from_iso8601 ("2010-04-17T15:00:00.000Z", NULL);
++	gdata_calendar_query_set_start_max (query, g_date_time_to_unix (time_val));
+ 	_time = gdata_calendar_query_get_start_max (query);
+-	g_assert_cmpint (_time, ==, time_val.tv_sec);
++	g_assert_cmpint (_time, ==, g_date_time_to_unix (time_val));
++	g_date_time_unref (time_val);
+ 
+ 	gdata_calendar_query_set_timezone (query, "America/Los Angeles");
+ 	g_assert_cmpstr (gdata_calendar_query_get_timezone (query), ==, "America/Los_Angeles");
+diff --git a/gdata/tests/contacts.c b/gdata/tests/contacts.c
+index e4f72deb..f70cee25 100644
+--- a/gdata/tests/contacts.c
++++ b/gdata/tests/contacts.c
+@@ -304,14 +304,12 @@ test_contact_insert (InsertData *data, gconstpointer service)
+ 	GList *list;
+ 	GDate date;
+ 	GHashTable *properties;
+-	GTimeVal current_time;
+ 	gint64 edited, creation_time;
+ 	GError *error = NULL;
+ 
+ 	gdata_test_mock_server_start_trace (mock_server, "contact-insert");
+ 
+ 	contact = gdata_contacts_contact_new (NULL);
+-	g_get_current_time (&current_time);
+ 
+ 	/* Check the kind is present and correct */
+ 	g_assert (GDATA_IS_CONTACTS_CONTACT (contact));
+@@ -752,13 +750,13 @@ static void
+ test_group_insert (InsertGroupData *data, gconstpointer service)
+ {
+ 	GDataContactsGroup *group, *new_group;
+-	GTimeVal time_val;
++	gint64 time_val;
+ 	GHashTable *properties;
+ 	GError *error = NULL;
+ 
+ 	gdata_test_mock_server_start_trace (mock_server, "group-insert");
+ 
+-	g_get_current_time (&time_val);
++	time_val = g_get_real_time () / G_USEC_PER_SEC;
+ 
+ 	group = gdata_contacts_group_new (NULL);
+ 
+@@ -780,7 +778,7 @@ test_group_insert (InsertGroupData *data, gconstpointer service)
+ 	/* Check the properties. Time-based properties can't be checked when running against a mock server, since
+ 	 * the trace files may be quite old. */
+ 	if (uhm_server_get_enable_online (mock_server) == TRUE) {
+-		g_assert_cmpint (gdata_contacts_group_get_edited (new_group), >=, time_val.tv_sec);
++		g_assert_cmpint (gdata_contacts_group_get_edited (new_group), >=, time_val);
+ 	}
+ 	g_assert (gdata_contacts_group_is_deleted (new_group) == FALSE);
+ 	g_assert (gdata_contacts_group_get_system_group_id (new_group) == NULL);
+@@ -850,12 +848,12 @@ test_contact_properties (void)
+ 	gchar *nickname, *file_as, *billing_information, *directory_server, *gender, *initials, *maiden_name, *mileage, *occupation;
+ 	gchar *priority, *sensitivity, *short_name, *subject, *photo_etag;
+ 	GDate date, *date2;
+-	GTimeVal current_time;
++	gint64 current_time;
+ 	gint64 edited;
+ 	gboolean deleted, birthday_has_year;
+ 
+ 	contact = gdata_contacts_contact_new (NULL);
+-	g_get_current_time (&current_time);
++	current_time = g_get_real_time () / G_USEC_PER_SEC;
+ 
+ 	/* Check the kind is present and correct */
+ 	g_assert (GDATA_IS_CONTACTS_CONTACT (contact));
+@@ -984,7 +982,7 @@ test_contact_properties (void)
+ 	              "subject", &subject,
+ 	              NULL);
+ 
+-	g_assert_cmpint (edited, ==, current_time.tv_sec);
++	g_assert_cmpint (edited, ==, current_time);
+ 	g_assert (deleted == FALSE);
+ 	g_assert (photo_etag == NULL);
+ 	g_assert (name2 == name);
+@@ -1751,7 +1749,7 @@ static void
+ test_group_properties (void)
+ {
+ 	GDataContactsGroup *group;
+-	GTimeVal time_val;
++	gint64 time_val;
+ 	GHashTable *properties;
+ 	gint64 edited;
+ 	gboolean deleted;
+@@ -1768,8 +1766,8 @@ test_group_properties (void)
+ 	g_assert (gdata_contacts_group_set_extended_property (group, "foobar", "barfoo") == TRUE);
+ 
+ 	/* Check various properties */
+-	g_get_current_time (&time_val);
+-	g_assert_cmpint (gdata_contacts_group_get_edited (group), ==, time_val.tv_sec);
++	time_val = g_get_real_time () / G_USEC_PER_SEC;
++	g_assert_cmpint (gdata_contacts_group_get_edited (group), ==, time_val);
+ 	g_assert (gdata_contacts_group_is_deleted (group) == FALSE);
+ 	g_assert (gdata_contacts_group_get_system_group_id (group) == NULL);
+ 
+@@ -1785,7 +1783,7 @@ test_group_properties (void)
+ 	              "system-group-id", &system_group_id,
+ 	              NULL);
+ 
+-	g_assert_cmpint (edited, ==, time_val.tv_sec);
++	g_assert_cmpint (edited, ==, time_val);
+ 	g_assert (deleted == FALSE);
+ 	g_assert (system_group_id == NULL);
+ 
+diff --git a/gdata/tests/general.c b/gdata/tests/general.c
+index 30604ba1..39478713 100644
+--- a/gdata/tests/general.c
++++ b/gdata/tests/general.c
+@@ -3502,11 +3502,12 @@ static void
+ test_gd_when_escaping (void)
+ {
+ 	GDataGDWhen *when;
+-	GTimeVal start_time;
++	GDateTime *start_time;
+ 
+-	g_time_val_from_iso8601 ("2005-06-07T01:00:00Z", &start_time);
+-	when = gdata_gd_when_new (start_time.tv_sec, -1, FALSE);
++	start_time = g_date_time_new_from_iso8601 ("2005-06-07T01:00:00Z", NULL);
++	when = gdata_gd_when_new (g_date_time_to_unix (start_time), -1, FALSE);
+ 	gdata_gd_when_set_value_string (when, "Value string & stuff!");
++	g_date_time_unref (start_time);
+ 
+ 	/* Check the outputted XML is escaped properly */
+ 	gdata_test_assert_xml (when,
+diff --git a/gdata/tests/perf.c b/gdata/tests/perf.c
+index 2749d40d..60f3dcc1 100644
+--- a/gdata/tests/perf.c
++++ b/gdata/tests/perf.c
+@@ -78,23 +78,24 @@ test_parse_feed (void)
+ static void
+ test_perf_parsing (void)
+ {
+-	GTimeVal start_time, end_time;
++	GDateTime *start_time, *end_time;
++	GTimeSpan total_time, per_iteration_time;
+ 	guint i;
+-	guint64 total_time;  /* microseconds */
+-	guint64 per_iteration_time;  /* microseconds */
+ 
+ 	#define ITERATIONS 10000
+ 
+ 	/* Test feed parsing time */
+-	g_get_current_time (&start_time);
++	start_time = g_date_time_new_now_utc ();
+ 	for (i = 0; i < ITERATIONS; i++)
+ 		test_parse_feed ();
+-	g_get_current_time (&end_time);
++	end_time = g_date_time_new_now_utc ();
+ 
+-	total_time = (end_time.tv_sec - start_time.tv_sec) * G_USEC_PER_SEC +
+-	             (end_time.tv_usec - start_time.tv_usec);
++	total_time = g_date_time_difference (end_time, start_time);
+ 	per_iteration_time = total_time / ITERATIONS;
+ 
++	g_date_time_unref (start_time);
++	g_date_time_unref (end_time);
++
+ 	/* Prefix with hashes to avoid the output being misinterpreted as TAP
+ 	 * commands. */
+ 	printf ("# Parsing a feed %u times took:\n"
+diff --git a/gdata/tests/picasaweb.c b/gdata/tests/picasaweb.c
+index eecf1b78..19978e3c 100644
+--- a/gdata/tests/picasaweb.c
++++ b/gdata/tests/picasaweb.c
+@@ -782,7 +782,7 @@ typedef struct {
+ static void
+ set_up_insert_album (InsertAlbumData *data, gconstpointer service)
+ {
+-	GTimeVal timestamp;
++	GDateTime *timestamp;
+ 
+ 	data->album = gdata_picasaweb_album_new (NULL);
+ 	g_assert (GDATA_IS_PICASAWEB_ALBUM (data->album));
+@@ -791,8 +791,9 @@ set_up_insert_album (InsertAlbumData *data, gconstpointer service)
+ 	gdata_entry_set_summary (GDATA_ENTRY (data->album), "Family photos of the feast!");
+ 	gdata_picasaweb_album_set_location (data->album, "Winnipeg, MN");
+ 
+-	g_time_val_from_iso8601 ("2002-10-14T09:58:59.643554Z", &timestamp);
+-	gdata_picasaweb_album_set_timestamp (data->album, (gint64) timestamp.tv_sec * 1000);
++	timestamp = g_date_time_new_from_iso8601 ("2002-10-14T09:58:59.643554Z", NULL);
++	gdata_picasaweb_album_set_timestamp (data->album, g_date_time_to_unix (timestamp) * 1000);
++	g_date_time_unref (timestamp);
+ }
+ 
+ static void
+@@ -1757,12 +1758,12 @@ test_album_new (void)
+ 	GRegex *regex;
+ 	GMatchInfo *match_info;
+ 	gint64 delta;
+-	GTimeVal timeval;
++	GDateTime *timeval;
+ 
+ 	g_test_bug ("598893");
+ 
+ 	/* Get the current time */
+-	g_get_current_time (&timeval);
++	timeval = g_date_time_new_now_utc ();
+ 
+ 	/* Build a regex to match the timestamp from the XML, since we can't definitely say what it'll be. Note that we also assign any order to the
+ 	 * namespace definitions, since due to a change in GLib's hashing algorithm, they could be in different orders with different GLib versions. */
+@@ -1795,9 +1796,10 @@ test_album_new (void)
+ 	xml = gdata_parsable_get_xml (GDATA_PARSABLE (album));
+ 	g_assert (g_regex_match (regex, xml, 0, &match_info) == TRUE);
+ 	parsed_time_str = g_match_info_fetch (match_info, 2);
+-	delta = g_ascii_strtoull (parsed_time_str, NULL, 10) - (((guint64) timeval.tv_sec) * 1000 + ((guint64) timeval.tv_usec) / 1000);
++	delta = g_ascii_strtoull (parsed_time_str, NULL, 10) - (g_date_time_to_unix (timeval) * 1000 + ((guint64) g_date_time_get_microsecond (timeval)) / 1000);
+ 	g_assert_cmpuint (ABS (delta), <, 1000);
+ 
++	g_date_time_unref (timeval);
+ 	g_free (parsed_time_str);
+ 	g_free (xml);
+ 	g_regex_unref (regex);
+diff --git a/gdata/tests/youtube.c b/gdata/tests/youtube.c
+index 5fefbaf8..b2732680 100644
+--- a/gdata/tests/youtube.c
++++ b/gdata/tests/youtube.c
+@@ -1537,13 +1537,17 @@ test_comment_properties_parent_comment_uri (void)
+ static gchar *
+ build_this_week_date_str (void)
+ {
+-	GTimeVal tv;
++	GDateTime *tv, *tv2;
++	gchar *ret;
+ 
+-	g_get_current_time (&tv);
+-	tv.tv_sec -= 7 * 24 * 60 * 60;  /* this week */
+-	tv.tv_usec = 0;  /* pointless accuracy */
++	/* don't use g_date_time_new_now_utc (squash microseconds) */
++	tv = g_date_time_new_from_unix_utc (g_get_real_time () / G_USEC_PER_SEC);
++	tv2 = g_date_time_add_weeks (tv, -1);
++	g_date_time_unref (tv);
+ 
+-	return g_time_val_to_iso8601 (&tv);
++	ret = g_date_time_format_iso8601 (tv2);
++	g_date_time_unref (tv2);
++	return ret;
+ }
+ 
+ static void
+-- 
+GitLab
+

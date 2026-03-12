@@ -1,0 +1,32 @@
+From c214f7884155607861d43dbfceaeb1c2d9f20740 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 29 Aug 2025 17:08:23 -0700
+Subject: [PATCH] x509_crt: Zero-initialize mbedtls_x509_time at declaration
+
+'mbedtls_x509_time now' is a local struct variable. passing an uninitialized local as a const *
+argument is UB-risk, since the callee is not
+allowed to write into it.
+
+Clang-21 got stricter about const pointer arguments finds it and flags it.
+
+zero-initializing ensures all fields are defined.
+
+Upstream-Status: Submitted [https://github.com/Mbed-TLS/mbedtls/pull/10377]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ third_party/mbedtls/repo/library/x509_crt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/third_party/mbedtls/repo/library/x509_crt.c b/third_party/mbedtls/repo/library/x509_crt.c
+index 2fd56fbd7..d09060fd7 100644
+--- a/third_party/mbedtls/repo/library/x509_crt.c
++++ b/third_party/mbedtls/repo/library/x509_crt.c
+@@ -2523,7 +2523,7 @@ static int x509_crt_verify_chain(
+     int signature_is_good;
+     unsigned self_cnt;
+     mbedtls_x509_crt *cur_trust_ca = NULL;
+-    mbedtls_x509_time now;
++    mbedtls_x509_time now = {0};
+ 
+ #if defined(MBEDTLS_HAVE_TIME_DATE)
+     if (mbedtls_x509_time_gmtime(mbedtls_time(NULL), &now) != 0) {

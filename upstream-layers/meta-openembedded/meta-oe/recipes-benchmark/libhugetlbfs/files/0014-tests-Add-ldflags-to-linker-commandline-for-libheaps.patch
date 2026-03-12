@@ -1,0 +1,33 @@
+From 834662425936ae222789f4823d10a1371b951ae1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 20 Jul 2025 14:19:59 -0700
+Subject: [PATCH] tests: Add ldflags to linker commandline for libheapshrink.so
+
+This fixes build QA errors
+ERROR: libhugetlbfs-1_2.24-r0 do_package_qa: QA Issue: File /usr/lib/libhugetlbfs/tests/obj64/libheapshrink.so in package libhugetlbfs-tests doesn't have GNU_HASH (didn't pass LDFLAGS?) [ldflags]
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/Makefile.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/Makefile.in b/tests/Makefile.in
+index d33a228..042af8d 100644
+--- a/tests/Makefile.in
++++ b/tests/Makefile.in
+@@ -140,12 +140,12 @@ obj64/%-pic.o: %.c
+ obj32/libheapshrink.so: obj32/heapshrink-helper-pic.o
+ 	@$(VECHO) LD32 "(shared)" $@
+ 	@mkdir -p obj32
+-	$(CC32) -Wl,-soname,$(notdir $@) -shared -o $@ $^
++	$(CC32) -Wl,-soname,$(notdir $@) -shared $(LDFLAGS) -o $@ $^
+ 
+ obj64/libheapshrink.so: obj64/heapshrink-helper-pic.o
+ 	@$(VECHO) LD64 "(shared)" $@
+ 	@mkdir -p obj64
+-	$(CC64) -Wl,-soname,$(notdir $@) -shared -o $@ $^
++	$(CC64) -Wl,-soname,$(notdir $@) -shared $(LDFLAGS) -o $@ $^
+ 
+ $(LIB_TESTS:%=obj32/%): %: %.o obj32/testutils.o obj32/libtestutils.o
+ 	@$(VECHO) LD32 "(lib test)" $@

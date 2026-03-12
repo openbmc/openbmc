@@ -21,8 +21,6 @@ Signed-off-by: Quanyang Wang <quanyang.wang@windriver.com>
  kexec/arch/ppc/kexec-ppc.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kexec/arch/ppc/kexec-ppc.h b/kexec/arch/ppc/kexec-ppc.h
-index 04e728e..6bae9ec 100644
 --- a/kexec/arch/ppc/kexec-ppc.h
 +++ b/kexec/arch/ppc/kexec-ppc.h
 @@ -44,7 +44,7 @@ void dol_ppc_usage(void);

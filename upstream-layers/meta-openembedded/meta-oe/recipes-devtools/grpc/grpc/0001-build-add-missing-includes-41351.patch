@@ -1,0 +1,58 @@
+From a976f66ac7d1b9f43a3071e22b5014fcfeab04b3 Mon Sep 17 00:00:00 2001
+From: "Mark D. Roth" <roth@google.com>
+Date: Tue, 6 Jan 2026 10:09:45 -0800
+Subject: [PATCH] [build] add missing includes (#41351)
+
+Fixes #41305.
+
+Closes #41351
+
+COPYBARA_INTEGRATE_REVIEW=https://github.com/grpc/grpc/pull/41351 from markdroth:add_missing_includes 223be6932adb00d085149c53167c1b0318745f6c
+PiperOrigin-RevId: 852829597
+
+Upstream-Status: Backport [https://github.com/grpc/grpc/commit/d54219b508423f0a2ff6a0b98c16fb6dafd44b84]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ include/grpc/event_engine/memory_request.h | 2 ++
+ src/core/channelz/v2tov1/property_list.cc  | 1 +
+ src/core/util/glob.cc                      | 2 ++
+ 3 files changed, 5 insertions(+)
+
+diff --git a/include/grpc/event_engine/memory_request.h b/include/grpc/event_engine/memory_request.h
+index 76bcbb2036..ad8cab842e 100644
+--- a/include/grpc/event_engine/memory_request.h
++++ b/include/grpc/event_engine/memory_request.h
+@@ -17,6 +17,8 @@
+ #include <grpc/support/port_platform.h>
+ #include <stddef.h>
+ 
++#include <string>
++
+ #include "absl/strings/string_view.h"
+ 
+ namespace grpc_event_engine {
+diff --git a/src/core/channelz/v2tov1/property_list.cc b/src/core/channelz/v2tov1/property_list.cc
+index 64bbb6307c..03367cce7c 100644
+--- a/src/core/channelz/v2tov1/property_list.cc
++++ b/src/core/channelz/v2tov1/property_list.cc
+@@ -15,6 +15,7 @@
+ #include "src/core/channelz/v2tov1/property_list.h"
+ 
+ #include <cstdint>
++#include <limits>
+ #include <optional>
+ #include <string>
+ 
+diff --git a/src/core/util/glob.cc b/src/core/util/glob.cc
+index 1b1c16e23d..22e54259f0 100644
+--- a/src/core/util/glob.cc
++++ b/src/core/util/glob.cc
+@@ -12,6 +12,8 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.
+ 
++#include <algorithm>
++
+ #include "absl/strings/string_view.h"
+ 
+ namespace grpc_core {

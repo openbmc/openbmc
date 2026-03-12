@@ -1,0 +1,50 @@
+From: Eric Meyers <eric.meyers@arthrex.com>
+Date: Fri, 7 Nov 2025 12:00:00 +0000
+Subject: [PATCH] Patch to fix gdkx.h build issues.
+
+Patch to fix gdkx.h build issues when x11 is not included in DISTRO_FEATURES:
+
+| In file included from ../sources/network-manager-applet-1.36.0/src/applet.c:25:
+| ../sources/network-manager-applet-1.36.0/src/applet.h:14:10: fatal error: gdk/gdkx.h: No such file or directory
+|    14 | #include <gdk/gdkx.h>
+|       |          ^~~~~~~~~~~~
+| compilation terminated.
+
+Upstream-Status: Pending
+Signed-off-by: Eric Meyers <eric.meyers@arthrex.com>
+diff --git a/src/applet.h b/src/applet.h
+index 7978ba7c..6992196a 100644
+--- a/src/applet.h
++++ b/src/applet.h
+@@ -11,7 +11,6 @@
+ #include <string.h>
+
+ #include <gtk/gtk.h>
+-#include <gdk/gdkx.h>
+
+ #include <net/ethernet.h>
+
+diff --git a/src/connection-editor/nm-connection-editor.c b/src/connection-editor/nm-connection-editor.c
+index b68141bb..2d8762d8 100644
+--- a/src/connection-editor/nm-connection-editor.c
++++ b/src/connection-editor/nm-connection-editor.c
+@@ -15,7 +15,6 @@
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <errno.h>
+-#include <gdk/gdkx.h>
+
+ #if WITH_SELINUX
+ #include <selinux/selinux.h>
+diff --git a/src/connection-editor/nm-connection-list.c b/src/connection-editor/nm-connection-list.c
+index a3f41c04..b54c76b0 100644
+--- a/src/connection-editor/nm-connection-list.c
++++ b/src/connection-editor/nm-connection-list.c
+@@ -13,7 +13,6 @@
+ #include <string.h>
+ #include <sys/types.h>
+ #include <unistd.h>
+-#include <gdk/gdkx.h>
+
+ #include "ce-page.h"
+ #include "nm-connection-editor.h"

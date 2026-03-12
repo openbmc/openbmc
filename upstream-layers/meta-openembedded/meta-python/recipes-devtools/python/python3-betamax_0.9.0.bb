@@ -10,6 +10,7 @@ SRC_URI += " \
         file://run-ptest \
         git://github.com/betamaxpy/betamax;protocol=https;branch=main \
         file://0001-Drop-ptests-fixtures-and-recorde_modes.patch \
+        file://0001-test_placeholders-use-pytest-vcr-or-skip-if-cassette.patch \
 "
 
 

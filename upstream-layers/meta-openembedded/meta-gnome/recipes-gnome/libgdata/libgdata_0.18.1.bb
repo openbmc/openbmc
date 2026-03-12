@@ -13,6 +13,8 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 inherit gnomebase pkgconfig gettext gtk-doc vala gobject-introspection manpages features_check
 
+SRC_URI += "file://0001-Drop-usage-of-deprecated-GTimeVal.patch"
+
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('PACKAGECONFIG', 'goa', 'opengl', '', d)}"
 

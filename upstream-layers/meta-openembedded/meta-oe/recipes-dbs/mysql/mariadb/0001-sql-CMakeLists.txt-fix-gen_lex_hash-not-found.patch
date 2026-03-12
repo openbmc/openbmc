@@ -18,8 +18,8 @@ diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
 index 0195555e..507136cb 100644
 --- a/sql/CMakeLists.txt
 +++ b/sql/CMakeLists.txt
-@@ -64,11 +64,18 @@ ${CMAKE_BINARY_DIR}/sql
- ${CMAKE_SOURCE_DIR}/tpool
+@@ -63,11 +63,18 @@
+ ${CMAKE_BINARY_DIR}/sql
  )
  
 -ADD_CUSTOM_COMMAND(
@@ -41,7 +41,7 @@ index 0195555e..507136cb 100644
  
  FIND_PACKAGE(BISON 2.4)
  
-@@ -405,11 +412,18 @@ IF(NOT CMAKE_CROSSCOMPILING OR DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
+@@ -405,11 +412,18 @@
    ADD_EXECUTABLE(gen_lex_hash gen_lex_hash.cc)
  ENDIF()
  

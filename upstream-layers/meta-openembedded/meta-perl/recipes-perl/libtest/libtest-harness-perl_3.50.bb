@@ -38,6 +38,18 @@ RDEPENDS:${PN} += "\
     perl-module-benchmark \
 "
 
+RDEPENDS:${PN}-ptest += "\
+    perl-module-carp \
+    perl-module-file-find \
+    perl-module-file-glob \
+    perl-module-file-spec-functions \
+    perl-module-getopt-long \
+    perl-module-io-select \
+    perl-module-ipc-open3 \
+    perl-module-lib \
+    perl-module-test-more \
+    perl-module-text-parsewords"
+
 RPROVIDES:${PN} += "libapp-prove-perl \
                     libapp-prove-state-perl \
                     libapp-prove-state-result-perl \

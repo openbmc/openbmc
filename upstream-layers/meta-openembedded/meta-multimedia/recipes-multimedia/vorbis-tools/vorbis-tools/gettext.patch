@@ -3,18 +3,40 @@ Fix build with gettext 0.20.x
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Michael Opdenacker <michael.opdenacker@bootlin.com>
+---
+ Makefile.am  | 4 ++--
+ configure.ac | 3 +--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 62c36d7..201c69c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -2,8 +2,8 @@
+ 
+ AUTOMAKE_OPTIONS = foreign dist-zip
+ 
+-SUBDIRS = po intl include share win32 @OPT_SUBDIRS@ tests
+-DIST_SUBDIRS = po intl include share win32 ogg123 oggenc oggdec ogginfo \
++SUBDIRS = po include share win32 @OPT_SUBDIRS@ tests
++DIST_SUBDIRS = po include share win32 ogg123 oggenc oggdec ogginfo \
+ 	vcut vorbiscomment m4 tests
+ 
+ EXTRA_DIST = config.rpath README AUTHORS COPYING CHANGES
+diff --git a/configure.ac b/configure.ac
+index 6751ec8..67746ce 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -34,7 +34,7 @@
+@@ -34,7 +34,7 @@ CFLAGS="$cflags_save"
  AC_PROG_LIBTOOL
  
- ALL_LINGUAS="be cs da en_GB eo es fr hr hu nl pl ro ru sk sv uk vi"
+ ALL_LINGUAS="be cs da de en_GB eo es fr hr hu id ka nb nl pl ro ru sk sl sr sv uk vi "
 -AM_GNU_GETTEXT
 +AM_GNU_GETTEXT([external])
  
  dnl --------------------------------------------------
  dnl System checks
-@@ -397,7 +397,6 @@
+@@ -413,7 +413,6 @@ AC_CONFIG_FILES([
  Makefile
  m4/Makefile
  po/Makefile.in
@@ -22,16 +44,6 @@ Signed-off-by: Michael Opdenacker <michael.opdenacker@bootlin.com>
  include/Makefile
  share/Makefile
  win32/Makefile
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -2,8 +2,8 @@
- 
- AUTOMAKE_OPTIONS = foreign dist-zip
- 
--SUBDIRS = po intl include share win32 @OPT_SUBDIRS@
--DIST_SUBDIRS = po intl include share win32 ogg123 oggenc oggdec ogginfo \
-+SUBDIRS = po include share win32 @OPT_SUBDIRS@
-+DIST_SUBDIRS = po include share win32 ogg123 oggenc oggdec ogginfo \
- 	vcut vorbiscomment m4
- 
- EXTRA_DIST = config.rpath README AUTHORS COPYING CHANGES
+-- 
+2.43.0
+

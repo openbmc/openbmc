@@ -5,6 +5,10 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=f77f2ed49768c8d4c79ba874c0f94d8a"
 
 SRC_URI[sha256sum] = "b860baba1e8c6f71f8f5f6e3949a694daccf40820fa8f138b3f712bd85804903"
 
+SRC_URI += " \
+    file://0001-Allow-install-over-python-3.14-329.patch \
+"
+
 inherit pypi setuptools3 ptest-python-pytest
 
 RDEPENDS:${PN} += "python3-simplejson python3-math"

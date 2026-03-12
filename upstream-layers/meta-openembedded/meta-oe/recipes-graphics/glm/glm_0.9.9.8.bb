@@ -39,4 +39,4 @@ do_install() {
 
 RDEPENDS:${PN}-dev = ""
 
-BBCLASSEXTEND = "native"
+BBCLASSEXTEND = "native nativesdk"

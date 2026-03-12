@@ -1,10 +1,11 @@
-#!/bin/sh
+#!/usr/bin/env sh
 
-cd tests
+cd tests || exit 1
+
+rm -rf tests.log
+
 for atest in test_* ; do
-    rm -rf tests.log
-    ./${atest} > tests.log 2>&1
-    if [ $? = 0 ] ; then
+    if ./"${atest}" >> tests.log 2>&1; then
         echo "PASS: ${atest}"
     else
         echo "FAIL: ${atest}"

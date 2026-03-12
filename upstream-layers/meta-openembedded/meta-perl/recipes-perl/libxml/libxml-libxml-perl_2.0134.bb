@@ -70,3 +70,8 @@ do_install_ptest() {
 	cp -r ${B}/test ${D}${PTEST_PATH}
 	chown -R root:root ${D}${PTEST_PATH}
 }
+
+# See issues:
+# https://github.com/shlomif/perl-XML-LibXML/issues/84 - libxml incompatibility
+# https://github.com/shlomif/perl-XML-LibXML/issues/91 - looking for new maintainer
+SKIP_RECIPE[libxml-libxml-perl] ?= "Not compatible with latest libxml"

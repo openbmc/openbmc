@@ -27,10 +27,8 @@ Signed-off-by: mark.yang <mark.yang@lge.com>
  include/rocksdb/utilities/checkpoint.h | 1 +
  1 file changed, 1 insertion(+)
 
-Index: git/include/rocksdb/utilities/checkpoint.h
-===================================================================
---- git.orig/include/rocksdb/utilities/checkpoint.h
-+++ git/include/rocksdb/utilities/checkpoint.h
+--- a/include/rocksdb/utilities/checkpoint.h
++++ b/include/rocksdb/utilities/checkpoint.h
 @@ -7,6 +7,7 @@
  
  #pragma once
@@ -39,3 +37,13 @@ Index: git/include/rocksdb/utilities/checkpoint.h
  #include <string>
  #include <vector>
  
+--- a/include/rocksdb/utilities/transaction_db_mutex.h
++++ b/include/rocksdb/utilities/transaction_db_mutex.h
+@@ -5,6 +5,7 @@
+ 
+ #pragma once
+ 
++#include <cstdint>
+ #include <memory>
+ 
+ #include "rocksdb/status.h"

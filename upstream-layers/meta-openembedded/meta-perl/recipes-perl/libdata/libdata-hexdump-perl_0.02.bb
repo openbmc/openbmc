@@ -29,6 +29,8 @@ do_install_ptest () {
     install -m 0755 ${B}/t/* ${D}${PTEST_PATH}/t
 }
 
+RDEPENDS:${PN}-ptest += "perl-module-exporter perl-module-carp perl-module-filehandle"
+
 BBCLASSEXTEND = "native"
 
 ALTERNATIVES_PRIORITY = "100"

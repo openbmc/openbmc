@@ -1,0 +1,33 @@
+From 049909ed3db8527aaae86a15d3c7998988ea77a0 Mon Sep 17 00:00:00 2001
+From: James Hilliard <james.hilliard1@gmail.com>
+Date: Mon, 29 Dec 2025 13:21:12 -0700
+Subject: [PATCH] Update Cython to version 3.2.3 (#184)
+
+Upstream-Status: Backport [https://github.com/aio-libs/propcache/pull/184]
+Co-authored-by: J. Nick Koston <nick@koston.org>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ packaging/pep517_backend/_backend.py | 2 +-
+ requirements/cython.txt              | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/packaging/pep517_backend/_backend.py b/packaging/pep517_backend/_backend.py
+index ce79c4e..e05a9dd 100644
+--- a/packaging/pep517_backend/_backend.py
++++ b/packaging/pep517_backend/_backend.py
+@@ -376,7 +376,7 @@ def get_requires_for_build_wheel(
+     if is_pure_python_build:
+         c_ext_build_deps = []
+     else:
+-        c_ext_build_deps = ['Cython ~= 3.1.0']
++        c_ext_build_deps = ['Cython ~= 3.2.0']
+ 
+     return _setuptools_get_requires_for_build_wheel(
+         config_settings=config_settings,
+diff --git a/requirements/cython.txt b/requirements/cython.txt
+index 97dc5a1..209c15a 100644
+--- a/requirements/cython.txt
++++ b/requirements/cython.txt
+@@ -1 +1 @@
+-cython==3.1.4
++cython==3.2.3

@@ -1,0 +1,47 @@
+From deb225d2aaeb44f6a4c01eab25624193351f7f58 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Zolt=C3=A1n=20B=C3=B6sz=C3=B6rm=C3=A9nyi?=
+ <zboszor@gmail.com>
+Date: Wed, 12 Nov 2025 09:56:59 +0100
+Subject: [PATCH] Find cmake from PATH instead of CMAKE_BIN_DIR
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+python3-cmake is patched to run cmake from PATH.
+
+Another detail called CMAKE_BIN_DIR is not patched out, but
+scikit-build-core prefers using it in its program_search.py.
+It also has a fallback to find cmake from PATH.
+
+Remove using CMAKE_BIN_DIR and keep the fallback.
+
+Signed-off-by: Zoltán Böszörményi <zboszor@gmail.com>
+Upstream-Status: Inappropriate [oe specific]
+---
+ src/scikit_build_core/program_search.py | 10 ----------
+ 1 file changed, 10 deletions(-)
+
+diff --git a/src/scikit_build_core/program_search.py b/src/scikit_build_core/program_search.py
+index 7995c14..f82cad3 100644
+--- a/src/scikit_build_core/program_search.py
++++ b/src/scikit_build_core/program_search.py
+@@ -90,16 +90,6 @@ class Program(NamedTuple):
+ 
+ 
+ def _get_cmake_path(*, module: bool = True) -> Generator[Path, None, None]:
+-    """
+-    Get the path to CMake.
+-    """
+-    if module:
+-        with contextlib.suppress(ImportError):
+-            # If a "cmake" directory exists, this will also ImportError
+-            from cmake import CMAKE_BIN_DIR
+-
+-            yield Path(CMAKE_BIN_DIR) / "cmake"
+-
+     candidates = ("cmake3", "cmake")
+     for candidate in candidates:
+         cmake_path = shutil.which(candidate)
+-- 
+2.51.1
+

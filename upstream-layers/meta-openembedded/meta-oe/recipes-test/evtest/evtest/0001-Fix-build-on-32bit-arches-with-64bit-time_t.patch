@@ -1,4 +1,4 @@
-From 490f5b6cd788692d989f07180a5714c76872911e Mon Sep 17 00:00:00 2001
+From 55c872430c9444d7edaf50db0faa9bbc31dd085f Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Sat, 30 Nov 2019 11:58:58 -0800
 Subject: [PATCH] Fix build on 32bit arches with 64bit time_t
@@ -10,13 +10,12 @@ input.h [1]
 
 Upstream-Status: Submitted [https://gitlab.freedesktop.org/libevdev/evtest/merge_requests/6]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  evtest.c | 5 +++++
  1 file changed, 5 insertions(+)
 
 diff --git a/evtest.c b/evtest.c
-index ba7a161..8fc2e5a 100644
+index d3d3d8f..3045cce 100644
 --- a/evtest.c
 +++ b/evtest.c
 @@ -63,6 +63,11 @@
@@ -30,4 +29,4 @@ index ba7a161..8fc2e5a 100644
 +
  #define BITS_PER_LONG (sizeof(long) * 8)
  #define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
- #define OFF(x)  ((x)%BITS_PER_LONG)
+ #define NBYTES(x) (NBITS(x) * sizeof(long))

@@ -1,0 +1,29 @@
+From d68300ca8c7c518abd404873a8201b71988e492d Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Fri, 23 Jan 2026 09:28:56 +0800
+Subject: [PATCH] toggle-onboard-hoverclick: use /bin/sh default shell
+ interpreter
+
+checkbashism reports no issues, therefore using /bin/sh instead of
+/bin/bash should be safe.
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ scripts/toggle-onboard-hoverclick | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/toggle-onboard-hoverclick b/scripts/toggle-onboard-hoverclick
+index 7ee3b024..48636225 100755
+--- a/scripts/toggle-onboard-hoverclick
++++ b/scripts/toggle-onboard-hoverclick
+@@ -1,4 +1,4 @@
+-#!/bin/bash
++#!/bin/sh
+ STATUS=$(gsettings get org.gnome.desktop.a11y.mouse dwell-click-enabled)
+ case $STATUS in
+     true )
+-- 
+2.34.1
+

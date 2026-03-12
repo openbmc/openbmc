@@ -1,0 +1,43 @@
+From 8de40703857e63483a5c1b83ee7a5b6323c0b7d3 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Fri, 26 Dec 2025 19:50:20 +0100
+Subject: [PATCH] adapt tests to ptest
+
+The tests are expected to be executed after compilation, and
+they look for the tested binaries in the build folder. However
+for ptests we want to test the already installed binaries,
+so change the tests to use them.
+
+Also, adapt the fusermount executable name to what's installed
+in the ptest images.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ test_all.py | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/test_all.py b/test_all.py
+index 6ead5b4..bb167a9 100755
+--- a/test_all.py
++++ b/test_all.py
+@@ -41,8 +41,8 @@ def get_osxfuse_unionfs_mounts():
+ 
+ class Common:
+ 	def setUp(self):
+-		self.unionfs_path = os.path.abspath('src/unionfs')
+-		self.unionfsctl_path = os.path.abspath('src/unionfsctl')
++		self.unionfs_path = 'unionfs'
++		self.unionfsctl_path = 'unionfsctl'
+ 
+ 		self.tmpdir = tempfile.mkdtemp()
+ 		self.original_cwd = os.getcwd()
+@@ -81,7 +81,7 @@ class Common:
+ 			if platform.system() == 'Darwin':
+ 				call('umount %s' % self.mount_device)
+ 			else:
+-				call('fusermount -u union')
++				call('fusermount3 -u union')
+ 
+ 		os.chdir(self.original_cwd)
+ 		shutil.rmtree(self.tmpdir)

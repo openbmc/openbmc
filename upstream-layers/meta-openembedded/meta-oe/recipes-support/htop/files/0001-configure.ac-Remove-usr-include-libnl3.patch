@@ -1,0 +1,50 @@
+From 87d66b3b60176197e785670214b0bbc5bedd6552 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 8 Dec 2025 11:06:01 +0000
+Subject: [PATCH] configure.ac: Remove /usr/include/libnl3
+
+Fixes:
+
+| configure: error: can not find required header files
+netlink/attr.h, netlink/handlers.h, netlink/msg.h
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 9f2f46b3..f3906692 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -980,14 +980,14 @@ case "$enable_delayacct" in
+          enable_delayacct=no
+       else
+          old_CFLAGS="$CFLAGS"
+-         CFLAGS="$CFLAGS -I/usr/include/libnl3"
++         CFLAGS="$CFLAGS"
+          AC_CHECK_HEADERS([netlink/attr.h netlink/handlers.h netlink/msg.h], [enable_delayacct=yes], [enable_delayacct=no])
+          CFLAGS="$old_CFLAGS"
+       fi
+       ;;
+    yes)
+       old_CFLAGS="$CFLAGS"
+-      CFLAGS="$CFLAGS -I/usr/include/libnl3"
++      CFLAGS="$CFLAGS"
+       AC_CHECK_HEADERS([netlink/attr.h netlink/handlers.h netlink/msg.h], [], [AC_MSG_ERROR([can not find required header files netlink/attr.h, netlink/handlers.h, netlink/msg.h])])
+       CFLAGS="$old_CFLAGS"
+       ;;
+@@ -997,7 +997,7 @@ case "$enable_delayacct" in
+ esac
+ if test "$enable_delayacct" = yes; then
+   AC_DEFINE([HAVE_DELAYACCT], [1], [Define if delay accounting support should be enabled.])
+-  AM_CFLAGS="$AM_CFLAGS -I/usr/include/libnl3"
++  AM_CFLAGS="$AM_CFLAGS"
+ fi
+ AM_CONDITIONAL([HAVE_DELAYACCT], [test "$enable_delayacct" = yes])
+ 
+-- 
+2.47.3
+

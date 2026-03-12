@@ -16,7 +16,7 @@ do_configure:prepend() {
     # will try to fetch https://ceres-solver-review.googlesource.com/tools/hooks/commit-msg durind do_configure
     # which sometimes gets stuck (as there is no TIMEOUT set in DOWNLOAD)
     # and we really don't need Gerrit's Change-Id tags when just building this
-    touch ${S}/.git/hooks/commit-msg
+    touch ${S}/.git/hooks/commit-msg 2>/dev/null || :
 }
 
 # We don't want path to eigen3 in ceres-solver RSS to be

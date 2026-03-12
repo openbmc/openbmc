@@ -26,4 +26,9 @@ do_install_ptest () {
     cp -r ${B}/t ${D}${PTEST_PATH}
 }
 
+RDEPENDS:${PN}-ptest += "perl-module-test-more \
+                         perl-module-findbin \
+                         perl-module-test2-api-breakage \
+                         perl-module-tie-handle"
+
 BBCLASSEXTEND = "native"

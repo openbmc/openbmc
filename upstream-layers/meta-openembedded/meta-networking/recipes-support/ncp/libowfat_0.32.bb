@@ -6,7 +6,7 @@ HOMEPAGE = "http://www.fefe.de/libowfat"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8ca43cbc842c2336e835926c2166c28b"
 
-SRC_URI = "https://www.fefe.de/${BPN}/${BP}.tar.xz \
+SRC_URI = "http://www.fefe.de/${BPN}/${BP}.tar.xz \
            file://0001-Depend-on-haveuint128.h-for-umult64.c.patch \
            file://0001-replace-__pure__-with-compiler-attribute-pure.patch \
            file://0001-fix-incompatible-type-error-with-gcc-15.patch \

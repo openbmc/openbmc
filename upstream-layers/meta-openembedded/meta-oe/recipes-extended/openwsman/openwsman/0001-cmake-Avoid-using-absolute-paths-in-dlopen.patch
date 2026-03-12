@@ -1,0 +1,54 @@
+From 03d3f19c00f959bb77464dfa90bcb197eb71b27a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 25 Jul 2025 20:41:05 -0700
+Subject: [PATCH] cmake: Avoid using absolute paths in dlopen()
+
+This encodes absolutes paths currently, via LIB_SSL
+which is detected in cmake and then passed to compiler
+via a define in src/server/CMakeLists.txt#L19
+
+ADD_DEFINITIONS(-DSSL_LIB="${SSL_LIB}")
+
+This define is then used by a dlopen() call in
+src/server/shttpd/shttpd.c#L1514
+
+if ((lib = dlopen(SSL_LIB, RTLD_LAZY)) == NULL) {
+
+This ends up emitting absolute path into openwsmand
+binary
+
+It breaks reproducible builds, especially in cross-build
+e.g. yocto, where build time install dir will never be same as
+runtime install dir, this absolute path will be
+non-existent on targets and this call will fail.
+
+Removing path element and leaving libssl.so which will/can be
+in /usr/lib on targets
+
+This approach makes your binary more portable
+since it doesn't hardcode absolute paths.
+
+Upstream-Status: Submitted [https://github.com/Openwsman/openwsman/pull/213]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/server/CMakeLists.txt | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/server/CMakeLists.txt b/src/server/CMakeLists.txt
+index 79702787..39568504 100644
+--- a/src/server/CMakeLists.txt
++++ b/src/server/CMakeLists.txt
+@@ -16,7 +16,12 @@ SET(openwsmand_SOURCES ${openwsmand_SOURCES} gss.c wsmand.c)
+ IF(USE_OPENSSL)
+ SET(SSL_LIB ${OPENSSL_SSL_LIBRARY})
+ MESSAGE(STATUS "SSL_LIB is at >${SSL_LIB}<")
+-ADD_DEFINITIONS(-DSSL_LIB="${SSL_LIB}")
++
++# Extract just the filename from the full path
++get_filename_component(SSL_LIB_NAME ${SSL_LIB} NAME)
++MESSAGE(STATUS "SSL_LIB filename is >${SSL_LIB_NAME}<")
++
++ADD_DEFINITIONS(-DSSL_LIB="${SSL_LIB_NAME}")
+ ENDIF(USE_OPENSSL)
+ 
+ ADD_DEFINITIONS(-DDELIM_CHARS=", " )

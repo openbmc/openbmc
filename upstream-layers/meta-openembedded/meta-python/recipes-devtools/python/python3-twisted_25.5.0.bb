@@ -8,6 +8,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5316a448a61a38d722c291f78d915d11"
 
 SRC_URI[sha256sum] = "1deb272358cb6be1e3e8fc6f9c8b36f78eb0fa7c2233d2dbe11ec6fee04ea316"
 
+CVE_PRODUCT = "twisted"
+
 inherit pypi python_hatchling
 
 PACKAGES =+ "\

@@ -1,3 +1,5 @@
+HOMEPAGE = "https://www.yoctoproject.org/"
+
 # polkit must prepare polkitd group
 DEPENDS += "polkit"
 

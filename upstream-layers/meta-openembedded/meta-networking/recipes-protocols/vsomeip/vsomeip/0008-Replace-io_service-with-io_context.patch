@@ -1,0 +1,51 @@
+From 4b2d82748eaf53a700002d05c6629fa6f5df3dcf Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 20 Nov 2025 17:27:39 +0800
+Subject: [PATCH] Replace io_service with io_context
+
+boost::asio::io_service has been removed in boost 1.87. Replace it with
+boost::asio::io_context.
+
+Fix:
+test/common/include/common/process_manager.hpp:10:10: fatal error:
+boost/asio/io_service.hpp: No such file or directory
+   10 | #include <boost/asio/io_service.hpp>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Upstream-Status: Pending
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ test/common/include/common/process_manager.hpp | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/test/common/include/common/process_manager.hpp b/test/common/include/common/process_manager.hpp
+index e09d530e..23731785 100644
+--- a/test/common/include/common/process_manager.hpp
++++ b/test/common/include/common/process_manager.hpp
+@@ -6,8 +6,11 @@
+ #pragma once
+ 
+ #include <boost/date_time/posix_time/posix_time.hpp>
+-#include <boost/process.hpp>
+-#include <boost/asio/io_service.hpp>
++#define BOOST_PROCESS_VERSION 1
++#include <boost/process/v1/child.hpp>
++#include <boost/process/v1/env.hpp>
++#include <boost/process/v1/detail/on_exit.hpp>
++#include <boost/asio/io_context.hpp>
+ 
+ #include <iostream>
+ 
+@@ -97,7 +100,7 @@ private:
+      */
+     void spawn() {
+         std::unique_lock<std::mutex> lock(process_mutex_);
+-        boost::asio::io_service io;
++        boost::asio::io_context io;
+ 
+         // Handle env vars
+         boost::process::environment cp_env;
+-- 
+2.34.1
+

@@ -1,0 +1,35 @@
+From 05d8f730b746d73a1efec7c42066953b5708c5b6 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 2 Dec 2025 12:07:42 +0800
+Subject: [PATCH] Makefile.am: Pass BUILD_CFLAGS to BUILD_CC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Pass BUILD_CFLAGS to BUILD_CC to fix the below error.
+   Making all in sdrcomp
+   make[3]: Entering directory '/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/sources/OpenIPMI-2.0.37/lanserv/sdrcomp'
+aarch64-wrs-linux-gcc  -mcpu=cortex-a57+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/recipe-sysroot -DHAVE_CONFIG_H -I. -I../..  -DSTATEDIR='"/var"'  -Wall -Wsign-compare -I../../include -I../../lanserv -I../../utils -O2 -g -fcanon-prefix-map  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/sources/OpenIPMI-2.0.37=/usr/src/debug/openipmi/2.0.37  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/sources/OpenIPMI-2.0.37=/usr/src/debug/openipmi/2.0.37  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/recipe-sysroot=  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/recipe-sysroot-native=  -pipe -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -c -o sdrcomp.o sdrcomp.c
+gcc  -o sdrcomp_build ../../lanserv/sdrcomp/sdrcomp.c -O2 -g -fcanon-prefix-map  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/sources/OpenIPMI-2.0.37=/usr/src/debug/openipmi/2.0.37  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/sources/OpenIPMI-2.0.37=/usr/src/debug/openipmi/2.0.37  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/recipe-sysroot=  -ffile-prefix-map=/tmp/work/cortexa57-wrs-linux/openipmi/2.0.37/recipe-sysroot-native=  -pipe -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -Wall -Wsign-compare -I../../include -I../../lanserv -I../../utils -lm
+   gcc: error: unrecognized command-line option ‘-fcanon-prefix-map’; did you mean ‘-fmacro-prefix-map=’?
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ lanserv/sdrcomp/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lanserv/sdrcomp/Makefile.am b/lanserv/sdrcomp/Makefile.am
+index e473af8..057a536 100644
+--- a/lanserv/sdrcomp/Makefile.am
++++ b/lanserv/sdrcomp/Makefile.am
+@@ -19,4 +19,4 @@ BUILD_SDRCOMP_DEPS = $(top_srcdir)/lanserv/persist.c \
+ 	$(top_srcdir)/utils/string.c
+ BUILD_SDRCOMP_SRCS = $(top_srcdir)/$(subdir)/sdrcomp.c
+ sdrcomp_build$(EXEEXT): $(BUILD_SDRCOMP_SRCS) $(BUILD_SDRCOMP_DEPS)
+-	$(BUILD_CC) -o $@ $(BUILD_SDRCOMP_SRCS) $(CFLAGS) $(AM_CFLAGS) -lm
++	$(BUILD_CC) -o $@ $(BUILD_SDRCOMP_SRCS) $(BUILD_CFLAGS) $(AM_CFLAGS) -lm
+-- 
+2.34.1
+

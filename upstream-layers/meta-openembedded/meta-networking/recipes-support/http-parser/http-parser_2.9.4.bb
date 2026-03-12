@@ -11,7 +11,7 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE-MIT;md5=9bfa835d048c194ab30487af8d7b3778"
 
-SRC_URI = "git://github.com/nodejs/http-parser.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/nodejs/http-parser.git;branch=main;protocol=https"
 SRCREV = "2343fd6b5214b2ded2cdcf76de2bf60903bb90cd"
 
 

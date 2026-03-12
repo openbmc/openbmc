@@ -1,0 +1,41 @@
+From 9a3cf8cf44e916cca30cd6c3cfcf6b2f20ce2c06 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 1 Aug 2025 11:22:24 -0700
+Subject: [PATCH 2/2] catch.hpp: Define SIGSTKSZ as constant
+
+This compilation error is occurring because of a change
+in how SIGSTKSZ is defined in newer versions of glibc.
+In older versions, SIGSTKSZ was a compile-time constant,
+but in glibc 2.34 and later, it became a runtime value
+(specifically a function call to sysconf(_SC_SIGSTKSZ)),
+which means it can't be used to declare static arrays
+at file scope.
+
+This is already fixed for Catch2 but for catch-1.x
+this is best we can do, define it to be 16K which is
+the value in glibc 2.33 for all architectures except
+IA ( itanium ) where it was 256K but we do not support
+it in OE
+
+Upstream-Status: Inappropriate [Cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ test/thirdparty/catch/catch.hpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/test/thirdparty/catch/catch.hpp b/test/thirdparty/catch/catch.hpp
+index fdb046f..1e444a4 100644
+--- a/test/thirdparty/catch/catch.hpp
++++ b/test/thirdparty/catch/catch.hpp
+@@ -6519,6 +6519,11 @@ namespace Catch {
+ 
+ #include <signal.h>
+ 
++#ifdef SIGSTKSZ
++#undef SIGSTKSZ
++#define SIGSTKSZ 16384 // 16K bytes
++#endif
++
+ namespace Catch {
+ 
+     struct SignalDefs {

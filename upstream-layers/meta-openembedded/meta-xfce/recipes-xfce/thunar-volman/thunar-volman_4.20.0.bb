@@ -1,4 +1,5 @@
 SUMMARY = "Automatic management of removable drives and media for thunar"
+HOMEPAGE = "https://docs.xfce.org/xfce/thunar/thunar-volman"
 SECTION = "x11"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"

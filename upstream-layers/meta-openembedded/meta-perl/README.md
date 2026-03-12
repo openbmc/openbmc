@@ -75,7 +75,7 @@ Maintenance
 Send patches / pull requests to openembedded-devel@lists.openembedded.org with
 '[meta-perl]' in the subject.
 
-When sending single patches, please using something like:
+When sending single patches, please use something like:
 git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix='meta-perl][PATCH'
 
 Layer maintainers:

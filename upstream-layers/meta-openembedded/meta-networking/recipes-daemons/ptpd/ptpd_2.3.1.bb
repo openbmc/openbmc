@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://README;md5=0733e1b3788ab2ebbc63bf33a020da1d"
 
 DEPENDS = "libpcap"
 
-inherit autotools pkgconfig systemd
+inherit autotools pkgconfig systemd sourceforge-releases
 
 # return something like '1.2.3' or '1.2.3/rc1'
 #
@@ -31,8 +31,6 @@ SRC_URI = "http://downloads.sourceforge.net/project/ptpd/ptpd/${@get_sub(d)}/ptp
 
 SRC_URI[md5sum] = "253bab7ab51d969616ea811be1f132f3"
 SRC_URI[sha256sum] = "0dbf54dd2c178bd9fe62481d2c37513ee36636d8bf137cfdad96891490cdbf93"
-
-UPSTREAM_CHECK_URI = "http://sourceforge.net/projects/ptpd/files/releases"
 
 S = "${UNPACKDIR}/ptpd-${PV}"
 

@@ -1,4 +1,4 @@
-From c34c65a3f5ddec22cb417872f90c2c9540a1847b Mon Sep 17 00:00:00 2001
+From 4d68ea4a75c63cf92469be95579542c434561871 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 11:17:41 +0800
 Subject: [PATCH] Always use devmapper
@@ -21,7 +21,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 8 insertions(+), 28 deletions(-)
 
 diff --git a/create-config.mk b/create-config.mk
-index 40d2446a..f5eb2803 100644
+index f620da5a..8ffcde02 100644
 --- a/create-config.mk
 +++ b/create-config.mk
 @@ -79,34 +79,14 @@ URCU_VERSION = $(shell \
@@ -67,6 +67,3 @@ index 40d2446a..f5eb2803 100644
  
  libmount_h := $(shell $(PKG_CONFIG) --variable=includedir mount)/libmount/libmount.h
  ifneq ($(call check_func,mnt_unref_cache,$(libmount_h)),0)
--- 
-2.25.1
-

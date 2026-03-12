@@ -13,7 +13,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 RDEPENDS:${PN} = "libvdpau"
 
 SRCREV = "d3c5bd63bf8878d59b22d618d2bb5116db392d28"
-SRC_URI = "git://anongit.freedesktop.org/vdpau/vdpauinfo;branch=master"
+SRC_URI = "git://gitlab.freedesktop.org/vdpau/vdpauinfo.git;protocol=https;branch=master;tag=${PV}"
 
 
 inherit autotools pkgconfig

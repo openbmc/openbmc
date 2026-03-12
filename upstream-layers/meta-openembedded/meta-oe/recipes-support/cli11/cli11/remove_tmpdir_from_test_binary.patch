@@ -1,0 +1,33 @@
+Remove tmpdir from apptest binary
+
+This binary is used in the ptest package. It executes another helper binary
+for the test, which is identified by its absolute path, as it was determined during
+build. To avoid the QA error (and to find the helper binary during test excution),
+use pwd command files.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+
+
+diff --git a/tests/AppTest.cpp b/tests/AppTest.cpp
+index 29aff27c..ddb8238b 100644
+--- a/tests/AppTest.cpp
++++ b/tests/AppTest.cpp
+@@ -2819,7 +2819,7 @@ TEST_CASE("C20_compile", "simple") {
+ 
+ // #845
+ TEST_CASE("Ensure UTF-8", "[app]") {
+-    const char *commandline = CLI11_ENSURE_UTF8_EXE " 1234 false \"hello world\"";
++    const char *commandline = "$(pwd)/ensure_utf8 1234 false \"hello world\"";
+     int retval = std::system(commandline);
+ 
+     if(retval == -1) {
+@@ -2837,7 +2837,7 @@ TEST_CASE("Ensure UTF-8", "[app]") {
+ 
+ // #845
+ TEST_CASE("Ensure UTF-8 called twice", "[app]") {
+-    const char *commandline = CLI11_ENSURE_UTF8_TWICE_EXE " 1234 false \"hello world\"";
++    const char *commandline = "$(pwd)/ensure_utf8_twice 1234 false \"hello world\"";
+     int retval = std::system(commandline);
+ 
+     if(retval == -1) {

@@ -1,4 +1,4 @@
-From 71c44c214c0ab8dc8e9675e5e862f2e342fcb271 Mon Sep 17 00:00:00 2001
+From 7df907871b87772072abc94aeff2b7ba770e8f44 Mon Sep 17 00:00:00 2001
 From: Joe Slater <jslater@windriver.com>
 Date: Thu, 9 Mar 2017 10:58:06 -0800
 Subject: [PATCH] chrony: fix build failure for arma9
@@ -22,16 +22,15 @@ Signed-off-by: Robert Joslyn <robert.joslyn@redrectangle.org>
 Refreshed for 4.0
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
-
 ---
  sys_linux.c | 15 +++++++++------
  1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/sys_linux.c b/sys_linux.c
-index 6849637..10f9a57 100644
+index 8373e25..47b4459 100644
 --- a/sys_linux.c
 +++ b/sys_linux.c
-@@ -485,7 +485,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -490,7 +490,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
  #endif
      SCMP_SYS(gettimeofday),
      SCMP_SYS(settimeofday),
@@ -39,7 +38,7 @@ index 6849637..10f9a57 100644
  
      /* Process */
      SCMP_SYS(clone),
-@@ -495,7 +494,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -500,7 +499,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(exit),
      SCMP_SYS(exit_group),
      SCMP_SYS(getpid),
@@ -47,7 +46,7 @@ index 6849637..10f9a57 100644
      SCMP_SYS(getuid),
      SCMP_SYS(getuid32),
  #ifdef __NR_membarrier
-@@ -515,7 +513,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -520,7 +518,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      /* Memory */
      SCMP_SYS(brk),
      SCMP_SYS(madvise),
@@ -55,7 +54,7 @@ index 6849637..10f9a57 100644
      SCMP_SYS(mmap2),
      SCMP_SYS(mprotect),
      SCMP_SYS(mremap),
-@@ -575,8 +572,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -580,8 +577,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(sendmsg),
      SCMP_SYS(sendto),
      SCMP_SYS(shutdown),
@@ -64,7 +63,7 @@ index 6849637..10f9a57 100644
  
      /* General I/O */
      SCMP_SYS(_newselect),
-@@ -600,7 +595,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -605,7 +600,6 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
  #ifdef __NR_futex_time64
      SCMP_SYS(futex_time64),
  #endif
@@ -72,7 +71,7 @@ index 6849637..10f9a57 100644
      SCMP_SYS(set_robust_list),
      SCMP_SYS(write),
      SCMP_SYS(writev),
-@@ -609,6 +603,15 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
+@@ -614,6 +608,15 @@ SYS_Linux_EnableSystemCallFilter(int level, SYS_ProcessContext context)
      SCMP_SYS(getrandom),
      SCMP_SYS(sysinfo),
      SCMP_SYS(uname),

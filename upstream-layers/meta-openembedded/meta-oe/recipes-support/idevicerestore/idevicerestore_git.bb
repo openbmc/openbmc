@@ -6,11 +6,11 @@ LIC_FILES_CHKSUM = "\
 
 HOMEPAGE = "http://www.libimobiledevice.org/"
 
-DEPENDS = "libirecovery libimobiledevice libzip curl libimobiledevice-glue openssl"
+DEPENDS = "libirecovery libimobiledevice libzip curl libimobiledevice-glue openssl libtatsu"
 
 PV = "1.0.1+git"
 
-SRCREV = "ecae6c6e8ca6b6bad080a1c73f10ffd0e67d75a7"
+SRCREV = "a0cec3b34fb112168aaae9fbb024e15302563b34"
 SRC_URI = "git://github.com/libimobiledevice/idevicerestore;protocol=https;branch=master"
 
 inherit autotools pkgconfig

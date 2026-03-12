@@ -1,0 +1,72 @@
+From b5dbfca23986429853ccb15a38cc526d9df0dd40 Mon Sep 17 00:00:00 2001
+From: Haixiao Yan <haixiao.yan.cn@windriver.com>
+Date: Wed, 22 Oct 2025 15:23:57 +0800
+Subject: [PATCH 2/2] fix: correct struct packing on 32-bit with _TIME_BITS=64
+
+On 32-bit platforms with glibc time64 ABI, time_t is 64-bit wide while
+`long` remains 32-bit. This causes struct timeval to use two 64-bit fields
+(tv_sec, tv_usec). The previous code incorrectly packed timeout as "ll",
+leading to EINVAL in setsockopt(SO_RCVTIMEO).
+
+Use "qq" instead when m2.time_t_bits() == 64 to match the actual ABI.
+
+Fixes: https://todo.sr.ht/~mcepl/m2crypto/374
+
+Upstream-Status: Backport [https://gitlab.com/m2crypto/m2crypto/-/commit/473de659f78e]
+
+Signed-off-by: Haixiao Yan <haixiao.yan.cn@windriver.com>
+---
+ src/M2Crypto/SSL/timeout.py | 24 ++++++++++++++++++++----
+ 1 file changed, 20 insertions(+), 4 deletions(-)
+
+diff --git a/src/M2Crypto/SSL/timeout.py b/src/M2Crypto/SSL/timeout.py
+index b45f38b1cbdb..5ba52283b6f8 100644
+--- a/src/M2Crypto/SSL/timeout.py
++++ b/src/M2Crypto/SSL/timeout.py
+@@ -33,10 +33,14 @@ class timeout(object):
+             millisec = int(self.sec * 1000 + round(float(self.microsec) / 1000))
+             binstr = struct.pack("l", millisec)
+         else:
+-            if m2.time_t_bits() == 32:
++            bits = m2.time_t_bits()
++            if bits == 32:
+                 binstr = struct.pack("ii", self.sec, self.microsec)
++            elif bits == 64:
++                # handle both 64-bit and 32-bit+TIME_BITS=64
++                binstr = struct.pack("qq", self.sec, self.microsec)
+             else:
+-                binstr = struct.pack("ll", self.sec, self.microsec)
++                raise ValueError(f"Unsupported time_t_bits: {bits}")
+         return binstr
+ 
+ 
+@@ -48,7 +52,13 @@ def struct_to_timeout(binstr: bytes) -> timeout:
+         sec = int(millisec / 1000)
+         microsec = (millisec % 1000) * 1000
+     else:
+-        (sec, microsec) = struct.unpack("ll", binstr)
++        bits = m2.time_t_bits()
++        if bits == 32:
++            (sec, microsec) = struct.unpack("ii", binstr)
++        elif bits == 64:
++            (sec, microsec) = struct.unpack("qq", binstr)
++        else:
++            raise ValueError(f"Unsupported time_t_bits: {bits}")
+     return timeout(sec, microsec)
+ 
+ 
+@@ -56,4 +66,10 @@ def struct_size() -> int:
+     if sys.platform == "win32":
+         return struct.calcsize("l")
+     else:
+-        return struct.calcsize("ll")
++        bits = m2.time_t_bits()
++        if bits == 32:
++            return struct.calcsize("ii")
++        elif bits == 64:
++            return struct.calcsize("qq")
++        else:
++            raise ValueError(f"Unsupported time_t_bits: {bits}")
+-- 
+2.34.1
+

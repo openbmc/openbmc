@@ -1,0 +1,16 @@
+#!/bin/sh
+
+RET=0
+cd tests
+
+for t in $(ls *); do
+    ./$t > /dev/null
+    if [ $? -eq 0 ]; then
+        echo PASS: $t
+    else
+        echo FAIL: $t
+        RET=1
+    fi
+done
+
+exit $RET

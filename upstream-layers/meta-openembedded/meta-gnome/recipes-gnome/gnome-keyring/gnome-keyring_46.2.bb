@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c \
 "
 
+CVE_PRODUCT = "gnome-keyring gnome_keyring"
+
 DEPENDS = " \
     glib-2.0-native \
     gtk+3 \

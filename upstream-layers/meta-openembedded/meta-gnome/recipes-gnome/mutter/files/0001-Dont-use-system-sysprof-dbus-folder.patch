@@ -1,4 +1,4 @@
-From 790177e2a89aa0710b570d595223bdb511241c56 Mon Sep 17 00:00:00 2001
+From 342358225ad886726d68239be8e9eb5e78eacb64 Mon Sep 17 00:00:00 2001
 From: Gyorgy Sarvari <skandigraun@gmail.com>
 Date: Tue, 11 Feb 2025 13:39:54 +0100
 Subject: [PATCH] Don't use system sysprof dbus folder
@@ -10,7 +10,7 @@ system ($datadir/dbus-1/interfaces) instead of searching for it
 in the $RECIPE_SYSROOT.
 
 To ensure that it looks for this file in the correct folder, prefix
-the search path with the value of the sys_root property, which is set 
+the search path with the value of the sys_root property, which is set
 in the meson.cross file (by meson.bbclass).
 
 Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
@@ -21,10 +21,10 @@ Upstream-Status: Inappropriate [oe-specific: only related to cross-compiling]
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 551cb23..5199be6 100644
+index 8513f14..0f87e4a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -446,7 +446,7 @@ if have_profiler
+@@ -469,7 +469,7 @@ if have_profiler
  
    if libsysprof_capture_dep.type_name() == 'pkgconfig'
      sysprof_dep = dependency('sysprof-6', 'sysprof-4')

@@ -22,6 +22,7 @@ SRC_URI = "git://github.com/facebook/${BPN}.git;branch=${SRCBRANCH};protocol=htt
            file://run-ptest \
            file://0001-Fix-build-error-with-gcc-13-by-adding-cstdint-header.patch \
            file://0001-checkpoint.h-Add-missing-includes-cstdint.patch \
+           file://0001-Findzstd.cmake-support-pkg-config-based-zstd-detecti.patch \
           "
 
 SRC_URI:append:riscv32 = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
@@ -29,6 +30,7 @@ SRC_URI:append:mips = " file://0001-replace-old-sync-with-new-atomic-builtin-equ
 SRC_URI:append:powerpc = " file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
 SRC_URI:remove:toolchain-clang:riscv32 = "file://0001-replace-old-sync-with-new-atomic-builtin-equivalents.patch"
 
+LDFLAGS:append:toolchain-clang:x86 = "${@bb.utils.contains_any("TC_CXX_RUNTIME", "gnu", " -latomic", "", d)}"
 
 inherit cmake ptest
 
@@ -51,6 +53,7 @@ EXTRA_OECMAKE = "\
 "
 
 CXXFLAGS += "${@bb.utils.contains('SELECTED_OPTIMIZATION', '-Og', '-DXXH_NO_INLINE_HINTS', '', d)}"
+CXXFLAGS += "${@bb.utils.contains('TUNE_FEATURES', 'x86-64-v3', '-mpclmul', '', d)}"
 
 do_install:append() {
     # Fix for qa check buildpaths

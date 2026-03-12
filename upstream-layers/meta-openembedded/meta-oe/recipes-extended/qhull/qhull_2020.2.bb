@@ -25,3 +25,5 @@ inherit cmake
 SYSROOT_DIRS:append = " \
     ${bindir} \
 "
+
+BBCLASSEXTEND = "native"

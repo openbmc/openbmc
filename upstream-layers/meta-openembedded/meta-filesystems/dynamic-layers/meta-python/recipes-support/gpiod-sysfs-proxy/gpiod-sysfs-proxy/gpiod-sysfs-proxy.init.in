@@ -40,7 +40,7 @@ do_start()
 		mkdir -p $MOUNTPOINT
 	fi
 
-	$PROG $MOUNTPOINT -o nonempty -o allow_other -o default_permissions -o entry_timeout=0 -f | logger -i $NAME &
+	$PROG $MOUNTPOINT -o nonempty -o allow_other -o default_permissions -o entry_timeout=0 -o attr_timeout=0 -f | logger -i $NAME &
 	echo "done"
 }
 

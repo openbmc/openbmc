@@ -7,7 +7,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 DEPENDS = "libowfat"
 
-SRC_URI = "https://dl.fefe.de/${BP}.tar.bz2"
+SRC_URI = "http://dl.fefe.de/${BP}.tar.bz2"
 SRC_URI[md5sum] = "421c4855bd3148b7d0a4342942b4bf13"
 SRC_URI[sha256sum] = "6cfa72edd5f7717bf7a4a93ccc74c4abd89892360e2e0bb095a73c24b9359b88"
 

@@ -12,6 +12,8 @@ EXTRA_OEMAKE:class-cross = 'RPMPKG="${PV}" \
 EXTRA_OEMAKE:append:class-native = " LDFLAGS='${BUILD_LDFLAGS}'"
 EXTRA_OEMAKE:append:class-cross = " LDFLAGS='${BUILD_LDFLAGS}'"
 
+DEPENDS:append:class-cross = " zlib-native"
+
 do_install:class-target () {
     oe_runmake DESTDIR=${D} install
 }

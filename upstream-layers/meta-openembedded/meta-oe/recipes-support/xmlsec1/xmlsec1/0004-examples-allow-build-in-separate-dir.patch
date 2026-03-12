@@ -1,0 +1,29 @@
+From fab6503dca2046d32fa186c33c566c58110334a5 Mon Sep 17 00:00:00 2001
+From: Jackie Huang <jackie.huang@windriver.com>
+Date: Tue, 30 Dec 2014 11:18:17 +0800
+Subject: [PATCH] examples: allow build in separate dir
+
+Upstream-Status: Inappropriate [ OE specific ]
+
+Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
+---
+ examples/Makefile | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/examples/Makefile b/examples/Makefile
+index 3da1cb33..ff44cb7b 100644
+--- a/examples/Makefile
++++ b/examples/Makefile
+@@ -16,8 +16,10 @@ ifndef CC
+ CC	= gcc
+ endif
+ 
+-CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS -Wall -Wextra
+-LDLIBS  += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
++top_srcdir = ..
++top_builddir = ..
++CFLAGS  += -I$(top_srcdir)/include -g $(shell PKG_CONFIG_PATH=$(top_srcdir) pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS -Wall -Wextra
++LDLIBS += -L$(top_builddir)/src/.libs -g $(shell PKG_CONFIG_PATH=$(top_srcdir) pkg-config --libs xmlsec1 )
+ 
+ DESTDIR = /usr/share/xmlsec1
+ install-ptest:

@@ -23,6 +23,7 @@ RDEPENDS:${PN} += " \
 RDEPENDS:${PN}-ptest += " \
     python3-fsspec \
     python3-aiohttp \
+    python3-pytest-html \
     python3-requests \
 "
 BBCLASSEXTEND = "native nativesdk"

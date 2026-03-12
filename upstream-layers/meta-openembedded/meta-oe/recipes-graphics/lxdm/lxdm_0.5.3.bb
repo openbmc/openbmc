@@ -29,7 +29,7 @@ DEPENDS = "virtual/libintl intltool-native cairo dbus gdk-pixbuf glib-2.0 gtk+3 
 DEPENDS += "${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "consolekit", d)}"
 DEPENDS:append:libc-musl = " libexecinfo"
 
-inherit autotools pkgconfig gettext systemd features_check
+inherit autotools pkgconfig gettext systemd features_check sourceforge-releases
 # depends on virtual/libx11
 REQUIRED_DISTRO_FEATURES = "x11"
 

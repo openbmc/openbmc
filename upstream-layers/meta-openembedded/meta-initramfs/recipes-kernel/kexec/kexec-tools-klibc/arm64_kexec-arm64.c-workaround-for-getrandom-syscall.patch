@@ -22,12 +22,10 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/arch/arm64/kexec-arm64.c | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/kexec/arch/arm64/kexec-arm64.c b/kexec/arch/arm64/kexec-arm64.c
-index b143e86..88d4168 100644
 --- a/kexec/arch/arm64/kexec-arm64.c
 +++ b/kexec/arch/arm64/kexec-arm64.c
-@@ -16,7 +16,11 @@
- #include <elf.h>
+@@ -19,7 +19,11 @@
+ #include <elf_info.h>
  
  #include <unistd.h>
 +
@@ -38,7 +36,7 @@ index b143e86..88d4168 100644
  #include <errno.h>
  #include <linux/random.h>
  
-@@ -487,10 +491,16 @@ static int setup_2nd_dtb(struct dtb *dtb, char *command_line, int on_crash)
+@@ -595,10 +599,16 @@ static int setup_2nd_dtb(struct dtb *dtb
  		 * have a valid random seed to pass to the
  		 * secondary kernel.
  		 */

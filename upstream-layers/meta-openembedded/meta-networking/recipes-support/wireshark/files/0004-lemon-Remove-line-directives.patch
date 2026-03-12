@@ -17,7 +17,7 @@ diff --git a/cmake/modules/UseLemon.cmake b/cmake/modules/UseLemon.cmake
 index e419de1..fa4034e 100644
 --- a/cmake/modules/UseLemon.cmake
 +++ b/cmake/modules/UseLemon.cmake
-@@ -12,6 +12,7 @@ if(LEMON_EXECUTABLE)
+@@ -17,6 +17,7 @@ if(LEMON_EXECUTABLE)
  				${_out}.h
  				${_out}.out
  			COMMAND ${LEMON_EXECUTABLE}
@@ -25,11 +25,11 @@ index e419de1..fa4034e 100644
  				-T/usr/share/lemon/lempar.c
  				-d.
  				${_in}
-@@ -30,6 +31,7 @@ else()
+@@ -35,6 +36,7 @@ else()
  				${_out}.h
  				${_out}.out
  			COMMAND $<TARGET_FILE:lemon>
 +				-l
  				-T${CMAKE_SOURCE_DIR}/tools/lemon/lempar.c
  				-d.
- 				${_in}
+ 				--

@@ -1,0 +1,42 @@
+From 01d9add9f9c25442329879d1c3513c68ed14a749 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 28 Aug 2025 10:29:59 +0800
+Subject: [PATCH] tasklist.c: fix -Wincompatible-pointer-types error
+
+Fix the following compile error:
+../../sources/libwnck-2.31.0/libwnck/tasklist.c:4355:49: error: passing argument 2 of 'sn_startup_sequence_get_last_active_time' from incompatible pointer type [-Wincompatible-pointer-types]
+ 4355 |                                                 &tv_sec, &tv_usec);
+      |                                                 ^~~~~~~
+      |                                                 |
+      |                                                 long int *
+In file included from /build/tmp/work/core2-32-wrsmllib32-linux/lib32-libwnck/2.31.0/lib32-recipe-sysroot/usr/include/startup-notification-1.0/libsn/sn.h:32,
+                 from ../../sources/libwnck-2.31.0/libwnck/private.h:36,
+                 from ../../sources/libwnck-2.31.0/libwnck/tasklist.c:40:
+/build/tmp/work/core2-32-wrsmllib32-linux/lib32-libwnck/2.31.0/lib32-recipe-sysroot/usr/include/startup-notification-1.0/libsn/sn-monitor.h:84:79: note: expected 'time_t *' {aka 'long long int *'} but argument is of type 'long int *'
+   84 |                                                            time_t            *tv_sec,
+      |                                                            ~~~~~~~~~~~~~~~~~~~^~~~~~
+
+Upstream-Status: Inappropriate [ Latest master don't have this code ]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ libwnck/tasklist.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/libwnck/tasklist.c b/libwnck/tasklist.c
+index 4f0c6c4..758fc5f 100644
+--- a/libwnck/tasklist.c
++++ b/libwnck/tasklist.c
+@@ -4340,7 +4340,8 @@ sequence_timeout_callback (void *user_data)
+   WnckTasklist *tasklist = user_data;
+   GList *tmp;
+   GTimeVal now;
+-  long tv_sec, tv_usec;
++  time_t tv_sec;
++  long tv_usec;
+   double elapsed;
+ 
+   g_get_current_time (&now);
+-- 
+2.34.1
+

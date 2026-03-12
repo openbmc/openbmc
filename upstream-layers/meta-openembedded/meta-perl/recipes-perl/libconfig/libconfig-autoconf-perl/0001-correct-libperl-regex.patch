@@ -1,0 +1,42 @@
+From 5ffd363a7acd4ef794eb265eaf6c42321097cd46 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sat, 25 Oct 2025 15:48:51 +0200
+Subject: [PATCH] correct libperl regex
+
+The module expects the libperl library's format (from $Config{libperl})
+to be versionless, just simply libperl.so. However this value in the
+OE builds is versioned, causing some issues.
+
+The module transforms this value into a linker flag, and tries to link
+with the library. The transformation is simple: cut off the "lib" from
+the start, and everything after the last dot.
+
+With versionless version, the transformation works: libperl.so -> perl
+
+However with versioned library it looks like this:
+libperl.so.5.99.9 -> perl.so.5.99
+which is just wrong.
+
+This patch changes this transformation in way that throws away everything
+after the first dot (instead of the last one).
+
+Upstream-Status: Submitted [https://github.com/ambs/Config-AutoConf/pull/19]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ lib/Config/AutoConf.pm | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/Config/AutoConf.pm b/lib/Config/AutoConf.pm
+index 0bba5a4..a2e7099 100644
+--- a/lib/Config/AutoConf.pm
++++ b/lib/Config/AutoConf.pm
+@@ -3001,7 +3001,7 @@ sub _check_link_perlapi
+ 
+     my $libperl = $Config{libperl};
+     $libperl =~ s/^lib//;
+-    $libperl =~ s/\.[^\.]*$//;
++    $libperl =~ s/^([^\.]*)\..*$/$1/;
+ 
+     push @{$self->{extra_link_flags}}, "-L" . File::Spec->catdir($Config{installarchlib}, "CORE");
+     push @{$self->{extra_libs}},       "$libperl";

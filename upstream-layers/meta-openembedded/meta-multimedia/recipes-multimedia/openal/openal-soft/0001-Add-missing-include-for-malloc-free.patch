@@ -1,0 +1,38 @@
+From 468b52958ded2dd942386d52e456ed259875b6e3 Mon Sep 17 00:00:00 2001
+From: Chris Robinson <chris.kcat@gmail.com>
+Date: Fri, 18 Jul 2025 01:57:32 -0700
+Subject: [PATCH] Add missing include for malloc/free
+
+Upstream-Status: Backport [https://github.com/kcat/openal-soft/commit/6b69e11867e6498f244da95de7a3d6c25f79f205]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ fmt-11.1.1/include/fmt/format.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/fmt-11.1.1/include/fmt/format.h b/fmt-11.1.1/include/fmt/format.h
+index d1b83d18..ae5700ff 100644
+--- a/fmt-11.1.1/include/fmt/format.h
++++ b/fmt-11.1.1/include/fmt/format.h
+@@ -44,6 +44,7 @@
+ #  include <cmath>    // std::signbit
+ #  include <cstddef>  // std::byte
+ #  include <cstdint>  // uint32_t
++#  include <cstdlib>  // std::malloc, std::free
+ #  include <cstring>  // std::memcpy
+ #  include <limits>   // std::numeric_limits
+ #  include <new>      // std::bad_alloc
+@@ -742,12 +743,12 @@ template <typename T> struct allocator {
+ 
+   T* allocate(size_t n) {
+     FMT_ASSERT(n <= max_value<size_t>() / sizeof(T), "");
+-    T* p = static_cast<T*>(malloc(n * sizeof(T)));
++    T* p = static_cast<T*>(std::malloc(n * sizeof(T)));
+     if (!p) FMT_THROW(std::bad_alloc());
+     return p;
+   }
+ 
+-  void deallocate(T* p, size_t) { free(p); }
++  void deallocate(T* p, size_t) { std::free(p); }
+ };
+ 
+ }  // namespace detail

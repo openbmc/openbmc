@@ -1,98 +1,92 @@
+# SPDX-FileCopyrightText: Axis Communication AB <https://www.axis.com/>
+# SPDX-License-Identifier: MIT
+
+DEPENDS += "python3-kconfiglib-native python3-pcpp-native"
+
+SRC_URI += " \
+    file://defconfig \
+    ${@oe.utils.vartrue('DEBUG_BUILD', 'file://debug.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'drm', 'file://drm.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'fbdev', 'file://fbdev.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'freetype', 'file://freetype.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'gridnav', 'file://gridnav.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'sdl', 'file://sdl.cfg', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'thorvg', 'file://thorvg.cfg', '', d)} \
+"
+
 PACKAGECONFIG ??= "drm"
 
-PACKAGECONFIG[drm] = ",,libdrm"
-PACKAGECONFIG[fbdev] = ",,"
+PACKAGECONFIG[drm] = ",,libdrm libevdev"
+PACKAGECONFIG[fbdev] = ",,libevdev"
+PACKAGECONFIG[freetype] = ",,freetype"
 PACKAGECONFIG[gridnav] = ",,"
 PACKAGECONFIG[thorvg] = ",,"
 PACKAGECONFIG[sdl] = ",,virtual/libsdl2 libsdl2-image"
 
-# Add libdrm include if drm is selected in PACKAGECONFIG
-TARGET_CFLAGS += "${@bb.utils.contains('PACKAGECONFIG', 'drm', '-I${STAGING_INCDIR}/libdrm', '', d)}"
+inherit cml1 python3native
 
-LVGL_CONFIG_USE_DRM = "${@bb.utils.contains('PACKAGECONFIG', 'drm', '1', '0', d)}"
+EXTRA_OECMAKE += "-DLV_BUILD_USE_KCONFIG=ON"
 
-LVGL_CONFIG_USE_EVDEV = "${@bb.utils.contains_any('PACKAGECONFIG', 'drm fbdev', '1', '0', d)}"
+LVGL_FLAGS += " \
+    ${@bb.utils.contains('PACKAGECONFIG', 'drm', '-I${STAGING_INCDIR}/libdrm', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'freetype', '-I${STAGING_INCDIR}/freetype2', '', d)} \
+"
+CFLAGS += "${LVGL_FLAGS}"
+CXXFLAGS += "${LVGL_FLAGS}"
 
-LVGL_CONFIG_USE_FBDEV = "${@bb.utils.contains('PACKAGECONFIG', 'fbdev', '1', '0', d)}"
+KCONFIG_CONFIG_ROOTDIR ?= "${S}"
+KCONFIG_FILE ?= "${KCONFIG_CONFIG_ROOTDIR}/Kconfig"
+export KCONFIG_CONFIG ?= "${KCONFIG_CONFIG_ROOTDIR}/.config"
+KCONFIG_CONFIG_COMMAND ?= "menuconfig ${KCONFIG_FILE}"
 
-LVGL_CONFIG_USE_SDL = "${@bb.utils.contains('PACKAGECONFIG', 'sdl', '1', '0', d)}"
+do_configure() {
+    cat ${UNPACKDIR}/defconfig ${@" ".join(find_cfgs(d))} > ${B}/defconfig
+    defconfig --kconfig ${KCONFIG_FILE} ${B}/defconfig
 
-LVGL_CONFIG_SDL_FULLSCREEN ?= "0"
+    cmake_do_configure
+}
 
-LVGL_CONFIG_LV_MEM_CUSTOM ?= "0"
-LVGL_CONFIG_LV_MEM_SIZE ?= "(64 * 1024U)"
-LVGL_CONFIG_LV_COLOR_DEPTH ?= "32"
+# Copied from cml1.bbclass. The only modification is that
+# ${KCONFIG_CONFIG_COMMAND} is not prefixed with "make" when called by
+# oe_terminal.
+python do_menuconfig() {
+    import shutil
 
-LVGL_CONFIG_LV_USE_LOG    ?= "0"
-LVGL_CONFIG_LV_LOG_LEVEL  ?= "LV_LOG_LEVEL_WARN"
-LVGL_CONFIG_LV_LOG_PRINTF ?= "0"
+    if not bb.utils.to_boolean(d.getVar("KCONFIG_CONFIG_ENABLE_MENUCONFIG")):
+        bb.fatal("do_menuconfig is disabled, please check KCONFIG_CONFIG_ENABLE_MENUCONFIG variable.")
+        return
 
-LVGL_CONFIG_LV_USE_FONT_COMPRESSED ?= "0"
+    config = os.path.join(d.getVar('KCONFIG_CONFIG_ROOTDIR'), ".config")
+    configorig = os.path.join(d.getVar('KCONFIG_CONFIG_ROOTDIR'), ".config.orig")
 
-LVGL_CONFIG_LV_USE_GRIDNAV = "${@bb.utils.contains('PACKAGECONFIG', 'gridnav', '1', '0', d)}"
+    try:
+        mtime = os.path.getmtime(config)
+        shutil.copy(config, configorig)
+    except OSError:
+        mtime = 0
 
-LVGL_CONFIG_LV_THEME_DEFAULT_DARK ?= "0"
+    # setup native pkg-config variables (kconfig scripts call pkg-config directly, cannot generically be overriden to pkg-config-native)
+    d.setVar("PKG_CONFIG_DIR", "${STAGING_DIR_NATIVE}${libdir_native}/pkgconfig")
+    d.setVar("PKG_CONFIG_PATH", "${PKG_CONFIG_DIR}:${STAGING_DATADIR_NATIVE}/pkgconfig")
+    d.setVar("PKG_CONFIG_LIBDIR", "${PKG_CONFIG_DIR}")
+    d.setVarFlag("PKG_CONFIG_SYSROOT_DIR", "unexport", "1")
+    # ensure that environment variables are overwritten with this tasks 'd' values
+    d.appendVar("OE_TERMINAL_EXPORTS", " PKG_CONFIG_DIR PKG_CONFIG_PATH PKG_CONFIG_LIBDIR PKG_CONFIG_SYSROOT_DIR")
 
-LVGL_CONFIG_USE_LOTTIE = "${@bb.utils.contains('PACKAGECONFIG', 'thorvg', '1', '0', d)}"
+    oe_terminal("sh -c '%s; if [ $? -ne 0 ]; then echo \"Command failed.\"; printf \"Press any key to continue... \"; read r; fi'" % d.getVar('KCONFIG_CONFIG_COMMAND'),
+                d.getVar('PN') + ' Configuration', d)
 
-LVGL_CONFIG_USE_VECTOR_GRAPHICS = "${@bb.utils.contains('PACKAGECONFIG', 'thorvg', '1', '0', d)}"
+    try:
+        newmtime = os.path.getmtime(config)
+    except OSError:
+        newmtime = 0
 
-LVGL_CONFIG_USE_THORVG_INTERNAL = "${@bb.utils.contains('PACKAGECONFIG', 'thorvg', '1', '0', d)}"
+    if newmtime > mtime:
+        bb.plain("Changed configuration saved at:\n %s\nRecompile will be forced" % config)
+        bb.build.write_taint('do_compile', d)
+}
 
-LVGL_CONFIG_USE_MATRIX = "${@bb.utils.contains('PACKAGECONFIG', 'thorvg', '1', '0', d)}"
-
-LVGL_CONFIG_USE_FLOAT = "${@bb.utils.contains('PACKAGECONFIG', 'thorvg', '1', '0', d)}"
-
-DEBUG_BUILD ??= "0"
-
-ALLOW_EMPTY:${PN} = "1"
-
-EXTRA_OECMAKE += "-Dinstall:BOOL=ON -DLIB_INSTALL_DIR=${baselib}"
-
-do_configure:append() {
-    # If there is a configuration template, start from that
-    [ -r "${S}/lv_conf_template.h" ] && cp -Lv "${S}/lv_conf_template.h" "${S}/lv_conf.h"
-
-    sed -r -e "s|#if 0 .*Set it to \"1\" to enable content.*|#if 1 // Enabled by ${PN}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_LINUX_DRM[[:space:]]).*|\1${LVGL_CONFIG_USE_DRM}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_LINUX_FBDEV[[:space:]]).*|\1${LVGL_CONFIG_USE_FBDEV}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_SDL[[:space:]]).*|\1${LVGL_CONFIG_USE_SDL}|" \
-        -e "s|^([[:space:]]*#define LV_USE_DRAW_SDL[[:space:]]).*|\1${LVGL_CONFIG_USE_SDL}|" \
-        -e "s|^([[:space:]]*#define LV_SDL_BUF_COUNT[[:space:]]).*|\1 2|" \
-        -e "s|^([[:space:]]*#define LV_SDL_FULLSCREEN[[:space:]]).*|\1${LVGL_CONFIG_SDL_FULLSCREEN}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_COLOR_DEPTH[[:space:]]).*|\1${LVGL_CONFIG_LV_COLOR_DEPTH}|" \
-        -e "s|^([[:space:]]*#define LV_MEM_CUSTOM[[:space:]]).*|\1${LVGL_CONFIG_LV_MEM_CUSTOM}|" \
-        -e "s|^([[:space:]]*#define LV_MEM_SIZE[[:space:]]).*|\1${LVGL_CONFIG_LV_MEM_SIZE}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_TICK_CUSTOM[[:space:]]).*|\1 1|" \
-        -e "s|^([[:space:]]*#define LV_TICK_CUSTOM_INCLUDE[[:space:]]).*|\1 <stdint.h>|" \
-        -e "s|^([[:space:]]*#define LV_TICK_CUSTOM_SYS_TIME_EXPR[[:space:]]).*|extern uint32_t custom_tick_get(void);\n\1 (custom_tick_get())|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_EVDEV[[:space:]]).*|\1${LVGL_CONFIG_USE_EVDEV}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_ASSERT_NULL[[:space:]]).*|\1${DEBUG_BUILD}|" \
-        -e "s|^([[:space:]]*#define LV_USE_ASSERT_MALLOC[[:space:]]).*|\1${DEBUG_BUILD}|" \
-        -e "s|^([[:space:]]*#define LV_USE_ASSERT_STYLE[[:space:]]).*|\1${DEBUG_BUILD}|" \
-        -e "s|^([[:space:]]*#define LV_USE_ASSERT_MEM_INTEGRITY[[:space:]]).*|\1${DEBUG_BUILD}|" \
-        -e "s|^([[:space:]]*#define LV_USE_ASSERT_OBJ[[:space:]]).*|\1${DEBUG_BUILD}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_LOG[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_LOG}|" \
-        -e "s|^([[:space:]]*#define LV_LOG_LEVEL[[:space:]]).*|\1${LVGL_CONFIG_LV_LOG_LEVEL}|" \
-        -e "s|^([[:space:]]*#define LV_LOG_PRINTF[[:space:]]).*|\1${LVGL_CONFIG_LV_LOG_PRINTF}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_FONT_COMPRESSED[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_FONT_COMPRESSED}|" \
-        -e "s|^([[:space:]]*#define LV_USE_GRIDNAV[[:space:]]).*|\1${LVGL_CONFIG_LV_USE_GRIDNAV}|" \
-        -e "s|^([[:space:]]*#define LV_THEME_DEFAULT_DARK[[:space:]]).*|\1${LVGL_CONFIG_LV_THEME_DEFAULT_DARK}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_VECTOR_GRAPHIC[[:space:]]).*|\1${LVGL_CONFIG_USE_VECTOR_GRAPHICS}|" \
-        -e "s|^([[:space:]]*#define LV_USE_THORVG_INTERNAL[[:space:]]).*|\1${LVGL_CONFIG_USE_THORVG_INTERNAL}|" \
-        -e "s|^([[:space:]]*#define LV_USE_MATRIX[[:space:]]).*|\1${LVGL_CONFIG_USE_MATRIX}|" \
-        -e "s|^([[:space:]]*#define LV_USE_FLOAT[[:space:]]).*|\1${LVGL_CONFIG_USE_FLOAT}|" \
-        \
-        -e "s|^([[:space:]]*#define LV_USE_LOTTIE[[:space:]]).*|\1${LVGL_CONFIG_USE_LOTTIE}|" \
-        -i "${S}/lv_conf.h"
+do_savedefconfig() {
+    bbplain "Saving defconfig to:\n${B}/defconfig"
+    savedefconfig --kconfig ${KCONFIG_FILE} --out ${B}/defconfig
 }

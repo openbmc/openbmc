@@ -1,0 +1,68 @@
+From 18e5b22a71f85091127cc063db79c8df687c582c Mon Sep 17 00:00:00 2001
+From: Ankur Tyagi <ankur.tyagi85@gmail.com>
+Date: Thu, 20 Nov 2025 16:01:58 +1300
+Subject: [PATCH] test: fix operator error
+
+Otherwise test fail with error [: -neq: binary operator expected
+
+Upstream-Status: Submitted [https://github.com/libimobiledevice/libplist/pull/284]
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ test/json-invalid-types.test  | 6 +++---
+ test/ostep-invalid-types.test | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/test/json-invalid-types.test b/test/json-invalid-types.test
+index c532316..a21fcd9 100755
+--- a/test/json-invalid-types.test
++++ b/test/json-invalid-types.test
+@@ -14,19 +14,19 @@ export PLIST_JSON_DEBUG=1
+ 
+ echo "Converting (failure expected)"
+ $top_builddir/tools/plistutil -f json -i $DATASRC/$TESTFILE0 -o /dev/null
+-if [ $? -neq 2 ]; then
++if [ $? -ne 2 ]; then
+   exit 1
+ fi
+ 
+ echo "Converting (failure expected)"
+ $top_builddir/tools/plistutil -f json -i $DATASRC/$TESTFILE1 -o /dev/null
+-if [ $? -neq 2 ]; then
++if [ $? -ne 2 ]; then
+   exit 2
+ fi
+ 
+ echo "Converting (failure expected)"
+ $top_builddir/tools/plistutil -f json -i $DATASRC/$TESTFILE2 -o /dev/null
+-if [ $? -neq 2 ]; then
++if [ $? -ne 2 ]; then
+   exit 3
+ fi
+ 
+diff --git a/test/ostep-invalid-types.test b/test/ostep-invalid-types.test
+index 9222394..240505c 100755
+--- a/test/ostep-invalid-types.test
++++ b/test/ostep-invalid-types.test
+@@ -14,19 +14,19 @@ export PLIST_OSTEP_DEBUG=1
+ 
+ echo "Converting (failure expected)"
+ $top_builddir/tools/plistutil -f openstep -i $DATASRC/$TESTFILE0 -o /dev/null
+-if [ $? -neq 2 ]; then
++if [ $? -ne 2 ]; then
+   exit 1
+ fi
+ 
+ echo "Converting (failure expected)"
+ $top_builddir/tools/plistutil -f openstepn -i $DATASRC/$TESTFILE1 -o /dev/null
+-if [ $? -neq 2 ]; then
++if [ $? -ne 2 ]; then
+   exit 2
+ fi
+ 
+ echo "Converting (failure expected)"
+ $top_builddir/tools/plistutil -f openstep -i $DATASRC/$TESTFILE2 -o /dev/null
+-if [ $? -neq 2 ]; then
++if [ $? -ne 2 ]; then
+   exit 3
+ fi
+ 

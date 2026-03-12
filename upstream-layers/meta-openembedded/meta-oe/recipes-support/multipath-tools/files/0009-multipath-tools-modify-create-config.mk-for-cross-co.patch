@@ -1,4 +1,4 @@
-From c22c897e7c55fc0b8c5bdd113a0357654ee895ae Mon Sep 17 00:00:00 2001
+From 3491d5ed1633a42d1f46d50ebce324d28e02ed32 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 4 Jun 2019 11:39:39 +0800
 Subject: [PATCH] multipath-tools: modify create-config.mk for
@@ -21,7 +21,7 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  1 file changed, 4 deletions(-)
 
 diff --git a/create-config.mk b/create-config.mk
-index 8bd2c20c..40d2446a 100644
+index e8fa391c..f620da5a 100644
 --- a/create-config.mk
 +++ b/create-config.mk
 @@ -127,10 +127,6 @@ ifeq ($(ENABLE_DMEVENTS_POLL),0)
@@ -35,6 +35,3 @@ index 8bd2c20c..40d2446a 100644
  # $(call TEST_CC_OPTION,option,fallback)
  # Test if the C compiler supports the option.
  # Evaluates to "option" if yes, and "fallback" otherwise.
--- 
-2.25.1
-

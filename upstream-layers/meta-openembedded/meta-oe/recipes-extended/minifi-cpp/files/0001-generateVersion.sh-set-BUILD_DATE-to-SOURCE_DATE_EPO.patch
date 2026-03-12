@@ -1,0 +1,34 @@
+From ee9722731b3f9cfc3d8e338ab09bc0ad409a6941 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Thu, 18 Sep 2025 14:43:11 +0000
+Subject: [PATCH] generateVersion.sh: set BUILD_DATE to SOURCE_DATE_EPOCH
+
+Use SOURCE_DATE_EPOCH to set BUILD_DATE to improve reproducibility.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ generateVersion.sh | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/generateVersion.sh b/generateVersion.sh
+index 0b50a16..96cc3ae 100755
+--- a/generateVersion.sh
++++ b/generateVersion.sh
+@@ -25,7 +25,11 @@ flags=$6
+ extensions=$7
+ buildident=$8
+ 
+-date=$(date +%s)
++if [ -n "${SOURCE_DATE_EPOCH}" ]; then
++  date=$(date -u -d "@${SOURCE_DATE_EPOCH}" +%s)
++else
++  date=$(date +%s)
++fi
+ 
+ if [ -d "${src_dir}"/.git ]; then
+   buildrev=$(git -C "${src_dir}" log -1 --pretty=format:"%H")
+-- 
+2.48.1
+

@@ -56,7 +56,7 @@ pidfile="/var/run/postmaster.${PGPORT}.pid"
 script_result=0
 
 start(){
-	[ -x "$PGENGINE/postmaster" ] || exit 5
+	[ -x "$PGENGINE/pg_ctl" ] || exit 5
 
 	PSQL_START=$"Starting ${NAME} service: "
 
@@ -109,9 +109,9 @@ start(){
 
 	echo -n "$PSQL_START"
 	test x"$PG_OOM_ADJ" != x && echo "$PG_OOM_ADJ" > /proc/self/oom_score_adj
-	$SU -l postgres -c "$PGENGINE/postmaster -p '$PGPORT' -D '$PGDATA' ${PGOPTS} &" >> "$PGLOG" 2>&1 < /dev/null
-	sleep 2
-	pid=`head -n 1 "$PGDATA/postmaster.pid" 2>/dev/null`
+	$SU -l postgres -c "$PGENGINE/pg_ctl start -D '$PGDATA' -s -o '-p $PGPORT' ${PGOPTS} -w -t 300" >> ${PGLOG}
+
+        pid=`su postgres -c "pg_ctl status -D /var/lib/postgresql/data" | grep "PID:" | grep -o [0-9]*`
 	if [ "x$pid" != x ]
 	then
 		echo -n " [ OK ]"

@@ -23,29 +23,26 @@ diff --git a/docs/Makefile.am b/docs/Makefile.am
 index b20918a..47406eb 100644
 --- a/docs/Makefile.am
 +++ b/docs/Makefile.am
-@@ -156,7 +156,7 @@ gnuplot-groff.ps: gnuplot.ms $(srcdir)/titlepag.ms
+@@ -175,7 +175,7 @@
+ 	$(AM_V_GEN) touch $@
  
- ### doc2xxx dependencies
- gnuplot.ms: doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc
--	$(AM_V_GEN) ./doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms "$(srcdir)/titlepag.ms"
-+	$(AM_V_GEN) doc2ms$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ms "$(srcdir)/titlepag.ms"
- 
- doc2ms_SOURCES = doc2ms.c termdoc.c
- doc2ms_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
-@@ -177,10 +177,10 @@ pdf_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
- 	$(AM_V_GEN)touch $@
- 
- figures.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
+ gnuplot.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
 -	$(AM_V_GEN)./doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc $@
 +	$(AM_V_GEN) doc2tex$(EXEEXT) -figures $(srcdir)/gnuplot.doc $@
  
- nofigures.tex: allterm.h doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc
--	$(AM_V_GEN)./doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc $@
-+	$(AM_V_GEN) doc2tex$(EXEEXT) $(srcdir)/gnuplot.doc $@
- 
- pdf: gnuplot.pdf
- pdf_nofig: nofigures.pdf
-@@ -260,7 +260,7 @@ gnuplot.ps: gnuplot.dvi
+ pdf: pdf_figures
+ 	$(MAKE) gnuplot.pdf
+@@ -255,7 +255,7 @@
+
+ gnuplot-ja.pdf: gnuplot-ja.doc title-ja.tex pdf_figures allterm-ja.h doc2tex$(EXEEXT)
+ 	iconv -f EUC-JP -t UTF-8 gnuplot-ja.doc > ja.doc
+-	./doc2tex$(EXEEXT) -figures -japanese ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
++	doc2tex$(EXEEXT) -figures -japanese ja.doc | sed 's/titlepag.tex/title-ja.tex/' > gnuplot-ja.tex
+ 	lualatex gnuplot-ja
+ 	lualatex gnuplot-ja
+ 	makeindex gnuplot-ja
+
+@@ -268,7 +268,7 @@ gnuplot.ps: gnuplot.dvi
  hlp: gnuplot.hlp
  
  gnuplot.hlp: doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc
@@ -54,7 +51,7 @@ index b20918a..47406eb 100644
  
  doc2hlp_SOURCES = doc2hlp.c termdoc.c
  
-@@ -268,14 +268,14 @@ doc2hlp_SOURCES = doc2hlp.c termdoc.c
+@@ -276,14 +276,14 @@ doc2hlp_SOURCES = doc2hlp.c termdoc.c
  gih: gnuplot.gih
  
  gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
@@ -71,7 +68,7 @@ index b20918a..47406eb 100644
  
  alldoc2gih_SOURCES = doc2gih.c termdoc.c
  alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
-@@ -290,7 +290,7 @@ $(srcdir)/windows/wgnuplot.hhk
+@@ -298,7 +298,7 @@ $(srcdir)/windows/wgnuplot.hhk
  wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
  
  wxhelp/wgnuplot.html: doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc 
@@ -80,7 +77,16 @@ index b20918a..47406eb 100644
  
  doc2wxhtml_SOURCES = windows/doc2html.c termdoc.c xref.c allterm.h
  doc2wxhtml_CPPFLAGS = -DALL_TERM_DOC -DWXHELP -I../src $(AM_CPPFLAGS)
-@@ -340,7 +340,7 @@ install-info: gnuplot.info
+@@ -318,7 +318,7 @@
+ 	$(AM_V_at) [ -d html ] || mkdir -p html
+ 	$(AM_V_at) rm -f html/Overview.html html/Plotting_Styles.html html/Commands.html html/Terminals.html
+ 	$(AM_V_at) rm -f html/NewFeatures.html
+-	$(AM_V_GEN)./doc2web$(EXEEXT) $(srcdir)/gnuplot.doc html
++	$(AM_V_GEN) doc2web$(EXEEXT) $(srcdir)/gnuplot.doc html
+ 	$(AM_V_GEN) sort -k 3 html/index.hhk > html/index.html
+ 
+ svg_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+@@ -372,7 +372,7 @@ install-info: gnuplot.info
  ipf: gnuplot.ipf
  
  gnuplot.ipf: doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc
@@ -89,7 +95,7 @@ index b20918a..47406eb 100644
  
  doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
  
-@@ -348,7 +348,7 @@ doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
+@@ -380,7 +380,7 @@ doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
  rtf: gnuplot.rtf
  
  gnuplot.rtf: doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc
@@ -98,14 +104,78 @@ index b20918a..47406eb 100644
  
  doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
  
-@@ -356,13 +356,13 @@ doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
- rnh: gnuplot.rnh
+@@ -386,7 +386,7 @@
  
- gnuplot.rnh: doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc
--	$(AM_V_GEN) ./doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
-+	$(AM_V_GEN) doc2rnh$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rnh
+ # this is how to check the gnuplot.doc file
+ check-local: checkdoc$(EXEEXT)
+-	$(AM_V_at)./checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
++	$(AM_V_at)checkdoc$(EXEEXT) < $(srcdir)/gnuplot.doc; \
+ 	if test $$? -eq 0; then \
+          echo "PASS: gnuplot.doc"; \
+ 	else \
+--- ./docs/Makefile.am.orig	2025-10-06 20:44:25.315270887 +0200
++++ ./docs/Makefile.am	2025-10-06 21:22:31.287527296 +0200
+@@ -268,7 +268,7 @@
+ hlp: gnuplot.hlp
  
- doc2rnh_SOURCES = doc2rnh.c termdoc.c
+ gnuplot.hlp: doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN)./doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
++	$(AM_V_GEN)doc2hlp$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.hlp
+ 
+ doc2hlp_SOURCES = doc2hlp.c termdoc.c
+ 
+@@ -276,14 +276,14 @@
+ gih: gnuplot.gih
+ 
+ gnuplot.gih: doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN)./doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
++	$(AM_V_GEN)doc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
+ 
+ doc2gih_SOURCES = doc2gih.c termdoc.c
+ 
+ # To include all terminals in the .gih file
+ allgih: alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc
+ 	@echo "generate gnuplot.gih with all terminals"
+-	$(AM_V_at)./alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
++	$(AM_V_at)alldoc2gih$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.gih
+ 
+ alldoc2gih_SOURCES = doc2gih.c termdoc.c
+ alldoc2gih_CPPFLAGS = -DALL_TERM_DOC $(AM_CPPFLAGS)
+@@ -298,7 +298,7 @@
+ wxhelp/wgnuplot.hhc wxhelp/wgnuplot.hhk wxhelp/*.html windows/*.png
+ 
+ wxhelp/wgnuplot.html: doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc 
+-	$(AM_V_GEN) ./doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
++	$(AM_V_GEN) doc2wxhtml$(EXEEXT) $(srcdir)/gnuplot.doc wxhelp/
+ 
+ doc2wxhtml_SOURCES = windows/doc2html.c termdoc.c xref.c allterm.h
+ doc2wxhtml_CPPFLAGS = -DALL_TERM_DOC -DWXHELP -I../src $(AM_CPPFLAGS)
+@@ -318,7 +318,7 @@
+ 	$(AM_V_at) [ -d html ] || mkdir -p html
+ 	$(AM_V_at) rm -f html/Overview.html html/Plotting_Styles.html html/Commands.html html/Terminals.html
+ 	$(AM_V_at) rm -f html/NewFeatures.html
+-	$(AM_V_GEN)./doc2web$(EXEEXT) $(srcdir)/gnuplot.doc html
++	$(AM_V_GEN)doc2web$(EXEEXT) $(srcdir)/gnuplot.doc html
+ 	$(AM_V_GEN) sort -k 3 html/index.hhk > html/index.html
+ 
+ svg_figures: $(GNUPLOT_EXE) $(srcdir)/plotstyles.gnu
+@@ -372,7 +372,7 @@
+ ipf: gnuplot.ipf
+ 
+ gnuplot.ipf: doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN) ./doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
++	$(AM_V_GEN) doc2ipf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.ipf
+ 
+ doc2ipf_SOURCES = doc2ipf.c termdoc.c xref.c
+ 
+@@ -380,13 +380,13 @@
+ rtf: gnuplot.rtf
+ 
+ gnuplot.rtf: doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc
+-	$(AM_V_GEN) ./doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
++	$(AM_V_GEN) doc2rtf$(EXEEXT) $(srcdir)/gnuplot.doc gnuplot.rtf
+ 
+ doc2rtf_SOURCES = doc2rtf.c termdoc.c xref.c
  
  # this is how to check the gnuplot.doc file
  check-local: checkdoc$(EXEEXT)
@@ -114,6 +184,3 @@ index b20918a..47406eb 100644
  	if test $$? -eq 0; then \
  	  echo "PASS: gnuplot.doc"; \
  	else \
--- 
-2.14.3
-

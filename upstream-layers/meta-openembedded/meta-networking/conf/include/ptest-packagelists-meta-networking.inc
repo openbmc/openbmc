@@ -20,8 +20,11 @@ PTESTS_FAST_META_NETWORKING = "\
     mbedtls \
     openhpi \
     openl2tp \
+    python3-scapy \
     squid \
     tcpdump \
+    tinyproxy \
+    unbound \
     wolfssl \
 "
 PTESTS_FAST_META_NETWORKING:remove:libc-musl = "\
@@ -34,14 +37,13 @@ PTESTS_FAST_META_NETWORKING:remove:libc-musl = "\
 # firewalld currently hangs forever so disable it for now
 #    firewalld
 PTESTS_SLOW_META_NETWORKING = "\
+    lksctp-tools \
+    net-snmp \
     openvpn \
 "
 
 PTESTS_PROBLEMS_META_NETWORKING = "\
-    lksctp-tools \
-    net-snmp \
     nftables \
-    python3-scapy \
 "
 PTESTS_PROBLEMS_META_NETWORKING:append:libc-musl = "\
     libtalloc \

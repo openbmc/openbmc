@@ -1,0 +1,308 @@
+From 8174382fe7a278309fc98b6e11ff99b6f41a8719 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 16 Oct 2025 11:19:51 +0200
+Subject: [PATCH 3/4] Replace memset_s() with memset_explicit()
+
+Upstream-Status: Backport [https://gitlab.com/samba-team/samba/-/commit/3e81b73a050e511c658afc786478431ceef175ee]
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/replace/replace.h                    | 18 +++++++++---------
+ lib/util/memory.h                        | 16 +++++++++-------
+ lib/util/tests/test_talloc_keep_secret.c | 19 ++++++++-----------
+ 3 files changed, 26 insertions(+), 27 deletions(-)
+
+--- a/lib/replace/replace.h
++++ b/lib/replace/replace.h
+@@ -815,50 +815,50 @@ typedef unsigned long long ptrdiff_t ;
+ /**
+  * Zero a structure.
+  */
+-#define ZERO_STRUCT(x) memset_s((char *)&(x), sizeof(x), 0, sizeof(x))
++#define ZERO_STRUCT(x) memset_explicit((char *)&(x), 0, sizeof(x))
+ 
+ /**
+  * Zero a structure given a pointer to the structure.
+  */
+ #define ZERO_STRUCTP(x) do { \
+ 	if ((x) != NULL) { \
+-		memset_s((char *)(x), sizeof(*(x)), 0, sizeof(*(x))); \
++		memset_explicit((char *)(x), 0, sizeof(*(x))); \
+ 	} \
+ } while(0)
+ 
+ /**
+  * Zero a structure given a pointer to the structure - no zero check
+  */
+-#define ZERO_STRUCTPN(x) memset_s((char *)(x), sizeof(*(x)), 0, sizeof(*(x)))
++#define ZERO_STRUCTPN(x) memset_explicit((char *)(x), 0, sizeof(*(x)))
+ 
+ /**
+  * Zero an array - note that sizeof(array) must work - ie. it must not be a
+  * pointer
+  */
+-#define ZERO_ARRAY(x) memset_s((char *)(x), sizeof(x), 0, sizeof(x))
++#define ZERO_ARRAY(x) memset_explicit((char *)(x), 0, sizeof(x))
+ 
+ /**
+  * Zero a given len of an array
+  */
+-#define ZERO_ARRAY_LEN(x, l) memset_s((char *)(x), (l), 0, (l))
++#define ZERO_ARRAY_LEN(x, l) memset_explicit((char *)(x), 0, (l))
+ 
+ /**
+  * Explicitly zero data from memory. This is guaranteed to be not optimized
+  * away.
+  */
+-#define BURN_DATA(x) memset_s((char *)&(x), sizeof(x), 0, sizeof(x))
++#define BURN_DATA(x) memset_explicit((char *)&(x), 0, sizeof(x))
+ 
+ /**
+  * Explicitly zero data from memory. This is guaranteed to be not optimized
+  * away.
+  */
+-#define BURN_DATA_SIZE(x, s) memset_s((char *)&(x), (s), 0, (s))
++#define BURN_DATA_SIZE(x, s) memset_explicit((char *)&(x), 0, (s))
+ 
+ /**
+  * Explicitly zero data from memory. This is guaranteed to be not optimized
+  * away.
+  */
+-#define BURN_PTR_SIZE(x, s) memset_s((x), (s), 0, (s))
++#define BURN_PTR_SIZE(x, s) memset_explicit((x), 0, (s))
+ 
+ /**
+  * Explicitly zero data in string. This is guaranteed to be not optimized
+@@ -867,7 +867,7 @@ typedef unsigned long long ptrdiff_t ;
+ #define BURN_STR(x)	do { \
+ 				if ((x) != NULL) { \
+ 					size_t s = strlen(x); \
+-					memset_s((x), s, 0, s); \
++					memset_explicit((x), 0, s); \
+ 				} \
+ 			} while(0)
+ 
+--- a/lib/util/memory.h
++++ b/lib/util/memory.h
+@@ -40,7 +40,7 @@
+ #define BURN_FREE_STR(x) do { \
+ 				if ((x) != NULL) { \
+ 					size_t s = strlen(x); \
+-					memset_s((x), s, 0, s); \
++					memset_explicit((x), 0, s); \
+ 					free(x); (x) = NULL; \
+ 				} \
+ 			} while(0)
+@@ -53,7 +53,7 @@
+  **/
+ #define BURN_FREE(x, s) do { \
+ 				if ((x) != NULL) { \
+-					memset_s((x), (s), 0, (s)); \
++					memset_explicit((x), 0, (s)); \
+ 					free(x); (x) = NULL; \
+ 				} \
+ 			} while(0)
+@@ -78,7 +78,7 @@
+  * Zero a structure.
+  */
+ #ifndef ZERO_STRUCT
+-#define ZERO_STRUCT(x) memset_s((char *)&(x), sizeof(x), 0, sizeof(x))
++#define ZERO_STRUCT(x) memset_explicit((char *)&(x), 0, sizeof(x))
+ #endif
+ 
+ /**
+@@ -87,7 +87,7 @@
+ #ifndef ZERO_STRUCTP
+ #define ZERO_STRUCTP(x) do { \
+ 	if ((x) != NULL) { \
+-		memset_s((char *)(x), sizeof(*(x)), 0, sizeof(*(x))); \
++		memset_explicit((char *)(x), 0, sizeof(*(x))); \
+ 	} \
+ } while(0)
+ #endif
+@@ -96,7 +96,7 @@
+  * Zero a structure given a pointer to the structure - no zero check.
+  */
+ #ifndef ZERO_STRUCTPN
+-#define ZERO_STRUCTPN(x) memset_s((char *)(x), sizeof(*(x)), 0, sizeof(*(x)))
++#define ZERO_STRUCTPN(x) memset_explicit((char *)(x), 0, sizeof(*(x)))
+ #endif
+ 
+ /**
+@@ -104,13 +104,15 @@
+  * pointer.
+  */
+ #ifndef ZERO_ARRAY
+-#define ZERO_ARRAY(x) memset_s((char *)(x), sizeof(x), 0, sizeof(x))
++#define ZERO_ARRAY(x) memset_explicit((char *)(x), 0, sizeof(x))
+ #endif
+ 
+ /**
+  * Zero a given len of an array
+  */
+-#define ZERO_ARRAY_LEN(x, l) memset_s((char *)(x), (l), 0, (l))
++#ifndef ZERO_ARRAY_LEN
++#define ZERO_ARRAY_LEN(x, l) memset_explicit((char *)(x), 0, (l))
++#endif
+ 
+ /**
+  * Work out how many elements there are in a static array
+--- a/lib/util/tests/test_talloc_keep_secret.c
++++ b/lib/util/tests/test_talloc_keep_secret.c
+@@ -8,12 +8,11 @@
+ #include <talloc.h>
+ #include "lib/util/talloc_keep_secret.h"
+ 
+-int rep_memset_s(void *dest, size_t destsz, int ch, size_t count);
++int rep_memset_explicit(void *dest, int ch, size_t count);
+ 
+-int rep_memset_s(void *dest, size_t destsz, int ch, size_t count)
++int rep_memset_explicit(void *dest, int ch, size_t count)
+ {
+ 	check_expected_ptr(dest);
+-	check_expected(destsz);
+ 	check_expected(ch);
+ 	check_expected(count);
+ 
+@@ -44,10 +43,9 @@ static void test_talloc_keep_secret(void
+ 	ptr1_size = talloc_get_size(ptr1);
+ 	assert_int_equal(ptr1_size, strlen(ptr1) + 1);
+ 
+-	expect_string(rep_memset_s, dest, "secret");
+-	expect_value(rep_memset_s, destsz, strlen(ptr1) + 1);
+-	expect_value(rep_memset_s, ch, (int)'\0');
+-	expect_value(rep_memset_s, count, strlen(ptr1) + 1);
++	expect_string(rep_memset_explicit, dest, "secret");
++	expect_value(rep_memset_explicit, ch, (int)'\0');
++	expect_value(rep_memset_explicit, count, strlen(ptr1) + 1);
+ 
+ 	talloc_free(ptr1);
+ 
+@@ -73,10 +71,9 @@ static void test_talloc_keep_secret_vali
+ 	assert_non_null(password);
+ 	talloc_keep_secret(password);
+ 
+-	expect_string(rep_memset_s, dest, "secret");
+-	expect_value(rep_memset_s, destsz, strlen(password) + 1);
+-	expect_value(rep_memset_s, ch, (int)'\0');
+-	expect_value(rep_memset_s, count, strlen(password) + 1);
++	expect_string(rep_memset_explicit, dest, "secret");
++	expect_value(rep_memset_explicit, ch, (int)'\0');
++	expect_value(rep_memset_explicit, count, strlen(password) + 1);
+ 
+ 	talloc_free(mem_ctx);
+ }
+--- a/lib/cmdline/cmdline.c
++++ b/lib/cmdline/cmdline.c
+@@ -358,7 +358,7 @@ bool samba_cmdline_burn(int argc, char *
+ 				p += ulen;
+ 			}
+ 
+-			memset_s(p, strlen(p), '\0', strlen(p));
++			memset_explicit(p, '\0', strlen(p));
+ 			burnt = true;
+ 		}
+ 	}
+--- a/lib/util/data_blob.c
++++ b/lib/util/data_blob.c
+@@ -1,19 +1,19 @@
+-/* 
++/*
+    Unix SMB/CIFS implementation.
+    Easy management of byte-length data
+    Copyright (C) Andrew Tridgell 2001
+    Copyright (C) Andrew Bartlett 2001
+-   
++
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
+-   
++
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+-   
++
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+@@ -67,7 +67,7 @@ _PUBLIC_ DATA_BLOB data_blob_talloc_name
+ }
+ 
+ /**
+- construct a zero data blob, using supplied TALLOC_CTX. 
++ construct a zero data blob, using supplied TALLOC_CTX.
+  use this sparingly as it initialises data - better to initialise
+  yourself if you want specific data in the blob
+ **/
+@@ -95,7 +95,7 @@ clear a DATA_BLOB's contents
+ _PUBLIC_ void data_blob_clear(DATA_BLOB *d)
+ {
+ 	if (d->data) {
+-		memset_s(d->data, d->length, 0, d->length);
++		memset_explicit(d->data, 0, d->length);
+ 	}
+ }
+ 
+@@ -219,7 +219,7 @@ _PUBLIC_ DATA_BLOB data_blob_string_cons
+ }
+ 
+ /**
+- * Create a new data blob from const data 
++ * Create a new data blob from const data
+  */
+ 
+ _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length)
+@@ -266,7 +266,7 @@ _PUBLIC_ bool data_blob_append(TALLOC_CT
+ 	if ((const uint8_t *)p + length < (const uint8_t *)p) {
+ 		return false;
+ 	}
+-	
++
+ 	if (!data_blob_realloc(mem_ctx, blob, new_len)) {
+ 		return false;
+ 	}
+--- a/lib/util/talloc_keep_secret.c
++++ b/lib/util/talloc_keep_secret.c
+@@ -22,27 +22,13 @@
+ 
+ static int talloc_keep_secret_destructor(void *ptr)
+ {
+-	int ret;
+ 	size_t size = talloc_get_size(ptr);
+ 
+ 	if (unlikely(size == 0)) {
+ 		return 0;
+ 	}
+ 
+-	ret = memset_s(ptr, size, 0, size);
+-	if (unlikely(ret != 0)) {
+-		char *msg = NULL;
+-		int ret2;
+-		ret2 = asprintf(&msg,
+-				"talloc_keep_secret_destructor: memset_s() failed: %s",
+-				strerror(ret));
+-		if (ret2 != -1) {
+-			smb_panic(msg);
+-		} else {
+-			smb_panic("talloc_keep_secret_destructor: memset_s() failed");
+-		}
+-	}
+-
++	memset_explicit(ptr, 0, size);
+ 	return 0;
+ }
+ 
+--- a/librpc/ndr/util.c
++++ b/librpc/ndr/util.c
+@@ -32,5 +32,5 @@ _PUBLIC_ void ndr_print_sockaddr_storage
+ 
+ _PUBLIC_ void ndr_zero_memory(void *ptr, size_t len)
+ {
+-	memset_s(ptr, len, 0, len);
++	memset_explicit(ptr, 0, len);
+ }

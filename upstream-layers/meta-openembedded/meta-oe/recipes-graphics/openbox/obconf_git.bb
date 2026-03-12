@@ -10,12 +10,11 @@ DEPENDS = " \
 "
 PV = "2.0.4+git"
 
-SRCREV = "63ec47c5e295ad4f09d1df6d92afb7e10c3fec39"
-SRC_URI = " \
-    git://git.openbox.org/dana/obconf;branch=master \
-    file://0001-Fix-function-protype-visibility.patch \
-"
+SRC_URI = "http://deb.debian.org/debian/pool/main/o/obconf/obconf_2.0.4+git20150213.orig.tar.xz \
+           file://0001-Fix-function-protype-visibility.patch"
+SRC_URI[sha256sum] = "2c8837de833a4f2859ddf06e512d7d96d9a7623f90f95d1137779c69e9209feb"
 
+S = "${UNPACKDIR}/${BPN}"
 
 inherit autotools gettext pkgconfig mime mime-xdg features_check
 # depends on openbox, which is X11-only

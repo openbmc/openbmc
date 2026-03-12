@@ -39,6 +39,7 @@ RDEPENDS:${PN} += " \
 
 RDEPENDS:${PN}-ptest += " \
     perl-module-file-spec \
+    perl-module-test \
     perl-module-test-more \
 "
 

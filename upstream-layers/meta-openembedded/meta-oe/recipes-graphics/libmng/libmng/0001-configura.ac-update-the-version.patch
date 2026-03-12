@@ -1,0 +1,32 @@
+From 8bf709daf0fe0657b55dad50a3a04854140c69a3 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 3 Dec 2025 13:57:39 +0800
+Subject: [PATCH] configura.ac: update the version
+
+current version is 2.0.3
+
+Upstream-Status: Inactive-Upstream [ lastrelease: 2015-04-20 ]
+
+https://sourceforge.net/projects/libmng/files/libmng-devel/
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index 04f9c7a..a7ca9d8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@ AC_PREREQ(2.65)
+ #
+ define([MAJ_NR],[2])
+ define([MIN_NR],[0])
+-define([REL_NR],[2])
++define([REL_NR],[3])
+ #
+ #AC_INIT (PACKAGE, VERSION, [BUG-REPORT], [TARNAME], [URL])
+ AC_INIT( [libmng],[MAJ_NR.MIN_NR.REL_NR],
+-- 
+2.34.1
+

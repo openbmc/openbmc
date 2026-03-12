@@ -1,4 +1,4 @@
-From 4035b48b512b5010b1c33aeba8c58cf2705bca83 Mon Sep 17 00:00:00 2001
+From 4ce6abf6f30fc6cadc9c9fc50b66363078a0162e Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Mon, 26 Nov 2018 09:55:12 +0800
 Subject: [PATCH] RH: add mpathconf

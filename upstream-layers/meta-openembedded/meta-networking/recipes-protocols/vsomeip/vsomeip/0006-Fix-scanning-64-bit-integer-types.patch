@@ -1,0 +1,128 @@
+From 67878aa198e17f13a6d1a0de72bf06a872aec472 Mon Sep 17 00:00:00 2001
+From: Yi Zhao <yi.zhao@windriver.com>
+Date: Tue, 4 Nov 2025 12:50:51 +0800
+Subject: [PATCH] Fix scanning 64-bit integer types
+
+Fix build error on 32-bit host:
+test/network_tests/cpu_load_tests/cpu_load_measurer.cpp:89:24: error: format '%lu' expects argument of type 'long unsigned int*',
+but argument 3 has type 'uint64_t*' {aka 'long long unsigned int*'} [-Werror=format=]
+   89 |   "%lu %lu %ld %ld", // utime, stime, cutime, cstime
+      |    ~~^
+      |      |
+      |      long unsigned int*
+      |    %llu
+   90 |   &utime, &stime, &cutime, &cstime)
+      |   ~~~~~~
+      |   |
+      |   uint64_t* {aka long long unsigned int*}
+
+Upstream-Status: Submitted [https://github.com/COVESA/vsomeip/pull/974]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ implementation/routing/src/routing_manager_impl.cpp     | 4 +++-
+ test/network_tests/cpu_load_tests/cpu_load_measurer.cpp | 6 ++++--
+ test/network_tests/memory_tests/memory_test_client.cpp  | 4 +++-
+ test/network_tests/memory_tests/memory_test_service.cpp | 4 +++-
+ 4 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/implementation/routing/src/routing_manager_impl.cpp b/implementation/routing/src/routing_manager_impl.cpp
+index 8a252c0b..9fb6c32c 100644
+--- a/implementation/routing/src/routing_manager_impl.cpp
++++ b/implementation/routing/src/routing_manager_impl.cpp
+@@ -10,6 +10,7 @@
+ #include <fstream>
+ #include <forward_list>
+ #include <thread>
++#include <cinttypes>
+ 
+ #if defined(__linux__) || defined(__QNX__)
+ #include <unistd.h>
+@@ -3914,7 +3915,8 @@ void routing_manager_impl::memory_log_timer_cbk(boost::system::error_code const&
+     std::uint64_t its_dirtypages(0);
+ 
+     if (EOF
+-        == std::fscanf(its_file, "%lu %lu %lu %lu %lu %lu %lu", &its_size, &its_rsssize, &its_sharedpages, &its_text, &its_lib, &its_data,
++        == std::fscanf(its_file, "%" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
++                    &its_size, &its_rsssize, &its_sharedpages, &its_text, &its_lib, &its_data,
+                     &its_dirtypages)) {
+         VSOMEIP_ERROR << "memory_log_timer_cbk: error reading: errno " << errno;
+     }
+diff --git a/test/network_tests/cpu_load_tests/cpu_load_measurer.cpp b/test/network_tests/cpu_load_tests/cpu_load_measurer.cpp
+index aaf91174..dfe27e8c 100644
+--- a/test/network_tests/cpu_load_tests/cpu_load_measurer.cpp
++++ b/test/network_tests/cpu_load_tests/cpu_load_measurer.cpp
+@@ -12,6 +12,7 @@
+ #include <vector>
+ #include <stdexcept>
+ #include <cstdio>
++#include <cinttypes>
+ 
+ #include <sys/types.h>
+ #include <unistd.h>
+@@ -86,7 +87,7 @@ std::uint64_t cpu_load_measurer::read_proc_pid_stat() {
+     std::int64_t cstime(0);
+     if (std::fscanf(f,
+                     "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u "
+-                    "%lu %lu %ld %ld", // utime, stime, cutime, cstime
++                    "%" SCNu64 " %" SCNu64 " %" SCNi64 " %" SCNi64, // utime, stime, cutime, cstime
+                     &utime, &stime, &cutime, &cstime)
+         == EOF) {
+         std::cerr << "Failed to read " + path << std::endl;
+@@ -116,7 +117,8 @@ std::uint64_t cpu_load_measurer::read_proc_stat(std::uint64_t* _idle) {
+     std::uint64_t steal(0);
+     std::uint64_t guest(0);
+     std::uint64_t guest_nice(0);
+-    if (std::fscanf(f, "%*s %lu %lu %lu %lu %lu %lu %lu %lu %lu %lu", &user, &nice, &system, &idle, &iowait, &irq, &softirq, &steal, &guest,
++    if (std::fscanf(f, "%*s %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
++                    &user, &nice, &system, &idle, &iowait, &irq, &softirq, &steal, &guest,
+                     &guest_nice)
+         == EOF) {
+         std::cerr << "Failed to read /proc/stat" << std::endl;
+diff --git a/test/network_tests/memory_tests/memory_test_client.cpp b/test/network_tests/memory_tests/memory_test_client.cpp
+index 102c8218..d922ad81 100644
+--- a/test/network_tests/memory_tests/memory_test_client.cpp
++++ b/test/network_tests/memory_tests/memory_test_client.cpp
+@@ -6,6 +6,7 @@
+ #include <chrono>
+ #include <iomanip>
+ #include <cstring>
++#include <cinttypes>
+ 
+ #include <vsomeip/internal/logger.hpp>
+ #include "memory_test_client.hpp"
+@@ -30,7 +31,8 @@ void check_memory(std::vector<std::uint64_t>& test_memory_, std::atomic<bool>& s
+         std::uint64_t its_dirtypages(0);
+ 
+         if (EOF
+-            == std::fscanf(its_file, "%lu %lu %lu %lu %lu %lu %lu", &its_size, &its_rsssize, &its_sharedpages, &its_text, &its_lib,
++            == std::fscanf(its_file, "%" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
++                           &its_size, &its_rsssize, &its_sharedpages, &its_text, &its_lib,
+                            &its_data, &its_dirtypages)) {
+             VSOMEIP_ERROR << "check_memory: error reading: errno " << errno;
+         }
+diff --git a/test/network_tests/memory_tests/memory_test_service.cpp b/test/network_tests/memory_tests/memory_test_service.cpp
+index a8547395..751c6f9e 100644
+--- a/test/network_tests/memory_tests/memory_test_service.cpp
++++ b/test/network_tests/memory_tests/memory_test_service.cpp
+@@ -5,6 +5,7 @@
+ 
+ #include <vsomeip/internal/logger.hpp>
+ #include <cstring>
++#include <cinttypes>
+ 
+ #include "memory_test_service.hpp"
+ 
+@@ -28,7 +29,8 @@ void check_memory(std::vector<std::uint64_t>& test_memory_, std::atomic<bool>& s
+         std::uint64_t its_dirtypages(0);
+ 
+         if (EOF
+-            == std::fscanf(its_file, "%lu %lu %lu %lu %lu %lu %lu", &its_size, &its_rsssize, &its_sharedpages, &its_text, &its_lib,
++            == std::fscanf(its_file, "%" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64 " %" SCNu64,
++                           &its_size, &its_rsssize, &its_sharedpages, &its_text, &its_lib,
+                            &its_data, &its_dirtypages)) {
+             VSOMEIP_ERROR << "check_memory: error reading: errno " << errno;
+         }
+-- 
+2.34.1
+

@@ -15,11 +15,9 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/kexec.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/kexec/kexec.c b/kexec/kexec.c
-index 0764e85..157c577 100644
 --- a/kexec/kexec.c
 +++ b/kexec/kexec.c
-@@ -55,6 +55,10 @@
+@@ -61,6 +61,10 @@
  #define KEXEC_LOADED_PATH "/sys/kernel/kexec_loaded"
  #define KEXEC_CRASH_LOADED_PATH "/sys/kernel/kexec_crash_loaded"
  
@@ -29,4 +27,4 @@ index 0764e85..157c577 100644
 +
  unsigned long long mem_min = 0;
  unsigned long long mem_max = ULONG_MAX;
- static unsigned long kexec_flags = 0;
+ unsigned long elfcorehdrsz = 0;

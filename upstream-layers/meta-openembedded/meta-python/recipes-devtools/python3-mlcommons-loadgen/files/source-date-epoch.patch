@@ -1,0 +1,41 @@
+From dd7925397b84c2a327cd4594edba9f7ca5acef61 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 26 Sep 2025 14:02:23 +0800
+Subject: [PATCH] Honor the SOURCE_DATE_EPOCH variable
+
+Implement the SOURCE_DATE_EPOCH specification[1] for reproducible
+builds. If SOURCE_DATE_EPOCH is set, use it as timestamp instead of the
+current time.
+
+[1] https://reproducible-builds.org/specs/source-date-epoch/
+
+Upstream-Status: Submitted [https://github.com/mlcommons/inference/pull/2345]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ version_generator.py | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/version_generator.py b/version_generator.py
+index 2e75243..5202da9 100644
+--- a/version_generator.py
++++ b/version_generator.py
+@@ -110,8 +110,13 @@ def generate_loadgen_version_definitions(cc_filename, loadgen_root):
+     # Write the version into the function definition
+     ofile.write(func_def("Version", f"\"{version_contents}\""))
+ 
+-    date_time_now_local = datetime.datetime.now().isoformat()
+-    date_time_now_utc = datetime.datetime.utcnow().isoformat()
++    if os.environ.get('SOURCE_DATE_EPOCH', False):
++        source_date_epoch = int(os.environ['SOURCE_DATE_EPOCH'])
++        date_time_now_local = datetime.datetime.fromtimestamp(source_date_epoch).isoformat()
++        date_time_now_utc = datetime.datetime.fromtimestamp(source_date_epoch, tz=datetime.timezone.utc).isoformat()
++    else:
++        date_time_now_local = datetime.datetime.now().isoformat()
++        date_time_now_utc = datetime.datetime.utcnow().isoformat()
+     ofile.write(func_def("BuildDateLocal", '"' + date_time_now_local + '"'))
+     ofile.write(func_def("BuildDateUtc", '"' + date_time_now_utc + '"'))
+ 
+-- 
+2.34.1
+

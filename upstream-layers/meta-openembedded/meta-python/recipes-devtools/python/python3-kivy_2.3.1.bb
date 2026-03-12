@@ -39,6 +39,9 @@ export KIVY_GRAPHICS
 KIVY_CROSS_SYSROOT = "${RECIPE_SYSROOT}"
 export KIVY_CROSS_SYSROOT
 
+KIVY_NO_ARGS = "1"
+export KIVY_NO_ARGS
+
 REQUIRED_DISTRO_FEATURES += "opengl gobject-introspection-data"
 
 ANY_OF_DISTRO_FEATURES = "x11 wayland"

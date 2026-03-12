@@ -1,0 +1,47 @@
+From 5afb9b9267b59f60b53978858e21ec2369659de7 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 10 Nov 2025 18:53:38 -0800
+Subject: [PATCH] libheaptrack: Fix build on c23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+C23/glibc is now including once_init in stdlib.h
+
+https://patchwork.sourceware.org/project/glibc/patch/78061085-f04a-0c45-107b-5a8a15521083@redhat.com/#213088
+
+This is a name collision with the new C once_flag/call_once that
+glibc exposes (via <stdlib.h>) and C++’s std::once_flag/std::call_once
+
+Fixes
+../sources/heaptrack-1.5.0+git/src/track/libheaptrack.cpp:301:16: error: reference to 'once_flag' is ambiguous
+  301 |         static once_flag once;
+      |                ^
+../recipe-sysroot/usr/include/bits/types/once_flag.h:24:21: note: candidate found by name lookup is 'once_flag'
+   24 | typedef __once_flag once_flag;
+      |                     ^
+../recipe-sysroot/usr/lib/aarch64-yoe-linux/15.2.0/../../../include/c++/15.2.0/mutex:809:10: note: candidate found by name lookup is 'std::once_flag'
+  809 |   struct once_flag
+      |          ^
+
+Upstream-Status: Submitted [https://invent.kde.org/sdk/heaptrack/-/merge_requests/56]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/track/libheaptrack.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/track/libheaptrack.cpp b/src/track/libheaptrack.cpp
+index 4be3dcd..f7576a2 100644
+--- a/src/track/libheaptrack.cpp
++++ b/src/track/libheaptrack.cpp
+@@ -298,8 +298,8 @@ public:
+         }
+
+         // do some once-only initializations
+-        static once_flag once;
+-        call_once(once, [] {
++        static std::once_flag once;
++        std::call_once(once, [] {
+             debugLog<MinimalOutput>("%s", "doing once-only initialization");
+
+             Trace::setup();

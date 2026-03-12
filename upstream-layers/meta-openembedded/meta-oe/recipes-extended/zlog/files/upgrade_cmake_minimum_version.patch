@@ -1,0 +1,25 @@
+From 3715879775f725260aeda14f94887bbc7a007e29 Mon Sep 17 00:00:00 2001
+From: haydenZhou <mfkhao2009@outlook.com>
+Date: Sun, 8 Jun 2025 10:45:05 +0800
+Subject: [PATCH] upgrade cmake minimum version
+
+Upstream-Status: Backport [https://github.com/HardySimpson/zlog/commit/3715879775f725260aeda14f94887bbc7a007e29]
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5ddaf8d..31a1553 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -14,7 +14,7 @@
+ # limitations under the License.
+ #/
+ 
+-cmake_minimum_required(VERSION 2.8.5)
++cmake_minimum_required(VERSION 3.12)
+ 
+ message(STATUS "path : ${CMAKE_FIND_ROOT_PATH}")
+ project(zlog)

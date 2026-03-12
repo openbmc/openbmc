@@ -7,22 +7,25 @@ Signed-off-by: Markus Volk <f_l_k@t-online.de>
 ---
 Upstream-Status: Inappropriate [oe-specific]
 
+Update for 1.17.2.
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
  meson.build | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 4a0b865e..5f69b1d9 100644
+index e97b8cef..5c8de55f 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -509,7 +509,7 @@ pkgconfig_variables += 'exec_prefix=${prefix}'
+@@ -515,7 +515,7 @@ pkgconfig_variables += 'exec_prefix=${prefix}'
  pkgconfig_variables += 'datadir=' + ('${prefix}' / get_option('datadir'))
  
  pkgconfig_variables += 'datarootdir=' + ('${prefix}' / get_option('datadir'))
 -pkgconfig_variables += 'interfaces_dir=${datadir}/dbus-1/interfaces/'
 +pkgconfig_variables += 'interfaces_dir=${pc_sysrootdir}${datadir}/dbus-1/interfaces/'
- pkgconfig_variables += 'httpbackend=' + get_option('http_backend')
  
  pkgconfig.generate(
+   libflatpak,
 -- 
-2.34.1
+2.43.0
 

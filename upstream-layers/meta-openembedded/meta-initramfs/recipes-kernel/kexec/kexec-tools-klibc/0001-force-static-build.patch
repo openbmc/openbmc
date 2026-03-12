@@ -10,8 +10,6 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  Makefile.in | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index fb01134..dbf1fb6 100644
 --- a/Makefile.in
 +++ b/Makefile.in
 @@ -47,7 +47,7 @@ TARGET_CFLAGS	= @TARGET_CFLAGS@

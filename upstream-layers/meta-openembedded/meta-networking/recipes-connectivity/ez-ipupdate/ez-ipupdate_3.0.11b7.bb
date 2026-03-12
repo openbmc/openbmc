@@ -10,8 +10,15 @@ SRC_URI = "http://sourceforge.net/projects/ez-ipupdate/files/${BPN}/${PV}/${BPN}
            file://conf_file.c.patch \
            file://wformat.patch \
            file://0001-ez-ipupdate-Include-time.h-for-time-API-prototype.patch \
+           file://CVE-2003-0887.patch \
            "
 SRC_URI[md5sum] = "525be4550b4461fdf105aed8e753b020"
 SRC_URI[sha256sum] = "a15ec0dc0b78ec7578360987c68e43a67bc8d3591cbf528a323588830ae22c20"
 
 inherit autotools pkgconfig
+
+do_install:append(){
+    install -m 0744 -d ${D}${localstatedir}/lib/ez-ipupdate
+}
+
+FILES:${PN} += "${localstatedir}/lib/ez-ipupdate"

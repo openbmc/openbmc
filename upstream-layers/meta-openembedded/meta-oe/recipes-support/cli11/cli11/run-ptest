@@ -1,0 +1,5 @@
+#!/bin/sh
+cd tests
+for t in `ls ./*Test`; do
+	./$t && echo PASS: $t || echo FAIL: $t
+done

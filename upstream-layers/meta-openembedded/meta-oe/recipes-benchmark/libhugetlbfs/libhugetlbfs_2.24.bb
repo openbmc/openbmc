@@ -24,6 +24,8 @@ SRC_URI = " \
     file://0011-include-limits.h-for-PATH_MAX.patch \
     file://0012-huge_page_setup_helper-use-python3-interpreter.patch \
     file://0013-elflink.c-include-libgen.h-for-basename.patch \
+    file://0014-tests-Add-ldflags-to-linker-commandline-for-libheaps.patch \
+    file://0015-support-reproducible-builds.patch \
 "
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
@@ -42,9 +44,10 @@ CFLAGS += "-fexpensive-optimizations -frename-registers -fomit-frame-pointer -g0
 
 export HUGETLB_LDSCRIPT_PATH = "${S}/ldscripts"
 
-TARGET_CC_ARCH += "${LDFLAGS}"
-
 LDFLAGS += "-B${S}"
+# glibc objects have missing symbols from libgcc that compiler-rt does not provide
+# /usr/src/debug/glibc/2.41+git/stdio-common/../stdio-common/printf_fphex.c:123:(.text+0x77): undefined reference to `__unordtf2'
+LDFLAGS:append:libc-glibc:toolchain-clang:x86 = " --rtlib=libgcc --unwindlib=libgcc"
 
 inherit autotools-brokensep
 

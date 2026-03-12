@@ -1,4 +1,4 @@
-From 1ccbd8fdbd2e367a702e48c8703b2f010d067b23 Mon Sep 17 00:00:00 2001
+From b3854245f061d9ba2159bdb37197e1c711cbd9cd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 22 May 2023 18:16:24 -0700
 Subject: [PATCH] plugins: Avoid absolute buildpaths in binaries
@@ -11,9 +11,11 @@ Upstream-Status: Submitted [https://gitlab.com/nbdkit/nbdkit/-/merge_requests/30
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- plugins/cc/Makefile.am | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ plugins/cc/Makefile.am | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/plugins/cc/Makefile.am b/plugins/cc/Makefile.am
+index 478178bd..742ea535 100644
 --- a/plugins/cc/Makefile.am
 +++ b/plugins/cc/Makefile.am
 @@ -44,9 +44,13 @@ nbdkit_cc_plugin_la_SOURCES = \

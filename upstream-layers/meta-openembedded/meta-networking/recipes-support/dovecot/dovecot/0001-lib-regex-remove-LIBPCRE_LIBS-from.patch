@@ -1,0 +1,26 @@
+From fd3d65c65c778cf0a2fba6487c8d0eb30b6780b7 Mon Sep 17 00:00:00 2001
+From: Aki Tuomi <aki.tuomi@open-xchange.com>
+Date: Fri, 31 Oct 2025 12:53:33 +0200
+Subject: [PATCH] lib-regex: Remove LIBPCRE_LIBS from test dependencies
+
+Was accidentically added in 49ae6e798310e5c4b96709db435a3714ea6468a8
+
+Upstream-Status: Backport [https://github.com/dovecot/core/commit/fd3d65c65c778cf0a2fba6487c8d0eb30b6780b7]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ src/lib-regex/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib-regex/Makefile.am b/src/lib-regex/Makefile.am
+index 60f43d9779..9d26d27fa1 100644
+--- a/src/lib-regex/Makefile.am
++++ b/src/lib-regex/Makefile.am
+@@ -34,7 +34,7 @@ test_regex_LDADD = libdregex.la \
+ 		   ../lib-test/libtest.la \
+ 		   ../lib/liblib.la \
+ 		   $(LIBPCRE_LIBS)
+-test_regex_DEPENDENCIES = libdregex.la $(LIBPCRE_LIBS)
++test_regex_DEPENDENCIES = libdregex.la
+ 
+ check-local:
+ 	for bin in $(test_programs); do \

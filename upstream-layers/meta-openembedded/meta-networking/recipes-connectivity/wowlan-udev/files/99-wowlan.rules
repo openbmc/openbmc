@@ -1,0 +1,4 @@
+# Enable WoWLAN when Wi-Fi PHY is registered
+ACTION=="add", SUBSYSTEM=="ieee80211", KERNEL=="phy*", \
+  RUN+="/usr/sbin/iw %k wowlan enable magic-packet"
+

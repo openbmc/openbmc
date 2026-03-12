@@ -14,15 +14,17 @@ Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
+
+Updated by Jason Schonberg <schonm@gamil.com> August 1, 2025 for nodejs 22.18.0
+which uses libuv 1.51.0
 ---
  deps/uv/src/unix/linux.c | 29 +----------------------------
  1 file changed, 1 insertion(+), 28 deletions(-)
 
 diff --git a/deps/uv/src/unix/linux.c b/deps/uv/src/unix/linux.c
-index 803a9a9d3f0..a4735f56cf0 100644
 --- a/deps/uv/src/unix/linux.c
 +++ b/deps/uv/src/unix/linux.c
-@@ -465,34 +465,7 @@ static int uv__use_io_uring(void) {
+@@ -465,36 +465,7 @@
    /* See https://github.com/libuv/libuv/issues/4283. */
    return 0; /* Random SIGSEGV in signal handler. */
  #else
@@ -31,30 +33,33 @@ index 803a9a9d3f0..a4735f56cf0 100644
 -  char* val;
 -  int use;
 -
+-#if defined(__hppa__)
+-  /* io_uring first supported on parisc in 6.1, functional in .51
+-   * https://lore.kernel.org/all/cb912694-b1fe-dbb0-4d8c-d608f3526905@gmx.de/
+-   */
+-  if (uv__kernel_version() < /*6.1.51*/0x060133)
+-    return 0;
+-#endif
+-
+-  /* SQPOLL is all kinds of buggy but epoll batching should work fine. */
+-  if (0 == (flags & UV__IORING_SETUP_SQPOLL))
+-    return 1;
+-
+-  /* Older kernels have a bug where the sqpoll thread uses 100% CPU. */
+-  if (uv__kernel_version() < /*5.10.186*/0x050ABA)
+-    return 0;
+-
 -  use = atomic_load_explicit(&use_io_uring, memory_order_relaxed);
 -
 -  if (use == 0) {
--    use = uv__kernel_version() >=
--#if defined(__hppa__)
--    /* io_uring first supported on parisc in 6.1, functional in .51 */
--    /* https://lore.kernel.org/all/cb912694-b1fe-dbb0-4d8c-d608f3526905@gmx.de/ */
--    /* 6.1.51 */ 0x060133
--#else
--    /* Older kernels have a bug where the sqpoll thread uses 100% CPU. */
--    /* 5.10.186 */ 0x050ABA
--#endif
--    ? 1 : -1;
--
--    /* But users can still enable it if they so desire. */
 -    val = getenv("UV_USE_IO_URING");
--    if (val != NULL)
--      use = atoi(val) ? 1 : -1;
--
+-    use = val != NULL && atoi(val) > 0 ? 1 : -1;
 -    atomic_store_explicit(&use_io_uring, use, memory_order_relaxed);
 -  }
 -
 -  return use > 0;
-+  return 0; /* pseudo doesn't support io_uring https://bugzilla.yoctoproject.org/show_bug.cgi?id=15244 */
++return 0; /* pseudo doesn't support io_uring https://bugzilla.yoctoproject.org/show_bug.cgi?id=15244 */
  #endif
  }
+ 
  

@@ -1,0 +1,40 @@
+From 5e53d0f2ef08b0805136adf580b5e84fee9fcfc9 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 14 Nov 2025 15:35:52 +0800
+Subject: [PATCH] storage/mroonga/CMakeLists.txt: fix reproducible builds
+
+Due to the link diretory includes source path and then the compile option
+-WR,rpath,xxx caused the generated libarary not to be reproducible
+...
+|path-to/mariadb/11.4.8/recipe-sysroot-native/usr/bin/x86_64-poky-linux/x86_64-poky-linux-g++ ...
+-Wl,-rpath,path-to/mariadb/11.4.8/sources/mariadb-11.4.8/storage/mroonga/vendor/groonga/lib:
+path-to/mariadb/11.4.8/sources/mariadb-11.4.8/storage/mroonga/vendor/groonga/vendor/plugins/groonga-normalizer-mysql/normalizers:
+path/mariadb/11.4.8/sources/mariadb-11.4.8/libservices: ...
+...
+
+Remove it for Yocto without regression
+
+Upstream-Status: Inappropriate [OE specific, the removing code may matter for others]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ storage/mroonga/CMakeLists.txt | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/storage/mroonga/CMakeLists.txt b/storage/mroonga/CMakeLists.txt
+index 1538b6cc..cdccb2c5 100644
+--- a/storage/mroonga/CMakeLists.txt
++++ b/storage/mroonga/CMakeLists.txt
+@@ -298,9 +298,6 @@ else()
+   set(MYSQL_LIBRARY_DIRS
+     "${MYSQL_SERVICES_LIB_DIR}")
+ endif()
+-link_directories(
+-  ${MRN_LIBRARY_DIRS}
+-  ${MYSQL_LIBRARY_DIRS})
+ 
+ set(MRN_ALL_SOURCES
+   ${MRN_SOURCES}
+-- 
+2.34.1
+

@@ -1,0 +1,64 @@
+From 577e21622475fa29fd471149cf2380c53fdbfcbd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Andreas=20M=C3=BCller?= <schnitzeltony@gmail.com>
+Date: Tue, 6 Mar 2018 22:26:48 +0100
+Subject: [PATCH] Add configure option to find qt5 native tools
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Pkg-config checks for target locations. With these qt5 tools as uic/moc..
+cannot be used.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
+---
+ configure.ac | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index cdd831a..fdd192b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1061,11 +1061,15 @@
+   if test "x${with_qt}" != "xqt4"; then
+     pkg_failed="not_tried"
+     if test "x${with_qt}" != "xqt5"; then
++     AC_ARG_WITH(qt6nativesysroot,
++       AC_HELP_STRING([--with-qt6nativesysroot=PATH], [prepend path - for native qt6 tools]),
++      [QT6NATIVESYSROOT="$withval"], [QT6NATIVESYSROOT=""])
++
+       AC_MSG_CHECKING([Checking for Qt6 support libraries])
+       PKG_CHECK_MODULES_NOFAIL(QT, [Qt6Core Qt6Gui Qt6Network Qt6Svg Qt6PrintSupport Qt6Widgets Qt6Core5Compat])
+     fi
+     if test $pkg_failed = no; then
+-      QT6LOC=`$PKG_CONFIG --variable=libexecdir Qt6Core`
++      QT6LOC=${QT6NATIVESYSROOT}`$PKG_CONFIG --variable=libexecdir Qt6Core`
+       if test "x${QT6LOC}" != "x"; then
+           UIC=${QT6LOC}/uic
+           MOC=${QT6LOC}/moc
+@@ -1075,7 +1079,7 @@
+           MOC=moc-qt6
+           RCC=rcc-qt6
+       fi
+-      QT6BIN=`$PKG_CONFIG --variable=bindir Qt6Core`
++      QT6BIN=${QT6NATIVESYSROOT}`$PKG_CONFIG --variable=bindir Qt6Core`
+       if test "x${QT6BIN}" != "x"; then
+           LRELEASE=${QT6BIN}/lrelease
+       elif test "x${LRELEASE}" = "x"; then
+@@ -1086,10 +1090,14 @@
+       AC_MSG_RESULT([The Qt terminal will use Qt6.])
+       QTVER="6"
+     else
++     AC_ARG_WITH(qt5nativesysroot,
++       AC_HELP_STRING([--with-qt5nativesysroot=PATH], [prepend path - for native qt5 tools]),
++       [QT5NATIVESYSROOT="$withval"], [QT5NATIVESYSROOT=""])
++
+       AC_MSG_CHECKING([Checking for Qt5 support libraries])
+       PKG_CHECK_MODULES_NOFAIL(QT, [Qt5Core Qt5Gui Qt5Network Qt5Svg Qt5PrintSupport])
+       if test $pkg_failed = no; then
+-        QT5LOC=`$PKG_CONFIG --variable=host_bins Qt5Core`
++        QT5LOC=${QT5NATIVESYSROOT}`$PKG_CONFIG --variable=host_bins Qt5Core`
+         if test "x${QT5LOC}" != "x"; then
+           UIC=${QT5LOC}/uic
+           MOC=${QT5LOC}/moc

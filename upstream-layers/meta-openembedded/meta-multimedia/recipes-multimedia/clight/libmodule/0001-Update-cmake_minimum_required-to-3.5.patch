@@ -1,0 +1,66 @@
+From 858aa0dcd8cba8288db3f10b1e6622ac79ae63e3 Mon Sep 17 00:00:00 2001
+From: LI Qingwu <Qing-wu.Li@leica-geosystems.com.cn>
+Date: Thu, 14 Aug 2025 14:51:55 +0800
+Subject: [PATCH] Update cmake_minimum_required to 3.5
+
+This supports compilation with cmake-4.0.0.
+
+Fixes:
+
+Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+to tell CMake that the project requires at least <min> but has been updated
+to work with policies introduced by <max> or earlier.
+Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway.
+
+Upstream-Status: Submitted [https://github.com/FedeDP/libmodule/pull/21]
+Signed-off-by: LI Qingwu <Qing-wu.Li@leica-geosystems.com.cn>
+---
+ CMakeLists.txt         | 2 +-
+ Samples/CMakeLists.txt | 2 +-
+ docs/CMakeLists.txt    | 2 +-
+ tests/CMakeLists.txt   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 349c2be..a3301ba 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required (VERSION 3.3.2)
++cmake_minimum_required (VERSION 3.5)
+ 
+ project(libmodule VERSION 5.0.1 LANGUAGES C CXX)
+ 
+diff --git a/Samples/CMakeLists.txt b/Samples/CMakeLists.txt
+index 9b369e3..2bc32c0 100644
+--- a/Samples/CMakeLists.txt
++++ b/Samples/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ 
+ file(GLOB EASY_SRC Easy/*.c)
+ file(GLOB MULTICTX_SRC MultiCtx/*.c)
+diff --git a/docs/CMakeLists.txt b/docs/CMakeLists.txt
+index b39f0e8..2e26c94 100644
+--- a/docs/CMakeLists.txt
++++ b/docs/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ 
+ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+ 
+diff --git a/tests/CMakeLists.txt b/tests/CMakeLists.txt
+index e5ffbf4..225a3a8 100644
+--- a/tests/CMakeLists.txt
++++ b/tests/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ 
+ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+ 
+-- 
+2.43.0
+

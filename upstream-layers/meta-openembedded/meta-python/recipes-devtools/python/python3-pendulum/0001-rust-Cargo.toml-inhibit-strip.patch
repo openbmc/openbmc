@@ -1,0 +1,31 @@
+From 74db4bc77be0e02912975ea198e58addf97bc218 Mon Sep 17 00:00:00 2001
+From: Tim Orling <tim.orling@konsulko.com>
+Date: Fri, 30 Jan 2026 07:06:05 -0800
+Subject: [PATCH] rust/Cargo.toml: inhibit strip
+
+For OpenEmbedded builds, we want debug symbols which will be stripped
+later by us.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+---
+ rust/Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/rust/Cargo.toml b/rust/Cargo.toml
+index 097321f..8bde1fd 100644
+--- a/rust/Cargo.toml
++++ b/rust/Cargo.toml
+@@ -10,7 +10,7 @@ crate-type = ["cdylib"]
+ [profile.release]
+ lto = "fat"
+ codegen-units = 1
+-strip = true
++strip = false
+ overflow-checks = false
+ 
+ [dependencies]
+-- 
+2.43.0
+

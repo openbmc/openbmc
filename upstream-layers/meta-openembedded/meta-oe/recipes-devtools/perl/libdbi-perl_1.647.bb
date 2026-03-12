@@ -42,8 +42,7 @@ RDEPENDS:${PN}:class-target = " \
     perl-module-universal \
 "
 
-RDEPENDS:${PN}-ptest = " \
-    ${PN} \
+RDEPENDS:${PN}-ptest += " \
     perl-module-b \
     perl-module-benchmark \
     perl-module-cwd \
@@ -55,11 +54,14 @@ RDEPENDS:${PN}-ptest = " \
     perl-module-file-path \
     perl-module-lib \
     perl-module-perlio \
+    perl-module-perlio-encoding \
     perl-module-perlio-scalar \
     perl-module-perlio-via \
     perl-module-sdbm-file \
     perl-module-storable \
     perl-module-test-more \
+    perl-module-test2-ipc-driver \
+    perl-module-threads \
     perl-module-utf8 \
     "
 

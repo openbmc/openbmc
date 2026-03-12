@@ -13,7 +13,6 @@ DEPENDS = "xfsprogs attr"
 SRC_URI = "https://www.kernel.org/pub/linux/utils/fs/xfs/xfsdump/${BP}.tar.xz \
            file://remove-install-as-user.patch \
            file://0001-include-libgen.h-for-basename-API-prototype.patch \
-           ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','file://0001-xfsdump-support-usrmerge.patch','',d)} \
            "
 SRC_URI[sha256sum] = "2914dbbe1ebc88c7d93ad88e220aa57dabc43d216e11f06221c01edf3cc10732"
 
@@ -37,4 +36,13 @@ do_install () {
     export DIST_ROOT=${D}
     oe_runmake install
     oe_runmake install-dev
+    if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}
+    then
+        # move files from /sbin to /usr/sbin
+        mv -vf ${D}${exec_prefix}/../sbin/* ${D}${sbindir}
+        rmdir ${D}${exec_prefix}/../sbin
+    else
+        ln -sf ${base_sbindir}/xfsdump ${D}${sbindir}/xfsdump
+        ln -sf ${base_sbindir}/xfsrestore ${D}${sbindir}/xfsrestore
+    fi
 }

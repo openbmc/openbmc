@@ -49,6 +49,8 @@ DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
 
 TEST_LIST = "\
     ${@bb.utils.filter('PACKAGECONFIG', 'bpf firmware vm', d)} \
+    cpufreq \
+    cpu-hotplug \
     rtc \
     ptp \
     timers \
@@ -89,7 +91,16 @@ either install it and add it to HOSTTOOLS, or add clang-native from meta-clang t
     install -Dm 0644 ${STAGING_KERNEL_BUILDDIR}/.config ${S}/include/config/auto.conf
     if [ "${SITEINFO_BITS}" != "32" ]; then
         for f in long-double endianness floatn struct_rwlock; do
-            cp ${RECIPE_SYSROOT}${includedir}/bits/$f-64.h ${S}/bits/$f-32.h
+            src_base="${RECIPE_SYSROOT}${includedir}/bits/${f}"
+            if [ -f "${src_base}-64.h" ]; then
+                src="${src_base}-64.h"
+            elif [ -f "${src_base}.h" ]; then
+                src="${src_base}.h"
+            else
+                bbwarn "Missing header for bits/${f}{-64,.h} under ${RECIPE_SYSROOT}${includedir}/bits skipped"
+                continue
+            fi
+            install -m 0644 "${src}" "${S}/bits/${f}-32.h"
         done
     fi
     oe_runmake -C ${S} headers

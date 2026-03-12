@@ -1,0 +1,59 @@
+From 671fba096962a24c9dd71b5c995399984ec2ef60 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Mon, 12 Jan 2026 15:01:00 +0800
+Subject: [PATCH] setup.py: fix install failed
+
+Use pip 25.3 to install failed
+...
+Traceback (most recent call last):
+  File "menulibre-2.4.0/setup.py", line 245, in <module>
+    DistUtilsExtra.auto.setup(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        name='menulibre',
+        ^^^^^^^^^^^^^^^^^
+    ...<12 lines>...
+        cmdclass={'install': InstallAndUpdateDataDirectory}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "recipe-sysroot-native/usr/lib/python3.13/site-packages/DistUtilsExtra/auto.py", line 98, in setup
+    __requires(attrs, src_all)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "recipe-sysroot-native/usr/lib/python3.13/site-packages/DistUtilsExtra/auto.py", line 471, in __requires
+    __add_imports(imports, s, attrs)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "recipe-sysroot-native/usr/lib/python3.13/site-packages/DistUtilsExtra/auto.py", line 405, in __add_imports
+    if alias.name and __external_mod(cur_module, alias.name, attrs):
+                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "recipe-sysroot-native/usr/lib/python3.13/site-packages/DistUtilsExtra/auto.py", line 377, in __external_mod
+    return 'dist-packages' in mod.__file__ or 'site-packages' in mod.__file__ or \
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: argument of type 'NoneType' is not iterable
+...
+
+Refer [1] to correct one line in setup.py
+
+[1] https://github.com/epoptes/epoptes/commit/81be63961a428728601df6f442490638df3bd263
+
+Upstream-Status: Submitted [https://github.com/bluesabre/menulibre/pull/233]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ setup.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/setup.py b/setup.py
+index 4aec9fd..649f5f7 100644
+--- a/setup.py
++++ b/setup.py
+@@ -248,6 +248,7 @@ DistUtilsExtra.auto.setup(
+     license='GPL-3',
+     author='Sean Davis',
+     author_email='sean@bluesabre.org',
++    requires='',
+     description='advanced menu editor with support for Unity actions',
+     long_description='An advanced menu editor that provides modern features '
+                      'and full Unity action support. Suitable for lightweight '
+-- 
+2.34.1
+

@@ -8,41 +8,14 @@ Content-Transfer-Encoding: 8bit
 
 These tests fail on Linux
 
-There were 4 failures:
- 1: N7CppUnit10TestCallerI11ProcessTestEE.testLaunch
-    "rc == 3"
-    in "/usr/src/debug/poco/1.12.4-r0/Foundation/testsuite/src/ProcessTest.cpp", line 79
- 2: N7CppUnit10TestCallerI11ProcessTestEE.testLaunchRedirectIn
-    "rc == 100"
-    in "/usr/src/debug/poco/1.12.4-r0/Foundation/testsuite/src/ProcessTest.cpp", line 106
- 3: N7CppUnit10TestCallerI11ProcessTestEE.testLaunchRedirectOut
-    "s == "Hello, world!""
-    in "/usr/src/debug/poco/1.12.4-r0/Foundation/testsuite/src/ProcessTest.cpp", line 134
- 4: N7CppUnit10TestCallerI11ProcessTestEE.testLaunchEnv
-    "s == "test""
-    in "/usr/src/debug/poco/1.12.4-r0/Foundation/testsuite/src/ProcessTest.cpp", line 166
-
- There were 4 errors:-
-   1: N7CppUnit10TestCallerI7EVPTestEE.testRSAEVPKeyFromPKCS12
-  │ │ "N4Poco17NotFoundExceptionE:
-  Not found: POCO_BASE"
-  │ │ in "<unknown>", line -1
-   2: N7CppUnit10TestCallerI19PKCS12ContainerTestEE.testFullPKCS12
-  │ │ "N4Poco17NotFoundExceptionE:
-  Not found: POCO_BASE"
-  │ │ in "<unknown>", line -1
-   3: N7CppUnit10TestCallerI19PKCS12ContainerTestEE.testCertsOnlyPKCS12
-  │ │ "N4Poco17NotFoundExceptionE:
-  Not found: POCO_BASE"
-  │ │ in "<unknown>", line -1
-   4: N7CppUnit10TestCallerI19PKCS12ContainerTestEE.testPEMReadWrite
-  │ │ "N4Poco17NotFoundExceptionE:
-  Not found: POCO_BASE"
-  │ │ in "<unknown>", line -1
-
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+
+Updated comment and content after fixing some tests.
+Left only MongoDBTest.testArray on ignore list, untested.
+
 ---
  cppignore.lnx | 9 +++++++++
  1 file changed, 9 insertions(+)
@@ -51,16 +24,8 @@ diff --git a/cppignore.lnx b/cppignore.lnx
 index b3288d474..9aad48ca5 100644
 --- a/cppignore.lnx
 +++ b/cppignore.lnx
-@@ -30,3 +30,12 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
+@@ -30,3 +30,4 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
  CppUnit::TestCaller<HTTPSStreamFactoryTest>.testProxy
  CppUnit::TestCaller<DNSTest>.testHostByAddress
  CppUnit::TestCaller<DNSTest>.testHostByName
-+CppUnit::TestCaller<ProcessTest>.testLaunch
-+CppUnit::TestCaller<ProcessTest>.testLaunchRedirectIn
-+CppUnit::TestCaller<ProcessTest>.testLaunchRedirectOut
-+CppUnit::TestCaller<ProcessTest>.testLaunchEnv
-+CppUnit::TestCaller<EVPTest>.testRSAEVPKeyFromPKCS12
-+CppUnit::TestCaller<PKCS12ContainerTest>.testFullPKCS12
-+CppUnit::TestCaller<PKCS12ContainerTest>.testCertsOnlyPKCS12
-+CppUnit::TestCaller<PKCS12ContainerTest>.testPEMReadWrite
 +CppUnit::TestCaller<MongoDBTest>.testArray

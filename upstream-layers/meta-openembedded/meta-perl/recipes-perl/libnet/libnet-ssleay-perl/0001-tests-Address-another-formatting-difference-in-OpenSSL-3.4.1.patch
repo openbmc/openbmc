@@ -1,0 +1,32 @@
+From eac7ac502b02f44a84a67920e9f634cce71ff335 Mon Sep 17 00:00:00 2001
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Date: Tue, 18 Feb 2025 18:57:15 +0100
+Subject: [PATCH] tests: Address another formatting difference in OpenSSL 3.4.1
+
+Since OpenSSL 3.4.1, commit 8a28bca8ee08 ("x509: add a newline after
+printing Full Name") to be exact, there is another new line change.
+
+Adapt the testsuite.
+
+Fixes: #513
+
+Upstream-Status: Backport [https://github.com/radiator-software/p5-net-ssleay/commit/eac7ac502b02f44a84a67920e9f634cce71ff335]
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ t/local/32_x509_get_cert_info.t | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/t/local/32_x509_get_cert_info.t b/t/local/32_x509_get_cert_info.t
+index 0fd1b68..08316bf 100644
+--- a/t/local/32_x509_get_cert_info.t
++++ b/t/local/32_x509_get_cert_info.t
+@@ -218,6 +218,9 @@ for my $f (keys (%$dump)) {
+                       # OpenSSL 1.0.0 to 1.1.1:
+                       $ext_data =~ s{(Full Name:\n  )}{\n$1}g;
+                       $ext_data .= "\n";
++                  } elsif ( Net::SSLeay::SSLeay >  0x3040000f ) {
++                      $ext_data =~ s{(\nFull Name:)}{\n$1}g;
++                      $ext_data .= "\n";
+                   }
+               }
+               elsif ( $nid == 126 ) {

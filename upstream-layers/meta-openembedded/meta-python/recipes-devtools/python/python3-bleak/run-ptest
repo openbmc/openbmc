@@ -1,0 +1,3 @@
+#!/bin/sh
+#Skip integration as it need hci_vhci, but hci_vhci module is not enabled in yocto kernel.
+pytest --automake -k "not integration"

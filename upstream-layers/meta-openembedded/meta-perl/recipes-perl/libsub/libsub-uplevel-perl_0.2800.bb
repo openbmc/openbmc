@@ -34,6 +34,7 @@ RDEPENDS:${PN}-ptest += " \
     perl-module-cpan \
     perl-module-exporter \
     perl-module-extutils-makemaker \
+    perl-module-extutils-mm-unix \
     perl-module-file-spec \
     perl-module-lib \
     perl-module-test-more \

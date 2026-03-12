@@ -1,0 +1,54 @@
+From c98d9022377e88f8cc2d557a4ffd321e6f2dd320 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@eng.windriver.com>
+Date: Tue, 18 Nov 2025 01:04:27 -0800
+Subject: [PATCH] doc/man: support reproducible builds
+
+When compressing, do not save the original file name and
+timestamp by default (gzip -n). Make archives be reproducible
+at each build
+
+Upstream-Status: Submitted [linux-xfs@vger.kernel.org]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@eng.windriver.com>
+---
+ doc/Makefile        | 2 +-
+ include/buildmacros | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/doc/Makefile b/doc/Makefile
+index 83dfa38b..17b63c85 100644
+--- a/doc/Makefile
++++ b/doc/Makefile
+@@ -14,7 +14,7 @@ include $(BUILDRULES)
+ 
+ CHANGES.gz:
+ 	@echo "    [ZIP]    $@"
+-	$(Q)$(ZIP) --best -c < CHANGES > $@
++	$(Q)$(ZIP) -n --best -c < CHANGES > $@
+ 
+ install: default
+ 	$(INSTALL) -m 755 -d $(PKG_DOC_DIR)
+diff --git a/include/buildmacros b/include/buildmacros
+index 9183e5bc..6ba0d515 100644
+--- a/include/buildmacros
++++ b/include/buildmacros
+@@ -105,7 +105,7 @@ INSTALL_MAN = \
+ 			t=$(MAN_DEST)/$$m.$(MAN_SECTION); \
+ 			if $$first; then \
+ 				if $(HAVE_ZIPPED_MANPAGES); then \
+-					$(ZIP) -9 -c $$d > $$d.gz; _sfx=.gz; \
++					$(ZIP) -n -9 -c $$d > $$d.gz; _sfx=.gz; \
+ 				fi; \
+ 				u=$$m.$(MAN_SECTION)$$_sfx; \
+ 				echo $(INSTALL) -m 644 $${d}$$_sfx $${t}$$_sfx;\
+@@ -132,6 +132,6 @@ endif
+ MAN_MAKERULE = \
+ 	@for f in *.[12345678] ""; do \
+ 		if test ! -z "$$f"; then \
+-			$(ZIP) --best -c < $$f > $$f.gz; \
++			$(ZIP) -n --best -c < $$f > $$f.gz; \
+ 		fi; \
+ 	done
+-- 
+2.49.0
+

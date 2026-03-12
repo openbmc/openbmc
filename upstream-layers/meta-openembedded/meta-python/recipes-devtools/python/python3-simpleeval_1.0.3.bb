@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENCE;md5=83843c8f0f3beb18af2f282faecbdebe"
 
 SRC_URI[sha256sum] = "67bbf246040ac3b57c29cf048657b9cf31d4e7b9d6659684daa08ca8f1e45829"
 
-inherit pypi python_setuptools_build_meta python_hatchling ptest-python-pytest
+inherit pypi python_hatchling ptest-python-pytest
 
 BBCLASSEXTEND = "native nativesdk"
 

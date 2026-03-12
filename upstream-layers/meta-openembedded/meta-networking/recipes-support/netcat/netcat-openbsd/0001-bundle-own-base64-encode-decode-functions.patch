@@ -14,7 +14,7 @@ Update to version 1.190-2
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  Makefile |   4 +-
- base64.c | 313 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ base64.c | 313 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
  netcat.c |   3 +
  socks.c  |   3 +
  4 files changed, 321 insertions(+), 2 deletions(-)
@@ -360,8 +360,8 @@ diff --git a/netcat.c b/netcat.c
 index a0fb51b..9c4ed23 100644
 --- a/netcat.c
 +++ b/netcat.c
-@@ -240,6 +240,9 @@ static int connect_with_timeout(int fd, const struct sockaddr *sa,
- 
+@@ -239,6 +239,9 @@ char *proto_name(int, int);
+ static int connect_with_timeout(int, const struct sockaddr *, socklen_t, int);
  static void quit();
  
 +int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
@@ -378,10 +378,10 @@ index 9068f39..c576f6b 100644
  #define SOCKS_DOMAIN	3
  #define SOCKS_IPV6	4
  
-+int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
-+int    b64_pton(char const *src, u_char *target, size_t targsize);
++int	b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
++int	b64_pton(char const *src, u_char *target, size_t targsize);
 +
- int	remote_connect(const char *, const char *, struct addrinfo);
+ int	remote_connect(const char *, const char *, struct addrinfo, char *);
  int	socks_connect(const char *, const char *, struct addrinfo,
  	    const char *, const char *, struct addrinfo, int,
 -- 

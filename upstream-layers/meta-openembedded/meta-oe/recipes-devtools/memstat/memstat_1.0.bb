@@ -18,6 +18,8 @@ SRC_URI = "http://sourceforge.net/projects/memstattool/files/memstat_${PV}.tar.g
 
 SRC_URI[sha256sum] = "245d5fc7fb87bcfd14486cd34917cae2856e799559ac568434af12c4852bce94"
 
+TARGET_LDFLAGS:append = " ${DEBUG_PREFIX_MAP}"
+
 do_install:append(){
     install -d ${D}${bindir}
     install -m 0755 memstat ${D}${bindir}

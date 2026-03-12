@@ -18,8 +18,6 @@ Upstream-Status: Pending
  kexec/arch/arm64/crashdump-arm64.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/kexec/arch/arm64/crashdump-arm64.c b/kexec/arch/arm64/crashdump-arm64.c
-index 4fd7aa8..890d88f 100644
 --- a/kexec/arch/arm64/crashdump-arm64.c
 +++ b/kexec/arch/arm64/crashdump-arm64.c
 @@ -13,6 +13,9 @@

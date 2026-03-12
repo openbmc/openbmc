@@ -13,6 +13,8 @@ SRC_URI = " \
     http://download.librdf.org/source/${BPN}-${PV}.tar.gz \
     file://0001-Remove-the-access-to-entities-checked-private-symbol.patch \
     file://raptor-2.0.16-dont_use_curl-config.patch \
+    file://CVE-2024-57822.patch \
+    file://CVE-2024-57823.patch \
 "
 SRC_URI[sha256sum] = "089db78d7ac982354bdbf39d973baf09581e6904ac4c92a98c5caadb3de44680"
 
@@ -22,3 +24,5 @@ EXTRA_OECONF = " \
     --without-xml2-config \
     --without-xslt-config \
 "
+
+CVE_PRODUCT = "librdf:raptor_rdf_syntax_library librdf:raptor"

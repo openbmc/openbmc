@@ -12,19 +12,17 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/arch/i386/x86-linux-setup.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/kexec/arch/i386/x86-linux-setup.c b/kexec/arch/i386/x86-linux-setup.c
-index 6cda12c..5514c1c 100644
 --- a/kexec/arch/i386/x86-linux-setup.c
 +++ b/kexec/arch/i386/x86-linux-setup.c
-@@ -304,9 +304,9 @@ static int add_edd_entry(struct x86_linux_param_header *real_mode,
- 	memset(edd_info, 0, sizeof(struct edd_info));
+@@ -332,9 +332,9 @@ static int add_edd_entry(struct x86_linu
  
  	/* extract the device number */
--	if (sscanf(basename(sysfs_name), "int13_dev%hhx", &devnum) != 1) {
-+	if (sscanf(strrchr(sysfs_name,'/') + 1, "int13_dev%hhx", &devnum) != 1) {
+ 	char* sysfs_name_copy = strdup(sysfs_name);
+-	if (sscanf(basename(sysfs_name_copy), "int13_dev%hhx", &devnum) != 1) {
++	if (sscanf(strrchr(sysfs_name_copy,'/') + 1, "int13_dev%hhx", &devnum) != 1) {
  		fprintf(stderr, "Invalid format of int13_dev dir "
--				"entry: %s\n", basename(sysfs_name));
-+				"entry: %s\n", strrchr(sysfs_name,'/') + 1);
+-				"entry: %s\n", basename(sysfs_name_copy));
++				"entry: %s\n", strrchr(sysfs_name_copy,'/') + 1);
+ 		free(sysfs_name_copy);
  		return -1;
  	}
- 

@@ -1,0 +1,43 @@
+From ae5566a7df4851bd47081ef0e00e2a0513b7f331 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 10 Nov 2025 19:41:16 -0800
+Subject: [PATCH] Fix build on c23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+C23/glibc is now including once_init in stdlib.h
+
+https://patchwork.sourceware.org/project/glibc/patch/78061085-f04a-0c45-107b-5a8a15521083@redhat.com/#213088
+
+This is a name collision with the new C once_flag/call_once that
+glibc exposes (via <stdlib.h>) and C++’s std::once_flag/std::call_once
+
+Upstream-Status: Submitted [https://github.com/snort3/snort3/pull/431]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/loggers/alert_fast.cc | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/loggers/alert_fast.cc b/src/loggers/alert_fast.cc
+index 7b5deab2..3f88bff6 100644
+--- a/src/loggers/alert_fast.cc
++++ b/src/loggers/alert_fast.cc
+@@ -53,7 +53,7 @@ using namespace std;
+ #define FAST_BUF (4*K_BYTES)
+
+ static THREAD_LOCAL TextLog* fast_log = nullptr;
+-static once_flag init_flag;
++static std::once_flag init_flag;
+
+ #define S_NAME "alert_fast"
+ #define F_NAME S_NAME ".txt"
+@@ -319,7 +319,7 @@ void FastLogger::set_buffer_ids(Inspector* gadget)
+ const BufferIds& FastLogger::get_buffer_ids(Inspector* gadget, Packet* p)
+ {
+     // lazy init required because loggers don't have a configure (yet)
+-    call_once(init_flag, set_buffer_ids, gadget);
++    std::call_once(init_flag, set_buffer_ids, gadget);
+
+     InspectionBuffer buf;
+     const std::vector<unsigned>& idv =

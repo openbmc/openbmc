@@ -17,8 +17,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -19,6 +19,16 @@ add_definitions(-DCL_USE_DEPRECATED_OPEN
- add_definitions(-DCL_USE_DEPRECATED_OPENCL_1_0_APIS=1)
  add_definitions(-DCL_NO_EXTENSION_PROTOTYPES)
+ add_definitions(-DCL_ENABLE_BETA_EXTENSIONS)
  
 +option(ENABLE_WERROR "Enable warnings as errors" ON)
 +

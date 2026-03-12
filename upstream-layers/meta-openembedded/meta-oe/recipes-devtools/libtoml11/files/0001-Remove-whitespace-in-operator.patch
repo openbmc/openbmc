@@ -11,7 +11,7 @@ include/toml11/impl/../fwd/literal_fwd.hpp:22:26: error: identifier '_toml' prec
 |       |               ~~~~~~~~~~~^~~~~
 |       |               operator""_toml
 
-Upstream-Status: Submitted [https://github.com/ToruNiina/toml11/pull/285]
+Upstream-Status: Backport [https://github.com/ToruNiina/toml11/commit/dee78f822d8a5b985e565e5c1ef42a59557aa8fc]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  include/toml11/fwd/literal_fwd.hpp   | 2 +-

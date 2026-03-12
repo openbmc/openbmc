@@ -1,0 +1,42 @@
+From 49df2d7021a68d9fe13ff094e9f564323c7c8556 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Thu, 15 Jan 2026 14:33:58 +0100
+Subject: [PATCH] gsd-smartcard-enum-types.c.in:fix reproducibility issue
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/merge_requests/467] 
+---
+ plugins/smartcard/gsd-smartcard-enum-types.c.in | 4 ++--
+ plugins/smartcard/gsd-smartcard-enum-types.h.in | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/plugins/smartcard/gsd-smartcard-enum-types.c.in b/plugins/smartcard/gsd-smartcard-enum-types.c.in
+index f281cf4e..0a970105 100644
+--- a/plugins/smartcard/gsd-smartcard-enum-types.c.in
++++ b/plugins/smartcard/gsd-smartcard-enum-types.c.in
+@@ -5,8 +5,8 @@
+ /*** END file-header ***/
+ 
+ /*** BEGIN file-production ***/
+-#include "@filename@"
+-/* enumerations from "@filename@" */
++#include "@basename@"
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/
+diff --git a/plugins/smartcard/gsd-smartcard-enum-types.h.in b/plugins/smartcard/gsd-smartcard-enum-types.h.in
+index 79dcc3d8..3906ba4c 100644
+--- a/plugins/smartcard/gsd-smartcard-enum-types.h.in
++++ b/plugins/smartcard/gsd-smartcard-enum-types.h.in
+@@ -9,7 +9,7 @@ G_BEGIN_DECLS
+ 
+ /*** BEGIN file-production ***/
+ 
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+ 
+ /*** BEGIN value-header ***/
+-- 
+2.52.0
+

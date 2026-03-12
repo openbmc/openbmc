@@ -1,0 +1,36 @@
+From c71b58dd324a29f2d157eb9d07f5a05bee0518f6 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Dec 2025 12:16:00 -0800
+Subject: [PATCH 4/5] exec: Define EM_RISCV for klibc builds
+
+klibc's elf.h header doesn't define the EM_RISCV machine type
+constant. Add a fallback definition when building with klibc to
+support RISC-V architecture.
+
+EM_RISCV (243) is the official ELF machine type for RISC-V as
+defined in the ELF specification.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ kexec/kexec-elf.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/kexec/kexec-elf.h b/kexec/kexec-elf.h
+index 1e512c8..af3fc55 100644
+--- a/kexec/kexec-elf.h
++++ b/kexec/kexec-elf.h
+@@ -4,6 +4,13 @@
+ #include <stdint.h>
+ #include <sys/types.h>
+ 
++/* klibc provided elf.h does not yet have this definition and its preferred in includes
++ * when building for klibc
++ */
++#ifndef EM_RISCV
++#define EM_RISCV	243		/* RISC-V */
++#endif
++
+ struct kexec_info;
+ 
+ struct mem_ehdr {

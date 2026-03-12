@@ -1,0 +1,19 @@
+#!/bin/sh
+useradd tester || echo test user exists already
+
+# We need $(pwd), because some tests import modules from the actual tests folder
+# Also, there is one module in the docs/_ext folder that is imported, and that
+# module accesses other modules by a relative path to itself.
+export PYTHONPATH=$(pwd):$(pwd)/docs/_ext:$PYTHONPATH
+
+cd tests
+
+su tester -c "./runtests.py --noinput -v 2" 2>&1 | \
+     tee ../testoutput.log | \
+     sed -e '/\.\.\. ok/ s/^/PASS: /g' \
+         -e '/\.\.\. \(ERROR\|FAIL\)/ s/^/FAIL: /g' \
+         -e '/\.\.\. skipped/ s/^/SKIP: /g' \
+         -e 's/ \.\.\. ok//g' \
+         -e 's/ \.\.\. ERROR//g' \
+         -e 's/ \.\.\. FAIL//g' \
+         -e 's/ \.\.\. skipped//g'

@@ -8,7 +8,8 @@ LIC_FILES_CHKSUM = "file://NOTICE;md5=d2918795d9185efcbf430b9ad5cda46d"
 
 PV .= "+git"
 SRCREV = "f78ed25aced2dfea743867b8205a787bfb091340"
-SRC_URI = "git://github.com/tinyalsa/tinyalsa;branch=master;protocol=https"
+SRC_URI = "git://github.com/tinyalsa/tinyalsa;branch=master;protocol=https \
+           file://0001-meson-add-option-to-enable-disable-plugin-support.patch"
 
 
 inherit meson

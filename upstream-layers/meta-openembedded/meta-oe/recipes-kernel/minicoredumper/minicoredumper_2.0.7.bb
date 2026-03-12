@@ -1,5 +1,6 @@
 SUMMARY = "minicoredumper provides an alternate core dump facility for Linux \
 to allow minimal and customized crash dumps"
+HOMEPAGE = "https://www.linutronix.de/minicoredumper/"
 LICENSE = " LGPL-2.1-only & BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=71827c617ec7b45a0dd23658347cc1e9 \
                     file://COPYING.BSD;md5=b915ac80d5236d6aa659cb986daf00e5 \
@@ -16,6 +17,7 @@ SRC_URI = "git://github.com/diamon/minicoredumper;protocol=https;branch=master \
            file://minicoredumper.init \
            file://run-ptest \
            file://0001-corestripper-Fix-uninitialized-warning.patch \
+           file://0002-Fix-2038-year-problem-in-timestamp-handling.patch \
            "
 
 

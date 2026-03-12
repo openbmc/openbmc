@@ -1,4 +1,4 @@
-From 9f1075f82ecd39a9960f868eef890baf2ba36d4e Mon Sep 17 00:00:00 2001
+From 74051f361ce0b9b4405afc789c62a277aa37cc05 Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 1 Mar 2024 11:45:10 +0800
 Subject: [PATCH] RH: warn on invalid regex instead of failing
@@ -100,6 +100,3 @@ index a06a6138..a734ba9b 100644
  declare_hw_snprint(bl_product, print_str)
  
  declare_hw_arg_str_handler(hwhandler, 0)
--- 
-2.25.1
-

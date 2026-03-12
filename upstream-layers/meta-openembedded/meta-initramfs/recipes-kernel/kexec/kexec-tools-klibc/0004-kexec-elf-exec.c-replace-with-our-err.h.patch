@@ -15,8 +15,6 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/kexec-elf-exec.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kexec/kexec-elf-exec.c b/kexec/kexec-elf-exec.c
-index a9329ac..0dd0700 100644
 --- a/kexec/kexec-elf-exec.c
 +++ b/kexec/kexec-elf-exec.c
 @@ -4,7 +4,7 @@

@@ -14,4 +14,7 @@ S = "${UNPACKDIR}/${BPN}"
 
 SRC_URI[sha256sum] = "4dabf61f045f022bac8bc909e5fd96041af6c53df56d97dfa3cfbf49af4453a5"
 
+UPSTREAM_CHECK_URI = "https://github.com/dvorka/hstr/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+
 inherit autotools pkgconfig bash-completion

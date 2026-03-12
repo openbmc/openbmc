@@ -1,0 +1,69 @@
+From 26e13ce45ffeb2f233d1dd7e4321cb65ab10b0fb Mon Sep 17 00:00:00 2001
+From: Daniel Klauer <daniel.klauer@gin.de>
+Date: Fri, 6 Feb 2026 17:13:49 +0100
+Subject: [PATCH] Makefile: Fix sysinfo generation in parallel build
+
+sysinfo.sh non-atomically overwrites both sysinfo.c and sysinfoc.c,
+so it should only be invoked once, not twice in parallel.
+
+Requires at least GNU make 4.3, for Grouped Targets support [1].
+
+Should fix random build failures like this one:
+
+| NOTE: make -j 20 -e MAKEFLAGS=
+[...]
+| ./sysinfo.sh x86_64-gin-linux-gcc [...]
+| ./sysinfo.sh x86_64-gin-linux-gcc [...]
+[...]
+| x86_64-gin-linux-gcc [...] \
+| 	-c nbench0.c
+| In file included from nbench0.c:219:
+| sysinfo.c: In function 'main':
+| sysinfo.c:11:1: error: 'fer' undeclared (first use in this function)
+|    11 | fer);
+|       | ^~~
+| sysinfo.c:11:1: note: each undeclared identifier is reported only once for each function it appears in
+| sysinfo.c:11:4: error: expected ';' before ')' token
+|    11 | fer);
+|       |    ^
+|       |    ;
+| sysinfo.c:11:4: error: expected statement before ')' token
+| In file included from nbench0.c:317:
+| sysinfoc.c:5:4: error: expected ';' before ')' token
+|     5 | fer);
+|       |    ^
+|       |    ;
+| sysinfoc.c:5:4: error: expected statement before ')' token
+| make: *** [Makefile:115: nbench0.o] Error 1
+| make: *** Waiting for unfinished jobs....
+| ERROR: oe_runmake failed
+| WARNING: exit code 1 from a shell command.
+NOTE: recipe nbench-byte-2.2.3-r0: task do_compile: Failed
+
+[1] https://lists.gnu.org/archive/html/info-gnu/2020-01/msg00004.html
+Upstream-Status: Inactive-Upstream [lastrelease 2003, no vcs]
+Signed-off-by: Daniel Klauer <daniel.klauer@gin.de>
+---
+ Makefile | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index edd9ea2..66b2ddc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -95,10 +95,8 @@ DEFINES= -DLINUX $(NO_UNAME)
+ 
+ ##########################################################################
+ # For LINUX-like systems with gcc
+-sysinfoc.c: Makefile
+-	./sysinfo.sh $(CC) $(MACHINE) $(DEFINES) $(CFLAGS)
+-
+-sysinfo.c: Makefile
++# sysinfo.sh generates both sysinfo.c and sysinfoc.c
++sysinfo.c sysinfoc.c &: Makefile
+ 	./sysinfo.sh $(CC) $(MACHINE) $(DEFINES) $(CFLAGS)
+ 
+ ##########################################################################
+-- 
+2.43.0
+

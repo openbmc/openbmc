@@ -1,0 +1,45 @@
+From 66b2158f80e03d144f192b0be997c813b3f1d00e Mon Sep 17 00:00:00 2001
+From: Sairamreddy Bojja <sbojja@qti.qualcomm.com>
+Date: Tue, 9 Sep 2025 17:15:19 +0530
+Subject: [PATCH] FROMLIST: meson: add option to enable/disable plugin
+ support
+
+Default is enabled to support Tinyalsa plugin.
+
+ref:https://github.com/tinyalsa/tinyalsa/pull/261
+
+Signed-off-by: Sairamreddy Bojja <sbojja@qti.qualcomm.com>
+Upstream-Status: Submitted [https://github.com/tinyalsa/tinyalsa/pull/269]
+---
+ meson.build       | 4 ++++
+ meson_options.txt | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 213f8c8..df4e95a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -9,6 +9,10 @@ cc = meson.get_compiler('c')
+ # Dependency on libdl
+ dl_dep = cc.find_library('dl')
+ 
++if get_option('tinyalsa_uses_plugins')
++    add_project_arguments('-DTINYALSA_USES_PLUGINS', language: 'c')
++endif
++
+ tinyalsa = library('tinyalsa',
+   'src/mixer.c', 'src/pcm.c', 'src/pcm_hw.c', 'src/pcm_plugin.c', 'src/snd_card_plugin.c', 'src/mixer_hw.c', 'src/mixer_plugin.c',
+   include_directories: tinyalsa_includes,
+diff --git a/meson_options.txt b/meson_options.txt
+index f2e2bc2..dad0242 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -4,3 +4,5 @@ option('examples', type: 'feature', value: 'auto', yield: true,
+   description : 'Build examples')
+ option('utils', type: 'feature', value: 'auto', yield: true,
+   description : 'Build utility tools')
++option('tinyalsa_uses_plugins', type: 'boolean', value: true,
++  description : 'Enable plugin support')
+-- 
+2.34.1
+

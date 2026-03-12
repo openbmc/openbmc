@@ -1,0 +1,25 @@
+From f1b4ef78719146d84f16e86bf77de027e608eb17 Mon Sep 17 00:00:00 2001
+From: Vitezslav Crhonek <vcrhonek@redhat.com>
+Date: Mon, 3 Feb 2025 11:30:15 +0100
+Subject: [PATCH] Fix to build with GCC 15.
+
+Upstream-Status: Backport [https://github.com/Openwsman/openwsman/pull/209]
+Signed-off-by: Vitezslav Crhonek <vcrhonek@redhat.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/plugins/swig/src/target_ruby.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/swig/src/target_ruby.c b/src/plugins/swig/src/target_ruby.c
+index bbce398..e17bb44 100644
+--- a/src/plugins/swig/src/target_ruby.c
++++ b/src/plugins/swig/src/target_ruby.c
+@@ -49,7 +49,7 @@
+  */
+ 
+ static VALUE
+-load_module()
++load_module(VALUE)
+ {
+   ruby_script(PLUGIN_FILE);
+   return rb_require(PLUGIN_FILE);

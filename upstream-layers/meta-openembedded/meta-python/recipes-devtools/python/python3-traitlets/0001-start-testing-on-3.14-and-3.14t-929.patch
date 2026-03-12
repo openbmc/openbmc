@@ -1,0 +1,25 @@
+From 472cf29d06edce66db4af7eb47f601e40cff71c8 Mon Sep 17 00:00:00 2001
+From: M Bussonnier <bussonniermatthias@gmail.com>
+Date: Tue, 14 Oct 2025 08:55:52 +0200
+Subject: [PATCH] start testing on 3.14 and 3.14t (#929)
+
+Upstream-Status: Backport [https://github.com/ipython/traitlets/pull/929]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ traitlets/config/application.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/traitlets/config/application.py b/traitlets/config/application.py
+index b01a11e..2860de7 100644
+--- a/traitlets/config/application.py
++++ b/traitlets/config/application.py
+@@ -215,7 +215,8 @@ class Application(SingletonConfigurable):
+     _log_formatter_cls = LevelFormatter
+
+     log_datefmt = Unicode(
+-        "%Y-%m-%d %H:%M:%S", help="The date format used by logging formatters for %(asctime)s"
++        "%Y-%m-%d %H:%M:%S",
++        help="The date format used by logging formatters for `asctime`",
+     ).tag(config=True)
+
+     log_format = Unicode(

@@ -13,11 +13,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  kexec/ifdown.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kexec/ifdown.c b/kexec/ifdown.c
-index 9679ad7..82c6141 100644
 --- a/kexec/ifdown.c
 +++ b/kexec/ifdown.c
-@@ -16,8 +16,8 @@ char *v_ifdown = "@(#)ifdown.c  1.11  02-Jun-1998  miquels@cistron.nl";
+@@ -16,8 +16,8 @@ char *v_ifdown = "@(#)ifdown.c  1.11  02
  #include <sys/socket.h>
  #include <sys/time.h>
  

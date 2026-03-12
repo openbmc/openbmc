@@ -1,4 +1,4 @@
-From ed9f268774838d279e23b4ae9fb95ca7650942b2 Mon Sep 17 00:00:00 2001
+From 55405c161ec71068229d13ef19d2f01ff59c2b77 Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Wed, 5 Feb 2025 21:06:50 +0100
 Subject: [PATCH] python: enable unbundled cross compilation
@@ -13,7 +13,7 @@ Signed-off-by: Peter Marko <peter.marko@siemens.com>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 4d13d87..f002ab2 100644
+index 39ca17e..bffa9fb 100644
 --- a/setup.py
 +++ b/setup.py
 @@ -318,25 +318,25 @@ if BUILD_WITH_SYSTEM_OPENSSL:

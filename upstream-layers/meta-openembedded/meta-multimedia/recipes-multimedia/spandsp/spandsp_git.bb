@@ -20,14 +20,13 @@ PV = "3.0.0+git"
 
 SRC_URI = "\
     git://github.com/freeswitch/spandsp.git;protocol=https;branch=master \
-    file://configure.patch \
-    file://makefile.patch \
+    file://0001-configure-Replace-manual-search-for-libxml-by-AC_CHE.patch \
+    file://0002-configure-Use-AX_PROG_CC_FOR_BUILD-for-cross-compili.patch \
 "
 # Fails to build with Clang since 5394b2cae6c482ccb835335b769469977e6802ae
 # https://github.com/freeswitch/spandsp/issues/67
 # https://lists.openembedded.org/g/openembedded-devel/message/109325
-SRCREV = "df1282eb9af538ab1aadb6d66146e258451d4fe4"
-
+SRCREV = "797760168945c96e91af55bde9d4edaea2e654f9"
 
 inherit autotools
 

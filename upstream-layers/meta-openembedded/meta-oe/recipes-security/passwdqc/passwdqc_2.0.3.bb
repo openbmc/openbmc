@@ -27,7 +27,7 @@ REQUIRED_DISTRO_FEATURES = "pam"
 LICENSE = "BSD-1-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ac99c8678577a1c2f9f04cccee411d5d"
 
-SRC_URI = "http://www.openwall.com/${BPN}/${BP}.tar.gz \
+SRC_URI = "https://download.openwall.net/pub/projects/${BPN}/${BP}.tar.gz \
            file://makefile-add-ldflags.patch \
           "
 SRC_URI[sha256sum] = "53b0f4bc49369f06195e9e13abb6cff352d5acb79e861004ec95973896488cf4"

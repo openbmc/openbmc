@@ -24,7 +24,15 @@ RDEPENDS:${PN} = " \
     perl-module-warnings \
 "
 
+do_install_ptest:append(){
+    install -d ${D}${PTEST_PATH}/lib
+    touch ${D}${PTEST_PATH}/lib/File
+}
+
 RDEPENDS:${PN}-ptest += "libtest-warnings-perl \
+    perl-module-encode-encoding \
+    perl-module-file-spec-functions \
+    perl-module-findbin \
     perl-module-test-more \
     "
 

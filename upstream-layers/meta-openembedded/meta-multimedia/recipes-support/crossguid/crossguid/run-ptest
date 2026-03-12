@@ -1,0 +1,10 @@
+#!/bin/sh
+RET=0
+cd tests
+if ./crossguid-test; then
+  echo PASS: crossguid-test
+else
+  echo FAIL: crossguid-test
+  RET=1
+fi
+exit $RET

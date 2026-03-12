@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd $(dirname $0)/tests
+
+# Failing cases are not transformed, only passing and skipped ones.
+# Unitttest will output a summary at the end for each failing testcase, 
+# starting each line with "FAIL: " followed by the testcase name.
+
+python3 -m unittest -v 2>&1 | sed -e 's/\(test_[^ ]*\).*ok$/PASS: \1/' -e 's/\(test_[^ ]*\).*skipped.*/SKIP: \1/'

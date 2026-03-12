@@ -2,7 +2,7 @@ Upstream-Status: Pending
 
 --- a/kexec/Makefile
 +++ b/kexec/Makefile
-@@ -110,7 +110,7 @@ $(KEXEC): $(KEXEC_OBJS) $(UTIL_LIB)
+@@ -116,7 +116,7 @@ $(KEXEC): $(KEXEC_OBJS) $(UTIL_LIB)
  	@$(MKDIR) -p $(@D)
  	$(LINK.o) -o $@ $^ $(CFLAGS) $(LIBS)
  

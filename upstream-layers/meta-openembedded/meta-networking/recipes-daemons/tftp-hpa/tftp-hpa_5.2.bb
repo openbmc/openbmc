@@ -5,7 +5,7 @@ booting diskless workstations.  The tftp package provides the user   \
 interface for TFTP, which allows users to transfer files to and from a \
 remote machine.  This program and TFTP provide very little security, \
 and should not be enabled unless it is expressly needed."
-DEPENDS = "tcp-wrappers readline"
+DEPENDS = "readline"
 SECTION = "net"
 HOMEPAGE = "http://freecode.com/projects/tftp-hpa"
 LICENSE = "BSD-4-Clause"

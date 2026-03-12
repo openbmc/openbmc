@@ -13,6 +13,9 @@ SRC_URI = "https://launchpad.net/debian/+archive/primary/+sourcefiles/adduser/${
 
 SRC_URI[sha256sum] = "3e9eea661c9aac6b2c791bfcc1de3a9c6a422d45c8f3d38ed417737ed3166ffc"
 
+UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/a/adduser"
+UPSTREAM_CHECK_REGEX = "adduser_(?P<pver>\d+(\.\d+)+)"
+
 S = "${UNPACKDIR}/${BPN}"
 
 inherit cpan-base update-alternatives

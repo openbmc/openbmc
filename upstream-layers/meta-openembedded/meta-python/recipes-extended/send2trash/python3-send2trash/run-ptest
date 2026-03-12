@@ -1,0 +1,10 @@
+#!/bin/sh
+# Not all tests can run as root
+useradd tester || echo test user already exists
+
+# The test are running in /tmp folder by default, but
+# the tests expect the test folder to be a regular folder, not
+# a mount/symlink. Specify the TMP folder explicitly.
+export TMP=/var/volatile/tmp
+
+su tester -c "pytest --automake"

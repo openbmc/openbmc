@@ -6,15 +6,14 @@ LICENSE = "GPL-2.0-only & LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://COPYING.LIB;md5=f30a9716ef3762e3467a2f62bf790f0a"
 
-SRC_URI = "http://tuxera.com/opensource/ntfs-3g_ntfsprogs-${PV}.tgz \
+SRC_URI = "git://github.com/tuxera/ntfs-3g;protocol=https;branch=edge;tag=${PV} \
            file://0001-libntfs-3g-Makefile.am-fix-install-failed-while-host.patch \
            file://0001-unistr.c-Fix-use-after-free-in-ntfs_uppercase_mbs.patch \
 "
-S = "${UNPACKDIR}/ntfs-3g_ntfsprogs-${PV}"
-SRC_URI[sha256sum] = "f20e36ee68074b845e3629e6bced4706ad053804cbaf062fbae60738f854170c"
+SRCREV = "78414d93613532fd82f3a82aba5d4a1c32898781"
 
-UPSTREAM_CHECK_URI = "https://www.tuxera.com/community/open-source-ntfs-3g/"
-UPSTREAM_CHECK_REGEX = "ntfs-3g_ntfsprogs-(?P<pver>\d+(\.\d+)+)\.tgz"
+UPSTREAM_CHECK_URI = "https://github.com/tuxera/ntfs-3g/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools pkgconfig
 

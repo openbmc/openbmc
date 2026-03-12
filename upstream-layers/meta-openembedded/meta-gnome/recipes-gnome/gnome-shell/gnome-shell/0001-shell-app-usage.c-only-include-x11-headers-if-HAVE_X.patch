@@ -1,0 +1,30 @@
+From 2ae299419ec7b15a59e2b2b8a5b266b9f29df5a4 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Thu, 22 Jan 2026 12:52:34 +0100
+Subject: [PATCH] shell-app-usage.c: only include x11 headers if HAVE_X11
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Pending
+---
+ src/shell-app-usage.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/shell-app-usage.c b/src/shell-app-usage.c
+index 9e57a91b2..77adcf6a2 100644
+--- a/src/shell-app-usage.c
++++ b/src/shell-app-usage.c
+@@ -5,8 +5,10 @@
+ #include <string.h>
+ #include <stdlib.h>
+ 
++#ifdef HAVE_X11
+ #include <X11/Xlib.h>
+ #include <X11/Xatom.h>
++#endif
+ #include <glib.h>
+ #include <gio/gio.h>
+ #include <meta/display.h>
+-- 
+2.52.0
+

@@ -34,4 +34,5 @@ PROVIDES += "libcrypt-openssl-guess"
 
 RDEPENDS:${PN}-ptest += "\
     perl-module-test-more \
+    perl-module-english \
 "

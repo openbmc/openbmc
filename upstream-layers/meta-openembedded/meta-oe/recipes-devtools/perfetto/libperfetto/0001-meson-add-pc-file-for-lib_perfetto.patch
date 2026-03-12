@@ -18,7 +18,7 @@ index 8fb1e26275..3ef3ebf27d 100644
  project(
      'perfetto',
      ['cpp'],
-+    version: '47.0'
++    version: '51.2'
  )
  
 +soversion = meson.project_version()

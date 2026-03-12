@@ -4,8 +4,10 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.MIT;md5=b67209a1e36b682a8226de19d265b1e0"
 
-SRC_URI = "git://github.com/nlohmann/fifo_map.git;branch=master;protocol=https"
-
+SRC_URI = "git://github.com/nlohmann/fifo_map.git;branch=master;protocol=https \
+           file://0001-catch.hpp-Upgrade-to-latest-from-Catch-v1.12.2.patch \
+           file://0002-catch.hpp-Define-SIGSTKSZ-as-constant.patch \
+          "
 PV = "1.0.0+git"
 
 SRCREV = "d732aaf9a315415ae8fd7eb11e3a4c1f80e42a48"

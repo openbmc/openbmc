@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=11f384074d8e93e263b5664ef08a411a \
     file://alt-cannadic/COPYING;md5=c93c0550bd3173f4504b2cbd8991e50b \
 "
 
-SRC_URI = "http://osdn.dl.sourceforge.jp/anthy/37536/anthy-9100h.tar.gz \
+SRC_URI = "https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/anthy/9100h-23ubuntu2/anthy_9100h.orig.tar.gz \
     file://not_build_elc.patch \
     file://2ch_t.patch \
 "

@@ -17,6 +17,10 @@ inherit meson ptest pkgconfig
 EXTRA_OEMESON += "-Dbuild_tests=${@bb.utils.contains("DISTRO_FEATURES", "ptest", "true", "false", d)} \
 "
 
+# See - https://github.com/marzer/tomlplusplus/issues/279
+CXXFLAGS:append:toolchain-clang = " -stdlib=libstdc++"
+LDFLAGS:append:toolchain-clang = " -stdlib=libstdc++"
+
 do_install_ptest () {
     install -d ${D}${PTEST_PATH}/tests
     cp ${B}/tests/tomlplusplus_odr_test ${D}${PTEST_PATH}/tests

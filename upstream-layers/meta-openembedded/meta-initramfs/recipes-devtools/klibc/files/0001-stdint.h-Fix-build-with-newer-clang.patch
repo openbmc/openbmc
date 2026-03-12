@@ -1,0 +1,99 @@
+From 84bfb7a85900446e3cc96a103601052781627043 Mon Sep 17 00:00:00 2001
+From: Florent Revest <revest@chromium.org>
+Date: Mon, 14 Jul 2025 19:25:04 +0200
+Subject: [PATCH 1/2] stdint.h: Fix build with newer clang
+
+Recent versions of Clang introduced definitions for __*INT64_C:
+https://github.com/llvm/llvm-project/commit/33ad474c45e6d7a0de7bc75e15e27cf6cb9ff895
+
+This results in these build errors:
+
+usr/include/bits64/bitsize/stdint.h:27:9: error: '__INT64_C' macro redefined [-Werror,-Wmacro-redefined]
+   27 | #define __INT64_C(c)  c ## L
+      |         ^
+<built-in>:194:9: note: previous definition is here
+  194 | #define __INT64_C(c) c##L
+      |         ^
+
+Renaming these macros to something more unique avoids the errors.
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/libs/klibc/klibc.git/commit/?id=1d27e1732f1326eaf98f4624100f83232d843616]
+Signed-off-by: Florent Revest <revest@chromium.org>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ usr/include/bits32/bitsize/stdint.h |  4 ++--
+ usr/include/bits64/bitsize/stdint.h |  4 ++--
+ usr/include/stdint.h                | 10 +++++-----
+ 3 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/usr/include/bits32/bitsize/stdint.h b/usr/include/bits32/bitsize/stdint.h
+index 8e444b6..147090b 100644
+--- a/usr/include/bits32/bitsize/stdint.h
++++ b/usr/include/bits32/bitsize/stdint.h
+@@ -24,8 +24,8 @@ typedef unsigned int		uint_fast32_t;
+ typedef int			intptr_t;
+ typedef unsigned int		uintptr_t;
+ 
+-#define __INT64_C(c)   c ## LL
+-#define __UINT64_C(c)  c ## ULL
++#define __KLIBC_INT64_C(c)   c ## LL
++#define __KLIBC_UINT64_C(c)  c ## ULL
+ 
+ #define __PRI64_RANK   "ll"
+ #define __PRIFAST_RANK ""
+diff --git a/usr/include/bits64/bitsize/stdint.h b/usr/include/bits64/bitsize/stdint.h
+index 988e639..5bc64bf 100644
+--- a/usr/include/bits64/bitsize/stdint.h
++++ b/usr/include/bits64/bitsize/stdint.h
+@@ -24,8 +24,8 @@ typedef unsigned long int	uint_fast32_t;
+ typedef long int		intptr_t;
+ typedef unsigned long int	uintptr_t;
+ 
+-#define __INT64_C(c)  c ## L
+-#define __UINT64_C(c) c ## UL
++#define __KLIBC_INT64_C(c)  c ## L
++#define __KLIBC_UINT64_C(c) c ## UL
+ 
+ #define __PRI64_RANK	"l"
+ #define __PRIFAST_RANK  "l"
+diff --git a/usr/include/stdint.h b/usr/include/stdint.h
+index f64f027..6cda583 100644
+--- a/usr/include/stdint.h
++++ b/usr/include/stdint.h
+@@ -31,17 +31,17 @@ typedef uint64_t	uintmax_t;
+ #define INT8_MIN	(-128)
+ #define INT16_MIN	(-32768)
+ #define INT32_MIN	(-2147483647-1)
+-#define INT64_MIN	(__INT64_C(-9223372036854775807)-1)
++#define INT64_MIN	(__KLIBC_INT64_C(-9223372036854775807)-1)
+ 
+ #define INT8_MAX	(127)
+ #define INT16_MAX	(32767)
+ #define INT32_MAX	(2147483647)
+-#define INT64_MAX	(__INT64_C(9223372036854775807))
++#define INT64_MAX	(__KLIBC_INT64_C(9223372036854775807))
+ 
+ #define UINT8_MAX	(255U)
+ #define UINT16_MAX	(65535U)
+ #define UINT32_MAX	(4294967295U)
+-#define UINT64_MAX	(__UINT64_C(18446744073709551615))
++#define UINT64_MAX	(__KLIBC_UINT64_C(18446744073709551615))
+ 
+ #define INT_LEAST8_MIN	INT8_MIN
+ #define INT_LEAST16_MIN	INT16_MIN
+@@ -80,12 +80,12 @@ typedef uint64_t	uintmax_t;
+ #define INT8_C(c)	c
+ #define INT16_C(c)	c
+ #define INT32_C(c)	c
+-#define INT64_C(c)	__INT64_C(c)
++#define INT64_C(c)	__KLIBC_INT64_C(c)
+ 
+ #define UINT8_C(c)	c ## U
+ #define UINT16_C(c)	c ## U
+ #define UINT32_C(c)	c ## U
+-#define UINT64_C(c)	__UINT64_C(c)
++#define UINT64_C(c)	__KLIBC_UINT64_C(c)
+ 
+ #define INT_LEAST8_C(c)	 INT8_C(c)
+ #define INT_LEAST16_C(c) INT16_C(c)

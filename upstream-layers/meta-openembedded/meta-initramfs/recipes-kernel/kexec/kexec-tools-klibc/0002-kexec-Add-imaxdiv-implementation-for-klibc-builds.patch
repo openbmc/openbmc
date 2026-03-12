@@ -1,0 +1,48 @@
+From 47bad82779f7fcd46b8a269cfe9a99f8ef34d317 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 13 Dec 2025 12:13:08 -0800
+Subject: [PATCH 2/5] kexec: Add imaxdiv implementation for klibc builds
+
+klibc doesn't provide the imaxdiv_t structure or imaxdiv() function
+from inttypes.h. Add a simple inline implementation when building
+with klibc.
+
+The imaxdiv() function computes the quotient and remainder of the
+division of numer by denom, which is required for standard C99
+compliance but missing in minimal libc implementations.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ util_lib/include/elf_info.h | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/util_lib/include/elf_info.h b/util_lib/include/elf_info.h
+index fdf4c3d..9338205 100644
+--- a/util_lib/include/elf_info.h
++++ b/util_lib/include/elf_info.h
+@@ -22,7 +22,23 @@
+ #include <stdbool.h>
+ #include <inttypes.h>
+ #include <ctype.h>
++#ifdef __KLIBC__
++/* klibc doesn't provide imaxdiv_t or imaxdiv() */
++#include <inttypes.h>
++
++typedef struct {
++    intmax_t quot;  /* Quotient */
++    intmax_t rem;   /* Remainder */
++} imaxdiv_t;
+ 
++static inline imaxdiv_t imaxdiv(intmax_t numer, intmax_t denom)
++{
++    imaxdiv_t result;
++    result.quot = numer / denom;
++    result.rem = numer % denom;
++    return result;
++}
++#endif /* __KLIBC__ */
+ int get_pt_load(int idx,
+ 	unsigned long long *phys_start,
+ 	unsigned long long *phys_end,

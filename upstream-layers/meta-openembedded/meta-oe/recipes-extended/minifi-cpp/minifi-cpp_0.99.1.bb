@@ -27,6 +27,8 @@ SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;protocol=https;branch=mai
            file://0006-CMakeLists.txt-do-not-use-ccache.patch \
            file://0007-libsodium-aarch64-set-compiler-attributes-after-including-arm_.patch \
            file://0008-MINIFICPP-2553-CMP0065-OLD-removed-in-cmake-4.0-remo.patch \
+           file://0001-Add-missing-include-for-malloc-free.patch;patchdir=thirdparty/fmt-src \
+           file://0001-generateVersion.sh-set-BUILD_DATE-to-SOURCE_DATE_EPO.patch \
            file://systemd-volatile.conf \
            file://sysvinit-volatile.conf \
           "
@@ -113,6 +115,7 @@ EXTRA_OECMAKE = " \
                  -DFETCHCONTENT_SOURCE_DIR_FMT=${S}/thirdparty/fmt-src \
                  -DFETCHCONTENT_SOURCE_DIR_SPDLOG=${S}/thirdparty/spdlog-src \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '-DENABLE_SYSTEMD=ON', '-DENABLE_SYSTEMD=OFF', d)} \
+                 -DBUILD_IDENTIFIER=${PV} \
                 "
 
 PACKAGECONFIG ??= "libarchive expression-language"
@@ -204,6 +207,11 @@ do_install() {
 
         sed -i "s|@MINIFI_LOG@|${MINIFI_LOG}|g" ${D}${sysconfdir}/default/volatiles/99_minifi
     fi
+    
+    for ss in $(find ${D}${libexecdir}/minifi-python-examples -type f); do
+        sed -i 's,/usr/bin/env python$,/usr/bin/env python3,' "$ss"
+    done
+
 }
 
 pkg_postinst:${PN}() {

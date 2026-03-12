@@ -1,0 +1,51 @@
+From 437b7b143072b088ca34e10165abed04973280a3 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Wed, 5 Nov 2025 15:22:34 +0800
+Subject: [PATCH] support reproducible builds
+
+When compressing, do not save the original file name and
+timestamp by default (gzip -n). Make archives be reproducible
+at each build
+
+Upstream-Status: Submitted [https://github.com/libhugetlbfs/libhugetlbfs/pull/108]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ Makefile.in | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 25be577..e4037af 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -446,11 +446,11 @@ install-man:
+ 	$(INSTALL) -d $(DESTDIR)$(MANDIR8)
+ 	for x in $(INSTALL_MAN1); do \
+ 		$(INSTALL) -m 444 man/$$x $(DESTDIR)$(MANDIR1); \
+-		gzip -f $(DESTDIR)$(MANDIR1)/$$x; \
++		gzip -fn $(DESTDIR)$(MANDIR1)/$$x; \
+ 	done
+ 	for x in $(INSTALL_MAN3); do \
+ 		$(INSTALL) -m 444 man/$$x $(DESTDIR)$(MANDIR3); \
+-		gzip -f $(DESTDIR)$(MANDIR3)/$$x; \
++		gzip -fn $(DESTDIR)$(MANDIR3)/$$x; \
+ 	done
+ 	rm -f $(DESTDIR)$(MANDIR3)/free_huge_pages.3.gz
+ 	rm -f $(DESTDIR)$(MANDIR3)/free_hugepage_region.3.gz
+@@ -462,11 +462,11 @@ install-man:
+ 	ln -s hugetlbfs_find_path.3.gz $(DESTDIR)$(MANDIR3)/hugetlbfs_find_path_for_size.3.gz
+ 	for x in $(INSTALL_MAN7); do \
+ 		$(INSTALL) -m 444 man/$$x $(DESTDIR)$(MANDIR7); \
+-		gzip -f $(DESTDIR)$(MANDIR7)/$$x; \
++		gzip -fn $(DESTDIR)$(MANDIR7)/$$x; \
+ 	done
+ 	for x in $(INSTALL_MAN8); do \
+ 		$(INSTALL) -m 444 man/$$x $(DESTDIR)$(MANDIR8); \
+-		gzip -f $(DESTDIR)$(MANDIR8)/$$x; \
++		gzip -fn $(DESTDIR)$(MANDIR8)/$$x; \
+ 	done
+ 
+ install-bin:
+-- 
+2.34.1
+

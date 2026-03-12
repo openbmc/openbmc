@@ -3,20 +3,20 @@ From: Alex Kiernan <alex.kiernan@gmail.com>
 Date: Mon, 5 Dec 2022 22:49:49 +0000
 Subject: [PATCH] mDNSCore: Fix broken debug parameter
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
 Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
 ---
  mDNSCore/mDNS.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mDNSCore/mDNS.c b/mDNSCore/mDNS.c
-index ad9eaa37a82a..fc51e1ad9bd4 100644
---- a/mDNSCore/mDNS.c
-+++ b/mDNSCore/mDNS.c
-@@ -11046,7 +11046,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastAnswers(mDNS *const m, const DNSMessage *
- #else
+Index: mDNSResponder/mDNSCore/mDNS.c
+===================================================================
+--- mDNSResponder.orig/mDNSCore/mDNS.c
++++ mDNSResponder/mDNSCore/mDNS.c
+@@ -9481,7 +9481,7 @@ mDNSlocal void mDNSCoreReceiveNoUnicastA
+                         {
+                             CacheRecord *negcr;
                              const DNSServRef dnsserv = qptr->qDNSServer;
- #endif
 -                            debugf("mDNSCoreReceiveNoUnicastAnswers making negative cache entry TTL %d for %##s (%s)", negttl, currentQName, DNSTypeName(q.qtype));
 +                            debugf("mDNSCoreReceiveNoUnicastAnswers making negative cache entry TTL %d for %##s (%s)", negttl, currentQName->c, DNSTypeName(q.qtype));
                              // Create a negative record for the current name in the CNAME chain.

@@ -22,8 +22,6 @@ Signed-off-by: Andrea Adami <andrea.adami@gmail.com>
  kexec/kexec-elf-rel.c                    | 2 +-
  6 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/kexec/arch/arm/kexec-elf-rel-arm.c b/kexec/arch/arm/kexec-elf-rel-arm.c
-index a939cf4..2551dc0 100644
 --- a/kexec/arch/arm/kexec-elf-rel-arm.c
 +++ b/kexec/arch/arm/kexec-elf-rel-arm.c
 @@ -1,5 +1,5 @@
@@ -33,8 +31,6 @@ index a939cf4..2551dc0 100644
  #include "../../kexec.h"
  #include "../../kexec-elf.h"
  
-diff --git a/kexec/arch/i386/kexec-elf-rel-x86.c b/kexec/arch/i386/kexec-elf-rel-x86.c
-index 55a214e..e7583d1 100644
 --- a/kexec/arch/i386/kexec-elf-rel-x86.c
 +++ b/kexec/arch/i386/kexec-elf-rel-x86.c
 @@ -1,5 +1,5 @@
@@ -44,8 +40,6 @@ index 55a214e..e7583d1 100644
  #include "../../kexec.h"
  #include "../../kexec-elf.h"
  
-diff --git a/kexec/arch/ppc/kexec-elf-rel-ppc.c b/kexec/arch/ppc/kexec-elf-rel-ppc.c
-index 1acbd86..a60c66c 100644
 --- a/kexec/arch/ppc/kexec-elf-rel-ppc.c
 +++ b/kexec/arch/ppc/kexec-elf-rel-ppc.c
 @@ -1,5 +1,5 @@
@@ -55,8 +49,6 @@ index 1acbd86..a60c66c 100644
  #include "../../kexec.h"
  #include "../../kexec-elf.h"
  
-diff --git a/kexec/arch/ppc64/kexec-elf-rel-ppc64.c b/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
-index 51b1354..c85f421 100644
 --- a/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
 +++ b/kexec/arch/ppc64/kexec-elf-rel-ppc64.c
 @@ -1,5 +1,5 @@
@@ -66,8 +58,6 @@ index 51b1354..c85f421 100644
  #include <string.h>
  #include "../../kexec.h"
  #include "../../kexec-elf.h"
-diff --git a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
-index db85b44..761a4ed 100644
 --- a/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
 +++ b/kexec/arch/x86_64/kexec-elf-rel-x86_64.c
 @@ -1,5 +1,5 @@
@@ -77,8 +67,6 @@ index db85b44..761a4ed 100644
  #include "../../kexec.h"
  #include "../../kexec-elf.h"
  
-diff --git a/kexec/kexec-elf-rel.c b/kexec/kexec-elf-rel.c
-index 9a6e63d..a856636 100644
 --- a/kexec/kexec-elf-rel.c
 +++ b/kexec/kexec-elf-rel.c
 @@ -4,7 +4,7 @@

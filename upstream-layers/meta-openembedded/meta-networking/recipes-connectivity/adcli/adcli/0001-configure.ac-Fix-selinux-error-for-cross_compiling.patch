@@ -1,0 +1,49 @@
+Subject: [PATCH] configure.ac: Fix selinux error for
+ cross_compiling
+
+Before this patch:
+configure file will check SELINUX_MAKEFILE /usr/share/selinux/devel/Makefile which is defined for target.
+But in cross_compiling environment, the SELINUX_MAKEFILE should defined for host
+
+So following error occurs
+| checking for libselinux... no
+| checking for /usr/share/selinux/devel/Makefile... configure: error: cannot check for file existence when cross compiling
+| NOTE: The following config.log files may provide further information.
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ configure.ac | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b0be041..b5c3baf 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -171,9 +171,19 @@ fi
+ SELINUX_MAKEFILE=/usr/share/selinux/devel/Makefile
+ AC_SUBST([SELINUX_MAKEFILE])
+ 
+-AC_CHECK_FILE([$SELINUX_MAKEFILE],
+-              [build_selinux=yes],
+-              [build_selinux=no])
++AS_IF([test "x$cross_compiling" = "xyes"],
++    [
++        AS_IF([test -f "${SYSROOT_DIR}/usr/share/selinux/devel/Makefile"],
++            [build_selinux=yes],
++            [build_selinux=no])
++        SELINUX_MAKEFILE="${SYSROOT_DIR}/usr/share/selinux/devel/Makefile"
++    ],
++    [
++        SELINUX_MAKEFILE=/usr/share/selinux/devel/Makefile
++        AC_CHECK_FILE([$SELINUX_MAKEFILE],
++            [build_selinux=yes],
++            [build_selinux=no])
++    ])
+ 
+ if test x$build_selinux_support = xyes && test x$build_selinux = xno; then
+     AC_MSG_ERROR([Couldn't build SELinux support, SELinux policy devel packages missing])
+-- 
+2.43.0
+

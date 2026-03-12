@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# run-ptest — ImageMagick ptest harness
+# POSIX-safe and BusyBox compatible
+
+PTDIR=$(dirname "$0")
+TESTDIR="$PTDIR"
+PASSCOUNT=0
+FAILCOUNT=0
+TOTAL=0
+
+echo "======================================="
+echo "ImageMagick ptest: Runtime Validation"
+echo "======================================="
+
+for t in "$TESTDIR"/*.sh; do
+    [ -x "$t" ] || chmod +x "$t"
+    TOTAL=$((TOTAL + 1))
+    echo
+    echo "[DEBUG] Launching test script $t"
+
+    if sh "$t" 2>&1; then
+        echo "PASS: $(basename "$t")"
+        PASSCOUNT=$((PASSCOUNT + 1))
+    else
+        rc=$?
+        if [ "$rc" -eq 77 ]; then
+            echo "SKIP: $(basename "$t")"
+        else
+            echo "FAIL: $(basename "$t")"
+            FAILCOUNT=$((FAILCOUNT + 1))
+        fi
+    fi
+
+done
+
+echo
+echo "======================================="
+echo "[SUMMARY] Total: $TOTAL | PASS: $PASSCOUNT | FAIL: $FAILCOUNT"
+echo "======================================="
+echo
+[ "$FAILCOUNT" -eq 0 ]
+

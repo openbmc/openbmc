@@ -12,14 +12,14 @@ Index: emacs-29.1/Makefile.in
 ===================================================================
 --- emacs-29.1.orig/Makefile.in
 +++ emacs-29.1/Makefile.in
-@@ -416,19 +416,10 @@ advice-on-failure:
+@@ -420,19 +420,11 @@
  	@exit ${exit-status}
  
  sanity-check:
 -	@[ -f .no-advice-on-failure ] && exit 0; true
--	@v=$$(src/emacs${EXEEXT} --batch --eval \
+-	@v=`src/emacs${EXEEXT} --batch -Q --eval \
 -	  '(progn (defun f (n) (if (= 0 n) 1 (* n (f (- n 1))))) (princ (f 10)))' \
--	  2> /dev/null); \
+-	  2> /dev/null`; \
 -	[ "X$$v" = "X3628800" ] && exit 0; \
 -	echo >&2 '***'; \
 -	echo >&2 '*** '"\"make ${make-target}\" succeeded, but Emacs is not functional."; \
@@ -33,6 +33,7 @@ Index: emacs-29.1/Makefile.in
 +# this is not going to work since it was (probably) built for a different architecture.
 +# Avoid calling target binaries from the host and simply assume our build artifacts work.
 +	exit 0
++
  
  .PHONY: all ${SUBDIR} blessmail epaths-force epaths-force-w32 epaths-force-ns-self-contained etc-emacsver
  

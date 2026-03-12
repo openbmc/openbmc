@@ -1,0 +1,69 @@
+From 3659ce248a62d98ac950ab68d8a5b4488136c85d Mon Sep 17 00:00:00 2001
+From: Ryan Eatmon <reatmon@ti.com>
+Date: Fri, 6 Feb 2026 11:52:31 -0600
+Subject: [PATCH] Fix multiple definitions with --enable-intervals
+
+There are multiple definitions of two variables when enabling intervals.
+
+| <snip>/ld: nettest_omni.o:<snip>/src/nettest_omni.c:233: multiple definition of `signal_set'; nettest_bsd.o:<snip>/src/nettest_bsd.c:302: first defined here
+| <snip>/ld: nettest_omni.o:<snip>/src/nettest_omni.c:191: multiple definition of `interval_count'; nettest_bsd.o:<snip>/src/nettest_bsd.c:289: first defined here
+| <snip>/ld: nettest_omni.o:<snip>/src/nettest_omni.c:233: multiple definition of `signal_set'; nettest_bsd.o:<snip>/src/nettest_bsd.c:302: first defined here
+| <snip>/ld: nettest_omni.o:<snip>/src/nettest_omni.c:191: multiple definition of `interval_count'; nettest_bsd.o:<snip>/src/nettest_bsd.c:289: first defined here
+
+Make them static for each file.
+
+Upstream-Status: Submitted [https://github.com/HewlettPackard/netperf/pull/94]
+
+Signed-off-by: Ryan Eatmon <reatmon@ti.com>
+---
+ src/nettest_bsd.c  | 4 ++--
+ src/nettest_omni.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/nettest_bsd.c b/src/nettest_bsd.c
+index 36f5810..4bbc4fa 100644
+--- a/src/nettest_bsd.c
++++ b/src/nettest_bsd.c
+@@ -286,7 +286,7 @@ static HIST time_hist;
+ #endif /* WANT_HISTOGRAM */
+ 
+ #ifdef WANT_INTERVALS
+-int interval_count;
++static int interval_count;
+ #ifndef WANT_SPIN
+ #ifdef WIN32
+ #define INTERVALS_INIT() \
+@@ -299,7 +299,7 @@ int interval_count;
+     } \
+     interval_count = interval_burst;
+ #else
+-sigset_t signal_set;
++static sigset_t signal_set;
+ #define INTERVALS_INIT() \
+     if (interval_burst) { \
+       /* zero means that we never pause, so we never should need the \
+diff --git a/src/nettest_omni.c b/src/nettest_omni.c
+index 5d63f02..2ba5604 100644
+--- a/src/nettest_omni.c
++++ b/src/nettest_omni.c
+@@ -188,7 +188,7 @@ static HIST time_hist;
+ 
+ 
+ #ifdef WANT_INTERVALS
+-int interval_count;
++static int interval_count;
+ unsigned int interval_wait_microseconds;
+ 
+ /* hoist the timestamps up here so we can use them to factor-out the
+@@ -230,7 +230,7 @@ static struct timeval *temp_intvl_ptr = &intvl_one;
+     interval_count = interval_burst; \
+     interval_wait_microseconds = 0;
+ #else
+-sigset_t signal_set;
++static sigset_t signal_set;
+ #define INTERVALS_INIT() \
+     if (interval_burst) { \
+       /* zero means that we never pause, so we never should need the \
+-- 
+2.43.0
+

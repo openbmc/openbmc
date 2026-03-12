@@ -1,0 +1,38 @@
+From ff394a977e699e1b757c6e83143e1f330e20ca37 Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Fri, 14 Nov 2025 12:38:20 +0800
+Subject: [PATCH] support reproducible builds
+
+In order to support reproducible builds [1], while using bison to generate
+source code, add option --file-prefix-map [2] to remove build path prefix
+in the generated header file.
+
+[1] https://reproducible-builds.org/
+[2] https://cgit.git.savannah.gnu.org/cgit/bison.git/commit/?id=dd878d18519689c7bbcd72de4c9f9e53085a3cbf
+
+Upstream-Status: Submitted [https://github.com/MariaDB/server/pull/4440]
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+---
+ sql/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sql/CMakeLists.txt b/sql/CMakeLists.txt
+index 3a7c9d36..ac868072 100644
+--- a/sql/CMakeLists.txt
++++ b/sql/CMakeLists.txt
+@@ -400,10 +400,10 @@ ELSE()
+   CONFIGURE_FILE(myskel.m4.in myskel.m4)
+   BISON_TARGET(gen_mariadb_cc_hh ${CMAKE_CURRENT_BINARY_DIR}/yy_mariadb.yy
+                                  ${CMAKE_CURRENT_BINARY_DIR}/yy_mariadb.cc
+-               COMPILE_FLAGS "-p MYSQL -S ${CMAKE_CURRENT_BINARY_DIR}/myskel.m4")
++               COMPILE_FLAGS "-p MYSQL -S ${CMAKE_CURRENT_BINARY_DIR}/myskel.m4 --file-prefix-map=${CMAKE_BINARY_DIR}=''")
+   BISON_TARGET(gen_oracle_cc_hh ${CMAKE_CURRENT_BINARY_DIR}/yy_oracle.yy
+                                 ${CMAKE_CURRENT_BINARY_DIR}/yy_oracle.cc
+-               COMPILE_FLAGS "-p ORA -S ${CMAKE_CURRENT_BINARY_DIR}/myskel.m4")
++               COMPILE_FLAGS "-p ORA -S ${CMAKE_CURRENT_BINARY_DIR}/myskel.m4 --file-prefix-map=${CMAKE_BINARY_DIR}=''")
+ ENDIF()
+ 
+ IF(NOT CMAKE_CROSSCOMPILING OR DEFINED CMAKE_CROSSCOMPILING_EMULATOR)
+-- 
+2.34.1
+

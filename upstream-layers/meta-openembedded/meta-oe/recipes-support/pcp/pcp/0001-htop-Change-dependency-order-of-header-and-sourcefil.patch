@@ -1,4 +1,4 @@
-From c123980d6bf1bc2bf93ee0dd0d7f8fee3d4ddc96 Mon Sep 17 00:00:00 2001
+From 66aa3efbd182c5597b66d9237c213449f31acdac Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 5 Jul 2023 08:45:14 -0700
 Subject: [PATCH] htop: Change dependency order of header and sourcefiles
@@ -16,9 +16,11 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/pcp/htop/GNUmakefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/src/pcp/htop/GNUmakefile b/src/pcp/htop/GNUmakefile
+index 167b4b048..3e29638d6 100644
 --- a/src/pcp/htop/GNUmakefile
 +++ b/src/pcp/htop/GNUmakefile
-@@ -210,8 +210,8 @@ CFGCOLUMNS = $(patsubst %,pcp/columns/%,
+@@ -210,8 +210,8 @@ CFGCOLUMNS = $(patsubst %,pcp/columns/%,$(COLUMNS))
  CFGSCREENS = $(patsubst %,pcp/screens/%,$(SCREENS))
  
  CFGXFILES = $(CFGMETERS) $(CFGCOLUMNS) $(CFGSCREENS)

@@ -7,6 +7,6 @@ SRC_URI[sha256sum] = "e4b68bb881802dda1a7d878b2fc84c06d1ee57fb40b874d3dc97dabfa3
 PYPI_PACKAGE = "flask_sqlalchemy"
 UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
-inherit pypi python_setuptools_build_meta
+inherit pypi python_flit_core
 
 RDEPENDS:${PN} = "python3-sqlalchemy python3-flask"

@@ -1,4 +1,4 @@
-From 5f0f70192b0e20336e642b02ca9662ba2fef66cf Mon Sep 17 00:00:00 2001
+From 266090c3af1db8e43e5ee349f5dd515983e651f8 Mon Sep 17 00:00:00 2001
 From: Yi Fan Yu <yifan.yu@windriver.com>
 Date: Fri, 19 Feb 2021 15:21:18 -0500
 Subject: [PATCH] Add ptest for tcpdump
@@ -19,10 +19,10 @@ Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
  1 file changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index ea1ef1d0..e7987bd8 100644
+index 72dd01d..3f90901 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -445,9 +445,18 @@ distclean:
+@@ -448,9 +448,18 @@ distclean: clean
  	    tests/failure-outputs.txt
  	rm -rf autom4te.cache tests/DIFF tests/NEW
  
@@ -42,6 +42,3 @@ index ea1ef1d0..e7987bd8 100644
  extags: $(TAGFILES)
  	ctags $(TAGFILES)
  
--- 
-2.29.2
-

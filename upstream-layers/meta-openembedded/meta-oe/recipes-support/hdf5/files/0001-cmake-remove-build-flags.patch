@@ -9,46 +9,45 @@ to improve reproducibility.
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+
+Updated for v2.0.0
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+
 ---
- config/cmake/libhdf5.settings.cmake.in | 18 +++++++++---------
+ src/libhdf5.settings.cmake.in | 18 +++++++++---------
  1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/config/cmake/libhdf5.settings.cmake.in b/config/cmake/libhdf5.settings.cmake.in
+diff --git a/src/libhdf5.settings.in b/src/libhdf5.settings.in
 index deb07ed..6f255c4 100644
---- a/config/cmake/libhdf5.settings.cmake.in
-+++ b/config/cmake/libhdf5.settings.cmake.in
-@@ -23,23 +23,23 @@ Linking Options:
- ----------------
-                       Libraries: @BUILD_NAME_EXT@
-   Statically Linked Executables: @BUILD_STATIC_EXECS@
--                        LDFLAGS: @CMAKE_SHARED_LINKER_FLAGS@
-+                        LDFLAGS:
-                      H5_LDFLAGS: @H5_LDFLAGS@
-                      AM_LDFLAGS: @AM_LDFLAGS@
-                 Extra libraries: @LINK_LIBS@
--                       Archiver: @CMAKE_AR@
--                       AR_FLAGS:
--                         Ranlib: @CMAKE_RANLIB@
-+                       Archiver:
-+                       AR_FLAGS:
-+                         Ranlib:
- 
+--- a/src/libhdf5.settings.in
++++ b/src/libhdf5.settings.in
+@@ -4,7 +4,7 @@
+ General Information:
+ -------------------
+                    HDF5 Version: @HDF5_PACKAGE_VERSION_STRING@
+-                  Configured on: @CONFIG_DATE@
++                  Configured on:
+                   Configured by: @CMAKE_GENERATOR@
+                     Host system: @CMAKE_HOST_SYSTEM@
+               Uname information: @CMAKE_SYSTEM_NAME@
+@@ -34,12 +34,12 @@
  Languages:
  ----------
                                C: YES
 -                     C Compiler: @CMAKE_C_COMPILER@ @CMAKE_C_COMPILER_VERSION@
+-                       CPPFLAGS: @CPPFLAGS@
 +                     C Compiler:
-                        CPPFLAGS: @CPPFLAGS@
++                       CPPFLAGS:
                      H5_CPPFLAGS: @H5_CPPFLAGS@
                      AM_CPPFLAGS: @AM_CPPFLAGS@
--                         CFLAGS: @CMAKE_C_FLAGS@
+-                         CFLAGS: @CMAKE_C_FLAGS@ @HDF5_BUILD_MODE_C_FLAGS@
 -                      H5_CFLAGS: @HDF5_CMAKE_C_FLAGS@
 +                         CFLAGS:
 +                      H5_CFLAGS:
                        AM_CFLAGS: @AM_CFLAGS@
                 Shared C Library: @H5_ENABLE_SHARED_LIB@
                 Static C Library: @H5_ENABLE_STATIC_LIB@
-@@ -51,11 +51,11 @@ Languages:
+@@ -51,11 +51,11 @@
                 AM Fortran Flags: @AM_FCFLAGS@
           Shared Fortran Library: @H5_ENABLE_SHARED_LIB@
           Static Fortran Library: @H5_ENABLE_STATIC_LIB@
@@ -57,11 +56,8 @@ index deb07ed..6f255c4 100644
  
                              C++: @HDF5_BUILD_CPP_LIB@
                     C++ Compiler: @CMAKE_CXX_COMPILER@ @CMAKE_CXX_COMPILER_VERSION@
--                      C++ Flags: @CMAKE_CXX_FLAGS@
+-                      C++ Flags: @CMAKE_CXX_FLAGS@ @HDF5_BUILD_MODE_CXX_FLAGS@
 +                      C++ Flags:
                     H5 C++ Flags: @HDF5_CMAKE_CXX_FLAGS@
                     AM C++ Flags: @AM_CXXFLAGS@
               Shared C++ Library: @H5_ENABLE_SHARED_LIB@
--- 
-2.25.1
-

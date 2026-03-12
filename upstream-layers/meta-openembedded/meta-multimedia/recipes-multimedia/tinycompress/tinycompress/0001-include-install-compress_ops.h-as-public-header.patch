@@ -1,0 +1,32 @@
+From 2db4ee4ed5e12a48b1d195dab0f57b7106ff37c4 Mon Sep 17 00:00:00 2001
+From: Pratyush Meduri <mpratyus@qti.qualcomm.com>
+Date: Tue, 20 Jan 2026 14:47:27 +0530
+Subject: [PATCH] include: install compress_ops.h as public header
+
+Move tinycompress/compress_ops.h from noinst_HEADERS to
+nobase_include_HEADERS so it gets installed for users.
+
+Signed-off-by: Pratyush Meduri <mpratyus@qti.qualcomm.com>
+Upstream-Status: Submitted [https://github.com/alsa-project/tinycompress/pull/30]
+---
+ include/Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/Makefile.am b/include/Makefile.am
+index b12c2c5..15058a9 100644
+--- a/include/Makefile.am
++++ b/include/Makefile.am
+@@ -1,8 +1,8 @@
+-nobase_include_HEADERS = tinycompress/tinycompress.h
++nobase_include_HEADERS = tinycompress/tinycompress.h \
++                         tinycompress/compress_ops.h
+ 
+ noinst_HEADERS = sound/compress_offload.h \
+ 		 sound/compress_params.h \
+ 		 tinycompress/version.h \
+-		 tinycompress/compress_ops.h \
+ 		 tinycompress/tinymp3.h \
+ 		 tinycompress/tinywave.h
+-- 
+2.34.1
+

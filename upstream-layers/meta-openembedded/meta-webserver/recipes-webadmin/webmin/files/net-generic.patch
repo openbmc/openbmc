@@ -5,15 +5,14 @@ Upstream-Status: Inappropriate [config]
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
 --- a/net/module.info
 +++ b/net/module.info
-@@ -1,7 +1,7 @@
- version=2.202
- longdesc=Configure boot time and active interfaces, DNS, routing and /etc/hosts.
+@@ -1,6 +1,6 @@
  name=Networking
+ category=net
 -os_support=solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
 +os_support=generic-linux solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
- readonly=1
  desc=Network Configuration
- category=net
+ longdesc=Configure boot time and active interfaces, DNS, routing and /etc/hosts.
+ readonly=1
 --- /dev/null
 +++ b/net/generic-linux-lib.pl
 @@ -0,0 +1,2 @@

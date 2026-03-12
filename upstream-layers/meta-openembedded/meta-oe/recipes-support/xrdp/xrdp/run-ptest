@@ -1,0 +1,13 @@
+#!/bin/sh
+
+RESULT=0
+cd tests
+for t in $(find . -type f -executable); do
+    ./$t > $t.out
+    ret=$?
+    if [ $ret -ne 0 ]; then
+        RESULT=$ret
+    fi
+    sed -e "s/^ok/PASS: /g" -e "s/^not ok/FAIL: /g" ./$t.out
+done
+exit $RESULT

@@ -1,0 +1,345 @@
+From 06b9291b4a351c5d3a40f6c80ee11713840b1039 Mon Sep 17 00:00:00 2001
+From: Andreas Schneider <asn@samba.org>
+Date: Thu, 16 Oct 2025 11:22:46 +0200
+Subject: [PATCH 4/4] lib:replace: Remove memset_s()
+
+Upstream-Status: Backport [https://gitlab.com/samba-team/samba/-/commit/f3b380b8a3866286244725903287211cf54a4e74]
+Signed-off-by: Andreas Schneider <asn@samba.org>
+Reviewed-by: Douglas Bagnall <douglas.bagnall@catalyst.net.nz>
+
+Autobuild-User(master): Andreas Schneider <asn@cryptomilk.org>
+Autobuild-Date(master): Tue Nov 11 14:51:45 UTC 2025 on atb-devel-224
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/replace/README                      |  1 -
+ lib/replace/replace.c                   | 87 ++++++++-----------------
+ lib/replace/replace.h                   |  5 --
+ lib/replace/wscript                     |  2 +-
+ third_party/heimdal_build/roken.h       |  4 --
+ third_party/heimdal_build/wscript_build |  5 ++
+ 6 files changed, 34 insertions(+), 70 deletions(-)
+
+diff --git a/lib/replace/README b/lib/replace/README
+index bb9d008..d8431e7 100644
+--- a/lib/replace/README
++++ b/lib/replace/README
+@@ -74,7 +74,6 @@ realpath
+ poll
+ setproctitle
+ memset_explicit
+-memset_s
+ 
+ Types:
+ bool
+diff --git a/lib/replace/replace.c b/lib/replace/replace.c
+index 8615899..a419837 100644
+--- a/lib/replace/replace.c
++++ b/lib/replace/replace.c
+@@ -1,4 +1,4 @@
+-/* 
++/*
+    Unix SMB/CIFS implementation.
+    replacement routines for broken systems
+    Copyright (C) Andrew Tridgell 1992-1998
+@@ -8,7 +8,7 @@
+      ** NOTE! The following LGPL license applies to the replace
+      ** library. This does NOT imply that all of Samba is released
+      ** under the LGPL
+-   
++
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+@@ -91,7 +91,7 @@ size_t rep_strlcpy(char *d, const char *s, size_t bufsize)
+ #endif
+ 
+ #ifndef HAVE_STRLCAT
+-/* like strncat but does not 0 fill the buffer and always null 
++/* like strncat but does not 0 fill the buffer and always null
+    terminates. bufsize is the length of the buffer, which should
+    be one more than the maximum resulting string length */
+ size_t rep_strlcat(char *d, const char *s, size_t bufsize)
+@@ -116,7 +116,7 @@ size_t rep_strlcat(char *d, const char *s, size_t bufsize)
+ 
+ #ifndef HAVE_MKTIME
+ /*******************************************************************
+-a mktime() replacement for those who don't have it - contributed by 
++a mktime() replacement for those who don't have it - contributed by
+ C.A. Lademann <cal@zls.com>
+ Corrections by richard.kettlewell@kewill.com
+ ********************************************************************/
+@@ -137,7 +137,7 @@ time_t rep_mktime(struct tm *t)
+     return((time_t)-1);
+ 
+   n = t->tm_year + 1900 - 1;
+-  epoch = (t->tm_year - 70) * YEAR + 
++  epoch = (t->tm_year - 70) * YEAR +
+     ((n / 4 - n / 100 + n / 400) - (1969 / 4 - 1969 / 100 + 1969 / 400)) * DAY;
+ 
+   y = t->tm_year + 1900;
+@@ -147,7 +147,7 @@ time_t rep_mktime(struct tm *t)
+     epoch += mon [m] * DAY;
+     if(m == 1 && y % 4 == 0 && (y % 100 != 0 || y % 400 == 0))
+       epoch += DAY;
+-    
++
+     if(++m > 11) {
+       m = 0;
+       y++;
+@@ -156,7 +156,7 @@ time_t rep_mktime(struct tm *t)
+ 
+   epoch += (t->tm_mday - 1) * DAY;
+   epoch += t->tm_hour * HOUR + t->tm_min * MINUTE + t->tm_sec;
+-  
++
+   if((u = localtime(&epoch)) != NULL) {
+     t->tm_sec = u->tm_sec;
+     t->tm_min = u->tm_min;
+@@ -176,7 +176,7 @@ time_t rep_mktime(struct tm *t)
+ 
+ #ifndef HAVE_INITGROUPS
+ /****************************************************************************
+- some systems don't have an initgroups call 
++ some systems don't have an initgroups call
+ ****************************************************************************/
+ int rep_initgroups(char *name, gid_t id)
+ {
+@@ -194,7 +194,7 @@ int rep_initgroups(char *name, gid_t id)
+ 	int    i,j;
+ 	struct group *g;
+ 	char   *gr;
+-	
++
+ 	if((grouplst = malloc(sizeof(gid_t) * max_gr)) == NULL) {
+ 		errno = ENOMEM;
+ 		return -1;
+@@ -250,9 +250,9 @@ void *rep_memmove(void *dest,const void *src,int size)
+ 
+ 	if (d < s) {
+ 		/* we can forward copy */
+-		if (s-d >= sizeof(int) && 
+-		    !(s%sizeof(int)) && 
+-		    !(d%sizeof(int)) && 
++		if (s-d >= sizeof(int) &&
++		    !(s%sizeof(int)) &&
++		    !(d%sizeof(int)) &&
+ 		    !(size%sizeof(int))) {
+ 			/* do it all as words */
+ 			int *idest = (int *)dest;
+@@ -267,9 +267,9 @@ void *rep_memmove(void *dest,const void *src,int size)
+ 		}
+ 	} else {
+ 		/* must backward copy */
+-		if (d-s >= sizeof(int) && 
+-		    !(s%sizeof(int)) && 
+-		    !(d%sizeof(int)) && 
++		if (d-s >= sizeof(int) &&
++		    !(s%sizeof(int)) &&
++		    !(d%sizeof(int)) &&
+ 		    !(size%sizeof(int))) {
+ 			/* do it all as words */
+ 			int *idest = (int *)dest;
+@@ -281,7 +281,7 @@ void *rep_memmove(void *dest,const void *src,int size)
+ 			char *cdest = (char *)dest;
+ 			char *csrc = (char *)src;
+ 			for (i=size-1;i>=0;i--) cdest[i] = csrc[i];
+-		}      
++		}
+ 	}
+ 	return(dest);
+ }
+@@ -334,16 +334,16 @@ void rep_vsyslog (int facility_priority, const char *format, va_list arglist)
+  size_t rep_strnlen(const char *s, size_t max)
+ {
+         size_t len;
+-  
++
+         for (len = 0; len < max; len++) {
+                 if (s[len] == '\0') {
+                         break;
+                 }
+         }
+-        return len;  
++        return len;
+ }
+ #endif
+-  
++
+ #ifndef HAVE_STRNDUP
+ /**
+  Some platforms don't have strndup.
+@@ -351,7 +351,7 @@ void rep_vsyslog (int facility_priority, const char *format, va_list arglist)
+ char *rep_strndup(const char *s, size_t n)
+ {
+ 	char *ret;
+-	
++
+ 	n = strnlen(s, n);
+ 	ret = malloc(n+1);
+ 	if (!ret)
+@@ -407,7 +407,7 @@ int rep_chroot(const char *dname)
+ 
+ /*****************************************************************
+  Possibly replace mkstemp if it is broken.
+-*****************************************************************/  
++*****************************************************************/
+ 
+ #ifndef HAVE_SECURE_MKSTEMP
+ int rep_mkstemp(char *template)
+@@ -425,7 +425,7 @@ int rep_mkstemp(char *template)
+ char *rep_mkdtemp(char *template)
+ {
+ 	char *dname;
+-	
++
+ 	if ((dname = mktemp(template))) {
+ 		if (mkdir(dname, 0700) >= 0) {
+ 			return dname;
+@@ -532,7 +532,7 @@ long long int rep_strtoll(const char *str, char **endptr, int base)
+ {
+ #ifdef HAVE_STRTOQ
+ 	return strtoq(str, endptr, base);
+-#elif defined(HAVE___STRTOLL) 
++#elif defined(HAVE___STRTOLL)
+ 	return __strtoll(str, endptr, base);
+ #elif SIZEOF_LONG == SIZEOF_LONG_LONG
+ 	return (long long int) strtol(str, endptr, base);
+@@ -568,7 +568,7 @@ unsigned long long int rep_strtoull(const char *str, char **endptr, int base)
+ {
+ #ifdef HAVE_STRTOUQ
+ 	return strtouq(str, endptr, base);
+-#elif defined(HAVE___STRTOULL) 
++#elif defined(HAVE___STRTOULL)
+ 	return __strtoull(str, endptr, base);
+ #elif SIZEOF_LONG == SIZEOF_LONG_LONG
+ 	return (unsigned long long int) strtoul(str, endptr, base);
+@@ -599,7 +599,7 @@ unsigned long long int rep_strtoull(const char *str, char **endptr, int base)
+ #endif /* HAVE_STRTOULL */
+ 
+ #ifndef HAVE_SETENV
+-int rep_setenv(const char *name, const char *value, int overwrite) 
++int rep_setenv(const char *name, const char *value, int overwrite)
+ {
+ 	char *p;
+ 	size_t l1, l2;
+@@ -644,10 +644,10 @@ int rep_unsetenv(const char *name)
+ 	for (i=0;environ[i];i++) /* noop */ ;
+ 
+ 	count=i;
+-	
++
+ 	for (i=0;i<count;) {
+ 		if (strncmp(environ[i], name, len) == 0 && environ[i][len] == '=') {
+-			/* note: we do _not_ free the old variable here. It is unsafe to 
++			/* note: we do _not_ free the old variable here. It is unsafe to
+ 			   do so, as the pointer may not have come from malloc */
+ 			memmove(&environ[i], &environ[i+1], (count-i)*sizeof(char *));
+ 			count--;
+@@ -688,7 +688,7 @@ int rep_utimes(const char *filename, const struct timeval tv[2])
+ #endif
+ 
+ #ifndef HAVE_DUP2
+-int rep_dup2(int oldfd, int newfd) 
++int rep_dup2(int oldfd, int newfd)
+ {
+ 	errno = ENOSYS;
+ 	return -1;
+@@ -965,37 +965,6 @@ void *rep_memset_explicit(void *block, int c, size_t size)
+ }
+ #endif
+ 
+-#ifndef HAVE_MEMSET_S
+-# ifndef RSIZE_MAX
+-#  define RSIZE_MAX (SIZE_MAX >> 1)
+-# endif
+-
+-int rep_memset_s(void *dest, size_t destsz, int ch, size_t count)
+-{
+-	if (dest == NULL) {
+-		return EINVAL;
+-	}
+-
+-	if (destsz > RSIZE_MAX ||
+-	    count > RSIZE_MAX ||
+-	    count > destsz) {
+-		return ERANGE;
+-	}
+-
+-#if defined(HAVE_MEMSET_EXPLICIT)
+-	memset_explicit(dest, destsz, ch, count);
+-#else /* HAVE_MEMSET_EXPLICIT */
+-	memset(dest, ch, count);
+-# if defined(HAVE_GCC_VOLATILE_MEMORY_PROTECTION)
+-	/* See http://llvm.org/bugs/show_bug.cgi?id=15495 */
+-	__asm__ volatile("" : : "g"(dest) : "memory");
+-# endif /* HAVE_GCC_VOLATILE_MEMORY_PROTECTION */
+-#endif /* HAVE_MEMSET_EXPLICIT */
+-
+-	return 0;
+-}
+-#endif /* HAVE_MEMSET_S */
+-
+ #ifndef HAVE_GETPROGNAME
+ # ifndef HAVE_PROGRAM_INVOCATION_SHORT_NAME
+ # define PROGNAME_SIZE 32
+diff --git a/lib/replace/replace.h b/lib/replace/replace.h
+index 6b72c1f..24b2d8c 100644
+--- a/lib/replace/replace.h
++++ b/lib/replace/replace.h
+@@ -999,11 +999,6 @@ void rep_setproctitle_init(int argc, char *argv[], char *envp[]);
+ void *rep_memset_explicit(void *block, int c, size_t size);
+ #endif
+ 
+-#ifndef HAVE_MEMSET_S
+-#define memset_s rep_memset_s
+-int rep_memset_s(void *dest, size_t destsz, int ch, size_t count);
+-#endif
+-
+ #ifndef HAVE_GETPROGNAME
+ #define getprogname rep_getprogname
+ const char *rep_getprogname(void);
+diff --git a/lib/replace/wscript b/lib/replace/wscript
+index 9acebd3..faef185 100644
+--- a/lib/replace/wscript
++++ b/lib/replace/wscript
+@@ -881,7 +881,7 @@ REPLACEMENT_FUNCTIONS = {
+                   'utime', 'utimes', 'dup2', 'chown', 'link', 'readlink',
+                   'symlink', 'lchown', 'realpath', 'memmem', 'vdprintf',
+                   'dprintf', 'get_current_dir_name', 'copy_file_range',
+-                  'strerror_r', 'clock_gettime', 'memset_explicit', 'memset_s'],
++                  'strerror_r', 'clock_gettime', 'memset_explicit'],
+     'timegm.c': ['timegm'],
+     # Note: C99_VSNPRINTF is not a function, but a special condition
+     # for replacement
+diff --git a/third_party/heimdal_build/roken.h b/third_party/heimdal_build/roken.h
+index 3870609..4740a3d 100644
+--- a/third_party/heimdal_build/roken.h
++++ b/third_party/heimdal_build/roken.h
+@@ -123,10 +123,6 @@
+ #define HAVE_SETEUID
+ #endif
+ 
+-#ifndef HAVE_MEMSET_S
+-#define HAVE_MEMSET_S
+-#endif
+-
+ #ifndef HAVE_DIRFD
+ #ifdef HAVE_DIR_DD_FD
+ #define dirfd(x) ((x)->dd_fd)
+diff --git a/third_party/heimdal_build/wscript_build b/third_party/heimdal_build/wscript_build
+index 8aea52b..1988535 100644
+--- a/third_party/heimdal_build/wscript_build
++++ b/third_party/heimdal_build/wscript_build
+@@ -366,6 +366,11 @@ if not bld.CONFIG_SET('USING_SYSTEM_ROKEN'):
+         lib/roken/getuserinfo.c
+     '''
+ 
++    if not bld.CONFIG_SET('HAVE_MEMSET_S'):
++        ROKEN_SOURCE += '''
++            lib/roken/memset_s.c
++        '''
++
+     HEIMDAL_LIBRARY('roken',
+         ROKEN_SOURCE,
+         includes='../heimdal/lib/roken ../heimdal/include ../heimdal_build/include',

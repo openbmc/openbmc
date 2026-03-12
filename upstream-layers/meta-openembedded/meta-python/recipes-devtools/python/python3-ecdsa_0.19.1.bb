@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=66ffc5e30f76cbb5358fe54b645e5a1d"
 PYPI_PACKAGE = "ecdsa"
 SRC_URI[sha256sum] = "478cba7b62555866fcb3bb3fe985e06decbdb68ef55713c4e5ab98c57d508e61"
 
+CVE_PRODUCT = "python-ecdsa_project:python-ecdsa tlsfuzzer:ecdsa"
+
 inherit pypi setuptools3 python3native ptest-python-pytest
 
 RDEPENDS:${PN}-ptest += " \

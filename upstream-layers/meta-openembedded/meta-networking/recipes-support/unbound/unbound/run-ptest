@@ -2,15 +2,27 @@
 
 cd tests || exit 1
 retVal=0
-./unittest
-./testbound -s
+if ./unittest; then
+    echo PASS: unittest
+else
+    echo FAIL: unittest
+    retVal=1
+fi
+
+if ./testbound -s; then
+    echo PASS: testbound selftest
+else
+    echo FAIL: testbound selftest
+    retVal=1
+fi
+
 for x in ./testdata/*.rpl; do
 	output="$(./testbound -p $x -o -vvvvv 2>&1)"
         if test $? -eq 0; then
-                echo "$x :Pass"
+                echo "PASS: $x"
         else
                 echo "$output"
-                echo "$x :Fail"
+                echo "FAIL: $x"
                 retVal=1
         fi
 done

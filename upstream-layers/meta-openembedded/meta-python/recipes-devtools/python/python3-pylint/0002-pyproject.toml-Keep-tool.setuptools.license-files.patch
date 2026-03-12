@@ -1,4 +1,4 @@
-From a1ec7fa97cb73754cb250a9cf0ea95b9d0511e0c Mon Sep 17 00:00:00 2001
+From b559c86a8e6efb7f2081c4aacf9ce1c552d60abb Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
 Date: Thu, 20 Mar 2025 12:09:42 +0000
 Subject: [PATCH] pyproject.toml: Keep tool.setuptools.license-files
@@ -19,8 +19,6 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  pyproject.toml | 6 ++++--
  1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/pyproject.toml b/pyproject.toml
-index a3cc3f43b..5eaf5ee5e 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
 @@ -8,8 +8,7 @@ name = "pylint"
@@ -33,9 +31,9 @@ index a3cc3f43b..5eaf5ee5e 100644
  authors = [
    { name = "Python Code Quality Authority", email = "code-quality@python.org" },
  ]
-@@ -65,6 +64,9 @@ scripts.pylint-config = "pylint:_run_pylint_config"
- scripts.pyreverse = "pylint:run_pyreverse"
- scripts.symilar = "pylint:run_symilar"
+@@ -105,6 +104,9 @@ test-min = [
+   "typing-extensions~=4.15",
+ ]
  
 +[tool.setuptools]
 +license-files = [ "LICENSE", "CONTRIBUTORS.txt" ]

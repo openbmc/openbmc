@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 DEPENDS = " sysfsutils"
 
-SRCREV = "1c57818ecee186aa47af0342149577df5302c022"
+SRCREV = "8fdc1d40e30f65737fef6c3ddcd1d2cd769f6277"
 PV = "0.18+git"
 
 

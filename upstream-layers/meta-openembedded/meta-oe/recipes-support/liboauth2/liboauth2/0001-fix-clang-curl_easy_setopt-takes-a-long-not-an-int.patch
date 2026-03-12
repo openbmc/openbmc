@@ -1,0 +1,33 @@
+From a9f28a44b9b387ef28904e24ca05d28562fdcc45 Mon Sep 17 00:00:00 2001
+From: Frede Hoey Braendstrup <frede@vokalo.io>
+Date: Mon, 26 Jan 2026 11:07:24 +0100
+Subject: [PATCH] fix(clang): curl_easy_setopt takes a long not an int
+
+Signed-off-by: Frede Hoey Braendstrup <frede@vokalo.io>
+Upstream-Status: Backport [https://github.com/OpenIDC/liboauth2/pull/69]
+---
+ src/http.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/http.c b/src/http.c
+index ab7a25a..bc242ed 100644
+--- a/src/http.c
++++ b/src/http.c
+@@ -1024,7 +1024,7 @@ bool oauth2_http_call(oauth2_log_t *log, const char *url, const char *data,
+ 	curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L);
+ 
+ 	if (ctx)
+-		curl_easy_setopt(curl, CURLOPT_TIMEOUT, ctx->timeout);
++		curl_easy_setopt(curl, CURLOPT_TIMEOUT, (long)ctx->timeout);
+ 
+ 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION,
+ 			 oauth2_http_curl_buf_write);
+@@ -1092,7 +1092,7 @@ bool oauth2_http_call(oauth2_log_t *log, const char *url, const char *data,
+ 
+ 	if (data != NULL) {
+ 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data);
+-		curl_easy_setopt(curl, CURLOPT_POST, 1);
++		curl_easy_setopt(curl, CURLOPT_POST, 1L);
+ 	}
+ 
+ 	if (ctx)

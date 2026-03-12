@@ -1,0 +1,49 @@
+From fd59aeedac8ab75d044026b8ff32adf9aa485dea Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Dec 2025 12:56:14 -0800
+Subject: [PATCH] test_data_generator: Use own generic htobe() template
+
+musl based builds expose this build failure where htobe32/htobe64 macros
+are in endian.h and it needs to be included. However, there is a local
+template in librwmem/endianness.h that can be used for
+better portability across platforms which
+might use different C library implementations
+
+
+Remove this patch when upgrading to 0.3 since the v2 tests are removed [1]
+
+[1] https://github.com/tomba/rwmem/commit/f9e0bffacd7520ee8975c4a36a9d47292d145ae9
+
+Upstream-Status: Inappropriate [Use of these macros are removed in master]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/test_data_generator.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_data_generator.cpp b/tests/test_data_generator.cpp
+index 39e1322..94e732d 100644
+--- a/tests/test_data_generator.cpp
++++ b/tests/test_data_generator.cpp
+@@ -101,12 +101,12 @@ std::vector<uint8_t> TestRegisterFileBuilder::build() {
+
+     // Write header (RegisterFileData)
+     auto write_be32 = [&](uint32_t val) {
+-        uint32_t be_val = htobe32(val);
++        uint32_t be_val = htobe(val);
+         data.insert(data.end(), (uint8_t*)&be_val, (uint8_t*)&be_val + 4);
+     };
+
+     auto write_be64 = [&](uint64_t val) {
+-        uint64_t be_val = htobe64(val);
++        uint64_t be_val = htobe(val);
+         data.insert(data.end(), (uint8_t*)&be_val, (uint8_t*)&be_val + 8);
+     };
+
+@@ -169,4 +169,4 @@ std::vector<uint8_t> TestRegisterFileBuilder::build() {
+     }
+
+     return data;
+-}
+\ No newline at end of file
++}

@@ -32,6 +32,7 @@ QB_MEM:virtclass-mcextend-python3-scrypt = "-m 2048"
 # Needs atleast 5G to avoid OOMs
 QB_MEM:virtclass-mcextend-python3-fastjsonschema = "-m 5120"
 QB_MEM:virtclass-mcextend-python3-pillow = "-m 2048"
+QB_MEM:virtclass-mcextend-python3-django = "-m 3072"
 
 TEST_SUITES = "ping ssh parselogs ptest"
 

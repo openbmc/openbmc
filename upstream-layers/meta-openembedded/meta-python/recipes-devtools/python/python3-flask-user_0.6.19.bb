@@ -11,6 +11,8 @@ SRC_URI[sha256sum] = "601abcc0343dfbae0c56273d98362d5cdc266ac84d20b3f65a212e4a2c
 PYPI_PACKAGE = "Flask-User"
 UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
+CVE_PRODUCT = "flask-user"
+
 inherit pypi setuptools3
 
 RDEPENDS:${PN} = " \

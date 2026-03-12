@@ -1,4 +1,5 @@
 SUMMARY = "C library and tools for interacting with the linux GPIO character device"
+HOMEPAGE = "https://libgpiod.readthedocs.io/"
 RECIPE_MAINTAINER = "Bartosz Golaszewski <brgl@bgdev.pl>"
 
 inherit autotools pkgconfig ptest

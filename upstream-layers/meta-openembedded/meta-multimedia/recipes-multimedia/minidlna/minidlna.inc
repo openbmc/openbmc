@@ -43,3 +43,4 @@ SYSTEMD_SERVICE:${PN} = "minidlna.service"
 INITSCRIPT_NAME = "minidlna"
 INITSCRIPT_PARAMS = "defaults 90"
 
+CVE_STATUS[CVE-2024-51442] = "not-applicable-config: vulnerability requires root access"

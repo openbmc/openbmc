@@ -14,7 +14,10 @@ SRC_URI[sha256sum] = "defd50f72b65c5402ab2c573830a6978e5f202ad0d984793c8dde2c415
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += "\
+    python3-misc \
     python3-crypt \
     python3-logging \
     python3-netclient \
 "
+
+BBCLASSEXTEND = "native"

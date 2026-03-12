@@ -1,0 +1,27 @@
+#!/bin/sh
+
+result=0
+
+if ! nslookup example.com; then
+  mv /etc/resolv.conf /etc/resolv.conf.bak
+  echo "nameserver 8.8.8.8" > /etc/resolv.conf
+  trap "mv /etc/resolv.conf.bak /etc/resolv.conf" INT EXIT
+fi
+
+for case in `find t -type f -name '*.t'`; do
+    perl -I . $case >$case.output 2>&1
+    ret=$?
+    cat $case.output
+    if [ $ret -ne 0 ]; then
+        result=1
+        echo "FAIL: ${case%.t}"
+    elif grep -i 'SKIP' $case.output; then
+        echo "SKIP: ${case%.t}"
+    else
+        echo "PASS: ${case%.t}"
+    fi
+
+    rm -f $case.output
+done
+
+exit $result

@@ -1,0 +1,26 @@
+From 7582be50050b36e3275f6d4eacd8eceada8b6afd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 10 Dec 2025 11:58:21 -0800
+Subject: [PATCH] Define ALIGNOF_MAX_ALIGN_T for riscv32
+
+Long double is 16byte aligned on both rv32 and rv64
+
+Upstream-Status: Submitted [https://github.com/tikv/jemallocator/pull/153]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/lib.rs | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/lib.rs b/src/lib.rs
+index 165660e..5f6a2a0 100644
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -57,6 +57,7 @@ const ALIGNOF_MAX_ALIGN_T: usize = 8;
+     target_arch = "powerpc64le",
+     target_arch = "loongarch64",
+     target_arch = "mips64",
++    target_arch = "riscv32",
+     target_arch = "riscv64",
+     target_arch = "s390x",
+     target_arch = "sparc64"

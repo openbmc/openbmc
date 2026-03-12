@@ -1,4 +1,5 @@
 SUMMARY = "Touchscreen calibration data"
+HOMEPAGE = "https://www.yoctoproject.org/"
 SECTION = "base"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4b5fcfc87fb615860d398b5e38685edf"

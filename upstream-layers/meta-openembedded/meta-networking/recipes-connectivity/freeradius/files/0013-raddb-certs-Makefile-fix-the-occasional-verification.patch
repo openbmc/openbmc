@@ -1,4 +1,4 @@
-From 38cbab566143b9e002ee24a1f08a52ec74186eca Mon Sep 17 00:00:00 2001
+From 7ac812c9ba377ba7c40348ea757086c5c01c04df Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Wed, 5 Aug 2020 07:23:11 +0000
 Subject: [PATCH] raddb/certs/Makefile: fix the occasional verification failure
@@ -25,11 +25,11 @@ Upstream-Status: Pending
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 ---
- raddb/certs/Makefile | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+ raddb/certs/Makefile | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/raddb/certs/Makefile b/raddb/certs/Makefile
-index cae939668e..52ae65755f 100644
+index a2f49f72c9..88874309f7 100644
 --- a/raddb/certs/Makefile
 +++ b/raddb/certs/Makefile
 @@ -59,7 +59,7 @@ passwords.mk: server.cnf ca.cnf client.cnf inner-server.cnf
@@ -63,7 +63,7 @@ index cae939668e..52ae65755f 100644
  	rm ca-crl.pem
  
  ######################################################################
-@@ -88,18 +88,18 @@ ca.crl: ca.pem
+@@ -88,21 +88,21 @@ ca.crl: ca.pem
  #
  ######################################################################
  server.csr server.key: server.cnf
@@ -79,13 +79,17 @@ index cae939668e..52ae65755f 100644
 +	@[ -f server.p12 ] || $(OPENSSL) pkcs12 -export -in server.crt -inkey server.key -out server.p12  -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
  	chmod g+r server.p12
  
+ server.der: server.pem
+-	$(OPENSSL) x509 -inform PEM -outform DER -in server.pem -out server.der
++	@[ -f server.der ] || $(OPENSSL) x509 -inform PEM -outform DER -in server.pem -out server.der
+ 
  server.pem: server.p12
 -	$(OPENSSL) pkcs12 -in server.p12 -out server.pem -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
 +	@[ -f server.pem ] || $(OPENSSL) pkcs12 -in server.p12 -out server.pem -passin pass:$(PASSWORD_SERVER) -passout pass:$(PASSWORD_SERVER)
  	chmod g+r server.pem
  
  .PHONY: server.vrfy
-@@ -113,19 +113,19 @@ server.vrfy: ca.pem
+@@ -116,19 +116,19 @@ server.vrfy: ca.pem
  #
  ######################################################################
  client.csr client.key: client.cnf
@@ -108,7 +112,7 @@ index cae939668e..52ae65755f 100644
  	chmod g+r client.pem
  	cp client.pem $(USER_NAME).pem
  
-@@ -140,18 +140,18 @@ client.vrfy: ca.pem client.pem
+@@ -143,18 +143,18 @@ client.vrfy: ca.pem client.pem
  #
  ######################################################################
  inner-server.csr inner-server.key: inner-server.cnf
@@ -132,5 +136,5 @@ index cae939668e..52ae65755f 100644
  
  .PHONY: inner-server.vrfy
 -- 
-2.25.1
+2.34.1
 

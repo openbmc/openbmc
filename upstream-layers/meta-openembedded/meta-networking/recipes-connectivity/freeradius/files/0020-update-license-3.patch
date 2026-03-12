@@ -1,0 +1,101 @@
+From d00440f3290871aef667f80e15f256c64f9b7cd6 Mon Sep 17 00:00:00 2001
+From: "Alan T. DeKok" <aland@freeradius.org>
+Date: Wed, 29 Oct 2025 09:45:17 -0400
+Subject: [PATCH] update license
+
+Upstream-Status: Backport
+[https://github.com/FreeRADIUS/freeradius-server/commit/d00440f3290871aef667f80e15f256c64f9b7cd6]
+
+Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+---
+ .../types/rlm_eap_teap/eap_teap_crypto.c      | 30 +++++++------------
+ .../types/rlm_eap_teap/eap_teap_crypto.h      | 30 +++++++------------
+ 2 files changed, 22 insertions(+), 38 deletions(-)
+
+diff --git a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.c b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.c
+index 17f49f9dfc..aaa74837a9 100644
+--- a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.c
++++ b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.c
+@@ -1,26 +1,18 @@
+ /*
+- * teap-crypto.c  Cryptographic functions for EAP-TEAP.
++ *   This program is is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or (at
++ *   your option) any later version.
+  *
+- * Version:     $Id$
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
+  *
+- * Copyright (C) 2022 Network RADIUS SARL <legal@networkradius.com>
+- *
+- * This software may not be redistributed in any form without the prior
+- * written consent of Network RADIUS.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+-
+ RCSID("$Id$")
+ USES_APPLE_DEPRECATED_API	/* OpenSSL API has been deprecated by Apple */
+ 
+diff --git a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.h b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.h
+index b02f2b9083..f9403dcf93 100644
+--- a/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.h
++++ b/src/modules/rlm_eap/types/rlm_eap_teap/eap_teap_crypto.h
+@@ -1,26 +1,18 @@
+ /*
+- * eap_teap_crypto.h
++ *   This program is is free software; you can redistribute it and/or modify
++ *   it under the terms of the GNU General Public License as published by
++ *   the Free Software Foundation; either version 2 of the License, or (at
++ *   your option) any later version.
+  *
+- * Version:     $Id$
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
+  *
+- * Copyright (C) 2022 Network RADIUS SARL <legal@networkradius.com>
+- *
+- * This software may not be redistributed in any form without the prior
+- * written consent of Network RADIUS.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+- * SUCH DAMAGE.
++ *   You should have received a copy of the GNU General Public License
++ *   along with this program; if not, write to the Free Software
++ *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+  */
+-
+ #ifndef _EAP_TEAP_CRYPTO_H
+ #define _EAP_TEAP_CRYPTO_H
+ 
+-- 
+2.43.0
+

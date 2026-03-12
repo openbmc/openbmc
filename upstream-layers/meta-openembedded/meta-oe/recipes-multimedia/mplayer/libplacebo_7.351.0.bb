@@ -4,7 +4,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=435ed639f84d4585d93824e7da3d85da"
 
 DEPENDS += "fastfloat glad-native python3-mako-native python3-jinja2-native vulkan-headers"
 
-SRC_URI = "git://code.videolan.org/videolan/libplacebo.git;protocol=https;branch=v7.351"
+SRC_URI = "git://code.videolan.org/videolan/libplacebo.git;protocol=https;branch=v7.351 \
+           file://0001-vulkan-utils_gen-fix-for-python-3.14.patch \
+          "
 SRCREV = "3188549fba13bbdf3a5a98de2a38c2e71f04e21e"
 
 inherit meson pkgconfig
