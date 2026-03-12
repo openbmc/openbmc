@@ -26,9 +26,7 @@ SRC_URI = "https://github.com/SSSD/sssd/releases/download/${PV}/${BP}.tar.gz \
            "
 SRC_URI[sha256sum] = "e8aa5e6b48ae465bea7064048715ce7e9c53b50ec6a9c69304f59e0d35be40ff"
 
-UPSTREAM_CHECK_URI = "https://github.com/SSSD/${BPN}/releases"
-
-inherit autotools pkgconfig gettext python3native features_check systemd useradd
+inherit autotools pkgconfig gettext python3native features_check systemd useradd github-releases
 
 REQUIRED_DISTRO_FEATURES = "pam"
 

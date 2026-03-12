@@ -14,6 +14,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 PrivateTmp=yes
 ProtectHome=yes
 ProtectSystem=yes
+MemoryDenyWriteExecute=no
 
 [Install]
 WantedBy=multi-user.target

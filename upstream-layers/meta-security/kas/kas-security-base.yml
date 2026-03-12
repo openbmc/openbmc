@@ -1,5 +1,5 @@
 header:
-  version: 9
+  version: 19
 
 distro: poky
 
@@ -11,17 +11,28 @@ repos:
       meta-integrity:
       meta-hardening:
 
-  poky:
-    url: https://git.yoctoproject.org/git/poky
-    refspec: master
+  bitbake:
+    url: "https://git.openembedded.org/bitbake"
+    branch: master
+    layers:
+      .: disabled
+
+  openembedded-core:
+    url: "https://git.openembedded.org/openembedded-core"
+    branch: master
     layers:
       meta:
+
+  poky:
+    url: "https://git.yoctoproject.org/git/meta-yocto"
+    branch: master
+    layers:
       meta-poky:
       meta-yocto-bsp:
 
   meta-openembedded:
-    url: http://git.openembedded.org/meta-openembedded
-    refspec: master
+    url: "http://git.openembedded.org/meta-openembedded"
+    branch: master
     layers:
       meta-oe:
       meta-perl:
@@ -36,8 +47,8 @@ local_conf_header:
     INHERIT += "buildstats buildstats-summary buildhistory"
     INHERIT += "report-error"
     IMAGE_CLASSES += "testimage"
-    BB_NUMBER_THREADS="24"
-    BB_NUMBER_PARSE_THREADS="12"
+    BB_NUMBER_THREADS = "24"
+    BB_NUMBER_PARSE_THREADS = "12"
     BB_TASK_NICE_LEVEL = '5'
     BB_TASK_NICE_LEVEL_task-testimage = '0'
     BB_TASK_IONICE_LEVEL = '2.7'
@@ -59,6 +70,10 @@ local_conf_header:
     HALT,${DL_DIR},100M,1K \
     HALT,${SSTATE_DIR},100M,1K \
     HALT,/tmp,10M,1K"
+
+  dlsstate: |
+    DL_DIR = "/home/gitlab-runner/build/downloads"
+    SSTATE_DIR = "/home/gitlab-runner/build/sstate-cache"
 
 bblayers_conf_header:
   base: |

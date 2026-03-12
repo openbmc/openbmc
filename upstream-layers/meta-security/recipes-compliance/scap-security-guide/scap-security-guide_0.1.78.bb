@@ -6,10 +6,12 @@ HOME_URL = "https://www.open-scap.org/security-policies/scap-security-guide/"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9bfa86579213cb4c6adaffface6b2820"
 LICENSE = "BSD-3-Clause"
 
-SRCREV = "c1e1ba121d32b3c319b0e25ee2993b62386e5857"
-SRC_URI = "git://github.com/ComplianceAsCode/content.git;nobranch=1;protocol=https \
+SRCREV = "f7d794851971087db77d4be8eeb716944a1aae21"
+SRC_URI = "git://github.com/ComplianceAsCode/content.git;protocol=https;branch=stable \
            file://run_eval.sh \
            "
+
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)$"
 
 DEPENDS = "openscap-native python3-pyyaml-native python3-jinja2-native libxml2-native expat-native coreutils-native"
 

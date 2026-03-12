@@ -12,7 +12,7 @@ IMAGE_INSTALL:append = "\
     ${@bb.utils.contains("BBFILE_COLLECTIONS", "integrity", "packagegroup-ima-evm-utils","", d)} \
 "
 
-TEST_SUITES = "ssh ping apparmor clamav samhain sssd checksec smack suricata aide firejail"
+TEST_SUITES = "ssh ping apparmor clamav openscap samhain sssd checksec smack suricata aide firejail"
 TEST_SUITES:append = " parsec tpm2 swtpm ima"
 
 INSTALL_CLAMAV_CVD = "1"

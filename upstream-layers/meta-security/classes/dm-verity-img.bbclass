@@ -71,12 +71,12 @@ process_verity() {
     # two parts into separate variables and process them separately. For the
     # key part: convert the names to upper case and replace spaces with
     # underscores to create correct shell variable names. For the value part:
-    # just trim all white-spaces.
+    # just trim all white-spaces and remove units.
     IFS=":"
     while read KEY VAL; do
         printf '%s=%s\n' \
             "$(echo "$KEY" | tr '[:lower:]' '[:upper:]' | sed 's/ /_/g')" \
-            "$(echo "$VAL" | tr -d ' \t')" >> $ENV
+            "$(echo "$VAL" | tr -d ' \t' | sed 's/\[.*\]//')" >> $ENV
     done
 
     # Add partition size

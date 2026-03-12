@@ -4,6 +4,7 @@ directories to Perl's search path so that later 'use' or 'require' statements \
 will find modules which are not located in the default search path."
 
 SECTION = "libs"
+HOMEPAGE = "https://metacpan.org/dist/lib"
 LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
 PR = "r0"
 
@@ -11,7 +12,7 @@ LIC_FILES_CHKSUM = "file://README;beginline=26;endline=30;md5=94b119f1a7b8d611ef
 
 DEPENDS += "perl"
 
-SRC_URI = "http://www.cpan.org/authors/id/S/SM/SMUELLER/lib-${PV}.tar.gz"
+SRC_URI = "${CPAN_MIRROR}/authors/id/S/SM/SMUELLER/lib-${PV}.tar.gz"
 
 SRC_URI[md5sum] = "8607ac4e0d9d43585ec28312f52df67c"
 SRC_URI[sha256sum] = "72f63db9220098e834d7a38231626bd0c9b802c1ec54a628e2df35f3818e5a00"

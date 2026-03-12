@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7b3ab643b9ce041de515d1ed092a36d4"
 
 SECTION = "security/tpm"
 
-DEPENDS = "autoconf-archive-native bash-completion libtss2 libgcrypt openssl"
+DEPENDS = "autoconf-archive-native bash-completion libtss2 openssl"
 
 SRC_URI = "https://github.com/tpm2-software/${BPN}/releases/download/${PV}/${BPN}-${PV}.tar.gz \
            file://0001-Configure-Allow-disabling-of-digest-sign-operations.patch \

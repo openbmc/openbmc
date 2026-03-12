@@ -146,6 +146,8 @@ do_install () {
 
 	${THISDIR}/files/set_required_questions.py ${D}${sysconfdir}/Bastille/config ${D}${datadir}/Bastille/Questions
 
+	chown root:root -R ${D}/${datadir}/Bastille
+
 	ln -s RevertBastille ${D}${sbindir}/UndoBastille
 
     # Create /var/log/Bastille in runtime.

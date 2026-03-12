@@ -5,7 +5,7 @@ mechanisms itself; instead it calls gssapi routines in other libraries, \
 depending on the mechanism. \
 "
 
-HOMEPAGE = "http://www.citi.umich.edu/projects/nfsv4/linux/"
+HOMEPAGE = "https://gitlab.com/gsasl/libgssglue"
 SECTION = "libs"
 
 LICENSE = "BSD-3-Clause | HPND"
@@ -25,6 +25,8 @@ SRC_URI = "git://gitlab.com/gsasl/libgssglue.git;protocol=https;branch=master \
            file://run-ptest \
           "
 SRCREV = "ada76bdaec665f70505f0b3aefe871b873e7c4b6"
+
+UPSTREAM_CHECK_GITTAGREGEX = "libgssglue-(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools-brokensep ptest
 

@@ -6,5 +6,6 @@ header:
 local_conf_header:
   ptest: |
       DISTRO_FEATURES:append = " ptest"
+      EXTRA_IMAGE_FEATURES:append = " allow-empty-password allow-root-login empty-root-password"
 
 machine: qemux86

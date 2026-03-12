@@ -103,33 +103,6 @@ help for each package.
                 usage : simply invoke the script name in the terminal.
 
 
-        == pax-utils ==
-
-		( This package can be found in oe-core )
-
-        pax-utils is a small set of various PaX aware and related utilities for
-        ELF binaries.
-
-        - scanelf : With this application you can print out information specific to the ELF structure of a binary.
-                    For more help please consult the man pages or the readme file.
-
-        - pspax : is a user-space utility that scans the proc directory and list
-                  ELF types, as well as their respective PaX flags and filenames and
-                  attributes. Depending on build options, it may additionaly display the
-                  process running set of capabilities.
-
-        - scanmacho : is a user-space utility to quickly scan given
-                      Mach-Os, directories, or common system paths for different information. This
-                      may include Mach-O types, their install_names, etc.
-
-        - dumpelf : is a user-space utility to dump all of the internal
-                    ELF structures into the equivalent C structures for fun debugging and/or
-                    reference purposes.
-
-
-                usage : simply invoke the script name in the terminal.
-
-
         == buck-security ==
 
         Buck-Security is a security scanner for Debian and Ubuntu Linux. It runs a couple of important checks and helps you to harden your Linux

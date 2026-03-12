@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bc2d1f9b427be5fb63f6af9da56f7c5d"
 DEPENDS = "virtual/kernel nasm-native"
 
 SRC_URI = "git://github.com/chipsec/chipsec.git;branch=main;protocol=https"
-SRCREV = "d8c2a606bf440c32196c6289a7a458f3ae3107cc"
+SRCREV = "c5e396716caf3749f728e43d0895317b593f5b95"
 
 inherit module setuptools3
 
@@ -34,3 +34,5 @@ FILES:${PN} += "${exec_prefix}"
 
 RDEPENDS:${PN} = "python3 python3-modules"
 INSANE_SKIP:${PN} = "already-stripped"
+
+SKIP_RECIPE[chipsec] ?= "Waiting for upstream support of the kernel 6.16"

@@ -6,8 +6,6 @@ DEPENDS += "openssl attr keyutils"
 
 DEPENDS:class-native += "openssl-native keyutils-native"
 
-FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
-
 SRC_URI = " \
     https://github.com/mimizohar/ima-evm-utils/releases/download/v${PV}/${BP}.tar.gz \
     file://0001-Do-not-get-generation-using-ioctl-when-evm_portable-.patch \

@@ -1,0 +1,40 @@
+From a59708a9300df8116867ac77f7829f7fd647325e Mon Sep 17 00:00:00 2001
+From: Clayton Casciato <ccasciato@21sw.us>
+Date: Mon, 3 Nov 2025 10:30:26 -0700
+Subject: [PATCH] Skip pkg Makefile from using its own rust steps
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+Signed-off-by: Clayton Casciato <majortomtosourcecontrol@gmail.com>
+---
+ Makefile.am | 2 +-
+ Makefile.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d0d3d09..a572912 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -10,7 +10,7 @@ EXTRA_DIST = ChangeLog COPYING LICENSE suricata.yaml.in \
+ 	     scripts/generate-images.sh \
+ 	     scripts/docs-almalinux9-minimal-build.sh \
+ 	     scripts/docs-ubuntu-debian-minimal-build.sh
+-SUBDIRS = $(HTP_DIR) rust src qa rules doc contrib etc python ebpf \
++SUBDIRS = $(HTP_DIR) src qa rules doc contrib etc python ebpf \
+           $(SURICATA_UPDATE_DIR)
+ 
+ CLEANFILES = stamp-h[0-9]*
+diff --git a/Makefile.in b/Makefile.in
+index 7a89353..3864613 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -428,7 +428,7 @@ EXTRA_DIST = ChangeLog COPYING LICENSE suricata.yaml.in \
+ 	     scripts/docs-almalinux9-minimal-build.sh \
+ 	     scripts/docs-ubuntu-debian-minimal-build.sh
+ 
+-SUBDIRS = $(HTP_DIR) rust src qa rules doc contrib etc python ebpf \
++SUBDIRS = $(HTP_DIR) src qa rules doc contrib etc python ebpf \
+           $(SURICATA_UPDATE_DIR)
+ 
+ CLEANFILES = stamp-h[0-9]*

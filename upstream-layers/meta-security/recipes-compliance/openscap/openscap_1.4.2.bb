@@ -1,19 +1,21 @@
 # Copyright (C) 2017  - 2023 Armin Kuster  <akuster808@gmail.com>
 # Released under the MIT license (see COPYING.MIT for the terms)
 
-SUMARRY = "NIST Certified SCAP 1.2 toolkit"
+SUMMARY = "NIST Certified SCAP 1.2 toolkit"
 HOME_URL = "https://www.open-scap.org/tools/openscap-base/"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fbc093901857fcd118f065f900982c24"
 LICENSE = "LGPL-2.1-only"
 
-DEPENDS = "dbus acl bzip2 pkgconfig gconf procps curl libxml2 libxslt libcap swig libpcre  xmlsec1"
-DEPENDS:class-native = "pkgconfig-native swig-native curl-native libxml2-native libxslt-native libcap-native libpcre-native xmlsec1-native"
+DEPENDS = "dbus acl bzip2 pkgconfig gconf procps curl libxml2 libxslt libcap swig libpcre2  xmlsec1"
+DEPENDS:class-native = "pkgconfig-native swig-native curl-native libxml2-native libxslt-native libcap-native libpcre2-native xmlsec1-native"
 
 SRC_URI = "git://github.com/OpenSCAP/openscap.git;branch=main;protocol=https \
            file://0001-CMakeLists.txt-fix-installation-directory-for-system.patch \
           "
 
-SRCREV = "23a8ea3de3c4fd6017db4067675a81287177166e"
+SRCREV = "e9b2a41f5796f5ead3d1e2d9df1fb06818a569ac"
+
+COMPATIBLE_HOST:libc-musl = "null"
 
 inherit cmake pkgconfig python3native python3targetconfig perlnative systemd
 
@@ -61,5 +63,5 @@ SYSTEMD_AUTO_ENABLE = "disable"
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
 
 RDEPENDS:${PN} = "libxml2 python3-core libgcc bash"
-RDEPENDS:${PN}-class-target = "libxml2 python3-core libgcc bash os-release"
+RDEPENDS:${PN}:class-target = "libxml2 python3-core libgcc bash os-release"
 BBCLASSEXTEND = "native"
