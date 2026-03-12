@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2025, Arm Limited.
+ # Copyright (c) 2022-2026, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -18,17 +18,17 @@ for more information.
 Prerequisites
 -------------
 
-This guide assumes that your host machine is running Ubuntu 20.04 LTS ( with ``sudo`` rights), with at least
+This guide assumes that your host machine is running Ubuntu 24.04 LTS ( with ``sudo`` rights), with at least
 32GB of free disk space and 16GB of RAM as minimum requirement.
 
 The following prerequisites must be available on the host system:
 
-- Git 1.8.3.1 or greater.
-- Python 3.8.0 or greater.
-- GNU Tar 1.28 or greater.
-- GNU Compiler Collection 8.0 or greater.
-- GNU Make 4.0 or greater.
-- tmux.
+- Git 2.39.2 or greater.
+- Python 3.11.2 or greater.
+- GNU Tar 1.34 or greater.
+- GNU Compiler Collection 12.2 or greater.
+- GNU Make 4.3 or greater.
+- tmux 3.3 or greater.
 
 Please follow the steps described in the Yocto mega manual:
 
@@ -50,7 +50,7 @@ The Corstone-1000 software stack can be run on:
 Yocto Stable Branch
 -------------------
 
-Corstone-1000 software stack is built on top of Yocto Project's `Walnascar release <meta-arm-repository-release-branch_>`__.
+Corstone-1000 software stack is built on top of Yocto Project's `Whinlatter release <meta-arm-repository-release-branch_>`__.
 
 Software Components
 -------------------
@@ -91,7 +91,7 @@ Host Processor Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.11.0.bb``    |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.0.bb``        |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 `Trusted Services <https://trusted-services.readthedocs.io/en/latest/index.html>`__
@@ -133,7 +133,7 @@ Host Processor Components
 +----------+------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_4.%.bbappend``      |
 +----------+------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.4.0.bb``              |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.9.0.bb``              |
 +----------+------------------------------------------------------------------------------------------+
 
 `U-Boot <https://github.com/u-boot/u-boot.git>`__
@@ -144,7 +144,7 @@ Host Processor Components
 +----------+----------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_%.bbappend``      |
 +----------+----------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2023.07.02.bb``   |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.04.bb``      |
 +----------+----------------------------------------------------------------------------------+
 
 Linux
@@ -157,7 +157,7 @@ The provided distribution is based on `BusyBox <https://www.busybox.net/>`__ and
 +-----------+------------------------------------------------------------------------------------------------+
 | bbappend  | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-kernel/linux/linux-yocto_%.bbappend``             |
 +-----------+------------------------------------------------------------------------------------------------+
-| Recipe    | ``${WORKSPACE}/poky/meta/recipes-kernel/linux/linux-yocto_6.12.bb``                            |
+| Recipe    | ``${WORKSPACE}/core/meta/recipes-kernel/linux/linux-yocto_6.18.bb``                            |
 +-----------+------------------------------------------------------------------------------------------------+
 | defconfig | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-kernel/linux/files/corstone1000/defconfig``       |
 +-----------+------------------------------------------------------------------------------------------------+
@@ -172,7 +172,7 @@ Secure Enclave Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.1.1.bb``         |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.1.bb``         |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 ************************************
@@ -223,7 +223,7 @@ Build
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2025.05
+        git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2025.12
 
 #. Build a Corstone-1000 image:
 
@@ -243,12 +243,27 @@ Build
 
     .. warning::
 
-        Access to the External System Processor is disabled by default.
+        **The External System Processor is not available on the Corstone-1000 with Cortex-A320 FVP.**
+
+        Access to the External System Processor is disabled by default on **Corstone-1000 with Cortex-A35**.
+
         To build the Corstone-1000 image with External System Processor enabled, run:
 
         .. code-block:: console
 
             kas build meta-arm/kas/corstone1000-${TARGET}.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-extsys.yml
+
+    .. warning::
+
+        **The Ethos-U85 Neural Processing Unit (NPU) is only available on
+        the Corstone-1000 with Cortex-A320 FVP.**
+
+        To build the Corstone-1000 image with the Ethos-U85 NPU enabled, run:
+
+        .. code-block:: console
+
+            kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml
+
 
 A clean build takes a significant amount of time given that all of the development machine utilities are also
 built along with the target images. Those development machine utilities include executables (Python,
@@ -261,7 +276,7 @@ Everything apart from the Secure Enclave ROM firmware and External System firmwa
 ``corstone1000-flash-firmware-image-corstone1000-${TARGET}.wic`` file.
 
 The output binaries run in the Corstone-1000 platform are the following:
- - The Secure Enclave ROM firmware: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/bl1.bin``
+ - The Secure Enclave ROM firmware: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/trusted-firmware-m/bl1.bin``
  - The External System Processor firmware: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/es_flashfw.bin``
  - The internal firmware flash image: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-flash-firmware-image-corstone1000-${TARGET}.wic``
 
@@ -355,7 +370,7 @@ Flash
         IMAGE2FILE: \SOFTWARE\es0.bin
 
 
-#. Copy ``bl1.bin`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3`` to the ``SOFTWARE`` directory of the FPGA bundle.
+#. Copy ``bl1.bin`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/trusted-firmware-m/`` to the ``SOFTWARE`` directory of the FPGA bundle.
 #. Copy ``es_flashfw.bin`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3`` to the ``SOFTWARE`` directory of the FPGA bundle
    and rename the binary to ``es0.bin``.
 #. Copy ``corstone1000-flash-firmware-image-corstone1000-mps3.wic`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3`` to the ``SOFTWARE``
@@ -442,9 +457,14 @@ Corstone-1000 FVP software image.
 A Yocto recipe is provided to download the latest supported FVP version.
 
 The recipe is located at ``${WORKSPACE}/meta-arm/meta-arm/recipes-devtools/fvp/fvp-corstone1000.bb``.
+This recipe supports selecting different Corstone‑1000 FVP models via MACHINE_FEATURES:
 
-The latest FVP version is ``11.23.25`` and is automatically downloaded and installed when using the
-``runfvp`` command as detailed below.
+- ``cortexa320``      use the Cortex-A320 Host Processor with Ethos U85 enabled FVP build
+- (default)           use the Cortex-A35 Host Processor with Cortex-M3 External System FVP build
+
+The latest FVP version is ``11.23.25`` for Corstone-1000 with Cortex-A35 and ``11.30.27`` for
+Corstone-1000 with Cortex-A320, and each model is automatically downloaded and installed when using
+the ``runfvp`` command as detailed below.
 
 .. note::
 
@@ -457,11 +477,16 @@ The FVP can also be manually downloaded from `Arm Developer <arm-developer-fvp_>
 the Corstone-1000 platform FVP installer.
 Follow the instructions of the installer to setup the FVP.
 
-#. Run the FVP
+#. Run ``tmux``:
 
     .. code-block:: console
 
-        tmux
+        cd ${WORKSPACE} && tmux
+
+#. Run the FVP within ``tmux``:
+
+    .. code-block:: console
+
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml \
         -c "../meta-arm/scripts/runfvp --terminals=tmux"
 
@@ -496,8 +521,8 @@ Tests
 Reports
 -------
 
-Reports for the tests conducted on the `Corstone-1000 software (CORSTONE1000-2025.05) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2025.05>`__
-release are available for reference `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2025.05/embedded-a/corstone1000/CORSTONE1000-2025.05?ref_type=tags>`__.
+Reports for the tests conducted on the `Corstone-1000 software (CORSTONE1000-2025.12) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2025.12>`__
+release are available for reference `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2025.12/embedded-a/corstone1000/CORSTONE1000-2025.12?ref_type=tags>`__.
 
 
 .. _clean-secure-flash:
@@ -516,7 +541,7 @@ Clean Secure Flash
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git -b CORSTONE1000-2025.05
+        git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git -b CORSTONE1000-2025.12
 
 #. Copy the secure flash cleaning Git patch file to your copy of `meta-arm`.
 
@@ -540,7 +565,7 @@ Clean Secure Flash
         bitbake -c cleansstate trusted-firmware-m corstone1000-flash-firmware-image
         bitbake -c build corstone1000-flash-firmware-image
 
-#. Replace the ``bl1.bin`` file on the SD card with ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/bl1.bin``.
+#. Replace the ``bl1.bin`` file on the SD card with ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/trusted-firmware-m/bl1.bin``.
 
 #. Reboot the board to completely erase the secure flash.
 
@@ -721,9 +746,7 @@ This sections below describe how to build and run ACS tests on Corstone-1000.
     .. note::
 
         This prebuilt ACS image includes v5.13 kernel, which does not provide
-        USB driver support for Corstone-1000. The ACS image with a newer kernel version
-        and full USB support for Corstone-1000 will be available in the repository with the next
-        SystemReady release.
+        USB driver support for Corstone-1000.
 
 #. Decompress the pre-built ACS live image.
 
@@ -789,16 +812,20 @@ FVP
 ===
 
 
-Run the commands below to run the ACS test on FVP using the built firmware image and the pre-built ACS image identified above:
+#. Run ``tmux``:
 
-.. code-block:: console
+    .. code-block:: console
 
-    cd ${WORKSPACE}
-    tmux
-    ./meta-arm/scripts/runfvp \
-    --terminals=tmux \
-    ./build/tmp/deploy/images/corstone1000-fvp/corstone1000-flash-firmware-image-corstone1000-fvp.fvpconf \
-    -- -C board.msd_mmc.p_mmc_file=${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0/ir-acs-live-image-generic-arm64.wic
+        cd ${WORKSPACE} && tmux
+
+#. Run the commands below within ``tmux`` to run the ACS test on FVP using the built firmware image and the pre-built ACS image identified above:
+
+    .. code-block:: console
+
+        ./meta-arm/scripts/runfvp \
+        --terminals=tmux \
+        ./build/tmp/deploy/images/corstone1000-fvp/corstone1000-flash-firmware-image-corstone1000-fvp.fvpconf \
+        -- -C board.msd_mmc.p_mmc_file=${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0/ir-acs-live-image-generic-arm64.wic
 
 
 .. note::
@@ -838,73 +865,218 @@ The results can be fetched from the `acs_results` folder in the ``BOOT`` partiti
 Capsule Update
 --------------
 
+.. warning::
+
+    The **Corstone-1000 with Cortex-A320 FVP** becomes unresponsive when the Linux kernel driver for the
+    Ethos-U85 NPU loads automatically after a software reboot.
+    This behavior results from a power reset control issue in the **Corstone-1000 with Cortex-A320 FVP** model.
+    To prevent the failure and complete the test successfully,
+    rebuild the **Corstone-1000 with Cortex-A320** firmware image using the following steps:
+
+
+    #. Clone the `systemready-patch` repository to your ``${WORKSPACE}``.
+
+        .. code-block:: console
+
+            cd ${WORKSPACE}
+            git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git \
+            -b CORSTONE1000-2025.12
+
+
+    #. Re-Build the **Corstone-1000 with Cortex-A320 FVP** software stack as follows:
+
+        .. code-block:: console
+
+            kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+            systemready-patch/embedded-a/corstone1000/disable_module_autoloading/disable_module_autoloading.yml
+
+
+.. important::
+
+    Payload GUIDs (``${BL2_GUID}``, ``${TFM_S_GUID}``, ``${FIP_GUID}``, and ``${INITRAMFS_GUID}``)
+    are different depending on whether the capsule is built for the ``fvp`` or ``mps3`` ``${TARGET}``.
+
+    +------------+----------------------------------------+----------------------------------------+
+    | Payloads   | FVP                                    | MPS3                                   |
+    +============+========================================+========================================+
+    | BL2        | f1d883f9-dfeb-5363-98d8-686ee3b69f4f   | fbfbefaa-0a56-50d5-b651-74091d3d62cf   |
+    +------------+----------------------------------------+----------------------------------------+
+    | TFM_S      | 7fad470e-5ec5-5c03-a2c1-4756b495de61   | af4cc7ad-ee2e-5a39-aad5-fac8a1e6173c   |
+    +------------+----------------------------------------+----------------------------------------+
+    | FIP        | f1933675-5a8c-5b6d-9ef4-846739e89bc8   | 55302f96-c4f0-5cf9-8624-e7cc388f2b68   |
+    +------------+----------------------------------------+----------------------------------------+
+    | INITRAMFS  | f771aff9-c7e9-5f99-9eda-2369dd694f61   | 3e8ac972-c33c-5cc9-90a0-cdd3159683ea   |
+    +------------+----------------------------------------+----------------------------------------+
+
 The following section describes the steps to update the firmware using Capsule Update
 as the Corstone-1000 supports UEFI.
 
-The firmware update process is tested with an invalid capsule (negative capsule update test)
-and with a valid capsule (positive capsule update test) to validate the robustness and
+The firmware update process is tested with an invalid capsule and with valid capsules to validate the robustness and
 error-handling capabilities of the firmware update mechanism.
 
-During the positive capsule update test, the Corstone-1000 is given a valid capsule, which it successfully applies, boots up and then reaches the Linux command prompt.
+**Positive full capsule update test:**
+The Corstone-1000 is provided with a valid full capsule, which it applies successfully.
+The system then boots normally and reaches the Linux command prompt.
 
-During the negative capsule update test, the Corstone-1000 is given an outdated capsule with a lower version number,
-which is expected to be rejected due to its outdated status, thereby retaining the previous firmware.
+**Positive partial capsule update test:**
+The Corstone-1000 is provided with a valid partial capsule that specifies an update for a single component only.
+The capsule is applied successfully, after which the system boots normally and reaches the Linux command prompt.
 
-Two different capsules (one for each test) are therefore needed to perform the tests.
+**Rollback protection capsule update test:**
+The Corstone-1000 is provided with an outdated capsule containing lower version numbers for all payloads.
+The capsule is correctly rejected due to rollback protection, and the previously installed firmware is retained.
+
+Three different capsules are therefore needed to perform the tests.
+
+The following payloads can be individually updated:
+
+    - Boot Loader stage 2 (BL2)
+    - Trusted Firmware-M Secure partition (TFM_S)
+    - Firmware Image Package (FIP)
+    - Initial RAM Filesystem (INITRAMFS)
 
 
 *****************
 Generate Capsules
 *****************
 
-U-Boot's ``mkeficapsule`` tool is used to generate capsules. It is built automatically for the host machine during the firmware image building process.
-The tool can be found in the ``${WORKSPACE}/build/tmp/sysroots-components/x86_64/u-boot-tools-native/usr/bin/mkeficapsule`` directory.
+`EDK II's <edk2-repository_>`__ ``GenerateCapsule`` tool is used to generate capsules and is built automatically
+for the host machine during the firmware image building process.
+The tool can be found at ``${WORKSPACE}/build/tmp/sysroots-components/aarch64/edk2-basetools-native/usr/bin/edk2-BaseTools/BinWrappers/PosixLike/GenerateCapsule``.
 
-``mkeficapsule`` uses a no-partition image which is created when performing a clean firmware build.
-The no-partition image can be found in the ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-${TARGET}/corstone1000-${TARGET}_image.nopt`` directory.
+A JSON file containing metadata about the capsule payloads needs to be created using the script
+found at ``${WORKSPACE}/meta-arm/meta-arm/scripts/generate_capsule_json_multiple.py``.
+This JSON file is required by EDK II's ``GenerateCapsule`` tool to generate the capsule.
 
 The capsule's default metadata passed can be found in the ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/images/corstone1000-flash-firmware-image.bb``
 and ``${WORKSPACE}/meta-arm/kas/corstone1000-image-configuration.yml`` files.
 
-Valid Capsule
-=============
+Valid Full Capsule
+==================
 
-An automatically generated capsule can be found in ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-${TARGET}-v6.uefi.capsule`` after running a firmware build.
+An automatically generated capsule can be found at ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-${TARGET}-v6.uefi.capsule`` after running a firmware build.
 
 The default metadata values are assumed to be correct to generate a valid capsule.
 
 This capsule will be used for the positive capsule update test.
 
-Invalid Capsule
-===============
+Valid Partial Capsule
+=====================
 
-Generate another capsule with ``fw-version`` metadata set to a lower version than the valid capsule.
-The example below assumes the valid capsule has a default firmware version of 6, and therefore creates an invalid capsule with firmware version 5.
+To generate a capsule that updates only a single component, explicitly set the firmware version for that component and mark it as the only payload to be updated.
 
+The **partial capsule** is also valid, but sets the firmware version to **7** **only** for the **BL2** component, indicating that no other components should be updated.
 
-Run the following commands to generate an invalid capsule with a ``fw-version`` of ``5``:
+Use the following commands to generate the `capsule_config.json` file, which is required by the EDK2 tool for capsule creation:
 
 .. code-block:: console
 
-   cd ${WORKSPACE}
+    cd ${WORKSPACE}
 
-   ./build/tmp/sysroots-components/x86_64/u-boot-tools-native/usr/bin/mkeficapsule \
-   --monotonic-count 1 \
-   --private-key build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
-   --certificate build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
-   --index 1 \
-   --guid ${TARGET}_GUID \
-   --fw-version 5 \
-   build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-${TARGET}_image.nopt \
-   corstone1000-${TARGET}-v5.uefi.capsule
+    python3 meta-arm/meta-arm/scripts/generate_capsule_json_multiple.py \
+    --selected_components DUMMY_START  BL2  DUMMY_END \
+    --components DUMMY_START  BL2  TFM_S  FIP  INITRAMFS  DUMMY_END \
+    --fw_versions 0 7 0 0 0 0 \
+    --guids \
+    6f784cbf-7938-5c23-8d6e-24d2f1410fa9  \
+    ${BL2_GUID} ${TFM_S_GUID}  ${FIP_GUID}  ${INITRAMFS_GUID} \
+    b57e432b-a250-5c73-93e3-90205e64baba \
+    --hardware_instances 1  1  1  1  1  1 \
+    --lowest_supported_versions 5 5 5 5 5 5 \
+    --monotonic_counts 1  1  1  1  1  1 \
+    --payloads \
+    build/tmp/work/corstone1000_${TARGET}-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/trusted-firmware-m/bl2_signed.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/trusted-firmware-m/tfm_s_signed.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/signed_fip.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/Image.gz-initramfs-corstone1000-${TARGET}.bin \
+    build/tmp/work/corstone1000_${TARGET}-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+    --update_image_indexes 5  1  2  3  4  6 \
+    --private_keys \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    --certificates \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    --output capsule_config.json
+
+Run the command below to generate the partial capsule:
+
+.. code-block:: console
+
+    ./build/tmp/sysroots-components/aarch64/edk2-basetools-native/usr/bin/edk2-BaseTools/BinWrappers/PosixLike/GenerateCapsule \
+    -e \
+    -j capsule_config.json \
+    --capflag PersistAcrossReset \
+    -o corstone1000-${TARGET}-partial-v7.uefi.capsule
+
+The partial capsule will be located in the ``${WORKSPACE}`` directory.
+
+Invalid Capsule
+===============
+
+Generate a capsule with firmware version metadata for all payloads set lower than that of a valid capsule.
+The valid capsule has a default firmware version of 6 for all payloads, while the simulated invalid capsule has the firmware version set to 5 for all payloads.
+
+Use the following commands to generate the `capsule_config.json` file, which is required by the EDK2 tool for capsule creation:
+
+.. code-block:: console
+
+    cd ${WORKSPACE}
+
+    python3 meta-arm/meta-arm/scripts/generate_capsule_json_multiple.py \
+    --selected_components DUMMY_START  BL2  TFM_S  FIP  INITRAMFS  DUMMY_END \
+    --components DUMMY_START  BL2  TFM_S  FIP  INITRAMFS  DUMMY_END \
+    --fw_versions 5 5 5 5 5 5 \
+    --guids \
+    6f784cbf-7938-5c23-8d6e-24d2f1410fa9  \
+    ${BL2_GUID} ${TFM_S_GUID}  ${FIP_GUID}  ${INITRAMFS_GUID} \
+    b57e432b-a250-5c73-93e3-90205e64baba \
+    --hardware_instances 1  1  1  1  1  1 \
+    --lowest_supported_versions 5 5 5 5 5 5 \
+    --monotonic_counts 1  1  1  1  1  1 \
+    --payloads \
+    build/tmp/work/corstone1000_${TARGET}-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/trusted-firmware-m/bl2_signed.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/trusted-firmware-m/tfm_s_signed.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/signed_fip.bin \
+    build/tmp/deploy/images/corstone1000-${TARGET}/Image.gz-initramfs-corstone1000-${TARGET}.bin \
+    build/tmp/work/corstone1000_${TARGET}-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+    --update_image_indexes 5  1  2  3  4  6 \
+    --private_keys \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_key.key \
+    --certificates \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000_capsule_cert.crt \
+    --output capsule_config.json
 
 
-.. important::
+Run the command below to generate the invalid capsule:
 
-    ``${TARGET}_GUID`` is different depending on whether the capsule is built for the ``fvp`` or ``mps3`` ``${TARGET}``.
+.. code-block:: console
 
-    - ``fvp`` ``${TARGET}_GUID`` is ``989f3a4e-46e0-4cd0-9877-a25c70c01329``
-    - ``mps3`` ``${TARGET}_GUID`` is ``df1865d1-90fb-4d59-9c38-c9f2c1bba8cc``
+    ./build/tmp/sysroots-components/aarch64/edk2-basetools-native/usr/bin/edk2-BaseTools/BinWrappers/PosixLike/GenerateCapsule \
+    -e \
+    -j capsule_config.json \
+    --capflag PersistAcrossReset \
+    -o corstone1000-${TARGET}-v5.uefi.capsule
 
 The invalid capsule will be located in the ``${WORKSPACE}`` directory.
 
@@ -926,6 +1098,7 @@ MPS3
 
     cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/corstone1000-mps3-v6.uefi.capsule /dev/sdc/BOOT/
     cp ${WORKSPACE}/corstone1000-mps3-v5.uefi.capsule /dev/sdc/EFI/BOOT/
+    cp ${WORKSPACE}/corstone1000-mps3-partial-v7.uefi.capsule /dev/sdc/EFI/BOOT/
     sync
 
 .. note::
@@ -936,8 +1109,8 @@ MPS3
 
 .. important::
 
-    Since we are using the direct Capsule Update method, the capsule files should not be placed in
-    the ``EFI/UpdateCapsule`` directory, as this might inadvertently trigger the on-disk update method.
+    The direct Capsule Update method requires that the capsule files not be placed in the ``EFI/UpdateCapsule`` directory,
+    as doing so might inadvertently trigger the on-disk update method.
 
 FVP
 ===
@@ -976,6 +1149,7 @@ FVP
 
         sudo cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/corstone1000-fvp-v6.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
         sudo cp ${WORKSPACE}/corstone1000-fvp-v5.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
+        sudo cp ${WORKSPACE}/corstone1000-fvp-partial-v7.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
         sync
 
 #. Unmount the IR image:
@@ -988,19 +1162,19 @@ FVP
 Run Capsule Update Tests
 ************************
 
-The valid capsule (``corstone1000-${TARGET}-v6.uefi.capsule``) will be used first to run the positive capsule update test.
-This will be followed by using the invalid capsule (``corstone1000-${TARGET}-v5.uefi.capsule``) to run the negative capsule update test.
+The valid capsules will be used first to run the positive capsule update tests.
+This will be followed by using the invalid capsule to run the rollback protection capsule update test.
 
 .. important::
 
     This sequence order must be respected as the invalid capsule has a firmware version lower than the firmware version in the valid capsule.
-    The negative capsule update test effectively tests that firmware rollback is not permitted.
+    The rollback protection capsule update test effectively tests that firmware rollback is not permitted.
 
 
-.. _positive-capsule-update-test:
+.. _positive-full-capsule-update-test:
 
-Positive Capsule Update Test
-============================
+Positive Full Capsule Update Test
+=================================
 
 #. Run Corstone-1000 with the ACS image containing the two capsule files:
 
@@ -1011,11 +1185,16 @@ Positive Capsule Update Test
 
     - FVP:
 
-      #. Run the FVP with the IR prebuilt image which now also contains the two capsules:
+      #. Run ``tmux``:
 
       .. code-block:: console
 
-        tmux
+        cd ${WORKSPACE} && tmux
+
+      #. Run the FVP within ``tmux`` with the IR prebuilt image which now also contains the two capsules:
+
+      .. code-block:: console
+
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml \
         -c "../meta-arm/scripts/runfvp --terminals=tmux \
         -- -C board.msd_mmc.p_mmc_file=${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic"
@@ -1031,7 +1210,7 @@ Positive Capsule Update Test
 
         Press ESC in 4 seconds to skip startup.nsh or any other key to continue.
 
-#. Access the content of the first file system (``File System 0``) where we copied the capsule files by running the following command:
+#. The content of the first file system (``File System 0``), where the capsule files were copied, can be accessed by running the following command:
 
     .. code-block:: console
 
@@ -1108,34 +1287,60 @@ Positive Capsule Update Test
         $ loadm 0x90000000 $kernel_addr_r $filesize
         $ bootefi $kernel_addr_r $fdtcontroladdr
 
+#. The first boot after a capsule update is considered the trial stage, during which the FWU image is accepted.
+   However, to view the updated contents of the EFI System Resource Table (ESRT), an additional reboot is required.
 
-#. After the system fully boots, read the EFI System Resource Table (ESRT) to verify that the firmware version matches the version of the capsule applied.
+   .. code-block:: console
 
-  .. code-block:: console
+      # reboot
 
-    # cd /sys/firmware/efi/esrt/entries/entry0
-    # cat *
+#. Interrupt the U-Boot shell when prompted.
 
-    0x0                                      # capsule_flags
-    989f3a4e-46e0-4cd0-9877-a25c70c01329     # fw_class
-    0                                        # fw_type
-    6                                        # fw_version
-    0                                        # last_attempt_status
-    6                                        # last_attempt_version
-    0                                        # lowest_supported_fw_ver
+   .. code-block:: console
 
-  See the `UEFI documentation <https://uefi.org/specs/UEFI/2.10/23_Firmware_Update_and_Reporting.html#id29>`__ for more information on the significance of the table fields.
+      Hit any key to stop autoboot:
+
+#. Run the following commands to boot the Corstone-1000 Linux kernel.
+
+   .. note::
+      If these commands are not executed, the system will default to booting into the ACS live image.
+
+   .. code-block:: console
+
+      $ unzip $kernel_addr 0x90000000
+      $ loadm 0x90000000 $kernel_addr_r $filesize
+      $ bootefi $kernel_addr_r $fdtcontroladdr
+
+#. Once the system has fully booted again, `read the ESRT <verifying-firmware-versions-via-esrt_>`__ to 
+   confirm that the firmware version reflects the updated capsule.
 
 .. warning::
 
-    Do not terminate FVP between the positive and negative capsule update tests.
+    Do not terminate FVP between the positive full capsule update and partial capsule update tests.
 
-Negative Capsule Update Test
-============================
+
+.. _positive-partial-capsule-update-test:
+
+Positive Partial Capsule Update Test
+====================================
+
+Follow the steps for the `positive full capsule update test <positive-full-capsule-update-test_>`__ ensuring you use
+``corstone1000-${TARGET}-partial-v7.uefi.capsule`` instead of ``corstone1000-${TARGET}-v6.uefi.capsule``.
+
+Once the system has fully booted again, `read the ESRT <verifying-firmware-versions-via-esrt_>`__ to
+confirm that the firmware version reflects the updated capsule.
+
+.. warning::
+
+    Do not terminate FVP between the positive partial capsule update rollback protection capsule update tests.
+
+
+Rollback Protection Capsule Update Test
+=======================================
 
 .. important::
 
-  The `positive capsule update test <positive-capsule-update-test_>`__ must be run before running the negative capsule update test.
+  The `positive partial capsule update test <positive-partial-capsule-update-test_>`__ must be run before running the rollback protection capsule update test.
 
 #. After running the positive capsule update test, reboot the system by typing the following command on the Host Processor terminal (``ttyUSB2`` for MPS3):
 
@@ -1149,7 +1354,7 @@ Negative Capsule Update Test
 
         Press ESC in 4 seconds to skip startup.nsh or any other key to continue.
 
-#. Access the content of the first file system (``File System 0``) where we copied the capsule files by running the following command:
+#. The content of the first file system (``File System 0``), where the capsule files were copied, can be accessed by running the following command:
 
     .. code-block:: console
 
@@ -1228,21 +1433,152 @@ Negative Capsule Update Test
         $ loadm 0x90000000 $kernel_addr_r $filesize
         $ bootefi $kernel_addr_r $fdtcontroladdr
 
-#. After the system fully boots, read the ESRT to verify the firmware version does not match what is on the invalid capsule.
+#. The first boot after a capsule update is considered the trial stage, during which the FWU image is rejected.
+   However, to view the updated contents of the ESRT, an additional reboot is required.
 
-    .. code-block:: console
+   .. code-block:: console
 
-      # cd /sys/firmware/efi/esrt/entries/entry0
-      # cat *
+      # reboot
 
-      0x0                                      # capsule_flags
-      989f3a4e-46e0-4cd0-9877-a25c70c01329     # fw_class
-      0                                        # fw_type
-      6                                        # fw_version
-      1                                        # last_attempt_status
-      5                                        # last_attempt_version
-      0                                        # lowest_supported_fw_ver
+#. Interrupt the U-Boot shell when prompted.
 
+   .. code-block:: console
+
+      Hit any key to stop autoboot:
+
+#. Run the following commands to boot the Corstone-1000 Linux kernel.
+
+   .. note::
+      If these commands are not executed, the system will default to booting into the ACS live image.
+
+   .. code-block:: console
+
+      $ unzip $kernel_addr 0x90000000
+      $ loadm 0x90000000 $kernel_addr_r $filesize
+      $ bootefi $kernel_addr_r $fdtcontroladdr
+
+#. Once the system has fully booted again, `read the ESRT <verifying-firmware-versions-via-esrt_>`__ to
+   confirm that the firmware version reflects the updated capsule.
+
+.. _verifying-firmware-versions-via-esrt:
+
+*************************************
+Verifying Firmware Versions via ESRT
+*************************************
+
+After the system has fully booted, verify that the firmware versions of all applied capsule payloads
+match those currently installed on the system. This can be done by inspecting the ESRT, which is exposed by the Linux kernel.
+
+Reading ESRT Entries
+====================
+
+To read each ESRT entry, use the following commands:
+
+.. code-block:: bash
+
+   cat /sys/firmware/efi/esrt/entries/entry0/*
+   cat /sys/firmware/efi/esrt/entries/entry1/*
+   cat /sys/firmware/efi/esrt/entries/entry2/*
+   cat /sys/firmware/efi/esrt/entries/entry3/*
+
+These entries typically correspond to:
+
+- ``entry0``: BL2
+- ``entry1``: TFM_S
+- ``entry2``: FIP
+- ``entry3``: INITRAMFS
+
+.. note::
+
+   Entry indices may vary depending on how your firmware capsules are structured. Adjust as needed.
+
+Structure of Each ESRT Entry
+============================
+
+Each directory under ``/sys/firmware/efi/esrt/entries/entryX/`` contains files representing the following fields:
+
++---------------------------------+--------------------------------------------------------------+
+| Field Name                      | Description                                                  |
++=================================+==============================================================+
+| ``capsule_flags``               | Attributes of the update capsule (e.g., persist, reset)      |
++---------------------------------+--------------------------------------------------------------+
+| ``fw_class``                    | GUID identifying the firmware component                      |
++---------------------------------+--------------------------------------------------------------+
+| ``fw_type``                     | Firmware type (e.g., system, device, peripheral)             |
++---------------------------------+--------------------------------------------------------------+
+| ``fw_version``                  | Currently installed firmware version                         |
++---------------------------------+--------------------------------------------------------------+
+| ``last_attempt_status``         | Status of the last update attempt (e.g., success, failure)   |
++---------------------------------+--------------------------------------------------------------+
+| ``last_attempt_version``        | Version that was last attempted to install                   |
++---------------------------------+--------------------------------------------------------------+
+| ``lowest_supported_fw_version`` | Minimum firmware version that is still supported             |
++---------------------------------+--------------------------------------------------------------+
+
+Verifying an ESRT Entry
+=======================
+
+To check the version and status of BL2 (``entry0``), run:
+
+.. code-block:: bash
+
+   cat /sys/firmware/efi/esrt/entries/entry0/fw_version
+   cat /sys/firmware/efi/esrt/entries/entry0/last_attempt_version
+   cat /sys/firmware/efi/esrt/entries/entry0/last_attempt_status
+
+
+Positive Full Capsule Update Test ESRT
+======================================
+
+The following table shows the details of the first four ESRT entries for the positive capsule update test:
+
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| ``capsule_flags`` | ``fw_class``          | ``fw_type`` | ``fw_version`` | ``last_attempt_status`` | ``last_attempt_version`` | ``lowest_supported_fw_ver`` |
++===================+=======================+=============+================+=========================+==========================+=============================+
+| 0                 | ``${BL2_GUID}``       | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${TFM_S_GUID}``     | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${FIP_GUID}``       | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${INITRAMFS_GUID}`` | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+
+Positive Partial Capsule Update Test ESRT
+=========================================
+
+The following table shows the details of the first four ESRT entries for the positive capsule update test:
+
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| ``capsule_flags`` | ``fw_class``          | ``fw_type`` | ``fw_version`` | ``last_attempt_status`` | ``last_attempt_version`` | ``lowest_supported_fw_ver`` |
++===================+=======================+=============+================+=========================+==========================+=============================+
+| 0                 | ``${BL2_GUID}``       | 0           | 7              | 0                       | 7                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${TFM_S_GUID}``     | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${FIP_GUID}``       | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${INITRAMFS_GUID}`` | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+-----------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+
+Rollback Protection Capsule Update Test ESRT
+============================================
+
+The following table shows the details of the first four ESRT entries for the rollback protection capsule update test:
+
++-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| ``capsule_flags`` | ``fw_class``           | ``fw_type`` | ``fw_version`` | ``last_attempt_status`` | ``last_attempt_version`` | ``lowest_supported_fw_ver`` |
++===================+========================+=============+================+=========================+==========================+=============================+
+| 0                 | ``${BL2_GUID}``        | 0           | 7              | 1                       | 5                        | 0                           |
++-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${TFM_S_GUID}``      | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${FIP_GUID}``        | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+| 0                 | ``${INITRAMFS_GUID}``  | 0           | 6              | 0                       | 6                        | 0                           |
++-------------------+------------------------+-------------+----------------+-------------------------+--------------------------+-----------------------------+
+
+See the `UEFI documentation <https://uefi.org/specs/UEFI/2.10/23_Firmware_Update_and_Reporting.html#id29>`__ for more information on the significance of the table fields.
 
 
 Linux Distributions
@@ -1268,44 +1604,40 @@ Follow the instructions below to create the installation media.
 #. Using your development machine, download one of following Linux distribution images:
 
     - `Debian installer image <https://cdimage.debian.org/mirror/cdimage/archive/12.7.0/arm64/iso-dvd/>`__
-    - `OpenSUSE Tumbleweed installer image <http://download.opensuse.org/ports/aarch64/tumbleweed/iso/>`__ 
+    - `openSUSE Leap installer image <https://download.opensuse.org/distribution/leap/15.6/iso/openSUSE-Leap-15.6-DVD-aarch64-Current.iso>`__
 
     .. note::
-        
-        For openSUSE Tumbleweed, search for an ISO file with the format: ``openSUSE-Tumbleweed-DVD-aarch64-Snapshot$DATE-Media.iso``.
-        
-        ``openSUSE-Tumbleweed-DVD-aarch64-Snapshot20250509-Media.iso`` was used during development.
-
-    The location of the ISO file on the development machine will be referred to as ``${DISTRO_INSTALLER_ISO_PATH}``.
+    
+        The location of the ISO file on the development machine will be referred to as ``${DISTRO_INSTALLER_ISO_PATH}``.
 
 #. Create the installation media which will contain the necessary files to install the operation system.
 
-    - MPS3:
+- **MPS3**:
 
-        #. Plug a blank USB drive formatted with FAT32, ensuring it has a minimum capacity of 4GB, to the development machine.
+    #. Plug a blank USB drive formatted with FAT32, ensuring it has a minimum capacity of 4GB, to the development machine.
 
-        #. Run the following command to discover which device is your USB drive:
+    #. Run the following command to discover which device is your USB drive:
 
-            .. code-block:: console
+        .. code-block:: console
 
-                lsblk
+            lsblk
 
-            The remaining steps assume the USB drive is ``/dev/sdb``.
+        The remaining steps assume the USB drive is ``/dev/sdb``.
 
-            .. warning::
+        .. warning::
 
-                Do not mistake your development machine hard drive with the USB drive.
+            Do not mistake your development machine hard drive with the USB drive.
 
-        #. Write one of the distribution installer ISO file to the USB drive.
+    #. Write one of the distribution installer ISO file to the USB drive.
 
-            .. code-block:: console
+        .. code-block:: console
 
-                sudo dd if=${DISTRO_INSTALLER_ISO_PATH} of=/dev/sdb iflag=direct oflag=direct status=progress bs=1M; sync;
+            sudo dd if=${DISTRO_INSTALLER_ISO_PATH} of=/dev/sdb iflag=direct oflag=direct status=progress bs=1M; sync;
 
-    - FVP:
+- **FVP**:
 
-        The distribution installer ISO file does not need to be burnt to a USB drive.
-        It will be used as is when starting the FVP install the distribution.
+    The distribution installer ISO file does not need to be burnt to a USB drive.
+    It will be used as is when starting the FVP install the distribution.
 
 ********************
 Prepare System Drive
@@ -1363,11 +1695,17 @@ MPS3
 
 FVP
 ===
-#. Start the FVP with the system drive as the primary drive and the distro ISO file as the secondary drive.
+
+#. Run the ``tmux``:
 
     .. code-block:: console
 
-        tmux
+        cd ${WORKSPACE} && tmux
+
+#. Start the FVP within ``tmux`` with the system drive as the primary drive and the distro ISO file as the secondary drive:
+
+    .. code-block:: console
+
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml \
         -c "../meta-arm/scripts/runfvp --terminals=tmux -- \
         -C board.msd_mmc.p_mmc_file=${WORKSPACE}/fvp_distro_system_drive.img \
@@ -1430,11 +1768,16 @@ Boot Distribution
 
     The target should automatically boot into the installed operating system image.
 
-    Stop the FVP and run the command below to simulate a cold boot:
+    Stop the FVP with ``CTRL+C`` and run ``tmux``:
 
     .. code-block:: console
 
-        tmux
+        cd ${WORKSPACE} && tmux
+
+    Run the command below to simulate a cold boot:
+
+    .. code-block:: console
+
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml \
         -c "../meta-arm/scripts/runfvp --terminals=tmux -- \
         -C board.msd_mmc.p_mmc_file=${WORKSPACE}/fvp_distro_system_drive.img"
@@ -1458,7 +1801,7 @@ Timeout Optimizations
 .. important::
 
     Operating system timeouts are inconsistent across systems.
-    Skip this section if the system boots to Debian or OpenSUSE without any issue.
+    Skip this section if the system boots to Debian or openSUSE without any issue.
 
 Make the system modification below whilst in recovery mode to increase timeouts and boot to the installed distribution.
 
@@ -1536,7 +1879,7 @@ Generate Keys, Signed Image and Unsigned Image
 
         git clone https://gitlab.arm.com/arm-reference-solutions/systemready-patch \
 
-        -b CORSTONE1000-2025.05
+        -b CORSTONE1000-2025.12
 
 #. Set the current working directory to build directory's subdirectory containing the software stack build images.
 
@@ -1572,63 +1915,6 @@ The modified ESP image can be found at ``${WORKSPACE}/build/tmp/deploy/images/co
 ****************************
 Run Unsigned Image Boot Test
 ****************************
-
-.. _unsigned-image-boot-test-fvp:
-
-FVP
-===
-
-#. Follow the instructions `here <use-efi-system-partition-fvp_>`__ to use the ESP.
-
-#. Run the software stack as described `here <running-software-stack-fvp_>`__.
-
-#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Press any key to stop``.
-
-    .. warning::
-
-        There is a timeout of 3 seconds to stop the execution at the U-Boot prompt.
-
-    The U-Boot console prompt looks as follows:
-   
-    .. code-block:: console
-   
-        corstone1000#
-
-
-    .. important::
-    
-        The rest of the instructions below will be executed on the U-Boot terminal.
-
-#. On the U-Boot console, set the current MMC device.
-
-    .. code-block:: console
-
-        corstone1000# mmc dev 1
-
-#. Enroll the four UEFI secure boot authenticated variables.
-
-    .. code-block:: console
-
-        corstone1000# \
-        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/PK.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
-        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/KEK.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize KEK; \
-        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/db.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize db; \
-        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/dbx.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize dbx
-
-#. Attempt to Load the unsigned kernel image.
-
-    .. code-block:: console
-
-        corstone1000# \
-        load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp; \
-        loadm $loadaddr $kernel_addr_r $filesize; \
-        bootefi $kernel_addr_r $fdtcontroladdr
-
-        Booting /MemoryMapped(0x0,0x88200000,0x236aa00)
-        Image not authenticated
-        Loading image failed
-
-The unsigned Linux kernel image should not be loaded.
 
 .. _unsigned-image-boot-test-mps3:
 
@@ -1702,27 +1988,68 @@ MPS3
 
 The unsigned Linux kernel image should not be loaded.
 
-**************************
-Run Signed Image Boot Test
-**************************
+
+.. _unsigned-image-boot-test-fvp:
 
 FVP
 ===
 
-.. important::
+#. Follow the instructions `here <use-efi-system-partition-fvp_>`__ to use the ESP.
 
-    You must first perform the `Unsigned Image Boot Test <unsigned-image-boot-test-fvp_>`__.
+#. Run the software stack as described `here <running-software-stack-fvp_>`__.
 
-Load the signed kernel image.
+#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Press any key to stop``.
 
-.. code-block:: console
+    .. warning::
 
-    corstone1000# \
-    load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp.signed; \
-    loadm $loadaddr $kernel_addr_r $filesize; \
-    bootefi $kernel_addr_r $fdtcontroladdr
+        There is a timeout of 3 seconds to stop the execution at the U-Boot prompt.
 
-The signed Linux kernel image should be booted successfully.
+    The U-Boot console prompt looks as follows:
+   
+    .. code-block:: console
+   
+        corstone1000#
+
+
+    .. important::
+    
+        The rest of the instructions below will be executed on the U-Boot terminal.
+
+#. On the U-Boot console, set the current MMC device.
+
+    .. code-block:: console
+
+        corstone1000# mmc dev 1
+
+#. Enroll the four UEFI secure boot authenticated variables.
+
+    .. code-block:: console
+
+        corstone1000# \
+        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/PK.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
+        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/KEK.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize KEK; \
+        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/db.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize db; \
+        load mmc 1:1 $loadaddr corstone1000_secureboot_keys/dbx.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize dbx
+
+#. Attempt to Load the unsigned kernel image.
+
+    .. code-block:: console
+
+        corstone1000# \
+        load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp; \
+        loadm $loadaddr $kernel_addr_r $filesize; \
+        bootefi $kernel_addr_r $fdtcontroladdr
+
+        Booting /MemoryMapped(0x0,0x88200000,0x236aa00)
+        Image not authenticated
+        Loading image failed
+
+The unsigned Linux kernel image should not be loaded.
+
+
+**************************
+Run Signed Image Boot Test
+**************************
 
 MPS3
 ====
@@ -1737,6 +2064,25 @@ Load the signed kernel image.
 
     corstone1000# \
     load usb 0 $loadaddr corstone1000_secureboot_mps3_images/Image_mps3.signed; \
+    loadm $loadaddr $kernel_addr_r $filesize; \
+    bootefi $kernel_addr_r $fdtcontroladdr
+
+The signed Linux kernel image should be booted successfully.
+
+
+FVP
+===
+
+.. important::
+
+    You must first perform the `Unsigned Image Boot Test <unsigned-image-boot-test-fvp_>`__.
+
+Load the signed kernel image.
+
+.. code-block:: console
+
+    corstone1000# \
+    load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp.signed; \
     loadm $loadaddr $kernel_addr_r $filesize; \
     bootefi $kernel_addr_r $fdtcontroladdr
 
@@ -1759,15 +2105,6 @@ To resolve this, the Platform Key (one of the UEFI authenticated variables for s
 
 #. On the U-Boot console, delete the Platform Key (PK).
 
-    - FVP
-
-        .. code-block:: console
-
-            corstone1000# \
-            mmc dev 1; \
-            load mmc 1:1 $loadaddr corstone1000_secureboot_keys/PK_delete.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
-            boot
-
     - MPS3
 
         .. code-block:: console
@@ -1777,6 +2114,16 @@ To resolve this, the Platform Key (one of the UEFI authenticated variables for s
             usb dev 0; \
             load usb 0 $loadaddr corstone1000_secureboot_keys/PK_delete.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
             boot
+
+    - FVP
+
+        .. code-block:: console
+
+            corstone1000# \
+            mmc dev 1; \
+            load mmc 1:1 $loadaddr corstone1000_secureboot_keys/PK_delete.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
+            boot
+
 
 
 PSA API
@@ -1835,7 +2182,7 @@ Symmetric Multiprocessing
 
 .. warning::
 
-    Symmetric multiprocessing (SMP) mode is only supported on FVP but is disabled by default.
+    Symmetric multiprocessing (SMP) mode is only supported on Corstone-1000 with Cortex-A35 FVP but is disabled by default.
 
 
 #. Build the software stack with SMP mode enabled:
@@ -1858,6 +2205,72 @@ Symmetric Multiprocessing
 
         nproc
         4                  # number of processing units
+
+Ethos-U85 NPU
+-------------
+
+.. warning::
+
+    The Ethos-U85 NPU is only supported on Corstone-1000 with Cortex-A320 FVP.
+
+
+#. Clone the `systemready-patch` repository to your ``${WORKSPACE}``.
+
+    .. code-block:: console
+
+        cd ${WORKSPACE}
+        git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git \
+        -b CORSTONE1000-2025.12
+
+#. Copy the additional kas configuration file to:
+
+    .. code-block:: console
+
+        cp ${WORKSPACE}/systemready-patch/embedded-a/corstone1000/ethos-u85_test/ethos-u85_test.yml \
+        ${WORKSPACE}/meta-arm/kas/
+
+#. Re-Build the Corstone-1000 with Cortex-A320 FVP software stack as follows:
+
+    .. code-block:: console
+
+        kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+        meta-arm/kas/ethos-u85_test.yml
+
+#. Run the Corstone-1000 with Cortex-320 FVP:
+
+    .. code-block:: console
+
+        kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+        systemready-patch/embedded-a/corstone1000/ethos-u85_test/ethos-u85_test.yml \
+        -c "../meta-arm/scripts/runfvp"
+
+#. To verify you are running the Corstone-1000 with Cortex-A320, build and run the FVP and inspect the CPU model
+   reported in ``/proc/cpuinfo`` as shown below. Inside the FVP shell, confirm the core type:
+
+
+    .. code-block:: console
+
+        grep -E 'CPU part|model name' /proc/cpuinfo
+        # Expect: CPU part : 0xd8f  (which corresponds to Cortex-A320)
+
+#. Run the `delegate_runner` test application inside the FVP shell as follows:
+
+    .. code-block:: console
+
+        delegate_runner -l /usr/lib/libethosu_op_delegate.so \
+        -n /usr/share/ethosu/mobilenet_v2_1.0_224_INT8_vela.tflite \
+        -i /usr/share/ethosu/input_data0.bin \
+        -o /usr/share/ethosu/actual_output_data0.bin
+
+   The test completes in approximately one minute.
+
+#. Run the following command to compare the generated output binary with the expected output binary:
+
+    .. code-block:: console
+
+        cmp -s /usr/share/ethosu/expected_output_data0.bin /usr/share/ethosu/actual_output_data0.bin
+
+    The two binary files should be identical.
 
 Secure Debug
 ------------
@@ -1952,11 +2365,12 @@ and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 202
 
 --------------
 
-*Copyright (c) 2022-2025, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2026, Arm Limited. All rights reserved.*
 
 .. _arm-developer-fvp: https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
 .. _secure-debug-manager-repo-readme: https://github.com/ARM-software/secure-debug-manager/tree/master?tab=readme-ov-file#secure-debug-manager-psa-adac--sdc-600
 .. _secure-debug-manager-armds-integration: https://github.com/ARM-software/secure-debug-manager?tab=readme-ov-file#arm-development-studio-integration
-.. _meta-arm-repository-release-branch: https://web.git.yoctoproject.org/meta-arm?h=walnascar
+.. _meta-arm-repository-release-branch: https://docs.yoctoproject.org/next/migration-guides/migration-5.3.html
 .. _arm-ulink-pro-website: https://www.arm.com/products/development-tools/debug-probes/ulink-pro
 .. _arm-ds-website: https://www.arm.com/products/development-tools/embedded-and-software/arm-development-studio
+.. _edk2-repository: https://github.com/tianocore/edk2

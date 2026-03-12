@@ -35,13 +35,13 @@ do_compile[noexec] = "1"
 # packages for this recipe.
 do_install() {
     cp -a ${S} ${D}/
-    cp -f ${RECIPE_SYSROOT}/firmware/bl1-juno.bin \
+    cp -f ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/bl1.bin \
         ${D}/${FIRMWARE_DIR}/SOFTWARE/bl1.bin
 
-    cp -f ${RECIPE_SYSROOT}/firmware/fip-juno.bin \
+    cp -f ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/fip.bin \
         ${D}/${FIRMWARE_DIR}/SOFTWARE/fip.bin
 
-    cp -f ${RECIPE_SYSROOT}/firmware/scp_romfw_bypass.bin \
+    cp -f ${RECIPE_SYSROOT}/firmware/scp-firmware/scp_romfw_bypass.bin \
         ${D}/${FIRMWARE_DIR}/SOFTWARE/scp_bl1.bin
 
     # u-boot environment file

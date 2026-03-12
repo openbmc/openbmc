@@ -1,0 +1,37 @@
+From b3d2c75ef21e5c4baa957839ef44c6f32e8e2626 Mon Sep 17 00:00:00 2001
+From: Hugues KAMBA MPIANA <hugues.kambampiana@arm.com>
+Date: Thu, 15 Jan 2026 19:10:32 +0000
+Subject: [PATCH 3/3] plat-corstone1000: swap GIC-600 for GIC-700 for
+ Cortex-A320 variant
+
+Switch the Cortex-A320 variant to use GIC-700 instead of GIC-600.
+GIC-700 implements the Arm GICv4.1 architecture, so enable the
+CFG_ARM_GICV4 compiler definition for the Corstone-1000 platform.
+
+Upstream-Status: Submitted [https://github.com/OP-TEE/optee_os/pull/7682]
+Signed-off-by: Hugues KAMBA MPIANA <hugues.kambampiana@arm.com>
+Reviewed-by: Jerome Forissier <jerome.forissier@arm.com>
+Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+---
+ core/arch/arm/plat-corstone1000/conf.mk | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/core/arch/arm/plat-corstone1000/conf.mk b/core/arch/arm/plat-corstone1000/conf.mk
+index e929d8233..eabad7739 100644
+--- a/core/arch/arm/plat-corstone1000/conf.mk
++++ b/core/arch/arm/plat-corstone1000/conf.mk
+@@ -34,8 +34,8 @@ CFG_DT_ADDR ?= 0x82100000
+ CFG_DTB_MAX_SIZE ?= 0x100000
+ CFG_CORE_HEAP_SIZE ?= 131072
+ 
+-# Corstone-1000 with Cortex-A320 uses GIC-600 which supports
+-# the GICv3 architecture
++# Corstone-1000 with Cortex-A320 uses GIC-700 which supports
++# the GICv3, GICv3.1, and GICv4.1 architectures
+ ifeq ($(arm64-platform-cpuarch),cortex-a320)
+-$(call force,CFG_ARM_GICV3,y)
++CFG_ARM_GICV4 ?= y
+ endif
+-- 
+2.50.1
+

@@ -6,7 +6,7 @@ header:
     - ci/base.yml
 
 repos:
-  poky:
+  meta-yocto:
     layers:
       meta-yocto-bsp:
 

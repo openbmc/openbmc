@@ -1,0 +1,33 @@
+From fdfbb3b82f62a2d4575a983ebaee14a67130d316 Mon Sep 17 00:00:00 2001
+From: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Date: Tue, 15 Oct 2024 12:50:16 +0000
+Subject: [PATCH] Platform: Corstone1000: Enable FWU partition
+
+Enable firmware update partition for Corstone-1000 platform.
+
+Increase the necessary flags to enable firmware update partition.
+Set TFM_FWU_BOOTLOADER_LIB to use Corstone-1000 specific bootloader
+configuration. Fix linker issues caused by enablement.
+
+Upstream-Status: Backport [0107057d1411ec68e374fbd0ddc0e12abd5754ec]
+Signed-off-by: Ali Can Ozaslan <ali.oezaslan@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ platform/ext/target/arm/corstone1000/config.cmake | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/platform/ext/target/arm/corstone1000/config.cmake b/platform/ext/target/arm/corstone1000/config.cmake
+index 7a88542a32fc..6d9cb1fea750 100644
+--- a/platform/ext/target/arm/corstone1000/config.cmake
++++ b/platform/ext/target/arm/corstone1000/config.cmake
+@@ -55,6 +55,10 @@ set(TFM_PARTITION_CRYPTO                ON          CACHE BOOL      "Enable Cryp
+ set(TFM_PARTITION_INITIAL_ATTESTATION   ON          CACHE BOOL      "Enable Initial Attestation partition")
+ set(TFM_PARTITION_INTERNAL_TRUSTED_STORAGE ON       CACHE BOOL      "Enable Internal Trusted Storage partition")
+ 
++set(TFM_PARTITION_FIRMWARE_UPDATE         ON        CACHE BOOL      "Enable firmware update partition")
++set(PLATFORM_HAS_FIRMWARE_UPDATE_SUPPORT ON         CACHE BOOL      "Wheter the platform has firmware update support")
++set(MCUBOOT_DATA_SHARING                 ON         CACHE BOOL      "Enable Data Sharing")
++set(TFM_FWU_BOOTLOADER_LIB                "${CMAKE_CURRENT_LIST_DIR}/bootloader/mcuboot"   CACHE STRING    "Bootloader configure file for Firmware Update partition")
+ 
+ if (${CMAKE_BUILD_TYPE} STREQUAL Debug OR ${CMAKE_BUILD_TYPE} STREQUAL RelWithDebInfo)
+   set(ENABLE_FWU_AGENT_DEBUG_LOGS     TRUE          CACHE BOOL      "Enable Firmware update agent debug logs.")

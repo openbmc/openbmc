@@ -1,0 +1,297 @@
+From 016eec200c2da5949dd3b1886f4d0ff078085594 Mon Sep 17 00:00:00 2001
+From: kas User <kas@example.com>
+Date: Sat, 24 Jan 2026 11:15:25 +0000
+Subject: Add TPM CRB FF-A DT support
+
+Add DT support and limit FF-A communication to 32 bit
+FFA_MSG_SEND_DIRECT_REQ calls.
+
+This patch is a protorype implementation, proper DT support would need
+wider changes (e.g. code is not reading carveout location from DT).
+
+Upstream-Status: Inappropriate [other]
+Signed-off-by: Balint Dobszay <balint.dobszay@arm.com>
+Signed-Off-By: Gyorgy Szing <gyorgy.szing@arm.com>
+---
+ arch/arm64/boot/dts/arm/fvp-base-revc.dts |  11 ++
+ drivers/char/tpm/tpm_crb.c                | 187 ++++++++++++++++++++--
+ drivers/char/tpm/tpm_crb_ffa.c            |   7 +-
+ 3 files changed, 186 insertions(+), 19 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/arm/fvp-base-revc.dts b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+index 68a69f17e93d..c0ee96bddb61 100644
+--- a/arch/arm64/boot/dts/arm/fvp-base-revc.dts
++++ b/arch/arm64/boot/dts/arm/fvp-base-revc.dts
+@@ -217,6 +217,17 @@ vram: vram@18000000 {
+ 			reg = <0x00000000 0x18000000 0 0x00800000>;
+ 			no-map;
+ 		};
++
++		/* TPM CRB carveout for SWd communication */
++		tpm-crb@84000000 {
++			reg = <0x00000000 0x84000000 0 0x4000>;
++			no-map;
++		};
++	};
++
++	ftpm {
++		/* Dummy node for TPM CRB platform driver */
++		compatible = "arm,ftpm";
+ 	};
+ 
+ 	gic: interrupt-controller@2f000000 {
+diff --git a/drivers/char/tpm/tpm_crb.c b/drivers/char/tpm/tpm_crb.c
+index c75a531cfb98..3bd60cf34daf 100644
+--- a/drivers/char/tpm/tpm_crb.c
++++ b/drivers/char/tpm/tpm_crb.c
+@@ -16,6 +16,8 @@
+ #include <linux/rculist.h>
+ #include <linux/module.h>
+ #include <linux/pm_runtime.h>
++#include <linux/platform_device.h>
++#include <linux/of.h>
+ #ifdef CONFIG_ARM64
+ #include <linux/arm-smccc.h>
+ #endif
+@@ -25,6 +27,10 @@
+ #define ACPI_SIG_TPM2 "TPM2"
+ #define TPM_CRB_MAX_RESOURCES 3
+ 
++/* TPM CRB carveout. Should be marked as reserved-memory with no-map in the DT */
++static const u64 carveout_addr = 0x84000000;
++static const size_t carveout_size = 4 * SZ_4K;
++
+ static const guid_t crb_acpi_start_guid =
+ 	GUID_INIT(0x6BBF6CAB, 0x5463, 0x4714,
+ 		  0xB7, 0xCD, 0xF0, 0x20, 0x3C, 0x03, 0x68, 0xD4);
+@@ -907,29 +913,180 @@ static void crb_acpi_remove(struct acpi_device *device)
+ 	tpm_chip_unregister(chip);
+ }
+ 
++static int crb_map_of_io(struct platform_device *pdev, struct crb_priv *priv)
++{
++	struct device *dev = &pdev->dev;
++	u32 pa_high, pa_low;
++	u64 cmd_pa;
++	u32 cmd_size;
++	__le64 __rsp_pa;
++	u64 rsp_pa;
++	u32 rsp_size;
++	int ret;
++	void __iomem *carveout;
++
++	carveout = ioremap_np(carveout_addr, carveout_size);
++	if (!carveout)
++		return -EINVAL;
++
++	priv->regs_h = (struct crb_regs_head *)carveout;
++	priv->regs_t = (struct crb_regs_tail *)((u8 *)carveout + 0x40);
++	priv->cmd = (u8 *)carveout + 0x80;
++
++	ret = __crb_request_locality(dev, priv, 0);
++	if (ret)
++		return ret;
++
++	pa_high = ioread32(&priv->regs_t->ctrl_cmd_pa_high);
++	pa_low  = ioread32(&priv->regs_t->ctrl_cmd_pa_low);
++	cmd_pa = ((u64)pa_high << 32) | pa_low;
++	cmd_size = ioread32(&priv->regs_t->ctrl_cmd_size);
++
++	dev_dbg(dev, "cmd_hi = %X cmd_low = %X cmd_size %X\n",
++		pa_high, pa_low, cmd_size);
++
++	memcpy_fromio(&__rsp_pa, &priv->regs_t->ctrl_rsp_pa, 8);
++	rsp_pa = le64_to_cpu(__rsp_pa);
++	rsp_size = ioread32(&priv->regs_t->ctrl_rsp_size);
++
++	/* According to the PTP specification, overlapping command and response
++	 * buffer sizes must be identical.
++	 */
++	if (cmd_size != rsp_size) {
++		dev_err(dev, FW_BUG "overlapping command and response buffer sizes are not identical");
++		ret = -EINVAL;
++		goto out;
++	}
++
++	priv->rsp = priv->cmd;
++
++out:
++	if (!ret)
++		priv->cmd_size = cmd_size;
++
++	__crb_go_idle(dev, priv, 0);
++	__crb_relinquish_locality(dev, priv, 0);
++
++	return ret;
++}
++
++static int crb_of_add(struct platform_device *pdev)
++{
++	struct crb_priv *priv;
++	struct tpm_chip *chip;
++	struct device *dev = &pdev->dev;
++	int rc;
++
++	priv = devm_kzalloc(dev, sizeof(struct crb_priv), GFP_KERNEL);
++	if (!priv) {
++		rc = -ENOMEM;
++		goto out;
++	}
++
++	priv->ffa_flags = 0;
++	priv->ffa_attributes = 0;
++	priv->sm = ACPI_TPM2_CRB_WITH_ARM_FFA;
++	priv->hid = "ftpm-ffa";
++
++	rc = tpm_crb_ffa_init();
++	if (rc) {
++		if (rc == -ENOENT) {
++			/* FF-A driver is not available yet */
++			rc = -EPROBE_DEFER;
++		}
++		goto out;
++	}
++
++	rc = crb_map_of_io(pdev, priv);
++	if (rc)
++		goto out;
++
++	chip = tpmm_chip_alloc(dev, &tpm_crb);
++	if (IS_ERR(chip)) {
++		rc = PTR_ERR(chip);
++		goto out;
++	}
++
++	dev_set_drvdata(&chip->dev, priv);
++	chip->flags = TPM_CHIP_FLAG_TPM2;
++
++	rc = tpm_chip_bootstrap(chip);
++	if (rc)
++		goto out;
++
++	rc = tpm_chip_register(chip);
++
++out:
++	return rc;
++}
++
++static void crb_of_remove(struct platform_device *pdev)
++{
++	struct device *dev = &pdev->dev;
++	struct tpm_chip *chip = dev_get_drvdata(dev);
++
++	tpm_chip_unregister(chip);
++}
++
++static int crb_probe(struct platform_device *pdev)
++{
++	struct device_node *node = pdev->dev.of_node;
++	int rc;
++
++	if (node)
++		rc = crb_of_add(pdev);
++	else if (ACPI_HANDLE(&pdev->dev))
++		rc = crb_acpi_add(ACPI_COMPANION(&pdev->dev));
++	else
++		return -EINVAL;
++
++	return rc;
++}
++
++static void crb_remove(struct platform_device *pdev)
++{
++	struct device_node *node = pdev->dev.of_node;
++
++	if (node)
++		crb_of_remove(pdev);
++	else if (ACPI_HANDLE(&pdev->dev))
++		crb_acpi_remove(ACPI_COMPANION(&pdev->dev));
++}
++
++
+ static const struct dev_pm_ops crb_pm = {
+ 	SET_SYSTEM_SLEEP_PM_OPS(tpm_pm_suspend, tpm_pm_resume)
+ };
+ 
+-static const struct acpi_device_id crb_device_ids[] = {
++#ifdef CONFIG_OF
++static const struct of_device_id crb_of_device_ids[] = {
++	{ .compatible = "arm,ftpm" },
++	{},
++};
++MODULE_DEVICE_TABLE(of, crb_of_device_ids);
++#endif
++
++#ifdef CONFIG_ACPI
++static const struct acpi_device_id crb_acpi_device_ids[] = {
+ 	{"MSFT0101", 0},
+ 	{"", 0},
+ };
+-MODULE_DEVICE_TABLE(acpi, crb_device_ids);
+-
+-static struct acpi_driver crb_acpi_driver = {
+-	.name = "tpm_crb",
+-	.ids = crb_device_ids,
+-	.ops = {
+-		.add = crb_acpi_add,
+-		.remove = crb_acpi_remove,
+-	},
+-	.drv = {
+-		.pm = &crb_pm,
+-	},
+-};
++MODULE_DEVICE_TABLE(acpi, crb_acpi_device_ids);
++#endif
++
++static struct platform_driver crb_driver = {
++	.probe = crb_probe,
++	.remove = crb_remove,
++	.driver = {
++		.name = "tpm_crb",
++ 		.pm = &crb_pm,
++		.of_match_table = of_match_ptr(crb_of_device_ids),
++		.acpi_match_table = ACPI_PTR(crb_acpi_device_ids),
++ 	},
++ };
++
++module_platform_driver(crb_driver);
+ 
+-module_acpi_driver(crb_acpi_driver);
+ MODULE_AUTHOR("Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>");
+ MODULE_DESCRIPTION("TPM2 Driver");
+ MODULE_VERSION("0.1");
+diff --git a/drivers/char/tpm/tpm_crb_ffa.c b/drivers/char/tpm/tpm_crb_ffa.c
+index 755b77b32ea4..84b2ebc5c7c3 100644
+--- a/drivers/char/tpm/tpm_crb_ffa.c
++++ b/drivers/char/tpm/tpm_crb_ffa.c
+@@ -340,8 +340,7 @@ static int tpm_crb_ffa_probe(struct ffa_device *ffa_dev)
+ 
+ 	tpm_crb_ffa = ERR_PTR(-ENODEV); // set tpm_crb_ffa so we can detect probe failure
+ 
+-	if (!ffa_partition_supports_direct_recv(ffa_dev) &&
+-	    !ffa_partition_supports_direct_req2_recv(ffa_dev)) {
++	if (!ffa_partition_supports_direct_recv(ffa_dev)) {
+ 		dev_warn(&ffa_dev->dev, "partition doesn't support direct message receive.\n");
+ 		return -EINVAL;
+ 	}
+@@ -356,7 +355,7 @@ static int tpm_crb_ffa_probe(struct ffa_device *ffa_dev)
+ 	ffa_dev_set_drvdata(ffa_dev, tpm_crb_ffa);
+ 
+ 	/* if TPM is aarch32 use 32-bit SMCs */
+-	if (!ffa_partition_check_property(ffa_dev, FFA_PARTITION_AARCH64_EXEC))
++	if (!ffa_partition_check_property(ffa_dev, FFA_PARTITION_AARCH64_EXEC))
+ 		ffa_dev->ops->msg_ops->mode_32bit_set(ffa_dev);
+ 
+ 	/* verify compatibility of TPM service version number */
+@@ -406,7 +405,7 @@ static struct ffa_driver tpm_crb_ffa_driver = {
+ };
+ 
+ #ifdef MODULE
+-module_ffa_driver(tpm_crb_ffa_driver);
++(tpm_crb_ffa_driver);
+ #endif
+ 
+ MODULE_AUTHOR("Arm");
+-- 
+2.43.0
+

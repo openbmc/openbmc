@@ -1,0 +1,29 @@
+From 745294ffa9bb9296eb4250f24dd0ae8115fadd7a Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Thu, 27 Oct 2022 20:10:09 +0000
+Subject: [PATCH] work around visibility issue
+
+gn commit 46b572ce4ceedfe57f4f84051bd7da624c98bf01 "fixed" the
+visibility field not applying to public configs.  This caused dtc to
+have issues due to libfdt and others not being specified.  Due to the
+number, it was cleaner to remove the visibility field (which defaults to
+everything being visible).
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+---
+ BUILD.gn | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/BUILD.gn b/BUILD.gn
+index f55560c540de..d60c3e37135b 100644
+--- a/BUILD.gn
++++ b/BUILD.gn
+@@ -5,7 +5,6 @@
+ # https://opensource.org/licenses/BSD-3-Clause.
+ 
+ config("libfdt_config") {
+-  visibility = [ ":gtest" ]
+   include_dirs = [
+     "libfdt",
+     "hafnium_inc",

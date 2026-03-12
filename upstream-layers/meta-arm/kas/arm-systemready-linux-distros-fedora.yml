@@ -1,8 +1,0 @@
-header:
-  version: 16
-  includes:
-    - kas/arm-systemready-firmware.yml
-    - kas/arm-systemready-linux-distros-unattended-installation.yml
-
-target:
-  - arm-systemready-linux-distros-fedora

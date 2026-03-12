@@ -1,0 +1,487 @@
+From c5bcb737352ad2e1c24cc14a0b8ddf91ad7197b4 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Tue, 29 Jul 2025 15:09:45 +0000
+Subject: [PATCH] plat: corstone1000: Add support for Cortex-A320 variant
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add support for powering on the Cortex-A320 host in the DSU-120T
+cluster and reserve Host SRAM for the normal world on the
+Corstone-1000 platform. These changes enable secure-enclave firmware
+control of the Cortex-A320 power domain and memory access
+configuration.
+
+**DSU-120T Power-Policy Unit (PPU) driver**
+
+* Introduce a minimal driver to program the DSU-120T Power-Policy
+  Units, allowing the secure-enclave firmware to bring the
+  Cortex-A320 host cluster out of reset.
+* The DSU utility-bus registers are located at:
+  * `0x6091_0000` in the Host memory map.
+  * `0xC091_0000` in the Secure-Enclave memory map.
+* The FC1 firewall is configured so that only the Secure Enclave may
+  write to this window.
+* Add new CMake option `CORSTONE1000_DSU_120T` and platform define to
+  enable Cortex-A320 DSU-120T–specific code.
+
+**Host SRAM allocation**
+
+* Reserve a 4 MiB block of Host SRAM at `0x0240_0000` for the
+  Cortex-A320 normal world.
+* Open the same region in the Host-side firewall (CVM, region 2)
+  to allow non-secure access.
+* This configuration is compiled in when `CORSTONE1000_CORTEX_A320`
+  is defined.
+
+These updates prepare the Corstone-1000 platform for Cortex-A320
+integration with proper cluster power management and normal-world
+memory accessibility.
+
+Upstream-Status: Submitted (https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/45749)
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ .../target/arm/corstone1000/CMakeLists.txt    |  31 +++
+ .../Device/Include/platform_base_address.h    |   8 +-
+ .../arm/corstone1000/bl1/boot_hal_bl1_1.c     |  50 ++++-
+ .../target/arm/corstone1000/dsu-120t/ppu.c    |  40 ++++
+ .../target/arm/corstone1000/dsu-120t/ppu.h    | 185 ++++++++++++++++++
+ .../arm/corstone1000/tfm_hal_multi_core.c     |  28 ++-
+ 6 files changed, 339 insertions(+), 3 deletions(-)
+ create mode 100644 platform/ext/target/arm/corstone1000/dsu-120t/ppu.c
+ create mode 100644 platform/ext/target/arm/corstone1000/dsu-120t/ppu.h
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 91bf197d86b7..993c51591fa7 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -423,6 +423,37 @@ target_sources(tfm_spm
+         $<$<BOOL:${TFM_S_REG_TEST}>:${CMAKE_CURRENT_SOURCE_DIR}/target_cfg.c>
+ )
+ 
++#========================= DSU-120T ============================================#
++if (CORSTONE1000_DSU_120T)
++    target_sources(tfm_psa_rot_partition_ns_agent_mailbox
++        PUBLIC
++            dsu-120t/ppu.c
++    )
++
++    target_compile_definitions(tfm_psa_rot_partition_ns_agent_mailbox
++        PUBLIC
++            CORSTONE1000_DSU_120T
++    )
++
++    target_compile_definitions(platform_bl1_1
++        PUBLIC
++            CORSTONE1000_DSU_120T
++    )
++
++    target_include_directories(tfm_psa_rot_partition_ns_agent_mailbox
++        PUBLIC
++            dsu-120t
++    )
++endif()
++
++#========================= Ethos-U NPU =========================================#
++if (CORSTONE1000_CORTEX_A320)
++    target_compile_definitions(platform_bl1_1
++        PUBLIC
++            CORSTONE1000_CORTEX_A320
++    )
++endif()
++
+ #========================= tfm_adac ============================================#
+ 
+ if (${PLATFORM_PSA_ADAC_SECURE_DEBUG})
+diff --git a/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h b/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
+index 5f9f03ddc610..3908d69bc9bd 100644
+--- a/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
++++ b/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
+@@ -1,5 +1,7 @@
+ /*
+- * Copyright (c) 2017-2024 Arm Limited. All rights reserved.
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -79,6 +81,10 @@
+ #define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_SE_SECURE_FLASH (0x90010000U) /* AXI QSPI Controller for SE FLash  */
+ #define CORSTONE1000_HOST_DRAM_UEFI_CAPSULE        (0xA0000000U) /* 1.5 GB DDR                        */
+ 
++#ifdef CORSTONE1000_DSU_120T
++#define CORSTONE1000_HOST_DSU_120T_BASE            (0xC0910000U) /* DSU-120T PPU                      */
++#endif
++
+ /* Map Component definitions to Corstone definitions */
+ #define CC3XX_BASE_S        CORSTONE1000_CRYPTO_ACCELERATOR_BASE
+ 
+diff --git a/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_1.c b/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_1.c
+index b51a233e9143..1a5e98ad3c35 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_1.c
++++ b/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_1.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2019-2024, Arm Limited. All rights reserved.
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -48,6 +48,15 @@ REGION_DECLARE(Image$$, ARM_LIB_HEAP, $$ZI$$Limit)[];
+ #define HOST_SE_SECURE_FLASH_BASE_FVP       0x60010000
+ #define HOST_AXI_QSPI_CTRL_REG_BASE_SE_SECURE_FLASH    0x60010000
+ 
++#ifdef CORSTONE1000_DSU_120T
++#define HOST_DSU_120T_BASE              0x60910000
++#endif
++
++#ifdef CORSTONE1000_CORTEX_A320
++#define HOST_SECURE_SRAM_SIZE           0x400000
++#define HOST_NONSECURE_SRAM_BASE        (HOST_TRUSTED_RAM_BASE + HOST_SECURE_SRAM_SIZE)
++#endif
++
+ #define HOST_DRAM_BASE                  0x80000000
+ #define HOST_DRAM_UEFI_CAPSULE          0x80000000
+ 
+@@ -286,6 +295,25 @@ static void setup_se_firewall(void)
+     fc_enable_regions();
+ #endif
+ 
++#ifdef CORSTONE1000_DSU_120T
++#if (PLATFORM_IS_FVP)
++    fc_select_region(7);
++    fc_disable_regions();
++    fc_disable_mpe(RGN_MPE0);
++    fc_prog_rgn(RGN_SIZE_16MB, CORSTONE1000_HOST_DSU_120T_BASE);
++    fc_prog_rgn_upper_addr(HOST_DSU_120T_BASE);
++    fc_enable_addr_trans();
++    fc_init_mpl(RGN_MPE0);
++
++    mpl_rights = (RGN_MPL_SECURE_READ_MASK |
++                  RGN_MPL_SECURE_WRITE_MASK);
++
++    fc_enable_mpl(RGN_MPE0, mpl_rights);
++    fc_prog_mid(RGN_MPE0, SE_MID);
++    fc_enable_mpe(RGN_MPE0);
++    fc_enable_regions();
++#endif
++#endif
+     fc_pe_enable();
+ }
+ 
+@@ -369,6 +397,26 @@ static void setup_host_firewall(void)
+     fc_enable_regions();
+     fc_rgn_lock();
+ 
++#ifdef CORSTONE1000_CORTEX_A320
++    /* CVM - Non Secure RAM */
++    fc_select_region(2);
++    fc_disable_regions();
++    fc_disable_mpe(RGN_MPE0);
++    fc_prog_rgn(RGN_SIZE_4MB, HOST_NONSECURE_SRAM_BASE);
++    fc_init_mpl(RGN_MPE0);
++
++    mpl_rights = (RGN_MPL_ANY_MST_MASK | RGN_MPL_NONSECURE_READ_MASK |
++                                         RGN_MPL_NONSECURE_WRITE_MASK |
++                                         RGN_MPL_NONSECURE_EXECUTE_MASK);
++
++    fc_enable_mpl(RGN_MPE0, mpl_rights);
++    fc_disable_mpl(RGN_MPE0, ~mpl_rights);
++
++    fc_enable_mpe(RGN_MPE0);
++    fc_enable_regions();
++    fc_rgn_lock();
++#endif
++    
+     fc_pe_enable();
+ 
+     /* DDR */
+diff --git a/platform/ext/target/arm/corstone1000/dsu-120t/ppu.c b/platform/ext/target/arm/corstone1000/dsu-120t/ppu.c
+new file mode 100644
+index 000000000000..d6be5982a8dd
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/dsu-120t/ppu.c
+@@ -0,0 +1,40 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#include <stdint.h>
++#include "ppu.h"
++
++void PPU_SetPowerPolicy(PPU_TypeDef *ppu, PPU_PowerPolicy_Type policy, bool isDynamic)
++{
++    uint32_t regval = ppu->PWPR;
++
++    regval &= ~(PPU_PWPR_PWR_POLICY_Msk | PPU_PWPR_PWR_DYN_EN_Msk);
++
++    regval |= ((policy << PPU_PWPR_PWR_POLICY_Pos) & PPU_PWPR_PWR_POLICY_Msk);
++
++    if (isDynamic) {
++        regval |= PPU_PWPR_PWR_DYN_EN_Msk;
++    }
++
++    ppu->PWPR = regval;
++}
++
++void PPU_SetOperatingPolicy(PPU_TypeDef *ppu, PPU_OperatingPolicy_Type policy, bool isDynamic)
++{
++    uint32_t regval = ppu->PWPR;
++
++    regval &= ~(PPU_PWPR_OP_POLICY_Msk | PPU_PWPR_OP_DYN_EN_Msk);
++
++    regval |= ((policy << PPU_PWPR_OP_POLICY_Pos) & PPU_PWPR_OP_POLICY_Msk);
++
++    if (isDynamic) {
++        regval |= PPU_PWPR_OP_DYN_EN_Msk;
++    }
++
++    ppu->PWPR = regval;
++}
++
+diff --git a/platform/ext/target/arm/corstone1000/dsu-120t/ppu.h b/platform/ext/target/arm/corstone1000/dsu-120t/ppu.h
+new file mode 100644
+index 000000000000..05470df9a884
+--- /dev/null
++++ b/platform/ext/target/arm/corstone1000/dsu-120t/ppu.h
+@@ -0,0 +1,185 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++#ifndef PPU_H
++#define PPU_H
++
++#include <stdbool.h>
++#include <stdint.h>
++#include "platform_base_address.h"
++
++// Bit definition for PPU_PWPR register
++#define PPU_PWPR_PWR_POLICY_Pos            (0U)                                // Power mode policy
++#define PPU_PWPR_PWR_POLICY_Msk            (0xFUL << PPU_PWPR_PWR_POLICY_Pos)  // 4 bits
++#define PPU_PWPR_PWR_POLICY_OFF            (0UL << PPU_PWPR_PWR_POLICY_Pos)    // Logic off and RAM off.
++#define PPU_PWPR_PWR_POLICY_OFF_EMU        (1UL << PPU_PWPR_PWR_POLICY_Pos)    // Emulated Off. Logic on with RAM on. This mode is used to emulate the functional condition of OFF without removing
++#define PPU_PWPR_PWR_POLICY_MEM_RET        (2UL << PPU_PWPR_PWR_POLICY_Pos)    // Memory Retention. Logic off with RAM retained.
++#define PPU_PWPR_PWR_POLICY_MEM_RET_EMU    (3UL << PPU_PWPR_PWR_POLICY_Pos)    // Emulated Memory Retention. Logic on with RAM on. This mode is used to emulate the functional condition of
++#define PPU_PWPR_PWR_POLICY_FULL_RET       (5UL << PPU_PWPR_PWR_POLICY_Pos)    // Full Retention. Slice logic off with RAM contents retained.
++#define PPU_PWPR_PWR_POLICY_FUNC_RET       (7UL << PPU_PWPR_PWR_POLICY_Pos)    // Functional Retention. Logic on with L3 Cache and Snoop Filter retained.
++#define PPU_PWPR_PWR_POLICY_ON             (8UL << PPU_PWPR_PWR_POLICY_Pos)    // Logic on with RAM on, cluster is functional.
++#define PPU_PWPR_PWR_POLICY_WARM_RST       (9UL << PPU_PWPR_PWR_POLICY_Pos)    // Warm Reset. Warm reset application with logic and RAM on.
++#define PPU_PWPR_PWR_POLICY_DBG_RECOV      (10UL << PPU_PWPR_PWR_POLICY_Pos)   // Debug Recovery Reset. Warm reset application with logic and RAM on.
++#define PPU_PWPR_PWR_DYN_EN_Pos            (8U)                                // Power mode dynamic transition enable.
++#define PPU_PWPR_PWR_DYN_EN_Msk            (0x1UL << PPU_PWPR_PWR_DYN_EN_Pos)  // 1 bit
++#define PPU_PWPR_LOCK_EN_Pos               (12U)                               // Lock enable bit for OFF, OFF_EMU, MEM_RET and MEM_RET_EMU power modes.
++#define PPU_PWPR_LOCK_EN_Msk               (0x1UL << PPU_PWPR_LOCK_EN_Pos)     // 1 bit
++#define PPU_PWPR_OP_POLICY_Pos             (16U)                               // Operating mode policy
++#define PPU_PWPR_OP_POLICY_Msk             (0xFUL << PPU_PWPR_OP_POLICY_Pos)   // 4 bits
++#define PPU_PWPR_OP_POLICY_OPMODE_00       (0UL << PPU_PWPR_OP_POLICY_Pos)     // ONE_SLICE_SF_ONLY_ON: One L3 Cache slice is operational, the Cache RAM is powered down.
++#define PPU_PWPR_OP_POLICY_OPMODE_01       (1UL << PPU_PWPR_OP_POLICY_Pos)     // ONE_SLICE_HALF_RAM_ON: One L3 Cache slice is operational, half of the Cache RAMs are powered on.
++#define PPU_PWPR_OP_POLICY_OPMODE_03       (3UL << PPU_PWPR_OP_POLICY_Pos)     // ONE_SLICE_FULL_RAM_ON: One L3 Cache slice is operational, all of the Cache RAMs are powered on.
++#define PPU_PWPR_OP_POLICY_OPMODE_04       (4UL << PPU_PWPR_OP_POLICY_Pos)     // ALL_SLICE_SF_ONLY_ON: All L3 Cache slices are operational, the Cache RAMs in each slice are powered down.
++#define PPU_PWPR_OP_POLICY_OPMODE_05       (5UL << PPU_PWPR_OP_POLICY_Pos)     // ALL_SLICE_HALF_RAM_ON: All L3 Cache slices are operational, half of the Cache RAMs are powered on.
++#define PPU_PWPR_OP_POLICY_OPMODE_07       (7UL << PPU_PWPR_OP_POLICY_Pos)     // ALL_SLICE_FULL_RAM_ON: All L3 Cache slices are operational, all of the Cache RAMs are powered on.
++#define PPU_PWPR_OP_POLICY_OPMODE_08       (8UL << PPU_PWPR_OP_POLICY_Pos)     // HALF_SLICE_SF_ONLY_ON: Half L3 Cache slices are operational, the Cache RAMs in each slice are powered down.
++#define PPU_PWPR_OP_POLICY_OPMODE_09       (9UL << PPU_PWPR_OP_POLICY_Pos)     // HALF_SLICE_HALF_RAM_ON: Half L3 Cache slices are operational, half of the Cache RAMs are powered on.
++#define PPU_PWPR_OP_POLICY_OPMODE_0B       (11UL << PPU_PWPR_PWR_POLICY_Pos)   // HALF_SLICE_FULL_RAM_ON: Half L3 Cache slices are operational, all of the Cache RAMs are powered on.
++#define PPU_PWPR_OP_DYN_EN_Pos             (24U)                               // Operating mode dynamic transition enable.
++#define PPU_PWPR_OP_DYN_EN_Msk             (0x1UL << PPU_PWPR_OP_DYN_EN_Pos)   // 1 bit
++
++// Bit definition for PPU_PWSR register
++#define PPU_PWSR_PWR_STATUS_Pos            (0U)
++#define PPU_PWSR_PWR_STATUS_Msk            (0xFUL << PPU_PWSR_PWR_STATUS_Pos)      // 4 bits
++#define PPU_PWSR_PWR_STATUS_OFF            (0UL << PPU_PWSR_PWR_STATUS_Pos)        // Logic off and RAM off.
++#define PPU_PWSR_PWR_STATUS_OFF_EMU        (1UL << PPU_PWSR_PWR_STATUS_Pos)        // Emulated Off. Logic on with RAM on. This mode is used to emulate the functional condition of OFF without removing
++#define PPU_PWSR_PWR_STATUS_MEM_RET        (2UL << PPU_PWSR_PWR_STATUS_Pos)        // Memory Retention. Logic off with RAM retained.
++#define PPU_PWSR_PWR_STATUS_MEM_RET_EMU    (3UL << PPU_PWSR_PWR_STATUS_Pos)        // Emulated Memory Retention. Logic on with RAM on. This mode is used to emulate the functional condition of
++#define PPU_PWSR_PWR_STATUS_FULL_RET       (5UL << PPU_PWSR_PWR_STATUS_Pos)        // Full Retention. Slice logic off with RAM contents retained.
++#define PPU_PWSR_PWR_STATUS_FUNC_RET       (7UL << PPU_PWSR_PWR_STATUS_Pos)        // Functional Retention. Logic on with L3 Cache and Snoop Filter retained.
++#define PPU_PWSR_PWR_STATUS_ON             (8UL << PPU_PWSR_PWR_STATUS_Pos)        // Logic on with RAM on, cluster is functional.
++#define PPU_PWSR_PWR_STATUS_WARM_RST       (9UL << PPU_PWSR_PWR_STATUS_Pos)        // Warm Reset. Warm reset application with logic and RAM on.
++#define PPU_PWSR_PWR_STATUS_DBG_RECOV      (10UL << PPU_PWSR_PWR_STATUS_Pos)       // Debug Recovery Reset. Warm reset application with logic and RAM on.
++#define PPU_PWSR_PWR_DYN_STATUS_Pos        (8U)                                    // Power mode dynamic transition enable.
++#define PPU_PWSR_PWR_DYN_STATUS_Msk        (0x1UL << PPU_PWSR_PWR_DYN_STATUS_Pos)  // 1 bit
++#define PPU_PWSR_LOCK_STATUS_Pos           (12U)                                   // Lock enable bit for OFF, OFF_EMU, MEM_RET and MEM_RET_EMU power modes.
++#define PPU_PWSR_LOCK_STATUS_Msk           (0x1UL << PPU_PWSR_LOCK_STATUS_Pos)     // 1 bit
++#define PPU_PWSR_OP_STATUS_Pos             (16U)                                   // Operating mode policy
++#define PPU_PWSR_OP_STATUS_Msk             (0xFUL << PPU_PWSR_OP_STATUS_Pos)       // 4 bits
++#define PPU_PWSR_OP_STATUS_OPMODE_00       (0UL << PPU_PWSR_OP_STATUS_Pos)         // ONE_SLICE_SF_ONLY_ON: One L3 Cache slice is operational, only the snoop filter RAM instances are active in the slice
++#define PPU_PWSR_OP_STATUS_OPMODE_01       (1UL << PPU_PWSR_OP_STATUS_Pos)         // ONE_SLICE_HALF_RAM_ON: One L3 Cache slice is operational, half of the Cache RAMs are powered on.
++#define PPU_PWSR_OP_STATUS_OPMODE_03       (3UL << PPU_PWSR_OP_STATUS_Pos)         // ONE_SLICE_FULL_RAM_ON: One L3 Cache slice is operational, all of the Cache RAMs are powered on.
++#define PPU_PWSR_OP_STATUS_OPMODE_04       (4UL << PPU_PWSR_OP_STATUS_Pos)         // ALL_SLICE_SF_ONLY_ON: All L3 Cache slices are operational, the Cache RAMs in each slice are powered down.
++#define PPU_PWSR_OP_STATUS_OPMODE_05       (5UL << PPU_PWSR_OP_STATUS_Pos)         // ALL_SLICE_HALF_RAM_ON: All L3 Cache slices are operational, half of the Cache RAMs are powered on.
++#define PPU_PWSR_OP_STATUS_OPMODE_07       (7UL << PPU_PWSR_OP_STATUS_Pos)         // ALL_SLICE_FULL_RAM_ON: All L3 Cache slices are operational, all of the Cache RAMs are powered on.
++#define PPU_PWSR_OP_STATUS_OPMODE_08       (8UL << PPU_PWSR_OP_STATUS_Pos)         // HALF_SLICE_SF_ONLY_ON: Half L3 Cache slices are operational, the Cache RAMs in each slice are powered down.
++#define PPU_PWSR_OP_STATUS_OPMODE_09       (9UL << PPU_PWSR_OP_STATUS_Pos)         // HALF_SLICE_HALF_RAM_ON: Half L3 Cache slices are operational, half of the Cache RAMs are powered on.
++#define PPU_PWSR_OP_STATUS_OPMODE_0B       (11UL << PPU_PWSR_OP_STATUS_Pos)        // HALF_SLICE_FULL_RAM_ON: Half L3 Cache slices are operational, all of the Cache RAMs are powered on.
++#define PPU_PWSR_OP_DYN_STATUS_Pos         (24U)                                   // Operating mode dynamic transition enable.
++#define PPU_PWSR_OP_DYN_STATUS_Msk         (0x1UL << PPU_PWSR_OP_DYN_STATUS_Pos)   // 1 bit
++
++/*!< PPU memory offsets */
++#define DSU_120T_CLUSTER_PPU_OFFSET  0x030000
++#define DSU_120T_CORE0_PPU_OFFSET    0x080000
++#define DSU_120T_CORE1_PPU_OFFSET    0x180000
++#define DSU_120T_CORE2_PPU_OFFSET    0x280000
++#define DSU_120T_CORE3_PPU_OFFSET    0x380000
++
++/*!< PPU memory map */
++#define CLUSTER_PPU_BASE (CORSTONE1000_HOST_DSU_120T_BASE + DSU_120T_CLUSTER_PPU_OFFSET)
++#define CORE0_PPU_BASE (CORSTONE1000_HOST_DSU_120T_BASE + DSU_120T_CORE0_PPU_OFFSET)
++#define CORE1_PPU_BASE (CORSTONE1000_HOST_DSU_120T_BASE + DSU_120T_CORE1_PPU_OFFSET)
++#define CORE2_PPU_BASE (CORSTONE1000_HOST_DSU_120T_BASE + DSU_120T_CORE2_PPU_OFFSET)
++#define CORE3_PPU_BASE (CORSTONE1000_HOST_DSU_120T_BASE + DSU_120T_CORE3_PPU_OFFSET)
++
++/*!< PPU declarations */
++#define CLUSTER_PPU ((PPU_TypeDef *) CLUSTER_PPU_BASE)
++#define CORE0_PPU   ((PPU_TypeDef *) CORE0_PPU_BASE)
++#define CORE1_PPU   ((PPU_TypeDef *) CORE1_PPU_BASE)
++#define CORE2_PPU   ((PPU_TypeDef *) CORE2_PPU_BASE)
++#define CORE3_PPU   ((PPU_TypeDef *) CORE3_PPU_BASE)
++
++typedef struct
++{
++    volatile uint32_t PWPR;                      /*!< PPU Power Policy Register, Address offset: 0x00 */
++    volatile uint32_t PMER;                      /*!< PPU Power Mode Emulation Enable Register, Address offset: 0x04 */
++    volatile uint32_t PWSR;                      /*!< PPU Power Status Register, Address offset: 0x08 */
++    volatile uint32_t RESERVED0;                 /*!< Reserved, Address offset: 0x0C */
++    volatile uint32_t DISR;                      /*!< PPU Device Interface Input Current Status Register, Address offset: 0x10 */
++    volatile uint32_t MISR;                      /*!< PPU Miscellaneous Input Current Status Register, Address offset: 0x14 */
++    volatile uint32_t STSR;                      /*!< PPU Stored Status Register, Address offset: 0x18 */
++    volatile uint32_t UNLK;                      /*!< PPU Unlock Register, Address offset: 0x1C */
++    volatile uint32_t PWCR;                      /*!< PPU Power Configuration Register, Address offset: 0x20 */
++    volatile uint32_t PTCR;                      /*!< PPU Power Mode Transition Register, Address offsets: 0x24 */
++    volatile uint32_t RESERVED1[2];              /*!< Reserved: Address offsets 0x28 - 0x2C */
++    volatile uint32_t IMR;                       /*!< PPU Interrupt Mask Register, Address offsets: 0x30 */
++    volatile uint32_t AIMR;                      /*!< PPU Additional Interrupt Mask Register, Address offsets: 0x34 */
++    volatile uint32_t ISR;                       /*!< PPU Interrupt Status Register, Address offsets: 0x38 */
++    volatile uint32_t AISR;                      /*!< PPU Additional Interrupt Status Register, Address offsets: 0x3C */
++    volatile uint32_t IESR;                      /*!< PPU Input Edge Sensitivity Register	Address offsets: 0x040 */
++    volatile uint32_t OPSR;                      /*!< PPU Operating Mode Active Edge Sensitivity Register	Address offsets: 0x044 */
++    volatile uint32_t RESERVED2[2];              /*!< Reserved: Address offsets 0x48 - 0x4C */
++    volatile uint32_t FUNRR;                     /*!< Functional Retention RAM Configuration Register	Address offsets: 0x050 */
++    volatile uint32_t FULRR;                     /*!< Full Retention RAM Configuration Register	Address offsets: 0x054 */
++    volatile uint32_t MEMRR;                     /*!< Memory Retention RAM Configuration Register	Address offsets: 0x058 */
++    volatile uint32_t RESERVED3[69];             /*!< Reserved: Address offsets 0x5C - 0x16C */
++    volatile uint32_t DCDR0;                     /*!< Device Control Delay Configuration Register 0	Address offsets: 0x170 */
++    volatile uint32_t DCDR1;                     /*!< Device Control Delay Configuration Register 1	Address offsets: 0x174 */
++    volatile uint32_t RESERVED4[910];            /*!< Reserved, offsets 0x178 - 0xFAC */
++    volatile uint32_t IDR0;                      /*!< PPU Identification Register 0, Address offsets: 0xFB0 */
++    volatile uint32_t IDR1;                      /*!< PPU Identification Register 1, Address offsets: 0xFB4 */
++    volatile uint32_t RESERVED5[4];             /*!< Reserved, offsets 0xFB8 - 0xFC4 */
++    volatile uint32_t IIDR;                      /*!< PPU Implementation Identification Register, Address offsets: 0xFC8 */
++    volatile uint32_t AIDR;                      /*!< PPU Architecture Identification Register, Address offsets: 0xFCC */
++    volatile uint32_t PIDR4;                     /*!< PPU Peripheral Identification Register 4, Address offsets: 0xFD0 */
++    volatile uint32_t PIDR5;                     /*!< PPU Peripheral Identification Register 5, Address offsets: 0xFD4 */
++    volatile uint32_t PIDR6;                     /*!< PPU Peripheral Identification Register 6, Address offsets: 0xFD8 */
++    volatile uint32_t PIDR7;                     /*!< PPU Peripheral Identification Register 7, Address offsets: 0xFDC */
++    volatile uint32_t PIDR0;                     /*!< PPU Peripheral Identification Register 0, Address offsets: 0xFE0 */
++    volatile uint32_t PIDR1;                     /*!< PPU Peripheral Identification Register 1, Address offsets: 0xFE4 */
++    volatile uint32_t PIDR2;                     /*!< PPU Peripheral Identification Register 2, Address offsets: 0xFE8 */
++    volatile uint32_t PIDR3;                     /*!< PPU Peripheral Identification Register 3, Address offsets: 0xFEC */
++    volatile uint32_t CIDR0;                     /*!< PPU Component Identification Register 0,	Address offsets: 0xFF0 */
++    volatile uint32_t CIDR1;                     /*!< PPU Component Identification Register 1,	Address offsets: 0xFF4 */
++    volatile uint32_t CIDR2;                     /*!< PPU Component Identification Register 2,	Address offsets: 0xFF8 */
++    volatile uint32_t CIDR3;                     /*!< PPU Component Identification Register 3,	Address offsets: 0xFFC */
++} PPU_TypeDef;
++
++typedef enum {
++    PPU_PWR_MODE_OFF         = 0, // Logic off and RAM off.
++    PPU_PWR_MODE_OFF_EMU     = 1, // Emulated Off. Logic on with RAM on. This mode is used to emulate the functional condition of OFF without removing
++    PPU_PWR_MODE_MEM_RET     = 2, // Memory Retention. Logic off with RAM retained.
++    PPU_PWR_MODE_MEM_RET_EMU = 3, // Emulated Memory Retention. Logic on with RAM on. This mode is used to emulate the functional condition of
++    PPU_PWR_MODE_FULL_RET    = 5, // Full Retention. Slice logic off with RAM contents retained.
++    PPU_PWR_MODE_FUNC_RET    = 7, // Functional Retention. Logic on with L3 Cache and Snoop Filter retained.
++    PPU_PWR_MODE_ON          = 8, // Logic on with RAM on, cluster is functional.
++    PPU_PWR_MODE_WARM_RST    = 9, // Warm Reset. Warm reset application with logic and RAM on.
++    PPU_PWR_MODE_DBG_RECOV   = 10 // Debug Recovery Reset. Warm reset application with logic and RAM on.
++} PPU_PowerPolicy_Type;
++
++typedef enum {
++    PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON   = 0, // One L3 Cache slice is operational, only the snoop filter RAM instances are active in the slice
++    PPU_OP_MODE_ONE_SLICE_HALF_RAM_ON  = 1, // One L3 Cache slice is operational, half of the Cache RAMs are powered on.
++    PPU_OP_MODE_ONE_SLICE_FULL_RAM_ON  = 3, // One L3 Cache slice is operational, all of the Cache RAMs are powered on.
++    PPU_OP_MODE_ALL_SLICE_SF_ONLY_ON   = 4, // All L3 Cache slices are operational, the Cache RAMs in each slice are powered down.
++    PPU_OP_MODE_ALL_SLICE_HALF_RAM_ON  = 5, // All L3 Cache slices are operational, half of the Cache RAMs are powered on.
++    PPU_OP_MODE_ALL_SLICE_FULL_RAM_ON  = 7, // All L3 Cache slices are operational, all of the Cache RAMs are powered on.
++    PPU_OP_MODE_HALF_SLICE_SF_ONLY_ON  = 8, // Half L3 Cache slices are operational, the Cache RAMs in each slice are powered down.
++    PPU_OP_MODE_HALF_SLICE_HALF_RAM_ON = 9, // Half L3 Cache slices are operational, half of the Cache RAMs are powered on.
++    PPU_OP_MODE_HALF_SLICE_FULL_RAM_ON = 11 // Half L3 Cache slices are operational, all of the Cache RAMs are powered on.
++} PPU_OperatingPolicy_Type;
++
++/**
++ * @brief  Set the power policy for a given PPU instance.
++ *         Only modifies PWR_POLICY and PWR_DYN_EN bits.
++ * @param  ppu: Pointer to the PPU instance (e.g., CLUSTER_PPU, CORE0_PPU1)
++ * @param  policy: Power mode policy (e.g., PPU_PWR_MODE_ON)
++ * @param  dynamic: Enable dynamic transitions enabled for power modes, allowing transitions to be initiated by changes on power mode DEVACTIVE inputs if non-zero
++ * @retval None
++ */
++void PPU_SetPowerPolicy(PPU_TypeDef *ppu, PPU_PowerPolicy_Type policy, bool isDynamic);
++
++/**
++ * @brief  Set the operating mode policy for a given PPU instance.
++*          Only modifies OP_POLICY and OP_DYN_EN bits.
++ * @param  ppu: Pointer to the PPU instance (e.g., CLUSTER_PPU, CORE0_PPU)
++ * @param  policy: Operating mode policy (e.g., PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON)
++ * @param  dynamic: Enable dynamic transitions enabled for operating modes, allowing transitions to be initiated by changes on operating mode DEVACTIVE inputs if non-zero
++ * @retval None
++ */
++void PPU_SetOperatingPolicy(PPU_TypeDef *ppu, PPU_OperatingPolicy_Type policy, bool isDynamic);
++
++#endif /* PPU_H */
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+index d0c6b8d590f9..10c66ac41ad2 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2018-2024 Arm Limited. All rights reserved.
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -11,6 +11,10 @@
+ #include "tfm_hal_multi_core.h"
+ #include "fwu_agent.h"
+ 
++#ifdef CORSTONE1000_DSU_120T
++#include "ppu.h"
++#endif
++
+ #define HOST_SYS_RST_CTRL_OFFSET     0x000
+ #define HOST_CPU_PE0_CONFIG_OFFSET   0x010
+ #define HOST_CPU_PE1_CONFIG_OFFSET   0x020
+@@ -98,6 +102,28 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+ 
+     (void) start_addr;
+ 
++#ifdef CORSTONE1000_DSU_120T
++    /* Power on DSU-120T cluster */
++    PPU_SetOperatingPolicy(CLUSTER_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
++    PPU_SetPowerPolicy(CLUSTER_PPU, PPU_PWR_MODE_ON, false);
++    
++    /* Power on Cortex-A320 core0 in DSU-120T Cluster */
++    PPU_SetOperatingPolicy(CORE0_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
++    PPU_SetPowerPolicy(CORE0_PPU, PPU_PWR_MODE_ON, false);
++    
++#if CORSTONE1000_FVP_MULTICORE
++    /* Power on all Cortex-A320 cores in DSU-120T Cluster */
++    PPU_SetOperatingPolicy(CORE1_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
++    PPU_SetPowerPolicy(CORE1_PPU, PPU_PWR_MODE_ON, false);
++    
++    PPU_SetOperatingPolicy(CORE2_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
++    PPU_SetPowerPolicy(CORE2_PPU, PPU_PWR_MODE_ON, false);
++
++    PPU_SetOperatingPolicy(CORE3_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
++    PPU_SetPowerPolicy(CORE3_PPU, PPU_PWR_MODE_ON, false);
++#endif
++#endif
++
+ #ifdef EXTERNAL_SYSTEM_SUPPORT
+     /*release EXT SYS out of reset*/
+     tfm_external_system_boot();

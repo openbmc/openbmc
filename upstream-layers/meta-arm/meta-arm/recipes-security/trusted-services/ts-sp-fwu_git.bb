@@ -14,7 +14,7 @@ TS_SP_FWU_CONFIG ?= "default"
 OECMAKE_SOURCEPATH = "${S}/deployments/fwu/config/${TS_SP_FWU_CONFIG}-${TS_ENV}"
 
 # The GPT parser component is needed from TF-A
-SRC_URI += "git://git.trustedfirmware.org/TF-A/trusted-firmware-a.git;name=tfa;protocol=https;branch=master;destsuffix=tf-a"
+SRC_URI += "git://review.trustedfirmware.org/TF-A/trusted-firmware-a;name=tfa;protocol=https;branch=master;destsuffix=tf-a"
 SRCREV_tfa = "35f4c7295bafeb32c8bcbdfb6a3f2e74a57e732b"
 LIC_FILES_CHKSUM = "file://../tf-a/docs/license.rst;md5=b2c740efedc159745b9b31f88ff03dde"
 do_apply_local_src_patches:append() {

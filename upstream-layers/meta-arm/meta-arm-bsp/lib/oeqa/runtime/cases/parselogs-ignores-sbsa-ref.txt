@@ -1,8 +1,8 @@
-# The release of EDK2 after 202402 should fix this
-NUMA: Failed to initialise from firmware
-
 # TODO: we should be using bochsdrm over efifb?
 efifb: cannot reserve video memory at 0x80000000
 
 # TODO: debug why this sometimes happens
 failed to find screen to remove
+
+# appears with upgrade to kernel 6.18
+PCI: OF: of_root node is NULL, cannot create PCI host bridge node

@@ -31,7 +31,7 @@ EXTRA_IMAGEDEPENDS += "${FVP_PROVIDER}"
 
 IMAGE_CLASSES += "image-artifact-names"
 
-IMAGE_POSTPROCESS_COMMAND += "do_write_fvpboot_conf;"
+IMAGE_POSTPROCESS_COMMAND += "do_write_fvpboot_conf"
 python do_write_fvpboot_conf() {
     # Note that currently this JSON file is in development and the format may
     # change at any point, so it should always be used with a matching runfvp.

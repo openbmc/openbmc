@@ -1,0 +1,51 @@
+From f5551affe1ad99b4b9566570fbe82a1745be3ea8 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 10 Mar 2025 16:33:06 +0000
+Subject: [PATCH] fwu_arm_psa: Add ExitBootService() notification handler
+
+Provide a weak function that can be overridden
+
+Some boards need to perform custom actions on ExitBootService()
+related to FWU. This function can be overridden by the board.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ lib/fwu_updates/fwu_arm_psa.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/lib/fwu_updates/fwu_arm_psa.c b/lib/fwu_updates/fwu_arm_psa.c
+index 7297e724569..6a829c631b0 100644
+--- a/lib/fwu_updates/fwu_arm_psa.c
++++ b/lib/fwu_updates/fwu_arm_psa.c
+@@ -1252,6 +1252,21 @@ static bool fwu_all_images_accepted(const struct fwu_data *fwu_data)
+ 	return true;
+ }
+ 
++/**
++ * fwu_notify_exit_boot_services() - FWU notification handler
++ *
++ * Some boards need to perform custom actions on ExitBootService()
++ * related to FWU. This function can be overridden by the board.
++ *
++ * Return:
++ *
++ * EFI_SUCCESS on success. Otherwise, failure
++ */
++efi_status_t __weak fwu_notify_exit_boot_services(void)
++{
++	return EFI_SUCCESS;
++}
++
+ /**
+  * fwu_accept_notify_exit_boot_services() - ExitBootServices callback
+  *
+@@ -1292,6 +1307,8 @@ static void EFIAPI fwu_accept_notify_exit_boot_services(struct efi_event *event,
+ 	}
+ 
+ out:
++	fwu_notify_exit_boot_services();
++
+ 	EFI_EXIT(efi_ret);
+ }
+ 

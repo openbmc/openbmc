@@ -1,4 +1,4 @@
-From adaa22bc2f529bb34e9d4fe89ff5c65f0c83ca0c Mon Sep 17 00:00:00 2001
+From efce372dfac4ccef239b67abb4ec1cc450096329 Mon Sep 17 00:00:00 2001
 From: emeara01 <emekcan.aras@arm.com>
 Date: Wed, 11 May 2022 14:37:06 +0100
 Subject: [PATCH] Fix FF-A version in SPMC manifest

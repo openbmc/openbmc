@@ -1,0 +1,46 @@
+From 78231f27db0bbc747902b603bf279dce1707a3cc Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Mon, 16 Jun 2025 14:44:39 +0100
+Subject: [PATCH] Platform: Corstone1000: Increase buffer sizes
+
+Increase PSA_MAX_ASSET_SIZE and CRYPTO_IOVEC_BUFFER_SIZE
+to accommodate large size EFI variables set by new U-Boot version.
+
+This change is required to pass ACS tests related to Set/Get
+EFI variables. These ACS tests started failing after introducing new
+version of U-Boot, Trusted-Services and Trusted-Firmware-M while
+implementing PSA FWU support.
+
+Upstream-Status: Backport [bd80dee733e792eadfd2115f4bfa6bad748e5ce5]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ platform/ext/target/arm/corstone1000/config_tfm_target.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/config_tfm_target.h b/platform/ext/target/arm/corstone1000/config_tfm_target.h
+index 4920f67084d4..cf13712a1806 100644
+--- a/platform/ext/target/arm/corstone1000/config_tfm_target.h
++++ b/platform/ext/target/arm/corstone1000/config_tfm_target.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2022-2024, Arm Limited. All rights reserved.
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+@@ -27,13 +27,13 @@
+ #define ITS_MAX_ASSET_SIZE   2048
+ 
+ /* The maximum asset size to be stored in the Protected Storage */
+-#define PS_MAX_ASSET_SIZE   2592
++#define PS_MAX_ASSET_SIZE   3500
+ 
+ /* This is needed to be able to process the EFI variables during PS writes. */
+ #define CRYPTO_ENGINE_BUF_SIZE 0x5000
+ 
+ /* This is also has to be increased to fit the EFI variables into the iovecs. */
+-#define CRYPTO_IOVEC_BUFFER_SIZE    6000
++#define CRYPTO_IOVEC_BUFFER_SIZE    7200
+ 
+ /* The Mailbox partition is used as an NS Agent so its stack size is used to
+  * determine the PSP and PSPLIM during the SFN backend initialization. It has to

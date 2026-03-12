@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+header:
+  version: 14
+  includes:
+    - ci/fvp-base-ts.yml
+    - ci/meta-secure-core.yml
+
+repos:
+  meta-secure-core:
+    layers:
+      meta-tpm2:
+
+local_conf_header:
+  remove_secureboot: |
+    BBMASK += "efi-secure-boot"
+
+  ftpm_sp_test: |
+    # Include tpm2 related packages
+    IMAGE_INSTALL:append = " tpm2-tools-tests tpm2-abrmd tpm2-tss"
+    # Use systemd as the init system, which is required for the tpm2 self-tests
+    INIT_MANAGER = "systemd"
+    IMAGE_INSTALL:append = " systemd util-linux"
+
+  ts_ftpm_sp: |
+    MACHINE_FEATURES:append = " ts-ftpm"
+    RUN_TPM2_TESTS = "1"

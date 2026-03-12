@@ -1,0 +1,53 @@
+From 901a63f09369cfbed8eff8c450b8615bd4c361af Mon Sep 17 00:00:00 2001
+From: Devaraj Ranganna <devaraj.ranganna@arm.com>
+Date: Mon, 22 Sep 2025 12:59:43 +0100
+Subject: [PATCH] bl2: corstone-1000: secure debug waiting in CM LCS
+
+Currently, when the device is in Secure Enable (SE) LCS state, setting
+`dcu_en` register causes CC-312 reset, which effectively resets the
+device as they are both on same power domain. Therefore, temporarily
+disable moving SE enable before waiting for secure debug notification.
+The device will be in CM provisioned state.
+
+Long-term solution is to implement a solution similar to RSE, secure
+debug handshake is completed and then a reset is triggered and `dcu_en`
+is applied during bl2.
+
+Upstream-Status: Inappropriate [Need to be redesigned]
+Signed-off-by: Devaraj Ranganna <devaraj.ranganna@arm.com>
+---
+ .../ext/target/arm/corstone1000/bl2/boot_hal_bl2.c  | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+index 8c4eb80d032c..bf7b62881ad5 100644
+--- a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
++++ b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+@@ -165,7 +165,18 @@ int32_t boot_platform_post_init(void)
+     }
+ 
+ #ifdef PLATFORM_PSA_ADAC_SECURE_DEBUG
++    /*  TODO: Currently, when the device is in Secure Enable (SE) LCS state,
++        setting `dcu_en` register causes CC-312 reset, which effectively resets
++        the device as they are both on same power domain. Therefore, temporarily
++        disable moving SE enable before waiting for secure debug notification.
++        The device will be in CM provisioned state.
++
++        Long-term solution is to implement a solution similar to RSE, secure
++        debug handshake is completed and then a reset is triggered and `dcu_en`
++        is applied during bl2.
++
+     if (!tfm_plat_provisioning_is_required()) {
++    */
+ 
+         plat_err = tfm_plat_otp_read(PLAT_OTP_ID_SECURE_DEBUG_PK, 32, secure_debug_rotpk);
+         if (plat_err != TFM_PLAT_ERR_SUCCESS) {
+@@ -176,7 +187,7 @@ int32_t boot_platform_post_init(void)
+         BOOT_LOG_INF("%s: Corstone-1000 Secure Debug is a %s.\r\n", __func__,
+                 (result == 0) ? "success" : "failure");
+ 
+-    }
++  /*}*/
+ #endif
+ 
+     return 0;

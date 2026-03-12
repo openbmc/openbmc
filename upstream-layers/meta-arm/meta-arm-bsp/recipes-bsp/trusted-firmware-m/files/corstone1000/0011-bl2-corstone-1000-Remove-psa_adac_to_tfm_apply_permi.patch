@@ -1,0 +1,48 @@
+From 3a9e209596ca0ae5850ae382c624adf9932b16b4 Mon Sep 17 00:00:00 2001
+From: Devaraj Ranganna <devaraj.ranganna@arm.com>
+Date: Mon, 22 Sep 2025 12:48:57 +0100
+Subject: [PATCH] bl2: corstone-1000: Remove
+ `psa_adac_to_tfm_apply_permissions`
+
+The API `psa_adac_to_tfm_apply_permissions` is added to `psa-adac`
+library. Therefore, remove it from
+`platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c`.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Devaraj Ranganna <devaraj.ranganna@arm.com>
+---
+ .../arm/corstone1000/bl2/boot_hal_bl2.c       | 21 -------------------
+ 1 file changed, 21 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+index 2abcfb5fd39d..8c4eb80d032c 100644
+--- a/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
++++ b/platform/ext/target/arm/corstone1000/bl2/boot_hal_bl2.c
+@@ -111,27 +111,6 @@ static bool fill_flash_map_with_fip_data(uint8_t boot_index) {
+ #endif /* !TFM_S_REG_TEST */
+ 
+ #ifdef PLATFORM_PSA_ADAC_SECURE_DEBUG
+-int psa_adac_to_tfm_apply_permissions(uint8_t permissions_mask[16])
+-{
+-    (void)permissions_mask;
+-
+-    int ret;
+-    uint32_t dcu_reg_values[4];
+-
+-    /* Below values provide same access as when platform is in development
+-       life cycle state */
+-    dcu_reg_values[0] = 0xffffe7fc;
+-    dcu_reg_values[1] = 0x800703ff;
+-    dcu_reg_values[2] = 0xffffffff;
+-    dcu_reg_values[3] = 0xffffffff;
+-
+-    ret = crypto_hw_apply_debug_permissions((uint8_t*)dcu_reg_values, 16);
+-    BOOT_LOG_INF("%s: debug permission apply %s\n\r", __func__,
+-            (ret == 0) ? "success" : "fail");
+-
+-    return ret;
+-}
+-
+ uint8_t secure_debug_rotpk[32];
+ #endif /* PLATFORM_PSA_ADAC_SECURE_DEBUG */
+ 

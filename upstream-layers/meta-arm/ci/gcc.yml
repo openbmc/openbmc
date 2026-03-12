@@ -3,7 +3,7 @@
 header:
   version: 14
 
-#NOTE: This is the default for poky.  This is only being added for completeness/clarity
+#NOTE: This is the default.  This is only being added for completeness/clarity
 local_conf_header:
   toolchain: |
-    TOOLCHAIN = "gcc"
+    PREFERRED_TOOLCHAIN_TARGET = "gcc"

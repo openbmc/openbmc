@@ -18,11 +18,14 @@ do_deploy() {
     firmware_loc=$(echo "${TMPDIR}" | sed "s/${TCLIBC}/musl/")
     firmware_loc="${firmware_loc}_${MACHINE}/deploy/images/${MACHINE}"
     for firmware in ${FIRMWARE_BINARIES}; do
-        echo "cp -av ${firmware_loc}/${firmware} ${DEPLOYDIR}/"
-        cp -av "${firmware_loc}/${firmware}" ${DEPLOYDIR}/
+        # Preserve the directory structure when copying
+        subdir="$(dirname -- "${firmware}")"
+        mkdir -p "${DEPLOYDIR}"/"${subdir}"
+        echo "cp -av ${firmware_loc}/${firmware} ${DEPLOYDIR}/${subdir}"
+        cp -av "${firmware_loc}/${firmware}" ${DEPLOYDIR}/"${subdir}"
         if [ -L "${firmware_loc}/${firmware}" ]; then
-            echo "cp -av ${firmware_loc}/$(readlink ${firmware_loc}/${firmware}) ${DEPLOYDIR}/"
-            cp -av "${firmware_loc}/$(readlink ${firmware_loc}/${firmware})" ${DEPLOYDIR}/
+            echo "cp -av ${firmware_loc}/$(readlink ${firmware_loc}/${firmware}) ${DEPLOYDIR}/${subdir}"
+            cp -av "${firmware_loc}/$(readlink ${firmware_loc}/${firmware})" ${DEPLOYDIR}/${subdir}
         fi
     done
 }

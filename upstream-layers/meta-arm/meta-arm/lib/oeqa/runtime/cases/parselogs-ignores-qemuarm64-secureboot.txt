@@ -1,3 +1,8 @@
 optee: Failed to initialize async notifications: -95
 ARM FF-A: Failed to register driver sched callback -95
 ARM FF-A: Notification setup failed -95, not enabled
+
+# u-boot appears to be telling the kernel via devicetree that it has an initrd,
+# but it doesnt. The blob appears to be the same size as the kernel, which is
+# interesting. Until this is resolved, ignore the warning.
+check access for rdinit=/init failed: -2, ignoring

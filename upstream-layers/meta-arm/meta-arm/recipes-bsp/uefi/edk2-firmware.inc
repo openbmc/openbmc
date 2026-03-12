@@ -54,6 +54,7 @@ EDK2_BUILD_MODE ?= "${@bb.utils.contains('EDK2_BUILD_RELEASE', '1', 'RELEASE', '
 # Baremetal, no need for a C library
 DEPENDS:remove = "virtual/${TARGET_PREFIX}compilerlibs virtual/libc"
 DEPENDS += "util-linux-native iasl-native"
+DEPENDS:append:toolchain-clang = " lld-native"
 
 inherit deploy
 
@@ -77,12 +78,9 @@ EDK_COMPILER ?= "GCC5"
 export GCC5_AARCH64_PREFIX = "${TARGET_PREFIX}"
 export GCC5_ARM_PREFIX = "${TARGET_PREFIX}"
 
-EDK_COMPILER:toolchain-clang = "CLANG38"
+EDK_COMPILER:toolchain-clang = "CLANGDWARF"
 export CLANG38_AARCH64_PREFIX = "${TARGET_PREFIX}"
 export CLANG38_ARM_PREFIX = "${TARGET_PREFIX}"
-
-#FIXME - arm32 doesn't work with clang due to a linker issue
-TOOLCHAIN:arm = "gcc"
 
 do_configure:prepend() {
     sed -i -e "s#-target ${HOST_ARCH}-linux-gnu.*#-target ${HOST_SYS}#" ${S}/BaseTools/Conf/tools_def.template

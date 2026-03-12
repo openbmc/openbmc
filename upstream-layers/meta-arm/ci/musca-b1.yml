@@ -6,6 +6,11 @@ header:
     - ci/base.yml
     - ci/meta-openembedded.yml
 
+local_conf_header:
+  version_for_ci: |
+    # For better CI coverage, use the LTS version of tf-m
+    PREFERRED_VERSION_trusted-firmware-m ?= "2.1.%"
+
 machine: musca-b1
 
 target:

@@ -1,0 +1,43 @@
+From 092003a8a911e585f8b69d895a50a4f7eb4caea1 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Fri, 24 Jan 2025 15:26:57 +0000
+Subject: [PATCH] efi_loader: fwu_arm_psa: Skip accepting the payload after
+ set_image()
+
+Do not update the acceptance metadata bit after updating an image
+
+The update agent (secure world) is responsible of setting the acceptance
+bit in the metadata.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ lib/efi_loader/efi_capsule.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index f28fcf85f68..a28b7e978e2 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -4,6 +4,11 @@
+  *
+  *  Copyright (c) 2018 Linaro Limited
+  *			Author: AKASHI Takahiro
++ *
++ * Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ * Author:
++ *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+  */
+ 
+ #define LOG_CATEGORY LOGC_EFI
+@@ -683,7 +688,8 @@ static efi_status_t efi_capsule_update_firmware(
+ 			goto out;
+ 		}
+ 
+-		if (IS_ENABLED(CONFIG_FWU_MULTI_BANK_UPDATE)) {
++		if (IS_ENABLED(CONFIG_FWU_MULTI_BANK_UPDATE) &&
++		    !IS_ENABLED(CONFIG_FWU_ARM_PSA)) {
+ 			image_type_id = &image->update_image_type_id;
+ 			if (!fw_accept_os) {
+ 				/*

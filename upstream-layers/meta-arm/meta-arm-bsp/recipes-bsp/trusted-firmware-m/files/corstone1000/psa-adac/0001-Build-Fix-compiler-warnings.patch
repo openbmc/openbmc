@@ -1,0 +1,151 @@
+From 6391a6189ee2024f0ef956f56373f79128576230 Mon Sep 17 00:00:00 2001
+From: Maulik Patel <maulik.patel@arm.com>
+Date: Tue, 23 Sep 2025 21:26:44 +0100
+Subject: [PATCH] Build: Fix compiler warnings
+
+- Add header crypto_hw for crypto_hw_apply_debug_permissions()
+- Add header int_com_port_driver.h for IComPortRxIntInit()
+- Move psa_adac_platform_init() declaration to psa_adac_platform.h
+- Add include path for psa-adac/transport_layer/transports/sdc-600
+
+Signed-off-by: Maulik Patel <maulik.patel@arm.com>
+Change-Id: I34f774a9843f7a3a62ad447fa0ae607184bd800a
+
+Upstream-Status: Backport [6391a6189ee2024f0ef956f56373f79128576230]
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+
+---
+ .../platform/arm/corstone1000/CMakeLists.txt               | 2 ++
+ .../platform/arm/corstone1000/corstone1000.c               | 7 ++++++-
+ .../platform/arm/corstone1000/include/platform/platform.h  | 1 -
+ .../platform/arm/corstone1000/include/psa_adac_platform.h  | 6 ++++++
+ .../platform/arm/rse/common/CMakeLists.txt                 | 1 +
+ .../platform/arm/rse/common/include/platform/platform.h    | 1 -
+ .../platform/arm/rse/common/include/psa_adac_platform.h    | 7 +++++++
+ .../platform/arm/rse/common/psa_adac_platform.c            | 5 +++++
+ 8 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/target/trusted-firmware-m/platform/arm/corstone1000/CMakeLists.txt b/target/trusted-firmware-m/platform/arm/corstone1000/CMakeLists.txt
+index c36259e0b31f..604c9b72745d 100644
+--- a/target/trusted-firmware-m/platform/arm/corstone1000/CMakeLists.txt
++++ b/target/trusted-firmware-m/platform/arm/corstone1000/CMakeLists.txt
+@@ -20,6 +20,8 @@ target_include_directories(${PROJECT_NAME}
+         ${CMAKE_CURRENT_SOURCE_DIR}
+         ${PSA_ADAC_MBEDTLS_INCLUDE}
+         ${PSA_ADAC_ROOT}/transport_layer/transports
++        ${PSA_ADAC_ROOT}/transport_layer/transports/sdc-600
++
+ )
+ 
+ target_compile_definitions(${PROJECT_NAME}
+diff --git a/target/trusted-firmware-m/platform/arm/corstone1000/corstone1000.c b/target/trusted-firmware-m/platform/arm/corstone1000/corstone1000.c
+index e629eed97236..e979b3246e12 100644
+--- a/target/trusted-firmware-m/platform/arm/corstone1000/corstone1000.c
++++ b/target/trusted-firmware-m/platform/arm/corstone1000/corstone1000.c
+@@ -12,6 +12,11 @@
+ #include "platform/msg_interface.h"
+ #include "demo-anchors.h"
+ #include <string.h>
++#include "crypto_hw.h"
++
++#ifdef PSA_ADAC_AS_TFM_RUNTIME_SERVICE
++#include "int_com_port_driver.h"
++#endif /* PSA_ADAC_AS_TFM_RUNTIME_SERVICE */
+ 
+ extern uint8_t discovery_template[];
+ extern size_t discovery_template_len;
+@@ -70,7 +75,7 @@ int psa_adac_platform_check_certificate(uint8_t *crt, size_t crt_size)
+ 
+ int psa_adac_to_tfm_apply_permissions(uint8_t permissions_mask[16])
+ {
+-    /* This implementation only support coarse-grained secure debug 
++    /* This implementation only support coarse-grained secure debug
+      * unlock (closed/open). Fine-grained access-control can be
+      * supported by defining a mapping from permissions_mask to
+      * dcu_reg_values.
+diff --git a/target/trusted-firmware-m/platform/arm/corstone1000/include/platform/platform.h b/target/trusted-firmware-m/platform/arm/corstone1000/include/platform/platform.h
+index e99d0d55f624..82b416f5f67f 100644
+--- a/target/trusted-firmware-m/platform/arm/corstone1000/include/platform/platform.h
++++ b/target/trusted-firmware-m/platform/arm/corstone1000/include/platform/platform.h
+@@ -31,7 +31,6 @@ adac_status_t psa_adac_change_life_cycle_state(uint8_t *input, size_t input_size
+ void psa_adac_close_session(void);
+ void psa_adac_resume(void);
+ void psa_adac_platform_lock(void);
+-void psa_adac_platform_init(void);
+ int psa_adac_detect_debug_request(void);
+ void psa_adac_acknowledge_debug_request(void);
+ 
+diff --git a/target/trusted-firmware-m/platform/arm/corstone1000/include/psa_adac_platform.h b/target/trusted-firmware-m/platform/arm/corstone1000/include/psa_adac_platform.h
+index 26f10f8999ca..2ae4569f5ff1 100644
+--- a/target/trusted-firmware-m/platform/arm/corstone1000/include/psa_adac_platform.h
++++ b/target/trusted-firmware-m/platform/arm/corstone1000/include/psa_adac_platform.h
+@@ -30,5 +30,11 @@ int tfm_to_psa_adac_corstone1000_secure_debug(uint8_t *secure_debug_rotpk, uint3
+  */
+ int psa_adac_to_tfm_apply_permissions(uint8_t permissions_mask[16]);
+ 
++/*
++ * Platform initialization function for PSA ADAC.
++ * This function should be called during runtime service init to initialize
++ * the PSA ADAC platform-specific components.
++ */
++void psa_adac_platform_init(void);
+ 
+ #endif /* __PSA_ADAC_PLATFORM_H__ */
+diff --git a/target/trusted-firmware-m/platform/arm/rse/common/CMakeLists.txt b/target/trusted-firmware-m/platform/arm/rse/common/CMakeLists.txt
+index 67214bb3f354..d1b9718a8183 100644
+--- a/target/trusted-firmware-m/platform/arm/rse/common/CMakeLists.txt
++++ b/target/trusted-firmware-m/platform/arm/rse/common/CMakeLists.txt
+@@ -23,6 +23,7 @@ target_include_directories(${PROJECT_NAME}
+         ${PSA_ADAC_MBEDTLS_INCLUDE}
+         ${PSA_ADAC_ROOT}/transport_layer/transports
+         ${TFM_SRC_DIR}/platform/ext/target/arm/rse/common/partition
++        ${PSA_ADAC_ROOT}/transport_layer/transports/sdc-600
+ )
+ 
+ target_compile_definitions(${PROJECT_NAME}
+diff --git a/target/trusted-firmware-m/platform/arm/rse/common/include/platform/platform.h b/target/trusted-firmware-m/platform/arm/rse/common/include/platform/platform.h
+index 57044f05a67a..afd4b3033a4b 100644
+--- a/target/trusted-firmware-m/platform/arm/rse/common/include/platform/platform.h
++++ b/target/trusted-firmware-m/platform/arm/rse/common/include/platform/platform.h
+@@ -32,7 +32,6 @@ void psa_adac_resume(void);
+ void psa_adac_platform_lock(void);
+ int psa_adac_platform_check_token(uint8_t *token, size_t token_size);
+ int psa_adac_platform_check_certificate(uint8_t *crt, size_t crt_size);
+-void psa_adac_platform_init(void);
+ int psa_adac_detect_debug_request(void);
+ void psa_adac_acknowledge_debug_request(void);
+ int psa_adac_apply_permissions(uint8_t permissions_mask[16]);
+diff --git a/target/trusted-firmware-m/platform/arm/rse/common/include/psa_adac_platform.h b/target/trusted-firmware-m/platform/arm/rse/common/include/psa_adac_platform.h
+index a47788566aec..3e1dc73c4e0e 100644
+--- a/target/trusted-firmware-m/platform/arm/rse/common/include/psa_adac_platform.h
++++ b/target/trusted-firmware-m/platform/arm/rse/common/include/psa_adac_platform.h
+@@ -34,6 +34,13 @@ int tfm_to_psa_adac_rse_secure_debug(uint8_t *secure_debug_rotpk, uint32_t len);
+  */
+ int psa_adac_to_tfm_apply_permissions(uint8_t permissions_mask[16]);
+ 
++/*
++ * Platform initialization function for PSA ADAC.
++ * This function should be called during runtime service init to initialize
++ * the PSA ADAC platform-specific components.
++ */
++void psa_adac_platform_init(void);
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/target/trusted-firmware-m/platform/arm/rse/common/psa_adac_platform.c b/target/trusted-firmware-m/platform/arm/rse/common/psa_adac_platform.c
+index fa2e7c023ef4..5c5cfd1529a3 100644
+--- a/target/trusted-firmware-m/platform/arm/rse/common/psa_adac_platform.c
++++ b/target/trusted-firmware-m/platform/arm/rse/common/psa_adac_platform.c
+@@ -21,6 +21,11 @@
+ #include "rse_debug_after_reset.h"
+ #include "lcm_drv.h"
+ #include "device_definition.h"
++
++#ifdef PSA_ADAC_AS_TFM_RUNTIME_SERVICE
++#include "int_com_port_driver.h"
++#endif /* PSA_ADAC_AS_TFM_RUNTIME_SERVICE */
++
+ #define ROTPK_ANCHOR_ALG PSA_ALG_SHA_512
+ #define UINT8_SIZE_IN_BITS  8
+ 

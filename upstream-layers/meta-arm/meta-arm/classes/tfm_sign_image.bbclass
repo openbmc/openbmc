@@ -12,6 +12,11 @@ inherit python3native
 TFM_IMAGE_SIGN_DIR = "${WORKDIR}/tfm-signed-images"
 TFM_IMAGE_SIGN_DEPLOY_DIR = "${WORKDIR}/deploy-tfm-signed-images"
 
+# Security counter value
+# If the security counter is not specified, generate the value from the image
+# version by default
+RE_WRAPPER_SECURITY_COUNTER ?= "auto"
+
 SSTATETASKS += "do_sign_images"
 do_sign_images[sstate-inputdirs] = "${TFM_IMAGE_SIGN_DEPLOY_DIR}"
 do_sign_images[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
@@ -39,6 +44,7 @@ export OPENSSL_MODULES = "${STAGING_LIBDIR_NATIVE}/ossl-modules"
 # in an image recipe to customize the arguments.
 TFM_IMAGE_SIGN_ARGS ?= "\
     -v ${RE_LAYOUT_WRAPPER_VERSION} \
+    -s ${RE_WRAPPER_SECURITY_COUNTER} \
     --layout "${TFM_IMAGE_SIGN_DIR}/${host_binary_layout}" \
     --public-key-format full \
     --align 1 \
@@ -46,7 +52,6 @@ TFM_IMAGE_SIGN_ARGS ?= "\
     --pad-header \
     --measured-boot-record \
     -H ${RE_IMAGE_OFFSET} \
-    -s auto \
 "
 
 #

@@ -76,10 +76,10 @@ class OEFVPTarget(OESSHTarget):
     def stop(self, **kwargs):
         self.transition(OEFVPTargetState.OFF)
 
-    def run(self, cmd, timeout=None):
+    def run(self, *args, **kwargs):
         # Running a command implies the LINUX state
         self.transition(OEFVPTargetState.LINUX)
-        return super().run(cmd, timeout)
+        return super().run(*args, **kwargs)
 
     def _setup_consoles(self):
         with open(self.fvp_log.name, 'rb') as logfile:

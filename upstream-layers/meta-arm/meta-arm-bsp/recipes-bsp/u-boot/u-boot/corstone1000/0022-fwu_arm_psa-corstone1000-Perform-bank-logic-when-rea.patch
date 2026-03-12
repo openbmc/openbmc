@@ -1,0 +1,140 @@
+From 0aa80df8e50eba1474e37a4128e835fb56de8362 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Wed, 5 Mar 2025 19:09:20 +0000
+Subject: [PATCH] fwu_arm_psa: corstone1000: Perform bank logic when reading
+ boot index
+
+Move bank logic from board_late_init to fwu_plat_get_bootidx
+
+board_late_init is called very early before the FWU subsystem is setup.
+So, the metadata is still not initialized at that level. Reading the boot
+index at that level returns an invalid value.
+Moving the bank logic to fwu_plat_get_bootidx guarantees the returned
+boot index is reflecting the value read from the metadata.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ board/armltd/corstone1000/corstone1000.c | 63 +++++++++++-------------
+ configs/corstone1000_defconfig           |  1 -
+ 2 files changed, 29 insertions(+), 35 deletions(-)
+
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index d2176b9174d..2ccf851e6c5 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -151,8 +151,6 @@ struct efi_capsule_update_info update_info = {
+ 
+ #endif /* EFI_HAVE_CAPSULE_SUPPORT */
+ 
+-static int corstone1000_boot_idx;
+-
+ static struct mm_region corstone1000_mem_map[] = {
+ 	{
+ 		/* CVM */
+@@ -234,45 +232,37 @@ int dram_init_banksize(void)
+ }
+ 
+ void fwu_plat_get_bootidx(uint *boot_idx)
+-{
+-	int ret;
+-
+-	/*
+-	 * in our platform, the Secure Enclave is the one who controls
+-	 * all the boot tries and status, so, every time we get here
+-	 * we know that the we are booting from the active index
+-	 */
+-	ret = fwu_get_active_index(boot_idx);
+-	if (ret < 0) {
+-		*boot_idx = CONFIG_FWU_NUM_BANKS;
+-		log_err("corstone1000: failed to read active index\n");
+-	}
+-}
+-
+-int board_late_init(void)
+ {
+ 	struct disk_partition part_info;
+ 	struct udevice *dev, *bdev;
+ 	struct nvmxip_plat *plat;
+ 	struct blk_desc *desc;
+ 	int ret;
++	bool kernel_addr_set, kernel_size_set;
+ 
+ 	ret = uclass_first_device_err(UCLASS_NVMXIP, &dev);
+ 	if (ret < 0) {
+-		log_err("Cannot find kernel device\n");
+-		return ret;
++		log_err("Cannot find kernel device, err (%d)\n", ret);
++		return;
+ 	}
+ 
+ 	plat = dev_get_plat(dev);
+ 	device_find_first_child(dev, &bdev);
+ 	desc = dev_get_uclass_plat(bdev);
+-	ret = fwu_get_active_index(&corstone1000_boot_idx);
++	ret = fwu_get_active_index(boot_idx);
+ 	if (ret < 0) {
++		*boot_idx = CONFIG_FWU_NUM_BANKS;
+ 		log_err("corstone1000: failed to read boot index\n");
+-		return ret;
++		return;
+ 	}
+ 
+-	if (!corstone1000_boot_idx)
++	kernel_addr_set = env_get_hex("kernel_addr", 0) ? true : false;
++	kernel_size_set = env_get_hex("kernel_size", 0) ? true : false;
++
++	if (kernel_addr_set && kernel_size_set)
++		return;
++
++	if (!(*boot_idx))
+ 		ret = part_get_info_by_name(desc, CORSTONE1000_KERNEL_PRIMARY,
+ 					    &part_info);
+ 	else
+@@ -281,18 +271,23 @@ int board_late_init(void)
+ 
+ 	if (ret < 0) {
+ 		log_err("failed to fetch kernel partition index: %d\n",
+-			corstone1000_boot_idx);
+-		return ret;
++			*boot_idx);
++		return;
+ 	}
+ 
+-	ret = 0;
+-
+-	ret |= env_set_hex("kernel_addr", plat->phys_base +
+-			   (part_info.start * part_info.blksz));
+-	ret |= env_set_hex("kernel_size", part_info.size * part_info.blksz);
+-
+-	if (ret < 0)
+-		log_err("failed to setup kernel addr and size\n");
++	if (!kernel_addr_set) {
++		ret = env_set_hex("kernel_addr", plat->phys_base +
++				(part_info.start * part_info.blksz));
++		if (ret)
++			log_err("cannot set kernel_addr variable, err (%d)\n",
++				ret);
++	}
+ 
+-	return ret;
++	if (!kernel_size_set) {
++		ret = env_set_hex("kernel_size",
++				  part_info.size * part_info.blksz);
++		if (ret)
++			log_err("cannot set kernel_size variable, err (%d)\n",
++				ret);
++	}
+ }
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index a75877a9174..7be842a2fe2 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -32,7 +32,6 @@ CONFIG_LOGLEVEL=7
+ # CONFIG_DISPLAY_CPUINFO is not set
+ # CONFIG_DISPLAY_BOARDINFO is not set
+ CONFIG_BOARD_INIT=y
+-CONFIG_BOARD_LATE_INIT=y
+ CONFIG_SYS_PROMPT="corstone1000# "
+ # CONFIG_CMD_CONSOLE is not set
+ CONFIG_CMD_FWU_METADATA=y

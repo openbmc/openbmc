@@ -23,6 +23,11 @@ local_conf_header:
     INIT_MANAGER:firmware = "mdev-busybox"
     VIRTUAL-RUNTIME_init_manager:firmware = "busybox"
 
+    # This guarantees module auto-loading support at boot
+    # by adding /etc/init.d/modutils.sh and /etc/rcS.d/ files
+    CORE_IMAGE_EXTRA_INSTALL:append = " modutils-initscripts"
+    DISTRO_FEATURES:append = " sysvinit"
+
     # prevent the kernel image from being included in the intramfs rootfs
     PACKAGE_EXCLUDE:firmware += "kernel-image-*"
 
@@ -41,6 +46,7 @@ local_conf_header:
     CORE_IMAGE_EXTRA_INSTALL:firmware += "packagegroup-ts-tests-psa"
 
   capsule: |
+    # These variables are set here since they are not defined in the arm-systemready-firmware recipe or under multiconfig mode.
     CAPSULE_EXTENSION = "uefi.capsule"
-    CAPSULE_FW_VERSION = "6"
-    CAPSULE_NAME = "${MACHINE}-v${CAPSULE_FW_VERSION}"
+    CAPSULE_VERSION = "6"
+    CAPSULE_NAME = "${MACHINE}-v${CAPSULE_VERSION}"

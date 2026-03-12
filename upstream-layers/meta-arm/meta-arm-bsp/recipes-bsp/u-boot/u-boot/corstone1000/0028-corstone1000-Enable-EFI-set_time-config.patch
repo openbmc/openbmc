@@ -1,0 +1,32 @@
+From bdba4f1c13464378a74fa859d641fa1cce6a672e Mon Sep 17 00:00:00 2001
+From: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
+Date: Thu, 20 Mar 2025 16:06:18 +0000
+Subject: [PATCH] corstone1000: Enable EFI set_time() config
+
+Enable EFI set_time() config
+
+SetTime_Conf and SetTime_Func tests in UEFI SCT test suite of ACS
+fail with unsupported return value. CONFIG_EFI_SET_TIME and
+CONFIG_EFI_GET_TIME config values are needed.
+This commit enables the set_time() config.
+get_time() config is enabled automatically.
+
+Signed-off-by: Gowtham Suresh Kumar <gowtham.sureshkumar@arm.com>
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ configs/corstone1000_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index c44911e6f64..cbf4550cdb1 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -13,6 +13,7 @@ CONFIG_SYS_LOAD_ADDR=0x82100000
+ CONFIG_IDENT_STRING=" corstone1000 aarch64 "
+ CONFIG_FWU_NUM_IMAGES_PER_BANK=4
+ CONFIG_EFI_SECURE_BOOT=y
++CONFIG_EFI_SET_TIME=y
+ CONFIG_EFI_MM_COMM_TEE=y
+ CONFIG_FFA_SHARED_MM_BUF_SIZE=4096
+ CONFIG_FFA_SHARED_MM_BUF_OFFSET=0

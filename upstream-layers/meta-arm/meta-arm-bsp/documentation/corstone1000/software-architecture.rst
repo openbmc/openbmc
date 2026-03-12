@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2025, Arm Limited.
+ # Copyright (c) 2022-2026, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -115,6 +115,19 @@ mechanism. The current software release supports switching the External System O
 The Corstone-1000 architecture is designed to cover a range of
 `Power, Performance, and Area (PPA) <ppa-website_>`__ applications, and enable extension
 for use-case specific applications, for example, sensors, cloud connectivity, and edge computing.
+
+**************************************
+Corstone-1000 with Cortex-A320 Variant
+**************************************
+
+This variant of the Corstone-1000 platform replaces the Host System's Cortex-A35 processor
+with a Cortex-A320. In this configuration, the optional External System (previously a Cortex-M3)
+is replaced by an Arm Ethos-U85 Neural Processing Unit (NPU).
+The Ethos-U85 runs in the direct drive configuration, where the Host System is responsible for managing the NPU directly.
+
+.. image:: images/CorstoneA320Subsystems.png
+   :width: 720
+   :alt: CorstoneA320Subsystems
 
 *****************
 Secure Boot Chain
@@ -315,15 +328,49 @@ Host Secure World experience lower latency, but rely on TrustZone technology for
 which offers comparatively less robust security.
 
 
-**********************
-Secure Firmware Update
-**********************
+**************************
+PSA Secure Firmware Update
+**************************
+
+The Arm Corstone-1000 platform necessitates a robust, secure, and flexible firmware update mechanism
+including partial capsule update to ensure fielded devices can receive critical patches, feature enhancements,
+and security fixes without compromising system integrity. To meet these requirements, we have implemented the
+Platform Security Architecture (PSA) Firmware Update (FWU) framework on Corstone-1000, leveraging Trusted Firmware-M (TF-M)
+for the Secure Enclave, U-Boot as the host-side client on Cortex-A, and the UEFI capsule update mechanism for payload
+encapsulation. This design supports both the Fixed Virtual Platform (FVP) and the Field Programmable Gate Array (FPGA)
+targets, providing consistent behavior across simulation and silicon-based deployments. The Corstone-1000 supports FWU
+which complies with the `Platform Security Firmware Update for the A-profile Arm Architecture <platform-security-fwu-for-a-profile-pdf_>`__
+and `PSA Firmware Update IHI 0093 <psa-firmware-update-ihi-0093-api-reference-website_>`__
+specifications.
+
+To standardize and streamline capsule creation with multiple FMP payloads, the `EDK2 capsule generation tool <edk2-capsule-generation-tool-repository_>`__
+tool has been integrated into the meta-arm Yocto layer for Corstone‑1000. This integration involves defining
+build rules for generating UEFI capsules as part of the firmware image build process. Configuration parameters
+exposed in the recipe allow developers to specify the number of FMP payloads, target image GUIDs, version numbers etc.
+This capsule ensures that all update payloads conform to the UEFI FMP specification and are ready for
+validation and delivery by U‑Boot.
+
+The FWU solution for Corstone-1000 is composed of three primary domains:
+
+- Host System
+- Trusted Services intermediary
+- Secure Enclave
+
+Each domain has distinct responsibilities and communicates through standardized interfaces.
 
 
-In addition to always booting authorized images, it is equally important that the device only accepts
-authorized (signed) images during the firmware update process. Corstone-1000 supports over-the-air (OTA)
-firmware updates and complies with the `Platform Security Firmware Update for the A-profile Arm Architecture <platform-security-fwu-for-a-profile-pdf_>`__ 
-specification.
+.. image:: images/SystemArchitecturePSAFirmwareUpdate.png
+   :width: 690
+   :alt: SystemArchitecturePSAFirmwareUpdate
+
+On the host side, U-Boot functions as the FWU client and orchestrates the update process from capsule retrieval to
+payload delivery based on `PSA FWU DEN0018 specification <psa-fwu-den0018-specification-website_>`__
+via Arm FF-A framework. The Trusted-Services SE Proxy secure partition serves as a gateway between the non-secure host
+environment and the Secure Enclave. The `PSA FWU service <ts-psa-fwu-service-website_>`__ running in the Trusted Services
+implementation forwards the data to the Secure Enclave via MHU-based PSA calls. Within the Secure Enclave, the PSA FWU
+Agent, conforming to `PSA Firmware Update IHI 0093 <psa-firmware-update-ihi-0093-api-reference-website_>`__ specification,
+orchestrates the actual flash programming, metadata management, and rollback protection mechanisms. The agent relies on a
+bespoke `shim layer <tfm-shim-layer-website_>`__ to abstract hardware‑specific flash operations and bootloader interactions.
 
 As defined in the specification, the external flash is divided into two banks: one bank holds the
 currently running images, while the other is used to stage new images.
@@ -336,23 +383,55 @@ New images are delivered and accepted in the form of UEFI capsules.
    :width: 690
    :alt: ExternalFlash
 
-When a firmware update is triggered, U-Boot begins by verifying the UEFI capsule by checking its signature,
-version number, and size. After successful verification, it signals the Secure Enclave, which then
-starts writing the capsule contents to flash memory.
+When a FWU is initiated on Corstone-1000, the following sequence of operations takes place:
 
-Once the write operation is complete, the Secure Enclave resets the entire system. The update process
-is tracked using a state machine stored in the Metadata Block within flash. TF-M runs an OTA service
-that is responsible for verifying and updating the images in the passive flash bank. Communication
-between the UEFI capsule update subsystem and the OTA service follows the same data path described
-earlier. After verifying the capsule, the OTA service writes the new images to the passive bank,
-updates the system state to 'trial,' and initiates a reset.
+#. **Capsule Retrieval and Preparation**
 
-During boot, the bootloaders in both the Secure Enclave and the Host system read the Metadata Block to
-determine which bank to boot from. If the trial boot succeeds, the Host system sends an acknowledgment
-that transitions the system state from 'trial' to 'regular.' If the system fails during the trial phase
-or hangs, a watchdog timer triggers a reset. The Secure Enclave’s BL1 contains logic to detect multiple
-resets and can revert to the previously known-good bank. This fallback mechanism is essential to ensure
-the device remains available and functional.
+   U-Boot on the host system retrieves the firmware capsule.
+   It validates the capsule header and parses the FMP (Firmware Management Protocol) descriptor list to identify the payloads to be updated.
+
+   For each FMP descriptor, U-Boot:
+
+   Splits the firmware payload into 4 KiB chunks.
+   Invokes the PSA_FWU_Update API for each chunk, transmitting the buffer address via the FF-A (Firmware Framework for Arm) shared memory interface.
+
+#. **Secure Transmission and Forwarding**
+
+   The PSA Firmware Update (FWU) service, running as part of Trusted Services, receives the chunks through Secure Partition Client (SPC) calls.
+   It forwards these chunks to the Secure Enclave using MHU-based PSA calls.
+
+#. **Flashing Within the Secure Enclave**
+
+   Inside the Secure Enclave, the PSA FWU Agent dispatches each chunk to the shim layer.
+
+   The shim layer:
+
+   Erases the corresponding sectors in the non-active flash bank.
+   Writes the received firmware chunks at the correct offsets.
+   During partial updates, it also copies static partitions from the active bank to the non-active one to maintain consistency.
+
+#. **Finalization and Boot Preparation**
+
+   After all chunks are successfully written:
+
+   The shim updates the firmware manifest and the EFI System Resource Table (ESRT) entries to reflect the new image version.
+   This step enables the bootloader to recognize the new firmware for a trial boot.
+   The platform then performs an automatic reset, booting into the non-active bank in trial mode.
+
+#. **Trial Boot and Confirmation**
+
+   In trial mode, U-Boot evaluates the new firmware and issues either an accept or reject command using the PSA FWU ABI.
+   These commands are sent to the Secure Enclave, instructing the shim to update the firmware metadata accordingly.
+
+#. **Recovery and Fallback Mechanism**
+
+   If the trial boot is successful, the host sends an acknowledgment, transitioning the firmware state from 'trial' to 'regular'.
+
+   If the system fails or becomes unresponsive:
+
+   A watchdog timer triggers a system reset.
+   The BL1 firmware in the Secure Enclave detects repeated failures and reverts to the previously known-good flash bank.
+   This rollback mechanism ensures the device remains operational and recoverable, even after a failed update.
 
 
 .. image:: images/SecureFirmwareUpdate.png
@@ -389,7 +468,7 @@ References
 
 --------------
 
-*Copyright (c) 2022-2025, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2026, Arm Limited. All rights reserved.*
 
 .. _arm-developer-cs1000-website: https://developer.arm.com/Tools%20and%20Software/Corstone-1000%20Software
 .. _arm-developer-cs1000-search: https://developer.arm.com/search#q=corstone-1000
@@ -401,6 +480,11 @@ References
 .. _arm-fmw-framework-a-profile-pdf: https://developer.arm.com/documentation/den0077/latest
 .. _arm-fmw-framework-m-profile-pdf: https://developer.arm.com/architectures/Firmware%20Framework%20for%20M-Profile
 .. _platform-security-fwu-for-a-profile-pdf: https://developer.arm.com/documentation/den0118/a/
+.. _psa-firmware-update-ihi-0093-api-reference-website: https://arm-software.github.io/psa-api/fwu/1.0/api/api.html
+.. _edk2-capsule-generation-tool-repository: https://github.com/tianocore/edk2/blob/master/BaseTools/Source/Python/Capsule/GenerateCapsule.py
+.. _psa-fwu-den0018-specification-website: https://developer.arm.com/documentation/den0118/latest/
+.. _ts-psa-fwu-service-website: https://trusted-services.readthedocs.io/en/stable/services/fwu/psa-fwu-m.html
+.. _tfm-shim-layer-website: https://trustedfirmware-m.readthedocs.io/en/latest/design_docs/services/tfm_fwu_service.html#shim-layer-between-fwu-and-bootloader
 .. _op-tee-os-repository: https://github.com/OP-TEE/optee_os
 .. _psa-certified-website: https://www.psacertified.org/
 .. _psa_l2-ready: https://www.psacertified.org/products/corstone-1000/

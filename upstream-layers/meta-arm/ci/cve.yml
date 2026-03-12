@@ -15,7 +15,6 @@ local_conf_header:
     CVE_CHECK_SHOW_WARNINGS:layer-arm-toolchain = "1"
     CVE_CHECK_SHOW_WARNINGS:layer-meta-arm = "1"
     CVE_CHECK_SHOW_WARNINGS:layer-meta-arm-bsp = "1"
-    CVE_CHECK_SHOW_WARNINGS:layer-meta-arm-systemready = "1"
 
     # Ignore the kernel, we sometime carry kernels in meta-arm
     CVE_CHECK_SHOW_WARNINGS:pn-linux-yocto = "0"

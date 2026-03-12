@@ -9,6 +9,7 @@ machine: qemuarm64-secureboot
 
 target:
   - core-image-base
+  - hafnium
 
 local_conf_header:
   optee: |

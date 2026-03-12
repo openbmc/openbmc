@@ -1,0 +1,157 @@
+From ff4bb404474a3310654827c36c4ac882eb0344b5 Mon Sep 17 00:00:00 2001
+From: Michael Safwat <michael.safwat@arm.com>
+Date: Tue, 26 Aug 2025 11:20:01 +0000
+Subject: [PATCH] plat: corstone1000: Add Cortex-A320 support
+
+Switch platform to GICv3 (GIC-600) for Corstone-1000 with Cortex-A320
+depending on CORSTONE1000_CORTEX_A320:
+    - Define GICD and GICR bases.
+    - Update the platform sources to include the GIC-V3 files.
+
+Move the NVM offset to prevent overlap with the TFTF firmware,
+which starts at 0x80000000 (TFTF_BASE).
+
+Introduce a new skip file tests_to_skip_cortex_a320 to be used when building
+TF-A-Tests with CORSTONE1000_CORTEX_A320=1. This ensures that tests which
+are not supported or cause traps on Corstone-1000 with Cortex-A320 are
+consistently skipped during execution.
+
+Skipped entries:
+    CPU extensions/AMUv1 suspend/resume
+    CPU extensions/Use trace buffer control Registers
+
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Upstream-Status: Submitted (https://review.trustedfirmware.org/c/TF-A/tf-a-tests/+/42352)
+---
+ plat/arm/corstone1000/corstone1000_def.h      | 12 ++++++++++-
+ plat/arm/corstone1000/include/platform_def.h  | 11 +++++-----
+ plat/arm/corstone1000/platform.mk             | 20 ++++++++++++++++++
+ .../tests_to_skip_cortex_a320.txt             | 21 +++++++++++++++++++
+ 4 files changed, 58 insertions(+), 6 deletions(-)
+ create mode 100644 plat/arm/corstone1000/tests_to_skip_cortex_a320.txt
+
+diff --git a/plat/arm/corstone1000/corstone1000_def.h b/plat/arm/corstone1000/corstone1000_def.h
+index 3e6f036acc9a..c4fa9a3b5f68 100644
+--- a/plat/arm/corstone1000/corstone1000_def.h
++++ b/plat/arm/corstone1000/corstone1000_def.h
+@@ -26,13 +26,23 @@
+  * GIC-400 & interrupt handling related constants
+  ******************************************************************************/
+ /* GIC memory map */
++#ifdef CORSTONE1000_CORTEX_A320
++#define GICD_BASE	0x1C000000
++#define GICR_BASE	0x1C040000
++
++/* GIC re-distributor doesn't exits on gic-600, but we still need to
++ * provide GICC_BASE as the gic driver needs it
++ */
++#define GICC_BASE		0x0
++#else
++
+ #define GICD_BASE		0x1C010000
+ #define GICC_BASE		0x1C02F000
+ /* GIC re-distributor doesn't exits on gic-400, but we still need to
+  * provide GICR_BASE as the gic driver needs it
+  */
+ #define GICR_BASE		0x0
+-
++#endif
+ /*******************************************************************************
+  * PL011 related constants
+  ******************************************************************************/
+diff --git a/plat/arm/corstone1000/include/platform_def.h b/plat/arm/corstone1000/include/platform_def.h
+index 91f4cda19a90..2a9e5c4c35bb 100644
+--- a/plat/arm/corstone1000/include/platform_def.h
++++ b/plat/arm/corstone1000/include/platform_def.h
+@@ -98,12 +98,13 @@
+ #endif
+ 
+ /*
+- * USE 0x200000 DRAM offset to store TFTF data
+- *
+- * Please note that this won't be suitable for all test scenarios and
+- * for this reason some tests will be disabled in this configuration.
++ * When USE_NVM = 0, TFTF_NVM_OFFSET marks the DRAM region
++ * used as NVM. This region must not overlap the memory where
++ * the TFTF image is loaded. The load address is given by
++ * the TFTF_BASE macro. Set TFTF_NVM_OFFSET to leave enough
++ * space for the TFTF image.
+  */
+-#define TFTF_NVM_OFFSET		0x40000
++#define TFTF_NVM_OFFSET		0x80000
+ #define TFTF_NVM_SIZE		(128 * SZ_1M)	/* 128 MB */
+ 
+ /*******************************************************************************
+diff --git a/plat/arm/corstone1000/platform.mk b/plat/arm/corstone1000/platform.mk
+index cd7a19162bcf..dfdd27abd897 100644
+--- a/plat/arm/corstone1000/platform.mk
++++ b/plat/arm/corstone1000/platform.mk
+@@ -6,6 +6,16 @@
+ 
+ PLAT_INCLUDES	:=	-Iplat/arm/corstone1000/include/
+ 
++CORSTONE1000_CORTEX_A320   :=      0
++ifeq (${CORSTONE1000_CORTEX_A320},1)
++PLAT_SOURCES	:=	drivers/arm/timer/private_timer.c		\
++                        drivers/arm/timer/system_timer.c                \
++                        plat/arm/corstone1000/plat_helpers.S            \
++                        plat/arm/corstone1000/corstone1000_pwr_state.c  \
++                        plat/arm/corstone1000/corstone1000_topology.c   \
++                        plat/arm/corstone1000/corstone1000_mem_prot.c   \
++                        plat/arm/corstone1000/plat_setup.c
++else
+ PLAT_SOURCES	:=	drivers/arm/timer/private_timer.c		\
+ 			drivers/arm/timer/system_timer.c		\
+ 			plat/arm/corstone1000/plat_helpers.S		\
+@@ -13,6 +23,7 @@ PLAT_SOURCES	:=	drivers/arm/timer/private_timer.c		\
+ 			plat/arm/corstone1000/corstone1000_topology.c	\
+ 			plat/arm/corstone1000/corstone1000_mem_prot.c	\
+ 			plat/arm/corstone1000/plat_setup.c
++endif
+ 
+ PLAT_SUPPORTS_NS_RESET	:=	1
+ 
+@@ -21,6 +32,15 @@ $(eval $(call assert_boolean,PLAT_SUPPORTS_NS_RESET))
+ $(eval $(call add_define,TFTF_DEFINES,PLAT_SUPPORTS_NS_RESET))
+ 
+ FIRMWARE_UPDATE := 0
++
++ifeq ($(CORSTONE1000_CORTEX_A320),1)
++$(eval $(call add_define,TFTF_DEFINES,CORSTONE1000_CORTEX_A320))
++endif
++
++ifeq (${CORSTONE1000_CORTEX_A320},1)
++PLAT_TESTS_SKIP_LIST    :=      plat/arm/corstone1000/tests_to_skip_cortex_a320.txt
++else
+ PLAT_TESTS_SKIP_LIST    :=      plat/arm/corstone1000/tests_to_skip.txt
++endif
+ 
+ include plat/arm/common/arm_common.mk
+diff --git a/plat/arm/corstone1000/tests_to_skip_cortex_a320.txt b/plat/arm/corstone1000/tests_to_skip_cortex_a320.txt
+new file mode 100644
+index 000000000000..87b9241daba0
+--- /dev/null
++++ b/plat/arm/corstone1000/tests_to_skip_cortex_a320.txt
+@@ -0,0 +1,21 @@
++Realm payload tests
++Realm payload boot
++Realm payload multi CPU request
++Realm payload Delegate and Undelegate
++Multi CPU Realm payload Delegate and Undelegate
++Testing delegation fails
++Realm testing with SPM tests
++PSCI System Suspend Validation
++PSCI STAT/Stats test cases after system suspend
++IRQ support in TSP/Resume preempted STD SMC after PSCI SYSTEM SUSPEND
++PSCI SYSTEM SUSPEND stress tests
++Timer framework Validation/Verify the timer interrupt generation
++CPU Hotplug/CPU hotplug
++PSCI CPU Suspend
++PSCI CPU Suspend in OSI mode
++PSCI STAT/for valid composite state CPU suspend
++FF-A Setup and Discovery/FF-A RXTX remap unmapped region success
++FF-A Memory Sharing/Normal World VM retrieve request into SPMC
++Boot requirement tests
++CPU extensions/AMUv1 suspend/resume
++CPU extensions/Use trace buffer control Registers

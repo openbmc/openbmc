@@ -1,0 +1,147 @@
+From 14fff6df016dad1d76f1eda6f77dde1890836c3c Mon Sep 17 00:00:00 2001
+From: Anton Komlev <anton.komlev@arm.com>
+Date: Thu, 11 Sep 2025 17:16:43 +0100
+Subject: [PATCH] Build: adjust CS1000 platform for GCC v14.2
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The latest GNUARM toolchain is more strict, converting some warnings
+into errors. This change:
+- adds missing function prototypes and header files
+- explicitly typecasts incompatible types in secure side
+- prevents integer–pointer conversion errors in
+  `tfm_test_suite_extra_s` CMake targets because a number of type
+  mismatch is too high.
+
+Signed-off-by: Anton Komlev <anton.komlev@arm.com>
+Change-Id: Ia803ebd5ceeab03ab7c7afc7c79c4e5836e03b26
+
+Upstream-Status: Backport [05c174df157eac428a3e87a1c40170ed7a74af57]
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+---
+ .../ext/target/arm/corstone1000/bl1/boot_hal_bl1_2.c   |  1 +
+ .../corstone1000/ci_regression_tests/CMakeLists.txt    |  2 ++
+ platform/ext/target/arm/corstone1000/io/io_block.c     |  1 +
+ platform/ext/target/arm/corstone1000/io/io_flash.c     | 10 +++++-----
+ platform/ext/target/arm/corstone1000/platform.c        |  8 ++++----
+ .../target/arm/corstone1000/rse_comms/rse_comms_hal.h  |  2 ++
+ 6 files changed, 15 insertions(+), 9 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_2.c b/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_2.c
+index 8d85d2b2c9b8..b81e14e03aa9 100644
+--- a/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_2.c
++++ b/platform/ext/target/arm/corstone1000/bl1/boot_hal_bl1_2.c
+@@ -21,6 +21,7 @@
+ #include "uart_stdout.h"
+ #include "region_defs.h"
+ #include "tfm_log.h"
++#include "cc3xx_init.h"
+ 
+ #ifdef CRYPTO_HW_ACCELERATOR
+ #include "cc3xx_dev.h"
+diff --git a/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt b/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt
+index 405b2b370237..3b023c813e02 100644
+--- a/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/ci_regression_tests/CMakeLists.txt
+@@ -44,3 +44,5 @@ target_compile_definitions(tfm_test_suite_extra_s
+         TEST_FLASH_PAGE_SIZE=${TEST_FLASH_PAGE_SIZE}
+         TEST_FLASH_PROGRAM_UNIT=${TEST_FLASH_PROGRAM_UNIT}
+ )
++
++target_compile_options(tfm_test_suite_extra_s PRIVATE -Wno-int-conversion)
+diff --git a/platform/ext/target/arm/corstone1000/io/io_block.c b/platform/ext/target/arm/corstone1000/io/io_block.c
+index f7eaf7444c38..a5c021ac5a18 100644
+--- a/platform/ext/target/arm/corstone1000/io/io_block.c
++++ b/platform/ext/target/arm/corstone1000/io/io_block.c
+@@ -20,6 +20,7 @@
+ 
+ #include <assert.h>
+ #include <errno.h>
++#include <string.h>
+ 
+ #include "io_defs.h"
+ #include "io_driver.h"
+diff --git a/platform/ext/target/arm/corstone1000/io/io_flash.c b/platform/ext/target/arm/corstone1000/io/io_flash.c
+index ff4524e9c575..b90a81a48d82 100644
+--- a/platform/ext/target/arm/corstone1000/io/io_flash.c
++++ b/platform/ext/target/arm/corstone1000/io/io_flash.c
+@@ -71,7 +71,7 @@ static size_t flash_read(int lba, uintptr_t buf, size_t size, size_t flash_id) {
+     size_t rem = info->sector_count * info->sector_size - offset;
+     size_t cnt = size < rem ? size : rem;
+ 
+-    return flash_driver->ReadData(offset, buf, cnt);
++    return flash_driver->ReadData(offset, (void *)buf, cnt);
+ }
+ 
+ static size_t flash_write(int lba, const uintptr_t buf, size_t size,
+@@ -86,7 +86,7 @@ static size_t flash_write(int lba, const uintptr_t buf, size_t size,
+     size_t cnt = size < rem ? size : rem;
+ 
+     flash_driver->EraseSector(offset);
+-    rc = flash_driver->ProgramData(offset, buf, cnt);
++    rc = flash_driver->ProgramData(offset, (const void *)buf, cnt);
+     return rc;
+ }
+ 
+@@ -143,8 +143,8 @@ static int flash_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info) {
+     /* Check if Flash ops functions are defined for this flash */
+     assert(flashs_ops[index].read && flashs_ops[index].write);
+ 
+-    flash_dev_specs[index] = dev_spec;
+-    flash_driver = flash_dev_specs[index]->flash_driver;
++    flash_dev_specs[index] = (io_flash_dev_spec_t *)dev_spec;
++    flash_driver = (const ARM_DRIVER_FLASH *)flash_dev_specs[index]->flash_driver;
+ 
+     block_dev_spec[index].block_size = flash_driver->GetInfo()->sector_size;
+     block_dev_spec[index].buffer.offset = flash_dev_specs[index]->buffer;
+@@ -153,7 +153,7 @@ static int flash_dev_open(const uintptr_t dev_spec, io_dev_info_t **dev_info) {
+ 
+     flash_driver->Initialize(NULL);
+ 
+-    block_dev_connectors[index].dev_open(&block_dev_spec[index], dev_info);
++    block_dev_connectors[index].dev_open((uintptr_t)&block_dev_spec[index], dev_info);
+ 
+     return 0;
+ }
+diff --git a/platform/ext/target/arm/corstone1000/platform.c b/platform/ext/target/arm/corstone1000/platform.c
+index c686b403ff10..d0f30b72a76d 100644
+--- a/platform/ext/target/arm/corstone1000/platform.c
++++ b/platform/ext/target/arm/corstone1000/platform.c
+@@ -29,10 +29,10 @@ extern ARM_DRIVER_FLASH FLASH_DEV_NAME;
+ static io_dev_connector_t *flash_dev_con;
+ static uint8_t local_block_flash[FLASH_SECTOR_SIZE];
+ static io_flash_dev_spec_t flash_dev_spec = {
+-    .buffer = local_block_flash,
++    .buffer = (uintptr_t)local_block_flash,
+     .bufferlen = FLASH_SECTOR_SIZE,
+     .base_addr = FLASH_BASE_ADDRESS,
+-    .flash_driver = &FLASH_DEV_NAME,
++    .flash_driver = (uintptr_t)&FLASH_DEV_NAME,
+ };
+ static io_block_spec_t flash_spec = {
+     .offset = FLASH_BASE_ADDRESS,
+@@ -41,8 +41,8 @@ static io_block_spec_t flash_spec = {
+ 
+ static platform_image_source_t platform_image_source[] = {
+     [PLATFORM_GPT_IMAGE] = {
+-        .dev_handle = NULL,
+-        .image_spec = &flash_spec,
++        .dev_handle = (uintptr_t)NULL,
++        .image_spec = (uintptr_t)&flash_spec,
+     }
+ };
+ 
+diff --git a/platform/ext/target/arm/corstone1000/rse_comms/rse_comms_hal.h b/platform/ext/target/arm/corstone1000/rse_comms/rse_comms_hal.h
+index c4676cb2ef74..29be08ddb36e 100644
+--- a/platform/ext/target/arm/corstone1000/rse_comms/rse_comms_hal.h
++++ b/platform/ext/target/arm/corstone1000/rse_comms/rse_comms_hal.h
+@@ -49,6 +49,8 @@ enum tfm_plat_err_t tfm_multi_core_hal_receive(void *mhu_receiver_dev,
+  */
+ enum tfm_plat_err_t tfm_multi_core_hal_reply(struct client_request_t *req);
+ 
++int32_t tfm_hal_client_id_translate(void *owner, int32_t client_id_in);
++
+ #ifdef __cplusplus
+ }
+ #endif

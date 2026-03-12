@@ -4,6 +4,7 @@ from oeqa.runtime.case import OERuntimeTestCase
 from oeqa.core.decorator.depends import OETestDepends
 from oeqa.runtime.decorator.package import OEHasPackage
 from oeqa.core.decorator.data import skipIfNotInDataVar
+from oeqa.core.decorator.oetimeout import OETimeout
 
 class TrustedServicesTest(OERuntimeTestCase):
 
@@ -102,3 +103,11 @@ class TrustedServicesTest(OERuntimeTestCase):
            'ts-se-proxy' not in self.tc.td['MACHINE_FEATURES']:
             self.skipTest('Crypto SP is not deployed in the system.')
         self.run_test_tool('ts-service-test -g Crypto')
+
+    @OEHasPackage(['tpm2-tools-tests'])
+    @skipIfNotInDataVar('MACHINE_FEATURES', 'ts-ftpm', 'fTPM SP is not included')
+    @skipIfNotInDataVar('RUN_TPM2_TESTS', '1', 'Automated test is disabled (RUN_TPM2_TESTS is undefined).')
+    @OETestDepends(['ssh.SSHTest.test_ssh'])
+    @OETimeout(4*60*60)
+    def test_16_tpm2_test_all(self):
+        self.run_test_tool('tpm2-test-all')

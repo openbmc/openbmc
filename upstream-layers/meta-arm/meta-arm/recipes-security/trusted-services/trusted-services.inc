@@ -28,7 +28,7 @@ SYSROOT_DIRS += "/usr/${TS_ENV} /usr/opteesp /usr/arm-linux"
 # TS cmake files use find_file() to search through source code and build dirs.
 # Yocto cmake class limits CMAKE_FIND_ROOT_PATH and find_file() fails.
 # Include the source tree and build dirs into searchable path.
-OECMAKE_EXTRA_ROOT_PATH = "${UNPACKDIR}/ ${B}"
+OECMAKE_EXTRA_ROOT_PATH = "${S}/ ${B}"
 
 EXTRA_OECMAKE += '-DLIBGCC_LOCATE_CFLAGS="--sysroot=${STAGING_DIR_HOST}" \
                   -DCROSS_COMPILE="${TARGET_PREFIX}" \

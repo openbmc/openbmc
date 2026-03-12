@@ -1,0 +1,61 @@
+From 891cef3c87081d0b719213c98cb2a50ecb601332 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Wed, 30 Oct 2024 14:10:43 +0000
+Subject: [PATCH] arm_ffa: Add NULL pointer check to the uclass driver
+ operations
+
+Add NULL pointer check for ops
+
+The device driver can miss defining an operations structure.
+So, ffa_get_ops() can return NULL.
+This commit adds checks for ops in the uclass driver operations
+and an error is returned when ops is NULL.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ drivers/firmware/arm-ffa/arm-ffa-uclass.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/firmware/arm-ffa/arm-ffa-uclass.c b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
+index 96c64964bb7..f8d231204db 100644
+--- a/drivers/firmware/arm-ffa/arm-ffa-uclass.c
++++ b/drivers/firmware/arm-ffa/arm-ffa-uclass.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+- * Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2022-2023, 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * Authors:
+  *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -954,6 +954,9 @@ int ffa_partition_info_get(struct udevice *dev, const char *uuid_str,
+ {
+ 	struct ffa_bus_ops *ops = ffa_get_ops(dev);
+ 
++	if (!ops)
++		return -EINVAL;
++
+ 	if (!ops->partition_info_get)
+ 		return -ENOSYS;
+ 
+@@ -979,6 +982,9 @@ int ffa_sync_send_receive(struct udevice *dev, u16 dst_part_id,
+ {
+ 	struct ffa_bus_ops *ops = ffa_get_ops(dev);
+ 
++	if (!ops)
++		return -EINVAL;
++
+ 	if (!ops->sync_send_receive)
+ 		return -ENOSYS;
+ 
+@@ -1000,6 +1006,9 @@ int ffa_rxtx_unmap(struct udevice *dev)
+ {
+ 	struct ffa_bus_ops *ops = ffa_get_ops(dev);
+ 
++	if (!ops)
++		return -EINVAL;
++
+ 	if (!ops->rxtx_unmap)
+ 		return -ENOSYS;
+ 

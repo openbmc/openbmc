@@ -141,7 +141,6 @@ def harvest_data(machines, recipes):
 recipes = ("boot-wrapper-aarch64",
            "edk2-firmware",
            "gator-daemon",
-           "gn",
            "hafnium",
            "opencsd",
            "optee-ftpm",

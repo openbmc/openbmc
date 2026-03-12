@@ -7,3 +7,9 @@ local_conf_header:
   testimagefvp: |
     LICENSE_FLAGS_ACCEPTED += "Arm-FVP-EULA"
     IMAGE_CLASSES += "fvpboot"
+  networking_failing_tests: |
+    # These tests currently fail as the wrong IP for the build host is used
+    TEST_SUITES:remove = "opkg dnf"
+
+target:
+  - core-image-full-cmdline

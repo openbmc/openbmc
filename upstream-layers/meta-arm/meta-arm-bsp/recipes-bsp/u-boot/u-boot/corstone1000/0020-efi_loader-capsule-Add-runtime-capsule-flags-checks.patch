@@ -1,0 +1,64 @@
+From 7e8674fc7b2d85e62efdc7aa3937fe510ee24ddb Mon Sep 17 00:00:00 2001
+From: Emekcan Aras <emekcan.aras@arm.com>
+Date: Fri, 21 Mar 2025 15:34:44 +0000
+Subject: [PATCH] efi_loader: capsule: Add runtime capsule flags checks
+
+Add missing checks according to the UEFI specification [1]
+
+checks added for these capsule flags:
+
+CAPSULE_FLAGS_PERSIST_ACROSS_RESET
+CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE
+CAPSULE_FLAGS_INITIATE_RESET
+
+[1]: Table 8.8 Flag Firmware Behavior,
+        https://uefi.org/specs/UEFI/2.10/08_Services_Runtime_Services.html
+
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ lib/efi_loader/efi_capsule.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index d293d4c402b..1500cd6a3f9 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -773,6 +773,36 @@ efi_status_t EFIAPI efi_update_capsule(
+ 			continue;
+ 		}
+ 
++		/*
++		 * ScatterGatherList must point to a list when the
++		 * CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag is set.
++		 */
++		if ((capsule->flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET) &&
++		    !scatter_gather_list) {
++			ret = EFI_INVALID_PARAMETER;
++			goto out;
++		}
++
++		/*
++		 * The CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag must be set
++		 * along with the CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE flag.
++		 */
++		if ((capsule->flags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE) &&
++		    !(capsule->flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET)) {
++			ret = EFI_INVALID_PARAMETER;
++			goto out;
++		}
++
++		/*
++		 * The CAPSULE_FLAGS_PERSIST_ACROSS_RESET flag must be set
++		 * along with the CAPSULE_FLAGS_INITIATE_RESET flag.
++		 */
++		if ((capsule->flags & CAPSULE_FLAGS_INITIATE_RESET) &&
++		    !(capsule->flags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET)) {
++			ret = EFI_INVALID_PARAMETER;
++			goto out;
++		}
++
+ 		log_debug("Capsule[%d] (guid:%pUs)\n",
+ 			  i, &capsule->capsule_guid);
+ 		ret  = efi_capsule_update_firmware(capsule);

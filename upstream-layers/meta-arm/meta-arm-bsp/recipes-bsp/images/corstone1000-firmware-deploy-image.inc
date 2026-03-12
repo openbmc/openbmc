@@ -1,7 +1,7 @@
 COMPATIBLE_MACHINE = "corstone1000"
 
 FIRMWARE_BINARIES = "corstone1000-flash-firmware-image-${MACHINE}.wic \
-                     bl1.bin \
+                     trusted-firmware-m/bl1.bin \
                      ${@bb.utils.contains('MACHINE_FEATURES', \
                                           'corstone1000-extsys', \
                                           'es_flashfw.bin', \

@@ -1,0 +1,107 @@
+From 6760e2c19467585422377dac0e8d160f0e63dc5a Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Wed, 18 Dec 2024 15:14:24 +0000
+Subject: [PATCH] efi_loader: fwu_arm_psa: Add set_image and get_image_info
+ support
+
+Implement set_image and get_image_info through RAW functions
+
+The implementation is done using efi_firmware_raw_set_image()
+and efi_firmware_get_image_info()
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Davidson kumaresan <davidson.kumaresan@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ lib/efi_loader/efi_firmware.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/lib/efi_loader/efi_firmware.c b/lib/efi_loader/efi_firmware.c
+index 216df83de67..be439b4019d 100644
+--- a/lib/efi_loader/efi_firmware.c
++++ b/lib/efi_loader/efi_firmware.c
+@@ -4,6 +4,12 @@
+  *
+  *  Copyright (c) 2020 Linaro Limited
+  *			Author: AKASHI Takahiro
++ *
++ * Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ * Authors:
++ *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++ *   Davidson kumaresan <davidson.kumaresan@arm.com>
+  */
+ 
+ #define LOG_CATEGORY LOGC_EFI
+@@ -14,6 +20,7 @@
+ #include <efi_variable.h>
+ #include <env.h>
+ #include <fwu.h>
++#include <fwu_arm_psa.h>
+ #include <image.h>
+ #include <signatures.h>
+ 
+@@ -190,6 +197,7 @@ static void efi_firmware_get_lsv_from_dtb(u8 image_index,
+ 	}
+ }
+ 
++#if !CONFIG_IS_ENABLED(FWU_ARM_PSA)
+ /**
+  * efi_firmware_fill_version_info - fill the version information
+  * @image_info:		Image information
+@@ -373,6 +381,7 @@ static efi_status_t efi_fill_image_desc_array(
+ 
+ 	return EFI_SUCCESS;
+ }
++#endif
+ 
+ /**
+  * efi_firmware_capsule_authenticate - authenticate the capsule if enabled
+@@ -603,10 +612,17 @@ efi_status_t EFIAPI efi_firmware_get_image_info(
+ 	     !descriptor_size || !package_version || !package_version_name))
+ 		return EFI_EXIT(EFI_INVALID_PARAMETER);
+ 
++#if CONFIG_IS_ENABLED(FWU_ARM_PSA)
++	ret = fwu_arm_psa_get_image_info(image_info_size, image_info,
++					descriptor_version, descriptor_count,
++					descriptor_size, package_version,
++					package_version_name);
++#else
+ 	ret = efi_fill_image_desc_array(image_info_size, image_info,
+ 					descriptor_version, descriptor_count,
+ 					descriptor_size, package_version,
+ 					package_version_name);
++#endif
+ 
+ 	return EFI_EXIT(ret);
+ }
+@@ -734,8 +750,10 @@ efi_status_t EFIAPI efi_firmware_raw_set_image(
+ 	efi_status_t (*progress)(efi_uintn_t completion),
+ 	u16 **abort_reason)
+ {
++#if !CONFIG_IS_ENABLED(FWU_ARM_PSA)
+ 	int ret;
+ 	u8 dfu_alt_num;
++#endif
+ 	efi_status_t status;
+ 	struct fmp_state state = { 0 };
+ 	char *orig_dfu_env;
+@@ -751,6 +769,10 @@ efi_status_t EFIAPI efi_firmware_raw_set_image(
+ 	if (status != EFI_SUCCESS)
+ 		return EFI_EXIT(status);
+ 
++#if CONFIG_IS_ENABLED(FWU_ARM_PSA)
++	if (fwu_update_image(image, image_index, image_size))
++		return EFI_EXIT(EFI_DEVICE_ERROR);
++#else
+ 	/*
+ 	 * dfu_alt_num is assigned from 0 while image_index starts from 1.
+ 	 * dfu_alt_num is calculated by (image_index - 1) when multi bank update
+@@ -793,6 +815,7 @@ efi_status_t EFIAPI efi_firmware_raw_set_image(
+ 
+ 	if (ret)
+ 		return EFI_EXIT(EFI_DEVICE_ERROR);
++#endif
+ 
+ 	efi_firmware_set_fmp_state_var(&state, image_index);
+ 

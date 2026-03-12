@@ -2,6 +2,7 @@ include features/input/input.scc
 include features/net/net.scc
 include cfg/timer/no_hz.scc
 include cfg/virtio.scc
+include virtio-9p.scc
 
 kconf hardware fvp/fvp-board.cfg
 kconf hardware fvp/fvp-net.cfg
@@ -10,3 +11,4 @@ kconf hardware fvp/fvp-serial.cfg
 kconf hardware fvp/fvp-cfi.cfg
 kconf hardware fvp/fvp-drm.cfg
 kconf hardware fvp/fvp-watchdog.cfg
+kconf hardware fvp/fvp-mmc.cfg

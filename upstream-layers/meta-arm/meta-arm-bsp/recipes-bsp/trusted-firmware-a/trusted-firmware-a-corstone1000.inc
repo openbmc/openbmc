@@ -5,7 +5,8 @@ COMPATIBLE_MACHINE = "(corstone1000)"
 FILESEXTRAPATHS:prepend := "${THISDIR}/files/corstone1000:"
 SRC_URI:append = " \
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
-       "
+	file://0002-plat-corstone1000-add-Cortex-A320-support.patch \
+"
 
 TFA_DEBUG = "1"
 TFA_UBOOT ?= "1"
@@ -20,6 +21,13 @@ TFA_SPMD_SPM_AT_SEL2 = "0"
 
 # BL2 loads BL32 (optee). So, optee needs to be built first:
 DEPENDS += "optee-os"
+
+ENABLE_CORTEX_A35_ERRATA = " \
+    ERRATA_A35_855472=1 \
+"
+ENABLE_CORTEX_A35_ERRATA:cortexta320 = ""
+FVP_GIC_DRIVER ?= "FVP_GICV2"
+FVP_GIC_DRIVER:cortexa320 = "FVP_GICV3"
 
 # Note: Regarding the build option: LOG_LEVEL.
 # There seems to be an issue when setting it
@@ -45,15 +53,31 @@ EXTRA_OEMAKE:append = " \
                         NR_OF_IMAGES_IN_FW_BANK=4 \
                         COT=tbbr \
                         ARM_ROTPK_LOCATION=devel_rsa  \
-                        ERRATA_A35_855472=1 \
+                        ${ENABLE_CORTEX_A35_ERRATA} \
                         ROT_KEY=plat/arm/board/common/rotpk/arm_rotprivk_rsa.pem \
                         BL32=${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/tee-pager_v2.bin \
-                        FVP_USE_GIC_DRIVER=FVP_GICV2 \
+                        FVP_USE_GIC_DRIVER=${FVP_GIC_DRIVER} \
                         "
 EXTRA_OEMAKE:append:corstone1000-fvp = "${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_fvp_smp', ' ENABLE_MULTICORE=1', '', d)}"
+
+# Add Cortex-A320 specific configurations
+EXTRA_OEMAKE:append:cortexa320 = " \
+    CORSTONE1000_CORTEX_A320=1 \
+    HW_ASSISTED_COHERENCY=1 \
+    USE_COHERENT_MEM=0 \
+    CTX_INCLUDE_AARCH32_REGS=0 \
+    ENABLE_FEAT_HCX=1 \
+    ENABLE_FEAT_FGT=1 \
+    ENABLE_FEAT_ECV=1 \
+    ENABLE_FEAT_MTE2=1 \
+    ENABLE_FEAT_AMU=1 \
+    ENABLE_FEAT_CSV2_2=1 \
+    ENABLE_SVE_FOR_NS=1 \
+    ENABLE_SVE_FOR_SWD=1 \
+"
 
 # If GENERATE_COT is set, then TF-A will try to use local poetry install
 # to run the python cot-dt2c command.  Disable the local poetry and use
 # the provided cot-dt2c.
-EXTRA_OEMAKE += "POETRY=''"
+EXTRA_OEMAKE += "host-poetry=''"
 DEPENDS += "cot-dt2c-native"

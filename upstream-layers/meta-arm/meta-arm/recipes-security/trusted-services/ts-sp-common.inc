@@ -31,10 +31,6 @@ INSANE_SKIP:${PN}-dev += "ldflags"
 
 # Trusted Services SPs do not compile with clang
 TOOLCHAIN = "gcc"
-# FIXME - there is an issue with mbedtls unions and gcc15.  It has been
-# fixed in commit 4c26d7d54cf5f5dc1e63e0dd0b902fda05e7063f but that has
-# not been released yet.  Work around this issue here until that is out
-TARGET_CFLAGS += "-fzero-init-padding-bits=unions"
 
 # FORTIFY_SOURCE is a glibc feature. Disable it for all SPs as these do not use glibc.
 TARGET_CFLAGS:remove = "-D_FORTIFY_SOURCE=2"

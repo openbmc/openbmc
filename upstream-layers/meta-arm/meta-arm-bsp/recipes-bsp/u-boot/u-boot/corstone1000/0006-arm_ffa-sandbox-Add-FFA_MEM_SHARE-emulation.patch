@@ -1,0 +1,126 @@
+From b7f2e23ff923af9a37122b385c0453ea0720dbc0 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Wed, 16 Oct 2024 18:41:16 +0100
+Subject: [PATCH] arm_ffa: sandbox: Add FFA_MEM_SHARE emulation
+
+Add FFA_MEM_SHARE support to the FF-A emulator
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ .../include/asm/sandbox_arm_ffa_priv.h        |  6 ++-
+ drivers/firmware/arm-ffa/ffa-emul-uclass.c    | 43 +++++++++++++++++++
+ drivers/firmware/arm-ffa/sandbox_ffa.c        |  3 +-
+ 3 files changed, 50 insertions(+), 2 deletions(-)
+
+diff --git a/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h b/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h
+index 5c46547beab..fa09f9598ee 100644
+--- a/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h
++++ b/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0+ */
+ /*
+- * Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2022-2023, 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * Authors:
+  *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -38,6 +38,7 @@
+ /*  RX/TX buffers minimum size */
+ #define RXTX_BUFFERS_MIN_SIZE (RXTX_4K)
+ #define RXTX_BUFFERS_MIN_PAGES (1)
++#define RXTX_BUFFERS_MIN_PAGES_SIZE (RXTX_BUFFERS_MIN_PAGES * SZ_4K)
+ 
+ /* A helper macro used for clearing registers that Must Be Zero (MBZ) */
+ #define FFA_X_REG_SIZE_IN_BYTE sizeof((((ffa_value_t *)0)->a0))
+@@ -59,6 +60,9 @@
+ #define SANDBOX_SERVICE2_UUID_A3	0x9cc02d72
+ #define SANDBOX_SERVICE2_UUID_A4	0xcdd998a7
+ 
++/* Globally unique Handle to identify the shared memory region */
++#define SANDBOX_MEM_HANDLE		0xffffffff
++
+ /**
+  * struct ffa_rxtxpair_info - structure hosting the RX/TX buffers flags
+  * @rxbuf_owned:	RX buffer ownership flag (the owner is non secure world)
+diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+index dcf5bce9435..4918404fb6d 100644
+--- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
++++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+@@ -563,6 +563,46 @@ static int sandbox_ffa_get_parts(struct udevice *emul, struct ffa_sandbox_data *
+ 	return 0;
+ }
+ 
++/**
++ * sandbox_ffa_memory_share() - Emulated FFA_MEM_SHARE handler
++ * @emul: The sandbox FF-A emulator device
++ * @pargs: The SMC call input arguments a0-a7
++ * @res:  The SMC return data
++ *
++ * Emulate FFA_MEM_SHARE FF-A function.
++ *
++ * Return:
++ *
++ * 0 on success. Otherwise, failure
++ */
++static int sandbox_ffa_memory_share(struct udevice *emul, ffa_value_t *pargs,
++				    ffa_value_t *res)
++{
++	int ret;
++
++	res->a1 = 0;
++
++	if (!pargs->a1 || pargs->a1 > RXTX_BUFFERS_MIN_PAGES_SIZE) {
++		/* FFA_ERROR encoding */
++		res->a0 = FFA_SMC_32(FFA_ERROR);
++		res->a2 = -INVALID_PARAMETERS;
++		ret = ffa_to_std_errmap[INVALID_PARAMETERS];
++		/* x3-x7 MBZ */
++		memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
++
++		return ret;
++	}
++
++	/* FFA_SUCCESS encoding */
++	res->a0 = FFA_SMC_32(FFA_SUCCESS);
++	res->a2 = SANDBOX_MEM_HANDLE;
++	res->a3 = SANDBOX_MEM_HANDLE;
++	/* x4-x7 MBZ */
++	memset(&res->a4, 0, 4 * FFA_X_REG_SIZE_IN_BYTE);
++
++	return 0;
++}
++
+ /**
+  * sandbox_query_ffa_emul_state() - Inspect the FF-A ABIs
+  * @queried_func_id:	The FF-A function to be queried
+@@ -653,6 +693,9 @@ void sandbox_arm_ffa_smccc_smc(ffa_value_t *args, ffa_value_t *res)
+ 	case FFA_SMC_32(FFA_RX_RELEASE):
+ 		ret = sandbox_ffa_rx_release(emul, args, res);
+ 		break;
++	case FFA_SMC_32(FFA_MEM_SHARE):
++		ret = sandbox_ffa_memory_share(emul, args, res);
++		break;
+ 	default:
+ 		log_err("Undefined FF-A interface (%lx)\n",
+ 			args->a0);
+diff --git a/drivers/firmware/arm-ffa/sandbox_ffa.c b/drivers/firmware/arm-ffa/sandbox_ffa.c
+index 44b32a829dd..8d85e660e2b 100644
+--- a/drivers/firmware/arm-ffa/sandbox_ffa.c
++++ b/drivers/firmware/arm-ffa/sandbox_ffa.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+- * Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2022-2023, 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * Authors:
+  *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -91,6 +91,7 @@ static const struct ffa_bus_ops sandbox_ffa_ops = {
+ 	.partition_info_get = ffa_get_partitions_info_hdlr,
+ 	.sync_send_receive = ffa_msg_send_direct_req_hdlr,
+ 	.rxtx_unmap = ffa_unmap_rxtx_buffers_hdlr,
++	.memory_share = ffa_memory_share_hdlr,
+ };
+ 
+ static const struct udevice_id sandbox_ffa_id[] = {

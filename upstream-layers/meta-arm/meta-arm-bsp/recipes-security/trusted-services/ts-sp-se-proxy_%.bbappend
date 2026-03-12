@@ -1,8 +1,6 @@
 require ts-arm-platforms.inc
 
-EXTRA_OECMAKE:append:corstone1000 = " -DMM_COMM_BUFFER_ADDRESS="0x00000000 0x81FFF000" \
-    -DMM_COMM_BUFFER_PAGE_COUNT="1" \
-    -DSP_HEAP_SIZE=70*1024 \
+EXTRA_OECMAKE:append:corstone1000 = " -DSP_HEAP_SIZE=70*1024 \
     "
 
 # Proxy is pointless on fvp-base as there is no dedicated security subsystem. It could be

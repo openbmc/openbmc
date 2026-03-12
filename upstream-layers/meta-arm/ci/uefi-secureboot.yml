@@ -39,7 +39,6 @@ local_conf_header:
     IMAGE_CLASSES += "sbsign"
     UKI_SB_KEY = "${SBSIGN_KEY}"
     UKI_SB_CERT = "${SBSIGN_CERT}"
-    QB_KERNEL_ROOT = ""
     IMAGE_BOOT_FILES:remove = "Image"
 
     INITRAMFS_IMAGE = "core-image-initramfs-boot"

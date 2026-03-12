@@ -1,4 +1,4 @@
-From 3d266a5d77c908566b1a541f3ff8b717f17a9a8a Mon Sep 17 00:00:00 2001
+From ddf8928e53830ddce9dc5383143dcab75b4a4cfb Mon Sep 17 00:00:00 2001
 From: Jon Mason <jdmason@kudzu.us>
 Date: Mon, 19 Dec 2022 11:36:04 -0500
 Subject: [PATCH] configs: vexpress: modify to boot compressed initramfs
@@ -10,10 +10,10 @@ Upstream-Status: Inappropriate
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/include/configs/vexpress_aemv8.h b/include/configs/vexpress_aemv8.h
-index 24d8ca086653..0935461340b7 100644
+index 5eee13b3fc01..82dff260c30c 100644
 --- a/include/configs/vexpress_aemv8.h
 +++ b/include/configs/vexpress_aemv8.h
-@@ -198,8 +198,10 @@
+@@ -213,8 +213,10 @@
  #define VEXPRESS_RAMDISK_ADDR		0x8fe00000
  
  #define EXTRA_ENV_NAMES							\

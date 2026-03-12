@@ -1,0 +1,98 @@
+From 828a16417e27271bc0f5f148fdd53f16c0ded311 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 17 Oct 2024 15:14:10 +0100
+Subject: [PATCH] arm_ffa: sandbox: Add FFA_MEM_SHARE tests
+
+Add positive and negative test cases
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ test/dm/ffa.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
+
+diff --git a/test/dm/ffa.c b/test/dm/ffa.c
+index 593b7177fce..59eea9a57cc 100644
+--- a/test/dm/ffa.c
++++ b/test/dm/ffa.c
+@@ -2,7 +2,7 @@
+ /*
+  * Functional tests for UCLASS_FFA  class
+  *
+- * Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2022-2023, 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * Authors:
+  *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -13,6 +13,7 @@
+ #include <asm/sandbox_arm_ffa.h>
+ #include <asm/sandbox_arm_ffa_priv.h>
+ #include <dm/test.h>
++#include <linux/sizes.h>
+ #include <test/test.h>
+ #include <test/ut.h>
+ 
+@@ -141,6 +142,43 @@ static int test_partitions_and_comms(const char *service_uuid,
+ 	return 0;
+ }
+ 
++static int  test_ffa_memory_share(bool test_ack, struct unit_test_state *uts)
++{
++	struct ffa_mem_ops_args args = {0};
++	struct ffa_mem_region_attributes attrs = {0};
++	static u8 buf[SZ_4K];
++	int ret;
++	struct udevice *dev;
++
++	ut_assertok(uclass_first_device_err(UCLASS_FFA, &dev));
++
++	args.attrs = &attrs;
++	args.nattrs = 1;
++	args.address = buf;
++	args.pg_cnt = 1;
++
++	if (test_ack) {
++		args.use_txbuf = true;
++
++		ut_assertok(ffa_memory_share(dev, &args));
++		ut_asserteq(HANDLE_LOW(args.g_handle), SANDBOX_MEM_HANDLE);
++		ut_asserteq(HANDLE_HIGH(args.g_handle), SANDBOX_MEM_HANDLE);
++	} else {
++		/* Do not use the TX buffer as a transaction buffer */
++		args.use_txbuf = false;
++		ret = ffa_memory_share(dev, &args);
++		ut_asserteq(-EPROTONOSUPPORT, ret);
++
++		/* No memory region address given */
++		args.use_txbuf = true;
++		args.address = NULL;
++		ret = ffa_memory_share(dev, &args);
++		ut_asserteq(-EINVAL, ret);
++	}
++
++	return 0;
++}
++
+ static int dm_test_ffa_ack(struct unit_test_state *uts)
+ {
+ 	struct ffa_priv *uc_priv;
+@@ -195,6 +233,9 @@ static int dm_test_ffa_ack(struct unit_test_state *uts)
+ 	ut_assertok(sandbox_query_ffa_emul_state(FFA_RX_RELEASE, &func_data));
+ 	check_rxbuf_release_flag(rxbuf_flag, uts);
+ 
++	/* Test FFA_MEM_SHARE */
++	test_ffa_memory_share(true, uts);
++
+ 	return 0;
+ }
+ DM_TEST(dm_test_ffa_ack, UTF_SCAN_FDT | UTF_CONSOLE);
+@@ -253,6 +294,9 @@ static int dm_test_ffa_nack(struct unit_test_state *uts)
+ 	part_id = uc_priv->partitions.descs[0].info.id;
+ 	ut_assertok(ffa_sync_send_receive(dev, part_id, &msg, 1));
+ 
++	/* Test FFA_MEM_SHARE */
++	test_ffa_memory_share(false, uts);
++
+ 	return 0;
+ }
+ DM_TEST(dm_test_ffa_nack, UTF_SCAN_FDT | UTF_CONSOLE);

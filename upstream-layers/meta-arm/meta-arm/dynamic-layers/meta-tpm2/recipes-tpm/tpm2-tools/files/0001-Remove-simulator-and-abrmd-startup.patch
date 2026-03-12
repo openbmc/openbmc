@@ -1,0 +1,55 @@
+From b5269bd5380a8a7b202a27a558d98468e14ac642 Mon Sep 17 00:00:00 2001
+From: Imre Kis <imre.kis@arm.com>
+Date: Wed, 25 Sep 2024 15:44:08 +0200
+Subject: [PATCH] Remove simulator and abrmd startup
+
+Upstream-Status: Inappropriate
+Signed-off-by: Imre Kis <imre.kis@arm.com>
+---
+ test/integration/helpers.sh | 31 -------------------------------
+ 1 file changed, 31 deletions(-)
+
+diff --git a/test/integration/helpers.sh b/test/integration/helpers.sh
+index 4c861567..bb339078 100644
+--- a/test/integration/helpers.sh
++++ b/test/integration/helpers.sh
+@@ -396,37 +396,6 @@ function start_up() {
+
+     run_startup=true
+
+-    if [ -n "$TPM2_SIM" ]; then
+-        # Start the simulator
+-        echo "Starting the simulator"
+-        start_sim || exit 1
+-        echo "Started the simulator"
+-    else
+-        echo "not starting simulator"
+-    fi
+-
+-    if [ -n "$TPM2_ABRMD" ]; then
+-        echo "Starting tpm2-abrmd"
+-        # Start tpm2-abrmd
+-        start_abrmd || exit 1
+-        run_startup=false
+-    else
+-        echo "not starting abrmd"
+-    fi
+-
+-    echo "TPM2TOOLS_TEST_TCTI=$TPM2TOOLS_TEST_TCTI"
+-    if [ -z "$TPM2TOOLS_TEST_TCTI" ]; then
+-        echo "TPM2TOOLS_TEST_TCTI not set, attempting to figure out default"
+-        if [ -z "$tpm2tools_tcti" ]; then
+-            echo "The simulator not abrmd was started, cannot determine a TCTI for tools."
+-            exit 1;
+-        fi
+-        TPM2TOOLS_TEST_TCTI="$tpm2tools_tcti"
+-    fi
+-
+-    echo "export TPM2TOOLS_TCTI=\"$TPM2TOOLS_TEST_TCTI\""
+-    export TPM2TOOLS_TCTI="$TPM2TOOLS_TEST_TCTI"
+-
+     recreate_info
+
+     echo "run_startup: $run_startup"
+--
+2.34.1

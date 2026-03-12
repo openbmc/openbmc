@@ -9,6 +9,8 @@ local_conf_header:
   testimage: |
     IMAGE_CLASSES += "testimage"
     TESTIMAGE_AUTO = "1"
+    # Don't testimage initramfs
+    TESTIMAGE_AUTO:pn-core-image-initramfs-boot = "0"
   kvm: |
     QEMU_USE_KVM = ""
   slirp: |
@@ -17,5 +19,3 @@ local_conf_header:
     IMAGE_FEATURES += "ssh-server-dropbear"
   sshkeys: |
     CORE_IMAGE_EXTRA_INSTALL += "ssh-pregen-hostkeys"
-  universally_failing_tests: |
-    TEST_SUITES:remove = "opkg"

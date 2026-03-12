@@ -8,8 +8,8 @@ FW_INSTALL:append = " romfw_bypass"
 do_install:append() {
     for TYPE in ${FW_INSTALL}; do
         if [ "$TYPE" = "romfw_bypass" ]; then
-            install -D "${B}/${TYPE}/${FW_TARGETS}/bin/${SCP_PLATFORM}-bl1-bypass.bin" "${D}/firmware/${FW}_${TYPE}.bin"
-            install -D "${B}/${TYPE}/${FW_TARGETS}/bin/${SCP_PLATFORM}-bl1-bypass.elf" "${D}/firmware/${FW}_${TYPE}.elf"
+            install -D "${B}/${TYPE}/${FW_TARGETS}/bin/${SCP_PLATFORM}-bl1-bypass.bin" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.bin"
+            install -D "${B}/${TYPE}/${FW_TARGETS}/bin/${SCP_PLATFORM}-bl1-bypass.elf" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.elf"
         fi
     done
 }

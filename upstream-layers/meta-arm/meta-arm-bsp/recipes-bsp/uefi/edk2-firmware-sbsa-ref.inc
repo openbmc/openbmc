@@ -14,8 +14,8 @@ EDK2_BIN_NAME:sbsa-ref      = "SBSA_FLASH0.fd"
 
 do_compile:prepend:sbsa-ref() {
     mkdir -p ${B}/Platform/Qemu/Sbsa/
-    cp ${RECIPE_SYSROOT}/firmware/bl1.bin ${B}/Platform/Qemu/Sbsa/
-    cp ${RECIPE_SYSROOT}/firmware/fip.bin ${B}/Platform/Qemu/Sbsa/
+    cp ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/bl1.bin ${B}/Platform/Qemu/Sbsa/
+    cp ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/fip.bin ${B}/Platform/Qemu/Sbsa/
 }
 
 do_install:append:sbsa-ref() {

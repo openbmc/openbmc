@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+header:
+  version: 14
+
+local_conf_header:
+  latest_revisions: |
+    PREFERRED_VERSION_trusted-firmware-a ?= "git"
+    PREFERRED_VERSION_trusted-firmware-m ?= "git"
+    PREFERRED_VERSION_optee-client ?= "git"
+    PREFERRED_VERSION_optee-examples ?= "git"
+    PREFERRED_VERSION_optee-os-tadevkit ?= "git"
+    PREFERRED_VERSION_optee-os ?= "git"
+    PREFERRED_VERSION_optee-test ?= "git"
+    PREFERRED_PROVIDER_u-boot = "u-boot:class-devupstream"

@@ -5,7 +5,7 @@
 
 SUMMARY = "Trusted Firmware for Cortex-M"
 DESCRIPTION = "Trusted Firmware-M"
-HOMEPAGE = "https://git.trustedfirmware.org/trusted-firmware-m.git"
+HOMEPAGE = "https://trustedfirmware-m.readthedocs.io/"
 PROVIDES = "virtual/trusted-firmware-m"
 
 UPSTREAM_CHECK_GITTAGREGEX = "^TF-Mv(?P<pver>\d+(\.\d+)+)$"
@@ -15,7 +15,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "^TF-Mv(?P<pver>\d+(\.\d+)+)$"
 # cmake here. You can easily short-circuit the toolchain but the install
 # is so convoluted there's no gain.
 
-inherit python3native deploy
+inherit python3native firmware
 
 # Baremetal and we bring a compiler below
 INHIBIT_DEFAULT_DEPS = "1"
@@ -44,10 +44,10 @@ DEPENDS += "cmake-native \
 B = "${WORKDIR}/build"
 
 # Build for debug (set TFM_DEBUG to 1 to activate)
-TFM_DEBUG ?= "0"
+TFM_DEBUG ?= "${FIRMWARE_DEBUG_BUILD}"
 
-# Platform must be set, ideally in the machine configuration.
-TFM_PLATFORM ?= ""
+# Platform can be overridden in the machine configuration.
+TFM_PLATFORM ?= "${FIRMWARE_PLATFORM}"
 python() {
     if not d.getVar("TFM_PLATFORM"):
         raise bb.parse.SkipRecipe("TFM_PLATFORM needs to be set")
@@ -70,19 +70,21 @@ EXTRA_OECMAKE += "-DTFM_PLATFORM=${TFM_PLATFORM}"
 # Handle TFM_DEBUG parameter
 EXTRA_OECMAKE += "${@bb.utils.contains('TFM_DEBUG', '1', '-DCMAKE_BUILD_TYPE=Debug', '-DCMAKE_BUILD_TYPE=Release', d)}"
 
-# Verbose builds
-EXTRA_OECMAKE += "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON"
-
-EXTRA_OECMAKE += "-DMBEDCRYPTO_PATH=${S}/../mbedtls -DTFM_TEST_REPO_PATH=${S}/../tf-m-tests -DTFM_EXTRAS_REPO_PATH=${S}/../tfm-extras -DMCUBOOT_PATH=${S}/../mcuboot -DQCBOR_PATH=${S}/../qcbor -DCMSIS_PATH=${S}/../cmsis"
+EXTRA_OECMAKE += "\
+    -DCMSIS_PATH=${S}/external/cmsis \
+    -DMBEDCRYPTO_PATH=${S}/external/mbedtls \
+    -DMCUBOOT_PATH=${S}/external/mcuboot \
+    -DQCBOR_PATH=${S}/external/qcbor \
+    -DT_COSE_PATH=${S}/external/t_cose \
+    -DTFM_EXTRAS_REPO_PATH=${S}/external/tfm-extras \
+    -DTFM_TEST_REPO_PATH=${S}/external/tf-m-tests \
+    "
 
 export CMAKE_BUILD_PARALLEL_LEVEL = "${@oe.utils.parallel_make(d, False)}"
 
 AS[unexport] = "1"
 CC[unexport] = "1"
 LD[unexport] = "1"
-
-# remove once arm-none-eabi-gcc updates to 13 or newer like poky
-DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
 
 # python3-cryptography needs the legacy provider, so set OPENSSL_MODULES to the
 # right path until this is relocated automatically.
@@ -104,17 +106,10 @@ do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 
 do_install() {
     # TODO install headers and static libraries when we know how they're used
-    install -d -m 755 ${D}/firmware
-    install -m 0644 ${B}/bin/* ${D}/firmware/
-}
-
-FILES:${PN} = "/firmware"
-SYSROOT_DIRS += "/firmware"
-FILES:${PN}-dbg = "/firmware/*.elf"
-
-addtask deploy after do_install
-do_deploy() {
-    cp -rf ${D}/firmware/* ${DEPLOYDIR}/
+    install -d -m 755 ${D}${FIRMWARE_DIR}
+    find ${B}/bin \( -name '*.bin' -o -name '*.elf' \) -type f | while read -r file; do
+        install -m 0644 "$file" "${D}${FIRMWARE_DIR}"
+    done
 }
 
 # Build paths are currently embedded because it's impossible to pass -fdebug-prefix-map

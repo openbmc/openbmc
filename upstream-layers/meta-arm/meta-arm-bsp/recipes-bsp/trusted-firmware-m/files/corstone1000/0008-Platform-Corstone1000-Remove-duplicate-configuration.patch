@@ -1,0 +1,31 @@
+From 291b717c9ff6124dd132602e84f75f320adbfda1 Mon Sep 17 00:00:00 2001
+From: Yogesh Wani <yogesh.wani@arm.com>
+Date: Wed, 30 Apr 2025 14:39:37 +0100
+Subject: [PATCH] Platform: Corstone1000: Remove duplicate configuration
+ parameters for Corstone-1000
+
+The PS_NUM_ASSET is duplicated in the cmake.config and the
+config_tfm_target.h file under Corstone-1000. The commit removes
+the one from the cmake.config and keeps the one in the header file.
+
+The whole rationale behind this is for the vendor to be able
+to override the configuration using the cmake file.
+
+Upstream-Status: Backport [948cb8e7601dcf1fe822d855c77749287fe6d9bd]
+Signed-off-by: Yogesh Wani <yogesh.wani@arm.com>
+---
+ platform/ext/target/arm/corstone1000/config.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/config.cmake b/platform/ext/target/arm/corstone1000/config.cmake
+index a923f63ca697..032265cdf4ac 100644
+--- a/platform/ext/target/arm/corstone1000/config.cmake
++++ b/platform/ext/target/arm/corstone1000/config.cmake
+@@ -74,7 +74,6 @@ endif()
+ # Platform-specific configurations
+ set(CONFIG_TFM_USE_TRUSTZONE            OFF)
+ set(TFM_MULTI_CORE_TOPOLOGY             ON)
+-set(PS_NUM_ASSETS                       "40"        CACHE STRING    "The maximum number of assets to be stored in the Protected Storage area")
+ 
+ set(MCUBOOT_USE_PSA_CRYPTO            ON               CACHE BOOL      "Enable the cryptographic abstraction layer to use PSA Crypto APIs")
+ set(MCUBOOT_SIGNATURE_TYPE            "EC-P256"        CACHE STRING    "Algorithm to use for signature validation [RSA-2048, RSA-3072, EC-P256, EC-P384]")

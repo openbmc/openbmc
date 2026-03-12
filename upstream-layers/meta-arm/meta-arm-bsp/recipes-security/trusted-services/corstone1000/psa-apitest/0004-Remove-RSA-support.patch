@@ -1,0 +1,52 @@
+From 56a71c2f32f73e0d4fec9f0881c390b7c2809a9e Mon Sep 17 00:00:00 2001
+From: emeara01 <emekcan.aras@arm.com>
+Date: Wed, 25 Sep 2024 15:06:19 +0100
+Subject: [PATCH] Remove RSA support
+
+TF-M 2.2 uses a new crypto driver that does not support RSA algorithms
+and Corstone1000 incorporates this version of TF-M.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+---
+ .../tgt_dev_apis_linux/nspe/pal_crypto_config.h  | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h b/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
+index d6d552a..bfdeedc 100755
+--- a/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
++++ b/api-tests/platform/targets/tgt_dev_apis_linux/nspe/pal_crypto_config.h
+@@ -36,10 +36,10 @@
+  */
+ #ifndef TF_M_PROFILE_SMALL
+ #ifndef TF_M_PROFILE_MEDIUM
+-#define ARCH_TEST_RSA
+-#define ARCH_TEST_RSA_1024
+-#define ARCH_TEST_RSA_2048
+-#define ARCH_TEST_RSA_3072
++//#define ARCH_TEST_RSA
++//#define ARCH_TEST_RSA_1024
++//#define ARCH_TEST_RSA_2048
++//#define ARCH_TEST_RSA_3072
+ #endif
+ #endif
+ 
+@@ -206,10 +206,10 @@
+ #ifndef TF_M_PROFILE_SMALL
+ #ifndef TF_M_PROFILE_MEDIUM
+ #define ARCH_TEST_PKCS1V15
+-#define ARCH_TEST_RSA_PKCS1V15_SIGN
+-#define ARCH_TEST_RSA_PKCS1V15_SIGN_RAW
+-#define ARCH_TEST_RSA_PKCS1V15_CRYPT
+-#define ARCH_TEST_RSA_OAEP
++//#define ARCH_TEST_RSA_PKCS1V15_SIGN
++//#define ARCH_TEST_RSA_PKCS1V15_SIGN_RAW
++//#define ARCH_TEST_RSA_PKCS1V15_CRYPT
++//#define ARCH_TEST_RSA_OAEP
+ #endif
+ #endif
+ 
+-- 
+2.25.1
+

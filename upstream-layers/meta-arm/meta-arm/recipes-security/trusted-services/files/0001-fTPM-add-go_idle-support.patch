@@ -1,0 +1,84 @@
+From 08fa0610c8796675ea8c8e5aabc6313b1c237f9c Mon Sep 17 00:00:00 2001
+From: Gyorgy Szing <gyorgy.szing@arm.com>
+Date: Mon, 2 Feb 2026 11:18:22 +0100
+Subject: [PATCH 1/1] fTPM: add go_idle support
+
+The Linux tpm_crb driver was changed to assume an fTPM instance accessed
+trough FF-A CRB to support idle bit handing in the TPM_CRB_CTRL_REQ
+register. Withouth this the kernel fails to start the device with a
+timeout error. Add a minimal implementation to restore compatibility.
+
+Upstream-Status: Pending
+
+Signed-off-by: Gyorgy Szing <gyorgy.szing@arm.com>
+---
+ .../service/tpm/provider/tpm_crb_provider.c   | 29 +++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
+
+diff --git a/components/service/tpm/provider/tpm_crb_provider.c b/components/service/tpm/provider/tpm_crb_provider.c
+index a0c8c4bf5..4a932624f 100644
+--- a/components/service/tpm/provider/tpm_crb_provider.c
++++ b/components/service/tpm/provider/tpm_crb_provider.c
+@@ -142,6 +142,27 @@ static inline uint32_t tpm_get_request_length(uint8_t *buf)
+ 	return (uint32_t)((buf[2] << 24) + (buf[3] << 16) + (buf[4] << 8 ) + buf[5]);
+ }
+ 
++#define WRITE_ALIAS_REG(this_instance, reg_name, value) \
++	do { \
++		unsigned int loc; \
++		for (loc=0; loc < sizeof(this_instance->loc_ptr)/sizeof(this_instance->loc_ptr[0]); loc++) { \
++			this_instance->loc_ptr[loc]->reg_name = (value); \
++		} \
++	} while(0)
++
++static inline void go_busy(struct tpm_crb_provider *this_instance) {
++	WRITE_ALIAS_REG(this_instance, ctrl_status, 0);
++}
++
++static inline void go_idle(struct tpm_crb_provider *this_instance, unsigned int locality) {
++	/* All operations done:
++		- clear the pending request
++		- set idle bit */
++	this_instance->loc_ptr[locality]->ctrl_request = 0;
++	this_instance->loc_ptr[locality]->ctrl_start = 0;
++	WRITE_ALIAS_REG(this_instance, ctrl_status, CRB_CTRL_STS_TPM_IDLE);
++}
++
+ static rpc_status_t command_handler(void *context, struct rpc_request *req)
+ {
+ 	struct tpm_crb_provider *this_instance = (struct tpm_crb_provider *)context;
+@@ -161,25 +182,29 @@ static rpc_status_t command_handler(void *context, struct rpc_request *req)
+ 
+ 	if (!(req_loc->ctrl_start & CRB_CTRL_START_COMMAND)) {
+ 		req->service_status = TPM_ERROR_INV_CRB_CTRL_DATA;
++		go_idle(this_instance, locality);
+ 		return RPC_ERROR_INTERNAL;
+ 	}
+ 
+ 	req_len = tpm_get_request_length(req_loc->data_buffer);
+ 	if (req_len == 0 || crb_size < req_len) {
+ 		req->service_status = TPM_ERROR_INV_CRB_CTRL_DATA;
++		go_idle(this_instance, locality);
+ 		return RPC_ERROR_INTERNAL;
+ 	}
+ 
++	go_busy(this_instance);
++
+ 	req_data = req_loc->data_buffer;
+ 	resp_data = req_loc->data_buffer;
+ 	resp_max_size = crb_size;
+ 
+ 	ms_tpm_backend_execute_command(req_data, req_len, &resp_data, &resp_len, resp_max_size);
+ 
+-	/* All operations done, clear the pending request */
+-	req_loc->ctrl_start &= ~CRB_CTRL_START_COMMAND;
+ 	req->service_status = TPM_STATUS_OK;
+ 
++	go_idle(this_instance, locality);
++
+ 	return RPC_SUCCESS;
+ }
+ 
+-- 
+2.43.0
+

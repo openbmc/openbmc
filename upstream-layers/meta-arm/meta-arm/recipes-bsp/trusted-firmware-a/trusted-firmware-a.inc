@@ -1,11 +1,10 @@
 DESCRIPTION = "Trusted Firmware-A"
+HOMEPAGE = "https://trustedfirmware-a.readthedocs.io/"
 LICENSE = "BSD-2-Clause & BSD-3-Clause & MIT & Apache-2.0"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
+inherit firmware
 
-inherit deploy
-
-SRC_URI_TRUSTED_FIRMWARE_A ?= "git://review.trustedfirmware.org/TF-A/trusted-firmware-a;protocol=https"
+SRC_URI_TRUSTED_FIRMWARE_A ?= "gitsm://review.trustedfirmware.org/TF-A/trusted-firmware-a;protocol=https"
 SRCBRANCH = "master"
 SRC_URI = "${SRC_URI_TRUSTED_FIRMWARE_A};name=tfa;branch=${SRCBRANCH}"
 
@@ -16,7 +15,7 @@ SRCREV_FORMAT = "tfa"
 COMPATIBLE_MACHINE ?= "invalid"
 
 # Platform must be set for each machine
-TFA_PLATFORM ?= "invalid"
+TFA_PLATFORM ?= "${FIRMWARE_PLATFORM}"
 
 # Some platforms can have multiple board configurations
 # Leave empty for default behavior
@@ -37,7 +36,7 @@ TFA_SP_LAYOUT_FILE ?= ""
 TFA_ARM_SPMC_MANIFEST_DTS ?= ""
 
 # Build for debug (set TFA_DEBUG to 1 to activate)
-TFA_DEBUG ?= "0"
+TFA_DEBUG ?= "${FIRMWARE_DEBUG_BUILD}"
 
 B = "${WORKDIR}/build"
 
@@ -74,6 +73,11 @@ TFA_BUILD_TARGET ?= "bl1"
 # do_install and do_deploy will install everything listed in this
 # variable. It is set by default to TFA_BUILD_TARGET
 TFA_INSTALL_TARGET ?= "${TFA_BUILD_TARGET}"
+
+# How to name installed files
+# If we need to uniquely name the files that are produced, we can add
+# TFA_INSTALL_SUFFIX to all targets.  By default, set to "" for no suffix.
+TFA_INSTALL_SUFFIX ?= ""
 
 # Requires CROSS_COMPILE set by hand as there is no configure script
 export CROSS_COMPILE = "${TARGET_PREFIX}"
@@ -155,7 +159,7 @@ EXTRA_OEMAKE += "${@bb.utils.contains('SEL2_SPMC', '1', 'ARM_SPMC_MANIFEST_DTS=$
 # Tell the tools where the native OpenSSL is located
 EXTRA_OEMAKE += "OPENSSL_DIR=${STAGING_DIR_NATIVE}/${prefix_native}"
 # Use the correct native compiler
-EXTRA_OEMAKE += "HOSTCC='${BUILD_CC}'"
+EXTRA_OEMAKE += "HOSTCC='${BUILD_CC}' HOSTCCFLAGS='${BUILD_CFLAGS}' HOSTLDFLAGS='${BUILD_LDFLAGS}'"
 
 # Runtime variables
 EXTRA_OEMAKE += "RUNTIME_SYSROOT=${STAGING_DIR_HOST}"
@@ -179,7 +183,8 @@ do_compile() {
 do_compile[cleandirs] = "${B}"
 
 do_install() {
-    install -d -m 755 ${D}/firmware
+    install -d -m 755 ${D}${FIRMWARE_DIR}
+
     for atfbin in ${TFA_INSTALL_TARGET}; do
         processed="0"
         if [ "$atfbin" = "all" ]; then
@@ -193,28 +198,25 @@ do_install() {
         if [ -f ${BUILD_DIR}/$atfbin.bin ]; then
             echo "Install $atfbin.bin"
             install -m 0644 ${BUILD_DIR}/$atfbin.bin \
-                ${D}/firmware/$atfbin-${TFA_PLATFORM}.bin
-            ln -sf $atfbin-${TFA_PLATFORM}.bin ${D}/firmware/$atfbin.bin
+                ${D}${FIRMWARE_DIR}/$atfbin${TFA_INSTALL_SUFFIX}.bin
             processed="1"
         fi
         if [ -f ${BUILD_DIR}/$atfbin/$atfbin.elf ]; then
             echo "Install $atfbin.elf"
             install -m 0644 ${BUILD_DIR}/$atfbin/$atfbin.elf \
-                ${D}/firmware/$atfbin-${TFA_PLATFORM}.elf
-            ln -sf $atfbin-${TFA_PLATFORM}.elf ${D}/firmware/$atfbin.elf
+                ${D}${FIRMWARE_DIR}/$atfbin${TFA_INSTALL_SUFFIX}.elf
             processed="1"
         fi
         if [ -f ${BUILD_DIR}/$atfbin ]; then
             echo "Install $atfbin"
             install -m 0644 ${BUILD_DIR}/$atfbin \
-                ${D}/firmware/$atfbin-${TFA_PLATFORM}
-            ln -sf $atfbin-${TFA_PLATFORM} ${D}/firmware/$atfbin
+                ${D}${FIRMWARE_DIR}/$atfbin${TFA_INSTALL_SUFFIX}
             processed="1"
         fi
         if [ -f ${BUILD_DIR}/fdts/$atfbin.dtb ]; then
             echo "Install $atfbin.dtb"
             install -m 0644 "${BUILD_DIR}/fdts/$atfbin.dtb" \
-                "${D}/firmware/$atfbin.dtb"
+                "${D}${FIRMWARE_DIR}/$atfbin${TFA_INSTALL_SUFFIX}.dtb"
             processed="1"
         elif [ "$atfbin" = "dtbs" ]; then
             echo "dtbs install, skipped: set dtbs in TFA_INSTALL_TARGET"
@@ -227,20 +229,15 @@ do_install() {
     done
 }
 
-FILES:${PN} = "/firmware"
-SYSROOT_DIRS += "/firmware"
+# The firmware.bbclass only adds *.bin files by default but TF-A could install
+# files with dtb extension
+FILES:${PN} += "${FIRMWARE_DIR}/*.dtb"
 
-FILES:${PN}-dbg = "/firmware/*.elf"
 # Skip QA check for relocations in .text of elf binaries
 INSANE_SKIP:${PN}-dbg += "textrel"
 # Build paths are currently embedded
 INSANE_SKIP:${PN} += "buildpaths"
 INSANE_SKIP:${PN}-dbg += "buildpaths"
-
-do_deploy() {
-    cp -rf ${D}/firmware/* ${DEPLOYDIR}/
-}
-addtask deploy after do_install
 
 CVE_PRODUCT = "arm:arm-trusted-firmware \
                arm:trusted_firmware-a \

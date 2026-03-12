@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siemens/kas/master/kas/schema-kas.json
+
+header:
+  version: 14
+
+local_conf_header:
+  a320: |
+    MACHINE_FEATURES += "cortexa320"
+    OVERRIDES .= ":cortexa320"
+
+repos:
+  meta-ethos:
+    url: https://gitlab.arm.com/iot/meta-ethos.git
+    branch: whinlatter
+  meta-sca:
+    url: https://github.com/priv-kweihmann/meta-sca.git
+    branch: master

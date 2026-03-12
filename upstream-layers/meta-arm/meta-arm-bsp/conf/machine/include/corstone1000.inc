@@ -1,21 +1,23 @@
-require conf/machine/include/arm/armv8a/tune-cortexa35.inc
+TUNE_FILE = "conf/machine/include/arm/armv8a/tune-cortexa35.inc"
+TUNE_FILE:cortexa320 = "conf/machine/include/arm/arch-armv9-2a.inc"
+require ${TUNE_FILE}
 
 MACHINEOVERRIDES =. "corstone1000:"
 
 # TF-M
-PREFERRED_VERSION_trusted-firmware-m ?= "2.1.%"
+PREFERRED_VERSION_trusted-firmware-m ?= "2.2.%"
 
 # TF-A
 TFA_PLATFORM = "corstone1000"
-PREFERRED_VERSION_trusted-firmware-a ?= "2.12.%"
-PREFERRED_VERSION_tf-a-tests ?= "2.12.%"
+PREFERRED_VERSION_trusted-firmware-a ?= "2.14.%"
+PREFERRED_VERSION_tf-a-tests ?= "2.14.%"
 
 TFA_BL2_BINARY = "bl2-corstone1000.bin"
 TFA_FIP_BINARY = "fip-corstone1000.bin"
 
 # optee
-PREFERRED_VERSION_optee-os ?= "4.6.%"
-PREFERRED_VERSION_optee-client ?= "4.6.%"
+PREFERRED_VERSION_optee-os ?= "4.9.%"
+PREFERRED_VERSION_optee-client ?= "4.9.%"
 
 # Trusted Services
 TS_PLATFORM = "arm/corstone1000"
@@ -23,8 +25,8 @@ TS_SP_SE_PROXY_CONFIG = "corstone1000"
 # Include smm-gateway and se-proxy SPs into optee-os binary
 MACHINE_FEATURES += "ts-smm-gateway ts-se-proxy"
 
-# u-boot
-PREFERRED_VERSION_u-boot ?= "2023.07%"
+# U-Boot
+PREFERRED_VERSION_u-boot ?= "2025.10"
 MACHINE_FEATURES += "efi"
 EFI_PROVIDER ?= "grub-efi"
 
@@ -35,7 +37,7 @@ IMAGE_CMD:wic[vardeps] += "GRUB_LINUX_APPEND"
 
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ?= "6.12.%"
+PREFERRED_VERSION_linux-yocto ?= "6.18.%"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_IMAGETYPE:firmware = "Image.gz"
 # add FF-A support in the kernel
@@ -66,7 +68,7 @@ ARM_SYSTEMREADY_FIRMWARE = "${FIRMWARE_DEPLOYMENT}:do_deploy \
 ARM_SYSTEMREADY_ACS_CONSOLE ?= "default"
 
 # Workaround IMAGE_ROOTFS_EXTRA_SPACE being ignored when images are repacked
-IMAGE_ROOTFS_EXTRA_ARGS += "--extra-space ${@${IMAGE_ROOTFS_EXTRA_SPACE}}K"
+IMAGE_ROOTFS_EXTRA_ARGS += "--extra-filesystem-space ${@${IMAGE_ROOTFS_EXTRA_SPACE}}K"
 
 # Enable Authenticated variable support in SmmGW
 SMMGW_AUTH_VAR = "1"

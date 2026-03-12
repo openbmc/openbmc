@@ -12,3 +12,6 @@ local_conf_header:
     COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:sgi575 = "sgi575"
 
 machine: sgi575
+
+target:
+  - core-image-base

@@ -9,14 +9,10 @@ variables:
   CPU_REQUEST: ""
   # The default machine tag for the build jobs
   DEFAULT_TAG: ""
-  # The machine tag for the ACS test jobs
-  ACS_TAG: "$DEFAULT_TAG"
   # The directory to use as the persistent cache (the root for DL_DIR, SSTATE_DIR, etc)
   CACHE_DIR: $CI_BUILDS_DIR/persist
   # The container mirror to use
   MIRROR_GHCR: ghcr.io
-  # Whether to run the SystemReady ACS tests
-  ACS_TEST: 0
   # The list of extra Kas fragments to be used when building
   EXTRA_KAS_FILES: ""
   # The NVD API key to use when fetching CVEs
@@ -126,7 +122,7 @@ update-repos:
 #
 # Available options for building are (VIRT _must_ be last for ssh override)
 #  DISTRO: [poky, poky-altcfg, poky-tiny]
-#  KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+#  KERNEL: [linux-yocto, linux-yocto-dev]
 #  TOOLCHAINS: [gcc, clang]
 #  TCLIBC: [glibc, musl]
 #  FIRMWARE: [u-boot, edk2]
@@ -134,19 +130,6 @@ update-repos:
 #  TESTING: testimage
 #  SECUREDEBUG: [none, secure-debug]
 #  VIRT: [none, xen]
-
-arm-systemready-ir-acs:
-  extends: .build
-  timeout: 12h
-  parallel:
-    matrix:
-      # arm-systemready-ir-acs must be specified after fvp-base for ordering
-      # purposes for the jobs-to-kas output. It is not enough to just have it
-      # in the job name because fvp-base.yml overwrites the target.
-      - PLATFORM: [fvp-base, corstone1000-fvp]
-        ARM_SYSTEMREADY_IR_ACS: arm-systemready-ir-acs
-  tags:
-    - ${ACS_TAG}
 
 # Validate layers are Yocto Project Compatible
 check-layers:
@@ -166,7 +149,6 @@ corstone1000-fvp:
         TESTING: [testimage, tftf]
       - FIRMWARE: none
         TESTING: testimage
-      - SYSTEMREADY_FIRMWARE: arm-systemready-firmware
 
 corstone1000-mps3:
   extends: .build
@@ -208,7 +190,11 @@ fvp-base:
         TESTING: testimage
       - FIRMWARE: [u-boot, edk2]
         TESTING: testimage
-      - SYSTEMREADY_FIRMWARE: arm-systemready-firmware
+      - LTS: lts-revisions
+        TESTING: testimage
+      - KERNEL: linux-yocto-dev
+        LATEST: latest-revisions
+        TESTING: testimage
 
 fvps:
   extends: .build
@@ -253,6 +239,11 @@ musca-s1:
 
 pending-updates:
   extends: .setup
+  # Only run this job for the default branch (master), or if forced with
+  # BUILD_FORCE_PENDING_UPDATES.
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $BUILD_FORCE_PENDING_UPDATES != null
   artifacts:
     paths:
       - update-report
@@ -266,14 +257,12 @@ qemuarm64-secureboot:
   extends: .build
   parallel:
     matrix:
-      - KERNEL: [linux-yocto, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang]
+      - TOOLCHAINS: [gcc, clang]
+        FIRMWARE: [u-boot, edk2]
         TCLIBC: [glibc, musl]
         TS: [none, qemuarm64-secureboot-ts]
         TESTING: testimage
-      - TOOLCHAINS: [gcc, clang]
-        TS: [none, qemuarm64-secureboot-ts]
-        UEFISB: [none, uefi-secureboot]
+      - UEFISB: [none, uefi-secureboot]
         TESTING: testimage
       - KERNEL: linux-yocto-dev
         TESTING: testimage
@@ -282,23 +271,16 @@ qemuarm64:
   extends: .build
   parallel:
     matrix:
-      - DISTRO: poky
-        KERNEL: [linux-yocto, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang]
+      - DISTRO: poky-tiny
         FIRMWARE: [u-boot, edk2]
         TESTING: testimage
-      - DISTRO: poky-tiny
-        TESTING: testimage
       - VIRT: xen
-      - KERNEL: linux-yocto-dev
-        TESTING: testimage
 
 qemuarm-secureboot:
   extends: .build
   parallel:
     matrix:
-      - KERNEL: [linux-yocto, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang]
+      - TOOLCHAINS: [gcc, clang]
         TCLIBC: [glibc, musl]
         TESTING: testimage
       - DISTRO: [poky, poky-altcfg]
@@ -310,23 +292,18 @@ qemuarm:
   extends: .build
   parallel:
     matrix:
-      - DISTRO: poky
-        KERNEL: [linux-yocto, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang]
-        FIRMWARE: [u-boot, edk2]
+      - TOOLCHAINS: [gcc, clang]
         TESTING: testimage
       - DISTRO: poky-tiny
         TESTING: testimage
       - VIRT: xen
-      - KERNEL: linux-yocto-dev
-        TESTING: testimage
 
 qemuarmv5:
   extends: .build
   parallel:
     matrix:
       - DISTRO: poky
-        KERNEL: [linux-yocto, linux-yocto-dev, linux-yocto-rt]
+        KERNEL: [linux-yocto, linux-yocto-dev]
         TESTING: testimage
       - DISTRO: poky-tiny
         TESTING: testimage
@@ -335,8 +312,7 @@ sbsa-ref:
   extends: .build
   parallel:
     matrix:
-      - KERNEL: [linux-yocto, linux-yocto-rt]
-        TOOLCHAINS: [gcc, clang]
+      - TOOLCHAINS: [gcc, clang]
         TESTING: testimage
       - DISTRO: poky-altcfg
         TESTING: testimage

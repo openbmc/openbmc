@@ -26,47 +26,152 @@ IMAGE_LINGUAS = ""
 
 PACKAGE_INSTALL = ""
 
-# The generated ${MACHINE}_image.nopt is used instead of the default wic image
-# for the capsule generation. The uefi.capsule image type doesn't have to
-# depend on the wic because of this.
-#
 # The corstone1000_capsule_cert.crt and corstone1000_capsule_key.key are installed
 # by the U-Boot recipe so this recipe has to depend on that.
+
 CAPSULE_IMGTYPE = ""
-CAPSULE_CERTIFICATE_PATH = "${DEPLOY_DIR_IMAGE}/corstone1000_capsule_cert.crt"
-CAPSULE_GUID:corstone1000-fvp ?= "989f3a4e-46e0-4cd0-9877-a25c70c01329"
-CAPSULE_GUID:corstone1000-mps3 ?= "df1865d1-90fb-4d59-9c38-c9f2c1bba8cc"
-CAPSULE_IMGLOCATION = "${DEPLOY_DIR_IMAGE}"
-CAPSULE_INDEX = "1"
-CAPSULE_MONOTONIC_COUNT = "1"
-CAPSULE_PRIVATE_KEY_PATH = "${DEPLOY_DIR_IMAGE}/corstone1000_capsule_key.key"
-UEFI_FIRMWARE_BINARY = "${B}/${MACHINE}_image.nopt"
+CAPSULE_IMG_LOCATION = "${DEPLOY_DIR_IMAGE}"
+
+# User-configurable common capsule settings
+CAPSULE_EXTENSION ?= "uefi.capsule"
+CAPSULE_VERSION ?= "6"
+CAPSULE_LOWEST_SUPPORTED_VERSION ?= "6"
+CAPSULE_NAME ?= "${MACHINE}-v${CAPSULE_VERSION}"
+CAPSULE_SELECTED_COMPONENTS ?= "BL2 TFM_S FIP INITRAMFS"
+CAPSULE_EXTRA_ARGS ?= "--capflag PersistAcrossReset"
+
+# Non-configurable common payloads settings
+PAYLOAD_CERTIFICATE_PATH = "${DEPLOY_DIR_IMAGE}/corstone1000_capsule_cert.crt"
+PAYLOAD_HARDWARE_INSTANCE = "1"
+PAYLOAD_MONOTONIC_COUNT = "1"
+PAYLOAD_PRIVATE_KEY_PATH = "${DEPLOY_DIR_IMAGE}/corstone1000_capsule_key.key"
+CAPSULE_SELECTED_COMPONENTS += " DUMMY_START DUMMY_END"
+
+# All capsule fields are reset and initialized with DUMMY_START since it is the first payload
+# DUMMY_START
+PAYLOAD_DUMMY_START_INDEX ?= "5"
+PAYLOAD_DUMMY_START_VERSION ?= "${CAPSULE_VERSION}"
+PAYLOAD_DUMMY_START_LOWEST_SUPPORTED_VERSION ?= "${CAPSULE_LOWEST_SUPPORTED_VERSION}"
+PAYLOAD_DUMMY_START_GUID ?=  "6f784cbf-7938-5c23-8d6e-24d2f1410fa9"
+
+CAPSULE_ALL_COMPONENTS = "DUMMY_START "
+CAPSULE_CERTIFICATE_PATHS = "${PAYLOAD_CERTIFICATE_PATH} "
+CAPSULE_GUIDS = "${PAYLOAD_DUMMY_START_GUID} "
+CAPSULE_INDEXES = "${PAYLOAD_DUMMY_START_INDEX} "
+CAPSULE_HARDWARE_INSTANCES = "${PAYLOAD_HARDWARE_INSTANCE} "
+CAPSULE_MONOTONIC_COUNTS = "${PAYLOAD_MONOTONIC_COUNT} "
+CAPSULE_PRIVATE_KEY_PATHS = "${PAYLOAD_PRIVATE_KEY_PATH} "
+UEFI_FIRMWARE_BINARIES = "${B}/dummy.bin "
+CAPSULE_FW_VERSIONS = "${PAYLOAD_DUMMY_START_VERSION} "
+CAPSULE_LOWEST_SUPPORTED_VERSIONS = "${PAYLOAD_DUMMY_START_LOWEST_SUPPORTED_VERSION} "
+
+# BL2
+PAYLOAD_BL2_INDEX ?= "1"
+PAYLOAD_BL2_VERSION ?= "${CAPSULE_VERSION}"
+PAYLOAD_BL2_LOWEST_SUPPORTED_VERSION ?= "${CAPSULE_LOWEST_SUPPORTED_VERSION}"
+PAYLOAD_BL2_GUID:corstone1000-fvp ?= "f1d883f9-dfeb-5363-98d8-686ee3b69f4f"
+PAYLOAD_BL2_GUID:corstone1000-mps3 ?= "fbfbefaa-0a56-50d5-b651-74091d3d62cf"
+
+CAPSULE_ALL_COMPONENTS += "BL2 "
+CAPSULE_CERTIFICATE_PATHS += "${PAYLOAD_CERTIFICATE_PATH} "
+CAPSULE_GUIDS += "${PAYLOAD_BL2_GUID} "
+CAPSULE_INDEXES += "${PAYLOAD_BL2_INDEX} "
+CAPSULE_HARDWARE_INSTANCES += "${PAYLOAD_HARDWARE_INSTANCE} "
+CAPSULE_MONOTONIC_COUNTS += "${PAYLOAD_MONOTONIC_COUNT} "
+CAPSULE_PRIVATE_KEY_PATHS += "${PAYLOAD_PRIVATE_KEY_PATH} "
+UEFI_FIRMWARE_BINARIES += "${DEPLOY_DIR_IMAGE}/trusted-firmware-m/bl2_signed.bin "
+CAPSULE_FW_VERSIONS += "${PAYLOAD_BL2_VERSION} "
+CAPSULE_LOWEST_SUPPORTED_VERSIONS += "${PAYLOAD_BL2_LOWEST_SUPPORTED_VERSION} "
+
+# TFM_S
+PAYLOAD_TFM_S_INDEX ?= "2"
+PAYLOAD_TFM_S_VERSION ?= "${CAPSULE_VERSION}"
+PAYLOAD_TFM_S_LOWEST_SUPPORTED_VERSION ?= "${CAPSULE_LOWEST_SUPPORTED_VERSION}"
+PAYLOAD_TFM_S_GUID:corstone1000-fvp ?= "7fad470e-5ec5-5c03-a2c1-4756b495de61"
+PAYLOAD_TFM_S_GUID:corstone1000-mps3 ?= "af4cc7ad-ee2e-5a39-aad5-fac8a1e6173c"
+
+CAPSULE_ALL_COMPONENTS += "TFM_S "
+CAPSULE_CERTIFICATE_PATHS += "${PAYLOAD_CERTIFICATE_PATH} "
+CAPSULE_GUIDS += "${PAYLOAD_TFM_S_GUID} "
+CAPSULE_INDEXES += "${PAYLOAD_TFM_S_INDEX} "
+CAPSULE_HARDWARE_INSTANCES += "${PAYLOAD_HARDWARE_INSTANCE} "
+CAPSULE_MONOTONIC_COUNTS += "${PAYLOAD_MONOTONIC_COUNT} "
+CAPSULE_PRIVATE_KEY_PATHS += "${PAYLOAD_PRIVATE_KEY_PATH} "
+UEFI_FIRMWARE_BINARIES += "${DEPLOY_DIR_IMAGE}/trusted-firmware-m/tfm_s_signed.bin "
+CAPSULE_FW_VERSIONS += "${PAYLOAD_TFM_S_VERSION} "
+CAPSULE_LOWEST_SUPPORTED_VERSIONS += "${PAYLOAD_TFM_S_LOWEST_SUPPORTED_VERSION} "
+
+# FIP
+PAYLOAD_FIP_INDEX ?= "3"
+PAYLOAD_FIP_VERSION ?= "${CAPSULE_VERSION}"
+PAYLOAD_FIP_LOWEST_SUPPORTED_VERSION ?= "${CAPSULE_LOWEST_SUPPORTED_VERSION}"
+PAYLOAD_FIP_GUID:corstone1000-fvp ?= "f1933675-5a8c-5b6d-9ef4-846739e89bc8"
+PAYLOAD_FIP_GUID:corstone1000-mps3 ?= "55302f96-c4f0-5cf9-8624-e7cc388f2b68"
+
+CAPSULE_ALL_COMPONENTS += "FIP "
+CAPSULE_CERTIFICATE_PATHS += "${PAYLOAD_CERTIFICATE_PATH} "
+CAPSULE_GUIDS += "${PAYLOAD_FIP_GUID} "
+CAPSULE_INDEXES += "${PAYLOAD_FIP_INDEX} "
+CAPSULE_HARDWARE_INSTANCES += "${PAYLOAD_HARDWARE_INSTANCE} "
+CAPSULE_MONOTONIC_COUNTS += "${PAYLOAD_MONOTONIC_COUNT} "
+CAPSULE_PRIVATE_KEY_PATHS += "${PAYLOAD_PRIVATE_KEY_PATH} "
+UEFI_FIRMWARE_BINARIES += "${DEPLOY_DIR_IMAGE}/signed_fip.bin "
+CAPSULE_FW_VERSIONS += "${PAYLOAD_FIP_VERSION} "
+CAPSULE_LOWEST_SUPPORTED_VERSIONS += "${PAYLOAD_FIP_LOWEST_SUPPORTED_VERSION} "
+
+# INITRAMFS
+PAYLOAD_INITRAMFS_INDEX ?= "4"
+PAYLOAD_INITRAMFS_VERSION ?= "${CAPSULE_VERSION}"
+PAYLOAD_INITRAMFS_LOWEST_SUPPORTED_VERSION ?= "${CAPSULE_LOWEST_SUPPORTED_VERSION}"
+PAYLOAD_INITRAMFS_GUID:corstone1000-fvp ?= "f771aff9-c7e9-5f99-9eda-2369dd694f61"
+PAYLOAD_INITRAMFS_GUID:corstone1000-mps3 ?= "3e8ac972-c33c-5cc9-90a0-cdd3159683ea"
+
+CAPSULE_ALL_COMPONENTS += "INITRAMFS "
+CAPSULE_CERTIFICATE_PATHS += "${PAYLOAD_CERTIFICATE_PATH} "
+CAPSULE_GUIDS += "${PAYLOAD_INITRAMFS_GUID} "
+CAPSULE_INDEXES += "${PAYLOAD_INITRAMFS_INDEX} "
+CAPSULE_HARDWARE_INSTANCES += "${PAYLOAD_HARDWARE_INSTANCE} "
+CAPSULE_MONOTONIC_COUNTS += "${PAYLOAD_MONOTONIC_COUNT} "
+CAPSULE_PRIVATE_KEY_PATHS += "${PAYLOAD_PRIVATE_KEY_PATH} "
+UEFI_FIRMWARE_BINARIES += "${DEPLOY_DIR_IMAGE}/Image.gz-initramfs-${MACHINE}.bin "
+CAPSULE_FW_VERSIONS += "${PAYLOAD_INITRAMFS_VERSION} "
+CAPSULE_LOWEST_SUPPORTED_VERSIONS += "${PAYLOAD_INITRAMFS_LOWEST_SUPPORTED_VERSION} "
+
+# DUMMY_END
+PAYLOAD_DUMMY_END_INDEX ?= "6"
+PAYLOAD_DUMMY_END_VERSION ?= "${CAPSULE_VERSION}"
+PAYLOAD_DUMMY_END_LOWEST_SUPPORTED_VERSION ?= "${CAPSULE_LOWEST_SUPPORTED_VERSION}"
+PAYLOAD_DUMMY_END_GUID ?= "b57e432b-a250-5c73-93e3-90205e64baba"
+
+CAPSULE_ALL_COMPONENTS += "DUMMY_END"
+CAPSULE_CERTIFICATE_PATHS += "${PAYLOAD_CERTIFICATE_PATH}"
+CAPSULE_GUIDS += "${PAYLOAD_DUMMY_END_GUID}"
+CAPSULE_INDEXES += "${PAYLOAD_DUMMY_END_INDEX}"
+CAPSULE_HARDWARE_INSTANCES += "${PAYLOAD_HARDWARE_INSTANCE}"
+CAPSULE_MONOTONIC_COUNTS += "${PAYLOAD_MONOTONIC_COUNT}"
+CAPSULE_PRIVATE_KEY_PATHS += "${PAYLOAD_PRIVATE_KEY_PATH}"
+UEFI_FIRMWARE_BINARIES += "${B}/dummy.bin"
+CAPSULE_FW_VERSIONS += "${PAYLOAD_DUMMY_END_VERSION}"
+CAPSULE_LOWEST_SUPPORTED_VERSIONS += "${PAYLOAD_DUMMY_END_LOWEST_SUPPORTED_VERSION}"
 
 # TF-A settings for signing host images
-TFA_BL2_BINARY = "bl2-corstone1000.bin"
-TFA_FIP_BINARY = "fip-corstone1000.bin"
+TFA_BL2_BINARY = "bl2.bin"
+TFA_FIP_BINARY = "fip.bin"
 TFA_BL2_RE_IMAGE_LOAD_ADDRESS = "0x62353000"
 TFA_BL2_RE_SIGN_BIN_SIZE = "0x2d000"
 TFA_FIP_RE_IMAGE_LOAD_ADDRESS = "0x68130000"
 TFA_FIP_RE_SIGN_BIN_SIZE = "0x00200000"
 RE_LAYOUT_WRAPPER_VERSION = "0.0.7"
-TFM_SIGN_PRIVATE_KEY = "${libdir}/tfm-scripts/root-RSA-3072_1.pem"
+TFM_SIGN_PRIVATE_KEY = "${libdir}/tfm-scripts/root-EC-P256_1.pem"
 RE_IMAGE_OFFSET = "0x1000"
-
-# Offsets for the .nopt image generation
-# These offset values have to be aligned with those in
-# meta-arm/meta-arm-bsp/wic/corstone1000-flash-firmware.wks.in
-TFM_OFFSET = "147456"
-FIP_OFFSET = "475136"
-KERNEL_OFFSET = "2572288"
 
 do_sign_images() {
     # Sign TF-A BL2
-    sign_host_image ${RECIPE_SYSROOT}/firmware/${TFA_BL2_BINARY} \
+    sign_host_image ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/${TFA_BL2_BINARY} \
         ${TFA_BL2_RE_IMAGE_LOAD_ADDRESS} ${TFA_BL2_RE_SIGN_BIN_SIZE}
 
     # Update BL2 in the FIP image
-    cp ${RECIPE_SYSROOT}/firmware/${TFA_FIP_BINARY} .
+    cp ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/${TFA_FIP_BINARY} .
     fiptool update --tb-fw \
         ${TFM_IMAGE_SIGN_DEPLOY_DIR}/signed_${TFA_BL2_BINARY} \
         ${TFM_IMAGE_SIGN_DIR}/${TFA_FIP_BINARY}
@@ -79,21 +184,11 @@ do_sign_images[depends] = "\
     fiptool-native:do_populate_sysroot \
     "
 
-# This .nopt image is not the same as the one which is generated by meta-arm/meta-arm/classes/wic_nopt.bbclass.
-# The meta-arm/meta-arm/classes/wic_nopt.bbclass removes the partition table from the wic image, but keeps the
-# second bank. This function creates a no-partition image with only the first bank.
-create_nopt_image() {
-    dd conv=notrunc bs=1 if=${DEPLOY_DIR_IMAGE}/bl2_signed.bin of=${B}/${MACHINE}_image.nopt
-    dd conv=notrunc bs=1 if=${DEPLOY_DIR_IMAGE}/tfm_s_signed.bin of=${B}/${MACHINE}_image.nopt seek=${TFM_OFFSET}
-    dd conv=notrunc bs=1 if=${DEPLOY_DIR_IMAGE}/signed_fip-corstone1000.bin of=${B}/${MACHINE}_image.nopt seek=${FIP_OFFSET}
-    dd conv=notrunc bs=1 if=${DEPLOY_DIR_IMAGE}/Image.gz-initramfs-${MACHINE}.bin of=${B}/${MACHINE}_image.nopt seek=${KERNEL_OFFSET}
-}
-do_image_uefi_capsule[depends] += " linux-yocto:do_deploy"
-do_image_uefi_capsule[mcdepends] += " ${@bb.utils.contains('BBMULTICONFIG', 'firmware', 'mc::firmware:linux-yocto:do_deploy', '', d)}"
-do_image_uefi_capsule[prefuncs] += "create_nopt_image"
-
-do_deploy() {
-    install -m 0755 ${B}/${MACHINE}_image.nopt  ${DEPLOYDIR}
+# Create an empty dummy payload file required for capsule generation
+create_dummy_image() {
+    touch  ${B}/dummy.bin
 }
 
-addtask deploy after do_image_uefi_capsule
+do_image_uefi_capsule[depends] += " linux-yocto:do_deploy corstone1000-flash-firmware-image:do_sign_images"
+do_image_uefi_capsule[mcdepends] += " ${@bb.utils.contains('BBMULTICONFIG', 'firmware', 'mc::firmware:linux-yocto:do_deploy mc::firmware:corstone1000-flash-firmware-image:do_sign_images', '', d)}"
+do_image_uefi_capsule[prefuncs] += "create_dummy_image"

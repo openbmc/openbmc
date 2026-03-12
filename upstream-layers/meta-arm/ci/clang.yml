@@ -3,10 +3,6 @@
 header:
   version: 14
 
-repos:
-  meta-clang:
-    url: https://github.com/kraj/meta-clang
-
 local_conf_header:
   toolchain: |
-    TOOLCHAIN = "clang"
+    PREFERRED_TOOLCHAIN_TARGET = "clang"

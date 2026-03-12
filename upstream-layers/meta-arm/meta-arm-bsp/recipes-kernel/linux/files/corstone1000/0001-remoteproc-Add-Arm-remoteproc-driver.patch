@@ -472,7 +472,7 @@ index 000000000000..6afa78ae7ad3
 +
 +static struct platform_driver arm_rproc_driver = {
 +	.probe = arm_rproc_probe,
-+	.remove_new = arm_rproc_remove,
++	.remove = arm_rproc_remove,
 +	.driver = {
 +		.name = "arm-rproc",
 +		.of_match_table = arm_rproc_of_match,

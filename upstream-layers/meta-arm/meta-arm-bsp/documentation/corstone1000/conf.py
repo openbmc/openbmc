@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: <text>Copyright 2020-2024 Arm Limited and/or its
+# SPDX-FileCopyrightText: <text>Copyright 2020-2024, 2026 Arm Limited and/or its
 # affiliates <open-source-office@arm.com></text>
 #
 # SPDX-License-Identifier: MIT
@@ -26,8 +26,8 @@ sys.path.append(os.path.dirname(__file__))
 
 # -- Project information -----------------------------------------------------
 
-project = 'corstone1000'
-copyright = '2020-2024, Arm Limited'
+project = 'Corstone-1000'
+copyright = '2020-2026, Arm Limited'
 author = 'Arm Limited'
 
 

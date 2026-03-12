@@ -24,8 +24,6 @@ COMPATIBLE_MACHINE:corstone1000 = "${MACHINE}"
 KCONFIG_MODE:corstone1000 = "--alldefconfig"
 KMACHINE:corstone1000 = "corstone1000"
 LINUX_KERNEL_TYPE:corstone1000 = "standard"
-#disabling the rootfs cpio file compression so it is not compressed twice when bundled with the kernel
-KERNEL_EXTRA_ARGS:corstone1000 += "CONFIG_INITRAMFS_COMPRESSION_NONE=y"
 SRC_URI:append:corstone1000 = " \
            file://defconfig  \
         "
@@ -58,14 +56,43 @@ KERNEL_EXTRA_FEATURES:corstone1000 = ""
 KERNEL_FEATURES:corstone1000 = ""
 
 #
+# Corstone1000 with CORTEX-A320 KMACHINE
+#
+FILESEXTRAPATHS:prepend:cortexa320 := "${ARMBSPFILESPATHS}"
+COMPATIBLE_MACHINE:corstone1000:cortexa320 = "${MACHINE}"
+KCONFIG_MODE:corstone1000:cortexa320 = "--alldefconfig"
+KMACHINE:corstone1000:cortexa320 = "corstone1000-a320"
+LINUX_KERNEL_TYPE:corstone1000:cortexa320 = "standard"
+SRC_URI:append:corstone1000:cortexa320 = " \
+    file://defconfig  \
+"
+
+# Default kernel features not needed for Corstone-1000 with
+# Cortex-A320; otherwise the extra kernel modules will
+# increase the rootfs size but the board has limited flash
+# memory constraints
+KERNEL_EXTRA_FEATURES:corstone1000:cortexa320 = ""
+KERNEL_FEATURES:corstone1000:cortexa320 = ""
+
+
+#
 # FVP BASE KMACHINE
 #
 COMPATIBLE_MACHINE:fvp-base = "fvp-base"
 KMACHINE:fvp-base = "fvp"
 FILESEXTRAPATHS:prepend:fvp-base := "${ARMBSPFILESPATHS}:${ARMFILESPATHS}"
+
+
+FTPM_SRC = " \
+     file://0002-Add-TPM-CRB-FF-A-DT-support.patch \
+     file://tpm-crb.cfg \
+"
+
 SRC_URI:append:fvp-base = " \
     file://0001-arm64-dts-fvp-Enable-virtio-rng-support.patch \
     file://tee.cfg \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'ts-ftpm', \
+                         '${FTPM_SRC}', '' , d)} \
     ${@bb.utils.contains('MACHINE_FEATURES', 'ts-smm-gateway', \
                          'file://no-strict-devmem.cfg', '' , d)} \
 "
@@ -88,6 +115,8 @@ COMPATIBLE_MACHINE:musca-s1 = "(^$)"
 COMPATIBLE_MACHINE:sgi575 = "sgi575"
 KBUILD_DEFCONFIG:sgi575 = "defconfig"
 KCONFIG_MODE:sgi575 = "--alldefconfig"
+# Upstream defconfig often causes warnings but we don't maintain it
+KCONF_BSP_AUDIT_LEVEL:sgi575 = "0"
 
 #
 # sbsa-ref KMACHINE
@@ -95,3 +124,5 @@ KCONFIG_MODE:sgi575 = "--alldefconfig"
 COMPATIBLE_MACHINE:sbsa-ref = "sbsa-ref"
 KBUILD_DEFCONFIG:sbsa-ref = "defconfig"
 KCONFIG_MODE:sbsa-ref = "--alldefconfig"
+# Upstream defconfig often causes warnings but we don't maintain it
+KCONF_BSP_AUDIT_LEVEL:sbsa-ref = "0"

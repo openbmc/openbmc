@@ -1,0 +1,231 @@
+From 4e23e72e65481fe917d8a0af355b3b7669d5acb6 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Thu, 7 Aug 2025 10:05:02 +0000
+Subject: [PATCH] plat: corstone1000: add Cortex-A320 support
+
+Introduce `CORSTONE1000_CORTEX_A320` to enable Cortex-A320 on
+Corstone-1000 while keeping Cortex-A35 as the default. When the
+define is enabled, the build switches from `cortex_a35.S` to
+`cortex_a320.S`, maintaining compatibility with existing A35-based
+designs.
+
+Also add Normal-World mappings for the Ethos-U85 NPU and its SRAM
+on Cortex-A320 platforms so U-Boot and other non-secure software
+can safely access these regions:
+
+* **Ethos-U85 registers**: base `0x1A050000`, size `0x00004000` (16 KB),
+  attrs `MT_DEVICE | MT_RW | MT_NS`
+* **Non-secure SRAM**: base `0x02400000`, size `0x00400000` (4 MB),
+  attrs `MT_MEMORY | MT_RW | MT_NS`
+
+Enable GICv3 with GIC-600 when building for Cortex-A320 (retain
+GICv2/GIC-400 for Cortex-A35):
+
+* Update `plat_my_core_pos()` and `plat_arm_calc_core_pos()` to use
+  the Cortex-A320 MPIDR_EL1 affinity layout.
+* Add an A320-specific core-position routine in assembly guarded by
+  `CORSTONE1000_CORTEX_A320`.
+* Switch to the GICv3 driver with GIC-600 extensions: update GIC base
+  addresses, use GICv3 APIs, and set `USE_GIC_DRIVER=3`,
+  `GICV3_SUPPORT_GIC600=1`, `GIC_ENABLE_V4_EXTN=1`.
+
+These changes prepare the platform for Cortex-A320 integration and
+ensure correct GIC configuration and secondary-core bring-up, while
+preserving A35 behavior.
+
+Upstream-Status: Submitted (https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/45729)
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
+---
+ .../common/corstone1000_helpers.S             | 35 ++++++++++++++++++-
+ .../corstone1000/common/corstone1000_plat.c   |  4 +++
+ .../corstone1000/common/corstone1000_pm.c     |  8 +++++
+ .../common/include/platform_def.h             | 26 ++++++++++++++
+ plat/arm/board/corstone1000/platform.mk       | 11 ++++++
+ 5 files changed, 83 insertions(+), 1 deletion(-)
+
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_helpers.S b/plat/arm/board/corstone1000/common/corstone1000_helpers.S
+index a4ca9fe98223..665dbc61a92e 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_helpers.S
++++ b/plat/arm/board/corstone1000/common/corstone1000_helpers.S
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2021-2024 Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2025 Arm Limited and Contributors. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+@@ -13,6 +13,39 @@
+ 	.globl	plat_is_my_cpu_primary
+ 	.globl	plat_arm_calc_core_pos
+ 
++#ifdef CORSTONE1000_CORTEX_A320
++	.globl	plat_my_core_pos
++
++func plat_my_core_pos
++	mrs	x0, mpidr_el1
++	b	plat_arm_calc_core_pos
++endfunc plat_my_core_pos
++
++func plat_arm_calc_core_pos
++	/* Aff0 is always 0 for Cortex-A320
++	MPIDR format: https://developer.arm.com/documentation/109551/0001/AArch64-registers/AArch64-Identification-registers-summary/MPIDR-EL1--Multiprocessor-Affinity-Register?lang=en
++	*/
++	/* Extract Aff1 (core ID) */
++	ubfx    x1, x0, #MPIDR_AFF1_SHIFT, #MPIDR_AFFINITY_BITS
++
++	/* Extract Aff2 (cluster lower bits) */
++	ubfx    x2, x0, #MPIDR_AFF2_SHIFT, #MPIDR_AFFINITY_BITS
++
++	/* Extract Aff3 (cluster upper bits) */
++	ubfx    x3, x0, #MPIDR_AFF3_SHIFT, #MPIDR_AFFINITY_BITS
++
++	/* cluster_id = (Aff3 << 8) | Aff2 */
++	lsl     x3, x3, #MPIDR_AFFINITY_BITS
++	orr     x3, x3, x2
++
++	/* core_pos = core_id + (cluster_id * FVP_MAX_CPUS_PER_CLUSTER) */
++	mov	x4, #CORSTONE1000_MAX_CPUS_PER_CLUSTER
++	madd	x0, x3, x4, x1
++
++	ret
++endfunc plat_arm_calc_core_pos
++#endif
++
+ 	/* --------------------------------------------------------------------
+ 	 * void plat_secondary_cold_boot_setup (void);
+ 	 *
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_plat.c b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+index e388c82f311b..d34e80b29bb0 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_plat.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_plat.c
+@@ -26,6 +26,10 @@ const mmap_region_t plat_arm_mmap[] = {
+ 	ARM_MAP_NS_DRAM1,
+ 	CORSTONE1000_MAP_DEVICE,
+ 	CORSTONE1000_EXTERNAL_FLASH,
++#ifdef CORSTONE1000_CORTEX_A320
++	ARM_MAP_ETHOS_U85,
++	ARM_MAP_NONSECURE_SRAM,
++#endif
+ 	{0}
+ };
+ 
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_pm.c b/plat/arm/board/corstone1000/common/corstone1000_pm.c
+index ac808873b9e7..a87697e97f11 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_pm.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_pm.c
+@@ -8,7 +8,11 @@
+ #include <plat/arm/common/plat_arm.h>
+ #include <platform_def.h>
+ #include <plat/common/platform.h>
++#ifdef CORSTONE1000_CORTEX_A320
++#include <drivers/arm/gicv3.h>
++#else
+ #include <drivers/arm/gicv2.h>
++#endif
+ /*******************************************************************************
+  * Export the platform handlers via plat_arm_psci_pm_ops. The ARM Standard
+  * platform layer will take care of registering the handlers with PSCI.
+@@ -24,7 +28,11 @@ static void corstone1000_system_reset(void)
+ 	 * Disable GIC CPU interface to prevent pending interrupt
+ 	 * from waking up the AP from WFI.
+ 	 */
++#ifdef CORSTONE1000_CORTEX_A320
++	gicv3_cpuif_disable(plat_my_core_pos());
++#else
+ 	gicv2_cpuif_disable();
++#endif
+ 
+ 	/* Flush and invalidate data cache */
+ 	dcsw_op_all(DCCISW);
+diff --git a/plat/arm/board/corstone1000/common/include/platform_def.h b/plat/arm/board/corstone1000/common/include/platform_def.h
+index 200383475c80..ffb1e2dec0e1 100644
+--- a/plat/arm/board/corstone1000/common/include/platform_def.h
++++ b/plat/arm/board/corstone1000/common/include/platform_def.h
+@@ -112,12 +112,19 @@
+ #define ARM_SHARED_RAM_SIZE	(SZ_8K)  /* 8 KB */
+ #define ARM_SHARED_RAM_BASE	ARM_TRUSTED_SRAM_BASE
+ 
++#ifdef CORSTONE1000_CORTEX_A320
++#define TOTAL_SECURE_SRAM_SIZE		(SZ_4M)
++#define TOTAL_NONSECURE_SRAM_SIZE	(SZ_4M)
++#define PLAT_ARM_TRUSTED_SRAM_SIZE	(TOTAL_SECURE_SRAM_SIZE - \
++					 ARM_SHARED_RAM_SIZE)
++#else
+ /* The remaining Trusted SRAM is used to load the BL images */
+ #define TOTAL_SRAM_SIZE		(SZ_4M)  /* 4 MB */
+ 
+ 
+ #define PLAT_ARM_TRUSTED_SRAM_SIZE	(TOTAL_SRAM_SIZE - \
+ 					 ARM_SHARED_RAM_SIZE)
++#endif
+ 
+ #define PLAT_ARM_MAX_BL2_SIZE	(180 * SZ_1K)  /* 180 KB */
+ 
+@@ -208,8 +215,13 @@
+ #define MAX_IO_BLOCK_DEVICES	1
+ 
+ /* GIC related constants */
++#ifdef CORSTONE1000_CORTEX_A320
++#define PLAT_ARM_GICD_BASE	0x1C000000
++#define PLAT_ARM_GICR_BASE	0x1C040000
++#else
+ #define PLAT_ARM_GICD_BASE	0x1C010000
+ #define PLAT_ARM_GICC_BASE	0x1C02F000
++#endif
+ 
+ /* MHUv2 Secure Channel receiver and sender */
+ #define PLAT_SDK700_MHU0_SEND	0x1B800000
+@@ -334,6 +346,20 @@
+ 					CORSTONE1000_DEVICE_BASE, \
+ 					CORSTONE1000_DEVICE_SIZE, \
+ 					MT_DEVICE | MT_RW | MT_SECURE)
++#ifdef CORSTONE1000_CORTEX_A320
++#define ARM_ETHOS_U85_BASE		UL(0x1A050000)
++#define ARM_ETHOS_U85_SIZE		UL(0x4000)
++#define ARM_MAP_ETHOS_U85		MAP_REGION_FLAT( \
++					ARM_ETHOS_U85_BASE, \
++					ARM_ETHOS_U85_SIZE, \
++					MT_DEVICE | MT_RW | MT_NS)
++
++#define ARM_NONSECURE_SRAM_BASE		(ARM_TRUSTED_SRAM_BASE + TOTAL_SECURE_SRAM_SIZE)
++#define ARM_MAP_NONSECURE_SRAM		MAP_REGION_FLAT( \
++					ARM_NONSECURE_SRAM_BASE, \
++					TOTAL_NONSECURE_SRAM_SIZE, \
++					MT_MEMORY | MT_RW | MT_NS)
++#endif
+ 
+ #define ARM_IRQ_SEC_PHY_TIMER	29
+ 
+diff --git a/plat/arm/board/corstone1000/platform.mk b/plat/arm/board/corstone1000/platform.mk
+index 65be9c1f5ad7..fe3e94865fca 100644
+--- a/plat/arm/board/corstone1000/platform.mk
++++ b/plat/arm/board/corstone1000/platform.mk
+@@ -9,7 +9,14 @@ ifeq ($(filter ${TARGET_PLATFORM}, fpga fvp),)
+         $(error TARGET_PLATFORM must be fpga or fvp)
+ endif
+ 
++ifdef CORSTONE1000_CORTEX_A320
++CORSTONE1000_CPU_LIBS	+=lib/cpus/aarch64/cortex_a320.S
++$(eval $(call add_define,CORSTONE1000_CORTEX_A320))
++GIC_ENABLE_V4_EXTN		:= 1
++GICV3_SUPPORT_GIC600		:= 1
++else
+ CORSTONE1000_CPU_LIBS	+=lib/cpus/aarch64/cortex_a35.S
++endif
+ 
+ PLAT_INCLUDES		:=	-Iplat/arm/board/corstone1000/common/include	\
+ 				-Iplat/arm/board/corstone1000/include		\
+@@ -43,7 +50,11 @@ $(eval $(call add_define,CORSTONE1000_FVP_MULTICORE))
+ endif
+ endif
+ 
++ifdef CORSTONE1000_CORTEX_A320
++USE_GIC_DRIVER			:=	3
++else
+ USE_GIC_DRIVER			:=	2
++endif
+ 
+ BL2_SOURCES		+=	plat/arm/board/corstone1000/common/corstone1000_security.c		\
+ 				plat/arm/board/corstone1000/common/corstone1000_err.c		\

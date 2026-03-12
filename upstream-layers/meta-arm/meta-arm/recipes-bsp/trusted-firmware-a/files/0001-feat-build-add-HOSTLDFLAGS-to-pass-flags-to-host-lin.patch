@@ -1,0 +1,31 @@
+From a55ee6bd2eb7e0aff6f17b933b78cb3f73ea3634 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 22 Jan 2026 16:16:27 +0000
+Subject: [PATCH] feat(build): add HOSTLDFLAGS to pass flags to host links
+
+There is a HOSTCCFLAGS variable to pass flags to all host compilations,
+but no corresponding HOSTLDFLAGS to pass flags to host links.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/47531]
+Change-Id: I17441fc61e45d2ee41f9ab55a5d745bd0d2156d7
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ make_helpers/build_macros.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/make_helpers/build_macros.mk b/make_helpers/build_macros.mk
+index 25b4fa498..a20c1ed2d 100644
+--- a/make_helpers/build_macros.mk
++++ b/make_helpers/build_macros.mk
+@@ -356,7 +356,7 @@ $(eval $(foreach src,$(SRCS),$(call MAKE_TOOL_C,$(1),$(src),$(2),$(3))))
+ 
+ $(DST): $(OBJS) $(filter-out %.d,$(MAKEFILE_LIST)) | $(1)
+ 	$$(s)echo "  HOSTLD  $$@"
+-	$$(q)$(host-cc) $${OBJS} -o $$@ $($(3)_LDFLAGS)
++	$$(q)$(host-cc) $${HOSTLDFLAGS} $${OBJS} -o $$@ $($(3)_LDFLAGS)
+ 	$$(s)echo
+ 	$$(s)echo "Built $$@ successfully"
+ 	$$(s)echo
+-- 
+2.43.0
+

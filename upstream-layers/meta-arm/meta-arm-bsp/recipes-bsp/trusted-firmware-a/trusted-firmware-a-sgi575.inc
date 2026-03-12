@@ -17,3 +17,10 @@ EXTRA_OEMAKE += "TRUSTED_BOARD_BOOT=1 GENERATE_COT=1 ARM_ROTPK_LOCATION=devel_rs
 # the provided cot-dt2c.
 EXTRA_OEMAKE += "POETRY=''"
 DEPENDS += "cot-dt2c-native"
+
+# When compiling tf-a with clang, multiple errors are being seen in the
+# ASM files:
+#   error: instruction requires: fp-armv8
+# Given that this is platform is EOLed, forcing it to use GCC and not
+# reporting upstream
+TOOLCHAIN = "gcc"

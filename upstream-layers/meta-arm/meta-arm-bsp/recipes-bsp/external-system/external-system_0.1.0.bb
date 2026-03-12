@@ -21,16 +21,13 @@ PRODUCT = "corstone-1000"
 
 B = "${WORKDIR}/build"
 
-# remove once arm-none-eabi-gcc updates to 13 or newer like poky
-DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
-
 LDFLAGS[unexport] = "1"
 
 do_compile() {
     oe_runmake -C ${S} V=y \
         BUILD_PATH=${B} \
-	PRODUCT=${PRODUCT} \
-	CROSS_COMPILE=arm-none-eabi- \
+        PRODUCT=${PRODUCT} \
+        CROSS_COMPILE=arm-none-eabi- \
         all
 }
 

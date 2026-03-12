@@ -17,15 +17,31 @@ local_conf_header:
 
 target:
   # Target packages to test aarch64
-  - fvp-base-a-aem
-  - fvp-corstone1000
-  - fvp-rd1-ae
-  - fvp-v3-r1
   # Nativesdk to test x86-64
+
+  # Architecture Envelope Models (AEM) FVPs
+  - fvp-base-a-aem
   - nativesdk-fvp-base-a-aem
-  - nativesdk-fvp-corstone1000
+
+  # Arm Lumex CSS (Total Compute) FVPs
+  # These are x86 only... :(
+  - nativesdk-fvp-tc3
+
+  # Automotive FVPs
+  - fvp-rd1-ae
   - nativesdk-fvp-rd1-ae
-  - nativesdk-fvp-v3-r1
+
+  # Infrastructure FVPs
+  - fvp-rd-v3-r1
+  - nativesdk-fvp-rd-v3-r1
   # These are x86 only... :(
   - nativesdk-fvp-sgi575
-  - nativesdk-fvp-tc3
+
+  # IoT FVPs
+  - fvp-corstone1000
+  - nativesdk-fvp-corstone1000
+  - fvp-corstone1000-a320
+  - nativesdk-fvp-corstone1000-a320
+
+  # Morello FVPs
+  # TBD

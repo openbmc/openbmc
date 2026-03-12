@@ -1,0 +1,65 @@
+From be89a3fdab2273a6b108574eca997fe818180dea Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 17 Oct 2024 15:50:21 +0100
+Subject: [PATCH] arm_ffa: sandbox: Add FFA_MEM_RECLAIM tests
+
+Add FFA_MEM_RECLAIM positive and negative test cases
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ test/dm/ffa.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+diff --git a/test/dm/ffa.c b/test/dm/ffa.c
+index 59eea9a57cc..f4a6716cfd8 100644
+--- a/test/dm/ffa.c
++++ b/test/dm/ffa.c
+@@ -179,6 +179,27 @@ static int  test_ffa_memory_share(bool test_ack, struct unit_test_state *uts)
+ 	return 0;
+ }
+ 
++static int  test_ffa_memory_reclaim(bool test_ack, struct unit_test_state *uts)
++{
++	int ret;
++	u64 g_handle;
++	struct udevice *dev;
++
++	ut_assertok(uclass_first_device_err(UCLASS_FFA, &dev));
++
++	if (test_ack) {
++		g_handle = PACK_HANDLE(SANDBOX_MEM_HANDLE, SANDBOX_MEM_HANDLE);
++		ut_assertok(ffa_memory_reclaim(dev, g_handle, 0));
++	} else {
++		/* Provide a wrong handle */
++		g_handle = PACK_HANDLE(SANDBOX_MEM_HANDLE, 0);
++		ret = ffa_memory_reclaim(dev, g_handle, 0);
++		ut_asserteq(-EINVAL, ret);
++	}
++
++	return 0;
++}
++
+ static int dm_test_ffa_ack(struct unit_test_state *uts)
+ {
+ 	struct ffa_priv *uc_priv;
+@@ -236,6 +257,9 @@ static int dm_test_ffa_ack(struct unit_test_state *uts)
+ 	/* Test FFA_MEM_SHARE */
+ 	test_ffa_memory_share(true, uts);
+ 
++	/* Test FFA_MEM_RECLAIM */
++	test_ffa_memory_reclaim(true, uts);
++
+ 	return 0;
+ }
+ DM_TEST(dm_test_ffa_ack, UTF_SCAN_FDT | UTF_CONSOLE);
+@@ -297,6 +321,9 @@ static int dm_test_ffa_nack(struct unit_test_state *uts)
+ 	/* Test FFA_MEM_SHARE */
+ 	test_ffa_memory_share(false, uts);
+ 
++	/* Test FFA_MEM_RECLAIM */
++	test_ffa_memory_reclaim(false, uts);
++
+ 	return 0;
+ }
+ DM_TEST(dm_test_ffa_nack, UTF_SCAN_FDT | UTF_CONSOLE);

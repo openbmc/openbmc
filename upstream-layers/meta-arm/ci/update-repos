@@ -23,7 +23,6 @@ repositories = (
     "https://git.yoctoproject.org/poky",
     "https://git.openembedded.org/meta-openembedded",
     "https://git.yoctoproject.org/meta-virtualization",
-    "https://github.com/kraj/meta-clang",
 )
 
 if __name__ == "__main__":

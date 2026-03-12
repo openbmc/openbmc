@@ -1,0 +1,67 @@
+From a1f2383f8aef24e87e8a2440882fd9ff71b70fb7 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 20 Mar 2025 15:05:08 +0000
+Subject: [PATCH] efi_loader: fwu: fwu_arm_psa: Disable trial state handling
+
+No need for trial state handling in U-Boot for FWU Arm PSA
+
+In FWU Arm PSA mode, trial state is handled by Secure world.
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ lib/efi_loader/efi_capsule.c | 7 +++++--
+ lib/fwu_updates/fwu.c        | 8 +++++++-
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/lib/efi_loader/efi_capsule.c b/lib/efi_loader/efi_capsule.c
+index a28b7e978e2..d293d4c402b 100644
+--- a/lib/efi_loader/efi_capsule.c
++++ b/lib/efi_loader/efi_capsule.c
+@@ -568,7 +568,9 @@ static efi_status_t efi_capsule_update_firmware(
+ 	if (IS_ENABLED(CONFIG_FWU_MULTI_BANK_UPDATE)) {
+ 		if (fwu_empty_capsule(capsule_data)) {
+ 			if (fwu_empty_capsule_checks_pass()) {
+-				return fwu_empty_capsule_process(capsule_data);
++				return !IS_ENABLED(CONFIG_FWU_ARM_PSA) ?
++					fwu_empty_capsule_process(capsule_data) :
++					0;
+ 			} else {
+ 				log_err("FWU empty capsule checks failed. Cannot start update\n");
+ 				return EFI_INVALID_PARAMETER;
+@@ -1381,7 +1383,8 @@ efi_status_t efi_launch_capsules(void)
+ 
+ 	efi_capsule_scan_done();
+ 
+-	if (IS_ENABLED(CONFIG_FWU_MULTI_BANK_UPDATE)) {
++	if (IS_ENABLED(CONFIG_FWU_MULTI_BANK_UPDATE) &&
++	    !IS_ENABLED(CONFIG_FWU_ARM_PSA)) {
+ 		if (capsule_update == true && update_status == true) {
+ 			ret = fwu_post_update_process(fw_accept_os);
+ 		} else if (capsule_update == true && update_status == false) {
+diff --git a/lib/fwu_updates/fwu.c b/lib/fwu_updates/fwu.c
+index 7f085a0211f..9e6511b4da0 100644
+--- a/lib/fwu_updates/fwu.c
++++ b/lib/fwu_updates/fwu.c
+@@ -340,6 +340,11 @@ int fwu_get_mdata(struct fwu_mdata *mdata)
+ 		if (parts_ok[i])
+ 			continue;
+ 
++		if (IS_ENABLED(CONFIG_FWU_ARM_PSA)) {
++			log_err("FWU metadata copy %d invalid\n", i);
++			return -ENOTSYNC;
++		}
++
+ 		memcpy(parts_mdata[i], parts_mdata[1 - i], mdata_size);
+ 		err = fwu_sync_mdata(parts_mdata[i], i ? SECONDARY_PART : PRIMARY_PART);
+ 		if (err) {
+@@ -765,7 +770,8 @@ static int fwu_boottime_checks(void)
+ 
+ 	in_trial = in_trial_state();
+ 
+-	ret = in_trial ? fwu_trial_count_update() : trial_counter_update(NULL);
++	ret = (in_trial && !IS_ENABLED(CONFIG_FWU_ARM_PSA)) ?
++	       fwu_trial_count_update() : trial_counter_update(NULL);
+ 
+ 	if (!ret)
+ 		boottime_check = 1;

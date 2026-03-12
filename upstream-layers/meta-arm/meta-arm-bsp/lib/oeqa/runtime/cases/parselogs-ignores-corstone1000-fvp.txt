@@ -6,3 +6,4 @@ psci: failed to boot CPU3 (-95)
 CPU3: failed to boot: -95
 ARM FF-A: Notification setup failed -95, not enabled
 ARM FF-A: Failed to register driver sched callback -95
+basic-mmio-gpio: Failed to locate of_node [id: -2]

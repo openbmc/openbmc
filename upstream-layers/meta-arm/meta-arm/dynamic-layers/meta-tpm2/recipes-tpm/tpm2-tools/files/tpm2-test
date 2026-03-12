@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Some tests refers to these variables, which is not set at runtime
+export srcdir=/usr/share/tpm2-tools
+export abs_srcdir=$srcdir
+
+cd /usr/share/tpm2-tools/test/integration
+dbus-run-session bash tests/$1.sh

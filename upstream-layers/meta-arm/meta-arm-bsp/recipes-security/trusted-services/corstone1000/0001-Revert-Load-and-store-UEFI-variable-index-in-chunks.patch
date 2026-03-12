@@ -1,0 +1,337 @@
+From 76113b4c497f478d2e3a791acd5f43ece6325038 Mon Sep 17 00:00:00 2001
+From: Hugues KAMBA MPIANA <hugues.kambampiana@arm.com>
+Date: Fri, 12 Sep 2025 15:41:10 +0100
+Subject: [PATCH 1/2] Revert "Load and store UEFI variable index in chunks"
+
+This reverts commit a0a08571084238af2a24d4e6e580308f86ab59a2.
+The PSA IPC backend for the Protected Storage doesn't support the optional
+create() and set_extended() APIs. This feature has to be reverted because
+of this.
+Keep this inappropriate patch until the usage of create() and set_extended()
+APIs are not optional in the SMM-Gateway.
+
+Upstream-Status: Inappropriate [To be redesigned]
+Signed-off-by: Bence Balogh <bence.balogh@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Signed-off-by: Hugues KAMBA MPIANA <hugues.kambampiana@arm.com>
+---
+ .../backend/test/variable_store_tests.cpp     | 100 +--------------
+ .../backend/uefi_variable_store.c             | 115 ++++--------------
+ deployments/smm-gateway/common/smm_gateway.c  |   4 +
+ .../providers/arm/corstone1000/platform.cmake |   1 +
+ 4 files changed, 29 insertions(+), 191 deletions(-)
+
+diff --git a/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp b/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp
+index 0f962f206..7c7435fb4 100644
+--- a/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp
++++ b/components/service/uefi/smm_variable/backend/test/variable_store_tests.cpp
+@@ -57,12 +57,6 @@ TEST_GROUP(UefiVariableStoreTests)
+ 		return var_name;
+ 	}
+ 
+-	std::u16string intToChar16(const int i)
+-	{
+-		auto s = std::to_string(i);
+-		return { s.begin(), s.end() };
+-	}
+-
+ 	size_t string_get_size_in_bytes(const std::u16string &string)
+ 	{
+ 		return string.size() * sizeof(uint16_t);
+@@ -267,9 +261,9 @@ TEST_GROUP(UefiVariableStoreTests)
+ 						       MAX_VARIABLE_SIZE);
+ 	}
+ 
+-	static const size_t MAX_VARIABLES = 5;
++	static const size_t MAX_VARIABLES = 10;
+ 	static const size_t MAX_VARIABLE_SIZE = 3000;
+-	static const size_t STORE_CAPACITY = MAX_VARIABLES * MAX_VARIABLE_SIZE;
++	static const size_t STORE_CAPACITY = 10000;
+ 	static const size_t VARIABLE_INDEX_MAX_SIZE =
+ 		sizeof(uint32_t) +
+ 		MAX_VARIABLES * (sizeof(struct variable_metadata) +
+@@ -784,96 +778,6 @@ TEST(UefiVariableStoreTests, noRemoveCheck)
+ 	UNSIGNED_LONGLONGS_EQUAL(EFI_INVALID_PARAMETER, status);
+ }
+ 
+-TEST(UefiVariableStoreTests, fillStore)
+-{
+-	efi_status_t status = EFI_SUCCESS;
+-
+-	/* Fill the variable store with max size variables */
+-	for (size_t i = 0; i < MAX_VARIABLES; i++) {
+-		std::u16string current_var = u"var_";
+-		std::string input_data(MAX_VARIABLE_SIZE, 'a');
+-		std::string output_data;
+-		current_var += intToChar16(i);
+-
+-		status = set_variable(current_var, input_data,
+-				      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS |
+-					      EFI_VARIABLE_RUNTIME_ACCESS);
+-		UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+-
+-		/* Verify the write */
+-		status = get_variable(current_var, output_data);
+-		UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+-
+-		/* Expect got variable data to be the same as the set value */
+-		UNSIGNED_LONGLONGS_EQUAL(input_data.size(), output_data.size());
+-		LONGS_EQUAL(0, input_data.compare(output_data));
+-	}
+-
+-	/* Try adding a small variable to an already full store */
+-	status = set_variable(u"var", "a",
+-			      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS |
+-				      EFI_VARIABLE_RUNTIME_ACCESS);
+-	UNSIGNED_LONGLONGS_EQUAL(EFI_OUT_OF_RESOURCES, status);
+-}
+-
+-TEST(UefiVariableStoreTests, fillIndex)
+-{
+-	efi_status_t status = EFI_SUCCESS;
+-	std::u16string var_name = u"var";
+-	std::string input_data = "a";
+-	std::string output_data;
+-
+-	/*
+-	 * Fill the variable store with small variables so the index
+-	 * will be filled, but the store does not
+-	 */
+-	for (size_t i = 0; i < MAX_VARIABLES; i++) {
+-		std::u16string current_var = u"var_";
+-		current_var += intToChar16(i);
+-
+-		status = set_variable(current_var, input_data,
+-				      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS |
+-					      EFI_VARIABLE_RUNTIME_ACCESS);
+-		UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+-
+-		/* Verify the write */
+-		status = get_variable(current_var, output_data);
+-		UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+-
+-		/* Expect got variable data to be the same as the set value */
+-		UNSIGNED_LONGLONGS_EQUAL(input_data.size(), output_data.size());
+-		LONGS_EQUAL(0, input_data.compare(output_data));
+-	}
+-
+-	/* Try adding a small variable to an already full store */
+-	input_data.resize(1, 'a');
+-
+-	status = set_variable(u"var", input_data,
+-			      EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS |
+-				      EFI_VARIABLE_RUNTIME_ACCESS);
+-	UNSIGNED_LONGLONGS_EQUAL(EFI_OUT_OF_RESOURCES, status);
+-
+-	/* Simulate a power-cycle without deleting the NV store content */
+-	uefi_variable_store_deinit(&m_uefi_variable_store);
+-
+-	/* Try loading the non-volatile variables */
+-	status = uefi_variable_store_init(&m_uefi_variable_store, OWNER_ID, MAX_VARIABLES,
+-					  m_persistent_backend, m_volatile_backend);
+-
+-	UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+-
+-	/* Try reading the previously set variables */
+-	for (size_t i = 0; i < MAX_VARIABLES; i++) {
+-		std::u16string current_var = u"var_";
+-		current_var += intToChar16(i);
+-
+-		status = get_variable(current_var, output_data);
+-		UNSIGNED_LONGLONGS_EQUAL(EFI_SUCCESS, status);
+-		UNSIGNED_LONGLONGS_EQUAL(input_data.size(), output_data.size());
+-		LONGS_EQUAL(0, input_data.compare(output_data));
+-	}
+-}
+-
+ TEST(UefiVariableStoreTests, variableIndexCounterOverflow)
+ {
+ 	efi_status_t efi_status = EFI_SUCCESS;
+diff --git a/components/service/uefi/smm_variable/backend/uefi_variable_store.c b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+index 48b81ff37..e90ed1722 100644
+--- a/components/service/uefi/smm_variable/backend/uefi_variable_store.c
++++ b/components/service/uefi/smm_variable/backend/uefi_variable_store.c
+@@ -716,59 +716,29 @@ static psa_status_t get_active_variable_uid(struct uefi_variable_store *context,
+ static efi_status_t load_variable_index(struct uefi_variable_store *context)
+ {
+ 	struct storage_backend *persistent_store = context->persistent_store.storage_backend;
+-	psa_status_t psa_status = PSA_SUCCESS;
+ 
+ 	if (persistent_store) {
+ 		size_t data_len = 0;
+-		size_t data_offset = 0;
+-		struct psa_storage_info_t variable_index_info = { 0 };
+-
+-		psa_status = get_active_variable_uid(context, &context->active_variable_index_uid,
+-						     &context->variable_index.counter);
+-		switch (psa_status) {
+-		case PSA_SUCCESS:
+-			break;
+ 
+-		case PSA_ERROR_DOES_NOT_EXIST:
+-			IMSG("Variable index does not exist in NV store, continuing with empty index");
+-			return EFI_SUCCESS;
++		psa_status_t psa_status = persistent_store->interface->get(
++			persistent_store->context, context->owner_id,
++			SMM_VARIABLE_INDEX_STORAGE_UID, 0, context->index_sync_buffer_size,
++			context->index_sync_buffer, &data_len);
+ 
+-		default:
+-			EMSG("Loading variable index failed: %d", psa_status);
+-			return EFI_LOAD_ERROR;
+-		}
+-
+-		/* Make sure the variable index fits the buffer */
+-		persistent_store->interface->get_info(persistent_store->context, context->owner_id,
+-						      context->active_variable_index_uid,
+-						      &variable_index_info);
+-
+-		if (variable_index_info.size > context->index_sync_buffer_size) {
+-			EMSG("Variable index cannot fit the sync buffer");
+-			return EFI_LOAD_ERROR;
+-		}
++		switch(psa_status) {
++			case PSA_SUCCESS:
++				(void) variable_index_restore(&context->variable_index, data_len,
++							      context->index_sync_buffer);
++				break;
+ 
+-		do {
+-			psa_status = persistent_store->interface->get(
+-				persistent_store->context, context->owner_id,
+-				context->active_variable_index_uid, data_offset,
+-				RPC_CALLER_SESSION_SHARED_MEMORY_SIZE,
+-				context->index_sync_buffer + data_offset, &data_len);
++			case PSA_ERROR_DOES_NOT_EXIST:
++				IMSG("Index variable does not exist in NV store, continuing with empty index");
++				break;
+ 
+-			if (psa_status != PSA_SUCCESS) {
++			default:
+ 				EMSG("Loading variable index failed: %d", psa_status);
+ 				return EFI_LOAD_ERROR;
+-			}
+-
+-			data_offset += data_len;
+-
+-		} while (data_len == RPC_CALLER_SESSION_SHARED_MEMORY_SIZE);
+-
+-		variable_index_restore(&context->variable_index, data_offset,
+-				       context->index_sync_buffer);
+-	} else {
+-		EMSG("Loading variable index failed, store backend is not accessible");
+-		return EFI_LOAD_ERROR;
++		}
+ 	}
+ 
+ 	return EFI_SUCCESS;
+@@ -777,14 +747,13 @@ static efi_status_t load_variable_index(struct uefi_variable_store *context)
+ static efi_status_t sync_variable_index(struct uefi_variable_store *context)
+ {
+ 	efi_status_t status = EFI_SUCCESS;
+-	psa_status_t psa_status = PSA_SUCCESS;
+ 	bool is_dirty = false;
+ 
+ 	/* Sync the variable index to storage if anything is dirty */
+-	size_t remaining_data_len = 0;
++	size_t data_len = 0;
+ 
+ 	status = variable_index_dump(&context->variable_index, context->index_sync_buffer_size,
+-				     context->index_sync_buffer, &remaining_data_len, &is_dirty);
++				     context->index_sync_buffer, &data_len, &is_dirty);
+ 	if (status != EFI_SUCCESS)
+ 		return status;
+ 
+@@ -793,56 +762,16 @@ static efi_status_t sync_variable_index(struct uefi_variable_store *context)
+ 			context->persistent_store.storage_backend;
+ 
+ 		if (persistent_store) {
+-			size_t data_offset = 0;
+-			uint64_t next_index_uid = 0;
+-
+-			/* Write the older one */
+-			next_index_uid = (context->active_variable_index_uid ==
+-							  SMM_VARIABLE_INDEX_STORAGE_A_UID ?
+-						  SMM_VARIABLE_INDEX_STORAGE_B_UID :
+-						  SMM_VARIABLE_INDEX_STORAGE_A_UID);
+-
+-			psa_status = persistent_store->interface->remove(
+-				persistent_store->context, context->owner_id, next_index_uid);
+-
+-			if (psa_status != PSA_SUCCESS && psa_status != PSA_ERROR_DOES_NOT_EXIST)
+-				goto end;
+-
+-			/* Check if the index exists and create if not yet */
+-			psa_status = persistent_store->interface->create(
+-				persistent_store->context, context->owner_id, next_index_uid,
+-				remaining_data_len, PSA_STORAGE_FLAG_NONE);
+-
+-			if (psa_status != PSA_SUCCESS)
+-				goto end;
+-
+-			do {
+-				size_t data_of_this_iteration = MIN(
+-					remaining_data_len, RPC_CALLER_SESSION_SHARED_MEMORY_SIZE);
+-
+-				psa_status = persistent_store->interface->set_extended(
+-					persistent_store->context, context->owner_id,
+-					next_index_uid, data_offset, data_of_this_iteration,
+-					context->index_sync_buffer + data_offset);
+-
+-				if (psa_status != PSA_SUCCESS)
+-					goto end;
+-
+-				data_offset += RPC_CALLER_SESSION_SHARED_MEMORY_SIZE;
+-				remaining_data_len -= data_of_this_iteration;
+-
+-			} while (remaining_data_len);
++			psa_status_t psa_status = persistent_store->interface->set(
++				persistent_store->context, context->owner_id,
++				SMM_VARIABLE_INDEX_STORAGE_UID, data_len,
++				context->index_sync_buffer, PSA_STORAGE_FLAG_NONE);
+ 
+-			variable_index_confirm_write(&context->variable_index);
+-			context->active_variable_index_uid = next_index_uid;
+-		} else {
+-			EMSG("Syncing variable index failed, store backend is not accessible");
+-			return EFI_LOAD_ERROR;
++			status = psa_to_efi_storage_status(psa_status);
+ 		}
+ 	}
+ 
+-	end:
+-	return psa_to_efi_storage_status(psa_status);
++	return status;
+ }
+ 
+ /* Check attribute usage rules */
+diff --git a/deployments/smm-gateway/common/smm_gateway.c b/deployments/smm-gateway/common/smm_gateway.c
+index 3ab45ccf5..eaa861370 100644
+--- a/deployments/smm-gateway/common/smm_gateway.c
++++ b/deployments/smm-gateway/common/smm_gateway.c
+@@ -40,6 +40,10 @@
+ #define SMM_UEFI_VARIABLE_STORE_INDEX_SIZE \
+ 	UEFI_VARIABLE_STORE_INDEX_SIZE(SMM_GATEWAY_MAX_UEFI_VARIABLES)
+ 
++_Static_assert(SMM_UEFI_VARIABLE_STORE_INDEX_SIZE < RPC_CALLER_SESSION_SHARED_MEMORY_SIZE,
++	       "The UEFI variable index does not fit into the RPC shared memory, please increase " \
++	       "RPC_CALLER_SESSION_SHARED_MEMORY_SIZE");
++
+ /**
+  * The SP heap must be large enough for storing the UEFI variable index, the RPC shared memory and
+  * ~16kB of miscellaneous data.
+diff --git a/platform/providers/arm/corstone1000/platform.cmake b/platform/providers/arm/corstone1000/platform.cmake
+index f5a9c48f6..03e99972b 100644
+--- a/platform/providers/arm/corstone1000/platform.cmake
++++ b/platform/providers/arm/corstone1000/platform.cmake
+@@ -51,6 +51,7 @@ target_compile_definitions(${TGT} PRIVATE
+ 	MBEDTLS_ECP_DP_SECP521R1_ENABLED
+ 	CORSTONE_1000_TYPE=${CORSTONE_1000_TYPE_INT}
+ 	TFM_FWU_MAX_DIGEST_SIZE=${TFM_FWU_MAX_DIGEST_SIZE}
++   SMM_VARIABLE_INDEX_STORAGE_UID=0x787
+ )
+ 
+ get_property(_platform_driver_dependencies TARGET ${TGT}
+-- 
+2.43.0
+

@@ -1,0 +1,31 @@
+From 37cacab4b3717509edb863f9deb6a2dd4a1f080f Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Mon, 18 Mar 2024 17:00:56 +0000
+Subject: [PATCH] corstone1000: dts: Add external system node
+
+Add the external system node
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ arch/arm/dts/corstone1000.dtsi | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
+index 5d9d95b21cb..76bfc561df7 100644
+--- a/arch/arm/dts/corstone1000.dtsi
++++ b/arch/arm/dts/corstone1000.dtsi
+@@ -118,6 +118,13 @@
+ 		interrupt-parent = <&gic>;
+ 		ranges;
+ 
++		extsys0: remoteproc@1a010310 {
++			compatible = "arm,corstone1000-extsys";
++			reg = <0x1a010310 0x4>, <0x1a010314 0x4>;
++			reg-names = "reset-control", "reset-status";
++			firmware-name = "es_flashfw.elf";
++		};
++
+ 		timer@1a220000 {
+ 			compatible = "arm,armv7-timer-mem";
+ 			reg = <0x1a220000 0x1000>;

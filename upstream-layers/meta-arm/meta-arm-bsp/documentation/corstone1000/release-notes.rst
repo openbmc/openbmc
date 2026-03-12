@@ -1,5 +1,5 @@
 ..
- # Copyright (c) 2022-2025, Arm Limited.
+ # Copyright (c) 2022-2026, Arm Limited.
  #
  # SPDX-License-Identifier: MIT
 
@@ -18,6 +18,18 @@ including without limitation, Your software or Your Hardware designed or
 intended for safety-critical applications. Should Your Software or Your Hardware
 prove defective, you assume the entire cost of all necessary servicing, repair
 or correction.
+
+***********************
+Release notes - 2025.12
+***********************
+
+The same notes as the 2025.05 release still apply.
+
+Known Issues or Limitations
+---------------------------
+
+- Corstone-1000 with Cortex-A320 FVP does not currently support Symmetric Multiprocessing
+- Corstone-1000 with Cortex-A320 FVP becomes unresponsive when the Linux kernel driver for the Ethos-U85 NPU loads automatically after a software reboot.
 
 ***********************
 Release notes - 2025.05
@@ -268,4 +280,4 @@ For all security issues, contact Arm by email at psirt@arm.com.
 
 --------------
 
-*Copyright (c) 2022-2023, Arm Limited. All rights reserved.*
+*Copyright (c) 2022-2026, Arm Limited. All rights reserved.*

@@ -1,0 +1,56 @@
+From be44c3231fe40c99ba55abe4f8ae6a7bfed92bde Mon Sep 17 00:00:00 2001
+From: Gabor Toth <gabor.toth2@arm.com>
+Date: Thu, 30 Jan 2025 15:11:48 +0100
+Subject: [PATCH] abrmd_policysigned.sh: fix error, clear lockout
+
+Fix cleanup function to be able to return success.
+Clear lockout state at the end of the test.
+
+Upstream-Status: Pending
+Signed-off-by: Gabor Toth <gabor.toth2@arm.com>
+---
+ test/integration/tests/abrmd_policysigned.sh | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/test/integration/tests/abrmd_policysigned.sh b/test/integration/tests/abrmd_policysigned.sh
+index 2a0b3994..d062f033 100644
+--- a/test/integration/tests/abrmd_policysigned.sh
++++ b/test/integration/tests/abrmd_policysigned.sh
+@@ -3,15 +3,19 @@
+ source helpers.sh
+ 
+ cleanup() {
+-    rm -f session.ctx secret.dat private.pem public.pem signature.dat \
++    rm -f secret.dat private.pem public.pem signature.dat \
+     signing_key.ctx policy.signed prim.ctx sealing_key.priv sealing_key.pub \
+     unsealed.dat qual.dat to_sign.bin
+ 
+-    tpm2 flushcontext $session_ctx 2>/dev/null || true
++    tpm2 flushcontext session.ctx 2>/dev/null || true
++
++    rm -f session.ctx
+ 
+     if [ "${1}" != "no-shutdown" ]; then
+         shut_down
+     fi
++
++    return 0
+ }
+ trap cleanup EXIT
+ 
+@@ -129,10 +133,12 @@ openssl dgst -sha256 -sign signing_key.priv -out signature.dat to_sign.bin
+ tpm2 policysigned -S session.ctx -g sha256 -s signature.dat -f ecdsa \
+ -c signing_key_pub.ctx --cphash cphash.bin
+ ### Authorize
+-tpm2 dictionarylockout -c session:session.ctx
++tpm2 dictionarylockout -c -p session:session.ctx
+ 
+ tpm2 flushcontext session.ctx
+ rm -f signing_key.priv signing_key.pub signing_key_pub.ctx cphash.bin \
+       session.ctx policy.signed to_sign.bin signature.dat
++
++tpm2 clear -c l "password"
+ 
+ exit 0
+-- 
+2.34.1

@@ -1,0 +1,227 @@
+From 46fd90a19c9a2c04fb958badb19e148b08f559c8 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 15 Aug 2025 09:22:26 +0100
+Subject: [PATCH] corstone1000: Add Cortex-A320 support on FVP
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Enable Cortex-A320 support on the Corstone-1000 platform
+(including FVP) and update the device tree to support the integrated
+Ethos-U85 NPU and GIC-700 interrupt controller. These updates make
+the platform fully compatible with Cortex-A320 while retaining
+backward compatibility with Cortex-A35 and GIC-400.
+
+**Cortex-A320 enablement**
+
+* Extend Corstone-1000 compatibility list to include `cortex-a320`.
+* Ensure build and device-tree logic support both Cortex-A35 and
+  Cortex-A320 configurations.
+
+**Ethos-U85 integration**
+
+* Add `/ethosu@1a050000` node describing the NPU register block at
+  `0x1A050000`.
+* Introduce associated reserved memory regions:
+  * `ethosu_sram@02400000`: 2 MiB on-chip SRAM (`no-map`).
+  * `ethosu_reserved@A0000000`: 32 MiB DDR carve-out
+     (`shared-dma-pool`).
+* Connect memory regions through `memory-region` and `sram` phandles.
+* Add `dma-ranges`, interrupt spec, `region-cfgs`, `cs-region`, and
+  `ethosu-mem-config` for full driver support.
+* Enable the NPU node conditionally via `CONFIG_ETHOS_U85`.
+
+**GIC-700 support**
+
+* Introduce `CONFIG_GIC_700` to toggle between GIC-400 and
+  GIC-700.
+* Add full GICv3 node guarded by `#ifdef CONFIG_GIC_700`.
+* Adjust `cpu@1..3` `reg` values to `0x100/0x200/0x300` under
+  GIC-700 (keep `0x1/0x2/0x3` for GIC-400).
+* Update Ethos-U85 interrupt assignment to **SPI 16** to align with
+  the new interrupt map.
+
+These updates align the Corstone-1000 platform with Arm’s latest
+Cortex-A320 and Ethos-U85 configurations and ensure proper interrupt
+and memory mapping for both secure and non-secure domains.
+
+Upstream-Status: Submitted (https://lore.kernel.org/all/20251127154752.589691-1-frazer.carsley@arm.com/)
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ arch/arm/dts/corstone1000-fvp-u-boot.dtsi | 39 ++++++++++++
+ arch/arm/dts/corstone1000-u-boot.dtsi     | 76 +++++++++++++++++++++++
+ arch/arm/include/asm/armv8/cpu.h          |  1 +
+ board/armltd/corstone1000/Kconfig         |  8 +++
+ 4 files changed, 124 insertions(+)
+
+diff --git a/arch/arm/dts/corstone1000-fvp-u-boot.dtsi b/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
+index 20425fa0624..0539e6c092a 100644
+--- a/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
++++ b/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
+@@ -13,3 +13,42 @@
+ 		interrupts = <145>;
+ 	};
+ };
++
++&{/cpus} {
++	cpu1: cpu@1 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35","arm,cortex-a320";
++#ifdef CONFIG_GIC_700
++		reg = <0x100>;
++#else
++		reg = <0x1>;
++#endif
++		enable-method = "psci";
++		next-level-cache = <&L2_0>;
++	};
++
++	cpu2: cpu@2 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35","arm,cortex-a320";
++#ifdef CONFIG_GIC_700
++		reg = <0x200>;
++#else
++		reg = <0x2>;
++#endif
++		enable-method = "psci";
++		next-level-cache = <&L2_0>;
++	};
++
++	cpu3: cpu@3 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35","arm,cortex-a320";
++#ifdef CONFIG_GIC_700
++		reg = <0x300>;
++#else
++		reg = <0x3>;
++#endif
++		enable-method = "psci";
++		next-level-cache = <&L2_0>;
++	};
++};
++
+diff --git a/arch/arm/dts/corstone1000-u-boot.dtsi b/arch/arm/dts/corstone1000-u-boot.dtsi
+index b29ac74217e..7f75eae48cc 100644
+--- a/arch/arm/dts/corstone1000-u-boot.dtsi
++++ b/arch/arm/dts/corstone1000-u-boot.dtsi
+@@ -29,6 +29,15 @@
+ 	};
+ };
+ 
++&{/cpus} {
++	cpu: cpu@0 {
++		device_type = "cpu";
++		compatible = "arm,cortex-a35","arm,cortex-a320";
++		reg = <0>;
++		next-level-cache = <&L2_0>;
++	};
++};
++
+ &{/soc} {
+ 	extsys0: remoteproc@1a010310 {
+ 		compatible = "arm,corstone1000-extsys";
+@@ -37,3 +46,72 @@
+ 		firmware-name = "es_flashfw.elf";
+ 	};
+ };
++
++#ifdef CONFIG_ETHOS_U85
++&{/reserved-memory} {
++	ethosu_sram: ethosu_sram@02400000 {
++		reg = <0x02400000 0x200000>;
++		no-map;
++	};
++
++	ethosu_reserved: ethosu_reserved@A0000000 {
++		compatible = "shared-dma-pool";
++		reg = <0xA0000000 0x02000000>;
++		no-map;
++	};
++};
++
++/ {
++	ethosu: ethosu@1A050000 {
++		compatible = "arm,ethosu-direct";
++		#address-cells = <1>;
++		#size-cells = <1>;
++
++		// Base address and size of NPU registers
++		reg = <0x1A050000 0x4000>;
++
++		memory-region = <&ethosu_reserved>;
++		sram = <&ethosu_sram>;
++
++		// Address mappings to translate between bus addresses (NPU) and physical host CPU addresses
++		dma-ranges = <0x02400000 0x02400000 0x200000>,
++			     <0xA0000000 0xA0000000 0x02000000>;
++
++		interrupts = <0 16 4>;
++		interrupt-names = "irq";
++
++		// Memory region configuration
++		region-cfgs = <3 3 0 3 3 3 3 3>;
++
++		// Memory regions used for the command stream
++		cs-region = <2>;
++
++		// Memory interface configuration for Ethos-U85
++		ethosu_mem_config {
++			compatible = "arm,ethosu-mem-config";
++			// <beats outstanding_read outstanding_write>
++			sram = <0 64 32>;
++			ext  = <1 64 32>;
++			// <mem_domain mem_type axi_port>
++			configs = <0 0 0>,
++			<0 0 0>,
++			<0 0 1>,
++			<0 0 1>;
++		};
++	};
++};
++#endif
++
++#ifdef CONFIG_GIC_700
++gic: &{/interrupt-controller@1c000000} {
++		compatible = "arm,gic-v3";
++		#interrupt-cells = <3>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++		interrupt-controller;
++		reg = <0x1c000000 0x00010000>,
++		<0x1c040000 0x00100000>;
++		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
++	};
++#endif
+diff --git a/arch/arm/include/asm/armv8/cpu.h b/arch/arm/include/asm/armv8/cpu.h
+index e906fdf1bf1..a361c1100b3 100644
+--- a/arch/arm/include/asm/armv8/cpu.h
++++ b/arch/arm/include/asm/armv8/cpu.h
+@@ -11,6 +11,7 @@
+ #define MIDR_PARTNUM_CORTEX_A73		0xD09
+ #define MIDR_PARTNUM_CORTEX_A75		0xD0A
+ #define MIDR_PARTNUM_CORTEX_A76		0xD0B
++#define MIDR_PARTNUM_CORTEX_A320		0xD8F
+ #define MIDR_PARTNUM_SHIFT		0x4
+ #define MIDR_PARTNUM_MASK		(0xFFF << MIDR_PARTNUM_SHIFT)
+ 
+diff --git a/board/armltd/corstone1000/Kconfig b/board/armltd/corstone1000/Kconfig
+index 709674d4cf7..3af29b2bae7 100644
+--- a/board/armltd/corstone1000/Kconfig
++++ b/board/armltd/corstone1000/Kconfig
+@@ -9,4 +9,12 @@ config SYS_VENDOR
+ config SYS_CONFIG_NAME
+ 	default "corstone1000"
+ 
++config ETHOS_U85
++	bool "Enable Arm Ethos-U85 NPU support"
++	default n
++
++config GIC_700
++	bool "Enable GIC-700 support"
++	default n
++
+ endif
+

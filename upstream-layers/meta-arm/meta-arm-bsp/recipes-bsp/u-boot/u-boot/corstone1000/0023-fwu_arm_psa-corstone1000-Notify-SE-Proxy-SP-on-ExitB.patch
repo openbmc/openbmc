@@ -1,0 +1,101 @@
+From b31e32bb9e0447aaa86afa001134b9b5261ba8b7 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 20 Mar 2025 15:27:27 +0000
+Subject: [PATCH] fwu_arm_psa: corstone1000: Notify SE Proxy SP on
+ ExitBootService()
+
+Implement the notification in fwu_notify_exit_boot_services()
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ board/armltd/corstone1000/corstone1000.c | 60 ++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index 2ccf851e6c5..2532c5f10fa 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -5,6 +5,7 @@
+  * Rui Miguel Silva <rui.silva@linaro.org>
+  */
+ 
++#include <arm_ffa.h>
+ #include <blk.h>
+ #include <cpu_func.h>
+ #include <dm.h>
+@@ -19,11 +20,28 @@
+ #include <dm/platform_data/serial_pl01x.h>
+ #include <asm/armv8/mmu.h>
+ #include <asm/global_data.h>
++#include <linux/bitfield.h>
+ 
+ #define CORSTONE1000_KERNEL_PARTS 2
+ #define CORSTONE1000_KERNEL_PRIMARY "kernel_primary"
+ #define CORSTONE1000_KERNEL_SECONDARY "kernel_secondary"
+ 
++/* The SE Proxy partition ID*/
++#define CORSTONE1000_SEPROXY_PART_ID (0x8002)
++
++/* Update service ID provided by  the SE Proxy SP*/
++#define CORSTONE1000_SEPROXY_UPDATE_SVC_ID (0x4)
++#define PREP_SEPROXY_SVC_ID_MASK GENMASK(31, 16)
++#define PREP_SEPROXY_SVC_ID(x)  (FIELD_PREP(PREP_SEPROXY_SVC_ID_MASK, (x)))
++
++/* Notification event used with SE Proxy SP */
++#define CORSTONE1000_UBOOT_EFI_STARTED_EVT (0x3)
++#define PREP_SEPROXY_EVT_MASK GENMASK(15, 0)
++#define PREP_SEPROXY_EVT(x) (FIELD_PREP(PREP_SEPROXY_EVT_MASK, (x)))
++
++/* Signal that there is no shared memory used when notifying SE Proxy SP */
++#define FFA_MEM_HANDLE_INVALID (0xffffffff)
++
+ #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+ 
+ /* The total number of upgradable images including the start and end dummy payloads */
+@@ -291,3 +309,45 @@ void fwu_plat_get_bootidx(uint *boot_idx)
+ 				ret);
+ 	}
+ }
++
++/**
++ * fwu_notify_exit_boot_services() - ExitBootService event handler
++ *
++ * Notify SE Proxy SP when reaching ExitBootService().
++ *
++ * Return:
++ *
++ * EFI_SUCCESS on success. Otherwise, failure
++ */
++efi_status_t fwu_notify_exit_boot_services(void)
++{
++	efi_status_t efi_ret = EFI_SUCCESS;
++	int ffa_ret;
++	struct ffa_send_direct_data msg = {0};
++	struct udevice *dev;
++
++	ffa_ret = uclass_first_device_err(UCLASS_FFA, &dev);
++	if (ffa_ret) {
++		log_err("Cannot find FF-A bus device, err (%d)\n", ffa_ret);
++		efi_ret = EFI_DEVICE_ERROR;
++		goto out;
++	}
++
++	msg.data0 = PREP_SEPROXY_SVC_ID(CORSTONE1000_SEPROXY_UPDATE_SVC_ID) |
++					PREP_SEPROXY_EVT(CORSTONE1000_UBOOT_EFI_STARTED_EVT);
++
++	msg.data1 = FFA_MEM_HANDLE_INVALID;
++	msg.data2 = FFA_MEM_HANDLE_INVALID;
++
++	ffa_ret = ffa_sync_send_receive(dev, CORSTONE1000_SEPROXY_PART_ID, &msg, 0);
++	if (ffa_ret) {
++		log_err("Cannot notify SE Proxy SP, err (%d)\n", ffa_ret);
++		efi_ret = EFI_NO_RESPONSE;
++		goto out;
++	}
++
++	log_debug("SE Proxy SP notified\n");
++
++out:
++	return efi_ret;
++}

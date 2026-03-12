@@ -16,8 +16,9 @@ SRCREV  = "190e938c2da3631b4834a90448516423099c79f7"
 
 PROVIDES += "virtual/control-processor-firmware"
 
-CMAKE_BUILD_TYPE    ?= "RelWithDebInfo"
-SCP_PLATFORM        ?= "${MACHINE}"
+SCP_DEBUG           ?= "${FIRMWARE_DEBUG_BUILD}"
+CMAKE_BUILD_TYPE    ?= "${@oe.utils.vartrue('SCP_DEBUG', 'Debug', 'RelWithDebInfo', d)}"
+SCP_PLATFORM        ?= "${FIRMWARE_PLATFORM}"
 SCP_PRODUCT_GROUP   ?= "."
 SCP_LOG_LEVEL       ?= "WARN"
 SCP_PLATFORM_FEATURE_SET ?= "0"
@@ -31,7 +32,7 @@ DEPENDS = "gcc-arm-none-eabi-native \
 # For now we only build with GCC, so stop meta-clang trying to get involved
 TOOLCHAIN = "gcc"
 
-inherit deploy
+inherit firmware
 
 B = "${WORKDIR}/build"
 
@@ -39,7 +40,6 @@ B = "${WORKDIR}/build"
 FW_TARGETS ?= "scp mcp"
 FW_INSTALL ?= "ramfw romfw"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
 COMPATIBLE_MACHINE ?= "invalid"
 
 export CFLAGS = "${DEBUG_PREFIX_MAP}"
@@ -75,41 +75,31 @@ do_compile() {
 }
 
 do_install() {
-    install -d ${D}/firmware
+    install -d ${D}${FIRMWARE_DIR}
     for TYPE in ${FW_INSTALL}; do
         for FW in ${FW_TARGETS}; do
            if [ "$TYPE" = "romfw" ]; then
                if [ "$FW" = "scp" ]; then
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl1.bin" "${D}/firmware/${FW}_${TYPE}.bin"
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl1.elf" "${D}/firmware/${FW}_${TYPE}.elf"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl1.bin" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.bin"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl1.elf" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.elf"
                else
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl1.bin" "${D}/firmware/${FW}_${TYPE}.bin"
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl1.elf" "${D}/firmware/${FW}_${TYPE}.elf"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl1.bin" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.bin"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl1.elf" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.elf"
                fi
            elif [ "$TYPE" = "ramfw" ]; then
                if [ "$FW" = "scp" ]; then
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl2.bin" "${D}/firmware/${FW}_${TYPE}.bin"
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl2.elf" "${D}/firmware/${FW}_${TYPE}.elf"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl2.bin" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.bin"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-bl2.elf" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.elf"
                else
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl2.bin" "${D}/firmware/${FW}_${TYPE}.bin"
-                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl2.elf" "${D}/firmware/${FW}_${TYPE}.elf"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl2.bin" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.bin"
+                   install -D "${B}/${TYPE}/${FW}/bin/${SCP_PLATFORM}-${FW}-bl2.elf" "${D}${FIRMWARE_DIR}/${FW}_${TYPE}.elf"
                fi
            fi
        done
     done
 }
 
-FILES:${PN} = "/firmware"
-SYSROOT_DIRS += "/firmware"
-
-FILES:${PN}-dbg += "/firmware/*.elf"
 # These binaries are specifically for 32-bit arm
 INSANE_SKIP:${PN}-dbg += "arch"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
-
-do_deploy() {
-    # Copy the images to deploy directory
-    cp -rf ${D}/firmware/* ${DEPLOYDIR}/
-}
-addtask deploy after do_install

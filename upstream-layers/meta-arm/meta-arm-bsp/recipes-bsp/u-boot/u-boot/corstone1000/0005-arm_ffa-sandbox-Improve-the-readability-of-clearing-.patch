@@ -1,0 +1,125 @@
+From 962b8b4f2baf4a84de1fc76382ef7aa240ec1534 Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Tue, 11 Feb 2025 17:54:45 +0000
+Subject: [PATCH] arm_ffa: sandbox: Improve the readability of clearing the X
+ registers
+
+Make clearing the must be zero registers more readable in the emulator
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ .../sandbox/include/asm/sandbox_arm_ffa_priv.h | 15 ++-------------
+ drivers/firmware/arm-ffa/ffa-emul-uclass.c     | 18 +++++++++---------
+ 2 files changed, 11 insertions(+), 22 deletions(-)
+
+diff --git a/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h b/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h
+index b0881822d78..5c46547beab 100644
+--- a/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h
++++ b/arch/sandbox/include/asm/sandbox_arm_ffa_priv.h
+@@ -39,19 +39,8 @@
+ #define RXTX_BUFFERS_MIN_SIZE (RXTX_4K)
+ #define RXTX_BUFFERS_MIN_PAGES (1)
+ 
+-/* MBZ registers info */
+-
+-/* x1-x7 MBZ */
+-#define FFA_X1X7_MBZ_CNT (7)
+-#define FFA_X1X7_MBZ_REG_START (&res->a1)
+-
+-/* x4-x7 MBZ */
+-#define FFA_X4X7_MBZ_CNT (4)
+-#define FFA_X4X7_MBZ_REG_START (&res->a4)
+-
+-/* x3-x7 MBZ */
+-#define FFA_X3X7_MBZ_CNT (5)
+-#define FFA_X3_MBZ_REG_START (&res->a3)
++/* A helper macro used for clearing registers that Must Be Zero (MBZ) */
++#define FFA_X_REG_SIZE_IN_BYTE sizeof((((ffa_value_t *)0)->a0))
+ 
+ /* number of emulated FF-A secure partitions (SPs) */
+ #define SANDBOX_PARTITIONS_CNT (4)
+diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+index d2f051f7e2a..dcf5bce9435 100644
+--- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
++++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+@@ -83,7 +83,7 @@ static int sandbox_ffa_version(struct udevice *emul, ffa_value_t *pargs, ffa_val
+ 	res->a0 = priv->fwk_version;
+ 
+ 	/* x1-x7 MBZ */
+-	memset(FFA_X1X7_MBZ_REG_START, 0, FFA_X1X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a1, 0, 7 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 	return 0;
+ }
+@@ -111,7 +111,7 @@ static int sandbox_ffa_id_get(struct udevice *emul, ffa_value_t *pargs, ffa_valu
+ 	res->a2 = priv->id;
+ 
+ 	/* x3-x7 MBZ */
+-	memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 	return 0;
+ }
+@@ -136,14 +136,14 @@ static int sandbox_ffa_features(ffa_value_t *pargs, ffa_value_t *res)
+ 		res->a2 = RXTX_BUFFERS_MIN_SIZE;
+ 		res->a3 = 0;
+ 		/* x4-x7 MBZ */
+-		memset(FFA_X4X7_MBZ_REG_START, 0, FFA_X4X7_MBZ_CNT * sizeof(ulong));
++		memset(&res->a4, 0, 4 * FFA_X_REG_SIZE_IN_BYTE);
+ 		return 0;
+ 	}
+ 
+ 	res->a0 = FFA_SMC_32(FFA_ERROR);
+ 	res->a2 = -NOT_SUPPORTED;
+ 	/* x3-x7 MBZ */
+-	memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 	log_err("FF-A interface %lx not implemented\n", pargs->a1);
+ 
+ 	return ffa_to_std_errmap[NOT_SUPPORTED];
+@@ -248,7 +248,7 @@ cleanup:
+ 	res->a1 = 0;
+ 
+ 	/* x3-x7 MBZ */
+-	memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 	return ret;
+ }
+@@ -305,7 +305,7 @@ feedback:
+ 	res->a1 = 0;
+ 
+ 	/* x3-x7 MBZ */
+-	memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 	return ret;
+ }
+@@ -352,7 +352,7 @@ feedback:
+ 	res->a1 = 0;
+ 
+ 	/* x3-x7 MBZ */
+-	memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 	return ret;
+ }
+@@ -388,7 +388,7 @@ static int sandbox_ffa_rx_release(struct udevice *emul, ffa_value_t *pargs, ffa_
+ 	res->a1 = 0;
+ 
+ 	/* x3-x7 MBZ */
+-	memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++	memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 	return ret;
+ }
+@@ -448,7 +448,7 @@ static int sandbox_ffa_msg_send_direct_req(struct udevice *emul,
+ 		res->a2 = -INVALID_PARAMETERS;
+ 
+ 		/* x3-x7 MBZ */
+-		memset(FFA_X3_MBZ_REG_START, 0, FFA_X3X7_MBZ_CNT * sizeof(ulong));
++		memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
+ 
+ 		return ffa_to_std_errmap[INVALID_PARAMETERS];
+ 	}

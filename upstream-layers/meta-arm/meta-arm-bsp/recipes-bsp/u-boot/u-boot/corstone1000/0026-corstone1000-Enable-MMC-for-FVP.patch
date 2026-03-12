@@ -1,0 +1,91 @@
+From ebaa8f79cd68e2bd6fbe43bb76c70da31f69349b Mon Sep 17 00:00:00 2001
+From: Vishnu Banavath <vishnu.banavath@arm.com>
+Date: Thu, 20 Mar 2025 15:56:14 +0000
+Subject: [PATCH] corstone1000: Enable MMC for FVP
+
+Enable support mmc/sdcard for the corstone1000 FVP
+
+Signed-off-by: Vishnu Banavath <vishnu.banavath@arm.com>
+Signed-off-by: Rui Miguel Silva <rui.silva@linaro.org>
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Pending [Not submitted to upstream yet]
+---
+ board/armltd/corstone1000/corstone1000.c | 16 ++++++++++++++++
+ configs/corstone1000_defconfig           |  5 ++++-
+ include/configs/corstone1000.h           |  4 +++-
+ 3 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index 2532c5f10fa..9189640ef75 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -208,6 +208,22 @@ static struct mm_region corstone1000_mem_map[] = {
+ 		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
+ 			PTE_BLOCK_NON_SHARE |
+ 			PTE_BLOCK_PXN | PTE_BLOCK_UXN
++	}, {
++		/* MMC0 */
++		.virt = 0x40300000UL,
++		.phys = 0x40300000UL,
++		.size = 0x00100000UL,
++		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
++			PTE_BLOCK_NON_SHARE |
++			PTE_BLOCK_PXN | PTE_BLOCK_UXN
++	}, {
++		/* MMC1 */
++		.virt = 0x50000000UL,
++		.phys = 0x50000000UL,
++		.size = 0x00100000UL,
++		.attrs = PTE_BLOCK_MEMTYPE(MT_DEVICE_NGNRNE) |
++			PTE_BLOCK_NON_SHARE |
++			PTE_BLOCK_PXN | PTE_BLOCK_UXN
+ 	}, {
+ 		/* OCVM */
+ 		.virt = 0x80000000UL,
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index 3e0fe47bbaf..c0fecb4aea1 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -6,6 +6,7 @@ CONFIG_SYS_MALLOC_LEN=0x2000000
+ CONFIG_NR_DRAM_BANKS=1
+ CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
+ CONFIG_CUSTOM_SYS_INIT_SP_ADDR=0x83f00000
++CONFIG_DM_GPIO=y
+ CONFIG_DEFAULT_DEVICE_TREE="corstone1000-mps3"
+ CONFIG_SYS_BOOTM_LEN=0x800000
+ CONFIG_SYS_LOAD_ADDR=0x82100000
+@@ -40,6 +41,7 @@ CONFIG_CMD_BOOTZ=y
+ CONFIG_CMD_GPT=y
+ CONFIG_CMD_LOADM=y
+ # CONFIG_CMD_LOADS is not set
++CONFIG_CMD_MMC=y
+ CONFIG_CMD_USB=y
+ # CONFIG_CMD_SETEXPR is not set
+ CONFIG_CMD_CACHE=y
+@@ -51,9 +53,10 @@ CONFIG_OF_CONTROL=y
+ CONFIG_VERSION_VARIABLE=y
+ CONFIG_NET_RANDOM_ETHADDR=y
+ CONFIG_REGMAP=y
++CONFIG_CLK=y
+ CONFIG_ARM_FFA_TRANSPORT=y
+ CONFIG_MISC=y
+-# CONFIG_MMC is not set
++CONFIG_ARM_PL180_MMCI=y
+ CONFIG_MTD=y
+ CONFIG_NVMXIP_QSPI=y
+ CONFIG_PHYLIB=y
+diff --git a/include/configs/corstone1000.h b/include/configs/corstone1000.h
+index 3ada21cbba1..737b7c277fb 100644
+--- a/include/configs/corstone1000.h
++++ b/include/configs/corstone1000.h
+@@ -25,7 +25,9 @@
+ #define CFG_SYS_SDRAM_BASE	PHYS_SDRAM_1
+ 
+ #define BOOT_TARGET_DEVICES(func) \
+-	func(USB, usb, 0)
++	func(USB, usb, 0) \
++	func(MMC, mmc, 0) \
++	func(MMC, mmc, 1)
+ 
+ #include <config_distro_bootcmd.h>
+ 

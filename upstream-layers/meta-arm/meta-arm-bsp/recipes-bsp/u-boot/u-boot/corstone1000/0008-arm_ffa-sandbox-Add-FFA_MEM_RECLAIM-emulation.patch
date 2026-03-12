@@ -1,0 +1,86 @@
+From 99008b3a0627c975f14b7f7a64bfee5d59cd93ed Mon Sep 17 00:00:00 2001
+From: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Date: Thu, 17 Oct 2024 15:50:02 +0100
+Subject: [PATCH] arm_ffa: sandbox: Add FFA_MEM_RECLAIM emulation
+
+Add FFA_MEM_RECLAIM support to the FF-A emulator
+
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/all/20250702152528.1180414-1-abdellatif.elkhlifi@arm.com/]
+---
+ drivers/firmware/arm-ffa/ffa-emul-uclass.c | 42 ++++++++++++++++++++++
+ drivers/firmware/arm-ffa/sandbox_ffa.c     |  1 +
+ 2 files changed, 43 insertions(+)
+
+diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+index 4918404fb6d..a630392b6d1 100644
+--- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
++++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+@@ -603,6 +603,45 @@ static int sandbox_ffa_memory_share(struct udevice *emul, ffa_value_t *pargs,
+ 	return 0;
+ }
+ 
++/**
++ * sandbox_ffa_memory_reclaim() - Emulated FFA_MEM_RECLAIM handler
++ * @emul: The sandbox FF-A emulator device
++ * @pargs: The SMC call input arguments a0-a7
++ * @res:  The SMC return data
++ *
++ * Emulate FFA_MEM_RECLAIM FF-A function.
++ *
++ * Return:
++ *
++ * 0 on success. Otherwise, failure
++ */
++static int sandbox_ffa_memory_reclaim(struct udevice *emul, ffa_value_t *pargs,
++				      ffa_value_t *res)
++{
++	int ret;
++
++	res->a1 = 0;
++
++	if (pargs->a1 != SANDBOX_MEM_HANDLE ||
++	    pargs->a2 != SANDBOX_MEM_HANDLE) {
++		/* FFA_ERROR encoding */
++		res->a0 = FFA_SMC_32(FFA_ERROR);
++		res->a2 = -INVALID_PARAMETERS;
++		ret = ffa_to_std_errmap[INVALID_PARAMETERS];
++		/* x3-x7 MBZ */
++		memset(&res->a3, 0, 5 * FFA_X_REG_SIZE_IN_BYTE);
++
++		return ret;
++	}
++
++	/* FFA_SUCCESS encoding */
++	res->a0 = FFA_SMC_32(FFA_SUCCESS);
++	/* x2-x7 MBZ */
++	memset(&res->a2, 0, 6 * FFA_X_REG_SIZE_IN_BYTE);
++
++	return 0;
++}
++
+ /**
+  * sandbox_query_ffa_emul_state() - Inspect the FF-A ABIs
+  * @queried_func_id:	The FF-A function to be queried
+@@ -696,6 +735,9 @@ void sandbox_arm_ffa_smccc_smc(ffa_value_t *args, ffa_value_t *res)
+ 	case FFA_SMC_32(FFA_MEM_SHARE):
+ 		ret = sandbox_ffa_memory_share(emul, args, res);
+ 		break;
++	case FFA_SMC_32(FFA_MEM_RECLAIM):
++		ret = sandbox_ffa_memory_reclaim(emul, args, res);
++		break;
+ 	default:
+ 		log_err("Undefined FF-A interface (%lx)\n",
+ 			args->a0);
+diff --git a/drivers/firmware/arm-ffa/sandbox_ffa.c b/drivers/firmware/arm-ffa/sandbox_ffa.c
+index 8d85e660e2b..54c81d12f92 100644
+--- a/drivers/firmware/arm-ffa/sandbox_ffa.c
++++ b/drivers/firmware/arm-ffa/sandbox_ffa.c
+@@ -92,6 +92,7 @@ static const struct ffa_bus_ops sandbox_ffa_ops = {
+ 	.sync_send_receive = ffa_msg_send_direct_req_hdlr,
+ 	.rxtx_unmap = ffa_unmap_rxtx_buffers_hdlr,
+ 	.memory_share = ffa_memory_share_hdlr,
++	.memory_reclaim = ffa_memory_reclaim_hdlr,
+ };
+ 
+ static const struct udevice_id sandbox_ffa_id[] = {

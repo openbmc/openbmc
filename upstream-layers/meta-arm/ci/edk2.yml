@@ -13,5 +13,5 @@ local_conf_header:
     EXTRA_IMAGEDEPENDS += "edk2-firmware"
     EFI_PROVIDER ?= "grub-efi"
 
-    QB_DEFAULT_BIOS = "QEMU_EFI.fd"
+    QB_DEFAULT_BIOS ??= "QEMU_EFI.fd"
     WKS_FILE ?= "efi-disk.wks.in"

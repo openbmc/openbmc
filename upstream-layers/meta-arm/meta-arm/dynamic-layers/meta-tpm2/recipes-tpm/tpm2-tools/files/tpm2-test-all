@@ -1,0 +1,123 @@
+#!/bin/bash
+
+tests=(
+    abrmd_extended-sessions
+    abrmd_nvundefinespecial
+    abrmd_policyauthorizenv
+    abrmd_policyauthorize
+    abrmd_policyauthvalue
+    abrmd_policycommandcode
+    abrmd_policycountertimer
+    abrmd_policycphash
+    abrmd_policyduplicationselect
+    abrmd_policynamehash
+    abrmd_policynv
+    abrmd_policynvwritten
+    abrmd_policyor
+    abrmd_policypassword
+    abrmd_policypcr
+    abrmd_policysecret
+    abrmd_policysigned
+    abrmd_policytemplate
+    abrmd_policyticket
+    activecredential
+    attestation
+    certifycreation
+    certify
+    changeauth
+    changeeps
+    changepps
+    checkquote
+    clearcontrol
+    clear
+    clockrateadjust
+    commandaudit
+    createak
+    createpolicy
+    createprimary
+    create
+    dictionarylockout
+    duplicate
+    ecc
+    encryptdecrypt
+    evictcontrol
+    flushcontext
+    getcap
+    getpolicydigest
+    getrandom
+    gettestresult
+    gettime
+    hash
+    hierarchycontrol
+    hmac
+    import
+    import_tpm
+    incrementalselftest
+    load
+    makecredential
+    nvcertify
+    nvinc
+    output_formats
+    pcrevent
+    pcrextend
+    pcrlist
+    pcrreset
+    pcrs_format
+    print
+    readclock
+    readpublic
+    rsadecrypt
+    rsaencrypt
+    selftest
+    sessionconfig
+    setprimarypolicy
+    startup
+    stirrandom
+    symlink
+    testparms
+    unseal
+    verifysignature
+    X509certutil
+)
+
+failed_tests=()
+
+# Failing tests:
+# createek
+# eventlog
+# getekcertificate
+# loadexternal
+# quote
+# rc_decode
+# send
+# send-tcti-cmd
+# sign
+# toggle_options
+# nv
+# pcrallocate
+# sessionaudit
+# setclock
+
+for test in "${tests[@]}"; do
+    echo '*******************************************************************************'
+    echo "${test} Starting..."
+    
+    if tpm2-test "${test}"
+    then
+        echo "${test} OK"
+    else
+        echo "${test} FAILED"
+        failed_tests+=("${test}")
+    fi
+done
+echo '*******************************************************************************'
+
+if [ ${#failed_tests[@]} -ne 0 ]
+then
+    echo "ERROR: the following tpm2 tests failed:"
+    printf '\t%s\n' "${failed_tests[@]}"
+fi
+
+echo '*******************************************************************************'
+
+(exit ${#failed_tests[@]})

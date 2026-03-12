@@ -1,8 +1,8 @@
 # Corstone1000 specific U-boot support
 
 DEPENDS:append = " openssl-native efitools-native"
-CORSTONE1000_DEVICE_TREE:corstone1000-mps3 = "corstone1000-mps3"
-CORSTONE1000_DEVICE_TREE:corstone1000-fvp = "corstone1000-fvp"
+CORSTONE1000_DEVICE_TREE:corstone1000-mps3 = "arm/corstone1000-mps3"
+CORSTONE1000_DEVICE_TREE:corstone1000-fvp = "arm/corstone1000-fvp"
 EXTRA_OEMAKE:append = ' DEVICE_TREE=${CORSTONE1000_DEVICE_TREE}'
 
 UBOOT_CONFIG ??= "EFI"
@@ -15,70 +15,81 @@ UBOOT_EXTLINUX = "0"
 
 SYSROOT_DIRS:append = " /boot"
 
+# FWU patches
 SRC_URI:append = " \
-    file://0001-FF-A-v15-arm64-smccc-add-support-for-SMCCCv1.2-x0-x1.patch \
-    file://0002-FF-A-v15-lib-uuid-introduce-uuid_str_to_le_bin-funct.patch \
-    file://0003-FF-A-v15-lib-uuid-introduce-testcase-for-uuid_str_to.patch \
-    file://0004-FF-A-v15-arm_ffa-introduce-Arm-FF-A-support.patch \
-    file://0005-FF-A-v15-arm_ffa-introduce-armffa-command.patch \
-    file://0006-FF-A-v15-arm_ffa-introduce-sandbox-FF-A-support.patch \
-    file://0007-FF-A-v15-arm_ffa-introduce-sandbox-test-cases-for-UC.patch \
-    file://0008-FF-A-v15-arm_ffa-introduce-armffa-command-Sandbox-te.patch \
-    file://0009-FF-A-v15-arm_ffa-efi-introduce-FF-A-MM-communication.patch \
-    file://0010-FF-A-v15-arm_ffa-efi-corstone1000-enable-MM-communic.patch \
-    file://0011-efi-corstone1000-fwu-introduce-EFI-capsule-update.patch \
-    file://0012-arm-corstone1000-fix-unrecognized-filesystem-type.patch \
-    file://0013-efi_loader-corstone1000-remove-guid-check-from-corst.patch \
-    file://0014-efi_loader-populate-ESRT-table-if-EFI_ESRT-config-op.patch \
-    file://0015-efi_firmware-add-get_image_info-for-corstone1000.patch \
-    file://0016-efi_loader-fix-null-pointer-exception-with-get_image.patch \
-    file://0017-arm-corstone1000-add-mmc-for-fvp.patch \
-    file://0018-corstone1000-add-compressed-kernel-support.patch \
-    file://0019-arm-corstone1000-esrt-support.patch \
-    file://0020-corstone1000-enable-distro-booting-command.patch \
-    file://0021-corstone1000-add-fwu-metadata-store-info.patch \
-    file://0022-fwu_metadata-make-sure-structures-are-packed.patch \
-    file://0023-corstone1000-add-boot-index.patch \
-    file://0024-corstone1000-adjust-boot-bank-and-kernel-location.patch \
-    file://0025-corstone1000-add-nvmxip-fwu-mdata-and-gpt-options.patch \
-    file://0026-nvmxip-move-header-to-include.patch \
-    file://0027-corstone1000-set-kernel_addr-based-on-boot_idx.patch \
-    file://0028-corstone1000-boot-index-from-active.patch \
-    file://0029-corstone1000-enable-PSCI-reset.patch \
-    file://0030-Enable-EFI-set-get-time-services.patch \
-    file://0031-corstone1000-detect-inflated-kernel-size.patch \
-    file://0032-corstone1000-ESRT-add-unique-firmware-GUID.patch \
-    file://0033-dt-Provide-a-way-to-remove-non-compliant-nodes-and-p.patch \
-    file://0034-bootefi-Call-the-EVT_FT_FIXUP-event-handler.patch \
-    file://0035-corstone1000-purge-U-Boot-specific-DT-nodes.patch \
-    file://0036-corstone1000-add-signature-device-tree-overlay.patch \
-    file://0037-corstone1000-enable-authenticated-capsule-config.patch \
-    file://0038-corstone1000-introduce-EFI-authenticated-capsule-upd.patch \
-    file://0039-enables-ondisk-capsule-update-feature.patch		  \
-    file://0040-fix-runtime-capsule-update-flags-checks.patch		  \
-    file://0041-scatter-gather-flag-workaround.patch			  \
-    file://0042-corstone1000-enable-virtio-net-support.patch		  \
-    file://0043-firmware-psci-Fix-bind_smccc_features-psci-check.patch		  \
-    file://0044-corstone1000-set-unique-GUID-for-fvp-and-mps3.patch		  \
-    file://0045-efi-corstone1000-fwu-update-RPC-ABI.patch			  \
-    file://0046-Corstone1000-Change-MMCOMM-buffer-location.patch		  \
-    file://0047-corstone1000-dts-add-external-system-node.patch \
-    file://0048-corstone1000-Enable-UEFI-Secure-boot.patch 			  \
-    file://0049-corstone1000-Add-secondary-cores-cpu-nodes-for-FVP.patch	  \
-    file://0050-fwu-Use-metadata-v2.patch	  \
-    ${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000-extsys', \
-                         '', 'file://0051-corstone1000-purge-remoteproc-dts-node.patch' , d)} \
-    file://0052-reserve-memory-for-se-comm.patch \
+    file://0001-arm_ffa-Add-NULL-pointer-check-to-the-uclass-driver-.patch \
+    file://0002-arm_ffa-Add-FFA_MEM_SHARE-support.patch                    \
+    file://0003-arm_ffa-Add-FFA_MEM_RECLAIM-support.patch                  \
+    file://0004-arm_ffa-sandbox-Replace-the-emulator-error-log-with-.patch \
+    file://0005-arm_ffa-sandbox-Improve-the-readability-of-clearing-.patch \
+    file://0006-arm_ffa-sandbox-Add-FFA_MEM_SHARE-emulation.patch          \
+    file://0007-arm_ffa-sandbox-Add-FFA_MEM_SHARE-tests.patch              \
+    file://0008-arm_ffa-sandbox-Add-FFA_MEM_RECLAIM-emulation.patch        \
+    file://0009-arm_ffa-sandbox-Add-FFA_MEM_RECLAIM-tests.patch            \
+    file://0010-fwu_arm_psa-Initialize-the-update-agent.patch              \
+    file://0011-fwu_arm_psa-Read-the-FWU-directory-through-get_image.patch \
+    file://0012-fwu_arm_psa-Add-staging-ABIs.patch                         \
+    file://0013-efi_loader-fwu_arm_psa-Add-set_image-and-get_image_i.patch \
+    file://0014-efi_loader-fwu_arm_psa-Keep-the-FMP-payload-header.patch   \
+    file://0015-efi_loader-fwu_arm_psa-Skip-accepting-the-payload-af.patch \
+    file://0016-efi_loader-fwu-fwu_arm_psa-Disable-trial-state-handl.patch \
+    file://0017-fwu_arm_psa-Add-FWU-acceptance-mechanism.patch             \
+    file://0018-fwu_arm_psa-Add-ESRT-support.patch                         \
+    file://0019-fwu_arm_psa-Add-ExitBootService-notification-handler.patch \
+    file://0020-efi_loader-capsule-Add-runtime-capsule-flags-checks.patch  \
+    file://0021-fwu_arm_psa-corstone1000-Enable-FWU-support.patch          \
+    file://0022-fwu_arm_psa-corstone1000-Perform-bank-logic-when-rea.patch \
+    file://0023-fwu_arm_psa-corstone1000-Notify-SE-Proxy-SP-on-ExitB.patch \
+    file://0024-fwu_arm_psa-corstone1000-Set-Boot0001-for-on-disk-FW.patch \
+    "
+# Other features
+SRC_URI:append = " \
+    file://0025-corstone1000-set-CONFIG_FFA_SHARED_MM_BUF_ADDR.patch \
+    file://0026-corstone1000-Enable-MMC-for-FVP.patch \
+    file://0027-corstone1000-Enable-secure-boot-configs.patch \
+    file://0028-corstone1000-Enable-EFI-set_time-config.patch \
+    file://0029-corstone1000-Enable-set-print-EFI-variables.patch \
+    file://0030-corstone1000-Enable-virtio-net-support.patch \
+    file://0031-arm-corstone1000-Fix-unrecognized-filesystem-type.patch \
+    file://0032-corstone1000-dts-Add-external-system-node.patch \
+    file://0033-arm-bsp-u-boot-dts-Reserve-memory-for-RSS-comm-point.patch \
     "
 
-do_configure:append() {
-    openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=CRT/ -keyout ${B}/CRT.key -out ${B}/CRT.crt -nodes -days 365
-    cert-to-efi-sig-list ${B}/CRT.crt ${B}/corstone1000_defconfig/CRT.esl
+# Purging device tree nodes
+SRC_URI:append = " \
+    file://0034-dt-Provide-a-way-to-remove-non-compliant-nodes-and-p.patch \
+    file://0035-corstone1000-Purge-U-Boot-specific-DT-nodes.patch          \
+    ${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000-extsys', \
+                         '', 'file://0036-corstone1000-purge-remoteproc-DTS-node.patch' , d)} \
+    "
+
+# Add OF_UPSTREAM support
+SRC_URI:append = " \
+    file://0037-corstone1000-enable-OF_UPSTREAM-device-tree-support.patch \
+"
+
+# Use 32 bit cells for reserved-memory node in dts
+SRC_URI:append = " \
+    file://0038-corstone1000-dts-use-32-bit-cells-for-reserved-memor.patch \
+"
+
+# Add Cortex-a320 support
+SRC_URI:append = " \
+    file://0039-corstone1000-Add-Cortex-A320-support-on-FVP.patch \
+"
+
+# Add Cortex-a320 specific configurations
+SRC_URI:append:cortexa320 = " \
+    file://corstone1000-a320.cfg \
+"
+
+uboot_configure_config:append() {
+   openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=CRT/ -keyout ${B}/CRT.key -out ${S}/CRT.crt -nodes -days 365
 }
 
 FILES:${PN} += "/corstone1000_capsule_*"
-do_install:append() {
-   install -D -p -m 0644 ${B}/CRT.crt ${D}/corstone1000_capsule_cert.crt
+uboot_install_config:append() {
+   install -D -p -m 0644 ${S}/CRT.crt ${D}/corstone1000_capsule_cert.crt
    install -D -p -m 0644 ${B}/CRT.key ${D}/corstone1000_capsule_key.key
 }
 

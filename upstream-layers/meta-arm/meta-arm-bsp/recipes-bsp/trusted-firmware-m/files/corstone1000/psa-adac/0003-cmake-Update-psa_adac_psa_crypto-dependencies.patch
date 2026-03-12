@@ -1,0 +1,30 @@
+From 3c552d0b46559160581e89bf310db0b176e33074 Mon Sep 17 00:00:00 2001
+From: Devaraj Ranganna <devaraj.ranganna@arm.com>
+Date: Thu, 18 Sep 2025 17:45:20 +0100
+Subject: [PATCH] cmake: Update `psa_adac_psa_crypto` dependencies
+
+The auto-generated header files are part of `psa_adac_core` library.
+Therefore, link `psa_adac_psa_crypto` library with `psa_adac_core`
+library.
+
+Upstream-Status: Pending [Not submitted to upstream yet]
+Signed-off-by: Devaraj Ranganna <devaraj.ranganna@arm.com>
+---
+ psa_crypto/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/psa_crypto/CMakeLists.txt b/psa_crypto/CMakeLists.txt
+index b1c3f5d..efc284d 100644
+--- a/psa_crypto/CMakeLists.txt
++++ b/psa_crypto/CMakeLists.txt
+@@ -20,6 +20,7 @@ target_link_libraries(psa_adac_psa_crypto
+         psa_adac_config
+         $<$<BOOL:${PSA_ADAC_AS_TFM_RUNTIME_SERVICE}>:tfm_sprt>
+         psa_interface
++        psa_adac_core
+ )
+ 
+ target_link_libraries(trusted-firmware-m-psa-adac
+-- 
+2.43.0
+

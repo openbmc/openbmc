@@ -7,4 +7,11 @@ inherit pypi setuptools3
 
 SRC_URI[sha256sum] = "5700c05df89bad8fd729c11aa6f764a3323bcb3796f13b32481ae34445cfc1b7"
 
+do_install:append() {
+    # This package installs test cases into an un-namespaced "tests" directory,
+    # remove it so it doesn't conflict with other recipes that do the same.
+    # https://github.com/sifive/pydevicetree/issues/57
+    rm -rf ${D}/${PYTHON_SITEPACKAGES_DIR}/tests
+}
+
 BBCLASSEXTEND = "native nativesdk"

@@ -1,4 +1,4 @@
-require recipes-bsp/uefi/edk2-firmware_202505.bb
+require recipes-bsp/uefi/edk2-firmware_202602.bb
 PROVIDES:remove = "virtual/bootloader"
 
 LICENSE += "& Apache-2.0"
@@ -20,6 +20,12 @@ SRCREV_bsa = "db423614002621e1f0a9440955e3503623ff64f3"
 SRCREV_libc = "caea801aac338aa60f85a7c10148ca0b4440fff3"
 
 UPSTREAM_CHECK_URI = "https://github.com/ARM-software/sbsa-acs/releases"
+
+# FIXME - some weirdness here with clang.  Looks like there are some
+# hardcoded assembly instructions which need feature enablement that
+# magically happens in gcc, but needs explicit enablement in clang.
+# Hardcode GCC until this can be bottomed out.
+TOOLCHAIN:aarch64 = "gcc"
 
 COMPATIBLE_HOST = "aarch64.*-linux"
 COMPATIBLE_MACHINE = ""
