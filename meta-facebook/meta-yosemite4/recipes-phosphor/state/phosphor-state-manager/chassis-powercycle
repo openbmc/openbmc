@@ -183,7 +183,8 @@ chassis-power-cycle()
             # Wait for standby sensors to be ready
             sleep 2
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
-            /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID" && systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
+            /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
+            systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
             msg="Chassis$CHASSIS_ID is AC power on"
             echo "${msg}"
             lock_cleanup
