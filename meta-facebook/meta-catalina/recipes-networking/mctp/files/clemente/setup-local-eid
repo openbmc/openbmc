@@ -3,8 +3,6 @@
 declare -A MCTP_BUS_EID_LIST=(
   [0]=mctpi2c10
   [1]=mctpi2c15
-  [2]=mcu1u2u2
-  [3]=mcu1u2u7u2
 )
 
 for i in $(seq 0 3)

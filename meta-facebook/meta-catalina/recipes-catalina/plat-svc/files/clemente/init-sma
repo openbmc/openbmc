@@ -8,7 +8,6 @@ MAX_RETRY=5
 RETRY_DELAY_SEC=1
 REGEX_EIP_POOL="([0-9]?[0-9]) ([0-9]?[0-9])"
 FW_UPDATE_LOCK="/tmp/pldm-fw-update.lock"
-sma_eids=("9" "14")
 cx_eids=()
 brd_map=()
 osfp_pr=()
@@ -94,26 +93,19 @@ get_sma_eid_pool()
     fi
 }
 
-remove_sma_eid()
+remove_endpoints()
 {
-    local eid=$1
-    local eid_pool=""
-    eid_pool=$(get_sma_eid_pool "$eid")
-    echo "endpoint ${eid} eid pool: (${eid_pool})"
-    if [[ ${eid_pool} =~ ${REGEX_EIP_POOL} ]]; then
-        for ds_eid in $(seq "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
-        do
-            remove_eid "$ds_eid"
-        done
-    fi
-    remove_eid "$eid"
-}
-
-remove_sma()
-{
+    local ep_regex=".*/endpoints/([0-9]+)"
+    local eid=""
     systemctl stop cx-ready.target
-    remove_sma_eid 9
-    remove_sma_eid 14
+    busctl tree au.com.codeconstruct.MCTP1 | grep endpoints/ | while IFS= read -r line; do
+        if [[ "$line" =~ $ep_regex ]]; then
+            eid=${BASH_REMATCH[1]}
+            if [ "$eid" -gt 8 ] && [ "$eid" -lt 90 ]; then
+                remove_eid "$eid"
+            fi
+        fi
+    done
 }
 
 check_fw_version()
@@ -202,7 +194,6 @@ setup_eid()
         echo "$res"
         if [[ $res =~ $regex ]]; then
             mctp_eid=${BASH_REMATCH[1]}
-            sma_eids["$iob_index"]="$mctp_eid"
         fi
         is_cx8_ready "$iob_index"
         echo "Discovering bridged endpoints"
@@ -241,14 +232,8 @@ reset_sma()
 {
     echo "Resetting SMA ..."
     systemctl stop pldmd
-    systemctl stop cx-ready.target
-    for eid in "${cx_eids[@]}"; do
-        remove_eid "$eid"
-    done
+    remove_endpoints
     cx_eids=()
-    for eid in "${sma_eids[@]}"; do
-        remove_eid "$eid"
-    done
     set_gpio "MCU_RST_N" 0
     set_gpio "SEC_MCU_RST_N" 0
     sleep 1
@@ -304,8 +289,9 @@ update_numeric_sensor_value()
 }
 ###### End of Temporary functions ######
 
+reset_sma
 
-trap "remove_sma; exit 0" SIGTERM
+trap "remove_endpoints; exit 0" SIGTERM
 
 if ! setup_sma; then
     exit 1
