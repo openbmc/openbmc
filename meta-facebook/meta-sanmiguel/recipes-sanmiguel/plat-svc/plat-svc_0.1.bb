@@ -12,6 +12,7 @@ RDEPENDS:${PN} += "fb-common-functions"
 # udev rules
 SRC_URI:append = " \
     file://99-cp2112-bind.rules \
+    file://99-cp2112-cx9-gpio.rules \
     "
 
 # scripts
@@ -41,5 +42,6 @@ do_install() {
     UDEV_RULES_DIR="${D}${sysconfdir}/udev/rules.d"
     install -d ${UDEV_RULES_DIR}
     install -m 0644 ${UNPACKDIR}/99-cp2112-bind.rules ${UDEV_RULES_DIR}/99-cp2112-bind.rules
+    install -m 0644 ${UNPACKDIR}/99-cp2112-cx9-gpio.rules ${UDEV_RULES_DIR}/99-cp2112-cx9-gpio.rules
 }
 
