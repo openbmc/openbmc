@@ -7,6 +7,7 @@ SRC_URI:append = " \
     file://phosphor-multi-gpio-presence.json \
     file://cpu-boot-done \
     file://cpu-shdn-ok \
+    file://hmc-ready \
     file://run-power-good \
     file://thermal-event-logger \
     "
@@ -33,6 +34,7 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
     cpu-shdn-ok.service \
     prochot-assert-log@.service \
     prochot-deassert-log@.service \
+    hmc-ready-assert.service \
     run-power-good-assert.service \
     run-power-good-deassert.service \
     thermtrip-assert-log@.service \
@@ -55,6 +57,8 @@ do_install:append() {
                     ${D}${libexecdir}/${PN}/cpu-boot-done
     install -m 0755 ${UNPACKDIR}/cpu-shdn-ok \
                     ${D}${libexecdir}/${PN}/cpu-shdn-ok
+    install -m 0755 ${UNPACKDIR}/hmc-ready \
+                    ${D}${libexecdir}/${PN}/hmc-ready
     install -m 0755 ${UNPACKDIR}/run-power-good \
                     ${D}${libexecdir}/${PN}/run-power-good
     install -m 0755 ${UNPACKDIR}/thermal-event-logger \

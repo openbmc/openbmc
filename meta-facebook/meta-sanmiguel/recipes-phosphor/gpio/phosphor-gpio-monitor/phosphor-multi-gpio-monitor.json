@@ -106,5 +106,15 @@
             "RISING": ["prochot-deassert-log@HPM1-Chipthrot-Alert.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "HMC_READY-I",
+        "LineName": "HMC_READY-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_HIGH": ["hmc-ready-assert.service"],
+            "RISING": ["hmc-ready-assert.service"]
+        },
+        "Continue": true
     }
 ]

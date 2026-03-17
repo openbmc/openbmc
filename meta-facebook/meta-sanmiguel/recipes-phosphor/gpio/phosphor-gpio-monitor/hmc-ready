@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Define devices: "bus address"
+DEVICES=(
+    "90 0x50 24c64" # HPM0 FRU
+    "90 0x51 24c64" # HPM1 FRU
+    "90 0x52 24c02" # HMC FRU
+    "90 0x53 24c02" # CBC00 FRU
+    "90 0x54 24c02" # CBC01 FRU
+    "90 0x55 24c02" # CBC10 FRU
+    "90 0x56 24c02" # CBC11 FRU
+)
+
+bind_fru()
+{
+    MAX_RETRIES=6
+    ATTEMPT=1
+
+    while [ $ATTEMPT -le $MAX_RETRIES ]; do
+        echo "--- Attempt $ATTEMPT of $MAX_RETRIES ---"
+        ALL_SUCCESS=true
+
+        for DEV in "${DEVICES[@]}"; do
+            read -r BUS ADDR DRV_TYPE<<< "$DEV"
+            ADDR_SHORT=${ADDR#0x}
+
+            DEV_DIR="/sys/bus/i2c/devices/i2c-$BUS/$BUS-00$ADDR_SHORT"
+            EEPROM_PATH="$DEV_DIR/eeprom"
+
+            if [ -f "$EEPROM_PATH" ]; then
+                echo "[OK] Bus $BUS Addr $ADDR: EEPROM attribute exists."
+            else
+                ALL_SUCCESS=false
+                echo "[!] Bus $BUS Addr $ADDR: EEPROM attribute missing."
+
+                if [ -d "$DEV_DIR" ]; then
+                    echo "    -> Device folder exists but no eeprom. Deleting device to reset..."
+                    echo "$ADDR" > "/sys/bus/i2c/devices/i2c-$BUS/delete_device" 2>/dev/null
+                    sleep 0.5
+                fi
+
+                echo "    -> Adding device $DRV_TYPE to bus $BUS at $ADDR..."
+                echo "$DRV_TYPE" "$ADDR" > "/sys/bus/i2c/devices/i2c-$BUS/new_device" 2>/dev/null
+            fi
+        done
+
+        if [ "$ALL_SUCCESS" = true ]; then
+            echo "Success: All devices are fully initialized."
+            return 0
+        fi
+
+        echo "Round $ATTEMPT incomplete. Waiting 2s..."
+        sleep 2
+        ((ATTEMPT++))
+    done
+
+    echo "Error: Failed to stabilize all EEPROM attributes after $MAX_RETRIES attempts."
+    return 1
+}
+
+STATE="$1"
+
+if [ "$STATE" = "assert" ]; then
+    # Virtual EEPROMs appear a few seconds after HMC_READY-I is asserted, so use
+    # driver binding to ensure they are ready before triggering FRU rescan.
+    bind_fru
+
+    # Trigger FruDevice rescan on bus 90
+    busctl call xyz.openbmc_project.FruDevice /xyz/openbmc_project/FruDevice xyz.openbmc_project.FruDeviceManager ReScanBus q 90
+
+    # Restart HMC datetime sync service
+    systemctl restart hmc-datetime-sync.service
+fi
+
+exit 0

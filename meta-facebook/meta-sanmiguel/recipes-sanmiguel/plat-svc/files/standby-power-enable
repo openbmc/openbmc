@@ -213,12 +213,4 @@ echo "All HPM board CPLD Ready assertions successful."
 # Check ttyUSB devices is created with correct sequqnce
 check_ttyusb
 
-echo "Wait HMC Ready"
-if ! wait_gpio_value "HMC_READY-I" 1 120 1; then
-    ERROR_MESSAGE="HMC_READY-I failed to assert after 120 seconds."
-    echo "$ERROR_MESSAGE"
-else
-    echo "HMC_READY-I asserted."
-fi
-
 exit 0

@@ -1,0 +1,8 @@
+[Unit]
+Description=HMC Ready Assert
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/phosphor-gpio-monitor/hmc-ready assert
+
+SyslogIdentifier=hmc-ready-assert
