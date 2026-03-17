@@ -2,6 +2,12 @@
     "ConnectedCables": [
         "E1SBP_Cable_0A",
         "SWB_Cable_0B",
+        "SWB_Cable_J1",
+        "SWB_Cable_J2",
+        "SWB_Cable_MCIO0",
+        "SWB_Cable_MCIO1",
+        "SWB_Cable_MCIO2",
+        "SWB_Cable_MCIO3",
         "Rainbow_Cable_1A",
         "Rainbow_Cable_1B",
         "Rainbow_Cable_2A",
