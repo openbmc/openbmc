@@ -1,0 +1,10 @@
+[Unit]
+Description=SMA MCTP EID configuration - %i
+Wants=mctpd.service
+After=mctpd.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/mctp/sma-mctp-eid-config %i
+
+SyslogIdentifier=sma-mctp-eid-config-%i

@@ -1,0 +1,2 @@
+ACTION=="add|move", SUBSYSTEM=="net", KERNEL=="mcu1u*", TAG+="systemd", ENV{SYSTEMD_WANTS}+="sma-mctp-eid-config@%k"
+ACTION=="remove", SUBSYSTEM=="net", KERNEL=="mcu1u*", RUN+="/usr/bin/systemctl stop sma-mctp-eid-config@%k.service"

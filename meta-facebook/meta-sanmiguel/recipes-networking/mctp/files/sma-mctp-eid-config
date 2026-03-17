@@ -1,0 +1,79 @@
+#!/bin/bash
+
+MCTP_INTF=$1
+MAX_RETRIES=60
+RETRY_DELAY=2
+
+case "$MCTP_INTF" in
+    mcu1u2u1u1)   MCTP_EID=10 ;;
+    mcu1u2u2u1)   MCTP_EID=20 ;;
+    mcu1u2u1u4u1) MCTP_EID=30 ;;
+    mcu1u2u1u3u1) MCTP_EID=40 ;;
+    mcu1u2u2u3u1) MCTP_EID=50 ;;
+    mcu1u2u2u4u1) MCTP_EID=60 ;;
+    mcu1u1u4u1)   MCTP_EID=70 ;;
+    *)
+        echo "Unknown SMA MCTP interface: $MCTP_INTF"
+        exit 1
+        ;;
+esac
+
+setup_mctp_addr() {
+    if /usr/bin/mctp addr show "$MCTP_INTF" | grep -q "eid"; then
+        echo "MCTP address already exists for $MCTP_INTF."
+        return 0
+    fi
+
+    echo "Setting MCTP address 8 for $MCTP_INTF..."
+    /usr/bin/mctp addr add 8 dev "$MCTP_INTF"
+}
+
+setup_mctp_link() {
+    if /usr/bin/mctp link show "$MCTP_INTF" | grep -q "up"; then
+        echo "MCTP link $MCTP_INTF is already UP."
+        return 0
+    fi
+
+    echo "Bringing MCTP link $MCTP_INTF UP..."
+    /usr/bin/mctp link set "$MCTP_INTF" up
+}
+
+check_service_status() {
+    local SERVICE_NAME="mctpd.service"
+
+    if systemctl is-active --quiet "$SERVICE_NAME"; then
+        echo "Service $SERVICE_NAME is running."
+        return 0
+    fi
+
+    echo "Waiting for $SERVICE_NAME to be active..."
+    return 1
+}
+
+assign_static_eid() {
+    echo "Calling AssignEndpointStatic (EID: $MCTP_EID)..."
+    busctl call au.com.codeconstruct.MCTP1 \
+        /au/com/codeconstruct/mctp1/interfaces/"$MCTP_INTF" \
+        au.com.codeconstruct.MCTP.BusOwner1 \
+        AssignEndpointStatic ayy 0 "$MCTP_EID"
+}
+
+for ((i=1; i<=MAX_RETRIES; i++)); do
+    echo "--- Attempt $i/$MAX_RETRIES ---"
+
+    # Execute steps in sequence. If any return non-zero, sleep and start over.
+    if setup_mctp_addr && \
+        setup_mctp_link && \
+        check_service_status && \
+        assign_static_eid; then
+
+        echo "--- MCTP Setup Completed Successfully ---"
+        exit 0
+    fi
+
+    echo "SMA EID configuration failed. retry..."
+    sleep $RETRY_DELAY
+done
+
+echo "Error: MCTP setup failed after $MAX_RETRIES attempts."
+exit 1
