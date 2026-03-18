@@ -61,9 +61,11 @@ declare -A ERROR_MAP=(
 # Force DC off
 force_power_off() {
     if [ "$(power_status)" == "on" ]; then
+        trap 'trap - INT TERM; echo "force_power_off: interrupted, restoring power-host-control to 1" | systemd-cat -t power-cmd -p warning; set_gpio power-host-control 1; exit 1' INT TERM
         set_gpio power-host-control 0
         sleep 5
         set_gpio power-host-control 1
+        trap - INT TERM
         sleep 1
     fi
 
@@ -85,9 +87,11 @@ force_power_off() {
 # Graceful DC off
 graceful_power_off() {
     if [ "$(power_status)" == "on" ]; then
+        trap 'trap - INT TERM; echo "graceful_power_off: interrupted, restoring power-host-control to 1" | systemd-cat -t power-cmd -p warning; set_gpio power-host-control 1; exit 1' INT TERM
         set_gpio power-host-control 0
         sleep 5
         set_gpio power-host-control 1
+        trap - INT TERM
         sleep 1
 
         # wait host power off

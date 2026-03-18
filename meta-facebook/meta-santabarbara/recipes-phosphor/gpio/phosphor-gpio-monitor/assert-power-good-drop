@@ -37,17 +37,17 @@ if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningT
 fi
 
 active=$(systemctl is-active host-graceful-poweroff@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+if [ "$active" = "active" ] || [ "$active" = "activating" ] || [ "$active" = "deactivating" ]; then
     exit 0
 fi
 
 active=$(systemctl is-active host-force-poweroff@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+if [ "$active" = "active" ] || [ "$active" = "activating" ] || [ "$active" = "deactivating" ]; then
     exit 0
 fi
 
 active=$(systemctl is-active host-powerreset@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+if [ "$active" = "active" ] || [ "$active" = "activating" ] || [ "$active" = "deactivating" ]; then
     exit 0
 fi
 
