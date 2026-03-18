@@ -1,0 +1,6 @@
+#!/bin/sh
+# Wrapper around uboot-mkimage that forces external data (-E) with 8-byte
+# alignment (-B 8) for NPCM8XX FIT images. This ensures the FDT blob in the
+# FIT image is aligned to 8 bytes, preventing "Synchronous Abort" on ARMv8
+# when U-Boot accesses 64-bit reserved memory entries in the FDT.
+exec uboot-mkimage -E -B 8 "$@"

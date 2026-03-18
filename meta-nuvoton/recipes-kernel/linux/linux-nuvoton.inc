@@ -17,8 +17,6 @@ LINUX_VERSION_EXTENSION ?= "-${SRCREV}"
 
 PV = "${LINUX_VERSION}+git${SRCPV}"
 
-UBOOT_MKIMAGE:append:npcm8xx = " -E -B 8"
-
 inherit kernel
 require recipes-kernel/linux/linux-yocto.inc
 

@@ -52,3 +52,5 @@ OPTEEMACHINE ?= "nuvoton"
 TIP_IMAGE ?= "True"
 
 SA_TIP_IMAGE ?= "False"
+
+UBOOT_MKIMAGE:npcm8xx = "uboot-mkimage-npcm8xx"
