@@ -6,7 +6,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://../../LICENSE;md5=34400b68072d710fecd0a2940a0d1658"
 
 SRC_URI += "git://github.com/openbmc/google-misc;branch=master;protocol=https"
-SRCREV = "339f2ca90096afa4f3d216d277261fcfc44559f6"
+SRCREV = "a5505ddbe23485505fdc03c16132ba62daa4fbcb"
 
 S = "${UNPACKDIR}/${PN}-1.0+git/subprojects/${GOOGLE_MISC_PROJ}"
 inherit meson pkgconfig
