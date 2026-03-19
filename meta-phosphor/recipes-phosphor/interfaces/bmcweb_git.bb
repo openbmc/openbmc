@@ -32,6 +32,7 @@ PACKAGECONFIG ??= " \
     http-zstd \
     kvm \
     mutual-tls-auth \
+    redfish-allow-rotational-fans \
     redfish-bmc-journal \
     redfish-oem-manager-fan-data \
     vm-websocket \
@@ -43,6 +44,7 @@ PACKAGECONFIG[insecure-redfish-expand] = "-Dinsecure-enable-redfish-query=enable
 PACKAGECONFIG[kvm] = "-Dkvm=enabled,-Dkvm=disabled"
 PACKAGECONFIG[mutual-tls-auth] = "-Dmutual-tls-auth=enabled,-Dmutual-tls-auth=disabled"
 PACKAGECONFIG[redfish-allow-deprecated-power-thermal] = "-Dredfish-allow-deprecated-power-thermal=enabled,-Dredfish-allow-deprecated-power-thermal=disabled"
+PACKAGECONFIG[redfish-allow-rotational-fans] = "-Dredfish-allow-rotational-fans=enabled, -Dredfish-allow-rotational-fans=disabled"
 PACKAGECONFIG[redfish-bmc-journal] = "-Dredfish-bmc-journal=enabled,-Dredfish-bmc-journal=disabled"
 PACKAGECONFIG[redfish-cpu-log] = "-Dredfish-cpu-log=enabled,-Dredfish-cpu-log=disabled"
 PACKAGECONFIG[redfish-dbus-log] = "-Dredfish-dbus-log=enabled,-Dredfish-dbus-log=disabled"
