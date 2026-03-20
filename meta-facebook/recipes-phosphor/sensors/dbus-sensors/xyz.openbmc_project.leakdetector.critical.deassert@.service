@@ -1,0 +1,7 @@
+[Unit]
+Description=Leak detection critical deassert handler for %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/dbus-sensors/critical-leak-deassert-handler %i
+SyslogIdentifier=%i-critical-leak-deassert-handler

@@ -1,0 +1,7 @@
+[Unit]
+Description=Leak detection warning deassert handler for %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/dbus-sensors/warning-leak-deassert-handler %i
+SyslogIdentifier=%i-warning-leak-deassert-handler

@@ -1,0 +1,202 @@
+#!/bin/bash
+
+if [ $# -ne 1 ]; then
+    echo "Incorrect number of arguments. Expected 1, got $#."
+    exit 1
+fi
+
+detector=$1
+
+call_if_defined() {
+    local func="$1"
+    shift
+    if declare -f "$func" > /dev/null 2>&1; then
+        "$func" "$@"
+    fi
+}
+
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+# shellcheck source=meta-facebook/recipes-phosphor/sensors/dbus-sensors/critical-leak-assert-handler-platform.sh
+source "${SCRIPT_DIR}/critical-leak-assert-handler-platform.sh"
+
+# === Leak detection: invoke optional hook ===
+
+call_if_defined hook_on_leak_detected "$detector"
+
+# === Leak detection: rack power-off handling ===
+
+get_leak_config() {
+    call_if_defined _platform_get_leak_config
+}
+check_rpu_ready() {
+    call_if_defined _platform_check_rpu_ready
+}
+call_if_defined _platform_get_shutdown_detectors
+call_if_defined _platform_get_valves
+
+readonly LEAK_CONFIG_BRINGUP=0
+readonly LEAK_CONFIG_CAPACITY=1
+readonly LEAK_CONFIG_SAFETY=2
+readonly LEAK_CONFIG_POR=3
+get_leak_config_name() {
+    case "$(get_leak_config)" in
+        "$LEAK_CONFIG_BRINGUP") echo "BRINGUP" ;;
+        "$LEAK_CONFIG_CAPACITY") echo "CAPACITY" ;;
+        "$LEAK_CONFIG_SAFETY") echo "SAFETY" ;;
+        "$LEAK_CONFIG_POR") echo "POR" ;;
+        *) echo "UNKNOWN" ;;
+    esac
+}
+
+leak_config_requires_power_off() {
+    local mode
+    mode=$(get_leak_config)
+    if [[ -z "$mode" ]]; then
+        echo "Warning: failed to read leak config, assuming power-off required" >&2
+        return 0
+    fi
+    (( mode == LEAK_CONFIG_SAFETY || mode == LEAK_CONFIG_POR ))
+}
+
+if ! declare -p SHUTDOWN_DETECTORS &>/dev/null || [[ ${#SHUTDOWN_DETECTORS[@]} -eq 0 ]]; then
+    echo "Leak detector '$detector' ignored (SHUTDOWN_DETECTORS is not declared or empty)"
+    exit 0
+fi
+
+# Check if power-off is required by leak_config
+if ! leak_config_requires_power_off; then
+    echo "Leak detector '$detector' ignored (leak_config=$(get_leak_config_name) does not require power-off)"
+    exit 0
+fi
+
+# Check if detector is in shutdown list and enabled
+if [[ -v "SHUTDOWN_DETECTORS[$detector]" && "${SHUTDOWN_DETECTORS[$detector]}" != "0" ]]; then
+    echo "Leak detector '$detector' triggered power-off sequence (leak_config=$(get_leak_config_name))"
+else
+    echo "Leak detector '$detector' ignored (not in shutdown list or disabled, leak_config=$(get_leak_config_name))"
+    exit 0
+fi
+
+get_cable_presence() {
+    # Returns 0 if cable is present, 1 if not
+    local path="/xyz/openbmc_project/inventory/system/cable/$1"
+    busctl introspect xyz.openbmc_project.EntityManager "$path" >/dev/null 2>&1 # return 0: present, 1: not present
+}
+
+get_valve_value() {
+    # Returns valve value, or exits with error if unavailable
+    local path="/xyz/openbmc_project/sensors/valve/$1"
+    local val
+    val=$(busctl get-property \
+            xyz.openbmc_project.valvemonitor \
+            "$path" \
+            xyz.openbmc_project.Sensor.Value \
+        Value 2>/dev/null | awk '{print $2}')
+
+    [[ -z "$val" ]] && return 1
+    echo "$val"
+}
+
+has_any_valve_port() {
+    local cable_name valve_name
+    for entry in "${VALVES[@]}"; do
+        IFS='|' read -r cable_name valve_name <<< "$entry"
+        if get_cable_presence "$cable_name"; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+all_connected_valves_closed() {
+    local cable_name valve_name val
+    for entry in "${VALVES[@]}"; do
+        IFS='|' read -r cable_name valve_name <<< "$entry"
+        if get_cable_presence "$cable_name"; then
+            val=$(get_valve_value "$valve_name") || return 1
+            awk -v v="$val" 'BEGIN {exit !(v < 0.001)}' || return 1
+        fi
+    done
+    return 0
+}
+
+rack_power_off_when_coolant_safe() {
+    start_ts=$(date +%s)
+    while true; do
+        if has_any_valve_port; then
+            # For valve systems, wait until all valves are closed, then request the PSU to power off.
+            if all_connected_valves_closed; then
+                rack_power_off "$detector"
+                break
+            else
+                wait_limit=150
+            fi
+        else
+            # For AALC systems, wait until rpu_ready becomes 0, then request the PSU to power off.
+            if (( $(check_rpu_ready) == 0 )); then
+                rack_power_off "$detector"
+                break
+            else
+                wait_limit=15
+            fi
+        fi
+
+        now_ts=$(date +%s)
+        elapsed=$((now_ts - start_ts))
+        if [ "$elapsed" -ge "$wait_limit" ]; then
+            echo "Timeout after $wait_limit seconds"
+            rack_power_off "$detector"
+            break
+        else
+            echo "Waiting ($elapsed/$wait_limit)"
+        fi
+        sleep 1
+    done
+}
+
+rack_power_off() {
+    curl -f -s -o /dev/null \
+        --cacert /var/facebook/rootcanal/rc_digicert_ca.pem \
+        --cert /mnt/data/etc/x509_highpriv_host.cert \
+        --key /mnt/data/etc/x509_highpriv_host.key \
+        -X POST "https://${RACKPOWER_HOSTNAME}/${RACKPOWER_URI}" \
+        --data '{"ResetType": "ForceOff"}' \
+        --resolve "${RACKPOWER_HOSTNAME}:443:${RACKPOWER_IP}"
+
+    CMD_STATUS=$?
+
+    if [ $CMD_STATUS -eq 0 ]; then
+        echo "Rack Power Off command sent successfully."
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Successfully sent rack power off command during rack leak to RackSwitch" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 2 "DetectorName" "$1" "RackSwitch" "$RACKPOWER_HOSTNAME"
+    else
+        echo "[ERROR] Failed($CMD_STATUS) to send Rack Power Off command."
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Failed to send rack power off command during rack leak to RackSwitch" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 3 "DetectorName" "$1" "RackSwitch" "$RACKPOWER_HOSTNAME" "Error" "$CMD_STATUS"
+        exit 1
+    fi
+}
+
+files=(
+    "/var/facebook/rootcanal/rc_digicert_ca.pem"
+    "/mnt/data/etc/x509_highpriv_host.cert"
+    "/mnt/data/etc/x509_highpriv_host.key"
+    "/mnt/data/etc/rackpower_ipaddr"
+    "/mnt/data/etc/rackpower_hostname"
+)
+
+for file in "${files[@]}"; do
+    if [ ! -f "$file" ]; then
+        echo "[ERROR] Required file not found: $file"
+        echo "[ERROR] Abort sending Rack Power Off command"
+        exit 1
+    fi
+done
+
+RACKPOWER_HOSTNAME=$(cat /mnt/data/etc/rackpower_hostname)
+RACKPOWER_IP=$(cat /mnt/data/etc/rackpower_ipaddr)
+RACKPOWER_URI="redfish/v1/Chassis/Rack/Actions/Chassis.Reset"
+
+rack_power_off_when_coolant_safe
