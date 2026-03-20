@@ -2,6 +2,79 @@
 # shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
 source /usr/libexec/yosemite5-common-functions
 
+set_product_versions_to_mb_cpld()
+{
+    printf "Setting board product version to MB CPLD\n"
+
+    local BUS="11"
+    local ADDR="0x0f"
+    declare -A REGS=( ["17"]=0x88 ["18"]=0x88 )
+
+    local BOARD_CONFIGS=(
+        "E1_S:17:16"
+        "SCM:17:1"
+        "Victoria_Falls:18:16"
+        "Maple_Falls:18:1"
+    )
+
+    for CONFIG in "${BOARD_CONFIGS[@]}"; do
+        local BOARD REG MULT
+        IFS=":" read -r BOARD REG MULT <<< "$CONFIG"
+
+        local FRU_NAME
+        if ! FRU_NAME=$(find_fru_name "$BOARD"); then
+            continue
+        fi
+
+        local VERSION
+        VERSION=$(get_product_version "$FRU_NAME")
+        if [ "$VERSION" = "Unknown" ]; then
+            continue
+        fi
+
+        local STAGE_VAL
+        case "$VERSION" in
+            EVT)      STAGE_VAL=0 ;;
+            DVT|DVT1) STAGE_VAL=1 ;;
+            DVT2)     STAGE_VAL=2 ;;
+            DVT3)     STAGE_VAL=3 ;;
+            PVT)      STAGE_VAL=4 ;;
+            MP)       STAGE_VAL=5 ;;
+            *)        continue ;;
+        esac
+
+        local MASK=$(( 0x0F * MULT ))
+        local VAL=$(( STAGE_VAL * MULT ))
+        REGS["$REG"]=$(( (REGS["$REG"] & ~MASK) | VAL ))
+
+        printf "Found %s version: %s\n" "$FRU_NAME" "$VERSION"
+    done
+
+    for REG in "${!REGS[@]}"; do
+        local VAL_HEX
+        VAL_HEX=$(printf "0x%02x" "${REGS[$REG]}")
+
+        if ! i2cset -y "$BUS" "$ADDR" "0x$REG" "$VAL_HEX" 2>/dev/null; then
+            printf "MB CPLD Reg 0x%s: Write failed\n" "$REG"
+            continue
+        fi
+
+        local READ_VAL
+        READ_VAL=$(i2cget -y "$BUS" "$ADDR" "0x$REG" 2>/dev/null)
+
+        if [ -z "$READ_VAL" ]; then
+            printf "MB CPLD Reg 0x%s: Read back failed\n" "$REG"
+        elif [ "$((READ_VAL))" -ne "$((VAL_HEX))" ]; then
+            printf "MB CPLD  Reg 0x%s: Mismatch (W:%s R:%s)\n" \
+                "$REG" "$VAL_HEX" "$READ_VAL"
+        else
+            printf "MB CPLD Reg 0x%s: Updated to %s\n" "$REG" "$VAL_HEX"
+        fi
+    done
+}
+
+set_product_versions_to_mb_cpld
+
 echo "initial value for GPIO output pins"
 # set initial value for GPIO output pins
 

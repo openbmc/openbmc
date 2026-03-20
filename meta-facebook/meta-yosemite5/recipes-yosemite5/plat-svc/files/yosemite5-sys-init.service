@@ -3,6 +3,7 @@ Description=Yosemite5 Early System Init
 Before=phosphor-multi-gpio-monitor.service
 Before=phosphor-pid-control.service
 Before=xyz.openbmc_project.fansensor.service
+After=xyz.openbmc_project.EntityManager.service
 
 [Service]
 Type=oneshot

@@ -1,5 +1,8 @@
 #!/bin/bash
 
+FRU_SVC="xyz.openbmc_project.FruDevice"
+FRU_ROOT="/xyz/openbmc_project/FruDevice"
+
 set_gpio()
 {
     local NET_NAME=$1
@@ -38,4 +41,54 @@ get_gpio()
 
     echo " success"
     return "${ret}"
+}
+
+find_fru_name()
+{
+    local KEYWORD="$1"
+    local FRU_PATH
+
+    if [ -z "$KEYWORD" ]; then
+        echo "find_fru_name: no keyword provided" >&2
+        return 1
+    fi
+
+    FRU_PATH=$(busctl tree "$FRU_SVC" --list --timeout=10s 2>/dev/null |
+        grep -i "$KEYWORD" | head -n 1)
+
+    if [ -z "$FRU_PATH" ]; then
+        echo "find_fru_name: no FRU found for $KEYWORD" >&2
+        return 1
+    fi
+
+    basename "$FRU_PATH"
+}
+
+get_product_version()
+{
+    local FRU_NAME="$1"
+    local OUTPUT
+    local VERSION
+    local OBJ_PATH="$FRU_ROOT/$FRU_NAME"
+
+    if [ -z "$FRU_NAME" ]; then
+        echo "get_product_version: no name provided" >&2
+        return 1
+    fi
+
+    if ! OUTPUT=$(busctl get-property --timeout=10s \
+        "$FRU_SVC" "$OBJ_PATH" "$FRU_SVC" PRODUCT_VERSION 2>/dev/null); then
+        echo "Unknown"
+        return 1
+    fi
+
+    VERSION=$(echo "$OUTPUT" | cut -d'"' -f2)
+
+    if [ -z "$VERSION" ] || [ "$VERSION" = "$OUTPUT" ]; then
+        echo "get_product_version: parse error for $FRU_NAME" >&2
+        echo "Unknown"
+        return 1
+    fi
+
+    echo "$VERSION"
 }
