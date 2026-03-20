@@ -28,6 +28,7 @@ ARGUMENT_LIST=(
     "dev-type:"
     "gadget-dir-name:"
     "iface-name:"
+    "iface-alias:"
 )
 
 print_usage() {
@@ -42,6 +43,7 @@ $0 [OPTIONS] [stop|start]
         --bind-device Name of the device to bind, as listed in /sys/class/udc/
         --gadget-dir-name Optional base name for gadget directory. Default: iface-name
         --iface-name name of the network interface.
+        --iface-alias alias name of the network interface.
         --help  Print this help and exit.
 HELP
 }
@@ -53,6 +55,16 @@ gadget_start() {
 [Match]
 Name=${IFACE_NAME}
 EOF
+
+    if [[ -n $IFACE_ALIAS ]]; then
+        cat >/run/systemd/network/+-bmc-"${IFACE_NAME}".link <<EOF
+[Match]
+OriginalName=${IFACE_NAME}
+
+[Link]
+Alias=${IFACE_ALIAS}
+EOF
+    fi
 
     # Add the gbmcbr configuration if this is a relevant device
     if (( ID_VENDOR == 0x18d1 && ID_PRODUCT == 0x22b )); then
@@ -121,6 +133,10 @@ EOF
             ip link set dev "$ifname" name "${IFACE_NAME}" && break
         sleep 1
     done
+    if [[ -n $IFACE_ALIAS ]]; then
+        ip link set dev "$IFACE_NAME" alias "$IFACE_ALIAS" || return
+    fi
+
     ip link set dev "$IFACE_NAME" up || return
 }
 
@@ -134,6 +150,7 @@ gadget_stop() {
       "${gadget_dir}" || true
 
     rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".network
+    rm -f /run/systemd/network/+-bmc-"${IFACE_NAME}".link
     # shellcheck disable=SC2119
     gbmc_net_networkd_reload || true
 }
@@ -191,6 +208,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --iface-name)
             IFACE_NAME=$2
+            shift 2
+            ;;
+        --iface-alias)
+            IFACE_ALIAS=$2
             shift 2
             ;;
         --help)
