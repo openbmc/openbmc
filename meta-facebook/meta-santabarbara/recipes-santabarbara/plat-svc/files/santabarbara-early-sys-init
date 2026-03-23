@@ -36,6 +36,20 @@ config_max31790()
     echo "43-0021" > /sys/bus/i2c/drivers/max31790/bind
 }
 
+config_tps25990()
+{
+    # TI recommends sending the CLEAR_FAULTS command after every successful
+    # power-up to clear warning/fault/status bits and de-assert SMBA#.
+    for dev in /sys/bus/i2c/drivers/tps25990/*-0050; do
+        if [ -d "$dev" ]; then
+            bus_addr=$(basename "$dev")
+            bus=${bus_addr%%-*}
+            i2cset -fy "$bus" 0x50 0x03 c
+            echo "Configure TPS25990 HSC"
+        fi
+    done
+}
+
 config_mcp9600()
 {
     # Enable thermocouple sensor IC alert to prevent PTTV hardware damage from overheating.
@@ -91,6 +105,9 @@ fi
 
 # Enable all fan input as early as possible
 enable_all_fan_input
+
+# Clear TPS25990 HSC fault to allow hwmon telemetry readings
+config_tps25990
 
 # Enable MCP9600 IC alert to prevent hardware damage
 config_mcp9600
