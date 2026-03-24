@@ -10,6 +10,24 @@
         "Continue": true
     },
     {
+        "Name": "B0_M0_CPU_SHDN_OK_L-I",
+        "LineName": "B0_M0_CPU_SHDN_OK_L-I",
+          "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cpu-shdn-ok.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "B1_M0_CPU_SHDN_OK_L-I",
+        "LineName": "B1_M0_CPU_SHDN_OK_L-I",
+          "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["cpu-shdn-ok.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "HPM0-Run-Power-Good",
         "LineName": "B0_M0_RUN_POWER_PG-I",
         "EventMon": "BOTH",

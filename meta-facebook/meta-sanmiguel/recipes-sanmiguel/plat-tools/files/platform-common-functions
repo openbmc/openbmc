@@ -12,6 +12,18 @@ plat_get_gpio() {
         "B1_M0_RUN_POWER_PG-I")
             get_ioexp_gpio 7 0x20 9
             ;;
+        "B0_M0_CPU_SHDN_OK_L-I")
+            get_ioexp_gpio 2 0x20 12
+            ;;
+        "B1_M0_CPU_SHDN_OK_L-I")
+            get_ioexp_gpio 7 0x20 12
+            ;;
+        "B0_M0_CPU_BOOT_COMPLETE_3V3-I")
+            get_ioexp_gpio 2 0x21 14
+            ;;
+        "B1_M0_CPU_BOOT_COMPLETE_3V3-I")
+            get_ioexp_gpio 7 0x21 14
+            ;;
         *)
             get_gpio "$net_name"
             ;;

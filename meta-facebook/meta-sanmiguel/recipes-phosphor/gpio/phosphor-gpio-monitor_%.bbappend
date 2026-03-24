@@ -5,9 +5,14 @@ inherit systemd
 SRC_URI:append = " \
     file://phosphor-multi-gpio-monitor.json \
     file://cpu-boot-done \
+    file://cpu-shdn-ok \
     file://run-power-good \
+    "
+
+SRC_URI:append = " \
     file://cpu-boot-done-assert.service \
     file://cpu-boot-done-deassert.service \
+    file://cpu-shdn-ok.service \
     file://run-power-good-assert.service \
     file://run-power-good-deassert.service \
     "
@@ -19,6 +24,7 @@ FILES:${PN} += "${systemd_system_unitdir}/*"
 SYSTEMD_SERVICE:${PN}-monitor += " \
     cpu-boot-done-assert.service \
     cpu-boot-done-deassert.service \
+    cpu-shdn-ok.service \
     run-power-good-assert.service \
     run-power-good-deassert.service \
     "
@@ -34,12 +40,11 @@ do_install:append() {
 
     install -m 0755 ${UNPACKDIR}/cpu-boot-done \
                     ${D}${libexecdir}/${PN}/cpu-boot-done
+    install -m 0755 ${UNPACKDIR}/cpu-shdn-ok \
+                    ${D}${libexecdir}/${PN}/cpu-shdn-ok
     install -m 0755 ${UNPACKDIR}/run-power-good \
                     ${D}${libexecdir}/${PN}/run-power-good
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${UNPACKDIR}/cpu-boot-done-assert.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${UNPACKDIR}/cpu-boot-done-deassert.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${UNPACKDIR}/run-power-good-assert.service ${D}${systemd_system_unitdir}
-    install -m 0644 ${UNPACKDIR}/run-power-good-deassert.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
 }
