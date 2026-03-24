@@ -143,9 +143,6 @@ OBMC_DBUS_IFACE_ROOT ?= "xyz.openbmc_project"
 # phosphor-ipmi-fru-whitelist-native recipe.
 VIRTUAL-RUNTIME_phosphor-ipmi-providers ?= "phosphor-ipmi-fru"
 
-# Set security headers on builds
-require conf/distro/include/security_flags.inc
-
 # obmc-libobmc-intf doesn't compile with security flags enabled
 SECURITY_CFLAGS:pn-obmc-libobmc-intf = ""
 

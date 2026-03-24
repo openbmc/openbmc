@@ -63,9 +63,6 @@ WARN_TO_ERROR_QA = "already-stripped compile-host-path install-host-path \
 WARN_QA:remove = "${WARN_TO_ERROR_QA}"
 ERROR_QA:append = " ${WARN_TO_ERROR_QA}"
 
-require conf/distro/include/no-static-libs.inc
-require conf/distro/include/yocto-uninative.inc
-
 DISTRO_NAME ?= "Phosphor OpenBMC (Phosphor OpenBMC Project Reference Distro)"
 TARGET_VENDOR = "-openbmc"
 
