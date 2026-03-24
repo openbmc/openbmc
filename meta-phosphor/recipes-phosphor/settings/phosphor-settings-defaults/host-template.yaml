@@ -23,6 +23,10 @@
       Properties:
           BootType:
               Default: Type::Types::EFI
+    - Interface: "xyz.openbmc_project.Control.Boot.Flags"
+      Properties:
+          CMOSClear:
+              Default: 'false'
     - Interface: xyz.openbmc_project.Object.Enable
       Properties:
           Enabled:
