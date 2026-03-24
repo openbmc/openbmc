@@ -1,0 +1,21 @@
+[Unit]
+Description=Scan FSI devices
+Wants=obmc-power-on@0.target
+After=obmc-power-on@0.target
+Wants=obmc-host-start-pre@0.target
+Before=obmc-host-start-pre@0.target
+After=op-cfam-reset.service
+Before=start_host@0.service
+Conflicts=obmc-chassis-poweroff@0.target
+Conflicts=obmc-host-stop@0.target
+ConditionPathExists=!/run/openbmc/mpreboot@0
+
+[Service]
+ExecStart=/usr/bin/openpower-proc-control scanFSI
+
+Type=oneshot
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-chassis-poweron@0.target
+WantedBy=obmc-host-startmin@0.target

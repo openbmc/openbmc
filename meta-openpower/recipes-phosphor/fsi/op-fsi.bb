@@ -10,15 +10,5 @@ inherit obmc-phosphor-systemd
 
 RDEPENDS:${PN} += "op-proc-control"
 
-TGTFMT_CHASSIS = "obmc-chassis-poweron@{0}.target"
-TGTFMT_HOST = "obmc-host-startmin@{0}.target"
+SYSTEMD_SERVICE:${PN} += "fsi-scan.service fsi-enable.service fsi-disable.service"
 
-TMPL_SCAN = "fsi-scan@.service"
-INSTFMT_SCAN = "fsi-scan@{0}.service"
-FMT_SCAN_CHASSIS = "../${TMPL_SCAN}:${TGTFMT_CHASSIS}.wants/${INSTFMT_SCAN}"
-FMT_SCAN_HOST = "../${TMPL_SCAN}:${TGTFMT_HOST}.wants/${INSTFMT_SCAN}"
-
-SYSTEMD_SERVICE:${PN} += "${TMPL_SCAN} fsi-enable.service fsi-disable.service"
-
-SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_SCAN_CHASSIS', 'OBMC_CHASSIS_INSTANCES')}"
-SYSTEMD_LINK:${PN} += "${@compose_list(d, 'FMT_SCAN_HOST', 'OBMC_HOST_INSTANCES')}"
