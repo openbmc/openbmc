@@ -17,16 +17,16 @@ HOST_DEFAULT_TARGETS = " \
     obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
     obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
+    obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
+    obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
 "
 
 CHASSIS_DEFAULT_TARGETS = " \
-    obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
     obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
     obmc-chassis-poweron@{}.target.requires/phosphor-set-chassis-transition-to-on@{}.service \
     obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
     obmc-chassis-poweroff@{}.target.requires/obmc-powered-off@{}.service \
-    obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
     obmc-chassis-poweroff@{}.target.requires/phosphor-set-chassis-transition-to-off@{}.service \
     obmc-chassis-blackout@{}.target.wants/phosphor-reset-sensor-states@{}.service \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-on@{}.service \
