@@ -36,6 +36,7 @@ GROUPADD_PARAM:${PN} = "--system ${TSS_USER}"
 USERADD_PARAM:${PN} = "--system -g ${TSS_GROUP} --home-dir / \
     --no-create-home  --shell /bin/false ${BPN}"
 
+
 PACKAGE_BEFORE_PN = "${PN}-cuse"
 FILES:${PN}-cuse = "${bindir}/swtpm_cuse"
 

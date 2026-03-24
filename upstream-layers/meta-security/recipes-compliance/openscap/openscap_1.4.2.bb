@@ -56,11 +56,14 @@ do_install:append:class-native () {
     cp -a ${D}/${STAGING_DATADIR_NATIVE}/openscap $oscapdir
 }
 
+
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "${@bb.utils.contains('PACKAGECONFIG','remediate_service', 'oscap-remediate.service', '',d)}"
 SYSTEMD_AUTO_ENABLE = "disable"
 
+
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR}"
+
 
 RDEPENDS:${PN} = "libxml2 python3-core libgcc bash"
 RDEPENDS:${PN}:class-target = "libxml2 python3-core libgcc bash os-release"
