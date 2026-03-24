@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://${UNPACKDIR}/LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a
 
 FILENAME = "Poleg_bootblock_${PV}.bin"
 
-S = "${UNPACKDIR}/sources"
+S = "${UNPACKDIR}"
 
 SRCREV = "cac8f0ed8c6e875148ec37b657fcbdd1058c2c69"
 SRC_URI = " \
