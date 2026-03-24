@@ -61,8 +61,11 @@ do_compile[depends] += " \
 do_compile() {
     # copy Openbmc built images
     cd ${DEPLOY_DIR_IMAGE}
-    cp -v ${BB_BIN} bl31.bin tee.bin u-boot.bin ${IGPS_SCRIPT_BASE}/inputs
-
+    cp -v -t ${IGPS_SCRIPT_BASE}/inputs \
+        ${BB_BIN} \
+        trusted-firmware-a/bl31.bin \
+        tee.bin \
+        u-boot.bin
     cd ${IGPS_SCRIPT_BASE}
     install -d output_binaries/tmp
     install -d inputs/key_input
