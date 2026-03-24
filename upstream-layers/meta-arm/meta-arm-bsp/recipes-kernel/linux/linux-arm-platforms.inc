@@ -97,6 +97,7 @@ SRC_URI:append:fvp-base = " \
                          'file://no-strict-devmem.cfg', '' , d)} \
 "
 
+
 #
 # Juno KMACHINE
 #

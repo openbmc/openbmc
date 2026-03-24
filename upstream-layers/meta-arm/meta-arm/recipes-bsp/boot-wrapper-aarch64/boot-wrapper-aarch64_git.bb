@@ -52,6 +52,7 @@ EXTRA_OEMAKE += "'KERNEL_DTB=${DEPLOY_DIR_IMAGE}/${REAL_DTB}'"
 EXTRA_OEMAKE += "'KERNEL_IMAGE=${DEPLOY_DIR_IMAGE}/${BOOT_WRAPPER_AARCH64_KERNEL}'"
 EXTRA_OEMAKE += "'CMDLINE=${BOOT_WRAPPER_AARCH64_CMDLINE}'"
 
+
 do_configure:prepend() {
     # Create dummy files to make configure happy.
     # We will pass the generated ones directly to make.
