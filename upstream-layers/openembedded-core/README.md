@@ -1,1 +1,1 @@
-README.poky.md
+README.OE-Core.md
