@@ -66,7 +66,7 @@ EXTRA_OEMESON = " \
 
 do_install_ptest() {
         install -d ${D}${PTEST_PATH}/test
-        cp -rf ${B}/*_test ${D}${PTEST_PATH}/test/
+        cp -rf ${B}/test/*_test ${D}${PTEST_PATH}/test/
 }
 
 RDEPENDS:${PN} += " \
