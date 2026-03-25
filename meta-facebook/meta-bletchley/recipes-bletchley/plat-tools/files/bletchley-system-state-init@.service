@@ -6,7 +6,7 @@ Wants=xyz.openbmc_project.State.Host@%i.service
 After=xyz.openbmc_project.State.Host@%i.service
 
 [Service]
-ExecStart=/usr/libexec/bletchley-system-state-init %i
+ExecStart=/usr/libexec/bletchley-common-tool/bletchley-system-state-init %i
 SyslogIdentifier=bletchley-system-state-init sled%i
 Type=oneshot
 RemainAfterExit=yes

@@ -8,11 +8,11 @@ Wants=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presenc
 After=mapper-wait@-xyz-openbmc_project-inventory-system-chassis-presence-presence_sled%i.service
 
 [Service]
-ExecStart=/usr/libexec/motor-init sled%i
+ExecStart=/usr/libexec/motor-ctrl/motor-init sled%i
 SyslogIdentifier=Motor Initialize sled%i
 Type=oneshot
 RemainAfterExit=yes
-ExecStopPost=/usr/libexec/motor-ctrl sled%i s
+ExecStopPost=/usr/libexec/motor-ctl/motor-ctrl sled%i s
 Restart=on-failure
 RestartSec=1
 
