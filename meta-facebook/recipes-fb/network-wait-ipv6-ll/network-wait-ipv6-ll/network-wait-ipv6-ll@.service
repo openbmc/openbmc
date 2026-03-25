@@ -5,7 +5,7 @@ Before=systemd-networkd.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/libexec/check-ipv6-ll %i
+ExecStart=/usr/libexec/network-wait-ipv6-ll/check-ipv6-ll %i
 
 [Install]
 WantedBy=multi-user.target
