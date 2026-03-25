@@ -148,6 +148,13 @@ SECURITY_CFLAGS:pn-obmc-libobmc-intf = ""
 
 # We generally want to enable LTO with meson
 EXTRA_OEMESON:append:class-target = " -Db_lto=true"
+# But, GCC possibly injects build strings when using LTO unless
+# DEBUG_PREFIX_MAP flags are given, resulting in build QA failures:
+#   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=109805
+# See also:
+#   https://lore.kernel.org/openembedded-core/20260325113951.1278864-1-patrick@stwcx.xyz/
+TARGET_LDFLAGS:append:class-target = " ${DEBUG_PREFIX_MAP}"
+
 
 # Set the root password to '0penBmc'
 # Override this in your local.conf
