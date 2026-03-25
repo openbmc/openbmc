@@ -8,6 +8,8 @@ inherit phosphor-dbus-monitor
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
+S = "${UNPACKDIR}"
+
 SRC_URI += "file://power-supply-policy.yaml"
 
 do_install() {

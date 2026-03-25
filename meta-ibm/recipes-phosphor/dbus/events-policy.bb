@@ -8,6 +8,8 @@ inherit phosphor-dbus-monitor
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}:"
 
+S = "${UNPACKDIR}"
+
 SRC_URI += "file://config.yaml"
 
 do_install() {
