@@ -11,7 +11,9 @@ PACKAGECONFIG:openbmc-phosphor:class-target = ""
 #https://github.com/openbmc/docs/blob/master/cpp-style-and-conventions.md#boost
 #
 BOOST_LIBS:openbmc-phosphor:class-target = " \
+    atomic \
     chrono \
+    container \
     context \
     coroutine \
     date_time \
