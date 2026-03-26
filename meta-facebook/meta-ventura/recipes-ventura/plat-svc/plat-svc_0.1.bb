@@ -1,7 +1,8 @@
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-inherit allarch systemd obmc-phosphor-systemd
+inherit allarch
+inherit systemd
 
 S = "${UNPACKDIR}"
 
@@ -26,6 +27,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
     ventura-fan-status-monitor.service \
     "
 
+FILES:${PN} += "${systemd_system_unitdir}/*"
+
 do_install() {
     VENTURA_LIBEXECDIR="${D}${libexecdir}/ventura"
     install -d ${VENTURA_LIBEXECDIR}
@@ -33,4 +36,9 @@ do_install() {
     install -m 0755 ${UNPACKDIR}/ventura-early-sys-init ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-schematic-init ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-fan-status-monitor ${D}${libexecdir}
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ventura-sys-init.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ventura-schematic-init.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ventura-fan-status-monitor.service ${D}${systemd_system_unitdir}
 }

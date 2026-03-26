@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 CRITICAL_LEAK_SERVICE = "xyz.openbmc_project.leakdetector.critical.assert@.service"
 CRITICAL_DEASSERT_SERVICE = "xyz.openbmc_project.leakdetector.critical.deassert@.service"
@@ -32,7 +32,7 @@ SYSTEMD_SERVICE:${PN} += "${WARNING_DEASSERT_SERVICE}"
 
 SYSTEMD_AUTO_ENABLE = "enable"
 
-do_install:append:() {
+do_install:append() {
     if ${@bb.utils.contains('PACKAGECONFIG', 'cablemonitor', 'true', 'false', d)}; then
         install -d ${D}/var/lib/cablemonitor
         install -m 0755 ${UNPACKDIR}/cable-config.json ${D}/var/lib/cablemonitor/cable-config.json
@@ -41,6 +41,10 @@ do_install:append:() {
     install -m 0755 ${UNPACKDIR}/critical-leak-handler ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-leak-handler ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/warning-leak-handler ${D}${libexecdir}/${PN}/
+
+    install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/${CRITICAL_LEAK_SERVICE} ${D}${systemd_system_unitdir}/${CRITICAL_LEAK_SERVICE}
     install -m 0644 ${UNPACKDIR}/${CRITICAL_DEASSERT_SERVICE} ${D}${systemd_system_unitdir}/${CRITICAL_DEASSERT_SERVICE}
+    install -m 0644 ${UNPACKDIR}/${WARNING_LEAK_SERVICE} ${D}${systemd_system_unitdir}/${WARNING_LEAK_SERVICE}
+    install -m 0644 ${UNPACKDIR}/${WARNING_DEASSERT_SERVICE} ${D}${systemd_system_unitdir}/${WARNING_DEASSERT_SERVICE}
 }
