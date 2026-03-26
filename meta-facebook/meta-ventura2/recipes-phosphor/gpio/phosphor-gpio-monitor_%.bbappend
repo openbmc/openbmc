@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit obmc-phosphor-utils
+inherit systemd
 
 SERVICE_LIST = "gpio-set-high@.service \
                 gpio-set-low@.service \
@@ -31,6 +32,7 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/plat-phosphor-multi-gpio-monitor.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
 
+    install -d ${D}${systemd_system_unitdir}
     for s in ${SERVICE_LIST}
     do
         install -m 0644 ${UNPACKDIR}/${s} ${D}${systemd_system_unitdir}/${s}

@@ -1,7 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd
-
 PACKAGECONFIG:append = " sync-mac"
 
 EXTRA_OEMESON = "-Dforce-sync-mac=true"
@@ -15,10 +13,7 @@ SRC_URI += " \
 FILES:${PN} += " \
     ${datadir}/network/*.json \
     ${libexecdir}/phosphor-network/wait-baseboard-inventory \
-    "
-
-SYSTEMD_OVERRIDE:${PN} += " \
-    wait-inventory.conf:xyz.openbmc_project.Network.service.d/wait-inventory.conf \
+    ${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d/wait-inventory.conf \
     "
 
 do_install:append() {
@@ -27,5 +22,9 @@ do_install:append() {
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/wait-baseboard-inventory ${D}${libexecdir}/${PN}/
+
+    install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d
+    install -m 0644 ${UNPACKDIR}/wait-inventory.conf \
+        ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d/wait-inventory.conf
 }
 

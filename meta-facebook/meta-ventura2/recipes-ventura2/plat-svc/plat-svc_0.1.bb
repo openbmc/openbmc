@@ -1,7 +1,8 @@
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-inherit allarch systemd obmc-phosphor-systemd
+inherit allarch
+inherit systemd
 
 S = "${UNPACKDIR}"
 
@@ -37,6 +38,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
     ncsi-state.service \
     "
 
+FILES:${PN} += "${systemd_system_unitdir}/*"
+
 do_install() {
     LIBEXECDIR_PN="${D}${libexecdir}/${PN}"
     install -d ${LIBEXECDIR_PN}
@@ -51,4 +54,13 @@ do_install() {
     install -m 0644 ${UNPACKDIR}/99-valve-dac-init.rules ${D}${sysconfdir}/udev/rules.d
     install -m 0755 ${UNPACKDIR}/ventura2-fan-status-monitor ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/ventura2-early-sys-init ${LIBEXECDIR_PN}
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/marvell-switch-init.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/marvell-switch-poe-init.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/sgpio-state-init.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/valve-dac-init@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ventura2-fan-status-monitor.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ventura2-sys-init.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/ncsi-state.service ${D}${systemd_system_unitdir}
 }
