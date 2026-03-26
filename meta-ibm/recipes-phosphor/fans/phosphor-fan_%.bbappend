@@ -14,6 +14,7 @@ FMT_COOLING = "../${TMPL_COOLING}:${MULTI_USR_TGT}.requires/${INSTFMT_COOLING}"
 
 FILES:phosphor-cooling-type:append:ibm-ac-server = " ${bindir}/phosphor-cooling-type"
 SYSTEMD_SERVICE:phosphor-cooling-type:append:ibm-ac-server = " ${TMPL_COOLING}"
+SYSTEMD_AUTO_ENABLE:phosphor-cooling-type = "disable"
 SYSTEMD_LINK:phosphor-cooling-type:append:ibm-ac-server = " ${@compose_list(d, 'FMT_COOLING', 'OBMC_CHASSIS_INSTANCES')}"
 
 COOLING_ENV_FMT = "obmc/phosphor-fan/phosphor-cooling-type-{0}.conf"
