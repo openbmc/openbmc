@@ -1,9 +1,8 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd
-
 SRC_URI += " \
     file://setup-devices-eid \
+    file://setup-mctpreactor.conf \
 "
 
 PACKAGECONFIG:append = "\
@@ -18,7 +17,9 @@ do_install:append () {
 
     install -m 0755 ${UNPACKDIR}/setup-devices-eid \
               ${D}${libexecdir}/${PN}
-}
 
-SYSTEMD_OVERRIDE:${PN} += "setup-mctpreactor.conf:xyz.openbmc_project.mctpreactor.service.d/setup-mctpreactor.conf"
+    install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.mctpreactor.service.d
+    install -m 0644 ${UNPACKDIR}/setup-mctpreactor.conf \
+        ${D}${systemd_system_unitdir}/xyz.openbmc_project.mctpreactor.service.d/setup-mctpreactor.conf
+}
 

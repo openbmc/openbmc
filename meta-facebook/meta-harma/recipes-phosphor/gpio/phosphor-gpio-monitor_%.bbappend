@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 SRC_URI += "file://assert-post-end \
             file://assert-post-end.service \
@@ -53,6 +53,7 @@ SRC_URI += "file://assert-post-end \
             file://vr-fault-assert-log@.service \
             file://vr-fault-deassert-log@.service \
             file://vr-fault-event-logger \
+            file://phosphor-multi-gpio-monitor.conf \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -126,6 +127,8 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/fan-reload ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/initial-poweron-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/mmc-recovery ${D}${libexecdir}/${PN}/
-}
 
-SYSTEMD_OVERRIDE:${PN}-monitor += "phosphor-multi-gpio-monitor.conf:phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf"
+    install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \
+        ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf
+}
