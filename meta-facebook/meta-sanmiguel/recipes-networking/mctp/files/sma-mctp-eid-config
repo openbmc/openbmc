@@ -5,13 +5,13 @@ MAX_RETRIES=60
 RETRY_DELAY=2
 
 case "$MCTP_INTF" in
-    mcu1u2u1u1)   MCTP_EID=10 ;;
-    mcu1u2u2u1)   MCTP_EID=20 ;;
-    mcu1u2u1u4u1) MCTP_EID=30 ;;
-    mcu1u2u1u3u1) MCTP_EID=40 ;;
-    mcu1u2u2u3u1) MCTP_EID=50 ;;
-    mcu1u2u2u4u1) MCTP_EID=60 ;;
-    mcu1u1u4u1)   MCTP_EID=70 ;;
+    mcu1u2u1u1)   MCTP_EID=10; POOL_START=11; POOL_SIZE=9 ;;
+    mcu1u2u2u1)   MCTP_EID=20; POOL_START=21; POOL_SIZE=9 ;;
+    mcu1u2u1u4u1) MCTP_EID=30; POOL_START=31; POOL_SIZE=9 ;;
+    mcu1u2u1u3u1) MCTP_EID=40; POOL_START=41; POOL_SIZE=9 ;;
+    mcu1u2u2u3u1) MCTP_EID=50; POOL_START=51; POOL_SIZE=9 ;;
+    mcu1u2u2u4u1) MCTP_EID=60; POOL_START=61; POOL_SIZE=9 ;;
+    mcu1u1u4u1)   MCTP_EID=70; POOL_START=71; POOL_SIZE=9 ;;
     *)
         echo "Unknown SMA MCTP interface: $MCTP_INTF"
         exit 1
@@ -51,14 +51,18 @@ check_service_status() {
 }
 
 assign_static_eid() {
-    echo "Calling AssignEndpointStatic (EID: $MCTP_EID)..."
+    echo "Calling AssignBridgeStatic..."
+    echo "EID: $MCTP_EID"
+    echo "POOL_SIZE, $POOL_SIZE"
+    echo "POOL_START: $POOL_START"
     busctl call au.com.codeconstruct.MCTP1 \
         /au/com/codeconstruct/mctp1/interfaces/"$MCTP_INTF" \
         au.com.codeconstruct.MCTP.BusOwner1 \
-        AssignEndpointStatic ayy 0 "$MCTP_EID"
+        AssignBridgeStatic ayyyy 0 "$MCTP_EID" "$POOL_SIZE" "$POOL_START"
 }
 
 for ((i=1; i<=MAX_RETRIES; i++)); do
+    sleep $RETRY_DELAY
     echo "--- Attempt $i/$MAX_RETRIES ---"
 
     # Execute steps in sequence. If any return non-zero, sleep and start over.
@@ -72,7 +76,6 @@ for ((i=1; i<=MAX_RETRIES; i++)); do
     fi
 
     echo "SMA EID configuration failed. retry..."
-    sleep $RETRY_DELAY
 done
 
 echo "Error: MCTP setup failed after $MAX_RETRIES attempts."
