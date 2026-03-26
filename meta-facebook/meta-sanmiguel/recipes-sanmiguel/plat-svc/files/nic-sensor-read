@@ -1,0 +1,145 @@
+#!/bin/bash
+
+readonly EXT_SENSOR_SERVICE="xyz.openbmc_project.ExternalSensor"
+readonly SNR_VAL_INTF="xyz.openbmc_project.Sensor.Value"
+readonly STABILIZATION_DELAY=10
+readonly POLL_INTERVAL=2
+
+readonly HOST_ON=1
+readonly HOST_OFF=0
+
+declare -A SENSOR_NAME_MAP=(
+    [500]="OSFP_TEMP_C"
+    [300]="TEMP_C"
+    [50]="PWR_W"
+)
+
+NIC_INFO_LIST=(
+    "32 IOB0_NIC0"
+    "34 IOB0_NIC1"
+    "42 IOB1_NIC0"
+    "44 IOB1_NIC1"
+    "52 IOB2_NIC0"
+    "54 IOB2_NIC1"
+    "62 IOB3_NIC0"
+    "64 IOB3_NIC1"
+    "72 NS_NIC"
+)
+
+SNR_LIST=(50 300 500)
+LAST_HOST_READY="0"
+
+is_host_on() {
+    local state
+    state=$(busctl get-property \
+        xyz.openbmc_project.State.Host \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host CurrentHostState |
+        cut -d'"' -f2)
+
+    [[ "$state" == "xyz.openbmc_project.State.Host.HostState.Running" ]]
+}
+
+get_sensor_path() {
+    local name="$1"
+
+    case "$name" in
+        *_TEMP_C) echo "/xyz/openbmc_project/sensors/temperature/$name" ;;
+        *_PWR_W) echo "/xyz/openbmc_project/sensors/power/$name" ;;
+        *) return 1 ;;
+    esac
+}
+
+update_sensor_val() {
+    local path="$1"
+    local val="$2"
+
+    busctl set-property "$EXT_SENSOR_SERVICE" "$path" "$SNR_VAL_INTF" Value d "$val"
+}
+
+get_numeric_sensor_by_eid() {
+    local eid="$1"
+    local sensor_id="$2"
+    local out
+
+    out=$(pldmtool platform GetSensorReading -i "$sensor_id" -r 0 -m "$eid") || return 1
+
+    jq -e '.presentReading' <<< "$out" 2> /dev/null
+}
+
+update_numeric_sensor_value() {
+    local eid="$1"
+    local sensor_id="$2"
+    local sensor_name="$3"
+    local val
+    local path
+
+    if ! val=$(get_numeric_sensor_by_eid "$eid" "$sensor_id"); then
+        echo "sensor read failed: eid=$eid id=$sensor_id name=$sensor_name"
+        return 1
+    fi
+
+    if path=$(get_sensor_path "$sensor_name"); then
+        update_sensor_val "$path" "$val"
+    fi
+}
+
+invalidate_all_sensors() {
+    local nic_info
+    local nic_name
+    local suffix
+    local path
+
+    for nic_info in "${NIC_INFO_LIST[@]}"; do
+        read -r _ nic_name <<< "$nic_info"
+        for suffix in "${SENSOR_NAME_MAP[@]}"; do
+            if path=$(get_sensor_path "${nic_name}_${suffix}"); then
+                update_sensor_val "$path" "nan"
+            fi
+        done
+    done
+}
+
+handle_host_transition() {
+    local current="$1"
+
+    if [[ "$current" != "$LAST_HOST_READY" ]]; then
+        if [[ "$current" == "1" ]]; then
+            echo "Host ON, wait stabilization"
+            sleep "$STABILIZATION_DELAY"
+        else
+            echo "Host OFF, invalidate all sensors..."
+            invalidate_all_sensors
+        fi
+    fi
+
+    LAST_HOST_READY="$current"
+}
+
+# ------------------------------------------------------------------------------
+# Main
+# ------------------------------------------------------------------------------
+while true; do
+    sleep "$POLL_INTERVAL"
+
+    host_ready=$(is_host_on && echo "$HOST_ON" || echo "$HOST_OFF")
+
+    handle_host_transition "$host_ready"
+
+    [[ "$host_ready" != "1" ]] && continue
+
+    for nic_info in "${NIC_INFO_LIST[@]}"; do
+        read -r nic_eid nic_name <<< "$nic_info"
+
+        for sensor_id in "${SNR_LIST[@]}"; do
+
+            if ! is_host_on; then
+                handle_host_transition "$HOST_OFF"
+                break 2
+            fi
+
+            sensor_name="${nic_name}_${SENSOR_NAME_MAP[$sensor_id]}"
+            update_numeric_sensor_value "$nic_eid" "$sensor_id" "$sensor_name"
+        done
+    done
+done
