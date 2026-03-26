@@ -86,7 +86,11 @@ DISTRO_FEATURES_BACKFILL_CONSIDERED = " \
         bluez5 \
         ldconfig \
         gobject-introspection-data \
+        multiarch \
         pulseaudio \
+        opengl \
+        wayland \
+        vulkan \
         "
 
 DISTRO_FEATURES_OBMC = " \
