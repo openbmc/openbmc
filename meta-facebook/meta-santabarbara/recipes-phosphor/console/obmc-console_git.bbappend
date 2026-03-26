@@ -1,7 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/obmc-console:"
 
-inherit obmc-phosphor-systemd
-
 def fb_get_consoles_usb(d):
     usbs = d.getVar('OBMC_USB_INSTANCES', True)
     if not usbs:
