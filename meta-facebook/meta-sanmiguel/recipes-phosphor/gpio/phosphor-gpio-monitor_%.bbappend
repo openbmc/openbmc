@@ -1,11 +1,15 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 SRC_URI:append = " \
     file://phosphor-multi-gpio-monitor.json \
     file://cpu-boot-done \
     file://run-power-good \
+    file://cpu-boot-done-assert.service \
+    file://cpu-boot-done-deassert.service \
+    file://run-power-good-assert.service \
+    file://run-power-good-deassert.service \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -32,4 +36,10 @@ do_install:append() {
                     ${D}${libexecdir}/${PN}/cpu-boot-done
     install -m 0755 ${UNPACKDIR}/run-power-good \
                     ${D}${libexecdir}/${PN}/run-power-good
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/cpu-boot-done-assert.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/cpu-boot-done-deassert.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/run-power-good-assert.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/run-power-good-deassert.service ${D}${systemd_system_unitdir}
 }

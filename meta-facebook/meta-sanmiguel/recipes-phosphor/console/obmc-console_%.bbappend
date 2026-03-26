@@ -1,9 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 RDEPENDS:${PN}:append = " bash"
 
-inherit obmc-phosphor-systemd
-inherit obmc-phosphor-dbus-service
-
 SRC_URI:append = " \
     file://plat-80-obmc-console-uart.rules \
     file://server.ttyUSB1.conf \
@@ -51,42 +48,15 @@ OBMC_CONSOLE_TTYS:append = " \
     VSER24 VSER25 VSER26 VSER27 VSER28 VSER29 VSER30 VSER31 \
     "
 
-SYSTEMD_OVERRIDE:${PN}:append = " \
-    use-service-VSER.conf:obmc-console@VSER0.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER1.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER2.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER3.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER4.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER5.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER6.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER7.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER8.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER9.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER10.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER11.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER12.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER13.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER14.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER15.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER16.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER17.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER18.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER19.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER20.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER21.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER22.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER23.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER24.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER25.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER26.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER27.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER28.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER29.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER30.service.d/use-service-VSER.conf \
-    use-service-VSER.conf:obmc-console@VSER31.service.d/use-service-VSER.conf \
-    "
+FILES:${PN} += "${systemd_system_unitdir}/obmc-console@*.service.d/use-service-VSER.conf"
 
 do_install:append() {
         install -d ${D}${base_libdir}/udev/rules.d/
         install -m 0644 ${UNPACKDIR}/plat-80-obmc-console-uart.rules ${D}${base_libdir}/udev/rules.d/80-obmc-console-uart.rules
+
+        for i in $(seq 0 31); do
+                install -d ${D}${systemd_system_unitdir}/obmc-console@VSER${i}.service.d
+                install -m 0644 ${UNPACKDIR}/use-service-VSER.conf \
+                        ${D}${systemd_system_unitdir}/obmc-console@VSER${i}.service.d/use-service-VSER.conf
+        done
 }

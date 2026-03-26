@@ -1,7 +1,8 @@
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-inherit allarch systemd obmc-phosphor-systemd
+inherit allarch
+inherit systemd
 
 S = "${UNPACKDIR}/sources"
 
@@ -31,6 +32,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
     platform-sys-init.service \
     "
 
+FILES:${PN} += "${systemd_system_unitdir}/platform-sys-init.service"
+
 do_install() {
     # install scripts
     PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
@@ -43,5 +46,9 @@ do_install() {
     install -d ${UDEV_RULES_DIR}
     install -m 0644 ${UNPACKDIR}/99-cp2112-bind.rules ${UDEV_RULES_DIR}/99-cp2112-bind.rules
     install -m 0644 ${UNPACKDIR}/99-cp2112-cx9-gpio.rules ${UDEV_RULES_DIR}/99-cp2112-cx9-gpio.rules
+
+    # install services
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/platform-sys-init.service ${D}${systemd_system_unitdir}
 }
 
