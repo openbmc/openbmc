@@ -5,7 +5,6 @@ SRC_URI:append = " file://virtual_sensor_config.json "
 #=========================================================
 # Clemente interposer
 #=========================================================
-inherit obmc-phosphor-systemd
 RDEPENDS:${PN}:append:clemente = " bash"
 
 SRC_URI:append:clemente = " \
@@ -17,10 +16,7 @@ SRC_URI:append:clemente = " \
 FILES:${PN}:append:clemente = "\
     ${libexecdir}/phosphor-virtual-sensor \
     ${datadir}/phosphor-virtual-sensor/no-cable-tsense.json \
-    "
-
-SYSTEMD_OVERRIDE:${PN}:append:clemente = "\
-    check-interposer-config.conf:phosphor-virtual-sensor.service.d/check-interposer-config.conf \
+    ${systemd_system_unitdir}/phosphor-virtual-sensor.service.d/check-interposer-config.conf \
     "
 
 do_install:append:clemente() {
@@ -30,4 +26,8 @@ do_install:append:clemente() {
     LIBEXECDIR="${D}${libexecdir}/phosphor-virtual-sensor"
     install -d ${LIBEXECDIR}
     install -m 0755 -D ${UNPACKDIR}/check-interposer-config ${LIBEXECDIR}/check-interposer-config
+
+    install -d ${D}${systemd_system_unitdir}/phosphor-virtual-sensor.service.d
+    install -m 0644 ${UNPACKDIR}/check-interposer-config.conf \
+        ${D}${systemd_system_unitdir}/phosphor-virtual-sensor.service.d/check-interposer-config.conf
 }

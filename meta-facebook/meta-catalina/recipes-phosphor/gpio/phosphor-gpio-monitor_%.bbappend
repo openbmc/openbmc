@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 SRC_URI:append = " \
     file://phosphor-multi-gpio-monitor.json \
@@ -13,6 +13,17 @@ SRC_URI:append = " \
     file://vr-fault-assert-log@.service \
     file://vr-fault-deassert-log@.service \
     file://vr-fault-event-logger \
+    file://assert-cpu-boot-done.service \
+    file://assert-gpio-log@.service \
+    file://assert-reset-button.service \
+    file://assert-run-power-pg.service \
+    file://assert-uart-select-led.service \
+    file://deassert-cpu-boot-done.service \
+    file://deassert-gpio-log@.service \
+    file://deassert-reset-button.service \
+    file://deassert-run-power-pg.service \
+    file://deassert-uart-select-led.service \
+    file://platform-host-ready.target \
     "
 
 SRC_URI:append:catalina = " \
@@ -63,6 +74,23 @@ do_install:append() {
                     ${D}${libexecdir}/${PN}/power-rail-event-logger
     install -m 0755 ${UNPACKDIR}/vr-fault-event-logger \
                     ${D}${libexecdir}/${PN}/vr-fault-event-logger
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/assert-cpu-boot-done.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/assert-gpio-log@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/assert-reset-button.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/assert-run-power-pg.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/assert-uart-select-led.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/deassert-cpu-boot-done.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/deassert-gpio-log@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/deassert-reset-button.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/deassert-run-power-pg.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/deassert-uart-select-led.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/power-rail-assert-log@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/power-rail-deassert-log@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/vr-fault-assert-log@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/vr-fault-deassert-log@.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/platform-host-ready.target ${D}${systemd_system_unitdir}
 }
 
 do_install:append:catalina() {

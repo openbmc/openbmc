@@ -12,7 +12,6 @@ do_install:append() {
 #========================================================
 # Changes for catalina
 #========================================================
-inherit obmc-phosphor-systemd
 RDEPENDS:${PN}:append:catalina = " bash"
 
 SRC_URI:append:catalina = " \
@@ -24,10 +23,7 @@ SRC_URI:append:catalina = " \
 FILES:${PN}:append:catalina = "\
     ${libexecdir}/phosphor-pid-control \
     ${datadir}/swampd/config-pdb-brick.json \
-    "
-
-SYSTEMD_OVERRIDE:${PN}:append:catalina = "\
-    check-fsc-config.conf:phosphor-pid-control.service.d/check-fsc-config.conf \
+    ${systemd_system_unitdir}/phosphor-pid-control.service.d/check-fsc-config.conf \
     "
 
 do_install:append:catalina() {
@@ -37,4 +33,8 @@ do_install:append:catalina() {
     LIBEXECDIR="${D}${libexecdir}/phosphor-pid-control"
     install -d ${LIBEXECDIR}
     install -m 0755 -D ${UNPACKDIR}/check-fsc-config ${LIBEXECDIR}/check-fsc-config
+
+    install -d ${D}${systemd_system_unitdir}/phosphor-pid-control.service.d
+    install -m 0644 ${UNPACKDIR}/check-fsc-config.conf \
+        ${D}${systemd_system_unitdir}/phosphor-pid-control.service.d/check-fsc-config.conf
 }

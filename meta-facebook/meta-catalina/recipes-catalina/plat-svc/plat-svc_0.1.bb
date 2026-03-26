@@ -1,7 +1,8 @@
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10"
 
-inherit allarch systemd obmc-phosphor-systemd
+inherit allarch
+inherit systemd
 
 S = "${UNPACKDIR}"
 
@@ -23,6 +24,8 @@ SYSTEMD_SERVICE:${PN}:append = " \
     platform-sys-init.service \
     "
 
+FILES:${PN} += "${systemd_system_unitdir}/*"
+
 do_install() {
     PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
     install -d ${PLATSVC_LIBEXECDIR}
@@ -31,6 +34,9 @@ do_install() {
     install -m 0755 ${UNPACKDIR}/platform-early-sys-init ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/standby-power-enable ${PLATSVC_LIBEXECDIR}
 
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/frontend-nic-temp-read.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/platform-sys-init.service ${D}${systemd_system_unitdir}
 }
 
 #===============================================================================
@@ -53,6 +59,10 @@ do_install:append:catalina() {
     install -d ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/iob-nic-temp-read ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/osfp-eeprom-driver-bind ${PLATSVC_LIBEXECDIR}
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/iob-nic-temp-read.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/osfp-eeprom-driver-bind.service ${D}${systemd_system_unitdir}
 }
 
 #===============================================================================
@@ -65,6 +75,7 @@ SRC_URI:append:clemente = " \
     file://check-bootdrive-led.service \
     file://init-sma \
     file://init-sma.service \
+    file://cx-ready.target \
     "
 
 SYSTEMD_SERVICE:${PN}:append:clemente = " \
@@ -80,4 +91,10 @@ do_install:append:clemente() {
     install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/check-bootdrive-led ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/init-sma ${PLATSVC_LIBEXECDIR}
+
+    install -d ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/backend-nic-driver-bind.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/check-bootdrive-led.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/init-sma.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/cx-ready.target ${D}${systemd_system_unitdir}
 }
