@@ -3,9 +3,11 @@ PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-nuvoton"
 PREFERRED_PROVIDER_u-boot ?= "u-boot-nuvoton"
 PREFERRED_PROVIDER_u-boot-fw-utils ?= "u-boot-fw-utils-nuvoton"
 
+# FIT images are now built by the linux-yocto-fitimage recipe
 WKS_FILE ?= "emmc-nuvoton.wks.in"
 WKS_FILE_DEPENDS ?= " \
     virtual/kernel \
+    linux-yocto-fitimage \
 "
 WKS_RWFS_SIZE ??= "256M"
 WKS_ROFS_SIZE ??= "256M"
