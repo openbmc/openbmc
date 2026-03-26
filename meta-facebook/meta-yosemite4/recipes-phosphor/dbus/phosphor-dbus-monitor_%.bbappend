@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd
+inherit systemd
 
 SRC_URI:append = " \
     file://control-fio-led \
@@ -8,6 +8,8 @@ SRC_URI:append = " \
     file://fan-rotor-fail-mechanism.service \
     file://fan-rotor-missing-mechanism \
     file://fan-rotor-missing-mechanism.service \
+    file://enable-fio-led@.service \
+    file://disable-fio-led@.service \
 "
 
 SYSTEMD_SERVICE:${PN}:append = " \

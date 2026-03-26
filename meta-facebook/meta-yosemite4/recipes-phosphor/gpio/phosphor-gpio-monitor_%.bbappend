@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 SRC_URI += "file://yosemite4-phosphor-multi-gpio-monitor.json \
             file://configure-nic-mctp-endpoint \
@@ -73,6 +73,8 @@ do_install:append() {
     install -d ${D}${datadir}/phosphor-gpio-monitor
     install -m 0644 ${UNPACKDIR}/yosemite4-phosphor-multi-gpio-monitor.json \
                     ${D}${datadir}/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json
+
+    install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/set-button-sled.service ${D}${systemd_system_unitdir}/set-button-sled.service
     install -m 0644 ${UNPACKDIR}/probe-slot-device@.service ${D}${systemd_system_unitdir}/probe-slot-device@.service
     install -m 0644 ${UNPACKDIR}/rescan-fru-ocp-setting@.service ${D}${systemd_system_unitdir}/rescan-fru-ocp-setting@.service
@@ -93,6 +95,7 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/medusa-hsc-fault@.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/medusa-power-module-fault.service ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/medusa-power-module-pwrgd@.service ${D}${systemd_system_unitdir}/
+
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/probe-slot-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/reconfig-net-interface ${D}${libexecdir}/${PN}/
@@ -110,6 +113,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/medusa-hsc-fault ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/medusa-power-module-fault ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/medusa-power-module-pwrgd ${D}${libexecdir}/${PN}/
-    install -d ${D}/${bindir}
-    install -m 0755 ${UNPACKDIR}/configure-nic-mctp-endpoint ${D}/${bindir}/
+
+    install -d ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/configure-nic-mctp-endpoint ${D}${bindir}/
 }

@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 SRC_URI += "file://clean-up-filesystem \
             file://clean-up-filesystem.service \
@@ -16,6 +16,7 @@ SYSTEMD_SERVICE:${PN} += " \
     "
 do_install:append() {
     install -d ${D}${datadir}/phosphor-health-monitor
+    install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/clean-up-filesystem.service ${D}${systemd_system_unitdir}/clean-up-filesystem.service
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/clean-up-filesystem ${D}${libexecdir}/${PN}/

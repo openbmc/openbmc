@@ -1,6 +1,6 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
+inherit systemd
 
 SRC_URI += "file://monitor-pldm-sensor \
             file://monitor-pldm-sensor.service \
@@ -20,12 +20,13 @@ FILES:${PN}:append = " ${datadir}/swampd"
 FILES:${PN}:append = " ${systemd_system_unitdir}/phosphor-pid-control.service.d/*.conf"
 
 do_install:append() {
-    override_dir="${D}${systemd_system_unitdir}/phosphor-pid-control.service.d"
-    override_file="${override_dir}/yosemite4.conf"
-    mkdir -p ${D}${systemd_system_unitdir}/phosphor-pid-control.service.d
+    install -d ${D}${systemd_system_unitdir}/phosphor-pid-control.service.d
+    override_file="${D}${systemd_system_unitdir}/phosphor-pid-control.service.d/yosemite4.conf"
     echo "[Unit]" > ${override_file}
     echo "After=monitor-pldm-sensor.service" >> ${override_file}
     echo "After=multi-user.target" >> ${override_file}
+
+    install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/monitor-pldm-sensor.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/monitor-fan-sensor.service ${D}${systemd_system_unitdir}
     install -d ${D}${libexecdir}/${PN}
