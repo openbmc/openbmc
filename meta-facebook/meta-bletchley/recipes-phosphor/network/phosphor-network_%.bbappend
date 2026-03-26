@@ -14,7 +14,6 @@ do_install:append() {
     install -m 0644 ${UNPACKDIR}/config.json ${D}${datadir}/network/
 }
 
-inherit obmc-phosphor-systemd
 RDEPENDS:${PN}:append:bletchley15 = " bash"
 
 SRC_URI:append:bletchley15 = " \
@@ -24,13 +23,14 @@ SRC_URI:append:bletchley15 = " \
 
 FILES:${PN}:append:bletchley15 = " \
     ${libexecdir}/phosphor-network/wait-baseboard-inventory \
-    "
-
-SYSTEMD_OVERRIDE:${PN}:append:bletchley15 = " \
-    wait-inventory.conf:xyz.openbmc_project.Network.service.d/wait-inventory.conf \
+    ${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d/wait-inventory.conf \
     "
 
 do_install:append:bletchley15() {
     install -d ${D}${libexecdir}/phosphor-network
     install -m 0755 ${UNPACKDIR}/wait-baseboard-inventory ${D}${libexecdir}/phosphor-network/
+
+    install -d ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d
+    install -m 0644 ${UNPACKDIR}/wait-inventory.conf \
+        ${D}${systemd_system_unitdir}/xyz.openbmc_project.Network.service.d/wait-inventory.conf
 }

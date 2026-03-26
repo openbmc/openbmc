@@ -1,13 +1,11 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd
+inherit obmc-phosphor-utils
+inherit systemd
 
-# Add service file link
-TMPL_PRESENT = "phosphor-gpio-presence@.service"
-INSTFMT_PRESENT = "phosphor-gpio-presence@presence-sled{0}.service"
-PRESENT_TGT = "multi-user.target"
-FMT_PRESENT = "../${TMPL_PRESENT}:${PRESENT_TGT}.requires/${INSTFMT_PRESENT}"
-SYSTEMD_LINK:${PN}-presence:append = " ${@compose_list(d, 'FMT_PRESENT', 'OBMC_HOST_INSTANCES')}"
+# Add service file
+SYSTEMD_SERVICE_FMT = "phosphor-gpio-presence@presence-sled{0}.service"
+SYSTEMD_SERVICE:${PN}-presence:append = " ${@compose_list(d, 'SYSTEMD_SERVICE_FMT', 'OBMC_HOST_INSTANCES')}"
 
 # Add environment file
 SLED_PRESENT_ENV_FMT = "obmc/gpio/presence-sled{0}.conf"
