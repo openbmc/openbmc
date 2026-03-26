@@ -1,7 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-inherit obmc-phosphor-systemd systemd
-
 SRC_URI += "\
     file://blacklist.json \
     "
