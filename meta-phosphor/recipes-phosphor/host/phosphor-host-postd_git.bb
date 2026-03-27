@@ -21,10 +21,10 @@ SERVICE_FILE = "lpcsnoop.service"
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} += "${SERVICE_FILE}"
 SERVICE_FILE_7SEG = " \
-  postcode-7seg@.service \
   postcode-7seg@${POSTCODE_SEVENSEG_DEVICE}.service \
 "
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', '7seg', '${SERVICE_FILE_7SEG}', '', d)}"
+FILES:${PN} += "${systemd_system_unitdir}/postcode-7seg@.service"
 
 inherit meson
 inherit pkgconfig
