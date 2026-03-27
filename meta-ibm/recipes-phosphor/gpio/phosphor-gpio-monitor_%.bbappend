@@ -1,12 +1,26 @@
+inherit obmc-phosphor-utils
+inherit systemd
+
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-TMPL_POWERSUPPLY = "phosphor-gpio-presence@.service"
-INSTFMT_POWERSUPPLY = "phosphor-gpio-presence@{0}.service"
-POWERSUPPLY_TGT = "multi-user.target"
-FMT_POWERSUPPLY = "../${TMPL_POWERSUPPLY}:${POWERSUPPLY_TGT}.wants/${INSTFMT_POWERSUPPLY}"
+SRC_URI:append:ibm-ac-server = " \
+    file://obmc/gpio/phosphor-power-supply-0.conf \
+    file://obmc/gpio/phosphor-power-supply-1.conf \
+    "
 
-SYSTEMD_LINK:${PN}-presence:append:ibm-ac-server = " ${@compose_list(d, 'FMT_POWERSUPPLY', 'OBMC_POWER_SUPPLY_INSTANCES')}"
+SYSTEMD_SERVICE_FMT:ibm-ac-server = "phosphor-gpio-presence@{0}.service"
+SYSTEMD_SERVICE:${PN}-presence:append:ibm-ac-server = " ${@compose_list(d, 'SYSTEMD_SERVICE_FMT', 'OBMC_POWER_SUPPLY_INSTANCES')}"
 
-POWERSUPPLY_ENV_FMT  = "obmc/gpio/phosphor-power-supply-{0}.conf"
+POWERSUPPLY_ENV_FMT = "obmc/gpio/phosphor-power-supply-{0}.conf"
 
-SYSTEMD_ENVIRONMENT_FILE:${PN}-presence:append:ibm-ac-server = " ${@compose_list(d, 'POWERSUPPLY_ENV_FMT', 'OBMC_POWER_SUPPLY_INSTANCES')}"
+FILES:${PN}-presence:append:ibm-ac-server = " \
+    ${sysconfdir}/default/obmc/gpio/phosphor-power-supply-*.conf \
+    "
+
+do_install:append:ibm-ac-server() {
+    for i in ${OBMC_POWER_SUPPLY_INSTANCES}; do
+        install -d ${D}${sysconfdir}/default/obmc/gpio/
+        install -m 0644 ${UNPACKDIR}/obmc/gpio/phosphor-power-supply-$i.conf \
+            ${D}${sysconfdir}/default/obmc/gpio/
+    done
+}

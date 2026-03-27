@@ -1,6 +1,5 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit systemd
-inherit obmc-phosphor-systemd
 
 SRC_URI += " \
             file://phosphor-multi-gpio-presence.json \
