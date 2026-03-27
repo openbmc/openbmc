@@ -12,7 +12,7 @@ DATA = "${datadir}/test"
 FILES:${PN} += "${DATA}"
 
 do_compile() {
-  SYSROOT="$PKG_CONFIG_SYSROOT_DIR" bash test.sh || exit
+  SYSROOT="${STAGING_DIR_HOST}" bash test.sh || exit
 }
 
 do_install:append() {
