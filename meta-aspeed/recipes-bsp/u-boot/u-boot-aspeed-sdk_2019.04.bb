@@ -26,12 +26,12 @@ inherit otptool
 UBOOT_ENV_SIZE:df-phosphor-mmc = "0x10000"
 UBOOT_ENV:df-phosphor-mmc = "u-boot-env"
 UBOOT_ENV_SUFFIX:df-phosphor-mmc = "bin"
-UBOOT_ENV_TXT:df-phosphor-mmc = "u-boot-env-ast2600.txt"
+UBOOT_ENV_SRC:df-phosphor-mmc = "u-boot-env-ast2600.txt"
 
 do_compile:append() {
     if [ -n "${UBOOT_ENV}" ]
     then
         # Generate redundant environment image
-        ${B}/tools/mkenvimage -r -s ${UBOOT_ENV_SIZE} -o ${B}/${UBOOT_ENV_BINARY} ${UNPACKDIR}/${UBOOT_ENV_TXT}
+        ${B}/tools/mkenvimage -r -s ${UBOOT_ENV_SIZE} -o ${B}/${UBOOT_ENV_BINARY} ${UNPACKDIR}/${UBOOT_ENV_SRC}
     fi
 }
