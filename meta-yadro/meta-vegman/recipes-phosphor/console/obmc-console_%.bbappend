@@ -3,10 +3,10 @@ RDEPENDS:${PN} += "bash"
 
 OBMC_CONSOLE_HOST_TTY = "ttyS2"
 SRC_URI += " \
-        file://obmc-console@.service \
+        file://uart-routing.conf \
         file://uart-remapping.sh \
 "
-inherit obmc-phosphor-systemd
+inherit systemd
 
 SYSTEMD_SERVICE:${PN} += " \
         ${PN}@${OBMC_CONSOLE_HOST_TTY}.service \
@@ -14,6 +14,8 @@ SYSTEMD_SERVICE:${PN} += " \
 
 do_install:append() {
         rm -rf ${D}${nonarch_base_libdir}/udev/rules.d/80-obmc-console-uart.rules
-        install -m 0644 ${UNPACKDIR}/${PN}@.service -D -t ${D}${systemd_system_unitdir}
+        install -d ${D}${systemd_system_unitdir}/obmc-console@.service.d
+        install -m 0644 ${UNPACKDIR}/uart-routing.conf ${D}${systemd_system_unitdir}/obmc-console@.service.d/uart-routing.conf
+
         install -m 0755 ${UNPACKDIR}/uart-remapping.sh -D -t ${D}${sbindir}
 }

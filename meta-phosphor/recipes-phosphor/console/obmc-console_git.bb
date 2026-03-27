@@ -22,17 +22,20 @@ SRC_URI += "file://${BPN}.conf"
 SRC_URI += "file://dropbear.env"
 
 UNPACKDIR = "${WORKDIR}/sources-unpack"
-SYSTEMD_SERVICE:${PN} += " obmc-console@.service"
+SYSTEMD_SERVICE_FMT = "obmc-console@{0}.service"
+SYSTEMD_SERVICE:${PN} += "${@compose_list(d, 'SYSTEMD_SERVICE_FMT', 'OBMC_CONSOLE_TTYS')}"
 
 # Include ssh service if `ssh` is in PACKAGECONFIG.
 # Only install the ssh socket if we are not enabling
 #   `concurrent-servers` in PACKAGECONFIG.
-SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'obmc-console-ssh@.service', '', d)}"
+CONSOLE_SSH_SERVICE_FMT = "obmc-console-ssh@{0}.service"
+SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ssh', compose_list(d, 'CONSOLE_SSH_SERVICE_FMT', 'OBMC_CONSOLE_TTYS'), '', d)}"
 SSH_SYSTEMD_SOCKET = "${@bb.utils.contains('PACKAGECONFIG', 'ssh', 'obmc-console-ssh.socket', '', d)}"
 SYSTEMD_SERVICE:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'concurrent-servers', '', '${SSH_SYSTEMD_SOCKET}', d)}"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-discovery-service
+inherit obmc-phosphor-utils
 inherit systemd
 
 do_install:append() {

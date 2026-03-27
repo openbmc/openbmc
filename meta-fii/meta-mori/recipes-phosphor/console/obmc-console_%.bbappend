@@ -1,7 +1,7 @@
 FILESEXTRAPATHS:prepend:mori := "${THISDIR}/${PN}:"
 
 SRC_URI:append:mori = " \
-    file://${BPN}@.service \
+    file://mori-overrides.conf \
     file://host_console_uart_config.service \
     file://mori_uart_mux_ctrl.sh \
     file://server.ttyS1.conf \
@@ -19,9 +19,9 @@ do_install:append:mori() {
         ${D}${libexecdir}/${PN}/mori_uart_mux_ctrl.sh
     install -m 0644 ${UNPACKDIR}/host_console_uart_config.service \
         ${D}${systemd_unitdir}/system
-    # Overwrite base package's obmc-console@.service with our own
-    install -m 0644 ${UNPACKDIR}/${BPN}@.service \
-        ${D}${systemd_unitdir}/system/${BPN}@.service
+    install -d ${D}${systemd_unitdir}/system/obmc-console@.service.d
+    install -m 0644 ${UNPACKDIR}/mori-overrides.conf \
+        ${D}${systemd_unitdir}/system/obmc-console@.service.d/mori-overrides.conf
 }
 
 RDEPENDS:${PN}:append:mori = " bash"

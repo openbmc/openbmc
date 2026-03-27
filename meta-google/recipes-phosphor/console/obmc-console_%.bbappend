@@ -7,8 +7,8 @@ SRC_URI:append:gbmc = " \
   file://host-console-filtered.sh \
   "
 
-SYSTEMD_SERVICE:${PN}:append:gbmc = " serial-to-bmc@.service"
-SYSTEMD_SERVICE:${PN}:append:gbmc = " serial-to-host@.service"
+SYSTEMD_SERVICE:${PN}:append:gbmc = " serial-to-bmc@{OBMC_CONSOLE_HOST_TTY}.service"
+SYSTEMD_SERVICE:${PN}:append:gbmc = " serial-to-host@{OBMC_CONSOLE_HOST_TTY}.service"
 
 # Remove the default ssh package config
 PACKAGECONFIG:remove:gbmc = "ssh"

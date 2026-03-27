@@ -2,13 +2,11 @@ FILESEXTRAPATHS:append := "${THISDIR}/${PN}:"
 OBMC_CONSOLE_HOST_TTY = "ttyS3"
 
 SRC_URI:append = " \
-    file://obmc-console@.service \
+    file://uart-routing.conf \
 "
-
-SYSTEMD_SERVICE:${PN} += "obmc-console@.service "
-FILES:${PN}  += "${systemd_system_unitdir}/obmc-console@.service"
 
 do_install:append() {
     # Override the obmc-console service to set UART routing
-    install -m 0644 ${UNPACKDIR}/obmc-console@.service ${D}${systemd_system_unitdir}
+    install -d ${D}${systemd_system_unitdir}/obmc-console@.service.d
+    install -m 0644 ${UNPACKDIR}/uart-routing.conf ${D}${systemd_system_unitdir}/obmc-console@.service.d/uart-routing.conf
 }
