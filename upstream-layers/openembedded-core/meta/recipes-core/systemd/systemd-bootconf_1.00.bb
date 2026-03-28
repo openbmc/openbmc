@@ -24,9 +24,8 @@ do_install() {
 	install -d ${D}/boot
 	install -d ${D}/boot/loader
 	install -d ${D}/boot/loader/entries
-	install loader.conf ${D}/boot/loader/
-	rm loader.conf
-	install *.conf ${D}/boot/loader/entries/
+	install ${SYSTEMD_BOOT_CFG} ${D}/boot/loader/
+	install ${SYSTEMD_BOOT_ENTRIES_DIR}/*.conf ${D}/boot/loader/entries/
 }
 
 FILES:${PN} = "/boot/loader/* /boot/loader/entries/*"

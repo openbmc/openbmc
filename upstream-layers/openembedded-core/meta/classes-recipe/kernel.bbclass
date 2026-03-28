@@ -550,6 +550,7 @@ do_shared_workdir () {
 	cp .config $kerneldir/
 	mkdir -p $kerneldir/include/config
 	cp include/config/kernel.release $kerneldir/include/config/kernel.release
+	cp include/config/auto.conf      $kerneldir/include/config/auto.conf
 	if [ -e certs/signing_key.x509 ]; then
 		# The signing_key.* files are stored in the certs/ dir in
 		# newer Linux kernels
@@ -882,7 +883,7 @@ do_create_spdx:append() {
         except Exception as e:
             bb.error(f"Failed to parse kernel config file: {e}")
 
-        path = oe.sbom30.jsonld_arch_path(d, pkg_arch, "recipes", f"recipe-{pn}", deploydir=deploydir)
+        path = oe.sbom30.jsonld_arch_path(d, pkg_arch, "builds", f"build-{pn}", deploydir=deploydir)
         build_objset = oe.sbom30.load_jsonld(d, path, required=True)
         build = build_objset.find_root(oe.spdx30.build_Build)
         if not build:

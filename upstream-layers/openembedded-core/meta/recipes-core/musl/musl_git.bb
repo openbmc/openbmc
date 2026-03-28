@@ -4,16 +4,15 @@
 require musl.inc
 inherit linuxloader
 
-SRCREV = "0ccaf0572e9cccda2cced0f7ee659af4c1c6679a"
+SRCREV = "9fa28ece75d8a2191de7c5bb53bed224c5947417"
 
-BASEVER = "1.2.5"
+BASEVER = "1.2.6"
 
 PV = "${BASEVER}+git"
 
 SRC_URI = "git://git.musl-libc.org/musl;branch=master \
            file://0001-Make-dynamic-linker-a-relative-symlink-to-libc.patch \
            file://0002-ldso-Use-syslibdir-and-libdir-as-default-pathes-to-l.patch \
-           file://0001-Update-syscalls-for-r32-rv64-from-kernel-6.4-through.patch \
           "
 
 PROVIDES += "virtual/libc virtual/libiconv virtual/libintl virtual/crypt"

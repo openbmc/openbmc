@@ -7,7 +7,8 @@ SUMMARY = "Runtime libraries from GCC"
 LICENSE = "GPL-3.0-with-GCC-exception"
 
 CXXFLAGS:remove = "-fvisibility-inlines-hidden"
-
+CFLAGS:append = " -Wno-error=discarded-qualifiers"
+ 
 EXTRA_OECONF_PATHS = "\
     --with-gxx-include-dir=${includedir}/c++/${BINV} \
     --with-sysroot=/not/exist \

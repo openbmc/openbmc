@@ -9,6 +9,9 @@ SRC_URI[sha256sum] = "7ec912ab59af3cc97874c456a56a8ae1eec520c385ec447e8a102b2bd1
 
 inherit meson pkgconfig
 
+PACKAGECONFIG ??= ""
+PACKAGECONFIG[hotdoc] = "-Dhotdoc=enabled,-Dhotdoc=disabled,hotdoc-native"
+
 # distinguish from apache:orc
 CVE_PRODUCT = "gstreamer:orc"
 
@@ -26,4 +29,14 @@ python populate_packages:prepend () {
 
 do_compile:prepend:class-native () {
     sed -i -e 's#/tmp#.#g' ${S}/orc/orccodemem.c
+}
+
+#Add this function to deal with QA Issue like File /usr/share/doc/orc/html/assets/js/search/hotdoc_fragments/orctarget.html-enum (unnamed at /work/x86-64-v3-poky-linux/orc/0.4.42/sources/orc-0.4.42/orc/orctarget.h:39:1).fragment in package orc-doc contains reference to TMPDIR [buildpaths]
+do_install:append:class-target () {
+    if ${@bb.utils.contains('PACKAGECONFIG', 'hotdoc', 'true', 'false', d)}; then
+        rm -rf ${D}${docdir}/${PN}/html/assets/js/search/hotdoc_fragments/*unnamed*
+        for ss in $(find ${D}${docdir}/${PN}/html -type f); do
+            sed -i 's,${S},,g' "$ss"
+        done
+    fi
 }

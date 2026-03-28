@@ -65,6 +65,58 @@ class Partition():
 
         self.lineno = lineno
         self.source_file = ""
+        self.sector_size = 512
+
+    def _mkdosfs_extraopts(self):
+        """
+        Build mkdosfs extra options ensuring the CLI sector size is applied.
+
+        Generate cmdline options for mkdosfs. A user can supply options
+        they want to see used via a wks file. Check that the user has
+        not supplied an "-S <logical-sector-size>" option, if they
+        have not, we define "-S <logical-sector-size>" option based on
+        the value of self.sector_size.
+        """
+        extraopts = self.mkfs_extraopts
+        for token in extraopts.split():
+            if token == '-S' or (token.startswith('-S') and token[2:].isdigit()):
+                # Nothing to do, the user already supplied a value
+                return extraopts
+
+        # Supply the default based on the partitioning sector_size
+        return extraopts + " -S %d" % (self.sector_size)
+
+    def _mkfs_ext_extraopts(self, base_opts):
+        """
+        Build mkfs.ext* extra options ensuring the CLI sector size is applied.
+
+        Generate cmdline options for mkfs.ext*. Different parts of the
+        code want to provide different default sets of ext* options for
+        mkfs. But the user can provide their own options via the wks
+        file; in which case the user options completely replace the
+        in-code default options. If the user does not specify an option
+        as long as sector-size != 512 we supply an additional
+        "-b <block-size>" argument to align the filesystem with the
+        overall block-size.
+
+        NOTE: the default sector/block size for an ext* filesystem depends on
+        a number of factors and it is generally best to allow the tools to
+        determine the sector/block size heuristically. Therefore only specify
+        the size explicitly when it is not the default. Specifying a sector-size
+        of 512, for example, for an ext4 filesystem will result in:
+            ERROR: mkfs.ext4: invalid block size - 512
+        See the mkfs.ext4 man page for details on the -b option.
+        """
+        extraopts = self.mkfs_extraopts or base_opts
+        for token in extraopts.split():
+            if token == '-b' or (token.startswith('-b') and token[2:].isdigit()):
+                # Nothing to do, the user already supplied a value
+                return extraopts
+
+        if self.sector_size != 512:
+            # Supply the default based on the partitioning sector_size
+            return extraopts + " -b %d" % (self.sector_size)
+        return extraopts
 
     def get_extra_block_count(self, current_blocks):
         """
@@ -138,6 +190,8 @@ class Partition():
         Prepare content for individual partitions, depending on
         partition command parameters.
         """
+        # capture the sector size requested on the CLI for mkdosfs invocations
+        self.sector_size = getattr(creator, 'sector_size', 512)
         self.updated_fstab_path = updated_fstab_path
         if self.updated_fstab_path and not (self.fstype.startswith("ext") or self.fstype == "msdos"):
             self.update_fstab_in_rootfs = True
@@ -293,7 +347,7 @@ class Partition():
         with open(rootfs, 'w') as sparse:
             os.ftruncate(sparse.fileno(), rootfs_size * 1024)
 
-        extraopts = self.mkfs_extraopts or "-F -i 8192"
+        extraopts = self._mkfs_ext_extraopts("-F -i 8192")
 
         # use hash_seed to generate reproducible ext4 images
         (extraopts, pseudo) = self.get_hash_seed_ext4(extraopts, pseudo)
@@ -401,7 +455,7 @@ class Partition():
 
         size_str = ""
 
-        extraopts = self.mkfs_extraopts or '-S 512'
+        extraopts = self._mkdosfs_extraopts()
 
         dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
                     (label_str, self.fsuuid, size_str, extraopts, rootfs,
@@ -452,7 +506,7 @@ class Partition():
         with open(rootfs, 'w') as sparse:
             os.ftruncate(sparse.fileno(), size * 1024)
 
-        extraopts = self.mkfs_extraopts or "-i 8192"
+        extraopts = self._mkfs_ext_extraopts("-i 8192")
 
         # use hash_seed to generate reproducible ext4 images
         (extraopts, pseudo) = self.get_hash_seed_ext4(extraopts, None)
@@ -498,7 +552,7 @@ class Partition():
 
         size_str = ""
 
-        extraopts = self.mkfs_extraopts or '-S 512'
+        extraopts = self._mkdosfs_extraopts()
 
         dosfs_cmd = "mkdosfs %s -i %s %s %s -C %s %d" % \
                     (label_str, self.fsuuid, extraopts, size_str, rootfs,
@@ -559,4 +613,3 @@ class Partition():
                     logger.warn("%s Inodes (of size %d) are too small." %
                                 (get_err_str(self), size))
                 break
-

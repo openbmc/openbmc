@@ -201,6 +201,13 @@ class FilemapSeek(_FilemapBase):
         _FilemapBase.__init__(self, image, log)
         self._log.debug("FilemapSeek: initializing")
 
+        # Open a separate file handle for SEEK_DATA/SEEK_HOLE probes so
+        # that the lseek() calls do not disturb the BufferedReader state
+        # of self._f_image, which sparse_copy() uses for data reading.
+        # Sharing a single fd between os.lseek() and buffered read()
+        # has the potential to cause data corruption.
+        self._f_seek = open(self._image_path, 'rb')
+
         self._probe_seek_hole()
 
     def _probe_seek_hole(self):
@@ -244,7 +251,7 @@ class FilemapSeek(_FilemapBase):
 
     def block_is_mapped(self, block):
         """Refer the '_FilemapBase' class for the documentation."""
-        offs = _lseek(self._f_image, block * self.block_size, _SEEK_DATA)
+        offs = _lseek(self._f_seek, block * self.block_size, _SEEK_DATA)
         if offs == -1:
             result = False
         else:
@@ -265,11 +272,11 @@ class FilemapSeek(_FilemapBase):
         limit = end + count * self.block_size
 
         while True:
-            start = _lseek(self._f_image, end, whence1)
+            start = _lseek(self._f_seek, end, whence1)
             if start == -1 or start >= limit or start == self.image_size:
                 break
 
-            end = _lseek(self._f_image, start, whence2)
+            end = _lseek(self._f_seek, start, whence2)
             if end == -1 or end == self.image_size:
                 end = self.blocks_cnt * self.block_size
             if end > limit:

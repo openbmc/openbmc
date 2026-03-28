@@ -167,18 +167,13 @@
         "files": [
             "${libdir}/python${PYTHON_MAJMIN}/gzip.py",
             "${libdir}/python${PYTHON_MAJMIN}/tarfile.py",
-            "${libdir}/python${PYTHON_MAJMIN}/compression/gzip.py",
-            "${libdir}/python${PYTHON_MAJMIN}/compression/tarfile.py",
-            "${libdir}/python${PYTHON_MAJMIN}/compression/_common/_streams.py",
-            "${libdir}/python${PYTHON_MAJMIN}/zipfile",
-            "${libdir}/python${PYTHON_MAJMIN}/zipfile/_path"
+            "${libdir}/python${PYTHON_MAJMIN}/zipfile/",
+            "${libdir}/python${PYTHON_MAJMIN}/compression/",
+            "${libdir}/python${PYTHON_MAJMIN}/lib-dynload/_zstd.*.so"
         ],
         "cached": [
             "${libdir}/python${PYTHON_MAJMIN}/__pycache__/gzip.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tarfile.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/compression/__pycache__/gzip.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/compression/__pycache__/tarfile.*.pyc",
-            "${libdir}/python${PYTHON_MAJMIN}/compression/_common/__pycache__/_streams.*.pyc"
+            "${libdir}/python${PYTHON_MAJMIN}/__pycache__/tarfile.*.pyc"
         ]
     },
     "core": {

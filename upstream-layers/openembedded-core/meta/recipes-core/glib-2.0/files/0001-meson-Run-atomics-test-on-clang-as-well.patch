@@ -17,7 +17,7 @@ diff --git a/meson.build b/meson.build
 index dab1d61..cc3a5ed 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -2092,7 +2092,7 @@ atomicdefine = '''
+@@ -2100,7 +2100,7 @@ atomicdefine = '''
  # We know that we can always use real ("lock free") atomic operations with MSVC
  if cc.get_id() == 'msvc' or cc.get_id() == 'clang-cl' or cc.links(atomictest, name : 'atomic ops')
    have_atomic_lock_free = true

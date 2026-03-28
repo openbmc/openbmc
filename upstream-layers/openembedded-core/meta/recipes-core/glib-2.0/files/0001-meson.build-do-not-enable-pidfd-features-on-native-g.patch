@@ -17,7 +17,7 @@ diff --git a/meson.build b/meson.build
 index cc3a5ed..58dd87a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -1090,7 +1090,8 @@ if cc.links('''#include <sys/syscall.h>
+@@ -1098,7 +1098,8 @@ if cc.links('''#include <sys/syscall.h>
                   waitid (P_PIDFD, 0, &child_info, WEXITED | WNOHANG);
                   return 0;
                 }''', name : 'pidfd_open(2) system call')

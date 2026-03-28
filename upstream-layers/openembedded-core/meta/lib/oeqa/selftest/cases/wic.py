@@ -935,8 +935,8 @@ bootloader --ptable gpt""")
         finally:
             os.remove(wks_file)
 
-    def test_wic_sector_size(self):
-        """Test generation image sector size"""
+    def test_wic_sector_size_env(self):
+        """Test generation image sector size via environment (obsolete)"""
  
         oldpath = os.environ['PATH']
         os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
@@ -958,6 +958,7 @@ bootloader --ptable gpt""")
             with NamedTemporaryFile("w", suffix=".wks") as wks:
                 wks.writelines(
                     ['bootloader --ptable gpt\n',
+                     'part --fstype vfat --fstype vfat --label emptyfat --size 1M --mkfs-extraopts "-S 4096"\n',
                      'part --fstype ext4 --source rootfs --label rofs-a --mkfs-extraopts "-b 4096"\n',
                      'part --fstype ext4 --source rootfs --use-uuid --mkfs-extraopts "-b 4096"\n'])
                 wks.flush()
@@ -970,23 +971,117 @@ bootloader --ptable gpt""")
             sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
             # list partitions
             result = runCmd("wic ls %s -n %s" % (images[0], sysroot))
-            self.assertEqual(3, len(result.output.split('\n')))
+            print(result.output)
+            # Deprecated message + 4 lines of output: header + 3 partitions
+            self.assertEqual(5, len(result.output.split('\n')))
 
             # verify partition size with wic
             res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (wic_sector_size, images[0]),
                          stderr=subprocess.PIPE)
 
+            print(res.output)
             # parse parted output which looks like this:
             # BYT;\n
             # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
-            # 1:139264B:39284735B:39145472B:ext4:rofs-a:;\n
-            # 2:39284736B:78430207B:39145472B:ext4:primary:;\n
+            # 1:139264B:1187839B:1048576B::emptyfat:msftdata;
+            # 2:1187840B:149270527B:148082688B:ext4:rofs-a:;
+            # 3:149270528B:297353215B:148082688B:ext4:primary:;
             disk_info = res.output.splitlines()[1]
             # Check sector sizes
             sector_size_logical = int(disk_info.split(":")[3])
             sector_size_physical = int(disk_info.split(":")[4])
             self.assertEqual(wic_sector_size, sector_size_logical, "Logical sector size is not %d." % wic_sector_size)
             self.assertEqual(wic_sector_size, sector_size_physical, "Physical sector size is not %d." % wic_sector_size)
+
+            # It is a known issue with parsed that a 4K FAT partition does
+            # not have a recognized filesystem type of *fat.
+            part_info = res.output.splitlines()[2]
+            partname = part_info.split(":")[5]
+            parttype = part_info.split(":")[6]
+            self.assertEqual('emptyfat', partname)
+            self.assertEqual('msftdata;', parttype)
+
+            part_info = res.output.splitlines()[3]
+            parttype = part_info.split(":")[4]
+            partname = part_info.split(":")[5]
+            self.assertEqual('ext4', parttype)
+            self.assertEqual('rofs-a', partname)
+
+            part_info = res.output.splitlines()[4]
+            parttype = part_info.split(":")[4]
+            partname = part_info.split(":")[5]
+            self.assertEqual('ext4', parttype)
+            self.assertEqual('primary', partname)
+
+        finally:
+            os.environ['PATH'] = oldpath
+
+    def test_wic_sector_size_cli(self):
+        """Test sector size handling via CLI option."""
+
+        oldpath = os.environ['PATH']
+        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+
+        try:
+            bitbake('core-image-minimal')
+
+            with NamedTemporaryFile("w", suffix=".wks") as wks:
+                wks.writelines(
+                    ['bootloader --ptable gpt\n',
+                     'part --fstype vfat --fstype vfat --label emptyfat --size 1M\n',
+                     'part --fstype ext4 --source rootfs --label rofs-a\n',
+                     'part --fstype ext4 --source rootfs --use-uuid\n'])
+                wks.flush()
+                cmd = "wic create %s -e core-image-minimal -o %s --sector-size 4096" % (wks.name, self.resultdir)
+                runCmd(cmd)
+                wksname = os.path.splitext(os.path.basename(wks.name))[0]
+                images = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
+                self.assertEqual(1, len(images))
+
+            sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
+            # list partitions
+            result = runCmd("wic ls %s -n %s --sector-size 4096" % (images[0], sysroot))
+            print(result.output)
+            # 4 lines of output: header + 3 partitions
+            self.assertEqual(4, len(result.output.split('\n')))
+
+            # verify partition size with parted output
+            res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (4096, images[0]),
+                         stderr=subprocess.PIPE)
+
+            print(res.output)
+            # parse parted output which looks like this:
+            # BYT;\n
+            # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
+            # 1:139264B:1187839B:1048576B::emptyfat:msftdata;
+            # 2:1187840B:149270527B:148082688B:ext4:rofs-a:;
+            # 3:149270528B:297353215B:148082688B:ext4:primary:;
+            disk_info = res.output.splitlines()[1]
+            # Check sector sizes
+            sector_size_logical = int(disk_info.split(":")[3])
+            sector_size_physical = int(disk_info.split(":")[4])
+            self.assertEqual(4096, sector_size_logical, "Logical sector size is not 4096.")
+            self.assertEqual(4096, sector_size_physical, "Physical sector size is not 4096.")
+
+            # It is a known issue with parsed that a 4K FAT partition does
+            # not have a recognized filesystem type of *fat.
+            part_info = res.output.splitlines()[2]
+            partname = part_info.split(":")[5]
+            parttype = part_info.split(":")[6]
+            self.assertEqual('emptyfat', partname)
+            self.assertEqual('msftdata;', parttype)
+
+            part_info = res.output.splitlines()[3]
+            parttype = part_info.split(":")[4]
+            partname = part_info.split(":")[5]
+            self.assertEqual('ext4', parttype)
+            self.assertEqual('rofs-a', partname)
+
+            part_info = res.output.splitlines()[4]
+            parttype = part_info.split(":")[4]
+            partname = part_info.split(":")[5]
+            self.assertEqual('ext4', parttype)
+            self.assertEqual('primary', partname)
 
         finally:
             os.environ['PATH'] = oldpath
@@ -1555,6 +1650,9 @@ QB_DEFAULT_KERNEL = "none"
 
 # boot command line provided via uki, not via bootloader
 UKI_CMDLINE = "rootwait root=LABEL=root console=${KERNEL_CONSOLE}"
+
+# qemu provides the devicetree at boot, do not embed a dtb in the uki for selftests
+UKI_DEVICETREE = ""
 
 """
         self.append_config(config)

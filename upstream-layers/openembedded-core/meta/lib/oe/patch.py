@@ -318,6 +318,8 @@ class GitApplyTree(PatchTree):
 
     def _initRepo(self):
         runcmd("git init".split(), self.dir)
+        runcmd(["git", "config", "user.email", self.commitemail], self.dir)
+        runcmd(["git", "config", "user.name", self.commituser], self.dir)
         runcmd("git add .".split(), self.dir)
         runcmd("git commit -a --allow-empty -m bitbake_patching_started".split(), self.dir)
 

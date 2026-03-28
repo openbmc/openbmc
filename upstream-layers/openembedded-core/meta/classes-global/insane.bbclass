@@ -1344,6 +1344,15 @@ python do_qa_patch() {
     oe.qa.exit_if_errors(d)
 }
 
+def configure_qa_invalid_packageconfig(pn, d):
+    pkgconfigs = (d.getVar("PACKAGECONFIG") or "").split()
+    if pkgconfigs:
+        pkgconfigflags = d.getVarFlags("PACKAGECONFIG") or {}
+        invalid_pkgconfigs = set(pkgconfigs) - set(pkgconfigflags)
+        if invalid_pkgconfigs:
+            error_msg = "%s: invalid PACKAGECONFIG(s): %s" % (pn, " ".join(sorted(invalid_pkgconfigs)))
+            oe.qa.handle_error("invalid-packageconfig", error_msg, d)
+
 python do_qa_configure() {
     import subprocess
 
@@ -1353,11 +1362,12 @@ python do_qa_configure() {
 
     configs = []
     workdir = d.getVar('WORKDIR')
+    pn = d.getVar('PN')
 
     skip = (d.getVar('INSANE_SKIP') or "").split()
     skip_configure_unsafe = False
     if 'configure-unsafe' in skip:
-        bb.note("Recipe %s skipping qa checking: configure-unsafe" % d.getVar('PN'))
+        bb.note(f"Recipe {pn} skipping qa checking: configure-unsafe")
         skip_configure_unsafe = True
 
     if bb.data.inherits_class('autotools', d) and not skip_configure_unsafe:
@@ -1382,7 +1392,7 @@ Rerun configure task after fixing this."""
 
     skip_configure_gettext = False
     if 'configure-gettext' in skip:
-        bb.note("Recipe %s skipping qa checking: configure-gettext" % d.getVar('PN'))
+        bb.note(f"Recipe {pn} skipping qa checking: configure-gettext")
         skip_configure_gettext = True
 
     cnf = d.getVar('EXTRA_OECONF') or ""
@@ -1417,11 +1427,12 @@ Rerun configure task after fixing this."""
             ignore_opts = set(d.getVar("UNKNOWN_CONFIGURE_OPT_IGNORE").split())
             options -= ignore_opts
             if options:
-                pn = d.getVar('PN')
                 error_msg = pn + ": configure was passed unrecognised options: " + " ".join(options)
                 oe.qa.handle_error("unknown-configure-option", error_msg, d)
         except subprocess.CalledProcessError:
             pass
+
+    configure_qa_invalid_packageconfig(pn, d)
 
     oe.qa.exit_if_errors(d)
 }
@@ -1484,21 +1495,11 @@ python do_recipe_qa() {
             if re.search(r"git(hu|la)b\.com/.+/.+/archive/.+", url) or "//codeload.github.com/" in url:
                 oe.qa.handle_error("src-uri-bad", "%s: SRC_URI uses unstable GitHub/GitLab archives, convert recipe to use git protocol" % pn, d)
 
-    def test_packageconfig(pn, d):
-        pkgconfigs = (d.getVar("PACKAGECONFIG") or "").split()
-        if pkgconfigs:
-            pkgconfigflags = d.getVarFlags("PACKAGECONFIG") or {}
-            invalid_pkgconfigs = set(pkgconfigs) - set(pkgconfigflags)
-            if invalid_pkgconfigs:
-                error_msg = "%s: invalid PACKAGECONFIG(s): %s" % (pn, " ".join(sorted(invalid_pkgconfigs)))
-                oe.qa.handle_error("invalid-packageconfig", error_msg, d)
-
     pn = d.getVar('PN')
     test_naming(pn, d)
     test_missing_metadata(pn, d)
     test_missing_maintainer(pn, d)
     test_srcuri(pn, d)
-    test_packageconfig(pn, d)
     oe.qa.exit_if_errors(d)
 }
 

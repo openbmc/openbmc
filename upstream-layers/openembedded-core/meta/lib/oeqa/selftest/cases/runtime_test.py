@@ -11,6 +11,7 @@ import os
 import tempfile
 import oe.lsb
 from oeqa.core.decorator.data import skipIfNotQemu, skipIfNotMachine
+from unittest import mock
 
 class TestExport(OESelftestTestCase):
 
@@ -226,8 +227,13 @@ TEST_RUNQEMUPARAMS += " slirp"
         Product: oe-core
         Author: Alexander Kanavin <alex.kanavin@gmail.com>
         """
-        if "DISPLAY" not in os.environ:
+
+        # Use OEQA_TESTDISPLAY if set, fallback to DISPLAY from os.environ
+        display = get_bb_var('OEQA_TESTDISPLAY') or os.environ.get("DISPLAY", None)
+
+        if not display:
             self.skipTest("virgl gtk test must be run inside a X session")
+
         distro = oe.lsb.distro_identifier()
         if distro and distro == 'debian-8':
             self.skipTest('virgl isn\'t working with Debian 8')
@@ -252,12 +258,14 @@ TEST_RUNQEMUPARAMS += " slirp"
         features += 'IMAGE_INSTALL:append = " kmscube"\n'
         features_gtk = features + 'TEST_RUNQEMUPARAMS += " gtk gl"\n'
         self.write_config(features_gtk)
-        bitbake('core-image-minimal')
-        bitbake('-c testimage core-image-minimal')
+        with mock.patch.dict(os.environ, {"DISPLAY": display}):
+            bitbake('core-image-minimal')
+            bitbake('-c testimage core-image-minimal')
         features_sdl = features + 'TEST_RUNQEMUPARAMS += " sdl gl"\n'
         self.write_config(features_sdl)
-        bitbake('core-image-minimal')
-        bitbake('-c testimage core-image-minimal')
+        with mock.patch.dict(os.environ, {"DISPLAY": display}):
+            bitbake('core-image-minimal')
+            bitbake('-c testimage core-image-minimal')
 
     @skipIfNotMachine("qemux86-64", "test needs qemux86-64")
     def test_testimage_virgl_headless(self):
@@ -481,3 +489,44 @@ IMAGE_INSTALL:append = " systemtap-runtime"
                 cmd = "crosstap -r root@192.168.7.2 -s %s/process/ syscalls_by_pid.stp" % systemtap_examples
                 result = runCmd(cmd)
                 self.assertEqual(0, result.status, 'crosstap  syscalls_by_pid returned a non 0 status:%s' % result.output)
+@OETestTag("runqemu")
+class RustKernel(OESelftestTestCase):
+        @classmethod
+        def setUpClass(cls):
+            super(RustKernel, cls).setUpClass()
+            cls.image = "core-image-minimal"
+
+        def test_kernel_rust_sample(self):
+            import textwrap
+            self.write_config(textwrap.dedent("""
+                KERNEL_FEATURES += "rust"
+                KERNEL_EXTRA_FEATURES:append = " features/kernel-sample/kernel-rust-sample.scc"
+                CORE_IMAGE_EXTRA_INSTALL += "kernel-module-rust-minimal kernel-module-rust-out-of-tree"
+            """))
+
+            runCmd('bitbake-layers add-layer %s' % os.path.join(get_bb_var("COREBASE"), 'meta-skeleton'))
+            self.add_command_to_tearDown('bitbake-layers remove-layer */meta-skeleton')
+            bitbake(self.image)
+
+            with runqemu(self.image, runqemuparams = "nographic") as qemu:
+                qemu.run_serial("dmesg -c > /dev/null")
+                status, _ = qemu.run_serial("modprobe rust_minimal")
+                #Disable status check due to intermittent failures on armhost/qemuarm64.
+                #The module loads successfully, but qemu.run_serial() occasionally
+                #returns an incorrect status.
+                #Bug report: https://bugzilla.yoctoproject.org/show_bug.cgi?id=16189
+                #self.assertEqual(status, 1, "Loading rust_minimal module failed!")
+                _, output = qemu.run_serial("dmesg")
+                self.logger.debug(f"rust_minimal dmesg output:\n" + textwrap.indent(output, "  "))
+                self.assertIn("Rust minimal sample", output, "Kernel Rust sample expected output not found in dmesg")
+
+                qemu.run_serial("dmesg -c > /dev/null")
+                status, _ = qemu.run_serial("modprobe rust_out_of_tree")
+                #Disable status check due to intermittent failures on armhost/qemuarm64.
+                #The module loads successfully, but qemu.run_serial() occasionally
+                #returns an incorrect status.
+                #Bug report: https://bugzilla.yoctoproject.org/show_bug.cgi?id=16189
+                #self.assertEqual(status, 1, "Loading rust_out_of_tree module failed!")
+                _, output = qemu.run_serial("dmesg")
+                self.logger.debug(f"rust_out_of_tree dmesg output:\n" + textwrap.indent(output, "  "))
+                self.assertIn("Rust out-of-tree sample", output, "Out-of-tree Rust sample expected output not found in dmesg")

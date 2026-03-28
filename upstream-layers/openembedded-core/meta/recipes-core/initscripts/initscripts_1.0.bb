@@ -32,13 +32,11 @@ SRC_URI = "file://functions \
            file://save-rtc.sh \
            file://dmesg.sh \
            file://logrotate-dmesg.conf \
+           file://alignment.sh \
            ${@bb.utils.contains('DISTRO_FEATURES','selinux','file://sushell','',d)} \
 "
 
 S = "${UNPACKDIR}"
-
-SRC_URI:append:arm = " file://alignment.sh"
-SRC_URI:append:armeb = " file://alignment.sh"
 
 KERNEL_VERSION = ""
 

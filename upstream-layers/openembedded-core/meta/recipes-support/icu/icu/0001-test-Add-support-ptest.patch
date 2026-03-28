@@ -44,7 +44,7 @@ diff --git a/test/intltest/intltest.cpp b/test/intltest/intltest.cpp
 index 3806d0f..33829b0 100644
 --- a/test/intltest/intltest.cpp
 +++ b/test/intltest/intltest.cpp
-@@ -1713,7 +1713,7 @@ static bool fileExists(const char* fileName) {
+@@ -1707,7 +1707,7 @@ static bool fileExists(const char* fileName) {
   * Returns the path to icu/testdata/
   */
  const char *IntlTest::getSharedTestData(UErrorCode& err) {

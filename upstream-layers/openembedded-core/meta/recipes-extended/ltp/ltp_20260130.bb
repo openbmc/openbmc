@@ -30,6 +30,7 @@ SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=ht
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
            file://0001-Add-__clear_cache-declaration-for-clang.patch \
            file://0001-syscalls-semctl08-Skip-semctl08-when-__USE_TIME64_RE.patch \
+           file://0001-ltp-fix-build-failure-with-glibc-2.43.patch \
           "
 
 inherit autotools-brokensep pkgconfig
@@ -77,6 +78,15 @@ do_install(){
     # The controllers memcg_stree test seems to cause us hangs and takes 900s
     # (maybe we expect more regular output?), anyhow, skip it
     sed -e '/^memcg_stress/d' -i ${D}${prefix}/runtest/controllers
+
+    # min_free_kbytes can be disruptive on constrained targets
+    sed -e '/^min_free_kbytes/d' -i ${D}${prefix}/runtest/mm
+
+    # cve-2018-13405 triggers memory deadlock kernel panic on constrained targets
+    sed -e '/^cve-2018-13405/d' -i ${D}${prefix}/runtest/cve
+
+    # cve-2020-36557 triggers memory deadlock kernel panic on constrained targets
+    sed -e '/^cve-2020-36557/d' -i ${D}${prefix}/runtest/cve
 }
 
 RDEPENDS:${PN} = "\
@@ -125,7 +135,7 @@ remove_broken_musl_sources() {
 	[ "${TCLIBC}" = "musl" ] || return 0
 
 	cd ${S}
-	echo "WARNING: remove unsupported tests (until they're fixed)"
+	bbverbnote "remove unsupported tests (until they're fixed)"
 
 	# sync with upstream
 	# https://github.com/linux-test-project/ltp/blob/master/ci/alpine.sh#L33

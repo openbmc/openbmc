@@ -11,6 +11,5 @@ SRC_URI[sha256sum] = "d8071403ce742d3ac3592ddc4fb7057a46caffb415b928b4d52802e5f2
 inherit pypi python_flit_core
 
 PYPI_PACKAGE = "coherent_licensed"
-UPSTREAM_CHECK_PYPI_PACKAGE = "coherent_licensed"
 
 BBCLASSEXTEND = "native nativesdk"

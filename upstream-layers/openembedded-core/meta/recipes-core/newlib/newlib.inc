@@ -8,16 +8,16 @@ LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 		file://COPYING3.LIB;md5=6a6a8e020838b23406c81b19c1d46df6 \
 		file://COPYING3;md5=d32239bcb673463ab874e80d47fae504 \
-		file://COPYING.LIBGLOSS;md5=faa6f6ad545714df2a7d1276ed899f15 \
+		file://COPYING.LIBGLOSS;md5=069b617d6628c1502d7dc2d43d7c836e \
 		file://COPYING.LIB;md5=2d5025d4aa3495befef8f17206a5b0a1 \
-		file://COPYING.NEWLIB;md5=61255563bbcda142f581b94591b6a589 \
+		file://COPYING.NEWLIB;md5=31bee4d729ae1a5423048cc181a2f1ad \
 		file://newlib/libc/posix/COPYRIGHT;md5=103468ff1982be840fdf4ee9f8b51bbf \
 		"
 
-BASEVER = "4.5.0"
+BASEVER = "4.6.0"
 PV = "${BASEVER}+git"
 SRC_URI = "git://sourceware.org/git/newlib-cygwin.git;protocol=https;branch=main"
-SRCREV = "5e5e51f1dc56a99eb4648c28e00d73b6ea44a8b0"
+SRCREV = "8ba4275b83ec27529f67e0d477611fa6d8d6e6bd"
 
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS = "virtual/cross-cc"

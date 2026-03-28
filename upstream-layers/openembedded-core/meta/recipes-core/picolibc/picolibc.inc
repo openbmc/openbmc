@@ -7,14 +7,12 @@ SECTION = "libs"
 # are GPLv2 and GeneratePicolibcCrossFile.sh is AGPL3 but not part of the artifacts.
 LICENSE = "BSD-2-Clause & BSD-3-Clause"
 LIC_FILES_CHKSUM = " \
-		file://COPYING.GPL2;md5=59530bdf33659b29e73d4adb9f9f6552 \
-		file://COPYING.NEWLIB;md5=08ae03456feb75b81cfdb359e0f1ef85 \
-		file://COPYING.picolibc;md5=e50fa9458a40929689861ed472d46bc7 \
+		file://COPYING.picolibc;md5=e44132dded508048efb22b15ccd40d7d \
 		"
 
-BASEVER = "1.8.6"
+BASEVER = "1.8.11"
 PV = "${BASEVER}+git"
 SRC_URI = "git://github.com/picolibc/picolibc.git;protocol=https;branch=main"
-SRCREV = "764ef4e401a8f4c6a86ab723533841f072885a5b"
+SRCREV = "f7edb0869e64b9d687f46961adeef7154921fe92"
 
 B = "${WORKDIR}/build"

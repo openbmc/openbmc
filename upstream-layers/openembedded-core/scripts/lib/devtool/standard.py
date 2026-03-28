@@ -801,7 +801,8 @@ def modify(args, config, basepath, workspace):
         commits = {}
         check_commits = False
 
-        if bb.data.inherits_class('kernel-yocto', rd):
+        if bb.data.inherits_class('kernel-yocto', rd) and not args.no_extract:
+
             # Current set kernel version
             kernelVersion = rd.getVar('LINUX_VERSION')
             srcdir = rd.getVar('STAGING_KERNEL_DIR')

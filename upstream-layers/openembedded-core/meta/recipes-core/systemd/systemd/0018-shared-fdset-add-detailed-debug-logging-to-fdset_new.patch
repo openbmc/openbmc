@@ -1,0 +1,97 @@
+From 0565f9f27323a8f9e62d85f2add542af99cea06a Mon Sep 17 00:00:00 2001
+From: AshishKumar Mishra <ashishkumar.mishra@bmwtechworks.in>
+Date: Wed, 21 Jan 2026 14:13:29 +0530
+Subject: [PATCH] systemd: Add detailed debug logging to fdset_new_fill()
+
+Currently, when fdset_new_fill() fails to open /proc/self/fd or
+encounters an error while processing individual file descriptors
+(such as fcntl or fstat failures), it returns a silent error code.
+
+For debugging rarely reproducible failures it becomes difficult to
+know the exact cause of failure
+This commit updates the function to use log_debug_errno() for all
+error paths and hence  provides better visibility into why FD collection
+failed, including the path of the problematic FD (via fd_get_path)
+and its inode type.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/pull/40385]
+
+Signed-off-by: AshishKumar Mishra <ashishkumar.mishra@bmwtechworks.in>
+---
+ src/shared/fdset.c | 35 ++++++++++++++++++++++++++---------
+ 1 file changed, 26 insertions(+), 9 deletions(-)
+
+diff --git a/src/shared/fdset.c b/src/shared/fdset.c
+index 832e7fda60..f340f41b0e 100644
+--- a/src/shared/fdset.c
++++ b/src/shared/fdset.c
+@@ -8,6 +8,7 @@
+ #include "alloc-util.h"
+ #include "async.h"
+ #include "dirent-util.h"
++#include "errno-util.h"
+ #include "fd-util.h"
+ #include "fdset.h"
+ #include "log.h"
+@@ -179,9 +180,10 @@ int fdset_new_fill(
+         d = opendir("/proc/self/fd");
+         if (!d) {
+                 if (errno == ENOENT && proc_mounted() == 0)
+-                        return -ENOSYS;
++                        return log_debug_errno(SYNTHETIC_ERRNO(ENOSYS),
++                                               "Failed to open /proc/self/fd/, /proc/ is not mounted.");
+ 
+-                return -errno;
++                return log_debug_errno(errno, "Failed to open /proc/self/fd/: %m ");
+         }
+ 
+         s = fdset_new();
+@@ -210,9 +212,14 @@ int fdset_new_fill(
+                          * been passed in can be collected and fds which have been created locally can be
+                          * ignored, under the assumption that only the latter have O_CLOEXEC set. */
+ 
+-                        fl = fcntl(fd, F_GETFD);
+-                        if (fl < 0)
+-                                return -errno;
++                        fl = RET_NERRNO(fcntl(fd, F_GETFD));
++                        if (fl < 0) {
++                                _cleanup_free_ char *path = NULL;
++                                (void) fd_get_path(fd, &path);
++                                return log_debug_errno(fl,
++                                                       "Failed to get flag of fd=%d (%s): %m ",
++                                                       fd, strna(path));
++                        }
+ 
+                         if (FLAGS_SET(fl, FD_CLOEXEC) != !!filter_cloexec)
+                                 continue;
+@@ -221,13 +228,23 @@ int fdset_new_fill(
+                 /* We need to set CLOEXEC manually only if we're collecting non-CLOEXEC fds. */
+                 if (filter_cloexec <= 0) {
+                         r = fd_cloexec(fd, true);
+-                        if (r < 0)
+-                                return r;
++                        if (r < 0) {
++                                _cleanup_free_ char *path = NULL;
++                                (void) fd_get_path(fd, &path);
++                                return log_debug_errno(r,
++                                                       "Failed to set CLOEXEC flag fd=%d (%s): %m ",
++                                                       fd, strna(path));
++                        }
+                 }
+ 
+                 r = fdset_put(s, fd);
+-                if (r < 0)
+-                        return r;
++                if (r < 0) {
++                        _cleanup_free_ char *path = NULL;
++                        (void) fd_get_path(fd, &path);
++                        return log_debug_errno(r,
++                                               "Failed to put fd=%d (%s) into fdset: %m ",
++                                               fd, strna(path));
++                }
+         }
+ 
+         *ret = TAKE_PTR(s);
+-- 
+2.34.1
+

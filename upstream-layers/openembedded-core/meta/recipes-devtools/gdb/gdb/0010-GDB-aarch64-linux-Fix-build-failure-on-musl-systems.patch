@@ -1,0 +1,196 @@
+From 654223c799910837c80d0964a971fbdf7808864a Mon Sep 17 00:00:00 2001
+From: Thiago Jung Bauermann <thiago.bauermann@linaro.org>
+Date: Tue, 17 Mar 2026 02:24:48 -0700
+Subject: [PATCH] GDB: aarch64-linux: Fix build failure on musl systems
+
+(cherry picked from commit 02090062127d59978ccc312dabf63c6ea838cd85)
+
+When building against musl (e.g. on Alpine Linux), the following error
+happens:
+
+    CXX    linux-aarch64-low.o
+  In file included from /home/bauermann/src/binutils-gdb/gdbserver/linux-aarch64-low.cc:42:
+  /home/bauermann/src/binutils-gdb/gdbserver/../gdb/arch/aarch64-gcs-linux.h:35:8: error: redefinition of 'struct user_gcs'
+     35 | struct user_gcs
+        |        ^~~~~~~~
+  In file included from /home/bauermann/src/binutils-gdb/gdbserver/linux-aarch64-low.cc:35:
+  /usr/include/asm/ptrace.h:329:8: note: previous definition of 'struct user_gcs'
+    329 | struct user_gcs {
+        |        ^~~~~~~~
+  make[2]: *** [Makefile:565: linux-aarch64-low.o] Error 1
+
+aarch64-linux-tdep.c fails to build in the same way.  This happens because
+aarch64-gcs-linux.h uses GCS_MAGIC to see whether the system headers
+have GCS-related definitions.  The problem is that GCS_MAGIC is defined in
+<asm/sigcontext.h> while struct gcs_user is defined in <asm/ptrace.h>.
+It's fine on glibc systems because in the set of system headers that
+linux-aarch64-low.cc and aarch64-linux-tdep.c include, <asm/sigcontext.h>
+ends up being included implicitly as well.  This doesn't happen when using
+musl's headers though.
+
+There isn't a macro in <asm/ptrace.h> whose presence is correlated with
+the presence of the struct user_gcs definition, so a configure check is
+needed to detect it and conditionally define the struct.
+
+Also, this change requires aarch64-linux-tdep.c to stop using
+struct user_gcs because target-dependent code can't include <asm/ptrace.h>
+and thus even if HAVE_STRUCT_USER_GCS is set, the file won't have the
+struct definition available. To fix this problem, also backport the
+definition of AARCH64_LINUX_SIZEOF_GCS_REGSET and use it there.
+
+Note that there's another build issue with musl, described in
+PR gdb/33747 affecting compilation of gdb/ser-unix.c.  In order to be
+able to test this patch, I applied the patch in comment 11 there.
+
+Tested with a native build on an Alpine Linux aarch64 system, and also
+verified that all gdb.arch/aarch64-gcs*.exp tests pass on it.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=33926
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/gdb-patches/2026-March/226049.html]
+
+Co-authored-by: Chris Packham <judge.packham@gmail.com>
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+ gdb/aarch64-linux-tdep.c     |  5 +++--
+ gdb/arch/aarch64-gcs-linux.h |  8 +++++---
+ gdbsupport/config.in         |  3 +++
+ gdbsupport/configure         | 36 ++++++++++++++++++++++++++++++++++++
+ gdbsupport/configure.ac      | 19 +++++++++++++++++++
+ 5 files changed, 66 insertions(+), 5 deletions(-)
+
+diff --git a/gdb/aarch64-linux-tdep.c b/gdb/aarch64-linux-tdep.c
+index 76bde85188b..6c402e7ecdd 100644
+--- a/gdb/aarch64-linux-tdep.c
++++ b/gdb/aarch64-linux-tdep.c
+@@ -1684,8 +1684,9 @@ aarch64_linux_iterate_over_regset_sections (struct gdbarch *gdbarch,
+ 	  gcs_regmap, regcache_supply_regset, regcache_collect_regset
+ 	};
+ 
+-      cb (".reg-aarch-gcs", sizeof (user_gcs), sizeof (user_gcs),
+-	  &aarch64_linux_gcs_regset, "GCS registers", cb_data);
++      cb (".reg-aarch-gcs", AARCH64_LINUX_SIZEOF_GCS_REGSET,
++	  AARCH64_LINUX_SIZEOF_GCS_REGSET, &aarch64_linux_gcs_regset,
++	  "GCS registers", cb_data);
+     }
+ }
+ 
+diff --git a/gdb/arch/aarch64-gcs-linux.h b/gdb/arch/aarch64-gcs-linux.h
+index 018ca37a522..632823a8120 100644
+--- a/gdb/arch/aarch64-gcs-linux.h
++++ b/gdb/arch/aarch64-gcs-linux.h
+@@ -27,8 +27,7 @@
+ #define HWCAP_GCS (1ULL << 32)
+ #endif
+ 
+-/* Make sure we only define these if the kernel header doesn't.  */
+-#ifndef GCS_MAGIC
++#ifndef HAVE_STRUCT_USER_GCS
+ 
+ /* GCS state (NT_ARM_GCS).  */
+ 
+@@ -39,6 +38,9 @@ struct user_gcs
+   uint64_t gcspr_el0;
+ };
+ 
+-#endif /* GCS_MAGIC */
++#endif /* HAVE_STRUCT_USER_GCS */
++
++/* The GCS regset consists of 3 64-bit registers.  */
++#define AARCH64_LINUX_SIZEOF_GCS_REGSET (3 * 8)
+ 
+ #endif /* GDB_ARCH_AARCH64_GCS_LINUX_H */
+diff --git a/gdbsupport/config.in b/gdbsupport/config.in
+index 0beacf22c05..2957ee0f030 100644
+--- a/gdbsupport/config.in
++++ b/gdbsupport/config.in
+@@ -271,6 +271,9 @@
+ /* Define to 1 if `st_blocks' is a member of `struct stat'. */
+ #undef HAVE_STRUCT_STAT_ST_BLOCKS
+ 
++/* Define to 1 if your system has struct user_gcs. */
++#undef HAVE_STRUCT_USER_GCS
++
+ /* Define to 1 if you have the <sys/param.h> header file. */
+ #undef HAVE_SYS_PARAM_H
+ 
+diff --git a/gdbsupport/configure b/gdbsupport/configure
+index 133ddfa7f6c..66135791aa5 100755
+--- a/gdbsupport/configure
++++ b/gdbsupport/configure
+@@ -14307,6 +14307,42 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
+ 
+ 
+ 
++# Check for `struct user_gcs`
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for struct user_gcs" >&5
++$as_echo_n "checking for struct user_gcs... " >&6; }
++if ${gdb_cv_struct_user_gcs+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <sys/ptrace.h>
++	 #include <asm/ptrace.h>
++int
++main ()
++{
++struct user_gcs u;
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++  gdb_cv_struct_user_gcs=yes
++else
++  gdb_cv_struct_user_gcs=no
++
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gdb_cv_struct_user_gcs" >&5
++$as_echo "$gdb_cv_struct_user_gcs" >&6; }
++if test "$gdb_cv_struct_user_gcs" = yes; then
++
++$as_echo "#define HAVE_STRUCT_USER_GCS 1" >>confdefs.h
++
++fi
++
+ # Set the 'development' global.
+ . $srcdir/../bfd/development.sh
+ 
+diff --git a/gdbsupport/configure.ac b/gdbsupport/configure.ac
+index b7ccfabd6c6..d3b4c05daeb 100644
+--- a/gdbsupport/configure.ac
++++ b/gdbsupport/configure.ac
+@@ -68,6 +68,25 @@ GDB_AC_PTRACE
+ AM_GDB_COMPILER_TYPE
+ AM_GDB_WARNINGS
+ 
++# Check for `struct user_gcs`
++AC_CACHE_CHECK(
++  [for struct user_gcs],
++  [gdb_cv_struct_user_gcs],
++  [AC_COMPILE_IFELSE(
++     [AC_LANG_PROGRAM(
++	[#include <sys/ptrace.h>
++	 #include <asm/ptrace.h>],
++	[struct user_gcs u;]
++      )],
++     [gdb_cv_struct_user_gcs=yes],
++     [gdb_cv_struct_user_gcs=no]
++  )]
++)
++if test "$gdb_cv_struct_user_gcs" = yes; then
++  AC_DEFINE(HAVE_STRUCT_USER_GCS, 1,
++	    [Define to 1 if your system has struct user_gcs.])
++fi
++
+ # Set the 'development' global.
+ . $srcdir/../bfd/development.sh
+ 
+-- 
+2.49.0
+

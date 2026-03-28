@@ -1,0 +1,36 @@
+From de7ca66c797ba0b3273a217a47c8fb791d896f7c Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Fri, 27 Feb 2026 17:54:39 -0500
+Subject: [PATCH] fix: adjust range in btrfs probe for v6.18.14
+
+Upstream commit c5667f9c8eb9 ("btrfs: headers cleanup to remove
+unnecessary local includes") was backported in v6.18.14, adjust the
+range accordingly in the btrfs probe.
+
+Upstream-Status: Backport from commit ca93dc3b05fcb
+
+Change-Id: I51c5cb6345c6a1e1aa4e5e3cb9a4af2ec962ecb2
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Signed-off-by: Xiangyu Chen <xiangyu.chen@windriver.com>
+---
+ include/instrumentation/events/btrfs.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/btrfs.h b/include/instrumentation/events/btrfs.h
+index feb4f40b..e87f0085 100644
+--- a/include/instrumentation/events/btrfs.h
++++ b/include/instrumentation/events/btrfs.h
+@@ -12,7 +12,8 @@
+ #include <linux/writeback.h>
+ #include <lttng/kernel-version.h>
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0) || \
++	LTTNG_KERNEL_RANGE(6,18,14, 6,19,0))
+ #include <../fs/btrfs/ordered-data.h>
+ #endif
+ 
+-- 
+2.47.3
+

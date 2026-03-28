@@ -4,6 +4,8 @@
 # SPDX-License-Identifier: MIT
 #
 
+inherit_defer ${@bb.utils.contains('KERNEL_FEATURES', 'rust', 'kernel-yocto-rust', '', d)}
+
 # remove tasks that modify the source tree in case externalsrc is inherited
 SRCTREECOVEREDTASKS += "do_validate_branches do_kernel_configcheck do_kernel_checkout do_fetch do_unpack do_patch"
 PATCH_GIT_USER_EMAIL ?= "kernel-yocto@oe"
@@ -269,6 +271,9 @@ do_kernel_metadata() {
 	KERNEL_FEATURES_FINAL=""
 	if [ -n "${KERNEL_FEATURES}" ]; then
 		for feature in ${KERNEL_FEATURES}; do
+			if [ "$feature" = "rust" ]; then
+				feature="features/kernel-rust/kernel-rust.scc"
+			fi
 			feature_as_specified="$feature"
 			feature="$(echo $feature_as_specified | cut -d: -f1)"
 			feature_specifier="$(echo $feature_as_specified | cut -d: -f2)"

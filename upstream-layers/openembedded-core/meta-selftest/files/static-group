@@ -28,4 +28,5 @@ ptest:x:529:
 xuser:x:530:
 seat:x:531:
 audio:x:532:
+empower:x:533:
 nogroup:x:65534:

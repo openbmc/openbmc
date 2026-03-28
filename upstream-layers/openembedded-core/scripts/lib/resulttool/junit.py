@@ -91,6 +91,9 @@ def junit_tree(testresults, test_log_dir=None):
     """
     test_logfiles = {}
     testsuites_node = ET.Element("testsuites")
+
+    image_errors = image_failures = image_skipped = image_tests = image_total_time = 0
+    ptest_errors = ptest_failures = ptest_skipped = ptest_tests = ptest_total_time = 0
     total_errors = total_failures = total_skipped = total_tests = total_time = 0
 
     for _, run_name, _, results in resultutils.test_run_results(testresults):
@@ -98,7 +101,6 @@ def junit_tree(testresults, test_log_dir=None):
 
         # Handle all image tests but skip all ptests related sections
         imagetest_testsuite = ET.SubElement(test_run_testsuite, "testsuite", name="Image Tests")
-        image_errors = image_failures = image_skipped = image_tests = image_total_time = 0
 
         ptest_summarys = {}
 
@@ -141,7 +143,6 @@ def junit_tree(testresults, test_log_dir=None):
         imagetest_testsuite.set("time", str(image_total_time))
 
         # Handle all ptest related sections
-        ptest_errors = ptest_failures = ptest_skipped = ptest_tests = ptest_total_time = 0
         if "ptestresult.sections" in results:
             ptest_testsuite = ET.SubElement(test_run_testsuite, "testsuite", name="Package Tests")
 

@@ -5,7 +5,6 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=fae78348fee46c087389813e0ebf5ed7"
 
 PYPI_PACKAGE = "ruamel_yaml"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_setuptools_build_meta
 

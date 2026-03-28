@@ -1,3 +1,4 @@
+Upstream-Status: Inappropriate [OE-specific patch for manual testing]
 ########
 diff --git a/glxgears_check.sh b/glxgears_check.sh
 index 17622b8..c4d3b97 100755

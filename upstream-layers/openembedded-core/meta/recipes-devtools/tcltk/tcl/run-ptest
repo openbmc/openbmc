@@ -32,6 +32,8 @@ SKIP="$SKIP socket-\* socket_inet\* socket_inet6\*"
 SKIP="$SKIP http11-\*"
 # tries to access google.com
 SKIP="$SKIP httpProxy-\*"
+# These tests appear to be load-sensitive (16214)
+SKIP="$SKIP mutex-condition-\*"
 
 # Run all tests in tests/*.test unless tests are specified as arguments
 TESTS=${*:-tests/*.test}

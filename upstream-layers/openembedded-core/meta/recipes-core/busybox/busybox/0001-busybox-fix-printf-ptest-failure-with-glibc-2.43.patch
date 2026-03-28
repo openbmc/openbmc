@@ -1,0 +1,114 @@
+busybox: fix printf ptest failure with glibc 2.43
+
+Following ptests were failing on aarch64 after glibc 2.43 upgrade:
+  - printf_understands_%s_'"x'_"'y"_"'zTAIL"
+  - printf_handles_positive_numbers_for_%f
+
+Backport fix from Debian bug #1128825.
+
+Upstream-Status: Submitted [https://bugs.debian.org/cgi-bin/bugreport.cgi?att=1;bug=1128825;filename=busybox_glibc-2.43_thp.patch;msg=10]
+
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+
+diff --git a/coreutils/printf.c b/coreutils/printf.c
+index 3cd48cfcc..a5d995ab5 100644
+--- a/coreutils/printf.c
++++ b/coreutils/printf.c
+@@ -191,6 +191,7 @@ static void print_direc(char *format, unsigned fmt_length,
+ 	double dv;
+ 	char saved;
+ 	char *have_prec, *have_width;
++	int saved_errno, ret;
+ 
+ 	saved = format[fmt_length];
+ 	format[fmt_length] = '\0';
+@@ -205,22 +206,32 @@ static void print_direc(char *format, unsigned fmt_length,
+ 
+ 	switch (format[fmt_length - 1]) {
+ 	case 'c':
+-		printf(format, *argument);
++		saved_errno = errno;
++		ret = printf(format, *argument);
++		/* Restore errno if there was no error */
++		if (ret >= 0) {
++			errno = saved_errno;
++		}
+ 		break;
+ 	case 'd':
+ 	case 'i':
+ 		llv = my_xstrtoll(skip_whitespace(argument));
+  print_long:
++		saved_errno = errno;
+ 		if (!have_width) {
+ 			if (!have_prec)
+-				printf(format, llv);
++				ret = printf(format, llv);
+ 			else
+-				printf(format, precision, llv);
++				ret = printf(format, precision, llv);
+ 		} else {
+ 			if (!have_prec)
+-				printf(format, field_width, llv);
++				ret = printf(format, field_width, llv);
+ 			else
+-				printf(format, field_width, precision, llv);
++				ret = printf(format, field_width, precision, llv);
++		}
++		/* Restore errno if there was no error */
++		if (ret >= 0) {
++			errno = saved_errno;
+ 		}
+ 		break;
+ 	case 'o':
+@@ -238,16 +249,21 @@ static void print_direc(char *format, unsigned fmt_length,
+ 		} else {
+ 			/* Hope compiler will optimize it out by moving call
+ 			 * instruction after the ifs... */
++			saved_errno = errno;
+ 			if (!have_width) {
+ 				if (!have_prec)
+-					printf(format, argument, /*unused:*/ argument, argument);
++					ret = printf(format, argument, /*unused:*/ argument, argument);
+ 				else
+-					printf(format, precision, argument, /*unused:*/ argument);
++					ret = printf(format, precision, argument, /*unused:*/ argument);
+ 			} else {
+ 				if (!have_prec)
+-					printf(format, field_width, argument, /*unused:*/ argument);
++					ret = printf(format, field_width, argument, /*unused:*/ argument);
+ 				else
+-					printf(format, field_width, precision, argument);
++					ret = printf(format, field_width, precision, argument);
++			}
++			/* Restore errno if there was no error */
++			if (ret >= 0) {
++				errno = saved_errno;
+ 			}
+ 			break;
+ 		}
+@@ -257,16 +273,21 @@ static void print_direc(char *format, unsigned fmt_length,
+ 	case 'g':
+ 	case 'G':
+ 		dv = my_xstrtod(argument);
++		saved_errno = errno;
+ 		if (!have_width) {
+ 			if (!have_prec)
+-				printf(format, dv);
++				ret = printf(format, dv);
+ 			else
+-				printf(format, precision, dv);
++				ret = printf(format, precision, dv);
+ 		} else {
+ 			if (!have_prec)
+-				printf(format, field_width, dv);
++				ret = printf(format, field_width, dv);
+ 			else
+-				printf(format, field_width, precision, dv);
++				ret = printf(format, field_width, precision, dv);
++		}
++		/* Restore errno if there was no error */
++		if (ret >= 0) {
++			errno = saved_errno;
+ 		}
+ 		break;
+ 	} /* switch */

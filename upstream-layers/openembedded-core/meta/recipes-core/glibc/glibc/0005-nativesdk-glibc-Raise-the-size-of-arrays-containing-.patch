@@ -1,4 +1,4 @@
-From 3bc3bbda6092b1b6d497d24e319a10b4c8c48caf Mon Sep 17 00:00:00 2001
+From 179c398399444e772bb9f5c4ef6d8682ce390387 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -26,7 +26,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  8 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index f9ca40de3f..407db2aa54 100644
+index 9458ffae2a..0e80847695 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
 @@ -335,6 +335,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
@@ -41,7 +41,7 @@ index f9ca40de3f..407db2aa54 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index d331e0f01a..ee024f7136 100644
+index a706cef129..19a93ea9a8 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
 @@ -107,8 +107,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
@@ -56,7 +56,7 @@ index d331e0f01a..ee024f7136 100644
    SYSTEM_DIRS_LEN
  };
 diff --git a/elf/dl-usage.c b/elf/dl-usage.c
-index 31b27e5ea6..3cdb99caa7 100644
+index a5bc1cb4ad..7eb2ac1f1e 100644
 --- a/elf/dl-usage.c
 +++ b/elf/dl-usage.c
 @@ -24,6 +24,8 @@
@@ -87,7 +87,7 @@ index 31b27e5ea6..3cdb99caa7 100644
    print_hwcaps_subdirectories (state);
    _exit (EXIT_SUCCESS);
 diff --git a/elf/interp.c b/elf/interp.c
-index cc49e13c86..394c1ce0c5 100644
+index bdc7291966..5c401940a5 100644
 --- a/elf/interp.c
 +++ b/elf/interp.c
 @@ -18,5 +18,5 @@
@@ -98,7 +98,7 @@ index cc49e13c86..394c1ce0c5 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index 39b154c72c..c1014b773b 100644
+index aca967403a..dde1960347 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
 @@ -150,6 +150,8 @@ static struct argp argp =
@@ -111,7 +111,7 @@ index 39b154c72c..c1014b773b 100644
  static error_t
  parse_opt (int key, char *arg, struct argp_state *state)
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 493f9696ea..2ae4a5d28b 100644
+index 29e7a4ddfa..70483518ed 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
 @@ -189,6 +189,7 @@ dso_name_valid_for_suid (const char *p)
@@ -123,7 +123,7 @@ index 493f9696ea..2ae4a5d28b 100644
  static void
  audit_list_init (struct audit_list *list)
 diff --git a/iconv/gconv_conf.c b/iconv/gconv_conf.c
-index 41ab0768c9..7c48c2b328 100644
+index a1f10ea88a..888d9a18f3 100644
 --- a/iconv/gconv_conf.c
 +++ b/iconv/gconv_conf.c
 @@ -35,7 +35,7 @@
@@ -136,7 +136,7 @@ index 41ab0768c9..7c48c2b328 100644
  /* Type to represent search path.  */
  struct path_elem
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index 0ee6571315..792308c0ab 100644
+index 26f0c1e0bd..41541a889f 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -34,10 +34,6 @@

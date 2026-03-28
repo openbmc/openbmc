@@ -47,6 +47,9 @@ QB_DEFAULT_KERNEL = "none"
 # boot command line provided via uki, not via bootloader
 UKI_CMDLINE = "rootwait root=LABEL=root console=${KERNEL_CONSOLE}"
 
+# qemu provides the devicetree at boot, do not embed a dtb in the uki for selftests
+UKI_DEVICETREE = ""
+
 # disable kvm, breaks boot
 QEMU_USE_KVM = ""
 
@@ -105,6 +108,9 @@ QB_DEFAULT_KERNEL = "none"
 
 # boot command line provided via uki, not via bootloader
 UKI_CMDLINE = "rootwait root=LABEL=root console=${KERNEL_CONSOLE}"
+
+# qemu provides the devicetree at boot, do not embed a dtb in the uki for selftests
+UKI_DEVICETREE = ""
 
 # disable kvm, breaks boot
 QEMU_USE_KVM = ""

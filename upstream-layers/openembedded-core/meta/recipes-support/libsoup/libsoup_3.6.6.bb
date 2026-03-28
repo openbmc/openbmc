@@ -11,6 +11,13 @@ DEPENDS = "glib-2.0 glib-2.0-native libxml2 sqlite3 libpsl nghttp2"
 
 SRC_URI[archive.sha256sum] = "51ed0ae06f9d5a40f401ff459e2e5f652f9a510b7730e1359ee66d14d4872740"
 
+SRC_URI += "file://CVE-2025-32049-1.patch \
+            file://CVE-2025-32049-2.patch \
+            file://CVE-2025-32049-3.patch \
+            file://CVE-2025-32049-4.patch \
+            file://CVE-2026-1539.patch \
+"
+
 PROVIDES = "libsoup-3.0"
 
 inherit gettext gnomebase upstream-version-is-even gobject-introspection gi-docgen vala

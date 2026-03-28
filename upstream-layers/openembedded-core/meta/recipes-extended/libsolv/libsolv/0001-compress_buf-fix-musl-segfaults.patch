@@ -1,0 +1,44 @@
+From 23e2d4c5064ddb023ed1a9d364793dbe0d20717f Mon Sep 17 00:00:00 2001
+From: Adam Duskett <adam.duskett@amarulasolutions.com>
+Date: Thu, 26 Mar 2026 12:11:42 +0100
+Subject: [PATCH] compress_buf: fix musl segfaults
+
+By default, musl has a stack size of 128K, while the compress_buf
+method uses 256KB of stack space!
+
+The easiest course of action is to add `static thread_local`
+to htab and hnext.
+
+Upstream-Status: Submitted [https://github.com/openSUSE/libsolv/pull/612]
+
+Signed-off-by: Adam Duskett <adam.duskett@amarulasolutions.com>
+---
+ src/repopage.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/repopage.c b/src/repopage.c
+index 77c7fcc7..470e4f34 100644
+--- a/src/repopage.c
++++ b/src/repopage.c
+@@ -29,6 +29,7 @@
+ #include <assert.h>
+ #include <fcntl.h>
+ #include <time.h>
++#include <threads.h>
+ 
+ #ifdef _WIN32
+   #include <windows.h>
+@@ -100,8 +101,8 @@ compress_buf(const unsigned char *in, unsigned int in_len,
+   unsigned int oo = 0;		/* out-offset */
+   unsigned int io = 0;		/* in-offset */
+ #define HS (65536)
+-  Ref htab[HS];
+-  Ref hnext[BLOCK_SIZE];
++  static thread_local Ref htab[HS];
++  static thread_local Ref hnext[BLOCK_SIZE];
+   unsigned int litofs = 0;
+   memset(htab, -1, sizeof (htab));
+   memset(hnext, -1, sizeof (hnext));
+-- 
+2.53.0
+

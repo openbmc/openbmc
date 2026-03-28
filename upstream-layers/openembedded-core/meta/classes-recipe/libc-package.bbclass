@@ -321,14 +321,11 @@ python package_do_split_gconvs () {
         bb.note("preparing tree for binary locale generation")
         bb.build.exec_func("do_prep_locale_tree", d)
 
-    utf8_only = int(d.getVar('LOCALE_UTF8_ONLY') or 0)
     utf8_is_default = int(d.getVar('LOCALE_UTF8_IS_DEFAULT') or 0)
 
     encodings = {}
     for locale in to_generate:
         charset = supported[locale]
-        if utf8_only and charset != 'UTF-8':
-            continue
 
         m = dot_re.match(locale)
         if m:

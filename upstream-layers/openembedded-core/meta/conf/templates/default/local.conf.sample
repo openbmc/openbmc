@@ -204,6 +204,16 @@ BB_DISKMON_DIRS ??= "\
 #file://.* https://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
 #file://.* file:///some/local/dir/sstate/PATH"
 
+#
+# Yocto Project SState Mirror
+#
+# The Yocto Project has prebuilt artefacts available for its releases, you can enable
+# by enabling the following config fragment. This will mean the build uses the network to
+# check for artefacts at the start of builds, which does slow it down initially but it
+# will then speed up the builds by not having to build things if they are present in the
+# cache. It assumes you can download something faster than you can build it which will
+# depend on your network.
+# OE_FRAGMENTS += "core/yocto/sstate-mirror-cdn"
 
 #
 # Qemu configuration

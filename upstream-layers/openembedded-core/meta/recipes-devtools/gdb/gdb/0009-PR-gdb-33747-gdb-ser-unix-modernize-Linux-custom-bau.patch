@@ -1,0 +1,248 @@
+From 1a77c71303b552140613d49595baebdff1a4716e Mon Sep 17 00:00:00 2001
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Tue, 17 Mar 2026 01:58:55 -0700
+Subject: [PATCH] PR gdb/33747: gdb/ser-unix: modernize Linux custom baud rate
+ support
+
+The Linux custom baud rate implementation previously accessed the
+struct termios members c_ispeed and c_ospeed directly. These fields
+exist in glibc but are not exposed by musl, causing builds to fail on
+musl-based systems.
+
+Update set_custom_baudrate_linux to use a capability-based approach,
+with three distinct code paths:
+
+1) If POSIX cfsetispeed/cfsetospeed accept arbitrary baud rates
+   (HAVE_CFSETSPEED_ARBITRARY), use them to set input and output
+   speeds.
+
+2) Else if Linux termios2 interface is available (TCGETS2/BOTHER),
+   use it to support arbitrary baud rates.
+
+3) Else if legacy struct termios supports c_ispeed/c_ospeed, use
+   the TCGETS/TCSETS fallback (primarily for glibc on older
+   architectures).
+
+4) Otherwise, emit an error indicating that custom baud rates are
+   unsupported on this platform.
+
+This preserves existing behavior on glibc systems while restoring
+build compatibility with musl and other libc implementations.
+
+Bug: https://sourceware.org/bugzilla/show_bug.cgi?id=33747
+
+Upstream-Status: Submitted [https://sourceware.org/pipermail/gdb-patches/2026-March/225952.html]
+
+Suggested-by: Kevin Buettner <kevinb@redhat.com>
+Suggested-by: Maciej W. Rozycki <macro@orcam.me.uk>
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+ gdb/config.in    |  6 ++++++
+ gdb/configure    | 52 +++++++++++++++++++++++++++++++++++++++++++++
+ gdb/configure.ac | 22 +++++++++++++++++++
+ gdb/ser-unix.c   | 55 ++++++++++++++++++++++++++++++++++--------------
+ 4 files changed, 119 insertions(+), 16 deletions(-)
+
+diff --git a/gdb/config.in b/gdb/config.in
+index efc3100cb9e..b2469c8dabd 100644
+--- a/gdb/config.in
++++ b/gdb/config.in
+@@ -110,6 +110,9 @@
+    the CoreFoundation framework. */
+ #undef HAVE_CFPREFERENCESCOPYAPPVALUE
+ 
++/* Define if cfsetispeed/cfsetospeed accept arbitrary baud rates */
++#undef HAVE_CFSETSPEED_ARBITRARY
++
+ /* Define if compiling support to gdb compile. */
+ #undef HAVE_COMPILE
+ 
+@@ -517,6 +520,9 @@
+ /* Define to 1 if `st_blocks' is a member of `struct stat'. */
+ #undef HAVE_STRUCT_STAT_ST_BLOCKS
+ 
++/* Define to 1 if `c_ospeed' is a member of `struct termios'. */
++#undef HAVE_STRUCT_TERMIOS_C_OSPEED
++
+ /* Define to 1 if `td_pcb' is a member of `struct thread'. */
+ #undef HAVE_STRUCT_THREAD_TD_PCB
+ 
+diff --git a/gdb/configure b/gdb/configure
+index d0bdba6eb36..8a0e2fa2771 100755
+--- a/gdb/configure
++++ b/gdb/configure
+@@ -27336,6 +27336,58 @@ if test "$ac_res" != no; then :
+ fi
+ 
+ 
++# Check whether cfsetispeed/cfsetospeed accept arbitrary baud rates.
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether cfsetispeed/cfsetospeed accept arbitrary baud rates" >&5
++$as_echo_n "checking whether cfsetispeed/cfsetospeed accept arbitrary baud rates... " >&6; }
++if ${gdb_cv_cfsetspeed_arbitrary+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++
++  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
++/* end confdefs.h.  */
++#include <termios.h>
++int
++main ()
++{
++
++       #if B9600 != 9600
++       #error B-constants are not numeric symbols
++       #endif
++
++  ;
++  return 0;
++}
++_ACEOF
++if ac_fn_c_try_compile "$LINENO"; then :
++  gdb_cv_cfsetspeed_arbitrary=yes
++else
++  gdb_cv_cfsetspeed_arbitrary=no
++fi
++rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $gdb_cv_cfsetspeed_arbitrary" >&5
++$as_echo "$gdb_cv_cfsetspeed_arbitrary" >&6; }
++
++if test "$gdb_cv_cfsetspeed_arbitrary" = yes; then
++
++$as_echo "#define HAVE_CFSETSPEED_ARBITRARY 1" >>confdefs.h
++
++fi
++
++# Check for members required by the legacy Linux custom baud rate path.
++ac_fn_c_check_member "$LINENO" "struct termios" "c_ospeed" "ac_cv_member_struct_termios_c_ospeed" "#include <termios.h>
++"
++if test "x$ac_cv_member_struct_termios_c_ospeed" = xyes; then :
++
++cat >>confdefs.h <<_ACEOF
++#define HAVE_STRUCT_TERMIOS_C_OSPEED 1
++_ACEOF
++
++
++fi
++
++
+ 
+ 
+ # Check whether --with-jit-reader-dir was given.
+diff --git a/gdb/configure.ac b/gdb/configure.ac
+index 52924106bca..26e8d1ee276 100644
+--- a/gdb/configure.ac
++++ b/gdb/configure.ac
+@@ -733,6 +733,28 @@ AC_CONFIG_FILES([jit-reader.h:jit-reader.in])
+ 
+ AC_SEARCH_LIBS(dlopen, dl)
+ 
++# Check whether cfsetispeed/cfsetospeed accept arbitrary baud rates.
++AC_CACHE_CHECK([whether cfsetispeed/cfsetospeed accept arbitrary baud rates],
++  [gdb_cv_cfsetspeed_arbitrary], [
++  AC_COMPILE_IFELSE(
++    [AC_LANG_PROGRAM([[#include <termios.h>]],
++      [[
++       #if B9600 != 9600
++       #error B-constants are not numeric symbols
++       #endif
++      ]])],
++    [gdb_cv_cfsetspeed_arbitrary=yes],
++    [gdb_cv_cfsetspeed_arbitrary=no])
++])
++
++if test "$gdb_cv_cfsetspeed_arbitrary" = yes; then
++  AC_DEFINE([HAVE_CFSETSPEED_ARBITRARY], [1],
++           [Define if cfsetispeed/cfsetospeed accept arbitrary baud rates])
++fi
++
++# Check for members required by the legacy Linux custom baud rate path.
++AC_CHECK_MEMBERS([struct termios.c_ospeed], [], [], [[#include <termios.h>]])
++
+ GDB_AC_WITH_DIR([JIT_READER_DIR], [jit-reader-dir],
+                 [directory to load the JIT readers from],
+                 [${libdir}/gdb])
+diff --git a/gdb/ser-unix.c b/gdb/ser-unix.c
+index 6f2766518be..fbd73970dbb 100644
+--- a/gdb/ser-unix.c
++++ b/gdb/ser-unix.c
+@@ -508,36 +508,59 @@ set_baudcode_baudrate (struct serial *scb, int baud_code)
+ 
+ #if HAVE_CUSTOM_BAUDRATE_SUPPORT && defined(BOTHER)
+ 
+-/* Set a custom baud rate using the termios BOTHER.  */
++/* Set a custom baud rate.
++
++   Prefer the POSIX cfsetispeed/cfsetospeed interface when it accepts
++   arbitrary baud rates.  Otherwise fall back to Linux-specific termios2
++   (BOTHER) or legacy termios interfaces.  */
+ 
+ static void
+ set_custom_baudrate_linux (int fd, int rate)
+ {
+-#ifdef TCGETS2
+-  struct termios2 tio;
+-  const unsigned long req_get = TCGETS2;
+-  const unsigned long req_set = TCSETS2;
+-#else
++#if defined(HAVE_CFSETSPEED_ARBITRARY)
+   struct termios tio;
+-  const unsigned long req_get = TCGETS;
+-  const unsigned long req_set = TCSETS;
+-#endif
++  if (tcgetattr (fd, &tio) < 0)
++    perror_with_name (_("Cannot get current baud rate"));
++
++  cfsetispeed (&tio, rate);
++  cfsetospeed (&tio, rate);
++
++  if (tcsetattr (fd, TCSANOW, &tio) < 0)
++    perror_with_name (_("Cannot set custom baud rate"));
++
++#elif defined(TCGETS2)
++  struct termios2 tio2;
++  if (ioctl (fd, TCGETS2, &tio2) < 0)
++    perror_with_name (_("Cannot get current baud rate"));
++
++  tio2.c_cflag &= ~CBAUD;
++  tio2.c_cflag |= BOTHER;
++  tio2.c_ospeed = rate;
++  tio2.c_cflag &= ~(CBAUD << IBSHIFT);
++  tio2.c_cflag |= BOTHER << IBSHIFT;
++  tio2.c_ispeed = rate;
+ 
+-  if (ioctl (fd, req_get, &tio) < 0)
+-    perror_with_name (_("Can not get current baud rate"));
++  if (ioctl (fd, TCSETS2, &tio2) < 0)
++    perror_with_name (_("Cannot set custom baud rate"));
++
++#elif defined(HAVE_STRUCT_TERMIOS_C_OSPEED)
++  struct termios tio;
++  if (ioctl (fd, TCGETS, &tio) < 0)
++    perror_with_name (_("Cannot get current baud rate"));
+ 
+-  /* Clear the current output baud rate and fill a new value.  */
+   tio.c_cflag &= ~CBAUD;
+   tio.c_cflag |= BOTHER;
+   tio.c_ospeed = rate;
+-
+-  /* Clear the current input baud rate and fill a new value.  */
+   tio.c_cflag &= ~(CBAUD << IBSHIFT);
+   tio.c_cflag |= BOTHER << IBSHIFT;
+   tio.c_ispeed = rate;
+ 
+-  if (ioctl (fd, req_set, &tio) < 0)
+-    perror_with_name (_("Can not set custom baud rate"));
++  if (ioctl (fd, TCSETS, &tio) < 0)
++    perror_with_name (_("Cannot set custom baud rate"));
++
++#else
++  error (_("Custom baud rate not supported on this platform"));
++#endif
+ }
+ 
+ #elif HAVE_CUSTOM_BAUDRATE_SUPPORT && defined(IOSSIOSPEED)
+-- 
+2.49.0
+

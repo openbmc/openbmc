@@ -1004,7 +1004,7 @@ to your build configuration.
         # If the STAGING_BINDIR_NATIVE directories from the config file don't exist
         # and we're in a sourced OE build directory try to extract the paths
         # from `bitbake -e`
-        havenative = os.path.exists(os.path.exists(self.get('STAGING_BINDIR_NATIVE')))
+        havenative = os.path.exists(self.get('STAGING_BINDIR_NATIVE'))
 
         if not havenative:
             if not self.bitbake_e:

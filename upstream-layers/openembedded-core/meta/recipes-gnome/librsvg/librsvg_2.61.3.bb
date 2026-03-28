@@ -103,6 +103,7 @@ FILES:rsvg = "${bindir}/rsvg* \
 	      ${datadir}/themes"
 FILES:librsvg-gtk = "${libdir}/gdk-pixbuf-2.0/*/*/*.so \
                      ${datadir}/thumbnailers/librsvg.thumbnailer"
+FILES:${PN}-ptest += "${libdir}/${BPN}/rsvg"
 RRECOMMENDS:librsvg-gtk = "gdk-pixbuf-bin"
 
 PIXBUF_PACKAGES = "librsvg-gtk"

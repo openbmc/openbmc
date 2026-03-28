@@ -30,11 +30,12 @@ SRC_URI = "http://www.python.org/ftp/python/${PV}/Python-${PV}.tar.xz \
            file://0001-test_active_children-skip-problematic-test.patch \
            file://0001-test_readline-skip-limited-history-test.patch \
            file://0001-test_cmd-skip-bang-completion-test.patch \
-	   file://0001-test_pyrepl-skip-test_unix_console.test_cursor_back_.patch \
-	   file://0001-test_sysconfig-skip-test_sysconfig.test_sysconfigdat.patch \
+           file://0001-test_pyrepl-skip-test_unix_console.test_cursor_back_.patch \
+           file://0001-test_sysconfig-skip-test_sysconfig.test_sysconfigdat.patch \
            file://0001-Skip-flaky-test_default_timeout-tests.patch \
            file://0001-gh-144787-tests-Allow-TLS-v1.2-to-be-minimum-version.patch \
-	   file://0001-test_only_active_thread-skip-problematic-test.patch \
+           file://0001-test_only_active_thread-skip-problematic-test.patch \
+           file://0001-test_pyrepl-skip-test_pyrepl_eio.patch \
            "
 SRC_URI:append:class-native = " \
            file://0001-Lib-sysconfig.py-use-prefix-value-from-build-configu.patch \
@@ -112,6 +113,7 @@ CACHED_CONFIGUREVARS:append:libc-musl = "\
 
 # PGO currently causes builds to not be reproducible so disable by default, see YOCTO #13407
 PACKAGECONFIG ??= "editline gdbm ${@bb.utils.filter('DISTRO_FEATURES', 'lto', d)}"
+PACKAGECONFIG[freethreading] = "--disable-gil,--enable-gil"
 PACKAGECONFIG[readline] = "--with-readline=readline,,readline,,,editline"
 PACKAGECONFIG[editline] = "--with-readline=editline,,libedit,,,readline"
 # Use profile guided optimisation by running PyBench inside qemu-user

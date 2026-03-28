@@ -14,7 +14,7 @@ diff --git a/test/intltest/ustrtest.cpp b/test/intltest/ustrtest.cpp
 index 56976b3e3d2..26225f5b5b5 100644
 --- a/test/intltest/ustrtest.cpp
 +++ b/test/intltest/ustrtest.cpp
-@@ -2353,7 +2353,7 @@ void UnicodeStringTest::TestUnicodeStringInsertAppendToSelf() {
+@@ -2375,7 +2375,7 @@ void UnicodeStringTest::TestUnicodeStringInsertAppendToSelf() {
  }
  
  void UnicodeStringTest::TestLargeMemory() {

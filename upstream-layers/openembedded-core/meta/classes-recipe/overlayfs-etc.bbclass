@@ -43,6 +43,8 @@ OVERLAYFS_ETC_INIT_TEMPLATE ??= "${COREBASE}/meta/files/overlayfs-etc-preinit.sh
 OVERLAYFS_ETC_EXPOSE_LOWER ??= "0"
 OVERLAYFS_ETC_CREATE_MOUNT_DIRS ??= "1"
 
+do_rootfs[file-checksums] += "${OVERLAYFS_ETC_INIT_TEMPLATE}:True"
+
 python create_overlayfs_etc_preinit() {
     overlayEtcMountPoint = d.getVar("OVERLAYFS_ETC_MOUNT_POINT")
     overlayEtcFsType = d.getVar("OVERLAYFS_ETC_FSTYPE")

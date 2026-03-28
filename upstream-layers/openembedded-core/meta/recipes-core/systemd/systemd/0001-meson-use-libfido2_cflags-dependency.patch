@@ -1,0 +1,54 @@
+From 97142fd1db4124de5d5bdd3f49cc5a390286e522 Mon Sep 17 00:00:00 2001
+From: Dan McGregor <danmcgr@protonmail.com>
+Date: Wed, 11 Mar 2026 18:26:05 -0600
+Subject: [PATCH] meson: use libfido2_cflags dependency
+
+Add the libfido2 dependency to cryptenroll and cryptsetup's
+meson files. If libfido2's not installed in the default path
+the build wasn't finding its headers correctly.
+
+Signed-off-by: Dan McGregor <danmcgr@protonmail.com>
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/9ce905e35f690e7a10cd286be2b50594d0857f5e]
+---
+ src/cryptenroll/meson.build                  | 1 +
+ src/cryptsetup/cryptsetup-tokens/meson.build | 2 +-
+ src/cryptsetup/meson.build                   | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/cryptenroll/meson.build b/src/cryptenroll/meson.build
+index 488ceea14d..11265c8b41 100644
+--- a/src/cryptenroll/meson.build
++++ b/src/cryptenroll/meson.build
+@@ -23,6 +23,7 @@ executables += [
+                 'dependencies' : [
+                         libcryptsetup,
+                         libdl,
++                        libfido2_cflags,
+                         libopenssl,
+                         libp11kit_cflags,
+                 ],
+diff --git a/src/cryptsetup/cryptsetup-tokens/meson.build b/src/cryptsetup/cryptsetup-tokens/meson.build
+index 804e18bc67..0fd6309201 100644
+--- a/src/cryptsetup/cryptsetup-tokens/meson.build
++++ b/src/cryptsetup/cryptsetup-tokens/meson.build
+@@ -58,7 +58,7 @@ modules += [
+                 'sources' : cryptsetup_token_systemd_fido2_sources,
+                 'dependencies' : [
+                         libcryptsetup,
+-                        libfido2,
++                        libfido2_cflags,
+                 ],
+         },
+         template + {
+diff --git a/src/cryptsetup/meson.build b/src/cryptsetup/meson.build
+index d9778259c2..b36354fb0a 100644
+--- a/src/cryptsetup/meson.build
++++ b/src/cryptsetup/meson.build
+@@ -19,6 +19,7 @@ executables += [
+                 'sources' : systemd_cryptsetup_sources,
+                 'dependencies' : [
+                         libcryptsetup,
++                        libfido2_cflags,
+                         libmount_cflags,
+                         libopenssl,
+                         libp11kit_cflags,

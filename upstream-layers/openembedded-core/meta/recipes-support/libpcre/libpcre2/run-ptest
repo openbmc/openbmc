@@ -1,0 +1,32 @@
+#!/bin/sh
+
+TESTS="RunGrepTest RunTest"
+total=0
+pass=0
+fail=0
+
+for T in $TESTS; do
+    if [ -x "./$T" ]; then
+        echo "Running $T"
+        total=$((total + 1))
+        if "./$T"; then
+            echo "PASS: $T"
+            pass=$((pass + 1))
+        else
+            echo "FAIL: $T"
+            fail=$((fail + 1))
+        fi
+    else
+        echo "SKIP: $T (not found or not executable)"
+    fi
+done
+
+# Summary
+echo "============================================================================"
+echo "# TOTAL: $total"
+echo "# PASS:  $pass"
+echo "# FAIL:  $fail"
+echo "============================================================================"
+
+# Exit code based on failures
+[ "$fail" -eq 0 ] && exit 0 || exit 1

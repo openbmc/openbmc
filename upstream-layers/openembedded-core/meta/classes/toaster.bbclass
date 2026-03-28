@@ -343,15 +343,15 @@ python toaster_artifacts() {
         d2 = d.createCopy()
         d2.setVar('FILE', e.taskfile)
         # Use 'stamp-extra-info' if present, else use workaround
-        # to determine 'SSTATE_MANMACH'
+        # to determine 'SSTATE_PKGARCH'
         extrainf = d2.getVarFlag(e.taskname, 'stamp-extra-info')
         if extrainf:
-            d2.setVar('SSTATE_MANMACH', extrainf)
+            d2.setVar('SSTATE_PKGARCH', extrainf)
         else:
             if "do_populate_sdk" == e.taskname:
-                d2.setVar('SSTATE_MANMACH', d2.expand("${MACHINE}${SDKMACHINE}"))
+                d2.setVar('SSTATE_PKGARCH', d2.expand("${MACHINE}${SDKMACHINE}"))
             else:
-                d2.setVar('SSTATE_MANMACH', d2.expand("${MACHINE}"))
+                d2.setVar('SSTATE_PKGARCH', d2.expand("${MACHINE}"))
         manifest = oe.sstatesig.sstate_get_manifest_filename(e.taskname[3:], d2)[0]
 
         if os.access(manifest, os.R_OK):

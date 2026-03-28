@@ -5,9 +5,9 @@ SECTION = "libs"
 LICENSE = "GPL-2.0-only & LGPL-2.1-or-later"
 
 LIC_FILES_CHKSUM ?= "file://LICENSES;md5=df6e0948b55669789c30764c5fd9bc41 \
-      file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
+      file://COPYINGv2;md5=570a9b3749dd0463a1778803b12a6dce \
       file://posix/rxspencer/COPYRIGHT;md5=dc5485bb394a13b2332ec1c785f5d83a \
-      file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c"
+      file://COPYING.LESSERv2;md5=4bf661c1e3793e55c8d1051bc5e0ae21"
 
 CVE_PRODUCT = "glibc"
 
@@ -22,6 +22,6 @@ ARM_INSTRUCTION_SET:armv6 = "arm"
 #
 COMPATIBLE_HOST:libc-musl:class-target = "null"
 
-PV = "2.42+git"
+PV = "2.43+git"
 
 TOOLCHAIN = "gcc"

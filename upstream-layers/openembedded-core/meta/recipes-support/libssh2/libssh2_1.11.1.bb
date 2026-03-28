@@ -18,14 +18,14 @@ inherit autotools pkgconfig ptest
 
 EXTRA_OECONF += "\
                  --with-libz \
-                 --with-libz-prefix=${STAGING_LIBDIR} \
+                 --with-libz-prefix=${STAGING_DIR_HOST} \
                  --disable-rpath \
                 "
 DISABLE_STATIC = ""
 
 # only one of openssl and gcrypt could be set
 PACKAGECONFIG ??= "openssl"
-PACKAGECONFIG[openssl] = "--with-crypto=openssl --with-libssl-prefix=${STAGING_LIBDIR}, , openssl"
+PACKAGECONFIG[openssl] = "--with-crypto=openssl --with-libssl-prefix=${STAGING_DIR_HOST}, , openssl"
 PACKAGECONFIG[gcrypt] = "--with-crypto=libgcrypt --with-libgcrypt-prefix=${STAGING_EXECPREFIXDIR}, , libgcrypt"
 
 BBCLASSEXTEND = "native nativesdk"

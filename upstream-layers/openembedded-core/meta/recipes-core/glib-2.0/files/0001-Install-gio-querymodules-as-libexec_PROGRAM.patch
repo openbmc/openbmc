@@ -16,11 +16,11 @@ diff --git a/gio/meson.build b/gio/meson.build
 index 39256d3..2f8f188 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -1049,6 +1049,7 @@ gio_querymodules = executable('gio-querymodules', 'gio-querymodules.c', 'giomodu
+@@ -1071,6 +1071,7 @@ gio_querymodules = executable('gio-querymodules', 'gio-querymodules.c', 'giomodu
    c_args : gio_c_args,
    # intl.lib is not compatible with SAFESEH
    link_args : noseh_link_args,
 +  install_dir: glib_libexecdir,
-   dependencies : [libgio_dep, libgobject_dep, libgmodule_dep, libglib_dep])
+   dependencies : [libgio_dep, libgobject_dep, libgmodule_dep, libglib_dep, app_profile_dep])
  
  glib_compile_schemas = executable('glib-compile-schemas',

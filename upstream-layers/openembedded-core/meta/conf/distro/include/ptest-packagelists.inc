@@ -39,6 +39,7 @@ PTESTS_FAST = "\
     libmd \
     libnl \
     libpcre \
+    libpcre2 \
     librsvg \
     libsolv \
     libssh2 \
@@ -84,7 +85,6 @@ PTESTS_FAST = "\
     python3-pyasn1 \
     python3-pytz \
     python3-pyyaml \
-    python3-pyzstd \
     python3-rpds-py \
     python3-trove-classifiers \
     python3-uritools \
@@ -156,6 +156,15 @@ PTESTS_SLOW:append:libc-musl = " libc-test"
 # These tests don't yet pass for riscv64
 PTESTS_SLOW:remove:riscv64 = "tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl"
 PTESTS_PROBLEMS:append:riscv64 = " tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl"
+
+# These tests don't yet pass for musl qemuarm64
+PTESTS_SLOW:remove:libc-musl:qemuarm64 = "strace perl gnutls glib-2.0"
+PTESTS_FAST:remove:libc-musl:qemuarm64 = "libarchive"
+PTESTS_PROBLEMS:append:libc-musl:qemuarm64 = "strace perl gnutls glib-2.0 libarchive"
+# These tests don't yet pass for musl qemux86-64
+PTESTS_SLOW:remove:libc-musl:qemux86-64 = "perl gnutls"
+PTESTS_FAST:remove:libc-musl:qemux86-64 = "libarchive"
+PTESTS_PROBLEMS:append:libc-musl:qemux86-64 = "perl gnutls libarchive"
 
 #    ruby \ # Timeout
 #    rt-tests \ # Needs to be checked whether it runs at all

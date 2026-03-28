@@ -560,3 +560,112 @@ class ResultToolTests(OESelftestTestCase):
                 "test-logs/package-error-noresult.log": "ERROR: -bash: testerror: command not found\nERROR: Exit status is 123\n",
             },
         )
+
+    def test_junit_empty_testresults(self):
+        """Test junit_tree with empty testresults (e.g., missing testresults.json)"""
+        testresults = {}
+        tree, test_logfiles = junit_tree(testresults)
+        self._dump_junit_tree(testresults, tree, "junit_empty")
+        testsuites_node = tree.getroot()
+
+        # Should have zero counts for everything
+        self.assertEqual(testsuites_node.attrib["errors"], "0")
+        self.assertEqual(testsuites_node.attrib["failures"], "0")
+        self.assertEqual(testsuites_node.attrib["skipped"], "0")
+        self.assertEqual(testsuites_node.attrib["tests"], "0")
+        self.assertEqual(testsuites_node.attrib["time"], "0")
+
+        # Should have no testsuites
+        testsuites = testsuites_node.findall("testsuite")
+        self.assertEqual(len(testsuites), 0)
+
+        # No log files
+        self.assertDictEqual(test_logfiles, {})
+
+    def test_junit_missing_image_tests(self):
+        """Test junit_tree with only ptest results, no image tests"""
+        testresults = {
+            "a": {
+                "runtime_a-image": {
+                    "configuration": {"TEST_TYPE": "runtime", "MACHINE": "qemux86"},
+                    "result": {
+                        # Only ptest results, no image tests
+                        "ptestresult.package-test.test_example": {"status": "PASSED"},
+                        "ptestresult.sections": {
+                            "package-test": {
+                                "duration": "3",
+                                "log": "PASS: package-test.test_example\n",
+                            }
+                        },
+                    },
+                }
+            }
+        }
+        tree, test_logfiles = junit_tree(testresults)
+        self._dump_junit_tree(testresults, tree, "junit_no_image")
+        testsuites_node = tree.getroot()
+
+        # Should have 1 test total (only ptest)
+        self.assertEqual(testsuites_node.attrib["errors"], "0")
+        self.assertEqual(testsuites_node.attrib["failures"], "0")
+        self.assertEqual(testsuites_node.attrib["skipped"], "0")
+        self.assertEqual(testsuites_node.attrib["tests"], "1")
+        self.assertEqual(testsuites_node.attrib["time"], "3")
+
+        # Should have one main testsuite with 2 sub-testsuites
+        testsuites = testsuites_node.findall("testsuite")
+        self.assertEqual(len(testsuites), 1)
+        inner_testsuites = testsuites[0].findall("testsuite")
+        self.assertEqual(len(inner_testsuites), 2)
+
+        # Image testsuite should be empty
+        image_suite = testsuites_node.find(".//testsuite[@name='Image Tests']")
+        self.assertEqual(image_suite.attrib["tests"], "0")
+        self.assertEqual(image_suite.attrib["time"], "0")
+
+        # Package testsuite should have 1 test
+        package_suite = testsuites_node.find(".//testsuite[@name='Package Tests']")
+        self.assertEqual(package_suite.attrib["tests"], "1")
+        self.assertEqual(package_suite.attrib["time"], "3")
+
+    def test_junit_missing_ptests(self):
+        """Test junit_tree with only image tests, no ptest results"""
+        testresults = {
+            "a": {
+                "runtime_a-image": {
+                    "configuration": {"TEST_TYPE": "runtime", "MACHINE": "qemux86"},
+                    "result": {
+                        # Only image tests, no ptests
+                        "test.ImageTest.test_example": {
+                            "duration": 5,
+                            "status": "PASSED",
+                        },
+                    },
+                }
+            }
+        }
+        tree, test_logfiles = junit_tree(testresults)
+        self._dump_junit_tree(testresults, tree, "junit_no_ptest")
+        testsuites_node = tree.getroot()
+
+        # Should have 1 test total (only image test)
+        self.assertEqual(testsuites_node.attrib["errors"], "0")
+        self.assertEqual(testsuites_node.attrib["failures"], "0")
+        self.assertEqual(testsuites_node.attrib["skipped"], "0")
+        self.assertEqual(testsuites_node.attrib["tests"], "1")
+        self.assertEqual(testsuites_node.attrib["time"], "5")
+
+        # Should have one main testsuite with 1 sub-testsuite (only Image Tests)
+        testsuites = testsuites_node.findall("testsuite")
+        self.assertEqual(len(testsuites), 1)
+        inner_testsuites = testsuites[0].findall("testsuite")
+        self.assertEqual(len(inner_testsuites), 1)
+
+        # Image testsuite should have 1 test
+        image_suite = testsuites_node.find(".//testsuite[@name='Image Tests']")
+        self.assertEqual(image_suite.attrib["tests"], "1")
+        self.assertEqual(image_suite.attrib["time"], "5")
+
+        # Package testsuite should not exist (no ptestresult.sections)
+        package_suite = testsuites_node.find(".//testsuite[@name='Package Tests']")
+        self.assertIsNone(package_suite)

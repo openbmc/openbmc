@@ -18,7 +18,7 @@ diff --git a/gio/meson.build b/gio/meson.build
 index 2f8f188..57c48d2 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -912,17 +912,18 @@ libgio_dep = declare_dependency(link_with : libgio,
+@@ -934,17 +934,18 @@ libgio_dep = declare_dependency(link_with : libgio,
  pkg.generate(libgio,
    requires : ['glib-2.0', 'gobject-2.0'],
    variables : [
@@ -49,7 +49,7 @@ diff --git a/glib/meson.build b/glib/meson.build
 index 209bcbf..a86cfd3 100644
 --- a/glib/meson.build
 +++ b/glib/meson.build
-@@ -464,9 +464,10 @@ pkg.generate(libglib,
+@@ -480,9 +480,10 @@ pkg.generate(libglib,
    subdirs : ['glib-2.0'],
    extra_cflags : ['-I${libdir}/glib-2.0/include'] + win32_cflags,
    variables : [

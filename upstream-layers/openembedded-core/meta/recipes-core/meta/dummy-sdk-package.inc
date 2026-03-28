@@ -1,18 +1,21 @@
 SUMMARY = "Dummy packages which handle excluding packages from the sdk, e.g. ensuring perl is excluded from buildtools"
 LICENSE = "MIT"
 
-PACKAGE_ARCH = "all"
-
-inherit allarch
-
 INHIBIT_DEFAULT_DEPS = "1"
 
 python() {
+    pkgdata_var = d.getVar("DUMMYSDK_PKGDATA_VARNAME")
+    # Expand PKGDATA_DIR_SDK/SDK_SYS and stamp-extra-info before we lose the values
+    d.setVar(pkgdata_var, d.getVar(pkgdata_var))
+    stampinfo = d.getVar("DUMMYSDK_EXTRASTAMP_VARNAME")
+    d.setVarFlag("do_packagedata", "stamp-extra-info", d.getVar(stampinfo))
+
+    oe.utils.make_arch_independent(d)
+
     # Put the package somewhere separate to ensure it's never used except
     # when we want it
-    # (note that we have to do this in anonymous python here to avoid
-    # allarch.bbclass disabling itself)
-    d.setVar('PACKAGE_ARCH', '${DUMMYARCH}')
+    # Need to set PACKAGE_ARCH after deferred nativesdk inherit
+    d.setVar("PACKAGE_ARCH", "${DUMMYARCH}")
 }
 
 ALLOW_EMPTY:${PN} = "1"
@@ -31,3 +34,11 @@ python populate_packages:prepend() {
     d.appendVar("RREPLACES:%s" % p, "${DUMMYPROVIDES_PACKAGES_MULTILIB}")
 }
 
+deltask fetch
+deltask unpack
+deltask patch
+deltask prepare_recipe_sysroot
+deltask configure
+deltask compile
+deltask install
+deltask populate_sysroot

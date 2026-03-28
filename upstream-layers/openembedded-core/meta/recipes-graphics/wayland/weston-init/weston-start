@@ -50,7 +50,7 @@ if [ -d "$modules_dir" ]; then
 
 		# process module
 		. $m
-		if [[ x"{$weston_modules}" != "x" ]]; then
+		if [[ x"${weston_modules}" != "x" ]]; then
 			add_weston_argument "${weston_modules}"
 		fi;
 	done

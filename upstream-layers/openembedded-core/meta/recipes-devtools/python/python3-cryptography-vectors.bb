@@ -15,7 +15,6 @@ SRC_URI += "file://0001-pyproject.toml-bump-uv_build-version-requirement.patch \
 SRC_URI[sha256sum] = "ffbccee9455201c01b37c63d65d9f83b362d40c2bed9caac248ebbdfa4e4fc7c"
 
 PYPI_PACKAGE = "cryptography_vectors"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += "python3-uv-build-native"
 

@@ -33,7 +33,7 @@ CVE_CHECK_SUMMARY_INDEX_PATH = "${CVE_CHECK_SUMMARY_DIR}/cve-summary-index.txt"
 
 CVE_CHECK_DIR ??= "${DEPLOY_DIR}/cve"
 CVE_CHECK_RECIPE_FILE_JSON ?= "${CVE_CHECK_DIR}/${PN}_cve.json"
-CVE_CHECK_MANIFEST_JSON ?= "${IMGDEPLOYDIR}/${IMAGE_NAME}.json"
+CVE_CHECK_MANIFEST_JSON ?= "${IMGDEPLOYDIR}/${IMAGE_NAME}.vex.json"
 
 # Skip CVE Check for packages (PN)
 CVE_CHECK_SKIP_RECIPE ?= ""
@@ -201,7 +201,7 @@ python vex_write_rootfs_manifest () {
 
     d.setVar("PN", save_pn)
 
-    link_path = os.path.join(deploy_dir, "%s.json" % link_name)
+    link_path = os.path.join(deploy_dir, "%s.vex.json" % link_name)
     manifest_name = d.getVar("CVE_CHECK_MANIFEST_JSON")
 
     with open(manifest_name, "w") as f:

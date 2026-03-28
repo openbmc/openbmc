@@ -11,7 +11,6 @@ DEPENDS = " \
 "
 
 PYPI_PACKAGE = "meson_python"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_mesonpy
 SRC_URI[sha256sum] = "9959d198aa69b57fcfd354a34518c6f795b781a73ed0656f4d01660160cc2553"

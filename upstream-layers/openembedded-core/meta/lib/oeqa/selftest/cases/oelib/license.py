@@ -12,8 +12,8 @@ class SeenVisitor(oe.license.LicenseVisitor):
         self.seen = []
         oe.license.LicenseVisitor.__init__(self)
 
-    def visit_Str(self, node):
-        self.seen.append(node.s)
+    def visit_Constant(self, node):
+        self.seen.append(node.value)
 
 class TestSingleLicense(TestCase):
     licenses = [

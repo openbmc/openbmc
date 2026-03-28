@@ -10,7 +10,6 @@ SRC_URI[sha256sum] = "b540987f239e745613c7a9176f3edb72b832a4ac465cf0271228839783
 inherit pypi python_hatchling
 
 PYPI_PACKAGE = "jsonschema_specifications"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += "python3-hatch-vcs-native"
 

@@ -33,8 +33,7 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[gtk] = "--enable-gtk,--disable-gtk,gtk+3"
 PACKAGECONFIG[libidn] = "--with-libidn,--without-libidn,libidn"
 PACKAGECONFIG[libpaper] = "--with-libpaper,--without-libpaper,libpaper"
-PACKAGECONFIG[x11] = "--with-x --x-includes=${STAGING_INCDIR} --x-libraries=${STAGING_LIBDIR}, \
-                      --without-x, virtual/libx11 libxext libxt"
+PACKAGECONFIG[x11] = "--with-x, --without-x, virtual/libx11 libxext libxt"
 
 EXTRA_OECONF = "--with-jbig2dec \
                 --with-fontpath=${datadir}/fonts \

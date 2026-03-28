@@ -13,6 +13,8 @@ import oe.spdx30
 import oe.spdx_common
 import oe.sdk
 import os
+import re
+import urllib.parse
 
 from contextlib import contextmanager
 from datetime import datetime, timezone
@@ -32,7 +34,9 @@ def set_timestamp_now(d, o, prop):
         delattr(o, prop)
 
 
-def add_license_expression(d, objset, license_expression, license_data):
+def add_license_expression(
+    d, objset, license_expression, license_data, search_objsets=[]
+):
     simple_license_text = {}
     license_text_map = {}
     license_ref_idx = 0
@@ -44,14 +48,15 @@ def add_license_expression(d, objset, license_expression, license_data):
         if name in simple_license_text:
             return simple_license_text[name]
 
-        lic = objset.find_filter(
-            oe.spdx30.simplelicensing_SimpleLicensingText,
-            name=name,
-        )
+        for o in [objset] + search_objsets:
+            lic = o.find_filter(
+                oe.spdx30.simplelicensing_SimpleLicensingText,
+                name=name,
+            )
 
-        if lic is not None:
-            simple_license_text[name] = lic
-            return lic
+            if lic is not None:
+                simple_license_text[name] = lic
+                return lic
 
         lic = objset.add(
             oe.spdx30.simplelicensing_SimpleLicensingText(
@@ -154,17 +159,27 @@ def add_package_files(
     file_counter = 1
     if not os.path.exists(topdir):
         bb.note(f"Skip {topdir}")
-        return spdx_files
+        return spdx_files, set()
 
     check_compiled_sources = d.getVar("SPDX_INCLUDE_COMPILED_SOURCES") == "1"
     if check_compiled_sources:
         compiled_sources, types = oe.spdx_common.get_compiled_sources(d)
         bb.debug(1, f"Total compiled files: {len(compiled_sources)}")
 
+    exclude_patterns = [
+        re.compile(pattern)
+        for pattern in (d.getVar("SPDX_FILE_EXCLUDE_PATTERNS") or "").split()
+    ]
+    excluded_files = set()
+
     for subdir, dirs, files in os.walk(topdir, onerror=walk_error):
-        dirs[:] = [d for d in dirs if d not in ignore_dirs]
+        dirs[:] = [directory for directory in dirs if directory not in ignore_dirs]
         if subdir == str(topdir):
-            dirs[:] = [d for d in dirs if d not in ignore_top_level_dirs]
+            dirs[:] = [
+                directory
+                for directory in dirs
+                if directory not in ignore_top_level_dirs
+            ]
 
         dirs.sort()
         files.sort()
@@ -174,12 +189,19 @@ def add_package_files(
                 continue
 
             filename = str(filepath.relative_to(topdir))
+
+            if exclude_patterns and any(
+                pattern.search(filename) for pattern in exclude_patterns
+            ):
+                excluded_files.add(filename)
+                continue
+
             file_purposes = get_purposes(filepath)
 
-            # Check if file is compiled
-            if check_compiled_sources:
-                if not oe.spdx_common.is_compiled_source(filename, compiled_sources, types):
-                    continue
+            if check_compiled_sources and not oe.spdx_common.is_compiled_source(
+                filename, compiled_sources, types
+            ):
+                continue
 
             spdx_file = objset.new_file(
                 get_spdxid(file_counter),
@@ -213,12 +235,15 @@ def add_package_files(
 
     bb.debug(1, "Added %d files to %s" % (len(spdx_files), objset.doc._id))
 
-    return spdx_files
+    return spdx_files, excluded_files
 
 
 def get_package_sources_from_debug(
-    d, package, package_files, sources, source_hash_cache
+    d, package, package_files, sources, source_hash_cache, excluded_files=None
 ):
+    if excluded_files is None:
+        excluded_files = set()
+
     def file_path_match(file_path, pkg_file):
         if file_path.lstrip("/") == pkg_file.name.lstrip("/"):
             return True
@@ -251,6 +276,12 @@ def get_package_sources_from_debug(
             continue
 
         if not any(file_path_match(file_path, pkg_file) for pkg_file in package_files):
+            if file_path.lstrip("/") in excluded_files:
+                bb.debug(
+                    1,
+                    f"Skipping debug source lookup for excluded file {file_path} in {package}",
+                )
+                continue
             bb.fatal(
                 "No package file found for %s in %s; SPDX found: %s"
                 % (str(file_path), package, " ".join(p.name for p in package_files))
@@ -293,17 +324,14 @@ def get_package_sources_from_debug(
     return dep_source_files
 
 
-def collect_dep_objsets(d, build):
-    deps = oe.spdx_common.get_spdx_deps(d)
-
+def collect_dep_objsets(d, direct_deps, subdir, fn_prefix, obj_type, **attr_filter):
     dep_objsets = []
-    dep_builds = set()
+    dep_objs = set()
 
-    dep_build_spdxids = set()
-    for dep in deps:
+    for dep in direct_deps:
         bb.debug(1, "Fetching SPDX for dependency %s" % (dep.pn))
-        dep_build, dep_objset = oe.sbom30.find_root_obj_in_jsonld(
-            d, "recipes", "recipe-" + dep.pn, oe.spdx30.build_Build
+        dep_obj, dep_objset = oe.sbom30.find_root_obj_in_jsonld(
+            d, subdir, fn_prefix + dep.pn, obj_type, **attr_filter
         )
         # If the dependency is part of the taskhash, return it to be linked
         # against. Otherwise, it cannot be linked against because this recipe
@@ -311,10 +339,10 @@ def collect_dep_objsets(d, build):
         if dep.in_taskhash:
             dep_objsets.append(dep_objset)
 
-        # The build _can_ be linked against (by alias)
-        dep_builds.add(dep_build)
+        # The object _can_ be linked against (by alias)
+        dep_objs.add(dep_obj)
 
-    return dep_objsets, dep_builds
+    return dep_objsets, dep_objs
 
 
 def index_sources_by_hash(sources, dest):
@@ -355,6 +383,105 @@ def collect_dep_sources(dep_objsets, dest):
                 continue
 
             index_sources_by_hash(e.to, dest)
+
+
+
+def _generate_git_purl(d, download_location, srcrev):
+    """Generate a Package URL for a Git source from its download location.
+
+    Parses the Git URL to identify the hosting service and generates the
+    appropriate PURL type. Supports github.com by default and custom
+    mappings via SPDX_GIT_PURL_MAPPINGS.
+
+    Returns the PURL string or None if no mapping matches.
+    """
+    if not download_location or not download_location.startswith('git+'):
+        return None
+
+    git_url = download_location[4:]  # Remove 'git+' prefix
+
+    # Default handler: github.com
+    git_purl_handlers = {
+        'github.com': 'pkg:github',
+    }
+
+    # Custom PURL mappings from SPDX_GIT_PURL_MAPPINGS
+    # Format: "domain1:purl_type1 domain2:purl_type2"
+    custom_mappings = d.getVar('SPDX_GIT_PURL_MAPPINGS')
+    if custom_mappings:
+        for mapping in custom_mappings.split():
+            parts = mapping.split(':', 1)
+            if len(parts) == 2:
+                git_purl_handlers[parts[0]] = parts[1]
+                bb.debug(2, f"Added custom Git PURL mapping: {parts[0]} -> {parts[1]}")
+            else:
+                bb.warn(f"Invalid SPDX_GIT_PURL_MAPPINGS entry: {mapping} (expected format: domain:purl_type)")
+
+    try:
+        parsed = urllib.parse.urlparse(git_url)
+    except Exception:
+        return None
+
+    hostname = parsed.hostname
+    if not hostname:
+        return None
+
+    for domain, purl_type in git_purl_handlers.items():
+        if hostname == domain:
+            path = parsed.path.strip('/')
+            path_parts = path.split('/')
+            if len(path_parts) >= 2:
+                owner = path_parts[0]
+                repo = path_parts[1].replace('.git', '')
+                return f"{purl_type}/{owner}/{repo}@{srcrev}"
+            break
+
+    return None
+
+
+def _enrich_source_package(d, dl, fd, file_name, primary_purpose):
+    """Enrich a Git source download package with version, PURL, and external refs.
+
+    For Git sources, extracts the full SHA-1 from SRCREV as the version,
+    generates PURLs for known hosting services, and adds VCS external
+    references.
+    """
+    version = None
+    purl = None
+
+    if fd.type == "git":
+        # Use full SHA-1 from fd.revision
+        srcrev = getattr(fd, 'revision', None)
+        if srcrev and srcrev not in {'${AUTOREV}', 'AUTOINC', 'INVALID'}:
+            version = srcrev
+
+        # Generate PURL for Git hosting services
+        download_location = getattr(dl, 'software_downloadLocation', None)
+        if version and download_location:
+            purl = _generate_git_purl(d, download_location, version)
+
+    if version:
+        dl.software_packageVersion = version
+
+    if purl:
+        dl.software_packageUrl = purl
+
+    # Add VCS external reference for Git repositories
+    download_location = getattr(dl, 'software_downloadLocation', None)
+    if download_location and isinstance(download_location, str):
+        if download_location.startswith('git+'):
+            git_url = download_location[4:]
+            if '@' in git_url:
+                git_url = git_url.split('@')[0]
+
+            dl.externalRef = dl.externalRef or []
+            dl.externalRef.append(
+                oe.spdx30.ExternalRef(
+                    externalRefType=oe.spdx30.ExternalRefType.vcs,
+                    locator=[git_url],
+                )
+            )
+
 
 
 def add_download_files(d, objset):
@@ -420,12 +547,12 @@ def add_download_files(d, objset):
                 )
             )
 
+            _enrich_source_package(d, dl, fd, file_name, primary_purpose)
+
             if fd.method.supports_checksum(fd):
                 # TODO Need something better than hard coding this
                 for checksum_id in ["sha256", "sha1"]:
-                    expected_checksum = getattr(
-                        fd, "%s_expected" % checksum_id, None
-                    )
+                    expected_checksum = getattr(fd, "%s_expected" % checksum_id, None)
                     if expected_checksum is None:
                         continue
 
@@ -462,6 +589,220 @@ def set_purposes(d, element, *var_names, force_purposes=[]):
     ]
 
 
+def set_purls(spdx_package, purls):
+    if purls:
+        spdx_package.software_packageUrl = purls[0]
+
+    for p in sorted(set(purls)):
+        spdx_package.externalIdentifier.append(
+            oe.spdx30.ExternalIdentifier(
+                externalIdentifierType=oe.spdx30.ExternalIdentifierType.packageUrl,
+                identifier=p,
+            )
+        )
+
+
+def get_is_native(d):
+    return bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d)
+
+
+def create_recipe_spdx(d):
+    deploydir = Path(d.getVar("SPDXRECIPEDEPLOY"))
+    deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
+    pn = d.getVar("PN")
+
+    license_data = oe.spdx_common.load_spdx_license_data(d)
+
+    include_vex = d.getVar("SPDX_INCLUDE_VEX")
+    if not include_vex in ("none", "current", "all"):
+        bb.fatal("SPDX_INCLUDE_VEX must be one of 'none', 'current', 'all'")
+
+    recipe_objset = oe.sbom30.ObjectSet.new_objset(d, "static-" + pn)
+
+    recipe = recipe_objset.add_root(
+        oe.spdx30.software_Package(
+            _id=recipe_objset.new_spdxid("recipe", pn),
+            creationInfo=recipe_objset.doc.creationInfo,
+            name=d.getVar("PN"),
+            software_packageVersion=d.getVar("PV"),
+            software_primaryPurpose=oe.spdx30.software_SoftwarePurpose.specification,
+            software_sourceInfo=json.dumps(
+                {
+                    "FILENAME": os.path.basename(d.getVar("FILE")),
+                    "FILE_LAYERNAME": d.getVar("FILE_LAYERNAME"),
+                },
+                separators=(",", ":"),
+            ),
+        )
+    )
+
+    if get_is_native(d):
+        ext = oe.sbom30.OERecipeExtension()
+        ext.is_native = True
+        recipe.extension.append(ext)
+
+    set_purls(recipe, (d.getVar("SPDX_PACKAGE_URLS") or "").split())
+
+    # TODO: This doesn't work before do_unpack because the license text has to
+    # be available for recipes with NO_GENERIC_LICENSE
+    # recipe_spdx_license = add_license_expression(
+    #    d,
+    #    recipe_objset,
+    #    d.getVar("LICENSE"),
+    #    license_data,
+    # )
+    # recipe_objset.new_relationship(
+    #    [recipe],
+    #    oe.spdx30.RelationshipType.hasDeclaredLicense,
+    #    [oe.sbom30.get_element_link_id(recipe_spdx_license)],
+    # )
+
+    if val := d.getVar("HOMEPAGE"):
+        recipe.software_homePage = val
+
+    if val := d.getVar("SUMMARY"):
+        recipe.summary = val
+
+    if val := d.getVar("DESCRIPTION"):
+        recipe.description = val
+
+    for cpe_id in oe.cve_check.get_cpe_ids(
+        d.getVar("CVE_PRODUCT"), d.getVar("CVE_VERSION")
+    ):
+        recipe.externalIdentifier.append(
+            oe.spdx30.ExternalIdentifier(
+                externalIdentifierType=oe.spdx30.ExternalIdentifierType.cpe23,
+                identifier=cpe_id,
+            )
+        )
+
+    direct_deps = oe.spdx_common.collect_direct_deps(d, "do_create_recipe_spdx")
+
+    dep_objsets, dep_recipes = collect_dep_objsets(
+        d, direct_deps, "static", "static-", oe.spdx30.software_Package
+    )
+
+    if dep_recipes:
+        recipe_objset.new_scoped_relationship(
+            [recipe],
+            oe.spdx30.RelationshipType.dependsOn,
+            oe.spdx30.LifecycleScopeType.build,
+            sorted(oe.sbom30.get_element_link_id(dep) for dep in dep_recipes),
+        )
+
+    # Add CVEs
+    cve_by_status = {}
+    if include_vex != "none":
+        patched_cves = oe.cve_check.get_patched_cves(d)
+        for cve, patched_cve in patched_cves.items():
+            mapping = patched_cve["abbrev-status"]
+            detail = patched_cve["status"]
+            description = patched_cve.get("justification", None)
+            resources = patched_cve.get("resource", [])
+
+            # If this CVE is fixed upstream, skip it unless all CVEs are
+            # specified.
+            if include_vex != "all" and detail in (
+                "fixed-version",
+                "cpe-stable-backport",
+            ):
+                bb.debug(1, "Skipping %s since it is already fixed upstream" % cve)
+                continue
+
+            spdx_cve = recipe_objset.new_cve_vuln(cve)
+
+            cve_by_status.setdefault(mapping, {})[cve] = (
+                spdx_cve,
+                detail,
+                description,
+                resources,
+            )
+
+    all_cves = set()
+    for status, cves in cve_by_status.items():
+        for cve, items in cves.items():
+            spdx_cve, detail, description, resources = items
+            spdx_cve_id = oe.sbom30.get_element_link_id(spdx_cve)
+
+            all_cves.add(spdx_cve)
+
+            if status == "Patched":
+                spdx_vex = recipe_objset.new_vex_patched_relationship(
+                    [spdx_cve_id], [recipe]
+                )
+                patches = []
+                for idx, filepath in enumerate(resources):
+                    patches.append(
+                        recipe_objset.new_file(
+                            recipe_objset.new_spdxid(
+                                "patch", str(idx), os.path.basename(filepath)
+                            ),
+                            os.path.basename(filepath),
+                            filepath,
+                            purposes=[oe.spdx30.software_SoftwarePurpose.patch],
+                            hashfile=os.path.isfile(filepath),
+                        )
+                    )
+
+                if patches:
+                    recipe_objset.new_scoped_relationship(
+                        spdx_vex,
+                        oe.spdx30.RelationshipType.patchedBy,
+                        oe.spdx30.LifecycleScopeType.build,
+                        patches,
+                    )
+
+            elif status == "Unpatched":
+                recipe_objset.new_vex_unpatched_relationship([spdx_cve_id], [recipe])
+            elif status == "Ignored":
+                spdx_vex = recipe_objset.new_vex_ignored_relationship(
+                    [spdx_cve_id],
+                    [recipe],
+                    impact_statement=description,
+                )
+
+                vex_just_type = d.getVarFlag("CVE_CHECK_VEX_JUSTIFICATION", detail)
+                if vex_just_type:
+                    if (
+                        vex_just_type
+                        not in oe.spdx30.security_VexJustificationType.NAMED_INDIVIDUALS
+                    ):
+                        bb.fatal(
+                            f"Unknown vex justification '{vex_just_type}', detail '{detail}', for ignored {cve}"
+                        )
+
+                    for v in spdx_vex:
+                        v.security_justificationType = (
+                            oe.spdx30.security_VexJustificationType.NAMED_INDIVIDUALS[
+                                vex_just_type
+                            ]
+                        )
+
+            elif status == "Unknown":
+                bb.note(f"Skipping {cve} with status 'Unknown'")
+            else:
+                bb.fatal(f"Unknown {cve} status '{status}'")
+
+    if all_cves:
+        recipe_objset.new_relationship(
+            [recipe],
+            oe.spdx30.RelationshipType.hasAssociatedVulnerability,
+            sorted(list(all_cves)),
+        )
+
+    oe.sbom30.write_recipe_jsonld_doc(d, recipe_objset, "static", deploydir)
+
+
+def load_recipe_spdx(d):
+
+    return oe.sbom30.find_root_obj_in_jsonld(
+        d,
+        "static",
+        "static-" + d.getVar("PN"),
+        oe.spdx30.software_Package,
+    )
+
+
 def create_spdx(d):
     def set_var_field(var, obj, name, package=None):
         val = None
@@ -476,19 +817,17 @@ def create_spdx(d):
 
     license_data = oe.spdx_common.load_spdx_license_data(d)
 
+    pn = d.getVar("PN")
     deploydir = Path(d.getVar("SPDXDEPLOY"))
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     spdx_workdir = Path(d.getVar("SPDXWORK"))
     include_sources = d.getVar("SPDX_INCLUDE_SOURCES") == "1"
     pkg_arch = d.getVar("SSTATE_PKGARCH")
-    is_native = bb.data.inherits_class("native", d) or bb.data.inherits_class(
-        "cross", d
-    )
-    include_vex = d.getVar("SPDX_INCLUDE_VEX")
-    if not include_vex in ("none", "current", "all"):
-        bb.fatal("SPDX_INCLUDE_VEX must be one of 'none', 'current', 'all'")
+    is_native = get_is_native(d)
 
-    build_objset = oe.sbom30.ObjectSet.new_objset(d, "recipe-" + d.getVar("PN"))
+    recipe, recipe_objset = load_recipe_spdx(d)
+
+    build_objset = oe.sbom30.ObjectSet.new_objset(d, "build-" + pn)
 
     build = build_objset.new_task_build("recipe", "recipe")
     build_objset.set_element_alias(build)
@@ -506,47 +845,13 @@ def create_spdx(d):
 
     build_inputs = set()
 
-    # Add CVEs
-    cve_by_status = {}
-    if include_vex != "none":
-        patched_cves = oe.cve_check.get_patched_cves(d)
-        for cve, patched_cve in patched_cves.items():
-            decoded_status = {
-                "mapping": patched_cve["abbrev-status"],
-                "detail": patched_cve["status"],
-                "description": patched_cve.get("justification", None)
-            }
-
-            # If this CVE is fixed upstream, skip it unless all CVEs are
-            # specified.
-            if (
-                include_vex != "all"
-                and "detail" in decoded_status
-                and decoded_status["detail"]
-                in (
-                    "fixed-version",
-                    "cpe-stable-backport",
-                )
-            ):
-                bb.debug(1, "Skipping %s since it is already fixed upstream" % cve)
-                continue
-
-            spdx_cve = build_objset.new_cve_vuln(cve)
-            build_objset.set_element_alias(spdx_cve)
-
-            cve_by_status.setdefault(decoded_status["mapping"], {})[cve] = (
-                spdx_cve,
-                decoded_status["detail"],
-                decoded_status["description"],
-            )
-
     cpe_ids = oe.cve_check.get_cpe_ids(d.getVar("CVE_PRODUCT"), d.getVar("CVE_VERSION"))
 
     source_files = add_download_files(d, build_objset)
     build_inputs |= source_files
 
     recipe_spdx_license = add_license_expression(
-        d, build_objset, d.getVar("LICENSE"), license_data
+        d, build_objset, d.getVar("LICENSE"), license_data, [recipe_objset]
     )
     build_objset.new_relationship(
         source_files,
@@ -559,7 +864,7 @@ def create_spdx(d):
         bb.debug(1, "Adding source files to SPDX")
         oe.spdx_common.get_patched_src(d)
 
-        files = add_package_files(
+        files, _ = add_package_files(
             d,
             build_objset,
             spdx_workdir,
@@ -575,7 +880,12 @@ def create_spdx(d):
         build_inputs |= files
         index_sources_by_hash(files, dep_sources)
 
-    dep_objsets, dep_builds = collect_dep_objsets(d, build)
+    direct_deps = oe.spdx_common.collect_direct_deps(d, "do_create_spdx")
+
+    dep_objsets, dep_builds = collect_dep_objsets(
+        d, direct_deps, "builds", "build-", oe.spdx30.build_Build
+    )
+
     if dep_builds:
         build_objset.new_scoped_relationship(
             [build],
@@ -645,20 +955,18 @@ def create_spdx(d):
                 or ""
             ).split()
 
-            if purls:
-                spdx_package.software_packageUrl = purls[0]
-
-            for p in sorted(set(purls)):
-                spdx_package.externalIdentifier.append(
-                    oe.spdx30.ExternalIdentifier(
-                        externalIdentifierType=oe.spdx30.ExternalIdentifierType.packageUrl,
-                        identifier=p,
-                    )
-                )
+            set_purls(spdx_package, purls)
 
             pkg_objset.new_scoped_relationship(
                 [oe.sbom30.get_element_link_id(build)],
                 oe.spdx30.RelationshipType.hasOutput,
+                oe.spdx30.LifecycleScopeType.build,
+                [spdx_package],
+            )
+
+            pkg_objset.new_scoped_relationship(
+                [oe.sbom30.get_element_link_id(recipe)],
+                oe.spdx30.RelationshipType.generates,
                 oe.spdx30.LifecycleScopeType.build,
                 [spdx_package],
             )
@@ -696,7 +1004,11 @@ def create_spdx(d):
             package_license = d.getVar("LICENSE:%s" % package)
             if package_license and package_license != d.getVar("LICENSE"):
                 package_spdx_license = add_license_expression(
-                    d, build_objset, package_license, license_data
+                    d,
+                    build_objset,
+                    package_license,
+                    license_data,
+                    [recipe_objset],
                 )
             else:
                 package_spdx_license = recipe_spdx_license
@@ -709,7 +1021,9 @@ def create_spdx(d):
 
             # Add concluded license relationship if manually set
             # Only add when license analysis has been explicitly performed
-            concluded_license_str = d.getVar("SPDX_CONCLUDED_LICENSE:%s" % package) or d.getVar("SPDX_CONCLUDED_LICENSE")
+            concluded_license_str = d.getVar(
+                "SPDX_CONCLUDED_LICENSE:%s" % package
+            ) or d.getVar("SPDX_CONCLUDED_LICENSE")
             if concluded_license_str:
                 concluded_spdx_license = add_license_expression(
                     d, build_objset, concluded_license_str, license_data
@@ -721,61 +1035,8 @@ def create_spdx(d):
                     [oe.sbom30.get_element_link_id(concluded_spdx_license)],
                 )
 
-            # NOTE: CVE Elements live in the recipe collection
-            all_cves = set()
-            for status, cves in cve_by_status.items():
-                for cve, items in cves.items():
-                    spdx_cve, detail, description = items
-                    spdx_cve_id = oe.sbom30.get_element_link_id(spdx_cve)
-
-                    all_cves.add(spdx_cve_id)
-
-                    if status == "Patched":
-                        pkg_objset.new_vex_patched_relationship(
-                            [spdx_cve_id], [spdx_package]
-                        )
-                    elif status == "Unpatched":
-                        pkg_objset.new_vex_unpatched_relationship(
-                            [spdx_cve_id], [spdx_package]
-                        )
-                    elif status == "Ignored":
-                        spdx_vex = pkg_objset.new_vex_ignored_relationship(
-                            [spdx_cve_id],
-                            [spdx_package],
-                            impact_statement=description,
-                        )
-
-                        vex_just_type = d.getVarFlag(
-                            "CVE_CHECK_VEX_JUSTIFICATION", detail
-                        )
-                        if vex_just_type:
-                            if (
-                                vex_just_type
-                                not in oe.spdx30.security_VexJustificationType.NAMED_INDIVIDUALS
-                            ):
-                                bb.fatal(
-                                    f"Unknown vex justification '{vex_just_type}', detail '{detail}', for ignored {cve}"
-                                )
-
-                            for v in spdx_vex:
-                                v.security_justificationType = oe.spdx30.security_VexJustificationType.NAMED_INDIVIDUALS[
-                                    vex_just_type
-                                ]
-
-                    elif status == "Unknown":
-                        bb.note(f"Skipping {cve} with status 'Unknown'")
-                    else:
-                        bb.fatal(f"Unknown {cve} status '{status}'")
-
-            if all_cves:
-                pkg_objset.new_relationship(
-                    [spdx_package],
-                    oe.spdx30.RelationshipType.hasAssociatedVulnerability,
-                    sorted(list(all_cves)),
-                )
-
             bb.debug(1, "Adding package files to SPDX for package %s" % pkg_name)
-            package_files = add_package_files(
+            package_files, excluded_files = add_package_files(
                 d,
                 pkg_objset,
                 pkgdest / package,
@@ -798,7 +1059,8 @@ def create_spdx(d):
 
             if include_sources:
                 debug_sources = get_package_sources_from_debug(
-                    d, package, package_files, dep_sources, source_hash_cache
+                    d, package, package_files, dep_sources, source_hash_cache,
+                    excluded_files=excluded_files,
                 )
                 debug_source_ids |= set(
                     oe.sbom30.get_element_link_id(d) for d in debug_sources
@@ -810,7 +1072,7 @@ def create_spdx(d):
 
     if include_sources:
         bb.debug(1, "Adding sysroot files to SPDX")
-        sysroot_files = add_package_files(
+        sysroot_files, _ = add_package_files(
             d,
             build_objset,
             d.expand("${COMPONENTS_DIR}/${PACKAGE_ARCH}/${PN}"),
@@ -851,27 +1113,27 @@ def create_spdx(d):
                 status = "enabled" if feature in enabled else "disabled"
                 build.build_parameter.append(
                     oe.spdx30.DictionaryEntry(
-                        key=f"PACKAGECONFIG:{feature}",
-                        value=status
+                        key=f"PACKAGECONFIG:{feature}", value=status
                     )
                 )
 
-            bb.note(f"Added PACKAGECONFIG entries: {len(enabled)} enabled, {len(disabled)} disabled")
+            bb.note(
+                f"Added PACKAGECONFIG entries: {len(enabled)} enabled, {len(disabled)} disabled"
+            )
 
-    oe.sbom30.write_recipe_jsonld_doc(d, build_objset, "recipes", deploydir)
+    oe.sbom30.write_recipe_jsonld_doc(d, build_objset, "builds", deploydir)
 
 
 def create_package_spdx(d):
     deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     deploydir = Path(d.getVar("SPDXRUNTIMEDEPLOY"))
-    is_native = bb.data.inherits_class("native", d) or bb.data.inherits_class(
-        "cross", d
-    )
 
-    providers = oe.spdx_common.collect_package_providers(d)
+    direct_deps = oe.spdx_common.collect_direct_deps(d, "do_create_spdx")
+
+    providers = oe.spdx_common.collect_package_providers(d, direct_deps)
     pkg_arch = d.getVar("SSTATE_PKGARCH")
 
-    if is_native:
+    if get_is_native(d):
         return
 
     bb.build.exec_func("read_subpackage_metadata", d)
@@ -1045,14 +1307,15 @@ def write_bitbake_spdx(d):
 def collect_build_package_inputs(d, objset, build, packages, files_by_hash=None):
     import oe.sbom30
 
-    providers = oe.spdx_common.collect_package_providers(d)
+    direct_deps = oe.spdx_common.collect_direct_deps(d, "do_create_spdx")
+
+    providers = oe.spdx_common.collect_package_providers(d, direct_deps)
 
     build_deps = set()
-    missing_providers = set()
 
     for name in sorted(packages.keys()):
         if name not in providers:
-            missing_providers.add(name)
+            bb.note(f"Unable to find SPDX provider for '{name}'")
             continue
 
         pkg_name, pkg_hashfn = providers[name]
@@ -1070,11 +1333,6 @@ def collect_build_package_inputs(d, objset, build, packages, files_by_hash=None)
         if files_by_hash is not None:
             for h, f in pkg_objset.by_sha256_hash.items():
                 files_by_hash.setdefault(h, set()).update(f)
-
-    if missing_providers:
-        bb.fatal(
-            f"Unable to find SPDX provider(s) for: {', '.join(sorted(missing_providers))}"
-        )
 
     if build_deps:
         objset.new_scoped_relationship(
@@ -1196,7 +1454,7 @@ def create_image_spdx(d):
             image_filename = image["filename"]
             image_path = image_deploy_dir / image_filename
             if os.path.isdir(image_path):
-                a = add_package_files(
+                a, _ = add_package_files(
                         d,
                         objset,
                         image_path,
@@ -1233,7 +1491,6 @@ def create_image_spdx(d):
                 )
 
                 set_timestamp_now(d, a, "builtTime")
-
 
         if artifacts:
             objset.new_scoped_relationship(
@@ -1293,6 +1550,16 @@ def create_image_sbom_spdx(d):
         root_elements.append(oe.sbom30.get_element_link_id(o))
 
     objset, sbom = oe.sbom30.create_sbom(d, image_name, root_elements)
+
+    # Set supplier on root elements if SPDX_IMAGE_SUPPLIER is defined
+    supplier = objset.new_agent("SPDX_IMAGE_SUPPLIER", add=False)
+    if supplier is not None:
+        supplier_id = supplier if isinstance(supplier, str) else supplier._id
+        if not isinstance(supplier, str):
+            objset.add(supplier)
+        for elem in sbom.rootElement:
+            if hasattr(elem, "suppliedBy"):
+                elem.suppliedBy = supplier_id
 
     oe.sbom30.write_jsonld_doc(d, objset, spdx_path)
 
@@ -1405,6 +1672,26 @@ def create_sdk_sbom(d, sdk_deploydir, spdx_work_dir, toolchain_outputname):
         d, toolchain_outputname, sorted(list(files)), [rootfs_objset]
     )
 
+    # Set supplier on root elements if SPDX_SDK_SUPPLIER is defined
+    supplier = objset.new_agent("SPDX_SDK_SUPPLIER", add=False)
+    if supplier is not None:
+        supplier_id = supplier if isinstance(supplier, str) else supplier._id
+        if not isinstance(supplier, str):
+            objset.add(supplier)
+        for elem in sbom.rootElement:
+            if hasattr(elem, "suppliedBy"):
+                elem.suppliedBy = supplier_id
+
     oe.sbom30.write_jsonld_doc(
         d, objset, sdk_deploydir / (toolchain_outputname + ".spdx.json")
     )
+
+
+def create_recipe_sbom(d, deploydir):
+    sbom_name = d.getVar("SPDX_RECIPE_SBOM_NAME")
+
+    recipe, recipe_objset = load_recipe_spdx(d)
+
+    objset, sbom = oe.sbom30.create_sbom(d, sbom_name, [recipe], [recipe_objset])
+
+    oe.sbom30.write_jsonld_doc(d, objset, deploydir / (sbom_name + ".spdx.json"))

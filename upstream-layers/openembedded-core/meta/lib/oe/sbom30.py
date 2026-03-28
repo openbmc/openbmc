@@ -13,7 +13,9 @@ import hashlib
 import uuid
 import os
 import oe.spdx_common
+from oe.spdx30 import ClassProp
 from datetime import datetime, timezone
+from contextlib import contextmanager
 
 OE_SPDX_BASE = "https://rdf.openembedded.org/spdx/3.0/"
 
@@ -25,7 +27,6 @@ OE_ALIAS_PREFIX = "http://spdxdocs.org/openembedded-alias/by-doc-hash/"
 OE_DOC_ALIAS_PREFIX = "http://spdxdocs.org/openembedded-alias/doc/"
 
 
-@oe.spdx30.register(OE_SPDX_BASE + "id-alias")
 class OEIdAliasExtension(oe.spdx30.extension_Extension):
     """
     This extension allows an Element to provide an internal alias for the SPDX
@@ -51,71 +52,88 @@ class OEIdAliasExtension(oe.spdx30.extension_Extension):
     SBoM
     """
 
+    TYPE = OE_SPDX_BASE + "id-alias"
     CLOSED = True
     INTERNAL = True
 
-    @classmethod
-    def _register_props(cls):
-        super()._register_props()
-        cls._add_property(
+    PROPERTIES = [
+        ClassProp(
             "alias",
-            oe.spdx30.StringProp(),
+            lambda: oe.spdx30.StringProp(),
             OE_SPDX_BASE + "alias",
             max_count=1,
-        )
-
-        cls._add_property(
+        ),
+        ClassProp(
             "link_name",
-            oe.spdx30.StringProp(),
+            lambda: oe.spdx30.StringProp(),
             OE_SPDX_BASE + "link-name",
             max_count=1,
-        )
+        ),
+    ]
 
 
-@oe.spdx30.register(OE_SPDX_BASE + "file-name-alias")
 class OEFileNameAliasExtension(oe.spdx30.extension_Extension):
+    TYPE = OE_SPDX_BASE + "file-name-alias"
     CLOSED = True
     INTERNAL = True
 
-    @classmethod
-    def _register_props(cls):
-        super()._register_props()
-        cls._add_property(
+    PROPERTIES = [
+        ClassProp(
             "aliases",
-            oe.spdx30.ListProp(oe.spdx30.StringProp()),
+            lambda: oe.spdx30.ListProp(oe.spdx30.StringProp()),
             OE_SPDX_BASE + "filename-alias",
         )
+    ]
 
 
-@oe.spdx30.register(OE_SPDX_BASE + "license-scanned")
 class OELicenseScannedExtension(oe.spdx30.extension_Extension):
     """
     The presence of this extension means the file has already been scanned for
     license information
     """
 
+    TYPE = OE_SPDX_BASE + "license-scanned"
     CLOSED = True
     INTERNAL = True
 
 
-@oe.spdx30.register(OE_SPDX_BASE + "document-extension")
 class OEDocumentExtension(oe.spdx30.extension_Extension):
     """
     This extension is added to a SpdxDocument to indicate various useful bits
     of information about its contents
     """
 
+    TYPE = OE_SPDX_BASE + "document-extension"
     CLOSED = True
 
-    @classmethod
-    def _register_props(cls):
-        super()._register_props()
-        cls._add_property(
+    PROPERTIES = [
+        ClassProp(
             "is_native",
-            oe.spdx30.BooleanProp(),
+            lambda: oe.spdx30.BooleanProp(),
             OE_SPDX_BASE + "is-native",
             max_count=1,
-        )
+        ),
+    ]
+
+
+class OERecipeExtension(oe.spdx30.extension_Extension):
+    """
+    This extension is added to recipe software_Packages to indicate various
+    useful bits of information about the recipe
+    """
+
+    TYPE = OE_SPDX_BASE + "recipe-extension"
+
+    CLOSED = True
+
+    PROPERTIES = [
+        ClassProp(
+            "is_native",
+            lambda: oe.spdx30.BooleanProp(),
+            OE_SPDX_BASE + "is-native",
+            max_count=1,
+        ),
+    ]
 
 
 def spdxid_hash(*items):
@@ -169,6 +187,25 @@ def to_list(l):
         raise TypeError("Must be a list or tuple. Got %s" % type(l))
 
     return l
+
+
+class Dedup(object):
+    def __init__(self, objset):
+        self.unique = set()
+        self.dedup = {}
+        self.objset = objset
+
+    def find_duplicates(self, cmp, typ, **kwargs):
+        for o in self.objset.foreach_filter(typ, **kwargs):
+            for u in self.unique:
+                if cmp(u, o):
+                    self.dedup[o] = u
+                    break
+            else:
+                self.unique.add(o)
+
+    def get(self, o):
+        return self.dedup.get(o, o)
 
 
 class ObjectSet(oe.spdx30.SHACLObjectSet):
@@ -600,37 +637,38 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         )
         spdx_file.extension.append(OELicenseScannedExtension())
 
-    def new_file(self, _id, name, path, *, purposes=[]):
-        sha256_hash = bb.utils.sha256_file(path)
+    def new_file(self, _id, name, path, *, purposes=[], hashfile=True):
+        if hashfile:
+            sha256_hash = bb.utils.sha256_file(path)
 
-        for f in self.by_sha256_hash.get(sha256_hash, []):
-            if not isinstance(f, oe.spdx30.software_File):
-                continue
+            for f in self.by_sha256_hash.get(sha256_hash, []):
+                if not isinstance(f, oe.spdx30.software_File):
+                    continue
 
-            if purposes:
-                new_primary = purposes[0]
-                new_additional = []
+                if purposes:
+                    new_primary = purposes[0]
+                    new_additional = []
 
-                if f.software_primaryPurpose:
-                    new_additional.append(f.software_primaryPurpose)
-                new_additional.extend(f.software_additionalPurpose)
+                    if f.software_primaryPurpose:
+                        new_additional.append(f.software_primaryPurpose)
+                    new_additional.extend(f.software_additionalPurpose)
 
-                new_additional = sorted(
-                    list(set(p for p in new_additional if p != new_primary))
-                )
+                    new_additional = sorted(
+                        list(set(p for p in new_additional if p != new_primary))
+                    )
 
-                f.software_primaryPurpose = new_primary
-                f.software_additionalPurpose = new_additional
+                    f.software_primaryPurpose = new_primary
+                    f.software_additionalPurpose = new_additional
 
-            if f.name != name:
-                for e in f.extension:
-                    if isinstance(e, OEFileNameAliasExtension):
-                        e.aliases.append(name)
-                        break
-                else:
-                    f.extension.append(OEFileNameAliasExtension(aliases=[name]))
+                if f.name != name:
+                    for e in f.extension:
+                        if isinstance(e, OEFileNameAliasExtension):
+                            e.aliases.append(name)
+                            break
+                    else:
+                        f.extension.append(OEFileNameAliasExtension(aliases=[name]))
 
-            return f
+                return f
 
         spdx_file = oe.spdx30.software_File(
             _id=_id,
@@ -641,12 +679,13 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             spdx_file.software_primaryPurpose = purposes[0]
             spdx_file.software_additionalPurpose = purposes[1:]
 
-        spdx_file.verifiedUsing.append(
-            oe.spdx30.Hash(
-                algorithm=oe.spdx30.HashAlgorithm.sha256,
-                hashValue=sha256_hash,
+        if hashfile:
+            spdx_file.verifiedUsing.append(
+                oe.spdx30.Hash(
+                    algorithm=oe.spdx30.HashAlgorithm.sha256,
+                    hashValue=sha256_hash,
+                )
             )
-        )
 
         return self.add(spdx_file)
 
@@ -873,6 +912,45 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         self.missing_ids -= set(imports.keys())
         return self.missing_ids
 
+    @contextmanager
+    def deduplicate(self):
+        d = Dedup(self)
+
+        yield d
+
+        visited = set()
+
+        def visit(o, path):
+            if isinstance(o, oe.spdx30.SHACLObject):
+                if o in visited:
+                    return False
+                visited.add(o)
+
+                for k in o:
+                    v = o[k]
+                    if isinstance(v, oe.spdx30.SHACLObject):
+                        o[k] = d.get(v)
+
+            elif isinstance(o, oe.spdx30.ListProxy):
+                for idx, v in enumerate(o):
+                    if isinstance(v, oe.spdx30.SHACLObject):
+                        o[idx] = d.get(v)
+
+            return True
+
+        if d.dedup:
+            for o in self.objects:
+                o.walk(visit)
+
+            for k, v in d.dedup.items():
+                bb.debug(
+                    1,
+                    f"Removing duplicate {k.__class__.__name__} {k._id or id(k)} -> {v._id or id(v)}",
+                )
+                self.objects.discard(k)
+
+            self.create_index()
+
 
 def load_jsonld(d, path, required=False):
     deserializer = oe.spdx30.JSONLDDeserializer()
@@ -1058,39 +1136,28 @@ def create_sbom(d, name, root_elements, add_objectsets=[]):
     # SBoM should be the only root element of the document
     objset.doc.rootElement = [sbom]
 
-    # De-duplicate licenses
-    unique = set()
-    dedup = {}
-    for lic in objset.foreach_type(oe.spdx30.simplelicensing_LicenseExpression):
-        for u in unique:
-            if (
-                u.simplelicensing_licenseExpression
-                == lic.simplelicensing_licenseExpression
-                and u.simplelicensing_licenseListVersion
-                == lic.simplelicensing_licenseListVersion
-            ):
-                dedup[lic] = u
-                break
-        else:
-            unique.add(lic)
+    def cmp_license_expression(a, b):
+        return (
+            a.simplelicensing_licenseExpression == b.simplelicensing_licenseExpression
+            and a.simplelicensing_licenseListVersion
+            == b.simplelicensing_licenseListVersion
+        )
 
-    if dedup:
-        for rel in objset.foreach_filter(
-            oe.spdx30.Relationship,
-            relationshipType=oe.spdx30.RelationshipType.hasDeclaredLicense,
-        ):
-            rel.to = [dedup.get(to, to) for to in rel.to]
+    def cmp_creation_info(a, b):
+        data_a = {k: a[k] for k in a}
+        data_b = {k: b[k] for k in b}
+        data_a["@id"] = ""
+        data_b["@id"] = ""
+        return data_a == data_b
 
-        for rel in objset.foreach_filter(
-            oe.spdx30.Relationship,
-            relationshipType=oe.spdx30.RelationshipType.hasConcludedLicense,
-        ):
-            rel.to = [dedup.get(to, to) for to in rel.to]
+    with objset.deduplicate() as dedup:
+        # De-duplicate licenses
+        dedup.find_duplicates(
+            cmp_license_expression,
+            oe.spdx30.simplelicensing_LicenseExpression,
+        )
 
-        for k, v in dedup.items():
-            bb.debug(1, f"Removing duplicate License {k._id} -> {v._id}")
-            objset.objects.remove(k)
-
-        objset.create_index()
+        # Deduplicate creation info
+        dedup.find_duplicates(cmp_creation_info, oe.spdx30.CreationInfo)
 
     return objset, sbom

@@ -96,7 +96,7 @@ RRECOMMENDS:locale-base-nb-no += "${PN}"
 RRECOMMENDS:locale-base-nl-nl += "${PN}"
 RRECOMMENDS:locale-base-pt-br += "${PN}"
 RRECOMMENDS:locale-base-ru-ru += "${PN}"
-RRECOMMENDS:locale-base-sr-sr += "${PN}"
+RRECOMMENDS:locale-base-sr-rs += "${PN}"
 RRECOMMENDS:locale-base-sv-se += "${PN}"
 
 UPSTREAM_CHECK_COMMITS = "1"

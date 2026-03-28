@@ -178,13 +178,46 @@ class UBootConfigTest(OESelftestTestCase):
 
         bitbake("-e u-boot")
 
-        bb_vars = get_bb_vars(["UBOOT_MACHINE", "IMAGE_FSTYPES", "UBOOT_CONFIG_BINARY", "UBOOT_CONFIG_MAKE_OPTS", "UBOOT_CONFIG_FRAGMENTS"], "u-boot")
+        bb_vars = get_bb_vars(["UBOOT_MACHINE", "IMAGE_FSTYPES", "UBOOT_CONFIG_BINARY", "UBOOT_CONFIG_MAKE_OPTS", "UBOOT_CONFIG_FRAGMENTS", "KCONFIG_CONFIG_ENABLE_MENUCONFIG"], "u-boot")
 
         self.assertEqual(bb_vars["UBOOT_MACHINE"], " machine1 machine2 machine3")
         self.assertTrue(bb_vars["IMAGE_FSTYPES"].endswith(" image_fstype2 image_fstype3"))
         self.assertEqual(bb_vars["UBOOT_CONFIG_BINARY"], "defBinary ? defBinary ? binary3 ? ")
         self.assertEqual(bb_vars["UBOOT_CONFIG_MAKE_OPTS"], "OPT=1 ?  ? OPT=3 FOO=2 ? ")
         self.assertEqual(bb_vars["UBOOT_CONFIG_FRAGMENTS"], "fragment1a fragment1b ? fragment2 ?  ? ")
+        self.assertEqual(bb_vars["KCONFIG_CONFIG_ENABLE_MENUCONFIG"], "false")
+
+    def test_uboot_config_extract_single_config(self):
+        """
+        Tests the uboot-config.bbclass python function that extracts all of
+        the config variations into the support variables.
+        """
+
+        self.write_config(textwrap.dedent(f"""
+            UBOOT_BINARY = "defBinary"
+            UBOOT_MACHINE = ""
+            UBOOT_CONFIG = "test1"
+            UBOOT_CONFIG[test1] = "machine1"
+            UBOOT_CONFIG[test2] = "machine2"
+            UBOOT_CONFIG[test3] = "machine3"
+            UBOOT_CONFIG_IMAGE_FSTYPES[test2] = "image_fstype2"
+            UBOOT_CONFIG_IMAGE_FSTYPES[test3] = "image_fstype3"
+            UBOOT_CONFIG_BINARY[test3] = "binary3"
+            UBOOT_CONFIG_MAKE_OPTS[test1] = "OPT=1"
+            UBOOT_CONFIG_MAKE_OPTS[test3] = "OPT=3 FOO=2"
+            UBOOT_CONFIG_FRAGMENTS[test1] = "fragment1a fragment1b"
+            UBOOT_CONFIG_FRAGMENTS[test2] = "fragment2"
+        """))
+
+        bitbake("-e u-boot")
+
+        bb_vars = get_bb_vars(["UBOOT_MACHINE", "IMAGE_FSTYPES", "UBOOT_CONFIG_BINARY", "UBOOT_CONFIG_MAKE_OPTS", "UBOOT_CONFIG_FRAGMENTS", "KCONFIG_CONFIG_ROOTDIR"], "u-boot")
+
+        self.assertEqual(bb_vars["UBOOT_MACHINE"], " machine1")
+        self.assertEqual(bb_vars["UBOOT_CONFIG_BINARY"], "defBinary ? ")
+        self.assertEqual(bb_vars["UBOOT_CONFIG_MAKE_OPTS"], "OPT=1 ? ")
+        self.assertEqual(bb_vars["UBOOT_CONFIG_FRAGMENTS"], "fragment1a fragment1b ? ")
+        self.assertTrue(bb_vars["KCONFIG_CONFIG_ROOTDIR"].endswith("/build/machine1-test1"))
 
     def test_uboot_config_extract_legacy(self):
         """
@@ -204,13 +237,14 @@ class UBootConfigTest(OESelftestTestCase):
 
         bitbake("-e u-boot")
 
-        bb_vars = get_bb_vars(["UBOOT_MACHINE", "IMAGE_FSTYPES", "UBOOT_CONFIG_BINARY", "UBOOT_CONFIG_MAKE_OPTS", "UBOOT_CONFIG_FRAGMENTS"], "u-boot")
+        bb_vars = get_bb_vars(["UBOOT_MACHINE", "IMAGE_FSTYPES", "UBOOT_CONFIG_BINARY", "UBOOT_CONFIG_MAKE_OPTS", "UBOOT_CONFIG_FRAGMENTS", "KCONFIG_CONFIG_ENABLE_MENUCONFIG"], "u-boot")
 
         self.assertEqual(bb_vars["UBOOT_MACHINE"], " machine1 machine2 machine3")
         self.assertTrue(bb_vars["IMAGE_FSTYPES"].endswith(" image_fstype2 image_fstype3"))
         self.assertEqual(bb_vars["UBOOT_CONFIG_BINARY"], "defBinary ? defBinary ? binary3 ? ")
         self.assertEqual(bb_vars["UBOOT_CONFIG_MAKE_OPTS"], " ?  ?  ? ")
         self.assertEqual(bb_vars["UBOOT_CONFIG_FRAGMENTS"], " ?  ?  ? ")
+        self.assertEqual(bb_vars["KCONFIG_CONFIG_ENABLE_MENUCONFIG"], "false")
 
     def test_uboot_config_extract_error_missing_config(self):
         """

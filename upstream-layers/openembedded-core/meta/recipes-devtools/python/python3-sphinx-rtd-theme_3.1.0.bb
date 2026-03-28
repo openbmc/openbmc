@@ -13,7 +13,6 @@ RDEPENDS:${PN} += " \
 "
 
 PYPI_PACKAGE = "sphinx_rtd_theme"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 SRC_URI[sha256sum] = "b44276f2c276e909239a4f6c955aa667aaafeb78597923b1c60babc76db78e4c"
 

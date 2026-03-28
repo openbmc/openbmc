@@ -38,7 +38,7 @@ def extract_licenses(filename):
 
 
 def is_work_shared_spdx(d):
-    return '/work-shared/' in d.getVar('S')
+    return "/work-shared/" in d.getVar("S")
 
 
 def load_spdx_license_data(d):
@@ -77,11 +77,14 @@ def process_sources(d):
     return True
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=True, order=True)
 class Dep(object):
     pn: str
     hashfn: str
     in_taskhash: bool
+
+    def to_tuple(self):
+        return (self.pn, self.hashfn, self.in_taskhash)
 
 
 def collect_direct_deps(d, dep_task):
@@ -96,6 +99,19 @@ def collect_direct_deps(d, dep_task):
 
     taskdepdata = d.getVar("BB_TASKDEPDATA", False)
 
+    # Check that the task is listed one of the task dependency flags of the
+    # current task
+    depflags = (
+        set((d.getVarFlag(current_task, "deptask") or "").split())
+        | set((d.getVarFlag(current_task, "rdeptask") or "").split())
+        | set((d.getVarFlag(current_task, "recrdeptask") or "").split())
+    )
+
+    if not dep_task in depflags:
+        bb.fatal(
+            f"Task {dep_task} was not found in any dependency flag of {pn}:{current_task}"
+        )
+
     for this_dep in taskdepdata.values():
         if this_dep[0] == pn and this_dep[1] == current_task:
             break
@@ -107,25 +123,14 @@ def collect_direct_deps(d, dep_task):
     for dep_name in this_dep.deps:
         dep_data = taskdepdata[dep_name]
         if dep_data.taskname == dep_task and dep_data.pn != pn:
-            deps.add((dep_data.pn, dep_data.hashfn, dep_name in this_dep.taskhash_deps))
+            deps.add(
+                Dep(dep_data.pn, dep_data.hashfn, dep_name in this_dep.taskhash_deps)
+            )
 
     return sorted(deps)
 
 
-def get_spdx_deps(d):
-    """
-    Reads the SPDX dependencies JSON file and returns the data
-    """
-    spdx_deps_file = Path(d.getVar("SPDXDEPS"))
-
-    deps = []
-    with spdx_deps_file.open("r") as f:
-        for d in json.load(f):
-            deps.append(Dep(*d))
-    return deps
-
-
-def collect_package_providers(d):
+def collect_package_providers(d, direct_deps):
     """
     Returns a dictionary where each RPROVIDES is mapped to the package that
     provides it
@@ -134,16 +139,15 @@ def collect_package_providers(d):
 
     providers = {}
 
-    deps = collect_direct_deps(d, "do_create_spdx")
-    deps.append((d.getVar("PN"), d.getVar("BB_HASHFILENAME"), True))
+    all_deps = direct_deps + [Dep(d.getVar("PN"), d.getVar("BB_HASHFILENAME"), True)]
 
-    for dep_pn, dep_hashfn, _ in deps:
+    for dep in all_deps:
         localdata = d
-        recipe_data = oe.packagedata.read_pkgdata(dep_pn, localdata)
+        recipe_data = oe.packagedata.read_pkgdata(dep.pn, localdata)
         if not recipe_data:
             localdata = bb.data.createCopy(d)
             localdata.setVar("PKGDATA_DIR", "${PKGDATA_DIR_SDK}")
-            recipe_data = oe.packagedata.read_pkgdata(dep_pn, localdata)
+            recipe_data = oe.packagedata.read_pkgdata(dep.pn, localdata)
 
         for pkg in recipe_data.get("PACKAGES", "").split():
             pkg_data = oe.packagedata.read_subpkgdata_dict(pkg, localdata)
@@ -160,7 +164,7 @@ def collect_package_providers(d):
                 rprovides.add(pkg)
 
             for r in rprovides:
-                providers[r] = (pkg, dep_hashfn)
+                providers[r] = (pkg, dep.hashfn)
 
     return providers
 
@@ -191,25 +195,21 @@ def get_patched_src(d):
             bb.build.exec_func("do_unpack", d)
 
             if d.getVar("SRC_URI") != "":
-                if bb.data.inherits_class('dos2unix', d):
-                    bb.build.exec_func('do_convert_crlf_to_lf', d)
+                if bb.data.inherits_class("dos2unix", d):
+                    bb.build.exec_func("do_convert_crlf_to_lf", d)
                 bb.build.exec_func("do_patch", d)
 
         # Copy source from work-share to spdx_workdir
         if is_work_shared_spdx(d):
-            share_src = d.getVar('S')
+            share_src = d.getVar("S")
             d.setVar("WORKDIR", spdx_workdir)
             d.setVar("STAGING_DIR_NATIVE", spdx_sysroot_native)
             # Copy source to ${SPDXWORK}, same basename dir of ${S};
-            src_dir = (
-                spdx_workdir
-                + "/"
-                + os.path.basename(share_src)
-            )
+            src_dir = spdx_workdir + "/" + os.path.basename(share_src)
             # For kernel souce, rename suffix dir 'kernel-source'
             # to ${BP} (${BPN}-${PV})
             if bb.data.inherits_class("kernel", d):
-                src_dir = spdx_workdir + "/" + d.getVar('BP')
+                src_dir = spdx_workdir + "/" + d.getVar("BP")
 
             bb.note(f"copyhardlinktree {share_src} to {src_dir}")
             oe.path.copyhardlinktree(share_src, src_dir)
@@ -222,7 +222,9 @@ def get_patched_src(d):
 
 
 def has_task(d, task):
-    return bool(d.getVarFlag(task, "task", False)) and not bool(d.getVarFlag(task, "noexec", False))
+    return bool(d.getVarFlag(task, "task", False)) and not bool(
+        d.getVarFlag(task, "noexec", False)
+    )
 
 
 def fetch_data_to_uri(fd, name):
@@ -232,8 +234,8 @@ def fetch_data_to_uri(fd, name):
     uri = fd.type
 
     # crate: is not a valid URL.  Use url field instead if exist
-    if uri == "crate" and hasattr(fd,"url"):
-       return fd.url
+    if uri == "crate" and hasattr(fd, "url"):
+        return fd.url
 
     # Map gitsm to git, since gitsm:// is not a valid URI protocol
     if uri == "gitsm":
@@ -248,11 +250,13 @@ def fetch_data_to_uri(fd, name):
 
     return uri
 
-def is_compiled_source (filename, compiled_sources, types):
+
+def is_compiled_source(filename, compiled_sources, types):
     """
     Check if the file is a compiled file
     """
     import os
+
     # If we don't have compiled source, we assume all are compiled.
     if not compiled_sources:
         return True
@@ -267,11 +271,13 @@ def is_compiled_source (filename, compiled_sources, types):
     # Check that the file is in the list
     return filename in compiled_sources
 
+
 def get_compiled_sources(d):
     """
     Get list of compiled sources from debug information and normalize the paths
     """
     import itertools
+
     source_info = oe.package.read_debugsources_info(d)
     if not source_info:
         bb.debug(1, "Do not have debugsources.list. Skipping")

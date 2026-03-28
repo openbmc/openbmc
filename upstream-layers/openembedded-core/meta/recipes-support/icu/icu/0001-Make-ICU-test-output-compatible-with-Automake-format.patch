@@ -25,7 +25,7 @@ diff --git a/configure.ac b/configure.ac
 index da4f170..514fa0c 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1165,6 +1165,21 @@ If set, it will REPLACE any automatic list of libraries.],
+@@ -1103,6 +1103,21 @@ If set, it will REPLACE any automatic list of libraries.],
  		*) AC_MSG_ERROR(bad value ${enableval} for --enable-samples) ;;
  		esac],
  	samples=true)
@@ -47,7 +47,7 @@ index da4f170..514fa0c 100644
  ICU_CONDITIONAL(SAMPLES, test "$samples" = true)
  
  ICUDATA_CHAR=$U_ENDIAN_CHAR
-@@ -1428,3 +1443,5 @@ then
+@@ -1366,3 +1381,5 @@ then
  fi
  
  $as_unset _CXX_CXXSUFFIX
@@ -57,7 +57,7 @@ diff --git a/test/intltest/intltest.cpp b/test/intltest/intltest.cpp
 index 33829b0..bf3ef56 100644
 --- a/test/intltest/intltest.cpp
 +++ b/test/intltest/intltest.cpp
-@@ -830,11 +830,19 @@ UBool IntlTest::runTestLoop( char* testname, char* par, char *baseName )
+@@ -824,11 +824,19 @@ UBool IntlTest::runTestLoop( char* testname, char* par, char *baseName )
              saveBaseLoc[0]=0; /* reset path */
              
              if (lastErrorCount == errorCount) {

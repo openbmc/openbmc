@@ -5,6 +5,7 @@
 #
 
 SYSTEMD_BOOT_CFG ?= "${S}/loader.conf"
+SYSTEMD_BOOT_ENTRIES_DIR ?= "${S}/entries"
 SYSTEMD_BOOT_ENTRIES ?= ""
 SYSTEMD_BOOT_TIMEOUT ?= "10"
 
@@ -15,7 +16,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 inherit fs-uuid
 
 python build_efi_cfg() {
-    s = d.getVar("S")
     labels = d.getVar('LABELS')
     if not labels:
         bb.debug(1, "LABELS not defined, nothing to do")
@@ -43,12 +43,14 @@ python build_efi_cfg() {
         cfgfile.write('timeout 10\n')
     cfgfile.close()
 
+    entries_dir = d.getVar('SYSTEMD_BOOT_ENTRIES_DIR')
+    if not os.path.exists(entries_dir):
+        os.makedirs(entries_dir)
+
     for label in labels.split():
         localdata = d.createCopy()
 
-        entryfile = "%s/%s.conf" % (s, label)
-        if not os.path.exists(s):
-            os.makedirs(s)
+        entryfile = "%s/%s.conf" % (entries_dir, label)
         d.appendVar("SYSTEMD_BOOT_ENTRIES", " " + entryfile)
         try:
             entrycfg = open(entryfile, "w")

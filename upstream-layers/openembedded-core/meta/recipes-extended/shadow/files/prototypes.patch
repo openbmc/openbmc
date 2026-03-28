@@ -1,0 +1,38 @@
+Give unused function arguments names as GCC 10 will fail otherwise.
+
+This is a continuation of a PR that has been merged upstream[1] but
+this merged after expiry.c[2] and logout.c[3] were removed.
+
+[1] shadow cb0ec030 ("Fix build failure on hosts with gcc 10")
+[2] shadow 2bb1b984 ("*/: expiry(1): Remove program")
+[3] shadow eec97ce4 ("Remove unused `logoutd` utility")
+
+Upstream-Status: Inappropriate [code no longer exists upstream]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff --git a/src/expiry.c b/src/expiry.c
+index 8da89bd..0abf011 100644
+--- a/src/expiry.c
++++ b/src/expiry.c
+@@ -37,7 +37,7 @@ static void process_flags (int argc, char **argv);
+  * catch_signals - signal catcher
+  */
+ static void
+-catch_signals(int)
++catch_signals(MAYBE_UNUSED int _1)
+ {
+ 	_exit (10);
+ }
+diff --git a/src/logoutd.c b/src/logoutd.c
+index c87b75c..09a24b3 100644
+--- a/src/logoutd.c
++++ b/src/logoutd.c
+@@ -116,7 +116,7 @@ static void send_mesg_to_tty (int tty_fd)
+  *	off from the system.
+  */
+ int
+-main(int argc, char *[])
++main(int argc, char *argv[])
+ {
+ 	pid_t  pid;
+ 

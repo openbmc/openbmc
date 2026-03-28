@@ -1,3 +1,8 @@
+From dda13d0d8d2de700e29582120f8202920c5cf35e Mon Sep 17 00:00:00 2001
+From: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
+Date: Tue, 18 Jun 2024 12:12:26 -0600
+Subject: [PATCH] tclibc-picolibc: Adds a new TCLIBC variant to build with
+
 Upstream-Status: Pending
 
 Picolibc uses its own specs file: picolibc.specs to facilitate compilation, this
@@ -21,14 +26,16 @@ then the paths used by the compiler will be relative to the path passed by the
 --sysroot= cmdline argument, setting back the behavior that we intended in the
 first place.
 
-
 Signed-off-by: Alejandro Enedino Hernandez Samaniego <alejandro@enedino.org>
+---
+ meson.build | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
-Index: git/meson.build
-===================================================================
---- git.orig/meson.build
-+++ git/meson.build
-@@ -622,12 +622,13 @@ else
+diff --git a/meson.build b/meson.build
+index 3323741c2..0df0768df 100644
+--- a/meson.build
++++ b/meson.build
+@@ -622,12 +622,13 @@ crt0_expr = '%{-crt0=*:crt0-%*%O; :crt0%O}'
  #
  picolibc_prefix_format = '-picolibc-prefix=*:@0@'
  picolibc_buildtype_format = '-picolibc-buildtype=*:@0@'
@@ -43,7 +50,7 @@ Index: git/meson.build
  
  #
  # Build the -isystem value
-@@ -639,10 +640,13 @@ isystem_prefix = picolibc_prefix_format.
+@@ -639,10 +640,13 @@ isystem_prefix = picolibc_prefix_format.format(prefix_include_dir)
  buildtype_include_dir = specs_prefix_format.format(get_option('includedir') / '%*')
  isystem_buildtype = picolibc_buildtype_format.format(buildtype_include_dir)
  
@@ -56,9 +63,21 @@ Index: git/meson.build
 -specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
 +specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_sysroot, isystem_gen)
  
+ gcc_dumpmachine = run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().split('\n')[0]
+ 
+@@ -651,7 +655,10 @@ cxxconfig_isystem_prefix = isystem_prefix / cxxconfig_path_postfix
+ cxxconfig_isystem_buildtype = isystem_buildtype / cxxconfig_path_postfix
+ cxxconfig_isystem_gen = isystem_gen / cxxconfig_path_postfix
+ 
+-specs_isystem = specs_isystem + ' -isystem ' + specs_option_format.format(cxxconfig_isystem_prefix, cxxconfig_isystem_buildtype, cxxconfig_isystem_gen)
++sysroot_cxx_dir = '%*'
++cxx_sysroot = sysroot_format.format(sysroot_cxx_dir)
++
++specs_isystem = specs_isystem + ' -isystem ' + specs_option_format.format(cxxconfig_isystem_prefix, cxxconfig_isystem_buildtype, cxx_sysroot, cxxconfig_isystem_gen)
+ 
  #
  # Build the non-multilib -L value
-@@ -654,10 +658,13 @@ lib_prefix = picolibc_prefix_format.form
+@@ -663,10 +670,13 @@ lib_prefix = picolibc_prefix_format.format(prefix_lib_dir)
  buildtype_lib_dir = specs_prefix_format.format(get_option('libdir') / '%*')
  lib_buildtype = picolibc_buildtype_format.format(buildtype_lib_dir)
  
@@ -73,7 +92,7 @@ Index: git/meson.build
  
  #
  # Build the non-multilib *startfile options
-@@ -669,6 +676,9 @@ crt0_prefix = picolibc_prefix_format.for
+@@ -678,6 +688,9 @@ crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
  buildtype_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*' / crt0_expr)
  crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
  
@@ -83,7 +102,7 @@ Index: git/meson.build
  gen_crt0_path = specs_prefix_format.format(get_option('libdir') / crt0_expr)
  crt0_gen = gen_format.format(gen_crt0_path)
  
-@@ -686,10 +696,13 @@ if enable_multilib
+@@ -695,10 +708,13 @@ if enable_multilib
    buildtype_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%*/%M')
    multilib_buildtype = picolibc_buildtype_format.format(buildtype_multilib_dir)
  
@@ -98,7 +117,7 @@ Index: git/meson.build
  
    #
    # Prepend the multilib -L option to the non-multilib option
-@@ -705,6 +718,9 @@ if enable_multilib
+@@ -714,6 +730,9 @@ if enable_multilib
    buildtype_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
    crt0_buildtype = picolibc_buildtype_format.format(buildtype_multilib_crt0_path)
  
@@ -108,7 +127,7 @@ Index: git/meson.build
    gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
    crt0_gen = gen_format.format(gen_multilib_crt0_path)
  endif
-@@ -714,7 +730,7 @@ endif
+@@ -723,7 +742,7 @@ endif
  # above. As there's only one value, it's either the
  # multilib path or the non-multilib path
  #

@@ -1,16 +1,7 @@
-#!/bin/sh
-# pkgconf wrapper to deal with pkg-config/pkgconf compatibility issues
-#
-# Copyright (C) 2015 Christopher Larson <chris_larson@mentor.com>
-# License: MIT (see COPYING.MIT at the root of the repository for terms)
+#! /bin/sh
 
-for arg; do
-    case "$arg" in
-        --variable|--variable=*)
-            # pkg-config doesn't sysroot-prefix user variables
-            unset PKG_CONFIG_SYSROOT_DIR
-            ;;
-    esac
-done
+# Tell pkgconf to use pkgconfig behaviour when dealing with the sysroot to ease
+# migration.
+export PKG_CONFIG_FDO_SYSROOT_RULES="1"
 
 exec pkgconf "$@"

@@ -247,15 +247,15 @@ python () {
             bb.debug(1, "Appending '%s' to UBOOT_CONFIG_FRAGMENTS." % fragments)
             d.appendVar('UBOOT_CONFIG_FRAGMENTS', fragments + " ? ")
 
-            # This recipe might be inherited e.g. by the kernel recipe via kernel-fitimage.bbclass
-            # Ensure the uboot specific menuconfig settings do not leak into other recipes
-            if 'u-boot' in recipename:
-                if len(ubootconfig) == 1:
-                    builddir = "%s-%s" % (d.getVar("UBOOT_MACHINE").strip(), config)
-                    d.setVar('KCONFIG_CONFIG_ROOTDIR', os.path.join("${B}", builddir))
-                else:
-                    # Disable menuconfig for multiple configs
-                    d.setVar('KCONFIG_CONFIG_ENABLE_MENUCONFIG', "false")
+        # This recipe might be inherited e.g. by the kernel recipe via kernel-fitimage.bbclass
+        # Ensure the uboot specific menuconfig settings do not leak into other recipes
+        if 'u-boot' in recipename:
+            if len(ubootconfig) == 1:
+                builddir = "%s-%s" % (d.getVar("UBOOT_MACHINE").strip(), config)
+                d.setVar('KCONFIG_CONFIG_ROOTDIR', os.path.join("${B}", builddir))
+            else:
+                # Disable menuconfig for multiple configs
+                d.setVar('KCONFIG_CONFIG_ENABLE_MENUCONFIG', "false")
 }
 
 uboot_config_get_indexed_value () {

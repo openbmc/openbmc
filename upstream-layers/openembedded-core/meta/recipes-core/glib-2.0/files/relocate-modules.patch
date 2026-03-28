@@ -13,32 +13,39 @@ Signed-off-by: Ross Burton <ross.burton@intel.com>
 
 Port patch to 2.48
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
+
+Port patch to 2.88
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
 ---
- gio/giomodule.c | 7 -------
- 1 file changed, 7 deletions(-)
+ gio/giomodule.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/gio/giomodule.c b/gio/giomodule.c
 index 38761e4..afa7878 100644
 --- a/gio/giomodule.c
 +++ b/gio/giomodule.c
-@@ -1272,11 +1272,6 @@ get_gio_module_dir (void)
-       g_free (install_dir);
+@@ -1312,6 +1312,24 @@ get_gio_module_dir (void)
+       module_dir = get_gio_module_dir_darwin ();
  #else
        module_dir = g_strdup (GIO_MODULE_DIR);
--#ifdef __APPLE__
--#include "TargetConditionals.h"
--/* Only auto-relocate on macOS, not watchOS etc; older macOS SDKs only define TARGET_OS_MAC */
--#if (defined (TARGET_OS_OSX) && TARGET_OS_OSX) || \
--     (!defined (TARGET_OS_OSX) && defined (TARGET_OS_MAC) && TARGET_OS_MAC)
- #include <dlfcn.h>
-       {
-         g_autofree gchar *path = NULL;
-@@ -1295,8 +1290,6 @@ get_gio_module_dir (void)
-               }
-           }
-       }
--#endif
--#endif
++#include <dlfcn.h>
++      {
++        g_autofree gchar *path = NULL;
++        g_autofree gchar *possible_dir = NULL;
++        Dl_info info;
++
++        if (dladdr (get_gio_module_dir, &info))
++          {
++            /* Gets path to the PREFIX/lib directory */
++            path = g_path_get_dirname (info.dli_fname);
++            possible_dir = g_build_filename (path, "gio", "modules", NULL);
++            if (g_file_test (possible_dir, G_FILE_TEST_IS_DIR))
++              {
++                g_free (module_dir);
++                module_dir = g_steal_pointer (&possible_dir);
++              }
++          }
++      }
  #endif
      }
  

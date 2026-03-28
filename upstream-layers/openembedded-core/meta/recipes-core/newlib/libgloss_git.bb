@@ -23,9 +23,18 @@ do_install:append() {
 
         # Remove original directory
         rmdir -p --ignore-fail-on-non-empty ${D}${prefix}/${TARGET_SYS}/lib
-        # Remove empty include dir
-        rmdir ${D}/${prefix}/${TARGET_SYS}/include
-        rmdir ${D}/${prefix}/${TARGET_SYS}/
+
+        # RiscV machines install header files into ${D}/${prefix}/${TARGET_SYS}/include/machine
+        # move their contents into ${includedir}
+        if [ "$(ls -A ${D}/${prefix}/${TARGET_SYS}/include/machine 2>/dev/null)" ]; then
+              mkdir ${D}/${includedir}
+              mv ${D}/${prefix}/${TARGET_SYS}/include/machine/* ${D}/${includedir}
+              rmdir -p --ignore-fail-on-non-empty ${D}${prefix}/${TARGET_SYS}/include/machine
+        fi
+        if [ -d "${D}/${prefix}/${TARGET_SYS}/include" ]; then
+            rmdir -p --ignore-fail-on-non-empty ${D}${prefix}/${TARGET_SYS}/include
+        fi
+
 
 }
 

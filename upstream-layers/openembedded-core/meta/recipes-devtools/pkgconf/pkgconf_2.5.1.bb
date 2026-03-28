@@ -22,7 +22,13 @@ SRC_URI = "\
 "
 SRC_URI[sha256sum] = "cd05c9589b9f86ecf044c10a2269822bc9eb001eced2582cfffd658b0a50c243"
 
-inherit autotools
+inherit autotools pkgconfig
+
+# Tell the native pkgconf to use directories that don't exist, so we _need_ to
+# tell it the paths with environment variables.
+EXTRA_OECONF:append:class-native = " --with-pkg-config-dir='/not/exist' \
+                                     --with-system-includedir=/not/exist/include \
+                                     --with-system-libdir=/not/exist/lib"
 
 do_install:append () {
     # Install a wrapper which deals, as much as possible with pkgconf vs

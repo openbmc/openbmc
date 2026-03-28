@@ -23,8 +23,7 @@ GTKDOC_MESON_OPTION = "gtk_doc"
 
 MULTILIB_SCRIPTS = "${PN}-tools:${bindir}/g-ir-annotation-tool ${PN}-tools:${bindir}/g-ir-scanner"
 
-# setuptools are required to provide distutils to build the tools
-DEPENDS += " libffi zlib python3 python3-setuptools flex-native bison-native"
+DEPENDS += " libffi zlib flex-native bison-native"
 DEPENDS:append:class-native = " glib-2.0"
 DEPENDS:append:class-target = " glib-2.0-initial"
 
@@ -114,6 +113,8 @@ EOF
 do_compile:prepend() {
         # Needed to run g-ir unit tests, which won't be able to find the built libraries otherwise
         export GIR_EXTRA_LIBS_PATH=$B/.libs
+        # This prevents g-ir-scanner from writing cache data to $HOME
+        export GI_SCANNER_DISABLE_CACHE=1
 }
 
 do_install:prepend() {

@@ -4,7 +4,8 @@
 #
 # Attempt to mount any added block devices and umount any removed devices
 
-BASE_INIT="`readlink -f "@base_sbindir@/init"`"
+INITNAME=`cat /proc/1/cmdline`
+BASE_INIT="`readlink -f ${INITNAME}`"
 INIT_SYSTEMD="@systemd_unitdir@/systemd"
 MOUNT_BASE="@MOUNT_BASE@"
 
@@ -165,7 +166,7 @@ automount() {
 		echo "$name" > "/tmp/.automount-$name"
 	fi
 }
-	
+
 rm_dir() {
 	# We do not want to rm -r populated directories
 	if test "`find "$1" | wc -l | tr -d " "`" -lt 2 -a -d "$1"

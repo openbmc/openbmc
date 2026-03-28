@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://iptables/iptables.c;beginline=13;endline=25;md5=c5cffd09974558cf27d0f763df2a12dc \
 "
 
-SRC_URI = "http://netfilter.org/projects/iptables/files/iptables-${PV}.tar.xz \
+SRC_URI = "http://netfilter.org/pub/iptables/iptables-${PV}.tar.xz \
            file://iptables.service \
            file://iptables.rules \
            file://ip6tables.service \
