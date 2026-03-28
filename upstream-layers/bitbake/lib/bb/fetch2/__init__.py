@@ -1634,6 +1634,9 @@ class FetchMethod(object):
 
         return
 
+    def unpack_update(self, urldata, rootdir, data):
+        raise RuntimeError("No method available for this url type: %s" % urldata.type)
+
     def clean(self, urldata, d):
         """
         Clean any existing full or partial download
@@ -1990,7 +1993,7 @@ class Fetch(object):
             if not ret:
                 raise FetchError("URL doesn't work", u)
 
-    def unpack(self, root, urls=None):
+    def unpack(self, root, urls=None, update=False):
         """
         Unpack urls to root
         """
@@ -2009,7 +2012,10 @@ class Fetch(object):
                     lf = bb.utils.lockfile(ud.lockfile)
 
                 unpack_tracer.start_url(u)
-                ud.method.unpack(ud, root, self.d)
+                if update:
+                    ud.method.unpack_update(ud, root, self.d)
+                else:
+                    ud.method.unpack(ud, root, self.d)
                 unpack_tracer.finish_url(u)
 
             finally:
@@ -2017,6 +2023,9 @@ class Fetch(object):
                     bb.utils.unlockfile(lf)
 
         unpack_tracer.complete()
+
+    def unpack_update(self, root, urls=None):
+        self.unpack(root, urls, update=True)
 
     def clean(self, urls=None):
         """

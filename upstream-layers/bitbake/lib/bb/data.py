@@ -367,7 +367,7 @@ def build_dependencies(key, keys, mod_funcs, shelldeps, varflagsexcl, ignored_va
     except bb.parse.SkipRecipe:
         raise
     except Exception as e:
-        bb.warn("Exception during build_dependencies for %s" % key)
+        bb.warn("Exception during build_dependencies for %s: %s" % (key, repr(e)))
         raise
     return frozenset(deps), value
     #bb.note("Variable %s references %s and calls %s" % (key, str(deps), str(execs)))

@@ -8,14 +8,25 @@
 
 import datetime
 import os
+import subprocess
 import sys
 
 from pathlib import Path
+
+# Test that we are building from a Git repository
+try:
+    subprocess.run(["git", "rev-parse", "--is-inside-work-tree"],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+except subprocess.CalledProcessError:
+    sys.exit("Building bitbake's documentation must be done from its Git repository.\n"
+             "Clone the repository with the following command:\n"
+             "git clone https://git.openembedded.org/bitbake ")
 
 sys.path.insert(0, os.path.abspath('.'))
 import setversions
 
 current_version = setversions.get_current_version()
+print(f"Version calculated to be {current_version}")
 
 # String used in sidebar
 version = 'Version: ' + current_version
@@ -27,6 +38,8 @@ release = current_version
 setversions.write_switchers_js("sphinx-static/switchers.js.in",
                                "sphinx-static/switchers.js",
                                current_version)
+
+setversions.write_releases_rst("releases.rst")
 
 # -- Project information -----------------------------------------------------
 

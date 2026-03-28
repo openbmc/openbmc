@@ -475,9 +475,9 @@ class Git(FetchMethod):
                 bb.fetch2.check_network_access(d, fetch_cmd, ud.url)
             progresshandler = GitProgressHandler(d)
             runfetchcmd(fetch_cmd, d, log=progresshandler, workdir=ud.clonedir)
-            runfetchcmd("%s prune-packed" % ud.basecmd, d, workdir=ud.clonedir)
+            runfetchcmd("%s repack -adk" % ud.basecmd, d, workdir=ud.clonedir)
             runfetchcmd("%s pack-refs --all" % ud.basecmd, d, workdir=ud.clonedir)
-            runfetchcmd("%s pack-redundant --all | xargs -r rm" % ud.basecmd, d, workdir=ud.clonedir)
+            runfetchcmd("%s prune-packed" % ud.basecmd, d, workdir=ud.clonedir)
             try:
                 os.unlink(ud.fullmirror)
             except OSError as exc:
@@ -656,7 +656,10 @@ class Git(FetchMethod):
         # The url is local ud.clonedir, set it to upstream one
         runfetchcmd("%s remote set-url origin %s" % (ud.basecmd, shlex.quote(repourl)), d, workdir=dest)
 
-    def unpack(self, ud, destdir, d):
+    def unpack_update(self, ud, destdir, d):
+        return self.unpack(ud, destdir, d, update=True)
+
+    def unpack(self, ud, destdir, d, update=False):
         """ unpack the downloaded src to destdir"""
 
         subdir = ud.parm.get("subdir")
@@ -680,7 +683,7 @@ class Git(FetchMethod):
 
         destsuffix = ud.parm.get("destsuffix", def_destsuffix)
         destdir = ud.destdir = os.path.join(destdir, destsuffix)
-        if os.path.exists(destdir):
+        if os.path.exists(destdir) and not update:
             bb.utils.prunedir(destdir)
         if not ud.bareclone:
             ud.unpack_tracer.unpack("git", destdir)
@@ -691,11 +694,15 @@ class Git(FetchMethod):
             ud.basecmd = "GIT_LFS_SKIP_SMUDGE=1 " + ud.basecmd
 
         source_found = False
+        update_mode = False
         source_error = []
 
         clonedir_is_up_to_date = not self.clonedir_need_update(ud, d)
         if clonedir_is_up_to_date:
-            runfetchcmd("%s clone %s %s/ %s" % (ud.basecmd, ud.cloneflags, ud.clonedir, destdir), d)
+            if update and os.path.exists(destdir):
+                update_mode = True
+            else:
+                runfetchcmd("%s clone %s %s/ %s" % (ud.basecmd, ud.cloneflags, ud.clonedir, destdir), d)
             source_found = True
         else:
             source_error.append("clone directory not available or not up to date: " + ud.clonedir)
@@ -703,8 +710,11 @@ class Git(FetchMethod):
         if not source_found:
             if ud.shallow:
                 if os.path.exists(ud.fullshallow):
-                    bb.utils.mkdirhier(destdir)
-                    runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=destdir)
+                    if update and os.path.exists(destdir):
+                        update_mode = True
+                    else:
+                        bb.utils.mkdirhier(destdir)
+                        runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=destdir)
                     source_found = True
                 else:
                     source_error.append("shallow clone not available: " + ud.fullshallow)
@@ -713,6 +723,32 @@ class Git(FetchMethod):
 
         if not source_found:
             raise bb.fetch2.UnpackError("No up to date source found: " + "; ".join(source_error), ud.url)
+
+        if update_mode:
+            if ud.shallow:
+                raise bb.fetch2.UnpackError("Can't update shallow clones checkouts without network access, not supported.", ud.url)
+
+            output = runfetchcmd("%s status --untracked-files=no --porcelain" % (ud.basecmd), d, workdir=destdir)
+            if output:
+                raise bb.fetch2.UnpackError("Repository at %s has uncommitted changes, unable to update:\n%s" % (destdir, output), ud.url)
+
+            # Set up remote for the download location if it doesn't exist
+            try:
+                runfetchcmd("%s remote get-url dldir" % (ud.basecmd), d, workdir=destdir)
+            except bb.fetch2.FetchError:
+                if ud.clonedir:
+                    runfetchcmd("%s remote add dldir file://%s" % (ud.basecmd, ud.clonedir), d, workdir=destdir)
+            try:
+                runfetchcmd("%s fetch dldir" % (ud.basecmd), d, workdir=destdir)
+                runfetchcmd("%s rebase --no-autosquash --no-autostash %s" % (ud.basecmd, ud.revision), d, workdir=destdir)
+            except bb.fetch2.FetchError as e:
+                # If rebase failed, abort it
+                try:
+                    runfetchcmd("%s rebase --abort" % (ud.basecmd), d, workdir=destdir)
+                except Exception:
+                    pass
+                raise bb.fetch2.UnpackError("Failed to update checkout in place: %s" % str(e), ud.url)
+            return True
 
         # If there is a tag parameter in the url and we also have a fixed srcrev, check the tag
         # matches the revision
@@ -729,6 +765,11 @@ class Git(FetchMethod):
 
         repourl = self._get_repo_url(ud)
         runfetchcmd("%s remote set-url origin %s" % (ud.basecmd, shlex.quote(repourl)), d, workdir=destdir)
+        if ud.clonedir:
+            try:
+                runfetchcmd("%s remote get-url dldir" % (ud.basecmd), d, workdir=destdir)
+            except bb.fetch2.FetchError:
+                runfetchcmd("%s remote add dldir file://%s" % (ud.basecmd, ud.clonedir), d, workdir=destdir)
 
         if self._contains_lfs(ud, d, destdir):
             if not need_lfs:

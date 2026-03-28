@@ -191,39 +191,6 @@ def checkout_layers(layers, confdir, layerdir, d):
         logger.plain("Making a symbolic link {} pointing to {}".format(dst, src))
         os.symlink(src, dst)
 
-    def _has_local_modifications(r_name, r_path):
-        fixed_revisions = json.load(open(os.path.join(confdir, "sources-fixed-revisions.json")))
-
-        if not r_name in fixed_revisions['sources']:
-            logger.warning("""Source {} is added with path {}.
-This path already exists, but it has no entry in a fixed revisions
-record. To ensure possible local modifications are not lost, it will
-be preserved in a backup directory.""".format(r_name, r_path))
-            return True
-
-        rev = fixed_revisions['sources'][r_name]['git-remote']['rev']
-        status = bb.process.run('git -C {} status --porcelain'.format(r_path))[0]
-        if status:
-            return True
-        diff = bb.process.run('git -C {} diff {} {}'.format(r_path, get_diff_color_param(), rev))[0]
-        if diff:
-            return True
-        return False
-
-    def _restrict_commits(r_name, r_path):
-        hook_path = os.path.join(r_path, '.git', 'hooks', 'pre-commit')
-        restrict_hook = """#!/bin/sh
-echo "This repository is managed by bitbake-setup, and making commits is restricted.
-If you wish to make local modifications, clone it separately, and re-initialize using
-bitbake-setup init -L {} /path/to/repo/checkout"
-exit 1
-""".format(r_name)
-        with open(hook_path, 'w') as f:
-            f.write(restrict_hook)
-        import stat
-        st = os.stat(hook_path)
-        os.chmod(hook_path, st.st_mode | stat.S_IEXEC)
-
     layers_fixed_revisions = copy.deepcopy(layers)
     repodirs = []
     oesetupbuild = None
@@ -242,19 +209,16 @@ exit 1
         if os.path.lexists(repodir_path):
             if os.path.islink(repodir_path):
                 os.remove(repodir_path)
-            elif _has_local_modifications(r_name, repodir_path):
+            elif r_local:
                 backup_path = add_unique_timestamp_to_path(repodir_path + '-backup')
                 logger.warning("""Source {} in {} contains local modifications. Renaming to {} to preserve them.
 For local development work it is recommended to clone the needed layers separately and re-initialize using -L option:
 bitbake-setup init -L {} /path/to/repo/checkout""".format(
                     r_name, repodir_path, backup_path, r_name))
                 os.rename(repodir_path, backup_path)
-            else:
-                shutil.rmtree(repodir_path)
 
         if r_remote:
             _checkout_git_remote(r_remote, repodir, layers_fixed_revisions)
-            _restrict_commits(r_name, repodir_path)
         if r_local:
             _symlink_local(os.path.expanduser(r_local["path"]), repodir_path)
 
@@ -830,7 +794,7 @@ def do_fetch(fetcher, dir):
         oldstdout = sys.stdout
         sys.stdout = f
         fetcher.download()
-        fetcher.unpack(dir)
+        fetcher.unpack_update(dir)
         sys.stdout = oldstdout
 
 def update_registry(registry, cachedir, d):
@@ -934,6 +898,31 @@ def create_siteconf(top_dir, non_interactive, settings):
 
         os.makedirs(top_dir, exist_ok=True)
         with open(siteconfpath, 'w') as siteconffile:
+            sstate_settings = textwrap.dedent(
+                """
+                #
+                # Where to place shared-state files
+                #
+                # BitBake has the capability to accelerate builds based on previously built output.
+                # This is done using "shared state" files which can be thought of as cache objects
+                # and this option determines where those files are placed.
+                #
+                # You can wipe out TMPDIR leaving this directory intact and the build would regenerate
+                # from these files if no changes were made to the configuration. If changes were made
+                # to the configuration, only shared state files where the state was still valid would
+                # be used (done using checksums).
+                SSTATE_DIR ?= "{sstate_dir}"
+                #
+                # Hash Equivalence database location
+                #
+                # Hash equivalence improves reuse of sstate by detecting when a given sstate
+                # artifact can be reused as equivalent, even if the current task hash doesn't
+                # match the one that generated the artifact. This variable controls where the
+                # Hash Equivalence database ("hashserv.db") is stored and can be shared between
+                # concurrent builds.
+                BB_HASHSERVE_DB_DIR ?= "${{SSTATE_DIR}}"
+                """.format(sstate_dir=os.path.join(top_dir, ".sstate-cache"))
+            )
             siteconffile.write(
                 textwrap.dedent(
                     """\
@@ -951,7 +940,7 @@ def create_siteconf(top_dir, non_interactive, settings):
                     """.format(
                         dl_dir=settings["default"]["dl-dir"],
                     )
-                )
+                ) + (sstate_settings if settings["default"]["common-sstate"] == 'yes' else "")
             )
 
 
@@ -1162,6 +1151,7 @@ def main():
                          'top-dir-name':'bitbake-builds',
                          'registry':get_default_registry(),
                          'use-full-setup-dir-name':'no',
+                         'common-sstate':'yes',
                          }
 
         global_settings = load_settings(global_settings_path(args))

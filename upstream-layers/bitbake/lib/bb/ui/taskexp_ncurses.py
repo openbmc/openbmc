@@ -146,6 +146,9 @@ def debug_frame(nbox_ojb):
 unit_test = os.environ.get('TASK_EXP_UNIT_TEST')
 unit_test_cmnds=[
     '# Default selected task in primary box',
+    'tst_selected=<TASK>.do_create_recipe_spdx',
+    '# Move to next entry, more predictable',
+    'tst_entry=<DOWN>',  # optional injected error
     'tst_selected=<TASK>.do_recipe_qa',
     '# Default selected task in deps',
     'tst_entry=<TAB>',

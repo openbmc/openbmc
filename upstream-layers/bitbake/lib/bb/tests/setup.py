@@ -447,16 +447,27 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
             self.assertEqual(self.testrepopath, os.path.realpath(custom_layer_path))
             self.config_is_unchanged(custom_setup_path)
 
+        def _check_layer_backups(layer_path, expected_backups):
+            files = os.listdir(layer_path)
+            backups = len([f for f in files if 'backup' in f])
+            self.assertEqual(backups, expected_backups, msg = "Expected {} layer backups, got {}, directory listing: {}".format(expected_backups, backups, files))
+
         # Change the configuration to refer to a local source, then to another local source, then back to a git remote
         # Run status/update after each change and verify that nothing breaks
+        # Also check that layer backups happen when expected
         c = 'gadget'
         setuppath = self.get_setup_path('test-config-1', c)
         self.config_is_unchanged(setuppath)
+
+        layers_path = os.path.join(setuppath, 'layers')
+        layer_path = os.path.join(layers_path, 'test-repo')
+        _check_layer_backups(layers_path, 0)
 
         json_1 = self.add_local_json_config_to_registry('test-config-1.conf.json', self.testrepopath)
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
         out = self.runbbsetup("update --update-bb-conf='yes'")
         _check_local_sources(setuppath)
+        _check_layer_backups(layers_path, 1)
 
         prev_path = self.testrepopath
         self.testrepopath = prev_path + "-2"
@@ -465,23 +476,14 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
         out = self.runbbsetup("update --update-bb-conf='yes'")
         _check_local_sources(setuppath)
+        _check_layer_backups(layers_path, 1)
 
         self.testrepopath = prev_path
         json_1 = self.add_json_config_to_registry('test-config-1.conf.json', branch, branch)
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
         out = self.runbbsetup("update --update-bb-conf='yes'")
         self.check_setupdir_files(setuppath, test_file_content)
-
-        # Also check that there are no layer backups up to this point, then make a change that should
-        # result in a layer backup, and check that it does happen.
-        def _check_layer_backups(layer_path, expected_backups):
-            files = os.listdir(layer_path)
-            backups = len([f for f in files if 'backup' in f])
-            self.assertEqual(backups, expected_backups, msg = "Expected {} layer backups, got {}, directory listing: {}".format(expected_backups, backups, files))
-
-        layers_path = os.path.join(setuppath, 'layers')
-        layer_path = os.path.join(layers_path, 'test-repo')
-        _check_layer_backups(layers_path, 0)
+        _check_layer_backups(layers_path, 1)
 
         ## edit a file without making a commit
         with open(os.path.join(layer_path, 'local-modification'), 'w') as f:
@@ -492,16 +494,26 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         out = self.runbbsetup("update --update-bb-conf='yes'")
         _check_layer_backups(layers_path, 1)
 
-        ## edit a file and try to make a commit; this should be rejected
+        ## edit a file and make a commit such that no rebase conflicts occur
         with open(os.path.join(layer_path, 'local-modification'), 'w') as f:
             f.write('locally-modified-again\n')
         self.git('add .', cwd=layer_path)
-        with self.assertRaisesRegex(bb.process.ExecutionError, "making commits is restricted"):
-            self.git('commit -m "Adding a local modification"', cwd=layer_path)
+        self.git('commit -m "Adding a local modification"', cwd=layer_path)
         test_file_content = "modified-again-and-again\n"
         self.add_file_to_testrepo('test-file', test_file_content)
         out = self.runbbsetup("update --update-bb-conf='yes'")
-        _check_layer_backups(layers_path, 2)
+        _check_layer_backups(layers_path, 1)
+
+        ## edit a file and make a commit in a way that causes a rebase conflict
+        with open(os.path.join(layer_path, 'test-file'), 'w') as f:
+            f.write('locally-modified\n')
+        self.git('add .', cwd=layer_path)
+        self.git('commit -m "Adding a local modification"', cwd=layer_path)
+        test_file_content = "remotely-modified\n"
+        self.add_file_to_testrepo('test-file', test_file_content)
+        with self.assertRaisesRegex(bb.process.ExecutionError, "Merge conflict in test-file"):
+            out = self.runbbsetup("update --update-bb-conf='yes'")
+        _check_layer_backups(layers_path, 1)
 
         # check source overrides, local sources provided with symlinks, and custom setup dir name
         source_override_content = """

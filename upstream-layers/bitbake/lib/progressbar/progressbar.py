@@ -278,6 +278,9 @@ class ProgressBar(object):
         self.last_update_time = now
         return output
 
+    def clear(self):
+        self.fd.write(" " * self.term_width + '\r')
+        self.fd.flush()
 
     def start(self, update=True):
         """Starts measuring time, and prints the bar at 0%.

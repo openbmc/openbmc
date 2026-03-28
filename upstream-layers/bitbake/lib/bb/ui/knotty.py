@@ -87,6 +87,7 @@ class NonInteractiveProgress(object):
     def __init__(self, msg, maxval):
         self.id = msg
         self.msg = msg
+        self.currval = 0
         self.maxval = maxval
         self.finished = False
 
@@ -96,6 +97,10 @@ class NonInteractiveProgress(object):
         return self
 
     def update(self, value):
+        self.currval = value
+        pass
+
+    def clear(self):
         pass
 
     def finish(self):
@@ -791,7 +796,12 @@ def main(server, eventHandler, params, tf = TerminalFilter):
                         event.msg = taskinfo['title'] + ': ' + event.msg
                 if hasattr(event, 'fn') and event.levelno not in [bb.msg.BBLogFormatter.WARNONCE, bb.msg.BBLogFormatter.ERRORONCE]:
                     event.msg = event.fn + ': ' + event.msg
+                # Need to remove any progress bar, then add it back after we print this message
+                if parseprogress:
+                    parseprogress.clear()
                 logging.getLogger(event.name).handle(event)
+                if parseprogress:
+                    parseprogress.update(parseprogress.currval)
                 continue
 
             if isinstance(event, bb.build.TaskFailedSilent):

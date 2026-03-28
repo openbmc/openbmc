@@ -516,6 +516,7 @@ A valid settings file would for example be:
    registry = /path/to/bitbake/default-registry
    dl-dir = /path/to/bitbake-setup-downloads
    use-full-setup-dir-name = yes
+   common-sstate = yes
 
 Settings and their values can be listed and modified with the ``bitbake-setup
 settings`` command. See the :ref:`ref-bbsetup-command-settings` section for
@@ -619,6 +620,24 @@ will override the suggestions for the :term:`Setup` directory name made by
 ``setup-dir-name`` entries in :term:`Configuration Template` files. This
 will make the directory names longer, but fully specific: they will contain
 all selections made during initialization.
+
+.. _ref-bbsetup-setting-common-sstate:
+
+``common-sstate``
+-----------------
+
+When this setting is set to ``yes`` (which is also the default), bitbake-setup will
+set up a common sstate directory and common hash equivalency database for all the
+:term:`setups <Setup>` in a :term:`Top Directory`. This is very beneficial for speeding
+up builds as build artefacts will be reused whenever possible between them.
+
+Set this to ``no`` for advanced use cases, such as placing the sstate directory on a NFS
+mount and maintaining a separate hash equivalency server, so that sstate and hash equivalency
+data can be shared between several computers. For such use cases the sstate settings need
+to be added to a build configuration separately.
+
+See https://docs.yoctoproject.org/dev-manual/hashequivserver.html for how to share sstate
+on the network.
 
 .. _ref-bbsetup-section-config-reference:
 
