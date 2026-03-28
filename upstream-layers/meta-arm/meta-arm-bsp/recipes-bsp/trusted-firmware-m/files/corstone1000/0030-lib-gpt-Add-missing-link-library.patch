@@ -1,0 +1,27 @@
+From 343bba6c20802555dfb92c3e2b22a7e07c10a57a Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:16:00 +0000
+Subject: [PATCH] lib: gpt: Add missing link library
+
+tfm_log requires tfm_vprintf. When building for a platform with logging
+enabled, these headers are therefore required.
+
+Change-Id: I63b35d5af818ea5ad7b1fe76200250ad98584a63
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [92a3738634fe121766705599d66e4a8b772ce06e]
+---
+ lib/gpt/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/lib/gpt/CMakeLists.txt b/lib/gpt/CMakeLists.txt
+index 5befc346f..ed31adfbe 100644
+--- a/lib/gpt/CMakeLists.txt
++++ b/lib/gpt/CMakeLists.txt
+@@ -36,6 +36,7 @@ target_compile_definitions(tfm_gpt
+ target_link_libraries(tfm_gpt
+     PUBLIC
+         tfm_log_headers
++        tfm_vprintf_headers
+     PRIVATE
+         tfm_efi_guid
+         tfm_efi_soft_crc

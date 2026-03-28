@@ -26,7 +26,7 @@ EXTRA_OECMAKE:append:cortexa320 = " \
 
 EXTRA_OECMAKE += "-DPLATFORM_IS_FVP=${TFM_PLATFORM_IS_FVP}"
 EXTRA_OECMAKE += "-DCC312_LEGACY_DRIVER_API_ENABLED=OFF"
-EXTRA_OECMAKE:append:corstone1000-fvp = " -DENABLE_MULTICORE=${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_fvp_smp', 'TRUE', 'FALSE', d)}"
+EXTRA_OECMAKE:append = " -DENABLE_MULTICORE=${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_smp', 'TRUE', 'FALSE', d)}"
 EXTRA_OECMAKE:append:corstone1000-mps3 = " -DPLATFORM_PSA_ADAC_SECURE_DEBUG=${@bb.utils.contains('MACHINE_FEATURES', 'secure-debug', 'ON', 'OFF', d)}"
 EXTRA_OECMAKE:append:corstone1000-mps3 = " -DPLATFORM_PSA_ADAC_SOURCE_PATH=${S}/external/tfm-psa-adac -DPLATFORM_PSA_ADAC_BUILD_PATH=${B}/tfm-psa-adac-build"
 
@@ -46,6 +46,35 @@ SRC_URI:append:corstone1000 = " \
     file://0012-bl2-corstone-1000-secure-debug-waiting-in-CM-LCS.patch \
     file://0013-Build-adjust-CS1000-platform-for-GCC-v14.2.patch \
     file://0014-Workaround-compile-errors-in-AES.patch \
+    file://0015-CC312-Add-barrier-before-first-AO-lock-write.patch \
+    file://0016-Platform-CS1K-make-mutlicore-support-platform-generi.patch \
+    file://0017-lib-efi_guid-Added-EFI-GUID-library.patch \
+    file://0018-lib-efi_soft_crc-Added-EFI-CRC-library.patch \
+    file://0019-lib-gpt-Implemented-generic-GPT-parser-for-flash.patch \
+    file://0020-lib-gpt-Expanded-how-GPT-partition-can-be-identified.patch \
+    file://0021-lib-gpt-Added-operations-to-modify-partitions.patch \
+    file://0022-lib-gpt-Added-operation-to-move-entry.patch \
+    file://0023-lib-gpt-Added-ability-to-create-and-remove-partition.patch \
+    file://0024-lib-gpt-Added-table-validation-operations.patch \
+    file://0025-lib-gpt-Added-defragmentation-operation.patch \
+    file://0026-lib-GPT-Fix-cppcheck-warnings.patch \
+    file://0027-lib-efi_guid-Remove-unecessary-include-folder.patch \
+    file://0028-lib-efi_guid-Correct-included-folder.patch \
+    file://0029-lib-efi_soft_crc-Correct-include-directory.patch \
+    file://0030-lib-gpt-Add-missing-link-library.patch \
+    file://0031-lib-gpt-Correct-variable-name-used.patch \
+    file://0032-lib-gpt-Correct-include-directory.patch \
+    file://0033-lib-gpt-Move-contents-of-CMake-config-file.patch \
+    file://0034-plat-cs1k-Fixed-formatting-errors.patch \
+    file://0035-plat-cs1k-Removed-unused-variables.patch \
+    file://0036-plat-cs1k-Fixed-bad-function-returns.patch \
+    file://0037-plat-cs1k-Improved-logging-in-function.patch \
+    file://0038-plat-cs1k-Remove-unused-function.patch \
+    file://0039-plat-cs1k-Reduce-BL1-binary-size.patch \
+    file://0040-plat-cs1k-Update-license-identifier.patch \
+    file://0041-plat-cs1k-Changed-to-use-new-GPT-library.patch \
+    file://0042-plat-cs1k-Move-variable-from-stack-to-data.patch \
+    file://0043-plat-cs1k-Create-and-remove-FWU-image-partitions.patch \
     "
 
 SRCREV_tfm-psa-adac:corstone1000 = "f2809ae231be33a1afcd7714f40756c67d846c88"
@@ -59,7 +88,7 @@ SRC_URI:append:corstone1000-mps3 = " \
 
 create_bl1_image(){
     dd conv=notrunc bs=1 if=${D}${FIRMWARE_DIR}/bl1_1.bin of=${D}${FIRMWARE_DIR}/bl1.bin seek=0
-    # Size of bl1_1.bin is 58KB (59392 bytes)  
-    dd conv=notrunc bs=1 if=${D}${FIRMWARE_DIR}/bl1_provisioning_bundle.bin of=${D}${FIRMWARE_DIR}/bl1.bin seek=59392
+    # Size of bl1_1.bin is 58KB (59208 bytes)
+    dd conv=notrunc bs=1 if=${D}${FIRMWARE_DIR}/bl1_provisioning_bundle.bin of=${D}${FIRMWARE_DIR}/bl1.bin seek=59208
 }
 do_install[postfuncs] += "create_bl1_image"

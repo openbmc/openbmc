@@ -1,0 +1,41 @@
+From 3d2bdf81fee8832101fe47b633af5bdee251531a Mon Sep 17 00:00:00 2001
+From: Michael Safwat <michael.safwat@arm.com>
+Date: Fri, 13 Mar 2026 12:42:09 +0000
+Subject: [PATCH] CC312: Add barrier before first AO lock write
+
+On Corstone-1000 MPS3 with GCC 15.x, TF-M can HardFault in
+CC_LibInit() on the first HOST_AO_LOCK_BITS write.
+
+Add a compiler barrier before that write to keep the fix minimal and
+local to the affected sequence.
+
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49269]
+---
+ lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c b/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c
+index 4b08c02526..1e96fcac5b 100644
+--- a/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c
++++ b/lib/ext/cryptocell-312-runtime/host/src/cc3x_lib/cc_lib.c
+@@ -33,6 +33,8 @@
+ #include "cc_rnd_common.h"
+ #include "cc_int_general_defs.h"
+ 
++#define CC_COMPILER_BARRIER() __asm volatile("" ::: "memory")
++
+ CC_PalMutex CCSymCryptoMutex;
+ CC_PalMutex CCAsymCryptoMutex;
+ CC_PalMutex *pCCRndCryptoMutex;
+@@ -213,6 +215,7 @@ CClibRetCode_t CC_LibInit(CCRndContext_t *rndContext_ptr, CCRndWorkBuff_t  *rndW
+     /* turn off the DFA since Cerberus doen't support it */
+     reg = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_AO_LOCK_BITS));
+     CC_REG_FLD_SET(0, HOST_AO_LOCK_BITS, HOST_FORCE_DFA_ENABLE, reg, 0x0);
++    CC_COMPILER_BARRIER();
+     CC_HAL_WRITE_REGISTER(CC_REG_OFFSET(HOST_RGF, HOST_AO_LOCK_BITS)  ,reg );
+     tempVal = CC_HAL_READ_REGISTER(CC_REG_OFFSET(HOST_RGF,HOST_AO_LOCK_BITS));
+     if(tempVal != reg) {
+-- 
+2.43.0
+

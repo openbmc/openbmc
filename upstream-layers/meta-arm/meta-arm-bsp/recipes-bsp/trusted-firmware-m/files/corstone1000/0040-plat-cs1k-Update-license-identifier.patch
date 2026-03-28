@@ -1,0 +1,35 @@
+From b4fd75b96b49756c4815685fc19089793fcc9356 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Wed, 14 Jan 2026 14:00:12 +0000
+Subject: [PATCH] plat: cs1k: Update license identifier
+
+Change-Id: I26af0dbf66359e76b7164b3abdbbf3ace3f358c6
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49428]
+---
+ platform/ext/target/arm/corstone1000/platform.c | 2 +-
+ platform/ext/target/arm/corstone1000/platform.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/platform.c b/platform/ext/target/arm/corstone1000/platform.c
+index d0f30b72a..32fdc55aa 100644
+--- a/platform/ext/target/arm/corstone1000/platform.c
++++ b/platform/ext/target/arm/corstone1000/platform.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2023, Arm Limited. All rights reserved.
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *
+diff --git a/platform/ext/target/arm/corstone1000/platform.h b/platform/ext/target/arm/corstone1000/platform.h
+index a88093ed4..906a8f9ae 100644
+--- a/platform/ext/target/arm/corstone1000/platform.h
++++ b/platform/ext/target/arm/corstone1000/platform.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2023, Arm Limited. All rights reserved.
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  *

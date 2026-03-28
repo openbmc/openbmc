@@ -1,0 +1,28 @@
+From 31cd6d9eb82792efd5af7d99802581eace13a083 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:10:25 +0000
+Subject: [PATCH] lib: efi_guid: Remove unecessary include folder
+
+There are no header files in the src folder, so there is nothing to
+include. This line was redundant.
+
+Change-Id: I5289932119629fc1ef6a71f0a0ceb63e5a466c96
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [e74a1f467317c16487b9d41f43f147dd41985cb9]
+---
+ lib/efi_guid/CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/lib/efi_guid/CMakeLists.txt b/lib/efi_guid/CMakeLists.txt
+index 656eb72ea..9c4771cba 100644
+--- a/lib/efi_guid/CMakeLists.txt
++++ b/lib/efi_guid/CMakeLists.txt
+@@ -15,8 +15,6 @@ target_sources(tfm_efi_guid
+ target_include_directories(tfm_efi_guid
+     PUBLIC
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
+-    PRIVATE
+-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+ )
+ 
+ target_link_libraries(tfm_efi_guid

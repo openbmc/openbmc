@@ -1,0 +1,713 @@
+From bec8f44a2732c20e8f69a06841637673af90c37e Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Tue, 30 Dec 2025 10:16:21 +0000
+Subject: [PATCH] lib: gpt: Added ability to create and remove partitions
+
+With this change, new GPT partitions can be created and added to the
+table and old partitions can be removed. Both of these are metadata
+changes and only make changes to the partition entry array and header
+(primary and backup).
+
+New partitions must be created in empty space only. The data that the
+partition points to is not cleared and if desired this should be done by
+the caller before or after creation.
+
+When a partition is removed, the data it pointed to is not cleared so
+this should be done by the caller if desired. After removal, that data
+is considered empty space.
+
+Change-Id: Iecccb814aaf8f48cbdd8e29b3d2b54fb5b58aae8
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [4d69babc99917e3cc2df284a311ec37004c3ee3f]
+---
+ lib/gpt/CMakeLists.txt                        |   1 +
+ lib/gpt/inc/gpt.h                             |  37 +++
+ lib/gpt/src/gpt.c                             | 249 ++++++++++++++-
+ lib/gpt/unittests/gpt/test_gpt.c              | 284 ++++++++++++++++++
+ lib/gpt/unittests/gpt/utcfg.cmake             |   2 +
+ .../include/mbedtls/mbedtls_config.h          |  18 ++
+ 6 files changed, 590 insertions(+), 1 deletion(-)
+ create mode 100644 lib/gpt/unittests/include/mbedtls/mbedtls_config.h
+
+diff --git a/lib/gpt/CMakeLists.txt b/lib/gpt/CMakeLists.txt
+index 25d0de9cd..5befc346f 100644
+--- a/lib/gpt/CMakeLists.txt
++++ b/lib/gpt/CMakeLists.txt
+@@ -23,6 +23,7 @@ target_sources(tfm_gpt
+ target_include_directories(tfm_gpt
+     PUBLIC
+         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++        $<INSTALL_INTERFACE:inc>
+ )
+ 
+ target_compile_definitions(tfm_gpt
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+index 85f9bed9c..f04643957 100644
+--- a/lib/gpt/inc/gpt.h
++++ b/lib/gpt/inc/gpt.h
+@@ -170,6 +170,43 @@ psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
+                             const uint64_t           start,
+                             const uint64_t           end);
+ 
++/**
++ * \brief Creates a partition entry in the table.
++ *
++ * \param[in]  type Partition type.
++ * \param[in]  start Starting LBA (0 uses the lowest free LBA possible).
++ * \param[in]  size Size of the partition in LBAs.
++ * \param[in]  attr Attributes for the partition.
++ * \param[in]  name Partition name in unicode.
++ * \param[out] guid GUID populated on success for subsequent API calls.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_INSUFFICIENT_STORAGE Maximum number of partitions reached.
++ * \retval PSA_ERROR_INVALID_ARGUMENT Partition would extend beyond the flash.
++ * \retval PSA_ERROR_INVALID_ARGUMENT New entry would overlap an existing partition, the name is empty,
++ *                                    or \p size is zero.
++ */
++__attribute__((nonnull(1,5,6)))
++psa_status_t gpt_entry_create(const struct efi_guid_t *type,
++                              const uint64_t           start,
++                              const uint64_t           size,
++                              const uint64_t           attr,
++                              const char               name[GPT_ENTRY_NAME_LENGTH],
++                              struct efi_guid_t       *guid);
++
++/**
++ * \brief Removes a partition entry from the table.
++ *
++ * \param[in] guid Entry to remove.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_DOES_NOT_EXIST No entry found with the provided GUID.
++ */
++__attribute__((nonnull(1)))
++psa_status_t gpt_entry_remove(const struct efi_guid_t *guid);
++
+ /**
+  * \brief Reads the GPT header from the second block (LBA 1).
+  *
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 40b73f3e9..676f04fd6 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -9,11 +9,12 @@
+ #include <string.h>
+ #include <inttypes.h>
+ 
+-#include "psa/error.h"
++#include "psa/crypto.h"
+ #include "gpt.h"
+ #include "gpt_flash.h"
+ #include "tfm_log.h"
+ #include "efi_guid_structs.h"
++#include "efi_guid.h"
+ #include "efi_soft_crc.h"
+ 
+ /* This needs to be defined by the platform and is used by the GPT library as
+@@ -500,6 +501,252 @@ psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
+     return write_entry(cached_index, &cached_entry, false);
+ }
+ 
++psa_status_t gpt_entry_create(const struct efi_guid_t *type,
++                              const uint64_t           start,
++                              const uint64_t           size,
++                              const uint64_t           attr,
++                              const char               name[GPT_ENTRY_NAME_LENGTH],
++                              struct efi_guid_t       *guid)
++{
++    /* Using inequlity here handles when reading an initial GPT has more than
++     * the maximum defined number of partitions.
++     */
++    if (primary_gpt.num_used_partitions >= plat_max_partitions) {
++        ERROR("Maximum number of partitions reached\n");
++        return PSA_ERROR_INSUFFICIENT_STORAGE;
++    }
++    if (size == 0) {
++        ERROR("Cannot create entry of size 0\n");
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++    if (name[0] == '\0') {
++        ERROR("Cannot create entry with no name\n");
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    uint64_t start_lba = start;
++    psa_status_t ret = PSA_SUCCESS;
++    if (start_lba == 0) {
++        /* Use the lowest free LBA possible. Each partition uses contiguous space,
++         * so if there is a gap between partitions, that will be shown by the end
++         * and start not being contiguous.
++         */
++        uint64_t prev_end = primary_gpt.header.first_lba;
++        for (uint32_t i = 0; i < primary_gpt.header.num_partitions; ++i) {
++            struct gpt_entry_t entry = {0};
++            ret = read_entry_from_flash(&primary_gpt, i, &entry);
++            if (ret != PSA_SUCCESS) {
++                return ret;
++            }
++
++            if (entry.start - 1 > prev_end) {
++                start_lba = prev_end + 1;
++                break;
++            }
++            prev_end = entry.end;
++        }
++
++        if (start_lba != prev_end + 1) {
++            /* No free space */
++            ERROR("No free space on device!\n");
++            return PSA_ERROR_INSUFFICIENT_STORAGE;
++        }
++    }
++
++    /* Must fit on flash */
++    const uint64_t end_lba = start_lba + size - 1;
++    if (start_lba < primary_gpt.header.first_lba ||
++            end_lba < primary_gpt.header.first_lba ||
++            start_lba > primary_gpt.header.last_lba ||
++            end_lba > primary_gpt.header.last_lba)
++    {
++        ERROR("Requested partition would not be on disk\n");
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    /* Do not allow overlapping partitions */
++    struct gpt_entry_t entry;
++    for (uint32_t i = 0; i < primary_gpt.num_used_partitions; ++i) {
++        ret = read_entry_from_flash(&primary_gpt, i, &entry);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++
++        if ((start_lba >= entry.start && start_lba <= entry.end) ||
++                (end_lba >= entry.start && end_lba <= entry.end) ||
++                (start_lba <= entry.start && end_lba >= entry.end))
++        {
++            return PSA_ERROR_INVALID_ARGUMENT;
++        }
++    }
++
++    /* Generate the new random GUID */
++    if (efi_guid_generate_random(guid) != PSA_SUCCESS) {
++        ERROR("Unable to generate GUID\n");
++        return PSA_ERROR_STORAGE_FAILURE;
++    }
++
++    /* Set new entry's metadata */
++    struct gpt_entry_t new_entry = {0};
++    new_entry.start = start_lba;
++    new_entry.end = end_lba;
++    new_entry.attr = attr;
++    memcpy(new_entry.name, name, GPT_ENTRY_NAME_LENGTH);
++    new_entry.partition_type = *type;
++    new_entry.unique_guid = *guid;
++
++    /* Write the new entry. Skip header update as it is explicitely called
++     * below with new number of partitions
++     */
++    ret = write_entry(primary_gpt.num_used_partitions++, &new_entry, true);
++    if (ret != PSA_SUCCESS) {
++        --primary_gpt.num_used_partitions;
++        return ret;
++    }
++
++    /* Flush the buffered LBA if not done so. This will cause the header to be
++     * updated
++     */
++    if (write_buffered) {
++        /* flush_lba_buf will update the header */
++        ret = flush_lba_buf();
++    } else {
++        ret = update_header(primary_gpt.num_used_partitions);
++    }
++
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    return PSA_SUCCESS;
++}
++
++psa_status_t gpt_entry_remove(const struct efi_guid_t *guid)
++{
++    struct gpt_entry_t cached_entry;
++    uint32_t cached_index;
++    psa_status_t ret = find_gpt_entry(
++            &primary_gpt,
++            gpt_entry_cmp_guid,
++            guid,
++            0,
++            &cached_entry,
++            &cached_index);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    /* Shuffle the remainder of the array up. This will overwrite the
++     * most previous entry.
++     *
++     * The first LBA to potentially modify is in memory. It doesn't need
++     * to be modified if the last entry in the array was moved or if it is
++     * the only LBA used by the partition array
++     */
++    if (cached_index != primary_gpt.num_used_partitions - 1 ||
++            cached_index < gpt_entry_per_lba_count())
++    {
++        /* Shuffle up the remainder of the LBA. If it was the last entry
++         * in the LBA, there is nothing to do.
++         */
++        const uint32_t lba_index = cached_index % gpt_entry_per_lba_count();
++        if (lba_index + 1 != gpt_entry_per_lba_count()) {
++            memmove(
++                    lba_buf + lba_index * primary_gpt.header.entry_size,
++                    lba_buf + (lba_index + 1) * primary_gpt.header.entry_size,
++                    (gpt_entry_per_lba_count() - lba_index - 1) * primary_gpt.header.entry_size);
++        }
++
++        /* If this is not the last LBA, then read the next LBA into memory and
++         * place it's first element in the final slot of the currently modified
++         * LBA. Repeat this for each LBA read.
++         *
++         * Use a second buffer to read each consecutive LBA and copy that to
++         * the global LBA buffer to then write afterwards.
++         */
++        const uint64_t array_end_lba = partition_array_last_lba(&primary_gpt);
++        for (uint64_t i = partition_entry_lba(&primary_gpt, cached_index) + 1;
++                i <= array_end_lba;
++                ++i)
++        {
++            uint8_t array_buf[TFM_GPT_BLOCK_SIZE] = {0};
++            int read_ret = plat_flash_driver->read(i, array_buf);
++            if (read_ret != TFM_GPT_BLOCK_SIZE) {
++                ERROR("Unable to read LBA 0x%08x%08x\n",
++                        (uint32_t)(i >> 32), (uint32_t)i);
++                return PSA_ERROR_STORAGE_FAILURE;
++            }
++
++            memcpy(
++                    lba_buf + primary_gpt.header.entry_size * (gpt_entry_per_lba_count() - 1),
++                    array_buf,
++                    GPT_ENTRY_SIZE);
++
++            /* Write to backup first, then primary partition array */
++            if (backup_gpt_array_lba != 0) {
++                ret = write_to_flash(backup_gpt_array_lba + i - 1 - PRIMARY_GPT_ARRAY_LBA);
++                if (ret != PSA_SUCCESS) {
++                    return ret;
++                }
++            }
++            ret = write_to_flash(i - 1);
++            if (ret != PSA_SUCCESS) {
++                return ret;
++            }
++
++            memmove(
++                    array_buf,
++                    array_buf + primary_gpt.header.entry_size,
++                    sizeof(array_buf) - primary_gpt.header.entry_size);
++            memcpy(lba_buf, array_buf, TFM_GPT_BLOCK_SIZE);
++        }
++
++        /* What was the final LBA is now cached and may be empty or partially-filled */
++        cached_lba = array_end_lba;
++        write_buffered = false;
++        uint32_t entries_in_last_lba = (--primary_gpt.num_used_partitions) % gpt_entry_per_lba_count();
++        if (entries_in_last_lba == 0) {
++            /* There's nothing left in this LBA, so zero it all and write it out.
++             * There is also no need to do an erase just to zero afterwards.
++             */
++            memset(lba_buf, 0, TFM_GPT_BLOCK_SIZE);
++            if (backup_gpt_array_lba != 0) {
++                int write_ret = plat_flash_driver->write(
++                        backup_gpt_array_lba + array_end_lba - PRIMARY_GPT_ARRAY_LBA,
++                        lba_buf);
++                if (write_ret != TFM_GPT_BLOCK_SIZE) {
++                    return PSA_ERROR_STORAGE_FAILURE;
++                }
++            }
++            int write_ret = plat_flash_driver->write(array_end_lba, lba_buf);
++            if (write_ret != TFM_GPT_BLOCK_SIZE) {
++                return PSA_ERROR_STORAGE_FAILURE;
++            }
++        } else {
++            /* Zero what is not needed anymore */
++            memset(
++                    lba_buf + primary_gpt.header.entry_size * entries_in_last_lba,
++                    0,
++                    (gpt_entry_per_lba_count() - entries_in_last_lba) * primary_gpt.header.entry_size);
++            if (backup_gpt_array_lba != 0) {
++                ret = write_to_flash(backup_gpt_array_lba + array_end_lba - PRIMARY_GPT_ARRAY_LBA);
++                if (ret != PSA_SUCCESS) {
++                    return ret;
++                }
++            }
++            ret = write_to_flash(array_end_lba);
++            if (ret != PSA_SUCCESS) {
++                return ret;
++            }
++        }
++    }
++
++    /* Update the header after flash changes */
++    ret = update_header(primary_gpt.num_used_partitions);
++
++    return ret;
++}
++
+ /* Initialises GPT from first block. */
+ psa_status_t gpt_init(struct gpt_flash_driver_t *flash_driver, uint64_t max_partitions)
+ {
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index 251b04ee9..18cf2c8f3 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -10,6 +10,7 @@
+ 
+ #include "unity.h"
+ 
++#include "mock_efi_guid.h"
+ #include "mock_efi_soft_crc.h"
+ #include "mock_tfm_log.h"
+ #include "mock_tfm_vprintf.h"
+@@ -368,6 +369,260 @@ void test_gpt_init_should_failWhenFlashDriverNotFullyDefined(void)
+     mock_driver.erase = erase_fn;
+ }
+ 
++void test_gpt_entry_create_should_createNewEntry(void)
++{
++    /* Add an entry. It must not overlap with an existing entry and must also
++     * fit on the storage device. The GUID should be populated with something.
++     */
++    setup_valid_gpt();
++
++    /* Each entry will be read in order to check that it doesn't overlap with
++     * any of them
++     */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* Update header. Read each entry for CRC calculation. */
++    struct gpt_entry_t new_entry = {
++        .type = NULL_GUID,
++        .start = TEST_GPT_THIRD_PARTITION_END + 1,
++        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .attr = 0,
++        .name = "Fourth partition"
++    };
++
++    /* Mock out the call to create a new GUID */
++    struct efi_guid_t expected_guid = MAKE_EFI_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    efi_guid_generate_random_ExpectAnyArgsAndReturn(PSA_SUCCESS);
++    efi_guid_generate_random_ReturnThruPtr_guid(&expected_guid);
++
++    /* Ensure also the that a new GUID is assigned */
++    struct efi_guid_t new_guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_create(
++                &expected_guid,
++                new_entry.start,
++                new_entry.end - new_entry.start + 1,
++                new_entry.attr,
++                new_entry.name,
++                &new_guid));
++    TEST_ASSERT_EQUAL_MEMORY(&expected_guid, &new_guid, sizeof(new_guid));
++}
++
++void test_gpt_entry_create_should_createNewEntryNextToLastEntry(void)
++{
++    /* Add an entry, allowing the library to choose the start LBA.
++     * The GUID should be populated with something.
++     */
++    setup_valid_gpt();
++
++    /* Each entry will be read in order to check that it doesn't overlap with
++     * any of them
++     */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* Update header. Read each entry for CRC calculation. */
++    struct gpt_entry_t new_entry = {
++        .type = NULL_GUID,
++        .start = TEST_GPT_THIRD_PARTITION_END + 1,
++        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .attr = 0,
++        .name = "Fourth partition"
++    };
++
++    /* Mock out the call to create a new GUID */
++    struct efi_guid_t expected_guid = MAKE_EFI_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    efi_guid_generate_random_ExpectAnyArgsAndReturn(PSA_SUCCESS);
++    efi_guid_generate_random_ReturnThruPtr_guid(&expected_guid);
++
++    /* Ensure also the that a new GUID is assigned */
++    struct efi_guid_t new_guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    name[0] = 'a';
++
++    /* Ensure also the that a new GUID is assigned */
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_create(
++                &expected_guid,
++                0,
++                1,
++                new_entry.attr,
++                name,
++                &new_guid));
++    TEST_ASSERT_EQUAL_MEMORY(&expected_guid, &new_guid, sizeof(new_guid));
++}
++
++void test_gpt_entry_create_should_failToCreateEntryWhenLowestFreeLbaDoesNotHaveSpace(void)
++{
++    /* Add an entry, allowing the library to choose the start LBA.
++     * The GUID should be populated with something.
++     */
++    setup_valid_gpt();
++
++    /* Each entry will be read in order to check that it doesn't overlap with
++     * any of them
++     */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* Ensure also the that a new GUID is assigned */
++    struct efi_guid_t existing_guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t new_guid;
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    name[0] = 'a';
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &(existing_guid),
++                0,
++                TEST_DISK_NUM_BLOCKS,
++                0,
++                name,
++                &(new_guid)));
++}
++
++void test_gpt_entry_create_should_failWhenTableFull(void)
++{
++    /* Start with a full array of entries */
++    struct gpt_entry_t new_entry = {
++        .type = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
++        .start = TEST_GPT_THIRD_PARTITION_END + 1,
++        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .attr = 0,
++        .guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
++        .name = "Fourth partition"
++    };
++    test_partition_array[TEST_MAX_PARTITIONS - 1] = new_entry;
++    setup_valid_gpt();
++
++    struct efi_guid_t type = MAKE_EFI_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t guid;
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    name[0] = 'a';
++    TEST_ASSERT_EQUAL(PSA_ERROR_INSUFFICIENT_STORAGE, gpt_entry_create(
++                &type,
++                TEST_GPT_THIRD_PARTITION_END + 4,
++                1,
++                0,
++                name,
++                &guid));
++}
++
++void test_gpt_entry_create_should_failWhenLbaOffDisk(void)
++{
++    setup_valid_gpt();
++
++    /* First start on disk, then go off the disk */
++    struct efi_guid_t type = NULL_GUID;
++    struct efi_guid_t guid;
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    name[0] = 'a';
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_GPT_THIRD_PARTITION_END + 1,
++                1000,
++                0,
++                name,
++                &guid));
++
++    /* Second, start off the disk entirely */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_DISK_NUM_BLOCKS + 100,
++                1,
++                0,
++                name,
++                &guid));
++
++    /* Third, do the same but in the header area */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_GPT_PRIMARY_LBA,
++                1,
++                0,
++                name,
++                &guid));
++
++    /* Fourth, start in the backup header area */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_GPT_BACKUP_LBA,
++                1,
++                0,
++                name,
++                &guid));
++}
++
++void test_gpt_entry_create_should_failWhenOverlapping(void)
++{
++    setup_valid_gpt();
++
++    /* Since the disk is not fragmented by default, there are two test cases:
++     *   1. start in the middle of a partition and end in the middle of a partition
++     *   2. start in the middle of a partition and end in free space
++     */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    struct efi_guid_t type = NULL_GUID;
++    struct efi_guid_t guid;
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    name[0] = 'a';
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_GPT_FIRST_PARTITION_START,
++                TEST_GPT_FIRST_PARTITION_END - TEST_GPT_FIRST_PARTITION_START + 1,
++                0,
++                name,
++                &guid));
++
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_GPT_FIRST_PARTITION_START,
++                TEST_GPT_LAST_USABLE_LBA - TEST_GPT_FIRST_PARTITION_START,
++                0,
++                name,
++                &guid));
++}
++
++void test_gpt_entry_create_should_failWhenNameIsEmpty(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++
++    struct efi_guid_t type = NULL_GUID;
++    struct gpt_entry_t new_entry = {
++        .type = type,
++        .start = TEST_GPT_THIRD_PARTITION_END + 1,
++        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .attr = 0,
++    };
++
++    /* Make an entry with an empty name */
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    struct efi_guid_t new_guid;
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                new_entry.start,
++                1,
++                0,
++                name,
++                &new_guid));
++}
++
++void test_gpt_entry_create_should_failWhenSizeIsZero(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++
++    struct efi_guid_t type = NULL_GUID;
++
++    /* Make the size zero */
++    struct efi_guid_t new_guid;
++    char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    name[0] = 'a';
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
++                &type,
++                TEST_GPT_THIRD_PARTITION_END + 1,
++                0,
++                0,
++                name,
++                &new_guid));
++}
++
+ void test_gpt_entry_move_should_moveEntry(void)
+ {
+     /* Start with a populated GPT */
+@@ -654,6 +909,35 @@ void test_gpt_entry_rename_should_failWhenEntryNotExisting(void)
+     TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_rename(&non_existing, new_name));
+ }
+ 
++void test_gpt_entry_remove_should_removeEntry(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++
++    /* Each entry is read */
++    struct gpt_entry_t *test_entry = &(default_partition_array[TEST_DEFAULT_NUM_PARTITIONS - 1]);
++    struct efi_guid_t test_guid = test_entry->guid;
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_remove(&test_guid));
++}
++
++void test_gpt_entry_remove_should_failWhenEntryNotExisting(void)
++{
++    /* Start by trying to remove from an empty table */
++    setup_empty_gpt();
++
++    struct efi_guid_t non_existing = NULL_GUID;
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_remove(&non_existing));
++
++    /* Now, have a non-empty GPT but search for a non-existing GUID */
++    setup_valid_gpt();
++
++    /* Each entry should be read. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_remove(&non_existing));
++}
++
+ void test_gpt_entry_read_should_populateEntry(void)
+ {
+     /* Start with a populated GPT */
+diff --git a/lib/gpt/unittests/gpt/utcfg.cmake b/lib/gpt/unittests/gpt/utcfg.cmake
+index 620d15b4c..f3f4e7dcc 100644
+--- a/lib/gpt/unittests/gpt/utcfg.cmake
++++ b/lib/gpt/unittests/gpt/utcfg.cmake
+@@ -15,11 +15,13 @@ set(UNIT_TEST_SUITE ${CMAKE_CURRENT_LIST_DIR}/test_gpt.c)
+ list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/interface/include)
+ list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/efi_guid/inc)
+ list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/gpt/inc)
++list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/gpt/unittests/include)
+ list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/ext/efi_soft_crc/inc)
+ list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/tfm_log/inc)
+ list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/tfm_vprintf/inc)
+ 
+ # Headers to be mocked
++list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/efi_guid/inc/efi_guid.h)
+ list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/tfm_log/inc/tfm_log.h)
+ list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/tfm_vprintf/inc/tfm_vprintf.h)
+ list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/ext/efi_soft_crc/inc/efi_soft_crc.h)
+diff --git a/lib/gpt/unittests/include/mbedtls/mbedtls_config.h b/lib/gpt/unittests/include/mbedtls/mbedtls_config.h
+new file mode 100644
+index 000000000..5144daae3
+--- /dev/null
++++ b/lib/gpt/unittests/include/mbedtls/mbedtls_config.h
+@@ -0,0 +1,18 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef MBEDTLS_CONFIG_H
++#define MBEDTLS_CONFIG_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif

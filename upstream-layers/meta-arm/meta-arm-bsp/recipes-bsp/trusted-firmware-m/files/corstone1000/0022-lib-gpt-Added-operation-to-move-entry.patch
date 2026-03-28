@@ -1,0 +1,374 @@
+From 7a453edd736c919eccc40eec567e8e97c0597bba Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Tue, 30 Dec 2025 09:13:07 +0000
+Subject: [PATCH] lib: gpt: Added operation to move entry
+
+The operation to move or resize an entry is not just a metadata change
+and actually moves the data the partition entry points to as well.
+
+Change-Id: Id6b98dcb3d77366db19e453acfbe4af59697eaf6
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [cbab5fd7757e9c06952c15ac7d30b0809b21406c]
+---
+ lib/gpt/inc/gpt.h                |  19 ++++
+ lib/gpt/src/gpt.c                | 156 ++++++++++++++++++++++++++++++-
+ lib/gpt/unittests/gpt/test_gpt.c | 128 +++++++++++++++++++++++++
+ 3 files changed, 301 insertions(+), 2 deletions(-)
+
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+index 6e7bb360e..85f9bed9c 100644
+--- a/lib/gpt/inc/gpt.h
++++ b/lib/gpt/inc/gpt.h
+@@ -151,6 +151,25 @@ psa_status_t gpt_attr_remove(const struct efi_guid_t *guid, const uint64_t attr)
+ __attribute__((nonnull(1)))
+ psa_status_t gpt_attr_set(const struct efi_guid_t *guid, const uint64_t attr);
+ 
++/**
++ * \brief Moves (or resizes) a partition entry.
++ *
++ * \param[in] guid Entry to move.
++ * \param[in] start New start LBA.
++ * \param[in] end New end LBA.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_DOES_NOT_EXIST No entry found with the provided GUID.
++ * \retval PSA_ERROR_INVALID_ARGUMENT Move would overlap with an existing partition.
++ * \retval PSA_ERROR_INVALID_ARGUMENT \p end is less than \p start.
++ * \retval PSA_ERROR_INVALID_ARGUMENT Part of the partition would move off flash.
++ */
++__attribute__((nonnull(1)))
++psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
++                            const uint64_t           start,
++                            const uint64_t           end);
++
+ /**
+  * \brief Reads the GPT header from the second block (LBA 1).
+  *
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 2cfcdff07..40b73f3e9 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -214,6 +214,10 @@ static psa_status_t find_gpt_entry(const struct gpt_t      *table,
+                                    const uint32_t           repeat_index,
+                                    struct gpt_entry_t      *entry,
+                                    uint32_t                *array_index);
++static psa_status_t move_lba(const uint64_t old_lba, const uint64_t new_lba);
++static psa_status_t move_partition(const uint64_t old_lba,
++                                   const uint64_t new_lba,
++                                   const uint64_t num_blocks);
+ static psa_status_t mbr_load(struct mbr_t *mbr);
+ static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid);
+ static bool gpt_entry_cmp_name(const struct gpt_entry_t *entry, const void *name);
+@@ -391,6 +395,111 @@ psa_status_t gpt_attr_set(const struct efi_guid_t *guid, const uint64_t attr)
+     return write_entry(cached_index, &cached_entry, false);
+ }
+ 
++psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
++                            const uint64_t           start,
++                            const uint64_t           end)
++{
++    if (end < start) {
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    /* Must fit on flash */
++    if (start < primary_gpt.header.first_lba ||
++            end < primary_gpt.header.first_lba ||
++            start > primary_gpt.header.last_lba ||
++            end > primary_gpt.header.last_lba)
++    {
++        ERROR("Requested move would not be on disk\n");
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    struct gpt_entry_t cached_entry;
++    uint32_t cached_index;
++    psa_status_t ret = find_gpt_entry(
++            &primary_gpt,
++            gpt_entry_cmp_guid,
++            guid,
++            0,
++            &cached_entry,
++            &cached_index);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++     /* Prevent unecessary I/O */
++    if (start == cached_entry.start && end == cached_entry.end) {
++        return PSA_SUCCESS;
++    }
++
++    /* It is not possible to move a partition such that it overlaps with an
++     * existing partition (other than itself). Check the currently cached LBA
++     * first, then the others to avoid reading this LBA twice
++     */
++    struct gpt_entry_t entry;
++    const uint64_t checked_lba = cached_lba;
++    const uint64_t array_end_lba = partition_array_last_lba(&primary_gpt);
++    uint32_t num_entries_in_cached_lba;
++    if (cached_lba == array_end_lba) {
++        /* If this is 0, then the last LBA is full */
++        uint32_t num_entries_in_last_lba = primary_gpt.num_used_partitions % gpt_entry_per_lba_count();
++        if (num_entries_in_last_lba == 0) {
++            num_entries_in_cached_lba = gpt_entry_per_lba_count();
++        } else {
++            num_entries_in_cached_lba = num_entries_in_last_lba;
++        }
++    } else {
++        num_entries_in_cached_lba = gpt_entry_per_lba_count();
++    }
++
++    /* Cached LBA */
++    for (uint32_t i = 0; i < num_entries_in_cached_lba; ++i) {
++        memcpy(&entry, lba_buf + (i * primary_gpt.header.entry_size), GPT_ENTRY_SIZE);
++
++        const struct efi_guid_t ent_guid = entry.unique_guid;
++        if (efi_guid_cmp(&ent_guid, guid) == 0) {
++            continue;
++        }
++
++        if ((start >= entry.start && start <= entry.end) ||
++                (end >= entry.start && end <= entry.end) ||
++                (start <= entry.start && end >= entry.end))
++        {
++            return PSA_ERROR_INVALID_ARGUMENT;
++        }
++    }
++
++    /* All the rest */
++    for (uint32_t i = 0; i < primary_gpt.num_used_partitions; ++i) {
++        if (partition_entry_lba(&primary_gpt, i) == checked_lba) {
++            continue;
++        }
++
++        ret = read_entry_from_flash(&primary_gpt, i, &entry);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++
++        if ((start >= entry.start && start <= entry.end) ||
++                (end >= entry.start && end <= entry.end) ||
++                (start <= entry.start && end >= entry.end))
++        {
++            return PSA_ERROR_INVALID_ARGUMENT;
++        }
++    }
++
++    ret = move_partition(
++            cached_entry.start,
++            start,
++            end - start + 1);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++    cached_entry.start = start;
++    cached_entry.end = end;
++
++    return write_entry(cached_index, &cached_entry, false);
++}
++
+ /* Initialises GPT from first block. */
+ psa_status_t gpt_init(struct gpt_flash_driver_t *flash_driver, uint64_t max_partitions)
+ {
+@@ -586,6 +695,49 @@ static psa_status_t find_gpt_entry(const struct gpt_t        *table,
+     return io_failure ? PSA_ERROR_STORAGE_FAILURE : PSA_ERROR_DOES_NOT_EXIST;
+ }
+ 
++/* Move a single LBAs data to somewhere else */
++static psa_status_t move_lba(const uint64_t old_lba, const uint64_t new_lba)
++{
++    const psa_status_t ret = read_from_flash(old_lba);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    return write_to_flash(new_lba);
++}
++
++/* Moves a partition's data to start from one logical block to another */
++static psa_status_t move_partition(const uint64_t old_lba,
++                                   const uint64_t new_lba,
++                                   const uint64_t num_blocks)
++{
++    if (old_lba == new_lba) {
++        return PSA_SUCCESS;
++    }
++
++    if (old_lba < new_lba) {
++        /* Move block by block backwards */
++        for (uint64_t block = num_blocks; block > 0; --block) {
++            const psa_status_t ret = move_lba(old_lba + block - 1, new_lba + block - 1);
++            if (ret != PSA_SUCCESS) {
++                return ret;
++            }
++        }
++    } else {
++        /* Move block by block forwards */
++        for (uint64_t block = 0; block < num_blocks; ++block) {
++            const psa_status_t ret = move_lba(old_lba + block, new_lba + block);
++            if (ret != PSA_SUCCESS) {
++                return ret;
++            }
++        }
++    }
++
++    write_buffered = false;
++
++    return PSA_SUCCESS;
++}
++
+ /* Updates the header of the GPT based on new number of partitions */
+ static psa_status_t update_header(uint32_t num_partitions)
+ {
+@@ -794,8 +946,8 @@ static psa_status_t flush_lba_buf(void)
+         /* Backup array entry. Write to backup and primary array */
+         ret = write_entries_to_flash(cached_lba - backup_gpt_array_lba, false);
+     } else {
+-        /* Shouldn't be possible */
+-        ERROR("Unknown data in LBA cache, discarding\n");
++        /* Some other LBA is cached, possibly data. Write it anyway */
++        ret = write_to_flash(cached_lba);
+     }
+ 
+     in_flush = false;
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index 1121f7c73..251b04ee9 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -368,6 +368,134 @@ void test_gpt_init_should_failWhenFlashDriverNotFullyDefined(void)
+     mock_driver.erase = erase_fn;
+ }
+ 
++void test_gpt_entry_move_should_moveEntry(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++    struct gpt_entry_t *test_entry = &(test_partition_array[TEST_DEFAULT_NUM_PARTITIONS - 1]);
++    struct efi_guid_t test_guid = test_entry->guid;
++
++    /* First all entries are read to determine for overlap */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* Move the partition. Read each block to then write. It doesn't matter what
++     * the data is
++     */
++    char unused_read_data = 'X';
++    register_mocked_read(&unused_read_data, sizeof(unused_read_data));
++
++    /* Header update - reads partition array to calculate crc32 and also then
++     * reads the header to modify and write back
++     */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    register_mocked_read(&test_header, sizeof(test_header));
++
++    /* Do a valid move and resize in one */
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_THIRD_PARTITION_END + 1,
++                TEST_GPT_THIRD_PARTITION_END + 1));
++}
++
++void test_gpt_entry_move_should_failWhenEntryNotExisting(void)
++{
++    setup_valid_gpt();
++
++    /* Read every entry */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    struct efi_guid_t non_existing = NULL_GUID;
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_move(
++                &non_existing,
++                TEST_GPT_THIRD_PARTITION_END + 1,
++                TEST_GPT_THIRD_PARTITION_END + 1));
++}
++
++void test_gpt_entry_move_should_failWhenEndLessThanStart(void)
++{
++    setup_valid_gpt();
++
++    struct efi_guid_t test_guid = test_partition_array[0].guid;
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_THIRD_PARTITION_END + 2,
++                TEST_GPT_THIRD_PARTITION_END + 1));
++}
++
++void test_gpt_entry_move_should_failWhenLbaOverlapping(void)
++{
++    setup_valid_gpt();
++
++    /* Try to move an entry. Each entry is read to determine for overlap */
++    size_t test_index = 1;
++    struct gpt_entry_t *test_entry = &(test_partition_array[test_index]);
++    struct efi_guid_t test_guid = test_entry->guid;
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* Try to move the test entry into the middle of the entry just read.
++     * Starting at the same LBA
++     */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_FIRST_PARTITION_START,
++                TEST_GPT_SECOND_PARTITION_END));
++
++    /* Try to move the test entry into the middle of the entry just read.
++     * Starting in the middle
++     */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_FIRST_PARTITION_START + 1,
++                TEST_GPT_SECOND_PARTITION_END));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_SECOND_PARTITION_START,
++                TEST_GPT_THIRD_PARTITION_START));
++
++    /* Try to move the test entry into the middle of the entry just read.
++     * Starting and ending in the middle.
++     */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_FIRST_PARTITION_START + 1,
++                TEST_GPT_FIRST_PARTITION_START + 1));
++}
++
++void test_gpt_entry_move_should_failWhenLbaOffDisk(void)
++{
++    setup_valid_gpt();
++
++    /* Try to move an entry. */
++    size_t test_index = 1;
++    struct gpt_entry_t *test_entry = &(test_partition_array[test_index]);
++    struct efi_guid_t test_guid = test_entry->guid;
++
++    /* First start on disk, then go off the disk */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_THIRD_PARTITION_END + 1,
++                TEST_DISK_NUM_BLOCKS + 1));
++
++    /* Second, start off the disk entirely */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_DISK_NUM_BLOCKS + 1,
++                TEST_DISK_NUM_BLOCKS + 2));
++
++    /* Third, do the same but in the header area */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_PRIMARY_LBA,
++                TEST_GPT_THIRD_PARTITION_END + 2));
++
++    /* Fourth, start in the backup header area */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
++                &test_guid,
++                TEST_GPT_BACKUP_LBA,
++                TEST_GPT_BACKUP_LBA + 1));
++}
++
+ void test_gpt_attr_set_should_setAttributes(void)
+ {
+     /* Start with a populated GPT */

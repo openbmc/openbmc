@@ -1,0 +1,24 @@
+From 1ae97df8db8babcaa999e47d9641c83c4ee8424a Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:17:33 +0000
+Subject: [PATCH] lib: gpt: Correct variable name used
+
+Change-Id: I86d616b3c86cf0a1fd053b732565477278030d89
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [bc9522f5c47c7e3f3a92189073166e73323010e9]
+---
+ lib/gpt/unittests/gpt/utcfg.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/gpt/unittests/gpt/utcfg.cmake b/lib/gpt/unittests/gpt/utcfg.cmake
+index f3f4e7dcc..69a1d10bd 100644
+--- a/lib/gpt/unittests/gpt/utcfg.cmake
++++ b/lib/gpt/unittests/gpt/utcfg.cmake
+@@ -27,6 +27,6 @@ list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/tfm_vprintf/inc/tfm_vprintf.h)
+ list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/ext/efi_soft_crc/inc/efi_soft_crc.h)
+ 
+ # Compile-time definitions
+-list(APPEND UNIT_TEST_COMPILE_DEFS LOG_LEVEL=LOG_LEVEL_VERBOSE)
++list(APPEND UNIT_TEST_COMPILE_DEFS GPT_LOG_LEVEL=LOG_LEVEL_VERBOSE)
+ list(APPEND UNIT_TEST_COMPILE_DEFS TFM_GPT_BLOCK_SIZE=512)
+ 

@@ -1,0 +1,93 @@
+From bd6d7dc80556e8c4261343141d675e865d4e960b Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 2 Jan 2026 13:33:25 +0000
+Subject: [PATCH] plat: cs1k: Remove unused function
+
+Change-Id: I6e054213dc1ec94a6dc8304705d4cb6e6da701cc
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49426]
+---
+ .../bootloader/mcuboot/tfm_mcuboot_fwu.c      | 70 -------------------
+ 1 file changed, 70 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+index 2c17d4b79..76ee8a3dc 100644
+--- a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
++++ b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+@@ -501,76 +501,6 @@ static psa_status_t metadata_validate(struct fwu_metadata *metadata)
+     return PSA_SUCCESS;
+ }
+ 
+-#ifdef BL1_BUILD
+-static psa_status_t metadata_read_without_validation(struct fwu_metadata *metadata)
+-{
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  FWU_METADATA_REPLICA_1_OFFSET, sizeof(*metadata));
+-
+-    if (!metadata) {
+-        FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+-        return PSA_ERROR_INVALID_ARGUMENT;
+-    }
+-
+-    int ret = FWU_METADATA_FLASH_DEV.ReadData(FWU_METADATA_REPLICA_1_OFFSET,
+-                                metadata, sizeof(*metadata));
+-    if (ret < 0) {
+-        FWU_LOG_MSG("%s: ERROR - Flash read failed (ret = %d)\n\r", __func__, ret);
+-        return PSA_ERROR_STORAGE_FAILURE;
+-    }
+-
+-    if (ret != sizeof(*metadata)) {
+-        FWU_LOG_MSG("%s: ERROR - Incomplete metadata read (expected %zu, got %d)\n\r", 
+-                    __func__, sizeof(*metadata), ret);
+-        return PSA_ERROR_INSUFFICIENT_DATA;
+-    }
+-
+-    FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
+-                  metadata->active_index, metadata->previous_active_index);
+-
+-    return PSA_SUCCESS;
+-}
+-#else
+-static psa_status_t metadata_read_without_validation(struct fwu_metadata *metadata)
+-{
+-    uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+-    partition_entry_t *part;
+-
+-    if (!metadata) {
+-        FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+-        return PSA_ERROR_INVALID_ARGUMENT;
+-    }
+-
+-    part = get_partition_entry_by_type(&metadata_uuid);
+-    if (!part) {
+-        FWU_LOG_MSG("%s: FWU metadata partition not found\n\r", __func__);
+-        return PSA_ERROR_GENERIC_ERROR;
+-    }
+-
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
+-                  part->start, sizeof(*metadata));
+-
+-
+-    int ret = FWU_METADATA_FLASH_DEV.ReadData(part->start,
+-                                metadata, sizeof(*metadata));
+-    if (ret < 0) {
+-        FWU_LOG_MSG("%s: ERROR - Flash read failed (ret = %d)\n\r", __func__, ret);
+-        return PSA_ERROR_STORAGE_FAILURE;
+-    }
+-
+-    if (ret != sizeof(*metadata)) {
+-        FWU_LOG_MSG("%s: ERROR - Incomplete metadata read (expected %zu, got %d)\n\r", 
+-                    __func__, sizeof(*metadata), ret);
+-        return PSA_ERROR_INSUFFICIENT_DATA;
+-    }
+-
+-    FWU_LOG_MSG("%s: success: active = %u, previous = %d\n\r", __func__,
+-                  metadata->active_index, metadata->previous_active_index);
+-
+-    return PSA_SUCCESS;
+-}
+-#endif
+-
+ #ifdef BL1_BUILD
+ static psa_status_t metadata_read(struct fwu_metadata *metadata, uint8_t replica_num)
+ {

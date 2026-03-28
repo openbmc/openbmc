@@ -1,0 +1,40 @@
+From 50db5724ef37d5c7cec019254d135b3dcfd0d340 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 29 Dec 2025 11:30:32 +0000
+Subject: [PATCH] plat: cs1k: Fixed bad function returns
+
+The rest of the functions would go to a label to perform some cleanup
+before exiting the function, however these particular errors did not. The
+cleanup would reset the write mode on flash, which is required since the
+errors occur after it being changed.
+
+Change-Id: Ic8277a3295398922b2f05fcaddfb5a188b14e537
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49425]
+---
+ .../arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c    | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+index 52db60bbc..2c17d4b79 100644
+--- a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
++++ b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+@@ -1798,7 +1798,8 @@ psa_status_t fwu_bootloader_load_image(psa_fwu_component_t component,
+         bank_offset = BANK_0_PARTITION_OFFSET;
+     } else {
+         FWU_LOG_MSG("ERROR: %s: active_index %d\n\r",__func__,active_index);
+-        return PSA_ERROR_DATA_INVALID;
++        ret = PSA_ERROR_DATA_INVALID;
++        goto out;
+     }
+ 
+     image_offset = bank_offset + fwu_image[fwu_image_index].image_offset;
+@@ -2002,7 +2003,7 @@ static psa_status_t maintain_bank_consistency(void)
+         ret = copy_image_from_other_bank(i, active_index, previous_active_index);
+         if(ret) {
+             FWU_LOG_MSG("ERROR: %s: copy_image_from_other_bank failed for Image : %d\n\r",__func__, i);
+-            return ret;
++            goto out;
+         }
+ 
+         _metadata.fw_desc.img_entry[i].img_props[previous_active_index].version =

@@ -1,0 +1,25 @@
+From f1862245d39a726c8e37f58498dd433c6fd99d1b Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:13:07 +0000
+Subject: [PATCH] lib: efi_soft_crc: Correct include directory
+
+The variables had no real effect, so this is therefore simplified.
+
+Change-Id: Ifa03bc23e0419f9d6d598e7753f23dfde57c7bf6
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [3856d55117b727c6c21bb821fa4236b113fb08ef]
+---
+ lib/ext/efi_soft_crc/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/ext/efi_soft_crc/CMakeLists.txt b/lib/ext/efi_soft_crc/CMakeLists.txt
+index 47fd2d507..d77310167 100644
+--- a/lib/ext/efi_soft_crc/CMakeLists.txt
++++ b/lib/ext/efi_soft_crc/CMakeLists.txt
+@@ -14,5 +14,5 @@ target_sources(tfm_efi_soft_crc
+ 
+ target_include_directories(tfm_efi_soft_crc
+     PUBLIC
+-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++        inc
+ )

@@ -1,0 +1,217 @@
+From 5fc4f3857739a9fe93819cedc4a8108d33bf8241 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Thu, 27 Nov 2025 10:35:58 +0000
+Subject: [PATCH] lib: efi_guid: Added EFI GUID library
+
+This library can be used to generate version 4 UUID/GUIDs according to
+RFC 4122 by using a PSA crypto driver. A separate header is provided to
+give access to the struct without the need of a PSA config.
+
+Change-Id: Ief35b2a4f565889ba2ea0de82e20dc12f6e824e8
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [3bdd2562ebad3115457ea75e58d0554802e12dba]
+---
+ CMakeLists.txt                      |  1 +
+ lib/efi_guid/CMakeLists.txt         | 26 ++++++++++++
+ lib/efi_guid/inc/efi_guid.h         | 36 +++++++++++++++++
+ lib/efi_guid/inc/efi_guid_structs.h | 62 +++++++++++++++++++++++++++++
+ lib/efi_guid/src/efi_guid.c         | 33 +++++++++++++++
+ 5 files changed, 158 insertions(+)
+ create mode 100644 lib/efi_guid/CMakeLists.txt
+ create mode 100644 lib/efi_guid/inc/efi_guid.h
+ create mode 100644 lib/efi_guid/inc/efi_guid_structs.h
+ create mode 100644 lib/efi_guid/src/efi_guid.c
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2560dd15e..b120de697 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -44,6 +44,7 @@ project("Trusted Firmware M" VERSION ${TFM_VERSION} LANGUAGES C CXX ASM)
+ 
+ add_subdirectory(lib/backtrace)
+ add_subdirectory(lib/ext)
++add_subdirectory(lib/efi_guid)
+ add_subdirectory(lib/fih)
+ add_subdirectory(lib/tfm_log)
+ add_subdirectory(lib/tfm_log_unpriv)
+diff --git a/lib/efi_guid/CMakeLists.txt b/lib/efi_guid/CMakeLists.txt
+new file mode 100644
+index 000000000..656eb72ea
+--- /dev/null
++++ b/lib/efi_guid/CMakeLists.txt
+@@ -0,0 +1,26 @@
++#-------------------------------------------------------------------------------
++# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++add_library(tfm_efi_guid STATIC)
++
++target_sources(tfm_efi_guid
++    PRIVATE
++        src/efi_guid.c
++)
++
++target_include_directories(tfm_efi_guid
++    PUBLIC
++        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++    PRIVATE
++        ${CMAKE_CURRENT_SOURCE_DIR}/src
++)
++
++target_link_libraries(tfm_efi_guid
++    PUBLIC
++        psa_interface
++        psa_crypto_config
++)
+diff --git a/lib/efi_guid/inc/efi_guid.h b/lib/efi_guid/inc/efi_guid.h
+new file mode 100644
+index 000000000..81f6ad507
+--- /dev/null
++++ b/lib/efi_guid/inc/efi_guid.h
+@@ -0,0 +1,36 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __TFM_EFI_GUID_H__
++#define __TFM_EFI_GUID_H__
++
++#include "psa/crypto.h"
++#include "efi_guid_structs.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * \brief Generates a random version 4 UUID/GUID using a PSA crypto driver.
++ *
++ * \note See RFC 4112 for details on UUID/GUIDs.
++ *
++ * \note See psa_generate_random for possible failures.
++ *
++ * \param[out] guid Pointer populated with the generated UUID/GUID.
++ *
++ * \return PSA_SUCCESS on success or a PSA error code on failure.
++ *
++ */
++psa_status_t efi_guid_generate_random(struct efi_guid_t *guid);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __TFM_EFI_GUID_H__ */
+diff --git a/lib/efi_guid/inc/efi_guid_structs.h b/lib/efi_guid/inc/efi_guid_structs.h
+new file mode 100644
+index 000000000..c89e8f692
+--- /dev/null
++++ b/lib/efi_guid/inc/efi_guid_structs.h
+@@ -0,0 +1,62 @@
++/*
++ * Copyright (c) 2021, Linaro Limited
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __TFM_EFI_GUID_STRUCTS_H__
++#define __TFM_EFI_GUID_STRUCTS_H__
++
++#include <stdint.h>
++#include <string.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#define EFI_GUID_NODE_LEN 6
++
++/**
++ * \brief Representation that makes creating GUIDs slightly easier.
++ */
++struct efi_guid_t {
++    uint32_t time_low;                  /**< Low 32-bits of timestamp. */
++    uint16_t time_mid;                  /**< Middle 16-bits of timestamp. */
++    uint16_t time_hi_and_version;       /**< High 12-bits of timestamp with 4-bit version. */
++    uint8_t clock_seq_hi_and_reserved;  /**< High 4-bits of clock sequence with 4-bit variant. */
++    uint8_t clock_seq_low;              /**< Low 8-bits of clock sequence. */
++    uint8_t node[EFI_GUID_NODE_LEN];    /**< 48-bit spatially unique node identifier. */
++};
++
++static inline int efi_guid_cmp(const struct efi_guid_t *g1,
++                               const struct efi_guid_t *g2)
++{
++    return memcmp(g1, g2, sizeof(struct efi_guid_t));
++}
++
++static inline void *efi_guid_cpy(const struct efi_guid_t *src,
++                                 struct efi_guid_t       *dst)
++{
++    return memcpy(dst, src, sizeof(struct efi_guid_t));
++}
++
++/** \brief Helper macro to build an EFI GUID structure from individual values. */
++#define MAKE_EFI_GUID(a, b, c, d0, d1, e0, e1, e2, e3, e4, e5)  \
++    {                                                           \
++        (a) & 0xffffffff, (b)&0xffff, (c)&0xffff, d0, d1, {     \
++            (e0), (e1), (e2), (e3), (e4), (e5)                  \
++        }                                                       \
++    }
++
++/** \brief Helper macro to build the EFI GUID 00000000-0000-0000-0000-0000000000. */
++#define NULL_GUID                                                           \
++    MAKE_EFI_GUID(0x00000000, 0x0000, 0x0000, 0x00, 0x00, 0x00, 0x00, 0x00, \
++            0x00, 0x00, 0x00)
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __TFM_EFI_GUID_STRUCTS_H__ */
+diff --git a/lib/efi_guid/src/efi_guid.c b/lib/efi_guid/src/efi_guid.c
+new file mode 100644
+index 000000000..cb8730a51
+--- /dev/null
++++ b/lib/efi_guid/src/efi_guid.c
+@@ -0,0 +1,33 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stdint.h>
++
++#include "psa/crypto.h"
++
++#include "efi_guid_structs.h"
++#include "efi_guid.h"
++
++psa_status_t efi_guid_generate_random(struct efi_guid_t *guid)
++{
++    const psa_status_t ret = psa_generate_random((uint8_t *)guid, sizeof(*guid));
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    /* According to RFC 4122, counting bits from the right:
++     * - Bits 6 and 7 of clock_seq_hi_and_reserved need to be set to
++     *   0 and 1 respecitively
++     * - Bits 12 through 15 of time_hi_and_version need to be set to
++     *   0b0100
++     */
++    guid->clock_seq_hi_and_reserved &= 0x3F;
++    guid->clock_seq_hi_and_reserved |= 0x80;
++    guid->time_hi_and_version &= 0x0FFF;
++    guid->time_hi_and_version |= 0x4000;
++
++    return PSA_SUCCESS;
++}

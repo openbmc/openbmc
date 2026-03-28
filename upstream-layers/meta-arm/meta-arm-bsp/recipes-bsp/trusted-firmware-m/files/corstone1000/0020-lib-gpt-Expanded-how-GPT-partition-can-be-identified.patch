@@ -1,0 +1,308 @@
+From b3775fd8aa2078e5e86d5cdb4164e6fc31fabbfc Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Wed, 11 Feb 2026 11:16:13 +0000
+Subject: [PATCH] lib: gpt: Expanded how GPT partition can be identified
+
+The GUID of a partition is not always known, particularly for tables
+that have been created outside the control of the user. Therefore,
+allowing the name or type to be used to identify a partition gives the
+user greater flexibility. These may not be unique, however, and so must
+be indexed. A single entry is returned rather than a list so as to not
+dynamically allocate such memory.
+
+Change-Id: I7687bfc737b244f6e589c4fe6b61c370daf1b062
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [aede42c1c58b5681fe50bbec3a797f69256d108e]
+---
+ lib/gpt/inc/gpt.h                |  34 +++++++++
+ lib/gpt/src/gpt.c                |  68 +++++++++++++++--
+ lib/gpt/unittests/gpt/test_gpt.c | 127 +++++++++++++++++++++++++++++++
+ 3 files changed, 223 insertions(+), 6 deletions(-)
+
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+index d98abe980..947a6b341 100644
+--- a/lib/gpt/inc/gpt.h
++++ b/lib/gpt/inc/gpt.h
+@@ -48,6 +48,40 @@ __attribute__((nonnull(1,2)))
+ psa_status_t gpt_entry_read(const struct efi_guid_t  *guid,
+                             struct partition_entry_t *partition_entry);
+ 
++/**
++ * \brief Reads the contents of a partition entry identified by name.
++ *
++ * \param[in]  name Name of the partition to read in unicode.
++ * \param[in]  index Index to read when multiple entries share the same name.
++ * \param[out] partition_entry Populated partition entry on success.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_DOES_NOT_EXIST No entry found with the provided name at \p index. For example,
++ *                                  \p index was 1 (second entry) but only one entry was found.
++ */
++__attribute__((nonnull(1,3)))
++psa_status_t gpt_entry_read_by_name(const char                name[GPT_ENTRY_NAME_LENGTH],
++                                    const uint32_t            index,
++                                    struct partition_entry_t *partition_entry);
++
++/**
++ * \brief Reads the contents of a partition entry identified by type.
++ *
++ * \param[in]  type Type of the partition to read.
++ * \param[in]  index Index to read when multiple entries share the same type.
++ * \param[out] partition_entry Populated partition entry on success.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_DOES_NOT_EXIST No entry found with the provided type at \p index. For example,
++ *                                  \p index was 1 (second entry) but only one entry was found.
++ */
++__attribute__((nonnull(1,3)))
++psa_status_t gpt_entry_read_by_type(const struct efi_guid_t  *type,
++                                    const uint32_t            index,
++                                    struct partition_entry_t *partition_entry);
++
+ /**
+  * \brief Reads the GPT header from the second block (LBA 1).
+  *
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 99d735797..1662b81c2 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -177,6 +177,8 @@ static inline uint64_t partition_entry_lba(const struct gpt_t *table,
+ static inline uint64_t gpt_entry_per_lba_count(void);
+ static psa_status_t count_used_partitions(const struct gpt_t *table,
+                                           uint32_t *num_used);
++static inline void parse_entry(struct gpt_entry_t       *entry,
++                               struct partition_entry_t *partition_entry);
+ static psa_status_t read_from_flash(uint64_t required_lba);
+ static psa_status_t read_entry_from_flash(const struct gpt_t *table,
+                                           uint32_t array_index,
+@@ -190,6 +192,8 @@ static psa_status_t find_gpt_entry(const struct gpt_t      *table,
+                                    uint32_t                *array_index);
+ static psa_status_t mbr_load(struct mbr_t *mbr);
+ static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid);
++static bool gpt_entry_cmp_name(const struct gpt_entry_t *entry, const void *name);
++static bool gpt_entry_cmp_type(const struct gpt_entry_t *entry, const void *type);
+ 
+ /* PUBLIC API FUNCTIONS */
+ 
+@@ -202,12 +206,37 @@ psa_status_t gpt_entry_read(const struct efi_guid_t  *guid,
+         return ret;
+     }
+ 
+-    partition_entry->start = cached_entry.start;
+-    partition_entry->size = cached_entry.end - cached_entry.start + 1;
+-    memcpy(partition_entry->name, cached_entry.name, GPT_ENTRY_NAME_LENGTH);
+-    partition_entry->attr = cached_entry.attr;
+-    partition_entry->partition_guid = cached_entry.unique_guid;
+-    partition_entry->type_guid = cached_entry.partition_type;
++    parse_entry(&cached_entry, partition_entry);
++
++    return PSA_SUCCESS;
++}
++
++psa_status_t gpt_entry_read_by_name(const char                name[GPT_ENTRY_NAME_LENGTH],
++                                    const uint32_t            index,
++                                    struct partition_entry_t *partition_entry)
++{
++    struct gpt_entry_t cached_entry;
++    const psa_status_t ret = find_gpt_entry(&primary_gpt, gpt_entry_cmp_name, name, index, &cached_entry, NULL);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    parse_entry(&cached_entry, partition_entry);
++
++    return PSA_SUCCESS;
++}
++
++psa_status_t gpt_entry_read_by_type(const struct efi_guid_t  *type,
++                                    const uint32_t            index,
++                                    struct partition_entry_t *partition_entry)
++{
++    struct gpt_entry_t cached_entry;
++    const psa_status_t ret = find_gpt_entry(&primary_gpt, gpt_entry_cmp_type, type, index, &cached_entry, NULL);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    parse_entry(&cached_entry, partition_entry);
+ 
+     return PSA_SUCCESS;
+ }
+@@ -322,6 +351,18 @@ static inline uint64_t gpt_entry_per_lba_count(void)
+     return num_entries;
+ }
+ 
++/* Copies information from the entry to the user visible structure */
++static inline void parse_entry(struct gpt_entry_t       *entry,
++                               struct partition_entry_t *partition_entry)
++{
++    partition_entry->start = entry->start;
++    partition_entry->size = entry->end - entry->start + 1;
++    memcpy(partition_entry->name, entry->name, GPT_ENTRY_NAME_LENGTH);
++    partition_entry->attr = entry->attr;
++    partition_entry->partition_guid = entry->unique_guid;
++    partition_entry->type_guid = entry->partition_type;
++}
++
+ /* Compare the entry with the given guid */
+ static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid)
+ {
+@@ -331,6 +372,21 @@ static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid
+     return efi_guid_cmp(&entry_guid, cmp_guid) == 0;
+ }
+ 
++/* Compare the entry with the given name */
++static bool gpt_entry_cmp_name(const struct gpt_entry_t *entry, const void *name)
++{
++    return memcmp(name, entry->name, GPT_ENTRY_NAME_LENGTH) == 0;
++}
++
++/* Compare the entry with the given type */
++static bool gpt_entry_cmp_type(const struct gpt_entry_t *entry, const void *type)
++{
++    const struct efi_guid_t *cmp_type = (const struct efi_guid_t *)type;
++    const struct efi_guid_t entry_type = entry->partition_type;
++
++    return efi_guid_cmp(&entry_type, cmp_type) == 0;
++}
++
+ /* Read entry with given GUID from given table and return it if found. */
+ static psa_status_t find_gpt_entry(const struct gpt_t        *table,
+                                    gpt_entry_cmp_t            compare,
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index 325887fae..d6671f3fc 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -381,3 +381,130 @@ void test_gpt_entry_read_should_failWhenEntryNotExisting(void)
+     register_mocked_read(&test_partition_array, sizeof(test_partition_array));
+     TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read(&non_existing, &entry));
+ }
++
++void test_gpt_entry_read_by_name_should_populateEntry(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++
++    /* Ensure an entry is found, even with repeat names */
++    struct partition_entry_t entry;
++    struct gpt_entry_t *desired1 = &(test_partition_array[0]);
++    struct efi_guid_t test_guid1 = desired1->guid;
++    struct efi_guid_t test_type1 = desired1->type;
++
++    /* Change the name of something else and ensure it is found */
++    struct gpt_entry_t *desired2 = &(test_partition_array[1]);
++    struct efi_guid_t test_guid2 = desired2->guid;
++    struct efi_guid_t test_type2 = desired2->type;
++    memcpy(desired2->name, desired1->name, GPT_ENTRY_NAME_LENGTH);
++
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_read_by_name(desired1->name, 0, &entry));
++
++    /* Ensure this is the correct entry */
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_guid1, &(entry.partition_guid)));
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_type1, &(entry.type_guid)));
++    TEST_ASSERT_EQUAL(desired1->start, entry.start);
++    TEST_ASSERT_EQUAL(desired1->end, entry.start + entry.size - 1);
++
++    TEST_ASSERT_EQUAL_MEMORY(desired1->name, entry.name, GPT_ENTRY_NAME_LENGTH);
++
++    /* Do again but the next entry */
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_read_by_name(desired1->name, 1, &entry));
++
++    /* Ensure this is the correct entry */
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_guid2, &(entry.partition_guid)));
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_type2, &(entry.type_guid)));
++    TEST_ASSERT_EQUAL(desired2->start, entry.start);
++    TEST_ASSERT_EQUAL(desired2->end, entry.start + entry.size - 1);
++
++    TEST_ASSERT_EQUAL_MEMORY(desired2->name, entry.name, GPT_ENTRY_NAME_LENGTH);
++}
++
++void test_gpt_entry_read_by_name_should_failWhenEntryNotExisting(void)
++{
++    /* Start with an empty GPT */
++    setup_empty_gpt();
++
++    /* Try to read something */
++    struct partition_entry_t entry;
++    char test_name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_name(test_name, 0, &entry));
++
++    /* Now, have a non-empty GPT but search for a name that won't exist */
++    setup_valid_gpt();
++
++    /* Each entry should be read */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_name(test_name, 0, &entry));
++
++    /* Finally, search for the second entry of a name that appears only once */
++    memcpy(test_name, test_partition_array[0].name, GPT_ENTRY_NAME_LENGTH);
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_name(test_name, 1, &entry));
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_name(test_name, TEST_DEFAULT_NUM_PARTITIONS, &entry));
++}
++
++void test_gpt_entry_read_by_type_should_populateEntry(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++
++    /* Ensure an entry is found, even with repeat types */
++    struct partition_entry_t entry;
++    struct gpt_entry_t *desired1 = &(test_partition_array[0]);
++    struct efi_guid_t test_guid1 = desired1->guid;
++    struct efi_guid_t test_type1 = desired1->type;
++
++    struct gpt_entry_t *desired2 = &(test_partition_array[1]);
++    struct efi_guid_t test_guid2 = desired2->guid;
++    struct efi_guid_t test_type2 = test_type1;
++    desired2->type = test_type2;
++
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_read_by_type(&test_type1, 0, &entry));
++
++    /* Ensure this is the correct entry */
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_guid1, &(entry.partition_guid)));
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_type1, &(entry.type_guid)));
++    TEST_ASSERT_EQUAL(desired1->start, entry.start);
++    TEST_ASSERT_EQUAL(desired1->end, entry.start + entry.size - 1);
++
++    /* Name is unicode */
++    TEST_ASSERT_EQUAL_MEMORY(desired1->name, entry.name, GPT_ENTRY_NAME_LENGTH);
++
++    /* Do again but the next entry */
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_read_by_type(&test_type1, 1, &entry));
++
++    /* Ensure this is the correct entry */
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_guid2, &(entry.partition_guid)));
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_type2, &(entry.type_guid)));
++    TEST_ASSERT_EQUAL(desired2->start, entry.start);
++    TEST_ASSERT_EQUAL(desired2->end, entry.start + entry.size - 1);
++
++    TEST_ASSERT_EQUAL_MEMORY(desired2->name, entry.name, GPT_ENTRY_NAME_LENGTH);
++}
++
++void test_gpt_entry_read_by_type_should_failWhenEntryNotExisting(void)
++{
++    /* Start with an empty GPT */
++    setup_empty_gpt();
++
++    /* Try to read something */
++    struct partition_entry_t entry;
++    struct efi_guid_t test_type = MAKE_EFI_GUID(11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_type(&test_type, 0, &entry));
++
++    /* Now, have a non-empty GPT but search for a type that won't exist */
++    setup_valid_gpt();
++
++    /* Each entry should be read */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_type(&test_type, 0, &entry));
++
++    /* Finally, search for the second entry of a type that appears only once */
++    struct efi_guid_t existing_type = test_partition_array[0].type;
++    efi_guid_cpy(&existing_type, &test_type);
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_type(&test_type, 1, &entry));
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_type(&test_type, TEST_DEFAULT_NUM_PARTITIONS, &entry));
++}

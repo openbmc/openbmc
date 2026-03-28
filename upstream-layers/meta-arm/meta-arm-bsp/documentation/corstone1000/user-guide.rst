@@ -2189,13 +2189,13 @@ Symmetric Multiprocessing
 
     .. code-block:: console
 
-        kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-fvp-multicore.yml
+        kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-multicore.yml
 
 #. Run the Corstone-1000 FVP:
 
     .. code-block:: console
 
-        kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-fvp-multicore.yml \
+        kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-multicore.yml \
         -c "../meta-arm/scripts/runfvp"
 
 

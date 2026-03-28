@@ -1,0 +1,28 @@
+From 0b6a2e681b0f76c425896990ebc4afcbc65419d3 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:11:05 +0000
+Subject: [PATCH] lib: efi_guid: Correct included folder
+
+The use of the variables is unecessary and has no real effect. This
+change is therefore simplified.
+
+Change-Id: I0811b4768502d15b62f1af3ef90a56db3e9df525
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [7bb11e81cd69718df3b11a3f8b42a3b5edf4c42d]
+---
+ lib/efi_guid/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/efi_guid/CMakeLists.txt b/lib/efi_guid/CMakeLists.txt
+index 9c4771cba..95d7b8f1e 100644
+--- a/lib/efi_guid/CMakeLists.txt
++++ b/lib/efi_guid/CMakeLists.txt
+@@ -14,7 +14,7 @@ target_sources(tfm_efi_guid
+ 
+ target_include_directories(tfm_efi_guid
+     PUBLIC
+-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++        inc
+ )
+ 
+ target_link_libraries(tfm_efi_guid

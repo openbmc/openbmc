@@ -1,0 +1,90 @@
+From 9f86d644aa23589e5187f0a22394438cd525d574 Mon Sep 17 00:00:00 2001
+From: Alex Chapman <alex.chapman@arm.com>
+Date: Wed, 4 Mar 2026 13:41:59 +0000
+Subject: [PATCH] Platform: CS1K: make mutlicore support platform generic
+
+To improve portability, testing coverage, and future platform enablement.
+
+- Replace FVP-only multicore checks with platform-generic checks.
+
+Upstream-Status: Backport [71619253e03cc10cdd4527ab7e896e3ec10afabe]
+Signed-off-by: Alex Chapman <alex.chapman@arm.com>
+---
+ platform/ext/target/arm/corstone1000/CMakeLists.txt       | 4 +---
+ .../target/arm/corstone1000/Device/Config/device_cfg.h    | 2 +-
+ platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c | 8 ++++----
+ 3 files changed, 6 insertions(+), 8 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index 993c51591..a13f16fd7 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -407,12 +407,10 @@ target_sources(tfm_psa_rot_partition_ns_agent_mailbox
+         tfm_hal_multi_core.c
+ )
+ 
+-if (PLATFORM_IS_FVP)
+ target_compile_definitions(tfm_psa_rot_partition_ns_agent_mailbox
+     PUBLIC
+-       $<$<BOOL:${ENABLE_MULTICORE}>:CORSTONE1000_FVP_MULTICORE>
++       $<$<BOOL:${ENABLE_MULTICORE}>:CORSTONE1000_MULTICORE>
+ )
+-endif()
+ #========================= tfm_spm ============================================#
+ 
+ target_sources(tfm_spm
+diff --git a/platform/ext/target/arm/corstone1000/Device/Config/device_cfg.h b/platform/ext/target/arm/corstone1000/Device/Config/device_cfg.h
+index 544475a86..0c3a9088e 100644
+--- a/platform/ext/target/arm/corstone1000/Device/Config/device_cfg.h
++++ b/platform/ext/target/arm/corstone1000/Device/Config/device_cfg.h
+@@ -46,7 +46,7 @@
+ #define CFI_S
+ 
+ /* Total number of host cores */
+-#if CORSTONE1000_FVP_MULTICORE
++#if CORSTONE1000_MULTICORE
+ #define PLATFORM_HOST_MAX_CORE_COUNT 4
+ #else
+ #define PLATFORM_HOST_MAX_CORE_COUNT 1
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+index 10c66ac41..9a785bfa0 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+@@ -62,7 +62,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+     volatile uint32_t *PE0_CONFIG =
+                         (uint32_t *)(CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE
+                                      + HOST_CPU_PE0_CONFIG_OFFSET);
+-#if CORSTONE1000_FVP_MULTICORE
++#if CORSTONE1000_MULTICORE
+     volatile uint32_t *PE1_CONFIG =
+                         (uint32_t *)(CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE
+                                      + HOST_CPU_PE1_CONFIG_OFFSET);
+@@ -80,7 +80,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+ #endif
+     /* Select host CPU architecture as AArch64 */
+     *PE0_CONFIG |= AA64nAA32_MASK; /* 0b1 – AArch64 */
+-#if CORSTONE1000_FVP_MULTICORE
++#if CORSTONE1000_MULTICORE
+     *PE1_CONFIG |= AA64nAA32_MASK; /* 0b1 – AArch64 */
+     *PE2_CONFIG |= AA64nAA32_MASK; /* 0b1 – AArch64 */
+     *PE3_CONFIG |= AA64nAA32_MASK; /* 0b1 – AArch64 */
+@@ -92,7 +92,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+     /* Clear HOST_SYS_RST_CTRL register to bring host out of RESET */
+     *reset_ctl_reg = 0;
+ 
+-#if CORSTONE1000_FVP_MULTICORE
++#if CORSTONE1000_MULTICORE
+     /* Wake up secondary cores.
+      * This should be done after bringing the primary core out of reset.*/
+     for (int core_index=1; core_index < PLATFORM_HOST_MAX_CORE_COUNT; core_index++) {
+@@ -111,7 +111,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+     PPU_SetOperatingPolicy(CORE0_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
+     PPU_SetPowerPolicy(CORE0_PPU, PPU_PWR_MODE_ON, false);
+     
+-#if CORSTONE1000_FVP_MULTICORE
++#if CORSTONE1000_MULTICORE
+     /* Power on all Cortex-A320 cores in DSU-120T Cluster */
+     PPU_SetOperatingPolicy(CORE1_PPU, PPU_OP_MODE_ONE_SLICE_SF_ONLY_ON, false);
+     PPU_SetPowerPolicy(CORE1_PPU, PPU_PWR_MODE_ON, false);
+-- 
+2.43.0

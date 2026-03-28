@@ -52,7 +52,6 @@ IMAGE_FSTYPES += "wic"
 # Need to clear the suffix so TESTIMAGE_AUTO works
 IMAGE_NAME_SUFFIX = ""
 WKS_FILE ?= "efi-disk-no-swap.wks.in"
-WKS_FILE:firmware ?= "corstone1000-flash-firmware.wks.in"
 
 # making sure EXTRA_IMAGEDEPENDS will be used while creating the image
 WKS_FILE_DEPENDS:append = " ${EXTRA_IMAGEDEPENDS}"

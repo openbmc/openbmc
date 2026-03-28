@@ -1,0 +1,51 @@
+From ce3a4f3dd8900c068f2bfe951d55b895e3c10d43 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:29:04 +0000
+Subject: [PATCH] lib: gpt: Move contents of CMake config file
+
+A config.cmake used in a library can be a little confusing, especially
+considering that such files are used for platform configurations. The
+contents of the file are placed directly in the CMakeLists.txt that was
+including it.
+
+Change-Id: I8a88971feebaf37498828af5854de94e74e16f2c
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [4b569b02b98a577e45e833f4dd9886e54df71a7d]
+---
+ lib/gpt/CMakeLists.txt | 6 +++---
+ lib/gpt/config.cmake   | 8 --------
+ 2 files changed, 3 insertions(+), 11 deletions(-)
+ delete mode 100644 lib/gpt/config.cmake
+
+diff --git a/lib/gpt/CMakeLists.txt b/lib/gpt/CMakeLists.txt
+index 19cfe5bc2..4a15173fd 100644
+--- a/lib/gpt/CMakeLists.txt
++++ b/lib/gpt/CMakeLists.txt
+@@ -9,10 +9,10 @@ cmake_minimum_required(VERSION 3.21)
+ 
+ add_library(tfm_gpt STATIC)
+ 
+-include(./config.cmake)
++set(GPT_LOG_LEVEL LOG_LEVEL_INFO CACHE STRING "Set default log level for the GPT library")
+ 
+-if(NOT DEFINED TFM_GPT_BLOCK_SIZE OR NOT DEFINED GPT_LOG_LEVEL)
+-    message(FATAL_ERROR "TFM_GPT_BLOCK_SIZE and GPT_LOG_LEVEL must be defined to use GPT library")
++if(NOT DEFINED TFM_GPT_BLOCK_SIZE)
++    message(FATAL_ERROR "TFM_GPT_BLOCK_SIZE must be defined to use GPT library")
+ endif()
+ 
+ target_sources(tfm_gpt
+diff --git a/lib/gpt/config.cmake b/lib/gpt/config.cmake
+deleted file mode 100644
+index 9575aa8a8..000000000
+--- a/lib/gpt/config.cmake
++++ /dev/null
+@@ -1,8 +0,0 @@
+-#-------------------------------------------------------------------------------
+-# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
+-#
+-# SPDX-License-Identifier: BSD-3-Clause
+-#
+-#-------------------------------------------------------------------------------
+-
+-set(GPT_LOG_LEVEL LOG_LEVEL_INFO CACHE STRING "Set default log level for the GPT library")

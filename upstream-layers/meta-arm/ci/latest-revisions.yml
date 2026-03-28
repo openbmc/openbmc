@@ -5,6 +5,7 @@ header:
 
 local_conf_header:
   latest_revisions: |
+    PREFERRED_VERSION_scp-firmware ?= "git"
     PREFERRED_VERSION_trusted-firmware-a ?= "git"
     PREFERRED_VERSION_trusted-firmware-m ?= "git"
     PREFERRED_VERSION_optee-client ?= "git"

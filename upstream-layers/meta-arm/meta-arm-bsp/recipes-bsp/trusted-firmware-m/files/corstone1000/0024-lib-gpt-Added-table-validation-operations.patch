@@ -1,0 +1,412 @@
+From c0037dc1779d181ce7d7dbd5871519c9d218440a Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Tue, 30 Dec 2025 10:29:47 +0000
+Subject: [PATCH] lib: gpt: Added table validation operations
+
+Added validate and restore operations. Both of these operate on the
+entirety of the table and allow the caller to:
+
+1. determine if the GPT is valid or not.
+2. restore a GPT from the alternative at the other end of the storage
+   device.
+
+Both of these operations can be performed on either the primary or
+backup table to allow full recovery.
+
+Change-Id: Ie5ac2fdc42858cb439a2dcd08f4203eb181d4e88
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [62a038e80574e094e64617953748633737cd760d]
+---
+ lib/gpt/inc/gpt.h                |  22 ++++
+ lib/gpt/src/gpt.c                | 184 +++++++++++++++++++++++++++++++
+ lib/gpt/unittests/gpt/test_gpt.c | 135 +++++++++++++++++++++++
+ 3 files changed, 341 insertions(+)
+
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+index f04643957..0ce4d04ab 100644
+--- a/lib/gpt/inc/gpt.h
++++ b/lib/gpt/inc/gpt.h
+@@ -207,6 +207,28 @@ psa_status_t gpt_entry_create(const struct efi_guid_t *type,
+ __attribute__((nonnull(1)))
+ psa_status_t gpt_entry_remove(const struct efi_guid_t *guid);
+ 
++/**
++ * \brief Validates the GPT.
++ *
++ * \param[in] is_primary True to validate the primary table, false to validate the backup.
++ *
++ * \retval PSA_SUCCESS GPT is valid.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_INVALID_SIGNATURE GPT is invalid.
++ */
++psa_status_t gpt_validate(bool is_primary);
++
++/**
++ * \brief Restores either the primary or backup GPT from the other copy.
++ *
++ * \param[in] is_primary True to restore the primary table, false to restore the backup.
++ *
++ * \retval PSA_SUCCESS GPT restored.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_INVALID_SIGNATURE Restoring GPT invalid; cannot restore.
++ */
++psa_status_t gpt_restore(bool is_primary);
++
+ /**
+  * \brief Reads the GPT header from the second block (LBA 1).
+  *
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 676f04fd6..1bc592bb3 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -223,6 +223,8 @@ static psa_status_t mbr_load(struct mbr_t *mbr);
+ static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid);
+ static bool gpt_entry_cmp_name(const struct gpt_entry_t *entry, const void *name);
+ static bool gpt_entry_cmp_type(const struct gpt_entry_t *entry, const void *type);
++static psa_status_t validate_table(struct gpt_t *table, bool is_primary);
++static psa_status_t restore_table(struct gpt_t *restore_from, bool is_primary);
+ 
+ /* PUBLIC API FUNCTIONS */
+ 
+@@ -747,6 +749,76 @@ psa_status_t gpt_entry_remove(const struct efi_guid_t *guid)
+     return ret;
+ }
+ 
++psa_status_t gpt_validate(bool is_primary)
++{
++    if (!is_primary && (backup_gpt_lba == 0 || backup_gpt_array_lba == 0)) {
++        ERROR("Backup GPT location unknown!\n");
++        return PSA_ERROR_STORAGE_FAILURE;
++    }
++
++    /* Flush and invalidate the in-memory buffer before attempting to validate
++     * a table. The in-memory header needs to be updated if the flushed LBA was
++     * part of the entry array
++     */
++    psa_status_t ret;
++    if (write_buffered) {
++        ret = flush_lba_buf();
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++        write_buffered = false;
++    }
++    cached_lba = 0;
++
++    if (is_primary) {
++        return validate_table(&primary_gpt, true);
++    } else {
++        struct gpt_t backup_gpt;
++        ret = read_table_from_flash(&backup_gpt, false);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++        return validate_table(&backup_gpt, false);
++    }
++}
++
++psa_status_t gpt_restore(bool is_primary)
++{
++    if (!is_primary && (backup_gpt_lba == 0 || backup_gpt_array_lba == 0)) {
++        ERROR("Backup GPT location unknown!\n");
++        return PSA_ERROR_STORAGE_FAILURE;
++    }
++
++    /* Flush and invalidate the in-memory buffer before attempting to restore a
++     * table. The in-memory header needs to be updated if the flushed LBA was
++     * part of the entry array
++     */
++    psa_status_t ret;
++    if (write_buffered) {
++        ret = flush_lba_buf();
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++        write_buffered = false;
++    }
++    cached_lba = 0;
++
++    if (is_primary) {
++        struct gpt_t backup_gpt;
++        ret = read_table_from_flash(&backup_gpt, false);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++        ret = count_used_partitions(&backup_gpt, &backup_gpt.num_used_partitions);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++        return restore_table(&backup_gpt, false);
++    } else {
++        return restore_table(&primary_gpt, true);
++    }
++}
++
+ /* Initialises GPT from first block. */
+ psa_status_t gpt_init(struct gpt_flash_driver_t *flash_driver, uint64_t max_partitions)
+ {
+@@ -1349,6 +1421,118 @@ static inline void swap_headers(const struct gpt_header_t *src, struct gpt_heade
+             primary_gpt.header.array_lba);
+ }
+ 
++/* Validates a specific GPT. */
++static psa_status_t validate_table(struct gpt_t *table, bool is_primary)
++{
++    struct gpt_header_t *header = &(table->header);
++
++    /* Check signature */
++    if (strncmp(header->signature, GPT_SIG, GPT_SIG_LEN) != 0) {
++        ERROR("Invalid GPT signature\n");
++        return PSA_ERROR_INVALID_SIGNATURE;
++    }
++
++    /* Check header CRC */
++    uint32_t calc_crc = 0;
++    uint32_t old_crc = header->header_crc;
++    header->header_crc = 0;
++    calc_crc = efi_soft_crc32_update(calc_crc, (uint8_t *)header, GPT_HEADER_SIZE);
++    header->header_crc = old_crc;
++
++    if (old_crc != calc_crc) {
++        ERROR("CRC of header does not match, expected 0x%x got 0x%x\n",
++             old_crc, calc_crc);
++        return PSA_ERROR_INVALID_SIGNATURE;
++    }
++
++    /* Check MyLBA field points to this table */
++    const uint64_t table_lba = (is_primary ? PRIMARY_GPT_LBA : backup_gpt_lba);
++    if (table_lba != header->current_lba) {
++        ERROR("MyLBA not pointing to this GPT, expected 0x%08x%08x, got 0x%08x%08x\n",
++                (uint32_t)(table_lba >> 32),
++                (uint32_t)table_lba,
++                (uint32_t)(header->current_lba >> 32),
++                (uint32_t)(header->current_lba));
++        return PSA_ERROR_INVALID_SIGNATURE;
++    }
++
++    /* Check the CRC of the partition array */
++    calc_crc = 0;
++    for (uint32_t i = 0; i < header->num_partitions; ++i) {
++        uint8_t entry_buf[header->entry_size];
++        memset(entry_buf, 0, header->entry_size);
++        struct gpt_entry_t *entry = (struct gpt_entry_t *)entry_buf;
++
++        psa_status_t ret = read_entry_from_flash(table, i, entry);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++        calc_crc = efi_soft_crc32_update(calc_crc, (uint8_t *)entry, header->entry_size);
++    }
++
++    if (calc_crc != header->array_crc) {
++        ERROR("CRC of partition array does not match, expected 0x%x got 0x%x\n",
++                calc_crc, header->array_crc);
++        return PSA_ERROR_INVALID_SIGNATURE;
++    }
++
++    if (is_primary) {
++        /* Any time the primary table is considered valid, cache the backup
++         * LBA field
++         */
++        backup_gpt_lba = header->backup_lba;
++    } else {
++        /* Any time backup table is considered valid, cache its array LBA
++         * field and crc32
++         */
++        backup_gpt_array_lba = header->array_lba;
++        backup_crc32 = header->header_crc;
++    }
++    return PSA_SUCCESS;
++}
++
++/* Restore a table from another. The second parameter indicates whether the
++ * restoring table is the primary GPT or not
++ */
++static psa_status_t restore_table(struct gpt_t *restore_from, bool is_primary)
++{
++    /* Determine if the restoring GPT is valid */
++    psa_status_t ret = validate_table(restore_from, is_primary);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    struct gpt_t restore_to;
++    swap_headers(&(restore_from->header), &(restore_to.header));
++
++    /* Copy the partition array as well */
++    ret = move_partition(
++            restore_from->header.array_lba,
++            restore_to.header.array_lba,
++            (restore_from->header.num_partitions +
++             gpt_entry_per_lba_count() - 1) / gpt_entry_per_lba_count());
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    /* Write the header */
++    ret = write_header_to_flash(&restore_to);
++    if (ret != PSA_SUCCESS) {
++        ERROR("Unable to write %s GPT header\n", is_primary ? "backup" : "primary");
++        return ret;
++    }
++
++    /* The primary GPT is cached in memory */
++    if (!is_primary) {
++        memcpy(&(primary_gpt.header), &(restore_to.header), GPT_HEADER_SIZE);
++        primary_gpt.num_used_partitions = restore_from->num_used_partitions;
++    }
++
++    INFO("Successfully restored %s GPT table\n", is_primary ? "backup" : "primary");
++
++    return 0;
++}
++
+ /* Converts unicode string to valid ascii */
+ static psa_status_t unicode_to_ascii(const char *unicode, char *ascii)
+ {
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index 18cf2c8f3..f15a0a737 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -369,6 +369,141 @@ void test_gpt_init_should_failWhenFlashDriverNotFullyDefined(void)
+     mock_driver.erase = erase_fn;
+ }
+ 
++void test_gpt_validate_should_validateWhenGptGood(void)
++{
++    setup_test_gpt();
++
++    /* Each entry will be read in order to check the partition array CRC */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_validate(true));
++
++    /* Now do the backup */
++    setup_backup_gpt();
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_validate(false));
++}
++
++void test_gpt_validate_should_failWhenGptSigBad(void)
++{
++    test_header.signature[0] = '\0';
++    setup_test_gpt();
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(true));
++
++    /* Now do the backup */
++    setup_backup_gpt();
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(false));
++}
++
++void test_gpt_validate_should_failWhenHeaderCrcBad(void)
++{
++    test_header.header_crc--;
++    setup_test_gpt();
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(true));
++
++    /* Now do the backup */
++    struct gpt_header_t backup_header;
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    backup_header.header_crc--;
++    register_mocked_read(&backup_header, sizeof(backup_header));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(false));
++}
++
++void test_gpt_validate_should_failWhenLbaPointerBad(void)
++{
++    test_header.current_lba = 2;
++    test_header.backup_lba = 3;
++    setup_test_gpt();
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(true));
++
++    /* Now set the backup LBA to be something different that what it should be
++     * to force a mismatch
++     */
++    test_header.current_lba = default_header.current_lba;
++    test_header.backup_lba = default_header.backup_lba - 1;
++
++    /* Now do the backup */
++    struct gpt_header_t backup_header;
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    register_mocked_read(&backup_header, sizeof(backup_header));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(false));
++}
++
++void test_gpt_validate_should_failWhenArrayCrcBad(void)
++{
++    test_header.array_crc--;
++    setup_test_gpt();
++
++    /* Each entry will be read in order to check the partition array CRC */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(true));
++
++    /* Now do the backup */
++    struct gpt_header_t backup_header;
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    backup_header.array_crc--;
++    register_mocked_read(&backup_header, sizeof(test_partition_array));
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_validate(false));
++}
++
++void test_gpt_restore_should_restorePrimaryFromBackup(void)
++{
++    /* Start with a valid GPT */
++    setup_valid_gpt();
++
++    /* The backup table is read and checked for validity, including taking
++     * CRC32 of partition array
++     */
++    setup_backup_gpt();
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_restore(true));
++}
++
++void test_gpt_restore_should_failToRestoreWhenBackupIsBad(void)
++{
++    /* Start with a valid GPT */
++    setup_valid_gpt();
++
++    /* The backup table is read and checked for validity. Corrupt it in
++     * various ways
++     */
++    struct gpt_header_t backup_header;
++
++    /* Bad signature */
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    backup_header.signature[0] = '\0';
++    register_mocked_read(&backup_header, sizeof(backup_header));
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_restore(true));
++
++    /* Bad header CRC */
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    backup_header.header_crc = 0;
++    register_mocked_read(&backup_header, sizeof(backup_header));
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_restore(true));
++
++    /* Bad LBA */
++    test_header.backup_lba = 2;
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    register_mocked_read(&backup_header, sizeof(backup_header));
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_restore(true));
++    test_header.backup_lba = default_header.backup_lba;
++
++    /* Bad array CRC. Will involve reading array entries */
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++    backup_header.array_crc = 0;
++    register_mocked_read(&backup_header, sizeof(backup_header));
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_SIGNATURE, gpt_restore(true));
++}
++
+ void test_gpt_entry_create_should_createNewEntry(void)
+ {
+     /* Add an entry. It must not overlap with an existing entry and must also

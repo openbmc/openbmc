@@ -1,4 +1,5 @@
 require recipes-security/optee/optee-os_${PV}.bb
+UPSTREAM_CHECK_COMMITS = "1"
 
 SUMMARY = "OP-TEE Trusted OS TA devkit"
 DESCRIPTION = "OP-TEE TA devkit for build TAs"

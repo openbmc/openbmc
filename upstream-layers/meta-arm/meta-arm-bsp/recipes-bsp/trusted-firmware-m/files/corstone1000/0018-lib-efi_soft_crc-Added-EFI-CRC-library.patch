@@ -1,0 +1,136 @@
+From 4a47d926420bfec4a0e687b6ecc4cf52419e4f58 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Thu, 27 Nov 2025 10:37:28 +0000
+Subject: [PATCH] lib: efi_soft_crc: Added EFI CRC library
+
+This library can be used to perform CRC32 calculations using the
+standard CRC32 polynomial specified by the UEFI spec 2.10. It does not
+use a lookup table to save on memory. The polynomial used is in reverse
+order to match little-endian machines.
+
+Change-Id: Ifce5a1cbbb3ab394bc748305be213a8467610015
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [3f2b707eaadef8008f333bd5c519c1b2544458ab]
+---
+ lib/ext/CMakeLists.txt                  |  1 +
+ lib/ext/efi_soft_crc/CMakeLists.txt     | 18 ++++++++++++++
+ lib/ext/efi_soft_crc/inc/efi_soft_crc.h | 33 +++++++++++++++++++++++++
+ lib/ext/efi_soft_crc/src/efi_soft_crc.c | 32 ++++++++++++++++++++++++
+ 4 files changed, 84 insertions(+)
+ create mode 100644 lib/ext/efi_soft_crc/CMakeLists.txt
+ create mode 100644 lib/ext/efi_soft_crc/inc/efi_soft_crc.h
+ create mode 100644 lib/ext/efi_soft_crc/src/efi_soft_crc.c
+
+diff --git a/lib/ext/CMakeLists.txt b/lib/ext/CMakeLists.txt
+index 05f6b8f14..1dffbacfb 100644
+--- a/lib/ext/CMakeLists.txt
++++ b/lib/ext/CMakeLists.txt
+@@ -10,6 +10,7 @@ add_subdirectory(qcbor)
+ add_subdirectory(t_cose)
+ add_subdirectory(mbedcrypto)
+ add_subdirectory(cmsis)
++add_subdirectory(efi_soft_crc)
+ if(BL2)
+     add_subdirectory(mcuboot)
+ endif()
+diff --git a/lib/ext/efi_soft_crc/CMakeLists.txt b/lib/ext/efi_soft_crc/CMakeLists.txt
+new file mode 100644
+index 000000000..47fd2d507
+--- /dev/null
++++ b/lib/ext/efi_soft_crc/CMakeLists.txt
+@@ -0,0 +1,18 @@
++#-------------------------------------------------------------------------------
++# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++add_library(tfm_efi_soft_crc STATIC)
++
++target_sources(tfm_efi_soft_crc
++    PRIVATE
++        src/efi_soft_crc.c
++)
++
++target_include_directories(tfm_efi_soft_crc
++    PUBLIC
++        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++)
+diff --git a/lib/ext/efi_soft_crc/inc/efi_soft_crc.h b/lib/ext/efi_soft_crc/inc/efi_soft_crc.h
+new file mode 100644
+index 000000000..77baa8987
+--- /dev/null
++++ b/lib/ext/efi_soft_crc/inc/efi_soft_crc.h
+@@ -0,0 +1,33 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __TFM_EFI_SOFT_CRC_H__
++#define __TFM_EFI_SOFT_CRC_H__
++
++#include <stddef.h>
++#include <stdint.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * \brief Updates a CRC32 calculation using ISO 3309 CRC-32.
++ *
++ * \param[in] old_crc Existing CRC value (0 for the first calculation).
++ * \param[in] buf     Buffer of bytes to perform the calculation over.
++ * \param[in] len     Length of \p buf in bytes.
++ *
++ * \return The calculated CRC32 value.
++ */
++uint32_t efi_soft_crc32_update(uint32_t old_crc, const uint8_t *buf, size_t len);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __TFM_EFI_SOFT_CRC_H__ */
+diff --git a/lib/ext/efi_soft_crc/src/efi_soft_crc.c b/lib/ext/efi_soft_crc/src/efi_soft_crc.c
+new file mode 100644
+index 000000000..041a321cd
+--- /dev/null
++++ b/lib/ext/efi_soft_crc/src/efi_soft_crc.c
+@@ -0,0 +1,32 @@
++/* Copyright (C) 2013 Henry S. Warren Jr. You are free to use, copy,
++ * and distribute any of the code on this web site, whether modified
++ * by you or not.
++ */
++
++#include "efi_soft_crc.h"
++
++/* The standard polynomial, in reverse */
++#define POLYNOMIAL 0xEDB88320
++
++/* Algorithmic approach to CRC calculation: avoids lookup tables, slow. Byte
++ * reversal is avoided by shifting the crc register right instead of left and
++ * by using a reversed 32-bit word to represent the polynomial.
++ *
++ * Derived from work by Henry S. Warren Jr.
++ */
++uint32_t efi_soft_crc32_update(uint32_t old_crc32, const uint8_t *buf, size_t len)
++{
++    register uint32_t crc32 = ~old_crc32;
++    uint32_t mask;
++
++    for ( ; len; --len, ++buf)
++    {
++        crc32 ^= *buf;
++        for (size_t i = 0; i < 8; ++i) {
++            mask = -(crc32 & 1);
++            crc32 = (crc32 >> 1) ^ (POLYNOMIAL & mask);
++        }
++    }
++
++    return ~crc32;
++}

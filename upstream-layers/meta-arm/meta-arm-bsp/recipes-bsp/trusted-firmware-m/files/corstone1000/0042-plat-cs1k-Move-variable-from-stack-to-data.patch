@@ -1,0 +1,55 @@
+From 201166be49ca4c0079cf804f208534f201cb4b65 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 16:53:54 +0000
+Subject: [PATCH] plat: cs1k: Move variable from stack to data
+
+The firmware update secure partition stack is only 0x600 bytes in size.
+The variable moved is a buffer of size 0x200, consituting one third of
+the available stack. Moving this to the much larger .data section allows
+much more stack space if required.
+
+Change-Id: I59d68e80acefaeea36c7060442e005998217d923
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49430]
+---
+ .../arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c   | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+index 5e1c4ecc5..a35125b00 100644
+--- a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
++++ b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+@@ -39,6 +39,7 @@
+  * This is used when bank consistency is maintained during partial capsule update
+  */
+ #define FLASH_CHUNK_SIZE                512
++static uint8_t flash_data_buf[FLASH_CHUNK_SIZE];
+ 
+ /* Possible states of the bank.
+  * Naming convention here matches the implementation in U-Boot 
+@@ -1978,7 +1979,6 @@ static psa_status_t copy_image_from_other_bank(int image_index,
+     FWU_LOG_FUNC_ENTER;
+ 
+     uint32_t bank_offset[NR_OF_FW_BANKS] = {BANK_0_PARTITION_OFFSET, BANK_1_PARTITION_OFFSET};
+-    uint8_t data[FLASH_CHUNK_SIZE];
+     size_t remaining_size = fwu_image[image_index].image_size;
+     size_t data_size;
+     size_t offset_read = bank_offset[active_index] + fwu_image[image_index].image_offset;
+@@ -1997,7 +1997,7 @@ static psa_status_t copy_image_from_other_bank(int image_index,
+         data_size = (remaining_size > FLASH_CHUNK_SIZE) ? FLASH_CHUNK_SIZE : remaining_size;
+ 
+         /* read image data from flash */
+-        data_transferred_count = FWU_METADATA_FLASH_DEV.ReadData(offset_read, data, data_size);
++        data_transferred_count = FWU_METADATA_FLASH_DEV.ReadData(offset_read, flash_data_buf, data_size);
+         if (data_transferred_count < 0) {
+             FWU_LOG_MSG("%s: ERROR - Flash read failed (ret = %d)\n\r", __func__, data_transferred_count);
+             return PSA_ERROR_STORAGE_FAILURE;
+@@ -2012,7 +2012,7 @@ static psa_status_t copy_image_from_other_bank(int image_index,
+         offset_read += data_size;
+ 
+         /* write image data to flash */
+-        data_transferred_count = FWU_METADATA_FLASH_DEV.ProgramData(offset_write, data, data_size);
++        data_transferred_count = FWU_METADATA_FLASH_DEV.ProgramData(offset_write, flash_data_buf, data_size);
+         if (data_transferred_count < 0) {
+             FWU_LOG_MSG("%s: ERROR - Flash read failed (ret = %d)\n\r", __func__, data_transferred_count);
+             return PSA_ERROR_STORAGE_FAILURE;

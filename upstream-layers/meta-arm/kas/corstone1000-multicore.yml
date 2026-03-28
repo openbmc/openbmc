@@ -4,5 +4,5 @@ header:
   version: 14
 
 local_conf_header:
-  fvp-multicore: |
-    MACHINE_FEATURES += "corstone1000_fvp_smp"
+  multicore: |
+    MACHINE_FEATURES += "corstone1000_smp"

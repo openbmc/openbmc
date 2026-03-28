@@ -1,0 +1,113 @@
+From a9801643d9d4d3f24960c5f24d5f5c3fd4889cc1 Mon Sep 17 00:00:00 2001
+From: Alex Chapman <alecha05@e142473.arm.com>
+Date: Tue, 3 Mar 2026 17:00:58 +0000
+Subject: [PATCH] feat(corestone-1000): make mutlicore support platform generic
+
+To improve portability, testing coverage, and future platform enablement.
+
+- Replace FVP-only multicore checks with platform-generic checks.
+- Add the corresponding TF-M patch to the Corstone-1000 recipe.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-A/trusted-firmware-a/+/49092]
+Signed-off-by: Alex Chapman <alex.chapman@arm.com>
+---
+ plat/arm/board/corstone1000/common/corstone1000_helpers.S | 4 ++--
+ plat/arm/board/corstone1000/common/corstone1000_pm.c      | 6 +++---
+ plat/arm/board/corstone1000/common/include/platform_def.h | 4 ++--
+ plat/arm/board/corstone1000/platform.mk                   | 6 ++----
+ 4 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_helpers.S b/plat/arm/board/corstone1000/common/corstone1000_helpers.S
+index 665dbc61a..d41df4ebe 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_helpers.S
++++ b/plat/arm/board/corstone1000/common/corstone1000_helpers.S
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2021-2025 Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2026 Arm Limited and Contributors. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+@@ -54,7 +54,7 @@ endfunc plat_arm_calc_core_pos
+ 	 * --------------------------------------------------------------------
+ 	 */
+ func plat_secondary_cold_boot_setup
+-#if defined(CORSTONE1000_FVP_MULTICORE)
++#if defined(CORSTONE1000_MULTICORE)
+ 
+ 	/* Calculate the address of our hold entry */
+ 	bl	plat_my_core_pos
+diff --git a/plat/arm/board/corstone1000/common/corstone1000_pm.c b/plat/arm/board/corstone1000/common/corstone1000_pm.c
+index a87697e97..2c7a2c67b 100644
+--- a/plat/arm/board/corstone1000/common/corstone1000_pm.c
++++ b/plat/arm/board/corstone1000/common/corstone1000_pm.c
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2021-2025, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2026, Arm Limited and Contributors. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+@@ -41,7 +41,7 @@ static void corstone1000_system_reset(void)
+ 	*watchdog_ctrl_reg = SECURE_WATCHDOG_MASK_ENABLE;
+ }
+ 
+-#if defined(CORSTONE1000_FVP_MULTICORE)
++#if defined(CORSTONE1000_MULTICORE)
+ int corstone1000_validate_ns_entrypoint(uintptr_t entrypoint)
+ {
+ 	/*
+@@ -77,7 +77,7 @@ void corstone1000_pwr_domain_on_finish(const psci_power_state_t *target_state)
+ #endif
+ 
+ plat_psci_ops_t plat_arm_psci_pm_ops = {
+-#if defined(CORSTONE1000_FVP_MULTICORE)
++#if defined(CORSTONE1000_MULTICORE)
+ 	.pwr_domain_on = corstone1000_pwr_domain_on,
+ 	.pwr_domain_on_finish = corstone1000_pwr_domain_on_finish,
+ 	.validate_ns_entrypoint = corstone1000_validate_ns_entrypoint,
+diff --git a/plat/arm/board/corstone1000/common/include/platform_def.h b/plat/arm/board/corstone1000/common/include/platform_def.h
+index ffb1e2dec..4682b8b5d 100644
+--- a/plat/arm/board/corstone1000/common/include/platform_def.h
++++ b/plat/arm/board/corstone1000/common/include/platform_def.h
+@@ -1,5 +1,5 @@
+ /*
+- * Copyright (c) 2021-2025, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2021-2026, Arm Limited and Contributors. All rights reserved.
+  *
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+@@ -266,7 +266,7 @@
+ 
+ #define PLAT_ARM_TRUSTED_MAILBOX_BASE	ARM_TRUSTED_SRAM_BASE
+ 
+-#if defined(CORSTONE1000_FVP_MULTICORE)
++#if defined(CORSTONE1000_MULTICORE)
+ /* The secondary core entrypoint address points to bl31_warm_entrypoint
+  * and the address size is 8 bytes */
+ #define CORSTONE1000_SECONDARY_CORE_ENTRYPOINT_ADDRESS_SIZE    UL(0x8)
+diff --git a/plat/arm/board/corstone1000/platform.mk b/plat/arm/board/corstone1000/platform.mk
+index fe3e94865..dee40f3b3 100644
+--- a/plat/arm/board/corstone1000/platform.mk
++++ b/plat/arm/board/corstone1000/platform.mk
+@@ -1,5 +1,5 @@
+ #
+-# Copyright (c) 2021-2025 Arm Limited and Contributors. All rights reserved.
++# Copyright (c) 2021-2026 Arm Limited and Contributors. All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+@@ -44,10 +44,8 @@ $(eval $(call add_define,CORSTONE1000_WITH_BL32))
+ endif
+ 
+ ENABLE_MULTICORE       :=      0
+-ifneq ($(filter ${TARGET_PLATFORM}, fvp),)
+ ifeq (${ENABLE_MULTICORE},1)
+-$(eval $(call add_define,CORSTONE1000_FVP_MULTICORE))
+-endif
++$(eval $(call add_define,CORSTONE1000_MULTICORE))
+ endif
+ 
+ ifdef CORSTONE1000_CORTEX_A320
+-- 
+2.43.0

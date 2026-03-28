@@ -6,6 +6,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files/corstone1000:"
 SRC_URI:append = " \
 	file://0001-Fix-FF-A-version-in-SPMC-manifest.patch \
 	file://0002-plat-corstone1000-add-Cortex-A320-support.patch \
+	file://0003-feat-corestone-1000-make-mutlicore-support-platform-.patch \
 "
 
 TFA_DEBUG = "1"
@@ -58,7 +59,7 @@ EXTRA_OEMAKE:append = " \
                         BL32=${RECIPE_SYSROOT}/${nonarch_base_libdir}/firmware/tee-pager_v2.bin \
                         FVP_USE_GIC_DRIVER=${FVP_GIC_DRIVER} \
                         "
-EXTRA_OEMAKE:append:corstone1000-fvp = "${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_fvp_smp', ' ENABLE_MULTICORE=1', '', d)}"
+EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'corstone1000_smp', ' ENABLE_MULTICORE=1', '', d)}"
 
 # Add Cortex-A320 specific configurations
 EXTRA_OEMAKE:append:cortexa320 = " \

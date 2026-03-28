@@ -1,0 +1,48 @@
+From f48a0a6b60309433269c7927dac992eff06f3745 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 29 Dec 2025 11:29:33 +0000
+Subject: [PATCH] plat: cs1k: Improved logging in function
+
+The enter log statement claims to log when the function is entered,
+however it was possible for the function to return before reaching it.
+The error cases have now been given log statements too in order to make
+it easier to track when and why the function exited.
+
+Change-Id: I7fe610ca6a596b6af1e48720a503b76064eed3ff
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49424]
+---
+ .../arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+index 83b0bd27d..52db60bbc 100644
+--- a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
++++ b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+@@ -1700,11 +1700,16 @@ psa_status_t fwu_bootloader_load_image(psa_fwu_component_t component,
+                                        size_t block_size)
+ {
+ 
++    FWU_LOG_MSG("%s: enter: block_offset = %u, block = 0x%p, block_size = %u\n\r"
++                , __func__, block_offset, block, block_size);
++
+     if (block == NULL) {
++        FWU_LOG_MSG("%s: exit: block is NULL\n\r", __func__);
+         return PSA_ERROR_INVALID_ARGUMENT;
+     }
+ 
+     if (!is_initialized) {
++        FWU_LOG_MSG("%s: exit: not initialised\n\r", __func__);
+         return PSA_ERROR_BAD_STATE;
+     }
+ 
+@@ -1726,9 +1731,6 @@ psa_status_t fwu_bootloader_load_image(psa_fwu_component_t component,
+     uint8_t fwu_image_index = component - FWU_FAKE_IMAGES_INDEX_COUNT;
+     struct fwu_private_metadata priv_metadata;
+ 
+-    FWU_LOG_MSG("%s: enter: block_offset = %u, block = 0x%p, block_size = %u\n\r"
+-                , __func__, block_offset, block, block_size);
+-
+     /* Parse the incoming block to make sure complete FMP header is received */
+     if (fmp_header_image_info[fwu_image_index].fmp_hdr_size_recvd != sizeof(fmp_header_image_info[fwu_image_index].fmp_hdr)) {
+         ret = parse_fmp_header(fwu_image_index, block, block_size);

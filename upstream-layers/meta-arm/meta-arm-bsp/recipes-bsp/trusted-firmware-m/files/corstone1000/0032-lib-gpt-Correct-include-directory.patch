@@ -1,0 +1,27 @@
+From eb934a532bbc8385cd9b062fc80cece61350f086 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 13 Mar 2026 17:19:50 +0000
+Subject: [PATCH] lib: gpt: Correct include directory
+
+The variables have no real effect, so therefore this is simplified.
+
+Change-Id: Ie912941f8eafd9cd5bf4dd88927640ad70d0676a
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [369c897be0b9102cec8141c53b3d3fe6abb56b6e]
+---
+ lib/gpt/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/gpt/CMakeLists.txt b/lib/gpt/CMakeLists.txt
+index ed31adfbe..19cfe5bc2 100644
+--- a/lib/gpt/CMakeLists.txt
++++ b/lib/gpt/CMakeLists.txt
+@@ -22,7 +22,7 @@ target_sources(tfm_gpt
+ 
+ target_include_directories(tfm_gpt
+     PUBLIC
+-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++        inc
+         $<INSTALL_INTERFACE:inc>
+ )
+ 

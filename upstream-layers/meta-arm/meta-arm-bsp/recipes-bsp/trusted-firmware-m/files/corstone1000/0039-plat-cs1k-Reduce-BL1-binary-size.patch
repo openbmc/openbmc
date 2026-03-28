@@ -1,0 +1,464 @@
+From 939d18a0d8dcedd2b5c4b6220e1a0f6c6855fcf6 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Fri, 2 Jan 2026 14:21:57 +0000
+Subject: [PATCH] plat: cs1k: Reduce BL1 binary size
+
+The size of the BL1 binary is nearly at its maximum allowable size of
+64KiB. By making logging a bit more consistent, string literals can be
+re-used and reduce the size of the binary. This allows more space for
+BL1_2.
+
+Some functions also had two or more "entry" logging statements, and so
+the redundant statements were removed.
+
+The size of BL1_1 has been updated to reflect these changes.
+
+Change-Id: Id52dd0d319fb252d7d05e40b6f8f640d27d45ddb
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/49427]
+---
+ .../bootloader/mcuboot/tfm_mcuboot_fwu.c      | 101 ++++++++++--------
+ .../arm/corstone1000/partition/region_defs.h  |   2 +-
+ 2 files changed, 56 insertions(+), 47 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+index 76ee8a3dc..dc7503d41 100644
+--- a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
++++ b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+@@ -56,6 +56,13 @@
+ #define FWU_FAKE_IMAGES_INDEX_COUNT    1
+ #define FWU_FAKE_IMAGE_INDEX           0
+ 
++/* These macros provide consistent logging for simple function enter and
++ * successful exit. This helps reduce the number of string literals in the
++ * final binary, thus reducing its size
++ */
++#define FWU_LOG_FUNC_ENTER FWU_LOG_MSG("%s: enter\n\r", __func__)
++#define FWU_LOG_FUNC_EXIT_SUCCESS FWU_LOG_MSG("%s: success\n\r", __func__)
++
+ /*
+  * Metadata version 2 data structures defined by PSA_FW update specification
+  * at https://developer.arm.com/documentation/den0118/latest/
+@@ -334,7 +341,7 @@ extern ARM_DRIVER_FLASH FWU_METADATA_FLASH_DEV;
+ static psa_status_t private_metadata_read(
+         struct fwu_private_metadata* priv_metadata)
+ {
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!priv_metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+@@ -366,7 +373,7 @@ static psa_status_t private_metadata_read(
+     partition_entry_t *part;
+     uuid_t private_uuid = PRIVATE_METADATA_TYPE_UUID;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!priv_metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+@@ -430,7 +437,7 @@ static psa_status_t private_metadata_write(
+         return PSA_ERROR_INSUFFICIENT_DATA;
+     }
+ 
+-    FWU_LOG_MSG("%s: success\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ #else
+@@ -473,14 +480,14 @@ static psa_status_t private_metadata_write(
+         return PSA_ERROR_INSUFFICIENT_DATA;
+     }
+ 
+-    FWU_LOG_MSG("%s: success\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ #endif
+ 
+ static psa_status_t metadata_validate(struct fwu_metadata *metadata)
+ {
+-    FWU_LOG_MSG("%s: enter:\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+@@ -496,7 +503,7 @@ static psa_status_t metadata_validate(struct fwu_metadata *metadata)
+         return PSA_ERROR_GENERIC_ERROR;
+     }
+ 
+-    FWU_LOG_MSG("%s: success\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+ 
+     return PSA_SUCCESS;
+ }
+@@ -506,7 +513,7 @@ static psa_status_t metadata_read(struct fwu_metadata *metadata, uint8_t replica
+ {
+     uint32_t replica_offset = 0;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+@@ -525,7 +532,6 @@ static psa_status_t metadata_read(struct fwu_metadata *metadata, uint8_t replica
+     FWU_LOG_MSG("%s: flash addr = %u, size = %d\n\r", __func__,
+                   replica_offset, sizeof(*metadata));
+ 
+-
+     int ret = FWU_METADATA_FLASH_DEV.ReadData(replica_offset,
+                                 metadata, sizeof(*metadata));
+     if (ret < 0) {
+@@ -555,7 +561,7 @@ static psa_status_t metadata_read(struct fwu_metadata *metadata, uint8_t replica
+     uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+     partition_entry_t *part;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+@@ -611,7 +617,7 @@ static psa_status_t metadata_write(
+ {
+     uint32_t replica_offset = 0;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+@@ -627,10 +633,9 @@ static psa_status_t metadata_write(
+         return PSA_ERROR_GENERIC_ERROR;
+     }
+ 
+-    FWU_LOG_MSG("%s: enter: flash addr = %u, size = %d\n\r", __func__,
++    FWU_LOG_MSG("%s: flash addr = %u, size = %d\n\r", __func__,
+                   replica_offset, sizeof(*metadata));
+ 
+-
+     int ret = FWU_METADATA_FLASH_DEV.EraseSector(replica_offset);
+     if (ret != ARM_DRIVER_OK) {
+         FWU_LOG_MSG("%s: ERROR - Flash erase failed (ret = %d)\n\r", __func__, ret);
+@@ -661,6 +666,8 @@ static psa_status_t metadata_write(
+     uuid_t metadata_uuid = FWU_METADATA_TYPE_UUID;
+     partition_entry_t *part;
+ 
++    FWU_LOG_FUNC_ENTER;
++
+     if (!metadata) {
+         FWU_LOG_MSG("%s: ERROR - Null pointer received\n\r", __func__);
+         return PSA_ERROR_INVALID_ARGUMENT;
+@@ -888,7 +895,7 @@ psa_status_t fwu_metadata_provision(void)
+ {
+     psa_status_t ret;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     ret = fwu_metadata_init();
+     if (ret) {
+@@ -918,7 +925,7 @@ psa_status_t fwu_metadata_provision(void)
+         return ret;
+     }
+ 
+-    FWU_LOG_MSG("%s: FWU METADATA PROVISIONED.\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ 
+@@ -927,7 +934,7 @@ static uint8_t get_fwu_image_state(
+         struct fwu_private_metadata *priv_metadata,
+         uint32_t fwu_image_index)
+ {
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if ((metadata->fw_desc.img_entry[fwu_image_index].img_props[metadata->active_index].accepted)
+             == (IMAGE_NOT_ACCEPTED)) {
+@@ -943,7 +950,7 @@ static uint8_t get_fwu_agent_state(
+         struct fwu_metadata *metadata,
+         struct fwu_private_metadata *priv_metadata)
+ {
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (priv_metadata->boot_index != metadata->active_index) {
+         FWU_LOG_MSG("%s: exit: FWU Agent PSA_FWU_TRIAL (index mismatch)\n\r", __func__);
+@@ -966,7 +973,7 @@ static psa_status_t erase_image(uint32_t image_offset, uint32_t image_size)
+     int ret;
+     uint32_t sectors;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if ((image_offset % FWU_METADATA_FLASH_SECTOR_SIZE) != 0) {
+         return PSA_ERROR_INVALID_ARGUMENT;
+@@ -989,7 +996,7 @@ static psa_status_t erase_image(uint32_t image_offset, uint32_t image_size)
+         }
+     }
+ 
+-    FWU_LOG_MSG("%s: exit\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ 
+@@ -1001,7 +1008,7 @@ static psa_status_t fwu_select_previous(
+     uint8_t current_state;
+     uint32_t index;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     /* it is expected to receive this call only when
+        in trial state */
+@@ -1049,8 +1056,8 @@ static psa_status_t fwu_select_previous(
+     FWU_LOG_MSG("%s: in regular state by choosing previous active bank\n\r",
+                  __func__);
+ 
+-    FWU_LOG_MSG("%s: exit: ret = %d\n\r", __func__, ret);
+-    return ret;
++    FWU_LOG_FUNC_EXIT_SUCCESS;
++    return PSA_SUCCESS;
+ 
+ }
+ 
+@@ -1061,7 +1068,7 @@ void bl1_get_active_bl2_image(uint32_t *offset)
+     uint32_t boot_attempted;
+     uint32_t boot_index;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (fwu_metadata_init()) {
+         FWU_ASSERT(0);
+@@ -1125,7 +1132,7 @@ uint8_t bl2_get_boot_bank(void)
+ {
+     uint8_t boot_index;
+     struct fwu_private_metadata priv_metadata;
+-    FWU_LOG_MSG("%s: enter", __func__);
++    FWU_LOG_FUNC_ENTER;
+     if (fwu_metadata_init()) {
+         FWU_ASSERT(0);
+     }
+@@ -1150,7 +1157,7 @@ static psa_status_t update_nv_counters(
+     uint32_t security_cnt;
+     enum tfm_nv_counter_t tfm_nv_counter_i;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     /* The FWU_BL2_NV_COUNTER (0) is not mirrored in the private metadata. It is
+      * directly updated in the bl1_2_validate_image_at_addr() function, in
+@@ -1194,7 +1201,7 @@ static psa_status_t update_nv_counters(
+ 
+     }
+ 
+-    FWU_LOG_MSG("%s: exit\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ 
+@@ -1204,7 +1211,7 @@ psa_status_t corstone1000_fwu_host_ack(void)
+     struct fwu_private_metadata priv_metadata;
+     uint8_t current_state;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!is_initialized) {
+         return PSA_ERROR_BAD_STATE;
+@@ -1309,7 +1316,7 @@ void host_acknowledgement_timer_to_reset(void)
+     struct fwu_private_metadata priv_metadata;
+     uint8_t current_state;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     Select_Write_Mode_For_Shared_Flash();
+ 
+@@ -1342,7 +1349,7 @@ void host_acknowledgement_timer_to_reset(void)
+         }
+     }
+ 
+-    FWU_LOG_MSG("%s: exit\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return;
+ }
+ 
+@@ -1379,7 +1386,7 @@ psa_status_t fwu_stage_nv_counter(enum fwu_nv_counter_index_t index,
+         }
+     }
+ 
+-    FWU_LOG_MSG("%s: exit\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ 
+@@ -1397,7 +1404,7 @@ bool is_image_index_valid(uint8_t fwu_image_index) {
+ 
+ static psa_status_t get_esrt_data(struct fwu_esrt_data_wrapper *esrt)
+ {
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     if (!esrt)
+     {
+@@ -1445,7 +1452,7 @@ static psa_status_t fwu_accept_image(struct fwu_metadata *metadata,
+     uint32_t fwu_image_index;
+     psa_status_t ret;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+ 
+     /* booted from previous_active_bank, not expected
+@@ -1492,8 +1499,8 @@ static psa_status_t fwu_accept_image(struct fwu_metadata *metadata,
+         return ret;
+     }
+ 
+-    FWU_LOG_MSG("%s: exit: fwu state is changed to regular, ret - %d\n\r", __func__, ret);
+-    return ret;
++    FWU_LOG_MSG("%s: success: fwu state is changed to regular\n\r", __func__);
++    return PSA_SUCCESS;
+ }
+ 
+ static psa_status_t uint_to_image_version(uint32_t ver_in, psa_fwu_image_version_t *ver_out)
+@@ -1525,6 +1532,8 @@ static psa_status_t erase_staging_area(struct fwu_metadata* metadata, psa_fwu_co
+         return PSA_ERROR_INVALID_ARGUMENT;
+     }
+ 
++    FWU_LOG_FUNC_ENTER;
++
+     if (!is_image_index_valid(component)) {
+         FWU_LOG_MSG("%s: Invalid Component received \n\r", __func__);
+         return PSA_ERROR_GENERIC_ERROR;
+@@ -1535,8 +1544,6 @@ static psa_status_t erase_staging_area(struct fwu_metadata* metadata, psa_fwu_co
+     uint32_t image_offset;
+     uint8_t fwu_image_index = component - FWU_FAKE_IMAGES_INDEX_COUNT; /* Decrement to get the correct fwu image index */
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
+-
+     if (active_index == BANK_0) {
+         bank_offset = BANK_1_PARTITION_OFFSET;
+     } else if (active_index == BANK_1) {
+@@ -1551,7 +1558,7 @@ static psa_status_t erase_staging_area(struct fwu_metadata* metadata, psa_fwu_co
+         return PSA_ERROR_GENERIC_ERROR;
+     }
+ 
+-    FWU_LOG_MSG("%s: exit: Staging area erased succesfully \n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+     return PSA_SUCCESS;
+ }
+ 
+@@ -1559,7 +1566,7 @@ psa_status_t fwu_bootloader_init(void)
+ {
+     psa_status_t ret;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     ret = fwu_metadata_init();
+     if (ret) {
+@@ -1569,7 +1576,7 @@ psa_status_t fwu_bootloader_init(void)
+     /* Initialize the fmp_header_image_info object */
+     fmp_header_image_info_init();
+ 
+-    FWU_LOG_MSG("%s: exit: Initialized\n\r", __func__);
++    FWU_LOG_FUNC_EXIT_SUCCESS;
+ 
+     return PSA_SUCCESS;
+ }
+@@ -1588,7 +1595,7 @@ psa_status_t fwu_bootloader_staging_area_init(psa_fwu_component_t component,
+ 
+     psa_status_t ret;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     Select_Write_Mode_For_Shared_Flash();
+ 
+@@ -1783,7 +1790,7 @@ static psa_status_t fwu_update_metadata(const psa_fwu_component_t *candidates, u
+     uint32_t previous_active_index;
+     uint8_t fwu_image_index;
+ 
+-    FWU_LOG_MSG("%s: enter function\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     Select_Write_Mode_For_Shared_Flash();
+ 
+@@ -1842,6 +1849,8 @@ static psa_status_t copy_image_from_other_bank(int image_index,
+                                                uint32_t active_index,
+                                                uint32_t previous_active_index)
+ {
++    FWU_LOG_FUNC_ENTER;
++
+     uint32_t bank_offset[NR_OF_FW_BANKS] = {BANK_0_PARTITION_OFFSET, BANK_1_PARTITION_OFFSET};
+     uint8_t data[FLASH_CHUNK_SIZE];
+     size_t remaining_size = fwu_image[image_index].image_size;
+@@ -1904,7 +1913,7 @@ static psa_status_t maintain_bank_consistency(void)
+     uint32_t previous_active_index;
+     struct fwu_private_metadata priv_metadata;
+ 
+-    FWU_LOG_MSG("%s: Enter \n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+     Select_Write_Mode_For_Shared_Flash();
+ 
+     if (metadata_read(&_metadata, 1) || private_metadata_read(&priv_metadata)) {
+@@ -1979,7 +1988,7 @@ psa_status_t fwu_bootloader_install_image(const psa_fwu_component_t *candidates,
+     }
+ 
+     psa_status_t ret;
+-    FWU_LOG_MSG("%s: enter function\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     /* Copy images from other bank which are not received by FWU client */
+     ret = maintain_bank_consistency();
+@@ -2015,7 +2024,7 @@ psa_status_t fwu_bootloader_mark_image_accepted(const psa_fwu_component_t *trial
+     uint8_t current_state;
+     uint8_t fwu_image_index;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     Select_Write_Mode_For_Shared_Flash();
+ 
+@@ -2114,7 +2123,7 @@ psa_status_t fwu_bootloader_reject_staged_image(psa_fwu_component_t component)
+     uint32_t image_offset;
+     uint8_t image_index = component - FWU_FAKE_IMAGES_INDEX_COUNT;    /* Decrement to get the correct fwu image index */
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+     Select_Write_Mode_For_Shared_Flash();
+ 
+     if (metadata_read(&_metadata, 1)) {
+@@ -2158,7 +2167,7 @@ psa_status_t fwu_bootloader_reject_trial_image(psa_fwu_component_t component)
+     int ret;
+     uint8_t fwu_image_index = component - FWU_FAKE_IMAGES_INDEX_COUNT;    /* Decrement to get the correct fwu image index */
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+     /* Disable host ackowledgement timer */
+     disable_host_ack_timer();
+@@ -2213,7 +2222,7 @@ psa_status_t fwu_bootloader_get_image_info(psa_fwu_component_t component,
+     uint8_t current_state;
+     psa_status_t ret;
+ 
+-    FWU_LOG_MSG("%s: enter\n\r", __func__);
++    FWU_LOG_FUNC_ENTER;
+ 
+ 
+     Select_Write_Mode_For_Shared_Flash();
+diff --git a/platform/ext/target/arm/corstone1000/partition/region_defs.h b/platform/ext/target/arm/corstone1000/partition/region_defs.h
+index 92e01c0e3..1feee7841 100644
+--- a/platform/ext/target/arm/corstone1000/partition/region_defs.h
++++ b/platform/ext/target/arm/corstone1000/partition/region_defs.h
+@@ -94,7 +94,7 @@
+ 
+ /* SE BL1 regions */
+ #define BL1_1_CODE_START    (0)
+-#define BL1_1_CODE_SIZE     (0x0000E800)     /* 58 KiB */
++#define BL1_1_CODE_SIZE     (0x0000E748)     /* 58 KiB */
+ #define BL1_1_CODE_LIMIT    (BL1_1_CODE_START + BL1_1_CODE_SIZE - 1)
+ 
+ #define PROVISIONING_DATA_START (BL1_1_CODE_START + BL1_1_CODE_SIZE)

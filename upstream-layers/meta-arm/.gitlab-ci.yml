@@ -37,12 +37,10 @@ stages:
     SSTATE_DIR: $CACHE_DIR/sstate
     DL_DIR: $CACHE_DIR/downloads
     BB_LOGCONFIG: $CI_PROJECT_DIR/ci/logging.yml
-    TOOLCHAIN_DIR: $CACHE_DIR/toolchains
     IMAGE_DIR: $KAS_BUILD_DIR/tmp/deploy/images
-    TOOLCHAIN_LINK_DIR: $KAS_BUILD_DIR/toolchains
   before_script:
     - rm -rf $KAS_WORK_DIR
-    - mkdir --verbose --parents $KAS_WORK_DIR $KAS_REPO_REF_DIR $SSTATE_DIR $DL_DIR $TOOLCHAIN_DIR $TOOLCHAIN_LINK_DIR
+    - mkdir --verbose --parents $KAS_WORK_DIR $KAS_REPO_REF_DIR $SSTATE_DIR $DL_DIR
 
 # Generalised fragment to do a Kas build
 .build:

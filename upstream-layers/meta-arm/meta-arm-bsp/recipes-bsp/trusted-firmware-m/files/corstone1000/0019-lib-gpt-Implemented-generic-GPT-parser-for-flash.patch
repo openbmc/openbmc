@@ -1,0 +1,1495 @@
+From ea6748c8778d21e331b22ddea808f9343a654b4d Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 29 Dec 2025 17:36:22 +0000
+Subject: [PATCH] lib: gpt: Implemented generic GPT parser for flash
+
+The library can be used to parse GPT partitions on a flash device by
+giving the library endpoint the GUID that identifies the partition. A
+platform must register with the library a pseudo-device driver that
+defines a read operation, allowing the library to perform I/O.
+
+Change-Id: Id504ceb93856561063751570a773c4aae592b535
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [2b155c6163f866757971ddf438014b518c4edd05]
+---
+ CMakeLists.txt                    |   5 +
+ config/config_base.cmake          |   2 +
+ lib/gpt/CMakeLists.txt            |  40 ++
+ lib/gpt/config.cmake              |   8 +
+ lib/gpt/inc/gpt.h                 |  80 ++++
+ lib/gpt/inc/gpt_flash.h           |  73 ++++
+ lib/gpt/src/gpt.c                 | 592 ++++++++++++++++++++++++++++++
+ lib/gpt/unittests/CMakeLists.txt  | 179 +++++++++
+ lib/gpt/unittests/gpt/test_gpt.c  | 383 +++++++++++++++++++
+ lib/gpt/unittests/gpt/utcfg.cmake |  28 ++
+ 10 files changed, 1390 insertions(+)
+ create mode 100644 lib/gpt/CMakeLists.txt
+ create mode 100644 lib/gpt/config.cmake
+ create mode 100644 lib/gpt/inc/gpt.h
+ create mode 100644 lib/gpt/inc/gpt_flash.h
+ create mode 100644 lib/gpt/src/gpt.c
+ create mode 100644 lib/gpt/unittests/CMakeLists.txt
+ create mode 100644 lib/gpt/unittests/gpt/test_gpt.c
+ create mode 100644 lib/gpt/unittests/gpt/utcfg.cmake
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index b120de697..9e6e2ceda 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,6 +42,11 @@ set(CMAKE_CXX_COMPILER_FORCED true)
+ 
+ project("Trusted Firmware M" VERSION ${TFM_VERSION} LANGUAGES C CXX ASM)
+ 
++
++if(PLATFORM_GPT_LIBRARY)
++    add_subdirectory(lib/gpt)
++endif()
++
+ add_subdirectory(lib/backtrace)
+ add_subdirectory(lib/ext)
+ add_subdirectory(lib/efi_guid)
+diff --git a/config/config_base.cmake b/config/config_base.cmake
+index f4b2f3cd9..4cd14ab2b 100644
+--- a/config/config_base.cmake
++++ b/config/config_base.cmake
+@@ -129,6 +129,8 @@ set(PLATFORM_DEFAULT_SYSTEM_RESET_HALT  ON          CACHE BOOL      "Use default
+ set(PLATFORM_DEFAULT_IMAGE_SIGNING      ON          CACHE BOOL      "Use default image signing implementation")
+ set(PLATFORM_DEFAULT_PROV_LINKER_SCRIPT ON          CACHE BOOL      "Use default provisioning linker script")
+ 
++set(PLATFORM_GPT_LIBRARY                OFF         CACHE BOOL      "Whether to build the GPT library or not")
++
+ set(TFM_DUMMY_PROVISIONING              ON          CACHE BOOL      "Provision with dummy values. NOT to be used in production")
+ 
+ set(BL2_HEADER_SIZE                     0x000       CACHE STRING    "BL2 Header size")
+diff --git a/lib/gpt/CMakeLists.txt b/lib/gpt/CMakeLists.txt
+new file mode 100644
+index 000000000..2b5d6af8f
+--- /dev/null
++++ b/lib/gpt/CMakeLists.txt
+@@ -0,0 +1,40 @@
++#-------------------------------------------------------------------------------
++# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++cmake_minimum_required(VERSION 3.21)
++
++add_library(tfm_gpt STATIC)
++
++include(./config.cmake)
++
++if(NOT DEFINED TFM_GPT_BLOCK_SIZE OR NOT DEFINED GPT_LOG_LEVEL)
++    message(FATAL_ERROR "TFM_GPT_BLOCK_SIZE and GPT_LOG_LEVEL must be defined to use GPT library")
++endif()
++
++target_sources(tfm_gpt
++    PRIVATE
++        src/gpt.c
++)
++
++target_include_directories(tfm_gpt
++    PUBLIC
++        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/inc>
++)
++
++target_compile_definitions(tfm_gpt
++    PUBLIC
++        TFM_GPT_BLOCK_SIZE=${TFM_GPT_BLOCK_SIZE}
++    PRIVATE
++        LOG_LEVEL=${GPT_LOG_LEVEL}
++)
++
++target_link_libraries(tfm_gpt
++    PUBLIC
++        tfm_log_headers
++    PRIVATE
++        tfm_efi_guid
++)
+diff --git a/lib/gpt/config.cmake b/lib/gpt/config.cmake
+new file mode 100644
+index 000000000..9575aa8a8
+--- /dev/null
++++ b/lib/gpt/config.cmake
+@@ -0,0 +1,8 @@
++#-------------------------------------------------------------------------------
++# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++set(GPT_LOG_LEVEL LOG_LEVEL_INFO CACHE STRING "Set default log level for the GPT library")
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+new file mode 100644
+index 000000000..d98abe980
+--- /dev/null
++++ b/lib/gpt/inc/gpt.h
+@@ -0,0 +1,80 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __TFM_GPT_H__
++#define __TFM_GPT_H__
++
++#include <stdbool.h>
++#include <stdint.h>
++
++#include "psa/error.h"
++#include "gpt_flash.h"
++#include "efi_guid_structs.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/** \brief Name length of a GPT partition entry. */
++#define GPT_ENTRY_NAME_LENGTH 72
++
++/**
++ * \brief Information about a GPT partition presented to callers.
++ */
++struct partition_entry_t {
++    uint64_t start;                   /**< Start Logical Block Address (LBA) of the partition. */
++    uint64_t size;                    /**< Size of the partition in number of LBAs. */
++    char name[GPT_ENTRY_NAME_LENGTH]; /**< Human readable name for the partition in unicode. */
++    uint64_t attr;                    /**< Attributes associated with the partition. */
++    struct efi_guid_t partition_guid; /**< Unique partition GUID. */
++    struct efi_guid_t type_guid;      /**< Partition type GUID. */
++};
++
++/**
++ * \brief Reads the contents of a partition entry identified by a GUID.
++ *
++ * \param[in]  guid GUID of the partition entry to read.
++ * \param[out] partition_entry Populated partition entry on success.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_DOES_NOT_EXIST No entry found with the provided GUID.
++ */
++__attribute__((nonnull(1,2)))
++psa_status_t gpt_entry_read(const struct efi_guid_t  *guid,
++                            struct partition_entry_t *partition_entry);
++
++/**
++ * \brief Reads the GPT header from the second block (LBA 1).
++ *
++ * \param[in] flash_driver Driver used to perform I/O.
++ * \param[in] max_partitions Maximum number of allowable partitions.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_INVALID_ARGUMENT \p max_partitions is less than four, or one of the I/O
++ *                                    functions defined by \p flash_driver is NULL. The init
++ *                                    and uninit functions may be NULL if not required.
++ * \retval PSA_ERROR_NOT_SUPPORTED Legacy MBR is used and not GPT.
++ */
++__attribute__((nonnull(1)))
++psa_status_t gpt_init(struct gpt_flash_driver_t *flash_driver,
++                      uint64_t max_partitions);
++
++/**
++ * \brief Uninitialises the library.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ */
++psa_status_t gpt_uninit(void);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __TFM_GPT_H__ */
+diff --git a/lib/gpt/inc/gpt_flash.h b/lib/gpt/inc/gpt_flash.h
+new file mode 100644
+index 000000000..2b43390c1
+--- /dev/null
++++ b/lib/gpt/inc/gpt_flash.h
+@@ -0,0 +1,73 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#ifndef __TFM_GPT_FLASH_H__
++#define __TFM_GPT_FLASH_H__
++
++#include <sys/types.h>
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * \brief Error codes returned by GPT flash driver operations.
++ */
++typedef enum {
++    GPT_FLASH_SUCCESS = 0,        /**< Operation completed successfully. */
++    GPT_FLASH_GENERIC_ERROR = -1, /**< Unspecified error. */
++    GPT_FLASH_NOT_INIT = -2,      /**< Flash driver has not been initialised. */
++    GPT_FLASH_UNAVAILABLE = -3,   /**< Flash driver is unavailable. */
++    GPT_FLASH_BAD_PARAM = -4,     /**< Parameter supplied to the driver is invalid. */
++} gpt_flash_err_t;
++
++/**
++ * \brief Function used to initialise the driver.
++ *
++ * \retval GPT_FLASH_SUCCESS Success.
++ * \retval GPT_FLASH_GENERIC_ERROR Driver-specific failure.
++ */
++typedef gpt_flash_err_t (*gpt_flash_init_t)(void);
++
++/**
++ * \brief Function used to uninitialise the driver.
++ *
++ * \retval GPT_FLASH_SUCCESS Success.
++ * \retval GPT_FLASH_GENERIC_ERROR Driver-specific failure.
++ */
++typedef gpt_flash_err_t (*gpt_flash_uninit_t)(void);
++
++/**
++ * \brief Function that reads a logical block address.
++ *
++ * \param[in]  lba Logical block address to read.
++ * \param[out] buf Buffer to populate. Must be at least the size of an LBA.
++ *
++ * \return Number of bytes read on success or a negative error code on failure.
++ * \retval GPT_FLASH_NOT_INIT The flash driver has not been initialised.
++ * \retval GPT_FLASH_UNAVAILABLE The flash driver is unavailable.
++ * \retval GPT_FLASH_BAD_PARAM \p lba is not a valid address (for example larger than the flash size).
++ * \retval GPT_FLASH_GENERIC_ERROR Unspecified error.
++ */
++__attribute__((nonnull(2)))
++typedef ssize_t (*gpt_flash_read_t)(uint64_t lba,
++                                    void    *buf);
++
++/**
++ * \brief Interface for interacting with the flash driver.
++ */
++struct gpt_flash_driver_t {
++    gpt_flash_init_t init;     /**< Flash initialisation routine. */
++    gpt_flash_uninit_t uninit; /**< Flash deinitialisation routine. */
++    gpt_flash_read_t read;     /**< Routine used to read a logical block. */
++};
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif /* __TFM_GPT_FLASH_H__ */
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+new file mode 100644
+index 000000000..99d735797
+--- /dev/null
++++ b/lib/gpt/src/gpt.c
+@@ -0,0 +1,592 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <string.h>
++#include <inttypes.h>
++
++#include "psa/error.h"
++#include "gpt.h"
++#include "gpt_flash.h"
++#include "tfm_log.h"
++#include "efi_guid_structs.h"
++
++/* This needs to be defined by the platform and is used by the GPT library as
++ * the number of bytes in a Logical Block Address (LBA)
++ */
++#ifndef TFM_GPT_BLOCK_SIZE
++#error "TFM_GPT_BLOCK_SIZE must be defined if using GPT library!"
++#endif
++
++/* Where Master Boot Record (MBR) is on flash */
++#define MBR_LBA 0ULL
++
++/* Number of unused bytes at the start of the MBR */
++#define MBR_UNUSED_BYTES 446
++
++/* Cylinder Head Sector (CHS) length for MBR entry */
++#define MBR_CHS_ADDRESS_LEN 3
++
++/* Number of entries in an MBR */
++#define MBR_NUM_ENTRIES 4
++
++/* MBR signature as defined by UEFI spec */
++#define MBR_SIG 0xAA55
++
++/* Type of MBR partition that indicates GPT in use */
++#define MBR_TYPE_GPT 0xEE
++
++/* Default GUID Partition Table (GPT) header size */
++#define GPT_HEADER_SIZE 92
++
++/* "EFI PART" (without null byte) */
++#define GPT_SIG "EFI PART"
++#define GPT_SIG_LEN 8
++
++/* Default partition entry size */
++#define GPT_ENTRY_SIZE 128
++
++/* Minimum number of partition entries according to spec */
++#define GPT_MIN_PARTITIONS 4
++
++/* Logical Block Address (LBA) for primary GPT */
++#define PRIMARY_GPT_LBA 1
++
++/* LBA for primary GPT partition array */
++#define PRIMARY_GPT_ARRAY_LBA 2
++
++/* MBR partition entry - both for protective MBR entry and
++ * legacy MBR entry
++ */
++struct mbr_entry_t {
++    /* Indicates if bootable */
++    uint8_t status;
++    /* For legacy MBR, not used by UEFI firmware. For protective MBR, set to
++     * 0x000200
++     */
++    uint8_t first_sector[MBR_CHS_ADDRESS_LEN];
++    /* Type of partition */
++    uint8_t os_type;
++    /* For legacy MBR, not used by UEFI firmware. For protective MBR, last
++     * block on flash.
++     */
++    uint8_t last_sector[MBR_CHS_ADDRESS_LEN];
++    /* For legacy MBR, starting LBA of partition. For protective MBR, set to
++     * 0x00000001
++     */
++    uint32_t first_lba;
++    /* For legacy MBR, size of partition. For protective MBR, size of flash
++     * minus one
++     */
++    uint32_t size;
++} __attribute__((packed));
++
++/* MBR. This structure is used both for protective MBR and legacy MBR. The boot
++ * code, flash signature and unknown sections are not read because they are
++ * unused and do not change.
++ */
++struct mbr_t {
++    /* Boot code at offset 0 is unused in EFI */
++    /* Unique MBR Disk signature at offset 440 is unused */
++    /* The next 2 bytes are also unused */
++    /* Array of four MBR partition records. For protective MBR, only the first
++     * is valid
++     */
++    struct mbr_entry_t partitions[MBR_NUM_ENTRIES];
++    /* 0xAA55 */
++    uint16_t sig;
++} __attribute__((packed));
++
++/* A GPT partition entry. */
++ struct gpt_entry_t {
++    struct efi_guid_t partition_type;   /* Partition type, defining purpose */
++    struct efi_guid_t unique_guid;      /* Unique GUID that defines each partition */
++    uint64_t start;                     /* Starting LBA for partition */
++    uint64_t end;                       /* Ending LBA for partition */
++    uint64_t attr;                      /* Attribute bits */
++    char name[GPT_ENTRY_NAME_LENGTH];   /* Human readable name for partition */
++}  __attribute__((packed));
++
++/* The GPT header. */
++struct gpt_header_t {
++    char signature[GPT_SIG_LEN];    /* "EFI PART" */
++    uint32_t revision;              /* Revision number */
++    uint32_t size;                  /* Size of this header */
++    uint32_t header_crc;            /* CRC of this header */
++    uint32_t reserved;              /* Reserved */
++    uint64_t current_lba;           /* LBA of this header */
++    uint64_t backup_lba;            /* LBA of backup GPT header */
++    uint64_t first_lba;             /* First usable LBA */
++    uint64_t last_lba;              /* Last usable LBA */
++    struct efi_guid_t flash_guid;   /* Disk GUID */
++    uint64_t array_lba;             /* First LBA of array of partition entries */
++    uint32_t num_partitions;        /* Number of partition entries in array */
++    uint32_t entry_size;            /* Size of a single partition entry */
++    uint32_t array_crc;             /* CRC of partitions array */
++} __attribute__((packed));
++
++/* A GUID partition table in memory. The array is not stored in memory
++ * due to its size
++ */
++struct gpt_t {
++    struct gpt_header_t header;     /* GPT header */
++    uint32_t num_used_partitions;   /* Number of in-use partitions */
++};
++
++/* A function for comparing some gpt entry's attribute with something known.
++ * Used to find entries of a certain kind, such as with a particular GUID,
++ * name or type.
++ */
++typedef bool (*gpt_entry_cmp_t)(const struct gpt_entry_t *, const void *);
++
++/* The LBA for the backup table */
++static uint64_t backup_gpt_lba = 0;
++
++/* The flash driver, used to perform I/O */
++static struct gpt_flash_driver_t *plat_flash_driver = NULL;
++
++/* Maximum partitions on platform */
++static uint32_t plat_max_partitions = 0;
++
++/* The primary GPT (also used if legacy MBR, but GPT header and partition
++ * entries are zero'd)
++ */
++static struct gpt_t primary_gpt = {0};
++
++/* Buffer to use for LBA I/O */
++static uint8_t lba_buf[TFM_GPT_BLOCK_SIZE] = {0};
++
++/* LBA that is cached in the buffer. Zero is valid only for protective MBR, all
++ * other GPT operations must have LBA of one or greater
++ */
++static uint64_t cached_lba = 0;
++
++/* Helper function prototypes */
++__attribute__((unused))
++static void print_guid(struct efi_guid_t guid);
++__attribute__((unused))
++static void dump_table(const struct gpt_t *table, bool header_only);
++__attribute__((unused))
++static psa_status_t unicode_to_ascii(const char *unicode, char *ascii);
++static inline uint64_t partition_entry_lba(const struct gpt_t *table,
++                                           uint32_t array_index);
++static inline uint64_t gpt_entry_per_lba_count(void);
++static psa_status_t count_used_partitions(const struct gpt_t *table,
++                                          uint32_t *num_used);
++static psa_status_t read_from_flash(uint64_t required_lba);
++static psa_status_t read_entry_from_flash(const struct gpt_t *table,
++                                          uint32_t array_index,
++                                          struct gpt_entry_t *entry);
++static psa_status_t read_table_from_flash(struct gpt_t *table, bool is_primary);
++static psa_status_t find_gpt_entry(const struct gpt_t      *table,
++                                   gpt_entry_cmp_t          compare,
++                                   const void              *attr,
++                                   const uint32_t           repeat_index,
++                                   struct gpt_entry_t      *entry,
++                                   uint32_t                *array_index);
++static psa_status_t mbr_load(struct mbr_t *mbr);
++static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid);
++
++/* PUBLIC API FUNCTIONS */
++
++psa_status_t gpt_entry_read(const struct efi_guid_t  *guid,
++                            struct partition_entry_t *partition_entry)
++{
++    struct gpt_entry_t cached_entry;
++    const psa_status_t ret = find_gpt_entry(&primary_gpt, gpt_entry_cmp_guid, guid, 0, &cached_entry, NULL);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    partition_entry->start = cached_entry.start;
++    partition_entry->size = cached_entry.end - cached_entry.start + 1;
++    memcpy(partition_entry->name, cached_entry.name, GPT_ENTRY_NAME_LENGTH);
++    partition_entry->attr = cached_entry.attr;
++    partition_entry->partition_guid = cached_entry.unique_guid;
++    partition_entry->type_guid = cached_entry.partition_type;
++
++    return PSA_SUCCESS;
++}
++
++/* Initialises GPT from first block. */
++psa_status_t gpt_init(struct gpt_flash_driver_t *flash_driver, uint64_t max_partitions)
++{
++    cached_lba = 0;
++    if (max_partitions < GPT_MIN_PARTITIONS) {
++        ERROR("Minimum number of partitions is %d\n", GPT_MIN_PARTITIONS);
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    if (flash_driver->read == NULL) {
++        ERROR("I/O functions must be defined\n");
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    /* Retain information needed to perform I/O. */
++    if (plat_flash_driver == NULL) {
++        plat_flash_driver = flash_driver;
++    }
++    if (plat_max_partitions == 0) {
++        plat_max_partitions = max_partitions;
++    }
++    if (plat_flash_driver->init != NULL) {
++        if (plat_flash_driver->init() != 0) {
++            ERROR("Unable to initialise flash driver\n");
++            return PSA_ERROR_STORAGE_FAILURE;
++        }
++    }
++
++    struct mbr_t mbr;
++    psa_status_t ret = mbr_load(&mbr);
++    if (ret != PSA_SUCCESS) {
++        goto fail_load;
++    }
++
++    /* If the first record has type 0xEE (GPT protective), then the flash uses
++     * GPT. Else, treat it as legacy MBR
++     */
++    if (mbr.partitions[0].os_type == MBR_TYPE_GPT) {
++        ret = read_table_from_flash(&primary_gpt, true);
++    } else {
++        WARN("Unsupported legacy MBR in use\n");
++        ret = PSA_ERROR_NOT_SUPPORTED;
++    }
++
++    if (ret != PSA_SUCCESS) {
++        goto fail_load;
++    }
++
++    /* Count the number of used entries, assuming the array is not sparese */
++    ret = count_used_partitions(&primary_gpt, &primary_gpt.num_used_partitions);
++    if (ret != PSA_SUCCESS) {
++        goto fail_load;
++    }
++
++    /* Read the backup GPT and cache necessary values */
++    backup_gpt_lba = primary_gpt.header.backup_lba;
++    if (backup_gpt_lba != 0) {
++        struct gpt_t backup_gpt;
++        ret = read_table_from_flash(&backup_gpt, false);
++        if (ret != PSA_SUCCESS) {
++            goto fail_load;
++        }
++    } else {
++        WARN("Backup GPT location is unknown!\n");
++    }
++
++    return PSA_SUCCESS;
++
++fail_load:
++    /* Reset so that the user can try with something else if desired */
++    plat_flash_driver = NULL;
++    plat_max_partitions = 0;
++    backup_gpt_lba = 0;
++    cached_lba = 0;
++
++    return ret;
++}
++
++psa_status_t gpt_uninit(void)
++{
++    psa_status_t ret = PSA_SUCCESS;
++
++    if (plat_flash_driver) {
++        /* Uninitialise driver if function provided */
++        if (plat_flash_driver->uninit != NULL) {
++            if (plat_flash_driver->uninit() != 0) {
++                ERROR("Unable to uninitialise flash driver\n");
++                ret = PSA_ERROR_STORAGE_FAILURE;
++            }
++        }
++    }
++
++    plat_flash_driver = NULL;
++    plat_max_partitions = 0;
++    backup_gpt_lba = 0;
++    cached_lba = 0;
++
++    return ret;
++}
++
++/* Returns the number of partition entries in each LBA */
++static inline uint64_t gpt_entry_per_lba_count(void)
++{
++    static uint64_t num_entries = 0;
++    if (num_entries == 0) {
++        num_entries = TFM_GPT_BLOCK_SIZE / primary_gpt.header.entry_size;
++    }
++    return num_entries;
++}
++
++/* Compare the entry with the given guid */
++static bool gpt_entry_cmp_guid(const struct gpt_entry_t *entry, const void *guid)
++{
++    const struct efi_guid_t *cmp_guid = (const struct efi_guid_t *)guid;
++    const struct efi_guid_t entry_guid = entry->unique_guid;
++
++    return efi_guid_cmp(&entry_guid, cmp_guid) == 0;
++}
++
++/* Read entry with given GUID from given table and return it if found. */
++static psa_status_t find_gpt_entry(const struct gpt_t        *table,
++                                   gpt_entry_cmp_t            compare,
++                                   const void                *cmp_attr,
++                                   const uint32_t             repeat_index,
++                                   struct gpt_entry_t        *entry,
++                                   uint32_t                  *array_index)
++{
++    if (table->num_used_partitions == 0) {
++        return PSA_ERROR_DOES_NOT_EXIST;
++    }
++
++    uint32_t num_found = 0;
++    bool io_failure = false;
++    for (uint32_t i = 0; i < table->num_used_partitions; ++i) {
++        const psa_status_t ret = read_entry_from_flash(table, i, entry);
++        if (ret != PSA_SUCCESS) {
++            /* This might not have been the partition being sought after anyway,
++             * so may as well try the rest
++             */
++            io_failure = true;
++            continue;
++        }
++
++        if (compare(entry, cmp_attr) && num_found++ == repeat_index) {
++            if (array_index != NULL) {
++                *array_index = i;
++            }
++            return PSA_SUCCESS;
++        }
++    }
++
++    return io_failure ? PSA_ERROR_STORAGE_FAILURE : PSA_ERROR_DOES_NOT_EXIST;
++}
++
++/* Load MBR from flash */
++static psa_status_t mbr_load(struct mbr_t *mbr)
++{
++    /* Read the beginning of the first block of flash, which will contain either
++     * a legacy MBR or a protective MBR (in the case of GPT). The first
++     * MBR_UNUSED_BYTES are unused and so do not need to be considered.
++     */
++    ssize_t ret = plat_flash_driver->read(MBR_LBA, lba_buf);
++    if (ret != TFM_GPT_BLOCK_SIZE) {
++        ERROR("Unable to read from flash at block 0x%08x%08x\n",
++                (uint32_t)(MBR_LBA >> 32),
++                (uint32_t)MBR_LBA);
++        return PSA_ERROR_STORAGE_FAILURE;
++    }
++    memcpy(mbr, lba_buf + MBR_UNUSED_BYTES, sizeof(*mbr));
++
++    /* Check MBR boot signature */
++    if (mbr->sig != MBR_SIG) {
++        ERROR("MBR signature incorrect\n");
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++
++    return PSA_SUCCESS;
++}
++
++/* Reads an LBA from the flash device and caches it. If the requested LBA is
++ * already cached, this is a no-op
++ */
++static psa_status_t read_from_flash(uint64_t required_lba)
++{
++    ssize_t ret;
++
++    if (required_lba != cached_lba) {
++        ret = plat_flash_driver->read(required_lba, lba_buf);
++        if (ret != TFM_GPT_BLOCK_SIZE) {
++            ERROR("Unable to read from flash at block 0x%08x%08x\n",
++                    (uint32_t)(required_lba >> 32),
++                    (uint32_t)required_lba);
++            return PSA_ERROR_STORAGE_FAILURE;
++        }
++        cached_lba = required_lba;
++    }
++
++    return PSA_SUCCESS;
++}
++
++/* Returns the LBA that a particular partition entry is in based on its position
++ * in the array
++ */
++static uint64_t inline partition_entry_lba(const struct gpt_t *table,
++                                           uint32_t array_index)
++{
++    return table->header.array_lba + (array_index / gpt_entry_per_lba_count());
++}
++
++/* Returns the number of partition entries used in the array, assuming the
++ * array is not sparse
++ */
++static psa_status_t count_used_partitions(const struct gpt_t *table,
++                                          uint32_t *num_used)
++{
++    for (uint32_t i = 0; i < table->header.num_partitions; ++i) {
++        struct gpt_entry_t entry = {0};
++        const psa_status_t ret = read_entry_from_flash(table, i, &entry);
++        if (ret != PSA_SUCCESS) {
++            return ret;
++        }
++
++        const struct efi_guid_t null_guid = NULL_GUID;
++        const struct efi_guid_t entry_guid = entry.partition_type;
++        if (efi_guid_cmp(&null_guid, &entry_guid) == 0) {
++            *num_used = i;
++            return PSA_SUCCESS;
++        }
++    }
++
++    *num_used = table->header.num_partitions;
++    return PSA_SUCCESS;
++}
++
++/* Reads a GPT entry from the given table on flash */
++static psa_status_t read_entry_from_flash(const struct gpt_t *table,
++                                          uint32_t            array_index,
++                                          struct gpt_entry_t *entry)
++{
++    uint64_t required_lba = partition_entry_lba(table, array_index);
++    const psa_status_t ret = read_from_flash(required_lba);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    memcpy(
++            entry,
++            lba_buf + ((array_index % gpt_entry_per_lba_count()) * table->header.entry_size),
++            GPT_ENTRY_SIZE);
++
++    return PSA_SUCCESS;
++}
++
++/* Reads a GPT table from flash */
++static psa_status_t read_table_from_flash(struct gpt_t *table, bool is_primary)
++{
++    if (!is_primary && backup_gpt_lba == 0) {
++        ERROR("Backup GPT location unknown!\n");
++        return PSA_ERROR_STORAGE_FAILURE;
++    }
++
++    const psa_status_t ret = read_from_flash(is_primary ? PRIMARY_GPT_LBA : backup_gpt_lba);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    memcpy(&(table->header), lba_buf, GPT_HEADER_SIZE);
++
++    return PSA_SUCCESS;
++}
++
++/* Converts unicode string to valid ascii */
++static psa_status_t unicode_to_ascii(const char *unicode, char *ascii)
++{
++    /* Check whether the unicode string is valid */
++    if (unicode[0] == '\0') {
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
++    for (int i = 1; i < GPT_ENTRY_NAME_LENGTH; i += 2) {
++        if (unicode[i] != '\0') {
++            return PSA_ERROR_INVALID_ARGUMENT;
++        }
++    }
++
++    /* Convert the unicode string to ascii string */
++    for (int i = 0; i < GPT_ENTRY_NAME_LENGTH; i += 2) {
++        ascii[i >> 1] = unicode[i];
++        if (unicode[i] == '\0') {
++            break;
++        }
++    }
++
++    return PSA_SUCCESS;
++}
++
++/* Prints guid in human readable format. Useful for debugging but should never
++ * be used in production, hence marked as unused
++ */
++static void print_guid(struct efi_guid_t guid)
++{
++    INFO("%04x%04x-%04x-%04x-%04x-%04x%04x%04x\n",
++            ((uint16_t *)&guid)[0],
++            ((uint16_t *)&guid)[1],
++            ((uint16_t *)&guid)[2],
++            ((uint16_t *)&guid)[3],
++            ((uint16_t *)&guid)[4],
++            ((uint16_t *)&guid)[5],
++            ((uint16_t *)&guid)[6],
++            ((uint16_t *)&guid)[7]);
++}
++
++/* Dumps header and optionally meta-data about array. Useful for debugging,
++ * but should never be used in production, hence marked as unused.
++ */
++static void dump_table(const struct gpt_t *table, bool header_only)
++{
++    /* Print the header first */
++    const struct gpt_header_t *header = &(table->header);
++    INFO("----------\n");
++    INFO("Signature: %8s\n", header->signature);
++    INFO("Revision: 0x%08x\n", header->revision);
++    INFO("HeaderSize: 0x%08x\n", header->size);
++    INFO("HeaderCRC32: 0x%08x\n", header->header_crc);
++    INFO("Reserved: 0x%08x\n", header->reserved);
++    INFO("MyLBA: 0x%08x%08x\n",
++            (uint32_t)(header->current_lba >> 32),
++            (uint32_t)(header->current_lba));
++    INFO("AlternateLBA: 0x%08x%08x\n",
++            (uint32_t)(header->backup_lba >> 32),
++            (uint32_t)(header->backup_lba));
++    INFO("FirstUsableLBA: 0x%08x%08x\n",
++            (uint32_t)(header->first_lba >> 32),
++            (uint32_t)(header->first_lba));
++    INFO("LastUsableLBA: 0x%08x%08x\n",
++            (uint32_t)(header->last_lba >> 32),
++            (uint32_t)(header->last_lba));
++    INFO("DiskGUID: ");
++    print_guid(header->flash_guid);
++    INFO("ParitionEntryLBA: 0x%08x%08x\n",
++            (uint32_t)(header->array_lba >> 32),
++            (uint32_t)(header->array_lba));
++    INFO("NumberOfPartitionEntries: 0x%08x\n", header->num_partitions);
++    INFO("SizeOfPartitionEntry: 0x%08x\n", header->entry_size);
++    INFO("PartitionEntryArrayCRC32: 0x%08x\n", header->array_crc);
++    INFO("----------\n");
++
++    if (!header_only) {
++        /* Now print meta-data for each entry, including those not in use */
++        for (uint32_t i = 0; i < table->num_used_partitions; ++i) {
++            struct gpt_entry_t entry;
++            psa_status_t ret = read_entry_from_flash(&primary_gpt, i, &entry);
++            if (ret != PSA_SUCCESS) {
++                continue;
++            }
++
++            INFO("Entry number: %u\n", i);
++            INFO("\tPartitionTypeGUID: ");
++            print_guid(entry.partition_type);
++            INFO("\tUniquePartitionGUID: ");
++            print_guid(entry.unique_guid);
++            INFO("\tStartingLBA: 0x%08x%08x\n",
++                    (uint32_t)(entry.start >> 32),
++                    (uint32_t)(entry.start));
++            INFO("\tEndingLBA: 0x%08x%08x\n",
++                    (uint32_t)(entry.end >> 32),
++                    (uint32_t)(entry.end));
++            INFO("\tAttributes: 0x%08x%08x\n",
++                    (uint32_t)(entry.attr >> 32),
++                    (uint32_t)(entry.attr));
++            char name[GPT_ENTRY_NAME_LENGTH >> 1];
++            if (unicode_to_ascii(entry.name, name) != PSA_SUCCESS) {
++                INFO("\tPartitionName: [Not valid ascii]\n");
++            } else {
++                INFO("\tPartitionName: %s\n", name);
++            }
++        }
++    }
++}
+diff --git a/lib/gpt/unittests/CMakeLists.txt b/lib/gpt/unittests/CMakeLists.txt
+new file mode 100644
+index 000000000..61c7078e5
+--- /dev/null
++++ b/lib/gpt/unittests/CMakeLists.txt
+@@ -0,0 +1,179 @@
++#-------------------------------------------------------------------------------
++# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++cmake_minimum_required(VERSION 3.21)
++
++if (NOT DEFINED TFM_UNITTESTS_PATHS)
++    message(FATAL_ERROR "Please provide absolute paths to the unittests using -DTFM_UNITTESTS_PATHS=<path1;path2;...>")
++endif()
++
++if (NOT DEFINED TFM_ROOT_DIR)
++    message(FATAL_ERROR "Please provide absolute paths to the TF-M root directory using -DTFM_ROOT_DIR=<path>")
++endif()
++
++list(APPEND CMAKE_MODULE_PATH ${TFM_ROOT_DIR}/cmake)
++
++project(
++    "tfm_gpt_unit_tests"
++    VERSION 1.0.0
++    LANGUAGES C
++)
++
++enable_testing()
++include(CTest)
++
++find_package(Ruby)
++find_program(LCOV lcov REQUIRED)
++find_program(GENHTML genhtml REQUIRED)
++
++set(UNITY_SRC_DIR ${TFM_ROOT_DIR}/platform/ext/target/arm/rse/common/unittests/framework/unity)
++set(CMOCK_SRC_DIR ${TFM_ROOT_DIR}/platform/ext/target/arm/rse/common/unittests/framework/cmock)
++
++add_subdirectory(${UNITY_SRC_DIR} ${UNITY_SRC_DIR})
++add_subdirectory(${CMOCK_SRC_DIR} ${CMOCK_SRC_DIR})
++
++function(generate_test UNIT_NAME UNIT_PATH)
++        include(${UNIT_PATH}/utcfg.cmake)
++
++        # Generate runner for the test
++        file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/unittests/${UNIT_NAME})
++        add_custom_command(
++            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/unittests/${UNIT_NAME}/test_runner.c
++            COMMAND ${Ruby_EXECUTABLE}
++                ${UNITY_PATH}/auto/generate_test_runner.rb
++                ${UNITY_SRC_DIR}/cfg.yml
++                ${UNIT_TEST_SUITE}
++                ${CMAKE_CURRENT_BINARY_DIR}/unittests/${UNIT_NAME}/test_runner.c
++            COMMENT "Generating test runner for ${UNIT_NAME}"
++        )
++
++        # test_<unit-name> is the runner for <unit-name>
++        add_executable(test_${UNIT_NAME} ${UNIT_UNDER_TEST}
++            ${UNIT_TEST_SUITE}
++            ${CMAKE_CURRENT_BINARY_DIR}/unittests/${UNIT_NAME}/test_runner.c
++            ${UNIT_TEST_DEPS}
++        )
++
++        # Enable debug syms & coverage support while compiling
++        target_compile_options(test_${UNIT_NAME}
++            PUBLIC
++                -g3
++                -fprofile-arcs
++                -ftest-coverage
++        )
++
++        target_link_libraries(test_${UNIT_NAME}
++            PRIVATE cmock
++            PRIVATE unity
++            PRIVATE gcov
++            ${UNIT_TEST_LINK_LIBS}
++        )
++
++        target_include_directories(test_${UNIT_NAME}
++            PUBLIC
++                ${UNIT_TEST_INCLUDE_DIRS}
++        )
++
++        # UNIT_TEST must always be defined, each unit test may define more
++        target_compile_definitions(test_${UNIT_NAME}
++            PUBLIC
++                UNIT_TEST
++                ${UNIT_TEST_COMPILE_DEFS}
++        )
++
++        # For every <unit> in, we build test_<unit>
++        add_test(
++            NAME ${UNIT_NAME}
++            COMMAND test_${UNIT_NAME}
++        )
++
++        # Generate mocks
++        foreach(FILEPATH_TO_MOCK ${MOCK_HEADERS})
++            get_filename_component(FILENAME_TO_MOCK ${FILEPATH_TO_MOCK} NAME_WE)
++            set(MOCK_TARGET ${UNIT_NAME}_mock_${FILENAME_TO_MOCK})
++
++            # Invoke CMock to generate mock_<filename>
++            add_custom_command(
++                OUTPUT
++                    ${CMAKE_BINARY_DIR}/unittests/${UNIT_NAME}/mock_${FILENAME_TO_MOCK}.c
++                COMMAND ${CMAKE_COMMAND} -E env
++                    UNITY_DIR=${UNITY_PATH}
++                    ${Ruby_EXECUTABLE}
++                        ${CMOCK_PATH}/lib/cmock.rb
++                        -o${CMOCK_SRC_DIR}/cfg.yml
++                        ${FILEPATH_TO_MOCK}
++                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/unittests/${UNIT_NAME}
++                DEPENDS ${FILEPATH_TO_MOCK}
++                COMMENT "Mocking ${FILEPATH_TO_MOCK} for ${UNIT_NAME}"
++            )
++
++            target_sources(
++                test_${UNIT_NAME} PRIVATE
++                ${CMAKE_BINARY_DIR}/unittests/${UNIT_NAME}/mock_${FILENAME_TO_MOCK}.c
++            )
++
++            target_include_directories(
++                test_${UNIT_NAME} PRIVATE
++                ${CMAKE_BINARY_DIR}/unittests/${UNIT_NAME}
++            )
++        endforeach()
++endfunction()
++
++# unittests target
++# Depends on
++#   - All tests detected
++# Performs
++#   - Execute all tests
++#   - Generate and filter coverage info
++#   - Convert report into browsable html
++add_custom_target(unittests)
++
++add_custom_command(
++    TARGET unittests
++    POST_BUILD
++    COMMAND ${CMAKE_CTEST_COMMAND}
++        ARGS
++            --output-on-failure
++    COMMAND ${LCOV}
++        ARGS
++            --capture
++            --directory ${CMAKE_CURRENT_BINARY_DIR}
++            --output-file raw_test_coverage.info
++            > lcov.log 2>&1
++    COMMAND ${LCOV}
++        ARGS
++            --remove raw_test_coverage.info
++            -o test_coverage.info
++            '/usr/*'
++            '${CMAKE_BINARY_DIR}/*'
++            '*tests*'
++            >> lcov.log 2>&1
++    COMMAND ${GENHTML}
++        ARGS
++            test_coverage.info
++            --output-directory ${CMAKE_BINARY_DIR}/coverage_report
++            >> lcov.log 2>&1
++    COMMAND ${CMAKE_COMMAND}
++        ARGS
++            -E echo "Coverage Report: file://${CMAKE_BINARY_DIR}/coverage_report/index.html"
++)
++
++foreach(TFM_UNITTESTS_PATH ${TFM_UNITTESTS_PATHS})
++    if (NOT EXISTS ${TFM_UNITTESTS_PATH})
++        message(FATAL_ERROR "Path ${TFM_UNITTESTS_PATH} does not exist.")
++    endif()
++
++    file(GLOB_RECURSE UNIT_PATHS LIST_DIRECTORIES TRUE "${TFM_UNITTESTS_PATH}/*")
++    foreach(UNIT_PATH ${UNIT_PATHS})
++        # Only for directories that contain a utcfg.cmake
++        if(IS_DIRECTORY ${UNIT_PATH} AND EXISTS ${UNIT_PATH}/utcfg.cmake)
++            get_filename_component(UNIT_NAME ${UNIT_PATH} NAME)
++            message(STATUS "Found ${UNIT_NAME}")
++            generate_test(${UNIT_NAME} ${UNIT_PATH})
++            add_dependencies(unittests test_${UNIT_NAME})
++        endif()
++    endforeach()
++endforeach()
+\ No newline at end of file
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+new file mode 100644
+index 000000000..325887fae
+--- /dev/null
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -0,0 +1,383 @@
++/*
++ * SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ *
++ */
++
++#include <string.h>
++#include <inttypes.h>
++
++#include "unity.h"
++
++#include "mock_tfm_log.h"
++#include "mock_tfm_vprintf.h"
++
++#include "efi_guid_structs.h"
++#include "gpt_flash.h"
++#include "gpt.h"
++#include "psa/error.h"
++
++/* Basic mocked disk layout and number of partitions */
++#define TEST_BLOCK_SIZE 512
++#define TEST_DISK_NUM_BLOCKS 128
++#define TEST_MAX_PARTITIONS 4
++#define TEST_DEFAULT_NUM_PARTITIONS TEST_MAX_PARTITIONS - 1
++
++/* Maximum number of mocked reads per test */
++#define TEST_MOCK_BUFFER_SIZE 512
++
++/* Master Boot Record (MBR) definitions for test */
++#define TEST_MBR_SIG 0xAA55
++#define TEST_MBR_TYPE_GPT 0xEE
++#define TEST_MBR_CHS_ADDRESS_LEN 3
++#define TEST_MBR_NUM_PARTITIONS 4
++#define TEST_MBR_UNUSED_BYTES 446
++
++/* GUID Partition Table (GPT) header values */
++#define TEST_GPT_SIG_LEN 8
++#define TEST_GPT_SIG_INITIALISER {'E', 'F', 'I', ' ', 'P', 'A', 'R', 'T'}
++#define TEST_GPT_REVISION 0x00010000
++#define TEST_GPT_HEADER_SIZE 92
++#define TEST_GPT_CRC32 42
++#define TEST_GPT_PRIMARY_LBA 1
++#define TEST_GPT_BACKUP_LBA (TEST_DISK_NUM_BLOCKS - 1)
++#define TEST_GPT_ARRAY_LBA (TEST_GPT_PRIMARY_LBA + 1)
++#define TEST_GPT_BACKUP_ARRAY_LBA (TEST_GPT_BACKUP_LBA - 1)
++#define TEST_GPT_FIRST_USABLE_LBA (TEST_GPT_ARRAY_LBA + 2)
++#define TEST_GPT_LAST_USABLE_LBA (TEST_GPT_BACKUP_LBA - 2)
++#define TEST_GPT_DISK_GUID MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
++#define TEST_GPT_ENTRY_SIZE 128
++
++/* Test data. These are defined to be not fragmented */
++#define TEST_GPT_FIRST_PARTITION_START TEST_GPT_FIRST_USABLE_LBA
++#define TEST_GPT_FIRST_PARTITION_END (TEST_GPT_FIRST_PARTITION_START + 3)
++#define TEST_GPT_SECOND_PARTITION_START (TEST_GPT_FIRST_PARTITION_END + 1)
++#define TEST_GPT_SECOND_PARTITION_END (TEST_GPT_SECOND_PARTITION_START + 50)
++#define TEST_GPT_THIRD_PARTITION_START (TEST_GPT_SECOND_PARTITION_END + 1)
++#define TEST_GPT_THIRD_PARTITION_END (TEST_GPT_THIRD_PARTITION_START + 1)
++
++/* Populates a backup header from a primary header and calculates the new CRC32 */
++#define MAKE_BACKUP_HEADER(backup, primary)              \
++    do {                                                 \
++        memcpy(&backup, &primary, TEST_GPT_HEADER_SIZE); \
++        backup.header_crc = TEST_GPT_CRC32;              \
++        backup.current_lba = primary.backup_lba;         \
++        backup.backup_lba = primary.current_lba;         \
++        backup.array_lba = TEST_GPT_BACKUP_ARRAY_LBA;    \
++    } while (0)
++
++/* MBR partition entry */
++struct mbr_entry_t {
++    /* Indicates if bootable */
++    uint8_t status;
++    /* For legacy MBR, not used by UEFI firmware. For protective MBR, set to
++     * 0x000200
++     */
++    uint8_t first_sector[TEST_MBR_CHS_ADDRESS_LEN];
++    /* Type of partition */
++    uint8_t os_type;
++    /* For legacy MBR, not used by UEFI firmware. For protective MBR, last
++     * block on disk.
++     */
++    uint8_t last_sector[TEST_MBR_CHS_ADDRESS_LEN];
++    /* For legacy MBR, starting LBA of partition. For protective MBR, set to
++     * 0x00000001
++     */
++    uint32_t first_lba;
++    /* For legacy MBR, size of partition. For protective MBR, size of disk
++     * minus one
++     */
++    uint32_t size;
++} __attribute__((packed));
++
++/* Master Boot Record. */
++struct mbr_t {
++    /* Unused bytes */
++    uint8_t unused[TEST_MBR_UNUSED_BYTES];
++    /* Array of four MBR partition records. For protective MBR, only the first
++     * is valid
++     */
++    struct mbr_entry_t partitions[TEST_MBR_NUM_PARTITIONS];
++    /* 0xAA55 */
++    uint16_t sig;
++} __attribute__((packed));
++
++/* A gpt partition entry */
++struct gpt_entry_t {
++    struct efi_guid_t type;             /* Partition type */
++    struct efi_guid_t guid;             /* Unique GUID */
++    uint64_t start;                     /* Starting LBA for partition */
++    uint64_t end;                       /* Ending LBA for partition */
++    uint64_t attr;                      /* Attribute bits */
++    char name[GPT_ENTRY_NAME_LENGTH];   /* Human readable name for partition */
++} __attribute__((packed));
++
++/* The gpt header */
++struct gpt_header_t {
++    char signature[TEST_GPT_SIG_LEN];   /* "EFI PART" */
++    uint32_t revision;                  /* Revision number. */
++    uint32_t size;                      /* Size of this header */
++    uint32_t header_crc;                /* CRC of this header */
++    uint32_t reserved;                  /* Reserved */
++    uint64_t current_lba;               /* LBA of this header */
++    uint64_t backup_lba;                /* LBA of backup GPT header */
++    uint64_t first_lba;                 /* First usable LBA */
++    uint64_t last_lba;                  /* Last usable LBA */
++    struct efi_guid_t disk_guid;        /* Disk GUID */
++    uint64_t array_lba;                 /* First LBA of array of partition entries */
++    uint32_t num_partitions;            /* Number of partition entries in array */
++    uint32_t entry_size;                /* Size of a single partition entry */
++    uint32_t array_crc;                 /* CRC of partition entry array */
++} __attribute__((packed));
++
++static void register_mocked_read(void *buf, size_t num_bytes);
++static ssize_t test_driver_read(uint64_t lba, void *buf);
++
++/* LBA driver used in test module */
++static struct gpt_flash_driver_t mock_driver = {
++    .init = NULL,
++    .uninit = NULL,
++    .read = test_driver_read,
++};
++
++/* Valid MBR. Only signature is required to be valid */
++static struct mbr_t default_mbr = {
++    .unused = {0},
++    .sig = TEST_MBR_SIG,
++};
++static struct mbr_t test_mbr;
++
++/* Default GPT header. CRC values need to be populated to be valid. */
++static struct gpt_header_t default_header = {
++    .signature = TEST_GPT_SIG_INITIALISER,
++    .revision = TEST_GPT_REVISION,
++    .size = TEST_GPT_HEADER_SIZE,
++    .header_crc = TEST_GPT_CRC32,
++    .reserved = 0,
++    .current_lba = TEST_GPT_PRIMARY_LBA,
++    .backup_lba = TEST_GPT_BACKUP_LBA,
++    .first_lba = TEST_GPT_FIRST_USABLE_LBA,
++    .last_lba = TEST_GPT_LAST_USABLE_LBA,
++    .disk_guid = TEST_GPT_DISK_GUID,
++    .array_lba = TEST_GPT_ARRAY_LBA,
++    .num_partitions = TEST_MAX_PARTITIONS,
++    .entry_size = TEST_GPT_ENTRY_SIZE,
++    .array_crc = TEST_GPT_CRC32
++};
++static struct gpt_header_t test_header;
++
++/* Default entry array. This is valid, though fragmented. */
++static struct gpt_entry_t default_partition_array[TEST_DEFAULT_NUM_PARTITIONS] = {
++    {
++        .type = MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .start = TEST_GPT_FIRST_PARTITION_START,
++        .end = TEST_GPT_FIRST_PARTITION_END,
++        .attr = 0,
++        .name = "First partition"
++    },
++    {
++        .type = MAKE_EFI_GUID(2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = MAKE_EFI_GUID(2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .start = TEST_GPT_SECOND_PARTITION_START,
++        .end = TEST_GPT_SECOND_PARTITION_END,
++        .attr = 0,
++        .name = "Second partition"
++    },
++    {
++        .type = MAKE_EFI_GUID(3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = MAKE_EFI_GUID(3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .start = TEST_GPT_THIRD_PARTITION_START,
++        .end = TEST_GPT_THIRD_PARTITION_END,
++        .attr = 0,
++        .name = "Third partition"
++    }
++};
++static struct gpt_entry_t test_partition_array[TEST_MAX_PARTITIONS];
++
++/* Set to determine what is "read" by the flash driver. Allows for the mocking
++ * of multiple read calls
++ */
++static unsigned int num_mocked_reads = 0;
++static unsigned int registered_mocked_reads = 0;
++static uint8_t mock_read_buffer[TEST_MOCK_BUFFER_SIZE][TEST_BLOCK_SIZE] = {0};
++
++/* Turn ascii string to unicode */
++static void ascii_to_unicode(const char *ascii, char *unicode)
++{
++    for (int i = 0; i < strlen(ascii) + 1; ++i) {
++        unicode[i << 1] = ascii[i];
++        unicode[(i << 1) + 1] = '\0';
++    }
++}
++
++/* Tell the test what to return from the next read call. This is very much
++ * whitebox testing
++ */
++static void register_mocked_read(void *data, size_t num_bytes)
++{
++    memcpy(mock_read_buffer[registered_mocked_reads++], data, num_bytes);
++}
++
++/* Driver function that always succeeds in reading the data it has been given */
++static ssize_t test_driver_read(uint64_t lba, void *buf)
++{
++    memcpy(buf, mock_read_buffer[num_mocked_reads++], TEST_BLOCK_SIZE);
++    return TEST_BLOCK_SIZE;
++}
++
++/* Creates backup table from test table and registers a read for it */
++static void setup_backup_gpt(void)
++{
++    struct gpt_header_t backup_header;
++    MAKE_BACKUP_HEADER(backup_header, test_header);
++
++    register_mocked_read(&backup_header, sizeof(backup_header));
++}
++
++/* Uses the test MBR and GPT header to initialise for tests */
++static psa_status_t setup_test_gpt(void)
++{
++    /* Expect first a valid MBR read */
++    register_mocked_read(&test_mbr, sizeof(test_mbr));
++
++    /* Expect a GPT header read second */
++    register_mocked_read(&test_header, sizeof(test_header));
++
++    /* Expect third each partition is read to find the number in use (if the
++     * number in the header is non-zero)
++     */
++    if (test_header.num_partitions != 0) {
++        register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    }
++
++    /* Expect fourth the backup to be read */
++    setup_backup_gpt();
++
++    return gpt_init(&mock_driver, TEST_MAX_PARTITIONS);
++}
++
++/* Ensures a valid GPT populated with the default entries is initialised */
++static void setup_valid_gpt(void)
++{
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, setup_test_gpt());
++}
++
++/* Ensures a valid but empty GPT is initialised */
++static void setup_empty_gpt(void)
++{
++    test_header.num_partitions = 0;
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, setup_test_gpt());
++}
++
++void setUp(void)
++{
++    /* Default starting points */
++    test_mbr = default_mbr;
++    test_header = default_header;
++    memcpy(&test_partition_array, &default_partition_array, sizeof(default_partition_array));
++    for (size_t i = 0; i < TEST_DEFAULT_NUM_PARTITIONS; ++i) {
++        char unicode_name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
++        ascii_to_unicode(test_partition_array[i].name, unicode_name);
++        memcpy(test_partition_array[i].name, unicode_name, GPT_ENTRY_NAME_LENGTH);
++    }
++
++    test_mbr.partitions[0].os_type = TEST_MBR_TYPE_GPT;
++
++    /* Ignore all logging calls */
++    tfm_log_Ignore();
++
++    num_mocked_reads = 0;
++    registered_mocked_reads = 0;
++    memset(mock_read_buffer, 0, sizeof(mock_read_buffer));
++}
++
++void tearDown(void)
++{
++    num_mocked_reads = 0;
++    registered_mocked_reads = 0;
++    memset(mock_read_buffer, 0, sizeof(mock_read_buffer));
++    memset(&test_partition_array, 0, sizeof(test_partition_array));
++    gpt_uninit();
++}
++
++void test_gpt_init_should_loadWhenGptGood(void)
++{
++    setup_valid_gpt();
++}
++
++void test_gpt_init_should_overwriteOldGpt(void)
++{
++    setup_valid_gpt();
++    gpt_uninit();
++
++    /* Use a different disk GUID */
++    const struct efi_guid_t new_guid = MAKE_EFI_GUID(1, 1, 3, 4, 5, 6 ,7 ,8, 9, 10, 11);
++    test_header.disk_guid = new_guid;
++
++    setup_valid_gpt();
++}
++
++void test_gpt_init_should_failWhenMbrSigBad(void)
++{
++    test_mbr.sig--;
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, setup_test_gpt());
++}
++
++void test_gpt_init_should_failWhenMbrTypeInvalid(void)
++{
++    test_mbr.partitions[0].os_type--;
++    TEST_ASSERT_EQUAL(PSA_ERROR_NOT_SUPPORTED, setup_test_gpt());
++}
++
++void test_gpt_init_should_failWhenFlashDriverNotFullyDefined(void)
++{
++    gpt_flash_read_t read_fn = mock_driver.read;
++    mock_driver.read = NULL;
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_init(&mock_driver, TEST_MAX_PARTITIONS));
++    mock_driver.read = read_fn;
++}
++
++void test_gpt_entry_read_should_populateEntry(void)
++{
++    /* Start with a populated GPT */
++    setup_valid_gpt();
++
++    /* Ensure an entry is found */
++    struct partition_entry_t entry;
++    struct gpt_entry_t *desired = &(test_partition_array[TEST_DEFAULT_NUM_PARTITIONS - 1]);
++    struct efi_guid_t test_guid = desired->guid;
++    struct efi_guid_t test_type = desired->type;
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_read(&test_guid, &entry));
++
++    /* Ensure this is the correct entry */
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_guid, &(entry.partition_guid)));
++    TEST_ASSERT_EQUAL(0, efi_guid_cmp(&test_type, &(entry.type_guid)));
++    TEST_ASSERT_EQUAL(desired->start, entry.start);
++
++    /* Size is number of blocks, so subtract one */
++    TEST_ASSERT_EQUAL(desired->end, entry.start + entry.size - 1);
++
++    /* Name is unicode */
++    TEST_ASSERT_EQUAL_MEMORY(desired->name, entry.name, GPT_ENTRY_NAME_LENGTH);
++}
++
++void test_gpt_entry_read_should_failWhenEntryNotExisting(void)
++{
++    /* Start with an empty GPT */
++    setup_empty_gpt();
++
++    /* Try to read something */
++    struct partition_entry_t entry;
++    struct efi_guid_t non_existing = NULL_GUID;
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read(&non_existing, &entry));
++
++    /* Now, have a non-empty GPT but search for a non-existing GUID */
++    setup_valid_gpt();
++
++    /* Each entry should be read */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read(&non_existing, &entry));
++}
+diff --git a/lib/gpt/unittests/gpt/utcfg.cmake b/lib/gpt/unittests/gpt/utcfg.cmake
+new file mode 100644
+index 000000000..37d72d138
+--- /dev/null
++++ b/lib/gpt/unittests/gpt/utcfg.cmake
+@@ -0,0 +1,28 @@
++#-------------------------------------------------------------------------------
++# SPDX-FileCopyrightText: Copyright The TrustedFirmware-M Contributors
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++#-------------------------------------------------------------------------------
++
++# Define what is being unit tested and by what
++set(UNIT_UNDER_TEST ${TFM_ROOT_DIR}/lib/gpt/src/gpt.c)
++set(UNIT_TEST_SUITE ${CMAKE_CURRENT_LIST_DIR}/test_gpt.c)
++
++# Dependencies for the UUT, that get linked into the executable
++
++# Include directories for compilation
++list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/interface/include)
++list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/efi_guid/inc)
++list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/gpt/inc)
++list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/tfm_log/inc)
++list(APPEND UNIT_TEST_INCLUDE_DIRS ${TFM_ROOT_DIR}/lib/tfm_vprintf/inc)
++
++# Headers to be mocked
++list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/tfm_log/inc/tfm_log.h)
++list(APPEND MOCK_HEADERS ${TFM_ROOT_DIR}/lib/tfm_vprintf/inc/tfm_vprintf.h)
++
++# Compile-time definitions
++list(APPEND UNIT_TEST_COMPILE_DEFS LOG_LEVEL=LOG_LEVEL_VERBOSE)
++list(APPEND UNIT_TEST_COMPILE_DEFS TFM_GPT_BLOCK_SIZE=512)
++

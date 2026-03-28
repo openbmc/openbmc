@@ -1,0 +1,43 @@
+From c579565c25937ae9455efe9cc3fbcace84c3e580 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 29 Dec 2025 11:28:47 +0000
+Subject: [PATCH] plat: cs1k: Removed unused variables
+
+Change-Id: I0dd3ff834c47c58dc833586c74791deca679a3ab
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport
+---
+ .../arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c     | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+index cff80b755..83b0bd27d 100644
+--- a/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
++++ b/platform/ext/target/arm/corstone1000/bootloader/mcuboot/tfm_mcuboot_fwu.c
+@@ -1511,7 +1511,6 @@ static psa_status_t fwu_accept_image(struct fwu_metadata *metadata,
+         uint8_t number)
+ {
+     uint8_t current_state;
+-    uint32_t image_bank_offset;
+     uint32_t active_bank_index;
+     uint32_t fwu_image_index;
+     psa_status_t ret;
+@@ -1848,7 +1847,6 @@ static psa_status_t fwu_update_metadata(const psa_fwu_component_t *candidates, u
+ {
+     int ret;
+     uint32_t active_index;
+-    uint32_t bank_offset;
+     uint32_t previous_active_index;
+     uint8_t fwu_image_index;
+ 
+@@ -1864,10 +1862,8 @@ static psa_status_t fwu_update_metadata(const psa_fwu_component_t *candidates, u
+ 
+     if (active_index == BANK_0) {
+         previous_active_index = BANK_1;
+-        bank_offset = BANK_1_PARTITION_OFFSET;
+     } else if (active_index == BANK_1) {
+         previous_active_index = BANK_0;
+-        bank_offset = BANK_0_PARTITION_OFFSET;
+     } else {
+         FWU_LOG_MSG("ERROR: %s: active_index %d\n\r",__func__,active_index);
+         ret = PSA_ERROR_DATA_INVALID;

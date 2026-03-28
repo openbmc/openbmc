@@ -3,6 +3,7 @@ require recipes-security/optee/optee-test.inc
 # v4.8.0
 SRCREV = "6569cd7b13e1b37b37069e090d592adca7d3926d"
 PV .= "+git"
+UPSTREAM_CHECK_COMMITS = "1"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=a8fa504109e4cd7ea575bc49ea4be560 \
                     file://LICENSE-BSD;md5=dca16d6efa93b55d0fd662ae5cd6feeb \

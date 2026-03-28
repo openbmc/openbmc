@@ -1,0 +1,74 @@
+From f9e4d1f48a4553278dc4de82b0d2f4d82b1e5193 Mon Sep 17 00:00:00 2001
+From: Antonio de Angelis <antonio.deangelis@arm.com>
+Date: Wed, 4 Mar 2026 13:05:51 +0000
+Subject: [PATCH] lib: GPT: Fix cppcheck warnings
+
+Change-Id: Ia9e99dc59cbf869b804a24ba029f19f7170860b4
+Signed-off-by: Antonio de Angelis <antonio.deangelis@arm.com>
+Upstream-Status: Backport [92d5b6b7d296c174364e684508089c0a0678e3bb]
+---
+ lib/gpt/src/gpt.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index b1d4597cd..a9dbb918e 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -4,6 +4,7 @@
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+ 
++#include <assert.h>
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <stdlib.h>
+@@ -194,7 +195,7 @@ static inline uint64_t gpt_entry_per_lba_count(void);
+ static inline void swap_headers(const struct gpt_header_t *src, struct gpt_header_t *dst);
+ static psa_status_t count_used_partitions(const struct gpt_t *table,
+                                           uint32_t *num_used);
+-static inline void parse_entry(struct gpt_entry_t       *entry,
++static inline void parse_entry(const struct gpt_entry_t *entry,
+                                struct partition_entry_t *partition_entry);
+ static psa_status_t read_from_flash(uint64_t required_lba);
+ static psa_status_t read_entry_from_flash(const struct gpt_t *table,
+@@ -226,7 +227,7 @@ static bool gpt_entry_cmp_name(const struct gpt_entry_t *entry, const void *name
+ static bool gpt_entry_cmp_type(const struct gpt_entry_t *entry, const void *type);
+ static psa_status_t validate_table(struct gpt_t *table, bool is_primary);
+ static psa_status_t restore_table(struct gpt_t *restore_from, bool is_primary);
+-static psa_status_t sort_partition_array(struct gpt_t *table);
++static psa_status_t sort_partition_array(const struct gpt_t *table);
+ 
+ /* PUBLIC API FUNCTIONS */
+ 
+@@ -1006,7 +1007,7 @@ static inline uint64_t gpt_entry_per_lba_count(void)
+ }
+ 
+ /* Copies information from the entry to the user visible structure */
+-static inline void parse_entry(struct gpt_entry_t       *entry,
++static inline void parse_entry(const struct gpt_entry_t *entry,
+                                struct partition_entry_t *partition_entry)
+ {
+     partition_entry->start = entry->start;
+@@ -1604,7 +1605,7 @@ static int cmp_u64(const void *a, const void *b)
+ }
+ 
+ /* bsearch but returns the index rather than the item */
+-static int64_t bsearch_index(uint64_t arr[], uint32_t len, uint64_t key)
++static int64_t bsearch_index(const uint64_t arr[], uint32_t len, uint64_t key)
+ {
+     uint32_t l = 0;
+     uint32_t r = len;
+@@ -1628,8 +1629,12 @@ static int64_t bsearch_index(uint64_t arr[], uint32_t len, uint64_t key)
+ /* Sorts the partition array for the given table by the start LBA for each
+  * partition. This makes defragmentation easier.
+  */
+-static psa_status_t sort_partition_array(struct gpt_t *table)
++static psa_status_t sort_partition_array(const struct gpt_t *table)
+ {
++    if (table->num_used_partitions == 0) {
++        assert(table->num_used_partitions > 0);
++        return PSA_ERROR_INVALID_ARGUMENT;
++    }
+     /* To avoid as much I/O as possible, the LBA's for each entry are sorted in
+      * memory and then the entries rearranged on flash after
+      */
