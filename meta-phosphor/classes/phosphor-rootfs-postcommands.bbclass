@@ -3,7 +3,7 @@
 #
 update_root_user_groups () {
     if [ -e ${IMAGE_ROOTFS}/etc/group ]; then
-        sed -i '/^\(ipmi\|web\|redfish\|priv-admin\):.*:.*:$/s/$/root/' ${IMAGE_ROOTFS}/etc/group
+        sed -i '/^\(ipmi\|web\|redfish\|priv-admin\):/ { /:root\(,\|$\)/! s/$/,root/; s/:,/:/ }' ${IMAGE_ROOTFS}/etc/group
     fi
 }
 # Add root user to the needed groups
