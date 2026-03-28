@@ -33,3 +33,5 @@ FILES:${PN} += " ${systemd_system_unitdir} "
 FILES:${PN} += " ${libdir} "
 FILES:${PN} += " ${nonarch_libdir}/tmpfiles.d/* "
 FILES:${PN} += " ${base_libdir}/security/*.so "
+
+TARGET_LDFLAGS:append = " ${DEBUG_PREFIX_MAP}"

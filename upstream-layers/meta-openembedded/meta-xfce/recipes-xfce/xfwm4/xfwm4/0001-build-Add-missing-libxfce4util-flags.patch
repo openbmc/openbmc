@@ -1,0 +1,59 @@
+From 6468f80ee9283c03fc18f67361b20c6efdf3df50 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Mon, 3 Feb 2025 11:09:59 +0100
+Subject: [PATCH] build: Add missing libxfce4util flags
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This will be necessary when xfwm4 is built against a meson release of
+libxfce4ui, which sets private flags by default in pkgconfig (and
+therefore no longer exposes libxfce4util flags).
+
+Signed-off-by: Gaël Bonithon <gael@xfce.org>
+
+Upstream-Status: Backport [https://gitlab.xfce.org/xfce/xfwm4/-/commit/6468f80ee9283c03fc18f67361b20c6efdf3df50]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ settings-dialogs/Makefile.am | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/settings-dialogs/Makefile.am b/settings-dialogs/Makefile.am
+index 3a1d2a510..86c6ab9be 100644
+--- a/settings-dialogs/Makefile.am
++++ b/settings-dialogs/Makefile.am
+@@ -44,6 +44,7 @@ xfwm4_settings_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(DBUS_GLIB_CFLAGS) \
+	$(LIBXFCE4UI_CFLAGS) \
++	$(LIBXFCE4UTIL_CFLAGS) \
+	$(LIBXFCE4KBD_PRIVATE_CFLAGS) \
+	$(LIBXFCONF_CFLAGS) \
+	-DDATADIR=\"$(datadir)\" \
+@@ -56,6 +57,7 @@ xfwm4_settings_LDADD = \
+	$(GLIB_LIBS) \
+	$(DBUS_GLIB_LIBS) \
+	$(LIBXFCE4UI_LIBS) \
++	$(LIBXFCE4UTIL_LIBS) \
+	$(LIBXFCE4KBD_PRIVATE_LIBS) \
+	$(LIBXFCONF_LIBS)
+
+@@ -70,6 +72,7 @@ xfwm4_tweaks_settings_CFLAGS = \
+	$(GLIB_CFLAGS) \
+	$(DBUS_GLIB_CFLAGS) \
+	$(LIBXFCE4UI_CFLAGS) \
++	$(LIBXFCE4UTIL_CFLAGS) \
+	$(LIBXFCONF_CFLAGS) \
+	-DDATADIR=\"$(datadir)\" \
+	-DSRCDIR=\"$(top_srcdir)\" \
+@@ -81,6 +84,7 @@ xfwm4_tweaks_settings_LDADD = \
+	$(GLIB_LIBS) \
+	$(DBUS_GLIB_LIBS) \
+	$(LIBXFCE4UI_LIBS) \
++	$(LIBXFCE4UTIL_LIBS) \
+	$(LIBXFCONF_LIBS)
+
+ AM_CPPFLAGS = \
+--
+2.50.0

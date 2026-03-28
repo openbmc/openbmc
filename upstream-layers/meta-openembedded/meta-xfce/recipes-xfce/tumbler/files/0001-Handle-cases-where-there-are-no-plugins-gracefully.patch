@@ -1,0 +1,57 @@
+From 95244ee0d1f3184e2c2cae9d33095dc03829b10e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Fri, 20 Feb 2026 17:07:56 +0100
+Subject: [PATCH] Handle cases where there are no plugins gracefully
+
+Not sure it makes much sense to allow the cache plugin not to be built,
+but then again, why not? It could be replaced by a customized
+implementation, and it has always been possible not to build it, so we
+might as well leave it as it is.
+
+Fixes: #109
+(cherry picked from commit b4f4db4bfc1a45f0a405c4516e38394a44c90fcf)
+
+Upstream-Status: Backport [https://gitlab.xfce.org/xfce/tumbler/-/commit/95244ee0d1f3184e2c2cae9d33095dc03829b10e]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ tumbler/tumbler-cache-plugin.c | 5 ++++-
+ tumblerd/tumbler-registry.c    | 7 ++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/tumbler/tumbler-cache-plugin.c b/tumbler/tumbler-cache-plugin.c
+index 50700a3..e308638 100644
+--- a/tumbler/tumbler-cache-plugin.c
++++ b/tumbler/tumbler-cache-plugin.c
+@@ -188,7 +188,10 @@ tumbler_cache_plugin_get_default (void)
+       g_object_add_weak_pointer (G_OBJECT (plugin), (gpointer) &plugin);
+
+       if (!g_type_module_use (G_TYPE_MODULE (plugin)))
+-        return NULL;
++        {
++          g_object_unref (plugin);
++          return NULL;
++        }
+     }
+
+   return G_TYPE_MODULE (plugin);
+diff --git a/tumblerd/tumbler-registry.c b/tumblerd/tumbler-registry.c
+index 705dbc9..b58e831 100644
+--- a/tumblerd/tumbler-registry.c
++++ b/tumblerd/tumbler-registry.c
+@@ -534,7 +534,12 @@ tumbler_registry_update_supported (TumblerRegistry *registry)
+
+   /* abort if there are no thumbnailers */
+   if (thumbnailers == NULL)
+-    return;
++    {
++      /* we need NULL-terminated arrays for the _get_supported() dbus call anyway */
++      registry->uri_schemes = g_new0 (gchar *, 1);
++      registry->mime_types = g_new0 (gchar *, 1);
++      return;
++    }
+
+   /* clear visited flag of all thumbnailers */
+   for (lp = thumbnailers; lp != NULL; lp = lp->next)
+--
+2.50.0

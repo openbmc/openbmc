@@ -10,8 +10,8 @@ export PCP_BIN_DIR = "${D}/usr/bin"
 B = "${S}"
 
 do_configure:prepend() {
-    export SED=${TMPDIR}/hosttools/sed
-    export AR=${TMPDIR}/hosttools/ar
+    export SED=${HOSTTOOLS_DIR}/sed
+    export AR=${HOSTTOOLS_DIR}/ar
 #    export PYTHON=python3
     
     rm -rf ${S}/include/pcp/configsz.h
@@ -25,7 +25,7 @@ do_compile:prepend() {
            -e "s,#undef PM_SIZEOF_TIME_T,,g" \
            ${S}/src/include/pcp/config.h.in
 
-    export AR=${TMPDIR}/hosttools/ar
+    export AR=${HOSTTOOLS_DIR}/ar
 #    export PYTHON=python3
 }
 

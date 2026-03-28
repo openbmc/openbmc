@@ -1,0 +1,55 @@
+From c833520ac8cb473a6d820a063adb10c49304c4a8 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 18 Mar 2026 13:42:04 +0800
+Subject: [PATCH] Fix build failure with glibc 2.43
+
+src/shared/dlt_common.c:6477:17: error: initialization discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+|  6477 |     char *dot = strrchr(filename, '.');
+
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/828]
+
+[1] https://github.com/bminor/glibc/commit/cd748a63ab1a7ae846175c532a3daab341c62690
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ include/dlt/dlt_common.h | 2 +-
+ src/shared/dlt_common.c  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/dlt/dlt_common.h b/include/dlt/dlt_common.h
+index 85cf5b7..30d3ca7 100644
+--- a/include/dlt/dlt_common.h
++++ b/include/dlt/dlt_common.h
+@@ -2308,7 +2308,7 @@ int dlt_execute_command(char *filename, char *command, ...);
+  * @param filename Only file names without prepended path allowed.
+  * @return pointer to extension
+  */
+-char *get_filename_ext(const char *filename);
++const char *get_filename_ext(const char *filename);
+ 
+ /**
+  * Extract the base name of given file name (without the extension).
+diff --git a/src/shared/dlt_common.c b/src/shared/dlt_common.c
+index aa0aaaa..4c379af 100644
+--- a/src/shared/dlt_common.c
++++ b/src/shared/dlt_common.c
+@@ -6467,14 +6467,14 @@ int dlt_execute_command(char *filename, char *command, ...)
+     return ret;
+ }
+ 
+-char *get_filename_ext(const char *filename)
++const char *get_filename_ext(const char *filename)
+ {
+     if (filename == NULL) {
+         fprintf(stderr, "ERROR: %s: invalid arguments\n", __func__);
+         return "";
+     }
+ 
+-    char *dot = strrchr(filename, '.');
++    const char *dot = strrchr(filename, '.');
+     return (!dot || dot == filename) ? NULL : dot;
+ }
+ 
+-- 
+2.34.1
+

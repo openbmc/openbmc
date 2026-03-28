@@ -1,0 +1,116 @@
+From 6fc6e4408ea021ee8a210e691f1a13b807121a3c Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Thu, 19 Mar 2026 18:33:41 +0100
+Subject: [PATCH] build: Make sure gdbus headers are generated before including
+ them
+
+Fixes: #48
+
+Upstream-Status: Backport [https://gitlab.xfce.org/xfce/xfconf/-/commit/6fc6e4408ea021ee8a210e691f1a13b807121a3c]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ .scan-build-false-positives |  2 ++
+ common/meson.build          | 36 +++++++++++++++++++-----------------
+ xfconf/meson.build          |  5 ++++-
+ xfconfd/meson.build         |  1 +
+ 4 files changed, 26 insertions(+), 18 deletions(-)
+
+diff --git a/.scan-build-false-positives b/.scan-build-false-positives
+index d925d3f..7ab5ec6 100644
+--- a/.scan-build-false-positives
++++ b/.scan-build-false-positives
+@@ -1,5 +1,7 @@
+ # gdbus-codegen generated code
+ xfconf-gdbus-bindings.c:[0-9]+:[0-9]+: warning: Value stored to .+skeleton.+ during its initialization is never read \[deadcode.DeadStores\]
++xfconf-gdbus-bindings.c:[0-9]+:[0-9]+: warning: Value stored to .+skeleton.+ during its initialization is never read \[deadcode.DeadStores\]
++xfconf-gdbus-bindings.c:[0-9]+:[0-9]+: warning: Value stored to .+skeleton.+ during its initialization is never read \[deadcode.DeadStores\]
+
+ # gobject-introspection generated code
+ Xfconf-0.c:[0-9]+:[0-9]+: warning: Access to field .+message.+ results in a dereference of a null pointer \(loaded from variable .+error.+\) \[core.NullDereference\]
+diff --git a/common/meson.build b/common/meson.build
+index 08acd5b..fe30c38 100644
+--- a/common/meson.build
++++ b/common/meson.build
+@@ -22,6 +22,24 @@ xfconf_visibility_sources += configure_file(
+   command: [xdt_gen_visibility, '--kind=source', '@INPUT@', '@OUTPUT@'],
+ )
+
++xfconf_dbus_xml = configure_file(
++  configuration: configuration_data({
++    'XFCONF_SERVICE_NAME_PREFIX': xfconf_service_name_prefix,
++    'XFCONF_SERVICE_PATH_PREFIX': xfconf_service_path_prefix,
++  }),
++  input: 'xfconf-dbus.xml.in',
++  output: 'xfconf-dbus.xml',
++)
++
++xfconf_gdbus_sources = gnome.gdbus_codegen(
++  'xfconf-gdbus-bindings',
++  sources: xfconf_dbus_xml,
++  interface_prefix: '@0@.Xfconf'.format(xfconf_service_name_prefix),
++  namespace: 'Xfconf',
++  annotations: ['@0@.Xfconf'.format(xfconf_service_name_prefix), 'org.gtk.GDBus.C.Name', 'Exported'],
++  install_header: false,
++)
++
+ xfconf_common = static_library(
+   'xfconf-common',
+   xfconf_common_sources,
+@@ -61,25 +79,9 @@ xfconf_gvaluefuncs = static_library(
+   install: false,
+ )
+
+-xfconf_dbus_xml = configure_file(
+-  configuration: configuration_data({
+-    'XFCONF_SERVICE_NAME_PREFIX': xfconf_service_name_prefix,
+-    'XFCONF_SERVICE_PATH_PREFIX': xfconf_service_path_prefix,
+-  }),
+-  input: 'xfconf-dbus.xml.in',
+-  output: 'xfconf-dbus.xml',
+-)
+-
+ xfconf_dbus = static_library(
+   'xfconf-dbus',
+-  gnome.gdbus_codegen(
+-    'xfconf-gdbus-bindings',
+-    sources: xfconf_dbus_xml,
+-    interface_prefix: '@0@.Xfconf'.format(xfconf_service_name_prefix),
+-    namespace: 'Xfconf',
+-    annotations: ['@0@.Xfconf'.format(xfconf_service_name_prefix), 'org.gtk.GDBus.C.Name', 'Exported'],
+-    install_header: false,
+-  ),
++  xfconf_gdbus_sources,
+   c_args: [
+     '-DG_LOG_DOMAIN="@0@"'.format('xfconf-common'),
+   ],
+diff --git a/xfconf/meson.build b/xfconf/meson.build
+index e3ecd55..15cafa5 100644
+--- a/xfconf/meson.build
++++ b/xfconf/meson.build
+@@ -39,7 +39,10 @@ xfconf_version = '@0@.0.0'.format(xfconf_so_version)
+ xfconf = library(
+   xfconf_pkgname,
+   xfconf_sources,
+-  sources: xfconf_visibility_sources,
++  sources: [
++    xfconf_visibility_sources,
++    xfconf_gdbus_sources,
++  ],
+   version: xfconf_version,
+   soversion: xfconf_so_version,
+   c_args: [
+diff --git a/xfconfd/meson.build b/xfconfd/meson.build
+index 6e46a58..13e614e 100644
+--- a/xfconfd/meson.build
++++ b/xfconfd/meson.build
+@@ -56,6 +56,7 @@ executable(
+   sources: [
+     xfce_revision_h,
+     xfconf_visibility_sources,
++    xfconf_gdbus_sources,
+   ],
+   c_args: c_args,
+   include_directories: [
+--
+2.50.0

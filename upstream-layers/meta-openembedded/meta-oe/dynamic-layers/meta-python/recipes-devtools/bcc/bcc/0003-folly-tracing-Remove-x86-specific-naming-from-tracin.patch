@@ -1,0 +1,25 @@
+From c2bd977c6c885d5cdca94ef5ac31bfcd9c4347ea Mon Sep 17 00:00:00 2001
+From: Harish Sadineni <Harish.Sadineni@windriver.com>
+Date: Sat, 7 Mar 2026 21:44:41 +0000
+Subject: [PATCH 1/2] folly/tracing: Remove x86-specific naming from tracing
+ header
+
+Rename StaticTracepoint-ELFx86.h to StaticTracepoint-ELF.h so the header
+name is no longer tied to a specific architecture, enabling future
+support for additional architectures.
+
+Upstream-Status: Submitted [https://github.com/iovisor/bcc/pull/5491]
+
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+---
+ .../tracing/{StaticTracepoint-ELFx86.h => StaticTracepoint-ELF.h} | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ rename tests/python/include/folly/tracing/{StaticTracepoint-ELFx86.h => StaticTracepoint-ELF.h} (100%)
+
+diff --git a/tests/python/include/folly/tracing/StaticTracepoint-ELFx86.h b/tests/python/include/folly/tracing/StaticTracepoint-ELF.h
+similarity index 100%
+rename from tests/python/include/folly/tracing/StaticTracepoint-ELFx86.h
+rename to tests/python/include/folly/tracing/StaticTracepoint-ELF.h
+-- 
+2.49.1
+

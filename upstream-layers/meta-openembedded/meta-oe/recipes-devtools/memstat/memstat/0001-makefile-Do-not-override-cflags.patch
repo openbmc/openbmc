@@ -1,0 +1,30 @@
+From a0806283da1b82b511aa879fa2f71deb01f849bd Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 26 Jan 2026 22:22:54 -0800
+Subject: [PATCH] makefile: Do not override cflags
+
+bitbake environment passes correct clfags for OE env
+overriding it means some important flags for cross-compiling
+go missing and causes
+
+memstat-1.0-r0 do_package_qa: QA Issue: File /usr/bin/.debug/memstat in package memstat-dbg contains reference to TMPDIR [buildpaths]
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Makefile | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 29f8129..5426bf4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -3,7 +3,6 @@
+ # Copyright 1998, by Bernd Eckenfels <ecki@debian.org>
+ # This file is under the GPL.
+ #
+-CFLAGS = -g -Wall -O2
+ prefix = $(DESTDIR)/
+ exec_prefix = $(prefix)/usr
+ 

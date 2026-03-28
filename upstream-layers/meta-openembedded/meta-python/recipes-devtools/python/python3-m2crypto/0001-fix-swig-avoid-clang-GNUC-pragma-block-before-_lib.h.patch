@@ -1,0 +1,49 @@
+From df210da932c2cab9d3a80ee88c70611d77824a15 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 18 Mar 2026 02:26:56 +0000
+Subject: [PATCH] fix(swig): avoid clang GNUC pragma block before _lib.h
+
+Clang defines __GNUC__, so the old guard emitted PRAGMA_* tokens before
+they were defined, breaking builds on macOS/clang; move the block after
+<_lib.h> and exclude clang while keeping the GCC<5 workaround.
+
+Fixes: https://todo.sr.ht/~mcepl/m2crypto/392
+
+Upstream-Status: Backport [git.sr.ht/~mcepl/m2crypto/commit/504ca8f438afb0f5041d2b5163e5f666a9a1b742.patch]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ src/SWIG/_m2crypto.i | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/src/SWIG/_m2crypto.i b/src/SWIG/_m2crypto.i
+index d89d355..5426446 100644
+--- a/src/SWIG/_m2crypto.i
++++ b/src/SWIG/_m2crypto.i
+@@ -43,15 +43,18 @@ typedef unsigned __int64 uint64_t;
+ %}
+ 
+ %{
+-#if defined __GNUC__ && __GNUC__ < 5
+-PRAGMA_IGNORE_UNUSED_LABEL
+-PRAGMA_WARN_STRICT_PROTOTYPES
+-#endif
+-
+ #include <openssl/err.h>
+ #include <openssl/rand.h>
+ #include <_lib.h>
+ 
++/* _lib.h defines PRAGMA_* helpers; only needed for old GCC (clang defines
++ * __GNUC__ too, but doesn't need this workaround).
++ */
++#if defined(__GNUC__) && !defined(__clang__) && (__GNUC__ < 5)
++PRAGMA_IGNORE_UNUSED_LABEL
++PRAGMA_WARN_STRICT_PROTOTYPES
++#endif
++
+ #include "compile.h"
+ 
+ static PyObject *ssl_verify_cb_func;
+-- 
+2.43.0
+

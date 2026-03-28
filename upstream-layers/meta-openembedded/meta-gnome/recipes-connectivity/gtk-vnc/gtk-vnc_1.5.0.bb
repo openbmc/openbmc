@@ -12,7 +12,7 @@ DEPENDS = " \
     zlib \
 "
 
-REQUIRED_DISTRO_FEATURES = "gobject-introspection-data"
+REQUIRED_DISTRO_FEATURES = "gobject-introspection-data x11"
 GIR_MESON_OPTION = ""
 VALA_MESON_OPTION = "with-vala"
 VALA_MESON_ENABLE_FLAG ?= 'enabled'

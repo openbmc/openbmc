@@ -1,0 +1,28 @@
+From c847b8162959c29b783585e0dcadbfb096e7cb73 Mon Sep 17 00:00:00 2001
+From: Ripley Tom <discofan420@protonmail.com>
+Date: Sat, 21 Feb 2026 19:33:11 +0100
+Subject: [PATCH] spa/plugins/alsa/acp/compat.h: Fix missed
+ -Wdiscarded-qualifiers warning
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/pipewire/pipewire/-/commit/c847b8162959c29b783585e0dcadbfb096e7cb73]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ spa/plugins/alsa/acp/compat.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/spa/plugins/alsa/acp/compat.h b/spa/plugins/alsa/acp/compat.h
+index f7592e1a6..0f7b959df 100644
+--- a/spa/plugins/alsa/acp/compat.h
++++ b/spa/plugins/alsa/acp/compat.h
+@@ -429,9 +429,9 @@ static PA_PRINTF_FUNC(1,0) inline char *pa_vsprintf_malloc(const char *fmt, va_l
+ 
+ #define pa_fopen_cloexec(f,m)	fopen(f,m"e")
+ 
+-static inline char *pa_path_get_filename(const char *p)
++static inline const char *pa_path_get_filename(const char *p)
+ {
+-    char *fn;
++    const char *fn;
+     if (!p)
+         return NULL;
+     if ((fn = strrchr(p, PA_PATH_SEP_CHAR)))

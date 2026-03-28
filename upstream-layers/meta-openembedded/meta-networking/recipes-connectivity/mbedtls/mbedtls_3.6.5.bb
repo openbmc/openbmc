@@ -15,7 +15,8 @@ understand what the code does. It features:                          \
    platform abstraction and threading                                \
 "
 
-HOMEPAGE = "https://tls.mbed.org/"
+HOMEPAGE = "https://www.trustedfirmware.org/projects/mbed-tls/"
+BUGTRACKER = "https://github.com/Mbed-TLS/mbedtls/issues"
 
 LICENSE = "Apache-2.0 | GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=379d5819937a6c2f1ef1630d341e026d"

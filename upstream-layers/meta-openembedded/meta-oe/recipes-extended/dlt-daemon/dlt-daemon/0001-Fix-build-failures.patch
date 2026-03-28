@@ -1,0 +1,360 @@
+From 4813b72cfe82062db41dd1d8cfa7069634d78d9e Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Mon, 16 Mar 2026 13:28:40 +0800
+Subject: [PATCH] Fix build failures
+
+Fix the following similar build failures, some of the build failure
+reproduced with arm64/riscv64, some of the build reproduced with 32bit
+x86/arm.
+
+dlt_daemon_common.c:2785:26: error: conversion to 'int8_t' {aka 'signed char'} from 'char' may change the sign of the result [-Werror=sign-conversion]
+
+src/tests/dlt-test-multi-process-client-v2.c:302:49: error: format '%lld' expects argument of type 'long long int', but argument 2 has type 'time_t' {aka 'long int'} [-Werror=format=]
+  302 |     printf(" Time running (seconds)        : %lld\n", time(NULL) - stats.first_message_time);
+      |                                              ~~~^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                                                 |                |
+      |                                                 long long int    time_t {aka long int}
+      |                                              %ld
+
+src/lib/dlt_user.c:5109:60: error: format '%lld' expects argument of type 'long long int', but argument 4 has type '__off_t' {aka 'long int'} [-Werror=format=]
+ 5109 |             dlt_vlog(LOG_DEBUG, "%s: Current file size=[%lld]\n", __func__,
+      |                                                         ~~~^
+      |                                                            |
+      |                                                            long long int
+      |                                                         %ld
+ 5110 |                      st.st_size);
+      |                      ~~~~~~~~~~
+      |                        |
+      |                        __off_t {aka long int}
+
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/827]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/daemon/dlt-daemon.c                      |  8 ++---
+ src/daemon/dlt_daemon_client.c               | 32 ++++++++++----------
+ src/daemon/dlt_daemon_common.c               |  4 +--
+ src/lib/dlt_user.c                           | 18 +++++------
+ src/shared/dlt_common.c                      |  2 +-
+ src/shared/dlt_multiple_files.c              |  2 +-
+ src/tests/dlt-test-multi-process-client-v2.c |  8 ++---
+ src/tests/dlt-test-multi-process-v2.c        |  2 +-
+ src/tests/dlt-test-multi-process.c           |  2 +-
+ 9 files changed, 39 insertions(+), 39 deletions(-)
+
+diff --git a/src/daemon/dlt-daemon.c b/src/daemon/dlt-daemon.c
+index 523bf33..2ae5bc9 100644
+--- a/src/daemon/dlt-daemon.c
++++ b/src/daemon/dlt-daemon.c
+@@ -457,7 +457,7 @@ int option_file_parser(DltDaemonLocal *daemon_local)
+ 
+     if (n < 0 || (size_t)n > sizeof(daemon_local->flags.loggingFilename)) {
+         dlt_vlog(LOG_WARNING, "%s: snprintf truncation/error(%ld) %s\n",
+-                __func__, n, daemon_local->flags.loggingFilename);
++                __func__, (long int)n, daemon_local->flags.loggingFilename);
+     }
+     daemon_local->flags.enableLoggingFileLimit = false;
+     daemon_local->flags.loggingFileSize = 250000;
+@@ -2501,7 +2501,7 @@ void dlt_daemon_exit_trigger()
+     n = snprintf(tmp, DLT_PATH_MAX, "%s/dlt", dltFifoBaseDir);
+     if (n < 0 || (size_t)n > DLT_PATH_MAX) {
+         dlt_vlog(LOG_WARNING, "%s: snprintf truncation/error(%ld) %s\n",
+-                __func__, n, tmp);
++                __func__, (long int)n, tmp);
+     }
+ 
+     (void)unlink(tmp);
+@@ -2878,8 +2878,8 @@ int dlt_daemon_log_internal(DltDaemon *daemon, DltDaemonLocal *daemon_local,
+         dlt_daemon_client_send(DLT_DAEMON_SEND_TO_ALL, daemon,daemon_local,
+                             msg.headerbuffer, sizeof(DltStorageHeader),
+                             msg.headerbuffer + sizeof(DltStorageHeader),
+-                            (size_t)(msg.headersize - (int32_t)sizeof(DltStorageHeader)),
+-                            msg.databuffer, (size_t)msg.datasize, verbose);
++                            (int)(msg.headersize - (int32_t)sizeof(DltStorageHeader)),
++                            msg.databuffer, (int)msg.datasize, verbose);
+ 
+         free(msg.databuffer);
+     }else {
+diff --git a/src/daemon/dlt_daemon_client.c b/src/daemon/dlt_daemon_client.c
+index 50d8f19..20a512b 100644
+--- a/src/daemon/dlt_daemon_client.c
++++ b/src/daemon/dlt_daemon_client.c
+@@ -551,8 +551,8 @@ int dlt_daemon_client_send_message_to_all_client(DltDaemon *daemon,
+     return dlt_daemon_client_send(DLT_DAEMON_SEND_TO_ALL, daemon, daemon_local,
+                 daemon_local->msg.headerbuffer, sizeof(DltStorageHeader),
+                 daemon_local->msg.headerbuffer + sizeof(DltStorageHeader),
+-                (size_t)(daemon_local->msg.headersize - (int32_t)sizeof(DltStorageHeader)),
+-                daemon_local->msg.databuffer, (size_t)daemon_local->msg.datasize, verbose);
++                (int)(daemon_local->msg.headersize - (int32_t)sizeof(DltStorageHeader)),
++                daemon_local->msg.databuffer, (int)daemon_local->msg.datasize, verbose);
+ 
+ }
+ 
+@@ -771,8 +771,8 @@ int dlt_daemon_client_send_control_message(int sock,
+     if ((ret =
+              dlt_daemon_client_send(sock, daemon, daemon_local, msg->headerbuffer, sizeof(DltStorageHeader),
+                                     msg->headerbuffer + sizeof(DltStorageHeader),
+-                                    (size_t)(msg->headersize - (int32_t)sizeof(DltStorageHeader)),
+-                                    msg->databuffer, (size_t)msg->datasize, verbose))) {
++                                    (int)(msg->headersize - (int32_t)sizeof(DltStorageHeader)),
++                                    msg->databuffer, (int)msg->datasize, verbose))) {
+         dlt_log(LOG_DEBUG, "dlt_daemon_control_send_control_message: DLT message send to all failed!.\n");
+         return ret;
+     }
+@@ -1919,7 +1919,7 @@ void dlt_daemon_control_get_log_info(int sock,
+ 
+     /* Allocate buffer for response message */
+     resp.databuffer = (uint8_t *)malloc((size_t)resp.datasize);
+-    resp.databuffersize = (size_t)resp.datasize;
++    resp.databuffersize = resp.datasize;
+ 
+     if (resp.databuffer == 0) {
+         dlt_daemon_control_service_response(sock,
+@@ -2572,7 +2572,7 @@ int dlt_daemon_control_message_buffer_overflow(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2633,7 +2633,7 @@ int dlt_daemon_control_message_buffer_overflow_v2(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2686,7 +2686,7 @@ void dlt_daemon_control_service_response(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2732,7 +2732,7 @@ void dlt_daemon_control_service_response_v2(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2779,7 +2779,7 @@ int dlt_daemon_control_message_unregister_context(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2842,7 +2842,7 @@ int dlt_daemon_control_message_unregister_context_v2(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2909,7 +2909,7 @@ int dlt_daemon_control_message_connection_info(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -2962,7 +2962,7 @@ int dlt_daemon_control_message_connection_info_v2(int sock,
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -3010,7 +3010,7 @@ int dlt_daemon_control_message_timezone(int sock, DltDaemon *daemon, DltDaemonLo
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -3072,7 +3072,7 @@ int dlt_daemon_control_message_timezone_v2(int sock, DltDaemon *daemon, DltDaemo
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+@@ -3127,7 +3127,7 @@ int dlt_daemon_control_message_marker(int sock, DltDaemon *daemon, DltDaemonLoca
+ 
+     if (msg.databuffer == 0) {
+         msg.databuffer = (uint8_t *)malloc((size_t)msg.datasize);
+-        msg.databuffersize = (size_t)msg.datasize;
++        msg.databuffersize = msg.datasize;
+     }
+ 
+     if (msg.databuffer == 0)
+diff --git a/src/daemon/dlt_daemon_common.c b/src/daemon/dlt_daemon_common.c
+index 2f08c6a..65b264a 100644
+--- a/src/daemon/dlt_daemon_common.c
++++ b/src/daemon/dlt_daemon_common.c
+@@ -2782,7 +2782,7 @@ int dlt_daemon_user_send_log_state(DltDaemon *daemon, DltDaemonApplication *app,
+     if (dlt_user_set_userheader(&userheader, DLT_USER_MESSAGE_LOG_STATE) < DLT_RETURN_OK)
+         return -1;
+ 
+-    logstate.log_state = daemon->connectionState;
++    logstate.log_state = (int8_t)daemon->connectionState;
+ 
+     /* log to FIFO */
+     ret = dlt_user_log_out2_with_timeout(app->user_handle,
+@@ -2811,7 +2811,7 @@ int dlt_daemon_user_send_log_state_v2(DltDaemon *daemon, DltDaemonApplication *a
+     if (dlt_user_set_userheader_v2(&userheader, DLT_USER_MESSAGE_LOG_STATE) < DLT_RETURN_OK)
+         return -1;
+ 
+-    logstate.log_state = daemon->connectionState;
++    logstate.log_state = (int8_t)daemon->connectionState;
+ 
+     /* log to FIFO */
+     ret = dlt_user_log_out2_with_timeout(app->user_handle,
+diff --git a/src/lib/dlt_user.c b/src/lib/dlt_user.c
+index 6d0098d..e432e26 100644
+--- a/src/lib/dlt_user.c
++++ b/src/lib/dlt_user.c
+@@ -5106,8 +5106,8 @@ DltReturnValue dlt_user_log_send_log(DltContextData *log, const int mtype, int *
+                 return DLT_RETURN_ERROR;
+             }
+ 
+-            dlt_vlog(LOG_DEBUG, "%s: Current file size=[%ld]\n", __func__,
+-                     st.st_size);
++            dlt_vlog(LOG_DEBUG, "%s: Current file size=[%lld]\n", __func__,
++                     (long long int)st.st_size);
+             /* Check filesize */
+             /* Return error if the file size has reached to maximum */
+             unsigned int msg_size = (unsigned int)st.st_size + (unsigned int)msg.headersize +
+@@ -5115,8 +5115,8 @@ DltReturnValue dlt_user_log_send_log(DltContextData *log, const int mtype, int *
+             if (msg_size > dlt_user.filesize_max) {
+                 dlt_user_file_reach_max = true;
+                 dlt_vlog(LOG_ERR,
+-                         "%s: File size (%ld bytes) reached to defined maximum size (%d bytes)\n",
+-                         __func__, st.st_size, dlt_user.filesize_max);
++                         "%s: File size (%lld bytes) reached to defined maximum size (%d bytes)\n",
++                         __func__, (long long int)st.st_size, dlt_user.filesize_max);
+                 dlt_mutex_unlock();
+                 return DLT_RETURN_FILESZERR;
+             }
+@@ -5612,21 +5612,21 @@ DltReturnValue dlt_user_log_send_log_v2(DltContextData *log, const int mtype, Dl
+                 return DLT_RETURN_ERROR;
+             }
+ 
+-            dlt_vlog(LOG_DEBUG, "%s: Current file size=[%ld]\n", __func__,
+-                     st.st_size);
++            dlt_vlog(LOG_DEBUG, "%s: Current file size=[%lld]\n", __func__,
++                     (long long int)st.st_size);
+             /* Check filesize */
+             /* Return error if the file size has reached to maximum */
+             unsigned int msg_size = 0;
+             if (st.st_size < 0 || st.st_size > UINT_MAX) {
+-                dlt_vlog(LOG_ERR, "%s: File size (%ld bytes) is invalid or too large for unsigned int\n", __func__, st.st_size);
++                dlt_vlog(LOG_ERR, "%s: File size (%lld bytes) is invalid or too large for unsigned int\n", __func__, (long long int)st.st_size);
+                 return DLT_RETURN_FILESZERR;
+             }
+             msg_size = (unsigned int)st.st_size + (unsigned int) msg.headersizev2 + (unsigned int) log->size;
+             if (msg_size > dlt_user.filesize_max) {
+                 dlt_user_file_reach_max = true;
+                 dlt_vlog(LOG_ERR,
+-                         "%s: File size (%ld bytes) reached to defined maximum size (%d bytes)\n",
+-                         __func__, st.st_size, dlt_user.filesize_max);
++                         "%s: File size (%lld bytes) reached to defined maximum size (%d bytes)\n",
++                         __func__, (long long int)st.st_size, dlt_user.filesize_max);
+                 return DLT_RETURN_FILESZERR;
+             }
+             else {
+diff --git a/src/shared/dlt_common.c b/src/shared/dlt_common.c
+index 6ad354b..aa0aaaa 100644
+--- a/src/shared/dlt_common.c
++++ b/src/shared/dlt_common.c
+@@ -1220,7 +1220,7 @@ DltReturnValue dlt_message_header_flags_v2(DltMessageV2 *msg, char *text, size_t
+             for (int i = 0; i<5; ++i){
+                 tt = (tt << 8) | msg->headerextrav2.seconds[i];
+             }
+-            snprintf(text + strlen(text), textlength - strlen(text), "%ld.%.9u ", tt, msg->headerextrav2.nanoseconds);
++            snprintf(text + strlen(text), textlength - strlen(text), "%lld.%.9u ", (long long int)tt, msg->headerextrav2.nanoseconds);
+         }
+         else
+             snprintf(text + strlen(text), textlength - strlen(text), "---------- ");
+diff --git a/src/shared/dlt_multiple_files.c b/src/shared/dlt_multiple_files.c
+index c4019e5..65529ff 100644
+--- a/src/shared/dlt_multiple_files.c
++++ b/src/shared/dlt_multiple_files.c
+@@ -257,7 +257,7 @@ ssize_t multiple_files_buffer_get_total_size(const MultipleFilesRingBuffer *file
+             if (((unsigned int)res < sizeof(filename)) && (res > 0)) {
+                 errno = 0;
+                 if (0 == stat(filename, &status))
+-                    size += status.st_size;
++                    size += (ssize_t)status.st_size;
+                 else
+                     fprintf(stderr, "file %s cannot be stat-ed, error=%s\n", filename, strerror(errno));
+             }
+diff --git a/src/tests/dlt-test-multi-process-client-v2.c b/src/tests/dlt-test-multi-process-client-v2.c
+index 2bb1158..ec99720 100644
+--- a/src/tests/dlt-test-multi-process-client-v2.c
++++ b/src/tests/dlt-test-multi-process-client-v2.c
+@@ -299,10 +299,10 @@ void print_stats(s_statistics stats, s_parameters params)
+     printf(" Messages received             : %d\n", stats.messages_received);
+     printf(" Broken messages received      : %d\n", stats.broken_messages_received);
+     printf(" Bytes received                : %d\n", stats.bytes_received);
+-    printf(" Time running (seconds)        : %ld\n", time(NULL) - stats.first_message_time);
+-    printf(" Throughput (msgs/sec)/(B/sec) : %ld/%ld\n",
+-           stats.messages_received / ((time(NULL) - stats.first_message_time) + 1),
+-           (stats.bytes_received) / ((time(NULL) - stats.first_message_time) + 1));
++    printf(" Time running (seconds)        : %lld\n", (long long int)(time(NULL) - stats.first_message_time));
++    printf(" Throughput (msgs/sec)/(B/sec) : %lld/%lld\n",
++           (long long int)(stats.messages_received / ((time(NULL) - stats.first_message_time) + 1)),
++           (long long int)((stats.bytes_received) / ((time(NULL) - stats.first_message_time) + 1)));
+ 
+     if (params.messages_left == 0) {
+         if (stats.broken_messages_received == 0)
+diff --git a/src/tests/dlt-test-multi-process-v2.c b/src/tests/dlt-test-multi-process-v2.c
+index 44a8622..1d3a54a 100644
+--- a/src/tests/dlt-test-multi-process-v2.c
++++ b/src/tests/dlt-test-multi-process-v2.c
+@@ -393,7 +393,7 @@ void *do_logging(void *arg)
+ 
+         sleep_time = mksleep_time(data->params.delay, data->params.delay_fudge);
+         ts.tv_sec = sleep_time / 1000000000;
+-        ts.tv_nsec = sleep_time % 1000000000;
++        ts.tv_nsec = (long int)(sleep_time % 1000000000);
+         nanosleep(&ts, NULL);
+     }
+ 
+diff --git a/src/tests/dlt-test-multi-process.c b/src/tests/dlt-test-multi-process.c
+index 016c8b4..00fb11c 100644
+--- a/src/tests/dlt-test-multi-process.c
++++ b/src/tests/dlt-test-multi-process.c
+@@ -370,7 +370,7 @@ void *do_logging(void *arg)
+ 
+         sleep_time = mksleep_time(data->params.delay, data->params.delay_fudge);
+         ts.tv_sec = sleep_time / 1000000000;
+-        ts.tv_nsec = sleep_time % 1000000000;
++        ts.tv_nsec = (long int)(sleep_time % 1000000000);
+         nanosleep(&ts, NULL);
+     }
+ 
+-- 
+2.34.1
+

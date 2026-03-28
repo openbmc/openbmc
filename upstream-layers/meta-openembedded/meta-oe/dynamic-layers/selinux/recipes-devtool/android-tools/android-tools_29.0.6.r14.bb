@@ -22,6 +22,7 @@ SRC_URI += " \
     file://debian/external/libunwind/legacy_built-in_sync_functions.patch \
     file://debian/external/libunwind/20150704-CVE-2015-3239_dwarf_i.h.patch \
     file://debian/external/libunwind/libunwind-guard-unreachable-macro-to-avoid-redefinit.patch \
+    file://debian/external/libunwind/libunwind-fix-strchr-conformance-to-ISO-C23.patch \
     \
     file://debian/system/core/move-log-file-to-proper-dir.patch \
     file://debian/system/core/Added-missing-headers.patch \

@@ -1,0 +1,37 @@
+Subject: [PATCH] cmake: disable filesystem gitclone
+
+In Yocto we don't download filesystem, it is satisfied from source dir.
+This Dependencies.cmake file would try to download filesystem even if it is satisfied.
+
+Fix error log as following:
+| fatal: unable to access 'https://github.com/rikyoz/filesystem.git/': Could not resolve host: github.com
+| Had to git clone more than once: 3 times.
+| CMake Error at bit7z/4.0.11/build/_deps/ghc_filesystem-subbuild/ghc_filesystem-populate-prefix/tmp/ghc_filesystem-populate-gitclone.cmake:50 (message):
+|   Failed to clone repository: 'https://github.com/rikyoz/filesystem.git'
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ cmake/Dependencies.cmake | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/cmake/Dependencies.cmake b/cmake/Dependencies.cmake
+index 110d9c2b..dc1dead8 100644
+--- a/cmake/Dependencies.cmake
++++ b/cmake/Dependencies.cmake
+@@ -39,10 +39,9 @@ if( NOT USE_STANDARD_FILESYSTEM OR NOT STANDARD_FILESYSTEM_COMPILES OR BIT7Z_BUI
+     CPMAddPackage( NAME ghc_filesystem
+                    GITHUB_REPOSITORY rikyoz/filesystem
+                    GIT_TAG b99c2aebd5ddd6fb2f190731ba80b949fc3842b5
+-                   DOWNLOAD_ONLY YES )
++                   SOURCE_DIR "${CPM_SOURCE_CACHE}/ghc_filesystem" )
+     if( ghc_filesystem_ADDED )
+         message( STATUS "ghc::filesystem source code available at ${ghc_filesystem_SOURCE_DIR}" )
+-        add_library( ghc_filesystem INTERFACE IMPORTED )
+         target_include_directories( ghc_filesystem SYSTEM INTERFACE ${ghc_filesystem_SOURCE_DIR}/include )
+     endif()
+ endif()
+-- 
+2.43.0
+

@@ -9,10 +9,11 @@ DEPENDS:class-native = "curl-native"
 
 SRC_URI = "git://github.com/jpbarrette/curlpp.git;branch=master;protocol=https \
            file://0001-curlpp-config.in-Remove-references-to-absolute-build.patch \
-           file://0002-fix-invalid-conversion-from-int-to-CURLoption.patch"
+"
 
-SRCREV = "592552a165cc569dac7674cb7fc9de3dc829906f"
+SRCREV = "ec1b66e699557cd9d608d322c013a1ebda16bd08"
 
+PV .= "+git"
 
 inherit cmake pkgconfig binconfig
 
@@ -23,4 +24,6 @@ do_install:append() {
         -e 's@[^ ]*-fdebug-prefix-map=[^ "]*@@g' \
         -e 's@[^ ]*-fmacro-prefix-map=[^ "]*@@g' \
         -i ${D}${libdir}/pkgconfig/*.pc
+
+    sed -i 's@${RECIPE_SYSROOT}@${CMAKE_SYSROOT}@' ${D}${libdir}/cmake/curlpp/curlppTargets.cmake
 }

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -e -u -C
+
+cd test
+
+./dotest |sed \
+    -e 's,^executing test \(#[0-9]*\)...succeeded$,PASS: conserver \1,' \
+    -e 's,^executing test \(#[0-9]*\)...failed\(.*\)$,FAIL: conserver \1 \2,'
+
+for i in test*.diff conserver.log shell.log shell2.log
+do
+    test "$i" != 'test*.diff' || exit 0
+    test -e "$i" || continue
+
+    echo "----[ $i ]--------------------"
+    cat "$i"
+    echo "------------------------------------"
+done
+
+exit 1

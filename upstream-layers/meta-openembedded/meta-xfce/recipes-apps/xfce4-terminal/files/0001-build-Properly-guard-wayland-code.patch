@@ -1,0 +1,35 @@
+From b07d9546a08a3cd70b7e9aaad7a86256fbe32b8b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Sun, 8 Mar 2026 22:23:34 +0100
+Subject: [PATCH] build: Properly guard wayland code
+
+Closes: #383
+Fixes: ab0136ac39d1eb0849dcfca84bbd91e8562a7176
+
+Upstream-Status: Backport [https://gitlab.xfce.org/apps/xfce4-terminal/-/commit/b07d9546a08a3cd70b7e9aaad7a86256fbe32b8b]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ terminal/terminal-window-dropdown.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/terminal/terminal-window-dropdown.c b/terminal/terminal-window-dropdown.c
+index 6f9e3b48..074a6ce0 100644
+--- a/terminal/terminal-window-dropdown.c
++++ b/terminal/terminal-window-dropdown.c
+@@ -567,11 +567,13 @@ terminal_window_dropdown_finalize (GObject *object)
+   if (dropdown->animation_timeout_id != 0)
+     g_source_remove (dropdown->animation_timeout_id);
+
++#ifdef HAVE_GTK_LAYER_SHELL
+   if (dropdown->set_monitor_idle_id != 0)
+     g_source_remove (dropdown->set_monitor_idle_id);
+
+   if (dropdown->monitor_removed_idle_id != 0)
+     g_source_remove (dropdown->monitor_removed_idle_id);
++#endif
+
+   if (dropdown->status_icon != NULL)
+     g_object_unref (G_OBJECT (dropdown->status_icon));
+--
+2.51.2

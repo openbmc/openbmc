@@ -1,0 +1,55 @@
+From 25129a49bd220b4668e1df474b1b1549885aaced Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Mar 2026 09:47:12 -0700
+Subject: [PATCH] configure: Stop embedding pwd at configure time
+
+NDPI_BASE_DIR seems to unused and currently encodes hardcoded
+absolute paths in for it breaking repeoducible builds
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6984b38b5..1b9aae4df 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -353,7 +353,7 @@ case "$host" in
+ 	 if test -f $PCAP_HOME/lib/libpfring.a; then :
+    	   PFRING_LIB=$PCAP_HOME/lib/libpfring.a
+ 	 fi
+-	 
++
+          PCAP_LIB="$PCAP_HOME/libpcap/libpcap.a $PFRING_LIB $LIBNUMA `$PCAP_HOME/lib/pfring_config --libs`"
+          AC_CHECK_LIB([rt], [clock_gettime],   [PCAP_LIB="$PCAP_LIB -lrt"])
+          AC_CHECK_LIB([nl], [nl_handle_alloc], [PCAP_LIB="$PCAP_LIB -lnl"])
+@@ -438,7 +438,7 @@ PCRE2_ENABLED=0
+ AC_ARG_WITH(pcre2, AS_HELP_STRING([--with-pcre2], [Enable nDPI build with libpcre2]))
+ if test "${with_pcre2+set}" = set; then :
+   AC_CHECK_LIB(pcre2-8, pcre2_compile_8, AC_DEFINE_UNQUOTED(HAVE_PCRE2, 1, [libpcre2(-dev) is present]))
+-  
++
+  if test "x$ac_cv_lib_pcre2_8_pcre2_compile_8" = xyes; then :
+    ADDITIONAL_LIBS="${ADDITIONAL_LIBS} -lpcre2-8"
+    PCRE2_ENABLED=1
+@@ -456,11 +456,6 @@ if test "${with_maxminddb+set}" = set; then :
+   fi
+ fi
+ 
+-dnl> Use absolute source directory for NDPI_BASE_DIR
+-NDPI_ABS_SRCDIR="`cd ${srcdir} && pwd`"
+-AC_DEFINE_UNQUOTED(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}", [nDPI base directory])
+-AC_SUBST(NDPI_BASE_DIR, "${NDPI_ABS_SRCDIR}")
+-
+ dnl> Curl
+ dnl> AC_CHECK_LIB([curl], [curl_easy_perform])
+ dnl> if test ${ac_cv_lib_curl_curl_easy_perform} = "no"; then
+@@ -515,5 +510,4 @@ AC_SUBST(DISABLE_NPCAP)
+ AC_SUBST(EXE_SUFFIX)
+ AC_SUBST(NDPI_CFLAGS)
+ AC_SUBST(NDPI_LDFLAGS)
+-AC_SUBST(NDPI_BASE_DIR)
+ AC_OUTPUT

@@ -21,7 +21,7 @@ index a3f341bfc..0c05eb151 100644
 +++ b/lib/device/device_id.c
 @@ -27,6 +27,7 @@
  #include "lib/display/display.h"
- #include "device_mapper/misc/dm-ioctl.h"
+ #include "libdm/misc/dm-ioctl.h"
  
 +#include <libgen.h>
  #include <sys/stat.h>

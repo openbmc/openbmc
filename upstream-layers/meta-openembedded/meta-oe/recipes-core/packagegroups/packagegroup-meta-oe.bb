@@ -52,6 +52,7 @@ RDEPENDS:packagegroup-meta-oe = "\
 
 RDEPENDS:packagegroup-meta-oe-benchmarks = "\
     bonnie++ \
+    cpupower \
     dbench \
     dhrystone \
     fio \
@@ -67,6 +68,7 @@ RDEPENDS:packagegroup-meta-oe-benchmarks = "\
     nbench-byte \
     phoronix-test-suite \
     qperf \
+    rtla \
     s-suite \
     stressapptest \
     tinymembench \

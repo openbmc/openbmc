@@ -1,0 +1,27 @@
+From d91f5324f809c3a5b0343927716e4b99bc31db53 Mon Sep 17 00:00:00 2001
+From: Viswanath Kraleti <viswanath.kraleti@oss.qualcomm.com>
+Date: Fri, 13 Mar 2026 18:57:36 +0530
+Subject: [PATCH] libunwind: fix strchr() conformance to ISO C23
+
+Fix uses of strchr() to conform to ISO C23, supported since glibc-2.43
+
+Signed-off-by: Viswanath Kraleti <viswanath.kraleti@oss.qualcomm.com>
+Upstream-Status: Pending
+---
+ external/libunwind/src/dwarf/Gfind_proc_info-lsb.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/external/libunwind/src/dwarf/Gfind_proc_info-lsb.c b/external/libunwind/src/dwarf/Gfind_proc_info-lsb.c
+index 77ed3d09..37eadf52 100644
+--- a/external/libunwind/src/dwarf/Gfind_proc_info-lsb.c
++++ b/external/libunwind/src/dwarf/Gfind_proc_info-lsb.c
+@@ -248,7 +248,8 @@ load_debug_frame (const char *file, char **buf, size_t *bufsize,
+ 
+   if (*buf == NULL && linkbuf != NULL && memchr (linkbuf, 0, linksize) != NULL)
+     {
+-      char *newname, *basedir, *p;
++      char *newname, *basedir;
++      const char *p;
+       static const char *debugdir = "/usr/lib/debug";
+       int ret;
+ 

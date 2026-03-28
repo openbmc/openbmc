@@ -15,9 +15,6 @@ DEPENDS += "bison-native \
             "
 DEPENDS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'pahole-native llvm-native', '', d)}"
 
-RDEPENDS:${PN} += "bash python3 xz"
-RDEPENDS:${PN}-ptest += "bpftool"
-
 SRC_URI = "git://github.com/iovisor/bpftrace;branch=release/0.24.x;protocol=https;tag=v${PV} \
            file://run-ptest \
            file://0002-CMakeLists.txt-allow-to-set-BISON_FLAGS-like-l.patch \
@@ -41,14 +38,20 @@ do_install_ptest() {
         cp -rf ${B}/tests/test* ${D}${PTEST_PATH}/tests
     fi
     for f in testlibs/cmake_install.cmake \
-    testprogs/cmake_install.cmake \
-    testlibs/CTestTestfile.cmake \
-    testprogs/CTestTestfile.cmake
+             testprogs/cmake_install.cmake \
+             testlibs/CTestTestfile.cmake \
+             testprogs/CTestTestfile.cmake
     do
         sed -i -e 's|${STAGING_BINDIR_TOOLCHAIN}/||' ${D}${libdir}/bpftrace/ptest/tests/$f
         sed -i -e 's|${S}/||' ${D}${libdir}/bpftrace/ptest/tests/$f
         sed -i -e 's|${B}/||' ${D}${libdir}/bpftrace/ptest/tests/$f
     done
+}
+
+do_install_ptest:powerpc64() {
+}
+
+do_install_ptest:powerpc64le() {
 }
 
 EXTRA_OECMAKE = " \
@@ -58,6 +61,11 @@ EXTRA_OECMAKE = " \
     -DENABLE_MAN=OFF \
     -DBISON_FLAGS='--file-prefix-map=${WORKDIR}=' \
 "
+
+PACKAGES:remove:powerpc64 = "${PN}-ptest"
+PACKAGES:remove:powerpc64le = "${PN}-ptest"
+
+RDEPENDS:${PN}-ptest += "bash bpftool python3"
 
 COMPATIBLE_HOST = "(x86_64.*|aarch64.*|powerpc64.*|riscv64.*)-linux"
 

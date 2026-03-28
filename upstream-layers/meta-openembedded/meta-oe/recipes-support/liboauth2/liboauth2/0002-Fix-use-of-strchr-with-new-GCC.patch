@@ -1,0 +1,33 @@
+From 0dcba079907d559550ee8d9a201d26203bb8aebd Mon Sep 17 00:00:00 2001
+From: Alexander Bokovoy <abokovoy@redhat.com>
+Date: Wed, 7 Jan 2026 11:41:37 +0200
+Subject: [PATCH] Fix use of strchr with new GCC
+
+According to C specification, 7.28.5.1, strchr() is a generic function
+and its string argument's type is promoted to the result. So if it is
+const char*, the result will be const char* as well.
+
+gcc in Fedora Rawhide (15.2.1 20251111 or later) implements this
+conformance, resulting in a compilation fail with
+-Werror=discarded-qualifiers.
+
+Signed-off-by: Alexander Bokovoy <abokovoy@redhat.com>
+Upstream-Status: Backport [https://github.com/OpenIDC/liboauth2/commit/0dcba079907d559550ee8d9a201d26203bb8aebd]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ src/jose.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/jose.c b/src/jose.c
+index fbaf661..a3441c8 100644
+--- a/src/jose.c
++++ b/src/jose.c
+@@ -993,7 +993,7 @@ char *oauth2_jose_jwt_header_peek(oauth2_log_t *log,
+ {
+ 	char *input = NULL, *result = NULL;
+ 	json_t *json = NULL;
+-	char *p = NULL;
++	const char *p = NULL;
+ 	size_t result_len;
+ 	char *rv = NULL;
+ 

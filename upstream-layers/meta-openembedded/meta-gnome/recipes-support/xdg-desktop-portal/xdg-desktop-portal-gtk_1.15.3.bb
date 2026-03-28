@@ -15,7 +15,7 @@ inherit gettext meson pkgconfig gsettings features_check
 
 REQUIRED_DISTRO_FEATURES = "polkit"
 
-SRC_URI = "git://github.com/flatpak/xdg-desktop-portal-gtk.git;protocol=https;branch=main"
+SRC_URI = "git://github.com/flatpak/xdg-desktop-portal-gtk.git;protocol=https;branch=main;tag=${PV}"
 
 SRCREV = "337202d4e7179857bc37b03c1a6d8c9d92e47c44"
 

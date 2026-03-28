@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# PostgreSQL regression test runner for ptest
+#
+# This script initializes a temporary PostgreSQL database cluster,
+# starts a server instance, and executes the standard regression test
+# suite via pg_regress against the installed PostgreSQL binaries.
+#
+
+set -e
+
+PGDATA=/tmp/ptest_pgdata
+PTEST_PATH=$(dirname "$(readlink -f "$0")")
+TESTDIR="${PTEST_PATH}/test"
+PGBIN=$(pg_config --bindir)
+PKGLIBDIR=$(pg_config --pkglibdir)
+
+cleanup() {
+    su - postgres -c "pg_ctl -D ${PGDATA} stop -m immediate" 2>/dev/null || true
+    rm -rf "${PGDATA}"
+}
+trap cleanup EXIT
+
+# Initialize the database cluster
+rm -rf "${PGDATA}"
+su - postgres -c "${PGBIN}/initdb -D ${PGDATA} --no-locale" || exit 1
+
+# Start the server
+su - postgres -c "pg_ctl -D ${PGDATA} -l ${PGDATA}/logfile start -w -t 120" || exit 1
+
+# Ensure the test directory is writable by the postgres user for
+# regression output files (regression.out, regression.diffs, results/).
+chown -R postgres:postgres "${TESTDIR}"
+
+# Prepare the tablespace test directory
+mkdir -p "${TESTDIR}/testtablespace"
+chmod 0700 "${TESTDIR}/testtablespace"
+chown postgres:postgres "${TESTDIR}/testtablespace"
+
+# Disable set -e before the pipe so we can capture PIPESTATUS
+set +e
+
+# Run the regression tests.
+# --dlpath points to the standard PostgreSQL package library directory
+# where regress.so and contrib modules (autoinc.so, refint.so, etc.)
+# are installed, so that CREATE FUNCTION ... AS tests can locate them.
+su - postgres -c "cd ${TESTDIR} && \
+    ${TESTDIR}/pg_regress \
+        --inputdir=. \
+        --bindir=${PGBIN} \
+        --dlpath=${PKGLIBDIR} \
+        --max-concurrent-tests=20 \
+        --schedule=parallel_schedule" 2>&1 | \
+    stdbuf -oL sed -n \
+        -e 's/^ok [0-9]\+\s\+[+* ]\?\s*/PASS: /p' \
+        -e 's/^not ok [0-9]\+\s\+[+* ]\?\s*/FAIL: /p'
+RESULT=${PIPESTATUS[0]}
+
+if [ "${RESULT}" = "0" ]; then
+    echo "PASS: all tests passed"
+else
+    echo "FAIL: some tests failed"
+fi
+
+exit ${RESULT}

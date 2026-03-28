@@ -1,0 +1,32 @@
+From 75003957e8f526738b479dff7d5d9a5419111f33 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 18 Mar 2026 15:30:37 -0700
+Subject: [PATCH] Adjust for c23 prototype for strchr
+
+in glibc 2.43+ functions like strchr, memchr, strstr
+and friends are now const-preserving macros
+
+That means if you pass a const char *, strchr now returns const char *,
+which breaks older code patterns that assumed char * or wrapped the
+result in compatibility helpers
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ ftp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ftp.c b/ftp.c
+index 7a8d05d..41c0a25 100644
+--- a/ftp.c
++++ b/ftp.c
+@@ -768,7 +768,7 @@ do {								\
+ } while (0)
+ 		A(ftp_head);
+ 		ud = stracpy(get_url_data(c->url));
+-		if (strchr(cast_const_char ud, POST_CHAR)) *strchr(cast_const_char ud, POST_CHAR) = 0;
++		if (strchr(ud, POST_CHAR)) *strchr(ud, POST_CHAR) = 0;
+ 		s0 = init_str();
+ 		s0l = 0;
+ 		add_conv_str(&s0, &s0l, ud, (int)strlen(cast_const_char ud), -1);

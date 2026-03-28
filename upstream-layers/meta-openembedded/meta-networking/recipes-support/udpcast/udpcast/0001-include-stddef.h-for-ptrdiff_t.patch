@@ -5,7 +5,7 @@ Subject: [PATCH 1/1] include stddef.h for ptrdiff_t
 
 This fixes compilation with musl.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://udpcast.linux.lu/mailman3/hyperkitty/list/udpcast@udpcast.linux.lu/thread/2WTDPJNR6WGDO3PGCEC2J7RSJWETDCXW/]
 
 Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
 ---

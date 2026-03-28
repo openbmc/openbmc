@@ -51,6 +51,9 @@ FILES:${PN}-dbg += "${PTEST_PATH}/.debug/*"
 RDEPENDS:${PN}-ptest += "${PN}-dev"
 INSANE_SKIP:${PN}-ptest += "dev-deps"
 
+# The ptests are not buildable now that pkgconf is being used, disable until fixed.
+PTEST_ENABLED = "0"
+
 PTEST_EXTRA_ARGS = "top_srcdir=${S} top_builddir=${B}"
 
 do_compile_ptest () {

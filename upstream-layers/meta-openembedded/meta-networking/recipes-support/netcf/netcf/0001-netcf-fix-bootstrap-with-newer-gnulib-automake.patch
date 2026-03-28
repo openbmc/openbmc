@@ -1,0 +1,61 @@
+From dded6e3321e304f50922e61c553d4e4eb0f80fd0 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 22 Mar 2026 11:05:34 -0700
+Subject: [PATCH] netcf: fix bootstrap with newer gnulib/automake
+
+Upstream netcf is old enough that bootstrap/autoreconf now trips over:
+- gnulib-tool.py wrapper expectations in newer gnulib
+- stricter automake handling of AM_CFLAGS += from generated gnulib.mk
+- subdir source warnings
+- deprecated INCLUDES usage
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ configure.ac             | 2 +-
+ gnulib/lib/Makefile.am   | 2 +-
+ gnulib/tests/Makefile.am | 2 ++
+ tests/Makefile.am        | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
+
+--- a/configure.ac
++++ b/configure.ac
+@@ -3,7 +3,7 @@ AC_CONFIG_SRCDIR([src/netcf.c])
+ AC_CONFIG_AUX_DIR([build-aux])
+ AC_CONFIG_MACRO_DIR([gnulib/m4])
+ AC_CONFIG_HEADERS([config.h])
+-AM_INIT_AUTOMAKE([-Wno-portability 1.11 color-tests parallel-tests])
++AM_INIT_AUTOMAKE([-Wno-portability 1.11 subdir-objects color-tests parallel-tests])
+ AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
+ AC_CANONICAL_HOST
+ 
+--- a/gnulib/lib/Makefile.am
++++ b/gnulib/lib/Makefile.am
+@@ -13,4 +13,4 @@ CLEANFILES=
+ 
+ include gnulib.mk
+ 
+-INCLUDES = $(GETTEXT_CPPFLAGS)
++AM_CPPFLAGS = $(GETTEXT_CPPFLAGS)
+--- a/gnulib/tests/Makefile.am
++++ b/gnulib/tests/Makefile.am
+@@ -3,6 +3,6 @@
+ ## Copyright (C) 2011 Red Hat, Inc.
+ ## See COPYING.LIB for the License of this software
+ 
+-include gnulib.mk
++AM_CFLAGS =
+ 
+-INCLUDES = $(GETTEXT_CPPFLAGS)
++include gnulib.mk
+--- a/tests/Makefile.am
++++ b/tests/Makefile.am
+@@ -14,7 +14,7 @@ TESTS_ENVIRONMENT = \
+   abs_top_builddir='$(abs_top_builddir)' \
+   abs_top_srcdir='$(abs_top_srcdir)'
+ 
+-INCLUDES = -I$(top_srcdir)/src
++AM_CPPFLAGS = -I$(top_srcdir)/src
+ 
+ TESTS=
+ check_PROGRAMS=

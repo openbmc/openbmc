@@ -14,9 +14,9 @@ diff --git a/utilities/transactions/lock/range/range_tree/lib/portability/toku_t
 index 0a7488c397..ad7d9f2124 100644
 --- a/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
 +++ b/utilities/transactions/lock/range/range_tree/lib/portability/toku_time.h
-@@ -162,6 +162,12 @@ static inline tokutime_t toku_time_now(void) {
+@@ -158,6 +158,12 @@ static inline tokutime_t toku_time_now(void) {
    unsigned long result;
-   asm volatile ("rdtime.d\t%0,$r0" : "=r" (result));
+   asm volatile("rdtime.d\t%0,$r0" : "=r"(result));
    return result;
 +#elif defined(__mips__)
 +  // mips apparently only allows rdtsc for superusers, so we fall

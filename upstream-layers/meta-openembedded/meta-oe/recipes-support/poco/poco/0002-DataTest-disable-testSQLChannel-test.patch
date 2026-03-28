@@ -15,7 +15,7 @@ diff --git a/Data/testsuite/src/DataTest.cpp b/Data/testsuite/src/DataTest.cpp
 index e18b87edc..60fd266c3 100644
 --- a/Data/testsuite/src/DataTest.cpp
 +++ b/Data/testsuite/src/DataTest.cpp
-@@ -1648,7 +1648,7 @@ CppUnit::Test* DataTest::suite()
+@@ -1659,7 +1659,7 @@ CppUnit::Test* DataTest::suite()
  	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
  	CppUnit_addTest(pSuite, DataTest, testTranscode);
  	CppUnit_addTest(pSuite, DataTest, testSQLParse);

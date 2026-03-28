@@ -1,0 +1,23 @@
+gcc complains about
+
+| ../../sources/gd-2.3.3/src/gd_filename.c: In function 'ftype':
+| ../../sources/gd-2.3.3/src/gd_filename.c:99:9: error: assignment discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+|    99 |     ext = strrchr(filename, '.');
+|       |         ^
+| cc1: all warnings being treated as errors
+
+Upstream-Status: Submitted [https://github.com/libgd/libgd/issues/985]
+
+diff --git i/src/gd_filename.c w/src/gd_filename.c
+index 7ce4817f..89b25204 100644
+--- i/src/gd_filename.c
++++ w/src/gd_filename.c
+@@ -93,7 +93,7 @@ static const struct FileType {
+ static const struct FileType *
+ ftype(const char *filename) {
+     int n;
+-    char *ext;
++    const char *ext;
+
+     /* Find the file extension (i.e. the last period in the string. */
+     ext = strrchr(filename, '.');

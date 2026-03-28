@@ -134,3 +134,6 @@ FILES:${PN}-staticdev += "\
 INSANE_SKIP:${PN} = "dev-so"
 
 EXCLUDE_FROM_WORLD = "${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "0", "1", d)}"
+
+CVE_STATUS[CVE-2026-26227] = "not-applicable-platform: the vulnerability is Android-specific"
+CVE_STATUS[CVE-2026-26228] = "not-applicable-platform: the vulnerability is Android-specific"

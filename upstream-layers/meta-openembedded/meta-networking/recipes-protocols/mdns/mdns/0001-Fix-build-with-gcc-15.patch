@@ -1,4 +1,4 @@
-From c84f185f29d0839b97177aecb0a78b9717947973 Mon Sep 17 00:00:00 2001
+From 0ec55ecaa7386f924ee3d64fdfbe1c2d0df1341a Mon Sep 17 00:00:00 2001
 From: Nguyen Dat Tho <tho3.nguyen@lge.com>
 Date: Wed, 9 Apr 2025 13:05:24 +0900
 Subject: [PATCH] Fix build with gcc-15

@@ -1,0 +1,83 @@
+From 3c38c5f9ab49384039f35408656a88f87619dd03 Mon Sep 17 00:00:00 2001
+From: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+Date: Wed, 18 Mar 2026 14:07:06 +0100
+Subject: [libgpiod][PATCH] tools: tests: remove SIGINT test cases
+
+In coreutils v9.10 (specifically with commit 8c2461933411 ("timeout:
+honor ignored signal dispositions")) the behavior of timeout changed and
+it will no longer propagate SIGINT or SIGQUIT in shell background jobs.
+This breaks the test cases checking the behavior of tools after SIGINT.
+We have to assume that if exit after SIGTERM works, then so does it
+after SIGINT and remove the failing tests.
+
+Upstream-Status: Submitted [https://lore.kernel.org/all/20260318131413.56575-1-bartosz.golaszewski@oss.qualcomm.com/]
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@oss.qualcomm.com>
+---
+ tools/gpio-tools-test.bash | 37 -------------------------------------
+ 1 file changed, 37 deletions(-)
+
+diff --git a/tools/gpio-tools-test.bash b/tools/gpio-tools-test.bash
+index 71d6e3d..62f6836 100755
+--- a/tools/gpio-tools-test.bash
++++ b/tools/gpio-tools-test.bash
+@@ -1415,17 +1415,6 @@ test_gpioset_with_lines_strictly_by_name() {
+ 	gpiosim_check_value sim0 6 0
+ }
+ 
+-test_gpioset_interactive_after_SIGINT() {
+-	gpiosim_chip sim0 num_lines=8 line_name=1:foo
+-
+-	dut_run gpioset -i foo=1
+-
+-	dut_kill -SIGINT
+-	dut_wait
+-
+-	status_is 130
+-}
+-
+ test_gpioset_interactive_after_SIGTERM() {
+ 	gpiosim_chip sim0 num_lines=8 line_name=1:foo
+ 
+@@ -1907,20 +1896,6 @@ test_gpiomon_multiple_lines_across_multiple_chips() {
+ 	assert_fail dut_readable
+ }
+ 
+-test_gpiomon_exit_after_SIGINT() {
+-	gpiosim_chip sim0 num_lines=8
+-
+-	local sim0=${GPIOSIM_CHIP_NAME[sim0]}
+-
+-	dut_run gpiomon --banner --chip "$sim0" 4
+-	dut_regex_match "Monitoring line .*"
+-
+-	dut_kill -SIGINT
+-	dut_wait
+-
+-	status_is 130
+-}
+-
+ test_gpiomon_exit_after_SIGTERM() {
+ 	gpiosim_chip sim0 num_lines=8
+ 
+@@ -2503,18 +2478,6 @@ test_gpionotify_multiple_lines_across_multiple_chips() {
+ 	assert_fail dut_readable
+ }
+ 
+-test_gpionotify_exit_after_SIGINT() {
+-	gpiosim_chip sim0 num_lines=8
+-
+-	dut_run gpionotify --banner --chip "${GPIOSIM_CHIP_NAME[sim0]}" 4
+-	dut_regex_match "Watching line .*"
+-
+-	dut_kill -SIGINT
+-	dut_wait
+-
+-	status_is 130
+-}
+-
+ test_gpionotify_exit_after_SIGTERM() {
+ 	gpiosim_chip sim0 num_lines=8
+ 
+-- 
+2.47.3
+

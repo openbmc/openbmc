@@ -21,7 +21,7 @@ diff --git a/configure.ac b/configure.ac
 index 9dfdcfe01..fcf5c8b78 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -1282,8 +1282,8 @@ AS_IF([test "$BUILD_LVMDBUSD" = "yes"], [
+@@ -1338,8 +1338,8 @@ AS_IF([test "$BUILD_LVMDBUSD" = "yes"], [
  	AS_IF([test "$PYTHON3_BINDINGS" = "yes"], [PYTHON_BINDINGS="yes"])
  
  	# To get this macro, install autoconf-archive package then run autoreconf

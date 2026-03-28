@@ -1,0 +1,25 @@
+From 17bc1de2c08f9303886d654572b1ba64259a8a68 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 20 Mar 2026 15:06:51 -0700
+Subject: [PATCH] pyprojects: Bump setuptools check to be <= 82.x
+
+This ensures build with 82.0.1 goes on
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index ea1c514..bbc83b7 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=68,<=82.0.0"]
++requires = ["setuptools>=68,<=83.0.0"]
+ build-backend = "backend"
+ backend-path = ["_mypyc_hook"]
+ 

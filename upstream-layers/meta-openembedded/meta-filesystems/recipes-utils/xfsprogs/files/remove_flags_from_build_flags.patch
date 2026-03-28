@@ -1,15 +1,15 @@
 Upstream-Status: Pending
 
-Index: xfsprogs-4.14.0/include/builddefs.in
+Index: xfsprogs-6.18.0/include/builddefs.in
 ===================================================================
---- xfsprogs-4.14.0.orig/include/builddefs.in
-+++ xfsprogs-4.14.0/include/builddefs.in
-@@ -168,7 +168,7 @@ ifeq ($(ENABLE_GETTEXT),yes)
- GCFLAGS += -DENABLE_GETTEXT
- endif
+--- xfsprogs-6.18.0.orig/include/builddefs.in
++++ xfsprogs-6.18.0/include/builddefs.in
+@@ -180,7 +180,7 @@ SANITIZER_CXXFLAGS = $(SANITIZER_CFLAGS)
+ GCXXFLAGS = $(GCFLAGS)
+ PCXXFLAGS = $(PCFLAGS)
  
 -BUILD_CFLAGS += $(GCFLAGS) $(PCFLAGS)
 +BUILD_CFLAGS += $(GCFLAGS)
  # First, Sanitizer, Global, Platform, Local CFLAGS
  CFLAGS += $(FCFLAGS) $(SANITIZER_CFLAGS) $(OPTIMIZER) $(GCFLAGS) $(PCFLAGS) $(LCFLAGS)
- 
+ CXXFLAGS += $(FCXXFLAGS) $(SANITIZER_CXXFLAGS) $(OPTIMIZER) $(GCXXFLAGS) $(PCXXFLAGS) $(LCXXFLAGS)

@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 DEPENDS += "coreutils e2fsprogs"
 
 SRC_URI = " \
-           git://github.com/e2tools/e2tools;protocol=https;branch=master \
+           git://github.com/e2tools/e2tools;protocol=https;branch=master;tag=v${PV} \
            file://run-ptest \
 "
 

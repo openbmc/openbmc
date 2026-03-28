@@ -8,7 +8,7 @@ inherit features_check gobject-introspection meson pkgconfig vala
 REQUIRED_DISTRO_FEATURES = "opengl"
 
 SRCREV = "941560af497148588783db991e8135f52a82574d"
-SRC_URI = "git://github.com/gnome/libchamplain.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/gnome/libchamplain.git;branch=master;protocol=https;tag=${PV}"
 
 # Compilation fails on 32-bit targets, due to GTimeVal usage, which assumes that
 # time_t is always long, which is not always the case. 

@@ -1,0 +1,41 @@
+From 857fbdf3e9079cec04bfa5fe7a93a432485b5cab Mon Sep 17 00:00:00 2001
+From: Priyansh Jain <priyansh.jain@oss.qualcomm.com>
+Date: Tue, 27 Jan 2026 15:26:24 +0530
+Subject: [PATCH 2/3] Invoke parser_init before platform_match
+
+The initialization flow currently invokes platform_match without
+calling parser_init first. As a result, the platform matching
+logic runs with no parsed configuration data available. This
+can cause incorrect platform detection, or failure to load
+the expected thermal configurations.
+
+This patch adds the missing parser_init() call before
+platform_match(), ensuring that configuration files are properly
+parsed and populated before any platform-specific matching occurs.
+This makes initialization reliable and aligns with the intended
+dependency order.
+
+Suggested-by: Amit Kucheria <amit.kucheria@oss.qualcomm.com>
+Signed-off-by: Priyansh Jain <priyansh.jain@oss.qualcomm.com>
+
+Upstream-Status: Backport [from commit 857fbdf3e9079cec04bfa5fe7a93a432485b5cab]
+---
+ src/thd_engine.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/thd_engine.cpp b/src/thd_engine.cpp
+index 319f50b..da52a5b 100644
+--- a/src/thd_engine.cpp
++++ b/src/thd_engine.cpp
+@@ -318,7 +318,7 @@ int cthd_engine::thd_engine_start() {
+ 		poll_timeout_msec = poll_interval_sec * 1000;
+ 	}
+ 
+-	if (parser.platform_matched()) {
++	if (!parser_init() && parser.platform_matched()) {
+ 		parser.set_default_preference();
+ 		int poll_secs = parser.get_polling_interval();
+ 		if (poll_secs) {
+-- 
+2.25.1
+

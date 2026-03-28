@@ -15,7 +15,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=5f8a62fabd50ce3f1d7794bc849ae7a5"
 
 DEPENDS = "cjson libinih libsdl3 lua libsocketcan pocketpy"
 
-SRC_URI = "git://github.com/CANopenTerm/CANopenTerm.git;protocol=https;branch=main"
+SRC_URI = "git://github.com/CANopenTerm/CANopenTerm.git;protocol=https;branch=main \
+           file://0001-cmake-Do-not-pin-to-c89-constructs-on-linux.patch"
 
 SRCREV  = "b0555360e5e8b444a2a9e14088fd253412184eb8"
 

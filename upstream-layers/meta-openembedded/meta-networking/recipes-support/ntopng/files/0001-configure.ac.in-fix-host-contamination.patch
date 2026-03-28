@@ -14,17 +14,95 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  configure.ac.in | 43 +++----------------------------------------
  1 file changed, 3 insertions(+), 40 deletions(-)
 
-diff --git a/configure.ac.in b/configure.ac.in
-index 1d6380c..beffc6c 100644
 --- a/configure.ac.in
 +++ b/configure.ac.in
-@@ -167,31 +167,6 @@ fi
- #
- REVISION=`git log --pretty=oneline | wc -l`
+@@ -83,30 +83,6 @@ if test "$with_dynamic_ndpi" = "yes"; th
+   AC_DEFINE([HAVE_DYNAMIC_NDPI], [1], [Define if using dynamic linking with nDPI])
+ fi
+ 
+-dnl> CLANG_STDLIB="-stdlib=libc++"
+-
+-dnl> On Ubuntu do sudo apt-get install -y clang-14  clang-tools-14
+-if test "x$USE_CLANG" = xyes; then
+-    if test $SYSTEM = "Darwin"; then
+-        CC=clang
+-        CXX="clang++ -fno-color-diagnostics -fPIE -stdlib=libc++"
+-    else
+-       if test -x "/usr/bin/clang-10"; then
+-           CLANG_VERSION=10
+-       elif test -x "/usr/bin/clang-13"; then
+-           CLANG_VERSION=13
+-       elif test -x "/usr/bin/clang-14"; then
+-           CLANG_VERSION=14
+-       else
+-           echo "Could not find clang. Please install clang-14 clang-tools-14"
+-           exit 1
+-       fi
+-
+-       CC=clang-$CLANG_VERSION
+-       CXX="clang++-$CLANG_VERSION -fno-color-diagnostics -fPIE $CLANG_STDLIB"
+-    fi
+-fi
+-
+ CFLAGS="${CFLAGS} -I${HERE} -I${HERE}/include"
+ CXXFLAGS="${CXXFLAGS} -I${HERE} -I${HERE}/include"
+ 
+@@ -122,7 +98,7 @@ fi
+ 
+ if test -f /proc/device-tree/model; then
+   IS_RASPBERRY=`cat /proc/device-tree/model | grep -a -e "Orange Pi" -e Raspberry | wc -l`
+-  
++
+   if test "$IS_RASPBERRY" = "1"; then
+     CFLAGS="${CFLAGS} -DHAVE_EMBEDDED_SUPPORT"
+     CXXFLAGS="${CXXFLAGS} -DHAVE_EMBEDDED_SUPPORT"
+@@ -158,39 +134,6 @@ MAKE=make
+ BIN_PATH=/usr/bin
+ LIBPCAP=-lpcap
+ 
+-if test $SYSTEM = "FreeBSD" || test $SYSTEM = "Darwin"; then
+-   CFLAGS="${CFLAGS} -I/usr/local/include"
+-   LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+-
+-   dnl> https://github.com/google/sanitizers/wiki/AddressSanitizerFlags
+-   CC=clang
+-   CXX="clang++ -fpie -fno-color-diagnostics $CLANG_STDLIB"
+-   if test $SYSTEM = "FreeBSD"; then
+-    MAKE=gmake
+-    BIN_PATH=/usr/local/bin
+-   else
+-     dnl> Adds /opt if MacPorts is installed
+-     if [ test -f /opt/local/bin/port ]; then
+-       CFLAGS="${CFLAGS} -I/opt/local/include"
+-       LDFLAGS="${LDFLAGS} -L/opt/local/lib"
+-     fi
+-   fi
+-   dnl> CXX=clang++ -fsanitize=address -fsanitize-address-use-after-scope
+-   OSXV=`sw_vers -productVersion`
+-   if test $SYSTEM = "Darwin"; then
+-     OS="macOS $OSXV"
+-   else
+-     OS=`uname -or | cut -d '-' -f 1`
+-   fi
+-   if test $MACHINE = "x86_64"; then
+-      LDFLAGS="${LDFLAGS} -L/usr/local/opt/ntopng"
+-      RES=`g++ -Wall -fno-color-diagnostics Prefs.cpp 2>&1 | grep "unrecognized command line option "|wc -l`
+-      if test $RES -eq 0; then
+-            CFLAGS="-fno-color-diagnostics $CFLAGS"
+-      fi
+-   fi
+-fi
+-
+ dnl> Remove spaces
+ OS="${OS#"${OS%%[![:space:]]*}"}"
+ 
+@@ -237,31 +180,6 @@ if test "${with_nedge+set}" = set; then
+   LIBS="${LIBS} -lnetfilter_queue -lnfnetlink -lnetfilter_conntrack"
+ fi
  
 -if test -d "/usr/local/include"; then
 -  CFLAGS="${CFLAGS} -I/usr/local/include"
--  CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+-  CXXFLAGS="${CXXFLAGS} -I/usr/local/include"
 -fi
 -
 -if test -d "/usr/local/lib"; then
@@ -33,7 +111,7 @@ index 1d6380c..beffc6c 100644
 -
 -if test -d /opt/local/include; then :
 -  CFLAGS="${CFLAGS} -I/opt/local/include"
--  CPPFLAGS="${CPPFLAGS} -I/opt/local/include"
+-  CXXFLAGS="${CXXFLAGS} -I/opt/local/include"
 -fi
 -
 -if test -d /opt/local/lib; then :
@@ -42,15 +120,26 @@ index 1d6380c..beffc6c 100644
 -
 -if [ test -f /usr/bin/lsb_release ]; then
 -  CODENAME=`/usr/bin/lsb_release -c|cut -f 2`
--  if [[ $CODENAME == "wheezy" ]]; then :
--    CPPFLAGS="${CPPFLAGS} -DOLD_NETFILTER_INTERFACE=1"
+-  if test $CODENAME = "wheezy" ; then
+-    CXXFLAGS="${CXXFLAGS} -DOLD_NETFILTER_INTERFACE=1"
 -  fi
 -fi
 -
- SHORT_MACHINE=`uname -m | cut -b1-3`
+ if test -d "pro"; then
+   NTOPCLOUD_LIB=
+   NTOPCLOUD_HOME="../ntopcloud"
+@@ -317,10 +235,6 @@ AC_ARG_WITH(ndpi-includes,
+       NDPI_CUST_INC="-I$withval -I$withval/../lib/third_party/include"
+    ])
  
- GIT_RELEASE="@GIT_RELEASE@"
-@@ -300,23 +275,11 @@ fi
+-if test -d /usr/local/include/ndpi ; then :
+-   echo "WARNING: /usr/local/include/ndpi is present and might lead to compile errors"
+-fi
+-
+ NDPI_INC=`echo $NDPI_CFLAGS | sed -e "s/[ ]*$//"`
+ NDPI_LIB=
+ NDPI_LIB_DEP=
+@@ -387,7 +301,7 @@ fi
  pkg-config --exists libssl
  if test "$?" -ne 1; then
    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
@@ -58,25 +147,70 @@ index 1d6380c..beffc6c 100644
 +  SSL_INC="`pkg-config --cflags libssl`"
    SSL_LIB="`pkg-config --libs libssl` -lssl -lcrypto"
  else
--  dnl Workaround for MacOS Brew
--  if test -d "/usr/local/opt/openssl/lib"; then
--    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
--    SSL_INC="-I/usr/local/opt/openssl/include"
--    SSL_LIB="-L/usr/local/opt/openssl/lib -lssl -lcrypto"
--  dnl Workaround for FreeBSD
+   dnl Workaround for MacOS Brew
+@@ -408,10 +322,6 @@ else
+     SSL_INC="-I/usr/local/opt/openssl/include"
+     SSL_LIB="-L/usr/local/opt/openssl/lib -lssl -lcrypto"
+   dnl Workaround for FreeBSD
 -  elif test -f "/usr/lib/libssl.so"; then
 -    AC_DEFINE_UNQUOTED(NO_SSL_DL, 1, [has openssl])
 -    SSL_INC="-I/usr/include"
 -    SSL_LIB="-L/usr/lib -lssl -lcrypto"
--  else
--    echo "Please install openssl-dev(el) package prerequisite"
--    exit -1
+   else
+     echo "Please install openssl-dev(el) package prerequisite"
+     exit -1
+@@ -433,13 +343,6 @@ fi
+ AC_MSG_CHECKING(for ntopng professional edition)
+ 
+ REDIS_SERVICE="redis.service"
+-if [ test -f /usr/bin/lsb_release ]; then
+-  UBUNTU_RELEASE=`lsb_release -r|cut -f 2`
+-  UBUNTU_SUB_RELEASE=`echo $UBUNTU_RELEASE|cut -f 1 -d '.'`
+-  if test "$UBUNTU_SUB_RELEASE" = "8" || test "$UBUNTU_SUB_RELEASE" = "10"; then
+-    REDIS_SERVICE="redis-server.service"
 -  fi
-+  echo "Please install openssl-dev(el) package prerequisite"
-+  exit -1
+-fi
+ 
+ SERVICE_ALIAS=
+ SERVICE_REQUIRES=
+@@ -497,7 +400,7 @@ fi
+ echo "Using clickhouse-cpp stored at ${CLICKHOUSE_HOME}"
+ 
+ dnl> fi dnl> test $SYSTEM = "Linux"
+- 
++
+ AC_DEFINE_UNQUOTED(NTOPNG_PRO_GIT_RELEASE, "r${PRO_GIT_RELEASE}", [ntopng professional release])
+ AC_DEFINE_UNQUOTED(NTOPNG_PRO_GIT_DATE, "${PRO_GIT_DATE}", [ntopng professional date])
+ DUMMY=`cd ./pro; ${MAKE} build`
+@@ -531,21 +434,7 @@ if test -f ".git/index"; then
  fi
  
- AC_CHECK_LIB([gcrypt], [gcry_cipher_checktag], [LIBS="${LIBS} -lgcrypt"])
--- 
-2.25.1
-
+ if test $SYSTEM = "Linux"; then
+-  if [ test -f /usr/bin/lsb_release ]; then
+-      OSNAME=`/usr/bin/lsb_release -d|cut -d ':' -f 2| sed -e 's/^[[[:space:]]]*//'`
+-      OS="$OSNAME"
+-  else
+-    if test -f /etc/debian_version; then
+-       DEBIAN_VERSION=`cat /etc/debian_version`
+-       OSNAME="Debian $DEBIAN_VERSION"
+-    else
+-        if test -f /etc/redhat-release; then
+-          OS=`cat /etc/redhat-release | cut -d '(' -f 1 | awk '{$1=$1};1'`
+-        else
+-          OS=`./config.guess`
+-        fi
+-   fi
+-  fi
++  OS=`./config.guess`
+ else
+ dnl> wget -O config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
+   if test $SYSTEM = "FreeBSD"; then
+@@ -575,7 +464,7 @@ AS_VAR_IF(with_hiredis, yes, [
+     else
+       pkg-config --exists hiredis
+       if test "$?" -ne 1; then
+-      HIREDIS_INC="`pkg-config --cflags hiredis` -I/usr/include/hiredis"
++      HIREDIS_INC="`pkg-config --cflags hiredis`"
+       if test $SYSTEM = "FreeBSD" && $FREEBSD_VERSION != "15"; then
+ 	dnl> Note: on freebsd 15 .a is not installed
+         HIREDIS_LIB="/usr/local/lib/libhiredis.a"

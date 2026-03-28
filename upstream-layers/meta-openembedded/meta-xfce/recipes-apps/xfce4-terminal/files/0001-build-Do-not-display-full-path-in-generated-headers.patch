@@ -1,0 +1,36 @@
+From c1b15e5249fa975308c75f5f9791a444a44f05bc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Mon, 16 Mar 2026 16:48:25 +0100
+Subject: [PATCH] build: Do not display full path in generated headers
+
+Upstream-Status: Backport [https://gitlab.xfce.org/apps/xfce4-terminal/-/commit/c1b15e5249fa975308c75f5f9791a444a44f05bc]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ terminal/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/terminal/meson.build b/terminal/meson.build
+index e0e109f7..5ff7b1ee 100644
+--- a/terminal/meson.build
++++ b/terminal/meson.build
+@@ -50,7 +50,7 @@ terminal_sources += gnome.mkenums(
+   install_header: false,
+   sources: 'terminal-preferences.h',
+   fhead: '#ifndef TERMINAL_ENUM_TYPES_H\n#define TERMINAL_ENUM_TYPES_H\n#include <gtk/gtk.h>\nG_BEGIN_DECLS\n',
+-  fprod: '/* enumerations from "@filename@" */\n',
++  fprod: '/* enumerations from "@basename@" */\n',
+   vhead: 'GType @enum_name@_get_type (void);\n#define TERMINAL_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n',
+   ftail: 'G_END_DECLS\n\n#endif /* !TERMINAL_ENUM_TYPES_H */',
+ )
+@@ -59,7 +59,7 @@ terminal_sources += gnome.mkenums(
+   install_header: false,
+   sources: 'terminal-preferences.h',
+   fhead: '#include "terminal-enum-types.h"\n#include "terminal-app.h"\n#include "terminal-preferences.h"',
+-  fprod: ' \n/* enumerations from "@filename@" */',
++  fprod: ' \n/* enumerations from "@basename@" */',
+   vhead: 'GType\n@enum_name@_get_type (void)\n{\n\tstatic GType type = 0;\n\tif (type == 0) {\n\tstatic const G@Type@Value values[] = {',
+   vprod: ' \t{ @VALUENAME@, "@VALUENAME@", "@valuenick@" },',
+   vtail: ' \t{ 0, NULL, NULL }\n\t};\n\ttype = g_@type@_register_static ("@EnumName@", values);\n  }\n\treturn type;\n}\n',
+--
+2.51.2

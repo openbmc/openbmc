@@ -1,0 +1,30 @@
+From 030b4983e3515b214f4faa61ce1b7c552c007340 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Thu, 19 Mar 2026 18:05:00 +0100
+Subject: [PATCH] fix compilation with glibc 2.43
+
+Fioxes compilation error:
+| ../sources/qad-0.0+git/src/server.c:212:22: error: initialization discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+|   212 |   char *pLastSlash = strrchr(url, '/');
+
+Upstream-Status: Submitted [https://gitlab.com/CodethinkLabs/qad/qad/-/merge_requests/56]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ src/server.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/server.c b/src/server.c
+index 648fb46..11ec114 100644
+--- a/src/server.c
++++ b/src/server.c
+@@ -307,8 +307,8 @@ void qad_text(const char *post_data, int post_data_size, qad_backend_t *backend,
+ void qad_screenshot(struct MHD_Connection *connection, const char *url,
+                     qad_backend_t *backend, connection_info_struct_t *con_info,
+                     char *error) {
+-  char *pLastSlash = strrchr(url, '/');
+-  char *screenName = pLastSlash ? pLastSlash + 1 : NULL;
++  const char *pLastSlash = strrchr(url, '/');
++  const char *screenName = pLastSlash ? pLastSlash + 1 : NULL;
+   int screenNumber = -1;
+ 
+   if (screenName && *screenName != '\0') {

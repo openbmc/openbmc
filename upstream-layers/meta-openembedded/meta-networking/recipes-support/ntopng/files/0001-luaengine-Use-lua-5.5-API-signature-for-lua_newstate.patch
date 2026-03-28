@@ -1,0 +1,31 @@
+From 6c4806436c3214e32487d05ce099ac86b0b2519c Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 22 Mar 2026 10:08:01 -0700
+Subject: [PATCH] luaengine: Use lua 5.5 API signature for lua_newstate
+
+in Lua 5.5 lua_newstate gained a third argument,
+
+lua_State *lua_newstate(lua_Alloc f, void *ud, unsigned int seed);
+
+The 5.5 manual says that third argument, seed,
+is "a seed for the hashing of strings," and the 5.5 incompatibilities
+section explicitly calls out that lua_newstate now has
+a third parameter.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/LuaEngine.cpp | 64 +++++++++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
+
+--- a/src/LuaEngine.cpp
++++ b/src/LuaEngine.cpp
+@@ -154,7 +154,7 @@ LuaEngine::LuaEngine() {
+   is_system_vm = false;
+   mem_used = 0;
+   
+-  L = lua_newstate(l_alloc, this);
++  L = lua_newstate(l_alloc, this, luaL_makeseed(NULL));
+ 
+   if (!L) {
+     ntop->getTrace()->traceEvent(TRACE_ERROR, "Unable to create a new Lua state.");

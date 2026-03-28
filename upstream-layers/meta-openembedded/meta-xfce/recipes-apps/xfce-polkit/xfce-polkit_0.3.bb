@@ -7,7 +7,8 @@ DEPENDS = "libxfce4ui polkit"
 inherit xfce-app features_check
 REQUIRED_DISTRO_FEATURES = "polkit"
 
-SRC_URI = " \
-    git://github.com/ncopa/${BPN}.git;branch=master;protocol=https \
-"
+SRC_URI = "\
+           git://github.com/ncopa/${BPN}.git;branch=master;protocol=https \
+           file://0001-configure.ac-add-missing-direct-dependency-on-gtk-3.patch \
+           "
 SRCREV = "6d3282cc1734c305850d48f5bf4b4d94e88885e9"

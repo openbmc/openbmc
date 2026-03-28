@@ -17,11 +17,9 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/ncftransform.c | 2 +-
  4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/src/dutil_linux.c b/src/dutil_linux.c
-index 742153a..eb72eb2 100644
 --- a/src/dutil_linux.c
 +++ b/src/dutil_linux.c
-@@ -1113,7 +1113,7 @@ static void add_link_info(struct netcf *ncf,
+@@ -1113,7 +1113,7 @@ static void add_link_info(struct netcf *
  
      xasprintf(&path, "/sys/class/net/%s/operstate", ifname);
      ERR_NOMEM(!path, ncf);
@@ -30,7 +28,7 @@ index 742153a..eb72eb2 100644
      if (!state) {
          /* missing operstate is *not* an error. It could be due to an
           * alias interface, which has no entry in /sys/class/net at
-@@ -1132,7 +1132,7 @@ static void add_link_info(struct netcf *ncf,
+@@ -1132,7 +1132,7 @@ static void add_link_info(struct netcf *
          FREE(path);
          xasprintf(&path, "/sys/class/net/%s/speed", ifname);
          ERR_NOMEM(path == NULL, ncf);
@@ -39,11 +37,9 @@ index 742153a..eb72eb2 100644
          if (!speed && errno == EINVAL) {
              /* attempts to read $ifname/speed result in EINVAL if the
               * interface is ifconfiged down (which isn't exactly the
-diff --git a/src/dutil_posix.c b/src/dutil_posix.c
-index 1313514..b9884f0 100644
 --- a/src/dutil_posix.c
 +++ b/src/dutil_posix.c
-@@ -211,7 +211,7 @@ int run_program(struct netcf *ncf, const char *const *argv, char **output)
+@@ -211,7 +211,7 @@ int run_program(struct netcf *ncf, const
                         "Failed to create file stream for output while executing '%s': %s",
                         argv_str, errbuf);
  
@@ -52,11 +48,9 @@ index 1313514..b9884f0 100644
      ERR_THROW_STRERROR(*output == NULL, ncf, EEXEC,
                         "Error while reading output from execution of '%s': %s",
                         argv_str, errbuf);
-diff --git a/src/ncftool.c b/src/ncftool.c
-index f1b5642..c878cb0 100644
 --- a/src/ncftool.c
 +++ b/src/ncftool.c
-@@ -351,7 +351,7 @@ static int cmd_define(const struct command *cmd) {
+@@ -351,7 +351,7 @@ static int cmd_define(const struct comma
      struct netcf_if *nif = NULL;
      int result = CMD_RES_ERR;
  
@@ -65,8 +59,6 @@ index f1b5642..c878cb0 100644
      if (xml == NULL) {
          fprintf(stderr, "Failed to read %s\n", fname);
          goto done;
-diff --git a/src/ncftransform.c b/src/ncftransform.c
-index fbabfc3..4c9a56d 100644
 --- a/src/ncftransform.c
 +++ b/src/ncftransform.c
 @@ -54,7 +54,7 @@ int main(int argc, char **argv) {
@@ -78,6 +70,25 @@ index fbabfc3..4c9a56d 100644
      if (in_xml == NULL)
          die("Failed to read %s\n", argv[2]);
  
--- 
-2.44.0
-
+--- a/src/internal.h
++++ b/src/internal.h
+@@ -30,6 +30,7 @@
+ 
+ #include <string.h>
+ #include <stdarg.h>
++#include <stdlib.h>
+ 
+ #include <libxslt/transform.h>
+ #include <libxml/relaxng.h>
+@@ -85,6 +86,11 @@
+ #define ATTRIBUTE_NOINLINE
+ #endif                                   /* __GNUC__ */
+ 
++#ifndef REALLOC_N
++# define REALLOC_N(ptr, count) \
++    (((ptr) = realloc((ptr), sizeof(*(ptr)) * (count))) == NULL ? -1 : 0)
++#endif
++
+ /* This needs ATTRIBUTE_RETURN_CHECK */
+ #include "ref.h"
+ 

@@ -61,7 +61,7 @@ do_configure:prepend () {
     cp ${UNPACKDIR}/config.linux ${B}
     rm -rf ${S}/include/pcp/configsz.h
     rm -rf ${S}/include/pcp/platformsz.h
-    export SED=${TMPDIR}/hosttools/sed
+    export SED=${HOSTTOOLS_DIR}/sed
     export PYTHON=python3
 }
 

@@ -45,9 +45,9 @@ index b492532..2236257 100644
 -SUFFIXES = .1.xml
 +
  
- ##
- # Local Rules
-@@ -50,12 +42,6 @@ bin_PROGRAMS =						\
+ #
+ imsettings_boot_in = imsettings-boot.sh.in
+@@ -59,12 +51,6 @@ bin_PROGRAMS =						\
  libexec_PROGRAMS =					\
  	imsettings-check				\
  	$(NULL)
@@ -60,7 +60,7 @@ index b492532..2236257 100644
  #
  autostartdir = $(sysconfdir)/xdg/autostart
  #
-@@ -64,13 +50,6 @@ autostart_in_files =					\
+@@ -73,13 +59,6 @@ autostart_in_files =					\
  	$(NULL)
  autostart_DATA = $(autostart_in_files:.desktop.in=.desktop)
  #

@@ -6,10 +6,12 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=75859989545e37968a99b631ef42722e"
 
 DEPENDS = "glib-2.0-native libxfce4ui"
 
-SRC_URI = "git://github.com/schnitzeltony/xfce4-datetime-setter.git;protocol=https;branch=master \
+SRC_URI = "\
+           git://github.com/schnitzeltony/xfce4-datetime-setter.git;protocol=https;branch=master \
            file://fix-inner-dependency.patch \
            file://0001-Fix-build-with-meson-0.61.patch \
-"
+           file://0001-build-add-missing-direct-dependencies-to-fix-link-fa.patch \
+           "
 SRCREV = "5c7a73a3824b03b91719e05e2604b97c7a72d50f"
 
 

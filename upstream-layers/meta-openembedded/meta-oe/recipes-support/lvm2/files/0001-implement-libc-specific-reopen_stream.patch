@@ -48,7 +48,7 @@ diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
 index 22ae1e3bb..b0928bc04 100644
 --- a/tools/lvmcmdline.c
 +++ b/tools/lvmcmdline.c
-@@ -3407,7 +3407,7 @@ static int _check_standard_fds(void)
+@@ -3427,7 +3427,7 @@ static int _check_standard_fds(void)
  	int err = is_valid_fd(STDERR_FILENO);
  
  	if (!is_valid_fd(STDIN_FILENO) &&
@@ -57,7 +57,7 @@ index 22ae1e3bb..b0928bc04 100644
  		if (err)
  			perror("stdin stream open");
  		else
-@@ -3417,7 +3417,7 @@ static int _check_standard_fds(void)
+@@ -3437,7 +3437,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDOUT_FILENO) &&
@@ -66,7 +66,7 @@ index 22ae1e3bb..b0928bc04 100644
  		if (err)
  			perror("stdout stream open");
  		/* else no stdout */
-@@ -3425,7 +3425,7 @@ static int _check_standard_fds(void)
+@@ -3445,7 +3445,7 @@ static int _check_standard_fds(void)
  	}
  
  	if (!is_valid_fd(STDERR_FILENO) &&

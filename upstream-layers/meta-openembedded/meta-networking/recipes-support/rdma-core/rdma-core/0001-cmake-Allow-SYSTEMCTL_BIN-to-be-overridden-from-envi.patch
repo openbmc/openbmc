@@ -17,8 +17,8 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 index 98985e7ee..001efb800 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -237,7 +237,10 @@ else()
-   endif()
+@@ -256,7 +256,10 @@ else()
+     message(WARNING "pyverbs build requested but python development files not found")
  endif()
  
 -find_program(SYSTEMCTL_BIN systemctl HINTS "/usr/bin" "/bin")

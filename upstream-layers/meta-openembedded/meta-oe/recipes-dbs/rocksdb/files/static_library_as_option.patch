@@ -26,7 +26,7 @@ index 93b884dd9c1..2ca925d505c 100644
 +option(ROCKSDB_BUILD_STATIC "Build static versions of the RocksDB libraries" ON)
 
  if( NOT DEFINED CMAKE_CXX_STANDARD )
-   set(CMAKE_CXX_STANDARD 17)
+   set(CMAKE_CXX_STANDARD 20)
 @@ -1139,11 +1140,13 @@ string(REGEX REPLACE "[^0-9: /-]+" "" GIT_DATE "${GIT_DATE}")
  set(BUILD_VERSION_CC ${CMAKE_BINARY_DIR}/build_version.cc)
  configure_file(util/build_version.cc.in ${BUILD_VERSION_CC} @ONLY)

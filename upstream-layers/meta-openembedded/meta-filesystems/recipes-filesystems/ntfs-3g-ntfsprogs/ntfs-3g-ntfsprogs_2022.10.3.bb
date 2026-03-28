@@ -12,8 +12,7 @@ SRC_URI = "git://github.com/tuxera/ntfs-3g;protocol=https;branch=edge;tag=${PV} 
 "
 SRCREV = "78414d93613532fd82f3a82aba5d4a1c32898781"
 
-UPSTREAM_CHECK_URI = "https://github.com/tuxera/ntfs-3g/releases"
-UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools pkgconfig
 

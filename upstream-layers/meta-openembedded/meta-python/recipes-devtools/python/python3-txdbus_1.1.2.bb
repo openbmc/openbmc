@@ -8,4 +8,4 @@ SRC_URI[sha256sum] = "8375a5fb68a12054f0def91af800c821fb2232949337756ed975f88d8e
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += "python3-twisted-core"
+RDEPENDS:${PN} += "python3-twisted-core python3-six"

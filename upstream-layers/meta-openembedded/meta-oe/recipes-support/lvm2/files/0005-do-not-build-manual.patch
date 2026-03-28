@@ -47,7 +47,7 @@ index 06c4b1823..90df7b09c 100644
      libdaemon lib tools daemons libdm \
      udev po
  tools.distclean: test.distclean
-@@ -59,7 +59,7 @@ unit-test  run-unit-test: test libdm
+@@ -57,7 +57,7 @@ unit-test  run-unit-test: test libdm
  
  daemons.device-mapper: libdm.device-mapper
  tools.device-mapper: libdm.device-mapper
@@ -60,7 +60,7 @@ diff --git a/configure.ac b/configure.ac
 index 3af73c781..f32d1f376 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -2076,7 +2076,6 @@ libdaemon/server/Makefile
+@@ -2083,7 +2083,6 @@ libdaemon/server/Makefile
  libdm/Makefile
  libdm/dm-tools/Makefile
  libdm/libdevmapper.pc

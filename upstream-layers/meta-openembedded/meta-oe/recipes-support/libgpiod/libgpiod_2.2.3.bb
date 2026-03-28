@@ -11,7 +11,10 @@ LIC_FILES_CHKSUM = " \
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}-2.x:"
 
-SRC_URI += "file://gpio-manager.init"
+SRC_URI += " \
+    file://gpio-manager.init \
+    file://0001-tools-tests-remove-SIGINT-test-cases.patch \
+"
 
 SRC_URI[sha256sum] = "70012b0262e4b90f140431efa841ca89643b02ea6c09f507e23cec664a51b71a"
 

@@ -1,0 +1,36 @@
+From 3f69abae74f4c0ad41c8fa2886148db834ddb9f1 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Mon, 16 Mar 2026 16:46:52 +0100
+Subject: [PATCH] build: Do not display full path in generated headers
+
+Upstream-Status: Backport [https://gitlab.xfce.org/xfce/xfce4-power-manager/-/commit/3f69abae74f4c0ad41c8fa2886148db834ddb9f1]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ common/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/common/meson.build b/common/meson.build
+index 7f71309f..cdae226f 100644
+--- a/common/meson.build
++++ b/common/meson.build
+@@ -37,7 +37,7 @@ common_sources += gnome.mkenums(
+   install_header: false,
+   sources: 'xfpm-enum-glib.h',
+   fhead: '#ifndef _XFPM_ENUM_TYPES_H\n#define _XFPM_ENUM_TYPES_H\n#include <glib-object.h>\nG_BEGIN_DECLS\n',
+-  fprod: '/* enumerations from "@filename@" */\n',
++  fprod: '/* enumerations from "@basename@" */\n',
+   vhead: 'GType @enum_name@_get_type (void);\n#define XFPM_TYPE_@ENUMSHORT@ (@enum_name@_get_type())\n',
+   ftail: 'G_END_DECLS\n\n#endif /* _XFPM_ENUM_TYPES_H__ */',
+ )
+@@ -46,7 +46,7 @@ common_sources += gnome.mkenums(
+   install_header: false,
+   sources: 'xfpm-enum-glib.h',
+   fhead: '#include "xfpm-enum-types.h"\n#include "xfpm-enum-glib.h"\n\n',
+-  fprod: '\n/* enumerations from "@filename@" */\n',
++  fprod: '\n/* enumerations from "@basename@" */\n',
+   vhead: 'GType\n@enum_name@_get_type (void)\n{\n\tstatic GType type = 0;\n\tif (type == 0) {\n\tstatic const G@Type@Value values[] = {',
+   vprod: '\t{ @VALUENAME@, "@VALUENAME@", "@valuenick@" },',
+   vtail: '\t{ 0, NULL, NULL }\n\t};\n\ttype = g_@type@_register_static ("@EnumName@", values);\n  }\n\treturn type;\n}\n',
+--
+2.34.1

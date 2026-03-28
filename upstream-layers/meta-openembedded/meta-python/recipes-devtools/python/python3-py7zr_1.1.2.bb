@@ -23,7 +23,6 @@ RDEPENDS:${PN} += "\
     python3-pybcj \
     python3-inflate64 \
     python3-pyppmd \
-    python3-pyzstd \
     python3-brotli \
     python3-multiprocessing \
     python3-datetime \

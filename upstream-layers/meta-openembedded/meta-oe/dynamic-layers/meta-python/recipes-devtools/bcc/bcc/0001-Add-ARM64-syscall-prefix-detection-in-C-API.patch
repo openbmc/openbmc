@@ -1,0 +1,35 @@
+From b901fb0088a7605eec00af7b644e25987995d693 Mon Sep 17 00:00:00 2001
+From: Harish Sadineni <Harish.Sadineni@windriver.com>
+Date: Sat, 7 Mar 2026 07:18:43 -0800
+Subject: [PATCH] Add ARM64 syscall prefix detection in C++ API
+
+Fixes issue where bpf.get_syscall_fnname() on ARM64 returns bare
+syscall name instead of the prefixed __arm64_sys_ variant, causing
+kprobe attachment failures. Now detects ARM64 prefix alongside x64
+(__x64_sys_) and generic (sys_) prefixes.
+
+Fixes: #5350
+
+Upstream-Status: Submitted [https://github.com/iovisor/bcc/pull/5489]
+
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+---
+ src/cc/api/BPF.cc | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/cc/api/BPF.cc b/src/cc/api/BPF.cc
+index 2a77c2c9..11c6c542 100644
+--- a/src/cc/api/BPF.cc
++++ b/src/cc/api/BPF.cc
+@@ -780,6 +780,8 @@ std::string BPF::get_syscall_fnname(const std::string& name) {
+       syscall_prefix_.reset(new std::string("sys_"));
+     else if (ksym.resolve_name(nullptr, "__x64_sys_bpf", &addr))
+       syscall_prefix_.reset(new std::string("__x64_sys_"));
++    else if (ksym.resolve_name(nullptr, "__arm64_sys_bpf", &addr))
++      syscall_prefix_.reset(new std::string("__arm64_sys_"));
+     else
+       syscall_prefix_.reset(new std::string());
+   }
+-- 
+2.49.0
+

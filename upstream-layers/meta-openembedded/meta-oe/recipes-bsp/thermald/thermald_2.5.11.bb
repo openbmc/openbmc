@@ -13,6 +13,9 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea8831610e926e2e469075b52bf08848"
 
 SRC_URI = "git://github.com/intel/thermal_daemon/;branch=master;protocol=https \
+           file://0001-Refactor-Intel-specific-logic-into-separate-files.patch \
+           file://0002-Invoke-parser_init-before-platform_match.patch \
+           file://0003-Add-ARM-backend-and-enable-ARM-platform-detection.patch \
            "
 
 SRCREV = "5269afcf3e021e4e1b672b4640a0358f4ae5821b"
@@ -33,7 +36,7 @@ FILES:${PN} += "${datadir}/dbus-1"
 
 SYSTEMD_SERVICE:${PN} = "thermald.service"
 
-COMPATIBLE_HOST = '(i.86|x86_64).*-linux'
+COMPATIBLE_HOST = '(i.86|x86_64|aarch64|arm).*-linux'
 
 CONFFILES:${PN} = " \
                    ${sysconfdir}/thermald/thermal-conf.xml \

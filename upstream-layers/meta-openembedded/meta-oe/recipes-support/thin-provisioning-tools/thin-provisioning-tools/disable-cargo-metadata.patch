@@ -1,0 +1,38 @@
+Enable the feature *disable_cargo_metadata* on dependency devicemapper.
+Otherwise the build (in kas-container 5.2) fails with:
+
+|    Compiling devicemapper v0.34.5
+|     Building [=======================> ] 140/145: devicemapper(build.rs)
+|      Running `rustc --crate-name build_script_build --edition=2021 /build/tmp/work/x86-64-v3-poky-linux/thin-provisioning-tools/1.3.1/sources/cargo_home/bit>
+build/target/release/deps --extern devicemapper_sys=/build/tmp/work/x86-64-v3-poky-linux/thin-provisioning-tools/1.3.1/build/target/release/deps/libdevicemapp>
+| error: linking with `/build/tmp/work/x86-64-v3-poky-linux/thin-provisioning-tools/1.3.1/wrapper/build-rust-ccld` failed: exit status: 1
+|   |
+|   = note:  "/build/tmp/work/x86-64-v3-poky-linux/thin-provisioning-tools/1.3.1/wrapper/build-rust-ccld" "-m64" "/build/tmp/work/x86-64-v3-poky-linux/thin-pr>
+|   = note: some arguments are omitted. use `--verbose` to show all linker arguments
+|   = note: /build/tmp/hosttools/ld: cannot find /usr/lib/libm.so.6: No such file or directory
+|           /build/tmp/hosttools/ld: cannot find /usr/lib/libmvec.so.1: No such file or directory
+|           collect2: error: ld returned 1 exit status
+|
+|
+| error: could not compile `devicemapper` (build script) due to 1 previous error
+|
+| Caused by:
+|   process didn't exit successfully: `rustc --crate-name build_script_build --edition=2021 /build/tmp/work/x86-64-v3-poky-linux/thin-provisioning-tools/1.3.1>
+
+This problem was reported upstream: https://github.com/stratis-storage/devicemapper-rs/issues/965
+
+Upstream-Status: Inappropriate [package configuration]
+
+diff --git c/Cargo.toml i/Cargo.toml
+index 39853af1..160bb3d9 100644
+--- c/Cargo.toml
++++ i/Cargo.toml
+@@ -18,7 +18,7 @@ clap = { version = "4.5", default-features = false, features = [
+ ] }
+ crc32c = "0.6"
+ data-encoding = "2.9"
+-devicemapper = "0.34"
++devicemapper = { version = "0.34", features = [ "disable_cargo_metadata" ] }
+ exitcode = "1.1.2"
+ fixedbitset = "0.5"
+ flate2 = "1.1"

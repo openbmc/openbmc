@@ -24,7 +24,6 @@ SRC_URI:append = " \
            git://chromium.googlesource.com/chromium/src/third_party/zlib.git;nobranch=1;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zlib;name=zlib \
            git://android.googlesource.com/platform/external/lzma.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/lzma;name=lzma \
            git://android.googlesource.com/platform/external/zstd.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zstd;name=zstd \
-           https://storage.googleapis.com/perfetto/gn-linux64-1968-0725d782;subdir=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/;name=gn \
            \
            file://0001-Remove-check_build_deps-build-steps.patch \
            "
@@ -44,8 +43,6 @@ SRCREV_zlib = "6f9b4e61924021237d474569027cfb8ac7933ee6"
 SRCREV_zstd = "77211fcc5e08c781734a386402ada93d0d18d093"
 
 SRCREV_FORMAT .= "_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib_zstd"
-
-SRC_URI[gn.sha256sum] = "f706aaa0676e3e22f5fc9ca482295d7caee8535d1869f99efa2358177b64f5cd"
 
 require perfetto.inc
 
@@ -71,12 +68,6 @@ B = "${WORKDIR}/build"
 do_configure () {
     # Configuration needs to be done from the source directory
     cd ${S}
-    # Rename a few build tools if they have not been renamed
-    cd buildtools
-
-    mkdir linux64 && cp ${RECIPE_SYSROOT_NATIVE}${bindir}/gn linux64/gn
-    chmod +x linux64/gn
-    cd ..
 
     CC_BIN=`echo $CC | awk '{print $1}'`
     CXX_BIN=`echo $CXX | awk '{print $1}'`
@@ -109,7 +100,7 @@ do_configure () {
     ARGS=$ARGS" target_linker=\"$CC_BIN ${TUNE_CCARGS} ${LDFLAGS}\""
     ARGS=$ARGS" target_ar=\"$AR\""
     ARGS="'$ARGS'"
-    cmd="tools/gn gen --args=$ARGS ${B}"
+    cmd="gn gen --args=$ARGS ${B}"
 
     echo $cmd
     # Use eval, not just call $cmd, due to escaping of single quotation marks

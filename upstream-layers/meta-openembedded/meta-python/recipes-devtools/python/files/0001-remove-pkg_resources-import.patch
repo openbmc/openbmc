@@ -1,0 +1,32 @@
+From d9152f0dc31b655654edcee6859b3e3a06ef4c98 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sun, 15 Mar 2026 21:16:54 +0100
+Subject: [PATCH] remove pkg_resources import
+
+setutools 82 dropped pkf_resources module. Also, beside importing
+it, it isn't used for anything.
+
+Upstream has started to rework their setup config, and moved to
+build_meta, however that's still in development, and there seem to
+be no stable version yet.
+
+Once there is a new version, most likely this patch can be dropped.
+
+Upstream-Status: Inappropriate [see above]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ setup.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/setup.py b/setup.py
+index b655222..c2aff91 100644
+--- a/setup.py
++++ b/setup.py
+@@ -8,7 +8,6 @@ XStatic - setup.py
+ import os
+ 
+ from setuptools import setup, find_packages
+-import pkg_resources
+ 
+ # The README.txt file should be written in reST so that PyPI can use
+ # it to generate your project's PyPI page. 

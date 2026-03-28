@@ -5,6 +5,8 @@ LICENSE = "GPL-2.0-only"
 DEPENDS = "pciutils gettext-native"
 PROVIDES = "virtual/cpupower"
 
+B = "${WORKDIR}/${BPN}-${PV}"
+
 inherit kernelsrc kernel-arch bash-completion
 
 do_populate_lic[depends] += "virtual/kernel:do_shared_workdir"
@@ -19,17 +21,16 @@ do_compile() {
 
 do_install() {
     oe_runmake DESTDIR=${D} install
-    # Do not ship headers
-    rm -rf ${D}${includedir}
     chown -R root:root ${D}
 }
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
+PACKAGES =+ "${PN}-systemd"
+
+FILES:${PN}-systemd = "${sysconfdir}/cpupower-service.conf ${systemd_unitdir}"
 
 RDEPENDS:${PN} = "bash"
 
 python do_package:prepend() {
     d.setVar('PKGV', d.getVar("KERNEL_VERSION").split("-")[0])
 }
-
-B = "${WORKDIR}/${BPN}-${PV}"

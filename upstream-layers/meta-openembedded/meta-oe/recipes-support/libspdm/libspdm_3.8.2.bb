@@ -37,6 +37,7 @@ def get_spdm_multiarch(bb, d):
         "riscv32": "riscv32",
         "riscv64": "riscv64",
         "ppc64le": "ppc64le",
+        "powerpc64le": "ppc64le",
     }
 
     if target_arch in multiarch_options :

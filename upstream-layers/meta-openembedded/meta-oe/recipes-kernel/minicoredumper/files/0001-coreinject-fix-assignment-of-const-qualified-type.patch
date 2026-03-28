@@ -1,0 +1,44 @@
+From 07023a2d2ef059a039fef83ee4b33a7e47ca8e3e Mon Sep 17 00:00:00 2001
+From: John Ogness <john.ogness@linutronix.de>
+Date: Tue, 24 Feb 2026 11:33:40 +0106
+Subject: [PATCH] coreinject: fix assignment of const-qualified type
+
+coreinject fails to build with glibc 2.43.
+
+The issue is due to a new glibc feature:
+
+* For ISO C23, the functions bsearch, memchr, strchr, strpbrk, strrchr,
+  strstr, wcschr, wcspbrk, wcsrchr, wcsstr and wmemchr that return
+  pointers into their input arrays now have definitions as macros that
+  return a pointer to a const-qualified type when the input argument is
+  a pointer to a const-qualified type.
+
+The fix is trivial since the returned strrchr() value is only used in
+a way compatible with const pointers. The data type was simply defined
+incorrectly.
+
+Reported-by: Aurelien Jarno <aurel32@debian.org>
+Closes: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1128695
+Signed-off-by: John Ogness <john.ogness@linutronix.de>
+
+Upstream-Status: Backport [https://github.com/diamon/minicoredumper/commit/eb66f10ae26edf94bf41d513ce90a4eb1e0f11b3]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ src/coreinject/main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/coreinject/main.c b/src/coreinject/main.c
+index faf8edf..198485d 100644
+--- a/src/coreinject/main.c
++++ b/src/coreinject/main.c
+@@ -240,9 +240,9 @@ static int inject_data(FILE *f_core, FILE *f_symmap, const char *b_fname,
+ 	struct ident_data indirect;
+ 	struct ident_data direct;
+ 	const char *ident;
++	const char *p;
+ 	FILE *f_dump;
+ 	int err = 0;
+-	char *p;
+ 
+ 	/* extract ident name from file path */
+ 	p = strrchr(b_fname, '/');

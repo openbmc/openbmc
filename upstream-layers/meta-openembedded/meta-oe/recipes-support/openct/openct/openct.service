@@ -7,7 +7,7 @@ EnvironmentFile=-/etc/sysconfig/openct
 ExecStart=/usr/sbin/openct-control $OPENCT_OPTIONS init 
 ExecStop=/usr/sbin/openct-control $OPENCT_OPTIONS shutdown
 RemainAfterExit=yes
-KillMode=none
+KillMode=mixed
 
 [Install]
 WantedBy=multi-user.target

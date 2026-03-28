@@ -19,7 +19,7 @@
 # build system level, this class takes the approach of always using PKCS #11 at
 # the recipe level. For cases where the keys are available as files (i.e. test
 # keys in CI), they are imported into SoftHSM (a HSM emulation library).
-# 
+#
 # Recipes access the available keys via a specific role. So, depending on
 # whether we're building during development or for release, a given role can
 # refer to different keys.
@@ -33,7 +33,7 @@
 #   SIGNING_PKCS11_MODULE[fit] = "/usr/lib/x86_64-linux-gnu/opensc-pkcs11.so"
 #
 # Examples for defining roles and importing keys:
-# 
+#
 #   meta-code-signing/recipes-security/signing-keys/dummy-rsa-key-native.bb
 #   meta-code-signing-demo/recipes-security/ptx-dev-keys/ptx-dev-keys-native_git.bb
 #
@@ -54,7 +54,7 @@
 SIGNING_PKCS11_URI ?= ""
 SIGNING_PKCS11_MODULE ?= ""
 
-DEPENDS += "softhsm-native libp11-native opensc-native openssl-native extract-cert-native"
+DEPENDS += "softhsm-native pkcs11-provider-native libp11-native opensc-native openssl-native extract-cert-native"
 
 def signing_class_prepare(d):
     import os.path
@@ -338,16 +338,10 @@ signing_import_install() {
 signing_prepare() {
     export OPENSSL_MODULES="${STAGING_LIBDIR_NATIVE}/ossl-modules"
     export OPENSSL_ENGINES="${STAGING_LIBDIR_NATIVE}/engines-3"
-    export OPENSSL_CONF="${STAGING_LIBDIR_NATIVE}/ssl-3/openssl.cnf"
+    export OPENSSL_CONF="${STAGING_LIBDIR_NATIVE}/openssl-provider-signing.cnf"
     export SSL_CERT_DIR="${STAGING_LIBDIR_NATIVE}/ssl-3/certs"
     export SSL_CERT_FILE="${STAGING_LIBDIR_NATIVE}/ssl-3/cert.pem"
 
-    if [ -f ${OPENSSL_CONF} ]; then
-        echo "Using '${OPENSSL_CONF}' for OpenSSL configuration"
-    else
-        echo "Missing 'openssl.cnf' at '${STAGING_ETCDIR_NATIVE}/ssl'"
-        return 1
-    fi
     if [ -d ${OPENSSL_MODULES} ]; then
         echo "Using '${OPENSSL_MODULES}' for OpenSSL run-time modules"
     else
@@ -367,6 +361,26 @@ signing_prepare() {
     echo "directories.tokendir = $SOFTHSM2_DIR" > "$SOFTHSM2_CONF"
     echo "objectstore.backend = db" >> "$SOFTHSM2_CONF"
 
+    cat > "${OPENSSL_CONF}" <<EOF
+openssl_conf = openssl_init
+
+[openssl_init]
+providers = provider_sect
+
+[provider_sect]
+default = default_sect
+pkcs11 = pkcs11_sect
+
+[default_sect]
+activate = 1
+
+[pkcs11_sect]
+pkcs11-module-quirks = no-operation-state no-deinit
+pkcs11-module-cache-keys = false
+pkcs11-module-encode-provider-uri-to-pem = true
+activate = 1
+EOF
+
     for env in $(ls "${STAGING_DIR_NATIVE}/var/lib/meta-signing.env.d"); do
         . "${STAGING_DIR_NATIVE}/var/lib/meta-signing.env.d/$env"
     done
@@ -378,6 +392,8 @@ signing_use_role() {
     local role="${1}"
 
     export PKCS11_MODULE_PATH="$(signing_get_module $role)"
+    export PKCS11_PROVIDER_MODULE="$PKCS11_MODULE_PATH"
+    # export PKCS11_PROVIDER_DEBUG="file:/dev/stderr"
     export PKCS11_URI="$(signing_get_uri $role)"
 
     if [ -z "$PKCS11_MODULE_PATH" ]; then
@@ -445,6 +461,40 @@ signing_extract_cert_pem() {
     extract-cert "$(signing_get_uri $role)" "${output}.tmp-der"
     openssl x509 -inform der -in "${output}.tmp-der" -out "${output}"
     rm "${output}.tmp-der"
+}
+
+# signing_create_uri_pem <role> <pem>
+#
+# Wrap the role's pkcs11: URI in a PEM file.
+# The resulting file can be used instead of the URI returned by
+# 'signing_get_uri $role' with applications which do not yet support the
+# OSSL_STORE for native access to the PKCS#11 provider.
+signing_create_uri_pem() {
+    local role="${1}"
+    local output="${2}"
+    local conf="${output}.cnf"
+    local der="${output}.der"
+
+    local uri="$(signing_get_uri $role)"
+
+    echo "Wrapping PKCS#11 URI for role '$role' as '${output}'"
+
+    # The \# escape prevents OpenSSL's config parser treating # as a comment.
+    cat > "${conf}" <<EOF
+asn1=SEQUENCE:pkcs11_uri_seq
+
+[pkcs11_uri_seq]
+version=VISIBLESTRING:PKCS\#11 Provider URI v1.0
+uri=UTF8:${uri}
+EOF
+
+    openssl asn1parse -genconf "${conf}" -noout -out "${der}"
+
+    {
+        echo "-----BEGIN PKCS#11 PROVIDER URI-----"
+        openssl base64 -in "${der}"
+        echo "-----END PKCS#11 PROVIDER URI-----"
+    } > "${output}"
 }
 
 python () {

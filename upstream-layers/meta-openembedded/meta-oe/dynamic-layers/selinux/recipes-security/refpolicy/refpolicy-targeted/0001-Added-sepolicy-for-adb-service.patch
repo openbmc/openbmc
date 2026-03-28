@@ -1,0 +1,76 @@
+From c110d893be565ade574ee2933c6e89197f833006 Mon Sep 17 00:00:00 2001
+From: Gargi Misra <gmisra@qti.qualcomm.com>
+Date: Thu, 5 Mar 2026 12:39:42 +0530
+Subject: [PATCH] refpolicy-targeted: Added sepolicy for adb service
+
+    - Labeled adb binary
+    - Moved adb shell from initrc_t to unconfined_t
+
+Upstream-Status: Inappropriate [meta-oe Specific]
+
+Signed-off-by: Gargi Misra <gmisra@qti.qualcomm.com>
+---
+ policy/modules/services/adbd.fc |  5 +++++
+ policy/modules/services/adbd.if |  5 +++++
+ policy/modules/services/adbd.te | 25 +++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+ create mode 100644 policy/modules/services/adbd.fc
+ create mode 100644 policy/modules/services/adbd.if
+ create mode 100644 policy/modules/services/adbd.te
+
+diff --git a/policy/modules/services/adbd.fc b/policy/modules/services/adbd.fc
+new file mode 100644
+index 000000000..6f5bb9269
+--- /dev/null
++++ b/policy/modules/services/adbd.fc
+@@ -0,0 +1,5 @@
++/usr/bin/adbd        --  gen_context(system_u:object_r:adbd_exec_t,s0)
++
++
++
++
+diff --git a/policy/modules/services/adbd.if b/policy/modules/services/adbd.if
+new file mode 100644
+index 000000000..612fc0106
+--- /dev/null
++++ b/policy/modules/services/adbd.if
+@@ -0,0 +1,5 @@
++## <summary>adb service.</summary>
++
++
++
++
+diff --git a/policy/modules/services/adbd.te b/policy/modules/services/adbd.te
+new file mode 100644
+index 000000000..f7e8ac7d0
+--- /dev/null
++++ b/policy/modules/services/adbd.te
+@@ -0,0 +1,25 @@
++policy_module(adbd)
++
++########################################
++#
++# Declarations
++#
++
++type adbd_t;
++type adbd_exec_t;
++
++init_daemon_domain(adbd_t, adbd_exec_t)
++
++# Move adb from system_r:initrc_t to unconfined_r:unconfined_t
++unconfined_shell_domtrans(adbd_t)
++
++# Minimal Rules Required for adbd service
++allow adbd_t self:capability sys_resource;
++
++domain_interactive_fd(adbd_t)
++dev_rw_usbfs(adbd_t)
++files_read_etc_files(adbd_t)
++files_rw_etc_runtime_files(adbd_t)
++term_use_ptmx(adbd_t)
++term_use_generic_ptys(adbd_t)
++
+-- 
+2.43.0
+

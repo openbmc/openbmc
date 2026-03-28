@@ -8,6 +8,7 @@ IPv6 support, modification time preservation, paging of local and \
 remote files, passive mode support (with fallback to active mode), \
 SOCKS support, TIS FWTK gate-ftp server support, and transfer rate \
 throttling."
+HOMEPAGE = "https://en.wikipedia.org/wiki/Tnftp"
 
 SECTION = "net"
 LICENSE = "BSD-2-Clause"

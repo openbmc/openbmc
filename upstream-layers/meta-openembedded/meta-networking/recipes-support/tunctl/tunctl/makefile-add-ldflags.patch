@@ -1,14 +1,21 @@
 Add LDFLAGS variable to Makefile, make sure the extra linker flags can be passed.
 
-Upstream-Status: Pending
+Upstream-Status: Inactive-Upstream [last change: 2013-03-22]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
 
-diff --git a/Makefile b/Makefile
-index a0aa7f6..d6ce2c7 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -14,7 +14,7 @@ MAN_DIR ?= /usr/share/man/man$(MANS)
+@@ -6,7 +6,7 @@ MAN = $(PACKAGE).$(MANS)
+ 
+ DIST = Makefile $(PACKAGE).spec $(PACKAGE).c $(PACKAGE).sgml ChangeLog
+ 
+-CFLAGS = -g -Wall
++CFLAGS ?= -g -Wall
+ 
+ BIN_DIR ?= /usr/sbin
+ MAN_DIR ?= /usr/share/man/man$(MANS)
+@@ -14,12 +14,12 @@ MAN_DIR ?= /usr/share/man/man$(MANS)
  all : $(BIN) $(MAN)
  
  $(BIN) : $(BIN).c
@@ -17,3 +24,9 @@ index a0aa7f6..d6ce2c7 100644
  
  $(MAN) : $(PACKAGE).sgml
  	docbook2man $(PACKAGE).sgml
+ 
+-clean : 
++clean :
+ 	rm -f $(BIN) $(OBJS) $(MAN) *~ manpage.*
+ 
+ install : $(BIN) $(MAN)

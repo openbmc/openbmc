@@ -2,9 +2,12 @@
 
 set -e
 
+conf="Conf 1"
 manufacturer=RPB
 model="Android device"
+product=0xd002
 serial=0123456789ABCDEF
+vendor=0x18d1
 
 if [ -r /etc/android-gadget-setup.machine ] ; then
 	. /etc/android-gadget-setup.machine
@@ -23,12 +26,12 @@ mkdir configs/c.1
 mkdir functions/ffs.usb0
 mkdir strings/0x409
 mkdir configs/c.1/strings/0x409
-echo -n 0x18d1 > idVendor
-echo -n 0xd002 > idProduct
+echo -n "$vendor"  > idVendor
+echo -n "$product" > idProduct
 echo "$serial" > strings/0x409/serialnumber
 echo "$manufacturer" > strings/0x409/manufacturer
 echo "$model" > strings/0x409/product
-echo "Conf 1" > configs/c.1/strings/0x409/configuration
+echo "$conf" > configs/c.1/strings/0x409/configuration
 ln -s functions/ffs.usb0 configs/c.1
 
 mkdir -p /dev/usb-ffs/adb

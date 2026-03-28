@@ -9,7 +9,6 @@ DEPENDS = " \
     garcon \
     glib-2.0 \
     gtk+3 \
-    intltool \
     libwnck3 \
     libxfce4ui \
     libxfce4util \
@@ -18,6 +17,8 @@ DEPENDS = " \
     xfconf \
 "
 
+XFCEBASEBUILDCLASS = "meson"
+
 inherit xfce features_check
 
 REQUIRED_DISTRO_FEATURES = "x11"
@@ -25,12 +26,7 @@ REQUIRED_DISTRO_FEATURES = "x11"
 SRC_URI[sha256sum] = "acccde849265bbf4093925ba847977b7abf70bb2977e4f78216570e887c157b8"
 
 PACKAGECONFIG ??= "notify"
-PACKAGECONFIG[notify] = "--enable-notifications,--disable-notifications,libnotify"
-
-EXTRA_OECONF = "GDBUS_CODEGEN=${STAGING_BINDIR_NATIVE}/gdbus-codegen \
-                GLIB_COMPILE_RESOURCES=${STAGING_BINDIR_NATIVE}/glib-compile-resources \
-                GLIB_GENMARSHAL=${STAGING_BINDIR_NATIVE}/glib-genmarshal \
-                GLIB_MKENUMS=${STAGING_BINDIR_NATIVE}/glib-mkenums \
-                "
+PACKAGECONFIG[notify] = "-Dnotifications=enabled,-Dnotifications=disabled,libnotify"
+PACKAGECONFIG[tests] = "-Dtests=true,-Dtests=false,"
 
 FILES:${PN} += "${datadir}/backgrounds"

@@ -15,6 +15,7 @@ DEPENDS = "freetype libpng jpeg zlib tiff"
 
 SRC_URI = "git://github.com/libgd/libgd.git;nobranch=1;protocol=https \
            file://0001-Fix-deprecared-function-prototypes.patch \
+           file://Fix-ftype-missing-const.patch \
            "
 
 SRCREV = "b5319a41286107b53daa0e08e402aa1819764bdc"

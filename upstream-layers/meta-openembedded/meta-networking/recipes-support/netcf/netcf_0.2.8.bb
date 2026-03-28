@@ -10,6 +10,7 @@ SRCREV = "2c5d4255857531bc09d91dcd02e86545f29004d4"
 PV .= "+git"
 
 SRC_URI = "git://pagure.io/netcf.git;protocol=https;branch=master \
+           file://0001-netcf-fix-bootstrap-with-newer-gnulib-automake.patch \
            file://0001-Adopt-to-new-gnulib-read_file-fread_file-signature.patch"
 
 UPSTREAM_CHECK_GITTAGREGEX = "release-(?P<pver>(\d+(\.\d+)+))"
@@ -50,11 +51,11 @@ do_install:append() {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
        install -d ${D}${systemd_unitdir}/system
        if [ -d "${D}${libdir}/systemd/system" ]; then
-           if [ "${systemd_unitdir}" != "${libdir}/systemd" ] ; then 
+           if [ "${systemd_unitdir}" != "${libdir}/systemd" ] ; then
                mv ${D}${libdir}/systemd/system/* ${D}${systemd_unitdir}/system/
                rm -rf ${D}${libdir}/systemd/
 	   fi
-       elif [ "${systemd_unitdir}" != "${nonarch_libdir}/systemd" ] ; then 
+       elif [ "${systemd_unitdir}" != "${nonarch_libdir}/systemd" ] ; then
            mv ${D}${nonarch_libdir}/systemd/system/* ${D}${systemd_unitdir}/system/
            rm -rf ${D}${nonarch_libdir}/systemd/
        fi

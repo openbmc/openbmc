@@ -1,0 +1,44 @@
+From 5bae4e7b62996f1ef1b9ee6719581bde115d762c Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Fri, 13 Mar 2026 13:37:58 +0100
+Subject: [PATCH] setup.py: make pkg_resources import optional for Python 3.12+
+
+pkg_resources has been removed from newer Python/setuptools versions.
+Wrap the import in a try/except block and guard the usage site,
+allowing html5lib to build without pkg_resources present.
+
+Upstream-Status: Pending
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ setup.py | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/setup.py b/setup.py
+index c393c9c..e659e98 100644
+--- a/setup.py
++++ b/setup.py
+@@ -6,9 +6,13 @@ import sys
+ 
+ from os.path import join, dirname
+ from setuptools import setup, find_packages, __version__ as setuptools_version
+-from pkg_resources import parse_version
+ 
+-import pkg_resources
++try:
++    from pkg_resources import parse_version
++    import pkg_resources
++except ImportError:
++    parse_version = None
++    pkg_resources = None
+ 
+ try:
+     import _markerlib.markers
+@@ -49,7 +53,7 @@ if _markerlib and sys.version_info[0] == 3:
+ # Avoid the very buggy pkg_resources.parser, which doesn't consistently
+ # recognise the markers needed by this setup.py
+ # Change this to setuptools 20.10.0 to support all markers.
+-if pkg_resources:
++if pkg_resources and parse_version:
+     if parse_version(setuptools_version) < parse_version('18.5'):
+         MarkerEvaluation = pkg_resources.MarkerEvaluation
+ 

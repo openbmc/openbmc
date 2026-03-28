@@ -1,0 +1,174 @@
+From 3d713358fe19ce02e7c580d26222ec2386c94bc9 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 12 Mar 2026 20:06:34 +0800
+Subject: [PATCH] Fix kinds of build failure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix kinds of build failures caused by -Werror=sign-conversion,
+-Werror=cast-qual, -Werror=conversion etc.
+Eg:
+src/offlinelogstorage/dlt_offline_logstorage.h:129:49: error: unsigned conversion from ‘int’ to ‘unsigned int’ changes value from ‘-1’ to ‘4294967295’ [-Werror=sign-conversion]
+  129 | #define DLT_LOGSTORAGE_GZIP_ERROR               -1 /* error case */
+      |                                                 ^
+/dlt-daemon/src/offlinelogstorage/dlt_offline_logstorage.c:1303:36: note: in expansion of macro ‘DLT_LOGSTORAGE_GZIP_ERROR’
+ 1303 |         config->gzip_compression = DLT_LOGSTORAGE_GZIP_ERROR;
+
+      |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/offlinelogstorage/dlt_offline_logstorage_behavior.c:851:16: error: conversion from ‘z_size_t’ {aka ‘long unsigned int’} to ‘int’ may change value [-Werror=conversion]
+  851 |         return gzfwrite(ptr, size, nmemb, config->gzlog);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/console/dlt-control-common.c:922:25: error: cast discards 'const' qualifier from pointer target type [-Werror=cast-qual]
+  922 |     json_object_to_file((char*)filename, json_filter_obj);
+      |
+
+Use explicit type conversion to make the build can pass
+
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/826]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/console/dlt-control-common.c                       |  2 +-
+ src/daemon/dlt-daemon.c                                |  4 ++--
+ src/daemon/udp_connection/dlt_daemon_udp_socket.c      | 10 +++++-----
+ src/examples/dlt-example-multicast-clientmsg-view.c    |  8 ++++----
+ src/offlinelogstorage/dlt_offline_logstorage.h         |  2 +-
+ .../dlt_offline_logstorage_behavior.c                  |  4 ++--
+ 6 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/src/console/dlt-control-common.c b/src/console/dlt-control-common.c
+index 2aeea280..4f9e95b4 100644
+--- a/src/console/dlt-control-common.c
++++ b/src/console/dlt-control-common.c
+@@ -919,7 +919,7 @@ DltReturnValue dlt_json_filter_save(DltFilter *filter, const char *filename, int
+     }
+ 
+     printf("Saving current filter into '%s'\n", filename);
+-    json_object_to_file((char*)filename, json_filter_obj);
++    json_object_to_file(filename, json_filter_obj);
+ 
+     return DLT_RETURN_OK;
+ }
+diff --git a/src/daemon/dlt-daemon.c b/src/daemon/dlt-daemon.c
+index 97af1cd9..94024eb4 100644
+--- a/src/daemon/dlt-daemon.c
++++ b/src/daemon/dlt-daemon.c
+@@ -867,7 +867,7 @@ int option_file_parser(DltDaemonLocal *daemon_local)
+ 
+                         if ((longval == MULTICAST_CONNECTION_DISABLED)
+                             || (longval == MULTICAST_CONNECTION_ENABLED)) {
+-                            daemon_local->UDPConnectionSetup = longval;
++                            daemon_local->UDPConnectionSetup = (int)longval;
+                             printf("Option: %s=%s\n", token, value);
+                         }
+                         else {
+@@ -884,7 +884,7 @@ int option_file_parser(DltDaemonLocal *daemon_local)
+                     }
+                     else if (strcmp(token, "UDPMulticastIPPort") == 0)
+                     {
+-                        daemon_local->UDPMulticastIPPort = strtol(value, NULL, 10);
++                        daemon_local->UDPMulticastIPPort = (int)strtol(value, NULL, 10);
+                     }
+ #endif
+                     else if (strcmp(token, "BindAddress") == 0)
+diff --git a/src/daemon/udp_connection/dlt_daemon_udp_socket.c b/src/daemon/udp_connection/dlt_daemon_udp_socket.c
+index 4c40cda8..b3408773 100644
+--- a/src/daemon/udp_connection/dlt_daemon_udp_socket.c
++++ b/src/daemon/udp_connection/dlt_daemon_udp_socket.c
+@@ -66,7 +66,7 @@ void dlt_daemon_udp_setmulticast_addr(DltDaemonLocal *daemon_local)
+     struct sockaddr_in clientaddr;
+     clientaddr.sin_family = AF_INET;
+     inet_pton(AF_INET, daemon_local->UDPMulticastIPAddress, &clientaddr.sin_addr);
+-    clientaddr.sin_port = htons(daemon_local->UDPMulticastIPPort);
++    clientaddr.sin_port = htons((uint16_t)daemon_local->UDPMulticastIPPort);
+     memcpy(&g_udpmulticast_addr.clientaddr, &clientaddr, sizeof(struct sockaddr_in));
+     g_udpmulticast_addr.clientaddr_size = sizeof(g_udpmulticast_addr.clientaddr);
+     g_udpmulticast_addr.isvalidflag = ADDRESS_VALID;
+@@ -224,17 +224,17 @@ void dlt_daemon_udp_clientmsg_send(DltDaemonClientSockInfo *clientinfo,
+ 
+     if ((clientinfo->isvalidflag == ADDRESS_VALID) &&
+         (size1 > 0) && (size2 > 0)) {
+-        void *data = (void *)calloc(size1 + size2, sizeof(char));
++        void *data = (void *)calloc((size_t)(size1 + size2), sizeof(char));
+ 
+         if (data == NULL) {
+             dlt_vlog(LOG_ERR, "%s: calloc failure\n", __func__);
+             return;
+         }
+ 
+-        memcpy(data, data1, size1);
+-        memcpy(data + size1, data2, size2);
++        memcpy(data, data1, (size_t)size1);
++        memcpy((int*)data + size1, data2, (size_t)size2);
+ 
+-        if (sendto(g_udp_sock_fd, data, size1 + size2, 0, (struct sockaddr *)&clientinfo->clientaddr,
++        if (sendto(g_udp_sock_fd, data, (size_t)(size1 + size2), 0, (struct sockaddr *)&clientinfo->clientaddr,
+                    clientinfo->clientaddr_size) < 0)
+             dlt_vlog(LOG_ERR, "%s: Send UDP Packet Data failed\n", __func__);
+ 
+diff --git a/src/examples/dlt-example-multicast-clientmsg-view.c b/src/examples/dlt-example-multicast-clientmsg-view.c
+index c00537e5..f8920453 100644
+--- a/src/examples/dlt-example-multicast-clientmsg-view.c
++++ b/src/examples/dlt-example-multicast-clientmsg-view.c
+@@ -74,9 +74,9 @@ int dlt_receiver_receive_socket_udp(struct clientinfostruct *clientinfo, DltRece
+     /* wait for data from socket */
+     unsigned int addrlen = sizeof(clientinfo->addr);
+ 
+-    if ((receiver->bytesRcvd = recvfrom(clientinfo->fd,
++    if ((receiver->bytesRcvd = (int32_t)recvfrom(clientinfo->fd,
+                                         receiver->buf + receiver->lastBytesRcvd,
+-                                        receiver->buffersize - receiver->lastBytesRcvd,
++                                        (size_t)(receiver->buffersize - receiver->lastBytesRcvd),
+                                         0,
+                                         (struct sockaddr *)&(clientinfo->addr), &addrlen))
+         <= 0) {
+@@ -177,11 +177,11 @@ int main()
+         dlt_receiver_receive_socket_udp(&clientinfo, &(clientinfo.receiver));
+ 
+         while (dlt_message_read(&msg, (unsigned char *)(clientinfo.receiver.buf),
+-                                clientinfo.receiver.bytesRcvd, 0, 0) == DLT_MESSAGE_ERROR_OK) {
++                                (unsigned int)clientinfo.receiver.bytesRcvd, 0, 0) == DLT_MESSAGE_ERROR_OK) {
+             dlt_receive_message_callback_udp(&msg);
+ 
+             if (dlt_receiver_remove(&(clientinfo.receiver),
+-                                    msg.headersize + msg.datasize - sizeof(DltStorageHeader))
++                                    msg.headersize + msg.datasize - ((int32_t)(sizeof(DltStorageHeader))))
+                 == DLT_RETURN_ERROR) {
+                 /* Return value ignored */
+                 dlt_message_free(&msg, 0);
+diff --git a/src/offlinelogstorage/dlt_offline_logstorage.h b/src/offlinelogstorage/dlt_offline_logstorage.h
+index 09ea5ce4..cfb70f33 100644
+--- a/src/offlinelogstorage/dlt_offline_logstorage.h
++++ b/src/offlinelogstorage/dlt_offline_logstorage.h
+@@ -192,7 +192,7 @@ struct DltLogStorageFilterConfig
+     int overwrite;                  /* Overwrite strategy */
+     int skip;                       /* Flag to skip file logging if DISCARD_NEW */
+     char *ecuid;                    /* ECU identifier */
+-    unsigned int gzip_compression;  /* Toggle if log files should be gzip compressed */
++    int gzip_compression;           /* Toggle if log files should be gzip compressed */
+     /* callback function for filter configurations */
+     int (*dlt_logstorage_prepare)(DltLogStorageFilterConfig *config,
+                                   DltLogStorageUserConfig *file_config,
+diff --git a/src/offlinelogstorage/dlt_offline_logstorage_behavior.c b/src/offlinelogstorage/dlt_offline_logstorage_behavior.c
+index ff09c9eb..ae8f4442 100644
+--- a/src/offlinelogstorage/dlt_offline_logstorage_behavior.c
++++ b/src/offlinelogstorage/dlt_offline_logstorage_behavior.c
+@@ -848,10 +848,10 @@ DLT_STATIC int dlt_logstorage_write_to_log(void *ptr, size_t size, size_t nmemb,
+ {
+ #ifdef DLT_LOGSTORAGE_USE_GZIP
+     if (config->gzip_compression == DLT_LOGSTORAGE_GZIP_ON) {
+-        return gzfwrite(ptr, size, nmemb, config->gzlog);
++        return (int)gzfwrite(ptr, size, nmemb, config->gzlog);
+     }
+     else {
+-        return fwrite(ptr, size, nmemb, config->log);
++        return (int)fwrite(ptr, size, nmemb, config->log);
+     }
+ #else
+     return (int)fwrite(ptr, size, nmemb, config->log);
+-- 
+2.34.1
+

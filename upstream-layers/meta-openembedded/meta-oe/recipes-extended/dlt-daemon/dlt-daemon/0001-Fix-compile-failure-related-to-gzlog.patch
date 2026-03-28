@@ -1,0 +1,69 @@
+From bee9bce043c72de1d27a4251333ace9fe66bcc74 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Thu, 12 Mar 2026 19:37:11 +0800
+Subject: [PATCH] Fix compile failure related to gzlog
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+* In commit [1], gzlog is changed from gzFile to gzFile*, this cause
+  failure:
+/dlt-daemon/src/offlinelogstorage/dlt_offline_logstorage.c:88:21: error: passing argument 1 of ‘gzclose’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+   88 |         gzclose(data->gzlog);
+      |                 ~~~~^~~~~~~
+      |                     |
+      |                     struct gzFile_s **
+compilation terminated due to -Wfatal-errors.
+
+so change gzlog back to gzFile, so that all the gzxxx function can work
+well.
+
+* Change to gzFile causes the following failure, since fileno need
+  FILE*, according to code "config->gzlog = gzdopen(config->fd, mode)",
+  seems we don't need to use fileno, just use config->fd is ok.
+/dlt-daemon/src/offlinelogstorage/dlt_offline_logstorage_behavior.c:1133:48: error: passing argument 1 of ‘fileno’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+ 1133 |                         if (fsync(fileno(config->gzlog)) != 0) {
+      |                                          ~~~~~~^~~~~~~
+      |                                                |
+      |                                                gzFile {aka struct gzFile_s *}
+compilation terminated due to -Wfatal-errors.
+
+[1] https://github.com/COVESA/dlt-daemon/commit/543087ba98c103dc576edadeccf614c9dab1b9b3
+
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/826]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/offlinelogstorage/dlt_offline_logstorage.h          | 2 +-
+ src/offlinelogstorage/dlt_offline_logstorage_behavior.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/offlinelogstorage/dlt_offline_logstorage.h b/src/offlinelogstorage/dlt_offline_logstorage.h
+index fe38687..09ea5ce 100644
+--- a/src/offlinelogstorage/dlt_offline_logstorage.h
++++ b/src/offlinelogstorage/dlt_offline_logstorage.h
+@@ -217,7 +217,7 @@ struct DltLogStorageFilterConfig
+     FILE *log;                      /* current open log file */
+     int fd;                         /* The file descriptor for the active log file */
+ #ifdef DLT_LOGSTORAGE_USE_GZIP
+-    gzFile *gzlog;                  /* current open gz log file */
++    gzFile gzlog;                   /* current open gz log file */
+ #endif
+     void *cache;                    /* log data cache */
+     unsigned int specific_size;     /* cache size used for specific_size sync strategy */
+diff --git a/src/offlinelogstorage/dlt_offline_logstorage_behavior.c b/src/offlinelogstorage/dlt_offline_logstorage_behavior.c
+index f17fbb2..ff09c9e 100644
+--- a/src/offlinelogstorage/dlt_offline_logstorage_behavior.c
++++ b/src/offlinelogstorage/dlt_offline_logstorage_behavior.c
+@@ -1130,7 +1130,7 @@ int dlt_logstorage_prepare_on_msg(DltLogStorageFilterConfig *config,
+                     (config->sync == DLT_LOGSTORAGE_SYNC_UNSET)) {
+ #ifdef DLT_LOGSTORAGE_USE_GZIP
+                     if (config->gzip_compression == DLT_LOGSTORAGE_GZIP_ON) {
+-                        if (fsync(fileno(config->gzlog)) != 0) {
++                        if (fsync(config->fd) != 0) {
+                             if (errno != ENOSYS) {
+                                 dlt_vlog(LOG_ERR, "%s: failed to sync gzip log file\n", __func__);
+                             }
+-- 
+2.34.1
+

@@ -1,0 +1,829 @@
+From 4cf42fc89ccdbcecdcd30b32a7ca8040be55c253 Mon Sep 17 00:00:00 2001
+From: Priyansh Jain <priyansh.jain@oss.qualcomm.com>
+Date: Tue, 27 Jan 2026 14:58:05 +0530
+Subject: [PATCH 1/3] Refactor Intel-specific logic into separate files
+
+Thermald currently only supports x86 platforms but is a very useful tool for
+controlling user-space thermal policy on a wide range of systems. As more
+SoCs and architectures adopt user-space driven thermal management models,
+the limitation to x86-only backends prevents thermald from being used on
+non-x86 platforms.
+
+This series adds support for non-x86 platforms by first refactoring all
+x86-specific logic into a dedicated backend. This separation enables a clean
+and modular structure where additional platform backends can be introduced
+without impacting the existing Intel implementation. Once the backend
+abstraction is in place, subsequent patches add support for ARM backends
+and integrate them into the new platform detection logic.
+
+Suggested-by: Amit Kucheria <amit.kucheria@oss.qualcomm.com>
+Signed-off-by: Priyansh Jain <priyansh.jain@oss.qualcomm.com>
+
+Upstream-Status: Backport [from commit 4cf42fc89ccdbcecdcd30b32a7ca8040be55c253]
+---
+ Android.mk                 |   4 +-
+ Makefile.am                |   5 +-
+ src/thd_engine.cpp         | 125 +++----------------
+ src/thd_engine.h           |   6 -
+ src/thd_engine_default.cpp |  79 ++----------
+ src/thd_platform.cpp       | 109 +++++++++++++++++
+ src/thd_platform.h         |  58 +++++++++
+ src/thd_platform_intel.cpp | 238 +++++++++++++++++++++++++++++++++++++
+ src/thd_platform_intel.h   |  38 ++++++
+ 9 files changed, 476 insertions(+), 186 deletions(-)
+ create mode 100644 src/thd_platform.cpp
+ create mode 100644 src/thd_platform.h
+ create mode 100644 src/thd_platform_intel.cpp
+ create mode 100644 src/thd_platform_intel.h
+
+diff --git a/Android.mk b/Android.mk
+index 0b279f4..c14fa4a 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -43,7 +43,9 @@ LOCAL_SRC_FILES := \
+ 		src/thd_engine_adaptive.cpp \
+ 		src/thd_lzma_dec.cpp \
+ 		src/LzmaDec.c \
+-		src/thd_gddv.cpp
++		src/thd_gddv.cpp \
++		src/thd_platform.cpp \
++		src/thd_platform_intel.cpp
+ 
+ LOCAL_C_INCLUDES += external/libxml2/include
+ 
+diff --git a/Makefile.am b/Makefile.am
+index dbf86db..2e76187 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -75,8 +75,9 @@ thermald_SOURCES = \
+ 	src/thd_gddv.cpp \
+ 	thermald-resource.c \
+ 	src/thd_lzma_dec.cpp \
+-	src/LzmaDec.c
+-
++	src/LzmaDec.c \
++	src/thd_platform.cpp \
++	src/thd_platform_intel.cpp
+ 
+ man5_MANS = man/thermal-conf.xml.5
+ man8_MANS = man/thermald.8
+diff --git a/src/thd_engine.cpp b/src/thd_engine.cpp
+index d2028c6..319f50b 100644
+--- a/src/thd_engine.cpp
++++ b/src/thd_engine.cpp
+@@ -35,7 +35,6 @@
+ #include <errno.h>
+ #include <sys/types.h>
+ #include <sys/utsname.h>
+-#include <cpuid.h>
+ #include <locale>
+ #include <memory>
+ #include "thd_engine.h"
+@@ -44,6 +43,8 @@
+ #include "thd_zone_dynamic.h"
+ #include "thd_cdev_gen_sysfs.h"
+ #include "thd_int3400.h"
++#include "thd_platform.h"
++#include "thd_platform_intel.h"
+ 
+ static void *cthd_engine_thread(void *arg);
+ 
+@@ -53,11 +54,10 @@ cthd_engine::cthd_engine(std::string _uuid) :
+ 				false), adaptive_mode(false), poll_timeout_msec(-1), wakeup_fd(
+ 				-1), uevent_fd(-1), control_mode(COMPLEMENTRY), write_pipe_fd(
+ 				0), preference(0), status(true), thz_last_uevent_time(0), thz_last_temp_ind_time(
+-				0), thz_last_update_event_time(0), terminate(false), genuine_intel(
+-				0), has_invariant_tsc(0), has_aperf(0), proc_list_matched(
+-				false), poll_interval_sec(0), poll_sensor_mask(0), fast_poll_sensor_mask(
+-				0), saved_poll_interval(0), poll_fd_cnt(0), rt_kernel(false), parser_init_done(
+-				false) {
++				0), thz_last_update_event_time(0), terminate(false), has_invariant_tsc(0),
++				has_aperf(0), proc_list_matched(false), poll_interval_sec(0), poll_sensor_mask(0),
++				fast_poll_sensor_mask(0), saved_poll_interval(0), poll_fd_cnt(0), rt_kernel(false),
++				parser_init_done(false) {
+ 	thd_engine = pthread_t();
+ 	thd_attr = pthread_attr_t();
+ 
+@@ -742,112 +742,23 @@ void cthd_engine::thd_engine_reload_zones() {
+ 	}
+ }
+ 
+-// Add any tested platform ids in this table
+-#ifndef ANDROID
+-static const supported_ids_t id_table[] = {
+-		{ 6, 0x2a }, // Sandybridge
+-		{ 6, 0x3a }, // IvyBridge
+-		{ 6, 0x3c }, // Haswell
+-		{ 6, 0x45 }, // Haswell ULT
+-		{ 6, 0x46 }, // Haswell ULT
+-		{ 6, 0x3d }, // Broadwell
+-		{ 6, 0x47 }, // Broadwell-GT3E
+-		{ 6, 0x37 }, // Valleyview BYT
+-		{ 6, 0x4c }, // Brasewell
+-		{ 6, 0x4e }, // skylake
+-		{ 6, 0x5e }, // skylake
+-		{ 6, 0x5c }, // Broxton
+-		{ 6, 0x7a }, // Gemini Lake
+-		{ 6, 0x8e }, // kabylake
+-		{ 6, 0x9e }, // kabylake
+-		{ 6, 0x66 }, // Cannonlake
+-		{ 6, 0x7e }, // Icelake
+-		{ 6, 0x8c }, // Tigerlake_L
+-		{ 6, 0x8d }, // Tigerlake
+-		{ 6, 0xa5 }, // Cometlake
+-		{ 6, 0xa6 }, // Cometlake_L
+-		{ 6, 0xa7 }, // Rocketlake
+-		{ 6, 0x9c }, // Jasper Lake
+-		{ 6, 0x97 }, // Alderlake
+-		{ 6, 0x9a }, // Alderlake
+-		{ 6, 0xb7 }, // Raptorlake
+-		{ 6, 0xba }, // Raptorlake
+-		{ 6, 0xbe }, // Alderlake N
+-		{ 6, 0xbf }, // Raptorlake S
+-		{ 6, 0xaa }, // Mateor Lake L
+-		{ 6, 0xbd }, // Lunar Lake M
+-		{ 6, 0xc6 }, // Arrow Lake
+-		{ 6, 0xc5 }, // Arrow Lake H
+-		{ 6, 0xb5 }, // Arrow Lake U
+-		{ 6, 0xcc }, // Panther Lake L
+-		{ 6, 0xd5 }, // Wildcat Lake L
+-		{ 0, 0 } // Last Invalid entry
+-};
+-
+-const char * const blocklist_paths[] {
+-	/* Some Lenovo machines have in-firmware thermal management,
+-	 * avoid having two entities trying to manage things.
+-	 * We may want to change this to dytc_perfmode once that is
+-	 * widely available. */
+-	"/sys/devices/platform/thinkpad_acpi/dytc_lapmode",
+-};
+-#endif
+-
+ int cthd_engine::check_cpu_id() {
+-#ifndef ANDROID
+-	// Copied from turbostat program
+-	unsigned int ebx, ecx, edx, max_level;
+-	unsigned int fms, family, model, stepping;
+-	genuine_intel = 0;
+-	int i = 0;
+-	bool valid = false;
+-
+-	proc_list_matched = false;
+-	ebx = ecx = edx = 0;
+-
+-	__cpuid(0, max_level, ebx, ecx, edx);
+-	if (ebx == 0x756e6547 && edx == 0x49656e69 && ecx == 0x6c65746e)
+-		genuine_intel = 1;
+-	if (genuine_intel == 0) {
+-		// Simply return without further capability check
+-		return THD_SUCCESS;
+-	}
+-	__cpuid(1, fms, ebx, ecx, edx);
+-	family = (fms >> 8) & 0xf;
+-	model = (fms >> 4) & 0xf;
+-	stepping = fms & 0xf;
+-	if (family == 6 || family == 0xf)
+-		model += ((fms >> 16) & 0xf) << 4;
+-
+-	thd_log_msg(
+-			"%u CPUID levels; family:model:stepping 0x%x:%x:%x (%u:%u:%u)\n",
+-			max_level, family, model, stepping, family, model, stepping);
+-
+-	while (id_table[i].family) {
+-		if (id_table[i].family == family && id_table[i].model == model) {
+-			proc_list_matched = true;
+-			valid = true;
+-			break;
+-		}
+-		i++;
+-	}
+-	if (!valid) {
+-		thd_log_msg(" Need Linux PowerCap sysfs\n");
++	// Create platform instance using factory method
++	cthd_platform *platform = cthd_platform::create_platform();
++	if (!platform) {
++		thd_log_error("Failed to create platform instance\n");
++		proc_list_matched = false;
++		return THD_ERROR;
+ 	}
+ 
++	// Dump platform information
++	platform->dump_platform_info();
+ 
+-	for (const char *path : blocklist_paths) {
+-		struct stat s;
++	// Call platform-specific CPU ID check
++	int ret = platform->check_cpu_id(proc_list_matched);
+ 
+-		if (!stat(path, &s)) {
+-			proc_list_matched = false;
+-			thd_log_warn("[%s] present: Thermald can't run on this platform\n", path);
+-			break;
+-		}
+-	}
+-
+-#endif
+-	return THD_SUCCESS;
++	delete platform;
++	return ret;
+ }
+ 
+ void cthd_engine::thd_read_default_thermal_sensors() {
+diff --git a/src/thd_engine.h b/src/thd_engine.h
+index f6c9edf..2e024ca 100644
+--- a/src/thd_engine.h
++++ b/src/thd_engine.h
+@@ -67,11 +67,6 @@ typedef struct {
+ 	unsigned long msg[MAX_MSG_SIZE];
+ } message_capsul_t;
+ 
+-typedef struct {
+-	unsigned int family;
+-	unsigned int model;
+-} supported_ids_t;
+-
+ class cthd_engine {
+ 
+ protected:
+@@ -100,7 +95,6 @@ private:
+ 	time_t thz_last_temp_ind_time;
+ 	time_t thz_last_update_event_time;
+ 	bool terminate;
+-	int genuine_intel;
+ 	int has_invariant_tsc;
+ 	int has_aperf;
+ 	bool proc_list_matched;
+diff --git a/src/thd_engine_default.cpp b/src/thd_engine_default.cpp
+index 0e2a35c..62c2e67 100644
+--- a/src/thd_engine_default.cpp
++++ b/src/thd_engine_default.cpp
+@@ -40,6 +40,8 @@
+ #include "thd_int3400.h"
+ #include "thd_sensor_rapl_power.h"
+ #include "thd_zone_rapl_power.h"
++#include "thd_platform.h"
++#include "thd_platform_intel.h"
+ 
+ 
+ // Default CPU cooling devices, which are not part of thermal sysfs
+@@ -795,7 +797,13 @@ void cthd_engine_default::workarounds()
+ {
+ 	// Every 30 seconds repeat
+ 	if (!disable_active_power && !workaround_interval) {
+-		workaround_rapl_mmio_power();
++		// Create platform instance and call workaround
++		cthd_platform *platform = cthd_platform::create_platform();
++		if (platform) {
++			platform->workaround_rapl_mmio_power();
++			delete platform;
++		}
++
+ 		workaround_tcc_offset();
+ 		workaround_interval = 7;
+ 	} else {
+@@ -803,75 +811,6 @@ void cthd_engine_default::workarounds()
+ 	}
+ }
+ 
+-#ifndef ANDROID
+-#include <cpuid.h>
+-#include <sys/mman.h>
+-#define BIT_ULL(nr)	(1ULL << (nr))
+-#endif
+-
+-void cthd_engine_default::workaround_rapl_mmio_power(void)
+-{
+-	if (!workaround_enabled)
+-		return;
+-
+-	cthd_cdev *cdev = search_cdev("rapl_controller_mmio");
+-	if (cdev) {
+-		/* RAPL MMIO is enabled and getting used. No need to disable */
+-		return;
+-	} else {
+-		csys_fs _sysfs("/sys/devices/virtual/powercap/intel-rapl-mmio/intel-rapl-mmio:0/");
+-
+-		if (_sysfs.exists()) {
+-			std::ostringstream temp_str;
+-
+-			temp_str << "enabled";
+-			if (_sysfs.write(temp_str.str(), 0) > 0)
+-				return;
+-
+-			thd_log_debug("Failed to write to RAPL MMIO\n");
+-		}
+-	}
+-
+-#ifndef ANDROID
+-	int map_fd;
+-	void *rapl_mem;
+-	unsigned char *rapl_pkg_pwr_addr;
+-	unsigned long long pkg_power_limit;
+-
+-	unsigned int ebx, ecx, edx;
+-	unsigned int fms, family, model;
+-
+-	ecx = edx = 0;
+-	__cpuid(1, fms, ebx, ecx, edx);
+-	family = (fms >> 8) & 0xf;
+-	model = (fms >> 4) & 0xf;
+-	if (family == 6 || family == 0xf)
+-		model += ((fms >> 16) & 0xf) << 4;
+-
+-	// Apply for KabyLake only
+-	if (model != 0x8e && model != 0x9e)
+-		return;
+-
+-	map_fd = open("/dev/mem", O_RDWR, 0);
+-	if (map_fd < 0)
+-		return;
+-
+-	rapl_mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, map_fd,
+-			0xfed15000);
+-	if (!rapl_mem || rapl_mem == MAP_FAILED) {
+-		close(map_fd);
+-		return;
+-	}
+-
+-	rapl_pkg_pwr_addr = ((unsigned char *)rapl_mem + 0x9a0);
+-	pkg_power_limit = *(unsigned long long *)rapl_pkg_pwr_addr;
+-	*(unsigned long long *)rapl_pkg_pwr_addr = pkg_power_limit
+-			& ~BIT_ULL(15);
+-
+-	munmap(rapl_mem, 4096);
+-	close(map_fd);
+-#endif
+-}
+ 
+ void cthd_engine_default::workaround_tcc_offset(void)
+ {
+diff --git a/src/thd_platform.cpp b/src/thd_platform.cpp
+new file mode 100644
+index 0000000..25ce094
+--- /dev/null
++++ b/src/thd_platform.cpp
+@@ -0,0 +1,109 @@
++/*
++ * thd_platform.cpp: Platform detection and abstraction layer implementation
++ *
++ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 or later as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ * Author Name <priyansh.jain@oss.qualcomm.com>
++ */
++
++#include "thd_platform.h"
++#include "thd_platform_intel.h"
++#include "thd_common.h"
++#include <cstring>
++#include <iostream>
++
++cthd_platform::cthd_platform() : detected_platform(PLATFORM_UNKNOWN), machine_type("") {
++}
++
++cthd_platform::~cthd_platform() {
++}
++
++void cthd_platform::detect_platform() {
++    struct utsname sysinfo;
++    if (uname(&sysinfo) != 0) {
++        thd_log_error("Failed to get system information\n");
++        detected_platform = PLATFORM_UNKNOWN;
++        return;
++    }
++
++    machine_type = std::string(sysinfo.machine);
++    thd_log_info("Detected machine architecture: %s\n", machine_type.c_str());
++
++    if (strcmp(sysinfo.machine, "x86_64") == 0) {
++        detected_platform = PLATFORM_INTEL_X86;
++    } else {
++        detected_platform = PLATFORM_OTHER;
++    }
++}
++
++platform_type_t cthd_platform::get_platform() {
++    return detected_platform;
++}
++
++std::string cthd_platform::get_machine_type() {
++    return machine_type;
++}
++
++int cthd_platform::check_cpu_id(bool &proc_list_matched) {
++    // Base implementation - to be overridden by derived classes
++    proc_list_matched = false;
++    return THD_SUCCESS;
++}
++
++void cthd_platform::workaround_rapl_mmio_power() {
++    // Base implementation - to be overridden by derived classes
++    // No workaround needed for generic platform
++}
++
++void cthd_platform::dump_platform_info() {
++    platform_type_t platform = get_platform();
++
++    thd_log_info("=== Platform Information ===\n");
++    thd_log_info("Machine Type: %s\n", get_machine_type().c_str());
++
++    switch (platform) {
++        case PLATFORM_INTEL_X86:
++            thd_log_info("Platform: Intel x86/x86_64\n");
++            break;
++        case PLATFORM_OTHER:
++            thd_log_info("Platform: Other (%s)\n", get_machine_type().c_str());
++            break;
++        case PLATFORM_UNKNOWN:
++        default:
++            thd_log_info("Platform: Unknown\n");
++            break;
++    }
++    thd_log_info("============================\n");
++}
++
++cthd_platform* cthd_platform::create_platform() {
++    // Detect platform architecture using uname
++    struct utsname sysinfo;
++    if (uname(&sysinfo) != 0) {
++        thd_log_error("Failed to get system information\n");
++        return new cthd_platform();
++    }
++
++    // Create appropriate platform instance based on architecture
++    if (strcmp(sysinfo.machine, "x86_64") == 0) {
++        thd_log_info("Creating Intel platform instance\n");
++        return new intel_platform();
++    } else {
++        thd_log_info("Creating generic platform instance for %s\n", sysinfo.machine);
++        return new cthd_platform();
++    }
++}
+diff --git a/src/thd_platform.h b/src/thd_platform.h
+new file mode 100644
+index 0000000..25746c3
+--- /dev/null
++++ b/src/thd_platform.h
+@@ -0,0 +1,58 @@
++/*
++ * thd_platform.h: Platform detection and abstraction layer
++ *
++ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 or later as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ * Author Name <priyansh.jain@oss.qualcomm.com>
++ */
++
++#ifndef THD_PLATFORM_H_
++#define THD_PLATFORM_H_
++
++#include <string>
++#include <sys/utsname.h>
++
++typedef enum {
++    PLATFORM_UNKNOWN = 0,
++    PLATFORM_INTEL_X86,
++    PLATFORM_OTHER
++} platform_type_t;
++
++class cthd_platform {
++protected:
++    platform_type_t detected_platform;
++    std::string machine_type;
++
++public:
++    cthd_platform();
++    virtual ~cthd_platform();
++
++    // Virtual methods to be overridden by derived classes
++    virtual void detect_platform();
++    virtual int check_cpu_id(bool &proc_list_matched);
++    virtual void workaround_rapl_mmio_power();
++    virtual void dump_platform_info();
++
++    // Common methods
++    platform_type_t get_platform();
++    std::string get_machine_type();
++
++    // Factory method to create appropriate platform instance
++    static cthd_platform* create_platform();
++};
++
++#endif /* THD_PLATFORM_H_ */
+diff --git a/src/thd_platform_intel.cpp b/src/thd_platform_intel.cpp
+new file mode 100644
+index 0000000..622a9ad
+--- /dev/null
++++ b/src/thd_platform_intel.cpp
+@@ -0,0 +1,238 @@
++/*
++ * thd_platform_intel.cpp: Intel platform-specific functionality implementation
++ *
++ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 or later as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ */
++
++#include "thd_platform_intel.h"
++#include "thd_common.h"
++#include "thd_engine.h"
++#include <vector>
++#include <string>
++#include <fstream>
++#include <algorithm>
++
++#ifndef ANDROID
++#ifdef __x86_64__
++#include <cpuid.h>
++#include <sys/mman.h>
++#endif
++#include <sys/stat.h>
++#endif
++
++#define BIT_ULL(nr)	(1ULL << (nr))
++
++#ifndef ANDROID
++#ifdef __x86_64__
++typedef struct {
++	unsigned int family;
++	unsigned int model;
++} supported_ids_t;
++
++static supported_ids_t intel_id_table[] = {
++    { 6, 0x2a }, // Sandybridge
++    { 6, 0x3a }, // IvyBridge
++    { 6, 0x3c }, // Haswell
++    { 6, 0x45 }, // Haswell ULT
++    { 6, 0x46 }, // Haswell ULT
++    { 6, 0x3d }, // Broadwell
++    { 6, 0x47 }, // Broadwell-GT3E
++    { 6, 0x37 }, // Valleyview BYT
++    { 6, 0x4c }, // Brasewell
++    { 6, 0x4e }, // skylake
++    { 6, 0x5e }, // skylake
++    { 6, 0x5c }, // Broxton
++    { 6, 0x7a }, // Gemini Lake
++    { 6, 0x8e }, // kabylake
++    { 6, 0x9e }, // kabylake
++    { 6, 0x66 }, // Cannonlake
++    { 6, 0x7e }, // Icelake
++    { 6, 0x8c }, // Tigerlake_L
++    { 6, 0x8d }, // Tigerlake
++    { 6, 0xa5 }, // Cometlake
++    { 6, 0xa6 }, // Cometlake_L
++    { 6, 0xa7 }, // Rocketlake
++    { 6, 0x9c }, // Jasper Lake
++    { 6, 0x97 }, // Alderlake
++    { 6, 0x9a }, // Alderlake
++    { 6, 0xb7 }, // Raptorlake
++    { 6, 0xba }, // Raptorlake
++    { 6, 0xbe }, // Alderlake N
++    { 6, 0xbf }, // Raptorlake S
++    { 6, 0xaa }, // Mateor Lake L
++    { 6, 0xbd }, // Lunar Lake M
++    { 6, 0xc6 }, // Arrow Lake
++    { 6, 0xc5 }, // Arrow Lake H
++    { 6, 0xb5 }, // Arrow Lake U
++    { 6, 0xcc }, // Panther Lake L
++    { 0, 0 } // Last Invalid entry
++};
++
++std::vector<std::string> blocklist_paths {
++    /* Some Lenovo machines have in-firmware thermal management,
++     * avoid having two entities trying to manage things.
++     * We may want to change this to dytc_perfmode once that is
++     * widely available. */
++    "/sys/devices/platform/thinkpad_acpi/dytc_lapmode",
++};
++#endif // __x86_64__
++#endif
++
++intel_platform::intel_platform() : cthd_platform() {
++    // Intel platform specific initialization
++    detect_platform();
++}
++
++intel_platform::~intel_platform() {
++}
++
++void intel_platform::detect_platform() {
++    // Call base class detection first
++    cthd_platform::detect_platform();
++
++    thd_log_info("Intel platform detected\n");
++}
++
++int intel_platform::check_cpu_id(bool &proc_list_matched) {
++#ifndef ANDROID
++#ifdef __x86_64__
++    unsigned int ebx, ecx, edx, max_level;
++    unsigned int fms, family, model, stepping;
++	unsigned int genuine_intel = 0;
++    int i = 0;
++    bool valid = false;
++
++	proc_list_matched = false;
++    ebx = ecx = edx = 0;
++
++    __cpuid(0, max_level, ebx, ecx, edx);
++    if (ebx == 0x756e6547 && edx == 0x49656e69 && ecx == 0x6c65746e)
++        genuine_intel = 1;
++    if (genuine_intel == 0) {
++        // Simply return without further capability check
++        return THD_SUCCESS;
++    }
++    __cpuid(1, fms, ebx, ecx, edx);
++    family = (fms >> 8) & 0xf;
++    model = (fms >> 4) & 0xf;
++    stepping = fms & 0xf;
++    if (family == 6 || family == 0xf)
++        model += ((fms >> 16) & 0xf) << 4;
++
++    thd_log_msg(
++            "%u CPUID levels; family:model:stepping 0x%x:%x:%x (%u:%u:%u)\n",
++            max_level, family, model, stepping, family, model, stepping);
++
++    while (intel_id_table[i].family) {
++        if (intel_id_table[i].family == family && intel_id_table[i].model == model) {
++            proc_list_matched = true;
++            valid = true;
++            break;
++        }
++        i++;
++    }
++    if (!valid) {
++        thd_log_msg(" Need Linux PowerCap sysfs\n");
++    }
++
++    for (std::string path : blocklist_paths) {
++        struct stat s;
++
++        if (!stat(path.c_str(), &s)) {
++            proc_list_matched = false;
++            thd_log_warn("[%s] present: Thermald can't run on this platform\n", path.c_str());
++            break;
++        }
++    }
++#else
++    thd_log_info("Non-x86_64 platform detected in Intel check - skipping CPUID\n");
++#endif // __x86_64__
++#endif // ANDROID
++    return THD_SUCCESS;
++}
++
++void intel_platform::workaround_rapl_mmio_power(void) {
++    // First check if workaround is enabled and needed
++    extern bool workaround_enabled;
++    if (!workaround_enabled)
++        return;
++
++    // Check if RAPL MMIO controller is already being used
++    extern cthd_engine *thd_engine;
++    if (thd_engine) {
++        cthd_cdev *cdev = thd_engine->search_cdev("rapl_controller_mmio");
++        if (cdev) {
++            /* RAPL MMIO is enabled and getting used. No need to disable */
++            return;
++        } else {
++            csys_fs _sysfs("/sys/devices/virtual/powercap/intel-rapl-mmio/intel-rapl-mmio:0/");
++
++            if (_sysfs.exists()) {
++                std::stringstream temp_str;
++
++                temp_str << "enabled";
++                if (_sysfs.write(temp_str.str(), 0) > 0)
++                    return;
++
++                thd_log_debug("Failed to write to RAPL MMIO\n");
++            }
++        }
++    }
++
++#ifndef ANDROID
++#ifdef __x86_64__
++    int map_fd;
++    void *rapl_mem;
++    unsigned char *rapl_pkg_pwr_addr;
++    unsigned long long pkg_power_limit;
++
++    unsigned int ebx, ecx, edx;
++    unsigned int fms, family, model;
++
++    ecx = edx = 0;
++    __cpuid(1, fms, ebx, ecx, edx);
++    family = (fms >> 8) & 0xf;
++    model = (fms >> 4) & 0xf;
++    if (family == 6 || family == 0xf)
++        model += ((fms >> 16) & 0xf) << 4;
++
++    // Apply for KabyLake only
++    if (model != 0x8e && model != 0x9e)
++        return;
++
++    map_fd = open("/dev/mem", O_RDWR, 0);
++    if (map_fd < 0)
++        return;
++
++    rapl_mem = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, map_fd,
++            0xfed15000);
++    if (!rapl_mem || rapl_mem == MAP_FAILED) {
++        close(map_fd);
++        return;
++    }
++
++    rapl_pkg_pwr_addr = ((unsigned char *)rapl_mem + 0x9a0);
++    pkg_power_limit = *(unsigned long long *)rapl_pkg_pwr_addr;
++    *(unsigned long long *)rapl_pkg_pwr_addr = pkg_power_limit
++            & ~BIT_ULL(15);
++
++    munmap(rapl_mem, 4096);
++    close(map_fd);
++#endif // __x86_64__
++#endif // ANDROID
++}
+diff --git a/src/thd_platform_intel.h b/src/thd_platform_intel.h
+new file mode 100644
+index 0000000..5753afe
+--- /dev/null
++++ b/src/thd_platform_intel.h
+@@ -0,0 +1,38 @@
++/*
++ * thd_platform_intel.h: Intel platform-specific functionality
++ *
++ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 or later as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ */
++
++#ifndef THD_PLATFORM_INTEL_H_
++#define THD_PLATFORM_INTEL_H_
++
++#include "thd_platform.h"
++
++class intel_platform : public cthd_platform {
++public:
++    intel_platform();
++    virtual ~intel_platform();
++
++    // Override virtual methods from base class
++    void detect_platform() override;
++    int check_cpu_id(bool &proc_list_matched) override;
++    void workaround_rapl_mmio_power() override;
++};
++
++#endif /* THD_PLATFORM_INTEL_H_ */
+-- 
+2.25.1
+

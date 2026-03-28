@@ -1,0 +1,66 @@
+Between version 0.69.4 and 0.72.1, rust-bindgen changed the kind of layout
+checks from runtime to compile-time. The old checks look like this:
+
+    assert_eq!(
+        ::std::mem::size_of::<ipc_perm>(),
+        36usize,
+        concat!("Size of: ", stringify!(ipc_perm))
+    );
+
+The new checks look like this:
+
+    const _: () = {
+        ["Size of ipc_perm"][::std::mem::size_of::<ipc_perm>() - 36usize];
+    }
+
+These new checks fail, if the pointer size of the host and the target
+architecture differ:
+
+| error[E0080]: index out of bounds: the length is 1 but the index is 12
+|  --> /build/tmp/work/riscv32imafdc-poky-linux/thin-provisioning-tools/1.3.1/build/target/release/build/devicemapper-sys-8d0196f02bac90ea/out/sem-bindings.rs:3:1175
+|   |
+| 3 | ... _ : () = { ["Size of ipc_perm"] [:: std :: mem :: size_of :: < ipc_perm > () - 36usize] ; ["Alignment of ipc_perm"] [:: std :: me...
+|   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `_` failed here
+|
+| error[E0080]: index out of bounds: the length is 1 but the index is 16
+|  --> /build/tmp/work/riscv32imafdc-poky-linux/thin-provisioning-tools/1.3.1/build/target/release/build/devicemapper-sys-8d0196f02bac90ea/out/sem-bindings.rs:3:2735
+|   |
+| 3 | ... _ : () = { ["Size of semid_ds"] [:: std :: mem :: size_of :: < semid_ds > () - 72usize] ; ["Alignment of semid_ds"] [:: std :: me...
+|   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `_` failed here
+|
+| error[E0080]: index out of bounds: the length is 1 but the index is 4
+|  --> /build/tmp/work/riscv32imafdc-poky-linux/thin-provisioning-tools/1.3.1/build/target/release/build/devicemapper-sys-8d0196f02bac90ea/out/sem-bindings.rs:3:5620
+|   |
+| 3 | ...nst _ : () = { ["Size of semun"] [:: std :: mem :: size_of :: < semun > () - 4usize] ; ["Alignment of semun"] [:: std :: mem :: al...
+|   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ evaluation of `_` failed here
+
+But according to
+https://users.rust-lang.org/t/what-to-do-when-bindgen-tests-fail/23822/2
+it's okay to skip these check:
+
+> The usual cause of mismatch is generating bindings on 64-bit platform and
+> using them on 32-bit platform.
+>
+> In that case you can often just ignore the tests (delete them), because
+> rustc will adjust the structs because they are repr(c).
+
+Upstream-Status: Inappropriate [cross-platform issue]
+
+--- a/build.rs
++++ b/build.rs
+@@ -42,6 +42,7 @@ fn main() {
+         .allowlist_type("dm_target_versions")
+         .derive_debug(true)
+         .derive_default(true)
++        .layout_tests(false)
+         .generate()
+         .expect("Could not generate dm.h bindings");
+ 
+@@ -69,6 +70,7 @@ fn main() {
+     let bindings = bindings
+         .derive_debug(true)
+         .derive_default(true)
++        .layout_tests(false)
+         .generate()
+         .expect("Could not generate sem.h bindings");
+ 

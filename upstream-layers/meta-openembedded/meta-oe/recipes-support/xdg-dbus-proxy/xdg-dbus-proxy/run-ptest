@@ -1,0 +1,2 @@
+#!/bin/sh
+gnome-desktop-testing-runner xdg-dbus-proxy

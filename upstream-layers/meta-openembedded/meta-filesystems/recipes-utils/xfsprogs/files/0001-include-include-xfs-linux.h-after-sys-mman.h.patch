@@ -1,0 +1,33 @@
+From 04a4272a36f6b2a1ad30a10fcf36a4a1c68a5449 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 23 Aug 2018 05:33:57 +0000
+Subject: [PATCH] include include/xfs/linux.h after <sys/mman.h>
+
+This helps compiling with musl which goes ahead and undefines MAP_SYNC
+for mips and other architectures where its not wired in kernel
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ io/mmap.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/io/mmap.c b/io/mmap.c
+index 4c03e3d..3763551 100644
+--- a/io/mmap.c
++++ b/io/mmap.c
+@@ -4,10 +4,11 @@
+  * All Rights Reserved.
+  */
+ 
+-#include "command.h"
+-#include "input.h"
+ #include <sys/mman.h>
+ #include <signal.h>
++
++#include "command.h"
++#include "input.h"
+ #include "init.h"
+ #include "io.h"
+ 

@@ -9,10 +9,18 @@ DEPENDS = " \
     docbook-xsl-stylesheets-native \
 "
 
-inherit meson pkgconfig
+inherit meson pkgconfig ptest-gnome
 
-SRC_URI = "git://github.com/flatpak/xdg-dbus-proxy.git;protocol=https;branch=main"
+SRC_URI = " \
+    git://github.com/flatpak/xdg-dbus-proxy.git;protocol=https;branch=main \
+    file://run-ptest \
+    "
 
 SRCREV = "1c1989e56f94b9eb3b7567f8a6e8a0aa16cba496"
+
+PACKAGECONFIG = "${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
+PACKAGECONFIG[tests] = "-Dtests=true -Dinstalled_tests=true,-Dtests=false -Dinstalled_tests=false"
+
+RDEPENDS:${PN}-ptest += "dbus"
 
 BBCLASSEXTEND = "native"

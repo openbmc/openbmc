@@ -1,0 +1,69 @@
+From 49cc7ebaf3ed86b693ac80c76a28ba0db7406374 Mon Sep 17 00:00:00 2001
+From: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+Date: Mon, 9 Mar 2026 15:50:26 +0100
+Subject: [PATCH] meson: fix cross-compilation issues
+
+Strip newline from GI_TYPELIB_PATH and LD_LIBRARY_PATH
+run_command().stdout() returns the raw shell output including a trailing
+newline. When the value is used to build a colon-separated path, the newline
+gets embedded at the end of the last path component, making the directory
+invalid and causing GObject Introspection to fail with:
+
+  ImportError: Typelib file for namespace 'Gio', version '2.0' not found
+
+Use .strip() to remove leading/trailing whitespace from both env variable
+reads.
+
+Fix jansson SONAME detection for cross-compilation
+When cross-compiling, jansson's pkg-config 'libdir' variable returns a
+path relative to the sysroot (e.g., /usr/lib) without the actual sysroot
+prefix.  The host readelf binary cannot find the library at that path.
+
+Fix this by using meson.get_external_property('sys_root', '') to obtain
+the sysroot path set by the cross-compilation environment and prepend it
+to the library path before calling readelf.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/NetworkManager/NetworkManager/-/merge_requests/2380]
+Signed-off-by: Andrej Kozemcak <andrej.kozemcak@siemens.com>
+---
+ meson.build                       | 3 ++-
+ src/libnm-client-impl/meson.build | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 8b0334240d..75f6871dd2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -296,7 +296,8 @@ config_h.set10('WITH_JANSSON', jansson_dep.found())
+ jansson_msg = 'no'
+ if jansson_dep.found()
+   jansson_libdir = jansson_dep.get_variable(pkgconfig: 'libdir')
+-  res = run_command(find_program('eu-readelf', 'readelf'), '-d', join_paths(jansson_libdir, 'libjansson.so'), check: false)
++  jansson_sysroot = meson.is_cross_build() ? meson.get_external_property('sys_root', '') : ''
++  res = run_command(find_program('eu-readelf', 'readelf'), '-d', jansson_sysroot + join_paths(jansson_libdir, 'libjansson.so'), check: false)
+   jansson_soname = ''
+   foreach line: res.stdout().split('\n')
+     if line.strip().contains('SONAME')
+diff --git a/src/libnm-client-impl/meson.build b/src/libnm-client-impl/meson.build
+index 3352ebfee0..329078ab46 100644
+--- a/src/libnm-client-impl/meson.build
++++ b/src/libnm-client-impl/meson.build
+@@ -167,13 +167,13 @@ if enable_introspection
+     install: true,
+   )
+ 
+-  gi_typelib_path = run_command('printenv', 'GI_TYPELIB_PATH', check: false).stdout()
++  gi_typelib_path = run_command('printenv', 'GI_TYPELIB_PATH', check: false).stdout().strip()
+   if gi_typelib_path != ''
+     gi_typelib_path = ':' + gi_typelib_path
+   endif
+   gi_typelib_path = meson.current_build_dir() + gi_typelib_path
+ 
+-  ld_library_path = run_command('printenv', 'LD_LIBRARY_PATH', check: false).stdout()
++  ld_library_path = run_command('printenv', 'LD_LIBRARY_PATH', check: false).stdout().strip()
+   if ld_library_path != ''
+     ld_library_path = ':' + ld_library_path
+   endif
+-- 
+2.47.3
+

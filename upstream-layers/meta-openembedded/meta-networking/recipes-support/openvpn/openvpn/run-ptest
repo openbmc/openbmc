@@ -1,8 +1,20 @@
 #!/bin/sh
 
-find ./ -name Makefile | while read -r x; do
-    make -C "$(dirname "${x}")" -k runtest-TESTS | sed \
+# Run unit tests directly
+find ./ -name "*testdriver" -type f -executable | while read -r t; do
+    dir=$(dirname "${t}")
+    srcdir="${dir}" "${t}" 2>&1 | sed \
         -e 's/^\(\[       OK \].*\)$/PASS: \1/' \
         -e 's/^\(\[  FAILED  \].*\)$/FAIL: \1/' \
         -e 's/^\(\[  SKIPPED \].*\)$/SKIP: \1/'
 done
+
+# Run crypto loopback integration test
+if [ -f ./t_lpback.sh ]; then
+    sh ./t_lpback.sh 2>&1
+    if [ $? -eq 0 ]; then
+        echo "PASS: t_lpback"
+    else
+        echo "FAIL: t_lpback"
+    fi
+fi

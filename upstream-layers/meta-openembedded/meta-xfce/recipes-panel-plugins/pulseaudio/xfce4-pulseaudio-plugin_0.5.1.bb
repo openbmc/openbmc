@@ -7,7 +7,7 @@ XFCE_COMPRESS_TYPE = "xz"
 
 inherit xfce-panel-plugin features_check
 
-REQUIRED_DISTRO_FEATURES = "pulseaudio"
+REQUIRED_DISTRO_FEATURES = "pulseaudio ${@bb.utils.contains_any('DISTRO_FEATURES', 'opengl vulkan', 'x11', '', d)}"
 
 DEPENDS += "dbus-glib pulseaudio"
 

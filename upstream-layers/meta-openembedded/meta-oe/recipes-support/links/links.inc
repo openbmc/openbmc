@@ -8,6 +8,7 @@ DEPENDS = "jpeg libpng flex openssl zlib"
 
 SRC_URI = "http://links.twibright.com/download/links-${PV}.tar.bz2 \
            file://ac-prog-cxx.patch \
+           file://0001-Adjust-for-c23-prototype-for-strchr.patch \
 "
 
 PACKAGECONFIG ??= ""

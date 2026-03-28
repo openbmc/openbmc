@@ -4,7 +4,6 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 SRC_URI = "https://github.com/${BPN}/${BPN}/releases/download/${PV}/${BP}.tar.gz \
-           file://disable-documentation.patch \
            file://tinyproxy.service \
            file://tinyproxy.conf \
            file://run-ptest \
@@ -21,6 +20,7 @@ EXTRA_OECONF += " \
 	--enable-reverse \
 	--enable-upstream \
 	--enable-xtinyproxy \
+        --enable-manpage_support=no \
 	"
 
 inherit autotools systemd useradd ptest

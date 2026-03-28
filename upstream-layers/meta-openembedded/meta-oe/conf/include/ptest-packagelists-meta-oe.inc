@@ -13,6 +13,7 @@ PTESTS_FAST_META_OE = "\
     cjson \
     cli11 \
     cmocka \
+    conserver \
     cunit \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'dbus-broker', '', d)} \
     duktape \
@@ -51,14 +52,12 @@ PTESTS_FAST_META_OE = "\
     onig \
     oprofile \
     pegtl \
-    protobuf \
     pv \
     sdbus-c++ \
     tomlplusplus \
     uriparser \
     utf8proc \
     uthash \
-    xmlsec1 \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'xrdp', '', d)} \
     zeromq \
 "
@@ -76,6 +75,7 @@ PTESTS_SLOW_META_OE = "\
     fftw \
     libusb-compat \
     mariadb \
+    postgresql \
     re2 \
     rocksdb \
 "

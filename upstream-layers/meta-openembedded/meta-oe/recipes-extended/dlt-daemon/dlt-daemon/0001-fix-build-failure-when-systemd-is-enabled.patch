@@ -1,0 +1,423 @@
+From 28322f951bb8510ddb4cf767426a67c81ce826ab Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Tue, 17 Mar 2026 13:04:11 +0800
+Subject: [PATCH] fix build failure when systemd is enabled
+
+Fix build failures when -DWITH_SYSTEMD=ON, -DWITH_SYSTEMD_WATCHDOG=ON,
+-DWITH_SYSTEMD_JOURNAL=ON:
+Eg:
+src/system/dlt-system-syslog.c:91:39: error: conversion from 'int' to '__uint16_t' {aka 'short unsigned int'} may change value [-Werror=conversion]
+   91 |     syslog_addr.sin6_port = htons(opts.Port);
+      |                                   ~~~~^~~~~
+
+src/system/dlt-system-logfile.c:74:21: error: conversion from 'size_t' {aka 'long unsigned int'} to 'int' may change value [-Werror=conversion]
+   74 |             bytes = fread(buffer, 1, sizeof(buffer) - 1, pFile);
+      |                     ^~~~~
+
+src/daemon/dlt-daemon.c:5513:14: error: unused variable 'curr_time' [-Werror=unused-variable]
+ 5513 |     uint32_t curr_time = 0U;
+      |              ^~~~~~~~~
+
+src/system/dlt-system-syslog.c:120:22: error: conversion from 'ssize_t' {aka 'long int'} to 'int' may change value [-Werror=conversion]
+  120 |     int bytes_read = recvfrom(sock, recv_data, RECV_BUF_SZ, 0,
+      |                      ^~~~~~~~
+
+src/system/dlt-system-logfile.c:76:23: error: comparison of unsigned expression in '>= 0' is always true [-Werror=type-limits]
+   76 |             if (bytes >= 0)
+      |                       ^~
+
+ src/system/dlt-system-filetransfer.c:727:56: error: '__builtin___snprintf_chk' output may be truncated before the last format cha    racter [-Werror=format-truncation=]
+ 10   727 |                         snprintf(tosend, length, "%s/%s", opts->Directory[j], ie->name);
+
+src/system/dlt-system-filetransfer.c:153: error: declaration of 'len' shadows a previous local [-Werror=shadow]
+
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/828]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/daemon/dlt-daemon.c                  |  8 +----
+ src/daemon/dlt_daemon_client.c           |  2 +-
+ src/system/dlt-system-filetransfer.c     | 43 +++++++++++++-----------
+ src/system/dlt-system-journal.c          |  2 +-
+ src/system/dlt-system-logfile.c          |  4 +--
+ src/system/dlt-system-process-handling.c |  2 +-
+ src/system/dlt-system-processes.c        |  2 +-
+ src/system/dlt-system-syslog.c           |  6 ++--
+ src/system/dlt-system-watchdog.c         |  8 ++---
+ systemd/3rdparty/sd-daemon.c             |  5 +--
+ 10 files changed, 40 insertions(+), 42 deletions(-)
+
+diff --git a/src/daemon/dlt-daemon.c b/src/daemon/dlt-daemon.c
+index ef42f89..8c318a4 100644
+--- a/src/daemon/dlt-daemon.c
++++ b/src/daemon/dlt-daemon.c
+@@ -1620,7 +1620,7 @@ int main(int argc, char *argv[])
+             watchdogTimeoutSeconds = 30;
+         }
+ 
+-        daemon.watchdog_trigger_interval = watchdogTimeoutSeconds;
++        daemon.watchdog_trigger_interval = (unsigned int)watchdogTimeoutSeconds;
+         daemon.watchdog_last_trigger_time = 0U;
+         create_timer_fd(&daemon_local,
+                         watchdogTimeoutSeconds,
+@@ -5509,9 +5509,6 @@ int dlt_daemon_send_ringbuffer_to_client(DltDaemon *daemon, DltDaemonLocal *daem
+     int ret;
+     static uint8_t data[DLT_DAEMON_RCVBUFSIZE];
+     int length;
+-#ifdef DLT_SYSTEMD_WATCHDOG_ENABLE
+-    uint32_t curr_time = 0U;
+-#endif
+ 
+     PRINT_FUNCTION_VERBOSE(verbose);
+ 
+@@ -5554,9 +5551,6 @@ int dlt_daemon_send_ringbuffer_to_client_v2(DltDaemon *daemon, DltDaemonLocal *d
+     int ret;
+     static uint8_t data[DLT_DAEMON_RCVBUFSIZE];
+     int length;
+-#ifdef DLT_SYSTEMD_WATCHDOG_ENABLE
+-    uint32_t curr_time = 0U;
+-#endif
+ 
+     PRINT_FUNCTION_VERBOSE(verbose);
+ 
+diff --git a/src/daemon/dlt_daemon_client.c b/src/daemon/dlt_daemon_client.c
+index 20a512b..681bf1e 100644
+--- a/src/daemon/dlt_daemon_client.c
++++ b/src/daemon/dlt_daemon_client.c
+@@ -4690,7 +4690,7 @@ int dlt_daemon_process_systemd_timer(DltDaemon *daemon,
+ 
+     if ((daemon_local == NULL) || (daemon == NULL) || (receiver == NULL)) {
+         dlt_vlog(LOG_ERR, "%s: invalid parameters", __func__);
+-        return res;
++        return (int)res;
+     }
+ 
+     res = read(receiver->fd, &expir, sizeof(expir));
+diff --git a/src/system/dlt-system-filetransfer.c b/src/system/dlt-system-filetransfer.c
+index c082f22..6024a3e 100644
+--- a/src/system/dlt-system-filetransfer.c
++++ b/src/system/dlt-system-filetransfer.c
+@@ -105,14 +105,14 @@ char *unique_name(char *src)
+             DLT_STRING("dlt-system-filetransfer, creating unique temporary file name."));
+     time_t t = time(NULL);
+     int ok;
+-    uint32_t l = getFileSerialNumber(src, &ok) ^ t;
++    uint32_t l = (uint32_t)(getFileSerialNumber(src, &ok) ^ t);
+ 
+     if (!ok)
+         return (char *)NULL;
+ 
+     char *basename_f = basename(src);
+     /* Length of ULONG_MAX + 1 */
+-    int len = 11 + strlen(basename_f);
++    size_t len = 11 + strlen(basename_f);
+ 
+     if (len > NAME_MAX) {
+         DLT_LOG(dltsystem, DLT_LOG_WARN,
+@@ -155,7 +155,7 @@ void send_dumped_file(FiletransferOptions const *opts, char *dst_tosend)
+             while ((total - used) < (total / 2)) {
+                 struct timespec t;
+                 t.tv_sec = 0;
+-                t.tv_nsec = 1000000ul * opts->TimeoutBetweenLogs;
++                t.tv_nsec = (long int)(1000000ul * (unsigned long)opts->TimeoutBetweenLogs);
+                 nanosleep(&t, NULL);
+                 dlt_user_log_resend_buffer();
+                 dlt_user_check_buffer(&total, &used);
+@@ -220,7 +220,7 @@ int compress_file_to(char *src, char *dst, int level)
+     MALLOC_ASSERT(buf);
+ 
+     while (!feof(src_file)) {
+-        int read = fread(buf, 1, Z_CHUNK_SZ, src_file);
++        size_t read = fread(buf, 1, Z_CHUNK_SZ, src_file);
+ 
+         if (ferror(src_file)) {
+             free(buf);
+@@ -230,7 +230,7 @@ int compress_file_to(char *src, char *dst, int level)
+             return -1;
+         }
+ 
+-        gzwrite(dst_file, buf, read);
++        gzwrite(dst_file, buf, (unsigned int)read);
+     }
+ 
+     if (remove(src) < 0)
+@@ -290,7 +290,7 @@ int send_one(char *src, FiletransferOptions const *opts, int which)
+         char *dst_tocompress;/*file which is going to be compressed, the compressed one is named dst_tosend */
+ 
+ 
+-        int len = strlen(fdir) + strlen(SUBDIR_COMPRESS) + strlen(rn) + 3;/*the filename in .tocompress +2 for 2*"/", +1 for \0 */
++        size_t len = strlen(fdir) + strlen(SUBDIR_COMPRESS) + strlen(rn) + 3;/*the filename in .tocompress +2 for 2*"/", +1 for \0 */
+         dst_tocompress = malloc(len);
+         MALLOC_ASSERT(dst_tocompress);
+ 
+@@ -328,7 +328,7 @@ int send_one(char *src, FiletransferOptions const *opts, int which)
+         /*move it directly into "tosend" */
+         DLT_LOG(dltsystem, DLT_LOG_DEBUG,
+                 DLT_STRING("dlt-system-filetransfer, Moving file to tmp directory."));
+-        int len = strlen(fdir) + strlen(SUBDIR_TOSEND) + strlen(rn) + 3;
++        size_t len = strlen(fdir) + strlen(SUBDIR_TOSEND) + strlen(rn) + 3;
+         dst_tosend = malloc(len);/*the resulting filename in .tosend +2 for 2*"/", +1 for \0 */
+ 
+         snprintf(dst_tosend, len, "%s/%s/%s", fdir, SUBDIR_TOSEND, rn);
+@@ -379,7 +379,7 @@ int flush_dir_send(FiletransferOptions const *opts, const char *compress_dir, co
+             DLT_LOG(dltsystem, DLT_LOG_DEBUG,
+                     DLT_STRING("dlt-system-filetransfer, old compressed file found in send directory:"),
+                     DLT_STRING(dp->d_name));
+-            int len = strlen(send_dir) + strlen(dp->d_name) + 2;
++            size_t len = strlen(send_dir) + strlen(dp->d_name) + 2;
+             fn = malloc(len);
+             MALLOC_ASSERT(fn);
+             snprintf(fn, len, "%s/%s", send_dir, dp->d_name);
+@@ -394,10 +394,10 @@ int flush_dir_send(FiletransferOptions const *opts, const char *compress_dir, co
+                 strncpy(tmp, dp->d_name, strlen(dp->d_name) - strlen(COMPRESS_EXTENSION));
+                 tmp[strlen(dp->d_name) - strlen(COMPRESS_EXTENSION)] = '\0';
+ 
+-                int len = strlen(tmp) + strlen(compress_dir) + 1 + 1;/*2 sizes + 1*"/" + \0 */
+-                char *path_uncompressed = malloc(len);
++                size_t length = strlen(tmp) + strlen(compress_dir) + 1 + 1;/*2 sizes + 1*"/" + \0 */
++                char *path_uncompressed = malloc(length);
+                 MALLOC_ASSERT(path_uncompressed);
+-                snprintf(path_uncompressed, len, "%s/%s", compress_dir, tmp);
++                snprintf(path_uncompressed, length, "%s/%s", compress_dir, tmp);
+ 
+                 struct stat sb;
+ 
+@@ -475,7 +475,7 @@ int flush_dir_compress(FiletransferOptions const *opts, int which, const char *c
+ 
+ 
+             /*compress file into to_send dir */
+-            int len = strlen(compress_dir) + strlen(dp->d_name) + 2;
++            size_t len = strlen(compress_dir) + strlen(dp->d_name) + 2;
+             char *cd_filename = malloc(len);
+             MALLOC_ASSERT(cd_filename);
+             snprintf(cd_filename, len, "%s/%s", compress_dir, dp->d_name);
+@@ -526,7 +526,7 @@ int flush_dir_original(FiletransferOptions const *opts, int which)
+ 
+             DLT_LOG(dltsystem, DLT_LOG_DEBUG,
+                     DLT_STRING("dlt-system-filetransfer, old file found in directory."));
+-            int len = strlen(sdir) + strlen(dp->d_name) + 2;
++            size_t len = strlen(sdir) + strlen(dp->d_name) + 2;
+             char *fn = malloc(len);
+             MALLOC_ASSERT(fn);
+             snprintf(fn, len, "%s/%s", sdir, dp->d_name);
+@@ -564,7 +564,7 @@ int flush_dir(FiletransferOptions const *opts, int which)
+ 
+     char *compress_dir;
+     char *send_dir;
+-    int len = strlen(opts->Directory[which]) + strlen(SUBDIR_COMPRESS) + 2;
++    size_t len = strlen(opts->Directory[which]) + strlen(SUBDIR_COMPRESS) + 2;
+     compress_dir = malloc (len);
+     MALLOC_ASSERT(compress_dir);
+     snprintf(compress_dir, len, "%s/%s", opts->Directory[which], SUBDIR_COMPRESS);
+@@ -625,7 +625,7 @@ int init_filetransfer_dirs(DltSystemConfiguration *config)
+         /*create subdirectories for processing the files */
+ 
+         char *subdirpath;
+-        int len = strlen(opts->Directory[i]) + strlen(SUBDIR_COMPRESS) + 2;
++        size_t len = strlen(opts->Directory[i]) + strlen(SUBDIR_COMPRESS) + 2;
+         subdirpath = malloc (len);
+         MALLOC_ASSERT(subdirpath);
+         snprintf(subdirpath, len, "%s/%s", opts->Directory[i], SUBDIR_COMPRESS);
+@@ -699,7 +699,7 @@ int process_files(FiletransferOptions const *opts)
+ 
+     unsigned int i = 0;
+ 
+-    while (i < (len - INOTIFY_SZ)) {
++    while (i < ((long unsigned int)len - INOTIFY_SZ)) {
+         struct inotify_event *ie = (struct inotify_event *)&buf[i];
+ 
+         if (ie->len > 0) {
+@@ -712,26 +712,29 @@ int process_files(FiletransferOptions const *opts)
+                                 DLT_LOG_DEBUG,
+                                 DLT_STRING("dlt-system-filetransfer, found new file."),
+                                 DLT_STRING(ie->name));
+-                        int length = strlen(opts->Directory[j]) + ie->len + 1;
++                        size_t length = strlen(opts->Directory[j]) + strlen(ie->name) + 2;
+ 
+                         if (length > PATH_MAX) {
+                             DLT_LOG(filetransferContext,
+                                     DLT_LOG_ERROR,
+                                     DLT_STRING(
+                                         "dlt-system-filetransfer: Very long path for file transfer. Cancelling transfer! Length is: "),
+-                                    DLT_INT(length));
++                                    DLT_INT((int)length));
+                             return -1;
+                         }
+ 
+                         char *tosend = malloc(length);
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-truncation="
+                         snprintf(tosend, length, "%s/%s", opts->Directory[j], ie->name);
++#pragma GCC diagnostic pop
+                         send_one(tosend, opts, j);
+                         free(tosend);
+                     }
+             }
+         }
+ 
+-        i += INOTIFY_SZ + ie->len;
++        i += (unsigned int)INOTIFY_SZ + ie->len;
+     }
+ 
+ #endif
+@@ -741,4 +744,4 @@ int process_files(FiletransferOptions const *opts)
+ void filetransfer_fd_handler(DltSystemConfiguration *config)
+ {
+     process_files(&(config->Filetransfer));
+-}
+\ No newline at end of file
++}
+diff --git a/src/system/dlt-system-journal.c b/src/system/dlt-system-journal.c
+index 366555b..9a55c3f 100644
+--- a/src/system/dlt-system-journal.c
++++ b/src/system/dlt-system-journal.c
+@@ -393,7 +393,7 @@ void register_journal_fd(sd_journal **j, struct pollfd *pollfd, int i,  DltSyste
+             DLT_STRING(strerror(pollfd[i].fd)));
+         j_tmp = NULL;
+     }
+-    pollfd[i].events = sd_journal_get_events(j_tmp);
++    pollfd[i].events = (short)sd_journal_get_events(j_tmp);
+     if(pollfd[i].events < 0) {
+         DLT_LOG(dltsystem, DLT_LOG_ERROR, DLT_STRING("Error while getting journal events: "), 
+             DLT_STRING(strerror(pollfd[i].events)));
+diff --git a/src/system/dlt-system-logfile.c b/src/system/dlt-system-logfile.c
+index 941a3be..d31441c 100644
+--- a/src/system/dlt-system-logfile.c
++++ b/src/system/dlt-system-logfile.c
+@@ -64,7 +64,7 @@ void send_file(LogFileOptions const *fileopt, int n)
+     FILE *pFile;
+     DltContext context = logfileContext[n];
+     char buffer[1024];
+-    int bytes;
++    size_t bytes;
+     int seq = 1;
+ 
+     pFile = fopen((*fileopt).Filename[n], "r");
+@@ -73,7 +73,7 @@ void send_file(LogFileOptions const *fileopt, int n)
+         while (!feof(pFile)) {
+             bytes = fread(buffer, 1, sizeof(buffer) - 1, pFile);
+ 
+-            if (bytes >= 0)
++            if (bytes == (sizeof(buffer) - 1))
+                 buffer[bytes] = 0;
+             else
+                 buffer[0] = 0;
+diff --git a/src/system/dlt-system-process-handling.c b/src/system/dlt-system-process-handling.c
+index 3e092d4..708e9e3 100644
+--- a/src/system/dlt-system-process-handling.c
++++ b/src/system/dlt-system-process-handling.c
+@@ -201,7 +201,7 @@ int register_timer_fd(struct pollfd *pollfd, int fdcnt)
+ void timer_fd_handler(int fd, DltSystemConfiguration *config)
+ {
+     uint64_t timersElapsed = 0ULL;
+-    int r = read(fd, &timersElapsed, 8U);    // only needed to reset fd event
++    int r = (int)read(fd, &timersElapsed, 8U);    // only needed to reset fd event
+     if (r < 0) 
+         DLT_LOG(dltsystem, DLT_LOG_ERROR, DLT_STRING("Error while reading timer fd: "), 
+             DLT_STRING(strerror(r)));
+diff --git a/src/system/dlt-system-processes.c b/src/system/dlt-system-processes.c
+index c35596c..b17b8ee 100644
+--- a/src/system/dlt-system-processes.c
++++ b/src/system/dlt-system-processes.c
+@@ -72,7 +72,7 @@ void send_process(LogProcessOptions const *popts, int n)
+     struct dirent *dp;
+     char filename[PATH_MAX];
+     char buffer[1024];
+-    int bytes;
++    size_t bytes;
+     int found = 0;
+ 
+     /* go through all process files in directory */
+diff --git a/src/system/dlt-system-syslog.c b/src/system/dlt-system-syslog.c
+index 59e9d3f..d6b1b8a 100644
+--- a/src/system/dlt-system-syslog.c
++++ b/src/system/dlt-system-syslog.c
+@@ -88,7 +88,7 @@ int init_socket(SyslogOptions opts)
+ #ifdef DLT_USE_IPv6
+     syslog_addr.sin6_family = AF_INET6;
+     syslog_addr.sin6_addr = in6addr_any;
+-    syslog_addr.sin6_port = htons(opts.Port);
++    syslog_addr.sin6_port = htons((uint16_t)opts.Port);
+ #else
+     syslog_addr.sin_family = AF_INET;
+     syslog_addr.sin_addr.s_addr = INADDR_ANY;
+@@ -117,7 +117,7 @@ int read_socket(int sock)
+     struct sockaddr_in client_addr;
+     socklen_t addr_len = sizeof(struct sockaddr_in);
+ 
+-    int bytes_read = recvfrom(sock, recv_data, RECV_BUF_SZ, 0,
++    int bytes_read = (int)recvfrom(sock, recv_data, RECV_BUF_SZ, 0,
+                               (struct sockaddr *)&client_addr, &addr_len);
+ 
+     if (bytes_read == -1) {
+@@ -157,4 +157,4 @@ int register_syslog_fd(struct pollfd *pollfd, int i, DltSystemConfiguration *con
+ void syslog_fd_handler(int syslogSock)
+ {
+     read_socket(syslogSock);
+-}
+\ No newline at end of file
++}
+diff --git a/src/system/dlt-system-watchdog.c b/src/system/dlt-system-watchdog.c
+index 7ed1604..6334214 100644
+--- a/src/system/dlt-system-watchdog.c
++++ b/src/system/dlt-system-watchdog.c
+@@ -56,7 +56,7 @@ int calculate_period(struct itimerspec *itval)
+     }
+     
+     DLT_LOG(watchdogContext, DLT_LOG_DEBUG, DLT_STRING("watchdogusec: "), DLT_STRING(watchdogUSec));
+-    watchdogTimeoutSeconds = atoi(watchdogUSec);
++    watchdogTimeoutSeconds = (unsigned int)atoi(watchdogUSec);
+ 
+     if (watchdogTimeoutSeconds <= 0) {
+         snprintf(str, 512, "systemd watchdog timeout incorrect: %u\n", watchdogTimeoutSeconds);
+@@ -78,9 +78,9 @@ int calculate_period(struct itimerspec *itval)
+     sec = notifiyPeriodNSec / 1000000;
+     ns = (notifiyPeriodNSec - (sec * 1000000)) * 1000;
+     itval->it_interval.tv_sec = sec;
+-    itval->it_interval.tv_nsec = ns;
++    itval->it_interval.tv_nsec = (long int)ns;
+     itval->it_value.tv_sec = sec;
+-    itval->it_value.tv_nsec = ns;
++    itval->it_value.tv_nsec = (long int)ns;
+ 
+     return 0;
+ }
+@@ -114,7 +114,7 @@ void watchdog_fd_handler(int fd)
+ #endif
+ {
+     uint64_t timersElapsed = 0ULL;
+-    int r = read(fd, &timersElapsed, 8U);    // only needed to reset fd event
++    int r = (int)read(fd, &timersElapsed, 8U);    // only needed to reset fd event
+     if(r < 0)
+         DLT_LOG(watchdogContext, DLT_LOG_ERROR, DLT_STRING("Could not reset systemd watchdog. Exit with: "), 
+             DLT_STRING(strerror(r)));
+diff --git a/systemd/3rdparty/sd-daemon.c b/systemd/3rdparty/sd-daemon.c
+index de3f985..9fde8cc 100644
+--- a/systemd/3rdparty/sd-daemon.c
++++ b/systemd/3rdparty/sd-daemon.c
+@@ -46,6 +46,7 @@
+ #include <stdio.h>
+ #include <stddef.h>
+ #include <limits.h>
++#include <stdint.h>
+ 
+ #if defined(__linux__)
+ #include <mqueue.h>
+@@ -456,12 +457,12 @@ _sd_export_ int sd_notify(int unset_environment, const char *state) {
+                 sockaddr.un.sun_path[0] = 0;
+ 
+         memset(&iovec, 0, sizeof(iovec));
+-        iovec.iov_base = (char*) state;
++        iovec.iov_base = (void *)(uintptr_t)state;
+         iovec.iov_len = strlen(state);
+ 
+         memset(&msghdr, 0, sizeof(msghdr));
+         msghdr.msg_name = &sockaddr;
+-        msghdr.msg_namelen = offsetof(struct sockaddr_un, sun_path) + strlen(e);
++        msghdr.msg_namelen = (socklen_t)(offsetof(struct sockaddr_un, sun_path) + strlen(e));
+ 
+         if (msghdr.msg_namelen > sizeof(struct sockaddr_un))
+                 msghdr.msg_namelen = sizeof(struct sockaddr_un);
+-- 
+2.34.1
+

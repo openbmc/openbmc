@@ -1,0 +1,58 @@
+[Unit]
+Description=Console server
+Documentation=man:conserver(8)
+Documentation=https://www.conserver.com/
+After=network.target
+ConditionPathExists=/etc/conserver.cf
+
+[Service]
+Type=exec
+ExecStart=/usr/sbin/conserver -C /etc/conserver.cf
+ExecReload=+kill -HUP $MAINPID
+User=conserver
+# /run/conserver for Unix domain socket
+RuntimeDirectory=conserver
+
+CapabilityBoundingSet=
+
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+# No access to /dev/...
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+
+# strict: mounts the whole system read-only
+# full: mount only /var as read-write
+# true: mount /var and /etc as read-write
+ProtectSystem=full
+# Make some paths writable
+#ReadWritePaths=/…
+ProtectHome=true
+
+# Make sure that the process can only see PIDs and process details of itself,
+# and the second option disables seeing details of things like system load and
+# I/O etc
+ProtectProc=invisible
+ProcSubset=pid
+
+RemoveIPC=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources @obsolete
+
+
+[Install]
+WantedBy=multi-user.target

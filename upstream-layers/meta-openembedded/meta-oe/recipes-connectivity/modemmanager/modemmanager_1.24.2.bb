@@ -37,9 +37,8 @@ PACKAGECONFIG[vala] = "-Dvapi=true,-Dvapi=false"
 
 inherit upstream-version-is-even ${@bb.utils.contains('PACKAGECONFIG', 'vala', 'vala', '', d)}
 
-EXTRA_OEMESON = " \
+EXTRA_OEMESON += " \
     -Dudevdir=${nonarch_base_libdir}/udev \
-    -Dqrtr=false \
 "
 
 FILES:${PN} += " \

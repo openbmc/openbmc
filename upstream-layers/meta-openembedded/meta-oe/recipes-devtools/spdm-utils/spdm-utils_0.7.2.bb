@@ -15,7 +15,9 @@ SRC_URI += "git://github.com/westerndigitalcorporation/spdm-utils.git;protocol=h
 
 include spdm-utils-crates.inc
 
-SRCREV = "f67ac9e00b79f603ecbbd29928a4ecc3dec5abd5"
+SRCREV = "8805327c9ac0d354c6ef891ccdd0527bbecf80e0"
+
+PV .= "+git"
 
 DEPENDS += "libspdm udev clang-native bindgen-cli-native pciutils"
 

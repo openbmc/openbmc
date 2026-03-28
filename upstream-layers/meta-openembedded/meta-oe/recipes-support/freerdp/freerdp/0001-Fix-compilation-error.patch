@@ -1,0 +1,101 @@
+From 0d48a9cb6e25afa10e76de75232ad32a82806aae Mon Sep 17 00:00:00 2001
+From: Ankur Tyagi <ankur.tyagi85@gmail.com>
+Date: Wed, 25 Mar 2026 00:04:42 +1300
+Subject: [PATCH] Fix compilation error
+
+Upstream-Status: Backport [https://github.com/FreeRDP/FreeRDP/commit/b78cb455cbe847da934c777189b6e7f25267502e]
+
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
+---
+ winpr/include/winpr/collections.h        |  2 +-
+ winpr/libwinpr/utils/collections/Queue.c | 28 ++++++++++++++++++------
+ 2 files changed, 22 insertions(+), 8 deletions(-)
+
+diff --git a/winpr/include/winpr/collections.h b/winpr/include/winpr/collections.h
+index b8c8d9d66..64705751e 100644
+--- a/winpr/include/winpr/collections.h
++++ b/winpr/include/winpr/collections.h
+@@ -63,7 +63,7 @@ extern "C"
+ 		int head;
+ 		int tail;
+ 		int size;
+-		void** array;
++		uintptr_t* array;
+ 		CRITICAL_SECTION lock;
+ 		HANDLE event;
+ 
+diff --git a/winpr/libwinpr/utils/collections/Queue.c b/winpr/libwinpr/utils/collections/Queue.c
+index bb789b658..6b86f7ab7 100644
+--- a/winpr/libwinpr/utils/collections/Queue.c
++++ b/winpr/libwinpr/utils/collections/Queue.c
+@@ -34,6 +34,16 @@
+  * Properties
+  */
+ 
++static inline void* uptr2void(uintptr_t ptr)
++{
++	return (void*)ptr;
++}
++
++static inline uintptr_t void2uptr(const void* ptr)
++{
++	return (uintptr_t)ptr;
++}
++
+ /**
+  * Gets the number of elements contained in the Queue.
+  */
+@@ -98,9 +108,12 @@ void Queue_Clear(wQueue* queue)
+ 	for (index = queue->head; index != queue->tail; index = (index + 1) % queue->capacity)
+ 	{
+ 		if (queue->object.fnObjectFree)
+-			queue->object.fnObjectFree(queue->array[index]);
++		{
++			void* obj = uptr2void(queue->array[index]);
++			queue->object.fnObjectFree(obj);
++		}
+ 
+-		queue->array[index] = NULL;
++		queue->array[index] = 0;
+ 	}
+ 
+ 	queue->size = 0;
+@@ -124,7 +137,8 @@ BOOL Queue_Contains(wQueue* queue, void* obj)
+ 
+ 	for (index = 0; index < queue->tail; index++)
+ 	{
+-		if (queue->object.fnObjectEquals(queue->array[index], obj))
++		void* ptr = uptr2void(queue->array[index]);
++		if (queue->object.fnObjectEquals(ptr, obj))
+ 		{
+ 			found = TRUE;
+ 			break;
+@@ -217,7 +231,7 @@ BOOL Queue_Enqueue(wQueue* queue, void* obj)
+ 	if (!Queue_EnsureCapacity(queue, 1))
+ 		goto out;
+ 
+-	queue->array[queue->tail] = obj;
++	queue->array[queue->tail] = void2uptr(obj);
+ 	queue->tail = (queue->tail + 1) % queue->capacity;
+ 	queue->size++;
+ 	SetEvent(queue->event);
+@@ -242,8 +256,8 @@ void* Queue_Dequeue(wQueue* queue)
+ 
+ 	if (queue->size > 0)
+ 	{
+-		obj = queue->array[queue->head];
+-		queue->array[queue->head] = NULL;
++		obj = uptr2void(queue->array[queue->head]);
++		queue->array[queue->head] = 0;
+ 		queue->head = (queue->head + 1) % queue->capacity;
+ 		queue->size--;
+ 	}
+@@ -269,7 +283,7 @@ void* Queue_Peek(wQueue* queue)
+ 		EnterCriticalSection(&queue->lock);
+ 
+ 	if (queue->size > 0)
+-		obj = queue->array[queue->head];
++		obj = uptr2void(queue->array[queue->head]);
+ 
+ 	if (queue->synchronized)
+ 		LeaveCriticalSection(&queue->lock);

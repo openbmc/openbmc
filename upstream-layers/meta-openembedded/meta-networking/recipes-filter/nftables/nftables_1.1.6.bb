@@ -16,7 +16,7 @@ SRC_URI = "http://www.netfilter.org/projects/nftables/files/${BP}.tar.xz \
           "
 SRC_URI[sha256sum] = "372931bda8556b310636a2f9020adc710f9bab66f47efe0ce90bff800ac2530c"
 
-inherit autotools manpages pkgconfig ptest
+inherit autotools manpages pkgconfig ptest python3native
 
 PACKAGECONFIG ?= "python readline json"
 PACKAGECONFIG[editline] = "--with-cli=editline, , libedit, , , linenoise readline"

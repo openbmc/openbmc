@@ -1,0 +1,49 @@
+From d3561f125e6e6d6bfea0b41ba1ea02d14eb07244 Mon Sep 17 00:00:00 2001
+From: Zhang Peng <peng.zhang1.cn@windriver.com>
+Date: Tue, 17 Mar 2026 17:14:33 +0800
+Subject: [PATCH] meson.build: hard code path to iceauth
+
+Workaround find_program() which finds the native iceauth during
+cross-compilation instead of the target path.
+
+This is the meson equivalent of the autotools patch that modified
+configure.ac to hard code the iceauth path.
+
+This patch is replace the patch 0001-configure.in-hard-code-path-to-iceauth.patch
+
+Upstream-Status: Inappropriate [cross-compile specific]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ meson.build               | 2 +-
+ xfce4-session/meson.build | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 7ab81ae5..c54ebafd 100644
+--- a/meson.build
++++ b/meson.build
+@@ -75,7 +75,7 @@ if enable_x11
+     feature_cflags += '-DHAVE__ICETRANSNOLISTEN=1'
+   endif
+
+-  iceauth = find_program('iceauth', required: true)
++  # iceauth path is hard-coded below for cross-compilation
+
+   xsession_prefix = get_option('xsession-prefix')
+   if xsession_prefix == ''
+diff --git a/xfce4-session/meson.build b/xfce4-session/meson.build
+index 56a297f9..e36885e4 100644
+--- a/xfce4-session/meson.build
++++ b/xfce4-session/meson.build
+@@ -42,7 +42,7 @@ c_args = [
+
+ if enable_x11
+   c_args += [
+-    '-DICEAUTH_CMD="@0@"'.format(iceauth.full_path()),
++    '-DICEAUTH_CMD="' + get_option('prefix') / get_option('bindir') / 'iceauth' + '"',
+   ]
+
+   session_sources += [
+--
+2.50.0

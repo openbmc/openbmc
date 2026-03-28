@@ -2,7 +2,7 @@ SUMMARY = "Inspect and manipulate eBPF programs and maps"
 DESCRIPTION = "bpftool is a kernel tool for inspection and simple manipulation \
 of eBPF programs and maps."
 LICENSE = "GPL-2.0-only"
-DEPENDS = "binutils elfutils elfutils-native"
+DEPENDS = "binutils elfutils elfutils-native openssl"
 PROVIDES = "virtual/bpftool"
 
 inherit bash-completion kernelsrc kernel-arch

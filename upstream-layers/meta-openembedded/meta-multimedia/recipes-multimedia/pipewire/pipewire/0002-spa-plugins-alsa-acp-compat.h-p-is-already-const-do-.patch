@@ -1,0 +1,25 @@
+From 1a37f445a20e67976c83360ab5830887fffe37e2 Mon Sep 17 00:00:00 2001
+From: Rudi Heitbaum <rudi@heitbaum.com>
+Date: Tue, 17 Mar 2026 03:17:15 +1100
+Subject: [PATCH] spa/plugins/alsa/acp/compat.h: p is already const do not
+ recast
+
+Upstream-Status: Backport [https://gitlab.freedesktop.org/pipewire/pipewire/-/commit/1a37f445a20e67976c83360ab5830887fffe37e2]
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+---
+ spa/plugins/alsa/acp/compat.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/spa/plugins/alsa/acp/compat.h b/spa/plugins/alsa/acp/compat.h
+index 0f7b959df..87151d197 100644
+--- a/spa/plugins/alsa/acp/compat.h
++++ b/spa/plugins/alsa/acp/compat.h
+@@ -436,7 +436,7 @@ static inline const char *pa_path_get_filename(const char *p)
+         return NULL;
+     if ((fn = strrchr(p, PA_PATH_SEP_CHAR)))
+         return fn+1;
+-    return (char*) p;
++    return p;
+ }
+ 
+ static inline bool pa_is_path_absolute(const char *fn)

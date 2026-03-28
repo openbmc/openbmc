@@ -1,0 +1,27 @@
+From eac5e89c884b4dd28a80f77d2c447a398e8db94f Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Sat, 21 Mar 2026 20:12:39 +0000
+Subject: [PATCH] mDNSShared: Make Apple Wireless Direct Link depend on macOS
+
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ mDNSShared/uds_daemon.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/mDNSShared/uds_daemon.c b/mDNSShared/uds_daemon.c
+index 6486f1ed51dd..3113313191d7 100644
+--- a/mDNSShared/uds_daemon.c
++++ b/mDNSShared/uds_daemon.c
+@@ -3626,7 +3626,11 @@ mDNSlocal void resolve_result_callback(mDNS *const m, DNSQuestion *question, con
+     request_state *const req = question->QuestionContext;
+     const mDNSu32 name_hash = mDNS_DomainNameFNV1aHash(&question->qname);
+     const mDNSBool isMDNSQuestion = mDNSOpaque16IsZero(question->TargetQID);
++#if MDNS_OS(macOS)
+     const mDNSBool is_split_awdl_query = (req->resolve_awdl && question->InterfaceID == AWDLInterfaceID);
++#else
++    const mDNSBool is_split_awdl_query = mDNSfalse;
++#endif
+     UDS_LOG_ANSWER_EVENT(isMDNSQuestion ? MDNS_LOG_CATEGORY_MDNS : MDNS_LOG_CATEGORY_DEFAULT, MDNS_LOG_DEFAULT,
+         req, question, answer, mDNSfalse, "DNSServiceResolve result", AddRecord);
+ 

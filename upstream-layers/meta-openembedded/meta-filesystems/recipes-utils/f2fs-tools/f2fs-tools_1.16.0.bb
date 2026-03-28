@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=362b4b2594cd362b874a97718faa51d3"
 DEPENDS = "util-linux"
 
 SRCREV = "06c027abc6153c4a97cba5317844e8dcaaee3cf7"
-SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git;branch=master \
+SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/jaegeuk/f2fs-tools.git;branch=master;tag=v${PV} \
            file://0001-f2fs-tools-use-stdbool.h-instead-of-bool.patch \
            file://0002-f2fs_io-Define-_FILE_OFFSET_BITS-64.patch \
            "

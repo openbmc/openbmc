@@ -1,0 +1,81 @@
+From ac79c1da91f51b10059a266bf4db068a01963b01 Mon Sep 17 00:00:00 2001
+From: Liu Yiding <liuyd.fnst@fujitsu.com>
+Date: Wed, 18 Mar 2026 03:35:16 +0000
+Subject: [PATCH] To fix [-Werror=discarded-qualifiers] error to build with glibc 2.43
+
+| ../sources/opensaf-5.22.01/src/osaf/immutil/immutil.c:339:12: error: assignment discards 'const' qualifier from pointer target type [-Werror=discarded-qualifiers]
+|   339 |         cp = strstr(buffer, key);
+
+Upstream-Status: Pending
+
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ src/amf/common/util.c      | 8 ++++----
+ src/ckpt/ckptd/cpd_imm.c   | 4 ++--
+ src/osaf/immutil/immutil.c | 2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/src/amf/common/util.c b/src/amf/common/util.c
+index d17b766..56c1a50 100644
+--- a/src/amf/common/util.c
++++ b/src/amf/common/util.c
+@@ -252,8 +252,8 @@ void avsv_sanamet_init_from_association_dn(const SaNameT *haystack, SaNameT *dn,
+ 					   const char *needle,
+ 					   const char *parent)
+ {
+-	char *p;
+-	char *pp;
++	const char *p;
++	const char *pp;
+ 	int i = 0;
+ 
+ 	osaf_extended_name_clear(dn);
+@@ -270,8 +270,8 @@ void avsv_sanamet_init_from_association_dn(const SaNameT *haystack, SaNameT *dn,
+ 
+ 	/* copy the value upto parent but skip escape chars */
+ 	int size = 0;
+-	char *p1 = p;
+-	char *pp1 = pp;
++	const char *p1 = p;
++	const char *pp1 = pp;
+ 	while (p != pp) {
+ 		if (*p != '\\')
+ 			size++;
+diff --git a/src/ckpt/ckptd/cpd_imm.c b/src/ckpt/ckptd/cpd_imm.c
+index e2dee0c..7c25d02 100644
+--- a/src/ckpt/ckptd/cpd_imm.c
++++ b/src/ckpt/ckptd/cpd_imm.c
+@@ -117,7 +117,7 @@ cpd_saImmOiRtAttrUpdateCallback(SaImmOiHandleT immOiHandle,
+ 	/* Extract ckpt_name and node_name */
+ 	if (strncmp(object_name, "safReplica=", 11) == 0) {
+ 		/* Extract ckpt_name */
+-		char *p_char = strchr(object_name, ',');
++		const char *p_char = strchr(object_name, ',');
+ 		if (p_char) {
+ 			p_char++; /* escaping first ',' of the associated class
+ 				     DN name */
+@@ -657,7 +657,7 @@ SaAisErrorT create_runtime_ckpt_object(CPD_CKPT_INFO_NODE *ckpt_node,
+ 	SaNameT parentName;
+ 	SaAisErrorT rc = SA_AIS_OK;
+ 	char *dndup = strdup(ckpt_node->ckpt_name);
+-	char *parent_name = strchr(ckpt_node->ckpt_name, ',');
++	const char *parent_name = strchr(ckpt_node->ckpt_name, ',');
+ 	char *rdnstr;
+ 	const SaImmAttrValuesT_2 *attrValues[7];
+ 	SaImmAttrValueT dn[1], create_time[1], creat_flags[1], max_sections[1],
+diff --git a/src/osaf/immutil/immutil.c b/src/osaf/immutil/immutil.c
+index 1ca1fbb..d3a5b63 100644
+--- a/src/osaf/immutil/immutil.c
++++ b/src/osaf/immutil/immutil.c
+@@ -336,7 +336,7 @@ char const *immutil_getStringValue(char const *key, SaNameT const *name)
+ 	klen = strlen(key);
+ 	assert(klen > 1 || key[klen - 1] == '=');
+ 
+-	cp = strstr(buffer, key);
++	cp = (char*)strstr(buffer, key);
+ 	while (cp != NULL) {
+ 		if (cp == buffer || cp[-1] == ',') {
+ 			char *value = cp + klen;
+-- 
+2.43.0
+

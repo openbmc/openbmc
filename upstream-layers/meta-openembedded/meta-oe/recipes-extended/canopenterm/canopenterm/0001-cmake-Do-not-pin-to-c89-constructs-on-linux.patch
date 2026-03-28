@@ -1,0 +1,33 @@
+From 694563e023a296ecfd4c73fac681509323c14ada Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 24 Mar 2026 10:01:59 -0700
+Subject: [PATCH] cmake: Do not pin to c89 constructs on linux
+
+This does not work with latest lua
+
+Fixes
+|    91 | #error "POSIX is not compatible with C89"
+|       |  ^
+| 1 error generated.
+| [44/51] Building C object CMakeFiles/crossline.dir/src/crossline/crossline.c.o
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ cmake/os_linux.cmake | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cmake/os_linux.cmake b/cmake/os_linux.cmake
+index 7096cbd..ef18d56 100644
+--- a/cmake/os_linux.cmake
++++ b/cmake/os_linux.cmake
+@@ -56,7 +56,7 @@ if (BUILD_YOCTO)
+     if (LUA_FOUND)
+         include_directories(${LUA_INCLUDE_DIR})
+         set(PLATFORM_LIBS ${PLATFORM_LIBS} ${LUA_LIBRARIES})
+-        add_compile_definitions(LUA_USE_C89 LUA_USE_LINUX)
++        add_compile_definitions(LUA_USE_LINUX)
+     else()
+         message(FATAL_ERROR "Lua not found")
+     endif()

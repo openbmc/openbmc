@@ -14,11 +14,11 @@ diff --git a/setup.py b/setup.py
 index 419a982..3f1fe52 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -26,7 +26,6 @@ if sys.platform.startswith('linux'):
-         ('_FILE_OFFSET_BITS', '64'),
+@@ -25,7 +25,6 @@
+         # ("DEBUG", "1"),
      ]
-     libraries = ['crypto', 'rt']
--    includes = ['/usr/local/include', '/usr/include']
-     CFLAGS.append('-O2')
- elif sys.platform.startswith('win32') and os.environ.get('MSYSTEM'):
-     msys2_env = os.getenv('MSYSTEM')
+     libraries = ["crypto", "rt"]
+-    includes = ["/usr/local/include", "/usr/include"]
+     CFLAGS.append("-O2")
+     CFLAGS.append("-g")
+     CFLAGS.append("-Wall")

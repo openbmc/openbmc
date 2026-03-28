@@ -17,14 +17,14 @@ Updated comment and content after fixing some tests.
 Left only MongoDBTest.testArray on ignore list, untested.
 
 ---
- cppignore.lnx | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ cppignore.lnx | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/cppignore.lnx b/cppignore.lnx
 index b3288d474..9aad48ca5 100644
 --- a/cppignore.lnx
 +++ b/cppignore.lnx
-@@ -30,3 +30,4 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
+@@ -35,3 +35,4 @@ CppUnit::TestCaller<HTTPSClientSessionTest>.testProxy
  CppUnit::TestCaller<HTTPSStreamFactoryTest>.testProxy
  CppUnit::TestCaller<DNSTest>.testHostByAddress
  CppUnit::TestCaller<DNSTest>.testHostByName

@@ -1,0 +1,47 @@
+From 74dec208d95821855130f6ed7b167327f1247e99 Mon Sep 17 00:00:00 2001
+From: Liu Yiding <liuyd.fnst@fujitsu.com>
+Date: Thu, 5 Mar 2026 09:28:03 +0000
+Subject: [PATCH] Avoid duplicate operations of add_library.
+
+To fix following configure error
+| -- Existing strlcat found, will *not* use local definition
+| CMake Error at falcosecurity-libs/userspace/libscap/CMakeLists.txt:64 (add_library):
+|   add_library cannot create target "scap_error" because another target with
+|   the same name already exists.  The existing target is a static library
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
+---
+ cmake/modules/libscap.cmake  | 2 +-
+ cmake/modules/libsinsp.cmake | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/modules/libscap.cmake b/cmake/modules/libscap.cmake
+index b41b12ff3..1753598e9 100644
+--- a/cmake/modules/libscap.cmake
++++ b/cmake/modules/libscap.cmake
+@@ -14,7 +14,7 @@
+ #
+ 
+ if(NOT HAVE_LIBSCAP)
+-	set(HAVE_LIBSCAP On)
++        set(HAVE_LIBSCAP On CACHE INTERNAL "Flag to indicate libscap has been processed")
+ 
+ 	if(NOT LIBS_DIR)
+ 		get_filename_component(LIBS_DIR ${CMAKE_CURRENT_LIST_DIR}/../.. ABSOLUTE)
+diff --git a/cmake/modules/libsinsp.cmake b/cmake/modules/libsinsp.cmake
+index ff336e27f..0fdd2d4a9 100644
+--- a/cmake/modules/libsinsp.cmake
++++ b/cmake/modules/libsinsp.cmake
+@@ -14,7 +14,7 @@
+ #
+ 
+ if(NOT HAVE_LIBSINSP)
+-	set(HAVE_LIBSINSP On)
++        set(HAVE_LIBSINSP On CACHE INTERNAL "Flag to indicate libsinsp has been processed")
+ 
+ 	if(NOT LIBS_DIR)
+ 		get_filename_component(LIBS_DIR ${CMAKE_CURRENT_LIST_DIR}/../.. ABSOLUTE)
+-- 
+2.43.0
+

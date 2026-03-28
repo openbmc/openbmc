@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=eb723b61539feef013de476e68b5c50a"
 
 SECTION = "devel"
 
-EXTRA_OEMAKE = "'CC=${CC}'"
+EXTRA_OEMAKE = "'CC=${CC}' 'CFLAGS=${CFLAGS}'"
 
 SRCREV = "468fe4c31e6c62c9bbb328b06ba71eaf7be0b76a"
 

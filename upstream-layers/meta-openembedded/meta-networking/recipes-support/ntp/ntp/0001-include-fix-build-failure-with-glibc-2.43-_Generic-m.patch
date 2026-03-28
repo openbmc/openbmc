@@ -1,0 +1,41 @@
+From c7d76559dada2a6c0c9c18e8343a69b1eabc031e Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Fri, 13 Mar 2026 13:20:20 +0100
+Subject: [PATCH] include: fix build failure with glibc 2.38+ _Generic memchr
+ macro
+
+Newer glibc defines memchr as a _Generic macro in <string.h>.
+When sntp's config.h lacks a HAVE_MEMCHR definition, the #ifndef guard
+in l_stdlib.h passes and the extern declaration of memchr is emitted.
+The preprocessor expands the memchr token into _Generic(...), producing:
+
+  l_stdlib.h:225:14: error: expected identifier or '(' before '_Generic'
+
+Guard the fallback declarations of memchr and strnlen with an additional
+!defined(memchr) / !defined(strnlen) check so they are skipped when the
+symbols are already provided as macros by the C library headers.
+
+Upstream-Status: Pending
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ include/l_stdlib.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/l_stdlib.h b/include/l_stdlib.h
+index fbf57c5..195dc41 100644
+--- a/include/l_stdlib.h
++++ b/include/l_stdlib.h
+@@ -221,11 +221,11 @@ extern	int	errno;
+ extern	int	h_errno;
+ #endif
+ 
+-#ifndef HAVE_MEMCHR
++#if !defined(HAVE_MEMCHR) && !defined(memchr)
+ extern void *memchr(const void *s, int c, size_t n);
+ #endif
+ 
+-#ifndef HAVE_STRNLEN
++#if !defined(HAVE_STRNLEN) && !defined(strnlen)
+ extern size_t strnlen(const char *s, size_t n);
+ #endif
+ 

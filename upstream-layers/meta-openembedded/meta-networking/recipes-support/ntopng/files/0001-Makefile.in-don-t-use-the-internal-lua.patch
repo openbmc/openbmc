@@ -14,26 +14,32 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  Makefile.in | 2 --
  1 file changed, 2 deletions(-)
 
-diff --git a/Makefile.in b/Makefile.in
-index d737e74..a611b16 100755
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -36,7 +36,6 @@ MONGOOSE_INC=-I$(MONGOOSE_HOME)
+@@ -31,8 +31,6 @@ MONGOOSE_INC=-I$(MONGOOSE_HOME)
+ 
  LUA_PLATFORM=generic
- LUA_HOME=${PWD}/third-party/lua-5.4.3
- LUA_INC=-I$(LUA_HOME)/src
+ LUA_HOME=${PWD}/third-party/lua-5.4.6
+-LUA_INC=-I$(LUA_HOME)/src
 -LUA_LIB=$(LUA_HOME)/src/liblua.a
  
- ifeq ($(OS),Linux)
- 	LUA_PLATFORM=linux
-@@ -102,7 +101,6 @@ RPM_PKG = $(TARGET)-$(NTOPNG_VERSION)-@REVISION@.$(PLATFORM).rpm
- RPM_DATA_PKG = $(TARGET)-data-$(NTOPNG_VERSION)-@REVISION@.noarch.rpm
+ HAVE_CLICKHOUSE=@HAVE_CLICKHOUSE@
+ CLICKHOUSE_HOME=
+@@ -52,7 +50,7 @@ else ifeq ($(OS),Darwin)
+ 	LUA_PLATFORM=macosx
+ else ifeq ($(OS), $(filter $(OS), FreeBSD))
+ 	LUA_PLATFORM=freebsd
+-	LUA_LIB=/usr/local/lib/liblua-5.3.a
++	LUA_LIB=liblua.a
+ endif
+ 
  ######
+@@ -138,7 +136,7 @@ HEADERS = $(wildcard include/*.h) $(wild
+ INC     = $(wildcard src/*.inc)
+ OBJECTS_NO_MAIN := $(filter-out src/main.o,$(OBJECTS))
  
--LIB_TARGETS = $(LUA_LIB)
+-TEST_FILES = $(wildcard tests/src/*.cpp) 
++TEST_FILES = $(wildcard tests/src/*.cpp)
+ TEST_HEADERS = $(wildcard tests/include/*.h)
  
- ifneq ($(HAS_ZEROMQ), 0)
- LIB_TARGETS += $(ZEROMQ_LIB)
--- 
-2.25.1
-
+ %.o: %.c $(HEADERS) $(INC) Makefile

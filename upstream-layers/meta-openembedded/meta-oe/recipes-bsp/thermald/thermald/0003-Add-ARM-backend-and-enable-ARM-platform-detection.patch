@@ -1,0 +1,234 @@
+From 1931a12e7e44b6b85a02a5d8158829eff4b9cc92 Mon Sep 17 00:00:00 2001
+From: Priyansh Jain <priyansh.jain@oss.qualcomm.com>
+Date: Mon, 9 Feb 2026 16:11:31 +0530
+Subject: [PATCH 3/3] Add ARM backend and enable ARM platform detection
+
+thermald historically supported only Intel platforms. As the
+codebase is being refactored to allow multi-platform support,
+ARM platforms require their own backend implementation to
+handle platform-specific thermal controls, capabilities, and
+configuration rules.
+
+This patch adds the initial ARM-specific backend files and
+integrates ARM selection into the newly introduced platform
+detection mechanism. With this change, thermald can correctly
+identify ARM systems and route thermal management operations
+to the appropriate backend. This establishes the foundation
+needed for future ARM thermal features and expands thermald's
+usefulness beyond Intel-based platforms.
+
+Suggested-by: Amit Kucheria <amit.kucheria@oss.qualcomm.com>
+Signed-off-by: Priyansh Jain <priyansh.jain@oss.qualcomm.com>
+
+Upstream-Status: Backport [from commit 1931a12e7e44b6b85a02a5d8158829eff4b9cc92]
+---
+ Android.mk               |  3 ++-
+ Makefile.am              |  3 ++-
+ src/thd_engine.cpp       |  1 +
+ src/thd_platform.cpp     | 14 ++++++++++++
+ src/thd_platform.h       |  2 ++
+ src/thd_platform_arm.cpp | 47 ++++++++++++++++++++++++++++++++++++++++
+ src/thd_platform_arm.h   | 38 ++++++++++++++++++++++++++++++++
+ 7 files changed, 106 insertions(+), 2 deletions(-)
+ create mode 100644 src/thd_platform_arm.cpp
+ create mode 100644 src/thd_platform_arm.h
+
+diff --git a/Android.mk b/Android.mk
+index c14fa4a..5d38c35 100644
+--- a/Android.mk
++++ b/Android.mk
+@@ -45,7 +45,8 @@ LOCAL_SRC_FILES := \
+ 		src/LzmaDec.c \
+ 		src/thd_gddv.cpp \
+ 		src/thd_platform.cpp \
+-		src/thd_platform_intel.cpp
++		src/thd_platform_intel.cpp \
++		src/thd_platform_arm.cpp
+ 
+ LOCAL_C_INCLUDES += external/libxml2/include
+ 
+diff --git a/Makefile.am b/Makefile.am
+index 2e76187..61741ba 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -77,7 +77,8 @@ thermald_SOURCES = \
+ 	src/thd_lzma_dec.cpp \
+ 	src/LzmaDec.c \
+ 	src/thd_platform.cpp \
+-	src/thd_platform_intel.cpp
++	src/thd_platform_intel.cpp \
++	src/thd_platform_arm.cpp
+ 
+ man5_MANS = man/thermal-conf.xml.5
+ man8_MANS = man/thermald.8
+diff --git a/src/thd_engine.cpp b/src/thd_engine.cpp
+index da52a5b..9024650 100644
+--- a/src/thd_engine.cpp
++++ b/src/thd_engine.cpp
+@@ -45,6 +45,7 @@
+ #include "thd_int3400.h"
+ #include "thd_platform.h"
+ #include "thd_platform_intel.h"
++#include "thd_platform_arm.h"
+ 
+ static void *cthd_engine_thread(void *arg);
+ 
+diff --git a/src/thd_platform.cpp b/src/thd_platform.cpp
+index 25ce094..647b079 100644
+--- a/src/thd_platform.cpp
++++ b/src/thd_platform.cpp
+@@ -22,6 +22,7 @@
+ 
+ #include "thd_platform.h"
+ #include "thd_platform_intel.h"
++#include "thd_platform_arm.h"
+ #include "thd_common.h"
+ #include <cstring>
+ #include <iostream>
+@@ -45,6 +46,10 @@ void cthd_platform::detect_platform() {
+ 
+     if (strcmp(sysinfo.machine, "x86_64") == 0) {
+         detected_platform = PLATFORM_INTEL_X86;
++    } else if (strcmp(sysinfo.machine, "aarch64") == 0) {
++        detected_platform = PLATFORM_ARM64;
++    } else if (strcmp(sysinfo.machine, "arm") == 0) {
++        detected_platform = PLATFORM_ARM32;
+     } else {
+         detected_platform = PLATFORM_OTHER;
+     }
+@@ -79,6 +84,12 @@ void cthd_platform::dump_platform_info() {
+         case PLATFORM_INTEL_X86:
+             thd_log_info("Platform: Intel x86/x86_64\n");
+             break;
++        case PLATFORM_ARM64:
++            thd_log_info("Platform: ARM64 (aarch64)\n");
++            break;
++        case PLATFORM_ARM32:
++            thd_log_info("Platform: ARM32\n");
++            break;
+         case PLATFORM_OTHER:
+             thd_log_info("Platform: Other (%s)\n", get_machine_type().c_str());
+             break;
+@@ -102,6 +113,9 @@ cthd_platform* cthd_platform::create_platform() {
+     if (strcmp(sysinfo.machine, "x86_64") == 0) {
+         thd_log_info("Creating Intel platform instance\n");
+         return new intel_platform();
++    } else if (strcmp(sysinfo.machine, "aarch64") == 0 || strcmp(sysinfo.machine, "arm") == 0) {
++        thd_log_info("Creating ARM platform instance\n");
++        return new arm_platform();
+     } else {
+         thd_log_info("Creating generic platform instance for %s\n", sysinfo.machine);
+         return new cthd_platform();
+diff --git a/src/thd_platform.h b/src/thd_platform.h
+index 25746c3..096a55e 100644
+--- a/src/thd_platform.h
++++ b/src/thd_platform.h
+@@ -29,6 +29,8 @@
+ typedef enum {
+     PLATFORM_UNKNOWN = 0,
+     PLATFORM_INTEL_X86,
++    PLATFORM_ARM64,
++    PLATFORM_ARM32,
+     PLATFORM_OTHER
+ } platform_type_t;
+ 
+diff --git a/src/thd_platform_arm.cpp b/src/thd_platform_arm.cpp
+new file mode 100644
+index 0000000..a43ef9f
+--- /dev/null
++++ b/src/thd_platform_arm.cpp
+@@ -0,0 +1,47 @@
++/*
++ * thd_platform_arm.cpp: ARM platform-specific functionality implementation
++ *
++ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 or later as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ * Author Name <priyansh.jain@oss.qualcomm.com>
++ */
++
++#include "thd_platform_arm.h"
++#include "thd_common.h"
++
++arm_platform::arm_platform() : cthd_platform() {
++    // ARM platform specific initialization
++    detect_platform();
++}
++
++arm_platform::~arm_platform() {
++}
++
++void arm_platform::detect_platform() {
++    // Call base class detection first
++    cthd_platform::detect_platform();
++
++    // ARM-specific platform detection can be added here if needed
++    thd_log_info("ARM platform detected\n");
++}
++
++int arm_platform::check_cpu_id(bool &proc_list_matched) {
++    // For ARM, we assume the platform is supported
++    proc_list_matched = true;
++
++    return THD_SUCCESS;
++}
+diff --git a/src/thd_platform_arm.h b/src/thd_platform_arm.h
+new file mode 100644
+index 0000000..e970803
+--- /dev/null
++++ b/src/thd_platform_arm.h
+@@ -0,0 +1,38 @@
++/*
++ * thd_platform_arm.h: ARM platform-specific functionality
++ *
++ * Copyright (c) 2026 Qualcomm Innovation Center, Inc. All rights reserved.
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License version
++ * 2 or later as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++ * 02110-1301, USA.
++ *
++ * Author Name <priyansh.jain@oss.qualcomm.com>
++ */
++
++#ifndef THD_PLATFORM_ARM_H_
++#define THD_PLATFORM_ARM_H_
++
++#include "thd_platform.h"
++
++class arm_platform : public cthd_platform {
++public:
++    arm_platform();
++    virtual ~arm_platform();
++
++    // Override virtual methods from base class
++    void detect_platform() override;
++    int check_cpu_id(bool &proc_list_matched) override;
++};
++
++#endif /* THD_PLATFORM_ARM_H_ */
+-- 
+2.25.1
+

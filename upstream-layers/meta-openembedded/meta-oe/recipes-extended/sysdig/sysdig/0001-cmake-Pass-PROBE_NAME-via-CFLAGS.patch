@@ -1,6 +1,6 @@
-From ed8969a233adb6bf701de96d0fd0570e5ddcc787 Mon Sep 17 00:00:00 2001
-From: Khem Raj <raj.khem@gmail.com>
-Date: Mon, 21 Mar 2022 19:35:48 -0700
+From 6ff4114dcbb87f34751064249967aa96c7b8b030 Mon Sep 17 00:00:00 2001
+From: Liu Yiding <liuyd.fnst@fujitsu.com>
+Date: Wed, 4 Mar 2026 10:02:10 +0000
 Subject: [PATCH] cmake: Pass PROBE_NAME via CFLAGS
 
 This helps compliation of driver code where its calling modprobe on the
@@ -8,22 +8,25 @@ given kernel module via system() API
 
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+Update for 0.39.0
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
  CMakeLists.txt | 1 +
  1 file changed, 1 insertion(+)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 7dceb7ae..e156c36f 100644
+index 8e8850dbe..c6d725c05 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -149,6 +149,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
- 	if(NOT DEFINED PROBE_NAME)
- 		set(PROBE_NAME "scap")
+@@ -174,6 +174,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+ 	if(NOT DEFINED DRIVER_NAME)
+ 		set(DRIVER_NAME "scap")
  	endif()
-+	add_definitions(-DPROBE_NAME="${PROBE_NAME}")
++       add_definitions(-DPROBE_NAME="${PROBE_NAME}")
  
  	set(DRIVERS_REPO "https://download.sysdig.com/scap-drivers")
  	
 -- 
-2.35.1
+2.43.0
 

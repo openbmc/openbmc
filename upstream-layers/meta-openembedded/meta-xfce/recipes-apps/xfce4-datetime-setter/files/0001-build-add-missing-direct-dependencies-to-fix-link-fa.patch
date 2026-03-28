@@ -1,0 +1,35 @@
+From 57fc1ba0b433f2f95cd9eb011cf64a4f28b281b4 Mon Sep 17 00:00:00 2001
+From: Zhang Peng <peng.zhang1.cn@windriver.com>
+Date: Mon, 23 Mar 2026 16:44:28 +0800
+Subject: [PATCH] build: add missing direct dependencies to fix link failures
+
+xfce/ sources directly call symbols from libxfce4util (xfce_textdomain)
+and gtk+-3.0 (gtk_builder_*, gtk_combo_box_*, gtk_widget_*), but only
+libxfce4ui-2 was listed as a dependency. Since libxfce4ui-2 correctly
+places these in Requires.private, the client must declare its own direct
+dependencies.
+
+Upstream-Status: Submitted [https://github.com/schnitzeltony/xfce4-datetime-setter/pull/4]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ xfce/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/xfce/meson.build b/xfce/meson.build
+index 2acab2f..f1386a5 100644
+--- a/xfce/meson.build
++++ b/xfce/meson.build
+@@ -7,8 +7,9 @@ xfce_datetime_c_args = [
+   '-DHAVE_CONFIG_H',
+ ]
+
+-xfce_datetime_deps = [
++xfce_datetime_deps = common_deps + [
+   libxfce4ui_dep,
++  dependency('libxfce4util-1.0'),
+ ]
+
+ resource_data = files(
+--
+2.50.0

@@ -1,31 +1,22 @@
-We don't need to build ninja so there's no need to use scikit-build,
-as we just need the python module with it's one ninja() function.
+We don't need to build ninja so there's no need to use scikit-build-core,
+as we just need the python module with its one ninja() function.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
 
-diff --git a/pyproject.toml b/pyproject.toml
-index b895c20..577b642 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -2,7 +2,6 @@
- requires = [
-     "setuptools >=42",
-     "setuptools-scm[toml]",
--    "scikit-build",
- ]
- build-backend = "setuptools.build_meta"
+@@ -1,5 +1,4 @@
+ [build-system]
+-requires = ["scikit-build-core>=0.10"]
+-build-backend = "backend"
+-backend-path = ["_build_backend"]
++requires = ["setuptools", "setuptools-scm"]
++build-backend = "setuptools.build_meta"
  
-diff --git a/setup.py b/setup.py
-index dbe1fbc..3259754 100755
---- a/setup.py
-+++ b/setup.py
-@@ -5,7 +5,7 @@ import os
- import sys
- from distutils.text_file import TextFile
- 
--from skbuild import setup
-+from setuptools import setup
- 
- # Add current folder to path
- # This is required to import versioneer in an isolated pip build
+@@ -7,3 +6,3 @@
+ name = "ninja"
+-dynamic = ["version", "readme"]
++dynamic = ["version"]
+ description = "Ninja is a small build system with a focus on speed"

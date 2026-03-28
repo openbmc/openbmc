@@ -4,11 +4,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
 BRANCH ?= "dev"
 
-SRCREV = "dd2e655780424eadf7610de33e5966be19168a95"
+SRCREV = "bcf4b0dca8e58b8fc8265ba746a7b84af86fc365"
 
-SRC_URI = "git://github.com/SanDisk-Open-Source/ufs-utils.git;protocol=https;branch=${BRANCH} \
-           file://0001-ufs_cmds-fix-full_path-buffer-size-in-find_bsg_devic.patch \
-          "
+SRC_URI = "git://github.com/SanDisk-Open-Source/ufs-utils.git;protocol=https;branch=${BRANCH};tag=v${PV}"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

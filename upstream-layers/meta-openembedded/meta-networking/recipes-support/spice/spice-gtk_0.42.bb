@@ -22,7 +22,6 @@ DEPENDS = " \
 	cyrus-sasl \
 	gstreamer1.0 \
 	gstreamer1.0-plugins-base \
-	gstreamer1.0-vaapi \
 	gtk+3 \
 	jpeg \
 	json-glib \
@@ -30,6 +29,7 @@ DEPENDS = " \
 	libepoxy \
 	libopus \
 	libusb1 \
+	libva \
 	lz4 \
 	pixman \
 	python3-pyparsing-native \

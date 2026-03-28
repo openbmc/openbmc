@@ -1,0 +1,67 @@
+From f290f9df0556735041bfee8e67fcad55edb4c70b Mon Sep 17 00:00:00 2001
+From: Harish Sadineni <Harish.Sadineni@windriver.com>
+Date: Sat, 7 Mar 2026 22:02:07 +0000
+Subject: [PATCH 2/2] folly/tracing: Add ARM and AArch64 support to static
+ tracepoints
+
+Extend the static tracepoint (SDT) macros to work on ARM and AArch64
+by:
+
+- Defining FOLLY_SDT_NOP as "nop" (the same mnemonic works for both
+  ARM and AArch64)
+- Adding `defined(__aarch64__) || defined(__arm__)` to the preprocessor
+  guard in StaticTracepoint.h
+
+This resolves USDT probe test failures on ARM64 platforms.
+Without these changes, the .note.stapsdt section containing probe
+information was missing entirely on ARM64, causing test failures when
+attempting to find and attach to USDT probes in the BCC test suite.
+
+Fixes: #5354
+
+Upstream-Status: Submitted [https://github.com/iovisor/bcc/pull/5491]
+
+Signed-off-by: Harish Sadineni <Harish.Sadineni@windriver.com>
+---
+ tests/python/include/folly/tracing/StaticTracepoint-ELF.h | 6 ++++++
+ tests/python/include/folly/tracing/StaticTracepoint.h     | 4 ++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/tests/python/include/folly/tracing/StaticTracepoint-ELF.h b/tests/python/include/folly/tracing/StaticTracepoint-ELF.h
+index 033809cb..47828309 100644
+--- a/tests/python/include/folly/tracing/StaticTracepoint-ELF.h
++++ b/tests/python/include/folly/tracing/StaticTracepoint-ELF.h
+@@ -25,7 +25,13 @@
+ #endif
+ 
+ // Instruction to emit for the probe.
++#if defined(__x86_64__) || defined(__i386__)
+ #define FOLLY_SDT_NOP                 nop
++#elif defined(__aarch64__) || defined(__arm__)
++#define FOLLY_SDT_NOP                 nop
++#else
++#error "Unsupported architecture"
++#endif
+ 
+ // Note section properties.
+ #define FOLLY_SDT_NOTE_NAME           "stapsdt"
+diff --git a/tests/python/include/folly/tracing/StaticTracepoint.h b/tests/python/include/folly/tracing/StaticTracepoint.h
+index 858b7dbc..86f8e40c 100644
+--- a/tests/python/include/folly/tracing/StaticTracepoint.h
++++ b/tests/python/include/folly/tracing/StaticTracepoint.h
+@@ -16,10 +16,10 @@
+ 
+ #pragma once
+ 
+-#if defined(__ELF__) && (defined(__x86_64__) || defined(__i386__)) && \
++#if defined(__ELF__) && (defined(__x86_64__) || defined(__i386__) || defined(__aarch64__) || defined(__arm__)) && \
+     !FOLLY_DISABLE_SDT
+ 
+-#include <folly/tracing/StaticTracepoint-ELFx86.h>
++#include <folly/tracing/StaticTracepoint-ELF.h>
+ 
+ #define FOLLY_SDT(provider, name, ...) \
+   FOLLY_SDT_PROBE_N(                   \
+-- 
+2.49.0
+

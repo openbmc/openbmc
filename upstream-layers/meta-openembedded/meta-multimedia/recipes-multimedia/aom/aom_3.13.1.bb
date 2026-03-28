@@ -25,3 +25,5 @@ EXTRA_OECMAKE:append:riscv32 = " -DENABLE_RVV=OFF"
 do_generate_toolchain_file:append() {
     echo "set(AOM_AS_FLAGS --debug-prefix-map ${S}=${TARGET_DBGSRC_DIR})" >> ${WORKDIR}/toolchain.cmake
 }
+
+SYSROOT_DIRS += "${bindir}"

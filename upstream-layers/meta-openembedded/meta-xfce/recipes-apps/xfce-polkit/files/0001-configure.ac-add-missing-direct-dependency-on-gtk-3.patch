@@ -1,0 +1,52 @@
+From a89bd475c3cf7dc39618bcc9979fc618d7acd537 Mon Sep 17 00:00:00 2001
+From: Zhang Peng <peng.zhang1.cn@windriver.com>
+Date: Mon, 23 Mar 2026 16:52:58 +0800
+Subject: [PATCH] configure.ac: add missing direct dependency on gtk+-3.0
+
+xfce-polkit sources directly call GTK+ symbols (gtk_combo_box_set_model,
+gtk_widget_show, etc.), but only libxfce4ui-2 was listed as a dependency.
+Since libxfce4ui-2 correctly places gtk+-3.0 in Requires.private, the
+client must declare its own direct dependency on gtk+-3.0.
+
+See https://people.freedesktop.org/~dbn/pkg-config-guide.html#writing
+
+Upstream-Status: Submitted [https://github.com/ncopa/xfce-polkit/pull/14]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ configure.ac    | 1 +
+ src/Makefile.am | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 88f2432..15c09c9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -4,6 +4,7 @@ AC_PROG_CC
+
+ PKG_CHECK_MODULES([GLIB], [glib-2.0])
+ PKG_CHECK_MODULES([LIBXFCE4UI], [libxfce4ui-2])
++PKG_CHECK_MODULES([GTK3], [gtk+-3.0])
+ PKG_CHECK_MODULES([POLKIT_AGENT], [polkit-agent-1])
+
+ AC_CONFIG_FILES([
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 514605a..f13e4cb 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -10,11 +10,13 @@ xfce_polkit_SOURCES = \
+
+ xfce_polkit_CFLAGS = @GLIB_CFLAGS@ \
+	@LIBXFCE4UI_CFLAGS@ \
++	@GTK3_CFLAGS@ \
+	@POLKIT_AGENT_CFLAGS@
+
+
+ xfce_polkit_LDADD = @GLIB_LIBS@ \
+	@LIBXFCE4UI_LIBS@ \
++	@GTK3_LIBS@ \
+	@POLKIT_AGENT_LIBS@
+
+
+--
+2.50.0

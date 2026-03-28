@@ -1,0 +1,34 @@
+From ebee090ac020c5a4e4194788fc2f53d7a4e30b40 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Sun, 15 Mar 2026 21:28:07 +0100
+Subject: [PATCH] skip verifying the availability of setuptools
+
+The setup script checks is setuptools is available (with the correct minimum
+version), using setuptool's pkg_resouces modules. Setuptools has dropped
+this module in version 82, making this import fail.
+
+This patch skips the availability check of Setuptools, it is expected to be
+always available from oe-core - the patch itself is oe-specific.
+
+Upstream has already prepared a solution to rework their setup script to
+work with the latest Setuptools, however that patch builds on several other
+patches.
+
+Upstream-Status: Inappropriate [oe-specific]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ ez_setup.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/ez_setup.py b/ez_setup.py
+index 76e7105..c668e5d 100644
+--- a/ez_setup.py
++++ b/ez_setup.py
+@@ -107,6 +107,7 @@ def _do_download(version, download_base, to_dir, download_delay):
+ 
+ def use_setuptools(version=DEFAULT_VERSION, download_base=DEFAULT_URL,
+                    to_dir=os.curdir, download_delay=15):
++    return
+     # making sure we use the absolute path
+     to_dir = os.path.abspath(to_dir)
+     was_imported = 'pkg_resources' in sys.modules or \
