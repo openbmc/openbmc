@@ -158,7 +158,7 @@ general order when possible:
 -  :term:`S`
 -  ``inherit ...``
 -  :term:`PACKAGECONFIG`
--  Build class specific variables such as ``EXTRA_QMAKEVARS_POST`` and :term:`EXTRA_OECONF`
+-  Build class specific variables such as :term:`EXTRA_OECONF`
 -  Tasks such as :ref:`ref-tasks-configure`
 -  :term:`PACKAGE_ARCH`
 -  :term:`PACKAGES`

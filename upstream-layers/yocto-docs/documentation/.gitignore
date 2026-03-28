@@ -9,3 +9,4 @@ releases.rst
 */svg/*.pdf
 styles/*
 !styles/config
+releases.json

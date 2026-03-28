@@ -398,7 +398,8 @@ in your ``conf/local.conf`` file in the :term:`Build Directory`.
 The following list provides some explanation and references for what you
 typically find in a distribution layer:
 
--  *classes:* Class files (``.bbclass``) hold common functionality that
+-  *classes*, *classes-global*, *classes-recipe:* Class files (``.bbclass``)
+   hold common functionality that
    can be shared among recipes in the distribution. When your recipes
    inherit a class, they take on the settings and functions for that
    class. You can read more about class files in the
@@ -410,7 +411,7 @@ typically find in a distribution layer:
    (``conf/distro/distro.conf``), and any distribution-wide include
    files.
 
--  *recipes-*:* Recipes and append files that affect common
+-  *recipes-\*:* Recipes and append files that affect common
    functionality across the distribution. This area could include
    recipes and append files to add distribution-specific configuration,
    initialization scripts, custom image recipes, and so forth. Examples

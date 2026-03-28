@@ -300,9 +300,6 @@ system and gives an overview of their function and contents.
       variable), the OpenEmbedded build system ignores your request and
       will install the packages to avoid dependency errors.
 
-      This variable is supported only when using the IPK and RPM
-      packaging backends. DEB is not supported.
-
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`PACKAGE_EXCLUDE` variables for related
       information.

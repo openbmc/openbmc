@@ -11,82 +11,82 @@
 #
 
 
+import json
 import subprocess
 import collections
 import sys
 import os
 import itertools
 
-# Order matters: most recent to least recent
+from urllib.request import urlopen, URLError
+
+# NOTE: these variables contain default values in case we are not able to fetch
+# the releases.json file from https://dashboard.yoctoproject.org/releases.json
 activereleases = ["whinlatter", "scarthgap", "kirkstone"]
 devbranch = "wrynose"
 ltsseries = ["wrynose", "scarthgap", "kirkstone"]
+release_series = collections.OrderedDict({
+    "wrynose": "6.0",
+    "whinlatter": "5.3",
+    "scarthgap": "5.0",
+    "kirkstone": "4.0",
+})
+bitbake_mapping = collections.OrderedDict({
+    "wrynose": "2.18",
+    "whinlatter": "2.16",
+    "scarthgap": "2.8",
+    "kirkstone": "2.0",
+})
+
+releases_from_json = {}
+
+# Use the local releases.json file if found, fetch it from the dashboard otherwise
+releases_json_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "releases.json")
+try:
+    with open(releases_json_path, "r") as f:
+        releases_from_json = json.load(f)
+except FileNotFoundError:
+    print("Fetching releases.json from https://dashboard.yoctoproject.org/releases.json...",
+          file=sys.stderr)
+    try:
+        with urlopen("https://dashboard.yoctoproject.org/releases.json") as r, \
+                open(releases_json_path, "w") as f:
+            releases_from_json = json.load(r)
+            json.dump(releases_from_json, f)
+    except URLError:
+        print("WARNING: tried to fetch https://dashboard.yoctoproject.org/releases.json "
+              "but failed, using default values for active releases", file=sys.stderr)
+        pass
+
+if releases_from_json:
+    release_series = collections.OrderedDict()
+    activereleases = []
+    devbranch = ""
+    ltsseries = []
+    bitbake_mapping = collections.OrderedDict()
+
+    for release in releases_from_json:
+        codename = release["release_codename"].lower()
+        release_series[codename] = release["series_version"]
+        if release["status"] == "Active Development":
+            devbranch = codename
+        if release["series"] == "current":
+            activereleases.append(codename)
+        if "LTS until" in release["status"]:
+            ltsseries.append(codename)
+        if release["bitbake_version"]:
+            bitbake_mapping[codename] = release["bitbake_version"]
+
+    activereleases.remove(devbranch)
 
 # used by run-docs-builds to get the default page
 if len(sys.argv) > 1 and sys.argv[1] == "getlatest":
     print(activereleases[0])
     sys.exit(0)
 
-release_series = collections.OrderedDict()
-release_series["wrynose"] = "6.0"
-release_series["whinlatter"] = "5.3"
-release_series["walnascar"] = "5.2"
-release_series["styhead"] = "5.1"
-release_series["scarthgap"] = "5.0"
-release_series["nanbield"] = "4.3"
-release_series["mickledore"] = "4.2"
-release_series["langdale"] = "4.1"
-release_series["kirkstone"] = "4.0"
-release_series["honister"] = "3.4"
-release_series["hardknott"] = "3.3"
-release_series["gatesgarth"] = "3.2"
-release_series["dunfell"] = "3.1"
-release_series["zeus"] = "3.0"
-release_series["warrior"] = "2.7"
-release_series["thud"] = "2.6"
-release_series["sumo"] = "2.5"
-release_series["rocko"] = "2.4"
-release_series["pyro"] = "2.3"
-release_series["morty"] = "2.2"
-release_series["krogoth"] = "2.1"
-release_series["jethro"] = "2.0"
-release_series["jethro-pre"] = "1.9"
-release_series["fido"] = "1.8"
-release_series["dizzy"] = "1.7"
-release_series["daisy"] = "1.6"
-release_series["dora"] = "1.5"
-release_series["dylan"] = "1.4"
-release_series["danny"] = "1.3"
-release_series["denzil"] = "1.2"
-release_series["edison"] = "1.1"
-release_series["bernard"] = "1.0"
-release_series["laverne"] = "0.9"
-
-
-bitbake_mapping = {
-    "wrynose" : "2.18",
-    "whinlatter" : "2.16",
-    "walnascar" : "2.12",
-    "styhead" : "2.10",
-    "scarthgap" : "2.8",
-    "nanbield" : "2.6",
-    "mickledore" : "2.4",
-    "langdale" : "2.2",
-    "kirkstone" : "2.0",
-    "honister" : "1.52",
-    "hardknott" : "1.50",
-    "gatesgarth" : "1.48",
-    "dunfell" : "1.46",
-}
-
-# 3.4 onwards doesn't have poky version
-# Early 3.4 release docs do reference it though
-poky_mapping = {
-    "3.4" : "26.0",
-    "3.3" : "25.0",
-    "3.2" : "24.0",
-    "3.1" : "23.0",
-}
+print(f"activereleases calculated to be {activereleases}")
+print(f"devbranch calculated to be {devbranch}")
+print(f"ltsseries calculated to be {ltsseries}")
 
 ourversion = None
 ourseries = None
@@ -98,7 +98,8 @@ is_branch_tip = False
 
 # Test that we are building from a Git repository
 try:
-    subprocess.run(["git", "rev-parse", "--is-inside-work-tree"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    subprocess.run(["git", "rev-parse", "--is-inside-work-tree"],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
 except subprocess.CalledProcessError:
     sys.exit("Building yocto-docs must be done from its Git repository.\n"
              "Clone the documentation repository with the following command:\n"
@@ -106,12 +107,14 @@ except subprocess.CalledProcessError:
 
 # Test tags exist and inform the user to fetch if not
 try:
-    subprocess.run(["git", "show", "yocto-%s" % release_series[activereleases[0]]], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    subprocess.run(["git", "show", "yocto-%s" % release_series[activereleases[0]]],
+                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
 except subprocess.CalledProcessError:
     sys.exit("Please run 'git fetch --tags' before building the documentation")
 
 # Try and figure out what we are
-tags = subprocess.run(["git", "tag", "--points-at", "HEAD"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
+tags = subprocess.run(["git", "tag", "--points-at", "HEAD"],
+                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
 for t in tags.split():
     if t.startswith("yocto-"):
         ourversion = t[6:]
@@ -167,8 +170,8 @@ if ourversion is None:
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                      universal_newlines=True).stdout.strip()
         branch_commit = subprocess.run(["git", "rev-parse", "--short", branch],
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        universal_newlines=True).stdout.strip()
+                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                       universal_newlines=True).stdout.strip()
         if head_commit != branch_commit:
             ourversion += f"-{head_commit}"
         else:
@@ -176,10 +179,11 @@ if ourversion is None:
             ourversion += "-tip"
 
 series = [k for k in release_series]
-previousseries = series[series.index(ourseries)+1:] or [""]
+previousseries = series[series.index(ourseries) + 1:] or [""]
 lastlts = [k for k in previousseries if k in ltsseries] or "dunfell"
 
-latestreltag = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "--match", "yocto-*"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
+latestreltag = subprocess.run(["git", "describe", "--abbrev=0", "--tags", "--match", "yocto-*"],
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout
 latestreltag = latestreltag.strip()
 if latestreltag:
     if latestreltag.startswith("yocto-"):
@@ -216,16 +220,25 @@ elif distro in ["dev", "next"]:
 print(f"DISTRO calculated to be {distro}")
 
 replacements = {
-    "DISTRO" : distro,
+    "DISTRO": distro,
     "DISTRO_LATEST_TAG": latesttag,
     "DISTRO_RELEASE_SERIES": release_series[ourseries],
-    "DISTRO_NAME_NO_CAP" : ourseries,
-    "DISTRO_NAME" : ourseries.capitalize(),
-    "DISTRO_NAME_NO_CAP_MINUS_ONE" : previousseries[0],
-    "DISTRO_NAME_NO_CAP_LTS" : lastlts[0],
-    "YOCTO_DOC_VERSION" : ourversion,
-    "DOCCONF_VERSION" : ourversion,
-    "BITBAKE_SERIES" : bitbakeversion,
+    "DISTRO_NAME_NO_CAP": ourseries,
+    "DISTRO_NAME": ourseries.capitalize(),
+    "DISTRO_NAME_NO_CAP_MINUS_ONE": previousseries[0],
+    "DISTRO_NAME_NO_CAP_LTS": lastlts[0],
+    "YOCTO_DOC_VERSION": ourversion,
+    "DOCCONF_VERSION": ourversion,
+    "BITBAKE_SERIES": bitbakeversion,
+}
+
+# 3.4 onwards doesn't have poky version
+# Early 3.4 release docs do reference it though
+poky_mapping = {
+    "3.4": "26.0",
+    "3.3": "25.0",
+    "3.2": "24.0",
+    "3.1": "23.0",
 }
 
 if release_series[ourseries] in poky_mapping:
@@ -257,7 +270,7 @@ def get_latest_tag(branch: str) -> str:
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                      universal_newlines=True).stdout.split()
     branch_versions = sorted(
-        [v.replace("yocto-" +  release_series[branch] + ".", "")\
+        [v.replace("yocto-" + release_series[branch] + ".", "")
          .replace("yocto-" + release_series[branch], "0") for v in branch_versions],
         key=int)
     if not branch_versions:
@@ -270,7 +283,7 @@ def get_latest_tag(branch: str) -> str:
 
 def get_abbrev_hash(ref: str) -> str:
     """
-    Get the abbreviated hash of 
+    Get the abbreviated hash of a ref using a call to git rev-parse.
     """
     return subprocess.run(["git", "rev-parse", "--short", ref],
                           stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -301,7 +314,8 @@ print("switchers.js generated from switchers.js.in")
 
 # generate releases.rst
 
-yocto_tags = subprocess.run(["git", "tag", "--list", "--sort=version:refname", "yocto-*"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout.split()
+yocto_tags = subprocess.run(["git", "tag", "--list", "--sort=version:refname", "yocto-*"],
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True).stdout.split()
 tags = [tag[6:] for tag in yocto_tags]
 
 with open('releases.rst', 'w') as f:
@@ -345,5 +359,3 @@ with open('releases.rst', 'w') as f:
             if tag == release_series[series] or tag.startswith('%s.' % release_series[series]):
                 f.write('- :yocto_docs:`%s Documentation </%s>`\n' % (tag, tag))
         f.write('\n')
-
-
