@@ -7,7 +7,7 @@ LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
 SRCREV = "f1bbd1a8756c076c8fd4f4dd0bc34a8ef215ae79"
-SRC_URI = "git://github.com/sullo/nikto.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/sullo/nikto.git;branch=main;protocol=https \
            file://location.patch"
 
 S = "${UNPACKDIR}/${BP}/program"

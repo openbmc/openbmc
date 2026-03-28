@@ -23,7 +23,7 @@ repos:
     layers:
       meta:
 
-  poky:
+  meta-yocto:
     url: "https://git.yoctoproject.org/git/meta-yocto"
     branch: master
     layers:

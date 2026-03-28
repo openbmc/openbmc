@@ -19,3 +19,5 @@ DEPENDS = " \
 "
 
 RDEPENDS:${PN} = "libtss2 python3-asn1crypto"
+
+BBCLASSEXTEND = "native nativesdk"

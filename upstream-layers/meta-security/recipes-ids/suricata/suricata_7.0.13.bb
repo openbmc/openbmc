@@ -46,8 +46,8 @@ PACKAGECONFIG ??= "file \
                    cap-ng \
                    net \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'seccomp', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'unittests', '', d)} \
                    "
-PACKAGECONFIG:append = " ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'unittests', '', d)}"
 
 PACKAGECONFIG[pcre2] = "--with-libpcre2-includes=${STAGING_INCDIR} --with-libpcre2-libraries=${STAGING_LIBDIR}, ,libpcre2 ,"
 PACKAGECONFIG[yaml] = "--with-libyaml-includes=${STAGING_INCDIR} --with-libyaml-libraries=${STAGING_LIBDIR}, ,libyaml ,"
