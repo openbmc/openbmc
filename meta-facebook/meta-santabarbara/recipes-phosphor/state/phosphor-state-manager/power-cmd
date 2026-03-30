@@ -58,6 +58,13 @@ declare -A ERROR_MAP=(
     ["90"]="SWB Fault"
 )
 
+declare -A GPIO_MODULE_PWR_EN=(
+    [0]="FM_MODULE_PWR_EN_N_1B"
+    [1]="FM_MODULE_PWR_EN_N_3B"
+    [2]="FM_MODULE_PWR_EN_N_2B"
+    [3]="FM_MODULE_PWR_EN_N_4B"
+)
+
 # Force DC off
 force_power_off() {
     if [ "$(power_status)" == "on" ]; then
@@ -142,5 +149,19 @@ power_reset() {
     sleep 1
     set_gpio CPU0_SYS_RESET_N 1
     sleep 1
+    return 0
+}
+
+module_power_control() {
+    local SLOT_NUMBER=$1
+    local ACTION=$2
+    local NET_NAME="${GPIO_MODULE_PWR_EN[$SLOT_NUMBER]}"
+
+    if [ "$ACTION" == "on" ]; then
+        set_gpio "$NET_NAME" 0
+    else
+        set_gpio "$NET_NAME" 1
+    fi
+
     return 0
 }

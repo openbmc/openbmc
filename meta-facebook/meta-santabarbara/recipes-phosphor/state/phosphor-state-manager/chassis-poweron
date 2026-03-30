@@ -1,12 +1,17 @@
 #!/bin/bash
 
-busctl set-property \
-xyz.openbmc_project.State.Chassis1 \
-/xyz/openbmc_project/state/chassis1 \
-xyz.openbmc_project.State.Chassis \
-CurrentPowerState s \
-xyz.openbmc_project.State.Chassis.PowerState.On
+# shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
 
+# 0: Chassis
+# 1-4: ASIC module
+ChassisNumber=$1
+SlotNumber=$((ChassisNumber-1))
 
+case $SlotNumber in
+    0|1|2|3)
+        module_power_control $SlotNumber "on"
+        ;;
+esac
 
 exit 0

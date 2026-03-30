@@ -1,2 +1,17 @@
 #!/bin/bash
+
+# shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# 0: Chassis
+# 1-4: ASIC module
+ChassisNumber=$1
+SlotNumber=$((ChassisNumber-1))
+
+case $SlotNumber in
+    0|1|2|3)
+        module_power_control $SlotNumber "off"
+        ;;
+esac
+
 exit 0
