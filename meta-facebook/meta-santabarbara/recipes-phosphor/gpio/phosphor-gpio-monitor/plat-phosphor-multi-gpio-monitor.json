@@ -141,5 +141,85 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "FM_MODULE_PWRGD_1B",
+        "LineName": "FM_MODULE_PWRGD_1B",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "assert-module-power-good@1.service"
+            ],
+            "FALLING": [
+                "deassert-module-power-good@1.service"
+            ],
+            "INIT_HIGH": [
+                "assert-module-power-good@1.service"
+            ],
+            "INIT_LOW": [
+                "deassert-module-power-good@1.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_MODULE_PWRGD_2B",
+        "LineName": "FM_MODULE_PWRGD_2B",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "assert-module-power-good@3.service"
+            ],
+            "FALLING": [
+                "deassert-module-power-good@3.service"
+            ],
+            "INIT_HIGH": [
+                "assert-module-power-good@3.service"
+            ],
+            "INIT_LOW": [
+                "deassert-module-power-good@3.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_MODULE_PWRGD_3B",
+        "LineName": "FM_MODULE_PWRGD_3B",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "assert-module-power-good@2.service"
+            ],
+            "FALLING": [
+                "deassert-module-power-good@2.service"
+            ],
+            "INIT_HIGH": [
+                "assert-module-power-good@2.service"
+            ],
+            "INIT_LOW": [
+                "deassert-module-power-good@2.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_MODULE_PWRGD_4B",
+        "LineName": "FM_MODULE_PWRGD_4B",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "assert-module-power-good@4.service"
+            ],
+            "FALLING": [
+                "deassert-module-power-good@4.service"
+            ],
+            "INIT_HIGH": [
+                "assert-module-power-good@4.service"
+            ],
+            "INIT_LOW": [
+                "deassert-module-power-good@4.service"
+            ]
+        },
+        "Continue": true
     }
 ]

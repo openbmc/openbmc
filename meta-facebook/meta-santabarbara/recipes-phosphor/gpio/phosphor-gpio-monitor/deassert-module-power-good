@@ -1,0 +1,10 @@
+#!/bin/bash
+
+busctl set-property \
+xyz.openbmc_project.State.Chassis"$1" \
+/xyz/openbmc_project/state/chassis"$1" \
+xyz.openbmc_project.State.Chassis \
+CurrentPowerState s \
+xyz.openbmc_project.State.Chassis.PowerState.Off
+
+exit 0

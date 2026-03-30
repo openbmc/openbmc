@@ -3,10 +3,12 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 inherit obmc-phosphor-utils
 inherit systemd
 
-SERVICE_LIST = "assert-post-end.service \
+SERVICE_LIST = "assert-module-power-good@.service \
+                assert-post-end.service \
                 assert-power-good-drop.service \
                 assert-reset-button.service \
                 assert-rmc-main-power-enable.service \
+                deassert-module-power-good@.service \
                 deassert-post-end.service \
                 deassert-power-good-drop.service \
                 deassert-reset-button.service \
@@ -25,9 +27,11 @@ SERVICE_FILE_FMT = "file://{0}"
 
 SRC_URI += " \
     file://assert-post-end \
+    file://assert-module-power-good \
     file://assert-power-good-drop \
     file://assert-reset-button \
     file://assert-rmc-main-power-enable \
+    file://deassert-module-power-good \
     file://deassert-post-end \
     file://deassert-power-good-drop \
     file://deassert-reset-button \
@@ -59,10 +63,12 @@ do_install:append() {
     done
 
     install -d ${D}${libexecdir}/${PN}
+    install -m 0755 ${UNPACKDIR}/assert-module-power-good ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-post-end ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-reset-button ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/assert-rmc-main-power-enable ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/deassert-module-power-good ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-post-end ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/

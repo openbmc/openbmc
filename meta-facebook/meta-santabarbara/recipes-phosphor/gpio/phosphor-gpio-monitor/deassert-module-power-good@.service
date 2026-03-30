@@ -1,0 +1,7 @@
+[Unit]
+Description=Deassert ASIC Module%i Power Good Status
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/deassert-module-power-good "%i"
+SyslogIdentifier=deassert-module%i-power-good

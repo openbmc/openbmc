@@ -1,0 +1,8 @@
+[Unit]
+Description=Assert ASIC Module%i Power Good Status
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/assert-module-power-good "%i"
+
+SyslogIdentifier=assert-module%i-power-good
