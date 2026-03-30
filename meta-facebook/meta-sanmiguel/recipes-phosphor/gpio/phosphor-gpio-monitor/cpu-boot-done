@@ -13,6 +13,11 @@ set_os_status()
 
 if [ "$STATE" = "assert" ]; then
     set_os_status "$OS_STANDBY"
+
+    # Workaround to Disable BIOSFRB2 ipmi watchdog
+    if busctl get-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog CurrentTimerUse | grep -q BIOSFRB2; then
+        busctl set-property xyz.openbmc_project.Watchdog /xyz/openbmc_project/watchdog/host0 xyz.openbmc_project.State.Watchdog Enabled b false
+    fi
 elif [ "$STATE" = "deassert" ]; then
     set_os_status "$OS_INACTIVE"
 fi
