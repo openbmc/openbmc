@@ -17,3 +17,8 @@ devmem 0x1e6e2094 32 0x00000003
 if [ -e "/dev/i2c-57" ] && i2cdetect -y 57 0x68 0x68 | grep -q -E "(68|UU)"; then
     i2cset -y 57 0x68 0x3c 0x34
 fi
+
+# Disable SSC to prevent xGMI Gen1 link drop
+if i2cdetect -y 57 0x58 0x58 | grep -q -E "(58|UU)"; then
+    i2ctransfer -f -y 57 w4@0x58 0x03 0xD3 0x00 0x0C
+fi
