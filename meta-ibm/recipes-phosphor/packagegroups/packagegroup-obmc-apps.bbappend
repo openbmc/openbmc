@@ -23,7 +23,6 @@ POWER_SERVICE_PACKAGES_HUYGENS = " \
 "
 
 EXTRA_IBM_LOGGING_PKGS = ""
-EXTRA_IBM_LOGGING_PKGS:witherspoon = ""
 EXTRA_IBM_LOGGING_PKGS:ibm-enterprise = " \
     python3-sbe-log-parsers \
     hostboot-pel-parsers \
@@ -37,7 +36,7 @@ RDEPENDS:${PN}-fan-control:append:ibm-ac-server = " fan-watchdog"
 RDEPENDS:${PN}-fan-control:append:ibm-enterprise = " fan-watchdog"
 RDEPENDS:${PN}-fan-control:append:sbp1 = " fan-watchdog phosphor-fan-sensor-monitor"
 
-RDEPENDS:${PN}-extras:append:ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVER} witherspoon-power-supply-sync"
+RDEPENDS:${PN}-extras:append:ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVER}"
 RDEPENDS:${PN}-extras:append:ibm-enterprise = " ${POWER_SERVICE_PACKAGES_IBM_ENTERPRISE} dbus-sensors phosphor-virtual-sensor"
 RDEPENDS:${PN}-extras:append:ibm-enterprise = " pldm openpower-hw-diags srvcfg-manager biosconfig-manager phosphor-post-code-manager phosphor-host-postd debug-trigger libmctp"
 RDEPENDS:${PN}-extras:remove:ibm-enterprise = "obmc-ikvm liberation-fonts uart-render-controller"
@@ -53,4 +52,3 @@ RDEPENDS:${PN}-host-state-mgmt:remove:ibm-enterprise = "checkstop-monitor"
 RDEPENDS:${PN}-logging:append = " ${EXTRA_IBM_LOGGING_PKGS}"
 RDEPENDS:${PN}-logging:append = " phosphor-logging-test"
 RDEPENDS:${PN}-leds:remove:sbp1 = "phosphor-led-manager-faultmonitor"
-RDEPENDS:${PN}-devtools:remove:witherspoon = "rsync"

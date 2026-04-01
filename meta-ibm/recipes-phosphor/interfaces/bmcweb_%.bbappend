@@ -28,11 +28,6 @@ PACKAGECONFIG:remove:ibm-enterprise = " \
     vm-websocket \
 "
 
-# Witherspoon doesn't have the space for the both zstd and xz compression
-PACKAGECONFIG:remove:witherspoon = " \
-    http-zstd \
-"
-
 PACKAGECONFIG:append = " ${@bb.utils.contains('MACHINE_FEATURES', 'redundant-bmc', 'redundant-bmc', '', d)}"
 PACKAGECONFIG[redundant-bmc] = "-Dredfish-aggregation=enabled"
 

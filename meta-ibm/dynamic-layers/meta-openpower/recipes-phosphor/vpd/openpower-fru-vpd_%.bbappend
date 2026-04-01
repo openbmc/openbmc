@@ -25,11 +25,6 @@ do_install:append:mf-redundant-bmc() {
                 ${override_dir}/vpd-manager-rbmc-override.conf
 }
 
-do_install:append:witherspoon() {
-        DEST=${D}${inventory_envdir}
-        printf "\nEEPROM=/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a400.i2c/i2c-11/11-0051/eeprom" >> ${DEST}/inventory
-}
-
 pkg_postinst:${PN}:ibm-enterprise() {
     mkdir -p $D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants
     LINK="$D$systemd_system_unitdir/obmc-chassis-poweroff@0.target.wants/wait-vpd-parsers.service"

@@ -6,10 +6,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append:df-chrony = " chrony"
 
 IMAGE_FEATURES:append = " obmc-dbus-monitor"
 
-# remove so things fit in available flash space
-IMAGE_FEATURES:remove:witherspoon = "obmc-user-mgmt-ldap"
-IMAGE_FEATURES:remove:witherspoon = "obmc-telemetry"
-
 # Optionally configure IBM service accounts
 #
 # To configure your distro, add the following line to its config:

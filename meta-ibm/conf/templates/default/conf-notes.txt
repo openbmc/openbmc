@@ -6,5 +6,3 @@ huygens:
 MACHINE=huygens bitbake obmc-phosphor-image
 p10bmc:
 MACHINE=p10bmc bitbake obmc-phosphor-image
-witherspoon:
-MACHINE=witherspoon bitbake obmc-phosphor-image

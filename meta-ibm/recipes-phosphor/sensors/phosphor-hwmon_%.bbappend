@@ -4,19 +4,6 @@ SRC_URI:append:ibm-ac-server = " \
            file://70-hwmon.rules \
            "
 
-CHIPS:witherspoon = " \
-               bus@1e78a000/i2c@100/max31785@52 \
-               bus@1e78a000/i2c@100/power-supply@68 \
-               bus@1e78a000/i2c@100/power-supply@69 \
-               bus@1e78a000/i2c@100/bmp280@77 \
-               bus@1e78a000/i2c@100/dps310@76 \
-               bus@1e78a000/i2c@140/ir35221@70 \
-               bus@1e78a000/i2c@140/ir35221@71 \
-               bus@1e78a000/i2c@180/ir35221@70 \
-               bus@1e78a000/i2c@180/ir35221@71 \
-               bus@1e78a000/i2c@380/tmp275@4a \
-               "
-
 CHIPS:p10bmc = " \
                1e78a200.i2c/i2c-3/3-0068 \
                1e78a200.i2c/i2c-3/3-0069 \

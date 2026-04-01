@@ -1,6 +1,3 @@
-# Witherspoon system does not support warm reboots
-PACKAGECONFIG:append:witherspoon = " no-warm-reboot"
-
 # System1 does not support warm reboots
 PACKAGECONFIG:append:system1 = " no-warm-reboot"
 
