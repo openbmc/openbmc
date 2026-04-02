@@ -23,6 +23,17 @@
                     "Period": 1000
                 }
             ]
+        },
+        {
+            "group": "power_fault",
+            "members": [
+                {
+                    "Name": "power_fault_amber",
+                    "Action": "On",
+                    "Priority": "On",
+                    "DutyOn": 50
+                }
+            ]
         }
     ]
 }

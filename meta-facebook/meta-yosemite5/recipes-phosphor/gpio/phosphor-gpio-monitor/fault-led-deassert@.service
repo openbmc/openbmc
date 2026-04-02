@@ -1,0 +1,8 @@
+[Unit]
+Description=%i Power Fault LED Deassert
+Conflicts=fault-led-deassert@%i.timer
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/fault-led "%i" "deassert"
+SyslogIdentifier=%i-power-fault-led-deassert

@@ -1,0 +1,82 @@
+#!/bin/bash
+
+sleep 1
+source=$1
+power_state=$2
+self="${source#*_}"
+
+GPIO_NAME=( "ALERT_INA230_DIMM_0_N"
+            "ALERT_INA230_DIMM_1_N"
+            "ALERT_INA230_E1S_0_N"
+            "ALERT_INA230_E1S_1_N"
+            "ALERT_INA230_FAN0_N"
+            "ALERT_INA230_FAN1_N"
+            "ALERT_INA230_FAN2_N"
+            "ALERT_INA230_FAN3_N"
+            "ALERT_INA230_NIC_N"
+            "ALERT_INA230_SCM_N"
+            "ALERT_IRQ_PMBUS_PWR11_N"
+            "ALERT_MCIO2A_LEAK_DETECT_N"
+            "ALERT_MCIO3A_LEAK_DETECT_N"
+            "ALERT_MCIO4A_LEAK_DETECT_N"
+            "ALERT_OC_PADDLE2_N"
+            "ALERT_OC_PWR2_N"
+            "ALERT_OC_PWR11_N"
+            "ALERT_PWR14_SB2_LEAK_DETECT_N"
+            "ALERT_PWR14_SB3_LEAK_DETECT_N"
+            "ALERT_PWR15_SB2_LEAK_DETECT_N"
+            "ALERT_PWR15_SB3_LEAK_DETECT_N"
+            "ALERT_SMB_MCIO0A_N"
+            "ALERT_SMB_MCIO1A_N"
+            "ALERT_SMB_MCIO2A_N"
+            "ALERT_SMB_MCIO2B_N"
+            "ALERT_SMB_MCIO3A_N"
+            "ALERT_SMB_MCIO3B_N"
+            "ALERT_SMB_MCIO4A_N"
+            "ALERT_SMB_MCIO4B_N"
+            "ALERT_THERMALTRIP_MCIO1A_N"
+            "ALERT_THERMALTRIP_MCIO2A_N"
+            "ALERT_THERMALTRIP_MCIO3A_N"
+            "ALERT_THERMALTRIP_MCIO4A_N"
+            "ALERT_UV_PADDLE2_N"
+            "ALERT_UV_PWR2_N"
+            "ALERT_UV_PWR11_N"
+            "ALERT_VR_SMB_N"
+            "FAULT_FAN_0_N"
+            "FAULT_FAN_1_N"
+            "FAULT_FAN_2_N"
+            "FAULT_FAN_3_N"
+            "FAULT_P3V3_E1S_0_N"
+            "FAULT_P3V3_E1S_1_N"
+            "FAULT_P3V3_NIC_N"
+            "FAULT_P12V_NIC_N"
+            "FAULT_P12V_SCM_N"
+            "ALERT_INLET_TEMP_N"
+            "FM_CPU_PROCHOT_R_N"
+            "FM_CPU_THERMTRIP_N"
+            "ALERT_OUTLET_TEMP_N"
+            "PVDDCR_CPU0_P0_OCP_N"
+            "PVDDCR_CPU1_P0_OCP_N"
+            "PVDDCR_SOC_P0_OCP_N"
+            "ALERT_IRQ_PMBUS_PWR2_N"
+            "Fault" )
+
+if [ "$power_state" == "assert" ]; then
+    busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/power_fault" "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+elif [ "$power_state" == "deassert" ]; then
+    found=0
+
+    for name in "${GPIO_NAME[@]}"; do
+        [[ "$name" == "$self" ]] && continue
+        if [ -e "/run/$name.log_entry" ]; then
+            found=1
+            break
+        fi
+    done
+
+    if [ $found -eq 0 ]; then
+        busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/power_fault" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+    fi
+fi
+
+exit 0
