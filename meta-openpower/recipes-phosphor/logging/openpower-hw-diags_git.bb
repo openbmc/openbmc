@@ -15,7 +15,7 @@ PR = "r1"
 PV = "0.1+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/openpower-hw-diags;branch=master;protocol=https"
-SRCREV = "488e45f711aded8f071da91a2fae0881e4822fad"
+SRCREV = "8bf048390b1bb92f7dafa35f17630022750a0fa1"
 
 inherit pkgconfig meson systemd
 
