@@ -1,7 +1,4 @@
 #!/bin/bash
 
-# shellcheck source=meta-facebook/meta-anacapa/recipes-phosphor/state/phosphor-state-manager/power-cmd
-source /usr/libexec/phosphor-state-manager/power-cmd
-
-force_power_off
-
+echo "no support chassis power off"
+exit 0
