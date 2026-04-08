@@ -59,6 +59,17 @@
         "Continue": true
     },
     {
+        "Name": "R_RTM_SW_FLT",
+        "LineName": "R_RTM_SW_FLT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@R_RTM_SW_FLT:assert.service"],
+            "FALLING":  ["power-rail-logger@R_RTM_SW_FLT:assert.service"],
+            "RISING":   ["power-rail-logger@R_RTM_SW_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
         "Name": "L_RTM_SW_FLT",
         "LineName": "L_RTM_SW_FLT",
         "EventMon": "BOTH",
@@ -176,6 +187,61 @@
             "INIT_LOW": ["power-rail-logger@R_FNIC_FLT:assert.service"],
             "FALLING":  ["power-rail-logger@R_FNIC_FLT:assert.service"],
             "RISING":   ["power-rail-logger@R_FNIC_FLT:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_MAIN_PWREN_RMC_EN_ISO",
+        "LineName": "FM_MAIN_PWREN_RMC_EN_ISO",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@FM_MAIN_PWREN_RMC_EN_ISO:assert.service"],
+            "FALLING":  ["power-rail-logger@FM_MAIN_PWREN_RMC_EN_ISO:assert.service"],
+            "RISING":   ["power-rail-logger@FM_MAIN_PWREN_RMC_EN_ISO:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_CHMP_CPU0_FPGA",
+        "LineName": "PWRGD_CHMP_CPU0_FPGA",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@PWRGD_CHMP_CPU0_FPGA:assert.service"],
+            "FALLING":  ["power-rail-logger@PWRGD_CHMP_CPU0_FPGA:assert.service"],
+            "RISING":   ["power-rail-logger@PWRGD_CHMP_CPU0_FPGA:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_CHIL_CPU0_FPGA",
+        "LineName": "PWRGD_CHIL_CPU0_FPGA",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@PWRGD_CHIL_CPU0_FPGA:assert.service"],
+            "FALLING":  ["power-rail-logger@PWRGD_CHIL_CPU0_FPGA:assert.service"],
+            "RISING":   ["power-rail-logger@PWRGD_CHIL_CPU0_FPGA:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_CHEH_CPU0_FPGA",
+        "LineName": "PWRGD_CHEH_CPU0_FPGA",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@PWRGD_CHEH_CPU0_FPGA:assert.service"],
+            "FALLING":  ["power-rail-logger@PWRGD_CHEH_CPU0_FPGA:assert.service"],
+            "RISING":   ["power-rail-logger@PWRGD_CHEH_CPU0_FPGA:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWRGD_CHAD_CPU0_FPGA",
+        "LineName": "PWRGD_CHAD_CPU0_FPGA",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:assert.service"],
+            "FALLING":  ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:assert.service"],
+            "RISING":   ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:deassert.service"]
         },
         "Continue": true
     }
