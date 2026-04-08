@@ -14,8 +14,6 @@ FILES:${PN} += "${systemd_system_unitdir}/*"
 
 SYSTEMD_SERVICE:${PN} += "${CRITICAL_LEAK_SERVICE}"
 
-SYSTEMD_AUTO_ENABLE = "enable"
-
 do_install:append() {
 
     install -d ${D}${libexecdir}/${PN}/

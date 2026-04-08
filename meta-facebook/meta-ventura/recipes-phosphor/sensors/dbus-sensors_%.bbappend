@@ -30,8 +30,6 @@ SYSTEMD_SERVICE:${PN} += "${CRITICAL_DEASSERT_SERVICE}"
 SYSTEMD_SERVICE:${PN} += "${WARNING_LEAK_SERVICE}"
 SYSTEMD_SERVICE:${PN} += "${WARNING_DEASSERT_SERVICE}"
 
-SYSTEMD_AUTO_ENABLE = "enable"
-
 do_install:append() {
     if ${@bb.utils.contains('PACKAGECONFIG', 'cablemonitor', 'true', 'false', d)}; then
         install -d ${D}/var/lib/cablemonitor

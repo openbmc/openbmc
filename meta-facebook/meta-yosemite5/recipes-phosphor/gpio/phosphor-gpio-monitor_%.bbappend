@@ -48,8 +48,6 @@ SYSTEMD_SERVICE:${PN} += " \
     smc-deassert-log@.service \
     "
 
-SYSTEMD_AUTO_ENABLE = "enable"
-
 do_install:append() {
     install -d ${D}${datadir}/${PN}
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.json \
