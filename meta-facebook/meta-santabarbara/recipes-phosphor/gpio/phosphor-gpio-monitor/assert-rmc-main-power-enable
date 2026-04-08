@@ -1,5 +1,11 @@
 #!/bin/bash
 
+busctl call \
+    xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+    xyz.openbmc_project.Logging.Create Create "ssa{ss}" \
+    "RMC main power enabled" \
+    "xyz.openbmc_project.Logging.Entry.Level.Informational" 0
+
 busctl set-property xyz.openbmc_project.State.Host0 \
     /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host \
     RequestedHostTransition s "xyz.openbmc_project.State.Host.Transition.On"
