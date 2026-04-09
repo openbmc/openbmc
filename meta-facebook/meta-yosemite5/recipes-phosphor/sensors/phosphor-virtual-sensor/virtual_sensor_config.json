@@ -515,6 +515,11 @@
                 "chassis",
                 "all_sensors",
                 "/xyz/openbmc_project/inventory/system/board/Yosemite5_SCM"
+            ],
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_SCM_2700"
             ]
         ],
         "Params": {
