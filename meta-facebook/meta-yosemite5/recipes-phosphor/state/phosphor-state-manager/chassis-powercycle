@@ -7,6 +7,16 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 echo "Starting Chassis Power Cycle"
 
 chassis-power-cycle() {
+    # If any slot is updating CM, do not allow chassis AC cycle.
+    for i in {1..6}
+    do
+        if [ "$(get_gpio "SLOT${i}_CM_UPDATE")" = "1" ]; then
+            echo "Slot ${i} : CM updating in progress."
+            echo "AC Cycle prohibited."
+            return 1
+        fi
+    done
+
     # PDB CPLD
     if ! i2cset -f -y 8 0x0F 0x11 0xFE; then
         return 1
