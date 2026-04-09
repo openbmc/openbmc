@@ -40,10 +40,70 @@
     {
         "Name": "HPM1-Run-Power-Good",
         "LineName": "B1_M0_RUN_POWER_PG-I",
-          "EventMon": "BOTH",
+        "EventMon": "BOTH",
         "Targets": {
             "FALLING": ["run-power-good-deassert.service"],
             "RISING": ["run-power-good-assert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM0-Thermtrip-Alert",
+        "LineName": "B0_M0_THERM_OVERT_L-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["thermtrip-assert-log@HPM0-Thermtrip-Alert.service"],
+            "RISING": ["thermtrip-deassert-log@HPM0-Thermtrip-Alert.service"]
+        },
+        "Continue": true
+    },
+        {
+        "Name": "HPM1-Thermtrip-Alert",
+        "LineName": "B1_M0_THERM_OVERT_L-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["thermtrip-assert-log@HPM1-Thermtrip-Alert.service"],
+            "RISING": ["thermtrip-deassert-log@HPM1-Thermtrip-Alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM0-Prochot-Alert",
+        "LineName": "B0_M0_THERM_WARN_L-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["prochot-assert-log@HPM0-Prochot-Alert.service"],
+            "RISING": ["prochot-deassert-log@HPM0-Prochot-Alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM1-Prochot-Alert",
+        "LineName": "B1_M0_THERM_WARN_L-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["prochot-assert-log@HPM1-Prochot-Alert.service"],
+            "RISING": ["prochot-deassert-log@HPM1-Prochot-Alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM0-Chipthrot-Alert",
+        "LineName": "B0_CPU0_CHIPTHROT_L-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["prochot-assert-log@HPM0-Chipthrot-Alert.service"],
+            "RISING": ["prochot-deassert-log@HPM0-Chipthrot-Alert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "HPM1-Chipthrot-Alert",
+        "LineName": "B1_CPU0_CHIPTHROT_L-I",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["prochot-assert-log@HPM1-Chipthrot-Alert.service"],
+            "RISING": ["prochot-deassert-log@HPM1-Chipthrot-Alert.service"]
         },
         "Continue": true
     }

@@ -7,14 +7,19 @@ SRC_URI:append = " \
     file://cpu-boot-done \
     file://cpu-shdn-ok \
     file://run-power-good \
+    file://thermal-event-logger \
     "
 
 SRC_URI:append = " \
     file://cpu-boot-done-assert.service \
     file://cpu-boot-done-deassert.service \
     file://cpu-shdn-ok.service \
+    file://prochot-assert-log@.service \
+    file://prochot-deassert-log@.service \
     file://run-power-good-assert.service \
     file://run-power-good-deassert.service \
+    file://thermtrip-assert-log@.service \
+    file://thermtrip-deassert-log@.service \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -25,8 +30,12 @@ SYSTEMD_SERVICE:${PN}-monitor += " \
     cpu-boot-done-assert.service \
     cpu-boot-done-deassert.service \
     cpu-shdn-ok.service \
+    prochot-assert-log@.service \
+    prochot-deassert-log@.service \
     run-power-good-assert.service \
     run-power-good-deassert.service \
+    thermtrip-assert-log@.service \
+    thermtrip-deassert-log@.service \
     "
 
 do_install:append() {
@@ -44,6 +53,8 @@ do_install:append() {
                     ${D}${libexecdir}/${PN}/cpu-shdn-ok
     install -m 0755 ${UNPACKDIR}/run-power-good \
                     ${D}${libexecdir}/${PN}/run-power-good
+    install -m 0755 ${UNPACKDIR}/thermal-event-logger \
+                    ${D}${libexecdir}/${PN}/thermal-event-logger
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/

@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Prochot Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/thermal-event-logger "assert" "%i"
+SyslogIdentifier=%i-prochot-assert
