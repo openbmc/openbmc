@@ -3,6 +3,7 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 SYSTEMD_SERVICE:${PN}:append:ibm-enterprise = " system-vpd.service"
 SYSTEMD_SERVICE:${PN}:append:ibm-enterprise = " wait-vpd-parsers.service"
 SYSTEMD_SERVICE:${PN}:append:ibm-enterprise = " vpd-manager.service"
+SYSTEMD_SERVICE:${PN}:append:ibm-enterprise = " active-to-passive.service"
 PACKAGECONFIG:append:ibm-enterprise = " ibm_system"
 
 FILES:${PN}:append:ibm-enterprise = " ${datadir}/vpd/*.json"
