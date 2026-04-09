@@ -109,6 +109,8 @@ SRC_URI:append = " \
     file://host-graceful-poweroff-failure@.service \
     file://host-poweron \
     file://host-poweron@.service \
+    file://host-powerreset \
+    file://host-powerreset@.service \
     file://power-cmd \
     file://phosphor-state-manager-init.conf \
 "
@@ -130,6 +132,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/host-graceful-poweroff ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-graceful-poweroff-failure ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/host-poweron ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
 }
 
