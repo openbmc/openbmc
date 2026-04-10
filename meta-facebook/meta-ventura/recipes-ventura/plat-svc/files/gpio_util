@@ -50,7 +50,7 @@ get_gpio_val_from_debugfs() {
   [ -n "$want_name" ] || return 1
   [ -r /sys/kernel/debug/gpio ] || return 1
 
-  gpio_base=$(grep "$chip" /sys/kernel/debug/gpio | sed -n 's/.*GPIOs \([0-9]\+\)-.*/\1/p')
+  gpio_base=$(grep -w "$chip" /sys/kernel/debug/gpio | sed -n 's/.*GPIOs \([0-9]\+\)-.*/\1/p')
   gpio_id=$(("$gpio_base" + "$line"))
   gpio_val=$(awk -v gpio_id="$gpio_id" '
     $1 == "gpio-"gpio_id {
