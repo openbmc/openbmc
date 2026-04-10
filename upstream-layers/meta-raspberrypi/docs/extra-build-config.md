@@ -186,12 +186,6 @@ It means that, for those boards, `RPI_USE_U_BOOT = "1"` is not compatible with
 
 To build an initramfs image:
 
-* Set this 3 kernel variables (in kernel's do_configure:prepend in linux-raspberrypi.inc after the line kernel_configure_variable LOCALVERSION "\"\""
-)
-  - kernel_configure_variable BLK_DEV_INITRD y
-  - kernel_configure_variable INITRAMFS_SOURCE ""
-  - kernel_configure_variable RD_GZIP y
-
 * Set the yocto variables (e.g. in local.conf)
   - `INITRAMFS_IMAGE = "<name for your initramfs image>"`
   - `INITRAMFS_IMAGE_BUNDLE = "1"`
