@@ -3,7 +3,7 @@ inherit_defer native
 
 SUMMARY += " (tools only)"
 
-PACKAGECONFIG = "tools asahi panfrost"
+PACKAGECONFIG = "tools asahi imagination panfrost"
 # llvm required for libclc
 PACKAGECONFIG += "gallium-llvm"
 # Doesn't compile without wayland-scanner if PLATFORMS has wayland in, and,

@@ -66,9 +66,9 @@ class LtpTest(LtpTestBase):
 
     def runltp(self, ltp_group):
             # LTP appends to log files, so ensure we start with a clean log
-            self.target.deleteFiles("/opt/ltp/results/", ltp_group)
+            self.target.deleteFiles("/opt/ltp/results/", "%s.json" % ltp_group)
 
-            cmd = '/opt/ltp/runltp -f %s -q -r /opt/ltp -l /opt/ltp/results/%s -I 1 -d /opt/ltp' % (ltp_group, ltp_group)
+            cmd = 'kirk --run-suite %s --json-report /opt/ltp/results/%s.json -n -d /opt/ltp --exec-timeout 20m' % (ltp_group, ltp_group)
 
             starttime = time.time()
             (status, output) = self.target.run(cmd, timeout=1200)
@@ -87,8 +87,8 @@ class LtpTest(LtpTestBase):
             self.extras['ltpresult.rawlogs']['log'] = self.extras['ltpresult.rawlogs']['log'] + output
 
             # Copy the machine-readable test results locally so we can parse it
-            dst = os.path.join(self.ltptest_log_dir, ltp_group)
-            remote_src = "/opt/ltp/results/%s" % ltp_group 
+            dst = os.path.join(self.ltptest_log_dir, "%s.json" % ltp_group)
+            remote_src = "/opt/ltp/results/%s.json" % ltp_group
             (status, output) = self.target.copyFrom(remote_src, dst, True)
             if status:
                 msg = 'File could not be copied. Output: %s' % output
@@ -113,16 +113,21 @@ class LtpTest(LtpTestBase):
 
     # LTP runtime tests
     @OETestDepends(['ssh.SSHTest.test_ssh'])
-    @OEHasPackage(["ltp"])
+    @OEHasPackage(["ltp", "python3-kirk"])
     def test_ltp_help(self):
-        (status, output) = self.target.run('/opt/ltp/runltp --help')
+        (status, output) = self.target.run('kirk --help')
         msg = 'Failed to get ltp help. Output: %s' % output
         self.assertEqual(status, 0, msg=msg)
 
     @OETestDepends(['ltp.LtpTest.test_ltp_help'])
     def test_ltp_groups(self):
-        for ltp_group in self.ltp_groups: 
-            self.runltp(ltp_group)
+        for ltp_group in self.ltp_groups:
+            try:
+                self.runltp(ltp_group)
+            except Exception as e:
+                self.extras['ltpresult.%s' % ltp_group] = {'status': 'FAILED'}
+                self.failmsg = self.failmsg + "Suite %s crashed: %s\n" % (ltp_group, e)
+                self.target.logger.warning("Suite %s crashed, continuing: %s" % (ltp_group, e))
 
     @OETestDepends(['ltp.LtpTest.test_ltp_groups'])
     def test_ltp_runltp_cve(self):

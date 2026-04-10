@@ -54,6 +54,11 @@ do_install:append () {
 
 	install -d ${D}${systemd_system_unitdir}/rpcbind.service.d
 	install -m 0644 ${UNPACKDIR}/rpcbind.systemd ${D}${systemd_system_unitdir}/rpcbind.service.d/rpcbind.conf
+
+	if ! ${@bb.utils.contains('DISTRO_FEATURES', 'ipv6', 'true', 'false', d)}
+	then
+		sed -i '/^Listen.*=\[.*\]/s/^/# /' ${D}${systemd_system_unitdir}/*.socket
+	fi
 }
 
 FILES:${PN} += "${systemd_system_unitdir}/rpcbind.service.d/rpcbind.conf"

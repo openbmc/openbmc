@@ -454,9 +454,10 @@ def set_packagetriplet(d):
 python () {
     import string, re
 
-    # Handle backfilling
-    oe.utils.features_backfill("DISTRO_FEATURES", d)
-    oe.utils.features_backfill("MACHINE_FEATURES", d)
+    # Filter default features to allow users to opt out of features they don't
+    # want.
+    oe.utils.filter_default_features("DISTRO_FEATURES", d)
+    oe.utils.filter_default_features("MACHINE_FEATURES", d)
 
     # To add a recipe to the skip list , set:
     #   SKIP_RECIPE[pn] = "message"

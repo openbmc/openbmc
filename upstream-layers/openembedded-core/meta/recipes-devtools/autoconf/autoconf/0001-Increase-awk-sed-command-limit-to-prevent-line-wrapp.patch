@@ -1,0 +1,47 @@
+From 139f757a6244d3b1e07f7fddc6d07d9c17f45313 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 25 Nov 2025 21:03:38 -0800
+Subject: [PATCH] Increase awk/sed command limit to prevent line wrapping
+
+Autoconf 2.70+ wraps long variable assignments in config.status
+using backslash-newline continuations. This breaks when LDFLAGS
+or other variables contain special characters.
+
+In OE, buildpaths will be part of flags such as LDFLAGS or CFLAGS
+and they might end up being linewrapped now. OE recipes do have
+mechanisms to scrub the absolute paths for achieving reproducibility
+which fails when linwrapping happens as the strings get divided and
+the checks for scrubbing become ineffective.
+
+Increase _AC_SED_CMD_LIMIT from 99 and _AC_AWK_LITERAL_LIMIT
+from 148 to 4000 to prevent wrapping.
+
+Upstream-Status: Inappropriate [OE-Specific]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/autoconf/status.m4 | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/autoconf/status.m4 b/lib/autoconf/status.m4
+index 2bfaf32..be444b2 100644
+--- a/lib/autoconf/status.m4
++++ b/lib/autoconf/status.m4
+@@ -297,7 +297,7 @@ AC_DEFUN([AC_CONFIG_FILES], [_AC_CONFIG_FOOS([FILES], $@)])
+ # Some seds have small command number limits, like on Digital OSF/1 and HP-UX.
+ m4_define([_AC_SED_CMD_LIMIT],
+ dnl One cannot portably go further than 99 commands because of HP-UX.
+-[99])
++[4000])
+
+
+ # _AC_AWK_LITERAL_LIMIT
+@@ -307,7 +307,7 @@ dnl One cannot portably go further than 99 commands because of HP-UX.
+ #
+ # Some awk's have small limits, such as Solaris and AIX awk.
+ m4_define([_AC_AWK_LITERAL_LIMIT],
+-[148])
++[4000])
+
+
+ # _AC_OUTPUT_FILES_PREPARE

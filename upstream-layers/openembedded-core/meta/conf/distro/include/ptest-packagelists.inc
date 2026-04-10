@@ -160,11 +160,11 @@ PTESTS_PROBLEMS:append:riscv64 = " tcl tcl8 python3-cffi strace lttng-tools pyth
 # These tests don't yet pass for musl qemuarm64
 PTESTS_SLOW:remove:libc-musl:qemuarm64 = "strace perl gnutls glib-2.0"
 PTESTS_FAST:remove:libc-musl:qemuarm64 = "libarchive"
-PTESTS_PROBLEMS:append:libc-musl:qemuarm64 = "strace perl gnutls glib-2.0 libarchive"
+PTESTS_PROBLEMS:append:libc-musl:qemuarm64 = " strace perl gnutls glib-2.0 libarchive"
 # These tests don't yet pass for musl qemux86-64
 PTESTS_SLOW:remove:libc-musl:qemux86-64 = "perl gnutls"
 PTESTS_FAST:remove:libc-musl:qemux86-64 = "libarchive"
-PTESTS_PROBLEMS:append:libc-musl:qemux86-64 = "perl gnutls libarchive"
+PTESTS_PROBLEMS:append:libc-musl:qemux86-64 = " perl gnutls libarchive"
 
 #    ruby \ # Timeout
 #    rt-tests \ # Needs to be checked whether it runs at all

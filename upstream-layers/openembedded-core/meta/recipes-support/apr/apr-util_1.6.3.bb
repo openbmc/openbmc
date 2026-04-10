@@ -12,6 +12,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=158aa0b1efe0c12f23d4b007ddb9a5db \
 SRC_URI = "${APACHE_MIRROR}/apr/${BPN}-${PV}.tar.gz \
            file://configfix.patch \
 	   file://0001-test_transformation-Check-if-transform-is-supported-.patch \
+	       file://0001-sdbm-Fix-old-style-function-prototype-warning-with-c.patch \
            file://run-ptest \
            "
 

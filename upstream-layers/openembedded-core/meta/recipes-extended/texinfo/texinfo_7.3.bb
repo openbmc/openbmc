@@ -61,7 +61,7 @@ do_install:append() {
 	install -p -m644 ${S}/doc/texinfo.tex ${S}/doc/txi-??.tex ${D}${datadir}/${tex_texinfo}
 	sed -i -e '1s,#!.*perl,#! ${USRBINPATH}/env perl,' ${D}${bindir}/texi2any ${D}${bindir}/pod2texi
 	sed -i -e '1s,#!.*perl,#! ${USRBINPATH}/env perl,' ${D}${datadir}/texi2any/load_txi_modules
-	sed -i -e 's,${HOSTTOOLS_DIR},,' ${D}${bindir}/texindex
+	sed -i -e 's,${HOSTTOOLS_DIR}/,,' ${D}${bindir}/texindex
 }
 
 do_install:append:class-native() {

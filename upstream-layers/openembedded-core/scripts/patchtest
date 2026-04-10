@@ -183,6 +183,7 @@ def print_result_message(preresult, postresult):
     print("----------------------------------------------------------------------\n")
 
 def main():
+    ret = 0
     tmp_patch = False
     patch_path = PatchtestParser.patch_path
     log_results = PatchtestParser.log_results
@@ -214,12 +215,14 @@ def main():
 
         try:
             if log_path:
-                run(patch, log_path)
+                ret = run(patch, log_path)
             else:
-                run(patch)
+                ret = run(patch)
         finally:
             if tmp_patch:
                 os.remove(patch)
+
+    return ret
 
 if __name__ == '__main__':
     ret = 1

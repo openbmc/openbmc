@@ -39,8 +39,6 @@ UPSTREAM_CHECK_REGEX = "/Expect/(?P<pver>(\d+[\.\-_]*)+)/"
 
 S = "${UNPACKDIR}/${BPN}${PV}"
 
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 CFLAGS += "-std=gnu17"
 
 do_install:append() {

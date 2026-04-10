@@ -337,8 +337,8 @@ do_deploy () {
         fi
     fi
 
-     if [ -n "${SPL_BINARY}" ]
-     then
+    if [ -n "${SPL_BINARY}" ]
+    then
         if [ -n "${UBOOT_CONFIG}" ]
         then
             for config in ${UBOOT_MACHINE}; do

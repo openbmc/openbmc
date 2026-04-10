@@ -17,7 +17,6 @@ CLASSOVERRIDE = "class-nativesdk"
 MACHINEOVERRIDES = ""
 
 MACHINE_FEATURES = "${SDK_MACHINE_FEATURES}"
-MACHINE_FEATURES_BACKFILL = ""
 
 MULTILIBS = ""
 
@@ -78,13 +77,13 @@ python nativesdk_virtclass_handler () {
     if not (pn.endswith("-nativesdk") or pn.startswith("nativesdk-")):
         return
 
-    # Set features here to prevent appends and distro features backfill
-    # from modifying nativesdk distro features
+    # Set features here to prevent DISTRO_FEATURES modifications from affecting
+    # nativesdk distro features
     features = set(d.getVar("DISTRO_FEATURES_NATIVESDK").split())
-    oe.utils.features_backfill("DISTRO_FEATURES", d)
+    oe.utils.filter_default_features("DISTRO_FEATURES", d)
     filtered = set(bb.utils.filter("DISTRO_FEATURES", d.getVar("DISTRO_FEATURES_FILTER_NATIVESDK"), d).split())
     d.setVar("DISTRO_FEATURES", " ".join(sorted(features | filtered)))
-    d.setVar("DISTRO_FEATURES_BACKFILL", "")
+    d.setVar("DISTRO_FEATURES_DEFAULTS", "")
 
     e.data.setVar("MLPREFIX", "nativesdk-")
     e.data.setVar("PN", "nativesdk-" + e.data.getVar("PN").replace("-nativesdk", "").replace("nativesdk-", ""))

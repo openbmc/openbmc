@@ -783,7 +783,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         self._test_recipe_contents(recipefile, checkvars, [])
 
     def test_recipetool_create_git_http(self):
-        self._test_recipetool_create_git('http://git.yoctoproject.org/git/matchbox-keyboard')
+        self._test_recipetool_create_git('http://git.yoctoproject.org/matchbox-keyboard')
 
     def test_recipetool_create_git_srcuri_master(self):
         self._test_recipetool_create_git('git://git.yoctoproject.org/matchbox-keyboard;branch=master;protocol=https')

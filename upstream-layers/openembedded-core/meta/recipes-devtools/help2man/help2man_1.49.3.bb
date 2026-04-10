@@ -10,10 +10,6 @@ SRC_URI[sha256sum] = "4d7e4fdef2eca6afe07a2682151cea78781e0a4e8f9622142d9f70c083
 
 inherit autotools
 
-# This is a hand-maintained aclocal.m4 but our autotools class currently deletes
-# aclocal.m4.
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 EXTRA_OECONF = "--disable-nls"
 
 do_install:append () {

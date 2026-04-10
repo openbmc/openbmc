@@ -57,10 +57,12 @@ class WicTestCase(OESelftestTestCase):
 
     image_is_ready = False
     wicenv_cache = {}
+    wic_bindir = None
 
     def setUpLocal(self):
         """This code is executed before each test method."""
         self.resultdir = os.path.join(self.builddir, "wic-tmp")
+        self._old_path = os.environ.get('PATH')
         super(WicTestCase, self).setUpLocal()
 
         # Do this here instead of in setUpClass as the base setUp does some
@@ -72,12 +74,44 @@ class WicTestCase(OESelftestTestCase):
 
             bitbake('wic-tools core-image-minimal core-image-minimal-mtdutils')
             WicTestCase.image_is_ready = True
+
+        os.environ['PATH'] = self._get_wic_path()
         rmtree(self.resultdir, ignore_errors=True)
 
     def tearDownLocal(self):
         """Remove resultdir as it may contain images."""
+        if self._old_path is None:
+            os.environ.pop('PATH', None)
+        else:
+            os.environ['PATH'] = self._old_path
         rmtree(self.resultdir, ignore_errors=True)
         super(WicTestCase, self).tearDownLocal()
+
+    def _get_wic_path(self):
+        if WicTestCase.wic_bindir is None:
+            search_paths = [
+                os.path.join(self.td['COREBASE'], 'scripts'),
+                os.path.join(get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools'), 'usr', 'bin'),
+            ]
+
+            for bindir in search_paths:
+                if os.path.exists(os.path.join(bindir, 'wic')):
+                    WicTestCase.wic_bindir = bindir
+                    break
+
+            if WicTestCase.wic_bindir is None:
+                self.fail("Unable to find the wic binary in %s" % ', '.join(search_paths))
+
+        path_entries = []
+        for path_group in (
+                [WicTestCase.wic_bindir],
+                (get_bb_var("PATH", "wic-tools") or '').split(':'),
+                (self._old_path or '').split(':')):
+            for entry in path_group:
+                if entry and entry not in path_entries:
+                    path_entries.append(entry)
+
+        return ':'.join(path_entries)
 
     def _get_image_env_path(self, image):
         """Generate and obtain the path to <image>.env"""
@@ -88,7 +122,7 @@ class WicTestCase(OESelftestTestCase):
             WicTestCase.wicenv_cache[image] = os.path.join(stdir, machine, 'imgdata')
         return WicTestCase.wicenv_cache[image]
 
-class CLITests(OESelftestTestCase):
+class CLITests(WicTestCase):
     def test_version(self):
         """Test wic --version"""
         runCmd('wic --version')
@@ -1650,10 +1684,6 @@ QB_DEFAULT_KERNEL = "none"
 
 # boot command line provided via uki, not via bootloader
 UKI_CMDLINE = "rootwait root=LABEL=root console=${KERNEL_CONSOLE}"
-
-# qemu provides the devicetree at boot, do not embed a dtb in the uki for selftests
-UKI_DEVICETREE = ""
-
 """
         self.append_config(config)
         bitbake('core-image-base ovmf')
@@ -1863,34 +1893,6 @@ INITRAMFS_IMAGE = "core-image-initramfs-boot"
         runCmd(cmd)
         self.remove_config(config)
         self.assertEqual(1, len(glob(os.path.join(self.resultdir, "sdimage-bootpart-*direct"))))
-
-    def test_sparse_copy(self):
-        """Test sparse_copy with FIEMAP and SEEK_HOLE filemap APIs"""
-        libpath = os.path.join(self.td['COREBASE'], 'scripts', 'lib', 'wic')
-        sys.path.insert(0, libpath)
-        from  filemap import FilemapFiemap, FilemapSeek, sparse_copy, ErrorNotSupp
-        with NamedTemporaryFile("w", suffix=".wic-sparse") as sparse:
-            src_name = sparse.name
-            src_size = 1024 * 10
-            sparse.truncate(src_size)
-            # write one byte to the file
-            with open(src_name, 'r+b') as sfile:
-                sfile.seek(1024 * 4)
-                sfile.write(b'\x00')
-            dest = sparse.name + '.out'
-            # copy src file to dest using different filemap APIs
-            for api in (FilemapFiemap, FilemapSeek, None):
-                if os.path.exists(dest):
-                    os.unlink(dest)
-                try:
-                    sparse_copy(sparse.name, dest, api=api)
-                except ErrorNotSupp:
-                    continue # skip unsupported API
-                dest_stat = os.stat(dest)
-                self.assertEqual(dest_stat.st_size, src_size)
-                # 8 blocks is 4K (physical sector size)
-                self.assertEqual(dest_stat.st_blocks, 8)
-            os.unlink(dest)
 
     def test_mkfs_extraopts(self):
         """Test wks option --mkfs-extraopts for empty and not empty partitions"""

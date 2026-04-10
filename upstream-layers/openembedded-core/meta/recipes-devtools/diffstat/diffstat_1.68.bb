@@ -9,14 +9,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0c432d3aeb935855b2ca1ad2a0542ce4"
 
 SRC_URI = "http://invisible-mirror.net/archives/${BPN}/${BP}.tgz \
            file://run-ptest \
+           file://standard-autoconf.patch \
            file://avoid-check-user-break-cc.patch \
            "
 
 SRC_URI[sha256sum] = "89f9294a8ac74fcef6f1b9ac408f43ebedf8d208e3efe0b99b4acc16dc6582c7"
 
 inherit autotools gettext ptest
-
-EXTRA_AUTORECONF += "--exclude=aclocal"
 
 LDFLAGS += "${TOOLCHAIN_OPTIONS}"
 

@@ -1,0 +1,62 @@
+From 3cef11c710e95bb5f891181e9b2a6d8f174712c3 Mon Sep 17 00:00:00 2001
+From: Patrick Wicki <patrick.wicki@subset.ch>
+Date: Fri, 20 Mar 2026 15:56:56 +0100
+Subject: [PATCH] tpm2-util: fix PCR bank guessing without EFI
+
+Since 7643e4a89 efi_get_active_pcr_banks() is used to determine the
+active PCR banks. Without EFI support, this returns -EOPNOTSUPP. This in
+turns leads to cryptenroll and cryptsetup attach failures unless the PCR
+bank is explicitly set, i.e.
+
+$ systemd-cryptenroll $LUKS_PART --tpm2-device=auto --tpm2-pcrs='7'
+[...]
+Could not read pcr values: Operation not supported
+
+But it works fine with --tpm2-pcrs='7:sha256'.
+
+Similarly, unsealing during cryptsetup attach also fails if the bank
+needs to be determined:
+
+Failed to unseal secret using TPM2: Operation not supported
+
+Catch the -EOPNOTSUPP and fallback to the guessing strategy.
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/pull/41231]
+
+Signed-off-by: Patrick Wicki <patrick.wicki@siemens.com>
+---
+ src/shared/tpm2-util.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/shared/tpm2-util.c b/src/shared/tpm2-util.c
+index cf11b50695..c0590fe575 100644
+--- a/src/shared/tpm2-util.c
++++ b/src/shared/tpm2-util.c
+@@ -2702,11 +2702,11 @@ int tpm2_get_best_pcr_bank(
+         uint32_t efi_banks;
+         r = efi_get_active_pcr_banks(&efi_banks);
+         if (r < 0) {
+-                if (r != -ENOENT)
++                if (!IN_SET(r, -ENOENT, -EOPNOTSUPP))
+                         return r;
+ 
+                 /* If variable is not set use guesswork below */
+-                log_debug("Boot loader didn't set the LoaderTpm2ActivePcrBanks EFI variable, we have to guess the used PCR banks.");
++                log_debug("Boot loader didn't set the LoaderTpm2ActivePcrBanks EFI variable or EFI support is unavailable, we have to guess the used PCR banks.");
+         } else if (efi_banks == UINT32_MAX)
+                 log_debug("Boot loader set the LoaderTpm2ActivePcrBanks EFI variable to indicate that the GetActivePcrBanks() API is not available in the firmware. We have to guess the used PCR banks.");
+         else {
+@@ -2811,11 +2811,11 @@ int tpm2_get_good_pcr_banks(
+         uint32_t efi_banks;
+         r = efi_get_active_pcr_banks(&efi_banks);
+         if (r < 0) {
+-                if (r != -ENOENT)
++                if (!IN_SET(r, -ENOENT, -EOPNOTSUPP))
+                         return r;
+ 
+                 /* If the variable is not set we have to guess via the code below */
+-                log_debug("Boot loader didn't set the LoaderTpm2ActivePcrBanks EFI variable, we have to guess the used PCR banks.");
++                log_debug("Boot loader didn't set the LoaderTpm2ActivePcrBanks EFI variable or EFI support is unavailable, we have to guess the used PCR banks.");
+         } else if (efi_banks == UINT32_MAX)
+                 log_debug("Boot loader set the LoaderTpm2ActivePcrBanks EFI variable to indicate that the GetActivePcrBanks() API is not available in the firmware. We have to guess the used PCR banks.");
+         else {

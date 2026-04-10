@@ -27,6 +27,7 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://recognize_connmand.patch \
            file://busybox-cross-menuconfig.patch \
            file://mount-via-label.cfg \
+           file://mkdosfs.cfg \
            file://sha1sum.cfg \
            file://sha256sum.cfg \
            file://getopts.cfg \

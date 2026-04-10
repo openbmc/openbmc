@@ -21,4 +21,4 @@ GLIBC_EXTRA_OECONF:powerpc64 += "${@bb.utils.contains('TUNE_FEATURES', 'power5',
 GLIBC_EXTRA_OECONF:powerpc += "${@bb.utils.contains('TUNE_FEATURES', 'power5', '--with-cpu=power5', '', d)}"
 
 # QEMU usermode fails with invalid instruction error
-MACHINE_FEATURES_BACKFILL_CONSIDERED:append = "${@bb.utils.contains('TUNE_FEATURES', 'power5', ' qemu-usermode', '', d)}"
+MACHINE_FEATURES_OPTED_OUT += "${@bb.utils.contains('TUNE_FEATURES', 'power5', 'qemu-usermode', '', d)}"

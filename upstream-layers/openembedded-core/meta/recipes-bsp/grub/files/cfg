@@ -1,2 +1,2 @@
-search.file ($cmdpath)/EFI/BOOT/grub.cfg root
+search --file --set=root --hint-efi=$cmdpath /EFI/BOOT/grub.cfg
 set prefix=($root)/EFI/BOOT

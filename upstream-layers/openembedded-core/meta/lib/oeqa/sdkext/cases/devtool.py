@@ -71,14 +71,14 @@ class DevtoolTest(OESDKExtTestCase):
     def test_extend_autotools_recipe_creation(self):
         recipe = "test-dbus-wait"
         self._run('devtool sdk-install dbus')
-        self._run('devtool add %s https://git.yoctoproject.org/git/dbus-wait' % (recipe) )
+        self._run('devtool add %s https://git.yoctoproject.org/dbus-wait' % (recipe) )
         try:
             self._run('devtool build %s' % recipe)
         finally:
             self._run('devtool reset %s' % recipe)
 
     def test_devtool_kernelmodule(self):
-        docfile = 'https://git.yoctoproject.org/git/kernel-module-hello-world'
+        docfile = 'https://git.yoctoproject.org/kernel-module-hello-world'
         recipe = 'kernel-module-hello-world'
         self._run('devtool add %s %s' % (recipe, docfile) )
         try:

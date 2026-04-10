@@ -1,0 +1,136 @@
+From 1c41ae5ae3d4816687467712580d5f05957b3b88 Mon Sep 17 00:00:00 2001
+From: Nicolas Iooss <nicolas.iooss_git@polytechnique.org>
+Date: Thu, 6 Jul 2017 21:32:14 +0200
+Subject: [PATCH] Use str:replace from exslt.org to implement string.subst
+
+string.subst implementation causes recursion issues when building
+systemd documentation. This issue has been reported in
+https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=765567 and
+https://bugs.archlinux.org/task/54694 .
+
+A possible fix consists in using str:replace from exslt.org when this
+function is available. This has been implemented in a patch for the
+Debian package
+(https://anonscm.debian.org/cgit/collab-maint/docbook-xsl.git/tree/debian/patches/765567_non-recursive_string_subst.patch)
+which has also been used by Arch Linux
+(https://git.archlinux.org/svntogit/packages.git/tree/trunk/765567_non-recursive_string_subst.patch?h=packages/docbook-xsl&id=c6bf4ebc446487043437ed13e4fbe83f648f5c58).
+
+Translate this patch to xsl/lib/lib.xweb in order to fix the recursion
+issues.
+
+For reference, here is the beginning of the error messages reported by
+xslt when building systemd:
+
+      XSLT     man/systemd.directives.html
+    Note: namesp. add : added namespace before processing              systemd.directives
+    runtime error: file file:/usr/share/xml/docbook/xsl-stylesheets-1.79.2/lib/lib.xsl line 56 element variable
+    xsltApplySequenceConstructor: A potential infinite template recursion was detected.
+    You can adjust xsltMaxDepth (--maxdepth) in order to raise the maximum number of nested template calls and variables/params (currently set to 3000).
+    Templates:
+    #0 name string.subst
+    #1 name string.subst
+    #2 name string.subst
+    #3 name string.subst
+    #4 name string.subst
+    #5 name string.subst
+    #6 name string.subst
+    #7 name string.subst
+    #8 name string.subst
+    #9 name string.subst
+    #10 name string.subst
+    #11 name string.subst
+    #12 name string.subst
+    #13 name string.subst
+    #14 name string.subst
+    Variables:
+    #0
+    replacement   Object is a Node Set :
+    Set contains 1 nodes:
+      1    ATTRIBUTE newstring
+          TEXT
+            content= .
+
+    target   Object is a Node Set :
+    Set contains 1 nodes:
+      1    ATTRIBUTE oldstring
+          TEXT
+            content=  .
+
+    string   Object is a string : PP \fB\-\-multiple\fR .RS 4 \fBsystemd-a...
+
+    #1
+    target   Object is a Node Set :
+    Set contains 1 nodes:
+      1    ATTRIBUTE oldstring
+          TEXT
+            content=  .
+
+    string   Object is a string : PP \fB\-\-multiple\fR .RS 4 \fBsystemd-a...
+
+    #2
+    string   Object is a string : PP \fB\-\-multiple\fR .RS 4 \fBsystemd-a...
+
+    #3
+    replacement   Object is a Node Set :
+    Set contains 1 nodes:
+      1    ATTRIBUTE newstring
+          TEXT
+            content= .
+
+    target   Object is a Node Set :
+    Set contains 1 nodes:
+      1    ATTRIBUTE oldstring
+          TEXT
+            content=  .
+
+    string   Object is a string : PP \fB\-\-mode=\fR .RS 4 \fBsystemd-inhi...
+
+    #4
+    target   Object is a Node Set :
+    Set contains 1 nodes:
+      1    ATTRIBUTE oldstring
+          TEXT
+            content=  .
+
+    string   Object is a string : PP \fB\-\-mode=\fR .RS 4 \fBsystemd-inhi...
+
+Upstream-Status: Backport [https://github.com/docbook/xslt10-stylesheets/commit/1c41ae5ae3d4816687467712580d5f05957b3b88]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ xsl/lib/lib.xweb | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+--- a/lib/lib.xsl
++++ b/lib/lib.xsl
+@@ -10,7 +10,11 @@
+      This module implements DTD-independent functions
+ 
+      ******************************************************************** -->
+-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
++<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
++                xmlns:str="http://exslt.org/strings"
++                exclude-result-prefixes="str"
++                version="1.0">
++
+ 
+ <xsl:template name="dot.count">
+   <!-- Returns the number of "." characters in a string -->
+@@ -56,6 +60,9 @@
+   <xsl:param name="replacement"/>
+ 
+   <xsl:choose>
++    <xsl:when xmlns:str="http://exslt.org/strings" str:foo="" test="function-available('str:replace')">
++      <xsl:value-of select="str:replace($string, string($target), string($replacement))"/>
++    </xsl:when>
+     <xsl:when test="contains($string, $target)">
+       <xsl:variable name="rest">
+         <xsl:call-template name="string.subst">
+@@ -388,7 +395,7 @@
+         </xsl:otherwise>
+       </xsl:choose>
+     </xsl:template>
+-  
++
+ <xsl:template name="count.uri.path.depth">
+   <xsl:param name="filename" select="''"/>
+   <xsl:param name="count" select="0"/>

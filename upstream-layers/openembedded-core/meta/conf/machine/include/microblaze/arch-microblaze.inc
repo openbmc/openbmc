@@ -60,3 +60,6 @@ MBPKGARCH_SIZE = "${@bb.utils.contains("TUNE_FEATURES", "64-bit", "64", "", d)}"
 # Package Architecture formatting
 TUNE_PKGARCH = "microblaze${MBPKGARCH_SIZE}${MBPKGARCH_ENDIAN}${MBPKGARCH_VERSION}${MBPKGARCH_TUNE}${MBPKGARCH_MATH}"
 
+# Misc settings
+# Fix: ld: unrecognized option '--hash-style=sysv'
+LINKER_HASH_STYLE:libc-newlib = ""

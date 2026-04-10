@@ -150,7 +150,6 @@ FILES:${PN}-tools = "${bindir}/analyze-build \
   ${bindir}/clang-move \
   ${bindir}/clang-nvlink-wrapper \
   ${bindir}/clang-offload-bundler \
-  ${bindir}/clang-offload-packager \
   ${bindir}/clang-pseudo* \
   ${bindir}/clang-query \
   ${bindir}/clang-refactor \
@@ -229,7 +228,7 @@ clang_sysroot_preprocess() {
 	install -d ${SYSROOT_DESTDIR}${bindir}/
 
 	# clang and clang-tools
-	binaries="diagtool clang-${MAJOR_VER} clang-format clang-offload-packager
+	binaries="diagtool clang-${MAJOR_VER} clang-format
 	          clang-offload-bundler clang-scan-deps clang-repl
 	          clang-refactor clang-check clang-extdef-mapping"
 

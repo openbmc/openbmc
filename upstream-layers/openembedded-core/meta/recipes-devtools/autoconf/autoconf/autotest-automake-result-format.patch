@@ -34,21 +34,6 @@ index bf18866..8097523 100644
      [[0-9] | [0-9][0-9] | [0-9][0-9][0-9] | [0-9][0-9][0-9][0-9]])
  	at_fn_validate_ranges at_option
  	AS_VAR_APPEND([at_groups], ["$at_option$as_nl"])
-@@ -728,10 +735,10 @@ m4_divert_push([HELP_MODES])dnl
- cat <<_ATEOF || at_write_fail=1
- 
- Operation modes:
--  -h, --help     print the help message, then exit
--  -V, --version  print version number, then exit
--  -c, --clean    remove all the files this test suite might create and exit
--  -l, --list     describes all the tests, or the selected TESTS
-+  -h, --help      print the help message, then exit
-+  -V, --version   print version number, then exit
-+  -c, --clean     remove all the files this test suite might create and exit
-+  -l, --list      describes all the tests, or the selected TESTS
- _ATEOF
- m4_divert_pop([HELP_MODES])dnl
- m4_wrap([m4_divert_push([HELP_TUNING_BEGIN])dnl
 @@ -757,6 +764,7 @@ Execution tuning:
    -d, --debug    inhibit clean up and top-level logging
  [                 default for debugging scripts]

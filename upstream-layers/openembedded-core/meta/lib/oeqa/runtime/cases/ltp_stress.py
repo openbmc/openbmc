@@ -60,7 +60,7 @@ class LtpStressBase(OERuntimeTestCase):
 class LtpStressTest(LtpStressBase):
 
     def runltp(self, stress_group):
-            cmd = '/opt/ltp/runltp -f %s -p -q 2>@1 | tee /opt/ltp/results/%s' % (stress_group, stress_group)
+            cmd = 'kirk --run-suite %s --json-report /opt/ltp/results/%s.json -n -d /opt/ltp' % (stress_group, stress_group)
             starttime = time.time()
             (status, output) = self.target.run(cmd)
             endtime = time.time()
@@ -69,8 +69,16 @@ class LtpStressTest(LtpStressBase):
 
             self.extras['ltpstressresult.rawlogs']['log'] = self.extras['ltpstressresult.rawlogs']['log'] + output
 
+            # Copy kirk JSON report from target
+            dst = os.path.join(self.ltptest_log_dir, "%s.json" % stress_group)
+            remote_src = "/opt/ltp/results/%s.json" % stress_group
+            (status, output) = self.target.copyFrom(remote_src, dst, True)
+            if status:
+                msg = 'File could not be copied. Output: %s' % output
+                self.target.logger.warning(msg)
+
             parser = LtpParser()
-            results, sections  = parser.parse(os.path.join(self.ltptest_log_dir, "%s" % stress_group))
+            results, sections  = parser.parse(dst)
 
             runtime = int(endtime-starttime)
             sections['duration'] = runtime

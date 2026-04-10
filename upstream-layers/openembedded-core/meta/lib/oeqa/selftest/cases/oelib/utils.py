@@ -8,7 +8,7 @@ import sys
 from unittest.case import TestCase
 from contextlib import contextmanager
 from io import StringIO
-from oe.utils import packages_filter_out_system, trim_version, multiprocess_launch
+from oe.utils import packages_filter_out_system, trim_version, multiprocess_launch, filter_default_features
 
 class TestPackagesFilterOutSystem(TestCase):
     def test_filter(self):
@@ -102,3 +102,39 @@ class TestMultiprocessLaunch(TestCase):
         with captured_output() as (out, err):
             self.assertRaises(bb.BBHandledException, multiprocess_launch, testfunction, ["1", "2", "3", "4", "5", "6"], d, extraargs=(d,))
         self.assertIn("KeyError: 'Invalid number 2'", out.getvalue())
+
+
+class TestDefaultFeatures(TestCase):
+    def test_filter_default_features(self):
+        try:
+            import bb
+            d = bb.data_smart.DataSmart()
+        except ImportError:
+            self.skipTest("Cannot import bb")
+
+        # Test with nothing opted out
+        d.setVar("DISTRO_FEATURES", "")
+        d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
+        filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "alpha beta gamma")
+
+        # opt out of a single feature
+        d.setVar("DISTRO_FEATURES", "")
+        d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
+        d.setVar("DISTRO_FEATURES_OPTED_OUT", "beta")
+        filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "alpha gamma")
+
+        # opt out of everything
+        d.setVar("DISTRO_FEATURES", "")
+        d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
+        d.setVar("DISTRO_FEATURES_OPTED_OUT", "gamma alpha beta")
+        filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "")
+
+        # opt out of something that isn't in our defaults
+        d.setVar("DISTRO_FEATURES", "")
+        d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
+        d.setVar("DISTRO_FEATURES_OPTED_OUT", "omega")
+        filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "alpha beta gamma")

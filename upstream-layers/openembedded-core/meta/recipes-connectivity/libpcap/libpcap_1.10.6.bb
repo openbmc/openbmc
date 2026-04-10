@@ -25,7 +25,6 @@ EXTRA_OECONF = " \
                  --without-dag \
                  --without-dpdk \
                  "
-EXTRA_AUTORECONF += "--exclude=aclocal"
 
 PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
                    ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)} \

@@ -1207,7 +1207,7 @@ python() {
     funcs = d.getVarFlags("QAPATHTEST")
     funcs.update(d.getVarFlags("QAPKGTEST"))
     funcs.update(d.getVarFlags("QARECIPETEST"))
-    d.appendVarFlag("do_package_qa", "vardeps", " ".join(funcs.values()))
+    d.appendVarFlag("do_package_qa", "vardeps", " " + " ".join(funcs.values()))
 }
 
 SSTATETASKS += "do_package_qa"

@@ -80,6 +80,7 @@ UKI_CONFIG_FILE ?= "${UNPACKDIR}/uki.conf"
 UKI_FILENAME ?= "uki.efi"
 UKI_KERNEL_FILENAME ?= "${KERNEL_IMAGETYPE}"
 UKI_CMDLINE ?= "rootwait root=LABEL=root"
+KERNEL_DEVICETREE ??= ""
 UKI_DEVICETREE ?= "${KERNEL_DEVICETREE}"
 # secure boot keys and cert, needs sbsign-tools-native (meta-secure-core)
 #UKI_SB_KEY ?= ""
@@ -140,7 +141,7 @@ python do_uki() {
         # not always needed, ukify can detect version from kernel binary
         kernel_version = d.getVar('KERNEL_VERSION')
         if kernel_version:
-            ukify_cmd += "--uname %s" % (kernel_version)
+            ukify_cmd += " --uname %s" % (kernel_version)
     else:
         bb.fatal("ERROR - UKI_KERNEL_FILENAME not set")
 

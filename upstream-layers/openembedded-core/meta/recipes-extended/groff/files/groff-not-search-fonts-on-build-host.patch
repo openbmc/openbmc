@@ -11,6 +11,9 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase to 1.22.4
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 
+Rebase to 1.24.0
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+
 ---
  font/devpdf/Foundry.in | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -19,16 +22,16 @@ diff --git a/font/devpdf/Foundry.in b/font/devpdf/Foundry.in
 index e5aba65..5441734 100644
 --- a/font/devpdf/Foundry.in
 +++ b/font/devpdf/Foundry.in
-@@ -20,7 +20,7 @@
+@@ -23,7 +23,7 @@
  
  #=======================================================================
  #Foundry|Name|Search path
--foundry||@urwfontsdir@:(gs):/usr/share/fonts/type1/gsfonts:/usr/share/fonts/default/Type1:/usr/share/fonts/default/Type1/adobestd35:/usr/share/fonts/type1/urw-base35:/opt/local/share/fonts/urw-fonts:/usr/local/share/fonts/ghostscript
+-foundry||@urwfontsdir@:(gs):/usr/share/fonts/type1/urw-base35/:/usr/share/fonts/urw-base35:/opt/local/share/fonts/urw-fonts/:/usr/local/share/fonts/ghostscript/:/usr/share/fonts/type1/gsfonts/:/usr/share/fonts/type1/:/usr/share/fonts/default/Type1/adobestd35/:/usr/share/fonts/default/Type1/:/usr/share/ghostscript/Resource/Font
 +foundry||(gs)
  
  # Enable the font description files for grops (generated from Adobe
  # foundry font files) to be used with gropdf.  afmtodit must not be
-@@ -72,7 +72,7 @@ EURO|N||||*../devps/freeeuro.pfa
+@@ -79,7 +79,7 @@ EURO|N||||*../devps/freeeuro.pfa
  # URW fonts are typically shipped with Ghostscript, but can be replaced.
  
  #Foundry|Name|Search path
@@ -36,4 +39,3 @@ index e5aba65..5441734 100644
 +foundry|U|(gs)
  
  # Define flags for afmtodit.
- 

@@ -1,0 +1,274 @@
+From 82f18b02d9fec1bcc225a92251466ffee82f56b5 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 20 Mar 2026 14:22:17 -0700
+Subject: [PATCH] [Clang] Rename UNUSED and UNKNOWN elements of OffloadArch enum to avoid 
+ macro collisions
+
+OffloadArch uses enumerator named `UNUSED` `UNKNOWN`, which are common macro name
+in external codebases (e.g. Mesa defines UNUSED as an attribute helper). If such
+a macro is visible when including clang/Basic/OffloadArch.h, the preprocessor
+expands the token inside the enum and breaks compilation of the installed Clang
+headers.
+
+Rename the enumerator to `Unused` and `Unknown` and update all in-tree references. This is a
+spelling-only change (no behavioral impact) and mirrors the existing approach
+used for SM_32_ to avoid macro clashes.
+
+Upstream-Status: Backport [https://github.com/llvm/llvm-project/commit/5bc3d1966b2d0b300c338d85bb38e356f0d12a8c]
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+
+diff --git a/clang/include/clang/Basic/OffloadArch.h b/clang/include/clang/Basic/OffloadArch.h
+index ea665b1..970487c 100644
+--- a/clang/include/clang/Basic/OffloadArch.h
++++ b/clang/include/clang/Basic/OffloadArch.h
+@@ -16,8 +16,8 @@ class StringRef;
+ namespace clang {
+
+ enum class OffloadArch {
+-  UNUSED,
+-  UNKNOWN,
++  Unused,
++  Unknown,
+   // TODO: Deprecate and remove GPU architectures older than sm_52.
+   SM_20,
+   SM_21,
+@@ -145,7 +145,7 @@ const char *OffloadArchToString(OffloadArch A);
+ const char *OffloadArchToVirtualArchString(OffloadArch A);
+
+ // Convert a string to an OffloadArch enum value. Returns
+-// OffloadArch::UNKNOWN if the string is not recognized.
++// OffloadArch::Unknown if the string is not recognized.
+ OffloadArch StringToOffloadArch(llvm::StringRef S);
+
+ } // namespace clang
+diff --git a/clang/lib/Basic/Cuda.cpp b/clang/lib/Basic/Cuda.cpp
+index 514fa2f..7884910 100644
+--- a/clang/lib/Basic/Cuda.cpp
++++ b/clang/lib/Basic/Cuda.cpp
+@@ -75,7 +75,7 @@ CudaVersion ToCudaVersion(llvm::VersionTuple Version) {
+ }
+
+ CudaVersion MinVersionForOffloadArch(OffloadArch A) {
+-  if (A == OffloadArch::UNKNOWN)
++  if (A == OffloadArch::Unknown)
+     return CudaVersion::UNKNOWN;
+
+   // AMD GPUs do not depend on CUDA versions.
+@@ -141,7 +141,7 @@ CudaVersion MaxVersionForOffloadArch(OffloadArch A) {
+     return CudaVersion::NEW;
+
+   switch (A) {
+-  case OffloadArch::UNKNOWN:
++  case OffloadArch::Unknown:
+     return CudaVersion::UNKNOWN;
+   case OffloadArch::SM_20:
+   case OffloadArch::SM_21:
+diff --git a/clang/lib/Basic/OffloadArch.cpp b/clang/lib/Basic/OffloadArch.cpp
+index 05177f1..f3bbe64 100644
+--- a/clang/lib/Basic/OffloadArch.cpp
++++ b/clang/lib/Basic/OffloadArch.cpp
+@@ -17,7 +17,7 @@ struct OffloadArchToStringMap {
+ #define GFX(gpu) {OffloadArch::GFX##gpu, "gfx" #gpu, "compute_amdgcn"}
+ static const OffloadArchToStringMap ArchNames[] = {
+     // clang-format off
+-    {OffloadArch::UNUSED, "", ""},
++    {OffloadArch::Unused, "", ""},
+     SM(20), {OffloadArch::SM_21, "sm_21", "compute_20"}, // Fermi
+     SM(30), {OffloadArch::SM_32_, "sm_32", "compute_32"}, SM(35), SM(37),  // Kepler
+     SM(50), SM(52), SM(53),          // Maxwell
+@@ -132,7 +132,7 @@ OffloadArch StringToOffloadArch(llvm::StringRef S) {
+         return S == Map.ArchName;
+       });
+   if (Result == std::end(ArchNames))
+-    return OffloadArch::UNKNOWN;
++    return OffloadArch::Unknown;
+   return Result->Arch;
+ }
+
+diff --git a/clang/lib/Basic/Targets/NVPTX.cpp b/clang/lib/Basic/Targets/NVPTX.cpp
+index 6526eef..9584f8a 100644
+--- a/clang/lib/Basic/Targets/NVPTX.cpp
++++ b/clang/lib/Basic/Targets/NVPTX.cpp
+@@ -64,7 +64,7 @@ NVPTXTargetInfo::NVPTXTargetInfo(const llvm::Triple &Triple,
+   // Define available target features
+   // These must be defined in sorted order!
+   NoAsmVariants = true;
+-  GPU = OffloadArch::UNUSED;
++  GPU = OffloadArch::Unused;
+
+   // PTX supports f16 as a fundamental type.
+   HasFastHalfType = true;
+diff --git a/clang/lib/Basic/Targets/NVPTX.h b/clang/lib/Basic/Targets/NVPTX.h
+index 9bd0cc3..eeffb0e 100644
+--- a/clang/lib/Basic/Targets/NVPTX.h
++++ b/clang/lib/Basic/Targets/NVPTX.h
+@@ -87,7 +87,7 @@ public:
+   initFeatureMap(llvm::StringMap<bool> &Features, DiagnosticsEngine &Diags,
+                  StringRef CPU,
+                  const std::vector<std::string> &FeaturesVec) const override {
+-    if (GPU != OffloadArch::UNUSED)
++    if (GPU != OffloadArch::Unused)
+       Features[OffloadArchToString(GPU)] = true;
+     // Only add PTX feature if explicitly requested. Otherwise, let the backend
+     // use the minimum required PTX version for the target SM.
+@@ -146,7 +146,7 @@ public:
+   }
+
+   bool isValidCPUName(StringRef Name) const override {
+-    return StringToOffloadArch(Name) != OffloadArch::UNKNOWN;
++    return StringToOffloadArch(Name) != OffloadArch::Unknown;
+   }
+
+   void fillValidCPUList(SmallVectorImpl<StringRef> &Values) const override {
+@@ -157,7 +157,7 @@ public:
+
+   bool setCPU(const std::string &Name) override {
+     GPU = StringToOffloadArch(Name);
+-    return GPU != OffloadArch::UNKNOWN;
++    return GPU != OffloadArch::Unknown;
+   }
+
+   void setSupportedOpenCLOpts() override {
+diff --git a/clang/lib/CodeGen/CGOpenMPRuntimeGPU.cpp b/clang/lib/CodeGen/CGOpenMPRuntimeGPU.cpp
+index db0d56d..f78047d 100644
+--- a/clang/lib/CodeGen/CGOpenMPRuntimeGPU.cpp
++++ b/clang/lib/CodeGen/CGOpenMPRuntimeGPU.cpp
+@@ -2266,15 +2266,15 @@ bool CGOpenMPRuntimeGPU::hasAllocateAttributeForGlobalVar(const VarDecl *VD,
+ // Get current OffloadArch and ignore any unknown values
+ static OffloadArch getOffloadArch(CodeGenModule &CGM) {
+   if (!CGM.getTarget().hasFeature("ptx"))
+-    return OffloadArch::UNKNOWN;
++    return OffloadArch::Unknown;
+   for (const auto &Feature : CGM.getTarget().getTargetOpts().FeatureMap) {
+     if (Feature.getValue()) {
+       OffloadArch Arch = StringToOffloadArch(Feature.getKey());
+-      if (Arch != OffloadArch::UNKNOWN)
++      if (Arch != OffloadArch::Unknown)
+         return Arch;
+     }
+   }
+-  return OffloadArch::UNKNOWN;
++  return OffloadArch::Unknown;
+ }
+
+ /// Check to see if target architecture supports unified addressing which is
+@@ -2382,8 +2382,8 @@ void CGOpenMPRuntimeGPU::processRequiresDirective(const OMPRequiresDecl *D) {
+       case OffloadArch::Generic:
+       case OffloadArch::GRANITERAPIDS:
+       case OffloadArch::BMG_G21:
+-      case OffloadArch::UNUSED:
+-      case OffloadArch::UNKNOWN:
++      case OffloadArch::Unused:
++      case OffloadArch::Unknown:
+         break;
+       case OffloadArch::LAST:
+         llvm_unreachable("Unexpected GPU arch.");
+diff --git a/clang/lib/Driver/Driver.cpp b/clang/lib/Driver/Driver.cpp
+index eb3f9cb..c8894a1 100644
+--- a/clang/lib/Driver/Driver.cpp
++++ b/clang/lib/Driver/Driver.cpp
+@@ -946,7 +946,7 @@ inferOffloadToolchains(Compilation &C, Action::OffloadKind Kind) {
+   llvm::DenseSet<llvm::StringRef> Triples;
+   for (llvm::StringRef Arch : Archs) {
+     OffloadArch ID = StringToOffloadArch(Arch);
+-    if (ID == OffloadArch::UNKNOWN)
++    if (ID == OffloadArch::Unknown)
+       ID = StringToOffloadArch(
+           getProcessorFromTargetID(llvm::Triple("amdgcn-amd-amdhsa"), Arch));
+
+@@ -961,12 +961,12 @@ inferOffloadToolchains(Compilation &C, Action::OffloadKind Kind) {
+       return llvm::DenseSet<llvm::StringRef>();
+     }
+     if (Kind == Action::OFK_OpenMP &&
+-        (ID == OffloadArch::UNKNOWN || ID == OffloadArch::UNUSED)) {
++        (ID == OffloadArch::Unknown || ID == OffloadArch::Unused)) {
+       C.getDriver().Diag(clang::diag::err_drv_failed_to_deduce_target_from_arch)
+           << Arch;
+       return llvm::DenseSet<llvm::StringRef>();
+     }
+-    if (ID == OffloadArch::UNKNOWN || ID == OffloadArch::UNUSED) {
++    if (ID == OffloadArch::Unknown || ID == OffloadArch::Unused) {
+       C.getDriver().Diag(clang::diag::err_drv_offload_bad_gpu_arch)
+           << "offload" << Arch;
+       return llvm::DenseSet<llvm::StringRef>();
+@@ -3305,7 +3305,7 @@ class OffloadingActionBuilder final {
+     bool Relocatable = false;
+
+     /// Default GPU architecture if there's no one specified.
+-    OffloadArch DefaultOffloadArch = OffloadArch::UNKNOWN;
++    OffloadArch DefaultOffloadArch = OffloadArch::Unknown;
+
+     /// Compilation unit ID specified by option '-fuse-cuid=' or'-cuid='.
+     const CUIDOptions &CUIDOpts;
+@@ -3407,7 +3407,7 @@ class OffloadingActionBuilder final {
+
+       // If we have a fat binary, add it to the list.
+       if (CudaFatBinary) {
+-        AddTopLevel(CudaFatBinary, OffloadArch::UNUSED);
++        AddTopLevel(CudaFatBinary, OffloadArch::Unused);
+         CudaDeviceActions.clear();
+         CudaFatBinary = nullptr;
+         return;
+@@ -4669,12 +4669,12 @@ static StringRef getCanonicalArchString(Compilation &C,
+   OffloadArch Arch =
+       StringToOffloadArch(getProcessorFromTargetID(Triple, ArchStr));
+   if (Triple.isNVPTX() &&
+-      (Arch == OffloadArch::UNKNOWN || !IsNVIDIAOffloadArch(Arch))) {
++      (Arch == OffloadArch::Unknown || !IsNVIDIAOffloadArch(Arch))) {
+     C.getDriver().Diag(clang::diag::err_drv_offload_bad_gpu_arch)
+         << "CUDA" << ArchStr;
+     return StringRef();
+   } else if (Triple.isAMDGPU() &&
+-             (Arch == OffloadArch::UNKNOWN || !IsAMDOffloadArch(Arch))) {
++             (Arch == OffloadArch::Unknown || !IsAMDOffloadArch(Arch))) {
+     C.getDriver().Diag(clang::diag::err_drv_offload_bad_gpu_arch)
+         << "HIP" << ArchStr;
+     return StringRef();
+diff --git a/clang/lib/Driver/OffloadBundler.cpp b/clang/lib/Driver/OffloadBundler.cpp
+index f69ac41..6d446f2 100644
+--- a/clang/lib/Driver/OffloadBundler.cpp
++++ b/clang/lib/Driver/OffloadBundler.cpp
+@@ -95,7 +95,7 @@ OffloadTargetInfo::OffloadTargetInfo(const StringRef Target,
+       Components.size() == 6 ? Components.back() : "";
+   StringRef TargetId = TargetIdWithFeature.split(':').first;
+   if (!TargetId.empty() &&
+-      clang::StringToOffloadArch(TargetId) != clang::OffloadArch::UNKNOWN)
++      clang::StringToOffloadArch(TargetId) != clang::OffloadArch::Unknown)
+     this->TargetID = TargetIdWithFeature;
+   else
+     this->TargetID = "";
+diff --git a/clang/lib/Driver/ToolChains/Cuda.cpp b/clang/lib/Driver/ToolChains/Cuda.cpp
+index 6cc73ff..d97b926 100644
+--- a/clang/lib/Driver/ToolChains/Cuda.cpp
++++ b/clang/lib/Driver/ToolChains/Cuda.cpp
+@@ -319,7 +319,7 @@ void CudaInstallationDetector::AddCudaIncludeArgs(
+
+ void CudaInstallationDetector::CheckCudaVersionSupportsArch(
+     OffloadArch Arch) const {
+-  if (Arch == OffloadArch::UNKNOWN || Version == CudaVersion::UNKNOWN ||
++  if (Arch == OffloadArch::Unknown || Version == CudaVersion::UNKNOWN ||
+       ArchsWithBadVersion[(int)Arch])
+     return;
+
+@@ -408,7 +408,7 @@ void NVPTX::Assembler::ConstructJob(Compilation &C, const JobAction &JA,
+
+   // Obtain architecture from the action.
+   OffloadArch gpu_arch = StringToOffloadArch(GPUArchName);
+-  assert(gpu_arch != OffloadArch::UNKNOWN &&
++  assert(gpu_arch != OffloadArch::Unknown &&
+          "Device action expected to have an architecture.");
+
+   // Check that our installation's ptxas supports gpu_arch.
+diff --git a/clang/lib/Sema/SemaDeclAttr.cpp b/clang/lib/Sema/SemaDeclAttr.cpp
+index 3f0ea5c..e6d3516 100644
+--- a/clang/lib/Sema/SemaDeclAttr.cpp
++++ b/clang/lib/Sema/SemaDeclAttr.cpp
+@@ -5732,7 +5732,7 @@ Sema::CreateLaunchBoundsAttr(const AttributeCommonInfo &CI, Expr *MaxThreads,
+   if (MaxBlocks) {
+     // '.maxclusterrank' ptx directive requires .target sm_90 or higher.
+     auto SM = getOffloadArch(Context.getTargetInfo());
+-    if (SM == OffloadArch::UNKNOWN || SM < OffloadArch::SM_90) {
++    if (SM == OffloadArch::Unknown || SM < OffloadArch::SM_90) {
+       Diag(MaxBlocks->getBeginLoc(), diag::warn_cuda_maxclusterrank_sm_90)
+           << OffloadArchToString(SM) << CI << MaxBlocks->getSourceRange();
+       // Ignore it by setting MaxBlocks to null;

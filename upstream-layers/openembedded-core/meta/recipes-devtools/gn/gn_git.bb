@@ -30,7 +30,8 @@ do_configure() {
         --platform=${@gn_platform("TARGET_OS", d)} \
         --out-path=${B} \
         --no-static-libstdc++ \
-        --no-strip
+        --no-strip \
+        --allow-warnings
 }
 
 # Catch build progress from ninja

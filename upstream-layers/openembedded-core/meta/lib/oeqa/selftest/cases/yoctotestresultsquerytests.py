@@ -36,4 +36,4 @@ class TestResultsQueryTests(OESelftestTestCase):
             shutil.rmtree(workdir, ignore_errors=True)
             self.fail(f"Can not execute git commands in {workdir}")
         shutil.rmtree(workdir)
-        self.assertEqual(url, "git://git.yoctoproject.org/yocto-testresults")
+        self.assertEqual(url, "https://git.yoctoproject.org/yocto-testresults")

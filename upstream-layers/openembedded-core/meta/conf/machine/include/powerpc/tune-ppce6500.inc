@@ -19,4 +19,4 @@ PACKAGE_EXTRA_ARCHS:tune-ppc64e6500 = "${PACKAGE_EXTRA_ARCHS:tune-powerpc64} ppc
 QEMU_EXTRAOPTIONS:tune-ppc64e6500 = " -cpu e500mc"
 
 # QEMU usermode fails with invalid instruction error (YOCTO: #10304)
-MACHINE_FEATURES_BACKFILL_CONSIDERED:append = "${@bb.utils.contains('TUNE_FEATURES', 'e6500', ' qemu-usermode', '', d)}"
+MACHINE_FEATURES_OPTED_OUT += "${@bb.utils.contains('TUNE_FEATURES', 'e6500', 'qemu-usermode', '', d)}"

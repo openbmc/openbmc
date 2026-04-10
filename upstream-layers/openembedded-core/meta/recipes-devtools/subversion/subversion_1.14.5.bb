@@ -42,8 +42,6 @@ EXTRA_OEMAKE += "pkgconfig_dir=${libdir}/pkgconfig"
 CPPFLAGS += "-P"
 BUILD_CPPFLAGS += "-P"
 
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 do_configure:prepend () {
     # autogen.sh manually puts things in the right place, and libtoolize doesn't
     # work as they don't use aclocal

@@ -94,9 +94,11 @@ fi
 # populate bootparam environment
 for p in `cat /proc/cmdline`; do
 	if [ -n "$quoted" ]; then
-		value="$value $p"
-		if [ "`echo $p | sed -e 's/\"$//'`" != "$p" ]; then
-			eval "bootparam_${quoted}=${value}"
+		p_rstripped=${p%\"}
+		value="$value $p_rstripped"
+		if [ "$p_rstripped" != "$p" ]; then
+			# End of a opt="word1 word2..." parameter 
+			eval "bootparam_${quoted}=\"${value}\""
 			unset quoted
 		fi
 		continue
@@ -105,11 +107,23 @@ for p in `cat /proc/cmdline`; do
 	opt=`echo $p | cut -d'=' -f1`
 	opt=`echo $opt | sed -e 'y/.-/__/'`
 	if [ "`echo $p | cut -d'=' -f1`" = "$p" ]; then
+		# opt parameter
 		eval "bootparam_${opt}=true"
 	else
-		value="`echo $p | cut -d'=' -f2-`"
-		if [ "`echo $value | sed -e 's/^\"//'`" != "$value" ]; then
+		value="`echo $p | cut -d'=' -f2-`"	# Option value
+		value_lstripped=${value#\"}
+		value_rstripped=${value%\"}
+
+		if [ "$value_lstripped" != "$value" ] && [ "$value_rstripped" != "$value" ]; then
+			# opt="value" parameter
+			eval "bootparam_${opt}=${value_lstripped%\"}"
+			continue
+		fi
+
+		if [ "$value_lstripped" != "$value" ]; then
+			# Start of a opt="word1 word2..." parameter 
 			quoted=${opt}
+			value=${value_lstripped}
 			continue
 		fi
 		eval "bootparam_${opt}=\"${value}\""

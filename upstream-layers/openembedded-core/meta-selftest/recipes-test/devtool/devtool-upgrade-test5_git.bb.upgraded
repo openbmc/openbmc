@@ -6,10 +6,10 @@ LIC_FILES_CHKSUM = "file://${COMMON_LICENSE_DIR}/MIT;md5=0835ade698e0bcf8506ecda
 INHIBIT_DEFAULT_DEPS = "1"
 
 # Note: this is intentionally not the latest version in the original .bb
-SRCREV = "a2885dd7d25380d23627e7544b7bbb55014b16ee"
+SRCREV = "0a60d6af95d22b4c50446559cd41942a8acd2d57"
 PV = "0.1+git"
 
-SRC_URI = "gitsm://git.yoctoproject.org/git-submodule-test;branch=master"
+SRC_URI = "gitsm://git.yoctoproject.org/git-submodule-test;branch=master;protocol=https"
 UPSTREAM_CHECK_COMMITS = "1"
 RECIPE_NO_UPDATE_REASON = "This recipe is used to test devtool upgrade feature"
 

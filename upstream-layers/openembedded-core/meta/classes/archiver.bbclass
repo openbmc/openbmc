@@ -398,7 +398,7 @@ python do_ar_mirror() {
 
         # We now have an appropriate localpath
         bb.note('Copying source mirror')
-        cmd = 'cp -fpPRH %s %s' % (localpath, destdir)
+        cmd = 'cp --force --preserve=timestamps --no-dereference --recursive -H %s %s' % (localpath, destdir)
         subprocess.check_call(cmd, shell=True)
 }
 

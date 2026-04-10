@@ -21,7 +21,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 poky_path = os.path.abspath(os.path.join(script_path, ".."))
 resulttool = os.path.abspath(os.path.join(script_path, "resulttool"))
 logger = scriptutils.logger_create(sys.argv[0])
-testresults_default_url="git://git.yoctoproject.org/yocto-testresults"
+testresults_default_url="https://git.yoctoproject.org/yocto-testresults"
 
 def create_workdir():
     workdir = tempfile.mkdtemp(prefix='yocto-testresults-query.')

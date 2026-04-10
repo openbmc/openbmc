@@ -9,6 +9,7 @@ inherit python3native meson-routines qemu
 DEPENDS:append = " meson-native ninja-native"
 
 EXEWRAPPER_ENABLED:class-native = "False"
+EXEWRAPPER_ENABLED:allarch = "False"
 EXEWRAPPER_ENABLED ?= "${@bb.utils.contains('MACHINE_FEATURES', 'qemu-usermode', 'True', 'False', d)}"
 DEPENDS:append = "${@' qemu-native' if d.getVar('EXEWRAPPER_ENABLED') == 'True' else ''}"
 

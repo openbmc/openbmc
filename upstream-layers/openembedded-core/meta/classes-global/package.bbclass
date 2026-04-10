@@ -443,6 +443,12 @@ PACKAGEVARS = "FILES RDEPENDS RRECOMMENDS SUMMARY DESCRIPTION RSUGGESTS RPROVIDE
 def gen_packagevar(d, pkgvars="PACKAGEVARS"):
     ret = []
     pkgs = (d.getVar("PACKAGES") or "").split()
+    # populate_packages will add a -src package if debug-with-srcpkg which must
+    # be replicated here
+    if d.getVar('PACKAGE_DEBUG_SPLIT_STYLE') == 'debug-with-srcpkg':
+        src_pkg = "%s-src" % d.getVar("PN")
+        if src_pkg not in pkgs:
+            pkgs.append(src_pkg)
     vars = (d.getVar(pkgvars) or "").split()
     for v in vars:
         ret.append(v)

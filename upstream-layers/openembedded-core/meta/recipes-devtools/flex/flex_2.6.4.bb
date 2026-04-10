@@ -36,6 +36,11 @@ inherit autotools gettext texinfo ptest github-releases
 M4 = "${bindir}/m4"
 M4:class-native = "${STAGING_BINDIR_NATIVE}/m4"
 EXTRA_OECONF += "ac_cv_path_M4=${M4} ac_cv_func_reallocarray=no"
+# Don't let autoconf smarts to detect C standard, flex code does not need C23
+# which is what it will enforce see
+# https://savannah.gnu.org/support/index.php?111401
+CACHED_CONFIGUREVARS:append:toolchain-clang = " CFLAGS='${CFLAGS} -std=gnu17'"
+
 EXTRA_OEMAKE += "m4=${STAGING_BINDIR_NATIVE}/m4"
 
 EXTRA_OEMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', 'FLEX=${STAGING_BINDIR_NATIVE}/flex', '', d)}"

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-import enum
+import json
 import os
 import re
 
@@ -116,44 +116,29 @@ class PtestParser(object):
 
 class LtpParser:
     """
-    Parse the machine-readable LTP log output into a ptest-friendly data structure.
+    Parse kirk JSON report into a ptest-friendly data structure.
     """
+
+    STATUS_MAP = {
+        "pass": "PASSED",
+        "fail": "FAILED",
+        "brok": "FAILED",
+        "conf": "SKIPPED",
+        "warn": "PASSED",
+    }
+
     def parse(self, logfile):
+        with open(logfile, errors="replace") as f:
+            report = json.load(f)
+
         results = {}
-        # Aaccumulate the duration here but as the log rounds quick tests down
-        # to 0 seconds this is very much a lower bound. The caller can replace
-        # the value.
         section = {"duration": 0, "log": ""}
 
-        class LtpExitCode(enum.IntEnum):
-            # Exit codes as defined in ltp/include/tst_res_flags.h
-            TPASS = 0  # Test passed flag
-            TFAIL = 1  # Test failed flag
-            TBROK = 2  # Test broken flag
-            TWARN = 4  # Test warning flag
-            TINFO = 16 # Test information flag
-            TCONF = 32 # Test not appropriate for configuration flag
+        for entry in report.get("results", []):
+            results[entry["test_fqn"]] = self.STATUS_MAP.get(entry.get("status", ""), "FAILED")
+            section["log"] += entry.get("test", {}).get("log", "")
 
-        with open(logfile, errors="replace") as f:
-            # Lines look like this:
-            # tag=cfs_bandwidth01 stime=1689762564 dur=0 exit=exited stat=32 core=no cu=0 cs=0
-            for line in f:
-                if not line.startswith("tag="):
-                    continue
-
-                values = dict(s.split("=") for s in line.strip().split())
-
-                section["duration"] += int(values["dur"])
-                exitcode = int(values["stat"])
-                if values["exit"] == "exited" and exitcode == LtpExitCode.TCONF:
-                    # Exited normally with the "invalid configuration" code
-                    results[values["tag"]] = "SKIPPED"
-                elif exitcode == LtpExitCode.TPASS:
-                    # Successful exit
-                    results[values["tag"]] = "PASSED"
-                else:
-                    # Other exit
-                    results[values["tag"]] = "FAILED"
+        section["duration"] = int(report.get("stats", {}).get("runtime", 0))
 
         return results, section
 

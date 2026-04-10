@@ -34,8 +34,6 @@ UPSTREAM_CHECK_URI = "https://www.ruby-lang.org/en/downloads/"
 
 inherit autotools ptest pkgconfig
 
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 # This snippet lets compiled extensions which rely on external libraries,
 # such as zlib, compile properly.  If we don't do this, then when extmk.rb
 # runs, it uses the native libraries instead of the target libraries, and so

@@ -26,8 +26,6 @@ UPSTREAM_CHECK_REGEX = "nettle-(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit autotools ptest multilib_header lib_package
 
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 EXTRA_OECONF = "--disable-openssl"
 
 EXTRA_OECONF:append:armv7a = "${@bb.utils.contains("TUNE_FEATURES","neon",""," --disable-arm-neon --disable-fat",d)}"

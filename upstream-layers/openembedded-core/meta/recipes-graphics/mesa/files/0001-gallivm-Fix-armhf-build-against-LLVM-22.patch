@@ -1,0 +1,30 @@
+From 973dc32026c164d0c13f7f5bef36c8d1c2375973 Mon Sep 17 00:00:00 2001
+From: Alessandro Astone <ales.astone@gmail.com>
+Date: Sun, 1 Mar 2026 18:14:09 +0100
+Subject: [PATCH] gallivm: Fix armhf build against LLVM 22
+
+StringMapIterator<bool> became StringMapIterBase<bool, false /* IsConst */>;
+Use `auto` to handle either case.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/40161]
+Signed-off-by: Jose Quaresma <jose.quaresma@oss.qualcomm.com>
+---
+ src/gallium/auxiliary/gallivm/lp_bld_misc.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp b/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
+index d3ad342..c95d86e 100644
+--- a/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
++++ b/src/gallium/auxiliary/gallivm/lp_bld_misc.cpp
+@@ -331,7 +331,7 @@ lp_build_fill_mattrs(std::vector<std::string> &MAttrs)
+       llvm::sys::getHostCPUFeatures(features);
+    #endif
+ 
+-   for (llvm::StringMapIterator<bool> f = features.begin();
++   for (auto f = features.begin();
+         f != features.end();
+         ++f) {
+       MAttrs.push_back(((*f).second ? "+" : "-") + (*f).first().str());
+-- 
+2.53.0
+

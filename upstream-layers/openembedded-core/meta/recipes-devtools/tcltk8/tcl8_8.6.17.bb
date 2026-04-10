@@ -38,7 +38,6 @@ VER = "${PV}"
 inherit autotools ptest binconfig
 
 AUTOTOOLS_SCRIPT_PATH = "${S}/unix"
-EXTRA_AUTORECONF = "--exclude=aclocal"
 
 EXTRA_OECONF = "--enable-threads --disable-rpath --enable-man-suffix=tcl8"
 

@@ -17,8 +17,6 @@ SRC_URI[sha256sum] = "5ebc636b7f427053f98806696521653a614c7e06464910353cbf54e232
 
 inherit autotools
 
-EXTRA_AUTORECONF += "--exclude=autoheader"
-
 EXTRA_OECONF += "ac_cv_have_z_modifier=yes \
                  ac_cv_header_bsd_libutil_h=no \
                  sc_cv_termios_ispeed=no \

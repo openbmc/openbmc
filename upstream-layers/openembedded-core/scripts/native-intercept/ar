@@ -19,6 +19,11 @@ argv = sys.argv
 if argv[1].startswith('--'):
     # No modifier given
     None
+elif argv[1][0] == '@':
+    # Reading parameters from @file, we can try to inject D on the first line as well
+    # but modifying input files seems a bit too far for this intercept, bazel-native
+    # uses it but with rcsD by default
+    None
 else:
     # remove the optional '-'
     if argv[1][0] == '-':

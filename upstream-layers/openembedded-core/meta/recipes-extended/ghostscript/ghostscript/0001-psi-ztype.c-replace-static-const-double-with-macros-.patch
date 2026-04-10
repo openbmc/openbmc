@@ -1,0 +1,33 @@
+From 0298799777bd179c455e5ce8d6008b2d84732967 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 7 Apr 2026 22:40:26 -0700
+Subject: [PATCH] psi/ztype.c: replace static const double with macros for
+ min/max int bounds
+
+Clang rejects floating-point arithmetic in static initializers when it
+cannot evaluate them as constant expressions at compile time. Replace
+min_int_real and max_int_real with #define macros so the arithmetic is
+evaluated at each call site, fixing the build without any semantic change.
+
+Upstream-Status: Submitted [https://bugs.ghostscript.com/show_bug.cgi?id=709309]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ psi/ztype.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/psi/ztype.c b/psi/ztype.c
+index a01d83f..d454778 100644
+--- a/psi/ztype.c
++++ b/psi/ztype.c
+@@ -53,8 +53,9 @@ static int convert_to_string(const gs_memory_t *mem, os_ptr, os_ptr);
+  */
+ #define ALT_MIN_INT (((ps_int)-1) << ((sizeof(ps_int) * 8) - 1))
+ #define ALT_MAX_INT (~(ALT_MIN_INT))
+-static const double min_int_real = (ALT_MIN_INT * 1.0 - 1);
+-static const double max_int_real = (ALT_MAX_INT * 1.0 + 1);
++
++#define min_int_real ((double)(ALT_MIN_INT) - 1.0)
++#define max_int_real ((double)(ALT_MAX_INT) + 1.0)
+
+ #define REAL_CAN_BE_INT(v)\
+   ((v) > min_int_real && (v) < max_int_real)

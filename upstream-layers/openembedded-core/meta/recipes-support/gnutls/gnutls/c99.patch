@@ -13,7 +13,7 @@ explicitly for just c89.
 
 Closes #1806.
 
-Upstream-Status: Submitted [https://gitlab.com/gnutls/gnutls/-/merge_requests/2081]
+Upstream-Status: Backport [https://gitlab.com/gnutls/gnutls/-/merge_requests/2081]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
  configure.ac | 6 +++---

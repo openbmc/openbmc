@@ -324,15 +324,27 @@ def get_signatures(builddir, failsafe=False, machine=None, extravars=None):
         else:
             raise
 
-    sig_regex = re.compile(r"^(?P<task>[^:]*:[^:]*):(?P<hash>.*) .$")
-    tune_regex = re.compile(r"(^|\s)SIGGEN_LOCKEDSIGS_t-(?P<tune>\S*)\s*=\s*")
+    sig_regex = re.compile(r"^(?P<task>[^:]*:[^:]*):(?P<hash>[^:]*) .$")
+    assignment_regex = re.compile(r"^\s*(?P<var>\S+)\s*\+?=")
+    lockedsigs_regex = re.compile(r"^SIGGEN_LOCKEDSIGS_t-(?P<tune>\S*)$")
     current_tune = None
     with open(sigs_file, 'r') as f:
         for line in f.readlines():
             line = line.strip()
-            t = tune_regex.search(line)
-            if t:
-                current_tune = t.group('tune')
+            assignment = assignment_regex.search(line)
+            if assignment:
+                lockedsigs = lockedsigs_regex.search(assignment.group('var'))
+                if lockedsigs:
+                    # This variable contains signatures we want to compare
+                    current_tune = lockedsigs.group('tune')
+                else:
+                    # This variable isn't relevant for us
+                    current_tune = None
+                continue
+
+            if not current_tune:
+                continue
+
             s = sig_regex.match(line)
             if s:
                 exclude = False

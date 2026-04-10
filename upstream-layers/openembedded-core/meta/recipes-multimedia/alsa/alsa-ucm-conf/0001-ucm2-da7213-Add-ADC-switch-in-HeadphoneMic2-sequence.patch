@@ -1,0 +1,47 @@
+From 8a9581426459e1b423ef87d5ae0fe0a9e21eeaad Mon Sep 17 00:00:00 2001
+From: Le Qi <le.qi@oss.qualcomm.com>
+Date: Wed, 7 Jan 2026 11:20:54 +0800
+Subject: [PATCH] ucm2: da7213: Add ADC switch in HeadphoneMic2 sequences
+
+Enable and disable the ADC switch in HeadphoneMic2EnableSeq.conf and
+HeadphoneMic2DisableSeq.conf to ensure headset microphone audio works
+properly on Talos EVK with DA7213 codec.
+
+Without this change, the headset mic path remains muted and capture
+does not function.
+
+Signed-off-by: Le Qi <le.qi@oss.qualcomm.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+Upstream-Status: Backport [https://github.com/alsa-project/alsa-ucm-conf/commit/8a9581426459e1b423ef87d5ae0fe0a9e21eeaad]
+---
+ ucm2/codecs/da7213/HeadphoneMic2DisableSeq.conf | 1 +
+ ucm2/codecs/da7213/HeadphoneMic2EnableSeq.conf  | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/ucm2/codecs/da7213/HeadphoneMic2DisableSeq.conf b/ucm2/codecs/da7213/HeadphoneMic2DisableSeq.conf
+index a42f5f12be93..a9693af90acc 100644
+--- a/ucm2/codecs/da7213/HeadphoneMic2DisableSeq.conf
++++ b/ucm2/codecs/da7213/HeadphoneMic2DisableSeq.conf
+@@ -3,6 +3,7 @@ DisableSequence [
+ 	cset "name='Mixin Left Mic 2 Switch' off"
+ 	cset "name='Mixin Right Mic 2 Switch' off"
+ 	cset "name='Mixin PGA Switch' off"
++	cset "name='ADC Switch' off"
+ 	cset "name='Headphone Switch' off"
+ 	cset "name='Mixout Left DAC Left Switch' off"
+ 	cset "name='Mixout Right DAC Right Switch' off"
+diff --git a/ucm2/codecs/da7213/HeadphoneMic2EnableSeq.conf b/ucm2/codecs/da7213/HeadphoneMic2EnableSeq.conf
+index d3a69e0a550c..42bd9e2ba1fd 100644
+--- a/ucm2/codecs/da7213/HeadphoneMic2EnableSeq.conf
++++ b/ucm2/codecs/da7213/HeadphoneMic2EnableSeq.conf
+@@ -5,6 +5,7 @@ EnableSequence [
+ 	cset "name='Mixin Left Mic 2 Switch' on"
+ 	cset "name='Mixin Right Mic 2 Switch' on"
+ 	cset "name='Mixin PGA Switch' on"
++	cset "name='ADC Switch' on"
+ 	cset "name='DAI Left Source MUX' ADC Left"
+ 	cset "name='DAI Right Source MUX' ADC Right"
+ 	cset "name='Headphone Volume' 85"
+-- 
+2.34.1
+

@@ -14,19 +14,22 @@ LOCALE_UTF8_IS_DEFAULT ?= "1"
 LOCALE_UTF8_IS_DEFAULT:class-nativesdk = "0"
 
 # seccomp is not yet ported to rv32
-DISTRO_FEATURES_DEFAULT:remove:riscv32 = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:riscv32 = "seccomp"
 
 # seccomp is not yet ported to ARC
-DISTRO_FEATURES_DEFAULT:remove:arc = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:arc = "seccomp"
 
 # seccomp is not yet ported to microblaze
-DISTRO_FEATURES_DEFAULT:remove:microblaze = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:microblaze = "seccomp"
 
 # seccomp is not yet ported to loongarch64
-DISTRO_FEATURES_DEFAULT:remove:loongarch64 = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:loongarch64 = "seccomp"
 
-DISTRO_FEATURES_DEFAULT ?= "acl alsa bluetooth debuginfod ext2 ipv4 ipv6 pcmcia usbgadget usbhost wifi xattr nfs zeroconf pci 3g nfc x11 vfat seccomp"
-DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT}"
+DISTRO_FEATURES_DEFAULTS ?= " \
+    acl alsa bluetooth debuginfod ext2 ipv4 ipv6 \
+    wifi xattr nfs zeroconf pci 3g nfc x11 vfat seccomp pulseaudio \
+    gobject-introspection-data ldconfig opengl ptest multiarch wayland vulkan \
+    "
 IMAGE_FEATURES ?= ""
 
 COMMERCIAL_AUDIO_PLUGINS ?= ""

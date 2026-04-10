@@ -105,7 +105,7 @@ class GitArchiveTests(OESelftestTestCase):
         delete_fake_repository(path)
 
     def test_get_tags_without_valid_remote(self):
-        url = 'git://git.yoctoproject.org/poky'
+        url = 'https://git.yoctoproject.org/poky'
         path, git_obj = create_fake_repository(False, None, False)
 
         tags = ga.get_tags(git_obj, self.log, pattern="yocto-*", url=url)

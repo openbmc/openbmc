@@ -1,0 +1,39 @@
+Fix the build to do out-of-tree properly.
+
+The patches are in progress but are being submitted upstream.
+
+Upstream-Status: Submitted [https://bugs.ghostscript.com/show_bug.cgi?id=709289]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+diff -rU3 a/configure.ac b/configure.ac
+--- a/configure.ac	2025-09-09 10:36:39.000000000 +0100
++++ b/configure.ac	2026-03-31 15:35:08.988262612 +0100
+@@ -400,7 +400,7 @@
+           *)
+             ARCH_CONF_HEADER=
+             if test x"$host" != x"$build"; then
+-              ARCH_CONF_HEADER="\$(GLSRCDIR)/../$ARCH_AUTOCONF_HEADER"
++              ARCH_CONF_HEADER="./$ARCH_AUTOCONF_HEADER"
+             else
+               ARCH_CONF_HEADER=
+             fi
+@@ -869,8 +869,8 @@
+ AC_SUBST(RECURSIVE_MUTEXATTR)
+ 
+ dnl Tesseract/Leptonica detection
+-TESSERACTDIR=tesseract
+-LEPTONICADIR=leptonica
++TESSERACTDIR=$srcdir/tesseract
++LEPTONICADIR=$srcdir/leptonica
+ OCR_VERSION=0
+ OCR_SHARED=0
+ LEPTONICAINCLUDE=
+@@ -886,7 +886,7 @@
+ 
+ if test x$with_tesseract != xno; then
+   AC_MSG_CHECKING([for local Tesseract library source])
+-  if test -d $srcdir/tesseract && test -d $srcdir/leptonica; then
++  if test -d $TESSERACTDIR && test -d $LEPTONICADIR; then
+     AC_MSG_RESULT([yes])
+ 
+     if test x$with_tesseract != xno; then

@@ -111,6 +111,7 @@ SRC_URI = "${BASE_SRC_URI};name=code \
            file://0001-test-Add-support-ptest.patch \
            file://run-ptest \
            file://0001-Make-ICU-test-output-compatible-with-Automake-format.patch \
+           file://mangle-build-tmp.patch \
           "
 
 SRC_URI:append:class-target = "\

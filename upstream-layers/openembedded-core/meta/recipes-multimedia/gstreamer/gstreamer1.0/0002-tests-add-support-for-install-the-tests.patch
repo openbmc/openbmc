@@ -1,4 +1,4 @@
-From c33063360791e178de138304e29ab2264582d917 Mon Sep 17 00:00:00 2001
+From 92e7d4090fa458bf02d3418cd01c960982821e92 Mon Sep 17 00:00:00 2001
 From: Jose Quaresma <quaresma.jose@gmail.com>
 Date: Sun, 11 Apr 2021 19:48:13 +0100
 Subject: [PATCH] tests: add support for install the tests
@@ -12,17 +12,17 @@ Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-
 Signed-off-by: Jose Quaresma <quaresma.jose@gmail.com>
 ---
  meson.build                  |  4 ++++
- meson_options.txt            |  1 +
+ meson.options                |  1 +
  tests/check/meson.build      | 22 +++++++++++++++++++++-
  tests/check/template.test.in |  3 +++
  4 files changed, 29 insertions(+), 1 deletion(-)
  create mode 100644 tests/check/template.test.in
 
 diff --git a/meson.build b/meson.build
-index 0a77e90..cadfaeb 100644
+index 8adc055..b5c9e5b 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -664,6 +664,10 @@ if bashcomp_dep.found()
+@@ -667,6 +667,10 @@ if bashcomp_dep.found()
    endif
  endif
  
@@ -33,10 +33,10 @@ index 0a77e90..cadfaeb 100644
  plugins_install_dir = join_paths(get_option('libdir'), 'gstreamer-1.0')
  
  pkgconfig = import('pkgconfig')
-diff --git a/meson_options.txt b/meson_options.txt
+diff --git a/meson.options b/meson.options
 index 39255cf..78af552 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
+--- a/meson.options
++++ b/meson.options
 @@ -16,6 +16,7 @@ option('poisoning', type : 'boolean', value : false, description : 'Enable poiso
  option('memory-alignment', type: 'combo',
         choices : ['1', '2', '4', '8', '16', '32', '64', '128', '256', '512', '1024', '2048', '4096', '8192', 'malloc', 'pagesize'],

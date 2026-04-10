@@ -50,6 +50,8 @@ EXTRA_OECONF:append:libc-musl = " --with-path-utmpx=/dev/null/utmpx --with-path-
 EXTRA_OECONF:append = " --disable-rsh --disable-rshd --disable-rcp \
         --disable-rlogin --disable-rlogind --disable-rexec --disable-rexecd"
 
+SECURITY_STRINGFORMAT:remove:toolchain-clang = "-Werror=format-security"
+
 # The configure script guesses many paths in cross builds, check for this happening
 do_configure_cross_check() {
     if grep "may be incorrect because of cross-compilation" ${B}/config.log; then

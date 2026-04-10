@@ -1,0 +1,39 @@
+From f28f0c4d8dfdfb1c173d21df6ffbe35448fada9f Mon Sep 17 00:00:00 2001
+From: Zhang Peng <peng.zhang1.cn@windriver.com>
+Date: Mon, 9 Mar 2026 20:10:00 +0800
+Subject: [PATCH] gropdf: use SOURCE_DATE_EPOCH for reproducible builds
+
+gropdf uses rand() to generate random font subset tags in SubTag().
+Without a deterministic seed, each build produces different PDF output.
+
+Initialize srand() with SOURCE_DATE_EPOCH when available to ensure
+reproducible builds.
+
+Upstream-Status: Submitted [https://savannah.gnu.org/bugs/?68136]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ src/devices/gropdf/gropdf.pl | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/src/devices/gropdf/gropdf.pl b/src/devices/gropdf/gropdf.pl
+index f519a53..3a79b4c 100644
+--- a/src/devices/gropdf/gropdf.pl
++++ b/src/devices/gropdf/gropdf.pl
+@@ -30,6 +30,13 @@ use POSIX qw(mktime);
+ use File::Spec;
+ use File::Path;
+ 
++# Initialize random seed for reproducible builds.
++if (defined($ENV{SOURCE_DATE_EPOCH})) {
++    srand($ENV{SOURCE_DATE_EPOCH});
++} else {
++    srand();
++}
++
+ use constant
+ {
+     WIDTH    => 0,
+-- 
+2.50.0
+

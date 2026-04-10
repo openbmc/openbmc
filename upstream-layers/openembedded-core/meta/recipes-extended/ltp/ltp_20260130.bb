@@ -113,6 +113,7 @@ RDEPENDS:${PN} = "\
     net-tools \
     perl \
     python3-core \
+    python3-kirk \
     procps \
     quota \
     unzip \

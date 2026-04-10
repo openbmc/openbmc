@@ -16,28 +16,11 @@ inherit cmake pkgconfig
 DEPENDS += "clang-native spirv-llvm-translator-native"
 
 OECMAKE_SOURCEPATH = "${S}/libclc"
-B_NATIVE = "${B}-native"
 
 # Semicolon-separated list of targets to build
 LIBCLC_TARGETS ?= "all"
 
 EXTRA_OECMAKE += "-DLIBCLC_TARGETS_TO_BUILD='${LIBCLC_TARGETS}'"
-EXTRA_OECMAKE:append:class-target = " -DPREPARE_BUILTINS=${B_NATIVE}/prepare_builtins"
-EXTRA_OECMAKE:append:class-nativesdk = " -DPREPARE_BUILTINS=${B_NATIVE}/prepare_builtins"
-
-# Need to build a native prepare_builtins binary in target builds. The easiest
-# way to do this is with a second native cmake build tree.
-do_build_prepare_builtins() {
-    env -i PATH=$PATH cmake --fresh -G Ninja \
-        -S ${OECMAKE_SOURCEPATH} -B ${B_NATIVE} \
-        -DCMAKE_TOOLCHAIN_FILE:FILEPATH=${WORKDIR}/toolchain-native.cmake \
-        -DLIBCLC_TARGETS_TO_BUILD=
-    cmake --build ${B_NATIVE} --target prepare_builtins
-}
-do_build_prepare_builtins:class-native() {
-    :
-}
-do_configure[prefuncs] += "do_build_prepare_builtins"
 
 FILES:${PN} += "${datadir}/clc"
 

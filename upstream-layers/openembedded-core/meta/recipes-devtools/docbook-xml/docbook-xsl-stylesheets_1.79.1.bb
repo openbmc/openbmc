@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6beadd98f9c54ab0c387e14211ee4d0e"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/docbook/docbook-xsl-${PV}.tar.bz2 \
            file://docbook-xsl-stylesheets-no-bashism-in-docbook-xsl-up.patch \
+           file://1c41ae5ae3d4816687467712580d5f05957b3b88.patch \
 "
 
 SRC_URI[sha256sum] = "725f452e12b296956e8bfb876ccece71eeecdd14b94f667f3ed9091761a4a968"

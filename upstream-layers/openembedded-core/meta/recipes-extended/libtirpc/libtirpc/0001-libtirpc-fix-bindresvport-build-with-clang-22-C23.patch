@@ -1,0 +1,32 @@
+From 0ae4371ee63e25a48777a83c0601c85c5747cbac Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 31 Mar 2026 23:07:09 -0700
+Subject: [PATCH] libtirpc: fix bindresvport build with clang-22/C23
+
+bindresvport() is defined using old K&R-style syntax, which breaks when
+building libtirpc with clang-22 in gnu23 mode.
+
+Convert it to a prototype-style definition. This is a no-op change
+intended only to restore compatibility with modern C compilers.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-nfs/20260401060943.2578248-1-khem.raj@oss.qualcomm.com/T/#u]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/bindresvport.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/src/bindresvport.c b/src/bindresvport.c
+index 7b2056d..eea6589 100644
+--- a/src/bindresvport.c
++++ b/src/bindresvport.c
+@@ -57,9 +57,7 @@ extern pthread_mutex_t port_lock;
+  * Bind a socket to a privileged IP port
+  */
+ int
+-bindresvport(sd, sin)
+-        int sd;
+-        struct sockaddr_in *sin;
++bindresvport(int sd, struct sockaddr_in *sin)
+ {
+         return bindresvport_sa(sd, (struct sockaddr *)sin);
+ }

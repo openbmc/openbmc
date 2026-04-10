@@ -1,0 +1,66 @@
+From e015fc820db5d7fe2495c09b1fdd5e2092ed3cd1 Mon Sep 17 00:00:00 2001
+From: Nikita Popov <npopov@redhat.com>
+Date: Tue, 27 Jan 2026 12:03:48 +0100
+Subject: [PATCH] Adjust loongarch assembly test
+
+This generates different code on loongarch32r now.
+
+Upstream-Status: Backport [https://github.com/rust-lang/rust/commit/e015fc820db5d7fe2495c09b1fdd5e2092ed3cd1]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/assembly-llvm/asm/loongarch-type.rs | 27 +++++++++++++++++------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
+
+diff --git a/tests/assembly-llvm/asm/loongarch-type.rs b/tests/assembly-llvm/asm/loongarch-type.rs
+index e0a7940f89a..5efad583a39 100644
+--- a/tests/assembly-llvm/asm/loongarch-type.rs
++++ b/tests/assembly-llvm/asm/loongarch-type.rs
+@@ -1,10 +1,14 @@
+ //@ add-minicore
+-//@ revisions: loongarch32 loongarch64
++//@ revisions: loongarch32s loongarch32r loongarch64
+
+ //@ assembly-output: emit-asm
+
+-//@[loongarch32] compile-flags: --target loongarch32-unknown-none
+-//@[loongarch32] needs-llvm-components: loongarch
++//@[loongarch32s] compile-flags: --target loongarch32-unknown-none -Ctarget-feature=+32s
++//@[loongarch32s] needs-llvm-components: loongarch
++
++//@[loongarch32r] compile-flags: --target loongarch32-unknown-none
++//@[loongarch32r] needs-llvm-components: loongarch
++//@[loongarch32r] min-llvm-version: 22
+
+ //@[loongarch64] compile-flags: --target loongarch64-unknown-none
+ //@[loongarch64] needs-llvm-components: loongarch
+@@ -28,8 +32,12 @@
+
+ // CHECK-LABEL: sym_fn:
+ // CHECK: #APP
+-// CHECK: pcalau12i $t0, %got_pc_hi20(extern_func)
+-// CHECK: ld.{{[wd]}} $t0, $t0, %got_pc_lo12(extern_func)
++// loongarch64: pcalau12i $t0, %got_pc_hi20(extern_func)
++// loongarch64: ld.d $t0, $t0, %got_pc_lo12(extern_func)
++// loongarch32s: pcalau12i $t0, %got_pc_hi20(extern_func)
++// loongarch32s: ld.w $t0, $t0, %got_pc_lo12(extern_func)
++// loongarch32r: pcaddu12i $t0, %got_pcadd_hi20(extern_func)
++// loongarch32r: ld.w $t0, $t0, %got_pcadd_lo12(.Lpcadd_hi0)
+ // CHECK: #NO_APP
+ #[no_mangle]
+ pub unsafe fn sym_fn() {
+@@ -38,8 +46,13 @@ pub unsafe fn sym_fn() {
+
+ // CHECK-LABEL: sym_static:
+ // CHECK: #APP
+-// CHECK: pcalau12i $t0, %got_pc_hi20(extern_static)
+-// CHECK: ld.{{[wd]}} $t0, $t0, %got_pc_lo12(extern_static)
++// loongarch64: pcalau12i $t0, %got_pc_hi20(extern_static)
++// loongarch64: ld.d $t0, $t0, %got_pc_lo12(extern_static)
++// loongarch32s: pcalau12i $t0, %got_pc_hi20(extern_static)
++// loongarch32s: ld.w $t0, $t0, %got_pc_lo12(extern_static)
++// loongarch32r: pcaddu12i $t0, %got_pcadd_hi20(extern_static)
++// loongarch32r: ld.w $t0, $t0, %got_pcadd_lo12(.Lpcadd_hi1)
++
+ // CHECK: #NO_APP
+ #[no_mangle]
+ pub unsafe fn sym_static() {

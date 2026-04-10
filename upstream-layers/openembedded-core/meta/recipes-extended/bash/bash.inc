@@ -7,7 +7,6 @@ DEPENDS = "ncurses bison-native virtual/libiconv"
 
 inherit autotools gettext texinfo update-alternatives ptest
 
-EXTRA_AUTORECONF += "--exclude=autoheader,aclocal"
 EXTRA_OECONF = "--enable-job-control --without-bash-malloc bash_cv_wexitstatus_offset=8"
 
 # If NON_INTERACTIVE_LOGIN_SHELLS is defined, all login shells read the

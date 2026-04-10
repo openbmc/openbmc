@@ -1,0 +1,82 @@
+From c0f835a59d7b33452f280c8a73c3214e0a3a3d9f Mon Sep 17 00:00:00 2001
+From: Zhang Peng <peng.zhang1.cn@windriver.com>
+Date: Fri, 6 Mar 2026 05:18:33 +0000
+Subject: [PATCH] groff: fix test-groff not found in cross-compilation
+
+In groff 1.24.0, pdfmom uses GROFF_COMMAND=test-groff to invoke the
+build-tree groff wrapper during document generation. This fails in
+cross-compilation because:
+
+1. GROFF_COMMAND=test-groff is a relative name not in PATH.
+2. test-groff overrides GROFF_BIN_PATH to $builddir and then runs
+   $builddir/groff, which is a target binary.
+
+Fix by:
+- Using $(abs_top_builddir)/test-groff in .am files.
+- When the caller provides a GROFF_BIN_PATH with a usable groff
+  (cross-compilation with groff-native), keep it instead of
+  overriding to $builddir.
+- Run $GROFF_BIN_PATH/groff instead of $builddir/groff so the
+  correct (native or build-tree) binary is always used.
+
+Upstream-Status: Inappropriate [yocto specific]
+
+Signed-off-by: Zhang Peng <peng.zhang1.cn@windriver.com>
+---
+ contrib/mom/mom.am | 2 +-
+ doc/doc.am         | 2 +-
+ test-groff.in      | 8 ++++++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/contrib/mom/mom.am b/contrib/mom/mom.am
+index b99e869..120d3ee 100644
+--- a/contrib/mom/mom.am
++++ b/contrib/mom/mom.am
+@@ -24,7 +24,7 @@ mom_srcdir = $(top_srcdir)/contrib/mom
+ #
+ # Use '-K utf8', not '-k', in case 'configure' didn't find uchardet.
+ MOMPDFMOM = \
+-  GROFF_COMMAND=test-groff \
++  GROFF_COMMAND=$(abs_top_builddir)/test-groff \
+   GROFF_COMMAND_PREFIX= \
+   GROFF_BIN_PATH="$(GROFF_BIN_PATH)" \
+   $(PDFMOMBIN) $(FFLAG) $(MFLAG) -M$(mom_srcdir) -K utf8 -p -e -t \
+diff --git a/doc/doc.am b/doc/doc.am
+index 6cf9db5..906a989 100644
+--- a/doc/doc.am
++++ b/doc/doc.am
+@@ -54,7 +54,7 @@ groffmanpagesoption = -P-e
+ endif
+ 
+ DOC_PDFMOM = \
+-  GROFF_COMMAND=test-groff \
++  GROFF_COMMAND=$(abs_top_builddir)/test-groff \
+   GROFF_COMMAND_PREFIX= \
+   GROFF_BIN_PATH="$(GROFF_BIN_PATH)" \
+   $(PDFMOMBIN) $(MFLAG) $(FFLAG) -ww -b $(pdfmomoption) --roff
+diff --git a/test-groff.in b/test-groff.in
+index a65898a..9c6a8b6 100644
+--- a/test-groff.in
++++ b/test-groff.in
+@@ -23,7 +23,11 @@ SEP='@PATH_SEPARATOR@'
+ builddir=@abs_top_builddir@
+ srcdir=@abs_top_srcdir@
+ 
+-GROFF_BIN_PATH=$builddir
++# Keep caller's GROFF_BIN_PATH if it contains a usable groff (e.g.
++# groff-native during cross-compilation); otherwise use builddir.
++if [ -z "$GROFF_BIN_PATH" ] || [ ! -x "$GROFF_BIN_PATH/groff" ]; then
++    GROFF_BIN_PATH=$builddir
++fi
+ 
+ XENVIRONMENT=$srcdir/src/devices/xditview/GXditview.ad
+ export XENVIRONMENT
+@@ -52,4 +56,4 @@ $SEP$builddir/contrib/sboxes\
+ export GROFF_COMMAND_PREFIX
+ export GROFF_BIN_PATH GROFF_FONT_PATH GROFF_TMAC_PATH
+ 
+-exec $builddir/groff "$@"
++exec $GROFF_BIN_PATH/groff "$@"
+-- 
+2.51.2
+

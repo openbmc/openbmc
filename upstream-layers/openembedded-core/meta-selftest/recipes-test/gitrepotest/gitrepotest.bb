@@ -7,7 +7,7 @@ INHIBIT_DEFAULT_DEPS = "1"
 
 PATCHTOOL = "git"
 
-SRC_URI = "git://git.yoctoproject.org/git/matchbox-panel-2;branch=master;protocol=https \
+SRC_URI = "git://git.yoctoproject.org/matchbox-panel-2;branch=master;protocol=https \
            file://0001-testpatch.patch \
           "
 

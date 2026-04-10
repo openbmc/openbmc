@@ -66,8 +66,6 @@ PACKAGECONFIG[hostkey-rsa] = ""
 PACKAGECONFIG[hostkey-ecdsa] = ""
 PACKAGECONFIG[hostkey-ed25519] = ""
 
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 # login path is hardcoded in sshd
 EXTRA_OECONF = "'LOGIN_PROGRAM=${base_bindir}/login' \
                 ${@bb.utils.contains('DISTRO_FEATURES', 'pam', '--with-pam', '--without-pam', d)} \

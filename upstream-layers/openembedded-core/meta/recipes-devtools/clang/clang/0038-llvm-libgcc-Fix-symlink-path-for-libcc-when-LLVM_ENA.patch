@@ -1,0 +1,71 @@
+From bca77d818187e68989dfa9e386b38632b76a477e Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Oct 2025 15:44:49 -0700
+Subject: [PATCH] llvm-libgcc: Fix symlink path for libcc when
+ LLVM_ENABLE_PER_TARGET_RUNTIME_DIR is unset
+
+current logic fails when LLVM_ENABLE_PER_TARGET_RUNTIME_DIR = OFF
+and it ends up with symlinks e.g.
+
+libgcc.a -> ..//usr/lib/clang/21.1.4/lib/linux/libclang_rt.builtins.a
+
+the real library is at
+../lib/clang/21.1.4/lib/linux/libclang_rt.builtins-aarch64.a
+
+The relative path is incorrect and its missing to add -arch suffix
+as well.
+
+So we make checks a bit more explicit to cover this case.
+
+The symlink for libgcc_so.1.0 is made to point to libunwind.so
+which is functionally correct but it fails some linux distro packaging
+complain because libunwind.so is made part of -dev package but
+libgcc_so.1.0 ends up in the real package, and creates an unneeded
+package -> dev dependency
+
+create the symlink to point to libunwind.so.1 instead then the boundaries
+of packaging are not crossed and all is well.
+
+Upstream-Status: Submitted [https://github.com/llvm/llvm-project/pull/165487]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ llvm-libgcc/CMakeLists.txt | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/llvm-libgcc/CMakeLists.txt b/llvm-libgcc/CMakeLists.txt
+index 47208fc19869..54009c1104c3 100644
+--- a/llvm-libgcc/CMakeLists.txt
++++ b/llvm-libgcc/CMakeLists.txt
+@@ -124,11 +124,21 @@ target_link_libraries(unwind_shared PUBLIC
+ #===============================================================================
+ 
+ get_compiler_rt_install_dir(${COMPILER_RT_DEFAULT_TARGET_ARCH} install_dir_builtins)
++
++# Drop a leading "lib/" if present so we don't duplicate lib/lib
+ string(REGEX REPLACE "^lib/" "" install_dir_builtins "${install_dir_builtins}")
+-string(FIND "${install_dir_builtins}" "clang" install_path_contains_triple)
+-if(install_path_contains_triple EQUAL -1)
++
++# Decide based on the actual CMake option, not on guessing from the path.
++if (NOT LLVM_ENABLE_PER_TARGET_RUNTIME_DIR)
++  # Flat-ish layout, e.g. usr/lib/clang/21.1.4/lib/linux/
++  # Libraries are named libclang_rt.builtins-<arch>.a
+   set(builtins_suffix "-${COMPILER_RT_DEFAULT_TARGET_ARCH}")
++  # Do NOT prepend "../"
+ else()
++  # Per-target layout, e.g.
++  # usr/lib/clang/21.1.4/lib/aarch64-unknown-linux-gnu/
++  # Libraries are just libclang_rt.builtins.a
++  set(builtins_suffix "")
+   string(PREPEND install_dir_builtins "../")
+ endif()
+ set(LLVM_LIBGCC_COMPILER_RT ${install_dir_builtins}/libclang_rt.builtins${builtins_suffix}.a)
+@@ -137,7 +147,7 @@ add_custom_target(llvm-libgcc ALL
+   DEPENDS unwind_shared unwind_static clang_rt.builtins-${COMPILER_RT_DEFAULT_TARGET_ARCH}
+   COMMAND ${CMAKE_COMMAND} -E create_symlink ${LLVM_LIBGCC_COMPILER_RT} libgcc.a
+   COMMAND ${CMAKE_COMMAND} -E create_symlink libunwind.a libgcc_eh.a
+-  COMMAND ${CMAKE_COMMAND} -E create_symlink libunwind.so libgcc_s.so.1.0
++  COMMAND ${CMAKE_COMMAND} -E create_symlink libunwind.so.1 libgcc_s.so.1.0
+   COMMAND ${CMAKE_COMMAND} -E create_symlink libgcc_s.so.1.0 libgcc_s.so.1
+   COMMAND ${CMAKE_COMMAND} -E create_symlink libgcc_s.so.1 libgcc_s.so
+ )

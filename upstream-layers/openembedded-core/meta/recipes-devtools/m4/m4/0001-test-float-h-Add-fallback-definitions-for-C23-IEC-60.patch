@@ -1,0 +1,33 @@
+From 0e7b8e00e0c670295340a6472f5d5a164697cdcd Mon Sep 17 00:00:00 2001
+From: Bruno Haible <bruno@clisp.org>
+Date: Sun, 1 Mar 2026 19:28:29 +0100
+Subject: [PATCH] float-h: Ensure ISO C23 compliance with clang 22.
+
+* m4/float_h.m4 (gl_FLOAT_H): Test also whether the provided <float.h>
+defines {FLT,DBL,LDBL}_IS_IEC_60559.
+
+Upstream-Status: Backport [https://gitweb.git.savannah.gnu.org/gitweb/?p=gnulib.git;a=commit;h=0e7b8e00e0c670295340a6472f5d5a164697cdcd]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+---
+ ChangeLog     | 6 ++++++
+ m4/float_h.m4 | 3 ++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+--- a/m4/float_h.m4
++++ b/m4/float_h.m4
+@@ -1,5 +1,5 @@
+ # float_h.m4
+-# serial 16
++# serial 17
+ dnl Copyright (C) 2007, 2009-2026 Free Software Foundation, Inc.
+ dnl This file is free software; the Free Software Foundation
+ dnl gives unlimited permission to copy and/or distribute it,
+@@ -63,6 +63,7 @@ changequote([,])dnl
+        [AC_LANG_PROGRAM(
+           [[#include <float.h>
+             int x[] = { FLT_DECIMAL_DIG, DBL_DECIMAL_DIG, LDBL_DECIMAL_DIG };
++            int y[] = { FLT_IS_IEC_60559, DBL_IS_IEC_60559, LDBL_IS_IEC_60559 };
+             float maxf = FLT_NORM_MAX;
+             double maxd = DBL_NORM_MAX;
+             long double maxl = LDBL_NORM_MAX;

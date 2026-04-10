@@ -51,20 +51,20 @@ def get_patches(patchesdir):
             })
     return patch_list
 
-def analyze_result(results, patch, counts):
+def analyze_result(results, patch, counts, return_code):
     testid   = patch["testid"]
     expected_result = str(patch["expected"])
     for resultline in results.splitlines():
         if testid in resultline:
             result, _ = resultline.split(':', 1)
 
-            if expected_result.upper() == "FAIL" and result.upper() == "FAIL":
+            if expected_result.upper() == "FAIL" and result.upper() == "FAIL" and return_code != 0:
                     counts["xfail"] = counts["xfail"] + 1
                     print("XFAIL: %s (file: %s)" % (testid.strip("."), os.path.basename(patch["patch"])))
-            elif expected_result.upper() == "PASS" and result.upper() == "PASS":
+            elif expected_result.upper() == "PASS" and result.upper() == "PASS" and return_code == 0:
                     counts["xpass"] = counts["xpass"] + 1
                     print("XPASS: %s (file: %s)" % (testid.strip("."), os.path.basename(patch["patch"])))
-            elif expected_result.upper() == "SKIP" and result.upper() == "SKIP":
+            elif expected_result.upper() == "SKIP" and result.upper() == "SKIP" and return_code == 0:
                     counts["xskip"] = counts["xskip"] + 1
                     print("XSKIP: %s (file: %s)" % (testid.strip("."), os.path.basename(patch["patch"])))
             else:
@@ -135,17 +135,17 @@ def test(root, patch):
     patchpath = os.path.abspath(os.path.join(root, patch))
     
     cmd     = 'patchtest --base-commit HEAD --repodir %s --testdir %s/tests --patch %s' % (repodir, topdir, patchpath)
-    results = subprocess.check_output(cmd, stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+    results = subprocess.run(cmd, capture_output=True, universal_newlines=True, shell=True)
 
-    return results
+    return results.returncode, results.stdout
 
 def test_head_attached(patches, counts, branch):
 
     git_attach_head(branch)
     git_state_before = get_git_state()
     for patch_info in patches:
-        results = test(patch_info["root"], patch_info["patch"])
-        counts = analyze_result(results, patch_info, counts)
+        return_code, results = test(patch_info["root"], patch_info["patch"])
+        counts = analyze_result(results, patch_info, counts, return_code)
     git_state_after = get_git_state()
     assert is_git_state_same(git_state_before, git_state_after), "Repository state changed after attached HEAD test."
     return counts
@@ -155,9 +155,9 @@ def test_head_detached(patches, counts):
     git_st_detach_before = git_detach_head()
     patch_info = patches[0]
     testid   = patch_info["testid"]
-    results = test(patch_info["root"], patch_info["patch"])
+    return_code, results = test(patch_info["root"], patch_info["patch"])
     git_st_detach_after = get_git_state()
-    counts = analyze_result(results, patch_info, counts)
+    counts = analyze_result(results, patch_info, counts, return_code)
     if not is_git_state_same(git_st_detach_before, git_st_detach_after):
         print(" Test '%s' failed with git in detach HEAD mode: state changed after test" % testid.strip("."))
         counts["error"] = counts["error"] + 1

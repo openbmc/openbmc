@@ -1,0 +1,64 @@
+From bec790ecc4618b67604668601f84fa896476572c Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 1 Apr 2026 13:53:42 -0700
+Subject: [PATCH] lrzsz: convert K&R function definitions to ANSI C prototypes
+
+clang-22 with -std=gnu23 fails to build lrzsz because lib/long-options.c and
+lib/xstrtol.c still use old K&R-style function definitions, which
+newer toolchains reject.
+
+Rewrite parse_long_options() and __xstrtol() using standard prototype
+syntax so the sources compile cleanly with modern compilers.
+
+Upstream-Status: Submitted [https://github.com/UweOhse/lrzsz/pull/10]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ lib/long-options.c | 11 ++++++-----
+ lib/xstrtol.c      | 12 ++++++------
+ 2 files changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/lib/long-options.c b/lib/long-options.c
+index 2c8d267..71d0e65 100644
+--- a/lib/long-options.c
++++ b/lib/long-options.c
+@@ -36,11 +36,12 @@ static struct option const long_options[] =
+ /* Process long options --help and --version, but only if argc == 2.
+    Be careful not to gobble up `--'.  */
+ void
+-parse_long_options (argc, argv,version, usage)
+-     int argc;
+-     char **argv;
+-     void (*version)();
+-     void (*usage)(int);
++parse_long_options (
++     int argc,
++     char **argv,
++     void (*version)(),
++     void (*usage)(int)
++)
+ {
+   int c;
+   int saved_opterr;
+diff --git a/lib/xstrtol.c b/lib/xstrtol.c
+index 0ab337d..a34e23b 100644
+--- a/lib/xstrtol.c
++++ b/lib/xstrtol.c
+@@ -68,12 +68,12 @@ extern int errno;
+ /* FIXME: comment.  */
+ 
+ strtol_error
+-__xstrtol (s, ptr, base, val, valid_suffixes)
+-     const char *s;
+-     char **ptr;
+-     int base;
+-     __unsigned long int *val;
+-     const char *valid_suffixes;
++__xstrtol (
++     const char *s,
++     char **ptr,
++     int base,
++     __unsigned long int *val,
++     const char *valid_suffixes)
+ {
+   char *t_ptr;
+   char **p;

@@ -13,6 +13,7 @@ SRCREV = "500b41d5c8638f9b80dd558f4044f3301c7457a4"
 SRC_URI = "git://gitlab.freedesktop.org/virgl/virglrenderer.git;branch=main;protocol=https;tag=${PV} \
            file://0001-meson.build-use-python3-directly-for-python.patch \
            file://0001-c11-use-glibc-s-once_flag-ONCE_FLAG_INIT-when-presen.patch \
+           file://986b5fc57b07c06b5e0b3a3694d06898ebc80163.patch \
            "
 
 inherit meson pkgconfig features_check

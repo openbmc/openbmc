@@ -3,9 +3,9 @@ LLVM_DIR = "llvm${LLVM_RELEASE}"
 
 LLVM_HTTP ?= "https://github.com/llvm"
 
-MAJOR_VER = "21"
+MAJOR_VER = "22"
 MINOR_VER = "1"
-PATCH_VER = "8"
+PATCH_VER = "3"
 # could be 'rcX' or 'git' or empty ( for release )
 VER_SUFFIX = ""
 
@@ -15,10 +15,6 @@ LLVMMD5SUM = "8a15a0759ef07f2682d2ba4b893c9afe"
 CLANGMD5SUM = "ff42885ed2ab98f1ecb8c1fc41205343"
 LLDMD5SUM = "ae7dc7c027b1fa89b5b013d391d3ee2b"
 LLDBMD5SUM = "2e0d44968471fcde980034dbb826bea9"
-
-# remove at next version upgrade or when output changes
-PR = "r1"
-HASHEQUIV_HASH_VERSION .= ".1"
 
 LLVM_LIBDIR_SUFFIX = "${@d.getVar('baselib').replace('lib', '')}"
 

@@ -28,8 +28,6 @@ CLEANBROKEN = "1"
 EXTRA_OECONF = "--with-perl='${USRBINPATH}/env perl' --with-patch=patch --without-sendmail"
 EXTRA_OECONF:append:class-native = " --disable-nls"
 
-EXTRA_AUTORECONF += "--exclude=aclocal"
-
 CACHED_CONFIGUREVARS += "ac_cv_path_BASH=/bin/bash ac_cv_path_COLUMN=column"
 
 # Make sure we don't have "-w" in shebang lines: it breaks using

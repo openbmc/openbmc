@@ -63,8 +63,6 @@ EXTRA_OECONF = " \
                DSOFLAGS='${LDFLAGS}' \
                "
 
-EXTRA_AUTORECONF += "--exclude=autoheader"
-
 do_install () {
 	oe_runmake "BUILDROOT=${D}" install
 
