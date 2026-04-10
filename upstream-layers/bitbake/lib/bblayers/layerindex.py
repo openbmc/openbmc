@@ -116,7 +116,7 @@ class LayerIndexPlugin(ActionPlugin):
 
         # Load the cooker DB
         cookerIndex = layerindexlib.LayerIndex(self.tinfoil.config_data)
-        cookerIndex.load_layerindex('cooker://', load='layerDependencies')
+        cookerIndex.load_layerindex('cooker://', load=['layerDependencies'])
 
         # Fast path, check if we already have what has been requested!
         (dependencies, invalidnames) = cookerIndex.find_dependencies(names=args.layername, ignores=ignore_layers)
@@ -137,7 +137,7 @@ class LayerIndexPlugin(ActionPlugin):
 
             for remoteurl in _construct_url(apiurl, branches):
                 logger.plain("Loading %s..." % remoteurl)
-                remoteIndex.load_layerindex(remoteurl)
+                remoteIndex.load_layerindex(remoteurl, load=['layerDependencies'])
 
             if remoteIndex.is_empty():
                 logger.error("Remote layer index %s is empty for branches %s" % (apiurl, branches))

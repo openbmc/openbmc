@@ -105,7 +105,8 @@ class Command(BaseCommand):
             url_branches = ";branch=%s" % ','.join(allowed_branch_names)
         else:
             url_branches = ""
-        layerindex.load_layerindex("%s%s" % (self.apiurl, url_branches))
+        layerindex.load_layerindex("%s%s" % (self.apiurl, url_branches),
+                                   load=['layerDependencies', 'recipes', 'machines', 'distros'])
 
         http_progress.stop()
 

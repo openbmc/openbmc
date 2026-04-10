@@ -96,6 +96,23 @@ class UnpackError(BBFetchException):
         BBFetchException.__init__(self, msg)
         self.args = (message, url)
 
+class LocalModificationsError(UnpackError):
+    """Exception raised when a checkout cannot be updated due to local modifications"""
+    def __init__(self, repodir, url, git_output):
+        message = ("Repository at %s has uncommitted changes, unable to update:\n%s\n"
+                   "Commit, stash or discard your changes and re-run the update." % (repodir, git_output))
+        UnpackError.__init__(self, message, url)
+        self.args = (repodir, url, git_output)
+
+class RebaseError(UnpackError):
+    """Exception raised when a checkout has local commits that could not be rebased onto the new upstream revision"""
+    def __init__(self, repodir, url, git_output):
+        message = ("Repository at %s has local commits that could not be rebased onto the new upstream revision:\n%s\n"
+                   "Note: the 'dldir' remote points to the local download cache and may be used to resolve the conflict manually.\n"
+                   "Once resolved, re-run the update." % (repodir, git_output))
+        UnpackError.__init__(self, message, url)
+        self.args = (repodir, url, git_output)
+
 class NoMethodError(BBFetchException):
     """Exception raised when there is no method to obtain a supplied url or set of urls"""
     def __init__(self, url):

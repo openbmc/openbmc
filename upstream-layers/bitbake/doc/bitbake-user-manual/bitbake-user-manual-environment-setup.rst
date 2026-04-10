@@ -327,6 +327,16 @@ In addition, the command can take the following arguments:
    with a ``local`` source in it. See the :ref:`ref-bbsetup-source-overrides` section
    for more information on source overrides.
 
+-  ``--init-vscode`` / ``--no-init-vscode``: generate (or skip generating) a
+   ``bitbake.code-workspace`` file in the :term:`Setup` directory. The workspace
+   file configures the `Yocto Project BitBake
+   <https://marketplace.visualstudio.com/items?itemName=yocto-project.yocto-bitbake>`_
+   VS Code extension with paths to the build directory and the init script, and
+   lists the layer directories as workspace folders. Any user-added folders or
+   settings in an existing workspace file are preserved across updates.
+   The default is ``true`` when ``code`` (the VS Code binary) is found on
+   ``PATH``, and ``false`` otherwise.
+
 ``bitbake-setup init`` Examples
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -410,6 +420,30 @@ the latest changes from the :term:`Configuration Template` it was constructed fr
 The :ref:`ref-bbsetup-command-status` command can be used to show the current
 status of the :term:`Setup` before updating it.
 
+This command is intended to be run from a shell where the BitBake environment
+has been sourced (e.g. after ``source build/init-build-env``), so that
+``bitbake-setup`` can automatically identify the current :term:`Setup` without
+requiring the ``--setup-dir`` argument.
+
+When a layer repository already exists in the :term:`Setup` (i.e. it has been
+previously checked out by ``bitbake-setup init`` or a prior ``update``), the
+update is performed *in place* using the fetcher's
+:ref:`unpack_update <bb-the-unpack-update>` method: the new upstream revision
+is fetched into the local download cache and then rebased on top of the
+checkout's current HEAD. This means any local commits in the layer directory
+are preserved and rebased onto the new upstream revision. If the working tree
+contains staged or unstaged changes to tracked files, the update is blocked
+until those changes are committed, stashed or discarded.
+
+.. note::
+
+   ``bitbake-setup`` performs the rebase to fast-forward local commits onto
+   the new upstream revision, but intentionally does not go further by using
+   ``--autostash`` (which would silently stash uncommitted changes before the
+   rebase and pop them afterwards). Any uncommitted modifications are surfaced
+   to the user before the update proceeds, so there are no surprises from an
+   automatic stash/pop cycle.
+
 In addition, the command can take the following arguments:
 
 -  ``--update-bb-conf``: whether to update the :term:`BitBake Build`
@@ -420,9 +454,180 @@ In addition, the command can take the following arguments:
    -  ``yes``: update the configuration files.
    -  ``no``: don't update the configuration files.
 
+-  ``--rebase-conflicts-strategy``: what to do when a layer repository has
+   local modifications or commits that prevent an in-place update. Accepted
+   values are:
+
+   -  ``abort`` (default): stop with an error message describing the problem.
+      The repository is left in its previous state (the failed rebase is
+      automatically aborted). The error message includes a hint to re-run with
+      ``--rebase-conflicts-strategy=backup``.
+   -  ``backup``: rename the conflicting layer directory to a timestamped
+      ``<name>-backup-<timestamp>`` path (preserving local work), then
+      re-clone the layer from upstream into a fresh directory.
+
 -  ``--setup-dir``: path to the :term:`Setup` to update. Not required if the
    command is invoked from an initialized BitBake environment that contains
    :term:`BBPATH`.
+
+``bitbake-setup update`` Examples
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  This example performs a standard update from an initialized BitBake
+   environment. Local commits in any layer directory are rebased on top of
+   the new upstream revision and preserved:
+
+   .. code-block:: shell
+
+      $ bitbake-setup update
+      NOTE: Bitbake-setup is using /path/to/bitbake-builds as top directory.
+      NOTE: Looking up config poky-master in configuration registry
+      NOTE: Layer repository https://git.openembedded.org/openembedded-core
+            checked out into /path/to/bitbake-builds/poky-master/layers/openembedded-core
+            updated revision master from d383ea3... to b50d6de...
+      Fetching layer/tool repositories into /path/to/bitbake-builds/poky-master/layers
+          bitbake
+          meta-yocto
+          openembedded-core
+
+-  This example shows what happens when a layer directory contains staged or
+   unstaged changes to tracked files. The update is blocked with an error:
+
+   .. code-block:: shell
+
+      $ bitbake-setup update
+      NOTE: Bitbake-setup is using /path/to/bitbake-builds as top directory.
+      NOTE: Looking up config poky-master in configuration registry
+      Fetching layer/tool repositories into /path/to/bitbake-builds/poky-master/layers
+          bitbake
+          meta-yocto
+          openembedded-core
+      ERROR: Unpack failure for URL:
+       'git://git.openembedded.org/openembedded-core;protocol=https;rev=master;branch=master;destsuffix=openembedded-core'.
+       Repository at /path/to/bitbake-builds/poky-master/layers/openembedded-core has uncommitted changes, unable to update:
+       M meta/recipes-devtools/ccache/ccache_4.13.1.bb
+
+      Commit, stash or discard your changes and re-run the update.
+      Use 'bitbake-setup update --rebase-conflicts-strategy=backup'
+      to automatically back up the directory and re-clone from upstream,
+      or use 'bitbake-setup init -L openembedded-core /path/to/local/checkout'
+      to work with a local checkout instead.
+
+   Stashing the changes and re-running resolves the issue:
+
+   .. code-block:: shell
+
+      $ git -C layers/openembedded-core stash
+      $ bitbake-setup update
+      $ git -C layers/openembedded-core stash pop
+
+-  This example shows what happens when a layer directory contains local
+   commits that conflict with the incoming upstream changes. The failed rebase
+   is automatically aborted, and the ``dldir`` remote is left in the repository
+   for manual resolution:
+
+   .. code-block:: shell
+
+      $ bitbake-setup update
+      ERROR: Repository at layers/openembedded-core has local commits that could
+      not be rebased onto the new upstream revision:
+      ...
+      Note: the 'dldir' remote points to the local download cache and may be
+      used to resolve the conflict manually.
+      Once resolved, re-run the update.
+
+   The conflict can be resolved manually using the ``dldir`` remote that
+   ``bitbake-setup`` adds to the repository:
+
+   .. code-block:: shell
+
+      $ git -C layers/openembedded-core rebase dldir/master
+      # fix conflicts in an editor, then stage the resolved files:
+      $ git -C layers/openembedded-core add meta/recipes-core/base-files/base-files.bb
+      $ git -C layers/openembedded-core rebase --continue
+      $ bitbake-setup update
+
+-  When manual conflict resolution is not desired, the
+   ``--rebase-conflicts-strategy=backup`` option can be used instead. It
+   preserves the conflicting directory under a timestamped backup path and
+   re-clones the layer cleanly from upstream:
+
+   .. code-block:: shell
+
+      $ bitbake-setup update --rebase-conflicts-strategy=backup
+      NOTE: Bitbake-setup is using /path/to/bitbake-builds as top directory.
+      NOTE: Looking up config poky-master in configuration registry
+      NOTE: Layer repository https://git.openembedded.org/openembedded-core checked
+            out into /path/to/bitbake-builds/poky-master/layers/openembedded-core
+            updated revision master from 2ec283e... to b50d6de...
+      Fetching layer/tool repositories into /path/to/bitbake-builds/poky-master/layers
+          bitbake
+          meta-yocto
+          openembedded-core
+      WARNING: Unpack failure for URL:
+        'git://git.openembedded.org/openembedded-core;protocol=https;rev=master;branch=master;destsuffix=openembedded-core'.
+        Repository at /path/to/bitbake-builds/poky-master/layers/openembedded-core
+        has local commits that could not be rebased onto the new upstream revision:
+      ...
+      Note: the 'dldir' remote points to the local download cache and may be used to resolve the conflict manually.
+      Once resolved, re-run the update.
+      Renaming /path/to/bitbake-builds/poky-master/layers/openembedded-core to
+        /path/to/bitbake-builds/poky-master/layers/openembedded-core-backup.20260329160426
+        to preserve your work, then re-cloning from upstream.
+
+   The backup directory is a complete git repository. Local commits can be
+   recovered from it after the update by fetching a branch from the backup
+   into the fresh clone (git accepts local paths as remote URLs) and then
+   cherry-picking the desired commits. For example, given a ``my-wip`` branch
+   with two commits existing in the backup repository and not in the fresh clone,
+   the following commands can be used to apply these commits on top of the new
+   upstream revision in the fresh clone:
+
+   .. code-block:: shell
+
+      $ git -C layers/openembedded-core-backup.20260329160426 log --oneline my-wip
+      a1b2c3d u-boot: fix compilation with newer GCC
+      2ec283e base-files: update version
+      ...
+
+      $ cd layers/openembedded-core
+      $ git checkout -b my-wip
+      Switched to a new branch 'my-wip'
+      $ git fetch ../openembedded-core-backup.20260329160426 my-wip
+
+      $ git cherry-pick 2ec283e
+      # resolve any conflicts, then stage the resolved files:
+      $ git add meta/recipes-core/base-files/base-files.bb
+      $ git cherry-pick --continue
+
+      $ git cherry-pick a1b2c3d
+      # resolve any conflicts, then stage the resolved files:
+      $ git add meta/recipes-devtools/u-boot/u-boot_2026.04.bb
+      $ git cherry-pick --continue
+
+      $ cd ../..
+
+   The sequence above is:
+
+   #. Inspect the backup's branch history to identify the commits to recover.
+   #. Change into the fresh clone and create a matching branch.
+   #. Fetch the backup branch so its objects become available locally. Git
+      accepts filesystem paths as remote URLs, and from inside
+      ``layers/openembedded-core/``, ``../`` points to ``layers/``, where the
+      backup directory sits.
+   #. Cherry-pick the commits in oldest-first order.
+
+   Once all desired commits have been recovered and verified, the backup
+   directory can be removed:
+
+   .. code-block:: shell
+
+      $ rm -rf layers/openembedded-core-backup.20260329160426
+
+   If a VSCode workspace is in use, the backup directory will appear as an
+   additional workspace folder until it is cleaned up. It can be removed from
+   the workspace via the VS Code UI by right-clicking the folder and selecting
+   *Remove Folder from Workspace*.
 
 .. _ref-bbsetup-command-install-buildtools:
 

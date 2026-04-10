@@ -186,6 +186,51 @@ cloning the tree into the final directory. The process is completed
 using references so that there is only one central copy of the Git
 metadata needed.
 
+.. _bb-the-unpack-update:
+
+The Non-Destructive Update (``unpack_update``)
+==============================================
+
+.. note::
+
+   This is a specialised method intended for tools that manage persistent
+   layer checkouts on behalf of the user, such as
+   :ref:`bitbake-setup update <ref-bbsetup-command-update>`. It is not part of the
+   normal recipe fetch/unpack flow.
+
+For Git URLs, an alternative ``unpack_update()`` method is available
+that updates an existing checkout *in place* rather than removing and
+re-cloning it. This is useful when the target directory may contain
+local commits that should be preserved across updates.
+
+The code to call the non-destructive update looks like the following::
+
+   rootdir = l.getVar('UNPACKDIR')
+   fetcher.unpack_update(rootdir)
+
+``unpack_update()`` performs the following steps:
+
+1. A ``dldir`` git remote is added (or updated) in the existing
+   checkout, pointing at the local download cache. This remote may
+   also be useful for manually resolving conflicts outside the fetcher.
+2. The new upstream revision is fetched from the ``dldir`` remote into
+   the existing repository.
+3. Any local commits are rebased on top of the new upstream revision,
+   preserving local work.
+
+The method raises an error if:
+
+-  The working tree contains staged or unstaged changes to tracked
+   files (``LocalModificationsError``).
+-  Local commits cannot be cleanly rebased onto the new upstream
+   revision (``RebaseError``). A failed rebase is automatically aborted
+   before the exception is raised.
+-  The download cache does not contain a sufficiently recent clone
+   of the repository, or the checkout is a shallow clone.
+
+Currently only the Git fetcher supports ``unpack_update()``. All other
+fetcher types raise ``RuntimeError`` if it is called.
+
 .. _bb-fetchers:
 
 Fetchers
@@ -379,6 +424,21 @@ This fetcher supports the following parameters:
 
 -  *"subpath":* Limits the checkout to a specific subpath of the tree.
    By default, the whole tree is checked out.
+
+   .. warning::
+
+      When using this option, the value of :term:`SRCREV` may not be reflected
+      in the checked out repository.
+
+      To achieve a partial checkout of the repository with the ``subpath``
+      option, the BitBake Git fetcher makes use of Git "plumbing" commands: `git
+      read-tree <https://git-scm.com/docs/git-read-tree>`__ and `git
+      checkout-index <https://git-scm.com/docs/git-checkout-index>`__. However,
+      these commands only update the **files** within the repository, and do not
+      update the current ``HEAD`` to point to the commit specified by
+      :term:`SRCREV`. Instead, the value of ``HEAD`` will always point to the
+      tip of the branch specified by the ``branch`` parameter, which may or may
+      not correspond to :term:`SRCREV`.
 
 -  *"destsuffix":* The name of the path in which to place the checkout.
    By default, the path is ``git/``.
@@ -680,6 +740,12 @@ Here is an example URL::
 NPM Fetcher (``npm://``)
 ------------------------
 
+.. warning::
+
+   The NPM fetcher is currently disabled due to security concerns. See
+   `355cd226e0720a9ed7683bb01c8c0a58eee03664 <https://git.openembedded.org/bitbake/commit/?id=355cd226e0720a9ed7683bb01c8c0a58eee03664>`__
+   for more information.
+
 This submodule fetches source code from an
 `NPM <https://en.wikipedia.org/wiki/Npm_(software)>`__
 Javascript package registry.
@@ -718,6 +784,12 @@ to automatically create a recipe from an NPM URL.
 
 NPM shrinkwrap Fetcher (``npmsw://``)
 -------------------------------------
+
+.. warning::
+
+   The NPM fetcher is currently disabled due to security concerns. See
+   `355cd226e0720a9ed7683bb01c8c0a58eee03664 <https://git.openembedded.org/bitbake/commit/?id=355cd226e0720a9ed7683bb01c8c0a58eee03664>`__
+   for more information.
 
 This submodule fetches source code from an
 `NPM shrinkwrap <https://docs.npmjs.com/cli/v8/commands/npm-shrinkwrap>`__

@@ -1738,6 +1738,12 @@ overview of their function and contents.
 
       -  ``npm://``: Fetches JavaScript modules from a registry.
 
+         .. warning::
+
+            The NPM fetcher is currently disabled due to security concerns. See
+            `355cd226e0720a9ed7683bb01c8c0a58eee03664 <https://git.openembedded.org/bitbake/commit/?id=355cd226e0720a9ed7683bb01c8c0a58eee03664>`__
+            for more information.
+
       -  ``p4://``: Fetches files from a Perforce (``p4``) revision
          control repository.
 

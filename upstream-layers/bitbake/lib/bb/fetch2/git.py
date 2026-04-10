@@ -730,7 +730,7 @@ class Git(FetchMethod):
 
             output = runfetchcmd("%s status --untracked-files=no --porcelain" % (ud.basecmd), d, workdir=destdir)
             if output:
-                raise bb.fetch2.UnpackError("Repository at %s has uncommitted changes, unable to update:\n%s" % (destdir, output), ud.url)
+                raise bb.fetch2.LocalModificationsError(destdir, ud.url, output)
 
             # Set up remote for the download location if it doesn't exist
             try:
@@ -740,6 +740,9 @@ class Git(FetchMethod):
                     runfetchcmd("%s remote add dldir file://%s" % (ud.basecmd, ud.clonedir), d, workdir=destdir)
             try:
                 runfetchcmd("%s fetch dldir" % (ud.basecmd), d, workdir=destdir)
+            except bb.fetch2.FetchError as e:
+                raise bb.fetch2.UnpackError("Failed to fetch from dldir remote: %s" % str(e), ud.url)
+            try:
                 runfetchcmd("%s rebase --no-autosquash --no-autostash %s" % (ud.basecmd, ud.revision), d, workdir=destdir)
             except bb.fetch2.FetchError as e:
                 # If rebase failed, abort it
@@ -747,7 +750,7 @@ class Git(FetchMethod):
                     runfetchcmd("%s rebase --abort" % (ud.basecmd), d, workdir=destdir)
                 except Exception:
                     pass
-                raise bb.fetch2.UnpackError("Failed to update checkout in place: %s" % str(e), ud.url)
+                raise bb.fetch2.RebaseError(destdir, ud.url, str(e))
             return True
 
         # If there is a tag parameter in the url and we also have a fixed srcrev, check the tag

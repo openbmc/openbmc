@@ -174,15 +174,15 @@ class LayerIndex():
         return res
 
 
-    def load_layerindex(self, indexURI, load=['layerDependencies', 'recipes', 'machines', 'distros'], reload=False):
+    def load_layerindex(self, indexURI, load=[], reload=False):
         '''Load the layerindex.
 
            indexURI - An index to load.  (Use multiple calls to load multiple indexes)
 
            reload - If reload is True, then any previously loaded indexes will be forgotten.
 
-           load - List of elements to load.  Default loads all items.
-                  Note: plugs may ignore this.
+           load - List of elements to load. By default, an empty list is used to keep things lean.
+                  Callers need to specify a minimal set of elements to load, such as ['layerDependencies'] for dependency resolution.
 
 The format of the indexURI:
 

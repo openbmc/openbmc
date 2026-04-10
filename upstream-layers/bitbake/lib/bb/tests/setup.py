@@ -5,9 +5,13 @@
 #
 
 from bb.tests.fetch import FetcherTest
-import json
-import hashlib
+import bb
+import bb.process
 import glob
+import hashlib
+import json
+import os
+import stat
 from bb.tests.support.httpserver import HTTPService
 
 class BitbakeSetupTest(FetcherTest):
@@ -208,7 +212,6 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         with open(fullname, 'w') as f:
             f.write(content)
         if script:
-            import stat
             st = os.stat(fullname)
             os.chmod(fullname, st.st_mode | stat.S_IEXEC)
         self.git('add {}'.format(name), cwd=self.testrepopath)
@@ -257,11 +260,11 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
                         )
                     self.assertIn(filerelative_layer, bblayers)
 
-        if 'oe-fragment' in bitbake_config.keys():
+        if 'oe-fragments' in bitbake_config:
             for f in bitbake_config["oe-fragments"]:
                 self.assertTrue(os.path.exists(os.path.join(bb_conf_path, f)))
 
-        if 'bb-environment-passthrough' in bitbake_config.keys():
+        if 'bb-env-passthrough-additions' in bitbake_config:
             with open(os.path.join(bb_build_path, 'init-build-env'), 'r') as f:
                 init_build_env = f.read()
             self.assertTrue('BB_ENV_PASSTHROUGH_ADDITIONS' in init_build_env)
@@ -279,7 +282,6 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
 
     def test_setup(self):
         # unset BBPATH to ensure tests run in isolation from the existing bitbake environment
-        import os
         if 'BBPATH' in os.environ:
             del os.environ['BBPATH']
 
@@ -536,3 +538,191 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         custom_setup_dir = 'special-setup-dir-with-cmdline-overrides'
         out = self.runbbsetup("init --non-interactive -L test-repo {} --setup-dir-name {} test-config-1 gadget".format(self.testrepopath, custom_setup_dir))
         _check_local_sources(custom_setup_dir)
+
+    def test_vscode(self):
+        if 'BBPATH' in os.environ:
+            del os.environ['BBPATH']
+        os.chdir(self.tempdir)
+
+        self.runbbsetup("settings set default registry 'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath))
+        self.add_file_to_testrepo('test-file', 'initial\n')
+        self.add_json_config_to_registry('test-config-1.conf.json', 'master', 'master')
+
+        # --init-vscode should create bitbake.code-workspace
+        self.runbbsetup("init --non-interactive --init-vscode test-config-1 gadget")
+        setuppath = self.get_setup_path('test-config-1', 'gadget')
+        workspace_file = os.path.join(setuppath, 'bitbake.code-workspace')
+        self.assertTrue(os.path.exists(workspace_file),
+                        "bitbake.code-workspace should be created with --init-vscode")
+
+        with open(workspace_file) as f:
+            workspace = json.load(f)
+
+        # top-level structure
+        self.assertIn('folders', workspace)
+        self.assertIn('settings', workspace)
+        self.assertIn('extensions', workspace)
+        self.assertIn('yocto-project.yocto-bitbake',
+                      workspace['extensions']['recommendations'])
+
+        # folders: conf dir + test-repo (symlinks like oe-init-build-env-dir are skipped)
+        folder_names = {f['name'] for f in workspace['folders']}
+        self.assertIn('conf', folder_names)
+        self.assertIn('test-repo', folder_names)
+
+        # folder paths must be relative so the workspace is portable
+        for f in workspace['folders']:
+            self.assertFalse(os.path.isabs(f['path']),
+                             "Folder path should be relative, got: {}".format(f['path']))
+
+        # bitbake extension settings
+        settings = workspace['settings']
+        self.assertTrue(settings.get('bitbake.disableConfigModification'))
+        self.assertEqual(settings['bitbake.pathToBuildFolder'],
+                         os.path.join(setuppath, 'build'))
+        self.assertEqual(settings['bitbake.pathToEnvScript'],
+                         os.path.join(setuppath, 'build', 'init-build-env'))
+
+        # file associations
+        self.assertIn('*.conf', settings.get('files.associations', {}))
+        self.assertIn('*.inc', settings.get('files.associations', {}))
+
+        # python extra paths: test-repo/scripts/ exists and should be listed
+        extra_paths = settings.get('python.analysis.extraPaths', [])
+        self.assertTrue(any('scripts' in p for p in extra_paths),
+                        "python.analysis.extraPaths should include the scripts dir")
+        self.assertEqual(settings.get('python.analysis.extraPaths'),
+                         settings.get('python.autoComplete.extraPaths'))
+
+        # --no-init-vscode should NOT create a workspace file
+        self.runbbsetup("init --non-interactive --no-init-vscode test-config-1 gadget-notemplate")
+        notemplate_path = self.get_setup_path('test-config-1', 'gadget-notemplate')
+        self.assertFalse(
+            os.path.exists(os.path.join(notemplate_path, 'bitbake.code-workspace')),
+            "bitbake.code-workspace should not be created with --no-init-vscode")
+
+        # update with --init-vscode after a layer change should preserve
+        # user-added folders and settings while still rewriting managed ones
+        workspace['folders'].append({"name": "user-folder", "path": "user/custom"})
+        workspace['settings']['my.user.setting'] = 'preserved'
+        with open(workspace_file, 'w') as f:
+            json.dump(workspace, f, indent=4)
+
+        self.add_file_to_testrepo('test-file', 'updated\n')
+        os.environ['BBPATH'] = os.path.join(setuppath, 'build')
+        self.runbbsetup("update --update-bb-conf='no'")
+        del os.environ['BBPATH']
+
+        with open(workspace_file) as f:
+            updated = json.load(f)
+        self.assertIn('user/custom', {f['path'] for f in updated['folders']},
+                      "User-added folder was removed during update")
+        self.assertIn('my.user.setting', updated['settings'],
+                      "User-added setting was removed during update")
+
+        # update with a corrupt workspace file should log an error and leave it unchanged
+        self.add_file_to_testrepo('test-file', 'updated-again\n')
+        with open(workspace_file, 'w') as f:
+            f.write('{invalid json')
+        os.environ['BBPATH'] = os.path.join(setuppath, 'build')
+        self.runbbsetup("update --update-bb-conf='no'")
+        del os.environ['BBPATH']
+        with open(workspace_file) as f:
+            content = f.read()
+        self.assertEqual(content, '{invalid json',
+                         "Corrupt workspace file should not be modified")
+
+    def _count_layer_backups(self, layers_path):
+        return len([f for f in os.listdir(layers_path) if 'backup' in f])
+
+    def test_update_rebase_conflicts_strategy(self):
+        """Test the --rebase-conflicts-strategy option for the update command.
+
+        Covers three scenarios not exercised by test_setup:
+        1. Uncommitted tracked-file change (LocalModificationsError) + default 'abort'
+           strategy → clean error message containing 'has uncommitted changes' and a
+           hint at --rebase-conflicts-strategy=backup; no backup directory is created.
+        2. Same uncommitted change + 'backup' strategy → directory is renamed to a
+           timestamped backup and the layer is re-cloned cleanly.
+        3. Committed local change that conflicts with an incoming upstream commit
+           (RebaseError):
+           a. Default 'abort' strategy → error containing 'Merge conflict' and the
+              --rebase-conflicts-strategy=backup hint; no backup directory is created.
+           b. 'backup' strategy → backup + re-clone instead of a hard failure.
+        """
+        if 'BBPATH' in os.environ:
+            del os.environ['BBPATH']
+        os.chdir(self.tempdir)
+
+        self.runbbsetup("settings set default registry 'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath))
+        self.add_file_to_testrepo('test-file', 'initial\n')
+        self.add_json_config_to_registry('test-config-1.conf.json', 'master', 'master')
+        self.runbbsetup("init --non-interactive test-config-1 gadget")
+
+        setuppath = self.get_setup_path('test-config-1', 'gadget')
+        layer_path = os.path.join(setuppath, 'layers', 'test-repo')
+        layers_path = os.path.join(setuppath, 'layers')
+
+        # Scenario 1: uncommitted tracked change, default 'abort' strategy
+        # Advance upstream so an update is required.
+        self.add_file_to_testrepo('test-file', 'upstream-v2\n')
+        # Modify the same tracked file in the layer without committing.
+        with open(os.path.join(layer_path, 'test-file'), 'w') as f:
+            f.write('locally-modified\n')
+
+        os.environ['BBPATH'] = os.path.join(setuppath, 'build')
+        with self.assertRaises(bb.process.ExecutionError) as ctx:
+            self.runbbsetup("update --update-bb-conf='no'")
+        self.assertIn('has uncommitted changes', str(ctx.exception))
+        self.assertIn('--rebase-conflicts-strategy=backup', str(ctx.exception))
+        # No backup directory must have been created.
+        self.assertEqual(self._count_layer_backups(layers_path), 0,
+                         "abort strategy must not create any backup")
+
+        # Scenario 2: same uncommitted change, 'backup' strategy
+        out = self.runbbsetup("update --update-bb-conf='no' --rebase-conflicts-strategy=backup")
+        # One backup directory must now exist.
+        self.assertEqual(self._count_layer_backups(layers_path), 1,
+                         "backup strategy must create exactly one backup")
+        # The re-cloned layer must be clean and at the upstream revision.
+        with open(os.path.join(layer_path, 'test-file')) as f:
+            self.assertEqual(f.read(), 'upstream-v2\n',
+                             "re-cloned layer must contain the upstream content")
+        status = self.git('status --porcelain', cwd=layer_path).strip()
+        self.assertEqual(status, '',
+                         "re-cloned layer must have no local modifications")
+        del os.environ['BBPATH']
+
+        # Scenario 3: committed conflicting change, 'backup' strategy
+        # Re-initialise a fresh setup so we start from a clean state.
+        self.runbbsetup("init --non-interactive --setup-dir-name rebase-conflict-setup test-config-1 gadget")
+        conflict_setup = os.path.join(self.tempdir, 'bitbake-builds', 'rebase-conflict-setup')
+        conflict_layer = os.path.join(conflict_setup, 'layers', 'test-repo')
+        conflict_layers = os.path.join(conflict_setup, 'layers')
+
+        # Commit a local change that touches the same file as the next upstream commit.
+        with open(os.path.join(conflict_layer, 'test-file'), 'w') as f:
+            f.write('conflicting-local\n')
+        self.git('add test-file', cwd=conflict_layer)
+        self.git('commit -m "Local conflicting change"', cwd=conflict_layer)
+
+        # Advance upstream with a conflicting edit.
+        self.add_file_to_testrepo('test-file', 'conflicting-upstream\n')
+
+        os.environ['BBPATH'] = os.path.join(conflict_setup, 'build')
+        # Default stop strategy must still fail with a conflict error and include
+        # the --rebase-conflicts-strategy=backup hint (same handler as LocalModificationsError).
+        with self.assertRaises(bb.process.ExecutionError) as ctx:
+            self.runbbsetup("update --update-bb-conf='no'")
+        self.assertIn('Merge conflict in test-file', str(ctx.exception))
+        self.assertIn('--rebase-conflicts-strategy=backup', str(ctx.exception))
+        self.assertEqual(self._count_layer_backups(conflict_layers), 0)
+
+        # Backup strategy must succeed: backup the conflicted dir and re-clone.
+        self.runbbsetup("update --update-bb-conf='no' --rebase-conflicts-strategy=backup")
+        self.assertEqual(self._count_layer_backups(conflict_layers), 1,
+                         "backup strategy must create exactly one backup after a conflict")
+        with open(os.path.join(conflict_layer, 'test-file')) as f:
+            self.assertEqual(f.read(), 'conflicting-upstream\n',
+                             "re-cloned layer must contain the upstream content after conflict backup")
+        del os.environ['BBPATH']
