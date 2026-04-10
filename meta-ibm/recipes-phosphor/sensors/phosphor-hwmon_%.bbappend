@@ -34,3 +34,4 @@ SYSTEMD_ENVIRONMENT_FILE:${PN}:append:ibm-ac-server = " ${@compose_list(d, 'ENVS
 SYSTEMD_ENVIRONMENT_FILE:${PN}:append:p10bmc = " ${@compose_list(d, 'ENVS', 'ITEMS')}"
 
 PACKAGECONFIG:append:p10bmc = " use-dev-path"
+EXTRA_OEMESON:append = " -Dnegative-errno-on-fail=false -Dupdate-functional-on-fail=false"
