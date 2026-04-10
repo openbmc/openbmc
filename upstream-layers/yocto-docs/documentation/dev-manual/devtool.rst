@@ -1111,6 +1111,11 @@ the following methods when you run ``devtool add``:
 Adding Node.js Modules
 ----------------------
 
+.. warning::
+
+   The NPM fetcher is currently disabled due to security concerns. See
+   :bitbake_rev:`355cd226e0720a9ed7683bb01c8c0a58eee03664` for more information.
+
 You can use the ``devtool add`` command two different ways to add
 Node.js modules: through ``npm`` or from a repository or local source.
 

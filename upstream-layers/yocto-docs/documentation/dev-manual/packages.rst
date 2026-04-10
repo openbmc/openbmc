@@ -18,7 +18,7 @@ This section describes a few tasks that involve packages:
 -  :ref:`Setting up and running package test
    (ptest) <test-manual/ptest:testing packages with ptest>`
 
--  :ref:`dev-manual/packages:creating node package manager (npm) packages`
+-  (**disabled**) :ref:`dev-manual/packages:creating node package manager (npm) packages`
 
 -  :ref:`dev-manual/packages:adding custom metadata to packages`
 
@@ -913,6 +913,14 @@ Yocto Project Test Environment Manual.
 
 Creating Node Package Manager (NPM) Packages
 ============================================
+
+.. warning::
+
+   The NPM fetcher is currently disabled due to security concerns. See
+   :bitbake_rev:`355cd226e0720a9ed7683bb01c8c0a58eee03664` for more information.
+
+   This section is left there if it is re-enabled in the future, but is
+   currently obsolete.
 
 :wikipedia:`NPM <Npm_(software)>` is a package manager for the JavaScript
 programming language. The Yocto Project supports the NPM

@@ -91,9 +91,17 @@ rst_prolog = """
 .. |author| replace:: %s
 """ % (project, copyright, author)
 
+# base url definitions
+oe_git_server = "https://git.openembedded.org"
+oecore_git = f"{oe_git_server}/openembedded-core"
+bitbake_git = f"{oe_git_server}/bitbake"
+yocto_git_server = "https://git.yoctoproject.org"
+meta_yocto_git = f"{yocto_git_server}/meta-yocto"
+
 # external links and substitutions
 extlinks = {
-    'bitbake_git': ('https://git.openembedded.org/bitbake%s', None),
+    'bitbake_git': (f'{bitbake_git}%s', None),
+    'bitbake_rev': (f'{bitbake_git}/commit/?id=%s', '%.7s'),
     'cve_mitre': ('https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-%s', 'CVE-%s'),
     'cve_nist': ('https://nvd.nist.gov/vuln/detail/CVE-%s', 'CVE-%s'),
     'yocto_home': ('https://www.yoctoproject.org%s', None),
@@ -103,11 +111,13 @@ extlinks = {
     'yocto_bugs': ('https://bugzilla.yoctoproject.org%s', None),
     'yocto_ab': ('https://autobuilder.yoctoproject.org%s', None),
     'yocto_docs': ('https://docs.yoctoproject.org%s', None),
-    'yocto_git': ('https://git.yoctoproject.org%s', None),
+    'yocto_git': (f'{yocto_git_server}%s', None),
+    'meta_yocto_rev': (f'{meta_yocto_git}/commit/?id=%s', '%.7s'),
     'yocto_sstate': ('http://sstate.yoctoproject.org%s', None),
     'oe_home': ('https://www.openembedded.org%s', None),
     'oe_lists': ('https://lists.openembedded.org%s', None),
-    'oe_git': ('https://git.openembedded.org%s', None),
+    'oe_git': (f'{oe_git_server}%s', None),
+    'oecore_rev': (f'{oecore_git}/commit/?id=%s', '%.7s'),
     'oe_wiki': ('https://www.openembedded.org/wiki%s', None),
     'oe_layerindex': ('https://layers.openembedded.org%s', None),
     'oe_layer': ('https://layers.openembedded.org/layerindex/branch/master/layer%s', None),

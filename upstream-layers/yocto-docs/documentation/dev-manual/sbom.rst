@@ -64,6 +64,24 @@ more information in the output :term:`SPDX` data:
 
 -  Add archives of these source files themselves (:term:`SPDX_ARCHIVE_SOURCES`).
 
+-  Exclude specific files from the SPDX output using Python regular expressions
+   (:term:`SPDX_FILE_EXCLUDE_PATTERNS`).
+
+-  Attach supplier information to the image SBOM, SDK SBOM, or individual
+   packages (:term:`SPDX_IMAGE_SUPPLIER`, :term:`SPDX_SDK_SUPPLIER`,
+   :term:`SPDX_PACKAGE_SUPPLIER`).
+
+-  Enrich source downloads with ecosystem-specific Package URLs (PURLs), using
+   the :ref:`ref-classes-cargo_common`, :ref:`ref-classes-go-mod`,
+   :ref:`ref-classes-pypi`, :ref:`ref-classes-npm`, and
+   :ref:`ref-classes-cpan` classes to automatically populate PURL identifiers
+   for the corresponding language ecosystems.
+
+-  Record which agent invoked the build and on whose behalf it ran, enabling
+   CI/CD traceability in the SBOM
+   (:term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD`, :term:`SPDX_INVOKED_BY`,
+   :term:`SPDX_ON_BEHALF_OF`).
+
 Though the toplevel :term:`SPDX` output is available in
 ``tmp/deploy/images/MACHINE/`` inside the :term:`Build Directory`, ancillary
 generated files are available in ``tmp/deploy/spdx/MACHINE`` too, such as:

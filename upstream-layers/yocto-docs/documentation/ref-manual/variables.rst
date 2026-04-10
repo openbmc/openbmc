@@ -3510,6 +3510,184 @@ system and gives an overview of their function and contents.
       The default value is set to "x509" by the
       :ref:`ref-classes-kernel-fit-image` class.
 
+   :term:`FIT_LOADABLE_ARCH`
+      Architecture the loadables defined in :term:`FIT_LOADABLES`; the value
+      will be used for the ``arch`` property of the loadable.
+      If no value is defined for a specific loadable, the kernel architecture
+      will be used.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_ARCH[foo] = "arm"
+
+   :term:`FIT_LOADABLE_COMPRESSION`
+      Compression type for the loadables defined in :term:`FIT_LOADABLES`; the
+      value will be used for the ``compression`` property of the loadable.
+      If no value is defined for a specific loadable, its ``compression``
+      property will be set to ``none``.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_COMPRESSION[foo] = "gzip"
+
+      .. note::
+
+         The binary should already be compressed, as no compression is
+         performed by the :ref:`ref-classes-kernel-fit-image` class.
+
+   :term:`FIT_LOADABLE_DESCRIPTION`
+      Description for the loadables defined in :term:`FIT_LOADABLES`; the value
+      will be used for the ``description`` property of the loadable.
+      If no value is defined for a specific loadable, its description will be
+      set to the loadable name followed by a space plus the string ``loadable``.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_DESCRIPTION[foo] = "Foo firmware binary"
+
+   :term:`FIT_LOADABLE_ENTRYPOINT`
+      Entry point for the loadables defined in :term:`FIT_LOADABLES`; the value
+      will be used for the ``entry`` property of the loadable.
+      If no value is defined for a specific loadable, the ``entry`` property
+      will be omitted.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_ENTRYPOINT[foo] = "0x80234000"
+
+   :term:`FIT_LOADABLE_FILENAME`
+      Filename (or relative path) for the loadables defined in
+      :term:`FIT_LOADABLES`; this will be used to search for the binary to
+      include and is therefore mandatory for each loadable. Binary files to be
+      included need to be located in :term:`DEPLOY_DIR_IMAGE`.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_FILENAME[foo] = "foo-firmware.bin"
+
+   :term:`FIT_LOADABLE_LOADADDRESS`
+      Load address for the loadables defined in :term:`FIT_LOADABLES`; the
+      value will be used for the ``load`` property of the loadable.
+      This is mandatory for each loadable.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_LOADADDRESS[foo] = "0x80230000"
+
+   :term:`FIT_LOADABLE_OS`
+      Operating system for the loadables defined in :term:`FIT_LOADABLES`; the
+      value will be used for the ``os`` property of the loadable.
+      If no value is defined for a specific loadable, the ``os`` property will
+      be set to ``linux``.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_OS[foo] = "linux"
+
+   :term:`FIT_LOADABLE_TYPE`
+      Type for the loadables defined in :term:`FIT_LOADABLES`; the value will
+      be used for the ``type`` property of the loadable.
+      If no value is defined for a specific loadable, the ``type`` property
+      will be set to ``firmware``.
+
+      This variable cannot be used directly, but only defining flags on it.
+
+      Example::
+
+         FIT_LOADABLES = "foo"
+         FIT_LOADABLE_TYPE[foo] = "firmware"
+
+   :term:`FIT_LOADABLES`
+      Space-separated list of loadables to add to a FIT image in addition to
+      regular ones (kernel, initramfs, dtsb etc.).
+      Values specified here will be used as node names inside the FIT image;
+      all of them will be included in all configurations by using the
+      ``loadables`` property.
+
+      For each loadable specified in this variable, additional parameters can be
+      defined using :term:`FIT_LOADABLE_ARCH`, :term:`FIT_LOADABLE_COMPRESSION`,
+      :term:`FIT_LOADABLE_DESCRIPTION`, :term:`FIT_LOADABLE_ENTRYPOINT`,
+      :term:`FIT_LOADABLE_FILENAME`, :term:`FIT_LOADABLE_LOADADDRESS`,
+      :term:`FIT_LOADABLE_OS` and :term:`FIT_LOADABLE_TYPE`.
+
+      This variable is used by the :ref:`ref-classes-kernel-fit-image` class and
+      is empty by default.
+
+      For example, the following configuration adds as loadables a TF-A BL31
+      firmware and a (compressed) TEE firmware, to be loaded respectively at
+      0x204E0000 and 0x96000000::
+
+         FIT_LOADABLES = "atf tee"
+
+         FIT_LOADABLE_FILENAME[atf] = "bl31.bin"
+         FIT_LOADABLE_DESCRIPTION[atf] = "TF-A Firmware"
+         FIT_LOADABLE_TYPE[atf] = "tfa-bl31"
+         FIT_LOADABLE_ARCH[atf] = "arm64"
+         FIT_LOADABLE_OS[atf] = "arm-trusted-firmware"
+         FIT_LOADABLE_LOADADDRESS[atf] = "0x204E0000"
+         FIT_LOADABLE_ENTRYPOINT[atf] = "0x204E0000"
+
+         FIT_LOADABLE_FILENAME[tee] = "tee.bin.gz"
+         FIT_LOADABLE_COMPRESSION[tee] = "gzip"
+         FIT_LOADABLE_TYPE[tee] = "tee"
+         FIT_LOADABLE_OS[tee] = "tee"
+         FIT_LOADABLE_LOADADDRESS[tee] = "0x96000000"
+
+      and will be converted to the following FIT source::
+
+         images {
+                 atf {
+                         description = "TF-A Firmware";
+                         type = "tfa-bl31";
+                         compression = "none";
+                         data = /incbin/("<DEPLOY_DIR_IMAGE>/bl31.bin");
+                         arch = "arm64";
+                         os = "arm-trusted-firmware";
+                         load = <0x204E0000>;
+                         entry = <0x204E0000>;
+                 };
+                 tee {
+                         description = "tee loadable";
+                         type = "tee";
+                         compression = "gzip";
+                         data = /incbin/("<DEPLOY_DIR_IMAGE>/tee.bin.gz");
+                         arch = "arm64";
+                         os = "tee";
+                         load = <0x96000000>;
+                 };
+         };
+
+         configurations {
+                 default = "<my-board>.dtb";
+                 <my-board>.dtb {
+                         description = "1 Linux kernel, FDT blob, loadables";
+                         kernel = "kernel-1";
+                         fdt = "<my-board>.dtb";
+                         loadables = "atf", "tee";
+                 };
+         };
+
    :term:`FIT_MKIMAGE_EXTRA_OPTS`
       When inheriting the :ref:`ref-classes-kernel-fit-image`, the
       :term:`FIT_MKIMAGE_EXTRA_OPTS` variable allows passing extra options to
@@ -5890,6 +6068,13 @@ system and gives an overview of their function and contents.
       For the directory containing logs specific to each task, see the
       :term:`T` variable.
 
+   :term:`LTO`
+      The :term:`LTO` variable defines the flags specific to the ``lto``
+      :term:`distro feature <DISTRO_FEATURES>`. The value of this variable is
+      appended to the :term:`TARGET_LDFLAGS` variable, adding `Link-Time
+      Optimisation <https://wiki.gentoo.org/wiki/LTO>`__ flags to the linker
+      in-use.
+
    :term:`MACHINE`
       Specifies the target device for which the image is built. You define
       :term:`MACHINE` in the ``local.conf`` file found in the
@@ -7850,6 +8035,153 @@ system and gives an overview of their function and contents.
 
          QA_EMPTY_DIRS_RECOMMENDATION:/dev = "but all devices must be created at runtime"
 
+   :term:`QB_CMDLINE_IP_SLIRP`
+
+      If :term:`QB_NETWORK_DEVICE` adds more than one network interface to QEMU,
+      usually the ``ip=`` Linux kernel command line argument needs to be changed
+      accordingly. The :term:`QB_CMDLINE_IP_SLIRP` variable allows controlling
+      this value. See the Linux kernel documentation for more details:
+      https://www.kernel.org/doc/Documentation/filesystems/nfs/nfsroot.txt.
+
+   :term:`QB_CMDLINE_IP_TAP`
+
+      This variable is similar to the :term:`QB_CMDLINE_IP_SLIRP` variable.
+
+      Use as follows::
+
+         QB_CMDLINE_IP_TAP = "ip=192.168.7.@CLIENT@::192.168.7.@GATEWAY@:255.255.255.0::eth0"
+
+      Since the tap interface requires static IP configuration, ``runqemu``
+      replaces the ``@CLIENT@`` and ``@GATEWAY@`` place holders by the IP and
+      the gateway address of the QEMU guest.
+
+   :term:`QB_DEFAULT_FSTYPE`
+
+      The :term:`QB_DEFAULT_FSTYPE` variable controls the default filesystem
+      type to boot. It is represented as the file extension of one of the root
+      filesystem image extension found in :term:`DEPLOY_DIR_IMAGE`. For example:
+      ``ext4.zst``.
+
+   :term:`QB_DEFAULT_KERNEL`
+
+      When using ``runqemu``, the :term:`QB_DEFAULT_KERNEL` variable controls
+      the default Linux kernel image to boot, found in :term:`DEPLOY_DIR_IMAGE`. For
+      example: ``bzImage``.
+
+   :term:`QB_DRIVE_TYPE`
+
+      When using ``runqemu``, the :term:`QB_DRIVE_TYPE` variable specifies the
+      type of drive to emulate when starting the emulated machine.
+      Valid values are:
+
+      -  ``/dev/hd``: emulates an IDE drive.
+      -  ``/dev/mmcblk``: emulates an SD Card.
+      -  ``/dev/sd``: emulates an SCSI drive.
+      -  ``/dev/vd``: emulates a VirtIO drive.
+      -  ``/dev/vdb``: emulates a block VirtIO drive.
+
+   :term:`QB_GRAPHICS`
+
+      When using ``runqemu``, the :term:`QB_GRAPHICS` variable controls the QEMU
+      video card type to emulate. For example: ``-vga std``.
+
+      This value is appended to the argument list when running ``qemu``.
+
+   :term:`QB_KERNEL_CMDLINE_APPEND`
+
+      The :term:`QB_KERNEL_CMDLINE_APPEND` variable controls the options passed
+      to the Linux kernel's ``-append`` QEMU options, which controls the Linux kernel
+      command-line.
+
+      For example::
+
+         QB_KERNEL_CMDLINE_APPEND = "console=ttyS0"
+
+   :term:`QB_MEM`
+
+      The :term:`QB_MEM` variable controls the amount of memory allocated to the
+      emulated machine. Specify as follows::
+
+         QB_MEM = "-m 512"
+
+   :term:`QB_NETWORK_DEVICE`
+
+      When using ``runqemu``, the :term:`QB_NETWORK_DEVICE` variable controls
+      the network device instantiated by QEMU. This value needs to be compatible
+      with the :term:`QB_TAP_OPT` variable.
+
+      Example::
+
+         QB_NETWORK_DEVICE = "-device virtio-net-pci,netdev=net0,mac=@MAC@"
+
+      ``runqemu`` replaces ``@MAC@`` with a predefined mac address.
+
+   :term:`QB_NFSROOTFS_EXTRA_OPT`
+
+      When using ``runqemu``, the :term:`QB_NFSROOTFS_EXTRA_OPT` variable
+      controls extra options to be appended to the NFS rootfs options in the
+      Linux kernel command-line.
+
+      For example::
+
+         QB_NFSROOTFS_EXTRA_OPT = "wsize=4096,rsize=4096"
+
+   :term:`QB_OPT_APPEND`
+
+      When using ``runqemu``, the :term:`QB_OPT_APPEND` variable controls
+      general options to append to QEMU when starting.
+
+   :term:`QB_RNG`
+
+      When using ``runqemu``, the :term:`QB_RNG` variable controls
+      pass-through for host random number generator, it can speedup boot
+      in system mode, where system is experiencing entropy starvation.
+
+      For example::
+
+         QB_RNG = "-object rng-random,filename=/dev/urandom,id=rng0 -device virtio-rng-pci,rng=rng0"
+
+   :term:`QB_ROOTFS_EXTRA_OPT`
+
+      When using ``runqemu``, the :term:`QB_ROOTFS_EXTRA_OPT` variable controls
+      extra options to be appended to the rootfs device options.
+
+   :term:`QB_SERIAL_OPT`
+
+      When using ``runqemu``, the :term:`QB_SERIAL_OPT` variable controls the
+      serial port option.
+
+      For example::
+
+         QB_SERIAL_OPT = "-serial mon:stdio"
+
+   :term:`QB_SMP`
+
+      When using ``runqemu``, the :term:`QB_SMP` variable controls
+      amount of CPU cores made availalble inside the QEMU guest, each mapped to
+      a thread on the host.
+
+      For example::
+
+         QB_SMP = "-smp 8".
+
+   :term:`QB_TAP_NAMESERVER`
+
+      When using ``runqemu``, the :term:`QB_TAP_NAMESERVER` variable controls
+      the default :wikipedia:`name server <Name_server>` used in the QEMU guest.
+
+   :term:`QB_TAP_OPT`
+
+      When using ``runqemu``, the :term:`QB_TAP_OPT` variable controls
+      the network option for "tap" mode.
+
+      For example::
+
+         QB_TAP_OPT = "-netdev tap,id=net0,ifname=@TAP@,script=no,downscript=no"
+
+      Note that ``runqemu`` will replace ``@TAP@`` with the tap interface in
+      use, such as ``tap0``, ``tap1``, etc.
+
    :term:`RANLIB`
       The minimal command and arguments to run :manpage:`ranlib <ranlib(1)>`.
 
@@ -9037,6 +9369,38 @@ system and gives an overview of their function and contents.
       (+ 0.07\% with the tested image), compared to just enabling
       :term:`SPDX_INCLUDE_SOURCES`.
 
+   :term:`SPDX_BUILD_HOST`
+      The base variable name describing the build host on which the build is
+      running. The value must name a key from ``SPDX_IMPORTS``, allowing
+      the generated SPDX to reference externally defined host identity data.
+
+      Requires :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD` to be set to ``"1"``.
+
+      .. warning::
+
+         Setting this variable will result in non-reproducible SPDX output,
+         because the build host identity may vary across builds.
+
+      See also :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD`,
+      ``SPDX_IMPORTS``, :term:`SPDX_INVOKED_BY`,
+      and :term:`SPDX_ON_BEHALF_OF`.
+
+   :term:`SPDX_CONCLUDED_LICENSE`
+      The :term:`SPDX_CONCLUDED_LICENSE` variable allows overriding the
+      ``hasConcludedLicense`` object to individual SBOM packages. This can be
+      used when the license of a package was determined to be different than the
+      original license string value, after analysis.
+
+      This variable can be set in two ways:
+
+      -  For the entire recipe::
+
+            SPDX_CONCLUDED_LICENSE = "MIT & Apache-2.0"
+
+      -  For an individual package produced by the recipe::
+
+            SPDX_CONCLUDED_LICENSE:${PN} = "MIT & Apache-2.0"
+
    :term:`SPDX_CUSTOM_ANNOTATION_VARS`
       This option allows to associate `SPDX annotations
       <https://spdx.github.io/spdx-spec/v2.3/annotations/>`__ to a recipe,
@@ -9062,6 +9426,78 @@ system and gives an overview of their function and contents.
              "comment": "ANNOTATION2=Second annotation for recipe"
            }
          ],
+
+   :term:`SPDX_FILE_EXCLUDE_PATTERNS`
+      A space-separated list of Python regular expressions used to exclude files
+      from the SPDX output when :term:`SPDX_INCLUDE_SOURCES` is enabled.
+      Files whose paths match any of the patterns, via ``re.search()``, are
+      filtered out from the generated SBOM.
+
+      By default this variable is empty, meaning no files are excluded.
+
+      Example usage::
+
+         SPDX_FILE_EXCLUDE_PATTERNS = "\\.patch$ \\.diff$ /test/ \\.pyc$ \\.o$"
+
+      See also :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_IMAGE_SUPPLIER`
+      The name of an agent variable prefix describing the organization or
+      person who supplies the image SBOM. When set, the supplier is attached
+      to all root elements of the image SBOM using the ``suppliedBy`` property.
+
+      The value of this variable is the base prefix used to look up the
+      agent's details. The following sub-variables are read using that prefix:
+
+      -  ``<PREFIX>_name``: display name of the supplier (required)
+      -  ``<PREFIX>_type``: agent type: ``organization``, ``person``,
+         ``software``, or ``agent`` (optional, defaults to ``agent``)
+      -  ``<PREFIX>_comment``: free-text comment (optional)
+      -  ``<PREFIX>_id_email``: contact e-mail address (optional)
+
+      The simplest approach is to use the variable itself as its own prefix,
+      so the sub-variable names follow directly from
+      ``SPDX_IMAGE_SUPPLIER``.
+
+      Example (set in the image recipe or in a :term:`configuration file`)::
+
+         SPDX_IMAGE_SUPPLIER = "SPDX_IMAGE_SUPPLIER"
+         SPDX_IMAGE_SUPPLIER_name = "Acme Corp"
+         SPDX_IMAGE_SUPPLIER_type = "organization"
+
+      Alternatively, you can use any other prefix name, which is useful for
+      sharing an agent definition across multiple supplier variables::
+
+         MY_COMPANY_name = "Acme Corp"
+         MY_COMPANY_type = "organization"
+         SPDX_IMAGE_SUPPLIER = "MY_COMPANY"
+         SPDX_SDK_SUPPLIER = "MY_COMPANY"
+
+      If not set, no supplier information is added to the image SBOM.
+
+      See also :term:`SPDX_PACKAGE_SUPPLIER` and :term:`SPDX_SDK_SUPPLIER`.
+
+   :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD`
+      When set to ``"1"``, the SPDX output will include a ``Build`` object
+      representing the parent :term:`BitBake` invocation. This allows consumers
+      of the SBOM to trace which CI/CD job or orchestration system triggered
+      the build.
+
+      This variable is required for :term:`SPDX_INVOKED_BY`,
+      :term:`SPDX_ON_BEHALF_OF`, and :term:`SPDX_BUILD_HOST` to have any
+      effect.
+
+      .. warning::
+
+         Enabling this variable will result in non-reproducible SPDX output,
+         because the build invocation identity changes with every run.
+
+      Enable as follows::
+
+         SPDX_INCLUDE_BITBAKE_PARENT_BUILD = "1"
+
+      See also :term:`SPDX_BUILD_HOST`, :term:`SPDX_INVOKED_BY`,
+      and :term:`SPDX_ON_BEHALF_OF`.
 
    :term:`SPDX_INCLUDE_COMPILED_SOURCES`
       This option allows the same as :term:`SPDX_INCLUDE_SOURCES` but including
@@ -9161,6 +9597,33 @@ system and gives an overview of their function and contents.
       increases the SBOM size (potentially by several gigabytes for typical
       images).
 
+   :term:`SPDX_INVOKED_BY`
+      The base variable name describing the agent that invoked the build.
+      Each ``Build`` object in the SPDX output is linked to this agent with an
+      ``invokedBy`` relationship. Requires
+      :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD` to be set to ``"1"``.
+
+      The sub-variables follow the same agent prefix convention as
+      :term:`SPDX_IMAGE_SUPPLIER`:
+
+      -  ``SPDX_INVOKED_BY_name``: display name of the invoking agent
+      -  ``SPDX_INVOKED_BY_type``: agent type, such as ``software`` for a CI system
+
+      Example (CI pipeline invoking the build)::
+
+         SPDX_INCLUDE_BITBAKE_PARENT_BUILD = "1"
+         SPDX_INVOKED_BY = "SPDX_INVOKED_BY"
+         SPDX_INVOKED_BY_name = "GitLab CI"
+         SPDX_INVOKED_BY_type = "software"
+
+      .. warning::
+
+         Setting this variable will likely result in non-reproducible SPDX
+         output, because the invoking agent identity varies across builds.
+
+      See also :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD`,
+      :term:`SPDX_ON_BEHALF_OF`, and :term:`SPDX_BUILD_HOST`.
+
    :term:`SPDX_LICENSES`
       Path to the JSON file containing SPDX license identifier mappings.
       This file maps common license names to official SPDX license
@@ -9189,9 +9652,55 @@ system and gives an overview of their function and contents.
       and the prefix of ``documentNamespace``. It is set by default to
       ``http://spdx.org/spdxdoc``.
 
+   :term:`SPDX_ON_BEHALF_OF`
+      The base variable name describing the agent on whose behalf the invoking
+      agent (:term:`SPDX_INVOKED_BY`) is running the build. Requires
+      :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD` to be set to ``"1"``.
+      Has no effect if :term:`SPDX_INVOKED_BY` is not also set.
+
+      The sub-variables follow the same agent prefix convention as
+      :term:`SPDX_IMAGE_SUPPLIER`:
+
+      -  ``SPDX_ON_BEHALF_OF_name``: display name of the commissioning agent
+      -  ``SPDX_ON_BEHALF_OF_type``: agent type, such as ``organization``
+
+      Example (CI system building on behalf of a customer organization)::
+
+         SPDX_INCLUDE_BITBAKE_PARENT_BUILD = "1"
+         SPDX_INVOKED_BY = "SPDX_INVOKED_BY"
+         SPDX_INVOKED_BY_name = "GitLab CI"
+         SPDX_INVOKED_BY_type = "software"
+         SPDX_ON_BEHALF_OF = "SPDX_ON_BEHALF_OF"
+         SPDX_ON_BEHALF_OF_name = "Acme Corp"
+         SPDX_ON_BEHALF_OF_type = "organization"
+
+      .. warning::
+
+         Setting this variable will likely result in non-reproducible SPDX
+         output, because the agent identity varies across builds.
+
+      See also :term:`SPDX_INCLUDE_BITBAKE_PARENT_BUILD`,
+      :term:`SPDX_INVOKED_BY`, and :term:`SPDX_BUILD_HOST`.
+
+   :term:`SPDX_PACKAGE_SUPPLIER`
+      The base variable name describing the agent who supplies the artifacts
+      produced by the build. Works identically to :term:`SPDX_IMAGE_SUPPLIER`
+      but applies to individual packages rather than the image SBOM.
+
+      Typically set in a distro :term:`configuration file` to apply globally
+      to all packages, or in a specific software recipe (or a ``.bbappend``)
+      to apply only to packages of that recipe. Recipe-level overrides
+      (``SPDX_PACKAGE_SUPPLIER:pn-<recipe>``) are also supported::
+
+         SPDX_PACKAGE_SUPPLIER = "SPDX_PACKAGE_SUPPLIER"
+         SPDX_PACKAGE_SUPPLIER_name = "Acme Corp"
+         SPDX_PACKAGE_SUPPLIER_type = "organization"
+
+      See also :term:`SPDX_IMAGE_SUPPLIER` and :term:`SPDX_SDK_SUPPLIER`.
+
    :term:`SPDX_PACKAGE_URL`
       Provides a place for the SPDX data creator to record the package URL
-      string (``software_packageUrl``, in accordance with the Package URL
+      string (``software_packageUrl``), in accordance with the Package URL
       specification) for a software Package. The default value of this variable
       is an empty string.
 
@@ -9210,6 +9719,22 @@ system and gives an overview of their function and contents.
       The generated SPDX files are approximately 20% bigger, but
       this option is recommended if you want to inspect the SPDX
       output files with a text editor.
+
+   :term:`SPDX_SDK_SUPPLIER`
+      The base variable name describing the agent who supplies the SDK SBOM.
+      When set, the supplier is attached to all root elements of the SDK
+      SBOM using the ``suppliedBy`` property.
+
+      Works identically to :term:`SPDX_IMAGE_SUPPLIER` but applies to SDK
+      builds. This includes image-based SDKs produced by
+      ``bitbake <image> -c populate_sdk`` as well as toolchain SDKs produced
+      by ``bitbake meta-toolchain``.
+
+      Typically set in the image recipe or in a :term:`configuration file`.
+
+      If not set, no supplier information is added to the SDK SBOM.
+
+      See also :term:`SPDX_IMAGE_SUPPLIER` and :term:`SPDX_PACKAGE_SUPPLIER`.
 
    :term:`SPDX_UUID_NAMESPACE`
       The namespace used for generating UUIDs in SPDX documents. This

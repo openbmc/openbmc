@@ -139,6 +139,11 @@ if ourversion is None:
         possible_branch = None
         branch_count = 0
         for b in itertools.chain(release_series.keys(), ["master"]):
+            # The laverne branch was created but never branched off, which
+            # breaks this algorithm as this always gets count 0. Skip this
+            # branch as it is old and we'll never branch off of it now.
+            if b == "laverne":
+                continue
             result = subprocess.run(["git", "log", "--format=oneline", "HEAD..origin/" + b],
                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                     universal_newlines=True)
@@ -269,9 +274,13 @@ def get_latest_tag(branch: str) -> str:
     branch_versions = subprocess.run(["git", "tag", "--list", f'yocto-{release_series[branch]}*'],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                      universal_newlines=True).stdout.split()
+    # Sort the branches as integers
+    # On milestone tags (e.g. 6.0_M2), remove everything after "_" (including
+    # "_")
     branch_versions = sorted(
         [v.replace("yocto-" + release_series[branch] + ".", "")
-         .replace("yocto-" + release_series[branch], "0") for v in branch_versions],
+         .replace("yocto-" + release_series[branch], "0")
+         .split("_")[0] for v in branch_versions],
         key=int)
     if not branch_versions:
         return ""

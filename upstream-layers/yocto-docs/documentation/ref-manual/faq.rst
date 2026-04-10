@@ -197,7 +197,7 @@ requests through proxy servers.
 
 The Yocto Project also includes a
 ``meta-poky/conf/templates/default/site.conf.sample`` file that shows
-how to configure CVS and Git proxy servers if needed.
+how to configure a Git proxy server if needed.
 
 .. note::
 
