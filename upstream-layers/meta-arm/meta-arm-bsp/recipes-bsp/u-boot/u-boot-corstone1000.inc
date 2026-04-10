@@ -3,10 +3,13 @@
 DEPENDS:append = " openssl-native efitools-native"
 CORSTONE1000_DEVICE_TREE:corstone1000-mps3 = "arm/corstone1000-mps3"
 CORSTONE1000_DEVICE_TREE:corstone1000-fvp = "arm/corstone1000-fvp"
+CORSTONE1000_DEVICE_TREE:cortexa320 = "corstone1000-a320-fvp"
 EXTRA_OEMAKE:append = ' DEVICE_TREE=${CORSTONE1000_DEVICE_TREE}'
 
+CORSTONE1000_DEFCONFIG = "corstone1000_defconfig"
+CORSTONE1000_DEFCONFIG:cortexa320 = "corstone1000-a320_defconfig"
 UBOOT_CONFIG ??= "EFI"
-UBOOT_CONFIG[EFI] = "corstone1000_defconfig"
+UBOOT_CONFIG[EFI] = "${CORSTONE1000_DEFCONFIG}"
 UBOOT_ENTRYPOINT  = "0x80000000"
 UBOOT_LOADADDRESS = "0x80000000"
 UBOOT_BOOTARGS = "${LINUX_KERNEL_ARGS} loglevel=9"
@@ -75,12 +78,7 @@ SRC_URI:append = " \
 
 # Add Cortex-a320 support
 SRC_URI:append = " \
-    file://0039-corstone1000-Add-Cortex-A320-support-on-FVP.patch \
-"
-
-# Add Cortex-a320 specific configurations
-SRC_URI:append:cortexa320 = " \
-    file://corstone1000-a320.cfg \
+    file://0039-corstone1000-a320-Add-Corstone1000-board-variant.patch \
 "
 
 uboot_configure_config:append() {

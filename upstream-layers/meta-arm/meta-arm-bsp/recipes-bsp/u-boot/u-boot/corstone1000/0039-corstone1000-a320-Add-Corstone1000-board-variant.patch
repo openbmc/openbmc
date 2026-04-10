@@ -1,0 +1,563 @@
+From da23886f3b38812c60a4597db129ab96df74bb99 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Wed, 25 Feb 2026 14:28:08 +0000
+Subject: [PATCH] corstone1000-a320: Add Corstone1000 board variant
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Enable Cortex-A320 support on the Corstone-1000 platform
+(including FVP) and support for the integrated Ethos-U85 NPU and GIC-700
+interrupt controller by way of a new device-tree. These updates make the
+platform fully compatible with Cortex-A320 while retaining backward
+compatibility with Cortex-A35 and GIC-400.
+
+**Cortex-A320 enablement**
+
+* Extend Corstone-1000 compatibility list to include `cortex-a320`.
+* Add new device-tree to support Cortex-A320 configurations, retaining
+  existing board support code.
+
+**Ethos-U85 integration**
+
+* Add `/ethosu@1a050000` node describing the NPU register block at
+  `0x1A050000`.
+* `ethosu_sram@02400000`: 2 MiB on-chip SRAM.
+* Fully compliant with upstream bindings.
+
+**GIC-700 support**
+
+* Add full GICv3 node.
+* Map `cpu@1..3` `reg` values to `0x100/0x200/0x300` under
+  GIC-700
+* Update Ethos-U85 interrupt assignment to **SPI 16** to align with
+  the new interrupt map.
+
+These updates align the Corstone-1000 platform with Arm’s latest
+Cortex-A320 and Ethos-U85 configurations and ensure proper interrupt
+and memory mapping for both secure and non-secure domains.
+
+Upstream-Status: Pending [Strong dependency on previous patches that
+should be upstreamed first]
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
+---
+ arch/arm/Kconfig                              |   1 +
+ arch/arm/dts/corstone1000-a320-fvp.dts        |  51 +++++
+ arch/arm/dts/corstone1000-a320.dtsi           | 208 ++++++++++++++++++
+ arch/arm/include/asm/armv8/cpu.h              |   3 +
+ board/armltd/corstone1000-a320/Kconfig        |  12 +
+ board/armltd/corstone1000-a320/MAINTAINERS    |   7 +
+ board/armltd/corstone1000/corstone1000.c      |   6 +-
+ configs/corstone1000-a320_defconfig           |  89 ++++++++
+ .../arm/arm,corstone1000-a320.yml             |  31 +++
+ 9 files changed, 405 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/dts/corstone1000-a320-fvp.dts
+ create mode 100644 arch/arm/dts/corstone1000-a320.dtsi
+ create mode 100644 board/armltd/corstone1000-a320/Kconfig
+ create mode 100644 board/armltd/corstone1000-a320/MAINTAINERS
+ create mode 100644 configs/corstone1000-a320_defconfig
+ create mode 100644 doc/device-tree-bindings/arm/arm,corstone1000-a320.yml
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 625d2e995d2..aacc39fa60c 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -2405,6 +2405,7 @@ source "arch/arm/mach-npcm/Kconfig"
+ 
+ source "board/armltd/total_compute/Kconfig"
+ source "board/armltd/corstone1000/Kconfig"
++source "board/armltd/corstone1000-a320/Kconfig"
+ source "board/bosch/shc/Kconfig"
+ source "board/bosch/guardian/Kconfig"
+ source "board/Marvell/octeontx/Kconfig"
+diff --git a/arch/arm/dts/corstone1000-a320-fvp.dts b/arch/arm/dts/corstone1000-a320-fvp.dts
+new file mode 100644
+index 00000000000..c01c629e0ca
+--- /dev/null
++++ b/arch/arm/dts/corstone1000-a320-fvp.dts
+@@ -0,0 +1,51 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (c) 2026, Arm Limited. All rights reserved.
++ *
++ */
++
++/dts-v1/;
++
++#include "corstone1000-a320.dtsi"
++#include "corstone1000-virtio-u-boot.dtsi"
++
++/ {
++	model = "ARM Corstone1000-A320 FVP (Fixed Virtual Platform)";
++	compatible = "arm,corstone1000-a320-fvp";
++
++	smsc: ethernet@4010000 {
++		compatible = "smsc,lan91c111";
++		reg = <0x40100000 0x10000>;
++		phy-mode = "mii";
++		interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
++		reg-io-width = <2>;
++	};
++
++	vmmc_v3_3d: regulator-vmmc {
++		compatible = "regulator-fixed";
++		regulator-name = "vmmc_supply";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-always-on;
++	};
++
++	sdmmc0: mmc@40300000 {
++		compatible = "arm,pl18x", "arm,primecell";
++		reg = <0x40300000 0x1000>;
++		interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>;
++		max-frequency = <12000000>;
++		vmmc-supply = <&vmmc_v3_3d>;
++		clocks = <&smbclk>, <&refclk100mhz>;
++		clock-names = "smclk", "apb_pclk";
++	};
++
++	sdmmc1: mmc@50000000 {
++		compatible = "arm,pl18x", "arm,primecell";
++		reg = <0x50000000 0x10000>;
++		interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
++		max-frequency = <12000000>;
++		vmmc-supply = <&vmmc_v3_3d>;
++		clocks = <&smbclk>, <&refclk100mhz>;
++		clock-names = "smclk", "apb_pclk";
++	};
++};
+diff --git a/arch/arm/dts/corstone1000-a320.dtsi b/arch/arm/dts/corstone1000-a320.dtsi
+new file mode 100644
+index 00000000000..6715e15ec37
+--- /dev/null
++++ b/arch/arm/dts/corstone1000-a320.dtsi
+@@ -0,0 +1,208 @@
++// SPDX-License-Identifier: GPL-2.0 or MIT
++/*
++ * Copyright 2026, Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ */
++
++#include <dt-bindings/interrupt-controller/arm-gic.h>
++
++#include "corstone1000-u-boot.dtsi"
++
++/ {
++	interrupt-parent = <&gic>;
++	#address-cells = <1>;
++	#size-cells = <1>;
++
++	aliases {
++		serial0 = &uart0;
++		serial1 = &uart1;
++	};
++
++	chosen {
++		stdout-path = "serial0:115200n8";
++	};
++
++	cpus: cpus {
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		L2: l2-cache {
++			compatible = "cache";
++			cache-unified;
++			cache-level = <2>;
++			cache-size = <0x80000>;
++			cache-line-size = <64>;
++			cache-sets = <1024>;
++		};
++
++		cpu: cpu@0 {
++			device_type = "cpu";
++			compatible = "arm,cortex-a320";
++			reg = <0>;
++			enable-method = "psci";
++			next-level-cache = <&L2>;
++		};
++
++		cpu1: cpu@100 {
++			device_type = "cpu";
++			compatible = "arm,cortex-a320";
++			reg = <0x100>;
++			enable-method = "psci";
++			next-level-cache = <&L2>;
++		};
++
++		cpu2: cpu@200 {
++			device_type = "cpu";
++			compatible = "arm,cortex-a320";
++			reg = <0x200>;
++			enable-method = "psci";
++			next-level-cache = <&L2>;
++		};
++
++		cpu3: cpu@300 {
++			device_type = "cpu";
++			compatible = "arm,cortex-a320";
++			reg = <0x300>;
++			enable-method = "psci";
++			next-level-cache = <&L2>;
++		};
++	};
++
++	gic: interrupt-controller@1c000000 {
++		compatible = "arm,gic-v3";
++		#interrupt-cells = <3>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++		interrupt-controller;
++		reg = <0x1c000000 0x00010000>,
++		<0x1c040000 0x00100000>;
++		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_LOW>;
++	};
++
++	memory@88200000 {
++		device_type = "memory";
++		reg = <0x88200000 0x77e00000>;
++	};
++
++	refclk100mhz: clock-100000000 {
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <100000000>;
++		clock-output-names = "apb_pclk";
++	};
++
++	smbclk: clock-48000000 {
++		/* Reference 24MHz clock x 2 */
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <48000000>;
++		clock-output-names = "smclk";
++	};
++
++	timer {
++		compatible = "arm,armv8-timer";
++		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>,
++			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>,
++			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>,
++			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(1) | IRQ_TYPE_LEVEL_LOW)>;
++	};
++
++	uartclk: clock-50000000 {
++		/* UART clock - 50MHz */
++		compatible = "fixed-clock";
++		#clock-cells = <0>;
++		clock-frequency = <50000000>;
++		clock-output-names = "uartclk";
++	};
++
++	psci {
++		compatible = "arm,psci-1.0", "arm,psci-0.2";
++		method = "smc";
++	};
++
++	ethosu_sram: ethosu_sram@02400000 {
++		compatible = "mmio-sram";
++		reg = <0x02400000 0x200000>;
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++	};
++
++	ethosu@1A050000 {
++		compatible = "arm,corstone1000-ethos-u85", "arm,ethos-u85";
++
++		// Base address and size of NPU registers
++		reg = <0x1A050000 0x4000>;
++
++		sram = <&ethosu_sram>;
++
++		interrupts = <GIC_SPI 16 IRQ_TYPE_LEVEL_HIGH>;
++
++		clocks = <&uartclk>, <&refclk100mhz>;
++		clock-names = "core", "apb";
++	};
++
++	soc {
++		compatible = "simple-bus";
++		#address-cells = <1>;
++		#size-cells = <1>;
++		interrupt-parent = <&gic>;
++		ranges;
++
++		timer@1a220000 {
++			compatible = "arm,armv7-timer-mem";
++			reg = <0x1a220000 0x1000>;
++			#address-cells = <1>;
++			#size-cells = <1>;
++			ranges;
++
++			frame@1a230000 {
++				frame-number = <0>;
++				interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
++				reg = <0x1a230000 0x1000>;
++			};
++		};
++
++		uart0: serial@1a510000 {
++			compatible = "arm,pl011", "arm,primecell";
++			reg = <0x1a510000 0x1000>;
++			interrupts = <GIC_SPI 19 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&uartclk>, <&refclk100mhz>;
++			clock-names = "uartclk", "apb_pclk";
++		};
++
++		uart1: serial@1a520000 {
++			compatible = "arm,pl011", "arm,primecell";
++			reg = <0x1a520000 0x1000>;
++			interrupts = <GIC_SPI 20 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&uartclk>, <&refclk100mhz>;
++			clock-names = "uartclk", "apb_pclk";
++		};
++
++		mhu_hse1: mailbox@1b820000 {
++			compatible = "arm,mhuv2-tx", "arm,primecell";
++			reg = <0x1b820000 0x1000>;
++			clocks = <&refclk100mhz>;
++			clock-names = "apb_pclk";
++			interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <2>;
++			arm,mhuv2-protocols = <0 0>;
++			secure-status = "okay";     /* secure-world-only */
++			status = "disabled";
++		};
++
++		mhu_seh1: mailbox@1b830000 {
++			compatible = "arm,mhuv2-rx", "arm,primecell";
++			reg = <0x1b830000 0x1000>;
++			clocks = <&refclk100mhz>;
++			clock-names = "apb_pclk";
++			interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
++			#mbox-cells = <2>;
++			arm,mhuv2-protocols = <0 0>;
++			secure-status = "okay";     /* secure-world-only */
++			status = "disabled";
++		};
++	};
++};
++
+diff --git a/arch/arm/include/asm/armv8/cpu.h b/arch/arm/include/asm/armv8/cpu.h
+index e906fdf1bf1..1ae679f7119 100644
+--- a/arch/arm/include/asm/armv8/cpu.h
++++ b/arch/arm/include/asm/armv8/cpu.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0+ */
+ /*
+  * Copyright 2018 NXP
++ * (C) Copyright 2026 Arm Limited
+  */
+ 
+ #define MIDR_PARTNUM_CORTEX_A35		0xD04
+@@ -11,6 +12,7 @@
+ #define MIDR_PARTNUM_CORTEX_A73		0xD09
+ #define MIDR_PARTNUM_CORTEX_A75		0xD0A
+ #define MIDR_PARTNUM_CORTEX_A76		0xD0B
++#define MIDR_PARTNUM_CORTEX_A320		0xD8F
+ #define MIDR_PARTNUM_SHIFT		0x4
+ #define MIDR_PARTNUM_MASK		(0xFFF << MIDR_PARTNUM_SHIFT)
+ 
+@@ -40,3 +42,4 @@ is_cortex_a(72)
+ is_cortex_a(73)
+ is_cortex_a(75)
+ is_cortex_a(76)
++is_cortex_a(320)
+diff --git a/board/armltd/corstone1000-a320/Kconfig b/board/armltd/corstone1000-a320/Kconfig
+new file mode 100644
+index 00000000000..607e5f6689b
+--- /dev/null
++++ b/board/armltd/corstone1000-a320/Kconfig
+@@ -0,0 +1,12 @@
++if TARGET_CORSTONE1000-A320
++
++config SYS_BOARD
++	default "corstone1000-a320"
++
++config SYS_VENDOR
++	default "armltd"
++
++config SYS_CONFIG_NAME
++	default "corstone1000-a320"
++
++endif
+diff --git a/board/armltd/corstone1000-a320/MAINTAINERS b/board/armltd/corstone1000-a320/MAINTAINERS
+new file mode 100644
+index 00000000000..e62978b487e
+--- /dev/null
++++ b/board/armltd/corstone1000-a320/MAINTAINERS
+@@ -0,0 +1,7 @@
++CORSTONE1000-A320 BOARD
++M:	Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
++M:	Frazer Carsley <frazer.carsley@arm.com>
++M:	Hugues Kamba Mpiana <hugues.kambampiana@arm.com>
++S:	Maintained
++F:	board/armltd/corstone1000-a320/
++F:	configs/corstone1000-a320_defconfig
+diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
+index db8919298e1..0557865f59b 100644
+--- a/board/armltd/corstone1000/corstone1000.c
++++ b/board/armltd/corstone1000/corstone1000.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+- * (C) Copyright 2022, 2025 Arm Limited
++ * (C) Copyright 2022, 2025-2026 Arm Limited
+  * (C) Copyright 2022 Linaro
+  * Rui Miguel Silva <rui.silva@linaro.org>
+  */
+@@ -264,7 +264,7 @@ struct mm_region *mem_map = corstone1000_mem_map;
+ int board_init(void)
+ {
+ #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
+-	if (!strcmp(DEVICE_TREE, "arm/corstone1000-fvp"))
++	if (!strstr(DEVICE_TREE, "fvp"))
+ 		update_info.images = fw_fvp_images;
+ 	else
+ 		update_info.images = fw_mps3_images;
+@@ -396,7 +396,7 @@ int board_late_init(void)
+ 	const char *cmp_dtb = DEVICE_TREE;
+ 	int ret;
+ 
+-	if (!strcmp(cmp_dtb, "arm/corstone1000-fvp")) {
++	if (!strstr(cmp_dtb, "fvp")) {
+ 		ret = uclass_first_device_err(UCLASS_VIRTIO, &virtio_bus);
+ 		if (!virtio_bus) {
+ 			log_err("Cannot find virtio device, err (%d)\n", ret);
+diff --git a/configs/corstone1000-a320_defconfig b/configs/corstone1000-a320_defconfig
+new file mode 100644
+index 00000000000..d0ae1e745db
+--- /dev/null
++++ b/configs/corstone1000-a320_defconfig
+@@ -0,0 +1,89 @@
++CONFIG_ARM=y
++CONFIG_SKIP_LOWLEVEL_INIT=y
++CONFIG_TARGET_CORSTONE1000=y
++CONFIG_TEXT_BASE=0x80000000
++CONFIG_SYS_MALLOC_LEN=0x2000000
++CONFIG_NR_DRAM_BANKS=1
++CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
++CONFIG_CUSTOM_SYS_INIT_SP_ADDR=0x83f00000
++CONFIG_DM_GPIO=y
++CONFIG_DEFAULT_DEVICE_TREE="corstone1000-a320-fvp"
++CONFIG_SYS_BOOTM_LEN=0x800000
++CONFIG_SYS_LOAD_ADDR=0x82100000
++CONFIG_IDENT_STRING=" corstone1000-a320 aarch64 "
++CONFIG_FWU_NUM_IMAGES_PER_BANK=4
++CONFIG_EFI_SECURE_BOOT=y
++CONFIG_EFI_SET_TIME=y
++CONFIG_EFI_MM_COMM_TEE=y
++CONFIG_FFA_SHARED_MM_BUF_SIZE=4096
++CONFIG_FFA_SHARED_MM_BUF_OFFSET=0
++CONFIG_FFA_SHARED_MM_BUF_ADDR=0x81FFF000
++CONFIG_EFI_RUNTIME_UPDATE_CAPSULE=y
++CONFIG_EFI_CAPSULE_ON_DISK=y
++CONFIG_EFI_CAPSULE_FIRMWARE_RAW=y
++CONFIG_EFI_CAPSULE_AUTHENTICATE=y
++CONFIG_EFI_CAPSULE_CRT_FILE="CRT.crt"
++CONFIG_FIT=y
++CONFIG_FIT_SIGNATURE=y
++CONFIG_LEGACY_IMAGE_FORMAT=y
++CONFIG_DISTRO_DEFAULTS=y
++CONFIG_BOOTDELAY=3
++CONFIG_USE_BOOTARGS=y
++CONFIG_BOOTARGS="console=ttyAMA0 loglevel=9 ip=dhcp earlyprintk"
++CONFIG_BOOTCOMMAND="echo Loading kernel from $kernel_addr to memory ... ; unzip $kernel_addr 0x90000000; loadm 0x90000000 $kernel_addr_r $filesize; usb start; usb reset; run prepare_ondisk_fwu ; run distro_bootcmd; bootefi $kernel_addr_r $fdtcontroladdr;"
++CONFIG_CONSOLE_RECORD=y
++CONFIG_SYS_CBSIZE=512
++CONFIG_LOGLEVEL=7
++# CONFIG_DISPLAY_CPUINFO is not set
++# CONFIG_DISPLAY_BOARDINFO is not set
++CONFIG_BOARD_INIT=y
++CONFIG_SYS_PROMPT="corstone1000# "
++# CONFIG_CMD_CONSOLE is not set
++CONFIG_CMD_FWU_METADATA=y
++CONFIG_CMD_BOOTZ=y
++# CONFIG_CMD_XIMG is not set
++CONFIG_CMD_NVEDIT_EFI=y
++CONFIG_CMD_GPT=y
++CONFIG_CMD_LOADM=y
++# CONFIG_CMD_LOADS is not set
++CONFIG_CMD_MMC=y
++CONFIG_CMD_USB=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_CACHE=y
++CONFIG_CMD_EFIDEBUG=y
++CONFIG_CMD_RTC=y
++CONFIG_CMD_TIME=y
++CONFIG_CMD_GETTIME=y
++CONFIG_OF_CONTROL=y
++CONFIG_VERSION_VARIABLE=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_REGMAP=y
++CONFIG_CLK=y
++CONFIG_ARM_FFA_TRANSPORT=y
++CONFIG_MISC=y
++CONFIG_ARM_PL180_MMCI=y
++CONFIG_MTD=y
++CONFIG_NVMXIP_QSPI=y
++CONFIG_PHYLIB=y
++CONFIG_PHY_SMSC=y
++CONFIG_SMC911X=y
++CONFIG_PHY=y
++CONFIG_RAM=y
++CONFIG_DM_RTC=y
++CONFIG_RTC_EMULATION=y
++CONFIG_DM_SERIAL=y
++CONFIG_SYSRESET=y
++CONFIG_SYSRESET_PSCI=y
++CONFIG_TEE=y
++CONFIG_OPTEE=y
++CONFIG_USB=y
++CONFIG_USB_ISP1760=y
++CONFIG_VIRTIO_MMIO=y
++CONFIG_VIRTIO_NET=y
++# CONFIG_RANDOM_UUID is not set
++CONFIG_ERRNO_STR=y
++# CONFIG_HEXDUMP is not set
++CONFIG_FWU_MULTI_BANK_UPDATE=y
++CONFIG_FWU_MDATA_V2=y
++CONFIG_FWU_ARM_PSA=y
++# CONFIG_TOOLS_MKEFICAPSULE is not set
+diff --git a/doc/device-tree-bindings/arm/arm,corstone1000-a320.yml b/doc/device-tree-bindings/arm/arm,corstone1000-a320.yml
+new file mode 100644
+index 00000000000..9c8671d1775
+--- /dev/null
++++ b/doc/device-tree-bindings/arm/arm,corstone1000-a320.yml
+@@ -0,0 +1,31 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/arm/arm,corstone1000-a320.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: ARM Corstone1000-A320
++
++maintainers:
++  - Frazer Carsley <frazer.carsley@arm.com>
++  - Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
++  - Hugues Kamba Mpiana <hugues.kambampiana@arm.com>
++
++description: |+
++  ARM's Corstone1000-A320 platform is a Corstone1000 variant that supports
++  Cortex-A320 processors, enables the use of an integrated Ethos-U85 NPU and
++  an upgraded GIC-700 interrupt controller.
++
++properties:
++  $nodename:
++    const: '/'
++  compatible:
++    oneOf:
++      - description: Corstone1000-A320 FVP is the Fixed Virtual Platform
++          implementation of this system. See ARM ecosystems FVP's.
++        items:
++          - const: arm,corstone1000-a320-fvp
++
++additionalProperties: true
++
++...

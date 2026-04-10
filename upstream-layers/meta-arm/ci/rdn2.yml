@@ -9,9 +9,6 @@ header:
 local_conf_header:
   sshpregen: |
     # Allow the use of the pregen keys as this is CI so safe
-    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:sgi575 = "sgi575"
+    COMPATIBLE_MACHINE:pn-ssh-pregen-hostkeys:rdn2 = "rdn2"
 
-machine: sgi575
-
-target:
-  - core-image-base
+machine: rdn2

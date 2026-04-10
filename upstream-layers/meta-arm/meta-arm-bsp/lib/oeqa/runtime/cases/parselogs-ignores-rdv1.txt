@@ -1,0 +1,3 @@
+can't derive routing for PCI INT A
+jitterentropy: Initialization failed with host not compliant with requirements: 2
+PCI: OF: of_root node is NULL, cannot create PCI host bridge node

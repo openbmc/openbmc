@@ -12,4 +12,4 @@ local_conf_header:
     TEST_SUITES:remove = "opkg dnf"
 
 target:
-  - core-image-full-cmdline
+  - core-image-base

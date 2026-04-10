@@ -65,6 +65,7 @@ KMACHINE:corstone1000:cortexa320 = "corstone1000-a320"
 LINUX_KERNEL_TYPE:corstone1000:cortexa320 = "standard"
 SRC_URI:append:corstone1000:cortexa320 = " \
     file://defconfig  \
+    file://ethosu.cfg \
 "
 
 # Default kernel features not needed for Corstone-1000 with
@@ -111,13 +112,20 @@ COMPATIBLE_MACHINE:musca-b1 = "(^$)"
 COMPATIBLE_MACHINE:musca-s1 = "(^$)"
 
 #
-# SGI575 KMACHINE
+# RDN2 KMACHINE
 #
-COMPATIBLE_MACHINE:sgi575 = "sgi575"
-KBUILD_DEFCONFIG:sgi575 = "defconfig"
-KCONFIG_MODE:sgi575 = "--alldefconfig"
-# Upstream defconfig often causes warnings but we don't maintain it
-KCONF_BSP_AUDIT_LEVEL:sgi575 = "0"
+COMPATIBLE_MACHINE:rdn2 = "rdn2"
+KBUILD_DEFCONFIG:rdn2 = "defconfig"
+KCONFIG_MODE:rdn2 = "--alldefconfig"
+KCONF_BSP_AUDIT_LEVEL:rdn2 = "0"
+
+#
+# RDV2 KMACHINE
+#
+COMPATIBLE_MACHINE:rdv2 = "rdv2"
+KBUILD_DEFCONFIG:rdv2 = "defconfig"
+KCONFIG_MODE:rdv2 = "--alldefconfig"
+KCONF_BSP_AUDIT_LEVEL:rdv2 = "0"
 
 #
 # sbsa-ref KMACHINE

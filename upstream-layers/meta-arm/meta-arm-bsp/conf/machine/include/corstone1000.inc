@@ -37,7 +37,7 @@ IMAGE_CMD:wic[vardeps] += "GRUB_LINUX_APPEND"
 
 # Linux kernel
 PREFERRED_PROVIDER_virtual/kernel ?= "linux-yocto"
-PREFERRED_VERSION_linux-yocto ?= "6.18.%"
+PREFERRED_VERSION_linux-yocto ?= "6.19%"
 KERNEL_IMAGETYPE = "Image"
 KERNEL_IMAGETYPE:firmware = "Image.gz"
 # add FF-A support in the kernel

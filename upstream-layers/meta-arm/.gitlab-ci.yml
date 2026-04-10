@@ -306,6 +306,18 @@ qemuarmv5:
       - DISTRO: poky-tiny
         TESTING: testimage
 
+rdn2:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+
+rdv2:
+  extends: .build
+  parallel:
+    matrix:
+      - TESTING: testimage
+
 sbsa-ref:
   extends: .build
   parallel:
@@ -322,15 +334,6 @@ selftest:
   script:
     - KASFILES=./ci/qemuarm64.yml:./ci/selftest.yml:lockfile.yml
     - kas shell --update --force-checkout $KASFILES -c 'oe-selftest --num-processes 2 --select-tag meta-arm --run-all-tests'
-
-sgi575:
-  extends: .build
-  parallel:
-    matrix:
-      - TESTING: testimage
-  # FVP binary is x86-only
-  tags:
-    - x86_64
 
 toolchains:
   extends: .build

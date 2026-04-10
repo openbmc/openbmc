@@ -157,7 +157,7 @@ The provided distribution is based on `BusyBox <https://www.busybox.net/>`__ and
 +-----------+------------------------------------------------------------------------------------------------+
 | bbappend  | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-kernel/linux/linux-yocto_%.bbappend``             |
 +-----------+------------------------------------------------------------------------------------------------+
-| Recipe    | ``${WORKSPACE}/core/meta/recipes-kernel/linux/linux-yocto_6.18.bb``                            |
+| Recipe    | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-kernel/linux/linux-yocto_6.19.bb``                |
 +-----------+------------------------------------------------------------------------------------------------+
 | defconfig | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-kernel/linux/files/corstone1000/defconfig``       |
 +-----------+------------------------------------------------------------------------------------------------+
@@ -536,18 +536,18 @@ Clean Secure Flash
     This is to erase the flash cleanly and prepare a clean board environment for testing.
 
 
-#. Clone the `systemready-patch` repository to your ${WORKSPACE}.
+#. Clone the `iot-platform-assets` repository to your ${WORKSPACE}.
 
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git -b CORSTONE1000-2025.12
+        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git -b CORSTONE1000-2025.12
 
 #. Copy the secure flash cleaning Git patch file to your copy of `meta-arm`.
 
     .. code-block:: console
 
-        cp -f systemready-patch/embedded-a/corstone1000/erase_flash/0001-embedded-a-corstone1000-clean-secure-flash.patch meta-arm
+        cp -f iot-platform-assets/corstone1000/erase_flash/0001-embedded-a-corstone1000-clean-secure-flash.patch meta-arm
 
 #. Apply the Git patch to `meta-arm`.
 
@@ -874,21 +874,34 @@ Capsule Update
     rebuild the **Corstone-1000 with Cortex-A320** firmware image using the following steps:
 
 
-    #. Clone the `systemready-patch` repository to your ``${WORKSPACE}``.
+    #. Clone the `iot-platform-assets` repository to your ``${WORKSPACE}``.
 
         .. code-block:: console
 
             cd ${WORKSPACE}
-            git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git \
+            git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git \
             -b CORSTONE1000-2025.12
 
+    #. Copy the disable ethosu driver Git patch file to your copy of `meta-arm`.
+
+        .. code-block:: console
+
+            cp -f iot-platform-assets/corstone1000/disable_module_autoloading/0001-arm-bsp-linux-corstone1000-a320-disable-ethosu-confi.patch \
+            ${WORKSPACE}/meta-arm/
+
+    #. Apply the Git patch to `meta-arm`.
+
+        .. code-block:: console
+
+            cd ${WORKSPACE}/meta-arm/
+            git apply 0001-arm-bsp-linux-corstone1000-a320-disable-ethosu-confi.patch
+            cd ${WORKSPACE}
 
     #. Re-Build the **Corstone-1000 with Cortex-A320 FVP** software stack as follows:
 
         .. code-block:: console
 
-            kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-            systemready-patch/embedded-a/corstone1000/disable_module_autoloading/disable_module_autoloading.yml
+            kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml
 
 
 .. important::
@@ -1871,13 +1884,13 @@ Generate Keys, Signed Image and Unsigned Image
 
 #. Build an EFI System Partition as described `here <build-efi-system-partition_>`__.
 
-#. Clone the `systemready-patch` repository to your workspace.
+#. Clone the `iot-platform-assets` repository to your workspace.
 
     .. code-block:: console
 
         cd ${WORKSPACE}
 
-        git clone https://gitlab.arm.com/arm-reference-solutions/systemready-patch \
+        git clone https://gitlab.arm.com/arm-reference-solutions/iot-platform-assets \
 
         -b CORSTONE1000-2025.12
 
@@ -1891,7 +1904,7 @@ Generate Keys, Signed Image and Unsigned Image
 
     .. code-block:: console
 
-        ./${WORKSPACE}/systemready-patch/embedded-a/corstone1000/secureboot/create_keys_and_sign.sh \
+        ./${WORKSPACE}/iot-platform-assets/corstone1000/secureboot/create_keys_and_sign.sh \
         -d ${TARGET} \
         -v ${CERTIFICATE_VALIDITY_DURATION_IN_DAYS}
 
@@ -2182,22 +2195,41 @@ Symmetric Multiprocessing
 
 .. warning::
 
-    Symmetric multiprocessing (SMP) mode is only supported on Corstone-1000 with Cortex-A35 FVP but is disabled by default.
+    Symmetric multiprocessing (SMP) mode is supported on Corstone-1000
+    with Cortex-A35 FVP and Corstone-1000 with Cortex-A320 FVP, but is disabled by default.
 
 
-#. Build the software stack with SMP mode enabled:
+#. Build the software stack with SMP mode enabled.
+
+   For Corstone-1000 with Cortex-A35 FVP:
 
     .. code-block:: console
 
         kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-multicore.yml
 
-#. Run the Corstone-1000 FVP:
+   For Corstone-1000 with Cortex-A320 FVP:
+
+    .. code-block:: console
+
+        kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+        meta-arm/kas/corstone1000-multicore.yml
+
+#. Run the Corstone-1000 FVP.
+
+   For Corstone-1000 with Cortex-A35 FVP:
 
     .. code-block:: console
 
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-multicore.yml \
         -c "../meta-arm/scripts/runfvp"
 
+   For Corstone-1000 with Cortex-A320 FVP:
+
+    .. code-block:: console
+
+        kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+        meta-arm/kas/corstone1000-multicore.yml \
+        -c "../meta-arm/scripts/runfvp"
 
 #. Verify that the FVP is running the Host Processor with more than one CPU core:
 
@@ -2214,34 +2246,49 @@ Ethos-U85 NPU
     The Ethos-U85 NPU is only supported on Corstone-1000 with Cortex-A320 FVP.
 
 
-#. Clone the `systemready-patch` repository to your ``${WORKSPACE}``.
+#. Clone the `iot-platform-assets` repository to your ``${WORKSPACE}``.
 
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.gitlab.arm.com/arm-reference-solutions/systemready-patch.git \
+        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git \
         -b CORSTONE1000-2025.12
 
 #. Copy the additional kas configuration file to:
 
     .. code-block:: console
 
-        cp ${WORKSPACE}/systemready-patch/embedded-a/corstone1000/ethos-u85_test/ethos-u85_test.yml \
+        cp ${WORKSPACE}/iot-platform-assets/corstone1000/ethos-u85_test/ethos-u85-test.yml \
         ${WORKSPACE}/meta-arm/kas/
+
+#. Copy the mesa package Git patch file to your copy of meta-arm.
+
+    .. code-block:: console
+
+        cp -f ${WORKSPACE}/iot-platform-assets/corstone1000/ethos-u85_test/0001-arm-bsp-mesa-Package-Teflon-test-runner-and-models.patch \
+        ${WORKSPACE}/meta-arm/
+
+#. Apply the Git patch to meta-arm.
+
+    .. code-block:: console
+
+        cd ${WORKSPACE}/meta-arm/
+        git apply 0001-arm-bsp-mesa-Package-Teflon-test-runner-and-models.patch
+        cd ${WORKSPACE}
 
 #. Re-Build the Corstone-1000 with Cortex-A320 FVP software stack as follows:
 
     .. code-block:: console
 
         kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-        meta-arm/kas/ethos-u85_test.yml
+        meta-arm/kas/ethos-u85-test.yml
 
 #. Run the Corstone-1000 with Cortex-320 FVP:
 
     .. code-block:: console
 
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-        systemready-patch/embedded-a/corstone1000/ethos-u85_test/ethos-u85_test.yml \
+        meta-arm/kas/ethos-u85-test.yml \
         -c "../meta-arm/scripts/runfvp"
 
 #. To verify you are running the Corstone-1000 with Cortex-A320, build and run the FVP and inspect the CPU model
@@ -2253,24 +2300,15 @@ Ethos-U85 NPU
         grep -E 'CPU part|model name' /proc/cpuinfo
         # Expect: CPU part : 0xd8f  (which corresponds to Cortex-A320)
 
-#. Run the `delegate_runner` test application inside the FVP shell as follows:
+#. Run the `test_teflon` test application inside the FVP shell as follows:
 
     .. code-block:: console
 
-        delegate_runner -l /usr/lib/libethosu_op_delegate.so \
-        -n /usr/share/ethosu/mobilenet_v2_1.0_224_INT8_vela.tflite \
-        -i /usr/share/ethosu/input_data0.bin \
-        -o /usr/share/ethosu/actual_output_data0.bin
+        export TEFLON_TEST_DELEGATE=/usr/lib/libteflon.so
+        export TEFLON_TEST_DATA=/usr/share/teflon/tests
+        test_teflon --gtest_filter='Models.*'
 
    The test completes in approximately one minute.
-
-#. Run the following command to compare the generated output binary with the expected output binary:
-
-    .. code-block:: console
-
-        cmp -s /usr/share/ethosu/expected_output_data0.bin /usr/share/ethosu/actual_output_data0.bin
-
-    The two binary files should be identical.
 
 Secure Debug
 ------------

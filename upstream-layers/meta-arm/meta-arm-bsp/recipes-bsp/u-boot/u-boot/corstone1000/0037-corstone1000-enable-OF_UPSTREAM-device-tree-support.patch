@@ -1,4 +1,4 @@
-From d7500d2733efc8f872bd4be60b31176eec27b5d0 Mon Sep 17 00:00:00 2001
+From e070ae0f02b10bfd482146a748095ca782f73039 Mon Sep 17 00:00:00 2001
 From: Frazer Carsley <frazer.carsley@arm.com>
 Date: Mon, 19 Jan 2026 15:16:52 +0000
 Subject: [PATCH] corstone1000: enable OF_UPSTREAM device tree support
@@ -6,27 +6,32 @@ Subject: [PATCH] corstone1000: enable OF_UPSTREAM device tree support
 Enable OF_UPSTREAM option set for corstone1000 platform. Remove
 legacy u-boot corstone1000 device trees.
 Add device tree files for FVP and MPS3 platforms to add device
-tree nodes that are missing from the upstream.
+tree nodes that are missing from the upstream. These are done in a
+modular way.
 
 Signed-off-by: Clement Faure <clement.faure@arm.com>
 Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
 Upstream-Status: Pending [Not submitted to upstream yet]
 ---
- arch/arm/dts/Makefile                      |   3 -
- arch/arm/dts/corstone1000-fvp-u-boot.dtsi  |  15 ++
- arch/arm/dts/corstone1000-fvp.dts          |  82 ---------
- arch/arm/dts/corstone1000-mps3-u-boot.dtsi |   8 +
- arch/arm/dts/corstone1000-mps3.dts         |  32 ----
- arch/arm/dts/corstone1000-u-boot.dtsi      |  39 +++++
- arch/arm/dts/corstone1000.dtsi             | 194 ---------------------
- board/armltd/corstone1000/corstone1000.c   |   4 +-
- configs/corstone1000_defconfig             |   5 +-
- 9 files changed, 68 insertions(+), 314 deletions(-)
+ arch/arm/dts/Makefile                        |   3 -
+ arch/arm/dts/corstone1000-extsys-u-boot.dtsi |  14 ++
+ arch/arm/dts/corstone1000-fvp-u-boot.dtsi    |   9 +
+ arch/arm/dts/corstone1000-fvp.dts            |  82 --------
+ arch/arm/dts/corstone1000-mps3-u-boot.dtsi   |   9 +
+ arch/arm/dts/corstone1000-mps3.dts           |  32 ---
+ arch/arm/dts/corstone1000-u-boot.dtsi        |  30 +++
+ arch/arm/dts/corstone1000-virtio-u-boot.dtsi |  13 ++
+ arch/arm/dts/corstone1000.dtsi               | 194 -------------------
+ board/armltd/corstone1000/corstone1000.c     |   4 +-
+ configs/corstone1000_defconfig               |   5 +-
+ 11 files changed, 81 insertions(+), 314 deletions(-)
+ create mode 100644 arch/arm/dts/corstone1000-extsys-u-boot.dtsi
  create mode 100644 arch/arm/dts/corstone1000-fvp-u-boot.dtsi
  delete mode 100644 arch/arm/dts/corstone1000-fvp.dts
  create mode 100644 arch/arm/dts/corstone1000-mps3-u-boot.dtsi
  delete mode 100644 arch/arm/dts/corstone1000-mps3.dts
  create mode 100644 arch/arm/dts/corstone1000-u-boot.dtsi
+ create mode 100644 arch/arm/dts/corstone1000-virtio-u-boot.dtsi
  delete mode 100644 arch/arm/dts/corstone1000.dtsi
 
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
@@ -43,27 +48,41 @@ index 7c8cf3a5a1d..89b3728379b 100644
  dtb-$(CONFIG_TARGET_COREPRIMEVELTE) += pxa1908-samsung-coreprimevelte.dtb
  
  include $(srctree)/scripts/Makefile.dts
-diff --git a/arch/arm/dts/corstone1000-fvp-u-boot.dtsi b/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
+diff --git a/arch/arm/dts/corstone1000-extsys-u-boot.dtsi b/arch/arm/dts/corstone1000-extsys-u-boot.dtsi
 new file mode 100644
-index 00000000000..20425fa0624
+index 00000000000..074f45f0e69
 --- /dev/null
-+++ b/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
-@@ -0,0 +1,15 @@
++++ b/arch/arm/dts/corstone1000-extsys-u-boot.dtsi
+@@ -0,0 +1,14 @@
 +// SPDX-License-Identifier: GPL-2.0 or MIT
 +/*
-+ * Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ */
++
++&{/soc} {
++	extsys0: remoteproc@1a010310 {
++		compatible = "arm,corstone1000-extsys";
++		reg = <0x1a010310 0x4>, <0x1a010314 0x4>;
++		reg-names = "reset-control", "reset-status";
++		firmware-name = "es_flashfw.elf";
++	};
++};
+diff --git a/arch/arm/dts/corstone1000-fvp-u-boot.dtsi b/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
+new file mode 100644
+index 00000000000..5cb7762fc1c
+--- /dev/null
++++ b/arch/arm/dts/corstone1000-fvp-u-boot.dtsi
+@@ -0,0 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0 or MIT
++/*
++ * Copyright 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
 + *
 + */
 +
 +#include "corstone1000-u-boot.dtsi"
-+
-+/ {
-+	virtio: virtio-net@40400000 {
-+		compatible = "virtio,mmio";
-+		reg = <0x40400000 0x10000>;
-+		interrupts = <145>;
-+	};
-+};
++#include "corstone1000-extsys-u-boot.dtsi"
++#include "corstone1000-virtio-u-boot.dtsi"
 diff --git a/arch/arm/dts/corstone1000-fvp.dts b/arch/arm/dts/corstone1000-fvp.dts
 deleted file mode 100644
 index cd8a132271e..00000000000
@@ -154,17 +173,18 @@ index cd8a132271e..00000000000
 -
 diff --git a/arch/arm/dts/corstone1000-mps3-u-boot.dtsi b/arch/arm/dts/corstone1000-mps3-u-boot.dtsi
 new file mode 100644
-index 00000000000..9ab744d8d20
+index 00000000000..0d9d6c5e6e1
 --- /dev/null
 +++ b/arch/arm/dts/corstone1000-mps3-u-boot.dtsi
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +// SPDX-License-Identifier: GPL-2.0 or MIT
 +/*
-+ * Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
 + *
 + */
 +
 +#include "corstone1000-u-boot.dtsi"
++#include "corstone1000-extsys-u-boot.dtsi"
 +
 diff --git a/arch/arm/dts/corstone1000-mps3.dts b/arch/arm/dts/corstone1000-mps3.dts
 deleted file mode 100644
@@ -206,13 +226,13 @@ index e3146747c2d..00000000000
 -};
 diff --git a/arch/arm/dts/corstone1000-u-boot.dtsi b/arch/arm/dts/corstone1000-u-boot.dtsi
 new file mode 100644
-index 00000000000..95dd277d4cc
+index 00000000000..a75bc7016aa
 --- /dev/null
 +++ b/arch/arm/dts/corstone1000-u-boot.dtsi
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,30 @@
 +// SPDX-License-Identifier: GPL-2.0 or MIT
 +/*
-+ * Copyright 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2025-2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
 + *
 + */
 +
@@ -240,13 +260,23 @@ index 00000000000..95dd277d4cc
 +		};
 +	};
 +};
+diff --git a/arch/arm/dts/corstone1000-virtio-u-boot.dtsi b/arch/arm/dts/corstone1000-virtio-u-boot.dtsi
+new file mode 100644
+index 00000000000..89ff06a51f8
+--- /dev/null
++++ b/arch/arm/dts/corstone1000-virtio-u-boot.dtsi
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0 or MIT
++/*
++ * Copyright 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ */
 +
-+&{/soc} {
-+	extsys0: remoteproc@1a010310 {
-+		compatible = "arm,corstone1000-extsys";
-+		reg = <0x1a010310 0x4>, <0x1a010314 0x4>;
-+		reg-names = "reset-control", "reset-status";
-+		firmware-name = "es_flashfw.elf";
++/ {
++	virtio: virtio-net@40400000 {
++		compatible = "virtio,mmio";
++		reg = <0x40400000 0x10000>;
++		interrupts = <145>;
 +	};
 +};
 diff --git a/arch/arm/dts/corstone1000.dtsi b/arch/arm/dts/corstone1000.dtsi
@@ -494,3 +524,4 @@ index 450d69762ab..350607892fa 100644
  CONFIG_VERSION_VARIABLE=y
  CONFIG_NET_RANDOM_ETHADDR=y
  CONFIG_REGMAP=y
+
