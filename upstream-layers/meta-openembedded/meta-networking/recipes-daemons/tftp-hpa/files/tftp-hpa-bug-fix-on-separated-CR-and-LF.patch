@@ -1,4 +1,4 @@
-From 6ed1eb8829dee351b54e183bc42c007cb306aaa5 Mon Sep 17 00:00:00 2001
+From 2be04543d790d9ec29fa8522f07f221468ccd033 Mon Sep 17 00:00:00 2001
 From: Zhang Xiao <xiao.zhang@windriver.com>
 Date: Wed, 11 Jun 2014 14:01:16 +0800
 Subject: [PATCH] tftp-hpa: bug fix on separated CR and LF
@@ -34,5 +34,5 @@ index b4d4ffe..b4ea3f2 100644
          c = *p++;               /* pick up a character */
          if (prevchar == '\r') { /* if prev char was cr */
 -- 
-1.8.5.2.233.g932f7e4
+2.34.1
 

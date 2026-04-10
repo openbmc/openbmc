@@ -46,3 +46,8 @@ do_install_ptest() {
     cp -rf ${S}/certs  ${D}${PTEST_PATH}
     cp -rf ${S}/tests  ${D}${PTEST_PATH}
 }
+
+CVE_STATUS[CVE-2026-0819] = "fixed-version: fixed in 5.9.0"
+CVE_STATUS[CVE-2026-2646] = "fixed-version: fixed in 5.9.0"
+CVE_STATUS[CVE-2026-3503] = "fixed-version: fixed in 5.9.0"
+CVE_STATUS[CVE-2026-3548] = "fixed-version: fixed in 5.9.0"

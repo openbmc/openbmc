@@ -11,7 +11,7 @@ PACKAGES =. "${PN}-test "
 
 RPROVIDES:${PN} += "zope-interfaces"
 
-RDEPENDS:${PN}:class-target += "python3-datetime"
+RDEPENDS:${PN}:append:class-target = " python3-datetime"
 RDEPENDS:${PN}-test += "python3-unittest python3-doctest"
 
 FILES:${PN}-dbg += "${PYTHON_SITEPACKAGES_DIR}/*.egg/*/*/.debug"

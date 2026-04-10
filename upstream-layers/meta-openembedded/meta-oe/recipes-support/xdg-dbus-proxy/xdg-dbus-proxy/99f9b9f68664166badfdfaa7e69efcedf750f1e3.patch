@@ -1,0 +1,33 @@
+From 99f9b9f68664166badfdfaa7e69efcedf750f1e3 Mon Sep 17 00:00:00 2001
+From: Brahmajit Das <listout@listout.xyz>
+Date: Wed, 4 Mar 2026 06:27:54 +0530
+Subject: [PATCH] dbus-proxy: fix build with glibc >= 2.43
+
+memchr() returns const void * when passed const input, but the result
+was assigned to guchar *. This triggers
+-Wincompatible-pointer-types-discards-qualifiers when building with
+clang and -Werror.
+
+Make the pointer const to preserve const correctness.
+
+Closes: https://github.com/flatpak/xdg-dbus-proxy/issues/70
+Signed-off-by: Brahmajit Das <listout@listout.xyz>
+
+Upstream-Status: Backport [https://github.com/flatpak/xdg-dbus-proxy/commit/99f9b9f68664166badfdfaa7e69efcedf750f1e3]
+---
+ dbus-proxy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dbus-proxy.c b/dbus-proxy.c
+index 53d5c01..b32df34 100644
+--- a/dbus-proxy.c
++++ b/dbus-proxy.c
+@@ -133,7 +133,7 @@ add_args (GBytes    *bytes,
+ {
+   gsize data_len, remainder_len;
+   const guchar *data = g_bytes_get_data (bytes, &data_len);
+-  guchar *s;
++  const guchar *s;
+   const guchar *remainder;
+ 
+   remainder = data;

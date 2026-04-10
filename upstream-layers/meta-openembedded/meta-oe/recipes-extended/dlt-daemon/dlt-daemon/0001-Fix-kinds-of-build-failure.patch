@@ -27,7 +27,8 @@ src/console/dlt-control-common.c:922:25: error: cast discards 'const' qualifier 
 
 Use explicit type conversion to make the build can pass
 
-Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/826]
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/pull/826,
+https://github.com/COVESA/dlt-daemon/pull/837]
 
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
@@ -102,7 +103,7 @@ index 4c40cda8..b3408773 100644
 -        memcpy(data, data1, size1);
 -        memcpy(data + size1, data2, size2);
 +        memcpy(data, data1, (size_t)size1);
-+        memcpy((int*)data + size1, data2, (size_t)size2);
++        memcpy((char*)data + size1, data2, (size_t)size2);
  
 -        if (sendto(g_udp_sock_fd, data, size1 + size2, 0, (struct sockaddr *)&clientinfo->clientaddr,
 +        if (sendto(g_udp_sock_fd, data, (size_t)(size1 + size2), 0, (struct sockaddr *)&clientinfo->clientaddr,

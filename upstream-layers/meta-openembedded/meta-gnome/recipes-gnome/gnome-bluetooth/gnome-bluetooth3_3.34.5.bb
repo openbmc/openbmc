@@ -34,6 +34,6 @@ do_install:append() {
 FILES:${PN} += "${datadir}/gnome-bluetooth"
 
 # offer alternate bluetooth-sendto
-RRECOMMENS:${PN} += "gnome-bluetooth"
+RRECOMMENDS:${PN} += "gnome-bluetooth"
 
 RDEPENDS:${PN} += "bluez5"

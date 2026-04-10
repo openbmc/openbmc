@@ -34,7 +34,7 @@ PACKAGES = "${PN} ${PN}-dbg ${PN}-dev ${PN}-lib ${PN}-doc ${PN}-spy ${PN}-spy-de
 
 RRECOMMENDS:${PN} = "ccid"
 RRECOMMENDS:${PN}:class-native = ""
-RPROVIDES:${PN}:class-native += "pcsc-lite-lib-native"
+RPROVIDES:${PN}:append:class-native = " pcsc-lite-lib-native"
 
 FILES:${PN} = "${sbindir}/pcscd \
                ${datadir}/polkit-1"

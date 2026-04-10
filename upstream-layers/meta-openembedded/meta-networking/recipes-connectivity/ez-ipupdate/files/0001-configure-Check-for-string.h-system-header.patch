@@ -1,0 +1,53 @@
+From 811f253c03464489d445ab6627bb4187d27e98ef Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 4 Apr 2026 19:12:37 +0000
+Subject: [PATCH] configure: Check for string.h system header
+
+This is needed for functions like memcpy in md5.c but
+it only includes string.h when its detected by autotools
+however the needed check for detecting it during configure
+are missing. This patch adds them
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ config.h.in  | 3 +++
+ configure.in | 3 ++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/config.h.in b/config.h.in
+index 2ce447f..52a8d7d 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -129,6 +129,9 @@
+ /* Define if you have the <signal.h> header file.  */
+ #undef HAVE_SIGNAL_H
+ 
++/* Define if you have the <string.h> header file.  */
++#undef HAVE_STRING_H
++
+ /* Define if you have the <stdarg.h> header file.  */
+ #undef HAVE_STDARG_H
+ 
+diff --git a/configure.in b/configure.in
+index c97b9fc..f5d0808 100644
+--- a/configure.in
++++ b/configure.in
+@@ -62,6 +62,7 @@ AC_CHECK_HEADERS( arpa/inet.h \
+ 		  sys/stat.h \
+ 		  fcntl.h \
+ 		  signal.h \
++		  string.h \
+ 		  syslog.h \
+ 		  pwd.h \
+ 		  stdarg.h \
+@@ -104,7 +105,7 @@ AC_ARG_ENABLE(default-service,
+                           dyndns, dyndns-static, ods, tzo, gnudip, easydns, easydns-partner, dyns, hn, zoneedit, heipv6tb],
+ 	      [ use_SERVICE=$enableval;
+ 		AC_MSG_RESULT(yes) ],
+-	      [ AC_MSG_RESULT(no) 
++	      [ AC_MSG_RESULT(no)
+                 use_SERVICE=null
+                 AC_MSG_WARN(not setting default service) ]   )
+ case "$use_SERVICE" in

@@ -13,7 +13,7 @@ RDEPENDS:${PN}-ptest += " \
 	python3-misc \
 "
 
-RDEPENDS:${PN}:class-target += "\
+RDEPENDS:${PN}:append:class-target = " \
     python3-stringold \
     python3-threading \
 "

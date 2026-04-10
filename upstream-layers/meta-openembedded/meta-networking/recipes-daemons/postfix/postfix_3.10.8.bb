@@ -240,8 +240,8 @@ pkg_postinst_ontarget:${PN}-cfg () {
 }
 
 PACKAGES =+ "${PN}-cfg"
-RDEPENDS:${PN}-cfg:class-target += "${PN}-bin"
-RDEPENDS:${PN}:class-target += "${PN}-cfg"
+RDEPENDS:${PN}-cfg:append:class-target = " ${PN}-bin"
+RDEPENDS:${PN}:append:class-target = " ${PN}-cfg"
 # Exclude .debug directories from the main package
 FILES:${PN}-bin += "${localstatedir} ${bindir}/* ${sbindir}/* \
                ${libexecdir}/* ${systemd_unitdir}/*"

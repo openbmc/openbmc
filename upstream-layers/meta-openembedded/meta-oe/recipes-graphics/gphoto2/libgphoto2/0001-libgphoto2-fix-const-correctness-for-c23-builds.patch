@@ -1,0 +1,84 @@
+From bfa786a260bfd4660e8186ebad8778718e85e8cd Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 4 Apr 2026 14:56:01 -0700
+Subject: [PATCH] libgphoto2: fix const-correctness for c23 builds
+
+C23 treats the return values of strrchr() and strchr() as const char *
+when the input string is const-qualified. Update local variables to use
+const char * where appropriate to avoid discarded-qualifier warnings and
+build failures with -std=gnu23.
+
+No functional change intended.
+
+Upstream-Status: Submitted [https://github.com/gphoto/libgphoto2/pull/1235]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ camlibs/directory/directory.c         | 2 +-
+ libgphoto2/gphoto2-file.c             | 6 +++---
+ libgphoto2/gphoto2-filesys.c          | 2 +-
+ packaging/generic/print-camera-list.c | 2 +-
+ 4 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/camlibs/directory/directory.c b/camlibs/directory/directory.c
+index 790405d54..cc63c6684 100644
+--- a/camlibs/directory/directory.c
++++ b/camlibs/directory/directory.c
+@@ -125,7 +125,7 @@ static const char *
+ get_mime_type (const char *filename)
+ {
+ 
+-	char *dot;
++	const char *dot;
+ 	int x=0;
+ 
+ 	dot = strrchr(filename, '.');
+diff --git a/libgphoto2/gphoto2-file.c b/libgphoto2/gphoto2-file.c
+index 04d4d5e3e..1a9dbc193 100644
+--- a/libgphoto2/gphoto2-file.c
++++ b/libgphoto2/gphoto2-file.c
+@@ -610,7 +610,7 @@ int
+ gp_file_open (CameraFile *file, const char *filename)
+ {
+ 	FILE *fp;
+-	char *name, *dot;
++	const char *name, *dot;
+ 	long size, size_read;
+ 	int  i;
+ 	struct stat s;
+@@ -906,8 +906,8 @@ gp_file_get_name (CameraFile *file, const char **name)
+ int
+ gp_file_get_name_by_type (CameraFile *file, const char *basename, CameraFileType type, char **newname)
+ {
+-	char *prefix = NULL, *s, *new, *slash = NULL;
+-	const char *suffix = NULL;
++	char *prefix = NULL, *new;
++	const char *suffix = NULL, *s, *slash = NULL;
+ 	int i;
+ 
+ 	C_PARAMS (file && basename && newname);
+diff --git a/libgphoto2/gphoto2-filesys.c b/libgphoto2/gphoto2-filesys.c
+index 45f957292..07decff24 100644
+--- a/libgphoto2/gphoto2-filesys.c
++++ b/libgphoto2/gphoto2-filesys.c
+@@ -521,7 +521,7 @@ append_to_folder (CameraFilesystemFolder *folder,
+ 	CameraFilesystemFolder **newfolder
+ ) {
+ 	CameraFilesystemFolder	*f;
+-	char	*s;
++	const char	*s;
+ 
+ 	GP_LOG_D ("Append to folder %p/%s - %s", folder, folder->name, foldername);
+ 	/* Handle multiple slashes, and slashes at the end */
+diff --git a/packaging/generic/print-camera-list.c b/packaging/generic/print-camera-list.c
+index 1707b4e87..44530b4ae 100644
+--- a/packaging/generic/print-camera-list.c
++++ b/packaging/generic/print-camera-list.c
+@@ -1138,7 +1138,7 @@ escape_html(const char *str) {
+ 	newstr = malloc(strlen(str)+1+inc);
+ 	s = str; ns = newstr;
+ 	do {
+-		char *x;
++		const char *x;
+ 		x = strchr(s,'&');
+ 		if (x) {
+ 			memcpy (ns, s, x-s);

@@ -1,0 +1,31 @@
+From ca9457673128b4024250fe43716c6bbdfad96e96 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Mon, 30 Mar 2026 01:09:33 -0700
+Subject: [PATCH] meson.build: Make gdk-pixbuf-csource available
+
+Fixes:
+  ../sources/xfce4-session-4.21.1/meson.build:50:21: ERROR: Program '/usr/bin/gdk-pixbuf-csource' not found or not executable
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 6f372e0..633a5c5 100644
+--- a/meson.build
++++ b/meson.build
+@@ -47,7 +47,7 @@ libxfce4util = dependency('libxfce4util-1.0', version: dependency_versions['libx
+ libxfce4windowing = dependency('libxfce4windowing-0', version: dependency_versions['libxfce4windowing'])
+ xfconf = dependency('libxfconf-0', version: dependency_versions['xfce4'])
+ 
+-gdk_pixbuf_csource = find_program(gdk_pixbuf.get_variable(pkgconfig: 'gdk_pixbuf_csource'), required: true)
++gdk_pixbuf_csource = find_program('gdk-pixbuf-csource', required: true)
+ 
+ # Feature: 'x11'
+ x11_deps = []
+-- 
+2.49.0
+

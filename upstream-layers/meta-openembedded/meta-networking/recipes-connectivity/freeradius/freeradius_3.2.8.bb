@@ -40,6 +40,8 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.2.x;lfs=0
     file://0018-update-license-1.patch \
     file://0019-update-license-2.patch \
     file://0020-update-license-3.patch \
+    file://0001-don-t-load-legacy-provider-on-enable-fips-workaround.patch \
+    file://0002-don-t-load-legacy-provider-on-enable-fips-workaround.patch \
 "
 
 raddbdir = "${sysconfdir}/${MLPREFIX}raddb"
@@ -114,6 +116,7 @@ PACKAGECONFIG[openssl] = "--with-openssl, --without-openssl"
 PACKAGECONFIG[rlm-eap-fast] = "--with-rlm_eap_fast, --without-rlm_eap_fast"
 PACKAGECONFIG[rlm-eap-pwd] = "--with-rlm_eap_pwd, --without-rlm_eap_pwd"
 PACKAGECONFIG[kafka] = "--with-rlm_kafka, --without-rlm_kafka, librdkafka"
+PACKAGECONFIG[legacy-openssl] = ",--enable-fips-workaround,,openssl-ossl-module-legacy"
 
 inherit useradd autotools-brokensep update-rc.d systemd multilib_script multilib_header
 

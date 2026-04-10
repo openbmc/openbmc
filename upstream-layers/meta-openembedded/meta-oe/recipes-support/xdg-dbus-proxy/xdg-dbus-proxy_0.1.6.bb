@@ -13,6 +13,7 @@ inherit meson pkgconfig ptest-gnome
 
 SRC_URI = " \
     git://github.com/flatpak/xdg-dbus-proxy.git;protocol=https;branch=main \
+    file://99f9b9f68664166badfdfaa7e69efcedf750f1e3.patch \
     file://run-ptest \
     "
 

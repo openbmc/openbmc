@@ -9,19 +9,11 @@ DEPENDS = "webkitgtk3 gtk+3 glib-2.0 gcr3"
 
 REQUIRED_DISTRO_FEATURES = "x11 opengl"
 
-SRCREV = "665a709b522a6fa18c671f1fc41297603292d0e8"
+SRCREV = "48517e586cdc98bc1af7115674b554cc70c8bc2e"
 SRC_URI = "git://git.suckless.org/surf;branch=surf-webkit2 \
+           file://0001-config.mk-Fix-compiler-and-linker.patch \
            "
-SRC_URI += "${@bb.utils.contains('PACKAGECONFIG', 'soup3', 'file://0001-config.mk-Fix-compiler-and-linker.patch file://0001-config.ml-make-compatible-with-webkitgtk-2.34.0.patch', '', d)}"
-
-
 inherit pkgconfig features_check
-
-PACKAGECONFIG_SOUP ?= "soup3"
-PACKAGECONFIG ??= "${PACKAGECONFIG_SOUP}"
-
-PACKAGECONFIG[soup2] = ",,,"
-PACKAGECONFIG[soup3] = ",,,"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 

@@ -214,3 +214,10 @@ python __anonymous () {
 }
 
 BBCLASSEXTEND = "native"
+
+CVE_STATUS[CVE-2026-21712] = "cpe-incorrect: only v24 and v25 are affected"
+CVE_STATUS[CVE-2026-21713] = "fixed-version: fixed since v22.22.2"
+CVE_STATUS[CVE-2026-21714] = "fixed-version: fixed since v22.22.2"
+CVE_STATUS[CVE-2026-21715] = "fixed-version: fixed since v22.22.2"
+CVE_STATUS[CVE-2026-21716] = "fixed-version: fixed since v22.22.2"
+CVE_STATUS[CVE-2026-21717] = "fixed-version: fixed since v22.22.2"

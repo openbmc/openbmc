@@ -14,9 +14,6 @@ SRC_URI = "git://github.com/labapart/gattlib.git;branch=master;protocol=https;ta
 SRCBRANCH = "master"
 SRCREV = "f99558d9b8e3dbba2a952a0b292d3497aec8ee69"
 
-
-CVE_STATUS[CVE-2019-6498] = "fixed-version: patch is already included in sources"
-
 PACKAGECONFIG[examples] = "-DGATTLIB_BUILD_EXAMPLES=ON,-DGATTLIB_BUILD_EXAMPLES=OFF"
 
 # Set this to force use of DBus API if Bluez version is older than 5.42

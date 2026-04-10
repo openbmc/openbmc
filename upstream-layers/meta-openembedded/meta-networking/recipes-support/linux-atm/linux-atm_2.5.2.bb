@@ -4,6 +4,7 @@ SECTION = "libs"
 LICENSE = "GPL-2.0-only & LGPL-2.0-only"
 
 DEPENDS = "flex flex-native"
+RRECOMMENDS:${PN} = "kernel-module-atm-tcp"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}/${PV}/${BP}.tar.gz \
            file://link-with-ldflags.patch \

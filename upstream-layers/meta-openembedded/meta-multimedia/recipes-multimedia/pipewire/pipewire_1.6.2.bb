@@ -282,7 +282,7 @@ FILES:${PN} = " \
     ${bindir}/pipewire-vulkan \
 "
 
-RRECOMMENDS:${PN}:class-target += " \
+RRECOMMENDS:${PN}:append:class-target = " \
 	pipewire-modules-meta \
 	pipewire-spa-plugins-meta \
 "

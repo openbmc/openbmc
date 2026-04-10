@@ -59,8 +59,4 @@ do_install:append() {
 
 FILES:${PN} += "${PYTHON_SITEPACKAGES_DIR} ${datadir}/ncat"
 
-RDEPENDS:${PN} += " \
-    python3-difflib \
-    python3-asyncio \
-    python3-xml \
-"
+RDEPENDS:${PN} += "${@bb.utils.contains('PACKAGECONFIG', 'ndiff', 'python3-difflib python3-asyncio python3-xml', '', d)}"

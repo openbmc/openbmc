@@ -20,7 +20,7 @@ FILES:${PN}-tests += " \
     ${PYTHON_SITEPACKAGES_DIR}/astroid/__pycache__/test* \
 "
 
-RDEPENDS:${PN}:class-target += "\
+RDEPENDS:${PN}:append:class-target = " \
     python3-lazy-object-proxy \
     python3-logging \
     python3-six \
@@ -29,7 +29,7 @@ RDEPENDS:${PN}:class-target += "\
     python3-typing-extensions \
 "
 
-RDEPENDS:${PN}-tests:class-target += "\
+RDEPENDS:${PN}-tests:append:class-target = " \
     python3-unittest \
     python3-xml \
 "

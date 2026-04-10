@@ -7,7 +7,7 @@ SRC_URI[sha256sum] = "c1ba719f862ce885232a759eab47971fe74dfc7bb76ab8a51ef5940bad
 
 inherit pypi python_setuptools_build_meta
 
-RDEPENDS:${PN}:class-target += " \
+RDEPENDS:${PN}:append:class-target = " \
     python3-datetime \
     python3-math \
 "

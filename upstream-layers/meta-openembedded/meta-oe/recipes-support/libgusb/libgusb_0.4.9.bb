@@ -10,7 +10,7 @@ inherit meson gobject-introspection gi-docgen gettext vala pkgconfig
 PACKAGECONFIG:class-target ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)}"
 PACKAGECONFIG[vapi] = "-Dvapi=true,-Dvapi=false"
 
-EXTRA_OEMESON:class-native += "-Dtests=false  -Dintrospection=false"
+EXTRA_OEMESON:class-native = "-Dtests=false  -Dintrospection=false"
 
 GIDOCGEN_MESON_OPTION = 'docs'
 

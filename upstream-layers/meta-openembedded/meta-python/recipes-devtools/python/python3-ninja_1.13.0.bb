@@ -14,6 +14,11 @@ DEPENDS += "python3-setuptools-scm-native"
 
 do_install:append () {
 	rm -rf ${D}${bindir}
+	install -m 0644 ${S}/ninja-upstream/misc/ninja_syntax.py ${D}${PYTHON_SITEPACKAGES_DIR}/ninja/ninja_syntax.py
+}
+
+do_configure:prepend() {
+	echo 'version = "${PV}"' > ${S}/src/ninja/_version.py
 }
 
 RDEPENDS:${PN} = " \

@@ -110,6 +110,7 @@ PACKAGES =+ "${PN}-libs"
 FILES:${PN}-libs = "${base_libdir}/lib*.so.* \
                     ${base_libdir}/multipath/lib*.so*"
 RDEPENDS:${PN} += "${PN}-libs bash libgcc"
+RRECOMMENDS:${PN} = "kernel-module-dm-multipath"
 
 PROVIDES += "device-mapper-multipath"
 RPROVIDES:${PN} += "device-mapper-multipath"

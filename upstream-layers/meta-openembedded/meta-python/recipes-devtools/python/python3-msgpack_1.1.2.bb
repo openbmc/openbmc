@@ -8,7 +8,7 @@ PTEST_PYTEST_DIR = "test"
 
 SRC_URI[sha256sum] = "3b60763c1373dd60f398488069bcdc703cd08a711477b5d480eecc9f9626f47e"
 
-RDEPENDS:${PN}:class-target += "\
+RDEPENDS:${PN}:append:class-target = " \
     python3-io \
 "
 

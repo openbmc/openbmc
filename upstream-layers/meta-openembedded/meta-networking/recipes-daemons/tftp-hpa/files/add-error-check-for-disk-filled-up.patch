@@ -1,19 +1,19 @@
-From bd5773947af5ca80ca546ad5625818fc912bdd60 Mon Sep 17 00:00:00 2001
+From 0b89c5bd9723ebd5207590016a14e5f2c6a0bdc9 Mon Sep 17 00:00:00 2001
 From: "Roy.Li" <rongqing.li@windriver.com>
 Date: Thu, 22 Aug 2013 08:56:09 +0800
 Subject: [PATCH] tftp-hpa: add error check for disk filled up
-
-Upstream-Status: Pending [Sent to http://www.syslinux.org/archives/2013-August/020765.html]
 
 Add error check when the write-buffer is finally flushed to the file,
 the caller can detect if the disk filled up (or had an i/o error) and
 return a NOSAPCE nak to the other side.
 
+Upstream-Status: Pending [Sent to http://www.syslinux.org/archives/2013-August/020765.html]
+
 Signed-off-by: Ming Liu <ming.liu@windriver.com>
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
 ---
- common/tftpsubs.c |    8 +++++---
- tftpd/tftpd.c     |   12 ++++++++++--
+ common/tftpsubs.c |  8 +++++---
+ tftpd/tftpd.c     | 12 ++++++++++--
  2 files changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/common/tftpsubs.c b/common/tftpsubs.c
@@ -47,10 +47,10 @@ index 8c999f6..b4d4ffe 100644
  
  /* When an error has occurred, it is possible that the two sides
 diff --git a/tftpd/tftpd.c b/tftpd/tftpd.c
-index 1873e70..c2adbda 100644
+index 3158c6d..001237b 100644
 --- a/tftpd/tftpd.c
 +++ b/tftpd/tftpd.c
-@@ -1681,7 +1681,11 @@ static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oac
+@@ -1690,7 +1690,11 @@ static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oac
              syslog(LOG_WARNING, "tftpd: write(ack): %m");
              goto abort;
          }
@@ -63,7 +63,7 @@ index 1873e70..c2adbda 100644
          for (;;) {
              n = recv_time(peer, dp, PKTSIZE, 0, &r_timeout);
              if (n < 0) {        /* really? */
-@@ -1712,7 +1716,11 @@ static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oac
+@@ -1721,7 +1725,11 @@ static void tftp_recvfile(const struct formats *pf, struct tftphdr *oap, int oac
              goto abort;
          }
      } while (size == segsize);
@@ -77,5 +77,5 @@ index 1873e70..c2adbda 100644
  
      ap->th_opcode = htons((u_short) ACK);       /* send the "final" ack */
 -- 
-1.7.10.4
+2.34.1
 

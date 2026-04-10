@@ -78,7 +78,7 @@ EXTRA_OECONF += "--disable-rpath \
     --datadir=${datadir}/${BPN} \
     --sysconfdir=${sysconfdir}/${BPN} \
 "
-EXTRA_OECONF:sh4 += "--disable-spinlocks"
+EXTRA_OECONF:append:sh4 = " --disable-spinlocks"
 
 DEBUG_OPTIMIZATION:remove:mips = " -Og"
 DEBUG_OPTIMIZATION:append:mips = " -O"

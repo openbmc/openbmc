@@ -48,7 +48,6 @@ SRC_URI:append:libc-musl = "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld',
 
 SRCREV = "56b51b98fbb8627c4c09a483702e18fd8aee7ce1"
 
-
 # ['auto', 'symlink', 'file', 'netconfig', 'resolvconf']
 NETWORKMANAGER_DNS_RC_MANAGER_DEFAULT ??= "auto"
 
@@ -71,19 +70,6 @@ EXTRA_OEMESON = "\
     -Dnft=${sbindir}/nft \
     -Dman=false \
 "
-
-# stolen from https://github.com/void-linux/void-packages/blob/master/srcpkgs/NetworkManager/template
-# avoids:
-# | ../NetworkManager-1.16.0/libnm-core/nm-json.c:106:50: error: 'RTLD_DEEPBIND' undeclared (first use in this function); did you mean 'RTLD_DEFAULT'?
-CFLAGS:append:libc-musl = " \
-    -DRTLD_DEEPBIND=0 \
-"
-
-# networkmanager-1.52.0/src/nmcli/agent.c:88:29: error: incompatible function pointer types assigning to 'rl_hook_func_t *' (aka 'int (*)(void)') from 'int (const char *, int)' [-Wincompatible-function-pointer-types]
-#   88 |             rl_startup_hook = set_deftext;
-#      |                             ^ ~~~~~~~~~~~
-
-CFLAGS:append:toolchain-clang = " -Wno-error=incompatible-function-pointer-types"
 
 PACKAGECONFIG ??= "readline nss ifupdown dnsmasq nmcli \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'systemd', bb.utils.contains('DISTRO_FEATURES', 'x11', 'consolekit', '', d), d)} \

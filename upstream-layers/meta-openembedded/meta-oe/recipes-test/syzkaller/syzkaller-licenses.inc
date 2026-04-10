@@ -79,5 +79,5 @@ LIC_FILES_CHKSUM_HOST = "\
     file://pkg/mod/google.golang.org/appengine/v2@v2.0.6/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57;spdx=Apache-2.0 \
 "
 
-LIC_FILES_CHKSUM:class-native += "${LIC_FILES_CHKSUM_HOST}"
-LIC_FILES_CHKSUM:class-nativesdk += "${LIC_FILES_CHKSUM_HOST}"
+LIC_FILES_CHKSUM:append:class-native = " ${LIC_FILES_CHKSUM_HOST}"
+LIC_FILES_CHKSUM:append:class-nativesdk = " ${LIC_FILES_CHKSUM_HOST}"

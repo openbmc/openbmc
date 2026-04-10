@@ -24,6 +24,7 @@ ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 EXTRA_OEMESON = " \
     -Dbluray=false \
+    -Dgoogle=false \
 "
 
 PACKAGES =+ "gvfsd-ftp gvfsd-sftp gvfsd-trash"
@@ -60,7 +61,6 @@ PACKAGECONFIG[dnssd] = "-Ddnssd=true, -Ddnssd=false, avahi"
 PACKAGECONFIG[gcr] = "-Dgcr=true, -Dgcr=false, gcr"
 PACKAGECONFIG[gcrypt] = "-Dgcrypt=true, -Dgcrypt=false, libgcrypt"
 PACKAGECONFIG[goa] = "-Dgoa=true, -Dgoa=false, gnome-online-accounts"
-PACKAGECONFIG[google] = "-Dgoogle=true, -Dgoogle=false, libgdata"
 PACKAGECONFIG[http] = "-Dhttp=true, -Dhttp=false, libsoup-3.0"
 PACKAGECONFIG[libmtp] = "-Dmtp=true, -Dmtp=false, libmtp"
 PACKAGECONFIG[logind] = "-Dlogind=true, -Dlogind=false, systemd"

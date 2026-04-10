@@ -15,7 +15,7 @@ inherit pkgconfig pypi setuptools3
 
 DEPENDS += "parted"
 
-RDEPENDS:${PN}:class-target += " \
+RDEPENDS:${PN}:append:class-target = " \
     parted (>= 2.3) \
     python3-codecs \
     python3-math \

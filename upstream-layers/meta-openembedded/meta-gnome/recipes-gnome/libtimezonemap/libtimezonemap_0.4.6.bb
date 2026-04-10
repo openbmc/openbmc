@@ -5,13 +5,14 @@ LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = "${DEBIAN_MIRROR}/main/libt/${BPN}/${BPN}_${PV}.orig.tar.gz;downloadfilename=${BP}.tar.gz \
-           file://0001-configure.ac-correct-the-version.patch"
+           file://0001-configure.ac-correct-the-version.patch \
+           file://port-to-libsoup3.patch"
 SRC_URI[sha256sum] = "0d634cc2476d8f57d1ee1864bd4f442180ae4bf040a9ae4bf73b66bbd85d7195"
 
 UPSTREAM_CHECK_URI = "${DEBIAN_MIRROR}/main/libt/libtimezonemap"
 UPSTREAM_CHECK_REGEX = "libtimezonemap_(?P<pver>\d+(\.\d+)+)"
 
-DEPENDS = "gtk+3 gdk-pixbuf libsoup-2.4 json-glib gnome-common-native"
+DEPENDS = "gtk+3 gdk-pixbuf libsoup json-glib gnome-common-native"
 
 B = "${S}"
 

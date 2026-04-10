@@ -35,8 +35,9 @@ RDEPENDS:${PN} += "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'pam-plugin-li
 PAMLIB = "${@bb.utils.contains('DISTRO_FEATURES', 'pam', '-L${STAGING_BASELIBDIR} -lpam', '', d)}"
 NOPAM_SRC = "file://nopam.patch"
 
-inherit update-rc.d useradd systemd
+inherit update-rc.d useradd systemd multilib_script
 
+MULTILIB_SCRIPTS = "${PN}:${sysconfdir}/pam.d/vsftpd"
 CONFFILES:${PN} = "${sysconfdir}/vsftpd.conf"
 LDFLAGS:append = " -lcrypt -lcap"
 CFLAGS:append:libc-musl = " -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -include fcntl.h"

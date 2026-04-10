@@ -68,7 +68,7 @@ do_install:append:class-nativesdk() {
     install -d ${D}${SDKPATHNATIVE}/post-relocate-setup.d
     install -m 0755 ${UNPACKDIR}/graphviz-setup.sh ${D}${SDKPATHNATIVE}/post-relocate-setup.d
 }
-FILES:${PN}:class-nativesdk += "${SDKPATHNATIVE}"
+FILES:${PN}:append:class-nativesdk = " ${SDKPATHNATIVE}"
 
 # create /usr/lib/graphviz/config6
 graphviz_sstate_postinst() {

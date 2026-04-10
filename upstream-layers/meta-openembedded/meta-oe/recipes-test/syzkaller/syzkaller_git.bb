@@ -6,8 +6,6 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=5335066555b14d832335aa4660d6c376"
 require ${BPN}-licenses.inc
 
-DEPENDS:class-native += "qemu-system-native"
-
 SRC_URI = "git://${GO_IMPORT};protocol=https;destsuffix=${GO_SRCURI_DESTSUFFIX};branch=master"
 SRCREV = "22ec1469fe8c0ba256de07e8f97fa7b375b522bd"
 require ${BPN}-go-mods.inc
@@ -38,8 +36,6 @@ CGO_ENABLED = "0"
 GOBUILDFLAGS:remove = "-buildmode=pie"
 
 LDFLAGS:append:class-target = "${@bb.utils.contains_any("TC_CXX_RUNTIME", "llvm android", " -lc++", " -lstdc++", d)}"
-
-DEPENDS:class-native += "qemu-system-native"
 
 compile_native() {
     export HOSTOS="${GOHOSTOS}"

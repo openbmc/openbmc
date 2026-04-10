@@ -18,3 +18,5 @@ inherit pkgconfig pypi python_setuptools_build_meta
 
 # it's lowercase pyicu instead of ${PYPI_PACKAGE} in this version
 S = "${UNPACKDIR}/pyicu-${PV}"
+
+BBCLASSEXTEND = "native nativesdk"

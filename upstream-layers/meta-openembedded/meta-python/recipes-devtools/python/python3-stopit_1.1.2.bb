@@ -2,7 +2,6 @@ SUMMARY = "Raise asynchronous exceptions in other threads, control the timeout o
 HOMEPAGE = "https://pypi.org/project/stopit/"
 SECTION = "devel/python"
 
-SRC_URI += " file://LICENSE "
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/LICENSE;md5=497c556f42b1355b64190da2f3d88f93"
 
@@ -10,8 +9,9 @@ SRC_URI[sha256sum] = "f7f39c583fd92027bd9d06127b259aee7a5b7945c1f1fa56263811e1e7
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN} += "\
-    python3-setuptools \
-    "
+SRC_URI += "\
+    file://LICENSE \
+    file://0001-Drop-the-deprecated-pkg_resources.patch \
+"
 
 BBCLASSEXTEND = "native nativesdk"

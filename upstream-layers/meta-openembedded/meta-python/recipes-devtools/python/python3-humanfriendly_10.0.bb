@@ -10,7 +10,7 @@ SRC_URI[sha256sum] = "6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN}:class-target += " \
+RDEPENDS:${PN}:append:class-target = " \
     python3-datetime \
     python3-fcntl \
     python3-io \

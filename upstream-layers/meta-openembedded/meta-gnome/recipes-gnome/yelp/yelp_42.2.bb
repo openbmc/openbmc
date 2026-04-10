@@ -23,12 +23,6 @@ DEPENDS += " \
     webkitgtk3 \
     yelp-xsl \
 "
-PACKAGECONFIG_SOUP ?= "soup3"
-PACKAGECONFIG ??= "${PACKAGECONFIG_SOUP}"
-
-PACKAGECONFIG[soup2] = "--with-webkit2gtk-4-0,,"
-PACKAGECONFIG[soup3] = ",--with-webkit2gtk-4-0,"
-
 
 do_configure:prepend() {
     export ITSTOOL=${STAGING_BINDIR_NATIVE}/itstool

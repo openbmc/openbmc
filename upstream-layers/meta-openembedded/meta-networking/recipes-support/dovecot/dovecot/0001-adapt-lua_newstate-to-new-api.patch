@@ -1,0 +1,29 @@
+From 5efcbab91b510f5a2495369b729248e8bf8a5d63 Mon Sep 17 00:00:00 2001
+From: Gyorgy Sarvari <skandigraun@gmail.com>
+Date: Tue, 31 Mar 2026 11:05:52 +0000
+Subject: [PATCH] adapt lua_newstate to new api
+
+lua_newstate() in lua 5.5 has gained a new, third argument, which made
+it not backwards compatible. This change adapts this call to the lua version
+used in OE.
+
+Upstream-Status: Pending
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ src/lib-lua/dlua-script.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib-lua/dlua-script.c b/src/lib-lua/dlua-script.c
+index 20f91ad..789d603 100644
+--- a/src/lib-lua/dlua-script.c
++++ b/src/lib-lua/dlua-script.c
+@@ -253,7 +253,7 @@ static struct dlua_script *dlua_create_script(const char *name,
+ 	/* lua API says that lua_newstate will return NULL only if it's out of
+ 	   memory. this cannot really happen with our allocator as it will
+ 	   call i_fatal_status anyways if it runs out of memory */
+-	script->L = lua_newstate(dlua_alloc, script);
++	script->L = lua_newstate(dlua_alloc, script, luaL_makeseed(NULL));
+ 	i_assert(script->L != NULL);
+ 	script->ref = 1;
+ 	lua_atpanic(script->L, dlua_atpanic);

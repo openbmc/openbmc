@@ -24,7 +24,7 @@ SRC_URI:append:libc-musl = " \
 	file://0002-musl-add-missing-fgetspent_r.patch \
 "
 
-EXTRA_OEMESON:libc-musl += "-Dwtmpfile=/var/log/wtmp -Dtests=false"
+EXTRA_OEMESON:append:libc-musl = " -Dwtmpfile=/var/log/wtmp -Dtests=false"
 
 SRC_URI[sha256sum] = "adda4cdeae24fa0992e7df3ffff9effa7090be3ac233a3edfdf69d5a9c9b924f"
 

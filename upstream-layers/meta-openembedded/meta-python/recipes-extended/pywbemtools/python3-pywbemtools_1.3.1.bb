@@ -8,7 +8,7 @@ SRC_URI[sha256sum] = "7fb1c32e358d55c2c6966a071c8ecc0ca81de3d32944a67cc646c57b1a
 
 inherit pypi setuptools3
 
-RDEPENDS:${PN}:class-target += "\
+RDEPENDS:${PN}:append:class-target = " \
     python3-ply \
     python3-pyyaml \
     python3-six \

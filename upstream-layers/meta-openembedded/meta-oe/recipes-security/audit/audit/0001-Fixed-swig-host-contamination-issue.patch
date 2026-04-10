@@ -1,4 +1,4 @@
-From 4f78fcb8728cd4bf31175b3fa610a5c003e915d1 Mon Sep 17 00:00:00 2001
+From 14e49fe508a150d99ac18e35887b7d75e84c47d8 Mon Sep 17 00:00:00 2001
 From: Li xin <lixin.fnst@cn.fujitsu.com>
 Date: Sun, 19 Jul 2015 02:42:58 +0900
 Subject: [PATCH] Fixed swig host contamination issue
@@ -19,7 +19,7 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/bindings/swig/python3/Makefile.am b/bindings/swig/python3/Makefile.am
-index 428e40fa..f4dd45bc 100644
+index f8f6db18..171e96a6 100644
 --- a/bindings/swig/python3/Makefile.am
 +++ b/bindings/swig/python3/Makefile.am
 @@ -23,6 +23,7 @@
@@ -30,8 +30,8 @@ index 428e40fa..f4dd45bc 100644
  LIBS = $(top_builddir)/lib/libaudit.la
  SWIG_FLAGS = -python
  SWIG_INCLUDES = -I. -I$(top_builddir) -I${top_srcdir}/lib $(PYTHON3_INCLUDES)
-@@ -35,7 +36,7 @@ _audit_la_DEPENDENCIES =${top_srcdir}/lib/audit_logging.h ${top_builddir}/lib/li
- _audit_la_LIBADD = ${top_builddir}/lib/libaudit.la
+@@ -34,7 +35,7 @@ _audit_la_DEPENDENCIES =${top_srcdir}/lib/audit_logging.h ${top_builddir}/lib/li
+ _audit_la_LIBADD = ${top_builddir}/lib/libaudit.la $(PYTHON3_LIBS)
  nodist__audit_la_SOURCES  = audit_wrap.c
  audit.py audit_wrap.c: ${srcdir}/../src/auditswig.i 
 -	swig -o audit_wrap.c ${SWIG_FLAGS} ${SWIG_INCLUDES} ${srcdir}/../src/auditswig.i 

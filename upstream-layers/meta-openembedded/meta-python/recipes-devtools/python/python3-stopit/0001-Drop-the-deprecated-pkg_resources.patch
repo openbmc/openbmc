@@ -1,0 +1,38 @@
+From b72825c89724c2c3b4c9c60d90c9d4ad597eead0 Mon Sep 17 00:00:00 2001
+From: "Bai, Haiqing" <Haiqing.Bai@windriver.com>
+Date: Thu, 2 Apr 2026 08:40:26 +0000
+Subject: [PATCH] Drop the deprecated pkg_resources
+
+pkg_resources is deprecated as an API. The pkg_resources package
+is slated for removal, so the way of obtaining the version needs
+to be updated.
+
+Upstream-Status: Inactive-Upstream [lastcommit: Jan/2024 lastrelease: Feb/2018]
+
+Signed-off-by: Bai, Haiqing <Haiqing.Bai@windriver.com>
+---
+ src/stopit/__init__.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/stopit/__init__.py b/src/stopit/__init__.py
+index 6ca0180..5ddfa4a 100644
+--- a/src/stopit/__init__.py
++++ b/src/stopit/__init__.py
+@@ -7,7 +7,7 @@ stopit
+ Public resources from ``stopit``
+ """
+ 
+-import pkg_resources
++from importlib.metadata import version
+ 
+ from .utils import LOG, TimeoutException
+ from .threadstop import ThreadingTimeout, async_raise, threading_timeoutable
+@@ -15,7 +15,7 @@ from .signalstop import SignalTimeout, signal_timeoutable
+ 
+ # PEP 396 style version marker
+ try:
+-    __version__ = pkg_resources.get_distribution(__name__).version
++    __version__ = version(__name__)
+ except:
+     LOG.warning("Could not get the package version from pkg_resources")
+     __version__ = 'unknown'

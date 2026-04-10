@@ -1,6 +1,7 @@
-[PATCH] fix the empty file writting
-
-Upstream-Status: Pending
+From 1ce974f1cf6afbc528c941a8cdf0817a3fd7c5a7 Mon Sep 17 00:00:00 2001
+From: "Roy.Li" <rongqing.li@windriver.com>
+Date: Mon, 30 Mar 2026 22:37:22 +0800
+Subject: [PATCH] fix the empty file writting
 
 With the feature that checking the disk filled up, the return
 value of function write_behind was checked and used to detect
@@ -11,13 +12,15 @@ error was miss-raised.
 make write_behind to return 0 if written file is empty, to fix
 the this bug.
 
+Upstream-Status: Pending
+
 Signed-off-by: Roy.Li <rongqing.li@windriver.com>
 ---
  common/tftpsubs.c | 5 ++++-
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/common/tftpsubs.c b/common/tftpsubs.c
-index b4ea3f2..9f6cafc 100644
+index b4ea3f2..30e749a 100644
 --- a/common/tftpsubs.c
 +++ b/common/tftpsubs.c
 @@ -198,9 +198,12 @@ int write_behind(FILE * file, int convert)
@@ -35,5 +38,5 @@ index b4ea3f2..9f6cafc 100644
          return write(fileno(file), buf, count);
  
 -- 
-1.9.1
+2.34.1
 

@@ -19,6 +19,7 @@ RDEPENDS:${PN} += " \
     python3-pkgutil \
     python3-pprint \
     python3-shell \
+    python3-unittest \
     python3-unixadmin \
 "
 

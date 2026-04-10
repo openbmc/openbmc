@@ -25,7 +25,7 @@ inherit cmake python3native
 rm_flatc_cmaketarget_for_target() {
     rm -f "${SYSROOT_DESTDIR}/${libdir}/cmake/flatbuffers/FlatcTargets.cmake"
 }
-SYSROOT_PREPROCESS_FUNCS:class-target += "rm_flatc_cmaketarget_for_target"
+SYSROOT_PREPROCESS_FUNCS:append:class-target = " rm_flatc_cmaketarget_for_target"
 
 FILES:${PN}-compiler = "${bindir}"
 

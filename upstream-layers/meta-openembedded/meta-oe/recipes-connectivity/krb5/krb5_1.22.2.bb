@@ -23,6 +23,7 @@ SRC_URI = "http://web.mit.edu/kerberos/dist/${BPN}/${SHRT_VER}/${BP}.tar.gz \
            file://debian-suppress-usr-lib-in-krb5-config.patch;striplevel=2 \
            file://fix-strchr-conformance-to-C23.patch;striplevel=2 \
            file://crosscompile_nm.patch \
+           file://0001-configure.ac-replace-K5_AC_INIT-with-explicit-AC_INI.patch;striplevel=2 \
            file://etc/init.d/krb5-kdc \
            file://etc/init.d/krb5-admin-server \
            file://etc/default/krb5-kdc \

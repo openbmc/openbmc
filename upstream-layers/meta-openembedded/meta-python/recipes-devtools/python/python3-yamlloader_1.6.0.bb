@@ -11,6 +11,6 @@ DEPENDS += "\
     python3-hatch-vcs-native \
 "
 
-RDEPENDS:${PN}:class-target += "\
+RDEPENDS:${PN}:append:class-target = " \
     python3-pyyaml \
 "

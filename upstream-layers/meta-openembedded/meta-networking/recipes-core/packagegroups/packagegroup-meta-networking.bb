@@ -216,7 +216,6 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     ndisc6 \
     tcpdump \
     tcpslice \
-    netcf \
     tnftp \
     traceroute \
     tunctl \
