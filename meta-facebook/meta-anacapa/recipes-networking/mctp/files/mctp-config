@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Set mctpusb link up and assign local address.
+localEid=8
+
+for interface in $(seq 0 8); do
+    mctp link set mctpusb"$interface" up
+    mctp addr add "$localEid" dev mctpusb"$interface"
+done
+
