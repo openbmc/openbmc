@@ -188,16 +188,11 @@ See also
 Dive deeper into OpenBMC by opening the [docs](https://github.com/openbmc/docs)
 repository.
 
-## Technical Steering Committee
+## Technical Oversight Forum
 
-The Technical Steering Committee (TSC) guides the project. Members are:
-
-- Benjamin Fair, Google
-- Patrick Williams, Meta
-- Roxanne Clarke, IBM
-- Sagar Dharia, Microsoft
-- Samer El-Haj-Mahmoud, Arm
-- Terry Duncan, Intel
+The Technical Oversight Forum (TOF) guides the technical direction of the project. Members are voted on by
+community members based on the [membership and voting](https://github.com/openbmc/docs/blob/master/tof/membership-and-voting.md)
+guidelines.
 
 ## Contact
 
