@@ -8,8 +8,9 @@ DEPENDS += " \
     sdeventplus \
     phosphor-dbus-interfaces \
     phosphor-logging \
+    libgpiod \
     "
-SRCREV = "33eb55003f19ec95a95bfdf2473a1457535c1ee1"
+SRCREV = "95d33f1ef178d5d905b78a1e43fd3c91b2f53a22"
 PACKAGECONFIG ??= "signals handler"
 PACKAGECONFIG[signals] = ",,gpioplus nlohmann-json,"
 PACKAGECONFIG[handler] = ",,,${VIRTUAL-RUNTIME_obmc-host-state-manager} ${VIRTUAL-RUNTIME_obmc-chassis-state-manager}"
