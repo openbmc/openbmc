@@ -1,6 +1,7 @@
 {
     "ConnectedCables": [
         "E1SBP_Cable_0A",
+        "E1SBP_Cable_Power",
         "SWB_Cable_0B",
         "SWB_Cable_J1",
         "SWB_Cable_J2",
@@ -20,6 +21,8 @@
         "PDB_Cable_J312",
         "PDB_Cable_J313",
         "PDB_Cable_J314",
+        "PDB2_Cable_Sideband",
+        "Tray_Cable_SlotID",
         "Leak_Cable_1",
         "Leak_Cable_2"
     ]
