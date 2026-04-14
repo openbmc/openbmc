@@ -1,0 +1,14 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+GPIO_LOW=0
+
+#======================================
+# output pins
+#======================================
+out_rmc_small_leak_n="SMALL_LEAK_RMC_N"
+
+set_gpio "$out_rmc_small_leak_n" "$GPIO_LOW"
+
+exit 0
