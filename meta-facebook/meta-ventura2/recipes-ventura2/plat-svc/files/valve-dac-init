@@ -1,6 +1,15 @@
 #!/bin/bash
+if [ -z "$1" ]; then
+    echo "Usage: $0 <i2c-dev>" >&2
+    exit 1
+fi
+
 I2C_DEV="$1"
-VOLT=10
+readonly MAX_VOLT=10
+readonly MIN_VOLT=2
+readonly MAX_FLOWRATE=333               # UNIT: LPM
+readonly DEFAULT_FLOWRATE=150           # UNIT: LPM
+readonly VALVE_CONFIG_FILE="/var/lib/valvemonitor/valve-config.json"
 
 BUS=${I2C_DEV%%-*}
 ADDR=${I2C_DEV##*-}
@@ -9,6 +18,41 @@ if ! i2cget -y -f "$BUS" "0x$ADDR" 0x00 >/dev/null 2>&1; then
     echo "[$I2C_DEV] I2C device not responding" >&2
     exit 1
 fi
+
+flowrate_to_volt() {
+    local flowrate="$1"
+    awk -v flowrate="$flowrate" \
+        -v max_volt="$MAX_VOLT" \
+        -v min_volt="$MIN_VOLT" \
+        -v max_flowrate="$MAX_FLOWRATE" \
+        'BEGIN {print (flowrate/max_flowrate)*(max_volt-min_volt)+min_volt}'
+}
+
+declare -A ADDR_MAP=(
+    ["000c"]="SupplyValve2_2"
+    ["000e"]="SupplyValve2_3"
+    ["000f"]="SupplyValve2_1"
+)
+
+FLOWRATE="$DEFAULT_FLOWRATE"
+
+VALVE_NAME="${ADDR_MAP[$ADDR]}"
+if [ -z "$VALVE_NAME" ]; then
+    echo "[$I2C_DEV] Bus addr '$ADDR' not found in mapping table, using default flowrate: ${DEFAULT_FLOWRATE} LPM" >&2
+elif [ ! -f "$VALVE_CONFIG_FILE" ]; then
+    echo "[$I2C_DEV] Valve config file '$VALVE_CONFIG_FILE' not found, using default flowrate: ${DEFAULT_FLOWRATE} LPM" >&2
+else
+    _flowrate=$(jq --arg name "$VALVE_NAME" \
+            '.Valves[] | select(.Name == $name) | .FlowRate' \
+        "$VALVE_CONFIG_FILE")
+    if [[ "$_flowrate" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        FLOWRATE="$_flowrate"
+    else
+        echo "[$I2C_DEV] '$VALVE_NAME' not found in $VALVE_CONFIG_FILE, using default flowrate: ${DEFAULT_FLOWRATE} LPM" >&2
+    fi
+fi
+echo "[$I2C_DEV] Flowrate set to: ${FLOWRATE} LPM" >&2
+VOLT=$(flowrate_to_volt "$FLOWRATE")
 
 dac_volt_set() {
     local dev="$1" volt="$2"

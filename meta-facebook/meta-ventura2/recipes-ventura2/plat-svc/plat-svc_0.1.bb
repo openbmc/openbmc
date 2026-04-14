@@ -7,6 +7,8 @@ inherit systemd
 S = "${UNPACKDIR}"
 
 RDEPENDS:${PN} += "bash"
+# for valve-dac-init script
+RDEPENDS:${PN} += "jq"
 
 SRC_URI += " \
     file://marvell-switch-init.service \
