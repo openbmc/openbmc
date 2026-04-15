@@ -6,14 +6,6 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/Minerva_CB_cb_cpld:
-- Interface: "xyz.openbmc_project.Software.Version"
-  Properties:
-      Version:
-        Default: '""'
-      Purpose:
-        Default: Version::VersionPurpose::Other
-
 /xyz/openbmc_project/software/chassis/Nic_nic0:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
