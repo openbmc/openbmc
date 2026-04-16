@@ -1,0 +1,75 @@
+From 334e5513db08f6ebdd7e59429849d442b7b43446 Mon Sep 17 00:00:00 2001
+From: Michael Safwat <michael.safwat@arm.com>
+Date: Thu, 19 Mar 2026 11:12:19 +0000
+Subject: [PATCH 2/2] plat: cs1k: Drive NPU via external system reset control
+
+On Corstone-1000 with Cortex-A320, the NPU reset was previously tied
+to the host boot flow, so the NPU was powered on when the Secure
+Enclave powered on the host. Now the NPU is tied to the External
+System Reset Control register to control the power state.
+
+Reuse the existing external-system boot control mechanism for NPU.
+
+Change-Id: I74f9d57e8cbe5cb38db352d706885f9a37db0183
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
+Upstream-Status: Backport [6010d3b509e51cf10a711596e7d6058bde1568dc]
+---
+ platform/ext/target/arm/corstone1000/CMakeLists.txt          | 5 +++++
+ .../arm/corstone1000/Device/Include/platform_base_address.h  | 2 +-
+ platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c    | 4 ++--
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/CMakeLists.txt b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+index e543c4b6b..739a6a086 100644
+--- a/platform/ext/target/arm/corstone1000/CMakeLists.txt
++++ b/platform/ext/target/arm/corstone1000/CMakeLists.txt
+@@ -484,6 +484,11 @@ if (CORSTONE1000_CORTEX_A320)
+         PUBLIC
+             CORSTONE1000_CORTEX_A320
+     )
++
++    target_compile_definitions(platform_s
++        PUBLIC
++            CORSTONE1000_CORTEX_A320
++    )
+ endif()
+ 
+ #========================= tfm_adac ============================================#
+diff --git a/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h b/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
+index 62ee7d049..631592b34 100644
+--- a/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
++++ b/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
+@@ -91,7 +91,7 @@
+ #define CORSTONE1000_HOST_TRUSTED_RAM_BASE         (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_CVM_OFFSET)                                                  /* On-chip Volatile Memory */
+ #define CORSTONE1000_HOST_XNVM_BASE                (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_XNVM_OFFSET)                                                 /* eXecute-in-place Non-volatile Memory */
+ #define CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE_OFFSET)                             /* Security Control Bits */
+-#define CORSTONE1000_EXT_SYS_RESET_REG             (CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE + CORSTONE1000_HOST_EXT_SYS0_RST_CTRL_OFFSET)                              /* External System (Cortex-M3) */
++#define CORSTONE1000_EXT_SYS_RESET_REG             (CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE + CORSTONE1000_HOST_EXT_SYS0_RST_CTRL_OFFSET)                              /* External System (Cortex-M3/NPU) */
+ #define CORSTONE1000_HOST_FIREWALL_BASE            (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_FIREWALL_BASE_OFFSET)                                        /* System Firewall */
+ #define CORSTONE1000_HOST_INT_APBCOM_BASE          (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_INT_APBCOM_BASE_OFFSET)                                      /* Internal Advanced Peripheral Bus Communication */
+ #define CORSTONE1000_HOST_FPGA_SCC_REGISTERS       (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_FPGA_SCC_REGISTERS_OFFSET)                                   /* FPGA Serial Communication Controller Registers */
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+index 76360b507..ff65228bf 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+@@ -25,7 +25,7 @@
+ 
+ #define AA64nAA32_MASK (1 << 3)
+ 
+-#ifdef EXTERNAL_SYSTEM_SUPPORT
++#if defined(EXTERNAL_SYSTEM_SUPPORT) || defined(CORSTONE1000_CORTEX_A320)
+ void tfm_external_system_boot(void)
+ {
+     volatile uint32_t *ext_sys_reset_ctl_reg = (uint32_t *)(CORSTONE1000_EXT_SYS_RESET_REG);
+@@ -123,7 +123,7 @@ void tfm_hal_boot_ns_cpu(uintptr_t start_addr)
+ #endif
+ #endif
+ 
+-#ifdef EXTERNAL_SYSTEM_SUPPORT
++#if defined(EXTERNAL_SYSTEM_SUPPORT) || defined(CORSTONE1000_CORTEX_A320)
+     /*release EXT SYS out of reset*/
+     tfm_external_system_boot();
+ #endif
+-- 
+2.43.0
+

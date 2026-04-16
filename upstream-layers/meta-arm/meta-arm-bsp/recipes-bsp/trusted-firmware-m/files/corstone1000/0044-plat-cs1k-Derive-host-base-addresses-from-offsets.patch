@@ -1,0 +1,111 @@
+From 37cac6c86f10340382ff950e5e0323f2efbe5ed3 Mon Sep 17 00:00:00 2001
+From: Michael Safwat <michael.safwat@arm.com>
+Date: Wed, 8 Apr 2026 13:02:47 +0100
+Subject: [PATCH 1/2] plat: cs1k: Derive host base addresses from offsets
+
+Define explicit host register offsets and compute base addresses
+from the common host address space base. This keeps the map
+consistent, and also makes it easy to relocate all addresses if the
+base addresses change.
+
+Define External System Reset Control bitfields and use them to
+de-assert CPUWAIT when booting the external system, so we can touch
+only the bit of interest instead of zeroing the whole register.
+
+Change-Id: Id228351926fc846d28d5bf4e4180a995057154b1
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
+Upstream-Status: Backport [d73cc1dbc2eb72af02de740926f7b3c889bbac4b]
+---
+ .../Device/Include/platform_base_address.h    | 52 ++++++++++++++-----
+ .../arm/corstone1000/tfm_hal_multi_core.c     |  5 +-
+ 2 files changed, 41 insertions(+), 16 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h b/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
+index 3908d69bc..62ee7d049 100644
+--- a/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
++++ b/platform/ext/target/arm/corstone1000/Device/Include/platform_base_address.h
+@@ -68,23 +68,49 @@
+ /* Host base addresses from the SE perspective - partial list, only the ones
+  * required by the SE are defined here */
+ #define CORSTONE1000_HOST_ADDRESS_SPACE_BASE       (0x60000000U) /* Host Address Space                */
+-#define CORSTONE1000_HOST_BIR_BASE                 (0x60000000U) /* Boot Instruction Register         */
+-#define CORSTONE1000_HOST_TRUSTED_RAM_BASE         (0x62000000U) /* Secure RAM                        */
+-#define CORSTONE1000_HOST_XNVM_BASE                (0x68000000U) /* XNVM                              */
+-#define CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE (0x7A010000U) /* Host SCB                          */
+-#define CORSTONE1000_EXT_SYS_RESET_REG             (0x7A010310U) /* external system (cortex-M3)       */
+-#define CORSTONE1000_HOST_FIREWALL_BASE            (0x7A800000U) /* Host Firewall                     */
+-#define CORSTONE1000_HOST_INT_APBCOM_BASE          (0x7B900000U) /* Internal APBCOM                   */
+-#define CORSTONE1000_HOST_FPGA_SCC_REGISTERS       (0x80000000U) /* FPGA SCC Registers                */
+-#define CORSTONE1000_HOST_SE_SECURE_FLASH_BASE_FVP (0x80010000U) /* SE Flash                          */
+-#define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE   (0x80050000U) /* AXI QSPI Controller               */
+-#define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_SE_SECURE_FLASH (0x90010000U) /* AXI QSPI Controller for SE FLash  */
+-#define CORSTONE1000_HOST_DRAM_UEFI_CAPSULE        (0xA0000000U) /* 1.5 GB DDR                        */
+ 
++/* Registers offsets - partial list, only the ones
++ * required by the SE are defined here */
++#define CORSTONE1000_HOST_BIR_OFFSET                                           (0x00000000U)
++#define CORSTONE1000_HOST_CVM_OFFSET                                           (0x02000000U)
++#define CORSTONE1000_HOST_XNVM_OFFSET                                          (0x08000000U)
++#define CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE_OFFSET                      (0x1A010000U)
++#define CORSTONE1000_HOST_EXT_SYS0_RST_CTRL_OFFSET                             (0x310U)
++#define CORSTONE1000_HOST_FIREWALL_BASE_OFFSET                                 (0x1A800000U)
++#define CORSTONE1000_HOST_INT_APBCOM_BASE_OFFSET                               (0x1B900000U)
++/* The below offsets have been derived from the reserved section.*/
++#define CORSTONE1000_HOST_FPGA_SCC_REGISTERS_OFFSET                            (0x20000000U)
++#define CORSTONE1000_HOST_SE_SECURE_FLASH_BASE_FVP_OFFSET                      (0x20010000U)
++#define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_OFFSET                        (0x20050000U)
++#define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_SE_SECURE_FLASH_OFFSET        (0x30010000U)
++#define CORSTONE1000_HOST_DRAM_UEFI_CAPSULE_OFFSET                             (0x40000000U)
++#define CORSTONE1000_HOST_DSU_120T_BASE_OFFSET                                 (0x60910000U)
++
++/* Register Addresses */
++#define CORSTONE1000_HOST_BIR_BASE                 (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_BIR_OFFSET)                                                  /* Boot Instruction Register */
++#define CORSTONE1000_HOST_TRUSTED_RAM_BASE         (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_CVM_OFFSET)                                                  /* On-chip Volatile Memory */
++#define CORSTONE1000_HOST_XNVM_BASE                (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_XNVM_OFFSET)                                                 /* eXecute-in-place Non-volatile Memory */
++#define CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE_OFFSET)                             /* Security Control Bits */
++#define CORSTONE1000_EXT_SYS_RESET_REG             (CORSTONE1000_HOST_BASE_SYSTEM_CONTROL_BASE + CORSTONE1000_HOST_EXT_SYS0_RST_CTRL_OFFSET)                              /* External System (Cortex-M3) */
++#define CORSTONE1000_HOST_FIREWALL_BASE            (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_FIREWALL_BASE_OFFSET)                                        /* System Firewall */
++#define CORSTONE1000_HOST_INT_APBCOM_BASE          (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_INT_APBCOM_BASE_OFFSET)                                      /* Internal Advanced Peripheral Bus Communication */
++#define CORSTONE1000_HOST_FPGA_SCC_REGISTERS       (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_FPGA_SCC_REGISTERS_OFFSET)                                   /* FPGA Serial Communication Controller Registers */
++#define CORSTONE1000_HOST_SE_SECURE_FLASH_BASE_FVP (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_SE_SECURE_FLASH_BASE_FVP_OFFSET)                             /* Secure Enclave Flash */
++#define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE   (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_OFFSET)                               /* AXI QSPI Controller */
++#define CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_SE_SECURE_FLASH (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_AXI_QSPI_CTRL_REG_BASE_SE_SECURE_FLASH_OFFSET) /* AXI QSPI Controller for SE FLash  */
++#define CORSTONE1000_HOST_DRAM_UEFI_CAPSULE        (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_DRAM_UEFI_CAPSULE_OFFSET)                                    /* DDR RAM (1.5 GB) */
+ #ifdef CORSTONE1000_DSU_120T
+-#define CORSTONE1000_HOST_DSU_120T_BASE            (0xC0910000U) /* DSU-120T PPU                      */
++#define CORSTONE1000_HOST_DSU_120T_BASE            (CORSTONE1000_HOST_ADDRESS_SPACE_BASE + CORSTONE1000_HOST_DSU_120T_BASE_OFFSET)                                        /* DynamIQ Shared Unit-120 Power Policy Units */
+ #endif
+ 
++/* Bit definition for External System Reset Control register */
++#define CORSTONE1000_EXT_SYS_RESET_REG_CPUWAIT_Pos           (0U) // CPU Wait Control. 0b0 - External System's CPUWAIT signal is de-asserted. 0b1 - External System's CPUWAIT signal is asserted.
++#define CORSTONE1000_EXT_SYS_RESET_REG_CPUWAIT_Msk           (0x1UL << CORSTONE1000_EXT_SYS_RESET_REG_CPUWAIT_Pos)  // 1 bit
++#define CORSTONE1000_EXT_SYS_RESET_REG_RST_REQ_Pos           (1U) // Reset Request for External System. 0b0 - No Reset Requested. 0b1 - Reset Requested.
++#define CORSTONE1000_EXT_SYS_RESET_REG_RST_REQ_Msk           (0x1UL << CORSTONE1000_EXT_SYS_RESET_REG_RST_REQ_Pos)  // 1 bit
++#define CORSTONE1000_EXT_SYS_RESET_REG_Reserved_Pos          (2U) // Reserved.
++#define CORSTONE1000_EXT_SYS_RESET_REG_Reserved_Msk          (0x3FFFFFFFUL << CORSTONE1000_EXT_SYS_RESET_REG_Reserved_Pos)  // 30 bits
++
+ /* Map Component definitions to Corstone definitions */
+ #define CC3XX_BASE_S        CORSTONE1000_CRYPTO_ACCELERATOR_BASE
+ 
+diff --git a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+index 9a785bfa0..76360b507 100644
+--- a/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
++++ b/platform/ext/target/arm/corstone1000/tfm_hal_multi_core.c
+@@ -26,12 +26,11 @@
+ #define AA64nAA32_MASK (1 << 3)
+ 
+ #ifdef EXTERNAL_SYSTEM_SUPPORT
+-void tfm_external_system_boot()
++void tfm_external_system_boot(void)
+ {
+     volatile uint32_t *ext_sys_reset_ctl_reg = (uint32_t *)(CORSTONE1000_EXT_SYS_RESET_REG);
+ 
+-    /* de-assert CPU_WAIT signal*/
+-    *ext_sys_reset_ctl_reg = 0x0;
++    *ext_sys_reset_ctl_reg &= ~(CORSTONE1000_EXT_SYS_RESET_REG_CPUWAIT_Msk);
+ }
+ #endif
+ 
+-- 
+2.43.0
+

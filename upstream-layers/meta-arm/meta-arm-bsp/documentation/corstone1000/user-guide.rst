@@ -865,45 +865,6 @@ The results can be fetched from the `acs_results` folder in the ``BOOT`` partiti
 Capsule Update
 --------------
 
-.. warning::
-
-    The **Corstone-1000 with Cortex-A320 FVP** becomes unresponsive when the Linux kernel driver for the
-    Ethos-U85 NPU loads automatically after a software reboot.
-    This behavior results from a power reset control issue in the **Corstone-1000 with Cortex-A320 FVP** model.
-    To prevent the failure and complete the test successfully,
-    rebuild the **Corstone-1000 with Cortex-A320** firmware image using the following steps:
-
-
-    #. Clone the `iot-platform-assets` repository to your ``${WORKSPACE}``.
-
-        .. code-block:: console
-
-            cd ${WORKSPACE}
-            git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git \
-            -b CORSTONE1000-2025.12
-
-    #. Copy the disable ethosu driver Git patch file to your copy of `meta-arm`.
-
-        .. code-block:: console
-
-            cp -f iot-platform-assets/corstone1000/disable_module_autoloading/0001-arm-bsp-linux-corstone1000-a320-disable-ethosu-confi.patch \
-            ${WORKSPACE}/meta-arm/
-
-    #. Apply the Git patch to `meta-arm`.
-
-        .. code-block:: console
-
-            cd ${WORKSPACE}/meta-arm/
-            git apply 0001-arm-bsp-linux-corstone1000-a320-disable-ethosu-confi.patch
-            cd ${WORKSPACE}
-
-    #. Re-Build the **Corstone-1000 with Cortex-A320 FVP** software stack as follows:
-
-        .. code-block:: console
-
-            kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml
-
-
 .. important::
 
     Payload GUIDs (``${BL2_GUID}``, ``${TFM_S_GUID}``, ``${FIP_GUID}``, and ``${INITRAMFS_GUID}``)

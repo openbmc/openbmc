@@ -75,6 +75,8 @@ SRC_URI:append:corstone1000 = " \
     file://0041-plat-cs1k-Changed-to-use-new-GPT-library.patch \
     file://0042-plat-cs1k-Move-variable-from-stack-to-data.patch \
     file://0043-plat-cs1k-Create-and-remove-FWU-image-partitions.patch \
+    file://0044-plat-cs1k-Derive-host-base-addresses-from-offsets.patch \
+    file://0045-plat-cs1k-Drive-NPU-via-external-system-reset-contro.patch \
     "
 
 SRCREV_tfm-psa-adac:corstone1000 = "f2809ae231be33a1afcd7714f40756c67d846c88"
