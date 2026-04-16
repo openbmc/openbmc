@@ -44,6 +44,8 @@ EXTRA_OEMAKE = "'CFLAGS=${CFLAGS} -Wall' \
     NO_GLIBC_KEYERR=1 \
     "
 
+LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"
+
 do_install () {
     oe_runmake DESTDIR=${D} install
 }

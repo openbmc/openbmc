@@ -1,0 +1,102 @@
+From 58c160ce28328f9a75d41c283ee9b94c10d6ec62 Mon Sep 17 00:00:00 2001
+From: Sam James <sam@gentoo.org>
+Date: Thu, 9 Feb 2023 23:17:53 +0000
+Subject: [PATCH] ITS#10011 build: fix compatibility with stricter C99
+ compilers
+
+Fix the following warnings:
+- -Wimplicit-int (fatal with Clang 16)
+- -Wimplicit-function-declaration (fatal with Clang 16)
+- -Wincompatible-function-pointer-types (fatal with Clang 16)
+- -Wint-conversion (fatal with Clang 15)
+- Old style prototypes (K&R, removed from C23)
+
+These warnings-now-error led to misconfigurations and failure to build
+OpenLDAP, as the tests used during configure caused the wrong results
+to be emitted.
+
+For more information, see LWN.net [0] or LLVM's Discourse [1], the Gentoo wiki [2],
+or the (new) c-std-porting mailing list [3].
+
+[0] https://lwn.net/Articles/913505/
+[1] https://discourse.llvm.org/t/configure-script-breakage-with-the-new-werror-implicit-function-declaration/65213
+[2] https://wiki.gentoo.org/wiki/Modern_C_porting
+[3] hosted at lists.linux.dev.
+
+Bug: https://bugs.gentoo.org/871288
+
+Upstream-Status: Pending
+
+Signed-off-by: Sam James <sam@gentoo.org>
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ sntp/m4/openldap.m4 | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/sntp/m4/openldap.m4 b/sntp/m4/openldap.m4
+index 49ffb87..2db6aa3 100644
+--- a/sntp/m4/openldap.m4
++++ b/sntp/m4/openldap.m4
+@@ -154,6 +154,7 @@ fi
+ if test $ol_cv_header_stdc = yes; then
+   # /bin/cc in Irix-4.0.5 gets non-ANSI ctype macros unless using -ansi.
+ AC_RUN_IFELSE([AC_LANG_SOURCE([[#include <ctype.h>
++#include <stdlib.h>
+ #ifndef HAVE_EBCDIC
+ #	define ISLOWER(c) ('a' <= (c) && (c) <= 'z')
+ #	define TOUPPER(c) (ISLOWER(c) ? 'A' + ((c) - 'a') : (c))
+@@ -610,8 +611,12 @@ AC_DEFUN([OL_PTHREAD_TEST_INCLUDES], [[
+ #define NULL (void*)0
+ #endif
+ 
++#ifdef __STDC__
++static void *task(void *p)
++#else
+ static void *task(p)
+ 	void *p;
++#endif
+ {
+ 	return (void *) (p == NULL);
+ }
+@@ -667,9 +672,13 @@ AC_DEFUN([OL_PTHREAD_TEST_FUNCTION],[[
+ AC_DEFUN([OL_PTHREAD_TEST_PROGRAM], [
+ AC_LANG_SOURCE([OL_PTHREAD_TEST_INCLUDES
+ 
++#ifdef __STDC__
++int main(int argc, char **argv)
++#else
+ int main(argc, argv)
+ 	int argc;
+ 	char **argv;
++#endif
+ {
+ OL_PTHREAD_TEST_FUNCTION
+ }
+@@ -791,7 +800,7 @@ AC_CACHE_CHECK([for compatible POSIX regex],ol_cv_c_posix_regex,[
+ #include <sys/types.h>
+ #include <regex.h>
+ static char *pattern, *string;
+-main()
++int main(void)
+ {
+ 	int rc;
+ 	regex_t re;
+@@ -818,7 +827,8 @@ AC_DEFUN([OL_C_UPPER_LOWER],
+ [AC_CACHE_CHECK([if toupper() requires islower()],ol_cv_c_upper_lower,[
+ 	AC_RUN_IFELSE([AC_LANG_SOURCE([[
+ #include <ctype.h>
+-main()
++#include <stdlib.h>
++int main(void)
+ {
+ 	if ('C' == toupper('C'))
+ 		exit(0);
+@@ -873,7 +883,7 @@ AC_DEFUN([OL_NONPOSIX_STRERROR_R],
+ 			]])],[ol_cv_nonposix_strerror_r=yes],[ol_cv_nonposix_strerror_r=no])
+ 	else
+ 		AC_RUN_IFELSE([AC_LANG_SOURCE([[
+-			main() {
++			int main(void) {
+ 				char buf[100];
+ 				buf[0] = 0;
+ 				strerror_r( 1, buf, sizeof buf );

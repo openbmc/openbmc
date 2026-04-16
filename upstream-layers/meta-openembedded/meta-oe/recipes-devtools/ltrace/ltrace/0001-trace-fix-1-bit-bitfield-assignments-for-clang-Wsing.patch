@@ -1,0 +1,86 @@
+From 65c5a621a366a25b8572cd29c01b4aa92c02903a Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 12 Apr 2026 00:46:20 -0700
+Subject: [PATCH] trace: fix 1-bit bitfield assignments for clang
+ -Wsingle-bit-bitfield-constant-conversion
+
+Replace '1' with 'true' for all 1-bit signed bitfield assignments.
+Assigning integer 1 to a 1-bit signed bitfield truncates to -1; using
+'true' which is a bool is well-defined and avoids the clang error.
+
+Upstream-Status: Submitted [https://gitlab.com/cespedes/ltrace/-/merge_requests/30]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ ltrace-elf.c              |  2 +-
+ sysdeps/linux-gnu/trace.c | 12 ++++++------
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/ltrace-elf.c b/ltrace-elf.c
+index beaf69f..2be609c 100644
+--- a/ltrace-elf.c
++++ b/ltrace-elf.c
+@@ -819,7 +819,7 @@ mark_chain_latent(struct library_symbol *libsym)
+ {
+ 	for (; libsym != NULL; libsym = libsym->next) {
+ 		debug(DEBUG_FUNCTION, "marking %s latent", libsym->name);
+-		libsym->latent = 1;
++		libsym->latent = true;
+ 	}
+ }
+
+diff --git a/sysdeps/linux-gnu/trace.c b/sysdeps/linux-gnu/trace.c
+index 12c8747..b7f4c57 100644
+--- a/sysdeps/linux-gnu/trace.c
++++ b/sysdeps/linux-gnu/trace.c
+@@ -310,13 +310,13 @@ send_sigstop(struct process *task, void *data)
+ 	 * weed out unnecessary looping.  */
+ 	if (st == PS_SLEEPING
+ 	    && is_vfork_parent(task)) {
+-		task_info->vforked = 1;
++		task_info->vforked = true;
+ 		return CBS_CONT;
+ 	}
+
+ 	if (task_kill(task->pid, SIGSTOP) >= 0) {
+ 		debug(DEBUG_PROCESS, "send SIGSTOP to %d", task->pid);
+-		task_info->sigstopped = 1;
++		task_info->sigstopped = true;
+ 	} else
+ 		fprintf(stderr,
+ 			"Warning: couldn't send SIGSTOP to %d\n", task->pid);
+@@ -442,7 +442,7 @@ handle_stopping_event(struct pid_task *task_info, Event **eventp)
+ {
+ 	/* Mark all events, so that we know whom to SIGCONT later.  */
+ 	if (task_info != NULL)
+-		task_info->got_event = 1;
++		task_info->got_event = true;
+
+ 	Event *event = *eventp;
+
+@@ -454,7 +454,7 @@ handle_stopping_event(struct pid_task *task_info, Event **eventp)
+ 		debug(DEBUG_PROCESS, "SIGSTOP delivered to %d", task_info->pid);
+ 		if (task_info->sigstopped
+ 		    && !task_info->delivered) {
+-			task_info->delivered = 1;
++			task_info->delivered = true;
+ 			*eventp = NULL; // sink the event
+ 		} else
+ 			fprintf(stderr, "suspicious: %d got SIGSTOP, but "
+@@ -748,7 +748,7 @@ process_stopping_on_event(struct event_handler *super, Event *event)
+ 		debug(1, "%d LT_EV_SYSRET", event->proc->pid);
+ 		event_to_queue = 0;
+ 		if (task_info != NULL)
+-			task_info->sysret = 1;
++			task_info->sysret = true;
+ 	}
+
+ 	switch (state) {
+@@ -1070,7 +1070,7 @@ process_vfork_on_event(struct event_handler *super, Event *event)
+ 				      &event->e_un.brk_addr, &sbp);
+ 			assert(sbp != NULL);
+ 			breakpoint_turn_on(sbp, proc->leader);
+-			self->vfork_bp_refd = 1;
++			self->vfork_bp_refd = true;
+ 		}
+ 		break;
+

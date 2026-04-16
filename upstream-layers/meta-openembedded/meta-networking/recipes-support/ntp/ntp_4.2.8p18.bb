@@ -17,6 +17,8 @@ SRC_URI = "http://www.eecis.udel.edu/~ntp/ntp_spool/ntp4/ntp-4.2/ntp-${PV}.tar.g
            file://0001-test-Fix-build-with-new-compiler-defaults-to-fno-com.patch \
            file://0001-sntp-Fix-types-in-check-for-pthread_detach.patch \
            file://0001-include-fix-build-failure-with-glibc-2.43-_Generic-m.patch \
+           file://0001-ITS-10011-build-fix-compatibility-with-stricter-C99-.patch \
+           file://0001-colcomp-sntp-libpkgver-colcomp.c-Convert-K-R-functio.patch \
            file://ntpd \
            file://ntp.conf \
            file://ntpd.service \

@@ -37,10 +37,10 @@ diff --git a/wscript b/wscript
 index 95ddd9e..6d9577a 100644
 --- a/wscript
 +++ b/wscript
-@@ -123,6 +123,13 @@ def options(opt):
+@@ -131,6 +131,13 @@
                    help=('Disable kernely keyring support for credential storage'),
                    action='store_false', dest='enable_keyring')
- 
+
 +    opt.add_option('--with-valgrind',
 +                   help=("Enable use of valgrind"),
 +                   action="store_true", dest='enable_valgrind')
@@ -48,9 +48,6 @@ index 95ddd9e..6d9577a 100644
 +                   help=("Disable use of valgrind"),
 +                   action="store_false", dest='enable_valgrind', default=False)
 +
-     gr = opt.option_group('developer options')
- 
-     opt.load('python') # options for disabling pyc or pyo compilation
--- 
-2.25.1
+     opt.samba_add_onoff_option('ldap')
 
+     opt.option_group('developer options')

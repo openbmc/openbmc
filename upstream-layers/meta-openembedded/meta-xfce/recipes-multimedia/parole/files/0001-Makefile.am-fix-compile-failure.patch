@@ -1,0 +1,31 @@
+From 34ff86795396c320a9e19641d9d226190b7fdfc6 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Sun, 12 Apr 2026 19:30:23 +0800
+Subject: [PATCH] Makefile.am: fix compile failure
+
+Fix build failure:
+/build/tmp/work/x86-64-v3-poky-linux/parole/4.18.2/recipe-sysroot-native/usr/bin/x86_64-poky-linux/x86_64-poky-linux-ld: parole-conf.o: undefined reference to symbol 'xfce_rc_close'
+/build/tmp/work/x86-64-v3-poky-linux/parole/4.18.2/recipe-sysroot-native/usr/bin/x86_64-poky-linux/x86_64-poky-linux-ld: /build/tmp/work/x86-64-v3-poky-linux/parole/4.18.2/recipe-sysroot/usr/lib/libxfce4util.so.7: error adding symbols: DSO missing from command line
+
+Upstream-Status: Submitted [https://gitlab.xfce.org/apps/parole/-/issues/146]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 920b708..244c14c 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -90,6 +90,7 @@ parole_LDADD =						   	\
+ 	$(GMODULE_LIBS)				\
+ 	$(DBUS_GLIB_LIBS)                       \
+ 	$(LIBXFCE4UI_LIBS)                     \
++	$(LIBXFCE4UTIL_LIBS)                \
+ 	$(XFCONF_LIBS)                     \
+ 	$(GST_VIDEO_LIBS)			\
+ 	$(TAGLIBC_LIBS)				\
+-- 
+2.34.1
+

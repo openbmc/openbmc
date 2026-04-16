@@ -1,4 +1,4 @@
-From 28322f951bb8510ddb4cf767426a67c81ce826ab Mon Sep 17 00:00:00 2001
+From 6a95cc20d3c5adfc5c16f269f6dca9f7e2305b4e Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Tue, 17 Mar 2026 13:04:11 +0800
 Subject: [PATCH] fix build failure when systemd is enabled
@@ -42,10 +42,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  src/system/dlt-system-logfile.c          |  4 +--
  src/system/dlt-system-process-handling.c |  2 +-
  src/system/dlt-system-processes.c        |  2 +-
- src/system/dlt-system-syslog.c           |  6 ++--
+ src/system/dlt-system-syslog.c           |  8 ++---
  src/system/dlt-system-watchdog.c         |  8 ++---
  systemd/3rdparty/sd-daemon.c             |  5 +--
- 10 files changed, 40 insertions(+), 42 deletions(-)
+ 10 files changed, 41 insertions(+), 43 deletions(-)
 
 diff --git a/src/daemon/dlt-daemon.c b/src/daemon/dlt-daemon.c
 index ef42f89..8c318a4 100644
@@ -329,10 +329,10 @@ index c35596c..b17b8ee 100644
  
      /* go through all process files in directory */
 diff --git a/src/system/dlt-system-syslog.c b/src/system/dlt-system-syslog.c
-index 59e9d3f..d6b1b8a 100644
+index 59e9d3f..f0bf3dc 100644
 --- a/src/system/dlt-system-syslog.c
 +++ b/src/system/dlt-system-syslog.c
-@@ -88,7 +88,7 @@ int init_socket(SyslogOptions opts)
+@@ -88,11 +88,11 @@ int init_socket(SyslogOptions opts)
  #ifdef DLT_USE_IPv6
      syslog_addr.sin6_family = AF_INET6;
      syslog_addr.sin6_addr = in6addr_any;
@@ -341,6 +341,11 @@ index 59e9d3f..d6b1b8a 100644
  #else
      syslog_addr.sin_family = AF_INET;
      syslog_addr.sin_addr.s_addr = INADDR_ANY;
+-    syslog_addr.sin_port = htons(opts.Port);
++    syslog_addr.sin_port = htons((uint16_t)opts.Port);
+     memset(&(syslog_addr.sin_zero), 0, 8);
+ #endif
+ 
 @@ -117,7 +117,7 @@ int read_socket(int sock)
      struct sockaddr_in client_addr;
      socklen_t addr_len = sizeof(struct sockaddr_in);

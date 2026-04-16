@@ -8,15 +8,17 @@ SECTION = "utils"
 LICENSE = "MIT & BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=cf7fcb0a1def4a7ad62c028f7d0dca47"
 
-GITHUB_BASE_URI = "https://github.com/jqlang/${BPN}/releases/"
-SRC_URI = "${GITHUB_BASE_URI}/download/${BPN}-${PV}/${BPN}-${PV}.tar.gz \
+SRCREV = "4467af7068b1bcd7f882defff6e7ea674c5357f4"
+
+SRC_URI = " \
+    git://github.com/jqlang/jq.git;protocol=https;branch=master;tag=jq-${PV} \
     file://run-ptest \
-    "
-SRC_URI[sha256sum] = "2be64e7129cecb11d5906290eba10af694fb9e3e7f9fc208a311dc33ca837eb0"
+    file://0001-Support-building-with-disable-maintainer-mode-and-so.patch \
+"
 
-inherit autotools github-releases ptest
+inherit autotools ptest
 
-UPSTREAM_CHECK_REGEX = "releases/tag/${BPN}-(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_CHECK_GITTAGREGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"
 
 PACKAGECONFIG ?= "oniguruma"
 

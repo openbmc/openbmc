@@ -15,7 +15,7 @@ DEPENDS = "openssl-native openssl libidn libtool libpcap libtalloc"
 
 PATCHTOOL = "git"
 
-SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.2.x;lfs=0;;protocol=https \
+SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.2.x;lfs=0;protocol=https \
     file://freeradius \
     file://volatiles.58_radiusd \
     file://radiusd.service \
@@ -29,7 +29,6 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.2.x;lfs=0
     file://0007-rlm_python-add-PY_INC_DIR-in-search-dir.patch \
     file://0008-libtool-do-not-use-jlibtool.patch \
     file://0009-Fix-quoting-for-BUILD_WITH.patch \
-    file://0010-fix-error-for-expansion-of-macro-in-thread.h.patch \
     file://0011-rlm_mschap-Use-includedir-instead-of-hardcoding-usr-.patch \
     file://0012-raddb-certs-Makefile-fix-the-existed-certificate-err.patch \
     file://0013-raddb-certs-Makefile-fix-the-occasional-verification.patch \
@@ -37,16 +36,13 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.2.x;lfs=0
     file://0015-bootstrap-check-commands-of-openssl-exist.patch \
     file://0016-version.c-don-t-print-build-flags.patch \
     file://0017-Add-acinclude.m4-to-include-required-macros.patch \
-    file://0018-update-license-1.patch \
-    file://0019-update-license-2.patch \
-    file://0020-update-license-3.patch \
-    file://0001-don-t-load-legacy-provider-on-enable-fips-workaround.patch \
-    file://0002-don-t-load-legacy-provider-on-enable-fips-workaround.patch \
 "
 
 raddbdir = "${sysconfdir}/${MLPREFIX}raddb"
 
-SRCREV = "032be31bb52646171099617928ec1703335bcf73"
+SRCREV = "4e4cbbd93ff3b469a773c964c7b5b6f53d01457a"
+
+PV .= "+git"
 
 UPSTREAM_CHECK_GITTAGREGEX = "release_(?P<pver>\d+(\_\d+)+)"
 
@@ -55,6 +51,8 @@ CVE_STATUS[CVE-2011-4966] = "fixed-version: The CPE in the NVD database doesn't 
 
 PARALLEL_MAKE = ""
 
+# autoconf 2.73+Clang does not detect it correctly so help out
+CFLAGS += "-DTLS_STORAGE_CLASS=__thread"
 
 LDFLAGS:append:powerpc = " -latomic"
 LDFLAGS:append:mipsarch = " -latomic"

@@ -19,6 +19,7 @@ EXTRA_OECONF = "\
     --disable-oss \
     --disable-tdb \
     --disable-lynx \
+    --disable-gtk-doc \
 "
 
 PACKAGECONFIG ??= " \

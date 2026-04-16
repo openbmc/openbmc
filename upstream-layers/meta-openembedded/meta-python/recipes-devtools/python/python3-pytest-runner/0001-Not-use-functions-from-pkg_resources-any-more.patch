@@ -1,0 +1,77 @@
+From 81b0218e390e36aa2c3d1bdaa124d8af175e9cbb Mon Sep 17 00:00:00 2001
+From: Li Zhou <li.zhou@windriver.com>
+Date: Thu, 2 Apr 2026 15:44:18 +0800
+Subject: [PATCH] Not use functions from pkg_resources any more
+
+The python3 setuptools 82 dropped pkg_resources module by now.
+To avoid the failure "No module named 'pkg_resources'", replace the
+functions from this module with other functions from modules
+packaging and importlib.metadata.
+
+Upstream-Status: Inactive-Upstream [lastcommit: 2023]
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
+---
+ ptr/__init__.py | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
+
+diff --git a/ptr/__init__.py b/ptr/__init__.py
+index 41192fa..5186059 100644
+--- a/ptr/__init__.py
++++ b/ptr/__init__.py
+@@ -10,10 +10,12 @@ import operator as _operator
+ import itertools as _itertools
+ import warnings as _warnings
+ 
+-import pkg_resources
+ import setuptools.command.test as orig
+ from setuptools import Distribution
+ 
++from importlib.metadata import version
++from packaging.version import Version
++from packaging.markers import Marker, InvalidMarker
+ 
+ @_contextlib.contextmanager
+ def _save_argv(repl=None):
+@@ -121,7 +123,8 @@ class PyTest(orig.test):
+         instead of declaring the dependency in the package
+         metadata, assert the requirement at run time.
+         """
+-        pkg_resources.require('setuptools>=27.3')
++        if Version(version('setuptools')) < Version('27.3'):
++            raise RuntimeError("setuptools >= 27.3 is required")
+ 
+     def finalize_options(self):
+         if self.addopts:
+@@ -133,11 +136,12 @@ class PyTest(orig.test):
+         Given an environment marker, return True if the marker is valid
+         and matches this environment.
+         """
+-        return (
+-            not marker
+-            or not pkg_resources.invalid_marker(marker)
+-            and pkg_resources.evaluate_marker(marker)
+-        )
++        if not marker:
++            return True
++        try:
++            return Marker(marker).evaluate()
++        except InvalidMarker:
++            return False
+ 
+     def install_dists(self, dist):
+         """
+@@ -175,9 +179,8 @@ class PyTest(orig.test):
+             "please upgrade to setuptools 30.4 or later or pin to "
+             "pytest-runner < 5."
+         )
+-        ver_str = pkg_resources.get_distribution('setuptools').version
+-        ver = pkg_resources.parse_version(ver_str)
+-        if ver < pkg_resources.parse_version('30.4'):
++        ver = Version(version('setuptools'))
++        if ver < Version('30.4'):
+             _warnings.warn(msg)
+ 
+     def run(self):
+-- 
+2.34.1
+

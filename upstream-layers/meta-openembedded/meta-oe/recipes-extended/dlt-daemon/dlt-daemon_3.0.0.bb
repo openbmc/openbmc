@@ -22,6 +22,8 @@ SRC_URI = "git://github.com/COVESA/${BPN}.git;protocol=https;branch=master \
            file://0001-Fix-build-failures.patch \
            file://0001-fix-build-failure-when-systemd-is-enabled.patch \
            file://0001-Fix-build-failure-with-glibc-2.43.patch \
+           file://0001-CMakeLists.txt-make-CONFIGURATION_FILES_DIR-aligned.patch \
+           file://0001-warnings-Fix-clang-generated-warnings.patch \
            "
 SRCREV = "f595ea29d1007ca1c3b2d1fd3a88adf7d3db6320"
 
@@ -53,7 +55,7 @@ inherit autotools gettext cmake pkgconfig systemd
 
 # -DWITH_DLT_COREDUMPHANDLER=ON this feature is too experimental, disable for now
 #FILES:${PN} += "${libdir}/sysctl.d"
-EXTRA_OECMAKE += "-DWITH_DLT_LOGSTORAGE_GZIP=ON -DWITH_EXTENDED_FILTERING=ON -DSYSTEMD_UNITDIR=${systemd_system_unitdir}"
+EXTRA_OECMAKE += "-DWITH_DLT_LOGSTORAGE_GZIP=ON -DWITH_EXTENDED_FILTERING=ON -DSYSTEMD_UNITDIR=${systemd_system_unitdir} -DWITH_DLT_USE_IPv6=OFF"
 
 PACKAGES += "${PN}-systemd"
 SYSTEMD_PACKAGES = "${PN} ${PN}-systemd"

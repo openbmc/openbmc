@@ -34,7 +34,7 @@ def get_spdm_multiarch(d):
     if target_arch in multiarch_options:
         return multiarch_options[target_arch]
 
-    bb.fatal("unsupported architecture '%s'" % target_arch)
+    bb.parse.SkipRecipe("unsupported architecture '%s'" % target_arch)
 
 EXTRA_OECMAKE += "\
     -DARCH=${@get_spdm_multiarch(d)} \

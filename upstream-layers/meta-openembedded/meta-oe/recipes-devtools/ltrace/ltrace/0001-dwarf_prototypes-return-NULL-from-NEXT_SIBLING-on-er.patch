@@ -1,0 +1,34 @@
+From d568c0cbdecf31a7020f2a0574470d014f447a86 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 12 Apr 2026 00:07:06 -0700
+Subject: [PATCH] dwarf_prototypes: return NULL from NEXT_SIBLING on error
+
+NEXT_SIBLING is used in functions that return pointers, so returning
+false on error is misleading and relies on implicit conversion.
+Return (void *)0 instead to make the failure value explicit and match
+the surrounding function return type.
+
+This is flagged by clang-22 due to
+Replacing return false with return (void *)0
+avoids clang's -Wbool-conversion error when the macro expands
+inside functions returning a pointer type.
+
+Upstream-Status: Submitted [https://gitlab.com/cespedes/ltrace/-/merge_requests/30]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ dwarf_prototypes.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dwarf_prototypes.c b/dwarf_prototypes.c
+index bfac177..e7ea1bc 100644
+--- a/dwarf_prototypes.c
++++ b/dwarf_prototypes.c
+@@ -36,7 +36,7 @@
+ #define NEXT_SIBLING(die)					\
+ 	int res = dwarf_siblingof(die, die);			\
+ 	if (res == 0) continue;     /* sibling exists    */	\
+-	if (res < 0)  return false; /* error             */	\
++	if (res < 0)  return (void *)0;  /* error             */	\
+ 	break                       /* no sibling exists */
+
+ static struct arg_type_info *get_type(int *newly_allocated_info,

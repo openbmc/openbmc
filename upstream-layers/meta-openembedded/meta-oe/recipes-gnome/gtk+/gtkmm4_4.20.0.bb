@@ -8,13 +8,13 @@ LIC_FILES_CHKSUM = " \
 	file://COPYING.tools;md5=570a9b3749dd0463a1778803b12a6dce \
 "
 
-DEPENDS = "glib-2.0-native atkmm pangomm-2.48 glibmm gtk4 cairomm-1.16 gdk-pixbuf-native"
+DEPENDS = "glib-2.0-native pangomm-2.48 glibmm gtk4 cairomm-1.16 gdk-pixbuf-native"
 
 GNOMEBN = "gtkmm"
 
 inherit gnomebase features_check
 
-REQUIRED_DISTRO_FEATURES = "opengl x11"
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 SRC_URI[archive.sha256sum] = "daad9bf9b70f90975f91781fc7a656c923a91374261f576c883cd3aebd59c833"
 

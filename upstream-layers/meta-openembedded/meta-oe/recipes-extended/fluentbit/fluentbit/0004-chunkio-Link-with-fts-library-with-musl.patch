@@ -1,4 +1,4 @@
-From cc688b91c02df9a45ca8816a1d09649fadb9dc4a Mon Sep 17 00:00:00 2001
+From 26431b786b4c703bc2dcdb57d59487a3fef4a139 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 10 Aug 2022 01:27:16 -0700
 Subject: [PATCH] chunkio: Link with fts library with musl
@@ -10,7 +10,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 Upstream-Status: Pending
 ---
-
  lib/chunkio/src/CMakeLists.txt | 1 +
  1 file changed, 1 insertion(+)
 

@@ -1,6 +1,4 @@
-inherit xfce features_check
-
-REQUIRED_DISTRO_FEATURES = "x11"
+inherit xfce
 
 DEPENDS += "thunar"
 

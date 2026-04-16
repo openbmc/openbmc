@@ -1,4 +1,4 @@
-From 5cc79bdede89e75d713e23cf0fde26634320bc3e Mon Sep 17 00:00:00 2001
+From fef234a565d5150dc3d3d1374843024381e4f4de Mon Sep 17 00:00:00 2001
 From: Niko Mauno <niko.mauno@vaisala.com>
 Date: Mon, 21 Oct 2024 16:02:46 +0000
 Subject: [PATCH] CMakeLists.txt: Revise init manager deduction
@@ -15,10 +15,10 @@ Upstream-Status: Inappropriate [configuration]
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index ac5fe5ef8..f47a01b82 100644
+index a47a5d9d6..ddc93827c 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -600,7 +600,7 @@ if(FLB_BINARY)
+@@ -627,7 +627,7 @@ if(FLB_BINARY)
      set(SYSTEMD_UNITDIR  /lib/systemd/system)
    endif()
  
@@ -27,7 +27,7 @@ index ac5fe5ef8..f47a01b82 100644
      if (FLB_AMAZON_LINUX2)
        set(FLB_SYSTEMD_SCRIPT "${PROJECT_SOURCE_DIR}/init/${FLB_OUT_NAME}.service")
        configure_file(
-@@ -625,7 +625,7 @@ if(FLB_BINARY)
+@@ -652,7 +652,7 @@ if(FLB_BINARY)
        install(FILES ${FLB_SYSTEMD_SCRIPT} COMPONENT binary DESTINATION ${SYSTEMD_UNITDIR})
        install(DIRECTORY DESTINATION ${FLB_INSTALL_CONFDIR} COMPONENT binary)
      endif()

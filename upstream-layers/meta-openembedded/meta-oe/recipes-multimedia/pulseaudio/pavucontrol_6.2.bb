@@ -9,7 +9,6 @@ DEPENDS = "gtkmm4 pulseaudio json-glib"
 inherit meson features_check pkgconfig gettext
 
 ANY_OF_DISTRO_FEATURES = "opengl vulkan"
-REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI = "http://www.freedesktop.org/software/pulseaudio/${BPN}/${BP}.tar.xz"
 SRC_URI[sha256sum] = "e93a7836c7307dcbc989e95fc7ec0878322514c475fabd90e89ed52fd4f15d32"

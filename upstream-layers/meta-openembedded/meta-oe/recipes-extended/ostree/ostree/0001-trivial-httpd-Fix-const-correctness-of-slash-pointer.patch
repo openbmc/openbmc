@@ -1,0 +1,29 @@
+From 3b8255e24d0785d6049d473471da53b0c5fd52c1 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 9 Apr 2026 16:28:07 -0700
+Subject: [PATCH] trivial-httpd: Fix const-correctness of slash pointer
+
+strrchr() returns a 'const char *' when passed a 'const char *'
+argument. Declare the local 'slash' variable as 'const char *'
+to match, fixing a build failure with clang when
+-Werror,-Wincompatible-pointer-types-discards-qualifiers is active.
+
+Upstream-Status: Submitted [https://github.com/ostreedev/ostree/pull/3579]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/ostree/ostree-trivial-httpd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ostree/ostree-trivial-httpd.c b/src/ostree/ostree-trivial-httpd.c
+index 4a0c6b00..b5a52e61 100644
+--- a/src/ostree/ostree-trivial-httpd.c
++++ b/src/ostree/ostree-trivial-httpd.c
+@@ -281,7 +281,7 @@ do_get (OtTrivialHttpd *self, SoupServer *server, SoupServerMessage *msg, const
+ do_get (OtTrivialHttpd *self, SoupServer *server, SoupServerMessage *msg, const char *path)
+ #endif
+ {
+-  char *slash;
++  const char *slash;
+   int ret;
+   struct stat stbuf;
+

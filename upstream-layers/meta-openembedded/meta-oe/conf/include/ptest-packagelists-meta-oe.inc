@@ -58,6 +58,7 @@ PTESTS_FAST_META_OE = "\
     uriparser \
     utf8proc \
     uthash \
+    xdg-dbus-proxy \
     ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'xrdp', '', d)} \
     zeromq \
 "

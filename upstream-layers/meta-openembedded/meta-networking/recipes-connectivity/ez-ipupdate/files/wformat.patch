@@ -1,4 +1,9 @@
-Upstream-Status: Pending
+
+This patch is used by Gentoo to mitigate CVE-2004-0980:
+https://bugs.gentoo.org/69658
+
+CVE: CVE-2004-0980
+Upstream-Status: Inactive-Upstream [last commit: 2002]
 
 Index: ez-ipupdate-3.0.11b7/ez-ipupdate.c
 ===================================================================

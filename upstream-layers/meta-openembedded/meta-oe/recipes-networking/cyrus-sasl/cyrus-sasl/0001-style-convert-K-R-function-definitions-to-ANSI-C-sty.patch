@@ -1,0 +1,301 @@
+From 80bc0c1bfff769728d18ac5d9e22755e60fc23d8 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 10 Apr 2026 13:08:52 -0700
+Subject: [PATCH] style: convert K&R function definitions to ANSI C style in
+ md5.c
+
+Replace old-style K&R function parameter declarations with modern ANSI
+C prototypes across all functions in lib/md5.c. Also strip trailing
+whitespace throughout the file. No functional changes.
+
+Upstream-Status: Inappropriate [md5 does not exist in master branch]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ lib/md5.c       | 231 +++++++++++++++++++++++++-----------------------
+ saslauthd/md5.c |  77 +++++++++-------
+ 2 files changed, 163 insertions(+), 145 deletions(-)
+
+--- a/saslauthd/md5.c
++++ b/saslauthd/md5.c
+@@ -98,8 +98,9 @@ Rotation is separate from addition to pr
+ /* MD5 initialization. Begins an MD5 operation, writing a new context.
+ */
+ 
+-void _saslauthd_MD5Init (context)
+-MD5_CTX *context; /* context */
++void _saslauthd_MD5Init (
++MD5_CTX *context /* context */
++)
+ {
+        context->count[0] = context->count[1] = 0; 
+ 
+@@ -114,10 +115,11 @@ MD5_CTX *context; /* context */
+        operation, processing another message block, and updating the context. 
+ */
+ 
+-void _saslauthd_MD5Update (context, input, inputLen)
+-MD5_CTX *context; /* context */
+-unsigned char *input; /* input block */
+-unsigned int inputLen; /* length of input block */
++void _saslauthd_MD5Update (
++MD5_CTX *context, /* context */
++unsigned char *input, /* input block */
++unsigned int inputLen /* length of input block */
++)
+ {
+        unsigned int i, index, partLen; 
+ 
+@@ -159,9 +161,10 @@ unsigned int inputLen; /* length of inpu
+        the message digest and zeroizing the context. 
+ */
+ 
+-void _saslauthd_MD5Final (digest, context)
+-unsigned char digest[16]; /* message digest */
+-MD5_CTX *context; /* context */
++void _saslauthd_MD5Final (
++unsigned char digest[16], /* message digest */
++MD5_CTX *context /* context */
++)
+ {
+        unsigned char bits[8]; 
+        unsigned int index, padLen; 
+@@ -186,9 +189,10 @@ MD5_CTX *context; /* context */
+ 
+ /* MD5 basic transformation. Transforms state based on block. */
+ 
+-static void MD5Transform (state, block)
+-UINT4 state[4];
+-unsigned char block[64];
++static void MD5Transform (
++UINT4 state[4],
++unsigned char block[64]
++)
+ {
+        UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16]; 
+ 
+@@ -281,10 +285,11 @@ unsigned char block[64];
+ 
+         */
+ 
+-static void Encode (output, input, len)
+-unsigned char *output;
+-UINT4 *input;
+-unsigned int len;
++static void Encode (
++unsigned char *output,
++UINT4 *input,
++unsigned int len
++)
+ {
+        unsigned int i, j; 
+ 
+@@ -301,10 +306,11 @@ unsigned int len;
+ 
+         */
+ 
+-static void Decode (output, input, len)
+-UINT4 *output;
+-unsigned char *input;
+-unsigned int len;
++static void Decode (
++UINT4 *output,
++unsigned char *input,
++unsigned int len
++)
+ {
+        unsigned int i, j; 
+ 
+@@ -317,10 +323,11 @@ unsigned int len;
+ 
+         */
+ 
+-static void MD5_memcpy (output, input, len)
+-POINTER output;
+-POINTER input;
+-unsigned int len;
++static void MD5_memcpy (
++POINTER output,
++POINTER input,
++unsigned int len
++)
+ {
+        unsigned int i; 
+ 
+@@ -331,10 +338,11 @@ unsigned int len;
+ /* Note: Replace "for loop" with standard memset if possible.
+ */
+ 
+-static void MD5_memset (output, value, len)
+-POINTER output;
+-int value;
+-unsigned int len;
++static void MD5_memset (
++POINTER output,
++int value,
++unsigned int len
++)
+ {
+        unsigned int i; 
+ 
+@@ -452,12 +460,13 @@ void _saslauthd_hmac_md5_final(unsigned
+ }
+ 
+ 
+-void _saslauthd_hmac_md5(text, text_len, key, key_len, digest)
+-const unsigned char* text; /* pointer to data stream */
+-int text_len; /* length of data stream */
+-const unsigned char* key; /* pointer to authentication key */
+-int key_len; /* length of authentication key */
+-unsigned char *digest; /* caller digest to be filled in */
++void _saslauthd_hmac_md5(
++const unsigned char* text, /* pointer to data stream */
++int text_len, /* length of data stream */
++const unsigned char* key, /* pointer to authentication key */
++int key_len, /* length of authentication key */
++unsigned char *digest /* caller digest to be filled in */
++)
+ {
+   MD5_CTX context; 
+ 
+--- a/lib/md5.c
++++ b/lib/md5.c
+@@ -98,8 +98,9 @@ Rotation is separate from addition to pr
+ /* MD5 initialization. Begins an MD5 operation, writing a new context.
+ */
+ 
+-void _sasl_MD5Init (context)
+-MD5_CTX *context; /* context */
++void _sasl_MD5Init (
++MD5_CTX *context /* context */
++)
+ {
+        context->count[0] = context->count[1] = 0; 
+ 
+@@ -114,10 +115,11 @@ MD5_CTX *context; /* context */
+        operation, processing another message block, and updating the context. 
+ */
+ 
+-void _sasl_MD5Update (context, input, inputLen)
+-MD5_CTX *context; /* context */
+-const unsigned char *input; /* input block */
+-unsigned int inputLen; /* length of input block */
++void _sasl_MD5Update (
++MD5_CTX *context, /* context */
++const unsigned char *input, /* input block */
++unsigned int inputLen /* length of input block */
++)
+ {
+        unsigned int i, index, partLen; 
+ 
+@@ -159,9 +161,10 @@ unsigned int inputLen; /* length of inpu
+        the message digest and zeroizing the context. 
+ */
+ 
+-void _sasl_MD5Final (digest, context)
+-unsigned char digest[16]; /* message digest */
+-MD5_CTX *context; /* context */
++void _sasl_MD5Final (
++unsigned char digest[16], /* message digest */
++MD5_CTX *context /* context */
++)
+ {
+        unsigned char bits[8]; 
+        unsigned int index, padLen; 
+@@ -186,9 +189,10 @@ MD5_CTX *context; /* context */
+ 
+ /* MD5 basic transformation. Transforms state based on block. */
+ 
+-static void MD5Transform (state, block)
+-UINT4 state[4];
+-const unsigned char block[64];
++static void MD5Transform (
++UINT4 state[4],
++const unsigned char block[64]
++)
+ {
+        UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16]; 
+ 
+@@ -281,10 +285,11 @@ const unsigned char block[64];
+ 
+         */
+ 
+-static void Encode (output, input, len)
+-unsigned char *output;
+-UINT4 *input;
+-unsigned int len;
++static void Encode (
++unsigned char *output,
++UINT4 *input,
++unsigned int len
++)
+ {
+        unsigned int i, j; 
+ 
+@@ -301,10 +306,11 @@ unsigned int len;
+ 
+         */
+ 
+-static void Decode (output, input, len)
+-UINT4 *output;
+-const unsigned char *input;
+-unsigned int len;
++static void Decode (
++UINT4 *output,
++const unsigned char *input,
++unsigned int len
++)
+ {
+        unsigned int i, j; 
+ 
+@@ -317,10 +323,11 @@ unsigned int len;
+ 
+         */
+ 
+-static void MD5_memcpy (output, input, len)
+-POINTER output;
+-POINTER input;
+-unsigned int len;
++static void MD5_memcpy (
++POINTER output,
++POINTER input,
++unsigned int len
++)
+ {
+        unsigned int i; 
+ 
+@@ -331,10 +338,11 @@ unsigned int len;
+ /* Note: Replace "for loop" with standard memset if possible.
+ */
+ 
+-static void MD5_memset (output, value, len)
+-POINTER output;
+-int value;
+-unsigned int len;
++static void MD5_memset (
++POINTER output,
++int value,
++unsigned int len
++)
+ {
+        unsigned int i; 
+ 
+@@ -452,12 +460,13 @@ void _sasl_hmac_md5_final(unsigned char
+ }
+ 
+ 
+-void _sasl_hmac_md5(text, text_len, key, key_len, digest)
+-const unsigned char* text; /* pointer to data stream */
+-int text_len; /* length of data stream */
+-const unsigned char* key; /* pointer to authentication key */
+-int key_len; /* length of authentication key */
+-unsigned char *digest; /* caller digest to be filled in */
++void _sasl_hmac_md5(
++const unsigned char* text, /* pointer to data stream */
++int text_len, /* length of data stream */
++const unsigned char* key, /* pointer to authentication key */
++int key_len, /* length of authentication key */
++unsigned char *digest /* caller digest to be filled in */
++)
+ {
+   MD5_CTX context; 
+ 

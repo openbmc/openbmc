@@ -1,0 +1,25 @@
+From ea9ce6ae6154660f2a1dc7a73aedf906cc935a72 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 12 Apr 2026 16:38:28 -0700
+Subject: [PATCH] cleanup: modernize sendfile_tcp_stream signature from K&R to ANSI C style
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/nettest_bsd.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/nettest_bsd.c b/src/nettest_bsd.c
+index 36f5810..e7feb83 100644
+--- a/src/nettest_bsd.c
++++ b/src/nettest_bsd.c
+@@ -4270,8 +4270,7 @@ Size (bytes)\n\
+    all it knows, nothig is different. */
+
+ void
+-sendfile_tcp_stream(remote_host)
+-     char	remote_host[];
++sendfile_tcp_stream (char	remote_host[])
+ {
+
+   char *tput_title = "\

@@ -1,0 +1,92 @@
+From b0ecadec662a8e35b017e16e92c5b1a04ed72598 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sat, 11 Apr 2026 00:24:17 -0700
+Subject: [PATCH] sd/malloc: convert K&R function declarations to ANSI C
+ prototypes
+
+Replace old-style K&R parameter declarations with modern ANSI C
+(C89/C90) function prototypes across all functions in malloc.c.
+Also remove trailing whitespace in fixup_null_alloc().
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/sd/malloc.c | 23 ++++++++---------------
+ 1 file changed, 8 insertions(+), 15 deletions(-)
+
+diff --git a/src/sd/malloc.c b/src/sd/malloc.c
+index 7d241ad..43dd460 100644
+--- a/src/sd/malloc.c
++++ b/src/sd/malloc.c
+@@ -41,8 +41,7 @@ typedef void (*sd_malloc_handler_t)();
+ static sd_malloc_handler_t handler  = NULL;
+ 
+ static void *
+-fixup_null_alloc (n)
+-    size_t n;
++fixup_null_alloc (size_t n)
+ {
+     void* p = 0;
+ 
+@@ -62,8 +61,8 @@ fixup_null_alloc (n)
+ 	    allocated = (char *) sbrk (0) - (char *) &environ;
+ 	sd_error("\nCannot allocate %lu bytes after allocating %lu bytes\n",
+ 		 (unsigned long) n, (unsigned long) allocated);
+-	
+-	if (handler) 
++
++	if (handler)
+ 	    handler();
+ 	else {
+ 	    sd_error("\n\tMemory exhausted !! Aborting.\n");
+@@ -75,8 +74,7 @@ fixup_null_alloc (n)
+ }
+ 
+ sd_malloc_handler_t
+-sd_malloc_set_handler(a_handler)
+-    sd_malloc_handler_t a_handler;
++sd_malloc_set_handler(sd_malloc_handler_t a_handler)
+ {
+     sd_malloc_handler_t previous = handler;
+ 
+@@ -87,8 +85,7 @@ sd_malloc_set_handler(a_handler)
+ /* Allocate N bytes of memory dynamically, with error checking.  */
+ 
+ void *
+-sd_malloc (n)
+-    size_t n;
++sd_malloc (size_t n)
+ {
+     void *p;
+ 
+@@ -101,8 +98,7 @@ sd_malloc (n)
+ /* Allocate memory for N elements of S bytes, with error checking.  */
+ 
+ void *
+-sd_calloc (n, s)
+-    size_t n, s;
++sd_calloc (size_t n, size_t s)
+ {
+     void *p;
+ 
+@@ -117,9 +113,7 @@ sd_calloc (n, s)
+    If P is NULL, run sd_malloc.  */
+ 
+ void *
+-sd_realloc (p, n)
+-    void *p;
+-    size_t n;
++sd_realloc (void *p, size_t n)
+ {
+     if (p == 0)
+ 	return sd_malloc (n);
+@@ -132,8 +126,7 @@ sd_realloc (p, n)
+ /* Return a newly allocated copy of STRING.  */
+ 
+ char *
+-sd_strdup (string)
+-     const char *string;
++sd_strdup (const char *string)
+ {
+   return strcpy (sd_malloc (strlen (string) + 1), string);
+ }

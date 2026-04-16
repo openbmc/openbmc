@@ -9,15 +9,15 @@ XFCE_COMPRESS_TYPE = "xz"
 XFCEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk-doc"
 
-inherit xfce gobject-introspection features_check mime-xdg perlnative gtk-doc
-
-REQUIRED_DISTRO_FEATURES = "x11"
+inherit xfce gobject-introspection mime-xdg perlnative gtk-doc
 
 SRC_URI[sha256sum] = "eddbd4bab29c73718734e0bfcf650ceea8b4fcc8cb2cbb0b24fe22b286a2be00"
 
+SRC_URI += "file://0001-Properly-guard-gdkx.h-include.patch"
+
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"
 PACKAGECONFIG[pcre] = "-Dpcre2=enabled,-Dpcre2=disabled,libpcre2"
-PACKAGECONFIG[x11] = "-Dx11=enabled -Dsession-management=enabled,-Dx11=disabled,libsm startup-notification"
+PACKAGECONFIG[x11] = "-Dx11=enabled -Dsession-management=enabled,-Dx11=disabled,libsm startup-notification virtual/libx11"
 
 FILES:${PN} += " \
     ${libdir}/thunarx-3/* \

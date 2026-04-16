@@ -1,0 +1,62 @@
+From 5ea04d70221a18cbd711a9d570c81ef0b9be6765 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 10 Apr 2026 18:41:04 -0700
+Subject: [PATCH] compat: convert K&R function definitions to ANSI C prototypes
+
+Replace old-style K&R parameter declarations with modern ANSI C
+function prototypes in basename.c, dirname.c, and strmode.c.
+
+Required for compatibility with clang 22 under -std=gnu23, which
+no longer supports K&R-style function definitions.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ compat/basename.c | 3 +--
+ compat/dirname.c  | 3 +--
+ compat/strmode.c  | 4 +---
+ 3 files changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/compat/basename.c b/compat/basename.c
+index 2ac1e13..7b0384a 100644
+--- a/compat/basename.c
++++ b/compat/basename.c
+@@ -36,8 +36,7 @@ static char rcsid[] = "$OpenBSD: basename.c,v 1.4 1999/05/30 17:10:30 espie Exp
+ #include <sys/param.h>
+ 
+ char *
+-openbsd_basename(path)
+-	const char *path;
++openbsd_basename(const char *path)
+ {
+ 	static char bname[MAXPATHLEN];
+ 	register const char *endp, *startp;
+diff --git a/compat/dirname.c b/compat/dirname.c
+index 986db4a..6c1231d 100644
+--- a/compat/dirname.c
++++ b/compat/dirname.c
+@@ -36,8 +36,7 @@ static char rcsid[] = "$OpenBSD: dirname.c,v 1.4 1999/05/30 17:10:30 espie Exp $
+ #include <sys/param.h>
+ 
+ char *
+-openbsd_dirname(path)
+-	const char *path;
++openbsd_dirname (const char *path)
+ {
+ 	static char bname[MAXPATHLEN];
+ 	register const char *endp;
+diff --git a/compat/strmode.c b/compat/strmode.c
+index 5e7f15e..2ffab61 100644
+--- a/compat/strmode.c
++++ b/compat/strmode.c
+@@ -40,9 +40,7 @@ static char *rcsid = "$OpenBSD: strmode.c,v 1.3 1997/06/13 13:57:20 deraadt Exp
+ #include <string.h>
+ 
+ void
+-strmode(mode, p)
+-	register mode_t mode;
+-	register char *p;
++strmode (register mode_t mode, register char *p)
+ {
+ 	 /* print type */
+ 	switch (mode & S_IFMT) {

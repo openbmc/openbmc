@@ -1,0 +1,44 @@
+From 27f417f4812e688a59fc5186b7768cec004cd6e5 Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <peter.kjellerstedt@gmail.com>
+Date: Wed, 8 Apr 2026 05:58:49 +0200
+Subject: [PATCH] Support building with --disable-maintainer-mode and source !=
+ build dir (#3518)
+
+If --disable-maintainer-mode is enabled, then the rules for generating
+parser.[ch] and lexer.[ch] did nothing. This worked fine if the source
+and build directories are the same as the pre-generated parser.c and
+lexer.c files would suffice. However, if the build directory is not the
+same as the source directory, then the rest of the Make rules expect
+parser.[ch] and lexer.[ch] to have been created in the build directory
+if their source files (parser.y and lexer.l) are newer than the target
+files, which can happen in case the source is fetched using Git.
+
+Avoid the problem by copying the files to the build directory if needed.
+
+Co-authored-by: Peter Kjellerstedt <pkj@axis.com>
+Upstream-Status: Backport [https://github.com/jqlang/jq/commit/27f417f4812e688a59fc5186b7768cec004cd6e5]
+---
+ Makefile.am | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 96d6038..acb9443 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -41,9 +41,14 @@ src/lexer.h: src/lexer.c
+ else
+ BUILT_SOURCES = src/builtin.inc src/config_opts.inc src/version.h
+ .y.c:
+-	$(AM_V_YACC) echo "NOT building parser.c!"
++	$(AM_V_YACC) [ "$(<D)" = "$(@D)" ] || cp $(<D)/$(@F) $@
++	$(AM_V_YACC) [ "$(<D)" = "$(@D)" ] || cp $(<D)/$(*F).h $*.h
++	$(AM_V_YACC) touch $@ $*.h
++
+ .l.c:
+-	$(AM_V_LEX) echo "NOT building lexer.c!"
++	$(AM_V_LEX) [ "$(<D)" = "$(@D)" ] || cp $(<D)/$(@F) $@
++	$(AM_V_LEX) [ "$(<D)" = "$(@D)" ] || cp $(<D)/$(*F).h $*.h
++	$(AM_V_LEX) touch $@ $*.h
+ endif
+ 
+ # Tell YACC (Bison) autoconf macros that you want a header file created.

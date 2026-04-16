@@ -1,0 +1,32 @@
+From cd54486bdced460c174fcb98680ad5ffe64f906a Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 13 Apr 2026 19:09:24 -0700
+Subject: [PATCH] colcomp: sntp/libpkgver/colcomp.c: Convert K&R function
+ definition to ANSI C style
+
+Replace old-style K&R function declaration with modern ANSI C prototype
+syntax for colcomp(). Also remove trailing whitespace after return type.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ sntp/libpkgver/colcomp.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/sntp/libpkgver/colcomp.c b/sntp/libpkgver/colcomp.c
+index 4b151e3..29ecb3e 100644
+--- a/sntp/libpkgver/colcomp.c
++++ b/sntp/libpkgver/colcomp.c
+@@ -33,10 +33,8 @@
+ #endif
+ 
+ 
+-int 
+-colcomp (s1, s2)
+-     register char *s1;
+-     register char *s2;
++int
++colcomp (register char *s1, register char *s2)
+ {
+   int hilo = 0;			/* comparison value */
+ 

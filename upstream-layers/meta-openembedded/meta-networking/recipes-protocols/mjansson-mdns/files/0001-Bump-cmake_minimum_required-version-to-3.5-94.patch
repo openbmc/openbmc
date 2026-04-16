@@ -1,0 +1,21 @@
+From ab8f4118469d7a0bb83b9fcb88fe53482c35f0cb Mon Sep 17 00:00:00 2001
+From: skrede <code@skrede.me>
+Date: Sun, 26 Oct 2025 14:35:05 +0100
+Subject: [PATCH] Bump cmake_minimum_required version to 3.5 (#94)
+
+Upstream-Status: Backport [https://github.com/mjansson/mdns/commit/ab8f4118469d7a0bb83b9fcb88fe53482c35f0cb]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 1bce26d..50f1f05 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.0)
++cmake_minimum_required(VERSION 3.5)
+ project(mdns VERSION 1.4.2 LANGUAGES C)
+ 
+ option(MDNS_BUILD_EXAMPLE "build example" ON)

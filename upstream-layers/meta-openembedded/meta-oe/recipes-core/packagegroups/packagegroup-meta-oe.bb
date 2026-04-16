@@ -836,7 +836,6 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     nss \
     numactl \
     onig \
-    openct \
     opencv \
     openldap \
     opensc \

@@ -3,17 +3,13 @@ HOMEPAGE = "https://docs.xfce.org/xfce/xfce4-panel/start"
 SECTION = "x11"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=26a8bd75d8f8498bdbbe64a27791d4ee"
-DEPENDS = "garcon exo gtk+3 cairo virtual/libx11 libxfce4windowing libxml2 \
-           libwnck3 vala-native \
-           "
+DEPENDS = "garcon exo cairo libxml2 vala-native gtk+3 libxfce4windowing"
 
 XFCE_COMPRESS_TYPE = "xz"
 XFCEBASEBUILDCLASS = "meson"
 GTKDOC_MESON_OPTION = "gtk-doc"
 
 inherit xfce gtk-doc gobject-introspection features_check mime-xdg
-
-REQUIRED_DISTRO_FEATURES = "x11"
 
 SRC_URI += " \
     file://0001-windowmenu-do-not-display-desktop-icon-when-no-windo.patch \
@@ -23,6 +19,12 @@ SRC_URI += " \
 SRC_URI[sha256sum] = "c940dae515bef4af08a126011d2fd873ce99e815157ba8cef5332195bb60e51e"
 
 EXTRA_OEMESON += "-Dvala=disabled"
+
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'wayland x11', d)}"
+PACKAGECONFIG[x11] = "-Dx11=enabled, -Dx11=disabled, virtual/libx11 libwnck3 libxext"
+PACKAGECONFIG[wayland] = "-Dwayland=enabled, -Dwayland=disabled, wayland wayland-native wayland-protocols"
 
 python populate_packages:prepend() {
     plugin_dir = d.expand('${libdir}/xfce4/panel/plugins/')

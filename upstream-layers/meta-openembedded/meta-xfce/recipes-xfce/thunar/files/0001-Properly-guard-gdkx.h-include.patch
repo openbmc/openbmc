@@ -1,0 +1,37 @@
+From dd7fbf4540891053a4083228aac2485e6c469199 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Ga=C3=ABl=20Bonithon?= <gael@xfce.org>
+Date: Sat, 11 Apr 2026 18:07:05 +0200
+Subject: [PATCH] Properly guard gdkx.h include
+
+Fixes: #1820
+
+Upstream-Status: Backport [https://gitlab.xfce.org/xfce/thunar/-/commit/201f8ca0c3bc7b5e651201526fc3006a130718eb]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ thunar/thunar-session-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/thunar/thunar-session-client.c b/thunar/thunar-session-client.c
+index c36719c..2832818 100644
+--- a/thunar/thunar-session-client.c
++++ b/thunar/thunar-session-client.c
+@@ -30,6 +30,7 @@
+ 
+ #ifdef ENABLE_LIBSM
+ #include <X11/SM/SMlib.h>
++#include <gdk/gdkx.h>
+ #endif
+ 
+ #include "thunar/thunar-application.h"
+@@ -38,7 +39,6 @@
+ #include "thunar/thunar-private.h"
+ #include "thunar/thunar-session-client.h"
+ 
+-#include <gdk/gdkx.h>
+ #include <glib/gstdio.h>
+ 
+ 
+-- 
+2.34.1
+

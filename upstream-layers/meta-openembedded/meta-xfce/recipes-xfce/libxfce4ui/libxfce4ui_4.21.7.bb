@@ -3,7 +3,7 @@ HOMEPAGE = "https://docs.xfce.org/xfce/libxfce4ui/start"
 SECTION = "x11/libs"
 LICENSE = "LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=4cf66a4984120007c9881cc871cf49db"
-DEPENDS = "intltool-native perl-native gtk+3 libxfce4util xfce4-dev-tools xfconf"
+DEPENDS = "intltool-native perl-native gtk+3 libxfce4util xfce4-dev-tools xfconf gdk-pixbuf"
 
 XFCE_COMPRESS_TYPE = "xz"
 XFCEBASEBUILDCLASS = "meson"
@@ -26,7 +26,6 @@ SRC_URI[sha256sum] = "a72a7af39cf183819bcfb61b1747d425261e966ccb172b2fc28f1494f5
 
 EXTRA_OEMESON = "-Dvala=disabled -Dvendor-info=${DISTRO}"
 
-PACKAGECONFIG ??= " \
-       ${@bb.utils.contains('DISTRO_FEATURES', 'x11','x11', "", d)} \
-"
-PACKAGECONFIG[x11] = "-Dstartup-notification=enabled,-Dstartup-notification=disabled,libepoxy libice libsm startup-notification"
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'wayland x11', d)}"
+PACKAGECONFIG[x11] = "-Dsession-management=enabled -Dstartup-notification=enabled,-Dsession-management=disabled -Dstartup-notification=disabled,libepoxy libice libsm startup-notification"
+PACKAGECONFIG[wayland] = "-Dwayland=enabled, -Dwayland=disabled,"

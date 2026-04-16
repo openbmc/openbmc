@@ -1,0 +1,42 @@
+From bad5d689a69dca3d1dc3e7653946f1205661afbf Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Fri, 10 Apr 2026 13:25:39 +0800
+Subject: [PATCH 1/2] CMakeLists.txt: make CONFIGURATION_FILES_DIR aligned
+
+Commit [723e90e dlt: Adaptation for QNX build system with SDP 7.x
+(#609)], refer [1], make CONFIGURATION_FILES_DIR not aligned.  the CMake
+variable CONFIGURATION_FILES_DIR set to CMAKE_INSTALL_SYSCONFDIR, but
+the tell the compiler to define macro CONFIGURATION_FILES_DIR as
+${CMAKE_INSTALL_PREFIX}/${CONFIGURATION_FILES_DIR}.
+
+At least for linux, this will cause failure of the systemd service. Eg:
+if CMAKE_INSTALL_PREFIX is /usr, then the configuration file is
+installed under ${CONFIGURATION_FILES_DIR}, usually is /etc. But the
+application like dlt-daemon/dlt-system will find the default
+configuration file under /usr/etc. This makes service start failed.
+
+[1] https://github.com/COVESA/dlt-daemon/commit/723e90e77db91130375238a592b9a292302a32bb
+
+Upstream-Status: Submitted [https://github.com/COVESA/dlt-daemon/issues/848]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index bb9250f..821730a 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -289,7 +289,7 @@ endif()
+ 
+ set(CONFIGURATION_FILES_DIR ${CMAKE_INSTALL_SYSCONFDIR})
+ 
+-add_definitions(-DCONFIGURATION_FILES_DIR="${CMAKE_INSTALL_PREFIX}/${CONFIGURATION_FILES_DIR}")
++add_definitions(-DCONFIGURATION_FILES_DIR="${CONFIGURATION_FILES_DIR}")
+ 
+ add_subdirectory(cmake)
+ 
+-- 
+2.34.1
+

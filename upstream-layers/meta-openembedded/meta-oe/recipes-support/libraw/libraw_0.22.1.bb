@@ -11,3 +11,5 @@ DEPENDS = "jpeg jasper lcms"
 
 CVE_STATUS[CVE-2026-5318] = "fixed-version: fixed since 0.22.1"
 CVE_STATUS[CVE-2026-5342] = "fixed-version: fixed since 0.22.1"
+CVE_STATUS[CVE-2026-20884] = "fixed-version: fixed since 0.22.1"
+CVE_STATUS[CVE-2026-24450] = "fixed-version: fixed since 0.22.1"

@@ -1,4 +1,4 @@
-From 4b47a8f0e3d1d429356cdda8efa7682ab88d344a Mon Sep 17 00:00:00 2001
+From 8d93bb7c866f88dd7f2cac81d2acfcffae9d555d Mon Sep 17 00:00:00 2001
 From: Niko Mauno <niko.mauno@vaisala.com>
 Date: Sun, 29 Sep 2024 12:00:00 +0000
 Subject: [PATCH] lib: Do not use private makefile targets in CMakelists.txt
@@ -48,7 +48,7 @@ index 489570026..06d99cbbe 100644
  
  
 diff --git a/lib/cmetrics/CMakeLists.txt b/lib/cmetrics/CMakeLists.txt
-index 5421f8c80..0dcf7645c 100644
+index a3385a8ba..80170f8e7 100644
 --- a/lib/cmetrics/CMakeLists.txt
 +++ b/lib/cmetrics/CMakeLists.txt
 @@ -60,12 +60,8 @@ if(NOT MSVC)
@@ -67,11 +67,11 @@ index 5421f8c80..0dcf7645c 100644
  # Configuration options
  option(CMT_DEV                       "Enable development mode"                    No)
 diff --git a/lib/ctraces/CMakeLists.txt b/lib/ctraces/CMakeLists.txt
-index 73723433d..9f60699d5 100644
+index bb2c54fa6..7d59dd834 100644
 --- a/lib/ctraces/CMakeLists.txt
 +++ b/lib/ctraces/CMakeLists.txt
-@@ -30,12 +30,8 @@ set(CTR_VERSION_MINOR  6)
- set(CTR_VERSION_PATCH  6)
+@@ -30,12 +30,8 @@ set(CTR_VERSION_MINOR  7)
+ set(CTR_VERSION_PATCH  1)
  set(CTR_VERSION_STR "${CTR_VERSION_MAJOR}.${CTR_VERSION_MINOR}.${CTR_VERSION_PATCH}")
  
 -# Define __FILENAME__ consistently across Operating Systems
@@ -86,7 +86,7 @@ index 73723433d..9f60699d5 100644
  # Configuration options
  option(CTR_DEV             "Enable development mode"                   No)
 diff --git a/lib/monkey/CMakeLists.txt b/lib/monkey/CMakeLists.txt
-index 3fbace595..1c6ad031c 100644
+index 3dc1ef28a..2d08fc5fd 100644
 --- a/lib/monkey/CMakeLists.txt
 +++ b/lib/monkey/CMakeLists.txt
 @@ -15,10 +15,8 @@ include(GNUInstallDirs)

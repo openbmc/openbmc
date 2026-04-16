@@ -1,0 +1,35 @@
+From dce2cc2886a9097971856e69737cc5c05c9239ea Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Wed, 8 Apr 2026 10:54:25 +0200
+Subject: [PATCH] quill: use soft rdtsc fallback on 32-bit PowerPC
+
+Quill's rdtsc helper already avoids __rdtsc() on ARM and PPC64, but
+32-bit PowerPC was not included in that guard. On powerpc targets this
+falls through to the x86-specific intrinsic and fails with:
+
+  error: '__rdtsc' was not declared in this scope
+
+Treat common 32-bit PowerPC compiler define the same way as PPC64 and
+use the existing steady_clock-based fallback.
+
+Upstream-Status: Submitted [https://github.com/odygrd/quill/pull/911]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ dependencies/quill/include/quill/core/Rdtsc.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/dependencies/quill/include/quill/core/Rdtsc.h b/dependencies/quill/include/quill/core/Rdtsc.h
+index 3d0ae9f26..67f26cb89 100644
+--- a/dependencies/quill/include/quill/core/Rdtsc.h
++++ b/dependencies/quill/include/quill/core/Rdtsc.h
+@@ -100,7 +100,7 @@ QUILL_NODISCARD QUILL_ATTRIBUTE_HOT inline uint64_t rdtsc() noexcept
+   __asm__ volatile("stck %0" : "=Q"(tsc) : : "cc");
+   return tsc;
+ }
+-#elif (defined(_M_ARM) || defined(_M_ARM64) || defined(__PPC64__))
++#elif (defined(_M_ARM) || defined(_M_ARM64) || defined(__PPC64__) || defined(__PPC__))
+ QUILL_NODISCARD QUILL_ATTRIBUTE_HOT inline uint64_t rdtsc() noexcept
+ {
+   // soft failover
+-- 
+2.47.2

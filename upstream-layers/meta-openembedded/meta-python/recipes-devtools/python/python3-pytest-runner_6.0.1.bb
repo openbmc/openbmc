@@ -5,6 +5,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=7a7126e068206290f3fe9f8d6c713ea6"
 
 SRC_URI[sha256sum] = "70d4739585a7008f37bf4933c013fdb327b8878a5a69fcbb3316c88882f0f49b"
 
+SRC_URI += " \
+           file://0001-Not-use-functions-from-pkg_resources-any-more.patch \
+           "
+
 inherit pypi python_setuptools_build_meta
 
 DEPENDS += " \

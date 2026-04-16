@@ -15,7 +15,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 
 --- a/lib/replace/replace.h
 +++ b/lib/replace/replace.h
-@@ -815,50 +815,50 @@ typedef unsigned long long ptrdiff_t ;
+@@ -811,50 +811,50 @@ typedef unsigned long long ptrdiff_t ;
  /**
   * Zero a structure.
   */
@@ -74,7 +74,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  
  /**
   * Explicitly zero data in string. This is guaranteed to be not optimized
-@@ -867,7 +867,7 @@ typedef unsigned long long ptrdiff_t ;
+@@ -863,7 +863,7 @@ typedef unsigned long long ptrdiff_t ;
  #define BURN_STR(x)	do { \
  				if ((x) != NULL) { \
  					size_t s = strlen(x); \
@@ -192,117 +192,4 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +	expect_value(rep_memset_explicit, count, strlen(password) + 1);
  
  	talloc_free(mem_ctx);
- }
---- a/lib/cmdline/cmdline.c
-+++ b/lib/cmdline/cmdline.c
-@@ -358,7 +358,7 @@ bool samba_cmdline_burn(int argc, char *
- 				p += ulen;
- 			}
- 
--			memset_s(p, strlen(p), '\0', strlen(p));
-+			memset_explicit(p, '\0', strlen(p));
- 			burnt = true;
- 		}
- 	}
---- a/lib/util/data_blob.c
-+++ b/lib/util/data_blob.c
-@@ -1,19 +1,19 @@
--/* 
-+/*
-    Unix SMB/CIFS implementation.
-    Easy management of byte-length data
-    Copyright (C) Andrew Tridgell 2001
-    Copyright (C) Andrew Bartlett 2001
--   
-+
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 3 of the License, or
-    (at your option) any later version.
--   
-+
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
--   
-+
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-@@ -67,7 +67,7 @@ _PUBLIC_ DATA_BLOB data_blob_talloc_name
- }
- 
- /**
-- construct a zero data blob, using supplied TALLOC_CTX. 
-+ construct a zero data blob, using supplied TALLOC_CTX.
-  use this sparingly as it initialises data - better to initialise
-  yourself if you want specific data in the blob
- **/
-@@ -95,7 +95,7 @@ clear a DATA_BLOB's contents
- _PUBLIC_ void data_blob_clear(DATA_BLOB *d)
- {
- 	if (d->data) {
--		memset_s(d->data, d->length, 0, d->length);
-+		memset_explicit(d->data, 0, d->length);
- 	}
- }
- 
-@@ -219,7 +219,7 @@ _PUBLIC_ DATA_BLOB data_blob_string_cons
- }
- 
- /**
-- * Create a new data blob from const data 
-+ * Create a new data blob from const data
-  */
- 
- _PUBLIC_ DATA_BLOB data_blob_const(const void *p, size_t length)
-@@ -266,7 +266,7 @@ _PUBLIC_ bool data_blob_append(TALLOC_CT
- 	if ((const uint8_t *)p + length < (const uint8_t *)p) {
- 		return false;
- 	}
--	
-+
- 	if (!data_blob_realloc(mem_ctx, blob, new_len)) {
- 		return false;
- 	}
---- a/lib/util/talloc_keep_secret.c
-+++ b/lib/util/talloc_keep_secret.c
-@@ -22,27 +22,13 @@
- 
- static int talloc_keep_secret_destructor(void *ptr)
- {
--	int ret;
- 	size_t size = talloc_get_size(ptr);
- 
- 	if (unlikely(size == 0)) {
- 		return 0;
- 	}
- 
--	ret = memset_s(ptr, size, 0, size);
--	if (unlikely(ret != 0)) {
--		char *msg = NULL;
--		int ret2;
--		ret2 = asprintf(&msg,
--				"talloc_keep_secret_destructor: memset_s() failed: %s",
--				strerror(ret));
--		if (ret2 != -1) {
--			smb_panic(msg);
--		} else {
--			smb_panic("talloc_keep_secret_destructor: memset_s() failed");
--		}
--	}
--
-+	memset_explicit(ptr, 0, size);
- 	return 0;
- }
- 
---- a/librpc/ndr/util.c
-+++ b/librpc/ndr/util.c
-@@ -32,5 +32,5 @@ _PUBLIC_ void ndr_print_sockaddr_storage
- 
- _PUBLIC_ void ndr_zero_memory(void *ptr, size_t len)
- {
--	memset_s(ptr, len, 0, len);
-+	memset_explicit(ptr, 0, len);
  }

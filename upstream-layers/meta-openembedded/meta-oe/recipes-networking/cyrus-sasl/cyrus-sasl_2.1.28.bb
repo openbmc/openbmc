@@ -20,6 +20,7 @@ SRC_URI = " \
     file://0001-configure-prototypes.patch \
     file://0002-Fix-incompatible-pointer-types-error-with-gcc-15.patch \
     file://0003-Add-compatibility-for-gcc-15-869.patch \
+    file://0001-style-convert-K-R-function-definitions-to-ANSI-C-sty.patch \
 "
 
 UPSTREAM_CHECK_URI = "https://github.com/cyrusimap/cyrus-sasl/archives"

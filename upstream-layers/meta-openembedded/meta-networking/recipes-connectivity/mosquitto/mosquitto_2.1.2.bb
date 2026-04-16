@@ -57,6 +57,8 @@ do_install:append() {
         -e 's,@LOCALSTATEDIR@,${localstatedir},g' \
         -e 's,@SYSCONFDIR@,${sysconfdir},g' \
         ${D}${sysconfdir}/init.d/mosquitto
+
+    install -m 0644 ${S}/mosquitto.conf ${D}${sysconfdir}/mosquitto/mosquitto.conf
 }
 
 PACKAGE_BEFORE_PN = "libmosquitto1 libmosquittopp1 ${PN}-clients ${PN}-examples"
