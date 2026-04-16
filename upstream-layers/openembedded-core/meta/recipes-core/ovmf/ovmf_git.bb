@@ -26,6 +26,8 @@ SRC_URI = "gitsm://github.com/tianocore/edk2.git;branch=master;protocol=https;ta
            file://0003-debug-prefix-map.patch \
            file://0004-reproducible.patch \
            file://0005-UefiCpuPkg-CpuExceptionHandlerLib-fix-push-instructi.patch \
+           file://0001-BaseTools-StringFuncs-fix-gcc-16-warning.patch \
+           file://0002-BaseTools-EfiRom-fix-compiler-warning.patch \
            "
 
 PV = "edk2-stable202511"
@@ -45,6 +47,7 @@ CVE_STATUS[CVE-2019-14563] = "fixed-version: The CPE in the NVD database doesn't
 CVE_STATUS[CVE-2019-14575] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 CVE_STATUS[CVE-2019-14586] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 CVE_STATUS[CVE-2019-14587] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
+CVE_STATUS[CVE-2024-1298] = "fixed-version: fixed since edk2-stable202405"
 
 inherit deploy
 

@@ -32,6 +32,7 @@ PACKAGECONFIG[sqlite] = "--enable-sqlite,--disable-sqlite,sqlite3"
 PACKAGECONFIG[monitor] = "--enable-monitor,--disable-monitor,ncurses json-c"
 PACKAGECONFIG[python3-probes] = "--with-python3-probes,--without-python3-probes,python3-setuptools-native"
 PACKAGECONFIG[debuginfod] = "--with-debuginfod, --without-debuginfod"
+PACKAGECONFIG[readline] = "--with-readline,--without-readline,readline"
 
 inherit autotools gettext pkgconfig systemd
 inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python3-probes', 'setuptools3-base', '', d)}

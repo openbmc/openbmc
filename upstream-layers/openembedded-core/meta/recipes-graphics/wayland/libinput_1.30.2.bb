@@ -13,6 +13,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=bab4ac7dc1c10bc0fb037dc76c46ef8a"
 DEPENDS = "libevdev udev"
 
 SRC_URI = "git://gitlab.freedesktop.org/libinput/libinput.git;protocol=https;branch=1.30-branch;tag=${PV} \
+           file://CVE-2026-35093.patch \
+           file://CVE-2026-35094.patch \
            file://run-ptest \
            "
 SRCREV = "042c5e6fd9cc910307027a1522453794b29f2c72"

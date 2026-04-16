@@ -1,0 +1,104 @@
+From 41cfa5498ab37b67ae474abc88f08c9ef1bf9cc3 Mon Sep 17 00:00:00 2001
+From: Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
+Date: Wed, 4 Mar 2026 15:09:06 +0530
+Subject: [PATCH] Qualcomm: glymur: Add GLYMUR CRD HiFi config
+
+Add UCM2 configs for the Qualcomm GLYMUR CRD Board.
+
+Upstream-Status: Backport
+[https://github.com/alsa-project/alsa-ucm-conf/commit/41cfa5498ab37b67ae474abc88f08c9ef1bf9cc3]
+Closes: https://github.com/alsa-project/alsa-ucm-conf/pull/713
+Signed-off-by: Mohammad Rafi Shaik <mohammad.rafi.shaik@oss.qualcomm.com>
+Signed-off-by: Jaroslav Kysela <perex@perex.cz>
+---
+ ucm2/Qualcomm/glymur/GLYMUR-CRD.conf | 11 +++++++
+ ucm2/Qualcomm/glymur/HiFi.conf       | 49 ++++++++++++++++++++++++++++
+ ucm2/conf.d/glymur/GLYMUR-CRD.conf   |  1 +
+ 3 files changed, 61 insertions(+)
+ create mode 100755 ucm2/Qualcomm/glymur/GLYMUR-CRD.conf
+ create mode 100755 ucm2/Qualcomm/glymur/HiFi.conf
+ create mode 120000 ucm2/conf.d/glymur/GLYMUR-CRD.conf
+
+diff --git a/ucm2/Qualcomm/glymur/GLYMUR-CRD.conf b/ucm2/Qualcomm/glymur/GLYMUR-CRD.conf
+new file mode 100755
+index 0000000..15deae9
+--- /dev/null
++++ b/ucm2/Qualcomm/glymur/GLYMUR-CRD.conf
+@@ -0,0 +1,11 @@
++Syntax 4
++
++SectionUseCase."HiFi" {
++	File "/Qualcomm/glymur/HiFi.conf"
++	Comment "HiFi quality Music."
++}
++
++Include.card-init.File "/lib/card-init.conf"
++Include.ctl-remap.File "/lib/ctl-remap.conf"
++Include.wsa-init.File "/codecs/wsa884x/four-speakers/init.conf"
++Include.wsam-init.File "/codecs/qcom-lpass/wsa-macro/four-speakers/init.conf"
+diff --git a/ucm2/Qualcomm/glymur/HiFi.conf b/ucm2/Qualcomm/glymur/HiFi.conf
+new file mode 100755
+index 0000000..7419c1e
+--- /dev/null
++++ b/ucm2/Qualcomm/glymur/HiFi.conf
+@@ -0,0 +1,49 @@
++# Use case configuration for X1E80100.
++# Author: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
++
++SectionVerb {
++	EnableSequence [
++		cset "name='WSA_CODEC_DMA_RX_0 Audio Mixer MultiMedia1' 1"
++		cset "name='MultiMedia2 Mixer VA_CODEC_DMA_TX_0' 1"
++	]
++
++	Include.wsae.File "/codecs/wsa884x/four-speakers/DefaultEnableSeq.conf"
++	Include.wsm1e.File "/codecs/qcom-lpass/wsa-macro/Wsa1SpeakerEnableSeq.conf"
++	Include.wsm2e.File "/codecs/qcom-lpass/wsa-macro/Wsa2SpeakerEnableSeq.conf"
++
++	Value {
++		TQ "HiFi"
++	}
++}
++
++SectionDevice."Speaker" {
++	Comment "Speaker playback"
++
++	Include.wsmspk1e.File "/codecs/qcom-lpass/wsa-macro/Wsa1SpeakerEnableSeq.conf"
++	Include.wsmspk2e.File "/codecs/qcom-lpass/wsa-macro/Wsa2SpeakerEnableSeq.conf"
++	Include.wsmspk1d.File "/codecs/qcom-lpass/wsa-macro/Wsa1SpeakerDisableSeq.conf"
++	Include.wsmspk2d.File "/codecs/qcom-lpass/wsa-macro/Wsa2SpeakerDisableSeq.conf"
++	Include.wsaspk.File "/codecs/wsa884x/four-speakers/SpeakerSeq.conf"
++
++	Value {
++		PlaybackChannels 4
++		PlaybackPriority 100
++		PlaybackPCM "hw:${CardId},0"
++		PlaybackMixer "default:${CardId}"
++		PlaybackMixerElem "Speakers"
++	}
++}
++
++SectionDevice."Mic" {
++	Comment "Internal microphones"
++
++	Include.vadm0e.File "/codecs/qcom-lpass/va-macro/DMIC0EnableSeq.conf"
++	Include.vadm0d.File "/codecs/qcom-lpass/va-macro/DMIC0DisableSeq.conf"
++	Include.vadm1e.File "/codecs/qcom-lpass/va-macro/DMIC1EnableSeq.conf"
++	Include.vadm1d.File "/codecs/qcom-lpass/va-macro/DMIC1DisableSeq.conf"
++
++	Value {
++		CapturePriority 100
++		CapturePCM "hw:${CardId},1"
++	}
++}
+diff --git a/ucm2/conf.d/glymur/GLYMUR-CRD.conf b/ucm2/conf.d/glymur/GLYMUR-CRD.conf
+new file mode 120000
+index 0000000..f90f419
+--- /dev/null
++++ b/ucm2/conf.d/glymur/GLYMUR-CRD.conf
+@@ -0,0 +1 @@
++../../Qualcomm/glymur/GLYMUR-CRD.conf
+\ No newline at end of file
+-- 
+2.34.1
+

@@ -1,0 +1,42 @@
+From b5a3a8b28b7616403d5454f5f1816c933c34cdac Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@redhat.com>
+Date: Thu, 21 Aug 2025 16:58:54 -0500
+Subject: [PATCH 2/3] openssl: check return value of g_tls_bio_alloc()
+
+This function may fail, in which case the parameter remains
+uninitialized. We'd better not dereference it in that case.
+
+CVE: CVE-2025-60019
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tls/openssl/gtlsbio.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/tls/openssl/gtlsbio.c b/tls/openssl/gtlsbio.c
+index 0f603fe..1e54943 100644
+--- a/tls/openssl/gtlsbio.c
++++ b/tls/openssl/gtlsbio.c
+@@ -370,7 +370,8 @@ g_tls_bio_new_from_iostream (GIOStream *io_stream)
+   GTlsBio *gbio;
+ 
+   ret = g_tls_bio_alloc (&gbio);
+-  gbio->io_stream = g_object_ref (io_stream);
++  if (ret)
++    gbio->io_stream = g_object_ref (io_stream);
+ 
+   return ret;
+ }
+@@ -382,7 +383,8 @@ g_tls_bio_new_from_datagram_based (GDatagramBased *socket)
+   GTlsBio *gbio;
+ 
+   ret = g_tls_bio_alloc (&gbio);
+-  gbio->socket = g_object_ref (socket);
++  if (ret)
++    gbio->socket = g_object_ref (socket);
+ 
+   return ret;
+ }
+-- 
+2.43.0
+

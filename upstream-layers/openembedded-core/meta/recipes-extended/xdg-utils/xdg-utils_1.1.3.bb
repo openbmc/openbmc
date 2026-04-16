@@ -36,3 +36,5 @@ REQUIRED_DISTRO_FEATURES = "x11"
 
 DEPENDS = "xmlto-native libxslt-native"
 RDEPENDS:${PN} += "xprop"
+
+CVE_STATUS[CVE-2025-52968] = "disputed"

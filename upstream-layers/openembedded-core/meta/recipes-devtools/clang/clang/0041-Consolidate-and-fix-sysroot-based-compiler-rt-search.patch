@@ -1,0 +1,105 @@
+From b818a92ac171e80e39ad9e99d1f862d23f2bb5b3 Mon Sep 17 00:00:00 2001
+From: "mark.yang" <mark.yang@lge.com>
+Date: Tue, 14 Apr 2026 16:17:01 +0900
+Subject: [PATCH] Consolidate and fix sysroot-based compiler-rt search paths
+
+Consolidate patches 0008 and 0033 into a single patch with a fix for
+native builds.
+
+Background:
+In Yocto/OE, compiler-rt and libc++ are built as separate recipes and
+installed into the target sysroot, not into clang's resource directory
+(which is relative to the clang driver installation).
+Patches 0008 (getCompilerRTPath, Khem Raj, 2017) and 0033 (getRuntimePath and
+getArchSpecificLibPaths, Khem Raj, 2025) addressed this by changing the
+runtime library search base from ResourceDir to SysRoot-based paths.
+
+Problem:
+The patches unconditionally replaced ResourceDir with a SysRoot-based
+path using CLANG_VERSION_STRING. In native/standalone builds where
+SysRoot is empty, this produces invalid absolute paths like
+"/usr/lib/clang/<full-version>/" pointing to the host filesystem instead of the
+build tree's resource directory. This breaks PGO bootstrap and any other
+native workflow that depends on compiler-rt runtime libraries
+(e.g., -fprofile-generate cannot find libclang_rt.profile.a).
+
+Fix:
+Use SysRoot-based paths only when SysRoot is actually set (i.e., during
+cross-compilation). When SysRoot is empty (native/standalone builds),
+fall back to the upstream default ResourceDir, which correctly resolves
+to the build tree's resource directory.
+
+The following functions are updated with this conditional logic:
+- getCompilerRTPath()
+- getRuntimePath()
+- getArchSpecificLibPaths()
+
+Upstream-Status: Inappropriate [OE-Specific]
+Signed-off-by: mark.yang <mark.yang@lge.com>
+---
+ clang/lib/Driver/ToolChain.cpp | 31 ++++++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
+
+diff --git a/clang/lib/Driver/ToolChain.cpp b/clang/lib/Driver/ToolChain.cpp
+index 77a2c73f0..ac28b51c4 100644
+--- a/clang/lib/Driver/ToolChain.cpp
++++ b/clang/lib/Driver/ToolChain.cpp
+@@ -15,6 +15,7 @@
+ #include "ToolChains/InterfaceStubs.h"
+ #include "clang/Basic/ObjCRuntime.h"
+ #include "clang/Basic/Sanitizers.h"
++#include "clang/Basic/Version.h"
+ #include "clang/Config/config.h"
+ #include "clang/Driver/Action.h"
+ #include "clang/Driver/CommonArgs.h"
+@@ -723,7 +724,15 @@ StringRef ToolChain::getOSLibName() const {
+ }
+ 
+ std::string ToolChain::getCompilerRTPath() const {
+-  SmallString<128> Path(getDriver().ResourceDir);
++  SmallString<128> Path;
++  if (!getDriver().SysRoot.empty()) {
++    Path = getDriver().SysRoot;
++    StringRef ClangLibdirBasename(CLANG_INSTALL_LIBDIR_BASENAME);
++    llvm::sys::path::append(Path, "/usr/", ClangLibdirBasename, "clang",
++                              CLANG_VERSION_STRING);
++  } else {
++    Path = getDriver().ResourceDir;
++  }
+   if (isBareMetal()) {
+     llvm::sys::path::append(Path, "lib", getOSLibName());
+     if (!SelectedMultilibs.empty()) {
+@@ -1021,7 +1030,15 @@ ToolChain::getTargetSubDirPath(StringRef BaseDir) const {
+ }
+ 
+ std::optional<std::string> ToolChain::getRuntimePath() const {
+-  SmallString<128> P(D.ResourceDir);
++  SmallString<128> P;
++  if (!D.SysRoot.empty()) {
++    P = D.SysRoot;
++    StringRef ClangLibdirBasename(CLANG_INSTALL_LIBDIR_BASENAME);
++    llvm::sys::path::append(P, "/usr/", ClangLibdirBasename, "clang",
++                            CLANG_VERSION_STRING);
++  } else {
++    P = D.ResourceDir;
++  }
+   llvm::sys::path::append(P, "lib");
+   if (auto Ret = getTargetSubDirPath(P))
+     return Ret;
+@@ -1049,7 +1066,15 @@ ToolChain::path_list ToolChain::getArchSpecificLibPaths() const {
+   path_list Paths;
+ 
+   auto AddPath = [&](const ArrayRef<StringRef> &SS) {
+-    SmallString<128> Path(getDriver().ResourceDir);
++    SmallString<128> Path;
++    if (!getDriver().SysRoot.empty()) {
++      Path = getDriver().SysRoot;
++      StringRef ClangLibdirBasename(CLANG_INSTALL_LIBDIR_BASENAME);
++      llvm::sys::path::append(Path, "/usr/", ClangLibdirBasename, "clang",
++                              CLANG_VERSION_STRING);
++    } else {
++      Path = getDriver().ResourceDir;
++    }
+     llvm::sys::path::append(Path, "lib");
+     for (auto &S : SS)
+       llvm::sys::path::append(Path, S);

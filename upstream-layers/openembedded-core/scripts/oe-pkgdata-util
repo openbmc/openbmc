@@ -237,7 +237,27 @@ def lookup_pkg(args):
 
     if len(mappings) < len(pkgs):
         missing = list(set(pkgs) - set(mappings.keys()))
-        logger.error("The following packages could not be found: %s" % ', '.join(missing))
+        for pkg in missing:
+            providepkgpath = os.path.join(args.pkgdata_dir, "runtime-rprovides", pkg)
+            if os.path.exists(providepkgpath):
+                providers = os.listdir(providepkgpath)
+                for provider in providers:
+                    if provider == pkg:
+                        continue
+                    pn = ""
+                    pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", provider)
+                    if os.path.exists(pkgdatafile):
+                        with open(pkgdatafile, 'r') as f:
+                            for line in f:
+                                if line.startswith('PN:'):
+                                    pn = line.split(':', 1)[1].strip()
+                                    break
+                    if os.path.exists(os.path.join(args.pkgdata_dir, "runtime", "%s.packaged" % provider)):
+                        logger.error("%s is in the RPROVIDES of %s (recipe: %s), try looking up '%s' instead" % (pkg, provider, pn or "unknown", provider))
+                    else:
+                        logger.error("%s is in the RPROVIDES of %s (recipe: %s), but the package was not generated (e.g. empty package or disabled PACKAGECONFIG)" % (pkg, provider, pn or "unknown"))
+            else:
+                logger.error("The following packages could not be found: %s" % pkg)
         sys.exit(1)
 
     if args.reverse:

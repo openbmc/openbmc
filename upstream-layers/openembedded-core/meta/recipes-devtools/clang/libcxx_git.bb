@@ -31,6 +31,11 @@ LIC_FILES_CHKSUM = "file://libcxx/LICENSE.TXT;md5=55d89dd7eec8d3b4204b680e27da39
 OECMAKE_TARGET_COMPILE = "cxxabi cxx"
 OECMAKE_TARGET_INSTALL = "install-cxxabi install-cxx"
 
+# LLVM libunwind.a needed for static Rust musl builds.
+# GNU libunwind never produces .a on musl so no collision risk.
+OECMAKE_TARGET_COMPILE:append:libc-musl = " unwind"
+OECMAKE_TARGET_INSTALL:append:libc-musl = " install-unwind"
+
 CC = "${CCACHE}${HOST_PREFIX}clang ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
 CXX = "${CCACHE}${HOST_PREFIX}clang++ ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
 BUILD_CC = "${CCACHE}clang ${BUILD_CC_ARCH}"

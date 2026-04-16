@@ -20,6 +20,7 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/flex-${PV}.tar.gz \
            file://0001-Emit-no-line-directives-if-gen_line_dirs-is-false.patch \
            file://0001-build-tests-add-missing-parser-scanner-dependencies.patch \
            file://0001-Match-malloc-signature-to-its-use.patch \
+		   file://0001-ax_prog_cc_for_build-Support-ac_-cv_-build_prog_cc_s.patch \
            "
 
 SRC_URI[sha256sum] = "e87aae032bf07c26f85ac0ed3250998c37621d95f8bd748b31f15b33c45ee995"
@@ -36,10 +37,6 @@ inherit autotools gettext texinfo ptest github-releases
 M4 = "${bindir}/m4"
 M4:class-native = "${STAGING_BINDIR_NATIVE}/m4"
 EXTRA_OECONF += "ac_cv_path_M4=${M4} ac_cv_func_reallocarray=no"
-# Don't let autoconf smarts to detect C standard, flex code does not need C23
-# which is what it will enforce see
-# https://savannah.gnu.org/support/index.php?111401
-CACHED_CONFIGUREVARS:append:toolchain-clang = " CFLAGS='${CFLAGS} -std=gnu17'"
 
 EXTRA_OEMAKE += "m4=${STAGING_BINDIR_NATIVE}/m4"
 

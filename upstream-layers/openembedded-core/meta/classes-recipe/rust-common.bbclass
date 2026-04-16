@@ -161,6 +161,7 @@ WRAPPER_TARGET_CC = "${CC}"
 WRAPPER_TARGET_CXX = "${CXX}"
 WRAPPER_TARGET_CCLD = "${CCLD}"
 WRAPPER_TARGET_LDFLAGS = "${LDFLAGS}"
+WRAPPER_TARGET_LDFLAGS:append:libc-musl = " -L${STAGING_DIR_TARGET}${libdir}"
 WRAPPER_TARGET_EXTRALD = ""
 # see recipes-devtools/gcc/gcc/0018-Add-ssp_nonshared-to-link-commandline-for-musl-targe.patch
 # we need to link with ssp_nonshared on musl to avoid "undefined reference to `__stack_chk_fail_local'"

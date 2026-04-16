@@ -28,7 +28,6 @@ SRC_URI = "\
     file://0005-clang-driver-Check-sysroot-for-ldso-path.patch \
     file://0006-clang-Driver-tools.cpp-Add-lssp_nonshared-on-musl.patch \
     file://0007-clang-Prepend-trailing-to-sysroot.patch \
-    file://0008-clang-Look-inside-the-target-sysroot-for-compiler-ru.patch \
     file://0009-clang-Define-releative-gcc-installation-dir.patch \
     file://0010-clang-Add-lpthread-and-ldl-along-with-lunwind-for-st.patch \
     file://0011-Check-for-atomic-double-intrinsics.patch \
@@ -53,7 +52,6 @@ SRC_URI = "\
     file://0030-llvm-config-remove-LLVM_LDFLAGS-from-ldflags-output.patch \
     file://0031-compiler-rt-Exclude-sync_fetch_and_-for-any-pre-ARMv.patch \
     file://0032-compiler-rt-Hardcode-uptr-sptr-typedefs-on-Mips-Linu.patch \
-    file://0033-clang-Use-sysroot-relative-paths-for-getArchSpecific.patch \
     file://0034-Revert-libc-Remap-headers-in-the-debug-info-when-bui.patch \
     file://0035-Prevent-revisiting-block-when-searching-for-noreturn.patch \
     file://0036-Don-t-expose-LLVM_HAVE_OPT_VIEWER_MODULES-externally.patch \
@@ -61,6 +59,7 @@ SRC_URI = "\
     file://0038-llvm-libgcc-Fix-symlink-path-for-libcc-when-LLVM_ENA.patch \
     file://0039-Rename-UNUSED-and-UNKNOWN-elements-of-OffloadArch-enum.patch \
     file://0040-libcxxabi-declare-__gnu_unwind_frame-in-cxa_personal.patch \
+    file://0041-Consolidate-and-fix-sysroot-based-compiler-rt-search.patch \
 "
 # Fallback to no-PIE if not set
 GCCPIE ??= ""

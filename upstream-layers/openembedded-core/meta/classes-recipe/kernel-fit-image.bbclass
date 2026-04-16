@@ -47,6 +47,7 @@ python () {
 
 do_configure[noexec] = "1"
 
+INITRAMFS_DEPLOY_DIR_IMAGE ?= "${DEPLOY_DIR_IMAGE}"
 UBOOT_MKIMAGE_KERNEL_TYPE ?= "kernel"
 KERNEL_IMAGEDEST ?= "/boot"
 
@@ -139,7 +140,7 @@ python do_compile() {
         # Find and use the first initramfs image archive type we find
         found = False
         for img in d.getVar("FIT_SUPPORTED_INITRAMFS_FSTYPES").split():
-            initramfs_path = os.path.join(d.getVar("DEPLOY_DIR_IMAGE"), "%s.%s" % (d.getVar('INITRAMFS_IMAGE_NAME'), img))
+            initramfs_path = os.path.join(d.getVar("INITRAMFS_DEPLOY_DIR_IMAGE"), "%s.%s" % (d.getVar('INITRAMFS_IMAGE_NAME'), img))
             if os.path.exists(initramfs_path):
                 bb.note("Found initramfs image: " + initramfs_path)
                 found = True

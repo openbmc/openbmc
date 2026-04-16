@@ -1,0 +1,5 @@
+version = 3
+
+[[package]]
+name = "rust-static-musl-test"
+version = "0.1.0"

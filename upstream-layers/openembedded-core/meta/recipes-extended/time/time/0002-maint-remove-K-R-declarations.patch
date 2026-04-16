@@ -1,0 +1,131 @@
+From b4a9f76b5f30bda67a57a2c6df6221f95ed80b9b Mon Sep 17 00:00:00 2001
+From: Collin Funk <collin.funk1@gmail.com>
+Date: Mon, 12 Jan 2026 20:19:34 -0800
+Subject: [PATCH 2/4] maint: remove K&R declarations
+
+* src/resuse.c (resuse_start, resuse_end): Remove K&R declarations.
+* src/time.c (fprintargv, linear_argv, summarize, getargs)
+(main): Likewise.
+(run_command): Likewise. Avoid -Wincompatible-pointer-types.
+
+Upstream-Status: Backport [https://gitweb.git.savannah.gnu.org/gitweb/?p=time.git;a=commit;h=4eb6d87fc18929d75a444fbb05a2c4ec7fb052ba]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/resuse.c | 10 +---------
+ src/time.c   | 30 +++++++-----------------------
+ 2 files changed, 8 insertions(+), 32 deletions(-)
+
+diff --git a/src/resuse.c b/src/resuse.c
+index 9d3d18a..5ba3057 100644
+--- a/src/resuse.c
++++ b/src/resuse.c
+@@ -48,8 +48,7 @@
+ /* Prepare to measure a child process.  */
+
+ void
+-resuse_start (resp)
+-     RESUSE *resp;
++resuse_start (RESUSE *resp)
+ {
+ #if HAVE_WAIT3
+   gettimeofday (&resp->start, (struct timezone *) 0);
+@@ -66,16 +65,9 @@ resuse_start (resp)
+ /* Wait for and fill in data on child process PID.
+    Return 0 on error, 1 if ok.  */
+
+-#if __STDC__
+ /* pid_t is short on BSDI, so don't try to promote it.  */
+ int
+ resuse_end (pid_t pid, RESUSE *resp)
+-#else
+-int
+-resuse_end (pid, resp)
+-     pid_t pid;
+-     RESUSE *resp;
+-#endif
+ {
+   int status;
+
+diff --git a/src/time.c b/src/time.c
+index 7e07995..4438749 100644
+--- a/src/time.c
++++ b/src/time.c
+@@ -315,10 +315,7 @@ for details about the options it supports.\n",
+ /* Print ARGV to FP, with each entry in ARGV separated by FILLER.  */
+
+ static void
+-fprintargv (fp, argv, filler)
+-     FILE *fp;
+-     const char *const *argv;
+-     const char *filler;
++fprintargv (FILE *fp, const char *const *argv, const char *filler)
+ {
+   const char *const *av;
+
+@@ -341,8 +338,7 @@ fprintargv (fp, argv, filler)
+    Print a message and return NULL if memory allocation failed.  */
+
+ static char *
+-linear_argv (argv)
+-     const char *const *argv;
++linear_argv (const char *const *argv)
+ {
+   const char *const *s;		/* Each string in ARGV.  */
+   char *new;			/* Allocated space.  */
+@@ -421,11 +417,7 @@ linear_argv (argv)
+    RESP is resource information on the command.  */
+
+ static void
+-summarize (fp, fmt, command, resp)
+-     FILE *fp;
+-     const char *fmt;
+-     const char **command;
+-     RESUSE *resp;
++summarize (FILE *fp, const char *fmt, const char **command, RESUSE *resp)
+ {
+   unsigned long r;		/* Elapsed real milliseconds.  */
+   unsigned long v;		/* Elapsed virtual (CPU) milliseconds.  */
+@@ -637,9 +629,7 @@ summarize (fp, fmt, command, resp)
+    Return the command line to run and gather statistics on.  */
+
+ static const char **
+-getargs (argc, argv)
+-     int argc;
+-     char **argv;
++getargs (int argc, char **argv)
+ {
+   int optc;
+   char *format;			/* Format found in environment.  */
+@@ -723,9 +713,7 @@ getargs (argc, argv)
+    Put the statistics in *RESP.  */
+
+ static void
+-run_command (cmd, resp)
+-     char *const *cmd;
+-     RESUSE *resp;
++run_command (const char **cmd, RESUSE *resp)
+ {
+   pid_t pid;			/* Pid of child.  */
+   sighandler interrupt_signal, quit_signal;
+@@ -738,9 +726,7 @@ run_command (cmd, resp)
+     error (EXIT_CANCELED, errno, "cannot fork");
+   else if (pid == 0)
+     {				/* If child.  */
+-      /* Don't cast execvp arguments; that causes errors on some systems,
+-	 versus merely warnings if the cast is left off.  */
+-      execvp (cmd[0], cmd);
++      execvp (cmd[0], (char * const *) cmd);
+       saved_errno = errno;
+       error (0, errno, "cannot run %s", cmd[0]);
+       _exit (saved_errno == ENOENT ? EXIT_ENOENT : EXIT_CANNOT_INVOKE);
+@@ -759,9 +745,7 @@ run_command (cmd, resp)
+ }
+
+ int
+-main (argc, argv)
+-     int argc;
+-     char **argv;
++main (int argc, char **argv)
+ {
+   const char **command_line;
+   RESUSE res;

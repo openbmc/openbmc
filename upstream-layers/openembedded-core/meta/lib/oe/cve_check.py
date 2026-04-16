@@ -205,33 +205,32 @@ def get_patched_cves(d):
     return patched_cves
 
 
+_CPE23_ENCODE_TRANS_TABLE = str.maketrans(
+    {c: f"\\{c}" for c in [
+        "\\", "!", '"', "#", "$", "%", "&", "'", "(", ")", "+", ",", "/", ":", ";",
+        "<", "=", ">", "@", "[", "]", "^", "`", "{", "|", "}", "~", "?", "*"
+    ]}
+)
+
+
 def cpe_escape(value):
-    r"""
+    """
     Escape special characters for CPE 2.3 formatted string binding.
 
     CPE 2.3 formatted string binding (cpe:2.3:...) uses backslash escaping
     for special meta-characters, NOT percent-encoding. Percent-encoding is
     only used in the URI binding (cpe:/...).
 
-    According to NISTIR 7695, these characters need escaping:
-    - Backslash (\) -> \\
-    - Question mark (?) -> \?
-    - Asterisk (*) -> \*
-    - Colon (:) -> \:
-    - Plus (+) -> \+ (required by some SBOM validators)
+    According to NISTIR 7695, various characters referenced in the "Figure 6-3.
+    ABNF for Formatted String Binding" need escaping: escape, special and punc.
     """
     if not value:
         return value
 
-    # Escape special meta-characters for CPE 2.3 formatted string binding
-    # Order matters: escape backslash first to avoid double-escaping
-    result = value.replace('\\', '\\\\')
-    result = result.replace('?', '\\?')
-    result = result.replace('*', '\\*')
-    result = result.replace(':', '\\:')
-    result = result.replace('+', '\\+')
+    # Do not break compatibility
+    value = value.replace("\\+", "+")
 
-    return result
+    return value.translate(_CPE23_ENCODE_TRANS_TABLE)
 
 
 def get_cpe_ids(cve_product, version):

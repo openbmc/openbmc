@@ -19,3 +19,5 @@ _apt:x:523:523::/:/bin/nologin
 weston:x:525:525::/:/bin/nologin
 ptest:x:529:529::/:/bin/nologin
 xuser:x:530:530::/:/bin/nologin
+cmake-example:x:534:534::/var/lib/cmake-example:/bin/false
+meson-example:x:535:535::/var/lib/meson-example:/bin/false

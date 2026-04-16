@@ -41,7 +41,11 @@ USERADD_PARAM:${PN} = "--system --home /var/lib/${BPN} --no-create-home --shell 
 EX_BINARY_NAME ?= "${BPN}"
 
 do_install:append() {
-    # Install configuration file owned by unprivileged user
+    # Install configuration file owned by the recipe's unprivileged user.
+    # Note: this requires static UIDs/GIDs (USERADDEXTENSION = "useradd-staticids")
+    # so that the UID embedded by pseudo during do_install matches the UID assigned
+    # in the final image. devtool deploy-target is a raw file copy and does not run
+    # pkg_postinst, so the UID in ${D} must already be correct.
     install -d ${D}${sysconfdir}
     install -m 0644 -g ${BPN} -o ${BPN} ${S}/cpp-example.conf ${D}${sysconfdir}/${BPN}.conf
     sed -i -e 's|@BINARY_NAME@|${BPN}|g' ${D}${sysconfdir}/${BPN}.conf

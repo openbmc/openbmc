@@ -25,7 +25,7 @@ inherit cmake pkgconfig gobject-introspection perlnative features_check upstream
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 REQUIRED_DISTRO_FEATURES = "opengl"
 
-CVE_PRODUCT = "webkitgtk webkitgtk\+"
+CVE_PRODUCT = "webkitgtk webkitgtk+"
 
 DEPENDS += " \
           ruby-native \

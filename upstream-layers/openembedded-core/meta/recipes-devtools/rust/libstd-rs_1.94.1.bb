@@ -17,10 +17,7 @@ inherit cargo
 
 CVE_PRODUCT = "rust"
 
-DEPENDS:append:libc-musl = " libunwind"
-# rv32 does not have libunwind ported yet
-DEPENDS:remove:riscv32 = "libunwind"
-DEPENDS:remove:riscv64 = "libunwind"
+DEPENDS:append:libc-musl = " libcxx"
 
 # Embed bitcode in order to allow compiling both with and without LTO
 RUSTFLAGS += "-Cembed-bitcode=yes"

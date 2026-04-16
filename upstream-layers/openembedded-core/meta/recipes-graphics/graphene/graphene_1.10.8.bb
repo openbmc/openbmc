@@ -26,3 +26,5 @@ EXTRA_OEMESON = "-Dinstalled_tests=false"
 FILES:${PN} += "${libdir}/graphene-1.0"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2024-1984] = "cpe-incorrect: issue in a WordPress theme"

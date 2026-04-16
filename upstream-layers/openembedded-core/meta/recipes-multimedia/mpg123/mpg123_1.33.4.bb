@@ -53,3 +53,5 @@ EXTRA_OECONF = " \
 #| make[3]: *** [equalizer.lo] Error 1
 ARM_INSTRUCTION_SET:armv4 = "arm"
 ARM_INSTRUCTION_SET:armv5 = "arm"
+
+CVE_STATUS[CVE-2006-3355] = "fixed-version: fixed since pre0.59s_r11"

@@ -46,6 +46,7 @@ PACKAGECONFIG[directfb]        = "-Ddirectfb=enabled,-Ddirectfb=disabled,directf
 PACKAGECONFIG[dtls]            = "-Ddtls=enabled,-Ddtls=disabled,openssl"
 PACKAGECONFIG[faac]            = "-Dfaac=enabled,-Dfaac=disabled,faac"
 PACKAGECONFIG[faad]            = "-Dfaad=enabled,-Dfaad=disabled,faad2"
+PACKAGECONFIG[fdkaac]          = "-Dfdkaac=enabled,-Dfdkaac=disabled,fdk-aac"
 PACKAGECONFIG[fluidsynth]      = "-Dfluidsynth=enabled,-Dfluidsynth=disabled,fluidsynth"
 PACKAGECONFIG[gtk3]            = "-Dgtk3=enabled,-Dgtk3=disabled,gtk3+"
 PACKAGECONFIG[hls]             = "-Dhls=enabled,-Dhls=disabled,"
@@ -120,7 +121,6 @@ EXTRA_OEMESON += " \
     -Dd3d11=disabled \
     -Ddirectsound=disabled \
     -Ddts=disabled \
-    -Dfdkaac=disabled \
     -Dflite=disabled \
     -Dgme=disabled \
     -Dgs=disabled \

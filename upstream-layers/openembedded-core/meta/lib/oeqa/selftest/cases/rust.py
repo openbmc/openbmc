@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: MIT
+import os
 import subprocess
 import time
 from oeqa.core.decorator import OETestTag
@@ -144,3 +145,32 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
             test_results = parse_results(resultlog)
             for test in test_results:
                 self.ptest_result(ptestsuite, test, test_results[test])
+
+# Regression test for bug 16076 - verify static linking with TCLIBC=musl
+class RustStaticMuslTest(OESelftestTestCase):
+
+    RECIPE = "rust-static-musl-test"
+
+    def setUp(self):
+        super().setUp()
+        self.write_config(
+            'TCLIBC = "musl"\n'
+            'RUSTFLAGS:append:pn-%s = " -C target-feature=+crt-static"\n' % self.RECIPE
+        )
+        result = bitbake(self.RECIPE, ignore_status=True)
+        self.assertEqual(result.status, 0,
+            msg="bitbake %s failed:\n%s" % (self.RECIPE, result.output))
+
+    def test_static_musl_linking(self):
+        workdir = get_bb_var("WORKDIR", self.RECIPE)
+        cargo_target_subdir = get_bb_var("CARGO_TARGET_SUBDIR", self.RECIPE)
+        pn = get_bb_var("PN", self.RECIPE)
+        binary = os.path.join(workdir, "build", "target",
+                              cargo_target_subdir, pn)
+
+        result = runCmd("file %s" % binary, ignore_status=True)
+        self.assertIn("ELF", result.output,
+            msg="Not an ELF binary: %s" % result.output)
+        self.assertIn("statically linked", result.output,
+            msg="Binary is not statically linked. Regression of bug 16076.\n"
+                "file output: %s" % result.output)

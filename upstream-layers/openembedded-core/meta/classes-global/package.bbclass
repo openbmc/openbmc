@@ -41,7 +41,7 @@
 #
 # k) package_depchains - Adds automatic dependencies to -dbg and -dev packages
 #
-# l) emit_pkgdata - saves the packaging data into PKGDATA_DIR for use in later
+# l) emit_pkgdata - saves the packaging data into PKGDESTWORK for use in later
 #    packaging steps
 
 inherit packagedata
@@ -616,4 +616,3 @@ python do_packagedata_setscene () {
     sstate_setscene(d)
 }
 addtask do_packagedata_setscene
-

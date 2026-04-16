@@ -48,3 +48,5 @@ do_install:append() {
 FILES:${PN} += "${libdir}/xorg/protocol.txt"
 
 RDEPENDS:${PN} += "xkbcomp ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "", "x11-volatiles", d)}"
+
+CVE_STATUS[CVE-2024-21886] = "fixed-version: fixed since xwayland-23.2.4"

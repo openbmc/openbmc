@@ -27,6 +27,7 @@ SRC_URI += "file://fix-parallel-build.patch \
             file://sequence-type.patch \
             file://0001-Fix-libc-compatibility-by-renaming-atomic_init-API.patch \
             file://0001-clock-Do-not-define-own-timespec.patch \
+            file://0001-Fix-implicit-int-warnings.patch \
            "
 # We are not interested in official latest 6.x versions;
 # let's track what debian is using.
@@ -71,7 +72,11 @@ AUTOTOOLS_SCRIPT_PATH = "${S}/dist"
 # configure.
 CONFIG_SITE = ""
 
+CFLAGS += "-std=gnu99"
+
 oe_runconf:prepend() {
+	export CFLAGS="${CFLAGS}"
+
 	. ${S}/dist/RELEASE
 	# Edit version information we couldn't pre-compute.
 	sed -i -e "s/__EDIT_DB_VERSION_FAMILY__/$DB_VERSION_FAMILY/g" \
@@ -115,8 +120,3 @@ INSANE_SKIP:${PN} = "dev-so"
 INSANE_SKIP:${PN}-cxx = "dev-so"
 
 BBCLASSEXTEND = "native nativesdk"
-
-# many configure tests are failing with gcc-14
-# -Wno-error=incompatible-pointer-types needed for gcc-15
-CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"
-BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration -Wno-error=incompatible-pointer-types"

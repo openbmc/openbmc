@@ -1,0 +1,43 @@
+From 0b860a81d54b1d44823bd0b5ce3a817594fb388f Mon Sep 17 00:00:00 2001
+From: Collin Funk <collin.funk1@gmail.com>
+Date: Mon, 12 Jan 2026 21:06:53 -0800
+Subject: [PATCH 4/4] maint: remove obsolete autoconf macros
+
+* configure.ac (AC_PROG_CC): Call instead of AC_PROG_CC_STDC and
+AC_PROG_GCC_TRADITIONAL.
+(AC_CHECK_INCLUDES_DEFAULT, AC_PROG_EGREP): Use instead of
+AC_HEADER_STDC.
+
+Upstream-Status: Backport [https://gitweb.git.savannah.gnu.org/gitweb/?p=time.git;a=commit;h=d957319127352cc67de4de5fd5d1537f289c0a84]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ configure.ac | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index beb2077..1af59c2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -27,10 +27,9 @@ AM_INIT_AUTOMAKE([
+
+ dnl Checks for programs.
+ AC_USE_SYSTEM_EXTENSIONS
+-AC_PROG_CC_STDC
++AC_PROG_CC
+ AM_PROG_CC_C_O
+ AC_PROG_CPP
+-AC_PROG_GCC_TRADITIONAL
+ AC_PROG_INSTALL
+ AC_C_INLINE
+
+@@ -59,7 +58,9 @@ gl_WARN_ADD([-Wsuggest-attribute=pure])
+ AC_SUBST([WARN_CFLAGS])
+
+ dnl Checks for header files.
+-AC_HEADER_STDC
++AC_CHECK_INCLUDES_DEFAULT
++AC_PROG_EGREP
++
+ AC_HEADER_SYS_WAIT
+
+ dnl Checks for typedefs, structures, and compiler characteristics.

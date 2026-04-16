@@ -1,0 +1,106 @@
+From c744b20658641b46cf66429f573240b1b5737872 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 8 Apr 2026 08:52:55 -0700
+Subject: [PATCH] Fix implicit int warnings
+
+Newer compilers flag this warning which results in configure tests
+failing especially seen on native builds where AC_TRY_RUN is
+being used to detect mutex support.
+
+Also see
+https://sources.debian.org/src/db5.3/5.3.28%2Bdfsg2-11/debian/patches/014-implicit-int.patch
+
+Upstream-Status: Inappropriate [Inactive Upstream]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ dist/aclocal/mutex.m4 | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/dist/aclocal/mutex.m4 b/dist/aclocal/mutex.m4
+index 81f1ea8..8476f39 100644
+--- a/dist/aclocal/mutex.m4
++++ b/dist/aclocal/mutex.m4
+@@ -5,7 +5,7 @@ AC_DEFUN(AM_PTHREADS_SHARED, [
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_cond_t cond;
+ 	pthread_mutex_t mutex;
+ 	pthread_condattr_t condattr;
+@@ -49,7 +49,7 @@ AC_DEFUN(AM_PTHREADS_PRIVATE, [
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_cond_t cond;
+ 	pthread_mutex_t mutex;
+ 	pthread_condattr_t condattr;
+@@ -89,13 +89,13 @@ AC_DEFUN(AM_PTHREADS_CONDVAR_DUPINITCHK, [
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_cond_t cond;
+ 	pthread_condattr_t condattr;
+ 	exit(pthread_condattr_init(&condattr) ||
+ 	pthread_cond_init(&cond, &condattr) ||
+ 	pthread_cond_init(&cond, &condattr));
+-}], [db_cv_pthread_condinit_dupgood="yes"], 
++}], [db_cv_pthread_condinit_dupgood="yes"],
+ [db_cv_pthread_condinit_dupgood="no"],
+ AC_TRY_LINK([
+ #include <stdlib.h>
+@@ -104,19 +104,19 @@ AC_TRY_LINK([
+ 	pthread_condattr_t condattr;
+ 	exit(pthread_condattr_init(&condattr) ||
+ 	pthread_cond_init(&cond, &condattr));
+-], [db_cv_pthread_condinit_dupgood="yes"], 
++], [db_cv_pthread_condinit_dupgood="yes"],
+ [db_cv_pthread_condinit_dupgood="no"]))])
+ AC_DEFUN(AM_PTHREADS_RWLOCKVAR_DUPINITCHK, [
+ AC_TRY_RUN([
+ #include <stdlib.h>
+ #include <pthread.h>
+-main() {
++int main() {
+ 	pthread_rwlock_t rwlock;
+ 	pthread_rwlockattr_t rwlockattr;
+ 	exit(pthread_rwlockattr_init(&rwlockattr) ||
+ 	pthread_rwlock_init(&rwlock, &rwlockattr) ||
+ 	pthread_rwlock_init(&rwlock, &rwlockattr));
+-}], [db_cv_pthread_rwlockinit_dupgood="yes"], 
++}], [db_cv_pthread_rwlockinit_dupgood="yes"],
+ [db_cv_pthread_rwlockinit_dupgood="no"],
+ AC_TRY_LINK([
+ #include <stdlib.h>
+@@ -125,7 +125,7 @@ AC_TRY_LINK([
+ 	pthread_rwlockattr_t rwlockattr;
+ 	exit(pthread_rwlockattr_init(&rwlockattr) ||
+ 	pthread_rwlock_init(&rwlock, &rwlockattr));
+-], [db_cv_pthread_rwlockinit_dupgood="yes"], 
++], [db_cv_pthread_rwlockinit_dupgood="yes"],
+ [db_cv_pthread_rwlockinit_dupgood="no"]))])
+ 
+ # Figure out mutexes for this compiler/architecture.
+@@ -207,7 +207,7 @@ if test "$db_cv_mutex" = no; then
+ 		;;
+ 	esac
+ 	# We probe for private pthreads only when the user has asked for posix
+-	# mutexes and we don't have a multiprocess pthreads library available. 
++	# mutexes and we don't have a multiprocess pthreads library available.
+ 	if test "$db_cv_mutex" = posix_only; then
+ 		AM_PTHREADS_PRIVATE(POSIX/pthreads/private)
+ 		AM_PTHREADS_CONDVAR_DUPINITCHK
+@@ -571,7 +571,7 @@
+ 
+ # UNIX fcntl system call mutexes.
+ # Note that fcntl mutexes are no longer supported as of 4.8.  This code has been
+-# left in place in case there is some system that we are not aware of that 
++# left in place in case there is some system that we are not aware of that
+ # only uses fcntl mutexes.  In that case, contact Oracle for support.
+ if test "$db_cv_mutex" = no; then
+ 	db_cv_mutex=UNIX/fcntl

@@ -429,6 +429,8 @@ def rust_gen_target(d, thing, wd, arch):
     tspec['has-thread-local'] = True
     tspec['position-independent-executables'] = True
     tspec['panic-strategy'] = d.getVar("RUST_PANIC_STRATEGY")
+    if "musl" in tspec['llvm-target']:
+        tspec['crt-static-respected'] = True
 
     # write out the target spec json file
     with open(wd + rustsys + '.json', 'w') as f:

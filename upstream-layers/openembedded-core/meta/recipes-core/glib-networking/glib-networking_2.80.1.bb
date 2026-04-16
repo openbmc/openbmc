@@ -29,7 +29,10 @@ PACKAGECONFIG[gnomeproxy] = "-Dgnome_proxy=enabled,-Dgnome_proxy=disabled,gsetti
 
 inherit gnomebase gettext upstream-version-is-even gio-module-cache ptest-gnome
 
-SRC_URI += "file://run-ptest"
+SRC_URI += "file://0001-openssl-properly-check-return-value-when-writing-to-.patch \
+            file://0002-openssl-check-return-value-of-g_tls_bio_alloc.patch \
+            file://0003-openssl-check-return-values-of-BIO_new.patch \
+            file://run-ptest"
 
 FILES:${PN} += "\
                 ${libdir}/gio/modules/libgio*.so \

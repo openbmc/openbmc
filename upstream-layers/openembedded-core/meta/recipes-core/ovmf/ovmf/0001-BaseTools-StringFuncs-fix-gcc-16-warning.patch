@@ -1,0 +1,43 @@
+From 3597306191297b504683b83fe7750e49c6a2e836 Mon Sep 17 00:00:00 2001
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Thu, 29 Jan 2026 09:23:32 +0100
+Subject: [PATCH 1/2] BaseTools/StringFuncs: fix gcc 16 warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+StringFuncs.c: In function ‘SplitStringByWhitespace’:
+StringFuncs.c:113:15: error: variable ‘Item’ set but not used [-Werror=unused-but-set-variable=]
+  113 |   UINTN       Item;
+      |               ^~~~
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Upstream-Status: Backport
+---
+ BaseTools/Source/C/Common/StringFuncs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/BaseTools/Source/C/Common/StringFuncs.c b/BaseTools/Source/C/Common/StringFuncs.c
+index 53e44365e9..df02d9c808 100644
+--- a/BaseTools/Source/C/Common/StringFuncs.c
++++ b/BaseTools/Source/C/Common/StringFuncs.c
+@@ -110,7 +110,6 @@ SplitStringByWhitespace (
+   CHAR8       *EndOfSubString;
+   CHAR8       *EndOfString;
+   STRING_LIST *Output;
+-  UINTN       Item;
+ 
+   String = CloneString (String);
+   if (String == NULL) {
+@@ -120,7 +119,7 @@ SplitStringByWhitespace (
+ 
+   Output = NewStringList ();
+ 
+-  for (Pos = String, Item = 0; Pos < EndOfString; Item++) {
++  for (Pos = String; Pos < EndOfString;) {
+     while (isspace ((int)*Pos)) {
+       Pos++;
+     }
+-- 
+2.53.0
+

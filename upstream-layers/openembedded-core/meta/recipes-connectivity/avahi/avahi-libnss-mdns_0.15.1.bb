@@ -17,6 +17,8 @@ inherit autotools pkgconfig
 
 COMPATIBLE_HOST:libc-musl = 'null'
 
+LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"
+
 EXTRA_OECONF = "--libdir=${base_libdir}"
 
 RDEPENDS:${PN} = "avahi-daemon"

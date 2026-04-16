@@ -44,3 +44,5 @@ pkg_postinst:${PN} () {
 pkg_postrm:${PN} () {
 	printf "$(grep -v "^${bindir}/screen$" $D${sysconfdir}/shells)\n" > $D${sysconfdir}/shells
 }
+
+CVE_STATUS[CVE-2025-46802] = "fixed-version: fixed since 5.0.1"

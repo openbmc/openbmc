@@ -29,4 +29,6 @@ xuser:x:530:
 seat:x:531:
 audio:x:532:
 empower:x:533:
+cmake-example:x:534:
+meson-example:x:535:
 nogroup:x:65534:

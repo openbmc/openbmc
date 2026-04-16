@@ -6,6 +6,7 @@ SRC_URI = "git://sourceware.org/git/systemtap.git;protocol=https;branch=master;t
            file://0001-Install-python-modules-to-correct-library-dir.patch \
            file://0001-staprun-stapbpf-don-t-support-installing-a-non-root.patch \
            file://0001-elaborate.cxx-fix-32-bit-build.patch \
+           file://readline.patch \
            "
 
 SRCREV = "911a1354aac264651fda932061e7f20d2ecc2471"

@@ -21,6 +21,7 @@ from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import runCmd, Command, bitbake, get_bb_var, create_temp_layer
 from oeqa.utils.commands import get_bb_vars, runqemu, runqemu_check_taps, get_test_layer
 from oeqa.core.decorator import OETestTag
+from oeqa.core.decorator.data import skipIfNotFeature
 from bb.utils import mkdirhier, edit_bblayers_conf
 
 oldmetapath = None
@@ -1713,6 +1714,7 @@ class DevtoolUpdateTests(DevtoolBase):
         # Try building
         bitbake('%s -c patch' % testrecipe)
 
+    @skipIfNotFeature('vulkan', 'Test requires vulkan to be in DISTRO_FEATURES (operates on vulkan-samples)')
     def test_devtool_git_submodules(self):
         # This tests if we can add a patch in a git submodule and extract it properly using devtool finish
         # Check preconditions
@@ -2597,7 +2599,17 @@ class DevtoolIdeSdkTests(DevtoolBase):
             'IMAGE_GEN_DEBUGFS = "1"',
             'IMAGE_INSTALL:append = " gdbserver %s"' % ' '.join(
                 [r + '-ptest' for r in recipe_names]),
-            'DISTRO_FEATURES:append = " ptest"'
+            'DISTRO_FEATURES:append = " ptest"',
+            # Static UIDs/GIDs are required so that files installed via
+            # "install -o ${BPN}" in do_install embed the same UID that gets
+            # assigned in the final image. Without this, each recipe's isolated
+            # sysroot allocates UIDs independently (both start at the first free
+            # system UID), so files end up with colliding UIDs in the image.
+            # devtool deploy-target is a raw file copy and does not run
+            # pkg_postinst, so ownership must be correct already in ${D}.
+            'USERADDEXTENSION = "useradd-staticids"',
+            'USERADD_UID_TABLES += "files/static-passwd"',
+            'USERADD_GID_TABLES += "files/static-group"',
         ]
         self.write_config("\n".join(conf_lines))
 
@@ -2772,7 +2784,9 @@ class DevtoolIdeSdkTests(DevtoolBase):
 
         # check if resolving std::vector works with python scripts
         gdb_batch_cmd += " -ex 'list cpp-example.cpp:55,55'"
-        gdb_batch_cmd += " -ex 'break cpp-example.cpp:55'"
+        # Break on line 56 (the std::cout after the declaration) so the vector
+        # constructor on line 55 has already run when GDB stops.
+        gdb_batch_cmd += " -ex 'break cpp-example.cpp:56'"
         gdb_batch_cmd += " -ex 'continue'"
         gdb_batch_cmd += " -ex 'print numbers'"
         gdb_batch_cmd += " -ex 'continue'"
@@ -2909,7 +2923,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
         result = runCmd('%s test -C %s' % (meson_exe, build_dir),
                         cwd=tempdir, output_log=self._cmd_logger)
         self.assertEqual(result.status, 0)
-        self.assertIn("Fail:              0", result.output)
+        self.assertRegex(result.output, r"Fail:\s+0")
 
         # Verify re-building and testing works again
         result = runCmd('%s compile -C %s --clean' % (meson_exe, build_dir),
@@ -2920,7 +2934,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
         result = runCmd('%s test -C %s' % (meson_exe, build_dir),
                         cwd=tempdir, output_log=self._cmd_logger)
         self.assertEqual(result.status, 0)
-        self.assertIn("Fail:              0", result.output)
+        self.assertRegex(result.output, r"Fail:\s+0")
 
         return compile_cmd
 
@@ -2980,7 +2994,7 @@ class DevtoolIdeSdkTests(DevtoolBase):
             self.assertEqual(self._workspace_scripts_dir(
                 recipe_name), self._sources_scripts_dir(tempdir))
 
-            # Verify /etc/meson-example.conf is still owned by the cmake-example user
+            # Verify /etc/cmake-example.conf is still owned by the cmake-example user
             # after the install and deploy scripts updated the file
             self._verify_conf_file(qemu, conf_file, example_exe, example_exe)
 

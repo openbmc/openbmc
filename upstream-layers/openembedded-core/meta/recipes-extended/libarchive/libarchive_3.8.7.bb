@@ -34,7 +34,7 @@ SRC_URI = "https://libarchive.org/downloads/libarchive-${PV}.tar.gz \
           "
 UPSTREAM_CHECK_URI = "https://www.libarchive.org/"
 
-SRC_URI[sha256sum] = "213269b05aac957c98f6e944774bb438d0bd168a2ec60b9e4f8d92035925821c"
+SRC_URI[sha256sum] = "4b787cca6697a95c7725e45293c973c208cbdc71ae2279f30ef09f52472b9166"
 
 inherit autotools update-alternatives pkgconfig ptest
 
@@ -88,3 +88,5 @@ do_install_ptest() {
 }
 
 RDEPENDS:${PN}-ptest += "bsdtar bsdcpio"
+
+CVE_STATUS[CVE-2026-5121] = "fixed-version: fixed since 3.8.7"

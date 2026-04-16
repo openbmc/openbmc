@@ -212,6 +212,11 @@ def update_useradd_after_parse(d):
     useradd_packages = d.getVar('USERADD_PACKAGES')
 
     if not useradd_packages:
+        # It's valid to inherit useradd and only set USERADD_DEPENDS to
+        # depend on users/groups created by another recipe, without
+        # creating any users/groups in this recipe.
+        if d.getVar('USERADD_DEPENDS'):
+            return
         bb.fatal("%s inherits useradd but doesn't set USERADD_PACKAGES" % d.getVar('FILE', False))
 
     for pkg in useradd_packages.split():

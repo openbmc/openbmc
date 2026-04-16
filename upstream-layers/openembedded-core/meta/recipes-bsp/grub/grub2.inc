@@ -27,6 +27,13 @@ CVE_STATUS[CVE-2019-14865] = "not-applicable-platform: applies only to RHEL"
 CVE_STATUS[CVE-2023-4001]  = "not-applicable-platform: Applies only to RHEL/Fedora"
 CVE_STATUS[CVE-2024-1048]  = "not-applicable-platform: Applies only to RHEL/Fedora"
 CVE_STATUS[CVE-2024-2312]  = "not-applicable-platform: Applies only to Ubuntu"
+CVE_STATUS[CVE-2024-49504] = "not-applicable-platform: Applies only to SUSE"
+CVE_STATUS[CVE-2025-54770] = "fixed-version: fixed since 2.14"
+CVE_STATUS[CVE-2025-54771] = "fixed-version: fixed since 2.14"
+CVE_STATUS[CVE-2025-61661] = "fixed-version: fixed since 2.14"
+CVE_STATUS[CVE-2025-61662] = "fixed-version: fixed since 2.14"
+CVE_STATUS[CVE-2025-61663] = "fixed-version: fixed since 2.14"
+CVE_STATUS[CVE-2025-61664] = "fixed-version: fixed since 2.14"
 
 DEPENDS = "flex-native bison-native gettext-native gawk-replacement-native"
 

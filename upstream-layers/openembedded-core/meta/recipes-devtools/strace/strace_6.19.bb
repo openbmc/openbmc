@@ -15,11 +15,16 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/strace-${PV}.tar.xz \
            file://skip-bpf.patch \
            file://0001-configure-Use-autoconf-macro-to-detect-largefile-sup.patch \
            file://0002-tests-Replace-off64_t-with-off_t.patch \
+		   file://0001-m4-Backport-ax_prog_cc_for_build.m4-macros.patch \
            "
 SRC_URI:append:libc-musl = "\
            file://0001-Ignore-pwritev-pwrite64-tests-on-musl.patch \
            "
 SRC_URI[sha256sum] = "e076c851eec0972486ec842164fdc54547f9d17abd3d1449de8b120f5d299143"
+
+# remove at next version upgrade or when output changes
+PR = "r1"
+HASHEQUIV_HASH_VERSION .= ".1"
 
 inherit autotools github-releases ptest
 
@@ -50,6 +55,7 @@ do_install_ptest() {
 	install -m 644 ${B}/src/config.h ${D}${PTEST_PATH}/src/
 	sed -e 's/^srcdir = .*/srcdir = ..\/..\/ptest\/tests/' \
 	    -e "/^TEST_LOG_DRIVER =/s|(top_srcdir)|(top_builddir)|" \
+	    -e '/^CC_FOR_BUILD/s/\s-std=gnu23//g' \
 	    -i ${D}/${PTEST_PATH}/${TESTDIR}/Makefile
 }
 

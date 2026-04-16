@@ -15,8 +15,9 @@ BBCLASSEXTEND = "native nativesdk"
 
 SRC_URI = "${GNU_MIRROR}/time/time-${PV}.tar.gz \
            file://0001-include-string.h-for-memset.patch \
-           file://time-1.9-Fix-compiling-with-GCC15.patch \
-           file://0001-Fix-the-type-for-sighandler_t.patch \
+           file://0002-maint-remove-K-R-declarations.patch \
+           file://0003-maint-fix-compilation-errors-with-GCC-15.patch \
+           file://0004-maint-remove-obsolete-autoconf-macros.patch \
            "
 
 SRC_URI[sha256sum] = "fbacf0c81e62429df3e33bda4cee38756604f18e01d977338e23306a3e3b521e"

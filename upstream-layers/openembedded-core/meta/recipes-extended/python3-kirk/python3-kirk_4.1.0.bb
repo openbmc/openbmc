@@ -7,7 +7,7 @@ SECTION = "console/utils"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=39bba7d2cf0ba1036f2a6e2be52fe3f0"
 
-SRC_URI[sha256sum] = "4606f46dfdb7be1e1c2de8d8f040037459a9de8a07fa1123cee4b68c7f7cb764"
+SRC_URI[sha256sum] = "dc4dc4fa8994b14565a3d4f31bb79d6d27102ecbbd4feaef4ebc1e10e9cbace3"
 
 inherit pypi python_setuptools_build_meta
 

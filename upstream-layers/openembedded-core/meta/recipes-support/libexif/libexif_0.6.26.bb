@@ -12,7 +12,7 @@ SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/libexif-${PV}.tar.bz2 \
            file://run-ptest \
            "
 
-SRC_URI[sha256sum] = "7c9eba99aed3e6594d8c3e85861f1c6aaf450c218621528bc989d3b3e7a26307"
+SRC_URI[sha256sum] = "0830ed253fceeb60444fb309598bc8a9491d3007dc054aad3a50a347c5597c57"
 
 inherit autotools gettext github-releases ptest
 

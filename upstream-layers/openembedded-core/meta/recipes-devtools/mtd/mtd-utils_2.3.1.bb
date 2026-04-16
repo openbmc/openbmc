@@ -11,13 +11,8 @@ inherit autotools pkgconfig systemd update-alternatives
 DEPENDS = "zlib e2fsprogs util-linux"
 RDEPENDS:mtd-utils-tests += "bash"
 
-SRCREV = "4594fc1f4496a0ed55cabd31fbeba4e3fbf05602"
+SRCREV = "053ee1038e5dedae61a88cadfb7bdfe9894d8bb6"
 SRC_URI = "git://git.infradead.org/mtd-utils.git;branch=master \
-           file://0001-ubifs-utils-ubifs.h-Include-fcntl.h.patch \
-           file://0002-ubifs-utils-journal-Include-sys-stat.h.patch \
-           file://0003-ubifs-utils-link-libmissing.a-in-case-execinfo.h-isn.patch \
-           file://0004-ubifs-utils-extract_files-Include-linux-limits.h.patch \
-           file://0001-Improve-check-for-GCC-compiler-version.patch \
            file://ubihealthd.service"
 
 # xattr support creates an additional compile-time dependency on acl because
