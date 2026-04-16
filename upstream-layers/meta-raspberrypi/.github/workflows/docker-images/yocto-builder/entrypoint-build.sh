@@ -24,9 +24,9 @@ TEMP_DIR="$(mktemp -d)"
 cd "$TEMP_DIR"
 
 REPOS=" \
-    git://git.openembedded.org/openembedded-core \
-    git://git.openembedded.org/bitbake \
-    git://git.yoctoproject.org/meta-yocto \
+    https://git.openembedded.org/openembedded-core \
+    https://git.openembedded.org/bitbake \
+    https://git.yoctoproject.org/meta-yocto \
 "
 for repo in $REPOS; do
     log "Cloning $repo on branch $BASE_REF..."
