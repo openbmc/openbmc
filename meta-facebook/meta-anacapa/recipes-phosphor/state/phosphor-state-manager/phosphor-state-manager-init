@@ -14,4 +14,6 @@ devmem 0x1e6e2454 32 0xaa000000
 devmem 0x1e6e2094 32 0x00000003
 
 # Change SSC to -0.3% Down-spread
-i2cset -y 57 0x68 0x3c 0x34
+if [ -e "/dev/i2c-57" ] && i2cdetect -y 57 0x68 0x68 | grep -q -E "(68|UU)"; then
+    i2cset -y 57 0x68 0x3c 0x34
+fi
