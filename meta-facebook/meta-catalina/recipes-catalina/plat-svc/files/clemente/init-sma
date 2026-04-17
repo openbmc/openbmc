@@ -267,14 +267,28 @@ get_numeric_sensor_by_eid()
 
 err_count=0
 
+# Leaky bucket parameters for sensor fault tolerance.
+# A sensor's "nan" is only published after LEAK_BUCKET_THRESHOLD consecutive
+# (net) failures; each success drains the bucket by LEAK_BUCKET_DRAIN.
+LEAK_BUCKET_THRESHOLD=3
+LEAK_BUCKET_DRAIN=1
+declare -A snr_fail_count
+
 update_numeric_sensor_value()
 {
     local eid="$1"
     local snr_id="$2"
     local snr_name="$3"
     local snr_val
+    local bucket_val="${snr_fail_count[$snr_name]:-0}"
 
     if snr_val="$(get_numeric_sensor_by_eid "${eid}" "${snr_id}")"; then
+        # Drain the bucket on success, floor at 0.
+        if [[ $bucket_val -gt 0 ]]; then
+            bucket_val=$(( bucket_val - LEAK_BUCKET_DRAIN ))
+            [[ $bucket_val -lt 0 ]] && bucket_val=0
+            snr_fail_count[$snr_name]=$bucket_val
+        fi
         # The sensor (ID 50) has "unitModifier" = -1 in PDR.
         # The actual reading should be the original value * 0.1.
         if [[ ${snr_id} -eq 50 ]]; then
@@ -282,8 +296,14 @@ update_numeric_sensor_value()
         fi
     else
         echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, snr_id: $snr_id, snr_name: $snr_name"
-        snr_val="nan"
+        bucket_val=$(( bucket_val + 1 ))
+        snr_fail_count[$snr_name]=$bucket_val
         err_count=$((err_count+1))
+        # Suppress "nan" until the bucket exceeds the threshold.
+        if [[ $bucket_val -le $LEAK_BUCKET_THRESHOLD ]]; then
+            return 0
+        fi
+        snr_val="nan"
     fi
     busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$snr_name" xyz.openbmc_project.Sensor.Value Value d "$snr_val"
 }
