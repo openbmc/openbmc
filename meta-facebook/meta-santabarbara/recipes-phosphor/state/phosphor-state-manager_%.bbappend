@@ -11,7 +11,6 @@ CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-powerreset@{}.target.requires/phosphor-reset-chassis-running@{}.service \
     obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
     obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
-    obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
     "
 
 # TODO: Remove it when 69903 applied
@@ -33,6 +32,7 @@ HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
     obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
     obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
+    obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
     "
 
 HOST_DEFAULT_TARGETS:append = " \

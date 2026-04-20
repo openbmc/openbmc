@@ -13,7 +13,6 @@ PACKAGECONFIG:append = " host-gpio"
 # Chassis ON
 CHASSIS_DEFAULT_TARGETS:remove = " \
     obmc-chassis-poweron@{}.target.wants/chassis-poweron@{}.service \
-    obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
     obmc-chassis-poweron@{}.target.requires/obmc-power-start@{}.service \
     obmc-chassis-poweron@{}.target.requires/phosphor-set-chassis-transition-to-on@{}.service \
 "
@@ -24,7 +23,6 @@ CHASSIS_DEFAULT_TARGETS:append = " \
 
 # Chassis Off
 CHASSIS_DEFAULT_TARGETS:remove = " \
-    obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
     obmc-chassis-poweroff@{}.target.requires/obmc-power-stop@{}.service \
     obmc-chassis-poweroff@{}.target.requires/obmc-powered-off@{}.service \
     obmc-chassis-poweroff@{}.target.requires/phosphor-set-chassis-transition-to-off@{}.service \
@@ -49,6 +47,8 @@ HOST_DEFAULT_TARGETS:append = " \
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
     obmc-host-graceful-quiesce@{}.target.wants/pldmSoftPowerOff.service \
+    obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
+    obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
 "
 
 # Host On
