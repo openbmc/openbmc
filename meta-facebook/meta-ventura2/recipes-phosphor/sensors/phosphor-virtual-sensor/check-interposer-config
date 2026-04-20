@@ -7,48 +7,49 @@ CONFIG_PATH="$CONFIG_DIR/virtual_sensor_config.json"
 
 check_ventura2_sku()
 {
-  fru_path=$(busctl tree xyz.openbmc_project.FruDevice \
-	  | grep Ventura2_RMC | awk '{print $2}')
+    fru_path=$(busctl tree xyz.openbmc_project.FruDevice \
+        | grep Ventura2_RMC | awk '{print $2}')
 
-  if [ -z "$fru_path" ]; then
-    echo "Ventura2_RMC FRU not found"
-    return 1
-  fi
+    if [ -z "$fru_path" ]; then
+        echo "Ventura2_RMC FRU not found"
+        return 1
+    fi
 
-  sku=$(busctl get-property xyz.openbmc_project.FruDevice \
-	  "$fru_path" xyz.openbmc_project.FruDevice PRODUCT_INFO_AM1 \
-	  2>/dev/null | awk -F\" '{print $2}')
-  echo "$sku"
+    sku=$(busctl get-property xyz.openbmc_project.FruDevice \
+            "$fru_path" xyz.openbmc_project.FruDevice PRODUCT_INFO_AM1 \
+        2>/dev/null | awk -F\" '{print $2}')
+    echo "$sku"
 }
 
 
 # create config folder if not exist
 if [ ! -d "$CONFIG_DIR" ]; then
-  mkdir -p "$CONFIG_DIR"
+    mkdir -p "$CONFIG_DIR"
 fi
 
 # clean up exist link
 if [ -L "$CONFIG_PATH" ]; then
-  rm "$CONFIG_PATH"
+    rm "$CONFIG_PATH"
 fi
 
 # check interposer board type
 for i in {1..10}
 do
-  echo "check interposer board type, attempt $i"
-  sku=$(check_ventura2_sku)
-  echo "SKU: $sku"
-  case "$sku" in
-    "Sku 1")
-      ln -sf "$VENTURA2_SKU1_CONF_PATH" "$CONFIG_PATH"
-      break
-      ;;
-    "Sku 2")
-      ln -sf "$VENTURA2_SKU2_CONF_PATH" "$CONFIG_PATH"
-      break
-      ;;
-    *)
-      echo "Unknown SKU: $sku"
-      ;;
-  esac
+    echo "check interposer board type, attempt $i"
+    sku=$(check_ventura2_sku | tr '[:upper:]' '[:lower:]')
+    echo "SKU: $sku"
+    case "$sku" in
+        "sku 1" | "sku 4")
+            ln -sf "$VENTURA2_SKU1_CONF_PATH" "$CONFIG_PATH"
+            break
+            ;;
+        "sku 2" | "sku 1c" | "sku 4c")
+            ln -sf "$VENTURA2_SKU2_CONF_PATH" "$CONFIG_PATH"
+            break
+            ;;
+        *)
+            ln -sf "$VENTURA2_SKU1_CONF_PATH" "$CONFIG_PATH"
+            echo "Unknown SKU: $sku"
+            ;;
+    esac
 done
