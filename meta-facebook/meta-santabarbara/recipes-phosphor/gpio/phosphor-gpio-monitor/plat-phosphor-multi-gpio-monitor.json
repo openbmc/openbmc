@@ -100,6 +100,48 @@
         "Continue": true
     },
     {
+        "Name": "FM_P3V3_NIC_400G_FAULT_R_N",
+        "LineName": "FM_P3V3_NIC_400G_FAULT_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@FM_P3V3_NIC_400G_FAULT_R_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@FM_P3V3_NIC_400G_FAULT_R_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_P3V3_E1S_0_FAULT_R_N",
+        "LineName": "FM_P3V3_E1S_0_FAULT_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@FM_P3V3_E1S_0_FAULT_R_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@FM_P3V3_E1S_0_FAULT_R_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "E1S_0_P12V_ADC_R_ALERT",
+        "LineName": "E1S_0_P12V_ADC_R_ALERT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-deassert-log@E1S_0_P12V_ADC_R_ALERT.service"
+            ],
+            "FALLING": [
+                "vr-fault-assert-log@E1S_0_P12V_ADC_R_ALERT.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "reset-button",
         "LineName": "reset-button",
         "EventMon": "BOTH",
