@@ -1,0 +1,88 @@
+#!/bin/bash
+
+eids="10 20 30 40"
+retry_delay_sec=1
+
+eid_to_module() {
+    case "$1" in
+        10) echo 0 ;;
+        20) echo 1 ;;
+        30) echo 2 ;;
+        40) echo 3 ;;
+        *) return 1 ;;
+    esac
+}
+
+get_pldm_object_path() {
+    local eid=$1
+    local compid=$2
+    local module
+    local path
+
+    module=$(eid_to_module "$eid") || return 1
+
+    path=$(
+        busctl tree xyz.openbmc_project.PLDM |
+        grep -m1 "/xyz/openbmc_project/software/Santa_Barbara_Rainbow_module_${module}_MMC_Component_${compid}_" |
+        sed 's/^[^\/]*//'
+    )
+
+    echo "$path"
+}
+
+declare -A processed
+remaining=0
+
+for eid in $eids; do
+    processed["$eid"]=0
+    remaining=$((remaining + 1))
+done
+
+while [ "$remaining" -gt 0 ]; do
+    for eid in $eids; do
+        [ "${processed[$eid]}" -eq 1 ] && continue
+
+        output=$(
+            pldmtool fw_update GetFirmwareParameters -m "$eid" 2>/dev/null |
+            jq -r '
+                .ComponentParameterEntries[]
+                | select((.ActiveComponentVersionString // "") | startswith("flash hamsa BOOT0:"))
+                | (.ComponentIdentifier | tostring) + "#" + (.ActiveComponentVersionString // "")
+            '
+        )
+
+        if [ -z "$output" ]; then
+            continue
+        fi
+
+        IFS="#" read -r compId version <<< "$output"
+        
+
+        if [[ "$version" == "flash hamsa BOOT0: 000000 00000000" || \
+            "$version" == "flash hamsa BOOT0: ffffff "* ]]; then
+            continue
+        fi
+
+        pldmObjPath=$(get_pldm_object_path "$eid" "$compId")
+
+        if [ -z "$pldmObjPath" ]; then
+            continue
+        fi
+
+        echo "EID $eid: path=$pldmObjPath"
+
+        if busctl set-property \
+            xyz.openbmc_project.PLDM \
+            "$pldmObjPath" \
+            xyz.openbmc_project.Software.Version \
+            Version s "$version"; then
+            echo "EID $eid updated: $version"
+            processed["$eid"]=1
+            remaining=$((remaining - 1))
+        else
+            echo "EID $eid failed to update"
+        fi
+    done
+
+    [ "$remaining" -gt 0 ] && sleep "$retry_delay_sec"
+done
