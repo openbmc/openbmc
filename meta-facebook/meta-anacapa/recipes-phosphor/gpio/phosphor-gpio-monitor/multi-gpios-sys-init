@@ -17,7 +17,8 @@ set_gpio FM_CPU0_NMI_SYNC_FLOOD_N 1
 set_gpio FM_BRIDGE_JTAG_MUX_SEL 0
 set_gpio FM_SCM_JTAG_MUX_SEL 0
 set_gpio FM_CPU_FPGA_JTAG_MUX_SEL 1
-
+set_gpio FPGA_JTAG_SCM_DBREQ_N 1
+set_gpio JTAG_CPLD_TRST_R_N 1
 
 set_gpio Port80_b0 1
 set_gpio Port80_b1 1
