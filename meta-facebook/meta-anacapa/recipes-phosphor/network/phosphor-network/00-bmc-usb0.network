@@ -10,4 +10,4 @@ LinkLocalAddressing=no
 IPv6AcceptRA=false
 
 [Address]
-Address=192.168.31.2/16
+Address=192.168.31.2/32
