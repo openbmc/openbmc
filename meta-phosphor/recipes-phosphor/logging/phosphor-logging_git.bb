@@ -20,7 +20,7 @@ DEPENDS += " \
     systemd \
     virtual/phosphor-logging-callouts \
     "
-SRCREV = "bd656e0d899ab640f7965e635eef05117d161bde"
+SRCREV = "eeaf3af5ba60867ead695c57dc5a0a2b53d4fb09"
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[openpower-pels] = " \
         -Dopenpower-pel-extension=enabled, \
