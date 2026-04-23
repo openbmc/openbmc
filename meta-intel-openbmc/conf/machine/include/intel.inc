@@ -9,6 +9,9 @@ MACHINE_FEATURES += "\
         "
 
 VIRTUAL-RUNTIME_skeleton_workbook = "${MACHINE}-config"
+VIRTUAL-RUNTIME_obmc-host-state-manager = "x86-power-control"
+VIRTUAL-RUNTIME_obmc-chassis-state-manager = "x86-power-control"
+VIRTUAL-RUNTIME_obmc-discover-system-state = "x86-power-control"
 
 PREFERRED_PROVIDER_virtual/obmc-chassis-mgmt = "packagegroup-intel-apps"
 PREFERRED_PROVIDER_virtual/obmc-fan-mgmt = "packagegroup-intel-apps"
