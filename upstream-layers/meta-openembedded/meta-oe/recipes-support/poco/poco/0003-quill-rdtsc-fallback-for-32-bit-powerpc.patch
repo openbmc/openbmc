@@ -22,7 +22,7 @@ diff --git a/dependencies/quill/include/quill/core/Rdtsc.h b/dependencies/quill/
 index 3d0ae9f26..67f26cb89 100644
 --- a/dependencies/quill/include/quill/core/Rdtsc.h
 +++ b/dependencies/quill/include/quill/core/Rdtsc.h
-@@ -100,7 +100,7 @@ QUILL_NODISCARD QUILL_ATTRIBUTE_HOT inline uint64_t rdtsc() noexcept
+@@ -95,7 +95,7 @@ QUILL_NODISCARD QUILL_ATTRIBUTE_HOT inline uint64_t rdtsc() noexcept
    __asm__ volatile("stck %0" : "=Q"(tsc) : : "cc");
    return tsc;
  }

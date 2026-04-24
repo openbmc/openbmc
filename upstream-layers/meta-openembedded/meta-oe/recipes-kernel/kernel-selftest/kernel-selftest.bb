@@ -12,12 +12,17 @@ S = "${UNPACKDIR}"
 SRC_URI:append:libc-musl = "\
                       file://userfaultfd.patch \
                       "
+
+# Fix liburing detection (from Linux v7.0)
+MM_PATCH = "file://0001-selftests-mm-pass-down-full-CC-and-CFLAGS-to-check_c.patch"
+
 SRC_URI += "file://run-ptest \
             file://COPYING \
             file://0001-selftests-timers-Fix-clock_adjtime-for-newer-32-bit-.patch \
+            ${@bb.utils.contains('PACKAGECONFIG', 'mm', '${MM_PATCH}', '', d)} \
             "
 
-# now we just test bpf and vm
+# now we just test bpf and mm (formerly known as vm)
 # we will append other kernel selftest in the future
 # bpf was added in 4.10 with: https://github.com/torvalds/linux/commit/5aa5bd14c5f8660c64ceedf14a549781be47e53d
 # if you have older kernel than that you need to remove it from PACKAGECONFIG
@@ -25,20 +30,17 @@ PACKAGECONFIG ??= "firmware"
 # bpf needs working clang compiler anyway
 PACKAGECONFIG:append:toolchain-clang:x86-64 = " bpf"
 PACKAGECONFIG:remove:x86 = "bpf"
-PACKAGECONFIG:remove:arm = "bpf vm"
+PACKAGECONFIG:remove:arm = "bpf mm"
 # host ptrace.h is used to compile BPF target but mips ptrace.h is needed
 # progs/loop1.c:21:9: error: incomplete definition of type 'struct user_pt_regs'
 # m = PT_REGS_RC(ctx);
-# vm tests need libhugetlbfs starting 5.8+ (https://lkml.org/lkml/2020/4/22/1654)
-PACKAGECONFIG:remove:qemumips = "bpf vm"
-
-# riscv does not support libhugetlbfs yet
-PACKAGECONFIG:remove:riscv64 = "bpf vm"
-PACKAGECONFIG:remove:riscv32 = "bpf vm"
+PACKAGECONFIG:remove:qemumips = "bpf"
+PACKAGECONFIG:remove:riscv64 = "bpf"
+PACKAGECONFIG:remove:riscv32 = "bpf"
 
 PACKAGECONFIG[bpf] = ",,elfutils elfutils-native libcap libcap-ng rsync-native python3-docutils-native,"
 PACKAGECONFIG[firmware] = ",,libcap, bash"
-PACKAGECONFIG[vm] = ",,libcap libhugetlbfs,libgcc bash"
+PACKAGECONFIG[mm] = ",,libcap liburing numactl, libgcc bash"
 
 do_patch[depends] += "virtual/kernel:do_shared_workdir"
 do_compile[depends] += "virtual/kernel:do_install"
@@ -48,7 +50,7 @@ inherit linux-kernel-base module-base kernel-arch ptest siteinfo
 DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
 
 TEST_LIST = "\
-    ${@bb.utils.filter('PACKAGECONFIG', 'bpf firmware vm', d)} \
+    ${@bb.utils.filter('PACKAGECONFIG', 'bpf firmware mm', d)} \
     cpufreq \
     cpu-hotplug \
     rtc \
@@ -78,6 +80,7 @@ KERNEL_SELFTEST_SRC ?= "Makefile \
                         tools \
                         scripts \
                         arch \
+                        ${@bb.utils.filter('PACKAGECONFIG', 'mm', d)} \
                         LICENSES \
 "
 do_compile() {

@@ -6,7 +6,9 @@ SECION = "devel"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-SRC_URI = "git://github.com/varlink/libvarlink.git;protocol=https;branch=master;tag=v${PV}"
+SRC_URI = "git://github.com/varlink/libvarlink.git;protocol=https;branch=master;tag=v${PV} \
+           file://0001-transport-tool-use-const-for-strchr-return-pointers.patch \
+          "
 SRCREV = "2ad4ec7ca62e148dbf0ad98646ec68c2e7e8a88e"
 
 inherit meson bash-completion lib_package

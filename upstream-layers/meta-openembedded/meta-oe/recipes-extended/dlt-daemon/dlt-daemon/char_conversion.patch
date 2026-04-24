@@ -1,0 +1,27 @@
+daemon: fix sign-conversion warning in dlt_timer_conn_types array type
+
+Change dlt_timer_conn_types from char[] to DltConnectionType[] to match
+the actual type of values stored in the array.
+
+This was silently working on arm64 because char is unsigned by default on
+that architecture, making it compatible with DltConnectionType (an unsigned
+enum). On x86_64, char is signed by default, causing an implicit signed-to-
+unsigned conversion when passing array elements to dlt_connection_create(),
+which triggered -Wsign-conversion and broke the build.
+
+The fix corrects the array's declared type to match its contents, making the
+code portable regardless of the platform's char signedness.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+--- a/src/daemon/dlt-daemon.c
++++ b/src/daemon/dlt-daemon.c
+@@ -140,7 +140,7 @@ int g_signo = 0;
+ /* used for value from conf file */
+ static int value_length = 1024;
+ 
+-static char dlt_timer_conn_types[DLT_TIMER_UNKNOWN + 1] = {
++static DltConnectionType dlt_timer_conn_types[DLT_TIMER_UNKNOWN + 1] = {
+     [DLT_TIMER_PACKET] = DLT_CONNECTION_ONE_S_TIMER,
+     [DLT_TIMER_ECU] = DLT_CONNECTION_SIXTY_S_TIMER,
+ #ifdef DLT_SYSTEMD_WATCHDOG_ENABLE

@@ -12,8 +12,6 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  src/Makefile    |  8 ++++----
  2 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/sample/Makefile b/sample/Makefile
-index 15cafd9..d83641f 100644
 --- a/sample/Makefile
 +++ b/sample/Makefile
 @@ -35,9 +35,9 @@ ifeq ($(PLATFORM),SunOS)
@@ -50,13 +48,23 @@ index 15cafd9..d83641f 100644
  
  %.o: %.c
  	$(CC) $(ARCH) $(CPPFLAGS) $(CFLAGS) -c $<
-diff --git a/src/Makefile b/src/Makefile
-index 9b56b5e..39a5ea1 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -45,7 +45,7 @@ endif
+@@ -2,7 +2,7 @@
+ # $Id: Makefile,v 1.57 2005/06/13 16:34:53 evertonm Exp $
+ #
  
- WARN = -pedantic -ansi -Wshadow -Wpointer-arith -Wcast-qual \
+-#DEBUG += -DRULI_SRV_DEBUG 
++#DEBUG += -DRULI_SRV_DEBUG
+ #DEBUG += -DRULI_HOST_DEBUG
+ #DEBUG += -DRULI_RES_DEBUG
+ #DEBUG += -DRULI_TXT_COMPARE_DEBUG
+@@ -43,9 +43,9 @@ ifeq ($(PLATFORM),SunOS)
+ DEFINE_SOLARIS = -D_RULI_SOLARIS_
+ endif
+ 
+-WARN = -pedantic -ansi -Wshadow -Wpointer-arith -Wcast-qual \
++WARN = -Wshadow -Wpointer-arith -Wcast-qual \
  	-Wcast-align -Wwrite-strings -Wredundant-decls
 -CC = gcc
 +CC ?= gcc
@@ -72,7 +80,7 @@ index 9b56b5e..39a5ea1 100644
  LIBOBJ = ruli_isaac.o ruli_mem.o ruli_rand.o ruli_util.o ruli_list.o \
  	ruli_addr.o ruli_sock.o ruli_txt.o ruli_msg.o ruli_fsm.o \
  	ruli_res.o ruli_parse.o ruli_host.o ruli_srv.o ruli_conf.o \
-@@ -66,7 +66,7 @@ LIBOBJ = ruli_isaac.o ruli_mem.o ruli_rand.o ruli_util.o ruli_list.o \
+@@ -66,7 +66,7 @@ LIBOBJ = ruli_isaac.o ruli_mem.o ruli_ra
  	ruli_getaddrinfo.o
  SHAREDOBJ = $(LIBOBJ:%.o=%.os)
  SONAME = libruli.so.4
@@ -90,6 +98,3 @@ index 9b56b5e..39a5ea1 100644
  	@echo
  	@echo "REMINDER:"
  	@echo "Add $(INSTALL_LIB_DIR) to your dynamic loader path:"
--- 
-2.24.0
-

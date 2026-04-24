@@ -9,6 +9,8 @@ SRC_URI = "git://github.com/smuellerDD/libkcapi.git;branch=master;protocol=https
 
 inherit autotools
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[testapp] = "--enable-kcapi-test,,,bash"
 PACKAGECONFIG[apps] = "--enable-kcapi-speed --enable-kcapi-hasher --enable-kcapi-rngapp --enable-kcapi-encapp --enable-kcapi-dgstapp,,,"

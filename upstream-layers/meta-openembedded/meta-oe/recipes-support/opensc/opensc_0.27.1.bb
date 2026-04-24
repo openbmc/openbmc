@@ -36,6 +36,7 @@ PACKAGECONFIG[readline] = "--enable-readline,--disable-readline,readline"
 FILES:${PN} += "\
     ${libdir}/opensc-pkcs11.so \
     ${libdir}/pkcs11-spy.so \
+    ${datadir}/p11-kit/modules/opensc.module \
 "
 FILES:${PN}-dev += "\
     ${libdir}/onepin-opensc-pkcs11.so \

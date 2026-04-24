@@ -1,0 +1,56 @@
+From d0326cd89b01600a6d8ba5e32e8e090f2ea29f2d Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 15 Apr 2026 16:28:28 -0700
+Subject: [PATCH] misc: fix discarded const qualifiers in char pointer
+ assignments
+
+These show up with glibc 2.43 + clang-22, glibc-2.43 has C23 versions
+of str* mem* functions
+
+Upstream-Status: Backport [https://github.com/taisei-project/taisei/commit/1c8f773912cbbd72b4a4df271fda1bd6d2aeb27f]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/log.c           | 2 +-
+ src/pixmap/pixmap.c | 2 +-
+ src/vfs/pathutil.c  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/log.c b/src/log.c
+index 8194535a..88f34386 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -161,7 +161,7 @@ static void add_debug_info(StringBuffer *buf) {
+ static size_t modname(const char *filename, size_t filename_len, char *mod) {
+ 	size_t mlen = filename_len;
+
+-	char *dot = memchr(filename, '.', mlen);
++	const char *dot = memchr(filename, '.', mlen);
+ 	if(dot) {
+ 		mlen = dot - filename;
+ 	}
+diff --git a/src/pixmap/pixmap.c b/src/pixmap/pixmap.c
+index 25105215..9717f22a 100644
+--- a/src/pixmap/pixmap.c
++++ b/src/pixmap/pixmap.c
+@@ -49,7 +49,7 @@ void *pixmap_alloc_buffer_for_conversion(const Pixmap *src, PixmapFormat format,
+ }
+
+ static PixmapFileFormatHandler *pixmap_handler_for_filename(const char *file) {
+-	char *ext = strrchr(file, '.');
++	const char *ext = strrchr(file, '.');
+
+ 	if(!ext || !*(++ext)) {
+ 		return NULL;
+diff --git a/src/vfs/pathutil.c b/src/vfs/pathutil.c
+index f6bd6a80..85ccf5ee 100644
+--- a/src/vfs/pathutil.c
++++ b/src/vfs/pathutil.c
+@@ -14,7 +14,7 @@ char *vfs_path_normalize(const char *path, char *out) {
+ 	const char *p = path;
+ 	char *o = out;
+ 	char *last_sep = out - 1;
+-	char *path_end = strchr(path, 0);
++	const char *path_end = strchr(path, 0);
+
+ 	#define IS_SEP_OR_NUL(chr) (VFS_IS_PATH_SEPARATOR(chr) || (chr == '\0'))
+

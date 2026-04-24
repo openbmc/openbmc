@@ -1,0 +1,47 @@
+From d00c3c9fb8267f53cf730b8441a7d7f904af5215 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 20 Apr 2026 09:14:50 +0200
+Subject: [PATCH] meson.build: dont check for python3-pygobject gexiv2 support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+We only provide support for gexiv2 in python3-pygobject for the target, but
+unfortunately this feature is being requested for the native version, which
+would require gexiv2-native to be compilable — something I consider quite
+hard to achieve and maybe also not desirable at all.
+
+Remove the test for this feature, since we know that our target provides it.
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 4f6f8ce9a4..4509cd2c39 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1224,7 +1224,7 @@ foreach py : py_candidates
+                                         '''except (ImportError):''',
+                                         '''    sys.exit(1)''']),
+                                         check: false).returncode() == 0
+-    if pygobject_found.returncode() == 0 and pygobject_found.stdout().strip().version_compare(pygobject_minver) and pygobject_gexiv2_found
++    if pygobject_found.returncode() == 0 and pygobject_found.stdout().strip().version_compare(pygobject_minver)
+       break
+     endif
+   endif
+@@ -1235,7 +1235,7 @@ if not python.found() or not python.language_version().version_compare(python3_m
+ endif
+ message('Found Python @0@'.format(python.language_version()))
+ 
+-if pygobject_found.returncode() != 0 or not pygobject_found.stdout().strip().version_compare(pygobject_minver) or not pygobject_gexiv2_found
++if pygobject_found.returncode() != 0 or not pygobject_found.stdout().strip().version_compare(pygobject_minver)
+   error('No suitable PyGObject (with GExiv2 submodule) found. Minimum supported version: @0@'.format(pygobject_minver))
+ endif
+ message('Found PyGObject: @0@'.format(pygobject_found.stdout().strip()))
+-- 
+2.53.0
+

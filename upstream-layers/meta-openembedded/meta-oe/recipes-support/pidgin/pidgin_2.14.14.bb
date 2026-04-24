@@ -50,6 +50,7 @@ EXTRA_OECONF = " \
     --disable-farstream \
     --disable-vv \
 "
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
 
 # CONFIG_ARGS is used to display build info. Replace full paths by reproducible
 # variables ($S, $WORKDIR)

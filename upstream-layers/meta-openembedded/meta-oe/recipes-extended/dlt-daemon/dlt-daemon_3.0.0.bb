@@ -24,6 +24,8 @@ SRC_URI = "git://github.com/COVESA/${BPN}.git;protocol=https;branch=master \
            file://0001-Fix-build-failure-with-glibc-2.43.patch \
            file://0001-CMakeLists.txt-make-CONFIGURATION_FILES_DIR-aligned.patch \
            file://0001-warnings-Fix-clang-generated-warnings.patch \
+           file://0001-dlt-daemon.c-fix-wrong-len.patch \
+           file://char_conversion.patch \
            "
 SRCREV = "f595ea29d1007ca1c3b2d1fd3a88adf7d3db6320"
 

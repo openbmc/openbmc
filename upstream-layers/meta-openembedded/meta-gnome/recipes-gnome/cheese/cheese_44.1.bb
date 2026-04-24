@@ -5,7 +5,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a17cb0a873d252440acfdf9b3d0e7fbf"
 
 inherit gnomebase gobject-introspection vala itstool gtk-icon-cache gsettings gnome-help gtk-doc
 
-REQUIRED_DISTRO_FEATURES = "opengl"
+# x11 is needed due to libcanberra dependency which does not compile
+# gtk3 support with out it and cheese look for
+# | aarch64-yoe-linux-ld.lld: error: unable to find library -lcanberra-gtk3
+REQUIRED_DISTRO_FEATURES = "opengl x11"
 
 SRC_URI += "file://0001-libcheese-Add-GtkWidget-cast-to-avoid-an-incompatibl.patch"
 

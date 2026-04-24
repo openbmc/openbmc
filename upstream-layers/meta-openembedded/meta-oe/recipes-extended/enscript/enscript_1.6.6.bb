@@ -19,6 +19,8 @@ SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \
 
 inherit autotools gettext
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 EXTRA_OECONF += "PERL='${USRBINPATH}/env perl'"
 
 SRC_URI[sha256sum] = "6d56bada6934d055b34b6c90399aa85975e66457ac5bf513427ae7fc77f5c0bb"

@@ -1,0 +1,53 @@
+From 301e64db17466316ac34a28e30867cc7853777b5 Mon Sep 17 00:00:00 2001
+From: Haiqing Bai <Haiqing.Bai@windriver.com>
+Date: Thu, 16 Apr 2026 10:00:19 +0000
+Subject: [PATCH] Fix the hardcoded legacy helper path
+
+Fix the below issue:
+"~# drbdadm --version
+execvp() failed to exec drbdadm-84: No such file or directory"
+
+The legacy helper path was hardcoded to "/lib/drbd", which does not exist
+on systems where LIBDIR is configured to a different location (e.g.
+/usr/lib). This caused drbdadm to fail when attempting to exec drbdadm-84.
+Use the build-configured DRBD_LEGACY_LIB_DIR (derived from LIBDIR) instead
+of the hardcoded path, so the legacy helper lookup respects the actual
+install prefix.
+
+Upstream-Status: Pending
+
+Signed-off-by: Haiqing Bai <haiqing.bai@windriver.com>
+---
+ user/v9/Makefile.in       | 1 +
+ user/v9/drbdtool_common.c | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/user/v9/Makefile.in b/user/v9/Makefile.in
+index fa12f79..980c67c 100644
+--- a/user/v9/Makefile.in
++++ b/user/v9/Makefile.in
+@@ -70,6 +70,7 @@ CFLAGS += -DKEYUTILS
+ endif
+ ifeq ($(WITH_84_SUPPORT),yes)
+ CFLAGS += -DWITH_84_SUPPORT
++CFLAGS += -DDRBD_LEGACY_LIB_DIR=\"$(LIBDIR)\"
+ endif
+ CFLAGS += $(EXTRA_CFLAGS)
+ 
+diff --git a/user/v9/drbdtool_common.c b/user/v9/drbdtool_common.c
+index d07d054..ea95a16 100644
+--- a/user/v9/drbdtool_common.c
++++ b/user/v9/drbdtool_common.c
+@@ -332,8 +332,7 @@ void add_component_to_path(const char *path)
+ 
+ void add_lib_drbd_to_path(void)
+ {
+-		/* TODO: if exec-prefix != "/" ? */
+-	add_component_to_path("/lib/drbd");
++	add_component_to_path(DRBD_LEGACY_LIB_DIR);
+ }
+ 
+ /* from linux/crypto/crc32.c */
+-- 
+2.53.0
+

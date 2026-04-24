@@ -32,6 +32,8 @@ file://COPYING.LGPL;md5=6e29c688d912da12b66b73e32b03d812"
 
 inherit autotools pkgconfig
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 EXTRA_OEMAKE += "ROOTPREFIX=${root_prefix}"
 
 FILES:${PN} += "${nonarch_base_libdir}/firmware"

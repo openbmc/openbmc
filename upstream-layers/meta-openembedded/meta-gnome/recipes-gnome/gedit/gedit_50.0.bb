@@ -23,7 +23,7 @@ inherit gnomebase gsettings itstool gnome-help gobject-introspection gtk-doc get
 def gnome_verdir(v):
     return oe.utils.trim_version(v, 1)
 
-SRC_URI = "git://gitlab.gnome.org/World/gedit/gedit.git;protocol=https;branch=master;tag=${PV}"
+SRC_URI = "gitsm://gitlab.gnome.org/World/gedit/gedit.git;protocol=https;branch=master;tag=${PV}"
 SRCREV = "25d0bf0c3c40b0866fc23ec875f0af6c67f728ef"
 
 # gobject-introspection is mandatory and cannot be configured

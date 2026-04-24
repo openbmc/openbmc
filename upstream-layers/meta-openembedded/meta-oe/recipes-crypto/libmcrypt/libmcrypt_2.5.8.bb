@@ -16,6 +16,8 @@ UPSTREAM_CHECK_REGEX = "Libmcrypt/(?P<pver>\d+(\.\d+)+)/"
 
 inherit autotools-brokensep gettext binconfig multilib_script
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 CFLAGS += "-Wno-error=implicit-int"
 
 do_configure() {

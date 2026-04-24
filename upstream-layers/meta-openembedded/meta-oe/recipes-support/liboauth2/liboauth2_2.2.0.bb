@@ -7,6 +7,7 @@ SRC_URI = " \
     git://github.com/OpenIDC/liboauth2;protocol=https;branch=master;tag=v${PV} \
     file://0001-fix-clang-curl_easy_setopt-takes-a-long-not-an-int.patch \
     file://0002-Fix-use-of-strchr-with-new-GCC.patch \
+    file://0001-build-guard-coverage-linker-flag-behind-CODE_COVERAG.patch \
     "
 
 SRCREV = "12571b6d6568c2db7d5f080f60ecb55795c0db19"
@@ -20,4 +21,4 @@ PACKAGECONFIG[memcache] = "--with-memcache,--without-memcache,libmemcached"
 PACKAGECONFIG[redis] = "--with-redis,--without-redis,hiredis"
 PACKAGECONFIG[jq] = "--with-jq,--without-jq,jq"
 PACKAGECONFIG[apache] = "--with-apache,--without-apache,apache2"
-
+PACKAGECONFIG[ccov] = "--enable-code-coverage,--disable-code-coverage,"

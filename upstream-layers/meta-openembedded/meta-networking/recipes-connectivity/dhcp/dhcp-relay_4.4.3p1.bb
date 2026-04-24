@@ -39,7 +39,7 @@ BIND_EXTRA_CONFIG = "\
         --host=${HOST_SYS} \
         --target=${TARGET_SYS} \
 "
-
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
 EXTRA_OECONF = "--with-bind-extra-config="${BIND_EXTRA_CONFIG}" \
                 --enable-paranoia \
                 --disable-static \

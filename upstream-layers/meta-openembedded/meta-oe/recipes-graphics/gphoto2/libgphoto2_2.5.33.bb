@@ -12,8 +12,16 @@ DEPENDS = "libtool jpeg virtual/libusb0 libexif zlib libxml2"
 SRC_URI = "${SOURCEFORGE_MIRROR}/gphoto/${BP}.tar.xz;name=libgphoto2 \
            file://40-libgphoto2.rules \
            file://0001-configure-Filter-out-buildpaths-from-CC.patch \
-		   file://0001-libgphoto2-fix-const-correctness-for-c23-builds.patch \
-"
+           file://0001-libgphoto2-fix-const-correctness-for-c23-builds.patch \
+           file://CVE-2026-40333.patch \
+           file://CVE-2026-40334.patch \
+           file://CVE-2026-40335.patch \
+           file://CVE-2026-40336.patch \
+           file://CVE-2026-40338.patch \
+           file://CVE-2026-40339.patch \
+           file://CVE-2026-40340.patch \
+           file://CVE-2026-40341.patch \
+           "
 SRC_URI[libgphoto2.sha256sum] = "28825f767a85544cb58f6e15028f8e53a5bb37a62148b3f1708b524781c3bef2"
 
 UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/gphoto/files/libgphoto/"

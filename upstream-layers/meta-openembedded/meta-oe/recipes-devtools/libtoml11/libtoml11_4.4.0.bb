@@ -16,11 +16,14 @@ PE = "1"
 SRC_URI = "\
     gitsm://github.com/ToruNiina/toml11.git;protocol=https;branch=main;tag=v${PV} \
     file://0001-Remove-whitespace-in-operator.patch \
+    file://0001-Remove-more-whitespaces-after-operator.patch \
     file://run-ptest \
 "
 SRCREV = "be08ba2be2a964edcdb3d3e3ea8d100abc26f286"
 
 inherit cmake ptest
+
+CXXFLAGS:append:toolchain-clang = " -Wno-error=c2y-extensions"
 
 EXTRA_OECMAKE += "-DTOML11_PRECOMPILE=ON \
                   -DTOML11_BUILD_TESTS=${@bb.utils.contains("PTEST_ENABLED", "1", "ON", "OFF", d)} \

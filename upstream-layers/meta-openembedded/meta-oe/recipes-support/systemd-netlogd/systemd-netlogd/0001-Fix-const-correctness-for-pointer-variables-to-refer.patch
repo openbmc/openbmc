@@ -1,0 +1,60 @@
+From 515e23b37ad1400bfb73797771c4f0fd78655328 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 15 Apr 2026 10:52:05 -0700
+Subject: [PATCH] Fix const-correctness for pointer variables to referred
+ strings
+
+Mark pointer variables 'e' as 'const char *' in
+config_parse_netlog_remote_address,file_in_same_dir, and
+socket_address_parse, since they point to memory they do not
+own or modify.
+
+Upstream-Status: Submitted [https://github.com/systemd/systemd-netlogd/pull/148]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/netlog/netlog-conf.c | 2 +-
+ src/share/path-util.c    | 3 ++-
+ src/share/socket-util.c  | 3 ++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/src/netlog/netlog-conf.c b/src/netlog/netlog-conf.c
+index a4cf0da..59bdd23 100644
+--- a/src/netlog/netlog-conf.c
++++ b/src/netlog/netlog-conf.c
+@@ -22,7 +22,7 @@ int config_parse_netlog_remote_address(const char *unit,
+                                        void *data,
+                                        void *userdata) {
+         Manager *m = userdata;
+-        char *e;
++        const char *e;
+         int r;
+
+         assert(filename);
+diff --git a/src/share/path-util.c b/src/share/path-util.c
+index dda7ec6..ad6f24a 100644
+--- a/src/share/path-util.c
++++ b/src/share/path-util.c
+@@ -327,7 +327,8 @@ bool path_is_safe(const char *p) {
+ }
+
+ char *file_in_same_dir(const char *path, const char *filename) {
+-        char *e, *ret;
++        const char *e;
++        char *ret;
+         size_t k;
+
+         assert(path);
+diff --git a/src/share/socket-util.c b/src/share/socket-util.c
+index ae33338..5a6284b 100644
+--- a/src/share/socket-util.c
++++ b/src/share/socket-util.c
+@@ -33,7 +33,8 @@
+ #include "util.h"
+
+ int socket_address_parse(SocketAddress *a, const char *s) {
+-        char *e, *n;
++        const char *e;
++        char *n;
+         unsigned u;
+         int r;
+

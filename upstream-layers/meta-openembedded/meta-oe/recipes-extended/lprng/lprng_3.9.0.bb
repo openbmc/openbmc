@@ -10,6 +10,7 @@ UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/lprng/files/lprng/"
 UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit autotools gettext
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
 
 EXTRA_OECONF = "--disable-ssl --disable-kerberos --enable-force_localhost \
 				CHOWN=${base_bindir}/chown CHGRP=${base_bindir}/chgrp \

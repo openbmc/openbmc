@@ -1,0 +1,37 @@
+From 7e94c281563ff0eb67e521cf0a6fc3049f732214 Mon Sep 17 00:00:00 2001
+From: Changqing Li <changqing.li@windriver.com>
+Date: Wed, 15 Apr 2026 16:52:19 +0800
+Subject: [PATCH] dlt-daemon.c: fix wrong len
+
+Set len to 0 makes the application description always empty.
+One of the failure case:
+Running "dlt-example-user 'test'",
+Check "dlt-control -j localhost", will not get application description:
+APID:LOG-
+
+Expected:
+APID:LOG- Test Application for Logging
+
+Upstream-Status: Backport [https://github.com/COVESA/dlt-daemon/pull/852]
+
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
+---
+ src/daemon/dlt-daemon.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/daemon/dlt-daemon.c b/src/daemon/dlt-daemon.c
+index 8c318a4..38fe824 100644
+--- a/src/daemon/dlt-daemon.c
++++ b/src/daemon/dlt-daemon.c
+@@ -4110,7 +4110,7 @@ int dlt_daemon_process_user_message_register_application(DltDaemon *daemon,
+             to_remove = (uint32_t) temp;
+         }
+ 
+-        len = 0;
++        len = userapp.description_length;
+ 
+         if (len > DLT_DAEMON_DESCSIZE) {
+             len = DLT_DAEMON_DESCSIZE;
+-- 
+2.34.1
+

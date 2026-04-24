@@ -29,6 +29,7 @@ UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d\.\d+\.\d+)"
 CVE_PRODUCT = "google:protobuf protobuf:protobuf google-protobuf protobuf-cpp"
 
 CVE_STATUS[CVE-2026-0994] = "cpe-incorrect: the vulnerability affects only python3-protobuf recipe"
+CVE_STATUS[CVE-2026-6409] = "cpe-incorrect: the vulnerability affects only the php library"
 
 inherit cmake pkgconfig ptest
 

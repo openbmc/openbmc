@@ -1,0 +1,73 @@
+From 55edc241e9b61b14153c61fd0baaefac927ad89f Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Tue, 21 Apr 2026 17:39:43 -0700
+Subject: [PATCH] gphoto2: fix const qualifier violations
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+No logic is changed. The patch is a pure
+type-correctness fix that makes the variable
+declarations match the actual semantics —
+const char * for pointers into string literals
+or function parameters that must not be mutated,
+and char * only for owned heap memory. This
+satisfies Clang's strict qualifier checking without
+needing any casts or warning suppressions.
+
+Fixes errors seen on clang with
+  -Werror,-Wincompatible-pointer-types-discards-qualifiers
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ gphoto2/main.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/gphoto2/main.c b/gphoto2/main.c
+index 5a3c5c1..086f9df 100644
+--- a/gphoto2/main.c
++++ b/gphoto2/main.c
+@@ -146,7 +146,8 @@ static int
+ get_path_for_file (const char *folder, const char *name, CameraFileType type, CameraFile *file, char **path)
+ {
+ 	unsigned int i, l;
+-	char *s = NULL, b[1024];
++	const char *s = NULL;
++	char *p = NULL; char b[1024];
+ 	time_t t = 0;
+ 	struct tm *tm;
+ 	int hour12;
+@@ -339,18 +340,18 @@ get_path_for_file (const char *folder, const char *name, CameraFileType type, Ca
+ 			b[1] = '\0';
+ 		}
+ 
+-		s = *path ? realloc (*path, strlen (*path) + strlen (b) + 1) :
++		p = *path ? realloc (*path, strlen (*path) + strlen (b) + 1) :
+ 			    malloc (strlen (b) + 1);
+-		if (!s) {
++		if (!p) {
+ 			free (*path);
+ 			*path = NULL;
+ 			return (GP_ERROR_NO_MEMORY);
+ 		}
+ 		if (*path) {
+-			*path = s;
++			*path = p;
+ 			strcat (*path, b);
+ 		} else {
+-			*path = s;
++			*path = p;
+ 			strcpy (*path, b);
+ 		}
+ 	}
+@@ -696,7 +697,8 @@ dissolve_filename (
+ 	const char *folder, const char *filename,
+ 	char **newfolder, char **newfilename
+ ) {
+-	char *nfolder, *s;
++	char *nfolder;
++	const char *s;
+ 
+ 	s = strrchr (filename, '/');
+ 	if (!s) {

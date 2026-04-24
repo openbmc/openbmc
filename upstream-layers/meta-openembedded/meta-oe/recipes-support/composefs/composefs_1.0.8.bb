@@ -14,8 +14,9 @@ LIC_FILES_CHKSUM = "\
 "
 
 SRCREV = "858ce1b38e1534c2602eb431124b5dca706bc746"
-SRC_URI = "git://github.com/containers/composefs.git;protocol=https;branch=main"
-
+SRC_URI = "git://github.com/containers/composefs.git;protocol=https;branch=main;tag=v${PV} \
+           file://0001-mkcomposefs-use-const-char-for-memchr-return-values.patch \
+          "
 
 inherit meson
 

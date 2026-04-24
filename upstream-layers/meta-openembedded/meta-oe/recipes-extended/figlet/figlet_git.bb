@@ -10,5 +10,6 @@ SRCREV = "5bbcd7383a8c3a531299b216b0c734e1495c6db3"
 PV = "2.2.5+git"
 
 inherit autotools
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
 
 BBCLASSEXTEND = "native nativesdk"

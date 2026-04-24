@@ -1,0 +1,51 @@
+From 82fb537e74e9b801d196b76efaf735ee50cd86c6 Mon Sep 17 00:00:00 2001
+From: Eduardo Silva <eduardo@chronosphere.io>
+Date: Thu, 9 Apr 2026 12:43:31 -0600
+Subject: [PATCH] server: scheduler: guard protocol close callback
+
+Avoid calling a null cb_close handler from the scheduler close
+and timeout paths.
+
+This fixes the HTTP/2 upgrade case where the protocol handler can be
+switched to mk_http2_handler even though that handler does not
+implement cb_close.
+
+Verified by rebuilding with cmake --build build.
+
+Signed-off-by: Eduardo Silva <eduardo@chronosphere.io>
+
+This patch is part of https://github.com/monkey/monkey/pull/434, 
+containing assorted CVE fixes.
+
+Upstream-Status: Backport [https://github.com/monkey/monkey/commit/fc1d68fb38044df08cb43c7d9af0f68714388efc]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ mk_server/mk_scheduler.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/mk_server/mk_scheduler.c b/mk_server/mk_scheduler.c
+index a680d3cd..3cf0ba40 100644
+--- a/mk_server/mk_scheduler.c
++++ b/mk_server/mk_scheduler.c
+@@ -598,8 +598,10 @@ int mk_sched_check_timeouts(struct mk_sched_worker *sched,
+             MK_TRACE("Scheduler, closing fd %i due TIMEOUT",
+                      conn->event.fd);
+             MK_LT_SCHED(conn->event.fd, "TIMEOUT_CONN_PENDING");
+-            conn->protocol->cb_close(conn, sched, MK_SCHED_CONN_TIMEOUT,
+-                                     server);
++            if (conn->protocol->cb_close) {
++                conn->protocol->cb_close(conn, sched, MK_SCHED_CONN_TIMEOUT,
++                                         server);
++            }
+             mk_sched_drop_connection(conn, sched, server);
+         }
+     }
+@@ -749,7 +751,7 @@ int mk_sched_event_close(struct mk_sched_conn *conn,
+     MK_TRACE("[FD %i] Connection Handler, closed", conn->event.fd);
+     mk_event_del(sched->loop, &conn->event);
+ 
+-    if (type != MK_EP_SOCKET_DONE) {
++    if (type != MK_EP_SOCKET_DONE && conn->protocol->cb_close) {
+         conn->protocol->cb_close(conn, sched, type, server);
+     }
+     /*

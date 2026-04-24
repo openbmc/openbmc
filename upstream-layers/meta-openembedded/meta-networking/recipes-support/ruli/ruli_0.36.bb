@@ -20,7 +20,7 @@ SRC_URI[sha256sum] = "11d32def5b514748fbd9ea8c88049ae99e1bb358efc74eb91a4d268a39
 
 # -shared is passed via CFLAGS, clang complains since its used during linking
 # and not compiling
-CFLAGS:append:toolchain-clang = " -Wno-error=unused-command-line-argument"
+CFLAGS:append:toolchain-clang = " -std=gnu11 -Wno-error=unused-command-line-argument"
 
 EXTRA_OEMAKE = 'CC="${CC}" CPPFLAGS="${CFLAGS}" OOP_BASE_DIR="${STAGING_EXECPREFIXDIR}" \
                 INSTALL_BASE_DIR="${D}${exec_prefix}" \

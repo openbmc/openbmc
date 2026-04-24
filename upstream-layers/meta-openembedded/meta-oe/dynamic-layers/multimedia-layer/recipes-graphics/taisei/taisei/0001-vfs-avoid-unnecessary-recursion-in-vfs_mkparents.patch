@@ -1,0 +1,71 @@
+From c9c00a88c10db4ce93ffcc043c661727d2ec9758 Mon Sep 17 00:00:00 2001
+From: laochailan <239670+laochailan@users.noreply.github.com>
+Date: Fri, 13 Feb 2026 20:21:44 -0500
+Subject: [PATCH] vfs: avoid unnecessary recursion in vfs_mkparents
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+Upstream-Status: Backport [https://github.com/taisei-project/taisei/commit/f2e074f4a6aecf78b980014ed98f12fc6ddfd016]
+---
+ src/vfs/public.c | 43 +++++++++++++++++--------------------------
+ 1 file changed, 17 insertions(+), 26 deletions(-)
+
+diff --git a/src/vfs/public.c b/src/vfs/public.c
+index abaa050f..cfeef83a 100644
+--- a/src/vfs/public.c
++++ b/src/vfs/public.c
+@@ -146,38 +146,29 @@ void vfs_mkdir_required(const char *path) {
+ 	}
+ }
+
+-static bool vfs_mkparents_recurse(const char *path) {
+-	// FIXME this has stupid space complexity and is probably silly in general; optimize if you care
+-
+-	char *psep = strrchr(path, VFS_PATH_SEPARATOR);
+-
+-	if(!psep) {
+-		// parent is root
+-		return true;
+-	}
++bool vfs_mkparents(const char *path) {
++	char p[strlen(path)+1];
++	path = vfs_path_normalize(path, p);
+
+-	char p[strlen(path) + 1];
+-	strcpy(p, path);
+-	psep += p - path;
+-	*psep = 0;
++	// loop over all parent directories
++	char *psep = p;
++	while((psep = strchr(psep, VFS_PATH_SEPARATOR))) {
++		*psep = 0;
+
+-	VFSInfo i = vfs_query(p);
++		VFSInfo i = vfs_query(p);
++		if(i.error) {
++			return false;
++		}
+
+-	if(i.error) {
+-		return false;
+-	}
++		if(!i.exists || !i.is_dir) {
++			vfs_mkdir(p);
++		}
+
+-	if(i.exists) {
+-		return i.is_dir;
++		*psep = VFS_PATH_SEPARATOR;
++		psep++;
+ 	}
+
+-	return vfs_mkparents_recurse(p) && vfs_mkdir(p);
+-}
+-
+-bool vfs_mkparents(const char *path) {
+-	char p[strlen(path)+1];
+-	path = vfs_path_normalize(path, p);
+-	return vfs_mkparents_recurse(p);
++	return true;
+ }
+
+ char* vfs_repr(const char *path, bool try_syspath) {

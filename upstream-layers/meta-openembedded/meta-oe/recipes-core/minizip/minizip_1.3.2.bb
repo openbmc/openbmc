@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://zip.h;beginline=14;endline=30;md5=b7d2930a7332b2bc68f
 
 GITHUB_BASE_URI ?= "https://github.com/madler/zlib/releases/"
 
-SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/zlib-${PV}.tar.xz"
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/zlib-${PV}.tar.xz \
+           file://0001-Add-dependency-to-ints.h-in-minizip-Makefile.am.patch;patchdir=../.. \
+           "
 
 S = "${UNPACKDIR}/zlib-${PV}/contrib/minizip"
 

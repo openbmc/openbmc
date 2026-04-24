@@ -76,7 +76,7 @@ PACKAGECONFIG ??= "readline nss ifupdown dnsmasq nmcli \
     ${@bb.utils.contains('DISTRO_FEATURES', 'bluetooth', 'bluez5', '', d)} \
     ${@bb.utils.filter('DISTRO_FEATURES', 'wifi polkit ppp', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux audit', '', d)} \
-    ${@bb.utils.contains('DISTRO_FEATURES_BACKFILL_CONSIDERED', 'gobject-introspection-data', '', 'vala', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES_OPTED_OUT', 'gobject-introspection-data', '', 'vala', d)} \
 "
 
 inherit ${@bb.utils.contains('PACKAGECONFIG', 'vala', 'vala', '', d)}

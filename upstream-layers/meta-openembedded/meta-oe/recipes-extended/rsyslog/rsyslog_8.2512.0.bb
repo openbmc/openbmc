@@ -40,6 +40,7 @@ CVE_STATUS[CVE-2015-3243] = "fix-file-included: The shipped default rsyslog.conf
 
 inherit autotools pkgconfig systemd update-rc.d ptest
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
 EXTRA_OECONF += "--enable-imfile-tests ${ATOMICS}"
 ATOMICS = "ap_cv_atomic_builtins_64=yes ap_cv_atomic_builtins=yes"
 ATOMICS:mipsarch = ""

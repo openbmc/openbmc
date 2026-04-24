@@ -20,7 +20,10 @@ DEPENDS = "\
 DEPENDS:append:libc-musl = " libucontext"
 LDFLAGS:append:libc-musl = " -lucontext"
 
-SRC_URI = "gitsm://github.com/taisei-project/taisei.git;branch=v1.4.x;protocol=https;tag=v${PV}"
+SRC_URI = "gitsm://github.com/taisei-project/taisei.git;branch=v1.4.x;protocol=https;tag=v${PV} \
+           file://0001-misc-fix-discarded-const-qualifiers-in-char-pointer-.patch \
+		   file://0001-vfs-avoid-unnecessary-recursion-in-vfs_mkparents.patch \
+		  "
 SRCREV = "6a484e6e61cc51a22a9943762dc2ff6883914f38"
 
 inherit features_check meson mime mime-xdg pkgconfig

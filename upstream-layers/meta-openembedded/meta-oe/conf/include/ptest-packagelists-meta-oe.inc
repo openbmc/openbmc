@@ -59,7 +59,7 @@ PTESTS_FAST_META_OE = "\
     utf8proc \
     uthash \
     xdg-dbus-proxy \
-    ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'xrdp', '', d)} \
+    ${@bb.utils.contains('DISTRO_FEATURES', 'pam x11', 'xrdp', '', d)} \
     zeromq \
 "
 PTESTS_FAST_META_OE:append:x86 = " mcelog"
@@ -74,6 +74,7 @@ PTESTS_SLOW_META_OE = "\
     c-ares \
     ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'freerdp', '', d)} \
     fftw \
+    jsoncpp \
     libusb-compat \
     mariadb \
     postgresql \

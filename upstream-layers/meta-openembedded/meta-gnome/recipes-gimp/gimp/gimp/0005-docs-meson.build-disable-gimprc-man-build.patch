@@ -1,0 +1,33 @@
+From 47948d14777438ca5e8619a1f9293db28af88305 Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 20 Apr 2026 09:24:38 +0200
+Subject: [PATCH] docs/meson.build: disable gimprc man build
+
+This would require a native variant of gimp-console
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+
+Upstream-Status: Inappropriate [oe-specific]
+---
+ docs/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/docs/meson.build b/docs/meson.build
+index 70b57b52ef..d36e47dbb5 100644
+--- a/docs/meson.build
++++ b/docs/meson.build
+@@ -16,9 +16,9 @@ gimprc_man = custom_target('gimprc-' + gimp_app_version + '.5',
+                            command: [ gimp_exe, '--no-interface',
+                                       '--dump-gimprc-manpage' ],
+                            capture: true,
+-                           build_by_default: true,
++                           build_by_default: false,
+                            env: gimp_run_env,
+-                           install: true,
++                           install: false,
+                            install_dir: get_option('mandir') / 'man5')
+ 
+ gimptool_man = configure_file(input : 'gimptool.1.in',
+-- 
+2.53.0
+

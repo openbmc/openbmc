@@ -17,4 +17,6 @@ SRC_URI[sha256sum] = "4c305cc59f3e57f2cfc150a6ac511690f43633595760e1cb266bf23362
 
 inherit autotools
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 EXTRA_OECONF += "MKTEMP_PROG=mktemp"

@@ -1,0 +1,45 @@
+From 9d82303c7a3a780d481469cd8eafa016dcbff86f Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 16 Apr 2026 08:25:28 -0700
+Subject: [PATCH] mkcomposefs: use const char* for memchr return values
+
+memchr returns void*, which when assigned to char* discards the
+const qualifier of the input pointer. Cast to const char* to
+preserve const'ness.
+
+Fixes build with clang-22/glibc-2.43
+
+tools/mkcomposefs.c
+../sources/composefs-1.0.8/tools/mkcomposefs.c:413:8: error: initializing 'char *' with an expression of type 'const void *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+  413 |         char *embedded_nul_offset = memchr(line, 0, line_len);
+      |               ^                     ~~~~~~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+Upstream-Status: Submitted [https://github.com/composefs/composefs/pull/435]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tools/mkcomposefs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/mkcomposefs.c b/tools/mkcomposefs.c
+index 13b505d..e14d8d0 100644
+--- a/tools/mkcomposefs.c
++++ b/tools/mkcomposefs.c
+@@ -63,7 +63,7 @@ static __attribute__((format(printf, 1, 2))) char *make_error(const char *fmt, .
+ static size_t split_at(const char **start, size_t *length, char split_char,
+ 		       bool *partial)
+ {
+-	char *end = memchr(*start, split_char, *length);
++	const char *end = (const char*)memchr(*start, split_char, *length);
+ 	if (end == NULL) {
+ 		size_t part_len = *length;
+ 		*start = *start + *length;
+@@ -410,7 +410,7 @@ static char *tree_from_dump_line(dump_info *info, const char *line,
+ 	 * We didn't document support for embedded NULs, and it only introduces
+ 	 * ambiguity in parsing, so let's just reject this early on.
+ 	 */
+-	char *embedded_nul_offset = memchr(line, 0, line_len);
++	const char *embedded_nul_offset = (const char*)memchr(line, 0, line_len);
+ 	if (embedded_nul_offset != NULL) {
+ 		size_t off = embedded_nul_offset - line;
+ 		return make_error("Invalid embedded NUL character at position %lld",

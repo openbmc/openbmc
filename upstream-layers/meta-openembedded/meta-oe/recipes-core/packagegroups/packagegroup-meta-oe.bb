@@ -840,12 +840,11 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     openldap \
     opensc \
     p910nd \
-    pcp \
     pcsc-lite \
     pcsc-tools \
     picocom \
     pidgin \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "pidgin-otr", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "pcp pidgin-otr", "", d)} \
     pidgin-sipe \
     pngcheck \
     poco \
@@ -861,7 +860,6 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     rdfind \
     re2 \
     read-edid \
-    remmina \
     rsnapshot \
     sassc \
     satyr \
@@ -875,7 +873,7 @@ RDEPENDS:packagegroup-meta-oe-support = "\
     srecord \
     ssiapi \
     stm32flash \
-    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "synergy", "", d)} \
+    ${@bb.utils.contains("DISTRO_FEATURES", "x11", "remmina synergy", "", d)} \
     syslog-ng \
     tbb \
     thin-provisioning-tools \

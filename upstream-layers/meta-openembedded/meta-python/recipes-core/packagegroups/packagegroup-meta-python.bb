@@ -300,7 +300,7 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-py-ubjson \
     python3-pyalsaaudio \
     python3-pyasn1-modules \
-    python3-pyatspi \
+    ${@bb.utils.contains("DISTRO_FEATURES", "gobject-introspection-data ${GTK2DISTROFEATURES}", "python3-pyatspi", "", d)} \
     python3-pyaudio \
     python3-pybind11 \
     python3-pybind11-json \

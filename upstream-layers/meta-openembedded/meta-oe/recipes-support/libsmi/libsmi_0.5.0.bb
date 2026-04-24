@@ -20,6 +20,9 @@ UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"
 DEPENDS += "bison-native flex-native wget-native gawk-native"
 
 inherit autotools-brokensep update-alternatives
+
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 ALTERNATIVE_PRIORITY = "50"
 ALTERNATIVE:${PN}-yang = " ietf-interfaces ietf-netconf-acm ietf-netconf-with-defaults ietf-netconf"
 ALTERNATIVE_LINK_NAME[ietf-interfaces] = "${datadir}/yang/ietf-interfaces.yang"

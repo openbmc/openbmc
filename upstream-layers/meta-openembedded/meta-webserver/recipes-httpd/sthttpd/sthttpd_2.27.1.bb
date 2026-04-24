@@ -19,6 +19,8 @@ UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+(\.\d+)+).tar.gz"
 
 inherit autotools update-rc.d systemd update-alternatives
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 ALTERNATIVE_PRIORITY = "100"
 ALTERNATIVE:${PN}-doc = "htpasswd.1"
 ALTERNATIVE_LINK_NAME[htpasswd.1] = "${mandir}/man1/htpasswd.1"

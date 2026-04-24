@@ -1,0 +1,76 @@
+From 8f9e6395f1f8121b577eeb4cb54f671a9088bddd Mon Sep 17 00:00:00 2001
+From: Kevin Brodsky <kevin.brodsky@arm.com>
+Date: Thu, 22 Jan 2026 17:02:18 +0000
+Subject: [PATCH] selftests/mm: pass down full CC and CFLAGS to check_config.sh
+
+check_config.sh checks that liburing is available by running the compiler
+provided as its first argument.  This makes two assumptions:
+
+1. CC consists of only one word
+2. No extra flag is required
+
+Unfortunately, there are many situations where these assumptions don't
+hold.  For instance:
+
+- When using Clang, CC consists of multiple words
+- When cross-compiling, extra flags may be required to allow the
+  compiler to find headers
+
+Remove these assumptions by passing down CC and CFLAGS as-is from the
+Makefile, so that the same command line is used as when actually building
+the tests.
+
+Link: https://lkml.kernel.org/r/20260122170224.4056513-4-kevin.brodsky@arm.com
+Signed-off-by: Kevin Brodsky <kevin.brodsky@arm.com>
+Reviewed-by: Mark Brown <broonie@kernel.org>
+Acked-by: David Hildenbrand (Red Hat) <david@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: John Hubbard <jhubbard@nvidia.com>
+Cc: Dev Jain <dev.jain@arm.com>
+Cc: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>
+Cc: SeongJae Park <sj@kernel.org>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Usama Anjum <Usama.Anjum@arm.com>
+Cc: wang lian <lianux.mm@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+
+Upstream-Status: Backport [from commit 7f532d19c8be7, in tag v7.0]
+
+---
+ tools/testing/selftests/mm/Makefile        | 2 +-
+ tools/testing/selftests/mm/check_config.sh | 3 +--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/mm/Makefile b/tools/testing/selftests/mm/Makefile
+index ae6f994d3add..fc9b9ec367c3 100644
+--- a/tools/testing/selftests/mm/Makefile
++++ b/tools/testing/selftests/mm/Makefile
+@@ -228,7 +228,7 @@ $(OUTPUT)/ksm_tests: LDLIBS += -lnuma
+ $(OUTPUT)/migration: LDLIBS += -lnuma
+ 
+ local_config.mk local_config.h: check_config.sh
+-	/bin/sh ./check_config.sh $(CC)
++	CC="$(CC)" CFLAGS="$(CFLAGS)" ./check_config.sh
+ 
+ EXTRA_CLEAN += local_config.mk local_config.h
+ 
+diff --git a/tools/testing/selftests/mm/check_config.sh b/tools/testing/selftests/mm/check_config.sh
+index 3954f4746161..b84c82bbf875 100755
+--- a/tools/testing/selftests/mm/check_config.sh
++++ b/tools/testing/selftests/mm/check_config.sh
+@@ -16,8 +16,7 @@ echo "#include <sys/types.h>"        > $tmpfile_c
+ echo "#include <liburing.h>"        >> $tmpfile_c
+ echo "int func(void) { return 0; }" >> $tmpfile_c
+ 
+-CC=${1:?"Usage: $0 <compiler> # example compiler: gcc"}
+-$CC -c $tmpfile_c -o $tmpfile_o >/dev/null 2>&1
++$CC $CFLAGS -c $tmpfile_c -o $tmpfile_o
+ 
+ if [ -f $tmpfile_o ]; then
+     echo "#define LOCAL_CONFIG_HAVE_LIBURING 1"  > $OUTPUT_H_FILE
+-- 
+2.47.0
+

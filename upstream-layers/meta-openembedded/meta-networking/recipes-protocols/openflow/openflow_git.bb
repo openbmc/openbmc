@@ -40,6 +40,8 @@ DEPENDS:append:libc-musl = " libexecinfo"
 
 inherit autotools-brokensep pkgconfig
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 do_configure:prepend() {
     ./boot.sh
 }

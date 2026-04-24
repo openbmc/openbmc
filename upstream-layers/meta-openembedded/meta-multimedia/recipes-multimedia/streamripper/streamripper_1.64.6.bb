@@ -20,6 +20,8 @@ SRC_URI[sha256sum] = "c1d75f2e9c7b38fd4695be66eff4533395248132f3cc61f375196403c4
 
 inherit autotools pkgconfig
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 EXTRA_OECONF += "--with-included-argv=yes --with-included-libmad=no"
 EXTRA_OECONF += "\
     --with-ogg-includes=${STAGING_INCDIR} \

@@ -1,0 +1,94 @@
+SUMMARY = "Fast and Lightweight HTTP Server for Linux"
+HOMEPAGE = "https://github.com/monkey/monkey/issues/414"
+BUGTRACKER = "https://github.com/monkey/monkey/issues"
+
+LICENSE = "Apache-2.0"
+LIC_FILES_CHKSUM = "file://LICENSE;md5=2ee41112a44fe7014dce33e26468ba93"
+
+SECTION = "net"
+
+SRC_URI = "git://github.com/monkey/monkey;branch=master;protocol=https;tag=v${PV} \
+           file://0001-fastcgi-Use-value-instead-of-address-of-sin6_port.patch \
+           file://0001-include-Fix-location-of-mk_core.h-etal.patch \
+           file://monkey.service \
+           file://monkey.init \
+           file://0001-server-http-fix-malformed-request-crash-paths.patch \
+           file://0002-server-scheduler-guard-protocol-close-callback.patch \
+           file://0003-server-parser-harden-boundary-checks.patch \
+           "
+
+SRCREV = "0fd3bbd657c6d6339315709ef068493c572b973c"
+
+UPSTREAM_CHECK_COMMITS = "1"
+
+EXTRA_OECMAKE = "-DMK_PATH_LOG=${localstatedir}/log/monkey/ \
+                 -DPID_FILE=/run/monkey.pid \
+                 -DMK_PATH_CONF=${sysconfdir}/monkey/ \
+                 -DWITH_PLUGINS=* \
+                 -DWITHOUT_PLUGINS=mbedtls \
+                 -DWITH_DEBUG=1 \
+                 -DDEFAULT_USER='www-data' \
+                 -DWITH_SYSTEM_MALLOC=1 \
+                "
+
+EXTRA_OECMAKE:append:libc-musl = " -DWITH_MUSL=1 "
+
+DISABLE_STATIC = ""
+
+inherit cmake pkgconfig update-rc.d systemd
+
+do_configure:append() {
+    sed -i -e 's|${STAGING_BINDIR_TOOLCHAIN}/||g' ${B}/include/monkey/mk_env.h
+}
+
+do_install:append() {
+    install -Dm 0755 ${UNPACKDIR}/monkey.init ${D}${sysconfdir}/init.d/monkey
+    # Create /var/log/monkey in runtime.
+    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}" ]; then
+        install -d ${D}${nonarch_libdir}/tmpfiles.d
+        echo "d ${localstatedir}/log/${BPN} 0755 ${BPN} ${BPN} -" > ${D}${nonarch_libdir}/tmpfiles.d/${BPN}.conf
+    fi
+    if [ "${@bb.utils.filter('DISTRO_FEATURES', 'sysvinit', d)}" ]; then
+        install -d ${D}${sysconfdir}/default/volatiles
+        echo "d ${BPN} ${BPN} 0755 ${localstatedir}/log/${BPN} none" > ${D}${sysconfdir}/default/volatiles/99_${BPN}
+    fi
+    if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
+        install -Dm 644 ${UNPACKDIR}/monkey.service ${D}/${systemd_unitdir}/system/monkey.service
+    fi
+
+    # QA Issue: monkey installs files in /var/volatile, but it is expected to be empty [empty-dirs]
+    # these folders are supposed to be recreated at runtime
+    find ${D}/var -type d -empty -delete
+}
+
+INITSCRIPT_NAME = "monkey"
+INITSCRIPT_PARAMS = "defaults 70"
+
+SYSTEMD_SERVICE:${PN} = "monkey.service"
+
+PACKAGES += "${PN}-plugins"
+
+FILES:${PN}-plugins = "${libdir}/monkey-*.so"
+
+FILES:${PN} += "${nonarch_libdir}/tmpfiles.d"
+
+CONFFILES:${PN} = "${sysconfdir}/monkey/monkey.conf \
+                   ${sysconfdir}/monkey/sites/default \
+                   ${sysconfdir}/monkey/monkey.mime \
+                   ${sysconfdir}/monkey/plugins.load \
+                   ${sysconfdir}/monkey/plugins/proxy_reverse/proxy_reverse.conf \
+                   ${sysconfdir}/monkey/plugins/mandril/mandril.conf \
+                   ${sysconfdir}/monkey/plugins/fastcgi/fastcgi.conf \
+                   ${sysconfdir}/monkey/plugins/logger/logger.conf \
+                   ${sysconfdir}/monkey/plugins/cgi/cgi.conf \
+                   ${sysconfdir}/monkey/plugins/cheetah/cheetah.conf \
+                   ${sysconfdir}/monkey/plugins/dirlisting/dirhtml.conf \
+                   ${sysconfdir}/monkey/plugins/dirlisting/themes/guineo/header.theme \
+                   ${sysconfdir}/monkey/plugins/dirlisting/themes/guineo/footer.theme \
+                   ${sysconfdir}/monkey/plugins/dirlisting/themes/guineo/entry.theme \
+                   ${sysconfdir}/monkey/plugins/auth/README \
+                   ${sysconfdir}/monkey/plugins/auth/monkey.users \
+                   "
+
+CVE_STATUS[CVE-2013-2183] = "cpe-incorrect: Current version (1.6.9) is not affected. Issue was addressed in version 1.3.0"
+CVE_STATUS[CVE-2013-1771] = "not-applicable-platform: this is gentoo specific CVE"

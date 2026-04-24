@@ -3,11 +3,10 @@ HOMEPAGE = "http://ceres-solver.org/"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3585a26c9cd9ec0cb36a7d65542878ca"
 
-DEPENDS = "libeigen glog"
+DEPENDS = "libeigen"
 
 SRC_URI = "git://github.com/ceres-solver/ceres-solver.git;branch=master;protocol=https"
 SRCREV = "85331393dc0dff09f6fb9903ab0c4bfa3e134b01"
-
 
 inherit cmake
 
@@ -19,6 +18,14 @@ do_configure:prepend() {
     touch ${S}/.git/hooks/commit-msg 2>/dev/null || :
 }
 
+EXTRA_OECMAKE += " \
+    -DBUILD_BENCHMARKS=OFF \
+    -DBUILD_EXAMPLES=OFF \
+    -DBUILD_TESTING=OFF \
+    -DGFLAGS=OFF \
+    -DUSE_CUDA=OFF \
+"
+
 # We don't want path to eigen3 in ceres-solver RSS to be
 # used by components which use CeresConfig.cmake from their
 # own RSS
@@ -27,11 +34,12 @@ do_configure:prepend() {
 # ceres-solver/1.14-r0/packages-split/ceres-solver-dev/usr/lib/cmake/Ceres/CeresConfig.cmake:    set(glog_DIR ceres-solver/1.14-r0/recipe-sysroot/usr/lib/cmake/glog)
 SSTATE_SCAN_FILES += "*.cmake"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "glog"
 
 # suitesparse* recipes will be in meta-ros layer
 PACKAGECONFIG[suitesparse] = "-DSUITESPARSE=ON,-DSUITESPARSE=OFF,suitesparse-config suitesparse-amd suitesparse-camd suitesparse-colamd suitesparse-ccolamd suitesparse-cholmod suitesparse-metis suitesparse-spqr"
 PACKAGECONFIG[cxsparse] = "-DCXSPARSE=ON,-DCXSPARSE=OFF,suitesparse-cxsparse"
+PACKAGECONFIG[glog] = "-DMINIGLOG=OFF,-DMINIGLOG=ON,glog"
 PACKAGECONFIG[lapack] = "-DLAPACK=ON,-DLAPACK=OFF,lapack"
 
 # Only a static library and headers are created

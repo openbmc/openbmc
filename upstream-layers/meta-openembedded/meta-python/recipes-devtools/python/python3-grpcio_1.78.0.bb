@@ -50,3 +50,4 @@ BBCLASSEXTEND = "native nativesdk"
 CCACHE_DISABLE = "1"
 
 CVE_PRODUCT += "grpc:grpc"
+CVE_STATUS[CVE-2026-33186] = "cpe-incorrect: the vulnerabilty affects only the go implementation"

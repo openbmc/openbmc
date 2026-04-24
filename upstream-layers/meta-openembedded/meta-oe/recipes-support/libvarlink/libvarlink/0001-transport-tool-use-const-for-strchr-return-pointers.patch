@@ -1,0 +1,96 @@
+From 27e4f4504b3c60356b9507e926aae2b82ba47275 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 15 Apr 2026 11:10:01 -0700
+Subject: [PATCH] transport,tool: use const for strchr return pointers
+
+Fixes errors seen after c23 implemented in glibc
+
+lib/transport-device.c:13:14: error: assigning to 'char *' from 'const char *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+   13 |         parm = strchr(address, ';');
+      |              ^ ~~~~~~~~~~~~~~~~~~~~
+1 error generated.
+
+Upstream-Status: Submitted [https://github.com/varlink/libvarlink/pull/85]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ lib/transport-device.c | 2 +-
+ lib/transport-tcp.c    | 4 ++--
+ lib/transport-unix.c   | 2 +-
+ tool/command-format.c  | 2 +-
+ tool/command-info.c    | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/lib/transport-device.c b/lib/transport-device.c
+index 0b8cec5..205eac4 100644
+--- a/lib/transport-device.c
++++ b/lib/transport-device.c
+@@ -7,7 +7,7 @@
+ #include <fcntl.h>
+
+ static int strip_parameters(const char *address, char **devicep) {
+-        char *parm;
++        const char *parm;
+         _cleanup_(freep) char *device = NULL;
+
+         parm = strchr(address, ';');
+diff --git a/lib/transport-tcp.c b/lib/transport-tcp.c
+index 92a0e7b..fff2379 100644
+--- a/lib/transport-tcp.c
++++ b/lib/transport-tcp.c
+@@ -10,7 +10,7 @@
+ #include <sys/socket.h>
+
+ static int strip_parameters(const char *address, char **hostp) {
+-        char *parm;
++        const char *parm;
+         _cleanup_(freep) char *host = NULL;
+
+         parm = strchr(address, ';');
+@@ -34,7 +34,7 @@ static void freeaddrinfop(struct addrinfo **ai) {
+ static int resolve_addrinfo(const char *address, struct addrinfo **resultp) {
+         _cleanup_(freep) char *host = NULL;
+         char *endptr;
+-        char *port;
++        const char *port;
+         struct addrinfo hints = {
+                 .ai_family = AF_UNSPEC,
+                 .ai_socktype = SOCK_STREAM,
+diff --git a/lib/transport-unix.c b/lib/transport-unix.c
+index 5dc3853..2414b29 100644
+--- a/lib/transport-unix.c
++++ b/lib/transport-unix.c
+@@ -10,7 +10,7 @@
+ #include <unistd.h>
+
+ static int strip_parameters(const char *address, char **pathp) {
+-        char *parm;
++        const char *parm;
+         _cleanup_(freep) char *path = NULL;
+
+         parm = strchr(address, ';');
+diff --git a/tool/command-format.c b/tool/command-format.c
+index 6932bc4..0f5ef8c 100644
+--- a/tool/command-format.c
++++ b/tool/command-format.c
+@@ -155,7 +155,7 @@ static long format_run(Cli *UNUSED(cli), int argc, char **argv) {
+ static long format_complete(Cli *cli, int argc, char **UNUSED(argv), const char *current) {
+         _cleanup_(freep) char *prefix = NULL;
+         DIR *dir;
+-        char *p;
++        const char *p;
+
+         if (argc != 1)
+                 return 0;
+diff --git a/tool/command-info.c b/tool/command-info.c
+index 571b6fd..9d252f7 100644
+--- a/tool/command-info.c
++++ b/tool/command-info.c
+@@ -137,7 +137,7 @@ static long info_run(Cli *cli, int argc, char **argv) {
+ static long info_complete(Cli *UNUSED(cli), int argc, char **UNUSED(argv), const char *current) {
+         _cleanup_(freep) char *prefix = NULL;
+         DIR *dir;
+-        char *p;
++        const char *p;
+
+         if (argc != 1)
+                 return 0;

@@ -15,6 +15,8 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 inherit autotools
 
+CACHED_CONFIGUREVARS += "ac_cv_prog_cc_c23=no"
+
 AUTOTOOLS_SCRIPT_PATH = "${S}/src"
 
 BBCLASSEXTEND = "native nativesdk"

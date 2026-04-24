@@ -24,7 +24,7 @@ SRC_URI = "git://github.com/MusicPlayerDaemon/MPD;branch=master;protocol=https;t
 SRCREV = "7a9afa059e95668c912f779219ee8fe1e44dd2aa"
 
 
-EXTRA_OEMESON += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '-Dsystemd=enabled -Dsystemd_system_unit_dir=${systemd_system_unitdir} -Dsystemd_user_unit_dir=${systemd_system_unitdir}', '-Dsystemd=disabled', d)} \
+EXTRA_OEMESON += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '-Dsystemd=enabled -Dsystemd_system_unit_dir=${systemd_system_unitdir} -Dsystemd_user_unit_dir=${systemd_user_unitdir}', '-Dsystemd=disabled', d)} \
     -Dadplug=disabled \
     -Dsndio=disabled \
     -Dshine=disabled \
@@ -92,6 +92,8 @@ do_install:append() {
     # we don't need the icon
     rm -rf ${D}${datadir}/icons
 }
+
+FILES:${PN} += "${systemd_user_unitdir}"
 
 RPROVIDES:${PN} += "${PN}-systemd"
 RREPLACES:${PN} += "${PN}-systemd"

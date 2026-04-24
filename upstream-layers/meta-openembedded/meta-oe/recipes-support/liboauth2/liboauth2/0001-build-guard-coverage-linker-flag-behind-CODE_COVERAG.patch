@@ -1,0 +1,33 @@
+From 7c70315f7f6b4305d761804fb03f8f90ad7572eb Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 17 Apr 2026 14:01:46 -0700
+Subject: [PATCH] build: guard --coverage linker flag behind
+ CODE_COVERAGE_ENABLED
+
+AM_LDFLAGS passes --coverage to the linker unconditionally,
+it causes coverage instrumentation to be enabled even when
+configured with --disable-code-coverage. Wrap it in the
+automake conditional provided by AX_CODE_COVERAGE.
+
+Upstream-Status: Submitted [https://github.com/OpenIDC/liboauth2/pull/74]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Makefile.am | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index a079dcc..a3f991d 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -8,7 +8,10 @@ EXTRA_DIST = autogen.sh ChangeLog README.md LICENSE
+
+ AM_CPPFLAGS = -Wall -Werror -Wno-error=deprecated-declarations -I${srcdir}/include -I${srcdir}/src @JANSSON_CFLAGS@ @OPENSSL_CFLAGS@
+ AM_CPPFLAGS += $(CODE_COVERAGE_CPPFLAGS) $(CODE_COVERAGE_CFLAGS)
+-AM_LDFLAGS = --coverage
++AM_LDFLAGS =
++if CODE_COVERAGE_ENABLED
++AM_LDFLAGS += --coverage
++endif
+
+ LDADD = @JANSSON_LIBS@ @OPENSSL_LIBS@
+ LDADD += $(CODE_COVERAGE_LIBS)

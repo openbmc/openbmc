@@ -14,13 +14,13 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 --- a/configure.ac
 +++ b/configure.ac
 @@ -26,7 +26,9 @@ AC_PROG_INSTALL
- AC_SYS_LARGEFILE
+ ])
  
- GP_CONFIG_MSG([Compiler],[${CC}])
--AC_DEFINE_UNQUOTED([HAVE_CC],"$CC",[The C compiler we're using])
+ GP_CONFIG_MSG([Compiler], [${CC}])
+-AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC"], [The C compiler we are using])
 +CC_NO_SYSROOT=`echo $CC | sed -e \
 +	's|--sysroot=.*\b||g'`
-+AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC_NO_SYSROOT"], [The C compiler we're using])
++AC_DEFINE_UNQUOTED([HAVE_CC], ["$CC_NO_SYSROOT"], [The C compiler we are using])
  
  dnl AC_STRUCT_TIMEZONE
  

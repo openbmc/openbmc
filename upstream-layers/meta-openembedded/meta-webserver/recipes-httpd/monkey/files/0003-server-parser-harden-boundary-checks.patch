@@ -1,0 +1,108 @@
+From b9f24a2968fa62de4a6ecf070fa0389ce10e7729 Mon Sep 17 00:00:00 2001
+From: Eduardo Silva <eduardo@chronosphere.io>
+Date: Thu, 9 Apr 2026 12:11:57 -0600
+Subject: [PATCH] server: parser: harden boundary checks
+
+Tighten parser and helper validation around explicit lengths and
+buffer boundaries.
+
+Require exact header literal matches, validate chunk length tokens,
+and guard helper routines that previously trusted inconsistent
+pointer or length state.
+
+Verified by rebuilding with cmake --build build and replaying the
+reported malformed request fixtures against build/bin/monkey.
+
+Signed-off-by: Eduardo Silva <eduardo@chronosphere.io>
+
+This patch is part of https://github.com/monkey/monkey/pull/434, 
+containing assorted CVE fixes.
+
+Upstream-Status: Backport [https://github.com/monkey/monkey/commit/ffe0d0ed1b074ea6f3965c37bb754e9f19130a82]
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ include/monkey/mk_http_parser.h |  6 +++++-
+ mk_server/mk_http_parser.c      | 13 +++++++++++++
+ mk_server/mk_mimetype.c         |  7 ++++++-
+ mk_server/mk_user.c             |  2 +-
+ 4 files changed, 25 insertions(+), 3 deletions(-)
+
+diff --git a/include/monkey/mk_http_parser.h b/include/monkey/mk_http_parser.h
+index 9e3b365e..465ea0e4 100644
+--- a/include/monkey/mk_http_parser.h
++++ b/include/monkey/mk_http_parser.h
+@@ -389,7 +389,11 @@ int mk_http_parser_chunked_decode_buf(struct mk_http_parser *p,
+ 
+ static inline int mk_http_parser_more(struct mk_http_parser *p, int len)
+ {
+-    if (abs(len - p->i) - 1 > 0) {
++    if (len <= 0 || p->i < 0) {
++        return MK_FALSE;
++    }
++
++    if ((p->i + 1) < len) {
+         return MK_TRUE;
+     }
+ 
+diff --git a/mk_server/mk_http_parser.c b/mk_server/mk_http_parser.c
+index 9413528a..3c831f29 100644
+--- a/mk_server/mk_http_parser.c
++++ b/mk_server/mk_http_parser.c
+@@ -173,6 +173,16 @@ static inline void request_set(mk_ptr_t *ptr, struct mk_http_parser *p, char *bu
+ static inline int header_cmp(const char *expected, char *value, int len)
+ {
+     int i = 0;
++    size_t expected_len;
++
++    if (len < 0) {
++        return -1;
++    }
++
++    expected_len = strlen(expected);
++    if ((size_t) len != expected_len) {
++        return -1;
++    }
+ 
+     if (len >= 8) {
+         if (expected[0] != tolower(value[0])) return -1;
+@@ -535,6 +545,9 @@ parse_more:
+         (errno != 0)) {
+         return MK_HTTP_PARSER_ERROR;
+     }
++    if (ptr == tmp || *ptr != '\0') {
++        return MK_HTTP_PARSER_ERROR;
++    }
+ 
+     if (chunk_len < 0) {
+         return MK_HTTP_PARSER_ERROR;
+diff --git a/mk_server/mk_mimetype.c b/mk_server/mk_mimetype.c
+index b86b4ef1..5462ea5c 100644
+--- a/mk_server/mk_mimetype.c
++++ b/mk_server/mk_mimetype.c
+@@ -197,7 +197,12 @@ struct mk_mimetype *mk_mimetype_find(struct mk_server *server, mk_ptr_t *filenam
+ {
+     int j, len;
+ 
+-    j = len = filename->len;
++    if (!filename->data || filename->len <= 0) {
++        return NULL;
++    }
++
++    len = filename->len;
++    j = len - 1;
+ 
+     /* looking for extension */
+     while (j >= 0 && filename->data[j] != '.') {
+diff --git a/mk_server/mk_user.c b/mk_server/mk_user.c
+index 7200ff08..716331ac 100644
+--- a/mk_server/mk_user.c
++++ b/mk_server/mk_user.c
+@@ -46,7 +46,7 @@ int mk_user_init(struct mk_http_session *cs, struct mk_http_request *sr,
+     }
+ 
+     limit = mk_string_char_search(sr->uri_processed.data + offset, '/',
+-                                  sr->uri_processed.len);
++                                  sr->uri_processed.len - offset);
+ 
+     if (limit == -1) {
+         limit = (sr->uri_processed.len) - offset;

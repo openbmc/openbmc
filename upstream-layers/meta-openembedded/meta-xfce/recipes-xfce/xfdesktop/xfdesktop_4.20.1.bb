@@ -13,6 +13,7 @@ DEPENDS = " \
     libxfce4ui \
     libxfce4util \
     libxfce4windowing \
+    libyaml \
     thunar \
     xfconf \
 "
