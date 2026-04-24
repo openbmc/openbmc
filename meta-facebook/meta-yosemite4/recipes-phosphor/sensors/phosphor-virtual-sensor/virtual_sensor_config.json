@@ -24,7 +24,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD0_ADC_FAN0_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -56,7 +56,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD0_ADC_FAN1_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -88,7 +88,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD1_ADC_FAN2_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -120,7 +120,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD1_ADC_FAN3_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -152,7 +152,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD0_ADC_FAN4_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -184,7 +184,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD0_ADC_FAN5_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -216,7 +216,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD1_ADC_FAN6_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -248,7 +248,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD1_ADC_FAN7_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -280,7 +280,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD0_ADC_FAN8_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -312,7 +312,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD0_ADC_FAN9_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -344,7 +344,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD1_ADC_FAN10_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
@@ -376,7 +376,7 @@
                     "ParamName": "fan_curr",
                     "Desc": {
                         "Name": "FANBOARD1_ADC_FAN11_48V_CURR_A",
-                        "SensorType": "voltage"
+                        "SensorType": "current"
                     }
                 }
             ]
