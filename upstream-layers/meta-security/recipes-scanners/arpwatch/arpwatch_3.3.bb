@@ -1,6 +1,6 @@
 SUMARRY = "The ethernet monitor program; for keeping track of ethernet/ip address pairings"
 LICENSE = "BSD-4-Clause"
-HOME_PAGE = "http://ee.lbl.gov/"
+HOMEPAGE = "http://ee.lbl.gov/"
 LIC_FILES_CHKSUM = "file://configure;md5=0f6cca2f69f384a14e2f5803210ca92e"
 
 DEPENDS += "libpcap"

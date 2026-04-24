@@ -2,11 +2,11 @@
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 SUMARRY = "SCAP content for various platforms, upstream version"
-HOME_URL = "https://www.open-scap.org/security-policies/scap-security-guide/"
+HOMEPAGE = "https://www.open-scap.org/security-policies/scap-security-guide/"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9bfa86579213cb4c6adaffface6b2820"
 LICENSE = "BSD-3-Clause"
 
-SRCREV = "f7d794851971087db77d4be8eeb716944a1aae21"
+SRCREV = "a1b32362394c7739a7a94426c61c7cb24449d9a0"
 SRC_URI = "git://github.com/ComplianceAsCode/content.git;protocol=https;branch=stable \
            file://run_eval.sh \
            "

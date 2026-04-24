@@ -31,4 +31,4 @@ do_configure () {
     oe_runconf
 }
 
-RDEPNEDS += "libnet"
+RDEPENDS:${PN} += "libnet"

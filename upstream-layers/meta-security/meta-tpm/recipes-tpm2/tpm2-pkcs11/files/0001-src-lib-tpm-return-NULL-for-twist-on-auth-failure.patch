@@ -1,0 +1,28 @@
+From 0db779aecaae93633be963ffb8fdb097c85cc166 Mon Sep 17 00:00:00 2001
+From: Peter Marko <peter.marko@siemens.com>
+Date: Thu, 9 Apr 2026 00:00:00 +0000
+Subject: [PATCH] src/lib/tpm: return NULL for twist on auth failure
+
+`tpm_unseal` returns `twist` (a const char pointer alias). Returning
+`false` in the error path is a type mismatch that fails with stricter
+compiler settings. Return `NULL` instead.
+
+Upstream-Status: Submitted [https://github.com/tpm2-software/tpm2-pkcs11/pull/923]
+Signed-off-by: Peter Marko <peter.marko@siemens.com>
+---
+ src/lib/tpm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/lib/tpm.c b/src/lib/tpm.c
+index 5fff5d5..c51d984 100644
+--- a/src/lib/tpm.c
++++ b/src/lib/tpm.c
+@@ -1037,7 +1037,7 @@ twist tpm_unseal(tpm_ctx *ctx, uint32_t handle, twist objauth) {
+ 
+     bool result = set_esys_auth(ctx->esys_ctx, handle, objauth);
+     if (!result) {
+-        return false;
++        return NULL;
+     }
+ 
+     TPM2B_SENSITIVE_DATA *unsealed_data = NULL;

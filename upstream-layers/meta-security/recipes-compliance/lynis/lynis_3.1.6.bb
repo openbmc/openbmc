@@ -2,7 +2,7 @@
 # Released under the MIT license (see COPYING.MIT for the terms)
 
 SUMMARY = "Lynis is a free and open source security and auditing tool."
-HOMEDIR = "https://cisofy.com/lynis/"
+HOMEPAGE = "https://cisofy.com/lynis/"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3edd6782854304fd11da4975ab9799c1"
 

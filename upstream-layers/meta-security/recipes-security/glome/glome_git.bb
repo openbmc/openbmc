@@ -1,5 +1,5 @@
 SUMMARY = "GLOME Login Client"
-HOME_PAGE = "https://github.com/google/glome"
+HOMEPAGE = "https://github.com/google/glome"
 DESCRIPTION = "GLOME is used to authorize serial console access to Linux machines"
 PV = "0.1+git${SRCPV}"
 
