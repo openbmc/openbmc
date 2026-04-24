@@ -30,10 +30,13 @@ See also the list of new features and enhancements of the previous releases:
 New Features / Enhancements in |yocto-ver|
 ------------------------------------------
 
--  Linux kernel XXX, gcc XXX, glibc XXX, LLVM XXX, and over XXX other
+-  Linux kernel 6.18, gcc 15.2, glibc 2.43, LLVM 22.1.2, and over 300 other
    recipe upgrades
 
--  Minimum Python version required on the host: XXX.
+..
+   Found in meta/classes-global/sanity.bbclass:check_sanity_everybuild
+
+-  Minimum Python version required on the host: 3.9.
 
 -  New variables:
 
@@ -61,6 +64,10 @@ New Features / Enhancements in |yocto-ver|
       :ref:`ref-classes-create-spdx` class
       (:oecore_rev:`874b2d301d3cac617b1028bc6ce91b1f916a6508`)
 
+   -  The :term:`SPDX_GIT_PURL_MAPPINGS` variable allows mapping domain names to
+      PURLs (Package URLs) in SPDX documents
+      (:oecore_rev:`9f1825e74d0f70917676201286b148aea84cc660`)
+
    -  The :term:`SPDX_CONCLUDED_LICENSE` allows specifying the
       ``hasConcludedLicense`` object of individual SBOM packages when using the
       :ref:`ref-classes-create-spdx` class
@@ -86,7 +93,25 @@ New Features / Enhancements in |yocto-ver|
       partition created with the ``extra_partition`` plugin
       (:oecore_rev:`e1526079d205dac6e3cff6d8e5cb37f68b631009`)
 
+   -  The :term:`FIT_LOADABLES`, :term:`FIT_LOADABLE_FILENAME`,
+      :term:`FIT_LOADABLE_TYPE`, :term:`FIT_LOADABLE_ARCH`,
+      :term:`FIT_LOADABLE_OS` and :term:`FIT_LOADABLE_LOADADDRESS` variables can
+      be used to specify arbitrary ``loadables`` in a FIT image
+      (:oecore_rev:`2535427d8de07f6e432d08cbdc046bdfd8788911`)
+
 -  Kernel-related changes:
+
+   -  :ref:`ref-classes-kernel-fit-image`: Support arbitrary loadables
+      (:oecore_rev:`2535427d8de07f6e432d08cbdc046bdfd8788911`)
+
+   -  :ref:`ref-classes-kernel-yocto`: Allow enabling Rust in the kernel by
+      adding ``rust`` to the :term:`KERNEL_FEATURES` (for Linux kernel recipes
+      inheriting this class)
+      (:oecore_rev:`6719ed4a34051cf3dcbb67984ee15613512c061a`)
+
+   -  Disable :ref:`ref-classes-ccache` support when Linux kernel Rust support
+      is enabled
+      (:oecore_rev:`d80d006ae85172eb5125b7e1b44d4dee48615c92`)
 
 -  New core recipes:
 
@@ -106,7 +131,62 @@ New Features / Enhancements in |yocto-ver|
    -  ``blueprint-compiler``: Add the recipe as it became a dependency of the
       ``epiphany`` recipe after its upgrade to 49.2 (:oecore_rev:`4212392ca7ebf890e1e192ddd0e7dbe1f8dabcf2`)
 
+   -  ``python3-sbom-cve-check``: New recipe for building and using
+      `sbom-cve-check <https://github.com/bootlin/sbom-cve-check>`__, a
+      lightweight SBOM CVE analysis tool
+      (:oecore_rev:`0fdacec2d7101d3fe638b430c43b1e14acd148ae`)
+
+   -  ``python3-shacl2code``, ``python3-hatch-build-scripts``,
+      ``python3-spdx-python-model``: Added as dependencies of
+      ``python3-sbom-cve-check``
+      (:oecore_rev:`48622216cb1a80f9cc127ebb08e13cc455d09240`,
+      :oecore_rev:`41591afd51ddbdaf1779799f4258a81afcff238d`,
+      :oecore_rev:`a83eaca5d9f3e2eb76a5d3c6bb42cf3b3bfe92fb`)
+
+   -  ``libfyaml``: Added as a dependency of ``appstream``
+      (:oecore_rev:`b8b7b5873fecef4040c5f35d5a0e857f8f9fc907`)
+
+   -  ``meta-world-recipe-sbom``: Building this recipe will produce SBOM
+      documents for each recipe present in the build environment, using the
+      :ref:`ref-classes-create-spdx` class. This is different from the image
+      SBOM which can also be generated using the :ref:`ref-classes-create-spdx`
+      class after building an image. See :doc:`/dev-manual/sbom` for more
+      information
+      (:oecore_rev:`d999ac407c86b462134008818d5863ecb577f3c6`)
+
+   -  ``python3-kirk``: The Kirk application is a fork of ``runltp-ng`` and
+      became the official `LTP <https://linux-test-project.readthedocs.io/en/latest/>`__
+      tests executor
+      (:oecore_rev:`c33fd4e50a66ace990f3820f980876bfbfc07baa`)
+
+   -  ``wic``: This recipe builds the :doc:`WIC </dev-manual/wic>` command-line
+      tool. This used to be part of :term:`OpenEmbedded-Core (OE-Core)` but is
+      now externally managed
+      (:oecore_rev:`25ca1cb46dd6d0c57f61f2dc3b649601dc81b50c`,
+      :oecore_rev:`b9e2a2f584376076c4552bef7309c81b9fe986c0`)
+
 -  New core classes:
+
+   -  :ref:`ref-classes-kernel-yocto-rust`: Adds the required dependencies to
+      build the Rust components of the Linux kernel
+      (:oecore_rev:`6c90097bebeffe7c5be35fc56e61b1994f03d6a9`)
+
+   -  :ref:`ref-classes-module-rust`: Support for building out-of-tree Rust
+      kernel modules. An example recipe using this class can be found in
+      :oecore_path:`meta-skeleton/recipes-kernel/rust-out-of-tree-module`
+      (:oecore_rev:`76fd22f09fab6c1de339dac310f9b31cb5e4ad69`,
+      :oecore_rev:`76fd22f09fab6c1de339dac310f9b31cb5e4ad69`)
+
+   -  :ref:`ref-classes-sbom-cve-check`: Class for post-build CVE analysis of an
+      image, which uses the `sbom-cve-check <github.com/bootlin/sbom-cve-check>`__
+      tool internally
+      (:oecore_rev:`8ef22ad9e302f86b2da4fa81541a464e95b9ef3c`)
+
+   -  :ref:`ref-classes-sbom-cve-check-recipe`: Class for post-build CVE
+      analysis of recipes (using the recipe SBOM, meaning building the
+      software provided by the recipe is not needed), which uses the
+      `sbom-cve-check <github.com/bootlin/sbom-cve-check>`__ tool internally
+      (:oecore_rev:`e2518b1eaabef13c9f8d44b52b8ec9d4dd4ed916`)
 
 -  Global configuration changes:
 
@@ -177,7 +257,16 @@ New Features / Enhancements in |yocto-ver|
    -  ``runqemu``: Support ``.tar.zst``, ``.tar,xz``, ``.tar`` rootfs archive
       types (:oecore_rev:`3a6172fbb6d3866b84627bcbf13e0a96837a85b1`)
 
+   -  ``runqemu``: Allow VNC to be used as a fallback when there is no
+      ``DISPLAY`` set
+      (:oecore_rev:`df9e9f382eb27f15cee4f3f77023646dcc1273fa`)
+
 -  Documentation changes:
+
+   -  The documentation build now fetches the list of active and inactive
+      version of the documentation from the remote `releases.json
+      <dashboard.yoctoproject.org/releases.json>`__ file. This also applies to
+      the :term:`BitBake` documentation.
 
 -  Go changes:
 
@@ -194,10 +283,19 @@ New Features / Enhancements in |yocto-ver|
       ``libLLVM.so`` instead of linking statically
       (:oecore_rev:`74ba238ff1ba1e9b612aece1989b828f3a8f8770`)
 
+   -  Install Rust library sources for ``make rustavailable`` support
+      (:oecore_rev:`2912ca3b341a5c5f6a658cde332ccd87368bd39d`)
+
+   -  Enable dynamic LLVM linking by default
+      (:oecore_rev:`d0671c3dad87a063b3a41dd07cde89b5684e692c`)
+
 -  Wic Image Creator changes:
 
    -  ``wic/engine``: Fix copying directories into wic image with ``ext*``
       partitions (:oecore_rev:`1ed38aff5f810d064c87aff9cbd310906833b6ba`)
+
+   -  Re-implement sector-size support
+      (:oecore_rev:`b50d6debf7baa555fbfb3521c4f952675bba2d37`)
 
 -  SDK-related changes:
 
@@ -211,6 +309,7 @@ New Features / Enhancements in |yocto-ver|
       -  ``libconfig`` (:oecore_rev:`f3e9d1326bf37361ff94dc4eef52de13b64651b2`)
       -  ``libksba`` (:oecore_rev:`f50a2005dda8cecf3a9db44edb131e7e332fa42d`)
       -  ``libmd`` (:oecore_rev:`4c0a41389bdab30e3b349fef8df6ca0ef4893b89`)
+      -  ``libpcre2`` (:oecore_rev:`a7b79bf6ab86cb3ca82234e80f31c5f0208cd92d`)
       -  ``libsolv`` (:oecore_rev:`f5432d1c45f9eb47182049c6930cfc6d5b26bc8d`)
       -  ``libyaml`` (:oecore_rev:`ed2a3459829bb3b6c10143cceaef0147a0cb2b98`)
       -  ``utfcpp`` (:oecore_rev:`49314caa7eb8efd86577121337a0b0d7472eab1b`)
@@ -233,7 +332,22 @@ New Features / Enhancements in |yocto-ver|
    -  ``selftest``: Test installation of recipes with complex packaging
       (:oecore_rev:`6f3aab6bfa754ecaeee0acc013cb6be1f07c1ec0`)
 
--  Utility script changes:
+   -  Add ``test_sdk_runqemu`` to test the execution of ``runqemu`` from an SDK
+      (:oecore_rev:`7fbb281cc16b6a0071777df5a6ed988463dda263`)
+
+   -  Add tests for Rust support in the Linux kernel
+      (:oecore_rev:`01ea2b2add3c0e87a4a23c9d2dabee8a46b60702`,
+      :oecore_rev:`10dff9f0ed2a87512d96c9419f3b4b35db41dd8b`)
+
+   -  Replace ``runltp`` with ``kirk``, as it became the new official LTP test
+      executor
+      (:oecore_rev:`c1e5ed4133729212e6ce3e135a2e4d1d624de20b`)
+
+   -  :doc:`WIC </dev-manual/wic>` related tests were updated after wic was
+      moved to its own repository and is externally managed
+      (:oecore_rev:`b9e2a2f584376076c4552bef7309c81b9fe986c0`)
+
+-  Utility script changes:classes
 
    -  ``bitbake-config-build``: It is now possible to disable all fragments
       starting with a prefix by issuing ``bitbake-config-build disable-fragment
@@ -252,6 +366,14 @@ New Features / Enhancements in |yocto-ver|
 
    -  ``yocto-check-layer``: Add messages in ``test_readme`` assertions
       (:oecore_rev:`9fe883ce4c6284f1b75031adafeeafb47e56958c`)
+
+   -  ``improve_kernel_cve_report``:
+
+      -  Sort ``kernel_compiled_files`` (:oecore_rev:`682e5beb0ce100ddc8413296334dfdbe0426dd38`)
+      -  Correct the description for fixed version (:oecore_rev:`b76da2048bf3d72708d0d26215b959d09de17da0`)
+      -  Update data if CVE exists (:oecore_rev:`9ea6d9209b95f8d31975d71315fb52343e6aa729`)
+      -  Validate that cve details field exists (:oecore_rev:`80ff4903ea1b839f9cd9393b314c3adfbb80b765`)
+
 
 -  BitBake changes:
 
@@ -305,12 +427,41 @@ New Features / Enhancements in |yocto-ver|
          :ref:`bitbake:ref-bbsetup-command-status` or
          :ref:`bitbake:ref-bbsetup-command-update` commands
 
+      -  The :ref:`bitbake:ref-bbsetup-command-update` now behaves in a
+         non-destructive way: local commits and modifications to layers are
+         taken into account, and the tool will either stop or warn the user that
+         the update is possible or not
+         (:bitbake_rev:`2ee3a195bbe1b7458f44a712a271abd9686f90c7`)
+
+      -  Share :ref:`overview-manual/concepts:Shared State` by default between
+         builds, by adding a definition for :term:`SSTATE_DIR` and
+         :term:`BB_HASHSERVE_DB_DIR` in the ``site.conf`` file created by
+         :ref:`bitbake:ref-bbsetup-command-init`
+         (:bitbake_rev:`a70c336790a9188aae67975fac6ca13579ad1d3e`)
+
+      -  Generate config files for VSCode by default, unless
+         ``--no-init-vscode`` is passed to :ref:`bitbake:ref-bbsetup-command-init`
+         (:bitbake_rev:`92fd721941fd17d1febc7205739e9f9ce1bb3aee`)
+
+   -  The ``unpack()`` function (the one containing the logic of the
+      :ref:`ref-tasks-unpack` task), can now take an ``update`` argument to
+      allow updating a Git repository in-place rather than deleting it and
+      re-creating it. An alias function named ``unpack_update()`` was created
+      for this unpack mode. See :ref:`bitbake:bb-the-unpack-update` for more
+      information
+      (:bitbake_rev:`e7d5e156275782948d3346f299780389ab263ab6`)
+
    -  ``cooker``: Use :term:`bitbake:BB_HASHSERVE_DB_DIR` as hash server
       database location. If unset, the existing behavior is preserved
       (:bitbake_rev:`b339d05ad2b69a6518522ee4c46dd5f5a6e33f65`)
 
    -  ``bitbake-getvar``: Show close matches when no providers are found
       (:bitbake_rev:`1f8fa7c25e71cd0f230a2f6bfd9d5153c694da81`)
+
+   -  The ``GIT_CONFIG_GLOBAL`` environment variable will now be taken into
+      account by the Git fetcher, to allow passing a different set of Git
+      configuration options when fetching Git repositories
+      (:bitbake_rev:`4c378445969853d6aff4694d937b9af47c7f7300`)
 
 -  Packaging changes:
 
@@ -332,6 +483,9 @@ New Features / Enhancements in |yocto-ver|
 
 -  SPDX-related changes:
 
+   -  Output SBOM documents now include recipe metadata
+      (:oecore_rev:`d999ac407c86b462134008818d5863ecb577f3c6`)
+
    -  ``spdx30_tasks``: Fix :term:`SPDX_CUSTOM_ANNOTATION_VARS` implementation
       (:oecore_rev:`52ab3b640c6bb7ece34cb4ea6026fd6375f17af4`)
 
@@ -348,17 +502,44 @@ New Features / Enhancements in |yocto-ver|
       to the list of fixed CVEs in the output SBOM
       (:oecore_rev:`f8525224cb825b1aad2be240731eabafdde7612d`)
 
+   -  The :ref:`ref-classes-create-spdx` class used to include `VEX
+      <https://cyclonedx.org/capabilities/vex/>`__ statements in the SPDX documents
+      tied to each packages. This is no longer the case, as these statements are
+      now found in the SPDX documents for recipes directly. This was done to
+      decrease the duplication of these statements for packages that were generated
+      by the same recipe.
+
+      The output SPDX document for an image recipe will still include the VEX
+      statements, as the SPDX document for the image also include the recipe SPDX
+      metadata.
+
+      The inclusion of VEX statements in SPDX documents can be controlled with the
+      :term:`SPDX_INCLUDE_VEX` variable
+      (:oecore_rev:`d999ac407c86b462134008818d5863ecb577f3c6`)
+
+
 -  ``devtool`` changes:
 
-   -  ``ide-sdk``: Find ``bitbake-setup``'s ``init-build-env``
-      first, and ``oe-init-build-env`` if not found
-      (:oecore_rev:`6ab7e9e8e52fa123551438820c59b8c5e0c9c8a5`)
+   -  ``ide-sdk``:
 
-   -  ``ide-sdk``: Add `gdbserver` attach mode support
-      (:oecore_rev:`119171087681bd47842865d6451868c1127f1149`)
+      -  Find ``bitbake-setup``'s ``init-build-env`` first, and
+         ``oe-init-build-env`` if not found
+         (:oecore_rev:`6ab7e9e8e52fa123551438820c59b8c5e0c9c8a5`)
 
-   -  ``ide-sdk``: Support GDB pretty-printing for C++ STL types
-      (:oecore_rev:`a69e2baba81b0cd88d58b164433c72e1156424b1`)
+      -  Add `gdbserver` attach mode support
+         (:oecore_rev:`119171087681bd47842865d6451868c1127f1149`)
+
+      -  Support GDB pretty-printing for C++ STL types
+         (:oecore_rev:`a69e2baba81b0cd88d58b164433c72e1156424b1`)
+
+      -  Support kernel module development
+         (:oecore_rev:`aaf15d656db0f83b440de3b22a817355dd8dfebb`)
+
+   -  Add new patches in correct order when running ``devtool finish``
+      (:oecore_rev:`fa7877d25826f58a74909908148b6b963dfe6908`)
+
+   -  Prevent ``devtool modify -n`` from corrupting Linux kernel Git repos
+      (:oecore_rev:`d383ea37e4987ecabe011226f1a8e658a52ede12`)
 
 -  Patchtest-related changes:
 
@@ -374,6 +555,17 @@ New Features / Enhancements in |yocto-ver|
 
 -  :ref:`ref-classes-insane` / :ref:`ref-classes-sanity` classes related changes:
 
+   -  Reject :term:`TMPDIR` containing redundant slashes to avoid errors in
+      executions of :ref:`ref-tasks-populate_sysroot`
+      (:oecore_rev:`3e72ebe9ed4e2e5f34eb89cd460e75a9242e296f`)
+
+   -  :ref:`ref-classes-sanity`: Warn when the
+      :ref:`overview-manual/concepts:Shared State` cache directory
+      (:term:`SSTATE_DIR`) is outside of the build directory (:term:`BUILDDIR`),
+      but the :ref:`overview-manual/concepts:Hash Equivalence` database is
+      inside it
+      (:oecore_rev:`491de0db64a0decd616a9e1c035f105faa14cc3c`)
+
 -  Security changes:
 
    -  A new document was added to the Yocto Project documentation:
@@ -385,14 +577,21 @@ New Features / Enhancements in |yocto-ver|
    -  ``cve-update-nvd2-native``: Use maximum CVSS score when extracting it from
       multiple sources (:oecore_rev:`4f6192f3165de0bc2499e045607c7e7ffd878a4b`)
 
+   -  Escape special characters in CPE 2.3 strings
+      (:oecore_rev:`9dd9c0038907340ba08ff4c8ee06a8748c1ac00a`)
+
 -  New :term:`PACKAGECONFIG` options for individual recipes:
 
    -  ``curl``: ``schannel``
    -  ``gstreamer1.0-plugins-good``: ``qt6``
    -  ``libinput``: ``lua``, ``libwacom``, ``mtdev``
+   -  ``librepo``: ``sequoia``
    -  ``mesa``: ``expat``, ``zlib``
    -  ``openssl``: ``legacy``
    -  ``opkg``: ``acl``, ``xattr``
+   -  ``orc``: ``hotdoc``
+   -  ``python3``: ``freethreading`` (experimental, see
+      :oecore_rev:`c56990178b31b893fbf695eaf6b67de501e9d2e9`)
    -  ``python3-cryptography``: ``legacy-openssl``
 
 -  systemd related changes:
@@ -476,8 +675,13 @@ New Features / Enhancements in |yocto-ver|
       remove ``keactrl`` from the recipe
       (:oecore_rev:`08c3877f4df8392ae347b03ac5334b170b1a4fec`)
 
-   -  ``initramfs-framework``: Add handover of PID 1's arguments to modules
-      (:oecore_rev:`a0ab3d1c4f9ed34d1d17e6534f42d17b3387ebb3`)
+   -  ``initramfs-framework``:
+
+      -  Add handover of PID 1's arguments to modules
+         (:oecore_rev:`a0ab3d1c4f9ed34d1d17e6534f42d17b3387ebb3`)
+
+      -  Fix Linux kernel command line parsing when passing in double quotes
+         (:oecore_rev:`f9acaf1c130220859150bb4c0a0635fca2ad8487`)
 
    -  ``perl``: Provide ``pod2man`` (in the recipe's :term:`PROVIDES`
       definition). This is used by many other recipes to produce :wikipedia:`man
@@ -502,11 +706,35 @@ New Features / Enhancements in |yocto-ver|
       installing extra configuration files in ``${sysconfdir}/ssl/openssl.cnf.d/``
       (:oecore_rev:`34bafcf3d8cdaa87506df30ef554d18981454c5e`)
 
-   -  ``busybox``: Enable SELinux support if :term:`DISTRO_FEATURES` contains
-      ``selinux`` (:oecore_rev:`c544f12073ea712c3d3ce08105d52640a7a322b9`)
+   -  ``busybox``:
+
+      -  Enable SELinux support if :term:`DISTRO_FEATURES` contains
+         ``selinux`` (:oecore_rev:`c544f12073ea712c3d3ce08105d52640a7a322b9`)
+
+      -  Do not build SUID binary without an applet
+         (:oecore_rev:`1406f9523c104d5357ce9594737c3bd32625b068`)
 
    -  ``coreutils``: ``kill`` and ``uptime`` are no longer provided by the
       recipe (:oecore_rev:`cedeb958dfa892e409bdce8525030c20b3400332`)
+
+   -  ``tcl8``: Skip timing-sensitive :ref:`ptests <ref-classes-ptest>`
+      (:oecore_rev:`1b93479f7b5ae4e2a62f929386e516adabbce46b`)
+
+   -  ``license_image.bbclass``: Report all packages with incompatible license
+      (when using :term:`INCOMPATIBLE_LICENSE`)
+      (:oecore_rev:`57fe3e411faec8cc60853f2e499661f9ede4f453`)
+
+   -  ``python3``: Package all of the compression module into
+      ``python3-compression``
+      (:oecore_rev:`5f346802198f14d4c315783dea6a55743e34a2e8`)
+
+   -  ``gobject-introspection``: Disable cache for the scanner during
+      the :ref:`ref-tasks-compile` task (``GI_SCANNER_DISABLE_CACHE=1``), to fix
+      an intermittent build failure
+      (:oecore_rev:`2b55dd12fc9593beba20d684c8b143483e212bc6`)
+
+   -  :ref:`ref-classes-archiver`: Don't try to preserve all attributes when
+      copying files (:oecore_rev:`6e8313688fa994c82e4c846993ed8da0d1f4db0e`)
 
 Known Issues in |yocto-ver|
 ---------------------------

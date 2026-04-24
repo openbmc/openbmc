@@ -71,9 +71,16 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
   }
 
   function build_version_select(current_version) {
+    // Note: the logic for switching to another version of the documentation is
+    // done in on_version_switch(). Here we only populate the switcher menu.
+
     var buf = ['<select>'];
 
-    // Start by pushing the versions from the the switcher_versions array,
+    // Add a special "Outdated release manuals" entry here that points to the "Outdated
+    // release manuals" section
+     buf.push('<option value="outdated" selected="selected">Outdated release manuals</option>');
+
+    // Start by pushing the versions from the switcher_versions array,
     // unless our current version matches one of them, in which case this is
     // done last.
     $.each(switcher_versions, function (version, vers_data) {
@@ -204,17 +211,22 @@ by https://git.yoctoproject.org/yocto-autobuilder-helper/tree/scripts/run-docs-b
       current_version = all_releases[current_version_split[0]]['codename'].toLowerCase();
     }
 
-    if (selected_version == latest_version) {
-      // default landing page selected, empty the version
-      var new_versionpath = '';
-    } else if (selected_version.includes("-tip")) {
-      var branch_name = all_releases[selected_version.split("-")[0]]['codename'].toLowerCase();
-      var new_versionpath = branch_name + '/';
-    } else {
-      var new_versionpath = selected_version + '/';
+    if (selected_version != "outdated") {
+       if (selected_version == latest_version) {
+         // default landing page selected, empty the version
+         var new_versionpath = '';
+       } else if (selected_version.includes("-tip")) {
+         var branch_name = all_releases[selected_version.split("-")[0]]['codename'].toLowerCase();
+         var new_versionpath = branch_name + '/';
+       } else {
+         var new_versionpath = selected_version + '/';
+       }
     }
 
-    if (docroot.endsWith("dev/")) {
+    if (selected_version == "outdated") {
+       var new_url = docroot + "releases.html#outdated-release-manuals";
+       var fallback_url = docroot;
+    } else if (docroot.endsWith("dev/")) {
       var new_url = url.replace("/dev/", "/" + new_versionpath);
       var fallback_url = new_url.replace(url.replace(docroot, ""), "");
     } else if (docroot.endsWith(current_version + "/") == false) {

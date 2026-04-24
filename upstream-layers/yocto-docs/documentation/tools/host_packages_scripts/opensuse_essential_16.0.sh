@@ -1,0 +1,1 @@
+sudo zypper install bzip2 chrpath diffstat gcc gcc-c++ git gzip hostname libacl1 make makeinfo patch python3 python3-GitPython python3-Jinja2 python3-curses python3-pexpect python3-pip python3-websockets python3-xml rpcgen socat tar wget which xz zstd

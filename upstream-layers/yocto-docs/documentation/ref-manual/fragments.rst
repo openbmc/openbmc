@@ -204,6 +204,26 @@ The ``core/yocto/root-login-with-empty-password`` :term:`configuration fragment`
 can be used to allow to login as the ``root`` user to login without a password
 on the serial console and over SSH.
 
+.. _ref-fragments-core-yocto-sbom-cve-check:
+
+``core/yocto/sbom-cve-check``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``core/yocto/sbom-cve-check`` :term:`configuration fragment` can be used
+to set up the build to use the :ref:`ref-classes-sbom-cve-check` class .
+
+This configuration fragment does multiple things:
+
+-  Add the :ref:`ref-classes-create-spdx` class to the list of globally
+   inherited classes, as it depends on it.
+
+-  Sets the source revision (:term:`SRCREV`) of the input CVE databases to
+   :term:`AUTOREV`, so these databases are automatically fetched and updated
+   when starting a build.
+
+-  Include the VEX statements to the input SPDX document using the
+   :term:`SPDX_INCLUDE_VEX` variable.
+
 Yocto Project Autobuilder Fragments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

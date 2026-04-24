@@ -1679,8 +1679,8 @@ system and gives an overview of their function and contents.
 
       .. note::
 
-         When :term:`COMPATIBLE_MACHINE` is set in a recipe inherits from
-         native, the recipe is always skipped. All native recipes must be
+         When :term:`COMPATIBLE_MACHINE` is set in a native recipe,
+         the recipe is always skipped. All native recipes must be
          entirely target independent and should not rely on :term:`MACHINE`.
 
    :term:`COMPLEMENTARY_GLOB`
@@ -1712,7 +1712,7 @@ system and gives an overview of their function and contents.
          (set via :term:`RRECOMMENDS`) are always ignored.
 
    :term:`COMPONENTS_DIR`
-      Stores sysroot components for each recipe. The OpenEmbedded build
+      Stores sysroot components provided by each recipe. The OpenEmbedded build
       system uses :term:`COMPONENTS_DIR` when constructing recipe-specific
       sysroots for other recipes.
 
@@ -2056,6 +2056,10 @@ system and gives an overview of their function and contents.
 
          CVE_PRODUCT = "vendor:package"
 
+      Since Wrynose (6.0), special characters must not be escaped. For example,
+      the :term:`CVE_PRODUCT` variable for the ``webkitgtk`` recipe must no
+      longer be written as ``webkitgtk\+`` but rather ``webkitgtk+``.
+
    :term:`CVE_STATUS`
       The CVE ID which is patched or should be ignored. Here is
       an example from the :oe_layerindex:`Python3 recipe</layerindex/recipe/23823>`::
@@ -2225,7 +2229,7 @@ system and gives an overview of their function and contents.
 
       The practical effect of the previous assignment is that all files
       installed by bar will be available in the appropriate staging sysroot,
-      given by the :term:`STAGING_DIR* <STAGING_DIR>` variables, by the time
+      given by the :term:`STAGING_DIR* <STAGING_DIR_HOST>` variables, by the time
       the :ref:`ref-tasks-configure` task for ``foo`` runs. This mechanism is
       implemented by having :ref:`ref-tasks-configure` depend on the
       :ref:`ref-tasks-populate_sysroot` task of each recipe listed in
@@ -2481,41 +2485,13 @@ system and gives an overview of their function and contents.
       list of features that ships with the Yocto Project and that you can
       provide with this variable, see the ":ref:`ref-features-distro`" section.
 
-   :term:`DISTRO_FEATURES_BACKFILL`
-      A space-separated list of features to be added to :term:`DISTRO_FEATURES`
-      if not also present in :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`.
+   :term:`DISTRO_FEATURES_DEFAULTS`
+      Specifies a space-separated list of default distro features provided by
+      the :term:`OpenEmbedded Build System`. This list should not be modified
+      directly, but instead :term:`DISTRO_FEATURES_OPTED_OUT` should be used to
+      prevent default distro features from being enabled.
 
-      This variable is set in the ``meta/conf/bitbake.conf`` file. It is
-      not intended to be user-configurable. It is best to just reference
-      the variable to see which distro features are being
-      :ref:`backfilled <ref-features-backfill>` for all distro configurations.
-
-   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`
-      A space-separated list of features from :term:`DISTRO_FEATURES_BACKFILL`
-      that should not be :ref:`backfilled <ref-features-backfill>` (i.e. added
-      to :term:`DISTRO_FEATURES`) during the build.
-
-      This corresponds to an opt-out mechanism. When new default distro
-      features are introduced, distribution maintainers can review (`consider`)
-      them and decide to exclude them from the
-      :ref:`backfilled <ref-features-backfill>` features. Therefore, the
-      combination of :term:`DISTRO_FEATURES_BACKFILL` and
-      :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` makes it possible to
-      add new default features without breaking existing distributions.
-
-
-   :term:`DISTRO_FEATURES_DEFAULT`
-      A convenience variable that gives you the default list of distro
-      features with the exception of any features specific to the C library
-      (``libc``).
-
-      When creating a custom distribution, you might find it useful to be
-      able to reuse the default
-      :term:`DISTRO_FEATURES` options without the
-      need to write out the full set. Here is an example that uses
-      :term:`DISTRO_FEATURES_DEFAULT` from a custom distro configuration file::
-
-         DISTRO_FEATURES ?= "${DISTRO_FEATURES_DEFAULT} myfeature"
+      See :ref:`ref-manual/features:Default Features` for more information.
 
    :term:`DISTRO_FEATURES_FILTER_NATIVE`
       Specifies a list of features that if present in the target
@@ -2546,6 +2522,17 @@ system and gives an overview of their function and contents.
       :ref:`ref-classes-nativesdk` recipes. This variable is used
       in addition to the features filtered using the
       :term:`DISTRO_FEATURES_FILTER_NATIVESDK` variable.
+
+   :term:`DISTRO_FEATURES_OPTED_OUT`
+      Specifies a space-separated list of distro features to opt out from
+      when they are provided by the :term:`DISTRO_FEATURES_DEFAULTS` variable.
+
+      You can also opt out of all default features by setting
+      :term:`DISTRO_FEATURES_OPTED_OUT` to ``*``::
+
+         DISTRO_FEATURES_OPTED_OUT = "*"
+
+      See :ref:`ref-manual/features:Default Features` for more information.
 
    :term:`DISTRO_NAME`
       The long name of the distribution. For information on the short name
@@ -5067,7 +5054,7 @@ system and gives an overview of their function and contents.
          configuration file. You cannot set the variable in a recipe file.
 
       See the
-      :yocto_git:`local.conf.sample.extended </meta-yocto/tree/meta-poky/conf/templates/default/local.conf.sample.extended>`
+      :oecore_path:`local.conf.sample.extended <meta/conf/templates/default/local.conf.sample.extended>`
       file for additional information. Also, for information on creating an
       :term:`Initramfs`, see the ":ref:`dev-manual/building:building an initial ram filesystem (Initramfs) image`" section
       in the Yocto Project Development Tasks Manual.
@@ -5336,6 +5323,11 @@ system and gives an overview of their function and contents.
       For more details see the :ref:`ref-classes-kernel-yocto` class and the
       :yocto_git:`symbol_why.py </yocto-kernel-tools/tree/tools/symbol_why.py>`
       script in :yocto_git:`yocto-kernel-tools </yocto-kernel-tools>`.
+
+   :term:`KCONFIG_CONFIG_ROOTDIR`
+      The :term:`KCONFIG_CONFIG_ROOTDIR` variable allows overriding the default
+      location of the ``.config`` file for recipes using the
+      :ref:`ref-classes-cml1` class.
 
    :term:`KCONFIG_MODE`
       When used with the :ref:`ref-classes-kernel-yocto`
@@ -6245,28 +6237,24 @@ system and gives an overview of their function and contents.
       For a list of hardware features supported by the Yocto Project as
       shipped, see the ":ref:`ref-features-machine`" section.
 
-   :term:`MACHINE_FEATURES_BACKFILL`
-      A list of space-separated features to be added to
-      :term:`MACHINE_FEATURES` if not also present in
-      :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`.
+   :term:`MACHINE_FEATURES_DEFAULTS`
+      Specifies a space-separated list of default machine features provided by
+      the :term:`OpenEmbedded Build System`. This list should not be modified
+      directly, but instead :term:`MACHINE_FEATURES_OPTED_OUT` should be used to
+      prevent default machine features from being enabled.
 
-      This variable is set in the ``meta/conf/bitbake.conf`` file. It is not
-      intended to be user-configurable. It is best to just reference the
-      variable to see which machine features are being
-      :ref:`backfilled <ref-features-backfill>` for all machine configurations.
+      See :ref:`ref-manual/features:Default Features` for more information.
 
-   :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`
-      A list of space-separated features from :term:`MACHINE_FEATURES_BACKFILL`
-      that should not be :ref:`backfilled <ref-features-backfill>` (i.e. added
-      to :term:`MACHINE_FEATURES`) during the build.
+   :term:`MACHINE_FEATURES_OPTED_OUT`
+      Specifies a space-separated list of machine features to opt out from
+      when they are provided by the :term:`MACHINE_FEATURES_DEFAULTS` variable.
 
-      This corresponds to an opt-out mechanism. When new default machine
-      features are introduced, machine definition maintainers can review
-      (`consider`) them and decide to exclude them from the
-      :ref:`backfilled <ref-features-backfill>` features. Therefore, the
-      combination of :term:`MACHINE_FEATURES_BACKFILL` and
-      :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED` makes it possible to
-      add new default features without breaking existing machine definitions.
+      You can also opt out of all default features by setting
+      :term:`MACHINE_FEATURES_OPTED_OUT` to ``*``::
+
+         MACHINE_FEATURES_OPTED_OUT = "*"
+
+      See :ref:`ref-manual/features:Default Features` for more information.
 
    :term:`MACHINEOVERRIDES`
       A colon-separated list of overrides that apply to the current
@@ -7493,19 +7481,17 @@ system and gives an overview of their function and contents.
       Points to a shared, global-state directory that holds data generated
       during the packaging process. During the packaging process, the
       :ref:`ref-tasks-packagedata` task packages data
-      for each recipe and installs it into this temporary, shared area.
+      for each recipe and installs it into this shared area.
       This directory defaults to the following, which you should not
       change::
 
-         ${STAGING_DIR_HOST}/pkgdata
+         ${TMPDIR}/pkgdata/${MACHINE}
 
       For examples of how this data is used, see the
       ":ref:`overview-manual/concepts:automatically added runtime dependencies`"
       section in the Yocto Project Overview and Concepts Manual and the
       ":ref:`dev-manual/debugging:viewing package information with ``oe-pkgdata-util```"
-      section in the Yocto Project Development Tasks Manual. For more
-      information on the shared, global-state directory, see
-      :term:`STAGING_DIR_HOST`.
+      section in the Yocto Project Development Tasks Manual.
 
    :term:`PKGDEST`
       Points to the parent directory for files to be packaged after they
@@ -8347,13 +8333,13 @@ system and gives an overview of their function and contents.
       section.
 
    :term:`RECIPE_SYSROOT`
-      This variable points to the directory that holds all files populated from
+      This variable points to the directory populated with all files provided by
       recipes specified in :term:`DEPENDS`. As the name indicates,
-      think of this variable as a custom root (``/``) for the recipe that will be
+      think of this variable as a custom root (``/``) for the recipe, that will be
       used by the compiler in order to find headers and other files needed to complete
       its job.
 
-      This variable is related to :term:`STAGING_DIR_HOST` or :term:`STAGING_DIR_TARGET`
+      This variable is used to define :term:`STAGING_DIR_HOST` or :term:`STAGING_DIR_TARGET`
       according to the type of the recipe and the build target.
 
       To better understand this variable, consider the following examples:
@@ -8367,11 +8353,11 @@ system and gives an overview of their function and contents.
       Do not modify it.
 
    :term:`RECIPE_SYSROOT_NATIVE`
-      This is similar to :term:`RECIPE_SYSROOT` but the populated files are from
-      ``-native`` recipes. This allows a recipe built for the target machine to
-      use ``native`` tools.
+      This is similar to :term:`RECIPE_SYSROOT` but files in it are provided by
+      native recipes. This allows a recipe built for the target machine to
+      use native tools.
 
-      This variable is related to :term:`STAGING_DIR_NATIVE`.
+      This variable is used to define :term:`STAGING_DIR_NATIVE`.
 
       The default value is ``"${WORKDIR}/recipe-sysroot-native"``.
       Do not modify it.
@@ -8687,13 +8673,19 @@ system and gives an overview of their function and contents.
    :term:`RSUGGESTS`
       A list of additional packages that you can suggest for installation
       by the package manager at the time a package is installed. Not all
-      package managers support this functionality.
+      package managers support this functionality. This feature takes effect
+      only when the package manager is being used to install packages on
+      the target system from a package feed.
 
       As with all package-controlling variables, you must always use this
       variable in conjunction with a package name override. Here is an
       example::
 
          RSUGGESTS:${PN} = "useful_package another_package"
+
+      For more information on package management, see the
+      :ref:`dev-manual/packages:Using Runtime Package Management` section
+      of the Yocto Project Development Tasks Manual.
 
    :term:`RUST_CHANNEL`
       Specifies which version of Rust to build - "stable", "beta" or "nightly".
@@ -8736,6 +8728,44 @@ system and gives an overview of their function and contents.
       :term:`NATIVELSBSTRING` does not appear in the
       list, then the build system reports a warning that indicates the
       current host distribution has not been tested as a build host.
+
+   :term:`SBOM_CVE_CHECK_EXPORT_VARS`
+      When inheriting the :ref:`ref-classes-sbom-cve-check` class, this variable
+      holds the list of variables that declare export files to generate.
+
+      Each variable must have a ``type`` and an ``ext`` flag set:
+
+      -  The ``type`` flag contains the value that is passed to the
+         ``--export-type`` command line argument of ``sbom-cve-check``.
+
+      -  The ``ext`` flag contains the filename extension (suffix). The output
+         filename is going will be ``${IMAGE_NAME}${ext}``.
+
+      For example::
+
+         SBOM_CVE_CHECK_EXPORT_VARS = "SBOM_CVE_CHECK_EXPORT_SPDX3"
+         SBOM_CVE_CHECK_EXPORT_SPDX3[type] = "spdx3"
+         SBOM_CVE_CHECK_EXPORT_SPDX3[ext] = ".sbom-cve-check.spdx.json"
+
+   :term:`SBOM_CVE_CHECK_EXTRA_ARGS`
+      When inheriting the :ref:`ref-classes-sbom-cve-check` class, this variable
+      can be used to pass extra arguments to the ``sbom-cve-check`` command-line
+      tool.
+
+      See the `documentation <https://sbom-cve-check.readthedocs.io/en/latest/index.html>`__
+      of ``sbom-cve-check`` for more information.
+
+   :term:`SBOM_CVE_CHECK_SCAN_SCOPE`
+      When inheriting the :ref:`ref-classes-sbom-cve-check` class, this
+      variable controls whether to scan target and native, just target, or just
+      native recipes.
+
+      Valid values are:
+
+      -  ``target`` (default): recipes are scanned in their target context
+      -  ``native``: recipes are scanned in their :ref:`ref-classes-native` context
+      -  ``both``: recipes are scanned in both their target and
+         :ref:`ref-classes-native` context
 
    :term:`SDK_ARCH`
       The target architecture for the SDK. Typically, you do not directly
@@ -9319,56 +9349,6 @@ system and gives an overview of their function and contents.
 
             SOURCE_MIRROR_URL = "http://example.com/my_source_mirror;user=<user>;pswd=<password>"
 
-   :term:`SPDX_ARCHIVE_PACKAGED`
-      This option allows to add to :term:`SPDX` output compressed archives
-      of the files in the generated target packages.
-
-      Such archives are available in
-      ``tmp/deploy/spdx/MACHINE/packages/packagename.tar.zst``
-      under the :term:`Build Directory`.
-
-      Enable this option as follows::
-
-         SPDX_ARCHIVE_PACKAGED = "1"
-
-      According to our tests on release 4.1 "langdale", building
-      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling this
-      option multiplied the size of the ``tmp/deploy/spdx`` directory by a
-      factor of 13 (+1.6 GiB for this image), compared to just using the
-      :ref:`ref-classes-create-spdx` class with no option.
-
-      Note that this option doesn't increase the size of :term:`SPDX`
-      files in ``tmp/deploy/images/MACHINE``.
-
-   :term:`SPDX_ARCHIVE_SOURCES`
-      This option allows to add to :term:`SPDX` output compressed archives
-      of the sources for packages installed on the target. It currently
-      only works when :term:`SPDX_INCLUDE_SOURCES` is set.
-
-      This is one way of fulfilling "source code access" license
-      requirements.
-
-      Such source archives are available in
-      ``tmp/deploy/spdx/MACHINE/recipes/recipe-packagename.tar.zst``
-      under the :term:`Build Directory`.
-
-      Enable this option as follows::
-
-         SPDX_INCLUDE_SOURCES = "1"
-         SPDX_ARCHIVE_SOURCES = "1"
-
-      According to our tests on release 4.1 "langdale", building
-      ``core-image-minimal`` for the ``qemux86-64`` machine, enabling
-      these options multiplied the size of the ``tmp/deploy/spdx``
-      directory by a factor of 11 (+1.4 GiB for this image),
-      compared to just using the :ref:`ref-classes-create-spdx`
-      class with no option.
-
-      Note that using this option only marginally increases the size
-      of the :term:`SPDX` output in ``tmp/deploy/images/MACHINE/``
-      (+ 0.07\% with the tested image), compared to just enabling
-      :term:`SPDX_INCLUDE_SOURCES`.
-
    :term:`SPDX_BUILD_HOST`
       The base variable name describing the build host on which the build is
       running. The value must name a key from ``SPDX_IMPORTS``, allowing
@@ -9440,6 +9420,17 @@ system and gives an overview of their function and contents.
          SPDX_FILE_EXCLUDE_PATTERNS = "\\.patch$ \\.diff$ /test/ \\.pyc$ \\.o$"
 
       See also :term:`SPDX_INCLUDE_SOURCES`.
+
+   :term:`SPDX_GIT_PURL_MAPPINGS`
+      A space separated list of ``domain:purl_type`` mappings to configure PURL
+      (Package URLs) generation for Git source downloads.
+
+      For example, adding ``gitlab.example.com:pkg:gitlab`` to this variable
+      will map repositories hosted on "gitlab.example.com" to the ``pkg:gitlab``
+      PURL type.
+
+      See also the :term:`SPDX_PACKAGE_URLS` variable for more information on
+      PURLs.
 
    :term:`SPDX_IMAGE_SUPPLIER`
       The name of an agent variable prefix describing the organization or
@@ -9597,6 +9588,20 @@ system and gives an overview of their function and contents.
       increases the SBOM size (potentially by several gigabytes for typical
       images).
 
+   :term:`SPDX_INCLUDE_VEX`
+      This option controls what `VEX <https://cyclonedx.org/capabilities/vex/>`__
+      information will be present in the output SPDX documents.
+
+      It can take three different values:
+
+      -  ``none``: disable all VEX data.
+
+      -  ``current`` (default): include VEX data for vulnerabilities not already
+         fixed in the upstream source code.
+
+      -  ``all``: get all known historical vulnerabilities, including those
+         already fixed upstream (warning: this can be large and slow).
+
    :term:`SPDX_INVOKED_BY`
       The base variable name describing the agent that invoked the build.
       Each ``Build`` object in the SPDX output is linked to this agent with an
@@ -9703,6 +9708,15 @@ system and gives an overview of their function and contents.
       string (``software_packageUrl``), in accordance with the Package URL
       specification) for a software Package. The default value of this variable
       is an empty string.
+
+   :term:`SPDX_PACKAGE_URLS`
+      A space separated list of Package URLs ("PURLs") for the software package.
+      The first item in this list will be listed as the ``packageUrl`` property
+      of the packages, and all PURLs (including the first one) will be listed as
+      external references. The default value is an auto generated ``pkg:yocto``
+      PURL based on the recipe name, version, and layer name. Override this
+      variable to replace the default, otherwise append or prepend to add
+      additional PURLs.
 
    :term:`SPDX_PACKAGE_VERSION`
       This variable controls the package version as seen in the SPDX 3.0 JSON
@@ -10160,8 +10174,7 @@ system and gives an overview of their function and contents.
       directory for the build host.
 
    :term:`STAGING_DIR`
-      Helps construct the ``recipe-sysroot*`` directories, which are used
-      during packaging.
+      Used for constructing directory trees used during staging.
 
       For information on how staging for recipe-specific sysroots occurs,
       see the :ref:`ref-tasks-populate_sysroot`
@@ -10181,31 +10194,31 @@ system and gives an overview of their function and contents.
          those files into the sysroot.
 
    :term:`STAGING_DIR_HOST`
-      Specifies the path to the sysroot directory for the system on which
-      the component is built to run (the system that hosts the component).
-      For most recipes, this sysroot is the one in which that recipe's
-      :ref:`ref-tasks-populate_sysroot` task copies
-      files. Exceptions include ``-native`` recipes, where the
-      :ref:`ref-tasks-populate_sysroot` task instead uses
-      :term:`STAGING_DIR_NATIVE`. Depending on
-      the type of recipe and the build target, :term:`STAGING_DIR_HOST` can
-      have the following values:
+      Specifies the path to the recipe's input sysroot directory, populated with files
+      for the system on which the component is built to run
+      (the system that hosts the component).
+      For most recipes, this sysroot is populated by their
+      :ref:`ref-tasks-populate_sysroot` task (when sharing files
+      between recipes). Exceptions include native recipes, for which the files from
+      :ref:`ref-tasks-populate_sysroot` task are instead copied to
+      :term:`STAGING_DIR_NATIVE`. Depending on the type of recipe and the build target,
+      :term:`STAGING_DIR_HOST` can have the following values:
 
       -  For recipes building for the target machine, the value is
-         "${:term:`STAGING_DIR`}/${:term:`MACHINE`}".
+         ``"${RECIPE_SYSROOT}"``, check :term:`RECIPE_SYSROOT`.
 
-      -  For native recipes building for the build host, the value is empty
-         given the assumption that when building for the build host, the
-         build host's own directories should be used.
+      -  For native recipes (building for the :term:`build host`), the value is empty
+         given the assumption that when building for the :term:`build host`, the
+         :term:`build host`'s own directories should be used.
 
          .. note::
 
-            ``-native`` recipes are not installed into host paths like such
-            as ``/usr``. Rather, these recipes are installed into
-            :term:`STAGING_DIR_NATIVE`. When compiling ``-native`` recipes,
+            Native recipe files are not installed into host paths such
+            as ``/usr``. Rather, such files are installed into
+            :term:`STAGING_DIR_NATIVE`. When compiling native recipes,
             standard build environment variables such as
             :term:`CPPFLAGS` and
-            :term:`CFLAGS` are set up so that both host paths
+            :term:`CFLAGS` are set up so that both :term:`build host`'s paths
             and :term:`STAGING_DIR_NATIVE` are searched for libraries and
             headers using, for example, GCC's ``-isystem`` option.
 
@@ -10213,16 +10226,15 @@ system and gives an overview of their function and contents.
             should be viewed as input variables by tasks such as
             :ref:`ref-tasks-configure`,
             :ref:`ref-tasks-compile`, and
-            :ref:`ref-tasks-install`. Having the real system
-            root correspond to :term:`STAGING_DIR_HOST` makes conceptual sense
-            for ``-native`` recipes, as they make use of host headers and
-            libraries.
-
-      Check :term:`RECIPE_SYSROOT` and :term:`RECIPE_SYSROOT_NATIVE`.
+            :ref:`ref-tasks-install`. Having the real system root
+            (the :term:`build host`'s root) play the role of :term:`STAGING_DIR_HOST`
+            makes conceptual sense for native recipes, as they make use
+            of the :term:`build host`'s headers and libraries.
 
    :term:`STAGING_DIR_NATIVE`
-      Specifies the path to the sysroot directory used when building
-      components that run on the build host itself.
+      Specifies the path to the recipe's input sysroot directory, populated with
+      files provided by native recipes (recipes building components that
+      run on the :term:`build host` itself).
 
       The default value is ``"${RECIPE_SYSROOT_NATIVE}"``,
       check :term:`RECIPE_SYSROOT_NATIVE`.
@@ -11894,6 +11906,11 @@ system and gives an overview of their function and contents.
       <https://www.freedesktop.org/software/systemd/man/latest/ukify.html>`__
       command.
 
+   :term:`UKI_DEVICETREE`
+      When inheriting the :ref:`ref-classes-uki` class, the :term:`UKI_DEVICETREE`
+      variable holds the list of device tree blobs to include to the `Unified
+      Kernel Image (UKI) <https://uapi-group.org/specifications/specs/unified_kernel_image/>`__.
+
    :term:`UKI_FILENAME`
       When inheriting the :ref:`ref-classes-uki` class, the output file name
       for the generated `Unified Kernel Image (UKI)
@@ -12267,6 +12284,13 @@ system and gives an overview of their function and contents.
       Wic creation process.
 
    :term:`WIC_SECTOR_SIZE`
+
+      .. warning::
+
+         This variable is deprecated in favor of the ``--sector-size`` wic
+         command-line argument. See :ref:`ref-migration-6-0-wic-sector-size-change`
+         for more information.
+
       The variable :term:`WIC_SECTOR_SIZE` controls the sector size of Wic
       images. In the background, this controls the value of the
       ``PARTED_SECTOR_SIZE`` environment variable passed to the ``parted``

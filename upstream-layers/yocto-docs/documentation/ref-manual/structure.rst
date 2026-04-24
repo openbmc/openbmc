@@ -315,10 +315,10 @@ The :term:`OpenEmbedded Build System` can create the ``local.conf`` file from a
 setup script :ref:`structure-core-script`.
 
 The source ``local.conf.sample`` file used depends on the
-:term:`TEMPLATECONF` script variable, which defaults to ``layers/meta-yocto/meta-poky/conf/templates/default``
-when you are building from the Yocto Project development environment,
-and to ``layers/openembedded-core/meta/conf/templates/default`` when you are building from the OpenEmbedded-Core
-environment. Because the script variable points to the source of the
+:term:`TEMPLATECONF` script variable, which defaults to
+:oecore_path:`meta/conf/templates/default` in :term:`OpenEmbedded-Core
+(OE-Core)`.
+Because the script variable points to the source of the
 ``local.conf.sample`` file, this implies that you can configure your
 build environment from any layer by setting the variable in the
 top-level build environment setup script as follows::
@@ -334,8 +334,6 @@ file, it uses ``sed`` to substitute final
 
    You can see how the :term:`TEMPLATECONF` variable is used by looking at the
    ``layers/openembedded-core/scripts/oe-setup-builddir`` script in :term:`OpenEmbedded-Core (OE-Core)`.
-   You can find the :term:`Poky` version of the ``local.conf.sample`` file in
-   the ``layers/meta-yocto/meta-poky/conf/templates/default`` directory.
 
 .. _structure-build-conf-bblayers.conf:
 
@@ -354,9 +352,7 @@ when you ``source`` the top-level build environment setup script (i.e.
 
 As with the :ref:`structure-build-conf-local.conf` file, the source ``bblayers.conf.sample``
 file used depends on the :term:`TEMPLATECONF` script variable, which
-defaults to ``meta-poky/conf/templates/default`` when you are building using the
-:term:`Poky` reference distro, and to ``meta/conf/templates/default`` when you are
-building from the OpenEmbedded-Core environment (default). Because the script
+defaults to :oecore_path:`meta/conf/templates/default` . Because the script
 variable points to the source of the ``bblayers.conf.sample`` file, this
 implies that you can base your build from any layer by setting the
 variable in the top-level build environment setup script as follows::
@@ -369,9 +365,7 @@ Once the build process gets the sample file, it uses ``sed`` to substitute final
 .. note::
 
    You can see how the :term:`TEMPLATECONF` variable is defined by the ``scripts/oe-setup-builddir``
-   script in :term:`OpenEmbedded-Core (OE-Core)`. You can find the :term:`Poky`
-   version of the ``bblayers.conf.sample`` file in the ``layers/meta-yocto/meta-poky/conf/templates/default``
-   directory.
+   script in :term:`OpenEmbedded-Core (OE-Core)`.
 
 .. _structure-build-conf-site.conf:
 

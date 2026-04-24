@@ -39,7 +39,7 @@ from ``.templateconf`` file that is read from the same directory as
 ``oe-init-build-env`` script. For the Poky reference distribution this
 would be::
 
-   TEMPLATECONF=${TEMPLATECONF:-meta-poky/conf/templates/default}
+   TEMPLATECONF=${TEMPLATECONF:-meta/conf/templates/default}
 
 If you look at a configuration template directory, you will
 see the ``bblayers.conf.sample``, ``local.conf.sample``, ``conf-summary.txt`` and

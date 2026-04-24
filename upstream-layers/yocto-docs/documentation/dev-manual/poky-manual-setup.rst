@@ -94,7 +94,7 @@ an entire Linux distribution, including the toolchain, from source.
 
     .. code-block:: shell
 
-       $ TEMPLATECONF=$PWD/layers/meta-yocto/meta-poky/conf/templates/default source ./layers/openembedded-core/oe-init-build-env
+       $ source ./layers/openembedded-core/oe-init-build-env
 
     Among other things, the script creates the :term:`Build Directory`, which is
     ``build`` in this case and is located in the :term:`Source Directory`.

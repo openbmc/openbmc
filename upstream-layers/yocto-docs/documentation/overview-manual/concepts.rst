@@ -228,9 +228,8 @@ Directory` at the time you source the build environment setup script.
 :term:`Configuration files <Configuration File>` provide many basic variables
 that define a build environment. To show a list of possible variables to
 configure from :term:`configuration files <Configuration File>`, see the
-:yocto_git:`local.conf.sample
-</meta-yocto/tree/meta-poky/conf/templates/default/local.conf.sample>` in the
-``meta-poky`` layer:
+:oecore_path:`local.conf.sample <meta/conf/templates/default/local.conf.sample>`
+file in :term:`OpenEmbedded-Core (OE-Core)`:
 
 Here is a non-exhaustive list:
 

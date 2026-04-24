@@ -469,8 +469,8 @@ of the Yocto Project and layers used during your build. Archiving a Git
 repository can be done with the :manpage:`git-archive <git-archive(1)>` command.
 
 One thing a development organization might want to consider for end-user
-convenience is to modify
-``meta-poky/conf/templates/default/bblayers.conf.sample`` to ensure that when
+convenience is to provide its own version of the
+:oecore_path:`meta/conf/templates/default/bblayers.conf.sample` file to ensure that when
 the end user utilizes the released build system to build an image, the
 development organization's layers are included in the ``bblayers.conf`` file
 automatically::

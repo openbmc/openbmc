@@ -30,7 +30,7 @@ See also the list of new features and enhancements of the previous releases:
 Supported kernel versions
 -------------------------
 
-The :term:`OLDEST_KERNEL` setting is XXX in this release, meaning that
+The :term:`OLDEST_KERNEL` setting is 5.15 in this release, meaning that
 out the box, older kernels are not supported. See :ref:`4.3 migration notes
 <migration-4.3-supported-kernel-versions>` for details.
 
@@ -40,11 +40,16 @@ Supported distributions
 Compared to the previous releases, running BitBake is supported on new
 GNU/Linux distributions:
 
--  XXX
+-  Fedora 43
+-  openSUSE Leap 16.0
+-  Ubuntu 26.04 (LTS)
 
 On the other hand, some earlier distributions are no longer supported:
 
--  XXX
+-  Fedora 39
+-  Fedora 40
+-  Fedora 41
+-  openSUSE Leap 15.5
 
 See :ref:`all supported distributions <system-requirements-supported-distros>`.
 
@@ -89,6 +94,57 @@ Reverting to :wikipedia:`SysVinit <UNIX_System_V>` can be done by specifying the
 
 See commit :oecore_rev:`0b4061c5d50261f826d0edb4b478d2d305274b7c` for more information.
 
+Changes in how default :term:`DISTRO_FEATURES` and :term:`MACHINE_FEATURES` are provided
+----------------------------------------------------------------------------------------
+
+The way default :term:`DISTRO_FEATURES` and :term:`MACHINE_FEATURES` are
+provided by the :term:`OpenEmbedded Build System` has changed.
+
+The ``DISTRO_FEATURES_BACKFILL``, ``DISTRO_FEATURES_BACKFILL_CONSIDERED``,
+``DISTRO_FEATURES_DEFAULT``, ``MACHINE_FEATURES_BACKFILL`` and
+``MACHINE_FEATURES_BACKFILL_CONSIDERED`` variables are now obsolete.
+
+Instead, these are replaced by the :term:`DISTRO_FEATURES_DEFAULTS`,
+:term:`DISTRO_FEATURES_OPTED_OUT`, :term:`MACHINE_FEATURES_DEFAULTS` and
+:term:`MACHINE_FEATURES_OPTED_OUT` variables.
+
+Users are advised to migrate to these variables the following way:
+
+-  For :term:`DISTRO_FEATURES`:
+
+   -  If you have previously assigned :term:`DISTRO_FEATURES` without using
+      ``DISTRO_FEATURES_DEFAULT``, you will now get the default features added
+      automatically (from :term:`DISTRO_FEATURES_DEFAULTS`). You will need to
+      review these and add any features you do not want to use to
+      :term:`DISTRO_FEATURES_OPTED_OUT`.
+
+   -  ``DISTRO_FEATURES_DEFAULT`` is now unused, the new variable name is
+      slightly different (:term:`DISTRO_FEATURES_DEFAULTS`) to ensure that it is
+      not accidentally used if a layer hasn't been modified to adapt to the new
+      naming.
+
+   -  If you previously set ``DISTRO_FEATURES_BACKFILL_CONSIDERED``, use the new
+      :term:`DISTRO_FEATURES_OPTED_OUT` variable instead.
+
+   -  If you previously modified ``DISTRO_FEATURES_BACKFILL``, remove these
+      assignments and follow the above instructions.
+
+-  For :term:`MACHINE_FEATURES`:
+
+   -  :term:`MACHINE_FEATURES` will now get the default features added
+      automatically (from :term:`MACHINE_FEATURES_DEFAULTS`). You will need to
+      review these and add any features you do not want to use to
+      :term:`MACHINE_FEATURES_OPTED_OUT`.
+
+   -  If you previously set ``MACHINE_FEATURES_BACKFILL_CONSIDERED``, use the new
+      :term:`MACHINE_FEATURES_OPTED_OUT` variable instead.
+
+   -  If you previously modified ``MACHINE_FEATURES_BACKFILL``, remove these
+      assignments and follow the above instructions.
+
+See commit :oecore_rev:`159148f4de2595556fef6e8678578df83383857b` and
+:oecore_rev:`3194d6868dd14e40ae670db089e5bf6f862d3044` for more information.
+
 Changes to the list of :term:`DISTRO_FEATURES` enabled by default
 -----------------------------------------------------------------
 
@@ -113,6 +169,19 @@ The following :term:`DISTRO_FEATURES` are now enabled by default in
    library that supports it.
 
 See commit :oecore_rev:`2e1e7c86064ce36580953650b27cca9ae7c269c4` for more information.
+
+Default configuration templates removed from :yocto_git:`meta-poky </meta-yocto/tree/meta-poky>`
+------------------------------------------------------------------------------------------------
+
+The configuration templates located in ``meta-poky/conf/templates/default`` have
+been removed as they are now provided in a single location:
+:term:`OpenEmbedded-Core (OE-Core)` :oecore_path:`meta/conf/templates/default`.
+
+These files were duplicating themselves but were mostly similar.
+
+See commit :meta_yocto_rev:`ac300baea7314ea3c80f2330b2a993f729f32150` for more
+information on the differences there are between the two sets of default
+templates.
 
 :ref:`ref-classes-native` and :ref:`ref-classes-cross` classes :term:`DEBUG_BUILD` change
 -----------------------------------------------------------------------------------------
@@ -189,14 +258,103 @@ class, meaning recipes using these variables that not yet inheriting the
 
 See commit :oecore_rev:`68d2d38483efada7bc2409e10508b03a7431caff` for more information.
 
-Rust language changes
----------------------
+:ref:`ref-classes-vex` output JSON document extension change
+------------------------------------------------------------
 
-systemd changes
----------------
+Image recipes that inherit the :ref:`ref-classes-vex` class have an extra JSON
+document generated which was previous ending with the ``.json`` suffix. For
+example, a build for the ``core-image-minimal`` image recipe with this class
+would have resulted in a file named::
+
+   core-image-minimal-qemuarm64.rootfs.json
+
+The suffix of this file is now ``.vex.json``. Taking the above example, the same
+file is now named::
+
+   core-image-minimal-qemuarm64.rootfs.vex.json
+
+Support for SPDX 2.2 removed
+----------------------------
+
+Support for generating SPDX 2.2 document through the ``create-spdx-2.2`` class
+was removed:
+
+.. code-block::
+
+   Removes SPDX 2.2 support in favor of SPDX 3 support being the only
+   option. The SPDX 3 data is far superior to SPDX 2.2 and thus more useful
+   for SBoM uses cases.
+
+See commit :oecore_rev:`12abd0574c267bade0962ecb39d9e8da8c56842b` for more
+information.
+
+Users are advised to transition to SDPX 3.0, which is provided by the
+:ref:`ref-classes-create-spdx` class.
+
+.. _ref-migration-6-0-wic-sector-size-change:
+
+:term:`WIC_SECTOR_SIZE` should be replaced by ``--sector-size``
+---------------------------------------------------------------
+
+The :term:`WIC_SECTOR_SIZE` variable was previously used to define the sector
+size of the partitions generated by the :doc:`WIC </dev-manual/wic>` tool. The
+``wic`` command-line tool now supports a ``--sector-size`` argument that
+replaces this variable.
+
+While this variable can still be used in recipes, a warning is now printed on
+the console when used::
+
+   DEPRECATED: WIC_SECTOR_SIZE is deprecated, use the --sector-size command-line argument instead.
+
+Using the ``--sector-size`` command-line argument can be done through the
+:term:`WIC_CREATE_EXTRA_ARGS` variable.
+
+For example, a previous assignment to :term:`WIC_SECTOR_SIZE`::
+
+   WIC_SECTOR_SIZE = "4096"
+
+Should be replaced by::
+
+   WIC_CREATE_EXTRA_ARGS += "--sector-size 4096"
+
+See commit :oecore_rev:`b50d6debf7baa555fbfb3521c4f952675bba2d37` for more
+information.
+
+:doc:`WIC </dev-manual/wic>` files to be moved under ``files/wic``
+------------------------------------------------------------------
+
+:doc:`WIC </dev-manual/wic>` related files such as :doc:`WKS
+</ref-manual/kickstart>` files or custom WIC plugins should be moved to the
+``files/wic/`` directory of the layer containing them.
+
+If not done, the build will fail with errors indicating how to move these files,
+for example::
+
+   wic/wks files at ../meta-custom/wic need to be moved to files/wic within the layer to be found/used
+   wic/wks files at ../meta-custom/scripts/lib/wic/canned-wks need to be moved to files/wic within the layer to be found/used
+
+For example, here is the content of the :term:`OpenEmbedded-Core (OE-Core)`
+"meta" layer as of writing::
+
+   meta/files/wic
+   ├── common.wks.inc
+   ├── directdisk-bootloader-config.cfg
+   ├── directdisk-bootloader-config.wks
+   ├── directdisk-gpt.wks
+   ├── directdisk-multi-rootfs.wks
+   ├── directdisk.wks
+   ├── efi-bootdisk.wks.in
+   ├── efi-uki-bootdisk.wks.in
+   ├── mkefidisk.wks
+   ├── mkhybridiso.wks
+   ├── qemuloongarch.wks
+   ├── qemuriscv.wks
+   ├── qemux86-directdisk.wks
+   ├── sdimage-bootpart.wks
+   └── systemd-bootdisk.wks
 
 Support for SysVinit compatibility in systemd was dropped
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------------------------------------
 
 Support for the :wikipedia:`SysVinit <UNIX_System_V>` compatibility in
 :wikipedia:`systemd <Systemd>` was dropped.
@@ -212,14 +370,6 @@ Users are advised to switch to one init manager or the other entirely.
 
 See commit :oecore_rev:`d9ec9e20eebc062d084dd76b59d665994e0cb51b` for more information.
 
-Recipe changes
---------------
-
-Removed variables
------------------
-
-The following variables have been removed:
-
 Removed recipes
 ---------------
 
@@ -233,6 +383,18 @@ The following recipes have been removed in this release:
 -  ``systemd-compat-units``: Dropped as a consequence of removing
    :wikipedia:`SysVinit <UNIX_System_V>` support in :wikipedia:`systemd
    <Systemd>`
+   (:oecore_rev:`d9ec9e20eebc062d084dd76b59d665994e0cb51b`)
+
+-  ``gstreamer1.0-vaapi``: removed as it was already provided by the ``va``
+   :term:`PACKAGECONFIG` item of ``gstreamer1.0-plugins-bad``.
+   (:oecore_rev:`9e2d2a5b0c9e062f13651093bb1e459f210618e6`)
+
+-  ``pkgconfig``: replaced by the ``pkgconf`` recipe
+   (:oecore_rev:`e32bf38fab8b2ae417022a4dbd36f7e1ce52c206`)
+
+-  ``python3-pyzstd``: there were no users of this in :term:`OpenEmbedded-Core
+   (OE-Core)` and Python 3.14 now has built-in support for zstd
+   (:oecore_rev:`55061de857657ea01babc5652caa062e8d292c44`)
 
 Removed :term:`PACKAGECONFIG` options
 -------------------------------------
@@ -240,6 +402,8 @@ Removed :term:`PACKAGECONFIG` options
 -  ``mesa``: ``freedreno-fdperf`` (:oecore_rev:`293edd0d3d077d0fde7ba6671dc9a26d5b4cf5e4`)
 -  ``libcxx``: ``no-atomics`` (:oecore_rev:`ccc585f94c51ebaef863f116bcd2b41b2d958666`)
 -  ``systemd``: ``sysvinit`` (:oecore_rev:`e00d5d6eac65e2cd88e34c2790469c7325bfb37d`)
+-  ``gstreamer1.0-plugins-good``: ``soup2`` (:oecore_rev:`61d653562a5b3903aa4e79791b58a75e4dc74236`)
+-  ``webkitgtk``: ``soup2`` (:oecore_rev:`69af43387e809e595b992b3576dde89e700cc711`)
 
 Removed classes
 ---------------
@@ -249,13 +413,14 @@ The following classes have been removed in this release:
 -  ``oelint``: remove as most of the checks done by this class are done in other
    areas of code now, making this class obsolete.
 
-Removed features
-----------------
-
-The following features have been removed in this release:
-
 Miscellaneous changes
 ---------------------
 
 -  :ref:`ref-classes-meson`: drop ``meson_do_qa_configure`` as it was
    non-functional (:oecore_rev:`0514b451b5d96135c6d24e75e0afa8b5aea513dd`)
+
+-  Drop VSCode setup support from the ``oe-init-build-env`` script. Users are
+   advised to use :doc:`bitbake-setup
+   <bitbake:bitbake-user-manual/bitbake-user-manual-environment-setup>`
+   instead (:oecore_rev:`4e781c6618ae8ba1a3d2c1242a92017dbe44caaf`)
+

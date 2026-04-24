@@ -60,26 +60,25 @@ supported on the following distributions:
 
 ..
    Can be generated with yocto-autobuilder-helper's scripts/yocto-supported-distros.
-   yocto-supported-distros --release master --config yocto-autobuilder2/config.py --output-format docs
+   yocto-supported-distros --release master --config yocto-autobuilder2/config.py --output-format docs --check-worker-statuses
 
 -  AlmaLinux 8
 -  AlmaLinux 9
 -  CentOS Stream 9
--  Debian GNU/Linux 11 (Bullseye)
--  Debian GNU/Linux 12 (Bookworm)
--  Debian GNU/Linux 13 (Trixie)
--  Fedora 39
--  Fedora 40
+-  Debian 11
+-  Debian 12
+-  Debian 13
 -  Fedora 42
 -  Fedora 43
--  OpenSUSE Leap 15.5
 -  OpenSUSE Leap 15.6
+-  OpenSUSE Leap 16.0
 -  Rocky Linux 8
 -  Rocky Linux 9
 -  Ubuntu 22.04 (LTS)
 -  Ubuntu 24.04 (LTS)
 -  Ubuntu 25.04
 -  Ubuntu 25.10
+-  Ubuntu 26.04 (LTS)
 
 The following distribution versions are still tested, even though the
 organizations publishing them no longer make updates publicly available:
@@ -167,6 +166,37 @@ Ubuntu and Debian
 
 .. include:: ubuntu-debian-host-packages-nodocs.rst
 
+Additionally, on distributions other than Debian 11 and Ubuntu 22.04 (otherwise
+see note below), install the following package:
+
+.. code-block:: console
+
+   $ sudo apt-get install python3-websockets
+
+.. note::
+
+   On Debian 11 and Ubuntu 22.04, the minimum version for
+   ``python3-websockets`` is not satisfied by the host distribution. This
+   package is used for fetching pre-built :ref:`shared state
+   <overview-manual/concepts:shared state>` artifacts from upstream Yocto Project
+   servers (see :ref:`ref-fragments-core-yocto-sstate-mirror-cdn` for more
+   information).
+
+   In order to use this feature, you can get the correct version of
+   ``python3-websockets`` by either:
+
+   -  Using a :term:`buildtools` tarball by following the
+      :ref:`system-requirements-buildtools` section below.
+
+   -  Installing ``python3-websockets`` using `Pip
+      <https://pip.pypa.io/en/stable/>`__ in a virtual environment, e.g.:
+
+      .. code-block:: console
+
+         $ python3 -m venv --clear ./yocto-docs-venv
+         $ . ./yocto-docs-venv/bin/activate
+         $ pip install websockets
+
 Here are the packages needed to build Project documentation manuals:
 
 .. literalinclude:: ../tools/host_packages_scripts/ubuntu_docs.sh
@@ -204,13 +234,44 @@ documentation in PDF format:
 .. literalinclude:: ../tools/host_packages_scripts/fedora_docs_pdf.sh
    :language: shell
 
-openSUSE Packages
------------------
+openSUSE Leap Packages
+----------------------
+
+openSUSE Leap 15.6 Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Here are the packages needed to build an image on a headless system
-with a supported openSUSE distribution:
+with a supported openSUSE Leap 15.6 distribution:
 
-.. literalinclude:: ../tools/host_packages_scripts/opensuse_essential.sh
+.. literalinclude:: ../tools/host_packages_scripts/opensuse_essential_15.6.sh
+   :language: shell
+
+Additionally, openSUSE Leap 15.6 requires a :term:`buildtools` tarball to be
+installed and set up, as this distribution provides a version of Python that is
+too old for :term:`BitBake`. Follow the :ref:`system-requirements-buildtools`
+section below for more information.
+
+Here are the packages needed to build Project documentation manuals:
+
+.. literalinclude:: ../tools/host_packages_scripts/opensuse_docs.sh
+   :language: shell
+
+.. literalinclude:: ../tools/host_packages_scripts/pip3_docs.sh
+   :language: shell
+
+In addition to the previous packages, here are the packages needed to build the
+documentation in PDF format:
+
+.. literalinclude:: ../tools/host_packages_scripts/opensuse_docs_pdf.sh
+   :language: shell
+
+openSUSE Leap 16.0 Packages
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here are the packages needed to build an image on a headless system
+with a supported openSUSE Leap 16.0 distribution:
+
+.. literalinclude:: ../tools/host_packages_scripts/opensuse_essential_16.0.sh
    :language: shell
 
 Here are the packages needed to build Project documentation manuals:
@@ -235,6 +296,8 @@ with a supported AlmaLinux distribution:
 
 .. literalinclude:: ../tools/host_packages_scripts/almalinux_essential.sh
    :language: shell
+
+.. include:: buildtools-alma-centos-rocky-9.rst
 
 .. note::
 
@@ -285,6 +348,8 @@ with a supported CentOS Stream distribution:
 .. literalinclude:: ../tools/host_packages_scripts/centosstream_essential.sh
    :language: shell
 
+.. include:: buildtools-alma-centos-rocky-9.rst
+
 Here are the packages needed to build Project documentation manuals:
 
 .. literalinclude:: ../tools/host_packages_scripts/centosstream_docs.sh
@@ -320,6 +385,8 @@ with a supported RockyLinux distribution:
 
 .. literalinclude:: ../tools/host_packages_scripts/rockylinux_essential.sh
    :language: shell
+
+.. include:: buildtools-alma-centos-rocky-9.rst
 
 .. note::
 

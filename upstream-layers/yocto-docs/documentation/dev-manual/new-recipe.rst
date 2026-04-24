@@ -408,17 +408,19 @@ During the build, the
 the source with ``${``\ :term:`S`\ ``}``
 pointing to where it is unpacked.
 
-If you are fetching your source files from an upstream source archived
-tarball and the tarball's internal structure matches the common
-convention of a top-level subdirectory named
-``${``\ :term:`BPN`\ ``}-${``\ :term:`PV`\ ``}``,
-then you do not need to set :term:`S`. However, if :term:`SRC_URI` specifies to
-fetch source from an archive that does not use this convention, or from
-an SCM like Git or Subversion, your recipe needs to define :term:`S`.
+By default, the value of ``${``\ :term:`S`\ ``}`` is already set to where the
+:term:`OpenEmbedded Build System` will unpack the source code, by using the
+value of :term:`UNPACKDIR` and :term:`BP`.
 
-If processing your recipe using BitBake successfully unpacks the source
-files, you need to be sure that the directory pointed to by ``${S}``
-matches the structure of the source.
+You typically don't need to set :term:`S` explicitly. If processing your recipe
+using BitBake successfully unpacks the source files, you can verify that the
+directory pointed to by ``${S}`` is the root of your source code.
+
+.. note::
+
+   It used to be that when fetching with Git, recipes should explicitly set
+   :term:`S` to ``${WORKDIR}/git``: this is no longer the case. See
+   :ref:`ref-migration-5-3-s-workdir-git` for more information.
 
 Patching Code
 =============

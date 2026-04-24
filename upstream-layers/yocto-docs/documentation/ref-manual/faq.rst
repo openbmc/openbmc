@@ -196,7 +196,7 @@ and ``all_proxy`` set as to standard shell environment variables to redirect
 requests through proxy servers.
 
 The Yocto Project also includes a
-``meta-poky/conf/templates/default/site.conf.sample`` file that shows
+:oecore_path:`meta/conf/templates/default/site.conf.sample` file that shows
 how to configure a Git proxy server if needed.
 
 .. note::

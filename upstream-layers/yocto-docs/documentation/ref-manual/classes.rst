@@ -476,6 +476,10 @@ build configuration system. "cml" stands for "Configuration Menu Language", whic
 originates from the Linux kernel but is also used in other projects such as U-Boot
 and BusyBox. It could have been called "kconfig" too.
 
+The CML configuration file location (``.config``) is by default expected to be
+in the build directory (:term:`B`). This can be overridden with the
+:term:`KCONFIG_CONFIG_ROOTDIR` variable.
+
 .. _ref-classes-compress_doc:
 
 ``compress_doc``
@@ -555,8 +559,8 @@ The toplevel :term:`SPDX` output file is generated in JSON format as a
 as well as in ``tmp/deploy/spdx``.
 
 The exact behaviour of this class, and the amount of output can be controlled
-by the :term:`SPDX_PRETTY`, :term:`SPDX_ARCHIVE_PACKAGED`,
-:term:`SPDX_ARCHIVE_SOURCES` and :term:`SPDX_INCLUDE_SOURCES` variables.
+by the :term:`SPDX_PRETTY`, :term:`SPDX_INCLUDE_SOURCES` and other variables
+starting with with ``SPDX_``.
 
 See the description of these variables and the
 ":ref:`dev-manual/sbom:creating a software bill of materials`"
@@ -1067,10 +1071,10 @@ introspection. This functionality is only enabled if the
 
 .. note::
 
-   This functionality is :ref:`backfilled <ref-features-backfill>` by default
-   and, if not applicable, should be disabled through
-   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` or
-   :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`, respectively.
+   This functionality is :ref:`enabled <ref-manual/features:Default Features>`
+   by default and, if not applicable, should be disabled through
+   :term:`DISTRO_FEATURES_OPTED_OUT` or
+   :term:`MACHINE_FEATURES_OPTED_OUT`, respectively.
 
 .. _ref-classes-grub-efi:
 
@@ -1619,6 +1623,15 @@ The :ref:`ref-classes-kernel-uimage` class provides support to pack uImage.
 The :ref:`ref-classes-kernel-yocto` class provides common functionality for building
 from linux-yocto style kernel source repositories.
 
+.. _ref-classes-kernel-yocto-rust:
+
+``kernel-yocto-rust``
+=====================
+
+The :ref:`ref-classes-kernel-yocto-rust` class creates the necessary Rust
+Linux kernel dependencies and ensures that they are available by running ``make
+rustavailable`` from the Linux kernel source tree.
+
 .. _ref-classes-kernelsrc:
 
 ``kernelsrc``
@@ -1783,6 +1796,19 @@ building Linux kernel modules. Typically, a recipe that builds software that
 includes one or more kernel modules and has its own means of building the module
 inherits this class as opposed to inheriting the :ref:`ref-classes-module`
 class.
+
+.. _ref-classes-module-rust:
+
+``module-rust``
+===============
+
+The :ref:`ref-classes-module-rust` class provides support for building
+out-of-tree Linux kernel modules written in the Rust programming language. The
+class inherits the :ref:`ref-classes-module` class.
+
+For general information on out-of-tree Linux kernel modules, see the
+":ref:`kernel-dev/common:incorporating out-of-tree modules`"
+section in the Yocto Project Linux Kernel Development Manual.
 
 .. _ref-classes-multilib*:
 
@@ -2734,6 +2760,61 @@ configuration checks from the ``local.conf`` configuration file to
 prevent common mistakes that cause build failures. Distribution policy
 usually determines whether to include this class.
 
+.. _ref-classes-sbom-cve-check:
+
+``sbom-cve-check``
+==================
+
+The :ref:`ref-classes-sbom-cve-check` class uses the `sbom-cve-check
+<github.com/bootlin/sbom-cve-check>`__ command-line tool for post-build CVE
+analysis. It relies on the :ref:`ref-classes-create-spdx` class as SPDX files
+are the input of this tool.
+
+This class should be enabled through the :ref:`ref-fragments-core-yocto-sbom-cve-check`
+fragment:
+
+.. code-block:: console
+
+   $ bitbake-config-build enable-fragment core/yocto/sbom-cve-check
+
+After building an image, ``sbom-cve-check`` will generate one or more reports in
+the :term:`DEPLOY_DIR_IMAGE` directory depending on the current value of
+:term:`SBOM_CVE_CHECK_EXPORT_VARS`.
+
+See the variables starting with ``SBOM_CVE_CHECK_`` in the :doc:`Yocto Project
+Reference Manual glossary </ref-manual/variables>` to learn more on how to
+configure the behavior of this class.
+
+.. _ref-classes-sbom-cve-check-recipe:
+
+``sbom-cve-check-recipe``
+=========================
+
+The :ref:`ref-classes-sbom-cve-check-recipe` class uses the `sbom-cve-check
+<github.com/bootlin/sbom-cve-check>`__ command-line tool for post-build CVE
+analysis of a recipe. It relies on the :ref:`ref-classes-create-spdx` class as
+SPDX files are the input of this tool.
+
+This class can be inherited in any recipe. Compared to the
+:class:`ref-classes-sbom-cve-check` class, this class only uses the SBOM of the
+recipe (after the ``create_recipe_sbom`` is run) to determine which is the
+underlying software and do the analysis, meaning that building the recipe itself
+isn't necessary.
+
+To use this class, inherit it in the recipe and run:
+
+.. code-block:: console
+
+   $ bitbake <recipe> -c sbom_cve_check_recipe
+
+After running the command, ``sbom-cve-check`` will generate one or more reports
+in the :term:`DEPLOY_DIR_IMAGE` directory depending on the current value of
+:term:`SBOM_CVE_CHECK_EXPORT_VARS`.
+
+See the variables starting with ``SBOM_CVE_CHECK_`` in the :doc:`Yocto Project
+Reference Manual glossary </ref-manual/variables>` to learn more on how to
+configure the behavior of this class.
+
 .. _ref-classes-scons:
 
 ``scons``
@@ -3533,6 +3614,7 @@ The variables used by this class are:
 -  :term:`UKI_SB_CERT`: optional UEFI secureboot certificate matching the
    private key
 -  :term:`UKI_SB_KEY`: optional UEFI secureboot private key to sign UKI with
+-  :term:`UKI_DEVICETREE`: list of device tree blobs to include to the UKI
 
 For examples on how to use this class see oeqa selftest
 :oe_git:`meta/lib/oeqa/selftest/cases/uki.py

@@ -38,11 +38,8 @@ $0 OCI_IMAGE [make arguments...]
      - centos:stream9
      - debian:12
      - debian:13
-     - fedora:39
-     - fedora:40
-     - fedora:41
      - fedora:42
-     - leap:15.5
+     - fedora:43
      - leap:15.6
      - rockylinux:8
      - rockylinux:9
@@ -50,6 +47,7 @@ $0 OCI_IMAGE [make arguments...]
      - ubuntu:24.04
      - ubuntu:25.04
      - ubuntu:25.10
+     - ubuntu:26.04
 
    [make arguments] is one or more argument to pass to the make command of
    documentation/Makefile, see that file for what's supported. This is typically
@@ -117,21 +115,26 @@ main ()
       docs_pdf=ubuntu_docs_pdf.sh
       pip3=pip3_docs.sh
       ;;
-    "fedora:39"*|\
-    "fedora:40"*|\
-    "fedora:41"*|\
-    "fedora:42"*)
+    "fedora:42"*|\
+    "fedora:43"*)
       containerfile=Containerfile.fedora
       essential=fedora_essential.sh
       docs=fedora_docs.sh
       docs_pdf=fedora_docs_pdf.sh
       pip3=pip3_docs.sh
       ;;
-    "leap:15.5"*|\
     "leap:15.6"*)
       image=opensuse/leap:$version
       containerfile=Containerfile.zypper
-      essential=opensuse_essential.sh
+      essential=opensuse_essential_15.6.sh
+      docs=opensuse_docs.sh
+      docs_pdf=opensuse_docs_pdf.sh
+      pip3=pip3_docs.sh
+      ;;
+    "leap:16.0"*)
+      image=opensuse/leap:$version
+      containerfile=Containerfile.zypper
+      essential=opensuse_essential_16.0.sh
       docs=opensuse_docs.sh
       docs_pdf=opensuse_docs_pdf.sh
       pip3=pip3_docs.sh
@@ -147,7 +150,8 @@ main ()
     "ubuntu:22.04"*|\
     "ubuntu:24.04"*|\
     "ubuntu:25.04"*|\
-    "ubuntu:25.10"*)
+    "ubuntu:25.10"*|\
+    "ubuntu:26.04"*)
       containerfile=Containerfile.ubuntu
       essential=ubuntu_essential.sh
       docs=ubuntu_docs.sh

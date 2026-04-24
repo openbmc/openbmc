@@ -44,9 +44,9 @@ library package involves the following:
 #. Make sure introspection is not disabled anywhere in the recipe or
    from anything the recipe includes. Also, make sure that
    "gobject-introspection-data" is not in
-   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`
+   :term:`DISTRO_FEATURES_OPTED_OUT`
    and that "qemu-usermode" is not in
-   :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`.
+   :term:`MACHINE_FEATURES_OPTED_OUT`.
    In either of these conditions, nothing will happen.
 
 #. Try to build the recipe. If you encounter build errors that look like
@@ -84,7 +84,7 @@ disable GIR file generations:
 
 -  Add the following to your distro configuration::
 
-      DISTRO_FEATURES_BACKFILL_CONSIDERED = "gobject-introspection-data"
+      DISTRO_FEATURES_OPTED_OUT = "gobject-introspection-data"
 
    Adding this statement disables generating introspection data using
    QEMU but will still enable building introspection tools and libraries
@@ -92,7 +92,7 @@ disable GIR file generations:
 
 -  Add the following to your machine configuration::
 
-      MACHINE_FEATURES_BACKFILL_CONSIDERED = "qemu-usermode"
+      MACHINE_FEATURES_OPTED_OUT = "qemu-usermode"
 
    Adding this statement disables the use of QEMU when building packages for your
    machine. Currently, this feature is used only by introspection
@@ -115,9 +115,9 @@ Use the following procedure to test if generating introspection data is
 working in an image:
 
 #. Make sure that "gobject-introspection-data" is not in
-   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`
+   :term:`DISTRO_FEATURES_OPTED_OUT`
    and that "qemu-usermode" is not in
-   :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED`.
+   :term:`MACHINE_FEATURES_OPTED_OUT`.
 
 #. Build ``core-image-sato``.
 

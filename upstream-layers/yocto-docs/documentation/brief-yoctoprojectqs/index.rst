@@ -289,7 +289,7 @@ an entire Linux distribution, including the toolchain, from source.
 
     .. code-block:: console
 
-       $ bitbake-config-build enable-fragment root-login-with-empty-password
+       $ bitbake-config-build enable-fragment core/yocto/root-login-with-empty-password
 
     .. note::
 
@@ -333,7 +333,7 @@ an entire Linux distribution, including the toolchain, from source.
 
    .. code-block:: console
 
-      $ runqemu qemux86-64
+      $ runqemu snapshot
 
    If you want to learn more about running QEMU, see the
    :ref:`dev-manual/qemu:using the quick emulator (qemu)` chapter in

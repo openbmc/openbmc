@@ -54,6 +54,8 @@ changed to::
 
    S = "${UNPACKDIR}/something"
 
+.. _ref-migration-5-3-s-workdir-git:
+
 ``S = ${WORKDIR}/git`` and ``S = ${UNPACKDIR}/git`` should be removed
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

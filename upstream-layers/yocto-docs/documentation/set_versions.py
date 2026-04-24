@@ -70,14 +70,25 @@ if releases_from_json:
         release_series[codename] = release["series_version"]
         if release["status"] == "Active Development":
             devbranch = codename
-        if release["series"] == "current":
-            activereleases.append(codename)
         if "LTS until" in release["status"]:
             ltsseries.append(codename)
         if release["bitbake_version"]:
             bitbake_mapping[codename] = release["bitbake_version"]
 
-    activereleases.remove(devbranch)
+    # Find the first non-dev release, which should be displayed as the default
+    # page on the docs website.
+    current_branch = ""
+    for release in releases_from_json:
+        if release["status"] != "Active Development":
+            current_branch = release["release_codename"].lower()
+            break
+
+    if not current_branch:
+        sys.exit("Unable to find a current release! Exiting...")
+
+    # make the list of releases unique, there can be duplication when the
+    # current releases is also an LTS
+    activereleases = list(dict.fromkeys([current_branch] + ltsseries))
 
 # used by run-docs-builds to get the default page
 if len(sys.argv) > 1 and sys.argv[1] == "getlatest":
@@ -118,11 +129,16 @@ tags = subprocess.run(["git", "tag", "--points-at", "HEAD"],
 for t in tags.split():
     if t.startswith("yocto-"):
         ourversion = t[6:]
-        seriesversion = ".".join(ourversion.split(".")[0:2])
+        # remove "_MX" milestone information to get the series
+        seriesversion = ourversion.split("_")[0]
+        seriesversion = ".".join(seriesversion.split(".")[0:2])
         for series in release_series:
             if release_series[series] == seriesversion:
                 ourseries = series
-                bitbakeversion = bitbake_mapping[ourseries]
+                if ourseries == devbranch:
+                    bitbakeversion = "dev"
+                else:
+                    bitbakeversion = bitbake_mapping[ourseries]
                 break
         break
 

@@ -6,7 +6,7 @@ Features
 
 This chapter provides a reference of shipped machine and distro features
 you can include as part of your image, a reference on image features you
-can select, and a reference on :ref:`ref-features-backfill`.
+can select, and a reference on :ref:`ref-manual/Features:Default Features`.
 
 Features provide a mechanism for working out which packages should be
 included in the generated images. Distributions can select which
@@ -200,8 +200,6 @@ metadata, as extra layers can define their own:
 
 -  *pci:* Include PCI bus support.
 
--  *pcmcia:* Include PCMCIA/CompactFlash support.
-
 -  *pni-names:* Enable generation of persistent network interface names, i.e.
    the system tries hard to have the same but unique names for the network
    interfaces even after a reinstall.
@@ -238,12 +236,6 @@ metadata, as extra layers can define their own:
 -  *systemd-resolved:* Include support and use ``systemd-resolved`` as the
    main DNS name resolver in ``glibc`` Name Service Switch. This is a DNS
    resolver daemon from ``systemd``.
-
--  *usbgadget:* Include USB Gadget Device support (for USB
-   networking/serial/storage).
-
--  *usbhost:* Include USB Host support (allows to connect external
-   keyboard, mouse, storage, network etc).
 
 -  *usrmerge:* Merges the ``/bin``, ``/sbin``, ``/lib``, and ``/lib64``
    directories into their respective counterparts in the ``/usr``
@@ -419,55 +411,62 @@ these valid features is as follows:
 
 -  *x11-sato:* Installs the OpenedHand Sato environment.
 
-.. _ref-features-backfill:
+Default Features
+================
 
-Feature Backfilling
-===================
-
-Sometimes it is necessary in the OpenEmbedded build system to
+Sometimes it is necessary in the :term:`OpenEmbedded Build System` to
 add new functionality to :term:`MACHINE_FEATURES` or
 :term:`DISTRO_FEATURES`, but at the same time, allow existing
 distributions or machine definitions to opt out of such new
 features, to retain the same overall level of functionality.
 
-To make this possible, the OpenEmbedded build system has a mechanism to
-automatically "backfill" features into existing distro or machine
-configurations. You can see the list of features for which this is done
-by checking the :term:`DISTRO_FEATURES_BACKFILL` and
-:term:`MACHINE_FEATURES_BACKFILL` variables in the
-``meta/conf/bitbake.conf`` file.
+To make this possible, the OpenEmbedded build system provides a default list of
+features through the :term:`DISTRO_FEATURES_DEFAULTS` and
+:term:`MACHINE_FEATURES_DEFAULTS` variables. You can see the default definition
+of these variable in the :oecore_path:`meta/conf/distro/include/default-distrovars.inc`
+and :oecore_path:`meta/conf/bitbake.conf` files.
 
-These two variables are paired with the
-:term:`DISTRO_FEATURES_BACKFILL_CONSIDERED`
-and :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED` variables
-which allow distro or machine configuration maintainers to `consider` any
-added feature, and decide when they wish to keep or exclude such feature,
-thus preventing the backfilling from happening.
+.. note::
 
-Here are two examples to illustrate feature backfilling:
+   This does not apply to image features (there is no
+   ``IMAGE_FEATURES_DEFAULTS`` definition).
 
--  *The "pulseaudio" distro feature option*: Previously, PulseAudio support was
-   enabled within the Qt and GStreamer frameworks. Because of this, the feature
-   is now backfilled and thus enabled for all distros through the
-   :term:`DISTRO_FEATURES_BACKFILL` variable in the ``meta/conf/bitbake.conf``
-   file. However, if your distro needs to disable the feature, you can do so
-   without affecting other existing distro configurations that need PulseAudio
-   support. You do this by adding "pulseaudio" to
-   :term:`DISTRO_FEATURES_BACKFILL_CONSIDERED` in your distro's ``.conf``
-   file. So, adding the feature to this variable when it also exists in the
-   :term:`DISTRO_FEATURES_BACKFILL` variable prevents the build system from
-   adding the feature to your configuration's :term:`DISTRO_FEATURES`,
-   effectively disabling the feature for that particular distro.
+The :term:`DISTRO_FEATURES_OPTED_OUT` and :term:`MACHINE_FEATURES_OPTED_OUT`
+variables can be used to remove a feature provided by one of the
+:term:`DISTRO_FEATURES_DEFAULTS` of :term:`MACHINE_FEATURES_DEFAULTS` variables.
 
--  *The "rtc" machine feature option*: Previously, real time clock (RTC)
-   support was enabled for all target devices. Because of this, the
-   feature is backfilled and thus enabled for all machines through the
-   :term:`MACHINE_FEATURES_BACKFILL` variable in the ``meta/conf/bitbake.conf``
-   file. However, if your target device does not have this capability, you can
-   disable RTC support for your device without affecting other machines
-   that need RTC support. You do this by adding the "rtc" feature to the
-   :term:`MACHINE_FEATURES_BACKFILL_CONSIDERED` list in your machine's ``.conf``
-   file. So, adding the feature to this variable when it also exists in the
-   :term:`MACHINE_FEATURES_BACKFILL` variable prevents the build system from
-   adding the feature to your configuration's :term:`MACHINE_FEATURES`,
-   effectively disabling RTC support for that particular machine.
+For example, the two following assignments::
+
+   DISTRO_FEATURES_DEFAULTS = "a b c"
+   DISTRO_FEATURES_OPTED_OUT = "b"
+
+Would result in feature ``a`` and feature ``c`` making it to the final value of
+:term:`DISTRO_FEATURES`, but not feature ``b``. This also applies for
+:term:`MACHINE_FEATURES_DEFAULTS` and :term:`MACHINE_FEATURES_OPTED_OUT`.
+
+You can also opt out of all default features by setting
+:term:`DISTRO_FEATURES_OPTED_OUT` or :term:`MACHINE_FEATURES_OPTED_OUT` to
+``*``::
+
+   DISTRO_FEATURES_OPTED_OUT = "*"
+
+.. tip::
+
+   You can verify the value of :term:`DISTRO_FEATURES` or
+   :term:`MACHINE_FEATURES` with the following commands:
+
+   .. code-block:: console
+
+      $ bitbake-getvar DISTRO_FEATURES
+      NOTE: Starting bitbake server...
+      [...]
+      DISTRO_FEATURES=" sysvinit      acl alsa bluetooth debuginfod ext2 ipv4 ipv6     wifi xattr nfs zero
+      conf pci 3g nfc x11 vfat seccomp pulseaudio     gobject-introspection-data ldconfig opengl ptest mul
+      tiarch wayland vulkan     "
+
+   .. code-block:: console
+
+      $ bitbake-getvar MACHINE_FEATURES
+      NOTE: Starting bitbake server...
+      [...]
+      MACHINE_FEATURES="alsa bluetooth usbgadget screen vfat rtc qemu-usermode"
