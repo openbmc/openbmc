@@ -16,6 +16,7 @@ PACKAGECONFIG ??= ""
 # Meson configure option to enable/disable max31785-msl
 PACKAGECONFIG[max31785-msl] = "-Denable-max31785-msl=true, -Denable-max31785-msl=false"
 PACKAGECONFIG[use-dev-path] = "-Dalways-use-devpath=enabled, -Dalways-use-devpath=disabled"
+PACKAGECONFIG[use-bus-device] = "-Duse-bus-device=enabled, -Duse-bus-device=disabled"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
