@@ -22,9 +22,8 @@ PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-dbus-monitor;branch=master;protocol=https"
 
-SYSTEMD_PACKAGES = "${PN} phosphor-msl-verify"
+SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "phosphor-dbus-monitor.service"
-SYSTEMD_SERVICE:phosphor-msl-verify = "phosphor-msl-verify.service"
 
 inherit meson \
         pkgconfig \
@@ -35,7 +34,3 @@ inherit meson \
 EXTRA_OEMESON = " \
         -DYAML_PATH=${STAGING_DIR_HOST}${config_dir} \
         "
-
-FILES:phosphor-msl-verify = "${bindir}/phosphor-msl-verify"
-
-PACKAGE_BEFORE_PN = "phosphor-msl-verify"
