@@ -13,8 +13,6 @@ DEPENDS += " \
         "
 SRCREV = "fb3356aa0e41f482c05c8a98f20ba6c0d91f33d8"
 PACKAGECONFIG ??= ""
-# Meson configure option to enable/disable max31785-msl
-PACKAGECONFIG[max31785-msl] = "-Denable-max31785-msl=true, -Denable-max31785-msl=false"
 PACKAGECONFIG[use-dev-path] = "-Dalways-use-devpath=enabled, -Dalways-use-devpath=disabled"
 PACKAGECONFIG[use-bus-device] = "-Duse-bus-device=enabled, -Duse-bus-device=disabled"
 PV = "1.0+git${SRCPV}"
@@ -22,9 +20,7 @@ PR = "r1"
 
 SRC_URI = "git://github.com/openbmc/phosphor-hwmon;branch=master;protocol=https"
 
-SYSTEMD_PACKAGES = "${PN} max31785-msl"
 SYSTEMD_SERVICE:${PN} = "xyz.openbmc_project.Hwmon@.service"
-SYSTEMD_SERVICE:max31785-msl = "${@bb.utils.contains('PACKAGECONFIG', 'max31785-msl', 'phosphor-max31785-msl@.service', '', d)}"
 
 inherit pkgconfig meson
 inherit obmc-phosphor-systemd
@@ -34,15 +30,9 @@ EXTRA_OEMESON:append = " -Dtests=disabled"
 RDEPENDS:${PN} += "\
         bash \
         "
-RDEPENDS:max31785-msl = "${VIRTUAL-RUNTIME_base-utils} i2c-tools bash"
-
 RRECOMMENDS:${PN} += "${VIRTUAL-RUNTIME_phosphor-hwmon-config}"
 
 FILES:${PN} += "${base_libdir}/systemd/system/xyz.openbmc_project.Hwmon@.service"
-FILES:max31785-msl = "\
-        ${base_libdir}/systemd/system/phosphor-max31785-msl@.service \
-        ${bindir}/max31785-msl \
-        "
 
 # The following postinstall script iterate over hwmon env files:
 # 1. It adds HW_SENSOR_ID value if not set. The value being calculated
@@ -84,5 +74,3 @@ EOF
         done
     fi
 }
-
-PACKAGE_BEFORE_PN = "max31785-msl"

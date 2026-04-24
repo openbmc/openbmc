@@ -1,4 +1,4 @@
-OBMC_IMAGE_EXTRA_INSTALL:append:ibm-ac-server = " mboxd max31785-msl phosphor-msl-verify liberation-fonts uart-render-controller first-boot-set-hostname"
+OBMC_IMAGE_EXTRA_INSTALL:append:ibm-ac-server = " mboxd phosphor-msl-verify liberation-fonts uart-render-controller first-boot-set-hostname"
 OBMC_IMAGE_EXTRA_INSTALL:append:ibm-enterprise = " mboxd"
 # No host firmware related features for huygens wanted yet
 OBMC_IMAGE_EXTRA_INSTALL:remove:huygens = " mboxd"
