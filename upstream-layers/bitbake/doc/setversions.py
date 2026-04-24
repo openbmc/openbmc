@@ -65,14 +65,25 @@ if RELEASES_FROM_JSON:
         bb_ver = release["bitbake_version"]
         if release["status"] == "Active Development":
             DEVBRANCH = bb_ver
-        if release["series"] == "current":
-            ACTIVERELEASES.append(bb_ver)
         if "LTS until" in release["status"]:
             LTSSERIES.append(bb_ver)
         if release["bitbake_version"]:
             YOCTO_MAPPING[bb_ver] = release["release_codename"]
 
-    ACTIVERELEASES.remove(DEVBRANCH)
+    # Find the first non-dev release, which should be displayed as the default
+    # page on the docs website.
+    current_branch = ""
+    for release in RELEASES_FROM_JSON:
+        if release["status"] != "Active Development":
+            current_branch = release["bitbake_version"]
+            break
+
+    if not current_branch:
+        sys.exit("Unable to find a current release! Exiting...")
+
+    # make the list of releases unique, there can be duplication when the
+    # current releases is also an LTS
+    ACTIVERELEASES = list(dict.fromkeys([current_branch] + LTSSERIES))
 
 print(f"ACTIVERELEASES calculated to be {ACTIVERELEASES}", file=sys.stderr)
 print(f"DEVBRANCH calculated to be {DEVBRANCH}", file=sys.stderr)

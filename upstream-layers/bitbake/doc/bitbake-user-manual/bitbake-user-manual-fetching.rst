@@ -425,21 +425,6 @@ This fetcher supports the following parameters:
 -  *"subpath":* Limits the checkout to a specific subpath of the tree.
    By default, the whole tree is checked out.
 
-   .. warning::
-
-      When using this option, the value of :term:`SRCREV` may not be reflected
-      in the checked out repository.
-
-      To achieve a partial checkout of the repository with the ``subpath``
-      option, the BitBake Git fetcher makes use of Git "plumbing" commands: `git
-      read-tree <https://git-scm.com/docs/git-read-tree>`__ and `git
-      checkout-index <https://git-scm.com/docs/git-checkout-index>`__. However,
-      these commands only update the **files** within the repository, and do not
-      update the current ``HEAD`` to point to the commit specified by
-      :term:`SRCREV`. Instead, the value of ``HEAD`` will always point to the
-      tip of the branch specified by the ``branch`` parameter, which may or may
-      not correspond to :term:`SRCREV`.
-
 -  *"destsuffix":* The name of the path in which to place the checkout.
    By default, the path is ``git/``.
 

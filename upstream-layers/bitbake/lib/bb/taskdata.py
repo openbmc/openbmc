@@ -138,15 +138,15 @@ class TaskData:
             rdependids = set()
             rdepends = dataCache.rundeps[fn]
             rrecs = dataCache.runrecs[fn]
-            rdependlist = []
-            rreclist = []
+            rdependlist = set()
+            rreclist = set()
             for package in rdepends:
                 for rdepend in rdepends[package]:
-                    rdependlist.append(rdepend)
+                    rdependlist.add(rdepend)
                     rdependids.add(rdepend)
             for package in rrecs:
                 for rdepend in rrecs[package]:
-                    rreclist.append(rdepend)
+                    rreclist.add(rdepend)
                     rdependids.add(rdepend)
             if rdependlist:
                 logger.debug2("Added runtime dependencies %s for %s", str(rdependlist), fn)

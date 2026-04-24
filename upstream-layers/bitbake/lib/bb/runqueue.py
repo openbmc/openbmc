@@ -694,7 +694,7 @@ class RunQueueData:
         # To create the actual list of tasks to execute we fix the list of
         # providers and then resolve the dependencies into task IDs. This
         # process is repeated for each type of dependency (tdepends, deptask,
-        # rdeptast, recrdeptask, idepends).
+        # rdeptask, recrdeptask, idepends).
 
         def add_build_dependencies(depids, tasknames, depends, mc):
             for depname in depids:
@@ -842,7 +842,7 @@ class RunQueueData:
         # (makes sure sometask runs after someothertask of all DEPENDS, RDEPENDS and intertask dependencies, recursively)
         # We need to do this separately since we need all of runtaskentries[*].depends to be complete before this is processed
 
-        # Generating/interating recursive lists of dependencies is painful and potentially slow
+        # Generating/iterating recursive lists of dependencies is painful and potentially slow
         # Precompute recursive task dependencies here by:
         #     a) create a temp list of reverse dependencies (revdeps)
         #     b) walk up the ends of the chains (when a given task no longer has dependencies i.e. len(deps) == 0)

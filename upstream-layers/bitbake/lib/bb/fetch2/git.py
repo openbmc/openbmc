@@ -787,6 +787,12 @@ class Git(FetchMethod):
                 runfetchcmd("%s read-tree %s%s" % (ud.basecmd, ud.revision, readpathspec), d,
                             workdir=destdir)
                 runfetchcmd("%s checkout-index -q -f -a" % ud.basecmd, d, workdir=destdir)
+                runfetchcmd("%s update-ref --no-deref HEAD %s" % (ud.basecmd, ud.revision),
+                            d, workdir=destdir)
+                if not ud.nobranch:
+                    branchname = ud.branch
+                    runfetchcmd("%s update-ref refs/heads/%s %s" % (ud.basecmd, branchname,
+                                ud.revision), d, workdir=destdir)
             elif not ud.nobranch:
                 branchname =  ud.branch
                 runfetchcmd("%s checkout -B %s %s" % (ud.basecmd, branchname, \

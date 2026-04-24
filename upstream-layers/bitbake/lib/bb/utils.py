@@ -694,14 +694,19 @@ def goh1_file(filename):
     import zipfile
 
     lines = []
+    is_zipfile = False
     if zipfile.is_zipfile(filename):
-        with zipfile.ZipFile(filename) as archive:
-            for fn in sorted(archive.namelist()):
-                method = hashlib.sha256()
-                method.update(archive.read(fn))
-                hash = method.hexdigest()
-                lines.append("%s  %s\n" % (hash, fn))
-    else:
+        try:
+            with zipfile.ZipFile(filename) as archive:
+                for fn in sorted(archive.namelist()):
+                    method = hashlib.sha256()
+                    method.update(archive.read(fn))
+                    hash = method.hexdigest()
+                    lines.append("%s  %s\n" % (hash, fn))
+            is_zipfile = True
+        except zipfile.BadZipFile:
+            is_zipfile = False
+    if not is_zipfile:
         hash = _hasher(hashlib.sha256(), filename)
         lines.append("%s  go.mod\n" % hash)
     method = hashlib.sha256()
@@ -1331,6 +1336,27 @@ def contains_any(variable, checkvalues, truevalue, falsevalue, d):
         return truevalue
     return falsevalue
 
+def filter_string(val, checkvalues):
+    """Return all words in the string that are present in the ``checkvalues``.
+
+    Arguments:
+
+    -  ``val``: the string data to filter after being split into a set().
+    -  ``checkvalues``: if this is a string it is split on whitespace into a set(),
+       otherwise coerced directly into a set().
+    -  ``d``: the data store.
+
+    Returns a list of string.
+    """
+    if not val:
+        return ''
+    val = set(val.split())
+    if isinstance(checkvalues, str):
+        checkvalues = set(checkvalues.split())
+    else:
+        checkvalues = set(checkvalues)
+    return ' '.join(sorted(checkvalues & val))
+
 def filter(variable, checkvalues, d):
     """Return all words in the variable that are present in the ``checkvalues``.
 
@@ -1346,15 +1372,7 @@ def filter(variable, checkvalues, d):
     """
 
     val = d.getVar(variable)
-    if not val:
-        return ''
-    val = set(val.split())
-    if isinstance(checkvalues, str):
-        checkvalues = set(checkvalues.split())
-    else:
-        checkvalues = set(checkvalues)
-    return ' '.join(sorted(checkvalues & val))
-
+    return filter_string(val, checkvalues)
 
 def get_referenced_vars(start_expr, d):
     """
