@@ -106,7 +106,7 @@ update-repos:
         echo Using existing lockfile.yml
       else
         # Be sure that this is the complete list of layers being fetched
-        kas dump --lock --update ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/clang.yml:ci/meta-virtualization.yml | tee lockfile.yml
+        kas dump --lock --update ci/qemuarm64.yml:ci/meta-openembedded.yml:ci/clang.yml | tee lockfile.yml
       fi
       exit $exit_code
   artifacts:
@@ -127,7 +127,6 @@ update-repos:
 #  TS: [none, trusted-services]
 #  TESTING: testimage
 #  SECUREDEBUG: [none, secure-debug]
-#  VIRT: [none, xen]
 
 # Validate layers are Yocto Project Compatible
 check-layers:
@@ -272,7 +271,6 @@ qemuarm64:
       - DISTRO: poky-tiny
         FIRMWARE: [u-boot, edk2]
         TESTING: testimage
-      - VIRT: xen
 
 qemuarm-secureboot:
   extends: .build
@@ -294,7 +292,6 @@ qemuarm:
         TESTING: testimage
       - DISTRO: poky-tiny
         TESTING: testimage
-      - VIRT: xen
 
 qemuarmv5:
   extends: .build

@@ -22,7 +22,6 @@ def repo_shortname(url):
 repositories = (
     "https://git.yoctoproject.org/poky",
     "https://git.openembedded.org/meta-openembedded",
-    "https://git.yoctoproject.org/meta-virtualization",
 )
 
 if __name__ == "__main__":

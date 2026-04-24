@@ -93,7 +93,7 @@ def create_payloads(args: argparse.Namespace) -> List[dict]:
     for i in range(num_payloads):
 
         # If filtering is enabled, skip if not in the allowed components list
-        if  args.components[i] not in args.selected_components:
+        if args.selected_components and args.components[i] not in args.selected_components:
             continue
 
         payload = {
