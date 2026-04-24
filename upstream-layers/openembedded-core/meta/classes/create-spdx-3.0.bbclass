@@ -201,6 +201,7 @@ do_create_recipe_spdx[file-checksums] += "${SPDX3_DEP_FILES}"
 do_create_recipe_spdx[cleandirs] = "${SPDXRECIPEDEPLOY}"
 do_create_recipe_spdx[deptask] += "do_create_recipe_spdx"
 do_create_recipe_spdx[vardeps] += "${SPDX3_VAR_DEPS}"
+do_create_recipe_spdx[file-checksums] = "${@bb.fetch.get_checksum_file_list(d)}"
 
 python do_create_recipe_spdx_setscene () {
     sstate_setscene(d)

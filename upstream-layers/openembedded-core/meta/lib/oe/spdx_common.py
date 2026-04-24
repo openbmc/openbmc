@@ -15,7 +15,7 @@ from pathlib import Path
 from dataclasses import dataclass
 
 LIC_REGEX = re.compile(
-    rb"^\W*SPDX-License-Identifier:\s*([ \w\d.()+-]+?)(?:\s+\W*)?$",
+    rb"^\W*SPDX-License-Identifier:\s*([ \w.()+-]+?)(?:\s+\W*)?$",
     re.MULTILINE,
 )
 
@@ -135,8 +135,6 @@ def collect_package_providers(d, direct_deps):
     Returns a dictionary where each RPROVIDES is mapped to the package that
     provides it
     """
-    deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
-
     providers = {}
 
     all_deps = direct_deps + [Dep(d.getVar("PN"), d.getVar("BB_HASHFILENAME"), True)]
@@ -175,7 +173,6 @@ def get_patched_src(d):
     """
     spdx_workdir = d.getVar("SPDXWORK")
     spdx_sysroot_native = d.getVar("STAGING_DIR_NATIVE")
-    pn = d.getVar("PN")
 
     workdir = d.getVar("WORKDIR")
 

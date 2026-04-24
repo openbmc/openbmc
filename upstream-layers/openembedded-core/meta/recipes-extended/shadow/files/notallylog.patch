@@ -1,0 +1,19 @@
+We don't want to call /sbin/pam_tally2 in the native tools case so
+disable this function.
+
+Upstream-Status: Inappropriate [OE cross configuration specific]
+
+Index: shadow-4.19.4/src/useradd.c
+===================================================================
+--- shadow-4.19.4.orig/src/useradd.c
++++ shadow-4.19.4/src/useradd.c
+@@ -2046,6 +2046,9 @@ static void tallylog_reset (const char *
+ 	int failed;
+ 	int status;
+ 
++	/* Don't call /sbin/pam_tally2 in native builds */
++	return;
++
+ 	if (access(pam_tally2, X_OK) == -1)
+ 		return;
+ 

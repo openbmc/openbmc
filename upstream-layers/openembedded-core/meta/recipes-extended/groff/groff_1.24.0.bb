@@ -12,6 +12,7 @@ SRC_URI = "${GNU_MIRROR}/groff/groff-${PV}.tar.gz \
            file://0001-Make-manpages-mulitlib-identical.patch \
            file://0001-groff-fix-test-groff-not-found-in-cross-compilation.patch \
            file://0001-gropdf-use-SOURCE_DATE_EPOCH-for-reproducible-builds.patch \
+           file://builddep.patch \
            "
 
 SRC_URI[sha256sum] = "e79bbcd8ff3ed0200e7ac55d3962a15e118c1229990213025f2fc8b264727570"

@@ -86,8 +86,8 @@ FILES:guards = "${bindir}/guards"
 FILES:${PN}-doc = "${mandir}/man1/quilt.1 ${docdir}/${BPN}"
 FILES:guards-doc = "${mandir}/man1/guards.1"
 
-RDEPENDS:${PN} = "bash patch diffstat bzip2 util-linux less"
-RDEPENDS:${PN}:class-native = "diffstat-native patch-native bzip2-native"
+RDEPENDS:${PN} = "bash patch diffstat util-linux less"
+RDEPENDS:${PN}:class-native = "diffstat-native patch-native"
 
 RDEPENDS:${PN}-ptest += "file sed gawk diffutils findutils ed perl \
                          perl-module-filehandle perl-module-getopt-std \

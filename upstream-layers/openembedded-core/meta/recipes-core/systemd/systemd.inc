@@ -20,3 +20,9 @@ SRCBRANCH = "v259-stable"
 SRC_URI = "git://github.com/systemd/systemd.git;protocol=https;branch=${SRCBRANCH};tag=v${PV}"
 
 CVE_PRODUCT = "systemd"
+
+CVE_STATUS[CVE-2019-3815] = "not-applicable-platform: only applied to RHEL"
+CVE_STATUS[CVE-2026-40223] = "fixed-version: fixed in 259.2"
+CVE_STATUS[CVE-2026-40224] = "fixed-version: fixed in 259.3"
+CVE_STATUS[CVE-2026-40225] = "fixed-version: fixed in 259.5"
+CVE_STATUS[CVE-2026-40226] = "fixed-version: fixed in 259.4"

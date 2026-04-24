@@ -41,7 +41,7 @@ for pm in $backend_list; do
 done
 
 remove_rcsd_link () {
-	if [ -n "`which update-rc.d`" ]; then
+	if command -v update-rc.d >/dev/null; then
 		update-rc.d -f run-postinsts remove
 	fi
 }

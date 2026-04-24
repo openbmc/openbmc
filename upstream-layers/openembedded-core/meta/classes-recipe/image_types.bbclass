@@ -44,6 +44,10 @@ def imagetypes_getdepends(d):
                 deprecated.add(var)
 
         for ctype in resttypes:
+            ctype_cmd = d.getVar('CONVERSION_CMD:' + ctype)
+            if not ctype_cmd:
+                bb.fatal('No CONVERSION_CMD defined for subtype "%s"'
+                         ' - possibly invalid conversion type name or missing support class' % ctype)
             adddep(d.getVar("CONVERSION_DEPENDS_%s" % ctype), deps)
             adddep(d.getVar("COMPRESS_DEPENDS_%s" % ctype), deps)
 

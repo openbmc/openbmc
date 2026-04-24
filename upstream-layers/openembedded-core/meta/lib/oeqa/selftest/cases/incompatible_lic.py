@@ -5,6 +5,7 @@
 #
 from oeqa.selftest.case import OESelftestTestCase
 from oeqa.utils.commands import bitbake
+from oeqa.core.decorator.data import skipIfNotFeature
 
 class IncompatibleLicenseTestObsolete(OESelftestTestCase):
 
@@ -142,6 +143,7 @@ require conf/distro/include/no-gplv3.inc
 """)
         bitbake('core-image-minimal')
 
+    @skipIfNotFeature('wayland', 'Test requires wayland to be in DISTRO_FEATURES')
     def test_core_image_full_cmdline_weston(self):
         self.write_config("""
 IMAGE_CLASSES += "testimage"

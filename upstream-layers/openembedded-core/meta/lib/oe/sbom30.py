@@ -279,7 +279,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
 
     def is_native(self):
         for e in self.doc.extension:
-            if not isinstance(e, oe.sbom30.OEDocumentExtension):
+            if not isinstance(e, OEDocumentExtension):
                 continue
 
             if e.is_native is not None:
@@ -289,14 +289,14 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
 
     def set_is_native(self, is_native):
         for e in self.doc.extension:
-            if not isinstance(e, oe.sbom30.OEDocumentExtension):
+            if not isinstance(e, OEDocumentExtension):
                 continue
 
             e.is_native = is_native
             return
 
         if is_native:
-            self.doc.extension.append(oe.sbom30.OEDocumentExtension(is_native=True))
+            self.doc.extension.append(OEDocumentExtension(is_native=True))
 
     def add_aliases(self):
         for o in self.foreach_type(oe.spdx30.Element):
@@ -585,9 +585,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             re.sub(r"[^a-zA-Z0-9_-]", "_", license_expression),
         ]
 
-        license_text = [
-            (k, license_text_map[k]) for k in sorted(license_text_map.keys())
-        ]
+        license_text = sorted(license_text_map.items(), key=lambda t: t[0])
 
         if not license_text:
             lic = self.find_filter(
@@ -633,7 +631,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         self.new_relationship(
             [spdx_file],
             oe.spdx30.RelationshipType.hasDeclaredLicense,
-            [oe.sbom30.get_element_link_id(lic_alias) for lic_alias in file_licenses],
+            [get_element_link_id(lic_alias) for lic_alias in file_licenses],
         )
         spdx_file.extension.append(OELicenseScannedExtension())
 
@@ -706,7 +704,8 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         )
         return self.add(v)
 
-    def new_vex_patched_relationship(self, from_, to):
+    def new_vex_patched_relationship(self, from_, to, notes: None):
+        props = {'security_statusNotes': notes} if notes else {}
         return self._new_relationship(
             oe.spdx30.security_VexFixedVulnAssessmentRelationship,
             from_,
@@ -714,9 +713,11 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             to,
             spdxid_name="vex-fixed",
             security_vexVersion=VEX_VERSION,
+            **props,
         )
 
-    def new_vex_unpatched_relationship(self, from_, to):
+    def new_vex_unpatched_relationship(self, from_, to, notes: None):
+        props = {'security_statusNotes': notes} if notes else {}
         return self._new_relationship(
             oe.spdx30.security_VexAffectedVulnAssessmentRelationship,
             from_,
@@ -725,9 +726,11 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             spdxid_name="vex-affected",
             security_vexVersion=VEX_VERSION,
             security_actionStatement="Mitigation action unknown",
+            **props,
         )
 
-    def new_vex_ignored_relationship(self, from_, to, *, impact_statement):
+    def new_vex_ignored_relationship(self, from_, to, *, impact_statement, notes: None):
+        props = {'security_statusNotes': notes} if notes else {}
         return self._new_relationship(
             oe.spdx30.security_VexNotAffectedVulnAssessmentRelationship,
             from_,
@@ -736,6 +739,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
             spdxid_name="vex-not-affected",
             security_vexVersion=VEX_VERSION,
             security_impactStatement=impact_statement,
+            **props,
         )
 
     def import_bitbake_build_objset(self):
@@ -762,6 +766,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         bb_objset = self.import_bitbake_build_objset()
         build = find_bitbake_build(bb_objset)
         if build is None:
+            deploy_dir_spdx = self.d.getVar("DEPLOY_DIR_SPDX")
             bb.fatal(f"No build found in {deploy_dir_spdx}")
 
         return build

@@ -126,13 +126,8 @@ python native_virtclass_handler () {
         return
     bpn = d.getVar("BPN")
 
-    # Set features here to prevent DISTRO_FEATURES modifications from affecting
-    # native distro features
-    features = set(d.getVar("DISTRO_FEATURES_NATIVE").split())
-    oe.utils.filter_default_features("DISTRO_FEATURES", d)
-    filtered = set(bb.utils.filter("DISTRO_FEATURES", d.getVar("DISTRO_FEATURES_FILTER_NATIVE"), d).split())
-    d.setVar("DISTRO_FEATURES", " ".join(sorted(features | filtered)))
-    d.setVar("DISTRO_FEATURES_DEFAULTS", "")
+    defaults = d.getVar("DISTRO_FEATURES")
+    d.setVar("DISTRO_FEATURES", '${@oe.utils.class_filter_features("' + defaults + '", "DISTRO_FEATURES_NATIVE", "DISTRO_FEATURES_FILTER_NATIVE", d)}')
 
     classextend = d.getVar('BBCLASSEXTEND') or ""
     if "native" not in classextend:

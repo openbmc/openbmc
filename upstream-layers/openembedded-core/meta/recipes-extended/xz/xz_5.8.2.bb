@@ -26,6 +26,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d38d562f6112174de93a9677682231b2 \
                     "
 
 SRC_URI = "https://github.com/tukaani-project/xz/releases/download/v${PV}/xz-${PV}.tar.gz \
+           file://0001-liblzma-Fix-a-buffer-overflow-in-lzma_index_append.patch \
            file://run-ptest \
           "
 SRC_URI[sha256sum] = "ce09c50a5962786b83e5da389c90dd2c15ecd0980a258dd01f70f9e7ce58a8f1"
@@ -72,3 +73,7 @@ do_install_ptest () {
     ln -s ${bindir}/xzdiff ${D}${PTEST_PATH}/src/scripts/xzdiff
     ln -s ${bindir}/xzgrep ${D}${PTEST_PATH}/src/scripts/xzgrep
 }
+
+CVE_STATUS[CVE-2024-47611] = "fixed-version: fixed in 5.6.3 and Windows-specific"
+CVE_STATUS[CVE-2025-31115] = "fixed-version: fixed in 5.8.1"
+CVE_STATUS[CVE-2025-58058] = "cpe-incorrect: this is specific to the Go xz module"

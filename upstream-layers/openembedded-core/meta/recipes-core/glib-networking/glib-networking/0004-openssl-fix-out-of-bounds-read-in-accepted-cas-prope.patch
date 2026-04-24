@@ -1,0 +1,48 @@
+From be2173eb9b769255df9474a9128e642b60894f10 Mon Sep 17 00:00:00 2001
+From: Michael Catanzaro <mcatanzaro@gnome.org>
+Date: Thu, 12 Mar 2026 12:47:00 -0500
+Subject: [PATCH] openssl: fix out of bounds read in accepted-cas property
+ getter
+
+The d2i and i2d functions are quite dangerous because they advance the
+provided pointer, so we have to pass a temporary pointer if we're later
+going to do anything with the original pointer.
+
+I've audited the codebase and found this is our only such mistake.
+
+Fixes #228 (CVE-2026-2574)
+
+Part-of: <https://gitlab.gnome.org/GNOME/glib-networking/-/merge_requests/269>
+
+
+(cherry picked from commit c3c84b269165f2a312d47fa15c5cbc7f8ead7631)
+
+Co-authored-by: Michael Catanzaro <mcatanzaro@gnome.org>
+
+CVE: CVE-2026-2574
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ tls/openssl/gtlsclientconnection-openssl.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/tls/openssl/gtlsclientconnection-openssl.c b/tls/openssl/gtlsclientconnection-openssl.c
+index e98fb0b..e2ff0d4 100644
+--- a/tls/openssl/gtlsclientconnection-openssl.c
++++ b/tls/openssl/gtlsclientconnection-openssl.c
+@@ -141,9 +141,11 @@ g_tls_client_connection_openssl_get_property (GObject    *object,
+               if (size > 0)
+                 {
+                   unsigned char *ca;
++                  unsigned char *tmp;
+ 
+                   ca = g_malloc (size);
+-                  size = i2d_X509_NAME (sk_X509_NAME_value (openssl->ca_list, i), &ca);
++                  tmp = ca;
++                  size = i2d_X509_NAME (sk_X509_NAME_value (openssl->ca_list, i), &tmp);
+                   if (size > 0)
+                     accepted_cas = g_list_prepend (accepted_cas, g_byte_array_new_take (
+                                                    ca, size));
+-- 
+2.43.0
+

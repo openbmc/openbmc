@@ -787,6 +787,7 @@ sstate_task_postfunc[dirs] = "${WORKDIR}"
 # and renamed in place once created.
 python sstate_create_and_sign_package () {
     from pathlib import Path
+    import errno
 
     # Best effort touch
     def touch(file):
@@ -806,6 +807,9 @@ python sstate_create_and_sign_package () {
             else:
                 os.link(src, dst)
             return True
+        except OSError as e:
+            if e.errno == errno.ENOSYS:
+                bb.fatal("sstate is only supported on file systems with hard link support: %s" % e)
         except:
             pass
 

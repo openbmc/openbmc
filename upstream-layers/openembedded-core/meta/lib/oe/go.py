@@ -35,4 +35,4 @@ def map_arch(a):
         return 'riscv64'
     elif a == 'loongarch64':
         return 'loong64'
-    raise KeyError(f"Cannot map architecture {a}")
+    raise bb.parse.SkipRecipe(f"Cannot map architecture {a}")

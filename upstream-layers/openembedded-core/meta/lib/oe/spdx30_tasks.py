@@ -39,7 +39,6 @@ def add_license_expression(
 ):
     simple_license_text = {}
     license_text_map = {}
-    license_ref_idx = 0
 
     def add_license_text(name):
         nonlocal objset
@@ -96,7 +95,6 @@ def add_license_expression(
 
     def convert(l):
         nonlocal license_text_map
-        nonlocal license_ref_idx
 
         if l == "(" or l == ")":
             return l
@@ -266,10 +264,9 @@ def get_package_sources_from_debug(
 
     pkg_data = oe.packagedata.read_subpkgdata_extended(package, d)
 
-    if pkg_data is None:
-        return
-
     dep_source_files = set()
+    if pkg_data is None:
+        return dep_source_files
 
     for file_path, file_data in pkg_data["files_info"].items():
         if not "debugsrc" in file_data:
@@ -608,7 +605,6 @@ def get_is_native(d):
 
 def create_recipe_spdx(d):
     deploydir = Path(d.getVar("SPDXRECIPEDEPLOY"))
-    deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     pn = d.getVar("PN")
 
     license_data = oe.spdx_common.load_spdx_license_data(d)
@@ -728,7 +724,8 @@ def create_recipe_spdx(d):
 
             if status == "Patched":
                 spdx_vex = recipe_objset.new_vex_patched_relationship(
-                    [spdx_cve_id], [recipe]
+                    [spdx_cve_id], [recipe],
+                    notes=": ".join(v for v in (detail, description) if v)
                 )
                 patches = []
                 for idx, filepath in enumerate(resources):
@@ -753,12 +750,16 @@ def create_recipe_spdx(d):
                     )
 
             elif status == "Unpatched":
-                recipe_objset.new_vex_unpatched_relationship([spdx_cve_id], [recipe])
+                recipe_objset.new_vex_unpatched_relationship(
+                    [spdx_cve_id], [recipe],
+                    notes=": ".join(v for v in (detail, description) if v)
+                )
             elif status == "Ignored":
                 spdx_vex = recipe_objset.new_vex_ignored_relationship(
                     [spdx_cve_id],
                     [recipe],
                     impact_statement=description,
+                    notes=detail,
                 )
 
                 vex_just_type = d.getVarFlag("CVE_CHECK_VEX_JUSTIFICATION", detail)
@@ -819,10 +820,8 @@ def create_spdx(d):
 
     pn = d.getVar("PN")
     deploydir = Path(d.getVar("SPDXDEPLOY"))
-    deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     spdx_workdir = Path(d.getVar("SPDXWORK"))
     include_sources = d.getVar("SPDX_INCLUDE_SOURCES") == "1"
-    pkg_arch = d.getVar("SSTATE_PKGARCH")
     is_native = get_is_native(d)
 
     recipe, recipe_objset = load_recipe_spdx(d)
@@ -894,7 +893,7 @@ def create_spdx(d):
             sorted(oe.sbom30.get_element_link_id(b) for b in dep_builds),
         )
 
-    debug_source_ids = set()
+    debug_sources = set()
     source_hash_cache = {}
 
     # Write out the package SPDX data now. It is not complete as we cannot
@@ -1058,12 +1057,9 @@ def create_spdx(d):
                 )
 
             if include_sources:
-                debug_sources = get_package_sources_from_debug(
+                debug_sources |= get_package_sources_from_debug(
                     d, package, package_files, dep_sources, source_hash_cache,
                     excluded_files=excluded_files,
-                )
-                debug_source_ids |= set(
-                    oe.sbom30.get_element_link_id(d) for d in debug_sources
                 )
 
             oe.sbom30.write_recipe_jsonld_doc(
@@ -1090,12 +1086,17 @@ def create_spdx(d):
                 sorted(list(sysroot_files)),
             )
 
-    if build_inputs or debug_source_ids:
+    if build_inputs or debug_sources:
+        debug_source_ids = sorted(
+            oe.sbom30.get_element_link_id(d)
+            for d in debug_sources.difference(build_inputs)
+        )
+
         build_objset.new_scoped_relationship(
             [build],
             oe.spdx30.RelationshipType.hasInput,
             oe.spdx30.LifecycleScopeType.build,
-            sorted(list(build_inputs)) + sorted(list(debug_source_ids)),
+            sorted(build_inputs) + debug_source_ids,
         )
 
     if d.getVar("SPDX_INCLUDE_PACKAGECONFIG", True) != "0":
@@ -1125,7 +1126,6 @@ def create_spdx(d):
 
 
 def create_package_spdx(d):
-    deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     deploydir = Path(d.getVar("SPDXRUNTIMEDEPLOY"))
 
     direct_deps = oe.spdx_common.collect_direct_deps(d, "do_create_spdx")
@@ -1146,7 +1146,6 @@ def create_package_spdx(d):
         d, "%s-package-common" % d.getVar("PN")
     )
 
-    pkgdest = Path(d.getVar("PKGDEST"))
     for package in d.getVar("PACKAGES").split():
         localdata = bb.data.createCopy(d)
         pkg_name = d.getVar("PKG:%s" % package) or package
@@ -1344,7 +1343,6 @@ def collect_build_package_inputs(d, objset, build, packages, files_by_hash=None)
 
 
 def create_rootfs_spdx(d):
-    deploy_dir_spdx = Path(d.getVar("DEPLOY_DIR_SPDX"))
     deploydir = Path(d.getVar("SPDXROOTFSDEPLOY"))
     root_packages_file = Path(d.getVar("SPDX_ROOTFS_PACKAGES"))
     image_basename = d.getVar("IMAGE_BASENAME")

@@ -5,6 +5,8 @@ LDFLAGS += " ${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', '-Wl,-z,nostar
 SRC_URI[sha256sum] = "99f144540c6070591e4c53bcb977eb42664c62b7b36cb35a29cf72ded339621d"
 
 CVE_STATUS[CVE-2020-24490] = "cpe-incorrect: This issue has kernel fixes rather than bluez fixes"
+CVE_STATUS[CVE-2020-12351] = "cpe-incorrect: This issue has kernel fixes rather than bluez fixes"
+CVE_STATUS[CVE-2020-12352] = "cpe-incorrect: This issue has kernel fixes rather than bluez fixes"
 
 # noinst programs in Makefile.tools that are conditional on READLINE
 # support

@@ -9,6 +9,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2"
 
 DEPENDS = "glib-2.0 glib-2.0-native libxml2 sqlite3 libpsl nghttp2"
 
+inherit gettext gnomebase upstream-version-is-even gobject-introspection gi-docgen vala
+
 SRC_URI[archive.sha256sum] = "51ed0ae06f9d5a40f401ff459e2e5f652f9a510b7730e1359ee66d14d4872740"
 
 SRC_URI += "file://CVE-2025-32049-1.patch \
@@ -19,8 +21,6 @@ SRC_URI += "file://CVE-2025-32049-1.patch \
 "
 
 PROVIDES = "libsoup-3.0"
-
-inherit gettext gnomebase upstream-version-is-even gobject-introspection gi-docgen vala
 
 GIR_MESON_ENABLE_FLAG = 'enabled'
 GIR_MESON_DISABLE_FLAG = 'disabled'
@@ -58,3 +58,8 @@ DEBIAN_NOAUTONAME:${PN} = "1"
 RRECOMMENDS:${PN} = "glib-networking"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2026-1467] = "fixed-version: fixed in 3.6.6"
+CVE_STATUS[CVE-2026-1536] = "fixed-version: fixed in 3.6.6"
+CVE_STATUS[CVE-2026-1801] = "fixed-version: fixed in 3.6.6"
+CVE_STATUS[CVE-2026-2443] = "fixed-version: fixed in 3.6.6"

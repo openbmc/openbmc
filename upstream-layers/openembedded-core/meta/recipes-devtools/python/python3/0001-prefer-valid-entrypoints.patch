@@ -1,0 +1,27 @@
+From ef33ac27e3ac1b9cb159d7eec0ad1af120cd9dc1 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Fri, 17 Apr 2026 16:53:42 +0100
+Subject: [PATCH] prefer valid entrypoints
+
+When there are multiple distributions found and some of them are invalid, ensure that
+the entry_points() accessor puts valid dists first.
+
+Upstream-Status: Submitted [https://github.com/python/importlib_metadata/issues/534]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ Lib/importlib/metadata/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Lib/importlib/metadata/__init__.py b/Lib/importlib/metadata/__init__.py
+index 085378c..ff5cae4 100644
+--- a/Lib/importlib/metadata/__init__.py
++++ b/Lib/importlib/metadata/__init__.py
+@@ -1016,7 +1016,7 @@ def entry_points(**params) -> EntryPoints:
+     :return: EntryPoints for all installed packages.
+     """
+     eps = itertools.chain.from_iterable(
+-        dist.entry_points for dist in _unique(distributions())
++        dist.entry_points for dist in _unique(Distribution._prefer_valid(distributions()))
+     )
+     return EntryPoints(eps).select(**params)
+ 

@@ -9,7 +9,7 @@ https://patchwork.sourceware.org/project/glibc/patch/78061085-f04a-0c45-107b-5a8
 
 Just fix up our use of it.
 
-Upstream-Status: Submitted [https://gitlab.freedesktop.org/virgl/virglrenderer/-/merge_requests/1567]
+Upstream-Status: Backport [https://gitlab.freedesktop.org/virgl/virglrenderer/-/commit/3f0f775edb2df5ea54c37863286ad565ccddb276]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
  src/mesa/compat/c11/threads_posix.h | 8 ++++++--

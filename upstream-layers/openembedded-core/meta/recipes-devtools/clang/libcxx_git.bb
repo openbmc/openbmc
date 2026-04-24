@@ -32,9 +32,15 @@ OECMAKE_TARGET_COMPILE = "cxxabi cxx"
 OECMAKE_TARGET_INSTALL = "install-cxxabi install-cxx"
 
 # LLVM libunwind.a needed for static Rust musl builds.
-# GNU libunwind never produces .a on musl so no collision risk.
+# Install only static library to avoid collision with libunwind recipe.
 OECMAKE_TARGET_COMPILE:append:libc-musl = " unwind"
-OECMAKE_TARGET_INSTALL:append:libc-musl = " install-unwind"
+
+do_install:append:libc-musl() {
+    if [ -f ${B}/lib${LLVM_LIBDIR_SUFFIX}/libunwind.a ]; then
+        install -m 0644 ${B}/lib${LLVM_LIBDIR_SUFFIX}/libunwind.a \
+            ${D}${libdir}/libunwind.a
+    fi
+}
 
 CC = "${CCACHE}${HOST_PREFIX}clang ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
 CXX = "${CCACHE}${HOST_PREFIX}clang++ ${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"

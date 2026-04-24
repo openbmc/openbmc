@@ -115,26 +115,26 @@ class TestDefaultFeatures(TestCase):
         # Test with nothing opted out
         d.setVar("DISTRO_FEATURES", "")
         d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
-        filter_default_features("DISTRO_FEATURES", d)
-        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "alpha beta gamma")
+        filtered = filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(filtered.strip(), "alpha beta gamma")
 
         # opt out of a single feature
         d.setVar("DISTRO_FEATURES", "")
         d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
         d.setVar("DISTRO_FEATURES_OPTED_OUT", "beta")
-        filter_default_features("DISTRO_FEATURES", d)
-        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "alpha gamma")
+        filtered = filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(filtered.strip(), "alpha gamma")
 
         # opt out of everything
         d.setVar("DISTRO_FEATURES", "")
         d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
         d.setVar("DISTRO_FEATURES_OPTED_OUT", "gamma alpha beta")
-        filter_default_features("DISTRO_FEATURES", d)
-        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "")
+        filtered = filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(filtered.strip(), "")
 
         # opt out of something that isn't in our defaults
         d.setVar("DISTRO_FEATURES", "")
         d.setVar("DISTRO_FEATURES_DEFAULTS", "alpha beta gamma")
         d.setVar("DISTRO_FEATURES_OPTED_OUT", "omega")
-        filter_default_features("DISTRO_FEATURES", d)
-        self.assertEqual(d.getVar("DISTRO_FEATURES").strip(), "alpha beta gamma")
+        filtered = filter_default_features("DISTRO_FEATURES", d)
+        self.assertEqual(filtered.strip(), "alpha beta gamma")

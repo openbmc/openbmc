@@ -154,7 +154,12 @@ def filter_default_features(varname, d):
     default_features = set_difference(varname + "_DEFAULTS",
                                       varname + "_OPTED_OUT",
                                       d)
-    d.appendVar(varname, " " + default_features)
+    return default_features
+
+def class_filter_features(defaults, features_var, filter_var, d):
+    features = set(d.getVar(features_var).split())
+    filtered = set(bb.utils.filter_string(defaults, d.getVar(filter_var)).split())
+    return " ".join(sorted(features | filtered))
 
 def all_distro_features(d, features, truevalue="1", falsevalue=""):
     """

@@ -148,3 +148,6 @@ do_install:append() {
 	# Avoid non-reproducible -src package
 	sed -i -e "s,${B}/include/,,g" ${B}/apt-pkg/tagfile-keys.cc
 }
+
+# Add CVE_PRODUCT to match the NVD CPE product name
+CVE_PRODUCT = "debian:apt debian:advanced_package_tool"

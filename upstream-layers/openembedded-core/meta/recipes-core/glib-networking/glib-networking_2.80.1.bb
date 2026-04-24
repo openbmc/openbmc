@@ -32,6 +32,7 @@ inherit gnomebase gettext upstream-version-is-even gio-module-cache ptest-gnome
 SRC_URI += "file://0001-openssl-properly-check-return-value-when-writing-to-.patch \
             file://0002-openssl-check-return-value-of-g_tls_bio_alloc.patch \
             file://0003-openssl-check-return-values-of-BIO_new.patch \
+            file://0004-openssl-fix-out-of-bounds-read-in-accepted-cas-prope.patch \
             file://run-ptest"
 
 FILES:${PN} += "\

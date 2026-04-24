@@ -1,0 +1,33 @@
+[mom]: Fix example build dependencies
+
+We are seeing occasional failures for eqn being missing when building
+mom examples, e.g.:
+
+| groff-1.24.0/groff: error: couldn't exec eqn: Permission denied
+| pdfmom: fatal error: groff-1.24.0/test-groff exited with status 24
+| make[2]: *** [Makefile:19256: contrib/mom/examples/slide-demo.pdf] Error 1
+
+It may find eqn from the host system if installed too.
+
+Fix the build dependencies to add eqn, pic, tbl and preconv since a 
+quick strace indicates them all being used here
+
+Upstream-Status: Backport [https://cgit.git.savannah.gnu.org/cgit/groff.git/commit/?id=3f7d8ea20f91a8abf248fbf7ec73049cd8c3c9c2]
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: groff-1.24.0/contrib/mom/mom.am
+===================================================================
+--- groff-1.24.0.orig/contrib/mom/mom.am
++++ groff-1.24.0/contrib/mom/mom.am
+@@ -144,8 +144,8 @@ SUFFIXES += .mom .pdf
+ 	&& LC_ALL=C $(MOMPDFMOM) $< >$@
+ 
+ $(MOMPROCESSEDEXAMPLEFILES): $(MOMNORMALFILES) \
+-  test-groff groff troff gropdf pdfmom penguin.ps penguin.pdf \
+-  font/devpdf/stamp tmac/pdf.tmac
++  test-groff groff troff gropdf pdfmom eqn pic tbl preconv \
++  penguin.ps penguin.pdf font/devpdf/stamp tmac/pdf.tmac
+ 
+ penguin.ps:
+ 	$(AM_V_at)cp $(mom_srcdir)/examples/penguin.ps $@

@@ -37,12 +37,11 @@ python() {
     workdir = os.path.join(tempdir, 'workdir')
     d.setVar('WORKDIR', workdir)
     if not d.getVar('S').startswith(workdir):
+        d.setVar('UNPACKDIR', os.path.join(workdir, 'sources'))
         # Usually a shared workdir recipe (kernel, gcc)
         # Try to set a reasonable default
         if bb.data.inherits_class('kernel', d):
-            d.setVar('S', '${WORKDIR}/source')
-        else:
-            d.setVar('S', '${WORKDIR}/%s' % os.path.basename(d.getVar('S')))
+            d.setVar('S', '${UNPACKDIR}/source')
     if bb.data.inherits_class('kernel', d):
         # We don't want to move the source to STAGING_KERNEL_DIR here
         d.setVar('STAGING_KERNEL_DIR', '${S}')
