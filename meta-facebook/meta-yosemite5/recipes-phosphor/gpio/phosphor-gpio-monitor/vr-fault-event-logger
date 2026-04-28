@@ -35,7 +35,7 @@ else
     exit 1
 fi
 
-stash_file="/run/${message}.log_entry"
+stash_file="/run/${gpio_name}.log_entry"
 
 
 case "$1" in
