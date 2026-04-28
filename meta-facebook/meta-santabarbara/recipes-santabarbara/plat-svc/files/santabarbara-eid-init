@@ -44,12 +44,23 @@ main() {
     for slot in "${!reg_map[@]}"; do
         IFS=':' read -r sitv3_val rainbow_val <<< "${reg_map[$slot]}"
         if i2cdetect -y "$slot" | grep -Eq "^50:[[:space:]]+(UU|[0-9a-f]{2})"; then
-            echo "Slot $slot: Detecting Rainbow card, add the $rainbow_val at 0x50"
+            echo "Slot $slot: Detecting Rainbow card, target value is $rainbow_val at 0x50"
+ 
+            current_val=$(i2ctransfer -y "$slot" w2@0x50 0x00 0x00 r1 2>/dev/null | tr '[:upper:]' '[:lower:]')
+ 
+            if [[ "$current_val" == "$rainbow_val" ]]; then
+                echo "Slot $slot: 0x50 already has value $current_val, skip write and reboot"
+                continue
+            fi
+ 
+            echo "Slot $slot: Current value is '${current_val:-READ_FAIL}', writing $rainbow_val to 0x50"
+ 
             cmd="i2ctransfer -y $slot w3@0x50 0x00 0x00 $rainbow_val"
             if retry_i2c_command "$cmd" "$slot" "bus setup"; then
                 echo "Slot $slot setup success"
             else
                 echo "FATAL: Slot $slot failed after max retries"
+                continue
             fi
 
             sleep 1
@@ -78,7 +89,7 @@ main() {
         read -r expected_lo expected_hi <<< "$sitv3_val"
 
         if i2cdetect -y "$slot" | grep -Eq '^50:[[:space:]]+(UU|[0-9a-f]{2})'; then
-            echo "Slot $slot: Rainbow reboot check finished"
+            echo "Slot $slot: Rainbow check finished"
         elif i2cdetect -y "$slot" | grep -Eq '^50:([[:space:]]+..){1}[[:space:]]+(UU|[0-9a-f]{2})'; then
             echo "Slot $slot: Verifying SITv3 register 0x50"
             res=$(i2ctransfer -y "$slot" w1@0x51 0x50 r2 2>/dev/null || echo "FAIL")
