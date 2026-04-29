@@ -432,5 +432,19 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "PEX_SYS_ERR_FPGA",
+        "LineName": "PEX_SYS_ERR_FPGA",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@PEX_SYS_ERR_FPGA.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@PEX_SYS_ERR_FPGA.service"
+            ]
+        },
+        "Continue": true
     }
 ]
