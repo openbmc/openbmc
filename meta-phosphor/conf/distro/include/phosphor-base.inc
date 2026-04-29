@@ -8,19 +8,19 @@ DISTROOVERRIDES .= ":openbmc-phosphor"
 QEMU_TARGETS ?= "arm aarch64 i386 riscv32 riscv64 ppc64le x86_64"
 
 PREMIRRORS ??= "\
-bzr://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-cvs://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-git://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-gitsm://.*/.* http://downloads.yoctoproject.org/mirror/sources/ \n \
-hg://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n \
-osc://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n \
-p4://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n \
-svn://.*/.*   http://downloads.yoctoproject.org/mirror/sources/ \n"
+bzr://.*/.*   https://downloads.yoctoproject.org/mirror/sources/ \n \
+cvs://.*/.*   https://downloads.yoctoproject.org/mirror/sources/ \n \
+git://.*/.*   https://downloads.yoctoproject.org/mirror/sources/ \n \
+gitsm://.*/.* https://downloads.yoctoproject.org/mirror/sources/ \n \
+hg://.*/.*    https://downloads.yoctoproject.org/mirror/sources/ \n \
+osc://.*/.*   https://downloads.yoctoproject.org/mirror/sources/ \n \
+p4://.*/.*    https://downloads.yoctoproject.org/mirror/sources/ \n \
+svn://.*/.*   https://downloads.yoctoproject.org/mirror/sources/ \n"
 
 MIRRORS =+ "\
-ftp://.*/.*      http://downloads.yoctoproject.org/mirror/sources/ \n \
-http://.*/.*     http://downloads.yoctoproject.org/mirror/sources/ \n \
-https://.*/.*    http://downloads.yoctoproject.org/mirror/sources/ \n"
+ftp://.*/.*      https://downloads.yoctoproject.org/mirror/sources/ \n \
+http://.*/.*     https://downloads.yoctoproject.org/mirror/sources/ \n \
+https://.*/.*    https://downloads.yoctoproject.org/mirror/sources/ \n"
 
 # The CONNECTIVITY_CHECK_URI's are used to test whether we can successfully
 # fetch from the network (and warn you if not). To disable the test set
