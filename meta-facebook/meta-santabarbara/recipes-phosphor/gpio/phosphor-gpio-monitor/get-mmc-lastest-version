@@ -1,7 +1,8 @@
 #!/bin/bash
 
 eids="10 20 30 40"
-retry_delay_sec=1
+retry_delay_sec=5
+lock_delay_sec=120
 
 eid_to_module() {
     case "$1" in
@@ -30,17 +31,63 @@ get_pldm_object_path() {
     echo "$path"
 }
 
+is_eid_idle() {
+    local eid=$1
+    local out
+    local cur_state
+    local reason
+
+    out=$(pldmtool fw_update GetStatus -m "$eid" 2>&1)
+
+    cur_state=$(
+        echo "$out" |
+        sed -n 's/.*"CurrentState":[[:space:]]*"\([^"]*\)".*/\1/p' |
+        head -n1
+    )
+
+    reason=$(
+        echo "$out" |
+        sed -n 's/.*"ReasonCode":[[:space:]]*"\([^"]*\)".*/\1/p' |
+        head -n1
+    )
+
+    if [ "$cur_state" = "IDLE" ]; then
+        return 0
+    fi
+
+    [ -z "$cur_state" ] && cur_state="NO_RESPONSE"
+    [ -z "$reason" ] && reason="N/A"
+
+    echo "EID $eid not IDLE: $cur_state($reason)"
+    return 1
+}
+
 declare -A processed
+declare -A locked_until
+
 remaining=0
 
 for eid in $eids; do
     processed["$eid"]=0
+    locked_until["$eid"]=0
     remaining=$((remaining + 1))
 done
 
 while [ "$remaining" -gt 0 ]; do
+    now=$(date +%s)
+
     for eid in $eids; do
         [ "${processed[$eid]}" -eq 1 ] && continue
+
+        if [ "$now" -lt "${locked_until[$eid]}" ]; then
+            continue
+        fi
+
+        if ! is_eid_idle "$eid"; then
+            locked_until["$eid"]=$((now + lock_delay_sec))
+            echo "EID $eid locked for ${lock_delay_sec}s"
+            continue
+        fi
 
         output=$(
             pldmtool fw_update GetFirmwareParameters -m "$eid" 2>/dev/null |
@@ -56,10 +103,9 @@ while [ "$remaining" -gt 0 ]; do
         fi
 
         IFS="#" read -r compId version <<< "$output"
-        
 
         if [[ "$version" == "flash hamsa BOOT0: 000000 00000000" || \
-            "$version" == "flash hamsa BOOT0: ffffff "* ]]; then
+              "$version" == "flash hamsa BOOT0: ffffff "* ]]; then
             continue
         fi
 
