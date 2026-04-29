@@ -1,0 +1,7 @@
+[Unit]
+Description=SWB Power Fault Deassert Handler
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/swb-pwr-fault-handler "deassert"
+SyslogIdentifier=swb-pwr-fault-deassert

@@ -489,5 +489,25 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "SWB_PWR_FAULT_N",
+        "LineName": "SWB_PWR_FAULT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "swb-pwr-fault-assert.service"
+            ],
+            "FALLING": [
+                "swb-pwr-fault-deassert.service"
+            ],
+            "INIT_HIGH": [
+                "swb-pwr-fault-assert.service"
+            ],
+            "INIT_LOW": [
+                "swb-pwr-fault-deassert.service"
+            ]
+        },
+        "Continue": true
     }
 ]

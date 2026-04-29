@@ -1,0 +1,84 @@
+#!/bin/bash
+
+action=$1
+
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Santabarbara_MB/SWB_PWR_FAULT_N"
+STASH_FILE="/var/lib/phosphor-gpio-monitor/SWB_PWR_FAULT_N.log_entry"
+
+declare -A ERROR_MAP=(
+    ["20"]="NIC1_P3V3_Power_on_fail"
+    ["21"]="NIC1_P12V_Power_on_fail"
+    ["22"]="NIC2_P3V3_Power_on_fail"
+    ["23"]="NIC2_P12V_Power_on_fail"
+    ["24"]="NIC3_P3V3_Power_on_fail"
+    ["25"]="NIC3_P12V_Power_on_fail"
+    ["26"]="NIC4_P3V3_Power_on_fail"
+    ["27"]="NIC4_P12V_Power_on_fail"
+    ["28"]="P1V8_AUX_Power_on_fail"
+    ["29"]="P5V_Power_on_fail"
+    ["2A"]="P1V8_PEX_Power_on_fail"
+    ["2B"]="P1V5_PEX_Power_on_fail"
+    ["2C"]="P1V2_PEX_Power_on_fail"
+    ["2D"]="P0V895_PEX_Power_on_fail"
+    ["2E"]="P0V81_PEX1_Power_on_fail"
+    ["2F"]="P0V81_PEX0_Power_on_fail"
+    ["30"]="P0V81_REFCLK_Power_on_fail"
+    ["31"]="P1V2_SOC1_Power_on_fail"
+    ["32"]="P1V2_SOC2_Power_on_fail"
+    ["33"]="P1V2_SOC3_Power_on_fail"
+    ["34"]="P1V2_SOC4_Power_on_fail"
+    ["35"]="P0V75_SOC1_Power_on_fail"
+    ["36"]="P0V75_SOC2_Power_on_fail"
+    ["37"]="P0V75_SOC3_Power_on_fail"
+    ["38"]="P0V75_SOC4_Power_on_fail"
+    ["39"]="P1V2_AUX_Power_on_fail"
+    ["40"]="NIC1_P3V3_Power_fault"
+    ["41"]="NIC1_P12V_Power_fault"
+    ["42"]="NIC2_P3V3_Power_fault"
+    ["43"]="NIC2_P12V_Power_fault"
+    ["44"]="NIC3_P3V3_Power_fault"
+    ["45"]="NIC3_P12V_Power_fault"
+    ["46"]="NIC4_P3V3_Power_fault"
+    ["47"]="NIC4_P12V_Power_fault"
+    ["48"]="P1V8_AUX_Power_fault"
+    ["49"]="P5V_Power_fault"
+    ["4A"]="P1V8_PEX_Power_fault"
+    ["4B"]="P1V5_PEX_Power_fault"
+    ["4C"]="P1V2_PEX_Power_fault"
+    ["4D"]="P0V895_PEX_Power_fault"
+    ["4E"]="P0V81_PEX1_Power_fault"
+    ["4F"]="P0V81_PEX0_Power_fault"
+    ["50"]="P0V81_REFCLK_Power_fault"
+    ["51"]="P1V2_SOC1_Power_fault"
+    ["52"]="P1V2_SOC2_Power_fault"
+    ["53"]="P1V2_SOC3_Power_fault"
+    ["54"]="P1V2_SOC4_Power_fault"
+    ["55"]="P0V75_SOC1_Power_fault"
+    ["56"]="P0V75_SOC2_Power_fault"
+    ["57"]="P0V75_SOC3_Power_fault"
+    ["58"]="P0V75_SOC4_Power_fault"
+    ["59"]="P1V2_AUX_Power_fault"
+)
+
+case $action in
+    "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+            raw=$(i2cget -fy 12 0x66 0x00)
+            error_code=${raw:2}
+            error_code=$(echo "$error_code" | tr '[:lower:]' '[:upper:]')
+            decode=${ERROR_MAP[$error_code]:-"Unknown Error Code (0x${error_code})"}
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"SWB_CPLD_PWR_FAULT - [${decode}]\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+        fi
+        ;;
+esac
+
+exit 0
