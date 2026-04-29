@@ -26,86 +26,98 @@
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD0_SSD0_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "HDDBOARD0_SSD1_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD0_SSD1_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "HDDBOARD1_SSD0_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD1_SSD0_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "HDDBOARD1_SSD1_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HDDBOARD1_SSD1_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "BOOTDRIVE_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/BOOTDRIVE_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "PDB_VR_P12V_N1_0_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_0_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "PDB_VR_P12V_N1_1_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N1_1_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "PDB_VR_P12V_N2_0_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_0_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "PDB_VR_P12V_N2_1_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_VR_P12V_N2_1_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "PDB_MAX_VR_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/PDB_MAX_VR_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HGX_PROCESSORMODULE0_EXHAUST_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
         {
             "name": "HGX_PROCESSORMODULE1_EXHAUST_TEMP_C",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/HGX_PROCESSORMODULE1_EXHAUST_TEMP_C",
             "timeout": 0,
-            "ignoreDbusMinMax": true
+            "ignoreDbusMinMax": true,
+            "ignoreFailIfHostOff": true
         },
-       {
+        {
             "name": "FAN0_TACH_IL_SPEED_RPM",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN0_TACH_IL_SPEED_RPM",
