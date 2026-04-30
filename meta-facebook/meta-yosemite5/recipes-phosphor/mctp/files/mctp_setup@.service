@@ -8,6 +8,3 @@ Requires=mctpd.service
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/mctp/mctp_setup.sh %I
-
-[Install]
-WantedBy=multi-user.target

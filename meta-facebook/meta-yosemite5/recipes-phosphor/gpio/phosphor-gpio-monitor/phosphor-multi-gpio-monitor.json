@@ -14,7 +14,7 @@
         "LineName": "FM_BIOS_POST_CMPLT_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["deassert-host-ready.service", "mctp_remove.service"],
+            "RISING": ["deassert-host-ready.service"],
             "FALLING": ["assert-host-ready.service", "mctp_setup@cxl_mctp.service"]
         },
         "Continue": true
@@ -25,7 +25,7 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": ["deassert-power-good-drop.service"],
-            "FALLING": ["assert-power-good-drop.service"]
+            "FALLING": ["assert-power-good-drop.service", "mctp_remove@cxl_mctp.service"]
         },
         "Continue": true
     },
