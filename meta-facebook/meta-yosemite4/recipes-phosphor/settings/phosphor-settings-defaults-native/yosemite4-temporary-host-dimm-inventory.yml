@@ -1,0 +1,57 @@
+# Pre-created DIMM inventory D-Bus objects for Yosemite 4 host and CXL DIMMs.
+# Each object exposes Inventory.Item.Dimm, Decorator.Asset, and
+# Association.Definitions interfaces for recording DIMM information.
+#
+# Sentinel Dome host DIMMs: A0-A11 (T1 uses 10, T2 uses 12).
+# Wailua Falls CXL DIMMs: MCIO4 A1/A0/B1/B0 + MCIO3 A1/A0/B1/B0
+# (present in slots with Sentinel Dome T2 board config only).
+#
+# The {} placeholder is expanded per host instance (1-8) by the build system.
+# YAML anchor (&dimm_template_{}) defines interface defaults shared by all objects;
+# {} in the anchor name is expanded per instance to avoid duplicate anchors.
+
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A0: &dimm_template_{}
+  - Interface: "xyz.openbmc_project.Inventory.Item.Dimm"
+    Properties:
+      MemorySizeInKB:
+        Default: 0
+      MemoryConfiguredSpeedInMhz:
+        Default: 0
+      MemoryType:
+        Default: Dimm::DeviceType::Unknown
+  - Interface: "xyz.openbmc_project.Inventory.Decorator.Asset"
+    Properties:
+      BuildDate:
+        Default: '""'
+      SerialNumber:
+        Default: '""'
+      PartNumber:
+        Default: '""'
+      Manufacturer:
+        Default: '""'
+  - Interface: "xyz.openbmc_project.Association.Definitions"
+    Properties:
+      Associations:
+        Default: []
+
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A1: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A2: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A3: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A4: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A5: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A6: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A7: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A8: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A9: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A10: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Sentinel_Dome_Slot_{}_DIMM_A11: *dimm_template_{}
+
+# Wailua Falls CXL DIMMs (present in slots with Sentinel Dome T2 board config only)
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO4_DIMM_A1: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO4_DIMM_A0: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO4_DIMM_B1: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO4_DIMM_B0: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO3_DIMM_A1: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO3_DIMM_A0: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO3_DIMM_B1: *dimm_template_{}
+/xyz/openbmc_project/inventory/system/board/Wailua_Falls_Slot_{}_WF_MCIO3_DIMM_B0: *dimm_template_{}
