@@ -1,6 +1,7 @@
 [Unit]
 Description=Chassis Power Cycle: %i
 OnFailure=check-i3c-hub@%i.service
+Conflicts=log-chassis-powercycle-sel@%i.service
 
 [Service]
 Type=oneshot

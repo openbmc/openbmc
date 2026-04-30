@@ -37,10 +37,6 @@ HOST_DEFAULT_TARGETS:append = " \
     multi-user.target.wants/obmc-chassis-poweron@{}.target \
 "
 
-CHASSIS_DEFAULT_TARGETS:append = " \
-    obmc-chassis-powercycle@{}.target.wants/log-chassis-powercycle-sel@{}.service \
-"
-
 SRC_URI:append = " \
     file://chassis-poweroff@.service \
     file://chassis-poweron@.service \
