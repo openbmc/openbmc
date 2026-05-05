@@ -1,2 +1,78 @@
 [
+    {
+        "Desc": {
+            "Name": "PDB_R_BUSBAR_TSENSE_P1_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold" : {
+            "HardShutdownHigh": 105
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Anacapa_PDB_R"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "PDB_R_BTP1_VOLT",
+                    "Desc": {
+                        "Name": "PDB_R_BUSBAR_TSENSE_P1_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var Vin := 3.3;",
+            "var Rp := 12000;",
+            "var R := Rp * PDB_R_BTP1_VOLT / (Vin - PDB_R_BTP1_VOLT);",
+            "var A := 0.0011675038414;",
+            "var B := 0.0002258889746;",
+            "var C := 1.367104791e-07;",
+            "1 / (A + B * log(R) + C * pow(log(R), 3)) - 273.15"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "PDB_R_BUSBAR_TSENSE_P2_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold" : {
+            "HardShutdownHigh": 105
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Anacapa_PDB_R"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "PDB_R_BTP2_VOLT",
+                    "Desc": {
+                        "Name": "PDB_R_BUSBAR_TSENSE_P2_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var Vin := 3.3;",
+            "var Rp := 12000;",
+            "var R := Rp * PDB_R_BTP2_VOLT / (Vin - PDB_R_BTP2_VOLT);",
+            "var A := 0.0011675038414;",
+            "var B := 0.0002258889746;",
+            "var C := 1.367104791e-07;",
+            "1 / (A + B * log(R) + C * pow(log(R), 3)) - 273.15"
+        ]
+    }
 ]
