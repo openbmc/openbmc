@@ -409,7 +409,7 @@
     },
     {
         "Desc": {
-            "Name": "VIRTUAL_RMC_HSC_TEMP_C",
+            "Name": "VIRTUAL_RMC_HSC_REMOTE_TEMP_C",
             "SensorType": "temperature"
         },
         "Associations": [
@@ -422,15 +422,60 @@
         "Params": {
             "DbusParam": [
                 {
-                    "ParamName": "RMC_HSC_TEMP_C",
+                    "ParamName": "RMC_HSC_REMOTE_TEMP_C",
                     "Desc": {
-                        "Name": "RMC_HSC_TEMP_C",
+                        "Name": "RMC_HSC_REMOTE_TEMP_C",
                         "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN0_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN0_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN1_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN1_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN2_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN2_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN3_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN3_PWM_PCT",
+                        "SensorType": "fan_pwm"
                     }
                 }
             ]
         },
-        "Expression": "RMC_HSC_TEMP_C + 7.0"
+        "Expression": [
+            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT);",
+            "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
+            "var CAL_OFS[11]:={4.0, 3.0, 3.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0, 4.0};",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_AVG,DUTY_OFS[0]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[0];",
+            "  case inrange(DUTY_OFS[2],DUTY_AVG,DUTY_OFS[1]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[1];",
+            "  case inrange(DUTY_OFS[3],DUTY_AVG,DUTY_OFS[2]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[2];",
+            "  case inrange(DUTY_OFS[4],DUTY_AVG,DUTY_OFS[3]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[3];",
+            "  case inrange(DUTY_OFS[5],DUTY_AVG,DUTY_OFS[4]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[4];",
+            "  case inrange(DUTY_OFS[6],DUTY_AVG,DUTY_OFS[5]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[5];",
+            "  case inrange(DUTY_OFS[7],DUTY_AVG,DUTY_OFS[6]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[6];",
+            "  case inrange(DUTY_OFS[8],DUTY_AVG,DUTY_OFS[7]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[7];",
+            "  case inrange(DUTY_OFS[9],DUTY_AVG,DUTY_OFS[8]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[8];",
+            "  case inrange(DUTY_OFS[10],DUTY_AVG,DUTY_OFS[9]): RMC_HSC_REMOTE_TEMP_C+CAL_OFS[9];",
+            "  default: RMC_HSC_REMOTE_TEMP_C+CAL_OFS[10];",
+            "}"
+        ]
     },
     {
         "Desc": {
