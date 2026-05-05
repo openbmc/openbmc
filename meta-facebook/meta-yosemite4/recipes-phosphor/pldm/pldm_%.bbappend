@@ -20,6 +20,11 @@ SYSTEMD_SERVICE:${PN} += " \
     pldmd-exit-handler.service \
     "
 
+
+EXTRA_OEMESON:append = " \
+  -Dtransport-implementation=af-mctp \
+"
+
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}/pldmd.service.d
     install -m 0644 ${UNPACKDIR}/yosemite4.conf ${D}${systemd_system_unitdir}/pldmd.service.d/
