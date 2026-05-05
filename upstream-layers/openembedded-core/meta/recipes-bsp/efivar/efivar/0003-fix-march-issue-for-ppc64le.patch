@@ -1,0 +1,45 @@
+From 9711b8aa5acc63c54a12ba5505fe68b4475c8a13 Mon Sep 17 00:00:00 2001
+From: Andrew Geissler <geissonator@yahoo.com>
+Date: Tue, 4 Nov 2025 09:58:55 -0600
+Subject: [PATCH] Fix the -march issue for ppc64le
+
+Similar to the fix in aab4e9b10ac, need to also support the ppc64le
+architecture.
+
+The failure without this fix on a ppc64le machine:
+
+| cp util.c util-makeguids.c
+| gcc: error: unrecognized command-line option '-march=native'; did you mean '-mcpu=native'?
+
+Signed-off-by: Andrew Geissler <geissonator@yahoo.com>
+
+Upstream-Status: Backport [https://github.com/rhboot/efivar/commit/9711b8aa5acc63c54a12ba5505fe68b4475c8a13]
+---
+ src/include/defaults.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/include/defaults.mk b/src/include/defaults.mk
+index 4da0cde3..a21a7aeb 100644
+--- a/src/include/defaults.mk
++++ b/src/include/defaults.mk
+@@ -74,6 +74,7 @@ override SOFLAGS = $(_SOFLAGS) \
+ HOST_ARCH=$(shell uname -m)
+ ifneq ($(HOST_ARCH),ia64)
+ ifneq ($(HOST_ARCH),riscv64)
++ifneq ($(HOST_ARCH),ppc64le)
+ 	HOST_MARCH=-march=native
+ else
+ 	HOST_MARCH=
+@@ -81,6 +82,9 @@ endif
+ else
+ 	HOST_MARCH=
+ endif
++else
++	HOST_MARCH=
++endif
+ HOST_CPPFLAGS ?= $(CPPFLAGS)
+ override _HOST_CPPFLAGS := $(HOST_CPPFLAGS)
+ override HOST_CPPFLAGS = $(_HOST_CPPFLAGS) \
+--
+2.34.1
+
