@@ -48,7 +48,7 @@ config_fan_max31790() {
 
 	for offset in $(seq 0x08 0x0d); do
 		fan_dynam_val=$(printf "%d" "$(i2cget -y -f "$bus" "$addr" "$offset")")
-		fan_dynam_val=$((fan_dynam_val | 0xe0))
+		fan_dynam_val=$(((fan_dynam_val & 0x1f) | 0x80))
 		i2cset -y -f "$bus" "$addr" "$offset" "$fan_dynam_val"
 	done
 
