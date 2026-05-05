@@ -31,3 +31,7 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
 "
+
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    phosphor-modbus \
+"
