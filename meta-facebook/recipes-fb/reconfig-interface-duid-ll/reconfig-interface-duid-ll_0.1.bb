@@ -29,4 +29,4 @@ FILES:${PN}:append = " \
     "
 
 SYSTEMD_SERVICE_FMT = "reconfig-interface-duid-ll@{0}.path reconfig-interface-duid-ll@{0}.service"
-SYSTEMD_SERVICE = "${@compose_list(d, 'SYSTEMD_SERVICE_FMT', 'FB_ETH_INTF')}"
+SYSTEMD_SERVICE:${PN} = "${@compose_list(d, 'SYSTEMD_SERVICE_FMT', 'FB_ETH_INTF')}"
