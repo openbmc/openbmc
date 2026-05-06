@@ -1,0 +1,113 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+ALL_POWER_GOOD="wALL_POWER_OK"
+POWER_BUTTON="SYS_BMC_PWRBTN_R_N"
+PHX_PORESET="RST_SOC_PORESET_N_BMC"
+PWRBTN_HOLD_SEC=5
+PWRBTN_PULSE_SEC=1
+POWEROFF_TIMEOUT_SEC=20
+POWERON_TIMEOUT_SEC=10
+
+unbind_bios_flash()
+{
+    if [ -d "/sys/devices/platform/ahb/1e631000.spi/spi_master/spi1/spi1.0/spi-nor" ]; then
+        echo "UnBinding the BIOS flash driver before power ON !!"
+        echo spi1.0 > /sys/bus/spi/drivers/spi-nor/unbind
+    fi
+}
+
+power_status()
+{
+    if [ "$(get_gpio "$ALL_POWER_GOOD")" = "1" ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+# press power button
+press_power_button()
+{
+    set_gpio "$POWER_BUTTON" 0
+    sleep "$1"
+    set_gpio "$POWER_BUTTON" 1
+}
+
+# Force DC off
+force_power_off()
+{
+    if [ "$(power_status)" = "on" ]; then
+        press_power_button $PWRBTN_HOLD_SEC
+        for _ in $(seq 1 "$POWEROFF_TIMEOUT_SEC"); do
+            sleep 1
+            if [ "$(power_status)" = "off" ]; then
+                return 0
+            fi
+        done
+        return 1
+    fi
+    return 0
+}
+
+# Graceful DC off
+graceful_power_off()
+{
+    if [ "$(power_status)" = "on" ]; then
+        press_power_button $PWRBTN_PULSE_SEC
+        for _ in $(seq 1 "$POWEROFF_TIMEOUT_SEC"); do
+            sleep 1
+            if [ "$(power_status)" = "off" ]; then
+                return 0
+            fi
+        done
+        return 1
+    fi
+    return 0
+}
+
+# DC on
+power_on()
+{
+    if [ "$(power_status)" = "off" ]; then
+        press_power_button $PWRBTN_PULSE_SEC
+        for _ in $(seq 1 "$POWERON_TIMEOUT_SEC"); do
+            sleep 1
+            if [ "$(power_status)" = "on" ]; then
+                return 0
+            fi
+        done
+        return 1
+    fi
+    return 0
+}
+
+# Host reset
+power_reset()
+{
+    set_gpio "$PHX_PORESET" 0
+    sleep "$PWRBTN_PULSE_SEC"
+    set_gpio "$PHX_PORESET" 1
+    return 0
+}
+
+# Power cycle
+power_cycle()
+{
+    force_power_off
+    st=$?
+    if [ "$st" -ne 0 ]; then
+        echo "Power cycle failed!"
+        return 1
+    fi
+    if [ "$(power_status)" = "off" ]; then
+        power_on
+        st=$?
+        if [ "$st" -ne 0 ]; then
+            echo "Power cycle failed!"
+            return 1
+        fi
+        return 0
+    fi
+}
