@@ -61,22 +61,148 @@ assign_static_eid() {
         AssignBridgeStatic ayyyy 0 "$MCTP_EID" "$POOL_SIZE" "$POOL_START"
 }
 
+remove_eid()
+{
+    local eid=$1
+    if mapper get-service /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" 2>/dev/null; then
+        echo removing eid "$eid"
+        busctl call au.com.codeconstruct.MCTP1 \
+        "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" \
+        au.com.codeconstruct.MCTP.Endpoint1 \
+        Remove
+    fi
+}
+
+remove_eids() {
+    local start_eid="$MCTP_EID"
+    local end_eid="$((MCTP_EID + POOL_SIZE))"
+    local ep_regex="endpoints/([0-9]+)"
+    local eid
+
+    # Check if busctl is even available/service is running to avoid stderr noise
+    if ! busctl introspect au.com.codeconstruct.MCTP1 / >/dev/null 2>&1; then
+        echo "Error: MCTP service not reachable."
+        return 1
+    fi
+
+    # Using a process substitution <(...) to avoid subshell issues with variables
+    while IFS= read -r line; do
+        if [[ "$line" =~ $ep_regex ]]; then
+            eid="${BASH_REMATCH[1]}"
+
+            # 1. Use -ge and -le for inclusive range (usually what users expect)
+            # 2. Basic numeric validation to ensure $eid is actually an integer
+            if [[ "$eid" =~ ^[0-9]+$ ]] && [ "$eid" -ge "$start_eid" ] && [ "$eid" -le "$end_eid" ]; then
+                echo "Removing EID: $eid"
+                remove_eid "$eid"
+            fi
+        fi
+    done < <(busctl tree au.com.codeconstruct.MCTP1 --no-pager)
+}
+
+is_host_on() {
+    local state
+    state=$(busctl get-property \
+            xyz.openbmc_project.State.Host \
+            /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host CurrentHostState \
+        | cut -d'"' -f2)
+
+    [[ "$state" == "xyz.openbmc_project.State.Host.HostState.Running" ]]
+}
+
+learn_e1s_eid() {
+    local target_eid="$((MCTP_EID + 5))"
+    local network_path="/au/com/codeconstruct/mctp1/networks/1"
+    local interface="au.com.codeconstruct.MCTP.Network1"
+
+    echo "--- Starting E1S EID Discovery (Target EID: $target_eid) ---"
+
+    # Verification of Host State
+    if ! is_host_on; then
+        echo "Waiting for host power on..."
+        while ! is_host_on; do
+            sleep 10
+        done
+        # Give the E1S some settle time after power is detected
+        sleep 3
+    fi
+
+    # Learn E1S EID loop
+    for ((i=1; i<=MAX_RETRIES; i++)); do
+        echo "--- Learn Attempt $i/$MAX_RETRIES ---"
+
+        if busctl call au.com.codeconstruct.MCTP1 \
+            "$network_path" \
+            "$interface" \
+            LearnEndpoint y "$target_eid" --timeout=5; then
+
+            echo "--- Learn E1S EID $target_eid: SUCCESS ---"
+            return 0
+        fi
+
+        echo "Attempt $i failed. Retrying in ${RETRY_DELAY}s..."
+        sleep "$RETRY_DELAY"
+    done
+
+    echo "ERROR: Failed to learn E1S EID $target_eid after $MAX_RETRIES attempts."
+    return 1
+}
+
+
+
+success=false
 for ((i=1; i<=MAX_RETRIES; i++)); do
     sleep $RETRY_DELAY
     echo "--- Attempt $i/$MAX_RETRIES ---"
 
-    # Execute steps in sequence. If any return non-zero, sleep and start over.
-    if setup_mctp_addr && \
-        setup_mctp_link && \
-        check_service_status && \
-        assign_static_eid; then
-
-        echo "--- MCTP Setup Completed Successfully ---"
-        exit 0
+    if ! setup_mctp_addr; then
+        echo "setup_mctp_addr() failed"
+        continue
     fi
 
-    echo "SMA EID configuration failed. retry..."
+    if ! setup_mctp_link; then
+        echo "setup_mctp_link() failed"
+        continue
+    fi
+
+    if ! check_service_status; then
+        echo "check_service_status() failed"
+        continue
+    fi
+
+    if ! remove_eids; then
+        echo "remove_eids() failed"
+        continue
+    fi
+
+    if ! assign_static_eid; then
+        echo "assign_static_eid() failed"
+        continue
+    fi
+
+    echo "--- SMA MCTP Setup Completed Successfully ---"
+    success=true
+    break
 done
 
-echo "Error: MCTP setup failed after $MAX_RETRIES attempts."
-exit 1
+
+if [ "$success" = false ]; then
+    echo "Error: MCTP setup failed after $MAX_RETRIES attempts."
+    exit 1
+fi
+
+case $MCTP_INTF in
+    mcu1u2u1u4u1 | mcu1u2u1u3u1 | mcu1u2u2u3u1 | mcu1u2u2u4u1)
+        if ! learn_e1s_eid; then
+            echo "Error: E1S EID learning failed. Exiting."
+            exit 1
+        fi
+        ;;
+    *)
+        echo "No additional EID learning required for $MCTP_INTF."
+        ;;
+esac
+
+echo "--- All MCTP tasks completed successfully ---"
+exit 0
