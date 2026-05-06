@@ -1,0 +1,122 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
+source /usr/libexec/yosemite5-common-functions
+
+echo "Rainier initial value for I/O output pins"
+
+# Enable JTAG Mux that connects BMC JTAG to SoC or CPLD.
+set_gpio JTAG_BMC_IOEXP_MUX_OE 0
+
+# JTAG MCIO Mux Select default to MCIO 1A and 1B
+set_gpio JTAG_BMC_MCIO_MUX_S1 0
+set_gpio JTAG_BMC_MCIO_MUX_S0 0
+
+# BMC JTAG will be connected to CPLD
+set_gpio JTAG_IOEXP_BMC_MUX_SEL 1
+
+# Enable USB Mux 1 that connects SoC to BMC or USB Mux 2
+set_gpio FM_USB_MUX_1_OE_N 0
+
+# Enable USB Mux 2 that connects MCIO USB Hub to BMC or USB Mux 2
+set_gpio FM_USB_MUX_2_OE_N 0
+
+# Set RST_SOC_SRST_N_CPLD to high as default (active Low)
+set_gpio RST_SOC_SRST_N_CPLD 1
+echo "Set RST_SOC_SRST_N_CPLD to HIGH..."
+
+# set SYS_BMC_PWRBTN_R_N to high as default (active Low)
+set_gpio SYS_BMC_PWRBTN_R_N 1
+
+# set HDD0_PERST_N_CPLD high to avoid resetting HDD0
+set_gpio HDD0_PERST_N_CPLD 1
+
+# set HDD1_PERST_N_CPLD high to avoid resetting HDD1
+set_gpio HDD1_PERST_N_CPLD 1
+
+# set PERST_CEM0_N_CPLD high to avoid resetting DSTREAM
+set_gpio PERST_CEM0_N_CPLD 1
+
+# set PERST_CEM1_N_CPLD high to avoid resetting DSTREAM
+set_gpio PERST_CEM1_N_CPLD 1
+
+# set PERST_PLD_TUSB7340_N high to avoid resetting TUSB7340 device
+set_gpio PERST_PLD_TUSB7340_N 1
+
+# set RST_PCIE_BOOT_PERST_N_CPLD high to avoid resetting boot drive
+set_gpio RST_PCIE_BOOT_PERST_N_CPLD 1
+
+# set RST_PCIE_CPLD_NIC_N_CPLD high to avoid resetting OCP NIC
+set_gpio RST_PCIE_CPLD_NIC_N_CPLD 1
+
+# set RST_PCIE_MCIO_(0A-4B)_PERST_N_CPLD high to avoid resetting
+# MCIO (0A-4B) PCIe device
+set_gpio RST_PCIE_MCIO_0A_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_0B_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_1A_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_1A_SA_PERST_N_CPL 1
+set_gpio RST_PCIE_MCIO_1B_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_2A_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_2B_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_3A_PERST_N_CPLD 1
+set_gpio RST_PCIE_MCIO_3B_PERST_N_CPLD 1
+
+# set RST_PCIE_MCIO_4A_PERST_N_CPLD high to avoid resetting E1.S board
+set_gpio RST_PCIE_MCIO_4A_PERST_N_CPLD 1
+
+# set RST_PCIE_MCIO_4B_PERST_N_CPLD high to avoid resetting
+# MCIO 4B PCIe device
+set_gpio RST_PCIE_MCIO_4B_PERST_N_CPLD 1
+
+# set RST_PERST1_N_CPLD high to avoid resetting OCP NIC
+set_gpio RST_PERST1_N_CPLD 1
+
+# set RST_PERST2_N_CPLD high to avoid resetting OCP NIC
+set_gpio RST_PERST2_N_CPLD 1
+
+# set RST_PERST3_N_CPLD high to avoid resetting OCP NIC
+set_gpio RST_PERST3_N_CPLD 1
+
+# set CPLD_MUX6_EN_N to high as default when control the
+# HPM TPM, use a commmand to set it to low
+set_gpio CPLD_MUX6_EN_N 1
+
+# set FM_BIOS_DEBUG_MODE_N to High for disable debug message
+set_gpio FM_BIOS_DEBUG_MODE_N 1
+
+# set SPI_TPM_RST_R_N low to control the HPM_BIOS_TPM reset
+set_gpio SPI_TPM_RST_R_N 0
+
+# set RST_PLTRST_PLD_B_N low to control SCM_BIOS_TPM reset state
+set_gpio RST_PLTRST_PLD_B_N 0
+
+# P3V_BAT_SCALED_EN need to set high to enable for reading CH5 (P3V_BAT_SCALED)
+# on ADS7830. Set to low (disable) as dafault. However, this is a reserved
+# P3V_BAT ADC only
+set_gpio P3V_BAT_SCALED_EN 0
+
+# set FM_USB_MUX_SEL_CPLD to low for BMC USB to MB USB HUB
+set_gpio FM_USB_MUX_SEL_CPLD 0
+
+# set FM_TPM_MUX6_SEL low to the SOC
+set_gpio FM_TPM_MUX6_SEL 0
+
+# Set RST_SOC_PORESET_N_BMC to high before setting SOC_BMC_READY_CPLD
+# high.
+set_gpio RST_SOC_PORESET_N_BMC 1
+set_gpio SOC_BMC_READY_CPLD 1
+
+echo "Reading CLK GEN CK440Q ..."
+i2ctransfer -y 11 w1@0x5F 0x06 r2
+# Disable CLK GEN CK440Q SSC, write 0x3C to byte 6
+if i2ctransfer -y 11 w3@0x5F 0x06 0x01 0x3C; then
+    echo "Disabled CLK GEN CK440Q SSC..."
+else
+    echo "Failed to disable CLK GEN CK440Q SSC..!!"
+fi
+
+# Release USB Hub out of reset
+set_gpio RST_USB_HUB_R_N 1
+
+echo "Rainier Initialization Completed Successfully"
+
+exit 0
