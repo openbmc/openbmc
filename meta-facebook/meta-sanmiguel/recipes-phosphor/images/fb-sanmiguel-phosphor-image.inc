@@ -15,3 +15,9 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
     obmc-phosphor-buttons-signals \
     obmc-phosphor-buttons-handler \
 "
+
+# Extra utility
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    nvme-cli \
+"
+
