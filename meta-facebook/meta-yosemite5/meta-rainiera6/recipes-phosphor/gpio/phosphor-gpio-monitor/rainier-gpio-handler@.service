@@ -1,0 +1,7 @@
+[Unit]
+Description=Rainier GPIO handler (%i)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rainier-gpio-handler %i
+SyslogIdentifier=rainier-gpio-handler-%i

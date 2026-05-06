@@ -1,0 +1,51 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
+source /usr/libexec/yosemite5-common-functions
+input="$1"
+if [[ "$input" != *":"* ]]; then
+    echo "Error: Invalid instance format, expected ':' separator"
+    exit 1
+fi
+
+GPIO_NET=$(echo "$input" | cut -d':' -f1)
+Event=$(echo "$input" | cut -d':' -f2)
+
+trigger_ext_warm_reset() {
+    set_gpio RST_SOC_EXTWARMRESET_CPLD 1
+    sleep 1
+    set_gpio RST_SOC_EXTWARMRESET_CPLD 0
+}
+
+trigger_host_reboot() {
+    systemctl start obmc-host-reboot@0.target
+}
+
+trigger_host_poweroff(){
+    systemctl start obmc-host-shutdown@0.target
+}
+press_reset_button() {
+    systemctl start obmc-host-force-warm-reboot@0.target
+}
+
+case "$GPIO_NET" in
+    SOC_PORQ)
+        trigger_host_reboot
+        ;;
+    SOC_RESETREQ)
+        press_reset_button
+        ;;
+    wALL_POWER_OK_1)
+        if [ "$Event" = "RISING" ]; then
+            set_gpio PMBUS_MUX_SEL_C0 0
+            set_gpio PMBUS_MUX_SEL_C1 0
+        else
+            set_gpio PMBUS_MUX_SEL_C0 1
+            set_gpio PMBUS_MUX_SEL_C1 1
+        fi
+        ;;
+    SOC_SYS_PWRDN_CPLD)
+        trigger_host_poweroff
+        ;;
+    *)
+        ;;
+esac

@@ -1,0 +1,49 @@
+[
+    {
+        "Name": "SOC_PORESET_REQ",
+        "LineName": "SOC_PORQ",
+        "EventMon": "RISING",
+        "Target": "rainier-gpio-handler@SOC_PORQ:RISING.service",
+        "Continue": true
+    },
+    {
+        "Name": "SOC_RESET_REQ",
+        "LineName": "SOC_RESETREQ",
+        "EventMon": "RISING",
+        "Target": "rainier-gpio-handler@SOC_RESETREQ:RISING.service",
+        "Continue": true
+    },
+    {
+        "Name": "SOC_SYS_PWRDN",
+        "LineName": "SOC_SYS_PWRDN_CPLD",
+        "EventMon": "RISING",
+        "Target": "rainier-gpio-handler@SOC_SYS_PWRDN_CPLD:RISING.service",
+        "Continue": true
+    },
+    {
+        "Name": "ALL_POWER_OK_1",
+        "LineName": "wALL_POWER_OK_1",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "rainier-gpio-handler@wALL_POWER_OK_1:RISING.service",
+                "deassert-power-good-drop.service"
+            ],
+            "FALLING": [
+                "rainier-gpio-handler@wALL_POWER_OK_1:FALLING.service",
+                "assert-power-good-drop.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ID_RST_BTN_BMC_R_N",
+        "LineName": "ID_RST_BTN_BMC_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["reset_btn@RISING.service"],
+            "FALLING": ["reset_btn@FALLING.service"]
+        },
+        "Continue": true
+    }
+]
