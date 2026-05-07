@@ -18,7 +18,7 @@ rmc-hsc-power-cycle() {
     #       110 37.1 s
     #       111 74.2 s
     ret1=$(i2cget -y -f 10 0x44)
-    ret2=$(i2cget -y -f 10 0x20)
+    ret2=$(i2cget -y -f 10 0x24)
 
     if [[ "$ret1" =~ ^0x[0-9A-Fa-f]+$ ]]; then
         echo "RMC Main Source AC"
@@ -26,7 +26,7 @@ rmc-hsc-power-cycle() {
         i2cset -y -f 10 0x44 0xfd 0x0b
     elif [[ "$ret2" =~ ^0x[0-9A-Fa-f]+$ ]]; then
         echo "RMC Second Source AC"
-        i2ctransfer -f -y 10 w1@0x20 0xec
+        i2ctransfer -f -y 10 w1@0x24 0xec
     fi
 
     return 0
