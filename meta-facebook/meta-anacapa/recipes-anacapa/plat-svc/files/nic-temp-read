@@ -1,0 +1,134 @@
+#!/bin/bash
+
+declare -a EIDS
+
+is_host_on()
+{
+  local host_power_state=""
+  host_power_state="$(busctl get-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState | cut -d'"' -f2)"
+
+  if [ "$host_power_state" != "xyz.openbmc_project.State.Host.HostState.Running" ]; then
+      return 1
+  fi
+  return 0
+}
+
+setup_eid()
+{
+  for i in $(seq 0 8); do
+      result=$(busctl call au.com.codeconstruct.MCTP1 \
+          "/au/com/codeconstruct/mctp1/interfaces/mctpusb$i" \
+          au.com.codeconstruct.MCTP.BusOwner1 SetupEndpoint ay 0 \
+          2>/dev/null)
+
+      if [ -z "$result" ]; then
+          echo "SetupEndpoint failed: mctpusb$i"
+          continue
+      fi
+
+      EID=$(echo "$result" | awk '{print $2}')
+      EIDS+=("$EID")
+  done
+  return 0
+}
+
+get_numeric_sensor_by_eid()
+{
+  local eid=$1
+  local snr_id=$2
+  local pldmtool_out
+
+  pldmtool_out="$(pldmtool platform GetSensorReading -i "$snr_id" -r 0 -m "$eid")"
+  if echo "$pldmtool_out" | jq 'has("presentReading")' | grep -q true; then
+    echo "$pldmtool_out" | jq '.presentReading'
+    return 0
+  else
+    return 1
+  fi
+}
+
+update_numeric_sensor_value()
+{
+  local eid="$1"
+  local snr_id="$2"
+  local snr_name="$3"
+  local snr_val
+
+  if ! snr_val="$(get_numeric_sensor_by_eid "${eid}" "${snr_id}")"; then
+    echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, snr_id: $snr_id, snr_name: $snr_name"
+    return 1
+  fi
+  busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/temperature/$snr_name" xyz.openbmc_project.Sensor.Value Value d "$snr_val"
+}
+
+poll_numeric_sensor() {
+  local eid="$1"
+  local snr_id="$2"
+  local snr_name="$3"
+
+  if ! is_host_on; then
+    echo "poll_numeric_sensor(): host is off, eid: $eid"
+    return 1
+  fi
+
+  update_numeric_sensor_value "$eid" "$snr_id" "$snr_name"
+  return 0
+}
+
+set_all_external_sensors_invalid()
+{
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/BRB_L_FE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM0_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM0_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM1_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM1_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM2_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM2_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM3_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+  busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM3_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+}
+
+execute_when_host_off()
+{
+  set_all_external_sensors_invalid
+  LAST_HOST_READY="0"
+}
+
+
+# Get initial host power state
+LAST_HOST_READY=$(is_host_on && echo "1" || echo "0")
+
+setup_eid
+
+while true
+do
+  sleep 1
+  HOST_READY=$(is_host_on && echo "1" || echo "0")
+
+  if [ "$HOST_READY" != "$LAST_HOST_READY" ]; then
+    if [ "$HOST_READY" = "1" ]; then
+      sleep 10
+    else
+      execute_when_host_off
+    fi
+  fi
+  LAST_HOST_READY="$HOST_READY"
+
+  # Skip sensor polling when host power off
+  if [ "$HOST_READY" != "1" ]; then
+    continue
+  fi
+
+  poll_numeric_sensor "${EIDS[0]}" 61 BRB_L_FE_NIC0_Temp_C
+  poll_numeric_sensor "${EIDS[1]}" 61 EAM0_BE_NIC0_Temp_C
+  poll_numeric_sensor "${EIDS[2]}" 61 EAM0_BE_NIC1_Temp_C
+  poll_numeric_sensor "${EIDS[3]}" 61 EAM1_BE_NIC0_Temp_C
+  poll_numeric_sensor "${EIDS[4]}" 61 EAM1_BE_NIC1_Temp_C
+  poll_numeric_sensor "${EIDS[5]}" 61 EAM2_BE_NIC0_Temp_C
+  poll_numeric_sensor "${EIDS[6]}" 61 EAM2_BE_NIC1_Temp_C
+  poll_numeric_sensor "${EIDS[7]}" 61 EAM3_BE_NIC0_Temp_C
+  poll_numeric_sensor "${EIDS[8]}" 61 EAM3_BE_NIC1_Temp_C
+
+done
+
+exit 0
