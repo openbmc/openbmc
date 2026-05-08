@@ -24,6 +24,21 @@ plat_get_gpio() {
         "B1_M0_CPU_BOOT_COMPLETE_3V3-I")
             get_ioexp_gpio 7 0x21 14
             ;;
+        "FM_MAIN_PWREN_RMC_ISO_EN_N")
+            get_ioexp_gpio 14 0x20 12
+            ;;
+        "B0_vLeakDetect1Status0-I")
+            get_ioexp_gpio 70 0x52 7
+            ;;
+        "B0_vLeakDetect1Status1-I")
+            get_ioexp_gpio 70 0x52 8
+            ;;
+        "B1_vLeakDetect1Status0-I")
+            get_ioexp_gpio 71 0x52 7
+            ;;
+        "B1_vLeakDetect1Status1-I")
+            get_ioexp_gpio 71 0x52 8
+            ;;
         *)
             get_gpio "$net_name"
             ;;

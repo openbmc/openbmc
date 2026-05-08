@@ -8,6 +8,11 @@ ret=$?
 
 if [ $ret -ne 0 ]; then
     log_msg="host power on failed"
+    if [ $ret -eq 2 ]; then
+        log_msg="$log_msg, rmc main power is disabled"
+    elif [ $ret -eq 3 ]; then
+        log_msg="$log_msg, tray leak detect is not normal"
+    fi
     echo "$log_msg"
     exit 1
 fi

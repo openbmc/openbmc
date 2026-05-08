@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Power Rail Deassert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/power-rail-event-logger "deassert" "%i"
+SyslogIdentifier=%i-power-rail-deassert

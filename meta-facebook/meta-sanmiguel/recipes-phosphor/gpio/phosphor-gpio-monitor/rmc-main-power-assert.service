@@ -1,0 +1,8 @@
+[Unit]
+Description=RMC Main Power Disabled
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rmc-main-power "disabled"
+
+SyslogIdentifier=rmc-main-power-assert

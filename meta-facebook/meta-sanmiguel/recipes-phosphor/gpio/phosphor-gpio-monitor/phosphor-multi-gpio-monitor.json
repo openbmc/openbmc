@@ -116,5 +116,25 @@
             "RISING": ["hmc-ready-assert.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "TRAY_PowerEnable_L",
+        "LineName": "FM_MAIN_PWREN_RMC_ISO_EN_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": [
+                "power-rail-assert-log@TRAY-PowerEnable-L.service",
+                "rmc-main-power-assert.service"
+            ],
+            "FALLING": [
+                "power-rail-assert-log@TRAY-PowerEnable-L.service",
+                "rmc-main-power-assert.service"
+            ],
+            "RISING": [
+                "power-rail-deassert-log@TRAY-PowerEnable-L.service",
+                "rmc-main-power-deassert.service"
+            ]
+        },
+        "Continue": true
     }
 ]

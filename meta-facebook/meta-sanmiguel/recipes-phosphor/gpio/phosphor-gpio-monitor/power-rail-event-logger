@@ -1,0 +1,52 @@
+#!/bin/bash
+
+HELP="
+Usage: power-rail-event-logger <event> <gpio-name>
+<event> is the power rail event to log,
+e.g. assert / deassert.
+
+<gpio-name> is defined in json file,
+e.g. TRAY_PowerEnable_L
+"
+
+# check if parameters are missing
+if [[ -z "$1" || -z "$2" ]]; then
+    echo "Missing required arguments: event type, gpio name."
+    echo "$HELP"
+    exit 1
+fi
+
+GPIO_NAME=$2
+
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+STASH_FILE="/run/${GPIO_NAME}.log_entry"
+
+case $2 in
+    TRAY-PowerEnable-L)
+    DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/SanMiguel_FIO/TRAY-PowerEnable-L"
+    EVENT_DATA="RMC main power disabled"
+    ;;
+
+    *)
+    echo "Unrecognized gpio name."
+    exit 1
+esac
+
+case $1 in
+    "assert")
+        /usr/bin/log-create "$MSG_ID" --json \
+            "{ \"POWER_RAIL\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${EVENT_DATA}\"}" \
+            > "${STASH_FILE}"
+        ;;
+
+    "deassert")
+        MSG_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
+        if [ -s "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+        fi
+        /usr/bin/log-create "$MSG_ID" --json \
+            "{ \"POWER_RAIL\": \"${DEVICE_PATH}\"}"
+        ;;
+esac
+
+exit 0

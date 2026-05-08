@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set_request_host_transition()
+{
+    busctl set-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s "$1"
+}
+
+case $1 in
+    enabled)
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+        ;;
+
+    disabled)
+        set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+        ;;
+
+    *)
+        echo "Unrecognized RMC main power event."
+        exit 1
+esac
+
+exit 0

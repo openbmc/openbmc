@@ -29,6 +29,9 @@ in_pdb_pwrsts="MAIN_PWR_OK-I"
 in_shdn_ok_n="CPU_SHDN_OK_L-I"
 in_cpu_rst_n="CPU_RST_L-I"
 in_run_pwr_pg="RUN_POWER_PG-I"
+in_rmc_main_pwr_en="FM_MAIN_PWREN_RMC_ISO_EN_N"
+in_leak_detect="vLeakDetect1Status0-I"
+in_leak_detect_fault="vLeakDetect1Status1-I"
 
 
 chassis_power_cycle()
@@ -214,6 +217,16 @@ shutdown_request_n_check()
 host_power_on()
 {
     echo "Power On Host"
+
+    # Check RMC main power status
+    if is_rmc_main_power_disable; then
+        return 2
+    fi
+
+    # Check tray leak detect status
+    if ! is_tray_leak_detect_normal; then
+        return 3
+    fi
 
     # Check Host Power Status
     if is_host_power_on; then
@@ -458,6 +471,39 @@ is_host_power_on()
 is_host_power_off()
 {
     [[ "$(host_power_status)" == "off" ]] && return 0
+    return 1
+}
+
+is_rmc_main_power_disable()
+{
+    # 0: rmc main power disabled
+    # 1: rmc main power enabled
+    [[ "$(plat_get_gpio "$in_rmc_main_pwr_en")" -eq 0 ]] && return 0
+    return 1
+}
+
+tray_leak_detect_status()
+{
+    if [[ "$(plat_get_gpio "B0_$in_leak_detect")" -ne 0 ]] || \
+       [[ "$(plat_get_gpio "B0_$in_leak_detect_fault")" -ne 0 ]]; then
+        echo "abnormal"
+        return
+    fi
+
+    if [[ "$(plat_get_gpio "B1_$in_leak_detect")" -ne 0 ]] || \
+       [[ "$(plat_get_gpio "B1_$in_leak_detect_fault")" -ne 0 ]]; then
+        echo "abnormal"
+        return
+    fi
+
+    echo "normal"
+}
+
+is_tray_leak_detect_normal()
+{
+    # 0: no leak detected
+    # 1: leak detected or fault
+    [[ "$(tray_leak_detect_status)" == "normal" ]] && return 0
     return 1
 }
 
