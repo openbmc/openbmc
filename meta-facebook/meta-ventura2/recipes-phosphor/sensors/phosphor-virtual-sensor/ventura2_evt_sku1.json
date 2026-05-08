@@ -454,5 +454,54 @@
             "  default : 0.9507*(TEMP[0])-0.0013;",
             "}"
         ]
+    },
+    {
+        "Desc": {
+            "Name": "RMC_AIR_FLOW",
+            "SensorType": "airflow"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Ventura2_RMC"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FCB_0_FAN0_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN0_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN1_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN1_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN2_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN2_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                },
+                {
+                    "ParamName": "FCB_0_FAN3_PWM_PCT",
+                    "Desc": {
+                        "Name": "FCB_0_FAN3_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_AVG:=avg(FCB_0_FAN0_PWM_PCT, FCB_0_FAN1_PWM_PCT, FCB_0_FAN2_PWM_PCT, FCB_0_FAN3_PWM_PCT) / 100;",
+            "211.18 * pow(DUTY_AVG, 4) - 480.8 * pow(DUTY_AVG, 3) + 372.72 * pow(DUTY_AVG, 2) - 9.4858 * DUTY_AVG + 8.6427"
+        ]
     }
 ]
