@@ -1,6 +1,7 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
 PACKAGECONFIG:remove = "no-warm-reboot"
+PACKAGECONFIG:remove = "only-run-apr-on-power-loss"
 
 PACKAGECONFIG:append = " check-fwupdate-before-do-transition"
 PACKAGECONFIG:append = " host-gpio"
