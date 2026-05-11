@@ -1,0 +1,7 @@
+[Unit]
+Description=Hotplug AC Cycle trigger:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/hotplug-ac-cycle %i
+SyslogIdentifier=hotplug-ac-cycle%i

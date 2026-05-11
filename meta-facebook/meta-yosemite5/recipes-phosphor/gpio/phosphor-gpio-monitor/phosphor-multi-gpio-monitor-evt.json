@@ -558,5 +558,14 @@
             "FALLING": ["power-rail-assert-log@pdb_FM_SLOT6_HSC_FAULT.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "NIC_PRSNT_N",
+        "LineName": "NIC_PRSNT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": ["hotplug-ac-cycle@FALLING.service"]
+        },
+        "Continue": true
     }
 ]

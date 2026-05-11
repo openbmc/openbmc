@@ -1,0 +1,25 @@
+#!/bin/bash
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
+source /usr/libexec/yosemite5-common-functions
+
+input="$1"
+
+if [ "$input" == "FALLING" ] ; then
+    # debounce
+    sleep 0.2
+
+    GPIO_STATUS=$(grep "NIC_PRSNT_N" /sys/kernel/debug/gpio)
+
+    if echo "$GPIO_STATUS" | grep -q " hi "; then
+        echo "NIC not present, skipping hotplug AC cycle."
+        exit 1
+    fi
+
+    # PDB CPLD
+    if ! i2cset -f -y 8 0x0F 0x10 0xFE; then
+        exit 1
+    fi
+    i2cset -f -y 11 0x0F 0x13 0x01
+
+    i2cset -f -y 9 0x0F 0x0C 0xFD
+fi
