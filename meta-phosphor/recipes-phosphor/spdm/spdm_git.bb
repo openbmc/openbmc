@@ -2,7 +2,7 @@ SUMMARY = "SPDM Stack"
 DESCRIPTION = "Implementation of the SPDM specification for secure authentication and attestation"
 
 SRC_URI = "git://github.com/openbmc/spdm.git;branch=main;protocol=https"
-SRCREV = "2e827d5bac7bca463443732c3c3e5509a912b5b2"
+SRCREV = "ca670ece060949cea08314540686d891e4d02c17"
 
 PV = "1.0+git${SRCPV}"
 PR = "r1"
@@ -20,4 +20,10 @@ DEPENDS = " \
     phosphor-logging \
 "
 SYSTEMD_SERVICE:${PN} += "spdmd.service"
+
+PACKAGECONFIG ?= "\
+    ${@bb.utils.contains('DISTRO_FEATURES', 'ptest', 'ptest', '', d)} \
+"
+
+PACKAGECONFIG[ptest] = "-Dtests=enabled,-Dtests=disabled,gtest"
 
