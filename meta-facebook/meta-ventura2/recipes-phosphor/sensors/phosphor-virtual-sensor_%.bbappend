@@ -4,15 +4,18 @@ inherit obmc-phosphor-systemd
 RDEPENDS:${PN}:append:ventura2 = " bash"
 
 SRC_URI:append:ventura2 = " \
-	file://virtual_sensor_config.json \
-	file://check-interposer-config \
-	file://check-interposer-config.conf \
+    file://virtual_sensor_config.json \
+    file://check-interposer-config \
+    file://check-interposer-config.conf \
     file://ventura2_evt_sku1.json \
-	file://ventura2_evt_sku2.json \
+    file://ventura2_pvt_sku1_2nd.json \
+    file://ventura2_evt_sku2.json \
     file://ventura2_pvt_sku1.json \
     file://ventura2_pvt_sku1c.json \
     file://ventura2_pvt_sku4.json \
     file://ventura2_pvt_sku4c.json \
+    file://ventura2_cable_ina.json \
+    file://ventura2_cable_isl.json \
 	"
 
 FILES:${PN}:append:ventura2 = "\
@@ -29,9 +32,12 @@ do_install:append:ventura2() {
     install -m 0644 -D ${UNPACKDIR}/ventura2_evt_sku1.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_evt_sku1.json
     install -m 0644 -D ${UNPACKDIR}/ventura2_evt_sku2.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_evt_sku2.json
     install -m 0644 -D ${UNPACKDIR}/ventura2_pvt_sku1.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_pvt_sku1.json
+    install -m 0644 -D ${UNPACKDIR}/ventura2_pvt_sku1_2nd.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_pvt_sku1_2nd.json
     install -m 0644 -D ${UNPACKDIR}/ventura2_pvt_sku1c.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_pvt_sku1c.json
     install -m 0644 -D ${UNPACKDIR}/ventura2_pvt_sku4.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_pvt_sku4.json
     install -m 0644 -D ${UNPACKDIR}/ventura2_pvt_sku4c.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_pvt_sku4c.json
+    install -m 0644 -D ${UNPACKDIR}/ventura2_cable_ina.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_cable_ina.json
+    install -m 0644 -D ${UNPACKDIR}/ventura2_cable_isl.json ${D}${datadir}/phosphor-virtual-sensor/ventura2_cable_isl.json
 
     LIBEXECDIR="${D}${libexecdir}/phosphor-virtual-sensor"
     install -d ${LIBEXECDIR}

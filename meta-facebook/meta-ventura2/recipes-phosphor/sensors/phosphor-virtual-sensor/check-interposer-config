@@ -1,8 +1,11 @@
 #!/bin/bash
 
+VENTURA2_CABLE_INA_PATH="/usr/share/phosphor-virtual-sensor/ventura2_cable_ina.json"
+VENTURA2_CABLE_ISL_PATH="/usr/share/phosphor-virtual-sensor/ventura2_cable_isl.json"
 VENTURA2_EVT_SKU1_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_evt_sku1.json"
 VENTURA2_EVT_SKU2_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_evt_sku2.json"
 VENTURA2_PVT_SKU1_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku1.json"
+VENTURA2_PVT_SKU1_2ND_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku1_2nd.json"
 VENTURA2_PVT_SKU1C_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku1c.json"
 VENTURA2_PVT_SKU4_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku4.json"
 VENTURA2_PVT_SKU4C_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku4c.json"
@@ -38,6 +41,19 @@ check_ventura2_stage()
     echo "$stage"
 }
 
+check_source()
+{
+    fru_path=$(busctl tree xyz.openbmc_project.FruDevice | grep Ventura2_RMC | awk '{print $2}')
+
+    if [ -z "$fru_path" ]; then
+        echo "Ventura2_RMC FRU not found"
+        return 1
+    fi
+    cable_source=$(busctl get-property xyz.openbmc_project.FruDevice "$fru_path" xyz.openbmc_project.FruDevice BOARD_INFO_AM4 2>/dev/null | awk -F\" '{print $2}' | awk '{print $3
+}')
+    echo "$cable_source"
+}
+
 # create config folder if not exist
 if [ ! -d "$CONFIG_DIR" ]; then
     mkdir -p "$CONFIG_DIR"
@@ -54,47 +70,63 @@ do
     echo "check interposer board type, attempt $i"
     sku=$(check_ventura2_sku | tr '[:upper:]' '[:lower:]')
     stage=$(check_ventura2_stage | tr '[:upper:]' '[:lower:]')
-    echo "Stage: $stage, SKU: $sku"
+    cable_source=$(check_source | tr '[:upper:]' '[:lower:]')
+    echo "Stage: $stage, SKU: $sku, Cable_source: $cable_source"
+    if [[ "$cable_source" == "p24vsen-ina" ]]; then
+        CABLE_PATH="$VENTURA2_CABLE_INA_PATH"
+    elif [ "$cable_source" = "p24vsen-isl" ]; then
+        CABLE_PATH="$VENTURA2_CABLE_ISL_PATH"
+    else
+        # Use INA for default path
+        CABLE_PATH="$VENTURA2_CABLE_INA_PATH"
+    fi
     case "$stage" in
         "evt")
             case "$sku" in
                 "sku 1" | "sku 4")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_EVT_SKU1_CONF_PATH")"
-                    ln -sf "$VENTURA2_EVT_SKU1_CONF_PATH" "$CONFIG_PATH"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_EVT_SKU1_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 "sku 2" | "sku 1c" | "sku 4c")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_EVT_SKU2_CONF_PATH")"
-                    ln -sf "$VENTURA2_EVT_SKU2_CONF_PATH" "$CONFIG_PATH"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_EVT_SKU2_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 *)
                     echo "Unknown SKU for EVT: $sku"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_EVT_SKU1_CONF_PATH" > "$CONFIG_PATH"
                     ;;
             esac
             ;;
         "pvt")
             case "$sku" in
                 "sku 1")
-                    echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU1_CONF_PATH")"
-                    ln -sf "$VENTURA2_PVT_SKU1_CONF_PATH" "$CONFIG_PATH"
+                    if [ "$cable_source" = "p24vsen-isl" ]; then
+                        echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU1_2ND_CONF_PATH")"
+                        jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU1_2ND_CONF_PATH" > "$CONFIG_PATH"
+                    else
+                        echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU1_CONF_PATH")"
+                        jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU1_CONF_PATH" > "$CONFIG_PATH"
+                    fi
                     break ;;
                 "sku 1c")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU1C_CONF_PATH")"
-                    ln -sf "$VENTURA2_PVT_SKU1C_CONF_PATH" "$CONFIG_PATH"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU1C_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 "sku 4")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU4_CONF_PATH")"
-                    ln -sf "$VENTURA2_PVT_SKU4_CONF_PATH" "$CONFIG_PATH"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU4_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 "sku 4c")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU4C_CONF_PATH")"
-                    ln -sf "$VENTURA2_PVT_SKU4C_CONF_PATH" "$CONFIG_PATH"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU4C_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 "sku 2")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_EVT_SKU2_CONF_PATH")"
-                    ln -sf "$VENTURA2_EVT_SKU2_CONF_PATH" "$CONFIG_PATH"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_EVT_SKU2_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 *)
                     echo "Unknown SKU for PVT: $sku"
+                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU1_CONF_PATH" > "$CONFIG_PATH"
                     ;;
             esac
             ;;
