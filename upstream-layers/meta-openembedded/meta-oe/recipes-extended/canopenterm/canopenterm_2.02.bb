@@ -15,13 +15,15 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=bd2edc721b4a0289efe949bdbe7dda79"
 
 DEPENDS = "canvenient cjson isocline libinih libsdl3 lua pocketpy"
 
-SRC_URI = "git://github.com/CANopenTerm/CANopenTerm.git;protocol=https;branch=main;tag=v${PV}"
-SRCREV  = "4196097f71c7e59b27e9d8ac3c6cf58f44fa9f19"
+PV .= "+git"
+
+SRC_URI = "git://github.com/CANopenTerm/CANopenTerm.git;protocol=https;branch=main"
+SRCREV  = "7a9466029a6e88345e65e794ff1779f778c9358a"
 
 
 inherit cmake ptest
 
-EXTRA_OECMAKE += "-DBUILD_YOCTO=ON"
+EXTRA_OECMAKE += "-DUSE_SYSTEM_LIBS=ON"
 
 FILES:${PN} += "${bindir}/CANopenTerm ${bindir}/codb2json ${datadir}"
 

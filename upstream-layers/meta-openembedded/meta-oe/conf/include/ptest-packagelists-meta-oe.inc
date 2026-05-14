@@ -80,6 +80,7 @@ PTESTS_SLOW_META_OE = "\
     postgresql \
     re2 \
     rocksdb \
+    tbb \
 "
 PTESTS_SLOW_META_OE:append:x86 = " kernel-selftest"
 PTESTS_SLOW_META_OE:append:x86-64 = " kernel-selftest"

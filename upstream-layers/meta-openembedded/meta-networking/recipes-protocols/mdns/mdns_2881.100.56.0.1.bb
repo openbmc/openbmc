@@ -17,7 +17,7 @@ SRC_URI = "git://github.com/apple-oss-distributions/mDNSResponder;protocol=https
            file://0007-mDNSShared-Make-Apple-Wireless-Direct-Link-depend-on.patch \
            "
 BRANCH = "rel/mDNSResponder-2881"
-SRCREV = "e2a1e56a2f8d29640908c48f4de3f1ba65d1af46"
+SRCREV = "ea3902cfeff86a04b4c684753c80e425edbd1a21"
 
 inherit github-releases manpages systemd update-rc.d
 

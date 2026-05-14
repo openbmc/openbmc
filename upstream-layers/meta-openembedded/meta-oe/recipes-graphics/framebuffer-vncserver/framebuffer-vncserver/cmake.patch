@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rg=20Sommer?= <joerg@jo-so.de>
+Date: Tue, 21 Apr 2026 20:20:42 +0200
+Subject: [PATCH] CMakeLists: Raise minimum version to 3.10
+
+CMake 4 requires at least 3.5, but suggests 3.10.
+
+Signed-off-by: Jörg Sommer <joerg@jo-so.de>
+Upstream-Status: Submitted [https://github.com/ponty/framebuffer-vncserver/pull/30]
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index c8b8f90..d342734 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,5 +1,5 @@
+ PROJECT(framebuffer-vncserver)
+-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
++CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+ 
+ 
+ FILE(GLOB SOURCES src/*.c)

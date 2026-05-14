@@ -10,13 +10,11 @@ LIC_FILES_CHKSUM = "file://doc/licenses/GPL-2.0;md5=b234ee4d69f5fce4486a80fdaf4a
                     file://doc/licenses/LGPL-2.1;md5=4fbd65380cdd255951079008b364516c"
 
 
-SRC_URI = "git://github.com/FRRouting/frr.git;protocol=https;nobranch=1;tag=frr-${PV} \
+SRC_URI = "git://github.com/FRRouting/frr.git;protocol=https;branch=stable/10.6;tag=frr-${PV} \
            file://frr.pam \
-           file://CVE-2025-61099-61107-1.patch \
-           file://CVE-2025-61099-61107-2.patch \
-           file://CVE-2025-61099-61107-3.patch \
+           file://0001-lib-fix-mgmt_msg-recv-to-deal-with-mis-alignment.patch \
            "
-SRCREV = "cd39d029a48a1e58929a7f31e7d61a594c2ecb42"
+SRCREV = "71da51baee6fb2a02b24262defc46591c86e8a81"
 
 UPSTREAM_CHECK_GITTAGREGEX = "frr-(?P<pver>\d+(\.\d+)+)$"
 

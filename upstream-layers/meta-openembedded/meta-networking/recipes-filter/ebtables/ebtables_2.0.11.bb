@@ -52,4 +52,5 @@ SYSTEMD_SERVICE:${PN} = "ebtables.service"
 
 ALTERNATIVE:${PN} = "ebtables"
 ALTERNATIVE_LINK_NAME[ebtables] = "${sbindir}/ebtables"
+ALTERNATIVE_TARGET[ebtables] = "${sbindir}/ebtables-legacy"
 ALTERNATIVE_PRIORITY[ebtables] = "90"

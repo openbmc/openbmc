@@ -19,17 +19,14 @@ RDEPENDS:${PN} += "perl perl-module-posix perl-module-autoloader \
     perl-module-tie-hash bash \
     "
 
-SRC_URI = "http://www.memcached.org/files/${BP}.tar.gz \
-           file://memcached-add-hugetlbfs-check.patch \
-           "
+SRC_URI = "http://www.memcached.org/files/${BP}.tar.gz"
 SRC_URI[sha256sum] = "e097073c156eeff9e12655b054f446d57374cfba5c132dcdbe7fac64e728286a"
 
 CVE_STATUS[CVE-2022-26635] = "disputed: this is a problem of applications using php-memcached inproperly"
 
 UPSTREAM_CHECK_URI = "${HOMEPAGE}"
 
-# set the same COMPATIBLE_HOST as libhugetlbfs
-COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64|aarch64|arm).*-linux*"
+COMPATIBLE_HOST = "(i.86|x86_64|powerpc|powerpc64|riscv64|aarch64|arm).*-linux*"
 
 # assoc.c:83:9: error: variable 'depth' set but not used [-Werror,-Wunused-but-set-variable]
 CFLAGS:append:toolchain-clang = " -Wno-error=unused-but-set-variable"
@@ -41,9 +38,6 @@ python __anonymous () {
     else:
         d.appendVar('EXTRA_OECONF', " ac_cv_c_endian=big")
 }
-
-PACKAGECONFIG ??= ""
-PACKAGECONFIG[hugetlbfs] = "--enable-hugetlbfs, --disable-hugetlbfs, libhugetlbfs"
 
 inherit update-rc.d
 

@@ -15,19 +15,22 @@ PE = "1"
 BRANCH = "onetbb_2022"
 SRCREV = "f1862f38f83568d96e814e469ab61f88336cc595"
 SRC_URI = "git://github.com/oneapi-src/oneTBB.git;protocol=https;branch=${BRANCH} \
+           file://run-ptest \
           "
 
 LDFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'ld-is-lld', ' -Wl,--undefined-version', '', d)}"
 
-inherit cmake pkgconfig
+inherit cmake pkgconfig ptest
 
 # test build fails, error: 'mallinfo mallinfo()' is deprecated
 EXTRA_OECMAKE += " \
-                    -DTBB_TEST=OFF \
+                    -DTBB_TEST=${@bb.utils.contains('PTEST_ENABLED', '1', 'ON', 'OFF', d)} \
                     -DCMAKE_BUILD_TYPE=Release \
                     -DTBB_STRICT=OFF \
                     -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF \
                 "
+
+RDEPENDS:${PN}-ptest += "cmake"
 
 # Hard-float 'd' ABI can't be used for a target that doesn't support the D instruction set extension (ignoring target-abi)
 # tmp-glibc/work/riscv64-oe-linux/tbb/1_2021.7.0-r0/recipe-sysroot-native/usr/bin/riscv64-oe-linux/riscv64-oe-linux-ld: /tmp/lto-llvm-264bc2.o: can't link soft-float modules with double-float modules
@@ -60,5 +63,24 @@ do_install:append:class-target() {
     sed -i "s#${RECIPE_SYSROOT}##g" ${D}${libdir}/cmake/TBB/TBBTargets.cmake
 }
 
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}
+    install ${B}/test/CTestTestfile.cmake ${D}${PTEST_PATH}/
+    sed -i -e s#${S}#${PTEST_PATH}#g \
+           -e s#${B}#${PTEST_PATH}#g \
+            ${D}${PTEST_PATH}/CTestTestfile.cmake
+}
+
+do_install_ptest:append:toolchain-gcc() {
+    cp -rf ${B}/gnu* ${D}${PTEST_PATH}
+    rm -rf ${D}${PTEST_PATH}/gnu*/libtbb*
+    rm -rf ${D}${PTEST_PATH}/gnu*/*.sh
+}
+
+do_install_ptest:append:toolchain-clang() {
+    cp -rf ${B}/clang* ${D}${PTEST_PATH}
+    rm -rf ${D}${PTEST_PATH}/clang*/libtbb*
+    rm -rf ${D}${PTEST_PATH}/clang*/*.sh
+}
 
 BBCLASSEXTEND = "native nativesdk"

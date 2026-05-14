@@ -9,7 +9,7 @@ SRC_URI = " \
     file://install-bench.patch \
     file://run-ptest \
 "
-SRC_URI[sha256sum] = "56c932549852cddcfafdab3820b0200c7742675be92179e59e6215b340e26467"
+SRC_URI[sha256sum] = "5630c24cdeb33b131612f7eb4b1a9934234754f9f388ff8617458d0be6f239a1"
 
 UPSTREAM_CHECK_URI = "http://www.fftw.org/download.html"
 
@@ -57,7 +57,7 @@ do_configure() {
 do_compile() {
     for lib in fftw fftwl fftwf; do
         cd ${WORKDIR}/build-$lib
-        test -n "${TOOLCHAIN_OPTIONS}" && sed -i -e 's|${TOOLCHAIN_OPTIONS}||g' config.h
+        sed -i -e 's|${DEBUG_PREFIX_MAP}||g; s|--sysroot=${STAGING_DIR_TARGET}||g' config.h
         autotools_do_compile
     done
 }

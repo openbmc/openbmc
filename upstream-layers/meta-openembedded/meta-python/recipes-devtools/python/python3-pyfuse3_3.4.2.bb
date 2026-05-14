@@ -13,4 +13,10 @@ DEPENDS = " \
     python3-setuptools-scm-native \
 "
 
-RDEPENDS:${PN} = "python3-trio"
+RDEPENDS:${PN} += " \
+    python3-ctypes \
+    python3-logging \
+    python3-pickle \
+    python3-threading \
+    python3-trio \
+"
