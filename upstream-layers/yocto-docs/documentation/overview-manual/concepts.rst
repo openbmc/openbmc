@@ -779,17 +779,20 @@ to a holding area (staged) in preparation for packaging:
 This step in the build process consists of the following tasks:
 
 -  :ref:`ref-tasks-prepare_recipe_sysroot`:
-   This task sets up the two sysroots in
-   ``${``\ :term:`WORKDIR`\ ``}``
-   (i.e. ``recipe-sysroot`` and ``recipe-sysroot-native``) so that
-   during the packaging phase the sysroots can contain the contents of
-   the
-   :ref:`ref-tasks-populate_sysroot`
-   tasks of the recipes on which the recipe containing the tasks
-   depends. A sysroot exists for both the target and for the native
-   binaries, which run on the host system.
+   This task sets up the two sysroots in the ``${``\ :term:`WORKDIR`\ ``}`` (i.e.
+   ``recipe-sysroot`` and ``recipe-sysroot-native``) so that the subsequent tasks
+   of the recipe (notably :ref:`ref-tasks-configure` and :ref:`ref-tasks-compile`)
+   can access the libraries, headers, and similar files built by the recipes on
+   which it depends.
 
--  *do_configure*: This task configures the source by enabling and
+   -  ``recipe-sysroot``: contains target libraries, and associated headers and
+      other data needed to cross-build software from its sources
+
+   -  ``recipe-sysroot-native``: contains host-native executables with their libraries
+      and other data, so that they can be run directly on the build host when
+      that is required by the build process
+
+-  :ref:`ref-tasks-configure`: This task configures the source by enabling and
    disabling any build-time and configuration options for the software
    being built. Configurations can come from the recipe itself as well
    as from an inherited class. Additionally, the software itself might
@@ -808,7 +811,7 @@ This step in the build process consists of the following tasks:
    class, see the :ref:`ref-classes-autotools` class
    :oe_git:`here </openembedded-core/tree/meta/classes-recipe/autotools.bbclass>`.
 
--  *do_compile*: Once a configuration task has been satisfied,
+-  :ref:`ref-tasks-compile`: Once a configuration task has been satisfied,
    BitBake compiles the source using the
    :ref:`ref-tasks-compile` task.
    Compilation occurs in the directory pointed to by the
@@ -816,7 +819,7 @@ This step in the build process consists of the following tasks:
    :term:`B` directory is, by default, the same as the
    :term:`S` directory.
 
--  *do_install*: After compilation completes, BitBake executes the
+-  :ref:`ref-tasks-install`: After compilation completes, BitBake executes the
    :ref:`ref-tasks-install` task.
    This task copies files from the :term:`B` directory and places them in a
    holding area pointed to by the :term:`D`

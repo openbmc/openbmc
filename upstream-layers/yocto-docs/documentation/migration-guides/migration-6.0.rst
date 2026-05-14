@@ -291,6 +291,95 @@ information.
 Users are advised to transition to SDPX 3.0, which is provided by the
 :ref:`ref-classes-create-spdx` class.
 
+``cve-check`` class removed
+---------------------------
+
+The ``cve-check`` class was removed and replaced by the
+:ref:`ref-classes-sbom-cve-check` class. Quoting the commit removing the class
+(:oecore_rev:`00de455f8d3aeca880129d23e8cfb7e246404699`):
+
+.. code-block:: text
+
+   It's been long known that the cve-check class in oe-core is not that
+   usable in the real world, for more details see "Future of CVE scanning
+   in Yocto"[1].  This mail proposed an alternative direction that included
+   a CVE scanning tool that can be ran both during the build and afterwards,
+   so that periodic scans of a previously build image is possible.
+
+   Last year, Bootlin wrote sbom-cve-check[2] and I compared this to my
+   proposal in "Comparing cve-check with sbom-cve-check"[3], concluding
+   that this is likely the missing piece.
+
+   Support for sbom-cve-check has been merged into oe-core, and the
+   cve-check class is now obsolete. So that we don't have to maintain it for
+   the four-year lifecycle of the Wrynose release, delete it.
+
+   This patch also deletes the database fetcher recipes, and the test cases
+   that were specific to cve-check.  Note that the oe.cve_check library
+   still exists as this is used by the SPDX classes.
+
+   [1] https://lore.kernel.org/openembedded-core/7D6E419E-A7AE-4324-966C-3552C586E452@arm.com/
+   [2] https://github.com/bootlin/sbom-cve-check
+   [3] https://lore.kernel.org/openembedded-core/2CD10DD9-FB2A-4B10-B98A-85918EB6B4B7@arm.com/
+
+Users currently using the ``cve-check`` class are advised to switch to
+:ref:`ref-classes-sbom-cve-check`:
+
+-  The following assignment::
+
+      INHERIT += "cve-check"
+
+   Should be removed and replaced by::
+
+      OE_FRAGMENTS += "core/yocto/sbom-cve-check"
+
+   This will enable the :ref:`ref-classes-sbom-cve-check` class along with the recommended
+   settings.
+
+   This will deploy two files to the deployment directory
+   (:term:`DEPLOY_DIR_IMAGE`) after building an image:
+
+   -  A file ending with ``.sbom-cve-check.yocto.json``: this is the output JSON
+      report in the same format as the one deployed by the ``cve-check`` class.
+
+   -  A file ending with ``.sbom-cve-check.spdx.json``: this is an output SPDX
+      report annonated with vulnerable CVEs.
+
+-  The ``cve-check`` class output summary file (deployed in the
+   :term:`DEPLOY_DIR_IMAGE`) ending with ``.cve.txt`` is no longer
+   deployed by default but can be added back by adding the following statement
+   to a configuration file::
+
+      SBOM_CVE_CHECK_EXPORT_VARS:append = " SBOM_CVE_CHECK_EXPORT_SUMMARY"
+
+   This will deploy a new file ending with ``.cve.txt``, which uses the same
+   format as the summary previously deployed by the ``cve-check`` class.
+
+   See the documentation of :term:`SBOM_CVE_CHECK_EXPORT_VARS` for more
+   details.
+
+-  The ``CVE_CHECK_SHOW_WARNINGS`` variable, which was used to control whether
+   the ``cve-check`` would print warning when unpatched CVEs were found, is now
+   removed and replaced by the :term:`SBOM_CVE_CHECK_SHOW_WARNINGS` variable,
+   which does the same.
+
+See the :doc:`/security-manual/vulnerabilities` section of the Yocto Project
+Security Manual for more information.
+
+:term:`CVE_PRODUCT` character escaping change
+---------------------------------------------
+
+The :term:`CVE_PRODUCT` variable, which specifies a name used to match the
+recipe name against the name in the upstream `NIST CVE database
+<https://nvd.nist.gov/>`__, used to require special characters to be escaped.
+
+This is no longer, the case. For example, the :term:`CVE_PRODUCT` variable for
+the ``webkitgtk`` recipe must no longer be written as ``webkitgtk\+`` but
+``webkitgtk+``.
+
+Users are advised to review their :term:`CVE_PRODUCT` assignments and remove any
+special character escaping.
+
 .. _ref-migration-6-0-wic-sector-size-change:
 
 :term:`WIC_SECTOR_SIZE` should be replaced by ``--sector-size``
@@ -395,6 +484,13 @@ The following recipes have been removed in this release:
 -  ``python3-pyzstd``: there were no users of this in :term:`OpenEmbedded-Core
    (OE-Core)` and Python 3.14 now has built-in support for zstd
    (:oecore_rev:`55061de857657ea01babc5652caa062e8d292c44`)
+
+-  ``cve-update-db-native``, ``cve-update-nvd2-native``: removed with the
+   ``cve-check`` class removal as it was the only user of these recipes.
+   (:oecore_rev:`00de455f8d3aeca880129d23e8cfb7e246404699`)
+
+-  ``python3-roman-numerals-py``: renamed to ``python3-roman-numerals``
+   (:oecore_rev:`faff756e829b852724ad706051d6a771071440cb`)
 
 Removed :term:`PACKAGECONFIG` options
 -------------------------------------

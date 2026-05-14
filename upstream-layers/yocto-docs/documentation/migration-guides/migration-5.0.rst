@@ -186,7 +186,7 @@ Miscellaneous changes
 -  ``recipetool`` now prefixes the names of recipes created for Python modules
    with ``python3-``.
 
--  The :ref:`ref-classes-cve-check` class no longer produces a warning for
+-  The ``cve-check`` class no longer produces a warning for
    remote patches --- it only logs a note and does not try to fetch the patch
    in order to scan it for issues or CVE numbers. However, CVE number
    references in remote patch file names will now be picked up.

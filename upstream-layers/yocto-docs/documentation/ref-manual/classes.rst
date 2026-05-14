@@ -596,78 +596,6 @@ cross-compilation tools used for building SDKs. See the
 section in the Yocto Project Overview and Concepts Manual for more
 discussion on these cross-compilation tools.
 
-.. _ref-classes-cve-check:
-
-``cve-check``
-=============
-
-The :ref:`ref-classes-cve-check` class looks for known CVEs (Common Vulnerabilities
-and Exposures) while building with BitBake. This class is meant to be
-inherited globally from a configuration file::
-
-   INHERIT += "cve-check"
-
-To filter out obsolete CVE database entries which are known not to impact
-software from :term:`OpenEmbedded-Core (OE-Core)`, add the following line to the
-build configuration file::
-
-   include cve-extra-exclusions.inc
-
-You can also look for vulnerabilities in specific packages by passing
-``-c cve_check`` to BitBake.
-
-After building the software with Bitbake, CVE check output reports are available in ``tmp/deploy/cve``
-and image specific summaries in ``tmp/deploy/images/*.json`` files.
-
-When building, the CVE checker will emit build time warnings for any detected
-issues which are in the state ``Unpatched``, meaning that CVE issue seems to affect the software component
-and version being compiled and no patches to address the issue are applied. Other states
-for detected CVE issues are: ``Patched`` meaning that a patch to address the issue is already
-applied, and ``Ignored`` meaning that the issue can be ignored.
-
-The ``Patched`` state of a CVE issue is detected from patch files with the format
-``CVE-ID.patch``, e.g. ``CVE-2019-20633.patch``, in the :term:`SRC_URI` and using
-CVE metadata of format ``CVE: CVE-ID`` in the commit message of the patch file.
-
-.. note::
-
-   Commit message metadata (``CVE: CVE-ID`` in a patch header) will not be scanned
-   in any patches that are remote, i.e. that are anything other than local files
-   referenced via ``file://`` in SRC_URI. However, a ``CVE-ID`` in a remote patch
-   file name itself will be registered.
-
-If the recipe adds ``CVE-ID`` as flag of the :term:`CVE_STATUS` variable with status
-mapped to ``Ignored``, then the CVE state is reported as ``Ignored``::
-
-   CVE_STATUS[CVE-2020-15523] = "not-applicable-platform: Issue only applies on Windows"
-
-If CVE check reports that a recipe contains false positives or false negatives, these may be
-fixed in recipes by adjusting the CVE product name using :term:`CVE_PRODUCT` and :term:`CVE_VERSION` variables.
-:term:`CVE_PRODUCT` defaults to the plain recipe name :term:`BPN` which can be adjusted to one or more CVE
-database vendor and product pairs using the syntax::
-
-   CVE_PRODUCT = "flex_project:flex"
-
-where ``flex_project`` is the CVE database vendor name and ``flex`` is the product name. Similarly
-if the default recipe version :term:`PV` does not match the version numbers of the software component
-in upstream releases or the CVE database, then the :term:`CVE_VERSION` variable can be used to set the
-CVE database compatible version number, for example::
-
-   CVE_VERSION = "2.39"
-
-Any bugs or missing or incomplete information in the CVE database entries should be fixed in the CVE database
-via the `NVD feedback form <https://nvd.nist.gov/info/contact-form>`__.
-
-Users should note that security is a process, not a product, and thus also CVE checking, analyzing results,
-patching and updating the software should be done as a regular process. The data and assumptions
-required for CVE checker to reliably detect issues are frequently broken in various ways.
-These can only be detected by reviewing the details of the issues and iterating over the generated reports,
-and following what happens in other Linux distributions and in the greater open source community.
-
-You will find some more details in the
-":ref:`security-manual/vulnerabilities:checking for vulnerabilities`"
-section in the Development Tasks Manual.
-
 .. _ref-classes-cython:
 
 ``cython``
@@ -3818,8 +3746,7 @@ using the Vala programming language.
 ========
 
 The :ref:`ref-classes-vex` class is used to generate metadata needed by external
-tools to check for vulnerabilities, for example CVEs. It can be used as a
-replacement for :ref:`ref-classes-cve-check`.
+tools to check for vulnerabilities, for example CVEs.
 
 In order to use this class, inherit the class in the ``local.conf`` file and it
 will add the ``generate_vex`` task for every recipe::
@@ -3829,9 +3756,6 @@ will add the ``generate_vex`` task for every recipe::
 If an image is built it will generate a report in :term:`DEPLOY_DIR_IMAGE` for
 all the packages used, it will also generate a file for all recipes used in the
 build.
-
-Variables use the ``CVE_CHECK`` prefix to keep compatibility with the
-:ref:`ref-classes-cve-check` class.
 
 Example usage::
 

@@ -35,8 +35,8 @@ New Features / Enhancements in |yocto-ver|
       install tags (``--tags``) to the ``meson install`` command during the
       :ref:`ref-tasks-install` task.
 
-   -  :ref:`ref-classes-cve-check`: :term:`NVD_DB_VERSION` to allow choosing the
-      CVE feed when using the :ref:`ref-classes-cve-check` class.
+   -  ``cve-check``: ``NVD_DB_VERSION`` to allow choosing the
+      CVE feed when using the ``cve-check`` class.
 
    -  The :term:`BB_USE_HOME_NPMRC` controls whether or not BitBake uses the
       user's ``.npmrc`` file within their home directory within the npm fetcher.
@@ -479,7 +479,7 @@ New Features / Enhancements in |yocto-ver|
    -  ``openssh``: be more restrictive on private key file permissions by
       setting them from the :ref:`ref-tasks-install` task.
 
--  :ref:`ref-classes-cve-check` changes:
+-  ``cve-check`` changes:
 
    -  Update the :term:`DL_DIR` database location name
       (``${DL_DIR}/CVE_CHECK2``).
@@ -490,15 +490,15 @@ New Features / Enhancements in |yocto-ver|
 
    -  Fix malformed cve status description with ``:`` characters.
 
-   -  Restore the :term:`CVE_CHECK_SHOW_WARNINGS` variable and functionality. It
+   -  Restore the ``CVE_CHECK_SHOW_WARNINGS`` variable and functionality. It
       currently prints warning message for every unpatched CVE the
-      :ref:`ref-classes-cve-check` class finds.
+      ``cve-check`` class finds.
 
-   -  Users can control the NVD database source using the :term:`NVD_DB_VERSION`
+   -  Users can control the NVD database source using the ``NVD_DB_VERSION``
       variable with possible values ``NVD1``, ``NVD2``, or ``FKIE``.
 
    -  The default feed for CVEs is now ``FKIE`` instead of ``NVD2`` (see
-      :term:`NVD_DB_VERSION` for more information).
+      ``NVD_DB_VERSION`` for more information).
 
 -  New :term:`PACKAGECONFIG` options for individual recipes:
 
@@ -621,8 +621,8 @@ New Features / Enhancements in |yocto-ver|
 
    -  ``cve-update-nvd2-native``: updating the database will now result in an
       error if :term:`BB_NO_NETWORK` is enabled and
-      :term:`CVE_DB_UPDATE_INTERVAL` is not set to ``-1``. Users can control the
-      NVD database source using the :term:`NVD_DB_VERSION` variable with
+      ``CVE_DB_UPDATE_INTERVAL`` is not set to ``-1``. Users can control the
+      NVD database source using the ``NVD_DB_VERSION`` variable with
       possible values ``NVD1``, ``NVD2``, or ``FKIE``.
 
    -  ``systemtap``: add ``--with-extra-version="oe"`` configure option to
@@ -714,10 +714,10 @@ New Features / Enhancements in |yocto-ver|
 Known Issues in |yocto-ver|
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
--  The :ref:`ref-classes-cve-check` class is based on the `National
+-  The ``cve-check`` class is based on the `National
    Vulnerability Database <https://nvd.nist.gov/>`__ (NVD). Since the beginning
    of 2024, the maintainers of this database have stopped annotating CVEs with
-   the affected CPEs. This prevents the :ref:`ref-classes-cve-check` class to
+   the affected CPEs. This prevents the ``cve-check`` class to
    properly report CVEs as CPEs are used to match Yocto recipes with CVEs
    affecting them. As a result, the current CVE reports may look good but the
    reality is that some vulnerabilities are just not reported.
@@ -726,7 +726,7 @@ Known Issues in |yocto-ver|
    <https://www.cve.org/>'__ for entries concerning software they use, or follow
    release notes of such projects closely.
 
-   Please note, that the :ref:`ref-classes-cve-check` tool has always been a
+   Please note, that the ``cve-check`` tool has always been a
    helper tool, and users are advised to always review the final result. Results
    of an automatic scan may not take into account configuration options,
    compiler options and other factors.

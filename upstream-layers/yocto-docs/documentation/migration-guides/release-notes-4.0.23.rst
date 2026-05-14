@@ -80,7 +80,7 @@ Fixes in Yocto-4.0.23
 -  ref-manual: add missing :term:`OPKGBUILDCMD` variable
 -  ref-manual: devtool-reference: document missing commands
 -  ref-manual: devtool-reference: refresh example outputs
--  ref-manual: introduce :term:`CVE_CHECK_REPORT_PATCHED` variable
+-  ref-manual: introduce ``CVE_CHECK_REPORT_PATCHED`` variable
 -  ref-manual: release-process: add a reference to the doc's release
 -  ref-manual: release-process: refresh the current LTS releases
 -  ref-manual: release-process: update releases.svg

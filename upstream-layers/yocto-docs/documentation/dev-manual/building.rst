@@ -772,7 +772,7 @@ Follow these steps to populate your Downloads directory:
 #. *Populate Your Downloads Directory Without Building:* Use BitBake to
    fetch your sources but inhibit the build::
 
-      $ bitbake target --runonly=fetch
+      $ bitbake target --runall=fetch
 
    The downloads directory (i.e. ``${DL_DIR}``) now has
    a "snapshot" of the source files in the form of tarballs, which can

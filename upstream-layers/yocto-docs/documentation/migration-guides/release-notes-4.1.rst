@@ -47,11 +47,11 @@ New Features / Enhancements in 4.1
 
 - CVE checking enhancements:
 
-  - New :term:`CVE_DB_UPDATE_INTERVAL` variable to allow specifying the CVE database minimum update interval (and default to once per day)
+  - New ``CVE_DB_UPDATE_INTERVAL`` variable to allow specifying the CVE database minimum update interval (and default to once per day)
   - Added JSON format to summary output
   - Added support for Ignored CVEs
   - Enable recursive CVE checking also for ``do_populate_sdk``
-  - New :term:`CVE_CHECK_SHOW_WARNINGS` variable to disable unpatched CVE warning messages
+  - New ``CVE_CHECK_SHOW_WARNINGS`` variable to disable unpatched CVE warning messages
   - The :ref:`ref-classes-pypi` class now defaults :term:`CVE_PRODUCT` from :term:`PYPI_PACKAGE`
   - Added current kernel CVEs to ignore list since we stay as close to the kernel stable releases as we can
   - Optimisations to avoid dependencies on fetching

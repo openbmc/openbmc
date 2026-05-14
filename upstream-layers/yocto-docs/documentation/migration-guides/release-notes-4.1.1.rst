@@ -131,8 +131,8 @@ Fixes in Yocto-4.1.1
 -  ref-manual/faq.rst: update references to products built with OE / Yocto Project
 -  ref-manual/variables.rst: clarify sentence
 -  ref-manual: add a note to ssh-server-dropbear feature
--  ref-manual: add :term:`CVE_CHECK_SHOW_WARNINGS`
--  ref-manual: add :term:`CVE_DB_UPDATE_INTERVAL`
+-  ref-manual: add ``CVE_CHECK_SHOW_WARNINGS``
+-  ref-manual: add ``CVE_DB_UPDATE_INTERVAL``
 -  ref-manual: add :term:`DEV_PKG_DEPENDENCY`
 -  ref-manual: add :term:`DISABLE_STATIC`
 -  ref-manual: add :term:`FIT_PAD_ALG`
