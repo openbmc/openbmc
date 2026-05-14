@@ -50,9 +50,9 @@ Signed-off-by: Michael Safwat <michael.safwat@arm.com>
  board/armltd/corstone1000-a320/Kconfig        |  12 +
  board/armltd/corstone1000-a320/MAINTAINERS    |   7 +
  board/armltd/corstone1000/corstone1000.c      |   6 +-
- configs/corstone1000-a320_defconfig           |  89 ++++++++
+ configs/corstone1000-a320_defconfig           |  90 ++++++++
  .../arm/arm,corstone1000-a320.yml             |  31 +++
- 9 files changed, 405 insertions(+), 3 deletions(-)
+ 9 files changed, 406 insertions(+), 3 deletions(-)
  create mode 100644 arch/arm/dts/corstone1000-a320-fvp.dts
  create mode 100644 arch/arm/dts/corstone1000-a320.dtsi
  create mode 100644 board/armltd/corstone1000-a320/Kconfig
@@ -400,7 +400,7 @@ index 00000000000..e62978b487e
 +F:	board/armltd/corstone1000-a320/
 +F:	configs/corstone1000-a320_defconfig
 diff --git a/board/armltd/corstone1000/corstone1000.c b/board/armltd/corstone1000/corstone1000.c
-index db8919298e1..0557865f59b 100644
+index db8919298e1..2f65eac7bf4 100644
 --- a/board/armltd/corstone1000/corstone1000.c
 +++ b/board/armltd/corstone1000/corstone1000.c
 @@ -1,6 +1,6 @@
@@ -416,7 +416,7 @@ index db8919298e1..0557865f59b 100644
  {
  #if IS_ENABLED(CONFIG_EFI_HAVE_CAPSULE_SUPPORT)
 -	if (!strcmp(DEVICE_TREE, "arm/corstone1000-fvp"))
-+	if (!strstr(DEVICE_TREE, "fvp"))
++	if (strstr(DEVICE_TREE, "fvp"))
  		update_info.images = fw_fvp_images;
  	else
  		update_info.images = fw_mps3_images;
@@ -425,16 +425,16 @@ index db8919298e1..0557865f59b 100644
  	int ret;
  
 -	if (!strcmp(cmp_dtb, "arm/corstone1000-fvp")) {
-+	if (!strstr(cmp_dtb, "fvp")) {
++	if (strstr(cmp_dtb, "fvp")) {
  		ret = uclass_first_device_err(UCLASS_VIRTIO, &virtio_bus);
  		if (!virtio_bus) {
  			log_err("Cannot find virtio device, err (%d)\n", ret);
 diff --git a/configs/corstone1000-a320_defconfig b/configs/corstone1000-a320_defconfig
 new file mode 100644
-index 00000000000..d0ae1e745db
+index 00000000000..c7636bf45f8
 --- /dev/null
 +++ b/configs/corstone1000-a320_defconfig
-@@ -0,0 +1,89 @@
+@@ -0,0 +1,90 @@
 +CONFIG_ARM=y
 +CONFIG_SKIP_LOWLEVEL_INIT=y
 +CONFIG_TARGET_CORSTONE1000=y
@@ -474,6 +474,7 @@ index 00000000000..d0ae1e745db
 +# CONFIG_DISPLAY_CPUINFO is not set
 +# CONFIG_DISPLAY_BOARDINFO is not set
 +CONFIG_BOARD_INIT=y
++CONFIG_BOARD_LATE_INIT=y
 +CONFIG_SYS_PROMPT="corstone1000# "
 +# CONFIG_CMD_CONSOLE is not set
 +CONFIG_CMD_FWU_METADATA=y

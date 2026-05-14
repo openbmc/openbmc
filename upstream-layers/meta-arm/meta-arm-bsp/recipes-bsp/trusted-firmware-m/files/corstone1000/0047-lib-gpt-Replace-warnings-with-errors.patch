@@ -1,0 +1,37 @@
+From 68874e58811c5d4004492f15b3ac46d2cca186c0 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Thu, 16 Apr 2026 09:54:55 +0100
+Subject: [PATCH] lib: gpt: Replace warnings with errors
+
+These warnings return errors, so it makes more sense to output an error
+message.
+
+Change-Id: I589e24ba8aba2502a3fc86d2aeb648d125c022bd
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [68874e58811c5d4004492f15b3ac46d2cca186c0]
+---
+ lib/gpt/src/gpt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 16bda8aba..32c7277bd 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -830,7 +830,7 @@ psa_status_t gpt_defragment(void)
+      */
+     psa_status_t ret = sort_partition_array(&primary_gpt);
+     if (ret != PSA_SUCCESS) {
+-        WARN("Unable to defragment flash!\n");
++        ERROR("Unable to defragment flash!\n");
+         return ret;
+     }
+ 
+@@ -926,7 +926,7 @@ psa_status_t gpt_init(struct gpt_flash_driver_t *flash_driver, uint64_t max_part
+     if (mbr.partitions[0].os_type == MBR_TYPE_GPT) {
+         ret = read_table_from_flash(&primary_gpt, true);
+     } else {
+-        WARN("Unsupported legacy MBR in use\n");
++        ERROR("Unsupported legacy MBR in use\n");
+         ret = PSA_ERROR_NOT_SUPPORTED;
+     }
+ 

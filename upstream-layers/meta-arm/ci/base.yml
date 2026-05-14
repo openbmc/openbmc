@@ -7,11 +7,12 @@ distro: poky
 
 defaults:
   repos:
-    branch: master
+    branch: wrynose
 
 repos:
   bitbake:
     url: https://git.openembedded.org/bitbake
+    branch: "2.18"
     layers:
       bitbake: disabled
 

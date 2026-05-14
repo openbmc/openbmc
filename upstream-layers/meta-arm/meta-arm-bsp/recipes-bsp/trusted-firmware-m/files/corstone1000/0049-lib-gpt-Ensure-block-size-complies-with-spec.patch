@@ -1,0 +1,38 @@
+From c07da31be4551ee9b3ce546a1f6adccb19bc3b59 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Wed, 15 Apr 2026 11:17:25 +0100
+Subject: [PATCH] lib: gpt: Ensure block size complies with spec
+
+The UEFI spec 2.10 [1] implicitly requires a block size of at least 512
+in order to fit a legacy Master Boot Record.
+
+[1] https://uefi.org/specs/UEFI/2.10/05_GUID_Partition_Table_Format.html#legacy-master-boot-record-mbr
+
+Change-Id: I8218ef3d883b51d8fa14835e0ed884139fdebc7d
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Backport [c07da31be4551ee9b3ce546a1f6adccb19bc3b59]
+---
+ lib/gpt/src/gpt.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 200e21599..cda9fe358 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -20,11 +20,15 @@
+ #include "efi_soft_crc.h"
+ 
+ /* This needs to be defined by the platform and is used by the GPT library as
+- * the number of bytes in a Logical Block Address (LBA)
++ * the number of bytes in a Logical Block Address (LBA). It also must be at least
++ * 512.
+  */
+ #ifndef TFM_GPT_BLOCK_SIZE
+ #error "TFM_GPT_BLOCK_SIZE must be defined if using GPT library!"
+ #endif
++#if TFM_GPT_BLOCK_SIZE < 512
++#error "TFM_GPT_BLOCK_SIZE must be at least 512!"
++#endif
+ 
+ /* Where Master Boot Record (MBR) is on flash */
+ #define MBR_LBA 0ULL

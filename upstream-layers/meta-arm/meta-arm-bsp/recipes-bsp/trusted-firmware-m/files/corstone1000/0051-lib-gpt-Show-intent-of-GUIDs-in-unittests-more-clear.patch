@@ -1,0 +1,216 @@
+From ca0d50fc1abbfe165941dc0bd674bb117f236f87 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 30 Mar 2026 14:06:20 +0100
+Subject: [PATCH] lib: gpt: Show intent of GUIDs in unittests more clearly
+
+The standard EFI_GUID macros used in the unittests do not convey the
+full meaning of the why that particular GUID is used. The new macros can
+be used to make it clear when a valid GUID is being used or when the
+value is just a dummy and has no meaning.
+
+Change-Id: I1cf041703cbc40e60072e0662baebaef3239d3d1
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/50233/1]
+---
+ lib/gpt/unittests/gpt/test_gpt.c | 55 ++++++++++++++++++--------------
+ 1 file changed, 31 insertions(+), 24 deletions(-)
+
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index bd161ec74..32dfb8fb2 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -69,6 +69,13 @@
+         backup.array_lba = TEST_GPT_BACKUP_ARRAY_LBA;    \
+     } while (0)
+ 
++/* These macros make it clearer in the tests what is happening */
++#define TEST_GPT_VALID_GUID(...) MAKE_EFI_GUID(__VA_ARGS__)
++#define TEST_GPT_DUMMY_GUID NULL_GUID
++
++#define TEST_GPT_VALID_TYPE(...) MAKE_EFI_GUID(__VA_ARGS__)
++#define TEST_GPT_DUMMY_TYPE NULL_GUID
++
+ /* MBR partition entry */
+ struct mbr_entry_t {
+     /* Indicates if bootable */
+@@ -176,24 +183,24 @@ static struct gpt_header_t test_header;
+ /* Default entry array. This is valid, though fragmented. */
+ static struct gpt_entry_t default_partition_array[TEST_DEFAULT_NUM_PARTITIONS] = {
+     {
+-        .type = MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+-        .guid = MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .type = TEST_GPT_VALID_TYPE(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = TEST_GPT_VALID_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+         .start = TEST_GPT_FIRST_PARTITION_START,
+         .end = TEST_GPT_FIRST_PARTITION_END,
+         .attr = 0,
+         .name = "First partition"
+     },
+     {
+-        .type = MAKE_EFI_GUID(2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+-        .guid = MAKE_EFI_GUID(2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .type = TEST_GPT_VALID_TYPE(2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = TEST_GPT_VALID_GUID(2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+         .start = TEST_GPT_SECOND_PARTITION_START,
+         .end = TEST_GPT_SECOND_PARTITION_END,
+         .attr = 0,
+         .name = "Second partition"
+     },
+     {
+-        .type = MAKE_EFI_GUID(3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+-        .guid = MAKE_EFI_GUID(3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .type = TEST_GPT_VALID_TYPE(3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = TEST_GPT_VALID_GUID(3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+         .start = TEST_GPT_THIRD_PARTITION_START,
+         .end = TEST_GPT_THIRD_PARTITION_END,
+         .attr = 0,
+@@ -333,7 +340,7 @@ void test_gpt_init_should_overwriteOldGpt(void)
+     gpt_uninit();
+ 
+     /* Use a different disk GUID */
+-    const struct efi_guid_t new_guid = MAKE_EFI_GUID(1, 1, 3, 4, 5, 6 ,7 ,8, 9, 10, 11);
++    const struct efi_guid_t new_guid = TEST_GPT_VALID_GUID(1, 1, 3, 4, 5, 6 ,7 ,8, 9, 10, 11);
+     test_header.disk_guid = new_guid;
+ 
+     setup_valid_gpt();
+@@ -744,7 +751,7 @@ void test_gpt_entry_create_should_createNewEntry(void)
+ 
+     /* Update header. Read each entry for CRC calculation. */
+     struct gpt_entry_t new_entry = {
+-        .type = NULL_GUID,
++        .type = TEST_GPT_DUMMY_TYPE,
+         .start = TEST_GPT_THIRD_PARTITION_END + 1,
+         .end = TEST_GPT_THIRD_PARTITION_END + 1,
+         .attr = 0,
+@@ -752,12 +759,12 @@ void test_gpt_entry_create_should_createNewEntry(void)
+     };
+ 
+     /* Mock out the call to create a new GUID */
+-    struct efi_guid_t expected_guid = MAKE_EFI_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t expected_guid = TEST_GPT_VALID_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
+     efi_guid_generate_random_ExpectAnyArgsAndReturn(PSA_SUCCESS);
+     efi_guid_generate_random_ReturnThruPtr_guid(&expected_guid);
+ 
+     /* Ensure also the that a new GUID is assigned */
+-    struct efi_guid_t new_guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t new_guid = TEST_GPT_DUMMY_GUID;
+     TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_create(
+                 &expected_guid,
+                 new_entry.start,
+@@ -782,7 +789,7 @@ void test_gpt_entry_create_should_createNewEntryNextToLastEntry(void)
+ 
+     /* Update header. Read each entry for CRC calculation. */
+     struct gpt_entry_t new_entry = {
+-        .type = NULL_GUID,
++        .type = TEST_GPT_DUMMY_TYPE,
+         .start = TEST_GPT_THIRD_PARTITION_END + 1,
+         .end = TEST_GPT_THIRD_PARTITION_END + 1,
+         .attr = 0,
+@@ -790,12 +797,12 @@ void test_gpt_entry_create_should_createNewEntryNextToLastEntry(void)
+     };
+ 
+     /* Mock out the call to create a new GUID */
+-    struct efi_guid_t expected_guid = MAKE_EFI_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t expected_guid = TEST_GPT_VALID_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
+     efi_guid_generate_random_ExpectAnyArgsAndReturn(PSA_SUCCESS);
+     efi_guid_generate_random_ReturnThruPtr_guid(&expected_guid);
+ 
+     /* Ensure also the that a new GUID is assigned */
+-    struct efi_guid_t new_guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t new_guid = TEST_GPT_DUMMY_GUID;
+     char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
+     name[0] = 'a';
+ 
+@@ -823,7 +830,7 @@ void test_gpt_entry_create_should_failToCreateEntryWhenLowestFreeLbaDoesNotHaveS
+     register_mocked_read(&test_partition_array, sizeof(test_partition_array));
+ 
+     /* Ensure also the that a new GUID is assigned */
+-    struct efi_guid_t existing_guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t existing_guid = TEST_GPT_VALID_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11);
+     struct efi_guid_t new_guid;
+     char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
+     name[0] = 'a';
+@@ -840,17 +847,17 @@ void test_gpt_entry_create_should_failWhenTableFull(void)
+ {
+     /* Start with a full array of entries */
+     struct gpt_entry_t new_entry = {
+-        .type = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
++        .type = TEST_GPT_VALID_TYPE(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
+         .start = TEST_GPT_THIRD_PARTITION_END + 1,
+         .end = TEST_GPT_THIRD_PARTITION_END + 1,
+         .attr = 0,
+-        .guid = MAKE_EFI_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
++        .guid = TEST_GPT_VALID_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
+         .name = "Fourth partition"
+     };
+     test_partition_array[TEST_MAX_PARTITIONS - 1] = new_entry;
+     setup_valid_gpt();
+ 
+-    struct efi_guid_t type = MAKE_EFI_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t type = TEST_GPT_VALID_TYPE(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
+     struct efi_guid_t guid;
+     char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
+     name[0] = 'a';
+@@ -868,7 +875,7 @@ void test_gpt_entry_create_should_failWhenLbaOffDisk(void)
+     setup_valid_gpt();
+ 
+     /* First start on disk, then go off the disk */
+-    struct efi_guid_t type = NULL_GUID;
++    struct efi_guid_t type = TEST_GPT_DUMMY_TYPE;
+     struct efi_guid_t guid;
+     char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
+     name[0] = 'a';
+@@ -917,7 +924,7 @@ void test_gpt_entry_create_should_failWhenOverlapping(void)
+      *   2. start in the middle of a partition and end in free space
+      */
+     register_mocked_read(&test_partition_array, sizeof(test_partition_array));
+-    struct efi_guid_t type = NULL_GUID;
++    struct efi_guid_t type = TEST_GPT_DUMMY_TYPE;
+     struct efi_guid_t guid;
+     char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
+     name[0] = 'a';
+@@ -944,7 +951,7 @@ void test_gpt_entry_create_should_failWhenNameIsEmpty(void)
+     /* Start with a populated GPT */
+     setup_valid_gpt();
+ 
+-    struct efi_guid_t type = NULL_GUID;
++    struct efi_guid_t type = TEST_GPT_DUMMY_TYPE;
+     struct gpt_entry_t new_entry = {
+         .type = type,
+         .start = TEST_GPT_THIRD_PARTITION_END + 1,
+@@ -969,7 +976,7 @@ void test_gpt_entry_create_should_failWhenSizeIsZero(void)
+     /* Start with a populated GPT */
+     setup_valid_gpt();
+ 
+-    struct efi_guid_t type = NULL_GUID;
++    struct efi_guid_t type = TEST_GPT_DUMMY_TYPE;
+ 
+     /* Make the size zero */
+     struct efi_guid_t new_guid;
+@@ -1199,7 +1206,7 @@ void test_gpt_entry_change_type_should_setNewType(void)
+     /* Type validation is not a function of the library, as this is OS
+      * dependent, so anything will do here.
+      */
+-    struct efi_guid_t new_type = MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t new_type = TEST_GPT_VALID_TYPE(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+     TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_change_type(&test_guid, &new_type));
+ }
+ 
+@@ -1211,7 +1218,7 @@ void test_gpt_entry_change_type_should_failWhenEntryNotExisting(void)
+     register_mocked_read(&test_partition_array, sizeof(test_partition_array));
+ 
+     struct efi_guid_t non_existing = NULL_GUID;
+-    struct efi_guid_t new_type = MAKE_EFI_GUID(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
++    struct efi_guid_t new_type = TEST_GPT_VALID_TYPE(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+     TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_change_type(&non_existing, &new_type));
+ }
+ 
+@@ -1452,7 +1459,7 @@ void test_gpt_entry_read_by_type_should_failWhenEntryNotExisting(void)
+ 
+     /* Try to read something */
+     struct partition_entry_t entry;
+-    struct efi_guid_t test_type = MAKE_EFI_GUID(11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
++    struct efi_guid_t test_type = TEST_GPT_VALID_TYPE(11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
+     TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_read_by_type(&test_type, 0, &entry));
+ 
+     /* Now, have a non-empty GPT but search for a type that won't exist */

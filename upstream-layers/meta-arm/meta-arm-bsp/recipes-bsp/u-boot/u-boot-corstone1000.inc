@@ -81,6 +81,11 @@ SRC_URI:append = " \
     file://0039-corstone1000-a320-Add-Corstone1000-board-variant.patch \
 "
 
+# Disable the debug feature
+SRC_URI:append = " \
+    file://0040-configs-corstone1000-disable-EFI-debug-support.patch \
+"
+
 uboot_configure_config:append() {
    openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=CRT/ -keyout ${B}/CRT.key -out ${S}/CRT.crt -nodes -days 365
 }

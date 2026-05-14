@@ -1,0 +1,157 @@
+From 229313778bae6ca16d6e3b25437c8e87eddf3084 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 30 Mar 2026 14:35:45 +0100
+Subject: [PATCH] lib: gpt: Provide macro identifying free space
+
+In the unit tests, it is often required to know where free space on the
+mocked disk is in order to determine where it is valid to create or move
+a new partition. The macro makes it clearer when this is being done.
+
+Change-Id: I147faf516efa3e5c7fdd49775d0efa878890b771
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/50234/1]
+---
+ lib/gpt/unittests/gpt/test_gpt.c | 42 +++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 19 deletions(-)
+
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index 32dfb8fb2..0ae660336 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -58,6 +58,7 @@
+ #define TEST_GPT_SECOND_PARTITION_END (TEST_GPT_SECOND_PARTITION_START + 50)
+ #define TEST_GPT_THIRD_PARTITION_START (TEST_GPT_SECOND_PARTITION_END + 1)
+ #define TEST_GPT_THIRD_PARTITION_END (TEST_GPT_THIRD_PARTITION_START + 1)
++#define TEST_GPT_DISK_FREE_SPACE_START (TEST_GPT_THIRD_PARTITION_END + 1)
+ 
+ /* Populates a backup header from a primary header and calculates the new CRC32 */
+ #define MAKE_BACKUP_HEADER(backup, primary)              \
+@@ -752,8 +753,8 @@ void test_gpt_entry_create_should_createNewEntry(void)
+     /* Update header. Read each entry for CRC calculation. */
+     struct gpt_entry_t new_entry = {
+         .type = TEST_GPT_DUMMY_TYPE,
+-        .start = TEST_GPT_THIRD_PARTITION_END + 1,
+-        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .start = TEST_GPT_DISK_FREE_SPACE_START,
++        .end = TEST_GPT_DISK_FREE_SPACE_START,
+         .attr = 0,
+         .name = "Fourth partition"
+     };
+@@ -790,8 +791,8 @@ void test_gpt_entry_create_should_createNewEntryNextToLastEntry(void)
+     /* Update header. Read each entry for CRC calculation. */
+     struct gpt_entry_t new_entry = {
+         .type = TEST_GPT_DUMMY_TYPE,
+-        .start = TEST_GPT_THIRD_PARTITION_END + 1,
+-        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .start = TEST_GPT_DISK_FREE_SPACE_START,
++        .end = TEST_GPT_DISK_FREE_SPACE_START,
+         .attr = 0,
+         .name = "Fourth partition"
+     };
+@@ -846,10 +847,11 @@ void test_gpt_entry_create_should_failToCreateEntryWhenLowestFreeLbaDoesNotHaveS
+ void test_gpt_entry_create_should_failWhenTableFull(void)
+ {
+     /* Start with a full array of entries */
++    const uint64_t new_entry_end = TEST_GPT_DISK_FREE_SPACE_START;
+     struct gpt_entry_t new_entry = {
+         .type = TEST_GPT_VALID_TYPE(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
+-        .start = TEST_GPT_THIRD_PARTITION_END + 1,
+-        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .start = new_entry_end,
++        .end = new_entry_end,
+         .attr = 0,
+         .guid = TEST_GPT_VALID_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
+         .name = "Fourth partition"
+@@ -861,9 +863,11 @@ void test_gpt_entry_create_should_failWhenTableFull(void)
+     struct efi_guid_t guid;
+     char name[GPT_ENTRY_NAME_LENGTH] = {'\0'};
+     name[0] = 'a';
++    const uint64_t new_free_space = new_entry_end + 1;
++
+     TEST_ASSERT_EQUAL(PSA_ERROR_INSUFFICIENT_STORAGE, gpt_entry_create(
+                 &type,
+-                TEST_GPT_THIRD_PARTITION_END + 4,
++                new_free_space,
+                 1,
+                 0,
+                 name,
+@@ -881,7 +885,7 @@ void test_gpt_entry_create_should_failWhenLbaOffDisk(void)
+     name[0] = 'a';
+     TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
+                 &type,
+-                TEST_GPT_THIRD_PARTITION_END + 1,
++                TEST_GPT_DISK_FREE_SPACE_START,
+                 1000,
+                 0,
+                 name,
+@@ -954,8 +958,8 @@ void test_gpt_entry_create_should_failWhenNameIsEmpty(void)
+     struct efi_guid_t type = TEST_GPT_DUMMY_TYPE;
+     struct gpt_entry_t new_entry = {
+         .type = type,
+-        .start = TEST_GPT_THIRD_PARTITION_END + 1,
+-        .end = TEST_GPT_THIRD_PARTITION_END + 1,
++        .start = TEST_GPT_DISK_FREE_SPACE_START,
++        .end = TEST_GPT_DISK_FREE_SPACE_START,
+         .attr = 0,
+     };
+ 
+@@ -984,7 +988,7 @@ void test_gpt_entry_create_should_failWhenSizeIsZero(void)
+     name[0] = 'a';
+     TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_create(
+                 &type,
+-                TEST_GPT_THIRD_PARTITION_END + 1,
++                TEST_GPT_DISK_FREE_SPACE_START,
+                 0,
+                 0,
+                 name,
+@@ -1016,8 +1020,8 @@ void test_gpt_entry_move_should_moveEntry(void)
+     /* Do a valid move and resize in one */
+     TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_move(
+                 &test_guid,
+-                TEST_GPT_THIRD_PARTITION_END + 1,
+-                TEST_GPT_THIRD_PARTITION_END + 1));
++                TEST_GPT_DISK_FREE_SPACE_START,
++                TEST_GPT_DISK_FREE_SPACE_START));
+ }
+ 
+ void test_gpt_entry_move_should_failWhenEntryNotExisting(void)
+@@ -1030,8 +1034,8 @@ void test_gpt_entry_move_should_failWhenEntryNotExisting(void)
+     struct efi_guid_t non_existing = NULL_GUID;
+     TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_move(
+                 &non_existing,
+-                TEST_GPT_THIRD_PARTITION_END + 1,
+-                TEST_GPT_THIRD_PARTITION_END + 1));
++                TEST_GPT_DISK_FREE_SPACE_START,
++                TEST_GPT_DISK_FREE_SPACE_START));
+ }
+ 
+ void test_gpt_entry_move_should_failWhenEndLessThanStart(void)
+@@ -1041,8 +1045,8 @@ void test_gpt_entry_move_should_failWhenEndLessThanStart(void)
+     struct efi_guid_t test_guid = test_partition_array[0].guid;
+     TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
+                 &test_guid,
+-                TEST_GPT_THIRD_PARTITION_END + 2,
+-                TEST_GPT_THIRD_PARTITION_END + 1));
++                TEST_GPT_DISK_FREE_SPACE_START + 1,
++                TEST_GPT_DISK_FREE_SPACE_START));
+ }
+ 
+ void test_gpt_entry_move_should_failWhenLbaOverlapping(void)
+@@ -1097,7 +1101,7 @@ void test_gpt_entry_move_should_failWhenLbaOffDisk(void)
+     /* First start on disk, then go off the disk */
+     TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
+                 &test_guid,
+-                TEST_GPT_THIRD_PARTITION_END + 1,
++                TEST_GPT_DISK_FREE_SPACE_START,
+                 TEST_DISK_NUM_BLOCKS + 1));
+ 
+     /* Second, start off the disk entirely */
+@@ -1110,7 +1114,7 @@ void test_gpt_entry_move_should_failWhenLbaOffDisk(void)
+     TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
+                 &test_guid,
+                 TEST_GPT_PRIMARY_LBA,
+-                TEST_GPT_THIRD_PARTITION_END + 2));
++                TEST_GPT_DISK_FREE_SPACE_START + 1));
+ 
+     /* Fourth, start in the backup header area */
+     TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_move(
