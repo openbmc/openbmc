@@ -1,0 +1,39 @@
+From 4e0da6c3716c08a5864fbac3f647427bcc64693e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Van=C4=9Bk?= <arkamar@atlas.cz>
+Date: Sun, 31 Dec 2023 22:51:51 +0100
+Subject: [PATCH 2/2] reorder header files and include time.h
+
+The time.h header file is needed for strptime function, otherwise modern
+compilers fail with implicit function declaration error. Moreover,
+getopt.h needs to be included after config.h otherwise global
+configuration will not be respected. This can affect time.h as they both
+include features.h.
+
+Bug: https://bugs.gentoo.org/879727
+
+Upstream-Status: Submitted [https://github.com/opendnssec/opendnssec/pull/854]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ enforcer/src/daemon/time_leap_cmd.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/enforcer/src/daemon/time_leap_cmd.c b/enforcer/src/daemon/time_leap_cmd.c
+index af41c8db..c0acd01d 100644
+--- a/enforcer/src/daemon/time_leap_cmd.c
++++ b/enforcer/src/daemon/time_leap_cmd.c
+@@ -26,9 +26,11 @@
+  *
+  */
+ 
+-#include <getopt.h>
+ #include "config.h"
+ 
++#include <getopt.h>
++#include <time.h>
++
+ #include "file.h"
+ #include "duration.h"
+ #include "log.h"
+-- 
+2.47.3
+

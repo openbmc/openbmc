@@ -30,6 +30,7 @@ RDEPENDS:packagegroup-core-security = "\
 
 SUMMARY:packagegroup-security-utils = "Security utilities"
 RDEPENDS:packagegroup-security-utils = "\
+    aircrack-ng \
     bubblewrap \
     checksec \
     cryptmount \
@@ -39,8 +40,9 @@ RDEPENDS:packagegroup-security-utils = "\
     glome \
     keyutils \
     libgssglue \
-    libmhash \
+    ncrack \
     nmap \
+    opendnssec \
     pinentry \
     softhsm \
     sshguard \
@@ -89,6 +91,7 @@ RDEPENDS:packagegroup-security-ids = " \
     python3-suricata-update \
     ossec-hids \
     aide \
+    crowdsec \
     "
 
 RDEPENDS:packagegroup-security-ids:remove:powerpc = "suricata python3-suricata-update"

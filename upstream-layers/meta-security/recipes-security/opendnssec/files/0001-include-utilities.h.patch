@@ -1,0 +1,33 @@
+From 42c01ae83a0c549379b9739a74db8ca3c4924407 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Petr=20Van=C4=9Bk?= <arkamar@atlas.cz>
+Date: Sun, 31 Dec 2023 22:43:50 +0100
+Subject: [PATCH 1/2] include utilities.h
+
+The utilities.h header file is necessary for clamp function, otherwise
+compilation fails with implicit function declarations error with moder
+compilers. This is baiscally backport of commit f41dd6020f58 ("Compile
+warning. clamp implicitely defined.")
+
+Bug: https://bugs.gentoo.org/871294
+
+Upstream-Status: Submitted [https://github.com/opendnssec/opendnssec/pull/854]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ common/scheduler/task.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/common/scheduler/task.c b/common/scheduler/task.c
+index 4dcf9e90..0dfa496a 100644
+--- a/common/scheduler/task.c
++++ b/common/scheduler/task.c
+@@ -40,6 +40,7 @@
+ #include "duration.h"
+ #include "file.h"
+ #include "log.h"
++#include "utilities.h"
+ 
+ static const char* task_str = "task";
+ static pthread_mutex_t worklock = PTHREAD_MUTEX_INITIALIZER;
+-- 
+2.47.3
+

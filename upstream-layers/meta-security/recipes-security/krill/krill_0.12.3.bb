@@ -37,7 +37,7 @@ USERADD_PARAM:${PN} = "--system -g ${KRILL_GID} --home-dir  \
                        /var/lib/krill/ --no-create-home  \
                        --shell /sbin/nologin ${BPN}"
 
-FILES:${PN} += "{sysconfdir}/defaults ${datadir}"
+FILES:${PN} += "${sysconfdir}/defaults ${datadir}"
 INSANE_SKIP:${PN} = "already-stripped"
 
 COMPATIBLE_HOST = "(i.86|x86_64|aarch64).*-linux"

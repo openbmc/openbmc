@@ -6,17 +6,17 @@ LICENSE = "GPL-2.0-only"
 DEPENDS = "bison-native libpcre2"
 
 SRC_URI = "https://github.com/aide/aide/releases/download/v${PV}/${BPN}-${PV}.tar.gz \
+           file://0001-Fixes-build-issues.patch \
            file://aide.conf \
-           file://m4_allow.patch \
-           "
+"
 
-SRC_URI[sha256sum] = "16662dc632d17e2c5630b801752f97912a8e22697c065ebde175f1cc37b83a60"
+SRC_URI[sha256sum] = "6513170bb5b8c22802dd1b72f02d8aa9f432aef2b4470522db03e755212a3f47"
 
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 
 inherit autotools pkgconfig aide-base
 
-PACKAGECONFIG ??= " gcrypt zlib e2fsattrs posix capabilities curl pthread \
+PACKAGECONFIG ??= " nettle zlib e2fsattrs posix-acl capabilities curl \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux audit', '', d)} \
                  ${@bb.utils.contains('DISTRO_FEATURES', 'xattr', 'xattr', '', d)} \
                  "
@@ -25,12 +25,11 @@ PACKAGECONFIG[zlib] = "--with-zlib, --without-zlib, zlib, zlib "
 PACKAGECONFIG[xattr] = "--with-xattr, --without-xattr, attr, attr"
 PACKAGECONFIG[curl] = "--with-curl, --without-curl, curl, libcurl"
 PACKAGECONFIG[audit] = "--with-audit, --without-audit,audit"
-PACKAGECONFIG[gcrypt] = "--with-gcrypt, --without-gcrypt, libgcrypt, libgcrypt"
-PACKAGECONFIG[mhash] = "--with-mhash, --without-mhash, libmhash, libmhash"
+PACKAGECONFIG[gcrypt] = "--with-gcrypt, --without-gcrypt, libgcrypt, libgcrypt, , nettle"
+PACKAGECONFIG[nettle] = "--with-nettle, --without-nettle, nettle, nettle, , gcrypt"
 PACKAGECONFIG[e2fsattrs] = "--with-e2fsattrs, --without-e2fsattrs, e2fsprogs, e2fsprogs"
 PACKAGECONFIG[capabilities] = "--with-capabilities, --without-capabilities, libcap, libcap"
-PACKAGECONFIG[posix] = "--with-posix-acl, --without-posix-acl, acl, acl"
-PACKAGECONFIG[pthread] = "--with-pthread,"
+PACKAGECONFIG[posix-acl] = "--with-posix-acl, --without-posix-acl, acl, acl"
 
 do_install[nostamp] = "1"
 
