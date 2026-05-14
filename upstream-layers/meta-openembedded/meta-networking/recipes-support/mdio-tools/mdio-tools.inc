@@ -4,5 +4,5 @@ HOMEPAGE = "https://github.com/wkz/mdio-tools"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://github.com/wkz/mdio-tools.git;protocol=https;branch=master"
-SRCREV = "f74eaf38dbda441df4fcaeb21ca4465957953a2f"
+SRC_URI = "git://github.com/wkz/mdio-tools.git;protocol=https;branch=master;tag=${PV}"
+SRCREV = "a1fca6b8fb3b5a95ebb28324a95673488dddc005"

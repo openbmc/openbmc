@@ -113,6 +113,10 @@ CXXFLAGS:append:arc = " -mlong-calls"
 # Needed for non-mesa graphics stacks when x11 is disabled
 CXXFLAGS += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', '', '-DEGL_NO_X11=1', d)}"
 
+# Fix Source/ThirdParty/skia/modules/skcms/src/Transform_inl.h:810:71:
+# error: cannot tail-call: tail call production failed
+CXXFLAGS:append:riscv64 = " -DSKCMS_HAS_MUSTTAIL=0"
+
 # Javascript JIT is not supported on powerpc
 EXTRA_OECMAKE:append:powerpc = " -DENABLE_JIT=OFF "
 EXTRA_OECMAKE:append:powerpc64 = " -DENABLE_JIT=OFF "

@@ -32,9 +32,13 @@ PACKAGES =+ "${PN}-gpiosim ${PN}-glib ${PN}-manager ${PN}-manager-cfg ${PN}-cli"
 FILES:${PN}-tools += "${bindir}/gpionotify"
 FILES:${PN}-gpiosim += "${libdir}/libgpiosim.so.*"
 FILES:${PN}-gpiosim-dev += "${includedir}/gpiosim.h"
-FILES:${PN}-glib += "${libdir}/libgpiod-glib.so.*"
+FILES:${PN}-glib += " \
+    ${libdir}/libgpiod-glib.so.* \
+    ${libdir}/girepository-1.0/* \
+"
 FILES:${PN}-manager += " \
     ${bindir}/gpio-manager \
+    ${libdir}/libgpiodbus.so.* \
     ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${systemd_system_unitdir}/gpio-manager.service', '', d)} \
     ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', '${sysconfdir}/init.d/gpio-manager', '', d)} \
 "

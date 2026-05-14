@@ -10,7 +10,13 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
 XFCE_COMPRESS_TYPE = "xz"
 XFCEBASEBUILDCLASS = "meson"
 
-DEPENDS = "dbus-glib garcon gtk+3 libxklavier libxscrnsaver virtual/libx11 xfconf libwnck3 libpam systemd"
+DEPENDS = "dbus-glib garcon gtk+3 libxklavier libxscrnsaver virtual/libx11 xfconf libwnck3"
+
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'authentication-scheme', '', d)} \
+                   ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'session-manager', '', d)} \
+"
+PACKAGECONFIG[authentication-scheme] = ", -Dauthentication-scheme=none, libpam,"
+PACKAGECONFIG[session-manager] = ", -Dsession-manager=none, systemd,"
 
 inherit xfce-app
 

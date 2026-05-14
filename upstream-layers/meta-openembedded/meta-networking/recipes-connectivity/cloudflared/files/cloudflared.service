@@ -1,0 +1,15 @@
+[Unit]
+Description=cloudflared
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=notify
+DynamicUser=yes
+EnvironmentFile=/etc/default/cloudflared
+ExecStart=/usr/bin/cloudflared --no-autoupdate tunnel run --token ${TUNNEL_TOKEN}
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

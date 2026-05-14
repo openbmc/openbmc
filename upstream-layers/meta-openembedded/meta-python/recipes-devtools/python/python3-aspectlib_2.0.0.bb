@@ -8,6 +8,7 @@ HOMEPAGE = "https://github.com/ionelmc/python-aspectlib"
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=80721ace117fd1f814049ecb81c6be76"
 
+SRC_URI += "file://0001-python3-aspectlib-backport-fix-for-selftest.patch"
 SRC_URI[sha256sum] = "a4b461b9da0b531aebcb93efcde3de808a72c60226dd8d902c467d13faf7ce92"
 
 inherit ptest-python-pytest pypi setuptools3

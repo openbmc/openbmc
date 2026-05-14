@@ -47,7 +47,7 @@ PACKAGECONFIG[iproute2] = "--enable-iproute2,,iproute2,iproute2-ip"
 PACKAGECONFIG[systemd] = "--enable-systemd,--disable-systemd,systemd"
 PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux"
 
-RDEPENDS:${PN}:append = " bash"
+RDEPENDS:${PN}-dns-updown:append = " bash"
 RDEPENDS:${PN}-ptest:append = " bash"
 
 do_install:append() {
@@ -114,7 +114,7 @@ do_install_ptest() {
     cp -f ${S}/tests/t_lpback.sh ${D}/${PTEST_PATH}
 }
 
-PACKAGES =+ " ${PN}-sample "
+PACKAGES =+ " ${PN}-dns-updown ${PN}-sample "
 
 RRECOMMENDS:${PN} = "kernel-module-tun"
 
@@ -124,5 +124,6 @@ FILES:${PN} += "${systemd_system_unitdir}/openvpn-server@.service \
                 ${systemd_system_unitdir}/openvpn-client@.service \
                 ${nonarch_libdir}/tmpfiles.d \
                "
+FILES:${PN}-dns-updown = "${libexecdir}/openvpn/dns-updown"
 FILES:${PN}-sample = "${sysconfdir}/openvpn/sample/ \
                      "

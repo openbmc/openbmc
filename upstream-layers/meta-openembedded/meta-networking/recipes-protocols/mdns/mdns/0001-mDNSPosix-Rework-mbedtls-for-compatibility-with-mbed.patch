@@ -1,0 +1,57 @@
+From f4f5039eb90918b5248bd6266afdad0b33b2d010 Mon Sep 17 00:00:00 2001
+From: Alex Kiernan <alex.kiernan@gmail.com>
+Date: Thu, 30 Apr 2026 08:21:19 +0100
+Subject: [PATCH] mDNSPosix: Rework mbedtls for compatibility with mbedtls4
+
+Upstream-Status: Inactive-Upstream [Upstream does not take patches]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ mDNSPosix/mbedtls.c | 21 +++++----------------
+ 1 file changed, 5 insertions(+), 16 deletions(-)
+
+diff --git a/mDNSPosix/mbedtls.c b/mDNSPosix/mbedtls.c
+index 6726ef9b9145..c4b7fd4edfff 100644
+--- a/mDNSPosix/mbedtls.c
++++ b/mDNSPosix/mbedtls.c
+@@ -29,14 +29,10 @@
+ #include <errno.h>
+ #include <unistd.h>
+ 
++#include <psa/crypto.h>
++
+ #include <mbedtls/error.h>
+-#include <mbedtls/pk.h>
+-#include <mbedtls/ecp.h>
+-#include <mbedtls/ecdsa.h>
+-#include <mbedtls/entropy.h>
+-#include <mbedtls/ctr_drbg.h>
+-#include <mbedtls/sha256.h>
+-#include <mbedtls/base64.h>
++#include <mbedtls/psa_util.h>
+ 
+ #include <mbedtls/x509.h>
+ #include <mbedtls/ssl.h>
+@@ -53,21 +49,14 @@ struct TLSServerContext_struct {
+     mbedtls_ssl_config config;
+ };
+ 
+-// Context that is shared amongs all TLS connections, regardless of which server cert/key is in use.
+-static mbedtls_entropy_context entropy;
+-static mbedtls_ctr_drbg_context ctr_drbg;
+-
+ mDNSBool
+ mDNSPosixTLSInit(void)
+ {
+     int status;
+ 
+-    mbedtls_entropy_init(&entropy);
+-    mbedtls_ctr_drbg_init(&ctr_drbg);
+-
+-    status = mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func, &entropy, NULL, 0);
++    status = psa_crypto_init();
+     if (status != 0) {
+-        LogRedact(MDNS_LOG_CATEGORY_DEFAULT, MDNS_LOG_ERROR, "Unable to seed RNG: %x", -status);
++        LogRedact(MDNS_LOG_CATEGORY_DEFAULT, MDNS_LOG_ERROR, "PSA crypto init failed: %x", -status);
+         return mDNSfalse;
+     }
+     return mDNStrue;

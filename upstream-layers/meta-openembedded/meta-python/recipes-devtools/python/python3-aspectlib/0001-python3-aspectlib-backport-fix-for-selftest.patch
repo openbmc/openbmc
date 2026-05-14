@@ -1,0 +1,37 @@
+From 2e007c5c3ed048491c29e37991e6788f41728b31 Mon Sep 17 00:00:00 2001
+From: Ionel Cristian Mărieș <contact@ionelmc.ro>
+Date: Fri, 24 Apr 2026 13:17:54 +0000
+Subject: [PATCH] python3-aspectlib: backport fix for selftest
+
+Partial backport of upstream commit b85abdb056("Fix some cleanup regressions")
+
+Changes excluded:
+The stacklevel assertion updates in test_aspectlib.py and
+test_integrations.py are omitted. These are specific to upstream's
+test suite configuration and cause failures in this environment
+without providing functional value to the core library.
+
+Upstream-Status: Backport [https://github.com/ionelmc/python-aspectlib/commit/b85abdb0565d1598ce56bd49d49dc709d4e16081]
+
+Signed-off-by: Zhang Xiao <xiao.zhang@windriver.com>
+---
+ tests/conftest.py | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/tests/conftest.py b/tests/conftest.py
+index ee54d9d..29caa50 100644
+--- a/tests/conftest.py
++++ b/tests/conftest.py
+@@ -1,5 +1,6 @@
+-def pytest_ignore_collect(path, config):
+-    basename = path.basename
++from pathlib import Path
+ 
+-    if 'pytestsupport' in basename:
++
++def pytest_ignore_collect(collection_path: Path, config):
++    if 'pytestsupport' in collection_path.__fspath__():
+         return True
+-- 
+2.53.0
+

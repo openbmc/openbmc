@@ -1,4 +1,4 @@
-From a4b238241f3f3016ef3ddcd260c1490a9c9e8168 Mon Sep 17 00:00:00 2001
+From 8b95d3c1d5f475668d53cc21a7abf431d9a9822b Mon Sep 17 00:00:00 2001
 From: Andri Yngvason <andri@yngvason.is>
 Date: Sun, 23 Mar 2025 15:55:11 +0000
 Subject: [PATCH] Use aml v1
@@ -15,13 +15,13 @@ Upstream-Status: Backport [https://github.com/any1/neatvnc/commit/a4b238241f3f30
  src/server.c                |  6 ++----
  src/stream/gnutls.c         |  6 +++---
  src/stream/tcp.c            |  6 +++---
- 11 files changed, 35 insertions(+), 41 deletions(-)
+ 10 files changed, 34 insertions(+), 39 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 1017ffd..e731886 100644
+index a0d7401..b094d9b 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -71,7 +71,7 @@ libavcodec = dependency('libavcodec', required: get_option('h264'))
+@@ -63,7 +63,7 @@ libavcodec = dependency('libavcodec', required: get_option('h264'))
  libavfilter = dependency('libavfilter', required: get_option('h264'))
  libavutil = dependency('libavutil', required: get_option('h264'))
  
@@ -159,10 +159,10 @@ index a361974..441df19 100644
  	struct encoded_frame* result;
  	result = encoded_frame_new(self->dst.data, self->dst.len, self->n_rects,
 diff --git a/src/enc/zrle.c b/src/enc/zrle.c
-index 42044dc..e775f34 100644
+index 503c738..c043983 100644
 --- a/src/enc/zrle.c
 +++ b/src/enc/zrle.c
-@@ -315,9 +315,9 @@ static int zrle_encode_frame(struct zrle_encoder* self,
+@@ -340,9 +340,9 @@ static int zrle_encode_frame(struct zrle_encoder* self, z_stream* zs,
  	return 0;
  }
  
@@ -174,7 +174,7 @@ index 42044dc..e775f34 100644
  	int rc __attribute__((unused));
  
  	struct nvnc_fb* fb = self->current_fb;
-@@ -349,9 +349,9 @@ static void zrle_encoder_do_work(void* obj)
+@@ -374,9 +374,9 @@ static void zrle_encoder_do_work(void* obj)
  	assert(self->current_result);
  }
  
@@ -215,7 +215,7 @@ index e24798b..8f4cfa0 100644
  }
  
 diff --git a/src/server.c b/src/server.c
-index f172658..61da4dd 100644
+index a4f0ad9..099be28 100644
 --- a/src/server.c
 +++ b/src/server.c
 @@ -210,9 +210,8 @@ static void client_close(struct nvnc_client* client)
@@ -229,7 +229,7 @@ index f172658..61da4dd 100644
  	struct nvnc_client* client = aml_get_userdata(idle);
  	client->close_task = NULL;
  	aml_stop(aml_get_default(), idle);
-@@ -2033,9 +2032,8 @@ static void on_client_event(struct stream* stream, enum stream_event event)
+@@ -2013,9 +2012,8 @@ static void on_client_event(struct stream* stream, enum stream_event event)
  	client->buffer_index = 0;
  }
  
@@ -276,6 +276,3 @@ index 37f139a..95f5aa8 100644
  
  	// We hold a reference here in case the stream gets destroyed inside
  	// callback.
--- 
-2.43.0
-

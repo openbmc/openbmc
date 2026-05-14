@@ -86,9 +86,11 @@ FILES:${PN}-scripts = " \
     ${sbindir}/fsadm \
     ${sbindir}/lvmconf \
     ${sbindir}/lvmdump \
+    ${sbindir}/lvm_import_vdo \
+    ${sbindir}/lvmpersist \
+    ${libexecdir}/lvresize_fs_helper \
 "
 
-RDEPENDS:${PN} = "bash"
 RDEPENDS:${PN}:append:class-target = " libdevmapper"
 RDEPENDS:${PN}:append:class-nativesdk = " libdevmapper"
 
