@@ -291,7 +291,8 @@ python do_generate_static() {
         bb.debug(1, 'Spanning start=' + str(start_kb) + 'K end=' + str(finish_kb) + 'K')
         bb.debug(1, 'Compare needed=' + str(imgsize) + ' available=' + str(maxsize) + ' margin=' + str(maxsize - imgsize))
         if imgsize > maxsize:
-            bb.fatal("Image '%s' is %d bytes too large!" % (imgpath, imgsize - maxsize))
+            bb.fatal("Image size error: '%s' is %d bytes, exceeds allowed %d bytes (over by %d bytes)" % (
+                imgpath, imgsize, maxsize, imgsize - maxsize))
 
         subprocess.check_call(['dd', 'bs=1k', 'conv=notrunc',
                                'seek=%d' % start_kb,
