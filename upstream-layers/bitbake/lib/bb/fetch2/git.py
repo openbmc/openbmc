@@ -543,27 +543,23 @@ class Git(FetchMethod):
             runfetchcmd("touch %s.done" % ud.fullmirror, d)
 
     def clone_shallow_with_tarball(self, ud, d):
-        ret = False
-        tempdir = tempfile.mkdtemp(dir=d.getVar('DL_DIR'))
-        shallowclone = os.path.join(tempdir, 'git')
-        try:
-            try:
-                self.clone_shallow_local(ud, shallowclone, d)
-            except:
-                logger.warning("Fast shallow clone failed, try to skip fast mode now.")
-                bb.utils.remove(tempdir, recurse=True)
-                os.mkdir(tempdir)
-                ud.shallow_skip_fast = True
-                self.clone_shallow_local(ud, shallowclone, d)
-            logger.info("Creating tarball of git repository")
-            with self.create_atomic(ud.fullshallow) as tfile:
-                runfetchcmd("tar -czf %s ." % tfile, d, workdir=shallowclone)
-            runfetchcmd("touch %s.done" % ud.fullshallow, d)
-            ret = True
-        finally:
-            bb.utils.remove(tempdir, recurse=True)
-
-        return ret
+        for fast in [True, False]:
+            ud.shallow_skip_fast = not fast
+            with tempfile.TemporaryDirectory(dir=d.getVar('DL_DIR')) as tempdir:
+                shallowclone = os.path.join(tempdir, 'git')
+                try:
+                    self.clone_shallow_local(ud, shallowclone, d)
+                except:
+                    if not fast:
+                        raise
+                    logger.warning("Fast shallow clone failed, try to skip fast mode now.")
+                    continue
+                logger.info("Creating tarball of git repository")
+                with self.create_atomic(ud.fullshallow) as tfile:
+                    runfetchcmd("tar -czf %s ." % tfile, d, workdir=shallowclone)
+                runfetchcmd("touch %s.done" % ud.fullshallow, d)
+                return True
+        return False
 
     def clone_shallow_local(self, ud, dest, d):
         """
