@@ -64,3 +64,5 @@ do_install:append() {
 }
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2024-12084] = "fixed-version: fixed since v3.4.0"

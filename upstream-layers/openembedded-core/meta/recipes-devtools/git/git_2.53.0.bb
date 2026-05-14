@@ -171,3 +171,9 @@ EXTRA_OECONF += "ac_cv_snprintf_returns_bogus=no \
 EXTRA_OEMAKE += "NO_GETTEXT=1"
 
 SRC_URI[tarball.sha256sum] = "429dc0f5fe5f14109930cdbbb588c5d6ef5b8528910f0d738040744bebdc6275"
+
+CVE_STATUS[CVE-2024-32002] = "fixed-version: fixed since v2.46.0"
+CVE_STATUS[CVE-2024-50349] = "fixed-version: fixed since v2.49.0"
+CVE_STATUS[CVE-2024-52006] = "fixed-version: fixed since v2.49.0"
+CVE_STATUS[CVE-2025-48385] = "fixed-version: fixed since v2.51.0"
+CVE_STATUS[CVE-2025-48386] = "fixed-version: fixed since v2.51.0"

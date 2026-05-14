@@ -140,3 +140,5 @@ FILES:${PN}-ptest:append:class-target = "\
 "
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2025-0306] = "not-applicable-config: issue does not occur with openssl >= 3.2.0"

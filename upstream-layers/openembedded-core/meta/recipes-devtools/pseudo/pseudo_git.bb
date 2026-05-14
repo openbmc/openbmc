@@ -12,8 +12,8 @@ SRC_URI:append:class-nativesdk = " \
     file://older-glibc-symbols.patch"
 SRC_URI[prebuilt.sha256sum] = "ed9f456856e9d86359f169f46a70ad7be4190d6040282b84c8d97b99072485aa"
 
-SRCREV = "0bad85523ff71f1a84cea5fdf72e7f560c4aeed4"
-PV = "1.9.5"
+SRCREV = "7109ac1b417cd31e0100f6e1c4f3e5743541b9ed"
+PV = "1.9.6"
 
 # largefile and 64bit time_t support adds these macros via compiler flags globally
 # remove them for pseudo since pseudo intercepts some of the functions which will be

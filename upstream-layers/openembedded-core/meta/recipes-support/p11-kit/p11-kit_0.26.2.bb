@@ -42,3 +42,5 @@ BBCLASSEXTEND = "native nativesdk"
 # git/p11-kit/import-object.c:229:70: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
 # git/p11-kit/import-object.c:264:78: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
 CFLAGS += "-Wno-error=incompatible-pointer-types"
+
+CVE_STATUS[CVE-2026-2100] = "fixed-version: fixed since 0.26.2"

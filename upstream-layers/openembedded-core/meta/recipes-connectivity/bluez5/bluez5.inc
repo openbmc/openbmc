@@ -68,6 +68,8 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/bluetooth/bluez-${PV}.tar.xz \
            file://init \
            file://run-ptest \
            file://0001-tests-add-a-target-for-building-tests-without-runnin.patch \
+           file://0001-Revert-shared-shell-Don-t-init-input-for-non-interac.patch \
+           file://0001-tools-Work-around-broken-stdin-handling-in-home-made.patch \
            "
 S = "${UNPACKDIR}/bluez-${PV}"
 

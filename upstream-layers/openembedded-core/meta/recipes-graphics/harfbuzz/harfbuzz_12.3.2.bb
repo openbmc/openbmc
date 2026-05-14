@@ -50,3 +50,5 @@ FILES:${PN}-icu-dev = "${libdir}/libharfbuzz-icu.so \
 FILES:${PN}-subset = "${libdir}/libharfbuzz-subset.so.*"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2024-56732] = "fixed-version: affected versions are >= 8.5.0, <= 10.0.1"

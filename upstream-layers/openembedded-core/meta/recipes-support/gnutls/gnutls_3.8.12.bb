@@ -107,3 +107,4 @@ pkg_postinst_ontarget:${PN}-fips () {
 
 CVE_STATUS[CVE-2025-32989] = "fixed-version: fixed in version 3.8.10"
 CVE_STATUS[CVE-2025-32990] = "fixed-version: fixed in version 3.8.10"
+CVE_STATUS[CVE-2026-1584] = "fixed-version: fixed in version 3.8.12"

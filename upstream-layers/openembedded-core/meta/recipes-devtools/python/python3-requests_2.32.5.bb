@@ -32,3 +32,6 @@ FILES:${PN}:append:class-nativesdk = " ${SDKPATHNATIVE}/environment-setup.d/pyth
 CVE_PRODUCT = "requests"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2024-35195] = "fixed-version: fixed since 2.32.0"
+CVE_STATUS[CVE-2024-47081] = "fixed-version: fixed since 2.32.4"

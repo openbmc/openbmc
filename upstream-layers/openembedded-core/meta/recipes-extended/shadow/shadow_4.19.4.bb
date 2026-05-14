@@ -38,6 +38,8 @@ PAM_SRC_URI = "file://pam.d/chfn \
                file://pam.d/passwd \
                file://pam.d/su"
 
+CVE_PRODUCT = "debian:shadow shadow_project:shadow"
+
 inherit autotools gettext github-releases pkgconfig
 
 export CONFIG_SHELL = "/bin/sh"

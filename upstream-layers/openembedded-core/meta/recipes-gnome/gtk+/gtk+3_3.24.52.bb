@@ -22,7 +22,7 @@ inherit gettext gnomebase gtk-doc update-alternatives gtk-immodules-cache gsetti
 SRC_URI += "\
            file://opengl.patch \
            "
-SRC_URI[archive.sha256sum] = "0013877c6bd23c2dbe42ad7c70a053d0e449be66736574e37867c49c5f905a4f"
+SRC_URI[archive.sha256sum] = "80931fa472a77b9a164f6740e3c0b444fac6770054632d35a7ff9d679e5e7b9f"
 
 BBCLASSEXTEND = "native nativesdk"
 
