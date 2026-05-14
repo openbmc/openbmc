@@ -11,7 +11,7 @@ New Features / Enhancements in 5.1
 
 -  New variables:
 
-   -  :term:`CVE_CHECK_MANIFEST_JSON_SUFFIX`: suffix for the CVE JSON manifest file.
+   -  ``CVE_CHECK_MANIFEST_JSON_SUFFIX``: suffix for the CVE JSON manifest file.
 
    -  :term:`PRSERV_UPSTREAM`: Upstream PR service (``host:port``) for the local
       PR server to connect to.
@@ -235,12 +235,12 @@ New Features / Enhancements in 5.1
 
    -  Fetch release tarballs instead of git checkouts to reduce disk usage.
 
--  :ref:`ref-classes-cve-check` changes:
+-  ``cve-check`` changes:
 
-   -  The class :ref:`ref-classes-cve-check` now uses a local copy of the NVD
+   -  The class ``cve-check`` now uses a local copy of the NVD
       database during builds.
 
-   -  New statuses can be reported by :ref:`ref-classes-cve-check`:
+   -  New statuses can be reported by ``cve-check``:
 
       -  ``fix-file-included``: when a fix file has been included (set automatically)
       -  ``version-not-in-range``: version number NOT in the vulnerable range (set automatically)

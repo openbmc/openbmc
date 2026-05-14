@@ -36,11 +36,13 @@ $0 OCI_IMAGE [make arguments...]
      - almalinux:8
      - almalinux:9
      - centos:stream9
+     - centos:stream10
      - debian:12
      - debian:13
      - fedora:42
      - fedora:43
      - leap:15.6
+     - leap:16.0
      - rockylinux:8
      - rockylinux:9
      - ubuntu:22.04
@@ -97,7 +99,8 @@ main ()
       docs_pdf=tlmgr_docs_pdf.sh
       pip3=pip3_docs.sh
       ;;
-    "centos:stream9"*)
+    "centos:stream9"*|\
+    "centos:stream10"*)
       containerfile=Containerfile.stream
       essential=centosstream_essential.sh
       docs=centosstream_docs.sh

@@ -97,6 +97,7 @@ oecore_git = f"{oe_git_server}/openembedded-core"
 bitbake_git = f"{oe_git_server}/bitbake"
 yocto_git_server = "https://git.yoctoproject.org"
 meta_yocto_git = f"{yocto_git_server}/meta-yocto"
+bugzilla_server = "https://bugzilla.yoctoproject.org"
 
 # external links and substitutions
 extlinks = {
@@ -109,7 +110,8 @@ extlinks = {
     'yocto_wiki': ('https://wiki.yoctoproject.org/wiki%s', None),
     'yocto_dl': ('https://downloads.yoctoproject.org%s', None),
     'yocto_lists': ('https://lists.yoctoproject.org%s', None),
-    'yocto_bugs': ('https://bugzilla.yoctoproject.org%s', None),
+    'yocto_bugs': (f'{bugzilla_server}%s', None),
+    'yocto_bug': (f'{bugzilla_server}/show_bug.cgi?id=%s', '%s'),
     'yocto_ab': ('https://autobuilder.yoctoproject.org%s', None),
     'yocto_docs': ('https://docs.yoctoproject.org%s', None),
     'yocto_git': (f'{yocto_git_server}%s', None),

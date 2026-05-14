@@ -778,7 +778,7 @@ New Features / Enhancements in |yocto-ver|
       branch is no longer updated <migration-guides/migration-5.3:The Poky
       repository master branch is no longer updated>`.
 
--  :ref:`ref-classes-cve-check` class changes:
+-  ``cve-check`` class changes:
 
    -  ``cve-update-db-native``: FKIE: use Secondary metric if there is no
       Primary metric.

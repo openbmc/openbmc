@@ -83,7 +83,7 @@ Fixes in Yocto-5.0.5
 -  ref-manual: devtool-reference: document missing commands
 -  ref-manual: devtool-reference: refresh example outputs
 -  ref-manual: faq: add q&a on class appends
--  ref-manual: introduce :term:`CVE_CHECK_REPORT_PATCHED` variable
+-  ref-manual: introduce ``CVE_CHECK_REPORT_PATCHED`` variable
 -  ref-manual: merge patch-status-* to patch-status
 -  ref-manual: release-process: add a reference to the doc's release
 -  ref-manual: release-process: refresh the current LTS releases

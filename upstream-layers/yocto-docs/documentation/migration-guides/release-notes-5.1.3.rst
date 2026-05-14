@@ -40,7 +40,7 @@ Fixes in Yocto-5.1.3
 -  cmake: apply parallel build settings to ptest tasks
 -  contributor-guide/submit-changes: add policy on AI generated code
 -  cve-check: fix cvesInRecord
--  cve-check: restore :term:`CVE_CHECK_SHOW_WARNINGS` functionality
+-  cve-check: restore ``CVE_CHECK_SHOW_WARNINGS`` functionality
 -  dev-manual/building: document the initramfs-framework recipe
 -  devtool: ide-sdk recommend :term:`DEBUG_BUILD`
 -  devtool: ide-sdk remove the plugin from eSDK installer
