@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://COPYING.txt;md5=2c0b5770a62017a3121c69bb9f680b0c \
                     file://COPYING/COPYING.curl;md5=be5d9e1419c4363f4b32037a2d3b7ffa \
                     "
 
-DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c libcheck rust-native cargo-native libmspack"
+DEPENDS = "glibc llvm libtool db openssl zlib curl libxml2 bison pcre2 json-c libcheck rust-native cargo-native"
 
 SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/1.4;protocol=https \
            file://clamd.conf \
@@ -22,8 +22,8 @@ SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/1.4;protocol=https \
            file://tmpfiles.clamav \
            "
 
-# ClamAV version 1.4.3
-SRCREV = "d8b053865fd5995f7af98bfbcd98c9a5644bfe2b"
+# ClamAV version 1.4.4
+SRCREV = "f6d84be3c0048deb15c54d67e140dae062e5b82b"
 
 COMPATIBLE_HOST:libc-musl:class-target = "null"
 # As of 1.4.3 compilation is broken on 32-bit platforms

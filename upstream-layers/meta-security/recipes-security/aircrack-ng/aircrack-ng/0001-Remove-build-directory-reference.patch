@@ -1,0 +1,79 @@
+From 3101dcd56c19112c6b6e4378886cdfdae7001304 Mon Sep 17 00:00:00 2001
+From: Scott Murray <scott.murray@konsulko.com>
+Date: Sun, 26 Apr 2026 02:10:06 +0300
+Subject: [PATCH] Remove build directory reference
+
+Remove logic in crypto engine loader code that tries to detect
+running inside a build tree to remove the resulting reference
+to the absolute build directoy path in the binary.
+
+Upstream-Status: Inappropriate [OE-specific]
+Signed-off-by: Scott Murray <scott.murray@konsulko.com>
+---
+ lib/libac/support/crypto_engine_loader.c | 40 +++++-------------------
+ 1 file changed, 7 insertions(+), 33 deletions(-)
+
+diff --git a/lib/libac/support/crypto_engine_loader.c b/lib/libac/support/crypto_engine_loader.c
+index 0ec02e7..f9f9cfd 100644
+--- a/lib/libac/support/crypto_engine_loader.c
++++ b/lib/libac/support/crypto_engine_loader.c
+@@ -251,26 +251,13 @@ EXPORT int ac_crypto_engine_loader_get_available(void)
+ #endif
+ 	REQUIRE(working_directory != NULL);
+ 
+-	if (strncmp(working_directory, ABS_TOP_BUILDDIR, strlen(ABS_TOP_BUILDDIR))
+-		== 0)
+-	{
+-		// use development paths
+-		snprintf(library_path,
+-				 sizeof(library_path) - 1,
+-				 "%s%s",
+-				 LIBAIRCRACK_CE_WPA_PATH,
+-				 LT_OBJDIR);
+-	}
+-	else
+-	{
+ #if defined(WIN32_PORTABLE)
+-		// use the current directory
+-		snprintf(library_path, sizeof(library_path) - 1, working_directory);
++	// use the current directory
++	snprintf(library_path, sizeof(library_path) - 1, working_directory);
+ #else
+-		// use installation paths
+-		snprintf(library_path, sizeof(library_path) - 1, "%s", LIBDIR);
++	// use installation paths
++	snprintf(library_path, sizeof(library_path) - 1, "%s", LIBDIR);
+ #endif
+-	}
+ 	free(working_directory);
+ 
+ 	// enumerate all DSOs in folder, opening, searching symbols, and testing
+@@ -353,22 +340,9 @@ EXPORT char * ac_crypto_engine_loader_best_library_for(int simd_features)
+ 		= get_current_working_directory(); // or the binary's path?
+ 	REQUIRE(working_directory != NULL);
+ 
+-	if (strncmp(
+-			working_directory, ABS_TOP_BUILDDIR, sizeof(ABS_TOP_BUILDDIR) - 1)
+-		== 0)
+-	{
+-		// use development paths
+-		snprintf(library_path,
+-				 sizeof(library_path) - 1,
+-				 "%s%s",
+-				 LIBAIRCRACK_CE_WPA_PATH,
+-				 LT_OBJDIR);
+-	}
+-	else
+-	{
+-		// use installation paths
+-		snprintf(library_path, sizeof(library_path) - 1, "%s", LIBDIR);
+-	}
++	// use installation paths
++	snprintf(library_path, sizeof(library_path) - 1, "%s", LIBDIR);
++
+ 	free(working_directory);
+ 
+ #if defined(WIN32_PORTABLE)
+-- 
+2.47.3
+

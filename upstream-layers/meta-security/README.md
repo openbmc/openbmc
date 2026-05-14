@@ -1,7 +1,5 @@
-Master-next: 
-[![pipeline status](https://gitlab.com/akuster/meta-security/badges/master-next/pipeline.svg)](https://gitlab.com/akuster/meta-security/-/commits/master-next)
-
-Master: [![pipeline status](https://gitlab.com/akuster/meta-security/badges/master/pipeline.svg)](https://gitlab.com/akuster/meta-security/-/commits/master)
+Master-next: [pipeline status](https://gitlab.com/ygreky/meta-security/-/pipelines)
+Master: [pipeline status](https://gitlab.com/ygreky/meta-security/-/pipelines)
 
 Meta-security
 =============

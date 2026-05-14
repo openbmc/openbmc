@@ -5,9 +5,10 @@ require suricata.inc
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=1;endline=2;md5=c70d8d3310941dcdfcd1e02800a1f548"
 
 SRC_URI = "http://www.openinfosecfoundation.org/download/suricata-${PV}.tar.gz"
-SRC_URI[sha256sum] = "bbc94cf0a297f4560c64569ed72867c799287defdaf6e6572ce769f48dd2559b"
+SRC_URI[sha256sum] = "81cee7bae69848a9751b2ce0867620eefa52b192e79c20b5eac897600b28b191"
 
-DEPENDS = "jansson lz4 libhtp"
+DEPENDS = "jansson lz4"
+DEPENDS:append:libc-musl = " libunwind"
 
 SRC_URI += " \
     file://volatiles.03_suricata \
@@ -18,22 +19,23 @@ SRC_URI += " \
     file://0001-Skip-pkg-Makefile-from-using-its-own-rust-steps.patch \
     "
 
-inherit autotools pkgconfig python3native systemd ptest cargo cargo-update-recipe-crates
+inherit autotools pkgconfig python3native systemd ptest rust cargo cargo-update-recipe-crates
 
 require  ${BPN}-crates.inc
 
 EXTRA_OECONF += " --disable-debug \
     --disable-gccmarch-native \
-    --enable-non-bundled-htp \
     --disable-suricata-update \
-    --with-libhtp-includes=${STAGING_INCDIR} --with-libhtp-libraries=${STAGING_LIBDIR} \
     --with-libjansson-includes=${STAGING_INCDIR} --with-libjansson-libraries=${STAGING_LIBDIR} \
     "
 
 CARGO_SRC_DIR = "rust"
 
 CARGO_BUILD_FLAGS:remove = "--frozen"
-CARGO_BUILD_FLAGS:append = " --offline"
+CARGO_BUILD_FLAGS:append = " \
+    --offline \
+    ${@bb.utils.contains('PACKAGECONFIG', 'ja4', '--features ja4', '', d)} \
+    "
 
 B = "${S}"
 
@@ -54,6 +56,7 @@ PACKAGECONFIG[yaml] = "--with-libyaml-includes=${STAGING_INCDIR} --with-libyaml-
 PACKAGECONFIG[pcap] = "--with-libpcap-includes=${STAGING_INCDIR} --with-libpcap-libraries=${STAGING_LIBDIR}, ,libpcap"
 PACKAGECONFIG[cap-ng] = "--with-libcap_ng-includes=${STAGING_INCDIR} --with-libcap_ng-libraries=${STAGING_LIBDIR}, ,libcap-ng , "
 PACKAGECONFIG[net] = "--with-libnet-includes=${STAGING_INCDIR} --with-libnet-libraries=${STAGING_LIBDIR}, , libnet,"
+PACKAGECONFIG[ja4] = "--enable-ja4, --disable-ja4"
 PACKAGECONFIG[nfnetlink] = "--with-libnfnetlink-includes=${STAGING_INCDIR} --with-libnfnetlink-libraries=${STAGING_LIBDIR}, ,libnfnetlink ,"
 PACKAGECONFIG[nfq] = "--enable-nfqueue, --disable-nfqueue,libnetfilter-queue,"
 
@@ -75,7 +78,9 @@ do_configure:prepend () {
     autotools_do_configure
 }
 
-CFLAGS += "-Wno-error=incompatible-pointer-types"
+CFLAGS += "-Wno-error=incompatible-pointer-types \
+    -ffile-prefix-map=${CARGO_HOME}=${TARGET_DBGSRC_DIR} \
+    "
 
 # Commit 7a2b9acef2 cargo: pass PACKAGECONFIG_CONFARGS to cargo build
 # breaks building this recipe. Providing a copy of the original function
@@ -90,6 +95,9 @@ oe_cargo_build () {
 }
 
 do_compile () {
+    mkdir -p ${S}/${CARGO_SRC_DIR}/gen
+    export SURICATA_LUA_SYS_HEADER_DST='${S}/${CARGO_SRC_DIR}/gen'
+
     # we do this to bypass the make provided by this pkg
     # patches Makefile to skip the subdir
     cargo_do_compile
@@ -103,6 +111,9 @@ do_install () {
     install -d ${D}${sysconfdir}/suricata
 
     oe_runmake install DESTDIR=${D}
+
+    install -m 0755 '${B}/${CARGO_SRC_DIR}/target/${CARGO_TARGET_SUBDIR}/suricatasc' '${D}${bindir}'
+    install -m 0755 '${B}/${CARGO_SRC_DIR}/target/${CARGO_TARGET_SUBDIR}/suricatactl' '${D}${bindir}'
 
     install -d ${D}${sysconfdir}/suricata ${D}${sysconfdir}/default/volatiles
     install -m 0644 ${UNPACKDIR}/volatiles.03_suricata  ${D}${sysconfdir}/default/volatiles/03_suricata
@@ -132,10 +143,6 @@ do_install () {
 
     # Remove /var/run as it is created on startup
     rm -rf ${D}${localstatedir}/run
-
-    sed -i -e "s:#!.*$:#!${USRBINPATH}/env python3:g" ${D}${bindir}/suricatasc
-    sed -i -e "s:#!.*$:#!${USRBINPATH}/env python3:g" ${D}${bindir}/suricatactl
-    sed -i -e "s:#!.*$:#!${USRBINPATH}/env python3:g" ${D}${libdir}/suricata/python/suricata/sc/suricatasc.py
 }
 
 pkg_postinst_ontarget:${PN} () {
@@ -147,9 +154,7 @@ fi
 SYSTEMD_PACKAGES = "${PN}"
 SYSTEMD_SERVICE:${PN} = "${BPN}.service"
 
-PACKAGES =+ "${PN}-python"
 FILES:${PN} += "${systemd_unitdir} ${sysconfdir}/tmpfiles.d"
-FILES:${PN}-python = "${bindir}/suricatasc ${PYTHON_SITEPACKAGES_DIR}"
 
 RDEPENDS:${PN} += "jansson"
 

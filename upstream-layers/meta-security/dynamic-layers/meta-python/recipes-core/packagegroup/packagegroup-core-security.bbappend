@@ -1,7 +1,6 @@
 
 
 RDEPENDS:packagegroup-security-utils += "\
-    python3-privacyidea \
     python3-fail2ban \
     "
 
