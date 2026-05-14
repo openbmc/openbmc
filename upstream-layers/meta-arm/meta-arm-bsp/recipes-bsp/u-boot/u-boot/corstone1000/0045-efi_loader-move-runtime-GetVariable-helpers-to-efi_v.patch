@@ -1,0 +1,103 @@
+From 5c2b1f517c97f3349108bfd9fef9aac40ba236ac Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Fri, 12 Dec 2025 10:59:47 +0000
+Subject: [PATCH 45/53] efi_loader: move runtime GetVariable() helpers to
+ efi_variable.c
+
+Consolidate runtime GetVariable helpers to avoid duplicates
+
+The functions efi_get_variable_runtime() and
+efi_get_next_variable_name_runtime() were implemented in
+efi_variable_tee.c as part of the FF-A runtime variable handling work.
+However, default implementations for these same runtime helpers also
+exist in efi_var_common.c. This results in duplicate symbol definitions.
+To resolve the conflict and centralize the runtime API, this patch moves
+the default implementations of the two runtime GetVariable() helpers
+from efi_var_common.c to efi_variable.c. This ensures that:
+
+ - only a single definition of each runtime helper exists,
+ - backend-specific implementations can override these cleanly,
+ - the EFI runtime variable service table continues to reference the
+   correct functions.
+
+No functional changes are introduced; this is a structural cleanup to
+avoid build-time conflicts and consolidate EFI runtime variable support
+in the appropriate file.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ lib/efi_loader/efi_var_common.c | 24 ------------------------
+ lib/efi_loader/efi_variable.c   | 24 ++++++++++++++++++++++++
+ 2 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/lib/efi_loader/efi_var_common.c b/lib/efi_loader/efi_var_common.c
+index 4b34a58b4cf..0eaf89112e6 100644
+--- a/lib/efi_loader/efi_var_common.c
++++ b/lib/efi_loader/efi_var_common.c
+@@ -172,30 +172,6 @@ efi_status_t EFIAPI efi_query_variable_info(
+ 	return EFI_EXIT(ret);
+ }
+ 
+-efi_status_t __efi_runtime EFIAPI
+-efi_get_variable_runtime(u16 *variable_name, const efi_guid_t *guid,
+-			 u32 *attributes, efi_uintn_t *data_size, void *data)
+-{
+-	efi_status_t ret;
+-
+-	ret = efi_get_variable_mem(variable_name, guid, attributes, data_size,
+-				   data, NULL, EFI_VARIABLE_RUNTIME_ACCESS);
+-
+-	/* Remove EFI_VARIABLE_READ_ONLY flag */
+-	if (attributes)
+-		*attributes &= EFI_VARIABLE_MASK;
+-
+-	return ret;
+-}
+-
+-efi_status_t __efi_runtime EFIAPI
+-efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
+-				   u16 *variable_name, efi_guid_t *guid)
+-{
+-	return efi_get_next_variable_name_mem(variable_name_size, variable_name,
+-					      guid, EFI_VARIABLE_RUNTIME_ACCESS);
+-}
+-
+ /**
+  * efi_set_secure_state - modify secure boot state variables
+  * @secure_boot:	value of SecureBoot
+diff --git a/lib/efi_loader/efi_variable.c b/lib/efi_loader/efi_variable.c
+index f3533f4def3..a688c6da58d 100644
+--- a/lib/efi_loader/efi_variable.c
++++ b/lib/efi_loader/efi_variable.c
+@@ -566,6 +566,30 @@ efi_set_variable_runtime(u16 *variable_name, const efi_guid_t *vendor,
+ 	return EFI_SUCCESS;
+ }
+ 
++efi_status_t __efi_runtime EFIAPI
++efi_get_variable_runtime(u16 *variable_name, const efi_guid_t *guid,
++			 u32 *attributes, efi_uintn_t *data_size, void *data)
++{
++	efi_status_t ret;
++
++	ret = efi_get_variable_mem(variable_name, guid, attributes, data_size,
++				   data, NULL, EFI_VARIABLE_RUNTIME_ACCESS);
++
++	/* Remove EFI_VARIABLE_READ_ONLY flag */
++	if (attributes)
++		*attributes &= EFI_VARIABLE_MASK;
++
++	return ret;
++}
++
++efi_status_t __efi_runtime EFIAPI
++efi_get_next_variable_name_runtime(efi_uintn_t *variable_name_size,
++				   u16 *variable_name, efi_guid_t *guid)
++{
++	return efi_get_next_variable_name_mem(variable_name_size, variable_name,
++					      guid, EFI_VARIABLE_RUNTIME_ACCESS);
++}
++
+ /**
+  * efi_variables_boot_exit_notify() - notify ExitBootServices() is called
+  */

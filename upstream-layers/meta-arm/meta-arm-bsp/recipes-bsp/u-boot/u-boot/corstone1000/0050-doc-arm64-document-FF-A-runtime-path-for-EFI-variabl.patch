@@ -1,0 +1,176 @@
+From a4d871a16513e86290aaa2304f0195e533200937 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Wed, 25 Feb 2026 14:40:19 +0000
+Subject: [PATCH 50/53] doc: arm64: document FF-A runtime path for EFI
+ variables
+
+Document how EFI runtime variables use FF-A MM communication
+
+Describe the FF-A runtime layer on arm64 and how EFI variable
+runtime services use the FF-A transport and shared MM buffer.
+Also clarify armffa command scope and link to the FF-A doc.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ doc/arch/arm64.ffa.rst   | 92 +++++++++++++++++++++++++++++++++++++---
+ doc/usage/cmd/armffa.rst | 11 +++++
+ 2 files changed, 96 insertions(+), 7 deletions(-)
+
+diff --git a/doc/arch/arm64.ffa.rst b/doc/arch/arm64.ffa.rst
+index d2c4fb49f79..53218cd9c96 100644
+--- a/doc/arch/arm64.ffa.rst
++++ b/doc/arch/arm64.ffa.rst
+@@ -15,10 +15,10 @@ application in S-EL0, or a Trusted OS in S-EL1.
+ The U-Boot FF-A support (the bus) implements the interfaces to communicate
+ with partitions in the Secure world aka Secure partitions (SPs).
+ 
+-The FF-A support specifically focuses on communicating with SPs that
+-isolate portions of EFI runtime services that must run in a protected
+-environment which is inaccessible by the Host OS or Hypervisor.
+-Examples of such services are set/get variables.
++U-Boot's FF-A bus support exposes an optional transport that EFI runtime
++services can use to communicate with Secure Partitions. Through this
++interface, EFI services (such as variable access) can request or exchange
++data with the Secure World using FF-A.
+ 
+ The FF-A support uses the SMC ABIs defined by the FF-A specification to:
+ 
+@@ -26,13 +26,13 @@ The FF-A support uses the SMC ABIs defined by the FF-A specification to:
+ - Access an SP's service through communication protocols
+   e.g. EFI MM communication protocol
+ 
+-At this stage of development only EFI boot-time services are supported.
+-Runtime support will be added in future developments.
+-
+ The U-Boot FF-A support provides the following parts:
+ 
+ - A Uclass driver providing generic FF-A methods.
+ - An Arm FF-A device driver providing Arm-specific methods and reusing the Uclass methods.
++- An optional runtime FF-A transport (toggled via CONFIG_ARM_FFA_RT_MODE) that is
++  resident after ExitBootServices() and enables EFI runtime variable services
++  via FF-A helpers and a shared MM communication buffer.
+ - A sandbox emulator for Arm FF-A, emulates the FF-A side of the Secure World and provides
+   FF-A ABIs inspection methods.
+ - An FF-A sandbox device driver for FF-A communication with the emulated Secure World.
+@@ -69,6 +69,12 @@ CONFIG_ARM_FFA_TRANSPORT
+     When using an Arm 64-bit platform, the Arm FF-A driver will be used.
+     When using sandbox, the sandbox FF-A emulator and FF-A sandbox driver will be used.
+ 
++CONFIG_ARM_FFA_RT_MODE
++    Enables the FF-A runtime transport. This option depends on
++    CONFIG_ARM_FFA_TRANSPORT and CONFIG_EFI_LOADER, and is enabled by default.
++    When enabled, a minimal set of FF-A operations remains available after
++    ExitBootServices().
++
+ FF-A ABIs under the hood
+ ------------------------
+ 
+@@ -158,6 +164,77 @@ they want to use (32-bit vs 64-bit). Selecting the protocol means using
+ the 32-bit or 64-bit version of FFA_MSG_SEND_DIRECT_{REQ, RESP}.
+ The calling convention between U-Boot and the secure world stays the same: SMC32.
+ 
++FF-A runtime support for EFI variables
++--------------------------------------
++
++U-Boot provides an FF-A runtime transport to keep a minimal set of FF-A operations
++available after ExitBootServices(). This runtime transport is enabled with
++CONFIG_ARM_FFA_RT_MODE. The runtime helpers and data are marked with
++``__efi_runtime`` / ``__efi_runtime_data`` through the
++``__ffa_runtime`` / ``__ffa_runtime_data`` aliases in
++``include/arm_ffa_runtime.h``.
++
++Runtime context is enabled at ExitBootServices(), and the following prerequisites
++are prepared during FF-A bus probe:
++
++- The U-Boot FF-A endpoint ID is discovered at boot time with FFA_ID_GET and
++  stored in the runtime private data.
++- An ExitBootServices() event is registered by the runtime transport to enable
++  the runtime context with ffa_enable_runtime_context() when EFI transitions
++  to runtime.
++
++At runtime, the driver model is no longer available. Runtime users should
++use the runtime interface ffa_sync_send_receive_runtime(), which internally
++verifies the runtime context before issuing FF-A calls.
++
++EFI variable services over FF-A
++-------------------------------
++
++When CONFIG_EFI_MM_COMM_TEE and CONFIG_ARM_FFA_TRANSPORT are enabled, U-Boot
++routes EFI variable services to an MM Secure Partition (SP) over FF-A.
++The MM SP is discovered at boot time using FFA_PARTITION_INFO_GET and its
++partition ID is cached in runtime data.
++
++The data path uses a shared MM communication buffer and a door-bell style
++direct message:
++
++- The communication buffer is located at CONFIG_FFA_SHARED_MM_BUF_ADDR and
++  sized by CONFIG_FFA_SHARED_MM_BUF_SIZE.
++- CONFIG_FFA_SHARED_MM_BUF_OFFSET is sent in the FF-A direct message payload
++  to indicate where the data begins.
++- The buffer is filled by memcpy(), the cache is flushed before notifying the
++  MM SP, and later the buffer is reused directly with only the shared-buffer
++  range invalidated (invalidate_dcache_range()) to avoid whole-cache
++  invalidation.
++
++After ExitBootServices(), EFI SetVariable()/GetVariable() call paths use the
++runtime MM communication helpers:
++
++- get_comm_buf() switches to the static shared buffer
++- mm_communicate_runtime() selects FF-A transport when the runtime context
++  is enabled
++- ffa_mm_communicate_runtime() issues FFA_MSG_SEND_DIRECT_{REQ,RESP} through
++  ffa_sync_send_receive_runtime()
++
++Configuration notes
++-------------------
++
++Enable FF-A transport and MM communication:
++
++- CONFIG_ARM_FFA_TRANSPORT
++- CONFIG_ARM_FFA_RT_MODE
++- CONFIG_EFI_MM_COMM_TEE
++
++CONFIG_ARM_FFA_RT_MODE is enabled by default. It turns on MM communication for
++EFI runtime and may be disabled when EFI services over FF-A are not required
++after ExitBootServices().
++
++Configure the shared MM communication buffer:
++
++- CONFIG_FFA_SHARED_MM_BUF_ADDR
++- CONFIG_FFA_SHARED_MM_BUF_SIZE
++- CONFIG_FFA_SHARED_MM_BUF_OFFSET
++
+ Requirements for user drivers
+ -----------------------------
+ 
+@@ -260,6 +337,7 @@ For example, when using FF-A with Corstone-1000, debug logs enabled, the output
+ Contributors
+ ------------
+    * Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
++   * Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+ 
+ .. _`FF-A v1.0 specification`: https://documentation-service.arm.com/static/5fb7e8a6ca04df4095c1d65e
+ .. _`SMC Calling Convention v1.2 specification`: https://documentation-service.arm.com/static/5f8edaeff86e16515cdbe4c6
+diff --git a/doc/usage/cmd/armffa.rst b/doc/usage/cmd/armffa.rst
+index 4f41e3393fd..5dcc3047a45 100644
+--- a/doc/usage/cmd/armffa.rst
++++ b/doc/usage/cmd/armffa.rst
+@@ -39,6 +39,17 @@ The command also allows to gather secure partitions information and ping these
+ 
+ The command is also helpful in testing the communication with secure partitions.
+ 
++Notes
++-----
++
++armffa is a boot-time test command. It relies on the FF-A driver model device
++(UCLASS_FFA) and is not intended for EFI runtime use after
++ExitBootServices().
++
++armffa does not provide EFI variable operations. For more information about
++using EFI runtime SetVariable() and GetVariable() over FF-A please see
++:doc:`../../arch/arm64.ffa`.
++
+ Example
+ -------
+ 

@@ -1,0 +1,50 @@
+From 1be3bcbc0c7efc36b8fbac7ef0f8c8375dc6770d Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Sat, 18 Apr 2026 14:26:28 +0100
+Subject: [PATCH 53/53] efi_loader: fix AllocatePages overlap status
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Return EFI_NOT_FOUND for EFI_ALLOCATE_ADDRESS overlap
+
+When efi_allocate_pages() is called with EFI_ALLOCATE_ADDRESS, UEFI
+expects EFI_NOT_FOUND if the requested address range is already
+allocated or unavailable. U-Boot currently returns
+EFI_OUT_OF_RESOURCES when efi_update_memory_map() detects an overlap
+after a successful lmb_alloc_mem(), which does not match
+EFI_ALLOCATE_ADDRESS semantics.
+
+Return EFI_NOT_FOUND for EFI_ALLOCATE_ADDRESS requests that fail due
+to an overlapping EFI memory descriptor, while keeping
+EFI_OUT_OF_RESOURCES for other allocation types.
+
+The UEFI specification [1] specifies that
+EFI_BOOT_SERVICES.AllocatePages must return EFI_NOT_FOUND when the
+requested address range is unavailable or already allocated;
+EFI_OUT_OF_RESOURCES applies to non‑address‑specific allocation
+failures.
+
+[1] https://uefi.org/specs/UEFI/2.10_A/07_Services_Boot_Services.html
+
+Upstream-Status: Submitted [https://lore.kernel.org/u-boot/20260427150530.3156000-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ lib/efi_loader/efi_memory.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/efi_loader/efi_memory.c b/lib/efi_loader/efi_memory.c
+index b77c2f980cc..63cf1a7277f 100644
+--- a/lib/efi_loader/efi_memory.c
++++ b/lib/efi_loader/efi_memory.c
+@@ -510,7 +510,9 @@ efi_status_t efi_allocate_pages(enum efi_allocate_type type,
+ 		/* Map would overlap, bail out */
+ 		lmb_free(addr, (u64)pages << EFI_PAGE_SHIFT, flags);
+ 		unmap_sysmem((void *)(uintptr_t)efi_addr);
+-		return  EFI_OUT_OF_RESOURCES;
++		if (type == EFI_ALLOCATE_ADDRESS)
++			return EFI_NOT_FOUND;
++		return EFI_OUT_OF_RESOURCES;
+ 	}
+ 
+ 	*memory = efi_addr;

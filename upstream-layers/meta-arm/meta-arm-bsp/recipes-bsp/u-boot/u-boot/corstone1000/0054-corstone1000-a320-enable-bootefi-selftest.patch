@@ -1,0 +1,37 @@
+From 0da9650a3ed86e63c6a9621d7a9195eb3a75a233 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Fri, 17 Apr 2026 13:41:07 +0100
+Subject: [PATCH] corstone1000-a320: enable bootefi selftest
+
+Turn on CONFIG_CMD_BOOTEFI_SELFTEST in the Corstone-1000 defconfig
+so the board can run the built-in UEFI self-test suite during
+development and validation.
+
+Upstream-Status: Pending [Will be submitted upstream with the
+pending Cortex-A320 related U-Boot changes]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ configs/corstone1000-a320_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configs/corstone1000-a320_defconfig b/configs/corstone1000-a320_defconfig
+index d0ae1e745db..c4dcd1790cc 100644
+--- a/configs/corstone1000-a320_defconfig
++++ b/configs/corstone1000-a320_defconfig
+@@ -41,6 +41,8 @@ CONFIG_SYS_PROMPT="corstone1000# "
+ # CONFIG_CMD_CONSOLE is not set
+ CONFIG_CMD_FWU_METADATA=y
+ CONFIG_CMD_BOOTZ=y
++# CONFIG_CMD_BOOTEFI_HELLO is not set
++CONFIG_CMD_BOOTEFI_SELFTEST=y
+ # CONFIG_CMD_XIMG is not set
+ CONFIG_CMD_NVEDIT_EFI=y
+ CONFIG_CMD_GPT=y
+@@ -76,6 +78,7 @@ CONFIG_SYSRESET=y
+ CONFIG_SYSRESET_PSCI=y
+ CONFIG_TEE=y
+ CONFIG_OPTEE=y
++# CONFIG_CMD_POWEROFF is not set
+ CONFIG_USB=y
+ CONFIG_USB_ISP1760=y
+ CONFIG_VIRTIO_MMIO=y

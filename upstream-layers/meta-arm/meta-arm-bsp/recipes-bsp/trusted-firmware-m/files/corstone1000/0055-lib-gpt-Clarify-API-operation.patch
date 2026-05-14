@@ -1,0 +1,38 @@
+From 7e2ae2fc4f8ae8a16a24b87d0650c6b4b28fc870 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Wed, 8 Apr 2026 17:39:13 +0100
+Subject: [PATCH] lib: gpt: Clarify API operation
+
+The move and duplicate operations both also move or copy (respectively)
+the partition data, which is not immediately obvious.
+
+Change-Id: If4a0c4a87d30bfceb2534c9d01ba763688e0cc9e
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/50237/1]
+---
+ lib/gpt/inc/gpt.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+index 334a08f41..c11ecbff2 100644
+--- a/lib/gpt/inc/gpt.h
++++ b/lib/gpt/inc/gpt.h
+@@ -152,7 +152,7 @@ __attribute__((nonnull(1)))
+ psa_status_t gpt_attr_set(const struct efi_guid_t *guid, const uint64_t attr);
+ 
+ /**
+- * \brief Moves (or resizes) a partition entry.
++ * \brief Moves (or resizes) a partition entry, including the partition data.
+  *
+  * \param[in] guid Entry to move.
+  * \param[in] start New start LBA.
+@@ -171,7 +171,8 @@ psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
+                             const uint64_t           end);
+ 
+ /**
+- * \brief Duplicates an existing partition entry into new space.
++ * \brief Duplicates an existing partition entry into new space, including the
++ *        partition data.
+  *
+  * \param[in]  old_guid Entry to duplicate.
+  * \param[in]  start    Starting LBA (0 uses the lowest free LBA possible).

@@ -28,6 +28,7 @@ The following prerequisites must be available on the host system:
 - GNU Tar 1.34 or greater.
 - GNU Compiler Collection 12.2 or greater.
 - GNU Make 4.3 or greater.
+- mtools 4.0 or greater.
 - tmux 3.3 or greater.
 
 Please follow the steps described in the Yocto mega manual:
@@ -210,13 +211,22 @@ Build
         mkdir ${WORKSPACE}
         cd ${WORKSPACE}
 
-#. Install kas version 4.4 with ``sudo`` rights.
+#. Create a Python virtual environment and activate it.
 
     .. code-block:: console
 
-        sudo pip3 install kas==4.4
+        python3 -m venv ${WORKSPACE}/venv_cs1k
+        source ${WORKSPACE}/venv_cs1k/bin/activate
 
-    Ensure the kas installation directory is visible on the ``$PATH`` environment variable.
+#. Install ``kas`` and ``wic`` inside the virtual environment.
+
+    .. code-block:: console
+
+        python3 -m pip install kas==5.1 "git+https://git.yoctoproject.org/wic@v0.3.0"
+
+    .. note::
+
+        Ensure the kas and wic installation directory is visible on the ``$PATH`` environment variable.
 
 #. Clone the `meta-arm` Yocto layer in the workspace ``${WORKSPACE}``.
 
@@ -424,6 +434,10 @@ MPS3
     .. code-block:: console
 
         sudo picocom -b 115200 /dev/ttyUSB3
+
+    .. note::
+
+        If the user is a member of the ``dialout`` group, ``sudo`` is not required for this step.
 
     .. important::
         Plug a connected Ethernet cable to the MPS3 or it will
@@ -851,14 +865,15 @@ The results can be fetched from the `acs_results` folder in the ``BOOT`` partiti
 
 .. note::
 
-    Access the `acs_results` folder in FVP by running the following commands:
+    Access the `acs_results` folder in FVP by copying it from the same ACS image that was used to boot the FVP.
+    The following command copies the ``acs_results`` directory from the ACS image to
+    ``${WORKSPACE}/acs_results`` on the host development machine.
 
     .. code-block:: console
 
-        sudo mkdir /mnt/test
-        sudo mount -o rw,offset=1048576 \
-        ${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0/ir-acs-live-image-generic-arm64.wic \
-        /mnt/test
+        cd ${WORKSPACE}
+        wic cp ${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0/ir-acs-live-image-generic-arm64.wic:1/acs_results \
+          ${WORKSPACE}
 
 #####################################################
 
@@ -1061,76 +1076,48 @@ Transfer Capsules to Target
 The capsule delivery process described below is the direct method (usage of capsules from the ACS image)
 as opposed to the on-disk method (delivery of capsules using a file on a mass storage device).
 
-MPS3
-====
-
-#. Prepare a USB drive as explained in `this <mps3-instructions-for-acs-image_>`_ section.
-
-#. Copy the capsule file to the root directory of the ``BOOT`` partition in the USB drive.
-
-  .. code-block:: console
-
-    cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/corstone1000-mps3-v6.uefi.capsule /dev/sdc/BOOT/
-    cp ${WORKSPACE}/corstone1000-mps3-v5.uefi.capsule /dev/sdc/EFI/BOOT/
-    cp ${WORKSPACE}/corstone1000-mps3-partial-v7.uefi.capsule /dev/sdc/EFI/BOOT/
-    sync
-
 .. note::
 
-    ``/dev/sdc`` is the assumed path for the ACS Image USB drive.
-    Replace it with the actual device path as enumerated on your development machine.
+    The staging steps below are shared between ``mps3`` and ``fvp``.
 
+#. Download and extract the ACS image `as described for the MPS3 <mps3-instructions-for-acs-image_>`_.
+   The ACS image extraction location will be referred below as ``${ACS_IMAGE_PATH}``.
+
+#. Copy the ACS image to the workspace root directory and rename it to
+   ``ir-acs-live-image-generic-arm64-staged.wic``. The staged image will then be
+   populated with the capsule files.
+
+    ``${ACS_STAGED_IMAGE}`` refers to
+    ``${WORKSPACE}/ir-acs-live-image-generic-arm64-staged.wic``.
+
+    .. code-block:: console
+
+        cp ${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic \
+          ${ACS_STAGED_IMAGE}
+
+#. Copy the capsules to the staged ACS image:
+
+    .. code-block:: console
+
+        cd ${WORKSPACE}
+        wic cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-${TARGET}-v6.uefi.capsule \
+          ${ACS_STAGED_IMAGE}:1/corstone1000-${TARGET}-v6.uefi.capsule
+        wic cp ${WORKSPACE}/corstone1000-${TARGET}-v5.uefi.capsule \
+          ${ACS_STAGED_IMAGE}:1/corstone1000-${TARGET}-v5.uefi.capsule
+        wic cp ${WORKSPACE}/corstone1000-${TARGET}-partial-v7.uefi.capsule \
+          ${ACS_STAGED_IMAGE}:1/corstone1000-${TARGET}-partial-v7.uefi.capsule
 
 .. important::
 
     The direct Capsule Update method requires that the capsule files not be placed in the ``EFI/UpdateCapsule`` directory,
     as doing so might inadvertently trigger the on-disk update method.
 
-FVP
+MPS3
 ===
 
-#. Download and extract the ACS image `as described for the MPS3 <mps3-instructions-for-acs-image_>`_.
-   The ACS image extraction location will be referred below as ``${ACS_IMAGE_PATH}``.
-
-    .. note::
-
-      Creating a USB drive with the ACS image is not required as the image will be mounted with the steps below.
-
-#. Find the first partition's offset of the ``ir-acs-live-image-generic-arm64.wic`` image using the ``fdisk`` tool.
-   The partition table can be listed using:
-
-    .. code-block:: console
-
-        fdisk -lu ${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic
-        Device                                                 Start     End Sectors  Size Type
-        ${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic1    2048  309247  307200  150M Microsoft basic data
-        ${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic2  309248 1343339 1034092  505M Linux filesystem
-
-
-    Given that the first partition starts at sector 2048 and each sector is 512 bytes in size,
-    the first partition is at offset 1048576 (2048 x 512).
-
-#. Mount the ``ir-acs-live-image-generic-arm64.wic`` image using the previously calculated offset:
-
-    .. code-block:: console
-
-        sudo mkdir /mnt/ir-acs-live-image-generic-arm64
-        sudo mount -o rw,offset=<first_partition_offset> ${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic  /mnt/ir-acs-live-image-generic-arm64
-
-#. Copy the capsules:
-
-    .. code-block:: console
-
-        sudo cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/corstone1000-fvp-v6.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
-        sudo cp ${WORKSPACE}/corstone1000-fvp-v5.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
-        sudo cp ${WORKSPACE}/corstone1000-fvp-partial-v7.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
-        sync
-
-#. Unmount the IR image:
-
-    .. code-block:: console
-
-        sudo umount /mnt/ir-acs-live-image-generic-arm64
+#. Write ``${ACS_STAGED_IMAGE}`` to the ACS USB drive by following the
+   `MPS3 ACS image steps <mps3-instructions-for-acs-image_>`_ and replacing
+   ``ir-acs-live-image-generic-arm64.wic`` with ``${ACS_STAGED_IMAGE}``.
 
 ************************
 Run Capsule Update Tests
@@ -1169,13 +1156,14 @@ Positive Full Capsule Update Test
 
       .. code-block:: console
 
+        cd ${WORKSPACE}
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml \
         -c "../meta-arm/scripts/runfvp --terminals=tmux \
-        -- -C board.msd_mmc.p_mmc_file=${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic"
+        -- -C board.msd_mmc.p_mmc_file=${ACS_STAGED_IMAGE}"
 
       .. warning::
 
-          ``${ACS_IMAGE_PATH}`` must be an absolute path. Ensure there are no spaces before or after of ``=`` of the ``-C board.msd_mmc.p_mmc_file`` option.
+          ``${ACS_STAGED_IMAGE}`` must be an absolute path. Ensure there are no spaces before or after of ``=`` of the ``-C board.msd_mmc.p_mmc_file`` option.
 
 
 #. Wait until U-Boot loads EFI from the ACS image and interrupt the EFI shell by pressing the ``Escape`` key when the following prompt is displayed on the Host Processor terminal (``ttyUSB2`` for MPS3).
@@ -1196,7 +1184,7 @@ Positive Full Capsule Update Test
 
         .. code-block:: console
 
-            EFI/BOOT/app/CapsuleApp.efi EFI/BOOT/corstone1000-mps3-v6.uefi.capsule
+            EFI/BOOT/app/CapsuleApp.efi corstone1000-mps3-v6.uefi.capsule
 
     - FVP:
 
@@ -1340,7 +1328,7 @@ Rollback Protection Capsule Update Test
 
         .. code-block:: console
 
-            EFI/BOOT/app/CapsuleApp.efi EFI/BOOT/corstone1000-mps3-v5.uefi.capsule
+            EFI/BOOT/app/CapsuleApp.efi corstone1000-mps3-v5.uefi.capsule
 
     - FVP:
 
@@ -1656,6 +1644,10 @@ MPS3
 
         sudo picocom -b 115200 /dev/ttyUSB2
 
+    .. note::
+
+        If the user is a member of the ``dialout`` group, ``sudo`` is not required for this step.
+
 #. When the installation screen is displayed on ``ttyUSB2``, plug in the (still empty) system drive to the MPS3.
 #. Start the distribution installation process.
 
@@ -1865,7 +1857,7 @@ Generate Keys, Signed Image and Unsigned Image
 
     .. code-block:: console
 
-        ./${WORKSPACE}/iot-platform-assets/corstone1000/secureboot/create_keys_and_sign.sh \
+        ${WORKSPACE}/iot-platform-assets/corstone1000/secureboot/create_keys_and_sign.sh \
         -d ${TARGET} \
         -v ${CERTIFICATE_VALIDITY_DURATION_IN_DAYS}
 
@@ -1873,18 +1865,16 @@ Generate Keys, Signed Image and Unsigned Image
 
         The `efitools <https://github.com/vathpela/efitools/>`__  package is required to execute the script.
 
+        The ``mtools`` package is required on the host development machine to execute the script.
+
         ``${CERTIFICATE_VALIDITY_DURATION_IN_DAYS}`` is an integer that specifies the certificate's validity period in days.
 
     .. note::
 
         Consult the image signing script help message (``-h``) for more information about other optional arguments.
 
-        The script is interactive and contains commands that require ``sudo`` level permissions.
-
-
 The keys, signed kernel image, and unsigned kernel image will be copied to the exisiting ESP image.
 The modified ESP image can be found at ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-esp-image-corstone1000-${TARGET}.wic``.
-
 
 ****************************
 Run Unsigned Image Boot Test

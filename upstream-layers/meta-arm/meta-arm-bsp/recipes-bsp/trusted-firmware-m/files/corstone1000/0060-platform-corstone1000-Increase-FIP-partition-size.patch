@@ -1,0 +1,32 @@
+From 9edcdd272a7d2d872f7e04b3a9db5185fd24fd97 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Tue, 28 Apr 2026 08:57:06 +0100
+Subject: [PATCH] platform: corstone1000: Increase FIP partition size
+
+Increase the FIP partition size from 2MB to 2.5MB in the
+Corstone-1000 flash layout.
+
+The previous size is insufficient for current FIP images,
+which may lead to overflow during image generation or
+deployment. Expanding the partition ensures adequate
+space for firmware components packaged in the FIP.
+
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/50628]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ platform/ext/target/arm/corstone1000/partition/flash_layout.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/partition/flash_layout.h b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+index e2219d80a..b7282beb2 100644
+--- a/platform/ext/target/arm/corstone1000/partition/flash_layout.h
++++ b/platform/ext/target/arm/corstone1000/partition/flash_layout.h
+@@ -139,7 +139,7 @@
+ #define TFM_PARTITION_SIZE                (0x50000)    /* 320 KB */
+ #define TFM_PARTITION_BANK_OFFSET         (SE_BL2_PARTITION_SIZE)
+ 
+-#define FIP_PARTITION_SIZE                (0x200000)   /* 2 MB */
++#define FIP_PARTITION_SIZE                (0x280000)   /* 2.5 MB */
+ #define FIP_PARTITION_BANK_OFFSET         (TFM_PARTITION_BANK_OFFSET + TFM_PARTITION_SIZE)
+ 
+ #define INITRAMFS_PARTITION_SIZE          (0xC00000)   /* 12 MB */

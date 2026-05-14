@@ -9,6 +9,9 @@ COMPATIBLE_MACHINE = "rdv2"
 SRC_URI_EDK2 = "gitsm://gitlab.arm.com/infra-solutions/reference-design/platsw/edk2.git;protocol=https"
 SRC_URI_EDK2_PLATFORMS = "git://gitlab.arm.com/infra-solutions/reference-design/platsw/edk2-platforms.git;protocol=https"
 
+FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
+SRC_URI:append = " file://0001-Changes-in-acpica-20260408-are-now-causing-issues-wi.patch;patchdir=edk2-platforms"
+
 SRCBRANCH_edk2 = "refinfra"
 SRCBRANCH_edk2_platforms = "refinfra"
 

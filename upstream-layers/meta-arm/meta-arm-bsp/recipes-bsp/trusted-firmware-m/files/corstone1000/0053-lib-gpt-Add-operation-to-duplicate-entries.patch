@@ -1,0 +1,255 @@
+From 38daa61f876a6becb3968f1360d403f496634131 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Mon, 16 Mar 2026 16:46:43 +0000
+Subject: [PATCH] lib: gpt: Add operation to duplicate entries
+
+Without this new function, callers of the library would have to first
+read the entry they want to duplicate, then attempt to create a new
+entry, then manually, with their driver, copy the data of the partition
+across. This new function streamlines the latter half of that process
+into a single API call which creates, with the same size size, name and
+attributes, and copies the data across block by block.
+
+Change-Id: Ia30700cf6463f0e07e76d4b56ec015b51770459d
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/50235/1]
+---
+ lib/gpt/inc/gpt.h                |  19 ++++
+ lib/gpt/src/gpt.c                |  23 +++++
+ lib/gpt/unittests/gpt/test_gpt.c | 159 +++++++++++++++++++++++++++++++
+ 3 files changed, 201 insertions(+)
+
+diff --git a/lib/gpt/inc/gpt.h b/lib/gpt/inc/gpt.h
+index 34ce67580..334a08f41 100644
+--- a/lib/gpt/inc/gpt.h
++++ b/lib/gpt/inc/gpt.h
+@@ -170,6 +170,25 @@ psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
+                             const uint64_t           start,
+                             const uint64_t           end);
+ 
++/**
++ * \brief Duplicates an existing partition entry into new space.
++ *
++ * \param[in]  old_guid Entry to duplicate.
++ * \param[in]  start    Starting LBA (0 uses the lowest free LBA possible).
++ * \param[out] new_guid GUID populated on success for subsequent API calls.
++ *
++ * \retval PSA_SUCCESS Success.
++ * \retval PSA_ERROR_STORAGE_FAILURE I/O error.
++ * \retval PSA_ERROR_DOES_NOT_EXIST No entry found with the provided GUID.
++ * \retval PSA_ERROR_INSUFFICIENT_STORAGE Maximum number of partitions reached.
++ * \retval PSA_ERROR_INVALID_ARGUMENT New entry would overlap with an existing partition.
++ * \retval PSA_ERROR_INVALID_ARGUMENT Part of the partition would be off flash.
++ */
++__attribute__((nonnull(1,3)))
++psa_status_t gpt_entry_duplicate(const struct efi_guid_t *old_guid,
++                                 const uint64_t           start,
++                                 struct efi_guid_t       *new_guid);
++
+ /**
+  * \brief Creates a partition entry in the table.
+  *
+diff --git a/lib/gpt/src/gpt.c b/lib/gpt/src/gpt.c
+index 0335befa7..920c4ccca 100644
+--- a/lib/gpt/src/gpt.c
++++ b/lib/gpt/src/gpt.c
+@@ -516,6 +516,29 @@ psa_status_t gpt_entry_move(const struct efi_guid_t *guid,
+     return write_entry(cached_index, &cached_entry, false);
+ }
+ 
++psa_status_t gpt_entry_duplicate(const struct efi_guid_t *old_guid,
++                                 const uint64_t           start,
++                                 struct efi_guid_t       *new_guid)
++{
++    struct partition_entry_t old_entry;
++    psa_status_t ret = gpt_entry_read(old_guid, &old_entry);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    ret = gpt_entry_create(&(old_entry.type_guid),
++                           start,
++                           old_entry.size,
++                           old_entry.attr,
++                           old_entry.name,
++                           new_guid);
++    if (ret != PSA_SUCCESS) {
++        return ret;
++    }
++
++    return move_partition(old_entry.start, start, old_entry.size);
++}
++
+ psa_status_t gpt_entry_create(const struct efi_guid_t *type,
+                               const uint64_t           start,
+                               const uint64_t           size,
+diff --git a/lib/gpt/unittests/gpt/test_gpt.c b/lib/gpt/unittests/gpt/test_gpt.c
+index 0ae660336..5d2c4243f 100644
+--- a/lib/gpt/unittests/gpt/test_gpt.c
++++ b/lib/gpt/unittests/gpt/test_gpt.c
+@@ -738,6 +738,165 @@ void test_gpt_defragment_should_succeedWhenNoIOFailure(void)
+     TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_defragment());
+ }
+ 
++void test_gpt_entry_duplicate_should_DuplicateOldEntry(void)
++{
++    /* Duplicate an entry. It must not overlap with an existing entry and must also
++     * fit on the storage device. The GUID should be populated with something.
++     */
++    setup_valid_gpt();
++    struct gpt_entry_t *old_entry = &(test_partition_array[0]);
++    struct efi_guid_t old_guid = old_entry->guid;
++
++    /* Each entry will be read to find the entry to be duplicated. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* The partition data is moved: this means reading each block then writing.
++     * It doesn't matter what the data is
++     */
++    char unused_read_data = 'X';
++    register_mocked_read(&unused_read_data, sizeof(unused_read_data));
++
++    /* Mock out the call to create a new GUID */
++    struct efi_guid_t expected_guid = TEST_GPT_VALID_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    efi_guid_generate_random_ExpectAnyArgsAndReturn(PSA_SUCCESS);
++    efi_guid_generate_random_ReturnThruPtr_guid(&expected_guid);
++
++    /* Ensure that a new GUID is assigned. To test the duplication was successful
++     * would require reading from flash, which would be mocked anyway and therefore
++     * pointless
++     */
++    struct efi_guid_t new_guid = TEST_GPT_DUMMY_GUID;
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_duplicate(
++                &old_guid,
++                TEST_GPT_DISK_FREE_SPACE_START,
++                &new_guid));
++    TEST_ASSERT_EQUAL_MEMORY(&expected_guid, &new_guid, sizeof(new_guid));
++}
++
++void test_gpt_entry_duplicate_should_createNewEntryNextToLastEntry(void)
++{
++    /* Duplicate an entry, allowing the library to choose the start LBA. The
++     * GUID should be populated with something
++     */
++    setup_valid_gpt();
++    struct gpt_entry_t *old_entry = &(test_partition_array[0]);
++    struct efi_guid_t old_guid = old_entry->guid;
++
++    /* Each entry will be read to find the entry to be duplicated. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* The partition data is moved: this means reading each block then writing.
++     * It doesn't matter what the data is
++     */
++    char unused_read_data = 'X';
++    register_mocked_read(&unused_read_data, sizeof(unused_read_data));
++
++    /* Mock out the call to create a new GUID */
++    struct efi_guid_t expected_guid = TEST_GPT_VALID_GUID(5, 5, 5, 5, 5, 6, 7, 8, 9, 10, 11);
++    efi_guid_generate_random_ExpectAnyArgsAndReturn(PSA_SUCCESS);
++    efi_guid_generate_random_ReturnThruPtr_guid(&expected_guid);
++
++    /* Ensure that a new GUID is assigned. To test the duplication was successful
++     * would require reading from flash, which would be mocked anyway and therefore
++     * pointless
++     */
++    struct efi_guid_t new_guid = TEST_GPT_DUMMY_GUID;
++    TEST_ASSERT_EQUAL(PSA_SUCCESS, gpt_entry_duplicate(
++                &old_guid,
++                0,
++                &new_guid));
++    TEST_ASSERT_EQUAL_MEMORY(&expected_guid, &new_guid, sizeof(new_guid));
++}
++
++void test_gpt_entry_duplicate_should_failToCreateEntryWhenLowestFreeLbaDoesNotHaveSpace(void)
++{
++    /* Duplicate an entry, allowing the library to choose the start LBA. Resize
++     * the last partition to consume over half of the disk, such that duplicating
++     * it won't be possible.
++     */
++    struct gpt_entry_t *old_entry = &(test_partition_array[TEST_DEFAULT_NUM_PARTITIONS - 1]);
++    old_entry->end = TEST_GPT_THIRD_PARTITION_START + (TEST_DISK_NUM_BLOCKS / 2 ) + 1;
++    struct efi_guid_t old_guid = old_entry->guid;
++    setup_valid_gpt();
++
++    /* Each entry will be read to find the entry to be duplicated. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    struct efi_guid_t new_guid;
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_duplicate(
++                &old_guid,
++                0,
++                &new_guid));
++}
++
++void test_gpt_entry_duplicate_should_failWhenEntryNotExisting(void)
++{
++    setup_valid_gpt();
++    struct efi_guid_t old_guid = NULL_GUID;
++
++    /* Each entry will be read to find the entry to be duplicated. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    struct efi_guid_t new_guid;
++    TEST_ASSERT_EQUAL(PSA_ERROR_DOES_NOT_EXIST, gpt_entry_duplicate(
++                &old_guid,
++                TEST_GPT_DISK_FREE_SPACE_START,
++                &new_guid));
++}
++
++void test_gpt_entry_duplicate_should_failNewEntryOverlapping(void)
++{
++    setup_valid_gpt();
++    struct gpt_entry_t *old_entry = &(test_partition_array[0]);
++    struct efi_guid_t old_guid = old_entry->guid;
++    struct efi_guid_t new_guid;
++
++    /* Each entry will be read to find the entry to be duplicated. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    /* Since the disk is not fragmented by default, there are two test cases:
++     *   1. start in the middle of a partition and end in the middle of a partition
++     *   2. start in the middle of a partition and end in free space
++     */
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_duplicate(
++                &old_guid,
++                TEST_GPT_FIRST_PARTITION_START + 1,
++                &new_guid));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INVALID_ARGUMENT, gpt_entry_duplicate(
++                &old_guid,
++                TEST_GPT_THIRD_PARTITION_START + 1,
++                &new_guid));
++}
++
++void test_gpt_entry_duplicate_should_failWhenTableFull(void)
++{
++    /* Start with a full array of entries */
++    const uint64_t new_entry_end = TEST_GPT_DISK_FREE_SPACE_START;
++    struct gpt_entry_t new_entry = {
++        .type = TEST_GPT_VALID_TYPE(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
++        .start = new_entry_end,
++        .end = new_entry_end,
++        .attr = 0,
++        .guid = TEST_GPT_VALID_GUID(4, 4, 4, 4, 5, 6, 7, 8, 9, 10, 11),
++        .name = "Fourth partition"
++    };
++    test_partition_array[TEST_MAX_PARTITIONS - 1] = new_entry;
++    setup_valid_gpt();
++
++    struct gpt_entry_t *old_entry = &(test_partition_array[0]);
++    struct efi_guid_t old_guid = old_entry->guid;
++    struct efi_guid_t new_guid;
++
++    /* Each entry will be read to find the entry to be duplicated. */
++    register_mocked_read(&test_partition_array, sizeof(test_partition_array));
++
++    TEST_ASSERT_EQUAL(PSA_ERROR_INSUFFICIENT_STORAGE, gpt_entry_duplicate(
++                &old_guid,
++                new_entry_end + 1,
++                &new_guid));
++}
++
+ void test_gpt_entry_create_should_createNewEntry(void)
+ {
+     /* Add an entry. It must not overlap with an existing entry and must also

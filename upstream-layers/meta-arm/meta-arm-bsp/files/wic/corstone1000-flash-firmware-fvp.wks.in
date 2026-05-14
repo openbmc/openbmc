@@ -23,7 +23,7 @@ part --source rawcopy --size 144k --sourceparams="file=trusted-firmware-m/bl2_si
 part --source rawcopy --size 320k --sourceparams="file=trusted-firmware-m/tfm_s_signed.bin" --align 4 --part-name="tfm_primary" --uuid 07F9616C-1233-439C-ACBA-72D75421BF70 --part-type 7FAD470E-5EC5-5C03-A2C1-4756B495DE61
 
 # Rawcopy of the FIP binary
-part --source rawcopy --size 2 --sourceparams="file=signed_fip.bin" --align 4 --part-name="FIP_A" --uuid B9C7AC9D-40FF-4675-956B-EEF4DE9DF1C5 --part-type F1933675-5A8C-5B6D-9EF4-846739E89BC8
+part --source rawcopy --size 2560k --sourceparams="file=signed_fip.bin" --align 4 --part-name="FIP_A" --uuid B9C7AC9D-40FF-4675-956B-EEF4DE9DF1C5 --part-type F1933675-5A8C-5B6D-9EF4-846739E89BC8
 
 # Rawcopy of kernel with initramfs
 part --source rawcopy --size 12 --sourceparams="file=Image.gz-initramfs-${MACHINE}.bin" --align 4 --part-name="kernel_primary" --uuid BF7A6142-0662-47FD-9434-6A8811980816 --part-type F771AFF9-C7E9-5F99-9EDA-2369DD694F61

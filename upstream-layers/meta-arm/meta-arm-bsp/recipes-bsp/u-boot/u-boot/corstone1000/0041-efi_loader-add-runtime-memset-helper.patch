@@ -1,0 +1,63 @@
+From 7e878429dc5f186ff945281513593c54beaf03f6 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Fri, 10 Apr 2026 17:20:59 +0100
+Subject: [PATCH 41/53] efi_loader: add runtime memset helper
+
+Add efi_memset_runtime() for EFI runtime paths
+
+This keeps buffer initialization in runtime-resident code after
+ExitBootServices() and avoids relying on non-runtime helpers.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ include/efi_loader.h         |  3 +++
+ lib/efi_loader/efi_runtime.c | 21 +++++++++++++++++++++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/include/efi_loader.h b/include/efi_loader.h
+index 0340847c0b4..ec30042665b 100644
+--- a/include/efi_loader.h
++++ b/include/efi_loader.h
+@@ -1149,6 +1149,9 @@ struct pkcs7_message *efi_parse_pkcs7_header(const void *buf,
+ /* runtime implementation of memcpy() */
+ void efi_memcpy_runtime(void *dest, const void *src, size_t n);
+ 
++/* runtime implementation of memset */
++__efi_runtime void *efi_memset_runtime(void *dest, int c, size_t n);
++
+ /* commonly used helper functions */
+ u16 *efi_create_indexed_name(u16 *buffer, size_t buffer_size, const char *name,
+ 			     unsigned int index);
+diff --git a/lib/efi_loader/efi_runtime.c b/lib/efi_loader/efi_runtime.c
+index 35eb6a77766..e91b1583b6e 100644
+--- a/lib/efi_loader/efi_runtime.c
++++ b/lib/efi_loader/efi_runtime.c
+@@ -209,6 +209,27 @@ void __efi_runtime efi_memcpy_runtime(void *dest, const void *src, size_t n)
+ 		*d++ = *s++;
+ }
+ 
++/**
++ * efi_memset_runtime() - fill a memory region with a byte value
++ *
++ * At runtime memset() is not available.
++ *
++ * @dest:   pointer to the block of memory to fill.
++ * @c:      value to be set. The value is passed as an int, but the
++ *          function fills the block of memory using the u8 conversion of this value.
++ * @n:      number of bytes to be set to the value.
++ * Return:  dest is returned
++ */
++__efi_runtime void *efi_memset_runtime(void *dest, int c, size_t n)
++{
++	u8 *d = dest;
++
++	for (; n; --n)
++		*d++ = c;
++
++	return dest;
++}
++
+ /**
+  * efi_update_table_header_crc32() - Update crc32 in table header
+  *

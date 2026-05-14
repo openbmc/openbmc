@@ -1,4 +1,4 @@
-From e070ae0f02b10bfd482146a748095ca782f73039 Mon Sep 17 00:00:00 2001
+From e1b46cabacd2bbbde5ac42a01af21126788f274e Mon Sep 17 00:00:00 2001
 From: Frazer Carsley <frazer.carsley@arm.com>
 Date: Mon, 19 Jan 2026 15:16:52 +0000
 Subject: [PATCH] corstone1000: enable OF_UPSTREAM device tree support
@@ -502,7 +502,7 @@ index 1b9c3a9ed16..db8919298e1 100644
  		if (!virtio_bus) {
  			log_err("Cannot find virtio device, err (%d)\n", ret);
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index 450d69762ab..350607892fa 100644
+index 4ec23b4af1c..6ff855e7ce9 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
 @@ -7,7 +7,7 @@ CONFIG_NR_DRAM_BANKS=1
@@ -514,7 +514,7 @@ index 450d69762ab..350607892fa 100644
  CONFIG_SYS_BOOTM_LEN=0x800000
  CONFIG_SYS_LOAD_ADDR=0x82100000
  CONFIG_IDENT_STRING=" corstone1000 aarch64 "
-@@ -55,6 +55,9 @@ CONFIG_CMD_RTC=y
+@@ -56,6 +56,9 @@ CONFIG_CMD_RTC=y
  CONFIG_CMD_TIME=y
  CONFIG_CMD_GETTIME=y
  CONFIG_OF_CONTROL=y
@@ -524,4 +524,3 @@ index 450d69762ab..350607892fa 100644
  CONFIG_VERSION_VARIABLE=y
  CONFIG_NET_RANDOM_ETHADDR=y
  CONFIG_REGMAP=y
-

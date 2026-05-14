@@ -1,0 +1,176 @@
+From 85edddc46913a19ce9e2dd0cb802a2dac60c9b9d Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Sun, 11 Jan 2026 20:36:45 +0000
+Subject: [PATCH 47/53] efi: selftest: add runtime variable tests with
+ non-volatile storage
+
+Extend runtime variable tests for persistent storage
+
+Previously, EFI selftesting of runtime variables was only supported
+under CONFIG_EFI_RT_VOLATILE_STORE, which uses VarToFile to simulate
+non-volatile variable storage. This commit adds new test cases that
+exercise runtime variable operations for persistent storage.
+
+Features tested:
+- Creation of runtime-accessible variables (set)
+- Retrieval of runtime variables (get)
+- Deletion using SetVariable() with size = 0
+- Append operation using EFI_VARIABLE_APPEND_WRITE
+
+This improves EFI compliance validation for non-volatile runtime storage
+scenarios and ensures proper attribute enforcement and variable
+management.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ .../efi_selftest_variables_runtime.c          | 108 +++++++++++++++++-
+ 1 file changed, 105 insertions(+), 3 deletions(-)
+
+diff --git a/lib/efi_selftest/efi_selftest_variables_runtime.c b/lib/efi_selftest/efi_selftest_variables_runtime.c
+index 379c4f9c47b..7c14b9fefd4 100644
+--- a/lib/efi_selftest/efi_selftest_variables_runtime.c
++++ b/lib/efi_selftest/efi_selftest_variables_runtime.c
+@@ -3,6 +3,7 @@
+  * efi_selftest_variables_runtime
+  *
+  * Copyright (c) 2019 Heinrich Schuchardt <xypron.glpk@gmx.de>
++ * Copyright (c) 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * This unit test checks the runtime services for variables after
+  * ExitBootServices():
+@@ -40,7 +41,13 @@ static int setup(const efi_handle_t img_handle,
+ /**
+  * execute() - execute unit test
+  *
+- * As runtime support is not implmented expect EFI_UNSUPPORTED to be returned.
++ * For EFI variables in non-volatile storage, these tests have to be executed in two phases
++ * 1. During first phase, run these tests and it creates EFI variable in persistent storage.
++ * 2. Then reboot and run the test again to verify if the variable created above is still
++ *    available in non-volatile storage. If available, validate the EFI variable, append
++ *    it, and validate it again. If validation is successful, delete the same variable.
++ *
++ * Return: EFI_ST_SUCCESS on success, EFI_ST_FAILURE on failure
+  */
+ static int execute(void)
+ {
+@@ -57,6 +64,80 @@ static int execute(void)
+ 	u64 max_storage, rem_storage, max_size;
+ 	int test_ret;
+ 
++	/* Compare the value of EFI variable if it already exists in non volatile storage */
++	if (!IS_ENABLED(CONFIG_EFI_RT_VOLATILE_STORE)) {
++		len = sizeof(v) / 2;
++		ret = runtime->get_variable(u"efi_st_var0", &guid_vendor0,
++				&attr, &len, data);
++		if (ret == EFI_SUCCESS) {
++			efi_st_printf("EFI Variable efi_st_var0 found. Executing Second Phase\n");
++			if (len != sizeof(v) / 2) {
++				efi_st_error("GetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++			if (memcmp(data, v, len)) {
++				efi_st_error("GetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			/* Append an existing variable */
++			append_len = sizeof(v) - len;
++			ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++						    EFI_VARIABLE_BOOTSERVICE_ACCESS |
++						    EFI_VARIABLE_RUNTIME_ACCESS |
++						    EFI_VARIABLE_APPEND_WRITE |
++						    EFI_VARIABLE_NON_VOLATILE,
++						    append_len, (v + len));
++			if (ret != EFI_SUCCESS) {
++				efi_st_error("SetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			len = sizeof(v);
++			ret = runtime->get_variable(u"efi_st_var0", &guid_vendor0,
++					&attr, &len, data);
++			if (ret != EFI_SUCCESS) {
++				efi_st_error("GetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			if (len != sizeof(v)) {
++				efi_st_error("GetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			if (memcmp(data, v, len)) {
++				efi_st_error("GetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			/* Delete it by setting the size to 0 */
++			ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++						    EFI_VARIABLE_BOOTSERVICE_ACCESS |
++						    EFI_VARIABLE_RUNTIME_ACCESS |
++						    EFI_VARIABLE_NON_VOLATILE,
++						    0, NULL);
++			if (ret != EFI_SUCCESS) {
++				efi_st_error("SetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			ret = runtime->get_variable(u"efi_st_var0", &guid_vendor0,
++					&attr, &len, data);
++			if (ret != EFI_NOT_FOUND) {
++				efi_st_error("GetVariable failed\n");
++				return EFI_ST_FAILURE;
++			}
++
++			return EFI_ST_SUCCESS;
++		} else {
++			if (ret == EFI_NOT_FOUND) {
++				efi_st_printf("EFI Variable efi_st_var0 not found. "
++					"Executing First Phase\n");
++			}
++		}
++	}
++
+ 	memset(v2, 0x1, sizeof(v2));
+ 
+ 	if (IS_ENABLED(CONFIG_EFI_VARIABLE_FILE_STORE)) {
+@@ -70,7 +151,7 @@ static int execute(void)
+ 		ret = runtime->query_variable_info(EFI_VARIABLE_BOOTSERVICE_ACCESS,
+ 					   &max_storage, &rem_storage,
+ 					   &max_size);
+-		if (ret != EFI_UNSUPPORTED) {
++		if (ret != EFI_ST_SUCCESS) {
+ 			efi_st_error("QueryVariableInfo failed\n");
+ 			return EFI_ST_FAILURE;
+ 		}
+@@ -286,7 +367,28 @@ static int execute(void)
+ 			return EFI_ST_FAILURE;
+ 		}
+ 	} else {
+-		if (ret != EFI_UNSUPPORTED) {
++		if (ret != EFI_SUCCESS) {
++			efi_st_error("SetVariable failed\n");
++			return EFI_ST_FAILURE;
++		}
++
++		/* Delete it by setting the size to 0 */
++		ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++					    EFI_VARIABLE_BOOTSERVICE_ACCESS |
++					    EFI_VARIABLE_RUNTIME_ACCESS,
++					    0, NULL);
++		if (ret != EFI_SUCCESS) {
++			efi_st_error("SetVariable failed\n");
++			return EFI_ST_FAILURE;
++		}
++
++		/* Add an 8byte aligned variable */
++		ret = runtime->set_variable(u"efi_st_var0", &guid_vendor0,
++					    EFI_VARIABLE_BOOTSERVICE_ACCESS |
++					    EFI_VARIABLE_RUNTIME_ACCESS |
++					    EFI_VARIABLE_NON_VOLATILE,
++					    sizeof(v) / 2, v);
++		if (ret != EFI_SUCCESS) {
+ 			efi_st_error("SetVariable failed\n");
+ 			return EFI_ST_FAILURE;
+ 		}

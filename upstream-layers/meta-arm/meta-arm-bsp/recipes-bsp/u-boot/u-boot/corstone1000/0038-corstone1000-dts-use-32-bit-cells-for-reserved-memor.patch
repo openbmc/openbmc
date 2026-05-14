@@ -1,8 +1,7 @@
-From df01111a866a37fcf875b3c2e2394414d27c89da Mon Sep 17 00:00:00 2001
+From dd4db190281802141c4c787a9869f8153d93b1a4 Mon Sep 17 00:00:00 2001
 From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
 Date: Wed, 24 Sep 2025 13:42:25 +0000
-Subject: [PATCH] corstone1000: dts: use 32-bit cells for
- /reserved-memory node
+Subject: [PATCH] corstone1000: dts: use 32-bit cells for /reserved-memory node
 
 Switch the *reserved-memory* node from two-cell (64-bit) encoding to
 one-cell (32-bit) encoding and adjust the `reg` property accordingly
@@ -34,4 +33,3 @@ index a75bc7016aa..4ea6f1d9724 100644
  			no-map;
  		};
  	};
-

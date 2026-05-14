@@ -28,6 +28,13 @@ Note that currently meta-arm's `scripts` directory isn't in `PATH`, so a full pa
 
 `runfvp` will automatically start terminals connected to each of the serial ports that the machine specifies.  This can be controlled by using the `--terminals` option, for example `--terminals=none` will mean no terminals are started, and `--terminals=tmux` will start the terminals in [`tmux`][tmux] sessions.  Alternatively, passing `--console` will connect the serial port directly to the current session, without needing to open further windows.
 
+The tool attempts to automatically select a suitable terminal type. To see which terminal type is selected by default in your environment, run `runfvp --help`.
+
+`runfvp` determines availability by checking for required executables in your PATH as well as environment variables specific to each terminal type. If any of these checks fail, the corresponding terminal type is disabled.
+The --help output also lists all currently available terminal types.
+
+When using `-terminals=screen`, `runfvp` must be launched from within an existing [`screen`][screen] session. Normally, screen sets the `STY` environment variable to reference the current session. However, if the session is renamed or if `kas` is started from within the screen session, this value may become invalid or be lost. In such cases, `STY` must be set manually. Use `screen -ls` to view the list of currently attached sessions.
+
 The default terminal can also be configured by writing a [INI-style][INI] configuration file to `~/.config/runfvp.conf`:
 
 ```
@@ -139,3 +146,4 @@ FVP_ENV_PASSTHROUGH = "ARMLMD_LICENSE_FILE FM_TRACE_PLUGINS"
 [FVP]: https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms
 [tmux]: https://tmux.github.io/
 [INI]: https://docs.python.org/3/library/configparser.html
+[screen]: https://www.gnu.org/software/screen/

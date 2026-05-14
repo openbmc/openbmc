@@ -1,0 +1,24 @@
+From 5929e3d0b92d6ae72b2c7c79ca1543d4c2e23e98 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Mon, 4 May 2026 14:40:05 -0400
+Subject: [PATCH] Changes in acpica 20260408 are now causing issues with the
+ Printf in SsdrEvents.asl.  Since this is probably for debug, remove it.
+
+Upstream-Status: Inappropriate
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+---
+ Platform/ARM/SgiPkg/AcpiTables/SsdtEvents.asl | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Platform/ARM/SgiPkg/AcpiTables/SsdtEvents.asl b/Platform/ARM/SgiPkg/AcpiTables/SsdtEvents.asl
+index 58efe62c93ea..61489513f61b 100644
+--- a/Platform/ARM/SgiPkg/AcpiTables/SsdtEvents.asl
++++ b/Platform/ARM/SgiPkg/AcpiTables/SsdtEvents.asl
+@@ -56,7 +56,6 @@ DefinitionBlock("SsdtEvent.aml", "SSDT", 2, "ARMLTD", "ARMSGI", EFI_ACPI_ARM_OEM
+ 
+     /* Event handler for pin0 */
+     Method (_L00) {
+-      Printf ("GPIO0 Pin0 Toggled")
+       Store (1, INC0)
+     }
+ 

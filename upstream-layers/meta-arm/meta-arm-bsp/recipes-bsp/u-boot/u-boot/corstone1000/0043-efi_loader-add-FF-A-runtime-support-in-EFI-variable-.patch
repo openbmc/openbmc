@@ -1,0 +1,478 @@
+From dd992d82e9958786bd8367a8b7018648d217d552 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Thu, 20 Nov 2025 22:19:01 +0000
+Subject: [PATCH 43/53] efi_loader: add FF-A runtime support in EFI variable
+ TEE driver
+
+Enable MM variable services over FF-A after ExitBootServices
+
+This patch extends lib/efi_loader/efi_variable_tee.c to support FF-A
+communication with the secure world during EFI runtime. It enables EFI
+runtime variable access and MM communication using FF-A transport when
+ExitBootServices() has already been called.
+
+Key changes:
+ ------------
+  - Introduce runtime-safe implementations for MM communication,
+    notification, and variable access using FF-A driver.
+  - Introduce communication-buffer helper (get_comm_buf()) that switches
+    between dynamic allocation (boot phase) and the fixed FF-A shared
+    buffer (runtime phase).
+  - Mark persistent data and code with __efi_runtime and
+    __efi_runtime_data attributes.
+  - Use direct physical address mapping for shared buffers since
+    U-Boot operates with 1:1 physical-to-virtual mapping.
+  - Only per-buffer cache maintenance is performed at runtime,
+    as whole D-cache invalidation would violate the OS coherency model
+    after ExitBootServices().
+  - Add runtime-phase tracking (efi_runtime_enabled).
+
+The change reuses the statically reserved shared buffer, replaces
+allocations with __efi_runtime copies, and updates the runtime service
+table so EFI variable runtime calls reach the secure partition via FF-A.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ lib/efi_loader/efi_variable_tee.c | 331 ++++++++++++++++++++++++++++--
+ 1 file changed, 319 insertions(+), 12 deletions(-)
+
+diff --git a/lib/efi_loader/efi_variable_tee.c b/lib/efi_loader/efi_variable_tee.c
+index 6a1fa39bb6f..e4d97dc55ab 100644
+--- a/lib/efi_loader/efi_variable_tee.c
++++ b/lib/efi_loader/efi_variable_tee.c
+@@ -4,7 +4,7 @@
+  *
+  *  Copyright (C) 2019 Linaro Ltd. <sughosh.ganu@linaro.org>
+  *  Copyright (C) 2019 Linaro Ltd. <ilias.apalodimas@linaro.org>
+- *  Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *  Copyright 2022-2023, 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  *  Authors:
+  *    Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -14,6 +14,7 @@
+ 
+ #if CONFIG_IS_ENABLED(ARM_FFA_TRANSPORT)
+ #include <arm_ffa.h>
++#include <arm_ffa_runtime.h>
+ #endif
+ #include <cpu_func.h>
+ #include <dm.h>
+@@ -34,20 +35,47 @@
+ #define MM_DENIED (-3)
+ #define MM_NO_MEMORY (-5)
+ 
++static const int __efi_runtime_rodata mm_sp_errmap[] = {
++	[-MM_NOT_SUPPORTED]	 = -EINVAL,
++	[-MM_INVALID_PARAMETER]	 = -EPERM,
++	[-MM_DENIED]		 = -EACCES,
++	[-MM_NO_MEMORY]		 = -EBUSY,
++};
++
+ static const char *mm_sp_svc_uuid = MM_SP_UUID;
+-static u16 mm_sp_id;
++static u16 __efi_runtime_data mm_sp_id;
+ #endif
+ 
++static void *__efi_runtime_data ffa_shared_buf;
++static const efi_guid_t __efi_runtime_rodata mm_var_guid_runtime =
++	EFI_MM_VARIABLE_GUID;
++
+ extern struct efi_var_file __efi_runtime_data *efi_var_buf;
+-static efi_uintn_t max_buffer_size;	/* comm + var + func + data */
+-static efi_uintn_t max_payload_size;	/* func + data */
++static efi_uintn_t __efi_runtime_data max_buffer_size;	/* comm + var + func + data */
++static efi_uintn_t __efi_runtime_data max_payload_size;	/* func + data */
+ static const u16 __efi_runtime_rodata pk[] = u"PK";
++static bool __efi_runtime_data efi_runtime_enabled;
+ 
+ struct mm_connection {
+ 	struct udevice *tee;
+ 	u32 session;
+ };
+ 
++/**
++ * efi_is_runtime_enabled() - Indicate whether the system is in the UEFI runtime phase
++ *
++ * This helper returns whether the firmware has transitioned into the
++ * UEFI runtime phase, meaning that ExitBootServices() has been invoked.
++ *
++ * Return:
++ *   true  - The system is operating in UEFI runtime mode.
++ *   false - The system is still in the boot services phase.
++ */
++static bool __efi_runtime efi_is_runtime_enabled(void)
++{
++	return efi_runtime_enabled;
++}
++
+ /**
+  * get_connection() - Retrieve OP-TEE session for a specific UUID.
+  *
+@@ -169,6 +197,28 @@ static efi_status_t optee_mm_communicate(void *comm_buf, ulong dsize)
+ }
+ 
+ #if CONFIG_IS_ENABLED(ARM_FFA_TRANSPORT)
++/**
++ * ffa_map_sp_event_runtime() - Map MM SP response to errno (runtime-safe)
++ * @sp_event_ret: MM SP return code from ffa_notify_mm_sp_runtime()
++ *
++ * Convert the MM SP return code into a standard U-Boot errno. This helper
++ * is marked __efi_runtime to ensure it is safe to call after
++ * ExitBootServices().
++ *
++ * Return: 0 on success, negative errno on failure
++ */
++static __efi_runtime int ffa_map_sp_event_runtime(int sp_event_ret)
++{
++	int idx = -sp_event_ret;
++
++	if (sp_event_ret == MM_SUCCESS)
++		return 0;
++	if (idx > 0 && idx < (int)ARRAY_SIZE(mm_sp_errmap) &&
++	    mm_sp_errmap[idx])
++		return mm_sp_errmap[idx];
++	return -EACCES;
++}
++
+ /**
+  * ffa_notify_mm_sp() - Announce there is data in the shared buffer
+  *
+@@ -225,6 +275,35 @@ static int ffa_notify_mm_sp(void)
+ 	return ret;
+ }
+ 
++/**
++ * ffa_notify_mm_sp_runtime() - Runtime implementation of
++ *                              ffa_notify_mm_sp()
++ *
++ * Notify the MM partition in the trusted world that
++ * data is available in the shared buffer.
++ * This is a blocking call during which trusted world has exclusive access
++ * to the MM shared buffer.
++ *
++ * Return:
++ *
++ * 0 on success
++ */
++static int __efi_runtime ffa_notify_mm_sp_runtime(void)
++{
++	struct ffa_send_direct_data msg = {0};
++	int ret;
++	int sp_event_ret;
++
++	msg.data0 = CONFIG_FFA_SHARED_MM_BUF_OFFSET;
++
++	ret = ffa_sync_send_receive_runtime(mm_sp_id, &msg, 1);
++	if (ret)
++		return ret;
++
++	ret = ffa_map_sp_event_runtime(sp_event_ret);
++	return ret;
++}
++
+ /**
+  * ffa_discover_mm_sp_id() - Query the MM partition ID
+  *
+@@ -360,6 +439,116 @@ static efi_status_t ffa_mm_communicate(void *comm_buf, ulong comm_buf_size)
+ 	return efi_ret;
+ }
+ 
++/**
++ * ffa_mm_communicate_runtime() - Runtime implementation of ffa_mm_communicate()
++ * @comm_buf:		locally allocated communication buffer used for rx/tx
++ * @comm_buf_size:	communication buffer size
++ *
++ * Issue a door bell event to notify the MM partition (SP) running in OP-TEE
++ * that there is data to read from the shared buffer.
++ * Communication with the MM SP is performed using FF-A transport.
++ * On the event, MM SP can read the data from the buffer and
++ * update the MM shared buffer with response data.
++ * The response data is copied back to the communication buffer.
++ *
++ * Return:
++ *
++ * EFI status code
++ */
++static efi_status_t __efi_runtime ffa_mm_communicate_runtime(void *comm_buf,
++							     ulong comm_buf_size)
++{
++	ulong tx_data_size;
++	int ffa_ret;
++	efi_status_t efi_ret;
++	struct efi_mm_communicate_header *mm_hdr;
++
++	if (!comm_buf)
++		return EFI_INVALID_PARAMETER;
++
++	/* Discover MM partition ID at boot time */
++	if (!mm_sp_id)
++		return EFI_UNSUPPORTED;
++
++	mm_hdr = (struct efi_mm_communicate_header *)comm_buf;
++	tx_data_size = mm_hdr->message_len + sizeof(efi_guid_t) + sizeof(size_t);
++
++	if (comm_buf_size != tx_data_size || tx_data_size > CONFIG_FFA_SHARED_MM_BUF_SIZE)
++		return EFI_INVALID_PARAMETER;
++
++	/*
++	 * Shared buffer cache maintenance for FF-A / OP-TEE communication:
++	 *
++	 * NS -> S (request path):
++	 *
++	 * The non-secure side populates the shared buffer. If the buffer is cached
++	 * in NS, the updated bytes may reside in dirty D-cache lines and not yet be
++	 * visible in DDR. Since the secure world typically reads the shared buffer
++	 * directly from DDR (e.g. with caches disabled / non-coherent mapping), we
++	 * must clean the corresponding cache lines to the Point of Coherency (PoC)
++	 * before entering secure world.
++	 *
++	 * S -> NS (response path):
++	 *
++	 * The secure world may update the same shared buffer in DDR. After returning
++	 * to non-secure, any cached copies of that region in NS may be stale. We
++	 * therefore invalidate the shared buffer range after the FF-A call to drop
++	 * those lines and force subsequent reads to fetch the latest data from DDR.
++	 *
++	 * Note: Whole-cache invalidation must not be used in EFI runtime context.
++	 * After ExitBootServices(), the OS owns the cache hierarchy; global invalidation
++	 * could drop OS dirty lines and violate the OS coherency model. Always operate
++	 * on the shared buffer range only.
++	 */
++	if (IS_ENABLED(CONFIG_ARM64))
++		flush_dcache_range((unsigned long)comm_buf,
++				   (unsigned long)((u8 *)comm_buf +
++						   CONFIG_FFA_SHARED_MM_BUF_SIZE));
++
++	/* Announce there is data in the shared buffer */
++
++	ffa_ret = ffa_notify_mm_sp_runtime();
++
++	if (IS_ENABLED(CONFIG_ARM64))
++		invalidate_dcache_range((unsigned long)comm_buf,
++					(unsigned long)((u8 *)comm_buf +
++							CONFIG_FFA_SHARED_MM_BUF_SIZE));
++
++	switch (ffa_ret) {
++	case 0: {
++		ulong rx_data_size;
++
++		rx_data_size = ((struct efi_mm_communicate_header *)comm_buf)->message_len +
++				sizeof(efi_guid_t) +
++				sizeof(size_t);
++
++		if (rx_data_size > comm_buf_size) {
++			efi_ret = EFI_OUT_OF_RESOURCES;
++			break;
++		}
++
++		efi_ret = EFI_SUCCESS;
++		break;
++	}
++	case -EINVAL:
++		efi_ret = EFI_DEVICE_ERROR;
++		break;
++	case -EPERM:
++		efi_ret = EFI_INVALID_PARAMETER;
++		break;
++	case -EACCES:
++		efi_ret = EFI_ACCESS_DENIED;
++		break;
++	case -EBUSY:
++		efi_ret = EFI_OUT_OF_RESOURCES;
++		break;
++	default:
++		efi_ret = EFI_ACCESS_DENIED;
++	}
++
++	return efi_ret;
++}
++
+ /**
+  * get_mm_comms() - detect the available MM transport
+  *
+@@ -386,6 +575,27 @@ static enum mm_comms_select get_mm_comms(void)
+ 
+ 	return MM_COMMS_FFA;
+ }
++
++/**
++ * get_mm_comms_runtime() - detect the available MM transport at runtime
++ *
++ * Make sure the FF-A bus is available at runtime and ready
++ * for use.
++ *
++ * Return:
++ *
++ * MM_COMMS_FFA or MM_COMMS_UNDEFINED
++ */
++static enum mm_comms_select __efi_runtime get_mm_comms_runtime(void)
++{
++	bool ret;
++
++	ret = efi_is_runtime_enabled();
++	if (!ret)
++		return MM_COMMS_UNDEFINED;
++
++	return MM_COMMS_FFA;
++}
+ #endif
+ 
+ /**
+@@ -433,9 +643,86 @@ static efi_status_t mm_communicate(u8 *comm_buf, efi_uintn_t dsize)
+ 	return var_hdr->ret_status;
+ }
+ 
++/**
++ * mm_communicate_runtime() - Runtime implementation of mm_communicate()
++ *
++ * @comm_buf:	locally allocated communication buffer
++ * @dsize:		buffer size
++ *
++ * The SP (also called partition) can be any MM SP such as  StandAlonneMM or smm-gateway.
++ * The comm_buf format is the same for both partitions.
++ * When using the u-boot OP-TEE driver, StandAlonneMM is supported.
++ * When using the u-boot FF-A  driver, any MM SP is supported.
++ *
++ * Return:		status code
++ */
++static efi_status_t __efi_runtime mm_communicate_runtime(u8 *comm_buf, efi_uintn_t dsize)
++{
++	efi_status_t ret = EFI_UNSUPPORTED;
++	struct efi_mm_communicate_header *mm_hdr;
++	struct smm_variable_communicate_header *var_hdr;
++	enum mm_comms_select mm_comms;
++
++	dsize += MM_COMMUNICATE_HEADER_SIZE + MM_VARIABLE_COMMUNICATE_SIZE;
++	mm_hdr = (struct efi_mm_communicate_header *)comm_buf;
++	var_hdr = (struct smm_variable_communicate_header *)mm_hdr->data;
++
++	if (IS_ENABLED(CONFIG_ARM_FFA_TRANSPORT)) {
++		mm_comms = get_mm_comms_runtime();
++		if (mm_comms == MM_COMMS_FFA)
++			ret = ffa_mm_communicate_runtime(comm_buf, dsize);
++	}
++
++	if (ret != EFI_SUCCESS)
++		return ret;
++
++	return var_hdr->ret_status;
++}
++
++/**
++ * get_comm_buf() - Obtain a communication buffer for MM/FF-A exchange
++ * @payload_size: size of the payload that will be appended to the
++ *                MM communication header
++ * This helper returns a buffer suitable for constructing an
++ * EFI_MM_COMMUNICATE message. During the boot phase a new buffer is
++ * dynamically allocated. After ExitBootServices(), dynamic
++ * allocation is no longer permitted, and all runtime communication must
++ * use the statically reserved FF-A shared buffer.
++ *
++ * Return:
++ *   Pointer to a valid communication buffer on success,
++ *   NULL if allocation fails during the boot phase.
++ */
++static __efi_runtime u8 *get_comm_buf(efi_uintn_t payload_size)
++{
++	u8 *comm_buf;
++
++	/* After ExitBootServices(), dynamic allocation is no longer permitted.
++	 * Use the predefined FF-A shared buffer at runtime; otherwise allocate
++	 * a fresh buffer during the boot phase.
++	 */
++	if (efi_is_runtime_enabled()) {
++		if (IS_ENABLED(CONFIG_ARM_FFA_RT_MODE)) {
++			comm_buf = ffa_shared_buf;
++			if (!comm_buf)
++				return NULL;
++			efi_memset_runtime(comm_buf, 0, CONFIG_FFA_SHARED_MM_BUF_SIZE);
++		} else {
++			return NULL;
++		}
++	} else {
++		comm_buf = calloc(1, MM_COMMUNICATE_HEADER_SIZE +
++				MM_VARIABLE_COMMUNICATE_SIZE +
++				payload_size);
++		if (!comm_buf)
++			return NULL;
++	}
++	return comm_buf;
++}
++
+ /**
+  * setup_mm_hdr() -	Allocate a buffer for StandAloneMM and initialize the
+- *			header data.
++ *			header data. It is runtime safe.
+  *
+  * @dptr:		pointer address of the corresponding StandAloneMM
+  *			function
+@@ -444,10 +731,9 @@ static efi_status_t mm_communicate(u8 *comm_buf, efi_uintn_t dsize)
+  * @ret:		EFI return code
+  * Return:		buffer or NULL
+  */
+-static u8 *setup_mm_hdr(void **dptr, efi_uintn_t payload_size,
+-			efi_uintn_t func, efi_status_t *ret)
++static __efi_runtime u8 *setup_mm_hdr(void **dptr, efi_uintn_t payload_size,
++				      efi_uintn_t func, efi_status_t *ret)
+ {
+-	const efi_guid_t mm_var_guid = EFI_MM_VARIABLE_GUID;
+ 	struct efi_mm_communicate_header *mm_hdr;
+ 	struct smm_variable_communicate_header *var_hdr;
+ 	u8 *comm_buf;
+@@ -465,16 +751,15 @@ static u8 *setup_mm_hdr(void **dptr, efi_uintn_t payload_size,
+ 		return NULL;
+ 	}
+ 
+-	comm_buf = calloc(1, MM_COMMUNICATE_HEADER_SIZE +
+-			  MM_VARIABLE_COMMUNICATE_SIZE +
+-			  payload_size);
++	comm_buf = get_comm_buf(payload_size);
+ 	if (!comm_buf) {
+ 		*ret = EFI_OUT_OF_RESOURCES;
+ 		return NULL;
+ 	}
+ 
+ 	mm_hdr = (struct efi_mm_communicate_header *)comm_buf;
+-	guidcpy(&mm_hdr->header_guid, &mm_var_guid);
++	efi_memcpy_runtime(&mm_hdr->header_guid, &mm_var_guid_runtime,
++			   sizeof(mm_hdr->header_guid));
+ 	mm_hdr->message_len = MM_VARIABLE_COMMUNICATE_SIZE + payload_size;
+ 
+ 	var_hdr = (struct smm_variable_communicate_header *)mm_hdr->data;
+@@ -982,6 +1267,9 @@ void efi_variables_boot_exit_notify(void)
+ 			efi_get_next_variable_name_runtime;
+ 	efi_runtime_services.set_variable = efi_set_variable_runtime;
+ 	efi_update_table_header_crc32(&efi_runtime_services.hdr);
++
++	/* Set efi_runtime_enabled as true after ExitBootServices */
++	efi_runtime_enabled = true;
+ }
+ 
+ /**
+@@ -993,6 +1281,25 @@ efi_status_t efi_init_variables(void)
+ {
+ 	efi_status_t ret;
+ 
++	if (IS_ENABLED(CONFIG_ARM_FFA_RT_MODE)) {
++		/*
++		 * The FF-A shared buffer is accessed by EFI runtime services, so it must
++		 * be marked as runtime memory in the EFI memory map.
++		 */
++		ffa_shared_buf = (void *)CONFIG_FFA_SHARED_MM_BUF_ADDR;
++		ret = efi_add_memory_map(CONFIG_FFA_SHARED_MM_BUF_ADDR,
++					 CONFIG_FFA_SHARED_MM_BUF_SIZE,
++					 EFI_RUNTIME_SERVICES_DATA);
++		if (ret != EFI_SUCCESS) {
++			log_err("EFI: failed to add FF-A shared buffer to runtime map (%lu)\n",
++				ret);
++			return ret;
++		}
++		log_info("EFI: FF-A shared buffer runtime map: addr=0x%lx size=0x%lx\n",
++			 (ulong)CONFIG_FFA_SHARED_MM_BUF_ADDR,
++			 (ulong)CONFIG_FFA_SHARED_MM_BUF_SIZE);
++	}
++
+ 	/* Create a cached copy of the variables that will be enabled on ExitBootServices() */
+ 	ret = efi_var_mem_init();
+ 	if (ret != EFI_SUCCESS)

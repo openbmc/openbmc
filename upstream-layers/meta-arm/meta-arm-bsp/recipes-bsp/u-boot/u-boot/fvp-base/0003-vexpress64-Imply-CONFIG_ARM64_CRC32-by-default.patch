@@ -1,4 +1,4 @@
-From 67b2bcd428a13d14d4311bd1122e664f391af4d4 Mon Sep 17 00:00:00 2001
+From 469d6ae6f7f0e6356457a50ab490b56e423e4e50 Mon Sep 17 00:00:00 2001
 From: Diego Sueiro <diego.sueiro@arm.com>
 Date: Wed, 4 Oct 2023 06:29:12 +0100
 Subject: [PATCH] vexpress64: Imply CONFIG_ARM64_CRC32 by default
@@ -15,7 +15,7 @@ Signed-off-by: Diego Sueiro <diego.sueiro@arm.com>
  2 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/board/armltd/vexpress64/Kconfig b/board/armltd/vexpress64/Kconfig
-index 9ef3fa1b379f..1a0e0a5018d8 100644
+index 9ef3fa1b379..1a0e0a5018d 100644
 --- a/board/armltd/vexpress64/Kconfig
 +++ b/board/armltd/vexpress64/Kconfig
 @@ -24,6 +24,7 @@ config VEXPRESS64_BASE_MODEL
@@ -27,7 +27,7 @@ index 9ef3fa1b379f..1a0e0a5018d8 100644
  choice
  	prompt "VExpress64 board variant"
 diff --git a/include/configs/vexpress_aemv8.h b/include/configs/vexpress_aemv8.h
-index 5eee13b3fc01..5c271d239501 100644
+index fc4727b4a38..01310ca0454 100644
 --- a/include/configs/vexpress_aemv8.h
 +++ b/include/configs/vexpress_aemv8.h
 @@ -172,7 +172,7 @@
@@ -39,9 +39,9 @@ index 5eee13b3fc01..5c271d239501 100644
  		"  setenv bootargs;"					\
  		"  abootimg addr ${boot_addr_r};"			\
  		"  abootimg get dtb --index=0 fdt_addr_r;"		\
-@@ -181,13 +181,14 @@
+@@ -180,13 +180,14 @@
+ 		"else"							\
  		"  if load hostfs - ${kernel_addr_r} ${kernel_name}; then"	\
- 		"    setenv fdt_high 0xffffffffffffffff;"		\
  		"    setenv initrd_high 0xffffffffffffffff;"		\
 -		"    if test -n load hostfs - ${fdt_addr_r} ${fdtfile}; then"			\
 -		"        fdt move $fdtcontroladdr $fdt_addr_r;"			\

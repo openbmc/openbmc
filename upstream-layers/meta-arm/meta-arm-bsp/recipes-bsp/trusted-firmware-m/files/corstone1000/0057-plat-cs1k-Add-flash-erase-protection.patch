@@ -1,0 +1,98 @@
+From 60277832aa6d4a205a5b1180f0513de0eb7c84c6 Mon Sep 17 00:00:00 2001
+From: Frazer Carsley <frazer.carsley@arm.com>
+Date: Tue, 17 Mar 2026 11:05:45 +0000
+Subject: [PATCH] plat: cs1k: Add flash erase protection
+
+The GPT library deals in blocks, whereas flash deals in sectors. On
+cs1k, eight blocks make up a sector. So, when the GPT library requests a
+block erase from the platform driver, it actually erases the entire
+sector, and then rewrites the data that was there for the blocks that
+weren't being erased.
+
+This means that if all eight blocks in a sector were erased in a row,
+then the same sector would be erased eight times, which is both slow and
+also redundant, wearing out the flash device without need. These
+protections prevent flash erasure if the data is already equal to the
+erased value.
+
+Change-Id: Id8efe515647f45ac8e65cc95ef1bf58f9160aca2
+Signed-off-by: Frazer Carsley <frazer.carsley@arm.com>
+Upstream-Status: Submitted [https://review.trustedfirmware.org/c/TF-M/trusted-firmware-m/+/50259/1]
+---
+ .../ext/target/arm/corstone1000/io/io_gpt.c   | 42 +++++++++++++++++--
+ 1 file changed, 39 insertions(+), 3 deletions(-)
+
+diff --git a/platform/ext/target/arm/corstone1000/io/io_gpt.c b/platform/ext/target/arm/corstone1000/io/io_gpt.c
+index 513c77016..f7c3d79d2 100644
+--- a/platform/ext/target/arm/corstone1000/io/io_gpt.c
++++ b/platform/ext/target/arm/corstone1000/io/io_gpt.c
+@@ -53,6 +53,32 @@ static uint8_t sector_buf[FLASH_SECTOR_SIZE];
+ /* From io_gpt.h - the driver given to the GPT library */
+ struct gpt_flash_driver_t io_gpt_flash_driver = {0};
+ 
++/* Read the bytes that need to be erased. If they are already erased_value,
++ * report that an erase is not required. This is to reduce the number of flash
++ * erase cyles. If the read fails in any way, report erase required.
++ */
++static bool erase_required(uint32_t erase_addr,
++                           size_t   num_bytes)
++{
++    if (num_bytes > FLASH_SECTOR_SIZE) {
++        return true;
++    }
++
++    int32_t ret = flash_driver->ReadData(erase_addr, sector_buf, num_bytes);
++    if (ret < 0 || (uint32_t)ret != num_bytes) {
++        return true;
++    }
++
++    uint8_t erased_value = flash_driver->GetInfo()->erased_value;
++    for (size_t offset = 0; offset < num_bytes; ++offset) {
++        if (sector_buf[offset] != erased_value) {
++            return true;
++        }
++    }
++
++    return false;
++}
++
+ /* Erases TFM_GPT_BLOCK_SIZE bytes from offset within the sector beginning at
+  * sector_addr. This is done via a read-erase-write pattern whereby data is read,
+  * the sector is erased, and data written back to the parts of the sector that
+@@ -61,6 +87,10 @@ struct gpt_flash_driver_t io_gpt_flash_driver = {0};
+ static gpt_flash_err_t partially_erase_sector(uint32_t sector_addr,
+                                               uint32_t offset)
+ {
++    if (!erase_required(sector_addr + offset, TFM_GPT_BLOCK_SIZE)) {
++        return GPT_FLASH_SUCCESS;
++    }
++
+     if (flash_driver->ReadData(
+                 sector_addr,
+                 sector_buf,
+@@ -139,6 +169,10 @@ static ssize_t flash_erase(uint64_t lba, size_t num_blocks)
+ 
+     /* Whole sector erases until last sector */
+     for (size_t i = 0; i < num_sectors - 1; ++i) {
++        if (!erase_required(erase_addr + i * FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE)) {
++            continue;
++        }
++
+         int32_t ret = flash_driver->EraseSector(erase_addr + i * FLASH_SECTOR_SIZE);
+         if (ret != ARM_DRIVER_OK) {
+             return i;
+@@ -146,9 +180,11 @@ static ssize_t flash_erase(uint64_t lba, size_t num_blocks)
+     }
+ 
+     if (num_blocks % LBAS_PER_SECTOR == 0 && lba % LBAS_PER_SECTOR == 0) {
+-        /* Fully erase final sector */
+-        if (flash_driver->EraseSector(last_erase_addr) != ARM_DRIVER_OK) {
+-            return (num_sectors - 1) * LBAS_PER_SECTOR;
++        /* Fully erase final sector if required */
++        if (erase_required(last_erase_addr, FLASH_SECTOR_SIZE)) {
++            if (flash_driver->EraseSector(last_erase_addr) != ARM_DRIVER_OK) {
++                return (num_sectors - 1) * LBAS_PER_SECTOR;
++            }
+         }
+     } else {
+         /* Partial erase of final sector */

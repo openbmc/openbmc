@@ -1,0 +1,163 @@
+From d12b38b7af88fdb37487d5196e214c8a4ad561fc Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Wed, 14 Jan 2026 13:55:02 +0000
+Subject: [PATCH 48/53] test: dm: add sandbox FF-A runtime transport tests
+
+Exercise FF-A runtime helpers via sandbox DM tests
+
+Add driver-model unit tests that exercise the FF-A runtime helpers on
+sandbox. The new tests reuse the sandbox emulator to validate both the
+positive direct-request flow and failure handling, priming the emulator
+state so the runtime path can be executed.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ arch/sandbox/include/asm/sandbox_arm_ffa.h | 16 ++++-
+ test/dm/Makefile                           |  3 +-
+ test/dm/ffa_runtime.c                      | 82 ++++++++++++++++++++++
+ 3 files changed, 99 insertions(+), 2 deletions(-)
+ create mode 100644 test/dm/ffa_runtime.c
+
+diff --git a/arch/sandbox/include/asm/sandbox_arm_ffa.h b/arch/sandbox/include/asm/sandbox_arm_ffa.h
+index be2790f4960..a20eb159b73 100644
+--- a/arch/sandbox/include/asm/sandbox_arm_ffa.h
++++ b/arch/sandbox/include/asm/sandbox_arm_ffa.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-2.0+ */
+ /*
+- * Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2022-2023, 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * Authors:
+  *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -26,6 +26,20 @@
+ #define SANDBOX_SP3_ID 0x6452
+ #define SANDBOX_SP4_ID 0x7814
+ 
++/*
++ * The sandbox FF-A emulator uses fixed, synthetic execution-context counts and
++ * property bitfields for each partition.
++ */
++#define SANDBOX_SP1_EXEC_CTXT 0x5687
++#define SANDBOX_SP2_EXEC_CTXT 0x9587
++#define SANDBOX_SP3_EXEC_CTXT 0x7687
++#define SANDBOX_SP4_EXEC_CTXT 0x1487
++
++#define SANDBOX_SP1_PROPERTIES 0x89325621
++#define SANDBOX_SP2_PROPERTIES 0x45325621
++#define SANDBOX_SP3_PROPERTIES 0x23325621
++#define SANDBOX_SP4_PROPERTIES 0x70325621
++
+ /* Invalid service UUID (no matching SP) */
+ #define SANDBOX_SERVICE3_UUID	"55d532ed-0942-e699-722d-c09ca798d9cd"
+ 
+diff --git a/test/dm/Makefile b/test/dm/Makefile
+index 474e77a2151..218b0b1411f 100644
+--- a/test/dm/Makefile
++++ b/test/dm/Makefile
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0+
+ #
+ # Copyright (c) 2013 Google, Inc
+-# Copyright 2022-2023 Arm Limited and/or its affiliates <open-source-office@arm.com>
++# Copyright 2022-2023, 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+ 
+ # Tests for particular subsystems - when enabling driver model for a new
+ # subsystem you must add sandbox tests here.
+@@ -95,6 +95,7 @@ obj-$(CONFIG_ACPI_PMC) += pmc.o
+ obj-$(CONFIG_DM_PMIC) += pmic.o
+ obj-$(CONFIG_DM_PWM) += pwm.o
+ obj-$(CONFIG_ARM_FFA_TRANSPORT) += ffa.o
++obj-$(CONFIG_ARM_FFA_TRANSPORT) += ffa_runtime.o
+ obj-$(CONFIG_QFW) += qfw.o
+ obj-$(CONFIG_RAM) += ram.o
+ obj-y += regmap.o
+diff --git a/test/dm/ffa_runtime.c b/test/dm/ffa_runtime.c
+new file mode 100644
+index 00000000000..4ba859fa314
+--- /dev/null
++++ b/test/dm/ffa_runtime.c
+@@ -0,0 +1,82 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Functional tests for FF-A runtime helpers
++ *
++ * Copyright 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ *
++ * Authors:
++ *      Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
++ */
++
++#include <dm.h>
++#include <dm/test.h>
++#include <asm/sandbox_arm_ffa.h>
++#include <asm/sandbox_arm_ffa_priv.h>
++#include <arm_ffa_runtime.h>
++#include <test/ut.h>
++
++static int ffa_runtime_get_sp_id(struct unit_test_state *uts, u16 *sp_id)
++{
++	struct ffa_partition_desc *descs;
++	u32 count;
++	struct udevice *dev;
++	const char *svc_uuid = SANDBOX_SERVICE1_UUID;
++
++	ut_assertok(uclass_first_device_err(UCLASS_FFA, &dev));
++	ut_assertok(ffa_partition_info_get(dev, svc_uuid, &count, &descs));
++	ut_assert(count > 0);
++
++	*sp_id = descs[0].info.id;
++	return 0;
++}
++
++static int dm_test_ffa_runtime_ack(struct unit_test_state *uts)
++{
++	struct ffa_send_direct_data msg = {0};
++	u16 sp_id;
++	u8 cnt;
++
++	ut_assertok(ffa_runtime_get_sp_id(uts, &sp_id));
++
++	ffa_copy_runtime_priv(&(struct ffa_priv_runtime){
++		.id = NS_PHYS_ENDPOINT_ID,
++	});
++	ffa_enable_runtime_context();
++
++	/* Ensure runtime context is available before attempting runtime-only paths */
++	ut_assert(ffa_get_status_runtime_context());
++
++	/* Runtime messaging should reuse the sandbox emulator and return 0xff pattern */
++	ut_assertok(ffa_sync_send_receive_runtime(sp_id, &msg, true));
++	for (cnt = 0; cnt < sizeof(struct ffa_send_direct_data) / sizeof(u64); cnt++)
++		ut_asserteq_64(-1UL, ((u64 *)&msg)[cnt]);
++
++	/* Validate FF-A error to errno translation helpers */
++	ut_asserteq(-EINVAL, ffa_to_std_errno(-INVALID_PARAMETERS));
++	ut_asserteq(-EOPNOTSUPP, ffa_to_std_errno(-NOT_SUPPORTED));
++
++	return 0;
++}
++DM_TEST(dm_test_ffa_runtime_ack, UTF_SCAN_FDT | UTF_CONSOLE);
++
++static int dm_test_ffa_runtime_nack(struct unit_test_state *uts)
++{
++	struct ffa_send_direct_data msg = {0};
++	u16 sp_id;
++
++	ut_assertok(ffa_runtime_get_sp_id(uts, &sp_id));
++
++	ffa_copy_runtime_priv(&(struct ffa_priv_runtime){
++		.id = NS_PHYS_ENDPOINT_ID,
++	});
++	ffa_enable_runtime_context();
++
++	/* Ensure runtime context is available before attempting runtime-only paths */
++	ut_assert(ffa_get_status_runtime_context());
++
++	/* Invalid partition IDs must be rejected and mapped to -EINVAL */
++	ut_asserteq(-EINVAL, ffa_sync_send_receive_runtime(0, &msg, true));
++
++	return 0;
++}
++DM_TEST(dm_test_ffa_runtime_nack, UTF_SCAN_FDT | UTF_CONSOLE);

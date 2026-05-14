@@ -1,0 +1,47 @@
+From d595e579413e8bcf1f65be25f3da340abb5d2c2b Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Wed, 1 Apr 2026 13:37:35 +0100
+Subject: [PATCH 51/53] doc: bootefi: note two-phase runtime variables selftest
+
+Explain how the runtime variable selftest runs in two phases
+
+Document that the "variables at runtime" selftest runs in two
+phases when CONFIG_EFI_RT_VOLATILE_STORE is not enabled, and
+show how to select it with efi_selftest.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ doc/usage/cmd/bootefi.rst | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/doc/usage/cmd/bootefi.rst b/doc/usage/cmd/bootefi.rst
+index 7c5448586b7..91aebf1a4b5 100644
+--- a/doc/usage/cmd/bootefi.rst
++++ b/doc/usage/cmd/bootefi.rst
+@@ -160,6 +160,16 @@ environment variable to match one of the listed identifiers
+ Some of the tests execute the ExitBootServices() UEFI boot service and will not
+ return to the command line but require a board reset.
+ 
++The test *variables at runtime* runs in two phases when
++CONFIG_EFI_RT_VOLATILE_STORE is not enabled. Run it once to create a
++runtime-accessible variable in non-volatile storage, reboot, then run it
++again to validate, append, and delete that variable.
++
++::
++
++    => setenv efi_selftest 'variables at runtime'
++    => bootefi selftest
++
+ Configuration
+ -------------
+ 
+@@ -167,6 +177,8 @@ To use the *bootefi* command you must specify CONFIG_CMD_BOOTEFI=y.
+ The *bootefi bootmgr* sub-command requries CMD_BOOTEFI_BOOTMGR=y.
+ The *bootefi hello* sub-command requries CMD_BOOTEFI_HELLO=y.
+ The *bootefi selftest* sub-command depends on CMD_BOOTEFI_SELFTEST=y.
++The *variables at runtime* selftest runs in two phases when
++CONFIG\_EFI\_RT\_VOLATILE\_STORE is not enabled.
+ 
+ See also
+ --------

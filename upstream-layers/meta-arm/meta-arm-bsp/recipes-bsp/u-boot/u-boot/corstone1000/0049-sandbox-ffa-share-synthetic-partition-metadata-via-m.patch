@@ -1,0 +1,96 @@
+From 6e707fe6a0120a3a6aa7954a250293162a441b21 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Thu, 15 Jan 2026 10:57:48 +0000
+Subject: [PATCH 49/53] sandbox: ffa: share synthetic partition metadata via
+ macros
+
+Reuse sandbox FF-A partition constants in emulator tests
+
+Allow the sandbox FF-A emulator test to use execution-context and property
+constants defined in sandbox_arm_ffa.h
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ drivers/firmware/arm-ffa/ffa-emul-uclass.c | 36 ++++++++++++++++------
+ 1 file changed, 26 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/firmware/arm-ffa/ffa-emul-uclass.c b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+index 531ecb12f3a..33d38d37ddb 100644
+--- a/drivers/firmware/arm-ffa/ffa-emul-uclass.c
++++ b/drivers/firmware/arm-ffa/ffa-emul-uclass.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0+
+ /*
+- * Copyright 2022-2023, 2025 Arm Limited and/or its affiliates <open-source-office@arm.com>
++ * Copyright 2022-2023, 2025-2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+  *
+  * Authors:
+  *   Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+@@ -22,41 +22,57 @@ DECLARE_GLOBAL_DATA_PTR;
+ /* The partitions (SPs) table */
+ static struct ffa_partition_desc sandbox_partitions[SANDBOX_PARTITIONS_CNT] = {
+ 	{
+-		.info = { .id = SANDBOX_SP1_ID, .exec_ctxt = 0x5687, .properties = 0x89325621 },
++		.info = {
++			.id = SANDBOX_SP1_ID,
++			.exec_ctxt = SANDBOX_SP1_EXEC_CTXT,
++			.properties = SANDBOX_SP1_PROPERTIES,
++		},
+ 		.sp_uuid = {
+ 			.a1 = SANDBOX_SERVICE1_UUID_A1,
+ 			.a2 = SANDBOX_SERVICE1_UUID_A2,
+ 			.a3 = SANDBOX_SERVICE1_UUID_A3,
+ 			.a4 = SANDBOX_SERVICE1_UUID_A4,
+-		}
++		},
+ 	},
+ 	{
+-		.info = { .id = SANDBOX_SP3_ID, .exec_ctxt = 0x7687, .properties = 0x23325621 },
++		.info = {
++			.id = SANDBOX_SP2_ID,
++			.exec_ctxt = SANDBOX_SP2_EXEC_CTXT,
++			.properties = SANDBOX_SP2_PROPERTIES,
++		},
+ 		.sp_uuid = {
+ 			.a1 = SANDBOX_SERVICE2_UUID_A1,
+ 			.a2 = SANDBOX_SERVICE2_UUID_A2,
+ 			.a3 = SANDBOX_SERVICE2_UUID_A3,
+ 			.a4 = SANDBOX_SERVICE2_UUID_A4,
+-		}
++		},
+ 	},
+ 	{
+-		.info = { .id = SANDBOX_SP2_ID, .exec_ctxt = 0x9587, .properties = 0x45325621 },
++		.info = {
++			.id = SANDBOX_SP3_ID,
++			.exec_ctxt = SANDBOX_SP3_EXEC_CTXT,
++			.properties = SANDBOX_SP3_PROPERTIES,
++		},
+ 		.sp_uuid = {
+ 			.a1 = SANDBOX_SERVICE1_UUID_A1,
+ 			.a2 = SANDBOX_SERVICE1_UUID_A2,
+ 			.a3 = SANDBOX_SERVICE1_UUID_A3,
+ 			.a4 = SANDBOX_SERVICE1_UUID_A4,
+-		}
++		},
+ 	},
+ 	{
+-		.info = { .id = SANDBOX_SP4_ID, .exec_ctxt = 0x1487, .properties = 0x70325621 },
++		.info = {
++			.id = SANDBOX_SP4_ID,
++			.exec_ctxt = SANDBOX_SP4_EXEC_CTXT,
++			.properties = SANDBOX_SP4_PROPERTIES,
++		},
+ 		.sp_uuid = {
+ 			.a1 = SANDBOX_SERVICE2_UUID_A1,
+ 			.a2 = SANDBOX_SERVICE2_UUID_A2,
+ 			.a3 = SANDBOX_SERVICE2_UUID_A3,
+ 			.a4 = SANDBOX_SERVICE2_UUID_A4,
+-		}
+-	}
++		},
++	},
+ 
+ };
+ 

@@ -77,6 +77,21 @@ SRC_URI:append:corstone1000 = " \
     file://0043-plat-cs1k-Create-and-remove-FWU-image-partitions.patch \
     file://0044-plat-cs1k-Derive-host-base-addresses-from-offsets.patch \
     file://0045-plat-cs1k-Drive-NPU-via-external-system-reset-contro.patch \
+    file://0046-lib-gpt-Fix-final-entry-not-being-removed.patch \
+    file://0047-lib-gpt-Replace-warnings-with-errors.patch \
+    file://0048-lib-gpt-Enforce-entry-size-of-128-bytes.patch \
+    file://0049-lib-gpt-Ensure-block-size-complies-with-spec.patch \
+    file://0050-lib-gpt-Expand-table-validation.patch \
+    file://0051-lib-gpt-Show-intent-of-GUIDs-in-unittests-more-clear.patch \
+    file://0052-lib-gpt-Provide-macro-identifying-free-space.patch \
+    file://0053-lib-gpt-Add-operation-to-duplicate-entries.patch \
+    file://0054-lib-gpt-Consecutively-erase-blocks-when-moving-parti.patch \
+    file://0055-lib-gpt-Clarify-API-operation.patch \
+    file://0056-lib-gpt-Add-metadata-only-API-operations.patch \
+    file://0057-plat-cs1k-Add-flash-erase-protection.patch \
+    file://0058-plat-cs1k-Remove-unused-FWU-partitions-upon-version-.patch \
+    file://0059-plat-cs1k-Duplicate-old-images-in-FWU.patch \
+    file://0060-platform-corstone1000-Increase-FIP-partition-size.patch \
     "
 
 SRCREV_tfm-psa-adac:corstone1000 = "f2809ae231be33a1afcd7714f40756c67d846c88"

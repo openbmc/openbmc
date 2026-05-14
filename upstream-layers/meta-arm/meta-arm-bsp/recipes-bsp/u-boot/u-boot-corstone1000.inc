@@ -81,6 +81,29 @@ SRC_URI:append = " \
     file://0039-corstone1000-a320-Add-Corstone1000-board-variant.patch \
 "
 
+# Disable the debug feature
+SRC_URI:append = " \
+    file://0040-configs-corstone1000-disable-EFI-debug-support.patch \
+"
+
+# Add FF-A bus runtime support
+SRC_URI:append = " \
+    file://0041-efi_loader-add-runtime-memset-helper.patch \
+    file://0042-arm-ffa-add-FF-A-bus-runtime-support.patch \
+    file://0043-efi_loader-add-FF-A-runtime-support-in-EFI-variable-.patch \
+    file://0044-efi_loader-enable-EFI-runtime-SetVariable-GetVariabl.patch \
+    file://0045-efi_loader-move-runtime-GetVariable-helpers-to-efi_v.patch \
+    file://0046-corstone1000-enable-bootefi-selftest.patch \
+    file://0047-efi-selftest-add-runtime-variable-tests-with-non-vol.patch \
+    file://0048-test-dm-add-sandbox-FF-A-runtime-transport-tests.patch \
+    file://0049-sandbox-ffa-share-synthetic-partition-metadata-via-m.patch \
+    file://0050-doc-arm64-document-FF-A-runtime-path-for-EFI-variabl.patch \
+    file://0051-doc-bootefi-note-two-phase-runtime-variables-selftes.patch \
+    file://0052-efi_loader-align-FF-A-cache-maintenance-with-runtime.patch \
+    file://0053-efi_loader-fix-AllocatePages-overlap-status.patch \
+    file://0054-corstone1000-a320-enable-bootefi-selftest.patch \
+"
+
 uboot_configure_config:append() {
    openssl req -x509 -sha256 -newkey rsa:2048 -subj /CN=CRT/ -keyout ${B}/CRT.key -out ${S}/CRT.crt -nodes -days 365
 }

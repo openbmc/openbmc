@@ -1,0 +1,75 @@
+From 00b68d1c3dd2d182545bcacc668dbb2f637c94c1 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Fri, 10 Apr 2026 13:50:25 +0100
+Subject: [PATCH 52/53] efi_loader: align FF-A cache maintenance with runtime
+ path
+
+Match boot-time FF-A cache handling to runtime behavior
+
+The boot-time FF-A MM communication path used invalidate_dcache_all()
+after copying the message into the shared buffer. This differs from the
+runtime path, which performs range-based maintenance to avoid global cache
+operations.
+
+Update ffa_mm_communicate() to use the same pattern as the runtime helper:
+clean the shared buffer range before the SMC and invalidate the same range
+after the response. This keeps boot-time and runtime behavior consistent
+and avoids whole-cache invalidation.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ lib/efi_loader/efi_variable_tee.c | 33 ++++++++++++++++++++++++-------
+ 1 file changed, 26 insertions(+), 7 deletions(-)
+
+diff --git a/lib/efi_loader/efi_variable_tee.c b/lib/efi_loader/efi_variable_tee.c
+index 30687c21b8e..df509a435b1 100644
+--- a/lib/efi_loader/efi_variable_tee.c
++++ b/lib/efi_loader/efi_variable_tee.c
+@@ -389,19 +389,38 @@ static efi_status_t ffa_mm_communicate(void *comm_buf, ulong comm_buf_size)
+ 	memcpy(virt_shared_buf, comm_buf, tx_data_size);
+ 
+ 	/*
+-	 * The secure world might have cache disabled for
+-	 * the device region used for shared buffer (which is the case for Optee).
+-	 * In this case, the secure world reads the data from DRAM.
+-	 * Let's flush the cache so the DRAM is updated with the latest data.
++	 * Shared buffer cache maintenance for FF-A / OP-TEE communication:
++	 *
++	 * NS -> S (request path):
++	 *
++	 * The non-secure side populates the shared buffer. If the buffer is cached
++	 * in NS, the updated bytes may reside in dirty D-cache lines and not yet be
++	 * visible in DDR. Since the secure world typically reads the shared buffer
++	 * directly from DDR (e.g. with caches disabled / non-coherent mapping), we
++	 * must clean the corresponding cache lines to the Point of Coherency (PoC)
++	 * before entering secure world.
++	 *
++	 * S -> NS (response path):
++	 *
++	 * The secure world may update the same shared buffer in DDR. After returning
++	 * to non-secure, any cached copies of that region in NS may be stale. We
++	 * therefore invalidate the shared buffer range after the FF-A call to drop
++	 * those lines and force subsequent reads to fetch the latest data from DDR.
+ 	 */
+-#ifdef CONFIG_ARM64
+-	invalidate_dcache_all();
+-#endif
++	if (IS_ENABLED(CONFIG_ARM64))
++		flush_dcache_range((unsigned long)virt_shared_buf,
++				   (unsigned long)virt_shared_buf +
++				   CONFIG_FFA_SHARED_MM_BUF_SIZE);
+ 
+ 	/* Announce there is data in the shared buffer */
+ 
+ 	ffa_ret = ffa_notify_mm_sp();
+ 
++	if (IS_ENABLED(CONFIG_ARM64))
++		invalidate_dcache_range((unsigned long)virt_shared_buf,
++					(unsigned long)virt_shared_buf +
++					CONFIG_FFA_SHARED_MM_BUF_SIZE);
++
+ 	switch (ffa_ret) {
+ 	case 0: {
+ 		ulong rx_data_size;

@@ -23,7 +23,8 @@ def parse_args(arguments):
     parser = argparse.ArgumentParser(description="Run images in a FVP")
     parser.add_argument("config", nargs="?", help="Machine name or path to .fvpconf file")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("-t", "--terminals", choices=terminals.all_terminals(), default=terminals.preferred_terminal(), help="Automatically start terminals (default: %(default)s)")
+    available_terminals=",".join(terminals.available_terminals())
+    group.add_argument("-t", "--terminals", choices=terminals.all_terminals(), default=terminals.preferred_terminal(), help=f"Automatically start terminals (default: %(default)s). Available terminals are ({available_terminals})")
     group.add_argument("-c", "--console", action="store_true", help="Attach the first uart to stdin/stdout")
     parser.add_argument("--verbose", action="store_true", help="Output verbose logging")
     parser.usage = f"{parser.format_usage().strip()} -- [ arguments passed to FVP ]"
@@ -52,6 +53,11 @@ def parse_args(arguments):
 def start_fvp(args, fvpconf, extra_args):
     fvp = runner.FVPRunner(logger)
     try:
+
+        if args.terminals:
+            if not terminal.terminals[args.terminals].is_ready():
+                return 1
+
         fvp.start(fvpconf, extra_args, args.terminals)
 
         if args.console:
@@ -80,8 +86,9 @@ def start_fvp(args, fvpconf, extra_args):
     except FileNotFoundError as e:
         logger.error(f"FVP executable not found ({e})")
     finally:
-        return fvp.stop()
+        rv=fvp.stop()
 
+    return rv
 
 def runfvp(cli_args):
     args, extra_args = parse_args(cli_args)

@@ -7,12 +7,13 @@ Add virtio-net support in Corstone1000 FVP
 
 Signed-off-by: Emekcan Aras <emekcan.aras@arm.com>
 Signed-off-by: Abdellatif El Khlifi <abdellatif.elkhlifi@arm.com>
+Signed-off-by: Michael Safwat <michael.safwat@arm.com>
 Upstream-Status: Pending [Not submitted to upstream yet]
 ---
  arch/arm/dts/corstone1000-fvp.dts        |  6 ++++
  board/armltd/corstone1000/corstone1000.c | 42 ++++++++++++++++++++----
- configs/corstone1000_defconfig           |  2 ++
- 3 files changed, 44 insertions(+), 6 deletions(-)
+ configs/corstone1000_defconfig           |  3 ++
+ 3 files changed, 45 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm/dts/corstone1000-fvp.dts b/arch/arm/dts/corstone1000-fvp.dts
 index 3076fb9f344..cd8a132271e 100644
@@ -97,10 +98,18 @@ index 9189640ef75..39fd10ed653 100644
 +	return 0;
 +}
 diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
-index 00c3bb5f557..450d69762ab 100644
+index 00c3bb5f557..4ec23b4af1c 100644
 --- a/configs/corstone1000_defconfig
 +++ b/configs/corstone1000_defconfig
-@@ -78,6 +78,8 @@ CONFIG_TEE=y
+@@ -37,6 +37,7 @@ CONFIG_LOGLEVEL=7
+ # CONFIG_DISPLAY_CPUINFO is not set
+ # CONFIG_DISPLAY_BOARDINFO is not set
+ CONFIG_BOARD_INIT=y
++CONFIG_BOARD_LATE_INIT=y
+ CONFIG_SYS_PROMPT="corstone1000# "
+ # CONFIG_CMD_CONSOLE is not set
+ CONFIG_CMD_FWU_METADATA=y
+@@ -78,6 +79,8 @@ CONFIG_TEE=y
  CONFIG_OPTEE=y
  CONFIG_USB=y
  CONFIG_USB_ISP1760=y

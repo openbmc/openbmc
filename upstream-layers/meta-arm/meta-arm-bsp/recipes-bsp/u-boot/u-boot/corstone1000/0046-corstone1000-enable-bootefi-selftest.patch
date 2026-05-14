@@ -1,0 +1,38 @@
+From 4c8504fe21f91bf462486afdfe4113f8bbc9f930 Mon Sep 17 00:00:00 2001
+From: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+Date: Sun, 11 Jan 2026 20:34:13 +0000
+Subject: [PATCH 46/53] corstone1000: enable bootefi selftest
+
+Enable UEFI selftest command in Corstone-1000 defconfig
+
+Turn on CONFIG_CMD_BOOTEFI_SELFTEST in the Corstone-1000 defconfig
+so the board can run the built-in UEFI self-test suite during
+development and validation.
+
+Upstream-Status: Submitted [cover letter: https://lore.kernel.org/u-boot/20260424173151.371134-1-harsimransingh.tungal@arm.com/]
+Signed-off-by: Harsimran Singh Tungal <harsimransingh.tungal@arm.com>
+---
+ configs/corstone1000_defconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/configs/corstone1000_defconfig b/configs/corstone1000_defconfig
+index 350607892fa..8de2f9bd440 100644
+--- a/configs/corstone1000_defconfig
++++ b/configs/corstone1000_defconfig
+@@ -41,6 +41,8 @@ CONFIG_SYS_PROMPT="corstone1000# "
+ # CONFIG_CMD_CONSOLE is not set
+ CONFIG_CMD_FWU_METADATA=y
+ CONFIG_CMD_BOOTZ=y
++# CONFIG_CMD_BOOTEFI_HELLO is not set
++CONFIG_CMD_BOOTEFI_SELFTEST=y
+ # CONFIG_CMD_XIMG is not set
+ CONFIG_CMD_NVEDIT_EFI=y
+ CONFIG_CMD_GPT=y
+@@ -79,6 +81,7 @@ CONFIG_SYSRESET=y
+ CONFIG_SYSRESET_PSCI=y
+ CONFIG_TEE=y
+ CONFIG_OPTEE=y
++# CONFIG_CMD_POWEROFF is not set
+ CONFIG_USB=y
+ CONFIG_USB_ISP1760=y
+ CONFIG_VIRTIO_MMIO=y
