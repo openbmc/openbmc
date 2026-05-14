@@ -1,4 +1,4 @@
-From 02cd20470448676d97d77c2e6789ecce43f0e21c Mon Sep 17 00:00:00 2001
+From 3a335538594d0eb3da6155a64b473a46fd06ce76 Mon Sep 17 00:00:00 2001
 From: Christian Hofstaedtler <zeha@debian.org>
 Date: Tue, 10 Oct 2017 15:04:34 -0300
 Subject: [PATCH] rdoc: build reproducible documentation
@@ -38,6 +38,3 @@ index 065caa4..cfa1f33 100644
            gz.orig_name = dest.basename.to_s
            gz.write data
            gz.close
--- 
-2.34.1
-

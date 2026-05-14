@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# we need to load the vcs_versioning.test_api plugin for some tests to work.
+# Also make sure that we don't get pretty diffs for assertion errors so that we
+# don't see terminalreporter errors (which the automake plugin un-registers).
+pytest -p vcs_versioning.test_api --assert=plain --automake

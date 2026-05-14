@@ -1,4 +1,4 @@
-From 2cedad6b2beb908a8fb80da0e45e5055dca65e99 Mon Sep 17 00:00:00 2001
+From 73edbaf1a89e05e92f91ed97348a65c4ce740cea Mon Sep 17 00:00:00 2001
 From: Changqing Li <changqing.li@windriver.com>
 Date: Fri, 27 Feb 2026 16:59:24 +0800
 Subject: [PATCH] Don't save the original name and timestamp
@@ -28,6 +28,3 @@ index 874c3ef..eb99a70 100755
  def Compressors.for(type)
    ext = File.extname(type)
    if compress = fetch(ext, nil)
--- 
-2.34.1
-

@@ -4,41 +4,45 @@ HOMEPAGE = "https://p11-glue.github.io/p11-glue/p11-kit.html"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=02933887f609807fbb57aa4237d14a50"
 
-inherit meson gettext pkgconfig gtk-doc bash-completion manpages
+inherit meson gettext pkgconfig gtk-doc bash-completion manpages lib_package
 
-DEPENDS = "libtasn1 libtasn1-native libffi"
+DEPENDS = "libffi"
 
 DEPENDS:append = "${@' glib-2.0' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
 
-SRC_URI = "gitsm://github.com/p11-glue/p11-kit;branch=master;protocol=https;tag=${PV} \
-           "
+SRC_URI = "gitsm://github.com/p11-glue/p11-kit;branch=master;protocol=https;tag=${PV}"
 SRCREV = "8e6e4e6d64d9fe91c62b0052c105b2b72d4c24ef"
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} trust"
+PACKAGECONFIG[systemd] = "-Dsystemd=enabled,-Dsystemd=disabled,systemd"
 PACKAGECONFIG[manpages] = "-Dman=true,-Dman=false,libxslt-native"
+PACKAGECONFIG[trust] = "-Dtrust_module=enabled,-Dtrust_module=disabled,libtasn1-native libtasn1"
 PACKAGECONFIG[trust-paths] = "-Dtrust_paths=/etc/ssl/certs/ca-certificates.crt,,,ca-certificates"
 
-EXTRA_OEMESON:append = " -Dnls=${@'false' if d.getVar('USE_NLS') == 'no' else 'true'}"
+EXTRA_OEMESON = "\
+    -Dtest=false \
+    -Dzsh_completion=disabled \
+    -Dnls=${@'false' if d.getVar('USE_NLS') == 'no' else 'true'}"
+
 GTKDOC_MESON_OPTION = 'gtk_doc'
 
-FILES:${PN} += " \
-    ${libdir}/p11-kit-proxy.so \
-    ${libdir}/pkcs11/*.so \
-    ${libdir}/pkcs11/*.la \
-    ${datadir} \
-    ${systemd_user_unitdir}/*"
+PACKAGES =+ "${PN}-modules ${PN}-remote"
 
-# PN contains p11-kit-proxy.so, a symlink to a loadable module
-INSANE_SKIP:${PN} = "dev-so"
+FILES:${PN}-bin += "${libexecdir}/p11-kit/trust-extract-compat"
+
+FILES:${PN}-modules = "\
+    ${datadir}/p11-kit/modules \
+    ${libdir}/p11-kit-proxy.so \
+    ${libdir}/pkcs11"
+
+# p11-kit-proxy.so, a symlink to a loadable module
+INSANE_SKIP:${PN}-modules = "dev-so"
+
+FILES:${PN}-remote = "\
+    ${libexecdir}/p11-kit/p11-kit-remote \
+    ${libexecdir}/p11-kit/p11-kit-server \
+    ${systemd_user_unitdir}"
 
 BBCLASSEXTEND = "native nativesdk"
 
-# # This one is reproducible only on 32bit MACHINEs
-# http://errors.yoctoproject.org/Errors/Details/766969/
-# git/p11-kit/import-object.c:223:62: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
-# git/p11-kit/import-object.c:229:70: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
-# git/p11-kit/import-object.c:264:78: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
-# git/p11-kit/import-object.c:223:62: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
-# git/p11-kit/import-object.c:229:70: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
-# git/p11-kit/import-object.c:264:78: error: passing argument 3 of 'p11_asn1_read' from incompatible pointer type [-Wincompatible-pointer-types]
-CFLAGS += "-Wno-error=incompatible-pointer-types"
+CVE_STATUS[CVE-2026-2100] = "fixed-version: fixed since 0.26.2"

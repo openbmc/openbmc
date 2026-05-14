@@ -195,7 +195,6 @@ FILES:${PN}-dev:append = " ${datadir}/gobject-introspection-1.0/gdump.c \
 FILES:${PN}-dev:append = " ${datadir}/gobject-introspection-1.0/tests/*.c \
                            ${datadir}/gobject-introspection-1.0/tests/*.h"
 
-FILES:${PN}-dbg += "${libdir}/gobject-introspection/giscanner/.debug/"
 FILES:${PN}-staticdev += "${libdir}/gobject-introspection/giscanner/*.a"
 
 # glib-2.0 is required for libgirepository

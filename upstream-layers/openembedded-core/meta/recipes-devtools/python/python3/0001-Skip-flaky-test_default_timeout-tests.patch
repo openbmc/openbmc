@@ -27,7 +27,7 @@ diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.
 index e8064e7..9ab1f9e 100644
 --- a/Lib/test/_test_multiprocessing.py
 +++ b/Lib/test/_test_multiprocessing.py
-@@ -2259,6 +2259,7 @@ class _TestBarrier(BaseTestCase):
+@@ -2424,6 +2424,7 @@ class _TestBarrier(BaseTestCase):
          """
          Test the barrier's default timeout
          """
@@ -39,7 +39,7 @@ diff --git a/Lib/test/lock_tests.py b/Lib/test/lock_tests.py
 index 8c8f890..43e9b90 100644
 --- a/Lib/test/lock_tests.py
 +++ b/Lib/test/lock_tests.py
-@@ -1165,6 +1165,7 @@ class BarrierTests(BaseTestCase):
+@@ -1215,6 +1215,7 @@ class BarrierTests(BaseTestCase):
          """
          Test the barrier's default timeout
          """

@@ -37,7 +37,8 @@ def runstrip(file, elftype, strip, extra_strip_sections=''):
 
     stripcmd = [strip]
     skip_strip = False
-    # kernel module
+    # kernel module: use --strip-debug and --preserve-dates (required for
+    # module signing to remain valid after stripping)
     if elftype & 16:
         if is_kernel_module_signed(file):
             bb.debug(1, "Skip strip on signed module %s" % file)
@@ -1167,7 +1168,7 @@ def process_split_and_strip_files(d):
                         or (s[stat.ST_MODE] & stat.S_IXOTH) \
                         or ((file.startswith(libdir) or file.startswith(baselibdir)) \
                         and (".so" in f or ".node" in f)) \
-                        or (f.startswith('vmlinux') or ".ko" in f):
+                        or (f.startswith('vmlinux') or f.endswith(".ko")):
 
                     if cpath.islink(file):
                         checkelflinks[file] = ltarget

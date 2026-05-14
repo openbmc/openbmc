@@ -85,3 +85,5 @@ CFLAGS:append:class-native = " -DNO_SHARED_MEMORY"
 FILES:${PN} += "${datadir}/licenses/SDL2/LICENSE.txt"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2026-35444] = "cpe-incorrect: this CVE is for sdl_image"

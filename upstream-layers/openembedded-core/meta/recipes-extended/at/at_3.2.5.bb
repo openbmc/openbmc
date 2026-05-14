@@ -9,7 +9,7 @@ DEPENDS = "flex flex-native bison-native \
            ${@bb.utils.contains('DISTRO_FEATURES', 'pam', 'libpam', '', d)}"
 
 PACKAGECONFIG ?= "\
-    ${@bb.utils.contains('DISTRO_FEATURES', 'selinux', 'selinux', '', d)} \
+    ${@bb.utils.filter('DISTRO_FEATURES', 'selinux', d)} \
 "
 
 PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux,"

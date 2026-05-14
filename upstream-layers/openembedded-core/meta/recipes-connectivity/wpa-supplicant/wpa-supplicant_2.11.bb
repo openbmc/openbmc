@@ -113,31 +113,24 @@ PACKAGES += "${PN}-plugins"
 ALLOW_EMPTY:${PN}-plugins = "1"
 
 PACKAGES_DYNAMIC += "^${PN}-plugin-.*$"
-NOAUTOPACKAGEDEBUG = "1"
 
 FILES:${PN}-passphrase = "${sbindir}/wpa_passphrase"
 FILES:${PN}-cli = "${sbindir}/wpa_cli"
 FILES:${PN}-lib = "${libdir}/libwpa_client*${SOLIBSDEV}"
 FILES:${PN} += "${datadir}/dbus-1/system-services/* ${systemd_system_unitdir}/*"
-FILES:${PN}-dbg += "${sbindir}/.debug ${libdir}/.debug"
 
 CONFFILES:${PN} += "${sysconfdir}/wpa_supplicant.conf"
 
-RRECOMMENDS:${PN} = "${PN}-passphrase ${PN}-cli ${PN}-plugins"
+RRECOMMENDS:${PN} = "${PN}-passphrase ${PN}-cli ${PN}-plugins wireless-regdb-static"
 
 SYSTEMD_SERVICE:${PN} = "wpa_supplicant.service"
 SYSTEMD_AUTO_ENABLE = "disable"
 
 python split_wpa_supplicant_libs () {
     libdir = d.expand('${libdir}/wpa_supplicant')
-    dbglibdir = os.path.join(libdir, '.debug')
-
     split_packages = do_split_packages(d, libdir, r'^(.*)\.so', '${PN}-plugin-%s', 'wpa_supplicant %s plugin', prepend=True)
-    split_dbg_packages = do_split_packages(d, dbglibdir, r'^(.*)\.so', '${PN}-plugin-%s-dbg', 'wpa_supplicant %s plugin - Debugging files', prepend=True, extra_depends='${PN}-dbg')
-
     if split_packages:
         pn = d.getVar('PN')
         d.setVar('RRECOMMENDS:' + pn + '-plugins', ' '.join(split_packages))
-        d.appendVar('RRECOMMENDS:' + pn + '-dbg', ' ' + ' '.join(split_dbg_packages))
 }
 PACKAGESPLITFUNCS += "split_wpa_supplicant_libs"

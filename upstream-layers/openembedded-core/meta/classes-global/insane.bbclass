@@ -46,7 +46,7 @@ ERROR_QA ?= "\
     ${CHECKLAYER_REQUIRED_TESTS}"
 
 # Add usrmerge QA check based on distro feature
-ERROR_QA:append = "${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', ' usrmerge', '', d)}"
+ERROR_QA:append = " ${@bb.utils.filter('DISTRO_FEATURES', 'usrmerge', d)}"
 WARN_QA:append:layer-core = " missing-metadata missing-maintainer"
 
 FAKEROOT_QA = "host-user-contaminated"

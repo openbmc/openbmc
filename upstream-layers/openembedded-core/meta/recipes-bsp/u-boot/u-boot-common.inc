@@ -12,7 +12,7 @@ PE = "1"
 
 # We use the revision in order to avoid having to fetch it from the
 # repo during parse
-SRCREV = "127a42c7257a6ffbbd1575ed1cbaa8f5408a44b3"
+SRCREV = "88dc2788777babfd6322fa655df549a019aa1e69"
 
 SRC_URI = "git://source.denx.de/u-boot/u-boot.git;protocol=https;branch=master;tag=v${PV}"
 

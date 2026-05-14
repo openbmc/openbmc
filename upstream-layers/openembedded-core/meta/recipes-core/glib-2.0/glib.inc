@@ -124,6 +124,8 @@ do_install:append () {
 do_install:append:class-native () {
 	# Link gio-querymodules into ${bindir} as otherwise tools like meson won't find it
         ln -rs ${D}${libexecdir}/gio-querymodules ${D}${bindir}
+	# Remove gdb plugins as we'd never use them for native and they encode system build paths into their location
+	rm ${D}${datadir}/gdb -rf
 }
 
 do_install:append:class-target () {

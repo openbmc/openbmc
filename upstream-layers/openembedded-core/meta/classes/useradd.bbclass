@@ -26,7 +26,7 @@ SYSROOT=""
 if test "x$D" != "x"; then
 	# Installing into a sysroot
 	SYSROOT="$D"
-	OPT="--root $D"
+	OPT="--prefix $D"
 
 	# Make sure login.defs is there, this is to make debian package backend work
 	# correctly while doing rootfs.
@@ -37,7 +37,7 @@ if test "x$D" != "x"; then
 	    cp $D${sysconfdir}/login.defs.dpkg-new $D${sysconfdir}/login.defs
 	fi
 
-	# user/group lookups should match useradd/groupadd --root
+	# user/group lookups should match useradd/groupadd --prefix
 	export PSEUDO_PASSWD="$SYSROOT"
 fi
 

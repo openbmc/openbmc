@@ -14,7 +14,7 @@ REQUIRED_DISTRO_FEATURES = "opengl glvnd"
 inherit meson pkgconfig features_check
 
 PACKAGECONFIG ?= "\
-  ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'x11', '', d)} \
+  ${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)} \
   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'egl gles1 gles2', '', d)} \
   ${@bb.utils.contains('DISTRO_FEATURES', 'opengl x11', 'glx', '', d)} \
   "

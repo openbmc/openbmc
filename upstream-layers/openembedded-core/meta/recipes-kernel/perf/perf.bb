@@ -39,6 +39,7 @@ PACKAGECONFIG[coresight] = "CORESIGHT=1,,opencsd"
 PACKAGECONFIG[pfm4] = ",NO_LIBPFM4=1,libpfm4"
 PACKAGECONFIG[babeltrace] = ",NO_LIBBABELTRACE=1,babeltrace"
 PACKAGECONFIG[zstd] = ",NO_LIBZSTD=1,zstd"
+PACKAGECONFIG[llvm] = ",NO_LIBLLVM=1,llvm"
 
 # libunwind is not yet ported for some architectures
 PACKAGECONFIG:remove:arc = "libunwind"
@@ -168,6 +169,9 @@ PERF_EXTRA_LDFLAGS:mipsarchn32el = "-m elf32ltsmipn32"
 PERF_EXTRA_LDFLAGS:mipsarchn64eb = "-m elf64btsmip"
 PERF_EXTRA_LDFLAGS:mipsarchn64el = "-m elf64ltsmip"
 
+# override for older kernels which don't support installing headers for all libraries
+REPRODUCIBLE_HEADERS_TARGETS ?= "api bpf perf subcmd symbol"
+
 do_compile() {
 	# Linux kernel build system is expected to do the right thing
 	unset CFLAGS
@@ -178,7 +182,7 @@ do_compile() {
 	# There are two copies of internal headers such as:
 	# libperf/include/internal/xyarray.h and tools/lib/perf/include/internal/xyarray.h
 	# For reproducibile binaries, we need to find one copy, hence force libXXX to be created first
-	for i in api bpf subcmd symbol perf
+	for i in ${REPRODUCIBLE_HEADERS_TARGETS}
 	do
 		oe_runmake -C ${S}/tools/lib/$i DESTDIR=${B}/lib$i prefix= install_headers V=1
 	done

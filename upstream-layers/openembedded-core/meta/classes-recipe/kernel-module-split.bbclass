@@ -45,10 +45,14 @@ KERNEL_MODULE_PROVIDE_VIRTUAL ?= "1"
 python split_kernel_module_packages () {
     import re
 
-    modinfoexp = re.compile("([^=]+)=(.*)")
+    modinfoexp = re.compile(r"([^=]+)=\s*(.+)")
 
     def extract_modinfo(file):
-        import tempfile, subprocess
+        """
+        Extract the module metadata from the specified file,
+        returning a dictionary of fields to list of string values.
+        """
+        import collections, tempfile, subprocess
         tempfile.tempdir = d.getVar("WORKDIR")
         compressed = re.match( r'.*\.(gz|xz|zst)$', file)
         tf = tempfile.mkstemp()
@@ -78,12 +82,12 @@ python split_kernel_module_packages () {
         os.unlink(tmpfile)
         if compressed:
             os.unlink(tmpkofile)
-        vals = {}
+        vals = collections.defaultdict(list)
         for i in l:
             m = modinfoexp.match(i)
             if not m:
                 continue
-            vals[m.group(1)] = m.group(2)
+            vals[m.group(1)].append(m.group(2))
         return vals
 
     def handle_conf_files(d, basename, pkg):
@@ -185,6 +189,9 @@ python split_kernel_module_packages () {
 
 
     def frob_metadata(file, pkg, pattern, format, basename):
+        if "/.debug/" in file:
+            return
+
         vals = extract_modinfo(file)
         dvar = d.getVar('PKGD')
 
@@ -192,12 +199,12 @@ python split_kernel_module_packages () {
 
         if "description" in vals:
             old_desc = d.getVar('DESCRIPTION:' + pkg) or ""
-            d.setVar('DESCRIPTION:' + pkg, old_desc + "; " + vals["description"])
+            d.setVar('DESCRIPTION:' + pkg, old_desc + "; " + vals["description"][0])
 
         rdepends = bb.utils.explode_dep_versions2(d.getVar('RDEPENDS:' + pkg) or "")
         modinfo_deps = []
-        if "depends" in vals and vals["depends"] != "":
-            for dep in vals["depends"].split(","):
+        for deps in vals.get("depends", []):
+            for dep in deps.split(","):
                 on = legitimize_package_name(dep)
                 dependency_pkg = format % on
                 modinfo_deps.append(dependency_pkg)

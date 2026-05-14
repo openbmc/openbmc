@@ -138,3 +138,6 @@ do_install_ptest() {
 }
 
 export CONFIG_SHELL = "/bin/bash"
+
+# Add CVE_PRODUCT to match the NVD CPE product name
+CVE_PRODUCT = "apache:portable_runtime"

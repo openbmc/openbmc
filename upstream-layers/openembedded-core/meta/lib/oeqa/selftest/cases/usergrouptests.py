@@ -55,3 +55,9 @@ class UserGroupTests(OESelftestTestCase):
         self.write_config("USERADD_GID_TABLES += \"files/static-group\"")
         self.logger.info("Rebuild with other staticids")
         self.assertTrue(bitbake(' core-image-minimal'))
+
+    def test_useradd_depends_only(self):
+        # Test that a recipe inheriting useradd with only USERADD_DEPENDS
+        # (and no USERADD_PACKAGES) parses and builds successfully. [YOCTO #15863]
+        self.logger.info("Building usegroup-deponly to test USERADD_DEPENDS only")
+        self.assertTrue(bitbake(' usegroup-deponly'))

@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://OvmfPkg/License.txt;md5=06357ddc23f46577c2aeaeaf7b776
 # compiling OVMF twice, so it is disabled by default. Distros
 # may change that default.
 PACKAGECONFIG ??= ""
-PACKAGECONFIG += "${@bb.utils.contains('MACHINE_FEATURES', 'tpm', 'tpm', '', d)}"
+PACKAGECONFIG += "${@bb.utils.filter('MACHINE_FEATURES', 'tpm', d)}"
 PACKAGECONFIG += "${@bb.utils.contains('MACHINE_FEATURES', 'tpm2', 'tpm', '', d)}"
 PACKAGECONFIG[debug] = ",,,"
 PACKAGECONFIG[secureboot] = ",,,"
@@ -48,6 +48,13 @@ CVE_STATUS[CVE-2019-14575] = "fixed-version: The CPE in the NVD database doesn't
 CVE_STATUS[CVE-2019-14586] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 CVE_STATUS[CVE-2019-14587] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 CVE_STATUS[CVE-2024-1298] = "fixed-version: fixed since edk2-stable202405"
+CVE_STATUS[CVE-2024-38796] = "fixed-version: fixed since edk2-stable202411"
+CVE_STATUS[CVE-2024-38797] = "fixed-version: fixed since edk2-stable202502"
+CVE_STATUS[CVE-2024-38798] = "fixed-version: fixed since edk2-stable202511"
+CVE_STATUS[CVE-2024-38805] = "fixed-version: fixed since edk2-stabe202508"
+CVE_STATUS[CVE-2025-2295] = "fixed-version: fixed since edk2-stable202505"
+CVE_STATUS[CVE-2025-2296] = "fixed-version: fixed since edk2-stable202505"
+CVE_STATUS[CVE-2025-3770] = "fixed-version: fixed since edk2-stable202508"
 
 inherit deploy
 

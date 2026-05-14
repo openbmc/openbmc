@@ -1,4 +1,4 @@
-From 23e2d4c5064ddb023ed1a9d364793dbe0d20717f Mon Sep 17 00:00:00 2001
+From 847fb663583fd01121313d1ec0e9ceab240c9143 Mon Sep 17 00:00:00 2001
 From: Adam Duskett <adam.duskett@amarulasolutions.com>
 Date: Thu, 26 Mar 2026 12:11:42 +0100
 Subject: [PATCH] compress_buf: fix musl segfaults
@@ -39,6 +39,3 @@ index 77c7fcc7..470e4f34 100644
    unsigned int litofs = 0;
    memset(htab, -1, sizeof (htab));
    memset(hnext, -1, sizeof (hnext));
--- 
-2.53.0
-

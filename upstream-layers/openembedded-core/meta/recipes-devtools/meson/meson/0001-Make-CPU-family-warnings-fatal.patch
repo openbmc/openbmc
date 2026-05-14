@@ -1,4 +1,4 @@
-From 9854e557b77612afb095e9868bb7cba12bc1b1cb Mon Sep 17 00:00:00 2001
+From ba79cee701b80984c660ffc1c89ce1226b75ed5b Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Tue, 3 Jul 2018 13:59:09 +0100
 Subject: [PATCH] Make CPU family warnings fatal
@@ -6,15 +6,14 @@ Subject: [PATCH] Make CPU family warnings fatal
 Upstream-Status: Inappropriate [OE specific]
 Signed-off-by: Ross Burton <ross.burton@intel.com>
 ---
- mesonbuild/envconfig.py   | 4 ++--
- mesonbuild/environment.py | 6 ++----
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ mesonbuild/envconfig.py | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/mesonbuild/envconfig.py b/mesonbuild/envconfig.py
-index 43fad0c..27be871 100644
+index b0072a4..762818c 100644
 --- a/mesonbuild/envconfig.py
 +++ b/mesonbuild/envconfig.py
-@@ -287,8 +287,8 @@ class MachineInfo(HoldableObject):
+@@ -294,8 +294,8 @@ class MachineInfo(HoldableObject):
                  'but is missing {}.'.format(minimum_literal - set(literal)))
  
          cpu_family = literal['cpu_family']
@@ -25,11 +24,7 @@ index 43fad0c..27be871 100644
  
          endian = literal['endian']
          if endian not in ('little', 'big'):
-diff --git i/mesonbuild/envconfig.py w/mesonbuild/envconfig.py
-index dd050b011..5277693c3 100644
---- i/mesonbuild/envconfig.py
-+++ w/mesonbuild/envconfig.py
-@@ -634,9 +634,7 @@ def detect_cpu_family(compilers: T.Dict[str, Compiler]) -> str:
+@@ -642,9 +642,7 @@ def detect_cpu_family(compilers: CompilerDict) -> str:
              trial = 'mips'
  
      if trial not in known_cpu_families:

@@ -37,8 +37,7 @@
 
 PATH=/sbin:/bin:/usr/sbin:/usr/bin
 
-# We get OLDROOT from the rootfs module
-OLDROOT="/rootfs"
+OLDROOT="${ROOTFS_DIR}"
 
 NEWROOT="${RWMOUNT}/root"
 RWMOUNT="/overlay"

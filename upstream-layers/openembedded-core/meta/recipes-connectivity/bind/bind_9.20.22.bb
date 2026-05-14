@@ -108,3 +108,5 @@ FILES_SOLIBSDEV = "${libdir}/*[!0-9].so ${libdir}/libbind9.so"
 FILES:${PN}-libs = "${libdir}/named/*.so* ${libdir}/*-${PV}.so"
 
 DEV_PKG_DEPENDENCY = ""
+
+CVE_STATUS[CVE-2017-3139] = "not-applicable-platform: RedHat specific issue"

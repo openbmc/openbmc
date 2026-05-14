@@ -1,4 +1,4 @@
-From 65fa5c0f849fe4a1e3cb8e6af0086ef0748c28de Mon Sep 17 00:00:00 2001
+From f928abf16841e42bfd49ccaabc164318f61e842a Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 17 Feb 2021 17:57:13 +0000
 Subject: [PATCH] generate-configlist.sh: Fix determinism issue
@@ -19,14 +19,14 @@ shell script generating the header.
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 Upstream-Status: Submitted [https://public-inbox.org/git/f029a942dd3d50d85e60bd37d8e454524987842f.camel@linuxfoundation.org/T/#u]
 ---
- generate-configlist.sh | 2 +-
+ tools/generate-configlist.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/generate-configlist.sh b/generate-configlist.sh
-index 75c39ad..6d4525e 100755
---- a/generate-configlist.sh
-+++ b/generate-configlist.sh
-@@ -23,7 +23,7 @@ EOF
+diff --git a/tools/generate-configlist.sh b/tools/generate-configlist.sh
+index e28054f..96ddd51 100755
+--- a/tools/generate-configlist.sh
++++ b/tools/generate-configlist.sh
+@@ -24,7 +24,7 @@ EOF
  	d' \
  	    "$SOURCE_DIR"/Documentation/*config.adoc \
  	    "$SOURCE_DIR"/Documentation/config/*.adoc |

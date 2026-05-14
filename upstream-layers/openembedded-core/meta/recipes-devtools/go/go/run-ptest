@@ -1,0 +1,80 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+
+PTEST_DIR=$(cd "$(dirname "$0")" && pwd)
+GOROOT=$(dirname "$PTEST_DIR")
+
+export GOROOT
+export PATH=$GOROOT/bin:$PATH
+export GOCACHE=$(mktemp -d)
+export ZONEINFO=/usr/share/zoneinfo
+
+# Link ptest source tree into GOROOT for testing.
+# Save and restore any existing src directory.
+if [ -d "$GOROOT/src" ] && [ ! -L "$GOROOT/src" ]; then
+    mv "$GOROOT/src" "$GOROOT/src.orig"
+fi
+ln -sf "$PTEST_DIR/src" "$GOROOT/src"
+
+CLEANUP_VERSION=0
+if [ -f "$PTEST_DIR/VERSION" ] && [ ! -f "$GOROOT/VERSION" ]; then
+    cp "$PTEST_DIR/VERSION" "$GOROOT/VERSION"
+    CLEANUP_VERSION=1
+fi
+
+CLEANUP_INCLUDE=0
+if ls "$PTEST_DIR/pkg/include/"* >/dev/null 2>&1; then
+    if [ ! -d "$GOROOT/pkg/include" ]; then
+        mkdir -p "$GOROOT/pkg/include"
+        CLEANUP_INCLUDE=1
+    fi
+    cp "$PTEST_DIR/pkg/include/"* "$GOROOT/pkg/include/"
+fi
+
+cd "$GOROOT" || exit 1
+
+# Packages skipped due to known issues in the ptest environment:
+#   debug/dwarf, debug/elf, debug/pe, debug/plan9obj, internal/xcoff:
+#       require binary testdata files excluded to avoid QA errors
+#   go/types: extremely slow, exceeds ptest timeout
+#   net/http: requires network access unavailable in qemu
+#   runtime: requires cgo rebuild and race detector setup
+#   testing: circular dependency when testing the test framework
+#   time: requires writable GOROOT for timezone data
+SKIP_PKGS="debug/dwarf debug/elf debug/pe debug/plan9obj go/types internal/xcoff net/http runtime testing time"
+
+SKIP_REGEX=$(echo "$SKIP_PKGS" | sed 's/ /|/g')
+
+RC=0
+for pkg in $(go list std); do
+    # Skip package and all its subpackages
+    if echo "$pkg" | grep -qE "^($SKIP_REGEX)(/|$)"; then
+        echo "SKIP: $pkg"
+        continue
+    fi
+
+    output=$(go test -short "$pkg" 2>&1)
+    ret=$?
+    if [ $ret -eq 0 ]; then
+        echo "PASS: $pkg"
+    else
+        echo "FAIL: $pkg"
+        echo "$output"
+        RC=1
+    fi
+done
+
+# Cleanup: restore original src directory
+rm -f "$GOROOT/src"
+if [ -d "$GOROOT/src.orig" ]; then
+    mv "$GOROOT/src.orig" "$GOROOT/src"
+fi
+if [ $CLEANUP_VERSION -eq 1 ]; then
+    rm -f "$GOROOT/VERSION"
+fi
+if [ $CLEANUP_INCLUDE -eq 1 ]; then
+    rm -rf "$GOROOT/pkg/include"
+fi
+rm -rf "$GOCACHE"
+
+exit $RC

@@ -1,0 +1,26 @@
+From b1e8722ccf79ef02ae929df2e7fd7547e8615e68 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Wed, 22 Apr 2026 10:09:16 +0000
+Subject: [PATCH] bump uv_build to 0.11.0
+
+Upstream-Status: Backport [https://github.com/pyca/cryptography/pull/14545]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index eac1a07..6bc8d46 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["uv_build>=0.7.19,<0.9.0"]
++requires = ["uv_build>=0.7.19,<0.12.0"]
+ build-backend = "uv_build"
+ 
+ [project]
+-- 
+2.43.0
+

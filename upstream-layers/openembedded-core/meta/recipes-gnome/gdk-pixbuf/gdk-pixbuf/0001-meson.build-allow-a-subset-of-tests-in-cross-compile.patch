@@ -1,4 +1,4 @@
-From 3b6aab24f6844b7d5b3e166bc910bffbcee1f6f5 Mon Sep 17 00:00:00 2001
+From 38bc595a5c365074b924ed2706a402679b3f6df4 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 26 Jan 2023 20:29:46 +0100
 Subject: [PATCH] meson.build: allow (a subset of) tests in cross compile
@@ -22,10 +22,10 @@ Signed-off-by: Changqing Li <changqing.li@windriver.com>
  2 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index f478326..464ae1d 100644
+index b88ef70..b181054 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -428,10 +428,10 @@ subdir('gdk-pixbuf')
+@@ -434,10 +434,10 @@ subdir('gdk-pixbuf')
  # i18n
  subdir('po')
  
@@ -67,6 +67,3 @@ index 9b96fdc..9c3ed7d 100644
  
  foreach test_name, test_data: installed_tests
    test_sources = [ test_name + '.c', 'test-common.c' ]
--- 
-2.34.1
-

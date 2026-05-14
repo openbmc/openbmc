@@ -87,6 +87,7 @@ PTESTS_FAST = "\
     python3-pyyaml \
     python3-rpds-py \
     python3-trove-classifiers \
+    python3-vcs-versioning \
     python3-uritools \
     python3-wcwidth \
     python3-webcolors \
@@ -120,6 +121,7 @@ PTESTS_SLOW = "\
     gettext \
     glib-2.0 \
     gnutls \
+    go \
     gstreamer1.0 \
     less \
     libevent \

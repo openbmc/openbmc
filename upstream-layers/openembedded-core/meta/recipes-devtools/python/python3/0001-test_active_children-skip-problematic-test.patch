@@ -21,7 +21,7 @@ diff --git a/Lib/test/_test_multiprocessing.py b/Lib/test/_test_multiprocessing.
 index 008e6a505a5..746de8945f0 100644
 --- a/Lib/test/_test_multiprocessing.py
 +++ b/Lib/test/_test_multiprocessing.py
-@@ -615,6 +615,7 @@ def test_cpu_count(self):
+@@ -667,6 +667,7 @@ class _TestProcess(BaseTestCase):
          self.assertIsInstance(cpus, int)
          self.assertGreaterEqual(cpus, 1)
  

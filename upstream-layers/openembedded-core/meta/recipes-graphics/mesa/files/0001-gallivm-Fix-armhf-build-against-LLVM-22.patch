@@ -1,4 +1,4 @@
-From 973dc32026c164d0c13f7f5bef36c8d1c2375973 Mon Sep 17 00:00:00 2001
+From 2a40c481affef4df729d794daf378ed2e0184895 Mon Sep 17 00:00:00 2001
 From: Alessandro Astone <ales.astone@gmail.com>
 Date: Sun, 1 Mar 2026 18:14:09 +0100
 Subject: [PATCH] gallivm: Fix armhf build against LLVM 22
@@ -25,6 +25,3 @@ index d3ad342..c95d86e 100644
          f != features.end();
          ++f) {
        MAttrs.push_back(((*f).second ? "+" : "-") + (*f).first().str());
--- 
-2.53.0
-

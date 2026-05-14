@@ -18,7 +18,7 @@ diff --git a/Lib/test/test_cmd.py b/Lib/test/test_cmd.py
 index dbfec42fc21..c33dab8d10d 100644
 --- a/Lib/test/test_cmd.py
 +++ b/Lib/test/test_cmd.py
-@@ -295,6 +295,7 @@ def do_tab_completion_test(self, args):
+@@ -295,6 +295,7 @@ class CmdTestReadline(unittest.TestCase):
          self.assertIn(b'ab_completion_test', output)
          self.assertIn(b'tab completion success', output)
  

@@ -429,7 +429,6 @@ do_install() {
 do_install[lockfiles] = "${TMPDIR}/kernel-scripts.lock"
 
 FILES:${PN} = "${KERNEL_BUILD_ROOT} ${KERNEL_SRC_PATH}"
-FILES:${PN}-dbg += "${KERNEL_BUILD_ROOT}*/build/scripts/*/.debug/*"
 
 RDEPENDS:${PN} = "bc python3-core flex bison ${TCLIBC}-utils gawk"
 # 4.15+ needs these next two RDEPENDS

@@ -49,3 +49,5 @@ BBCLASSEXTEND = "native nativesdk"
 # This used to use the bootstrap install which didn't compile. Until we bump the
 # tmpdir version we can't compile the native otherwise the sysroot unpack fails
 INSTALL_WHEEL_COMPILE_BYTECODE:class-native = "--no-compile-bytecode"
+
+CVE_STATUS[CVE-2024-6345] = "fixed-version: fixed since 70.0"

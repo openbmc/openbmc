@@ -169,7 +169,7 @@ FILES:${PN}-tools = "${bindir}/wispr"
 RDEPENDS:${PN}-tools = "${PN}"
 
 FILES:${PN}-tests = "${bindir}/*-test"
-RDEPENDS:${PN}-tests = "${@bb.utils.contains('PACKAGECONFIG', 'iptables', 'iptables', '', d)}"
+RDEPENDS:${PN}-tests = "${@bb.utils.filter('PACKAGECONFIG', 'iptables', d)}"
 
 FILES:${PN}-client = "${bindir}/connmanctl"
 RDEPENDS:${PN}-client = "${PN}"
