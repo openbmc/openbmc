@@ -127,7 +127,6 @@ class GitProgressHandler(bb.progress.LineFilterProgressHandler):
 
 class Git(FetchMethod):
     bitbake_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.join(os.path.abspath(__file__))), '..', '..', '..'))
-    make_shallow_path = os.path.join(bitbake_dir, 'bin', 'git-make-shallow')
 
     """Class to fetch a module or modules from git repositories"""
     def init(self, d):
@@ -392,14 +391,14 @@ class Git(FetchMethod):
                 bb.utils.mkdirhier(ud.clonedir)
                 runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=ud.clonedir)
             else:
-                tmpdir = tempfile.mkdtemp(dir=d.getVar('DL_DIR'))
-                runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=tmpdir)
-                output = runfetchcmd("%s remote" % ud.basecmd, d, quiet=True, workdir=ud.clonedir)
-                if 'mirror' in output:
-                    runfetchcmd("%s remote rm mirror" % ud.basecmd, d, workdir=ud.clonedir)
-                runfetchcmd("%s remote add --mirror=fetch mirror %s" % (ud.basecmd, tmpdir), d, workdir=ud.clonedir)
-                fetch_cmd = "LANG=C %s fetch -f --update-head-ok  --progress mirror " % (ud.basecmd)
-                runfetchcmd(fetch_cmd, d, workdir=ud.clonedir)
+                with tempfile.TemporaryDirectory(dir=d.getVar('DL_DIR')) as tmpdir:
+                    runfetchcmd("tar -xzf %s" % ud.fullmirror, d, workdir=tmpdir)
+                    output = runfetchcmd("%s remote" % ud.basecmd, d, quiet=True, workdir=ud.clonedir)
+                    if 'mirror' in output:
+                        runfetchcmd("%s remote rm mirror" % ud.basecmd, d, workdir=ud.clonedir)
+                    runfetchcmd("%s remote add --mirror=fetch mirror %s" % (ud.basecmd, tmpdir), d, workdir=ud.clonedir)
+                    fetch_cmd = "LANG=C %s fetch -f --update-head-ok  --progress mirror " % (ud.basecmd)
+                    runfetchcmd(fetch_cmd, d, workdir=ud.clonedir)
         repourl = self._get_repo_url(ud)
 
         needs_clone = False
@@ -543,27 +542,23 @@ class Git(FetchMethod):
             runfetchcmd("touch %s.done" % ud.fullmirror, d)
 
     def clone_shallow_with_tarball(self, ud, d):
-        ret = False
-        tempdir = tempfile.mkdtemp(dir=d.getVar('DL_DIR'))
-        shallowclone = os.path.join(tempdir, 'git')
-        try:
-            try:
-                self.clone_shallow_local(ud, shallowclone, d)
-            except:
-                logger.warning("Fast shallow clone failed, try to skip fast mode now.")
-                bb.utils.remove(tempdir, recurse=True)
-                os.mkdir(tempdir)
-                ud.shallow_skip_fast = True
-                self.clone_shallow_local(ud, shallowclone, d)
-            logger.info("Creating tarball of git repository")
-            with self.create_atomic(ud.fullshallow) as tfile:
-                runfetchcmd("tar -czf %s ." % tfile, d, workdir=shallowclone)
-            runfetchcmd("touch %s.done" % ud.fullshallow, d)
-            ret = True
-        finally:
-            bb.utils.remove(tempdir, recurse=True)
-
-        return ret
+        for fast in [True, False]:
+            ud.shallow_skip_fast = not fast
+            with tempfile.TemporaryDirectory(dir=d.getVar('DL_DIR')) as tempdir:
+                shallowclone = os.path.join(tempdir, 'git')
+                try:
+                    self.clone_shallow_local(ud, shallowclone, d)
+                except:
+                    if not fast:
+                        raise
+                    logger.warning("Fast shallow clone failed, try to skip fast mode now.")
+                    continue
+                logger.info("Creating tarball of git repository")
+                with self.create_atomic(ud.fullshallow) as tfile:
+                    runfetchcmd("tar -czf %s ." % tfile, d, workdir=shallowclone)
+                runfetchcmd("touch %s.done" % ud.fullshallow, d)
+                return True
+        return False
 
     def clone_shallow_local(self, ud, dest, d):
         """

@@ -9,14 +9,13 @@
 #   docker build -f contrib/hashserv/Dockerfile .
 #
 
-FROM alpine:3.13.1
+FROM alpine:3.23
 
-RUN apk add --no-cache python3 libgcc
+RUN apk add --no-cache python3 py3-websockets libgcc
 
 COPY bin/bitbake-hashserv /opt/bbhashserv/bin/
 COPY lib/hashserv /opt/bbhashserv/lib/hashserv/
 COPY lib/bb /opt/bbhashserv/lib/bb/
-COPY lib/codegen.py /opt/bbhashserv/lib/codegen.py
 COPY lib/ply /opt/bbhashserv/lib/ply/
 COPY lib/bs4 /opt/bbhashserv/lib/bs4/
 

@@ -674,7 +674,7 @@ The ``bitbake-setup settings`` sub-command helps modifying the settings of
 
 Settings must be set with a section and a value, for example::
 
-   bitbake-setup setting set default top-dir-name bitbake-builds
+   bitbake-setup settings set default top-dir-name bitbake-builds
 
 Will set the value of ``top-dir-name`` in the ``default`` section to
 "bitbake-builds".

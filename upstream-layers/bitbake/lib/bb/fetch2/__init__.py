@@ -303,7 +303,7 @@ class URI(object):
 
     def _query_str(self):
         return (
-            ''.join(['?', self._param_str_join(self.query, "&")])
+            ''.join(['?', self._query_str_join(self.query, "&")])
             if self.query else '')
 
     def _param_str_split(self, string, elmdelim, kvdelim="="):
@@ -312,8 +312,11 @@ class URI(object):
             ret[k] = v
         return ret
 
-    def _param_str_join(self, dict_, elmdelim, kvdelim="="):
+    def _query_str_join(self, dict_, elmdelim, kvdelim="="):
         return elmdelim.join([kvdelim.join([k, v]) if v else k for k, v in dict_.items()])
+
+    def _param_str_join(self, dict_, elmdelim, kvdelim="="):
+        return elmdelim.join([kvdelim.join([k, v]) for k, v in dict_.items()])
 
     @property
     def hostport(self):
@@ -1962,6 +1965,7 @@ class Fetch(object):
                 if e.errno in [errno.ESTALE]:
                     logger.error("Stale Error Observed %s." % u)
                     raise ChecksumError("Stale Error Detected")
+                raise
 
             except BBFetchException as e:
                 if isinstance(e, NoChecksumError):

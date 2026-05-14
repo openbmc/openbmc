@@ -99,14 +99,19 @@ em {
 [alt='Permalink'] { color: #eee; }
 [alt='Permalink']:hover { color: black; }
 
-@media screen {
-    /* content column
-     *
-     * RTD theme's default is 800px as max width for the content, but we have
-     * tables with tons of columns, which need the full width of the view-port.
-     */
+.literal-block {
+    background: #f8f8f8;
+}
 
-    .wy-nav-content{max-width: none; }
+@media screen {
+    .wy-nav-content {
+       max-width: 1000px;
+       background: #fcfcfc;
+    }
+
+    .wy-nav-content-wrap {
+       background: #efefef;
+    }
 
     /* inline literal: drop the borderbox, padding and red color */
     code, .rst-content tt, .rst-content code {

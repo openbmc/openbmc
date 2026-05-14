@@ -64,22 +64,6 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
             True,
         )
 
-    def test_create_new_project_kirkstone(self):
-        """ Test create new project using:
-          - Project Name: Any string
-          - Release: Yocto Project 4.0 "Kirkstone" (option value: 5)
-          - Merge Toaster settings: True
-        """
-        release = '5'
-        release_title = 'Yocto Project 4.0 "Kirkstone"'
-        project_name = 'projectkirkstone'
-        self.create_new_project(
-            project_name,
-            release,
-            release_title,
-            True,
-        )
-
     def test_create_new_project_local(self):
         """ Test create new project using:
           - Project Name: Any string

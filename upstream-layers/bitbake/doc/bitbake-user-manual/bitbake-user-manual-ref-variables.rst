@@ -349,8 +349,9 @@ overview of their function and contents.
    :term:`BB_GIT_SHALLOW`
       Setting this variable to "1" enables the support for fetching, using and
       generating mirror tarballs of `shallow git repositories <https://riptutorial.com/git/example/4584/shallow-clone>`_.
-      The external `git-make-shallow <https://git.openembedded.org/bitbake/tree/bin/git-make-shallow>`_
-      script is used for shallow mirror tarball creation.
+      A git shallow fetch is used for shallow mirror tarball creation (i.e.
+      ``git fetch --depth <depth> ...`` or
+      ``git fetch --shallow-exclude=<revs> ...``.
 
       When :term:`BB_GIT_SHALLOW` is enabled, bitbake will attempt to fetch a shallow
       mirror tarball. If the shallow mirror tarball cannot be fetched, it will

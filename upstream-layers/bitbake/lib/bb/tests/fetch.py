@@ -291,8 +291,8 @@ class URITest(unittest.TestCase):
             'query': {},
             'relative': True
         },
-        "https://www.innodisk.com/Download_file?9BE0BF6657;downloadfilename=EGPL-T101.zip": {
-            'uri': 'https://www.innodisk.com/Download_file?9BE0BF6657;downloadfilename=EGPL-T101.zip',
+        "https://www.innodisk.com/Download_file?9BE0BF6657;downloadfilename=EGPL-T101.zip;someparam=": {
+            'uri': 'https://www.innodisk.com/Download_file?9BE0BF6657;downloadfilename=EGPL-T101.zip;someparam=',
             'scheme': 'https',
             'hostname': 'www.innodisk.com',
             'port': None,
@@ -302,7 +302,7 @@ class URITest(unittest.TestCase):
             'userinfo': '',
             'username': '',
             'password': '',
-            'params': {"downloadfilename" : "EGPL-T101.zip"},
+            'params': {"downloadfilename" : "EGPL-T101.zip", "someparam" : ""},
             'query': {"9BE0BF6657": None},
             'relative': False
         },
@@ -1627,11 +1627,6 @@ class GitMakeShallowTest(FetcherTest):
         actual_count = len(revs.splitlines())
         self.assertEqual(expected_count, actual_count, msg='Object count `%d` is not the expected `%d`' % (actual_count, expected_count))
 
-    def make_shallow(self, args=None):
-        if args is None:
-            args = ['HEAD']
-        return bb.process.run([bb.fetch2.git.Git.make_shallow_path] + args, cwd=self.gitdir)
-
     def add_empty_file(self, path, msg=None):
         if msg is None:
             msg = path
@@ -1639,88 +1634,6 @@ class GitMakeShallowTest(FetcherTest):
         self.git(['add', path])
         self.git(['commit', '-m', msg, path])
 
-    def test_make_shallow_single_branch_no_merge(self):
-        self.add_empty_file('a')
-        self.add_empty_file('b')
-        self.assertRevCount(2)
-        self.make_shallow()
-        self.assertRevCount(1)
-
-    def test_make_shallow_single_branch_one_merge(self):
-        self.add_empty_file('a')
-        self.add_empty_file('b')
-        self.git('checkout -b a_branch')
-        self.add_empty_file('c')
-        self.git('checkout master')
-        self.add_empty_file('d')
-        self.git('merge --no-ff --no-edit a_branch')
-        self.git('branch -d a_branch')
-        self.add_empty_file('e')
-        self.assertRevCount(6)
-        self.make_shallow(['HEAD~2'])
-        self.assertRevCount(5)
-
-    def test_make_shallow_at_merge(self):
-        self.add_empty_file('a')
-        self.git('checkout -b a_branch')
-        self.add_empty_file('b')
-        self.git('checkout master')
-        self.git('merge --no-ff --no-edit a_branch')
-        self.git('branch -d a_branch')
-        self.assertRevCount(3)
-        self.make_shallow()
-        self.assertRevCount(1)
-
-    def test_make_shallow_annotated_tag(self):
-        self.add_empty_file('a')
-        self.add_empty_file('b')
-        self.git('tag -a -m a_tag a_tag')
-        self.assertRevCount(2)
-        self.make_shallow(['a_tag'])
-        self.assertRevCount(1)
-
-    def test_make_shallow_multi_ref(self):
-        self.add_empty_file('a')
-        self.add_empty_file('b')
-        self.git('checkout -b a_branch')
-        self.add_empty_file('c')
-        self.git('checkout master')
-        self.add_empty_file('d')
-        self.git('checkout -b a_branch_2')
-        self.add_empty_file('a_tag')
-        self.git('tag a_tag')
-        self.git('checkout master')
-        self.git('branch -D a_branch_2')
-        self.add_empty_file('e')
-        self.assertRevCount(6, ['--all'])
-        self.make_shallow()
-        self.assertRevCount(5, ['--all'])
-
-    def test_make_shallow_multi_ref_trim(self):
-        self.add_empty_file('a')
-        self.git('checkout -b a_branch')
-        self.add_empty_file('c')
-        self.git('checkout master')
-        self.assertRevCount(1)
-        self.assertRevCount(2, ['--all'])
-        self.assertRefs(['master', 'a_branch'])
-        self.make_shallow(['-r', 'master', 'HEAD'])
-        self.assertRevCount(1, ['--all'])
-        self.assertRefs(['master'])
-
-    def test_make_shallow_noop(self):
-        self.add_empty_file('a')
-        self.assertRevCount(1)
-        self.make_shallow()
-        self.assertRevCount(1)
-
-    @skipIfNoNetwork()
-    def test_make_shallow_bitbake(self):
-        self.git('remote add origin https://github.com/openembedded/bitbake')
-        self.git('fetch --tags origin')
-        orig_revs = len(self.git('rev-list --all').splitlines())
-        self.make_shallow(['refs/tags/1.10.0'])
-        self.assertRevCount(orig_revs - 1746, ['--all'])
 
 class GitShallowTest(FetcherTest):
     def setUp(self):

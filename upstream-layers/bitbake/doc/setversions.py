@@ -13,6 +13,7 @@
 # SPDX-License-Identifier: MIT
 #
 
+import argparse
 import itertools
 import json
 import os
@@ -91,10 +92,24 @@ print(f"LTSSERIES calculated to be {LTSSERIES}", file=sys.stderr)
 
 BB_RELEASE_TAG_RE = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 
+def main():
+    parser = argparse.ArgumentParser(
+        description="Parse https://dashboard.yoctoproject.org/releases.json to get current releases information"
+    )
+    parser.add_argument("--get-latest-branch",
+                        help="Print current latest branch and exit",
+                        action="store_true",
+                        default=False)
+    args = parser.parse_args()
+
+    if args.get_latest_branch:
+        print(ACTIVERELEASES[0])
+        sys.exit(0)
+
 def get_current_version():
     # Test tags exist and inform the user to fetch if not
     try:
-        subprocess.run(["git", "show", f"{LTSSERIES[0]}.0"],
+        subprocess.run(["git", "show", f"{LTSSERIES[-1]}.0"],
                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
     except subprocess.CalledProcessError:
         sys.exit("Please run 'git fetch --tags' before building the documentation")
@@ -354,3 +369,6 @@ def write_releases_rst(releases_rst_out: str):
             - :yocto_docs:`1.6.2 BitBake User Manual </1.6.2/bitbake-user-manual/bitbake-user-manual.html>`
             - :yocto_docs:`1.6.3 BitBake User Manual </1.6.3/bitbake-user-manual/bitbake-user-manual.html>`
             """))
+
+if __name__ == "__main__":
+    main()

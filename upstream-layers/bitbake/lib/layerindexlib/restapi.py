@@ -213,7 +213,7 @@ class RestApiPlugin(layerindexlib.plugin.IndexPlugin):
         pindex['branches'] = _get_json_response(index.apilinks['branches'] + filter,
                                                     username=up.username, password=up.password)
         if not pindex['branches']:
-            logger.debug("No valid branches (%s) found at url %s." % (branch, url))
+            logger.debug("No valid branches (%s) found at url %s." % (branches, url))
             return index
         index.add_raw_element("branches", layerindexlib.Branch, pindex['branches'])
 
