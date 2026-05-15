@@ -3,6 +3,15 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+is_host_present() {
+    local COMe_PRSNT="/xyz/openbmc_project/inventory/system/board/Ventura2_SCM/PRSNT_COMe"
+    if mapper get-service "$COMe_PRSNT" > /dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Power Good Status
 power_status() {
     if [ "$(get_gpio "R_PWRGD_PCH_PWROK")" -eq 1 ] ; then
@@ -14,6 +23,10 @@ power_status() {
 
 # Force DC off
 force_power_off() {
+    if ! is_host_present; then
+        echo "Host not present, skip force off."
+        return 0
+    fi
     if [ "$(power_status)" == "on" ]; then
         set_gpio SYS_BMC_PWRBTN_R_N 0
         sleep 5
@@ -38,6 +51,10 @@ force_power_off() {
 
 # Graceful DC off
 graceful_power_off() {
+    if ! is_host_present; then
+        echo "Host not present, skip graceful off."
+        return 0
+    fi
     if [ "$(power_status)" == "on" ]; then
         set_gpio SYS_BMC_PWRBTN_R_N 0
         sleep 5
@@ -57,6 +74,10 @@ graceful_power_off() {
 
 # DC on
 power_on() {
+    if ! is_host_present; then
+        echo "Host not present, skip power on."
+        return 0
+    fi
     if [ "$(power_status)" == "off" ]; then
         set_gpio SYS_BMC_PWRBTN_R_N 0
         sleep 1
@@ -80,6 +101,10 @@ power_on() {
 
 # Host reset
 power_reset() {
+    if ! is_host_present; then
+        echo "Host not present, skip power reset."
+        return 0
+    fi
     set_gpio R_BMC_PTH_RST_BTN_L 0
     sleep 1
     set_gpio R_BMC_PTH_RST_BTN_L 1
