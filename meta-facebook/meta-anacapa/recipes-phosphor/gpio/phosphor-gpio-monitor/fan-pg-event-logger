@@ -1,0 +1,78 @@
+#!/bin/bash
+set -euo pipefail
+
+inst="${1:-}"
+IFS=":" read -r line action <<< "${inst}"
+
+if [[ -z "${line}" || -z "${action}" ]]; then
+    echo "Usage: fan-pg-event-logger <GPIO_LINE_NAME>:<assert|deassert>" >&2
+    exit 1
+fi
+
+get_fan_info() {
+    local fan_index
+
+    case "$1" in
+        LPDB_P50V_FAN[0-4]_R2_PG|RPDB_P50V_FAN[5-8]_R2_PG)
+            fan_index="${1#*_P50V_FAN}"
+            fan_index="${fan_index%%_R2_PG}"
+            FAN_PATH="/xyz/openbmc_project/inventory/FAN${fan_index}_TACH_IL_SPEED_RPM"
+            ;;
+        *)
+            echo "Unknown fan PG line: $1" >&2
+            exit 1
+            ;;
+    esac
+}
+
+fan_present() {
+    local present
+
+    present="$(busctl get-property \
+        xyz.openbmc_project.FanSensor \
+        "${FAN_PATH}" \
+        xyz.openbmc_project.Inventory.Item \
+        Present 2>/dev/null | awk '{print $2}' || true)"
+
+    [[ "${present}" == "true" ]]
+}
+
+get_fan_info "${line}"
+
+echo "line=${line}"
+echo "FAN_PATH=${FAN_PATH}"
+
+if ! fan_present; then
+    echo "Skip ${line} ${action}, mapped fan is not present"
+    exit 0
+fi
+
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Anacapa_PDB/${line}"
+STASH_FILE="/run/${line}.log_entry"
+RECOVER_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
+
+case "${action}" in
+    "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${line}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            if log-resolve -p "$(< "${STASH_FILE}")"; then
+                rm -f "${STASH_FILE}"
+                /usr/bin/log-create "$RECOVER_ID" --json \
+                    "{ \"POWER_RAIL\": \"${DEVICE_PATH}\"}"
+            fi
+        fi
+        ;;
+    *)
+        echo "Invalid action: ${action}" >&2
+        exit 1
+esac
+
+exit 0

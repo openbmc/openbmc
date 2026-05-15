@@ -233,5 +233,104 @@
             "RISING":   ["thermal-event-logger@AMC_THERMTRIP_ASSERT:assert.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FAN0_R2_PG",
+        "LineName": "LPDB_P50V_FAN0_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+        "INIT_LOW": ["fan-pg-event-logger@LPDB_P50V_FAN0_R2_PG:assert.service"],
+        "FALLING": ["fan-pg-event-logger@LPDB_P50V_FAN0_R2_PG:assert.service"],
+        "RISING": ["fan-pg-event-logger@LPDB_P50V_FAN0_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FAN1_R2_PG",
+        "LineName": "LPDB_P50V_FAN1_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@LPDB_P50V_FAN1_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@LPDB_P50V_FAN1_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@LPDB_P50V_FAN1_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FAN2_R2_PG",
+        "LineName": "LPDB_P50V_FAN2_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@LPDB_P50V_FAN2_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@LPDB_P50V_FAN2_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@LPDB_P50V_FAN2_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FAN3_R2_PG",
+        "LineName": "LPDB_P50V_FAN3_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@LPDB_P50V_FAN3_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@LPDB_P50V_FAN3_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@LPDB_P50V_FAN3_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "LPDB_P50V_FAN4_R2_PG",
+        "LineName": "LPDB_P50V_FAN4_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@LPDB_P50V_FAN4_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@LPDB_P50V_FAN4_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@LPDB_P50V_FAN4_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FAN5_R2_PG",
+        "LineName": "RPDB_P50V_FAN5_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@RPDB_P50V_FAN5_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@RPDB_P50V_FAN5_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@RPDB_P50V_FAN5_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FAN6_R2_PG",
+        "LineName": "RPDB_P50V_FAN6_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@RPDB_P50V_FAN6_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@RPDB_P50V_FAN6_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@RPDB_P50V_FAN6_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FAN7_R2_PG",
+        "LineName": "RPDB_P50V_FAN7_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@RPDB_P50V_FAN7_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@RPDB_P50V_FAN7_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@RPDB_P50V_FAN7_R2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "RPDB_P50V_FAN8_R2_PG",
+        "LineName": "RPDB_P50V_FAN8_R2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["fan-pg-event-logger@RPDB_P50V_FAN8_R2_PG:assert.service"],
+            "FALLING":  ["fan-pg-event-logger@RPDB_P50V_FAN8_R2_PG:assert.service"],
+            "RISING":   ["fan-pg-event-logger@RPDB_P50V_FAN8_R2_PG:deassert.service"]
+        },
+        "Continue": true
      }
 ]

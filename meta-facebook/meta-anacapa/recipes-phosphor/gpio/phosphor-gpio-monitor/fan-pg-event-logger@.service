@@ -1,0 +1,7 @@
+[Unit]
+Description=Fan Power Good Event Logger
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/fan-pg-event-logger "%i"
+SyslogIdentifier=fan-pg-event-logger

@@ -13,6 +13,7 @@ SERVICE_LIST = "assert-post-end.service \
                 dimm-power-fault-logger@.service \
                 hpm-power-fault@.service \
                 thermal-event-logger@.service \
+                fan-pg-event-logger@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -30,6 +31,7 @@ SRC_URI += " \
     file://dimm-power-fault-logger \
     file://hpm-power-fault \
     file://thermal-event-logger \
+    file://fan-pg-event-logger \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
 
@@ -61,6 +63,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/dimm-power-fault-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/hpm-power-fault ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/fan-pg-event-logger ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \
