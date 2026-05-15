@@ -332,5 +332,60 @@
             "RISING":   ["fan-pg-event-logger@RPDB_P50V_FAN8_R2_PG:deassert.service"]
         },
         "Continue": true
-     }
+    },
+    {
+        "Name": "HPM_EDSFF_PG",
+        "LineName": "HPM_EDSFF_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["ssd-pg-event-logger@HPM_EDSFF_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@HPM_EDSFF_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@HPM_EDSFF_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_EDSFF0_PG",
+        "LineName": "L_EDSFF2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF2_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@L_EDSFF2_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@L_EDSFF2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "L_EDSFF1_PG",
+        "LineName": "L_EDSFF3_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF3_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@L_EDSFF3_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@L_EDSFF3_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_EDSFF2_PG",
+        "LineName": "R_EDSFF2_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["ssd-pg-event-logger@R_EDSFF2_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@R_EDSFF2_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@R_EDSFF2_PG:deassert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "R_EDSFF3_PG",
+        "LineName": "R_EDSFF3_PG",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_LOW": ["ssd-pg-event-logger@R_EDSFF3_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@R_EDSFF3_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@R_EDSFF3_PG:deassert.service"]
+        },
+        "Continue": true
+    }
 ]

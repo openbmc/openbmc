@@ -1,0 +1,88 @@
+#!/bin/bash
+set -euo pipefail
+
+inst="${1:-}"
+IFS=":" read -r line action <<< "${inst}"
+
+if [[ -z "${line}" || -z "${action}" ]]; then
+    echo "Usage: ssd-pg-event-logger <GPIO_LINE_NAME>:<assert|deassert>" >&2
+    exit 1
+fi
+
+is_host_running()
+{
+    local state
+    state="$(busctl get-property \
+        xyz.openbmc_project.State.Host \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        CurrentHostState 2>/dev/null | awk -F'"' '{print $2}')"
+
+    [[ "$state" == "xyz.openbmc_project.State.Host.HostState.Running" ]]
+}
+
+get_presence_line() {
+    case "$1" in
+        HPM_EDSFF_PG) echo "PRSNT_EDSFF_BOOT_N" ;;
+        L_EDSFF0_PG) echo "L_PRSNT_EDSFF0_N" ;;
+        L_EDSFF1_PG) echo "L_PRSNT_EDSFF1_N" ;;
+        R_EDSFF2_PG) echo "R_PRSNT_EDSFF2_N" ;;
+        R_EDSFF3_PG) echo "R_PRSNT_EDSFF3_N" ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+is_present() {
+    local pg_line="$1"
+    local prsnt_line
+    local prsnt_object
+
+    prsnt_line="$(get_presence_line "${pg_line}")" || return 1
+    prsnt_object="/xyz/openbmc_project/GPIODeviceDetected/${prsnt_line}"
+
+    busctl introspect xyz.openbmc_project.gpiopresence \
+        "${prsnt_object}" \
+        xyz.openbmc_project.Inventory.Source.DevicePresence \
+        >/dev/null 2>&1
+}
+
+if ! is_host_running; then
+    echo "Skip ${line} ${action}, host is not running."
+    exit 0
+fi
+
+if ! is_present "${line}"; then
+    echo "Skip ${line} ${action}, mapped SSD is not present."
+    exit 0
+fi
+
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Anacapa_BRB/${line}"
+RECOVER_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
+STASH_FILE="/run/${line}.log_entry"
+
+case "${action}" in
+    "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${line}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            if log-resolve -p "$(< "${STASH_FILE}")"; then
+                rm -f "${STASH_FILE}"
+                /usr/bin/log-create "$RECOVER_ID" --json \
+                        "{ \"POWER_RAIL\": \"${DEVICE_PATH}\"}"
+            fi
+        fi
+        ;;
+    *)
+        echo "Invalid action: ${action}" >&2
+        exit 1
+        ;;
+esac
