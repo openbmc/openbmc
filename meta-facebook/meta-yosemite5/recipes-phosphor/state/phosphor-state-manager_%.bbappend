@@ -43,10 +43,15 @@ CHASSIS_DEFAULT_TARGETS:append = " \
 # Host Reset
 HOST_DEFAULT_TARGETS:append = " \
     obmc-host-warm-reboot@{}.target.requires/host-graceful-poweroff@{}.service \
+    obmc-host-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
+    obmc-host-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
 "
 
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-warm-reboot@{}.target.requires/xyz.openbmc_project.Ipmi.Internal.SoftPowerOff.service \
+    obmc-host-warm-reboot@{}.target.requires/obmc-host-force-warm-reboot@{}.target \
+    obmc-host-force-warm-reboot@{}.target.requires/obmc-host-stop@{}.target \
+    obmc-host-force-warm-reboot@{}.target.requires/phosphor-reboot-host@{}.service \
     obmc-host-graceful-quiesce@{}.target.wants/pldmSoftPowerOff.service \
     obmc-chassis-poweron@{}.target.wants/phosphor-reset-host-recovery@{}.service \
     obmc-chassis-poweroff@{}.target.wants/phosphor-clear-one-time@{}.service \
@@ -143,6 +148,7 @@ do_install:append:aspeed-g6() {
 do_install:append:aspeed-g7() {
     install -m 0755 ${UNPACKDIR}/ast2700/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
 }
+
 SYSTEMD_OVERRIDE:${PN}-discover += "discover-sys-init.conf:phosphor-discover-system-state@0.service.d/discover-sys-init.conf"
 SYSTEMD_OVERRIDE:${PN}-host += "chassis-power-state-init.conf:xyz.openbmc_project.State.Host@0.service.d/chassis-power-state-init.conf"
 SYSTEMD_OVERRIDE:${PN}-systemd-target-monitor += "phosphor-state-manager-init.conf:phosphor-systemd-target-monitor.service.d/phosphor-state-manager-init.conf"
