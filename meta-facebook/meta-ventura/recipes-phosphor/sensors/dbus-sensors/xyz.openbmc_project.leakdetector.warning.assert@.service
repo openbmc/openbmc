@@ -1,7 +1,0 @@
-[Unit]
-Description=%i Critical Leak Handler
-
-[Service]
-Type=oneshot
-ExecStart=/usr/libexec/dbus-sensors/warning-leak-handler %i
-SyslogIdentifier=%i-critical-leak-handler

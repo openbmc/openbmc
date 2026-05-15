@@ -1,0 +1,90 @@
+#!/bin/bash
+
+DetectorName=$1
+
+LeakType=$(echo "$DetectorName" | cut -d'_' -f2)
+temp=${DetectorName#*Port}
+portnum=${temp%%_*}
+
+# Configutration for I2C bus, address, register, and bit position
+declare -A i2c_configs=(
+  ["leakport1"]="10:0x11:0x00:2"
+  ["leakport2"]="10:0x11:0x00:1"
+  ["leakport3"]="10:0x11:0x00:0"
+  ["leakport4"]="10:0x11:0x01:7"
+  ["leakport5"]="10:0x11:0x01:6"
+  ["leakport6"]="10:0x11:0x01:5"
+  ["leakport7"]="10:0x11:0x01:4"
+  ["leakport8"]="10:0x11:0x01:3"
+  ["leakport9"]="10:0x11:0x01:2"
+  ["leakport10"]="10:0x11:0x01:1"
+  ["leakport11"]="10:0x12:0x00:0"
+  ["leakport12"]="10:0x12:0x01:7"
+  ["leakport13"]="10:0x12:0x01:6"
+  ["leakport14"]="10:0x12:0x01:5"
+  ["leakport15"]="10:0x12:0x01:4"
+  ["leakport16"]="10:0x12:0x01:3"
+  ["leakport17"]="10:0x12:0x01:2"
+  ["leakport18"]="10:0x12:0x01:1"
+  ["leakport19"]="10:0x12:0x01:0"
+  ["leakport20"]="10:0x11:0x01:0"
+  ["leakport21"]="10:0x12:0x00:7"
+  ["leakport22"]="10:0x12:0x00:6"
+  ["leakport23"]="10:0x12:0x00:5"
+  ["leakport24"]="10:0x12:0x00:4"
+  ["leakport25"]="10:0x12:0x00:3"
+  ["leakport26"]="10:0x12:0x00:2"
+  ["leakport27"]="10:0x12:0x00:1"
+)
+
+is_port_power_good() {
+  local port=$1
+  local config=${i2c_configs[$port]}
+  IFS=':' read -r bus addr reg bit <<< "$config"
+
+  if ! value=$(i2cget -f -y "$bus" "$addr" "$reg" 2>/dev/null); then
+      echo "Error: Failed to read I2C (bus=$bus, addr=$addr, reg=$reg) for $port" >&2
+      return 1 # Return false if I2C read fails
+  fi
+
+  local decimal=$((value))
+  local bit_value=$(( (decimal >> bit) & 1 ))
+
+  # power good is low active pin
+  if [ $bit_value -eq 0 ]; then
+      return 0; # Power good return true
+  else
+      return 1; # Power not good return false
+  fi
+}
+
+if [ "$LeakType" = "Big" ] || [ "$LeakType" = "Small" ]; then
+  bigLeakStatus=$(busctl get-property xyz.openbmc_project.leakdetector \
+    /xyz/openbmc_project/state/leak/detector/LeakPort"${portnum}"_Big \
+    xyz.openbmc_project.State.Leak.Detector State \
+    | cut -d' ' -f2 | cut -d'.' -f6-7 | tr -d '"')
+
+  smallLeakStatus=$(busctl get-property xyz.openbmc_project.leakdetector \
+    /xyz/openbmc_project/state/leak/detector/LeakPort"${portnum}"_Small \
+    xyz.openbmc_project.State.Leak.Detector State \
+    | cut -d' ' -f2 | cut -d'.' -f6-7 | tr -d '"')
+
+  # Check the LeakDetector status to ensure both the Big and Small
+  # Leak Status are Normal before turning off the port’s Leak LED.
+  if [[ "$bigLeakStatus" == "DetectorState.Normal" && "$smallLeakStatus" == "DetectorState.Normal" ]]; then
+
+    busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+      "/xyz/openbmc_project/led/groups/leakport${portnum}_amber" \
+      "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+
+    if is_port_power_good "leakport${portnum}"; then
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+        "/xyz/openbmc_project/led/groups/leakport${portnum}_blue" \
+        "xyz.openbmc_project.Led.Group" "Asserted" "b" "true"
+    else
+      busctl set-property "xyz.openbmc_project.LED.GroupManager" \
+        "/xyz/openbmc_project/led/groups/leakport${portnum}_blue" \
+        "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
+    fi
+  fi
+fi
