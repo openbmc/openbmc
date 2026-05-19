@@ -9,6 +9,6 @@ SRC_URI:append = "\
 "
 
 do_configure:append() {
-  install -m 644 ${UNPACKDIR}/fvp.env ${B}
+  install -m 644 ${UNPACKDIR}/fvp.env ${B}/source/board/armltd/vexpress64/fvp.env
 }
 

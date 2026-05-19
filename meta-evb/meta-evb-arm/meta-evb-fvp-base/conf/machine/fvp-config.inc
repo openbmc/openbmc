@@ -36,8 +36,8 @@ FVP_CONFIG[bp.terminal_3.start_port] = "5067"
 
 # FIP image settings
 # fip images can be inspected with 'fiptool' from TF-A
-FVP_CONFIG[bp.secureflashloader.fname] = "bl1-fvp.bin"
-FVP_CONFIG[bp.flashloader0.fname] = "fip-fvp.bin"
+FVP_CONFIG[bp.secureflashloader.fname] = "trusted-firmware-a/bl1.bin"
+FVP_CONFIG[bp.flashloader0.fname] = "trusted-firmware-a/fip.bin"
 # enable randomness which is needed for various security related applications
 FVP_CONFIG[bp.virtio_rng.enabled] = "1"
 FVP_CONFIG[bp.virtio_rng.diagnostics] = "1"
