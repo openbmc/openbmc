@@ -21,7 +21,9 @@ do_install:append() {
             sed "s/@HOST_ID@/${host}/g" ${UNPACKDIR}/10-host-console-dependency.conf.in > ${dstdir}/10-host-console-dependency@${console}.conf
             chmod 0644 ${dstdir}/10-host-console-dependency@${console}.conf
 
-            wantedby_units="obmc-host-starting@${host}.target \
+            wantedby_units="chassis-powercycle@${host}.service \
+                            chassis-poweron@${host}.service \
+                            obmc-host-starting@${host}.target \
                             obmc-host-reboot@${host}.target \
                             slot-plug-in@${host}.service"
             for wantedby in ${wantedby_units}; do
