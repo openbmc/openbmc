@@ -1,0 +1,59 @@
+From 45c167591d04e2dfecf5b4642168e54c23abbd40 Mon Sep 17 00:00:00 2001
+From: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Date: Sun, 26 Apr 2026 21:25:15 +0800
+Subject: [PATCH 2/2] gatt-client: Fix use-after-free caused by reentrant
+ client teardown
+
+btd_gatt_client_service_removed() can be called reentrantly via
+bt_gatt_client_unref() after the services queue has already been freed,
+resulting in a use-after-free.
+
+Reset client->ready to false before destroying the services queue to
+prevent reentrant calls from dereferencing freed memory.
+
+This was found with the following backtrace:
+
+    #0  match_service_handle ()
+    #1  queue_remove_if ()
+    #2  queue_remove_all ()
+    #3  btd_gatt_client_service_removed ()
+    #4  gatt_service_removed ()
+    #5  handle_notify ()
+    #6  queue_foreach ()
+    #7  notify_service_changed ()
+    #8  gatt_db_service_destroy ()
+    #9  queue_remove_all ()
+    #10 gatt_db_clear_range ()
+    #11 service_changed_failure ()
+    #12 discovery_op_unref ()
+    #13 bt_gatt_request_unref ()
+    #14 bt_gatt_client_cancel_all ()
+    #15 bt_gatt_client_free ()
+    #16 bt_gatt_client_unref ()
+    #17 bt_gatt_client_free ()
+    #18 bt_gatt_client_unref ()
+    #19 btd_gatt_client_destroy ()
+    #20 device_free ()
+
+Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Upstream-Status: Backport [commit d01616f0c276a441dad8afe4e8f7bb261b26ba0a]
+---
+ src/gatt-client.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 374e67c..3baf95c 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -2261,6 +2261,8 @@ void btd_gatt_client_destroy(struct btd_gatt_client *client)
+ 	if (!client)
+ 		return;
+ 
++	client->ready = false;
++
+ 	queue_destroy(client->services, unregister_service);
+ 	queue_destroy(client->all_notify_clients, NULL);
+ 	queue_destroy(client->ios, NULL);
+-- 
+2.34.1
+

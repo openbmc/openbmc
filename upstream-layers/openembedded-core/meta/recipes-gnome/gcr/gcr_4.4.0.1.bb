@@ -8,37 +8,27 @@ BUGTRACKER = "https://gitlab.gnome.org/GNOME/gcr/issues"
 LICENSE = "LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=55ca817ccb7d5b5b66355690e9abc605"
 
-DEPENDS = "p11-kit glib-2.0 libgcrypt gnupg-native \
-           ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'libxslt-native', '', d)}"
+DEPENDS = "p11-kit glib-2.0 libgcrypt"
 
 CFLAGS += "-D_GNU_SOURCE"
 
 GTKDOC_MESON_OPTION = "gtk_doc"
-inherit gnomebase gtk-icon-cache gi-docgen features_check vala gobject-introspection gettext mime mime-xdg
+inherit gnomebase gi-docgen vala gobject-introspection lib_package
 UPSTREAM_CHECK_REGEX = "gcr-(?P<pver>\d+\.\d+\.(?!9\d+)\d+(\.\d+)?)"
-
-REQUIRED_DISTRO_FEATURES = "${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'opengl', '', d)}"
 
 SRC_URI[archive.sha256sum] = "0c3c341e49f9f4f2532a4884509804190a0c2663e6120360bb298c5d174a8098"
 
-PACKAGECONFIG ??= " \
-	${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'gtk', '', d)} \
-	${@bb.utils.contains('DISTRO_FEATURES', 'wayland', 'gtk', '', d)} \
-	${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)} \
-"
-PACKAGECONFIG[gtk] = "-Dgtk4=true,-Dgtk4=false,gtk4"
-PACKAGECONFIG[ssh_agent] = "-Dssh_agent=true,-Dssh_agent=false,libsecret,openssh"
-#'Use systemd socket activation for server programs'
+PACKAGECONFIG ??= "${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vapi', '', d)}"
+PACKAGECONFIG[ssh_agent] = "-Dssh_agent=true,-Dssh_agent=false,libsecret"
+# Socket activation for the ssh-agent
 PACKAGECONFIG[systemd] = "-Dsystemd=enabled,-Dsystemd=disabled,systemd"
 PACKAGECONFIG[vapi] = "-Dvapi=true,-Dvapi=false,"
+# A tool to view certificates
+PACKAGECONFIG[viewer] = "-Dgtk4=true,-Dgtk4=false,gtk4"
 
-FILES:${PN} += " \
-    ${datadir}/dbus-1 \
-    ${datadir}/gcr-4 \
-    ${systemd_user_unitdir}/gcr-ssh-agent.socket \
-    ${systemd_user_unitdir}/gcr-ssh-agent.service \
-"
+PACKAGE_BEFORE_PN += "${PN}-ssh-agent"
+FILES:${PN}-ssh-agent = "${libexecdir}/gcr-ssh-agent ${systemd_user_unitdir}/gcr-ssh-agent.*"
+RDEPENDS:${PN}-ssh-agent += "openssh"
 
 # http://errors.yoctoproject.org/Errors/Details/20229/
 ARM_INSTRUCTION_SET:armv4 = "arm"

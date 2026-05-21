@@ -6,7 +6,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=0fca02217a5d49a14dfe2d11837bb34d"
 DEPENDS += "ninja-native"
 UPSTREAM_CHECK_COMMITS = "1"
 
-SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main"
+SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main \
+           file://0001-gn-fix-build-with-gcc-16-on-musl.patch \
+"
 SRCREV = "eab8a9f92dca9b8548a89d9e5eb6aeb8ac6bba77"
 PV = "0+git"
 

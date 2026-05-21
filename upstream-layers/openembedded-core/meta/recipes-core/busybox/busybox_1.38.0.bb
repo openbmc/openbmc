@@ -50,22 +50,16 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://0001-libbb-sockaddr2str-ensure-only-printable-characters-.patch \
            file://0002-nslookup-sanitize-all-printed-strings-with-printable.patch \
            file://busybox-1.36.1-no-cbq.patch \
-           file://0001-cut-Fix-s-flag-to-omit-blank-lines.patch \
            file://0001-syslogd-fix-wrong-OPT_locallog-flag-detection.patch \
            file://0002-start-stop-daemon-fix-tests.patch \
            file://0003-start-stop-false.patch \
-           file://0001-archival-disallow-path-traversals-CVE-2023-39810.patch \
            file://0001-hwclock-Check-for-SYS_settimeofday-before-calling-sy.patch \
            file://0001-busybox-Add-awk-gsub-erroneous-word-start-match-test.patch \
-           file://CVE-2025-46394-01.patch \
-           file://CVE-2025-46394-02.patch \
-           file://CVE-2025-60876.patch \
            file://0001-busybox-fix-printf-ptest-failure-with-glibc-2.43.patch \
-           file://0001-tar-strip-unsafe-hardlink-components-GNU-tar-does-th.patch \
-           file://0002-tar-only-strip-unsafe-components-from-hardlinks-not-.patch \
+           file://CVE-2025-60876.patch \
            file://CVE-2024-58251.patch \
            "
 SRC_URI:append:libc-musl = " file://musl.cfg"
 SRC_URI:append:x86-64 = " file://sha_accel.cfg"
 
-SRC_URI[tarball.sha256sum] = "3311dff32e746499f4df0d5df04d7eb396382d7e108bb9250e7b519b837043a4"
+SRC_URI[tarball.sha256sum] = "34f9ea6ff8636f2c9241153b9114eefa9e65674a45318ae1ef95bb5f31c53bb2"

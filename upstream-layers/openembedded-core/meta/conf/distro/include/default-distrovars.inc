@@ -14,16 +14,16 @@ LOCALE_UTF8_IS_DEFAULT ?= "1"
 LOCALE_UTF8_IS_DEFAULT:class-nativesdk = "0"
 
 # seccomp is not yet ported to rv32
-DISTRO_FEATURES_OPTED_OUT:append:riscv32 = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:riscv32 = " seccomp"
 
 # seccomp is not yet ported to ARC
-DISTRO_FEATURES_OPTED_OUT:append:arc = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:arc = " seccomp"
 
 # seccomp is not yet ported to microblaze
-DISTRO_FEATURES_OPTED_OUT:append:microblaze = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:microblaze = " seccomp"
 
 # seccomp is not yet ported to loongarch64
-DISTRO_FEATURES_OPTED_OUT:append:loongarch64 = "seccomp"
+DISTRO_FEATURES_OPTED_OUT:append:loongarch64 = " seccomp"
 
 DISTRO_FEATURES_DEFAULTS ?= " \
     acl alsa bluetooth debuginfod ext2 ipv4 ipv6 \

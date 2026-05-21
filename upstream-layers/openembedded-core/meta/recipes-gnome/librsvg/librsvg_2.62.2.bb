@@ -10,8 +10,8 @@ LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c"
 
 SECTION = "x11/utils"
-DEPENDS = "cairo gdk-pixbuf glib-2.0 libxml2 pango python3-docutils-native cargo-native cargo-c-native"
-RDEPENDS:${PN}-ptest += "rsvg liberation-fonts"
+DEPENDS = "cairo glib-2.0 libxml2 pango python3-docutils-native cargo-native cargo-c-native"
+RDEPENDS:${PN}-ptest += "rsvg"
 BBCLASSEXTEND = "native nativesdk"
 
 inherit cargo_common gnomebase pixbufcache gobject-introspection rust vala gi-docgen cargo-update-recipe-crates ptest-cargo
@@ -27,7 +27,7 @@ SRC_URI += "file://0001-query-rustc-append-RUSTFLAGS-to-rustc-executable.patch \
             file://0001-tests-revert-Take-care-of-deprecated-assert_cmd-Comm.patch \
             file://cross-query-loaders.patch \
             file://run-ptest"
-SRC_URI[archive.sha256sum] = "a56d2c80d744ad2f2718f85df466fe71d24ff1f9bc3e5ef588bde4d7e87815f2"
+SRC_URI[archive.sha256sum] = "c0c1367e381e1ae4842a78f1b57c656ff19b25637e3a6527cb44ae5a1cc68d65"
 
 UPSTREAM_CHECK_REGEX = "librsvg-(?P<pver>\d+\.\d+\.(?!9\d+)\d+)"
 
@@ -56,11 +56,14 @@ LDFLAGS += " -L${B}/rsvg"
 # needed on ubuntu 20.04/debian 11 to avoid 'undefined reference to `dlsym'' errors
 BUILD_LDFLAGS += " -ldl"
 
-PACKAGECONFIG ??= "gdkpixbuf \
+PACKAGECONFIG ??= "gdkpixbuf gdkpixbuf-loader \
                    ${@bb.utils.contains('PTEST_ENABLED', '1', 'apitest', '', d)} \
                    ${@bb.utils.contains('GI_DATA_ENABLED', 'True', 'vala', '', d)}"
-# The gdk-pixbuf loader
-PACKAGECONFIG[gdkpixbuf] = "-Dpixbuf-loader=enabled,-Dpixbuf-loader=disabled,gdk-pixbuf-native"
+
+PACKAGECONFIG[avif] = "-Davif=enabled,-Davif=disabled,dav1d"
+PACKAGECONFIG[gdkpixbuf] = "-Dpixbuf=enabled,-Dpixbuf=disabled,gdk-pixbuf"
+# The gdk-pixbuf loader (depends on gdkpixbuf)
+PACKAGECONFIG[gdkpixbuf-loader] = "-Dpixbuf-loader=enabled,-Dpixbuf-loader=disabled,gdk-pixbuf-native"
 PACKAGECONFIG[vala] = "-Dvala=enabled,-Dvala=disabled"
 PACKAGECONFIG[apitest] = "-Dtests=true,-Dtests=false"
 

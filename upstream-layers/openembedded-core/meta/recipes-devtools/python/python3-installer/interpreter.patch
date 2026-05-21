@@ -1,23 +1,24 @@
-From 74fe171fa4a25c120607e9f8450cbdfee675c959 Mon Sep 17 00:00:00 2001
+From 22fa800b4cbcfddd57fa262fd7f2aeb06a15a711 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Mon, 14 Mar 2022 14:39:22 +0000
-Subject: [PATCH] python3-installer: add installer module
+Subject: [PATCH 1/2] installer: add --interpreter option
 
-Let us override the hashbang directly (possibly upstreamable), and don't
-play games with hashbangs: for now assume that even hashbangs with spaces
-are simple (assume the spaces are only used to separate arguments) and
-we don't have long hashbangs.
+The currently running Python might not be the right one for the installed
+wheels, so add an option to allow the interpreter to be overridden.
 
-Upstream-Status: Inappropriate
+This is essential in cross/distro builds where we want to install a
+wheel into a working directory to build a distro package (eg a rpm or
+deb) with pypa/installer, but the currently running python on the build
+host might not be the right path for the scripts to use on the target.
+
+Upstream-Status: Submitted [https://github.com/pypa/installer/pull/332]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
-
 ---
- src/installer/__main__.py |  9 ++++++++-
- src/installer/scripts.py  | 15 +--------------
- 2 files changed, 9 insertions(+), 15 deletions(-)
+ src/installer/__main__.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/src/installer/__main__.py b/src/installer/__main__.py
-index 51014b9..38de286 100644
+index b7a7445..25415ea 100644
 --- a/src/installer/__main__.py
 +++ b/src/installer/__main__.py
 @@ -30,6 +30,13 @@ def _get_main_parser() -> argparse.ArgumentParser:
@@ -34,38 +35,38 @@ index 51014b9..38de286 100644
      parser.add_argument(
          "--compile-bytecode",
          action="append",
-@@ -86,7 +93,7 @@ def _main(cli_args: Sequence[str], program: Optional[str] = None) -> None:
-     with WheelFile.open(args.wheel) as source:
-         destination = SchemeDictionaryDestination(
-             scheme_dict=_get_scheme_dict(source.distribution, prefix=args.prefix),
--            interpreter=sys.executable,
-+            interpreter=args.interpreter,
-             script_kind=get_launcher_kind(),
-             bytecode_optimization_levels=bytecode_levels,
-             destdir=args.destdir,
+@@ -102,7 +109,7 @@ def _main(cli_args: Sequence[str], program: str | None = None) -> None:
+                 source.validate_record(validate_contents=args.validate_record == "all")
+             destination = SchemeDictionaryDestination(
+                 scheme_dict=_get_scheme_dict(source.distribution, prefix=args.prefix),
+-                interpreter=sys.executable,
++                interpreter=args.interpreter,
+                 script_kind=get_launcher_kind(),
+                 bytecode_optimization_levels=bytecode_levels,
+                 destdir=args.destdir,
 diff --git a/src/installer/scripts.py b/src/installer/scripts.py
-index 7e3c8fc..ba6ed5a 100644
+index b21a72e..551941f 100644
 --- a/src/installer/scripts.py
 +++ b/src/installer/scripts.py
-@@ -59,20 +59,7 @@ def _build_shebang(executable: str, forlauncher: bool) -> bytes:
-     https://bitbucket.org/pypa/distlib/src/58cd5c6/distlib/scripts.py#lines-124
-     """
-     executable_bytes = executable.encode("utf-8")
--    if forlauncher:  # The launcher can just use the command as-is.
--        return b"#!" + executable_bytes
--    if _is_executable_simple(executable_bytes):
--        return b"#!" + executable_bytes
+@@ -138,17 +138,4 @@ class Script:
+         https://bitbucket.org/pypa/distlib/src/58cd5c6/distlib/scripts.py#lines-124
+         """
+         executable_bytes = executable.encode("utf-8")
+-        if forlauncher:  # The launcher can just use the command as-is.
+-            return b"#!" + executable_bytes
+-        if self._is_executable_simple(executable_bytes):
+-            return b"#!" + executable_bytes
 -
--    # Shebang support for an executable with a space in it is under-specified
--    # and platform-dependent, so we use a clever hack to generate a script to
--    # run in ``/bin/sh`` that should work on all reasonably modern platforms.
--    # Read the following message to understand how the hack works:
--    # https://github.com/pradyunsg/installer/pull/4#issuecomment-623668717
+-        # Shebang support for an executable with a space in it is under-specified
+-        # and platform-dependent, so we use a clever hack to generate a script to
+-        # run in ``/bin/sh`` that should work on all reasonably modern platforms.
+-        # Read the following message to understand how the hack works:
+-        # https://github.com/pypa/installer/pull/4#issuecomment-623668717
 -
--    quoted = shlex.quote(executable).encode("utf-8")
--    # I don't understand a lick what this is trying to do.
--    return b"#!/bin/sh\n'''exec' " + quoted + b' "$0" "$@"\n' + b"' '''"
-+    return b"#!" + executable_bytes
- 
- 
- class InvalidScript(ValueError):
+-        quoted = shlex.quote(executable).encode("utf-8")
+-        # I don't understand a lick what this is trying to do.
+-        return b"#!/bin/sh\n'''exec' " + quoted + b' "$0" "$@"\n' + b"' '''"
++        return b"#!" + executable_bytes
+-- 
+2.43.0
+

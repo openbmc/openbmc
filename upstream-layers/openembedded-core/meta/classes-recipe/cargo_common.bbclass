@@ -154,6 +154,9 @@ python cargo_common_do_patch_paths() {
                     repo = '%s://%s@%s%s' % (ud.proto, ud.user, ud.host, ud.path)
                 else:
                     repo = '%s://%s%s' % (ud.proto, ud.host, ud.path)
+                subdir = ud.parm.get('subdir')
+                if subdir is not None:
+                    destsuffix = os.path.join(destsuffix, subdir)
                 path = '%s = { path = "%s" }' % (name, os.path.join(workdir, destsuffix))
                 patches.setdefault(repo, []).append(path)
 

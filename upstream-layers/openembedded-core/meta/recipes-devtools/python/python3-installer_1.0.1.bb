@@ -6,10 +6,9 @@ BUGTRACKER = "https://github.com/pypa/installer/issues"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=5038641aec7a77451e31da828ebfae00"
 
-SRC_URI += "file://interpreter.patch \
-            file://0001-src-installer-utils.py-sort-entries-before-writing-o.patch"
+SRC_URI += "file://interpreter.patch"
 
-SRC_URI[sha256sum] = "a26d3e3116289bb08216e0d0f7d925fcef0b0194eedfa0c944bcaaa106c4b631"
+SRC_URI[sha256sum] = "052c7fc3721d54c696e2dea019be67539d7b144e924f559f54beb3121831c364"
 
 inherit pypi python_flit_core
 

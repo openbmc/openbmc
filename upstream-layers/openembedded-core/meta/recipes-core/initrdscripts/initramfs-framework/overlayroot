@@ -114,4 +114,4 @@ mount -n --move /proc ${NEWROOT}/proc
 mount -n --move /sys ${NEWROOT}/sys
 mount -n --move /dev ${NEWROOT}/dev
 
-exec chroot ${NEWROOT}/ ${bootparam_init:-/sbin/init} || exit_gracefully "Couldn't chroot into overlay"
+exec switch_root ${NEWROOT}/ ${bootparam_init:-/sbin/init} || exit_gracefully "Couldn't switch_root into overlay"

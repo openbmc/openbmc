@@ -7,11 +7,11 @@ reflection of the outputs for a screen. It can also set the screen \
 size."
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://COPYING;md5=fe1608bdb33cf8c62a4438f7d34679b3"
+LIC_FILES_CHKSUM = "file://COPYING;md5=97a36d5c66965b1cea4666b3708ca6e8"
 DEPENDS += "libxrandr libxrender"
 PE = "1"
 
 SRC_URI_EXT = "xz"
-SRC_URI[sha256sum] = "f8dd7566adb74147fab9964680b6bbadee87cf406a7fcff51718a5e6949b841c"
+SRC_URI[sha256sum] = "2cafccb2aaf2491a4068676117a0d4f90ab307724b96fffc54cd1da953779400"
 
 BBCLASSEXTEND = "native nativesdk"

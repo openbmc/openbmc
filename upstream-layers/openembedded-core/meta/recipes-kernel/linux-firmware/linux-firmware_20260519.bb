@@ -314,7 +314,7 @@ LIC_FILES_CHKSUM = "file://LICENCE.Abilis;md5=b5ee3f410780e56711ad48eadc22b8bc \
                     "
 # WHENCE checksum is defined separately to ease overriding it if
 # class-devupstream is selected.
-WHENCE_CHKSUM  = "1468492365c9cec2e7ebf71c79d2e8f5"
+WHENCE_CHKSUM  = "6048e3ea8acf04b4c415db8a9e35a912"
 
 # These are not common licenses, set NO_GENERIC_LICENSE for them
 # so that the license files will be copied from fetched source
@@ -452,7 +452,7 @@ SRC_URI:class-devupstream = "git://git.kernel.org/pub/scm/linux/kernel/git/firmw
 # Pin this to the 20220509 release, override this in local.conf
 SRCREV:class-devupstream ?= "b19cbdca78ab2adfd210c91be15a22568e8b8cae"
 
-SRC_URI[sha256sum] = "b7812ed6d59f6b09ecceddaa0be842a7e82a79cc0e46ca60478a4ebf02f1e178"
+SRC_URI[sha256sum] = "b14e7197a290a7e5569f5ef790cde289bddc47e32126f2eb262a8e677fc39727"
 
 inherit allarch
 
@@ -564,7 +564,7 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-mwl8k ${PN}-mwlwifi\
              ${PN}-ti-connectivity-license ${PN}-wl1251-license ${PN}-wlcommon ${PN}-wl1251 ${PN}-wl12xx ${PN}-wl18xx ${PN}-cc33xx \
              ${PN}-ti-keystone-license ${PN}-ti-keystone \
-             ${PN}-ti-tspa-license ${PN}-ti-tas2563 ${PN}-ti-tas2781 ${PN}-ti-tas2783 ${PN}-ti-vpe \
+             ${PN}-ti-tspa-license ${PN}-ti-pcm6240 ${PN}-ti-tas2563 ${PN}-ti-tas2781 ${PN}-ti-tas2783 ${PN}-ti-vpe \
              ${PN}-ti-usb-3410-5052 \
              ${PN}-vt6656-license ${PN}-vt6656 \
              ${PN}-rs9113 ${PN}-rs9116 ${PN}-rsi-91x \
@@ -641,6 +641,8 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-ath11k-wcn6750 \
              ${PN}-ath11k-wcn6855 \
              ${PN}-ath12k \
+             ${PN}-ath12k-ipq5424 \
+             ${PN}-ath12k-qcc2072 \
              ${PN}-ath12k-qcn9274 \
              ${PN}-ath12k-wcn7850 \
              ${PN}-qca \
@@ -748,7 +750,7 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-qcom-sdm845-adreno ${PN}-qcom-sdm845-audio ${PN}-qcom-sdm845-compute \
              ${PN}-qcom-sdm845-thundercomm-db845c-sensors \
              ${PN}-qcom-sdx35-foxconn-firehose ${PN}-qcom-sdx61-foxconn-firehose \
-             ${PN}-qcom-shikra-qupv3fw \
+             ${PN}-qcom-shikra-compute ${PN}-qcom-shikra-qupv3fw \
              ${PN}-qcom-sm8150-adreno \
              ${PN}-qcom-sm8250-adreno ${PN}-qcom-sm8250-audio ${PN}-qcom-sm8250-compute \
              ${PN}-qcom-sm8250-thundercomm-rb5-sensors \
@@ -776,7 +778,7 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-qla2xxx ${PN}-qla2xxx-license \
              ${PN}-rockchip-license ${PN}-rockchip-dptx \
              ${PN}-amlogic-vdec-license ${PN}-amlogic-vdec \
-             ${PN}-lt8713sx ${PN}-lt9611uxc ${PN}-lontium-license \
+             ${PN}-lt7911exc ${PN}-lt8713sx ${PN}-lt9611c ${PN}-lt9611uxc ${PN}-lontium-license \
              ${PN}-wfx-license ${PN}-wfx \
              ${PN}-whence-license \
              ${PN}-xc4000-license ${PN}-xc4000 \
@@ -785,7 +787,7 @@ PACKAGES =+ "${PN}-amphion-vpu-license ${PN}-amphion-vpu \
              ${PN}-typhoon-license ${PN}-typhoon \
              ${PN}-intel-license ${PN}-ish-lnlm \
              ${PN}-dell-license ${PN}-ish-lnlm-39ceeaf8 ${PN}-ish-ptl-39ceeaf8 \
-             ${PN}-hp-license ${PN}-ish-lnlm-12128606 \
+             ${PN}-hp-license ${PN}-ish-lnlm-12128606 ${PN}-ish-ptl-12128606 \
              ${PN}-lenovo-license ${PN}-ish-lnlm-53c4ffad ${PN}-ish-ptl-53c4ffad \
              ${PN}-ish-ptl ${PN}-ish-wcl \
              ${PN}-advansys-license ${PN}-advansys \
@@ -954,6 +956,8 @@ LICENSE:${PN}-ath11k-qcn9074 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath11k-wcn6750 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath11k-wcn6855 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath12k = "Firmware-qualcommAthos_ath10k"
+LICENSE:${PN}-ath12k-ipq5424 = "Firmware-qualcommAthos_ath10k"
+LICENSE:${PN}-ath12k-qcc2072 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath12k-qcn9274 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-ath12k-wcn7850 = "Firmware-qualcommAthos_ath10k"
 LICENSE:${PN}-qca-qca2066 = "Firmware-qualcommAthos_ath10k"
@@ -999,6 +1003,8 @@ FILES:${PN}-ath11k-wcn6855 = "${firmwaredir}/ath11k/WCN6855"
 # -ath11k is a virtual package that depends upon all ath11k packages.
 ALLOW_EMPTY:${PN}-ath11k = "1"
 
+FILES:${PN}-ath12k-ipq5424 = "${firmwaredir}/ath12k/IPQ5424"
+FILES:${PN}-ath12k-qcc2072 = "${firmwaredir}/ath12k/QCC2072"
 FILES:${PN}-ath12k-qcn9274 = "${firmwaredir}/ath12k/QCN9274"
 FILES:${PN}-ath12k-wcn7850 = "${firmwaredir}/ath12k/WCN7850"
 # -ath12k is a virtual package that depends upon all ath12k packages.
@@ -1127,6 +1133,8 @@ RDEPENDS:${PN}-ath11k-qcn9074 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath11k-wcn6750 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath11k-wcn6855 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath12k += "${PN}-ath10k-license"
+RDEPENDS:${PN}-ath12k-ipq5424 += "${PN}-ath10k-license"
+RDEPENDS:${PN}-ath12k-qcc2072 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath12k-qcn9274 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-ath12k-wcn7850 += "${PN}-ath10k-license"
 RDEPENDS:${PN}-qca += "${PN}-ath10k-license ${PN}-qcom-license"
@@ -1344,12 +1352,16 @@ RDEPENDS:${PN}-amdgpu-vega12 += "${PN}-amdgpu-license"
 RDEPENDS:${PN}-amdgpu-misc += "${PN}-amdgpu-license"
 
 # For lontium
+LICENSE:${PN}-lt7911exc = "Firmware-Lontium"
 LICENSE:${PN}-lt8713sx = "Firmware-Lontium"
+LICENSE:${PN}-lt9611c = "Firmware-Lontium"
 LICENSE:${PN}-lt9611uxc = "Firmware-Lontium"
 
 FILES:${PN}-lontium-license = "${firmwaredir}/LICENSE.Lontium"
-FILES:${PN}-lt8713sx = "${firmwaredir}/lt8713sx_fw.bin*"
-FILES:${PN}-lt9611uxc = "${firmwaredir}/lt9611uxc_fw.bin*"
+FILES:${PN}-lt7911exc = "${firmwaredir}/Lontium/lt7911exc_fw.bin*"
+FILES:${PN}-lt8713sx = "${firmwaredir}/lt8713sx_fw.bin* ${firmwaredir}/Lontium/lt8713sx_fw.bin*"
+FILES:${PN}-lt9611c = "${firmwaredir}/Lontium/lt9611c_fw.bin*"
+FILES:${PN}-lt9611uxc = "${firmwaredir}/lt9611uxc_fw.bin* ${firmwaredir}/Lontium/lt9611uxc_fw.bin*"
 
 # For Arm Mali
 FILES:${PN}-mali-csffw-license = "${firmwaredir}/LICENCE.mali_csffw"
@@ -1830,6 +1842,13 @@ FILES:${PN}-ti-tas2563 = "\
 "
 RDEPENDS:${PN}-ti-tas2563 = "${PN}-ti-tspa-license"
 
+# For ti-pcm6240 - pcm6240 firmware
+LICENSE:${PN}-ti-pcm6240 = "Firmware-ti-tspa"
+FILES:${PN}-ti-pcm6240 = "\
+    ${firmwaredir}/ti/pcm6240/pcm6240-i2c-1-2dev.bin* \
+"
+RDEPENDS:${PN}-ti-pcm6240 = "${PN}-ti-tspa-license"
+
 # For ti-tas2781 - tas2781 firmware
 LICENSE:${PN}-ti-tas2781 = "Firmware-ti-tspa"
 FILES:${PN}-ti-tas2781 = "\
@@ -1843,7 +1862,17 @@ RDEPENDS:${PN}-ti-tas2781 = "${PN}-ti-tspa-license"
 # For ti-tas2783 - tas2783 firmware
 LICENSE:${PN}-ti-tas2783 = "Firmware-ti-tspa"
 FILES:${PN}-ti-tas2783 = "\
-    ${firmwaredir}/8E[8F]*-?-?.bin* \
+    ${firmwaredir}/1534-2-*.bin* \
+    ${firmwaredir}/16F4-1-*.bin* \
+    ${firmwaredir}/1714-1-*.bin* \
+    ${firmwaredir}/19[569]4-?-?-*.bin* \
+    ${firmwaredir}/1A[CD]4-?-?-*.bin* \
+    ${firmwaredir}/1B[09]4-?-?-*.bin* \
+    ${firmwaredir}/3??1-?-0x*.bin* \
+    ${firmwaredir}/8E??-?-0x*.bin* \
+    ${firmwaredir}/8E??-?-?-0x*.bin* \
+    ${firmwaredir}/8F??-?-0x*.bin* \
+    ${firmwaredir}/8F??-?-?-0x*.bin* \
     ${firmwaredir}/ti/audio/tas2783/* \
 "
 RDEPENDS:${PN}-ti-tas2781 = "${PN}-ti-tspa-license"
@@ -2401,6 +2430,7 @@ LICENSE:${PN}-qcom-sdm845-modem = "Firmware-qcom"
 LICENSE:${PN}-qcom-sdm845-thundercomm-db845c-sensors = "Firmware-qcom"
 LICENSE:${PN}-qcom-sdx35-foxconn-firehose = "Firmware-qcom"
 LICENSE:${PN}-qcom-sdx61-foxconn-firehose = "Firmware-qcom"
+LICENSE:${PN}-qcom-shikra-compute = "Firmware-qcom-2"
 LICENSE:${PN}-qcom-shikra-qupv3fw = "Firmware-qcom"
 LICENSE:${PN}-qcom-sm8150-adreno = "Firmware-qcom"
 LICENSE:${PN}-qcom-sm8250-adreno = "Firmware-qcom"
@@ -2564,6 +2594,7 @@ FILES:${PN}-qcom-sdm845-modem = "${firmwaredir}/qcom/sdm845/mba.mbn* ${firmwared
 FILES:${PN}-qcom-sdm845-thundercomm-db845c-sensors = "${firmwaredir}/qcom/sdm845/Thundercomm/db845c/slpi*.*"
 FILES:${PN}-qcom-sdx35-foxconn-firehose = "${firmwaredir}/qcom/sdx35/foxconn/xbl_s_devprg_ns.melf*"
 FILES:${PN}-qcom-sdx61-foxconn-firehose = "${firmwaredir}/qcom/sdx61/foxconn/prog_firehose_lite.elf*"
+FILES:${PN}-qcom-shikra-compute = "${firmwaredir}/qcom/shikra/cdsp*.*"
 FILES:${PN}-qcom-shikra-qupv3fw = "${firmwaredir}/qcom/shikra/qupv3fw.elf*"
 FILES:${PN}-qcom-sm8150-adreno = "${firmwaredir}/qcom/sm8150/a640*.*"
 FILES:${PN}-qcom-sm8250-adreno = "${firmwaredir}/qcom/sm8250/a650*.*"
@@ -2725,6 +2756,7 @@ RDEPENDS:${PN}-qcom-sdm845-modem = "${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-sdm845-thundercomm-db845c-sensors = "${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-sdx35-foxconn-firehose = "${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-sdx61-foxconn-firehose = "${PN}-qcom-license"
+RDEPENDS:${PN}-qcom-shikra-compute = "${PN}-qcom-2-license"
 RDEPENDS:${PN}-qcom-shikra-qupv3fw = "${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-sm8150-adreno = "${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-sm8250-adreno = "${PN}-qcom-license"
@@ -2749,9 +2781,9 @@ RDEPENDS:${PN}-qcom-x1e80100-asus-vivobook-s15-audio-tplg = "${PN}-linaro-licens
 RDEPENDS:${PN}-qcom-x1e80100-asus-zenbook-a14-audio-tplg = "${PN}-linaro-license"
 RDEPENDS:${PN}-qcom-x1e80100-dell-inspiron-14-plus-7441-audio-tplg = "${PN}-linaro-license"
 RDEPENDS:${PN}-qcom-x1e80100-dell-latitude-7455-audio-tplg = "${PN}-linaro-license"
-RDEPENDS:${PN}-qcom-x1e80100-dell-xps13-9345-adreno = "${PN}-dell-license"
-RDEPENDS:${PN}-qcom-x1e80100-dell-xps13-9345-audio = "${PN}-dell-license ${PN}-linaro-license"
-RDEPENDS:${PN}-qcom-x1e80100-dell-xps13-9345-compute = "${PN}-dell-license"
+RDEPENDS:${PN}-qcom-x1e80100-dell-xps13-9345-adreno = "${PN}-dell-license ${PN}-qcom-license"
+RDEPENDS:${PN}-qcom-x1e80100-dell-xps13-9345-audio = "${PN}-dell-license ${PN}-linaro-license ${PN}-qcom-license"
+RDEPENDS:${PN}-qcom-x1e80100-dell-xps13-9345-compute = "${PN}-dell-license ${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-x1e80100-hp-omnibook-x14-audio-tplg = "${PN}-linaro-license"
 RDEPENDS:${PN}-qcom-x1e80100-lenovo-t14s-g6-adreno = "${PN}-qcom-license"
 RDEPENDS:${PN}-qcom-x1e80100-lenovo-t14s-g6-audio = "${PN}-qcom-license ${PN}-linaro-license"
@@ -2834,6 +2866,12 @@ FILES:${PN}-ish-lnlm-12128606 = " \
     ${firmwaredir}/HP/ish/ish_lnlm_12128606_*.bin* \
 "
 RDEPENDS:${PN}-ish-lnlm-12128606 = "${PN}-hp-license"
+
+LICENSE:${PN}-ish-ptl-12128606 = "Firmware-HP"
+FILES:${PN}-ish-ptl-12128606 = " \
+    ${firmwaredir}/HP/ish/ish_ptl_12128606_*.bin* \
+"
+RDEPENDS:${PN}-ish-ptl-12128606 = "${PN}-hp-license"
 
 # For LENOVO ish - Intel Integrated Sensor Hub
 LICENSE:${PN}-lenovo-license = "Firmware-lenovo"

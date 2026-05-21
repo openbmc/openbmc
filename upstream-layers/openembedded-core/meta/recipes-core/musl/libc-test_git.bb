@@ -36,6 +36,7 @@ RDEPENDS:${PN} = " \
 
 RDEPENDS:${PN}-ptest = " \
      ${PN} \
+     libatomic-staticdev \
      locale-base-en-us \
      musl-staticdev \
      sed \

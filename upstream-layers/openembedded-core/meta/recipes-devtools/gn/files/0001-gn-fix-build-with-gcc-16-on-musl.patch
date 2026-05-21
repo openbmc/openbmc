@@ -1,0 +1,33 @@
+From 6d22f5c9e96811f1abcedd8fb1849fe72747b5c4 Mon Sep 17 00:00:00 2001
+From: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+Date: Mon, 11 May 2026 02:43:10 -0700
+Subject: [PATCH] gn: fix build with GCC 16 on musl
+
+Add missing <cstdint> include in src/gn/pool.h for int64_t.
+
+Fixes:
+| ../sources/gn-0+git/src/gn/pool.h:26:3: error: 'int64_t' does not name a type
+
+Upstream-Status: Submitted [https://gn-review.googlesource.com/c/gn/+/22740]
+
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+
+---
+ src/gn/pool.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/gn/pool.h b/src/gn/pool.h
+index e03113608..247cb6425 100644
+--- a/src/gn/pool.h
++++ b/src/gn/pool.h
+@@ -6,6 +6,7 @@
+ #define TOOLS_GN_POOL_H_
+ 
+ #include <string>
++#include <cstdint>
+ 
+ #include "gn/item.h"
+ 
+-- 
+2.49.0
+

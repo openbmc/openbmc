@@ -574,6 +574,18 @@ class ItsNodeRootKernel(ItsNode):
         except subprocess.CalledProcessError as e:
             bb.fatal(f"Command '{' '.join(cmd)}' failed with return code {e.returncode}\nstdout: {e.stdout.decode()}\nstderr: {e.stderr.decode()}\nitsflile: {os.path.abspath(itsfile)}")
 
+    def _check_sign_key_files(self, key_path, algo):
+        """Validate key files expected by mkimage for the selected algorithm"""
+        algo_parts = [p.strip().lower() for p in algo.split(',')]
+        is_ecdsa = any(p.startswith('ecdsa') for p in algo_parts)
+
+        if is_ecdsa:
+            if not os.path.exists(key_path + '.pem'):
+                bb.fatal("ECDSA signing requires '%s.pem'" % key_path)
+        else:
+            if not os.path.exists(key_path + '.key') or not os.path.exists(key_path + '.crt'):
+                bb.fatal("%s.key or .crt does not exist" % key_path)
+
     def run_mkimage_sign(self, fitfile):
         if not self._sign_enable:
             bb.debug(1, "FIT image signing is disabled. Skipping signing.")
@@ -581,12 +593,10 @@ class ItsNodeRootKernel(ItsNode):
 
         # Some sanity checks because mkimage exits with 0 also without needed keys
         sign_key_path = os.path.join(self._sign_keydir, self._sign_keyname_conf)
-        if not os.path.exists(sign_key_path + '.key') or not os.path.exists(sign_key_path + '.crt'):
-            bb.fatal("%s.key or .crt does not exist" % sign_key_path)
+        self._check_sign_key_files(sign_key_path, self._sign_algo)
         if self._sign_individual:
             sign_key_img_path = os.path.join(self._sign_keydir, self._sign_keyname_img)
-            if not os.path.exists(sign_key_img_path + '.key') or not os.path.exists(sign_key_img_path + '.crt'):
-                bb.fatal("%s.key or .crt does not exist" % sign_key_img_path)
+            self._check_sign_key_files(sign_key_img_path, self._sign_algo)
 
         cmd = [
             self._mkimage_sign,

@@ -638,6 +638,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
     def new_file(self, _id, name, path, *, purposes=[], hashfile=True):
         if hashfile:
             sha256_hash = bb.utils.sha256_file(path)
+            sha512_hash = bb.utils.sha512_file(path)
 
             for f in self.by_sha256_hash.get(sha256_hash, []):
                 if not isinstance(f, oe.spdx30.software_File):
@@ -682,6 +683,12 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
                 oe.spdx30.Hash(
                     algorithm=oe.spdx30.HashAlgorithm.sha256,
                     hashValue=sha256_hash,
+                )
+            )
+            spdx_file.verifiedUsing.append(
+                oe.spdx30.Hash(
+                    algorithm=oe.spdx30.HashAlgorithm.sha512,
+                    hashValue=sha512_hash,
                 )
             )
 

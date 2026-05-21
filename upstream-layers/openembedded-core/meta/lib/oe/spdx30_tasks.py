@@ -547,8 +547,10 @@ def add_download_files(d, objset):
             _enrich_source_package(d, dl, fd, file_name, primary_purpose)
 
             if fd.method.supports_checksum(fd):
-                # TODO Need something better than hard coding this
-                for checksum_id in ["sha256", "sha1"]:
+                for checksum_id in bb.fetch2.CHECKSUM_LIST:
+                    if checksum_id not in oe.spdx30.HashAlgorithm.NAMED_INDIVIDUALS:
+                        continue
+
                     expected_checksum = getattr(fd, "%s_expected" % checksum_id, None)
                     if expected_checksum is None:
                         continue
@@ -1476,6 +1478,10 @@ def create_image_spdx(d):
                             oe.spdx30.Hash(
                                 algorithm=oe.spdx30.HashAlgorithm.sha256,
                                 hashValue=bb.utils.sha256_file(image_path),
+                            ),
+                            oe.spdx30.Hash(
+                                algorithm=oe.spdx30.HashAlgorithm.sha512,
+                                hashValue=bb.utils.sha512_file(image_path),
                             )
                         ],
                     )

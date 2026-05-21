@@ -1,0 +1,61 @@
+From 4ff364c3df99b02e658ac2b3d2eec7139c494612 Mon Sep 17 00:00:00 2001
+From: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+Date: Tue, 28 Apr 2026 03:22:40 -0700
+Subject: [PATCH] rxvt-unicode: fix gcc16/c++20
+
+rename lerp to avoid conflict with the non-identical function std::lerp
+
+Upstream-Status: Submitted [https://lists.schmorp.de/pipermail/rxvt-unicode/2026q2/002707.html]
+
+Signed-off-by: Nicolas PARLANT <nicolas.parlant@parhuet.fr>
+Signed-off-by: Sam James <sam@gentoo.org>
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+---
+ src/rxvttoolkit.C | 10 +++++-----
+ src/rxvtutil.h    |  2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/rxvttoolkit.C b/src/rxvttoolkit.C
+index d92c5b9..343a901 100644
+--- a/src/rxvttoolkit.C
++++ b/src/rxvttoolkit.C
+@@ -834,7 +834,7 @@ rxvt_color::set (rxvt_screen *screen, const char *name)
+   // parse the nonstandard "[alphapercent]" prefix
+   if (1 <= sscanf (name, "[%hd]%n", &c.a, &skip))
+     {
+-      c.a = lerp<int, int, int> (0, rgba::MAX_CC, c.a);
++      c.a = rxlerp<int, int, int> (0, rgba::MAX_CC, c.a);
+       name += skip;
+     }
+ 
+@@ -981,10 +981,10 @@ rxvt_color::fade (rxvt_screen *screen, int percent, rxvt_color &result, const rg
+   result.set (
+     screen,
+     rgba (
+-      lerp (c.r, to.r, percent),
+-      lerp (c.g, to.g, percent),
+-      lerp (c.b, to.b, percent),
+-      lerp (c.a, to.a, percent)
++      rxlerp (c.r, to.r, percent),
++      rxlerp (c.g, to.g, percent),
++      rxlerp (c.b, to.b, percent),
++      rxlerp (c.a, to.a, percent)
+     )
+   );
+ }
+diff --git a/src/rxvtutil.h b/src/rxvtutil.h
+index d08b1bb..ec69cc1 100644
+--- a/src/rxvtutil.h
++++ b/src/rxvtutil.h
+@@ -21,7 +21,7 @@ template<typename T, typename U, typename V> static inline void clamp_it (T &v,
+ // linear interpolation
+ template<typename T, typename U, typename P>
+ static inline T
+-lerp (T a, U b, P p)
++rxlerp (T a, U b, P p)
+ {
+   return (long(a) * long(100 - p) + long(b) * long(p) + 50) / 100;
+ }
+-- 
+2.49.0
+

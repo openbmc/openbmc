@@ -42,7 +42,7 @@ index 087df2f8a..00790affb 100644
  use crate::utils::exec::{BootstrapCommand, command};
  use crate::utils::helpers::{add_dylib_path, exe, t};
  use crate::{Compiler, FileType, Kind, Mode};
-@@ -121,22 +119,7 @@ impl Step for ToolBuild {
+@@ -121,22 +121,7 @@ impl Step for ToolBuild {
              cargo.env("RUSTC_WRAPPER", ccache);
          }
 
@@ -58,7 +58,7 @@ index 087df2f8a..00790affb 100644
 -                RustcLto::ThinLocal => None,
 -            };
 -            if let Some(lto) = lto {
--                cargo.env(cargo_profile_var("LTO", &builder.config), lto);
+-                cargo.env(cargo_profile_var("LTO", &builder.config, self.mode), lto);
 -            }
 -        }
 -

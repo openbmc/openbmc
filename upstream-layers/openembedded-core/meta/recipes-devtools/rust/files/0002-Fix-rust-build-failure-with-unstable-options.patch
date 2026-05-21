@@ -1,0 +1,63 @@
+Fix build issues seen with Rust-1.95.0
+
+Remove the check that errors out when -Zunstable-options is not provided for custom targets.
+
+The original upstream change (and its follow-up) mainly ensured GitHub workflows and tests
+work correctly by explicitly passing -Zunstable-options, along with related testcase updates.
+Reverting the entire commit would also undo those unrelated workflow and test adjustments, so
+this patch only targets the specific enforcement logic without affecting the rest of the changes.
+
+Upstream-Status: Inappropriate [Reported at https://github.com/rust-lang/rust/issues/155963]
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+---
+diff --git a/compiler/rustc_target/src/spec/mod.rs b/compiler/rustc_target/src/spec/mod.rs
+index b1a9c4b3cde..25a26a9fb12 100644
+--- a/compiler/rustc_target/src/spec/mod.rs
++++ b/compiler/rustc_target/src/spec/mod.rs
+@@ -3707,7 +3707,7 @@ impl Target {
+     pub fn search(
+         target_tuple: &TargetTuple,
+         sysroot: &Path,
+-        unstable_options: bool,
++        _unstable_options: bool,
+     ) -> Result<(Target, TargetWarnings), String> {
+         use std::{env, fs};
+
+@@ -3715,12 +3715,6 @@ fn load_file(
+             path: &Path,
+-            unstable_options: bool,
+         ) -> Result<(Target, TargetWarnings), String> {
+-            if !unstable_options {
+-                return Err(
+-                    "custom targets are unstable and require `-Zunstable-options`".to_string()
+-                );
+-            }
+             let contents = fs::read_to_string(path).map_err(|e| e.to_string())?;
+             Target::from_json(&contents)
+         }
+
+@@ -3737,7 +3737,7 @@ impl Target {
+                 for dir in env::split_paths(&target_path) {
+                     let p = dir.join(&path);
+                     if p.is_file() {
+-                        return load_file(&p, unstable_options);
++                        return load_file(&p);
+                     }
+                 }
+
+@@ -3750,14 +3750,11 @@ impl Target {
+                     Path::new("target.json"),
+                 ]);
+                 if p.is_file() {
+-                    return load_file(&p, unstable_options);
++                    return load_file(&p);
+                 }
+
+                 Err(format!("could not find specification for target {target_tuple:?}"))
+             }
+-            TargetTuple::TargetJson { ref contents, .. } if !unstable_options => {
+-                Err("custom targets are unstable and require `-Zunstable-options`".to_string())
+-            }
+             TargetTuple::TargetJson { ref contents, .. } => Target::from_json(contents),
+         }
+     }

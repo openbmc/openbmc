@@ -102,7 +102,7 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
 
         exclude_fail_tests = " ".join([" --exclude " + item for item in exclude_list])
         # Add exclude_fail_tests with other test arguments
-        testargs =  exclude_fail_tests + " --no-doc --no-fail-fast --bless"
+        testargs =  exclude_fail_tests + " --no-doc --no-fail-fast --bless --skip src/librustdoc --skip src/tools/rustdoc"
 
         # wrap the execution with a qemu instance.
         # Set QEMU RAM to 1024MB to support running unit tests for the compiler crate, including larger

@@ -38,4 +38,4 @@ ARM_INSTRUCTION_SET:armv6 = "arm"
 
 BBCLASSEXTEND = "native nativesdk"
 
-CVE_PRODUCT = "squashfs"
+CVE_PRODUCT = "squashfs squashfs-tools"
