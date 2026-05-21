@@ -18,7 +18,7 @@ If this is not the case, you can reconfigure the ``locales`` package to add it
    -  If you are not in an interactive shell, ``dpkg-reconfigure`` will
       not work as expected. To add the locale you will need to edit
       ``/etc/locale.gen`` file to add/uncomment the ``en_US.UTF-8`` locale.
-      A naive way to do this as root is::
+      A simple way to do this as root is::
 
          $ echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
          $ locale-gen

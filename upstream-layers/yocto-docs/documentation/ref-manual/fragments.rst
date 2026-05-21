@@ -210,18 +210,18 @@ on the serial console and over SSH.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The ``core/yocto/sbom-cve-check`` :term:`configuration fragment` can be used
-to set up the build to use the :ref:`ref-classes-sbom-cve-check` class .
+to set up the build to use the :ref:`ref-classes-sbom-cve-check` class.
 
 This configuration fragment does multiple things:
 
--  Add the :ref:`ref-classes-create-spdx` class to the list of globally
+-  Adds the :ref:`ref-classes-create-spdx` class to the list of globally
    inherited classes, as it depends on it.
 
 -  Sets the source revision (:term:`SRCREV`) of the input CVE databases to
    :term:`AUTOREV`, so these databases are automatically fetched and updated
    when starting a build.
 
--  Include the VEX statements to the input SPDX document using the
+-  Includes the VEX statements to the input SPDX document using the
    :term:`SPDX_INCLUDE_VEX` variable.
 
 Yocto Project Autobuilder Fragments
