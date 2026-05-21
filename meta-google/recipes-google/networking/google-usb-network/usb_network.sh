@@ -241,6 +241,22 @@ if [ -z "$GADGET_DIR_NAME" ]; then
     GADGET_DIR_NAME="$IFACE_NAME"
 fi
 
+validate_safe_string() {
+    local name="$1"
+    local val="$2"
+    if [[ -n $val ]]; then
+        if [[ ! "$val" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+            echo "Error: Invalid $name: '$val'. Only alphanumeric, _, and - are allowed." >&2
+            exit 1
+        fi
+    fi
+}
+
+validate_safe_string "iface-name" "$IFACE_NAME"
+validate_safe_string "gadget-dir-name" "$GADGET_DIR_NAME"
+validate_safe_string "dev-type" "$DEV_TYPE"
+
+
 if [[ $ACTION == "stop" ]]; then
     gadget_stop
 else

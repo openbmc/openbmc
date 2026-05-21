@@ -287,4 +287,43 @@ test_gadget_creation_alt_iface
 test_teardown
 # -------------------------------------------------------------------
 
+test_invalid_inputs() {
+    local product_name="Souvenier BMC"
+    local product_id="0xcafe"
+    local bind_device="f80002000.udc"
+    # Test path traversal in iface-name
+    if CONFIGFS_HOME="${FAKE_CONFIGFS}" "${SUT}" --product-id "${product_id}" \
+        --product-name "${product_name}" \
+        --bind-device "${bind_device}" \
+        --iface-name "../../../etc/shadow" 2>/dev/null; then
+        test_fail "Should have failed with path traversal in iface-name"
+    fi
+
+    # Test path traversal in gadget-dir-name
+    if CONFIGFS_HOME="${FAKE_CONFIGFS}" "${SUT}" --product-id "${product_id}" \
+        --product-name "${product_name}" \
+        --bind-device "${bind_device}" \
+        --iface-name "usb0" \
+        --gadget-dir-name "../../../etc/shadow" 2>/dev/null; then
+        test_fail "Should have failed with path traversal in gadget-dir-name"
+    fi
+
+    # Test invalid dev-type
+    if CONFIGFS_HOME="${FAKE_CONFIGFS}" "${SUT}" --product-id "${product_id}" \
+        --product-name "${product_name}" \
+        --bind-device "${bind_device}" \
+        --iface-name "usb0" \
+        --dev-type "invalid/type" 2>/dev/null; then
+        test_fail "Should have failed with invalid dev-type"
+    fi
+}
+
+# -------------------------------------------------------------------
+test_setup "Invalid Inputs Rejection"
+
+test_invalid_inputs
+
+test_teardown
+# -------------------------------------------------------------------
+
 echo "SUCCESS!"
