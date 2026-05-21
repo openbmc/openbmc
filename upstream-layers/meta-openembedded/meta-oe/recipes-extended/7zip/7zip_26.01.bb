@@ -64,8 +64,7 @@ do_install() {
 	install -m 0644 ${S}/DOC/readme.txt ${D}${includedir}/${BPN}/DOC
 }
 
-PROVIDES += "p7zip"
-RPROVIDES:${PN} += "lib7z.so()(64bit) 7z lib7z.so p7zip"
+RPROVIDES:${PN} += "lib7z.so()(64bit) 7z lib7z.so"
 RPROVIDES:${PN}-dev += "lib7z.so()(64bit) 7z lib7z.so"
 
 BBCLASSEXTEND = "native nativesdk"

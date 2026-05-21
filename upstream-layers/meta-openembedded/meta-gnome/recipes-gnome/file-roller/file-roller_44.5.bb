@@ -11,7 +11,6 @@ DEPENDS = " \
     gtk4 \
     libadwaita \
     libarchive \
-    libhandy \
     libportal \
 "
 

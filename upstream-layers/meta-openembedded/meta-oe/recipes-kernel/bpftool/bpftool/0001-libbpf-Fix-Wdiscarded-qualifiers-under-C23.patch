@@ -1,0 +1,69 @@
+From ab21cf885fb2af179c44d8beeabd716133b9385d Mon Sep 17 00:00:00 2001
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Date: Sat, 6 Dec 2025 14:28:25 +0500
+Subject: [PATCH] libbpf: Fix -Wdiscarded-qualifiers under C23
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+commit d70f79fef65810faf64dbae1f3a1b5623cdb2345 upstream.
+
+glibc ≥ 2.42 (GCC 15) defaults to -std=gnu23, which promotes
+-Wdiscarded-qualifiers to an error.
+
+In C23, strstr() and strchr() return "const char *".
+
+Change variable types to const char * where the pointers are never
+modified (res, sym_sfx, next_path).
+
+Suggested-by: Florian Weimer <fweimer@redhat.com>
+Suggested-by: Andrii Nakryiko <andrii@kernel.org>
+Signed-off-by: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Link: https://lore.kernel.org/r/20251206092825.1471385-1-mikhail.v.gavrilov@gmail.com
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+[ shung-hsi.yu: needed to fix kernel build failure due to libbpf since glibc
+  2.43+ (which adds 'const' qualifier to strstr) ]
+Signed-off-by: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+Upstream-Status: Backport [https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-6.18.y&id=ab21cf885fb2af179c44d8beeabd716133b9385d]
+Signed-off-by: He Zhe <zhe.he@windriver.com>
+---
+ tools/lib/bpf/libbpf.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+index dd3b2f57082d..9c98c6adb6d0 100644
+--- a/tools/lib/bpf/libbpf.c
++++ b/tools/lib/bpf/libbpf.c
+@@ -8245,7 +8245,7 @@ static int kallsyms_cb(unsigned long long sym_addr, char sym_type,
+ 	struct bpf_object *obj = ctx;
+ 	const struct btf_type *t;
+ 	struct extern_desc *ext;
+-	char *res;
++	const char *res;
+ 
+ 	res = strstr(sym_name, ".llvm.");
+ 	if (sym_type == 'd' && res)
+@@ -11574,7 +11574,8 @@ static int avail_kallsyms_cb(unsigned long long sym_addr, char sym_type,
+ 		 *
+ 		 *   [0] fb6a421fb615 ("kallsyms: Match symbols exactly with CONFIG_LTO_CLANG")
+ 		 */
+-		char sym_trim[256], *psym_trim = sym_trim, *sym_sfx;
++		char sym_trim[256], *psym_trim = sym_trim;
++		const char *sym_sfx;
+ 
+ 		if (!(sym_sfx = strstr(sym_name, ".llvm.")))
+ 			return 0;
+@@ -12159,7 +12160,7 @@ static int resolve_full_path(const char *file, char *result, size_t result_sz)
+ 		if (!search_paths[i])
+ 			continue;
+ 		for (s = search_paths[i]; s != NULL; s = strchr(s, ':')) {
+-			char *next_path;
++			const char *next_path;
+ 			int seg_len;
+ 
+ 			if (s[0] == ':')
+-- 
+2.34.1
+

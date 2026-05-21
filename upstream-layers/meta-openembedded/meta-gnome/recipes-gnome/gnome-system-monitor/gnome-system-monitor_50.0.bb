@@ -4,7 +4,6 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=751419260aa954499f7abaabaa882bbe"
 
 DEPENDS = " \
     catch2 \
-    gnome-common-native \
     libxml2-native \
     glib-2.0-native \
     glibmm-2.68 \
@@ -13,15 +12,12 @@ DEPENDS = " \
     libadwaita \
     libgtop \
     librsvg \
-    polkit \
-    libhandy \
 "
-
 
 inherit gnomebase gsettings gnome-help itstool gtk-icon-cache features_check gettext
 
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
-REQUIRED_DISTRO_FEATURES = "polkit"
+REQUIRED_DISTRO_FEATURES = "opengl"
 
 SRC_URI[archive.sha256sum] = "a4138aa754b4584c46de91fad1d685e27b12bc2457de761863b6be02d84c4862"
 

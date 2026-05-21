@@ -1,0 +1,31 @@
+From 5cf10b111d61f00db2b3d9c8c6635fc31f3ceefd Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 14 May 2026 06:43:36 -0700
+Subject: [PATCH] pyprojects: Relax required version of uv to be < 0.12
+
+Core now has 0.11.x and it fails this check
+
+| * Getting build dependencies for wheel...
+|
+| ERROR Missing dependencies:
+|       uv_build<0.11.0,>=0.10.0
+
+Upstream-Status: Inappropriate [OE Specific]
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index b0f253e..b39d0fd 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,6 +1,6 @@
+ [build-system]
+ build-backend = "uv_build"
+-requires = ["uv_build>=0.10.0,<0.11.0"]
++requires = ["uv_build>=0.10.0,<0.12.0"]
+ 
+ [project]
+ name = "cucumber-tag-expressions"

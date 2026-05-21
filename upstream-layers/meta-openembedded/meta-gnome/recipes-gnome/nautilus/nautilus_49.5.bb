@@ -14,7 +14,6 @@ DEPENDS = " \
     gtk4 \
     libadwaita \
     libcloudproviders \
-    libhandy \
     libportal \
     libxml2 \
     tinysparql \
@@ -26,7 +25,8 @@ inherit gnomebase gsettings gobject-introspection gi-docgen gettext features_che
 
 SRC_URI[archive.sha256sum] = "fa5655e73ee7953aecfe71fea67bfec0c67447e14e6df135aa3f80334386872c"
 
-REQUIRED_DISTRO_FEATURES = "x11 opengl gobject-introspection-data"
+REQUIRED_DISTRO_FEATURES = "opengl gobject-introspection-data"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
 GIDOCGEN_MESON_OPTION = "docs"
 GIDOCGEN_MESON_ENABLE_FLAG = 'true'
