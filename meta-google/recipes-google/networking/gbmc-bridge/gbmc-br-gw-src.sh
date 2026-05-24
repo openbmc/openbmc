@@ -229,8 +229,8 @@ gbmc_br_gw_src_hook() {
     # ignore RA from systemd on standard RA
     [[ $route == *" proto ra "* && $route == *" dev l2br "* ]] && return
     # ignore dead route and linkdown route
-    [[ $route == *" dead " ]] && return
-    [[ $route == *" linkdown " ]] && return
+    [[ $route == *" dead "* ]] && return
+    [[ $route == *" linkdown "* ]] && return
 
     if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
