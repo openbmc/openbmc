@@ -1,0 +1,9 @@
+SPDM_RESPONDER_EMU_ARGS="--trans TCP \
+--cap CERT,MEAS_SIG,MEAS_FRESH,ENCRYPT,MAC,KEY_EX,HANDSHAKE_IN_CLEAR,HBEAT \
+--hash SHA_256 \
+--asym ECDSA_P256 \
+--req_asym ECDSA_P256 \
+--meas_hash SHA_256 \
+--dhe SECP_384_R1 \
+--aead AES_256_GCM \
+--key_schedule HMAC_HASH"

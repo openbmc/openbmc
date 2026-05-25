@@ -44,6 +44,8 @@ RDEPENDS:${PN}-extras:remove:ibm-enterprise = "obmc-ikvm liberation-fonts uart-r
 RDEPENDS:${PN}-extras:append:sbp1 = " phosphor-ipmi-ipmb "
 RDEPENDS:${PN}-extras:append:huygens = " ${POWER_SERVICE_PACKAGES_HUYGENS}"
 
+RDEPENDS:${PN}-dmtf-spdm:append:df-spdm-emu = " spdm-emu"
+
 RDEPENDS:${PN}-software:append:ibm-ac-server = " phosphor-software-manager-sync"
 RDEPENDS:${PN}-software:append:ibm-enterprise = " phosphor-software-manager-usb"
 RDEPENDS:${PN}-software:append:ibm-enterprise = " phosphor-software-manager-side-switch"
