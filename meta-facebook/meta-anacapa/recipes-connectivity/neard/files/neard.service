@@ -1,0 +1,16 @@
+[Unit]
+Description=neard service
+Documentation=man:neard(8)
+After=xyz.openbmc_project.FruDevice.service
+
+[Service]
+Type=dbus
+BusName=org.neard
+ExecStart=/usr/libexec/nfc/neard -n
+ExecStartPost=-busctl set-property org.neard /org/neard/nfc0 org.neard.Adapter Powered b true
+ExecStartPost=-busctl call org.neard /org/neard/nfc0 org.neard.Adapter StartPollLoop s Initiator
+LimitNPROC=1
+
+[Install]
+WantedBy=multi-user.target
+Alias=dbus-org.neard.service
