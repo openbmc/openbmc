@@ -5,6 +5,25 @@ source /usr/libexec/fb-common-functions
 # shellcheck source=meta-facebook/meta-yosemite5/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
 
+# 1. Change to page 3, for r/w regsiter 0x300 ~ 0x3FF
+i2ctransfer -y 13 w2@0x09 0xfd 0x03
+
+# 2. Disable SSC
+i2ctransfer -y 13 w2@0x09 0x07 0x00
+
+# 3. Setting SSC amplitude + step（-0.25%）
+i2ctransfer -y 13 w5@0x09 0x04 0xFC 0x2D 0x28 0x80
+i2ctransfer -y 13 w5@0x09 0x04 0xB5 0x16 0x28 0x80
+
+# 4. enable SSC
+i2ctransfer -y 13 w2@0x09 0x07 0x80
+
+# 5. Check SSC Enable/Disable status
+i2ctransfer -y 13 w1@0x09 0x07 r1
+
+if [ $? -ne 128 ]; then
+    exit 1
+fi
 
 currentstate=$(busctl get-property \
     xyz.openbmc_project.State.Host0 \
