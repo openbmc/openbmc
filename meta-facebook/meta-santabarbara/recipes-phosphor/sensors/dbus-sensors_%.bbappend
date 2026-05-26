@@ -9,12 +9,6 @@ PACKAGECONFIG:append = " \
     cablemonitor \
 "
 
-SRC_URI:append = " \
-    file://cable-config.json \
-    file://wait-cable-inventory \
-    file://wait-inventory.conf \
-    "
-
 inherit systemd
 
 SRC_URI:append = " \
