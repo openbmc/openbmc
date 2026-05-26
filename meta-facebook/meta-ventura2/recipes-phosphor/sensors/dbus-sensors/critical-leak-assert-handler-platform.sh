@@ -20,8 +20,8 @@ _platform_check_rpu_ready()             {
 _platform_get_shutdown_detectors()      {
     # shellcheck disable=SC2034
     declare -gA SHUTDOWN_DETECTORS=(
-        [RackDripTrayLeak1]=1
-        [RackDripTrayLeak2]=1
+        [RackDripPan1]=1
+        [RackDripPan2]=1
         [RackLeakSpare1]=1
         [RackLeakSpare2]=1
         [RackLeakSpare3]=1
