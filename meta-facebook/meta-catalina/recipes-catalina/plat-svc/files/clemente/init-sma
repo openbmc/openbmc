@@ -12,40 +12,37 @@ cx_eids=()
 brd_map=()
 osfp_pr=()
 
-remove_eid()
-{
+remove_eid() {
     local eid=$1
-    if mapper get-service /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" 2>/dev/null; then
+    if mapper get-service /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" 2> /dev/null; then
         echo removing eid "$eid"
         busctl call au.com.codeconstruct.MCTP1 \
-        "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" \
-        au.com.codeconstruct.MCTP.Endpoint1 \
-        Remove
+            "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" \
+            au.com.codeconstruct.MCTP.Endpoint1 \
+            Remove
     fi
 }
 
-is_cx8_ready()
-{
+is_cx8_ready() {
     local iob_index=$1
     local cur_retry=0
     local cx_ready=0
     local cx_boot=0
-    local line_names=(\
-             "CX_BOOT_CMPLT_CX0" \
-             "CX_BOOT_CMPLT_CX1" \
-             "SEC_CX_BOOT_CMPLT_CX0" \
-             "SEC_CX_BOOT_CMPLT_CX0"\
-          )
-    while [ $cur_retry -lt $MAX_RETRY ]
-    do
-        cur_retry=$((cur_retry+1))
+    local line_names=(
+        "CX_BOOT_CMPLT_CX0"
+        "CX_BOOT_CMPLT_CX1"
+        "SEC_CX_BOOT_CMPLT_CX0"
+        "SEC_CX_BOOT_CMPLT_CX0"
+    )
+    while [ $cur_retry -lt $MAX_RETRY ]; do
+        cur_retry=$((cur_retry + 1))
         if timeout 3 mapper wait "/xyz/openbmc_project/inventory/system/board/NVIDIA_GB300_IO_Board_${iob_index}"; then
             for i in 0 1; do
-                local line_name=${line_names[${iob_index}*2+$i]}
+                local line_name=${line_names[${iob_index} * 2 + $i]}
                 cx_boot=$(get_gpio "$line_name")
                 echo "${line_name} --> ${cx_boot}"
                 if [[ ${cx_boot} -eq 1 ]]; then
-                    cx_ready=$((cx_ready+1))
+                    cx_ready=$((cx_ready + 1))
                 fi
             done
             if [[ ${cx_ready} -eq 2 ]]; then
@@ -63,28 +60,27 @@ is_cx8_ready()
     return 1
 }
 
-get_sma_eid_pool()
-{
+get_sma_eid_pool() {
     local eid=$1
     local regex="y ([0-9]?[0-9])"
     local pool_start=""
     local pool_end=""
     local ret=""
     if busctl introspect au.com.codeconstruct.MCTP1 \
-        /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" | \
+        /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" |
         grep -q au.com.codeconstruct.MCTP.Bridge1; then
         ret=$(
             busctl get-property au.com.codeconstruct.MCTP1 \
-            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
-            au.com.codeconstruct.MCTP.Bridge1 PoolStart
+                /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
+                au.com.codeconstruct.MCTP.Bridge1 PoolStart
         )
         if [[ $ret =~ $regex ]]; then
             pool_start=${BASH_REMATCH[1]}
         fi
         ret=$(
             busctl get-property au.com.codeconstruct.MCTP1 \
-            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
-            au.com.codeconstruct.MCTP.Bridge1 PoolEnd
+                /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
+                au.com.codeconstruct.MCTP.Bridge1 PoolEnd
         )
         if [[ $ret =~ $regex ]]; then
             pool_end=${BASH_REMATCH[1]}
@@ -93,8 +89,7 @@ get_sma_eid_pool()
     fi
 }
 
-remove_endpoints()
-{
+remove_endpoints() {
     local ep_regex=".*/endpoints/([0-9]+)"
     local eid=""
     systemctl stop cx-ready.target
@@ -108,8 +103,7 @@ remove_endpoints()
     done
 }
 
-check_fw_version()
-{
+check_fw_version() {
     local eid=$1
     local regex="[0-9]+\.[0-9]+\.([0-9]+)\.[0-9]"
     local version=""
@@ -130,34 +124,32 @@ check_fw_version()
     return 1
 }
 
-enum_downstream()
-{
+enum_downstream() {
     local eid=$1
     local bid=$2
     local has_osfp_tsense=0
     if ! busctl call au.com.codeconstruct.MCTP1 \
-         /au/com/codeconstruct/mctp1/networks/1 \
-         au.com.codeconstruct.MCTP.Network1 \
-         LearnEndpoint y "$eid"; then
+        /au/com/codeconstruct/mctp1/networks/1 \
+        au.com.codeconstruct.MCTP.Network1 \
+        LearnEndpoint y "$eid"; then
         #echo "LearnEndpoint ${eid} Failed."
         return 1
     fi
     has_osfp_tsense=$(
         pldmtool platform GetPDR -m "$eid" -a |
-           jq --raw-output 'map(select(.sensorID == 500)) | length > 0'
+            jq --raw-output 'map(select(.sensorID == 500)) | length > 0'
     )
     if ${has_osfp_tsense}; then
-       osfp_pr+=(1)
+        osfp_pr+=(1)
     else
-       osfp_pr+=(0)
+        osfp_pr+=(0)
     fi
     cx_eids+=("$eid")
     brd_map+=("$bid")
     return 0
 }
 
-setup_eid()
-{
+setup_eid() {
     local mctp_intf=$1
     local mctp_eid=$2
     local iob_index=$3
@@ -166,15 +158,14 @@ setup_eid()
     local res=""
     local eid_pool=""
 
-    while [ $cur_retry -lt $MAX_RETRY ]
-    do
-        cur_retry=$((cur_retry+1))
+    while [ $cur_retry -lt $MAX_RETRY ]; do
+        cur_retry=$((cur_retry + 1))
         # Temporarily assign static endpoint to SMA for version checking and
         # firmware upgrage if the version is older than 137.
         if busctl call au.com.codeconstruct.MCTP1 \
-               "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" \
-               au.com.codeconstruct.MCTP.BusOwner1 \
-               AssignEndpointStatic ayy 0 "${mctp_eid}"; then
+            "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" \
+            au.com.codeconstruct.MCTP.BusOwner1 \
+            AssignEndpointStatic ayy 0 "${mctp_eid}"; then
             break
         fi
         echo "Set EID:${mctp_eid} at INTF:${mctp_intf} failed. Retry $cur_retry/$MAX_RETRY"
@@ -187,9 +178,9 @@ setup_eid()
         # for the bridge's downstream endpoints.
         res=$(
             busctl call au.com.codeconstruct.MCTP1 \
-            "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" \
-            au.com.codeconstruct.MCTP.BusOwner1 \
-            AssignEndpoint ay 0
+                "/au/com/codeconstruct/mctp1/interfaces/${mctp_intf}" \
+                au.com.codeconstruct.MCTP.BusOwner1 \
+                AssignEndpoint ay 0
         )
         echo "$res"
         if [[ $res =~ $regex ]]; then
@@ -199,10 +190,9 @@ setup_eid()
         echo "Discovering bridged endpoints"
         eid_pool=$(get_sma_eid_pool "$mctp_eid")
         if [[ ${eid_pool} =~ ${REGEX_EIP_POOL} ]]; then
-            for bridged_eid in $(seq "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
-            do
+            for bridged_eid in $(seq "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}"); do
                 if enum_downstream "$bridged_eid" "$iob_index"; then
-                    num_of_cx=$((num_of_cx+1))
+                    num_of_cx=$((num_of_cx + 1))
                 fi
             done
         fi
@@ -213,8 +203,7 @@ setup_eid()
     return 0
 }
 
-setup_sma()
-{
+setup_sma() {
     local res=0
     if ! setup_eid mcu1u2u2 9 0; then
         res=1
@@ -228,8 +217,7 @@ setup_sma()
     return "$res"
 }
 
-reset_sma()
-{
+reset_sma() {
     echo "Resetting SMA ..."
     systemctl stop pldmd
     remove_endpoints
@@ -250,13 +238,12 @@ reset_sma()
 }
 
 ###### Temporary functions ######
-get_numeric_sensor_by_eid()
-{
+get_numeric_sensor_by_eid() {
     local eid=$1
-    local snr_id=$2
+    local sensor_id=$2
     local pldmtool_out
 
-    pldmtool_out="$(pldmtool platform GetSensorReading -i "$snr_id" -r 0 -m "$eid")"
+    pldmtool_out="$(pldmtool platform GetSensorReading -i "$sensor_id" -r 0 -m "$eid")"
     if echo "$pldmtool_out" | jq 'has("presentReading")' | grep -q true; then
         echo "$pldmtool_out" | jq '.presentReading'
         return 0
@@ -272,40 +259,39 @@ err_count=0
 # (net) failures; each success drains the bucket by LEAK_BUCKET_DRAIN.
 LEAK_BUCKET_THRESHOLD=3
 LEAK_BUCKET_DRAIN=1
-declare -A snr_fail_count
+declare -A sensor_fail_count
 
-update_numeric_sensor_value()
-{
+update_numeric_sensor_value() {
     local eid="$1"
-    local snr_id="$2"
-    local snr_name="$3"
-    local snr_val
-    local bucket_val="${snr_fail_count[$snr_name]:-0}"
+    local sensor_id="$2"
+    local sensor_name="$3"
+    local sensor_val
+    local bucket_val="${sensor_fail_count[$sensor_name]:-0}"
 
-    if snr_val="$(get_numeric_sensor_by_eid "${eid}" "${snr_id}")"; then
+    if sensor_val="$(get_numeric_sensor_by_eid "${eid}" "${sensor_id}")"; then
         # Drain the bucket on success, floor at 0.
         if [[ $bucket_val -gt 0 ]]; then
-            bucket_val=$(( bucket_val - LEAK_BUCKET_DRAIN ))
+            bucket_val=$((bucket_val - LEAK_BUCKET_DRAIN))
             [[ $bucket_val -lt 0 ]] && bucket_val=0
-            snr_fail_count[$snr_name]=$bucket_val
+            sensor_fail_count[$sensor_name]=$bucket_val
         fi
         # The sensor (ID 50) has "unitModifier" = -1 in PDR.
         # The actual reading should be the original value * 0.1.
-        if [[ ${snr_id} -eq 50 ]]; then
-            snr_val="$((snr_val/10)).$((snr_val%10))"
+        if [[ ${sensor_id} -eq 50 ]]; then
+            sensor_val="$((sensor_val / 10)).$((sensor_val % 10))"
         fi
     else
-        echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, snr_id: $snr_id, snr_name: $snr_name"
-        bucket_val=$(( bucket_val + 1 ))
-        snr_fail_count[$snr_name]=$bucket_val
-        err_count=$((err_count+1))
+        echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, sensor_id: $sensor_id, sensor_name: $sensor_name"
+        bucket_val=$((bucket_val + 1))
+        sensor_fail_count[$sensor_name]=$bucket_val
+        err_count=$((err_count + 1))
         # Suppress "nan" until the bucket exceeds the threshold.
         if [[ $bucket_val -le $LEAK_BUCKET_THRESHOLD ]]; then
             return 0
         fi
-        snr_val="nan"
+        sensor_val="nan"
     fi
-    busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$snr_name" xyz.openbmc_project.Sensor.Value Value d "$snr_val"
+    busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$sensor_name" xyz.openbmc_project.Sensor.Value Value d "$sensor_val"
 }
 ###### End of Temporary functions ######
 
@@ -318,26 +304,24 @@ if ! setup_sma; then
 fi
 
 ###### Short term solution that is bound to be replaced by pldmd ######
-while systemctl is-active --quiet cx-ready.target
-do
-  err_count=0
-  for (( i=0; i<${#cx_eids[@]}; i++ ))
-  do
-      update_numeric_sensor_value "${cx_eids[$i]}" 300 temperature/IOB"${brd_map[$i]}"_NIC$((i%2))_TEMP_C
-      update_numeric_sensor_value "${cx_eids[$i]}" 50  power/IOB"${brd_map[$i]}"_NIC$((i%2))_PWR_W
-      if [[ ${osfp_pr[$i]} -ne 0 ]]; then
-          update_numeric_sensor_value "${cx_eids[$i]}" 500 temperature/IOB"${brd_map[$i]}"_NIC$((i%2))_OSFP_TEMP_C
-      fi
-  done
-  # Check for sensor errors only if a PLDM firmware update is NOT in progress
-  if [[ "$err_count" -ne 0 ]] && ( [[ ! -f "$FW_UPDATE_LOCK" ]] || flock -n "$FW_UPDATE_LOCK" -c "true" ); then
-    # Recover SMA if it becomes irresponsive to PLDM requests
-    reset_sma
-    setup_sma
-  else
-    sleep 2 &
-    wait $!
-  fi
+while systemctl is-active --quiet cx-ready.target; do
+    err_count=0
+    for ((i = 0; i < ${#cx_eids[@]}; i++)); do
+        update_numeric_sensor_value "${cx_eids[$i]}" 300 temperature/IOB"${brd_map[$i]}"_NIC$((i % 2))_TEMP_C
+        update_numeric_sensor_value "${cx_eids[$i]}" 50 power/IOB"${brd_map[$i]}"_NIC$((i % 2))_PWR_W
+        if [[ ${osfp_pr[$i]} -ne 0 ]]; then
+            update_numeric_sensor_value "${cx_eids[$i]}" 500 temperature/IOB"${brd_map[$i]}"_NIC$((i % 2))_OSFP_TEMP_C
+        fi
+    done
+    # Check for sensor errors only if a PLDM firmware update is NOT in progress
+    if [[ "$err_count" -ne 0 ]] && ([[ ! -f "$FW_UPDATE_LOCK" ]] || flock -n "$FW_UPDATE_LOCK" -c "true"); then
+        # Recover SMA if it becomes irresponsive to PLDM requests
+        reset_sma
+        setup_sma
+    else
+        sleep 2 &
+        wait $!
+    fi
 done
 ###### End of Short term solution ######
 

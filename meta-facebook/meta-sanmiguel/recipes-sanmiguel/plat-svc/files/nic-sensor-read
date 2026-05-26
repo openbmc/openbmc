@@ -1,7 +1,7 @@
 #!/bin/bash
 
 readonly EXT_SENSOR_SERVICE="xyz.openbmc_project.ExternalSensor"
-readonly SNR_VAL_INTF="xyz.openbmc_project.Sensor.Value"
+readonly SENSOR_VAL_INTF="xyz.openbmc_project.Sensor.Value"
 readonly STABILIZATION_DELAY=10
 readonly POLL_INTERVAL=2
 
@@ -26,7 +26,7 @@ NIC_INFO_LIST=(
     "72 NS_NIC"
 )
 
-SNR_LIST=(50 300 500)
+SENSOR_LIST=(50 300 500)
 LAST_HOST_READY="0"
 
 is_host_on() {
@@ -54,7 +54,7 @@ update_sensor_val() {
     local path="$1"
     local val="$2"
 
-    busctl set-property "$EXT_SENSOR_SERVICE" "$path" "$SNR_VAL_INTF" Value d "$val"
+    busctl set-property "$EXT_SENSOR_SERVICE" "$path" "$SENSOR_VAL_INTF" Value d "$val"
 }
 
 get_numeric_sensor_by_eid() {
@@ -131,7 +131,7 @@ while true; do
     for nic_info in "${NIC_INFO_LIST[@]}"; do
         read -r nic_eid nic_name <<< "$nic_info"
 
-        for sensor_id in "${SNR_LIST[@]}"; do
+        for sensor_id in "${SENSOR_LIST[@]}"; do
 
             if ! is_host_on; then
                 handle_host_transition "$HOST_OFF"
