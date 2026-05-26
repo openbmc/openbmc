@@ -21,11 +21,12 @@ setup_eid() {
 
         if [ -z "$result" ]; then
             echo "SetupEndpoint failed: mctpusb$i"
+            EIDS[i]=""
             continue
         fi
 
         EID=$(echo "$result" | awk '{print $2}')
-        EIDS+=("$EID")
+        EIDS[i]="$EID"
     done
     return 0
 }
@@ -37,6 +38,12 @@ get_numeric_sensor_by_eid() {
 
     pldmtool_out="$(pldmtool platform GetSensorReading -i "$sensor_id" -r 0 -m "$eid")"
     if echo "$pldmtool_out" | jq 'has("presentReading")' | grep -q true; then
+        local op_state
+        op_state="$(echo "$pldmtool_out" | jq -r '.sensorOperationalState')"
+        if [ "$op_state" != "Sensor Enabled" ]; then
+            echo "nan"
+            return 0
+        fi
         echo "$pldmtool_out" | jq '.presentReading'
         return 0
     else
@@ -54,7 +61,36 @@ update_numeric_sensor_value() {
         echo "update_numeric_sensor_value(): pldmtool failed, eid: $eid, sensor_id: $sensor_id, sensor_name: $sensor_name"
         return 1
     fi
-    busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/temperature/$sensor_name" xyz.openbmc_project.Sensor.Value Value d "$sensor_val"
+    case "${sensor_id}" in
+        61|63|64|65)
+            unit="temperature"
+            ;;
+        67|68)
+            unit="power"
+            ;;
+        70|71)
+            unit="voltage"
+            ;;
+        *)
+            return
+            ;;
+    esac
+
+    # Unit modifier: -3
+    case "${sensor_id}" in
+        67|68|70|71)
+           sensor_val=$(awk "BEGIN {printf \"%.3f\", ${sensor_val}/1000}")
+           ;;
+    esac
+
+    busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$unit/$sensor_name" xyz.openbmc_project.Sensor.Value Value d "$sensor_val"
+
+    if [ "$sensor_val" = "nan" ]; then
+        available="false"
+    else
+        available="true"
+    fi
+    busctl set-property xyz.openbmc_project.ExternalSensor "/xyz/openbmc_project/sensors/$unit/$sensor_name" xyz.openbmc_project.State.Decorator.Availability Available b "$available"
 }
 
 poll_numeric_sensor() {
@@ -72,15 +108,27 @@ poll_numeric_sensor() {
 }
 
 set_all_external_sensors_invalid() {
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/BRB_L_FE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM0_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM0_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM1_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM1_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM2_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM2_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM3_BE_NIC0_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
-    busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/EAM3_BE_NIC1_Temp_C xyz.openbmc_project.Sensor.Value Value d "nan"
+    for i in "${!EIDS[@]}"; do
+        if [ -z "${EIDS[$i]}" ]; then
+            continue
+        fi
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_VR_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_BOARD_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_OSFP_TEMP_C xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/power/NIC"${i}"_VR_PWR_W xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/power/NIC"${i}"_ASIC_PWR_W xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/voltage/NIC"${i}"_VR_VIN_VOLT_V xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/voltage/NIC"${i}"_ASIC_VOLT_V xyz.openbmc_project.Sensor.Value Value d "nan"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_TEMP_C xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_VR_TEMP_C xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_BOARD_TEMP_C xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/temperature/NIC"${i}"_OSFP_TEMP_C xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/power/NIC"${i}"_VR_PWR_W xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/power/NIC"${i}"_ASIC_PWR_W xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/voltage/NIC"${i}"_VR_VIN_VOLT_V xyz.openbmc_project.State.Decorator.Availability Available b "false"
+        busctl set-property xyz.openbmc_project.ExternalSensor /xyz/openbmc_project/sensors/voltage/NIC"${i}"_ASIC_VOLT_V xyz.openbmc_project.State.Decorator.Availability Available b "false"
+    done
 }
 
 execute_when_host_off() {
@@ -111,16 +159,19 @@ while true; do
         continue
     fi
 
-    poll_numeric_sensor "${EIDS[0]}" 61 BRB_L_FE_NIC0_Temp_C
-    poll_numeric_sensor "${EIDS[1]}" 61 EAM0_BE_NIC0_Temp_C
-    poll_numeric_sensor "${EIDS[2]}" 61 EAM0_BE_NIC1_Temp_C
-    poll_numeric_sensor "${EIDS[3]}" 61 EAM1_BE_NIC0_Temp_C
-    poll_numeric_sensor "${EIDS[4]}" 61 EAM1_BE_NIC1_Temp_C
-    poll_numeric_sensor "${EIDS[5]}" 61 EAM2_BE_NIC0_Temp_C
-    poll_numeric_sensor "${EIDS[6]}" 61 EAM2_BE_NIC1_Temp_C
-    poll_numeric_sensor "${EIDS[7]}" 61 EAM3_BE_NIC0_Temp_C
-    poll_numeric_sensor "${EIDS[8]}" 61 EAM3_BE_NIC1_Temp_C
-
+    for i in "${!EIDS[@]}"; do
+        if [ -z "${EIDS[$i]}" ]; then
+            continue
+        fi
+        poll_numeric_sensor "${EIDS[$i]}" 61 "NIC${i}_TEMP_C"
+        poll_numeric_sensor "${EIDS[$i]}" 63 "NIC${i}_VR_TEMP_C"
+        poll_numeric_sensor "${EIDS[$i]}" 64 "NIC${i}_BOARD_TEMP_C"
+        poll_numeric_sensor "${EIDS[$i]}" 65 "NIC${i}_OSFP_TEMP_C"
+        poll_numeric_sensor "${EIDS[$i]}" 67 "NIC${i}_VR_PWR_W"
+        poll_numeric_sensor "${EIDS[$i]}" 68 "NIC${i}_ASIC_PWR_W"
+        poll_numeric_sensor "${EIDS[$i]}" 70 "NIC${i}_VR_VIN_VOLT_V"
+        poll_numeric_sensor "${EIDS[$i]}" 71 "NIC${i}_ASIC_VOLT_V"
+    done
 done
 
 exit 0
