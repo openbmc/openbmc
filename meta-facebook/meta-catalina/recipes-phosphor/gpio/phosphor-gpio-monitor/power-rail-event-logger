@@ -11,7 +11,17 @@ e.g. P48V_HS1_FAULT_N_PLD
 
 gpio_name="$2"
 msg_id="xyz.openbmc_project.State.Power.PowerRailFault"
-device_path="/xyz/openbmc_project/inventory/system/board/Catalina_PDB/$gpio_name"
+# Board name differs per machine; read OPENBMC_TARGET_MACHINE from os-release
+# so this shared script produces the correct inventory path on each platform.
+# shellcheck source=/dev/null
+. /etc/os-release 2>/dev/null
+case "$OPENBMC_TARGET_MACHINE" in
+    clemente) _pdb="Clemente_PDB" ;;
+    *) _pdb="Catalina_PDB" ;;
+esac
+device_path="/xyz/openbmc_project/inventory/system/board/$_pdb/$gpio_name"
+# log-create writes the new entry's object path to stash_file; deassert reads
+# it back to resolve the same entry via log-resolve.
 stash_file="/run/${gpio_name}.log_entry"
 
 get_failure_data()
@@ -20,6 +30,16 @@ get_failure_data()
         echo "Hotswap Controller 1 fault assert"
     elif [ "$1" = "P48V_HS2_FAULT_N_PLD" ]; then
         echo "Hotswap Controller 2 fault assert"
+    elif [ "$1" = "P52V_SENSE_ALERT_PLD_N" ]; then
+        echo "P52V busbar power monitor alert assert"
+    elif [ "$1" = "P12V_SCM_SENSE_ALERT_R_N" ]; then
+        echo "P12V_BMC power monitor alert assert"
+    elif [ "$1" = "P12V_AUX_NIC1_SENSE_ALERT_R_N" ]; then
+        echo "P12V_AUX_NIC1 power monitor alert assert"
+    elif [ "$1" = "P12V_AUX_NIC0_SENSE_ALERT_R_N" ]; then
+        echo "P12V_AUX_NIC0 power monitor alert assert"
+    elif [ "$1" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
+        echo "RMC main power disabled"
     else
         echo "GPIO $1 assert"
     fi
@@ -31,17 +51,18 @@ case "$1" in
         ;;
 
     "assert")
-        if [ ! -s "$stash_file" ]; then
-            /usr/bin/log-create "$msg_id" --json \
-                "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$gpio_name")\"}" \
-                > "${stash_file}"
-        fi
+        /usr/bin/log-create "$msg_id" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$gpio_name")\"}" \
+            >"${stash_file}"
         ;;
 
     "deassert")
+        msg_id="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
         if [ -s "${stash_file}" ]; then
-            log-resolve -p "$(< "${stash_file}")" && rm "${stash_file}"
+            log-resolve -p "$(<"${stash_file}")" && rm "${stash_file}"
         fi
+        /usr/bin/log-create "$msg_id" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\"}"
         ;;
 esac
 

@@ -195,28 +195,12 @@ do_gpio_assert_log()
     elif [ "$LINENAME" = "OCP_SFF_PWRBRK_FROM_HOST_ISO_PL" ]; then
         LOG_MSG="NIC0 PWRBRK from Host assert"
 
-    # PDB CPLD IOEXP 14-0012, Port 0
-    elif [ "$LINENAME" = "P12V_AUX_PSU_SMB_ALERT_R_L" ]; then
-        LOG_MSG="P12V_AUX VR alert assert"
-    elif [ "$LINENAME" = "P12V_SCM_SENSE_ALERT_R_N" ]; then
-        LOG_MSG="P12V_BMC power monitor alert assert"
-    elif [ "$LINENAME" = "P12V_AUX_NIC1_SENSE_ALERT_R_N" ]; then
-        LOG_MSG="P12V_AUX_NIC1 power monitor alert assert"
-    elif [ "$LINENAME" = "P12V_AUX_NIC0_SENSE_ALERT_R_N" ]; then
-        LOG_MSG="P12V_AUX_NIC0 power monitor alert assert"
-    elif [ "$LINENAME" = "NODEB_PSU_SMB_ALERT_R_L" ]; then
-        LOG_MSG="CPU1 P12V_N2_VOUT VR alert assert"
-    elif [ "$LINENAME" = "NODEA_PSU_SMB_ALERT_R_L" ]; then
-        LOG_MSG="CPU0 P12V_N1_VOUT VR alert assert"
-    elif [ "$LINENAME" = "P12V_AUX_FAN_ALERT_PLD_N" ]; then
-        LOG_MSG="FAN P12V_AUX_FAN VR alert assert"
-    elif [ "$LINENAME" = "P52V_SENSE_ALERT_PLD_N" ]; then
-        LOG_MSG="P52V busbar power monitor alert assert"
-
     # PDB CPLD IOEXP 14-0012, Port 1
     elif [ "$LINENAME" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
-        LOG_MSG="RMC main power disabled"
         set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+        # Structured Redfish event is emitted by power-rail-assert-log@ service;
+        # return here to skip the log_error fallthrough below.
+        return 0
     elif [ "$LINENAME" = "SMB_RJ45_FIO_TMP_ALERT" ]; then
         LOG_MSG="FIO board tempreture sensor alert assert"
     else
@@ -293,28 +277,12 @@ do_gpio_deassert_log()
     elif [ "$LINENAME" = "OCP_SFF_PWRBRK_FROM_HOST_ISO_PL" ]; then
         LOG_MSG="NIC0 PWRBRK from Host deassert"
 
-    # PDB CPLD IOEXP 14-0012, Port 0
-    elif [ "$LINENAME" = "P12V_AUX_PSU_SMB_ALERT_R_L" ]; then
-        LOG_MSG="P12V_AUX VR alert deassert"
-    elif [ "$LINENAME" = "P12V_SCM_SENSE_ALERT_R_N" ]; then
-        LOG_MSG="P12V_BMC power monitor alert deassert"
-    elif [ "$LINENAME" = "P12V_AUX_NIC1_SENSE_ALERT_R_N" ]; then
-        LOG_MSG="P12V_AUX_NIC1 power monitor alert deassert"
-    elif [ "$LINENAME" = "P12V_AUX_NIC0_SENSE_ALERT_R_N" ]; then
-        LOG_MSG="P12V_AUX_NIC0 power monitor alert deassert"
-    elif [ "$LINENAME" = "NODEB_PSU_SMB_ALERT_R_L" ]; then
-        LOG_MSG="CPU1 P12V_N2_VOUT VR alert deassert"
-    elif [ "$LINENAME" = "NODEA_PSU_SMB_ALERT_R_L" ]; then
-        LOG_MSG="CPU0 P12V_N1_VOUT VR alert deassert"
-    elif [ "$LINENAME" = "P12V_AUX_FAN_ALERT_PLD_N" ]; then
-        LOG_MSG="FAN P12V_AUX_FAN VR alert deassert"
-    elif [ "$LINENAME" = "P52V_SENSE_ALERT_PLD_N" ]; then
-        LOG_MSG="P52V busbar power monitor alert deassert"
-
     # PDB CPLD IOEXP 14-0012, Port 1
     elif [ "$LINENAME" = "FM_MAIN_PWREN_RMC_EN_ISO_R" ]; then
-        LOG_MSG="RMC main power enabled"
         set_request_host_transition "xyz.openbmc_project.State.Host.Transition.On"
+        # Structured Redfish event is resolved by power-rail-deassert-log@ service;
+        # return here to skip the log_info fallthrough below.
+        return 0
     elif [ "$LINENAME" = "SMB_RJ45_FIO_TMP_ALERT" ]; then
         LOG_MSG="FIO board tempreture sensor alert deassert"
     else

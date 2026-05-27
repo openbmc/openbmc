@@ -11,7 +11,17 @@ e.g. FM_P12V_NIC1_FLTB_R_N
 
 gpio_name="$2"
 msg_id="xyz.openbmc_project.State.Power.VoltageRegulatorFault"
-device_path="/xyz/openbmc_project/inventory/system/board/Catalina_PDB/$gpio_name"
+# Board name differs per machine; read OPENBMC_TARGET_MACHINE from os-release
+# so this shared script produces the correct inventory path on each platform.
+# shellcheck source=/dev/null
+. /etc/os-release 2>/dev/null
+case "$OPENBMC_TARGET_MACHINE" in
+    clemente) _pdb="Clemente_PDB" ;;
+    *) _pdb="Catalina_PDB" ;;
+esac
+device_path="/xyz/openbmc_project/inventory/system/board/$_pdb/$gpio_name"
+# log-create writes the new entry's object path to stash_file; deassert reads
+# it back to resolve the same entry via log-resolve.
 stash_file="/run/${gpio_name}.log_entry"
 
 get_failure_data()
@@ -28,6 +38,14 @@ get_failure_data()
         echo "P12V_AUX_FAN VR OC fault assert"
     elif [ "$1" = "P12V_AUX_FAN_FAULT_PLD_N" ]; then
         echo "P12V_AUX_FAN VR fault assert"
+    elif [ "$1" = "NODEB_PSU_SMB_ALERT_R_L" ]; then
+        echo "CPU1 P12V_N2_VOUT VR alert assert"
+    elif [ "$1" = "NODEA_PSU_SMB_ALERT_R_L" ]; then
+        echo "CPU0 P12V_N1_VOUT VR alert assert"
+    elif [ "$1" = "P12V_AUX_PSU_SMB_ALERT_R_L" ]; then
+        echo "P12V_AUX VR alert assert"
+    elif [ "$1" = "P12V_AUX_FAN_ALERT_PLD_N" ]; then
+        echo "FAN P12V_AUX_FAN VR alert assert"
     else
         echo "GPIO $1 assert"
     fi
@@ -39,17 +57,18 @@ case "$1" in
         ;;
 
     "assert")
-        if [ ! -s "$stash_file" ]; then
-            /usr/bin/log-create "$msg_id" --json \
-                "{ \"VOLTAGE_REGULATOR\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$gpio_name")\"}" \
-                > "${stash_file}"
-        fi
+        /usr/bin/log-create "$msg_id" --json \
+            "{ \"VOLTAGE_REGULATOR\": \"${device_path}\", \"FAILURE_DATA\": \"$(get_failure_data "$gpio_name")\"}" \
+            >"${stash_file}"
         ;;
 
     "deassert")
+        msg_id="xyz.openbmc_project.State.Power.VoltageRegulatorFaultRecovered"
         if [ -s "${stash_file}" ]; then
-            log-resolve -p "$(< "${stash_file}")" && rm "${stash_file}"
+            log-resolve -p "$(<"${stash_file}")" && rm "${stash_file}"
         fi
+        /usr/bin/log-create "$msg_id" --json \
+            "{ \"VOLTAGE_REGULATOR\": \"${device_path}\"}"
         ;;
 esac
 
