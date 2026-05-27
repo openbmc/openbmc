@@ -16,6 +16,11 @@ do_install:append:fb-compute() {
     install -m 0644 ${UNPACKDIR}/01-bmc-eth.network ${D}${systemd_unitdir}/network/01-bmc-eth.network
 }
 
+do_install:append:mf-fb-ncsi-nic() {
+    install -d ${D}${sysconfdir}/systemd/network/
+    install -m 0644 ${UNPACKDIR}/01-bmc-eth.network ${D}${sysconfdir}/systemd/network/00-bmc-eth.network
+}
+
 do_install:append:fb-fboss() {
     install -d ${D}${systemd_unitdir}/network
     install -d ${D}${sysconfdir}/systemd/network
@@ -27,6 +32,8 @@ do_install:append:fb-fboss() {
 }
 
 FILES:${PN}:append:fb-compute = " ${systemd_unitdir}/network/01-bmc-eth.network"
+
+FILES:${PN}:append:mf-fb-ncsi-nic = " ${sysconfdir}/systemd/network/00-bmc-eth.network"
 
 FILES:${PN}:append:fb-fboss = " \
     ${sysconfdir}/systemd/network/10-eth0.network \
