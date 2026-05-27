@@ -1,10 +1,12 @@
 #!/bin/bash
 
-INTERFACE="eth1"
-INDEX=$(cat /sys/class/net/$INTERFACE/ifindex)
-MAX_RETRIES=3
+INTERFACE=$(basename /sys/bus/platform/devices/1e690000.ethernet/net/eth*)
+INDEX=$(cat /sys/bus/platform/devices/1e690000.ethernet/net/eth*/ifindex)
+MAX_RETRIES=5
 RETRY_COUNT=0
 WAIT_TIME=15
+
+echo "Target NCSI Interface: $INTERFACE (ifindex: $INDEX)"
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
     state=$(timeout 2 ncsi-cmd -i "$INDEX" discover 2> /dev/null)
@@ -15,9 +17,9 @@ while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
         exit 0
     fi
 
-    ip link set $INTERFACE down
+    ip link set "$INTERFACE" down
     sleep 2
-    ip link set $INTERFACE up
+    ip link set "$INTERFACE" up
 
     echo "Wait $WAIT_TIME seconds for NCSI state"
     sleep $WAIT_TIME
