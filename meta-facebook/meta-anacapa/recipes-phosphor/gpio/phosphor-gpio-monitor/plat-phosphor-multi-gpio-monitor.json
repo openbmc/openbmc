@@ -211,5 +211,27 @@
             "RISING":   ["hpm-power-fault@HPM_PWR_FAIL.service"]
         },
         "Continue": true
-    }
+    },
+    {
+        "Name": "CPU_THERMTRIP_ASSERT",
+        "LineName": "CPU_THERMTRIP_ASSERT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_HIGH": ["thermal-event-logger@CPU_THERMTRIP_ASSERT:assert.service"],
+            "FALLING":  ["thermal-event-logger@CPU_THERMTRIP_ASSERT:deassert.service"],
+            "RISING":   ["thermal-event-logger@CPU_THERMTRIP_ASSERT:assert.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "AMC_THERMTRIP_ASSERT",
+        "LineName": "AMC_THERMTRIP_ASSERT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "INIT_HIGH": ["thermal-event-logger@AMC_THERMTRIP_ASSERT:assert.service"],
+            "FALLING":  ["thermal-event-logger@AMC_THERMTRIP_ASSERT:deassert.service"],
+            "RISING":   ["thermal-event-logger@AMC_THERMTRIP_ASSERT:assert.service"]
+        },
+        "Continue": true
+     }
 ]

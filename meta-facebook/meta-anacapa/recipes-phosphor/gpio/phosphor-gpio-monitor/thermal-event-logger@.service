@@ -1,0 +1,7 @@
+[Unit]
+Description=Thermal Event Log
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/thermal-event-logger "%i"
+SyslogIdentifier=thermal-event-logger

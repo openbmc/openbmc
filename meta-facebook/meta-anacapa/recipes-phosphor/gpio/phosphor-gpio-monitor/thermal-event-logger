@@ -1,0 +1,58 @@
+#!/bin/bash
+set -euo pipefail
+
+inst="${1:-}"
+IFS=":" read -r line action <<< "${inst}"
+
+if [[ -z "${line}" || -z "${action}" ]]; then
+    echo "Usage: thermal-event-logger <GPIO_LINE_NAME>:<assert|deassert>" >&2
+    exit 1
+fi
+
+readonly STASH_FILE="/run/${line}.log_entry"
+
+MSG_ID=""
+RECOVER_ID=""
+DEVICE_PATH=""
+
+case "${line}" in
+    "CPU_THERMTRIP_ASSERT")
+        MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOverOperatingTemperatureFault"
+        DEVICE_PATH="/xyz/openbmc_project/State/Thermal/cpu0"
+        ;;
+    "AMC_THERMTRIP_ASSERT")
+        MSG_ID="xyz.openbmc_project.State.Thermal.DeviceOverOperatingTemperatureFault"
+        DEVICE_PATH="/xyz/openbmc_project/State/Thermal/amc"
+        ;;
+    *)
+        echo "Unsupported GPIO line: ${line}" >&2
+        exit 1
+        ;;
+esac
+
+case "${action}" in
+    "assert")
+        if [[ ! -s "${STASH_FILE}" ]]; then
+            /usr/bin/log-create "${MSG_ID}" --json \
+                "{ \"DEVICE\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"${line}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+    "deassert")
+        if [[ -s "${STASH_FILE}" ]]; then
+            /usr/bin/log-resolve -p "$(< "${STASH_FILE}")"
+            rm -f "${STASH_FILE}"
+        fi
+
+        if [[ -n "${RECOVER_ID}" ]]; then
+            /usr/bin/log-create "${RECOVER_ID}" --json \
+                "{ \"DEVICE\": \"${DEVICE_PATH}\" }"
+        fi
+        ;;
+    *)
+        echo "Invalid action: ${action}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
