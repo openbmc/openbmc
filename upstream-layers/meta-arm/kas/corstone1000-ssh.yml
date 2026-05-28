@@ -1,0 +1,13 @@
+header:
+  version: 14
+  includes:
+    - ci/debug.yml
+
+local_conf_header:
+  sshd: |
+    IMAGE_FEATURES += "ssh-server-dropbear"
+  fvp_sshkeys: |
+    CORE_IMAGE_EXTRA_INSTALL:append = " ssh-pregen-hostkeys"
+
+target:
+  - core-image-minimal

@@ -27,6 +27,17 @@ inherit native
 
 RDEPENDS:${PN} += "python3-core"
 
+DEPENDS += "util-linux-libuuid-native"
+
+EXTRA_OEMAKE += "\
+    CC='${BUILD_CC}' \
+    CXX='${BUILD_CXX}' \
+    AR='${BUILD_AR}' \
+    LINKER='${BUILD_CC}' \
+    EXTRA_OPTFLAGS='${BUILD_CFLAGS}' \
+    EXTRA_LDFLAGS='${BUILD_LDFLAGS}' \
+"
+
 do_compile() {
     BASE_C="${S}/BaseTools/Source/C"
 

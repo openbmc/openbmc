@@ -253,8 +253,6 @@ Build
 
     .. warning::
 
-        **The External System Processor is not available on the Corstone-1000 with Cortex-A320 FVP.**
-
         Access to the External System Processor is disabled by default on **Corstone-1000 with Cortex-A35**.
 
         To build the Corstone-1000 image with External System Processor enabled, run:
@@ -262,18 +260,6 @@ Build
         .. code-block:: console
 
             kas build meta-arm/kas/corstone1000-${TARGET}.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-extsys.yml
-
-    .. warning::
-
-        **The Ethos-U85 Neural Processing Unit (NPU) is only available on
-        the Corstone-1000 with Cortex-A320 FVP.**
-
-        To build the Corstone-1000 image with the Ethos-U85 NPU enabled, run:
-
-        .. code-block:: console
-
-            kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml
-
 
 A clean build takes a significant amount of time given that all of the development machine utilities are also
 built along with the target images. Those development machine utilities include executables (Python,
@@ -289,6 +275,28 @@ The output binaries run in the Corstone-1000 platform are the following:
  - The Secure Enclave ROM firmware: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/trusted-firmware-m/bl1.bin``
  - The External System Processor firmware: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/es_flashfw.bin``
  - The internal firmware flash image: ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/corstone1000-flash-firmware-image-corstone1000-${TARGET}.wic``
+
+Build with SSH
+--------------
+
+The ``meta-arm/kas/corstone1000-${TARGET}.yml`` build produces an image for
+booting from flash.
+
+To build a bootable mass storage OS image with Dropbear SSH enabled, run:
+
+.. code-block:: console
+
+    kas build meta-arm/ci/corstone1000-${TARGET}.yml:meta-arm/kas/corstone1000-ssh.yml
+
+The mass storage OS image can be found at ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/core-image-minimal-corstone1000-${TARGET}.wic``
+
+.. note::
+
+    For the FVP, the generated ``core-image-minimal-corstone1000-fvp.fvpconf``
+    configures the mass storage OS image using ``board.msd_mmc.p_mmc_file``.
+
+    For the MPS3 platform, write the ``*.wic`` image directly to the mass storage device.
+
 
 .. _flashing-firmware-images:
 
@@ -471,14 +479,9 @@ Corstone-1000 FVP software image.
 A Yocto recipe is provided to download the latest supported FVP version.
 
 The recipe is located at ``${WORKSPACE}/meta-arm/meta-arm/recipes-devtools/fvp/fvp-corstone1000.bb``.
-This recipe supports selecting different Corstone‑1000 FVP models via MACHINE_FEATURES:
 
-- ``cortexa320``      use the Cortex-A320 Host Processor with Ethos U85 enabled FVP build
-- (default)           use the Cortex-A35 Host Processor with Cortex-M3 External System FVP build
-
-The latest FVP version is ``11.23.25`` for Corstone-1000 with Cortex-A35 and ``11.30.27`` for
-Corstone-1000 with Cortex-A320, and each model is automatically downloaded and installed when using
-the ``runfvp`` command as detailed below.
+The latest FVP version is ``11.23.25`` and is automatically
+downloaded and installed when using the ``runfvp`` command as detailed below.
 
 .. note::
 
@@ -2146,40 +2149,19 @@ Symmetric Multiprocessing
 
 .. warning::
 
-    Symmetric multiprocessing (SMP) mode is supported on Corstone-1000
-    with Cortex-A35 FVP and Corstone-1000 with Cortex-A320 FVP, but is disabled by default.
+    Symmetric multiprocessing (SMP) mode is supported on FVP but is disabled by default.
 
+#. Build the software stack with SMP mode enabled:
 
-#. Build the software stack with SMP mode enabled.
-
-   For Corstone-1000 with Cortex-A35 FVP:
-
-    .. code-block:: console
+   .. code-block:: console
 
         kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-multicore.yml
 
-   For Corstone-1000 with Cortex-A320 FVP:
-
-    .. code-block:: console
-
-        kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-        meta-arm/kas/corstone1000-multicore.yml
-
 #. Run the Corstone-1000 FVP.
-
-   For Corstone-1000 with Cortex-A35 FVP:
 
     .. code-block:: console
 
         kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-multicore.yml \
-        -c "../meta-arm/scripts/runfvp"
-
-   For Corstone-1000 with Cortex-A320 FVP:
-
-    .. code-block:: console
-
-        kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-        meta-arm/kas/corstone1000-multicore.yml \
         -c "../meta-arm/scripts/runfvp"
 
 #. Verify that the FVP is running the Host Processor with more than one CPU core:
@@ -2188,78 +2170,6 @@ Symmetric Multiprocessing
 
         nproc
         4                  # number of processing units
-
-Ethos-U85 NPU
--------------
-
-.. warning::
-
-    The Ethos-U85 NPU is only supported on Corstone-1000 with Cortex-A320 FVP.
-
-
-#. Clone the `iot-platform-assets` repository to your ``${WORKSPACE}``.
-
-    .. code-block:: console
-
-        cd ${WORKSPACE}
-        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git \
-        -b CORSTONE1000-2025.12
-
-#. Copy the additional kas configuration file to:
-
-    .. code-block:: console
-
-        cp ${WORKSPACE}/iot-platform-assets/corstone1000/ethos-u85_test/ethos-u85-test.yml \
-        ${WORKSPACE}/meta-arm/kas/
-
-#. Copy the mesa package Git patch file to your copy of meta-arm.
-
-    .. code-block:: console
-
-        cp -f ${WORKSPACE}/iot-platform-assets/corstone1000/ethos-u85_test/0001-arm-bsp-mesa-Package-Teflon-test-runner-and-models.patch \
-        ${WORKSPACE}/meta-arm/
-
-#. Apply the Git patch to meta-arm.
-
-    .. code-block:: console
-
-        cd ${WORKSPACE}/meta-arm/
-        git apply 0001-arm-bsp-mesa-Package-Teflon-test-runner-and-models.patch
-        cd ${WORKSPACE}
-
-#. Re-Build the Corstone-1000 with Cortex-A320 FVP software stack as follows:
-
-    .. code-block:: console
-
-        kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-        meta-arm/kas/ethos-u85-test.yml
-
-#. Run the Corstone-1000 with Cortex-320 FVP:
-
-    .. code-block:: console
-
-        kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
-        meta-arm/kas/ethos-u85-test.yml \
-        -c "../meta-arm/scripts/runfvp"
-
-#. To verify you are running the Corstone-1000 with Cortex-A320, build and run the FVP and inspect the CPU model
-   reported in ``/proc/cpuinfo`` as shown below. Inside the FVP shell, confirm the core type:
-
-
-    .. code-block:: console
-
-        grep -E 'CPU part|model name' /proc/cpuinfo
-        # Expect: CPU part : 0xd8f  (which corresponds to Cortex-A320)
-
-#. Run the `test_teflon` test application inside the FVP shell as follows:
-
-    .. code-block:: console
-
-        export TEFLON_TEST_DELEGATE=/usr/lib/libteflon.so
-        export TEFLON_TEST_DATA=/usr/share/teflon/tests
-        test_teflon --gtest_filter='Models.*'
-
-   The test completes in approximately one minute.
 
 Secure Debug
 ------------

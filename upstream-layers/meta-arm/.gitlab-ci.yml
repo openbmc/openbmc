@@ -1,4 +1,4 @@
-image: ${MIRROR_GHCR}/siemens/kas/kas:4.7
+image: ${MIRROR_GHCR}/siemens/kas/kas:5.2
 
 variables:
   # These are needed as the k8s executor doesn't respect the container
@@ -155,6 +155,15 @@ corstone1000-mps3:
         TESTING: [none, tftf]
       - FIRMWARE: none
         SECUREDEBUG: [none, secure-debug]
+
+corstone1000-a320-fvp:
+  extends: .build
+  parallel:
+    matrix:
+      - FIRMWARE: corstone1000-firmware-only
+        TESTING: [none, tftf]
+      - FIRMWARE: none
+        TESTING: none
 
 documentation:
   extends: .setup

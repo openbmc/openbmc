@@ -38,6 +38,9 @@ TFA_ARM_SPMC_MANIFEST_DTS ?= ""
 # Build for debug (set TFA_DEBUG to 1 to activate)
 TFA_DEBUG ?= "${FIRMWARE_DEBUG_BUILD}"
 
+# Set to 1 if the platform has LTO enabled
+TFA_LTO ?= ""
+
 B = "${WORKDIR}/build"
 
 # mbed TLS support (set TFA_MBEDTLS to 1 to activate)
@@ -106,7 +109,7 @@ def remove_options_tail (in_string):
     from itertools import takewhile
     return ' '.join(takewhile(lambda x: not x.startswith('-'), in_string.split(' ')))
 
-EXTRA_OEMAKE += "LD='${@remove_options_tail(d.getVar('LD'))}'"
+EXTRA_OEMAKE += "${@'' if d.getVar('TFA_LTO') else "'LD=" + remove_options_tail(d.getVar('LD')) + "'"}"
 
 EXTRA_OEMAKE += "CC='${@remove_options_tail(d.getVar('CC'))}'"
 
