@@ -202,5 +202,14 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "HPM_PWR_FAIL",
+        "LineName": "HPM_PWR_FAIL",
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING":   ["hpm-power-fault@HPM_PWR_FAIL.service"]
+        },
+        "Continue": true
     }
 ]

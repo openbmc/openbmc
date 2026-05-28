@@ -1,0 +1,254 @@
+#!/bin/bash
+set -euo pipefail
+
+BUS=6
+ADDR=0x20
+READ_FAIL_REGS=""
+LOGGED_ANY_FAULT=0
+
+function log_error() {
+    local rail_name="$1"
+    local failure_data="$2"
+    local msg_id="xyz.openbmc_project.State.Power.PowerRailFault"
+    local device_path="/xyz/openbmc_project/inventory/system/board/Anacapa_MB/${rail_name}"
+    LOGGED_ANY_FAULT=1
+
+    /usr/bin/log-create "${msg_id}" --json \
+        "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"${failure_data}\" }"
+}
+
+function append_read_fail_reg() {
+    local reg="$1"
+
+    if [ -z "${READ_FAIL_REGS}" ]; then
+        READ_FAIL_REGS="${reg}"
+    else
+        case ",${READ_FAIL_REGS}," in
+            *,"${reg}",*) ;;
+            *) READ_FAIL_REGS="${READ_FAIL_REGS},${reg}" ;;
+        esac
+    fi
+}
+
+function flush_read_fail_logs() {
+    if [ -n "${READ_FAIL_REGS}" ]; then
+        log_error "HPM_PWR_FAIL" "CPLD_I2C_READ_FAIL"
+        echo "CPLD I2C read failed for registers: ${READ_FAIL_REGS}" >&2
+    fi
+}
+
+function flush_no_fault_decoded_log() {
+    if [ "${LOGGED_ANY_FAULT}" -eq 0 ] && [ -z "${READ_FAIL_REGS}" ]; then
+        log_error "HPM_PWR_FAIL" "NO_CPLD_FAULT_DECODED"
+    fi
+}
+
+function i2c_read_byte() {
+    local reg="$1"
+    local v=""
+
+    for _ in 1 2 3; do
+        v="$(i2cget -y "${BUS}" "${ADDR}" "${reg}" 2>/dev/null)" && {
+            echo "$v"
+            return 0
+        }
+        sleep 0.02
+    done
+    return 1
+}
+
+function is_valid_byte() {
+    local v="$1"
+
+    [[ "${v}" =~ ^(0x[0-9a-fA-F]+|[0-9]+)$ ]]
+}
+
+function bit_is_set() {
+    local byte_hex="$1" bit="$2"
+    local byte=$((byte_hex))
+    (( (byte >> bit) & 1 ))
+}
+
+function check_bits_expect_1() {
+    local reg="$1"
+    shift
+
+    local v
+
+    if [ $(( $# % 2 )) -ne 0 ]; then
+        log_error "HPM_PWR_FAIL" "INVALID_FAULT_DECODE_CONFIG"
+        return 0
+    fi
+
+    v="$(i2c_read_byte "${reg}" 2>/dev/null || true)"
+    if [ -z "${v}" ]; then
+        append_read_fail_reg "${reg}"
+        return 0
+    fi
+
+    if ! is_valid_byte "${v}"; then
+        log_error "HPM_PWR_FAIL" "CPLD_I2C_INVALID_VALUE"
+        echo "Invalid CPLD register value '${v}' from reg ${reg}" >&2
+        return 0
+    fi
+
+    while [ "$#" -ge 2 ]; do
+        local bit="$1"
+        local name="$2"
+        shift 2
+
+        case "${bit}" in
+            0|1|2|3|4|5|6|7) ;;
+            *)
+                log_error "HPM_PWR_FAIL" "INVALID_FAULT_DECODE_BIT"
+                continue
+                ;;
+        esac
+
+        if ! bit_is_set "${v}" "${bit}"; then
+            log_error "${name}" "${name}"
+        fi
+    done
+}
+
+function fault_desc_31_35() {
+    local reg="$1"
+    local bit="$2"
+
+    case "${reg}:${bit}" in
+        0x31:0) echo "FM_PVDD18_S5_P0_FLT" ;;
+        0x31:1) echo "FM_PVDD33_S5_P0_FLT" ;;
+        0x31:2|0x31:3|0x31:4|0x31:5|0x31:6|0x31:7) return 1 ;;
+
+        0x32:0) echo "PDB_P12V_VRM0_FLT" ;;
+        0x32:1) echo "PDB_P12V_VRM1_FLT" ;;
+        0x32:2) echo "PDB_MAIN_EN_R_FLT" ;;
+        0x32:3|0x32:4|0x32:5|0x32:6|0x32:7) return 1 ;;
+
+        0x33:0) echo "FM_P3V3_EN_FLT" ;;
+        0x33:1) echo "FM_DIMM_IP_FAIL" ;;
+        0x33:2) echo "FM_DIMM_AH_FAIL" ;;
+        0x33:3|0x33:4|0x33:5|0x33:6|0x33:7) return 1 ;;
+
+        0x34:0) echo "FM_CPU0_DIMM_IP_P12V_EN_R_FLT" ;;
+        0x34:1) echo "FM_CPU0_DIMM_AH_P12V_EN_R_FLT" ;;
+        0x34:2|0x34:3|0x34:4|0x34:5|0x34:6|0x34:7) return 1 ;;
+
+        0x35:0) echo "FM_PVDDCR_CPU1_P0_FLT" ;;
+        0x35:1) echo "FM_PVDDCR_CPU0_P0_FLT" ;;
+        0x35:2) echo "FM_PVDDCR_SOC_P0_FLT" ;;
+        0x35:3) echo "FM_PVDDIO_P0_FLT" ;;
+        0x35:4) echo "FM_PVDDIO_MEM_S3_P0_FLT" ;;
+        0x35:5|0x35:6|0x35:7) return 1 ;;
+
+        *) return 1 ;;
+    esac
+}
+
+function join_unknown_bits() {
+    local bits="$1"
+    local result=""
+    local bit
+
+    for bit in ${bits}; do
+        if [ -z "${result}" ]; then
+            result="${bit}"
+        else
+            result="${result},${bit}"
+        fi
+    done
+
+    printf '%s' "${result}"
+}
+
+function check_31_35_faults() {
+    local reg v val bit desc
+    local unknown_bits unknown_bits_csv
+
+    for reg in 0x31 0x32 0x33 0x34 0x35; do
+        v="$(i2c_read_byte "${reg}" 2>/dev/null || true)"
+        if [ -z "${v}" ]; then
+            append_read_fail_reg "${reg}"
+            continue
+        fi
+
+        if ! is_valid_byte "${v}"; then
+            log_error "HPM_PWR_FAIL" "CPLD_I2C_INVALID_VALUE"
+            echo "Invalid CPLD register value '${v}' from reg ${reg}" >&2
+            continue
+        fi
+
+        val=$((v))
+        [ "${val}" -eq 0 ] && continue
+
+        unknown_bits=""
+
+        for bit in 0 1 2 3 4 5 6 7; do
+            if (( (val >> bit) & 1 )); then
+                if desc="$(fault_desc_31_35 "${reg}" "${bit}" 2>/dev/null)"; then
+                    log_error "${desc}" "${desc}"
+                else
+                    unknown_bits="${unknown_bits} ${bit}"
+                fi
+            fi
+        done
+
+        if [ -n "${unknown_bits}" ]; then
+            unknown_bits_csv="$(join_unknown_bits "${unknown_bits}")"
+            log_error "HPM_PWR_FAIL" "UNKNOWN_CPLD_FAULT_BIT"
+            echo "Unknown CPLD fault bits detected: reg ${reg}, bits ${unknown_bits_csv}, value ${v}" >&2
+        fi
+    done
+}
+
+function main() {
+    check_bits_expect_1 0x20 \
+        1 "PWRGD_PVDD33_S5_P0_PG" \
+        0 "PWRGD_PVDD18_S5_P0_PG"
+
+    check_bits_expect_1 0x22 \
+        0 "AMCROT_BMC_S5_RDY_R" \
+        1 "AMC_RDY_R"
+
+    check_bits_expect_1 0x23 \
+        2 "PWRGD_PDB_HSC4_CPLD_PG_R" \
+        1 "PWRGD_P12V_VRM0_CPLD_PG_R" \
+        0 "PWRGD_P12V_VRM1_CPLD_PG_R" \
+        3 "PWRGD_P3V3"
+
+    check_bits_expect_1 0x24 \
+        5 "P12V_DDR_AH_PWRGD_R" \
+        4 "P12V_DDR_IP_PWRGD_R"
+
+    check_bits_expect_1 0x25 \
+        4 "PWRGD_PVDDIO_MEM_S3_P0" \
+        3 "PWRGD_PVDDIO_P0" \
+        2 "PWRGD_PVDDCR_SOC_P0" \
+        1 "PWRGD_PVDDCR_CPU0_P0" \
+        0 "PWRGD_PVDDCR_CPU1_P0"
+
+    check_bits_expect_1 0x27 \
+        4 "EAM0_CPU_MOD_PWR_GD_R" \
+        5 "EAM1_CPU_MOD_PWR_GD_R" \
+        6 "EAM2_CPU_MOD_PWR_GD_R" \
+        7 "EAM3_CPU_MOD_PWR_GD_R"
+
+    check_bits_expect_1 0x2A \
+        3 "FM_PWRGD_CPU0_PWROK" \
+        2 "FM_RST_CPU0_RESET_N"
+
+    check_bits_expect_1 0x38 \
+        1 "PWRGD_P1V0_STBY"
+
+    check_bits_expect_1 0x40 \
+        5 "HPM_STBY_RST_N"
+
+    check_bits_expect_1 0x43 \
+        7 "FM_MAIN_PWREN_RMC_EN_ISO"
+
+    check_31_35_faults
+    flush_read_fail_logs
+    flush_no_fault_decoded_log
+}
+
+main
