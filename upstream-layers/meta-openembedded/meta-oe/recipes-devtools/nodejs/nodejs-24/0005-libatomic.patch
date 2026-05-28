@@ -1,0 +1,95 @@
+From 15e751e4b79475fb34e4b32a3ca54119b20c564a Mon Sep 17 00:00:00 2001
+From: Hongxu Jia <hongxu.jia@windriver.com>
+Date: Sat, 17 Aug 2024 21:33:18 +0800
+Subject: [PATCH] link libatomic for clang conditionally
+
+Clang emits atomic builtin, explicitly link libatomic conditionally:
+- For target build, always link -latomic for clang as usual
+- For host build, if host and target have same bit width, cross compiling
+  is enabled, and host toolchain is gcc which does not link -latomic;
+  if host and target have different bit width, no cross compiling,
+  host build is the same with target build that requires to link
+  -latomic;
+
+Fix:
+|tmp-glibc/work/core2-64-wrs-linux/nodejs/20.13.0/node-v20.13.0/out/Release/node_js2c: error while loading shared libraries: libatomic.so.1: cannot open shared object file: No such file or directory
+
+Upstream-Status: Inappropriate [OE specific]
+
+Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
+
+Added libatomic library explicitly to x86 targets.
+
+Signed-off-by: Gyorgy Sarvari <skandigraun@gmail.com>
+---
+ node.gyp                 | 13 ++++++++++++-
+ tools/v8_gypfiles/v8.gyp | 29 ++++++++++++++++++++++++-----
+ 2 files changed, 36 insertions(+), 6 deletions(-)
+
+--- a/node.gyp
++++ b/node.gyp
+@@ -503,7 +503,18 @@
+         ],
+       }],
+       ['OS=="linux" and clang==1', {
+-        'libraries': ['-latomic'],
++        'target_conditions': [
++           ['_toolset=="host"', {
++             'conditions': [
++               ['"<!(echo $HOST_AND_TARGET_SAME_WIDTH)"=="0"', {
++                 'libraries': ['-latomic'],
++               }],
++             ],
++           }],
++           ['_toolset=="target"', {
++             'libraries': ['-latomic'],
++           }],
++        ],
+       }],
+     ],
+   },
+--- a/tools/v8_gypfiles/v8.gyp
++++ b/tools/v8_gypfiles/v8.gyp
+@@ -1324,10 +1324,24 @@
+         # Platforms that don't have Compare-And-Swap (CAS) support need to link atomic library
+         # to implement atomic memory access.
+         # Clang needs it for some atomic operations (https://clang.llvm.org/docs/Toolchain.html#atomics-library).
+-        ['(OS=="linux" and clang==1) or (v8_current_cpu in ["mips64", "mips64el", "arm", "riscv64", "loong64"])', {
+-          'link_settings': {
+-            'libraries': ['-latomic', ],
+-          },
++        ['(OS=="linux" and clang==1) or \
++          (v8_current_cpu in ["mips64", "mips64el", "arm", "riscv64", "loong64"])', {
++          'target_conditions': [
++             ['_toolset=="host"', {
++               'conditions': [
++                 ['"<!(echo $HOST_AND_TARGET_SAME_WIDTH)"=="0"', {
++                   'link_settings': {
++                     'libraries': ['-latomic'],
++                   },
++                 }],
++               ],
++             }],
++             ['_toolset=="target"', {
++               'link_settings': {
++                 'libraries': ['-latomic', ],
++               },
++             }],
++           ],
+         }],
+       ],
+     },  # v8_base_without_compiler
+@@ -1793,6 +1805,13 @@
+         ['enable_lto=="true"', {
+           'ldflags': [ '-fno-lto' ],
+         }],
++        # For future patch-rebases: this hunk is in mksnapshot target.
++        # ia32 includes x86 also
++        ['v8_target_arch=="ia32"', {
++          'link_settings': {
++            'libraries': ['-latomic']
++          }
++        }],
+       ],
+     },  # mksnapshot
+     {

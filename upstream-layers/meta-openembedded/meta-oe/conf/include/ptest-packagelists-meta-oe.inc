@@ -50,6 +50,7 @@ PTESTS_FAST_META_OE = "\
     nlohmann-json \
     nodejs \
     onig \
+    openjpeg \
     oprofile \
     pegtl \
     pv \

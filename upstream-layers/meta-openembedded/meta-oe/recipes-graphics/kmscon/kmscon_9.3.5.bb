@@ -20,7 +20,10 @@ DEPENDS = "\
     zlib \
 "
 
-SRC_URI = "git://github.com/kmscon/kmscon;protocol=https;branch=main;tag=v${PV}"
+SRC_URI = "\
+    git://github.com/kmscon/kmscon;protocol=https;branch=main;tag=v${PV} \
+    file://0001-fix-zlib-cross-compiling-errors.patch \
+"
 SRCREV = "a8832afb1dcca5bb4c0476d4c13c7239fecbd93a"
 
 inherit meson pkgconfig systemd

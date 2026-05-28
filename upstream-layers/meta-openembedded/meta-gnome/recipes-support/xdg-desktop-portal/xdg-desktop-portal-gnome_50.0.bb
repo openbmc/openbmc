@@ -23,9 +23,7 @@ REQUIRED_DISTRO_FEATURES = "polkit"
 
 SRC_URI[archive.sha256sum] = "ceeef2fb68b34b3f66a3def0a332a22a70af272641fb6c50065b7a2fde3d5759"
 
-PACKAGECONFIG ?= "screenshot screencast ${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)}"
+PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'wayland', d)}"
 PACKAGECONFIG[wayland] = ",,wayland-native"
-PACKAGECONFIG[screenshot] = ",,,gnome-shell"
-PACKAGECONFIG[screencast] = ",,,mutter"
 
 FILES:${PN} += "${systemd_user_unitdir} ${datadir}"

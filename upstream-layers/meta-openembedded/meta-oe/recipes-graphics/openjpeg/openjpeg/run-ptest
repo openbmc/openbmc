@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Only run unit tests, exclude nonregression and conformance tests that need external data files
+ctest -E "(NR-|CONF-|ETS-|testjp2)" -V | sed -u 's/\*\*\*/ /g' | awk '/Test +#/{gsub(/Passed/,"PASS"); gsub(/Failed/,"FAIL"); gsub(/Skipped/,"SKIP"); print $6": "$4; fflush();}'

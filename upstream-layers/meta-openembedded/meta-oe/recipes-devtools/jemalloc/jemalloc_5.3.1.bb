@@ -17,7 +17,7 @@ SRC_URI = "git://github.com/jemalloc/jemalloc.git;branch=master;protocol=https;t
            file://run-ptest \
            "
 SRCREV = "81034ce1f1373e37dc865038e1bc8eeecf559ce8"
-PV_LONG := "${PV}-171-g${SRCREV}"
+PV_LONG := "${PV}-0-g${SRCREV}"
 
 inherit autotools ptest
 

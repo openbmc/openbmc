@@ -109,6 +109,7 @@ remove_libdevmapper_sysroot_preprocess() {
     rm -f ${SYSROOT_DESTDIR}${libdir}/libdevmapper.so* \
        ${SYSROOT_DESTDIR}${sbindir}/dmsetup \
        ${SYSROOT_DESTDIR}${sbindir}/dmstats \
+       ${SYSROOT_DESTDIR}${sbindir}/dmvdostats \
        ${SYSROOT_DESTDIR}${includedir}/libdevmapper.h \
        ${SYSROOT_DESTDIR}${libdir}/pkgconfig/devmapper.pc
 }
