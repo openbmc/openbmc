@@ -19,11 +19,12 @@ i2ctransfer -y 13 w5@0x09 0x04 0xB5 0x16 0x28 0x80
 i2ctransfer -y 13 w2@0x09 0x07 0x80
 
 # 5. Check SSC Enable/Disable status
-i2ctransfer -y 13 w1@0x09 0x07 r1
-
-if [ $? -ne 128 ]; then
-    exit 1
+ret=$(i2ctransfer -y 13 w1@0x09 0x07 r1 2>/dev/null | tr -d ' ')
+if [ "$ret" != "0x80" ]; then
+    echo "Wrong SSC status read: $ret"
 fi
+echo "SSC deassertion is triggered by power-good drop, \
+    set SSC to -0.25% for better signal integrity"
 
 currentstate=$(busctl get-property \
     xyz.openbmc_project.State.Host0 \
