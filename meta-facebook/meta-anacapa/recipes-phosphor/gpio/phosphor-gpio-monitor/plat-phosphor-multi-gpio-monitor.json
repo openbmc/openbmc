@@ -52,9 +52,8 @@
         "LineName": "DIMM_PMIC_PG_TIMEOUT",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_HIGH": ["power-rail-logger@DIMM_PMIC_PG_TIMEOUT:assert.service"],
-            "FALLING":  ["power-rail-logger@DIMM_PMIC_PG_TIMEOUT:deassert.service"],
-            "RISING":   ["power-rail-logger@DIMM_PMIC_PG_TIMEOUT:assert.service"]
+            "INIT_HIGH": ["dimm-power-fault-logger@DIMM_PMIC_PG_TIMEOUT.service"],
+            "RISING":   ["dimm-power-fault-logger@DIMM_PMIC_PG_TIMEOUT.service"]
         },
         "Continue": true
     },
@@ -189,50 +188,6 @@
             "RISING":   ["power-rail-logger@FM_MAIN_PWREN_RMC_EN_ISO:deassert.service"]
         },
         "Continue": true
-    },
-    {
-        "Name": "PWRGD_CHMP_CPU0_FPGA",
-        "LineName": "PWRGD_CHMP_CPU0_FPGA",
-        "EventMon": "BOTH",
-        "Targets": {
-            "INIT_LOW": ["power-rail-logger@PWRGD_CHMP_CPU0_FPGA:assert.service"],
-            "FALLING":  ["power-rail-logger@PWRGD_CHMP_CPU0_FPGA:assert.service"],
-            "RISING":   ["power-rail-logger@PWRGD_CHMP_CPU0_FPGA:deassert.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "PWRGD_CHIL_CPU0_FPGA",
-        "LineName": "PWRGD_CHIL_CPU0_FPGA",
-        "EventMon": "BOTH",
-        "Targets": {
-            "INIT_LOW": ["power-rail-logger@PWRGD_CHIL_CPU0_FPGA:assert.service"],
-            "FALLING":  ["power-rail-logger@PWRGD_CHIL_CPU0_FPGA:assert.service"],
-            "RISING":   ["power-rail-logger@PWRGD_CHIL_CPU0_FPGA:deassert.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "PWRGD_CHEH_CPU0_FPGA",
-        "LineName": "PWRGD_CHEH_CPU0_FPGA",
-        "EventMon": "BOTH",
-        "Targets": {
-            "INIT_LOW": ["power-rail-logger@PWRGD_CHEH_CPU0_FPGA:assert.service"],
-            "FALLING":  ["power-rail-logger@PWRGD_CHEH_CPU0_FPGA:assert.service"],
-            "RISING":   ["power-rail-logger@PWRGD_CHEH_CPU0_FPGA:deassert.service"]
-        },
-        "Continue": true
-    },
-    {
-        "Name": "PWRGD_CHAD_CPU0_FPGA",
-        "LineName": "PWRGD_CHAD_CPU0_FPGA",
-        "EventMon": "BOTH",
-        "Targets": {
-            "INIT_LOW": ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:assert.service"],
-            "FALLING":  ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:assert.service"],
-            "RISING":   ["power-rail-logger@PWRGD_CHAD_CPU0_FPGA:deassert.service"]
-        },
-	"Continue": true
     },
     {
         "Name": "FM_BIOS_POST_CMPLT_R_N",

@@ -1,0 +1,64 @@
+#!/bin/bash
+set -euo pipefail
+
+trigger="${1:-unknown}"
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+
+CPLD_BUS="6"
+CPLD_ADDR="0x20"
+PWRGD_REG="0x24"
+
+read_cpld_reg()
+{
+    local bus="$1"
+    local addr="$2"
+    local reg="$3"
+
+    i2cget -y "${bus}" "${addr}" "${reg}" 2>/dev/null
+}
+
+log_power_fault()
+{
+    local rail="$1"
+    local failure_data="$2"
+    local device_path="/xyz/openbmc_project/inventory/system/board/Anacapa_MB/${rail}"
+    local stash_file="/run/${rail}.log_entry"
+
+    if [ ! -s "${stash_file}" ]; then
+        /usr/bin/log-create "${MSG_ID}" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"${failure_data}\"}" \
+            > "${stash_file}"
+    fi
+}
+
+rails=(
+    "PWRGD_CHMP_CPU0_FPGA:0"
+    "PWRGD_CHIL_CPU0_FPGA:1"
+    "PWRGD_CHEH_CPU0_FPGA:2"
+    "PWRGD_CHAD_CPU0_FPGA:3"
+)
+
+reg_value="$(read_cpld_reg "${CPLD_BUS}" "${CPLD_ADDR}" "${PWRGD_REG}" || true)"
+if [[ -z "${reg_value}" ]]; then
+    log_power_fault "${trigger}" "CPLD_I2C_READ_FAIL"
+    echo "Failed to read CPLD register ${PWRGD_REG} from bus ${CPLD_BUS}, addr ${CPLD_ADDR}" >&2
+    exit 1
+fi
+
+valid_reg_value='^(0x[0-9a-fA-F]+|[0-9]+)$'
+if ! [[ "${reg_value}" =~ ${valid_reg_value} ]]; then
+    log_power_fault "${trigger}" "CPLD_I2C_INVALID_VALUE"
+    echo "Invalid CPLD register value '${reg_value}' from ${PWRGD_REG}" >&2
+    exit 1
+fi
+
+reg_value=$((reg_value))
+
+
+for item in "${rails[@]}"; do
+    IFS=":" read -r rail bit <<< "${item}"
+
+    if (( (reg_value & (1 << bit)) == 0 )); then
+        log_power_fault "${rail}" "${rail}"
+    fi
+done

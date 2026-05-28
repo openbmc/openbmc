@@ -10,6 +10,7 @@ SERVICE_LIST = "assert-post-end.service \
                 deassert-power-good-drop.service \
                 multi-gpios-sys-init.service \
                 power-rail-logger@.service \
+                dimm-power-fault-logger@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -24,6 +25,7 @@ SRC_URI += " \
     file://plat-phosphor-multi-gpio-monitor.json \
     file://power-rail-event-logger \
     file://phosphor-multi-gpio-monitor.conf \
+    file://dimm-power-fault-logger \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
 
@@ -52,6 +54,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/deassert-power-good-drop ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/dimm-power-fault-logger ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \
