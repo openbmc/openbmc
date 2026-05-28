@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 import subprocess
+import re
 from functools import cmp_to_key
 import bb
 from   bb.fetch2 import logger, subprocess_setup, UnpackError
@@ -155,26 +156,27 @@ class Crate(Wget):
             with open(mdpath, "w") as f:
                 json.dump(metadata, f)
 
-    def latest_versionstring(self, ud, d):
+    def latest_versionstring(self, ud, d, filter_regex=None):
         """
         Return the latest upstream version, dispatching to the appropriate
         parser based on the versionsurl format.
         """
         if ud.versionsurl.startswith('https://index.crates.io/'):
-            return self._latest_versionstring_from_index(ud, d)
-        return self._latest_versionstring_from_api(ud, d)
+            return self._latest_versionstring_from_index(ud, d, filter_regex)
+        return self._latest_versionstring_from_api(ud, d, filter_regex)
 
-    def _latest_versionstring_from_api(self, ud, d):
+    def _latest_versionstring_from_api(self, ud, d, filter_regex=None):
         """
         Parse the latest version from a [name]/versions JSON API response.
         """
         json_data = json.loads(self._fetch_index(ud.versionsurl, ud, d))
         versions = [(0, i["num"], "") for i in json_data["versions"]]
+        if filter_regex:
+            versions = [v for v in versions if re.match(filter_regex, v[1])]
         versions = sorted(versions, key=cmp_to_key(bb.utils.vercmp))
-
         return (versions[-1][1], "") if versions else ("", "")
 
-    def _latest_versionstring_from_index(self, ud, d):
+    def _latest_versionstring_from_index(self, ud, d, filter_regex=None):
         """
         Parse the latest version from a Cargo sparse index file (NDJSON).
         https://doc.rust-lang.org/cargo/reference/registry-index.html#index-files
@@ -185,6 +187,9 @@ class Crate(Wget):
             data = json.loads(line)
             if not data.get("yanked", False):
                 versions.append((0, data["vers"], ""))
+
+        if filter_regex:
+            versions = [v for v in versions if re.match(filter_regex, v[1])]
 
         versions = sorted(versions, key=cmp_to_key(bb.utils.vercmp))
         return (versions[-1][1], "") if versions else ("", "")
