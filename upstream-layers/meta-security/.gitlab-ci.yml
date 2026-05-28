@@ -67,12 +67,6 @@ qemux86-musl:
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml 2>&1 | tee $CI_PROJECT_DIR/log/qemux86_musl_security_image.txt
 
-qemux86-parsec:
-  extends: .parsec
-  needs: ['qemux86']
-  script:
-  - kas build --target security-parsec-image kas/$CI_JOB_NAME.yml 2>&1 | tee $CI_PROJECT_DIR/log/qemux86_parsec_security_image.txt
-
 qemux86-test:
   extends: .test
   needs: ['qemux86']
@@ -98,12 +92,6 @@ qemuarm:
   extends: .base
   script:
   - kas build --target security-build-image kas/$CI_JOB_NAME.yml 2>&1 | tee $CI_PROJECT_DIR/log/qemuarm_security_image.txt
-
-qemuarm-parsec:
-  extends: .parsec
-  needs: ['qemuarm']
-  script:
-  - kas build --target security-parsec-image kas/$CI_JOB_NAME.yml 2>&1 | tee $CI_PROJECT_DIR/log/qemuarm_parsec_security_image.txt
 
 qemuarm64:
   extends: .base

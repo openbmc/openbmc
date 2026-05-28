@@ -57,7 +57,8 @@ pkg_postinst_ontarget:${PN} () {
     ${libdir}/${BPN}/fseccomp memory-deny-write-execute ${libdir}/${BPN}/seccomp.mdwx
 }
 
-COMPATIBLE_MACHINE:x86_64 = "x86_64"
-COMPATIBLE_MACHINE:arm64 = "arch64"
+COMPATIBLE_MACHINE = "(-)"
+COMPATIBLE_MACHINE:aarch64 = "(.*)"
+COMPATIBLE_MACHINE:x86-64 = "(.*)"
 
 RDEPENDS:${PN} = "bash"

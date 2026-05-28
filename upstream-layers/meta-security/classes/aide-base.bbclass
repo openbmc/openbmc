@@ -2,7 +2,7 @@
 # Copyright 2022 Armin Kuster <akuster808@gmail.com>
 #
 
-STAGING_AIDE_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/aida"
+STAGING_AIDE_DIR ?= "${TMPDIR}/work-shared/${MACHINE}/aide"
 AIDE_INCLUDE_DIRS ?= "/lib"
 AIDE_SKIP_DIRS ?= "/lib/modules/.\*"
 

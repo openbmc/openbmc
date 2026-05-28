@@ -62,10 +62,10 @@ CONF_FILE = "${sysconfdir}/aide.conf"
 FILES:${PN} += "${libdir}/${PN} ${sysconfdir}/aide.conf"
 
 pkg_postinst_ontarget:${PN} () {
-    if [ ${AIDE_SCAN_POSTINIT} ]; then
+    if [ "${AIDE_SCAN_POSTINIT}" = "1" ]; then
         ${bindir}/aide -i
     fi
-    if [ ${AIDE_RESCAN_POSTINIT}  && -e ${libdir}/aide/aide.db.gz ]; then
+    if [ "${AIDE_RESCAN_POSTINIT}" = "1" ] && [ -e ${libdir}/aide/aide.db.gz ]; then
         ${bindir}/aide -C
     fi
 }
