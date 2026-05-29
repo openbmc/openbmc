@@ -11,7 +11,7 @@ DEPENDS = " \
     systemd \
 "
 
-SRCREV = "73e9a8ac43ad55f29cad1a9b1022122d9788104e"
+SRCREV = "def894dc92816dfa9a13c307e9d3adabbdd97ffd"
 
 SRC_URI += "git://github.com/openbmc/platform-init.git;branch=master;protocol=https;branch=main"
 
