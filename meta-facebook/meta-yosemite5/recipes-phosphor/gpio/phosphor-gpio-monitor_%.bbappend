@@ -34,6 +34,8 @@ SRC_URI += "file://phosphor-multi-gpio-monitor.json \
             file://fault-led \
             file://hotplug-ac-cycle@.service \
             file://hotplug-ac-cycle \
+            file://uart-select-led@.service \
+            file://set-uart-select-led \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -56,9 +58,10 @@ SYSTEMD_SERVICE:${PN} += " \
     smc-deassert-log@.service \
     power-rail-assert-log@.service \
     power-rail-deassert-log@.service \
-    file://fault-led-assert@.service \
-    file://fault-led-deassert@.service \
-    file://hotplug-ac-cycle@.service \
+    fault-led-assert@.service \
+    fault-led-deassert@.service \
+    hotplug-ac-cycle@.service \
+    uart-select-led@.service \
     "
 
 do_install:append() {
@@ -83,6 +86,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/fault-led ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/hotplug-ac-cycle ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/set-uart-select-led ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

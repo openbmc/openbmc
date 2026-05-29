@@ -1,0 +1,8 @@
+[Unit]
+Description=Uart Select Led:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/set-uart-select-led %i
+
+SyslogIdentifier=uart-select-led%i

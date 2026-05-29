@@ -527,5 +527,15 @@
             "FALLING": ["hotplug-ac-cycle@FALLING.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "UART_MUX_SEL",
+        "LineName": "UART_MUX_SEL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["uart-select-led@host.service"],
+            "FALLING": ["uart-select-led@bmc.service"]
+        },
+        "Continue": true
     }
 ]
