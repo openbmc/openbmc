@@ -275,6 +275,19 @@ gbmc_br_gw_src_hook() {
       gbmc_br_gw_src_ips["$ip"]="$non_zero"
     elif [[ $action == del ]]; then
       unset 'gbmc_br_gw_src_ips[$ip]'
+      # The kernel will remove source addresses on routes if none of the interfaces
+      # have the source address any longer. Just assume it is pruned and
+      # it will end up getting fixed later.
+      for route in "${!gbmc_br_gw_src_routes[@]}"; do
+        if [[ $route == *" src $ip "* ]]; then
+          unset 'gbmc_br_gw_src_routes[$route]'
+          # shellcheck disable=all
+          if [[ $route =~ ^(.*)' src '[^ ]+(.*)$ ]]; then
+            new_route_key="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+            gbmc_br_gw_src_routes["$new_route_key"]=1
+          fi
+        fi
+      done
     fi
     gbmc_br_gw_src_update
   # check route on gbmcbr with /124 address
