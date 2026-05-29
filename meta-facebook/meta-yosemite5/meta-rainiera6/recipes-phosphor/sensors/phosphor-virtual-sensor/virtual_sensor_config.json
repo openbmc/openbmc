@@ -1,0 +1,1881 @@
+[
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN0_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN0_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN1_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN1_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN2_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN2_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN3_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "CriticalLow": -1,
+            "CriticalHigh": 4.92,
+            "HardShutdownHigh": 6.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_ADC_FAN3_52V_IMON_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ],
+            "ConstParam": [
+                {
+                    "ParamName": "fan_imp",
+                    "Value": 0.1875
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_OFS[21]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 5, 0};",
+            "var CAL_OFS[21]:={0.143, 0.140, 0.136, 0.130, 0.118, 0.107, 0.102, 0.096, 0.096, 0.094, 0.082, 0.078, 0.071, 0.065, 0.054, 0.046, 0.038, 0.031, 0.029, 0.029, 0.029};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    fan_vol/fan_imp+(CAL_OFS[0]+((FAN_DUTY-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    fan_vol/fan_imp+(CAL_OFS[1]+((FAN_DUTY-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    fan_vol/fan_imp+(CAL_OFS[2]+((FAN_DUTY-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    fan_vol/fan_imp+(CAL_OFS[3]+((FAN_DUTY-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    fan_vol/fan_imp+(CAL_OFS[4]+((FAN_DUTY-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    fan_vol/fan_imp+(CAL_OFS[5]+((FAN_DUTY-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    fan_vol/fan_imp+(CAL_OFS[6]+((FAN_DUTY-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    fan_vol/fan_imp+(CAL_OFS[7]+((FAN_DUTY-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    fan_vol/fan_imp+(CAL_OFS[8]+((FAN_DUTY-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    fan_vol/fan_imp+(CAL_OFS[9]+((FAN_DUTY-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_VALID,DUTY_OFS[10]):",
+            "    fan_vol/fan_imp+(CAL_OFS[10]+((FAN_DUTY-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_VALID,DUTY_OFS[11]):",
+            "    fan_vol/fan_imp+(CAL_OFS[11]+((FAN_DUTY-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_VALID,DUTY_OFS[12]):",
+            "    fan_vol/fan_imp+(CAL_OFS[12]+((FAN_DUTY-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_VALID,DUTY_OFS[13]):",
+            "    fan_vol/fan_imp+(CAL_OFS[13]+((FAN_DUTY-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_VALID,DUTY_OFS[14]):",
+            "    fan_vol/fan_imp+(CAL_OFS[14]+((FAN_DUTY-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_VALID,DUTY_OFS[15]):",
+            "    fan_vol/fan_imp+(CAL_OFS[15]+((FAN_DUTY-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_VALID,DUTY_OFS[16]):",
+            "    fan_vol/fan_imp+(CAL_OFS[16]+((FAN_DUTY-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_VALID,DUTY_OFS[17]):",
+            "    fan_vol/fan_imp+(CAL_OFS[17]+((FAN_DUTY-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_VALID,DUTY_OFS[18]):",
+            "    fan_vol/fan_imp+(CAL_OFS[18]+((FAN_DUTY-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  case inrange(DUTY_OFS[20],DUTY_VALID,DUTY_OFS[19]):",
+            "    fan_vol/fan_imp+(CAL_OFS[19]+((FAN_DUTY-DUTY_OFS[19])*(CAL_OFS[20]-CAL_OFS[19])/(DUTY_OFS[20]-DUTY_OFS[19])));",
+            "  default: fan_vol/fan_imp+CAL_OFS[20];",
+            "}"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN0_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN0_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN1_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN1_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN2_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN2_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "PDB_VIRTUAL_FAN3_PWR_W",
+            "SensorType": "power"
+        },
+        "Threshold": {
+            "HardShutdownHigh": 380.8
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "fan_vol",
+                    "Desc": {
+                        "Name": "PDB_HSC_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "fan_curr",
+                    "Desc": {
+                        "Name": "PDB_VIRTUAL_FAN3_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "fan_vol * fan_curr"
+    },
+    {
+        "Desc": {
+            "Name": "SCM_VIRTUAL_CALIBRATED_INLET_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 45
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_SCM"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "INLET_TEMP",
+                    "Desc": {
+                        "Name": "SCM_INLET_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var ARRAY_SIZE:=10;",
+            "var DUTY_OFS[10]:={90,80,70,60,50,40,30,20,10,0};",
+            "var CAL_OFS[10]:={-1.6,-1.7,-1.8,-1.9,-2.2,-2.4,-3.0,-3.8,-4.8,-4.8};",
+
+            "var DUTY_VALID:=ifnan(FAN_DUTY,999);",
+            "var OFFSET:=CAL_OFS[ARRAY_SIZE-1];",
+            "var FOUND:=0;",
+
+            "for(var i:=0; i<ARRAY_SIZE-1; i+=1)",
+            "{",
+            "  if((FOUND == 0) and (DUTY_VALID > DUTY_OFS[i]))",
+            "  {",
+            "    OFFSET:=CAL_OFS[i];",
+            "    FOUND:=1;",
+            "  };",
+            "};",
+
+            "INLET_TEMP + OFFSET"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "MB_CPU_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 95
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "CHIPLET0_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_CC0_MaxTemp",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "CHIPLET1_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_CC1_MaxTemp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "max(CHIPLET0_TEMP, CHIPLET1_TEMP)"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU0_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.513,
+            "WarningLow": 0.54,
+            "WarningHigh": 1.21,
+            "CriticalHigh": 1.2705,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR0_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU0_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 517,
+            "CriticalHigh": 564,
+            "HardShutdownHigh": 609
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR0_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU0_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR0_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU0_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR0_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM0_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.64125,
+            "WarningLow": 0.675,
+            "WarningHigh": 1.21,
+            "CriticalHigh": 1.2705,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR1_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM0_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 22,
+            "CriticalHigh": 24,
+            "HardShutdownHigh": 31.5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR1_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM0_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR1_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM0_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR1_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS0_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.627,
+            "WarningLow": 0.66,
+            "WarningHigh": 1,
+            "CriticalHigh": 1.05,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR2_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS0_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 135.3,
+            "CriticalHigh": 147.6,
+            "HardShutdownHigh": 168
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR2_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS0_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR2_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS0_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR2_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC0_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.6555,
+            "WarningLow": 0.69,
+            "WarningHigh": 1,
+            "CriticalHigh": 1.05,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR3_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC0_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 60.775,
+            "CriticalHigh": 66.3,
+            "HardShutdownHigh": 94.5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR3_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC0_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR3_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC0_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR3_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU1_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.513,
+            "WarningLow": 0.54,
+            "WarningHigh": 1.21,
+            "CriticalHigh": 1.2705,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR4_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU1_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 517,
+            "CriticalHigh": 564,
+            "HardShutdownHigh": 609
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR4_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU1_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR4_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_CPU1_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR4_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM1_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.64125,
+            "WarningLow": 0.675,
+            "WarningHigh": 1.21,
+            "CriticalHigh": 1.2705,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR5_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM1_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 22,
+            "CriticalHigh": 24,
+            "HardShutdownHigh": 31.5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR5_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM1_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR5_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_MEM1_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR5_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS1_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.627,
+            "WarningLow": 0.66,
+            "WarningHigh": 1,
+            "CriticalHigh": 1.05,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR6_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS1_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 135.3,
+            "CriticalHigh": 147.6,
+            "HardShutdownHigh": 168
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR6_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS1_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR6_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SYS1_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR6_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC1_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.6555,
+            "WarningLow": 0.69,
+            "WarningHigh": 1,
+            "CriticalHigh": 1.05,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR7_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC1_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 60.775,
+            "CriticalHigh": 66.3,
+            "HardShutdownHigh": 94.5
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR7_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC1_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR7_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_SOC1_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_VR7_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_0_0_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM0_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_0_1_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM1_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_0_2_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM2_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_0_3_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM3_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_0_4_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM4_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_0_5_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM5_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_1_0_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM6_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_1_1_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM7_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_1_2_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM8_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_1_3_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM9_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_1_4_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM10_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_DIMM_1_5_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 85
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/CPU0"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "DIMM_TEMP",
+                    "Desc": {
+                        "Name": "CPU0_PHX_DIMM11_Temp",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "DIMM_TEMP"
+    }
+]
