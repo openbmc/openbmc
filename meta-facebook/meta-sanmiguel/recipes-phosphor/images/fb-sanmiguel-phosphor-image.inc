@@ -8,7 +8,6 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 # Monitor gpio status
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-gpio-monitor \
-    phosphor-gpio-monitor-presence \
 "
 
 # Enable obmc-phosphor-buttons which needed by debug card function.
