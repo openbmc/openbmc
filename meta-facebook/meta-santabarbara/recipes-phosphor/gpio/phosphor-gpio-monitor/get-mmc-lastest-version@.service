@@ -3,6 +3,6 @@ Description=Get the latest MMC version
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/phosphor-gpio-monitor/get-mmc-lastest-version
+ExecStart=/usr/libexec/phosphor-gpio-monitor/get-mmc-lastest-version "%i"
 
 SyslogIdentifier=get-mmc-lastest-version

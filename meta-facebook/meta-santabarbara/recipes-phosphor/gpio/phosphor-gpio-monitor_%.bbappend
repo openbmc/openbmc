@@ -13,7 +13,7 @@ SERVICE_LIST = "assert-module-power-good@.service \
                 deassert-power-good-drop.service \
                 deassert-reset-button.service \
                 deassert-rmc-main-power-enable.service \
-                get-mmc-lastest-version.service \
+                get-mmc-lastest-version@.service \
                 platform-host-ready.target \
                 power-rail-assert-log@.service \
                 power-rail-deassert-log@.service \

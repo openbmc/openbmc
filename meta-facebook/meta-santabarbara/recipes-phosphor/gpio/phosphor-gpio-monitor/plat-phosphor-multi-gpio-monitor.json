@@ -170,6 +170,50 @@
         "Continue": true
     },
     {
+        "Name": "I3C_MCIO_1B_ALERT_ISO_R_N",
+        "LineName": "I3C_MCIO_1B_ALERT_ISO_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "get-mmc-lastest-version@0.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "I3C_MCIO_2B_ALERT_ISO_R_N",
+        "LineName": "I3C_MCIO_2B_ALERT_ISO_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "get-mmc-lastest-version@2.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "I3C_MCIO_3B_ALERT_ISO_R_N",
+        "LineName": "I3C_MCIO_3B_ALERT_ISO_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "get-mmc-lastest-version@1.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "I3C_MCIO_4B_ALERT_ISO_R_N",
+        "LineName": "I3C_MCIO_4B_ALERT_ISO_R_N",
+        "EventMon": "FALLING",
+        "Targets": {
+            "FALLING": [
+                "get-mmc-lastest-version@3.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "FM_P3V3_E1S_0_FAULT_R_N",
         "LineName": "FM_P3V3_E1S_0_FAULT_R_N",
         "EventMon": "BOTH",
@@ -333,8 +377,7 @@
             ],
             "FALLING": [
                 "assert-post-end.service",
-                "platform-host-ready.target",
-                "get-mmc-lastest-version.service"
+                "platform-host-ready.target"
             ]
         },
         "Continue": true

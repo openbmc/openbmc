@@ -1,8 +1,22 @@
 #!/bin/bash
 
-eids="10 20 30 40"
+retry_count=3
 retry_delay_sec=5
-lock_delay_sec=120
+version_prefixes=(
+    "flash hamsa BOOT0:"
+    "flash medha0 BOOT0:"
+    "flash medha1 BOOT0:"
+)
+
+instance_to_eid() {
+    case "$1" in
+        0) echo 10 ;;
+        1) echo 20 ;;
+        2) echo 30 ;;
+        3) echo 40 ;;
+        *) return 1 ;;
+    esac
+}
 
 eid_to_module() {
     case "$1" in
@@ -24,7 +38,7 @@ get_pldm_object_path() {
 
     path=$(
         busctl tree xyz.openbmc_project.PLDM |
-        grep -m1 "/xyz/openbmc_project/software/Santa_Barbara_Rainbow_module_${module}_MMC_Component_${compid}_" |
+        grep -Ei -m1 "/xyz/openbmc_project/software/.*module_${module}.*MMC.*Component_${compid}_" |
         sed 's/^[^\/]*//'
     )
 
@@ -62,73 +76,78 @@ is_eid_idle() {
     return 1
 }
 
-declare -A processed
-declare -A locked_until
+instance=$1
+eid=$(instance_to_eid "$instance") || {
+    echo "Invalid MMC instance '$instance'. Expected 0-3." >&2
+    exit 1
+}
+module=$(eid_to_module "$eid") || {
+    echo "Invalid EID '$eid'. Expected 10, 20, 30, or 40." >&2
+    exit 1
+}
+version_prefixes_json=$(jq -cn '$ARGS.positional' --args "${version_prefixes[@]}")
 
-remaining=0
+for ((attempt = 1; attempt <= retry_count; attempt++)); do
+    echo "EID $eid attempt $attempt/$retry_count"
 
-for eid in $eids; do
-    processed["$eid"]=0
-    locked_until["$eid"]=0
-    remaining=$((remaining + 1))
-done
+    if ! is_eid_idle "$eid"; then
+        [ "$attempt" -lt "$retry_count" ] && sleep "$retry_delay_sec"
+        continue
+    fi
 
-while [ "$remaining" -gt 0 ]; do
-    now=$(date +%s)
+    output=$(
+        pldmtool fw_update GetFirmwareParameters -m "$eid" 2>/dev/null |
+        jq -r --argjson prefixes "$version_prefixes_json" '
+            .ComponentParameterEntries[]
+            | select((.ActiveComponentVersionString // "") as $version | any($prefixes[]; . as $prefix | $version | startswith($prefix)))
+            | (.ComponentIdentifier | tostring) + "#" + (.ActiveComponentVersionString // "")
+        '
+    )
 
-    for eid in $eids; do
-        [ "${processed[$eid]}" -eq 1 ] && continue
+    if [ -z "$output" ]; then
+        echo "EID $eid failed to get firmware parameters"
+        [ "$attempt" -lt "$retry_count" ] && sleep "$retry_delay_sec"
+        continue
+    fi
 
-        if [ "$now" -lt "${locked_until[$eid]}" ]; then
-            continue
-        fi
+    updated=0
+    failed=0
 
-        if ! is_eid_idle "$eid"; then
-            locked_until["$eid"]=$((now + lock_delay_sec))
-            echo "EID $eid locked for ${lock_delay_sec}s"
-            continue
-        fi
-
-        output=$(
-            pldmtool fw_update GetFirmwareParameters -m "$eid" 2>/dev/null |
-            jq -r '
-                .ComponentParameterEntries[]
-                | select((.ActiveComponentVersionString // "") | startswith("flash hamsa BOOT0:"))
-                | (.ComponentIdentifier | tostring) + "#" + (.ActiveComponentVersionString // "")
-            '
-        )
-
-        if [ -z "$output" ]; then
-            continue
-        fi
-
-        IFS="#" read -r compId version <<< "$output"
-
-        if [[ "$version" == "flash hamsa BOOT0: 000000 00000000" || \
-              "$version" == "flash hamsa BOOT0: ffffff "* ]]; then
-            continue
-        fi
-
+    while IFS="#" read -r compId version; do
         pldmObjPath=$(get_pldm_object_path "$eid" "$compId")
 
         if [ -z "$pldmObjPath" ]; then
+            echo "EID $eid failed to find PLDM object path for component $compId"
+            busctl tree xyz.openbmc_project.PLDM |
+                grep -Ei "/xyz/openbmc_project/software/.*module_${module}.*MMC" |
+                sed 's/^[^\/]*//' |
+                sed 's/^/candidate PLDM path: /'
+            failed=1
             continue
         fi
 
-        echo "EID $eid: path=$pldmObjPath"
+        echo "EID $eid: path=$pldmObjPath" version="$version"
 
         if busctl set-property \
             xyz.openbmc_project.PLDM \
             "$pldmObjPath" \
             xyz.openbmc_project.Software.Version \
             Version s "$version"; then
-            echo "EID $eid updated: $version"
-            processed["$eid"]=1
-            remaining=$((remaining - 1))
+            echo "EID $eid updated component $compId: $version"
+            updated=$((updated + 1))
         else
-            echo "EID $eid failed to update"
+            echo "EID $eid failed to update component $compId"
+            failed=1
         fi
-    done
+    done <<< "$output"
 
-    [ "$remaining" -gt 0 ] && sleep "$retry_delay_sec"
+    if [ "$failed" -eq 0 ] && [ "$updated" -gt 0 ]; then
+        echo "EID $eid updated $updated components"
+        exit 0
+    fi
+
+    [ "$attempt" -lt "$retry_count" ] && sleep "$retry_delay_sec"
 done
+
+echo "EID $eid failed after $retry_count attempts"
+exit 1
