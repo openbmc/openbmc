@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="10-0040", ATTR{name}=="ina230", ATTR{shunt_resistor}="1000"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="10-0045", ATTR{name}=="ina230", ATTR{shunt_resistor}="1000"
