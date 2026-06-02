@@ -3,7 +3,7 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 
 inherit allarch systemd obmc-phosphor-systemd
 
-S = "${UNPACKDIR}/sources"
+S = "${UNPACKDIR}"
 
 RDEPENDS:${PN} += "bash"
 RDEPENDS:${PN} += "fb-common-functions"
