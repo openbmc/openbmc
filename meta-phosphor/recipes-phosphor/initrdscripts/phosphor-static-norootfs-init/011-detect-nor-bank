@@ -3,3 +3,4 @@
 MEDIA_DIR="/run/media"
 mkdir -p $MEDIA_DIR
 echo "Unknown" > "$MEDIA_DIR/slot"
+echo "Unknown" > "/run/boot-device"

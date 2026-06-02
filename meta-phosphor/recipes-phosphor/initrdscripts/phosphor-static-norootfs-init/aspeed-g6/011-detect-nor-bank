@@ -10,6 +10,8 @@ mkdir -p $MEDIA_DIR
 FMC_WDT2_CTRL_VAL=$(printf "%d\n" "$(/sbin/devmem 0x1e620064)")
 if [ "$((FMC_WDT2_CTRL_VAL & 0x00000010))" != "0" ]; then
     echo "1" > "$MEDIA_DIR/slot"
+    echo "Secondary SPI" > "/run/boot-device"
 else
     echo "0" > "$MEDIA_DIR/slot"
+    echo "Primary SPI" > "/run/boot-device"
 fi
