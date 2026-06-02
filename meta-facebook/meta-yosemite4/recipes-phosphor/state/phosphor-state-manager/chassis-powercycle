@@ -184,7 +184,7 @@ chassis-power-cycle()
             busctl set-property "$CHASSIS_BUS_NAME""$CHASSIS_ID" "$CHASSIS_OBJ_PATH""$CHASSIS_ID" "$CHASSIS_INTF_NAME" "$CHASSIS_PROPERTY_NAME" s "$CHASSIS_ON_PROPERTY"
             /usr/libexec/phosphor-state-manager/wait-until-mctp-connection-done "$CHASSIS_ID"
             systemctl restart "phosphor-discover-system-state@$CHASSIS_ID.service"
-            systemctl restart "log-chassis-powercycle-sel@$CHASSIS_ID.service"
+            systemctl --no-block restart "log-chassis-powercycle-sel@$CHASSIS_ID.service"
             msg="Chassis$CHASSIS_ID is AC power on"
             echo "${msg}"
             exit 0;
