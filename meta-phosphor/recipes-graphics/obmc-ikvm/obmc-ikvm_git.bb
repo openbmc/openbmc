@@ -3,7 +3,7 @@ DESCRIPTION = "obmc-ikvm is a vncserver for JPEG-serving V4L2 devices to allow i
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=75859989545e37968a99b631ef42722e"
 DEPENDS = " libvncserver systemd sdbusplus phosphor-logging phosphor-dbus-interfaces"
-SRCREV = "5ffea58e675b3ccee8e7b646e39c06b1d6b4dded"
+SRCREV = "9cfcb2d4037fcd3301687da9f7cc833b54303c95"
 PV = "1.0+git${SRCPV}"
 
 SRC_URI = "git://github.com/openbmc/obmc-ikvm;branch=master;protocol=https"
