@@ -74,6 +74,14 @@ PACKAGECONFIG[install-utils] = "-Dinstall-utils=enabled, -Dinstall-utils=disable
 
 PACKAGECONFIG[auto-reboot-on-bmc-quiesce] = "-Dauto-reboot-on-bmc-quiesce=enabled,-Dauto-reboot-on-bmc-quiesce=disabled"
 
+# Calculate the maximum chassis instance number from OBMC_CHASSIS_INSTANCES
+CHASSIS_SMP_MAX_INSTANCE = "${@max(map(int, d.getVar('OBMC_CHASSIS_INSTANCES').split()))}"
+
+# Enable multi-chassis SMP support where chassis instance 0 aggregates state
+# from chassis instances 1-N. The num-chassis-smp is set to the maximum chassis
+# instance number from OBMC_CHASSIS_INSTANCES.
+PACKAGECONFIG[multi-chassis-smp] = "-Dmulti-chassis-smp=enabled -Dnum-chassis-smp=${CHASSIS_SMP_MAX_INSTANCE},-Dmulti-chassis-smp=disabled"
+
 # The host-check function will check if the host is running
 # after a BMC reset.
 # The reset-sensor-states function will reset the host
@@ -127,6 +135,7 @@ SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-on@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-running@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-on@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-off@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "${@bb.utils.contains('PACKAGECONFIG', 'multi-chassis-smp', 'phosphor-chassis-wait-for-smp-poweron.service', '', d)}"
 
 SYSTEMD_SERVICE:${PN}-chassis-poweron-log += "phosphor-create-chassis-poweron-log@.service"
 
