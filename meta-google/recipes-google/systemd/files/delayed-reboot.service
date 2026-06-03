@@ -1,0 +1,8 @@
+[Unit]
+Description=Delayed Reboot Service
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sleep 5
+ExecStart=/bin/systemctl start reboot.target --job-mode=replace-irreversibly
