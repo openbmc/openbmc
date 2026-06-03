@@ -35,6 +35,7 @@ RDEPENDS:${PN}-inventory:remove:huygens = " openpower-occ-control"
 RDEPENDS:${PN}-fan-control:append:ibm-ac-server = " fan-watchdog"
 RDEPENDS:${PN}-fan-control:append:ibm-enterprise = " fan-watchdog"
 RDEPENDS:${PN}-fan-control:append:sbp1 = " fan-watchdog phosphor-fan-sensor-monitor"
+RDEPENDS:${PN}-fan-control:remove:huygens = " fan-watchdog"
 
 RDEPENDS:${PN}-extras:append:ibm-ac-server = " ${POWER_SERVICE_PACKAGES_AC_SERVER}"
 RDEPENDS:${PN}-extras:append:ibm-enterprise = " ${POWER_SERVICE_PACKAGES_IBM_ENTERPRISE} dbus-sensors phosphor-virtual-sensor"
