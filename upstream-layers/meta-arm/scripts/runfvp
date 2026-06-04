@@ -27,6 +27,7 @@ def parse_args(arguments):
     group.add_argument("-t", "--terminals", choices=terminals.all_terminals(), default=terminals.preferred_terminal(), help=f"Automatically start terminals (default: %(default)s). Available terminals are ({available_terminals})")
     group.add_argument("-c", "--console", action="store_true", help="Attach the first uart to stdin/stdout")
     parser.add_argument("--verbose", action="store_true", help="Output verbose logging")
+    parser.add_argument("--dry-run", action="store_true", help="Print the FVP command and exit")
     parser.usage = f"{parser.format_usage().strip()} -- [ arguments passed to FVP ]"
     # TODO option for telnet vs netcat
 
@@ -53,6 +54,12 @@ def parse_args(arguments):
 def start_fvp(args, fvpconf, extra_args):
     fvp = runner.FVPRunner(logger)
     try:
+
+        if args.dry_run:
+            config = conffile.load(fvpconf)
+            cli = runner.cli_from_config(config, args.terminals) + extra_args
+            print(runner.shlex_join(cli))
+            return 0
 
         if args.terminals:
             if not terminal.terminals[args.terminals].is_ready():

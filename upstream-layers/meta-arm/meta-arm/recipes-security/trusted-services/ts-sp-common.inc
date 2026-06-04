@@ -33,6 +33,7 @@ INSANE_SKIP:${PN}-dev += "ldflags"
 TOOLCHAIN = "gcc"
 
 # FORTIFY_SOURCE is a glibc feature. Disable it for all SPs as these do not use glibc.
+TARGET_CFLAGS += "-Wno-error=unused-but-set-variable"
 TARGET_CFLAGS:remove = "-D_FORTIFY_SOURCE=2"
 OECMAKE_C_FLAGS:remove = "-D_FORTIFY_SOURCE=2"
 OECMAKE_CXX_FLAGS:remove = "-D_FORTIFY_SOURCE=2"

@@ -1,0 +1,41 @@
+From 042dcbc95249a2311e8a784fa7193299aa2ad651 Mon Sep 17 00:00:00 2001
+From: Jon Mason <jon.mason@arm.com>
+Date: Sat, 30 May 2026 10:24:53 -0400
+Subject: [PATCH] Fix GCC errors in test_psci_stat.c
+
+With the latest GCC, we're seeing the errors:
+
+| tftf/tests/runtime_services/standard_service/psci/api_tests/psci_stat/test_psci_stat.c: In function 'test_psci_stats_cpu_off':
+| tftf/tests/runtime_services/standard_service/psci/api_tests/psci_stat/test_psci_stat.c:681:23: error: variable 'off_cpu_count' set but not used [-Werror=unused-but-set-variable=]
+|   681 |         int cpu_node, off_cpu_count = 0, ret;
+|       |                       ^~~~~~~~~~~~~
+| tftf/tests/runtime_services/standard_service/psci/api_tests/psci_stat/test_psci_stat.c: In function 'test_psci_stats_system_suspend':
+| tftf/tests/runtime_services/standard_service/psci/api_tests/psci_stat/test_psci_stat.c:800:23: error: variable 'off_cpu_count' set but not used [-Werror=unused-but-set-variable=]
+|   800 |         int cpu_node, off_cpu_count = 0;
+|       |                       ^~~~~~~~~~~~~
+
+This is because assert is being #ifdef'ed out and thus the variable is
+never being used.  Add '-Wno-unused-but-set-variable' to the Makefile to
+workaround the issue.
+
+See https://github.com/TrustedFirmware-A/tf-a-tests/issues/4
+
+Signed-off-by: Jon Mason <jon.mason@arm.com>
+Upstream-Status: Pending
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 9d222acc30b4..806329382da5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -277,7 +277,7 @@ GCC_ASFLAGS_aarch64	:=	-mgeneral-regs-only ${march64-directive}
+ 
+ GCC_WARNINGS		+=	-nostdinc -ffreestanding -Wall -Werror 	\
+ 				-Wmissing-include-dirs  $(GCC_CFLAGS_$(ARCH)) \
+-				-std=gnu99 -Os
++				-Wno-unused-but-set-variable -std=gnu99 -Os
+ 
+ # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105523
+ GCC_CFLAGS		+=	$(call cc_option, --param=min-pagesize=0)
