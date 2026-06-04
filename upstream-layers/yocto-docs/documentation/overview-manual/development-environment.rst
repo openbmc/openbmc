@@ -169,7 +169,7 @@ these tarballs gives you a snapshot of the released files.
       BSP repository, the :term:`OpenEmbedded-Core (OE-Core)` and
       :term:`BitBake` repositories. For example, if you have checked out the "&DISTRO_NAME_NO_CAP;"
       branch of :term:`OpenEmbedded-Core (OE-Core)` and you are going to use ``meta-intel``, be
-      sure to checkout the "&DISTRO_NAME_NO_CAP;" branch of ``meta-intel``.
+      sure to check out the "&DISTRO_NAME_NO_CAP;" branch of ``meta-intel``.
 
 In summary, here is where you can get the project files needed for
 development:
@@ -417,7 +417,7 @@ local branch named "&DISTRO_NAME_NO_CAP;", which tracks the upstream
 branch would ultimately affect the upstream "&DISTRO_NAME_NO_CAP;" branch
 of the ``yocto-docs`` repository.
 
-It is important to understand that when you create and checkout a local
+It is important to understand that when you create and check out a local
 working branch based on a branch name, your local environment matches
 the "tip" of that particular development branch at the time you created
 your local branch, which could be different from the files in the
@@ -439,10 +439,10 @@ Yocto Project releases.
 
 When you create a local copy of the Git repository, you also have access
 to all the tags in the upstream repository. Similar to branches, you can
-create and checkout a local working Git branch based on a tag name. When
+create and check out a local working Git branch based on a tag name. When
 you do this, you get a snapshot of the Git repository that reflects the
 state of the files when the change was made associated with that tag.
-The most common use is to checkout a working branch that matches a
+The most common use is to check out a working branch that matches a
 specific Yocto Project release. Here is an example::
 
    $ cd ~
@@ -461,7 +461,7 @@ whose "HEAD" matches the commit in the repository associated with the
 "&DISTRO_NAME_NO_CAP;-&DISTRO;" tag. The files in your repository now exactly match that
 particular Yocto Project release as it is tagged in the upstream Git
 repository. It is important to understand that when you create and
-checkout a local working branch based on a tag, your environment matches
+check out a local working branch based on a tag, your environment matches
 a specific point in time and not the entire development branch (i.e.
 from the "tip" of the branch backwards).
 

@@ -315,7 +315,7 @@ following status strings:
    No determination has been made yet, or patch has not yet been submitted to
    upstream.
 
-   Keep in mind that every patch submitted upstream reduces the maintainance
+   Keep in mind that every patch submitted upstream reduces the maintenance
    burden in OpenEmbedded and Yocto Project in the long run, so this patch
    status should only be used in exceptional cases if there are genuine
    obstacles to submitting a patch upstream; the reason for that should be
@@ -346,7 +346,7 @@ following status strings:
    The patch is not appropriate for upstream, include a brief reason on the
    same line enclosed with ``[]``. In the past, there were several different
    reasons not to submit patches upstream, but we have to consider that every
-   non-upstreamed patch means a maintainance burden for recipe maintainers.
+   non-upstreamed patch means a maintenance burden for recipe maintainers.
    Currently, the only reasons to mark patches as inappropriate for upstream
    submission are:
 

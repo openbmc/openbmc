@@ -63,8 +63,8 @@ following requirements:
 
    -  Git &MIN_GIT_VERSION; or greater
    -  tar &MIN_TAR_VERSION; or greater
-   -  Python &MIN_PYTHON_VERSION; or greater.
-   -  gcc &MIN_GCC_VERSION; or greater.
+   -  Python &MIN_PYTHON_VERSION; or greater
+   -  gcc &MIN_GCC_VERSION; or greater
    -  GNU make &MIN_MAKE_VERSION; or greater
 
 If your build host does not satisfy all of the above version
@@ -84,11 +84,11 @@ Build Host Packages
    see the :ref:`ref-manual/system-requirements:required packages for the build host`
    section in the Yocto Project Reference Manual.
 
-Use Git to Clone bitbake-setup
+Use Git to clone bitbake-setup
 ==============================
 
 Once you complete the setup instructions for your machine, you need to
-get a copy of the ``bitbake-setup`` tool to setup the :term:`Poky` reference
+get a copy of the ``bitbake-setup`` tool to set up the :term:`Poky` reference
 distribution on your build host. Use the following commands to clone
 the bitbake repository.
 
@@ -102,9 +102,9 @@ Setup a build environment with the following command:
 
    $ ./bitbake/bin/bitbake-setup init
 
-By default, this will setup a top directory in the current directory.
+By default, this will set up a top directory in the current directory.
 
-If you prefer to setup your builds in a different top directory, for example
+If you prefer to set up your builds in a different top directory, for example
 ``$HOME/bitbake-builds``, you can set it with the :ref:`bitbake:ref-bbsetup-command-settings` command:
 
 .. code-block:: console
@@ -219,7 +219,7 @@ This directory contains:
 
 .. note::
 
-   It is also possible to setup the :term:`Poky` reference distro manually. For
+   It is also possible to set up the :term:`Poky` reference distro manually. For
    that refer to the :doc:`/dev-manual/poky-manual-setup` section of the Yocto
    Project Development Tasks Manual.
 
@@ -245,7 +245,7 @@ an entire Linux distribution, including the toolchain, from source.
 
 #.  **Initialize the Build Environment:** Source the ``init-build-env``
     environment setup script within the :term:`bitbake:BitBake build` directory
-    to setup the :term:`BitBake` build environment on your host:
+    to set up the :term:`BitBake` build environment on your host:
 
     .. code-block:: console
 
@@ -279,7 +279,7 @@ an entire Linux distribution, including the toolchain, from source.
 
        These set up the environment similar to what was previously in the local
        configuration file :ref:`local.conf <structure-build-conf-local.conf>`,
-       which is now largely empty. To setup the build how it was done
+       which is now largely empty. To set up the build how it was done
        previously, see the :doc:`/dev-manual/poky-manual-setup` section of the
        Yocto Project Development Tasks Manual.
 
@@ -352,7 +352,7 @@ development environment.
 
 In general, layers are repositories that contain related sets of
 instructions and configurations that tell the Yocto Project what to do.
-Isolating related metadata into functionally specific layers facilitates
+Isolating related metadata into functionally-specific layers facilitates
 modular development and makes it easier to reuse the layer metadata.
 
 .. note::
@@ -367,7 +367,7 @@ layer>`:
     adds the :yocto_git:`meta-raspberrypi </meta-raspberrypi>` BSP
     layer.
 
-    First, clone the layer next the other layers::
+    First, clone the layer next to the other layers::
 
       git clone -b &DISTRO_NAME_NO_CAP; https://git.yoctoproject.org/meta-raspberrypi ../layers/meta-raspberrypi
 
@@ -375,7 +375,7 @@ layer>`:
     it, you must add the layer and its dependencies to your ``bblayers.conf``
     file, which is found in the :term:`Build Directory` (``conf/``) directory.
 
-    For this, the ``bitbake-layers add-layer`` can be used:
+    For this, the ``bitbake-layers add-layer`` command can be used:
 
     .. code-block:: console
 
@@ -387,8 +387,8 @@ layer>`:
 
 #.  **Change the Configuration to Build for a Specific Machine:** The
     :term:`MACHINE` variable is defined by the :ref:`ref-fragments-builtin-core-machine`
-    fragment. For this example, the meta-raspberrypi layer provides the
-    :yocto_git:`raspberrypi5 </meta-yocto/tree/meta-yocto-bsp/conf/machine/beaglebone-yocto.conf>`
+    fragment. For this example, the ``meta-raspberrypi`` layer provides the
+    :yocto_git:`raspberrypi5 </meta-raspberrypi/tree/conf/machine/raspberrypi5.conf>`
     machine, so let's make it the :term:`MACHINE` used for the build with
     ``bitbake-config-build``:
 

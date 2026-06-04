@@ -9,7 +9,7 @@ What I wish I'd known about Yocto Project
 .. note::
 
    Before reading further, make sure you've taken a look at the
-   :yocto_home:`Software Overview</software-overview>` page which presents the
+   :yocto_home:`Technical Overview</development/technical-overview>` page which presents the
    definitions for many of the terms referenced here. Also, know that some of the
    information here won't make sense now, but as you start developing, it is the
    information you'll want to keep close at hand. These are best known methods for
@@ -22,8 +22,8 @@ known before embarking on their first build with Yocto Project. Feel free to
 contact us with other suggestions.
 
 #. **Use Git, not the tarball download:**
-   If you use git the software will be automatically updated with bug updates
-   because of how git works. If you download the tarball instead, you will need
+   If you use Git, the software will be automatically updated with bug updates
+   because of how Git works. If you download the tarball instead, you will need
    to be responsible for your own updates.
 
 #. **Get to know the layer index:**
@@ -166,19 +166,19 @@ contact us with other suggestions.
 
    * deal with corporate proxies
    * add a package to an image
-   * understand the difference between a recipe and package
-   * build a package by itself and why that's useful
+   * understand the difference between a recipe and a package
+   * build a package by itself and understand why that's useful
    * find out what packages are created by a recipe
    * find out what files are in a package
    * find out what files are in an image
-   * add an ssh server to an image (enable transferring of files to target)
+   * add an SSH server to an image (enable transferring of files to target)
    * know the anatomy of a recipe
    * know how to create and use layers
    * find recipes (with the :oe_layerindex:`OpenEmbedded Layer index <>`)
-   * understand difference between machine and distro settings
+   * understand the difference between MACHINE and DISTRO settings
    * find and use the right BSP (machine) for your hardware
-   * find examples of distro features and know where to set them
-   * understanding the task pipeline and executing individual tasks
+   * find examples of DISTRO features and know where to set them
+   * understand the task pipeline and how to execute individual tasks
    * understand devtool and how it simplifies your workflow
    * improve build speeds with shared downloads and shared state cache
    * generate and understand a dependency graph

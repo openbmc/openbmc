@@ -177,11 +177,8 @@ The configuration templates located in ``meta-poky/conf/templates/default`` have
 been removed as they are now provided in a single location:
 :term:`OpenEmbedded-Core (OE-Core)` :oecore_path:`meta/conf/templates/default`.
 
-These files were duplicating themselves but were mostly similar.
-
 See commit :meta_yocto_rev:`ac300baea7314ea3c80f2330b2a993f729f32150` for more
-information on the differences there are between the two sets of default
-templates.
+information on the differences between the two sets of default templates.
 
 :ref:`ref-classes-native` and :ref:`ref-classes-cross` classes :term:`DEBUG_BUILD` change
 -----------------------------------------------------------------------------------------
@@ -262,9 +259,9 @@ See commit :oecore_rev:`68d2d38483efada7bc2409e10508b03a7431caff` for more infor
 ------------------------------------------------------------
 
 Image recipes that inherit the :ref:`ref-classes-vex` class have an extra JSON
-document generated which was previous ending with the ``.json`` suffix. For
+document generated which was previously ending with the ``.json`` suffix. For
 example, a build for the ``core-image-minimal`` image recipe with this class
-would have resulted in a file named::
+inherited would have resulted in a file named::
 
    core-image-minimal-qemuarm64.rootfs.json
 
@@ -343,11 +340,11 @@ Users currently using the ``cve-check`` class are advised to switch to
       report in the same format as the one deployed by the ``cve-check`` class.
 
    -  A file ending with ``.sbom-cve-check.spdx.json``: this is an output SPDX
-      report annonated with vulnerable CVEs.
+      report annotated with vulnerable CVEs.
 
 -  The ``cve-check`` class output summary file (deployed in the
    :term:`DEPLOY_DIR_IMAGE`) ending with ``.cve.txt`` is no longer
-   deployed by default but can be added back by adding the following statement
+   deployed by default but can be brought back by adding the following statement
    to a configuration file::
 
       SBOM_CVE_CHECK_EXPORT_VARS:append = " SBOM_CVE_CHECK_EXPORT_SUMMARY"

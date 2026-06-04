@@ -38,67 +38,6 @@ New Features / Enhancements in |yocto-ver|
 
 -  Minimum Python version required on the host: 3.9.
 
--  New variables:
-
-   -  The :term:`OPENSSH_HOST_KEY_DIR` variable can be used to specify the
-      directory where OpenSSH host keys are stored. The default value is
-      ``/etc/ssh`` (:oecore_rev:`addd80ddfd892eb4513f323d369d210935416e05`)
-
-   -  The :term:`OPENSSH_HOST_KEY_DIR_READONLY_CONFIG` variable can be used to
-      specify the directory where OpenSSH host keys are stored when the device
-      uses a read-only filesystem. The default value is ``/var/run/ssh``
-      (:oecore_rev:`addd80ddfd892eb4513f323d369d210935416e05`)
-
-   -  The :term:`SPDX_INCLUDE_KERNEL_CONFIG` can be set to "1" to export the Linux
-      kernel configuration (``CONFIG_*`` parameters) into the SPDX document when
-      using the :ref:`ref-classes-create-spdx` class
-      (:oecore_rev:`228a968e7c47d811c06143279bdb0f9c5f374bef`)
-
-   -  The :term:`SPDX_INCLUDE_PACKAGECONFIG` variable can be set to "1" to
-      export a recipe's :term:`PACKAGECONFIG` features (enabled/disabled) into
-      the SPDX document when using the :ref:`ref-classes-create-spdx` class
-      (:oecore_rev:`228a968e7c47d811c06143279bdb0f9c5f374bef`)
-
-   -  The :term:`SPDX_PACKAGE_URL` allows specifying a space-separated list of
-      Package URLs (purls) for the software Package when using the
-      :ref:`ref-classes-create-spdx` class
-      (:oecore_rev:`874b2d301d3cac617b1028bc6ce91b1f916a6508`)
-
-   -  The :term:`SPDX_GIT_PURL_MAPPINGS` variable allows mapping domain names to
-      PURLs (Package URLs) in SPDX documents
-      (:oecore_rev:`9f1825e74d0f70917676201286b148aea84cc660`)
-
-   -  The :term:`SPDX_CONCLUDED_LICENSE` allows specifying the
-      ``hasConcludedLicense`` object of individual SBOM packages when using the
-      :ref:`ref-classes-create-spdx` class
-      (:oecore_rev:`bb21c6a429a2ecec82a8afe7d79502291ccaef01`)
-
-   -  The :term:`FIT_MKIMAGE_EXTRA_OPTS` variable allows passing extra options
-      to the ``mkimage`` command when creating a FIT image with the
-      :ref:`ref-classes-kernel-fit-image` class
-      (:oecore_rev:`d925d67061ef5d7a8abe15c715614650094d50c6`)
-
-   -  The :term:`FIT_CONF_MAPPINGS` variable allows mapping extra configurations
-      to existing ones or rename an existing configuration in FIT images created
-      with the :ref:`ref-classes-kernel-fit-image` class (:oecore_rev:`e30f809a50c2151e525424879383c02325a7ec9a`)
-
-   -  The :term:`UBOOT_CONFIG_FRAGMENTS` and :term:`UBOOT_FRAGMENTS` allow
-      supplying additional configuration fragments to the existing U-Boot
-      configuration. See the definition of the variables for more information,
-      and the documentation of the :ref:`ref-classes-uboot-config` class
-      (:oecore_rev:`9e96d3dedee47657657686310508e0aaee7f4e02`)
-
-   -  The :term:`IMAGE_EXTRA_PARTITION_FILES` allows specifying extra files from
-      the deploy directory (:term:`DEPLOY_DIR_IMAGE`) to install in a WIC
-      partition created with the ``extra_partition`` plugin
-      (:oecore_rev:`e1526079d205dac6e3cff6d8e5cb37f68b631009`)
-
-   -  The :term:`FIT_LOADABLES`, :term:`FIT_LOADABLE_FILENAME`,
-      :term:`FIT_LOADABLE_TYPE`, :term:`FIT_LOADABLE_ARCH`,
-      :term:`FIT_LOADABLE_OS` and :term:`FIT_LOADABLE_LOADADDRESS` variables can
-      be used to specify arbitrary ``loadables`` in a FIT image
-      (:oecore_rev:`2535427d8de07f6e432d08cbdc046bdfd8788911`)
-
 -  Kernel-related changes:
 
    -  :ref:`ref-classes-kernel-fit-image`: Support arbitrary loadables
@@ -185,10 +124,77 @@ New Features / Enhancements in |yocto-ver|
    -  :ref:`ref-classes-sbom-cve-check-recipe`: Class for post-build CVE
       analysis of recipes (using the recipe SBOM, meaning building the
       software provided by the recipe is not needed), which uses the
-      `sbom-cve-check <github.com/bootlin/sbom-cve-check>`__ tool internally
-      (:oecore_rev:`e2518b1eaabef13c9f8d44b52b8ec9d4dd4ed916`)
+      `sbom-cve-check <github.com/bootlin/sbom-cve-check>`__ tool internally.
+      This also obsoletes the ``cve-check`` class.
+      (:oecore_rev:`e2518b1eaabef13c9f8d44b52b8ec9d4dd4ed916`,
+      :oecore_rev:`00de455f8d3aeca880129d23e8cfb7e246404699`)
+
+-  New variables:
+
+   -  The :term:`OPENSSH_HOST_KEY_DIR` variable can be used to specify the
+      directory where OpenSSH host keys are stored. The default value is
+      ``/etc/ssh`` (:oecore_rev:`addd80ddfd892eb4513f323d369d210935416e05`)
+
+   -  The :term:`OPENSSH_HOST_KEY_DIR_READONLY_CONFIG` variable can be used to
+      specify the directory where OpenSSH host keys are stored when the device
+      uses a read-only filesystem. The default value is ``/var/run/ssh``
+      (:oecore_rev:`addd80ddfd892eb4513f323d369d210935416e05`)
+
+   -  The :term:`SPDX_INCLUDE_KERNEL_CONFIG` can be set to "1" to export the Linux
+      kernel configuration (``CONFIG_*`` parameters) into the SPDX document when
+      using the :ref:`ref-classes-create-spdx` class
+      (:oecore_rev:`228a968e7c47d811c06143279bdb0f9c5f374bef`)
+
+   -  The :term:`SPDX_INCLUDE_PACKAGECONFIG` variable can be set to "1" to
+      export a recipe's :term:`PACKAGECONFIG` features (enabled/disabled) into
+      the SPDX document when using the :ref:`ref-classes-create-spdx` class
+      (:oecore_rev:`228a968e7c47d811c06143279bdb0f9c5f374bef`)
+
+   -  The :term:`SPDX_PACKAGE_URL` allows specifying a space-separated list of
+      Package URLs (purls) for the software Package when using the
+      :ref:`ref-classes-create-spdx` class
+      (:oecore_rev:`874b2d301d3cac617b1028bc6ce91b1f916a6508`)
+
+   -  The :term:`SPDX_GIT_PURL_MAPPINGS` variable allows mapping domain names to
+      PURLs (Package URLs) in SPDX documents
+      (:oecore_rev:`9f1825e74d0f70917676201286b148aea84cc660`)
+
+   -  The :term:`SPDX_CONCLUDED_LICENSE` allows specifying the
+      ``hasConcludedLicense`` object of individual SBOM packages when using the
+      :ref:`ref-classes-create-spdx` class
+      (:oecore_rev:`bb21c6a429a2ecec82a8afe7d79502291ccaef01`)
+
+   -  The :term:`FIT_MKIMAGE_EXTRA_OPTS` variable allows passing extra options
+      to the ``mkimage`` command when creating a FIT image with the
+      :ref:`ref-classes-kernel-fit-image` class
+      (:oecore_rev:`d925d67061ef5d7a8abe15c715614650094d50c6`)
+
+   -  The :term:`FIT_CONF_MAPPINGS` variable allows mapping extra configurations
+      to existing ones or rename an existing configuration in FIT images created
+      with the :ref:`ref-classes-kernel-fit-image` class (:oecore_rev:`e30f809a50c2151e525424879383c02325a7ec9a`)
+
+   -  The :term:`UBOOT_CONFIG_FRAGMENTS` and :term:`UBOOT_FRAGMENTS` allow
+      supplying additional configuration fragments to the existing U-Boot
+      configuration. See the definition of the variables for more information,
+      and the documentation of the :ref:`ref-classes-uboot-config` class
+      (:oecore_rev:`9e96d3dedee47657657686310508e0aaee7f4e02`)
+
+   -  The :term:`IMAGE_EXTRA_PARTITION_FILES` allows specifying extra files from
+      the deploy directory (:term:`DEPLOY_DIR_IMAGE`) to install in a WIC
+      partition created with the ``extra_partition`` plugin
+      (:oecore_rev:`e1526079d205dac6e3cff6d8e5cb37f68b631009`)
+
+   -  The :term:`FIT_LOADABLES`, :term:`FIT_LOADABLE_FILENAME`,
+      :term:`FIT_LOADABLE_TYPE`, :term:`FIT_LOADABLE_ARCH`,
+      :term:`FIT_LOADABLE_OS` and :term:`FIT_LOADABLE_LOADADDRESS` variables can
+      be used to specify arbitrary ``loadables`` in a FIT image
+      (:oecore_rev:`2535427d8de07f6e432d08cbdc046bdfd8788911`)
 
 -  Global configuration changes:
+
+   -  Changes in :term:`DISTRO_FEATURES` default values and how
+      :term:`DISTRO_FEATURES` and :term:`MACHINE_FEATURES` are provided, see
+      :doc:`/migration-guides/migration-6.0` for more information.
 
    -  ``base-passwd``: Add a ``clock`` group as `systemd` version v258 introduces
       this group to `enable applications like linuxptp to open clocks without
@@ -262,8 +268,8 @@ New Features / Enhancements in |yocto-ver|
 -  Documentation changes:
 
    -  The documentation build now fetches the list of active and inactive
-      version of the documentation from the remote `releases.json
-      <dashboard.yoctoproject.org/releases.json>`__ file. This also applies to
+      versions of the documentation from the remote `releases.json
+      <https://dashboard.yoctoproject.org/releases.json>`__ file. This also applies to
       the :term:`BitBake` documentation.
 
 -  Go changes:
@@ -510,9 +516,8 @@ New Features / Enhancements in |yocto-ver|
    -  Add suport for package URLs (PURLs) through :term:`SPDX_PACKAGE_URL`
       (:oecore_rev:`874b2d301d3cac617b1028bc6ce91b1f916a6508`)
 
-   -  ``create-spdx-2.2``: Add CVEs in :term:`CVE_CHECK_IGNORE`
-      to the list of fixed CVEs in the output SBOM
-      (:oecore_rev:`f8525224cb825b1aad2be240731eabafdde7612d`)
+   -  Support only SPDX 3 and removed SPDX 2.2 support.
+      (:oecore_rev:`12abd0574c267bade0962ecb39d9e8da8c56842b`)
 
    -  The :ref:`ref-classes-create-spdx` class used to include `VEX
       <https://cyclonedx.org/capabilities/vex/>`__ statements in the SPDX documents
@@ -757,9 +762,20 @@ New Features / Enhancements in |yocto-ver|
 Known Issues in |yocto-ver|
 ---------------------------
 
--  A known bug is affecting :term:`build hosts <Build Host>` that have Intel
-   Ultra 7 CPUs and breaks :term:`OpenEmbedded-Core (OE-Core)` tests that
-   involve KVM. See bug :yocto_bug:`16074` for more information.
+Referencing an unset variable in :term:`DISTRO_FEATURES` causes
+:term:`DISTRO_FEATURES_NATIVE` and :term:`DISTRO_FEATURES_NATIVESDK` to be set
+incorrectly. The leads to confusing errors, such as:
+
+-  ``Nothing PROVIDES 'libseccomp-native'``
+
+-  ``Required build target 'glibc' has no buildable providers.``
+
+To resolve these errors, ensure that all variables referenced in
+:term:`DISTRO_FEATURES` are set. Variables may be set to an empty string if not
+needed.
+
+A fix for this issue is in progress and should be included in Yocto Project
+6.0.1. See Yocto bug :yocto_bug:`16275` for further details.
 
 Recipe License changes in |yocto-ver|
 -------------------------------------
@@ -2223,3 +2239,74 @@ Thanks to the following people who contributed to this release:
 
 Repositories / Downloads for Yocto-|yocto-ver|
 ----------------------------------------------
+
+yocto-docs
+
+-  Repository Location: :yocto_git:`/yocto-docs`
+-  Branch: :yocto_git:`wrynose </yocto-docs/log/?h=wrynose>`
+-  Tag:  :yocto_git:`yocto-6.0 </yocto-docs/log/?h=yocto-6.0>`
+-  Git Revision: :yocto_git:`eb74fdfd9e5e579a65e8872d1a73b51e77b14f63 </yocto-docs/commit/?id=eb74fdfd9e5e579a65e8872d1a73b51e77b14f63>`
+-  Release Artefact: yocto-docs-eb74fdfd9e5e579a65e8872d1a73b51e77b14f63
+-  sha: 50d7391b4b4d169649a5628a8f367443eb03fb78faa813b9c20d5214e49ce782
+-  Download Locations:
+
+   https://downloads.yoctoproject.org/releases/yocto/yocto-6.0/yocto-docs-eb74fdfd9e5e579a65e8872d1a73b51e77b14f63.tar.bz2
+
+   https://mirrors.edge.kernel.org/yocto/yocto/yocto-6.0/yocto-docs-eb74fdfd9e5e579a65e8872d1a73b51e77b14f63.tar.bz2
+
+openembedded-core
+
+-  Repository Location: :oe_git:`/openembedded-core`
+-  Branch: :oe_git:`wrynose </openembedded-core/log/?h=wrynose>`
+-  Tag:  :oe_git:`yocto-6.0 </openembedded-core/log/?h=yocto-6.0>`
+-  Git Revision: :oe_git:`42fa856a00ac16b2a7a83d7ecfa60a5be192b16c </openembedded-core/commit/?id=42fa856a00ac16b2a7a83d7ecfa60a5be192b16c>`
+-  Release Artefact: oecore-42fa856a00ac16b2a7a83d7ecfa60a5be192b16c
+-  sha: 14abd19071d1b31737f5d3946182f21825e0a7121468054bbaa68f207b018fb6
+-  Download Locations:
+
+   https://downloads.yoctoproject.org/releases/yocto/yocto-6.0/oecore-42fa856a00ac16b2a7a83d7ecfa60a5be192b16c.tar.bz2
+
+   https://mirrors.edge.kernel.org/yocto/yocto/yocto-6.0/oecore-42fa856a00ac16b2a7a83d7ecfa60a5be192b16c.tar.bz2
+
+meta-yocto
+
+-  Repository Location: :yocto_git:`/meta-yocto`
+-  Branch: :yocto_git:`wrynose </meta-yocto/log/?h=wrynose>`
+-  Tag:  :yocto_git:`yocto-6.0 </meta-yocto/log/?h=yocto-6.0>`
+-  Git Revision: :yocto_git:`904846ae078ee20de073040ebb77c86e19250f56 </meta-yocto/commit/?id=904846ae078ee20de073040ebb77c86e19250f56>`
+-  Release Artefact: meta-yocto-904846ae078ee20de073040ebb77c86e19250f56
+-  sha: d3470939772339d2d70a2bbdd4e01563357c376fdb496d5515a1f96bce4e2ea2
+-  Download Locations:
+
+   https://downloads.yoctoproject.org/releases/yocto/yocto-6.0/meta-yocto-904846ae078ee20de073040ebb77c86e19250f56.tar.bz2
+
+   https://mirrors.edge.kernel.org/yocto/yocto/yocto-6.0/meta-yocto-904846ae078ee20de073040ebb77c86e19250f56.tar.bz2
+
+meta-mingw
+
+-  Repository Location: :yocto_git:`/meta-mingw`
+-  Branch: :yocto_git:`wrynose </meta-mingw/log/?h=wrynose>`
+-  Tag:  :yocto_git:`yocto-6.0 </meta-mingw/log/?h=yocto-6.0>`
+-  Git Revision: :yocto_git:`a4ba674d6a0a17e4c0bc4c11bbb9d0ea9de2b315 </meta-mingw/commit/?id=a4ba674d6a0a17e4c0bc4c11bbb9d0ea9de2b315>`
+-  Release Artefact: meta-mingw-a4ba674d6a0a17e4c0bc4c11bbb9d0ea9de2b315
+-  sha: cea731150cd3caedd90ca6a82bf050a00c3705cea166d24a6077d07b1b7b2404
+-  Download Locations:
+
+   https://downloads.yoctoproject.org/releases/yocto/yocto-6.0/meta-mingw-a4ba674d6a0a17e4c0bc4c11bbb9d0ea9de2b315.tar.bz2
+
+   https://mirrors.edge.kernel.org/yocto/yocto/yocto-6.0/meta-mingw-a4ba674d6a0a17e4c0bc4c11bbb9d0ea9de2b315.tar.bz2
+
+bitbake
+
+-  Repository Location: :oe_git:`/bitbake`
+-  Branch: :oe_git:`2.18 </bitbake/log/?h=2.18>`
+-  Tag:  :oe_git:`yocto-6.0 </bitbake/log/?h=yocto-6.0>`
+-  Git Revision: :oe_git:`33581c84f3a85008239acbd940501a35de48dc91 </bitbake/commit/?id=33581c84f3a85008239acbd940501a35de48dc91>`
+-  Release Artefact: bitbake-33581c84f3a85008239acbd940501a35de48dc91
+-  sha: 8a0b0243b50b6e004f3350824628f69ee66be0d3a28bc25f3d96b35406015ba7
+-  Download Locations:
+
+   https://downloads.yoctoproject.org/releases/yocto/yocto-6.0/bitbake-33581c84f3a85008239acbd940501a35de48dc91.tar.bz2
+
+   https://mirrors.edge.kernel.org/yocto/yocto/yocto-6.0/bitbake-33581c84f3a85008239acbd940501a35de48dc91.tar.bz2
+

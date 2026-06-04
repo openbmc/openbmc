@@ -841,8 +841,9 @@ system and gives an overview of their function and contents.
       previous link.
 
    :term:`BBFILES_DYNAMIC`
-      Activates content when identified layers are present. You identify
-      the layers by the collections that the layers define.
+      Activates content when identified layers are present. This mechanism
+      is commonly referred to as "dynamic layers". You identify the layers
+      by the collections that the layers define.
 
       Use the :term:`BBFILES_DYNAMIC` variable to avoid ``.bbappend`` files
       whose corresponding ``.bb`` file is in a layer that attempts to
@@ -856,8 +857,8 @@ system and gives an overview of their function and contents.
       filename patterns::
 
          BBFILES_DYNAMIC += " \
-            clang-layer:${LAYERDIR}/bbappends/meta-clang/*/*/*.bbappend \
-            core:${LAYERDIR}/bbappends/openembedded-core/meta/*/*/*.bbappend \
+            clang-layer:${LAYERDIR}/dynamic-layers/meta-clang/*/*/*.bbappend \
+            core:${LAYERDIR}/dynamic-layers/openembedded-core/meta/*/*/*.bbappend \
             "
 
       This next example shows an error message that occurs because invalid
@@ -866,8 +867,8 @@ system and gives an overview of their function and contents.
       .. code-block:: none
 
          ERROR: BBFILES_DYNAMIC entries must be of the form <collection name>:<filename pattern>, not:
-             /work/my-layer/bbappends/meta-security-isafw/*/*/*.bbappend
-             /work/my-layer/bbappends/openembedded-core/meta/*/*/*.bbappend
+             /work/my-layer/dynamic-layers/meta-security-isafw/*/*/*.bbappend
+             /work/my-layer/dynamic-layers/openembedded-core/meta/*/*/*.bbappend
 
    :term:`BBINCLUDED`
       See :term:`bitbake:BBINCLUDED` in the BitBake manual.
@@ -9379,7 +9380,7 @@ system and gives an overview of their function and contents.
       See also :term:`SPDX_INCLUDE_SOURCES`.
 
    :term:`SPDX_GIT_PURL_MAPPINGS`
-      A space separated list of ``domain:purl_type`` mappings to configure PURL
+      A space-separated list of ``domain:purl_type`` mappings to configure PURL
       (Package URLs) generation for Git source downloads.
 
       For example, adding ``gitlab.example.com:pkg:gitlab`` to this variable
@@ -9667,10 +9668,10 @@ system and gives an overview of their function and contents.
       is an empty string.
 
    :term:`SPDX_PACKAGE_URLS`
-      A space separated list of Package URLs ("PURLs") for the software package.
+      A space-separated list of Package URLs ("PURLs") for the software package.
       The first item in this list will be listed as the ``packageUrl`` property
       of the packages, and all PURLs (including the first one) will be listed as
-      external references. The default value is an auto generated ``pkg:yocto``
+      external references. The default value is an auto-generated ``pkg:yocto``
       PURL based on the recipe name, version, and layer name. Override this
       variable to replace the default, otherwise append or prepend to add
       additional PURLs.
@@ -11865,7 +11866,7 @@ system and gives an overview of their function and contents.
 
    :term:`UKI_DEVICETREE`
       When inheriting the :ref:`ref-classes-uki` class, the :term:`UKI_DEVICETREE`
-      variable holds the list of device tree blobs to include to the `Unified
+      variable holds the list of device tree blobs to include in the `Unified
       Kernel Image (UKI) <https://uapi-group.org/specifications/specs/unified_kernel_image/>`__.
 
    :term:`UKI_FILENAME`

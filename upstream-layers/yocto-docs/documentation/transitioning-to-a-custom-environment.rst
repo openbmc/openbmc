@@ -9,10 +9,10 @@ Transitioning to a custom environment for systems development
 .. note::
 
    So you've finished the :doc:`/brief-yoctoprojectqs/index` and
-   glanced over the document :doc:`/what-i-wish-id-known`, the latter contains
+   glanced over the document :doc:`/what-i-wish-id-known`, the latter containing
    important information learned from other users. You're well prepared. But
    now, as you are starting your own project, it isn't exactly straightforward what
-   to do. And, the documentation is daunting. We've put together a few hints to
+   to do, and the documentation is daunting. We've put together a few hints to
    get you started.
 
 #. **Make a list of the processor, target board, technologies, and capabilities
@@ -23,7 +23,7 @@ Transitioning to a custom environment for systems development
 #. **Set up your board support**.
    Even if you're using custom hardware, it might be easier to start with an
    existing target board that uses the same processor or at least the same
-   architecture as your custom hardware. Knowing the board already has a
+   architecture as your custom hardware. Knowing that the board already has a
    functioning Board Support Package (BSP) within the project makes it easier
    for you to get comfortable with project concepts.
 
@@ -34,19 +34,19 @@ Transitioning to a custom environment for systems development
    target board. The Yocto Project layer index BSPs are regularly validated. The
    best place to get your first BSP is from your silicon manufacturer or board
    vendor – they can point you to their most qualified efforts. In general, for
-   Intel silicon use meta-intel, for Texas Instruments use meta-ti, and so
+   Intel silicon use ``meta-intel``, for Texas Instruments use ``meta-ti``, and so
    forth. Choose a BSP that has been tested with the same Yocto Project release
    that you've downloaded. Be aware that some BSPs may not be immediately
    supported on the very latest release, but they will be eventually.
 
    You might want to start with the build specification that :term:`Poky` provides
-   (which is reference embedded distribution) and then add your newly chosen
+   (which is reference embedded distribution) and then add your newly-chosen
    layers to that. Here is the information :ref:`about adding layers
    <dev-manual/layers:Understanding and Creating Layers>`.
 
 #. **Based on the layers you've chosen, make needed changes in your
    configuration**.
-   For instance, you've chosen a machine type and added in the corresponding BSP
+   For instance, assume you've chosen a machine type and added in the corresponding BSP
    layer. You'll then need to change the value of the :term:`MACHINE` variable in your
    configuration (using the :ref:`ref-fragments-builtin-core-machine`
    fragment) to point to that same machine type. There could be other
@@ -65,8 +65,8 @@ Transitioning to a custom environment for systems development
    bsp layer using the \`\`bitbake-layers\`\` script>`. For example, given a
    64-bit x86-based machine, copy the conf/intel-corei7-64 definition and give
    the machine a relevant name (think board name, not product name). Make sure
-   the layer configuration is dependent on the meta-intel layer (or at least,
-   meta-intel remains in your bblayers.conf). Now you can put your custom BSP
+   the layer configuration is dependent on the ``meta-intel`` layer (or at least,
+   ``meta-intel`` remains in your ``bblayers.conf`` file). Now you can put your custom BSP
    settings into your layer and you can re-use it for different applications.
 
 #. **Write your own recipe to build additional software support that isn't

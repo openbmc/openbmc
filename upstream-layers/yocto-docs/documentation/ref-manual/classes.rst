@@ -2694,7 +2694,7 @@ usually determines whether to include this class.
 ==================
 
 The :ref:`ref-classes-sbom-cve-check` class uses the `sbom-cve-check
-<github.com/bootlin/sbom-cve-check>`__ command-line tool for post-build CVE
+<https://github.com/bootlin/sbom-cve-check>`__ command-line tool for post-build CVE
 analysis. It relies on the :ref:`ref-classes-create-spdx` class as SPDX files
 are the input of this tool.
 
@@ -2719,13 +2719,13 @@ configure the behavior of this class.
 =========================
 
 The :ref:`ref-classes-sbom-cve-check-recipe` class uses the `sbom-cve-check
-<github.com/bootlin/sbom-cve-check>`__ command-line tool for post-build CVE
+<https://github.com/bootlin/sbom-cve-check>`__ command-line tool for post-build CVE
 analysis of a recipe. It relies on the :ref:`ref-classes-create-spdx` class as
 SPDX files are the input of this tool.
 
 This class can be inherited in any recipe. Compared to the
 :class:`ref-classes-sbom-cve-check` class, this class only uses the SBOM of the
-recipe (after the ``create_recipe_sbom`` is run) to determine which is the
+recipe (after the ``create_recipe_sbom`` task is run) to determine which is the
 underlying software and do the analysis, meaning that building the recipe itself
 isn't necessary.
 
@@ -3542,7 +3542,7 @@ The variables used by this class are:
 -  :term:`UKI_SB_CERT`: optional UEFI secureboot certificate matching the
    private key
 -  :term:`UKI_SB_KEY`: optional UEFI secureboot private key to sign UKI with
--  :term:`UKI_DEVICETREE`: list of device tree blobs to include to the UKI
+-  :term:`UKI_DEVICETREE`: list of device tree blobs to include in the UKI
 
 For examples on how to use this class see oeqa selftest
 :oe_git:`meta/lib/oeqa/selftest/cases/uki.py
