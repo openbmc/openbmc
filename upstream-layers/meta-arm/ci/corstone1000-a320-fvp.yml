@@ -2,8 +2,7 @@
 
 header:
   version: 14
+  includes:
+    - ci/corstone1000-fvp.yml
 
-local_conf_header:
-  a320: |
-    MACHINE_FEATURES += "cortexa320"
-    OVERRIDES .= ":cortexa320"
+machine: corstone1000-a320-fvp

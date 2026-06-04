@@ -1,0 +1,22 @@
+header:
+  version: 14
+  includes:
+    - kas/corstone1000-base.yml
+    - kas/corstone1000-image-configuration.yml
+    - kas/corstone1000-firmware-only.yml
+    - kas/fvp-eula.yml
+
+env:
+  DISPLAY:
+  WAYLAND_DISPLAY:
+  XAUTHORITY:
+
+local_conf_header:
+  testimagefvp: |
+    IMAGE_CLASSES += "fvpboot"
+
+  mass-storage: |
+    # Ensure the Mass Storage device is absent
+    FVP_CONFIG[board.msd_mmc.p_mmc_file] = "invalid.dat"
+
+machine: corstone1000-a320-fvp

@@ -156,6 +156,15 @@ corstone1000-mps3:
       - FIRMWARE: none
         SECUREDEBUG: [none, secure-debug]
 
+corstone1000-a320-fvp:
+  extends: .build
+  parallel:
+    matrix:
+      - FIRMWARE: corstone1000-firmware-only
+        TESTING: [none, tftf]
+      - FIRMWARE: none
+        TESTING: none
+
 documentation:
   extends: .setup
   script:

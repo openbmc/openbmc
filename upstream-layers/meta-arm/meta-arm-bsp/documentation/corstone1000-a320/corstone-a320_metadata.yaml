@@ -1,0 +1,106 @@
+---
+title: Corstone-1000 Armv9-A Edge-AI
+subtitle: ""
+abstract: Arm Corstone-1000 with Cortex-A320 is a reference solution for IoT devices. It is part of Total Solution for IoT which consists of hardware and software reference implementation.
+author: Arm
+status: REL
+keywords: [IoT, software]
+bookpartno: 112000
+product: Corstone-1000 with Cortex-A320
+product_type: Open Source Projects
+product_revision:
+  - prefix: Version
+    version: "0101"
+    version_label: "2026.02"
+output_type: "software"
+conformance_notice: "true"
+content_type: User Guide
+audience:
+  - Software Developers
+categories:
+  - IoT
+themes:
+  - IoT
+intended_audience: Software Developers
+terminology_review: new
+releases:
+ - revision: 0100-01
+   date: 2026-05-01
+   change_summary: Update
+   permissions: nonconfidential
+
+variables:
+- name: arm_developer_cs1000_website
+  value: 'https://developer.arm.com/Tools%20and%20Software/Corstone-1000%20Software'
+- name: arm_developer_cs1000_search
+  value: 'https://developer.arm.com/search#q=corstone-1000'
+- name: arm_developer_mhu_website
+  value: 'https://developer.arm.com/documentation/ka005129/latest/#:~:text=An%20MHU%20is%20a%20device,that%20a%20message%20is%20available'
+- name: arm_developer_secureboot_website
+  value: 'https://developer.arm.com/documentation/PRD29-GENC-009492/c/TrustZone-Software-Architecture/Booting-a-secure-system/Secure-boot'
+- name: arm_architecture_security_features_platform_security
+  value: 'https://www.arm.com/architecture/security-features/platform-security'
+- name: linux_repository
+  value: 'https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/'
+- name: arm_trustzone_for_cortex_a_website
+  value: 'https://www.arm.com/technologies/trustzone-for-cortex-a'
+- name: arm_fmw_framework_a_profile_pdf
+  value: 'https://developer.arm.com/documentation/den0077/latest'
+- name: arm_fmw_framework_m_profile_pdf
+  value: 'https://developer.arm.com/architectures/Firmware%20Framework%20for%20M-Profile'
+- name: platform_security_fwu_for_a_profile_pdf
+  value: 'https://developer.arm.com/documentation/den0118/a/'
+- name: psa_firmware_update_ihi_0093_api_reference_website
+  value: 'https://arm-software.github.io/psa-api/fwu/1.0/api/api.html'
+- name: edk2_capsule_generation_tool_repository
+  value: 'https://github.com/tianocore/edk2/blob/master/BaseTools/Source/Python/Capsule/GenerateCapsule.py'
+- name: psa_fwu_den0018_specification_website
+  value: 'https://developer.arm.com/documentation/den0118/latest/'
+- name: ts_psa_fwu_service_website
+  value: 'https://trusted-services.readthedocs.io/en/stable/services/fwu/psa-fwu-m.html'
+- name: tfm_shim_layer_website
+  value: 'https://trustedfirmware-m.readthedocs.io/en/latest/design_docs/services/tfm_fwu_service.html#shim-layer-between-fwu-and-bootloader'
+- name: op_tee_os_repository
+  value: 'https://github.com/OP-TEE/optee_os'
+- name: psa_certified_website
+  value: 'https://www.psacertified.org/'
+- name: psa_l2_ready
+  value: 'https://www.psacertified.org/products/corstone-1000/'
+- name: systemready_ir_certification
+  value: 'https://armkeil.blob.core.windows.net/developer/Files/pdf/certificate-list/arm-systemready-ve-arm-neoverse.pdf'
+- name: trusted_board_boot_requirements_client_pdf
+  value: 'https://developer.arm.com/documentation/den0006/latest'
+- name: trusted_firmware_m_website
+  value: 'https://www.trustedfirmware.org/projects/tf-m/'
+- name: trusted_firmware_m_bl1_website
+  value: 'https://trustedfirmware-m.readthedocs.io/en/latest/design_docs/booting/bl1.html'
+- name: trusted_firmware_a_bl2_website
+  value: 'https://developer.arm.com/documentation/108028/0000/RD-TC22-software/Software-components/AP-firmware/Trusted-firmware-A-BL2'
+- name: trusted_firmware_a_fip_guide
+  value: 'https://trustedfirmware-a.readthedocs.io/en/latest/design/firmware-design.html#firmware-image-package-fip'
+- name: trusted_services_website
+  value: 'https://www.trustedfirmware.org/projects/trusted-services/'
+- name: trusted_services_uefi_smm_website
+  value: 'https://trusted-services.readthedocs.io/en/integration/services/uefi-smm-services.html#'
+- name: das_u_boot_repository
+  value: 'https://github.com/u-boot/u-boot.git'
+- name: keil_rtx5_website
+  value: 'https://developer.arm.com/Tools%20and%20Software/Keil%20MDK/RTX5%20RTOS'
+- name: ppa_website
+  value: 'https://developer.arm.com/documentation/102738/0100/Power--performance--and-area-analysis'
+- name: mcuboot_website
+  value: 'https://docs.mcuboot.com/'
+- name: arm_developer_fvp
+  value: 'https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps'
+- name: secure_debug_manager_repo_readme
+  value: 'https://github.com/ARM-software/secure-debug-manager/tree/master?tab=readme-ov-file#secure-debug-manager-psa-adac--sdc-600'
+- name: secure_debug_manager_armds_integration
+  value: 'https://github.com/ARM-software/secure-debug-manager?tab=readme-ov-file#arm-development-studio-integration'
+- name: meta_arm_repository_release_branch
+  value: 'https://docs.yoctoproject.org/next/migration-guides/migration-5.3.html'
+- name: arm_ulink_pro_website
+  value: 'https://www.arm.com/products/development-tools/debug-probes/ulink-pro'
+- name: arm_ds_website
+  value: 'https://www.arm.com/products/development-tools/embedded-and-software/arm-development-studio'
+- name: edk2_repository
+  value: 'https://github.com/tianocore/edk2'

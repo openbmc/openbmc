@@ -116,19 +116,6 @@ The Corstone-1000 architecture is designed to cover a range of
 `Power, Performance, and Area (PPA) <ppa-website_>`__ applications, and enable extension
 for use-case specific applications, for example, sensors, cloud connectivity, and edge computing.
 
-**************************************
-Corstone-1000 with Cortex-A320 Variant
-**************************************
-
-This variant of the Corstone-1000 platform replaces the Host System's Cortex-A35 processor
-with a Cortex-A320. In this configuration, the optional External System (previously a Cortex-M3)
-is replaced by an Arm Ethos-U85 Neural Processing Unit (NPU).
-The Ethos-U85 runs in the direct drive configuration, where the Host System is responsible for managing the NPU directly.
-
-.. image:: images/CorstoneA320Subsystems.png
-   :width: 720
-   :alt: CorstoneA320Subsystems
-
 *****************
 Secure Boot Chain
 *****************
