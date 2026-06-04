@@ -19,6 +19,7 @@ SRCREV = "c7a5c8b62a0ff012b16574f01651254ef7e664ee"
 
 SRC_URI = "git://github.com/latchset/${BPN}.git;branch=main;protocol=https"
 
+SRC_URI += "file://0001-Fix-i686-build-failures-in-cipher.c.patch"
 
 inherit meson pkgconfig
 

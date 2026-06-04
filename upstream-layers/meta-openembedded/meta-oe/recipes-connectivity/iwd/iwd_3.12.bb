@@ -59,4 +59,5 @@ RRECOMMENDS:${PN} = "\
     kernel-module-pkcs7-message \
     kernel-module-pkcs8-key-parser \
     kernel-module-x509-key-parser \
+    wireless-regdb-static \
 "

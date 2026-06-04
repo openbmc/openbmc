@@ -6,8 +6,8 @@ LIC_FILES_CHKSUM = " \
     file://COPYING.LESSER;md5=c96ca6c1de8adc025adfada81d06fba5 \
 "
 
-SRCREV = "2969be996acad84b91ab3875b1816636fe61a40e"
-SRC_URI = "git://github.com/${BPN}/${BPN}.git;branch=master;protocol=https"
+SRCREV = "c5f98152a274e25b5107101104bef632b83a0cc9"
+SRC_URI = "git://github.com/${BPN}/${BPN}.git;branch=master;protocol=https;tag=v${PV}"
 
 
 inherit autotools pkgconfig gettext

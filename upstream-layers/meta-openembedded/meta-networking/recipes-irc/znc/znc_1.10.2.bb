@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 DEPENDS = "zlib"
 SRC_URI = "gitsm://github.com/znc/znc.git;branch=master;protocol=https;tag=${BP}"
 
-SRCREV = "29694fd26f5e9ec46731ee13bf66224181984966"
+SRCREV = "59af2206c62724eec0d8c43d3c1c0b70610ca1d9"
 
 inherit cmake pkgconfig
 

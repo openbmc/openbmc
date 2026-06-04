@@ -10,7 +10,7 @@ SRC_URI = " \
     git://github.com/device-mapper-utils/thin-provisioning-tools;branch=main;protocol=https;tag=v${PV} \
     file://0001-Use-portable-atomics-crate.patch \
     file://disable-cargo-metadata.patch \
-    ${@bb.utils.contains('TUNE_FEATURES', '32', \
+    ${@bb.utils.contains('SITEINFO_BITS', '32', \
         'file://dms-no-layout-check.patch;patchdir=${CARGO_VENDORING_DIRECTORY}/devicemapper-sys-0.3.3', \
         '', d)} \
     "
@@ -19,7 +19,7 @@ SRCREV = "8b663fb4c6fb8e52ca06cea57b986c5ba45f668d"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
 
 inherit cargo cargo-update-recipe-crates
-inherit pkgconfig
+inherit pkgconfig siteinfo
 
 DEPENDS += "udev libdevmapper libdevmapper-native clang-native"
 

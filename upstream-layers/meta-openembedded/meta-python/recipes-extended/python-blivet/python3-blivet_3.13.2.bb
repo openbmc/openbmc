@@ -17,7 +17,7 @@ SRC_URI += "\
 "
 SRC_URI[sha256sum] = "6d8374d05eeab513b2a26cf01267e853df7b31e13ad1a1ba7d73a856190d0518"
 
-inherit pypi features_check systemd setuptools3_legacy
+inherit pypi features_check systemd python_setuptools_build_meta
 
 REQUIRED_DISTRO_FEATURES = "systemd"
 
