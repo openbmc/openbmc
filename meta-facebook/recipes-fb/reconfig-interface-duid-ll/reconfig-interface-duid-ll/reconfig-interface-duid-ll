@@ -2,14 +2,21 @@
 
 INTF_NAME="$1"
 NET_CONFIG_FILE="/etc/systemd/network/00-bmc-${INTF_NAME}.network"
-DHCPv6_SETTING_ADD="ClientIdentifier=duid\nIAID=0\nDUIDType=link-layer"
+DHCPv6_SETTING_ADD="IAID=0\nDUIDType=link-layer"
+
+# Use dropin to set DUIDType
+DROPIN_DIR="/run/systemd/network/00-bmc-${INTF_NAME}.network.d"
+DROPIN_FILE="${DROPIN_DIR}/duid-ll.conf"
 
 if [ -f "$NET_CONFIG_FILE" ]; then
-    if ! grep -q "^DUIDType=" "$NET_CONFIG_FILE"; then
-        sed -i "/^\[DHCPv6\]/a $DHCPv6_SETTING_ADD" "$NET_CONFIG_FILE"
+    if [ ! -f "$DROPIN_FILE" ] || ! grep -q "^DUIDType=" "$DROPIN_FILE"; then
+        mkdir -p "$DROPIN_DIR"
+        # Write DUIDType setting to dropin file
+        printf "[DHCPv6]\n%b\n" "$DHCPv6_SETTING_ADD" > "$DROPIN_FILE"
+
         echo "Added LL settings to network configuration file."
-        echo "Restarting systemd-networkd service..."
-        systemctl restart systemd-networkd.service
+        echo "Reload networkctl..."
+        networkctl reload
     else
         echo "'DUIDType' already exists in $NET_CONFIG_FILE. Exiting..."
     fi
