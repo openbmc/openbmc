@@ -4,7 +4,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 LICENSE = "Apache-2.0"
 
 SRC_URI = "git://github.com/google/google-authenticator-libpam.git;branch=master;protocol=https"
-SRCREV = "962f353aac6cfc7b804547319db40f8b804f0b6c"
+SRCREV = "016774b0b75ee8f5e80028998d386de762ba1697"
 
 DEPENDS = "libpam"
 
@@ -18,4 +18,4 @@ EXTRA_OECONF = "--libdir=${base_libdir}"
 PACKAGES += "pam-google-authenticator"
 FILES:pam-google-authenticator = "${base_libdir}/security/pam_google_authenticator.so"
 
-RDEPNEDS_pam-google-authenticator  = "libpam"
+RDEPENDS:pam-google-authenticator = "libpam"

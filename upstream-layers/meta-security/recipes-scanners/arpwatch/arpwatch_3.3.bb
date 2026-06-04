@@ -18,8 +18,8 @@ inherit  autotools-brokensep update-rc.d useradd
 
 ARPWATCH_UID ?= "arpwatch"
 ARPWATCH_GID ?= "arpwatch"
-APRWATCH_FROM ?= "root "
-ARPWATH_REPLY ?= "${ARPWATCH_UID}"
+ARPWATCH_FROM ?= "root "
+ARPWATCH_REPLY ?= "${ARPWATCH_UID}"
 
 # many configure tests are failing with gcc-14
 CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaration"
@@ -27,7 +27,7 @@ BUILD_CFLAGS += "-Wno-error=implicit-int -Wno-error=implicit-function-declaratio
 
 PACKAGECONFIG ??= ""
 
-PACKAGECONFIG[email] = "-with-watcher=email=${APRWATCH_FROM} --with-watchee=email=${ARPWATH_REPLY}, , postfix, postfix postfix-cfg"
+PACKAGECONFIG[email] = "--with-watcher=email=${ARPWATCH_FROM} --with-watchee=email=${ARPWATCH_REPLY}, , postfix, postfix postfix-cfg"
 
 CONFIGUREOPTS = " --build=${BUILD_SYS} \
           --host=${HOST_SYS} \
@@ -78,7 +78,7 @@ USERADD_PARAM:${PN} = "--system -g ${ARPWATCH_GID} --home-dir  \
     ${localstatedir}/spool/${BPN} \
     --no-create-home  --shell /bin/false ${BPN}"
 
-CONFFILE_FILES = "${sysconfdir}/${PN}.conf"
+CONFFILES:${PN} = "${sysconfdir}/${PN}.conf"
 
 FILES:${PN} = "${bindir} ${sbindir} ${prefix}/etc/rc.d \
                ${sysconfdir} /var/lib/arpwatch"
