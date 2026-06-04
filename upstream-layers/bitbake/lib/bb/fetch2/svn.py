@@ -13,6 +13,7 @@ BitBake 'Fetch' implementation for svn.
 import os
 import bb
 import re
+import shlex
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import MissingParameterError
@@ -34,7 +35,7 @@ class Svn(FetchMethod):
         if not "module" in ud.parm:
             raise MissingParameterError('module', ud.url)
 
-        ud.basecmd = d.getVar("FETCHCMD_svn") or "/usr/bin/env svn --non-interactive"
+        ud.basecmd = shlex.split(d.getVar("FETCHCMD_svn") or "") or ['svn', '--non-interactive']
 
         ud.module = ud.parm["module"]
 
@@ -83,15 +84,17 @@ class Svn(FetchMethod):
         options.append("--no-auth-cache")
 
         if ud.user:
-            options.append("--username %s" % ud.user)
+            options.append("--username")
+            options.append(ud.user)
 
         if ud.pswd:
-            options.append("--password %s" % ud.pswd)
+            options.append("--password")
+            options.append(ud.pswd)
 
         if command == "info":
-            svncmd = "%s info %s %s://%s/%s/" % (ud.basecmd, " ".join(options), proto, svnroot, ud.module)
+            svncmd = ud.basecmd + ['info'] + options + ['%s://%s/%s/' % (proto, svnroot, ud.module)]
         elif command == "log1":
-            svncmd = "%s log --limit 1 --quiet %s %s://%s/%s/" % (ud.basecmd, " ".join(options), proto, svnroot, ud.module)
+            svncmd = ud.basecmd + ['log', '--limit', '1', '--quiet'] + options + ['%s://%s/%s/' % (proto, svnroot, ud.module)]
         else:
             suffix = ""
 
@@ -102,22 +105,24 @@ class Svn(FetchMethod):
                 options.append("--ignore-externals")
 
             if ud.revision:
-                options.append("-r %s" % ud.revision)
+                options.append("-r")
+                options.append(ud.revision)
                 if ud.pegrevision:
                     suffix = "@%s" % (ud.revision)
 
             if command == "fetch":
                 transportuser = ud.parm.get("transportuser", "")
-                svncmd = "%s co %s %s://%s%s/%s%s %s" % (ud.basecmd, " ".join(options), proto, transportuser, svnroot, ud.module, suffix, ud.path_spec)
+                svncmd = ud.basecmd + ['co'] + options + ['%s://%s%s/%s%s' % (proto, transportuser, svnroot, ud.module, suffix), ud.path_spec]
             elif command == "update":
-                svncmd = "%s update %s" % (ud.basecmd, " ".join(options))
+                svncmd = ud.basecmd + ['update'] + options
             else:
                 raise FetchError("Invalid svn command %s" % command, ud.url)
 
+        extraenv = {}
         if svn_ssh:
-            svncmd = "SVN_SSH=\"%s\" %s" % (svn_ssh, svncmd)
+            extraenv['SVN_SSH'] = svn_ssh
 
-        return svncmd
+        return svncmd, extraenv
 
     def download(self, ud, d):
         """Fetch url"""
@@ -128,45 +133,47 @@ class Svn(FetchMethod):
 
         try:
             if os.access(os.path.join(ud.moddir, '.svn'), os.R_OK):
-                svncmd = self._buildsvncommand(ud, d, "update")
+                svncmd, extraenv = self._buildsvncommand(ud, d, "update")
                 logger.info("Update " + ud.url)
                 # We need to attempt to run svn upgrade first in case its an older working format
                 try:
-                    runfetchcmd(ud.basecmd + " upgrade", d, workdir=ud.moddir)
+                    runfetchcmd(ud.basecmd + ["upgrade"], d, workdir=ud.moddir)
                 except FetchError:
                     pass
                 logger.debug("Running %s", svncmd)
                 bb.fetch2.check_network_access(d, svncmd, ud.url)
-                runfetchcmd(svncmd, d, workdir=ud.moddir)
+                runfetchcmd(svncmd, d, workdir=ud.moddir, extraenv=extraenv)
             else:
-                svncmd = self._buildsvncommand(ud, d, "fetch")
+                svncmd, extraenv = self._buildsvncommand(ud, d, "fetch")
                 logger.info("Fetch " + ud.url)
                 # check out sources there
                 bb.utils.mkdirhier(ud.pkgdir)
                 logger.debug("Running %s", svncmd)
                 bb.fetch2.check_network_access(d, svncmd, ud.url)
-                runfetchcmd(svncmd, d, workdir=ud.pkgdir)
+                runfetchcmd(svncmd, d, workdir=ud.pkgdir, extraenv=extraenv)
 
             if not ("externals" in ud.parm and ud.parm["externals"] == "nowarn"):
                 # Warn the user if this had externals (won't catch them all)
-                output = runfetchcmd("svn propget svn:externals || true", d, workdir=ud.moddir)
-                if output:
-                    if "--ignore-externals" in svncmd.split():
-                        bb.warn("%s contains svn:externals." % ud.url)
-                        bb.warn("These should be added to the recipe SRC_URI as necessary.")
-                        bb.warn("svn fetch has ignored externals:\n%s" % output)
-                        bb.warn("To disable this warning add ';externals=nowarn' to the url.")
-                    else:
-                        bb.debug(1, "svn repository has externals:\n%s" % output)
-
+                try:
+                    output = runfetchcmd(['svn', 'propget', 'svn:externals'], d, workdir=ud.moddir)
+                    if output:
+                        if "--ignore-externals" in svncmd:
+                            bb.warn("%s contains svn:externals." % ud.url)
+                            bb.warn("These should be added to the recipe SRC_URI as necessary.")
+                            bb.warn("svn fetch has ignored externals:\n%s" % output)
+                            bb.warn("To disable this warning add ';externals=nowarn' to the url.")
+                        else:
+                            bb.debug(1, "svn repository has externals:\n%s" % output)
+                except bb.fetch2.FetchError:
+                    passs
             scmdata = ud.parm.get("scmdata", "")
             if scmdata == "keep":
-                tar_flags = ""
+                tar_flags = []
             else:
-                tar_flags = "--exclude='.svn'"
+                tar_flags = ["--exclude='.svn'"]
 
             # tar them up to a defined filename
-            runfetchcmd("tar %s -czf %s %s" % (tar_flags, ud.localpath, ud.path_spec), d,
+            runfetchcmd(['tar'] + tar_flags + ['-czf', ud.localpath, ud.path_spec], d,
                         cleanup=[ud.localpath], workdir=ud.pkgdir)
         finally:
             bb.utils.unlockfile(lf)
@@ -191,9 +198,11 @@ class Svn(FetchMethod):
         """
         Return the latest upstream revision number
         """
-        bb.fetch2.check_network_access(d, self._buildsvncommand(ud, d, "log1"), ud.url)
-
-        output = runfetchcmd("LANG=C LC_ALL=C " + self._buildsvncommand(ud, d, "log1"), d, True)
+        cmd, extraenv = self._buildsvncommand(ud, d, "log1")
+        bb.fetch2.check_network_access(d, cmd, ud.url)
+        extraenv['LANG'] = 'C'
+        extraenv['LC_ALL'] = 'C'
+        output = runfetchcmd(cmd, d, True, extraenv=extraenv)
 
         # skip the first line, as per output of svn log
         # then we expect the revision on the 2nd line

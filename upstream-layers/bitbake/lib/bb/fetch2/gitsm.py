@@ -63,14 +63,14 @@ class GitSM(Git):
 
         # Collect the defined submodules, and their attributes
         try:
-            gitmodules = runfetchcmd("%s show %s:.gitmodules" % (ud.basecmd, ud.revision), d, quiet=True, workdir=workdir)
+            gitmodules = runfetchcmd(ud.basecmd + ['show', '%s:.gitmodules' % ud.revision], d, quiet=True, workdir=workdir)
         except:
             # No submodules to update
             gitmodules = ""
 
         for m, md in parse_gitmodules(gitmodules).items():
             try:
-                module_hash = runfetchcmd("%s ls-tree -z -d %s %s" % (ud.basecmd, ud.revision, md['path']), d, quiet=True, workdir=workdir)
+                module_hash = runfetchcmd(ud.basecmd + ['ls-tree', '-z', '-d', ud.revision, md['path']], d, quiet=True, workdir=workdir)
             except:
                 # If the command fails, we don't have a valid file to check.  If it doesn't
                 # fail -- it still might be a failure, see next check...
@@ -155,7 +155,7 @@ class GitSM(Git):
         if ud.shallow and os.path.exists(ud.fullshallow) and unpack:
             tmpdir = tempfile.mkdtemp(dir=d.getVar("DL_DIR"))
             try:
-                runfetchcmd("tar -xzf %s" % ud.fullshallow, d, workdir=tmpdir)
+                runfetchcmd(['tar', '-xzf', ud.fullshallow], d, workdir=tmpdir)
                 self.process_submodules(ud, tmpdir, subfunc, d)
             finally:
                 shutil.rmtree(tmpdir)
@@ -228,14 +228,14 @@ class GitSM(Git):
             local_path = newfetch.localpath(url)
 
             # Correct the submodule references to the local download version...
-            runfetchcmd("%(basecmd)s config submodule.%(module)s.url %(url)s" % {'basecmd': ud.basecmd, 'module': module, 'url' : local_path}, d, workdir=ud.destdir)
+            runfetchcmd(ud.basecmd + ['config', 'submodule.%s.url' % module, local_path], d, workdir=ud.destdir)
 
             if ud.shallow:
-                runfetchcmd("%(basecmd)s config submodule.%(module)s.shallow true" % {'basecmd': ud.basecmd, 'module': module}, d, workdir=ud.destdir)
+                runfetchcmd(ud.basecmd + ['config', 'submodule.%s.shallow' % module, 'true'], d, workdir=ud.destdir)
 
             # Ensure the submodule repository is NOT set to bare, since we're checking it out...
             try:
-                runfetchcmd("%s config core.bare false" % (ud.basecmd), d, quiet=True, workdir=os.path.join(repo_conf, 'modules', module))
+                runfetchcmd(ud.basecmd + ['config', 'core.bare', 'false'], d, quiet=True, workdir=os.path.join(repo_conf, 'modules', module))
             except:
                 logger.error("Unable to set git config core.bare to false for %s" % os.path.join(repo_conf, 'modules', module))
                 raise
@@ -245,11 +245,12 @@ class GitSM(Git):
         ret = self.process_submodules(ud, ud.destdir, unpack_submodules, d)
 
         if not ud.bareclone and ret:
-            cmdprefix = ""
+            extraenv = {}
             # Avoid LFS smudging (replacing the LFS pointers with the actual content) when LFS shouldn't be used but git-lfs is installed.
             if not self._need_lfs(ud):
-                cmdprefix = "GIT_LFS_SKIP_SMUDGE=1 "
-            runfetchcmd("%s%s submodule update --recursive --no-fetch" % (cmdprefix, ud.basecmd), d, quiet=True, workdir=ud.destdir)
+                extraenv['GIT_LFS_SKIP_SMUDGE'] = '1'
+            runfetchcmd(ud.basecmd + ['submodule', 'update', '--recursive', '--no-fetch'], d, quiet=True, workdir=ud.destdir, extraenv=extraenv)
+
     def clean(self, ud, d):
         def clean_submodule(ud, url, module, modpath, workdir, d):
             url += ";bareclone=1;nobranch=1"

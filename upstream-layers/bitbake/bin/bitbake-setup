@@ -128,8 +128,8 @@ def write_sources_fixed_revisions(config_dir, layer_dir, config_data):
         os.symlink(os.path.relpath(json_path ,layer_dir), json_link)
 
 def commit_config(config_dir):
-    bb.process.run("git -C {} add .".format(config_dir))
-    bb.process.run("git -C {} commit --allow-empty --no-verify -a -m 'Configuration at {}'".format(config_dir, time.asctime()))
+    bb.process.run(['git', '-C', config_dir, 'add', '.'])
+    bb.process.run(['git', '-C', config_dir, 'commit', '--allow-empty', '--no-verify', '-a', '-m', 'Configuration at ' + time.asctime()])
 
 def _write_layer_list(dest, repodirs):
     layers = []
@@ -357,7 +357,7 @@ def setup_bitbake_build(bitbake_config, layerdir, setupdir, thisdir, update_bb_c
         _setup_build_conf(layers, filerelative_layers, bitbake_confdir)
 
     if template:
-        bb.process.run("{} setup -c {} -b {} --no-shell".format(oesetupbuild, template, bitbake_builddir))
+        bb.process.run([oesetupbuild, "setup", "-c", template, "-b", bitbake_builddir, "--no-shell"])
     else:
         oeinitbuildenvdir = os.path.join(layerdir, 'oe-init-build-env-dir')
         if not os.path.exists(os.path.join(oeinitbuildenvdir, "oe-init-build-env")):
@@ -857,11 +857,11 @@ def init_config(top_dir, settings, args):
     os.makedirs(confdir)
     os.makedirs(layerdir)
 
-    bb.process.run("git -C {} init -b main".format(confdir))
+    bb.process.run(["git", "-C", confdir, "init", "-b", "main"])
     # Make sure commiting doesn't fail if no default git user is configured on the machine
-    bb.process.run("git -C {} config user.name bitbake-setup".format(confdir))
-    bb.process.run("git -C {} config user.email bitbake-setup@not.set".format(confdir))
-    bb.process.run("git -C {} commit --no-verify --allow-empty -m 'Initial commit'".format(confdir))
+    bb.process.run(["git", "-C", confdir, "config", "user.name", "bitbake-setup"])
+    bb.process.run(["git", "-C", confdir, "config", "user.email", "bitbake-setup@not.set"])
+    bb.process.run(["git", "-C", confdir, "commit", "--no-verify", "--allow-empty", "-m", "Initial commit"])
 
     bb.event.register("bb.build.TaskProgress", handle_task_progress, data=d)
 
@@ -872,7 +872,7 @@ def init_config(top_dir, settings, args):
 
 def get_diff(file1, file2):
     try:
-        bb.process.run('diff {} -uNr {} {}'.format(get_diff_color_param(), file1, file2))
+        bb.process.run(["diff", get_diff_color_param(), "-uNr", file1, file2])
     except bb.process.ExecutionError as e:
         if e.exitcode == 1:
             return e.stdout
@@ -887,7 +887,7 @@ def are_layers_changed(layers, layerdir, d):
         rev = r_remote['rev']
         branch = r_remote.get('branch', None)
 
-        rev_parse_result = bb.process.run('git -C {} rev-parse HEAD'.format(os.path.join(layerdir, repodir)))
+        rev_parse_result = bb.process.run(['git', '-C', os.path.join(layerdir, repodir), "rev-parse", "HEAD"])
         local_revision = rev_parse_result[0].strip()
         if sha1_re.match(rev):
             if rev != local_revision:
@@ -937,7 +937,7 @@ def build_status(top_dir, settings, args, d, update=False):
     new_upstream_config = obtain_config(top_dir, registry, args, source_overrides, d)
 
     write_upstream_config(confdir, new_upstream_config)
-    config_diff = bb.process.run('git -C {} diff {}'.format(confdir, get_diff_color_param()))[0]
+    config_diff = bb.process.run(["git", "-C" , confdir, "diff", get_diff_color_param()])[0]
 
     if config_diff:
         logger.plain('\nConfiguration in {} has changed:\n{}'.format(setupdir, config_diff))
@@ -945,7 +945,7 @@ def build_status(top_dir, settings, args, d, update=False):
             update_build(new_upstream_config, confdir, setupdir, layerdir, d,
                          update_bb_conf=args.update_bb_conf, rebase_conflicts_strategy=args.rebase_conflicts_strategy)
         else:
-            bb.process.run('git -C {} restore config-upstream.json'.format(confdir))
+            bb.process.run(["git", "-C", confdir, "restore", "config-upstream.json"])
         return
 
     layer_config = merge_overrides_into_sources(current_upstream_config["data"]["sources"], current_upstream_config["source-overrides"]["sources"])

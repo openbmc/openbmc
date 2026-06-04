@@ -15,6 +15,7 @@ BitBake 'Fetch' implementation for mercurial DRCS (hg).
 import os
 import bb
 import errno
+import shlex
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError
 from bb.fetch2 import MissingParameterError
@@ -63,7 +64,7 @@ class Hg(FetchMethod):
         ud.pkgdir = os.path.join(hgdir, hgsrcname)
         ud.moddir = os.path.join(ud.pkgdir, ud.module)
         ud.localfile = ud.moddir
-        ud.basecmd = d.getVar("FETCHCMD_hg") or "/usr/bin/env hg"
+        ud.basecmd = shlex.split(d.getVar("FETCHCMD_hg") or "") or ["hg"]
 
         ud.setup_revisions(d)
 
@@ -113,7 +114,7 @@ class Hg(FetchMethod):
                 hgroot = ud.user + "@" + host + ud.path
 
         if command == "info":
-            return "%s identify -i %s://%s/%s" % (ud.basecmd, proto, hgroot, ud.module)
+            return ud.basecmd + ['identify', '-i', '%s://%s/%s' % (proto, hgroot, ud.module)]
 
         options = [];
 
@@ -122,26 +123,21 @@ class Hg(FetchMethod):
         # the tag actually exists in the specified revision + 1, so it won't
         # be available when used in any successive commands.
         if ud.revision and command != "fetch":
-            options.append("-r %s" % ud.revision)
+            options += ["-r", ud.revision]
+
+        authconfig = []
+        if ud.user and ud.pswd:
+            authconfig = ['--config', 'auth.default.prefix=*', '--config', 'auth.default.username=' + ud.user, '--config', 'auth.default.password=' + ud.pswd, '--config', 'auth.default.schemes=' + proto]
 
         if command == "fetch":
-            if ud.user and ud.pswd:
-                cmd = "%s --config auth.default.prefix=* --config auth.default.username=%s --config auth.default.password=%s --config \"auth.default.schemes=%s\" clone %s %s://%s/%s %s" % (ud.basecmd, ud.user, ud.pswd, proto, " ".join(options), proto, hgroot, ud.module, ud.module)
-            else:
-                cmd = "%s clone %s %s://%s/%s %s" % (ud.basecmd, " ".join(options), proto, hgroot, ud.module, ud.module)
+            cmd = ud.basecmd + authconfig + ['clone'] + options + ['%s://%s/%s' % (proto, hgroot, ud.module), ud.module]
         elif command == "pull":
             # do not pass options list; limiting pull to rev causes the local
             # repo not to contain it and immediately following "update" command
             # will crash
-            if ud.user and ud.pswd:
-                cmd = "%s --config auth.default.prefix=* --config auth.default.username=%s --config auth.default.password=%s --config \"auth.default.schemes=%s\" pull" % (ud.basecmd, ud.user, ud.pswd, proto)
-            else:
-                cmd = "%s pull" % (ud.basecmd)
+            cmd = ud.basecmd + authconfig + ['pull']
         elif command == "update" or command == "up":
-            if ud.user and ud.pswd:
-                cmd = "%s --config auth.default.prefix=* --config auth.default.username=%s --config auth.default.password=%s --config \"auth.default.schemes=%s\" update -C %s" % (ud.basecmd, ud.user, ud.pswd, proto, " ".join(options))
-            else:
-                cmd = "%s update -C %s" % (ud.basecmd, " ".join(options))
+            cmd = ud.basecmd + authconfig + ['update', '-C'] + options
         else:
             raise FetchError("Invalid hg command %s" % command, ud.url)
 
@@ -155,7 +151,7 @@ class Hg(FetchMethod):
         # If the checkout doesn't exist and the mirror tarball does, extract it
         if not os.path.exists(ud.pkgdir) and os.path.exists(ud.fullmirror):
             bb.utils.mkdirhier(ud.pkgdir)
-            runfetchcmd("tar -xzf %s" % (ud.fullmirror), d, workdir=ud.pkgdir)
+            runfetchcmd(['tar', '-xzf', ud.fullmirror], d, workdir=ud.pkgdir)
 
         if os.access(os.path.join(ud.moddir, '.hg'), os.R_OK):
             # Found the source, check whether need pull
@@ -228,8 +224,8 @@ class Hg(FetchMethod):
                 os.unlink(ud.fullmirror)
 
             logger.info("Creating tarball of hg repository")
-            runfetchcmd("tar -czf %s %s" % (ud.fullmirror, ud.module), d, workdir=ud.pkgdir)
-            runfetchcmd("touch %s.done" % (ud.fullmirror), d, workdir=ud.pkgdir)
+            runfetchcmd(['tar', '-czf', ud.fullmirror, ud.module], d, workdir=ud.pkgdir)
+            runfetchcmd(['touch', '%s.done' % ud.fullmirror], d, workdir=ud.pkgdir)
 
     def localpath(self, ud, d):
         return ud.pkgdir
@@ -249,16 +245,13 @@ class Hg(FetchMethod):
             proto = ud.parm.get('protocol', 'http')
             if not os.access(os.path.join(codir, '.hg'), os.R_OK):
                 logger.debug2("Unpack: creating new hg repository in '" + codir + "'")
-                runfetchcmd("%s init %s" % (ud.basecmd, codir), d)
+                runfetchcmd(ud.basecmd + ['init', codir], d)
             logger.debug2("Unpack: updating source in '" + codir + "'")
+            authconfig = []
             if ud.user and ud.pswd:
-                runfetchcmd("%s --config auth.default.prefix=* --config auth.default.username=%s --config auth.default.password=%s --config \"auth.default.schemes=%s\" pull %s" % (ud.basecmd, ud.user, ud.pswd, proto, ud.moddir), d, workdir=codir)
-            else:
-                runfetchcmd("%s pull %s" % (ud.basecmd, ud.moddir), d, workdir=codir)
-            if ud.user and ud.pswd:
-                runfetchcmd("%s --config auth.default.prefix=* --config auth.default.username=%s --config auth.default.password=%s --config \"auth.default.schemes=%s\" up -C %s" % (ud.basecmd, ud.user, ud.pswd, proto, revflag), d, workdir=codir)
-            else:
-                runfetchcmd("%s up -C %s" % (ud.basecmd, revflag), d, workdir=codir)
+                authconfig = ['--config', 'auth.default.prefix=*', '--config', 'auth.default.username=' + ud.user, '--config', 'auth.default.password=' + ud.pswd, '--config', 'auth.default.schemes=' + proto]
+            runfetchcmd(ud.basecmd + authconfig + ['pull', ud.moddir], d, workdir=codir)
+            runfetchcmd(ud.basecmd + authconfig + ['up', '-C', revflag], d, workdir=codir)
         else:
             logger.debug2("Unpack: extracting source to '" + codir + "'")
-            runfetchcmd("%s archive -t files %s %s" % (ud.basecmd, revflag, codir), d, workdir=ud.moddir)
+            runfetchcmd(ud.basecmd + ['archive', '-t', 'files', revflag, codir], d, workdir=ud.moddir)

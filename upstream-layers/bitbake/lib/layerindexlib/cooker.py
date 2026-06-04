@@ -55,10 +55,10 @@ class CookerPlugin(layerindexlib.plugin.IndexPlugin):
         bb_path = os.path.dirname(bb_path)  # .../bitbake/lib/layerindex
         bb_path = os.path.dirname(bb_path)  # .../bitbake/lib
         bb_path = os.path.dirname(bb_path)  # .../bitbake
-        bb_path = self._run_command('git rev-parse --show-toplevel', os.path.dirname(__file__), default=bb_path)
-        bb_branch = self._run_command('git rev-parse --abbrev-ref HEAD', bb_path, default="<unknown>")
-        bb_rev = self._run_command('git rev-parse HEAD', bb_path, default="<unknown>")
-        for remotes in self._run_command('git remote -v', bb_path, default="").split("\n"):
+        bb_path = self._run_command(['git', 'rev-parse', '--show-toplevel'], os.path.dirname(__file__), default=bb_path)
+        bb_branch = self._run_command(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], bb_path, default="<unknown>")
+        bb_rev = self._run_command(['git', 'rev-parse', 'HEAD'], bb_path, default="<unknown>")
+        for remotes in self._run_command(['git', 'remote', '-v'], bb_path, default="").split("\n"):
             remote = remotes.split("\t")[1].split(" ")[0]
             if "(fetch)" == remotes.split("\t")[1].split(" ")[1]:
                 bb_remote = self._handle_git_remote(remote)
@@ -118,14 +118,14 @@ class CookerPlugin(layerindexlib.plugin.IndexPlugin):
             layerbranch = "<unknown>"
 
             if os.path.isdir(layerpath):
-                layerbasepath = self._run_command('git rev-parse --show-toplevel', layerpath, default=layerpath)
+                layerbasepath = self._run_command(['git', 'rev-parse', '--show-toplevel'], layerpath, default=layerpath)
                 if os.path.abspath(layerpath) != os.path.abspath(layerbasepath):
                     layersubdir = os.path.abspath(layerpath)[len(layerbasepath) + 1:]
 
-                layerbranch = self._run_command('git rev-parse --abbrev-ref HEAD', layerpath, default="<unknown>")
-                layerrev = self._run_command('git rev-parse HEAD', layerpath, default="<unknown>")
+                layerbranch = self._run_command(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], layerpath, default="<unknown>")
+                layerrev = self._run_command(['git', 'rev-parse', 'HEAD'], layerpath, default="<unknown>")
 
-                for remotes in self._run_command('git remote -v', layerpath, default="").split("\n"):
+                for remotes in self._run_command(['git', 'remote', '-v'], layerpath, default="").split("\n"):
                     if not remotes:
                         layerurl = self._handle_git_remote(layerpath)
                     else:

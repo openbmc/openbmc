@@ -75,12 +75,9 @@ def npm_integrity(integrity):
 def npm_unpack(tarball, destdir, d):
     """Unpack a npm tarball"""
     bb.utils.mkdirhier(destdir)
-    cmd = "tar --extract --gzip --file=%s" % shlex.quote(tarball)
-    cmd += " --no-same-owner"
-    cmd += " --delay-directory-restore"
-    cmd += " --strip-components=1"
+    cmd = ['tar', '--extract', '--gzip', '--file=%s' % tarball, '--no-same-owner', '--delay-directory-restore', '--strip-components=1']
     runfetchcmd(cmd, d, workdir=destdir)
-    runfetchcmd("chmod -R +X '%s'" % (destdir), d, quiet=True, workdir=destdir)
+    runfetchcmd(['chmod', '-R', '+X', destdir], d, quiet=True, workdir=destdir)
 
 class NpmEnvironment(object):
     """
@@ -129,19 +126,20 @@ class NpmEnvironment(object):
                 workdir = tmpdir
 
             def _run(cmd):
-                cmd = "NPM_CONFIG_USERCONFIG=%s " % (self.user_config.name) + cmd
-                cmd = "NPM_CONFIG_GLOBALCONFIG=%s " % (self.global_config_name) + cmd
-                return runfetchcmd(cmd, d, workdir=workdir)
+                extraenv = {}
+                extraenv['NPM_CONFIG_USERCONFIG'] = self.user_config.name
+                extraenv['NPM_CONFIG_GLOBALCONFIG'] = self.global_config_name
+                return runfetchcmd(cmd, d, workdir=workdir, extraenv=extraenv)
 
             if configs:
                 bb.warn("Use of configs argument of NpmEnvironment.run() function"
                     " is deprecated. Please use args argument instead.")
                 for key, value in configs:
-                    cmd += " --%s=%s" % (key, shlex.quote(value))
+                    cmd.append('--%s=%s' % (key, value))
 
             if args:
                 for key, value in args:
-                    cmd += " --%s=%s" % (key, shlex.quote(value))
+                    cmd.append('--%s=%s' % (key, value))
 
             return _run(cmd)
 
@@ -190,7 +188,7 @@ class Npm(FetchMethod):
             ud.localfile = npm_localfile(ud.package, ud.version)
 
         # Get the base 'npm' command
-        ud.basecmd = d.getVar("FETCHCMD_npm") or "npm"
+        ud.basecmd = shlex.split(d.getVar("FETCHCMD_npm") or "") or ["npm"]
 
         # This fetcher resolves a URI from a npm package name and version and
         # then forwards it to a proxy fetcher. A resolve file containing the
@@ -206,8 +204,8 @@ class Npm(FetchMethod):
             args = []
             args.append(("json", "true"))
             args.append(("registry", ud.registry))
-            pkgver = shlex.quote(ud.package + "@" + ud.version)
-            cmd = ud.basecmd + " view %s" % pkgver
+            pkgver = ud.package + "@" + ud.version
+            cmd = ud.basecmd + ['view', pkgver]
             env = NpmEnvironment(d)
             check_network_access(d, cmd, ud.registry)
             view_string = env.run(cmd, args=args)

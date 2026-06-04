@@ -1068,6 +1068,12 @@ They contain the following sections:
       configuration choices by putting together information from a leaf
       configuration and all of its ancestors.
 
+      When the same keyword is present in a nested configuration and in one of
+      its ancestors, the values are merged with Python ``+`` semantics. For
+      example, lists are appended and strings are concatenated directly. String
+      values such as ``description`` should include any needed separators in
+      the configuration data.
+
    -  ``bb-env-passthrough-additions`` (*optional*): List of environment
       variables to include in :term:`BB_ENV_PASSTHROUGH_ADDITIONS`.
 

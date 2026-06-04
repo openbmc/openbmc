@@ -83,13 +83,13 @@ class Wget(FetchMethod):
         if not ud.localfile:
             ud.localfile = ud.host + ud.path.replace("/", ".")
 
-        self.basecmd = d.getVar("FETCHCMD_wget") or "/usr/bin/env wget --tries=2 --timeout=100"
+        self.basecmd = shlex.split(d.getVar("FETCHCMD_wget") or "") or ['wget', '--tries=2', '--timeout=100']
 
         if ud.type == 'ftp' or ud.type == 'ftps':
-            self.basecmd += " --passive-ftp"
+            self.basecmd.append("--passive-ftp")
 
         if not self.check_certs(d):
-            self.basecmd += " --no-check-certificate"
+            self.basecmd.append("--no-check-certificate")
 
     def _runwget(self, ud, d, command, quiet, workdir=None):
 
@@ -97,20 +97,21 @@ class Wget(FetchMethod):
 
         logger.debug2("Fetching %s using command '%s'" % (ud.url, command))
         bb.fetch2.check_network_access(d, command, ud.url)
-        runfetchcmd(command + ' --progress=dot --verbose', d, quiet, log=progresshandler, workdir=workdir)
+
+        runfetchcmd(command + ['--progress=dot', '--verbose'], d, quiet, log=progresshandler, workdir=workdir)
 
     def download(self, ud, d):
         """Fetch urls"""
 
-        fetchcmd = self.basecmd
+        fetchcmd = self.basecmd.copy()
 
         dldir = os.path.realpath(d.getVar("DL_DIR"))
         localpath = os.path.join(dldir, ud.localfile) + ".tmp"
         bb.utils.mkdirhier(os.path.dirname(localpath))
-        fetchcmd += " --output-document=%s" % shlex.quote(localpath)
+        fetchcmd.append("--output-document=%s" % localpath)
 
         if ud.user and ud.pswd:
-            fetchcmd += " --auth-no-challenge"
+            fetchcmd.append("--auth-no-challenge")
             if ud.parm.get("redirectauth", "1") == "1":
                 # An undocumented feature of wget is that if the
                 # username/password are specified on the URI, wget will only
@@ -120,10 +121,13 @@ class Wget(FetchMethod):
                 # AWS will reject any request that has authentication both in
                 # the query parameters (from the redirect) and in the
                 # Authorization header.
-                fetchcmd += " --user=%s --password=%s" % (ud.user, ud.pswd)
+                fetchcmd.append("--user=" + ud.user)
+                fetchcmd.append("--password=" + ud.pswd)
 
         uri = ud.url.split(";")[0]
-        fetchcmd += " --continue --directory-prefix=%s '%s'" % (dldir, uri)
+        fetchcmd.append("--continue")
+        fetchcmd.append("--directory-prefix=" + dldir)
+        fetchcmd.append(uri)
         self._runwget(ud, d, fetchcmd, False)
 
         # Sanity check since wget can pretend it succeed when it didn't
@@ -482,8 +486,7 @@ class Wget(FetchMethod):
         """
         f = tempfile.NamedTemporaryFile()
         with tempfile.TemporaryDirectory(prefix="wget-index-") as workdir, tempfile.NamedTemporaryFile(dir=workdir, prefix="wget-listing-") as f:
-            fetchcmd = self.basecmd
-            fetchcmd += " --output-document=%s '%s'" % (f.name, uri)
+            fetchcmd = self.basecmd + ["--output-document=%s" % f.name, uri]
             try:
                 self._runwget(ud, d, fetchcmd, True, workdir=workdir)
                 fetchresult = f.read()

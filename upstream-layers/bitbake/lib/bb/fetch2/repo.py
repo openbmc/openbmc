@@ -13,6 +13,7 @@ BitBake "Fetch" repo (git) implementation
 
 import os
 import bb
+import shlex
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import runfetchcmd
 from   bb.fetch2 import logger
@@ -33,7 +34,7 @@ class Repo(FetchMethod):
         "master".
         """
 
-        ud.basecmd = d.getVar("FETCHCMD_repo") or "/usr/bin/env repo"
+        ud.basecmd = shlex.split(d.getVar("FETCHCMD_repo") or "") or ["repo"]
 
         ud.proto = ud.parm.get('protocol', 'git')
         ud.branch = ud.parm.get('branch', 'master')
@@ -63,19 +64,19 @@ class Repo(FetchMethod):
         bb.utils.mkdirhier(repodir)
         if not os.path.exists(os.path.join(repodir, ".repo")):
             bb.fetch2.check_network_access(d, "%s init -m %s -b %s -u %s://%s%s%s" % (ud.basecmd, ud.manifest, ud.branch, ud.proto, username, ud.host, ud.path), ud.url)
-            runfetchcmd("%s init -m %s -b %s -u %s://%s%s%s" % (ud.basecmd, ud.manifest, ud.branch, ud.proto, username, ud.host, ud.path), d, workdir=repodir)
+            runfetchcmd(ud.basecmd + ['init', '-m', ud.manifest, '-b', ud.branch, '-u', '%s://%s%s%s' % (ud.proto, username, ud.host, ud.path)], d, workdir=repodir)
 
-        bb.fetch2.check_network_access(d, "%s sync %s" % (ud.basecmd, ud.url), ud.url)
-        runfetchcmd("%s sync" % ud.basecmd, d, workdir=repodir)
+        bb.fetch2.check_network_access(d, ud.basecmd + ['sync'], ud.url)
+        runfetchcmd(ud.basecmd + ['sync'], d, workdir=repodir)
 
         scmdata = ud.parm.get("scmdata", "")
         if scmdata == "keep":
-            tar_flags = ""
+            tar_flags = []
         else:
-            tar_flags = "--exclude='.repo' --exclude='.git'"
+            tar_flags = ["--exclude='.repo'", "--exclude='.git'"]
 
         # Create a cache
-        runfetchcmd("tar %s -czf %s %s" % (tar_flags, ud.localpath, os.path.join(".", "*") ), d, workdir=codir)
+        runfetchcmd(['tar'] + tar_flags + ['-czf', ud.localpath, os.path.join(".", "*")], d, workdir=codir)
 
     def supports_srcrev(self):
         return False

@@ -27,7 +27,7 @@ class GitANNEX(Git):
     def uses_annex(self, ud, d, wd):
         for name in ud.names:
             try:
-                runfetchcmd("%s rev-list git-annex" % (ud.basecmd), d, quiet=True, workdir=wd)
+                runfetchcmd(ud.basecmd + ['rev-list', 'git-annex'], d, quiet=True, workdir=wd)
                 return True
             except bb.fetch.FetchError:
                 pass
@@ -36,10 +36,10 @@ class GitANNEX(Git):
 
     def update_annex(self, ud, d, wd):
         try:
-            runfetchcmd("%s annex get --all" % (ud.basecmd), d, quiet=True, workdir=wd)
+            runfetchcmd(ud.basecmd + ['annex get', '--all'], d, quiet=True, workdir=wd)
         except bb.fetch.FetchError:
             return False
-        runfetchcmd("chmod u+w -R %s/annex" % (ud.clonedir), d, quiet=True, workdir=wd)
+        runfetchcmd(['chmod', 'u+w', '-R', '%s/annex' % ud.clonedir], d, quiet=True, workdir=wd)
 
         return True
 
@@ -54,24 +54,24 @@ class GitANNEX(Git):
         super(GitANNEX, self).clone_shallow_local(ud, dest, d)
 
         try:
-            runfetchcmd("%s annex init" % ud.basecmd, d, workdir=dest)
+            runfetchcmd(ud.basecmd + ['annex', 'init'], d, workdir=dest)
         except bb.fetch.FetchError:
             pass
 
         if self.uses_annex(ud, d, dest):
-            runfetchcmd("%s annex get" % ud.basecmd, d, workdir=dest)
-            runfetchcmd("chmod u+w -R %s/.git/annex" % (dest), d, quiet=True, workdir=dest)
+            runfetchcmd(ud.basecmd + ['annex', 'get'], d, workdir=dest)
+            runfetchcmd(['chmod', 'u+w', '-R',  '%s/.git/annex' % dest], d, quiet=True, workdir=dest)
 
     def unpack(self, ud, destdir, d):
         Git.unpack(self, ud, destdir, d)
 
         try:
-            runfetchcmd("%s annex init" % (ud.basecmd), d, workdir=ud.destdir)
+            runfetchcmd(ud.basecmd + ['annex' ,'init'], d, workdir=ud.destdir)
         except bb.fetch.FetchError:
             pass
 
         annex = self.uses_annex(ud, d, ud.destdir)
         if annex:
-            runfetchcmd("%s annex get" % (ud.basecmd), d, workdir=ud.destdir)
-            runfetchcmd("chmod u+w -R %s/.git/annex" % (ud.destdir), d, quiet=True, workdir=ud.destdir)
+            runfetchcmd(ud.basecmd + ['annex', 'get'], d, workdir=ud.destdir)
+            runfetchcmd(['chmod', 'u+w', '-R',  '%s/.git/annex' % ud.destdir], d, quiet=True, workdir=ud.destdir)
 

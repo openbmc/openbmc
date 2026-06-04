@@ -26,6 +26,7 @@ Supported SRC_URI options are:
 
 import os
 import bb
+import shlex
 from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
@@ -73,7 +74,7 @@ class Perforce(FetchMethod):
         provided by the env, use it.  If P4PORT is specified by the recipe, use
         its values, which may override the settings in P4CONFIG.
         """
-        ud.basecmd = d.getVar("FETCHCMD_p4") or "/usr/bin/env p4"
+        ud.basecmd = shlex.split(d.getVar("FETCHCMD_p4") or "") or ["p4"]
 
         ud.dldir = d.getVar("P4DIR") or (d.getVar("DL_DIR") + "/p4")
 
@@ -95,10 +96,15 @@ class Perforce(FetchMethod):
         else:
             logger.debug('Trying to use P4CONFIG to automatically set P4PORT...')
             ud.usingp4config = True
-            p4cmd = '%s info | grep "Server address"' % ud.basecmd
+            p4cmd = ud.basecmd + ['info']
             bb.fetch2.check_network_access(d, p4cmd, ud.url)
-            ud.host = runfetchcmd(p4cmd, d, True)
-            ud.host = ud.host.split(': ')[1].strip()
+            output = runfetchcmd(p4cmd, d, True)
+            ud.host = None
+            for line in output.splitlines():
+                if "Server address" in line:
+                    ud.host = line.split(': ')[1].strip()
+                    break
+
             logger.debug('Determined P4PORT to be: %s' % ud.host)
             if not ud.host:
                 raise FetchError('Could not determine P4PORT from P4CONFIG')
@@ -142,16 +148,16 @@ class Perforce(FetchMethod):
         "files".  depot_filename is the full path to the file in the depot
         including the trailing '#rev' value.
         """
-        p4opt = ""
+        p4opt = []
 
         if ud.user:
-            p4opt += ' -u "%s"' % (ud.user)
+            p4opt += ['-u', ud.user]
 
         if ud.pswd:
-            p4opt += ' -P "%s"' % (ud.pswd)
+            p4opt += ['-P', ud.pswd]
 
         if ud.host and not ud.usingp4config:
-            p4opt += ' -p %s' % (ud.host)
+            p4opt += ['-p', ud.host]
 
         if hasattr(ud, 'revision') and ud.revision:
             pathnrev = '%s@%s' % (ud.path, ud.revision)
@@ -176,14 +182,14 @@ class Perforce(FetchMethod):
             filename = filename[:filename.find('#')] # Remove trailing '#rev'
 
         if command == 'changes':
-            p4cmd = '%s%s changes -m 1 //%s' % (ud.basecmd, p4opt, pathnrev)
+            p4cmd = ud.basecmd + p4opt + ['changes', '-m', '1', '//%s' % pathnrev]
         elif command == 'print':
             if depot_filename is not None:
-                p4cmd = '%s%s print -o "p4/%s" "%s"' % (ud.basecmd, p4opt, filename, depot_filename)
+                p4cmd = ud.basecmd + p4opt + ['print', '-o', 'p4/%s' % filename, depot_filename]
             else:
                 raise FetchError('No depot file name provided to p4 %s' % command, ud.url)
         elif command == 'files':
-            p4cmd = '%s%s files //%s' % (ud.basecmd, p4opt, pathnrev)
+            p4cmd = ud.basecmd + p4opt + ['files', '//%s' % pathnrev]
         else:
             raise FetchError('Invalid p4 command %s' % command, ud.url)
 
@@ -231,7 +237,7 @@ class Perforce(FetchMethod):
             bb.fetch2.check_network_access(d, p4fetchcmd, ud.url)
             runfetchcmd(p4fetchcmd, d, workdir=ud.pkgdir, log=progresshandler)
 
-        runfetchcmd('tar -czf %s p4' % (ud.localpath), d, cleanup=[ud.localpath], workdir=ud.pkgdir)
+        runfetchcmd(['tar', '-czf', ud.localpath, 'p4'], d, cleanup=[ud.localpath], workdir=ud.pkgdir)
 
     def clean(self, ud, d):
         """ Cleanup p4 specific files and dirs"""

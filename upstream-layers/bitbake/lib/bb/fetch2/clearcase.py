@@ -49,6 +49,7 @@ User credentials:
 #
 
 import os
+import shlex
 import shutil
 import bb
 from   bb.fetch2 import FetchMethod
@@ -94,7 +95,7 @@ class ClearCase(FetchMethod):
         else:
             ud.module = ""
 
-        ud.basecmd = d.getVar("FETCHCMD_ccrc") or "/usr/bin/env cleartool || rcleartool"
+        ud.fallbackcmd = shlex.split(d.getVar("FETCHCMD_ccrc") or "")
 
         if d.getVar("SRCREV") == "INVALID":
           raise FetchError("Set a valid SRCREV for the clearcase fetcher in your recipe, e.g. SRCREV = \"/main/LATEST\" or any other label of your choice.")
@@ -122,7 +123,6 @@ class ClearCase(FetchMethod):
         self.debug("type            = %s" % ud.type)
         self.debug("vob             = %s" % ud.vob)
         self.debug("module          = %s" % ud.module)
-        self.debug("basecmd         = %s" % ud.basecmd)
         self.debug("label           = %s" % ud.label)
         self.debug("ccasedir        = %s" % ud.ccasedir)
         self.debug("viewdir         = %s" % ud.viewdir)
@@ -135,34 +135,35 @@ class ClearCase(FetchMethod):
         Build up a commandline based on ud
         command is: mkview, setcs, rmview
         """
-        options = []
+        cmd = [shutil.which("cleartool"), command]
+        if cmd[0] is None:
+            cmd = [shutil.which("rcleartool"), command]
+        if cmd[0] is None:
+            cmd = ud.fallbackcmd + [command]
 
-        if "rcleartool" in ud.basecmd:
-            options.append("-server %s" % ud.server)
-
-        basecmd = "%s %s" % (ud.basecmd, command)
+        if cmd[0].endswith("rcleartool"):
+            cmd += ['-server', ud.server]
 
         if command == 'mkview':
-            if not "rcleartool" in ud.basecmd:
+            if not cmd[0].endswith("rcleartool"):
                 # Cleartool needs a -snapshot view
-                options.append("-snapshot")
-            options.append("-tag %s" % ud.viewname)
-            options.append(ud.viewdir)
+                cmd.append("-snapshot")
+            cmd += ["-tag", ud.viewname]
+            cmd.append(ud.viewdir)
 
         elif command == 'rmview':
-            options.append("-force")
-            options.append("%s" % ud.viewdir)
+            cmd.append("-force")
+            cmd.append(ud.viewdir)
 
         elif command == 'setcs':
-            options.append("-overwrite")
-            options.append(ud.configspecfile)
+            cmd.append("-overwrite")
+            cmd.append(ud.configspecfile)
 
         else:
             raise FetchError("Invalid ccase command %s" % command)
 
-        ccasecmd = "%s %s" % (basecmd, " ".join(options))
-        self.debug("ccasecmd = %s" % ccasecmd)
-        return ccasecmd
+        self.debug("ccasecmd = %s" % cmd)
+        return cmd
 
     def _write_configspec(self, ud, d):
         """
@@ -235,7 +236,7 @@ class ClearCase(FetchMethod):
 
         # Clean clearcase meta-data before tar
 
-        runfetchcmd('tar -czf "%s" .' % (ud.localpath), d, cleanup = [ud.localpath], workdir = ud.viewdir)
+        runfetchcmd(['tar', '-czf', ud.localpath, '.'], d, cleanup = [ud.localpath], workdir = ud.viewdir)
 
         # Clean up so we can create a new view next time
         self.clean(ud, d);

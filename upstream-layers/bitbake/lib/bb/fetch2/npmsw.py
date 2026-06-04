@@ -276,7 +276,7 @@ class NpmShrinkWrap(FetchMethod):
                     npm_unpack(depsrcdir, depdestdir, d)
                 else:
                     bb.utils.mkdirhier(depdestdir)
-                    cmd = 'cp -fpPRH "%s/." .' % (depsrcdir)
+                    cmd = ['cp', '-fpPRH', '%s/.' % depsrcdir, "."]
                     runfetchcmd(cmd, d, workdir=depdestdir)
 
     def clean(self, ud, d):

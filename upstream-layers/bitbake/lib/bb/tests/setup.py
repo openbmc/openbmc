@@ -22,12 +22,12 @@ class BitbakeSetupTest(FetcherTest):
 
         os.makedirs(self.registrypath)
         self.git_init(cwd=self.registrypath)
-        self.git('commit --allow-empty -m "Initial commit"', cwd=self.registrypath)
+        self.git(['commit', '--allow-empty', '-m', "Initial commit"], cwd=self.registrypath)
 
         self.testrepopath = os.path.join(self.tempdir, "test-repo")
         os.makedirs(self.testrepopath)
         self.git_init(cwd=self.testrepopath)
-        self.git('commit --allow-empty -m "Initial commit"', cwd=self.testrepopath)
+        self.git(['commit', '--allow-empty', '-m', "Initial commit"], cwd=self.testrepopath)
 
         oeinitbuildenv = """BBPATH=$1
 export BBPATH
@@ -92,7 +92,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
 
     def runbbsetup(self, cmd):
         bbsetup = os.path.abspath(os.path.dirname(__file__) +  "/../../../bin/bitbake-setup")
-        return bb.process.run("{} --global-settings {} {}".format(bbsetup, os.path.join(self.tempdir, 'global-config'), cmd))
+        return bb.process.run([bbsetup, '--global-settings', os.path.join(self.tempdir, 'global-config')] + cmd)
 
 
     def _add_json_config_to_registry_helper(self, name, sources):
@@ -176,8 +176,8 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         os.makedirs(os.path.join(self.registrypath, os.path.dirname(name)), exist_ok=True)
         with open(os.path.join(self.registrypath, name), 'w') as f:
             f.write(config)
-        self.git('add {}'.format(name), cwd=self.registrypath)
-        self.git('commit -m "Adding {}"'.format(name), cwd=self.registrypath)
+        self.git(['add', name], cwd=self.registrypath)
+        self.git(['commit', '-m', "Adding " + name], cwd=self.registrypath)
         return json.loads(config)
 
     def add_json_config_to_registry(self, name, rev, branch):
@@ -214,14 +214,14 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         if script:
             st = os.stat(fullname)
             os.chmod(fullname, st.st_mode | stat.S_IEXEC)
-        self.git('add {}'.format(name), cwd=self.testrepopath)
-        self.git('commit -m "Adding {}"'.format(name), cwd=self.testrepopath)
+        self.git(['add', name], cwd=self.testrepopath)
+        self.git(['commit', '-m', "Adding " + name], cwd=self.testrepopath)
 
     def config_is_unchanged(self, setuppath):
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        out = self.runbbsetup("status")
+        out = self.runbbsetup(["status"])
         self.assertIn("Configuration in {} has not changed".format(setuppath), out[0])
-        out = self.runbbsetup("update --update-bb-conf='yes'")
+        out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         self.assertIn("Configuration in {} has not changed".format(setuppath), out[0])
         del os.environ['BBPATH']
 
@@ -238,7 +238,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         with open(os.path.join(setuppath, 'config', "sources-fixed-revisions.json")) as f:
             sources_fixed_revisions = json.load(f)
         self.assertTrue('test-repo' in sources_fixed_revisions['sources'].keys())
-        revision = self.git('rev-parse HEAD', cwd=self.testrepopath).strip()
+        revision = self.git(['rev-parse', 'HEAD'], cwd=self.testrepopath).strip()
         self.assertEqual(revision, sources_fixed_revisions['sources']['test-repo']['git-remote']['rev'])
 
         if "oe-template" in bitbake_config:
@@ -286,50 +286,50 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
             del os.environ['BBPATH']
 
         # check that no arguments works
-        self.runbbsetup("")
+        self.runbbsetup([])
 
         # check that --help works
-        self.runbbsetup("--help")
+        self.runbbsetup(["--help"])
 
         # change to self.tempdir to work with cwd-based default settings
         os.chdir(self.tempdir)
 
         # check that the default top-dir-prefix is cwd (now self.tempdir) with no global settings
-        out = self.runbbsetup("settings list")
+        out = self.runbbsetup(["settings", "list"])
         self.assertIn("default top-dir-prefix {}".format(os.getcwd()), out[0])
 
         # set up global location for dl-dir
         settings_path = "{}/global-config".format(self.tempdir)
-        out = self.runbbsetup("settings set --global default dl-dir {}".format(os.path.join(self.tempdir, 'downloads')))
+        out = self.runbbsetup(["settings", "set", "--global", "default", "dl-dir", os.path.join(self.tempdir, 'downloads')])
         self.assertIn("From section 'default' the setting 'dl-dir' was changed to", out[0])
         self.assertIn("Settings written to".format(settings_path), out[0])
 
         # check that writing settings works and then adjust them to point to
         # test registry repo
-        out = self.runbbsetup("settings set default registry 'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath))
+        out = self.runbbsetup(["settings", "set", "default", "registry", "'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath)])
         settings_path = "{}/bitbake-builds/settings.conf".format(self.tempdir)
         self.assertIn(settings_path, out[0])
         self.assertIn("From section 'default' the setting 'registry' was changed to", out[0])
         self.assertIn("Settings written to".format(settings_path), out[0])
 
         # check that listing settings works
-        out = self.runbbsetup("settings list")
+        out = self.runbbsetup(["settings", "list"])
         self.assertIn("default top-dir-prefix {}".format(self.tempdir), out[0])
         self.assertIn("default dl-dir {}".format(os.path.join(self.tempdir, 'downloads')), out[0])
         self.assertIn("default registry {}".format('git://{};protocol=file;branch=master;rev=master'.format(self.registrypath)), out[0])
 
         # check that 'list' produces correct output with no configs, one config and two configs
-        out = self.runbbsetup("list")
+        out = self.runbbsetup(["list"])
         self.assertNotIn("test-config-1", out[0])
         self.assertNotIn("test-config-2", out[0])
 
         json_1 = self.add_json_config_to_registry('test-config-1.conf.json', 'master', 'master')
-        out = self.runbbsetup("list")
+        out = self.runbbsetup(["list"])
         self.assertIn("test-config-1", out[0])
         self.assertNotIn("test-config-2", out[0])
 
         json_2 = self.add_json_config_to_registry('config-2/test-config-2.conf.json', 'master', 'master')
-        out = self.runbbsetup("list --write-json={}".format(os.path.join(self.tempdir, "test-configs.json")))
+        out = self.runbbsetup(["list", "--write-json={}".format(os.path.join(self.tempdir, "test-configs.json"))])
         self.assertIn("test-config-1", out[0])
         self.assertIn("test-config-2", out[0])
         with open(os.path.join(self.tempdir, "test-configs.json")) as f:
@@ -364,14 +364,14 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         try:
             for v in test_configurations:
                 for c in v['buildconfigs']:
-                    out = self.runbbsetup("init --non-interactive {} {}".format(v['cmdline'], c))
+                    out = self.runbbsetup(["init", "--non-interactive", v['cmdline']] + c.split())
                     setuppath = self.get_setup_path(v['name'], c)
                     self.check_setupdir_files(setuppath, test_file_content)
         finally:
             server.stop()
 
         # install buildtools
-        out = self.runbbsetup("install-buildtools --setup-dir {}".format(setuppath))
+        out = self.runbbsetup(["install-buildtools", "--setup-dir", setuppath])
         self.assertIn("Buildtools installed into", out[0])
         self.assertTrue(os.path.exists(os.path.join(setuppath, 'buildtools')))
 
@@ -383,9 +383,9 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         for c in variants:
             setuppath = self.get_setup_path('test-config-1', c)
             os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-            out = self.runbbsetup("status")
+            out = self.runbbsetup(["status"])
             self.assertIn("Layer repository file://{} checked out into {}/layers/test-repo updated revision master from".format(self.testrepopath, setuppath), out[0])
-            out = self.runbbsetup("update --update-bb-conf='yes'")
+            out = self.runbbsetup(["update", "--update-bb-conf=yes"])
             if c in ('gadget', 'gizmo'):
                 self.assertIn("Leaving the previous configuration in {}/build/conf-backup.".format(setuppath), out[0])
                 self.assertIn('-{}+{}'.format(prev_test_file_content, test_file_content), out[0])
@@ -397,16 +397,16 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         prev_test_file_content = test_file_content
         test_file_content = 'modified-in-branch\n'
         branch = "another-branch"
-        self.git('checkout -b {}'.format(branch), cwd=self.testrepopath)
+        self.git(['checkout', '-b', branch], cwd=self.testrepopath)
         self.add_file_to_testrepo('test-file', test_file_content)
         json_1 = self.add_json_config_to_registry('test-config-1.conf.json', branch, branch)
         for c in variants:
             setuppath = self.get_setup_path('test-config-1', c)
             os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-            out = self.runbbsetup("status")
+            out = self.runbbsetup(["status"])
             self.assertIn("Configuration in {} has changed:".format(setuppath), out[0])
             self.assertIn('-                    "rev": "master"\n+                    "rev": "another-branch"', out[0])
-            out = self.runbbsetup("update --update-bb-conf='yes'")
+            out = self.runbbsetup(["update", "--update-bb-conf=yes"])
             if c in ('gadget', 'gizmo'):
                 self.assertIn("Leaving the previous configuration in {}/build/conf-backup.".format(setuppath), out[0])
                 self.assertIn('-{}+{}'.format(prev_test_file_content, test_file_content), out[0])
@@ -427,7 +427,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         prev_test_file_content = test_file_content
         test_file_content = 'modified-in-branch-no-bb-conf-update\n'
         branch = "another-branch-no-bb-conf-update"
-        self.git('checkout -b {}'.format(branch), cwd=self.testrepopath)
+        self.git(['checkout', '-b', branch], cwd=self.testrepopath)
         self.add_file_to_testrepo('test-file', test_file_content)
         json_1 = self.add_json_config_to_registry('test-config-1.conf.json', branch, branch)
         for c in variants:
@@ -438,7 +438,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
                 with open(f"{setuppath}/build/conf/{f}", "w") as fd:
                     fd.write("deadbeef")
             sums_before = _conf_chksum(f"{setuppath}/build/conf")
-            out = self.runbbsetup("update --update-bb-conf='no'")
+            out = self.runbbsetup(["update", "--update-bb-conf=no"])
             sums_after = _conf_chksum(f"{setuppath}/build/conf")
             self.assertEqual(sums_before, sums_after)
 
@@ -467,23 +467,23 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
 
         json_1 = self.add_local_json_config_to_registry('test-config-1.conf.json', self.testrepopath)
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        out = self.runbbsetup("update --update-bb-conf='yes'")
+        out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         _check_local_sources(setuppath)
         _check_layer_backups(layers_path, 1)
 
         prev_path = self.testrepopath
         self.testrepopath = prev_path + "-2"
-        self.git("clone {} {}".format(prev_path, self.testrepopath), cwd=self.tempdir)
+        self.git(['clone', prev_path, self.testrepopath], cwd=self.tempdir)
         json_1 = self.add_local_json_config_to_registry('test-config-1.conf.json', self.testrepopath)
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        out = self.runbbsetup("update --update-bb-conf='yes'")
+        out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         _check_local_sources(setuppath)
         _check_layer_backups(layers_path, 1)
 
         self.testrepopath = prev_path
         json_1 = self.add_json_config_to_registry('test-config-1.conf.json', branch, branch)
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        out = self.runbbsetup("update --update-bb-conf='yes'")
+        out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         self.check_setupdir_files(setuppath, test_file_content)
         _check_layer_backups(layers_path, 1)
 
@@ -493,28 +493,28 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         test_file_content = "modified-again\n"
         self.add_file_to_testrepo('test-file', test_file_content)
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        out = self.runbbsetup("update --update-bb-conf='yes'")
+        out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         _check_layer_backups(layers_path, 1)
 
         ## edit a file and make a commit such that no rebase conflicts occur
         with open(os.path.join(layer_path, 'local-modification'), 'w') as f:
             f.write('locally-modified-again\n')
-        self.git('add .', cwd=layer_path)
-        self.git('commit -m "Adding a local modification"', cwd=layer_path)
+        self.git(['add', '.'], cwd=layer_path)
+        self.git(['commit', '-m', 'Adding a local modification'], cwd=layer_path)
         test_file_content = "modified-again-and-again\n"
         self.add_file_to_testrepo('test-file', test_file_content)
-        out = self.runbbsetup("update --update-bb-conf='yes'")
+        out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         _check_layer_backups(layers_path, 1)
 
         ## edit a file and make a commit in a way that causes a rebase conflict
         with open(os.path.join(layer_path, 'test-file'), 'w') as f:
             f.write('locally-modified\n')
-        self.git('add .', cwd=layer_path)
-        self.git('commit -m "Adding a local modification"', cwd=layer_path)
+        self.git(['add', '.'], cwd=layer_path)
+        self.git(['commit', '-m', 'Adding a local modification'], cwd=layer_path)
         test_file_content = "remotely-modified\n"
         self.add_file_to_testrepo('test-file', test_file_content)
         with self.assertRaisesRegex(bb.process.ExecutionError, "Merge conflict in test-file"):
-            out = self.runbbsetup("update --update-bb-conf='yes'")
+            out = self.runbbsetup(["update", "--update-bb-conf=yes"])
         _check_layer_backups(layers_path, 1)
 
         # check source overrides, local sources provided with symlinks, and custom setup dir name
@@ -531,12 +531,12 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         override_filename = 'source-overrides.json'
         custom_setup_dir = 'special-setup-dir'
         self.add_file_to_testrepo(override_filename, source_override_content)
-        out = self.runbbsetup("init --non-interactive --source-overrides {} --setup-dir-name {} test-config-1 gadget".format(os.path.join(self.testrepopath, override_filename), custom_setup_dir))
+        out = self.runbbsetup(["init", "--non-interactive", "--source-overrides", os.path.join(self.testrepopath, override_filename), "--setup-dir-name", custom_setup_dir, "test-config-1", "gadget"])
         _check_local_sources(custom_setup_dir)
 
         # same but use command line options to specify local overrides
         custom_setup_dir = 'special-setup-dir-with-cmdline-overrides'
-        out = self.runbbsetup("init --non-interactive -L test-repo {} --setup-dir-name {} test-config-1 gadget".format(self.testrepopath, custom_setup_dir))
+        out = self.runbbsetup(["init", "--non-interactive", "-L", "test-repo", self.testrepopath, "--setup-dir-name", custom_setup_dir, "test-config-1", "gadget"])
         _check_local_sources(custom_setup_dir)
 
     def test_vscode(self):
@@ -544,12 +544,12 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
             del os.environ['BBPATH']
         os.chdir(self.tempdir)
 
-        self.runbbsetup("settings set default registry 'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath))
+        self.runbbsetup(["settings", "set", "default", "registry", "'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath)])
         self.add_file_to_testrepo('test-file', 'initial\n')
         self.add_json_config_to_registry('test-config-1.conf.json', 'master', 'master')
 
         # --init-vscode should create bitbake.code-workspace
-        self.runbbsetup("init --non-interactive --init-vscode test-config-1 gadget")
+        self.runbbsetup(["init", "--non-interactive", "--init-vscode", "test-config-1", "gadget"])
         setuppath = self.get_setup_path('test-config-1', 'gadget')
         workspace_file = os.path.join(setuppath, 'bitbake.code-workspace')
         self.assertTrue(os.path.exists(workspace_file),
@@ -595,7 +595,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
                          settings.get('python.autoComplete.extraPaths'))
 
         # --no-init-vscode should NOT create a workspace file
-        self.runbbsetup("init --non-interactive --no-init-vscode test-config-1 gadget-notemplate")
+        self.runbbsetup(["init", "--non-interactive", "--no-init-vscode", "test-config-1", "gadget-notemplate"])
         notemplate_path = self.get_setup_path('test-config-1', 'gadget-notemplate')
         self.assertFalse(
             os.path.exists(os.path.join(notemplate_path, 'bitbake.code-workspace')),
@@ -610,7 +610,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
 
         self.add_file_to_testrepo('test-file', 'updated\n')
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        self.runbbsetup("update --update-bb-conf='no'")
+        self.runbbsetup(["update", "--update-bb-conf=no"])
         del os.environ['BBPATH']
 
         with open(workspace_file) as f:
@@ -625,7 +625,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         with open(workspace_file, 'w') as f:
             f.write('{invalid json')
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
-        self.runbbsetup("update --update-bb-conf='no'")
+        self.runbbsetup(["update", "--update-bb-conf=no"])
         del os.environ['BBPATH']
         with open(workspace_file) as f:
             content = f.read()
@@ -654,10 +654,10 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
             del os.environ['BBPATH']
         os.chdir(self.tempdir)
 
-        self.runbbsetup("settings set default registry 'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath))
+        self.runbbsetup(["settings", "set", "default", "registry", "'git://{};protocol=file;branch=master;rev=master'".format(self.registrypath)])
         self.add_file_to_testrepo('test-file', 'initial\n')
         self.add_json_config_to_registry('test-config-1.conf.json', 'master', 'master')
-        self.runbbsetup("init --non-interactive test-config-1 gadget")
+        self.runbbsetup(["init", "--non-interactive", "test-config-1", "gadget"])
 
         setuppath = self.get_setup_path('test-config-1', 'gadget')
         layer_path = os.path.join(setuppath, 'layers', 'test-repo')
@@ -672,7 +672,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
 
         os.environ['BBPATH'] = os.path.join(setuppath, 'build')
         with self.assertRaises(bb.process.ExecutionError) as ctx:
-            self.runbbsetup("update --update-bb-conf='no'")
+            self.runbbsetup(["update", "--update-bb-conf=no"])
         self.assertIn('has uncommitted changes', str(ctx.exception))
         self.assertIn('--rebase-conflicts-strategy=backup', str(ctx.exception))
         # No backup directory must have been created.
@@ -680,7 +680,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
                          "abort strategy must not create any backup")
 
         # Scenario 2: same uncommitted change, 'backup' strategy
-        out = self.runbbsetup("update --update-bb-conf='no' --rebase-conflicts-strategy=backup")
+        out = self.runbbsetup(["update", "--update-bb-conf=no", "--rebase-conflicts-strategy=backup"])
         # One backup directory must now exist.
         self.assertEqual(self._count_layer_backups(layers_path), 1,
                          "backup strategy must create exactly one backup")
@@ -688,14 +688,14 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         with open(os.path.join(layer_path, 'test-file')) as f:
             self.assertEqual(f.read(), 'upstream-v2\n',
                              "re-cloned layer must contain the upstream content")
-        status = self.git('status --porcelain', cwd=layer_path).strip()
+        status = self.git(['status', '--porcelain'], cwd=layer_path).strip()
         self.assertEqual(status, '',
                          "re-cloned layer must have no local modifications")
         del os.environ['BBPATH']
 
         # Scenario 3: committed conflicting change, 'backup' strategy
         # Re-initialise a fresh setup so we start from a clean state.
-        self.runbbsetup("init --non-interactive --setup-dir-name rebase-conflict-setup test-config-1 gadget")
+        self.runbbsetup(["init", "--non-interactive", "--setup-dir-name", "rebase-conflict-setup", "test-config-1", "gadget"])
         conflict_setup = os.path.join(self.tempdir, 'bitbake-builds', 'rebase-conflict-setup')
         conflict_layer = os.path.join(conflict_setup, 'layers', 'test-repo')
         conflict_layers = os.path.join(conflict_setup, 'layers')
@@ -703,8 +703,8 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         # Commit a local change that touches the same file as the next upstream commit.
         with open(os.path.join(conflict_layer, 'test-file'), 'w') as f:
             f.write('conflicting-local\n')
-        self.git('add test-file', cwd=conflict_layer)
-        self.git('commit -m "Local conflicting change"', cwd=conflict_layer)
+        self.git(['add', 'test-file'], cwd=conflict_layer)
+        self.git(['commit', '-m', 'Local conflicting change'], cwd=conflict_layer)
 
         # Advance upstream with a conflicting edit.
         self.add_file_to_testrepo('test-file', 'conflicting-upstream\n')
@@ -713,13 +713,13 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         # Default stop strategy must still fail with a conflict error and include
         # the --rebase-conflicts-strategy=backup hint (same handler as LocalModificationsError).
         with self.assertRaises(bb.process.ExecutionError) as ctx:
-            self.runbbsetup("update --update-bb-conf='no'")
+            self.runbbsetup(["update", "--update-bb-conf=no"])
         self.assertIn('Merge conflict in test-file', str(ctx.exception))
         self.assertIn('--rebase-conflicts-strategy=backup', str(ctx.exception))
         self.assertEqual(self._count_layer_backups(conflict_layers), 0)
 
         # Backup strategy must succeed: backup the conflicted dir and re-clone.
-        self.runbbsetup("update --update-bb-conf='no' --rebase-conflicts-strategy=backup")
+        self.runbbsetup(["update", "--update-bb-conf=no", "--rebase-conflicts-strategy=backup"])
         self.assertEqual(self._count_layer_backups(conflict_layers), 1,
                          "backup strategy must create exactly one backup after a conflict")
         with open(os.path.join(conflict_layer, 'test-file')) as f:

@@ -2293,5 +2293,5 @@ def is_path_on_nfs(path):
             path = os.path.dirname(path)
 
     import bb.process
-    fstype = bb.process.run("stat -f -c %T {}".format(path))[0].strip()
+    fstype = bb.process.run(['stat', '-f', '-c', '%T', path])[0].strip()
     return fstype == "nfs"

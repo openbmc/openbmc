@@ -242,9 +242,9 @@ class GoModGit(Git):
         srcrev = ud.parm['srcrev']
         version = ud.parm['version']
         escaped_version = escape(version)
-        cmd = f"git ls-tree -r --name-only '{srcrev}'"
+        cmd = ['git', 'ls-tree', '-r', '--name-only', srcrev]
         if 'subpath' in ud.parm:
-            cmd += f" '{ud.parm['subpath']}'"
+            cmd.append(ud.parm['subpath'])
         files = runfetchcmd(cmd, d, workdir=repodir).split()
         name = escaped_version + '.mod'
         bb.note(f"Unpacking {name} to {unpackdir}/")

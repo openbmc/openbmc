@@ -85,18 +85,16 @@ class SSH(FetchMethod):
         user = m.group('user')
         password = m.group('pass')
 
+        portarg = []
         if port:
-            portarg = '-P %s' % port
-        else:
-            portarg = ''
+            portarg = ['-P', port]
 
+        fr = host
         if user:
             fr = user
             if password:
                 fr += ':%s' % password
             fr += '@%s' % host
-        else:
-            fr = host
 
         if path[0] != '~':
             path = '/%s' % path
@@ -104,11 +102,7 @@ class SSH(FetchMethod):
 
         fr += ':%s' % path
 
-        cmd = 'scp -B -r %s %s %s/' % (
-            portarg,
-            fr,
-            dldir
-        )
+        cmd = ['scp', '-B', '-r'] + portarg + [fr, dldir + "/"]
 
         check_network_access(d, cmd, urldata.url)
 
@@ -125,28 +119,22 @@ class SSH(FetchMethod):
         user = m.group('user')
         password = m.group('pass')
 
+        portarg = []
         if port:
-            portarg = '-P %s' % port
-        else:
-            portarg = ''
+            portarg = ['-P', port]
 
+        fr = host
         if user:
             fr = user
             if password:
                 fr += ':%s' % password
             fr += '@%s' % host
-        else:
-            fr = host
 
         if path[0] != '~':
             path = '/%s' % path
         path = urllib.parse.unquote(path)
 
-        cmd = 'ssh -o BatchMode=true %s %s [ -f %s ]' % (
-            portarg,
-            fr,
-            path
-        )
+        cmd = ['ssh', '-o', 'BatchMode=true'] + portarg + [fr, '[', '-f', path, ']']
 
         check_network_access(d, cmd, urldata.url)
         runfetchcmd(cmd, d)

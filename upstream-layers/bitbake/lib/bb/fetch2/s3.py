@@ -19,6 +19,7 @@ import os
 import bb
 import urllib.request, urllib.parse, urllib.error
 import re
+import shlex
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import FetchError
 from bb.fetch2 import runfetchcmd
@@ -79,7 +80,7 @@ class S3(FetchMethod):
 
         ud.localfile = ud.basename
 
-        ud.basecmd = d.getVar("FETCHCMD_s3") or "/usr/bin/env aws s3"
+        ud.basecmd = shlex.split(d.getVar("FETCHCMD_s3") or "") or ["aws", "s3"]
 
     def download(self, ud, d):
         """
@@ -87,7 +88,7 @@ class S3(FetchMethod):
         Assumes localpath was called first
         """
 
-        cmd = '%s cp s3://%s%s %s' % (ud.basecmd, ud.host, ud.path, ud.localpath)
+        cmd = ud.basecmd + ['cp', 's3://%s%s' % (ud.basecmd, ud.host, ud.path), ud.localpath]
         bb.fetch2.check_network_access(d, cmd, ud.url)
 
         progresshandler = S3ProgressHandler(d)
@@ -111,7 +112,7 @@ class S3(FetchMethod):
         Check the status of a URL
         """
 
-        cmd = '%s ls s3://%s%s' % (ud.basecmd, ud.host, ud.path)
+        cmd = ud.basecmd + ['ls', 's3://%s%s' % (ud.basecmd, ud.host, ud.path)]
         bb.fetch2.check_network_access(d, cmd, ud.url)
         output = runfetchcmd(cmd, d)
 
