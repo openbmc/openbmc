@@ -20,7 +20,7 @@ SRCREV_FORMAT = "libekb_ekb"
 SRCREV_libekb = "bc2b16f059bbc78de71c7c3b82197d65a2f532fb"
 SRCREV_ekb = "${EKB_REV}"
 
-SRC_URI = "git://git@github.com/open-power/libekb_p10;branch=main;name=libekb;protocol=https \
+SRC_URI = "git://github.com/open-power/libekb_p10;branch=main;name=libekb;protocol=https \
            ${EKB_URI};name=ekb;destsuffix=${BPN}-1.0+git/ekb \
            "
 

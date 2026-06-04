@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 inherit pkgconfig meson
 
-SRC_URI = "git://git@github.com/open-power/guard;branch="main";protocol=https"
+SRC_URI = "git://github.com/open-power/guard;branch="main";protocol=https"
 SRCREV = "0cf8f2bc5663893065c95f8aaf4b9d463085b08a"
 
 DEPENDS = "cli11"

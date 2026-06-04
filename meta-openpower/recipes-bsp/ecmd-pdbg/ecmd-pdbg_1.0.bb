@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=34400b68072d710fecd0a2940a0d1658"
 inherit meson
 inherit pkgconfig
 
-SRC_URI = "git://git@github.com/open-power/ecmd-pdbg.git;branch=master;protocol=https"
+SRC_URI = "git://github.com/open-power/ecmd-pdbg.git;branch=master;protocol=https"
 SRCREV = "0362725415c9529c20ada661c92b2dcfc514006e"
 
 DEPENDS = "pdbg zlib libyaml ipl"
