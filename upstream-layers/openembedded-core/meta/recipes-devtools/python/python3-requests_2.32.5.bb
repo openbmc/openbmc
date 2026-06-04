@@ -8,6 +8,7 @@ inherit pypi python_setuptools_build_meta
 SRC_URI[sha256sum] = "dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf"
 
 SRC_URI += "file://CVE-2026-25645.patch"
+SRC_URI += "file://0001-Increase-chardet-upper-limit-to-8.patch"
 SRC_URI:append:class-nativesdk = " file://environment.d-python3-requests.sh"
 
 do_install:append:class-nativesdk() {

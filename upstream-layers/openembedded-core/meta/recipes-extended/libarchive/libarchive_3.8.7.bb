@@ -91,3 +91,4 @@ RDEPENDS:${PN}-ptest += "bsdtar bsdcpio"
 
 CVE_STATUS[CVE-2026-4426] = "fixed-version: fixed since 3.8.7"
 CVE_STATUS[CVE-2026-5121] = "fixed-version: fixed since 3.8.7"
+CVE_STATUS[CVE-2026-5745] = "fixed-version: fixed since 3.8.6"

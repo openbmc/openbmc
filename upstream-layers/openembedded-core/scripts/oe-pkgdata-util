@@ -239,8 +239,8 @@ def lookup_pkg(args):
         missing = list(set(pkgs) - set(mappings.keys()))
         for pkg in missing:
             providepkgpath = os.path.join(args.pkgdata_dir, "runtime-rprovides", pkg)
-            if os.path.exists(providepkgpath):
-                providers = os.listdir(providepkgpath)
+            providers = os.listdir(providepkgpath) if os.path.isdir(providepkgpath) else []
+            if providers:
                 for provider in providers:
                     if provider == pkg:
                         continue
@@ -289,8 +289,9 @@ def lookup_recipe(args):
 
     for pkg in pkgs:
         providepkgpath = os.path.join(args.pkgdata_dir, "runtime-rprovides", pkg)
-        if os.path.exists(providepkgpath):
-            for f in os.listdir(providepkgpath):
+        rprovides = os.listdir(providepkgpath) if os.path.isdir(providepkgpath) else []
+        if rprovides:
+            for f in rprovides:
                 if f != pkg:
                     print("%s is in the RPROVIDES of %s:" % (pkg, f))
                 pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", f)
@@ -355,8 +356,9 @@ def package_info(args):
 
     for pkg in packages:
         providepkgpath = os.path.join(args.pkgdata_dir, "runtime-rprovides", pkg)
-        if os.path.exists(providepkgpath):
-            for f in os.listdir(providepkgpath):
+        rprovides = os.listdir(providepkgpath) if os.path.isdir(providepkgpath) else []
+        if rprovides:
+            for f in rprovides:
                 if f != pkg:
                     print("%s is in the RPROVIDES of %s:" % (pkg, f))
                 pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", f)
@@ -507,8 +509,9 @@ def list_pkg_files(args):
 
         else:
             providepkgpath = os.path.join(args.pkgdata_dir, "runtime-rprovides", pkg)
-            if os.path.exists(providepkgpath):
-                for f in os.listdir(providepkgpath):
+            rprovides = os.listdir(providepkgpath) if os.path.isdir(providepkgpath) else []
+            if rprovides:
+                for f in rprovides:
                     if f != pkg:
                         print("%s is in the RPROVIDES of %s:" % (pkg, f))
                     pkgdatafile = os.path.join(args.pkgdata_dir, "runtime", f)

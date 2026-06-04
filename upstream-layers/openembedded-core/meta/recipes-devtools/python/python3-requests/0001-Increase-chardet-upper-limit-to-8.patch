@@ -1,0 +1,25 @@
+From c6a303bc6ea1d1d2ee5be86c4eed92cbb325c1fe Mon Sep 17 00:00:00 2001
+From: Dan Blanchard <dan.blanchard@gmail.com>
+Date: Mon, 2 Mar 2026 17:49:19 -0500
+Subject: [PATCH] Increase chardet upper limit to 8
+
+Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
+Signed-off-by: Daniel McGregor <daniel.mcgregor@vecima.com>
+Upstream-Status: Backport [https://github.com/psf/requests/commit/b2a1d33f571518ca9a6148e7da787cc5827f897a]
+---
+ src/requests/__init__.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/requests/__init__.py b/src/requests/__init__.py
+index 051cda1..f22eb37 100644
+--- a/src/requests/__init__.py
++++ b/src/requests/__init__.py
+@@ -76,7 +76,7 @@ def check_compatibility(urllib3_version, chardet_version, charset_normalizer_ver
+         major, minor, patch = chardet_version.split(".")[:3]
+         major, minor, patch = int(major), int(minor), int(patch)
+         # chardet_version >= 3.0.2, < 6.0.0
+-        assert (3, 0, 2) <= (major, minor, patch) < (6, 0, 0)
++        assert (3, 0, 2) <= (major, minor, patch) < (8, 0, 0)
+     elif charset_normalizer_version:
+         major, minor, patch = charset_normalizer_version.split(".")[:3]
+         major, minor, patch = int(major), int(minor), int(patch)

@@ -126,8 +126,7 @@ python native_virtclass_handler () {
         return
     bpn = d.getVar("BPN")
 
-    defaults = d.getVar("DISTRO_FEATURES")
-    d.setVar("DISTRO_FEATURES", '${@oe.utils.class_filter_features("' + defaults + '", "DISTRO_FEATURES_NATIVE", "DISTRO_FEATURES_FILTER_NATIVE", d)}')
+    oe.utils.set_class_filter("DISTRO_FEATURES", "DISTRO_FEATURES_NATIVE", "DISTRO_FEATURES_FILTER_NATIVE", d)
 
     classextend = d.getVar('BBCLASSEXTEND') or ""
     if "native" not in classextend:

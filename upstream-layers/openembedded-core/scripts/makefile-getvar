@@ -20,8 +20,8 @@ fi
 MAKEFILE=$1
 shift
 
-if [ ! -f $MAKEFILE ]; then
-	echo $MAKEFILE is not a file
+if [ ! -f "$MAKEFILE" ]; then
+	echo "$MAKEFILE is not a file"
 	exit 1
 fi
 
