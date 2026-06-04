@@ -1,0 +1,21 @@
+# Bay strap truth table (CP2112 GPIO offsets 4/5):
+#   IOB0: 4=0, 5=0
+#   IOB1: 4=0, 5=1
+#   IOB2: 4=1, 5=0
+#   IOB3: 4=1, 5=1
+#   BF4: no strap (single-bay design), reset only.
+
+# CP2112 on USB port 1-1.2.1.4.2 (IOB0)
+SUBSYSTEM=="gpio", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", KERNELS=="1-1.2.1.4.2", SYMLINK+="gpio-cp2112-iob0", ENV{GPIO_NAME}="cp2112-IOB0", RUN+="/bin/sh -c 'gpioset /dev/%k 4=0; gpioset /dev/%k 5=0; gpioset /dev/%k 1=1'"
+
+# CP2112 on USB port 1-1.2.1.3.2 (IOB1)
+SUBSYSTEM=="gpio", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", KERNELS=="1-1.2.1.3.2", SYMLINK+="gpio-cp2112-iob1", ENV{GPIO_NAME}="cp2112-IOB1", RUN+="/bin/sh -c 'gpioset /dev/%k 4=0; gpioset /dev/%k 5=1; gpioset /dev/%k 1=1'"
+
+# CP2112 on USB port 1-1.2.2.3.2 (IOB2)
+SUBSYSTEM=="gpio", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", KERNELS=="1-1.2.2.3.2", SYMLINK+="gpio-cp2112-iob2", ENV{GPIO_NAME}="cp2112-IOB2", RUN+="/bin/sh -c 'gpioset /dev/%k 4=1; gpioset /dev/%k 5=0; gpioset /dev/%k 1=1'"
+
+# CP2112 on USB port 1-1.2.2.4.2 (IOB3)
+SUBSYSTEM=="gpio", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", KERNELS=="1-1.2.2.4.2", SYMLINK+="gpio-cp2112-iob3", ENV{GPIO_NAME}="cp2112-IOB3", RUN+="/bin/sh -c 'gpioset /dev/%k 4=1; gpioset /dev/%k 5=1; gpioset /dev/%k 1=1'"
+
+# CP2112 on USB port 1-1.1.4.2 (BF4)
+SUBSYSTEM=="gpio", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea90", KERNELS=="1-1.1.4.2", SYMLINK+="gpiochip-cp2112-bf4", ENV{GPIO_NAME}="cp2112-bf4", RUN+="/bin/sh -c 'gpioset /dev/%k 1=1'"
