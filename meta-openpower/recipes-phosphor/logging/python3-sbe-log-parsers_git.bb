@@ -8,7 +8,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE_PROLOG;md5=d8e5f403c98fd80dcea90b9cc8cd083c"
 
-SRC_URI = "git://github.com/open-power/sbe;branch="master-p10";protocol=ssh;protocol=https"
+SRC_URI = "git://github.com/open-power/sbe;branch=master-p10;protocol=ssh;protocol=https"
 SRCREV = "f8ee8cfad2cf2a53e78789633ddffc192f5a197e"
 
 inherit setuptools3
