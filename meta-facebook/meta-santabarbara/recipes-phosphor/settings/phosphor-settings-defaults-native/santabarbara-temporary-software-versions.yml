@@ -54,7 +54,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/rainbow0_mmc:
+/xyz/openbmc_project/software/chassis/asic_module0_mmc:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
@@ -62,7 +62,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/rainbow1_mmc:
+/xyz/openbmc_project/software/chassis/asic_module1_mmc:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
@@ -70,7 +70,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/rainbow2_mmc:
+/xyz/openbmc_project/software/chassis/asic_module2_mmc:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
@@ -78,7 +78,7 @@
       Purpose:
         Default: Version::VersionPurpose::Other
 
-/xyz/openbmc_project/software/chassis/rainbow3_mmc:
+/xyz/openbmc_project/software/chassis/asic_module3_mmc:
 - Interface: "xyz.openbmc_project.Software.Version"
   Properties:
       Version:
