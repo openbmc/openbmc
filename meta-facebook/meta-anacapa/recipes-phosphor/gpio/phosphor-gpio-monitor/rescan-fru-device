@@ -1,0 +1,78 @@
+#!/bin/bash
+set -euo pipefail
+
+device="${1:-}"
+
+if [[ -z "${device}" ]]; then
+    echo "Usage: rescan-fru-device <device-name>" >&2
+    exit 1
+fi
+
+get_bus_by_device()
+{
+    case "$1" in
+        PRSNT_EDSFF_BOOT)
+            echo "24"
+            ;;
+        L_PRSNT_EDSFF0)
+            echo "25"
+            ;;
+        L_PRSNT_EDSFF1)
+            echo "26"
+            ;;
+        R_PRSNT_EDSFF2)
+            echo "27"
+            ;;
+        R_PRSNT_EDSFF3)
+            echo "28"
+            ;;
+        R_PRSNT_B_BENIC0)
+            echo "37"
+            ;;
+        R_PRSNT_B_BENIC1)
+            echo "38"
+            ;;
+        R_PRSNT_B_BENIC2)
+            echo "39"
+            ;;
+        R_PRSNT_B_BENIC3)
+            echo "40"
+            ;;
+        L_PRSNT_B_FENIC)
+            echo "44"
+            ;;
+        L_PRSNT_B_BENIC0)
+            echo "45"
+            ;;
+        L_PRSNT_B_BENIC1)
+            echo "46"
+            ;;
+        L_PRSNT_B_BENIC2)
+            echo "47"
+            ;;
+        L_PRSNT_B_BENIC3)
+            echo "48"
+            ;;
+        *)
+            echo "Unknown FRU presence device: ${device}" >&2
+            return 1
+            ;;
+    esac
+}
+
+bus="$(get_bus_by_device "${device}")"
+
+if [[ -z "${bus}" || "${bus}" == \<BUS_FOR_* ]]; then
+    echo "FRU bus is not configured: device=${device} bus=${bus}" >&2
+    exit 1
+fi
+
+echo "Rescan FruDevice: device=${device} bus=${bus}"
+sleep 1
+
+busctl call xyz.openbmc_project.FruDevice \
+    /xyz/openbmc_project/FruDevice \
+    xyz.openbmc_project.FruDeviceManager \
+    ReScanBus q "${bus}"
+
+echo "Completed FruDevice rescan: device=${device} bus=${bus}"

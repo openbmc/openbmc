@@ -387,5 +387,145 @@
             "RISING":   ["ssd-pg-event-logger@R_EDSFF3_PG:deassert.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "PRSNT_EDSFF_BOOT",
+        "LineName": "PRSNT_EDSFF_BOOT_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@PRSNT_EDSFF_BOOT.service"],
+            "RISING": ["rescan-fru-device@PRSNT_EDSFF_BOOT.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_EDSFF0",
+        "LineName": "L_PRSNT_EDSFF0_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_EDSFF0.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_EDSFF0.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_EDSFF1",
+        "LineName": "L_PRSNT_EDSFF1_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_EDSFF1.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_EDSFF1.service"]
+        }
+    },
+    {
+        "Name": "R_PRSNT_EDSFF2",
+        "LineName": "R_PRSNT_EDSFF2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@R_PRSNT_EDSFF2.service"],
+            "RISING": ["rescan-fru-device@R_PRSNT_EDSFF2.service"]
+        }
+    },
+    {
+        "Name": "R_PRSNT_EDSFF3",
+        "LineName": "R_PRSNT_EDSFF3_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@R_PRSNT_EDSFF3.service"],
+            "RISING": ["rescan-fru-device@R_PRSNT_EDSFF3.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_B_FENIC",
+        "LineName": "L_PRSNT_B_FENIC_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_B_FENIC.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_B_FENIC.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_B_BENIC0",
+        "LineName": "L_PRSNT_B_BENIC0_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_B_BENIC0.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_B_BENIC0.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_B_BENIC1",
+        "LineName": "L_PRSNT_B_BENIC1_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_B_BENIC1.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_B_BENIC1.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_B_BENIC2",
+        "LineName": "L_PRSNT_B_BENIC2_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_B_BENIC2.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_B_BENIC2.service"]
+        }
+    },
+    {
+        "Name": "L_PRSNT_B_BENIC3",
+        "LineName": "L_PRSNT_B_BENIC3_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@L_PRSNT_B_BENIC3.service"],
+            "RISING": ["rescan-fru-device@L_PRSNT_B_BENIC3.service"]
+        }
+    },
+    {
+        "Name": "R_PRSNT_B_BENIC0",
+        "LineName": "R_PRSNT_B_BENIC0_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@R_PRSNT_B_BENIC0.service"],
+            "RISING": ["rescan-fru-device@R_PRSNT_B_BENIC0.service"]
+        }
+    },
+    {
+        "Name": "R_PRSNT_B_BENIC1",
+        "LineName": "R_PRSNT_B_BENIC1_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@R_PRSNT_B_BENIC1.service"],
+            "RISING": ["rescan-fru-device@R_PRSNT_B_BENIC1.service"]
+        }
+    },
+    {
+        "Name": "R_PRSNT_B_BENIC2",
+        "LineName": "R_PRSNT_B_BENIC2_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@R_PRSNT_B_BENIC2.service"],
+            "RISING": ["rescan-fru-device@R_PRSNT_B_BENIC2.service"]
+        }
+    },
+    {
+        "Name": "R_PRSNT_B_BENIC3",
+        "LineName": "R_PRSNT_B_BENIC3_R2_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@R_PRSNT_B_BENIC3.service"],
+            "RISING": ["rescan-fru-device@R_PRSNT_B_BENIC3.service"]
+        }
     }
 ]

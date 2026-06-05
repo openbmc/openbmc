@@ -1,0 +1,9 @@
+[Unit]
+Description=Rescan FruDevice for %i
+After=xyz.openbmc_project.FruDevice.service
+Requires=xyz.openbmc_project.FruDevice.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/rescan-fru-device %i
+SyslogIdentifier=rescan-fru-device
