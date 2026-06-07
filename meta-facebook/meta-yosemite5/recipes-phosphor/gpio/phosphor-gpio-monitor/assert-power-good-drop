@@ -1,6 +1,8 @@
 #!/bin/bash
+
 # shellcheck source=meta-facebook/meta-yosemite5/recipes-phosphor/state/phosphor-state-manager/power-cmd
 source /usr/libexec/phosphor-state-manager/power-cmd
+
 currentstate=$(busctl get-property \
     xyz.openbmc_project.State.Host0 \
     /xyz/openbmc_project/state/host0 \
@@ -9,30 +11,39 @@ currentstate=$(busctl get-property \
 if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningToOff" ]; then
     exit 0
 fi
-active=$(systemctl is-active host-graceful-poweroff@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+
+if is_service_busy host-graceful-poweroff@0.service; then
     exit 0
 fi
-active=$(systemctl is-active host-force-poweroff@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+
+if is_service_busy host-force-poweroff@0.service; then
     exit 0
 fi
-active=$(systemctl is-active host-powerreset@0.service)
-if [ -z "$active" ] || [ "$active" != "inactive" ]; then
+
+if is_service_busy host-powerreset@0.service; then
     exit 0
 fi
-sleep 3
-# Sync power state to "off" for abnormal power lose.
-transition=$(busctl get-property \
-    xyz.openbmc_project.State.Host0 \
+
+busctl set-property xyz.openbmc_project.State.Host0 \
     /xyz/openbmc_project/state/host0 \
     xyz.openbmc_project.State.Host \
-    RequestedHostTransition | awk '{print $2}' | tr -d '"')
-if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ] && [ "$(power_status)" == "off" ]; then
-    busctl set-property xyz.openbmc_project.State.Host0 \
+    CurrentHostState s xyz.openbmc_project.State.Host.HostState.TransitioningToOff
+
+sleep 3
+# Sync power state to "off" for abnormal power lose.
+if [ "$(power_status)" == "off" ]; then
+    transition=$(busctl get-property \
+        xyz.openbmc_project.State.Host0 \
         /xyz/openbmc_project/state/host0 \
         xyz.openbmc_project.State.Host \
-        RequestedHostTransition s \
-        xyz.openbmc_project.State.Host.Transition.Off
+        RequestedHostTransition | awk '{print $2}' | tr -d '"')
+    if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ]; then
+        busctl set-property xyz.openbmc_project.State.Host0 \
+            /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host \
+            RequestedHostTransition s \
+            xyz.openbmc_project.State.Host.Transition.Off
+    fi
 fi
+
 exit 0
