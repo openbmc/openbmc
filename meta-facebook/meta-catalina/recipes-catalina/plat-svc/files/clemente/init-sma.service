@@ -9,6 +9,8 @@ Type=exec
 ExecStart=/usr/libexec/plat-svc/init-sma
 SyslogIdentifier=init-sma
 RemainAfterExit=yes
+Restart=on-failure
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
