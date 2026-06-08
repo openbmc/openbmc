@@ -12,6 +12,26 @@ cx_eids=()
 brd_map=()
 osfp_pr=()
 
+check_and_reset_usb_hub() {
+    # check mcu1u2u2 for IOB0 SMA
+    if ! mctp link show mcu1u2u2; then
+        echo "IOB0 SMA USB device is not exist. Resetting the hub using GPIO."
+        set_gpio "USB2_HUB_RST_L-O" 0
+        sleep 1
+        set_gpio "USB2_HUB_RST_L-O" 1
+        sleep 1
+    fi
+
+    # check mcu1u2u7u2 for IOB0 SMA
+    if ! mctp link show mcu1u2u7u2; then
+        echo "IOB1 SMA USB device is not exist. Resetting the hub using GPIO."
+        set_gpio "SEC_USB2_HUB_RST_L" 0
+        sleep 1
+        set_gpio "SEC_USB2_HUB_RST_L" 1
+        sleep 1
+    fi
+}
+
 remove_eid() {
     local eid=$1
     if mapper get-service /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" 2> /dev/null; then
@@ -228,6 +248,10 @@ reset_sma() {
     set_gpio "MCU_RST_N" 1
     set_gpio "SEC_MCU_RST_N" 1
     sleep 3
+
+    check_and_reset_usb_hub
+    sleep 3
+
     mctp link set mcu1u2u2 up
     mctp link set mcu1u2u7u2 up
     mctp link
