@@ -136,6 +136,7 @@ SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-running@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-on@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-off@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "${@bb.utils.contains('PACKAGECONFIG', 'multi-chassis-smp', 'phosphor-chassis-wait-for-smp-poweron.service', '', d)}"
+FILES:${PN}-chassis += "${@bb.utils.contains('PACKAGECONFIG', 'multi-chassis-smp', '${libexecdir}/phosphor-state-manager/phosphor-chassis-wait-for-smp-poweron', '', d)}"
 
 SYSTEMD_SERVICE:${PN}-chassis-poweron-log += "phosphor-create-chassis-poweron-log@.service"
 
