@@ -199,7 +199,8 @@ RDEPENDS:${PN}-dmtf-pmci:append:df-pldm = " pldm"
 RDEPENDS:${PN}-dmtf-pmci:append:df-mctp = " mctp"
 
 SUMMARY:${PN}-dmtf-spdm = "DMTF SPDM Implementations"
-RDEPENDS:${PN}-dmtf-spdm = " spdm"
+RDEPENDS:${PN}-dmtf-spdm = ""
+RDEPENDS:${PN}-dmtf-spdm:append:df-spdm = " spdm"
 
 SUMMARY:${PN}-webui = "Web User Interface support"
 RDEPENDS:${PN}-webui = "webui-vue"
