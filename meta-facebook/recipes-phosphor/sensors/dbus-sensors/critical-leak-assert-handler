@@ -154,32 +154,7 @@ rack_power_off_when_coolant_safe() {
     done
 }
 
-rack_power_off() {
-    curl -f -s -o /dev/null \
-        --cacert /var/facebook/rootcanal/rc_digicert_ca.pem \
-        --cert /mnt/data/etc/x509_highpriv_host.cert \
-        --key /mnt/data/etc/x509_highpriv_host.key \
-        -X POST "https://${RACKPOWER_HOSTNAME}/${RACKPOWER_URI}" \
-        --data '{"ResetType": "ForceOff"}' \
-        --resolve "${RACKPOWER_HOSTNAME}:443:${RACKPOWER_IP}"
-
-    CMD_STATUS=$?
-
-    if [ $CMD_STATUS -eq 0 ]; then
-        echo "Rack Power Off command sent successfully."
-        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Successfully sent rack power off command during rack leak to RackSwitch" \
-            xyz.openbmc_project.Logging.Entry.Level.Error 2 "DetectorName" "$1" "RackSwitch" "$RACKPOWER_HOSTNAME"
-    else
-        echo "[ERROR] Failed($CMD_STATUS) to send Rack Power Off command."
-        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
-            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Failed to send rack power off command during rack leak to RackSwitch" \
-            xyz.openbmc_project.Logging.Entry.Level.Error 3 "DetectorName" "$1" "RackSwitch" "$RACKPOWER_HOSTNAME" "Error" "$CMD_STATUS"
-        exit 1
-    fi
-}
-
-files=(
+REDFISH_REQUIRED_FILES=(
     "/var/facebook/rootcanal/rc_digicert_ca.pem"
     "/mnt/data/etc/x509_highpriv_host.cert"
     "/mnt/data/etc/x509_highpriv_host.key"
@@ -187,16 +162,89 @@ files=(
     "/mnt/data/etc/rackpower_hostname"
 )
 
-for file in "${files[@]}"; do
-    if [ ! -f "$file" ]; then
-        echo "[ERROR] Required file not found: $file"
-        echo "[ERROR] Abort sending Rack Power Off command"
+redfish_control_deployed() {
+    # Returns 0 if every cert/config file needed for Redfish rack power control is present, 1 otherwise.
+    local file
+    for file in "${REDFISH_REQUIRED_FILES[@]}"; do
+        if [ ! -f "$file" ]; then
+            echo "Redfish control file not found: $file" >&2
+            return 1
+        fi
+    done
+    return 0
+}
+
+# Dispatcher: pick Redfish if the certificate/config is deployed, else hpr-power-off.
+rack_power_off() {
+    local detector_name="$1"
+    if redfish_control_deployed; then
+        echo "Redfish control deployed, using RackSwitch power-off."
+        rack_power_off_redfish "$detector_name"
+    else
+        echo "Redfish control not deployed, falling back to hpr-power-off."
+        rack_power_off_hpr "$detector_name"
+    fi
+}
+
+rack_power_off_redfish() {
+    local detector_name="$1"
+    local rackpower_hostname rackpower_ip rackpower_uri cmd_status
+    rackpower_hostname=$(cat /mnt/data/etc/rackpower_hostname)
+    rackpower_ip=$(cat /mnt/data/etc/rackpower_ipaddr)
+    rackpower_uri="redfish/v1/Chassis/Rack/Actions/Chassis.Reset"
+
+    curl -f -s -o /dev/null \
+        --cacert /var/facebook/rootcanal/rc_digicert_ca.pem \
+        --cert /mnt/data/etc/x509_highpriv_host.cert \
+        --key /mnt/data/etc/x509_highpriv_host.key \
+        -X POST "https://${rackpower_hostname}/${rackpower_uri}" \
+        --data '{"ResetType": "ForceOff"}' \
+        --resolve "${rackpower_hostname}:443:${rackpower_ip}"
+    cmd_status=$?
+
+    if [ "$cmd_status" -eq 0 ]; then
+        echo "Rack Power Off command sent successfully (Redfish)."
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Successfully sent rack power off command during rack leak to RackSwitch" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 2 "DetectorName" "$detector_name" "RackSwitch" "$rackpower_hostname"
+    else
+        echo "[ERROR] Failed($cmd_status) to send Rack Power Off command (Redfish)."
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Failed to send rack power off command during rack leak to RackSwitch" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 3 "DetectorName" "$detector_name" "RackSwitch" "$rackpower_hostname" "Error" "$cmd_status"
         exit 1
     fi
-done
+}
 
-RACKPOWER_HOSTNAME=$(cat /mnt/data/etc/rackpower_hostname)
-RACKPOWER_IP=$(cat /mnt/data/etc/rackpower_ipaddr)
-RACKPOWER_URI="redfish/v1/Chassis/Rack/Actions/Chassis.Reset"
+rack_power_off_hpr() {
+    local detector_name="$1"
+    local cmd_status
+
+    if ! command -v hpr-power-off >/dev/null 2>&1; then
+        echo "[ERROR] hpr-power-off command not found; cannot power off rack"
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "hpr-power-off command not found during rack leak power-off" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 1 "DetectorName" "$detector_name"
+        exit 1
+    fi
+
+    systemctl stop fix-registers.timer fix-registers.service
+    systemctl stop rackmond
+    hpr-power-off
+    cmd_status=$?
+
+    if [ "$cmd_status" -eq 0 ]; then
+        echo "Rack Power Off command sent successfully (hpr-power-off)."
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Successfully sent rack power off command during rack leak via hpr-power-off" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 1 "DetectorName" "$detector_name"
+    else
+        echo "[ERROR] Failed($cmd_status) to send Rack Power Off command (hpr-power-off)."
+        busctl call xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+            xyz.openbmc_project.Logging.Create Create "ssa{ss}" "Failed to send rack power off command during rack leak via hpr-power-off" \
+            xyz.openbmc_project.Logging.Entry.Level.Error 2 "DetectorName" "$detector_name" "Error" "$cmd_status"
+        exit 1
+    fi
+}
 
 rack_power_off_when_coolant_safe
