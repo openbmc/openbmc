@@ -42,7 +42,7 @@ do_install_ptest() {
     # note1: if ipv6 isn't enabled, skip the related test (add '-K ipv6' argument)
     # note2: to make this test work, your ISP also must support ipv6 - the test is trying
     #        to ping google.com through ipv6.
-    if [ "${@oe.utils.all_distro_features(d, 'ipv6', 'true', 'false')}" = "false" ]; then
+    if [ -z "${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}" ]; then
         sed -i 's/UTscapy.py/UTscapy.py -K ipv6/g' ${D}${PTEST_PATH}/run-ptest
     fi
 }
