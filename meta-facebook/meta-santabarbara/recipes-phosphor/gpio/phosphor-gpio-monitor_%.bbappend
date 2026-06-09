@@ -14,6 +14,7 @@ SERVICE_LIST = "assert-module-power-good@.service \
                 deassert-reset-button.service \
                 deassert-rmc-main-power-enable.service \
                 get-mmc-lastest-version@.service \
+                mctp_remove.service \
                 platform-host-ready.target \
                 power-rail-assert-log@.service \
                 power-rail-deassert-log@.service \
@@ -40,6 +41,7 @@ SRC_URI += " \
     file://deassert-reset-button \
     file://deassert-rmc-main-power-enable \
     file://get-mmc-lastest-version \
+    file://mctp_remove \
     file://multi-gpios-sys-init \
     file://plat-phosphor-multi-gpio-monitor.json \
     file://power-rail-event-logger \
@@ -80,6 +82,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/deassert-reset-button ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/deassert-rmc-main-power-enable ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/get-mmc-lastest-version ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/mctp_remove ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/multi-gpios-sys-init ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-rail-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/

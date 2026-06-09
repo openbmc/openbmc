@@ -4,27 +4,6 @@
 source /usr/libexec/phosphor-state-manager/power-cmd
 source /usr/libexec/fb-common-functions
 
-# Remove EID for SWB
-rev_id_1=$(get_gpio "MB_REV_ID_1")
-rev_id_2=$(get_gpio "MB_REV_ID_2")
-
-if [ "$rev_id_1" -eq 0 ] && [ "$rev_id_2" -eq 0 ]; then
-    hub_devices=$(i2cdetect -l | grep "hub0-" | grep "\.port2")
-    target_device=$(echo "$hub_devices" | sed -n '2p')
-else
-    hub_devices=$(i2cdetect -l | grep "hub2-" | grep "\.port2")
-    target_device=$(echo "$hub_devices" | head -n 1)
-fi
-
-if [[ -n "$target_device" ]]; then
-    i2c_num=$(echo "$target_device" | awk '{print $1}' | cut -d'-' -f2)
-    eid=$(mctp route | grep "mctpi2c$i2c_num" | grep -oE "eid min [0-9]+" | awk '{print $3}' | head -n1)
-    if [[ -n "$eid" ]]; then
-        busctl call au.com.codeconstruct.MCTP1 \
-            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
-            au.com.codeconstruct.MCTP.Endpoint1 Remove 2>/dev/null || true
-    fi
-fi
 
 currentstate=$(busctl get-property \
     xyz.openbmc_project.State.Host0 \
@@ -36,34 +15,39 @@ if [ "$currentstate" == "xyz.openbmc_project.State.Host.HostState.TransitioningT
     exit 0
 fi
 
-active=$(systemctl is-active host-graceful-poweroff@0.service)
-if [ "$active" = "active" ] || [ "$active" = "activating" ] || [ "$active" = "deactivating" ]; then
+if is_service_busy host-graceful-poweroff@0.service; then
     exit 0
 fi
 
-active=$(systemctl is-active host-force-poweroff@0.service)
-if [ "$active" = "active" ] || [ "$active" = "activating" ] || [ "$active" = "deactivating" ]; then
+if is_service_busy host-force-poweroff@0.service; then
     exit 0
 fi
 
-active=$(systemctl is-active host-powerreset@0.service)
-if [ "$active" = "active" ] || [ "$active" = "activating" ] || [ "$active" = "deactivating" ]; then
+if is_service_busy host-powerreset@0.service; then
     exit 0
 fi
+
+busctl set-property xyz.openbmc_project.State.Host0 \
+    /xyz/openbmc_project/state/host0 \
+    xyz.openbmc_project.State.Host \
+    CurrentHostState s xyz.openbmc_project.State.Host.HostState.TransitioningToOff
 
 sleep 3
 # Sync power state to "off" for abnormal power lose.
-transition=$(busctl get-property \
-    xyz.openbmc_project.State.Host0 \
-    /xyz/openbmc_project/state/host0 \
-    xyz.openbmc_project.State.Host \
-    RequestedHostTransition | awk '{print $2}' | tr -d '"')
-
-if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ] && [ "$(power_status)" == "off" ]; then
-    busctl set-property xyz.openbmc_project.State.Host0 \
+if [ "$(power_status)" == "off" ]; then
+    transition=$(busctl get-property \
+        xyz.openbmc_project.State.Host0 \
         /xyz/openbmc_project/state/host0 \
         xyz.openbmc_project.State.Host \
-        RequestedHostTransition s \
-        xyz.openbmc_project.State.Host.Transition.Off
+        RequestedHostTransition | awk '{print $2}' | tr -d '"')
+
+    if [ "$transition" != "xyz.openbmc_project.State.Host.Transition.Off" ]; then
+        busctl set-property xyz.openbmc_project.State.Host0 \
+            /xyz/openbmc_project/state/host0 \
+            xyz.openbmc_project.State.Host \
+            RequestedHostTransition s \
+            xyz.openbmc_project.State.Host.Transition.Off
+    fi
 fi
+
 exit 0

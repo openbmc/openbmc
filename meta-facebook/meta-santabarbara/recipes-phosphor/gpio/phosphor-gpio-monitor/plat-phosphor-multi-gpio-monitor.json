@@ -10,6 +10,7 @@
             ],
             "FALLING": [
                 "assert-power-good-drop.service",
+                "mctp_remove.service",
                 "power-rail-assert-log@FM_PWRGD_CPU0_PWROK.service"
             ]
         },

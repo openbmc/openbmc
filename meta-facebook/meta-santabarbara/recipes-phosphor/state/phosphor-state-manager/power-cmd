@@ -152,6 +152,13 @@ power_reset() {
     return 0
 }
 
+is_service_busy() {
+    local output active sub
+    output=$(systemctl show -p ActiveState,SubState --value "$1")
+    { read -r active; read -r sub; } <<< "$output"
+    [ "$active" != "inactive" ] && [ "$sub" != "exited" ]
+}
+
 module_power_control() {
     local SLOT_NUMBER=$1
     local ACTION=$2

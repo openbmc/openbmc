@@ -1,0 +1,6 @@
+[Unit]
+Description=Remove MCTP Endpoint ID (EID)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/mctp_remove
