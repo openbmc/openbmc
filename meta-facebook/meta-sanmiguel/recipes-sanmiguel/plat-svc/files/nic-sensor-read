@@ -79,6 +79,12 @@ update_numeric_sensor_value() {
         return 1
     fi
 
+    # The sensor (ID 50) has "unitModifier" = -1 in PDR.
+    # The actual reading should be the original value * 0.1.
+    if [[ ${sensor_id} -eq 50 ]]; then
+        val="$((val / 10)).$((val % 10))"
+    fi
+
     if path=$(get_sensor_path "$sensor_name"); then
         update_sensor_val "$path" "$val"
     fi
