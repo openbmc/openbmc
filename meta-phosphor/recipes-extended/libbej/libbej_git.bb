@@ -2,7 +2,7 @@ SUMMARY = "Binary Encoded JSON library"
 DESCRIPTION = "Used to decode Redfish Device Enablement (RDE) BEJ"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
-SRCREV = "8013cc9d4af3b4afb9c8539ffd0fa07c4b0ff7d5"
+SRCREV = "8bce94030a3128ae7438e3c4c939e891fa841b89"
 PV = "0.1+git${SRCPV}"
 PR = "r1"
 
