@@ -232,8 +232,10 @@ setup_sma() {
         res=1
     fi
     # Signal the readiness of CXs and start pldmd.service
-    systemctl start cx-ready.target
-    systemctl start pldmd
+    if [[ $res -eq 0 ]]; then
+        systemctl start cx-ready.target
+        systemctl start pldmd
+    fi
     return "$res"
 }
 
