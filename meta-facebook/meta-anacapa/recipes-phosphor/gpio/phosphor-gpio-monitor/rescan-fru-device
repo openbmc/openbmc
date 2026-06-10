@@ -53,6 +53,21 @@ get_bus_by_device()
         L_PRSNT_B_BENIC3)
             echo "48"
             ;;
+        PRSNT_NFC_BOARD)
+            echo "59"
+            ;;
+        AMC_BRD_PRSNT_CPLD)
+            echo "5"
+            ;;
+        PRSNT_L_BRIDGE)
+            echo "49"
+            ;;
+        PRSNT_R_BRIDGE)
+            echo "41"
+            ;;
+        PDB_L_PRSNT)
+            echo "33"
+            ;;
         *)
             echo "Unknown FRU presence device: ${device}" >&2
             return 1

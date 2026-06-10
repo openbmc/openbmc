@@ -527,5 +527,55 @@
             "FALLING": ["rescan-fru-device@R_PRSNT_B_BENIC3.service"],
             "RISING": ["rescan-fru-device@R_PRSNT_B_BENIC3.service"]
         }
+    },
+    {
+        "Name": "PRSNT_NFC_BOARD",
+        "LineName": "PRSNT_NFC_BOARD_R",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@PRSNT_NFC_BOARD.service"],
+            "RISING": ["rescan-fru-device@PRSNT_NFC_BOARD.service"]
+        }
+    },
+    {
+        "Name": "AMC_BRD_PRSNT_CPLD",
+        "LineName": "AMC_BRD_PRSNT_CPLD_L",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@AMC_BRD_PRSNT_CPLD.service"],
+            "RISING": ["rescan-fru-device@AMC_BRD_PRSNT_CPLD.service"]
+        }
+    },
+    {
+        "Name": "PRSNT_L_BRIDGE",
+        "LineName": "PRSNT_L_BRIDGE_R",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@PRSNT_L_BRIDGE.service"],
+            "RISING": ["rescan-fru-device@PRSNT_L_BRIDGE.service"]
+        }
+    },
+    {
+        "Name": "PRSNT_R_BRIDGE",
+        "LineName": "PRSNT_R_BRIDGE_R",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@PRSNT_R_BRIDGE.service"],
+            "RISING": ["rescan-fru-device@PRSNT_R_BRIDGE.service"]
+        }
+    },
+    {
+        "Name": "PDB_L_PRSNT",
+        "LineName": "PDB_L_PRSNT_R_N",
+        "EventMon": "BOTH",
+        "Continue": true,
+        "Targets": {
+            "FALLING": ["rescan-fru-device@PDB_L_PRSNT.service"],
+            "RISING": ["rescan-fru-device@PDB_L_PRSNT.service"]
+        }
     }
 ]
