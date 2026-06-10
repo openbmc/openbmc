@@ -1,3 +1,8 @@
-# Set the systemd auto-enable variable to 'disable' for this package as rackmon is the
-# service handling modbus communication at the moment.
-SYSTEMD_AUTO_ENABLE:${PN} = "disable"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+
+SRC_URI += "file://allowed-devices.json"
+
+do_install:append() {
+    install -d ${D}/var/lib/phosphor-modbus
+    install -m 0644 ${UNPACKDIR}/allowed-devices.json ${D}/var/lib/phosphor-modbus/
+}

@@ -1,0 +1,7 @@
+{
+    "AllowedDevices": [
+        "SupplyValve2_1",
+        "SupplyValve2_2",
+        "SupplyValve2_3"
+    ]
+}
