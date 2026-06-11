@@ -645,9 +645,11 @@ class Git(FetchMethod):
 
         for ref in extra_refs:
             ref_fetch = ref.replace('refs/heads/', '').replace('refs/remotes/origin/', '').replace('refs/tags/', '')
-            runfetchcmd("%s fetch origin --depth 1 %s" % (ud.basecmd, ref_fetch), d, workdir=dest)
+            runfetchcmd("%s fetch origin --depth 1 -- %s" %
+                        (ud.basecmd, shlex.quote(ref_fetch)), d, workdir=dest)
             revision = runfetchcmd("%s rev-parse FETCH_HEAD" % ud.basecmd, d, workdir=dest)
-            runfetchcmd("%s update-ref %s %s" % (ud.basecmd, ref, revision), d, workdir=dest)
+            runfetchcmd("%s update-ref %s %s" %
+                        (ud.basecmd, shlex.quote(ref), revision), d, workdir=dest)
 
         # The url is local ud.clonedir, set it to upstream one
         runfetchcmd("%s remote set-url origin %s" % (ud.basecmd, shlex.quote(repourl)), d, workdir=dest)

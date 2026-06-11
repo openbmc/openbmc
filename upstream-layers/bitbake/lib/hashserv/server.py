@@ -13,6 +13,7 @@ import base64
 import json
 import hashlib
 from . import create_async_client
+from . import is_valid_unihash
 import bb.asyncrpc
 
 logger = logging.getLogger("hashserv.server")
@@ -171,6 +172,11 @@ def hash_token(algo, salt, token):
     h.update(salt.encode("utf-8"))
     h.update(token.encode("utf-8"))
     return ":".join([algo, salt, h.hexdigest()])
+
+
+def validate_unihash(value):
+    if not is_valid_unihash(value):
+        raise bb.asyncrpc.InvokeError("Invalid unihash")
 
 
 def permissions(*permissions, allow_anon=True, allow_self_service=False):
@@ -345,7 +351,7 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
                 d = {k: row[k] for k in row.keys()}
             elif self.upstream_client is not None:
                 d = await self.upstream_client.get_taskhash(method, taskhash)
-                await self.db.insert_unihash(d["method"], d["taskhash"], d["unihash"])
+                await self.insert_unihash(d["method"], d["taskhash"], d["unihash"])
 
         return d
 
@@ -377,8 +383,12 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
         if data is None:
             return
 
-        await self.db.insert_unihash(data["method"], data["taskhash"], data["unihash"])
+        await self.insert_unihash(data["method"], data["taskhash"], data["unihash"])
         await self.db.insert_outhash(data)
+
+    async def insert_unihash(self, method, taskhash, unihash):
+        validate_unihash(unihash)
+        return await self.db.insert_unihash(method, taskhash, unihash)
 
     async def _stream_handler(self, handler):
         await self.socket.send_message("ok")
@@ -467,6 +477,8 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
     # report is made inside the function
     @permissions(READ_PERM)
     async def handle_report(self, data):
+        validate_unihash(data.get("unihash"))
+
         if self.server.read_only or not self.user_has_permissions(REPORT_PERM):
             return await self.report_readonly(data)
 
@@ -509,7 +521,7 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
                     if upstream_data is not None:
                         unihash = upstream_data["unihash"]
 
-            await self.db.insert_unihash(data["method"], data["taskhash"], unihash)
+            await self.insert_unihash(data["method"], data["taskhash"], unihash)
 
         unihash_data = await self.get_unihash(data["method"], data["taskhash"])
         if unihash_data is not None:
@@ -525,7 +537,9 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
 
     @permissions(READ_PERM, REPORT_PERM)
     async def handle_equivreport(self, data):
-        await self.db.insert_unihash(data["method"], data["taskhash"], data["unihash"])
+        validate_unihash(data.get("unihash"))
+
+        await self.insert_unihash(data["method"], data["taskhash"], data["unihash"])
 
         # Fetch the unihash that will be reported for the taskhash. If the
         # unihash matches, it means this row was inserted (or the mapping
@@ -888,7 +902,10 @@ class Server(bb.asyncrpc.AsyncServer):
                 method, taskhash = item
                 d = await client.get_taskhash(method, taskhash)
                 if d is not None:
-                    await db.insert_unihash(d["method"], d["taskhash"], d["unihash"])
+                    if is_valid_unihash(d.get("unihash")):
+                        await db.insert_unihash(d["method"], d["taskhash"], d["unihash"])
+                    else:
+                        self.logger.warning("Upstream server returned invalid unihash")
                 self.backfill_queue.task_done()
 
     def start(self):

@@ -43,6 +43,10 @@ def check_siggen_version(siggen):
     if siggen.find_siginfo_version < siggen.find_siginfo_minversion:
         bb.fatal("Siggen from metadata (OE-Core?) is too old, please update it (%s vs %s)" % (siggen.find_siginfo_version, siggen.find_siginfo_minversion))
 
+def check_hashserv_unihash(unihash):
+    if not hashserv.is_valid_unihash(unihash):
+        bb.fatal("Hash Equivalence Server returned invalid unihash")
+
 class SetEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, set) or isinstance(obj, frozenset):
@@ -729,6 +733,7 @@ class SignatureGeneratorUniHashMixIn(object):
 
             if unihashes and unihashes[idx]:
                 unihash = unihashes[idx]
+                check_hashserv_unihash(unihash)
                 # A unique hash equal to the taskhash is not very interesting,
                 # so it is reported it at debug level 2. If they differ, that
                 # is much more interesting, so it is reported at debug level 1
@@ -747,7 +752,7 @@ class SignatureGeneratorUniHashMixIn(object):
         import importlib
 
         taskhash = d.getVar('BB_TASKHASH')
-        unihash = d.getVar('BB_UNIHASH')
+        unihash = d.getVar('BB_UNIHASH', expand=False)
         report_taskdata = d.getVar('SSTATE_HASHEQUIV_REPORT_TASKDATA') == '1'
         tempdir = d.getVar('T')
         mcfn = d.getVar('BB_FILENAME')
@@ -809,6 +814,7 @@ class SignatureGeneratorUniHashMixIn(object):
                     data = client.report_unihash(taskhash, method, outhash, unihash, extra_data)
 
                 new_unihash = data['unihash']
+                check_hashserv_unihash(new_unihash)
 
                 if new_unihash != unihash:
                     hashequiv_logger.debug('Task %s unihash changed %s -> %s by server %s' % (taskhash, unihash, new_unihash, self.server))
@@ -848,6 +854,7 @@ class SignatureGeneratorUniHashMixIn(object):
                 return False
 
             finalunihash = data['unihash']
+            check_hashserv_unihash(finalunihash)
 
             if finalunihash == current_unihash:
                 hashequiv_logger.verbose('Task %s unihash %s unchanged by server' % (tid, finalunihash))
