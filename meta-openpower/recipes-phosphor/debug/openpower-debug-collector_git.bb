@@ -16,7 +16,7 @@ DEPENDS += " \
         phosphor-logging \
         ${PYTHON_PN}-sdbus++-native \
         cli11 \
-        ipl \
+        ${@bb.utils.contains('MACHINE_FEATURES', 'phal', 'ipl','', d)} \
         "
 
 # This provides below applications that are called into in case
