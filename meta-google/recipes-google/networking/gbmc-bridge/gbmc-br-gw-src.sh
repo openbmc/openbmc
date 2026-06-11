@@ -232,10 +232,12 @@ gbmc_br_gw_src_hook() {
     [[ $route == *" dead "* ]] && return
     [[ $route == *" linkdown "* ]] && return
 
-    if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
+    local expires_regex='^(.*)( +expires +[^ ]+)(.*)$'
+    if [[ $route =~ $expires_regex ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
-    if [[ $route =~ ^(.*)( +proto +[^ ]+)(.*)$ ]]; then
+    local proto_regex='^(.*)( +proto +[^ ]+)(.*)$'
+    if [[ $route =~ $proto_regex ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
     fi
     if [[ $action == add && -z ${gbmc_br_gw_src_routes["$route"]} ]]; then
@@ -281,8 +283,8 @@ gbmc_br_gw_src_hook() {
       for route in "${!gbmc_br_gw_src_routes[@]}"; do
         if [[ $route == *" src $ip "* ]]; then
           unset 'gbmc_br_gw_src_routes[$route]'
-          # shellcheck disable=all
-          if [[ $route =~ ^(.*)' src '[^ ]+(.*)$ ]]; then
+          local route_regex='^(.*) src [^ ]+(.*)$'
+          if [[ $route =~ $route_regex ]]; then
             new_route_key="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
             gbmc_br_gw_src_routes["$new_route_key"]=1
           fi
@@ -293,7 +295,8 @@ gbmc_br_gw_src_hook() {
   # check route on gbmcbr with /124 address
   elif [[ $change == route && $route =~ ^[0-9a-f:]+'/124 '.*' dev gbmcbr ' ]]; then
     local expires='0sec'
-    if [[ $route =~ ^(.*)( +expires +[^ ]+)(.*)$ ]]; then
+    local br_expires_regex='^(.*)( +expires +[^ ]+)(.*)$'
+    if [[ $route =~ $br_expires_regex ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
       expires="${BASH_REMATCH[2]}"
     fi
