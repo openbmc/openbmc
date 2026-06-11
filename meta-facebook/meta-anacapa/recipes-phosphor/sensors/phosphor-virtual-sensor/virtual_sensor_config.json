@@ -13,7 +13,7 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Anacapa_PDB_R"
+                "/xyz/openbmc_project/inventory/system/board/PDB_R"
             ]
         ],
         "Params": {
@@ -51,7 +51,7 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Anacapa_PDB_R"
+                "/xyz/openbmc_project/inventory/system/board/PDB_R"
             ]
         ],
         "Params": {
