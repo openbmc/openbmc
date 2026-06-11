@@ -1,0 +1,51 @@
+From 0ff9beddd959ec9afc99f64789fdfb959842ba52 Mon Sep 17 00:00:00 2001
+From: Adam Duskett <adam.duskett@amarulasolutions.com>
+Date: Thu, 21 May 2026 16:30:27 +0200
+Subject: [PATCH 1/1] fix zlib cross-compiling errors
+
+zlib compression was introduced in version 9.3.3. However, when
+cross-compiling kmscon for an architecture other than x86_64, the
+genunifont executable tries to use the build-systems zlib instead
+of the hosts zlib.
+
+This leads to the following error during compiling:
+libz.so: error adding symbols: file in wrong format
+
+Fix this by adding a new native zlib dependency specifically for the
+genunifont executable.
+
+Upstream-Status: Submitted [https://github.com/kmscon/kmscon/pull/402]
+Signed-off-by: Adam Duskett <adam.duskett@amarulasolutions.com>
+---
+ meson.build     | 1 +
+ src/meson.build | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index f7c0858..74cf595 100644
+--- a/meson.build
++++ b/meson.build
+@@ -52,6 +52,7 @@ libudev_deps = dependency('libudev', version: '>=172')
+ dl_deps = dependency('dl')
+ threads_deps = dependency('threads')
+ zlib_deps = dependency('zlib')
++zlib_deps_native = dependency('zlib', native: true)
+ 
+ python = find_program('python3')
+ 
+diff --git a/src/meson.build b/src/meson.build
+index 63d38ca..070e2a4 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -159,7 +159,7 @@ endif
+ # Unifont Generator
+ # This generates the unifont sources from raw hex-encoded font data.
+ #
+-genunifont = executable('genunifont', 'genunifont.c', dependencies: [zlib_deps], native: true)
++genunifont = executable('genunifont', 'genunifont.c', dependencies: [zlib_deps_native], native: true)
+ 
+ unifont_bin = custom_target('unifont-bin',
+   input: ['font_unifont_data.hex'],
+-- 
+2.54.0
+

@@ -1,6 +1,6 @@
 Collection of layers for the OE-core universe
 
-Main layer maintainer: Khem Raj <raj.khem@gmail.com>
+Main layer maintainer: Anuj Mittal <anuj.mittal@oss.qualcomm.com>
 
 This repository is a collection of layers to supplement OE-Core
 with additional packages, Each layer have designated maintainer

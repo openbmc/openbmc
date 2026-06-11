@@ -31,9 +31,6 @@ SRC_URI = "https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://0001-positional-args.patch \
            file://0001-custom-env.patch \
            file://0001-build-remove-redundant-mXX-flags-for-V8.patch \
-           file://0001-fix-arm-Neon-intrinsics-types.patch \
-           file://0001-detect-aarch64-Neon-correctly.patch \
-           file://0001-llhttp-fix-NEON-header-value-__builtin_ctzll-undefin.patch \
            file://run-ptest \
            "
 SRC_URI:append:class-target = " \
@@ -42,7 +39,7 @@ SRC_URI:append:class-target = " \
 SRC_URI:append:toolchain-clang:powerpc64le = " \
            file://0001-ppc64-Do-not-use-mminimal-toc-with-clang.patch \
            "
-SRC_URI[sha256sum] = "b6bedd3a8cacd5df7df015a5088264b12c74a277ba60684cb9642ae8eb743132"
+SRC_URI[sha256sum] = "f3e6a578db1ab335a4a72785c1e87ad18a2cf6d2fc25747a1d741fb34af0bd0f"
 
 S = "${UNPACKDIR}/node-v${PV}"
 

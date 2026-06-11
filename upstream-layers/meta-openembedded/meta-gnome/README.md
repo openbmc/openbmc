@@ -11,6 +11,6 @@ branch: master
 Send pull requests to openembedded-devel@lists.openembedded.org with '[meta-gnome]' in the subject'
 
 When sending single patches, please use something like:
-git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix='meta-gnome][PATCH'
+git send-email -M -1 --to openembedded-devel@lists.openembedded.org --subject-prefix='meta-gnome][wrynose][PATCH'
 
-Layer maintainer: Khem Raj <raj.khem@gmail.com>
+Layer maintainer: Anuj Mittal <anuj.mittal@oss.qualcomm.com>

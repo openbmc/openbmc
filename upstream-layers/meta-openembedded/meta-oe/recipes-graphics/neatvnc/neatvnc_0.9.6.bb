@@ -10,7 +10,7 @@ SRC_URI = "git://github.com/any1/neatvnc;branch=v0.9;protocol=https \
            file://0001-Use-aml-v1.patch \
           "
 
-SRCREV = "36ef59a83291368d72f471700702a8b6a76f763b"
+SRCREV = "3295c11b934a83dbcb44beabf3f21a8b885a2d11"
 
 
 DEPENDS = "libdrm pixman aml zlib"

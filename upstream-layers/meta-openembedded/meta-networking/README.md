@@ -32,7 +32,7 @@ branch: master
 
 Maintenance
 -----------
-Layer maintainers: Khem Raj <raj.khem@gmail.com>
+Stable Layer maintainer: Anuj Mittal <anuj.mittal@oss.qualcomm.com>
 
 
 Please see the MAINTAINERS file for information on contacting the

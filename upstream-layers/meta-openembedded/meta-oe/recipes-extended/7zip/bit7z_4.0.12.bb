@@ -8,7 +8,7 @@ SRC_URI = " \
     ${@bb.utils.contains('PTEST_ENABLED', '1', d.getVar('SRC_URI_PTEST'), 'file://0001-cmake-disable-dependency-inclusion.patch', d)} \
 "
 
-SRCREV = "82f359371fda5c16c037ac0659b969334816a9c4"
+SRCREV = "9a43c9fb96003141dcb49c82843382a52afec86a"
 
 # ptest dependencies and their revisions
 SRC_URI_PTEST = " \
