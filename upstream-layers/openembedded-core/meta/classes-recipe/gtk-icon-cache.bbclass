@@ -46,7 +46,7 @@ gtk_icon_cache_postrm() {
 if [ "x$D" != "x" ]; then
 	$INTERCEPT_DIR/postinst_intercept update_gtk_icon_cache ${PKG} \
 		mlprefix=${MLPREFIX} \
-		libdir=${libdir}
+		libdir_native=${libdir_native}
 else
 	for icondir in /usr/share/icons/* ; do
 		if [ -d $icondir ] ; then

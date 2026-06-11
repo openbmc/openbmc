@@ -1,0 +1,276 @@
+From 95d19f6ff3d0591afce0e5666d3d17b9192789f6 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 25 May 2026 11:37:51 -0400
+Subject: [PATCH 5/8] fix: vfs: widen trace event i_ino fields to u64 (v7.1)
+
+See upstream commit:
+
+  commit 5a3d5928b1a4196affc5f504fdf95f67f169bc57
+  Author: Jeff Layton <jlayton@kernel.org>
+  Date:   Wed Mar 4 10:32:34 2026 -0500
+
+    vfs: widen trace event i_ino fields to u64
+
+    Update VFS-layer trace event definitions to use u64 instead of
+    ino_t/unsigned long for inode number fields. Update TP_printk format
+    strings to use %llu/%llx to match the widened field type. Remove
+    now-unnecessary (unsigned long) casts since __entry->ino is already
+    u64.
+
+Upstream-Status: Backport [https://review.lttng.org/c/lttng-modules/+/17891]
+
+Change-Id: Id48ff7ffe40528f839c84eaa060ab5cd67ea1436
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+---
+ include/instrumentation/events/writeback.h | 179 ++++++++++++++++++++-
+ 1 file changed, 174 insertions(+), 5 deletions(-)
+
+diff --git a/include/instrumentation/events/writeback.h b/include/instrumentation/events/writeback.h
+index f53d9d3c..cbf9a426 100644
+--- a/include/instrumentation/events/writeback.h
++++ b/include/instrumentation/events/writeback.h
+@@ -35,6 +35,31 @@ static inline const char *lttng_bdi_dev_name(struct backing_dev_info *bdi)
+ 	return dev_name(bdi->dev);
+ }
+ #endif
++
++#ifdef CONFIG_CGROUP_WRITEBACK
++static inline u64 lttng_wb_assign_cgroup(struct bdi_writeback *wb)
++{
++	return cgroup_ino(wb->memcg_css->cgroup);
++}
++
++static inline u64 lttng_wbc_assign_cgroup(struct writeback_control *wbc)
++{
++	if (wbc->wb)
++		return lttng_wb_assign_cgroup(wbc->wb);
++	else
++		return 1;
++}
++#else   /* CONFIG_CGROUP_WRITEBACK */
++static inline u64 lttng_wb_assign_cgroup(struct bdi_writeback *wb)
++{
++	return 1;
++}
++
++static inline u64 lttng_wbc_assign_cgroup(struct writeback_control *wbc)
++{
++	return 1;
++}
++#endif  /* CONFIG_CGROUP_WRITEBACK */
+ #endif
+ 
+ /*
+@@ -101,7 +126,36 @@ static inline const char *lttng_bdi_dev_name(struct backing_dev_info *bdi)
+ 	)
+ #endif /* #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,9,0)) */
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,16,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(writeback_folio_template,
++
++	TP_PROTO(struct folio *folio, struct address_space *mapping),
++
++	TP_ARGS(folio, mapping),
++
++	TP_FIELDS(
++		ctf_string(name, lttng_bdi_dev_name(mapping ? inode_to_bdi(mapping->host) : NULL))
++		ctf_integer(u64, ino, (mapping && mapping->host) ? mapping->host->i_ino : 0)
++		ctf_integer(pgoff_t, index, folio->index)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(writeback_folio_template, writeback_dirty_folio,
++
++	TP_PROTO(struct folio *folio, struct address_space *mapping),
++
++	TP_ARGS(folio, mapping)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE_MAP(writeback_folio_template, folio_wait_writeback,
++
++	writeback_folio_wait,
++
++	TP_PROTO(struct folio *folio, struct address_space *mapping),
++
++	TP_ARGS(folio, mapping)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,16,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(writeback_folio_template,
+ 
+ 	TP_PROTO(struct folio *folio, struct address_space *mapping),
+@@ -168,7 +222,19 @@ LTTNG_TRACEPOINT_EVENT(writeback_dirty_page,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(writeback_dirty_inode_template,
++	TP_PROTO(struct inode *inode, int flags),
++	TP_ARGS(inode, flags),
++	TP_FIELDS(
++		/* may be called for files on pseudo FSes w/ unregistered bdi */
++		ctf_string(name, lttng_bdi_dev_name(inode_to_bdi(inode)))
++		ctf_integer(u64, ino, inode->i_ino)
++		ctf_integer(unsigned long, state, inode_state_read_once(inode))
++		ctf_integer(unsigned long, flags, flags)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(writeback_dirty_inode_template,
+ 	TP_PROTO(struct inode *inode, int flags),
+ 	TP_ARGS(inode, flags),
+@@ -202,6 +268,18 @@ LTTNG_TRACEPOINT_EVENT_WRITEBACK_DIRTY_INODE_TEMPLATE(writeback_dirty_inode_star
+ LTTNG_TRACEPOINT_EVENT_WRITEBACK_DIRTY_INODE_TEMPLATE(writeback_dirty_inode)
+ LTTNG_TRACEPOINT_EVENT_WRITEBACK_DIRTY_INODE_TEMPLATE(writeback_mark_inode_dirty)
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(writeback_write_inode_template,
++	TP_PROTO(struct inode *inode, struct writeback_control *wbc),
++	TP_ARGS(inode, wbc),
++	TP_FIELDS(
++		ctf_string(name, lttng_bdi_dev_name(inode_to_bdi(inode)))
++		ctf_integer(u64, ino, inode->i_ino)
++		ctf_integer(u64, cgroup_ino, lttng_wbc_assign_cgroup(wbc))
++		ctf_integer(int, sync_mode, wbc->sync_mode)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(writeback_write_inode_template,
+ 	TP_PROTO(struct inode *inode, struct writeback_control *wbc),
+ 	TP_ARGS(inode, wbc),
+@@ -211,6 +289,7 @@ LTTNG_TRACEPOINT_EVENT_CLASS(writeback_write_inode_template,
+ 		ctf_integer(int, sync_mode, wbc->sync_mode)
+ 	)
+ )
++#endif
+ 
+ #define LTTNG_TRACEPOINT_EVENT_WRITEBACK_WRITE_INODE(name) \
+ LTTNG_TRACEPOINT_EVENT_INSTANCE(writeback_write_inode_template, name, \
+@@ -457,7 +536,53 @@ LTTNG_TRACEPOINT_EVENT_MAP(bdi_dirty_ratelimit,
+ 	)
+ )
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,15,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_MAP(balance_dirty_pages,
++
++	writeback_balance_dirty_pages,
++
++	TP_PROTO(struct bdi_writeback *wb,
++		 struct dirty_throttle_control *dtc,
++		 unsigned long dirty_ratelimit,
++		 unsigned long task_ratelimit,
++		 unsigned long dirtied,
++		 unsigned long period,
++		 long pause,
++		 unsigned long start_time),
++
++	TP_ARGS(wb, dtc, dirty_ratelimit, task_ratelimit,
++		dirtied, period, pause, start_time
++	),
++
++	TP_FIELDS(
++		ctf_string(bdi, lttng_bdi_dev_name(wb->bdi))
++		ctf_integer(u64, cgroup_ino, lttng_wb_assign_cgroup(wb))
++		ctf_integer(unsigned long, limit, dtc->limit)
++		ctf_integer(unsigned long, setpoint,
++                    (dtc->limit + (dtc->thresh + dtc->bg_thresh)) / 2)
++		ctf_integer(unsigned long, dirty, dtc->dirty)
++		ctf_integer(unsigned long, wb_setpoint,
++                    ((dtc->limit + (dtc->thresh + dtc->bg_thresh)) / 2)
++                    * (dtc->wb_thresh / (dtc->thresh + 1)))
++		ctf_integer(unsigned long, wb_dirty, dtc->wb_dirty)
++		ctf_integer(unsigned long, dirty_ratelimit,
++			KBps(dirty_ratelimit))
++		ctf_integer(unsigned long, task_ratelimit,
++			KBps(task_ratelimit))
++		ctf_integer(unsigned long, paused,
++			(jiffies - start_time) * 1000 / HZ)
++		ctf_integer(long, pause, pause * 1000 / HZ)
++		ctf_integer(unsigned long, period,
++			period * 1000 / HZ)
++		ctf_integer(long, think,
++			current->dirty_paused_when == 0 ? 0 :
++				(long)(jiffies - current->dirty_paused_when) * 1000/HZ)
++		ctf_integer(unsigned int, dirtied, dirtied)
++		ctf_integer(unsigned int, dirtied_pause,
++			current->nr_dirtied_pause)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,15,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(balance_dirty_pages,
+ 
+ 	writeback_balance_dirty_pages,
+@@ -604,7 +729,21 @@ LTTNG_TRACEPOINT_EVENT_MAP(balance_dirty_pages,
+ )
+ #endif /* else (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,14,2)) */
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT(writeback_sb_inodes_requeue,
++
++	TP_PROTO(struct inode *inode),
++	TP_ARGS(inode),
++
++	TP_FIELDS(
++		ctf_string(name, lttng_bdi_dev_name(inode_to_bdi(inode)))
++		ctf_integer(u64, ino, inode->i_ino)
++		ctf_integer(u64, cgroup_ino, lttng_wb_assign_cgroup(inode_to_wb(inode)))
++		ctf_integer(unsigned long, state, inode_state_read_once(inode))
++		ctf_integer(unsigned long, dirtied_when, inode->dirtied_when)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
+ LTTNG_TRACEPOINT_EVENT(writeback_sb_inodes_requeue,
+ 
+ 	TP_PROTO(struct inode *inode),
+@@ -658,7 +797,30 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(writeback_congest_waited_template, writeback_wai
+ 	TP_ARGS(usec_timeout, usec_delayed)
+ )
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(writeback_single_inode_template,
++
++	TP_PROTO(struct inode *inode,
++		 struct writeback_control *wbc,
++		 unsigned long nr_to_write
++	),
++
++	TP_ARGS(inode, wbc, nr_to_write),
++
++	TP_FIELDS(
++		ctf_string(name, lttng_bdi_dev_name(inode_to_bdi(inode)))
++		ctf_integer(u64, ino, inode->i_ino)
++		ctf_integer(u64, cgroup_ino, lttng_wbc_assign_cgroup(wbc))
++		ctf_integer(unsigned long, state, inode_state_read_once(inode))
++		ctf_integer(unsigned long, dirtied_when, inode->dirtied_when)
++		ctf_integer(unsigned long, writeback_index,
++			inode->i_mapping->writeback_index)
++		ctf_integer(unsigned long, wrote,
++			nr_to_write - wbc->nr_to_write)
++		ctf_integer(long, nr_to_write, nr_to_write)
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,19,0))
+ LTTNG_TRACEPOINT_EVENT_CLASS(writeback_single_inode_template,
+ 
+ 	TP_PROTO(struct inode *inode,
+@@ -704,6 +866,13 @@ LTTNG_TRACEPOINT_EVENT_CLASS(writeback_single_inode_template,
+ )
+ #endif
+ 
++LTTNG_TRACEPOINT_EVENT_INSTANCE(writeback_single_inode_template, writeback_single_inode_start,
++	TP_PROTO(struct inode *inode,
++		 struct writeback_control *wbc,
++		 unsigned long nr_to_write),
++	TP_ARGS(inode, wbc, nr_to_write)
++)
++
+ LTTNG_TRACEPOINT_EVENT_INSTANCE(writeback_single_inode_template, writeback_single_inode,
+ 	TP_PROTO(struct inode *inode,
+ 		 struct writeback_control *wbc,
+-- 
+2.43.0
+

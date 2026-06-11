@@ -1944,6 +1944,22 @@ class DevtoolUpgradeTests(DevtoolBase):
         except:
             self.skip("Git user.name and user.email must be set")
 
+    def _check_changelog(self, recipe, oldrecipefile):
+        """Compare extracted changelog against reference data."""
+        changelog_ref = oldrecipefile + '.changelog'
+        self.assertExists(changelog_ref, 'Changelog reference file must exist for %s' % recipe)
+        changelog_file = os.path.join(self.workspacedir, 'changelogs', '%s.txt' % recipe)
+        with open(changelog_ref, 'r') as f:
+            expected = f.read()
+        if not expected:
+            self.assertNotExists(changelog_file,
+                'Changelog file should not exist when reference is empty')
+        else:
+            self.assertExists(changelog_file, 'Changelog file should exist after upgrade')
+            with open(changelog_file, 'r') as f:
+                actual = f.read()
+            self.assertEqual(expected, actual)
+
     def test_devtool_upgrade(self):
         # Check preconditions
         self.assertTrue(not os.path.exists(self.workspacedir), 'This test cannot be run with a workspace directory under the build directory')
@@ -1982,6 +1998,8 @@ class DevtoolUpgradeTests(DevtoolBase):
         with open(newrecipefile, 'r') as f:
             newlines = f.readlines()
         self.assertEqual(desiredlines, newlines)
+        # Check changelog
+        self._check_changelog(recipe, oldrecipefile)
         # Check devtool reset recipe
         result = runCmd('devtool reset %s -n' % recipe)
         result = runCmd('devtool status')
@@ -2016,11 +2034,14 @@ class DevtoolUpgradeTests(DevtoolBase):
         with open(newrecipefile, 'r') as f:
             newlines = f.readlines()
         self.assertEqual(desiredlines, newlines)
+        # Check changelog
+        self._check_changelog(recipe, oldrecipefile)
         # Check devtool reset recipe
         result = runCmd('devtool reset %s -n' % recipe)
         result = runCmd('devtool status')
         self.assertNotIn(recipe, result.output)
         self.assertNotExists(os.path.join(self.workspacedir, 'recipes', recipe), 'Recipe directory should not exist after resetting')
+        self.assertNotExists(os.path.join(self.workspacedir, 'changelogs', '%s.txt' % recipe), 'Changelog file should be removed after reset')
 
     def test_devtool_upgrade_git(self):
         self._test_devtool_upgrade_git_by_recipe('devtool-upgrade-test2', '6cc6077a36fe2648a5f993fe7c16c9632f946517')
@@ -2051,6 +2072,8 @@ class DevtoolUpgradeTests(DevtoolBase):
         with open(newrecipefile, 'r') as f:
             newlines = f.readlines()
         self.assertEqual(desiredlines, newlines)
+        # Check changelog
+        self._check_changelog(recipe, oldrecipefile)
 
     def test_devtool_upgrade_all_checksums(self):
         # Check preconditions
@@ -2075,6 +2098,8 @@ class DevtoolUpgradeTests(DevtoolBase):
         with open(newrecipefile, 'r') as f:
             newlines = f.readlines()
         self.assertEqual(desiredlines, newlines)
+        # Check changelog
+        self._check_changelog(recipe, oldrecipefile)
 
     def test_devtool_upgrade_recipe_upgrade_extra_tasks(self):
         # Check preconditions
@@ -2116,6 +2141,8 @@ class DevtoolUpgradeTests(DevtoolBase):
         with open(newcratesincfile, 'r') as f:
             newlines = f.readlines()
         self.assertEqual(desiredlines, newlines)
+        # Check changelog
+        self._check_changelog(recipe, oldrecipefile)
         # Check devtool reset recipe
         result = runCmd('devtool reset %s -n' % recipe)
         result = runCmd('devtool status')

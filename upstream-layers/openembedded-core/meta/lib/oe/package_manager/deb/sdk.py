@@ -54,10 +54,10 @@ class PkgSdk(Sdk):
         pm.write_index()
         pm.update()
 
-        for pkg_type in self.install_order:
+        for pkg_type in Manifest.INSTALL_ORDER:
             if pkg_type in pkgs_to_install:
                 pm.install(pkgs_to_install[pkg_type],
-                           [False, True][pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY])
+                           pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY)
 
     def _populate(self):
         execute_pre_post_process(self.d, self.d.getVar("POPULATE_SDK_PRE_TARGET_COMMAND"))

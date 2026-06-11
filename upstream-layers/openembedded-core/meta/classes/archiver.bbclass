@@ -179,6 +179,20 @@ python () {
                 d.appendVarFlag('do_package_write_rpm', 'depends', ' %s:do_ar_configured' % pn)
 }
 
+do_ar_prepare[vardeps] += " \
+    ARCHIVER_MODE \
+    ARCHIVER_MIRROR_EXCLUDE \
+    COPYLEFT_LICENSE_EXCLUDE \
+    COPYLEFT_LICENSE_INCLUDE \
+    COPYLEFT_PN_EXCLUDE \
+    COPYLEFT_PN_INCLUDE \
+    COPYLEFT_RECIPE_TYPES \
+"
+do_ar_prepare[cleandirs] = "${ARCHIVER_TOPDIR}"
+do_ar_prepare() {
+	:
+}
+
 # Take all the sources for a recipe and put them in WORKDIR/archiver-work/.
 # Files in SRC_URI are copied directly, anything that's a directory
 # (e.g. git repositories) is "unpacked" and then put into a tarball.
@@ -609,14 +623,15 @@ do_deploy_archives[sstate-inputdirs] = "${ARCHIVER_TOPDIR}"
 do_deploy_archives[sstate-outputdirs] = "${DEPLOY_DIR_SRC}"
 addtask do_deploy_archives_setscene
 
-addtask do_ar_original after do_unpack
-addtask do_unpack_and_patch after do_patch do_preconfigure
+addtask do_ar_prepare
+addtask do_ar_original after do_unpack do_ar_prepare
+addtask do_unpack_and_patch after do_patch do_preconfigure do_ar_prepare
 addtask do_ar_patched after do_unpack_and_patch
 addtask do_ar_configured after do_unpack_and_patch
-addtask do_ar_mirror after do_fetch
-addtask do_dumpdata
-addtask do_ar_recipe
-addtask do_deploy_archives
+addtask do_ar_mirror after do_fetch do_ar_prepare
+addtask do_dumpdata after do_ar_prepare
+addtask do_ar_recipe after do_ar_prepare
+addtask do_deploy_archives after do_ar_prepare
 do_build[recrdeptask] += "do_deploy_archives"
 do_rootfs[recrdeptask] += "do_deploy_archives"
 do_populate_sdk[recrdeptask] += "do_deploy_archives"

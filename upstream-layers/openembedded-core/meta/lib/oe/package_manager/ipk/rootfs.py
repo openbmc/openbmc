@@ -298,7 +298,7 @@ class PkgRootfs(DpkgOpkgRootfs):
         if self.progress_reporter:
             self.progress_reporter.next_stage()
 
-        for pkg_type in self.install_order:
+        for pkg_type in Manifest.INSTALL_ORDER:
             if pkg_type in pkgs_to_install:
                 # For multilib, we perform a sanity test before final install
                 # If sanity test fails, it will automatically do a bb.fatal()
@@ -307,7 +307,7 @@ class PkgRootfs(DpkgOpkgRootfs):
                     self._multilib_test_install(pkgs_to_install[pkg_type])
 
                 self.pm.install(pkgs_to_install[pkg_type],
-                                [False, True][pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY])
+                                pkg_type == Manifest.PKG_TYPE_ATTEMPT_ONLY)
 
         if self.progress_reporter:
             self.progress_reporter.next_stage()

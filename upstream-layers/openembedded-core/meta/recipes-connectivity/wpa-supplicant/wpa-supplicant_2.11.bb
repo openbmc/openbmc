@@ -19,6 +19,7 @@ SRC_URI = "http://w1.fi/releases/wpa_supplicant-${PV}.tar.gz \
            file://0002-defconfig-Update-Opportunistic-Wireless-Encryption-O.patch \
            file://0003-defconfig-Document-IEEE-802.11be-as-a-published-amen.patch \
            file://0004-defconfig-Uncomment-CONFIG_IEEE80211BE-y.patch \
+           file://0005-WNM-Extend-workaround-for-broken-AP-operating-class-behavior.patch \
            file://CVE-2025-24912-01.patch \
            file://CVE-2025-24912-02.patch \
            "

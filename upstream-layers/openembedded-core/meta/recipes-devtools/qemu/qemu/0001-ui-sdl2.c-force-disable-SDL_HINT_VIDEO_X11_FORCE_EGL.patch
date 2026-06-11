@@ -1,0 +1,28 @@
+From ba4efe836c488d00e0f44929ee45feb3b1c1e014 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 10 Jun 2026 15:00:26 +0200
+Subject: [PATCH] ui/sdl2.c: force-disable SDL_HINT_VIDEO_X11_FORCE_EGL,
+
+This is problematic in X11-only environments, as it sets
+SDL on a code path that ends in a crash:
+https://gitlab.com/qemu-project/qemu/-/work_items/3540
+
+Upstream-Status: Inappropriate [yocto-specific workaround]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ ui/sdl2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index 987ad334b..b4c8a50de 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -871,7 +871,7 @@ static void sdl2_set_hint_x11_force_egl(void)
+          * It's always safe to set the hint even if X11 is not used by SDL.
+          * SDL will work regardless of the hint.
+          */
+-        SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
++        //SDL_SetHint(SDL_HINT_VIDEO_X11_FORCE_EGL, "1");
+         eglTerminate(egl_display);
+     }
+ 

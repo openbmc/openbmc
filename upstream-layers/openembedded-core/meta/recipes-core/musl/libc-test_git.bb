@@ -36,12 +36,13 @@ RDEPENDS:${PN} = " \
 
 RDEPENDS:${PN}-ptest = " \
      ${PN} \
-     libatomic-staticdev \
      locale-base-en-us \
      musl-staticdev \
      sed \
      tzdata \
 "
+
+RDEPENDS:${PN}-ptest:append:toolchain-gcc = " libatomic-staticdev"
 
 install_path = "/opt/${PN}"
 FILES:${PN} += "${install_path}/*"

@@ -30,6 +30,7 @@ PTESTS_FAST = "\
     json-glib \
     libarchive \
     libassuan \
+    libatomic-ops \
     libcheck \
     libconfig \
     libconvert-asn1-perl \
@@ -57,6 +58,7 @@ PTESTS_FAST = "\
     libxml-simple-perl \
     libxml2 \
     libxmlb \
+    libxslt \
     libyaml \
     logrotate \
     lua \

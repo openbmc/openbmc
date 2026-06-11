@@ -1,0 +1,37 @@
+From 388e023fe1197c1ffed374520ed45df4ac72b8f5 Mon Sep 17 00:00:00 2001
+From: Sai Sneha <saisneha196@gmail.com>
+Date: Thu, 21 May 2026 13:08:07 +0530
+Subject: [PATCH] Fix ThreadingMock call_count race condition
+
+ThreadingMock._increment_mock_call() was not thread-safe.
+Multiple threads calling the mock simultaneously could lose
+increments due to race conditions on call_count and other
+attributes.
+
+Fix by overriding _increment_mock_call in ThreadingMixin
+and wrapping it with the existing _mock_calls_events_lock.
+
+Upstream-Status: Backport [https://github.com/python/cpython/pull/150176]
+
+Signed-off-by: Sai Sneha <saisneha196@gmail.com>
+---
+ Lib/unittest/mock.py | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/Lib/unittest/mock.py b/Lib/unittest/mock.py
+index 16f3699e89..56cdc37942 100644
+--- a/Lib/unittest/mock.py
++++ b/Lib/unittest/mock.py
+@@ -3113,6 +3113,10 @@ def _mock_call(self, *args, **kwargs):
+ 
+         return ret_value
+ 
++    def _increment_mock_call(self, /, *args, **kwargs):
++        with self._mock_calls_events_lock:
++            super()._increment_mock_call(*args, **kwargs)
++
+     def wait_until_called(self, *, timeout=_timeout_unset):
+         """Wait until the mock object is called.
+ 
+-- 
+2.34.1

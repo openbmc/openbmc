@@ -97,14 +97,14 @@ class NpmRecipeHandler(RecipeHandler):
         bb.utils.remove(os.path.join(srctree, "node_modules"), recurse=True)
 
         env = NpmEnvironment(d, configs=configs)
-        env.run("npm install", workdir=srctree)
+        env.run(["npm", "install"], workdir=srctree)
 
     def _generate_shrinkwrap(self, d, srctree, dev):
         """Check and generate the 'npm-shrinkwrap.json' file if needed"""
         configs = self._npm_global_configs(dev)
 
         env = NpmEnvironment(d, configs=configs)
-        env.run("npm shrinkwrap", workdir=srctree)
+        env.run(["npm", "shrinkwrap"], workdir=srctree)
 
         return os.path.join(srctree, "npm-shrinkwrap.json")
 

@@ -1,0 +1,54 @@
+From b9d853f90111cf657762c3e23110ab9f7a66e1aa Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 25 May 2026 11:36:32 -0400
+Subject: [PATCH 3/8] fix: mm/vmscan: Convert pageout() to take a folio (v5.18)
+
+See upstream commit:
+
+  commit e0cd5e7ffa549487cf1a85452f371274cbf0a8f1
+  Author: Matthew Wilcox (Oracle) <willy@infradead.org>
+  Date:   Mon Jan 17 23:35:57 2022 -0500
+
+    mm/vmscan: Convert pageout() to take a folio
+
+    We always write out an entire folio at once.  This conversion removes
+    a few calls to compound_head() and gets the NR_VMSCAN_WRITE statistic
+    right when writing out a large folio.
+
+Upstream-Status: Backport [https://review.lttng.org/c/lttng-modules/+/17890]
+
+Change-Id: I43ce035aecbfb3f640d2af32224be71067762711
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+---
+ include/instrumentation/events/mm_vmscan.h | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/include/instrumentation/events/mm_vmscan.h b/include/instrumentation/events/mm_vmscan.h
+index 15d56b38..f33bcbd2 100644
+--- a/include/instrumentation/events/mm_vmscan.h
++++ b/include/instrumentation/events/mm_vmscan.h
+@@ -510,7 +510,20 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_lru_isolate_template, mm_vmscan_memcg_
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,7,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,18,0))
++LTTNG_TRACEPOINT_EVENT(mm_vmscan_write_folio,
++
++	TP_PROTO(struct folio *folio),
++
++	TP_ARGS(folio),
++
++	TP_FIELDS(
++		ctf_integer_hex(unsigned long, pfn, folio_pfn(folio))
++		ctf_integer(int, reclaim_flags, trace_reclaim_flags(
++				folio_is_file_lru(folio)))
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,7,0))
+ LTTNG_TRACEPOINT_EVENT(mm_vmscan_writepage,
+ 
+ 	TP_PROTO(struct page *page),
+-- 
+2.43.0
+

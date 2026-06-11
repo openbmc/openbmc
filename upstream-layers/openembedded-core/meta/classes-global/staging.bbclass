@@ -250,7 +250,7 @@ def staging_populate_sysroot_dir(targetsysroot, nativesysroot, native, d):
 
 #
 # Manifests here are complicated. The main sysroot area has the unpacked sstate
-# which us unrelocated and tracked by the main sstate manifests. Each recipe
+# which is unrelocated and tracked by the main sstate manifests. Each recipe
 # specific sysroot has manifests for each dependency that is installed there.
 # The task hash is used to tell whether the data needs to be reinstalled. We
 # use a symlink to point to the currently installed hash. There is also a

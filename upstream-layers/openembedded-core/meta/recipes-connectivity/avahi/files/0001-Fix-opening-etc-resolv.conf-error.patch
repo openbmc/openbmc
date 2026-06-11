@@ -39,7 +39,7 @@ index 548c834..63e28e4 100644
 +After=systemd-resolved.service connman.service
  
  [Service]
- Type=dbus
+ BusName=org.freedesktop.Avahi
 -- 
 2.11.0
 

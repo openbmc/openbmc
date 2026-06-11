@@ -31,7 +31,6 @@ class Archiver(OESelftestTestCase):
         features += 'COPYLEFT_PN_EXCLUDE = "%s"\n' % exclude_recipe
         self.write_config(features)
 
-        bitbake('-c clean %s %s' % (include_recipe, exclude_recipe))
         bitbake("-c deploy_archives %s %s" % (include_recipe, exclude_recipe))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'TARGET_SYS'])
@@ -62,7 +61,6 @@ class Archiver(OESelftestTestCase):
         features += 'COPYLEFT_RECIPE_TYPES = "target"\n'
         self.write_config(features)
 
-        bitbake('-c clean %s %s' % (target_recipe, native_recipe))
         bitbake("%s -c deploy_archives %s" % (target_recipe, native_recipe))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'TARGET_SYS', 'BUILD_SYS'])
@@ -99,7 +97,6 @@ class Archiver(OESelftestTestCase):
         features += 'COPYLEFT_PN_EXCLUDE = "%s"\n' % target_recipes[1]
         self.write_config(features)
 
-        bitbake('-c clean %s %s' % (' '.join(target_recipes), ' '.join(native_recipes)))
         bitbake('-c deploy_archives %s %s' % (' '.join(target_recipes), ' '.join(native_recipes)))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'TARGET_SYS', 'BUILD_SYS'])
@@ -174,7 +171,6 @@ class Archiver(OESelftestTestCase):
             features += extra_config
         self.write_config(features)
 
-        bitbake('-c clean %s' % (target))
         bitbake('-c deploy_archives %s' % (target))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'BUILD_SYS'])
@@ -255,7 +251,6 @@ class Archiver(OESelftestTestCase):
         features += 'ARCHIVER_MIRROR_EXCLUDE = "${GNU_MIRROR}"\n'
         self.write_config(features)
 
-        bitbake('-c clean %s' % (target))
         bitbake('-c deploy_archives %s' % (target))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'TARGET_SYS'])
@@ -281,7 +276,6 @@ class Archiver(OESelftestTestCase):
         self.write_config(features)
 
         for target in ['selftest-ed', 'selftest-hardlink']:
-            bitbake('-c clean %s' % (target))
             bitbake('-c deploy_archives %s' % (target))
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC'])
@@ -302,7 +296,6 @@ class Archiver(OESelftestTestCase):
         features += 'COPYLEFT_LICENSE_INCLUDE = "*"\n'
         self.write_config(features)
 
-        bitbake('-c clean git-submodule-test')
         bitbake('-c deploy_archives -f git-submodule-test')
 
         bb_vars = get_bb_vars(['DEPLOY_DIR_SRC'])
@@ -330,6 +323,8 @@ class Archiver(OESelftestTestCase):
         features += 'DL_DIR = "${TOPDIR}/downloads-shallow"\n'
         self.write_config(features)
 
+        # Clean the build directory so that fetch is rerun.
+        # This is needed due to modifying DL_DIR.
         bitbake('-c clean git-submodule-test')
         bitbake('-c deploy_archives -f git-submodule-test')
 
@@ -343,3 +338,41 @@ class Archiver(OESelftestTestCase):
         ]:
             target_path = os.path.join(bb_vars['DEPLOY_DIR_SRC'], 'mirror', target_file_name)
             self.assertTrue(os.path.exists(target_path))
+
+    def test_archiver_cleanup(self):
+        """
+        Test that the archiver removes no longer needed artifacts when its
+        configuration is modified.
+        """
+
+        target = 'selftest-ed-native'
+        target_file_name = 'selftest-ed-native-1.21.1-r0-showdata.dump'
+
+        def assert_dumpdata_present(expect_present):
+            bb_vars = get_bb_vars(['DEPLOY_DIR_SRC', 'BUILD_SYS'])
+            glob_str = os.path.join(bb_vars['DEPLOY_DIR_SRC'], bb_vars['BUILD_SYS'], '%s-*' % target)
+            glob_result = glob.glob(glob_str)
+            self.assertTrue(glob_result, 'Missing archiver directory for %s' % target)
+
+            archive_path = os.path.join(glob_result[0], target_file_name)
+            if expect_present:
+                self.assertTrue(os.path.exists(archive_path),
+                                'Missing archive file %s' % target_file_name)
+            else:
+                self.assertFalse(os.path.exists(archive_path),
+                                 'Unexpected archive file %s' % target_file_name)
+
+        features = 'INHERIT += "archiver"\n'
+        self.write_config(features)
+        bitbake('-c deploy_archives %s -f' % target)
+        assert_dumpdata_present(False)
+
+        features += 'ARCHIVER_MODE[dumpdata] = "1"\n'
+        self.write_config(features)
+        bitbake('-c deploy_archives %s -f' % target)
+        assert_dumpdata_present(True)
+
+        features = 'INHERIT += "archiver"\n'
+        self.write_config(features)
+        bitbake('-c deploy_archives %s -f' % target)
+        assert_dumpdata_present(False)

@@ -1,0 +1,56 @@
+From 0ae8e932cc2c431bafe390a43feb29b0c6a98ab5 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 25 May 2026 14:52:02 -0400
+Subject: [PATCH 6/8] fix: treewide: change inode->i_ino from unsigned long to
+ u64 (v7.1)
+
+See upstream commit:
+
+  commit 0b2600f81cefcdfcda58d50df7be8fd48ada8ce2
+  Author: Jeff Layton <jlayton@kernel.org>
+  Date:   Wed Mar 4 10:32:42 2026 -0500
+
+    treewide: change inode->i_ino from unsigned long to u64
+
+    On 32-bit architectures, unsigned long is only 32 bits wide, which
+    causes 64-bit inode numbers to be silently truncated. Several
+    filesystems (NFS, XFS, BTRFS, etc.) can generate inode numbers that
+    exceed 32 bits, and this truncation can lead to inode number collisions
+    and other subtle bugs on 32-bit systems.
+
+    Change the type of inode->i_ino from unsigned long to u64 to ensure that
+    inode numbers are always represented as 64-bit values regardless of
+    architecture. Update all format specifiers treewide from %lu/%lx to
+    %llu/%llx to match the new type, along with corresponding local variable
+    types.
+
+    This is the bulk treewide conversion. Earlier patches in this series
+    handled trace events separately to allow trace field reordering for
+    better struct packing on 32-bit.
+
+Upstream-Status: Backport [https://review.lttng.org/c/lttng-modules/+/17905]
+
+Change-Id: I027477ced731f74999ae40bc9b66bf9d2f295cbb
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+---
+ src/lttng-uprobes.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/lttng-uprobes.c b/src/lttng-uprobes.c
+index 39c09b8f..84edbd33 100644
+--- a/src/lttng-uprobes.c
++++ b/src/lttng-uprobes.c
+@@ -256,8 +256,8 @@ int lttng_uprobes_add_callsite(struct lttng_uprobe *uprobe,
+ 		      uprobe_handler->offset, &uprobe_handler->up_consumer);
+ #endif
+ 	if (ret) {
+-		printk(KERN_WARNING "LTTng: Error registering probe on inode %lu "
+-		       "and offset 0x%llx\n", uprobe->inode->i_ino,
++		printk(KERN_WARNING "LTTng: Error registering probe on inode %llu "
++		       "and offset 0x%llx\n", (u64) uprobe->inode->i_ino,
+ 		       uprobe_handler->offset);
+ 		ret = -1;
+ 		goto register_error;
+-- 
+2.43.0
+

@@ -1,0 +1,198 @@
+From 0d2ee7c9cb79a880c440153beeacd736d1b61a31 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 25 May 2026 11:30:54 -0400
+Subject: [PATCH 4/8] fix: mm: vmscan: add cgroup IDs to vmscan tracepoints
+ (v7.1)
+
+See upstream commit:
+
+  commit 874a0a566ede40f3d6062cae8fe1022e616edd1a
+  Author: Thomas Ballasi <tballasi@linux.microsoft.com>
+  Date:   Mon Mar 16 09:09:07 2026 -0700
+
+    mm: vmscan: add cgroup IDs to vmscan tracepoints
+
+    Memory reclaim events are currently difficult to attribute to specific
+    cgroups, making debugging memory pressure issues challenging.  This patch
+    adds memory cgroup ID (memcg_id) to key vmscan tracepoints to enable
+    better correlation and analysis.
+
+    For operations not associated with a specific cgroup, the field is
+    defaulted to 0.
+
+Upstream-Status: Backport [https://review.lttng.org/c/lttng-modules/+/17889]
+
+Change-Id: Ib1663810300b08e599f9c144930ae156e1efbaf9
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+---
+ include/instrumentation/events/mm_vmscan.h | 125 ++++++++++++++++++++-
+ 1 file changed, 123 insertions(+), 2 deletions(-)
+
+diff --git a/include/instrumentation/events/mm_vmscan.h b/include/instrumentation/events/mm_vmscan.h
+index f33bcbd2..cce06198 100644
+--- a/include/instrumentation/events/mm_vmscan.h
++++ b/include/instrumentation/events/mm_vmscan.h
+@@ -121,7 +121,43 @@ LTTNG_TRACEPOINT_EVENT(mm_vmscan_wakeup_kswapd,
+ )
+ #endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,2,0) || \
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++
++LTTNG_TRACEPOINT_EVENT_CLASS(mm_vmscan_direct_reclaim_begin_template,
++
++	TP_PROTO(gfp_t gfp_flags, int order, struct mem_cgroup *memcg),
++
++	TP_ARGS(gfp_flags, order, memcg),
++
++	TP_FIELDS(
++		ctf_integer(gfp_t, gfp_flags, gfp_flags)
++		ctf_integer(int, order, order)
++		ctf_integer(u64, memcg_id, mem_cgroup_id(memcg))
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_begin_template, mm_vmscan_direct_reclaim_begin,
++
++	TP_PROTO(gfp_t gfp_flags, int order, struct mem_cgroup *memcg),
++
++	TP_ARGS(gfp_flags, order, memcg)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_begin_template, mm_vmscan_memcg_reclaim_begin,
++
++	TP_PROTO(gfp_t gfp_flags, int order, struct mem_cgroup *memcg),
++
++	TP_ARGS(gfp_flags, order, memcg)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_begin_template, mm_vmscan_memcg_softlimit_reclaim_begin,
++
++	TP_PROTO(gfp_t gfp_flags, int order, struct mem_cgroup *memcg),
++
++	TP_ARGS(gfp_flags, order, memcg)
++)
++
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,2,0) || \
+ 	LTTNG_RHEL_KERNEL_RANGE(4,18,0,305,0,0, 4,19,0,0,0,0))
+ 
+ LTTNG_TRACEPOINT_EVENT_CLASS(mm_vmscan_direct_reclaim_begin_template,
+@@ -232,6 +268,40 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_begin_template, mm_vmsc
+ 
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_CLASS(mm_vmscan_direct_reclaim_end_template,
++
++	TP_PROTO(unsigned long nr_reclaimed, struct mem_cgroup *memcg),
++
++	TP_ARGS(nr_reclaimed, memcg),
++
++	TP_FIELDS(
++		ctf_integer(unsigned long, nr_reclaimed, nr_reclaimed)
++		ctf_integer(u64, memcg_id, mem_cgroup_id(memcg))
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_end_template, mm_vmscan_direct_reclaim_end,
++
++	TP_PROTO(unsigned long nr_reclaimed, struct mem_cgroup *memcg),
++
++	TP_ARGS(nr_reclaimed, memcg)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_end_template, mm_vmscan_memcg_reclaim_end,
++
++	TP_PROTO(unsigned long nr_reclaimed, struct mem_cgroup *memcg),
++
++	TP_ARGS(nr_reclaimed, memcg)
++)
++
++LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_end_template, mm_vmscan_memcg_softlimit_reclaim_end,
++
++	TP_PROTO(unsigned long nr_reclaimed, struct mem_cgroup *memcg),
++
++	TP_ARGS(nr_reclaimed, memcg)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_CLASS(mm_vmscan_direct_reclaim_end_template,
+ 
+ 	TP_PROTO(unsigned long nr_reclaimed),
+@@ -263,8 +333,35 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_direct_reclaim_end_template, mm_vmscan
+ 
+ 	TP_ARGS(nr_reclaimed)
+ )
++#endif
+ 
+-#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,16,0))
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_start,
++
++	mm_vmscan_shrink_slab_start,
++
++	TP_PROTO(struct shrinker *shr, struct shrink_control *sc,
++		long nr_objects_to_shrink, unsigned long cache_items,
++		unsigned long long delta, unsigned long total_scan,
++		int priority, struct mem_cgroup *memcg),
++
++	TP_ARGS(shr, sc, nr_objects_to_shrink, cache_items, delta, total_scan,
++		priority, memcg),
++
++	TP_FIELDS(
++		ctf_integer_hex(struct shrinker *, shr, shr)
++		ctf_integer_hex(void *, shrink, shr->scan_objects)
++		ctf_integer(int, nid, sc->nid)
++		ctf_integer(long, nr_objects_to_shrink, nr_objects_to_shrink)
++		ctf_integer(gfp_t, gfp_flags, sc->gfp_mask)
++		ctf_integer(unsigned long, cache_items, cache_items)
++		ctf_integer(unsigned long long, delta, delta)
++		ctf_integer(unsigned long, total_scan, total_scan)
++		ctf_integer(int, priority, priority)
++		ctf_integer(u64, memcg_id, mem_cgroup_id(memcg))
++	)
++)
++#elif (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(4,16,0))
+ LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_start,
+ 
+ 	mm_vmscan_shrink_slab_start,
+@@ -316,6 +413,29 @@ LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_start,
+ )
+ #endif
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(7,1,0))
++LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_end,
++
++	mm_vmscan_shrink_slab_end,
++
++	TP_PROTO(struct shrinker *shr, int nid, int shrinker_retval,
++		long unused_scan_cnt, long new_scan_cnt, long total_scan, struct mem_cgroup *memcg),
++
++	TP_ARGS(shr, nid, shrinker_retval, unused_scan_cnt, new_scan_cnt,
++		total_scan, memcg),
++
++	TP_FIELDS(
++		ctf_integer_hex(struct shrinker *, shr, shr)
++		ctf_integer(int, nid, nid)
++		ctf_integer_hex(void *, shrink, shr->scan_objects)
++		ctf_integer(long, unused_scan, unused_scan_cnt)
++		ctf_integer(long, new_scan, new_scan_cnt)
++		ctf_integer(int, retval, shrinker_retval)
++		ctf_integer(long, total_scan, total_scan)
++		ctf_integer(u64, memcg_id, mem_cgroup_id(memcg))
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_end,
+ 
+ 	mm_vmscan_shrink_slab_end,
+@@ -336,6 +456,7 @@ LTTNG_TRACEPOINT_EVENT_MAP(mm_shrink_slab_end,
+ 		ctf_integer(long, total_scan, total_scan)
+ 	)
+ )
++#endif
+ 
+ #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,7,0) || \
+      LTTNG_RHEL_KERNEL_RANGE(5,14,0,427,16,1, 5,15,0,0,0,0))
+-- 
+2.43.0
+

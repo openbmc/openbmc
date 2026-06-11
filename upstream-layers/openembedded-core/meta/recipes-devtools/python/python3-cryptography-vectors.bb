@@ -9,13 +9,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=8c3617db4fb6fae01f1d253ab91511e4 \
 # NOTE: Make sure to keep this recipe at the same version as python3-cryptography
 #       Upgrade both recipes at the same time
 require python3-cryptography-common.inc
-SRC_URI += "file://0001-bump-uv_build-to-0.11.0.patch"
-SRC_URI[sha256sum] = "08f3d13846fdd86d4c1138a88c695cee203b3dd3825c784d64a3b06d000cdda1"
+SRC_URI[sha256sum] = "69836f597ddfbe3920b3c90d1f18e5560973f0791b90e1921ad345e8111ac23e"
 
 PYPI_PACKAGE = "cryptography_vectors"
 
-DEPENDS += "python3-uv-build-native"
-
-inherit pypi python_flit_core
+inherit pypi python_uv_build
 
 BBCLASSEXTEND = "native nativesdk"

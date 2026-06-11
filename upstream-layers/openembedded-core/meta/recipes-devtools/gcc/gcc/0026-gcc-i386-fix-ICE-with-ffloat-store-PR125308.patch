@@ -1,0 +1,89 @@
+From c96589414eeb0e46d9fe9cc1d562e048230b5f67 Mon Sep 17 00:00:00 2001
+From: Jakub Jelinek <jakub@redhat.com>
+Date: Fri, 15 May 2026 09:55:40 +0200
+Subject: [PATCH] i386: Fix up *minmax<mode>3_4 [PR125308]
+
+IEEE min/max are not commutative and in the pattern
+(define_insn "ieee_<ieee_maxmin><mode>3<mask_name><round_saeonly_name>"
+  [(set (match_operand:VFH 0 "register_operand" "=x,v")
+        (unspec:VFH
+          [(match_operand:VFH 1 "register_operand" "0,v")
+           (match_operand:VFH 2 "<round_saeonly_nimm_predicate>" "xBm,<round_saeonly_constraint>")]
+          IEEE_MAXMIN))]
+the first operand is a register and only the second one is register/memory.
+Now, the *minmax<mode>3_3 define_insn_and_split does
+   rtx tmp = force_reg (<MODE>mode, operands[3]);
+   rtvec v = gen_rtvec (2, tmp, operands[2]);
+   operands[5] = gen_rtx_UNSPEC (<MODE>mode, v, u);
+where operands[3] is the const0_operand, so operands[2] can there be
+a memory, but in the *minmax<mode>3_4 case
+   rtx tmp = force_reg (<MODE>mode, operands[3]);
+   rtvec v = gen_rtvec (2, operands[2], tmp);
+   operands[5] = gen_rtx_UNSPEC (<MODE>mode, v, u);
+operands[2] goes into the operand which must be a REG, so it
+is incorrect to split it into something that won't work.
+Now, I've tried both disabling the define_insn_and_split and
+the following patch, the former to the latter results in
+        movaps  a, %xmm0
+        pxor    %xmm1, %xmm1
+-       cmpltps %xmm0, %xmm1
+-       andps   %xmm1, %xmm0
++       maxps   %xmm1, %xmm0
+        movaps  %xmm0, a
+        ret
+on the testcase, so I think it is better to match it and force_reg
+(it is a pre-reload splitter) than change "nonimmediate_operand"
+to "register_operand" because it won't match in that case.
+
+2026-05-15  Jakub Jelinek  <jakub@redhat.com>
+
+	PR target/125308
+	* config/i386/sse.md (*minmax<mode>3_4): Force also
+	operands[2] into a REG.
+
+	* gcc.target/i386/pr125308.c: New test.
+
+Upstream-Status: Backport [https://gcc.gnu.org/cgit/gcc/commit/?id=c96589414eeb0e46d9fe9cc1d562e048230b5f67]
+
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+
+---
+ gcc/config/i386/sse.md                   |  2 +-
+ gcc/testsuite/gcc.target/i386/pr125308.c | 12 ++++++++++++
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+ create mode 100644 gcc/testsuite/gcc.target/i386/pr125308.c
+
+diff --git a/gcc/config/i386/sse.md b/gcc/config/i386/sse.md
+index 51d1e9b455a0..de092f4b9ae1 100644
+--- a/gcc/config/i386/sse.md
++++ b/gcc/config/i386/sse.md
+@@ -3468,7 +3468,7 @@
+      u = UNSPEC_IEEE_MAX;
+ 
+    rtx tmp = force_reg (<MODE>mode, operands[3]);
+-   rtvec v = gen_rtvec (2, operands[2], tmp);
++   rtvec v = gen_rtvec (2, force_reg (<MODE>mode, operands[2]), tmp);
+    operands[5] = gen_rtx_UNSPEC (<MODE>mode, v, u);
+  })
+ 
+diff --git a/gcc/testsuite/gcc.target/i386/pr125308.c b/gcc/testsuite/gcc.target/i386/pr125308.c
+new file mode 100644
+index 000000000000..0a4dd7c8ea6f
+--- /dev/null
++++ b/gcc/testsuite/gcc.target/i386/pr125308.c
+@@ -0,0 +1,12 @@
++/* PR target/125308 */
++/* { dg-do compile } */
++/* { dg-options "-msse2 -O2 -ffloat-store" } */
++
++float a[4];
++
++void
++foo ()
++{
++  for (int i = 0; i < 4; i++)
++    a[i] = a[i] > 0 ? a[i] : 0;
++}
+-- 
+2.43.7
+

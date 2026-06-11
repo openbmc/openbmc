@@ -1,0 +1,31 @@
+From 98048fd9262b3e4e024248ebd07d5ff66175e4ec Mon Sep 17 00:00:00 2001
+From: Robert Yang <liezhi.yang@windriver.com>
+Date: Thu, 7 May 2026 03:32:57 -0700
+Subject: [PATCH] fh_key_file.c: Fix build error with musl
+
+Fixed:
+error: implicit declaration of function 'strerror'
+
+Upstream-Status: Backport [https://lore.kernel.org/linux-nfs/b2b370b6-8576-493a-b124-776e1249c312@redhat.com/]
+
+Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
+---
+ support/nfs/fh_key_file.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/support/nfs/fh_key_file.c b/support/nfs/fh_key_file.c
+index 5f5eafc..89555ce 100644
+--- a/support/nfs/fh_key_file.c
++++ b/support/nfs/fh_key_file.c
+@@ -30,6 +30,8 @@
+ 
+ #include "nfslib.h"
+ 
++#include <string.h>
++
+ #define HASH_BLOCKSIZE  256
+ int hash_fh_key_file(const char *fh_key_file, uuid_t uuid)
+ {
+-- 
+2.49.0
+

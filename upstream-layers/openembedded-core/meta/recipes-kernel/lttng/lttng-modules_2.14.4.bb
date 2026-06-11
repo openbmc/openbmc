@@ -15,6 +15,14 @@ SRC_URI = "https://lttng.org/files/${BPN}/${BPN}-${PV}.tar.bz2 \
 # Use :append here so that the patch is applied also when using devupstream
 SRC_URI:append = " file://0001-src-Kbuild-change-missing-CONFIG_TRACEPOINTS-to-warn.patch \
                    file://0001-fix-adjust-range-in-btrfs-probe-for-v6.18.14.patch \
+                   file://0001-fix-hrtimer-Reduce-trace-noise-in-hrtimer_start-v7.1.patch \
+                   file://0001-fix-hrtimer-Drop-unnecessary-pointer-indirection-in.patch \
+                   file://0001-fix-mm-vmscan-Convert-pageout-to-take-a-folio-v5.18.patch \
+                   file://0001-fix-mm-vmscan-add-cgroup-IDs-to-vmscan-tracepoints-v7.1.patch \
+                   file://0001-fix-vfs-widen-trace-event-i_ino-fields-to-u64-v7.1.patch \
+                   file://0001-fix-treewide-change-inode-i_ino-from-unsigned-long-to-u64-v7.1.patch \
+                   file://0001-fix-ext4-enhance-tracepoints-during-the-folios-writeback-v6.17.patch \
+                   file://0001-fix-ext4-widen-trace-event-i_ino-fields-to-u64-v7.1.patch \
                 "
 SRC_URI[sha256sum] = "63deefbc15d9ce7c43d858187533367b01dcb6e8469d6b69ccb757d6d3dbb0ad"
 

@@ -170,47 +170,6 @@ def set_class_filter(var, features_var, filter_var, d):
             bb.warn("Unexpanded variable %s in %s is not recommended" % (issue, var))
     d.setVar(var, '${@oe.utils.class_filter_features("' + defaults + '", "' + features_var + '", "' + filter_var + '", d)}')
 
-def all_distro_features(d, features, truevalue="1", falsevalue=""):
-    """
-    Returns truevalue if *all* given features are set in DISTRO_FEATURES,
-    else falsevalue. The features can be given as single string or anything
-    that can be turned into a set.
-
-    This is a shorter, more flexible version of
-    bb.utils.contains("DISTRO_FEATURES", features, truevalue, falsevalue, d).
-
-    Without explicit true/false values it can be used directly where
-    Python expects a boolean:
-       if oe.utils.all_distro_features(d, "foo bar"):
-           bb.fatal("foo and bar are mutually exclusive DISTRO_FEATURES")
-
-    With just a truevalue, it can be used to include files that are meant to be
-    used only when requested via DISTRO_FEATURES:
-       require ${@ oe.utils.all_distro_features(d, "foo bar", "foo-and-bar.inc")
-    """
-    return bb.utils.contains("DISTRO_FEATURES", features, truevalue, falsevalue, d)
-
-def any_distro_features(d, features, truevalue="1", falsevalue=""):
-    """
-    Returns truevalue if at least *one* of the given features is set in DISTRO_FEATURES,
-    else falsevalue. The features can be given as single string or anything
-    that can be turned into a set.
-
-    This is a shorter, more flexible version of
-    bb.utils.contains_any("DISTRO_FEATURES", features, truevalue, falsevalue, d).
-
-    Without explicit true/false values it can be used directly where
-    Python expects a boolean:
-       if not oe.utils.any_distro_features(d, "foo bar"):
-           bb.fatal("foo, bar or both must be set in DISTRO_FEATURES")
-
-    With just a truevalue, it can be used to include files that are meant to be
-    used only when requested via DISTRO_FEATURES:
-       require ${@ oe.utils.any_distro_features(d, "foo bar", "foo-or-bar.inc")
-
-    """
-    return bb.utils.contains_any("DISTRO_FEATURES", features, truevalue, falsevalue, d)
-
 def parallel_make_value(pm):
     """
     Return the integer value for the number of parallel threads to use when

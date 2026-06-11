@@ -1,0 +1,94 @@
+From 329ef88b9ae02228387f55a61ca1cef87a5cf3f4 Mon Sep 17 00:00:00 2001
+From: Michael Jeanson <mjeanson@efficios.com>
+Date: Mon, 25 May 2026 16:22:42 -0400
+Subject: [PATCH 7/8] fix: ext4: enhance tracepoints during the folios
+ writeback (v6.17)
+
+See upstream commits:
+
+  commit 6b132759b0fe78e518abafb62190c294100db6d6
+  Author: Zhang Yi <yi.zhang@huawei.com>
+  Date:   Mon Jul 7 22:08:09 2025 +0800
+
+    ext4: enhance tracepoints during the folios writeback
+
+    After mpage_map_and_submit_extent() supports restarting handle if
+    credits are insufficient during allocating blocks, it is more likely to
+    exit the current mapping iteration and continue to process the current
+    processing partially mapped folio again. The existing tracepoints are
+    not sufficient to track this situation, so enhance the tracepoints to
+    track the writeback position and the return value before and after
+    submitting the folios.
+
+  commit 1bfe6354e0975fe89c3d25e81b6546d205556a4b
+  Author: Zhang Yi <yi.zhang@huawei.com>
+  Date:   Mon Jul 7 22:08:04 2025 +0800
+
+    ext4: process folios writeback in bytes
+
+    Since ext4 supports large folios, processing writebacks in pages is no
+    longer appropriate, it can be modified to process writebacks in bytes.
+
+Upstream-Status: Backport [https://review.lttng.org/c/lttng-modules/+/17907]
+
+Change-Id: I15b849b9ebcf18b75b658b8f76cfa91e205f6cf6
+Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
+---
+ include/instrumentation/events/ext4.h | 34 +++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/include/instrumentation/events/ext4.h b/include/instrumentation/events/ext4.h
+index 75f92b31..fa5de84d 100644
+--- a/include/instrumentation/events/ext4.h
++++ b/include/instrumentation/events/ext4.h
+@@ -242,6 +242,39 @@ LTTNG_TRACEPOINT_EVENT(ext4_da_writepages,
+ 	)
+ )
+ 
++#if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,17,0))
++LTTNG_TRACEPOINT_EVENT(ext4_da_write_folios_start,
++	TP_PROTO(struct inode *inode, loff_t start_pos, loff_t next_pos,
++		 struct writeback_control *wbc),
++
++	TP_ARGS(inode, start_pos, next_pos, wbc),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, inode->i_sb->s_dev)
++		ctf_integer(ino_t, ino, inode->i_ino)
++		ctf_integer(loff_t, start_pos, start_pos)
++		ctf_integer(loff_t, next_pos, next_pos)
++		ctf_integer(long, nr_to_write, wbc->nr_to_write)
++		ctf_integer(int, sync_mode, wbc->sync_mode)
++	)
++)
++
++LTTNG_TRACEPOINT_EVENT(ext4_da_write_folios_end,
++	TP_PROTO(struct inode *inode, loff_t start_pos, loff_t next_pos,
++		 struct writeback_control *wbc, int ret),
++
++	TP_ARGS(inode, start_pos, next_pos, wbc, ret),
++
++	TP_FIELDS(
++		ctf_integer(dev_t, dev, inode->i_sb->s_dev)
++		ctf_integer(ino_t, ino, inode->i_ino)
++		ctf_integer(loff_t, start_pos, start_pos)
++		ctf_integer(loff_t, next_pos, next_pos)
++		ctf_integer(long, nr_to_write, wbc->nr_to_write)
++		ctf_integer(int, ret, ret)
++	)
++)
++#else
+ LTTNG_TRACEPOINT_EVENT(ext4_da_write_pages,
+ 	TP_PROTO(struct inode *inode, pgoff_t first_page,
+ 		 struct writeback_control *wbc),
+@@ -256,6 +289,7 @@ LTTNG_TRACEPOINT_EVENT(ext4_da_write_pages,
+ 		ctf_integer(int, sync_mode, wbc->sync_mode)
+ 	)
+ )
++#endif
+ 
+ LTTNG_TRACEPOINT_EVENT(ext4_da_write_pages_extent,
+ 	TP_PROTO(struct inode *inode, struct ext4_map_blocks *map),
+-- 
+2.43.0
+

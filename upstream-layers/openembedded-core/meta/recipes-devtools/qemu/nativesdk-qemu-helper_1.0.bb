@@ -1,5 +1,7 @@
 SUMMARY = "Qemu helper scripts"
 LICENSE = "GPL-2.0-only"
+# QEMU 11.0.0+ requires a 64-bit host architecture
+COMPATIBLE_HOST = "(aarch64|x86_64|ppc64|riscv64|loongarch64|mips64|s390x|sparc64).*-linux"
 RDEPENDS:${PN} = "nativesdk-qemu nativesdk-unfs3 nativesdk-pseudo \
                   nativesdk-python3-shell nativesdk-python3-fcntl nativesdk-python3-logging \
                 "

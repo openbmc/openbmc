@@ -19,7 +19,7 @@ PACKAGE_WRITE_DEPS += "shadow-native"
 # c) As the preinst script in the target package at do_rootfs time
 # d) As the preinst script in the target package on device as a package upgrade
 #
-useradd_preinst () {
+useradd_preinst() {
 OPT=""
 SYSROOT=""
 
@@ -34,7 +34,7 @@ if test "x$D" != "x"; then
 	# shadow package, then while performing preinsts for packages that depend on
 	# shadow, there might only be /etc/login.def.dpkg-new there in root filesystem.
 	if [ ! -e $D${sysconfdir}/login.defs -a -e $D${sysconfdir}/login.defs.dpkg-new ]; then
-	    cp $D${sysconfdir}/login.defs.dpkg-new $D${sysconfdir}/login.defs
+		cp $D${sysconfdir}/login.defs.dpkg-new $D${sysconfdir}/login.defs
 	fi
 
 	# user/group lookups should match useradd/groupadd --prefix
@@ -48,6 +48,7 @@ if test "x$UA_SYSROOT" = "x"; then
 	# Add groups and users defined only for this package
 	GROUPADD_PARAM="${GROUPADD_PARAM}"
 	USERADD_PARAM="${USERADD_PARAM}"
+	USERMOD_PARAM="${USERMOD_PARAM}"
 	GROUPMEMS_PARAM="${GROUPMEMS_PARAM}"
 fi
 
@@ -85,6 +86,22 @@ if test "x`echo $USERADD_PARAM | tr -d '[:space:]'`" != "x"; then
 	done
 fi
 
+if test "x`echo $USERMOD_PARAM | tr -d '[:space:]'`" != "x"; then
+	echo "Running usermod commands..."
+	# Invoke multiple instances of usermod for parameter lists
+	# separated by ';'
+	opts=`echo "$USERMOD_PARAM" | cut -d ';' -f 1 | sed -e 's#[ \t]*$##'`
+	remaining=`echo "$USERMOD_PARAM" | cut -d ';' -f 2- | sed -e 's#[ \t]*$##'`
+	while test "x$opts" != "x"; do
+		perform_usermod "$SYSROOT" "$OPT $opts"
+		if test "x$opts" = "x$remaining"; then
+			break
+		fi
+		opts=`echo "$remaining" | cut -d ';' -f 1 | sed -e 's#[ \t]*$##'`
+		remaining=`echo "$remaining" | cut -d ';' -f 2- | sed -e 's#[ \t]*$##'`
+	done
+fi
+
 if test "x`echo $GROUPMEMS_PARAM | tr -d '[:space:]'`" != "x"; then
 	echo "Running groupmems commands..."
 	# Invoke multiple instances of groupmems for parameter lists
@@ -102,19 +119,23 @@ if test "x`echo $GROUPMEMS_PARAM | tr -d '[:space:]'`" != "x"; then
 fi
 }
 
-useradd_sysroot () {
-	user_group_groupmems_add_sysroot user
+groupadd_sysroot() {
+	common_useradd_sysroot groupadd
 }
 
-groupadd_sysroot () {
-	user_group_groupmems_add_sysroot group
+useradd_sysroot() {
+	common_useradd_sysroot useradd
 }
 
-groupmemsadd_sysroot () {
-	user_group_groupmems_add_sysroot groupmems
+usermod_sysroot() {
+	common_useradd_sysroot usermod
 }
 
-user_group_groupmems_add_sysroot () {
+groupmems_sysroot() {
+	common_useradd_sysroot groupmems
+}
+
+common_useradd_sysroot() {
 	# Pseudo may (do_prepare_recipe_sysroot) or may not (do_populate_sysroot_setscene) be running 
 	# at this point so we're explicit about the environment so pseudo can load if 
 	# not already present.
@@ -130,28 +151,25 @@ user_group_groupmems_add_sysroot () {
 	# Beware that in some cases we might see the fake pseudo passwd here, in which case we also must
 	# exit.
 	if [ ! -f $D${sysconfdir}/passwd ] ||
-			grep -q this-is-the-pseudo-passwd $D${sysconfdir}/passwd; then
+	   grep -q this-is-the-pseudo-passwd $D${sysconfdir}/passwd; then
 		exit 0
 	fi
 
 	# It is also possible we may be in a recipe which doesn't have useradd dependencies and hence the
 	# useradd/groupadd tools are unavailable. If there is no dependency, we assume we don't want to
 	# create users in the sysroot
-	if ! command -v useradd; then
-		bbwarn "command useradd not found!"
+	if ! command -v "$1"; then
+		bbwarn "The $1 command could not be found!"
 		exit 0
 	fi
 
 	# Add groups and users defined for all recipe packages
-	if test "$1" = "group"; then
-		GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}"
-	elif test "$1" = "user"; then
-		USERADD_PARAM="${@get_all_cmd_params(d, 'useradd')}"
-	elif test "$1" = "groupmems"; then
-		GROUPMEMS_PARAM="${@get_all_cmd_params(d, 'groupmems')}"
-	elif test "x$1" = "x"; then
-		bbwarn "missing type of passwd db action"
-	fi
+	case "$1" in
+		groupadd) GROUPADD_PARAM="${@get_all_cmd_params(d, 'groupadd')}";;
+		useradd) USERADD_PARAM="${@get_all_cmd_params(d, 'useradd')}";;
+		usermod) USERMOD_PARAM="${@get_all_cmd_params(d, 'usermod')}";;
+		groupmems) GROUPMEMS_PARAM="${@get_all_cmd_params(d, 'groupmems')}";;
+	esac
 
 	# Tell the system to use the environment vars
 	UA_SYSROOT=1
@@ -159,36 +177,36 @@ user_group_groupmems_add_sysroot () {
 	useradd_preinst
 }
 
-# The export of PSEUDO in useradd_sysroot() above contains references to
+# The export of PSEUDO in common_useradd_sysroot() above contains references to
 # ${PSEUDO_SYSROOT} and ${PSEUDO_LOCALSTATEDIR}. Additionally, the logging
 # shell functions use ${LOGFIFO}. These need to be handled when restoring
 # postinst-useradd-${PN} from the sstate cache.
 EXTRA_STAGING_FIXMES += "PSEUDO_SYSROOT PSEUDO_LOCALSTATEDIR LOGFIFO"
 
-python useradd_sysroot_sstate () {
-    for type, sort_prefix in [("group", "01"), ("user", "02"), ("groupmems", "03")]:
+python useradd_sysroot_sstate() {
+    for cmd, sort_prefix in [("groupadd", "01"), ("useradd", "02"), ("usermod", "03"), ("groupmems", "04")]:
         scriptfile = None
         task = d.getVar("BB_CURRENTTASK")
         if task == "package_setscene":
-            bb.build.exec_func(type + "add_sysroot", d)
+            bb.build.exec_func(f"{cmd}_sysroot", d)
         elif task == "prepare_recipe_sysroot":
             # Used to update this recipe's own sysroot so the user/groups are available to do_install
 
             # If do_populate_sysroot is triggered and we write the file here, there would be an overlapping
-            # files. See usergrouptests.UserGroupTests.test_add_task_between_p_sysroot_and_package
-            scriptfile = d.expand("${RECIPE_SYSROOT}${bindir}/postinst-useradd-" + sort_prefix + type + "-${PN}-recipedebug")
+            # file. See usergrouptests.UserGroupTests.test_add_task_between_p_sysroot_and_package
+            scriptfile = d.expand("${RECIPE_SYSROOT}${bindir}/postinst-useradd-" + sort_prefix + cmd + "-${PN}-recipedebug")
 
-            bb.build.exec_func(type + "add_sysroot", d)
+            bb.build.exec_func(f"{cmd}_sysroot", d)
         elif task == "populate_sysroot":
             # Used when installed in dependent task sysroots
-            scriptfile = d.expand("${SYSROOT_DESTDIR}${bindir}/postinst-useradd-" + sort_prefix + type + "-${PN}")
+            scriptfile = d.expand("${SYSROOT_DESTDIR}${bindir}/postinst-useradd-" + sort_prefix + cmd + "-${PN}")
 
         if scriptfile:
             bb.utils.mkdirhier(os.path.dirname(scriptfile))
             with open(scriptfile, 'w') as script:
                 script.write("#!/bin/sh -e\n")
-                bb.data.emit_func(type + "add_sysroot", script, d)
-                script.write(type + "add_sysroot\n")
+                bb.data.emit_func(f"{cmd}_sysroot", script, d)
+                script.write(f"{cmd}_sysroot\n")
             os.chmod(scriptfile, 0o755)
 }
 
@@ -220,9 +238,9 @@ def update_useradd_after_parse(d):
         bb.fatal("%s inherits useradd but doesn't set USERADD_PACKAGES" % d.getVar('FILE', False))
 
     for pkg in useradd_packages.split():
-        d.appendVarFlag("do_populate_sysroot", "vardeps", " USERADD_PARAM:%s GROUPADD_PARAM:%s GROUPMEMS_PARAM:%s" % (pkg, pkg, pkg))
-        if not d.getVar('USERADD_PARAM:%s' % pkg) and not d.getVar('GROUPADD_PARAM:%s' % pkg) and not d.getVar('GROUPMEMS_PARAM:%s' % pkg):
-            bb.fatal("%s inherits useradd but doesn't set USERADD_PARAM, GROUPADD_PARAM or GROUPMEMS_PARAM for package %s" % (d.getVar('FILE', False), pkg))
+        d.appendVarFlag("do_populate_sysroot", "vardeps", f" USERADD_PARAM:{pkg} GROUPADD_PARAM:{pkg} USERMOD_PARAM:{pkg} GROUPMEMS_PARAM:{pkg}")
+        if not any(d.getVar(f"{name}_PARAM:{pkg}") for name in ["USERADD", "GROUPADD", "USERMOD", "GROUPMEMS"]):
+            bb.fatal("%s inherits useradd but doesn't set USERADD_PARAM, GROUPADD_PARAM, USERMOD_PARAM or GROUPMEMS_PARAM for package %s" % (d.getVar('FILE', False), pkg))
 
 python __anonymous() {
     if not bb.data.inherits_class('nativesdk', d) \
@@ -230,8 +248,8 @@ python __anonymous() {
         update_useradd_after_parse(d)
 }
 
-# Return a single [GROUP|USER]ADD_PARAM formatted string which includes the
-# [group|user]add parameters for all USERADD_PACKAGES in this recipe
+# Return a single (GROUPADD|USERADD|USERMOD)_PARAM formatted string which includes the
+# (groupadd|useradd|usermod) parameters for all USERADD_PACKAGES in this recipe
 def get_all_cmd_params(d, cmd_type):
     import string
     
@@ -247,7 +265,7 @@ def get_all_cmd_params(d, cmd_type):
     return "; ".join(params)
 
 # Adds the preinst script into generated packages
-fakeroot python populate_packages:prepend () {
+fakeroot python populate_packages:prepend() {
     def update_useradd_package(pkg):
         bb.debug(1, 'adding user/group calls to preinst for %s' % pkg)
 
@@ -264,10 +282,11 @@ fakeroot python populate_packages:prepend () {
         preinst += 'bbfatal () {\n\techo "ERROR: $*"\n\texit 1\n}\n'
         preinst += 'perform_groupadd () {\n%s}\n' % d.getVar('perform_groupadd')
         preinst += 'perform_useradd () {\n%s}\n' % d.getVar('perform_useradd')
+        preinst += 'perform_usermod () {\n%s}\n' % d.getVar('perform_usermod')
         preinst += 'perform_groupmems () {\n%s}\n' % d.getVar('perform_groupmems')
         preinst += d.getVar('useradd_preinst')
         # Expand out the *_PARAM variables to the package specific versions
-        for rep in ["GROUPADD_PARAM", "USERADD_PARAM", "GROUPMEMS_PARAM"]:
+        for rep in ["GROUPADD_PARAM", "USERADD_PARAM", "USERMOD_PARAM", "GROUPMEMS_PARAM"]:
             val = d.getVar(rep + ":" + pkg) or ""
             preinst = preinst.replace("${" + rep + "}", val)
         d.setVar('pkg_preinst:%s' % pkg, preinst)
@@ -287,6 +306,15 @@ fakeroot python populate_packages:prepend () {
         useradd_packages = d.getVar('USERADD_PACKAGES') or ""
         for pkg in useradd_packages.split():
             update_useradd_package(pkg)
+}
+
+do_recipe_qa[postfuncs] += "recipe_qa_deprecate_groupmems_param"
+python recipe_qa_deprecate_groupmems_param() {
+    useradd_packages = d.getVar('USERADD_PACKAGES') or ""
+    for pkg in useradd_packages.split():
+        if d.getVar(f"GROUPMEMS_PARAM:{pkg}"):
+            bb.warn("The GROUPMEMS_PARAM variable is deprecated. Please use USERMOD_PARAM instead.")
+            return
 }
 
 # Use the following to extend the useradd with custom functions

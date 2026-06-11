@@ -10,7 +10,7 @@ of the existence of the "bigendian" feature in a given tune.
 
 A small set of ARM specific variables have been defined to allow 
 TUNE_PKGARCH to be automatically defined.  Optimized tunings must NOT 
-change the definiton of TUNE_PKGARCH.  TUNE_PKGACH:tune-<tune> will be 
+change the definition of TUNE_PKGARCH.  TUNE_PKGARCH:tune-<tune> will be 
 ignored.  The format of the package arch is enforced by the TUNE_PKGARCH
 default.  The format must be of the form:
 <armversion>[t][e][hf][b][-vfp][-neon]
@@ -22,14 +22,14 @@ ARMPKGARCH - This is the core package arch component specified by each
 tuning.  This is the primary identifier of a tuning.  Usual values are:
 arm, armv4, armv5, armv6, armv7a, etc.
 
-ARMPKGSFX_THUMB - This is the thumb specific suffix.  Curently it is 
+ARMPKGSFX_THUMB - This is the thumb specific suffix.  Currently it is 
 defined in feature-arm-thumb.inc.
 
 ARMPKGSFX_DSP - This is the DSP specific suffix.  Currently this is set 
 to 'e' when on armv5 and the dsp feature is enabled.
 
 ARMPKGSFX_EABI - This is the eabi specific suffix.  There are currently 
-two defined ABIs specificed, standard EABI and Hard Float (VFP) EABI.  
+two defined ABIs specified, standard EABI and Hard Float (VFP) EABI.  
 When the callconvention-hard is enabled, "hf" is specified, otherwise it 
 is blank.
 

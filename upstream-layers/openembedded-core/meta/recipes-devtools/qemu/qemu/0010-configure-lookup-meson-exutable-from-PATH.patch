@@ -1,4 +1,4 @@
-From aaec67c133dddda7204d23964732b4b788cbc9ce Mon Sep 17 00:00:00 2001
+From 53b173fd19123b6fdcbfec3c0d458b074db09ced Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
 Date: Wed, 22 May 2024 14:02:55 +0200
 Subject: [PATCH] configure: lookup meson exutable from PATH
@@ -13,10 +13,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/configure b/configure
-index 82cace1..83bbda9 100755
+index eea903067..217af781f 100755
 --- a/configure
 +++ b/configure
-@@ -993,10 +993,7 @@ get_pwd() {
+@@ -981,10 +981,7 @@ get_pwd() {
      fi
  }
  
@@ -26,5 +26,5 @@ index 82cace1..83bbda9 100755
 -fi
 +meson=`which meson`
  
- # Conditionally ensure Sphinx is installed.
- 
+ # On Haiku, meson might show up in a "non-packaged" subfolder instead, see
+ # https://github.com/haiku/haiku/blob/r1beta5/docs/user/storage/storageintro.dox

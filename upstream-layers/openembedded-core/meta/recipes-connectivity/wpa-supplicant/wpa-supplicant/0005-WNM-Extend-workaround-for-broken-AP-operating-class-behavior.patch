@@ -1,0 +1,39 @@
+From 72ac0ee026d9f6f9cd031d7859ea0b343b34e61d Mon Sep 17 00:00:00 2001
+From: "Yu Zhang(Yuriy)" <quic_yuzha@quicinc.com>
+Date: Thu, 1 Aug 2024 18:37:25 +0800
+Subject: [PATCH] WNM: Extend workaround for broken AP operating class behavior
+
+Some APs do not advertise operating classes correctly for BSS Transition
+Management. Try to determine the most likely operating frequency based
+on the channel number (1..14 --> 2.4 GHz; 36..177 --> 5 GHz) if invalid
+op_class == 255 is received in a BSS Transition Management Request. This
+speeds up the following operating by avoiding a full scan due to an
+unknown channel.
+
+This extends the workaround that was added in commit 80ce804e8824 ("WNM:
+Workaround for broken AP operating class behavior") for invalid
+operating class 0 to cover another observed case with invalid operating
+class 255.
+
+Signed-off-by: Yu Zhang(Yuriy) <quic_yuzha@quicinc.com>
+Upstream-Status: Backport [https://w1.fi/cgit/hostap.git/commit/?id=72ac0ee026d9f6f9cd031d7859ea0b343b34e61d]
+---
+ wpa_supplicant/wnm_sta.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/wpa_supplicant/wnm_sta.c b/wpa_supplicant/wnm_sta.c
+index 58a124c00..662f6089e 100644
+--- a/wpa_supplicant/wnm_sta.c
++++ b/wpa_supplicant/wnm_sta.c
+@@ -555,7 +555,7 @@ static int wnm_nei_get_chan(struct wpa_supplicant *wpa_s, u8 op_class, u8 chan)
+ 	}
+ 
+ 	freq = ieee80211_chan_to_freq(country, op_class, chan);
+-	if (freq <= 0 && op_class == 0) {
++	if (freq <= 0 && (op_class == 0 || op_class == 255)) {
+ 		/*
+ 		 * Some APs do not advertise correct operating class
+ 		 * information. Try to determine the most likely operating
+-- 
+2.34.1
+

@@ -21,7 +21,10 @@ KEXECTOOLS:loongarch64 ?= ""
 # go does not support ppc32, only ppc64
 # https://github.com/golang/go/issues/22885
 # gccgo may do better
-GOTOOLS ?= "go-helloworld"
+GOTOOLS ?= "\
+    go-helloworld \
+    cgo-helloworld \
+    "
 GOTOOLS:powerpc ?= ""
 GOTOOLS:riscv32 ?= ""
 

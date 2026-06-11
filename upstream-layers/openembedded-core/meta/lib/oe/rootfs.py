@@ -27,8 +27,6 @@ class Rootfs(object, metaclass=ABCMeta):
         self.logcatcher = logcatcher
         self.warn_check_regex = r'^(warn|Warn|WARNING:)'
 
-        self.install_order = Manifest.INSTALL_ORDER
-
     @abstractmethod
     def _create(self):
         pass

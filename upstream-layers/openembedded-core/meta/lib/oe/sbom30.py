@@ -712,7 +712,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         return self.add(v)
 
     def new_vex_patched_relationship(self, from_, to, notes: None):
-        props = {'security_statusNotes': notes} if notes else {}
+        props = {"security_statusNotes": notes} if notes else {}
         return self._new_relationship(
             oe.spdx30.security_VexFixedVulnAssessmentRelationship,
             from_,
@@ -724,7 +724,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         )
 
     def new_vex_unpatched_relationship(self, from_, to, notes: None):
-        props = {'security_statusNotes': notes} if notes else {}
+        props = {"security_statusNotes": notes} if notes else {}
         return self._new_relationship(
             oe.spdx30.security_VexAffectedVulnAssessmentRelationship,
             from_,
@@ -737,7 +737,7 @@ class ObjectSet(oe.spdx30.SHACLObjectSet):
         )
 
     def new_vex_ignored_relationship(self, from_, to, *, impact_statement, notes: None):
-        props = {'security_statusNotes': notes} if notes else {}
+        props = {"security_statusNotes": notes} if notes else {}
         return self._new_relationship(
             oe.spdx30.security_VexNotAffectedVulnAssessmentRelationship,
             from_,

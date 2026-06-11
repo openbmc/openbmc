@@ -207,7 +207,7 @@ fi
 
 if [ "$ACTION" = "remove" ] || [ "$ACTION" = "change" ] && [ -x "$UMOUNT" ] && [ -n "$DEVNAME" ]; then
     name="`basename "$DEVNAME"`"
-    tmpfile=`find /tmp | grep "\.automount-.*${name}$"`
+    tmpfile=`find -H /tmp | grep "\.automount-.*${name}$"`
     if [ ! -e "/sys/$DEVPATH" -a -e "$tmpfile" ]; then
         logger "mount.sh/remove" "cleaning up $DEVNAME, was mounted by the auto-mounter"
         for mnt in `cat /proc/mounts | grep "$DEVNAME" | cut -f 2 -d " " `

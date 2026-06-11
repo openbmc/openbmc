@@ -300,7 +300,7 @@ python npm_do_compile() {
 
         # Pack and install the main package
         (tarball, _) = npm_pack(env, d.getVar("NPM_PACKAGE"), tmpdir)
-        cmd = "npm install %s %s" % (shlex.quote(tarball), d.getVar("EXTRA_OENPM"))
+        cmd = ["npm", "install", tarball] + shlex.split(d.getVar("EXTRA_OENPM") or "")
         env.run(cmd, args=args)
 }
 

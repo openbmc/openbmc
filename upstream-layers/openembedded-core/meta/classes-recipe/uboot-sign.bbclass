@@ -472,21 +472,25 @@ EOF
 	if [ "${SPL_SIGN_ENABLE}" = "1" ] ; then
 		if [ -n "${SPL_DTB_BINARY}" ] ; then
 			#
-			# Sign the U-boot FIT image and add public key to SPL dtb
+			# Sign the U-boot FIT image and add public key to SPL dtb.
+			# Work on a copy of the DTB so that the compile output is
+			# never modified in-place.  Without this, sequential test
+			# runs that reuse the same work directory accumulate public
+			# key nodes from previous runs, causing mkimage to require
+			# all of them when verifying the conf signature.
 			#
+			cp ${SPL_DIR}/${SPL_DTB_BINARY} ${SPL_DIR}/${SPL_DTB_SIGNED}
 			${UBOOT_MKIMAGE_SIGN} \
 				${@'-D "${SPL_MKIMAGE_DTCOPTS}"' if len('${SPL_MKIMAGE_DTCOPTS}') else ''} \
 				-F -k "${SPL_SIGN_KEYDIR}" \
-				-K "${SPL_DIR}/${SPL_DTB_BINARY}" \
+				-K "${SPL_DIR}/${SPL_DTB_SIGNED}" \
 				-r ${UBOOT_FITIMAGE_BINARY} \
 				${SPL_MKIMAGE_SIGN_ARGS}
 
 			# Verify the U-boot FIT image and SPL dtb
 			${UBOOT_FIT_CHECK_SIGN} \
-				-k "${SPL_DIR}/${SPL_DTB_BINARY}" \
+				-k "${SPL_DIR}/${SPL_DTB_SIGNED}" \
 				-f ${UBOOT_FITIMAGE_BINARY}
-
-			cp ${SPL_DIR}/${SPL_DTB_BINARY} ${SPL_DIR}/${SPL_DTB_SIGNED}
 		else
 			# Sign the U-boot FIT image
 			${UBOOT_MKIMAGE_SIGN} \

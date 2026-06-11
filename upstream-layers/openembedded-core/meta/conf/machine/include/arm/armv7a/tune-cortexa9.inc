@@ -7,20 +7,26 @@ TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'cortexa9', ' -mcpu=cortex
 MACHINEOVERRIDES =. "${@bb.utils.contains('TUNE_FEATURES', 'cortexa9', 'armv7a:', '', d)}"
 
 # Little Endian base configs
-AVAILTUNES += "cortexa9 cortexa9t cortexa9-neon cortexa9t-neon"
+AVAILTUNES += "cortexa9 cortexa9t cortexa9-neon cortexa9t-neon cortexa9-novfp cortexa9t-novfp"
 ARMPKGARCH:tune-cortexa9             = "cortexa9"
 ARMPKGARCH:tune-cortexa9t            = "cortexa9"
 ARMPKGARCH:tune-cortexa9-neon        = "cortexa9"
 ARMPKGARCH:tune-cortexa9t-neon       = "cortexa9"
+ARMPKGARCH:tune-cortexa9-novfp       = "cortexa9"
+ARMPKGARCH:tune-cortexa9t-novfp      = "cortexa9"
 # mcpu is used so don't use armv7a as we don't want march
 TUNE_FEATURES:tune-cortexa9             = "arm vfp cortexa9"
 TUNE_FEATURES:tune-cortexa9t            = "${TUNE_FEATURES:tune-cortexa9} thumb"
 TUNE_FEATURES:tune-cortexa9-neon        = "${TUNE_FEATURES:tune-cortexa9} neon"
 TUNE_FEATURES:tune-cortexa9t-neon       = "${TUNE_FEATURES:tune-cortexa9-neon} thumb"
+TUNE_FEATURES:tune-cortexa9-novfp       = "arm cortexa9"
+TUNE_FEATURES:tune-cortexa9t-novfp      = "${TUNE_FEATURES:tune-cortexa9-novfp} thumb"
 PACKAGE_EXTRA_ARCHS:tune-cortexa9             = "${PACKAGE_EXTRA_ARCHS:tune-armv7a} cortexa9-vfp"
 PACKAGE_EXTRA_ARCHS:tune-cortexa9t            = "${PACKAGE_EXTRA_ARCHS:tune-armv7at} cortexa9-vfp cortexa9t2-vfp"
 PACKAGE_EXTRA_ARCHS:tune-cortexa9-neon        = "${PACKAGE_EXTRA_ARCHS:tune-armv7a-neon} cortexa9-vfp cortexa9-neon"
 PACKAGE_EXTRA_ARCHS:tune-cortexa9t-neon       = "${PACKAGE_EXTRA_ARCHS:tune-armv7at-neon} cortexa9-vfp cortexa9-neon cortexa9t2-vfp cortexa9t2-neon"
+PACKAGE_EXTRA_ARCHS:tune-cortexa9-novfp       = "${PACKAGE_EXTRA_ARCHS:tune-armv7a}"
+PACKAGE_EXTRA_ARCHS:tune-cortexa9t-novfp      = "${PACKAGE_EXTRA_ARCHS:tune-armv7at} cortexa9t2"
 
 # HF Tunes
 AVAILTUNES += "cortexa9hf cortexa9thf cortexa9hf-neon cortexa9thf-neon"

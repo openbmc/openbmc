@@ -45,7 +45,7 @@ python do_image_complete(){
     import json
 
     data = {
-        "taskname": "do_image",
+        "taskname": "image",
         "imagetype": "baremetal-image",
         "images": []
     }

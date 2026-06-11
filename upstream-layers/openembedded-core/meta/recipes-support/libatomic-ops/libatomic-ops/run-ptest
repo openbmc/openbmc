@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cd "$(dirname "$0")/tests" || exit 1
+
+for test in $(find . -maxdepth 1 -type f -executable | sort); do
+    testname=$(basename "$test")
+    if ./"$test"; then
+        echo "PASS: $testname"
+    else
+        echo "FAIL: $testname"
+    fi
+done

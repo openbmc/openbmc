@@ -439,11 +439,15 @@ def package_qa_check_buildpaths(path, name, d, elf):
         return
 
     tmpdir = bytes(d.getVar('TMPDIR'), encoding="utf-8")
+    homedir = bytes(os.environ.get('HOME', ''), encoding="utf-8")
     with open(path, 'rb') as f:
         file_content = f.read()
         if tmpdir in file_content:
             path = package_qa_clean_path(path, d, name)
             oe.qa.handle_error("buildpaths", "File %s in package %s contains reference to TMPDIR" % (path, name), d)
+        if homedir and homedir in file_content:
+            path = package_qa_clean_path(path, d, name)
+            oe.qa.handle_error("buildpaths", "File %s in package %s contains reference to the build host HOME directory" % (path, name), d)
 
 
 QAPATHTEST[xorg-driver-abi] = "package_qa_check_xorg_driver_abi"

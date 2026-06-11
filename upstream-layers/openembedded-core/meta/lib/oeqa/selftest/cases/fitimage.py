@@ -1865,7 +1865,7 @@ UBOOT_SIGN_ENABLE = "1"
 UBOOT_SIGN_KEYDIR = "${TOPDIR}/signing-keys"
 UBOOT_SIGN_KEYNAME = "the-kernel-config-key"
 UBOOT_SIGN_IMG_KEYNAME = "the-kernel-image-key"
-UBOOT_MKIMAGE_DTCOPTS="-I dts -O dtb -p 2000"
+UBOOT_MKIMAGE_DTCOPTS = "-I dts -O dtb -p 2000"
 FIT_SIGN_INDIVIDUAL = "1"
 """
         self.write_config(config)

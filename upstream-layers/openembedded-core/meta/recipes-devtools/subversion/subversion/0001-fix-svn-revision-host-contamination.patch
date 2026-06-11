@@ -1,0 +1,43 @@
+From 54b2cf44445820ea7c3250a25ed957a389aafbd6 Mon Sep 17 00:00:00 2001
+From: Haixiao Yan <haixiao.yan.cn@windriver.com>
+Date: Thu, 28 May 2026 09:20:59 +0800
+Subject: [PATCH] build: do not run svnversion during install
+
+The revision-install target generates svn-revision.txt by first trying
+to run the cross-compiled svnversion binary on the host. When the target
+architecture is x86-64 (same as the build host), the cross-compiled
+binary can execute on the host. If the host has libapr1 installed, the
+64-bit svnversion succeeds and outputs "Unversioned directory", while
+the 32-bit (lib32) binary lacks the 32-bit libapr1 and fails, falling
+back to "unknown". The differing content causes an RPM file conflict
+when lib32-subversion-dev and subversion-dev are installed together.
+
+Since the source is a release tarball with no SVN metadata, the correct
+value is always "unknown". Skip the svnversion invocations entirely.
+
+Upstream-Status: Inappropriate [issue reported at https://www.mail-archive.com/users@subversion.apache.org/msg30267.html]
+
+Signed-off-by: Haixiao Yan <haixiao.yan.cn@windriver.com>
+---
+ Makefile.in | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/Makefile.in b/Makefile.in
+index 7f0a37dd9a9b..914c1c37790c 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -499,10 +499,7 @@ local-install: @INSTALL_RULES@
+ revision-install:
+ 	test -d $(DESTDIR)$(includedir)/subversion-1 || \
+ 	  $(MKDIR) $(DESTDIR)$(includedir)/subversion-1
+-	(subversion/svnversion/svnversion $(top_srcdir) 2> /dev/null ||  \
+-	 svnversion $(top_srcdir) 2> /dev/null ||                        \
+-	 echo "unknown";                                                 \
+-	) > $(DESTDIR)$(includedir)/subversion-1/svn-revision.txt
++	echo "unknown" > $(DESTDIR)$(includedir)/subversion-1/svn-revision.txt
+ 
+ install-static: @INSTALL_STATIC_RULES@
+ 
+-- 
+2.53.0
+

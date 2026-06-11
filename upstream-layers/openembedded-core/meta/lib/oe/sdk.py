@@ -29,8 +29,6 @@ class Sdk(object, metaclass=ABCMeta):
 
         self.remove(self.sdk_output, True)
 
-        self.install_order = Manifest.INSTALL_ORDER
-
     @abstractmethod
     def _populate(self):
         pass

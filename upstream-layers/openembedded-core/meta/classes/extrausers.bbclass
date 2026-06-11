@@ -38,25 +38,25 @@ set_user_group () {
 		# this setting is actually a serial process. So we only retry once.
 		case $cmd in
 			useradd)
-				perform_useradd "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
+				perform_useradd "${IMAGE_ROOTFS}" "--prefix ${IMAGE_ROOTFS} $opts"
 				;;
 			groupadd)
-				perform_groupadd "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
+				perform_groupadd "${IMAGE_ROOTFS}" "--prefix ${IMAGE_ROOTFS} $opts"
 				;;
 			userdel)
-				perform_userdel "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
+				perform_userdel "${IMAGE_ROOTFS}" "--prefix ${IMAGE_ROOTFS} $opts"
 				;;
 			groupdel)
-				perform_groupdel "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
+				perform_groupdel "${IMAGE_ROOTFS}" "--prefix ${IMAGE_ROOTFS} $opts"
 				;;
 			usermod)
-				perform_usermod "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
+				perform_usermod "${IMAGE_ROOTFS}" "--prefix ${IMAGE_ROOTFS} $opts"
 				;;
 			passwd-expire)
 				perform_passwd_expire "${IMAGE_ROOTFS}" "$opts"
 				;;
 			groupmod)
-				perform_groupmod "${IMAGE_ROOTFS}" "-R ${IMAGE_ROOTFS} $opts"
+				perform_groupmod "${IMAGE_ROOTFS}" "--prefix ${IMAGE_ROOTFS} $opts"
 				;;
 			*)
 				bbfatal "Invalid command in EXTRA_USERS_PARAMS: $cmd"

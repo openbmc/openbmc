@@ -1,0 +1,11 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+
+cd "$(dirname "$0")/tests" || exit 1
+
+./runtest 2>&1
+if [ $? -eq 0 ]; then
+    echo "PASS: runtest"
+else
+    echo "FAIL: runtest"
+fi

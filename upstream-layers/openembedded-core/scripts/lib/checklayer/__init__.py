@@ -422,6 +422,9 @@ def compare_signatures(old_sigs, curr_sigs):
     if not sig_diff:
         return None
 
+    for task in sig_diff:
+        print("%s changed %s -> %s" % (task, sig_diff[task][0], sig_diff[task][1]))
+
     # Beware, depgraph uses task=<pn>.<taskname> whereas get_signatures()
     # uses <pn>:<taskname>. Need to convert sometimes. The output follows
     # the convention from get_signatures() because that seems closer to

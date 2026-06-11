@@ -13,7 +13,9 @@ LIC_FILES_CHKSUM = "file://Copyright;md5=0cd9a07afbeb24026c9b03aecfeba458"
 SECTION = "libs"
 DEPENDS = "libxml2"
 
-SRC_URI = "https://download.gnome.org/sources/libxslt/1.1/libxslt-${PV}.tar.xz"
+SRC_URI = "https://download.gnome.org/sources/libxslt/1.1/libxslt-${PV}.tar.xz \
+           file://run-ptest \
+           "
 
 SRC_URI[sha256sum] = "9acfe68419c4d06a45c550321b3212762d92f41465062ca4ea19e632ee5d216e"
 
@@ -25,7 +27,7 @@ S = "${UNPACKDIR}/libxslt-${PV}"
 
 BINCONFIG = "${bindir}/xslt-config"
 
-inherit autotools pkgconfig binconfig-disabled lib_package multilib_header
+inherit autotools pkgconfig binconfig-disabled lib_package multilib_header ptest
 
 do_configure:prepend () {
 	# We don't DEPEND on binutils for ansidecl.h so ensure we don't use the header.
@@ -56,3 +58,20 @@ FILES:${PN} += "${libdir}/libxslt-plugins"
 FILES:${PN}-dev += "${libdir}/xsltConf.sh"
 
 BBCLASSEXTEND = "native nativesdk"
+
+RDEPENDS:${PN}-ptest:append:libc-glibc = " glibc-gconv-cp1251"
+
+do_compile_ptest() {
+    oe_runmake -C ${B}/tests runtest
+}
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+
+    ${B}/libtool --mode=install install -m 0755 ${B}/tests/runtest ${D}${PTEST_PATH}/tests/
+
+    for d in general REC REC2 documents encoding exslt extensions \
+             keys namespaces numbers plugins reports; do
+        cp -r ${S}/tests/$d ${D}${PTEST_PATH}/tests/
+    done
+}

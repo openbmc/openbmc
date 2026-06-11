@@ -27,6 +27,8 @@ SRC_URI[sha256sum] = "09702ddb078b637e85de9236cbedd3fb9d7af7c6e797026c538b45748a
 
 inherit meson pkgconfig systemd update-rc.d upstream-version-is-even
 
+# install-umask can be removed when upgrading to 3.1.19 onwards
+# https://gitlab.isc.org/isc-projects/kea/-/commit/d9f332a6f36f8056a54b0698d4672a67aea812ba
 EXTRA_OEMESON += "-Dcrypto=openssl -Drunstatedir=${runtimedir} -Dkrb5=disabled -Dnetconf=disabled --install-umask=0022"
 
 INITSCRIPT_NAME = "kea-dhcp4-server"

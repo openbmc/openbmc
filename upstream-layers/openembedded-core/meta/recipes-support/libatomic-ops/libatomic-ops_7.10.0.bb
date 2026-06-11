@@ -8,7 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://LICENSE;md5=5700d28353dfa2f191ca9b1bd707865e \
                     "
 
-SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/libatomic_ops-${PV}.tar.gz"
+SRC_URI = "${GITHUB_BASE_URI}/download/v${PV}/libatomic_ops-${PV}.tar.gz \
+           file://run-ptest \
+           "
 GITHUB_BASE_URI = "https://github.com/bdwgc/libatomic_ops/releases"
 
 SRC_URI[sha256sum] = "0db3ebff755db170f65e74a64ec4511812e9ee3185c232eeffeacd274190dfb0"
@@ -19,6 +21,18 @@ S = "${UNPACKDIR}/libatomic_ops-${PV}"
 
 ALLOW_EMPTY:${PN} = "1"
 
-inherit autotools pkgconfig github-releases
+inherit autotools pkgconfig github-releases ptest
+
+do_compile_ptest() {
+    oe_runmake -C ${B}/tests check TESTS=
+}
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+
+    for t in $(makefile-getvar ${B}/tests/Makefile check_PROGRAMS); do
+        ${B}/libtool --mode=install install -m 0755 ${B}/tests/$t ${D}${PTEST_PATH}/tests/
+    done
+}
 
 BBCLASSEXTEND = "native nativesdk"

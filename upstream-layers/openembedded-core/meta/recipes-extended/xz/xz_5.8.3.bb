@@ -3,6 +3,8 @@ HOMEPAGE = "https://tukaani.org/xz/"
 DESCRIPTION = "XZ Utils is free general-purpose data compression software with a high compression ratio. XZ Utils were written for POSIX-like systems, but also work on some not-so-POSIX systems. XZ Utils are the successor to LZMA Utils."
 SECTION = "base"
 
+PROVIDES += "xz-decompress"
+
 # The source includes bits of 0BSD, GPL-2.0, GPL-3.0, LGPL-2.1-or-later, but the
 # only file which is GPL-3.0 is an m4 macro which isn't shipped in any of our
 # packages, and the LGPL bits are under lib/, which appears to be used for

@@ -1,0 +1,39 @@
+From b072e3d025da9d5f266683b0b12796796c4208b3 Mon Sep 17 00:00:00 2001
+From: Quan Sun <Quan.Sun@windriver.com>
+Date: Fri, 5 Jun 2026 11:54:57 +0000
+Subject: [PATCH] meson: fix close_range detection on older glibc
+
+The has_function('close_range') check succeeds at link time on hosts
+with kernel >= 5.9 even when glibc does not declare the function
+(glibc < 2.34, e.g. AlmaLinux 8 / CentOS 8 with glibc 2.28). This
+causes CONFIG_CLOSE_RANGE to be set, but compilation then fails with:
+
+  error: implicit declaration of function 'close_range' [-Wimplicit-function-declaration]
+
+Fix by adding a prefix that includes <unistd.h>, so the meson check
+only succeeds when the C library actually declares close_range() in
+its headers. When the check fails, the existing fallback path in
+oslib-posix.c (which returns false and falls through to the /proc
+based fd closing) is used instead.
+
+Upstream-Status: Submitted [https://lore.kernel.org/qemu-devel/20260522201850.1342167-1-Quan.Sun@windriver.com/]
+
+Signed-off-by: Quan Sun <Quan.Sun@windriver.com>
+---
+ meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 51f5f2851..4353200db 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2637,7 +2637,8 @@ if host_os == 'windows'
+ endif
+ 
+ # has_function
+-config_host_data.set('CONFIG_CLOSE_RANGE', cc.has_function('close_range'))
++config_host_data.set('CONFIG_CLOSE_RANGE',
++                     cc.has_function('close_range', prefix: '#include <unistd.h>'))
+ config_host_data.set('CONFIG_ACCEPT4', cc.has_function('accept4'))
+ config_host_data.set('CONFIG_CLOCK_ADJTIME', cc.has_function('clock_adjtime'))
+ config_host_data.set('CONFIG_DUP3', cc.has_function('dup3'))

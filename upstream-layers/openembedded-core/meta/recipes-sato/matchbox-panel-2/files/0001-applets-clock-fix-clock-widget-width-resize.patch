@@ -1,0 +1,51 @@
+From 5244e02f14b3b99f60b4d9f90f504f6a7d6f2205 Mon Sep 17 00:00:00 2001
+From: Dmitry Sakhonchik <frezidok1@gmail.com>
+Date: Mon, 18 May 2026 16:21:06 +0300
+Subject: [PATCH] applets/clock: fix clock widget width resize
+
+Previously clock widget used to change its size depending on digits'
+width inside it, which caused other icons in the panel to move.
+
+Fixes [YOCTO #15435]
+
+Signed-off-by: Dmitry Sakhonchik <frezidok1@gmail.com>
+
+Upstream-Status: Backport
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ applets/clock/clock.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/applets/clock/clock.c b/applets/clock/clock.c
+index b8057a4..3065cfc 100644
+--- a/applets/clock/clock.c
++++ b/applets/clock/clock.c
+@@ -73,6 +73,7 @@ mb_panel_applet_create (const char    *id,
+         GtkWidget *label;
+         time_t t;
+         struct tm *local_time;
++        int ref_string_width;
+ 
+         applet = g_slice_new0 (ClockApplet);
+ 
+@@ -81,6 +82,17 @@ mb_panel_applet_create (const char    *id,
+ 
+         gtk_widget_set_name (label, "MatchboxPanelClock");
+ 
++        /* Size the widget using the widest possible time string ("88:88") */
++        PangoContext *context = gtk_widget_get_pango_context(label);
++        PangoLayout *reference_string = pango_layout_new(context);
++
++        pango_layout_set_text(reference_string, "88:88", 5);
++        pango_layout_get_pixel_size(reference_string, &ref_string_width, NULL);
++
++        g_object_unref(reference_string);
++
++        gtk_widget_set_size_request(label, ref_string_width, -1);
++
+         g_object_weak_ref (G_OBJECT (label),
+                            (GWeakNotify) clock_applet_free,
+                            applet);
+-- 
+2.43.0
+

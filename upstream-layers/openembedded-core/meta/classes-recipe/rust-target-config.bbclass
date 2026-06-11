@@ -416,10 +416,13 @@ def rust_gen_target(d, thing, wd, arch):
     if features != "":
         tspec['features'] = features
     fpu = d.getVar('TARGET_FPU')
-    if fpu in ["soft", "softfp"]:
-        tspec['llvm-floatabi'] = "soft"
-    elif fpu == "hard":
-        tspec['llvm-floatabi'] = "hard"
+    if arch in ["arm", "armv7"]:
+        if fpu in ["soft", "softfp"]:
+            tspec['abi'] = "eabi"
+            tspec['llvm-floatabi'] = "soft"
+        elif fpu == "hard":
+            tspec['abi'] = "eabihf"
+            tspec['llvm-floatabi'] = "hard"
     tspec['default-uwtable'] = True
     tspec['dynamic-linking'] = True
     tspec['executables'] = True
