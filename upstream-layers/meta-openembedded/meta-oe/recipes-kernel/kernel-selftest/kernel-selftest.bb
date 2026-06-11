@@ -4,7 +4,7 @@ LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=bbea815ee2795b2f4230826c0c6b8814"
 
-DEPENDS = "rsync-native llvm-native"
+DEPENDS = "rsync-native llvm-native libcap"
 
 S = "${UNPACKDIR}"
 
@@ -51,11 +51,67 @@ DEBUG_PREFIX_MAP:remove = "-fcanon-prefix-map"
 
 TEST_LIST = "\
     ${@bb.utils.filter('PACKAGECONFIG', 'bpf firmware mm', d)} \
+    acct \
+    breakpoints \
+    cachestat \
+    cgroup \
+    clone3 \
+    core \
+    coredump \
     cpufreq \
     cpu-hotplug \
-    rtc \
+    dmabuf-heaps \
+    efivarfs \
+    filelock \
+    filesystems \
+    filesystems/binderfs \
+    filesystems/epoll \
+    fpu \
+    ftrace \
+    futex \
+    gpio \
+    ipc \
+    kcmp \
+    kvm \
+    landlock \
+    locking \
+    lsm \
+    membarrier \
+    mincore \
+    mount \
+    mount_setattr \
+    move_mount_set_group \
+    mseal_system_mappings \
+    namespaces \
+    net \
+    net/mptcp \
+    pidfd \
+    pid_namespace \
+    proc \
+    ptrace \
     ptp \
+    rlimits \
+    rseq \
+    rtc \
+    sched \
+    seccomp \
+    signal \
+    size \
+    splice \
+    sync \
+    syscall_user_dispatch \
+    sysctl \
+    tc-testing \
+    timens \
     timers \
+    tmpfs \
+    tpm2 \
+    tty \
+    uevent \
+    user_events \
+    vDSO \
+    watchdog \
+    zram \
 "
 EXTRA_OEMAKE = '\
     CROSS_COMPILE=${TARGET_PREFIX} \
@@ -161,7 +217,7 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 FILES:${PN} += "/usr/kernel-selftest"
 
-RDEPENDS:${PN} += "python3 perl perl-module-io-handle"
+RDEPENDS:${PN} += "python3 perl perl-module-io-handle bash libcap libgcc"
 
 INSANE_SKIP:${PN} += "libdir"
 

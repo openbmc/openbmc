@@ -1,0 +1,30 @@
+#!/bin/bash
+
+cd tests
+
+# skip utf8 non-BMP(Basic Multilingual Plane) 
+SKIP_TESTS="utf8_nonbmp"
+
+tests=$(ls *.dic 2>/dev/null | sed 's/\.dic$//')
+
+if [ -z "$tests" ]; then
+    echo "SKIP: No test files found"
+    exit 0
+fi
+
+for test in $tests; do
+    if echo "$SKIP_TESTS" | grep -qw "$test"; then
+        continue
+    fi
+    
+    if ./test.sh "$test" > /dev/null 2>&1; then
+        echo "PASS: $test"
+    else
+        status=$?
+        if [ $status -eq 3 ]; then
+            echo "SKIP: $test"
+        else
+            echo "FAIL: $test"
+        fi
+    fi
+done

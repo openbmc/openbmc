@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd $(dirname $0)
+./testcms 2>&1 | awk '/^Checking/{test=substr($0,10); sub(/ \.\.\.$/,"",test); getline; print (/FAIL!/ ? "FAIL: " : "PASS: ") test}'

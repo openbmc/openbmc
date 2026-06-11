@@ -27,7 +27,10 @@ PACKAGECONFIG ?= "tls \
 PACKAGECONFIG[debug] = "DEBUG=1,DEBUG=0"
 PACKAGECONFIG[ipv6] = "HAVE_IPV6=1,HAVE_IPV6=0"
 PACKAGECONFIG[manpages] = ""
+PACKAGECONFIG[idlesleepcontrol] = ""
+PACKAGECONFIG[spc] = ""
 PACKAGECONFIG[tls] = ",tls=no,mbedtls"
+PACKAGECONFIG[unicast] = ""
 
 CVE_PRODUCT = "apple:mdnsresponder"
 
@@ -48,50 +51,55 @@ EXTRA_OEMAKE = "os=linux 'CC=${CCLD}' 'LD=${CCLD}' 'LINKOPTS=${LDFLAGS}' STRIP=:
 
 # MDNS_VERSIONSTR_NODTS disables __DATE__ and __TIME__ in the version string,
 # which are fixed anyway for build reproducibility.
+#
+# IDLESLEEPCONTROL_DISABLED - disables sleep control for Bonjour Sleep Proxy clients
+# UNICAST_DISABLED - disables unicast DNS functionality, including Wide Area Bonjour
+# SPC_DISABLED - disables Bonjour Sleep Proxy client
 TARGET_CPPFLAGS += "-DmDNSResponderVersion=${PV} \
-                    -DMDNS_VERSIONSTR_NODTS"
+                    -DMDNS_VERSIONSTR_NODTS \
+                    ${@bb.utils.contains('PACKAGECONFIG','idlesleepcontrol','','-DIDLESLEEPCONTROL_DISABLED', d)} \
+                    ${@bb.utils.contains('PACKAGECONFIG','unicast','','-DUNICAST_DISABLED', d)} \
+                    ${@bb.utils.contains('PACKAGECONFIG','spc','','-DSPC_DISABLED', d)}"
 
 TARGET_CC_ARCH += "${LDFLAGS}"
 
 MDNS_BUILDDIR = "build/${@bb.utils.contains('PACKAGECONFIG','debug','debug','prod', d)}"
 
 do_install () {
-	cd mDNSPosix
-
-	install -d ${D}${sbindir}
-	install ${MDNS_BUILDDIR}/mdnsd ${D}${sbindir}
-
+	install -d ${D}${bindir}
+	install -d ${D}${includedir}
 	install -d ${D}${libdir}
-	install -m 0644 ${MDNS_BUILDDIR}/libdns_sd.so ${D}${libdir}/libdns_sd.so.1
+	install -d ${D}${mandir}/man5
+	install -d ${D}${mandir}/man8
+	install -d ${D}${sbindir}
+	install -d ${D}${sysconfdir}
+	install -d ${D}${systemd_system_unitdir}
+	install -d ${D}${INIT_D_DIR}
+
+	install ${B}/mDNSPosix/${MDNS_BUILDDIR}/mdnsd ${D}${sbindir}
+	install ${B}/mDNSPosix/${MDNS_BUILDDIR}/mDNSClientPosix ${D}${bindir}
+	install ${B}/mDNSPosix/${MDNS_BUILDDIR}/mDNSNetMonitor ${D}${bindir}
+	install ${B}/mDNSPosix/${MDNS_BUILDDIR}/mDNSProxyResponderPosix ${D}${bindir}
+	install ${B}/mDNSPosix/${MDNS_BUILDDIR}/mDNSResponderPosix ${D}${bindir}
+
+	install -m 0644 ${B}/mDNSPosix/${MDNS_BUILDDIR}/libdns_sd.so ${D}${libdir}/libdns_sd.so.1
 	ln -s libdns_sd.so.1 ${D}${libdir}/libdns_sd.so
 
-	install -d ${D}${includedir}
-	install -m 0644 ../mDNSShared/dns_sd.h ${D}${includedir}
+	install -m 0644 ${B}/mDNSShared/dns_sd.h ${D}${includedir}
+	install -m 0644 ${B}/mDNSShared/mDNSResponder.8 ${D}${mandir}/man8/mdnsd.8
 
-	install -d ${D}${mandir}/man8
-	install -m 0644 ../mDNSShared/mDNSResponder.8 ${D}${mandir}/man8/mdnsd.8
+	install -m 0755 ${B}/Clients/build/dns-sd ${D}${bindir}
 
-	install -d ${D}${bindir}
-	install -m 0755 ../Clients/build/dns-sd ${D}${bindir}
-
-	install -d ${D}${libdir}
-	oe_libinstall -C ${MDNS_BUILDDIR} -so libnss_mdns-0.2 ${D}${libdir}
+	oe_libinstall -C ${B}/mDNSPosix/${MDNS_BUILDDIR} -so libnss_mdns-0.2 ${D}${libdir}
 	ln -s libnss_mdns-0.2.so ${D}${libdir}/libnss_mdns.so.2
 
-	install -d ${D}${sysconfdir}
-	install -m 0644 nss_mdns.conf ${D}${sysconfdir}
+	install -m 0644 ${B}/mDNSPosix/nss_mdns.conf ${D}${sysconfdir}
+	install -m 0644 ${B}/mDNSPosix/nss_mdns.conf.5 ${D}${mandir}/man5
+	install -m 0644 ${B}/mDNSPosix/libnss_mdns.8 ${D}${mandir}/man8
 
-	install -d ${D}${mandir}/man5
-	install -m 0644 nss_mdns.conf.5 ${D}${mandir}/man5
-
-	install -d ${D}${mandir}/man8
-	install -m 0644 libnss_mdns.8 ${D}${mandir}/man8
-
-	install -d ${D}${systemd_system_unitdir}
 	install -m 0644 ${UNPACKDIR}/mdns.service ${D}${systemd_system_unitdir}
 
-	install -d ${D}${INIT_D_DIR}
-	install mdnsd.sh ${D}${INIT_D_DIR}/mdns
+	install ${B}/mDNSPosix/mdnsd.sh ${D}${INIT_D_DIR}/mdns
 }
 
 pkg_postinst:${PN}-libnss-mdns () {
@@ -113,12 +121,17 @@ pkg_prerm:${PN}-libnss-mdns () {
 SYSTEMD_SERVICE:${PN} = "mdns.service"
 INITSCRIPT_NAME = "mdns"
 
-PACKAGE_BEFORE_PN = "${PN}-libnss-mdns"
+PACKAGE_BEFORE_PN = "${PN}-libnss-mdns ${PN}-clients"
 
 RRECOMMENDS:${PN}:append:libc-glibc = " ${PN}-libnss-mdns"
 
 FILES_SOLIBSDEV = "${libdir}/libdns_sd.so"
 FILES:${PN}-libnss-mdns = "${sysconfdir}/nss_mdns.conf ${libdir}/libnss_mdns*.so*"
 RPROVIDES:${PN}-libnss-mdns = "libnss-mdns"
+
+FILES:${PN}-clients = "${bindir}/mDNSClientPosix \
+                       ${bindir}/mDNSNetMonitor \
+                       ${bindir}/mDNSProxyResponderPosix \
+                       ${bindir}/mDNSResponderPosix"
 
 RPROVIDES:${PN} += "libdns-sd"

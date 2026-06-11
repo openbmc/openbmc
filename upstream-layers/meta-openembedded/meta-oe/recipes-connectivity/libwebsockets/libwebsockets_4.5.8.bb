@@ -35,6 +35,7 @@ python __anonymous() {
 EXTRA_OECMAKE += " \
     -DLIB_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
     -DLWS_WITHOUT_TESTAPPS=ON \
+    -DLWS_HAVE_HMAC_CTX_new=ON \
 "
 
 do_compile:prepend() {

@@ -34,3 +34,8 @@ FILES:${PN}-dev += "${datadir}/CUnit"
 FILES:${PN}-doc += "${docdir}"
 
 BBCLASSEXTEND = "native"
+
+# NOTE: make clean
+# CDPATH="${ZSH_VERSION+.}:" && cd . && /bin/sh /Users/aks/code/os/cunit/cunit/missing autoconf
+# /bin/sh: 0: cannot open /Users/aks/code/os/cunit/cunit/missing: No such file
+CLEANBROKEN = "1"

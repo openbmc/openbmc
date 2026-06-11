@@ -51,6 +51,7 @@ PACKAGECONFIG[libarchive] = "-Dlibarchive=enabled,-Dlibarchive=disabled,libarchi
 PACKAGECONFIG[lcms2] = "-Dlcms2=enabled,-Dlcms2=disabled,lcms"
 PACKAGECONFIG[libmpv] = "-Dlibmpv=true,-Dlibmpv=false"
 PACKAGECONFIG[jack] = "-Djack=enabled,-Djack=disabled,jack"
+PACKAGECONFIG[mpris] = ",,,playerctl mpv-mpris"
 PACKAGECONFIG[pipewire] = "-Dpipewire=enabled,-Dpipewire=disabled,pipewire"
 PACKAGECONFIG[pulseaudio] = "-Dpulse=enabled,-Dpulse=disabled,pulseaudio"
 PACKAGECONFIG[vaapi] = "-Dvaapi=enabled,-Dvaapi=disabled,libva"

@@ -1,0 +1,38 @@
+From eb5559b7df98581bd9a5142433122d1ba076d568 Mon Sep 17 00:00:00 2001
+From: Michael Paquier <michael@paquier.xyz>
+Date: Tue, 12 May 2026 16:44:28 +0900
+Subject: [PATCH] Add missing include in Cluster.pm
+
+The postmaster test 004_negotiate.pl could fail due to IO::Socket::INET
+gone missing, in environments that cannot use Unix sockets.
+
+Oversight in the backport done in 6dffaeb8e54c, so like the other commit
+this is applied across the v14~17 range.  Per buildfarm member drongo.
+
+Security: CVE-2026-6479
+Backpatch-through: 14
+
+CVE: CVE-2026-6479
+
+Upstream-Status: Backport [https://github.com/postgres/postgres/commit/eb5559b7df]
+
+Signed-off-by: Guocai He <guocai.he.cn@windriver.com>
+---
+ src/test/perl/PostgreSQL/Test/Cluster.pm | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/test/perl/PostgreSQL/Test/Cluster.pm b/src/test/perl/PostgreSQL/Test/Cluster.pm
+index a8635f4e6ad..4c2428a9247 100644
+--- a/src/test/perl/PostgreSQL/Test/Cluster.pm
++++ b/src/test/perl/PostgreSQL/Test/Cluster.pm
+@@ -104,6 +104,7 @@ use File::Path qw(rmtree mkpath);
+ use File::Spec;
+ use File::stat qw(stat);
+ use File::Temp ();
++use IO::Socket::INET;
+ use IPC::Run;
+ use PostgreSQL::Version;
+ use PostgreSQL::Test::RecursiveCopy;
+-- 
+2.34.1
+

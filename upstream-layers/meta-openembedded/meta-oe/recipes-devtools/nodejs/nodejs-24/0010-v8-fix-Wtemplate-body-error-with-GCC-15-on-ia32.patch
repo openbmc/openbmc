@@ -1,0 +1,52 @@
+From 9f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a Mon Sep 17 00:00:00 2001
+From: Bin Cao <bin.cao.cn@windriver.com>
+Date: Thu, 29 May 2026 12:00:00 +0800
+Subject: [PATCH] v8: fix -Wtemplate-body error with GCC 15 on ia32
+
+GCC 15 introduced -Wtemplate-body (enabled by default as an error) which
+performs stricter name lookup checking inside template bodies. In the
+Int64LoweringReducer template class (only compiled for 32-bit targets),
+the expression `__ Tuple<Word32, Word32>(...)` is ambiguous in a
+dependent context because GCC cannot determine whether `Tuple` after
+the `__` macro expansion (`Asm().`) refers to a template member function
+or the struct type `Tuple`.
+
+Add the C++ `template` disambiguator keyword to tell the compiler that
+`Tuple` is a dependent template name. This is the standards-correct fix
+and is backward-compatible with older GCC versions.
+
+This is a minimal backport of the fix already present in upstream V8
+(main branch), where the method was additionally renamed from `Tuple` to
+`MakeTuple`.
+
+Upstream-Status: Backport [https://github.com/nodejs/node/commit/7772a2df9d0b4db9947dbb902b4aec33c35401c0]
+Signed-off-by: Bin Cao <bin.cao.cn@windriver.com>
+---
+ .../turboshaft/int64-lowering-reducer.h       | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/deps/v8/src/compiler/turboshaft/int64-lowering-reducer.h b/deps/v8/src/compiler/turboshaft/int64-lowering-reducer.h
+index abcdef1..1234567 100644
+--- a/deps/v8/src/compiler/turboshaft/int64-lowering-reducer.h
++++ b/deps/v8/src/compiler/turboshaft/int64-lowering-reducer.h
+@@ -637,7 +637,7 @@ class Int64LoweringReducer : public Next {
+       result = __ Word32CountLeadingZeros(high);
+     }
+ 
+-    return __ Tuple<Word32, Word32>(result, __ Word32Constant(0));
++    return __ template Tuple<Word32, Word32>(result, __ Word32Constant(0));
+   }
+ 
+   V<Word32Pair> LowerCtz(V<Word32Pair> input) {
+@@ -650,7 +650,7 @@ class Int64LoweringReducer : public Next {
+       result = __ Word32CountTrailingZeros(low);
+     }
+ 
+-    return __ Tuple<Word32, Word32>(result, __ Word32Constant(0));
++    return __ template Tuple<Word32, Word32>(result, __ Word32Constant(0));
+   }
+ 
+   V<Word32Pair> LowerPopCount(V<Word32Pair> input) {
+-- 
+2.43.0
+

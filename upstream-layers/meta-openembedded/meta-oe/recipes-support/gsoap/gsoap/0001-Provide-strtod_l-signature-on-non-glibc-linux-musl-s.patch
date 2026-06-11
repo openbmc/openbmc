@@ -24,7 +24,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #if GSOAP_VERSION != GSOAP_LIB_VERSION
  # error "GSOAP VERSION MISMATCH IN LIBRARY: PLEASE REINSTALL PACKAGE"
  #endif
-@@ -5457,7 +5462,7 @@ tcp_gethostbyname(struct soap *soap, con
+@@ -5460,7 +5465,7 @@ tcp_gethostbyname(struct soap *soap, con
  {
  #if (defined(_AIX43) || defined(TRU64) || defined(HP_UX)) && defined(HAVE_GETHOSTBYNAME_R)
    struct hostent_data ht_data;
@@ -33,7 +33,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    int r;
    char *tmpbuf = soap->tmpbuf;
    size_t tmplen = sizeof(soap->tmpbuf);
-@@ -5490,7 +5495,7 @@ tcp_gethostbyname(struct soap *soap, con
+@@ -5493,7 +5498,7 @@ tcp_gethostbyname(struct soap *soap, con
      hostent = NULL;
      soap->errnum = h_errno;
    }
@@ -46,8 +46,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    {
  #ifndef WIN32
  # ifdef HAVE_STRERROR_R
--#  if !defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
-+#  if !defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
+-#  if !defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600))) || defined(WITH_POSIX_STRERROR_R)
++#  if !defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600))) || defined(WITH_POSIX_STRERROR_R)
      err = strerror_r(err, soap->msgbuf, sizeof(soap->msgbuf)); /* XSI-compliant */
      if (err != 0)
        soap_strcpy(soap->msgbuf, sizeof(soap->msgbuf), "unknown error");
@@ -65,7 +65,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  #if GSOAP_VERSION != GSOAP_LIB_VERSION
  # error "GSOAP VERSION MISMATCH IN LIBRARY: PLEASE REINSTALL PACKAGE"
  #endif
-@@ -5490,7 +5495,7 @@ tcp_gethostbyname(struct soap *soap, con
+@@ -5493,7 +5498,7 @@ tcp_gethostbyname(struct soap *soap, con
      hostent = NULL;
      soap->errnum = h_errno;
    }
@@ -74,12 +74,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
    while ((r = gethostbyname_r(addr, hostent, tmpbuf, tmplen, &hostent, &soap->errnum)) < 0)
    {
      if (tmpbuf != soap->tmpbuf)
-@@ -23192,7 +23197,7 @@ soap_strerror(struct soap *soap)
+@@ -23263,7 +23268,7 @@ soap_strerror(struct soap *soap)
    {
  #ifndef WIN32
  # ifdef HAVE_STRERROR_R
--#  if !defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
-+#  if !defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600)))
+-#  if !defined(_GNU_SOURCE) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600))) || defined(WITH_POSIX_STRERROR_R)
++#  if !defined(__GLIBC__) || (!(~_GNU_SOURCE+1) && ((!defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)) || (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600))) || defined(WITH_POSIX_STRERROR_R)
      err = strerror_r(err, soap->msgbuf, sizeof(soap->msgbuf)); /* XSI-compliant */
      if (err != 0)
        soap_strcpy(soap->msgbuf, sizeof(soap->msgbuf), "unknown error");

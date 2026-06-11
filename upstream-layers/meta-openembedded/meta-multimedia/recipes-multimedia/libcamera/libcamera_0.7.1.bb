@@ -100,3 +100,5 @@ FILES:${PN}-pycamera = "${PYTHON_SITEPACKAGES_DIR}/libcamera"
 GLIBC_64BIT_TIME_FLAGS = ""
 
 INSANE_SKIP += "32bit-time"
+
+CXXFLAGS += "-Wno-error=array-bounds="

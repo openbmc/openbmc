@@ -14,6 +14,7 @@ SECTION = "libs"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea061f8731d5e6a5761dfad951ef5f5f"
 
 SRC_URI = "git://github.com/jemalloc/jemalloc.git;branch=master;protocol=https;tag=${PV} \
+	   file://1a15fe33a48c52bfe26ea83e49f0d317a47da3ea.patch \
            file://run-ptest \
            "
 SRCREV = "81034ce1f1373e37dc865038e1bc8eeecf559ce8"

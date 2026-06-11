@@ -23,9 +23,11 @@ PTESTS_FAST_META_OE = "\
     function2 \
     fwupd \
     gcab \
+    hunspell \
     imagemagick \
     jemalloc \
     jq \
+    lcms \
     leveldb \
     libcereal \
     libdbi-perl \

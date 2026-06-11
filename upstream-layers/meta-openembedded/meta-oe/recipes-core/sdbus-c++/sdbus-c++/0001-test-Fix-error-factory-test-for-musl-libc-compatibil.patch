@@ -1,4 +1,4 @@
-From da0d6595c48905ec7d99f1a75878fbeb17972d75 Mon Sep 17 00:00:00 2001
+From ee1f61e7b4ac2cd5eb383e92b9e6eb1640675f72 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 26 Nov 2025 23:29:53 -0800
 Subject: [PATCH] test: Fix error factory test for musl libc compatibility
@@ -13,12 +13,14 @@ Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- tests/unittests/Types_test.cpp | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/unittests/Types_test.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/tests/unittests/Types_test.cpp b/tests/unittests/Types_test.cpp
+index 7405265..7a24f0c 100644
 --- a/tests/unittests/Types_test.cpp
 +++ b/tests/unittests/Types_test.cpp
-@@ -488,7 +488,7 @@ TEST(AnErrorFactory, CanCreateAnErrorFro
+@@ -551,7 +551,7 @@ TEST(AnErrorFactory, CanCreateAnErrorFromErrno)
      EXPECT_TRUE(error.isValid());
  }
  

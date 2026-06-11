@@ -1,0 +1,37 @@
+From 57df53d6132cc77251cea746ad6ab6cfd9c8a9f1 Mon Sep 17 00:00:00 2001
+From: Alexander Yurkov <alexander.v.yurkov@gmail.com>
+Date: Thu, 28 May 2026 21:01:40 +0000
+Subject: [PATCH] feat: Add option in cmake to remove awk.
+
+Add an option in cmake to remove the need for awk to avoid licensing issues.
+
+Upstream-Status: Backport [cd7ca1019aca0619f83035f2b11e8f3a22c51a33]
+
+Signed-off-by: Alexander Yurkov <alexander.v.yurkov@gmail.com>
+---
+ scl/CMakeLists.txt | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/scl/CMakeLists.txt b/scl/CMakeLists.txt
+index e3f8c1d..bef4d50 100644
+--- a/scl/CMakeLists.txt
++++ b/scl/CMakeLists.txt
+@@ -54,8 +54,17 @@ set(SCL_DIRS
+     azure
+ )
+
++option(ENABLE_SCL_SYSLOGCONF_AWK "Install scl/syslogconf/convert-syslogconf.awk" ON)
++
+ install(DIRECTORY ${SCL_DIRS} DESTINATION share/syslog-ng/include/scl
+-        USE_SOURCE_PERMISSIONS)
++        USE_SOURCE_PERMISSIONS
++        PATTERN "convert-syslogconf.awk" EXCLUDE)
++
++if (ENABLE_SCL_SYSLOGCONF_AWK)
++    install(FILES syslogconf/convert-syslogconf.awk
++            DESTINATION share/syslog-ng/include/scl/syslogconf)
++endif()
++
+ install(FILES scl.conf DESTINATION share/syslog-ng/include)
+
+ if (NOT EXISTS ${CMAKE_INSTALL_PREFIX}/etc/syslog-ng.conf)

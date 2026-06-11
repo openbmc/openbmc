@@ -1,4 +1,4 @@
-From cbe5ba0deeba6329eed63eade06bb8c062d0d445 Mon Sep 17 00:00:00 2001
+From c7ea1cce7f4f83e9ff27873a96113bdb382bb296 Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Fri, 8 May 2026 22:39:54 +0800
 Subject: [PATCH] Fix build with musl
@@ -27,10 +27,10 @@ Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/src/util/sys_defs.h b/src/util/sys_defs.h
-index 74319f2..6d3c7d2 100644
+index 09a05bd..15ea8c6 100644
 --- a/src/util/sys_defs.h
 +++ b/src/util/sys_defs.h
-@@ -794,12 +794,14 @@ extern int initgroups(const char *, int);
+@@ -794,10 +794,12 @@ extern int initgroups(const char *, int);
  #define NATIVE_NEWALIAS_PATH "/usr/bin/newaliases"
  #define NATIVE_COMMAND_DIR "/usr/sbin"
  #define NATIVE_DAEMON_DIR "/usr/libexec/postfix"
@@ -38,13 +38,8 @@ index 74319f2..6d3c7d2 100644
  #if HAVE_GLIBC_API_VERSION_SUPPORT(2, 1)
  #define SOCKADDR_SIZE	socklen_t
  #define SOCKOPT_SIZE	socklen_t
- #else
- #define NO_SNPRINTF
  #endif
 +#endif
  #ifndef NO_IPV6
  #define HAS_IPV6
  #if HAVE_GLIBC_API_VERSION_SUPPORT(2, 4)
--- 
-2.34.1
-

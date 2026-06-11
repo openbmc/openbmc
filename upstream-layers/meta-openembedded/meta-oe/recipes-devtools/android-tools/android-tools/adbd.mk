@@ -1,164 +1,90 @@
-# Makefile for adbd
+include rules_yocto.mk
+NAME = adbd
 
-SRCDIR ?= $(S)
+SOURCES = \
+	adb/adbconnection/adbconnection_server.cpp \
+	adb/daemon/auth.cpp \
+	adb/daemon/file_sync_service.cpp \
+	adb/daemon/framebuffer_service.cpp \
+	adb/daemon/jdwp_service.cpp \
+	adb/daemon/main.cpp \
+	adb/daemon/restart_service.cpp \
+	adb/daemon/services.cpp \
+	adb/daemon/shell_service.cpp \
+	adb/daemon/usb_ffs.cpp \
+	adb/daemon/usb_legacy.cpp \
+	adb/daemon/usb.cpp \
+	adb/shell_service_protocol.cpp \
+	adb/adb.cpp \
+	adb/adb_io.cpp \
+	adb/adb_listeners.cpp \
+	adb/adb_trace.cpp \
+	adb/adb_unique_fd.cpp \
+	adb/adb_utils.cpp \
+	adb/fdevent/fdevent.cpp \
+	adb/fdevent/fdevent_epoll.cpp \
+	adb/services.cpp \
+	adb/sockets.cpp \
+	adb/socket_spec.cpp \
+	adb/sysdeps/errno.cpp \
+	adb/sysdeps/posix/network.cpp \
+	adb/sysdeps_unix.cpp \
+	adb/transport.cpp \
+	adb/transport_fd.cpp \
+	adb/transport_local.cpp \
+	adb/transport_usb.cpp \
+	adb/types.cpp \
+	diagnose_usb/diagnose_usb.cpp \
+	libasyncio/AsyncIO.cpp \
 
-VPATH += $(SRCDIR)/system/core/adb
-adbd_SRC_FILES += adb.c
-adbd_SRC_FILES += fdevent.c
-adbd_SRC_FILES += transport.c
-adbd_SRC_FILES += transport_local.c
-adbd_SRC_FILES += transport_usb.c
-adbd_SRC_FILES += adb_auth_client.c
-adbd_SRC_FILES += sockets.c
-adbd_SRC_FILES += services.c
-adbd_SRC_FILES += file_sync_service.c
-adbd_SRC_FILES += jdwp_service.c
-adbd_SRC_FILES += framebuffer_service.c
-adbd_SRC_FILES += remount_service.c
-adbd_SRC_FILES += disable_verity_service.c
-adbd_SRC_FILES += base64.c
-adbd_SRC_FILES += usb_linux_client.c
-adbd_OBJS := $(adbd_SRC_FILES:.c=.o)
+HEADERS = \
+        adb/daemon/file_sync_service.h \
+        adb/daemon/framebuffer_service.h \
+        adb/daemon/restart_service.h \
+        adb/daemon/shell_service.h
 
-VPATH += $(SRCDIR)/system/core/liblog
-liblog_SRC_FILES += logd_write.c
-liblog_SRC_FILES += log_event_write.c
-liblog_SRC_FILES += logprint.c
-liblog_SRC_FILES += event_tag_map.c
-liblog_SRC_FILES += fake_log_device.c
-liblog_OBJS := $(liblog_SRC_FILES:.c=.o)
+SOURCES := $(foreach source, $(SOURCES), system/core/$(source))
+HEADERS := $(foreach header, $(HEADERS), system/core/$(header))
 
-VPATH += $(SRCDIR)/system/core/fs_mgr
-fs_mgr_SRC_FILES += fs_mgr_fstab.c
-fs_mgr_OBJS := $(fs_mgr_SRC_FILES:.c=.o)
+SOURCES += \
+    frameworks/native/libs/adbd_auth/adbd_auth.cpp
 
-VPATH += $(SRCDIR)/system/core/libcutils
-libcutils_SRC_FILES += atomic.c
-libcutils_SRC_FILES += hashmap.c
-libcutils_SRC_FILES += native_handle.c
-libcutils_SRC_FILES += config_utils.c
-libcutils_SRC_FILES += cpu_info.c
-libcutils_SRC_FILES += load_file.c
-# libcutils_SRC_FILES += open_memstream.c
-# libcutils_SRC_FILES += strdup16to8.c
-# libcutils_SRC_FILES += strdup8to16.c
-# libcutils_SRC_FILES += record_stream.c
-# libcutils_SRC_FILES += process_name.c
-# libcutils_SRC_FILES += threads.c
-# libcutils_SRC_FILES += sched_policy.c
-# libcutils_SRC_FILES += iosched_policy.c
-libcutils_SRC_FILES += str_parms.c
-libcutils_SRC_FILES += fs.c
-libcutils_SRC_FILES += multiuser.c
-libcutils_SRC_FILES += socket_inaddr_any_server.c
-libcutils_SRC_FILES += socket_local_client.c
-libcutils_SRC_FILES += socket_local_server.c
-libcutils_SRC_FILES += socket_loopback_client.c
-libcutils_SRC_FILES += socket_loopback_server.c
-libcutils_SRC_FILES += socket_network_client.c
-libcutils_SRC_FILES += sockets.c
-libcutils_SRC_FILES += ashmem-host.c
-libcutils_SRC_FILES += dlmalloc_stubs.c
-libcutils_SRC_FILES += klog.c
-libcutils_SRC_FILES += properties.c
-libcutils_OBJS := $(libcutils_SRC_FILES:.c=.o)
+CXXFLAGS += -std=gnu++20
+CPPFLAGS += -Isystem/coreinclude -Isystem/core/adb -Isystem/core/base/include  -Idebian/out/system/core -Isystem/tools/mkbootimg/include/bootimg -Isystem/core/fs_mgr/include \
+	    -Isystem/core/fs_mgr/include_fstab \
+            -DADB_VERSION='"$(DEB_VERSION)"' -D_GNU_SOURCE
+LDFLAGS += -Wl,-rpath='$$ORIGIN/../lib/android' -Wl,-rpath-link='$$ORIGIN/../lib/android' \
+           -lpthread -Ldebian/out/system/core -Ldebian/out/external/boringssl -lbase -lcrypto_utils -l:libcrypto.a -lcutils -llog -lresolv
 
-VPATH += $(SRCDIR)/external/libselinux/src
-libselinux_SRC_FILES += booleans.c
-libselinux_SRC_FILES += canonicalize_context.c
-libselinux_SRC_FILES += disable.c
-libselinux_SRC_FILES += enabled.c
-libselinux_SRC_FILES += fgetfilecon.c
-libselinux_SRC_FILES += fsetfilecon.c
-libselinux_SRC_FILES += getenforce.c
-libselinux_SRC_FILES += getfilecon.c
-libselinux_SRC_FILES += getpeercon.c
-libselinux_SRC_FILES += lgetfilecon.c
-libselinux_SRC_FILES += load_policy.c
-libselinux_SRC_FILES += lsetfilecon.c
-libselinux_SRC_FILES += policyvers.c
-libselinux_SRC_FILES += procattr.c
-libselinux_SRC_FILES += setenforce.c
-libselinux_SRC_FILES += setfilecon.c
-libselinux_SRC_FILES += context.c
-libselinux_SRC_FILES += mapping.c
-libselinux_SRC_FILES += stringrep.c
-libselinux_SRC_FILES += compute_create.c
-libselinux_SRC_FILES += compute_av.c
-libselinux_SRC_FILES += avc.c
-libselinux_SRC_FILES += avc_internal.c
-libselinux_SRC_FILES += avc_sidtab.c
-libselinux_SRC_FILES += get_initial_context.c
-libselinux_SRC_FILES += checkAccess.c
-libselinux_SRC_FILES += sestatus.c
-libselinux_SRC_FILES += deny_unknown.c
+PAGE_SIZE ?= 4096
 
-libselinux_SRC_FILES += callbacks.c
-libselinux_SRC_FILES += check_context.c
-libselinux_SRC_FILES += freecon.c
-libselinux_SRC_FILES += init.c
-libselinux_SRC_FILES += label.c
-libselinux_SRC_FILES += label_file.c
-libselinux_SRC_FILES += label_android_property.c
-libselinux_OBJS := $(libselinux_SRC_FILES:.c=.o)
+CXXFLAGS += -UADB_HOST
+CXXFLAGS +=	-DADB_HOST=0
+CXXFLAGS += -DALLOW_ADBD_DISABLE_VERITY
+CXXFLAGS += -DALLOW_ADBD_NO_AUTH
+CXXFLAGS += -DPLATFORM_TOOLS_VERSION='"28.0.2"' 
+CXXFLAGS += -Isystem/core/diagnose_usb/include 
+CXXFLAGS += -Isystem/core/adb/daemon/include
+CXXFLAGS += -Isystem/core/adb/adbconnection/include
+CXXFLAGS += -Isystem/core/libasyncio/include
+CXXFLAGS += -Isystem/core/libcutils/include
+CXXFLAGS += -Isystem/core/libcrypto_utils/include
+CXXFLAGS += -Isystem/core/liblog/include/
+CXXFLAGS += -Isystem/core/libutils/include
+CXXFLAGS += -Iframeworks/native/libs/adbd_auth/include
+CXXFLAGS += -Wno-c++11-narrowing 
+CXXFLAGS += -DPAGE_SIZE=$(PAGE_SIZE)
 
-VPATH += $(SRCDIR)/system/extras/ext4_utils
-libext4_utils_SRC_FILES += make_ext4fs.c
-libext4_utils_SRC_FILES += ext4fixup.c
-libext4_utils_SRC_FILES += ext4_utils.c
-libext4_utils_SRC_FILES += allocate.c
-libext4_utils_SRC_FILES += contents.c
-libext4_utils_SRC_FILES += extent.c
-libext4_utils_SRC_FILES += indirect.c
-libext4_utils_SRC_FILES += uuid.c
-libext4_utils_SRC_FILES += sha1.c
-libext4_utils_SRC_FILES += wipe.c
-libext4_utils_SRC_FILES += crc16.c
-libext4_utils_SRC_FILES += ext4_sb.c
-libext4_utils_OBJS := $(libext4_utils_SRC_FILES:.c=.o)
 
-CFLAGS += -std=gnu11
-CFLAGS += -DANDROID
-CFLAGS += -DADB_HOST=0
-CFLAGS += -D_XOPEN_SOURCE -D_GNU_SOURCE
-CFLAGS += -DALLOW_ADBD_ROOT=1
-CFLAGS += -DALLOW_ADBD_DISABLE_VERITY=1
-CFLAGS += -DPROP_NAME_MAX=32
-CFLAGS += -DPROP_VALUE_MAX=92
-CFLAGS += -DAUDITD_LOG_TAG=1003
-# CFLAGS += -DHOST
-CFLAGS += -DANDROID_SMP=0
-CFLAGS += -I$(SRCDIR)/system/core/adb
-CFLAGS += -I$(SRCDIR)/system/core/include
-CFLAGS += -I$(SRCDIR)/system/core/libsparse/include
-CFLAGS += -I$(SRCDIR)/system/extras/ext4_utils
-CFLAGS += -I$(SRCDIR)/system/core/fs_mgr/include
-CFLAGS += -I$(SRCDIR)/hardware/libhardware/include
-CFLAGS += -I$(SRCDIR)/external/libselinux/include
-CFLAGS += -include $(SRCDIR)/build/core/combo/include/arch/$(android_arch)/AndroidConfig.h
+# -latomic should be the last library specified
+# https://github.com/android/ndk/issues/589
+ifneq ($(filter armel mipsel,$(DEB_HOST_ARCH)),)
+  LDFLAGS += -latomic
+endif
 
-LIBS += liblog.a libfs_mgr.a libcutils.a libselinux.a libext4_utils.a -lpthread -lbsd -lpcre -lresolv -lcrypto
-
-all: adbd
-
-adbd: liblog.a libfs_mgr.a libcutils.a libselinux.a libext4_utils.a $(adbd_OBJS)
-	$(CC) -o $@ $(LDFLAGS) $(adbd_OBJS) $(LIBS)
-
-liblog.a: $(liblog_OBJS)
-	$(AR) rcs $@ $(liblog_OBJS)
-
-libfs_mgr.a: $(fs_mgr_OBJS)
-	$(AR) rcs $@ $(fs_mgr_OBJS)
-
-libcutils.a: $(libcutils_OBJS)
-	$(AR) rcs $@ $(libcutils_OBJS)
-
-libselinux.a: $(libselinux_OBJS)
-	export CFLAGS="-DANDROID -DHOST"
-	$(AR) rcs $@ $(libselinux_OBJS)
-
-libext4_utils.a: $(libext4_utils_OBJS)
-	$(AR) rcs $@ $(libext4_utils_OBJS)
+build: $(SOURCES) $(HEADERS)
+	mkdir --parents debian/out/system/core
+	$(CXX) $(SOURCES) -o debian/out/system/core/adbd $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS)
 
 clean:
-	$(RM) *.o *.a adbd
+	$(RM) debian/out/system/core/adbd

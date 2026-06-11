@@ -1,0 +1,63 @@
+From 71d46ca38e90dc902e8178ba484af4f27fa11947 Mon Sep 17 00:00:00 2001
+From: Jordan Bayles <bayles.jordan@gmail.com>
+Date: Thu, 14 May 2026 15:57:53 -0700
+Subject: [PATCH] fix: GCC 16 / C++20 build failure with u8 string literals
+ (#1685)
+
+* fix: GCC 16 / C++20 build failure with u8 string literals (#1684)
+
+In C++20, the `u8""` string literal prefix was changed to evaluate to `const char8_t[]` instead of `const char[]`. This caused compilation errors when these literals were implicitly converted to `std::string` or passed to functions expecting `const char*`.
+
+This commit adds `reinterpret_cast<const char*>` around the `u8` string literals in the test suite to resolve the build errors while maintaining the intended UTF-8 semantics.
+
+Additionally, this adds C++20 to the GitHub Actions CMake test matrix to ensure we don't regress on newer standards.
+
+Fixes #1684
+
+* style: run clang-format
+
+Upstream-Status: Backport [https://github.com/open-source-parsers/jsoncpp/commit/71d46ca38e90dc902e8178ba484af4f27fa11947]
+
+Signed-off-by: Markus Volk <f_l_k@t-online.de>
+---
+ .github/workflows/cmake.yml |  2 +-
+ src/test_lib_json/main.cpp  | 12 +++++++-----
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/src/test_lib_json/main.cpp b/src/test_lib_json/main.cpp
+index 501aba10e..08731f66a 100644
+--- a/src/test_lib_json/main.cpp
++++ b/src/test_lib_json/main.cpp
+@@ -1993,7 +1993,8 @@ JSONTEST_FIXTURE_LOCAL(ValueTest, StaticString) {
+
+ JSONTEST_FIXTURE_LOCAL(ValueTest, WideString) {
+   // https://github.com/open-source-parsers/jsoncpp/issues/756
+-  const std::string uni = u8"\u5f0f\uff0c\u8fdb"; // "式，进"
++  const std::string uni =
++      reinterpret_cast<const char*>(u8"\u5f0f\uff0c\u8fdb"); // "式，进"
+   std::string styled;
+   {
+     Json::Value v;
+@@ -3109,9 +3110,9 @@ JSONTEST_FIXTURE_LOCAL(ReaderTest, strictModeParseNumber) {
+ }
+
+ JSONTEST_FIXTURE_LOCAL(ReaderTest, parseChineseWithOneError) {
+-  checkParse(R"({ "pr)"
+-             u8"\u4f50\u85e4" // 佐藤
+-             R"(erty" :: "value" })",
++  checkParse(reinterpret_cast<const char*>(R"({ "pr)"
++                                           u8"\u4f50\u85e4" // 佐藤
++                                           R"(erty" :: "value" })"),
+              {{18, 19, "Syntax error: value, object or array expected."}},
+              "* Line 1, Column 19\n  Syntax error: value, object or array "
+              "expected.\n");
+@@ -3223,7 +3224,8 @@ JSONTEST_FIXTURE_LOCAL(CharReaderTest, parseString) {
+     bool ok = reader->parse(doc, doc + std::strlen(doc), &root, &errs);
+     JSONTEST_ASSERT(ok);
+     JSONTEST_ASSERT(errs.empty());
+-    JSONTEST_ASSERT_EQUAL(u8"\u8A2a", root[0].asString()); // "訪"
++    JSONTEST_ASSERT_EQUAL(reinterpret_cast<const char*>(u8"\u8A2a"),
++                          root[0].asString()); // "訪"
+   }
+   {
+     char const doc[] = R"([ "\uD801" ])";

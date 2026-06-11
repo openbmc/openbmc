@@ -24,6 +24,7 @@ PACKAGECONFIG[numa] = ",--disable-numa,numactl"
 
 SRC_URI = " \
     git://git.kernel.dk/fio.git;branch=master;tag=${BP} \
+    file://0001-backend-remove-linux-prctl.h-include-to-fix-musl-con.patch \
 "
 SRCREV = "ab77643023f5d7e3c1b71a7576a564f368bf577a"
 

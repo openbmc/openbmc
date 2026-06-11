@@ -26,10 +26,10 @@ SRC_URI = "https://nodejs.org/dist/v${PV}/node-v${PV}.tar.xz \
            file://0002-v8-don-t-override-ARM-CFLAGS.patch \
            file://0003-system-c-ares.patch \
            file://0004-liftoff-Correct-function-signatures.patch \
-           file://0005-libatomic.patch \
            file://0006-deps-disable-io_uring-support-in-libuv.patch \
            file://0007-positional-args.patch \
            file://0008-custom-env.patch \
+           file://0010-v8-fix-Wtemplate-body-error-with-GCC-15-on-ia32.patch \
            file://run-ptest \
            "
 SRC_URI:append:class-target = " \
