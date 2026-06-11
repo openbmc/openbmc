@@ -56,31 +56,21 @@ original reporter in the loop. There is also sometimes some coordination for
 handling patches, backporting patches etc, or just understanding the problem
 or what caused it.
 
-When the fix is publicly available, the YP security team member or the
-package maintainer sends patches against the YP code base, following usual
-procedures, including public code review.
-
-What Yocto Security Team does when it receives a security vulnerability
-=======================================================================
-
-The YP Security Team team performs a quick analysis and would usually report
-the flaw to the upstream project. Normally the upstream project analyzes the
-problem. If they deem it a real security problem in their software, they
-develop and release a fix following their own security policy. They may want
-to include the original reporter in the loop. There is also sometimes some
-coordination for handling patches, backporting patches etc, or just
-understanding the problem or what caused it.
-
 The security policy of the upstream project might include a notification to
 Linux distributions or other important downstream projects in advance to
 discuss coordinated disclosure. These mailing lists are normally non-public.
 
 When the upstream project releases a version with the fix, they are responsible
-for contacting `Mitre <https://www.cve.org/>`__ to get a CVE number assigned and
-the CVE record published.
+for contacting an appropriate CVE Numbering Authority (CNA), such as `Mitre
+<https://cveform.mitre.org/>`__, to get a CVE number assigned and the CVE
+record published.
+
+When the fix is publicly available, the YP security team member or the
+package maintainer sends patches against the YP code base, following usual
+procedures, including public code review.
 
 If an upstream project does not respond quickly
-===============================================
+-----------------------------------------------
 
 If an upstream project does not fix the problem in a reasonable time,
 the Yocto's Security Team will contact other interested parties (usually
@@ -89,6 +79,28 @@ vulnerability as quickly as possible.
 
 The Yocto Project Security team adheres to the 90 days disclosure policy
 by default. An increase of the embargo time is possible when necessary.
+
+Handling multi-project embargoes
+--------------------------------
+
+In rare cases, a severe security issue affects multiple projects. This might be
+numerous projects having a similar issue because of design, coding pattern, or
+reuse of the same code (an example of this situation is :cve_nist:`2023-44487`
+where multiple web servers share a design weakness). It might also be a
+high-profile issue in a commonly used library (like OpenSSL). In such cases,
+the project, learning first about the issue, might decide to notify other
+affected projects confidentially so that they come up with a synchronized fix.
+It might also be the affected project informing major distributions to roll out
+the update simultaneously.
+
+Such notifications happen over confidential, non-public means. Typically, the
+project initiating this "embargo" directly notifies a selected number of people
+from each project, including a subset of the security team. When Yocto Project
+is a part of such a notified group, developers prepare fixes on separate
+infrastructure and test it. They might also include additional developers and
+domain experts who can help with the fix and eventual regressions. When the
+embargo is lifted, they send a patch to the relevant public list, and the usual
+review process starts.
 
 Security Team Members
 =====================
@@ -105,6 +117,6 @@ information in the subject line.
 
 -  Richard Purdie: <richard.purdie [at] linuxfoundation [dot] org> `Public key <https://keys.openpgp.org/search?q=richard.purdie%40linuxfoundation.org>`__
 
--  Marta Rybczynska: <marta DOT rybczynska [at] syslinbit [dot] com> `Public key <https://keys.openpgp.org/search?q=marta.rybczynska@syslinbit.com>`__
+-  Marta Rybczynska: <marta DOT rybczynska [at] ygreky [dot] com> `Public key <https://keys.openpgp.org/search?q=marta.rybczynska@ygreky.com>`__
 
--  Steve Sakoman: <steve [at] sakoman [dot] com> `Public key <https://keys.openpgp.org/search?q=steve%40sakoman.com>`__
+-  Paul Barker <paul [at] pbarker [dot] dev> `Public key <https://keys.openpgp.org/search?q=paul@pbarker.dev>`__

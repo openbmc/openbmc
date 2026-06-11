@@ -19,7 +19,7 @@ Here is what you can get from this manual:
    about features and challenges of the Yocto Project, the layer model,
    components and tools, development methods, the
    :term:`Poky` reference distribution, the
-   OpenEmbedded build system workflow, and some basic Yocto terms.
+   :term:`OpenEmbedded Build System` workflow, and some basic Yocto terms.
 
 -  :ref:`overview-manual/development-environment:the yocto project development environment`\ *:*
    This chapter helps you get started understanding the Yocto Project

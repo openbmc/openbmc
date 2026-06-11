@@ -242,8 +242,8 @@ Here is an example of ``image-info.txt``:
    BAD_RECOMMENDATIONS =
    NO_RECOMMENDATIONS =
    PACKAGE_EXCLUDE =
-   ROOTFS_POSTPROCESS_COMMAND = write_package_manifest; license_create_manifest; cve_check_write_rootfs_manifest;   ssh_allow_empty_password;  ssh_allow_root_login;  postinst_enable_logging;  rootfs_update_timestamp;   write_image_test_data;   empty_var_volatile;   sort_passwd; rootfs_reproducible;
-   IMAGE_POSTPROCESS_COMMAND =  buildhistory_get_imageinfo ;
+   ROOTFS_POSTPROCESS_COMMAND = write_package_manifest license_create_manifest cve_check_write_rootfs_manifest   ssh_allow_empty_password  ssh_allow_root_login  postinst_enable_logging  rootfs_update_timestamp   write_image_test_data   empty_var_volatile   sort_passwd rootfs_reproducible
+   IMAGE_POSTPROCESS_COMMAND =  buildhistory_get_imageinfo
    IMAGESIZE = 9265
 
 Other than ``IMAGESIZE``,

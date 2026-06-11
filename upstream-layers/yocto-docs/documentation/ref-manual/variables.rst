@@ -6303,6 +6303,9 @@ system and gives an overview of their function and contents.
       The default value for :term:`MIRRORS` is defined in the
       ``meta/classes-global/mirrors.bbclass`` file in the core metadata layer.
 
+      See the definition of this variable in the BitBake Manual for more
+      details: :term:`bitbake:MIRRORS`.
+
    :term:`MLPREFIX`
       Specifies a prefix has been added to :term:`PN` to create a
       special version of a recipe or package (i.e. a Multilib version). The
@@ -7756,6 +7759,9 @@ system and gives an overview of their function and contents.
       direct them to the ``http://`` sources mirror. You can use
       ``file://`` URLs to point to local directories or network shares as
       well.
+
+      See the definition of this variable in the BitBake Manual for more
+      details: :term:`bitbake:PREMIRRORS`.
 
    :term:`PRIORITY`
       Indicates the importance of a package.

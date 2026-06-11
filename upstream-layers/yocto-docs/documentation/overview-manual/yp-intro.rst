@@ -42,7 +42,8 @@ Here are features and advantages of the Yocto Project:
    :yocto_home:`Yocto Project <>` home page.
 
 -  *Architecture Agnostic:* Yocto Project supports Intel, ARM, MIPS, AMD, PPC,
-   RISC-V and other architectures. Most ODMs, OSVs, and chip vendors create and
+   RISC-V and other architectures. Most Original Design Manufacturers (ODMs),
+   Operating System Vendors (OSVs), and chip vendors create and
    supply BSPs that support their hardware. If you have custom silicon, you can
    create a BSP that supports that architecture. See
    :doc:`/ref-manual/yocto-project-supported-features` for details on the level
@@ -674,7 +675,9 @@ helpful for getting started:
    their code available to other application developers. For information
    on the eSDK, see the :doc:`/sdk-manual/index` manual.
 
--  *Layer:* A collection of related recipes. Layers allow you to
+-  *Layer:* A collection of related metadata, which could include any of
+   recipes, machine configuration files, distro configuration files
+   and/or class files. Layers allow you to
    consolidate related metadata to customize your build. Layers also
    isolate information used when building for multiple architectures.
    Layers are hierarchical in their ability to override previous
