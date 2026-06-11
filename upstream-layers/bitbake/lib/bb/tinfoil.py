@@ -927,23 +927,23 @@ class Tinfoil:
                             if isinstance(event, bb.event.ProcessStarted):
                                 if self.quiet > 1:
                                     continue
+                                if parseprogress:
+                                    parseprogress.finish()
                                 parseprogress = bb.ui.knotty.new_progress(event.processname, event.total)
                                 parseprogress.start(False)
                                 continue
                             if isinstance(event, bb.event.ProcessProgress):
                                 if self.quiet > 1:
                                     continue
-                                if parseprogress:
+                                if parseprogress and parseprogress.id == event.processname:
                                     parseprogress.update(event.progress)
-                                else:
-                                    bb.warn("Got ProcessProgress event for something that never started?")
                                 continue
                             if isinstance(event, bb.event.ProcessFinished):
                                 if self.quiet > 1:
                                     continue
-                                if parseprogress:
+                                if parseprogress and parseprogress.id == event.processname:
                                     parseprogress.finish()
-                                parseprogress = None
+                                    parseprogress = None
                                 continue
                             if isinstance(event, bb.command.CommandCompleted):
                                 result = True

@@ -292,6 +292,18 @@ class Wget(FetchMethod):
             http_error_403 = http_error_405
 
 
+        def _url_origin(url):
+            parsed = urllib.parse.urlsplit(url)
+            scheme = parsed.scheme.lower()
+            host = parsed.hostname.lower() if parsed.hostname else ""
+            port = parsed.port
+            if port is None:
+                port = {"http": 80, "https": 443}.get(scheme)
+            return (scheme, host, port)
+
+        def _same_origin(url_a, url_b):
+            return _url_origin(url_a) == _url_origin(url_b)
+
         class FixedHTTPRedirectHandler(urllib.request.HTTPRedirectHandler):
             """
             urllib2.HTTPRedirectHandler before 3.13 has two flaws:
@@ -305,6 +317,9 @@ class Wget(FetchMethod):
 
             Until we depend on Python 3.13 onwards, copy the redirect_request
             method to fix these issues.
+
+            Additionally, strip sensitive headers (Authorization, Cookie) when
+            redirecting to a different origin to avoid credential leaks.
             """
             def redirect_request(self, req, fp, code, msg, headers, newurl):
                 m = req.get_method()
@@ -324,8 +339,16 @@ class Wget(FetchMethod):
                 newurl = newurl.replace(' ', '%20')
 
                 CONTENT_HEADERS = ("content-length", "content-type")
-                newheaders = {k: v for k, v in req.headers.items()
-                            if k.lower() not in CONTENT_HEADERS}
+                SENSITIVE_REDIRECT_HEADERS = ("authorization", "cookie")
+                same_origin = _same_origin(req.get_full_url(), newurl)
+                newheaders = {}
+                for k, v in req.headers.items():
+                    header = k.lower()
+                    if header in CONTENT_HEADERS:
+                        continue
+                    if not same_origin and header in SENSITIVE_REDIRECT_HEADERS:
+                        continue
+                    newheaders[k] = v
                 return urllib.request.Request(newurl,
                             method="HEAD" if m == "HEAD" else "GET",
                             headers=newheaders,

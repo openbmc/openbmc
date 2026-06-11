@@ -1057,6 +1057,12 @@ They contain the following sections:
       snippet. This is what is prompted during the
       :ref:`ref-bbsetup-command-init` command execution.
 
+   -  ``notes`` (*optional*): additional information written to
+      ``build/conf/conf-notes.txt`` when ``bitbake-setup`` generates the build
+      configuration from ``bb-layers``. This can be a string, or a list of
+      strings which will be written one per line. For ``oe-template``
+      configurations, this file is provided by the template.
+
    -  ``configurations``: Configurations can recursively contain as many nested
       configurations as needed. This will create more choices when running the
       :ref:`ref-bbsetup-command-init` command.

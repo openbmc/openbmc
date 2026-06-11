@@ -41,6 +41,20 @@
                                 "type": "string",
                                 "description": "Human-readable description of the configuration"
                             },
+                            "notes": {
+                                "oneOf": [
+                                    {
+                                        "type": "string"
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ],
+                                "description": "Extra notes that populate conf-notes.txt when bb-layers is used"
+                            },
                             "bb-layers": {
                                 "type": "array",
                                 "description": "List of BitBake layer paths to include, relative to the layers download directory",

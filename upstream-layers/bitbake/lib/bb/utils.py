@@ -1291,8 +1291,8 @@ def contains(variable, checkvalues, truevalue, falsevalue, d):
        not a subset of variable.
     -  ``d``: the data store.
 
-    Returns ``True`` if the variable contains the values specified, ``False``
-    otherwise.
+    Returns ``truevalue`` if the variable contains the values specified,
+    ``falsevalue`` otherwise.
     """
 
     val = d.getVar(variable)
@@ -1321,8 +1321,8 @@ def contains_any(variable, checkvalues, truevalue, falsevalue, d):
        not a subset of variable.
     -  ``d``: the data store.
 
-    Returns ``True`` if the variable contains any of the values specified,
-    ``False`` otherwise.
+    Returns ``truevalue`` if the variable contains any of the values specified,
+    ``falsevalue`` otherwise.
     """
     val = d.getVar(variable)
     if not val:

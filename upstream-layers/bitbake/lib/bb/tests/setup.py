@@ -136,6 +136,10 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
             {
                 "name": "gadget-notemplate",
                 "description": "Gadget notemplate configuration",
+                "notes": [
+                    "Gadget notemplate notes",
+                    "Second line"
+                ],
                 "bb-layers": ["layerA","layerB/meta-layer"],
                 "oe-fragments": ["test-fragment-1"]
             },
@@ -249,6 +253,11 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
         else:
             with open(os.path.join(bb_conf_path, 'conf-summary.txt')) as f:
                 self.assertIn(bitbake_config["description"], f.read())
+            with open(os.path.join(bb_conf_path, 'conf-notes.txt')) as f:
+                expected_notes = bitbake_config.get("notes")
+                if isinstance(expected_notes, list):
+                    expected_notes = "\n".join(expected_notes)
+                self.assertEqual(f.read(), expected_notes + "\n" if expected_notes else "")
             with open(os.path.join(bb_conf_path, 'bblayers.conf')) as f:
                 bblayers = f.read()
                 for l in bitbake_config["bb-layers"]:

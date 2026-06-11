@@ -7,11 +7,18 @@ import asyncio
 from contextlib import closing
 import itertools
 import json
+import re
 from collections import namedtuple
 from urllib.parse import urlparse
 from bb.asyncrpc.client import parse_address, ADDR_TYPE_UNIX, ADDR_TYPE_WS
 
 User = namedtuple("User", ("username", "permissions"))
+
+UNIHASH_REGEX = re.compile(r"^[0-9a-f]{64}$")
+
+
+def is_valid_unihash(value):
+    return isinstance(value, str) and UNIHASH_REGEX.fullmatch(value) is not None
 
 
 def create_server(

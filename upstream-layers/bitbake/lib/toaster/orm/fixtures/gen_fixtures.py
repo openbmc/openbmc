@@ -35,7 +35,7 @@ verbose = False
 # [0=Codename, 1=Yocto Project Version, 2=Release Date, 3=Current Version, 4=Support Level, 5=Poky Version, 6=BitBake branch]
 current_releases = [
     # Release slot #1
-    ['Wrynose','6.0','April 2026','6.0 (April 2026)','Long Term Support (until April 2030)','','2.16'],
+    ['Wrynose','6.0','April 2026','6.0 (April 2026)','Long Term Support (until April 2030)','','2.18'],
     # Release slot #2 'local'
     ['HEAD','HEAD','','Local Yocto Project','HEAD','','HEAD'],
     # Release slot #3 'master'
@@ -81,7 +81,7 @@ prolog_template = '''\
 bitbakeversion_poky_template = '''\
   <object model="orm.bitbakeversion" pk="{{bitbake_id}}">
     <field type="CharField" name="name">{{name}}</field>
-    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">{{branch}}</field>
     <field type="CharField" name="dirpath"></field>
   </object>
@@ -89,7 +89,7 @@ bitbakeversion_poky_template = '''\
 bitbakeversion_oecore_template = '''\
   <object model="orm.bitbakeversion" pk="{{bitbake_id}}">
     <field type="CharField" name="name">{{name}}</field>
-    <field type="CharField" name="giturl">git://git.openembedded.org/bitbake</field>
+    <field type="CharField" name="giturl">https://git.openembedded.org/bitbake</field>
     <field type="CharField" name="branch">{{bitbakeversion}}</field>
   </object>
 '''
@@ -247,7 +247,7 @@ def generate_poky():
             params['description'] = 'Local Yocto Project'
             params['name'] = 'local'
         else:
-            params['help_source'] = 'using the tip of the &lt;a href="https://git.yoctoproject.org/cgit/cgit.cgi/poky/log/{{h_release}}"&gt;Yocto Project {{Release}} branch&lt;/a&gt;'
+            params['help_source'] = 'using the tip of the &lt;a href="https://git.yoctoproject.org/meta-yocto/log/{{h_release}}"&gt;Yocto Project {{Release}} branch&lt;/a&gt;'
             params['description'] = 'Yocto Project {{release_version}} "{{Release}}"'
         if 'master' == params['release']:
             params['h_release'] = ''
@@ -280,10 +280,17 @@ def generate_poky():
         params = {}
         params['layer'] = layer
         params['layer_id'] = str(i+1)
-        params['vcs_url'] = 'git://git.yoctoproject.org/poky'
-        params['vcs_web_url'] = 'https://git.yoctoproject.org/cgit/cgit.cgi/poky'
-        params['vcs_web_tree_base_url'] = 'https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%'
-        params['vcs_web_file_base_url'] = 'https://git.yoctoproject.org/cgit/cgit.cgi/poky/tree/%path%?h=%branch%'
+        if 'openembedded-core' == layer:
+            params['vcs_url'] = 'https://git.openembedded.org/openembedded-core'
+            params['vcs_web_url'] = 'https://git.openembedded.org/openembedded-core'
+            params['vcs_web_tree_base_url'] = 'https://git.openembedded.org/openembedded-core/tree/%path%?h=%branch%'
+            params['vcs_web_file_base_url'] = 'https://git.openembedded.org/openembedded-core/tree/%path%?h=%branch%'
+        else:
+            # Yocto Project layers: meta-poky, meta-yocto-bsp
+            params['vcs_url'] = 'https://git.yoctoproject.org/meta-yocto'
+            params['vcs_web_url'] = 'https://git.yoctoproject.org/meta-yocto/tree'
+            params['vcs_web_tree_base_url'] = 'https://git.yoctoproject.org/meta-yocto/tree/%path%?h=%branch%'
+            params['vcs_web_file_base_url'] = 'https://git.yoctoproject.org/meta-yocto/tree/%path%?h=%branch%'
 
         if i:
             print_str('',fd)
@@ -392,10 +399,10 @@ def generate_oe_core():
         params = {}
         params['layer'] = layer
         params['layer_id'] = str(i+1)
-        params['vcs_url'] = 'git://git.openembedded.org/openembedded-core'
-        params['vcs_web_url'] = 'https://cgit.openembedded.org/openembedded-core'
-        params['vcs_web_tree_base_url'] = 'https://cgit.openembedded.org/openembedded-core/tree/%path%?h=%branch%'
-        params['vcs_web_file_base_url'] = 'https://cgit.openembedded.org/openembedded-core/tree/%path%?h=%branch%'
+        params['vcs_url'] = 'https://git.openembedded.org/openembedded-core'
+        params['vcs_web_url'] = 'https://git.openembedded.org/openembedded-core'
+        params['vcs_web_tree_base_url'] = 'https://git.openembedded.org/openembedded-core/tree/%path%?h=%branch%'
+        params['vcs_web_file_base_url'] = 'https://git.openembedded.org/openembedded-core/tree/%path%?h=%branch%'
         if i:
             print_str('',fd)
         print_template(layer_oe_core_template,params,fd)

@@ -301,7 +301,10 @@ def setup_bitbake_build(bitbake_config, layerdir, setupdir, thisdir, update_bb_c
             f.write(bitbake_config["description"] + "\n")
 
         with open(os.path.join(build_conf_dir, "conf-notes.txt"), 'w') as f:
-            f.write("")
+            notes = bitbake_config.get("notes")
+            if isinstance(notes, list):
+                notes = "\n".join(notes)
+            f.write(notes + "\n" if notes else "")
 
     def _make_init_build_env(builddir, oeinitbuildenvdir):
         builddir = os.path.realpath(builddir)

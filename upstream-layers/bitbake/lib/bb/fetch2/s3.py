@@ -88,7 +88,7 @@ class S3(FetchMethod):
         Assumes localpath was called first
         """
 
-        cmd = ud.basecmd + ['cp', 's3://%s%s' % (ud.basecmd, ud.host, ud.path), ud.localpath]
+        cmd = ud.basecmd + ['cp', 's3://%s%s' % (ud.host, ud.path), ud.localpath]
         bb.fetch2.check_network_access(d, cmd, ud.url)
 
         progresshandler = S3ProgressHandler(d)
@@ -112,7 +112,7 @@ class S3(FetchMethod):
         Check the status of a URL
         """
 
-        cmd = ud.basecmd + ['ls', 's3://%s%s' % (ud.basecmd, ud.host, ud.path)]
+        cmd = ud.basecmd + ['ls', 's3://%s%s' % (ud.host, ud.path)]
         bb.fetch2.check_network_access(d, cmd, ud.url)
         output = runfetchcmd(cmd, d)
 
