@@ -57,6 +57,20 @@ update_pfx() {
   # TODO: Remove this once internal relaying cleanups land
   gbmc-ncsi-smartnic-wa.sh "$RA_IF" || true
 
+  # The firewall needs to allow inbound traffic, we don't need to worry about
+  # the primary NCSI interface because it is already handled by
+  # gbmc-ncsi-br-deprecated-ips.sh
+  if [ "$RA_IF" != '@NCSI_IF@' ]; then
+    cat >/run/nftables/40-gbmc-ncsi-"$RA_IF"-br.rules <<EOF
+table inet filter {
+  chain ${RA_IF}_forward {
+    ip6 saddr != $pfx/76 ip6 daddr $pfx/76 accept
+  }
+}
+EOF
+    systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
+  fi
+
   # We need to know which NCSI path has which route
   mkdir -p /run/ncsi-ips
   echo "$pfx" >/run/ncsi-ips/"$RA_IF"

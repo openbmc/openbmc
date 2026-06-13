@@ -14,7 +14,7 @@ SRC_URI += " \
   file://50-gbmc-ncsi.rules.in \
   ${@'' if d.getVar('GBMC_DHCP_RELAY') != '1' else 'file://gbmc-ncsi-dhcrelay.sh.in'} \
   file://gbmc-ncsi-ra@.service \
-  file://gbmc-ncsi-ra.sh \
+  file://gbmc-ncsi-ra.sh.in \
   file://gbmc-ncsi-smartnic-wa.sh.in \
   file://gbmc-ncsi-sslh.socket.in \
   file://gbmc-ncsi-sslh.service \
@@ -149,7 +149,8 @@ do_install:append() {
 
   install -m0644 ${UNPACKDIR}/gbmc-ncsi-ra@.service ${D}${systemd_system_unitdir}
   install -d -m0755 ${D}${libexecdir}
-  install -m0755 ${UNPACKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/
+  sed "s,@NCSI_IF@,$if_name,g" ${UNPACKDIR}/gbmc-ncsi-ra.sh.in >${WORKDIR}/gbmc-ncsi-ra.sh
+  install -m0755 ${WORKDIR}/gbmc-ncsi-ra.sh ${D}${libexecdir}/
 
   sed -e "s,@NCSI_IF@,$if_name,g" -e "s,@GBMC_DHCP_RELAY@,${GBMC_DHCP_RELAY},g" \
     ${UNPACKDIR}/gbmc-ncsi-smartnic-wa.sh.in >${UNPACKDIR}/gbmc-ncsi-smartnic-wa.sh
