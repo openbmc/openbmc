@@ -5,3 +5,4 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 # included in the phosphor-power repository.
 OBMC_CONTROL_FMT:ibm-enterprise = ""
 OBMC_CONTROL_FMT:system1 = ""
+DBUS_SERVICE:${PN}:remove = "org.openbmc.control.Power@.service"
