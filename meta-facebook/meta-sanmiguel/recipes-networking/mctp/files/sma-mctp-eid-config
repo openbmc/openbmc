@@ -58,7 +58,7 @@ assign_static_eid() {
     busctl call au.com.codeconstruct.MCTP1 \
         /au/com/codeconstruct/mctp1/interfaces/"$MCTP_INTF" \
         au.com.codeconstruct.MCTP.BusOwner1 \
-        AssignBridgeStatic ayyyy 0 "$MCTP_EID" "$POOL_SIZE" "$POOL_START"
+        AssignBridgeStatic ayyyy 0 "$MCTP_EID" "$POOL_START" "$POOL_SIZE"
 }
 
 remove_eid()
