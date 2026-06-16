@@ -5,8 +5,6 @@
 #   Setup gpio pins for step motor control
 #   Moving step motor back to initial position
 
-export PATH=$PATH:/usr/libexec
-
 # shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
 source /usr/libexec/bletchley-common-functions
 
@@ -95,9 +93,9 @@ INIT_POS=$(get_gpio "$DETECT_PIN1")
 
 if [ "$INIT_POS" -eq 1 ];then
     echo "Making motor back to initial position..."
-    motor-ctrl "$SLED" r >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "$SLED" r >/dev/null
     wait_gpio_falling "$DETECT_PIN1" "$CALIBRATE_TIMEOUT"
-    motor-ctrl "$SLED" s >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "$SLED" s >/dev/null
 fi
 
 INIT_POS=$(get_gpio "$DETECT_PIN1")

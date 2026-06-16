@@ -4,7 +4,7 @@
 #   Enable/disable AC relay
 #   On/off System by step moter to press power key
 
-export PATH=$PATH:/usr/sbin:/usr/libexec
+export PATH=$PATH:/usr/sbin
 
 # shellcheck source=meta-facebook/meta-bletchley/recipes-bletchley/plat-tools/files/bletchley-common-functions
 source /usr/libexec/bletchley-common-functions
@@ -113,9 +113,9 @@ function trigger_power_button()
     GPIO_DETECT_PIN0="SLED${sled_gpio_num}_MS_DETECT0"
 
     echo "Motor go forward to press Power key"
-    motor-ctrl "sled${sled_num}" f >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" f >/dev/null
     wait_gpio_falling "${GPIO_DETECT_PIN0}" "$POWER_BTN_TIMEOUT_SEC"
-    motor-ctrl "sled${sled_num}" s >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" s >/dev/null
 
     if [ "$(get_gpio  "$GPIO_DETECT_PIN0")" -eq 0 ];then
         echo "Power key switch triggered"
@@ -125,9 +125,9 @@ function trigger_power_button()
         echo "Power key switch not trigger, back motor to initial position"
     fi
 
-    motor-ctrl "sled${sled_num}" r >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" r >/dev/null
     wait_gpio_falling "${GPIO_DETECT_PIN1}" "$POWER_BTN_TIMEOUT_SEC"
-    motor-ctrl "sled${sled_num}" s >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" s >/dev/null
     if [ "$(get_gpio  "$GPIO_DETECT_PIN1")" -eq 0 ];then
         echo "Motor reverse to initial position successful"
     else
@@ -147,9 +147,9 @@ function release_power_button()
         return 0
     fi
 
-    motor-ctrl "sled${sled_num}" r >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" r >/dev/null
     wait_gpio_falling "${GPIO_DETECT_PIN1}" "$POWER_BTN_TIMEOUT_SEC"
-    motor-ctrl "sled${sled_num}" s >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" s >/dev/null
     if [ "$(get_gpio  "$GPIO_DETECT_PIN1")" -eq 0 ];then
         echo "Motor reverse to initial position successful"
         return 0
@@ -167,9 +167,9 @@ function press_power_button()
     GPIO_DETECT_PIN0="SLED${sled_gpio_num}_MS_DETECT0"
 
     echo "Motor go forward to press Power button"
-    motor-ctrl "sled${sled_num}" f >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" f >/dev/null
     wait_gpio_falling "${GPIO_DETECT_PIN0}" "$POWER_BTN_TIMEOUT_SEC"
-    motor-ctrl "sled${sled_num}" s >/dev/null
+    /usr/libexec/motor-ctrl/motor-ctrl "sled${sled_num}" s >/dev/null
 
     if [ "$(get_gpio  "$GPIO_DETECT_PIN0")" -eq 0 ];then
         echo "Power button switch triggered"
