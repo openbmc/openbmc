@@ -23,7 +23,7 @@ SRC_URI += " \
 
 do_install() {
         install -D -m 0755 ${UNPACKDIR}/power-ctrl ${D}${sbindir}/power-ctrl
-        install -D -m 0755 ${UNPACKDIR}/motor-ctrl ${D}${libexecdir}/${BPN}/motor-ctl
+        install -D -m 0755 ${UNPACKDIR}/motor-ctrl ${D}${libexecdir}/${BPN}/motor-ctrl
         install -D -m 0755 ${UNPACKDIR}/motor-init ${D}${libexecdir}/${BPN}/motor-init
         install -D -m 0644 ${UNPACKDIR}/motor-init-calibration@.service \
             ${D}${systemd_system_unitdir}/motor-init-calibration@.service
