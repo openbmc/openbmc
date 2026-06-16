@@ -1,6 +1,6 @@
 owners:
 - geissonator@yahoo.com
-- anoo@us.ibm.com
+- spinler@us.ibm.com
 
 matchers:
 - partial_regex: recipes-kernel
