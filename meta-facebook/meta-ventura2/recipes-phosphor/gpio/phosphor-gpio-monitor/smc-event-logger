@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
 help_msg="
 Usage: smc-event-logger <event> <gpio_name>
 <event> is the smc event to log,
@@ -14,9 +17,10 @@ stash_file="/var/lib/phosphor-gpio-monitor/${gpio_name}.log_entry"
 
 # For VT cooling systems, AALC-related signals should be ignored.
 if [[ "$gpio_name" == *RPU* || "$gpio_name" == *PUMP* ]] &&
-    { busctl introspect xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/cable/ReturnValve_1_Port >/dev/null 2>&1 ||
-    busctl introspect xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/cable/ReturnValve_2_Port >/dev/null 2>&1 ||
-    busctl introspect xyz.openbmc_project.EntityManager /xyz/openbmc_project/inventory/system/cable/ReturnValve_3_Port >/dev/null 2>&1; }; then
+    { [ "$(get_gpio_val_by_name IT_GEAR_RPU_LINK_PRSNT_N_R)"      == "1" ] &&
+      [ "$(get_gpio_val_by_name IT_GEAR_RPU_LINK_PRSNT_SPARE_N_)" == "1" ] &&
+      [ "$(get_gpio_val_by_name IT_GEAR_RPU_2_LINK_PRSNT_N_R)"    == "1" ] &&
+      [ "$(get_gpio_val_by_name IT_GEAR_RPU_2_LINK_PRSNT_SPARE_)" == "1" ]; }; then
     exit 0
 fi
 
