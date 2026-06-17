@@ -27,6 +27,8 @@ SRC_URI += " \
     file://ventura2-early-sys-init \
     file://ncsi-state \
     file://ncsi-state.service \
+    file://usb-state \
+    file://usb-state.service \
     "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -38,6 +40,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
     ventura2-fan-status-monitor.service \
     ventura2-sys-init.service \
     ncsi-state.service \
+    usb-state.service \
     "
 
 FILES:${PN} += "${systemd_system_unitdir}/*"
@@ -50,6 +53,7 @@ do_install() {
     install -m 0755 ${UNPACKDIR}/sgpio-state-init ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/valve-dac-init ${LIBEXECDIR_PN}
     install -m 0755 ${UNPACKDIR}/ncsi-state ${LIBEXECDIR_PN}
+    install -m 0755 ${UNPACKDIR}/usb-state ${LIBEXECDIR_PN}
 
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${UNPACKDIR}/99-sgpio-state-init.rules ${D}${sysconfdir}/udev/rules.d
@@ -65,4 +69,5 @@ do_install() {
     install -m 0644 ${UNPACKDIR}/ventura2-fan-status-monitor.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/ventura2-sys-init.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/ncsi-state.service ${D}${systemd_system_unitdir}
+    install -m 0644 ${UNPACKDIR}/usb-state.service ${D}${systemd_system_unitdir}
 }

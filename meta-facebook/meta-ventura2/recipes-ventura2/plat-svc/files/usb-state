@@ -1,0 +1,57 @@
+#!/bin/bash
+
+MAX_RETRIES=5
+RETRY_COUNT=0
+SUCCESS=0
+
+check_usb_devices() {
+    genesys_hub=$(grep -il "05e3" /sys/bus/usb/devices/*/idVendor 2>/dev/null | wc -l)
+    cypress_hub=$(grep -il "04b4" /sys/bus/usb/devices/*/idVendor 2>/dev/null | wc -l)
+    ftdi_count=$(grep -il "0403" /sys/bus/usb/devices/*/idVendor 2>/dev/null | wc -l)
+    exar_count=$(grep -il "04e2" /sys/bus/usb/devices/*/idVendor 2>/dev/null | wc -l)
+
+    if [ "$genesys_hub" -gt 0 ]; then
+        if [ "$ftdi_count" -ge 3 ]; then
+            return 0
+        else
+            echo "Genesys Hub found, but FTDI count is $ftdi_count."
+            return 1
+        fi
+    elif [ "$cypress_hub" -gt 0 ]; then
+        if [ "$exar_count" -ge 3 ]; then
+            return 0
+        else
+            echo "Cypress Hub found, but Exar count is $exar_count and FTDI count is $ftdi_count."
+            return 1
+        fi
+    else
+        echo "No valid USB Hub (Genesys or Cypress) found."
+        return 1
+    fi
+}
+
+while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
+    if check_usb_devices; then
+        if [ "$RETRY_COUNT" -eq 0 ]; then
+            echo "All USB devices are properly enumerated. No action needed."
+        else
+            echo "$USB_BUS rebind successful on attempt $((RETRY_COUNT)). All devices enumerated."
+        fi
+        SUCCESS=1
+        break
+    else
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        echo "USB enumeration incomplete or missing. Attempt $RETRY_COUNT of $MAX_RETRIES. Triggering $USB_BUS rebind..."
+
+        echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/unbind
+        sleep 2
+
+        echo 1e6a1000.usb > /sys/bus/platform/drivers/ehci-platform/bind
+
+        sleep 5
+    fi
+done
+
+if [ "$SUCCESS" -eq 0 ]; then
+    echo "WARNING: $USB_BUS rebind failed to enumerate all expected devices after $MAX_RETRIES attempts!"
+fi

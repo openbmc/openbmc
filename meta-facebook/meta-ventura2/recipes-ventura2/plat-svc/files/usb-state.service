@@ -1,0 +1,13 @@
+[Unit]
+Description=Ventura2 USB state
+After=basic.target
+Before=marvell-switch-init.service
+Before=platform_init.service
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sleep 10
+ExecStart=/usr/libexec/plat-svc/usb-state
+
+[Install]
+WantedBy=multi-user.target
