@@ -1,4 +1,4 @@
 EXTRA_OEMESON:append:ibm-enterprise = " \
-    -Dmax-append-limit=300 \
-    -Dmax-reading-parameters=32768 \
+    -Dmax-append-limit=4096 \
+    -Dmax-reading-parameters=1000 \
 "
