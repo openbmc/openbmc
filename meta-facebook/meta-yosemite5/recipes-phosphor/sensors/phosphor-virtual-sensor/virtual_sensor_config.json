@@ -568,5 +568,57 @@
             "  default: INLET_TEMP+CAL_OFS[10];",
             "}"
         ]
+    },
+    {
+        "Desc": {
+            "Name": "SYSTEM_AIRFLOW_CFM",
+            "SensorType": "airflow"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Yosemite5_Medusa_Board"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FAN_DUTY",
+                    "Desc": {
+                        "Name": "PDB_FAN_PWM",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_OFS[11]:={100, 90, 80, 70, 60, 50, 40, 30, 20, 10, 0};",
+            "var AIRFLOW[11]:={549.6, 487.6, 441.5, 390.3, 340.7, 289.1, 238.7, 185.8, 136.8, 97.2, 97.2};",
+            "var DUTY_VALID:=ifnan(FAN_DUTY, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_VALID,DUTY_OFS[0]):",
+            "    AIRFLOW[0]+((FAN_DUTY-DUTY_OFS[0])*(AIRFLOW[1]-AIRFLOW[0])/(DUTY_OFS[1]-DUTY_OFS[0]));",
+            "  case inrange(DUTY_OFS[2],DUTY_VALID,DUTY_OFS[1]):",
+            "    AIRFLOW[1]+((FAN_DUTY-DUTY_OFS[1])*(AIRFLOW[2]-AIRFLOW[1])/(DUTY_OFS[2]-DUTY_OFS[1]));",
+            "  case inrange(DUTY_OFS[3],DUTY_VALID,DUTY_OFS[2]):",
+            "    AIRFLOW[2]+((FAN_DUTY-DUTY_OFS[2])*(AIRFLOW[3]-AIRFLOW[2])/(DUTY_OFS[3]-DUTY_OFS[2]));",
+            "  case inrange(DUTY_OFS[4],DUTY_VALID,DUTY_OFS[3]):",
+            "    AIRFLOW[3]+((FAN_DUTY-DUTY_OFS[3])*(AIRFLOW[4]-AIRFLOW[3])/(DUTY_OFS[4]-DUTY_OFS[3]));",
+            "  case inrange(DUTY_OFS[5],DUTY_VALID,DUTY_OFS[4]):",
+            "    AIRFLOW[4]+((FAN_DUTY-DUTY_OFS[4])*(AIRFLOW[5]-AIRFLOW[4])/(DUTY_OFS[5]-DUTY_OFS[4]));",
+            "  case inrange(DUTY_OFS[6],DUTY_VALID,DUTY_OFS[5]):",
+            "    AIRFLOW[5]+((FAN_DUTY-DUTY_OFS[5])*(AIRFLOW[6]-AIRFLOW[5])/(DUTY_OFS[6]-DUTY_OFS[5]));",
+            "  case inrange(DUTY_OFS[7],DUTY_VALID,DUTY_OFS[6]):",
+            "    AIRFLOW[6]+((FAN_DUTY-DUTY_OFS[6])*(AIRFLOW[7]-AIRFLOW[6])/(DUTY_OFS[7]-DUTY_OFS[6]));",
+            "  case inrange(DUTY_OFS[8],DUTY_VALID,DUTY_OFS[7]):",
+            "    AIRFLOW[7]+((FAN_DUTY-DUTY_OFS[7])*(AIRFLOW[8]-AIRFLOW[7])/(DUTY_OFS[8]-DUTY_OFS[7]));",
+            "  case inrange(DUTY_OFS[9],DUTY_VALID,DUTY_OFS[8]):",
+            "    AIRFLOW[8]+((FAN_DUTY-DUTY_OFS[8])*(AIRFLOW[9]-AIRFLOW[8])/(DUTY_OFS[9]-DUTY_OFS[8]));",
+            "  case inrange(DUTY_OFS[10],DUTY_VALID,DUTY_OFS[9]):",
+            "    AIRFLOW[9]+((FAN_DUTY-DUTY_OFS[9])*(AIRFLOW[10]-AIRFLOW[9])/(DUTY_OFS[10]-DUTY_OFS[9]));",
+            "  default: AIRFLOW[10];",
+            "}"
+        ]
     }
 ]
