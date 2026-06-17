@@ -14,7 +14,6 @@ declare -a endpoint_map=(
     "rainbow3_mmc_mctp:0x21:40"
     "swb_nic1_mctp:0x32:50"
     "swb_nic2_mctp:0x32:51"
-    "swb_PCIe_switch_mctp:0x62:52"
     "swb_nic3_mctp:0x32:54"
     "swb_nic4_mctp:0x32:55"
 )
@@ -36,7 +35,6 @@ declare -A hub0_port_mapping=(
 declare -A hub1_port_mapping=(
     [".port0"]="swb_nic1_mctp"
     [".port1"]="swb_nic2_mctp"
-    [".port2"]="swb_PCIe_switch_mctp"
     [".port4"]="swb_nic3_mctp"
     [".port5"]="swb_nic4_mctp"
 )
