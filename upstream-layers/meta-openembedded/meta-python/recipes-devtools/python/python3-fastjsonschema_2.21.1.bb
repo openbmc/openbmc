@@ -17,7 +17,6 @@ RDEPENDS:${PN}-ptest += "\
     python3-misc \
     python3-pylint \
     python3-pytest-benchmark \
-    python3-pytest-cache \
     python3-statistics \
 "
 RDEPENDS:${PN} += "\

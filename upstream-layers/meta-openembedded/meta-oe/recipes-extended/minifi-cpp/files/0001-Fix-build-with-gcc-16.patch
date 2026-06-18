@@ -1,0 +1,49 @@
+From 950aea28ffefd88f230d6bd25fa0352e9ca157c9 Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Wed, 3 Jun 2026 02:12:01 -0700
+Subject: [PATCH] Fix build with gcc 16
+
+Fixes:
+  extensions/systemd/libwrapper/LibWrapper.h:38:31: error: 'uint64_t' has not been declared
+   38 |   virtual int getRealtimeUsec(uint64_t* usec_out) noexcept = 0;
+      |                               ^~~~~~~~
+
+  libminifi/include/core/RepositoryMetricsSource.h:29:5: error: 'uint64_t' does not name a type
+  |    29 |     uint64_t table_readers_size{};
+  |       |     ^~~~~~~~
+
+Upstream-Status: Submitted [https://github.com/apache/nifi-minifi-cpp/pull/2194]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ extensions/systemd/libwrapper/LibWrapper.h       | 1 +
+ libminifi/include/core/RepositoryMetricsSource.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/extensions/systemd/libwrapper/LibWrapper.h b/extensions/systemd/libwrapper/LibWrapper.h
+index d7e7b7c..c8af00e 100644
+--- a/extensions/systemd/libwrapper/LibWrapper.h
++++ b/extensions/systemd/libwrapper/LibWrapper.h
+@@ -19,6 +19,7 @@
+ #pragma once
+ 
+ #include <memory>
++#include <cstdint>
+ 
+ #include "../Common.h"
+ #include "utils/gsl.h"
+diff --git a/libminifi/include/core/RepositoryMetricsSource.h b/libminifi/include/core/RepositoryMetricsSource.h
+index 6c933b7..f39fccf 100644
+--- a/libminifi/include/core/RepositoryMetricsSource.h
++++ b/libminifi/include/core/RepositoryMetricsSource.h
+@@ -20,6 +20,7 @@
+ 
+ #include <string>
+ #include <optional>
++#include <cstdint>
+ 
+ namespace org::apache::nifi::minifi::core {
+ 
+-- 
+2.49.0
+

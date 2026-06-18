@@ -7,4 +7,8 @@ XFCE_COMPRESS_TYPE = "xz"
 
 inherit xfce-panel-plugin perlnative
 
+SRC_URI += "\
+           file://0001-Fix-aggregate-init-failure-with-gcc16.patch \
+"
+
 SRC_URI[sha256sum] = "baa5b90f72e8c262777f1e246acae125af489e2c168a5f7f890d9d2b5567ec20"

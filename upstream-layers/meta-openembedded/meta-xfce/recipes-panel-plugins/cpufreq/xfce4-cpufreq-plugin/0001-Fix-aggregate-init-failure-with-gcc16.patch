@@ -1,0 +1,49 @@
+From b9dc593f2843bd0f18309bde4d79b88d9f37e32f Mon Sep 17 00:00:00 2001
+From: Mingli Yu <mingli.yu@windriver.com>
+Date: Tue, 2 Jun 2026 23:07:08 -0700
+Subject: [PATCH] Fix aggregate init failure with gcc16
+
+Replace deleted default constructors with explicit bool constructors
+to fix aggregate init failure with gcc16.
+
+Upstream-Status: Submitted [https://gitlab.xfce.org/panel-plugins/xfce4-cpufreq-plugin/-/merge_requests/68]
+
+Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+---
+ xfce4++/util/gtk.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/xfce4++/util/gtk.h b/xfce4++/util/gtk.h
+index 1443cb2..ef03dd1 100644
+--- a/xfce4++/util/gtk.h
++++ b/xfce4++/util/gtk.h
+@@ -63,22 +63,22 @@ void connect(GtkToggleButton *widget, const char *signal, const std::function<vo
+ 
+ struct PluginSize {
+     bool rectangle; /* Whether the panel plugin size is forced to be a square. Otherwise, the plugin can be a rectangle. */
+-    PluginSize() = delete;
++    constexpr explicit PluginSize(bool r) : rectangle(r) {}
+ };
+ 
+ struct Propagation {
+     bool stop; /* Whether to prevent the event from propagating to other handlers */
+-    Propagation() = delete;
++    constexpr explicit Propagation(bool s) : stop(s) {}
+ };
+ 
+ struct TimeoutResponse {
+     bool again; /* Invoke the timeout handler again, otherwise stop the timer */
+-    TimeoutResponse() = delete;
++    constexpr explicit TimeoutResponse(bool a) : again(a) {}
+ };
+ 
+ struct TooltipTime {
+     bool now; /* Whether to show the tooltip now or later */
+-    TooltipTime() = delete;
++    constexpr explicit TooltipTime(bool n) : now(n) {}
+ };
+ 
+ extern const PluginSize      RECTANGLE, SQUARE;
+-- 
+2.49.0
+

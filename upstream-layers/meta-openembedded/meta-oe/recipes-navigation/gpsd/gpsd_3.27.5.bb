@@ -126,7 +126,7 @@ FILES:gps-utils = "\
     ${bindir}/ntpshmmon    \
     ${bindir}/ppscheck     \
 "
-RRECOMMENDS:gps-utils = "gps-utils-python"
+RRECOMMENDS:gps-utils = "gps-utils-python ncurses-terminfo"
 
 SUMMARY:gps-utils-python = "Python utils used for simulating, monitoring,... a GPS"
 FILES:gps-utils-python = "\

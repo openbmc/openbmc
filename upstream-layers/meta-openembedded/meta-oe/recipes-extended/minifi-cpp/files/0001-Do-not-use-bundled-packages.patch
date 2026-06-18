@@ -1,4 +1,4 @@
-From 4952f03d150770ff06f9a12ff42d8de680407649 Mon Sep 17 00:00:00 2001
+From ff886f41c471a4b7d97a5a4473727a8b1d8ba2bb Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 19 Mar 2024 19:39:04 +0800
 Subject: [PATCH] Do not use bundled packages
@@ -9,27 +9,32 @@ xz, yaml-cpp and libxml2.
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+[lz: When upgrading from 0.99.1 to 0.99.2:
+adapted the patch for context changes;
+added using external dependencies for pugixml.]
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
 ---
- CMakeLists.txt                       | 3 +--
- cmake/GetBZip2.cmake                 | 3 +++
- cmake/GetCatch2.cmake                | 4 ++++
- cmake/GetCivetWeb.cmake              | 3 +++
- cmake/GetFmt.cmake                   | 3 +++
- cmake/GetLibCURL.cmake               | 3 +++
- cmake/GetLibXml2.cmake               | 3 +++
- cmake/GetOpenSSL.cmake               | 3 +++
- cmake/GetRocksDB.cmake               | 4 ++++
- cmake/GetSpdlog.cmake                | 4 ++++
- cmake/GetZLIB.cmake                  | 3 +++
- cmake/GetZstd.cmake                  | 4 ++++
- extensions/libarchive/CMakeLists.txt | 6 ++----
- 13 files changed, 40 insertions(+), 6 deletions(-)
+ CMakeLists.txt                       |  3 +--
+ cmake/GetBZip2.cmake                 |  3 +++
+ cmake/GetCatch2.cmake                |  4 ++++
+ cmake/GetCivetWeb.cmake              |  3 +++
+ cmake/GetFmt.cmake                   |  3 +++
+ cmake/GetLibCURL.cmake               |  3 +++
+ cmake/GetLibXml2.cmake               |  3 +++
+ cmake/GetOpenSSL.cmake               |  3 +++
+ cmake/GetRocksDB.cmake               |  4 ++++
+ cmake/GetSpdlog.cmake                |  4 ++++
+ cmake/GetZLIB.cmake                  |  3 +++
+ cmake/GetZstd.cmake                  |  4 ++++
+ cmake/PugiXml.cmake                  | 20 ++++++++++++--------
+ extensions/libarchive/CMakeLists.txt |  6 ++----
+ 14 files changed, 52 insertions(+), 14 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 50e31d871..fc1718dfd 100644
+index 5cf1c4e5f..36aee1508 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -265,8 +265,7 @@ include(GetSpdlog)
+@@ -285,8 +285,7 @@ include(GetSpdlog)
  get_spdlog()
  
  # yaml-cpp
@@ -106,13 +111,13 @@ index afd38f3c9..0eac59ec4 100644
      endif()
  endfunction(get_curl SOURCE_DIR BINARY_DIR)
 diff --git a/cmake/GetLibXml2.cmake b/cmake/GetLibXml2.cmake
-index 5915b117d..18048715d 100644
+index 2a6c618f6..093b57a4b 100644
 --- a/cmake/GetLibXml2.cmake
 +++ b/cmake/GetLibXml2.cmake
-@@ -23,5 +23,8 @@ function(get_libxml2 SOURCE_DIR BINARY_DIR)
+@@ -22,5 +22,8 @@ function(get_libxml2 SOURCE_DIR BINARY_DIR)
+     elseif(MINIFI_LIBXML2_SOURCE STREQUAL "BUILD")
          message("Using CMake to build libxml2 from source")
-         include(BundledLibXml2)
-         use_bundled_libxml2(${SOURCE_DIR} ${BINARY_DIR})
+         include(LibXml2)
 +    elseif(MINIFI_LIBXML2_SOURCE STREQUAL "SYSTEM")
 +        message("Using libxml2 provided by system")
 +        find_package(libxml2 REQUIRED)
@@ -146,10 +151,10 @@ index 0968afc38..3ca1fe565 100644
      endif()
  endfunction(get_rocksdb SOURCE_DIR BINARY_DIR)
 diff --git a/cmake/GetSpdlog.cmake b/cmake/GetSpdlog.cmake
-index 747894984..6255e31bf 100644
+index 9fe3b9c46..60f5c01d7 100644
 --- a/cmake/GetSpdlog.cmake
 +++ b/cmake/GetSpdlog.cmake
-@@ -27,5 +27,9 @@ function(get_spdlog)
+@@ -32,5 +32,9 @@ function(get_spdlog)
      elseif(MINIFI_SPDLOG_SOURCE STREQUAL "BUILD")
          message("Using CMake to build spdlog from source")
          include(Spdlog)
@@ -186,8 +191,37 @@ index a0334b02d..0e7600c22 100644
 +        add_library(zstd::zstd ALIAS zstd::libzstd_static)
      endif()
  endfunction(get_zstd)
+diff --git a/cmake/PugiXml.cmake b/cmake/PugiXml.cmake
+index ba5a4df38..7a1a72b9b 100644
+--- a/cmake/PugiXml.cmake
++++ b/cmake/PugiXml.cmake
+@@ -15,12 +15,16 @@
+ # specific language governing permissions and limitations
+ # under the License.
+ include(FetchContent)
++if(MINIFI_PUGIXML_SOURCE STREQUAL "SYSTEM")
++    message("Using pugixml provided by system")
++    find_package(PUGIXML REQUIRED)
++else()
++    set(PUGIXML_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+ 
+-set(PUGIXML_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+-
+-FetchContent_Declare(
+-    pugixml
+-    URL      https://github.com/zeux/pugixml/archive/refs/tags/v1.15.tar.gz
+-    URL_HASH SHA256=b39647064d9e28297a34278bfb897092bf33b7c487906ddfc094c9e8868bddcb
+-)
+-FetchContent_MakeAvailable(pugixml)
++    FetchContent_Declare(
++        pugixml
++        URL      https://github.com/zeux/pugixml/archive/refs/tags/v1.15.tar.gz
++        URL_HASH SHA256=b39647064d9e28297a34278bfb897092bf33b7c487906ddfc094c9e8868bddcb
++    )
++    FetchContent_MakeAvailable(pugixml)
++endif()
 diff --git a/extensions/libarchive/CMakeLists.txt b/extensions/libarchive/CMakeLists.txt
-index bf7b2a7f5..eb6b71091 100644
+index 14b75dcc2..ad2b13c25 100644
 --- a/extensions/libarchive/CMakeLists.txt
 +++ b/extensions/libarchive/CMakeLists.txt
 @@ -22,12 +22,10 @@ if (NOT ENABLE_LIBARCHIVE)

@@ -1,0 +1,24 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# BitBake recipes and configuration (the bulk of this repository)
+*.bb         text
+*.bbappend   text
+*.bbclass    text
+*.inc        text
+*.conf       text
+*.cfg        text
+
+# Other text files actually present in this repository
+*.md         text diff=markdown
+*.txt        text
+*.json       text
+*.xml        text
+
+# Binary files actually present in this repository
+*.png        binary
+*.zip        binary
+
+# Patch and diff files: keep verbatim (do NOT normalize line endings)
+*.patch      -text
+*.diff       -text

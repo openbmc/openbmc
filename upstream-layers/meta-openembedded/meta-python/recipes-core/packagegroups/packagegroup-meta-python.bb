@@ -270,7 +270,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     python3-passlib \
     python3-pastedeploy \
     python3-pathspec \
-    python3-pathtools3 \
     python3-pep8 \
     python3-periphery \
     python3-petact \
@@ -344,7 +343,6 @@ RDEPENDS:packagegroup-meta-python3 = "\
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "python3-pystemd", "", d)} \
     python3-pytest-asyncio \
     python3-pytest-benchmark \
-    python3-pytest-cache \
     python3-pytest-forked \
     python3-pytest-helpers-namespace \
     python3-pytest-html \

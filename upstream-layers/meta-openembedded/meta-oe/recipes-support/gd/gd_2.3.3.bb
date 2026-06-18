@@ -43,6 +43,8 @@ EXTRA_OECONF += "--disable-rpath"
 
 EXTRA_OEMAKE = 'LDFLAGS="${LDFLAGS}"'
 
+CFLAGS += "-Wno-error=maybe-uninitialized"
+
 DEBUG_OPTIMIZATION:append = " -Wno-error=maybe-uninitialized"
 
 do_install:append:class-target() {

@@ -7,7 +7,9 @@ XFCE_COMPRESS_TYPE = "xz"
 
 inherit xfce-panel-plugin
 
-SRC_URI += "file://0001-Do-not-check-for-sys-class-power_supply-we-are-cross.patch"
+SRC_URI += "file://0001-Do-not-check-for-sys-class-power_supply-we-are-cross.patch \
+            file://0001-Fix-aggregate-init-failure-with-gcc16.patch \
+"
 SRC_URI[sha256sum] = "840442b87fdddcd8595bd9f83ea8b81f771fe296bb9d2abf0e1979e208727ae9"
 
 EXTRA_OECONF = " \

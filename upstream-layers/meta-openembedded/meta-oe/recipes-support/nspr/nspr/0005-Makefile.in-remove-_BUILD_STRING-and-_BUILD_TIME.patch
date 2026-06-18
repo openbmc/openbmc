@@ -18,7 +18,6 @@ Signed-off-by: Mingli Yu <Mingli.Yu@windriver.com>
 ---
  lib/ds/Makefile.in        | 8 +-------
  lib/libc/src/Makefile.in  | 8 +-------
- lib/prstreams/Makefile.in | 8 +-------
  pr/src/Makefile.in        | 8 +-------
  4 files changed, 4 insertions(+), 28 deletions(-)
 
@@ -46,25 +45,6 @@ index 9ef2007..21abd6f 100644
 --- a/lib/libc/src/Makefile.in
 +++ b/lib/libc/src/Makefile.in
 @@ -106,13 +106,7 @@ GARBAGE += $(TINC)
- 
- $(TINC):
- 	@$(MAKE_OBJDIR)
--	@$(ECHO) '#define _BUILD_STRING "$(SH_DATE)"' > $(TINC)
--	@if test ! -z "$(SH_NOW)"; then \
--	    $(ECHO) '#define _BUILD_TIME $(SH_NOW)$(SUF)' >> $(TINC); \
--	else \
--	    true; \
--	fi
--	@$(ECHO) '#define _PRODUCTION "$(PROD)"' >> $(TINC)
-+	@$(ECHO) '#define _PRODUCTION "$(PROD)"' > $(TINC)
- 
- 
- $(OBJDIR)/plvrsion.$(OBJ_SUFFIX): plvrsion.c $(TINC)
-diff --git a/lib/prstreams/Makefile.in b/lib/prstreams/Makefile.in
-index 5865ab8..a00d20c 100644
---- a/lib/prstreams/Makefile.in
-+++ b/lib/prstreams/Makefile.in
-@@ -102,13 +102,7 @@ endif
  
  $(TINC):
  	@$(MAKE_OBJDIR)

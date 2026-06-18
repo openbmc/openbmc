@@ -18,5 +18,5 @@ UPSTREAM_CHECK_URI = "https://github.com/jordansissel/xdotool/tags"
 UPSTREAM_CHECK_REGEX = "v(?P<pver>\d+\.\d{8}\.\d+)"
 
 do_install() {
-    oe_runmake install DESTDIR=${D} PREFIX=${prefix}
+    oe_runmake install DESTDIR=${D} PREFIX=${prefix} LDCONFIG=true
 }

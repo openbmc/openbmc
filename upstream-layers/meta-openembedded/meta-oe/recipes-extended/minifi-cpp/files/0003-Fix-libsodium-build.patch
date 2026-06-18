@@ -1,4 +1,4 @@
-From a19e548826e65a95a55ac6b9c12a83d3dcc0010d Mon Sep 17 00:00:00 2001
+From d48ababf341708885ecf687ebc46bb1d84ca868d Mon Sep 17 00:00:00 2001
 From: Yi Zhao <yi.zhao@windriver.com>
 Date: Tue, 19 Mar 2024 20:56:05 +0800
 Subject: [PATCH] Fix libsodium build
@@ -9,16 +9,19 @@ Subject: [PATCH] Fix libsodium build
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
+[lz: Adapted the patch for context changes when upgrading
+from 0.99.1 to 0.99.2.]
+Signed-off-by: Li Zhou <li.zhou@windriver.com>
 ---
  cmake/BundledLibSodium.cmake | 6 ++----
  1 file changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/cmake/BundledLibSodium.cmake b/cmake/BundledLibSodium.cmake
-index 98d05b737..4f0faa879 100644
+index 001a90dad..87a3244fd 100644
 --- a/cmake/BundledLibSodium.cmake
 +++ b/cmake/BundledLibSodium.cmake
-@@ -58,14 +58,12 @@ function(use_bundled_libsodium SOURCE_DIR BINARY_DIR)
-                 EXCLUDE_FROM_ALL TRUE
+@@ -60,14 +60,12 @@ function(use_bundled_libsodium SOURCE_DIR BINARY_DIR)
+                 TLS_VERIFY TRUE
          )
      else()
 -        set(CONFIGURE_COMMAND ./configure --disable-pie --enable-minimal "--prefix=${LIBSODIUM_BIN_DIR}")

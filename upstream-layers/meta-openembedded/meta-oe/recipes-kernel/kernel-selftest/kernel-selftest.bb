@@ -129,6 +129,8 @@ EXTRA_OEMAKE:append:toolchain-clang = "\
     HOSTLD="clang ${BUILD_LDFLAGS} -unwindlib=libgcc -rtlib=libgcc -stdlib=libstdc++" \
 "
 
+CLEANBROKEN = "1"
+
 KERNEL_SELFTEST_SRC ?= "Makefile \
                         include \
                         kernel \

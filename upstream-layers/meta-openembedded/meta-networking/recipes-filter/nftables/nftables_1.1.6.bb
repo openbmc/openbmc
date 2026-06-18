@@ -72,7 +72,10 @@ do_install() {
     fi
 }
 
-RDEPENDS:${PN}-ptest += " ${PN}-python bash coreutils make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux"
+RDEPENDS:${PN}-ptest += " \
+	bash coreutils make iproute2 iputils-ping procps python3-core python3-ctypes python3-json python3-misc sed util-linux \
+	${@bb.utils.contains('PACKAGECONFIG', 'python', '${PN}-python', '', d)} \
+"
 
 
 # For ptests compile the kernel with CONFIG_NFT_TPROXY
