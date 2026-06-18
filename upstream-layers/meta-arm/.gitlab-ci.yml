@@ -9,14 +9,16 @@ variables:
   CPU_REQUEST: ""
   # The default machine tag for the build jobs
   DEFAULT_TAG: ""
-  # The directory to use as the persistent cache (the root for DL_DIR, SSTATE_DIR, etc)
-  CACHE_DIR: $CI_BUILDS_DIR/persist
+  # The directory to use as the persistent cache (the root for DL_DIR,
+  # SSTATE_DIR, etc). The default is the build tree which will not be
+  # persistent, so this should be set in the runner.
+  CACHE_DIR: $CI_PROJECT_DIR
   # The container mirror to use
   MIRROR_GHCR: ghcr.io
   # The list of extra Kas fragments to be used when building
   EXTRA_KAS_FILES: ""
-  # The NVD API key to use when fetching CVEs
-  NVDCVE_API_KEY: ""
+  # Whether warnings should be fatal (0/1)
+  FATAL_WARNINGS: 0
 
 stages:
   - prep
@@ -61,13 +63,15 @@ stages:
     # Catch all for everything else
     - if: '$KERNEL != "linux-yocto-dev"'
   script:
-    - KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME" $EXTRA_KAS_FILES):lockfile.yml
-    - echo KASFILES=$KASFILES
-    - kas dump --update --force-checkout --resolve-refs --resolve-env $KASFILES
-    - kas build $KASFILES
-    - ./ci/check-warnings $KAS_BUILD_DIR/warnings.log
-    - kas shell ci/base.yml:lockfile.yml --command "$CI_PROJECT_DIR/ci/junit.sh $KAS_WORK_DIR/build"
-
+    - |
+      KASFILES=$(./ci/jobs-to-kas "$CI_JOB_NAME" $EXTRA_KAS_FILES):lockfile.yml
+      echo KASFILES=$KASFILES
+      kas dump --update --force-checkout --resolve-refs --resolve-env $KASFILES
+      kas build $KASFILES
+      if [ $FATAL_WARNINGS -ne 0 ]; then
+        ./ci/check-warnings $KAS_BUILD_DIR/warnings.log
+      fi
+      kas shell ci/base.yml:lockfile.yml --command "$CI_PROJECT_DIR/ci/junit.sh $KAS_WORK_DIR/build"
   artifacts:
     name: "logs"
     when: on_failure

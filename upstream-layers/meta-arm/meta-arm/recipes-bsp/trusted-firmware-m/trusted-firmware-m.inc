@@ -136,3 +136,5 @@ INSANE_SKIP:${PN}-dbg += "buildpaths"
 # Target binaries will be 32-bit Arm
 INSANE_SKIP:${PN} += "arch"
 INSANE_SKIP:${PN}-dbg += "arch"
+
+CVE_PRODUCT = "trustedfirmware:trusted_firmware-m"

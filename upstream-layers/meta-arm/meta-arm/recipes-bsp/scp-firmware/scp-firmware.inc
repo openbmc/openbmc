@@ -96,3 +96,6 @@ do_install() {
 INSANE_SKIP:${PN}-dbg += "arch"
 INHIBIT_PACKAGE_DEBUG_SPLIT = "1"
 INHIBIT_PACKAGE_STRIP = "1"
+
+CVE_PRODUCT = "arm:scp-firmware \
+               arm:scp_firmware"

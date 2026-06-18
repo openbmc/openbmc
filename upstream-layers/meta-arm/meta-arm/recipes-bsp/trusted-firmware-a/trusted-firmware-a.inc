@@ -245,4 +245,5 @@ INSANE_SKIP:${PN}-dbg += "buildpaths"
 CVE_PRODUCT = "arm:arm-trusted-firmware \
                arm:trusted_firmware-a \
                arm:arm_trusted_firmware \
-               arm_trusted_firmware_project:arm_trusted_firmware"
+               arm_trusted_firmware_project:arm_trusted_firmware \
+               trustedfirmware:trusted_firmware-a"
