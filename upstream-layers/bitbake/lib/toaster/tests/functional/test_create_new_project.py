@@ -15,22 +15,6 @@ from selenium.webdriver.common.by import By
 
 class TestCreateNewProject(SeleniumFunctionalTestCase):
 
-    def test_create_new_project_master(self):
-        """ Test create new project using:
-          - Project Name: Any string
-          - Release: Yocto Project master (option value: 3)
-          - Merge Toaster settings: False
-        """
-        release = '3'
-        release_title = 'Yocto Project master'
-        project_name = 'projectmaster'
-        self.create_new_project(
-            project_name,
-            release,
-            release_title,
-            False,
-        )
-
     def test_create_new_project_wrynose(self):
         """ Test create new project using:
           - Project Name: Any string
@@ -47,6 +31,37 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
             True,
         )
 
+    def test_create_new_project_local(self):
+        """ Test create new project using:
+          - Project Name: Any string
+          - Release: Yocto Project "Local" (option value: 2)
+          - Merge Toaster settings: True
+        """
+        release = '2'
+        release_title = 'Local Yocto Project'
+        project_name = 'projectlocal'
+        self.create_new_project(
+            project_name,
+            release,
+            release_title,
+            True,
+        )
+
+    def test_create_new_project_master(self):
+        """ Test create new project using:
+          - Project Name: Any string
+          - Release: Yocto Project "Master" (option value: 3)
+          - Merge Toaster settings: False
+        """
+        release = '3'
+        release_title = 'Yocto Project master'
+        project_name = 'projectmaster'
+        self.create_new_project(
+            project_name,
+            release,
+            release_title,
+            False,
+        )
 
     def test_create_new_project_scarthgap(self):
         """ Test create new project using:
@@ -57,22 +72,6 @@ class TestCreateNewProject(SeleniumFunctionalTestCase):
         release = '4'
         release_title = 'Yocto Project 5.0 "Scarthgap"'
         project_name = 'projectscarthgap'
-        self.create_new_project(
-            project_name,
-            release,
-            release_title,
-            True,
-        )
-
-    def test_create_new_project_local(self):
-        """ Test create new project using:
-          - Project Name: Any string
-          - Release: Local Yocto Project (option value: 2)
-          - Merge Toaster settings: True
-        """
-        release = '2'
-        release_title = 'Local Yocto Project'
-        project_name = 'projectlocal'
         self.create_new_project(
             project_name,
             release,

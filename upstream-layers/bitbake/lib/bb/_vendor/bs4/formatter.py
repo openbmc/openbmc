@@ -1,4 +1,4 @@
-from bs4.dammit import EntitySubstitution
+from .dammit import EntitySubstitution
 
 class Formatter(EntitySubstitution):
     """Describes a strategy to use when outputting a parse tree to a string.

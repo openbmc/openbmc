@@ -418,12 +418,13 @@ def setup_bitbake_build(bitbake_config, layerdir, setupdir, thisdir, update_bb_c
 
     readme_extra = ""
     if init_vscode:
-        readme_extra = "\n\nTo edit the code in VSCode, open the workspace: code {}\n".format(workspace_file)
+        readme_extra = "\nTo edit the code in VSCode, open the workspace: code {}\n".format(workspace_file)
 
     readme = """{}\n\nAdditional information is in {} and {}\n
 Source the environment using '. {}' to run builds from the command line.\n
 {}\n
-The bitbake configuration files (local.conf, bblayers.conf and more) can be found in {}/conf{}""".format(
+The bitbake configuration files (local.conf, bblayers.conf and more) can be found in {}/conf
+{}""".format(
         bitbake_config["description"],
         os.path.join(bitbake_builddir,'conf/conf-summary.txt'),
         os.path.join(bitbake_builddir,'conf/conf-notes.txt'),

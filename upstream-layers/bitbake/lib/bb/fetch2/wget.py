@@ -27,8 +27,8 @@ from   bb.fetch2 import FetchMethod
 from   bb.fetch2 import FetchError
 from   bb.fetch2 import logger
 from   bb.fetch2 import runfetchcmd
-from   bs4 import BeautifulSoup
-from   bs4 import SoupStrainer
+from   bb._vendor.bs4 import BeautifulSoup
+from   bb._vendor.bs4 import SoupStrainer
 
 class WgetProgressHandler(bb.progress.LineFilterProgressHandler):
     """

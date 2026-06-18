@@ -51,7 +51,10 @@ class LocalhostBEController(BuildEnvironmentController):
             env=os.environ.copy()
 
         logger.debug("lbc_shellcmd: (%s) %s" % (cwd, command))
-        p = subprocess.Popen(command, cwd = cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        if isinstance(command, str):
+            p = subprocess.Popen(command, cwd = cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
+        else:
+            p = subprocess.Popen(command, cwd = cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
         if nowait:
             return
         (out,err) = p.communicate()
@@ -136,7 +139,7 @@ class LocalhostBEController(BuildEnvironmentController):
         cached_layers = {}
 
         try:
-            for remotes in self._shellcmd("git remote -v", self.be.sourcedir,env=git_env).split("\n"):
+            for remotes in self._shellcmd(['git', 'remote', '-v'], self.be.sourcedir, env=git_env).split("\n"):
                 try:
                     remote = remotes.split("\t")[1].split(" ")[0]
                     if remote not in cached_layers:
@@ -172,8 +175,7 @@ class LocalhostBEController(BuildEnvironmentController):
             # see if our directory is a git repository
             if os.path.exists(localdirname):
                 try:
-                    localremotes = self._shellcmd("git remote -v",
-                                                  localdirname,env=git_env)
+                    localremotes = self._shellcmd(['git' ,'remote', '-v'], localdirname, env=git_env)
                     # NOTE: this nice-to-have check breaks when using git remaping to get past firewall
                     #       Re-enable later with .gitconfig remapping checks
                     #if not giturl in localremotes and commit != 'HEAD':
@@ -186,12 +188,12 @@ class LocalhostBEController(BuildEnvironmentController):
             else:
                 if giturl in cached_layers:
                     logger.debug("localhostbecontroller git-copying %s to %s" % (cached_layers[giturl], localdirname))
-                    self._shellcmd("git clone \"%s\" \"%s\"" % (cached_layers[giturl], localdirname),env=git_env)
-                    self._shellcmd("git remote remove origin", localdirname,env=git_env)
-                    self._shellcmd("git remote add origin \"%s\"" % giturl, localdirname,env=git_env)
+                    self._shellcmd(['git', 'clone', cached_layers[giturl], localdirname], env=git_env)
+                    self._shellcmd(['git', 'remote', 'remove', 'origin'], localdirname, env=git_env)
+                    self._shellcmd(['git', 'remote', 'add', 'origin', giturl], localdirname, env=git_env)
                 else:
                     logger.debug("localhostbecontroller: cloning %s in %s" % (giturl, localdirname))
-                    self._shellcmd('git clone "%s" "%s"' % (giturl, localdirname),env=git_env)
+                    self._shellcmd(['git', 'clone', giturl, localdirname], env=git_env)
 
             # branch magic name "HEAD" will inhibit checkout
             if commit != "HEAD":
@@ -199,7 +201,8 @@ class LocalhostBEController(BuildEnvironmentController):
                 ref = commit if re.match('^[a-fA-F0-9]+$', commit) else 'origin/%s' % commit
                 # DEBUGGING NOTE: this is the 'git fetch" to disable after the initial clone to
                 # prevent inserted debugging commands from being lost
-                self._shellcmd('git fetch && git reset --hard "%s"' % ref, localdirname,env=git_env)
+                self._shellcmd(['git', 'fetch'], localdirname, env=git_env)
+                self._shellcmd(['git', 'reset', '--hard', ref], localdirname, env=git_env)
 
             # verify our repositories
             for name, dirpath, index in gitrepos[(giturl, commit)]:

@@ -14,7 +14,7 @@
 # that hard to enable pull mode.
 import re
 
-from ply import lex
+from bb._vendor.ply import lex
 from bb.pysh.sherrors import *
 
 class NeedMore(Exception):

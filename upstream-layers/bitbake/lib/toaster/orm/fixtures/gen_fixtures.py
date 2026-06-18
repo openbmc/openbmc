@@ -4,7 +4,7 @@
 #
 # Generate Toaster Fixtures for 'poky.xml' and 'oe-core.xml'
 #
-# Copyright (C) 2022      Wind River Systems
+# Copyright (C) 2026      Wind River Systems
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Edit the 'current_releases' table for each new release cycle
@@ -414,6 +414,68 @@ def generate_oe_core():
     fd.close()
 
 #################################
+# Update test project list
+#
+
+def generate_test():
+    this_path = os.path.dirname(os.path.abspath(__file__))
+    test_script = os.path.join(this_path,"../../tests/functional/test_create_new_project.py")
+
+    is_copy = True
+    out_lines = ""
+    with open(test_script, 'r') as file_fd:
+        lines = file_fd.readlines()
+        for line in lines:
+            if 'test_create_new_project_without_name' in line:
+                is_copy = True
+                out_lines += '\n'
+            if is_copy:
+                out_lines += line
+            if line.startswith('class TestCreateNewProject'):
+                is_copy = False
+                # Insert new project entries
+
+                for id,release in enumerate(current_releases):
+                    release_id = id + 1
+                    release_name = release[0]
+                    release_merge = 'True'
+                    release_version = ''
+                    if 'Master' == release_name:
+                        release_name = 'Master'
+                        release_title = 'Yocto Project master'
+                        release_merge = 'False'
+                    elif 'HEAD' == release_name:
+                        release_name = 'Local'
+                        release_title = 'Local Yocto Project'
+                    else:
+                        release_title = f'Yocto Project {release[1]} "{release_name}"'
+                        release_version = f'{release[1]} '
+                    # Insert project
+                    test_release_def = f'''
+    def test_create_new_project_{release_name.lower()}(self):
+        """ Test create new project using:
+          - Project Name: Any string
+          - Release: Yocto Project {release_version}"{release_name}" (option value: {release_id})
+          - Merge Toaster settings: {release_merge}
+        """
+        release = '{release_id}'
+        release_title = '{release_title}'
+        project_name = 'project{release_name.lower()}'
+        self.create_new_project(
+            project_name,
+            release,
+            release_title,
+            {release_merge},
+        )
+'''
+                    out_lines += test_release_def
+
+    with open('test_create_new_project.py', 'w') as file_fd:
+        file_fd.write(out_lines)
+    print(f"Output: 'test_create_new_project.py'")
+    os.system(f"mv -f test_create_new_project.py {test_script}")
+
+#################################
 # Help
 #
 
@@ -431,8 +493,9 @@ def main(argv):
     global verbose
 
     parser = argparse.ArgumentParser(description='gen_fixtures.py: table generate the fixture files')
-    parser.add_argument('--poky', '-p', action='store_const', const='poky', dest='command', help='Generate the poky.xml file')
-    parser.add_argument('--oe-core', '-o', action='store_const', const='oe_core', dest='command', help='Generate the oe-core.xml file')
+    parser.add_argument('--poky', '-p', action='store_const', const='poky', dest='command', help="Generate the 'poky.xml' file")
+    parser.add_argument('--oe-core', '-o', action='store_const', const='oe_core', dest='command', help="Generate the 'oe-core.xml' file")
+    parser.add_argument('--test', '-t', action='store_const', const='test', dest='command', help="Update the 'test_create_new_project.py' file")
     parser.add_argument('--all', '-a', action='store_const', const='all', dest='command', help='Generate all fixture files')
     parser.add_argument('--list', '-l', action='store_const', const='list', dest='command', help='List the release table')
     parser.add_argument('--verbose', '-v', action='store_true', dest='verbose', help='Enable verbose debugging output')
@@ -443,11 +506,12 @@ def main(argv):
         generate_poky()
     elif 'oe_core' == args.command:
         generate_oe_core()
+    elif 'test' == args.command:
+        generate_test()
     elif 'all' == args.command:
         generate_poky()
         generate_oe_core()
-    elif 'all' == args.command:
-        list_releases()
+        generate_test()
     elif 'list' == args.command:
         list_releases()
 

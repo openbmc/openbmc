@@ -236,7 +236,7 @@ for param in $*; do
                 manage_cmd="$manage_cmd $param"
             else
                 echo "$HELP"
-                exit 1
+                return 1
             fi
     ;;
 

@@ -27,7 +27,7 @@ import toastergui
 
 from toastergui.tables import SoftwareRecipesTable
 import json
-from bs4 import BeautifulSoup
+from bb._vendor.bs4 import BeautifulSoup
 import string
 
 PROJECT_NAME = "test project"

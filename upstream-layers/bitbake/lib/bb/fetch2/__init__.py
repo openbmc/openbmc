@@ -1056,6 +1056,8 @@ def build_mirroruris(origud, mirrors, ld):
                     newud = FetchData(newuri, ld)
                     newud.ignore_checksums = True
                     newud.setup_localpath(ld)
+                    if hasattr(ud, 'unpack_tracer'):
+                        newud.unpack_tracer = ud.unpack_tracer
                 except bb.fetch2.BBFetchException as e:
                     logger.debug("Mirror fetch failure for url %s (original url: %s)" % (newuri, origud.url))
                     logger.debug(str(e))

@@ -17,7 +17,7 @@ import subprocess
 import re
 from functools import cmp_to_key
 import bb
-from   bb.fetch2 import logger, subprocess_setup, UnpackError
+from   bb.fetch2 import logger, subprocess_setup, UnpackError, runfetchcmd
 from   bb.fetch2.wget import Wget
 
 
@@ -110,19 +110,15 @@ class Crate(Wget):
         # possible metadata we need to write out
         metadata = {}
 
-        # change to the rootdir to unpack but save the old working dir
-        save_cwd = os.getcwd()
-        os.chdir(rootdir)
-
         bp = d.getVar('BP')
         if bp == ud.parm.get('name'):
-            cmd = "tar -xz --no-same-owner -f %s" % thefile
+            cmd = ['tar', '-xz', '--no-same-owner', '-f', thefile]
             ud.unpack_tracer.unpack("crate-extract", rootdir)
         else:
             cargo_bitbake = self._cargo_bitbake_path(rootdir)
             ud.unpack_tracer.unpack("cargo-extract", cargo_bitbake)
 
-            cmd = "tar -xz --no-same-owner -f %s -C %s" % (thefile, cargo_bitbake)
+            cmd = ['tar', '-xz', '--no-same-owner', '-f', thefile, '-C', cargo_bitbake]
 
             # ensure we've got these paths made
             bb.utils.mkdirhier(cargo_bitbake)
@@ -135,17 +131,8 @@ class Crate(Wget):
             metadata['files'] = {}
             metadata['package'] = tarhash
 
-        path = d.getVar('PATH')
-        if path:
-            cmd = "PATH=\"%s\" %s" % (path, cmd)
         bb.note("Unpacking %s to %s/" % (thefile, os.getcwd()))
-
-        ret = subprocess.call(cmd, preexec_fn=subprocess_setup, shell=True)
-
-        os.chdir(save_cwd)
-
-        if ret != 0:
-            raise UnpackError("Unpack command %s failed with return value %s" % (cmd, ret), ud.url)
+        runfetchcmd(cmd, d, workdir=rootdir)
 
         # if we have metadata to write out..
         if len(metadata) > 0:

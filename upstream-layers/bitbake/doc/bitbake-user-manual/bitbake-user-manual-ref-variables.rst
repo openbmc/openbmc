@@ -135,6 +135,16 @@ overview of their function and contents.
       Specifies the path to a log file into which BitBake's user interface
       writes output during the build.
 
+      This variable's value remains persistent during the entire execution of
+      the BitBake server. Changes to this variable will only take effect
+      after a server restart, which can be accomplished with the ``bitbake
+      --kill-server`` command.
+
+      .. note::
+
+         For more details on how to make the BitBake server persistent, see the
+         :term:`BB_SERVER_TIMEOUT` variable.
+
    :term:`BB_CURRENTTASK`
       Contains the name of the currently running task. The name does not
       include the ``do_`` prefix.

@@ -135,13 +135,10 @@ class GoMod(Wget):
         unpackdir = os.path.dirname(unpackpath)
         bb.utils.mkdirhier(unpackdir)
         ud.unpack_tracer.unpack("file-copy", unpackdir)
-        cmd = f"cp {ud.localpath} {unpackpath}"
-        path = d.getVar('PATH')
-        if path:
-            cmd = f"PATH={path} {cmd}"
+        cmd = ['cp', ud.localpath, unpackpath]
         name = os.path.basename(unpackpath)
         bb.note(f"Unpacking {name} to {unpackdir}/")
-        subprocess.check_call(cmd, shell=True, preexec_fn=subprocess_setup)
+        runfetchcmd(cmd, d)
 
         if name.endswith('.zip'):
             # Unpack the go.mod file from the zip file

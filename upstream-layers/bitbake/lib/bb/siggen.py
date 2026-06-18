@@ -12,7 +12,7 @@ import tempfile
 import pickle
 import bb.data
 import difflib
-import simplediff
+from bb._vendor import simplediff
 import json
 import types
 from contextlib import contextmanager

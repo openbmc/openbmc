@@ -68,7 +68,7 @@ class CSS(object):
         result (a common mistake).
         """
         # Import here to avoid circular import
-        from bs4.element import ResultSet
+        from .element import ResultSet
         return ResultSet(None, results)
 
     def compile(self, select, namespaces=None, flags=0, **kwargs):

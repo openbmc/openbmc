@@ -13,7 +13,7 @@ import sys
 import bb.pysh.pyshlex as pyshlex
 tokens = pyshlex.tokens
 
-from ply import yacc
+from bb._vendor.ply import yacc
 import bb.pysh.sherrors as sherrors
     
 class IORedirect:

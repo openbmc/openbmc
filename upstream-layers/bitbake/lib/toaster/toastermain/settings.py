@@ -229,8 +229,8 @@ from os.path import dirname as DN
 SITE_ROOT=DN(DN(os.path.abspath(__file__)))
 
 import subprocess
-TOASTER_BRANCH = subprocess.Popen('git branch | grep "^* " | tr -d "* "', cwd = SITE_ROOT, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
-TOASTER_REVISION = subprocess.Popen('git rev-parse HEAD ', cwd = SITE_ROOT, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0]
+TOASTER_BRANCH = subprocess.check_output(['git', 'branch', '--show-current'], cwd=SITE_ROOT, text=True).strip()
+TOASTER_REVISION = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=SITE_ROOT, text=True).strip()
 
 ROOT_URLCONF = 'toastermain.urls'
 

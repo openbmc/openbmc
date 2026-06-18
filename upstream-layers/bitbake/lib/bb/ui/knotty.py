@@ -14,7 +14,7 @@ import io
 import os
 import sys
 import logging
-import progressbar
+from bb._vendor import progressbar
 import signal
 import bb.msg
 import time

@@ -7,14 +7,14 @@ __all__ = [
 
 import warnings
 import re
-from bs4.builder import (
+from . import (
     DetectsXMLParsedAsHTML,
     PERMISSIVE,
     HTML,
     HTML_5,
     HTMLTreeBuilder,
     )
-from bs4.element import (
+from ..element import (
     NamespacedAttribute,
     nonwhitespace_re,
 )
@@ -23,7 +23,7 @@ from html5lib.constants import (
     namespaces,
     prefixes,
     )
-from bs4.element import (
+from ..element import (
     Comment,
     Doctype,
     NavigableString,
@@ -134,7 +134,7 @@ class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
         if soup:
             self.soup = soup
         else:
-            from bs4 import BeautifulSoup
+            from .. import BeautifulSoup
             # TODO: Why is the parser 'html.parser' here? To avoid an
             # infinite loop?
             self.soup = BeautifulSoup(
@@ -180,7 +180,7 @@ class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
         return TextNode(Comment(data), self.soup)
 
     def fragmentClass(self):
-        from bs4 import BeautifulSoup
+        from .. import BeautifulSoup
         # TODO: Why is the parser 'html.parser' here? To avoid an
         # infinite loop?
         self.soup = BeautifulSoup("", "html.parser")
@@ -198,7 +198,7 @@ class TreeBuilderForHtml5lib(treebuilder_base.TreeBuilder):
         return treebuilder_base.TreeBuilder.getFragment(self).element
 
     def testSerializer(self, element):
-        from bs4 import BeautifulSoup
+        from .. import BeautifulSoup
         rv = []
         doctype_re = re.compile(r'^(.*?)(?: PUBLIC "(.*?)"(?: "(.*?)")?| SYSTEM "(.*?)")?$')
 
