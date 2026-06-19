@@ -10,7 +10,7 @@ DEPENDS += " \
     phosphor-logging \
     libgpiod \
     "
-SRCREV = "95d33f1ef178d5d905b78a1e43fd3c91b2f53a22"
+SRCREV = "b8072056e50001eff5f18baf225005721849d8fd"
 PACKAGECONFIG ??= "signals handler"
 PACKAGECONFIG[signals] = ",,gpioplus nlohmann-json,"
 PACKAGECONFIG[handler] = ",,,${VIRTUAL-RUNTIME_obmc-host-state-manager} ${VIRTUAL-RUNTIME_obmc-chassis-state-manager}"
