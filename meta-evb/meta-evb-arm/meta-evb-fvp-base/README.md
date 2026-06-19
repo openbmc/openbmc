@@ -69,8 +69,38 @@ Redfish--|             /dev/ttyAMA1 |-------------- UART --------------|       |
 5. Configure a TAP interface named `tap1` for BMC out-of-band access.
     - Sample setup on Ubuntu (requires sudo) is given below
         ```sh
+        # Install dependencies
         sudo apt update
         sudo apt install qemu-kvm libvirt-daemon-system iproute2 bridge-utils
+
+        # Configure bridge virbr0 with ipv6 support
+        cat > "default.xml" <<EOF
+        <network>
+            <name>default</name>
+            <forward mode='nat'>
+                <nat>
+                    <port start='1024' end='65535'/>
+                </nat>
+            </forward>
+            <bridge name='virbr0' stp='on' delay='0'/>
+            <ip address='192.168.122.1' netmask='255.255.255.0'>
+                <dhcp>
+                    <range start='192.168.122.2' end='192.168.122.254'/>
+                </dhcp>
+            </ip>
+            <ip family='ipv6' address='fd00:abcd::1' prefix='64'>
+                <dhcp>
+                    <range start='fd00:abcd::100' end='fd00:abcd::1ff'/>
+                </dhcp>
+          </ip>
+        </network>
+        EOF
+
+        sudo virsh net-define default.xml
+        sudo virsh net-start virbr0
+        ip addr show virbr0
+
+        # Configure tap interface
         sudo ip tuntap add dev tap1 mode tap user $(whoami)
         sudo ifconfig tap1 0.0.0.0 promisc up
         sudo brctl addif virbr0 tap1
