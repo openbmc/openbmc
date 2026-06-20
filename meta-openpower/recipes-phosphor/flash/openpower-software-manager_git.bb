@@ -65,7 +65,7 @@ FILES:${PN} += "${datadir}/dbus-1/system.d/org.open_power.Software.Host.Updater.
 
 SRC_URI = "git://github.com/openbmc/openpower-pnor-code-mgmt;branch=master;protocol=https"
 
-SRCREV = "c163d4fa8926761fffdfd155ae70ba12b3ec0eae"
+SRCREV = "709681eb53b7fc21b9f332645ede26b5de3c8b4d"
 
 DBUS_SERVICE:${PN} += "org.open_power.Software.Host.Updater.service"
 
