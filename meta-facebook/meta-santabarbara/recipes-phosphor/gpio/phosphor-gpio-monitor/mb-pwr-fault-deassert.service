@@ -1,0 +1,7 @@
+[Unit]
+Description=MB Power Fault Deassert Handler
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/mb-pwr-fault-handler "deassert"
+SyslogIdentifier=mb-pwr-fault-deassert

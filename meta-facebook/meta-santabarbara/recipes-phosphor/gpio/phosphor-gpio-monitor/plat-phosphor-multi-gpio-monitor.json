@@ -492,6 +492,26 @@
         "Continue": true
     },
     {
+        "Name": "SYS_PWR_FAULT_ALERT",
+        "LineName": "SYS_PWR_FAULT_ALERT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "mb-pwr-fault-assert.service"
+            ],
+            "FALLING": [
+                "mb-pwr-fault-deassert.service"
+            ],
+            "INIT_HIGH": [
+                "mb-pwr-fault-assert.service"
+            ],
+            "INIT_LOW": [
+                "mb-pwr-fault-deassert.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "SWB_PWR_FAULT_N",
         "LineName": "SWB_PWR_FAULT_N",
         "EventMon": "BOTH",

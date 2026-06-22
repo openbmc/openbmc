@@ -1,0 +1,78 @@
+#!/bin/bash
+
+MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Santabarbara_MB/SYS_PWR_FAULT_ALERT"
+STASH_FILE="/var/lib/phosphor-gpio-monitor/SYS_PWR_FAULT_ALERT.log_entry"
+
+declare -A ERROR_MAP=(
+    ["11"]="S5_PVDD33 Power on Fail"
+    ["12"]="S5_PVDD18 Power on Fail"
+    ["13"]="Wait SLP_S3 Power on Fail"
+    ["14"]="S0_PVDDIO Power on Fail"
+    ["15"]="PVDDCR_SOC_P0 Power on Fail"
+    ["16"]="PVDDCR_CPU0_P0 Power on Fail"
+    ["17"]="PVDDCR_CPU1_P0 Power on Fail"
+
+    ["21"]="P12V_E1S_0 Power Fault"
+    ["22"]="ASIC0 Power Fault"
+    ["23"]="ASIC1 Power Fault"
+    ["24"]="ASIC2 Power Fault"
+    ["25"]="ASIC3 Power Fault"
+    ["26"]="SWB Power Fault"
+    ["27"]="PWRGD_PVDD33_S5"
+    ["28"]="PWRGD_PVDD18_S5_P0"
+    ["29"]="PVDDIO_MEM_S3_P0 Power Fault"
+    ["2A"]="PVDDIO_P0 Power Fault"
+    ["2B"]="PVDDCR_SOC_P0 Power Fault"
+    ["2C"]="PVDDCR_CPU0_P0 Power Fault"
+    ["2D"]="PVDDCR_CPU1_P0 Power Fault"
+
+    ["30"]="System Leak"
+    ["40"]="System power disable by RMC"
+    ["50"]="STBY Fault"
+    ["60"]="SLP_S5 Fault"
+    ["70"]="No RMC power enable"
+
+    ["80"]="ASIC0 Power on Fail"
+    ["81"]="ASIC1 Power on Fail"
+    ["82"]="ASIC2 Power on Fail"
+    ["83"]="ASIC3 Power on Fail"
+
+    ["90"]="SWB Fault"
+
+    ["A1"]="DIMM CH A-D Power Fault"
+    ["A2"]="DIMM CH E-H Power Fault"
+    ["A3"]="DIMM CH I-L Power Fault"
+    ["A4"]="DIMM CH M-P Power Fault"
+
+    ["B0"]="CPU THERMTRIP fault"
+    ["B1"]="RB#0 THERMTRIP fault"
+    ["B2"]="RB#1 THERMTRIP fault"
+    ["B3"]="RB#2 THERMTRIP fault"
+    ["B4"]="RB#3 THERMTRIP fault"
+)
+
+action=$1
+
+case $action in
+    "assert")
+        if [ ! -s "$STASH_FILE" ]; then
+            raw=$(i2cget -fy 21 0x33 0x20)
+            error_code=${raw:2}
+            error_code=$(echo "$error_code" | tr '[:lower:]' '[:upper:]')
+            decode=${ERROR_MAP[$error_code]:-"Unknown Error Code (0x${error_code})"}
+            /usr/bin/log-create "$MSG_ID" --json \
+                "{ \"POWER_RAIL\": \"${DEVICE_PATH}\", \"FAILURE_DATA\": \"MB_CPLD_PWR_FAULT - [${decode}]\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            log-resolve -p "$(< "${STASH_FILE}")"
+            rm "${STASH_FILE}"
+        fi
+        ;;
+esac
+
+exit 0

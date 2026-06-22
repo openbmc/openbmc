@@ -25,6 +25,8 @@ SERVICE_LIST = "assert-module-power-good@.service \
                 vr-fault-deassert-log@.service \
                 swb-pwr-fault-assert.service \
                 swb-pwr-fault-deassert.service \
+                mb-pwr-fault-assert.service \
+                mb-pwr-fault-deassert.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -48,6 +50,7 @@ SRC_URI += " \
     file://thermal-event-logger \
     file://vr-fault-event-logger \
     file://swb-pwr-fault-handler \
+    file://mb-pwr-fault-handler \
     file://phosphor-multi-gpio-monitor.conf \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
@@ -88,6 +91,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/vr-fault-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/swb-pwr-fault-handler ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/mb-pwr-fault-handler ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

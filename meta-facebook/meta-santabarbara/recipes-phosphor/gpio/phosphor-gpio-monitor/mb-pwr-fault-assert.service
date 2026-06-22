@@ -1,0 +1,7 @@
+[Unit]
+Description=MB Power Fault Assert Handler
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/mb-pwr-fault-handler "assert"
+SyslogIdentifier=mb-pwr-fault-assert

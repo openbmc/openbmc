@@ -24,25 +24,27 @@ add_sel()
 }
 
 declare -A ERROR_MAP=(
-    ["11"]="S5_PVDD33 Fault(no power good)"
-    ["12"]="S5_PVDD18 Fault"
-    ["13"]="Wait SLP_S3 Fault"
-    ["14"]="S0_PVDDIO Fault"
-    ["15"]="PVDDCR_SOC_P0 Fault"
-    ["16"]="PVDDCR_CPU0_P0 Fault"
-    ["17"]="PVDDCR_CPU1_P0 Fault"
+    ["11"]="S5_PVDD33 Power on Fail"
+    ["12"]="S5_PVDD18 Power on Fail"
+    ["13"]="Wait SLP_S3 Power on Fail"
+    ["14"]="S0_PVDDIO Power on Fail"
+    ["15"]="PVDDCR_SOC_P0 Power on Fail"
+    ["16"]="PVDDCR_CPU0_P0 Power on Fail"
+    ["17"]="PVDDCR_CPU1_P0 Power on Fail"
 
-    ["21"]="P12V_E1S_0 Power dropped"
-    ["22"]="ASIC0 Power dropped"
-    ["23"]="ASIC1 Power dropped"
-    ["24"]="ASIC2 Power dropped"
-    ["25"]="ASIC3 Power dropped"
-    ["26"]="SWB Power dropped"
-    ["27"]="PVDDIO_MEM_S3_P0 Power dropped"
-    ["28"]="PVDDIO_P0 Power dropped"
-    ["29"]="PVDDCR_SOC_P0 Power dropped"
-    ["2A"]="PVDDCR_CPU0_P0 Power dropped"
-    ["2B"]="PVDDCR_CPU1_P0 Power dropped"
+    ["21"]="P12V_E1S_0 Power Fault"
+    ["22"]="ASIC0 Power Fault"
+    ["23"]="ASIC1 Power Fault"
+    ["24"]="ASIC2 Power Fault"
+    ["25"]="ASIC3 Power Fault"
+    ["26"]="SWB Power Fault"
+    ["27"]="PWRGD_PVDD33_S5"
+    ["28"]="PWRGD_PVDD18_S5_P0"
+    ["29"]="PVDDIO_MEM_S3_P0 Power Fault"
+    ["2A"]="PVDDIO_P0 Power Fault"
+    ["2B"]="PVDDCR_SOC_P0 Power Fault"
+    ["2C"]="PVDDCR_CPU0_P0 Power Fault"
+    ["2D"]="PVDDCR_CPU1_P0 Power Fault"
 
     ["30"]="System Leak"
     ["40"]="System power disable by RMC"
@@ -50,12 +52,23 @@ declare -A ERROR_MAP=(
     ["60"]="SLP_S5 Fault"
     ["70"]="No RMC power enable"
 
-    ["80"]="ASIC0 Fault"
-    ["81"]="ASIC1 Fault"
-    ["82"]="ASIC2 Fault"
-    ["83"]="ASIC3 Fault"
+    ["80"]="ASIC0 Power on Fail"
+    ["81"]="ASIC1 Power on Fail"
+    ["82"]="ASIC2 Power on Fail"
+    ["83"]="ASIC3 Power on Fail"
 
     ["90"]="SWB Fault"
+
+    ["A1"]="DIMM CH A-D Power Fault"
+    ["A2"]="DIMM CH E-H Power Fault"
+    ["A3"]="DIMM CH I-L Power Fault"
+    ["A4"]="DIMM CH M-P Power Fault"
+
+    ["B0"]="CPU THERMTRIP fault"
+    ["B1"]="RB#0 THERMTRIP fault"
+    ["B2"]="RB#1 THERMTRIP fault"
+    ["B3"]="RB#2 THERMTRIP fault"
+    ["B4"]="RB#3 THERMTRIP fault"
 )
 
 declare -A GPIO_MODULE_PWR_EN=(
