@@ -34,7 +34,8 @@ case $action in
     "deassert")
         MSG_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
         if [ -s "${STASH_FILE}" ]; then
-            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+            log-resolve -p "$(< "${STASH_FILE}")"
+            rm "${STASH_FILE}"
         fi
         /usr/bin/log-create "$MSG_ID" --json \
                 "{ \"POWER_RAIL\": \"${DEVICE_PATH}\"}"

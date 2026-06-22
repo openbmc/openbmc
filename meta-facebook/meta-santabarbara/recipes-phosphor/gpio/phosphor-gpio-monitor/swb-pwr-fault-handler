@@ -76,7 +76,8 @@ case $action in
 
     "deassert")
         if [ -s "${STASH_FILE}" ]; then
-            log-resolve -p "$(< "${STASH_FILE}")" && rm "${STASH_FILE}"
+            log-resolve -p "$(< "${STASH_FILE}")"
+            rm "${STASH_FILE}"
         fi
         ;;
 esac
