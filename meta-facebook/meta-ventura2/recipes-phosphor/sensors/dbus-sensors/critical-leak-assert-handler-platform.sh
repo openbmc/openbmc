@@ -7,11 +7,19 @@ _platform_get_leak_config()             {
 }
 
 # Output: RPU_READY value (0 or 1)
-_platform_check_rpu_ready()             {
+eplatform_check_rpu_ready()             {
+    local soc_family
+    local addr
+    local bit=4
+
     # RPU_READY_PLD_R is managed by phosphor-multi-gpio-monitor.service
     # and not accessible from userspace. Read SGPIO register instead.
-    local addr=0x1e780538
-    local bit=4
+    soc_family=$(cat /sys/devices/soc0/family 2>/dev/null)
+    if [[ "$soc_family" == "AST2700" ]]; then
+        addr=0x14c0c00c
+    else
+        addr=0x1e780538
+    fi
     echo $(( ( $(devmem "$addr") >> bit ) & 1 ))
 }
 

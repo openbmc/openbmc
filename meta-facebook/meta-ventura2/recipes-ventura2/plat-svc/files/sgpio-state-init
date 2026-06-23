@@ -21,9 +21,16 @@ declare -A SGPIO_I2C_REG=(
 )
 
 sgpio_state_sync() {
+    SGPIO_CHIP_NAME=$(gpiodetect | grep "sgpiom" | awk '{print $1}')
+    if [ -z "$SGPIO_CHIP_NAME" ]; then
+        echo "Error: Could not find SGPIO chip" >&2
+        return 1
+    fi
+
     for port in $(printf "%s\n" "${!SGPIO_I2C_REG[@]}" | sort); do
         i2c_reg="${SGPIO_I2C_REG[$port]}"
         IFS=':' read -r bus addr reg <<<"$i2c_reg"
+
         if ! value=$(i2cget -f -y "$bus" "$addr" "$reg" 2>/dev/null); then
             echo "Error: Failed to read I2C (bus=$bus, addr=$addr, reg=$reg) for $port" >&2
             return 1
@@ -32,7 +39,8 @@ sgpio_state_sync() {
         port_idx=$((port))
 
         printf "SGPIO_PORT[0x%02X]=0x%02X\n" "$port" "$value"
-        args=(--mode=exit gpiochip2)
+
+        args=(--mode=exit "$SGPIO_CHIP_NAME")
         for i in {0..7}; do
             line=$(((port_idx * 8 + i) * 2 + 1))
             bit=$(((value >> i) & 0x1))
@@ -43,10 +51,10 @@ sgpio_state_sync() {
     done
 
     # Set SGPIO_REG_VALID(SGPIO[124:127])=0b0101
-    gpioset --mode=exit gpiochip2 249=0
-    gpioset --mode=exit gpiochip2 251=1
-    gpioset --mode=exit gpiochip2 253=0
-    gpioset --mode=exit gpiochip2 255=1
+    gpioset --mode=exit "$SGPIO_CHIP_NAME" 249=0
+    gpioset --mode=exit "$SGPIO_CHIP_NAME" 251=1
+    gpioset --mode=exit "$SGPIO_CHIP_NAME" 253=0
+    gpioset --mode=exit "$SGPIO_CHIP_NAME" 255=1
 
     echo "SGPIO sync completed"
 }
