@@ -4,7 +4,6 @@ OnFailure=check-i3c-hub@%i.service
 
 [Service]
 Type=oneshot
-ExecStartPre=-/bin/systemctl stop log-chassis-powercycle-sel@%i.service
 ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle %i
 
 [Install]

@@ -245,6 +245,7 @@ else
         add_sel "${msg}" "Error"
         exit 1
     fi
+    systemctl stop "log-chassis-powercycle-sel@$CHASSIS_ID.service"
     echo "Starting chassis$1 AC power cycle"
     chassis-power-cycle "$1"
 fi
