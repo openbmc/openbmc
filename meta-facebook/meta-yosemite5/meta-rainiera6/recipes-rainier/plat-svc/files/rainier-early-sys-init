@@ -4,6 +4,27 @@ source /usr/libexec/yosemite5-common-functions
 
 echo "Rainier initial value for I/O output pins"
 
+ALL_POWER_GOOD="wALL_POWER_OK"
+
+power_status()
+{
+    if [ "$(get_gpio "$ALL_POWER_GOOD")" = "1" ]; then
+        echo "on"
+    else
+        echo "off"
+    fi
+}
+
+if [ "$(power_status)" = "off" ]; then
+    value=1
+else
+    value=0
+fi
+
+# Default: PMBUS is from BMC and will switch to SOC when DC on
+set_gpio PMBUS_MUX_SEL_C0 "$value"
+set_gpio PMBUS_MUX_SEL_C1 "$value"
+
 # Enable JTAG Mux that connects BMC JTAG to SoC or CPLD.
 set_gpio JTAG_BMC_IOEXP_MUX_OE 0
 
