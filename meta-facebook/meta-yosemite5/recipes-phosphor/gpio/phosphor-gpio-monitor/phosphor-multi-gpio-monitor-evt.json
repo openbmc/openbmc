@@ -15,7 +15,7 @@
         "EventMon": "BOTH",
         "Targets": {
             "RISING": ["deassert-host-ready.service"],
-            "FALLING": ["assert-host-ready.service", "mctp_setup@cxl_mctp.service"]
+            "FALLING": ["assert-host-ready.service"]
         },
         "Continue": true
     },
