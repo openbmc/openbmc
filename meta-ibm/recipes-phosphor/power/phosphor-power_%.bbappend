@@ -20,3 +20,8 @@ FILES:${PN}:append:df-openpower = " ${datadir}/phosphor-power/psu.json"
 
 PSU_MONITOR_ENV_FMT = "obmc/power-supply-monitor/power-supply-monitor-{0}.conf"
 SYSTEMD_ENVIRONMENT_FILE:${PN}-monitor:append:ibm-ac-server = " ${@compose_list(d, 'PSU_MONITOR_ENV_FMT', 'OBMC_POWER_SUPPLY_INSTANCES')}"
+
+# If building for Huygens, add dependency to the phosphor-power-sequencer
+# service to wait for VPD collection to be complete. Dependency is not created
+# for other machines because it leads to a systemd dependency cycle.
+SYSTEMD_OVERRIDE:${PN}-control:append:huygens = " wait-vpd-parsers.conf:phosphor-power-control.service.d/wait-vpd-parsers.conf"
