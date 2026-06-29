@@ -73,7 +73,63 @@ set_product_versions_to_mb_cpld()
     done
 }
 
+ti_hsc_init()
+{
+    local BOARD="1KW_paddle_BD"
+    local FRU_NAME
+    local SOURCE
+
+    if ! FRU_NAME=$(find_fru_name "$BOARD"); then
+        echo "Can't find ${BOARD} FRU."
+        return
+    fi
+
+    SOURCE=$(get_product_source "$FRU_NAME")
+    if [ "$SOURCE" = "Unknown" ]; then
+        echo "Unknown Paddle HSC source."
+        return
+    fi
+
+    if [ "$SOURCE" = "HSC-TIC" ]; then
+        local BUS="8"
+        local ADDR="0x47"
+        local REG_WRITE_PROTECT="0xF8"
+        local REG_OC_TIMER="0xE6"
+        local REG_ALERT_MASK="0xDB"
+        local WRITE_PROTECT_VAL="0xA2"
+        local OC_TIMER_VAL="0x5c"
+        local ALERT_MASK_VAL="0x0102"
+        local READ_VAL
+
+        echo "Initializing TIC HSC"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_WRITE_PROTECT" "$WRITE_PROTECT_VAL" || echo "Failed to unlock write protection"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_OC_TIMER" "$OC_TIMER_VAL" || echo "Failed to set OC timer"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_ALERT_MASK" "$ALERT_MASK_VAL" w || echo "Failed to set alert mask"
+
+        READ_VAL=$(i2cget -y -f "$BUS" "$ADDR" "$REG_OC_TIMER" 2>/dev/null)
+        if [ -z "$READ_VAL" ]; then
+            echo "Failed to read OC timer"
+        elif [ "$READ_VAL" == "$OC_TIMER_VAL" ]; then
+            echo "OC timer set to $OC_TIMER_VAL"
+        else
+            echo "OC timer mismatch (W:$OC_TIMER_VAL R:$READ_VAL)"
+        fi
+
+        READ_VAL=""
+
+        READ_VAL=$(i2cget -y -f "$BUS" "$ADDR" "$REG_ALERT_MASK" w 2>/dev/null)
+        if [ -z "$READ_VAL" ]; then
+            echo "Failed to read alert mask"
+        elif [ "$READ_VAL" == "$ALERT_MASK_VAL" ]; then
+            echo "Alert mask set to $ALERT_MASK_VAL"
+        else
+            echo "Alert mask mismatch (W:$ALERT_MASK_VAL R:$READ_VAL)"
+        fi
+    fi
+}
+
 set_product_versions_to_mb_cpld
+ti_hsc_init
 
 echo "initial value for GPIO output pins"
 # set initial value for GPIO output pins

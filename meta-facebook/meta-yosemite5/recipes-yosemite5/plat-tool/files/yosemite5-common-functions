@@ -92,3 +92,32 @@ get_product_version()
 
     echo "$VERSION"
 }
+
+get_product_source()
+{
+    local FRU_NAME="$1"
+    local OUTPUT
+    local SOURCE
+    local OBJ_PATH="$FRU_ROOT/$FRU_NAME"
+
+    if [ -z "$FRU_NAME" ]; then
+        echo "get_product_source: no name provided" >&2
+        return 1
+    fi
+
+    if ! OUTPUT=$(busctl get-property --timeout=10s \
+        "$FRU_SVC" "$OBJ_PATH" "$FRU_SVC" BOARD_INFO_AM4 2>/dev/null); then
+        echo "Unknown"
+        return 1
+    fi
+
+    SOURCE=$(echo "$OUTPUT" | cut -d'"' -f2)
+
+    if [ -z "$SOURCE" ] || [ "$SOURCE" = "$OUTPUT" ]; then
+        echo "get_product_source: parse error for $FRU_NAME" >&2
+        echo "Unknown"
+        return 1
+    fi
+
+    echo "$SOURCE"
+}
