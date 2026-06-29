@@ -346,23 +346,23 @@
     },
     {
         "Name": "L_EDSFF0_PG",
-        "LineName": "L_EDSFF2_PG",
+        "LineName": "L_EDSFF0_PG",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF2_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@L_EDSFF2_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@L_EDSFF2_PG:deassert.service"]
+            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF0_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@L_EDSFF0_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@L_EDSFF0_PG:deassert.service"]
         },
         "Continue": true
     },
     {
         "Name": "L_EDSFF1_PG",
-        "LineName": "L_EDSFF3_PG",
+        "LineName": "L_EDSFF1_PG",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF3_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@L_EDSFF3_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@L_EDSFF3_PG:deassert.service"]
+            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF1_PG:assert.service"],
+            "FALLING":  ["ssd-pg-event-logger@L_EDSFF1_PG:assert.service"],
+            "RISING":   ["ssd-pg-event-logger@L_EDSFF1_PG:deassert.service"]
         },
         "Continue": true
     },
