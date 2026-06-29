@@ -39,7 +39,11 @@ HOST_DEFAULT_TARGETS:remove = " \
 # Host Cycle
 HOST_DEFAULT_TARGETS:remove = " \
     obmc-host-reboot@{}.target.wants/host-powercycle@{}.service \
-    obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.service \
+    obmc-host-reboot@{}.target.requires/obmc-host-shutdown@{}.target \
+    "
+
+CHASSIS_DEFAULT_TARGETS:remove = " \
+    obmc-host-shutdown@{}.target.requires/obmc-chassis-poweroff@{}.target \
     "
 
 RDEPENDS:${PN}:append = " bash"
