@@ -111,24 +111,25 @@ is_host_on() {
     [[ "$state" == "xyz.openbmc_project.State.Host.HostState.Running" ]]
 }
 
-learn_e1s_eid() {
-    local target_eid="$((MCTP_EID + 5))"
-    local network_path="/au/com/codeconstruct/mctp1/networks/1"
-    local interface="au.com.codeconstruct.MCTP.Network1"
-
-    echo "--- Starting E1S EID Discovery (Target EID: $target_eid) ---"
-
-    # Verification of Host State
+wait_for_host_on() {
     if ! is_host_on; then
         echo "Waiting for host power on..."
         while ! is_host_on; do
             sleep 10
         done
-        # Give the E1S some settle time after power is detected
+        # Give the device some settle time after power is detected
         sleep 3
     fi
+}
 
-    # Learn E1S EID loop
+learn_eid() {
+    local target_eid="$1"
+    local network_path="/au/com/codeconstruct/mctp1/networks/1"
+    local interface="au.com.codeconstruct.MCTP.Network1"
+
+    echo "--- Starting EID Discovery (Target EID: $target_eid) ---"
+
+    # Learn EID loop
     for ((i=1; i<=MAX_RETRIES; i++)); do
         echo "--- Learn Attempt $i/$MAX_RETRIES ---"
 
@@ -137,7 +138,7 @@ learn_e1s_eid() {
             "$interface" \
             LearnEndpoint y "$target_eid" --timeout=5; then
 
-            echo "--- Learn E1S EID $target_eid: SUCCESS ---"
+            echo "--- Learn EID $target_eid: SUCCESS ---"
             return 0
         fi
 
@@ -145,11 +146,25 @@ learn_e1s_eid() {
         sleep "$RETRY_DELAY"
     done
 
-    echo "ERROR: Failed to learn E1S EID $target_eid after $MAX_RETRIES attempts."
+    echo "ERROR: Failed to learn EID $target_eid after $MAX_RETRIES attempts."
     return 1
 }
 
+learn_iob_downstream_eid() {
+    local rc=0
 
+    learn_eid "$((MCTP_EID + 1))" || rc=$?  # NIC0
+    learn_eid "$((MCTP_EID + 3))" || rc=$?  # NIC1
+    learn_eid "$((MCTP_EID + 5))" || rc=$?  # E1S
+    return $rc
+}
+
+learn_clover_downstream_eid() {
+    local rc=0
+
+    learn_eid "$((MCTP_EID + 1))" || rc=$?  # NIC
+    return $rc
+}
 
 success=false
 for ((i=1; i<=MAX_RETRIES; i++)); do
@@ -194,8 +209,16 @@ fi
 
 case $MCTP_INTF in
     mcu1u2u1u4u1 | mcu1u2u1u3u1 | mcu1u2u2u3u1 | mcu1u2u2u4u1)
-        if ! learn_e1s_eid; then
-            echo "Error: E1S EID learning failed. Exiting."
+        wait_for_host_on
+        if ! learn_iob_downstream_eid; then
+            echo "Error: IOB downstream EID learning failed. Exiting."
+            exit 1
+        fi
+        ;;
+    mcu1u1u4u1)
+        wait_for_host_on
+        if ! learn_clover_downstream_eid; then
+            echo "Error: Clover downstream EID learning failed. Exiting."
             exit 1
         fi
         ;;
