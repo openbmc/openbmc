@@ -8,6 +8,8 @@ SRC_URI:append:gbmc = " \
 DEPENDS:append:gbmc = " jq-native"
 
 GBMCBR_IPMI_CHANNEL ?= "11"
+ALWAYS_AVAILABLE_ON_GBMCBR_IPMI_CHANNEL ?= "1"
+
 GBMC_NCSI_IPMI_CHANNEL ??= "1"
 GBMC_NCSI_IPMI_CHANNEL:npcm8xx ??= "2"
 # Only used for extra channels, GBMCBR and NCSI are autopopulated
@@ -16,17 +18,30 @@ GBMC_IPMI_CHANNEL_MAP ??= ""
 
 ENTITY_MAPPING ?= "default"
 
-gbmc_add_channel() {
+gbmc_add_access() {
+  local chan="$1"
+  local intf="$2"
+
+  jq --slurpfile ecfg ${UNPACKDIR}/gbmc_eth_access.json --arg CHAN "$chan" \
+    '. + {$CHAN: $ecfg[0]}' $access_json >${UNPACKDIR}/tmp-access.json
+  mv ${UNPACKDIR}/tmp-access.json $access_json
+}
+
+gbmc_add_config() {
   local chan="$1"
   local intf="$2"
 
   jq --slurpfile ecfg ${UNPACKDIR}/gbmc_eth_config.json --arg CHAN "$chan" --arg INTF "$intf" \
     '. + {$CHAN: ($ecfg[0] + {"name": $INTF})}' $config_json >${UNPACKDIR}/tmp-config.json
   mv ${UNPACKDIR}/tmp-config.json $config_json
+}
 
-  jq --slurpfile ecfg ${UNPACKDIR}/gbmc_eth_access.json --arg CHAN "$chan" \
-    '. + {$CHAN: $ecfg[0]}' $access_json >${UNPACKDIR}/tmp-access.json
-  mv ${UNPACKDIR}/tmp-access.json $access_json
+gbmc_add_channel() {
+  local chan="$1"
+  local intf="$2"
+
+  gbmc_add_config "$chan" "$intf"
+  gbmc_add_access "$chan" "$intf"
 }
 
 # Replace a channel in config.json to add gbmcbr reporting
@@ -46,7 +61,13 @@ do_install:append:gbmc() {
     cat $access_json
     exit 1
   fi
-  gbmc_add_channel ${GBMCBR_IPMI_CHANNEL} gbmcbr
+
+  if [ "${ALWAYS_AVAILABLE_ON_GBMCBR_IPMI_CHANNEL}" = "1" ]; then
+    gbmc_add_channel ${GBMCBR_IPMI_CHANNEL} gbmcbr
+  else
+    gbmc_add_config ${GBMCBR_IPMI_CHANNEL} gbmcbr
+  fi
+
   if [ -n "${GBMC_NCSI_IF_NAME}" ]; then
     gbmc_add_channel ${GBMC_NCSI_IPMI_CHANNEL} ${GBMC_NCSI_IF_NAME}
   fi
@@ -59,6 +80,11 @@ do_install:append:gbmc() {
     gbmc_add_channel $entry
     IFS="$OLDIFS"
   done
+
+  if [ -n "${GBMC_KCS_DEVICE}" ]; then
+    jq --arg NAME "${GBMC_KCS_DEVICE}" '."15".name = $NAME' $config_json >${WORKDIR}/tmp-config.json
+    mv ${WORKDIR}/tmp-config.json $config_json
+  fi
 }
 
 python do_gbmc_version () {
