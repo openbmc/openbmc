@@ -3,7 +3,7 @@ DESCRIPTION = "PLDM library implementing various PLDM specifications"
 HOMEPAGE = "https://github.com/openbmc/libpldm"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
-SRCREV = "c69102d1ce5adba549e9236577fed95b713edc49"
+SRCREV = "c3d60a426dd0c5e6e0691e601a4b709af199c8d0"
 
 LIBPLDM_ABI_DEVELOPMENT = "deprecated,stable,testing"
 LIBPLDM_ABI_MAINTENANCE = "stable,testing"
