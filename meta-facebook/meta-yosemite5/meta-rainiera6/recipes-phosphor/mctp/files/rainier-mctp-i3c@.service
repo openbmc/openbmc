@@ -1,0 +1,16 @@
+[Unit]
+Description=Rainier MCTP over I3C setup
+Conflicts=host-force-poweroff@%i.service host-graceful-poweroff@%i.service host-powerreset@%i.service obmc-host-stop@%i.target
+After=mctpd.service
+Before=pldmd.service
+Wants=mctpd.service
+Requires=mctpd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/mctp/rainier-mctp-i3c.sh start
+ExecStop=/usr/libexec/mctp/rainier-mctp-i3c.sh stop
+RemainAfterExit=yes
+
+[Install]
+WantedBy=obmc-host-started@%i.target
