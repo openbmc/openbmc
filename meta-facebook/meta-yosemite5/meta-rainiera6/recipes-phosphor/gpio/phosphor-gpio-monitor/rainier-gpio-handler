@@ -27,12 +27,19 @@ press_reset_button() {
     systemctl start obmc-host-force-warm-reboot@0.target
 }
 
+trigger_mctp_init() {
+    systemctl restart rainier-mctp-i3c@0.service
+}
+
 case "$GPIO_NET" in
     SOC_PORQ)
         trigger_host_reboot
         ;;
     SOC_RESETREQ)
         press_reset_button
+        ;;
+    SOC_POST_COMPLETE_CPLD)
+        trigger_mctp_init
         ;;
     wALL_POWER_OK_1)
         if [ "$Event" = "RISING" ]; then
