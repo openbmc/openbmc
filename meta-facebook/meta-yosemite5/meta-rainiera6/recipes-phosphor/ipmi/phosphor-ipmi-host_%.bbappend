@@ -2,3 +2,5 @@
 SOFT_SVC = ""
 SOFT_TGTFMT = ""
 SOFT_FMT = ""
+
+OBMC_ORG_IPMI_OEM_PROVIDERS = "arm"
