@@ -2,6 +2,60 @@
 # shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
 source /usr/libexec/yosemite5-common-functions
 
+set -euo pipefail
+
+select_uart_mux()
+{
+    local uart_value="0"
+
+    if [ -r /var/lib/uart_mux_value ]; then
+        IFS= read -r uart_value < /var/lib/uart_mux_value || uart_value="0"
+    fi
+
+    # Trim whitespace
+    uart_value=${uart_value#"${uart_value%%[![:space:]]*}"}
+    uart_value=${uart_value%"${uart_value##*[![:space:]]}"}
+
+    case "$uart_value" in
+        [0-5]) ;;
+        *)
+            echo "Invalid uart_mux_value: $uart_value, defaulting to 0" >&2
+            uart_value=0
+            ;;
+    esac
+
+    echo "Select UART mux source to $uart_value"
+
+    # Read CPLD version (4 bytes)
+    if ! read_bytes=$(i2ctransfer -y 15 w4@0x40 0xc0 0x0 0x0 0x0 r4 2>/dev/null); then
+        echo "ERROR: i2ctransfer command to read HPM CPLD version failed..!!"
+        i2cset -y 8 0x21 0x03 "$uart_value"
+        return 1
+    fi
+
+    echo "HPM CPLD usercode: $read_bytes"
+
+    phase_byte=$(echo "$read_bytes" | awk '{print $3}')
+    version_byte=$(echo "$read_bytes" | awk '{print $4}')
+
+    # Remove '0x' prefix
+    phase_byte_hex=${phase_byte#0x}
+    version_byte_hex=${version_byte#0x}
+
+    # Get lower nibble of the phase byte
+    lower_nibble=${phase_byte_hex:1:1}
+
+    # Convert version byte to decimal for comparison
+    version_byte_dec=$((16#$version_byte_hex))
+
+    # CPLD address changed from 0x20 to 0x21 since version 00010e03
+    if [[ "$lower_nibble" == "e" && $version_byte_dec -lt 3 ]]; then
+        i2cset -y 8 0x20 0x03 "$uart_value"
+    else
+        i2cset -y 8 0x21 0x03 "$uart_value"
+    fi
+}
+
 echo "Rainier initial value for I/O output pins"
 
 ALL_POWER_GOOD="wALL_POWER_OK"
@@ -137,6 +191,8 @@ fi
 
 # Release USB Hub out of reset
 set_gpio RST_USB_HUB_R_N 1
+
+select_uart_mux
 
 echo "Rainier Initialization Completed Successfully"
 
