@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+source /usr/libexec/fb-common-functions
+
+mapper wait /xyz/openbmc_project/state/host0
+
+get_state_host0()
+{
+    busctl get-property xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        CurrentHostState | grep -q "Running"
+    return $?
+}
+
+echo "Starting status check, max 10 retries..."
+
+for i in {1..10}; do
+    echo "--- Loop #$i ---"
+
+    # Condition: GPIO equals 1 AND Host0 state is Running (returns 0)
+    if [ "$(get_gpio "host0-ready")" -eq 1 ] && get_state_host0; then
+        echo "[SUCCESS] Exit conditions met: GPIO=1 and Host0 is Running!"
+        break
+    fi
+
+    echo "Power conditions not met yet. Sleeping for 0.5s..."
+    sleep 0.5
+done
+
+exit 0
