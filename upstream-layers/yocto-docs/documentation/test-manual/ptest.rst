@@ -31,16 +31,48 @@ see the :yocto_wiki:`Ptest </Ptest>` wiki page.
 Adding ptest to Your Build
 ==========================
 
-To add package testing to your build, add the :term:`DISTRO_FEATURES` and
-:term:`EXTRA_IMAGE_FEATURES` variables to your ``local.conf`` file, which
-is found in the :term:`Build Directory`::
+Adding package testing to your image is done in two steps:
+
+#. Select that all ptest packages should be built and packaged, and
+
+#. Identify which of those ptest packages to add to your image.
+
+First, in order to build all ptest packages, add the following line
+to a :term:`configuration file`::
 
    DISTRO_FEATURES:append = " ptest"
-   EXTRA_IMAGE_FEATURES += "ptest-pkgs"
+
+Note that this will cause all ptest packages to be built and packaged,
+but will not add any of those packages to your image; that comes in
+the next step. You can then add ptest packages to your image in one of two ways.
+
+#. If you want to add *all* of the generated ptest packages, add the line::
+
+      EXTRA_IMAGE_FEATURES += "ptest-pkgs"
+
+#. On the other hand, if you want to add only a select few of the ptest
+   packages, you can use some variation of::
+
+      IMAGE_INSTALL:append = " e2fsprogs-ptest zlib-ptest"
 
 Once your build is complete, the ptest files are installed into the
 ``/usr/lib/package/ptest`` directory within the image, where ``package``
 is the name of the package.
+
+.. note::
+
+   If you want to list all ptest packages currently available from
+   the local package feed that *could* be installed in your image
+   (not just the ones you're selecting), you can use the
+   ``oe-pkgdata-util`` command:
+
+   .. code-block:: console
+
+      $ oe-pkgdata-util list-pkgs "*-ptest"
+      acl-ptest
+      attr-ptest
+      bash-ptest
+      ... etc etc ...
 
 Running ptest
 =============
@@ -52,8 +84,8 @@ During the execution ``ptest-runner`` keeps count of total and failed
 ``ptests``. At end the execution summary is written to the console.
 If any of the ``run-ptest`` fails, ``ptest-runner`` returns '1'.
 
-Consequently, you might want to add ``ptest-runner`` to your image.
-
+The inclusion of any ptest packages in your image will automatically
+include ``ptest-runner`` in your image.
 
 Getting Your Package Ready
 ==========================

@@ -105,4 +105,4 @@ any new Yocto Project release.
       :ref:`ref-classes-buildhistory` output using ``git diff`` or ``buildhistory-diff``.
 
    For more information on using :ref:`ref-classes-buildhistory`, see
-   :ref:`dev-manual/build-quality:maintaining build output quality`.
+   :ref:`dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\``.

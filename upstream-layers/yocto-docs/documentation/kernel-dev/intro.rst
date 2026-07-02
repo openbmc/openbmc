@@ -8,14 +8,21 @@ Overview
 ========
 
 Regardless of how you intend to make use of the Yocto Project, chances
-are you will work with the Linux kernel. This manual describes how to
-set up your build host to support kernel development, introduces the
-kernel development process, provides background information on the Yocto
-Linux kernel :term:`Metadata`, describes
-common tasks you can perform using the kernel tools, shows you how to
-use the kernel Metadata needed to work with the kernel inside the Yocto
-Project, and provides insight into how the Yocto Project team develops
-and maintains Yocto Linux kernel Git repositories and Metadata.
+are you will work with the Linux kernel. This manual covers the following:
+
+-  how to set up your build host to support kernel development
+
+-  coverage of the kernel development process
+
+-  background information on the Yocto Linux kernel :term:`Metadata`
+
+-  common tasks you can perform using the kernel tools
+
+-  how to use the kernel Metadata needed to work with the kernel
+   inside the Yocto Project
+
+-  details on how the Yocto Project team develops and maintains
+   Yocto Linux kernel Git repositories and Metadata.
 
 Each Yocto Project release has a set of Yocto Linux kernel recipes,
 whose Git repositories you can view in the Yocto
@@ -23,11 +30,7 @@ whose Git repositories you can view in the Yocto
 heading. New recipes for the release track the latest Linux kernel
 upstream developments from https://www.kernel.org and introduce
 newly-supported platforms. Previous recipes in the release are refreshed
-and supported for at least one additional Yocto Project release. As they
-align, these previous releases are updated to include the latest from
-the Long Term Support Initiative (LTSI) project. You can learn more
-about Yocto Linux kernels and LTSI in the
-":ref:`kernel-dev/concepts-appx:yocto project kernel development and maintenance`" section.
+and supported for at least one additional Yocto Project release.
 
 Also included is a Yocto Linux kernel development recipe
 (``linux-yocto-dev.bb``) should you want to work with the very latest in

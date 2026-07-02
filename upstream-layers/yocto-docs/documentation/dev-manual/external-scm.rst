@@ -38,28 +38,29 @@ configuration file contains the line::
 
    require conf/distro/include/poky-floating-revisions.inc
 
-This line pulls in the
-listed include file that contains numerous lines of exactly that form::
+This line pulls in the listed include file that defines the set of
+AUTOREV-enabled recipes::
 
-   #SRCREV:pn-opkg-native ?= "${AUTOREV}"
-   #SRCREV:pn-opkg-sdk ?= "${AUTOREV}"
-   #SRCREV:pn-opkg ?= "${AUTOREV}"
-   #SRCREV:pn-opkg-utils-native ?= "${AUTOREV}"
-   #SRCREV:pn-opkg-utils ?= "${AUTOREV}"
-   SRCREV:pn-gconf-dbus ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-common ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-config-gtk ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-desktop ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-keyboard ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-panel-2 ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-themes-extra ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-terminal ?= "${AUTOREV}"
-   SRCREV:pn-matchbox-wm ?= "${AUTOREV}"
-   SRCREV:pn-settings-daemon ?= "${AUTOREV}"
-   SRCREV:pn-screenshot ?= "${AUTOREV}"
-   . . .
+   INHERIT += "poky-bleeding"
 
-These lines allow you to
+   POKY_AUTOREV_RECIPES = "\
+       libmatchbox \
+       opkg-utils \
+       matchbox-config-gtk \
+       matchbox-desktop \
+       matchbox-keyboard \
+       matchbox-panel-2 \
+       matchbox-terminal \
+       matchbox-theme-sato \
+       matchbox-wm \
+       pseudo \
+       puzzles \
+       sato-icon-theme \
+       sato-screenshot \
+       settings-daemon \
+   "
+
+This allows you to
 experiment with building a distribution that tracks the latest
 development source for numerous packages.
 

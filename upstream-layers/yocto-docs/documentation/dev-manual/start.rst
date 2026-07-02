@@ -235,7 +235,7 @@ particular working environment and set of practices.
        equivalence feature.
 
        See the :doc:`/dev-manual/hashequivserver` section of the Yocto Project
-       Development Tasks Manual for details on how to setup a
+       Development Tasks Manual for details on how to set up a
        :ref:`overview-manual/concepts:Hash Equivalence` server.
 
     -  Set up an Autobuilder and have it populate the sstate cache and
@@ -606,7 +606,7 @@ Initializing the Build Environment
 Initializing the build environment is a common task, as it needs to be done for
 each new instance of the shell where the :term:`Poky` reference distro was set up:
 
--  If ``bitbake-setup`` was used to setup the :term:`Poky` reference distro, you
+-  If ``bitbake-setup`` was used to set up the :term:`Poky` reference distro, you
    need to source the ``init-build-env`` file of the :term:`bitbake:Setup`
    directory that was created after the :ref:`bitbake:ref-bbsetup-command-init`
    command execution:
@@ -616,7 +616,7 @@ each new instance of the shell where the :term:`Poky` reference distro was set u
       $ source <setup-dir>/build/init-build-env
 
 
--  If the :term:`Poky` distro was setup using manual clones of the layers, you
+-  If the :term:`Poky` distro was set up using manual clones of the layers, you
    need to source the ``oe-init-build-env`` script present in the
    :term:`OpenEmbedded-Core (OE-Core)` layer:
 
@@ -624,7 +624,7 @@ each new instance of the shell where the :term:`Poky` reference distro was set u
 
       $ source openembedded-core/oe-init-build-env
 
-This will setup your current shell and change the current working directory to
+This will set up your current shell and change the current working directory to
 the :term:`Build Directory`.
 
 Where To Go From Here

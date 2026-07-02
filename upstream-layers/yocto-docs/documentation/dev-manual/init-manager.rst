@@ -5,7 +5,7 @@
 Selecting an Initialization Manager
 ***********************************
 
-By default, the Yocto Project uses :wikipedia:`SysVinit <Init#SysV-style>` as
+By default, the :term:`Poky` distro uses :wikipedia:`SysVinit <Init#SysV-style>` as
 the initialization manager. There is also support for BusyBox init, a simpler
 implementation, as well as support for :wikipedia:`systemd <Systemd>`, which
 is a full replacement for init with parallel starting of services, reduced

@@ -3,14 +3,14 @@
 Setting Up the Poky Reference Distro Manually
 *********************************************
 
-While the default way to setup the :term:`Poky` reference distro is to use
-``bitbake-setup``, it is also possible to manually setup the environment. This
+While the default way to set up the :term:`Poky` reference distro is to use
+``bitbake-setup``, it is also possible to manually set up the environment. This
 document guides through this setup step-by-step.
 
 .. note::
 
    This document will produce a setup similar to what is described in
-   :doc:`/brief-yoctoprojectqs/index`, which shows how to setup :term:`Poky`
+   :doc:`/brief-yoctoprojectqs/index`, which shows how to set up :term:`Poky`
    with ``bitbake-setup``.
 
 Obtaining The Source Repositories
@@ -41,7 +41,7 @@ Throughout the documentation, we will use ``bitbake-builds`` as the name of the
    $ cd bitbake-builds
 
 You need to get a copy of the different :term:`layers <Layer>` needed
-to setup the :term:`Poky` reference distribution on your build host. Use the
+to set up the :term:`Poky` reference distribution on your build host. Use the
 following commands:
 
 .. code-block:: shell
@@ -90,7 +90,7 @@ an entire Linux distribution, including the toolchain, from source.
       page of the Yocto Project Wiki.
 
 #.  **Initialize the Build Environment:** From your current working directory,
-    setup a build environment with the following command:
+    set up a build environment with the following command:
 
     .. code-block:: shell
 

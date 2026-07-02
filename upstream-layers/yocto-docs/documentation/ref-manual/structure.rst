@@ -267,7 +267,7 @@ The OpenEmbedded build system creates this directory when you enable
 build history via the :ref:`ref-classes-buildhistory` class file. The directory
 organizes build information into image, packages, and SDK
 subdirectories. For information on the build history feature, see the
-":ref:`dev-manual/build-quality:maintaining build output quality`"
+":ref:`dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\``"
 section in the Yocto Project Development Tasks Manual.
 
 .. _structure-build-cache:
@@ -370,7 +370,7 @@ Once the build process gets the sample file, it uses ``sed`` to substitute final
 .. _structure-build-conf-site.conf:
 
 ``build/conf/site.conf``
-========================
+------------------------
 
 This configuration file contains the site specific configurations for your build
 environment.
@@ -538,6 +538,16 @@ license files with other licensing information. For information on
 licensing, see the
 ":ref:`dev-manual/licenses:maintaining open source license compliance during your product's lifecycle`"
 section in the Yocto Project Development Tasks Manual.
+
+.. _structure-build-tmp-deploy-spdx:
+
+``build/tmp/deploy/spdx/``
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This directory contains JSON files in :term:`SPDX` format which are used to
+create a Software Bill of Materials (:term:`SBOM`), as explained in detail in
+the ":ref:`dev-manual/sbom:creating a software bill of materials`" section of
+the Yocto Project Development Tasks Manual.
 
 .. _structure-build-tmp-deploy-images:
 
@@ -868,7 +878,10 @@ layer.
 ---------------
 
 This directory contains common license files and several text files used
-by the build system. The text files contain minimal device information
+by the build system, as well as
+:ref:`Wic files <dev-manual/wic:creating partitioned images using wic>`
+that define the layouts of the images produced by the build.
+The text files contain minimal device information
 and lists of files and directories with known permissions.
 
 .. _structure-meta-lib:

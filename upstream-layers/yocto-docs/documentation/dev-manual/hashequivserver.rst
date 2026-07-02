@@ -11,8 +11,8 @@ This document will guide you through the steps required to set up the reference
 Hash Equivalence server provided by the :oe_git:`bitbake-hashserv
 </bitbake/tree/bin/bitbake-hashserv>` script in :term:`BitBake`.
 
-This guide will explain how to setup a local Hash Equivalence server and does
-not explain how to setup the surrounding infrastructure to secure this server.
+This guide will explain how to set up a local Hash Equivalence server and does
+not explain how to set up the surrounding infrastructure to secure this server.
 
 Hash Equivalence Server Setup
 =============================

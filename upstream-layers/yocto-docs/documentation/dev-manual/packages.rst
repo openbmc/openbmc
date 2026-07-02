@@ -194,7 +194,7 @@ each building system's ``local.conf`` file::
 
 For information on build
 history, see the
-":ref:`dev-manual/build-quality:maintaining build output quality`" section.
+":ref:`dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\``" section.
 
 .. note::
 

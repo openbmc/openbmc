@@ -1251,6 +1251,12 @@ variable is the function that determines whether a given dependency
 needs to be followed, and whether for any given relationship the
 function needs to be passed. The function returns a True or False value.
 
+.. note::
+
+   It is possible to sign these artifacts with :wikipedia:`GPG
+   <GNU_Privacy_Guard>`. See :doc:`/security-manual/sstate-signing` in the Yocto
+   Project Security Manual for more information.
+
 Images
 ------
 

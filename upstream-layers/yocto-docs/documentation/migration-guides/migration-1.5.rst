@@ -271,7 +271,7 @@ The changes to Build History are:
    option for each utility for more information on the new syntax.
 
 For more information on Build History, see the
-":ref:`dev-manual/build-quality:maintaining build output quality`"
+":ref:`dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\``"
 section in the Yocto Project Development Tasks Manual.
 
 .. _migration-1.5-udev:

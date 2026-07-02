@@ -65,3 +65,11 @@ build system uses to build the package would be as follows::
 
    project/build/tmp/work/qemux86-poky-linux/foo/1.3.0
 
+.. note::
+
+   If you want to iterate over testing your local changes, the proper way
+   is to use the ``devtool`` utility.
+
+   To learn how to use ``devtool`` to add, modify, upgrade recipes and more,
+   see the :ref:`dev-manual/devtool:Using the \`\`devtool\`\` command-line tool`
+   section of this Development Tasks Manual.

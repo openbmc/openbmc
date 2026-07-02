@@ -127,6 +127,126 @@ stable release.
    exception to this policy occurs when there is a strong reason such as
    the fix happens to also be the preferred upstream approach.
 
+.. _ref-stable-lts-patch-acceptance-policies:
+
+Stable/LTS Patch Acceptance Policies
+=====================================
+
+All changes must have already been accepted into the current master release
+and any other release still within its stable support window.
+
+**Acceptable:**
+
+-  Security and CVE fixes
+-  Fixes for bugs
+-  Version updates which follow an upstream stable series or LTS that aligns with
+   the original release (based on compatibility). See
+   :ref:`ref-manual/release-process:stable point release upgrades` for details.
+
+.. note::
+
+   Once :term:`UPSTREAM_STABLE_RELEASE_REGEX` has been accepted for a recipe,
+   version upgrades matching the accepted pattern are considered acceptable
+   by default (with the usual ability to reject if upstream fails to follow
+   their own stable guidelines).
+
+**Potentially acceptable:**
+
+-  Fixes so the codebase works with newly released distros, e.g.
+   :ref:`ref-classes-uninative` tarball updates or build fixes for a new GCC
+   version on the :term:`Build Host`.
+
+**Unacceptable:**
+
+-  General version upgrades
+-  New features
+-  ABI/API breakage
+-  Metadata improvements and refactoring, unless this is a dependency of a
+   required fix
+
+.. note::
+
+   Exceptions to these rules must be approved by the TSC.
+
+.. _ref-stable-point-release-upgrades:
+
+Stable Point Release Upgrades
+=============================
+
+Some upstream projects maintain stable branches that only collect bug fixes
+and security patches --- similar to the Yocto Project's own stable release
+policy. For recipes tracking such upstreams, it is possible to perform
+*stable point release upgrades* (e.g. upgrading from 1.0.2 to 1.0.3) rather
+than only accepting backported patches. This is the mechanism behind the
+"acceptable: version updates which follow an upstream stable series" policy above.
+
+Criteria for Qualifying Upstreams
+---------------------------------
+
+Setting :term:`UPSTREAM_STABLE_RELEASE_REGEX` for a recipe means that certain
+version upgrades can be confidently treated as stable point upgrades under
+OpenEmbedded's criteria. The
+:ref:`Automated Upgrade Helper (AUH) <dev-manual/upgrading-recipes:Using the Auto Upgrade Helper (AUH)>`
+will then automatically send patches to upgrade recipes with this variable
+set during stable releases.
+
+.. note::
+
+   Patches to upgrade recipes without this variable may still be submitted
+   for stable branches, but the barrier for acceptance is high. The commit
+   message needs to justify that the version upgrade follows our stable
+   branch policy or that there is an exceptional reason for taking the
+   upgrade.
+
+A recipe may have :term:`UPSTREAM_STABLE_RELEASE_REGEX` set based on the
+following criteria:
+
+1. **Upstream stable branches exist** --- the upstream project maintains
+   branches named with a stable version component, and there is evidence
+   that these branches only collect bug-fix and security-fix changes
+   (no new features or ABI/API breakage). For example, util-linux version
+   ``2.41.3`` has three parts in its version and upstream has branches like
+   ``stable/v2.41`` with two parts. This demonstrates that bumps in the
+   third part (e.g. ``2.41.3`` to ``2.41.4``) are stable point releases.
+   Similarly, systemd maintains ``stable/v259-stable``.
+
+2. **Upstream maintainer confirmation** --- the upstream project's maintainer
+   explicitly confirms that a bump in a certain part of the version is
+   bug-fix only.
+
+3. **Clear historical or common-sense evidence** --- the project's change
+   history clearly shows that a certain class of version bump is bug-fix
+   only, or it is widely understood convention. For example, openssh's
+   ``p`` suffix increments (``10.2p1`` to ``10.2p2``) and kmod's patch-level
+   bumps are historically bug-fix only releases.
+
+.. note::
+
+   Patches to set :term:`UPSTREAM_STABLE_RELEASE_REGEX` are sent against the
+   master branch first and follow the normal review process. Once accepted on
+   master they may be backported to stable release branches. Exceptions may be
+   made when necessary, e.g. setting :term:`UPSTREAM_STABLE_RELEASE_REGEX` on
+   a stable branch for a recipe which has since been removed on master.
+
+How Stable Release Regexes Work
+-------------------------------
+
+The stable point upgrade mechanism uses a *filter regex* to constrain the
+upstream version check so that only versions within the same stable series
+are considered. When a recipe sets :term:`UPSTREAM_STABLE_RELEASE_REGEX`, the
+version-checking infrastructure in BitBake's fetchers (git, wget, crate)
+applies that regex to filter discovered upstream versions. Only versions
+matching the regex are considered as upgrade candidates.
+
+For example, if a recipe is currently at version ``1.4.2`` and the regex is
+``^1\.4(\.\d+)*$``, then version ``1.4.7`` would be a valid upgrade candidate
+but ``1.5.0`` would not.
+
+For recipes whose version uses a dot-separated scheme, the
+:ref:`ref-classes-upstream-stable-release-point` class can automatically
+generate this regex. For other versioning schemes, set
+:term:`UPSTREAM_STABLE_RELEASE_REGEX` directly in the recipe.
+
 .. _ref-long-term-support-releases:
 
 Long Term Support Releases

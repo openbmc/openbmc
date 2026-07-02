@@ -73,7 +73,7 @@ Additional factors that can affect build speed are:
    assumes you structure the disk partitions and file systems in a way
    that this is practical.
 
-Aside from the previous list, you should keep some trade offs in mind
+Aside from the previous list, you should keep some trade-offs in mind
 that can help you speed up the build:
 
 -  Remove items from

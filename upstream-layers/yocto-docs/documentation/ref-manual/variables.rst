@@ -300,6 +300,9 @@ system and gives an overview of their function and contents.
       variable), the OpenEmbedded build system ignores your request and
       will install the packages to avoid dependency errors.
 
+      This variable is supported for the RPM and IPK packaging backends,
+      but not for DEB.
+
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`PACKAGE_EXCLUDE` variables for related
       information.
@@ -1391,7 +1394,7 @@ system and gives an overview of their function and contents.
       When inheriting the :ref:`ref-classes-buildhistory`
       class, this variable specifies the build history features to be
       enabled. For more information on how build history works, see the
-      ":ref:`dev-manual/build-quality:maintaining build output quality`"
+      ":ref:`dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\``"
       section in the Yocto Project Development Tasks Manual.
 
       You can specify these features in the form of a space-separated list:
@@ -5871,7 +5874,8 @@ system and gives an overview of their function and contents.
       section in the Yocto Project Development Tasks Manual.
 
    :term:`LICENSE`
-      The list of source licenses for the recipe. Follow these rules:
+      This is a required field in an OpenEmbedded recipe file, and should
+      contain a list of source licenses for the recipe. Follow these rules:
 
       -  Do not use spaces within individual license names.
 
@@ -5910,6 +5914,12 @@ system and gives an overview of their function and contents.
          LICENSE = "GFDL-1.2 & GPL-2.0-only"
          LICENSE:${PN} = "GPL-2.0.only"
          LICENSE:${PN}-doc = "GFDL-1.2"
+
+      .. note::
+
+         A recipe's :term:`LICENSE` value must be accompanied by an associated
+         :term:`LIC_FILES_CHKSUM` value, except in the special case where
+         the :term:`LICENSE` value is set to "CLOSED".
 
    :term:`LICENSE_CREATE_PACKAGE`
       Setting :term:`LICENSE_CREATE_PACKAGE` to "1" causes the OpenEmbedded
@@ -6498,8 +6508,7 @@ system and gives an overview of their function and contents.
          functionality, such as kernel modules. It is up to you to add
          packages with the :term:`IMAGE_INSTALL` variable.
 
-      This variable is only supported when using the IPK and RPM
-      packaging backends. DEB is not supported.
+      This variable is supported for all packaging backends.
 
       See the :term:`BAD_RECOMMENDATIONS` and
       the :term:`PACKAGE_EXCLUDE` variables for
@@ -6930,8 +6939,7 @@ system and gives an overview of their function and contents.
       an iterative development process to remove specific components from a
       system.
 
-      This variable is supported only when using the IPK and RPM
-      packaging backends. DEB is not supported.
+      This variable is supported for all packaging backends.
 
       See the :term:`NO_RECOMMENDATIONS` and the
       :term:`BAD_RECOMMENDATIONS` variables for
@@ -8431,6 +8439,12 @@ system and gives an overview of their function and contents.
    :term:`RM_WORK_EXCLUDE`
       With :ref:`ref-classes-rm-work` enabled, this variable
       specifies a list of recipes whose work directories should not be removed.
+      See the ":ref:`ref-classes-rm-work`" section for more details.
+
+   :term:`RM_WORK_EXCLUDE_ITEMS`
+      With :ref:`ref-classes-rm-work` enabled, this variable specifies
+      a list of files or folders --- relative to the recipe's :term:`WORKDIR` ---
+      to be preserved.
       See the ":ref:`ref-classes-rm-work`" section for more details.
 
    :term:`ROOT_HOME`
@@ -10077,6 +10091,24 @@ system and gives an overview of their function and contents.
 
       For details on the process, see the :ref:`ref-classes-staging` class.
 
+   :term:`SSTATE_SIG_KEY`
+      When signing :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts (when :term:`SSTATE_VERIFY_SIG` is set to
+      "1"), the :term:`SSTATE_SIG_KEY` variable is the :wikipedia:`GPG
+      <GNU_Privacy_Guard>` key identifier used to sign them.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
+   :term:`SSTATE_SIG_PASSPHRASE`
+      When signing :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts (when :term:`SSTATE_VERIFY_SIG` is set to
+      "1"), the :term:`SSTATE_SIG_PASSPHRASE` variable is the passphrase used to
+      protect the private key signing the artifacts.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
    :term:`SSTATE_SKIP_CREATION`
       The :term:`SSTATE_SKIP_CREATION` variable can be used to skip the
       creation of :ref:`shared state <overview-manual/concepts:shared state cache>`
@@ -10096,6 +10128,52 @@ system and gives an overview of their function and contents.
       The syntax to disable it for the whole recipe is::
 
          SSTATE_SKIP_CREATION = "1"
+
+   :term:`SSTATE_VALID_SIGS`
+      When verifying :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts (when :term:`SSTATE_VERIFY_SIG` is set to
+      "1"), the :term:`SSTATE_VALID_SIGS` variable is a space-separated list of
+      :wikipedia:`GPG <GNU_Privacy_Guard>` key identifiers to use to verify their
+      signature.
+
+      It must contain the short form identifier of the key pair. For example,
+      when running the ``gpg --list-keys`` command (in bold text below):
+
+      .. parsed-literal::
+
+         pub   ed25519 2026-04-17 [SC]
+               \4049A47E3AAA99D0250966DC\ **5B97632FA7F4E942**
+         uid           [ultimate] Antonin Godard (SState Signing) <antonin.godard\@bootlin.com>
+         sub   cv25519 2026-04-17 [E]
+
+      The short form equals the last 16 characters of the identifier. In the
+      above example: ``5B97632FA7F4E942``.
+
+      .. note::
+
+         If this variable is empty (the default), any of the GPG key present on
+         the :term:`Build Host` can be used by the :term:`OpenEmbedded Build
+         System` to verify the shared state artifacts.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
+   :term:`SSTATE_VERIFY_SIG`
+      The :term:`SSTATE_VERIFY_SIG` variable controls whether to enable or
+      disable the :ref:`shared state <overview-manual/concepts:setscene tasks
+      and shared state>` artifacts signing feature.
+
+      See :doc:`/security-manual/sstate-signing` in the Yocto Project Security
+      Manual for more information.
+
+   :term:`STABLE_VERSION_PARTS`
+      The number of leading dot-separated components of :term:`PV` that
+      constitute the stable version prefix. Used by the
+      :ref:`ref-classes-upstream-stable-release-point` class to generate
+      :term:`UPSTREAM_STABLE_RELEASE_REGEX`. Defaults to ``"2"``.
+
+      For example, with ``PV = "259.5"`` and ``STABLE_VERSION_PARTS = "1"``,
+      the generated regex matches versions starting with ``259``.
 
    :term:`STAGING_BASE_LIBDIR_NATIVE`
       Specifies the path to the ``/lib`` subdirectory of the sysroot
@@ -10294,6 +10372,10 @@ system and gives an overview of their function and contents.
       :term:`SUMMARY` is used to define the
       :term:`DESCRIPTION` variable if :term:`DESCRIPTION` is
       not set in the recipe.
+
+      If you don't set this variable in your recipe file, you will be warned
+      about that and it will be set to a default value from the
+      :oecore_path:`meta/conf/bitbake.conf` file.
 
    :term:`SVNDIR`
       The directory in which files checked out of a Subversion system are
@@ -11989,6 +12071,25 @@ system and gives an overview of their function and contents.
       contains the link to the latest tarball::
 
          UPSTREAM_CHECK_URI = "recipe_url"
+
+   :term:`UPSTREAM_STABLE_RELEASE_REGEX`
+      A regular expression used to filter upstream versions during version
+      checks so that only versions within the same stable series are
+      considered. When set, BitBake's fetchers (git, wget, crate) apply this
+      regex to discovered upstream versions and discard any that do not match.
+
+      For example, if a recipe is at version ``1.4.2`` and the regex is
+      ``^1\.4(\.\d+)*$``, then ``1.4.7`` would be a valid upgrade candidate
+      but ``1.5.0`` would not.
+
+      For recipes with dot-separated versions, inherit the
+      :ref:`ref-classes-upstream-stable-release-point` class to generate this
+      variable automatically. For other versioning schemes, set it directly::
+
+         UPSTREAM_STABLE_RELEASE_REGEX = "^10\.2p\d+$"
+
+      See :ref:`ref-manual/release-process:stable point release upgrades` for
+      the criteria under which this variable should be set.
 
    :term:`UPSTREAM_VERSION_UNKNOWN`
       You can perform a per-recipe check for what the latest upstream

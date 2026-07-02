@@ -37,7 +37,7 @@ YOCTO_DL_URL : "https://downloads.yoctoproject.org"
 YOCTO_RELEASE_DL_URL : "&YOCTO_DL_URL;/releases/yocto/yocto-&DISTRO;"
 MIN_PYTHON_VERSION : "3.9.0"
 MIN_TAR_VERSION : "1.28"
-MIN_GIT_VERSION : "1.8.3.1"
+MIN_GIT_VERSION : "2.22.0"
 MIN_GCC_VERSION : "10.1"
 MIN_MAKE_VERSION : "4.0"
 # Disk space (Gbytes) needed to generate qemux86-64 core-image-sato image with poky distro on Ubuntu 22.04 (x86-64), rounded up from 133

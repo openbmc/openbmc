@@ -7,8 +7,8 @@ The Yocto Project Test Environment Manual
 Welcome
 =======
 
-Welcome to the Yocto Project Test Environment Manual! This manual is a
-work in progress. The manual contains information about the testing
+Welcome to the Yocto Project Test Environment Manual,
+which contains information about the testing
 environment used by the Yocto Project to make sure each major and minor
 release works as intended. All the project's testing infrastructure and
 processes are publicly visible and available so that the community can
@@ -19,27 +19,28 @@ environment used by the Yocto Project to create their own automated,
 production test environment, building upon the foundations from the
 project core.
 
-This manual is a work-in-progress and is being initially loaded with
+This manual is a work in progress and is being loaded initially with
 information from the README files and notes from key engineers:
 
 -  *yocto-autobuilder2:* This
    :yocto_git:`README.md </yocto-autobuilder2/tree/README.md>`
    is the main README which details how to set up the Yocto Project
-   Autobuilder. The ``yocto-autobuilder2`` repository represents the
-   Yocto Project's console UI plugin to Buildbot and the configuration
-   necessary to configure Buildbot to perform the testing the project
-   requires.
+   Autobuilder. The :yocto_git:`yocto-autobuilder2 repository </yocto-autobuilder2>`
+   represents the Yocto Project's console UI plugin to
+   Buildbot and the configuration necessary to configure Buildbot
+   to perform the testing the project requires.
 
 -  *yocto-autobuilder-helper:* This :yocto_git:`README </yocto-autobuilder-helper/tree/README/>`
-   and repository contains Yocto Project Autobuilder Helper scripts and
-   configuration. The ``yocto-autobuilder-helper`` repository contains
+   and repository contains Yocto Project Autobuilder Helper scripts and configuration.
+   The :yocto_git:`yocto-autobuilder-helper repository </yocto-autobuilder-helper>` contains
    the "glue" logic that defines which tests to run and how to run them.
    As a result, it can be used by any Continuous Improvement (CI) system
    to run builds, support getting the correct code revisions, configure
    builds and layers, run builds, and collect results. The code is
-   independent of any CI system, which means the code can work `Buildbot <https://docs.buildbot.net/current/>`__,
-   Jenkins, or others. This repository has a branch per release of the
-   project defining the tests to run on a per release basis.
+   independent of any CI system, which means the code can work with
+   `Buildbot <https://docs.buildbot.net/current/>`__,
+   :wikipedia:`Jenkins <Jenkins_(software)>`, or others. This repository has a
+   branch per release of the project defining the tests to run on a per-release basis.
 
 Yocto Project Autobuilder Overview
 ==================================

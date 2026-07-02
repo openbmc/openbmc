@@ -101,7 +101,7 @@ The following steps describe how to set up the AUH utility:
    configurations:
 
    -  If you want to enable :ref:`Build
-      History <dev-manual/build-quality:maintaining build output quality>`,
+      History <dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\`>`,
       which is optional, you need the following lines in the
       ``conf/local.conf`` file::
 

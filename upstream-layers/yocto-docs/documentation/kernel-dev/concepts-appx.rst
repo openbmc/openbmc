@@ -76,22 +76,6 @@ and included with Yocto Project releases:
 -  *linux-yocto-dev:* A development kernel based on the latest
    upstream release candidate available.
 
-.. note::
-
-   Long Term Support Initiative (LTSI) for Yocto Linux kernels is as
-   follows:
-
-   -  For Yocto Project releases 1.7, 1.8, and 2.0, the LTSI kernel is
-      ``linux-yocto-3.14``.
-
-   -  For Yocto Project releases 2.1, 2.2, and 2.3, the LTSI kernel is
-      ``linux-yocto-4.1``.
-
-   -  For Yocto Project release 2.4, the LTSI kernel is
-      ``linux-yocto-4.9``
-
-   -  ``linux-yocto-4.4`` is an LTS kernel.
-
 Once a Yocto Linux kernel is officially released, the Yocto Project team
 goes into their next development cycle, or upward revision (uprev)
 cycle, while still continuing maintenance on the released kernel. It is

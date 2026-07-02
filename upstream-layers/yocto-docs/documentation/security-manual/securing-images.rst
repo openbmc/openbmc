@@ -92,21 +92,20 @@ Considerations Specific to the OpenEmbedded Build System
 You can take some steps that are specific to the OpenEmbedded build
 system to make your images more secure:
 
--  Ensure that "allow-empty-password", "allow-root-login", or
-   "empty-root-password" are not one of your selected :term:`IMAGE_FEATURES`.
-   When creating a new project, the default is to provide you with an
-   initial ``local.conf`` file that enables these features using the
-   :term:`EXTRA_IMAGE_FEATURES`
-   variable with the line::
+-  During development, it's convenient to relax security in your builds
+   and allow the use of empty passwords or root logins. This is typically
+   done by adding the values "allow-empty-password", "allow-root-login", and
+   "empty-root-password" to your build's image features, commonly with the
+   addition of the line::
 
       EXTRA_IMAGE_FEATURES = "allow-empty-password empty-root-password allow-root-login"
 
-   To disable these features, simply comment out that line in your
-   ``local.conf`` file, or make sure :term:`IMAGE_FEATURES` does not contain
-   any of these features before producing your final image. Among other things,
-   leaving this in place sets the root password as blank, which makes
-   logging in for debugging or inspection easy during development but
-   also means anyone can easily log in during production.
+   to your ``local.conf`` file, or by enabling the exactly equivalent
+   configuration fragment :ref:`ref-fragments-root-login-with-empty-password`.
+
+   If you're using either of these approaches during development,
+   make sure you remove or de-activate these settings before generating
+   your final production image.
 
 -  It is possible to set a root password for the image and also to set
    passwords for any extra users you might add (e.g. administrative or

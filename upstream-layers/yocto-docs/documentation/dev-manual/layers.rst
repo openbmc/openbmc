@@ -11,6 +11,13 @@ see the
 ":ref:`overview-manual/yp-intro:the yocto project layer model`"
 section in the Yocto Project Overview and Concepts Manual.
 
+Note well that to properly call the ``bitbake-layers`` command explained
+below, you must first
+:ref:`initialize the build environment <dev-manual/start:Initializing the Build Environment>`
+using your project's environment setup script.
+Without an initialized environment, your shell would not
+know where to find the command or your build configuration.
+
 Creating Your Own Layer
 =======================
 
@@ -59,7 +66,7 @@ Follow these general steps to create your layer without using tools:
    configuration.
 
    As an example, the following command creates a layer named ``meta-scottrif``
-   in your home directory:
+   in your current directory:
 
    .. code-block:: console
 
@@ -142,8 +149,8 @@ Follow these general steps to create your layer without using tools:
    of "6", you can either use the ``--priority`` option or you can edit the
    :term:`BBFILE_PRIORITY` value in the ``conf/layer.conf`` after the script
    creates it. Furthermore, if you want to give the example recipe file some
-   name other than the default, you can use the ``--example-recipe-name``
-   option.
+   name or version other than the defaults, you can use the ``--example-recipe-name``
+   and/or ``--example-recipe-version`` options.
 
    The easiest way to see how the ``bitbake-layers create-layer`` command
    works is to experiment with the script. You can also read the usage

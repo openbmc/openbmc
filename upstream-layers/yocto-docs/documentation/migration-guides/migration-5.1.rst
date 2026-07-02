@@ -23,7 +23,7 @@ supported, and an error will be issued. The recipe should be changed to::
     S = "${UNPACKDIR}"
 
 Any :term:`WORKDIR` references where files from :term:`SRC_URI` are referenced
-should be changed to :term:`S`. These are commonly in :ref:`ref-tasks-compile`,
+should be changed to :term:`S`. These are commonly in :ref:`ref-tasks-configure`,
 :ref:`ref-tasks-compile`, :ref:`ref-tasks-install` and :term:`LIC_FILES_CHKSUM`.
 
 :term:`WORKDIR` references in recipes

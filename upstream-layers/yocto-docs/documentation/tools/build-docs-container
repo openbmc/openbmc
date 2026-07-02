@@ -37,6 +37,7 @@ $0 OCI_IMAGE [make arguments...]
      - almalinux:9
      - centos:stream9
      - centos:stream10
+     - debian:11
      - debian:12
      - debian:13
      - fedora:42
@@ -108,8 +109,7 @@ main ()
       pip3=pip3_docs.sh
       repo=quay.io/centos
       ;;
-    # Missing python3-saneyaml
-    # "debian:11"*|\
+    "debian:11"*|\
     "debian:12"*|\
     "debian:13"*)
       containerfile=Containerfile.debian

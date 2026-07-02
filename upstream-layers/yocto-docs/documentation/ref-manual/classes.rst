@@ -270,7 +270,7 @@ The :ref:`ref-classes-buildhistory` class records a history of build output meta
 which can be used to detect possible regressions as well as used for
 analysis of the build output. For more information on using Build
 History, see the
-":ref:`dev-manual/build-quality:maintaining build output quality`"
+":ref:`dev-manual/build-quality:maintaining build output quality with \`\`buildhistory\`\``"
 section in the Yocto Project Development Tasks Manual.
 
 .. _ref-classes-buildstats:
@@ -2130,6 +2130,18 @@ section in the Yocto Project Development Tasks Manual.
 
 Previously, this class was called the ``task`` class.
 
+.. note::
+
+   If you're defining a packagegroup and need to set::
+
+      PACKAGE_ARCH = "${MACHINE_ARCH}"
+
+   for the packagegroup, you need to do that *before* the
+   ``inherit packagegroup`` line in the recipe file.
+   Setting it afterward can break BitBake parsing, result in
+   an "allarch" architecture mismatch error, or allow
+   architecture-independent defaults to override your intent.
+
 .. _ref-classes-patch:
 
 ``patch``
@@ -2613,6 +2625,13 @@ recipe or recipes you are working on to the :term:`RM_WORK_EXCLUDE` variable,
 which can also be set in your ``local.conf`` file. Here is an example::
 
    RM_WORK_EXCLUDE += "busybox glibc"
+
+Finally, if you are using this class for a recipe but want to prevent
+:term:`BitBake` from deleting specific folders or files in that recipe's
+:term:`WORKDIR` (other than ``temp``), you can preserve those folders or
+files with the :term:`RM_WORK_EXCLUDE_ITEMS` variable as follows::
+
+   RM_WORK_EXCLUDE_ITEMS += "items_to_keep"
 
 .. _ref-classes-rootfs*:
 
@@ -3654,6 +3673,30 @@ before a package is removed and started when the package is installed.
 Three variables control this class: :term:`INITSCRIPT_PACKAGES`,
 :term:`INITSCRIPT_NAME` and :term:`INITSCRIPT_PARAMS`. See the variable links
 for details.
+
+.. _ref-classes-upstream-stable-release-point:
+
+``upstream-stable-release-point``
+=================================
+
+The :ref:`ref-classes-upstream-stable-release-point` class automatically
+generates the :term:`UPSTREAM_STABLE_RELEASE_REGEX` variable for recipes
+whose version uses a dot-separated scheme. This enables stable point release
+upgrades — version upgrades constrained to the same stable series (e.g.
+``1.4.2`` to ``1.4.3`` but not to ``1.5.0``).
+
+The class uses the :term:`STABLE_VERSION_PARTS` variable (defaults to ``"2"``)
+to determine how many leading dot-separated parts of :term:`PV` constitute the
+stable prefix. For example:
+
+-  With ``PV = "1.4.2"`` and ``STABLE_VERSION_PARTS = "2"`` (default), the
+   generated regex is ``^1\.4(\.\d+)*$``.
+-  With ``PV = "259.5"`` and ``STABLE_VERSION_PARTS = "1"`` (e.g. systemd), the
+   generated regex is ``^259(\.\d+)*$``.
+
+For recipes whose stable version part is not dot-separated (e.g. openssh uses
+``10.2p1``), set :term:`UPSTREAM_STABLE_RELEASE_REGEX` directly instead of
+inheriting this class.
 
 .. _ref-classes-useradd:
 

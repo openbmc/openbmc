@@ -406,12 +406,12 @@ Should be replaced by::
 See commit :oecore_rev:`b50d6debf7baa555fbfb3521c4f952675bba2d37` for more
 information.
 
-:doc:`WIC </dev-manual/wic>` files to be moved under ``files/wic``
-------------------------------------------------------------------
+:doc:`WIC </dev-manual/wic>` kickstart files to be moved under ``files/wic``
+----------------------------------------------------------------------------
 
-:doc:`WIC </dev-manual/wic>` related files such as :doc:`WKS
-</ref-manual/kickstart>` files or custom WIC plugins should be moved to the
-``files/wic/`` directory of the layer containing them.
+:doc:`WIC </dev-manual/wic>` kickstart files (:doc:`WKS </ref-manual/kickstart>`
+files) should be moved to the ``files/wic/`` directory of the layer containing
+them.
 
 If not done, the build will fail with errors indicating how to move these files,
 for example::
@@ -438,6 +438,9 @@ For example, here is the content of the :term:`OpenEmbedded-Core (OE-Core)`
    ├── qemux86-directdisk.wks
    ├── sdimage-bootpart.wks
    └── systemd-bootdisk.wks
+
+This change does not affect :ref:`WIC plugins <dev-manual/wic:Using the Wic
+Plugin Interface>`, which should remain in ``scripts/lib/wic/plugins/source/``.
 
 Support for SysVinit compatibility in systemd was dropped
 ---------------------------------------------------------
