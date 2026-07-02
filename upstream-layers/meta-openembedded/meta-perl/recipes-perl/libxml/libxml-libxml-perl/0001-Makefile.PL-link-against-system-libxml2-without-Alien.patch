@@ -1,0 +1,42 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 22 Jun 2026 22:00:00 -0700
+Subject: [PATCH] Makefile.PL: link against system libxml2 without Alien::Libxml2
+
+XML::LibXML 2.0200+ switched its build system to use Alien::Libxml2 (via
+Alien::Base::Wrapper) to locate libxml2. That Perl module is not packaged
+in OpenEmbedded and pulls in the whole Alien::Build stack, so instead query
+the target libxml2 directly through pkg-config, which is already wired up to
+the recipe sysroot. libxml2 is listed in DEPENDS, so it is guaranteed to be
+present at build time.
+
+Upstream-Status: Inappropriate [oe-specific cross-compile]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -17,7 +17,7 @@
+ 
+ require 5.008001;
+ 
+-use Alien::Base::Wrapper qw( Alien::Libxml2 );
++# OE: avoid Alien::Libxml2; flags for target libxml2 come from pkg-config below
+ use ExtUtils::MakeMaker;
+ use Config;
+ 
+@@ -71,7 +71,14 @@
+   DEFINE  => '-DHAVE_UTF8',
+   OBJECT  => '$(O_FILES)',
+ );
+-my %xsbuild = Alien::Base::Wrapper->mm_args;  # Might contain a definition of DEFINE, must thus concatenate.
++my %xsbuild;
++{
++  # OE cross build: locate the target libxml2 via pkg-config instead of Alien.
++  chomp(my $cflags = `pkg-config --cflags libxml-2.0`);
++  chomp(my $libs   = `pkg-config --libs libxml-2.0`);
++  die "pkg-config failed for libxml-2.0\n" if $? != 0;
++  %xsbuild = ( INC => $cflags, LIBS => "$libs -lz -lm" );
++}
+ while (my ($k, $v) = each %xsbuild_concat) {
+   my $base_val = $xsbuild{$k};
+   $xsbuild{$k} = (defined($base_val) ? ($base_val . ' ' . $v) : $v);

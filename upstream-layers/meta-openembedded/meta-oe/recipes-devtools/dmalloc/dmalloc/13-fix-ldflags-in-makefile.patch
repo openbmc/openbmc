@@ -1,19 +1,18 @@
 Upstream-Status: Pending
 
-Index: dmalloc-5.5.2/Makefile.in
-===================================================================
---- dmalloc-5.5.2.orig/Makefile.in
-+++ dmalloc-5.5.2/Makefile.in
-@@ -260,7 +260,7 @@ shlib : $(BUILD_SL)
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -302,7 +302,7 @@
+ # NOTE: you may have to edit the configure.ac script to get this to
  # work on your operating system.  Please send feedback to the author
- # via: http://256.com/gray/email.html
  $(LIB_SL) : $(OBJS_SL) $(NORMAL_OBJS_SL)
 -	$(CC) -shared -Wl,-soname,libdmalloc.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL)
 +	$(CC) $(LDFLAGS) -shared -Wl,-soname,libdmalloc.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL)
  
  $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
  	ar cr $@ $?
-@@ -271,21 +271,21 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
+@@ -313,21 +313,21 @@
  	@RANLIB@ $@
  
  $(LIB_TH_SL) : $(OBJS_SL) $(THREAD_OBJS_SL)

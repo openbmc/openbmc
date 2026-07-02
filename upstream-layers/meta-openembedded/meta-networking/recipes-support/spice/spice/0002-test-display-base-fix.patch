@@ -1,0 +1,34 @@
+From: Nicholas Vinson <nvinson234@gmail.com>
+Date: Mon, 08 Dec 2025 00:33:52 -0800
+Subject: [PATCH] test-display-base.cpp: adjust designated init for C++20
+
+Adjust designated initializer to be C++20 compliant. Starting with
+g++-16, GCC will default to the C++20 standard.
+
+Note: v3 was acked by the maintainer on the spice-devel mailing list
+in December 2025 but was never merged.
+
+Upstream-Status: Submitted [https://www.mail-archive.com/spice-devel@lists.freedesktop.org/msg53355.html]
+
+Signed-off-by: Nicholas Vinson <nvinson234@gmail.com>
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+
+---
+ server/tests/test-display-base.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/server/tests/test-display-base.cpp b/server/tests/test-display-base.cpp
+index b220b7fe..5d0404c9 100644
+--- a/server/tests/test-display-base.cpp
++++ b/server/tests/test-display-base.cpp
+@@ -806,7 +806,7 @@ static QXLInterface display_sif = {
+         .major_version = SPICE_INTERFACE_QXL_MAJOR,
+         .minor_version = SPICE_INTERFACE_QXL_MINOR
+     },
+-    { .attached_worker = attached_worker },
++    .attached_worker = attached_worker,
+     .set_compression_level = set_compression_level,
+     .set_mm_time = nullptr,
+     .get_init_info = get_init_info,
+--
+2.52.0

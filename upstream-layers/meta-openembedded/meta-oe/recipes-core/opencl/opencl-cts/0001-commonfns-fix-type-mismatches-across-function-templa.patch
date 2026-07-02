@@ -1,0 +1,209 @@
+From ab834418e4250715868ba2b7d551c3c0e341a449 Mon Sep 17 00:00:00 2001
+From: Antonios Christidis <a-christidis@ti.com>
+Date: Wed, 24 Jun 2026 15:10:17 -0500
+Subject: [PATCH 1/2] commonfns: fix type mismatches across function templates
+
+Across multiple function templates within commonfns, format compilation
+errors are showing up. These errors are originating from print statements,
+where there is a type mismatch between the format specifier and variable
+provided. The variable provided inherits its type from the function
+template, and when the type does not match the expected format specifier
+the error shows.
+
+As an example:
+
+test_step_fn<T> template calls verify_step<T> template with T being int.
+Within verify_step<T>, local variable r is also of type T.  Later on in the
+function when going down either of the two log_error paths r gets printed
+using %a which expects a double. But r is of type int, so use conv_to_dbl()
+to convert.
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/OpenCL-CTS/pull/2728]
+
+Signed-off-by: Antonios Christidis <a-christidis@ti.com>
+---
+ test_conformance/commonfns/test_binary_fn.cpp  | 14 ++++++++++----
+ test_conformance/commonfns/test_clamp.cpp      |  4 +++-
+ test_conformance/commonfns/test_mix.cpp        |  9 ++++++---
+ test_conformance/commonfns/test_smoothstep.cpp |  8 +++++---
+ test_conformance/commonfns/test_step.cpp       |  7 +++++--
+ test_conformance/commonfns/test_unary_fn.cpp   | 12 ++++++++----
+ 6 files changed, 37 insertions(+), 17 deletions(-)
+
+diff --git a/test_conformance/commonfns/test_binary_fn.cpp b/test_conformance/commonfns/test_binary_fn.cpp
+index 8ad347aa..4a86310a 100644
+--- a/test_conformance/commonfns/test_binary_fn.cpp
++++ b/test_conformance/commonfns/test_binary_fn.cpp
+@@ -220,12 +220,15 @@ int max_verify(const T* const x, const T* const y, const T* const out,
+                               "(index %d is "
+                               "vector %d, element %d, for vector size %d)\n",
+                               k, conv_to_flt(x[k]), l, conv_to_flt(y[l]), k,
+-                              conv_to_flt(out[k]), v, k, i, j, vecSize);
++                              conv_to_flt(out[k]), conv_to_flt(v), k, i, j,
++                              vecSize);
+                 else
+                     log_error("x[%d]=%g y[%d]=%g out[%d]=%g, expected %g. "
+                               "(index %d is "
+                               "vector %d, element %d, for vector size %d)\n",
+-                              k, x[k], l, y[l], k, out[k], v, k, i, j, vecSize);
++                              k, conv_to_flt(x[k]), l, conv_to_flt(y[l]), k,
++                              conv_to_flt(out[k]), conv_to_flt(v), k, i, j,
++                              vecSize);
+                 return -1;
+             }
+         }
+@@ -251,12 +254,15 @@ int min_verify(const T* const x, const T* const y, const T* const out,
+                               "(index %d is "
+                               "vector %d, element %d, for vector size %d)\n",
+                               k, conv_to_flt(x[k]), l, conv_to_flt(y[l]), k,
+-                              conv_to_flt(out[k]), v, k, i, j, vecSize);
++                              conv_to_flt(out[k]), conv_to_flt(v), k, i, j,
++                              vecSize);
+                 else
+                     log_error("x[%d]=%g y[%d]=%g out[%d]=%g, expected %g. "
+                               "(index %d is "
+                               "vector %d, element %d, for vector size %d)\n",
+-                              k, x[k], l, y[l], k, out[k], v, k, i, j, vecSize);
++                              k, conv_to_flt(x[k]), l, conv_to_flt(y[l]), k,
++                              conv_to_flt(out[k]), conv_to_flt(v), k, i, j,
++                              vecSize);
+                 return -1;
+             }
+         }
+diff --git a/test_conformance/commonfns/test_clamp.cpp b/test_conformance/commonfns/test_clamp.cpp
+index 298811e2..0c272829 100644
+--- a/test_conformance/commonfns/test_clamp.cpp
++++ b/test_conformance/commonfns/test_clamp.cpp
+@@ -138,7 +138,9 @@ int verify_clamp(const T *const x, const T *const minval, const T *const maxval,
+             {
+                 log_error(
+                     "%d) verification error: clamp( %a, %a, %a) = *%a vs. %a\n",
+-                    i, x[i], minval[i], maxval[i], t, outptr[i]);
++                    i, conv_to_flt(x[i]), conv_to_flt(minval[i]),
++                    conv_to_flt(maxval[i]), conv_to_flt(t),
++                    conv_to_flt(outptr[i]));
+                 return -1;
+             }
+         }
+diff --git a/test_conformance/commonfns/test_mix.cpp b/test_conformance/commonfns/test_mix.cpp
+index ae543d0d..239a3380 100644
+--- a/test_conformance/commonfns/test_mix.cpp
++++ b/test_conformance/commonfns/test_mix.cpp
+@@ -82,7 +82,9 @@ int verify_mix(const T *const inptrX, const T *const inptrY,
+                 {
+                     log_error("%d) verification error: mix(%a, %a, %a) = *%a "
+                               "vs. %a\n",
+-                              i, inptrX[i], inptrY[i], inptrA[i], r, outptr[i]);
++                              i, conv_to_flt(inptrX[i]), conv_to_flt(inptrY[i]),
++                              conv_to_flt(inptrA[i]), r,
++                              conv_to_flt(outptr[i]));
+                     return -1;
+                 }
+             }
+@@ -111,8 +113,9 @@ int verify_mix(const T *const inptrX, const T *const inptrY,
+                         log_error(
+                             "{%d, element %d}) verification error: mix(%a, "
+                             "%a, %a) = *%a vs. %a\n",
+-                            ii, j, inptrX[vi], inptrY[vi], inptrA[i], r,
+-                            outptr[vi]);
++                            ii, j, conv_to_flt(inptrX[vi]),
++                            conv_to_flt(inptrY[vi]), conv_to_flt(inptrA[i]), r,
++                            conv_to_flt(outptr[vi]));
+                         return -1;
+                     }
+                 }
+diff --git a/test_conformance/commonfns/test_smoothstep.cpp b/test_conformance/commonfns/test_smoothstep.cpp
+index 6aaa800d..4a42513a 100644
+--- a/test_conformance/commonfns/test_smoothstep.cpp
++++ b/test_conformance/commonfns/test_smoothstep.cpp
+@@ -84,7 +84,8 @@ int verify_smoothstep(const T *const edge0, const T *const edge1,
+                     log_error(
+                         "%d) verification error: smoothstep(%a, %a, %a) = "
+                         "*%a vs. %a\n",
+-                        i, x[i], edge0[i], edge1[i], r, outptr[i]);
++                        i, conv_to_flt(x[i]), conv_to_flt(edge0[i]),
++                        conv_to_flt(edge1[i]), r, conv_to_flt(outptr[i]));
+                     return -1;
+                 }
+             }
+@@ -115,8 +116,9 @@ int verify_smoothstep(const T *const edge0, const T *const edge1,
+                     {
+                         log_error("{%d, element %d}) verification error: "
+                                   "smoothstep(%a, %a, %a) = *%a vs. %a\n",
+-                                  ii, j, x[vi], edge0[i], edge1[i], r,
+-                                  outptr[vi]);
++                                  ii, j, conv_to_flt(x[vi]),
++                                  conv_to_flt(edge0[i]), conv_to_flt(edge1[i]),
++                                  r, conv_to_flt(outptr[vi]));
+                         return -1;
+                     }
+                 }
+diff --git a/test_conformance/commonfns/test_step.cpp b/test_conformance/commonfns/test_step.cpp
+index e3a6fdf6..a98086bf 100644
+--- a/test_conformance/commonfns/test_step.cpp
++++ b/test_conformance/commonfns/test_step.cpp
+@@ -81,12 +81,15 @@ int verify_step(const T *const inptrA, const T *const inptrB,
+                             "Failure @ {%d, element %d}: step(%a,%a) -> *%a "
+                             "vs %a\n",
+                             ii, j, conv_to_flt(inptrA[ii]),
+-                            conv_to_flt(inptrB[i]), r, conv_to_flt(outptr[i]));
++                            conv_to_flt(inptrB[i]), conv_to_dbl(r),
++                            conv_to_flt(outptr[i]));
+                     else
+                         log_error(
+                             "Failure @ {%d, element %d}: step(%a,%a) -> *%a "
+                             "vs %a\n",
+-                            ii, j, inptrA[ii], inptrB[i], r, outptr[i]);
++                            ii, j, conv_to_flt(inptrA[ii]),
++                            conv_to_flt(inptrB[i]), conv_to_dbl(r),
++                            conv_to_flt(outptr[i]));
+                     return -1;
+                 }
+             }
+diff --git a/test_conformance/commonfns/test_unary_fn.cpp b/test_conformance/commonfns/test_unary_fn.cpp
+index 599067d2..ecd24822 100644
+--- a/test_conformance/commonfns/test_unary_fn.cpp
++++ b/test_conformance/commonfns/test_unary_fn.cpp
+@@ -82,7 +82,8 @@ int verify_degrees(const T *const inptr, const T *const outptr, int n)
+                 else
+                     log_error(
+                         "%d) Error @ %a: *%a vs %a  (*%g vs %g) ulps: %f\n", i,
+-                        inptr[i], r, outptr[i], r, outptr[i], error);
++                        conv_to_flt(inptr[i]), r, conv_to_flt(outptr[i]), r,
++                        conv_to_flt(outptr[i]), error);
+                 return 1;
+             }
+         }
+@@ -98,7 +99,8 @@ int verify_degrees(const T *const inptr, const T *const outptr, int n)
+         log_info("degrees: Max error %f ulps at %d, input %a: *%a vs %a  (*%g "
+                  "vs %g)\n",
+                  max_error, max_index, conv_to_flt(inptr[max_index]), max_val,
+-                 outptr[max_index], max_val, outptr[max_index]);
++                 conv_to_flt(outptr[max_index]), max_val,
++                 conv_to_flt(outptr[max_index]));
+ 
+     return 0;
+ }
+@@ -131,7 +133,8 @@ int verify_radians(const T *const inptr, const T *const outptr, int n)
+                 else
+                     log_error(
+                         "%d) Error @ %a: *%a vs %a  (*%g vs %g) ulps: %f\n", i,
+-                        inptr[i], r, outptr[i], r, outptr[i], error);
++                        conv_to_flt(inptr[i]), r, conv_to_flt(outptr[i]), r,
++                        conv_to_flt(outptr[i]), error);
+                 return 1;
+             }
+         }
+@@ -147,7 +150,8 @@ int verify_radians(const T *const inptr, const T *const outptr, int n)
+         log_info("radians: Max error %f ulps at %d, input %a: *%a vs %a  (*%g "
+                  "vs %g)\n",
+                  max_error, max_index, conv_to_flt(inptr[max_index]), max_val,
+-                 outptr[max_index], max_val, outptr[max_index]);
++                 conv_to_flt(outptr[max_index]), max_val,
++                 conv_to_flt(outptr[max_index]));
+ 
+     return 0;
+ }
+-- 
+2.34.1
+

@@ -1,0 +1,30 @@
+From 2e0994321b57e547a3c1f7e1f225e55ca007e45f Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 15 Jun 2026 17:53:47 +0300
+Subject: [PATCH] bleak: Support newer uv_build versions
+
+Support newer uv_build versions
+
+Upstream-Status: Submitted [https://github.com/hbldh/bleak/pull/2001]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 3224afc..4be6da7 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -66,7 +66,7 @@ dev = [
+ ]
+ 
+ [build-system]
+-requires = ["uv_build>=0.10.9,<0.11.0"]
++requires = ["uv_build>=0.10.9,<0.12.0"]
+ build-backend = "uv_build"
+ 
+ [tool.uv.build-backend]
+-- 
+2.47.3
+

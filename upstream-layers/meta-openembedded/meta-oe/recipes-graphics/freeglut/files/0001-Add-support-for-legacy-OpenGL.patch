@@ -1,28 +1,53 @@
 From a4c51ae7897f1ad82d10e593344511b3d7b81dbc Mon Sep 17 00:00:00 2001
 From: Jan Vermaete <jan.vermaete@gmail.com>
 Date: Wed, 24 Dec 2025 12:58:36 +0100
-Subject: [PATCH 1/1] Add support for legacy OpenGL
+Subject: [PATCH 1/1] Add support for legacy (non-GLVND) OpenGL
+
+Without the glvnd distro feature libglvnd is not built, so libOpenGL.so
+(OPENGL_opengl_LIBRARY) is absent. Make all OpenGL-using code paths work
+against the legacy mesa libGL.so instead:
+
+* Link the legacy OpenGL::GL target rather than the GLVND OpenGL::OpenGL
+  target everywhere (X11, GLES and Wayland).
+
+* X11 / GLES: drop the unsatisfiable GLVND "OpenGL" component from the
+  FIND_PACKAGE() calls; the legacy OpenGL::GL target covers it.
+
+* Wayland: CMake's FindOpenGL couples the EGL component to GLVND -
+  requesting EGL without GLES2/GLES3 forces OPENGL_opengl_LIBRARY to be a
+  required var (FindOpenGL.cmake), so configure fails with:
+
+    Could NOT find OpenGL (missing: OPENGL_opengl_LIBRARY)
+
+  at CMakeLists.txt:435. Find EGL via pkg-config (PkgConfig::EGL) instead,
+  which works regardless of GLVND, and keep the legacy OpenGL::GL target.
 
 Upstream-Status: Pending
 
 Signed-off-by: Rob Woolley <rob.woolley@windriver.com>
 Commited-by: Jan Vermaete <jan.vermaete@gmail.com>
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- CMakeLists.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ CMakeLists.txt | 19 +++++++------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 23741bf..31b3ac8 100644
+index 23741bf..580d1a0 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -378,13 +378,13 @@ IF(FREEGLUT_GLES)
-       FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL GLES2 OpenGL)
+@@ -375,16 +375,16 @@ ENDIF()
+ IF(FREEGLUT_GLES)
+     LIST(APPEND PUBLIC_DEFINITIONS -DFREEGLUT_GLES)
+     if(NOT CMAKE_VERSION VERSION_LESS "3.27")
+-      FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL GLES2 OpenGL)
++      FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL GLES2)
        CMAKE_PATH(GET OPENGL_gles2_LIBRARY PARENT_PATH _OPENGL_LIBDIR)
        FIND_LIBRARY(GLES1_LIBRARY GLESv1_CM HINTS ${_OPENGL_LIBDIR} REQUIRED)
 -      LIST(APPEND LIBS ${GLES1_LIBRARY} OpenGL::EGL OpenGL::GLES2 OpenGL::OpenGL)
 +      LIST(APPEND LIBS ${GLES1_LIBRARY} OpenGL::EGL OpenGL::GLES2 OpenGL::GL)
      elseif(NOT CMAKE_VERSION VERSION_LESS "3.10")
-       FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL OpenGL)
+-      FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL OpenGL)
++      FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL)
        GET_FILENAME_COMPONENT(_OPENGL_LIBDIR ${OPENGL_egl_LIBRARY} DIRECTORY)
        FIND_LIBRARY(GLES1_LIBRARY GLESv1_CM HINTS ${_OPENGL_LIBDIR})
        FIND_LIBRARY(GLES2_LIBRARY GLESv2 HINTS ${_OPENGL_LIBDIR})
@@ -31,15 +56,30 @@ index 23741bf..31b3ac8 100644
      else()
        FIND_PACKAGE(OpenGL REQUIRED)
        LIST(GET ${OPENGL_LIBRARIES} 0 _OPENGL_LIB)
-@@ -433,7 +433,7 @@ IF(FREEGLUT_WAYLAND)
+@@ -407,7 +407,7 @@ ELSE()
+     endif()
+ 
+     if(NOT CMAKE_VERSION VERSION_LESS "3.10")
+-      FIND_PACKAGE(OpenGL REQUIRED COMPONENTS OpenGL)
++      FIND_PACKAGE(OpenGL REQUIRED)
+       LIST(APPEND LIBS OpenGL::GL)
+     else()
+       FIND_PACKAGE(OpenGL REQUIRED)
+@@ -432,8 +432,13 @@ IF(FREEGLUT_WAYLAND)
+   ADD_DEFINITIONS(-DFREEGLUT_WAYLAND)
    INCLUDE(FindPkgConfig)
    if(NOT CMAKE_VERSION VERSION_LESS "3.10")
-     FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL OpenGL)
+-    FIND_PACKAGE(OpenGL REQUIRED COMPONENTS EGL OpenGL)
 -    LIST(APPEND LIBS OpenGL::EGL OpenGL::OpenGL)
-+    LIST(APPEND LIBS OpenGL::EGL OpenGL::GL)
++    # CMake's FindOpenGL ties the EGL component to GLVND: requesting EGL
++    # without GLES2/GLES3 forces OPENGL_opengl_LIBRARY (libOpenGL.so) to be
++    # required, which is absent without the glvnd distro feature. Find EGL via
++    # pkg-config instead and use the legacy OpenGL::GL (libGL) target.
++    FIND_PACKAGE(OpenGL REQUIRED)
++    PKG_CHECK_MODULES(EGL REQUIRED IMPORTED_TARGET egl)
++    LIST(APPEND LIBS PkgConfig::EGL OpenGL::GL)
    else()
      FIND_PACKAGE(OpenGL REQUIRED)
      LIST(GET ${OPENGL_LIBRARIES} 0 _OPENGL_LIB)
--- 
+--
 2.47.3
-

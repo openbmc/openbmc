@@ -26,7 +26,7 @@ PACKAGECONFIG[x11] = ",,virtual/libx11 libice libxmu libglu libxrandr libxext"
 # error by clang16+ and this is not really a problem
 CFLAGS += "-Wno-implicit-function-declaration"
 
-PROVIDES += "mesa-glut"
+PROVIDES += "mesa-glut virtual/freeglut"
 
 DEPENDS = "virtual/libgl libxi"
 
@@ -36,4 +36,7 @@ UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
 do_install:append() {
     # Remove buildpaths
     sed -i "s#${RECIPE_SYSROOT}##g" ${D}${libdir}/cmake/FreeGLUT/FreeGLUTTargets.cmake
+    if [ -f "${D}${libdir}/libfreeglut-gles.so" ]; then
+        ln -sf libfreeglut-gles.so ${D}${libdir}/libglut.so
+    fi
 }

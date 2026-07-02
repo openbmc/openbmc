@@ -6,12 +6,10 @@ Split installation of the utilitity from the global install.
 Copyright 2007 Yann E. MORIN <yann.morin.1998@anciens.enib.fr>
 Licensed to you as dmalloc-5.5.2 is.
 
-Index: dmalloc-5.5.2/Makefile.in
-===================================================================
---- dmalloc-5.5.2.orig/Makefile.in
-+++ dmalloc-5.5.2/Makefile.in
-@@ -178,66 +178,66 @@ distclean : clean
- #	rm -f configure
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -186,65 +186,65 @@
+ docs : $(DOCS) LICENSE.txt
  
  installdirs :
 -	$(srcdir)/mkinstalldirs $(includedir) $(libdir) $(bindir)
@@ -83,24 +81,22 @@ Index: dmalloc-5.5.2/Makefile.in
  @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
  @TH_OFF@	@echo "Enter 'make installth' to install thread library"
  
- installdocs : $(srcdir)/docs/$(HTMLFILE) $(srcdir)/docs/$(TEXIFILE) \
- 		$(srcdir)/docs/$(PDFFILE)
+ # see notes about why we need the FILE2 entries below
+ installdocs : $(INSTALL_FILE2) $(HTML_FILE2) $(INFO_FILE)
 -	$(srcdir)/mkinstalldirs $(docdir)
--	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(docdir)
--	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(docdir)
--	$(INSTALL_DATA) $(srcdir)/docs/$(PDFFILE) $(docdir)
+-	$(INSTALL_DATA) $(INSTALL_FILE2) $(docdir)/$(INSTALL_FILE)
+-	$(INSTALL_DATA) $(HTML_FILE2) $(docdir)/$(HTML_FILE)
+-	$(INSTALL_DATA) $(INFO_FILE) $(docdir)
 +	$(srcdir)/mkinstalldirs $(DESTDIR)/$(docdir)
-+	$(INSTALL_DATA) $(srcdir)/docs/$(HTMLFILE) $(DESTDIR)/$(docdir)
-+	$(INSTALL_DATA) $(srcdir)/docs/$(TEXIFILE) $(DESTDIR)/$(docdir)
-+	$(INSTALL_DATA) $(srcdir)/docs/$(PDFFILE) $(DESTDIR)/$(docdir)
++	$(INSTALL_DATA) $(INSTALL_FILE2) $(DESTDIR)/$(docdir)/$(INSTALL_FILE)
++	$(INSTALL_DATA) $(HTML_FILE2) $(DESTDIR)/$(docdir)/$(HTML_FILE)
++	$(INSTALL_DATA) $(INFO_FILE) $(DESTDIR)/$(docdir)
  
  install : installincs installlib $(UTIL)
 -	$(srcdir)/mkinstalldirs $(bindir)
 -	$(INSTALL_PROGRAM) $(UTIL) $(bindir)
--	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(docdir)"
 +	$(srcdir)/mkinstalldirs $(DESTDIR)/$(bindir)
 +	$(INSTALL_PROGRAM) $(UTIL) $(DESTDIR)/$(bindir)
-+	@echo "Enter 'make installdocs' to install $(DOCFILES) in $(DESTDIR)/$(docdir)"
+ 	@echo "Enter 'make installdocs' to install $(DOCS) in $(docdir)"
  
- dmalloc.h.2 : $(srcdir)/configure
- 	$(SHELL) $(srcdir)/configure
+ dmalloc.h.2 conf.h settings.h version.h : $(srcdir)/configure $(srcdir)/settings.dist $(srcdir)/conf.h.in

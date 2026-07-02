@@ -1,0 +1,34 @@
+From da0746f90c80bb5621d01f35d505412cd26898e2 Mon Sep 17 00:00:00 2001
+From: Mihajlo Marinkovic <mmarinkovic@snap.com>
+Date: Thu, 21 May 2026 14:10:00 +0200
+Subject: [PATCH] adb: replace socket_get_local_port with inline getsockname
+
+The libcutils socket_get_local_port helper is not available in the native
+libcutils build. Replace the call with an inline getsockname implementation.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Mihajlo Marinkovic <mmarinkovic@snap.com>
+---
+ packages/modules/adb/sysdeps.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/packages/modules/adb/sysdeps.h b/packages/modules/adb/sysdeps.h
+index 99f6b74..9a99295 100644
+--- a/packages/modules/adb/sysdeps.h
++++ b/packages/modules/adb/sysdeps.h
+@@ -626,7 +626,13 @@ inline int adb_getsockname(borrowed_fd fd, struct sockaddr* sockaddr, socklen_t*
+ }
+ 
+ inline int adb_socket_get_local_port(borrowed_fd fd) {
+-    return socket_get_local_port(fd.get());
++    sockaddr_storage addr;
++    socklen_t addr_size = sizeof(addr);
++
++    if (getsockname(fd.get(), reinterpret_cast<sockaddr*>(&addr), &addr_size) == 0) {
++        return ntohs(reinterpret_cast<sockaddr_in*>(&addr)->sin_port);
++    }
++    return -1;
+ }
+ 
+ // Operate on a file descriptor returned from unix_open() or a well-known file

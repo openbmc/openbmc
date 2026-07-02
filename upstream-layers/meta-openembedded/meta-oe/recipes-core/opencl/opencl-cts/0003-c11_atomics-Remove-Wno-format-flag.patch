@@ -1,0 +1,29 @@
+From e0439fd5cc889d64864c66b62ccf2d4e5accade0 Mon Sep 17 00:00:00 2001
+From: Antonios Christidis <a-christidis@ti.com>
+Date: Wed, 24 Jun 2026 16:02:02 -0500
+Subject: [PATCH 3/3] c11_atomics: Remove -Wno-format flag
+
+Remove -Wno-format compiler flag for files within c11_atomics.
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/OpenCL-CTS/pull/2727]
+
+Signed-off-by: Antonios Christidis <a-christidis@ti.com>
+---
+ test_conformance/c11_atomics/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test_conformance/c11_atomics/CMakeLists.txt b/test_conformance/c11_atomics/CMakeLists.txt
+index 25f0ba39..da39f5c2 100644
+--- a/test_conformance/c11_atomics/CMakeLists.txt
++++ b/test_conformance/c11_atomics/CMakeLists.txt
+@@ -8,6 +8,6 @@ set(${MODULE_NAME}_SOURCES
+     inclusive_scopes.cpp
+ )
+
+-set_gnulike_module_compile_flags("-Wno-sign-compare -Wno-format")
++set_gnulike_module_compile_flags("-Wno-sign-compare")
+
+ include(../CMakeCommon.txt)
+-- 
+2.34.1
+

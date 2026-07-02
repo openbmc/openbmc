@@ -9,7 +9,7 @@ REQUIRED_DISTRO_FEATURES = "opengl x11"
 
 DEPENDS += " \
     freetype \
-    freeglut \
+    virtual/freeglut \
 "
 SRCREV = "b787042cc1d1e4861337d5f9a6727e4c6900a4f2"
 PV .= "+git"

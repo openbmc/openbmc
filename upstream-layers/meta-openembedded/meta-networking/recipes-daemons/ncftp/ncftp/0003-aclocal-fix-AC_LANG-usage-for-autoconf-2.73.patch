@@ -1,0 +1,29 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jun 2026 00:00:00 +0000
+Subject: [PATCH] aclocal: fix AC_LANG usage for autoconf 2.73
+
+wi_TRY_RUN_NATIVE used the autoconf 2.13-era idiom
+"ifelse(AC_LANG, CPLUSPLUS, ...)". In modern autoconf AC_LANG is a macro
+that sets the current language rather than expanding to its name, so
+expanding it bare aborts autom4te ("m4 failed with exit status 1").
+ncftp is built as C, so emit the harmless C++ guard unconditionally.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/autoconf_local/aclocal.m4
++++ b/autoconf_local/aclocal.m4
+@@ -416,10 +416,10 @@
+ [cat > conftest.$ac_ext <<EOF
+ [#]line __oline__ "configure"
+ #include "confdefs.h"
+-ifelse(AC_LANG, CPLUSPLUS, [#ifdef __cplusplus
++#ifdef __cplusplus
+ extern "C" void exit(int);
+ #endif
+-])dnl
++dnl
+ wi_STD_INCLUDES
+ [$1]
+ EOF

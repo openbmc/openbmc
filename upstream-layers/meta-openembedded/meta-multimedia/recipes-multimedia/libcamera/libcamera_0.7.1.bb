@@ -101,4 +101,4 @@ GLIBC_64BIT_TIME_FLAGS = ""
 
 INSANE_SKIP += "32bit-time"
 
-CXXFLAGS += "-Wno-error=array-bounds="
+CXXFLAGS += "-Wno-error=array-bounds"

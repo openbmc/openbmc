@@ -26,7 +26,8 @@ SRC_URI = "http://downloads.yoctoproject.org/mirror/sources/DirectFB-${PV}.tar.g
            file://0001-include-libgen.h-for-basename.patch \
            file://0001-inputdrivers-Correct-the-signature-of-bind-call-on-m.patch \
            file://0001-libdirect-remove-use-of-keyword-register.patch \
-           "
+	    file://0001-TaskManager-make-comparator-const.patch \
+	    "
 
 S = "${UNPACKDIR}/DirectFB-${PV}"
 

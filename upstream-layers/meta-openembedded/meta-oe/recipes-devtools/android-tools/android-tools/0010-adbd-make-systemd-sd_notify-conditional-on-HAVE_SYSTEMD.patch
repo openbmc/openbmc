@@ -1,0 +1,54 @@
+From c5f5f6c1a5de768e3559fb0b261065f1766ac3c3 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Fri, 12 Jun 2026 15:54:47 +0200
+Subject: [PATCH] adbd: make systemd sd_notify conditional on HAVE_SYSTEMD
+
+Guard the sd-daemon.h include and sd_notify() call behind HAVE_SYSTEMD
+instead of __linux__, so the feature is opt-in via a recipe PACKAGECONFIG.
+Add a corresponding ifeq block in debian/system/adbd.mk to pass
+-DHAVE_SYSTEMD and -lsystemd only when the flag is set.
+
+Upstream-Status: Inappropriate [OE-specific]
+---
+ debian/system/adbd.mk                | 5 +++++
+ packages/modules/adb/daemon/main.cpp | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/debian/system/adbd.mk b/debian/system/adbd.mk
+index e755f20..a3f88f1 100644
+--- a/debian/system/adbd.mk
++++ b/debian/system/adbd.mk
+@@ -104,6 +104,11 @@ LDFLAGS += \
+   -lzstd \
+   -pie \
+ 
++ifeq ($(HAVE_SYSTEMD),1)
++LDFLAGS += -lsystemd
++CPPFLAGS += -DHAVE_SYSTEMD
++endif
++
+ STATIC_LIBS = \
+   debian/out/system/libadb.a \
+   debian/out/system/libcrypto_utils.a \
+diff --git a/packages/modules/adb/daemon/main.cpp b/packages/modules/adb/daemon/main.cpp
+index 0b4a909..ac37461 100644
+--- a/packages/modules/adb/daemon/main.cpp
++++ b/packages/modules/adb/daemon/main.cpp
+@@ -49,7 +49,7 @@
+ #include "selinux/android.h"
+ #endif
+ 
+-#if defined(__linux__)
++#if defined(HAVE_SYSTEMD)
+ #include <systemd/sd-daemon.h>
+ #endif
+ 
+@@ -368,7 +368,7 @@ int adbd_main(int server_port) {
+     init_jdwp();
+     D("adbd_main(): post init_jdwp()");
+ 
+-#if defined(__linux__)
++#if defined(HAVE_SYSTEMD)
+     sd_notify(1, "READY=1");
+ #endif
+ 

@@ -18,6 +18,12 @@ UPSTREAM_CHECK_REGEX = "libmng-devel/(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools-brokensep pkgconfig
 
+# The release tarball ships a pre-generated Makefile with the maintainer's
+# absolute build paths baked in (e.g. ${SHELL} /sources/LIB/MNG/.../missing),
+# so the "make clean" run by autotools_preconfigure fails before autoreconf
+# regenerates the build system. Skip that pre-configure clean.
+CLEANBROKEN = "1"
+
 PACKAGECONFIG ??= "jpeg"
 
 PACKAGECONFIG[jpeg] = "--with-jpeg,--without-jpeg,jpeg"

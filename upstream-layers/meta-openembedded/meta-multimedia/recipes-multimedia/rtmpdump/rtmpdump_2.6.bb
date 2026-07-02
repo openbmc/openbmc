@@ -11,6 +11,7 @@ PV .= "+git"
 SRCREV = "6f6bb1353fc84f4cc37138baa99f586750028a01"
 SRC_URI = " \
     git://git.ffmpeg.org/rtmpdump;branch=master \
+    file://nettle-4.patch \
 "
 
 

@@ -43,9 +43,11 @@ EXTRA_OECONF += "--disable-rpath"
 
 EXTRA_OEMAKE = 'LDFLAGS="${LDFLAGS}"'
 
-CFLAGS += "-Wno-error=maybe-uninitialized"
+# -Wmaybe-uninitialized is a GCC-only option; clang does not recognise it and
+# errors out on -Wno-error=maybe-uninitialized (-Werror,-Wunknown-warning-option).
+CFLAGS += "${@bb.utils.contains('TOOLCHAIN', 'gcc', '-Wno-error=maybe-uninitialized', '', d)}"
 
-DEBUG_OPTIMIZATION:append = " -Wno-error=maybe-uninitialized"
+DEBUG_OPTIMIZATION:append = " ${@bb.utils.contains('TOOLCHAIN', 'gcc', '-Wno-error=maybe-uninitialized', '', d)}"
 
 do_install:append:class-target() {
     # cleanup buildpaths from gdlib.pc

@@ -9,9 +9,16 @@ SRC_URI[sha256sum] = "ae280f697bf035a1fb780c9972e5c81d0d2712b7ab6124fb3fba24619d
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/${BPN}-1.x:"
 
-inherit python3native
+inherit autotools python3native
 inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'python3', 'python3targetconfig', '', d)}
 
+# Always build tools - they don't have any additional
+# requirements over the library.
+EXTRA_OECONF = "--enable-tools"
+
+DEPENDS += "autoconf-archive-native"
+
+PACKAGECONFIG[cxx] = "--enable-bindings-cxx,--disable-bindings-cxx"
 PACKAGECONFIG[tests] = "--enable-tests,--disable-tests,kmod udev glib-2.0 catch2"
 PACKAGECONFIG[python3] = "--enable-bindings-python,--disable-bindings-python,python3"
 
@@ -35,6 +42,15 @@ RDEPENDS:${PN}-ptest += " \
 "
 
 do_install_ptest:append() {
+    # These are the core C library tests
+    install -m 0755 ${B}/tests/.libs/gpiod-test ${D}${PTEST_PATH}/tests/
+
+    # Tools are always built so let's always install them for ptest even if
+    # we're not selecting libgpiod-tools.
+    for tool in ${FILES:${PN}-tools}; do
+        install ${B}/tools/.libs/$(basename $tool) ${D}${PTEST_PATH}/tests/
+    done
+
     install -m 0755 ${S}/tools/gpio-tools-test ${D}${PTEST_PATH}/tests/
     install -m 0755 ${S}/tools/gpio-tools-test.bats ${D}${PTEST_PATH}/tests/
 

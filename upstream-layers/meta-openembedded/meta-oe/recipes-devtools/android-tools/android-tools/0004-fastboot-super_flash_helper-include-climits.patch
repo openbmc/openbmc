@@ -1,0 +1,41 @@
+From fe7c2aa9a9032d11cb14ff7ab2a1a000237edaa3 Mon Sep 17 00:00:00 2001
+From: Mihajlo Marinkovic <mmarinkovic@snap.com>
+Date: Tue, 26 May 2026 17:41:00 +0200
+Subject: [PATCH] adb: include <climits> for missing integer constants
+
+GCC rejects builds where IOV_MAX (sysdeps/uio.h) or UINT_MAX
+(super_flash_helper.cpp) are used without the header that defines them.
+Add #include <climits> in both files.
+
+Upstream-Status: Inappropriate [OE-specific sysroot compat]
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ packages/modules/adb/sysdeps/uio.h          | 1 +
+ system/core/fastboot/super_flash_helper.cpp | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/packages/modules/adb/sysdeps/uio.h b/packages/modules/adb/sysdeps/uio.h
+index f3ace64..163b4a8 100644
+--- a/packages/modules/adb/sysdeps/uio.h
++++ b/packages/modules/adb/sysdeps/uio.h
+@@ -35,6 +35,7 @@ ssize_t adb_writev(borrowed_fd fd, const adb_iovec* iov, int iovcnt);
+ #else
+ 
+ #include <sys/uio.h>
++#include <climits>
+ using adb_iovec = struct iovec;
+ inline ssize_t adb_writev(borrowed_fd fd, const adb_iovec* iov, int iovcnt) {
+     return writev(fd.get(), iov, std::min(iovcnt, IOV_MAX));
+diff --git a/system/core/fastboot/super_flash_helper.cpp b/system/core/fastboot/super_flash_helper.cpp
+index b617ce8..8c1edde 100644
+--- a/system/core/fastboot/super_flash_helper.cpp
++++ b/system/core/fastboot/super_flash_helper.cpp
+@@ -16,6 +16,7 @@
+ 
+ #include "super_flash_helper.h"
+ 
++#include <climits>
+ #include <android-base/logging.h>
+ 
+ #include "util.h"

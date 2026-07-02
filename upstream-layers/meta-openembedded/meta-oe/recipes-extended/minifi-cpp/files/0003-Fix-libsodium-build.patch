@@ -9,8 +9,10 @@ Subject: [PATCH] Fix libsodium build
 Upstream-Status: Inappropriate [embedded specific]
 
 Signed-off-by: Yi Zhao <yi.zhao@windriver.com>
-[lz: Adapted the patch for context changes when upgrading
-from 0.99.1 to 0.99.2.]
+[lz: Adapted the patch for context changes when upgrading minifi-cpp
+from 0.99.1 to 0.99.2; adapted the patch when upgrading libsodium
+from 1.0.19 to 1.0.20 because the top-level directory name inside the
+tarball changed from libsodium-stable to libsodium-1.0.20.]
 Signed-off-by: Li Zhou <li.zhou@windriver.com>
 ---
  cmake/BundledLibSodium.cmake | 6 ++----
@@ -33,7 +35,7 @@ index 001a90dad..87a3244fd 100644
 -                URL_HASH ${LIBSODIUM_URL_HASH}
                  BUILD_IN_SOURCE true
 -                SOURCE_DIR "${BINARY_DIR}/thirdparty/libsodium-src"
-+                SOURCE_DIR "${SOURCE_DIR}/thirdparty/libsodium-stable"
++                SOURCE_DIR "${SOURCE_DIR}/thirdparty/libsodium-1.0.20"
                  BUILD_COMMAND make
                  CMAKE_COMMAND ""
                  UPDATE_COMMAND ""

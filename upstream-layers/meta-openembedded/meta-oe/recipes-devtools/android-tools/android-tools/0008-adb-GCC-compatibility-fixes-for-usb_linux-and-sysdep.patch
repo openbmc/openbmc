@@ -1,0 +1,197 @@
+From 67a400310c07fad8f9ecc0058203942237ab6325 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Wed, 10 Jun 2026 00:00:00 +0000
+Subject: [PATCH] adb: GCC compatibility fixes for usb_linux, sysdeps, and adbd
+
+GCC-specific issues when building adb/adbd with GCC instead of Clang:
+
+1. usb_linux.cpp embeds usbdevfs_urb (which ends in a flexible array member
+   iso_frame_desc[]) in a non-last position inside struct usb_handle. GCC
+   rejects this as a hard error. Introduce usbdevfs_urb_bulk, a copy of the
+   struct without the FAM, for use in embedding contexts.
+
+2. sysdeps.h uses #define write/pwrite to redirect callers to adb_write/
+   adb_pwrite. GCC's newer abseil in the native sysroot calls ostream::write()
+   which gets incorrectly macro-expanded. Replace the #define redirects with
+   #pragma GCC poison.
+
+3. adbd.mk links -lprotobuf but with protobuf 6.x the abseil log helpers are
+   no longer pulled in transitively. Add -labsl_log_internal_message and
+   -labsl_log_internal_check_op explicitly.
+
+Upstream-Status: Inappropriate [OE-specific, GCC compat]
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ debian/system/adb.mk                      |  2 ++
+ debian/system/adbd.mk                     |  2 ++
+ packages/modules/adb/client/usb_linux.cpp | 44 ++++++++++++++++-------
+ packages/modules/adb/sysdeps.h            | 11 ++----
+ 4 files changed, 37 insertions(+), 22 deletions(-)
+
+diff --git a/debian/system/adb.mk b/debian/system/adb.mk
+index 90a816f..6c9b4ce 100644
+--- a/debian/system/adb.mk
++++ b/debian/system/adb.mk
+@@ -95,6 +95,8 @@ LDFLAGS += \
+   -llog \
+   -llz4 \
+   -lprotobuf \
++  -labsl_log_internal_message \
++  -labsl_log_internal_check_op \
+   -lpthread \
+   -l:libssl.so.0 \
+   -lusb-1.0 \
+diff --git a/debian/system/adbd.mk b/debian/system/adbd.mk
+index beb412e..e755f20 100644
+--- a/debian/system/adbd.mk
++++ b/debian/system/adbd.mk
+@@ -97,6 +97,8 @@ LDFLAGS += \
+   -llog \
+   -llz4 \
+   -lprotobuf \
++  -labsl_log_internal_message \
++  -labsl_log_internal_check_op \
+   -lresolv \
+   -l:libssl.so.0 \
+   -lzstd \
+diff --git a/packages/modules/adb/client/usb_linux.cpp b/packages/modules/adb/client/usb_linux.cpp
+index 96d7a8a..ecc1035 100644
+--- a/packages/modules/adb/client/usb_linux.cpp
++++ b/packages/modules/adb/client/usb_linux.cpp
+@@ -57,6 +57,27 @@ using namespace std::literals;
+ /* usb scan debugging is waaaay too verbose */
+ #define DBGX(x...)
+ 
++// usbdevfs_urb embeds a flexible array member iso_frame_desc[]. Embedding this
++// struct in another struct in a non-last position is a hard GCC error. Since
++// ADB only uses bulk endpoints (never ISO), define a wrapper type without the
++// FAM to use for struct embedding.
++struct usbdevfs_urb_bulk {
++    unsigned char type;
++    unsigned char endpoint;
++    int status;
++    unsigned int flags;
++    void* buffer;
++    int buffer_length;
++    int actual_length;
++    int start_frame;
++    union { int number_of_packets; unsigned int stream_id; };
++    int error_count;
++    unsigned int signr;
++    void* usercontext;
++};
++static_assert(sizeof(usbdevfs_urb_bulk) == sizeof(usbdevfs_urb),
++              "usbdevfs_urb_bulk size mismatch");
++
+ struct usb_handle {
+     ~usb_handle() {
+         if (fd != -1) unix_close(fd);
+@@ -74,11 +95,8 @@ struct usb_handle {
+     // The usbdevfs_urb structure ends in a variable length array of
+     // usbdevfs_iso_packet_desc. Since none of the usb calls ever attempt
+     // to fill in those values, ignore this warning.
+-#pragma clang diagnostic push
+-#pragma clang diagnostic ignored "-Wgnu-variable-sized-type-not-at-end"
+-    usbdevfs_urb urb_in;
+-    usbdevfs_urb urb_out;
+-#pragma clang diagnostic pop
++    usbdevfs_urb_bulk urb_in;
++    usbdevfs_urb_bulk urb_out;
+ 
+     bool urb_in_busy = false;
+     bool urb_out_busy = false;
+@@ -316,7 +334,7 @@ static int usb_bulk_write(usb_handle* h, const void* data, int len) {
+     std::unique_lock<std::mutex> lock(h->mutex);
+     D("++ usb_bulk_write ++");
+ 
+-    usbdevfs_urb* urb = &h->urb_out;
++    usbdevfs_urb_bulk* urb = &h->urb_out;
+     memset(urb, 0, sizeof(*urb));
+     urb->type = USBDEVFS_URB_TYPE_BULK;
+     urb->endpoint = h->ep_out;
+@@ -329,7 +347,7 @@ static int usb_bulk_write(usb_handle* h, const void* data, int len) {
+         return -1;
+     }
+ 
+-    if (TEMP_FAILURE_RETRY(ioctl(h->fd, USBDEVFS_SUBMITURB, urb)) == -1) {
++    if (TEMP_FAILURE_RETRY(ioctl(h->fd, USBDEVFS_SUBMITURB, reinterpret_cast<usbdevfs_urb*>(urb))) == -1) {
+         return -1;
+     }
+ 
+@@ -355,7 +373,7 @@ static int usb_bulk_read(usb_handle* h, void* data, int len) {
+     std::unique_lock<std::mutex> lock(h->mutex);
+     D("++ usb_bulk_read ++");
+ 
+-    usbdevfs_urb* urb = &h->urb_in;
++    usbdevfs_urb_bulk* urb = &h->urb_in;
+     memset(urb, 0, sizeof(*urb));
+     urb->type = USBDEVFS_URB_TYPE_BULK;
+     urb->endpoint = h->ep_in;
+@@ -368,7 +386,7 @@ static int usb_bulk_read(usb_handle* h, void* data, int len) {
+         return -1;
+     }
+ 
+-    if (TEMP_FAILURE_RETRY(ioctl(h->fd, USBDEVFS_SUBMITURB, urb)) == -1) {
++    if (TEMP_FAILURE_RETRY(ioctl(h->fd, USBDEVFS_SUBMITURB, reinterpret_cast<usbdevfs_urb*>(urb))) == -1) {
+         return -1;
+     }
+ 
+@@ -400,7 +418,7 @@ static int usb_bulk_read(usb_handle* h, void* data, int len) {
+         }
+         D("[ urb @%p status = %d, actual = %d ]", out, out->status, out->actual_length);
+ 
+-        if (out == &h->urb_in) {
++        if (out == reinterpret_cast<usbdevfs_urb*>(&h->urb_in)) {
+             D("[ reap urb - IN complete ]");
+             h->urb_in_busy = false;
+             if (urb->status != 0) {
+@@ -409,7 +427,7 @@ static int usb_bulk_read(usb_handle* h, void* data, int len) {
+             }
+             return urb->actual_length;
+         }
+-        if (out == &h->urb_out) {
++        if (out == reinterpret_cast<usbdevfs_urb*>(&h->urb_out)) {
+             D("[ reap urb - OUT compelete ]");
+             h->urb_out_busy = false;
+             h->cv.notify_all();
+@@ -513,8 +531,8 @@ void usb_kick(usb_handle* h) {
+             ** but this ensures that a reader blocked on REAPURB
+             ** will get unblocked
+             */
+-            ioctl(h->fd, USBDEVFS_DISCARDURB, &h->urb_in);
+-            ioctl(h->fd, USBDEVFS_DISCARDURB, &h->urb_out);
++            ioctl(h->fd, USBDEVFS_DISCARDURB, reinterpret_cast<usbdevfs_urb*>(&h->urb_in));
++            ioctl(h->fd, USBDEVFS_DISCARDURB, reinterpret_cast<usbdevfs_urb*>(&h->urb_out));
+             h->urb_in.status = -ENODEV;
+             h->urb_out.status = -ENODEV;
+             h->urb_in_busy = false;
+diff --git a/packages/modules/adb/sysdeps.h b/packages/modules/adb/sysdeps.h
+index 9a99295..b364a47 100644
+--- a/packages/modules/adb/sysdeps.h
++++ b/packages/modules/adb/sysdeps.h
+@@ -141,11 +141,7 @@ static inline int unix_read(borrowed_fd fd, void* buf, size_t len) {
+ static inline int unix_write(borrowed_fd fd, const void* buf, size_t len) {
+     return write(fd.get(), buf, len);
+ }
+-#undef   write
+-#define  write  ___xxx_write
+-
+-#undef pwrite
+-#define pwrite ___xxx_pwrite
++// (write and pwrite macros omitted: incompatible with GCC/abseil compat)
+ 
+ // See the comments for the !defined(_WIN32) version of unix_lseek().
+ static inline int unix_lseek(borrowed_fd fd, int pos, int where) {
+@@ -549,10 +545,7 @@ static inline int adb_pwrite(int fd, const void* buf, size_t len, off64_t offset
+ #endif
+ }
+ 
+-#undef   write
+-#define  write  ___xxx_write
+-#undef pwrite
+-#define pwrite ___xxx_pwrite
++// (write and pwrite macros omitted: incompatible with GCC/abseil compat)
+ 
+ static inline int64_t adb_lseek(borrowed_fd fd, int64_t pos, int where) {
+ #if defined(__APPLE__)

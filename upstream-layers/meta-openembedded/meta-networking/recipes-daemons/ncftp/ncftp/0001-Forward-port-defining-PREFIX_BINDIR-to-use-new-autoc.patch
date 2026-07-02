@@ -11,11 +11,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.in b/configure.in
-index c3ef568..a320c56 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -44,7 +44,7 @@ wi_EXTRA_SYSV_SUNOS_DIRS	dnl	For better curses library on SunOS 4
- 
+@@ -37,7 +37,7 @@
+ wi_EXTRA_SYSV_SUNOS_DIRS	dnl	For better curses library on SunOS 4
  dnl Try to use PATH rather than hardcode the installation path, if possible.
  if test "${prefix-NONE}" != "NONE" && test "$prefix" != "/usr/local" && test "$prefix" != "/usr"; then
 -	AC_DEFINE_UNQUOTED(PREFIX_BINDIR, "$prefix/bin")

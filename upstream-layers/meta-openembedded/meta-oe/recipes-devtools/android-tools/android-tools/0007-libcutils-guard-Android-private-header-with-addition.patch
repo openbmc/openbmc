@@ -1,0 +1,36 @@
+From 35e41ab351e03abcd2709f136c57df7bc4855532 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Wed, 10 Jun 2026 00:00:00 +0000
+Subject: [PATCH] libcutils: guard Android-private header with additional
+ __has_include check
+
+The properties.cpp file uses __has_include(<sys/system_properties.h>) to
+conditionally compile the Android bionic property system implementation.
+However, some Linux host environments (e.g. those with Android SDK headers
+installed in /usr/local/include) have sys/system_properties.h without the
+accompanying private header sys/_system_properties.h.
+
+Guard both the public and private header inclusion to prevent a fatal error
+on such hosts.
+
+Upstream-Status: Inappropriate [OE-specific, guards against host header contamination]
+
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ system/core/libcutils/properties.cpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/system/core/libcutils/properties.cpp b/system/core/libcutils/properties.cpp
+index 03f0496..fd0f6c3 100644
+--- a/system/core/libcutils/properties.cpp
++++ b/system/core/libcutils/properties.cpp
+@@ -91,7 +91,8 @@ int property_get(const char* key, char* value, const char* default_value) {
+     return len;
+ }
+ 
+-#if __has_include(<sys/system_properties.h>)
++#if __has_include(<sys/system_properties.h>) && \
++    __has_include(<sys/_system_properties.h>)
+ 
+ #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+ #include <sys/_system_properties.h>

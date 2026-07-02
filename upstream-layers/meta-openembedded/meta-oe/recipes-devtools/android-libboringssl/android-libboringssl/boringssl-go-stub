@@ -1,0 +1,22 @@
+#!/bin/sh
+if [ "$1" = "run" ] && [ "$2" = "util/embed_test_data.go" ]; then
+    echo 'extern const int boringssl_dummy_crypto_test_data = 0;'
+    exit 0
+fi
+if [ "$1" = "run" ] && [ "$2" = "err_data_generate.go" ]; then
+    cat <<'EOF'
+#include <stddef.h>
+#include <stdint.h>
+
+const uint32_t kOpenSSLReasonValues[] = {0};
+const size_t kOpenSSLReasonValuesLen = 0;
+const char kOpenSSLReasonStringData[] = "";
+EOF
+    exit 0
+fi
+if [ "$1" = "version" ]; then
+    echo 'go version go0.0.0 yocto/stub'
+    exit 0
+fi
+echo "Unexpected Go invocation: $*" >&2
+exit 1

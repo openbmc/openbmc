@@ -1,0 +1,34 @@
+From 793ad99196c5b9cf2922689d993b8f798e87174c Mon Sep 17 00:00:00 2001
+From: Mihajlo Marinkovic <mmarinkovic@snap.com>
+Date: Sun, 10 May 2026 12:00:00 +0200
+Subject: [PATCH] GCC nullability and thread annotation compat
+
+GCC does not understand the Clang-only nullability markers used in adb,
+and it rejects function-definition attributes emitted by the thread
+annotation macros. The nullability markers are injected from the Yocto
+recipe flags, while thread annotation attributes are made Clang-only so
+the sources parse under Yocto's GCC toolchain.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Mihajlo Marinkovic <mmarinkovic@snap.com>
+---
+ system/libbase/include/android-base/thread_annotations.h | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/system/libbase/include/android-base/thread_annotations.h b/system/libbase/include/android-base/thread_annotations.h
+index 53fe6da..5523521 100644
+--- a/system/libbase/include/android-base/thread_annotations.h
++++ b/system/libbase/include/android-base/thread_annotations.h
+@@ -18,7 +18,11 @@
+ 
+ #include <mutex>
+ 
++#if defined(__clang__)
+ #define THREAD_ANNOTATION_ATTRIBUTE__(x) __attribute__((x))
++#else
++#define THREAD_ANNOTATION_ATTRIBUTE__(x)
++#endif
+ 
+ #define CAPABILITY(x) \
+       THREAD_ANNOTATION_ATTRIBUTE__(capability(x))

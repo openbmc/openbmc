@@ -1,0 +1,36 @@
+From af36170841d9836926953e17d93e9562e594c9aa Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jo=C3=A3o=20Marcos=20Costa?= <joaomarcos.costa@bootlin.com>
+Date: Wed, 24 Jun 2026 18:46:14 +0200
+Subject: [PATCH] cmake/BuildBPF.cmake: introduce DEBUG_PREFIX_MAP
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Upstream-Status: Inappropriate
+
+Signed-off-by: João Marcos Costa <joaomarcos.costa@bootlin.com>
+---
+ cmake/BuildBPF.cmake | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/cmake/BuildBPF.cmake b/cmake/BuildBPF.cmake
+index cb8cd687..95ae1dc1 100644
+--- a/cmake/BuildBPF.cmake
++++ b/cmake/BuildBPF.cmake
+@@ -86,11 +86,12 @@ function(bpf NAME)
+     add_custom_target(${NAME}_gen_bitcode DEPENDS ${ARG_BITCODE})
+     add_dependencies(${NAME} ${NAME}_gen_bitcode)
+   endif()
++  separate_arguments(DEBUG_PREFIX_MAP_LIST NATIVE_COMMAND "$ENV{DEBUG_PREFIX_MAP}")
+   add_custom_command(
+     OUTPUT ${ARG_OBJECT}
+     DEPENDS ${ARG_SOURCE} ${ARG_DEPENDS}
+     # See above: fresh compilation and the use of `gcc`.
+-    COMMAND ${GCC} -Wno-attributes -g -I ${CMAKE_CURRENT_BINARY_DIR} -c ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_SOURCE} -o ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
++    COMMAND ${GCC} -Wno-attributes -g ${DEBUG_PREFIX_MAP_LIST} -I ${CMAKE_CURRENT_BINARY_DIR} -c ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_SOURCE} -o ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
+     COMMAND cmake -E env LLVM_OBJCOPY=${LLVM_OBJCOPY} ${PAHOLE} -J ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
+     VERBATIM
+   )
+-- 
+2.47.0
+

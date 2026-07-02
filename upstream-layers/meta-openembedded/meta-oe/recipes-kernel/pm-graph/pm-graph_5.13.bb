@@ -19,7 +19,8 @@ SRC_URI = "git://github.com/intel/pm-graph.git;branch=master;protocol=https \
 #   - CONFIG_FUNCTION_GRAPH_TRACER=y
 
 COMPATIBLE_HOST = '(i.86|x86_64).*'
-EXTRA_OEMAKE = "PREFIX=${prefix} DESTDIR=${D} LIBDIR=${libdir} BASELIB=${baselib}"
+EXTRA_OEMAKE = "PREFIX=${prefix} DESTDIR=${D} LIBDIR=${libdir} BASELIB=${baselib} \
+                BINDIR=${bindir} MANDIR=${mandir} SHRDIR=${datadir}/pm-graph"
 
 do_install() {
     oe_runmake install

@@ -1,0 +1,45 @@
+From 2a6d219ec2f5413e38ec502421cce8a2c6d7f054 Mon Sep 17 00:00:00 2001
+From: Rajkumar Patel <patel.rajkumar@oss.qualcomm.com>
+Date: Tue, 9 Jun 2026 11:22:13 +0530
+Subject: [PATCH 1/2] configure: correctly handle CC when validating required
+ tools
+
+The tool validation loop checks the availability of required
+binaries using `command -v`. However, when CC is defined with
+additional flags (e.g. "aarch64-linux-gnu-gcc -O2 -pipe"),
+the check fails because `command -v` expects only the binary
+name.
+
+Extract the actual compiler executable from CC by taking the
+first word and include it in the validation list.
+
+This ensures tool detection works correctly in cross-compilation
+environments where CC commonly includes compiler flags.
+
+Additionally, quote variable expansions to avoid issues with
+word splitting and empty values.
+
+Upstream-Status: Pending
+
+Signed-off-by: Rajkumar Patel <patel.rajkumar@oss.qualcomm.com>
+---
+ configure | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/configure b/configure
+index d57b2ae..a234f80 100755
+--- a/configure
++++ b/configure
+@@ -70,8 +70,10 @@ check_toolchain()
+ 
+     CLANG=$(find_tool clang "$CLANG")
+ 
+-    for TOOL in $PKG_CONFIG $CC $OBJCOPY $CLANG $M4 $READELF; do
+-        if [ ! $(command -v ${TOOL} 2>/dev/null) ]; then
++    CC_TOOL=$(echo "$CC" | awk '{print $1}')
++
++    for TOOL in $PKG_CONFIG "$CC_TOOL" $OBJCOPY $CLANG $M4 $READELF; do
++        if [ ! $(command -v "${TOOL}" 2>/dev/null) ]; then
+             echo "*** ERROR: Cannot find tool ${TOOL}" ;
+             exit 1;
+         fi;

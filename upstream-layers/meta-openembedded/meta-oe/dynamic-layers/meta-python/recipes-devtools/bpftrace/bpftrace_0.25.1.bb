@@ -18,10 +18,13 @@ DEPENDS += "${@bb.utils.contains('PTEST_ENABLED', '1', 'pahole-native llvm-nativ
 SRC_URI = "git://github.com/iovisor/bpftrace;branch=release/0.25.x;protocol=https;tag=v${PV} \
            file://run-ptest \
            file://0002-CMakeLists.txt-allow-to-set-BISON_FLAGS-like-l.patch \
+           file://0001-cmake-BuildBPF.cmake-introduce-DEBUG_PREFIX_MAP.patch \
 "
 SRCREV = "e491811e5d648288c01f42ce087967b271f504a0"
 
 inherit bash-completion cmake ptest pkgconfig
+
+export DEBUG_PREFIX_MAP
 
 PACKAGECONFIG ?= " \
         ${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)} \

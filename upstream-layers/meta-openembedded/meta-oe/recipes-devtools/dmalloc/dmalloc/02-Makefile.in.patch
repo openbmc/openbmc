@@ -5,11 +5,9 @@ Description: Changes for building shared libraries
  files and the correct soname and libname.
 Author: Daniel Rus Morales <danirus@tol-project.org>
 
-Index: dmalloc-5.5.2/Makefile.in
-===================================================================
---- dmalloc-5.5.2.orig/Makefile.in
-+++ dmalloc-5.5.2/Makefile.in
-@@ -41,7 +41,7 @@ LIBRARY	= lib$(MODULE).a
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -42,7 +42,7 @@
  
  # thread version of the library
  LIB_TH	= lib$(MODULE)th.a
@@ -18,7 +16,7 @@ Index: dmalloc-5.5.2/Makefile.in
  @TH_ON@BUILD_ALL_1 = threads
  @TH_ON@INSTALL_LIB_1 = installth
  @SL_ON@BUILD_THREADS_1 = $(LIB_TH_SL)
-@@ -50,8 +50,8 @@ LIB_TH_SL = lib$(MODULE)th.@shlibext@
+@@ -51,8 +51,8 @@
  @TH_ON@@SL_ON@INSTALL_LIB_2 = installthsl
  
  # C++ version of the library
@@ -29,7 +27,7 @@ Index: dmalloc-5.5.2/Makefile.in
  @CXX_ON@BUILD_ALL_3 = $(LIB_CXX)
  @CXX_ON@INSTALL_LIB_3 = installcxx
  @SL_ON@BUILD_CXX_3 = $(LIB_CXX_SL)
-@@ -61,7 +61,7 @@ LIB_CXX_SL = lib$(MODULE)xx.@shlibext@
+@@ -62,7 +62,7 @@
  
  # threads + C++
  LIB_TH_CXX = lib$(MODULE)thcxx.a
@@ -38,7 +36,7 @@ Index: dmalloc-5.5.2/Makefile.in
  @TH_ON@@CXX_ON@BUILD_ALL_5 = $(LIB_TH_CXX)
  @TH_ON@@CXX_ON@INSTALL_LIB_5 = installthcxx
  @TH_ON@BUILD_CXX_5 = $(LIB_TH_CXX)
-@@ -76,7 +76,7 @@ LIB_TH_CXX_SL = lib$(MODULE)thcxx.@shlib
+@@ -77,7 +77,7 @@
  @CXX_ON@@SL_ON@INSTALL_THREADS_6 = installthcxxsl
  
  # shared versions of the libraries
@@ -47,21 +45,21 @@ Index: dmalloc-5.5.2/Makefile.in
  @SL_ON@BUILD_ALL_7 = $(LIB_SL)
  @SL_ON@INSTALL_LIB_7 = installsl
  @SL_ON@BUILD_TH_CXX_7 = $(LIB_TH_CXX_SL)
-@@ -145,9 +145,13 @@ SHELL = /bin/sh
+@@ -150,9 +150,13 @@
  
  HFLS = dmalloc.h
- OBJS = arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
-+OBJS_SL = arg_check_sl.o compat_sl.o dmalloc_rand_sl.o dmalloc_tab_sl.o env_sl.o heap_sl.o
- NORMAL_OBJS = chunk.o error.o malloc.o
-+NORMAL_OBJS_SL = chunk_sl.o error_sl.o malloc_sl.o
- THREAD_OBJS = chunk_th.o error_th.o malloc_th.o
-+THREAD_OBJS_SL = chunk_th_sl.o error_th_sl.o malloc_th_sl.o
+ OBJS = append.o arg_check.o compat.o dmalloc_rand.o dmalloc_tab.o env.o heap.o
++OBJS_SL = append_sl.o arg_check_sl.o compat_sl.o dmalloc_rand_sl.o dmalloc_tab_sl.o env_sl.o heap_sl.o
+ NORMAL_OBJS = chunk.o error.o user_malloc.o
++NORMAL_OBJS_SL = chunk_sl.o error_sl.o user_malloc_sl.o
+ THREAD_OBJS = chunk_th.o error_th.o user_malloc_th.o
++THREAD_OBJS_SL = chunk_th_sl.o error_th_sl.o user_malloc_th_sl.o
  CXX_OBJS = dmallocc.o
 +CXX_OBJS_SL = dmallocc_sl.o
  
  CFLAGS = $(CCFLAGS)
  TEST = $(MODULE)_t
-@@ -160,9 +164,9 @@ all : $(BUILD_ALL)
+@@ -165,9 +169,9 @@
  
  clean :
  	rm -f $(A_OUT) core *.o *.t
@@ -73,7 +71,7 @@ Index: dmalloc-5.5.2/Makefile.in
  
  realclean : clean
  
-@@ -181,43 +185,43 @@ installincs : $(HFLS)
+@@ -189,43 +193,43 @@
  	$(INSTALL_DATA) $(HFLS) $(includedir)
  
  installthsl : $(LIB_TH_SL)
@@ -127,26 +125,26 @@ Index: dmalloc-5.5.2/Makefile.in
  	@RANLIB@ $(libdir)/$(LIBRARY)
  @SL_OFF@	@echo "Enter 'make installsl' to install $(LIB_SL) in $(shlibdir)"
  @CXX_OFF@	@echo "Enter 'make installcxx' to install the C++ library"
-@@ -255,10 +259,8 @@ shlib : $(BUILD_SL)
+@@ -297,10 +301,8 @@
+ 
  # NOTE: you may have to edit the configure.ac script to get this to
  # work on your operating system.  Please send feedback to the author
- # via: http://256.com/gray/email.html
 -$(LIB_SL) : $(LIBRARY)
 -	rm -f $@ $@.t
--	@shlinkargs@ $(LIBRARY) $(OBJS) $(NORMAL_OBJS)
+-	@shlinkargs@ $(LIBRARY)
 -	mv $@.t $@
 +$(LIB_SL) : $(OBJS_SL) $(NORMAL_OBJS_SL)
 +	$(CC) -shared -Wl,-soname,libdmalloc.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL)
  
  $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)
  	ar cr $@ $?
-@@ -268,32 +270,26 @@ $(LIB_TH) : $(OBJS) $(THREAD_OBJS)
+@@ -310,32 +312,26 @@
  	ar cr $@ $?
  	@RANLIB@ $@
  
 -$(LIB_TH_SL) : $(LIB_TH)
 -	rm -f $@ $@.t
--	@shlinkargs@ $(LIB_TH) $(OBJS) $(THREAD_OBJS)
+-	@shlinkargs@ $(LIB_TH)
 -	mv $@.t $@
 +$(LIB_TH_SL) : $(OBJS_SL) $(THREAD_OBJS_SL)
 +	$(CC) -shared -Wl,-soname,libdmallocth.so.5 -o $@ $(OBJS_SL) $(THREAD_OBJS_SL)
@@ -157,7 +155,7 @@ Index: dmalloc-5.5.2/Makefile.in
  
 -$(LIB_CXX_SL) : $(LIB_CXX)
 -	rm -f $@ $@.t
--	@shlinkargs@ $(LIB_CXX) $(OBJS) $(NORMAL_OBJS) $(CXX_OBJS)
+-	@shlinkargs@ $(LIB_CXX)
 -	mv $@.t $@
 +$(LIB_CXX_SL) : $(OBJS_SL) $(NORMAL_OBJS_SL) $(CXX_OBJS_SL)
 +	$(CC) -shared -Wl,-soname,libdmalloccxx.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL) $(CXX_OBJS_SL)
@@ -168,7 +166,7 @@ Index: dmalloc-5.5.2/Makefile.in
  
 -$(LIB_TH_CXX_SL) : $(LIB_TH_CXX)
 -	rm -f $@ $@.t
--	@shlinkargs@ $(LIB_TH_CXX) $(OBJS) $(THREAD_OBJS) $(CXX_OBJS)
+-	@shlinkargs@ $(LIB_TH_CXX)
 -	mv $@.t $@
 +$(LIB_TH_CXX_SL) : $(OBJS_SL) $(THREAD_OBJS_SL) $(CXX_OBJS_SL)
 +	$(CC) -shared -Wl,-soname,libdmallocthcxx.so.5 -o $@ $(OBJS_SL) $(THREAD_OBJS_SL) $(CXX_OBJS_SL)
@@ -181,7 +179,7 @@ Index: dmalloc-5.5.2/Makefile.in
  
  threadscxx : $(BUILD_TH_CXX)
  @SL_OFF@	@echo "Enter 'make threadscxxsl' to build the threaded C++ shared-library"
-@@ -302,7 +298,7 @@ threads : $(BUILD_THREADS)
+@@ -344,7 +340,7 @@
  @CXX_OFF@	@echo "Enter 'make threadscxx' to build the threaded C++ library"
  @SL_OFF@	@echo "Enter 'make threadssl' to build the threaded shared library"
  
@@ -190,9 +188,9 @@ Index: dmalloc-5.5.2/Makefile.in
  
  cxx : $(BUILD_CXX)
  @SL_OFF@	@echo "Enter 'make cxxsl' to build the cxx shared library"
-@@ -371,6 +367,11 @@ dmallocc.o : $(srcdir)/dmallocc.cc
- 	$(CXX) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $(srcdir)/dmallocc.cc \
- 		-o ./$@
+@@ -404,6 +400,11 @@
+ 	rm -f $@
+ 	$(CC) $(CFLAGS) $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
  
 +dmallocc_sl.o : $(srcdir)/dmallocc.cc
 +	rm -f $@
@@ -200,115 +198,101 @@ Index: dmalloc-5.5.2/Makefile.in
 +		-o ./$@
 +
  #
- # auto configure settings - uncomment if you are doing configure
- # development on the library
-@@ -395,38 +396,109 @@ dmallocc.o : $(srcdir)/dmallocc.cc
+ # .cc.o auto-target doesn't work on some systems.
+ # also, $? did not work on OSF for the -c, grrr
+@@ -432,12 +433,28 @@
  
+ append.o: append.c conf.h settings.h dmalloc.h append.h compat.h \
+   dmalloc_loc.h
++append_sl.o: append.c conf.h settings.h dmalloc.h append.h compat.h \
++  dmalloc_loc.h
++	rm -f $@
++	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
  arg_check.o: arg_check.c conf.h settings.h dmalloc.h chunk.h debug_tok.h \
    dmalloc_loc.h error.h arg_check.h
 +arg_check_sl.o: arg_check.c conf.h settings.h dmalloc.h chunk.h debug_tok.h \
 +  dmalloc_loc.h error.h arg_check.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- chunk.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
-   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h error.h \
-   error_val.h heap.h
-+chunk_sl.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
-+  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h error.h \
-+  error_val.h heap.h
+ chunk.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
+   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
+   error.h error_val.h heap.h
++chunk_sl.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
++  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
++  error.h error_val.h heap.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
  compat.o: compat.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h
 +compat_sl.o: compat.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- dmalloc.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h compat.h \
-   debug_tok.h dmalloc_loc.h env.h error_val.h version.h
-+dmalloc_sl.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h compat.h \
-+  debug_tok.h dmalloc_loc.h env.h error_val.h version.h
-+	rm -f $@
-+	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- dmalloc_argv.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
-   dmalloc_argv_loc.h compat.h
-+dmalloc_argv_sl.o: dmalloc_argv.c conf.h settings.h dmalloc_argv.h \
-+  dmalloc_argv_loc.h compat.h
-+	rm -f $@
-+	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
+ dmalloc.o: dmalloc.c conf.h settings.h dmalloc_argv.h dmalloc.h append.h \
+   compat.h debug_tok.h dmalloc_loc.h env.h error_val.h version.h
+ dmalloc_argv.o: dmalloc_argv.c conf.h settings.h append.h dmalloc_argv.h \
+@@ -445,28 +462,66 @@
  dmalloc_fc_t.o: dmalloc_fc_t.c conf.h settings.h dmalloc.h dmalloc_argv.h \
    dmalloc_rand.h debug_tok.h dmalloc_loc.h error_val.h
-+dmalloc_fc_t_sl.o: dmalloc_fc_t.c conf.h settings.h dmalloc.h dmalloc_argv.h \
-+  dmalloc_rand.h debug_tok.h dmalloc_loc.h error_val.h
-+	rm -f $@
-+	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
  dmalloc_rand.o: dmalloc_rand.c dmalloc_rand.h
 +dmalloc_rand_sl.o: dmalloc_rand.c dmalloc_rand.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- dmalloc_t.o: dmalloc_t.c conf.h settings.h compat.h dmalloc.h \
+ dmalloc_t.o: dmalloc_t.c conf.h settings.h append.h compat.h dmalloc.h \
    dmalloc_argv.h dmalloc_rand.h arg_check.h debug_tok.h dmalloc_loc.h \
    error_val.h heap.h
-+dmalloc_t_sl.o: dmalloc_t.c conf.h settings.h compat.h dmalloc.h \
-+  dmalloc_argv.h dmalloc_rand.h arg_check.h debug_tok.h dmalloc_loc.h \
-+  error_val.h heap.h
+ dmalloc_tab.o: dmalloc_tab.c conf.h settings.h append.h chunk.h compat.h \
+   dmalloc.h dmalloc_loc.h dmalloc_tab.h dmalloc_tab_loc.h
++dmalloc_tab_sl.o: dmalloc_tab.c conf.h settings.h append.h chunk.h compat.h \
++  dmalloc.h dmalloc_loc.h dmalloc_tab.h dmalloc_tab_loc.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- dmalloc_tab.o: dmalloc_tab.c conf.h settings.h chunk.h compat.h dmalloc.h \
-   dmalloc_loc.h error.h error_val.h dmalloc_tab.h dmalloc_tab_loc.h
-+dmalloc_tab_sl.o: dmalloc_tab.c conf.h settings.h chunk.h compat.h dmalloc.h \
-+  dmalloc_loc.h error.h error_val.h dmalloc_tab.h dmalloc_tab_loc.h
-+	rm -f $@
-+	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- env.o: env.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h \
+ env.o: env.c conf.h settings.h dmalloc.h append.h compat.h dmalloc_loc.h \
    debug_tok.h env.h error.h
-+env_sl.o: env.c conf.h settings.h dmalloc.h compat.h dmalloc_loc.h \
++env_sl.o: env.c conf.h settings.h dmalloc.h append.h compat.h dmalloc_loc.h \
 +  debug_tok.h env.h error.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- error.o: error.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-   dmalloc_loc.h env.h error.h error_val.h version.h
-+error_sl.o: error.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-+  dmalloc_loc.h env.h error.h error_val.h version.h
+ error.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
+   debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
++error_sl.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
++  debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- heap.o: heap.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-   dmalloc_loc.h error.h error_val.h heap.h
-+heap_sl.o: heap.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-+  dmalloc_loc.h error.h error_val.h heap.h
-+	rm -f $@
-+	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- malloc.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
-   debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-   malloc_funcs.h return.h
-+malloc_sl.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
-+  debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-+  malloc_funcs.h return.h
+ heap.o: heap.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
+   debug_tok.h dmalloc_loc.h error.h error_val.h heap.h
++heap_sl.o: heap.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
++  debug_tok.h dmalloc_loc.h error.h error_val.h heap.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
  protect.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
    heap.h protect.h
-+protect_sl.o: protect.c conf.h settings.h dmalloc.h dmalloc_loc.h error.h \
-+  heap.h protect.h
+ user_malloc.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
+   compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
+   user_malloc.h return.h
++user_malloc_sl.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
++  compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
++  user_malloc.h return.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- chunk_th.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
-   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h error.h \
-   error_val.h heap.h
-+chunk_th_sl.o: chunk.c conf.h settings.h dmalloc.h chunk.h chunk_loc.h \
-+  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h error.h \
-+  error_val.h heap.h
+ dmallocc.o: dmallocc.cc dmalloc.h return.h conf.h settings.h
+ chunk_th.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
+   dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
+   error.h error_val.h heap.h
++chunk_th_sl.o: chunk.c conf.h settings.h dmalloc.h append.h chunk.h chunk_loc.h \
++  dmalloc_loc.h compat.h debug_tok.h dmalloc_rand.h dmalloc_tab.h \
++  error.h error_val.h heap.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- error_th.o: error.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-   dmalloc_loc.h env.h error.h error_val.h version.h
-+error_th_sl.o: error.c conf.h settings.h dmalloc.h chunk.h compat.h debug_tok.h \
-+  dmalloc_loc.h env.h error.h error_val.h version.h
+ error_th.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
+   debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
++error_th_sl.o: error.c conf.h settings.h dmalloc.h append.h chunk.h compat.h \
++  debug_tok.h dmalloc_loc.h env.h error.h error_val.h version.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@
- malloc_th.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
-   debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-   malloc_funcs.h return.h
-+malloc_th_sl.o: malloc.c conf.h settings.h dmalloc.h chunk.h compat.h \
-+  debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
-+  malloc_funcs.h return.h
+ user_malloc_th.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
+   compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
+   user_malloc.h return.h
++user_malloc_th_sl.o: user_malloc.c conf.h settings.h dmalloc.h append.h chunk.h \
++  compat.h debug_tok.h dmalloc_loc.h env.h error.h error_val.h heap.h \
++  user_malloc.h return.h
 +	rm -f $@
 +	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) $(DEFS) $(INCS) -c $< -o ./$@

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-set -e
-
-sleep 10
-
-ls /sys/class/udc/ | head -n 1 | xargs echo -n > /sys/kernel/config/usb_gadget/adb/UDC
-
-echo "Setting UDC $(ls /sys/class/udc/ | head -n 1) for USB ADB Gadget usage"

@@ -1,0 +1,45 @@
+From 2b6e64879883eec435318eb2dd9165904c2db764 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Jun 2026 21:48:13 -0700
+Subject: [PATCH] GNUmakefile: build the json helper with the build-host
+ compiler
+
+json is a build-time helper: it runs on the build host during the build to
+emit compile_commands.json. It has no explicit rule, so GNU make builds it
+with the builtin rule "$(CC) $(CFLAGS) json.c -o json". When cross
+compiling, $(CC) is the build-host compiler but $(CFLAGS) carries the
+target flags, so the host compiler is handed target-only options such as
+-fcanon-prefix-map and fails on older host toolchains (e.g. gcc 12 on
+Debian 12):
+
+  gcc: error: unrecognized command-line option '-fcanon-prefix-map';
+  did you mean '-fmacro-prefix-map='?
+  make: *** [<builtin>: json] Error 1
+
+Add an explicit rule that builds json with $(CC) only, exactly like the
+sibling host helper "ent", so the cross/target $(CFLAGS) are never applied
+to a piece that must be compiled for the build host.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ GNUmakefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/GNUmakefile b/GNUmakefile
+index c883337..08b9718 100644
+--- a/GNUmakefile
++++ b/GNUmakefile
+@@ -1390,6 +1390,12 @@ Makefile: GNUmakefile dep libdep
+ srcdirs=$(subst :, ,$(VPATH))
+ srcfiles=$(foreach dir,$(srcdirs),$(wildcard $(dir)/*.c))
+ 
++# json is a build-host helper (it runs during the build to emit
++# compile_commands.json). Build it with $(CC) like ent, so the cross
++# target $(CFLAGS) are not applied to a build-host compile.
++json: json.c
++	$(CC) -g -o $@ json.c -I.
++
+ compile_commands.json.tmpl: json
+ 	./json $(srcfiles) > $@
+ 

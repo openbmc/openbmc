@@ -1,0 +1,36 @@
+From 064ccdaf0d84bea86f9cd17383581c3844a33151 Mon Sep 17 00:00:00 2001
+From: Rajkumar Patel <patel.rajkumar@oss.qualcomm.com>
+Date: Tue, 9 Jun 2026 11:24:51 +0530
+Subject: [PATCH 2/2] lib/libxdp/Makefile: use cp -fRd to preserve symlinks
+ without metadata
+
+cp -fpR preserves ownership and timestamps from the build host,
+which breaks cross-compilation and packaging QA checks.
+
+The `-p` flag is unnecessary for symlink handling. Replace it
+with `-d` to explicitly preserve symlinks without carrying over
+file metadata.
+
+Switch to cp -fRd to maintain symlink structure while avoiding
+host contamination.
+
+Upstream-Status: Pending
+
+Signed-off-by: Rajkumar Patel <patel.rajkumar@oss.qualcomm.com>
+---
+ lib/libxdp/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/libxdp/Makefile b/lib/libxdp/Makefile
+index 7ea7e7e..3c36b70 100644
+--- a/lib/libxdp/Makefile
++++ b/lib/libxdp/Makefile
+@@ -56,7 +56,7 @@ install: all
+ 	$(Q)install -d -m 0755 $(DESTDIR)$(BPF_OBJECT_DIR)
+ 	$(Q)install -m 0644 $(LIB_HEADERS) $(DESTDIR)$(HDRDIR)/
+ 	$(Q)install -m 0644 $(PC_FILE) $(DESTDIR)$(LIBDIR)/pkgconfig/
+-	$(Q)cp -fpR $(SHARED_LIBS) $(STATIC_LIBS) $(DESTDIR)$(LIBDIR)
++	$(Q)cp -fdR $(SHARED_LIBS) $(STATIC_LIBS) $(DESTDIR)$(LIBDIR)
+ 	$(Q)install -m 0644 $(XDP_OBJS) $(DESTDIR)$(BPF_OBJECT_DIR)
+ 	$(if $(MAN_FILES),$(Q)install -m 0755 -d $(DESTDIR)$(MANDIR)/man3)
+ 	$(if $(MAN_FILES),$(Q)install -m 0644 $(MAN_FILES) $(DESTDIR)$(MANDIR)/man3)

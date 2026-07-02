@@ -1,0 +1,38 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jun 2026 00:00:00 +0000
+Subject: [PATCH] libdnet: fix PF_PACKET conftest nested function
+
+The bundled libdnet-stripped AC_DNET_LINUX_PF_PACKET check used
+"int foo() { return ETH_P_ALL; }" as the AC_TRY_COMPILE body, which the
+generated configure places inside main(). clang rejects nested function
+definitions ("function definition is not allowed here"), so the check
+fails and configure aborts with "Ethernet support not found". Use a plain
+expression statement that still references ETH_P_ALL. Patch both the macro
+source and the shipped configure.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/libdnet-stripped/m4/acinclude.m4
++++ b/libdnet-stripped/m4/acinclude.m4
+@@ -149,7 +149,7 @@
+     [AC_MSG_CHECKING(for Linux PF_PACKET sockets)
+     AC_TRY_COMPILE([#include <netpacket/packet.h>
+                     #include <linux/if_ether.h>],
+-                   [int foo() { return ETH_P_ALL; }],
++                   [(void) ETH_P_ALL;],
+     ac_cv_dnet_linux_pf_packet=yes,
+     ac_cv_dnet_linux_pf_packet=no)
+     AC_MSG_RESULT($ac_cv_dnet_linux_pf_packet)
+--- a/libdnet-stripped/configure
++++ b/libdnet-stripped/configure
+@@ -15219,7 +15219,7 @@
+ int
+ main (void)
+ {
+-int foo() { return ETH_P_ALL; }
++(void) ETH_P_ALL;
+   ;
+   return 0;
+ }

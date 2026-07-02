@@ -1,0 +1,31 @@
+From: Jason Smith <qili00001@gmail.com>
+Subject: [PATCH] Fix FILE descriptor leak in uio_line_from_file()
+
+The function uio_line_from_file() fails to close the FILE pointer
+when fgets() returns NULL, causing a file descriptor leak.
+
+Upstream-Status: Submitted [https://sourceforge.net/p/libuio/code/merge-requests/2/]
+Signed-off-by: Jason Smith <qili00001@gmail.com>
+
+--- a/src/uio_line_from_file.c
++++ b/src/uio_line_from_file.c
+@@ -28,14 +28,17 @@
+ {
+ 	char *s;
+ 	int i;
++	int ret = 0;
+ 	memset(linebuf, 0, UIO_MAX_NAME_SIZE);
+ 	FILE* file = fopen(filename,"r");
+ 	if (!file) return -1;
+ 	s = fgets(linebuf,UIO_MAX_NAME_SIZE,file);
+-	if (!s) return -2;
++	if (!s) { ret = -2; goto out; }
+ 	for (i=0; (*s)&&(i<UIO_MAX_NAME_SIZE); i++) {
+ 		if (*s == '\n') *s = 0;
+ 		s++;
+ 	}
+-	return 0;
++out:
++	fclose(file);
++	return ret;
+ }

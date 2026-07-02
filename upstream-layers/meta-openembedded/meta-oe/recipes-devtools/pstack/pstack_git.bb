@@ -5,4 +5,5 @@ PV = "2.11"
 
 SRC_URI = "git://github.com/peadar/pstack.git;branch=master;protocol=https \
            file://0001-tests-fix-the-issue-of-cross-compilation-failure.patch \
+           file://0001-reader.h-include-cstdint-for-uintmax_t-intmax_t.patch \
           "

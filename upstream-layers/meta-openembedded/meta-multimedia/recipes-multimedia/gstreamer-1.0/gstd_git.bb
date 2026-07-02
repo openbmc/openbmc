@@ -5,15 +5,15 @@ SECTION = "multimedia"
 LICENSE = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c71b653a0f608a58cdc5693ae57126bc"
 
-DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-rtsp-server json-glib libdaemon libsoup-2.4 jansson"
+DEPENDS = "gstreamer1.0 gstreamer1.0-plugins-base gstreamer1.0-plugins-bad gstreamer1.0-rtsp-server json-glib libdaemon libsoup jansson"
 
 SRCBRANCH ?= "master"
-SRCREV = "dac03d5e4102080a8f3ef274a6a6583455962095"
+SRCREV = "d3e1daefb999c3ba0f4fcc4744b53aab2aaa5f2d"
 SRC_URI = "git://git@github.com/RidgeRun/gstd-1.x.git;protocol=https;branch=${SRCBRANCH} \
            file://0001-gstd-Remove-redundant-rpaths.patch"
 
 # Remove the +really when upstream version is > 1.0
-PV = "1.0+really0.15.2"
+PV = "1.0+really0.16.0"
 
 GTKDOC_MESON_OPTION = "enable-gtk-doc"
 
@@ -24,9 +24,9 @@ GTKDOC_ENABLED = "False"
 inherit meson pkgconfig gettext gtk-doc python3native python3-dir python3targetconfig
 
 do_install:append() {
-        rmdir ${D}${exec_prefix}${localstatedir}/run/${BPN} ${D}${exec_prefix}${localstatedir}/run \
-              ${D}${exec_prefix}${localstatedir}/log/${BPN} ${D}${exec_prefix}${localstatedir}/log \
-              ${D}${exec_prefix}${localstatedir}
+        rmdir ${D}${localstatedir}/run/${BPN} ${D}${localstatedir}/run \
+              ${D}${localstatedir}/log/${BPN} ${D}${localstatedir}/log \
+              ${D}${localstatedir}
         rm -f ${D}${bindir}/gst-client ${D}${bindir}/gstd-client
         if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
                 install -d ${D}${sysconfdir}/tmpfiles.d

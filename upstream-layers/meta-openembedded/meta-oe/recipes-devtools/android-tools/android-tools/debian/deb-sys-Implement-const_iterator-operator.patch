@@ -1,0 +1,37 @@
+Description: Implement const_iterator::operator--
+Forwarded: not-needed
+
+Needed for
+android-platform-frameworks-base/libs/androidfw/LoadedArsc.cpp
+when compiling against libstdc++.
+Upstream-Status: Inappropriate [Debian-specific]
+---
+--- a/system/incremental_delivery/incfs/util/include/util/map_ptr.h
++++ b/system/incremental_delivery/incfs/util/include/util/map_ptr.h
+@@ -180,6 +180,11 @@ public:
+             return *this;
+         }
+ 
++        const const_iterator& operator--() {
++            safe_ptr_--;
++            return *this;
++        }
++
+         const_iterator& operator+=(int n) {
+             safe_ptr_ = safe_ptr_ + n;
+             return *this;
+@@ -321,6 +326,14 @@ public:
+         return temp;
+     }
+ 
++    template <typename T1 = T, NotVoid<T1> = 0>
++    const map_ptr<T1> operator--(int) {
++        map_ptr<T1> temp = *this;
++        LIBINCFS_MAP_PTR_DEBUG_CODE(verified_ = false);
++        --ptr_;
++        return temp;
++    }
++
+     template <typename S, typename T1 = T, NotVoid<T1> = 0>
+     map_ptr<T1> operator+(const S n) const {
+         return map_ptr<T1>(map_, ptr_ + n, verified_block_);

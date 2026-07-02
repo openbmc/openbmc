@@ -1,0 +1,87 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 27 Jun 2026 00:00:00 +0000
+Subject: [PATCH] gnulib: fix lftp build with clang, lld and GCC 16 libstdc++
+
+lftp 4.9.3 bundles gnulib sources that fail to build in the OpenEmbedded
+clang + lld toolchain. Collect the gnulib compatibility fixes here:
+
+1. Single-argument static_assert (lib/dirent.in.h, lib/uchar.in.h) was
+   introduced in C++17. clang in its default C++14 mode rejects it with
+   "static_assert with no message is a C++17 extension". Add a message
+   argument to restore C++11/C++14 compatibility.
+   Reported upstream: https://github.com/lavv17/lftp/issues/766
+
+2. lib/stdlib.in.h pre-includes <string> to pre-instantiate std::strtoull
+   before the "#define strtoull rpl_strtoull" macro fires, but guards the
+   workaround with "&& !defined __clang__", so it never triggers under
+   clang + libstdc++ and std::strtoull gets textually rewritten to the
+   non-existent std::rpl_strtoull. Extend the guard to cover clang.
+
+3. After gnulib split md5.c/sha1.c into primary + -stream.c files, both
+   the primary and the -stream.c file define GL_OPENSSL_INLINE to
+   _GL_EXTERN_INLINE before including the header, so with the OpenSSL
+   md5/sha1 backends both translation units emit out-of-line copies of the
+   wrapper functions and lld fails with duplicate symbol errors. Drop the
+   override from the -stream.c files; only the primary file needs it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/lib/dirent.in.h
++++ b/lib/dirent.in.h
+@@ -96,7 +96,7 @@ static_assert (DT_UNKNOWN != DT_FIFO && DT_UNKNOWN != DT_CHR
+                && DT_BLK != DT_WHT
+                && DT_REG != DT_LNK && DT_REG != DT_SOCK && DT_REG != DT_WHT
+                && DT_LNK != DT_SOCK && DT_LNK != DT_WHT
+-               && DT_SOCK != DT_WHT);
++               && DT_SOCK != DT_WHT, "DT_ constants must have unique values");
+ 
+ /* Other optional information about a directory entry.  */
+ #define _GL_DT_NOTDIR 0x100   /* Not a directory */
+--- a/lib/uchar.in.h
++++ b/lib/uchar.in.h
+@@ -151,7 +151,7 @@ typedef uint_least32_t gl_char32_t;
+ # define _GL_WCHAR_T_IS_UCS4 1
+ #endif
+ #if _GL_WCHAR_T_IS_UCS4
+-static_assert (sizeof (char32_t) == sizeof (wchar_t));
++static_assert (sizeof (char32_t) == sizeof (wchar_t), "char32_t and wchar_t must have the same size");
+ #endif
+ 
+ 
+--- a/lib/stdlib.in.h
++++ b/lib/stdlib.in.h
+@@ -119,7 +119,7 @@ struct random_data
+ # include <unistd.h>
+ #endif
+ 
+-#if ((@GNULIB_STRTOL@ && @REPLACE_STRTOL@) || (@GNULIB_STRTOLL@ && @REPLACE_STRTOLL@) || (@GNULIB_STRTOUL@ && @REPLACE_STRTOUL@) || (@GNULIB_STRTOULL@ && @REPLACE_STRTOULL@)) && defined __cplusplus && !defined GNULIB_NAMESPACE && defined __GNUG__ && !defined __clang__
++#if ((@GNULIB_STRTOL@ && @REPLACE_STRTOL@) || (@GNULIB_STRTOLL@ && @REPLACE_STRTOLL@) || (@GNULIB_STRTOUL@ && @REPLACE_STRTOUL@) || (@GNULIB_STRTOULL@ && @REPLACE_STRTOULL@)) && defined __cplusplus && !defined GNULIB_NAMESPACE && (defined __GNUG__ || defined __clang__)
+ /* When strtol, strtoll, strtoul, or strtoull is going to be defined as a macro
+    below, this may cause compilation errors later in the libstdc++ header files
+    (that are part of GCC), such as:
+--- a/lib/md5-stream.c
++++ b/lib/md5-stream.c
+@@ -22,9 +22,6 @@
+ #include <config.h>
+ 
+ /* Specification.  */
+-#if HAVE_OPENSSL_MD5
+-# define GL_OPENSSL_INLINE _GL_EXTERN_INLINE
+-#endif
+ #include "md5.h"
+ 
+ #include <stdlib.h>
+--- a/lib/sha1-stream.c
++++ b/lib/sha1-stream.c
+@@ -24,9 +24,6 @@
+ #include <config.h>
+ 
+ /* Specification.  */
+-#if HAVE_OPENSSL_SHA1
+-# define GL_OPENSSL_INLINE _GL_EXTERN_INLINE
+-#endif
+ #include "sha1.h"
+ 
+ #include <stdlib.h>

@@ -1,0 +1,114 @@
+Description: Drop gki dependency from mkbootimg
+ `mkbootimg` is currently unusable due to a missing `gki` python
+ module. This module is only needed for signing GKI boot images, which
+ is deprecated as the argument group description implies.
+ This patch disables this (deprecated) signature feature entirely as
+ it's unlikely Debian users will actually need it.
+Author: Arnaud Ferraris <aferraris@debian.org>
+Forwarded: not-needed
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/system/tools/mkbootimg/mkbootimg.py
++++ b/system/tools/mkbootimg/mkbootimg.py
+@@ -28,8 +28,6 @@ import os
+ import re
+ import tempfile
+ 
+-from gki.generate_gki_certificate import generate_gki_certificate
+-
+ # Constant and structure definition is in
+ # system/tools/mkbootimg/include/bootimg/bootimg.h
+ BOOT_MAGIC = 'ANDROID!'
+@@ -105,12 +103,6 @@ def get_recovery_dtbo_offset(args):
+     return dtbo_offset
+ 
+ 
+-def should_add_legacy_gki_boot_signature(args):
+-    if args.gki_signing_key and args.gki_signing_algorithm:
+-        return True
+-    return False
+-
+-
+ def write_header_v3_and_above(args):
+     if args.header_version > 3:
+         boot_header_size = BOOT_IMAGE_HEADER_V4_SIZE
+@@ -134,8 +126,6 @@ def write_header_v3_and_above(args):
+     if args.header_version >= 4:
+         # The signature used to verify boot image v4.
+         boot_signature_size = 0
+-        if should_add_legacy_gki_boot_signature(args):
+-            boot_signature_size = BOOT_IMAGE_V4_SIGNATURE_SIZE
+         args.output.write(pack('I', boot_signature_size))
+     pad_file(args.output, BOOT_IMAGE_HEADER_V3_PAGESIZE)
+ 
+@@ -549,19 +539,6 @@ def parse_cmdline():
+     parser.add_argument('--vendor_bootconfig', type=FileType('rb'),
+                         help='path to the vendor bootconfig file')
+ 
+-    gki_2_0_signing_args = parser.add_argument_group(
+-        '[DEPRECATED] GKI 2.0 signing arguments')
+-    gki_2_0_signing_args.add_argument(
+-        '--gki_signing_algorithm', help='GKI signing algorithm to use')
+-    gki_2_0_signing_args.add_argument(
+-        '--gki_signing_key', help='path to RSA private key file')
+-    gki_2_0_signing_args.add_argument(
+-        '--gki_signing_signature_args', default='',
+-        help='other hash arguments passed to avbtool')
+-    gki_2_0_signing_args.add_argument(
+-        '--gki_signing_avbtool_path', default='avbtool',
+-        help='path to avbtool for boot signature generation')
+-
+     args, extra_args = parser.parse_known_args()
+     if args.vendor_boot is not None and args.header_version > 3:
+         extra_args = parse_vendor_ramdisk_args(args, extra_args)
+@@ -577,42 +554,6 @@ def parse_cmdline():
+     return args
+ 
+ 
+-def add_boot_image_signature(args, pagesize):
+-    """Adds the boot image signature.
+-
+-    Note that the signature will only be verified in VTS to ensure a
+-    generic boot.img is used. It will not be used by the device
+-    bootloader at boot time. The bootloader should only verify
+-    the boot vbmeta at the end of the boot partition (or in the top-level
+-    vbmeta partition) via the Android Verified Boot process, when the
+-    device boots.
+-    """
+-    # Flush the buffer for signature calculation.
+-    args.output.flush()
+-
+-    # Outputs the signed vbmeta to a separate file, then append to boot.img
+-    # as the boot signature.
+-    with tempfile.TemporaryDirectory() as temp_out_dir:
+-        boot_signature_output = os.path.join(temp_out_dir, 'boot_signature')
+-        generate_gki_certificate(
+-            image=args.output.name, avbtool=args.gki_signing_avbtool_path,
+-            name='boot', algorithm=args.gki_signing_algorithm,
+-            key=args.gki_signing_key, salt='d00df00d',
+-            additional_avb_args=args.gki_signing_signature_args.split(),
+-            output=boot_signature_output,
+-        )
+-        with open(boot_signature_output, 'rb') as boot_signature:
+-            boot_signature_bytes = boot_signature.read()
+-            if len(boot_signature_bytes) > BOOT_IMAGE_V4_SIGNATURE_SIZE:
+-                raise ValueError(
+-                    f'boot sigature size is > {BOOT_IMAGE_V4_SIGNATURE_SIZE}')
+-            boot_signature_bytes += b'\x00' * (
+-                BOOT_IMAGE_V4_SIGNATURE_SIZE - len(boot_signature_bytes))
+-            assert len(boot_signature_bytes) == BOOT_IMAGE_V4_SIGNATURE_SIZE
+-            args.output.write(boot_signature_bytes)
+-            pad_file(args.output, pagesize)
+-
+-
+ def write_data(args, pagesize):
+     write_padded_file(args.output, args.kernel, pagesize)
+     write_padded_file(args.output, args.ramdisk, pagesize)
+@@ -622,8 +563,6 @@ def write_data(args, pagesize):
+         write_padded_file(args.output, args.recovery_dtbo, pagesize)
+     if args.header_version == 2:
+         write_padded_file(args.output, args.dtb, pagesize)
+-    if args.header_version >= 4 and should_add_legacy_gki_boot_signature(args):
+-        add_boot_image_signature(args, pagesize)
+ 
+ 
+ def write_vendor_boot_data(args):

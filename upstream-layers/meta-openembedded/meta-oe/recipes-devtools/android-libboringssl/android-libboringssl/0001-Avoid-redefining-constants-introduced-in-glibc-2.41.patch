@@ -1,0 +1,172 @@
+From 950b8565e333e2ed1a515e2b342009a33ef51733 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sergio=20G=C3=B3mez?=
+ <sergio.gdr@collabora.corp-partner.google.com>
+Date: Tue, 15 Apr 2025 17:57:46 -0500
+Subject: [PATCH] Avoid redefining constants introduced in glibc 2.41.
+
+These constants are now available through <sys/auxv.h> when using
+glibc >= 2.41, so we get re-define compilation errors.
+Just rename them by prefixing them with "CRYPTO_" to avoid the
+collision.
+
+Change-Id: I61807d8dfc8b5f482ec6191cb41aebfa5676c5b6
+Reviewed-on: https://boringssl-review.googlesource.com/c/boringssl/+/78527
+Commit-Queue: David Benjamin <davidben@google.com>
+Reviewed-by: David Benjamin <davidben@google.com>
+Reviewed-by: Adam Langley <agl@google.com>
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+Upstream-Status: Backport [https://github.com/google/boringssl/commit/ff9475331e72936bc1c00fcda6d4820ba67d4dae]
+Signed-off-by: Alex Kiernan <alex.kiernan@gmail.com>
+---
+ src/crypto/cpu_arm_linux.c       | 33 +++++++++++++++++++++++++++-----
+ src/crypto/cpu_arm_linux.h       | 20 ++++++++++---------
+ src/crypto/cpu_arm_linux_test.cc | 12 +++++++-----
+ 3 files changed, 46 insertions(+), 19 deletions(-)
+
+diff --git a/src/crypto/cpu_arm_linux.c b/src/crypto/cpu_arm_linux.c
+index d13ac215c4df..7c7cd9dd93f4 100644
+--- a/src/crypto/cpu_arm_linux.c
++++ b/src/crypto/cpu_arm_linux.c
+@@ -112,7 +112,11 @@ void OPENSSL_cpuid_setup(void) {
+ 
+   // Matching OpenSSL, only report other features if NEON is present.
+   unsigned long hwcap = getauxval(AT_HWCAP);
+-  if (hwcap & HWCAP_NEON) {
++  if (hwcap & CRYPTO_HWCAP_NEON) {
++#if defined(HWCAP_ARM_NEON)
++      static_assert(HWCAP_ARM_NEON == CRYPTO_HWCAP_NEON,
++                    "CRYPTO_HWCAP values must match Linux");
++#endif
+     OPENSSL_armcap_P |= ARMV7_NEON;
+ 
+     // Some ARMv8 Android devices don't expose AT_HWCAP2. Fall back to
+@@ -126,16 +130,35 @@ void OPENSSL_cpuid_setup(void) {
+       g_needs_hwcap2_workaround = hwcap2 != 0;
+     }
+ 
+-    if (hwcap2 & HWCAP2_AES) {
++    // HWCAP2_* values, without the "CRYPTO_" prefix, are exposed through
++    // <sys/auxv.h> in some versions of glibc(>= 2.41). Assert that we don't
++    // diverge from those values.
++    if (hwcap2 & CRYPTO_HWCAP2_AES) {
++#if defined(HWCAP2_AES)
++      static_assert(HWCAP2_AES == CRYPTO_HWCAP2_AES,
++                    "CRYPTO_HWCAP2 values must match Linux");
++#endif
+       OPENSSL_armcap_P |= ARMV8_AES;
+     }
+-    if (hwcap2 & HWCAP2_PMULL) {
++    if (hwcap2 & CRYPTO_HWCAP2_PMULL) {
++#if defined(HWCAP2_PMULL)
++      static_assert(HWCAP2_PMULL == CRYPTO_HWCAP2_PMULL,
++                    "CRYPTO_HWCAP2 values must match Linux");
++#endif
+       OPENSSL_armcap_P |= ARMV8_PMULL;
+     }
+-    if (hwcap2 & HWCAP2_SHA1) {
++    if (hwcap2 & CRYPTO_HWCAP2_SHA1) {
++#if defined(HWCAP2_SHA1)
++      static_assert(HWCAP2_SHA1 == CRYPTO_HWCAP2_SHA1,
++                    "CRYPTO_HWCAP2 values must match Linux");
++#endif
+       OPENSSL_armcap_P |= ARMV8_SHA1;
+     }
+-    if (hwcap2 & HWCAP2_SHA2) {
++    if (hwcap2 & CRYPTO_HWCAP2_SHA2) {
++#if defined(HWCAP2_SHA2)
++      static_assert(HWCAP2_SHA2 == CRYPTO_HWCAP2_SHA2,
++                    "CRYPTO_HWCAP2 values must match Linux");
++#endif
+       OPENSSL_armcap_P |= ARMV8_SHA256;
+     }
+   }
+diff --git a/src/crypto/cpu_arm_linux.h b/src/crypto/cpu_arm_linux.h
+index 895099787439..4b0ecfc77b49 100644
+--- a/src/crypto/cpu_arm_linux.h
++++ b/src/crypto/cpu_arm_linux.h
+@@ -29,14 +29,16 @@ extern "C" {
+ // The cpuinfo parser lives in a header file so it may be accessible from
+ // cross-platform fuzzers without adding code to those platforms normally.
+ 
+-#define HWCAP_NEON (1 << 12)
++#define CRYPTO_HWCAP_NEON (1 << 12)
+ 
+ // See /usr/include/asm/hwcap.h on an ARM installation for the source of
+ // these values.
+-#define HWCAP2_AES (1 << 0)
+-#define HWCAP2_PMULL (1 << 1)
+-#define HWCAP2_SHA1 (1 << 2)
+-#define HWCAP2_SHA2 (1 << 3)
++// We add the prefix "CRYPTO_" to the definitions so as not to collide with
++// some versions of glibc (>= 2.41) that expose them through <sys/auxv.h>.
++#define CRYPTO_HWCAP2_AES (1 << 0)
++#define CRYPTO_HWCAP2_PMULL (1 << 1)
++#define CRYPTO_HWCAP2_SHA1 (1 << 2)
++#define CRYPTO_HWCAP2_SHA2 (1 << 3)
+ 
+ typedef struct {
+   const char *data;
+@@ -141,16 +143,16 @@ static unsigned long crypto_get_arm_hwcap2_from_cpuinfo(
+ 
+   unsigned long ret = 0;
+   if (has_list_item(&features, "aes")) {
+-    ret |= HWCAP2_AES;
++    ret |= CRYPTO_HWCAP2_AES;
+   }
+   if (has_list_item(&features, "pmull")) {
+-    ret |= HWCAP2_PMULL;
++    ret |= CRYPTO_HWCAP2_PMULL;
+   }
+   if (has_list_item(&features, "sha1")) {
+-    ret |= HWCAP2_SHA1;
++    ret |= CRYPTO_HWCAP2_SHA1;
+   }
+   if (has_list_item(&features, "sha2")) {
+-    ret |= HWCAP2_SHA2;
++    ret |= CRYPTO_HWCAP2_SHA2;
+   }
+   return ret;
+ }
+diff --git a/src/crypto/cpu_arm_linux_test.cc b/src/crypto/cpu_arm_linux_test.cc
+index 0b6b02fbe4d1..cd626a90512e 100644
+--- a/src/crypto/cpu_arm_linux_test.cc
++++ b/src/crypto/cpu_arm_linux_test.cc
+@@ -93,7 +93,8 @@ TEST(ARMLinuxTest, CPUInfo) {
+           // (Extra processors omitted.)
+           "\n"
+           "Hardware        : Qualcomm Technologies, Inc MSM8998\n",
+-          HWCAP2_AES | HWCAP2_PMULL | HWCAP2_SHA1 | HWCAP2_SHA2,
++          CRYPTO_HWCAP2_AES | CRYPTO_HWCAP2_PMULL | CRYPTO_HWCAP2_SHA1 |
++              CRYPTO_HWCAP2_SHA2,
+       },
+       // Garbage should be tolerated.
+       {
+@@ -105,23 +106,24 @@ TEST(ARMLinuxTest, CPUInfo) {
+       {
+           "Features        : aes pmull sha1 sha2\n"
+           "CPU architecture: 8\n",
+-          HWCAP2_AES | HWCAP2_PMULL | HWCAP2_SHA1 | HWCAP2_SHA2,
++          CRYPTO_HWCAP2_AES | CRYPTO_HWCAP2_PMULL | CRYPTO_HWCAP2_SHA1 |
++              CRYPTO_HWCAP2_SHA2,
+       },
+       // Various combinations of ARMv8 flags.
+       {
+           "Features        : aes sha1 sha2\n"
+           "CPU architecture: 8\n",
+-          HWCAP2_AES | HWCAP2_SHA1 | HWCAP2_SHA2,
++          CRYPTO_HWCAP2_AES | CRYPTO_HWCAP2_SHA1 | CRYPTO_HWCAP2_SHA2,
+       },
+       {
+           "Features        : pmull sha2\n"
+           "CPU architecture: 8\n",
+-          HWCAP2_PMULL | HWCAP2_SHA2,
++          CRYPTO_HWCAP2_PMULL | CRYPTO_HWCAP2_SHA2,
+       },
+       {
+           "Features        : aes aes   aes not_aes aes aes \n"
+           "CPU architecture: 8\n",
+-          HWCAP2_AES,
++          CRYPTO_HWCAP2_AES,
+       },
+       {
+           "Features        : \n"

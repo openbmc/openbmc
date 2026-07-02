@@ -1,0 +1,27 @@
+From 2427e520751b13a6e0a409f427f1ec9b23e63447 Mon Sep 17 00:00:00 2001
+From: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Date: Wed, 3 May 2023 18:36:06 +0200
+Subject: [PATCH] adb: daemon: don't require authorization on Linux
+
+Signed-off-by: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Upstream-Status: Inappropriate [Debian-specific]
+---
+ packages/modules/adb/daemon/main.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/packages/modules/adb/daemon/main.cpp b/packages/modules/adb/daemon/main.cpp
+index 188272ae3..02a57f4e2 100644
+--- a/packages/modules/adb/daemon/main.cpp
++++ b/packages/modules/adb/daemon/main.cpp
+@@ -224,6 +224,8 @@ int adbd_main(int server_port) {
+         auth_required = android::base::GetBoolProperty("ro.adb.secure", false);
+ #endif
+     }
++#else
++    auth_required = false;
+ #endif
+ 
+     // Our external storage path may be different than apps, since
+-- 
+2.39.2
+

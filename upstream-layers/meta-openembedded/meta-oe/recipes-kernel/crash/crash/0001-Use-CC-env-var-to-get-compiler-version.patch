@@ -1,7 +1,7 @@
-From 6ad5e9302057e157ab701880a8543ca59058df2d Mon Sep 17 00:00:00 2001
+From df98eb38b680fd633a6e87679d7267252849764d Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?K=C3=A9l=C3=A9fa=20San=C3=A9?= <kelefa.sane@smile.fr>
 Date: Fri, 16 May 2025 16:18:28 +0200
-Subject: [PATCH v2] Use CC env var to get compiler version
+Subject: [PATCH] Use CC env var to get compiler version
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -19,15 +19,16 @@ compiler version, when the CC env var is define.
 Upstream-Status: Submitted [https://lists.crash-utility.osci.io/archives/list/devel@lists.crash-utility.osci.io/thread/V3G3QH3YW6WZWD56TVTFQIHYLZ33UIJL/]
 
 Signed-off-by: Kéléfa Sané <kelefa.sane@smile.fr>
+Signed-off-by: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
 ---
  configure.c | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/configure.c b/configure.c
-index 4668c9a..4b65bd7 100644
+index 6e39d87..74e88b7 100644
 --- a/configure.c
 +++ b/configure.c
-@@ -1362,7 +1362,17 @@ make_build_data(char *target)
+@@ -1381,7 +1381,17 @@ make_build_data(char *target)
  
          fp1 = popen("date", "r");
          fp2 = popen("id", "r");

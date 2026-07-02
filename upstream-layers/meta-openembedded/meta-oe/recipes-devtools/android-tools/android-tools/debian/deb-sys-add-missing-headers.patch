@@ -1,0 +1,13 @@
+Description: add missing headers
+Forwarded: not-needed
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/system/core/fastboot/fastboot_driver_interface.h
++++ b/system/core/fastboot/fastboot_driver_interface.h
+@@ -17,6 +17,7 @@
+ 
+ #include <string>
+ 
++#include <stdint.h>
+ #include "android-base/unique_fd.h"
+ 
+ class Transport;

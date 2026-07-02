@@ -13,6 +13,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "https://github.com/USBGuard/usbguard/releases/download/${BPN}-${PV}/${BPN}-${PV}.tar.gz \
            file://0001-Add-and-use-pkgconfig-instead-of-libgcrypt-config.patch \
+           file://0001-PEGTL-fix-demangle-static_assert-with-GCC-16.patch \
            "
 
 SRC_URI[sha256sum] = "7d76b75e779e3c9e6c2fc10e7389dfa34056864c9f0c6eaca722687b7e75893c"

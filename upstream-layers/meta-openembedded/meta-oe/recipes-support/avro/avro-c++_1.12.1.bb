@@ -36,6 +36,6 @@ do_configure:prepend() {
 # the workaround flags aren't recognized by Clang either.
 # To avoid unnecessary warnings and keep the build clean across toolchains, the flags are conditionally added
 # using the toolchain-gcc override. This makes it unnecessary to override anything for Clang.
-CXXFLAGS:append:toolchain-gcc = " -Wno-error=useless-cast -Wno-error=conversion"
+CXXFLAGS:append:toolchain-gcc = " -Wno-error=useless-cast -Wno-error=conversion -Wno-error=unused-but-set-variable"
 
 BBCLASSEXTEND = "native nativesdk"

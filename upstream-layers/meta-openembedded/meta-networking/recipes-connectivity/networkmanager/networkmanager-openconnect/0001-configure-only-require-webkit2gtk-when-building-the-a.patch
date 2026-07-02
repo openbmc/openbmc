@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Jun 2026 00:00:00 +0000
+Subject: [PATCH] configure: only require webkit2gtk when building the auth
+ dialog
+
+The webkit2gtk pkg-config module (webkit2gtk-4.1 / -4.0) is only ever used
+by the GNOME authentication dialog (auth-dialog/nm-openconnect-auth-dialog),
+which is built only when WITH_GNOME && WITH_AUTHDLG. However configure.ac
+runs PKG_CHECK_MODULES(WEBKIT, ...) unconditionally, so a VPN-service-only
+build configured with --without-gnome (and hence without the auth dialog)
+still hard-fails with:
+
+    configure: error: Neither webkit2gtk-4.0 nor webkit2gtk-4.1 found
+
+Move the WEBKIT check inside the "with_authdlg" block (next to the
+OPENCONNECT check which is already guarded the same way) so that webkit2gtk
+is only required when the auth dialog is actually being built.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ configure.ac | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 1111111..2222222 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -145,10 +145,6 @@ if test x"$with_gtk4" != xno; then
+ 	PKG_CHECK_MODULES(LIBNMA_GTK4, libnma-gtk4 >= 1.8.33)
+ fi
+
+-PKG_CHECK_MODULES(WEBKIT, webkit2gtk-4.1, [wekbit=4.1],
+-			  [PKG_CHECK_MODULES(WEBKIT, webkit2gtk-4.0,
+-			  [webkit=4.0], AC_MSG_ERROR(Neither webkit2gtk-4.0 nor wekit2gtk-4.1 found))])
+-
+ PKG_CHECK_MODULES(LIBNM, libnm >= 1.2.0)
+ LIBNM_CFLAGS="$LIBNM_CFLAGS -DNM_VERSION_MIN_REQUIRED=NM_VERSION_1_2"
+ LIBNM_CFLAGS="$LIBNM_CFLAGS -DNM_VERSION_MAX_ALLOWED=NM_VERSION_1_4"
+@@ -165,6 +161,10 @@ else
+ fi
+ if test x"$with_authdlg" != xno; then
+ 	PKG_CHECK_MODULES(OPENCONNECT, openconnect >= 3.02)
++	PKG_CHECK_MODULES(WEBKIT, webkit2gtk-4.1, [webkit=4.1],
++			  [PKG_CHECK_MODULES(WEBKIT, webkit2gtk-4.0,
++			  [webkit=4.0],
++			  AC_MSG_ERROR(Neither webkit2gtk-4.0 nor webkit2gtk-4.1 found))])
+ fi
+ AM_CONDITIONAL(WITH_AUTHDLG, test x"$with_authdlg" != xno)
+
+--
+2.43.0

@@ -1,0 +1,62 @@
+From 03a13ef3ea786286d9317562647e9856c1b71736 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Thu, 11 Jun 2026 00:00:00 +0000
+Subject: [PATCH] cmake: add SOVERSION 0 to crypto and ssl shared libraries
+
+BoringSSL's CMakeLists.txt does not set SOVERSION, so the built shared
+libraries have no SONAME embedded and cmake names them libcrypto.so /
+libssl.so without any version suffix.  This causes two problems in a
+Yocto build:
+
+1. The Yocto QA check "dev-so" rejects unversioned .so symlinks in
+   non-dev packages, but those symlinks are required at runtime because
+   the DT_NEEDED entry in binaries that link against BoringSSL refers to
+   the bare libcrypto.so name.
+
+2. Standard Yocto FILES patterns split libraries by suffix: .so.* goes
+   into the runtime package and .so symlinks go into -dev.  Without a
+   SOVERSION these patterns do not apply correctly.
+
+Setting SOVERSION to 0 causes cmake to:
+  - build libcrypto.so.0 as the real ELF with SONAME=libcrypto.so.0
+  - create libcrypto.so as a development symlink
+
+Binaries linked with -l:libcrypto.so.0 (as android-tools does) will
+record DT_NEEDED=libcrypto.so.0 and resolve correctly at runtime.
+
+Upstream-Status: Inappropriate [OE-specific packaging requirement]
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ crypto/CMakeLists.txt | 2 ++
+ ssl/CMakeLists.txt    | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/crypto/CMakeLists.txt b/crypto/CMakeLists.txt
+index cdb5ddc..fca86cc 100644
+--- a/crypto/CMakeLists.txt
++++ b/crypto/CMakeLists.txt
+@@ -327,6 +327,8 @@ endif()
+ 
+ set_target_properties(crypto PROPERTIES LINKER_LANGUAGE C)
+ 
++set_target_properties(crypto PROPERTIES SOVERSION 0)
++
+ if(WIN32)
+   target_link_libraries(crypto ws2_32)
+ endif()
+diff --git a/ssl/CMakeLists.txt b/ssl/CMakeLists.txt
+index d8d997e..e49b350 100644
+--- a/ssl/CMakeLists.txt
++++ b/ssl/CMakeLists.txt
+@@ -46,6 +46,8 @@ install_if_enabled(TARGETS ssl EXPORT OpenSSLTargets ${INSTALL_DESTINATION_DEFAU
+ set_property(TARGET ssl PROPERTY EXPORT_NAME SSL)
+ target_link_libraries(ssl crypto)
+ 
++set_target_properties(ssl PROPERTIES SOVERSION 0)
++
+ add_executable(
+   ssl_test
+ 
+-- 
+2.43.0
+

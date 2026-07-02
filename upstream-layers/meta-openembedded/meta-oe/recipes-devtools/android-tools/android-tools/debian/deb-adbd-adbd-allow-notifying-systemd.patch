@@ -1,0 +1,41 @@
+From: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Date: Fri, 30 Sep 2022 16:54:02 +0200
+Subject: adb: daemon: allow notifying systemd when ready
+
+When using `systemd` on Linux, we should allow `adbd` to notify
+`systemd` once it has started and configured its USB/network interface.
+This allows us to (for example) wait for the daemon to bind to the
+FunctionFS endpoints, then activate the USB gadget.
+
+Forwarded: https://android-review.googlesource.com/c/platform/packages/modules/adb/+/2238429
+Upstream-Status: Inappropriate [Debian-specific]
+---
+ packages/modules/adb/daemon/main.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/packages/modules/adb/daemon/main.cpp b/packages/modules/adb/daemon/main.cpp
+index d1b999b..deba593 100644
+--- a/packages/modules/adb/daemon/main.cpp
++++ b/packages/modules/adb/daemon/main.cpp
+@@ -49,6 +49,10 @@
+ #include "selinux/android.h"
+ #endif
+ 
++#if defined(__linux__)
++#include <systemd/sd-daemon.h>
++#endif
++
+ #include "adb.h"
+ #include "adb_auth.h"
+ #include "adb_listeners.h"
+@@ -302,6 +306,10 @@ int adbd_main(int server_port) {
+     init_jdwp();
+     D("adbd_main(): post init_jdwp()");
+ 
++#if defined(__linux__)
++    sd_notify(1, "READY=1");
++#endif
++
+     D("Event loop starting");
+     fdevent_loop();
+ 

@@ -18,11 +18,13 @@ Upstream-Status: Pending
 Signed-of-by: Khem Raj <raj.khem@gmail.com>
 --- a/autoconf_local/aclocal.m4
 +++ b/autoconf_local/aclocal.m4
-@@ -4220,7 +4220,6 @@ changequote({{, }})dnl
+@@ -4400,9 +4400,6 @@ cat << 'EOF' > "$wi_tmpdir/unistd.c"
  cat << 'EOF' > "$wi_tmpdir/unistd.c"
  #include <confdefs.h>
  
--#include <unistd.h>
+-#ifdef HAVE_UNISTD_H
+-#	include <unistd.h>
+-#endif
  #include <sys/types.h>
  #include <sys/socket.h>
  #include <netinet/in.h>

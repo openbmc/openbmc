@@ -16,6 +16,11 @@ DEPENDS = "libpam"
 inherit autotools-brokensep features_check
 REQUIRED_DISTRO_FEATURES = "pam"
 
+# The shipped Makefile errors out ("You must run './configure' before 'make'")
+# when Make.inc/src/config.h are missing, so the "make clean" run by
+# autotools_preconfigure fails before configure has run. Skip that clean.
+CLEANBROKEN = "1"
+
 EXTRA_OECONF = "--disable-developer"
 
 do_install() {

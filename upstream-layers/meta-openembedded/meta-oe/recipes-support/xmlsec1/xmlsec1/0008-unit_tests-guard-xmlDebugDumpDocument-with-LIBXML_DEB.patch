@@ -1,0 +1,26 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jun 2026 00:00:00 +0000
+Subject: [PATCH] unit_tests: guard xmlDebugDumpDocument with LIBXML_DEBUG_ENABLED
+
+libxml2 2.14 removed the tree-debugging module; in 2.15 LIBXML_DEBUG_ENABLED
+is no longer defined and xmlDebugDumpDocument() is not declared. The transform
+helpers unit test called it unconditionally, which fails to compile with a
+strict compiler (-Werror=implicit-function-declaration). Only emit the debug
+dump when the libxml2 debug module is available.
+
+Upstream-Status: Submitted [https://github.com/lsh123/xmlsec/issues]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+--- a/apps/unit_tests/transform_helpers_unit_tests.c
++++ b/apps/unit_tests/transform_helpers_unit_tests.c
+@@ -288,7 +288,9 @@
+     nonceContent = xmlNodeGetContent(nonceNode);
+     if((nonceContent == NULL) || (xmlStrcmp(nonceContent, BAD_CAST "000102030405060708090a0b") != 0)) {
+         testLog("Error: ChaCha20-Poly1305 params write serialized unexpected nonce\n");
++#ifdef LIBXML_DEBUG_ENABLED
+         xmlDebugDumpDocument(stdout, doc);
++#endif /* LIBXML_DEBUG_ENABLED */
+ 
+         xmlFree(nonceContent);
+         xmlFreeDoc(doc);

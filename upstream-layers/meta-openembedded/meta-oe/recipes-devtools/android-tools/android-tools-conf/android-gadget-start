@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+# Wait for adbd to open ep0 before activating the UDC. Without systemd
+# sd_notify synchronisation there is no other signal that adbd is ready, so
+# a fixed delay is used. When this script is invoked via ExecStartPost in a
+# Type=notify service, adbd has already sent READY=1 before this runs and
+# no delay is needed; set ANDROID_GADGET_UDC_DELAY=0 in that case (e.g. via
+# a systemd drop-in Environment= line).
+ANDROID_GADGET_UDC_DELAY="${ANDROID_GADGET_UDC_DELAY:-10}"
+sleep "$ANDROID_GADGET_UDC_DELAY"
+
+ls /sys/class/udc/ | head -n 1 | xargs echo -n > /sys/kernel/config/usb_gadget/adb/UDC
+
+echo "Setting UDC $(ls /sys/class/udc/ | head -n 1) for USB ADB Gadget usage"

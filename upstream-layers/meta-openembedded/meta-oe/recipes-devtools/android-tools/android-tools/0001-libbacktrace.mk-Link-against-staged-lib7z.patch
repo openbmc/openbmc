@@ -1,0 +1,38 @@
+From 1eab8bc4974c887c09d6b444c5198ec4c0932b36 Mon Sep 17 00:00:00 2001
+From: Mihajlo Marinkovic <mmarinkovic@snap.com>
+Date: Fri, 8 May 2026 12:10:00 +0000
+Subject: [PATCH] libbacktrace.mk: Link against staged lib7z
+
+In the Yocto target sysroot, p7zip installs `lib7z.so` under `/usr/lib`.
+The Debian make fragment hardcodes `/usr/lib/7zip` and links `-l:7z.so`,
+which does not exist in this environment and causes link failure.
+
+Use the standard sysroot library search path and link against `-l7z`
+instead.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Mihajlo Marinkovic <mmarinkovic@snap.com>
+---
+ debian/system/libbacktrace.mk | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/debian/system/libbacktrace.mk b/debian/system/libbacktrace.mk
+index b106c24..0f798d4 100644
+--- a/debian/system/libbacktrace.mk
++++ b/debian/system/libbacktrace.mk
+@@ -64,13 +64,11 @@ CPPFLAGS += \
+   -Isystem/unwinding/libunwindstack/include \
+ 
+ LDFLAGS += \
+-  -L/usr/lib/7zip \
+   -Ldebian/out/external \
+   -Ldebian/out/system \
+   -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -Wl,-rpath=/usr/lib/7zip \
+   -Wl,-soname,$(NAME).so.0 \
+-  -l:7z.so \
++  -l7z \
+   -lbase \
+   -llog \
+   -lpthread \

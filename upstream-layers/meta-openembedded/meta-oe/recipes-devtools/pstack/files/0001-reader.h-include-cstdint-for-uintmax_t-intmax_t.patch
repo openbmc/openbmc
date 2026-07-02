@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Jun 2026 00:00:00 +0000
+Subject: [PATCH] reader.h: include <cstdint> for uintmax_t/intmax_t
+
+GCC 16 / newer libstdc++ no longer transitively pull in <cstdint> via
+other standard headers. reader.h uses uintmax_t and intmax_t (in the
+readULEB128/readSLEB128 prototypes) without directly including the
+header that declares them, which fails to compile with:
+
+  error: 'uintmax_t' was not declared in this scope
+  error: 'intmax_t' was not declared in this scope
+
+Include <cstdint> explicitly to provide these fixed-width integer types.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ libpstack/reader.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libpstack/reader.h b/libpstack/reader.h
+index 1111111..2222222 100644
+--- a/libpstack/reader.h
++++ b/libpstack/reader.h
+@@ -1,6 +1,7 @@
+ #ifndef pstack_reader_h
+ #define pstack_reader_h
+
++#include <cstdint>
+ #include <climits>
+ #include <iostream>
+ #include <memory>
+--
+2.49.0

@@ -36,6 +36,7 @@ PTESTS_FAST_META_OE = "\
     libjcat \
     libio-pty-perl \
     libmanette \
+    libpcre \
     libplist \
     librelp \
     libssh \

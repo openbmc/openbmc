@@ -18,14 +18,14 @@ index 8bda997..b70c07e 100644
 --- a/dmalloc.h.3
 +++ b/dmalloc.h.3
 @@ -1,5 +1,8 @@
- /* NOTE: start of $Id: dmalloc.h.4,v 1.15 2007/05/14 17:23:37 gray Exp $ */
- 
+ /* NOTE: start of dmalloc.h.3 */
+
 +#undef strndup
 +#undef strdup
 +
- /* dmalloc version defines */
- #define DMALLOC_VERSION_MAJOR	5	/* X.0.0 */
- #define DMALLOC_VERSION_MINOR	5	/* 0.X.0 */
--- 
+ /* this defines what type the standard void memory-pointer is */
+ #if (defined(__STDC__) && __STDC__ == 1) || defined(__cplusplus) || defined(STDC_HEADERS) || defined(_ISO_STDLIB_ISO_H)
+ #define DMALLOC_PNT		void *
+--
 2.10.2
 

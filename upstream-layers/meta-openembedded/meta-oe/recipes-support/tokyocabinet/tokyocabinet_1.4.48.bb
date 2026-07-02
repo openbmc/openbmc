@@ -25,3 +25,11 @@ SRC_URI[sha256sum] = "a003f47c39a91e22d76bc4fe68b9b3de0f38851b160bbb1ca07a4f6441
 DEPENDS = "bzip2 zlib"
 
 inherit autotools-brokensep
+
+# tokyocabinet bakes LD_RUN_PATH=...:$(HOME)/lib:/usr/local/lib:... into the
+# command binaries via the Makefile LDENV/RUNENV variables, which leaks the
+# build host HOME directory into the shipped binaries (buildpaths QA). Drop
+# those host search paths from the generated Makefile after configure.
+do_configure:append() {
+    sed -i -e 's,\$(HOME)/lib:,,g' -e 's,/usr/local/lib:,,g' ${B}/Makefile
+}

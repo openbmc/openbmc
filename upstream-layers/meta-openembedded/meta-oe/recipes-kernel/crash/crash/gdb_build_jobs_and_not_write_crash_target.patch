@@ -1,4 +1,4 @@
-From af49d8df559aa18f97d14ab7971f211238a16041 Mon Sep 17 00:00:00 2001
+From 43d02dfa24f9f04e60911593e47e9cc2d68562e3 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 9 Mar 2023 10:50:10 +0800
 Subject: [PATCH] Makefile: Don't write ${TARGET} to crash.target
@@ -14,17 +14,18 @@ Don't write ${TARGET} to crash.target which causes rebuild fails.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
+Signed-off-by: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
 ---
  Makefile | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index cd25c7d..d61c4c5 100644
+index f2c945a..9fdb29b 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -262,8 +262,8 @@ gdb_merge: force
+@@ -316,8 +316,8 @@ gdb_merge: force
  	@if [ ! -f ${GDB}/config.status ]; then \
- 	  (cd ${GDB}; ./configure --host=${GDB_TARGET} --build=${GDB_HOST} --with-separate-debug-dir=/usr/lib/debug \
+ 	  (cd ${GDB}; ./configure ${GDB_CONF_FLAGS} --with-separate-debug-dir=/usr/lib/debug \
  	    --with-bugurl="" --with-expat=no --with-python=no --disable-sim; \
 -	  $(MAKE) CRASH_TARGET=${TARGET}; echo ${TARGET} > crash.target) \
 -	else $(MAKE) rebuild; fi
@@ -33,6 +34,3 @@ index cd25c7d..d61c4c5 100644
  	@if [ ! -f ${PROGRAM} ]; then \
  	  echo; echo "${PROGRAM} build failed"; \
  	  echo; exit 1; fi
--- 
-2.25.1
-

@@ -1,0 +1,14 @@
+Description: unwindstack porting
+Forwarded: not-needed
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/system/unwinding/libunwindstack/include/unwindstack/RegsGetLocal.h
++++ b/system/unwinding/libunwindstack/include/unwindstack/RegsGetLocal.h
+@@ -123,7 +123,7 @@
+       : "t1", "memory");
+ }
+ 
+-#elif defined(__i386__) || defined(__x86_64__)
++#else
+ 
+ // Do not change this, some libraries depend on this function existing on
+ // these architectures.

@@ -15,24 +15,21 @@ Subject: [PATCH] fix incompatible type error with gcc 15
 Upstream-Status: Submitted [felix-libowfat@fefe.de]
 Signed-off-by: mark.yang <mark.yang@lge.com>
 ---
- buffer.h                  | 2 +-
- buffer/buffer_frombuf.c   | 2 +-
- buffer/buffer_stubborn.c  | 2 +-
- buffer/buffer_stubborn2.c | 2 +-
- buffer/buffer_tosa.c      | 2 +-
- select.h2                 | 2 --
- 6 files changed, 5 insertions(+), 7 deletions(-)
+ buffer.h                | 2 +-
+ buffer/buffer_frombuf.c | 2 +-
+ buffer/buffer_tosa.c    | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/buffer.h b/buffer.h
 index 54bed5c..eaf7acb 100644
 --- a/buffer.h
 +++ b/buffer.h
-@@ -24,7 +24,7 @@ typedef struct buffer {
+@@ -37,7 +37,7 @@ typedef struct buffer {
    int fd;		/* passed as first argument to op */
  } buffer;
- 
--#define BUFFER_INIT(op,fd,buf,len) { (buf), 0, 0, (len), (op), NULL, NULL, (fd) }
-+#define BUFFER_INIT(op,fd,buf,len) { (buf), 0, 0, (len), (void*)(op), NULL, NULL, (fd) }
+
+-#define BUFFER_INIT(op,fd,buf,len) { (char*)(buf), 0, 0, (len), (op), NULL, NULL, (fd) }
++#define BUFFER_INIT(op,fd,buf,len) { (char*)(buf), 0, 0, (len), (void*)(op), NULL, NULL, (fd) }
  #define BUFFER_INIT_FREE(op,fd,buf,len) { (buf), 0, 0, (len), (op), NULL, buffer_free, (fd) }
  #define BUFFER_INIT_READ(op,fd,buf,len) BUFFER_INIT(op,fd,buf,len) /*obsolete*/
  #define BUFFER_INSIZE 8192
@@ -48,32 +45,6 @@ index 0c9d931..2aa27ca 100644
 +  b->op=(void*)dummyreadwrite;
    b->deinit=0;
  }
-diff --git a/buffer/buffer_stubborn.c b/buffer/buffer_stubborn.c
-index 2e00418..8079000 100644
---- a/buffer/buffer_stubborn.c
-+++ b/buffer/buffer_stubborn.c
-@@ -1,7 +1,7 @@
- #include <errno.h>
- #include "buffer.h"
- 
--int buffer_stubborn(ssize_t (*op)(),int fd,const char* buf, size_t len,void* cookie) {
-+int buffer_stubborn(ssize_t (*op)(int,char*,size_t,void*),int fd,const char* buf, size_t len,void* cookie) {
-   ssize_t w;
-   errno=0;
-   while (len) {
-diff --git a/buffer/buffer_stubborn2.c b/buffer/buffer_stubborn2.c
-index b9146e2..b47a245 100644
---- a/buffer/buffer_stubborn2.c
-+++ b/buffer/buffer_stubborn2.c
-@@ -1,7 +1,7 @@
- #include <errno.h>
- #include "buffer.h"
- 
--ssize_t buffer_stubborn_read(ssize_t (*op)(),int fd,const char* buf, size_t len,void* cookie) {
-+ssize_t buffer_stubborn_read(ssize_t (*op)(int,char*,size_t,void*),int fd,const char* buf, size_t len,void* cookie) {
-   ssize_t w;
-   for (;;) {
-     if ((w=op(fd,buf,len,cookie))<0)
 diff --git a/buffer/buffer_tosa.c b/buffer/buffer_tosa.c
 index a10be4f..99111a9 100644
 --- a/buffer/buffer_tosa.c
@@ -87,14 +58,3 @@ index a10be4f..99111a9 100644
    b->cookie=sa;
    b->deinit=0;
    return 0;
-diff --git a/select.h2 b/select.h2
-index 961c380..2a22543 100644
---- a/select.h2
-+++ b/select.h2
-@@ -10,6 +10,4 @@
- /* braindead BSD uses bzero in FD_ZERO but doesn't #include string.h */
- #include <string.h>
- 
--extern int select();
--
- #endif

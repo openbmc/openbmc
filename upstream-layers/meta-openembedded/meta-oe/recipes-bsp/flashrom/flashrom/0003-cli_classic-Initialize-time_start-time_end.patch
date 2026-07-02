@@ -1,0 +1,34 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Mon, 23 Jun 2026 00:00:00 +0000
+Subject: [PATCH] cli_classic: Initialize time_start/time_end
+
+clang's -Wsometimes-uninitialized (promoted to an error via -Werror)
+flags that time_start may be used uninitialized at the function's "out:"
+label. Several early "goto out" paths execute before time(&time_start)
+runs, and the cleanup code calls difftime(time_end, time_start)
+unconditionally. Initialize both time_t variables at declaration so the
+value passed to difftime is always well defined.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ cli_classic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/cli_classic.c b/cli_classic.c
+index 1234567..89abcde 100644
+--- a/cli_classic.c
++++ b/cli_classic.c
+@@ -1055,7 +1055,7 @@ int main(int argc, char *argv[])
+ 	int ret = 0;
+ 	int all_matched_count = 0;
+ 	const char **all_matched_names = NULL;
+-	time_t time_start, time_end;
++	time_t time_start = 0, time_end = 0;
+
+ 	struct flashctx *context = NULL; /* holds the active detected chip and other info */
+ 	ret = flashrom_create_context(&context);
+--
+2.43.0

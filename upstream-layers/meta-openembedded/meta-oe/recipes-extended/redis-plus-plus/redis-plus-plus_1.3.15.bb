@@ -13,6 +13,10 @@ SRCREV = "a63ac43bf192772910b52e27cd2b42a6098a0071"
 
 inherit cmake
 
+# GCC 16 reports a spurious -Wmaybe-uninitialized in the exception helper
+# constructors (reply.h); the project builds with -Werror.
+CXXFLAGS:append:toolchain-gcc = " -Wno-error=maybe-uninitialized"
+
 # if ssl is enabled for redis-plus-plus it must also be enabled for hiredis
 PACKAGECONFIG ??= "ssl"
 PACKAGECONFIG[ssl] = "-DREDIS_PLUS_PLUS_USE_TLS=ON, -DREDIS_PLUS_PLUS_USE_TLS=OFF, openssl"

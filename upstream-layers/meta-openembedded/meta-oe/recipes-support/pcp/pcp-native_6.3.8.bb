@@ -1,7 +1,7 @@
 require pcp.inc
 inherit python3native native 
 #autotools-brokensep 
-DEPENDS = "python3-native python3-setuptools-native flex-native bison-native"
+DEPENDS = "python3-native python3-setuptools-native flex-native bison-native readline-native ncurses-native"
 
 export PCP_DIR = "${D}"
 export PCP_TMP_DIR = "${D}/tmp"

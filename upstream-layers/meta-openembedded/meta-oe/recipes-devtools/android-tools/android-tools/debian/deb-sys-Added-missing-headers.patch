@@ -1,0 +1,15 @@
+Description: Added missing headers causing compile errors
+Author: Umang Parmar <umangjparmar@gmail.com>
+Forwarded: not-needed
+
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/packages/modules/adb/pairing_connection/pairing_server.cpp
++++ b/packages/modules/adb/pairing_connection/pairing_server.cpp
+@@ -20,6 +20,7 @@
+ #include <sys/eventfd.h>
+ 
+ #include <atomic>
++#include <condition_variable>
+ #include <deque>
+ #include <iomanip>
+ #include <mutex>

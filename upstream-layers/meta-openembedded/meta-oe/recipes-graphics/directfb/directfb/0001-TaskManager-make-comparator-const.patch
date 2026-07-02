@@ -1,0 +1,26 @@
+TaskManager: make comparator const for GCC 16
+
+Fixes build failure with GCC 16 due to stricter libstdc++ requirements
+for std::set comparator (must be const-callable).
+
+Upstream-Status: Submitted [https://github.com/deniskropp/DirectFB/issues/29]
+
+Signed-off-by: Hemanth Kumar M D <Hemanth.KumarMD@windriver.com>
+---
+ src/core/TaskManager.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/TaskManager.h b/src/core/TaskManager.h
+index 3f2174c..6ac29ee 100644
+--- a/src/core/TaskManager.h
++++ b/src/core/TaskManager.h
+@@ -121,7 +121,7 @@ public:
+      static void       dumpTasks();
+
+
+-     bool operator()( Task *t1, Task *t2 )
++     bool operator()( Task *t1, Task *t2 ) const
+      {
+           return t1->ts_emit < t2->ts_emit;
+      }
+

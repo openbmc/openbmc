@@ -1,4 +1,4 @@
-From bcf7da314d4cd1db1708d48c908ab7da797a733b Mon Sep 17 00:00:00 2001
+From d505f384aea5e565c4207e026b8c0dac485a741a Mon Sep 17 00:00:00 2001
 From: Naveen Saini <naveen.kumar.saini@intel.com>
 Date: Fri, 2 Aug 2019 10:41:26 +0800
 Subject: [PATCH] configure.ac: skip running test program when cross-compiling
@@ -11,7 +11,7 @@ Signed-off-by: Naveen Saini <naveen.kumar.saini@intel.com>
  1 file changed, 2 insertions(+), 17 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7d16afb..65cd194 100644
+index 8d3dfea..b21361e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -152,7 +152,7 @@ AC_CHECK_FUNCS([backtrace_symbols_fd memrchr sysctl sysctlbyname \
@@ -51,6 +51,6 @@ index 7d16afb..65cd194 100644
 -                             ])
 -              ])
 -
- PKG_CHECK_MODULES([CORE],[fontconfig xrender xcomposite xdamage xfixes xext x11])
+ PKG_CHECK_MODULES([CORE],[fontconfig xrender xcomposite
+                           xcursor xdamage xfixes xext x11])
  AC_SUBST([CORE_CFLAGS])
- AC_SUBST([CORE_LIBS])

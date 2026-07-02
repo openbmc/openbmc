@@ -1,0 +1,240 @@
+From 14058ff506910f19c6e6a49e2bb081c398a7acf0 Mon Sep 17 00:00:00 2001
+From: Mihajlo Marinkovic <mmarinkovic@snap.com>
+Date: Sun, 10 May 2026 15:20:00 +0000
+Subject: [PATCH] debian makefiles: adapt for cross-compilation in Yocto
+
+The Debian make fragments hardcode several assumptions that only work on
+a Debian build host:
+ - include /usr/share/dpkg/architecture.mk (shells out to dpkg-architecture)
+ - /usr/include/android (host path, not sysroot)
+ - /usr/lib/$(DEB_HOST_MULTIARCH)/android (host rpath)
+ - -lcrypto / -lssl (links against system OpenSSL instead of BoringSSL)
+ - -Wexit-time-destructors (Clang-only, rejected by GCC)
+
+Replace each with its Yocto-compatible equivalent: use $(SYSROOT) for
+include paths, rpath relative to $ORIGIN for installed libraries, exact
+soname matching for the staged BoringSSL shared objects, and drop the
+Clang-only warning flag.
+
+Upstream-Status: Inappropriate [OE-specific]
+
+Signed-off-by: Mihajlo Marinkovic <mmarinkovic@snap.com>
+---
+ debian/system/adb.mk                  |  9 ++++-----
+ debian/system/adbd.mk                 | 10 ++++------
+ debian/system/extras/libext4_utils.mk |  4 ++--
+ debian/system/fastboot.mk             | 13 ++++++-------
+ debian/system/libadb.mk               |  3 +--
+ debian/system/libbacktrace.mk         |  2 +-
+ debian/system/libbase.mk              |  2 +-
+ debian/system/libcrypto_utils.mk      |  2 +-
+ debian/system/libcutils.mk            |  2 +-
+ debian/system/liblog.mk               |  1 +
+ debian/system/libutils.mk             |  3 +--
+ 11 files changed, 23 insertions(+), 28 deletions(-)
+
+diff --git a/debian/system/adb.mk b/debian/system/adb.mk
+index 89530b0..90a816f 100644
+--- a/debian/system/adb.mk
++++ b/debian/system/adb.mk
+@@ -82,22 +82,21 @@ CPPFLAGS += \
+   -Isystem/libbase/include \
+   -Isystem/libziparchive/include \
+   \
+-  -I/usr/include/android \
++  -I$(SYSROOT)/usr/include/android \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system \
+-  -L/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -lbase \
+   -lbrotlidec \
+   -lbrotlienc \
+-  -lcrypto \
++  -l:libcrypto.so.0 \
+   -lcutils \
+   -llog \
+   -llz4 \
+   -lprotobuf \
+   -lpthread \
+-  -lssl \
++  -l:libssl.so.0 \
+   -lusb-1.0 \
+   -lziparchive \
+   -lzstd \
+diff --git a/debian/system/adbd.mk b/debian/system/adbd.mk
+index 9d6abd7..73e49a4 100644
+--- a/debian/system/adbd.mk
++++ b/debian/system/adbd.mk
+@@ -81,23 +81,21 @@ CPPFLAGS += \
+   -Isystem/libbase/include \
+   -Isystem/logging/liblog/include \
+   \
+-  -I/usr/include/android \
++  -I$(SYSROOT)/usr/include/android \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system \
+-  -L/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
+   -lbase \
+   -lbrotlidec \
+   -lbrotlienc \
+-  -lcrypto \
++  -l:libcrypto.so.0 \
+   -lcutils \
+   -llog \
+   -llz4 \
+   -lprotobuf \
+   -lresolv \
+-  -lssl \
+-  -lsystemd \
++  -l:libssl.so.0 \
+   -lzstd \
+   -pie \
+ 
+diff --git a/debian/system/extras/libext4_utils.mk b/debian/system/extras/libext4_utils.mk
+index 77455f4..5bfc950 100644
+--- a/debian/system/extras/libext4_utils.mk
++++ b/debian/system/extras/libext4_utils.mk
+@@ -26,8 +26,8 @@ CPPFLAGS += \
+   -D_LARGEFILE64_SOURCE \
+   -DFEC_NO_KLOG \
+   -DSQUASHFS_NO_KLOG \
+-  -I/usr/include/android \
+-  -I/usr/include/squashfuse \
++  -I$(SYSROOT)/usr/include/android \
++  -I$(SYSROOT)/usr/include/squashfuse \
+   -Isystem/core/libcutils/include \
+   -Isystem/core/libsparse/include \
+   -Isystem/extras/ext4_utils/include \
+diff --git a/debian/system/fastboot.mk b/debian/system/fastboot.mk
+index d68a99a..52f5d8b 100644
+--- a/debian/system/fastboot.mk
++++ b/debian/system/fastboot.mk
+@@ -56,16 +56,15 @@ CPPFLAGS += \
+   -Isystem/libziparchive/include \
+   -Isystem/tools/mkbootimg/include/bootimg \
+   \
+-  -I/usr/include/android \
++  -I$(SYSROOT)/usr/include/android \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system \
+-  -L/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
+-  -lbase \
+-  -lcrypto \
+-  -lcutils \
+-  -llog \
++  -Wl,-rpath='$$ORIGIN/../lib/android' \
++  debian/out/system/libbase.so.0 \
++  -l:libcrypto.so.0 \
++  debian/out/system/libcutils.so.0 \
++  debian/out/system/liblog.so.0 \
+   -lpthread \
+   -lprotobuf \
+   -lsparse \
+diff --git a/debian/system/libadb.mk b/debian/system/libadb.mk
+index 52f2838..ebd52aa 100644
+--- a/debian/system/libadb.mk
++++ b/debian/system/libadb.mk
+@@ -73,7 +73,6 @@ SOURCES_CC = $(filter %.cc,$(SOURCES))
+ OBJECTS_CC = $(SOURCES_CC:.cc=.o)
+ 
+ CXXFLAGS += \
+-  -Wexit-time-destructors \
+   -Wno-non-virtual-dtor \
+   -Wno-unused-parameter \
+   -Wno-missing-field-initializers \
+@@ -96,7 +95,7 @@ CPPFLAGS += \
+   -Isystem/core/libcutils/include \
+   -Isystem/libbase/include \
+   \
+-  -I/usr/include/android \
++  -I$(SYSROOT)/usr/include/android \
+ 
+ debian/out/system/$(NAME).a: $(OBJECTS_CC) $(OBJECTS_CPP)
+ 	ar -rcs $@ $^
+diff --git a/debian/system/libbacktrace.mk b/debian/system/libbacktrace.mk
+index 0f798d4..f004061 100644
+--- a/debian/system/libbacktrace.mk
++++ b/debian/system/libbacktrace.mk
+@@ -1,4 +1,4 @@
+-include /usr/share/dpkg/architecture.mk
++DEB_HOST_MULTIARCH ?=
+ 
+ NAME = libbacktrace
+ 
+diff --git a/debian/system/libbase.mk b/debian/system/libbase.mk
+index f04d3f9..61f71c6 100644
+--- a/debian/system/libbase.mk
++++ b/debian/system/libbase.mk
+@@ -42,7 +42,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -llog \
+   -lpthread \
+diff --git a/debian/system/libcrypto_utils.mk b/debian/system/libcrypto_utils.mk
+index 39fd8a7..82ae46c 100644
+--- a/debian/system/libcrypto_utils.mk
++++ b/debian/system/libcrypto_utils.mk
+@@ -7,7 +7,7 @@ CPPFLAGS += \
+   -Isystem/core/include \
+   -Isystem/core/libcrypto_utils/include \
+   \
+-  -I/usr/include/android \
++  -I$(SYSROOT)/usr/include/android \
+ 
+ debian/out/system/$(NAME).a: $(OBJECTS)
+ 	ar -rcs $@ $^
+diff --git a/debian/system/libcutils.mk b/debian/system/libcutils.mk
+index 596ebd8..ff9e911 100644
+--- a/debian/system/libcutils.mk
++++ b/debian/system/libcutils.mk
+@@ -50,7 +50,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lbase \
+   -llog \
+diff --git a/debian/system/liblog.mk b/debian/system/liblog.mk
+index b08a50c..091ccad 100644
+--- a/debian/system/liblog.mk
++++ b/debian/system/liblog.mk
+@@ -27,6 +27,7 @@ CPPFLAGS += \
+   -Isystem/logging/liblog/include \
+ 
+ LDFLAGS += \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lpthread \
+   -shared
+diff --git a/debian/system/libutils.mk b/debian/system/libutils.mk
+index 6218c73..c7948e7 100644
+--- a/debian/system/libutils.mk
++++ b/debian/system/libutils.mk
+@@ -1,4 +1,3 @@
+-include /usr/share/dpkg/architecture.mk
+ 
+ NAME = libutils
+ 
+@@ -42,7 +41,7 @@ CPPFLAGS += \
+ 
+ LDFLAGS += \
+   -Ldebian/out/system \
+-  -Wl,-rpath=/usr/lib/$(DEB_HOST_MULTIARCH)/android \
++  -Wl,-rpath='$$ORIGIN' \
+   -Wl,-soname,$(NAME).so.0 \
+   -lbacktrace \
+   -lcutils \

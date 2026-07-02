@@ -29,3 +29,14 @@ EXTRA_OECMAKE += "\
 LDFLAGS:append:riscv32 = " -latomic"
 
 SECURITY_CFLAGS:toolchain-clang = ""
+
+# Upstream bakes the absolute python CMake found at configure time
+# (Python3_EXECUTABLE) into the apitrace binary as APITRACE_PYTHON_EXECUTABLE.
+# That path points into the build host (e.g. the autobuilder's
+# /srv/pokybuild/buildbot-venv/bin/python3) which trips the buildpaths QA
+# check and does not exist on the target. The diff/leaks helper subcommands
+# exec it via os::execute(), which uses execvp(), so resolve "python3" through
+# PATH at runtime instead.
+do_configure:prepend() {
+    sed -i -E 's|(APITRACE_PYTHON_EXECUTABLE=)"[^"]*Python3_EXECUTABLE[^"]*"|\1"python3"|' ${S}/cli/CMakeLists.txt
+}

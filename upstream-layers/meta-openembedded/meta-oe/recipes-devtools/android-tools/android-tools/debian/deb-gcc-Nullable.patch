@@ -1,0 +1,14 @@
+Description: Bring Clang's _Nullable keyword to GCC
+ This patch is for gcc only, no need for clang.
+Forwarded: not-needed
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/libnativehelper/file_descriptor_jni.c
++++ b/libnativehelper/file_descriptor_jni.c
+@@ -22,6 +22,7 @@
+ #include "ALog-priv.h"
+ 
+ #include "JniConstants.h"
++#define _Nullable
+ 
+ static void EnsureArgumentIsFileDescriptor(JNIEnv* env, jobject instance) {
+     ALOG_ALWAYS_FATAL_IF(instance == NULL, "FileDescriptor is NULL");

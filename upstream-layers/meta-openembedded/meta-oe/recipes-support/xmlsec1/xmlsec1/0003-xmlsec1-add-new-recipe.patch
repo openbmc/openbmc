@@ -6,34 +6,44 @@ Subject: [PATCH] xmlsec1: add new recipe
 This enables the building of the examples directory
 and it's installed as ptest.
 
+Also allow the examples to be built from a separate build directory
+by honoring top_srcdir/top_builddir so that the include and library
+paths point at the cross build tree instead of the host.
+
 Upstream-Status: Inappropriate [ OE ptest specific ]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
----
- examples/Makefile | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
 
+Refreshed for xmlsec1 1.3.11 (examples/Makefile rewritten upstream).
+---
 diff --git a/examples/Makefile b/examples/Makefile
-index c6a25f09..3da1cb33 100644
+index dfba58e..f6f4d51 100644
 --- a/examples/Makefile
 +++ b/examples/Makefile
-@@ -12,9 +12,17 @@ PROGRAMS = \
- 	$(PROGRAMS_DEC) \
- 	xmldsigverify
- 
-+ifndef CC
- CC	= gcc
--CFLAGS	+= -g $(shell xmlsec1-config --cflags) -DUNIX_SOCKETS -Wall -Wextra
--LDLIBS	+= -g $(shell xmlsec1-config --libs)
-+endif
+@@ -12,6 +12,12 @@ PROGRAMS = \
+ 	$(PROGRAMS_DEC)
+
+ # try to find pkg-config, if available
++# OE: allow building from a separate build dir against the cross build tree
++top_srcdir ?= ..
++top_builddir ?= ..
++CFLAGS += -I$(top_srcdir)/include
++LDLIBS += -L$(top_builddir)/src/.libs
 +
-+CFLAGS  += -I../include -g $(shell PKG_CONFIG_PATH=.. pkg-config --cflags xmlsec1 ) -DUNIX_SOCKETS -Wall -Wextra
-+LDLIBS  += -L../src/.libs -g $(shell PKG_CONFIG_PATH=.. pkg-config --libs xmlsec1 )
-+
+ XMLSEC_PKG_CONFIG = "xmlsec1"
+ PKG_CONFIG := $(shell command -v pkg-config 2> /dev/null)
+ XMLSEC_CHECK := $(shell $(PKG_CONFIG) --exists $(XMLSEC_PKG_CONFIG) 2> /dev/null && echo "found")
+@@ -40,6 +46,11 @@ endif
+ # rules
+ all: $(PROGRAMS)
+
 +DESTDIR = /usr/share/xmlsec1
 +install-ptest:
 +	if [ ! -d $(DESTDIR) ]; then mkdir -p $(DESTDIR); fi
 +	cp * $(DESTDIR)
- 
- all: $(PROGRAMS)
- 
++
+ clean:
+ 	rm -rf $(PROGRAMS)
+
+--
+2.34.1

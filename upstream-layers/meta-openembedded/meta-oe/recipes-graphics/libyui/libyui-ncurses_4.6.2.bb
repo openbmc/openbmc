@@ -5,6 +5,7 @@ LIC_FILES_CHKSUM = "file://../COPYING.lgpl-3;md5=e6a600fd5e1d9cbde2d983680233ad0
 "
 
 SRC_URI = "git://github.com/libyui/libyui.git;branch=master;protocol=https \
+           file://0001-NCurses-cast-wchar_t-before-streaming-to-narrow-ostr.patch \
           "
 
 SRC_URI:append:class-target = " file://0001-Fix-the-error-of-can-t-find-header-file.patch"

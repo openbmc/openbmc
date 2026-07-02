@@ -17,6 +17,7 @@ SRC_URI += " \
     file://0001-build-Do-not-display-full-path-in-generated-headers.patch \
     file://0001-build-Be-sure-to-generate-sub-headers-before-includi.patch \
     file://0002-build-Install-missing-libxfce4panel.h.patch \
+    file://0001-panel-tic-tac-toe-Remove-wrong-autoptr-define-guard.patch \
 "
 SRC_URI[sha256sum] = "c940dae515bef4af08a126011d2fd873ce99e815157ba8cef5332195bb60e51e"
 

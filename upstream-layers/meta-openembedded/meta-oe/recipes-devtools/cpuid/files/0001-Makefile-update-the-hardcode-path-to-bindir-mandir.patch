@@ -16,7 +16,7 @@ diff --git a/Makefile b/Makefile
 index 828d2b1..365e26d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -55,10 +55,10 @@ cpuinfo2cpuid.man.gz: cpuinfo2cpuid.man
+@@ -61,10 +61,10 @@ cpuinfo2cpuid.man.gz: cpuinfo2cpuid.man
  	gzip < $< > $@
  
  install: $(PROG) $(PROG).man.gz cpuinfo2cpuid cpuinfo2cpuid.man.gz
@@ -30,7 +30,7 @@ index 828d2b1..365e26d 100644
 +	install -D -m 444 cpuinfo2cpuid.man.gz $(BUILDROOT)${mandir}/man1/cpuinfo2cpuid.1.gz
  
  clean:
- 	rm -f $(PROG) $(PROG).i386 $(PROG).x86_64
+ 	rm -f $(PROG) $(PROG).opt $(PROG).i386 $(PROG).x86_64
 -- 
 2.25.1
 

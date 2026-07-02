@@ -1,0 +1,28 @@
+From: Julien Massot <julien.massot@collabora.com>
+Date: Mon, 5 Sep 2022 16:00:12 +0200
+Subject: adb: daemon: allow binding to USB on Linux systems
+
+Linux systems are also capable of using FunctionFS for USB gadget
+configurations. This requires creating a specific gadget configuration
+using ConfigFS (including an `ffs.adb` function) and mounting
+FunctionFS to `/dev/usb-ffs/adb`.
+
+Forwarded: https://android-review.googlesource.com/c/platform/packages/modules/adb/+/2238428
+Upstream-Status: Inappropriate [Debian-specific]
+---
+ packages/modules/adb/daemon/main.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/packages/modules/adb/daemon/main.cpp b/packages/modules/adb/daemon/main.cpp
+index 188272a..6c949c1 100644
+--- a/packages/modules/adb/daemon/main.cpp
++++ b/packages/modules/adb/daemon/main.cpp
+@@ -251,7 +251,7 @@ int adbd_main(int server_port) {
+ 
+     bool is_usb = false;
+ 
+-#if defined(__ANDROID__)
++#if defined(__linux__)
+     if (access(USB_FFS_ADB_EP0, F_OK) == 0) {
+         // Listen on USB.
+         usb_init();

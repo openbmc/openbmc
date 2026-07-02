@@ -1,0 +1,46 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Jun 2026 00:00:00 +0000
+Subject: [PATCH] NCurses: cast wchar_t before streaming to narrow ostream
+
+GCC 16 / libstdc++ implements the C++20 deletion of
+std::operator<<(std::ostream&, wchar_t). Two debug-output sites stream a
+wchar_t directly into a narrow std::ostream, which is now ill-formed:
+
+  NCtext.cc:348:34: error: use of deleted function
+  'std::basic_ostream<char, _Traits>& std::operator<<(basic_ostream<char,
+  _Traits>&, wchar_t)'
+  NCRichText.cc:521:59: error: use of deleted function ... wchar_t ...
+
+Both values are ASCII characters used purely for debug output, so cast
+them to char to keep the previous behaviour.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/NCRichText.cc | 2 +-
+ src/NCtext.cc     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/NCtext.cc
++++ b/src/NCtext.cc
+@@ -345,7 +345,7 @@
+     str << "[label" << obj.size() << ':' << obj[0].str();
+
+     if ( obj.hasHotkey() )
+-	str << ':' << obj.hotkey() << " at " << obj.hotpos();
++	str << ':' << static_cast<char>( obj.hotkey() ) << " at " << obj.hotpos();
+
+     return str  << ']';
+ }
+--- a/src/NCRichText.cc
++++ b/src/NCRichText.cc
+@@ -518,7 +518,7 @@
+ 			    break;
+
+ 			default:
+-			    yuiDebug() << "Ignoring " << *wch << std::endl;
++			    yuiDebug() << "Ignoring " << static_cast<char>( *wch ) << std::endl;
+ 		    }
+ 		    ++wch;
+ 		}

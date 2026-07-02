@@ -43,7 +43,7 @@ Notes
   to the PACKAGECONFIG value for the php recipe in order to enable it.
   See here for info on how to do that:
 
-  http://www.yoctoproject.org/docs/current/ref-manual/ref-manual.html#var-PACKAGECONFIG
+  https://docs.yoctoproject.org/ref-manual/variables.html#term-PACKAGECONFIG
 
 
 Maintenance

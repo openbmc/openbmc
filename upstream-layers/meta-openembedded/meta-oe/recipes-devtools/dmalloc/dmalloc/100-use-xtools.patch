@@ -19,11 +19,10 @@ License for dmalloc is:
 I personnaly believe that the resulting code should therefore be
 LGPL v2.1, but don't believe me, ask your lawyers!
 
-Index: dmalloc-5.5.2/configure.ac
-===================================================================
---- dmalloc-5.5.2.orig/configure.ac
-+++ dmalloc-5.5.2/configure.ac
-@@ -69,6 +69,15 @@ if test "$ac_cv_prog_cc_stdc" = "no" ; t
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -76,6 +76,15 @@
  fi
  AC_PROG_INSTALL
  AC_PROG_RANLIB
@@ -39,9 +38,9 @@ Index: dmalloc-5.5.2/configure.ac
  AC_C_CONST
  
  # we need this for various settings
-@@ -131,14 +140,14 @@ AC_SUBST(shlibdir)
+@@ -144,14 +153,14 @@
  AC_MSG_CHECKING([shared library link args])
- AC_COMPILE_IFELSE([ int foo(int val) { return val + 1; } ],[
+ AC_COMPILE_IFELSE([AC_LANG_SOURCE([ int foo(int val) { return val + 1; } ])],[
  	# so now we try to create an archive from the compiled .o file
 -	(ar cr conftest.a conftest.o) 2>&5
 +	(${ac_cv_prog_AR} cr conftest.a conftest.o) 2>&5
@@ -56,7 +55,7 @@ Index: dmalloc-5.5.2/configure.ac
              # By convention on some platforms
              # libLLL.so, libLLL.X.so are symlinks to libLLL.X.Y.Z.so
              # where X.Y.Z is version # (major.minor.increment) of the library
-@@ -156,12 +165,12 @@ AC_COMPILE_IFELSE([ int foo(int val) { r
+@@ -169,12 +178,12 @@
              ac_cv_shared_link_args='# Could not configure shlib linking'
              enable_shlib=no
            fi
@@ -75,11 +74,10 @@ Index: dmalloc-5.5.2/configure.ac
  	else
  		# oh well, toss an error
  		ac_cv_shared_link_args='# Could not configure shlib linking'
-Index: dmalloc-5.5.2/Makefile.in
-===================================================================
---- dmalloc-5.5.2.orig/Makefile.in
-+++ dmalloc-5.5.2/Makefile.in
-@@ -263,25 +263,25 @@ $(LIB_SL) : $(OBJS_SL) $(NORMAL_OBJS_SL)
+diff --git a/Makefile.in b/Makefile.in
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -305,25 +305,25 @@
  	$(CC) $(LDFLAGS) -shared -Wl,-soname,libdmalloc.so.5 -o $@ $(OBJS_SL) $(NORMAL_OBJS_SL)
  
  $(LIBRARY) : $(OBJS) $(NORMAL_OBJS)

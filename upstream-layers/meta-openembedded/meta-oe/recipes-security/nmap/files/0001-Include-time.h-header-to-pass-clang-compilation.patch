@@ -13,10 +13,9 @@ Upstream-Status: Pending
  4 files changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/nmap_error.cc b/nmap_error.cc
-index 588b13c33..254107ff5 100644
 --- a/nmap_error.cc
 +++ b/nmap_error.cc
-@@ -135,16 +135,7 @@
+@@ -66,16 +66,7 @@
  #include "xml.h"
  
  #include <errno.h>
@@ -35,10 +34,9 @@ index 588b13c33..254107ff5 100644
  extern NmapOps o;
  
 diff --git a/nping/EchoServer.cc b/nping/EchoServer.cc
-index ccdcf9c2d..c403aeda5 100644
 --- a/nping/EchoServer.cc
 +++ b/nping/EchoServer.cc
-@@ -137,6 +137,7 @@
+@@ -68,6 +68,7 @@
  #include "NpingOps.h"
  #include "ProbeMode.h"
  #include <signal.h>
@@ -47,22 +45,20 @@ index ccdcf9c2d..c403aeda5 100644
  extern NpingOps o;
  extern EchoServer es;
 diff --git a/osscan2.cc b/osscan2.cc
-index aa31feb12..89673e108 100644
 --- a/osscan2.cc
 +++ b/osscan2.cc
-@@ -147,6 +147,7 @@
+@@ -78,6 +78,7 @@
  
  #include <list>
  #include <math.h>
 +#include <time.h>
  
  extern NmapOps o;
- #ifdef WIN32
+ 
 diff --git a/service_scan.cc b/service_scan.cc
-index 57a92ed28..ef277bb1f 100644
 --- a/service_scan.cc
 +++ b/service_scan.cc
-@@ -145,6 +145,7 @@
+@@ -78,6 +78,7 @@
  #include "nmap_tty.h"
  
  #include <errno.h>
@@ -70,6 +66,3 @@ index 57a92ed28..ef277bb1f 100644
  
  #if HAVE_OPENSSL
  /* OpenSSL 1.0.0 needs _WINSOCKAPI_ to be defined, otherwise it loads
--- 
-2.21.0
-

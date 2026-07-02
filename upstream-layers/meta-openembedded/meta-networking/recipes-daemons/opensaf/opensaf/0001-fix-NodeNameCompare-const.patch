@@ -1,0 +1,56 @@
+From 5e9f2fd4c73c9e0b666290934227200f2515f206 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Mon, 15 Jun 2026 03:32:05 +0000
+Subject: [PATCH] fix NodeNameCompare const
+
+Upstream-Status: Submitted [sourceforge]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ src/amf/amfd/node.cc           | 2 +-
+ src/amf/amfd/node.h            | 2 +-
+ src/imm/tools/imm_xmlw_dump.cc | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/amf/amfd/node.cc b/src/amf/amfd/node.cc
+index 04f35e7..9785a01 100644
+--- a/src/amf/amfd/node.cc
++++ b/src/amf/amfd/node.cc
+@@ -43,7 +43,7 @@ bool operator<(const AVD_AVND &lhs, const AVD_AVND &rhs) {
+   }
+ }
+ 
+-bool NodeNameCompare::operator()(const AVD_AVND *lhs, const AVD_AVND *rhs) {
++bool NodeNameCompare::operator()(const AVD_AVND *lhs, const AVD_AVND *rhs) const {
+   return *lhs < *rhs;
+ }
+ 
+diff --git a/src/amf/amfd/node.h b/src/amf/amfd/node.h
+index 3456adb..c6527d5 100644
+--- a/src/amf/amfd/node.h
++++ b/src/amf/amfd/node.h
+@@ -170,7 +170,7 @@ struct NodeNameCompare
+   typedef AVD_AVND first_argument_type;
+   typedef AVD_AVND second_argument_type;
+   typedef bool result_type;
+-  bool operator()(const AVD_AVND *lhs, const AVD_AVND *rhs);
++  bool operator()(const AVD_AVND *lhs, const AVD_AVND *rhs) const;
+ };
+ 
+ extern AmfDb<std::string, AVD_AVND> *node_name_db;
+diff --git a/src/imm/tools/imm_xmlw_dump.cc b/src/imm/tools/imm_xmlw_dump.cc
+index f8474c3..2da9bef 100644
+--- a/src/imm/tools/imm_xmlw_dump.cc
++++ b/src/imm/tools/imm_xmlw_dump.cc
+@@ -39,7 +39,7 @@ typedef struct {
+ 
+ /* Comparision object for Object */
+ struct ObjectComp {
+-  bool operator()(const Object& lhs, const Object& rhs) {
++  bool operator()(const Object& lhs, const Object& rhs) const {
+     return (lhs.reversedDn.compare(rhs.reversedDn) < 0) ? true : false;
+   }
+ };
+-- 
+2.43.0
+

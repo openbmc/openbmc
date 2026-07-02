@@ -1,0 +1,42 @@
+From 1cbe4eb212f9be35e89eb7f43160c7e0ec35524c Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 24 Jun 2026 17:50:54 -0700
+Subject: [PATCH] adb: drop non-portable std::is_standard_layout assertion in
+ IOVector::coalesce
+
+IOVector::coalesce() asserts that the destination collection type is
+standard-layout before memcpy'ing the coalesced payload into it:
+
+  static_assert(std::is_standard_layout<decltype(result)>());
+
+The default collection type is Block, which holds a std::unique_ptr<char[]>
+member. unique_ptr is standard-layout in LLVM libc++ (what AOSP builds
+against) but not in GNU libstdc++, so the assertion fails for any
+libstdc++ based toolchain (gcc, or clang with the default C++ runtime):
+
+  packages/modules/adb/types.h:235:27: error: static assertion failed due
+  to requirement 'std::is_standard_layout<Block>()'
+
+The assertion does not protect the memcpy, which only writes into the
+contiguous char storage exposed via Block::operator[]; Block being
+standard-layout is irrelevant to its correctness. Drop the assertion so
+the code builds with libstdc++.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ packages/modules/adb/types.h | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/packages/modules/adb/types.h b/packages/modules/adb/types.h
+index 18c8e13..2ed006a 100644
+--- a/packages/modules/adb/types.h
++++ b/packages/modules/adb/types.h
+@@ -232,7 +232,6 @@ struct IOVector {
+ 
+         size_t offset = 0;
+         iterate_blocks([&offset, &result](const char* data, size_t len) {
+-            static_assert(std::is_standard_layout<decltype(result)>());
+             memcpy(&result[offset], data, len);
+             offset += len;
+         });

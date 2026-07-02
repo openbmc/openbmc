@@ -1,0 +1,57 @@
+From ba56ee6f092601932f9146eeb4f8b057da157be2 Mon Sep 17 00:00:00 2001
+From: Arnaud Ferraris <arnaud.ferraris@collabora.com>
+Date: Tue, 2 May 2023 17:16:22 +0200
+Subject: [PATCH] adb: daemon: usb: drop property monitor
+
+This is an Android-only feature not available on Linux.
+Upstream-Status: Inappropriate [Debian-specific]
+---
+ packages/modules/adb/daemon/usb.cpp | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/packages/modules/adb/daemon/usb.cpp b/packages/modules/adb/daemon/usb.cpp
+index ec22f6661..e904a7629 100644
+--- a/packages/modules/adb/daemon/usb.cpp
++++ b/packages/modules/adb/daemon/usb.cpp
+@@ -48,7 +48,9 @@
+ 
+ #include "adb_unique_fd.h"
+ #include "adb_utils.h"
++#if defined(__ANDROID__)
+ #include "daemon/property_monitor.h"
++#endif
+ #include "daemon/usb_ffs.h"
+ #include "sysdeps/chrono.h"
+ #include "transfer_id.h"
+@@ -744,6 +746,7 @@ struct UsbFfsConnection : public Connection {
+ static void usb_ffs_open_thread() {
+     adb_thread_setname("usb ffs open");
+ 
++#if defined(__ANDROID__)
+     // When the device is acting as a USB host, we'll be unable to bind to the USB gadget on kernels
+     // that don't carry a downstream patch to enable that behavior.
+     //
+@@ -757,6 +760,7 @@ static void usb_ffs_open_thread() {
+         // Return false (i.e. break out of PropertyMonitor::Run) when the property != 1.
+         return android::base::ParseBool(value) == android::base::ParseBoolResult::kTrue;
+     });
++#endif
+ 
+     while (true) {
+         unique_fd control;
+@@ -767,11 +771,13 @@ static void usb_ffs_open_thread() {
+             continue;
+         }
+ 
++#if defined(__ANDROID__)
+         if (android::base::GetBoolProperty(kPropertyUsbDisabled, false)) {
+             LOG(INFO) << "pausing USB due to " << kPropertyUsbDisabled;
+             prop_mon.Run();
+             LOG(INFO) << "resuming USB";
+         }
++#endif
+ 
+         atransport* transport = new atransport();
+         transport->serial = "UsbFfs";
+-- 
+2.39.2

@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 24 Jun 2026 00:00:00 +0000
+Subject: [PATCH] raw_hash_set: include <immintrin.h> instead of <bmi2intrin.h>
+
+Clang refuses a direct include of <bmi2intrin.h> and errors out with:
+
+  error: "Never use <bmi2intrin.h> directly; include <immintrin.h> instead."
+
+This is hit whenever __BMI2__ is defined, e.g. when building with
+-march=x86-64-v3. Mirror upstream and include the umbrella <immintrin.h>
+header guarded by an x86 check, which transitively provides the BMI2
+intrinsics (_bzhi_u32/_bzhi_u64) used in mask().
+
+Upstream-Status: Backport [https://github.com/abseil/abseil-cpp/commit/d851fdd768b27c02b3fb786fd0987faddd279ece]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ absl/container/internal/raw_hash_set.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/absl/container/internal/raw_hash_set.h
++++ b/absl/container/internal/raw_hash_set.h
+@@ -225,9 +225,9 @@
+ #include <ranges>  // NOLINT(build/c++20)
+ #endif
+
+-#ifdef __BMI2__
+-#include <bmi2intrin.h>
+-#endif  // __BMI2__
++#if defined(__i386__) || defined(__x86_64__)
++#include <immintrin.h>
++#endif
+
+ namespace absl {
+ ABSL_NAMESPACE_BEGIN

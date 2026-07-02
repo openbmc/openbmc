@@ -1,0 +1,52 @@
+From 4e33b3183f7ec903f73479600cfcb9014de1780e Mon Sep 17 00:00:00 2001
+From: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
+Date: Wed, 5 Mar 2025 06:28:02 +0000
+Subject: [PATCH] hacked Makefile for module.bbclass
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
+---
+ memory_driver/Makefile | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
+
+diff --git a/memory_driver/Makefile b/memory_driver/Makefile
+index 61ee7c0..d8dd3b5 100644
+--- a/memory_driver/Makefile
++++ b/memory_driver/Makefile
+@@ -7,15 +7,23 @@
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+-#
+-ifneq ($(KERNELRELEASE),)
++
+ obj-m := crash.o
+-else
+-PWD := $(shell pwd)
+-KVER ?= $(shell uname -r)
+-KDIR ?= /lib/modules/${KVER}/build
++
++SRC := $(shell pwd)
++
+ all:
+-	${MAKE} -C ${KDIR} M=${PWD} SUBDIRS=${PWD} modules
++	$(MAKE) -C $(KERNEL_SRC) M=$(SRC)
++
++# if you would like to invoke sparse:
++#
++# all:
++#       $(MAKE) KBUILD_CHECKSRC=1 -C $(KERNEL_SRC) M=$(SRC)
++
++modules_install:
++	$(MAKE) -C $(KERNEL_SRC) M=$(SRC) modules_install
++
+ clean:
+-	test -e ${KDIR}/Makefile && ${MAKE} -C ${KDIR} M=${PWD} SUBDIRS=${PWD} clean || ${RM} *.mod.c *.ko *.o Module.*
+-endif
++	rm -f *.o *~ core .depend .*.cmd *.ko *.mod.c
++	rm -f Module.markers Module.symvers modules.order
++	rm -rf .tmp_versions Modules.symvers
+-- 
+2.34.1
+

@@ -1,0 +1,54 @@
+From 53c57b337a51a47b0edca64d88ef9aaacce90044 Mon Sep 17 00:00:00 2001
+From: Rajkumar Patel <patel.rajkumar@oss.qualcomm.com>
+Date: Wed, 10 Jun 2026 11:39:40 +0530
+Subject: [PATCH] CMakeLists.txt: make BPF clang and include paths configurable
+ for cross-builds
+
+The upstream CMakeLists.txt hardcodes the clang binary name and
+derives the BPF include path from CMAKE_C_LIBRARY_ARCHITECTURE,
+which is empty in a cross-compilation environment. This causes
+the BPF kernel programs to be compiled with the host clang and
+-I /usr/include/ (the build host include path), which fails with:
+
+  fatal error: 'asm/types.h' file not found
+
+Fix by converting the hardcoded values to CMake CACHE variables
+so they can be overridden from the recipe via -DCLANG=,
+-DBPF_INCLUDE_DIRS=, and -DBPF_EXTRA_FLAGS=.
+
+Upstream-Status: Inappropriate [OE cross-compilation specific]
+
+Signed-off-by: Rajkumar Patel <patel.rajkumar@oss.qualcomm.com>
+---
+ CMakeLists.txt | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f782304..7f284f9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -174,15 +174,21 @@ include_directories("${PROJECT_BINARY_DIR}")
+ #
+ # Add code for compiling XDP eBPF programes.
+ #
+-set(ASM_INCLUDE "/usr/include/${CMAKE_C_LIBRARY_ARCHITECTURE}")
++set(CLANG "clang" CACHE STRING "Clang binary used for BPF compilation")
++set(BPF_INCLUDE_DIRS "" CACHE STRING "Sysroot include path for BPF compilation")
++set(BPF_EXTRA_FLAGS "" CACHE STRING "Extra flags for BPF clang compilation (space-separated)")
++
++separate_arguments(BPF_EXTRA_FLAGS_LIST UNIX_COMMAND "${BPF_EXTRA_FLAGS}")
++
+ set(CLANG_FLAGS -Wall -O2 -fno-stack-protector
+-    -I ${ASM_INCLUDE}
++    ${BPF_EXTRA_FLAGS_LIST}
++    -I ${BPF_INCLUDE_DIRS}
+     -I ${PROJECT_BINARY_DIR}  # required for app_config.h
+ )
+ 
+ function(add_xdp_prog name)
+   add_custom_target(${name} ALL
+-    COMMAND clang ${CLANG_FLAGS} -target bpf -c -g -o ${CMAKE_BINARY_DIR}/${name}.o ${name}.c
++    COMMAND ${CLANG} ${CLANG_FLAGS} -target bpf -c -g -o ${CMAKE_BINARY_DIR}/${name}.o ${name}.c
+     DEPENDS reference
+     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/src
+     SOURCES src/${name}.c

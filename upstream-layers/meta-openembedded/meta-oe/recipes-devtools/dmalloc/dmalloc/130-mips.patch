@@ -19,11 +19,10 @@ License for dmalloc is:
 I personnaly believe that the resulting code should therefore be
 LGPL v2.1, but don't believe me, ask your lawyers!
 
-Index: dmalloc-5.5.2/return.h
-===================================================================
---- dmalloc-5.5.2.orig/return.h
-+++ dmalloc-5.5.2/return.h
-@@ -106,26 +106,16 @@
+diff --git a/return.h b/return.h
+--- a/return.h
++++ b/return.h
+@@ -117,26 +117,16 @@
  /*************************************/
  
  /*
@@ -53,15 +52,14 @@ Index: dmalloc-5.5.2/return.h
  
  #endif /* __mips */
  
-Index: dmalloc-5.5.2/configure.ac
-===================================================================
---- dmalloc-5.5.2.orig/configure.ac
-+++ dmalloc-5.5.2/configure.ac
-@@ -585,31 +585,7 @@ int main() { return 1; }
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -646,31 +646,7 @@
  # check if the return.h macros work
  #
  AC_MSG_CHECKING([return.h macros work])
--AC_RUN_IFELSE([
+-AC_RUN_IFELSE([AC_LANG_SOURCE([
 -
 -#define __CONF_H__
 -#define USE_RETURN_MACROS 1
@@ -75,12 +73,12 @@ Index: dmalloc-5.5.2/configure.ac
 -  GET_RET_ADDR(ret_addr);
 -}
 -
--main()
+-int main()
 -{
 -  foo();
--  exit(0);
+-  return 0;
 -}
--],
+-])],
 -[ AC_DEFINE(RETURN_MACROS_WORK, 1) AC_MSG_RESULT([yes]) ],
 -[ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ],
 -[ AC_DEFINE(RETURN_MACROS_WORK, 0) AC_MSG_RESULT([no]) ]

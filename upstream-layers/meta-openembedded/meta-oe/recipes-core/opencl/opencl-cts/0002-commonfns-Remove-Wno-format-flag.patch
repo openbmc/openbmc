@@ -1,0 +1,30 @@
+From 8c9d444083b6ca4f7e9bebf6ab3b8a252cdbfec6 Mon Sep 17 00:00:00 2001
+From: Antonios Christidis <a-christidis@ti.com>
+Date: Wed, 24 Jun 2026 14:49:23 -0500
+Subject: [PATCH 2/2] commonfns: Remove -Wno-format flag
+
+There are no longer issue with format.
+
+Remove -Wno-format compiler flag for files within commonfns.
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/OpenCL-CTS/pull/2728]
+
+Signed-off-by: Antonios Christidis <a-christidis@ti.com>
+---
+ test_conformance/commonfns/CMakeLists.txt | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/test_conformance/commonfns/CMakeLists.txt b/test_conformance/commonfns/CMakeLists.txt
+index e7752474..bea20cf5 100644
+--- a/test_conformance/commonfns/CMakeLists.txt
++++ b/test_conformance/commonfns/CMakeLists.txt
+@@ -10,6 +10,4 @@ set(${MODULE_NAME}_SOURCES
+     test_binary_fn.cpp
+ )
+
+-set_gnulike_module_compile_flags("-Wno-format")
+-
+ include(../CMakeCommon.txt)
+-- 
+2.34.1
+

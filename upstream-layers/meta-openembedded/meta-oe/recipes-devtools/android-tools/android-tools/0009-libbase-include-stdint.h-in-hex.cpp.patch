@@ -1,0 +1,26 @@
+From 164b4261fd5abd851a432c7d56280b1b1adc7f2b Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Wed, 10 Jun 2026 00:00:00 +0000
+Subject: [PATCH] libbase: include stdint.h in hex.cpp
+
+hex.cpp uses uint8_t but neither the file nor its transitive headers
+always pull in <stdint.h> on every sysroot.  Add an explicit include.
+
+Upstream-Status: Inappropriate [OE-specific sysroot compat]
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+---
+ system/libbase/hex.cpp | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/system/libbase/hex.cpp b/system/libbase/hex.cpp
+index a4b7715..857ff29 100644
+--- a/system/libbase/hex.cpp
++++ b/system/libbase/hex.cpp
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include "android-base/hex.h"
++#include <stdint.h>
+ 
+ #include "android-base/logging.h"
+ 

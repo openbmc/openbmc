@@ -30,7 +30,8 @@ EXTRA_OECMAKE += " \
                     -DTBB_DISABLE_HWLOC_AUTOMATIC_SEARCH=OFF \
                 "
 
-RDEPENDS:${PN}-ptest += "cmake"
+RDEPENDS:${PN} += "libhwloc"
+RDEPENDS:${PN}-ptest += "cmake libhwloc"
 
 # Hard-float 'd' ABI can't be used for a target that doesn't support the D instruction set extension (ignoring target-abi)
 # tmp-glibc/work/riscv64-oe-linux/tbb/1_2021.7.0-r0/recipe-sysroot-native/usr/bin/riscv64-oe-linux/riscv64-oe-linux-ld: /tmp/lto-llvm-264bc2.o: can't link soft-float modules with double-float modules

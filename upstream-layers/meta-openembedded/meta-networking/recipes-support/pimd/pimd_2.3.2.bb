@@ -13,6 +13,11 @@ EXTRA_OECONF:append:libc-musl = " --embedded-libc"
 
 inherit autotools-brokensep update-alternatives
 
+# The shipped Makefile "include config.mk" which is only created by configure,
+# so the "make clean" run by autotools_preconfigure fails before configure has
+# run. Skip that pre-configure clean.
+CLEANBROKEN = "1"
+
 do_configure() {
     oe_runconf
 }

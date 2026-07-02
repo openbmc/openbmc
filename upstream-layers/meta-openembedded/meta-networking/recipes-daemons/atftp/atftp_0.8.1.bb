@@ -1,6 +1,13 @@
 SUMMARY = "Advanced TFTP server and client"
+DESCRIPTION = "\
+    atftp is a client/server implementation of the TFTP protocol that \
+    implements RFCs 1350, 2090, 2347, 2348, 2349 and 7440. The server is \
+    multi-threaded and the client presents a friendly interface using \
+    libreadline. \
+"
+HOMEPAGE = "https://sourceforge.net/projects/atftp/"
+BUGTRACKER = "https://sourceforge.net/p/atftp/bugs/"
 SECTION = "net"
-HOMEPAGE = "http://packages.debian.org/atftp"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=570a9b3749dd0463a1778803b12a6dce"
 
@@ -11,25 +18,23 @@ SRC_URI = "git://git.code.sf.net/p/atftp/code;branch=master;protocol=https \
            file://atftpd.service \
 "
 
-
 inherit autotools update-rc.d systemd
 
 PACKAGECONFIG ??= ""
-PACKAGECONFIG[pcre] = "--enable-libpcre,--disable-libpcre,libpcre"
+PACKAGECONFIG[mtftp] = "--enable-mtftp,--disable-mtftp"
+PACKAGECONFIG[pcre] = "--enable-libpcre,--disable-libpcre,libpcre2"
 PACKAGECONFIG[readline] = "--enable-libreadline,--disable-libreadline,readline"
+PACKAGECONFIG[wrap] = "--enable-libwrap,--disable-libwrap,libwrap"
 
 INITSCRIPT_PACKAGES = "${PN}d"
 INITSCRIPT_NAME:${PN}d = "atftpd"
 INITSCRIPT_PARAMS:${PN}d = "defaults 80"
 
-
-EXTRA_OEMAKE = "CFLAGS='${CFLAGS} -std=gnu89'"
-
 do_install:append() {
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${UNPACKDIR}/atftpd.init ${D}${sysconfdir}/init.d/atftpd
 
-    install -d ${D}/srv/tftp
+    install -d ${D}${servicedir}/tftp
 
     rm ${D}${sbindir}/in.tftpd
 
@@ -41,9 +46,10 @@ PACKAGES =+ "${PN}d"
 
 FILES:${PN} = "${bindir}/*"
 
-FILES:${PN}d = "${sbindir}/* \
+FILES:${PN}d = "\
+    ${sbindir}/* \
     ${sysconfdir} \
-    /srv/tftp \
+    ${servicedir}/tftp \
     ${systemd_unitdir}/system/atftpd.service \
 "
 

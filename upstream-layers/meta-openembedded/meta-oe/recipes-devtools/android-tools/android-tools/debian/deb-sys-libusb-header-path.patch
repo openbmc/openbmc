@@ -1,0 +1,17 @@
+Description: libusb.h comes from different location
+Author: Umang Parmar <umangjparmar@gmail.com>
+Forwarded: not-needed
+Last-Update: 2018-05-26
+
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/packages/modules/adb/client/usb_libusb.cpp
++++ b/packages/modules/adb/client/usb_libusb.cpp
+@@ -36,7 +36,7 @@
+ #include <unordered_map>
+ #include <vector>
+ 
+-#include <libusb/libusb.h>
++#include <libusb-1.0/libusb.h>
+ 
+ #include <android-base/file.h>
+ #include <android-base/logging.h>

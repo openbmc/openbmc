@@ -1,0 +1,469 @@
+From 93dd48b34815a8c2f67058da73b5ca23ea9763e8 Mon Sep 17 00:00:00 2001
+From: Mihajlo Marinkovic <mmarinkovic@snap.com>
+Date: Fri, 29 May 2026 12:10:00 +0200
+Subject: [PATCH] adbd: enable root and remount support
+
+Enable root/unroot and remount support for the non-Android adbd build.
+
+Upstream-Status: Inappropriate [embedded Linux integration]
+
+Signed-off-by: Mihajlo Marinkovic <mmarinkovic@snap.com>
+---
+ debian/system/adbd.mk                         |  3 +
+ .../modules/adb/daemon/framebuffer_service.h  |  2 +-
+ packages/modules/adb/daemon/main.cpp          | 96 +++++++++++++++----
+ .../modules/adb/daemon/restart_service.cpp    | 40 +++++++-
+ packages/modules/adb/daemon/restart_service.h |  2 +-
+ packages/modules/adb/daemon/services.cpp      | 81 ++++++++++++++--
+ packages/modules/adb/sockets.cpp              | 20 +++-
+ packages/modules/adb/transport.cpp            |  1 -
+ 8 files changed, 207 insertions(+), 38 deletions(-)
+
+diff --git a/debian/system/adbd.mk b/debian/system/adbd.mk
+index 73e49a4..beb412e 100644
+--- a/debian/system/adbd.mk
++++ b/debian/system/adbd.mk
+@@ -17,6 +17,8 @@ ADBD_SRC_FILES = \
+   daemon/jdwp_service.cpp \
+   daemon/logging.cpp \
+   daemon/main.cpp \
++  daemon/framebuffer_service.cpp \
++  daemon/restart_service.cpp \
+   daemon/transport_local.cpp \
+   daemon/usb.cpp \
+   daemon/usb_ffs.cpp \
+@@ -64,6 +66,7 @@ CPPFLAGS += \
+   -DPLATFORM_TOOLS_VERSION='"$(PLATFORM_TOOLS_VERSION)"' \
+   -DADB_HOST=0 \
+   -DADB_VERSION='"$(DEB_VERSION)"' \
++  -DALLOW_ADBD_ROOT=1 \
+   -DANDROID_BASE_UNIQUE_FD_DISABLE_IMPLICIT_CONVERSION=1 \
+   -DPAGE_SIZE=4096 \
+   -Iframeworks/native/libs/adbd_auth/include/ \
+diff --git a/packages/modules/adb/daemon/framebuffer_service.h b/packages/modules/adb/daemon/framebuffer_service.h
+index bab44be..0a8c822 100644
+--- a/packages/modules/adb/daemon/framebuffer_service.h
++++ b/packages/modules/adb/daemon/framebuffer_service.h
+@@ -18,6 +18,6 @@
+ 
+ #include "adb_unique_fd.h"
+ 
+-#if defined(__ANDROID__)
++#if !defined(__ANDROID_RECOVERY__)
+ void framebuffer_service(unique_fd fd);
+ #endif
+diff --git a/packages/modules/adb/daemon/main.cpp b/packages/modules/adb/daemon/main.cpp
+index 83905d3..0b4a909 100644
+--- a/packages/modules/adb/daemon/main.cpp
++++ b/packages/modules/adb/daemon/main.cpp
+@@ -19,11 +19,15 @@
+ #include "sysdeps.h"
+ 
+ #include <errno.h>
++#include <fcntl.h>
+ #include <getopt.h>
++#include <grp.h>
+ #include <malloc.h>
++#include <pwd.h>
+ #include <signal.h>
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include <sys/capability.h>
+ #include <sys/prctl.h>
+ 
+@@ -61,6 +65,13 @@
+ #include "daemon/mdns.h"
+ #include "daemon/watchdog.h"
+ 
++namespace {
++constexpr char kAdbRootStatePath[] = "/run/adbd.root";
++constexpr char kRootMagic[] = "#ROOT#";
++constexpr char kNoRootMagic[] = "#NOROOT#";
++constexpr size_t kRootMagicSize = sizeof(kRootMagic) - 1;
++}
++
+ #if defined(__ANDROID__)
+ static const char* root_seclabel = nullptr;
+ 
+@@ -75,24 +86,16 @@ static bool should_drop_privileges() {
+     //
+     // ro.secure:
+     //   Drop privileges by default. Set to 1 on userdebug and user builds.
+-    bool ro_secure = android::base::GetBoolProperty("ro.secure", true);
+-    bool ro_debuggable = __android_log_is_debuggable();
+-
+-    // Drop privileges if ro.secure is set...
+-    bool drop = ro_secure;
+-
+-    // ... except "adb root" lets you keep privileges in a debuggable build.
+-    std::string prop = android::base::GetProperty("service.adb.root", "");
+-    bool adb_root = (prop == "1");
+-    bool adb_unroot = (prop == "0");
+-    if (ro_debuggable && adb_root) {
+-        drop = false;
++    int f = unix_open(kAdbRootStatePath, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
++    if (f < 0) {
++        return true;
+     }
+-    // ... and "adb unroot" lets you explicitly drop privileges.
+-    if (adb_unroot) {
+-        drop = true;
++    char buf[kRootMagicSize];
++    bool drop = true;
++    if (unix_read(f, buf, sizeof(buf)) != -1 && !strncmp(buf, kRootMagic, kRootMagicSize)) {
++        drop = false;
+     }
+-
++    unix_close(f);
+     return drop;
+ }
+ 
+@@ -122,6 +125,17 @@ static void drop_privileges(int server_port) {
+     // Don't listen on a port (default 5037) if running in secure mode.
+     // Don't run as root if running in secure mode.
+     if (should_drop_privileges()) {
++        int f = unix_open(kAdbRootStatePath, O_WRONLY | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600);
++        if (f >= 0) {
++            if (fchmod(f, 0600) == -1) {
++                PLOG(ERROR) << "failed to set root state permissions";
++            }
++            if (unix_write(f, kNoRootMagic, sizeof(kNoRootMagic) - 1) == -1) {
++                PLOG(ERROR) << "failed to initialize root state";
++            }
++            unix_close(f);
++        }
++
+         const bool should_drop_caps = !__android_log_is_debuggable();
+ 
+         if (should_drop_caps) {
+@@ -182,6 +196,54 @@ static void drop_privileges(int server_port) {
+ }
+ #endif
+ 
++#if !defined(__ANDROID__)
++static bool should_drop_privileges() {
++    int f = unix_open(kAdbRootStatePath, O_RDONLY | O_CLOEXEC | O_NOFOLLOW);
++    if (f < 0) {
++        return true;
++    }
++    char buf[kRootMagicSize];
++    bool drop = true;
++    if (unix_read(f, buf, sizeof(buf)) != -1 && !strncmp(buf, kRootMagic, kRootMagicSize)) {
++        drop = false;
++    }
++    unix_close(f);
++    return drop;
++}
++
++static void drop_privileges(int) {
++    if (!should_drop_privileges()) {
++        return;
++    }
++    passwd* adb_user = getpwnam("adb");
++    if (adb_user == nullptr) {
++        PLOG(FATAL) << "getpwnam(adb) failed";
++    }
++    int f = unix_open(kAdbRootStatePath, O_WRONLY | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600);
++    if (f >= 0) {
++        if (fchmod(f, 0600) == -1) {
++            PLOG(ERROR) << "failed to set root state permissions";
++        }
++        if (fchown(f, adb_user->pw_uid, adb_user->pw_gid) == -1) {
++            PLOG(ERROR) << "failed to set root state ownership";
++        }
++        if (unix_write(f, kNoRootMagic, sizeof(kNoRootMagic) - 1) == -1) {
++            PLOG(ERROR) << "failed to initialize root state";
++        }
++        unix_close(f);
++    }
++    if (initgroups(adb_user->pw_name, adb_user->pw_gid) != 0) {
++        PLOG(FATAL) << "initgroups(adb) failed";
++    }
++    if (setgid(adb_user->pw_gid) != 0) {
++        PLOG(FATAL) << "setgid(adb) failed";
++    }
++    if (setuid(adb_user->pw_uid) != 0) {
++        PLOG(FATAL) << "setuid(adb) failed";
++    }
++}
++#endif
++
+ static void setup_adb(const std::vector<std::string>& addrs) {
+ #if defined(__ANDROID__)
+     // Get the first valid port from addrs and setup mDNS.
+@@ -242,9 +304,7 @@ int adbd_main(int server_port) {
+           " unchanged.\n");
+     }
+ 
+-#if defined(__ANDROID__)
+     drop_privileges(server_port);
+-#endif
+ 
+ #if defined(__ANDROID__)
+     // A thread gets spawned as a side-effect of initializing the watchdog, so it needs to happen
+diff --git a/packages/modules/adb/daemon/restart_service.cpp b/packages/modules/adb/daemon/restart_service.cpp
+index 16d2627..8aee1af 100644
+--- a/packages/modules/adb/daemon/restart_service.cpp
++++ b/packages/modules/adb/daemon/restart_service.cpp
+@@ -18,6 +18,9 @@
+ 
+ #include "sysdeps.h"
+ 
++#include <errno.h>
++#include <fcntl.h>
++#include <string.h>
+ #include <unistd.h>
+ 
+ #include <android-base/logging.h>
+@@ -28,6 +31,26 @@
+ #include "adb_io.h"
+ #include "adb_unique_fd.h"
+ 
++namespace {
++constexpr char kAdbRootStatePath[] = "/run/adbd.root";
++constexpr char kRootMagic[] = "#ROOT#";
++constexpr char kNoRootMagic[] = "#NOROOT#";
++constexpr size_t kRootMagicSize = sizeof(kRootMagic) - 1;
++
++bool write_root_state(const char* value, size_t size) {
++    int f = unix_open(kAdbRootStatePath, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC | O_NOFOLLOW, 0600);
++    if (f < 0) {
++        return false;
++    }
++    bool ok = unix_write(f, value, size) == static_cast<int>(size);
++    if (ok) {
++        ok = fsync(f) == 0;
++    }
++    unix_close(f);
++    return ok;
++}
++}
++
+ void restart_root_service(unique_fd fd) {
+     if (getuid() == 0) {
+         WriteFdExactly(fd.get(), "adbd is already running as root\n");
+@@ -38,9 +61,15 @@ void restart_root_service(unique_fd fd) {
+         return;
+     }
+ 
+-    LOG(INFO) << "adbd restarting as root";
+-    android::base::SetProperty("service.adb.root", "1");
+-    WriteFdExactly(fd.get(), "restarting adbd as root\n");
++    for (int retry = 5; retry-- > 0;) {
++        if (write_root_state(kRootMagic, kRootMagicSize)) {
++            LOG(INFO) << "adbd restarting as root";
++            WriteFdExactly(fd.get(), "restarting adbd as root\n");
++            return;
++        }
++        usleep(100000);
++    }
++    WriteFdExactly(fd.get(), "failed to switch adbd to root\n");
+ }
+ 
+ void restart_unroot_service(unique_fd fd) {
+@@ -49,8 +78,11 @@ void restart_unroot_service(unique_fd fd) {
+         return;
+     }
+ 
++    if (!write_root_state(kNoRootMagic, sizeof(kNoRootMagic) - 1)) {
++        PLOG(ERROR) << "failed to write root state";
++        return;
++    }
+     LOG(INFO) << "adbd restarting as nonroot";
+-    android::base::SetProperty("service.adb.root", "0");
+     WriteFdExactly(fd.get(), "restarting adbd as non root\n");
+ }
+ 
+diff --git a/packages/modules/adb/daemon/restart_service.h b/packages/modules/adb/daemon/restart_service.h
+index 19840bd..2d239db 100644
+--- a/packages/modules/adb/daemon/restart_service.h
++++ b/packages/modules/adb/daemon/restart_service.h
+@@ -18,7 +18,7 @@
+ 
+ #include "adb_unique_fd.h"
+ 
+-#if defined(__ANDROID__)
++#if !defined(__ANDROID_RECOVERY__)
+ void restart_root_service(unique_fd fd);
+ void restart_unroot_service(unique_fd fd);
+ void restart_tcp_service(unique_fd fd, int port);
+diff --git a/packages/modules/adb/daemon/services.cpp b/packages/modules/adb/daemon/services.cpp
+index 5090441..1b27314 100644
+--- a/packages/modules/adb/daemon/services.cpp
++++ b/packages/modules/adb/daemon/services.cpp
+@@ -19,12 +19,18 @@
+ #include "sysdeps.h"
+ 
+ #include <errno.h>
++#include <fcntl.h>
++#include <linux/fs.h>
++#include <linux/reboot.h>
++#include <mntent.h>
+ #include <netdb.h>
+ #include <netinet/in.h>
+ #include <stddef.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/mount.h>
++#include <sys/syscall.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+@@ -40,7 +46,6 @@
+ #include <android-base/stringprintf.h>
+ #include <android-base/strings.h>
+ #include <android-base/unique_fd.h>
+-#include <cutils/android_reboot.h>
+ #include <cutils/sockets.h>
+ #include <log/log_properties.h>
+ 
+@@ -143,6 +148,60 @@ static void spin_service(unique_fd fd) {
+     WriteFdExactly(fd.get(), "spinning\n");
+ }
+ 
++static std::string find_mount(std::string_view dir) {
++    std::unique_ptr<FILE, int (*)(FILE*)> fp(setmntent("/proc/mounts", "r"), endmntent);
++    if (!fp) {
++        return {};
++    }
++    while (mntent* entry = getmntent(fp.get())) {
++        if (dir == entry->mnt_dir) {
++            return entry->mnt_fsname;
++        }
++    }
++    return {};
++}
++
++static bool make_block_device_writable(const std::string& dev) {
++    android::base::unique_fd fd(unix_open(dev.c_str(), O_RDONLY | O_CLOEXEC));
++    if (fd == -1) {
++        return false;
++    }
++    int off = 0;
++    return ioctl(fd.get(), BLKROSET, &off) != -1;
++}
++
++static bool remount_partition(unique_fd& fd, std::string_view dir) {
++    std::string mount_point(dir);
++    if (!directory_exists(mount_point)) {
++        return true;
++    }
++    std::string dev = find_mount(dir);
++    if (dev.empty()) {
++        WriteFdFmt(fd.get(), "remount of %.*s failed; mount not found\n",
++                   static_cast<int>(dir.size()), dir.data());
++        return false;
++    }
++    if (!make_block_device_writable(dev)) {
++        WriteFdFmt(fd.get(), "remount of %.*s failed; couldn't make block device %s writable: %s\n",
++                   static_cast<int>(dir.size()), dir.data(), dev.c_str(), strerror(errno));
++        return false;
++    }
++    if (mount(dev.c_str(), mount_point.c_str(), "none", MS_REMOUNT, nullptr) == -1) {
++        WriteFdFmt(fd.get(), "remount of %.*s failed: %s\n", static_cast<int>(dir.size()), dir.data(), strerror(errno));
++        return false;
++    }
++    return true;
++}
++
++static void remount_service(unique_fd fd) {
++    if (getuid() != 0) {
++        WriteFdExactly(fd.get(), "Not running as root. Try \"adb root\" first.\n");
++        return;
++    }
++    bool success = remount_partition(fd, "/");
++    WriteFdExactly(fd.get(), success ? "remount succeeded\n" : "remount failed\n");
++}
++
+ [[maybe_unused]] static unique_fd reboot_device(const std::string& name) {
+ #if defined(__ANDROID_RECOVERY__)
+     if (!__android_log_is_debuggable()) {
+@@ -157,10 +216,16 @@ static void spin_service(unique_fd fd) {
+         return create_service_thread("reboot", reboot_service);
+     }
+ #endif
+-    // Fall through
+-    std::string cmd = "/system/bin/reboot ";
+-    cmd += name;
+-    return StartSubprocess(cmd, nullptr, SubprocessType::kRaw, SubprocessProtocol::kNone);
++    auto reboot_service = [name](unique_fd fd) {
++        sync();
++        if (syscall(SYS_reboot, LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2,
++                    LINUX_REBOOT_CMD_RESTART2, "adb") != 0) {
++            WriteFdFmt(fd.get(), "reboot (%s) failed: %s\n", name.c_str(), strerror(errno));
++            return;
++        }
++        while (true) pause();
++    };
++    return create_service_thread("reboot", reboot_service);
+ }
+ 
+ struct ServiceSocket : public asocket {
+@@ -281,13 +346,11 @@ unique_fd daemon_service_to_fd(std::string_view name, atransport* transport) {
+     }
+ #endif
+ 
+-#if defined(__ANDROID__)
++#if !defined(__ANDROID_RECOVERY__)
+     if (name.starts_with("framebuffer:")) {
+         return create_service_thread("fb", framebuffer_service);
+     } else if (android::base::ConsumePrefix(&name, "remount:")) {
+-        std::string cmd = "/system/bin/remount ";
+-        cmd += name;
+-        return StartSubprocess(cmd, nullptr, SubprocessType::kRaw, SubprocessProtocol::kNone);
++        return create_service_thread("remount", remount_service);
+     } else if (android::base::ConsumePrefix(&name, "reboot:")) {
+         return reboot_device(std::string(name));
+     } else if (name.starts_with("root:")) {
+diff --git a/packages/modules/adb/sockets.cpp b/packages/modules/adb/sockets.cpp
+index f766f7e..8aa1e2b 100644
+--- a/packages/modules/adb/sockets.cpp
++++ b/packages/modules/adb/sockets.cpp
+@@ -337,7 +337,7 @@ static void local_socket_destroy(asocket* s) {
+ 
+     if (exit_on_close) {
+         D("local_socket_destroy: exiting");
+-        exit(0);
++        exit(exit_on_close - 1);
+     }
+ }
+ 
+@@ -473,9 +473,21 @@ asocket* create_local_service_socket(std::string_view name, atransport* transpor
+     LOG(VERBOSE) << "LS(" << s->id << "): bound to '" << name << "' via " << fd_value;
+ 
+ #if !ADB_HOST
+-    if ((name.starts_with("root:") && getuid() != 0 && __android_log_is_debuggable()) ||
+-        (name.starts_with("unroot:") && getuid() == 0) || name.starts_with("usb:") ||
+-        name.starts_with("tcpip:")) {
++    bool exit_on_close = false;
++#if defined(__ANDROID__)
++    exit_on_close = (name.starts_with("root:") && getuid() != 0 &&
++                     __android_log_is_debuggable()) ||
++                    (name.starts_with("unroot:") && getuid() == 0);
++#else
++    exit_on_close = (name.starts_with("root:") && getuid() != 0) ||
++                    (name.starts_with("unroot:") && getuid() == 0);
++#endif
++    // exit_on_close == 2: exit(1) — triggers Restart=on-failure (root/unroot)
++    // exit_on_close == 1: exit(0) — clean exit (usb/tcpip)
++    if (exit_on_close) {
++        D("LS(%d): enabling exit_on_close", s->id);
++        s->exit_on_close = 2;
++    } else if (name.starts_with("usb:") || name.starts_with("tcpip:")) {
+         D("LS(%d): enabling exit_on_close", s->id);
+         s->exit_on_close = 1;
+     }
+diff --git a/packages/modules/adb/transport.cpp b/packages/modules/adb/transport.cpp
+index b99e8bc..b89f495 100644
+--- a/packages/modules/adb/transport.cpp
++++ b/packages/modules/adb/transport.cpp
+@@ -1200,7 +1200,6 @@ const FeatureSet& supported_features() {
+             kFeatureAbb,
+             kFeatureFixedPushSymlinkTimestamp,
+             kFeatureAbbExec,
+-            kFeatureRemountShell,
+             kFeatureTrackApp,
+             kFeatureSendRecv2,
+             kFeatureSendRecv2Brotli,

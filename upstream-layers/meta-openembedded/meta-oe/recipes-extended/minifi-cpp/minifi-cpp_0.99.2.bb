@@ -15,18 +15,17 @@ SRC_URI = "git://github.com/apache/nifi-minifi-cpp.git;protocol=https;branch=mai
            git://github.com/gsl-lite/gsl-lite.git;protocol=https;branch=master;name=gsl-lite;destsuffix=${S}/thirdparty/gsl-lite-src \
            git://github.com/HowardHinnant/date.git;protocol=https;branch=master;name=date;destsuffix=${S}/thirdparty/date-src \
            git://github.com/chriskohlhoff/asio.git;protocol=https;branch=master;name=asio;destsuffix=${S}/thirdparty/asio-src \
-           git://github.com/fmtlib/fmt.git;protocol=https;branch=master;name=fmt;destsuffix=${S}/thirdparty/fmt-src \
+           git://github.com/fmtlib/fmt.git;protocol=https;branch=main;name=fmt;destsuffix=${S}/thirdparty/fmt-src \
            git://github.com/gabime/spdlog.git;protocol=https;branch=v1.x;tag=v1.15.3;name=spdlog;destsuffix=${S}/thirdparty/spdlog-src \
            git://github.com/danielaparker/jsoncons.git;protocol=https;branch=master;name=jsoncons;destsuffix=${S}/thirdparty/jsoncons-src \
            ${DEBIAN_MIRROR}/main/o/ossp-uuid/ossp-uuid_1.6.2.orig.tar.gz;name=ossp-uuid;subdir=${S}/thirdparty \
-           https://download.libsodium.org/libsodium/releases/libsodium-1.0.19.tar.gz;name=libsodium;subdir=${S}/thirdparty \
+           https://download.libsodium.org/libsodium/releases/libsodium-1.0.20.tar.gz;name=libsodium;subdir=${S}/thirdparty \
            file://0001-Do-not-use-bundled-packages.patch \
            file://0002-Fix-osspuuid-build.patch \
            file://0003-Fix-libsodium-build.patch \
            file://0004-Pass-noline-flag-to-flex.patch \
            file://0005-generateVersion.sh-set-correct-buildrev.patch \
            file://0006-CMakeLists.txt-do-not-use-ccache.patch \
-           file://0007-libsodium-aarch64-set-compiler-attributes-after-including-arm_.patch \
            file://0001-Add-missing-include-for-malloc-free.patch;patchdir=thirdparty/fmt-src \
            file://0001-generateVersion.sh-set-BUILD_DATE-to-SOURCE_DATE_EPO.patch \
            file://0001-Fix-build-with-gcc-16.patch \
@@ -61,8 +60,8 @@ SRCREV_FORMAT .= "_expected-lite_range-v3_magic-enum_argparse_gsl-lite_date_asio
 
 # ossp-uuid: 1.6.2
 SRC_URI[ossp-uuid.sha256sum] = "11a615225baa5f8bb686824423f50e4427acd3f70d394765bdff32801f0fd5b0"
-# libsodium: 1.0.19
-SRC_URI[libsodium.sha256sum] = "018d79fe0a045cca07331d37bd0cb57b2e838c51bc48fd837a1472e50068bbea"
+# libsodium: 1.0.20
+SRC_URI[libsodium.sha256sum] = "ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19"
 
 
 inherit pkgconfig cmake systemd
@@ -154,19 +153,19 @@ do_compile:prepend() {
 do_install() {
     DESTDIR='${WORKDIR}/minifi-install' cmake_runcmake_build --target ${OECMAKE_TARGET_INSTALL}
     MINIFI_BIN=${bindir}
-    MINIFI_HOME=${sysconfdir}/nifi-minifi-cpp
-    MINIFI_RUN=${localstatedir}/lib/nifi-minifi-cpp
-    MINIFI_LOG=${localstatedir}/log/nifi-minifi-cpp
+    MINIFI_HOME=${sysconfdir}/minifi
+    MINIFI_RUN=${localstatedir}/lib/minifi
+    MINIFI_LOG=${localstatedir}/log/minifi
 
     install -m 755 -d ${D}${MINIFI_BIN}
-    install -m 755 -d ${D}${MINIFI_HOME}
-    install -m 755 -d ${D}${MINIFI_RUN}
+    install -m 755 -d ${D}${MINIFI_HOME}/conf
+    install -m 755 -d ${D}${localstatedir}/lib/minifi
 
     for i in minifi-encrypt-config minifi minifi.sh minifi-controller; do
         install -m 755 ${WORKDIR}/minifi-install/usr/bin/${i} ${D}${MINIFI_BIN}
     done
     for i in config.yml minifi-log.properties minifi.properties minifi-uid.properties; do
-        install -m 644 ${WORKDIR}/minifi-install/usr/conf/${i} ${D}${MINIFI_HOME}
+        install -m 644 ${WORKDIR}/minifi-install/usr/conf/${i} ${D}${MINIFI_HOME}/conf
     done
 
     install -m 755 -d ${D}${libdir}/minifi-extensions
@@ -182,19 +181,19 @@ do_install() {
     sed -i "s|bin_dir=.*|bin_dir=${MINIFI_BIN}|g" ${D}${MINIFI_BIN}/minifi.sh
 
     sed -i "s|#appender.rolling.directory=.*|appender.rolling.directory=${MINIFI_LOG}|g" \
-        ${D}${MINIFI_HOME}/minifi-log.properties
+        ${D}${MINIFI_HOME}/conf/minifi-log.properties
     sed -i "s|nifi.provenance.repository.directory.default=.*|nifi.provenance.repository.directory.default=${MINIFI_RUN}/provenance_repository|g" \
-        ${D}${MINIFI_HOME}/minifi.properties
+        ${D}${MINIFI_HOME}/conf/minifi.properties
     sed -i "s|nifi.flowfile.repository.directory.default=.*|nifi.flowfile.repository.directory.default=${MINIFI_RUN}/flowfile_repository|g" \
-        ${D}${MINIFI_HOME}/minifi.properties
+        ${D}${MINIFI_HOME}/conf/minifi.properties
     sed -i "s|nifi.database.content.repository.directory.default=.*|nifi.database.content.repository.directory.default=${MINIFI_RUN}/content_repository|g" \
-        ${D}${MINIFI_HOME}/minifi.properties
-    sed -i "s|nifi.flow.configuration.file=.*|nifi.flow.configuration.file=${MINIFI_HOME}/config.yml|g" \
-        ${D}${MINIFI_HOME}/minifi.properties
+        ${D}${MINIFI_HOME}/conf/minifi.properties
+    sed -i "s|nifi.flow.configuration.file=.*|nifi.flow.configuration.file=${MINIFI_HOME}/conf/config.yml|g" \
+        ${D}${MINIFI_HOME}/conf/minifi.properties
     sed -i "s|nifi.python.processor.dir=.*|nifi.python.processor.dir=${libexecdir}/minifi-python|g" \
-        ${D}${MINIFI_HOME}/minifi.properties
+        ${D}${MINIFI_HOME}/conf/minifi.properties
     sed -i "s|nifi.extension.path=.*|nifi.extension.path=${libdir}/minifi-extensions/*|g" \
-        ${D}${MINIFI_HOME}/minifi.properties
+        ${D}${MINIFI_HOME}/conf/minifi.properties
 
     if ${@bb.utils.contains('DISTRO_FEATURES','systemd','true','false',d)}; then
         install -m 755 -d ${D}${sysconfdir}/tmpfiles.d

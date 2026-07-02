@@ -1,0 +1,148 @@
+Description: Workaround Clang's __builtin_available keyword
+ This patch is for gcc only, no need for clang.
+Forwarded: not-needed
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/system/libbase/logging.cpp
++++ b/system/libbase/logging.cpp
+@@ -209,8 +209,9 @@ static std::recursive_mutex& TagLock() {
+ static std::string* gDefaultTag;
+ 
+ void SetDefaultTag(const std::string& tag) {
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     __android_log_set_default_tag(tag.c_str());
++#if 0
+   } else {
+     std::lock_guard<std::recursive_mutex> lock(TagLock());
+     if (gDefaultTag != nullptr) {
+@@ -221,6 +222,7 @@ void SetDefaultTag(const std::string& tag) {
+       gDefaultTag = new std::string(tag);
+     }
+   }
++#endif
+ }
+ 
+ static bool gInitialized = false;
+@@ -314,13 +316,15 @@ static void LogdLogChunk(LogId id, LogSeverity severity, const char* tag, const
+   int32_t lg_id = LogIdTolog_id_t(id);
+   int32_t priority = LogSeverityToPriority(severity);
+ 
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     __android_log_message log_message = {sizeof(__android_log_message),     lg_id, priority, tag,
+                                          static_cast<const char*>(nullptr), 0,     message};
+     __android_log_logd_logger(&log_message);
++#if 0
+   } else {
+     __android_log_buf_print(lg_id, priority, tag, "%s", message);
+   }
++#endif
+ }
+ 
+ LogdLogger::LogdLogger(LogId default_log_id) : default_log_id_(default_log_id) {}
+@@ -396,7 +400,7 @@ LogFunction SetLogger(LogFunction&& logger) {
+   LogFunction old_logger = std::move(Logger());
+   Logger() = std::move(logger);
+ 
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     __android_log_set_logger([](const struct __android_log_message* log_message) {
+       auto log_id = log_id_tToLogId(log_message->buffer_id);
+       auto severity = PriorityToLogSeverity(log_message->priority);
+@@ -404,7 +408,7 @@ LogFunction SetLogger(LogFunction&& logger) {
+       Logger()(log_id, severity, log_message->tag, log_message->file, log_message->line,
+                log_message->message);
+     });
+-  }
++//  }
+   return old_logger;
+ }
+ 
+@@ -412,9 +416,9 @@ AbortFunction SetAborter(AbortFunction&& aborter) {
+   AbortFunction old_aborter = std::move(Aborter());
+   Aborter() = std::move(aborter);
+ 
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     __android_log_set_aborter([](const char* abort_message) { Aborter()(abort_message); });
+-  }
++//  }
+   return old_aborter;
+ }
+ 
+@@ -500,11 +504,13 @@ LogMessage::~LogMessage() {
+ 
+   // Abort if necessary.
+   if (data_->GetSeverity() == FATAL) {
+-    if (__builtin_available(android 30, *)) {
++//    if (__builtin_available(android 30, *)) {
+       __android_log_call_aborter(msg.c_str());
++#if 0
+     } else {
+       Aborter()(msg.c_str());
+     }
++#endif
+   }
+ }
+ 
+@@ -515,10 +521,11 @@ std::ostream& LogMessage::stream() {
+ void LogMessage::LogLine(const char* file, unsigned int line, LogSeverity severity, const char* tag,
+                          const char* message) {
+   int32_t priority = LogSeverityToPriority(severity);
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     __android_log_message log_message = {
+         sizeof(__android_log_message), LOG_ID_DEFAULT, priority, tag, file, line, message};
+     __android_log_write_log_message(&log_message);
++#if 0
+   } else {
+     if (tag == nullptr) {
+       std::lock_guard<std::recursive_mutex> lock(TagLock());
+@@ -531,37 +538,44 @@ void LogMessage::LogLine(const char* file, unsigned int line, LogSeverity severi
+       Logger()(DEFAULT, severity, tag, file, line, message);
+     }
+   }
++#endif
+ }
+ 
+ LogSeverity GetMinimumLogSeverity() {
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     return PriorityToLogSeverity(__android_log_get_minimum_priority());
++#if 0
+   } else {
+     return gMinimumLogSeverity;
+   }
++#endif
+ }
+ 
+ bool ShouldLog(LogSeverity severity, const char* tag) {
+   // Even though we're not using the R liblog functions in this function, if we're running on Q,
+   // we need to fall back to using gMinimumLogSeverity, since __android_log_is_loggable() will not
+   // take into consideration the value from SetMinimumLogSeverity().
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     int32_t priority = LogSeverityToPriority(severity);
+     return __android_log_is_loggable(priority, tag, ANDROID_LOG_INFO);
++#if 0
+   } else {
+     return severity >= gMinimumLogSeverity;
+   }
++#endif
+ }
+ 
+ LogSeverity SetMinimumLogSeverity(LogSeverity new_severity) {
+-  if (__builtin_available(android 30, *)) {
++//  if (__builtin_available(android 30, *)) {
+     int32_t priority = LogSeverityToPriority(new_severity);
+     return PriorityToLogSeverity(__android_log_set_minimum_priority(priority));
++#if 0
+   } else {
+     LogSeverity old_severity = gMinimumLogSeverity;
+     gMinimumLogSeverity = new_severity;
+     return old_severity;
+   }
++#endif
+ }
+ 
+ ScopedLogSeverity::ScopedLogSeverity(LogSeverity new_severity) {

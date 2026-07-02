@@ -1,0 +1,16 @@
+Description: Fix typos
+Author: Kai-Chung Yan (殷啟聰)
+Last-Update: 2016-10-01
+Forwarded: not-needed
+Upstream-Status: Inappropriate [Debian-specific]
+--- a/development/tools/etc1tool/etc1tool.cpp
++++ b/development/tools/etc1tool/etc1tool.cpp
+@@ -56,7 +56,7 @@
+             "\t\t                             image to difffile. (Only valid when encoding).\n");
+     fprintf(stderr,
+             "\tIf outfile is not specified, an outfile path is constructed from infile,\n");
+-    fprintf(stderr, "\twith the apropriate suffix (.pkm or .png).\n");
++    fprintf(stderr, "\twith the appropriate suffix (.pkm or .png).\n");
+     exit(1);
+ }
+ 

@@ -348,7 +348,6 @@ RDEPENDS:packagegroup-meta-oe-extended = "\
     indent \
     iotop \
     isomd5sum \
-    jansson \
     jpnevulator \
     libblockdev \
     libcec \
@@ -654,7 +653,6 @@ RDEPENDS:packagegroup-meta-oe-multimedia = "\
     libass \
     libcdio \
     libcdio-paranoia \
-    libdvdread \
     ${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "libmad", "", d)} \
     libmikmod \
     libmms \

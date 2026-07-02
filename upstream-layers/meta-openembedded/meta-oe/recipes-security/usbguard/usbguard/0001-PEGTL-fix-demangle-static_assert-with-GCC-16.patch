@@ -1,0 +1,59 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 25 Jun 2026 00:00:00 +0000
+Subject: [PATCH] PEGTL: fix demangle() static_assert with GCC 16
+
+The bundled PEGTL demangles type names at compile time by parsing
+__PRETTY_FUNCTION__, which looks like
+
+  ...[with T = X; std::string_view = std::basic_string_view<char>]
+
+and locating the end of the type name via rfind(';').
+
+usbguard instantiates demangle() for PEGTL rules built from
+ascii::one<'\000', '\012'> (and friends), i.e. types that carry a char
+non-type template parameter whose value is '\0'. GCC 16 renders such a
+parameter as a literal NUL byte in __PRETTY_FUNCTION__ and truncates the
+generated string at that byte:
+
+  constexpr std::string_view demangle() [with T = seq<one<'
+
+so the trailing "; std::string_view = ...]" alias and even the closing
+']' are gone. rfind(';') and rfind(']') both return npos and the
+demangler trips:
+
+  src/ThirdParty/PEGTL/include/tao/pegtl/demangle.hpp:118:23:
+  error: static assertion failed
+
+The demangled name is only used for human-readable tracing diagnostics,
+so rather than fail the build, fall back to the remainder of the string
+when no ';' or ']' terminator survives. Type names without a '\0' char
+parameter are unaffected.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ThirdParty/PEGTL/include/tao/pegtl/demangle.hpp | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+--- a/src/ThirdParty/PEGTL/include/tao/pegtl/demangle.hpp
++++ b/src/ThirdParty/PEGTL/include/tao/pegtl/demangle.hpp
+@@ -114,8 +114,17 @@
+    constexpr auto begin = sv.find( '=' );
+    static_assert( begin != std::string_view::npos );
+    constexpr auto tmp = sv.substr( begin + 2 );
+-   constexpr auto end = tmp.rfind( ';' );
+-   static_assert( end != std::string_view::npos );
++   // GCC 16 renders a char non-type template parameter whose value is '\0'
++   // (e.g. PEGTL's ascii::one<'\000', ...>) as a literal NUL byte inside
++   // __PRETTY_FUNCTION__ and truncates the generated string there, dropping
++   // the trailing "; std::string_view = ...]" alias and even the closing
++   // ']'. Fall back to the remainder of the string instead of failing a
++   // static_assert (the demangled name is only used for tracing output).
++   constexpr auto semi = tmp.rfind( ';' );
++   constexpr auto brak = tmp.rfind( ']' );
++   constexpr auto end = ( semi != std::string_view::npos ) ? semi
++                      : ( brak != std::string_view::npos ) ? brak
++                      : tmp.size();
+    return tmp.substr( 0, end );
+ }

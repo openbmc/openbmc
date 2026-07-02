@@ -14,6 +14,11 @@ SRC_URI[sha256sum] = "13bab36f39408f7a08fb368913290ad0f117c934bab602094e18fcc123
 
 inherit autotools
 
+# mbuffer's Makefile generates version.h by invoking "bash mkversion.sh"
+# with no path, which only works when building in the source tree (the
+# script is not found via VPATH in a separate build dir).
+B = "${S}"
+
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[md5] = "--enable-md5,--disable-md5,openssl"
 

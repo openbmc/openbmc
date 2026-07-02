@@ -15,7 +15,7 @@ TODO:
  - backup the original .bb file
  - make a diff and ask confirmation for patching ?
  - do not use startswith only:
-    /!\ startswith('SOMETHING') is not taken into account due to the previous startswith('S').
+     WARNING: startswith('SOMETHING') is not taken into account due to the previous startswith('S').
  - count rule breaks and displays them in the order frequence
 """
 

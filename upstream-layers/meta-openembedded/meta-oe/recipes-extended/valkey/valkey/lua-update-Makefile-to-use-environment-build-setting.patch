@@ -19,6 +19,9 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 Updated to work with 8.1.x
 Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
 
+Refreshed for 9.1.x
+Signed-off-by: Tim Orling <tim.orling@konsulko.com>
+
 Upstream-Status: Inappropriate [OE-specific]
 
 ---
@@ -28,10 +31,10 @@ Upstream-Status: Inappropriate [OE-specific]
  3 files changed, 6 insertions(+), 12 deletions(-)
 
 diff --git a/deps/Makefile b/deps/Makefile
-index 72389def9..5d3ade528 100644
+index 94d9385..5d49559 100644
 --- a/deps/Makefile
 +++ b/deps/Makefile
-@@ -95,7 +95,6 @@ endif
+@@ -102,7 +102,6 @@ endif
  # lua's Makefile defines AR="ar rcu", which is unusual, and makes it more
  # challenging to cross-compile lua (and redis).  These defines make it easier
  # to fit redis into cross-compilation environments, which typically set AR.
@@ -40,7 +43,7 @@ index 72389def9..5d3ade528 100644
  
  lua: .make-prerequisites
 diff --git a/deps/lua/Makefile b/deps/lua/Makefile
-index 209a13244..72f4b2bf2 100644
+index 209a132..72f4b2b 100644
 --- a/deps/lua/Makefile
 +++ b/deps/lua/Makefile
 @@ -33,7 +33,6 @@ INSTALL_DATA= $(INSTALL) -m 0644
@@ -52,7 +55,7 @@ index 209a13244..72f4b2bf2 100644
  # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
  
 diff --git a/deps/lua/src/Makefile b/deps/lua/src/Makefile
-index f3bba2f81..1555ec028 100644
+index d38b2d8..e6b3540 100644
 --- a/deps/lua/src/Makefile
 +++ b/deps/lua/src/Makefile
 @@ -5,18 +5,14 @@
@@ -78,5 +81,5 @@ index f3bba2f81..1555ec028 100644
 +CFLAGS += $(MYCFLAGS)
 +LIBS += -lm $(MYLIBS)
  
- # == END OF USER SETTINGS. NO NEED TO CHANGE ANYTHING BELOW THIS LINE =========
- 
+ # Pretty-printing setup
+ CC_COLOR="\033[32m"

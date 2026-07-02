@@ -29,6 +29,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/releases/${BPN}-${PV}.tar.gz \
            file://0001-Use-correct-printf-format-for-__fsblkcnt_t.patch \
            file://0002-configure-Disable-selected-warnings.patch \
            file://0001-To-fix-Werror-discarded-qualifiers-error.patch \
+           file://0001-fix-NodeNameCompare-const.patch \
            "
 SRC_URI[sha256sum] = "c51603bc486ce6db271a7023a75963bfc6f277f4d4486df2fe004a51c81cfdee"
 

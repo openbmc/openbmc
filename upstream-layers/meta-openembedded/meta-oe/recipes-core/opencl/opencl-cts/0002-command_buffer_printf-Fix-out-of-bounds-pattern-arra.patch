@@ -1,0 +1,32 @@
+From d06f56310e07e99d2450dbe728c37f3b34f966a3 Mon Sep 17 00:00:00 2001
+From: Antonios Christidis <a-christidis@ti.com>
+Date: Wed, 24 Jun 2026 14:26:32 -0500
+Subject: [PATCH 2/3] command_buffer_printf: Fix out of bounds pattern array
+
+The way .back method works, is container.size() - 1, which can evaluated to
+-1 if size is 0. Since pattern_length >=1, (std::max(min_pattern_length,
+rand() % max_pattern_length), use that to post pend the null terminator.
+
+Upstream-Status: Submitted [https://github.com/KhronosGroup/OpenCL-CTS/pull/2727]
+
+Signed-off-by: Antonios Christidis <a-christidis@ti.com>
+---
+ .../extensions/cl_khr_command_buffer/command_buffer_printf.cpp  | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/test_conformance/extensions/cl_khr_command_buffer/command_buffer_printf.cpp b/test_conformance/extensions/cl_khr_command_buffer/command_buffer_printf.cpp
+index fee14571..ab0078aa 100644
+--- a/test_conformance/extensions/cl_khr_command_buffer/command_buffer_printf.cpp
++++ b/test_conformance/extensions/cl_khr_command_buffer/command_buffer_printf.cpp
+@@ -283,7 +283,7 @@ struct CommandBufferPrintfTest : public BasicCommandBufferTest
+                 std::max(min_pattern_length, rand() % max_pattern_length);
+
+             std::vector<cl_char> pattern(pattern_length + 1, pattern_character);
+-            pattern.back() = '\0';
++            pattern[pattern_length] = '\0';
+             enqueue_passes[i] = {
+                 pattern,
+                 { cl_int(i * offset), cl_int(pattern_length) },
+-- 
+2.34.1
+
