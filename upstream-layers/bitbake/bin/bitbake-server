@@ -12,6 +12,8 @@ warnings.simplefilter("default")
 import logging
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(sys.argv[0])), 'lib'))
 
+__version__ = "2.19.0"
+
 import bb
 
 bb.utils.check_system_locale()
@@ -22,6 +24,10 @@ if len(sys.argv) != 11 or not sys.argv[1].startswith("decafbad"):
     sys.exit(1)
 
 import bb.server.process
+
+if __name__ == "__main__":
+    if __version__ != bb.__version__:
+        sys.exit("Bitbake core library version and program version mismatch!")
 
 lockfd = int(sys.argv[2])
 readypipeinfd = int(sys.argv[3])

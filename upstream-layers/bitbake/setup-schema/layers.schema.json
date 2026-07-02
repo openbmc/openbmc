@@ -1,5 +1,21 @@
 {
-    "description": "OpenEmbedder Layer Setup Manifest",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "description": "A schema for a manifest of layers to setup",
+    "title": "OpenEmbedded Layer Setup Schema",
+    "examples" : [
+        {
+            "sources": {
+                "bitbake": {
+                    "git-remote": {
+                        "uri": "https://git.openembedded.org/bitbake",
+                        "rev": "master"
+                    },
+                    "path": "bitbake"
+                }
+            },
+            "version": "1.0"
+        }
+    ],
     "type": "object",
     "additionalProperties": false,
     "required": [
@@ -23,7 +39,7 @@
                         "type": "string"
                     },
                     "contains_this_file": {
-                        "description": "Whether the directory with the layer source also contains this json description. Tools may want to skip the checkout of the source then.",
+                        "description": "Whether the directory with the layer source also contains this json description. Tools may want to skip the checkout of the source then",
                         "type": "boolean"
                     },
                     "git-remote": {
@@ -43,7 +59,7 @@
                                 "type": "string"
                             },
                             "describe": {
-                                "description": "The output of 'git describe' (human readable description of the revision using tags in revision history).",
+                                "description": "The output of 'git describe' (human readable description of the revision using tags in revision history)",
                                 "type": "string"
                             },
                             "uri": {
@@ -56,7 +72,7 @@
                                 "patternProperties": { ".*" : {
                                     "description": "A git remote",
                                     "type": "object",
-                                    "addtionalProperties": false,
+                                    "additionalProperties": false,
                                     "required": [
                                         "uri"
                                     ],

@@ -25,6 +25,12 @@ import subprocess
 import fcntl
 from threading import Thread
 
+__version__ = "2.19.0"
+ 
+if __name__ == "__main__":
+    if __version__ != bb.__version__:
+        sys.exit("Bitbake core library version and program version mismatch!")
+
 Lock = bb.multiprocessing.Lock
 
 # Remove when we have a minimum of python 3.10

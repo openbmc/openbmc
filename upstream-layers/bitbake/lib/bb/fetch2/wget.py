@@ -610,8 +610,7 @@ class Wget(FetchMethod):
                             package, package_regex, current_version, ud, d, filter_regex)
                     if pupver:
                         version[1] = pupver
-
-                    version_dir = version_dir_new
+                        version_dir = version_dir_new
 
         return version[1]
 

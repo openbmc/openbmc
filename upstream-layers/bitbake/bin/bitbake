@@ -31,7 +31,7 @@ __version__ = "2.19.0"
 
 if __name__ == "__main__":
     if __version__ != bb.__version__:
-        sys.exit("Bitbake core version and program version mismatch!")
+        sys.exit("Bitbake core library version and program version mismatch!")
     try:
         sys.exit(bitbake_main(BitBakeConfigParameters(sys.argv),
                               cookerdata.CookerConfiguration()))

@@ -669,6 +669,8 @@ class DataSmart(MutableMapping):
             bb.warn("Calling renameVar with equivalent keys (%s) is invalid" % key)
             return
 
+        found = False
+
         val = self.getVar(key, 0, parsing=True)
         if val is not None:
             self.varhistory.rename_variable_hist(key, newkey)
@@ -677,6 +679,7 @@ class DataSmart(MutableMapping):
             loginfo['detail'] = val
             self.varhistory.record(**loginfo)
             self.setVar(newkey, val, ignore=True, parsing=True)
+            found = True
 
         srcflags = self.getVarFlags(key, False, True) or {}
         for i in srcflags:
@@ -688,12 +691,19 @@ class DataSmart(MutableMapping):
             dest = self.getVarFlag(newkey, i, False) or []
             dest.extend(src)
             self.setVarFlag(newkey, i, dest, ignore=True)
+            found = True
 
         if key in self.overridedata:
+            found = True
             self.overridedata[newkey] = []
             for (v, o) in self.overridedata[key]:
                 self.overridedata[newkey].append([v.replace(key, newkey), o])
                 self.renameVar(v, v.replace(key, newkey))
+
+        if not found:
+            # No variable to rename so not worth the work in writing extra
+            # history data for performance
+            return
 
         if ':' in newkey and val is None:
             self._setvar_update_overrides(newkey, **loginfo)

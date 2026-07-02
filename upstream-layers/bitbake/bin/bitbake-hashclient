@@ -20,6 +20,8 @@ import statistics
 import textwrap
 warnings.simplefilter("default")
 
+__version__ = "2.19.0"
+
 try:
     import tqdm
     ProgressBar = tqdm.tqdm
@@ -41,6 +43,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib
 
 import hashserv
 import bb.asyncrpc
+from bb import __version__ as libbb_version
+
+if __version__ != libbb_version:
+    sys.exit("Bitbake core library version and program version mismatch!")
+if __version__ != hashserv.__version__:
+    sys.exit("Bitbake hashserv library version and program version mismatch!")
 
 DEFAULT_ADDRESS = 'unix://./hashserve.sock'
 METHOD = 'stress.test.method'

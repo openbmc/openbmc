@@ -31,6 +31,13 @@ sys.path.insert(0, join(dirname(dirname(abspath(__file__))), 'lib'))
 import bb.cooker
 from bb.ui import toasterui
 from bb.ui import eventreplay
+from bb import __version__ as libbb_version
+
+__version__ = "2.19.0"
+
+if __name__ == "__main__":
+    if __version__ != libbb_version:
+        sys.exit("Bitbake core library version and program version mismatch!")
 
 def main(argv):
     with open(argv[-1]) as eventfile:

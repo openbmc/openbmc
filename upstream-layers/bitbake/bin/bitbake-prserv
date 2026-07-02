@@ -11,12 +11,16 @@ import argparse
 import warnings
 warnings.simplefilter("default")
 
+__version__ = "2.19.0"
+
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib"))
 
 import prserv
 import prserv.serv
-
-VERSION = "2.0.0"
+ 
+if __name__ == "__main__":
+    if __version__ != prserv.__version__:
+        sys.exit("Bitbake prserv library version and program version mismatch!")
 
 PRHOST_DEFAULT="0.0.0.0"
 PRPORT_DEFAULT=8585
@@ -30,7 +34,7 @@ def init_logger(logfile, loglevel):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="BitBake PR Server. Version=%s" % VERSION,
+        description="BitBake PR Server. Version=%s" % __version__,
         formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument(

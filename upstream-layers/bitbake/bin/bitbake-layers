@@ -17,6 +17,8 @@ import argparse
 import warnings
 warnings.simplefilter("default")
 
+__version__ = "2.19.0"
+
 bindir = os.path.dirname(__file__)
 toolname = os.path.basename(__file__).split(".")[0]
 topdir = os.path.dirname(bindir)
@@ -25,6 +27,10 @@ sys.path[0:0] = [os.path.join(topdir, 'lib')]
 import bb.tinfoil
 import bb.cooker
 import bb.msg
+from bb import __version__ as libbb_version
+
+if __version__ != libbb_version:
+    sys.exit("Bitbake library version and program version mismatch!")
 
 logger = bb.msg.logger_create(toolname, sys.stdout)
 

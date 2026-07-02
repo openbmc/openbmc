@@ -48,17 +48,17 @@ class Az(Wget):
 
         # If were reaching the account transaction limit we might be refused a connection,
         # retrying allows us to avoid false negatives since the limit changes over time
-        fetchcmd = self.basecmd + ' --retry-connrefused --waitretry=5'
+        fetchcmd = self.basecmd + ['--retry-connrefused', '--waitretry=5']
 
         # We need to provide a localpath to avoid wget using the SAS
         # ud.localfile either has the downloadfilename or ud.path
         localpath = os.path.join(d.getVar("DL_DIR"), ud.localfile)
         bb.utils.mkdirhier(os.path.dirname(localpath))
-        fetchcmd += " -O %s" % shlex.quote(localpath)
+        fetchcmd += ["-O", localpath]
 
 
         if ud.user and ud.pswd:
-            fetchcmd += " --user=%s --password=%s --auth-no-challenge" % (ud.user, ud.pswd)
+            fetchcmd += ["--user=%s" % ud.user, "--password=%s" % ud.pswd, "--auth-no-challenge"]
 
         # Check if a Shared Access Signature was given and use it
         az_sas = d.getVar('AZ_SAS')
@@ -73,9 +73,9 @@ class Az(Wget):
         dldir = d.getVar("DL_DIR")
         if os.path.exists(ud.localpath):
             # file exists, but we didnt complete it.. trying again.
-            fetchcmd += " -c -P %s '%s'" % (dldir, azuri)
+            fetchcmd += ["-c", "-P", dldir, azuri]
         else:
-            fetchcmd += " -P %s '%s'" % (dldir, azuri)
+            fetchcmd += ["-P", dldir, azuri]
 
         try:
             self._runwget(ud, d, fetchcmd, False)

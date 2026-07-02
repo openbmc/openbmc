@@ -82,7 +82,7 @@ from   bb.fetch2 import logger
 from   bb.fetch2 import trusted_network
 
 
-sha1_re = re.compile(r'^[0-9a-f]{40}$')
+git_hash_re = re.compile(r'^[0-9a-f]{40,64}$')
 slash_re = re.compile(r"/+")
 
 class GitProgressHandler(bb.progress.LineFilterProgressHandler):
@@ -257,8 +257,8 @@ class Git(FetchMethod):
 
         ud.setup_revisions(d)
 
-        # Ensure any revision that doesn't look like a SHA-1 is translated into one
-        if not sha1_re.match(ud.revision or ''):
+        # Ensure any revision that doesn't look like a git hash (SHA-1 or SHA-256) is resolved
+        if not git_hash_re.match(ud.revision or ''):
             if ud.revision:
                 ud.unresolvedrev = ud.revision
             ud.revision = self.latest_revision(ud, d, ud.name)
@@ -505,7 +505,9 @@ class Git(FetchMethod):
                 # Using worktree with the revision because .lfsconfig may exists
                 worktree_add_cmd = ud.basecmd + ['worktree', 'add', 'wt', revision]
                 runfetchcmd(worktree_add_cmd, d, log=progresshandler, workdir=clonedir)
-                lfs_fetch_cmd = ud.basecmd + ['lfs', 'fetch', "--all" if fetchall else ""]
+                lfs_fetch_cmd = ud.basecmd + ['lfs', 'fetch']
+                if fetchall:
+                    lfs_fetch_cmd.append('--all')
                 runfetchcmd(lfs_fetch_cmd, d, log=progresshandler, workdir=(clonedir + "/wt"))
                 worktree_rem_cmd = ud.basecmd + ['worktree', 'remove', '-f', 'wt']
                 runfetchcmd(worktree_rem_cmd, d, log=progresshandler, workdir=clonedir)
@@ -578,7 +580,7 @@ class Git(FetchMethod):
         # Use repourl when creating a fast initial shallow clone
         # Prefer already existing full bare clones if available
         if not ud.shallow_skip_fast and not os.path.exists(ud.clonedir):
-            remote = shlex.quote(repourl)
+            remote = repourl
         else:
             remote = ud.clonedir
         runfetchcmd(ud.basecmd + ['remote', 'add', 'origin', remote], d, workdir=dest)
@@ -752,7 +754,7 @@ class Git(FetchMethod):
 
         # If there is a tag parameter in the url and we also have a fixed srcrev, check the tag
         # matches the revision
-        if 'tag' in ud.parm and sha1_re.match(ud.revision):
+        if 'tag' in ud.parm and git_hash_re.match(ud.revision):
             output = runfetchcmd(ud.basecmd + ['rev-list', '-n', '1', ud.parm['tag']], d, workdir=destdir, extraenv=extraenv)
             output = output.strip()
             if output != ud.revision:
@@ -976,7 +978,7 @@ class Git(FetchMethod):
             bb.note("Could not list remote: %s" % str(e))
             return pupver
 
-        rev_tag_re = re.compile(r"([0-9a-f]{40})\s+refs/tags/(.*)")
+        rev_tag_re = re.compile(r"([0-9a-f]{40,64})\s+refs/tags/(.*)")
         pver_re = re.compile(d.getVar('UPSTREAM_CHECK_GITTAGREGEX') or r"(?P<pver>([0-9][\.|_]?)+)")
         nonrel_re = re.compile(r"(alpha|beta|rc|final)+")
 
@@ -1029,9 +1031,9 @@ class Git(FetchMethod):
             commits = None
         else:
             if not os.path.exists(rev_file) or not os.path.getsize(rev_file):
-                commits = bb.fetch2.runfetchcmd(['git', 'rev-list', rev, '--'], d).splitlines()
+                commits = len(bb.fetch2.runfetchcmd(['git', 'rev-list', rev, '--'], d).splitlines())
                 if commits:
-                    open(rev_file, "w").write("%d\n" % len(commits))
+                    open(rev_file, "w").write("%d\n" % commits)
             else:
                 commits = open(rev_file, "r").readline(128).strip()
         if commits:

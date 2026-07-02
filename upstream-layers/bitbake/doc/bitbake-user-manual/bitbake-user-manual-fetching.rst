@@ -716,6 +716,11 @@ The format for the :term:`SRC_URI` setting must be::
 
    SRC_URI = "crate://REGISTRY/NAME/VERSION"
 
+This fetcher supports the following parameters:
+
+-  *"protocol":* The protocol used to fetch the crates. The default is "https".
+   You can also use "http".
+
 Here is an example URL::
 
    SRC_URI = "crate://crates.io/glob/0.2.11"

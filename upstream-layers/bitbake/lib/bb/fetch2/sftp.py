@@ -85,7 +85,7 @@ class SFTP(FetchMethod):
         urlo = URI(ud.url)
         basecmd = ['sftp', '-oBatchMode=yes']
         if urlo.port:
-            basecmd += ['-P', urlo.port]
+            basecmd += ['-P', str(urlo.port)]
             urlo.port = None
 
         dldir = d.getVar('DL_DIR')
@@ -102,7 +102,7 @@ class SFTP(FetchMethod):
         if path[:3] == '/~/':
             path = path[3:]
 
-        remote = '"%s%s:%s"' % (user, urlo.hostname, path)
+        remote = '%s%s:%s' % (user, urlo.hostname, path)
 
         cmd = basecmd + [remote, lpath]
 

@@ -11,6 +11,8 @@ import warnings
 warnings.simplefilter("default")
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'lib'))
 
+__version__ = "2.19.0"
+
 import unittest
 try:
     import bb
@@ -19,6 +21,9 @@ try:
     import layerindexlib
 except RuntimeError as exc:
     sys.exit(str(exc))
+
+if __version__ != bb.__version__:
+    sys.exit("Bitbake core library version and program version mismatch!")
 
 tests = ["bb.tests.codeparser",
          "bb.tests.color",

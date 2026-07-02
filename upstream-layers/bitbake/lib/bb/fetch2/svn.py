@@ -170,7 +170,7 @@ class Svn(FetchMethod):
             if scmdata == "keep":
                 tar_flags = []
             else:
-                tar_flags = ["--exclude='.svn'"]
+                tar_flags = ["--exclude=.svn"]
 
             # tar them up to a defined filename
             runfetchcmd(['tar'] + tar_flags + ['-czf', ud.localpath, ud.path_spec], d,

@@ -316,7 +316,7 @@ class BitBakeConfigParameters(cookerdata.ConfigParameters):
         options = parser.parse_intermixed_args(argv[1:])
 
         if options.version:
-            print("BitBake Build Tool Core version %s" % bb.__version__)
+            print("BitBake Build Tool version %s" % bb.__version__)
             sys.exit(0)
 
         if options.quiet and options.verbose:

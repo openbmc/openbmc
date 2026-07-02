@@ -1,7 +1,16 @@
 # ex:ts=4:sw=4:sts=4:et
 # -*- tab-width: 4; c-basic-offset: 4; indent-tabs-mode: nil -*-
 """
-BitBake 'Fetch' implementation for crates.io
+BitBake 'Fetch' implementation for cargo registries, e.g. crates.io
+
+SRC_URI = "crate://some.host/crate_name/version;OptionA=xxx;OptionB=xxx;..."
+
+Supported SRC_URI options are:
+
+- protocol
+   The method to use to download the crate file. Common options are "http",
+   "https", and "ftp". The default is "https".
+
 """
 
 # Copyright (C) 2016 Doug Goldstein
@@ -63,7 +72,7 @@ class Crate(Wget):
         Sets up the download for a crate
         """
 
-        # URL syntax is: crate://NAME/VERSION
+        # URL syntax is: crate://HOST/NAME/VERSION
         # break the URL apart by /
         parts = ud.url.split('/')
         if len(parts) < 5:
@@ -78,13 +87,20 @@ class Crate(Wget):
         # host (this is to allow custom crate registries to be specified
         host = '/'.join(parts[2:-2])
 
+        if 'protocol' in ud.parm:
+            proto = ud.parm['protocol']
+        else:
+            proto = 'https'
+
         # If using crates.io use the CDN directly as per https://crates.io/data-access
         if host == 'crates.io':
+            if proto != 'https':
+                bb.warn("URL: %s does the %s protocol which is not supported by crates.io. Please change to ;protocol=https in the url." % (ud.url, proto))
             ud.url = "https://static.crates.io/crates/%s/%s/download" % (name, version)
             ud.versionsurl = 'https://index.crates.io/' + self._generate_index_path(name)
         else:
-            ud.url = "https://%s/%s/%s/download" % (host, name, version)
-            ud.versionsurl = "https://%s/%s/versions" % (host, name)
+            ud.url = "%s://%s/%s/%s/download" % (proto, host, name, version)
+            ud.versionsurl = "%s://%s/%s/versions" % (proto, host, name)
 
         ud.parm['downloadfilename'] = "%s-%s.crate" % (name, version)
         if 'name' not in ud.parm:

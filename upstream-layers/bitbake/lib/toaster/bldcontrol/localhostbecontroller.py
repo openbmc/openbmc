@@ -547,14 +547,14 @@ class LocalhostBEController(BuildEnvironmentController):
         local_bitbake = os.path.join(os.path.dirname(os.getenv('BBBASEDIR')),
                                      'bitbake')
         if not is_merged_attr:
-            self._shellcmd([f'{env_clean} bash -c \"(TOASTER_BRBE="{brbe}" BBSERVER="0.0.0.0:{self.be.bbport}" '
+            self._shellcmd(f'{env_clean} bash -c \"(TOASTER_BRBE="{brbe}" BBSERVER="0.0.0.0:{self.be.bbport}" '
                         f'{bitbake} {bbtargets} -u toasterui  --read {confpath} --read {bblayers} --read {toasterlayers} --token="" >>{log} 2>&1;'
-                        f'BITBAKE_UI="knotty" BBSERVER=0.0.0.0:{self.be.bbport} {bitbake} -m)&\"'],
+                        f'BITBAKE_UI="knotty" BBSERVER=0.0.0.0:{self.be.bbport} {bitbake} -m)&\"',
                         builddir, nowait=True)
         else:
-            self._shellcmd([f'{env_clean} bash -c \"(TOASTER_BRBE="{brbe}" BBSERVER="0.0.0.0:{self.be.bbport}" '
+            self._shellcmd(f'{env_clean} bash -c \"(TOASTER_BRBE="{brbe}" BBSERVER="0.0.0.0:{self.be.bbport}" '
                         f'{local_bitbake} {bbtargets} -u toasterui  --token="" >>{log} 2>&1;'
-                        f'BITBAKE_UI="knotty" BBSERVER=0.0.0.0:{self.be.bbport} {bitbake} -m)&\"'],
+                        f'BITBAKE_UI="knotty" BBSERVER=0.0.0.0:{self.be.bbport} {bitbake} -m)&\"',
                         builddir, nowait=True)
 
         logger.debug('localhostbecontroller: Build launched, exiting. '

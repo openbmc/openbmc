@@ -36,7 +36,7 @@ class GitANNEX(Git):
 
     def update_annex(self, ud, d, wd):
         try:
-            runfetchcmd(ud.basecmd + ['annex get', '--all'], d, quiet=True, workdir=wd)
+            runfetchcmd(ud.basecmd + ['annex', 'get', '--all'], d, quiet=True, workdir=wd)
         except bb.fetch.FetchError:
             return False
         runfetchcmd(['chmod', 'u+w', '-R', '%s/annex' % ud.clonedir], d, quiet=True, workdir=wd)

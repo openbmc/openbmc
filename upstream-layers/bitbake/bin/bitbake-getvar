@@ -19,8 +19,14 @@ sys.path[0:0] = [os.path.join(topdir, 'lib')]
 
 import bb.providers
 import bb.tinfoil
+from bb import __version__ as libbb_version
+
+__version__ = "2.19.0"
 
 if __name__ == "__main__":
+    if __version__ != libbb_version:
+        sys.exit("Bitbake core library version and program version mismatch!")
+
     parser = argparse.ArgumentParser(description="Bitbake Query Variable")
     parser.add_argument("variable", help="variable name to query")
     parser.add_argument("-r", "--recipe", help="Recipe name to query", default=None, required=False)
