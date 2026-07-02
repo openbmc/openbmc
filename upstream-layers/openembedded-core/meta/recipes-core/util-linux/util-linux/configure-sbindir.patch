@@ -1,4 +1,4 @@
-From d521ca39a781873882b52ee52f46294596f41848 Mon Sep 17 00:00:00 2001
+From d91f680b43b0c70ee7c4f3b74996c342ca15129e Mon Sep 17 00:00:00 2001
 From: Phil Blundell <pb@pbcl.net>
 Date: Mon, 24 Sep 2012 07:24:51 +0100
 Subject: [PATCH] util-linux: Ensure that ${sbindir} is respected
@@ -14,7 +14,7 @@ Upstream-Status: Inappropriate [configuration]
  1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index d32b11d..f664d12 100644
+index 13bed69..e2061e7 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -110,7 +110,10 @@ AC_SUBST([runstatedir])

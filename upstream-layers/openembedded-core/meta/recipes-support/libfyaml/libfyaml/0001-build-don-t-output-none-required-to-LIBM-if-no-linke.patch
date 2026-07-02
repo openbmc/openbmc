@@ -1,0 +1,33 @@
+From 97a93fc2859bcb88ca15dc92e1ba6f852b4a0cb7 Mon Sep 17 00:00:00 2001
+From: "E. Madison Bray" <madison@bray.work>
+Date: Tue, 24 Mar 2026 17:09:24 +0100
+Subject: [PATCH] build: don't output "none required" to LIBM if no linker
+ flags needed for it
+
+Upstream-Status: Backport [https://github.com/pantoniou/libfyaml/commit/24b18e7363b336962fe160c1dc05ca57ba95783c]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ configure.ac | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index b03cf24..f5c854f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -254,9 +254,10 @@ AC_DEFINE_UNQUOTED([HAVE_ASAN], [$HAVE_ASAN], [Define to 1 if ASAN is enabled])
+ # Link libm on platforms where trunc() lives outside libc.
+ AC_SEARCH_LIBS([trunc], [m])
+ LIBM="$ac_cv_search_trunc"
+-if test "x$LIBM" = "xno" || test "x$LIBM" = "xyes" ; then
+-	LIBM=""
+-fi
++case "$ac_cv_search_trunc" in
++	no|yes|"none required") LIBM="" ;;
++	*) LIBM="$ac_cv_search_trunc" ;;
++esac
+ AC_SUBST(LIBM)
+ 
+ # check if there's a qsort_r available (musl does not have it)
+-- 
+2.47.3
+

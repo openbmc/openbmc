@@ -1,0 +1,30 @@
+From e625e06202f992936b43790ee2c992611facba04 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sun, 21 Jun 2026 22:57:24 +0200
+Subject: [PATCH] Source/cmake/FindGLib.cmake: do not set include dirs from
+ INCLUDEDIR
+
+The correct include directory set is provided by INCLUDE_DIRS (e.g. the following line).
+INCLUDEDIR is a prefix to them (e.g. it's set to /usr/include in most cases), and adding
+it is causing problems in cross-compile scenarios where the build is performed against
+a system root and include locations are substituted to that using pkg-config override
+mechanisms.
+
+Upstream-Status: Submitted [https://github.com/WebKit/WebKit/pull/67960]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ Source/cmake/FindGLib.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Source/cmake/FindGLib.cmake b/Source/cmake/FindGLib.cmake
+index 00de647d..68581c25 100644
+--- a/Source/cmake/FindGLib.cmake
++++ b/Source/cmake/FindGLib.cmake
+@@ -191,7 +191,6 @@ function(GLib_HandleComponent name)
+     list(TRANSFORM dependencies PREPEND GLib::)
+     add_library(GLib::${name} UNKNOWN IMPORTED GLOBAL)
+     set_target_properties(GLib::${name} PROPERTIES IMPORTED_LOCATION "${GLib_${name}_LIBRARY}")
+-    target_include_directories(GLib::${name} INTERFACE ${PC_GLib_${name}_INCLUDEDIR})
+     target_include_directories(GLib::${name} INTERFACE ${PC_GLib_${name}_INCLUDE_DIRS})
+     target_compile_options(GLib::${name} INTERFACE ${PC_GLib_${name}_CFLAGS})
+     target_compile_options(GLib::${name} INTERFACE ${PC_GLib_${name}_CFLAGS_OTHER})

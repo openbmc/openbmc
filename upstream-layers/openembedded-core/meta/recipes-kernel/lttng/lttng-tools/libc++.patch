@@ -1,4 +1,11 @@
-sessiond: avoid std::vector range-ctor on non-standard iterators (libc++)
+From 348e1be1cdfb897bc8a907e1a806cc7591efae8a Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Wed, 20 Aug 2025 23:45:20 -0700
+Subject: [PATCH] sessiond: avoid std::vector range-ctor on non-standard
+ iterators (libc++)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 libc++ SFINAE-gates std::vector(It, It) behind standard iterator requirements.
 The events_view/channels_ht_view iterators don’t model Input/Forward, so the
@@ -9,12 +16,16 @@ libstdc++ behavior unchanged.
 
 Upstream-Status: Submitted [https://review.lttng.org/c/lttng-tools/+/15163]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/bin/lttng-sessiond/ust-registry-channel.cpp | 7 +++++--
+ src/bin/lttng-sessiond/ust-registry-session.cpp | 7 +++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-Index: lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-channel.cpp
-===================================================================
---- lttng-tools-2.14.0.orig/src/bin/lttng-sessiond/ust-registry-channel.cpp
-+++ lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-channel.cpp
-@@ -529,8 +529,11 @@ void lsu::registry_channel::_accept_on_e
+diff --git a/src/bin/lttng-sessiond/ust-registry-channel.cpp b/src/bin/lttng-sessiond/ust-registry-channel.cpp
+index 45be2cc..01d5db3 100644
+--- a/src/bin/lttng-sessiond/ust-registry-channel.cpp
++++ b/src/bin/lttng-sessiond/ust-registry-channel.cpp
+@@ -529,8 +529,11 @@ void lsu::registry_channel::_accept_on_event_classes(
  		events_view(*_events->ht);
  
  	/* Copy the event ptrs from the _events ht to this vector which we'll sort. */
@@ -28,11 +39,11 @@ Index: lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-channel.cpp
  
  	std::sort(sorted_event_classes.begin(),
  		  sorted_event_classes.end(),
-Index: lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-session.cpp
-===================================================================
---- lttng-tools-2.14.0.orig/src/bin/lttng-sessiond/ust-registry-session.cpp
-+++ lttng-tools-2.14.0/src/bin/lttng-sessiond/ust-registry-session.cpp
-@@ -586,8 +586,11 @@ void lsu::registry_session::_accept_on_s
+diff --git a/src/bin/lttng-sessiond/ust-registry-session.cpp b/src/bin/lttng-sessiond/ust-registry-session.cpp
+index 693fc71..b355a14 100644
+--- a/src/bin/lttng-sessiond/ust-registry-session.cpp
++++ b/src/bin/lttng-sessiond/ust-registry-session.cpp
+@@ -587,8 +587,11 @@ void lsu::registry_session::_accept_on_stream_classes(lst::trace_class_visitor&
  						  decltype(lsu::registry_channel::_node),
  						  &lsu::registry_channel::_node>
  		channels_ht_view(*_channels->ht);

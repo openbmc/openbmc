@@ -77,6 +77,10 @@ FILES:info-doc = "${infodir}/info.info* ${infodir}/dir ${infodir}/info-*.info* \
 
 FILES:${PN} = "${bindir}/makeinfo ${bindir}/texi* ${bindir}/pdftexi2dvi ${bindir}/pod2texi ${datadir}/texinfo ${datadir}/texi2any"
 RDEPENDS:${PN} = "perl"
+RDEPENDS:${PN} += "perl-module-if perl-module-utf8 perl-module-encode perl-module-encode-encoding perl-module-locale perl-module-integer \
+                   perl-module-file-spec perl-module-cwd perl-module-file-basename perl-module-getopt-long perl-module-posix perl-module-data-dumper \
+                   perl-module-storable perl-module-feature perl-module-unicode-normalize perl-module-charnames perl-module-unicore perl-module-file-copy \
+                   perl-module-file-glob"
 FILES:${PN}-doc = "${infodir}/texi* \
                    ${datadir}/${tex_texinfo} \
                    ${mandir}/man1 ${mandir}/man5"

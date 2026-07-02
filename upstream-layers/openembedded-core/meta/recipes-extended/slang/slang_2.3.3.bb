@@ -36,7 +36,7 @@ EXTRA_OECONF = "--without-onig"
 # path. Unset RPATH to stop this.
 EXTRA_OEMAKE = "RPATH=''"
 
-PACKAGECONFIG ??= "pcre"
+PACKAGECONFIG ??= ""
 PACKAGECONFIG[pcre] = "--with-pcre=${STAGING_DIR_HOST}${prefix},--without-pcre,pcre"
 PACKAGECONFIG[png] = "--with-png=${STAGING_DIR_HOST}${prefix},--without-png,libpng"
 PACKAGECONFIG[zlib] = "--with-z=${STAGING_DIR_HOST}${prefix},--without-z,zlib"

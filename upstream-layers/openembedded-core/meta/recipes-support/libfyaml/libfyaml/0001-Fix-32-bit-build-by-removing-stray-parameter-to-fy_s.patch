@@ -1,0 +1,25 @@
+From 6e7cc36489999843990ff2da558f9f70e579c8e9 Mon Sep 17 00:00:00 2001
+From: Fredrik Fornwall <fredrik@fornwall.net>
+Date: Sun, 15 Mar 2026 21:47:27 +0100
+Subject: [PATCH] Fix 32-bit build by removing stray parameter to
+ fy_skip_size32()
+
+Upstream-Status: Backport [https://github.com/pantoniou/libfyaml/commit/0982fcefc6a16d4c8cb5b06747d3fc8e630de3ae]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ include/libfyaml/libfyaml-vlsize.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/libfyaml/libfyaml-vlsize.h b/include/libfyaml/libfyaml-vlsize.h
+index 6ccb7ab..1b950c4 100644
+--- a/include/libfyaml/libfyaml-vlsize.h
++++ b/include/libfyaml/libfyaml-vlsize.h
+@@ -816,7 +816,7 @@ fy_decode_size_nocheck(const uint8_t *start, size_t *sizep)
+ static inline const uint8_t *
+ fy_skip_size(const uint8_t *start, size_t bufsz)
+ {
+-	return fy_skip_size32(start, bufsz, &sz);
++	return fy_skip_size32(start, bufsz);
+ }
+ 
+ static inline const uint8_t *

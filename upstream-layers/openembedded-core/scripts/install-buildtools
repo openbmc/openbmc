@@ -33,6 +33,7 @@
 #
 
 import argparse
+import glob
 import logging
 import os
 import platform
@@ -113,6 +114,52 @@ def remove_quotes(var):
     return var
 
 
+def fetch_buildtools(buildtools_url, filename, sdk_dir, check):
+    """Download the buildtools installer and optionally verify its checksum."""
+    logger.info("Fetching buildtools installer")
+    tmpbuildtools = os.path.join(sdk_dir, filename)
+    with open(os.path.join(sdk_dir, 'buildtools_url'), 'w') as f:
+        f.write(buildtools_url)
+    ret = subprocess.call(["wget", "-q", "-O", tmpbuildtools, buildtools_url])
+    if ret != 0:
+        logger.error("Could not download file from %s" % buildtools_url)
+        return None
+
+    if check:
+        logger.info("Fetching buildtools installer checksum")
+        checksum_type = "sha256sum"
+        checksum_url = "{}.{}".format(buildtools_url, checksum_type)
+        checksum_filename = "{}.{}".format(filename, checksum_type)
+        tmpbuildtools_checksum = os.path.join(sdk_dir, checksum_filename)
+        with open(os.path.join(sdk_dir, 'checksum_url'), 'w') as f:
+            f.write(checksum_url)
+        ret = subprocess.call(["wget", "-q", "-O", tmpbuildtools_checksum, checksum_url])
+        if ret != 0:
+            logger.error("Could not download file from %s" % checksum_url)
+            return None
+        regex = re.compile(r"^(?P<checksum>[0-9a-f]+)\s+(?P<path>.*/)?(?P<filename>.*)$")
+        with open(tmpbuildtools_checksum, 'rb') as f:
+            original = f.read()
+            m = re.search(regex, original.decode("utf-8"))
+            logger.debug("checksum regex match: %s" % m)
+            logger.debug("checksum: %s" % m.group('checksum'))
+            logger.debug("path: %s" % m.group('path'))
+            logger.debug("filename: %s" % m.group('filename'))
+            if filename != m.group('filename'):
+                logger.error("Filename does not match name in checksum")
+                return None
+            checksum = m.group('checksum')
+        checksum_value = sha256_file(tmpbuildtools)
+        if checksum == checksum_value:
+            logger.info("Checksum success")
+        else:
+            logger.error("Checksum %s expected. Actual checksum is %s." %
+                         (checksum, checksum_value))
+            return None
+
+    return tmpbuildtools
+
+
 def main():
     global DEFAULT_INSTALL_DIR
     global DEFAULT_BASE_URL
@@ -129,6 +176,10 @@ def main():
         description="Buildtools installation helper",
         add_help=False,
         formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument('--local-file',
+                        help='path to a pre-downloaded buildtools installer file.\n'
+                             'Cannot be combined with --url or --filename.',
+                        action='store')
     parser.add_argument('-u', '--url',
                         help='URL from where to fetch buildtools SDK installer, not '
                              'including filename (optional)\n'
@@ -242,62 +293,35 @@ def main():
     os.makedirs(sdk_dir, exist_ok=True)
     try:
         # Fetch installer
-        logger.info("Fetching buildtools installer")
-        tmpbuildtools = os.path.join(sdk_dir, filename)
-        with open(os.path.join(sdk_dir, 'buildtools_url'), 'w') as f:
-            f.write(buildtools_url)
-        ret = subprocess.call("wget -q -O %s %s" %
-                              (tmpbuildtools, buildtools_url), shell=True)
-        if ret != 0:
-            logger.error("Could not download file from %s" % buildtools_url)
-            return ret
-
-        # Verify checksum
-        if args.check:
-            logger.info("Fetching buildtools installer checksum")
-            checksum_type = "sha256sum"
-            checksum_url = "{}.{}".format(buildtools_url, checksum_type)
-            checksum_filename = "{}.{}".format(filename, checksum_type)
-            tmpbuildtools_checksum = os.path.join(sdk_dir, checksum_filename)
-            with open(os.path.join(sdk_dir, 'checksum_url'), 'w') as f:
-                f.write(checksum_url)
-            ret = subprocess.call("wget -q -O %s %s" %
-                                    (tmpbuildtools_checksum, checksum_url), shell=True)
-            if ret != 0:
-                logger.error("Could not download file from %s" % checksum_url)
-                return ret
-            regex = re.compile(r"^(?P<checksum>[0-9a-f]+)\s+(?P<path>.*/)?(?P<filename>.*)$")
-            with open(tmpbuildtools_checksum, 'rb') as f:
-                original = f.read()
-                m = re.search(regex, original.decode("utf-8"))
-                logger.debug("checksum regex match: %s" % m)
-                logger.debug("checksum: %s" % m.group('checksum'))
-                logger.debug("path: %s" % m.group('path'))
-                logger.debug("filename: %s" % m.group('filename'))
-                if filename != m.group('filename'):
-                    logger.error("Filename does not match name in checksum")
-                    return 1
-                checksum = m.group('checksum')
-            checksum_value = sha256_file(tmpbuildtools)
-            if checksum == checksum_value:
-                    logger.info("Checksum success")
-            else:
-                logger.error("Checksum %s expected. Actual checksum is %s." %
-                             (checksum, checksum_value))
+        if args.local_file:
+            if args.url or args.filename:
+                parser.error("--local-file cannot be combined with --url or --filename")
+            tmpbuildtools = os.path.abspath(args.local_file)
+            if not os.path.exists(tmpbuildtools):
+                logger.error("Local file not found: %s" % tmpbuildtools)
+                return 1
+            filename = os.path.basename(tmpbuildtools)
+        else:
+            tmpbuildtools = fetch_buildtools(buildtools_url, filename, sdk_dir, args.check)
+            if tmpbuildtools is None:
                 return 1
 
-        # Make installer executable
-        logger.info("Making installer executable")
-        st = os.stat(tmpbuildtools)
-        os.chmod(tmpbuildtools, st.st_mode | stat.S_IEXEC)
-        logger.debug(os.stat(tmpbuildtools))
+        # Run installer
+        if args.local_file:
+            # Avoid mutating caller-owned file; invoke via /bin/sh instead
+            cmd = ["/bin/sh", tmpbuildtools]
+        else:
+            logger.info("Making installer executable")
+            st = os.stat(tmpbuildtools)
+            os.chmod(tmpbuildtools, st.st_mode | stat.S_IEXEC)
+            logger.debug(os.stat(tmpbuildtools))
+            cmd = [tmpbuildtools]
         if args.directory:
             install_dir = os.path.abspath(args.directory)
-            ret = subprocess.call("%s -d %s -y" %
-                                  (tmpbuildtools, install_dir), shell=True)
+            ret = subprocess.call(cmd + ["-d", install_dir, "-y"])
         else:
             install_dir = "/opt/poky/%s" % args.installer_version
-            ret = subprocess.call("%s -y" % tmpbuildtools, shell=True)
+            ret = subprocess.call(cmd + ["-y"])
         if ret != 0:
             logger.error("Could not run buildtools installer")
             return ret
@@ -305,8 +329,17 @@ def main():
         # Setup the environment
         logger.info("Setting up the environment")
         regex = re.compile(r'^(?P<export>export )?(?P<env_var>[A-Z_]+)=(?P<env_val>.+)$')
-        with open("%s/environment-setup-%s-pokysdk-linux" %
-                  (install_dir, arch), 'rb') as f:
+        pattern = os.path.join(install_dir, "environment-setup-%s-*-linux" % arch)
+        matches = glob.glob(pattern)
+        if len(matches) == 0:
+            logger.error("No environment setup script matching %s" % pattern)
+            return 1
+        if len(matches) > 1:
+            logger.error("Multiple environment setup scripts found: %s"
+                         % " ".join(matches))
+            return 1
+        logger.debug("Using environment setup script: %s" % matches[0])
+        with open(matches[0], 'rb') as f:
             for line in f:
                 match = regex.search(line.decode('utf-8'))
                 logger.debug("export regex: %s" % match)

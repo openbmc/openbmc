@@ -1,4 +1,4 @@
-From 52f928686da5ef699dec7f7a296c5226d82180c1 Mon Sep 17 00:00:00 2001
+From 2dd80802e0b9747ed32f45a886c7ad21b7fa61be Mon Sep 17 00:00:00 2001
 From: Jackie Huang <jackie.huang@windriver.com>
 Date: Fri, 23 Sep 2016 01:04:50 -0700
 Subject: [PATCH] boost-math: disable pch for gcc

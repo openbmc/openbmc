@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Device tree overlay for OE selftest external DTB overlay testing.
+ * Intentionally self-contained with no kernel source dependencies.
+ */
+/dts-v1/;
+/plugin/;
+
+&{/} {
+	oe-selftest-overlay {
+		compatible = "oe-selftest,test-overlay";
+		status = "okay";
+	};
+};

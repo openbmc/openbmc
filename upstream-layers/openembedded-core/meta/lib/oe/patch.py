@@ -5,6 +5,7 @@
 #
 
 import os
+import errno
 import shlex
 import subprocess
 import oe.path
@@ -37,16 +38,19 @@ def runcmd(args, dir = None):
         # print("cwd: %s -> %s" % (olddir, dir))
 
     try:
-        args = [ shlex.quote(str(arg)) for arg in args ]
-        cmd = " ".join(args)
-        # print("cmd: %s" % cmd)
-        proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        cmd = [str(arg) for arg in args]
+        print_cmd = shlex.join(cmd)
+        try:
+            proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except OSError as exc:
+            status = 127 if exc.errno in (errno.ENOENT, errno.ENOTDIR) else 126
+            raise CmdError(print_cmd, status, "stdout: \nstderr: %s" % exc) from exc
         stdout, stderr = proc.communicate()
         stdout = stdout.decode('utf-8')
         stderr = stderr.decode('utf-8')
         exitstatus = proc.returncode
         if exitstatus != 0:
-            raise CmdError(cmd, exitstatus >> 8, "stdout: %s\nstderr: %s" % (stdout, stderr))
+            raise CmdError(print_cmd, exitstatus, "stdout: %s\nstderr: %s" % (stdout, stderr))
         if " fuzz " in stdout and "Hunk " in stdout:
             # Drop patch fuzz info with header and footer to log file so
             # insane.bbclass can handle to throw error/warning
@@ -191,10 +195,12 @@ class PatchTree(PatchSet):
         bb.utils.mkdirhier(self.patchdir)
 
     def _appendPatchFile(self, patch, strippath):
+        import shutil
+
         with open(self.seriespath, 'a') as f:
             f.write(os.path.basename(patch) + "," + strippath + "\n")
-        shellcmd = ["cat", patch, ">" , self.patchdir + "/" + os.path.basename(patch)]
-        runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+        dest = os.path.join(self.patchdir, os.path.basename(patch))
+        shutil.copyfile(patch, dest)
 
     def _removePatch(self, p):
         patch = {}
@@ -229,24 +235,24 @@ class PatchTree(PatchSet):
         self.patches.insert(i, patch)
 
     def _applypatch(self, patch, force = False, reverse = False, run = True):
-        shellcmd = ["cat", patch['file'], "|", "patch", "--no-backup-if-mismatch", "-p", patch['strippath']]
+        cmd = ["patch", "--no-backup-if-mismatch", "-p", str(patch['strippath']), "-i", patch['file']]
         if reverse:
-            shellcmd.append('-R')
+            cmd.append('-R')
 
         if not run:
-            return "sh" + "-c" + " ".join(shellcmd)
+            return cmd
 
         if not force:
-            shellcmd.append('--dry-run')
+            cmd.append('--dry-run')
 
         try:
-            output = runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+            output = runcmd(cmd, self.dir)
 
             if force:
                 return
 
-            shellcmd.pop(len(shellcmd) - 1)
-            output = runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+            cmd.pop(len(cmd) - 1)
+            output = runcmd(cmd, self.dir)
         except CmdError as err:
             raise bb.BBHandledException("Applying '%s' failed:\n%s" %
                                         (os.path.basename(patch['file']), err.output))
@@ -271,7 +277,10 @@ class PatchTree(PatchSet):
                 next = 0
 
             bb.note("applying patch %s" % self.patches[next])
-            ret = self._applypatch(self.patches[next], force)
+            ret = self._applypatch(self.patches[next], force, run=run)
+
+            if not run:
+                return ret
 
             self._current = next
             return ret
@@ -413,9 +422,9 @@ class GitApplyTree(PatchTree):
             commituser = d.getVar('PATCH_GIT_USER_NAME')
             commitemail = d.getVar('PATCH_GIT_USER_EMAIL')
         if commituser:
-            cmd += ['-c', 'user.name="%s"' % commituser]
+            cmd += ['-c', 'user.name=%s' % commituser]
         if commitemail:
-            cmd += ['-c', 'user.email="%s"' % commitemail]
+            cmd += ['-c', 'user.email=%s' % commitemail]
 
     @staticmethod
     def prepareCommit(patchfile, commituser=None, commitemail=None):
@@ -429,8 +438,8 @@ class GitApplyTree(PatchTree):
         outlines, author, date, subject = GitApplyTree.interpretPatchHeader(lines)
         if not author or not subject or not date:
             try:
-                shellcmd = ["git", "log", "--format=email", "--follow", "--diff-filter=A", "--", patchfile]
-                out = runcmd(["sh", "-c", " ".join(shellcmd)], os.path.dirname(patchfile))
+                cmd = ["git", "log", "--format=email", "--follow", "--diff-filter=A", "--", patchfile]
+                out = runcmd(cmd, os.path.dirname(patchfile))
             except CmdError:
                 out = None
             if out:
@@ -458,9 +467,9 @@ class GitApplyTree(PatchTree):
         cmd += ["commit", "-F", tmpfile, "--no-verify", "--no-gpg-sign"]
         # git doesn't like plain email addresses as authors
         if author and '<' in author:
-            cmd.append('--author="%s"' % author)
+            cmd.append('--author=%s' % author)
         if date:
-            cmd.append('--date="%s"' % date)
+            cmd.append('--date=%s' % date)
         return (tmpfile, cmd)
 
     @staticmethod
@@ -521,11 +530,11 @@ class GitApplyTree(PatchTree):
         patches = []
         try:
             for name, rev in startcommits.items():
-                shellcmd = ["git", "format-patch", "--no-signature", "--no-numbered", rev, "-o", tempdir]
+                cmd = ["git", "format-patch", "--no-signature", "--no-numbered", rev, "-o", tempdir]
                 if paths:
-                    shellcmd.append('--')
-                    shellcmd.extend(paths)
-                out = runcmd(["sh", "-c", " ".join(shellcmd)], os.path.join(tree, name))
+                    cmd.append('--')
+                    cmd.extend(paths)
+                out = runcmd(cmd, os.path.join(tree, name))
                 if out:
                     for srcfile in out.split():
                         # This loop, which is used to remove any line that
@@ -578,19 +587,18 @@ class GitApplyTree(PatchTree):
                 check_dirtyness = True
         return check_dirtyness
 
-    def _commitpatch(self, patch, patchfilevar):
+    def _commitpatch(self, patch):
         output = ""
         # Add all files
-        shellcmd = ["git", "add", "-f", "-A", "."]
-        output += runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+        cmd = ["git", "add", "-f", "-A", "."]
+        output += runcmd(cmd, self.dir)
         # Exclude the patches directory
-        shellcmd = ["git", "reset", "HEAD", self.patchdir]
-        output += runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+        cmd = ["git", "reset", "HEAD", self.patchdir]
+        output += runcmd(cmd, self.dir)
         # Commit the result
-        (tmpfile, shellcmd) = self.prepareCommit(patch['file'], self.commituser, self.commitemail)
+        (tmpfile, cmd) = self.prepareCommit(patch['file'], self.commituser, self.commitemail)
         try:
-            shellcmd.insert(0, patchfilevar)
-            output += runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+            output += runcmd(cmd, self.dir)
         finally:
             os.remove(tmpfile)
         return output
@@ -598,16 +606,24 @@ class GitApplyTree(PatchTree):
     def _applypatch(self, patch, force = False, reverse = False, run = True):
         import shutil
 
-        def _applypatchhelper(shellcmd, patch, force = False, reverse = False, run = True):
-            if reverse:
-                shellcmd.append('-R')
+        def _applypatchhelper(cmd, patch, force = False, reverse = False, run = True):
+            cmd = list(cmd)
 
-            shellcmd.append(patch['file'])
+            if reverse:
+                cmd.append('-R')
+
+            cmd.append(patch['file'])
 
             if not run:
-                return "sh" + "-c" + " ".join(shellcmd)
+                return cmd
 
-            return runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+            return runcmd(cmd, self.dir)
+
+        def _committed_fallback_output(output):
+            if not run:
+                return output
+            output += self._commitpatch(patch)
+            return output
 
         reporoot = (runcmd("git rev-parse --show-toplevel".split(), self.dir) or '').strip()
         if not reporoot:
@@ -615,11 +631,10 @@ class GitApplyTree(PatchTree):
 
         patch_applied = True
         try:
-            patchfilevar = 'PATCHFILE="%s"' % os.path.basename(patch['file'])
             if self._need_dirty_check():
                 # Check dirtyness of the tree
                 try:
-                    output = runcmd(["git", "--work-tree=%s" % reporoot, "status", "--short"])
+                    output = runcmd(["git", "--work-tree=%s" % reporoot, "status", "--short"], self.dir)
                 except CmdError:
                     pass
                 else:
@@ -627,42 +642,40 @@ class GitApplyTree(PatchTree):
                         # The tree is dirty, no need to try to apply patches with git anymore
                         # since they fail, fallback directly to patch
                         output = PatchTree._applypatch(self, patch, force, reverse, run)
-                        output += self._commitpatch(patch, patchfilevar)
-                        return output
+                        return _committed_fallback_output(output)
             try:
-                shellcmd = [patchfilevar, "git", "--work-tree=%s" % reporoot]
-                self.gitCommandUserOptions(shellcmd, self.commituser, self.commitemail)
-                shellcmd += ["am", "--committer-date-is-author-date",
-                             "-3", "--keep-cr", "--no-scissors", "-p%s" % patch['strippath']]
-                return _applypatchhelper(shellcmd, patch, force, reverse, run)
+                cmd = ["git", "--work-tree=%s" % reporoot]
+                self.gitCommandUserOptions(cmd, self.commituser, self.commitemail)
+                cmd += ["am", "--committer-date-is-author-date",
+                        "-3", "--keep-cr", "--no-scissors", "-p%s" % patch['strippath']]
+                return _applypatchhelper(cmd, patch, force, reverse, run)
             except CmdError:
                 # Need to abort the git am, or we'll still be within it at the end
                 try:
-                    shellcmd = ["git", "--work-tree=%s" % reporoot, "am", "--abort"]
-                    runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+                    cmd = ["git", "--work-tree=%s" % reporoot, "am", "--abort"]
+                    runcmd(cmd, self.dir)
                 except CmdError:
                     pass
                 # git am won't always clean up after itself, sadly, so...
-                shellcmd = ["git", "--work-tree=%s" % reporoot, "reset", "--hard", "HEAD"]
-                runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+                cmd = ["git", "--work-tree=%s" % reporoot, "reset", "--hard", "HEAD"]
+                runcmd(cmd, self.dir)
                 # Also need to take care of any stray untracked files
-                shellcmd = ["git", "--work-tree=%s" % reporoot, "clean", "-f"]
-                runcmd(["sh", "-c", " ".join(shellcmd)], self.dir)
+                cmd = ["git", "--work-tree=%s" % reporoot, "clean", "-f"]
+                runcmd(cmd, self.dir)
 
                 # Fall back to git apply
-                shellcmd = ["git", "--git-dir=%s" % reporoot, "apply", "-p%s" % patch['strippath']]
+                cmd = ["git", "--git-dir=%s" % reporoot, "apply", "-p%s" % patch['strippath']]
                 try:
-                    output = _applypatchhelper(shellcmd, patch, force, reverse, run)
+                    output = _applypatchhelper(cmd, patch, force, reverse, run)
                 except CmdError:
                     # Fall back to patch
                     output = PatchTree._applypatch(self, patch, force, reverse, run)
-                output += self._commitpatch(patch, patchfilevar)
-                return output
+                return _committed_fallback_output(output)
         except:
             patch_applied = False
             raise
         finally:
-            if patch_applied:
+            if patch_applied and run:
                 GitApplyTree.addNote(self.dir, "HEAD", GitApplyTree.original_patch, os.path.basename(patch['file']), self.commituser, self.commitemail)
 
 
@@ -858,7 +871,7 @@ class UserResolver(Resolver):
                 f.write("echo 'Dropping to a shell, so patch rejects can be fixed manually.'\n")
                 f.write("echo 'Run \"quilt refresh\" when patch is corrected, press CTRL+D to exit.'\n")
                 f.write("echo ''\n")
-                f.write(" ".join(patchcmd) + "\n")
+                f.write(shlex.join(patchcmd) + "\n")
             os.chmod(rcfile, 0o775)
 
             self.terminal("bash --rcfile " + rcfile, 'Patch Rejects: Please fix patch rejects manually', self.patchset.d)

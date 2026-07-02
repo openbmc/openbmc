@@ -1,4 +1,4 @@
-From 6288ba5df0a8c73ef842b609081449ac4de86123 Mon Sep 17 00:00:00 2001
+From 06522edad080caa76f5abc8586fe5baf3b620f16 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 18 Jul 2018 16:58:33 +0800
 Subject: [PATCH] improve reproducibility for c++ compiling
@@ -13,10 +13,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  stringtable.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Index: git/stringtable.h
-===================================================================
---- git.orig/stringtable.h
-+++ git/stringtable.h
+diff --git a/stringtable.h b/stringtable.h
+index aef564824..a04888f3c 100644
+--- a/stringtable.h
++++ b/stringtable.h
 @@ -23,7 +23,7 @@
  
  #if 0 && defined(HAVE_BOOST_UTILITY_STRING_REF_HPP)

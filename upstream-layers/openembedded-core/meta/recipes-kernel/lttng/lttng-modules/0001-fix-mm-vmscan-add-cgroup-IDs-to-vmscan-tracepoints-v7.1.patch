@@ -1,8 +1,7 @@
-From 0d2ee7c9cb79a880c440153beeacd736d1b61a31 Mon Sep 17 00:00:00 2001
+From c3dac15e9e2be4ab818b59a74fda26466cc16c2c Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 11:30:54 -0400
-Subject: [PATCH 4/8] fix: mm: vmscan: add cgroup IDs to vmscan tracepoints
- (v7.1)
+Subject: [PATCH] fix: mm: vmscan: add cgroup IDs to vmscan tracepoints (v7.1)
 
 See upstream commit:
 
@@ -29,7 +28,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 123 insertions(+), 2 deletions(-)
 
 diff --git a/include/instrumentation/events/mm_vmscan.h b/include/instrumentation/events/mm_vmscan.h
-index f33bcbd2..cce06198 100644
+index f33bcbd..cce0619 100644
 --- a/include/instrumentation/events/mm_vmscan.h
 +++ b/include/instrumentation/events/mm_vmscan.h
 @@ -121,7 +121,43 @@ LTTNG_TRACEPOINT_EVENT(mm_vmscan_wakeup_kswapd,
@@ -193,6 +192,3 @@ index f33bcbd2..cce06198 100644
  
  #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(6,7,0) || \
       LTTNG_RHEL_KERNEL_RANGE(5,14,0,427,16,1, 5,15,0,0,0,0))
--- 
-2.43.0
-

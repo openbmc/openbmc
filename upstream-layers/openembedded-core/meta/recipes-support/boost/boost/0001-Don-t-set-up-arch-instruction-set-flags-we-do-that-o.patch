@@ -1,4 +1,4 @@
-From c2c2a53afc46775146c0960fc6c5f714530afa21 Mon Sep 17 00:00:00 2001
+From 98fff479c074472833dcacb815115f247e9023c7 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 18 Dec 2018 15:42:57 +0100
 Subject: [PATCH] Don't set up arch/instruction-set flags, we do that
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 153 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index 2b6caed41..8325a3f65 100644
+index acf02ce26..becd0ad05 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
-@@ -1143,156 +1143,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
+@@ -1150,156 +1150,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :
          <architecture>$(architecture)/<instruction-set>$(instruction-set)
          : $(values) ;
  }
@@ -162,10 +162,10 @@ index 2b6caed41..8325a3f65 100644
 -cpu-flags gcc OPTIONS : s390x : z14 : -march=z14 ;
 -cpu-flags gcc OPTIONS : s390x : z15 : -march=z15 ;
 -# ARM
--cpu-flags gcc OPTIONS : arm : cortex-a9+vfpv3 : -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard ;
+-cpu-flags gcc OPTIONS : arm : cortex-a9+vfpv3 : -mcpu=cortex-a9 -mfpu=vfpv3 ;
 -cpu-flags gcc OPTIONS : arm : cortex-a53 : -mcpu=cortex-a53 ;
 -cpu-flags gcc OPTIONS : arm : cortex-r5 : -mcpu=cortex-r5 ;
--cpu-flags gcc OPTIONS : arm : cortex-r5+vfpv3-d16 : -mcpu=cortex-r5 -mfpu=vfpv3-d16 -mfloat-abi=hard ;
+-cpu-flags gcc OPTIONS : arm : cortex-r5+vfpv3-d16 : -mcpu=cortex-r5 -mfpu=vfpv3-d16 ;
 -# AIX variant of RS/6000 & PowerPC
 -toolset.flags gcc AROPTIONS <address-model>64/<target-os>aix : "-X64" ;
 -

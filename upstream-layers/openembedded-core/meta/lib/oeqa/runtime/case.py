@@ -37,5 +37,5 @@ def run_network_serialdebug(target):
         subprocess.call(["/usr/bin/netstat", "-ei"])
     except (OSError, subprocess.SubprocessError) as e:
         print("netstat failed: %s" % e)
-    subprocess.call(["ps", "-awx"], shell=True)
+    subprocess.call(["ps", "-awx"])
     print("PID: %s %s" % (str(os.getpid()), time.time()))

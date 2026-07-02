@@ -40,6 +40,7 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
            file://unicode.cfg \
            file://rev.cfg \
            file://pgrep.cfg \
+           file://fdisk-gpt.cfg \
            file://rcS \
            file://rcK \
            file://makefile-libbb-race.patch \

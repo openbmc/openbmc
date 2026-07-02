@@ -1,4 +1,7 @@
-configure: add option to enable/disable readline
+From ee20cb1c1ca0337c56087934efbd66ba30d2d5c3 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Mon, 13 Apr 2026 11:28:39 +0100
+Subject: [PATCH] configure: add option to enable/disable readline
 
 Add an option to control explicitly whether systemtap will look for and
 use readline, for reproducible builds.
@@ -10,11 +13,14 @@ not be used.
 
 Upstream-Status: Submitted [https://sourceware.org/pipermail/systemtap/2026q2/028333.html]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac | 67 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 38 insertions(+), 29 deletions(-)
 
-diff --git i/configure.ac w/configure.ac
-index 6fb99da40..01457bafb 100644
---- i/configure.ac
-+++ w/configure.ac
+diff --git a/configure.ac b/configure.ac
+index 6fb99da40..2ec72e85a 100644
+--- a/configure.ac
++++ b/configure.ac
 @@ -525,38 +525,47 @@ AC_CHECK_HEADERS([rpm/rpmcrypto.h], [
                        have_rpmcrypto_h=yes
  		      AC_MSG_NOTICE([separate rpm/rpmcrypto.h])])
@@ -23,7 +29,7 @@ index 6fb99da40..01457bafb 100644
 -dnl
 -dnl First save the orignal value of LIBS.
 -LIBS_no_readline=$LIBS
- 
+-
 -dnl Check how for readline presence and how to link with it. On some
 -dnl systems you need to add a termcap compatible library.
 -have_libreadline="no"
@@ -31,6 +37,7 @@ index 6fb99da40..01457bafb 100644
 -for libtermcap in "" tinfo ncursesw ncurses curses termcap; do
 -  if test -z "$libtermcap"; then
 -    READLINE_LIBS="-lreadline"
++
 +AC_ARG_WITH([readline],
 +  AS_HELP_STRING([--without-readline],[disable use of readline]), [], [with_readline="check"])
 +
@@ -66,17 +73,17 @@ index 6fb99da40..01457bafb 100644
 +    READLINE_LIBS=""
    else
 -    READLINE_LIBS="-lreadline -l$libtermcap"
-+    AC_MSG_RESULT([$READLINE_LIBS])
-+    AC_DEFINE(HAVE_LIBREADLINE, [1],
-+        [Define if you have the readline library (-lreadline).])
-   fi
+-  fi
 -  LIBS="$READLINE_LIBS $LIBS_no_readline"
 -  AC_LINK_IFELSE(
 -    [AC_LANG_CALL([],[readline])],
 -    [have_libreadline="yes"])
 -  if test "$have_libreadline" = "yes"; then
 -    break
--  fi
++    AC_MSG_RESULT([$READLINE_LIBS])
++    AC_DEFINE(HAVE_LIBREADLINE, [1],
++        [Define if you have the readline library (-lreadline).])
+   fi
 -done
 -if test "$have_libreadline" = "no"; then
 -  AC_MSG_RESULT([none])

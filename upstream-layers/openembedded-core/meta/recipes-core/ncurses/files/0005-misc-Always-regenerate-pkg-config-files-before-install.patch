@@ -1,0 +1,38 @@
+From 2ddc64cb7814a2b7dd3ebaafcb66c5e6fbec75b6 Mon Sep 17 00:00:00 2001
+From: Luca Fancellu <luca.fancellu@arm.com>
+Date: Sun, 21 Jun 2026 09:52:00 +0100
+Subject: [PATCH] misc: Always regenerate pkg-config files before install
+
+The pc-files target is a stamp file rather than one of the generated
+pkg-config files.  If the stamp remains in the build directory while the
+generated .pc files are missing, install.libs can skip gen-pkgconfig and then
+silently install no pkg-config files because the install loop ignores missing
+files.
+
+Regenerate the pkg-config files directly from install and install.libs instead
+of relying on the stamp target.  The pc-files stamp remains useful for all and
+sources, but installation now guarantees that the files it is about to copy
+exist in the build tree.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bug-ncurses/2026-06/msg00044.html]
+Signed-off-by: Luca Fancellu <luca.fancellu@arm.com>
+---
+ misc/Makefile.in | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/misc/Makefile.in b/misc/Makefile.in
+index 31fc7f664860..90da6bba73c5 100644
+--- a/misc/Makefile.in
++++ b/misc/Makefile.in
+@@ -153,7 +153,8 @@ install.libs :: $(BINDIR) ncurses-config
+ # pkg-config is not installed.  Work around that by creating the library
+ # directory during this rule:
+ @MAKE_PC_FILES@install \
+-@MAKE_PC_FILES@install.libs :: pc-files
++@MAKE_PC_FILES@install.libs ::
++@MAKE_PC_FILES@	$(SHELL) ./gen-pkgconfig
+ @MAKE_PC_FILES@	@$(SHELL) -c 'case "x$(PKG_CONFIG_LIBDIR)" in \
+ @MAKE_PC_FILES@		x@GLOB_FULLPATH_POSIX@|x@GLOB_FULLPATH_OTHER@) \
+ @MAKE_PC_FILES@			mkdir -p $(INSTALL_CONFIG); \
+-- 
+2.43.0

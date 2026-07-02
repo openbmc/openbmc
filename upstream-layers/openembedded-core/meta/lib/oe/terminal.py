@@ -283,8 +283,8 @@ def check_tmux_pane_size(tmux):
     if not check_tmux_version('1.9'):
         return False
     try:
-        p = sub.Popen('%s list-panes -F "#{?pane_active,#{pane_height},}"' % tmux,
-                shell=True,stdout=sub.PIPE,stderr=sub.PIPE)
+        p = sub.Popen([tmux, "list-panes", "-F", "#{?pane_active,#{pane_height},}"],
+                stdout=sub.PIPE, stderr=sub.PIPE)
         out, err = p.communicate()
         size = int(out.strip())
     except OSError as exc:

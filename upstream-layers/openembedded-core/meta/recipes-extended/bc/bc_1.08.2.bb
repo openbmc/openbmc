@@ -10,6 +10,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
                     file://lib/number.c;endline=20;md5=cf43068cc88f837731dc53240456cfaf"
 
 SECTION = "base"
+
+CVE_PRODUCT = "gnu:bc"
+
 DEPENDS = "flex-native"
 
 SRC_URI = "${GNU_MIRROR}/${BPN}/${BP}.tar.gz \

@@ -11,8 +11,6 @@ inherit packagegroup
 
 VIRTUAL-RUNTIME_vim ?= "vim-tiny"
 
-PACKAGE_ARCH = "${MACHINE_ARCH}"
-
 RDEPENDS:${PN} = "\
     base-passwd \
     bash \

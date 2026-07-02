@@ -433,10 +433,12 @@ def get_host_gcc_version(d, taskcontextonly=False):
         # datastore PATH does not contain session PATH as set by environment-setup-...
         # this breaks the install-buildtools use-case
         # env["PATH"] = d.getVar("PATH")
-        output = subprocess.check_output("gcc --version", \
-                    shell=True, env=env, stderr=subprocess.STDOUT).decode("utf-8")
+        output = subprocess.check_output(["gcc", "--version"], \
+                    env=env, stderr=subprocess.STDOUT).decode("utf-8")
     except subprocess.CalledProcessError as e:
         bb.fatal("Error running gcc --version: %s" % (e.output.decode("utf-8")))
+    except OSError as e:
+        bb.fatal("Error running gcc --version: %s" % e)
 
     match = re.match(r".* (\d+\.\d+)\.\d+.*", output.split('\n')[0])
     if not match:

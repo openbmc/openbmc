@@ -31,7 +31,7 @@ PV .= "${@bb.utils.contains('RUST_CHANNEL', 'stable', '', '-${RUST_CHANNEL}', d)
 
 export FORCE_CRATE_HASH = "${BB_TASKHASH}"
 
-RUST_ALTERNATE_EXE_PATH ?= "${STAGING_BINDIR}/llvm-config"
+RUST_ALTERNATE_EXE_PATH = "${STAGING_BINDIR_CROSS}/llvm-config"
 RUST_ALTERNATE_EXE_PATH_NATIVE = "${STAGING_BINDIR_NATIVE}/llvm-config"
 
 # We don't want to use bitbakes vendoring because the rust sources do their
@@ -192,35 +192,20 @@ python do_configure() {
     bb.build.exec_func("setup_cargo_environment", d)
 }
 
-# llvm-config expects static/dynamic libraries to be in the 'lib' directory rather than 'lib64' when
-# multilibs enabled. Since we are copying the natively built llvm-config into the target sysroot
-# and executing it there, it will default to searching in 'lib', as it is unaware of the 'lib64'
-# directory. To ensure llvm-config can locate the necessary libraries, create a symlink from 'lib'
-do_compile:append:class-target() {
-    # Ensure llvm-config can find static libraries in multilib setup
-    lib64_dir="${STAGING_DIR_TARGET}/usr/lib64"
-    lib_dir="${STAGING_DIR_TARGET}/usr/lib"
-
-    if [ -d "$lib64_dir" ]; then
-        # If lib does not exist, symlink it to lib64
-        if [ ! -e "$lib_dir" ]; then
-            ln -s lib64 "$lib_dir"
-        fi
-
-        # Only do per-file symlinking if lib is a real directory (not symlink)
-        if [ -d "$lib_dir" ] && [ ! -L "$lib_dir" ]; then
-            for lib64_file in "${lib64_dir}"/libLLVM*.a "${lib64_dir}"/libLLVM*.so*; do
-                if [ -e "$lib64_file" ]; then
-                    lib_name=$(basename "${lib64_file}")
-                    target_link="${lib_dir}/${lib_name}"
-
-                    if [ ! -e "${target_link}" ]; then
-                        ln -s "../lib64/${lib_name}" "${target_link}"
-                    fi
-                fi
-            done
-        fi
+replace_llvm_config_path() {
+    if [ -f "${STAGING_BINDIR_CROSS}/llvm-config" ]; then
+        sed -i \
+            's#@LLVM_CONFIG_PATH@#${RUST_ALTERNATE_EXE_PATH_NATIVE}#g' \
+            ${RUST_ALTERNATE_EXE_PATH}
     fi
+}
+
+do_compile:append:class-target() {
+    replace_llvm_config_path
+}
+
+do_compile:append:class-nativesdk() {
+    replace_llvm_config_path
 }
 
 rust_runx () {
@@ -235,14 +220,6 @@ rust_runx () {
     unset CPPFLAGS
 
     export RUSTFLAGS="${RUST_DEBUG_REMAP} -Clink-arg=-lz -Clink-arg=-lzstd"
-
-    # Copy the natively built llvm-config into the target so we can run it. Horrible,
-    # but works!
-    if [ ${RUST_ALTERNATE_EXE_PATH_NATIVE} != ${RUST_ALTERNATE_EXE_PATH} -a ! -f ${RUST_ALTERNATE_EXE_PATH} ]; then
-        mkdir -p `dirname ${RUST_ALTERNATE_EXE_PATH}`
-        cp ${RUST_ALTERNATE_EXE_PATH_NATIVE} ${RUST_ALTERNATE_EXE_PATH}
-        patchelf --remove-rpath ${RUST_ALTERNATE_EXE_PATH}
-    fi
 
     oe_cargo_fix_env
 
@@ -263,6 +240,7 @@ do_compile () {
 
 do_test_compile[dirs] = "${B}"
 do_test_compile () {
+    replace_llvm_config_path
     rust_runx build src/tools/remote-test-server --target "${RUST_TARGET_SYS}"
 }
 

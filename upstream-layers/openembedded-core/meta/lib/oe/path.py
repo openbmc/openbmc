@@ -122,8 +122,8 @@ def copyhardlinktree(src, dst):
     if (canhard):
         # Need to copy directories only with tar first since cp will error if two 
         # writers try and create a directory at the same time
-        cmd = "cd %s; find . -type d -print | tar --xattrs --xattrs-include='*' -cf - -S -C %s -p --no-recursion --files-from - | tar --xattrs --xattrs-include='*' -xhf - -C %s" % (src, src, dst)
-        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT)
+        cmd = "find . -type d -print | tar --xattrs --xattrs-include='*' -cf - -S -C %s -p --no-recursion --files-from - | tar --xattrs --xattrs-include='*' -xhf - -C %s" % (src, dst)
+        subprocess.check_output(cmd, shell=True, stderr=subprocess.STDOUT, cwd=src)
         source = ''
         if os.path.isdir(src):
             if len(glob.glob('%s/.??*' % src)) > 0:

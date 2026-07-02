@@ -1,0 +1,25 @@
+#!/bin/sh
+
+EXPECT_FAIL=1
+EXPECT_PASS=0
+
+cd tests  
+
+for t in uns_test psx_test libcap_launch_test cap_test exploit noexploit; do
+        output=$("./$t" 2>&1 )
+        status=$?
+
+        expected="$EXPECT_PASS"
+
+        if [ $t = 'exploit' ]; then
+                expected="$EXPECT_FAIL"
+        fi
+
+        if [ "$status" -eq "$expected" ]; then
+                echo "PASS: $t"
+        else
+                echo "FAIL: $t"
+                echo "$output"
+        fi
+done
+

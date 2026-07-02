@@ -21,7 +21,7 @@ import subprocess
 
 def _is_repo_git_repo(repodir):
     try:
-        curr_toplevel = subprocess.check_output("git -C %s rev-parse --show-toplevel" % repodir, shell=True, stderr=subprocess.DEVNULL)
+        curr_toplevel = subprocess.check_output(['git', '-C', repodir, 'rev-parse', '--show-toplevel'], stderr=subprocess.DEVNULL)
         if curr_toplevel.strip().decode("utf-8") == repodir:
             return True
     except subprocess.CalledProcessError:
@@ -30,7 +30,7 @@ def _is_repo_git_repo(repodir):
 
 def _is_repo_at_rev(repodir, rev):
     try:
-        curr_rev = subprocess.check_output("git -C %s rev-parse HEAD" % repodir, shell=True, stderr=subprocess.DEVNULL)
+        curr_rev = subprocess.check_output(['git', '-C', repodir, 'rev-parse', 'HEAD'], stderr=subprocess.DEVNULL)
         if curr_rev.strip().decode("utf-8") == rev:
             return True
     except subprocess.CalledProcessError:
@@ -39,7 +39,7 @@ def _is_repo_at_rev(repodir, rev):
 
 def _is_repo_at_remote_uri(repodir, remote, uri):
     try:
-        curr_uri = subprocess.check_output("git -C %s remote get-url %s" % (repodir, remote), shell=True, stderr=subprocess.DEVNULL)
+        curr_uri = subprocess.check_output(['git', '-C', repodir, 'remote', 'get-url', remote], stderr=subprocess.DEVNULL)
         if curr_uri.strip().decode("utf-8") == uri:
             return True
     except subprocess.CalledProcessError:
@@ -113,28 +113,33 @@ def _do_checkout(args, json):
 
         print('\nSetting up source {}, revision {}, branch {}'.format(r_name, desc, branch))
         if not _is_repo_git_repo(repodir):
-            cmd = 'git init -q {}'.format(repodir)
+            cmd = ['git', 'init', '-q', repodir]
             print("Running '{}'".format(cmd))
-            subprocess.check_output(cmd, shell=True)
+            subprocess.check_output(cmd)
 
         for remote in remotes:
             if not _is_repo_at_remote_uri(repodir, remote, remotes[remote]['uri']):
-                cmd = "git remote remove {} > /dev/null 2>&1; git remote add {} {}".format(remote, remote, remotes[remote]['uri'])
+                cmd = ['git', 'remote', 'remove', remote]
+                # Ignore errors
+                subprocess.run(cmd, cwd=repodir)
+                cmd = ['git', 'remote', 'add', remote, remotes[remote]['uri']]
                 print("Running '{}' in {}".format(cmd, repodir))
-                subprocess.check_output(cmd, shell=True, cwd=repodir)
+                subprocess.check_output(cmd, cwd=repodir)
 
-                cmd = "git fetch -q {} || true".format(remote)
+                cmd = ['git', 'fetch', '-q', remote]
                 print("Running '{}' in {}".format(cmd, repodir))
-                subprocess.check_output(cmd, shell=True, cwd=repodir)
+                # Ignore errors
+                subprocess.run(cmd, cwd=repodir)
 
         if not _is_repo_at_rev(repodir, rev):
-            cmd = "git fetch -q --all || true"
+            cmd = ['git', 'fetch', '-q', '--all']
             print("Running '{}' in {}".format(cmd, repodir))
-            subprocess.check_output(cmd, shell=True, cwd=repodir)
+            # Ignore errors
+            subprocess.run(cmd, cwd=repodir)
 
-            cmd = 'git checkout -q {}'.format(rev)
+            cmd = ['git', 'checkout', '-q', rev]
             print("Running '{}' in {}".format(cmd, repodir))
-            subprocess.check_output(cmd, shell=True, cwd=repodir)
+            subprocess.check_output(cmd, cwd=repodir)
 
             if _contains_submodules(repodir):
                 print("Repo {} contains submodules, use 'git submodule update' to ensure they are up to date".format(repodir))
@@ -156,7 +161,7 @@ parser.add_argument('--force-bootstraplayer-checkout', action='store_true',
         help='Force the checkout of the layer containing this file (by default it is presumed that as this script is in it, the layer is already in place).')
 
 try:
-    defaultdest = os.path.dirname(subprocess.check_output('git rev-parse --show-toplevel', universal_newlines=True, shell=True, cwd=os.path.dirname(__file__)))
+    defaultdest = os.path.dirname(subprocess.check_output(['git', 'rev-parse', '--show-toplevel'], universal_newlines=True, cwd=os.path.dirname(__file__)))
 except subprocess.CalledProcessError as e:
     defaultdest = os.path.abspath(".")
 

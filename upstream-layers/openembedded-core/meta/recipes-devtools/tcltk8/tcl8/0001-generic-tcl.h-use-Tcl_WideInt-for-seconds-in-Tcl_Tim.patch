@@ -1,4 +1,4 @@
-From 7d404d1827ffb69a2aa7b60c10b435c6f47f7bfb Mon Sep 17 00:00:00 2001
+From 9f78045af22aa2217d7ec0233348983751223c89 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 18 Aug 2023 12:25:11 +0200
 Subject: [PATCH] generic/tcl.h: use Tcl_WideInt for seconds in Tcl_Time
@@ -19,7 +19,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/generic/tcl.h b/generic/tcl.h
-index d8fd70a..ffff4b1 100644
+index 83f07e6..16e99f8 100644
 --- a/generic/tcl.h
 +++ b/generic/tcl.h
 @@ -1425,7 +1425,7 @@ typedef enum {

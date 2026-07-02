@@ -94,6 +94,13 @@ python do_compile() {
         for dtb in kernel_devicetree.split():
             # In deploy_dir the DTBs are without sub-directories also with KERNEL_DTBVENDORED = "1"
             dtb_name = os.path.basename(dtb)
+            # With vendored DTs, use the DT name as listed in KERNEL_DEVICETREE
+            # and replace any path separators with underscores, this behaves the
+            # same way as KERNEL_DTBVENDORED = "1" did in OE 5.0 and older.
+            if d.getVar('KERNEL_DTBVENDORED') != "1":
+                conf_name = dtb_name
+            else:
+                conf_name = dtb.replace('/', '_')
 
             # Skip DTB if it's also provided in EXTERNAL_KERNEL_DEVICETREE directory
             if external_kernel_devicetree:
@@ -103,7 +110,7 @@ python do_compile() {
 
             # Copy the dtb or dtbo file into the FIT image assembly directory
             shutil.copyfile(os.path.join(kernel_deploydir, dtb_name), dtb_name)
-            root_node.fitimage_emit_section_dtb(dtb_name, dtb_name,
+            root_node.fitimage_emit_section_dtb(conf_name, dtb_name,
                 d.getVar("UBOOT_DTB_LOADADDRESS"), d.getVar("UBOOT_DTBO_LOADADDRESS"))
 
     if external_kernel_devicetree:

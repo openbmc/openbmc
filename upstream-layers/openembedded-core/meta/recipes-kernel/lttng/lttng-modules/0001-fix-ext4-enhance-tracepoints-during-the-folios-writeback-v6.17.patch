@@ -1,8 +1,8 @@
-From 329ef88b9ae02228387f55a61ca1cef87a5cf3f4 Mon Sep 17 00:00:00 2001
+From 8abda1d7c6b4a6346ef79e1b677ced4077c6b96e Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 16:22:42 -0400
-Subject: [PATCH 7/8] fix: ext4: enhance tracepoints during the folios
- writeback (v6.17)
+Subject: [PATCH] fix: ext4: enhance tracepoints during the folios writeback
+ (v6.17)
 
 See upstream commits:
 
@@ -38,7 +38,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 34 insertions(+)
 
 diff --git a/include/instrumentation/events/ext4.h b/include/instrumentation/events/ext4.h
-index 75f92b31..fa5de84d 100644
+index 75f92b3..fa5de84 100644
 --- a/include/instrumentation/events/ext4.h
 +++ b/include/instrumentation/events/ext4.h
 @@ -242,6 +242,39 @@ LTTNG_TRACEPOINT_EVENT(ext4_da_writepages,
@@ -89,6 +89,3 @@ index 75f92b31..fa5de84d 100644
  
  LTTNG_TRACEPOINT_EVENT(ext4_da_write_pages_extent,
  	TP_PROTO(struct inode *inode, struct ext4_map_blocks *map),
--- 
-2.43.0
-

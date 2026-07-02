@@ -143,6 +143,9 @@ do_configure() {
 }
 do_configure[cleandirs] += "${B}"
 
+# Use the Meson progress regex as qemu uses meson internally
+do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
+
 do_install () {
 	export STRIP=""
 	oe_runmake 'DESTDIR=${D}' install

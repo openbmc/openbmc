@@ -73,9 +73,6 @@ CVE_CHECK_LAYER_INCLUDELIST ??= ""
 CVE_VERSION_SUFFIX ??= ""
 
 python () {
-    if bb.data.inherits_class("cve-check", d):
-        raise bb.parse.SkipRecipe("Skipping recipe: found incompatible combination of cve-check and vex enabled at the same time.")
-
     from oe.cve_check import extend_cve_status
     extend_cve_status(d)
 }

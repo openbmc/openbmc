@@ -47,7 +47,7 @@ class TestSDKExt(TestSDKBase):
         bb.utils.remove(sdk_dir, True)
         bb.utils.mkdirhier(sdk_dir)
         try:
-            subprocess.check_output("%s -y -d %s" % (tcname, sdk_dir), shell=True)
+            subprocess.check_output([tcname, '-y', '-d', sdk_dir])
         except subprocess.CalledProcessError as e:
             msg = "Couldn't install the extensible SDK:\n%s" % e.output.decode("utf-8")
             logfn = os.path.join(sdk_dir, 'preparing_build_system.log')

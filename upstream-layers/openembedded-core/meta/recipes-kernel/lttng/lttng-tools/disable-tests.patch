@@ -1,4 +1,4 @@
-From 05cf8ed6cc42a2f6ff53009d0ae2713fe63f1245 Mon Sep 17 00:00:00 2001
+From 44c14ba25747ccee72667212003658447d8297ae Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 14 Dec 2021 12:34:04 +0000
 Subject: [PATCH] lttng-tools: Disable problem tests
@@ -14,14 +14,14 @@ https://bugzilla.yoctoproject.org/show_bug.cgi?id=14263
 
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
 ---
- tests/regression/Makefile.am | 12 ------------
- 1 file changed, 12 deletions(-)
+ tests/regression/Makefile.am | 13 -------------
+ 1 file changed, 13 deletions(-)
 
 diff --git a/tests/regression/Makefile.am b/tests/regression/Makefile.am
-index 7076488..e5be904 100644
+index 6730ff9..a7cd133 100644
 --- a/tests/regression/Makefile.am
 +++ b/tests/regression/Makefile.am
-@@ -40,18 +40,6 @@ SERIAL_TESTS = tools/base-path/test_ust \
+@@ -46,19 +46,6 @@ SERIAL_TESTS = tools/base-path/test_ust \
  	tools/regen-metadata/test_ust \
  	tools/regen-statedump/test_kernel \
  	tools/regen-statedump/test_ust \
@@ -37,6 +37,7 @@ index 7076488..e5be904 100644
 -	tools/notification/test_notification_notifier_discarded_count \
 -	tools/notification/test_notification_kernel_userspace_probe \
 -	tools/notification/test_notification_multi_app \
+-	tools/notification/test_rotation \
  	tools/rotation/test_ust \
  	tools/rotation/test_kernel \
  	tools/rotation/test_ust_kernel \

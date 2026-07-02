@@ -33,8 +33,6 @@ INITSCRIPT_PARAMS:${PN}-service = "start 03 2 3 4 5 . stop 30 0 6 1 ."
 SYSTEMD_PACKAGES = "${PN}-service"
 SYSTEMD_SERVICE:${PN}-service = "rng-tools.service"
 
-CFLAGS += " -DJENT_CONF_ENABLE_INTERNAL_TIMER "
-
 PACKAGES =+ "${PN}-service"
 
 FILES:${PN}-service += " \

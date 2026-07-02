@@ -1,4 +1,4 @@
-From 00e2905dc622f98f608d253b1148a3d778131cad Mon Sep 17 00:00:00 2001
+From 5180d1866b99125d3353f76151e84644a5791e3d Mon Sep 17 00:00:00 2001
 From: Kai Kang <kai.kang@windriver.com>
 Date: Tue, 14 Oct 2025 01:37:35 +0000
 Subject: [PATCH] There are conflict of config files between kea and lib32-kea:
@@ -19,27 +19,12 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
 Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
- src/bin/keactrl/kea-ctrl-agent.conf.pre | 3 ++-
- src/bin/keactrl/kea-dhcp4.conf.pre      | 6 +++---
- src/bin/keactrl/kea-dhcp6.conf.pre      | 6 +++---
- 3 files changed, 8 insertions(+), 7 deletions(-)
+ src/bin/keactrl/kea-dhcp4.conf.pre | 6 +++---
+ src/bin/keactrl/kea-dhcp6.conf.pre | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/src/bin/keactrl/kea-ctrl-agent.conf.pre b/src/bin/keactrl/kea-ctrl-agent.conf.pre
-index 29d8111..de71f41 100644
---- a/src/bin/keactrl/kea-ctrl-agent.conf.pre
-+++ b/src/bin/keactrl/kea-ctrl-agent.conf.pre
-@@ -85,7 +85,8 @@
-     // Agent will fail to start.
-     "hooks-libraries": [
- //  {
--//      "library": "@libdir@/kea/hooks/control-agent-commands.so",
-+//      // Replace $libdir with real library path /usr/lib or /usr/lib64
-+//      "library": "$libdir/kea/hooks/control-agent-commands.so",
- //      "parameters": {
- //          "param1": "foo"
- //      }
 diff --git a/src/bin/keactrl/kea-dhcp4.conf.pre b/src/bin/keactrl/kea-dhcp4.conf.pre
-index 2a58507..86b5abf 100644
+index a6030eb..a1eedcd 100644
 --- a/src/bin/keactrl/kea-dhcp4.conf.pre
 +++ b/src/bin/keactrl/kea-dhcp4.conf.pre
 @@ -255,7 +255,7 @@
@@ -69,7 +54,7 @@ index 2a58507..86b5abf 100644
      // ],
  
 diff --git a/src/bin/keactrl/kea-dhcp6.conf.pre b/src/bin/keactrl/kea-dhcp6.conf.pre
-index c69a508..2bb488f 100644
+index a16171f..14fe3f4 100644
 --- a/src/bin/keactrl/kea-dhcp6.conf.pre
 +++ b/src/bin/keactrl/kea-dhcp6.conf.pre
 @@ -201,7 +201,7 @@

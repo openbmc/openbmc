@@ -1,7 +1,7 @@
-From e80f709c4665a333da82b27605c26a3afccb299f Mon Sep 17 00:00:00 2001
+From 22078c50f8093b80741e080e17a3196fe074884c Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 16:01:09 -0400
-Subject: [PATCH 8/8] fix: ext4: widen trace event i_ino fields to u64 (v7.1)
+Subject: [PATCH] fix: ext4: widen trace event i_ino fields to u64 (v7.1)
 
 See upstream commit:
 
@@ -24,7 +24,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 1048 insertions(+), 75 deletions(-)
 
 diff --git a/include/instrumentation/events/ext4.h b/include/instrumentation/events/ext4.h
-index fa5de84d..43b93cde 100644
+index fa5de84..43b93cd 100644
 --- a/include/instrumentation/events/ext4.h
 +++ b/include/instrumentation/events/ext4.h
 @@ -26,6 +26,95 @@ struct ext4_extent;
@@ -1419,6 +1419,3 @@ index fa5de84d..43b93cde 100644
  
  #if (LTTNG_LINUX_VERSION_CODE >= LTTNG_KERNEL_VERSION(5,10,0))
  LTTNG_TRACEPOINT_EVENT(ext4_fc_replay_scan,
--- 
-2.43.0
-

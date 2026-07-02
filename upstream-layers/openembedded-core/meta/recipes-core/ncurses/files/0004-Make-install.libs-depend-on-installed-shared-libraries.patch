@@ -1,0 +1,267 @@
+From f2c153984dceb8b25a7612b744598cf01ded809f Mon Sep 17 00:00:00 2001
+From: Luca Fancellu <luca.fancellu@arm.com>
+Date: Thu, 11 Jun 2026 10:46:21 +0100
+Subject: [PATCH] Make install.libs depend on installed shared libraries
+
+The generated library Makefiles list the build-tree library outputs in
+LIBRARIES, but there is no matching aggregate for the installed shared
+libraries.  Instead, install and install.libs get their installed-file
+prerequisites only from the per-library rules emitted later.
+
+That can miss a library in split installs.  For example, after installing a
+narrow build first, $(LIBDIR)/libtinfo.so.$(REL_VERSION) already exists.  A
+subsequent wide install.libs with --with-termlib=tinfo --with-ticlib can
+install libticw, libpanelw, libmenuw and libformw, while not relinking
+$(LIBDIR)/libncursesw.so.$(REL_VERSION).
+
+Track the installed shared-library targets separately and make install and
+install.libs depend on that aggregate.  This keeps the generated install target
+consistent with LIBRARIES and forces all installed shared libraries in the
+directory to be considered.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/bug-ncurses/2026-06/msg00043.html]
+Signed-off-by: Luca Fancellu <luca.fancellu@arm.com>
+---
+ aclocal.m4          | 13 +++++++++++++
+ c++/Makefile.in     |  4 ++++
+ configure           | 13 +++++++++++++
+ form/Makefile.in    |  4 ++++
+ menu/Makefile.in    |  4 ++++
+ ncurses/Makefile.in |  4 ++++
+ panel/Makefile.in   |  4 ++++
+ 7 files changed, 46 insertions(+)
+
+diff --git a/aclocal.m4 b/aclocal.m4
+index 1463b247fb92..dbd521a88978 100644
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -4838,6 +4838,7 @@ do
+ 
+ 		SHARED_LIB=
+ 		Libs_To_Make=
++		Libs_To_Install=
+ 		cf_awk_program=
+ 		if test -n "${cf_cv_abi_default}" && test "x${cf_cv_abi_default}" != "x5"
+ 		then
+@@ -4951,12 +4952,18 @@ CF_EOF
+ 			fi
+ 			cf_add_lib="../lib/${cf_prefix}${cf_libname}${cf_suffix}"
+ 			Libs_To_Make="$Libs_To_Make $cf_add_lib"
++			if test "$cf_item" = shared && test "$cf_dir" != c++
++			then
++				cf_add_inst='$(LIBDIR)'"/${cf_prefix}${cf_libname}${cf_suffix}"
++				Libs_To_Install="$Libs_To_Install $cf_add_inst"
++			fi
+ 		done
+ 
+ 		if test "$cf_dir" = ncurses ; then
+ 			cf_subsets="$LIB_SUBSETS"
+ 			cf_r_parts="$cf_subsets"
+ 			cf_liblist="$Libs_To_Make"
++			cf_instlist="$Libs_To_Install"
+ 
+ 			while test -n "$cf_r_parts"
+ 			do
+@@ -4967,9 +4974,11 @@ CF_EOF
+ 					case "$cf_l_parts" in
+ 					(*termlib*)
+ 						cf_add_lib=`echo "$cf_liblist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TINFO_LIB_SUFFIX}%g`
++						cf_add_inst=`echo "$cf_instlist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TINFO_LIB_SUFFIX}%g`
+ 						;;
+ 					(*ticlib*)
+ 						cf_add_lib=`echo "$cf_liblist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TICS_LIB_SUFFIX}%g`
++						cf_add_inst=`echo "$cf_instlist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TICS_LIB_SUFFIX}%g`
+ 						;;
+ 					(*)
+ 						break
+@@ -4978,6 +4987,9 @@ CF_EOF
+ 					if test -n "$cf_add_lib"; then
+ 						Libs_To_Make="$cf_add_lib $Libs_To_Make"
+ 					fi
++					if test -n "$cf_add_inst"; then
++						Libs_To_Install="$cf_add_inst $Libs_To_Install"
++					fi
+ 				else
+ 					break
+ 				fi
+@@ -5014,6 +5026,7 @@ CF_EOF
+ 		fi
+ 
+ 		sed -e "s%@Libs_To_Make@%$Libs_To_Make%" \
++		    -e "s%@Libs_To_Install@%$Libs_To_Install%" \
+ 		    -e "s%@SHARED_LIB@%$SHARED_LIB%" \
+ 			"$cf_dir/Makefile" >$cf_dir/Makefile.out
+ 		mv "$cf_dir/Makefile.out" "$cf_dir/Makefile"
+diff --git a/c++/Makefile.in b/c++/Makefile.in
+index f03468bb519b..15746e20ca42 100644
+--- a/c++/Makefile.in
++++ b/c++/Makefile.in
+@@ -129,6 +129,7 @@ LIBNAME_NORMAL	= @LIB_PREFIX@$(LIBROOT)@ABI_SUFFIX@.a
+ LIBNAME		= @LIB_PREFIX@$(LIBROOT)@CXX_LIB_SUFFIX@
+ 
+ LIBRARIES	= @Libs_To_Make@
++INSTALL_LIBRARIES = @Libs_To_Install@
+ 
+ LINT		= @LINT@
+ LINT_OPTS	= @LINT_OPTS@
+@@ -184,6 +185,9 @@ AUTO_SRC	= \
+ all \
+ libs ::		$(AUTO_SRC) $(LIBRARIES)
+ 
++install \
++install.libs :: $(INSTALL_LIBRARIES)
++
+ @MAKE_TESTS@all ::		demo$x
+ 
+ depend :
+diff --git a/configure b/configure
+index 48ad381ffd83..f1351415cbb9 100755
+--- a/configure
++++ b/configure
+@@ -31344,6 +31344,7 @@ do
+ 
+ 		SHARED_LIB=
+ 		Libs_To_Make=
++		Libs_To_Install=
+ 		cf_awk_program=
+ 		if test -n "${cf_cv_abi_default}" && test "x${cf_cv_abi_default}" != "x5"
+ 		then
+@@ -31546,12 +31547,18 @@ eval cf_libname="\$${cf_map_lib_basename}_NAME"
+ 			fi
+ 			cf_add_lib="../lib/${cf_prefix}${cf_libname}${cf_suffix}"
+ 			Libs_To_Make="$Libs_To_Make $cf_add_lib"
++			if test "$cf_item" = shared && test "$cf_dir" != c++
++			then
++				cf_add_inst='$(LIBDIR)'"/${cf_prefix}${cf_libname}${cf_suffix}"
++				Libs_To_Install="$Libs_To_Install $cf_add_inst"
++			fi
+ 		done
+ 
+ 		if test "$cf_dir" = ncurses ; then
+ 			cf_subsets="$LIB_SUBSETS"
+ 			cf_r_parts="$cf_subsets"
+ 			cf_liblist="$Libs_To_Make"
++			cf_instlist="$Libs_To_Install"
+ 
+ 			while test -n "$cf_r_parts"
+ 			do
+@@ -31562,9 +31569,11 @@ eval cf_libname="\$${cf_map_lib_basename}_NAME"
+ 					case "$cf_l_parts" in
+ 					(*termlib*)
+ 						cf_add_lib=`echo "$cf_liblist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TINFO_LIB_SUFFIX}%g`
++						cf_add_inst=`echo "$cf_instlist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TINFO_LIB_SUFFIX}%g`
+ 						;;
+ 					(*ticlib*)
+ 						cf_add_lib=`echo "$cf_liblist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TICS_LIB_SUFFIX}%g`
++						cf_add_inst=`echo "$cf_instlist" |sed -e s%${LIB_NAME}${ABI_SUFFIX}%${TICS_LIB_SUFFIX}%g`
+ 						;;
+ 					(*)
+ 						break
+@@ -31573,6 +31582,9 @@ eval cf_libname="\$${cf_map_lib_basename}_NAME"
+ 					if test -n "$cf_add_lib"; then
+ 						Libs_To_Make="$cf_add_lib $Libs_To_Make"
+ 					fi
++					if test -n "$cf_add_inst"; then
++						Libs_To_Install="$cf_add_inst $Libs_To_Install"
++					fi
+ 				else
+ 					break
+ 				fi
+@@ -31609,6 +31621,7 @@ eval cf_libname="\$${cf_map_lib_basename}_NAME"
+ 		fi
+ 
+ 		sed -e "s%@Libs_To_Make@%$Libs_To_Make%" \
++		    -e "s%@Libs_To_Install@%$Libs_To_Install%" \
+ 		    -e "s%@SHARED_LIB@%$SHARED_LIB%" \
+ 			"$cf_dir/Makefile" >$cf_dir/Makefile.out
+ 		mv "$cf_dir/Makefile.out" "$cf_dir/Makefile"
+diff --git a/form/Makefile.in b/form/Makefile.in
+index 753e42faad72..f75ad26678fd 100644
+--- a/form/Makefile.in
++++ b/form/Makefile.in
+@@ -130,6 +130,7 @@ ABI_VERSION	= @cf_cv_abi_version@
+ RANLIB		= @LIB_PREP@
+ 
+ LIBRARIES	= @Libs_To_Make@
++INSTALL_LIBRARIES = @Libs_To_Install@
+ 
+ LINT		= @LINT@
+ LINT_OPTS	= @LINT_OPTS@
+@@ -156,6 +157,9 @@ all \
+ libs \
+ install ::	$(AUTO_SRC) $(LIBRARIES)
+ 
++install \
++install.libs :: $(INSTALL_LIBRARIES)
++
+ check ::
+ 	@echo "no unit-test implemented"
+ 
+diff --git a/menu/Makefile.in b/menu/Makefile.in
+index 5f96e76f944c..34cec6f51268 100644
+--- a/menu/Makefile.in
++++ b/menu/Makefile.in
+@@ -130,6 +130,7 @@ ABI_VERSION	= @cf_cv_abi_version@
+ RANLIB		= @LIB_PREP@
+ 
+ LIBRARIES	= @Libs_To_Make@
++INSTALL_LIBRARIES = @Libs_To_Install@
+ 
+ LINT		= @LINT@
+ LINT_OPTS	= @LINT_OPTS@
+@@ -158,6 +159,9 @@ all \
+ libs \
+ install ::	$(AUTO_SRC) $(LIBRARIES)
+ 
++install \
++install.libs :: $(INSTALL_LIBRARIES)
++
+ check ::
+ 	@echo "no unit-test implemented"
+ 
+diff --git a/ncurses/Makefile.in b/ncurses/Makefile.in
+index fbe2153baa7e..ac35a8274702 100644
+--- a/ncurses/Makefile.in
++++ b/ncurses/Makefile.in
+@@ -150,6 +150,7 @@ ABI_VERSION	= @cf_cv_abi_version@
+ RANLIB		= @LIB_PREP@
+ 
+ LIBRARIES	= @Libs_To_Make@
++INSTALL_LIBRARIES = @Libs_To_Install@
+ 
+ LINT		= @LINT@
+ LINT_OPTS	= @LINT_OPTS@
+@@ -235,6 +236,9 @@ all libs ::	$(AUTO_SRC) ../lib $(LIBRARIES)
+ 
+ @CHECK_BUILD@all libs ::	report_offsets$(BUILD_EXEEXT)
+ 
++install \
++install.libs :: $(INSTALL_LIBRARIES)
++
+ sources:	$(AUTO_SRC)
+ 
+ $(BINDIR) \
+diff --git a/panel/Makefile.in b/panel/Makefile.in
+index 53abc3625f57..e16a5dd43525 100644
+--- a/panel/Makefile.in
++++ b/panel/Makefile.in
+@@ -132,6 +132,7 @@ ABI_VERSION	= @cf_cv_abi_version@
+ RANLIB		= @LIB_PREP@
+ 
+ LIBRARIES	= @Libs_To_Make@
++INSTALL_LIBRARIES = @Libs_To_Install@
+ 
+ LINT		= @LINT@
+ LINT_OPTS	= @LINT_OPTS@
+@@ -158,6 +159,9 @@ all \
+ libs \
+ install ::	$(AUTO_SRC) $(LIBRARIES)
+ 
++install \
++install.libs :: $(INSTALL_LIBRARIES)
++
+ check ::
+ 	@echo "no unit-test implemented"
+ 
+-- 
+2.34.1

@@ -11,7 +11,7 @@ LDSHARED += "-pthread"
 # NOTE: Make sure to keep this recipe at the same version as python3-cryptography-vectors
 #       Upgrade both recipes at the same time
 require python3-cryptography-common.inc
-SRC_URI[sha256sum] = "5c3932f4436d1cccb036cb0eaef46e6e2db91035166f1ad6505c3c9d5a635920"
+SRC_URI[sha256sum] = "f89660a348f4f78a92366240a61404e337586ef7f5909a2fef59ca88ef505493"
 
 SRC_URI += "file://0001-pyproject.toml-remove-benchmark-disable-option.patch \
             file://check-memfree.py \
@@ -26,6 +26,8 @@ PACKAGECONFIG ??= ""
 PACKAGECONFIG[legacy-openssl] = ",,,openssl-ossl-module-legacy"
 
 export CRYPTOGRAPHY_BUILD_OPENSSL_NO_LEGACY = "${@bb.utils.contains('PACKAGECONFIG', 'legacy-openssl', '0', '1', d)}"
+
+TARGET_CFLAGS:append = " -I${STAGING_INCDIR}/python${PYTHON_BASEVERSION}"
 
 DEPENDS += " \
     python3-cffi-native \

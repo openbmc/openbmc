@@ -16,28 +16,28 @@ def get_scmbasepath(d):
 
 def get_metadata_git_branch(path):
     try:
-        rev, _ = bb.process.run('git rev-parse --abbrev-ref HEAD', cwd=path)
+        rev, _ = bb.process.run(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], cwd=path)
     except (bb.process.ExecutionError, bb.process.NotFoundError):
         rev = '<unknown>'
     return rev.strip()
 
 def get_metadata_git_revision(path):
     try:
-        rev, _ = bb.process.run('git rev-parse HEAD', cwd=path)
+        rev, _ = bb.process.run(['git', 'rev-parse', 'HEAD'], cwd=path)
     except (bb.process.ExecutionError, bb.process.NotFoundError):
         rev = '<unknown>'
     return rev.strip()
 
 def get_metadata_git_toplevel(path):
     try:
-        toplevel, _ = bb.process.run('git rev-parse --show-toplevel', cwd=path)
+        toplevel, _ = bb.process.run(['git', 'rev-parse', '--show-toplevel'], cwd=path)
     except (bb.process.ExecutionError, bb.process.NotFoundError):
         return ""
     return toplevel.strip()
 
 def get_metadata_git_remotes(path):
     try:
-        remotes_list, _ = bb.process.run('git remote', cwd=path)
+        remotes_list, _ = bb.process.run(['git', 'remote'], cwd=path)
         remotes = remotes_list.split()
     except (bb.process.ExecutionError, bb.process.NotFoundError):
         remotes = []
@@ -45,25 +45,24 @@ def get_metadata_git_remotes(path):
 
 def get_metadata_git_remote_url(path, remote):
     try:
-        uri, _ = bb.process.run('git remote get-url {remote}'.format(remote=remote), cwd=path)
+        uri, _ = bb.process.run(['git', 'remote', 'get-url', remote], cwd=path)
     except (bb.process.ExecutionError, bb.process.NotFoundError):
         return ""
     return uri.strip()
 
 def get_metadata_git_describe(path):
     try:
-        describe, _ = bb.process.run('git describe --tags --dirty', cwd=path)
+        describe, _ = bb.process.run(['git', 'describe', '--tags', '--dirty'], cwd=path)
     except (bb.process.ExecutionError, bb.process.NotFoundError):
         return ""
     return describe.strip()
 
 def is_layer_modified(path):
+    env = os.environ.copy()
+    env['PSEUDO_UNLOAD'] = '1'
     try:
-        subprocess.check_output("""cd %s; export PSEUDO_UNLOAD=1; set -e;
-                                git diff --quiet --no-ext-diff
-                                git diff --quiet --no-ext-diff --cached""" % path,
-                                shell=True,
-                                stderr=subprocess.STDOUT)
+        subprocess.check_output(['git', 'diff', '--quiet', '--no-ext-diff'], stderr=subprocess.STDOUT, cwd=path, env=env)
+        subprocess.check_output(['git', 'diff', '--quiet', '--no-ext-diff', '--cached'], stderr=subprocess.STDOUT, cwd=path, env=env)
         return ""
     except subprocess.CalledProcessError as ex:
         # Silently treat errors as "modified", without checking for the

@@ -107,7 +107,7 @@ python devtool_post_unpack() {
     devbranch = d.getVar('DEVTOOL_DEVBRANCH')
     setup_git_repo(srcsubdir, d.getVar('PV'), devbranch, d=d)
 
-    (stdout, _) = bb.process.run('git rev-parse HEAD', cwd=srcsubdir)
+    (stdout, _) = bb.process.run(['git', 'rev-parse', 'HEAD'], cwd=srcsubdir)
     initial_rev = stdout.rstrip()
     with open(os.path.join(tempdir, 'initial_rev'), 'w') as f:
         f.write(initial_rev)
@@ -130,7 +130,7 @@ python devtool_post_patch() {
             shutil.rmtree(patches_dir)
         # Restore any "patches" directory that was actually part of the source tree
         try:
-            bb.process.run('git checkout -- patches', cwd=srcsubdir)
+            bb.process.run(['git', 'checkout', '--', 'patches'], cwd=srcsubdir)
         except bb.process.ExecutionError:
             pass
 
@@ -148,7 +148,7 @@ python devtool_post_patch() {
         if default_overrides != no_overrides:
             # Some overrides are active in the current configuration, so
             # we need to create a branch where none of the overrides are active
-            bb.process.run('git checkout %s -b devtool-no-overrides' % initial_rev, cwd=srcsubdir)
+            bb.process.run(['git', 'checkout', initial_rev, '-b', 'devtool-no-overrides'], cwd=srcsubdir)
             # Run do_patch function with the override applied
             localdata = bb.data.createCopy(d)
             localdata.setVar('OVERRIDES', ':'.join(no_overrides))
@@ -157,18 +157,18 @@ python devtool_post_patch() {
             rm_patches()
             # Now we need to reconcile the dev branch with the no-overrides one
             # (otherwise we'd likely be left with identical commits that have different hashes)
-            bb.process.run('git checkout %s' % devbranch, cwd=srcsubdir)
-            bb.process.run('git rebase devtool-no-overrides', cwd=srcsubdir)
+            bb.process.run(['git', 'checkout', devbranch], cwd=srcsubdir)
+            bb.process.run(['git', 'rebase', 'devtool-no-overrides'], cwd=srcsubdir)
         else:
-            bb.process.run('git checkout %s -b devtool-no-overrides' % devbranch, cwd=srcsubdir)
+            bb.process.run(['git', 'checkout', devbranch, '-b', 'devtool-no-overrides'], cwd=srcsubdir)
 
         for override in extra_overrides:
             localdata = bb.data.createCopy(d)
             if override in default_overrides:
-                bb.process.run('git branch devtool-override-%s %s' % (override, devbranch), cwd=srcsubdir)
+                bb.process.run(['git', 'branch', 'devtool-override-' + override, devbranch], cwd=srcsubdir)
             else:
                 # Reset back to the initial commit on a new branch
-                bb.process.run('git checkout %s -b devtool-override-%s' % (initial_rev, override), cwd=srcsubdir)
+                bb.process.run(['git', 'checkout', initial_rev, '-b', 'devtool-override-' + override], cwd=srcsubdir)
                 # Run do_patch function with the override applied
                 localdata.setVar('OVERRIDES', ':'.join(no_overrides + [override]))
                 localdata.setVar('FILESOVERRIDES', ':'.join(no_overrides + [override]))
@@ -176,11 +176,11 @@ python devtool_post_patch() {
                 rm_patches()
                 # Now we need to reconcile the new branch with the no-overrides one
                 # (otherwise we'd likely be left with identical commits that have different hashes)
-                bb.process.run('git rebase devtool-no-overrides', cwd=srcsubdir)
-        bb.process.run('git checkout %s' % devbranch, cwd=srcsubdir)
-    bb.process.run('git tag -f --no-sign devtool-patched', cwd=srcsubdir)
+                bb.process.run(['git', 'rebase', 'devtool-no-overrides'], cwd=srcsubdir)
+        bb.process.run(['git', 'checkout', devbranch], cwd=srcsubdir)
+    bb.process.run(['git', 'tag', '-f', '--no-sign', 'devtool-patched'], cwd=srcsubdir)
     if os.path.exists(os.path.join(srcsubdir, '.gitmodules')):
-        bb.process.run('git submodule foreach --recursive  "git tag -f --no-sign devtool-patched"', cwd=srcsubdir)
+        bb.process.run(['git', 'submodule', 'foreach', '--recursive', 'git tag -f --no-sign devtool-patched'], cwd=srcsubdir)
 
 }
 

@@ -2,6 +2,8 @@ require vim.inc
 
 SUMMARY += " (with tiny features)"
 
+SRC_URI += "file://0001-Skip-sourcing-defaults.vim-when-Vim-is-invoked-as-vi.patch"
+
 PACKAGECONFIG += "tiny"
 
 do_install() {

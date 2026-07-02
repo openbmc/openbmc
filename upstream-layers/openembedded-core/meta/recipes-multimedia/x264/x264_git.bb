@@ -29,6 +29,8 @@ PACKAGECONFIG ?= " \
     ffmpeg \
     ${@bb.utils.filter("DISTRO_FEATURES", "opencl", d)} \
 "
+# Note: There is a circular dependency between ffmpeg and x264 that can be
+# triggered if both have PACKAGECONFIG enabled that depends on the other
 PACKAGECONFIG[ffmpeg] = "--enable-lavf --enable-swscale,--disable-lavf --disable-swscale,ffmpeg"
 PACKAGECONFIG[opencl] = "--enable-opencl,--disable-opencl,"
 

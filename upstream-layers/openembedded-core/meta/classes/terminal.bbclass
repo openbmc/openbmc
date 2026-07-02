@@ -65,7 +65,7 @@ def oe_terminal(command, title, d):
             envdata.delVar("PSEUDO_UNLOAD")
 
     # Add in all variables from the user's original environment which
-    # haven't subsequntly been set/changed
+    # haven't subsequently been set/changed
     origbbenv = d.getVar("BB_ORIGENV", False) or {}
     for key in origbbenv:
         if key in envdata:

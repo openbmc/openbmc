@@ -1,4 +1,4 @@
-From 0069056a23b39f53a05b89b2545a3a5ad1ff070a Mon Sep 17 00:00:00 2001
+From c6a700c79fcfba21b261cfa99e5e78ee3341c7ac Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Wed, 18 Mar 2026 11:27:24 +0000
 Subject: [PATCH] Use standard autoconf
@@ -11,10 +11,14 @@ form of AC_OUTPUT.
 
 Upstream-Status: Inappropriate
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+
+Refresh for version 1.69
+Fix configure.in:88: error: undefined or overquoted macro: AC_SETUP_DEFS
+Signed-off-by: Changqing Li <changqing.li@windriver.com>
 ---
  config_h.in  | 8 --------
- configure.in | 2 +-
- 2 files changed, 1 insertion(+), 9 deletions(-)
+ configure.in | 1 -
+ 2 files changed, 9 deletions(-)
  delete mode 100644 config_h.in
 
 diff --git a/config_h.in b/config_h.in
@@ -32,17 +36,16 @@ index ac8ff1d..0000000
 -
 -@DEFS@
 diff --git a/configure.in b/configure.in
-index cb641d4..7042800 100644
+index 24dfbb9..5da5d89 100644
 --- a/configure.in
 +++ b/configure.in
-@@ -83,5 +83,6 @@ CF_WITH_MAN2HTML
- CF_DISABLE_LEAKS
+@@ -85,6 +85,5 @@ CF_DISABLE_LEAKS
  
  ###	output makefile and config.h
--AC_OUTPUT(makefile,,,cat)
-+AC_CONFIG_FILES([makefile])
-+AC_OUTPUT
+ AC_CONFIG_FILES([makefile])
+-AC_SETUP_DEFS([cat])
+ AC_OUTPUT
  CF_MAKE_DOCS(diffstat,1)
 -- 
-2.43.0
+2.53.0
 

@@ -33,7 +33,7 @@ class OpkgDpkgPM(PackageManager):
         This method extracts the common parts for Opkg and Dpkg
         """
 
-        proc = subprocess.run(cmd, capture_output=True, encoding="utf-8", shell=True)
+        proc = subprocess.run(cmd, capture_output=True, encoding="utf-8")
         if proc.returncode:
             bb.fatal("Unable to list available packages. Command '%s' "
                      "returned %d:\n%s" % (cmd, proc.returncode, proc.stderr))

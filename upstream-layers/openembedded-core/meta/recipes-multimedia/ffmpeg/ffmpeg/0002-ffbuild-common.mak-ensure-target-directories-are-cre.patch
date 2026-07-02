@@ -1,4 +1,4 @@
-From 6cd4855ea3dd62e6eb36c0796f8cd7bd4aaae05c Mon Sep 17 00:00:00 2001
+From 894c92ca133c5f1532a4ae155ae8f4d2c6da3c9a Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 11 Dec 2025 19:55:46 +0100
 Subject: [PATCH] ffbuild/common.mak: ensure target directories are created
@@ -20,14 +20,16 @@ than add a Makefile dependency, I've injected the dir creation directly
 in front of commands that can otherwise fail - a proper fix would probably
 add the rule rather.
 
-Upstream-Status: Submitted [by email to ffmpeg-devel@ffmpeg.org,softworkz@hotmail.com,kasper93@gmail.com]
+Upstream-Status: Submitted
+    [by email to ffmpeg-devel@ffmpeg.org,softworkz@hotmail.com,kasper93@gmail.com,
+    https://lists.ffmpeg.org/archives/list/ffmpeg-devel@ffmpeg.org/message/6QKXQGZKGDNDQXH2XO5IO4LAQKVHHWZG/ ]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
 ---
  ffbuild/common.mak | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/ffbuild/common.mak b/ffbuild/common.mak
-index 0a60d01..346bb0a 100644
+index 06d6f39..52a9a20 100644
 --- a/ffbuild/common.mak
 +++ b/ffbuild/common.mak
 @@ -126,8 +126,8 @@ $(BIN2CEXE): ffbuild/bin2c_host.o

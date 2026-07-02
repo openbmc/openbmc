@@ -1,4 +1,4 @@
-From 191f528da19193d713d94ee252e2485efd9af4d3 Mon Sep 17 00:00:00 2001
+From 7672d0e398b29a52f59a1a0cbb75d4d07bd5f975 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Mon, 25 Oct 2021 17:59:24 +0200
 Subject: [PATCH] staprun: address ncurses 6.3 failures
@@ -10,10 +10,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/staprun/monitor.c b/staprun/monitor.c
-index 478634c09..f4fbfd686 100644
+index 851ee14c4..7d83a3846 100644
 --- a/staprun/monitor.c
 +++ b/staprun/monitor.c
-@@ -448,12 +448,12 @@ void monitor_render(void)
+@@ -453,12 +453,12 @@ void monitor_render(void)
        if (active_window == 0)
          wattron(status, A_BOLD);
        wprintw(status, "\n%*s\t%*s\t%*s\t%*s\t%*s\t%*s\t%s\n",
@@ -32,7 +32,7 @@ index 478634c09..f4fbfd686 100644
                HIGHLIGHT("name", p_name, comp_fn_index));
        if (active_window == 0)
          wattroff(status, A_BOLD);
-@@ -466,17 +466,17 @@ void monitor_render(void)
+@@ -471,17 +471,17 @@ void monitor_render(void)
            json_object *probe, *field;
            probe = json_object_array_get_idx(jso_probe_list, i);
            json_object_object_get_ex(probe, "index", &field);
@@ -56,6 +56,3 @@ index 478634c09..f4fbfd686 100644
            getyx(status, discard, cur_x);
            json_object_object_get_ex(probe, "name", &field);
            wprintw(status, "%.*s", max_cols-cur_x-1, json_object_get_string(field));
--- 
-2.20.1
-

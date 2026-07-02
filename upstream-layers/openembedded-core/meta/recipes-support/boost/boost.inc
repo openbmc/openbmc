@@ -37,7 +37,6 @@ BOOST_LIBS = "\
 	random \
 	regex \
 	serialization \
-	system \
 	test \
 	thread \
 	timer \

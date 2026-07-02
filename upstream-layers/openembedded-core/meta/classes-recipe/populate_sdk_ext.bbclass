@@ -626,7 +626,7 @@ def get_sdk_required_utilities(buildtools_fn, d):
     sanity_required_utilities.append(d.expand('${BUILD_PREFIX}g++'))
     if buildtools_fn:
         buildtools_installer = os.path.join(d.getVar('SDK_DEPLOY'), buildtools_fn)
-        filelist, _ = bb.process.run('%s -l' % buildtools_installer)
+        filelist, _ = bb.process.run([buildtools_installer, '-l'])
     else:
         buildtools_installer = None
         filelist = ""

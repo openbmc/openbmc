@@ -74,10 +74,10 @@ python patch_task_postfunc() {
             if os.path.exists(patchdir):
                 shutil.rmtree(patchdir)
                 if haspatches:
-                    stdout, _ = bb.process.run('git status --porcelain patches', cwd=srcsubdir)
+                    stdout, _ = bb.process.run(['git', 'status', '--porcelain', 'patches'], cwd=srcsubdir)
                     if stdout:
-                        bb.process.run('git checkout patches', cwd=srcsubdir)
-        stdout, _ = bb.process.run('git status --porcelain .', cwd=srcsubdir)
+                        bb.process.run(['git', 'checkout', 'patches'], cwd=srcsubdir)
+        stdout, _ = bb.process.run(['git', 'status', '--porcelain', '.'], cwd=srcsubdir)
         if stdout:
             oe.patch.GitApplyTree.commitIgnored("Add changes from %s" % func, dir=srcsubdir, files=['.'], d=d)
 }

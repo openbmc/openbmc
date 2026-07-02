@@ -1,28 +1,43 @@
+From 16890a3395d62e760ce11c3c5e1b7323e1b79b46 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 19 Aug 2025 10:09:07 +0100
+Subject: [PATCH] lttng-tools: Disable slow tests to fix ptest runs
+
 These tests take too long to run for our default output timeout in ptest-runner (450s).
 We could change that to 900s but it is a global setting so skip these tests for
 now. Ideally tests.serial would have occasional output when running to show activity.
 
 Upstream-Status: Inappropriate [workaround for slow tests]
 Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ tests/regression/Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Index: lttng-tools-2.14.0/tests/regression/Makefile.am
-===================================================================
---- lttng-tools-2.14.0.orig/tests/regression/Makefile.am
-+++ lttng-tools-2.14.0/tests/regression/Makefile.am
-@@ -26,7 +26,6 @@ SERIAL_TESTS = tools/base-path/test_ust
+diff --git a/tests/regression/Makefile.am b/tests/regression/Makefile.am
+index a7cd133..b5a25eb 100644
+--- a/tests/regression/Makefile.am
++++ b/tests/regression/Makefile.am
+@@ -30,7 +30,6 @@ SERIAL_TESTS = tools/base-path/test_ust \
  	tools/tracefile-limits/test_tracefile_count \
  	tools/tracefile-limits/test_tracefile_size \
  	tools/exclusion/test_exclusion \
 -	tools/snapshots/test_kernel \
  	tools/snapshots/test_ust_fast \
+ 	tools/snapshots/test_ust_long \
  	tools/snapshots/test_ust_streaming \
- 	tools/snapshots/test_kernel_streaming \
-@@ -47,8 +46,6 @@ SERIAL_TESTS = tools/base-path/test_ust
+@@ -53,7 +52,6 @@ SERIAL_TESTS = tools/base-path/test_ust \
  	tools/rotation/test_schedule_api \
  	tools/metadata/test_kernel \
  	tools/working-directory/test_relayd_working_directory \
--	tools/clear/test_ust \
 -	tools/clear/test_kernel \
  	tools/clear/test_live_hang.py \
  	tools/tracker/test_event_tracker \
  	tools/trigger/start-stop/test_start_stop \
+@@ -66,7 +64,6 @@ SERIAL_TESTS = tools/base-path/test_ust \
+ 	tools/trace-format/test_trace_format_kernel.py
+ 
+ TESTS = tools/clear/test_disallow.py \
+-	tools/clear/test_ust.py \
+ 	tools/clear/test_ust_multi_user.py \
+ 	tools/live/test_early_inactive_app.py \
+ 	tools/live/test_high_latency.py \

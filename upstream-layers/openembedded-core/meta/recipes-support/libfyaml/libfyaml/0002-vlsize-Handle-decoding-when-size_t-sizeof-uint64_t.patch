@@ -1,0 +1,35 @@
+From 3fea9f76ea36ec9364a9935ca1b64fa742d47fa1 Mon Sep 17 00:00:00 2001
+From: Pantelis Antoniou <pantelis.antoniou@konsulko.com>
+Date: Wed, 18 Mar 2026 15:56:10 +0200
+Subject: [PATCH] vlsize: Handle decoding when size_t < sizeof(uint64_t)
+
+Those two might differ.
+
+Upstream-Status: Backport [https://github.com/pantoniou/libfyaml/commit/9192deaac095f9881cc1e5756dede683f36b09d6]
+Signed-off-by: Pantelis Antoniou <pantelis.antoniou@konsulko.com>
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ include/libfyaml/libfyaml-vlsize.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/libfyaml/libfyaml-vlsize.h b/include/libfyaml/libfyaml-vlsize.h
+index 1b950c4..acfd78d 100644
+--- a/include/libfyaml/libfyaml-vlsize.h
++++ b/include/libfyaml/libfyaml-vlsize.h
+@@ -810,7 +810,12 @@ fy_decode_size(const uint8_t *start, size_t bufsz, size_t *sizep)
+ static inline const uint8_t *
+ fy_decode_size_nocheck(const uint8_t *start, size_t *sizep)
+ {
+-	return fy_decode_size32_nocheck(start, sizep);
++	uint64_t sz;
++	const uint8_t *ret;
++
++	ret = fy_decode_size32_nocheck(start, &sz);
++	*sizep = (size_t)sz;
++	return ret;
+ }
+ 
+ static inline const uint8_t *
+-- 
+2.47.3
+

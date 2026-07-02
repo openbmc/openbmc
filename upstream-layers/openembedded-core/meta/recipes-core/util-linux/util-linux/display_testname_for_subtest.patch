@@ -1,4 +1,4 @@
-From 05b495cbe9ffa7b45d9a383610aa95e31f2ab1e3 Mon Sep 17 00:00:00 2001
+From 42cfda0aa633f3a6786be1e490202cc9fe89e4e5 Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Thu, 3 Dec 2015 04:08:00 +0100
 Subject: [PATCH] Display testname for subtest
@@ -10,7 +10,7 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/functions.sh b/tests/functions.sh
-index 1d7a425..b1f0986 100644
+index f92520a..c32005c 100644
 --- a/tests/functions.sh
 +++ b/tests/functions.sh
 @@ -455,7 +455,7 @@ function ts_init_subtest {

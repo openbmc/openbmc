@@ -31,6 +31,7 @@ PTESTS_FAST = "\
     libarchive \
     libassuan \
     libatomic-ops \
+    libcap \
     libcheck \
     libconfig \
     libconvert-asn1-perl \
@@ -39,7 +40,6 @@ PTESTS_FAST = "\
     libksba \
     libmd \
     libnl \
-    libpcre \
     libpcre2 \
     librsvg \
     libsolv \
@@ -158,8 +158,8 @@ PTESTS_PROBLEMS:append:riscv32 = " lttng-tools strace"
 PTESTS_SLOW:append:libc-musl = " libc-test"
 
 # These tests don't yet pass for riscv64
-PTESTS_SLOW:remove:riscv64 = "tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl"
-PTESTS_PROBLEMS:append:riscv64 = " tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl"
+PTESTS_SLOW:remove:riscv64 = "tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl glib-2.0"
+PTESTS_PROBLEMS:append:riscv64 = " tcl tcl8 python3-cffi strace lttng-tools python3-numpy perl glib-2.0"
 
 # These tests don't yet pass for musl qemuarm64
 PTESTS_SLOW:remove:libc-musl:qemuarm64 = "strace perl gnutls glib-2.0"

@@ -412,8 +412,8 @@ python do_ar_mirror() {
 
         # We now have an appropriate localpath
         bb.note('Copying source mirror')
-        cmd = 'cp --force --preserve=timestamps --no-dereference --recursive -H %s %s' % (localpath, destdir)
-        subprocess.check_call(cmd, shell=True)
+        cmd = ['cp', '--force', '--preserve=timestamps', '--no-dereference', '--recursive', '-H', localpath, destdir]
+        subprocess.check_call(cmd)
 }
 
 def create_tarball(d, srcdir, suffix, ar_outdir):
@@ -452,9 +452,8 @@ def create_tarball(d, srcdir, suffix, ar_outdir):
     bb.note('Creating %s' % tarname)
     dirname = os.path.dirname(srcdir)
     basename = os.path.basename(srcdir)
-    exclude = "--exclude=temp --exclude=patches --exclude='.pc'"
-    tar_cmd = "tar %s -cf - %s | %s > %s" % (exclude, basename, compression_cmd, tarname)
-    subprocess.check_call(tar_cmd, cwd=dirname, shell=True)
+    tar_cmd = ["tar", "--exclude=temp", "--exclude=patches", "--exclude=.pc", '-cf', tarname, basename, '-I', compression_cmd]
+    subprocess.check_call(tar_cmd, cwd=dirname)
 
 # creating .diff.gz between source.orig and source
 def create_diff_gz(d, src_orig, src, ar_outdir):

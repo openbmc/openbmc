@@ -1,4 +1,4 @@
-From d8a41103d268c7d7de12326a15642508c3541d85 Mon Sep 17 00:00:00 2001
+From 983fe4a8fd6fb6512fdf78d9a32be345c252e64d Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Mon, 3 Jan 2022 14:18:34 +0000
 Subject: [PATCH] webkitgtk: Add reproducibility fix
@@ -16,7 +16,7 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Source/JavaScriptCore/generator/GeneratedFile.rb b/Source/JavaScriptCore/generator/GeneratedFile.rb
-index 6ed2b6e4..86a28286 100644
+index 9a951947..d499ae30 100644
 --- a/Source/JavaScriptCore/generator/GeneratedFile.rb
 +++ b/Source/JavaScriptCore/generator/GeneratedFile.rb
 @@ -25,7 +25,7 @@ require 'date'

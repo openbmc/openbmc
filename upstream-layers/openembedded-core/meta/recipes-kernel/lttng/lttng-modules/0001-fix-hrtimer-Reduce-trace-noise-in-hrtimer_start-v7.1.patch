@@ -1,8 +1,7 @@
-From 531c6e02c5a231f153d12ff628ecb677b7c2f7b9 Mon Sep 17 00:00:00 2001
+From 82000f32ec1c54a83e95ce10aefedfd6c41ec4bd Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 10:38:18 -0400
-Subject: [PATCH 1/8] fix: hrtimer: Reduce trace noise in hrtimer_start()
- (v7.1)
+Subject: [PATCH] fix: hrtimer: Reduce trace noise in hrtimer_start() (v7.1)
 
 See upstream commit:
 
@@ -38,7 +37,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 37 insertions(+), 2 deletions(-)
 
 diff --git a/include/instrumentation/events/timer.h b/include/instrumentation/events/timer.h
-index f69e069b..dfc295e0 100644
+index f69e069..dfc295e 100644
 --- a/include/instrumentation/events/timer.h
 +++ b/include/instrumentation/events/timer.h
 @@ -220,12 +220,43 @@ LTTNG_TRACEPOINT_EVENT_MAP(hrtimer_init,
@@ -98,6 +97,3 @@ index f69e069b..dfc295e0 100644
  LTTNG_TRACEPOINT_EVENT_MAP(hrtimer_start,
  
  	timer_hrtimer_start,
--- 
-2.43.0
-

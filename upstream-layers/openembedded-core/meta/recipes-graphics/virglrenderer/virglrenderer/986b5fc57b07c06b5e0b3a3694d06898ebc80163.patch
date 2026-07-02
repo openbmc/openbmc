@@ -1,4 +1,4 @@
-From 986b5fc57b07c06b5e0b3a3694d06898ebc80163 Mon Sep 17 00:00:00 2001
+From c0eeacaf2f3487cc3225f1b2316461eccdcf44b5 Mon Sep 17 00:00:00 2001
 From: Maximilian Hofmann <maxi@maxiicodes.dev>
 Date: Thu, 26 Feb 2026 23:28:58 +0100
 Subject: [PATCH] fix: build with glibc 2.43
@@ -19,7 +19,7 @@ Part-of: <https://gitlab.freedesktop.org/virgl/virglrenderer/-/merge_requests/15
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/gallium/auxiliary/tgsi/tgsi_text.c b/src/gallium/auxiliary/tgsi/tgsi_text.c
-index db7d7b952..7e37bf794 100644
+index db7d7b95..7e37bf79 100644
 --- a/src/gallium/auxiliary/tgsi/tgsi_text.c
 +++ b/src/gallium/auxiliary/tgsi/tgsi_text.c
 @@ -84,7 +84,7 @@ streq_nocase_uprcase(const char *str1,
@@ -31,6 +31,3 @@ index db7d7b952..7e37bf794 100644
     if (unlikely(str)) {
        *pcur = str;
        return false;
---
-GitLab
-

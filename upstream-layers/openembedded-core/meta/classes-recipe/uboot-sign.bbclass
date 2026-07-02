@@ -103,6 +103,9 @@ UBOOT_FIT_TEE_IMAGE ?= "tee-raw.bin"
 # User specific settings
 UBOOT_FIT_USER_SETTINGS ?= ""
 
+# U-Boot fitImage configuration description
+UBOOT_FIT_CONF_DESC ?= "Boot with signed U-Boot FIT"
+
 # Sets the firmware property to select the image to boot first.
 # If not set, the first entry in "loadables" is used instead.
 UBOOT_FIT_CONF_FIRMWARE ?= ""
@@ -452,7 +455,7 @@ EOF
     configurations {
         default = "conf";
         conf {
-            description = "Boot with signed U-Boot FIT";
+            description = "${UBOOT_FIT_CONF_DESC}";
             ${conf_firmware}
             loadables = ${conf_loadables};
             fdt = "fdt";

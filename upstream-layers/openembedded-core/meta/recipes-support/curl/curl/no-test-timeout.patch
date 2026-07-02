@@ -15,12 +15,12 @@ diff --git a/tests/servers.pm b/tests/servers.pm
 index 5d5d98b..442cfaf 100644
 --- a/tests/servers.pm
 +++ b/tests/servers.pm
-@@ -124,7 +124,7 @@ my $sshdverstr;  # for socks server, ssh daemon version string
- my $sshderror;   # for socks server, ssh daemon version error
- my %doesntrun;    # servers that do not work, identified by pidfile
+@@ -124,7 +124,7 @@
+ my $sshderror;     # for socks server, ssh daemon version error
+ my %doesntrun;     # servers that do not work, identified by pidfile
  my %PORT = (nolisten => 47); # port we use for a local non-listening service
--my $server_response_maxtime=13;
-+my $server_response_maxtime=600;
+-my $server_response_maxtime = 13;
++my $server_response_maxtime = 600;
  my $httptlssrv = find_httptlssrv();
- my %run;          # running server
- my %runcert;      # cert file currently in use by an ssl running server
+ my %run;           # running server
+ my %runcert;       # cert file currently in use by an SSL running server

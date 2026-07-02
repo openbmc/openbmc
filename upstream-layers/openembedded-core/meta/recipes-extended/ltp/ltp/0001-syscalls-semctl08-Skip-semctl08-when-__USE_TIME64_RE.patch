@@ -1,4 +1,4 @@
-From 09364a758df9d89a0968894376f82f636441addb Mon Sep 17 00:00:00 2001
+From 89c83185e757ddaeb0262c17a10f605056f53916 Mon Sep 17 00:00:00 2001
 From: Jiaying Song <jiaying.song.cn@windriver.com>
 Date: Fri, 23 May 2025 15:17:49 +0800
 Subject: [PATCH] syscalls/semctl08: Skip semctl08 when __USE_TIME64_REDIRECTS
@@ -20,12 +20,12 @@ Signed-off-by: Jiaying Song <jiaying.song.cn@windriver.com>
  1 file changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/testcases/kernel/syscalls/ipc/semctl/semctl08.c b/testcases/kernel/syscalls/ipc/semctl/semctl08.c
-index f4549adf4..28776f266 100644
+index 083179c92..a98eb35d6 100644
 --- a/testcases/kernel/syscalls/ipc/semctl/semctl08.c
 +++ b/testcases/kernel/syscalls/ipc/semctl/semctl08.c
 @@ -12,7 +12,11 @@
  #include "tst_test.h"
- #include "libnewipc.h"
+ #include "tse_newipc.h"
  
 -#ifdef HAVE_SEMID64_DS_TIME_HIGH
 +#if !defined(HAVE_SEMID64_DS_TIME_HIGH)

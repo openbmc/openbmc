@@ -42,6 +42,9 @@ def exec_build_env_command(init_path, builddir, cmd, watch=False, **options):
         init_prefix = ''
     if watch:
         if sys.stdout.isatty():
+            import shutil
+            if not shutil.which('script'):
+                raise DevtoolError('The util-linux "script" command was not found')
             # Fool bitbake into thinking it's outputting to a terminal (because it is, indirectly)
             cmd = 'script -e -q -c "%s" /dev/null' % cmd
         return exec_watch('%s%s' % (init_prefix, cmd), **options)

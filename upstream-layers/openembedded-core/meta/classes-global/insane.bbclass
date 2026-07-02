@@ -445,9 +445,9 @@ def package_qa_check_buildpaths(path, name, d, elf):
         if tmpdir in file_content:
             path = package_qa_clean_path(path, d, name)
             oe.qa.handle_error("buildpaths", "File %s in package %s contains reference to TMPDIR" % (path, name), d)
-        if homedir and homedir in file_content:
+        if homedir and homedir in file_content and not homedir.decode() in (d.getVar("OEQA_BUILDPATHS_SKIP") or "").split():
             path = package_qa_clean_path(path, d, name)
-            oe.qa.handle_error("buildpaths", "File %s in package %s contains reference to the build host HOME directory" % (path, name), d)
+            oe.qa.handle_error("buildpaths", "File %s in package %s contains a reference to the build host HOME directory. If upstream hardcodes a directory path that matches your home, you can set OEQA_BUILDPATHS_SKIP = \"%s\" in the recipe." % (path, name, homedir.decode()), d)
 
 
 QAPATHTEST[xorg-driver-abi] = "package_qa_check_xorg_driver_abi"

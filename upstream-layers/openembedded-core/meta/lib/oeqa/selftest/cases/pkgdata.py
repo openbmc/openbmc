@@ -225,3 +225,26 @@ class OePkgdataUtilTests(OESelftestTestCase):
         self.assertEqual(result.status, 2, "Status different than 2. output: %s" % result.output)
         currpos = result.output.find('usage: oe-pkgdata-util')
         self.assertTrue(currpos != -1, msg = "Test is Failed. Help is not Displayed in %s" % result.output)
+
+    def test_multilib_variables(self):
+        # Set up a lib32 multilib configuration
+        self.write_config("""
+MACHINE:forcevariable = "qemux86-64"
+require conf/multilib.conf
+MULTILIBS = "multilib:lib32"
+DEFAULTTUNE:virtclass-multilib-lib32 = "x86"
+INIT_MANAGER = "systemd"
+DISTRO_FEATURES:append = " systemd usrmerge"
+""")
+        # Verify pkgdata variable LICENSE is identical between the base
+        # and multilib packages for selected recipes/packages below.
+        test_list = [
+            ('systemd', 'libsystemd')
+        ]
+        for recipe, package in test_list:
+            bitbake(f'{recipe} lib32-{recipe}')
+            pkg = runCmd(f'oe-pkgdata-util lookup-pkg {package}').output
+            pkg_lib32 = runCmd(f'oe-pkgdata-util lookup-pkg lib32-{package}').output
+            lic = runCmd(f'oe-pkgdata-util read-value LICENSE {pkg}').output
+            lic_lib32 = runCmd(f'oe-pkgdata-util read-value LICENSE {pkg_lib32}').output
+            self.assertEqual(lic, lic_lib32)

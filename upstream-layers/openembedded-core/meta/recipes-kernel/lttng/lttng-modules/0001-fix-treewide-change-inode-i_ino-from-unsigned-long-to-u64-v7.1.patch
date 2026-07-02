@@ -1,8 +1,8 @@
-From 0ae8e932cc2c431bafe390a43feb29b0c6a98ab5 Mon Sep 17 00:00:00 2001
+From 69ee47280a495540d91718442a66af18362a4a26 Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 14:52:02 -0400
-Subject: [PATCH 6/8] fix: treewide: change inode->i_ino from unsigned long to
- u64 (v7.1)
+Subject: [PATCH] fix: treewide: change inode->i_ino from unsigned long to u64
+ (v7.1)
 
 See upstream commit:
 
@@ -37,7 +37,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/lttng-uprobes.c b/src/lttng-uprobes.c
-index 39c09b8f..84edbd33 100644
+index 39c09b8..84edbd3 100644
 --- a/src/lttng-uprobes.c
 +++ b/src/lttng-uprobes.c
 @@ -256,8 +256,8 @@ int lttng_uprobes_add_callsite(struct lttng_uprobe *uprobe,
@@ -51,6 +51,3 @@ index 39c09b8f..84edbd33 100644
  		       uprobe_handler->offset);
  		ret = -1;
  		goto register_error;
--- 
-2.43.0
-

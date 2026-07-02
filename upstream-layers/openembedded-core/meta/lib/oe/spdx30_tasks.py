@@ -588,6 +588,15 @@ def set_purposes(d, element, *var_names, force_purposes=[]):
     ]
 
 
+def add_custom_annotations(d, objset, obj):
+    for var in (d.getVar("SPDX_CUSTOM_ANNOTATION_VARS") or "").split():
+        objset.new_annotation(
+            obj,
+            "%s=%s" % (var, d.getVar(var)),
+            oe.spdx30.AnnotationType.other,
+        )
+
+
 def set_purls(spdx_package, purls):
     if purls:
         spdx_package.software_packageUrl = purls[0]
@@ -638,6 +647,8 @@ def create_recipe_spdx(d):
         ext = oe.sbom30.OERecipeExtension()
         ext.is_native = True
         recipe.extension.append(ext)
+
+    add_custom_annotations(d, recipe_objset, recipe)
 
     set_purls(recipe, (d.getVar("SPDX_PACKAGE_URLS") or "").split())
 
@@ -839,12 +850,7 @@ def create_spdx(d):
 
     build_objset.set_is_native(is_native)
 
-    for var in (d.getVar("SPDX_CUSTOM_ANNOTATION_VARS") or "").split():
-        build_objset.new_annotation(
-            build,
-            "%s=%s" % (var, d.getVar(var)),
-            oe.spdx30.AnnotationType.other,
-        )
+    add_custom_annotations(d, build_objset, build)
 
     build_inputs = set()
 

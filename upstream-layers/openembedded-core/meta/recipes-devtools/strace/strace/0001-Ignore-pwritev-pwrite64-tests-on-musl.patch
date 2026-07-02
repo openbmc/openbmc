@@ -1,4 +1,4 @@
-From 13fd22ad0df5b80c428d3ecc0114fb340f3b3894 Mon Sep 17 00:00:00 2001
+From 3c692ce22a70e9fa4cc21afa56d03a9adcd5d2a2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Mon, 18 Aug 2025 22:18:58 -0700
 Subject: [PATCH] Ignore pwritev/pwrite64 tests on musl
@@ -19,11 +19,13 @@ Issue is reported upstream [3]
 Upstream-Status: Inappropriate [Musl Specific]
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- tests/pread64-pwrite64.gen.test | 2 ++
- tests/preadv-pwritev.gen.test   | 2 ++
- tests/pwritev.gen.test          | 2 ++
- 3 files changed, 6 insertions(+)
+ tests/pread64-pwrite64.gen.test | 3 +++
+ tests/preadv-pwritev.gen.test   | 3 +++
+ tests/pwritev.gen.test          | 3 +++
+ 3 files changed, 9 insertions(+)
 
+diff --git a/tests/pread64-pwrite64.gen.test b/tests/pread64-pwrite64.gen.test
+index b53e069..0a1e6e6 100755
 --- a/tests/pread64-pwrite64.gen.test
 +++ b/tests/pread64-pwrite64.gen.test
 @@ -1,4 +1,7 @@
@@ -34,6 +36,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +skip_ "Test not ported to musl, musl generates pwritev2"
 +
  run_strace_match_diff -a21 -eread=0 -ewrite=1 -e trace=pread64,pwrite64 -P pread64-pwrite64-tmpfile -P /dev/zero -P /dev/null
+diff --git a/tests/preadv-pwritev.gen.test b/tests/preadv-pwritev.gen.test
+index 5ed8297..b83f129 100755
 --- a/tests/preadv-pwritev.gen.test
 +++ b/tests/preadv-pwritev.gen.test
 @@ -1,4 +1,7 @@
@@ -44,6 +48,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
 +skip_ "Test not ported to musl, musl generates pwritev2"
 +
  run_strace_match_diff -a19 -eread=0 -ewrite=1 -e trace=preadv,pwritev
+diff --git a/tests/pwritev.gen.test b/tests/pwritev.gen.test
+index e54fd15..4999816 100755
 --- a/tests/pwritev.gen.test
 +++ b/tests/pwritev.gen.test
 @@ -1,4 +1,7 @@

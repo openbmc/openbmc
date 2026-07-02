@@ -1,3 +1,8 @@
+From fe0f3729a7b6396b0d9cc54897955c1af56fc9db Mon Sep 17 00:00:00 2001
+From: Andreas Oberritter <obi@opendreambox.org>
+Date: Thu, 15 Mar 2012 23:17:52 +0100
+Subject: [PATCH] parted: update to version 3.1
+
 Upstream-Status: Submitted [bug-parted@gnu.org]
 
 | for po in `ls -1 ./*.pt_BR.po 2>/dev/null`; do \
@@ -6,9 +11,14 @@ Upstream-Status: Submitted [bug-parted@gnu.org]
 | Makefile:904: *** Recursive variable `mandir' references itself (eventually).  Stop.
 
 Signed-off-by: Andreas Oberritter <obi@opendreambox.org>
+---
+ doc/po4a.mk | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- parted-3.1/doc/po4a.mk.orig	2012-03-15 14:09:11.555831872 +0100
-+++ parted-3.1/doc/po4a.mk	2012-03-15 14:10:44.243830985 +0100
+diff --git a/doc/po4a.mk b/doc/po4a.mk
+index aaf4024..9c8672a 100644
+--- a/doc/po4a.mk
++++ b/doc/po4a.mk
 @@ -23,7 +23,7 @@
  # threshold is 80%), it won't be distributed, and the build won't fail.
  #

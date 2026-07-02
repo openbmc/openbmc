@@ -1,0 +1,42 @@
+From 0b4b577b7fc926d374234c80267a4bf9dcccb7ef Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Tue, 16 Jun 2026 09:12:34 +0000
+Subject: [PATCH] src/intel/compiler/jay: fix GCC 10 case label declaration
+ error
+
+GCC 10 (and earlier) does not allow a variable declaration immediately
+after a case label, because a label must be followed by a statement.
+
+  error: a label can only be part of a statement and a declaration is not a statement
+
+Wrap the case block for JAY_OPCODE_DESWIZZLE_ODD in braces to make the
+declaration a valid statement inside the block.
+
+Upstream-Status: Inappropriate [yocto host distro requirements]
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ src/intel/compiler/jay/jay_to_binary.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/intel/compiler/jay/jay_to_binary.c b/src/intel/compiler/jay/jay_to_binary.c
+index 62b9576..a0a9498 100644
+--- a/src/intel/compiler/jay/jay_to_binary.c
++++ b/src/intel/compiler/jay/jay_to_binary.c
+@@ -362,11 +362,12 @@ emit(struct brw_codegen *p,
+       brw_BFN(p, dst, SRC(0), SRC(1), SRC(2), brw_imm_ud(jay_bfn_ctrl(I)));
+       break;
+ 
+-   case JAY_OPCODE_DESWIZZLE_ODD:
++   case JAY_OPCODE_DESWIZZLE_ODD: {
+       bool hi = simd_offs ? true : jay_deswizzle_odd_src2_hi(I);
+       brw_MOV(p, dst,
+               byte_offset(to_brw_reg(f, I, simd_offs, 0, false), hi ? 64 : 0));
+       break;
++   }
+ 
+    case JAY_OPCODE_DESWIZZLE_EVEN:
+       brw_set_default_exec_size(p, BRW_EXECUTE_16);
+-- 
+2.43.0
+

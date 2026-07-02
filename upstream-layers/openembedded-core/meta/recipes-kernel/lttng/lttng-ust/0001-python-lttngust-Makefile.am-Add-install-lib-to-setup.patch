@@ -1,4 +1,4 @@
-From 30660997d220602202d8dc7264e49095a1581947 Mon Sep 17 00:00:00 2001
+From cd2fbbf5454af7c0910549e841b5da7a1b133a89 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Tue, 20 Feb 2024 12:19:06 +0000
 Subject: [PATCH] python-lttngust/Makefile.am: Add --install-lib to setup.py
@@ -14,10 +14,10 @@ Signed-off-by: Robert Yang <liezhi.yang@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/python-lttngust/Makefile.am b/src/python-lttngust/Makefile.am
-index d53e21d..283901e 100644
+index 30db9fb..d46b6ee 100644
 --- a/src/python-lttngust/Makefile.am
 +++ b/src/python-lttngust/Makefile.am
-@@ -45,7 +45,7 @@ install-exec-local: build-python-bindings.stamp
+@@ -47,7 +47,7 @@ install-exec-local: build-python-bindings.stamp
  	if [ "$(DESTDIR)" != "" ]; then \
  		opts="$$opts --root=$(DESTDIR)"; \
  	fi; \

@@ -1,4 +1,4 @@
-From b2715c3f4d28fab1c238086d9b5435e269b06301 Mon Sep 17 00:00:00 2001
+From f9e6f9cadedc94323e8878e60aaa684be7c52d97 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Thu, 23 Mar 2023 13:09:23 +0800
 Subject: [PATCH] Makefile.am: do not update manual
@@ -16,16 +16,16 @@ Upstream-Status: Inappropriate [OE Specific]
 
 Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
 ---
- Makefile.am | 30 ------------------------------
- 1 file changed, 30 deletions(-)
+ Makefile.am | 38 --------------------------------------
+ 1 file changed, 38 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
-index c590edf..692e016 100644
+index d3068d5..f218a05 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -52,36 +52,6 @@ sepdebugcrcfix_LDADD = @LIBELF_LIBS@
- # Manual pages are generated for dist
- dist_man_MANS = debugedit.1 sepdebugcrcfix.1 find-debuginfo.1
+@@ -60,44 +60,6 @@ debugedit_classify_ar_LDADD = @LIBELF_LIBS@
+ dist_man_MANS = debugedit.1 sepdebugcrcfix.1 find-debuginfo.1 \
+ 	debugedit-classify-ar.1
  
 -# The 'case' ensures the man pages are only generated if the corresponding
 -# source script (the first prerequisite) or configure.ac (for the version)
@@ -46,6 +46,14 @@ index c590edf..692e016 100644
 -	  *$<* | *configure.ac* ) $(HELP2MAN) -N --output=$@ \
 -		--name='fixes CRC for separate .debug files' \
 -		./sepdebugcrcfix$(EXEEXT) ;;\
+-	  * ) : ;; \
+-	esac
+-
+-debugedit-classify-ar.1: tools/debugedit-classify-ar.c configure.ac debugedit-classify-ar$(EXEEXT)
+-	@case '$?' in \
+-	  *$<* | *configure.ac* ) $(HELP2MAN) -N --output=$@ \
+-		--name='Checks whether ELF archive members should be processed' \
+-		./debugedit-classify-ar$(EXEEXT) ;;\
 -	  * ) : ;; \
 -	esac
 -

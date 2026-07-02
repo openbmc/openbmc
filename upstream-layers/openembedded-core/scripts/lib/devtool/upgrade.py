@@ -283,7 +283,7 @@ def _extract_new_source(newpv, srctree, no_patch, srcrev, srcbranch, branch, kee
 
         useroptions = []
         oe.patch.GitApplyTree.gitCommandUserOptions(useroptions, d=rd)
-        __run('git %s commit -q -m "Commit of upstream changes at version %s" --allow-empty' % (' '.join(useroptions), newpv))
+        __run('git %s commit -q -m "Commit of upstream changes at version %s" --allow-empty' % (shlex.join(useroptions), newpv))
         __run('git tag -f --no-sign devtool-base-%s' % newpv)
 
     revs = {}

@@ -85,15 +85,15 @@ class LoginTest(OERuntimeTestCase):
                 if self.td.get('MACHINE') == "qemuarm" or self.td.get('MACHINE') == "qemuppc":
                     width = "640"
                 else:
-                    cmd = "identify.im7 -ping -format '%w' {0}".format(t.name)
-                    width = subprocess.check_output(cmd, shell=True, env=ourenv).decode()
+                    cmd = ['identify.im7', '-ping', '-format', '%w', t.name]
+                    width = subprocess.check_output(cmd, env=ourenv).decode()
 
                 rblank = int(float(width))
                 lblank = rblank-80
 
                 # Use the meta-oe version of convert, along with it's suffix. This blanks out the clock.
-                cmd = "convert.im7 {0} -fill white -draw 'rectangle {1},4 {2},28' {3}".format(t.name, str(rblank), str(lblank), t.name)
-                convert_out=subprocess.check_output(cmd, shell=True, env=ourenv).decode()
+                cmd = ['convert.im7', t.name, '-fill', 'white', '-draw', 'rectangle %s,4 %s,28' % (str(rblank), str(lblank)), t.name]
+                convert_out=subprocess.check_output(cmd, env=ourenv).decode()
 
                 bb.utils.mkdirhier(saved_screenshots_dir)
                 savedfile = "{0}/saved-{1}-{2}-{3}.png".format(saved_screenshots_dir, \
@@ -106,8 +106,8 @@ class LoginTest(OERuntimeTestCase):
                 if not os.path.exists(refimage):
                     self.skipTest("No reference image for comparision (%s)" % refimage)
 
-                cmd = "compare.im7 -metric MSE {0} {1} /dev/null".format(t.name, refimage)
-                compare_out = subprocess.run(cmd, shell=True, capture_output=True, text=True, env=ourenv)
+                cmd = ['compare.im7', '-metric', 'MSE',  t.name, refimage, "/dev/null"]
+                compare_out = subprocess.run(cmd, capture_output=True, text=True, env=ourenv)
                 diff=float(compare_out.stderr.replace("(", "").replace(")","").split()[1])
             if diff > 0:
                 # Keep a copy of the failed screenshot so we can see what happened.

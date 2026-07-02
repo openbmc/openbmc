@@ -1,4 +1,4 @@
-From 4c0e374ba6c64d07da8acba5476cf8638c54820d Mon Sep 17 00:00:00 2001
+From 238020ed859acb41f1f43352afc28db14cecb34e Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Thu, 3 Dec 2015 04:08:00 +0100
 Subject: [PATCH] Define TESTS variable
@@ -10,10 +10,10 @@ Upstream-Status: Pending
  1 file changed, 1 insertion(+)
 
 diff --git a/Makefile.am b/Makefile.am
-index 01e9970..c3313ff 100644
+index 02db406..e09d6df 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -66,6 +66,7 @@ sysusers_DATA =
+@@ -67,6 +67,7 @@ sysusers_DATA =
  dist_bashcompletion_DATA =
  check_PROGRAMS =
  dist_check_SCRIPTS =

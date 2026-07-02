@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: GPL-2.0-only
+/*
+ * Minimal standalone device tree for OE selftest external DTB testing.
+ * No kernel source dependencies required.
+ */
+/dts-v1/;
+
+/ {
+	model = "OE Selftest External DTB";
+	compatible = "oe-selftest,test-ext";
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	aliases {
+		selftest = "/";
+	};
+};

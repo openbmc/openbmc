@@ -1,24 +1,27 @@
-From a45157a50e14d4bd244a3dd05d79c5703c819550 Mon Sep 17 00:00:00 2001
-From: Alexander Kanavin <alex.kanavin@gmail.com>
-Date: Thu, 12 Dec 2019 16:52:07 +0100
+From 8e56c9b414b60db1a14ea8ca664e2cff941ae14d Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 17 Jun 2026 10:04:13 +0200
 Subject: [PATCH] tests: do not strip a helper library
 
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 ---
- tests/utils/testapp/userspace-probe-elf-binary/Makefile.am | 2 +-
+ tests/utils/testapp/Makefile.am | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am b/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
-index 836f13e..e19a554 100644
---- a/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
-+++ b/tests/utils/testapp/userspace-probe-elf-binary/Makefile.am
-@@ -14,7 +14,7 @@ userspace_probe_elf_binary_LDADD = libfoo.la
- libfoo.strip: libfoo.la
- 	$(OBJCOPY) --strip-all .libs/libfoo.so
+diff --git a/tests/utils/testapp/Makefile.am b/tests/utils/testapp/Makefile.am
+index 131a4af..38ce076 100644
+--- a/tests/utils/testapp/Makefile.am
++++ b/tests/utils/testapp/Makefile.am
+@@ -363,7 +363,7 @@ endif # TEST_SDT_UPROBE
+ TEST_DEPS = gen-py-events.py
+ EXTRA_DIST += gen-py-events.py
  
--all-local: libfoo.strip
+-all-local: libdynsym.strip-stamp
 +all-local:
  	@if [ x"$(srcdir)" != x"$(builddir)" ]; then \
- 		for script in $(EXTRA_DIST); do \
- 			cp -f $(srcdir)/$$script $(builddir); \
+ 		for script in $(TEST_DEPS); do \
+ 			if [ x"$$(dirname $$script)" != x"." ]; then \
+-- 
+2.47.3
+

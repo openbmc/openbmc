@@ -1,14 +1,21 @@
-Fix the build to do out-of-tree properly.
+From 6d9852d5bac17a5fc7f605bd596e93528b0fcf81 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 2 Apr 2026 14:41:42 +0100
+Subject: [PATCH] Fix the build to do out-of-tree properly.
 
 The patches are in progress but are being submitted upstream.
 
-Upstream-Status: Submitted [https://bugs.ghostscript.com/show_bug.cgi?id=709289]
+Upstream-Status: Submitted [https://bugs.ghostscript.com/show_bug.cgi?id=709459]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff -rU3 a/configure.ac b/configure.ac
---- a/configure.ac	2025-09-09 10:36:39.000000000 +0100
-+++ b/configure.ac	2026-03-31 15:35:08.988262612 +0100
-@@ -400,7 +400,7 @@
+diff --git a/configure.ac b/configure.ac
+index b2b3678..dd00e86 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -400,7 +400,7 @@ if test x"$with_arch_h" = x""; then
            *)
              ARCH_CONF_HEADER=
              if test x"$host" != x"$build"; then
@@ -17,18 +24,7 @@ diff -rU3 a/configure.ac b/configure.ac
              else
                ARCH_CONF_HEADER=
              fi
-@@ -869,8 +869,8 @@
- AC_SUBST(RECURSIVE_MUTEXATTR)
- 
- dnl Tesseract/Leptonica detection
--TESSERACTDIR=tesseract
--LEPTONICADIR=leptonica
-+TESSERACTDIR=$srcdir/tesseract
-+LEPTONICADIR=$srcdir/leptonica
- OCR_VERSION=0
- OCR_SHARED=0
- LEPTONICAINCLUDE=
-@@ -886,7 +886,7 @@
+@@ -889,7 +889,7 @@ AC_ARG_WITH([tesseract], AS_HELP_STRING([--without-tesseract],
  
  if test x$with_tesseract != xno; then
    AC_MSG_CHECKING([for local Tesseract library source])

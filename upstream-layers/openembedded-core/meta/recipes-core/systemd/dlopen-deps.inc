@@ -66,15 +66,18 @@ python package_generate_dlopen_deps() {
                     elf = oe.qa.ELFFile(f)
                     elf.open()
                     for dep in parse(extract_segment(f, ".note.dlopen"), elf.isLittleEndian()):
+                        # soname list contains alternatives; find the first available provider
+                        found = False
                         for soname in dep["soname"]:
                             if soname in shlibs:
-                                # TODO assumes the first match is good
                                 package, version = list(shlibs[soname].values())[0]
                                 dependency = dep_map[dep["priority"]]
                                 bb.note(f"{pkg}: adding {dependency} on {package} via .note.dlopen")
                                 d.appendVar(f"{dependency}:{pkg}", f" {package} (>= {version})")
-                            else:
-                                bb.warn(f"cannot find {soname}")
+                                found = True
+                                break
+                        if not found:
+                            bb.warn(f"cannot find any provider for dlopen dependency: {dep['soname']}")
                 except oe.qa.NotELFFileError as e:
                     bb.note(f"Cannot extract ELF notes: {e}")
                     pass

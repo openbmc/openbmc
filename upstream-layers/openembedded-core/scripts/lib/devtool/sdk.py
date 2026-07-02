@@ -134,7 +134,7 @@ def sdk_update(args, config, basepath, workspace):
         new_locked_sig_file_path = os.path.join(tmpsdk_dir, 'conf', 'locked-sigs.inc')
         # Fetch manifest from server
         tmpmanifest = os.path.join(tmpsdk_dir, 'conf', 'sdk-conf-manifest')
-        ret = subprocess.call("wget -q -O %s %s/conf/sdk-conf-manifest" % (tmpmanifest, updateserver), shell=True)
+        ret = subprocess.call(['wget', '-q', '-O', tmpmanifest, '%s/conf/sdk-conf-manifest' % updateserver])
         if ret != 0:
             logger.error("Cannot dowload files from %s" % updateserver)
             return ret
@@ -146,9 +146,10 @@ def sdk_update(args, config, basepath, workspace):
         logger.debug("Updating metadata via git ...")
         #Check for the status before doing a fetch and reset
         if os.path.exists(os.path.join(basepath, 'layers/.git')):
-            out = subprocess.check_output("git status --porcelain", shell=True, cwd=layers_dir)
+            out = subprocess.check_output(['git', 'status', '--porcelain'], cwd=layers_dir)
             if not out:
-                ret = subprocess.call("git fetch --all; git reset --hard @{u}", shell=True, cwd=layers_dir)
+                subprocess.call(['git', 'fetch', '--all'], cwd=layers_dir)
+                ret = subprocess.call(['git', 'reset', '--hard', '@{u}'], cwd=layers_dir)
             else:
                 logger.error("Failed to update metadata as there have been changes made to it. Aborting.");
                 logger.error("Changed files:\n%s" % out);
@@ -156,13 +157,13 @@ def sdk_update(args, config, basepath, workspace):
         else:
             ret = -1
         if ret != 0:
-            ret = subprocess.call("git clone %s/layers/.git" % updateserver, shell=True, cwd=tmpsdk_dir)
+            ret = subprocess.call(['git', 'clone', '%s/layers/.git' % updateserver], cwd=tmpsdk_dir)
             if ret != 0:
                 logger.error("Updating metadata via git failed")
                 return ret
         logger.debug("Updating conf files ...")
         for changedfile in changedfiles:
-            ret = subprocess.call("wget -q -O %s %s/%s" % (changedfile, updateserver, changedfile), shell=True, cwd=tmpsdk_dir)
+            ret = subprocess.call(['wget', '-q', '-O', changedfile, '%s/%s' % (updateserver, changedfile)], cwd=tmpsdk_dir)
             if ret != 0:
                 logger.error("Updating %s failed" % changedfile)
                 return ret
@@ -187,7 +188,7 @@ def sdk_update(args, config, basepath, workspace):
                 for buildarch, chksum in newsums:
                     uninative_file = os.path.join('downloads', 'uninative', chksum, '%s-nativesdk-libc.tar.bz2' % buildarch)
                     mkdir(os.path.join(tmpsdk_dir, os.path.dirname(uninative_file)))
-                    ret = subprocess.call("wget -q -O %s %s/%s" % (uninative_file, updateserver, uninative_file), shell=True, cwd=tmpsdk_dir)
+                    ret = subprocess.call(['wget', '-q', '-O', uninative_file, '%s/%s' % (updateserver, uninative_file)], cwd=tmpsdk_dir)
 
         # Ok, all is well at this point - move everything over
         tmplayers_dir = os.path.join(tmpsdk_dir, 'layers')

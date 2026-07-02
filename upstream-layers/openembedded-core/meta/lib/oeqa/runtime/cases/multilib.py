@@ -20,7 +20,7 @@ class MultilibTest(OERuntimeTestCase):
 
         dest = "{}/test_binary".format(self.td.get('T', ''))
         self.target.copyFrom(binary, dest)
-        output = subprocess.check_output("readelf -h {}".format(dest), shell=True).decode()
+        output = subprocess.check_output(['readelf', '-h', dest], text=True)
         os.remove(dest)
 
         l = [l.split()[1] for l in output.split('\n') if "Class:" in l]

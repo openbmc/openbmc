@@ -37,6 +37,8 @@ DUMMYPROVIDES_PACKAGES = "\
     nativesdk-perl-module-threads \
     nativesdk-perl-module-warnings \
     nativesdk-perl-module-vars \
+    nativesdk-perl-module-locale \
+    nativesdk-perl-module-config \
 "
 
 DUMMYPROVIDES = "\

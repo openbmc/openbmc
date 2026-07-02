@@ -1,7 +1,7 @@
-From a74f94be254e5a9856655c982dbca44b86437897 Mon Sep 17 00:00:00 2001
+From faf9b9d9584ef6615243dc123f7c14ab01b0e7c3 Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 10:54:27 -0400
-Subject: [PATCH 2/8] fix: hrtimer: Drop unnecessary pointer indirection in
+Subject: [PATCH] fix: hrtimer: Drop unnecessary pointer indirection in
  hrtimer_expire_entry event (v7.1)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -29,7 +29,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 24 insertions(+)
 
 diff --git a/include/instrumentation/events/timer.h b/include/instrumentation/events/timer.h
-index dfc295e0..c4a94605 100644
+index dfc295e..c4a9460 100644
 --- a/include/instrumentation/events/timer.h
 +++ b/include/instrumentation/events/timer.h
 @@ -299,6 +299,29 @@ LTTNG_TRACEPOINT_EVENT_MAP(hrtimer_start,
@@ -70,6 +70,3 @@ index dfc295e0..c4a94605 100644
  
  LTTNG_TRACEPOINT_EVENT_CLASS(timer_hrtimer_class,
  
--- 
-2.43.0
-

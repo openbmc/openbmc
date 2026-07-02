@@ -26,6 +26,10 @@ ASNEEDED = ""
 PACKAGECONFIG ??= "rpc bsd"
 PACKAGECONFIG:libc-musl = "rpc"
 
-PACKAGECONFIG[rpc] = "--enable-rpc,--disable-rpc,libtirpc"
+# rpcgen execs its preprocessor as a single program; OE's multi-word $CPP fails,
+# so point it at the cross cpp instead.
+export RPCGEN_CPP = "${TARGET_PREFIX}cpp"
+
+PACKAGECONFIG[rpc] = "--enable-rpc,--disable-rpc,libtirpc rpcsvc-proto-native"
 PACKAGECONFIG[bsd] = "--enable-bsd_behaviour=yes,--enable-bsd_behaviour=no,"
 PACKAGECONFIG[ldapmail] = "--enable-ldapmail,--disable-ldapmail,openldap"

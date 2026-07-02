@@ -20,7 +20,7 @@ function validate_lttng_modules_present()
 	return 1
 }
 
-export LD_LIBRARY_PATH=FIXMEPTESTPATH/tests/utils/testapp/userspace-probe-elf-binary/.libs:FIXMEPTESTPATH/tests/utils/testapp/gen-ust-events-constructor/.libs
+export LD_LIBRARY_PATH=FIXMEPTESTPATH/tests/utils/testapp/.libs:FIXMEPTESTPATH/tests/utils/testapp/gen-ust-events-constructor/.libs
 makeargs="LOG_DRIVER_FLAGS=--ignore-exit top_srcdir=FIXMEPTESTPATH top_builddir=FIXMEPTESTPATH"
 
 #If current system doesn't have lttng kernel modules, disable lttng kernel related tests.

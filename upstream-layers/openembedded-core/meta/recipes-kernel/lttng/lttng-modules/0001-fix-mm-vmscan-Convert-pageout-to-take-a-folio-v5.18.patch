@@ -1,7 +1,7 @@
-From b9d853f90111cf657762c3e23110ab9f7a66e1aa Mon Sep 17 00:00:00 2001
+From 62aa0b4bba7e3b0c60f0bcdb5c98c77bedcd45ba Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 11:36:32 -0400
-Subject: [PATCH 3/8] fix: mm/vmscan: Convert pageout() to take a folio (v5.18)
+Subject: [PATCH] fix: mm/vmscan: Convert pageout() to take a folio (v5.18)
 
 See upstream commit:
 
@@ -24,7 +24,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 14 insertions(+), 1 deletion(-)
 
 diff --git a/include/instrumentation/events/mm_vmscan.h b/include/instrumentation/events/mm_vmscan.h
-index 15d56b38..f33bcbd2 100644
+index 15d56b3..f33bcbd 100644
 --- a/include/instrumentation/events/mm_vmscan.h
 +++ b/include/instrumentation/events/mm_vmscan.h
 @@ -510,7 +510,20 @@ LTTNG_TRACEPOINT_EVENT_INSTANCE(mm_vmscan_lru_isolate_template, mm_vmscan_memcg_
@@ -49,6 +49,3 @@ index 15d56b38..f33bcbd2 100644
  LTTNG_TRACEPOINT_EVENT(mm_vmscan_writepage,
  
  	TP_PROTO(struct page *page),
--- 
-2.43.0
-

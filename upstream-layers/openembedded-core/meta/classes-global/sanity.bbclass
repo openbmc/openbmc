@@ -568,11 +568,9 @@ def check_tar_version(sanity_data):
 
     return None
 
-# We use git parameters and functionality only found in 1.7.8 or later
-# The kernel tools assume git >= 1.8.3.1 (verified needed > 1.7.9.5) see #6162 
-# The git fetcher also had workarounds for git < 1.7.9.2 which we've dropped
+# We use git branch --show-current which was introduced in 2.22.0
 def check_git_version(sanity_data):
-    git_minimum_version = "1.8.3.1"
+    git_minimum_version = "2.22.0"
     import subprocess
     try:
         result = subprocess.check_output(["git", "--version"], stderr=subprocess.DEVNULL).decode('utf-8')
@@ -580,7 +578,7 @@ def check_git_version(sanity_data):
         return "Unable to execute git --version, exit code %d\n%s\n" % (e.returncode, e.output)
     version = result.split()[2]
     if bb.utils.vercmp_string_op(version, git_minimum_version, "<"):
-        return ("Your version of git is older than %s and has bugs which will break builds. "
+        return ("Your version of git is older than %s and is missing functionality we use. "
             "Please install a newer version of git.\n" % git_minimum_version)
     return None
 
@@ -856,6 +854,38 @@ def sanity_check_locale(d):
     except locale.Error:
         raise_sanity_error("Your system needs to support the en_US.UTF-8 locale.", d)
 
+def check_cargo_config(d):
+    # Cargo merges .cargo/config[.toml] from every directory between CWD and
+    # the filesystem root. Warn for anything found in ancestor directories
+    # above BASE_WORKDIR that Cargo would pick up silently.
+    import os
+
+    base_workdir = d.getVar('BASE_WORKDIR')
+    ancestor = os.path.dirname(base_workdir)
+    found = []
+    last_ancestor = None
+    while True:
+        for name in ('config', 'config.toml'):
+            cfg = os.path.join(ancestor, '.cargo', name)
+            if os.path.exists(cfg):
+                found.append(cfg)
+                last_ancestor = ancestor
+                break
+        parent = os.path.dirname(ancestor)
+        if parent == ancestor:
+            break
+        ancestor = parent
+
+    if found:
+        bb.warn("Cargo config file(s) found at %s which is/are outside the build "
+                "directory. Cargo will silently apply their settings during the "
+                "rust/cargo build and can override Yocto's settings like linker, "
+                "registry or compiler settings causing build failures. You can "
+                "either remove these file(s) or move your build directory outside "
+                "of %s to fix this. "
+                "See https://bugzilla.yoctoproject.org/show_bug.cgi?id=15637 for more details."
+                % (', '.join(found), last_ancestor))
+
 def check_sanity_everybuild(status, d):
     import os, stat
     # Sanity tests which test the users environment so need to run at each build (or are so cheap
@@ -875,6 +905,7 @@ def check_sanity_everybuild(status, d):
         status.addresult('Bitbake version %s is required and version %s was found\n' % (minversion, bb.__version__))
 
     sanity_check_locale(d)
+    check_cargo_config(d)
 
     paths = d.getVar('PATH').split(":")
     if "." in paths or "./" in paths or "" in paths:

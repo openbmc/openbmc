@@ -1,4 +1,4 @@
-From 7847240a97f5010ebab775f7ac51812a7705a886 Mon Sep 17 00:00:00 2001
+From a261ee9efca120b6d65310a972d91dffc00ac937 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 24 Feb 2017 17:53:02 +0200
 Subject: [PATCH] Install python modules to correct library dir.

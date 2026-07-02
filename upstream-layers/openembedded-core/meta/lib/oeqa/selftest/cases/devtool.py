@@ -1085,6 +1085,73 @@ class DevtoolModifyTests(DevtoolBase):
         # Try building
         bitbake(testrecipe)
 
+    def test_devtool_modify_kernel_cfg_subdirs(self):
+        """
+        Regression test for YOCTO #15169: devtool modify of a kernel-yocto
+        recipe must not fail when an .scc file and the .cfg fragments it
+        references (via "kconf"/"patch" lines) live in different
+        FILESEXTRAPATHS subdirectories. Pre-fix, devtool computed each .cfg
+        file's path as dirname(<.scc file>) + <cfg filename>, which broke
+        whenever the .cfg file was not in the same directory as the .scc
+        file that references it.
+        """
+        testrecipe = 'virtual/kernel'
+        bb_vars = get_bb_vars(['PN', 'FILE'], testrecipe)
+        realrecipe = bb_vars['PN']
+
+        self.track_for_cleanup(self.workspacedir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer */workspace')
+        self.add_command_to_tearDown('bitbake -c clean %s' % realrecipe)
+
+        # The created layer must outlive the 'bitbake-layers remove-layer'
+        # teardown command below: tearDown() runs the queued commands first
+        # and only then deletes track_for_cleanup() paths, so mkdtemp() +
+        # track_for_cleanup() removes the directory after remove-layer has
+        # run. A 'with tempfile.TemporaryDirectory()' here would instead
+        # delete it when the test body returns, i.e. before tearDown, leaving
+        # bblayers.conf pointing at a missing layer.
+        tempparentdir = tempfile.mkdtemp(prefix='devtoolqa')
+        self.track_for_cleanup(tempparentdir)
+        # bitbake-layers create-layer refuses to run if the target directory
+        # already exists, so use a not-yet-created subdirectory of tempparentdir
+        layerdir = os.path.join(tempparentdir, 'meta-selftest-kernelcfgsubdirs')
+        runCmd('bitbake-layers create-layer %s' % layerdir)
+        runCmd('bitbake-layers add-layer %s' % layerdir)
+        self.add_command_to_tearDown('bitbake-layers remove-layer %s || true' % layerdir)
+
+        recipedir = os.path.join(layerdir, 'recipes-kernel', 'linux', realrecipe)
+        bspdir = os.path.join(recipedir, 'bsp')
+        cfgdir = os.path.join(recipedir, 'cfg')
+        os.makedirs(bspdir)
+        os.makedirs(cfgdir)
+
+        # .scc lives in bsp/, references .cfg files that live in cfg/ -
+        # this is the exact split reported in the bug
+        with open(os.path.join(bspdir, 'selftest-cfgsubdirs.scc'), 'w') as f:
+            f.write('kconf hardware selftest-spi.cfg\n')
+            f.write('kconf hardware selftest-clock.cfg\n')
+        with open(os.path.join(cfgdir, 'selftest-spi.cfg'), 'w') as f:
+            f.write('# CONFIG_SPI_SELFTEST is not set\n')
+        with open(os.path.join(cfgdir, 'selftest-clock.cfg'), 'w') as f:
+            f.write('# CONFIG_COMMON_CLK_SELFTEST is not set\n')
+
+        appendfile = os.path.join(layerdir, 'recipes-kernel', 'linux', realrecipe + '_%.bbappend')
+        with open(appendfile, 'w') as f:
+            f.write('FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:${THISDIR}/${PN}/cfg:${THISDIR}/${PN}/bsp:"\n')
+            f.write('SRC_URI:append = " file://selftest-cfgsubdirs.scc"\n')
+            f.write('SRC_URI:append = " file://selftest-spi.cfg"\n')
+            f.write('SRC_URI:append = " file://selftest-clock.cfg"\n')
+
+        with tempfile.TemporaryDirectory(prefix='devtoolqa') as tempdir:
+            # Pre-fix (kirkstone-era), this raised FileNotFoundError while
+            # trying to shutil.copy2() selftest-spi.cfg/selftest-clock.cfg
+            # from inside bsp/ (the .scc's directory) instead of cfg/ (where
+            # they actually live).
+            result = runCmd('devtool modify %s -x %s' % (testrecipe, tempdir))
+            self.assertNotIn('FileNotFoundError', result.output)
+            self.assertExists(os.path.join(self.workspacedir, 'conf', 'layer.conf'),
+                               'Workspace directory not created')
+
     def test_devtool_modify_virtual(self):
         # Try modifying a virtual recipe
         virtrecipe = 'virtual/make'

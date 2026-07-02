@@ -1,4 +1,4 @@
-From 76c23e018608421624d1e00b9e387b265e6da469 Mon Sep 17 00:00:00 2001
+From 0b3d278fa808a21d4300a71d062807f905671bf9 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 29 May 2019 00:10:32 +0100
 Subject: [PATCH] strace: Tweak ptest disk space management

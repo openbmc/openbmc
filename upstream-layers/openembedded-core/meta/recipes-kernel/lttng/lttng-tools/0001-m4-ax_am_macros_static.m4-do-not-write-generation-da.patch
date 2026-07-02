@@ -1,0 +1,27 @@
+From c58eed85e47a605e2a9f2b2bc91917f68bec023f Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 18 Jun 2026 16:48:40 +0200
+Subject: [PATCH] m4/ax_am_macros_static.m4: do not write generation date into
+ Makefiles
+
+This breaks reproducibility of ptests (which install the Makefiles),
+but the fix isn't appropriate for upstream submission.
+
+Upstream-Status: Inappropriate [oe-core specific, really!]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ m4/ax_am_macros_static.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/m4/ax_am_macros_static.m4 b/m4/ax_am_macros_static.m4
+index f4cee8c..7fba5b2 100644
+--- a/m4/ax_am_macros_static.m4
++++ b/m4/ax_am_macros_static.m4
+@@ -33,6 +33,6 @@ AC_DEFUN([AX_AM_MACROS_STATIC],
+ [
+ AX_AC_PRINT_TO_FILE(AMINCLUDE_STATIC,[
+ # ]AMINCLUDE_STATIC[ generated automatically by Autoconf
+-# from AX_AM_MACROS_STATIC on ]m4_esyscmd([LC_ALL=C date])[
++# from AX_AM_MACROS_STATIC
+ ])
+ ])

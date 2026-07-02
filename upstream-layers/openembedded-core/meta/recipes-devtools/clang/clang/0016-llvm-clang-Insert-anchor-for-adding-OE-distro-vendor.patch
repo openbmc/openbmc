@@ -1,7 +1,10 @@
-From b14d66e6250566fb0b7786af92e3e83bade51c90 Mon Sep 17 00:00:00 2001
+From 259d8eb2ed82c9248387a3cbb1befee358ecbb8e Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 25 Jan 2021 16:14:35 +0800
 Subject: [PATCH] llvm/clang: Insert anchor for adding OE distro vendor names
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 This helps in making right detection for OE built gcc toolchains
 
@@ -82,22 +85,25 @@ b59da142f2b0:$ /path/to/x86_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot
 programs: =/build/tmp-glibc/work/x86_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin
 libraries: =/build/tmp-glibc/work/x84_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/lib/clang/13.0.1:/usr/lib/x86_64-wrs-linux/10.2.0://lib/x86_64-wrs-linux://usr/lib/x86_64-wrs-linux:/build/tmp-glibc/work/x86_64-linux/compiler-rt-native/13.0.1-r0/recipe-sysroot-native/usr/bin/../lib://lib://usr/lib
 
+[JM: add missing instance of Distro class in getMultiarchTriple(), at Linux.cpp]
+
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Martin Jansa <martin.jansa@gmail.com>
 Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
 Signed-off-by: Changqing Li <changqing.li@windriver.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: João Marcos Costa <joaomarcos.costa@bootlin.com>
 ---
  clang/include/clang/Driver/Distro.h   | 2 ++
  clang/lib/Driver/Distro.cpp           | 1 +
  clang/lib/Driver/ToolChains/Gnu.cpp   | 1 +
- clang/lib/Driver/ToolChains/Linux.cpp | 1 +
+ clang/lib/Driver/ToolChains/Linux.cpp | 2 ++
  llvm/lib/TargetParser/Triple.cpp      | 2 +-
- 5 files changed, 6 insertions(+), 1 deletion(-)
+ 5 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/clang/include/clang/Driver/Distro.h b/clang/include/clang/Driver/Distro.h
-index 0e17b30eb7e8..b449a62dc299 100644
+index 0e17b30eb..b449a62dc 100644
 --- a/clang/include/clang/Driver/Distro.h
 +++ b/clang/include/clang/Driver/Distro.h
 @@ -45,6 +45,7 @@ public:
@@ -117,7 +123,7 @@ index 0e17b30eb7e8..b449a62dc299 100644
  };
  
 diff --git a/clang/lib/Driver/Distro.cpp b/clang/lib/Driver/Distro.cpp
-index df10458d092d..61dc127a4574 100644
+index df10458d0..61dc127a4 100644
 --- a/clang/lib/Driver/Distro.cpp
 +++ b/clang/lib/Driver/Distro.cpp
 @@ -43,6 +43,7 @@ static Distro::DistroType DetectOsRelease(llvm::vfs::FileSystem &VFS) {
@@ -129,7 +135,7 @@ index df10458d092d..61dc127a4574 100644
    return Version;
  }
 diff --git a/clang/lib/Driver/ToolChains/Gnu.cpp b/clang/lib/Driver/ToolChains/Gnu.cpp
-index c80980a7fb09..80fd8058bd98 100644
+index c80980a7f..80fd8058b 100644
 --- a/clang/lib/Driver/ToolChains/Gnu.cpp
 +++ b/clang/lib/Driver/ToolChains/Gnu.cpp
 @@ -2370,6 +2370,7 @@ void Generic_GCC::GCCInstallationDetector::AddDefaultGCCPrefixes(
@@ -141,10 +147,18 @@ index c80980a7fb09..80fd8058bd98 100644
    static const char *const X32Triples[] = {"x86_64-linux-gnux32",
                                             "x86_64-pc-linux-gnux32"};
 diff --git a/clang/lib/Driver/ToolChains/Linux.cpp b/clang/lib/Driver/ToolChains/Linux.cpp
-index 7b608a84a66e..4a0adedce09a 100644
+index 7b608a84a..585a86a2d 100644
 --- a/clang/lib/Driver/ToolChains/Linux.cpp
 +++ b/clang/lib/Driver/ToolChains/Linux.cpp
-@@ -81,6 +81,7 @@ std::string Linux::getMultiarchTriple(const Driver &D,
+@@ -45,6 +45,7 @@ std::string Linux::getMultiarchTriple(const Driver &D,
+   bool IsAndroid = TargetTriple.isAndroid();
+   bool IsMipsR6 = TargetTriple.getSubArch() == llvm::Triple::MipsSubArch_r6;
+   bool IsMipsN32Abi = TargetTriple.getEnvironment() == llvm::Triple::GNUABIN32;
++  Distro Distro(D.getVFS(), TargetTriple);
+ 
+   // For most architectures, just use whatever we have rather than trying to be
+   // clever.
+@@ -81,6 +82,7 @@ std::string Linux::getMultiarchTriple(const Driver &D,
        return "x86_64-linux-android";
      if (TargetEnvironment == llvm::Triple::GNUX32)
        return "x86_64-linux-gnux32";
@@ -153,7 +167,7 @@ index 7b608a84a66e..4a0adedce09a 100644
    case llvm::Triple::aarch64:
      if (IsAndroid)
 diff --git a/llvm/lib/TargetParser/Triple.cpp b/llvm/lib/TargetParser/Triple.cpp
-index a4f9dd42c0fe..86b74451ec0d 100644
+index a4f9dd42c..86b74451e 100644
 --- a/llvm/lib/TargetParser/Triple.cpp
 +++ b/llvm/lib/TargetParser/Triple.cpp
 @@ -702,7 +702,7 @@ static Triple::VendorType parseVendor(StringRef VendorName) {
@@ -165,3 +179,6 @@ index a4f9dd42c0fe..86b74451ec0d 100644
        .Default(Triple::UnknownVendor);
  }
  
+-- 
+2.39.5
+

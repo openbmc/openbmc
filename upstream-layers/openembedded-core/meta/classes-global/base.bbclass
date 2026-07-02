@@ -117,7 +117,7 @@ def get_lic_checksum_file_list(d):
 def write_ld_wrapper(srctool, desttool):
     wrapper = "#!/bin/sh\n{} --no-rosegment $@".format(srctool)
 
-    stdout, _ = bb.process.run("{} --help".format(srctool))
+    stdout, _ = bb.process.run([srctool, "--help"])
     if "--no-rosegment" in stdout:
         with open(desttool, 'w') as f:
             f.write(wrapper)

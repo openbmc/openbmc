@@ -444,7 +444,7 @@ class DpkgPM(OpkgDpkgPM):
         """
         Returns a dictionary with the package info.
         """
-        cmd = "%s show %s" % (self.apt_cache_cmd, pkg)
+        cmd = [self.apt_cache_cmd, 'show', pkg]
         pkg_info = self._common_package_info(cmd)
 
         pkg_arch = pkg_info[pkg]["pkgarch"]

@@ -1,4 +1,4 @@
-From 4f05492ac07a7bbaf06dd8265b9cba329e1b53e9 Mon Sep 17 00:00:00 2001
+From 0873414e87d04561e531418a3a3c0f1574f31773 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Wed, 30 Aug 2017 15:05:16 +0800
 Subject: [PATCH] lsof: remove host information from version.h
@@ -42,7 +42,7 @@ index aac0b80..2e635a5 100644
  
  #endif
 diff --git a/lib/dialects/linux/Makefile b/lib/dialects/linux/Makefile
-index f8adaa6..7a79ca7 100644
+index 53bfc97..8512e36 100644
 --- a/lib/dialects/linux/Makefile
 +++ b/lib/dialects/linux/Makefile
 @@ -83,64 +83,17 @@ ${LIB}: FRC

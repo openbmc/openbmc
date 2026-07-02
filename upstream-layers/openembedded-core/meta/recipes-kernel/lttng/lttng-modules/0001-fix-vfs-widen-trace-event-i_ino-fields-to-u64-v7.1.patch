@@ -1,7 +1,7 @@
-From 95d19f6ff3d0591afce0e5666d3d17b9192789f6 Mon Sep 17 00:00:00 2001
+From 06f95d412fd63d4bd0ba2c24243a67808931f034 Mon Sep 17 00:00:00 2001
 From: Michael Jeanson <mjeanson@efficios.com>
 Date: Mon, 25 May 2026 11:37:51 -0400
-Subject: [PATCH 5/8] fix: vfs: widen trace event i_ino fields to u64 (v7.1)
+Subject: [PATCH] fix: vfs: widen trace event i_ino fields to u64 (v7.1)
 
 See upstream commit:
 
@@ -26,7 +26,7 @@ Signed-off-by: Michael Jeanson <mjeanson@efficios.com>
  1 file changed, 174 insertions(+), 5 deletions(-)
 
 diff --git a/include/instrumentation/events/writeback.h b/include/instrumentation/events/writeback.h
-index f53d9d3c..cbf9a426 100644
+index f53d9d3..cbf9a42 100644
 --- a/include/instrumentation/events/writeback.h
 +++ b/include/instrumentation/events/writeback.h
 @@ -35,6 +35,31 @@ static inline const char *lttng_bdi_dev_name(struct backing_dev_info *bdi)
@@ -271,6 +271,3 @@ index f53d9d3c..cbf9a426 100644
  LTTNG_TRACEPOINT_EVENT_INSTANCE(writeback_single_inode_template, writeback_single_inode,
  	TP_PROTO(struct inode *inode,
  		 struct writeback_control *wbc,
--- 
-2.43.0
-

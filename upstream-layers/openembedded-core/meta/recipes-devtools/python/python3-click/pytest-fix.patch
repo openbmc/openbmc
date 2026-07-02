@@ -1,0 +1,29 @@
+Fix an error with newer versions of pytest (9.1.0) by converting the generator into a tuple:
+
+E   pytest.PytestRemovedIn10Warning: Passing a non-Collection iterable to parametrize is deprecated.
+E   Test: tests/test_basic.py::test_boolean_conversion, argvalues type: chain
+E   Please convert to a list or tuple.
+E   See https://docs.pytest.org/en/stable/deprecations.html#parametrize-iterators
+ERROR: tests/test_basic.py:tests/test_basic.py
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Submitted [https://github.com/pallets/click/pull/3597]
+
+Index: click-8.3.3/tests/test_basic.py
+===================================================================
+--- click-8.3.3.orig/tests/test_basic.py
++++ click-8.3.3/tests/test_basic.py
+@@ -258,10 +258,10 @@ def test_boolean_flag(runner, default, a
+ 
+ @pytest.mark.parametrize(
+     ("value", "expect"),
+-    chain(
++    tuple(chain(
+         ((x, "True") for x in ("1", "true", "t", "yes", "y", "on")),
+         ((x, "False") for x in ("0", "false", "f", "no", "n", "off")),
+-    ),
++    )),
+ )
+ def test_boolean_conversion(runner, value, expect):
+     @click.command()

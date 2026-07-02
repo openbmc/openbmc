@@ -630,7 +630,7 @@ def create_recipe(args):
         if os.path.exists(os.path.join(srctree, '.git')):
             # Try to get upstream repo location from origin remote
             try:
-                stdout, _ = bb.process.run('git remote -v', cwd=srctree, shell=True)
+                stdout, _ = bb.process.run(['git', 'remote', '-v'], cwd=srctree)
             except bb.process.ExecutionError as e:
                 stdout = None
             if stdout:

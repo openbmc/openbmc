@@ -32,6 +32,9 @@ inherit pkgconfig systemd
 PACKAGECONFIG ?= "openssl"
 PACKAGECONFIG[gnutls] = ",,gnutls libgcrypt"
 PACKAGECONFIG[openssl] = ",,openssl"
+PACKAGECONFIG[suiteb] = ",,"
+PACKAGECONFIG[wnm] = ",,"
+PACKAGECONFIG[mbo] = ",,"
 
 CVE_PRODUCT = "wpa_supplicant"
 
@@ -51,6 +54,19 @@ do_configure () {
 		    -e 's/\(^CONFIG_EAP_PWD=\)/#\1/' \
 		    -e 's/\(^CONFIG_SAE=\)/#\1/' \
 		    -e 's/\(^CONFIG_OWE=\)/#\1/' wpa_supplicant/.config
+	fi
+
+	if ${@ bb.utils.contains('PACKAGECONFIG', 'suiteb', 'true', 'false', d) }; then
+		echo 'CONFIG_SUITEB=y' >>wpa_supplicant/.config
+		echo 'CONFIG_SUITEB192=y' >>wpa_supplicant/.config
+	fi
+
+	if ${@ bb.utils.contains('PACKAGECONFIG', 'wnm', 'true', 'false', d) }; then
+		echo 'CONFIG_WNM=y' >>wpa_supplicant/.config
+	fi
+
+	if ${@ bb.utils.contains('PACKAGECONFIG', 'mbo', 'true', 'false', d) }; then
+		echo 'CONFIG_MBO=y' >>wpa_supplicant/.config
 	fi
 
 	# For rebuild

@@ -180,7 +180,7 @@ meson_do_configure() {
 
 do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 meson_do_compile() {
-    meson compile -v ${PARALLEL_MAKE} ${MESON_TARGET}
+    ninja --verbose ${PARALLEL_MAKE} ${MESON_TARGET}
 }
 
 meson_do_install() {

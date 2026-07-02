@@ -18,7 +18,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://avahi-daemon/main.c;endline=21;md5=9ee77368c5407af77caaef1b07285969 \
                     file://avahi-client/client.h;endline=23;md5=f4ac741a25c4f434039ba3e18c8674cf"
 
-SRC_URI = "git://github.com/avahi/avahi;protocol=https;branch=master;tag=v0.9-rc4 \
+SRC_URI = "git://github.com/avahi/avahi;protocol=https;branch=master;tag=v0.9-rc5 \
            file://00avahi-autoipd \
            file://99avahi-autoipd \
            file://avahi-daemon.in \
@@ -26,8 +26,8 @@ SRC_URI = "git://github.com/avahi/avahi;protocol=https;branch=master;tag=v0.9-rc
            file://0001-Fix-opening-etc-resolv.conf-error.patch \
            "
 
-PV = "0.9~rc4"
-SRCREV = "625ca0fac19229f6dfa3a6c6b698ae657187e50c"
+PV = "0.9~rc5"
+SRCREV = "71b640e686964efb27cb708f4457ffaed183c319"
 
 GITHUB_BASE_URI = "https://github.com/avahi/avahi/releases/"
 

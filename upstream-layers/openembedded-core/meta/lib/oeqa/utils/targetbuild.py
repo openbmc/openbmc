@@ -46,14 +46,14 @@ class BuildProject(metaclass=ABCMeta):
                       'ALL_PROXY', 'all_proxy',
                       'SOCKS5_USER', 'SOCKS5_PASSWD']
 
-        cmd = ''
+        env = os.environ.copy()
         for var in exportvars:
             val = self.d.getVar(var)
             if val:
-                cmd = 'export ' + var + '=\"%s\"; %s' % (val, cmd)
+                env[var] = val
 
-        cmd = cmd + "wget -O %s %s" % (self.localarchive, self.uri)
-        subprocess.check_output(cmd, shell=True)
+        cmd = ['wget', '-O', self.localarchive, self.uri]
+        subprocess.check_output(cmd, env=env)
 
     # This method should provide a way to run a command in the desired environment.
     @abstractmethod
@@ -75,7 +75,7 @@ class BuildProject(metaclass=ABCMeta):
         if self.tempdirobj:
             self.tempdirobj.cleanup()
         self._run('rm -rf %s' % self.targetdir)
-        subprocess.check_call('rm -f %s' % self.localarchive, shell=True)
+        subprocess.check_call(['rm', '-f', self.localarchive])
 
 class TargetBuildProject(BuildProject):
 
@@ -122,8 +122,8 @@ class SDKBuildProject(BuildProject):
 
         self._download_archive()
 
-        cmd = 'tar xf %s%s -C %s' % (self.targetdir, self.archive, self.targetdir)
-        subprocess.check_output(cmd, shell=True)
+        cmd = ['tar', 'xf', self.targetdir + self.archive, '-C', self.targetdir]
+        subprocess.check_output(cmd)
 
         #Change targetdir to project folder
         self.targetdir = os.path.join(self.targetdir, self.fname)

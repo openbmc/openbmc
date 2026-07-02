@@ -37,7 +37,7 @@ export HOST_EXTRACFLAGS
 
 def get_layer_rev(path):
     try:
-        rev, _ = bb.process.run("git describe --match='' --always --dirty --broken", cwd=path)
+        rev, _ = bb.process.run(['git', 'describe', "--match=''", '--always', '--dirty', '--broken'], cwd=path)
     except bb.process.ExecutionError:
         rev = ""
     return rev.strip()

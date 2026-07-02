@@ -24,10 +24,11 @@ inherit pkgconfig autotools-brokensep systemd useradd
 
 SYSTEMD_SERVICE:${PN} = "dhcpcd.service"
 
-PACKAGECONFIG ?= "udev ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6', d)}"
+PACKAGECONFIG ?= "udev ${@bb.utils.filter('DISTRO_FEATURES', 'ipv6 seccomp', d)}"
 
 PACKAGECONFIG[udev] = "--with-udev,--without-udev,udev,udev"
 PACKAGECONFIG[ipv6] = "--enable-ipv6,--disable-ipv6"
+PACKAGECONFIG[seccomp] = "--enable-seccomp,--disable-seccomp"
 # ntp conflicts with chrony
 PACKAGECONFIG[ntp] = "--with-hook=ntp, , ,ntp"
 PACKAGECONFIG[chrony] = "--with-hook=ntp, , ,chrony"

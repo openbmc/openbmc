@@ -73,7 +73,7 @@ def collect_object_files():
     print("Collecting object files [DONE]")
 
 def add_ko_file(filename):
-        p = Popen("size -t " + filename, shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen(['size', '-t', filename], stdout=PIPE, stderr=PIPE, text=True)
         output = p.communicate()[0].splitlines()
         if len(output) > 2:
             sizes = output[-1].split()[0:4]
@@ -89,7 +89,7 @@ def add_ko_file(filename):
             n_ko_files += 1
 
 def get_vmlinux_totals():
-        p = Popen("size -t " + vmlinux_file, shell=True, stdout=PIPE, stderr=PIPE)
+        p = Popen(['size', '-t', vmlinux_file], stdout=PIPE, stderr=PIPE, text=True)
         output = p.communicate()[0].splitlines()
         if len(output) > 2:
             sizes = output[-1].split()[0:4]

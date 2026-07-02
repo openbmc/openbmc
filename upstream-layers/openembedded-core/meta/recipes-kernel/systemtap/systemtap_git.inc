@@ -5,11 +5,10 @@ SRC_URI = "git://sourceware.org/git/systemtap.git;protocol=https;branch=master;t
            file://0001-Do-not-let-configure-write-a-python-location-into-th.patch \
            file://0001-Install-python-modules-to-correct-library-dir.patch \
            file://0001-staprun-stapbpf-don-t-support-installing-a-non-root.patch \
-           file://0001-elaborate.cxx-fix-32-bit-build.patch \
            file://readline.patch \
            "
 
-SRCREV = "911a1354aac264651fda932061e7f20d2ecc2471"
+SRCREV = "90b164cf106ef16f873ab58c8c6f653718bb6e17"
 
 COMPATIBLE_HOST = '(x86_64|i.86|powerpc|arm|aarch64|microblazeel|mips|riscv64|riscv32).*-linux'
 COMPATIBLE_HOST:libc-musl = 'null'

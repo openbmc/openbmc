@@ -305,10 +305,9 @@
 #USERADD_ERROR_DYNAMIC = "1"
 
 # Enabling FORTRAN
-# Note this is not officially supported and is just illustrated here to
-# show an example of how it can be done
-# You'll also need your fortran recipe to depend on libgfortran
-#FORTRAN:forcevariable = ",fortran"
+# This variable will fall into LANGUAGES variable (i.e., "c,c++${FORTRAN}"),
+# which is then consumed in gcc-configure-common.inc.
+#FORTRAN = ",fortran"
 
 #
 # Kernel image features

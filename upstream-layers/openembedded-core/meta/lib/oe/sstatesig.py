@@ -684,10 +684,10 @@ def OEOuthashBasic(path, sigfile, task, d):
                     update_hash(" " * 10)
 
                 update_hash(" ")
-                fh = hashlib.sha256()
                 if stat.S_ISREG(s.st_mode):
                     # Hash file contents
                     if filterfile:
+                        fh = hashlib.sha256()
                         # Need to ignore paths in crossscripts and postinst-useradd files.
                         with open(path, 'rb') as d:
                             chunk = d.read()
@@ -701,13 +701,13 @@ def OEOuthashBasic(path, sigfile, task, d):
                                     else:
                                         chunk = chunk.replace(bytes(r, encoding='utf8'), b'')
                             fh.update(chunk)
+                        update_hash(fh.hexdigest())
                     else:
-                        with open(path, 'rb') as d:
-                            for chunk in iter(lambda: d.read(4096), b""):
-                                fh.update(chunk)
-                    update_hash(fh.hexdigest())
+                        # Plain file that we're not filtering, use the fastpath in bb.utils
+                        update_hash(bb.utils.sha256_file(path))
                 else:
-                    update_hash(" " * len(fh.hexdigest()))
+                    # SHA256 has a 64 character hex digest
+                    update_hash(" " * 64)
 
                 update_hash(" %s" % path)
 

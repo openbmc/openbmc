@@ -1,4 +1,4 @@
-From 60d423945bd4f4c4b7bfc6f29da9231152d05690 Mon Sep 17 00:00:00 2001
+From e7d6a99119798856810f4067c7c550cae2173cef Mon Sep 17 00:00:00 2001
 From: Bruce Ashfield <bruce.ashfield@gmail.com>
 Date: Sat, 15 May 2021 10:26:38 -0400
 Subject: [PATCH] src/Kbuild: change missing CONFIG_TRACEPOINTS to warning
@@ -19,11 +19,13 @@ Signed-off-by: Bruce Ashfield <bruce.ashfield@gmail.com>
  src/Kbuild | 9 +++++++--
  1 file changed, 7 insertions(+), 2 deletions(-)
 
-Index: lttng-modules-2.14.0/src/Kbuild
-===================================================================
---- lttng-modules-2.14.0.orig/src/Kbuild
-+++ lttng-modules-2.14.0/src/Kbuild
-@@ -3,10 +3,13 @@
+diff --git a/src/Kbuild b/src/Kbuild
+index f33d0d5..beef608 100644
+--- a/src/Kbuild
++++ b/src/Kbuild
+@@ -1,12 +1,15 @@
+ # SPDX-License-Identifier: (GPL-2.0-only or LGPL-2.1-only)
+ # SPDX-FileCopyrightText: 2010-2024 EfficiOS Inc.
  
 -ifdef CONFIG_LOCALVERSION	# Check if dot-config is included.
 +ifneq ($(CONFIG_LOCALVERSION)$(CONFIG_LOCALVERSION_AUTO),)	# Check if dot-config is included.
@@ -39,7 +41,7 @@ Index: lttng-modules-2.14.0/src/Kbuild
  TOP_LTTNG_MODULES_DIR := $(shell dirname $(lastword $(MAKEFILE_LIST)))/..
  
  lttng_check_linux_version = $(shell pwd)/include/linux/version.h
-@@ -168,3 +171,5 @@
+@@ -168,3 +171,5 @@ obj-$(CONFIG_LTTNG) += tests/
  obj-$(CONFIG_LTTNG_SYSCALLS_EXTRACTOR) += lttng-syscalls-extractor.o
  
  # vim:syntax=make

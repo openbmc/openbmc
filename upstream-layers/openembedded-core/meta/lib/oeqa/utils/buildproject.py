@@ -38,8 +38,8 @@ class BuildProject(metaclass=ABCMeta):
             shutil.copyfile(os.path.join(self.dl_dir, self.archive), self.localarchive)
             return
 
-        cmd = "wget -O %s %s" % (self.localarchive, self.uri)
-        subprocess.check_output(cmd, shell=True)
+        cmd = ['wget', '-O', self.localarchive, self.uri]
+        subprocess.check_output(cmd)
 
     # This method should provide a way to run a command in the desired environment.
     @abstractmethod
@@ -63,4 +63,4 @@ class BuildProject(metaclass=ABCMeta):
         if not self.needclean:
              return
         self._run('rm -rf %s' % self.targetdir)
-        subprocess.check_call('rm -f %s' % self.localarchive, shell=True)
+        subprocess.check_call(['rm', '-f', self.localarchive])

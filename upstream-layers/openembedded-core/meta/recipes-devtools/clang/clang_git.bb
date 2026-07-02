@@ -54,8 +54,6 @@ OECMAKE_SOURCEPATH = "${S}/clang"
 # linux hosts (.so) on Windows .pyd
 SOLIBSDEV:mingw32 = ".pyd"
 
-#CMAKE_VERBOSE = "VERBOSE=1"
-
 EXTRA_OECMAKE += "-DLLVM_ENABLE_ASSERTIONS=OFF \
                   -DLLVM_ENABLE_PIC=ON \
                   -DCLANG_DEFAULT_PIE_ON_LINUX=ON \

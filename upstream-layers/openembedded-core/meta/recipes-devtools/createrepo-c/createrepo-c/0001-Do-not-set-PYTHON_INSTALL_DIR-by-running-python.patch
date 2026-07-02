@@ -1,25 +1,27 @@
-From 20aec3f83a7ab6ebb89f40ee8c5df1af65eba32b Mon Sep 17 00:00:00 2001
+From 71df5a5471081cf2338f9f046cdc51d064534297 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:31:02 +0200
 Subject: [PATCH] Do not set PYTHON_INSTALL_DIR by running python
 
 Upstream-Status: Inappropriate [oe-core specific]
+
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
 Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+Signed-off-by: Moritz Haase <Moritz.Haase@bmw.de>
 ---
  src/python/CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/python/CMakeLists.txt b/src/python/CMakeLists.txt
-index a31b14d..01fd8ca 100644
+index 05ac89f9f491f93367283974ea38b5e314f0c5b6..44e38b386abc1c8eb135721d89509c649fdc6297 100644
 --- a/src/python/CMakeLists.txt
 +++ b/src/python/CMakeLists.txt
-@@ -14,7 +14,7 @@ if (NOT SKBUILD)
-     FIND_PACKAGE(PythonLibs 3 REQUIRED)
- endif (NOT SKBUILD)
+@@ -48,7 +48,7 @@ IF (SKBUILD)
+     find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
+     Python_add_library(_createrepo_c MODULE WITH_SOABI ${createrepo_cmodule_SRCS})
+ ELSE ()
+-    EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from sysconfig import get_path; stdout.write(get_path('platlib'))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
++    #EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from sysconfig import get_path; stdout.write(get_path('platlib'))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
+     INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
+     MESSAGE(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")
  
--EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from sysconfig import get_path; stdout.write(get_path('platlib'))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
-+#EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} -c "from sys import stdout; from sysconfig import get_path; stdout.write(get_path('platlib'))" OUTPUT_VARIABLE PYTHON_INSTALL_DIR)
- INCLUDE_DIRECTORIES (${PYTHON_INCLUDE_PATH})
- 
- MESSAGE(STATUS "Python install dir is ${PYTHON_INSTALL_DIR}")

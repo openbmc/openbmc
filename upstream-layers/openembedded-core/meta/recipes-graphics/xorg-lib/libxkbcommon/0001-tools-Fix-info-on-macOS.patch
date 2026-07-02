@@ -1,0 +1,40 @@
+From c34f1edf1a22b584a8d554117a9b64985ddc04b0 Mon Sep 17 00:00:00 2001
+From: Pierre Le Marre <dev@wismill.eu>
+Date: Thu, 12 Mar 2026 13:01:16 +0100
+Subject: [PATCH] tools: Fix info on macOS
+
+Alex: this also fixes failures on no-x11 builds.
+
+Upstream-Status: Backport [https://github.com/xkbcommon/libxkbcommon/commit/75b7da3f8698b3482ba6b11f3835561a3efb6a29]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tools/info.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/tools/info.c b/tools/info.c
+index faf0cf75..4c4f0aaa 100644
+--- a/tools/info.c
++++ b/tools/info.c
+@@ -86,8 +86,20 @@ main(int argc, char **argv)
+         { "XKB_CONFIG_ROOT", DFLT_XKB_CONFIG_ROOT },
+         { "XKB_CONFIG_LEGACY_ROOT", DFLT_XKB_LEGACY_ROOT },
+         { "XKB_CONFIG_EXTRA_PATH", DFLT_XKB_CONFIG_EXTRA_PATH },
+-        { "XKB_CONFIG_UNVERSIONED_EXTENSIONS_PATH", DFLT_XKB_CONFIG_UNVERSIONED_EXTENSIONS_PATH },
+-        { "XKB_CONFIG_VERSIONED_EXTENSIONS_PATH", DFLT_XKB_CONFIG_VERSIONED_EXTENSIONS_PATH },
++        { "XKB_CONFIG_UNVERSIONED_EXTENSIONS_PATH",
++#ifdef DFLT_XKB_CONFIG_UNVERSIONED_EXTENSIONS_PATH
++          DFLT_XKB_CONFIG_UNVERSIONED_EXTENSIONS_PATH
++#else
++          ""
++#endif
++        },
++        { "XKB_CONFIG_VERSIONED_EXTENSIONS_PATH",
++#ifdef DFLT_XKB_CONFIG_UNVERSIONED_EXTENSIONS_PATH
++          DFLT_XKB_CONFIG_VERSIONED_EXTENSIONS_PATH
++#else
++          ""
++#endif
++        },
+         { "XKB_DEFAULT_RULES", DEFAULT_XKB_RULES },
+         { "XKB_DEFAULT_MODEL", DEFAULT_XKB_MODEL },
+         { "XKB_DEFAULT_LAYOUT", DEFAULT_XKB_LAYOUT },

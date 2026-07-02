@@ -69,7 +69,7 @@ do_install_ptest_base:append() {
 DEPENDS:append:class-target = " ${@bb.utils.contains('PTEST_ENABLED', '1', 'ptest-runner', '', d)}"
 PACKAGE_WRITE_DEPS:append:class-target = " ${@bb.utils.contains('PTEST_ENABLED', '1', 'ptest-runner', '', d)}"
 
-RDEPENDS:${PN}-ptest += "ptest-runner coreutils"
+RDEPENDS:${PN}-ptest += "coreutils"
 
 PACKAGES =+ "${PN}-rmt"
 

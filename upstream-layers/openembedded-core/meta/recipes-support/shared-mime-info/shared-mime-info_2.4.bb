@@ -13,7 +13,7 @@ SRC_URI = "git://gitlab.freedesktop.org/xdg/shared-mime-info.git;protocol=https;
            file://0002-Handle-build-with-older-versions-of-GCC.patch"
 SRCREV = "9a6d6b8e963935f145f3a1ef446552de6996dada"
 
-inherit meson pkgconfig gettext python3native mime
+inherit meson pkgconfig gettext mime
 
 EXTRA_OEMESON = " \
                  -Dupdate-mimedb=true \
