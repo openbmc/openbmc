@@ -9,7 +9,7 @@ Yocto BSP layer for the Raspberry Pi boards - <http://www.raspberrypi.org/>.
 <tr border="0">
 <td width="140" height="100" align="center">
   <br />
-  <a href="https://www.yoctoproject.org/ecosystem/branding/">
+  <a href="https://www.yoctoproject.org/brand-guidelines/">
     <img alt="Yocto Project Layer Compatible" src="img/LF_17_02_Yocto-Badge-Update_Compatible_Final_Blank.png">
   </a>
 </td>
