@@ -6,3 +6,8 @@ require recipes-phosphor/images/fb-yosemite5-phosphor-image.inc
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     phosphor-ipmi-blobs \
 "
+
+# Enable SMBIOS MDR to parse host SMBIOS data
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    smbios-mdr \
+"
