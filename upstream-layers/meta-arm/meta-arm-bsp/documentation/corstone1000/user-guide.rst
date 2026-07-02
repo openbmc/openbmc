@@ -51,7 +51,7 @@ The Corstone-1000 software stack can be run on:
 Yocto Stable Branch
 -------------------
 
-Corstone-1000 software stack is built on top of Yocto Project's `Whinlatter release <meta-arm-repository-release-branch_>`__.
+Corstone-1000 software stack is built on top of Yocto Project's `Wrynose release <meta-arm-repository-release-branch_>`__.
 
 Software Components
 -------------------
@@ -92,7 +92,7 @@ Host Processor Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.0.bb``        |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.1.bb``        |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 `Trusted Services <https://trusted-services.readthedocs.io/en/latest/index.html>`__
@@ -132,7 +132,7 @@ Host Processor Components
 ================================================================
 
 +----------+------------------------------------------------------------------------------------------+
-| bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_4.%.bbappend``      |
+| bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_%.bbappend``        |
 +----------+------------------------------------------------------------------------------------------+
 | Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.9.0.bb``              |
 +----------+------------------------------------------------------------------------------------------+
@@ -145,7 +145,7 @@ Host Processor Components
 +----------+----------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_%.bbappend``      |
 +----------+----------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.04.bb``      |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.10.bb``      |
 +----------+----------------------------------------------------------------------------------+
 
 Linux
@@ -173,7 +173,7 @@ Secure Enclave Components
 +----------+-------------------------------------------------------------------------------------------------------+
 | bbappend | ``${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend``   |
 +----------+-------------------------------------------------------------------------------------------------------+
-| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.1.bb``         |
+| Recipe   | ``${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.2.bb``         |
 +----------+-------------------------------------------------------------------------------------------------------+
 
 ************************************
@@ -233,7 +233,7 @@ Build
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2025.12
+        git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2026.05
 
 #. Build a Corstone-1000 image:
 
@@ -282,20 +282,26 @@ Build with SSH
 The ``meta-arm/kas/corstone1000-${TARGET}.yml`` build produces an image for
 booting from flash.
 
-To build a bootable mass storage OS image with Dropbear SSH enabled, run:
+.. important::
+
+    The SSH-enabled mass storage image is supported only for the FVP target.
+    It is not supported for the MPS3 target, because it relies on pre-generated
+    SSH host keys intended for virtual platforms.
+
+To build a bootable mass storage OS image with Dropbear SSH enabled for FVP,
+run:
 
 .. code-block:: console
 
-    kas build meta-arm/ci/corstone1000-${TARGET}.yml:meta-arm/kas/corstone1000-ssh.yml
+    kas build meta-arm/ci/corstone1000-fvp.yml:meta-arm/kas/corstone1000-ssh.yml
 
-The mass storage OS image can be found at ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-${TARGET}/core-image-minimal-corstone1000-${TARGET}.wic``
+The mass storage OS image can be found at
+``${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/core-image-minimal-corstone1000-fvp.wic``
 
 .. note::
 
-    For the FVP, the generated ``core-image-minimal-corstone1000-fvp.fvpconf``
-    configures the mass storage OS image using ``board.msd_mmc.p_mmc_file``.
-
-    For the MPS3 platform, write the ``*.wic`` image directly to the mass storage device.
+    The generated ``core-image-minimal-corstone1000-fvp.fvpconf`` configures
+    the mass storage OS image using ``board.msd_mmc.p_mmc_file``.
 
 
 .. _flashing-firmware-images:
@@ -389,8 +395,8 @@ Flash
 
 
 #. Copy ``bl1.bin`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/trusted-firmware-m/`` to the ``SOFTWARE`` directory of the FPGA bundle.
-#. Copy ``es_flashfw.bin`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3`` to the ``SOFTWARE`` directory of the FPGA bundle
-   and rename the binary to ``es0.bin``.
+#. Remove ``ES0.bin`` from the ``SOFTWARE`` directory of the FPGA bundle. Copy ``es_flashfw.bin`` from
+   ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3`` to the ``SOFTWARE`` directory of the FPGA bundle and rename the binary to ``es0.bin``.
 #. Copy ``corstone1000-flash-firmware-image-corstone1000-mps3.wic`` from ``${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3`` to the ``SOFTWARE``
    directory of the FPGA bundle and rename the wic image to ``cs1000.bin``.
 
@@ -538,8 +544,8 @@ Tests
 Reports
 -------
 
-Reports for the tests conducted on the `Corstone-1000 software (CORSTONE1000-2025.12) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2025.12>`__
-release are available for reference `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2025.12/embedded-a/corstone1000/CORSTONE1000-2025.12?ref_type=tags>`__.
+Reports for the tests conducted on the `Corstone-1000 software (CORSTONE1000-2026.05) <https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2026.05>`__
+release are available for reference `here <https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2026.05/embedded-a/corstone1000/CORSTONE1000-2026.05?ref_type=tags>`__.
 
 
 .. _clean-secure-flash:
@@ -558,7 +564,7 @@ Clean Secure Flash
     .. code-block:: console
 
         cd ${WORKSPACE}
-        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git -b CORSTONE1000-2025.12
+        git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git -b CORSTONE1000-2026.05
 
 #. Copy the secure flash cleaning Git patch file to your copy of `meta-arm`.
 
@@ -796,7 +802,12 @@ MPS3
         cd ${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0
         sudo dd if=ir-acs-live-image-generic-arm64.wic of=/dev/sdc iflag=direct oflag=direct bs=1M status=progress; sync
 
-#. Plug the USB drive to the MPS3. At this point you should have both the USB drive with the ESP and the USB drive with the ACS image plugged to the MPS3.
+#. Unplug the ESP USB drive from the MPS3, if connected.
+
+#. Plug only the ACS image USB drive to the MPS3.
+
+   The ESP USB drive must remain unplugged while the ACS image is booting,
+   otherwise GRUB might fail to find the bootable partition on the ACS image USB drive.
 
 #. Reboot the MPS3.
 
@@ -804,12 +815,10 @@ The MPS3 will reset multiple times during the test, and it might take approximat
 
 .. important::
 
-    Unplug the ESP USB drive from the MPS3 if it is preventing GRUB
-    from finding the bootable partition. Leave only the ACS image USB drive
-    plugged in to run the ACS tests.
-
-    The ESP USB drive can be plugged in again after
-    selecting the `Linux Boot` option in the GRUB menu at the end of the ACS tests.
+    Keep the ESP USB drive unplugged until the GRUB menu is displayed during
+    the Linux boot timeout workaround described below. Plug the ESP USB drive
+    back in just before selecting the `Linux Boot` option, so it is available
+    for the remaining ACS tests.
 
 .. warning::
 
@@ -820,6 +829,7 @@ The MPS3 will reset multiple times during the test, and it might take approximat
     #. Press Enter at the Linux prompt.
     #. Open the file `/etc/systemd/system.conf` and set `DefaultDeviceTimeoutSec=infinity`.
     #. Reboot the platform using the `reboot` command.
+    #. When the GRUB menu appears, plug the ESP USB drive back into the MPS3.
     #. Select the `Linux Boot` option from the GRUB menu.
     #. Allow Linux to boot and run the remaining ACS tests until completion.
 
@@ -864,7 +874,7 @@ If GRUB is not interrupted, the tests are executed automatically in the followin
  - UEFI BSA
  - FWTS
 
-The results can be fetched from the `acs_results` folder in the ``BOOT`` partition of the USB drive (for MPS3) or SD Card (for FVP).
+The results can be fetched from the `acs_results` folder in the ``BOOT`` partition of the ACS image USB drive (for MPS3) or SD Card (for FVP).
 
 .. note::
 
@@ -935,6 +945,11 @@ Generate Capsules
 `EDK II's <edk2-repository_>`__ ``GenerateCapsule`` tool is used to generate capsules and is built automatically
 for the host machine during the firmware image building process.
 The tool can be found at ``${WORKSPACE}/build/tmp/sysroots-components/aarch64/edk2-basetools-native/usr/bin/edk2-BaseTools/BinWrappers/PosixLike/GenerateCapsule``.
+
+.. note::
+
+    The ``aarch64`` part of this path depends on the build host architecture
+    and can be different on another host.
 
 A JSON file containing metadata about the capsule payloads needs to be created using the script
 found at ``${WORKSPACE}/meta-arm/meta-arm/scripts/generate_capsule_json_multiple.py``.
@@ -1079,6 +1094,20 @@ Transfer Capsules to Target
 The capsule delivery process described below is the direct method (usage of capsules from the ACS image)
 as opposed to the on-disk method (delivery of capsules using a file on a mass storage device).
 
+MPS3
+====
+
+#. Prepare a USB drive as explained in `this <mps3-instructions-for-acs-image_>`_ section.
+
+#. Copy the capsule files to the root directory of the ``BOOT`` partition in the USB drive.
+
+  .. code-block:: console
+
+    cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-mps3/corstone1000-mps3-v6.uefi.capsule /dev/sdc/BOOT/
+    cp ${WORKSPACE}/corstone1000-mps3-v5.uefi.capsule /dev/sdc/EFI/BOOT/
+    cp ${WORKSPACE}/corstone1000-mps3-partial-v7.uefi.capsule /dev/sdc/EFI/BOOT/
+    sync
+
 .. note::
 
     The staging steps below are shared between ``mps3`` and ``fvp``.
@@ -1140,7 +1169,7 @@ This will be followed by using the invalid capsule to run the rollback protectio
 Positive Full Capsule Update Test
 =================================
 
-#. Run Corstone-1000 with the ACS image containing the two capsule files:
+#. Run Corstone-1000 with the ACS image containing the capsule files:
 
     - MPS3:
 
@@ -1204,42 +1233,40 @@ Positive Full Capsule Update Test
 
     
     The software stack copies the capsule content to the external flash, which is shared between the Secure Enclave and the Host Processor
-    before rebooting the system.
-
-    After the first reboot, TrustedFirmware-M should apply the valid capsule and display the following log on the Secure Enclave terminal (``ttyUSB1`` for MPS3)
-    before rebooting the system a second time:
+    before rebooting the system, and the following logs should be displayed on the Secure Enclave terminal (``ttyUSB1`` for MPS3):
 
     .. code-block:: console
 
       ...
-      SysTick_Handler: counted = 10, expiring on = 360
-      SysTick_Handler: counted = 20, expiring on = 360
-      SysTick_Handler: counted = 30, expiring on = 360
-      ...
+      fwu_bootloader_install_image: enter
+      metadata_read: success: active = 0, previous = 1
+      fwu_update_metadata: enter
       metadata_write: success: active = 1, previous = 0
-      flash_full_capsule: exit
-      corstone1000_fwu_flash_image: exit: ret = 0
+      fwu_update_metadata: exit: ret = 0
+      fwu_bootloader_install_image: exit: ret = 0
       ...
 
-    The above log snippet indicates that the new capsule image is successfully applied, and the board is booting with the external flash's Bank-1.
-
-    After a second reboot, the following log should be displayed on on the Secure Enclave terminal (``ttyUSB1``):
-
-    .. code-block:: console
-
-      ...
-      fmp_set_image_info:133 Enter
-      FMP image update: image id = 0
-      FMP image update: status = 0version=6 last_attempt_version=6.
-      fmp_set_image_info:157 Exit.
-      corstone1000_fwu_host_ack: exit: ret = 0
-      ...
+    The above log snippet indicates that the new capsule image is successfully applied.
+    
+    After the first reboot, 
 
 #. Interrupt the U-Boot shell.
 
     .. code-block:: console
 
         Hit any key to stop autoboot:
+    
+    After the first reboot, TrustedFirmware-M should display the following log on the Secure Enclave terminal (``ttyUSB1`` for MPS3):
+
+    .. code-block:: console
+
+      ...
+      [INF] Starting TF-M BL1_1
+      metadata_read: success: active = 1, previous = 0
+      get_fwu_agent_state: exit: FWU Agent PSA_FWU_TRIAL (index mismatch)
+      bl1_get_active_bl2_image: booting from trial bank: 1
+      bl1_get_active_bl2_image: exit: booting from bank = 1, offset = 0x1002000
+      ...
 
 #. Run the following commands in order to run the Corstone-1000 Linux kernel.
 
@@ -1251,6 +1278,18 @@ Positive Full Capsule Update Test
         $ unzip $kernel_addr 0x90000000
         $ loadm 0x90000000 $kernel_addr_r $filesize
         $ bootefi $kernel_addr_r $fdtcontroladdr
+
+    After executing above set of commands, the following log should be displayed on the Secure Enclave terminal (``ttyUSB1``):
+
+    .. code-block:: console
+
+      ...
+      fwu_accept_image: success: fwu state is changed to regular
+      update_nv_counters: success
+      disable_host_ack_timer: timer to reset is disabled
+      FMP image update: status = 0version=6 last_attempt_version=6.
+      fwu_bootloader_mark_image_accepted: exit: ret = 0
+      ...
 
 #. The first boot after a capsule update is considered the trial stage, during which the FWU image is accepted.
    However, to view the updated contents of the EFI System Resource Table (ESRT), an additional reboot is required.
@@ -1345,21 +1384,20 @@ Rollback Protection Capsule Update Test
     .. code-block:: console
 
       ...
-        uefi_capsule_retrieve_images: image 0 at 0xa0000070, size=15654928
-        uefi_capsule_retrieve_images: exit
-        flash_full_capsule: enter: image = 0x0xa0000070, size = 7764541, version = 5
-        ERROR: flash_full_capsule: version error
-        private_metadata_write: enter: boot_index = 1
-        private_metadata_write: success
-        fmp_set_image_info:133 Enter
-        FMP image update: image id = 0
-        FMP image update: status = 1version=6 last_attempt_version=5.
-        fmp_set_image_info:157 Exit.
-        corstone1000_fwu_flash_image: exit: ret = -1
-        fmp_get_image_info:232 Enter
-        pack_image_info:207 ImageInfo size = 105, ImageName size = 34, ImageVersionName
-        size = 36
-        fmp_get_image_info:236 Exit
+      fwu_bootloader_load_image: enter: block_offset = 0
+      FMP version: 0x5, metadata version : 0x7
+      private_metadata_write: enter: boot_index = 0
+      private_metadata_write: success
+      fmp_set_image_info:160 Enter
+      FMP image update: image id = 0
+      FMP image update: status = 1version=7 last_attempt_version=5.
+      fmp_set_image_info:184 Exit.
+      ERROR: fwu_bootloader_load_image: version error
+      remove_all_stale_partitions: Removed GPT partition 'bl2_secondary'
+      remove_all_stale_partitions: Removed GPT partition 'tfm_secondary'
+      remove_all_stale_partitions: Removed GPT partition 'FIP_B'
+      remove_all_stale_partitions: Removed GPT partition 'kernel_secondary'
+      fwu_bootloader_load_image: exit: ret = -248
       ...
 
     The Secure Enclave tries to load the new image a predetermined number of times
@@ -1622,7 +1660,7 @@ Corstone-1000 on-board non-volatile storage size is insufficient for installing 
 
                 dd if=/dev/zero of=${WORKSPACE}/fvp_distro_system_drive.img \
                 bs=1 count=0 seek=10G; sync; \
-                parted -s fvp_distro_system_drive.img mklabel gpt
+                parted -s ${WORKSPACE}/fvp_distro_system_drive.img mklabel gpt
     
         #. This MMC image will be used as the primary drive to boot the distribution.
 
@@ -1680,6 +1718,10 @@ FVP
         -C board.msd_mmc.p_mmc_file=${WORKSPACE}/fvp_distro_system_drive.img \
         -C board.msd_mmc_2.p_mmc_file=${DISTRO_INSTALLER_ISO_PATH}"
 
+    .. note::
+
+        The FVP distribution installation process can take 6-8 hours to complete.
+
     The Linux distribution will be installed on ``fvp_distro_system_drive.img``.
 
 
@@ -1688,7 +1730,7 @@ Debian Installation Extra Steps
 
 Debian installation may need some extra steps, that are indicated below:
 
-#. Answer ``Yes`` to the question ``Force grub installation to the EFI removable media path?``.
+#. Answer ``Yes`` to the question ``Install the GRUB boot loader``.
 
     If the GRUB installation fails, these are the steps to follow on the subsequent
     popups:
@@ -1847,8 +1889,7 @@ Generate Keys, Signed Image and Unsigned Image
         cd ${WORKSPACE}
 
         git clone https://gitlab.arm.com/arm-reference-solutions/iot-platform-assets \
-
-        -b CORSTONE1000-2025.12
+        -b CORSTONE1000-2026.05
 
 #. Set the current working directory to build directory's subdirectory containing the software stack build images.
 
@@ -1892,7 +1933,7 @@ MPS3
 
 #. Perform a cold boot of the MPS3.
 
-#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Press any key to stop``.
+#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Hit any key to stop autoboot``.
 
     .. warning::
 
@@ -1965,7 +2006,7 @@ FVP
 
 #. Run the software stack as described `here <running-software-stack-fvp_>`__.
 
-#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Press any key to stop``.
+#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Hit any key to stop autoboot``.
 
     .. warning::
 
@@ -2066,9 +2107,12 @@ As a result, U-Boot reads these variables and verifies the Linux kernel image be
 In a typical boot scenario, the Linux kernel image is not signed, which will prevent the system from booting due to failed image authentication.
 To resolve this, the Platform Key (one of the UEFI authenticated variables for secure boot) needs to be deleted.
 
-#. Perform a cold boot of the MPS3.
+#. For MPS3, perform a cold boot.
 
-#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Press any key to stop``.
+#. For FVP, continue in the same boot cycle in which the UEFI secure boot keys were enrolled.
+   Do not cold boot FVP before deleting the Platform Key, because the secure flash contents are not preserved across an FVP cold boot.
+
+#. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message ``Hit any key to stop autoboot``.
 
 #. On the U-Boot console, delete the Platform Key (PK).
 
@@ -2269,7 +2313,7 @@ and `Arm Development Studio <arm-ds-website_>`__ versions 2022.2, 2022.c, or 202
 .. _arm-developer-fvp: https://developer.arm.com/tools-and-software/open-source-software/arm-platforms-software/arm-ecosystem-fvps
 .. _secure-debug-manager-repo-readme: https://github.com/ARM-software/secure-debug-manager/tree/master?tab=readme-ov-file#secure-debug-manager-psa-adac--sdc-600
 .. _secure-debug-manager-armds-integration: https://github.com/ARM-software/secure-debug-manager?tab=readme-ov-file#arm-development-studio-integration
-.. _meta-arm-repository-release-branch: https://docs.yoctoproject.org/next/migration-guides/migration-5.3.html
+.. _meta-arm-repository-release-branch: https://docs.yoctoproject.org/next/migration-guides/migration-6.0.html
 .. _arm-ulink-pro-website: https://www.arm.com/products/development-tools/debug-probes/ulink-pro
 .. _arm-ds-website: https://www.arm.com/products/development-tools/embedded-and-software/arm-development-studio
 .. _edk2-repository: https://github.com/tianocore/edk2

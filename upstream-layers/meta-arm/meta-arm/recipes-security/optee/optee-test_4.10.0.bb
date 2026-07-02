@@ -2,8 +2,6 @@ require recipes-security/optee/optee-test.inc
 
 # v4.10.0
 SRCREV = "88c93e87a5c172363ee986ded036a25cafcc9d2c"
-PV .= "+git"
-UPSTREAM_CHECK_COMMITS = "1"
 
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=a8fa504109e4cd7ea575bc49ea4be560 \
                     file://LICENSE-BSD;md5=dca16d6efa93b55d0fd662ae5cd6feeb \
@@ -17,8 +15,3 @@ EXTRA_OEMAKE:append = "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test
 
 RDEPENDS:${PN} += "${@bb.utils.contains('MACHINE_FEATURES', 'optee-spmc-test', \
                                               ' arm-ffa-user', '' , d)}"
-
-# Not a release recipe, try our hardest to not pull this in implicitly
-DEFAULT_PREFERENCE = "-1"
-
-CFLAGS += "-Wno-error=unterminated-string-initialization"

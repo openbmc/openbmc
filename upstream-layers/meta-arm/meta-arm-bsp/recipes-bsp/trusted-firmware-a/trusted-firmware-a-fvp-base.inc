@@ -55,9 +55,6 @@ TFA_PLATFORM = "fvp"
 # Disable debug build if measured boot is enabled.
 TFA_DEBUG := "${@bb.utils.contains('MACHINE_FEATURES', 'ts-attestation', '0',\
               d.getVar('TFA_DEBUG'), d)}"
-# Add mbedtls if measured boot is enabled
-TFA_MBEDTLS := "${@bb.utils.contains('MACHINE_FEATURES', 'ts-attestation',\
-               '1', d.getVar('TFA_MBEDTLS'), d)}"
 TFA_UBOOT ?= "1"
 TFA_BUILD_TARGET = "bl1 bl2 bl31 dtbs fip"
 

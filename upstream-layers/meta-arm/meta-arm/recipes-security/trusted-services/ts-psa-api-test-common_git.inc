@@ -9,17 +9,17 @@ DEPENDS        += "python3-jsonschema-native python3-jinja2-native"
 DEPENDS        += "libpsats"
 RDEPENDS:${PN} += "libpsats"
 
-SRC_URI += "git://github.com/ARM-software/psa-arch-tests.git;name=psatest;protocol=https;branch=main;destsuffix=psatest \
-            file://0001-Pass-Yocto-build-settings-to-psa-arch-tests-native.patch;patchdir=../psatest \
+SRC_URI += "git://github.com/ARM-software/psa-arch-tests.git;name=psatest;protocol=https;branch=main;destsuffix=ts/ts-external/psatest \
+            file://0001-Pass-Yocto-build-settings-to-psa-arch-tests-native.patch;patchdir=../ts/ts-external/psatest \
            "
 
 SRCREV_psatest = "74dc6646ff594e131a726a5305aba77bac30eceb"
-LIC_FILES_CHKSUM += "file://../psatest/LICENSE.md;md5=2a944942e1496af1886903d274dedb13"
+LIC_FILES_CHKSUM += "file://${S}/ts-external/psatest/LICENSE.md;md5=2a944942e1496af1886903d274dedb13"
 
-EXTRA_OECMAKE += "-DPSA_ARCH_TESTS_SOURCE_DIR=${WORKDIR}/sources/psatest"
+EXTRA_OECMAKE += "-DPSA_ARCH_TESTS_SOURCE_DIR=${S}/ts-external/psatest"
 
 do_apply_local_src_patches:append() {
-    apply_local_src_patches ${S}/external/psa_arch_tests ${WORKDIR}/sources/psatest
+    apply_local_src_patches ${S}/external/psa_arch_tests ${S}/ts-external/psatest
 }
 
 FILES:${PN} = "${bindir}/${PSA_TEST}"

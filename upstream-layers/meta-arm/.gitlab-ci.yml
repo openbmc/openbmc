@@ -165,9 +165,9 @@ corstone1000-a320-fvp:
   parallel:
     matrix:
       - FIRMWARE: corstone1000-firmware-only
-        TESTING: [none, tftf]
+        TESTING: [testimage, tftf]
       - FIRMWARE: none
-        TESTING: none
+        TESTING: testimage
 
 documentation:
   extends: .setup

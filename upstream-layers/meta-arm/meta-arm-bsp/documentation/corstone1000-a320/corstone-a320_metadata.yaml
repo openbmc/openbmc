@@ -1,5 +1,5 @@
 ---
-title: Corstone-1000 Armv9-A Edge-AI
+title: Corstone-1000 with Cortex-A320
 subtitle: ""
 abstract: Arm Corstone-1000 with Cortex-A320 is a reference solution for IoT devices. It is part of Total Solution for IoT which consists of hardware and software reference implementation.
 author: Arm
@@ -97,7 +97,7 @@ variables:
 - name: secure_debug_manager_armds_integration
   value: 'https://github.com/ARM-software/secure-debug-manager?tab=readme-ov-file#arm-development-studio-integration'
 - name: meta_arm_repository_release_branch
-  value: 'https://docs.yoctoproject.org/next/migration-guides/migration-5.3.html'
+  value: 'https://docs.yoctoproject.org/next/migration-guides/migration-6.0.html'
 - name: arm_ulink_pro_website
   value: 'https://www.arm.com/products/development-tools/debug-probes/ulink-pro'
 - name: arm_ds_website

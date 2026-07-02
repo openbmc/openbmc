@@ -1,6 +1,8 @@
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://uefi-secureboot.cfg"
+SRC_URI += "file://uefi-secureboot.cfg \
+            file://0001-efi_loader-fix-building-with-CONFIG_EFI_VARIABLES_PR.patch \
+           "
 
 inherit sbsign
 

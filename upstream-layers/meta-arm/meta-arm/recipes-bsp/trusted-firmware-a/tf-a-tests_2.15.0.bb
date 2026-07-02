@@ -9,8 +9,10 @@ COMPATIBLE_MACHINE ?= "invalid"
 
 SRC_URI_TRUSTED_FIRMWARE_A_TESTS ?= "git://review.trustedfirmware.org/TF-A/tf-a-tests;protocol=https"
 SRC_URI = "${SRC_URI_TRUSTED_FIRMWARE_A_TESTS};branch=${SRCBRANCH}"
-SRCBRANCH = "lts-v2.10"
-SRCREV = "ad8e3c9506abc6fd093c9753c8e201ddc2daa270"
+SRCBRANCH = "master"
+SRCREV = "bd08278493028d3c33936f61f406169a7f0deb9f"
+
+SRC_URI += "file://0001-Fix-GCC-errors-in-test_psci_stat.c.patch"
 
 EXTRA_OEMAKE += "USE_NVM=0"
 EXTRA_OEMAKE += "SHELL_COLOR=1"

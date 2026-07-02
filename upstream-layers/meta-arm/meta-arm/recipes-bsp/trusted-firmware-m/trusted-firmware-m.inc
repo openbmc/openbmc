@@ -72,7 +72,6 @@ EXTRA_OECMAKE += "${@bb.utils.contains('TFM_DEBUG', '1', '-DCMAKE_BUILD_TYPE=Deb
 
 EXTRA_OECMAKE += "\
     -DCMSIS_PATH=${S}/external/cmsis \
-    -DMBEDCRYPTO_PATH=${S}/external/mbedtls \
     -DMCUBOOT_PATH=${S}/external/mcuboot \
     -DQCBOR_PATH=${S}/external/qcbor \
     -DT_COSE_PATH=${S}/external/t_cose \

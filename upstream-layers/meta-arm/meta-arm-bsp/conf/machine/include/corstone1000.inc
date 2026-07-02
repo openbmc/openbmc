@@ -6,6 +6,7 @@ MACHINEOVERRIDES =. "corstone1000:"
 
 # TF-M
 PREFERRED_VERSION_trusted-firmware-m ?= "2.2.%"
+PREFERRED_VERSION_trusted-firmware-m-scripts-native ?= "2.2.%"
 
 # TF-A
 TFA_PLATFORM = "corstone1000"
