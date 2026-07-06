@@ -2,7 +2,7 @@ HOMEPAGE = "https://github.com/openbmc/openpower-vpd-parser"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 SRC_URI += "git://github.com/openbmc/openpower-vpd-parser;branch=master;protocol=https"
-SRCREV = "7d9ef8e6e996aabe495ac2fb7d0558412d1c0d67"
+SRCREV = "a40897334df069211b1d4c2ca488af420a1625ef"
 DEPENDS += "\
     nlohmann-json \
     cli11 \
