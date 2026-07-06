@@ -160,4 +160,6 @@ if [ "$1" = bound ]; then
   echo 'Signaling dhcp done' >&2
   update_netboot_status "netboot" "BMC Netboot Complete" "SUCCESS"
   update-dhcp-status 'DONE' "Netboot finished"
+
+  touch /run/netboot_done
 fi
