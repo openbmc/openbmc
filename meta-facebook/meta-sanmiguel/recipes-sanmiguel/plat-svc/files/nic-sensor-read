@@ -26,8 +26,10 @@ NIC_INFO_LIST=(
     "72 NS_NIC"
 )
 
-SENSOR_LIST=(50 300 500)
+declare -A NIC_SENSORS
+declare -A NIC_SENSOR_LIST_BUILT
 LAST_HOST_READY="0"
+
 
 is_host_on() {
     local state
@@ -79,9 +81,9 @@ update_numeric_sensor_value() {
         return 1
     fi
 
-    # The sensor (ID 50) has "unitModifier" = -1 in PDR.
+    # The power sensor (ID 50-59) has "unitModifier" = -1 in PDR.
     # The actual reading should be the original value * 0.1.
-    if [[ ${sensor_id} -eq 50 ]]; then
+    if [[ ${sensor_id} -ge 50 && ${sensor_id} -le 59 ]]; then
         val="$((val / 10)).$((val % 10))"
     fi
 
@@ -116,10 +118,38 @@ handle_host_transition() {
         else
             echo "Host OFF, invalidate all sensors..."
             invalidate_all_sensors
+            for key in "${!NIC_SENSOR_LIST_BUILT[@]}"; do
+                NIC_SENSOR_LIST_BUILT[$key]=0
+            done
         fi
     fi
 
     LAST_HOST_READY="$current"
+}
+
+build_sensor_list() {
+    local eid="$1"
+    local -n out=$2
+    local file="/tmp/pldm_pdr_${eid}.json"
+
+    if ! timeout 3 pldmtool platform GetPDR -m "$eid" -a > "$file"; then
+        return 1
+    fi
+
+    out=()
+
+    local jq_out
+    if ! jq_out=$(jq -r '
+        [ .[] | select(.PDRType == "Numeric Sensor PDR") ] as $numeric |
+        ( [ $numeric[] | select(.sensorID >= 50 and .sensorID <= 59) | .sensorID ] | first // "null" ),
+        ( [ $numeric[] | select(.sensorID >= 300 and .sensorID <= 399) | .sensorID ] | first // "null" ),
+        ( [ $numeric[] | select(.sensorID >= 500 and .sensorID <= 699) | .sensorID ] | first // "null" )
+    ' "$file" 2>/dev/null) || [[ -z "$jq_out" ]]; then
+        echo "Error: Failed to parse PDR JSON or empty output for EID $eid" >&2
+        return 1
+    fi
+
+    mapfile -t out <<< "$jq_out"
 }
 
 # ------------------------------------------------------------------------------
@@ -137,14 +167,38 @@ while true; do
     for nic_info in "${NIC_INFO_LIST[@]}"; do
         read -r nic_eid nic_name <<< "$nic_info"
 
-        for sensor_id in "${SENSOR_LIST[@]}"; do
+        if [[ "${NIC_SENSOR_LIST_BUILT[$nic_name]:-0}" -ne 1 ]]; then
+            echo "Fetching PDR and building sensor list for $nic_name (EID: $nic_eid)..."
+            sensor_list=()
+            if build_sensor_list "$nic_eid" sensor_list; then
+                NIC_SENSORS["$nic_name"]="${sensor_list[*]}"
+                NIC_SENSOR_LIST_BUILT["$nic_name"]=1
+                echo "Available sensors for $nic_name: ${sensor_list[*]}"
+            else
+                echo "Failed to fetch PDR for $nic_name, retry on next poll."
+                continue
+            fi
+        fi
+
+        read -r -a sensor_ids <<< "${NIC_SENSORS[$nic_name]}"
+
+        for i in "${!sensor_ids[@]}"; do
+            sensor_id="${sensor_ids[$i]}"
+            [[ "$sensor_id" == "null" ]] && continue
 
             if ! is_host_on; then
                 handle_host_transition "$HOST_OFF"
                 break 2
             fi
 
-            sensor_name="${nic_name}_${SENSOR_NAME_MAP[$sensor_id]}"
+            suffix=""
+            case "$i" in
+                0) suffix="PWR_W" ;;
+                1) suffix="TEMP_C" ;;
+                2) suffix="OSFP_TEMP_C" ;;
+            esac
+
+            sensor_name="${nic_name}_${suffix}"
             update_numeric_sensor_value "$nic_eid" "$sensor_id" "$sensor_name"
         done
     done
