@@ -32,6 +32,7 @@ BOOST_LIBS:openbmc-phosphor:class-target = " \
 # by categorizing it as a dev dependency
 FILES:${PN}-dev:append = " \
     ${libdir}/libboost_system*.so.* \
+    ${libdir}/libboost_regex*.so.* \
 "
 
 BJAM_OPTS:append = " boost.process.fs=std"
