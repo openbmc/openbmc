@@ -1,0 +1,1 @@
+INSANE_SKIP:${PN}-context:aspeed-g5 = "textrel"
