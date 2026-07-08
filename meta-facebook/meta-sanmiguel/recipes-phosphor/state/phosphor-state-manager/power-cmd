@@ -235,6 +235,7 @@ host_power_on()
         set_gpio "B1_M0_${out_run_pwr_en}" "$GPIO_HIGH"
         set_gpio "${out_pdb_run_power_en}" "$GPIO_HIGH"
         set_gpio "${out_e1s_pwr_en}" "$GPIO_HIGH"
+        sleep 1
         set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_HIGH"
         set_gpio "${out_smm_usb_pwr_en}" "$GPIO_HIGH"
         return 0
@@ -258,6 +259,7 @@ host_power_on()
     # Enable boot driver power
     set_gpio "${out_ssd0_pwrdis}" "$GPIO_LOW"
     set_gpio "${out_e1s_pwr_en}" "$GPIO_HIGH"
+    sleep 1
     set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_HIGH"
 
     # Set RUN_POWER_EN, wait RUN_POWER_PG assert, 10s timeout
