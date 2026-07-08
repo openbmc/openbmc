@@ -487,7 +487,9 @@
     {
         "Desc": {
             "Name": "RMC_AIR_FLOW",
-            "SensorType": "airflow"
+            "SensorType": "airflow",
+            "MaxValue": 108,
+            "MinValue": 8.5
         },
         "Associations": [
             [
