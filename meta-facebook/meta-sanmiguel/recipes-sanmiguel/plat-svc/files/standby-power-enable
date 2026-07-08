@@ -135,6 +135,10 @@ fi
 # Bind PDB IOX
 bind_i2c_device pca953x 9-0020 3
 
+# Enable Clover power when standby power enabled
+# This allow shared NIC works even when host is powered off
+set_gpio "HSC4_S5_OR_S0_N-O" "$GPIO_HIGH"
+
 # This turns on STBY power to the PDB
 # Enables standby power to HPM Board 0 and 1, CPX modules, and N/S NIC.
 set_gpio "STBY_POWER_EN-O" "$GPIO_HIGH"

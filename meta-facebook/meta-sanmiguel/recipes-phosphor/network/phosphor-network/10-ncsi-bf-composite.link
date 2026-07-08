@@ -1,0 +1,10 @@
+[Match]
+Driver=cdc_ether
+Path=platform-1e6a3000.usb-usb-0:1.1.4.1:1.2
+Property=ID_VENDOR_ID=0955 ID_MODEL_ID=cf11
+
+[Link]
+Name=ncsi0
+NamePolicy=
+AlternativeNamesPolicy=
+MACAddressPolicy=

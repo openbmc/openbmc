@@ -5,22 +5,30 @@ EXTRA_OEMESON = "-Dforce-sync-mac=true"
 
 SRC_URI:append = " \
     file://00-hmc-usb0.network \
+    file://00-bmc-ncsi0.network \
+    file://10-ncsi-bf-composite.link \
     file://90-hmc-usb0-network.rules \
     file://config.json \
     "
 
 FILES:${PN}:append = " \
     ${sysconfdir}/systemd/network/00-bmc-hmcusb0.network \
+    ${sysconfdir}/systemd/network/00-bmc-ncsi0.network \
     ${sysconfdir}/udev/rules.d/90-hmc-usb0-network.rules \
+    ${systemd_unitdir}/network/10-ncsi-bf-composite.link \
     ${datadir}/network/*.json \
     "
 
 do_install:append() {
     install -d ${D}${sysconfdir}/systemd/network/
     install -m 0644 ${UNPACKDIR}/00-hmc-usb0.network ${D}${sysconfdir}/systemd/network/00-bmc-hmcusb0.network
+    install -m 0644 ${UNPACKDIR}/00-bmc-ncsi0.network ${D}${sysconfdir}/systemd/network/00-bmc-ncsi0.network
 
     install -d ${D}${sysconfdir}/udev/rules.d
     install -m 0644 ${UNPACKDIR}/90-hmc-usb0-network.rules ${D}${sysconfdir}/udev/rules.d/90-hmc-usb0-network.rules
+
+    install -d ${D}${systemd_unitdir}/network/
+    install -m 0644 ${UNPACKDIR}/10-ncsi-bf-composite.link ${D}${systemd_unitdir}/network/10-ncsi-bf-composite.link
 
     install -d ${D}${datadir}/network/
     install -m 0644 ${UNPACKDIR}/config.json ${D}${datadir}/network/
