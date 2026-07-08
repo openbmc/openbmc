@@ -28,6 +28,13 @@
         "Continue": true
     },
     {
+        "Name": "SOC_THRMTRIP",
+        "LineName": "SOC_THRMTRIP_N_CPLD",
+        "EventMon": "FALLING",
+        "Target": "thermal-assert-log@thermtrip_SOC_THRMTRIP_N_CPLD.service",
+        "Continue": true
+    },
+    {
         "Name": "ALL_POWER_OK_1",
         "LineName": "wALL_POWER_OK_1",
         "EventMon": "BOTH",
