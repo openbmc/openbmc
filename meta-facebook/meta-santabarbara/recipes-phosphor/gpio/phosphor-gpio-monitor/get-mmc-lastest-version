@@ -2,39 +2,72 @@
 
 retry_count=3
 retry_delay_sec=5
+host_eid=8
 version_prefixes=(
     "flash hamsa BOOT0:"
     "flash medha0 BOOT0:"
     "flash medha1 BOOT0:"
 )
 
-instance_to_eid() {
+instance_to_mctp_bus() {
     case "$1" in
-        0) echo 10 ;;
-        1) echo 20 ;;
-        2) echo 30 ;;
-        3) echo 40 ;;
+        0) echo mctpi2c102 ;;
+        1) echo mctpi2c103 ;;
+        2) echo mctpi2c104 ;;
+        3) echo mctpi2c105 ;;
         *) return 1 ;;
     esac
 }
 
-eid_to_module() {
-    case "$1" in
-        10) echo 0 ;;
-        20) echo 1 ;;
-        30) echo 2 ;;
-        40) echo 3 ;;
-        *) return 1 ;;
+mctp_bus_to_eid() {
+    local bus=$1
+    local routes
+    local eids
+
+    routes=$(mctp route 2>/dev/null) || {
+        echo "Failed to query mctp route" >&2
+        return 1
+    }
+
+    mapfile -t eids < <(
+        printf '%s\n' "$routes" |
+            awk -v bus="$bus" -v host_eid="$host_eid" '
+                $1 == "eid" {
+                    min = ""; max = ""; dev = ""
+                    for (i = 1; i <= NF; i++) {
+                        if ($i == "min") {
+                            min = $(i + 1)
+                        } else if ($i == "max") {
+                            max = $(i + 1)
+                        } else if ($i == "dev") {
+                            dev = $(i + 1)
+                        }
+                    }
+
+                    if (dev == bus && min == max && min != host_eid) {
+                        print min
+                    }
+                }
+            '
+    )
+
+    case "${#eids[@]}" in
+        1) echo "${eids[0]}" ;;
+        0)
+            echo "No MMC EID found for $bus from mctp route" >&2
+            return 1
+            ;;
+        *)
+            echo "Multiple MMC EIDs found for $bus from mctp route: ${eids[*]}" >&2
+            return 1
+            ;;
     esac
 }
 
 get_pldm_object_path() {
-    local eid=$1
+    local module=$1
     local compid=$2
-    local module
     local path
-
-    module=$(eid_to_module "$eid") || return 1
 
     path=$(
         busctl tree xyz.openbmc_project.PLDM |
@@ -77,12 +110,13 @@ is_eid_idle() {
 }
 
 instance=$1
-eid=$(instance_to_eid "$instance") || {
+bus=$(instance_to_mctp_bus "$instance") || {
     echo "Invalid MMC instance '$instance'. Expected 0-3." >&2
     exit 1
 }
-module=$(eid_to_module "$eid") || {
-    echo "Invalid EID '$eid'. Expected 10, 20, 30, or 40." >&2
+module=$instance
+eid=$(mctp_bus_to_eid "$bus") || {
+    echo "Failed to resolve MMC instance '$instance' EID from mctp route dev $bus." >&2
     exit 1
 }
 version_prefixes_json=$(jq -cn '$ARGS.positional' --args "${version_prefixes[@]}")
@@ -114,7 +148,7 @@ for ((attempt = 1; attempt <= retry_count; attempt++)); do
     failed=0
 
     while IFS="#" read -r compId version; do
-        pldmObjPath=$(get_pldm_object_path "$eid" "$compId")
+        pldmObjPath=$(get_pldm_object_path "$module" "$compId")
 
         if [ -z "$pldmObjPath" ]; then
             echo "EID $eid failed to find PLDM object path for component $compId"
