@@ -3,9 +3,11 @@ LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=4c01239e5c3a3d133858dedacdbca63c"
 
 RCONFLICTS:${PN} = "userland"
-DEPENDS:append = " dtc"
+DEPENDS:append = " dtc gnutls"
 PACKAGES =+ " ${PN}-raspinfo"
 PACKAGES =+ " ${PN}-ovmerge"
+PACKAGES =+ "${PN}-rpifwcrypto"
+PACKAGES =+ "${PN}-rpieepromab"
 RDEPENDS:${PN}-raspinfo += " bash"
 RDEPENDS:${PN}-ovmerge += " perl"
 
@@ -13,7 +15,7 @@ PV = "1.0+git"
 
 SRC_URI = "git://github.com/raspberrypi/utils;protocol=https;branch=master"
 
-SRCREV = "e923ccad57d2a22f606c8fe0d1096e782a090fc9"
+SRCREV = "8903f297141461854ad421bdf90846ad030bdcc7"
 
 FILES:${PN}:append = " \
     ${datadir}/bash-completion/completions/pinctrl \
@@ -21,6 +23,8 @@ FILES:${PN}:append = " \
 "
 FILES:${PN}-raspinfo += "${bindir}/raspinfo"
 FILES:${PN}-ovmerge += "${bindir}/ovmerge"
+FILES:${PN}-rpifwcrypto = "${bindir}/rpi-fw-crypto"
+FILES:${PN}-rpieepromab = "${bindir}/rpi-eeprom-ab"
 
 OECMAKE_TARGET_COMPILE = "\
     dtmerge/all \
@@ -33,6 +37,8 @@ OECMAKE_TARGET_COMPILE = "\
     vcgencmd/all \
     vclog/all \
     vcmailbox/all \
+    rpifwcrypto/all \
+    rpieepromab/all \
 "
 
 OECMAKE_TARGET_INSTALL = "\
@@ -46,6 +52,8 @@ OECMAKE_TARGET_INSTALL = "\
     vcgencmd/install \
     vclog/install \
     vcmailbox/install \
+    rpifwcrypto/install \
+    rpieepromab/install \
 "
 
 inherit cmake

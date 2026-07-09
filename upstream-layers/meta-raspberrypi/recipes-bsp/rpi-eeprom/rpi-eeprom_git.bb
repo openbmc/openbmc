@@ -8,8 +8,8 @@ SRC_URI = " \
     git://github.com/raspberrypi/rpi-eeprom.git;protocol=https;branch=master \
 "
 
-SRCREV = "2349daafacfb7a7abe2cfecf30a49ae837bdf2c6"
-PV = "v2025.07.17-2712"
+SRCREV = "e25fc5dcb8eb072eafb745cd546c3d9f73d102b5"
+PV = "v2026.05.11-2712"
 
 RDEPENDS:${PN} += " \
     coreutils \
@@ -18,6 +18,7 @@ RDEPENDS:${PN} += " \
     openssl \
     xxd \
     pciutils \
+    util-linux-findmnt \
 "
 
 inherit python3native
