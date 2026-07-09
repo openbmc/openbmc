@@ -15,6 +15,7 @@ DEPENDS = "dbus"
 SRCREV = "3b2cb4fb037bf6033b87d3c87ee917b2f686d309"
 BRANCH = "${@oe.utils.trim_version('${PV}', 2)}"
 SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=${BRANCH};protocol=https;tag=${PV}"
+SRC_URI += "file://0001-pipewire-compress-offload.patch"
 SRC_URI += "file://0002-spa-plugins-alsa-acp-compat.h-p-is-already-const-do-.patch"
 
 inherit meson pkgconfig systemd gettext useradd

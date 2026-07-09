@@ -19,6 +19,7 @@ DEPENDS = " \
     squashfs-tools \
     zlib \
 "
+DEPENDS:append:class-native = " gtest-native"
 
 # The debian/ patches are copied from android-platform-tools/debian/patches and
 # applied in the order defined by debian/patches/series. Listing them as

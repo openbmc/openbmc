@@ -65,6 +65,10 @@ python __anonymous() {
 
 BBCLASSEXTEND = "native nativesdk"
 
+do_configure:prepend() {
+    rm -f ${S}/.cargo/config.toml
+}
+
 do_compile:prepend() {
     export LIBSTDBUF_DIR="${libdir}/coreutils"
 }

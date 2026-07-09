@@ -10,15 +10,16 @@ inherit python_setuptools_build_meta pypi ptest-python-pytest
 
 RDEPENDS:${PN} += " \
     python3-ctypes \
+    python3-fcntl \
     python3-io \
     python3-json \
-    python3-fcntl \
     python3-logging \
     python3-multiprocessing \
     python3-pickle \
     python3-pkgutil \
     python3-pprint \
     python3-shell \
+    python3-sqlite3 \
     python3-unittest \
     python3-unixadmin \
 "
@@ -27,7 +28,6 @@ RDEPENDS:${PN}-ptest += " \
     python3-fcntl \
     python3-html \
     python3-netclient \
-    python3-sqlite3 \
 "
 
 do_install_ptest:append () {

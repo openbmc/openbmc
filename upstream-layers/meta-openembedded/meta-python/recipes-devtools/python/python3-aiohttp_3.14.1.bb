@@ -35,3 +35,5 @@ RDEPENDS:${PN} = "\
 CFLAGS:append:toolchain-gcc:arm = " -flax-vector-conversions"
 
 BBCLASSEXTEND = "native nativesdk"
+
+OEQA_BUILDPATHS_SKIP = "/home/runner"

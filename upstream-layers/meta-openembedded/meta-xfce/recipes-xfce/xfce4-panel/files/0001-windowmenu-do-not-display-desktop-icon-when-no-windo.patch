@@ -22,24 +22,28 @@ Rebase for xfce4-panel 4.20.0.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
 
+Rebase for xfce4-panel 4.21.2 (field renamed from `icon` to `widget`).
+
+Signed-off-by: Jason Schonberg <schonm@gmail.com>
+
 ---
  plugins/windowmenu/windowmenu.c | 10 +++++-----
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/plugins/windowmenu/windowmenu.c b/plugins/windowmenu/windowmenu.c
-index 9a73f29..eab0547 100644
+index 4e49277..29be92f 100644
 --- a/plugins/windowmenu/windowmenu.c
 +++ b/plugins/windowmenu/windowmenu.c
-@@ -266,7 +266,7 @@ window_menu_plugin_init (WindowMenuPlugin *plugin)
+@@ -267,7 +267,7 @@
    g_signal_connect (G_OBJECT (plugin->button), "toggled",
                      G_CALLBACK (window_menu_plugin_menu), plugin);
  
--  plugin->icon = gtk_image_new_from_icon_name ("user-desktop", GTK_ICON_SIZE_BUTTON);
-+  plugin->icon = gtk_image_new_from_icon_name (NULL, GTK_ICON_SIZE_BUTTON);
-   gtk_container_add (GTK_CONTAINER (plugin->button), plugin->icon);
-   gtk_widget_show (plugin->icon);
+-  plugin->widget = gtk_image_new_from_icon_name ("user-desktop", GTK_ICON_SIZE_BUTTON);
++  plugin->widget = gtk_image_new_from_icon_name (NULL, GTK_ICON_SIZE_BUTTON);
+   gtk_container_add (GTK_CONTAINER (plugin->button), plugin->widget);
+   gtk_widget_show (plugin->widget);
  }
-@@ -706,19 +706,19 @@ window_menu_plugin_active_window_changed (XfwScreen *screen,
+@@ -772,19 +772,19 @@
            /* skip 'fake' windows */
            type = xfw_window_get_window_type (window);
            if (type == XFW_WINDOW_TYPE_DESKTOP || type == XFW_WINDOW_TYPE_DOCK)
@@ -55,11 +59,11 @@ index 9a73f29..eab0547 100644
  
            /* desktop is shown right now */
            icon_size = xfce_panel_plugin_get_icon_size (XFCE_PANEL_PLUGIN (plugin));
--          gtk_image_set_from_icon_name (GTK_IMAGE (icon), "user-desktop", icon_size);
-+          gtk_image_set_from_icon_name (GTK_IMAGE (icon), NULL, icon_size);
-           gtk_image_set_pixel_size (GTK_IMAGE (icon), icon_size);
--          gtk_widget_set_tooltip_text (GTK_WIDGET (icon), _("Desktop"));
-+          gtk_widget_set_tooltip_text (GTK_WIDGET (icon), _("No Windows"));
+-          gtk_image_set_from_icon_name (GTK_IMAGE (widget), "user-desktop", icon_size);
++          gtk_image_set_from_icon_name (GTK_IMAGE (widget), NULL, icon_size);
+           gtk_image_set_pixel_size (GTK_IMAGE (widget), icon_size);
+-          gtk_widget_set_tooltip_text (GTK_WIDGET (widget), _("Desktop"));
++          gtk_widget_set_tooltip_text (GTK_WIDGET (widget), _("No Windows"));
          }
      }
  }

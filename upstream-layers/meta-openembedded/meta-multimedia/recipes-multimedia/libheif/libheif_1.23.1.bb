@@ -6,11 +6,9 @@ LICENSE_FLAGS = "commercial"
 
 COMPATIBLE_MACHINE:powerpc64le = "null"
 
-SRC_URI = "git://github.com/strukturag/libheif.git;protocol=https;branch=master;tag=v${PV} \
-           file://CVE-2026-3949.patch \
-           "
+SRC_URI = "git://github.com/strukturag/libheif.git;protocol=https;branch=master;tag=v${PV}"
 
-SRCREV = "62f1b8c76ed4d8305071fdacbe74ef9717bacac5"
+SRCREV = "2c4bbb54c2738d4a5efbbe3e5fa1d5d76bb88eb0"
 
 inherit cmake pkgconfig
 

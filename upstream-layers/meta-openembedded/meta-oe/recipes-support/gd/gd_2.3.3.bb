@@ -11,8 +11,6 @@ SECTION = "libs"
 LICENSE = "GD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ace63adfdac78400fc30fa22ee9c1bb1"
 
-DEPENDS = "freetype libpng jpeg zlib tiff"
-
 SRC_URI = "git://github.com/libgd/libgd.git;nobranch=1;protocol=https \
            file://0001-Fix-deprecared-function-prototypes.patch \
            file://Fix-ftype-missing-const.patch \
@@ -23,21 +21,21 @@ SRCREV = "b5319a41286107b53daa0e08e402aa1819764bdc"
 
 inherit autotools binconfig gettext pkgconfig
 
-PACKAGECONFIG ?= "jpeg freetype"
+PACKAGECONFIG ?= "jpeg png zlib tiff freetype"
 
-PACKAGECONFIG[avif] = "--with-avif,--without-avif"
-PACKAGECONFIG[fontconfig] = "--with-fontconfig,--without-fontconfig"
-PACKAGECONFIG[freetype] = "--with-freetype,--without-freetype"
-PACKAGECONFIG[heif] = "--with-heif,--without-heif"
-PACKAGECONFIG[jpeg] = "--with-jpeg,--without-jpeg"
-PACKAGECONFIG[liq] = "--with-liq,--without-liq"
-PACKAGECONFIG[png] = "--with-png,--without-png"
+PACKAGECONFIG[avif] = "--with-avif,--without-avif,libavif"
+PACKAGECONFIG[fontconfig] = "--with-fontconfig,--without-fontconfig,fontconfig"
+PACKAGECONFIG[freetype] = "--with-freetype,--without-freetype,freetype"
+PACKAGECONFIG[heif] = "--with-heif,--without-heif,libheif"
+PACKAGECONFIG[jpeg] = "--with-jpeg,--without-jpeg,jpeg"
+PACKAGECONFIG[liq] = "--with-liq,--without-liq,libimagequant"
+PACKAGECONFIG[png] = "--with-png,--without-png,libpng"
 PACKAGECONFIG[raqm] = "--with-raqm,--without-raqm,libraqm"
-PACKAGECONFIG[tiff] = "--with-tiff,--without-tiff"
-PACKAGECONFIG[webp] = "--with-webp,--without-webp"
-PACKAGECONFIG[x] = "--with-x,--without-x"
-PACKAGECONFIG[xpm] = "--with-xpm,--without-xpm"
-PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib"
+PACKAGECONFIG[tiff] = "--with-tiff,--without-tiff,tiff"
+PACKAGECONFIG[webp] = "--with-webp,--without-webp,libwebp"
+PACKAGECONFIG[x] = "--with-x,--without-x,virtual/libx11"
+PACKAGECONFIG[xpm] = "--with-xpm,--without-xpm,libxpm"
+PACKAGECONFIG[zlib] = "--with-zlib,--without-zlib,zlib"
 
 EXTRA_OECONF += "--disable-rpath"
 

@@ -14,12 +14,8 @@ inherit xfce gtk-doc gobject-introspection features_check mime-xdg
 SRC_URI += " \
     file://0001-windowmenu-do-not-display-desktop-icon-when-no-windo.patch \
     file://0002-use-lxdm-to-replace-dm-tool.patch \
-    file://0001-build-Do-not-display-full-path-in-generated-headers.patch \
-    file://0001-build-Be-sure-to-generate-sub-headers-before-includi.patch \
-    file://0002-build-Install-missing-libxfce4panel.h.patch \
-    file://0001-panel-tic-tac-toe-Remove-wrong-autoptr-define-guard.patch \
 "
-SRC_URI[sha256sum] = "c940dae515bef4af08a126011d2fd873ce99e815157ba8cef5332195bb60e51e"
+SRC_URI[sha256sum] = "ba490351b7837fa345385c830d118a1c85f7400672f7f0525095c739e83d9a43"
 
 EXTRA_OEMESON += "-Dvala=disabled"
 

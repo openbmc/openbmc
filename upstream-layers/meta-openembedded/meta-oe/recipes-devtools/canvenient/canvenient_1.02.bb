@@ -11,13 +11,15 @@ HOMEPAGE = "https://canopenterm.de/canvenient"
 BUGTRACKER = "https://github.com/CANopenTerm/CANvenient/issues"
 
 LICENSE = "MIT"
-LIC_FILES_CHKSUM = "file://LICENSE.md;md5=bd2edc721b4a0289efe949bdbe7dda79"
+LIC_FILES_CHKSUM = "file://LICENSE.md;md5=8977ecf3af54da2a5271158cc969bd45"
 
 DEPENDS = "libsocketcan"
 
-SRC_URI = "git://github.com/CANopenTerm/CANvenient.git;protocol=https;branch=main;tag=v${PV}"
+PV .= "+git"
 
-SRCREV  = "b8b37e3915caf5bce93f38c2c6cca71356dcfcab"
+SRC_URI = "git://github.com/CANopenTerm/CANvenient.git;protocol=https;branch=main"
+
+SRCREV  = "23408935f230f59632eafd56056824f8e91cd896"
 
 inherit cmake ptest
 
@@ -27,10 +29,10 @@ do_install:append() {
     install -d ${D}${libdir}
 
     install -m 0644 ${S}/include/CANvenient.h ${D}${includedir}/
-    install -m 0755 ${B}/libCANvenient.so.1.0.1 ${D}${libdir}/
+    install -m 0755 ${B}/libCANvenient.so.1.0.2 ${D}${libdir}/
 
-    ln -sf libCANvenient.so.1.0.1 ${D}${libdir}/libCANvenient.so.1
-    ln -sf libCANvenient.so.1.0.1 ${D}${libdir}/libCANvenient.so
+    ln -sf libCANvenient.so.1.0.2 ${D}${libdir}/libCANvenient.so.1
+    ln -sf libCANvenient.so.1.0.2 ${D}${libdir}/libCANvenient.so
 }
 
 FILES:${PN} += "${libdir}/libCANvenient.so ${libdir}/libCANvenient.so.*"

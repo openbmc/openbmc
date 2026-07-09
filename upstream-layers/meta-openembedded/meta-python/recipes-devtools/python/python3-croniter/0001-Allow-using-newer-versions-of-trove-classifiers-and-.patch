@@ -18,6 +18,7 @@ satisfy the requirements.
 Upstream-Status: Pending
 
 Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
 ---
  pyproject.toml | 8 ++++----
  1 file changed, 4 insertions(+), 4 deletions(-)
@@ -29,15 +30,15 @@ index 657cc21..d1b9ce3 100644
 @@ -1,10 +1,10 @@
  [build-system]
  requires = [
--    "hatchling==1.29.0",
--    "packaging==26.0",
--    "pathspec==1.0.4",
+-    "hatchling==1.30.1",
+-    "packaging==26.2",
+-    "pathspec==1.1.1",
 -    "pluggy==1.6.0",
--    "trove-classifiers==2026.1.14.14",
-+    "hatchling>=1.29.0",
-+    "packaging>=26.0",
-+    "pathspec>=1.0.4",
+-    "trove-classifiers==2026.6.1.19",
++    "hatchling>=1.30.1",
++    "packaging>=26.2",
++    "pathspec>=1.1.1",
 +    "pluggy>=1.6.0",
-+    "trove-classifiers>=2026.1.14.14",
++    "trove-classifiers>=2026.6.1.19",
  ]
  build-backend = "hatchling.build"

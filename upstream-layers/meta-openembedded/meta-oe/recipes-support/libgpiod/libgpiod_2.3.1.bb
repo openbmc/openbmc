@@ -15,7 +15,7 @@ SRC_URI += " \
     file://gpio-manager.init \
 "
 
-SRC_URI[sha256sum] = "cb71db463aec2604ac520c95bf04eff1839d86bdc9a2dfd67ef879fbb10426ea"
+SRC_URI[sha256sum] = "e3a358a90a9204ff16f92b6f4028ed91460b1926f10589eb54b3566484650a30"
 
 # Always build tools - they don't have any additional
 # requirements over the library.

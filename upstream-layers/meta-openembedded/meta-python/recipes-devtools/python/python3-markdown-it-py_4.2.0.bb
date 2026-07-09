@@ -3,13 +3,13 @@ HOMEPAGE = "https://github.com/executablebooks/markdown-it-py"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a38a1697260a7ad7bf29f44b362db1fc"
 
-SRC_URI[sha256sum] = "e3f60a94fa066dc52ec76661e37c851cb232d92f9886b15cb560aaada2df8feb"
+SRC_URI[sha256sum] = "04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49"
 
 inherit pypi python_flit_core
 
 RDEPENDS:${PN} += "python3-mdurl"
 
-PYPI_PACKAGE = "markdown-it-py"
+PYPI_PACKAGE = "markdown_it_py"
 CVE_PRODUCT = "markdown-it-py"
 
 BBCLASSEXTEND = "native nativesdk"
