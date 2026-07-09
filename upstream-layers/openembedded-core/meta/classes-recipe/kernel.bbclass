@@ -384,7 +384,7 @@ kernel_do_compile() {
 	# make ...args... CONFIG_INITRAMFS_SOURCE=some_other_initramfs.cpio
 	if [ "$use_alternate_initrd" = "" ] && [ "${INITRAMFS_TASK}" != "" ] ; then
 		# The old style way of copying an prebuilt image and building it
-		# is turned on via INTIRAMFS_TASK != ""
+		# is turned on via INITRAMFS_TASK != ""
 		copy_initramfs
 		use_alternate_initrd=CONFIG_INITRAMFS_SOURCE=${B}/usr/${INITRAMFS_IMAGE_NAME}.cpio
 	fi

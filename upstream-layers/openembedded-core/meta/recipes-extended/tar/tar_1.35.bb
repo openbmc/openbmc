@@ -6,7 +6,17 @@ SECTION = "base"
 LICENSE = "GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
 
-SRC_URI = "${GNU_MIRROR}/tar/tar-${PV}.tar.bz2"
+SRC_URI = "${GNU_MIRROR}/tar/tar-${PV}.tar.bz2 \
+           file://run-ptest \
+           file://0001-tests-fix-TESTSUITE_AT.patch \
+           file://0002-tests-check-for-recently-fixed-bug.patch \
+           file://0003-Exclude-VCS-directory-with-writing-from-an-archive.patch \
+           file://CVE-2026-5704-dependent_p1.patch \
+           file://CVE-2026-5704-dependent_p2.patch \
+           file://CVE-2026-5704.patch \
+           file://CVE-2026-5704-regression.patch \
+           file://0001-Avoid-acl_-prefix-for-functions.patch \
+           "
 
 SRC_URI[sha256sum] = "7edb8886a3dc69420a1446e1e2d061922b642f1cf632d2cd0f9ee7e690775985"
 
@@ -37,16 +47,6 @@ do_install:append:class-target() {
 }
 
 # add for ptest support
-SRC_URI += " \
-    file://run-ptest \
-    file://0001-tests-fix-TESTSUITE_AT.patch \
-    file://0002-tests-check-for-recently-fixed-bug.patch \
-    file://0003-Exclude-VCS-directory-with-writing-from-an-archive.patch \
-    file://CVE-2026-5704-dependent_p1.patch \
-    file://CVE-2026-5704-dependent_p2.patch \
-    file://CVE-2026-5704.patch \
-    file://CVE-2026-5704-regression.patch \
-"
 
 inherit ptest
 

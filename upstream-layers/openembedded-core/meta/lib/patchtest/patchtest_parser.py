@@ -37,7 +37,7 @@ class PatchtestParser(object):
                             help='The patch to be tested')
 
         target_patch_group.add_argument('--directory', metavar='DIRECTORY', dest='patch_path',
-                            help='The directory containing patches to be tested')
+                            help='The directory containing patches to be tested. CTRL+C aborts the entire directory test.')
 
         parser.add_argument('--repodir', metavar='REPO',
                             default=default_repodir,

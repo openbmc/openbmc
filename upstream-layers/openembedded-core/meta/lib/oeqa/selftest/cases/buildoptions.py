@@ -147,15 +147,13 @@ class ArchiverTest(OESelftestTestCase):
 INHERIT += "archiver"
 PACKAGE_CLASSES = "package_rpm"
 ARCHIVER_MODE[src] = "original"
-ARCHIVER_MODE[srpm] = "1"
 """)
         res = bitbake("xcursor-transparent-theme", ignore_status=True)
         self.assertEqual(res.status, 0, "\nCouldn't build xcursortransparenttheme.\nbitbake output %s" % res.output)
         deploy_dir_src = get_bb_var('DEPLOY_DIR_SRC')
         pkgs_path = g.glob(str(deploy_dir_src) + "/allarch*/xcurs*")
-        src_file_glob = str(pkgs_path[0]) + "/xcursor*.src.rpm"
         tar_file_glob = str(pkgs_path[0]) + "/xcursor*.tar.xz"
-        self.assertTrue((g.glob(src_file_glob) and g.glob(tar_file_glob)), "Couldn't find .src.rpm and .tar.xz files under %s/allarch*/xcursor*" % deploy_dir_src)
+        self.assertTrue(g.glob(tar_file_glob), "Couldn't find .tar.xz files under %s/allarch*/xcursor*" % deploy_dir_src)
 
 class ToolchainOptions(OESelftestTestCase):
     def test_toolchain_fortran(self):

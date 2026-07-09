@@ -60,8 +60,8 @@ def publish(args):
     if not is_remote:
         mkdir(destination)
     else:
-        cmd = "ssh %s 'mkdir -p %s'" % (host, destdir)
-        ret = subprocess.call(cmd, shell=True)
+        cmd = ['ssh', host, 'mkdir -p %s' % destdir]
+        ret = subprocess.call(cmd)
         if ret != 0:
             logger.error("Making directory %s on %s failed" % (destdir, host))
             return ret
@@ -76,8 +76,8 @@ def publish(args):
         else:
             shutil.copy(target_sdk, dest_sdk)
     else:
-        cmd = "scp %s %s" % (target_sdk, destination)
-        ret = subprocess.call(cmd, shell=True)
+        cmd = ['scp', target_sdk, destination]
+        ret = subprocess.call(cmd)
         if ret != 0:
             logger.error("scp %s %s failed" % (target_sdk, destination))
             return ret
@@ -85,8 +85,8 @@ def publish(args):
     # Unpack the SDK
     logger.info("Unpacking SDK")
     if not is_remote:
-        cmd = "sh %s -p -y -d %s" % (dest_sdk, destination)
-        ret = subprocess.call(cmd, shell=True)
+        cmd = [dest_sdk, '-p', '-y', '-d', destination]
+        ret = subprocess.call(cmd)
         if ret == 0:
             logger.info('Successfully unpacked %s to %s' % (dest_sdk, destination))
             os.remove(dest_sdk)
@@ -97,8 +97,8 @@ def publish(args):
         rm_or_not = " && rm -f %s" % dest_sdk
         if args.keep_orig:
             rm_or_not = ""
-        cmd = "ssh %s 'sh %s -p -y -d %s%s'" % (host, dest_sdk, destdir, rm_or_not)
-        ret = subprocess.call(cmd, shell=True)
+        cmd = ['ssh', host, 'sh %s -p -y -d %s%s' % (dest_sdk, destdir, rm_or_not)]
+        ret = subprocess.call(cmd)
         if ret == 0:
             logger.info('Successfully unpacked %s to %s' % (dest_sdk, destdir))
         else:

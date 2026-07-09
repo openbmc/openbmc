@@ -85,6 +85,10 @@ class PatchTestRepo(object):
             self._patchmerged = True
 
     def clean(self):
+        try:
+            self.repo.git.execute(['git', 'am', '--abort'])
+        except git.exc.GitCommandError:
+            pass
         self.repo.git.execute(['git', 'checkout', self.current_branch if self.current_branch else self.current_commit])
         self.repo.git.execute(['git', 'branch', '-D', self._workingbranch])
         self._patchmerged = False

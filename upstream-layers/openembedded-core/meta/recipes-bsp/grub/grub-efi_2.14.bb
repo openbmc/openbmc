@@ -41,6 +41,8 @@ python __anonymous () {
     d.setVar("GRUB_IMAGE_PREFIX", prefix)
 }
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit deploy
 
 CACHED_CONFIGUREVARS += "ac_cv_path_HELP2MAN="

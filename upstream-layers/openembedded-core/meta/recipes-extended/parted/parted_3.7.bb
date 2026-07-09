@@ -11,6 +11,9 @@ SRC_URI = "${GNU_MIRROR}/parted/parted-${PV}.tar.xz \
            file://run-ptest \
            "
 
+SRC_URI:append:riscv64 = " file://0001-t9042-dos-partition-limit.sh-unconditionally-skip.patch \
+                           "
+
 SRC_URI[sha256sum] = "008de57561a4f3c25a0648e66ed11e7b30be493889b64334a6d70f2c1951ef7b"
 
 inherit autotools pkgconfig gettext texinfo ptest

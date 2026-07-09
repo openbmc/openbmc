@@ -48,6 +48,8 @@ def get_common_data(e):
     data['layer_version'] = get_layers_branch_rev(e.data)
     data['local_conf'] = get_conf_data(e, 'local.conf')
     data['auto_conf'] = get_conf_data(e, 'auto.conf')
+    data['site_conf'] = get_conf_data(e, 'site.conf')
+    data['toolcfg_conf'] = get_conf_data(e, 'toolcfg.conf')
     return data
 
 python errorreport_handler () {

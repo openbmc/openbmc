@@ -1,0 +1,31 @@
+From b03c399e392c492782e680f66dd47bd34b325ab9 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Wed, 8 Jul 2026 09:45:06 -0400
+Subject: [PATCH] t9042-dos-partition-limit.sh: unconditionally skip
+
+This test is prone to failure under heavy system load, especially for
+guests using TCG emulation (e.g. qemuriscv64 on an x86 host). Skip it.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ tests/t9042-dos-partition-limit.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/tests/t9042-dos-partition-limit.sh b/tests/t9042-dos-partition-limit.sh
+index 87a32df..d6e8d75 100644
+--- a/tests/t9042-dos-partition-limit.sh
++++ b/tests/t9042-dos-partition-limit.sh
+@@ -21,6 +21,8 @@
+ require_root_
+ require_scsi_debug_module_
+ 
++skip_ 'this test frequently reports a timeout under heavy system load'
++
+ grep '^#define USE_BLKID 1' "$CONFIG_HEADER" > /dev/null ||
+   skip_ 'this system lacks a new-enough libblkid'
+ 
+-- 
+2.55.0
+

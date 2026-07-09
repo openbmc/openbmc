@@ -1,4 +1,4 @@
-From af1354b16aeffbfefc7e8d32160c97105a93a84f Mon Sep 17 00:00:00 2001
+From 72a58d19ae7f80985d9c91751fd6c359464ce292 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Tue, 22 Mar 2016 15:14:58 +0200
 Subject: [PATCH] Install gio-querymodules as libexec_PROGRAM

@@ -28,20 +28,12 @@ class TestPatch(base.Base):
     def setUp(self):
         if self.unidiff_parse_error:
             self.skip('Parse error %s' % self.unidiff_parse_error)
-
-        self.valid_status = ", ".join(patchtest_patterns.upstream_status_nonliteral_valid_status)
-        self.standard_format = "Upstream-Status: <Valid status>"
-
-        # we are just interested in series that introduce CVE patches, thus discard other
-        # possibilities: modification to current CVEs, patch directly introduced into the
-        # recipe, upgrades already including the CVE, etc.
-        new_cves = [p for p in self.patchset if p.path.endswith('.patch') and p.is_added_file]
-        if not new_cves:
-            self.skip('No new CVE patches introduced')
+        if not TestPatch.newpatches:
+            self.skip('No new source patches introduced')
 
     def test_upstream_status_presence_format(self):
-        if not TestPatch.newpatches:
-            self.skip("There are no new software patches, no reason to test Upstream-Status presence/format")
+        valid_status = ", ".join(patchtest_patterns.upstream_status_nonliteral_valid_status)
+        standard_format = "Upstream-Status: <Valid status>"
 
         for newpatch in TestPatch.newpatches:
             payload = newpatch.__str__()
@@ -71,16 +63,16 @@ class TestPatch(base.Base):
                         'Upstream-Status is present only after the patch scissors. '
                         "It must be placed in the patch header before the scissors line.",
                         data=[
-                            ("Standard format", self.standard_format),
-                            ("Valid status", self.valid_status),
+                            ("Standard format", standard_format),
+                            ("Valid status", valid_status),
                         ],
                     )
                 else:
                     self.fail(
                         "Added patch file is missing Upstream-Status: <Valid status> in the commit message",
                         data=[
-                            ("Standard format", self.standard_format),
-                            ("Valid status", self.valid_status),
+                            ("Standard format", standard_format),
+                            ("Valid status", valid_status),
                         ],
                     )
 
@@ -97,8 +89,8 @@ class TestPatch(base.Base):
                         "but was found afterwards.",
                         data=[
                             ("Current", line.lstrip("+")),
-                            ("Standard format", self.standard_format),
-                            ("Valid status", self.valid_status),
+                            ("Standard format", standard_format),
+                            ("Valid status", valid_status),
                         ],
                     )
 
@@ -142,15 +134,12 @@ class TestPatch(base.Base):
                             "Upstream-Status is in incorrect format",
                             data=[
                                 ("Current", pe.pstr),
-                                ("Standard format", self.standard_format),
-                                ("Valid status", self.valid_status),
+                                ("Standard format", standard_format),
+                                ("Valid status", valid_status),
                             ],
                         )
 
     def test_signed_off_by_presence(self):
-        if not TestPatch.newpatches:
-            self.skip("There are no new software patches, no reason to test %s presence" % PatchSignedOffBy.mark)
-
         for newpatch in TestPatch.newpatches:
             payload = newpatch.__str__()
             for line in payload.splitlines():
@@ -162,7 +151,7 @@ class TestPatch(base.Base):
                 self.fail('A patch file has been added without a Signed-off-by tag: \'%s\'' % os.path.basename(newpatch.path))
 
     def test_cve_tag_format(self):
-        for commit in TestPatch.commits:
+        for commit in self.commits:
             if patchtest_patterns.cve.search_string(
                 commit.shortlog
             ) or patchtest_patterns.cve.search_string(commit.commit_message):

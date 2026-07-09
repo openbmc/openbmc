@@ -1,4 +1,4 @@
-From 79dbf4d366e322dc544c749679d8a1abbbc91b7e Mon Sep 17 00:00:00 2001
+From d62f78fea47f4b32fd0f48c46253f161cf305547 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 22 May 2024 13:58:23 +0200
 Subject: [PATCH] qemu: Ensure pip and the python venv aren't used for meson

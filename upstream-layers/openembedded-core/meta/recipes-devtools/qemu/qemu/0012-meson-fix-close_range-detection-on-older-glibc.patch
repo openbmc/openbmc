@@ -1,4 +1,4 @@
-From b072e3d025da9d5f266683b0b12796796c4208b3 Mon Sep 17 00:00:00 2001
+From b2b9a9e38f20fb8aa6ed26a3c38962651e3a9eae Mon Sep 17 00:00:00 2001
 From: Quan Sun <Quan.Sun@windriver.com>
 Date: Fri, 5 Jun 2026 11:54:57 +0000
 Subject: [PATCH] meson: fix close_range detection on older glibc

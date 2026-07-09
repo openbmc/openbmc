@@ -8,7 +8,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main \
 "
-SRCREV = "bac66cfc3254aabcd8640c8ebbeb6d62a198d454"
+SRCREV = "1d86777e7f2562a86ecea77d1809ac4f82bb5bfe"
 PV = "0+git"
 
 BB_GIT_SHALLOW = ""
@@ -39,7 +39,7 @@ do_configure() {
 do_compile[progress] = "outof:^\[(\d+)/(\d+)\]\s+"
 
 do_compile() {
-    ninja -C ${B} --verbose
+    ninja -C ${B} --verbose gn
 }
 
 do_install() {

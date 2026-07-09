@@ -74,11 +74,11 @@ class TestMbox(base.Base):
             shortlog = re.sub(r'^(\[.*?\])+ ', '', commit.shortlog)
             if shortlog.startswith('Revert "'):
                 continue
-            l = len(shortlog)
-            if l > patchtest_patterns.mbox_shortlog_maxlength:
+            length = len(shortlog)
+            if length > patchtest_patterns.mbox_shortlog_maxlength:
                 self.fail(
                     "Edit shortlog so that it is %d characters or less (currently %d characters)"
-                    % (patchtest_patterns.mbox_shortlog_maxlength, l),
+                    % (patchtest_patterns.mbox_shortlog_maxlength, length),
                     commit=commit,
                 )
 
@@ -120,7 +120,7 @@ class TestMbox(base.Base):
             folders = patch.path.split('/')
             base_path = folders[0]
             for project in [self.bitbake, self.doc, self.oe, self.poky]:
-                if base_path in  project.paths:
+                if base_path in project.paths:
                     self.fail('Series sent to the wrong mailing list or some patches from the series correspond to different mailing lists',
                               data=[('Suggested ML', '%s [%s]' % (project.listemail, project.gitrepo)),
                                     ('Patch\'s path:', patch.path)])
@@ -173,7 +173,7 @@ class TestMbox(base.Base):
         for commit in self.commits:
             if patchtest_patterns.auh_email in commit.commit_message:
                 self.fail(
-                    "Invalid author %s. Resend the series with a valid patch author"
+                    "Commit message contains AUH email address %s. Resend the series with a valid patch author"
                     % patchtest_patterns.auh_email,
                     commit=commit,
                 )

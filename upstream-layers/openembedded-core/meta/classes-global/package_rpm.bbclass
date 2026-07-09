@@ -101,34 +101,6 @@ python write_specfile () {
     import oe.packagedata
     import os,pwd,grp,stat
 
-    # append information for logs and patches to %prep
-    def add_prep(d, spec_files_bottom):
-        if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
-            spec_files_bottom.append('%%prep')
-            spec_files_bottom.append('%s' % "echo \"include logs and patches, Please check them in SOURCES\"")
-            spec_files_bottom.append('')
-
-    # append the name of tarball to key word 'SOURCE' in xxx.spec.
-    def tail_source(d):
-        if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
-            ar_outdir = d.getVar('ARCHIVER_OUTDIR')
-            if not os.path.exists(ar_outdir):
-                return
-            source_list = os.listdir(ar_outdir)
-            source_number = 0
-            for source in source_list:
-                # do_deploy_archives may have already run (from sstate) meaning a .src.rpm may already
-                # exist in ARCHIVER_OUTDIR so skip if present.
-                if source.endswith(".src.rpm"):
-                    continue
-                # The rpmbuild doesn't need the root permission, but it needs
-                # to know the file's user and group name, the only user and
-                # group in fakeroot is "root" when working in fakeroot.
-                f = os.path.join(ar_outdir, source)
-                os.chown(f, 0, 0)
-                spec_preamble_top.append('Source%s: %s' % (source_number, source))
-                source_number += 1
-
     # In RPM, dependencies are of the format: pkg <>= Epoch:Version-Release
     # This format is similar to OE, however there are restrictions on the
     # characters that can be in a field.  In the Version field, "-"
@@ -402,11 +374,6 @@ python write_specfile () {
 
         # Gather special src/first package data
         if srcname == splitname:
-            archiving = d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and \
-                        bb.data.inherits_class('archiver', d)
-            if archiving and srclicense != splitlicense:
-                bb.warn("The SRPM produced may not have the correct overall source license in the License tag. This is due to the LICENSE for the primary package and SRPM conflicting.")
-
             srclicense     = splitlicense
             srcrdepends    = splitrdepends
             srcrrecommends = splitrrecommends
@@ -530,7 +497,6 @@ python write_specfile () {
 
         del localdata
 
-    add_prep(d, spec_files_bottom)
     spec_preamble_top.append('Summary: %s' % srcsummary)
     spec_preamble_top.append('Name: %s' % srcname)
     spec_preamble_top.append('Version: %s' % srcversion)
@@ -544,7 +510,6 @@ python write_specfile () {
         spec_preamble_top.append('URL: %s' % srchomepage)
     if srccustomtagschunk:
         spec_preamble_top.append(srccustomtagschunk)
-    tail_source(d)
 
     # Replaces == Obsoletes && Provides
     robsoletes = bb.utils.explode_dep_versions2(srcrobsoletes)
@@ -716,14 +681,6 @@ python do_package_rpm () {
     cmd = cmd + " --define '_passwd_path " + "/completely/bogus/path" + "'"
     cmd = cmd + " --define '_group_path " + "/completely/bogus/path" + "'"
     cmd = cmd + rpmbuild_extra_params
-    if d.getVarFlag('ARCHIVER_MODE', 'srpm') == '1' and bb.data.inherits_class('archiver', d):
-        cmd = cmd + " --define '_sourcedir " + d.getVar('ARCHIVER_OUTDIR') + "'"
-        cmdsrpm = cmd + " --define '_srcrpmdir " + d.getVar('ARCHIVER_RPMOUTDIR') + "'"
-        cmdsrpm = cmdsrpm + " -bs " + outspecfile
-        # Build the .src.rpm
-        d.setVar('SBUILDSPEC', cmdsrpm + "\n")
-        d.setVarFlag('SBUILDSPEC', 'func', '1')
-        bb.build.exec_func('SBUILDSPEC', d)
     cmd = cmd + " -bb " + outspecfile
 
     # rpm 4 creates various empty directories in _topdir, let's clean them up

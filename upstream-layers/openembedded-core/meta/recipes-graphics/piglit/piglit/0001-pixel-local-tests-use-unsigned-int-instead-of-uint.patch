@@ -1,0 +1,27 @@
+From 8b98674fedc0ac31e768ccd16165bcb585e413e2 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Thu, 2 Jul 2026 13:56:17 +0200
+Subject: [PATCH] pixel-local-tests: use unsigned int instead of uint
+
+uint is not a valid integer type in C, and this fails
+to compile under musl libc library.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/piglit/-/merge_requests/1170]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ tests/spec/ext_shader_pixel_local_storage/pixel-local-tests.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/spec/ext_shader_pixel_local_storage/pixel-local-tests.c b/tests/spec/ext_shader_pixel_local_storage/pixel-local-tests.c
+index 4776193f2..1ac669d11 100644
+--- a/tests/spec/ext_shader_pixel_local_storage/pixel-local-tests.c
++++ b/tests/spec/ext_shader_pixel_local_storage/pixel-local-tests.c
+@@ -851,7 +851,7 @@ make_test_main_str(char *dst, struct pls_format_data *format_data,
+ 		case GL_RGBA8UI:
+ 		case GL_RG16UI:
+ 		case GL_R32UI: {
+-			uint expected[4];
++			unsigned int expected[4];
+ 			for (int comp = 0; comp < 4; comp++) {
+ 				if (comp < format_data[member].num_components)
+ 					expected[comp] = format_data[member].u[comp];

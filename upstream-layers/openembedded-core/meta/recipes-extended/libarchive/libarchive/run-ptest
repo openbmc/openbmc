@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# The fuzz tests run 1000 randomised iterations per archive format and are
+# meant for dedicated fuzzing infrastructure, not routine ptest runs. They
+# regularly time out in the time/memory constrained autobuilder QEMU targets
+# (e.g. test_fuzz_iso9660). Skip them via the upstream escape hatch.
+export SKIP_TEST_FUZZ=1
+
 for t in libarchive_test bsdtar_test bsdcpio_test bsdcat_test bsdunzip_test; do
     ./$t
     if [ $? -eq 0 ]; then

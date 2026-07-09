@@ -1,4 +1,4 @@
-From 14e62a2eb40fdd1c78b82b4855541686608c3d45 Mon Sep 17 00:00:00 2001
+From da7a7acacde7771ce4c0fd3ae7e55d0c151ee063 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Sat, 16 Sep 2023 14:02:57 +0200
 Subject: [PATCH] xb-self-test.c: hardcode G_TEST_SRCDIR
@@ -18,10 +18,10 @@ Signed-off-by: Markus Volk <f_l_k@t-online.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/xb-self-test.c b/src/xb-self-test.c
-index 043db65..be86a38 100644
+index 795167d..ab2b582 100644
 --- a/src/xb-self-test.c
 +++ b/src/xb-self-test.c
-@@ -3304,7 +3304,7 @@ xb_speed_func(void)
+@@ -3329,7 +3329,7 @@ xb_speed_precompiled_func(void)
  int
  main(int argc, char **argv)
  {

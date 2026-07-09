@@ -1,4 +1,4 @@
-From ebafc97afab5bcd71ca1d2013aed3b09b12e1c35 Mon Sep 17 00:00:00 2001
+From 5681532ed4e1b656219bf887bbeadbe3ee6d277d Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 18 Dec 2025 15:45:11 +0100
 Subject: [PATCH] lib/meson.build: do not hardcode the build directory into the
@@ -32,10 +32,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/lib/meson.build b/lib/meson.build
-index 5c4829345..d28c95d99 100644
+index d1289a5e0..a8c15be8e 100644
 --- a/lib/meson.build
 +++ b/lib/meson.build
-@@ -301,7 +301,7 @@ foreach f: lib_sources
+@@ -309,7 +309,7 @@ foreach f: lib_sources
  	    '-DIGT_DATADIR="@0@"'.format(join_paths(prefix, datadir)),
  	    '-DIGT_SRCDIR="@0@"'.format(srcdir),
  	    '-DIGT_LOG_DOMAIN="@0@"'.format(f.split('.')[0]),

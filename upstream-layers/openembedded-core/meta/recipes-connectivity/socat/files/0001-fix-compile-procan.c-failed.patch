@@ -1,4 +1,4 @@
-From c4c3d5f2d4dfe8167205e8d20b4cb7a197706c16 Mon Sep 17 00:00:00 2001
+From 15c33fde40777ddbc8eb51f8b424032f2dd77189 Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Wed, 27 Nov 2024 04:09:59 -0800
 Subject: [PATCH] fix compile procan.c failed
@@ -32,10 +32,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile.in b/Makefile.in
-index 631d31d..103d4d1 100644
+index 629cb7e..4368a3f 100644
 --- a/Makefile.in
 +++ b/Makefile.in
-@@ -110,7 +110,7 @@ socat: socat.o libxio.a
+@@ -112,7 +112,7 @@ socat: socat.o libxio.a
  	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ socat.o libxio.a $(CLIBS)
  
  procan.o: $(srcdir)/procan.c
@@ -44,7 +44,7 @@ index 631d31d..103d4d1 100644
  
  PROCAN_OBJS=procan_main.o procan.o procan-cdefs.o hostan.o error.o sycls.o sysutils.o utils.o vsnprintf_r.o snprinterr.o
  procan: $(PROCAN_OBJS)
-@@ -132,9 +132,9 @@ install: progs $(srcdir)/doc/socat.1
+@@ -134,9 +134,9 @@ install: progs $(srcdir)/doc/socat.1
  	mkdir -p $(DESTDIR)$(BINDEST)
  	$(INSTALL) -m 755 socat $(DESTDIR)$(BINDEST)/socat1
  	ln -sf socat1 $(DESTDIR)$(BINDEST)/socat
@@ -57,6 +57,3 @@ index 631d31d..103d4d1 100644
  	$(INSTALL) -m 755 procan $(DESTDIR)$(BINDEST)
  	$(INSTALL) -m 755 filan $(DESTDIR)$(BINDEST)
  	mkdir -p $(DESTDIR)$(MANDEST)/man1
--- 
-2.25.1
-

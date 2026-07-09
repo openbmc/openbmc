@@ -31,6 +31,8 @@ def package_populate_pkgdata_dir(pkgdatadir, d):
                     except FileExistsError:
                         continue
 
+package_populate_pkgdata_dir[vardepsexclude] += "MACHINE_ARCH PACKAGE_EXTRA_ARCHS"
+
 python package_prepare_pkgdata() {
     import copy
     import glob
@@ -47,7 +49,7 @@ python package_prepare_pkgdata() {
     # Detect bitbake -b usage
     nodeps = d.getVar("BB_LIMITEDDEPS") or False
     if nodeps:
-        staging_package_populate_pkgdata_dir(pkgdatadir, d)
+        package_populate_pkgdata_dir(pkgdatadir, d)
         return
 
     start = None
@@ -168,6 +170,6 @@ python package_prepare_pkgdata() {
 
 }
 package_prepare_pkgdata[cleandirs] = "${WORKDIR_PKGDATA}"
-package_prepare_pkgdata[vardepsexclude] += "MACHINE_ARCH PACKAGE_EXTRA_ARCHS SDK_ARCH BUILD_ARCH SDK_OS BB_TASKDEPDATA SSTATETASKS"
+package_prepare_pkgdata[vardepsexclude] += "BB_TASKDEPDATA SSTATETASKS"
 
 

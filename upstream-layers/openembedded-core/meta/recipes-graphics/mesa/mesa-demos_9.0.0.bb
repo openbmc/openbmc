@@ -6,13 +6,16 @@ BUGTRACKER = "https://bugs.freedesktop.org"
 SECTION = "x11"
 
 LICENSE = "MIT & PD"
-LIC_FILES_CHKSUM = "file://src/xdemos/glxgears.c;beginline=1;endline=20;md5=914225785450eff644a86c871d3ae00e \
+LIC_FILES_CHKSUM = "file://src/xdemos/glxgears.c;beginline=1;endline=5;md5=2c456e2fe0a0a05d31a72e076d404528 \
                     file://src/xdemos/glxdemo.c;beginline=1;endline=8;md5=b01d5ab1aee94d35b7efaa2ef48e1a06"
 
-SRC_URI = "https://archive.mesa3d.org/demos/${BPN}-${PV}.tar.xz \
-           file://0001-meson-fix-glx-detection-without-glvnd.patch \
-           "
-SRC_URI[sha256sum] = "3046a3d26a7b051af7ebdd257a5f23bfeb160cad6ed952329cdff1e9f1ed496b"
+SRC_URI = "git://gitlab.freedesktop.org/mesa/demos.git;protocol=https;branch=main"
+
+SRCREV = "188fc2354de5a9cbfd73852183a35f4982ca43d5"
+
+# This recipe doesn't plan to make more releases, so track upstream git commits
+PV .= "+git"
+UPSTREAM_CHECK_COMMITS = "1"
 
 inherit meson pkgconfig features_check
 # depends on virtual/egl, virtual/libgl ...
@@ -33,7 +36,7 @@ PACKAGECONFIG[drm] = "-Dlibdrm=enabled,-Dlibdrm=disabled,libdrm"
 PACKAGECONFIG[egl] = "-Degl=enabled,-Degl=disabled,virtual/egl"
 PACKAGECONFIG[gles1] = "-Dgles1=enabled,-Dgles1=disabled,virtual/libgles1"
 PACKAGECONFIG[gles2] = "-Dgles2=enabled,-Dgles2=disabled,virtual/libgles2"
-PACKAGECONFIG[glut] = "-Dwith-glut=${STAGING_EXECPREFIXDIR},,freeglut"
+PACKAGECONFIG[glut] = "-Dglut=enabled,-Dglut=disabled,freeglut"
 PACKAGECONFIG[vulkan] = "-Dvulkan=enabled,-Dvulkan=disabled,vulkan-loader glslang-native"
 PACKAGECONFIG[wayland] = "-Dwayland=enabled,-Dwayland=disabled,virtual/libgl wayland wayland-native wayland-protocols libxkbcommon libdecor"
 PACKAGECONFIG[x11] = "-Dx11=enabled,-Dx11=disabled,virtual/libx11 libglu libxkbcommon libxcb"

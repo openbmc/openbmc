@@ -1,4 +1,4 @@
-From 7fc69711b5e216c385b22a5b64c6c7c8be693600 Mon Sep 17 00:00:00 2001
+From 537e44aa0204590171936eec0fcd279b74fbbfee Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Sat, 30 Aug 2025 00:47:03 +0200
 Subject: [PATCH] strace: skip a number of load-sensitive tests
@@ -49,7 +49,7 @@ index 41928de..f8a87cb 100755
 +skip_ "Test not reliable under load"
  run_strace_match_diff -a20 
 diff --git a/tests/strace-r.test b/tests/strace-r.test
-index 8299737..e894234 100755
+index a85558d..9ae9677 100755
 --- a/tests/strace-r.test
 +++ b/tests/strace-r.test
 @@ -9,6 +9,7 @@
@@ -59,4 +59,4 @@ index 8299737..e894234 100755
 +skip_ "Test not reliable under load"
  r_opt="${1:--r}"
  
- run_prog ../sleep 0
+ run_prog ../sleep-timing 0 "$TIMING_FILE"

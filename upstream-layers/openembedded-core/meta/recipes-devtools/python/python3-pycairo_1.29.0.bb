@@ -17,7 +17,7 @@ SRC_URI[sha256sum] = "f3f7fde97325cae80224c09f12564ef58d0d0f655da0e3b040f5807bd5
 
 S = "${UNPACKDIR}/pycairo-${PV}"
 
-inherit meson pkgconfig python3targetconfig github-releases
+inherit meson pkgconfig python3-dir github-releases
 
 CFLAGS += "-fPIC"
 

@@ -4,7 +4,7 @@
 pybootchartgui is a tool (now included as part of bootchart2) for
 visualization and analysis of the GNU/Linux boot process. It renders
 the output of the boot-logger tool bootchart (see
-http://www.bootchart.org/) to either the screen or files of various
+https://bootchart.sourceforge.net/) to either the screen or files of various
 formats. Bootchart collects information about the processes, their
 dependencies, and resource consumption during boot of a GNU/Linux
 system. The pybootchartgui tools visualizes the process tree and

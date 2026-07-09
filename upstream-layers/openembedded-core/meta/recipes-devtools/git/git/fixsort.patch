@@ -1,4 +1,4 @@
-From f928abf16841e42bfd49ccaabc164318f61e842a Mon Sep 17 00:00:00 2001
+From e3bdf5adc50b12d8625e70415c81402e0e938b68 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Wed, 17 Feb 2021 17:57:13 +0000
 Subject: [PATCH] generate-configlist.sh: Fix determinism issue

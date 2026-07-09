@@ -12,6 +12,7 @@
 import json
 import logging
 import os
+import signal
 import subprocess
 import sys
 import traceback
@@ -139,9 +140,6 @@ def _runner(resultklass, prefix=None):
 
 def run(patch, logfile=None):
     """ Load, setup and run pre and post-merge tests """
-    # Get the result class and install the control-c handler
-    unittest.installHandler()
-
     premerge_result = _runner(getResult(patch, False, logfile), 'pretest')
     postmerge_result = _runner(getResult(patch, True, logfile), 'test')
 
@@ -190,10 +188,26 @@ def main():
     else:
         patch_list = [patch_path]
 
+    interrupted = False
+    previous_sigint = signal.getsignal(signal.SIGINT)
+
+    def _sigint_handler(signum, frame):
+        nonlocal interrupted
+        interrupted = True
+        # Restore previous handler so a second CTRL+C exits immediately
+        signal.signal(signal.SIGINT, previous_sigint)
+        signal.default_int_handler(signum, frame)
+
+    signal.signal(signal.SIGINT, _sigint_handler)
+
     ret = 0
     for patch in patch_list:
+        if interrupted:
+            break
+
         if os.path.getsize(patch) == 0:
             logger.error('patchtest: patch is empty')
+            signal.signal(signal.SIGINT, previous_sigint)
             return 1
 
         logger.info('Testing patch %s' % patch)
@@ -204,8 +218,18 @@ def main():
             with open(log_path, "a") as f:
                 f.write("Patchtest results for patch '%s':\n\n" % patch)
 
-        ret = run(patch, log_path)
+        try:
+            result = run(patch, log_path)
+            ret = ret or result
+        except KeyboardInterrupt:
+            interrupted = True
 
+        if interrupted:
+            logger.error('\npatchtest: interrupted')
+            signal.signal(signal.SIGINT, previous_sigint)
+            return 1
+
+    signal.signal(signal.SIGINT, previous_sigint)
     return ret
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-From 2289366b53c5bdc117907e88578d24d2007fd035 Mon Sep 17 00:00:00 2001
+From 5c7bd395e9364a1c7c9370680ff265e50cf2b2b9 Mon Sep 17 00:00:00 2001
 From: Andrej Kozemcak <andrej.kozemcak@siemens.com>
 Date: Thu, 5 Mar 2026 08:06:54 +0100
 Subject: [PATCH] include/color.h: add missing include for types

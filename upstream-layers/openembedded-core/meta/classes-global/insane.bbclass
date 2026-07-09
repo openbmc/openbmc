@@ -83,25 +83,22 @@ QAPATHTEST[shebang-size] = "package_qa_check_shebang_size"
 def package_qa_check_shebang_size(path, name, d, elf):
     global cpath
 
+    # From kernel 5.1 onwards (specifically linux 6eb3c3d0a52dc ("exec: increase
+    # BINPRM_BUF_SIZE to 256")) the shebang buffer was increased from 128 bytes
+    # to 256 bytes.
+    BINPRM_BUF_SIZE = 256
+
     if elf or cpath.islink(path) or not cpath.isfile(path):
         return
 
     try:
         with open(path, 'rb') as f:
-            stanza = f.readline(130)
+            stanza = f.readline(BINPRM_BUF_SIZE * 2)
+            if stanza.startswith(b'#!') and len(stanza) > BINPRM_BUF_SIZE:
+                oe.qa.handle_error("shebang-size", "%s: %s maximum shebang size exceeded, the maximum size is %d" % (name, package_qa_clean_path(path, d, name), BINPRM_BUF_SIZE), d)
+                return
     except IOError:
-        return
-
-    if stanza.startswith(b'#!'):
-        try:
-            stanza.decode("utf-8")
-        except UnicodeDecodeError:
-            #If it is not a text file, it is not a script
-            return
-
-        if len(stanza) > 129:
-            oe.qa.handle_error("shebang-size", "%s: %s maximum shebang size exceeded, the maximum size is 128." % (name, package_qa_clean_path(path, d, name)), d)
-            return
+        pass
 
 QAPATHTEST[libexec] = "package_qa_check_libexec"
 def package_qa_check_libexec(path,name, d, elf):
@@ -732,6 +729,10 @@ def qa_check_staged(path,d):
     workdir = os.path.join(tmpdir, "work")
     recipesysroot = d.getVar("RECIPE_SYSROOT")
 
+    # package_qa_check_shebang_size needs the global cpath to be already created
+    global cpath
+    cpath = oe.cachedpath.CachedPath()
+
     if bb.data.inherits_class("native", d) or bb.data.inherits_class("cross", d):
         pkgconfigcheck = workdir
     else:
@@ -775,10 +776,7 @@ def qa_check_staged(path,d):
                         oe.qa.handle_error("pkgconfig", error_msg, d)
 
             if not skip_shebang_size:
-                global cpath
-                cpath = oe.cachedpath.CachedPath()
                 package_qa_check_shebang_size(path, "", d, None)
-                cpath = None
 
 # Walk over all files in a directory and call func
 def package_qa_walk(checkfuncs, package, d):
@@ -1224,9 +1222,7 @@ addtask do_package_qa_setscene
 
 python do_qa_sysroot() {
     bb.note("QA checking do_populate_sysroot")
-    sysroot_destdir = d.expand('${SYSROOT_DESTDIR}')
-    for sysroot_dir in d.expand('${SYSROOT_DIRS}').split():
-        qa_check_staged(sysroot_destdir + sysroot_dir, d)
+    qa_check_staged(d.getVar("SYSROOT_DESTDIR"), d)
     oe.qa.exit_with_message_if_errors("do_populate_sysroot for this recipe installed files with QA issues", d)
 }
 do_populate_sysroot[postfuncs] += "do_qa_sysroot"

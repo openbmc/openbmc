@@ -17,6 +17,8 @@ DEPENDS:append:aarch64 = " grub-efi systemd-boot"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 inherit nopackages
 
 # The sysroot of wic-tools is needed for wic, but if rm_work is enabled, it will

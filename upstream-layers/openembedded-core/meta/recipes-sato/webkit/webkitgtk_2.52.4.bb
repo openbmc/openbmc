@@ -80,6 +80,9 @@ PACKAGECONFIG[backtrace] = "-DUSE_LIBBACKTRACE=ON,-DUSE_LIBBACKTRACE=OFF,libback
 PACKAGECONFIG[gamepad] = "-DENABLE_GAMEPAD=ON,-DENABLE_GAMEPAD=OFF,libmanette"
 PACKAGECONFIG[sysprof-capture] = "-DUSE_SYSTEM_SYSPROF_CAPTURE=YES,-DUSE_SYSTEM_SYSPROF_CAPTURE=NO,sysprof"
 PACKAGECONFIG[speech] = "-DENABLE_SPEECH_SYNTHESIS=ON,-DENABLE_SPEECH_SYNTHESIS=OFF,flite"
+PACKAGECONFIG[librice] = "-DUSE_LIBRICE=ON,-DUSE_LIBRICE=OFF,librice"
+PACKAGECONFIG[webrtc] = "-DENABLE_WEB_RTC=ON,-DENABLE_WEB_RTC=OFF"
+PACKAGECONFIG[bubblewrap] = "-DENABLE_BUBBLEWRAP_SANDBOX=ON -DBWRAP_EXECUTABLE=${bindir}/bwrap -DDBUS_PROXY_EXECUTABLE=${bindir}/xdg-dbus-proxy,-DENABLE_BUBBLEWRAP_SANDBOX=OFF,,bubblewrap xdg-dbus-proxy"
 
 EXTRA_OECMAKE = " \
                  -DPORT=GTK \
@@ -87,7 +90,6 @@ EXTRA_OECMAKE = " \
                  ${@oe.utils.vartrue('GIDOCGEN_ENABLED', '-DENABLE_DOCUMENTATION=ON', '-DENABLE_DOCUMENTATION=OFF', d)} \
                  ${@oe.utils.vartrue('DEBUG_BUILD', '-DWEBKIT_NO_INLINE_HINTS=ON', '-DWEBKIT_NO_INLINE_HINTS=OFF', d)} \
                  -DENABLE_MINIBROWSER=ON \
-                 -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
                  -DUSE_GTK4=ON \
                  -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
                  -DENABLE_RELEASE_LOG=ON \
@@ -172,9 +174,6 @@ src_package_preprocess () {
             ${B}/WebCore/DerivedSources/*.cpp \
             ${B}/WebKitGTK/DerivedSources/webkit/*.cpp
 }
-
-# Clang-20 issue - https://github.com/llvm/llvm-project/issues/132322
-TOOLCHAIN:arm = "gcc"
 
 # Pass -g1 to massively reduce the size of the
 # debug symbols (4.3GB to 700M at time of writing)

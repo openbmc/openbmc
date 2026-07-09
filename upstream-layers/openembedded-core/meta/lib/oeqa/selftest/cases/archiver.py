@@ -150,18 +150,6 @@ class Archiver(OESelftestTestCase):
             'The task "%s" of the recipe "%s" has different signatures in "%s" for each machine in multiconfig' \
             % (task, pn, locked_sigs_inc))
 
-    def test_archiver_srpm_mode(self):
-        """
-        Test that in srpm mode, the added recipe dependencies at least exist/work [YOCTO #11121]
-        """
-
-        features = 'INHERIT += "archiver"\n'
-        features += 'ARCHIVER_MODE[srpm] = "1"\n'
-        features += 'PACKAGE_CLASSES = "package_rpm"\n'
-        self.write_config(features)
-
-        bitbake('-n selftest-nopackages selftest-ed')
-
     def _test_archiver_mode(self, mode, target_file_name, extra_config=None):
         target = 'selftest-ed-native'
 

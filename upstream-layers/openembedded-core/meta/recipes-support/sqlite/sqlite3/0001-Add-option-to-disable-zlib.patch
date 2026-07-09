@@ -1,4 +1,4 @@
-From a324ff380e6e83141f37cbee7b89e87282deb349 Mon Sep 17 00:00:00 2001
+From 7c6c5749f809eb3fd50fbaabb4ca6379968b3c5e Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Sun, 12 Oct 2025 23:32:46 +0200
 Subject: [PATCH] Add option to disable zlib

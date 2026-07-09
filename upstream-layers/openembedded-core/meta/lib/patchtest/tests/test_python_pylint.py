@@ -47,7 +47,7 @@ class PyLint(base.Base):
         for pythonpatch in self.pythonpatches:
             # a condition checking whether a file is renamed or not
             # unidiff doesn't support this yet
-            if pythonpatch.target_file is not pythonpatch.path:
+            if pythonpatch.target_file != pythonpatch.path:
                 path = pythonpatch.target_file[2:]
             else:
                 path = pythonpatch.path
@@ -55,9 +55,9 @@ class PyLint(base.Base):
             reporter = TextReporter(pylint_output)
             lint.Run([self.pylint_options, pythonpatch.path], reporter=reporter, exit=False)
             for line in pylint_output.readlines():
-                    if not '*' in line:
-                        if line.strip():
-                            self.pylint_test[line.strip().split(' ',1)[0]] = line.strip().split(' ',1)[1]
+                if not '*' in line:
+                    if line.strip():
+                        self.pylint_test[line.strip().split(' ',1)[0]] = line.strip().split(' ',1)[1]
 
         for issue in self.pylint_test:
              if self.pylint_test[issue] not in self.pylint_pretest.values():

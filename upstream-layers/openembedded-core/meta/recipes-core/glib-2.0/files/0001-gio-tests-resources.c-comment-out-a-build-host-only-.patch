@@ -1,4 +1,4 @@
-From 521b129c7c6329a01a5f56b4604ea1b7499b03ad Mon Sep 17 00:00:00 2001
+From d9c75aef8b68887ef4f1dd9bb73542cc0ff02b20 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Wed, 8 Jan 2020 18:22:46 +0100
 Subject: [PATCH] gio/tests/resources.c: comment out a build host-only test

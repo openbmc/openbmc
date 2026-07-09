@@ -23,7 +23,6 @@ DISABLE_STATIC:pn-musl = ""
 
 EXTRA_OECONF:append = "${DISABLE_STATIC}"
 
-EXTRA_OECMAKE:append:pn-libical = " -DSHARED_ONLY=True"
 EXTRA_OECMAKE:append:pn-libjpeg-turbo = " -DENABLE_STATIC=False"
 EXTRA_OECMAKE:append:pn-libjpeg-turbo-native = " -DENABLE_STATIC=False"
 

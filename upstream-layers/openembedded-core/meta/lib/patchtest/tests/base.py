@@ -22,10 +22,6 @@ info = logger.info
 warn = logger.warn
 error = logger.error
 
-Commit = collections.namedtuple(
-    "Commit", ["author", "subject", "commit_message", "shortlog", "payload"]
-)
-
 Commit = collections.namedtuple('Commit', ['author', 'subject', 'commit_message', 'shortlog', 'payload'])
 
 class PatchtestOEError(Exception):

@@ -1,17 +1,10 @@
 #!/bin/sh
 
+# If this wrapper script is being ran in a normal build environment and not an
+# eSDK, then just call the real script directly.
 if [ -z "$OECORE_NATIVE_SYSROOT" ]; then
     exec "meson.real" "$@"
 fi
-
-if [ -z "$SSL_CERT_DIR" ]; then
-    export SSL_CERT_DIR="$OECORE_NATIVE_SYSROOT/etc/ssl/certs/"
-fi
-
-# If these are set to a cross-compile path, meson will get confused and try to
-# use them as native tools. Unset them to prevent this, as all the cross-compile
-# config is already in meson.cross.
-unset CC CXX CPP LD AR NM STRIP
 
 case "$1" in
 setup|configure|dist|install|introspect|init|test|wrap|subprojects|rewrite|compile|devenv|env2mfile|help)

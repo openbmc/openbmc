@@ -30,9 +30,6 @@ TOOLCHAIN_HOST_TASK += "\
     nativesdk-glibc-utils \
     nativesdk-glibc-gconvs \
     nativesdk-libxcrypt-dev \
-    nativesdk-parted \
-    nativesdk-dosfstools \
-    nativesdk-gptfdisk \
     "
 # gconvs needed for iconv to work in vim builds
 

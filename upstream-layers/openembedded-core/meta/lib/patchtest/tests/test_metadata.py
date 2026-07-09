@@ -8,7 +8,6 @@ import base
 import collections
 import os
 import patchtest_patterns
-import pyparsing
 from patchtest_parser import PatchtestParser
 
 # Data store commonly used to share values between pre and post-merge tests
@@ -108,39 +107,28 @@ class TestMetadata(base.Metadata):
                             ],
                         )
 
-    def pretest_src_uri_left_files(self):
-        # these tests just make sense on patches that can be merged
-        if not PatchtestParser.repo.canbemerged():
-            self.skip("Patch cannot be merged")
-        if not self.modified:
-            self.skip('No modified recipes, skipping pretest')
-
-        # get the proper metadata values
+    def _collect_src_uri(self, key_prefix):
         for pn in self.modified:
-            # we are not interested in images
             if 'core-image' in pn:
                 continue
             rd = self.tinfoil.parse_recipe(pn)
             PatchTestDataStore[
-                "%s-%s-%s" % (self.shortid(), patchtest_patterns.metadata_src_uri, pn)
+                "%s-%s-%s" % (key_prefix, patchtest_patterns.metadata_src_uri, pn)
             ] = rd.getVar(patchtest_patterns.metadata_src_uri)
+
+    def pretest_src_uri_left_files(self):
+        if not PatchtestParser.repo.canbemerged():
+            self.skip("Patch cannot be merged")
+        if not self.modified:
+            self.skip('No modified recipes, skipping pretest')
+        self._collect_src_uri(self.shortid())
 
     def test_src_uri_left_files(self):
-        # these tests just make sense on patches that can be merged
         if not PatchtestParser.repo.canbemerged():
             self.skip("Patch cannot be merged")
         if not self.modified:
-            self.skip('No modified recipes, skipping pretest')
-
-        # get the proper metadata values
-        for pn in self.modified:
-            # we are not interested in images
-            if 'core-image' in pn:
-                continue
-            rd = self.tinfoil.parse_recipe(pn)
-            PatchTestDataStore[
-                "%s-%s-%s" % (self.shortid(), patchtest_patterns.metadata_src_uri, pn)
-            ] = rd.getVar(patchtest_patterns.metadata_src_uri)
+            self.skip('No modified recipes, skipping test')
+        self._collect_src_uri(self.shortid())
 
         for pn in self.modified:
             pretest_src_uri = PatchTestDataStore[

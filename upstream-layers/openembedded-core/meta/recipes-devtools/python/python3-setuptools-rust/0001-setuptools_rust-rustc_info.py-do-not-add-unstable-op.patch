@@ -1,0 +1,44 @@
+From 8e0c0ae45a8e4274482d39ee87775ca6d8de9ccb Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Tue, 30 Jun 2026 21:36:12 +0200
+Subject: [PATCH] setuptools_rust/rustc_info.py: do not add 'unstable-options'
+ to rustc invocation
+
+This avoids the error:
+| error: the option `Z` is only accepted on the nightly compiler
+| 
+| help: consider switching to a nightly toolchain: `rustup default nightly`
+| 
+| note: selecting a toolchain with `+toolchain` arguments require a rustup proxy; see <https://rust-lang.github.io/rustup/concepts/index.html>
+| 
+| note: for more information about Rust's stability policy, see <https://doc.rust-lang.org/book/appendix-07-nightly-rust.html#unstable-features>
+| 
+| error: 1 nightly option were parsed
+
+Please see https://github.com/rust-lang/rust/issues/155963
+for report to upstream about why we need custom targets and why
+requiring unstable-options gets in the way, badly.
+
+Rust is meanwhile patched to not require it:
+meta/recipes-devtools/rust/files/0002-Fix-rust-build-failure-with-unstable-options.patch
+
+Upstream-Status: Inappropriate [the issue is in rustc; see above]
+
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ setuptools_rust/rustc_info.py | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/setuptools_rust/rustc_info.py b/setuptools_rust/rustc_info.py
+index ad37249..f470e04 100644
+--- a/setuptools_rust/rustc_info.py
++++ b/setuptools_rust/rustc_info.py
+@@ -68,8 +68,6 @@ def get_rustc_cfgs(target_triple: Optional[str], env: Env) -> RustCfgs:
+ def get_rust_target_info(target_triple: Optional[str], env: Env) -> List[str]:
+     cmd = ["rustc", "--print", "cfg"]
+     if target_triple:
+-        if _is_custom_target(target_triple):
+-            cmd.extend(["-Z", "unstable-options"])
+         cmd.extend(["--target", target_triple.split(".")[0]])
+     output = check_subprocess_output(cmd, env=env, text=True)
+     return output.splitlines()

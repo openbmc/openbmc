@@ -1,11 +1,11 @@
-SUMMARY = "Check that shebang does not exceed 128 characters"
+SUMMARY = "Check that shebang does not exceed 256 characters"
 LICENSE = "CLOSED"
 INHIBIT_DEFAULT_DEPS = "1"
 
 EXCLUDE_FROM_WORLD = "1"
 do_install() {
     install -d ${D}${bindir}
-    echo '#!BiM3cnVd1Amtv6PG+FynrQiVMbZnX5ELgF21q3EkuB+44JEGWtq8TvBJ7EGidfVs3eR3wVOUbLnjYDlKUWcm7YC/ute7f+KDHbwxziRUSUBZAUqgjiQdfQ0HnxajI0ozbM863E9JV9k13yZKYfh9/zR77Y6Dl4Dd3zOWS75LSpkAXV' > ${D}${bindir}/max-shebang
+    echo '#!4Shfcy9Ej8gPKDGNkyhmtxrwPinmpZQ1pCS3snbdqlNx7YfmTpHkeJakCMaDnQXx4c4TmtyJpGBn5F7IO1FShYG9EwtALDOsRKEDOJKRj2L7hW92wZTzlqx4mMqREqNa7Hrwql4DYVv8vmEMhIwvtHO3UaVpgvLY9Y3HhfopUVUMZJi5Xs9KKkRisrM0HBePG67tbeWL9ZstNuPKH1ikyeNB7PprwLrsjZ6EngCrhFTfYzRSuXhdrQQBBsLZBRDsy5QE' > ${D}${bindir}/max-shebang
     chmod 755 ${D}${bindir}/max-shebang
 }
 

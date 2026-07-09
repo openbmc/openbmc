@@ -44,9 +44,8 @@ TESTSTRING:pn-sysroot-test-arch2 = "%s"
         Expected:  Fail when a shebang bigger than the max shebang-size is reached.
         Author:    Paulo Neves <ptsneves@gmail.com>
         """
-        expected = "maximum shebang size exceeded, the maximum size is 128. [shebang-size]"
         res = bitbake("sysroot-shebang-test-native -c populate_sysroot", ignore_status=True)
-        self.assertTrue(expected in res.output, msg=res.output)
+        self.assertTrue("[shebang-size]" in res.output, msg=res.output)
         self.assertTrue(res.status != 0)
 
     def test_sysroot_la(self):

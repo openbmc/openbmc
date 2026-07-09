@@ -238,16 +238,13 @@
 # 6) the recipe (.bb and .inc):
 #ARCHIVER_MODE[recipe] = "1"
 #
-# 7) Whether output the .src.rpm package:
-#ARCHIVER_MODE[srpm] = "1"
-#
-# 8) Filter the license, the recipe whose license in
+# 7) Filter the license, the recipe whose license in
 #    COPYLEFT_LICENSE_INCLUDE will be included, and in
 #    COPYLEFT_LICENSE_EXCLUDE will be excluded.
 #COPYLEFT_LICENSE_INCLUDE = 'GPL* LGPL*'
 #COPYLEFT_LICENSE_EXCLUDE = 'CLOSED Proprietary'
 #
-# 9) Config the recipe type that will be archived, the type can be
+# 8) Config the recipe type that will be archived, the type can be
 #    target, native, nativesdk, cross, crosssdk and cross-canadian,
 #    you can set one or more types. Archive all types by default.
 #COPYLEFT_RECIPE_TYPES = 'target'

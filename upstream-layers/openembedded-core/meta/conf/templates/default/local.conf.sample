@@ -228,6 +228,10 @@ BB_DISKMON_DIRS ??= "\
 # a handy set of menus for controlling the emulator.
 #PACKAGECONFIG:append:pn-qemu-system-native = " gtk+"
 
+# Alternatively, if your build machine is headless then you can disable the graphical
+# options to reduce the build dependencies.
+#PACKAGECONFIG:remove:pn-qemu-system-native = "gtk+ sdl"
+
 #
 # Hash Equivalence
 #

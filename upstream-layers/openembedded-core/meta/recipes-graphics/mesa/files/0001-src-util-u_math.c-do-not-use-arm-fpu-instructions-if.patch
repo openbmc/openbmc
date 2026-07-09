@@ -1,0 +1,34 @@
+From 013717829278f02b0815d80a423e05e4bd567ae3 Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Wed, 1 Jul 2026 22:48:15 +0200
+Subject: [PATCH] src/util/u_math.c: do not use arm fpu instructions if fpu is
+ not available
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/42682]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ src/util/u_math.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/util/u_math.c b/src/util/u_math.c
+index 337baa9..9ad03bf 100644
+--- a/src/util/u_math.c
++++ b/src/util/u_math.c
+@@ -86,7 +86,7 @@ util_fpstate_get(void)
+    if (util_get_cpu_caps()->has_neon) {
+ #ifdef HAVE___BUILTIN_ARM_GET_FPSCR
+       fpstate = __builtin_arm_get_fpscr();
+-#else
++#elif !defined(__SOFTFP__)
+       __asm__ volatile("vmrs %0, fpscr" : "=r"(fpstate));
+ #endif
+    }
+@@ -151,7 +151,7 @@ util_fpstate_set(unsigned fpstate)
+    if (util_get_cpu_caps()->has_neon) {
+ #ifdef HAVE___BUILTIN_ARM_SET_FPSCR
+       __builtin_arm_set_fpscr(fpstate);
+-#else
++#elif !defined(__SOFTFP__)
+       __asm__ volatile("vmsr fpscr, %0" :: "r"(fpstate));
+ #endif
+    }

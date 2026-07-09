@@ -467,6 +467,7 @@ def sstate_clean_cachefiles(d):
         ld = d.createCopy()
         ss = sstate_state_fromvars(ld, task)
         sstate_clean_cachefile(ss, ld)
+sstate_clean_cachefiles[vardepsexclude] += "SSTATETASKS"
 
 def sstate_clean_manifest(manifest, d, canrace=False, prefix=None):
     import oe.path
@@ -571,6 +572,7 @@ python sstate_cleanall() {
         shared_state = sstate_state_fromvars(ld, name)
         sstate_clean(shared_state, ld)
 }
+sstate_cleanall[vardepsexclude] = "SSTATETASKS"
 
 python sstate_hardcode_path () {
     import subprocess, platform

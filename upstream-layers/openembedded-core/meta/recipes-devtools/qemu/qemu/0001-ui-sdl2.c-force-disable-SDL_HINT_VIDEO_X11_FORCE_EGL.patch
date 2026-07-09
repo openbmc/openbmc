@@ -1,4 +1,4 @@
-From ba4efe836c488d00e0f44929ee45feb3b1c1e014 Mon Sep 17 00:00:00 2001
+From 0a029de8c4c31507cae542b5413491283569467c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 10 Jun 2026 15:00:26 +0200
 Subject: [PATCH] ui/sdl2.c: force-disable SDL_HINT_VIDEO_X11_FORCE_EGL,
@@ -14,10 +14,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ui/sdl2.c b/ui/sdl2.c
-index 987ad334b..b4c8a50de 100644
+index eccc5b0e9..ab91eaf25 100644
 --- a/ui/sdl2.c
 +++ b/ui/sdl2.c
-@@ -871,7 +871,7 @@ static void sdl2_set_hint_x11_force_egl(void)
+@@ -874,7 +874,7 @@ static void sdl2_set_hint_x11_force_egl(void)
           * It's always safe to set the hint even if X11 is not used by SDL.
           * SDL will work regardless of the hint.
           */

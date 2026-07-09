@@ -16,6 +16,7 @@ class LocalesTest(OESelftestTestCase):
         features.append('IMAGE_INSTALL:append = " glibc-utils localedef"')
         features.append('GLIBC_GENERATE_LOCALES = "en_US.UTF-8 fr_FR.UTF-8 en_US.ISO-8859-1 de_DE.UTF-8 fr_FR.ISO-8859-1 zh_HK.BIG5-HKSCS tr_TR.UTF-8"')
         features.append('IMAGE_LINGUAS:append = " en-us fr-fr"')
+        features.append('DISTRO_FEATURES_OPTED_OUT += "ptest"')
         if binary_enabled:
             features.append('ENABLE_BINARY_LOCALE_GENERATION = "1"')
         else:

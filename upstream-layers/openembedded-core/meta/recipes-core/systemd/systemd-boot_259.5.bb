@@ -8,6 +8,8 @@ DEPENDS = "libcap util-linux gperf-native python3-jinja2-native python3-pyelftoo
 inherit meson pkgconfig gettext
 inherit deploy
 
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 LDFLAGS =+ "${@ " ".join(d.getVar('LD').split()[1:])} "
 
 EFI_LD = "bfd"

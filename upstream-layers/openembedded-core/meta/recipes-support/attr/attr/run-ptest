@@ -3,7 +3,7 @@
 failed=0
 all=0
 
-for f in *.test; do
+for f in *.run; do
     ./run $f
     case "$?" in
         0)

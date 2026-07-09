@@ -1,4 +1,4 @@
-From 36df82284b1e8c3d7338c315016a8e74c0978e32 Mon Sep 17 00:00:00 2001
+From 65fb22e302a4dbec675377e61593b52c2e291705 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Thu, 15 Dec 2022 15:54:27 -0800
 Subject: [PATCH] configure: Use autoconf macro to detect largefile support

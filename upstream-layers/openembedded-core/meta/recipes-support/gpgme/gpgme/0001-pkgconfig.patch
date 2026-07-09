@@ -1,4 +1,4 @@
-From 4b4e6fc898dd249387bbed4924fa22c1c494327a Mon Sep 17 00:00:00 2001
+From 04838f9ce25f6964254310b66069ed1b37b019ce Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Mon, 21 Jul 2025 12:43:29 +0800
 Subject: [PATCH] pkgconfig
@@ -29,10 +29,10 @@ Signed-off-by: Hongxu Jia <hongxu.jia@windriver.com>
  create mode 100644 src/gpgme-pthread.pc.in
 
 diff --git a/configure.ac b/configure.ac
-index d4dcb1c..293fcc2 100644
+index cd0af89..5ee3891 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -844,6 +844,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
+@@ -845,6 +845,7 @@ AC_CONFIG_FILES(Makefile src/Makefile
                  src/gpgme.pc
                  src/gpgme-glib.pc
                  src/gpgme.h)
@@ -41,7 +41,7 @@ index d4dcb1c..293fcc2 100644
  AC_CONFIG_FILES([lang/Makefile lang/cl/Makefile lang/cl/gpgme.asd])
  AC_CONFIG_FILES([lang/js/Makefile lang/js/src/Makefile
 diff --git a/src/Makefile.am b/src/Makefile.am
-index edc239b..d427044 100644
+index 4f45dfe..3c49190 100644
 --- a/src/Makefile.am
 +++ b/src/Makefile.am
 @@ -20,11 +20,11 @@
@@ -80,7 +80,7 @@ index 0000000..074bbf6
 +Cflags: -I${includedir}
 +Requires: libassuan gpg-error
 diff --git a/src/gpgme.m4 b/src/gpgme.m4
-index 5f689e1..249e8c9 100644
+index 13b43a4..851e866 100644
 --- a/src/gpgme.m4
 +++ b/src/gpgme.m4
 @@ -166,7 +166,6 @@ dnl is added to the gpg_config_script_warn variable.
@@ -225,7 +225,7 @@ index 5f689e1..249e8c9 100644
  ])
  
  
-@@ -319,36 +249,12 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+@@ -320,36 +250,12 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],[
       min_gpgme_version="$tmp"
    fi
  
@@ -264,7 +264,7 @@ index 5f689e1..249e8c9 100644
          if test "$tmp" -gt 0 ; then
             if test "$req_gpgme_api" -ne "$tmp" ; then
               ok=no
-@@ -357,17 +263,9 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],
+@@ -358,17 +264,9 @@ AC_DEFUN([AM_PATH_GPGME_GLIB],[
       fi
    fi
    if test $ok = yes; then
@@ -295,6 +295,3 @@ index 9ddef5c..932645b 100644
 +Cflags: -I${includedir}
 +Libs: -L${libdir} -lgpgme
  URL: https://www.gnupg.org/software/gpgme/index.html
--- 
-2.34.1
-

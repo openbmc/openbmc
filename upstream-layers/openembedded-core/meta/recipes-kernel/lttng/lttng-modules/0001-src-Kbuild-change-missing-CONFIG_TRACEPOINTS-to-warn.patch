@@ -1,4 +1,4 @@
-From e7d6a99119798856810f4067c7c550cae2173cef Mon Sep 17 00:00:00 2001
+From 78f79eb607b6c0be71144d1ca70391f989846db1 Mon Sep 17 00:00:00 2001
 From: Bruce Ashfield <bruce.ashfield@gmail.com>
 Date: Sat, 15 May 2021 10:26:38 -0400
 Subject: [PATCH] src/Kbuild: change missing CONFIG_TRACEPOINTS to warning

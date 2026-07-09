@@ -1,4 +1,4 @@
-From d6ed4c477f22309c09accd4fee68486d7714f205 Mon Sep 17 00:00:00 2001
+From 3e7ec165c718234e1afcdf730bdf20942976e25c Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 22 Nov 2024 22:52:31 +0100
 Subject: [PATCH] tests/egl/spec: make egl_ext_surface_compression conditional
@@ -39,7 +39,7 @@ index d9540bcfd..01a70164f 100644
  
  # vim: ft=cmake:
 diff --git a/tests/egl/spec/egl_ext_surface_compression/create_surface.c b/tests/egl/spec/egl_ext_surface_compression/create_surface.c
-index e3d55d433..35f13fd00 100644
+index 71b043b54..09e87dee4 100644
 --- a/tests/egl/spec/egl_ext_surface_compression/create_surface.c
 +++ b/tests/egl/spec/egl_ext_surface_compression/create_surface.c
 @@ -25,7 +25,6 @@

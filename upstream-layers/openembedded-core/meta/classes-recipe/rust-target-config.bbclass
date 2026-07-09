@@ -19,6 +19,8 @@ def llvm_features_from_tune(d):
     mach_overrides = d.getVar('MACHINEOVERRIDES')
     mach_overrides = frozenset(mach_overrides.split(':'))
 
+    target_arch = d.getVar('TARGET_ARCH')
+
     if 'vfpv4' in feat:
         f.append("+vfp4")
     elif 'vfpv4d16' in feat:
@@ -46,6 +48,9 @@ def llvm_features_from_tune(d):
     if target_is_armv7(d):
         f.append('+v7')
 
+    if 'armv8a' in feat and target_arch == 'arm':
+        f.append('+v8')
+
     if ('armv6' in mach_overrides) or ('armv6' in feat):
         f.append("+v6")
     if 'armv5te' in feat:
@@ -63,7 +68,8 @@ def llvm_features_from_tune(d):
 
     if 'thumb' in feat:
         if d.getVar('ARM_THUMB_OPT') == "thumb":
-            if target_is_armv7(d):
+            if target_is_armv7(d) or \
+                    ('armv8a' in feat and target_arch == 'arm'):
                 f.append('+thumb2')
             f.append("+thumb-mode")
 
@@ -302,7 +308,16 @@ def arch_to_rust_target_arch(arch):
         return arch
 
 # Convert a rust target string to a llvm-compatible triplet
-def rust_sys_to_llvm_target(sys):
+def rust_sys_to_llvm_target(sys, d):
+    # For AArch32 ARMv8-A, RUST_TARGET_SYS stays "arm-..." because "armv8a" is not a
+    # valid Rust target architecture. Rewrite llvm-target to "armv8a-..." here so
+    # ParseARMTriple adds "+armv8-a" and transitively sets HasV4TOps in the
+    # MCSubtargetInfo used for module-level inline asm parsing, making hasThumb()
+    # return true for .thumb directives.
+    if sys.startswith('arm-') and \
+            'armv8a' in (d.getVar('TUNE_FEATURES') or '').split() and \
+            d.getVar('TARGET_ARCH') == 'arm':
+        return 'armv8a-' + sys[4:]
     return sys
 
 # generates our target CPU value
@@ -382,7 +397,7 @@ def rust_gen_target(d, thing, wd, arch):
 
     # build tspec
     tspec = {}
-    tspec['llvm-target'] = rust_sys_to_llvm_target(rustsys)
+    tspec['llvm-target'] = rust_sys_to_llvm_target(rustsys, d)
     tspec['data-layout'] = d.getVarFlag('DATA_LAYOUT', arch_abi)
     if tspec['data-layout'] is None:
         bb.fatal("No rust target defined for %s" % arch_abi)

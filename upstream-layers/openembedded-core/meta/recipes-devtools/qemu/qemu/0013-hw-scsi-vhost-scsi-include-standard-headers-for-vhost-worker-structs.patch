@@ -1,4 +1,4 @@
-From 6b613dae1eb1bad99fce6ee28f3c67fd0561b527 Mon Sep 17 00:00:00 2001
+From b8736798a109e2b3a4d5c02f5fd833bf870ba771 Mon Sep 17 00:00:00 2001
 From: Quan Sun <Quan.Sun@windriver.com>
 Date: Fri, 5 Jun 2026 11:54:58 +0000
 Subject: [PATCH] hw/scsi/vhost-scsi: fix build with older kernel headers
