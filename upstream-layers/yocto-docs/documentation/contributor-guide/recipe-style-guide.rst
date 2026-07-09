@@ -268,13 +268,18 @@ License Updates
 ~~~~~~~~~~~~~~~
 
 When you change the :term:`LICENSE` or :term:`LIC_FILES_CHKSUM` in the recipe
-you need to briefly explain the reason for the change via a ``License-Update:``
-tag.  Often it's quite trivial, such as::
+due to upstream making modifications to the license files, you need to briefly
+explain the reason for the change via a ``License-Update:`` tag. Often it's
+quite trivial, such as::
 
     License-Update: copyright years refreshed
 
 Less often, the actual licensing terms themselves will have changed.  If so, do
 try to link to upstream making/justifying that decision.
+
+The ``License-Update:`` tag is not needed for commits which fix incorrect
+license data in our metadata (for an example see OE-Core commit
+:oecore_rev:`6c8b76d240d2457578a58787121bc5873d724ee2`).
 
 Tips and Guidelines for Writing Recipes
 ---------------------------------------

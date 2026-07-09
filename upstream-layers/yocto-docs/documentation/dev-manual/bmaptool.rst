@@ -13,13 +13,13 @@ system image files much faster.
 .. note::
 
    -  If you are using Ubuntu or Debian distributions, you can install
-      the ``bmap-tools`` package using the following command and then
+      the ``bmaptool`` package using the following command and then
       use the tool without specifying ``PATH`` even from the root
       account::
 
-         $ sudo apt install bmap-tools
+         $ sudo apt install bmaptool
 
-   -  If you are unable to install the ``bmap-tools`` package, you will
+   -  If you are unable to install the ``bmaptool`` package, you will
       need to build `bmaptool` before using it. Use the following command::
 
          $ bitbake bmaptool-native -caddto_recipe_sysroot
@@ -56,3 +56,10 @@ For help on the ``bmaptool`` command, use the following command::
 
    $ bmaptool --help
 
+.. note::
+
+   Earlier releases of Ubuntu and Debian had a package named
+   ``bmap-tools``; you can still install by this name as this
+   is simply a transitional package which exists solely to
+   ensure backward compatibility and smooth upgrades from
+   older installations.

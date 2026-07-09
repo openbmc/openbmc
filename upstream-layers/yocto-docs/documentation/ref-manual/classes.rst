@@ -2261,6 +2261,15 @@ environment for cross compilation.
 This class is internal to the :ref:`ref-classes-python-setuptools3_rust` class
 and is not meant to be used directly in recipes.
 
+.. _ref-classes-python_uv_build:
+
+``python_uv_build``
+===================
+
+The :ref:`ref-classes-python_uv_build` class can be inherited in Python recipes
+that are built with ``uv_build`` and which are `PEP-517
+<https://www.python.org/dev/peps/pep-0517/>`__ compliant.
+
 .. _ref-classes-python-setuptools3_rust:
 
 ``python-setuptools3_rust``
@@ -3534,8 +3543,7 @@ by rootfs image recipes. The build configuration should also use an
 on target hardware. Using ``systemd`` as init is recommended. Image builds
 should create an ESP partition for UEFI firmware and copy ``systemd-boot`` and
 UKI files there. Sample configuration for Wic images is provided in
-:oe_git:`scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in
-</openembedded-core/tree/scripts/lib/wic/canned-wks/efi-uki-bootdisk.wks.in>`.
+:oecore_path:`meta/files/wic/efi-uki-bootdisk.wks.in`
 UKIs are generated using ``systemd`` reference implementation `ukify
 <https://www.freedesktop.org/software/systemd/man/latest/ukify.html>`__.
 This class uses a number of variables but tries to find sensible defaults for

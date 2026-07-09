@@ -9,6 +9,33 @@ tasks to complete configuring, compiling, and packaging software. This
 chapter provides a reference of the tasks defined in the OpenEmbedded
 build system.
 
+To see the tasks defined (in alphabetical order) for a given recipe,
+you can run:
+
+.. code-block:: console
+
+   $ bitbake -c listtasks recipename
+   do_build                              Default task for a recipe - depends on all other normal tasks required to 'build' a recipe
+   do_checkuri                           Validates the SRC_URI value
+   do_clean                              Removes all output files for a target
+   do_cleanall                           Removes all output files, shared state cache, and downloaded source files for a target
+   do_cleansstate                        Removes all output files and shared state cache for a target
+   do_compile                            Compiles the source in the compilation directory
+   ...
+
+In addition, once a recipe has been built, you can examine the
+resulting task information in that recipe's ``${WORKDIR}/temp/``
+directory, which will consist of the following:
+
+-  for each task, a ``run`` file that represents the code that
+   was executed for that task
+
+-  for each task, a corresponding ``log`` file showing the result of
+   task execution
+
+-  a single ``log.task_order`` file showing the execution order
+   of all tasks for that recipe
+
 Normal Recipe Build Tasks
 =========================
 
@@ -80,7 +107,7 @@ task runs with the current working directory set to
 Recipes implementing this task should inherit the
 :ref:`ref-classes-deploy` class and should write the output
 to ``${``\ :term:`DEPLOYDIR`\ ``}``, which is not to be
-confused with ``${DEPLOY_DIR}``. The :ref:`ref-classes-deploy` class sets up
+confused with ``${``\ :term:`DEPLOY_DIR`\ ``}``. The :ref:`ref-classes-deploy` class sets up
 :ref:`ref-tasks-deploy` as a shared state (sstate) task that can be accelerated
 through sstate use. The sstate mechanism takes care of copying the
 output from ``${DEPLOYDIR}`` to ``${DEPLOY_DIR_IMAGE}``.
@@ -432,7 +459,26 @@ Manually Called Tasks
 =====================
 
 These tasks are typically manually triggered (e.g. by using the
-``bitbake -c`` command-line option):
+``bitbake -c`` command-line option) because they are not normally
+part of any standard build workflow. As an example, consider the
+``listtasks`` task, which displays the tasks defined for a given
+recipe and would be invoked with:
+
+.. code-block:: console
+
+   $ bitbake -c listtasks recipename
+
+A typical definition of a manually-called task would look like::
+
+   addtask listtasks
+   do_listtasks[nostamp] = "1"
+   python do_listtasks() {
+      ... definition of task ...
+   }
+
+which defines that function as a task without building it into any
+task dependency chain, as well as setting the ``[nostamp]`` flag to
+ensure that it is run every time it is invoked.
 
 ``do_checkuri``
 ---------------
@@ -572,7 +618,7 @@ Yocto Project Development Tasks Manual for more information about using
 --------------------------
 
 Lists the available features for an image recipe. These features can be set
-in the :term:`IMAGE_FEATURES` variable.
+through either the :term:`IMAGE_FEATURES` or :term:`EXTRA_IMAGE_FEATURES` variables.
 
 .. _ref-tasks-listtasks:
 
@@ -675,7 +721,7 @@ When invoked by the user, this task creates a file containing the
 differences between the original config as produced by
 :ref:`ref-tasks-kernel_configme` task and the
 changes made by the user with other methods (i.e. using
-(:ref:`ref-tasks-kernel_menuconfig`). Once the
+(:ref:`ref-tasks-menuconfig`). Once the
 file of differences is created, it can be used to create a config
 fragment that only contains the differences. You can invoke this task
 from the command line as follows::
@@ -703,7 +749,7 @@ kernel with the correct branches checked out.
 -------------------------
 
 Validates the configuration produced by the
-:ref:`ref-tasks-kernel_menuconfig` task. The
+:ref:`ref-tasks-menuconfig` task. The
 :ref:`ref-tasks-kernel_configcheck` task produces warnings when a requested
 configuration does not appear in the final ``.config`` file or when you
 override a policy configuration in a hardware configuration fragment.
@@ -728,26 +774,6 @@ passed to the kernel configuration phase proper. This is also the time
 during which user-specified defconfigs are applied if present, and where
 configuration modes such as ``--allnoconfig`` are applied.
 
-.. _ref-tasks-kernel_menuconfig:
-
-``do_kernel_menuconfig``
-------------------------
-
-Invoked by the user to manipulate the ``.config`` file used to build a
-linux-yocto recipe. This task starts the Linux kernel configuration
-tool, which you then use to modify the kernel configuration.
-
-.. note::
-
-   You can also invoke this tool from the command line as follows::
-
-           $ bitbake linux-yocto -c menuconfig
-
-
-See the ":ref:`kernel-dev/common:using ``menuconfig```"
-section in the Yocto Project Linux Kernel Development Manual for more
-information on this configuration tool.
-
 .. _ref-tasks-kernel_metadata:
 
 ``do_kernel_metadata``
@@ -766,10 +792,19 @@ which can then be applied by subsequent tasks such as
 ``do_menuconfig``
 -----------------
 
-Runs ``make menuconfig`` for the kernel. For information on
-``menuconfig``, see the
-":ref:`kernel-dev/common:using ``menuconfig```"
-section in the Yocto Project Linux Kernel Development Manual.
+Invoked by the user to manipulate the ``.config`` file used to build a
+linux-yocto recipe. This task starts the Linux kernel configuration
+tool, which you then use to modify the kernel configuration.
+
+You can invoke this tool from the command line as follows:
+
+.. code-block:: console
+
+   $ bitbake linux-yocto -c menuconfig
+
+See the ":ref:`kernel-dev/common:using ``menuconfig```"
+section in the Yocto Project Linux Kernel Development Manual for more
+information on this configuration tool.
 
 .. _ref-tasks-savedefconfig:
 
@@ -780,7 +815,7 @@ When invoked by the user, creates a defconfig file that can be used
 instead of the default defconfig. The saved defconfig contains the
 differences between the default defconfig and the changes made by the
 user using other methods (i.e. the
-:ref:`ref-tasks-kernel_menuconfig` task. You
+:ref:`ref-tasks-menuconfig` task. You
 can invoke the task using the following command::
 
    $ bitbake linux-yocto -c savedefconfig

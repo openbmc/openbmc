@@ -69,7 +69,6 @@ supported on the following distributions:
 -  Debian 11
 -  Debian 12
 -  Debian 13
--  Fedora 42
 -  Fedora 43
 -  OpenSUSE Leap 15.6
 -  OpenSUSE Leap 16.0

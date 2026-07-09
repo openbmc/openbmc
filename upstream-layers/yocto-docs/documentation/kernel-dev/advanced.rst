@@ -719,6 +719,18 @@ form from your kernel append file::
        file://myplatform;type=kmeta;destsuffix=myplatform \
        "
 
+The ``type=kmeta`` attribute is significant: it adds the directory to the
+kernel Metadata that the tools search to *discover* the BSP description
+matching :term:`KMACHINE` and ``LINUX_KERNEL_TYPE``. A ``.scc`` file listed
+directly on :term:`SRC_URI` (for example ``file://myplatform.scc``) is instead
+treated as a configuration fragment and is processed in both the configuration
+and the patch phases. Any ``patch`` directives that such a fragment references,
+or that are reached through files it ``include``\ s (such as an ``arch/`` or
+``bsp/`` description), are then applied to the kernel source and will fail if
+those patches are already present in the branch. See the
+":ref:`kernel-dev/advanced:patch application for bsp descriptions`" section for
+the reasoning behind this.
+
 Metadata Outside the Recipe-Space
 ---------------------------------
 
@@ -749,6 +761,52 @@ statements in the kernel's recipe. In particular, you need to update the
 wish to use. Changing the data in these branches and not updating the
 :term:`SRCREV` statements to match will cause the build to fetch an older
 commit.
+
+Patch Application for BSP Descriptions
+--------------------------------------
+
+During the build, the kernel tools search the kernel Metadata for the BSP
+description that most closely matches the :term:`KMACHINE` and
+``LINUX_KERNEL_TYPE`` values passed in from the recipe, and use the first
+description they find that matches both. This is referred to as the
+*discovered* BSP description.
+
+For a discovered BSP description, the tools deliberately do **not** apply the
+``patch`` directives reachable from it, either directly or through any files it
+``include``\ s. The kernel source branch you are building (:term:`KBRANCH`) is
+assumed to already contain those commits as part of its history, so re-applying
+them would fail. Configuration fragments (``kconf`` directives) are always
+applied. In other words, a discovered BSP contributes *configuration*, not
+*patches*.
+
+This is why a recipe-space BSP description must be delivered as a
+``type=kmeta`` directory rather than as an individual ``file://*.scc`` entry on
+:term:`SRC_URI` (see the
+":ref:`kernel-dev/advanced:recipe-space metadata`" section). To have your
+description discovered, place it in a ``type=kmeta`` directory and set
+:term:`KMACHINE` so the tools locate it::
+
+   KMACHINE:myplatform ?= "myplatform"
+
+   SRC_URI:append:myplatform = " \
+       file://myplatform;type=kmeta;destsuffix=myplatform \
+       "
+
+Here, the ``myplatform`` directory contains the BSP description (for example
+``myplatform-standard.scc``, beginning with ``define KMACHINE myplatform`` and
+``define KTYPE standard``). Because the description is discovered rather than
+supplied as a fragment, its ``patch`` directives, and those of everything it
+``include``\ s, are inhibited, while its configuration is still applied.
+
+If your BSP genuinely lives outside the kernel source history (the branch you
+build does **not** already contain the BSP commits, and the patches *must* be
+applied), the BSP description can opt back in to patch application by adding the
+following directive to the description itself::
+
+   define KMETA_EXTERNAL_BSP 1
+
+With that directive present, the discovered BSP description is also injected
+into the patch phase and its ``patch`` directives are applied.
 
 Organizing Your Source
 ======================

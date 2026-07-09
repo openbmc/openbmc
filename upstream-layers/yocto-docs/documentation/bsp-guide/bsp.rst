@@ -440,7 +440,8 @@ the :yocto_git:`Source Repositories <>`:
    meta-raspberrypi/recipes-multimedia/omxplayer/omxplayer_git.bb
    meta-raspberrypi/recipes-multimedia/x264
    meta-raspberrypi/recipes-multimedia/x264/x264_git.bbappend
-   meta-raspberrypi/wic meta-raspberrypi/wic/sdimage-raspberrypi.wks
+   meta-raspberrypi/wic
+   meta-raspberrypi/wic/sdimage-raspberrypi.wks
 
 The following sections describe each part of the proposed BSP format.
 

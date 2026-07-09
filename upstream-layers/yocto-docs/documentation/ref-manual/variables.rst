@@ -1530,6 +1530,11 @@ system and gives an overview of their function and contents.
       :term:`CCACHE_DISABLE` variable can be set to "1" in a recipe to disable
       `Ccache` support. This is useful when the recipe is known to not support it.
 
+   :term:`CCACHE_NATIVE_RECIPES_ALLOWED`
+      The :term:`CCACHE_NATIVE_RECIPES_ALLOWED` variable can be set in a
+      :term:`configuration file` to a list of native recipes that are allowed to
+      be optimized with the :ref:`ref-classes-ccache` class.
+
    :term:`CCACHE_TOP_DIR`
       When inheriting the :ref:`ref-classes-ccache` class, the
       :term:`CCACHE_TOP_DIR` variable can be set to the location of where
@@ -1805,12 +1810,49 @@ system and gives an overview of their function and contents.
       Where :term:`AUTOTOOLS_SCRIPT_PATH` is the location of the of the
       Autotools build system scripts, which defaults to :term:`S`.
 
+   :term:`CONFLICT_COMBINED_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies combined features (see
+      :term:`COMBINED_FEATURES` for what this means) that would be in conflict
+      should the recipe be built. In other words, if the
+      :term:`CONFLICT_COMBINED_FEATURES` variable lists a feature that also
+      appears in :term:`COMBINED_FEATURES` within the current configuration,
+      then the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
    :term:`CONFLICT_DISTRO_FEATURES`
       When inheriting the :ref:`ref-classes-features_check`
-      class, this variable identifies distribution features that would be
+      class, this variable identifies distro features that would be
       in conflict should the recipe be built. In other words, if the
       :term:`CONFLICT_DISTRO_FEATURES` variable lists a feature that also
       appears in :term:`DISTRO_FEATURES` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
+   :term:`CONFLICT_IMAGE_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies image features that would be
+      in conflict should the recipe be built. In other words, if the
+      :term:`CONFLICT_IMAGE_FEATURES` variable lists a feature that also
+      appears in :term:`IMAGE_FEATURES` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
+   :term:`CONFLICT_MACHINE_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies machine features that would be
+      in conflict should the recipe be built. In other words, if the
+      :term:`CONFLICT_MACHINE_FEATURES` variable lists a feature that also
+      appears in :term:`MACHINE_FEATURES` within the current configuration, then
+      the recipe will be skipped, and if the build system attempts to build
+      the recipe then an error will be triggered.
+
+   :term:`CONFLICT_TUNE_FEATURES`
+      When inheriting the :ref:`ref-classes-features_check`
+      class, this variable identifies tune features that would be
+      in conflict should the recipe be built. In other words, if the
+      :term:`CONFLICT_TUNE_FEATURES` variable lists a feature that also
+      appears in :term:`TUNE_FEATURES` within the current configuration, then
       the recipe will be skipped, and if the build system attempts to build
       the recipe then an error will be triggered.
 
@@ -2276,6 +2318,11 @@ system and gives an overview of their function and contents.
       ":ref:`overview-manual/concepts:application development sdk`" sections all in the
       Yocto Project Overview and Concepts Manual.
 
+      .. warning::
+
+         Do not confuse this variable with the similarly-named
+         :term:`DEPLOYDIR` variable.
+
    :term:`DEPLOY_DIR_DEB`
       Points to the area that the OpenEmbedded build system uses to place
       Debian packages that are ready to be used outside of the build
@@ -2365,6 +2412,11 @@ system and gives an overview of their function and contents.
       deployed into :term:`DEPLOYDIR`, and the class will take care of copying
       them into :term:`DEPLOY_DIR_IMAGE`
       afterwards.
+
+      .. warning::
+
+         Do not confuse this variable with the similarly-named
+         :term:`DEPLOY_DIR` variable.
 
    :term:`DESCRIPTION`
       The package description used by package managers. If not set,
@@ -3904,13 +3956,8 @@ system and gives an overview of their function and contents.
       ``groupadd``, see https://linux.die.net/man/8/groupadd.
 
    :term:`GROUPMEMS_PARAM`
-      When inheriting the :ref:`ref-classes-useradd` class,
-      this variable specifies for a package what parameters should be
-      passed to the ``groupmems`` command if you wish to modify the members
-      of a group when the package is installed.
-
-      For information on the standard Linux shell command ``groupmems``,
-      see https://linux.die.net/man/8/groupmems.
+      Deprecated in favor of :term:`USERMOD_PARAMS`. See
+      :ref:`ref-migration-6-1-groupmems` for more information.
 
    :term:`GRUB_GFXSERIAL`
       Configures the GNU GRand Unified Bootloader (GRUB) to have graphics
@@ -4313,6 +4360,21 @@ system and gives an overview of their function and contents.
             variable, you cannot update its contents by using ``:append``
             or ``:prepend``. You must use the ``+=`` operator to add one or
             more options to the :term:`IMAGE_FSTYPES` variable.
+
+   :term:`IMAGE_FSTYPES_DEBUGFS`
+      The :term:`IMAGE_FSTYPES_DEBUGFS` holds a list of filesystem image types
+      to generate when the :term:`IMAGE_GEN_DEBUGFS` variable is set to "1". The
+      content of this variable is the same as what is supported by the
+      :term:`IMAGE_FSTYPES` variable.
+
+   :term:`IMAGE_GEN_DEBUGFS`
+      When set to "1" in an :ref:`ref-classes-image` recipe, the
+      :term:`OpenEmbedded Build System` will generate a companion image that
+      contains the debug symbols and source code for the packages installed on
+      the image. The :term:`OpenEmbedded Build System` does this by adding all
+      the available ``-dbg`` and ``-src`` packages available in the package
+      feed, which are automatically generated during
+      :ref:`overview-manual/concepts:Package Splitting`.
 
    :term:`IMAGE_INSTALL`
       Used by recipes to specify the packages to install into an image
@@ -6034,6 +6096,12 @@ system and gives an overview of their function and contents.
 
          $ uname -r
          3.7.0-rc8-custom
+
+   :term:`LOCALE_PATHS`
+      The :term:`LOCALE_PATHS` variable holds a whitespace separated list of
+      paths that are scanned to construct ``-locale`` packages during
+      :ref:`overview-manual/concepts:Package Splitting`. The list
+      contains ``${datadir}/locale`` by default.
 
    :term:`LOG_DIR`
       Specifies the directory to which the OpenEmbedded build system writes
@@ -10930,6 +10998,11 @@ system and gives an overview of their function and contents.
 
          TEST_SERIALCONTROL_CMD = "picocom /dev/ttyUSB0 -b 115200"
 
+   :term:`TEST_SERIALCONTROL_CONNECT_TIMEOUT`
+      For automated hardware testing with the :ref:`ref-classes-testexport`
+      class, the :term:`TEST_SERIALCONTROL_CONNECT_TIMEOUT` variable specifies
+      the timeout in seconds for the initial connection to the target.
+
    :term:`TEST_SERIALCONTROL_EXTRA_ARGS`
       For automated hardware testing, specifies additional arguments to
       pass through to the command specified in
@@ -10937,6 +11010,12 @@ system and gives an overview of their function and contents.
       :term:`TEST_SERIALCONTROL_EXTRA_ARGS` is optional. You can use it if you
       wish, for example, to separate the machine-specific and
       non-machine-specific parts of the command.
+
+   :term:`TEST_SERIALCONTROL_PS1`
+      For automated hardware testing with the :ref:`ref-classes-testexport`
+      class, the :term:`TEST_SERIALCONTROL_PS1` variable specifies a regex
+      string representing an empty prompt on the target terminal. For example:
+      ``root@target:.*#``.
 
    :term:`TEST_SERVER_IP`
       The IP address of the build machine (host machine). This IP address
@@ -11567,6 +11646,10 @@ system and gives an overview of their function and contents.
       :yocto_git:`meta-arm </meta-arm>` layer::
 
          do_compile[depends] += "trusted-firmware-a:do_deploy"
+
+   :term:`UBOOT_FIT_CONF_DESC`
+      The :term:`UBOOT_FIT_CONF_DESC` can be set to override the description
+      property of the configuration node of a U-Boot FIT image.
 
    :term:`UBOOT_FIT_CONF_FIRMWARE`
       Adds one image to the ``firmware`` property of the configuration node of
@@ -12282,6 +12365,14 @@ system and gives an overview of their function and contents.
       :term:`USERADD_GID_TABLES` variables.
       Additionally, you should also set the
       :term:`USERADD_ERROR_DYNAMIC` variable.
+
+   :term:`USERMOD_PARAMS`
+      When a recipe inherits the :ref:`ref-classes-useradd` class, this variable
+      specifies for a package what parameters should be passed to the ``usermod``
+      command if you wish to modify a user when the package is installed.
+      Is is typically used to add the user to one or more groups. For example::
+
+         USERMOD_PARAM:${PN} = "--append --groups group1,group2 user"
 
    :term:`VIRTUAL-RUNTIME`
       :term:`VIRTUAL-RUNTIME` is a commonly used prefix for defining virtual
