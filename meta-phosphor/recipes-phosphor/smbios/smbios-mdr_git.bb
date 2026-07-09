@@ -22,6 +22,7 @@ PACKAGECONFIG[firmware-inventory-dbus] = "-Dfirmware-inventory-dbus=enabled,-Dfi
 PACKAGECONFIG[expose-firmware-component-name] = "-Dexpose-firmware-component-name=enabled,-Dexpose-firmware-component-name=disabled"
 PACKAGECONFIG[slot-drive-presence] = "-Dslot-drive-presence=enabled,-Dslot-drive-presence=disabled"
 PACKAGECONFIG[dimm-only-locator] = "-Ddimm-only-locator=enabled,-Ddimm-only-locator=disabled"
+PACKAGECONFIG[pcie-device-dbus] = "-Dpcie-device-dbus=enabled,-Dpcie-device-dbus=disabled"
 
 PV = "1.0+git${SRCPV}"
 PR = "r1"
