@@ -15,15 +15,15 @@ declare -A SENSOR_NAME_MAP=(
 )
 
 NIC_INFO_LIST=(
-    "32 IOB0_NIC0"
-    "34 IOB0_NIC1"
-    "42 IOB1_NIC0"
-    "44 IOB1_NIC1"
-    "52 IOB2_NIC0"
-    "54 IOB2_NIC1"
-    "62 IOB3_NIC0"
-    "64 IOB3_NIC1"
-    "72 NS_NIC"
+    "31 IOB0_NIC0"
+    "33 IOB0_NIC1"
+    "41 IOB1_NIC0"
+    "43 IOB1_NIC1"
+    "51 IOB2_NIC0"
+    "53 IOB2_NIC1"
+    "61 IOB3_NIC0"
+    "63 IOB3_NIC1"
+    "71 NS_NIC"
 )
 
 declare -A NIC_SENSORS
