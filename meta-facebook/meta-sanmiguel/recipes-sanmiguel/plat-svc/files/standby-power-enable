@@ -75,6 +75,10 @@ check_ttyusb()
     local actual_b1=""
     local dev
 
+    local hpm0_ioexp_2_0020="/dev/hpm0-ioexp-2-0020"
+    local hpm1_ioexp_7_0020="/dev/hpm1-ioexp-7-0020"
+    local USB_HUB0_RST_LINE=5
+
     # Find ttyUSB for board 0
     for dev in "$b0_phys"/ttyUSB*; do
         [ -e "$dev" ] || continue
@@ -98,15 +102,22 @@ check_ttyusb()
         echo "Incorrect sequence detected..."
         echo "Resetting USB Hubs via GPIO..."
 
+        # Use the fixed ioexp symlinks + gpioset here instead of
+        # set_gpio/gpiofind. Triggering the reset unloads the IO
+        # expander devices behind the USB hub. If gpiofind is used,
+        # it takes a snapshot of and scans every gpiochip under /dev,
+        # and it may scan a gpiochip that is disappearing at that
+        # moment, causing the whole lookup to abort.
+
         # Trigger Reset (Pull Low)
-        set_gpio "B0_M0_USB_HUB0_RST_L-O" "$GPIO_LOW"
-        set_gpio "B1_M0_USB_HUB0_RST_L-O" "$GPIO_LOW"
+        gpioset "$hpm0_ioexp_2_0020" "${USB_HUB0_RST_LINE}=${GPIO_LOW}"
+        gpioset "$hpm1_ioexp_7_0020" "${USB_HUB0_RST_LINE}=${GPIO_LOW}"
         sleep 1
 
         # Release Reset (Pull High)
-        set_gpio "B0_M0_USB_HUB0_RST_L-O" "$GPIO_HIGH"
+        gpioset "$hpm0_ioexp_2_0020" "${USB_HUB0_RST_LINE}=${GPIO_HIGH}"
         sleep 1
-        set_gpio "B1_M0_USB_HUB0_RST_L-O" "$GPIO_HIGH"
+        gpioset "$hpm1_ioexp_7_0020" "${USB_HUB0_RST_LINE}=${GPIO_HIGH}"
     fi
 
     echo "USB Sequence is correct."

@@ -15,6 +15,7 @@ RDEPENDS:${PN} += "fb-common-functions"
 SRC_URI:append = " \
     file://99-cp2112-bind.rules \
     file://99-cp2112-cx9-gpio.rules \
+    file://99-hpm-ioexp-gpio.rules \
     "
 
 # scripts
@@ -54,6 +55,7 @@ do_install() {
     install -d ${UDEV_RULES_DIR}
     install -m 0644 ${UNPACKDIR}/99-cp2112-bind.rules ${UDEV_RULES_DIR}/99-cp2112-bind.rules
     install -m 0644 ${UNPACKDIR}/99-cp2112-cx9-gpio.rules ${UDEV_RULES_DIR}/99-cp2112-cx9-gpio.rules
+    install -m 0644 ${UNPACKDIR}/99-hpm-ioexp-gpio.rules ${UDEV_RULES_DIR}/99-hpm-ioexp-gpio.rules
 
     # install services
     install -d ${D}${systemd_system_unitdir}

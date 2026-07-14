@@ -1,0 +1,4 @@
+SUBSYSTEM=="gpio", KERNELS=="2-0020", SYMLINK+="hpm0-ioexp-2-0020"
+SUBSYSTEM=="gpio", KERNELS=="2-0021", SYMLINK+="hpm0-ioexp-2-0021"
+SUBSYSTEM=="gpio", KERNELS=="7-0020", SYMLINK+="hpm1-ioexp-7-0020"
+SUBSYSTEM=="gpio", KERNELS=="7-0021", SYMLINK+="hpm1-ioexp-7-0021"
