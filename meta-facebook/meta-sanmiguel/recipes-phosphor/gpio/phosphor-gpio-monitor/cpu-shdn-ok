@@ -11,6 +11,10 @@ set_request_host_transition()
         RequestedHostTransition s "$1"
 }
 
+# Add a 3-second delay before checking CPU boot complete status to avoid
+# false triggers when CPU_SHDN_OK is asserted during host power reset.
+sleep 3
+
 cpu_boot_done_val=$(plat_get_gpio "B0_M0_CPU_BOOT_COMPLETE_3V3-I")
 echo "cpu_boot_done: $cpu_boot_done_val"
 

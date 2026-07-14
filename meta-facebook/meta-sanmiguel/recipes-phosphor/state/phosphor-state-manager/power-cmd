@@ -118,9 +118,9 @@ cpu_reset_set_n_check()
     set_gpio "B0_M0_${out_pre_sys_rst_n}" "$GPIO_LOW"
     set_gpio "B1_M0_${out_pre_sys_rst_n}" "$GPIO_LOW"
 
-    sleep "$CPU_RESET_DELAY_SEC"
-
-    if [[ "$(plat_get_gpio "$in_cpu_rst_n")" -eq 1 ]]; then
+    local retry_cnt=11
+    local delay_secs="$CPU_RESET_DELAY_SEC"
+    if ! wait_gpios_value "$GPIO_LOW" "$retry_cnt" "$delay_secs" "$in_cpu_rst_n"; then
         echo "ERROR: CPUs failed to enter reset"
         return 1
     fi
@@ -134,9 +134,9 @@ cpu_reset_release_n_check()
     set_gpio "B0_M0_${out_pre_sys_rst_n}" "$GPIO_HIGH"
     set_gpio "B1_M0_${out_pre_sys_rst_n}" "$GPIO_HIGH"
 
-    sleep "$CPU_RESET_DELAY_SEC"
-
-    if [[ "$(plat_get_gpio "$in_cpu_rst_n")" -eq 0 ]]; then
+    local retry_cnt=11
+    local delay_secs="$CPU_RESET_DELAY_SEC"
+    if ! wait_gpios_value "$GPIO_HIGH" "$retry_cnt" "$delay_secs" "$in_cpu_rst_n"; then
         echo "ERROR: CPUs failed to exist reset"
         return 1
     fi
@@ -433,12 +433,23 @@ host_graceful_power_off()
 
 host_power_reset()
 {
+    # Set Shutdown Force, wait Shutdown OK assert
+    if ! shutdown_force_n_check; then
+        echo "Continuing with System Reset Sequence..."
+    fi
+
+    echo "De-asserting CPU Shutdown Force..."
+    set_gpio "B0_M0_${out_shdn_force_n}" "$GPIO_HIGH"
+    set_gpio "B1_M0_${out_shdn_force_n}" "$GPIO_HIGH"
 
     # Set CPUs reset and check
     if ! cpu_reset_set_n_check; then
+        set_gpio "B0_M0_${out_pre_sys_rst_n}" "$GPIO_HIGH"
+        set_gpio "B1_M0_${out_pre_sys_rst_n}" "$GPIO_HIGH"
         return 1
     fi
-    sleep 5
+
+    sleep 1
 
     # Release CPUs reset and check
     if ! cpu_reset_release_n_check; then
