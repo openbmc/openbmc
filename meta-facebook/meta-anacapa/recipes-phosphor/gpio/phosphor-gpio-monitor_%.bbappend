@@ -17,6 +17,7 @@ SERVICE_LIST = "assert-post-end.service \
                 fan-pg-event-logger@.service \
                 ssd-pg-event-logger@.service \
                 rescan-fru-device@.service \
+                amc-boot-failure-logger@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -35,6 +36,7 @@ SRC_URI += " \
     file://fan-pg-event-logger \
     file://ssd-pg-event-logger \
     file://rescan-fru-device \
+    file://amc-boot-failure-logger \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
 
@@ -67,6 +69,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/fan-pg-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/ssd-pg-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/amc-boot-failure-logger ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

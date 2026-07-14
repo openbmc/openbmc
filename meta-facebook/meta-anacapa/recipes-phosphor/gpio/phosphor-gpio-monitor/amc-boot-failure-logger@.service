@@ -1,0 +1,7 @@
+[Unit]
+Description=AMC boot failure event log
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/amc-boot-failure-logger "%i"
+SyslogIdentifier=amc-boot-failure-logger

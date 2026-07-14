@@ -1,0 +1,42 @@
+#!/bin/bash
+set -euo pipefail
+
+inst="${1:-}"
+IFS=":" read -r line action <<< "${inst}"
+
+if [[ -z "${action}" || -z "${line}" ]]; then
+    echo "Usage: amc-boot-failure-logger <GPIO_LINE_NAME>:<assert|deassert>" >&2
+    exit 1
+fi
+
+MSG_ID="xyz.openbmc_project.State.SMC.SMCFailed"
+RECOVER_ID="xyz.openbmc_project.State.SMC.SMCRestored"
+
+AMC_PATH="/xyz/openbmc_project/inventory/system/board/AMD_AMC"
+STASH_FILE="/run/${line}.log_entry"
+
+case "${action}" in
+    "assert")
+        if [ ! -s "${STASH_FILE}" ]; then
+            /usr/bin/log-create "${MSG_ID}" --json \
+                "{ \"IDENTIFIER\": \"${AMC_PATH}\", \"FAILURE_TYPE\": \"${line}\"}" \
+                > "${STASH_FILE}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${STASH_FILE}" ]; then
+            /usr/bin/log-resolve -p "$(< "${STASH_FILE}")"
+            rm -f "${STASH_FILE}"
+
+            /usr/bin/log-create "${RECOVER_ID}" --json \
+                "{ \"IDENTIFIER\": \"${AMC_PATH}\"}"
+        fi
+        ;;
+    *)
+        echo "Invalid action: ${action}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0

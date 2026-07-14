@@ -577,5 +577,17 @@
             "FALLING": ["rescan-fru-device@PDB_L_PRSNT.service"],
             "RISING": ["rescan-fru-device@PDB_L_PRSNT.service"]
         }
+    },
+    {
+        "Name": "AMC_FAIL",
+        "LineName": "AMC_FAIL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["amc-boot-failure-logger@AMC_FAIL:assert.service"],
+            "FALLING": ["amc-boot-failure-logger@AMC_FAIL:deassert.service"],
+            "INIT_HIGH": ["amc-boot-failure-logger@AMC_FAIL:assert.service"],
+            "INIT_LOW": ["amc-boot-failure-logger@AMC_FAIL:deassert.service"]
+        },
+        "Continue": true
     }
 ]
