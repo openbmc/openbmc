@@ -29,6 +29,23 @@ RRECOMMENDS:${PN}-host:append:ibm-enterprise = " ${PN}-secure-check"
 # system power on if chassis power is in a bad state
 RRECOMMENDS:${PN}-chassis:append = " ${PN}-chassis-check-power-status"
 
+# IBM enterprise systems implement chassis powercycle by hard powering off
+# the chassis and then booting the host back up once the power off completes.
+# Only the system chassis (instance 0) supports powercycle, so the links are
+# hardcoded to @0 rather than driven by the OBMC_CHASSIS_INSTANCES loop.
+pkg_postinst:${PN}-obmc-targets:append:ibm-enterprise() {
+    mkdir -p $D$systemd_system_unitdir/obmc-chassis-powercycle@0.target.requires
+    ln -s ../obmc-chassis-hard-poweroff@.target \
+        $D$systemd_system_unitdir/obmc-chassis-powercycle@0.target.requires/obmc-chassis-hard-poweroff@0.target
+    ln -s ../phosphor-reboot-host@.service \
+        $D$systemd_system_unitdir/obmc-chassis-powercycle@0.target.requires/phosphor-reboot-host@0.service
+}
+
+pkg_prerm:${PN}-obmc-targets:append:ibm-enterprise() {
+    rm $D$systemd_system_unitdir/obmc-chassis-powercycle@0.target.requires/obmc-chassis-hard-poweroff@0.target
+    rm $D$systemd_system_unitdir/obmc-chassis-powercycle@0.target.requires/phosphor-reboot-host@0.service
+}
+
 # Override critical services to monitor with IBM file
 FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
 FILES:${PN}-bmc:append = " ${sysconfdir}/phosphor-service-monitor-default.json"
