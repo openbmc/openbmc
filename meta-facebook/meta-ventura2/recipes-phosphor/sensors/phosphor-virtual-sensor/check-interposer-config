@@ -8,6 +8,7 @@ VENTURA2_PVT_SKU1_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku
 VENTURA2_PVT_SKU1_2ND_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku1_2nd.json"
 VENTURA2_PVT_SKU1C_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku1c.json"
 VENTURA2_PVT_SKU4_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku4.json"
+VENTURA2_PVT_SKU4_2ND_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku4_2nd.json"
 VENTURA2_PVT_SKU4C_CONF_PATH="/usr/share/phosphor-virtual-sensor/ventura2_pvt_sku4c.json"
 CONFIG_DIR="/var/lib/phosphor-virtual-sensor"
 CONFIG_PATH="$CONFIG_DIR/virtual_sensor_config.json"
@@ -113,8 +114,13 @@ do
                     jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU1C_CONF_PATH" > "$CONFIG_PATH"
                     break ;;
                 "sku 4")
-                    echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU4_CONF_PATH")"
-                    jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU4_CONF_PATH" > "$CONFIG_PATH"
+                    if [ "$cable_source" = "p24vsen-isl" ]; then
+                        echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU4_2ND_CONF_PATH")"
+                        jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU4_2ND_CONF_PATH" > "$CONFIG_PATH"
+                    else
+                        echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU4_CONF_PATH")"
+                        jq -s 'add' "$CABLE_PATH" "$VENTURA2_PVT_SKU4_CONF_PATH" > "$CONFIG_PATH"
+                    fi
                     break ;;
                 "sku 4c")
                     echo "Applying virtual sensor configuration: $(basename "$VENTURA2_PVT_SKU4C_CONF_PATH")"
