@@ -386,7 +386,9 @@ def setup_bitbake_build(bitbake_config, layerdir, setupdir, thisdir, update_bb_c
     init_script = os.path.join(bitbake_builddir, "init-build-env")
     workspace_file = os.path.join(setupdir, "bitbake.code-workspace")
     shell = "bash"
-    fragments = bitbake_config.get("oe-fragments", []) + sorted(bitbake_config.get("oe-fragment-choices",{}).values())
+    # oe-fragments entries can be strings or dicts with 'name'/'description' keys
+    oe_fragments = [f["name"] if isinstance(f, dict) else f for f in bitbake_config.get("oe-fragments", [])]
+    fragments = oe_fragments + sorted(bitbake_config.get("oe-fragment-choices",{}).values())
     if fragments:
         bb.process.run("{} -c '. {} && bitbake-config-build enable-fragment {}'".format(shell, init_script, " ".join(fragments)))
 
@@ -1059,10 +1061,87 @@ def install_buildtools(top_dir, settings, args, d):
             return
         shutil.rmtree(buildtools_install_dir)
 
-    install_buildtools = os.path.join(args.setup_dir, 'layers/oe-scripts/install-buildtools')
-    buildtools_download_dir = add_unique_timestamp_to_path(os.path.join(args.setup_dir, 'buildtools-downloads/buildtools'))
-    logger.plain("Buildtools archive is downloaded into {} and its content installed into {}".format(buildtools_download_dir, buildtools_install_dir))
-    subprocess.check_call("{} -d {} --downloads-directory {}".format(install_buildtools, buildtools_install_dir, buildtools_download_dir), shell=True)
+    install_buildtools_script = os.path.join(args.setup_dir, 'layers/oe-scripts/install-buildtools')
+
+    buildtools_config = {}
+    upstream_config_path = os.path.join(args.setup_dir, 'config', 'config-upstream.json')
+    try:
+        with open(upstream_config_path) as f:
+            upstream_config = json.load(f)
+        buildtools_config = upstream_config.get('bitbake-config', {}).get('install-buildtools', {})
+    except FileNotFoundError:
+        pass
+    except json.JSONDecodeError as e:
+        logger.error("Failed to parse %s: %s" % (upstream_config_path, e))
+        sys.exit(1)
+
+    url = args.url if args.url is not None else buildtools_config.get('url')
+    sha256 = args.sha256 if args.sha256 is not None else buildtools_config.get('sha256sum')
+
+    buildtools_download_dir = add_unique_timestamp_to_path(
+        os.path.join(args.setup_dir, 'buildtools-downloads/buildtools'))
+
+    if args.default or (not url and not sha256):
+        # No config or --default: fall back to install-buildtools defaults
+        logger.plain("Using install-buildtools script defaults")
+        subprocess.check_call([install_buildtools_script,
+                               '-d', buildtools_install_dir,
+                               '--downloads-directory', buildtools_download_dir])
+        return
+
+    if not url:
+        logger.error("No buildtools URL configured. "
+                     "Set 'url' in the install-buildtools config section or pass --url.")
+        sys.exit(1)
+
+    if not sha256:
+        logger.error("No sha256sum configured for buildtools installer. "
+                     "Add 'sha256sum' to the install-buildtools config section or pass --sha256.\n"
+                     "You can obtain it with: sha256sum <installer-file>")
+        sys.exit(1)
+
+    # Download using bb.fetch with sha256 validation
+    src_uri = "{};sha256sum={}".format(url, sha256)
+
+    logger.plain("Fetching buildtools installer using bitbake fetcher")
+    logger.plain("    {}".format(url))
+
+    fetcher = bb.fetch.Fetch([src_uri], d)
+    try:
+        fetcher.download()
+    except bb.fetch2.ChecksumError as e:
+        logger.error("Checksum mismatch for buildtools installer. "
+                     "Verify the URL and downloaded file.\n%s" % str(e))
+        sys.exit(1)
+    except bb.fetch2.FetchError as e:
+        logger.error("Failed to download buildtools installer: %s" % str(e))
+        sys.exit(1)
+
+    # Unpack into the standard buildtools download location
+    os.makedirs(buildtools_download_dir, exist_ok=True)
+    fetcher.unpack(buildtools_download_dir)
+
+    filename = os.path.basename(url.rstrip('/'))
+    matches = glob.glob(os.path.join(buildtools_download_dir, '**', filename), recursive=True)
+    if not matches:
+        logger.error("Unpacked file not found: %s" % filename)
+        sys.exit(1)
+    local_path = matches[0]
+
+    logger.plain("Buildtools installer will be installed into {}".format(
+        buildtools_install_dir))
+
+    cmd = [
+        install_buildtools_script,
+        '--local-file', local_path,
+        '-d', buildtools_install_dir,
+    ]
+
+    try:
+        subprocess.check_call(cmd)
+    except subprocess.CalledProcessError as e:
+        logger.error("install-buildtools failed with exit code %d" % e.returncode)
+        sys.exit(1)
 
 def create_siteconf(top_dir, non_interactive, settings):
     siteconfpath = os.path.join(top_dir, 'site.conf')
@@ -1250,6 +1329,7 @@ def main():
         )
     parser.add_argument('-d', '--debug', help='Enable debug output', action='store_true')
     parser.add_argument('-q', '--quiet', help='Print only errors', action='store_true')
+    parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
     parser.add_argument('--color', choices=['auto', 'always', 'never'], default='auto', help='Colorize output (where %(metavar)s is %(choices)s)', metavar='COLOR')
     parser.add_argument('--no-network', action='store_true', help='Do not check whether configuration repositories and layer repositories have been updated; use only the local cache.')
     parser.add_argument('--global-settings', action='store', metavar='PATH', help='Path to the global settings file.')
@@ -1292,6 +1372,9 @@ def main():
     parser_install_buildtools = subparsers.add_parser('install-buildtools', help='Install buildtools which can help fulfil missing or incorrect dependencies on the host machine')
     add_setup_dir_arg(parser_install_buildtools)
     parser_install_buildtools.add_argument('--force', action='store_true', help='Force a reinstall of buildtools over the previous installation.')
+    parser_install_buildtools.add_argument('--default', action='store_true', help='Use install-buildtools script defaults, ignoring any config.')
+    parser_install_buildtools.add_argument('--url', help='Full URL to the buildtools SDK installer. Overrides config value.')
+    parser_install_buildtools.add_argument('--sha256', help='SHA256 checksum of the buildtools installer. Overrides config value.')
     parser_install_buildtools.set_defaults(func=install_buildtools)
 
     parser_settings_arg_global = argparse.ArgumentParser(add_help=False)

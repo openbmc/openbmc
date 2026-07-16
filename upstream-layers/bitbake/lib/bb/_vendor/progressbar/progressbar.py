@@ -42,9 +42,6 @@ from .compat import *  # for: any, next
 from . import widgets
 
 
-class UnknownLength: pass
-
-
 class ProgressBar(object):
     """The ProgressBar class which updates and prints the bar.
 
@@ -99,7 +96,7 @@ class ProgressBar(object):
     _DEFAULT_WIDGETS = [widgets.Percentage(), ' ', widgets.Bar()]
 
     def __init__(self, maxval=None, widgets=None, term_width=None, poll=1,
-                 left_justify=True, fd=sys.stderr):
+                 left_justify=True, fd=None):
         """Initializes a progress bar with sane defaults."""
 
         # Don't share a reference with any other progress bars
@@ -108,7 +105,7 @@ class ProgressBar(object):
 
         self.maxval = maxval if maxval != 0 else self._DEFAULT_MAXVAL
         self.widgets = widgets
-        self.fd = fd
+        self.fd = fd if fd is not None else sys.stderr
         self.left_justify = left_justify
         self._fd_console = None
 
@@ -124,11 +121,11 @@ class ProgressBar(object):
                 # temporarily/permanently self.fd to any StringIO or other
                 # file descriptor later.
                 self._fd_console = fd
-                self._handle_resize(None, None)
+                self._handle_resize()
                 signal.signal(signal.SIGWINCH, self._handle_resize)
                 self.signal_set = True
             except (SystemExit, KeyboardInterrupt): raise
-            except Exception as e:
+            except:
                 self.term_width = self._env_size()
 
         self.__iterable = None
@@ -150,7 +147,7 @@ class ProgressBar(object):
             self.maxval = len(iterable)
         except:
             if self.maxval is None:
-                self.maxval = UnknownLength
+                self.maxval = widgets.UnknownLength
 
         self.__iterable = iter(iterable)
         return self
@@ -195,6 +192,8 @@ class ProgressBar(object):
 
     def percentage(self):
         """Returns the progress as a percentage."""
+        if self.maxval is widgets.UnknownLength:
+                return float("NaN")
         if self.currval >= self.maxval:
             return 100.0
         return (self.currval * 100.0 / self.maxval) if self.maxval else 100.00
@@ -256,8 +255,8 @@ class ProgressBar(object):
     def update(self, value=None):
         """Updates the ProgressBar to a new value."""
 
-        if value is not None and value is not UnknownLength:
-            if (self.maxval is not UnknownLength
+        if value is not None and value is not widgets.UnknownLength:
+            if (self.maxval is not widgets.UnknownLength
                 and not 0 <= value <= self.maxval):
 
                 self.maxval = value
@@ -300,7 +299,7 @@ class ProgressBar(object):
         self.num_intervals = max(100, self.term_width)
         self.next_update = 0
 
-        if self.maxval is not UnknownLength:
+        if self.maxval is not widgets.UnknownLength:
             if self.maxval < 0: raise ValueError('Value out of range')
             self.update_interval = self.maxval / self.num_intervals
 

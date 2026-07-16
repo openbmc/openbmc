@@ -660,6 +660,30 @@ In addition, the command can take the following arguments:
 -  ``--setup-dir``: path to the :term:`Setup` to check to status for. Not
    required if :term:`BBPATH` is already configured.
 
+-  ``--url``: full URL to the buildtools SDK installer. Overrides the value
+   from the configuration file.
+
+-  ``--sha256``: SHA256 checksum of the buildtools installer. Overrides the
+   value from the configuration file.
+
+When ``url`` and ``sha256sum`` are set in the :term:`Configuration File`,
+the installer is downloaded via ``bb.fetch`` (cached in ``DL_DIR``) and its
+checksum is enforced. If no configuration is present, the script falls back
+to its built-in defaults::
+
+   "bitbake-setup": {
+       "configurations": [
+           {
+               "name": "my-config",
+               "install-buildtools": {
+                   "url": "https://example.com/buildtools/x86_64-buildtools-extended-nativesdk-standalone-5.0.sh",
+                   "sha256sum": "af76648b..."
+               },
+               ...
+           }
+       ]
+   }
+
 .. _ref-bbsetup-command-settings:
 
 ``bitbake-setup settings``

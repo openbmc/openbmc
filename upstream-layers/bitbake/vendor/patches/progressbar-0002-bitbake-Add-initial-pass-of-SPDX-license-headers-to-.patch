@@ -1,0 +1,79 @@
+From ff237c33337f4da2ca06c3a2c49699bc26608a6b Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 30 Apr 2019 11:05:26 +0100
+Subject: [PATCH 2/6] bitbake: Add initial pass of SPDX license headers to
+ source code
+
+This adds the SPDX-License-Identifier license headers to the majority of
+our source files to make it clearer exactly which license files are under.
+
+The bulk of the files are under GPL v2.0 with one found to be under V2.0
+or later, some under MIT and some have dual license. There are some files
+which are potentially harder to classify where we've imported upstream code
+and those can be handled specifically in later commits.
+
+The COPYING file is replaced with LICENSE.X files which contain the full
+license texts.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ lib/progressbar/__init__.py    | 2 ++
+ lib/progressbar/compat.py      | 2 ++
+ lib/progressbar/progressbar.py | 2 ++
+ lib/progressbar/widgets.py     | 2 ++
+ 4 files changed, 8 insertions(+)
+
+diff --git a/lib/bb/_vendor/progressbar/__init__.py b/lib/bb/_vendor/progressbar/__init__.py
+index fbab744ee..c545a6275 100644
+--- a/lib/bb/_vendor/progressbar/__init__.py
++++ b/lib/bb/_vendor/progressbar/__init__.py
+@@ -4,6 +4,8 @@
+ # progressbar  - Text progress bar library for Python.
+ # Copyright (c) 2005 Nilton Volpato
+ #
++# SPDX-License-Identifier: LGPL-2.1-or-later OR BSD-3-Clause-Clear
++#
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+diff --git a/lib/bb/_vendor/progressbar/compat.py b/lib/bb/_vendor/progressbar/compat.py
+index a39f4a1f4..9804e0b51 100644
+--- a/lib/bb/_vendor/progressbar/compat.py
++++ b/lib/bb/_vendor/progressbar/compat.py
+@@ -3,6 +3,8 @@
+ # progressbar  - Text progress bar library for Python.
+ # Copyright (c) 2005 Nilton Volpato
+ #
++# SPDX-License-Identifier: LGPL-2.1-or-later OR BSD-3-Clause-Clear
++#
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+diff --git a/lib/bb/_vendor/progressbar/progressbar.py b/lib/bb/_vendor/progressbar/progressbar.py
+index 2873ad6ca..e2b6ba108 100644
+--- a/lib/bb/_vendor/progressbar/progressbar.py
++++ b/lib/bb/_vendor/progressbar/progressbar.py
+@@ -5,6 +5,8 @@
+ #
+ # (With some small changes after importing into BitBake)
+ #
++# SPDX-License-Identifier: LGPL-2.1-or-later OR BSD-3-Clause-Clear
++#
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+diff --git a/lib/bb/_vendor/progressbar/widgets.py b/lib/bb/_vendor/progressbar/widgets.py
+index 77285ca7a..0772aa536 100644
+--- a/lib/bb/_vendor/progressbar/widgets.py
++++ b/lib/bb/_vendor/progressbar/widgets.py
+@@ -3,6 +3,8 @@
+ # progressbar  - Text progress bar library for Python.
+ # Copyright (c) 2005 Nilton Volpato
+ #
++# SPDX-License-Identifier: LGPL-2.1-or-later OR BSD-3-Clause-Clear
++#
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+--
+2.49.0

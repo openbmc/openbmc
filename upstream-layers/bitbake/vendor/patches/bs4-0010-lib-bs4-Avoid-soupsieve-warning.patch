@@ -1,0 +1,40 @@
+From 8e444cd9913d1ee0672b5583e263e5927c3221df Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Fri, 31 May 2024 13:09:44 +0100
+Subject: [PATCH 10/11] lib/bs4: Avoid soupsieve warning
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ lib/bs4/css.py | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+diff --git a/lib/bb/_vendor/bs4/css.py b/lib/bb/_vendor/bs4/css.py
+index 245ac6010..cd1fd2df8 100644
+--- a/lib/bb/_vendor/bs4/css.py
++++ b/lib/bb/_vendor/bs4/css.py
+@@ -24,23 +24,14 @@
+     Optional,
+     TYPE_CHECKING,
+ )
+-import warnings
+ from bs4._typing import _NamespaceMapping
+
+ if TYPE_CHECKING:
+-    from soupsieve import SoupSieve
+     from bs4 import element
+     from bs4.element import ResultSet, Tag
+
+-soupsieve: Optional[ModuleType]
+-try:
+-    import soupsieve
+-except ImportError:
+-    soupsieve = None
+-    warnings.warn(
+-        "The soupsieve package is not installed. CSS selectors cannot be used."
+-    )
+-
++# We don't use soupsieve
++soupsieve = None
+
+ class CSS(object):
+     """A proxy object against the ``soupsieve`` library, to simplify its

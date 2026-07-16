@@ -51,7 +51,7 @@ class UntrustedUrl(BBFetchException):
     """Exception raised when encountering a host not listed in BB_ALLOWED_NETWORKS"""
     def __init__(self, url, message=''):
         if message:
-            msg = message
+            msg = str(message)
         else:
             msg = "The URL: '%s' is not trusted and cannot be used" % url
         self.url = url

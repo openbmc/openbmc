@@ -1,0 +1,23 @@
+commit 741db6719efca5aa9ef2c15e60cdd624e4aa1a8d
+Author: Michael Estner <michaelestner@web.de>
+Date:   Tue Feb 25 19:34:25 2025 +0100
+
+    lib: Remove double imports
+
+    * Remove double imports mentioned by pylint
+
+    Signed-off-by: Michael Estner <michaelestner@web.de>
+    Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+diff --git a/lib/bb/_vendor/bs4/__init__.py b/lib/bb/_vendor/bs4/__init__.py
+index d8ad5e1dc..725203d94 100644
+--- a/lib/bb/_vendor/bs4/__init__.py
++++ b/lib/bb/_vendor/bs4/__init__.py
+@@ -1173,7 +1173,5 @@
+
+ # If this file is run as a script, act as an HTML pretty-printer.
+ if __name__ == "__main__":
+-    import sys
+-
+     soup = BeautifulSoup(sys.stdin)
+     print((soup.prettify()))

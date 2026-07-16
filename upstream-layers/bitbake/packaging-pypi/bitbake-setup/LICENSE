@@ -1,0 +1,23 @@
+bitbake-setup is licensed under the GNU General Public License version 2.0. See
+LICENSE.GPL-2.0-only for further details.
+
+Individual files contain the following style tags instead of the full license text:
+
+    SPDX-License-Identifier:	GPL-2.0-only
+
+This enables machine processing of license information based on the SPDX
+License Identifiers that are here available: http://spdx.org/licenses/
+
+The bitbake-setup package vendorizes the following modules:
+
+beautifulsoup4
+    SPDX-License-Identifier:	MIT
+
+typing_extensions
+    SPDX-License-Identifier:	PSF-2.0
+
+progressbar:
+    SPDX-License-Identifier:	LGPL-2.1-or-later OR BSD-3-Clause-Clear
+
+simplediff:
+    SPDX-License-Identifier:	Zlib

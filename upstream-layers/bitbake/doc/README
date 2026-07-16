@@ -26,7 +26,7 @@ Additional information related to the Sphinx migration, and guidelines
 for developers willing to contribute to the BitBake documentation can
 be found in the Yocto Project Documentation README file:
 
-https://git.yoctoproject.org/cgit/cgit.cgi/yocto-docs/tree/documentation/README
+https://git.yoctoproject.org/yocto-docs/tree/documentation/README
 
 How to build the Yocto Project documentation
 ============================================

@@ -1,0 +1,31 @@
+From 736b5b33a5d656a6d5cb6a3180ab529832f77b16 Mon Sep 17 00:00:00 2001
+From: Peter Kjellerstedt <pkj@axis.com>
+Date: Sat, 11 Oct 2025 06:23:10 +0200
+Subject: [PATCH 5/6] progressbar: Make bars show correctly with maxval == 0
+
+While it can be argued how useful a progressbar created with 0 as
+maximum value is, it should still show two states, started (empty) and
+finished (full). Setting the maxval to _DEFAULT_MAXVAL instead will
+accomplish this.
+
+Signed-off-by: Peter Kjellerstedt <peter.kjellerstedt@axis.com>
+Signed-off-by: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+---
+ lib/progressbar/progressbar.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/bb/_vendor/progressbar/progressbar.py b/lib/bb/_vendor/progressbar/progressbar.py
+index eccc45849..a8e2dc09c 100644
+--- a/lib/bb/_vendor/progressbar/progressbar.py
++++ b/lib/bb/_vendor/progressbar/progressbar.py
+@@ -106,7 +106,7 @@ class ProgressBar(object):
+         if widgets is None:
+             widgets = list(self._DEFAULT_WIDGETS)
+
+-        self.maxval = maxval
++        self.maxval = maxval if maxval != 0 else self._DEFAULT_MAXVAL
+         self.widgets = widgets
+         self.fd = fd if fd is not None else sys.stderr
+         self.left_justify = left_justify
+--
+2.49.0

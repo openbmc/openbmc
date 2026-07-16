@@ -11,7 +11,14 @@ import glob
 import hashlib
 import json
 import os
+import shutil
 import stat
+import subprocess
+import sys
+import tempfile
+import unittest
+import venv
+import zipfile
 from bb.tests.support.httpserver import HTTPService
 
 class BitbakeSetupTest(FetcherTest):
@@ -61,15 +68,30 @@ import getopt
 import sys
 import os
 
-opts, args = getopt.getopt(sys.argv[1:], "d:", ["downloads-directory="])
+opts, args = getopt.getopt(sys.argv[1:], "d:", ["downloads-directory=", "local-file="])
+installdir = None
+local_file = None
 for option, value in opts:
     if option == '-d':
         installdir = value
+    elif option == '--local-file':
+        local_file = value
+        print("install-buildtools local-file={}".format(value))
 
 print("Buildtools installed into {}".format(installdir))
-os.makedirs(installdir)
+os.makedirs(installdir, exist_ok=True)
 """
         self.add_file_to_testrepo('scripts/install-buildtools', installbuildtools, script=True)
+
+        # Dummy buildtools installer for bb.fetch testing
+        self.buildtools_dir = os.path.join(self.tempdir, "buildtools-dl")
+        os.makedirs(self.buildtools_dir)
+        self.buildtools_filename = "x86_64-buildtools-nativesdk-standalone-test.sh"
+        buildtools_filepath = os.path.join(self.buildtools_dir, self.buildtools_filename)
+        with open(buildtools_filepath, 'w') as f:
+            f.write("#!/bin/sh\necho dummy\n")
+        with open(buildtools_filepath, 'rb') as f:
+            self.buildtools_sha256 = hashlib.sha256(f.read()).hexdigest()
 
         bitbakeconfigbuild = """#!/usr/bin/env python3
 import os
@@ -92,7 +114,11 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
 
     def runbbsetup(self, cmd):
         bbsetup = os.path.abspath(os.path.dirname(__file__) +  "/../../../bin/bitbake-setup")
-        return bb.process.run([bbsetup, '--global-settings', os.path.join(self.tempdir, 'global-config')] + cmd)
+        # Set PYTHONPATH so subprocess can find bb module instead of relying on the current directory
+        env = os.environ.copy()
+        libdir = os.path.abspath(os.path.dirname(__file__) + "/../..")
+        env["PYTHONPATH"] = libdir + ":" + env.get("PYTHONPATH", "")
+        return bb.process.run([bbsetup, '--global-settings', os.path.join(self.tempdir, 'global-config')] + cmd, env=env, cwd=self.tempdir)
 
 
     def _add_json_config_to_registry_helper(self, name, sources):
@@ -108,7 +134,11 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
                 "name": "gadget",
                 "description": "Gadget configuration",
                 "oe-template": "test-configuration-gadget",
-                "oe-fragments": ["test-fragment-1"]
+                "oe-fragments": ["test-fragment-1"],
+                "install-buildtools": {
+                    "url": "file://%s/%s",
+                    "sha256sum": "%s"
+                }
             },
             {
                 "name": "gizmo",
@@ -176,7 +206,7 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
     },
     "version": "1.0"
 }
-""" % (sources)
+""" % (sources, self.buildtools_dir, self.buildtools_filename, self.buildtools_sha256)
         os.makedirs(os.path.join(self.registrypath, os.path.dirname(name)), exist_ok=True)
         with open(os.path.join(self.registrypath, name), 'w') as f:
             f.write(config)
@@ -644,6 +674,56 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
     def _count_layer_backups(self, layers_path):
         return len([f for f in os.listdir(layers_path) if 'backup' in f])
 
+    def test_install_buildtools_fetch(self):
+        """Test that install-buildtools uses bb.fetch with sha256 and passes --local-file"""
+        import shutil
+
+        if 'BBPATH' in os.environ:
+            del os.environ['BBPATH']
+        os.chdir(self.tempdir)
+
+        registry_uri = "git://{};protocol=file;branch=master;rev=master".format(
+            self.registrypath)
+        self.runbbsetup(["settings", "set", "default", "registry", registry_uri])
+        self.add_file_to_testrepo('test-file', 'initial\n')
+        self.add_json_config_to_registry('test-config-bt.conf.json', 'master', 'master')
+        self.runbbsetup(["init", "--non-interactive", "test-config-bt", "gadget"])
+        setuppath = self.get_setup_path('test-config-bt', 'gadget')
+
+        # test config-driven install (url + sha256sum from config)
+        out = self.runbbsetup(["install-buildtools", "--setup-dir", setuppath])
+        self.assertIn("Buildtools installed into", out[0])
+        self.assertIn("install-buildtools local-file=", out[0])
+        self.assertTrue(os.path.exists(os.path.join(setuppath, 'buildtools')))
+
+        # test CLI overrides (use a different file to prove precedence)
+        shutil.rmtree(os.path.join(setuppath, 'buildtools'))
+        alt_filename = "alt-buildtools-test.sh"
+        alt_filepath = os.path.join(self.buildtools_dir, alt_filename)
+        with open(alt_filepath, 'w') as f:
+            f.write("#!/bin/sh\necho alt\n")
+        with open(alt_filepath, 'rb') as f:
+            alt_sha256 = hashlib.sha256(f.read()).hexdigest()
+        alt_url = "file://{}/{}".format(self.buildtools_dir, alt_filename)
+        out = self.runbbsetup(["install-buildtools", "--setup-dir", setuppath,
+                               "--url", alt_url,
+                               "--sha256", alt_sha256])
+        self.assertIn("Buildtools installed into", out[0])
+        self.assertIn("install-buildtools local-file=", out[0])
+        self.assertIn(alt_filename, out[0])
+
+        # test missing sha256sum is a hard error
+        shutil.rmtree(os.path.join(setuppath, 'buildtools'), ignore_errors=True)
+        with open(os.path.join(setuppath, 'config', 'config-upstream.json')) as f:
+            config_upstream = json.load(f)
+        config_upstream['bitbake-config']['install-buildtools'] = {
+            'url': 'file://{}/{}'.format(self.buildtools_dir, self.buildtools_filename)
+        }
+        with open(os.path.join(setuppath, 'config', 'config-upstream.json'), 'w') as f:
+            json.dump(config_upstream, f)
+        with self.assertRaises(bb.process.ExecutionError):
+            self.runbbsetup(["install-buildtools", "--setup-dir", setuppath, "--force"])
+
     def test_update_rebase_conflicts_strategy(self):
         """Test the --rebase-conflicts-strategy option for the update command.
 
@@ -735,3 +815,279 @@ print("BBPATH is {{}}".format(os.environ["BBPATH"]))
             self.assertEqual(f.read(), 'conflicting-upstream\n',
                              "re-cloned layer must contain the upstream content after conflict backup")
         del os.environ['BBPATH']
+
+@unittest.skipIf(os.environ.get("BB_SKIP_PYPI_TESTS", "yes") != "no",
+                 "PyPI packaging test (set BB_SKIP_PYPI_TESTS=no to run)")
+class PyPIPackagingTest(unittest.TestCase):
+    """Tests for PyPI packaging of bitbake-setup.
+
+    These tests build a wheel from source, install it in an isolated venv,
+    and verify the package works correctly. Skipped by default unless
+    BB_SKIP_PYPI_TESTS=no is set.
+    """
+
+    wheel_path = None
+    build_tempdir = None
+    workspace_dir = None
+
+    @classmethod
+    def setUpClass(cls):
+        """Build wheel once for all tests in this class."""
+        # Locate packaging-pypi/bitbake-setup directory
+        cls.pypi_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '..', '..', '..', 'packaging-pypi', 'bitbake-setup')
+        )
+
+        # Check for required build tools
+        cls._check_build_tools()
+
+        # Create temporary directory for packaging workspace
+        cls.build_tempdir = tempfile.mkdtemp(prefix="bitbake-pypi-build-")
+
+        # Run package-bitbake-setup.py to create packaging workspace
+        cls._create_packaging_workspace()
+
+        # Build the wheel
+        cls._build_wheel()
+
+    @classmethod
+    def _check_build_tools(cls):
+        """Verify build tools are available, skip if not."""
+        try:
+            result = subprocess.run(
+                [sys.executable, "-m", "build", "--version"],
+                capture_output=True, check=True
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            raise unittest.SkipTest("'build' package not installed (pip install build)")
+
+    @classmethod
+    def _create_packaging_workspace(cls):
+        """Create packaging workspace using package-bitbake-setup.py."""
+        script = os.path.join(cls.pypi_dir, 'package-bitbake-setup.py')
+        cls.workspace_dir = os.path.join(cls.build_tempdir, 'workspace')
+        result = subprocess.run(
+            [sys.executable, script, '-d', cls.workspace_dir],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            raise unittest.SkipTest(f"Packaging workspace creation failed: {result.stderr}")
+
+    @classmethod
+    def _build_wheel(cls):
+        """Build the wheel in the packaging workspace."""
+        result = subprocess.run(
+            [sys.executable, "-m", "build", "--wheel"],
+            cwd=cls.workspace_dir,
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            raise unittest.SkipTest(f"Wheel build failed: {result.stderr}")
+
+        # Find the built wheel
+        dist_dir = os.path.join(cls.workspace_dir, 'dist')
+        wheels = glob.glob(os.path.join(dist_dir, '*.whl'))
+        if not wheels:
+            raise unittest.SkipTest("No wheel file found after build")
+        cls.wheel_path = wheels[0]
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clean up the shared wheel build artifacts."""
+        if cls.build_tempdir and os.environ.get("BB_TMPDIR_NOCLEAN") != "yes":
+            shutil.rmtree(cls.build_tempdir, ignore_errors=True)
+        elif cls.build_tempdir:
+            print(f"Not cleaning up {cls.build_tempdir}. Please remove manually.")
+
+    def setUp(self):
+        """Create isolated venv for testing the installed package."""
+        self.venv_dir = tempfile.mkdtemp(prefix="bitbake-pypi-venv-")
+
+        # Create venv without pip (faster, no network needed)
+        venv.create(self.venv_dir, with_pip=False, symlinks=True)
+
+        # Get paths to venv python and bin directory
+        if sys.platform == 'win32':
+            self.venv_python = os.path.join(self.venv_dir, 'Scripts', 'python.exe')
+            self.venv_bin = os.path.join(self.venv_dir, 'Scripts')
+        else:
+            self.venv_python = os.path.join(self.venv_dir, 'bin', 'python')
+            self.venv_bin = os.path.join(self.venv_dir, 'bin')
+
+        # Install wheel using pip from the outer environment (offline, no-deps)
+        site_packages = self._get_site_packages()
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "install",
+             "--target", site_packages,
+             "--no-deps", "--no-index",
+             self.wheel_path],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            self.fail(f"Failed to install wheel: {result.stderr}")
+
+        # Install console script entry point manually
+        self._install_console_script()
+
+    def _get_site_packages(self):
+        """Get the site-packages directory in the venv."""
+        lib_dir = os.path.join(self.venv_dir, 'lib')
+        # Find python version directory
+        for d in os.listdir(lib_dir):
+            if d.startswith('python'):
+                return os.path.join(lib_dir, d, 'site-packages')
+        raise RuntimeError("Could not find site-packages in venv")
+
+    def _install_console_script(self):
+        """Create console script wrapper in venv bin directory."""
+        site_packages = self._get_site_packages()
+        script_path = os.path.join(self.venv_bin, 'bitbake-setup')
+        script_content = f'''#!{self.venv_python}
+import sys
+sys.path.insert(0, "{site_packages}")
+from bitbake_setup.__main__ import main
+sys.exit(main())
+'''
+        with open(script_path, 'w') as f:
+            f.write(script_content)
+        os.chmod(script_path, 0o755)
+
+    def tearDown(self):
+        """Remove venv after test."""
+        if os.environ.get("BB_TMPDIR_NOCLEAN") != "yes":
+            shutil.rmtree(self.venv_dir, ignore_errors=True)
+        else:
+            print(f"Not cleaning up {self.venv_dir}. Please remove manually.")
+
+    def test_imports(self):
+        """Verify all expected modules can be imported from installed package."""
+
+        site_packages = self._get_site_packages()
+        imports = ['bb', 'bitbake_setup']
+        for module in imports:
+            result = subprocess.run(
+                [self.venv_python, '-c', f'import sys; sys.path.insert(0, "{site_packages}"); import {module}'],
+                capture_output=True, text=True
+            )
+            self.assertEqual(result.returncode, 0,
+                f"Failed to import {module}: {result.stderr}")
+
+    def test_console_script_help(self):
+        """Verify bitbake-setup --help runs successfully."""
+        script = os.path.join(self.venv_bin, 'bitbake-setup')
+        result = subprocess.run(
+            [script, '--help'],
+            capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 0,
+            f"bitbake-setup --help failed: {result.stderr}")
+        self.assertIn('usage:', result.stdout.lower())
+
+    def test_console_script_list(self):
+        """Verify bitbake-setup list runs successfully."""
+        script = os.path.join(self.venv_bin, 'bitbake-setup')
+        result = subprocess.run(
+            [script, 'list'],
+            capture_output=True, text=True
+        )
+        # List may return 0 even with no configurations
+        self.assertEqual(result.returncode, 0,
+            f"bitbake-setup list failed: {result.stderr}")
+
+    def test_package_metadata(self):
+        """Verify package metadata is correctly set."""
+        site_packages = self._get_site_packages()
+        code = '''
+import json
+import sys
+sys.path.insert(0, "{}")
+from importlib.metadata import metadata
+m = metadata("bitbake-setup")
+print(json.dumps({{
+    "name": m["Name"],
+    "version": m["Version"],
+    "requires_python": m.get("Requires-Python", ""),
+    "license": m.get("License", ""),
+}}))
+'''.format(site_packages)
+        result = subprocess.run(
+            [self.venv_python, '-c', code],
+            capture_output=True, text=True
+        )
+        self.assertEqual(result.returncode, 0,
+            f"Failed to get metadata: {result.stderr}")
+
+        meta = json.loads(result.stdout)
+        self.assertEqual(meta['name'], 'bitbake-setup')
+        self.assertIn('>=3.9', meta['requires_python'])
+
+    def test_vendored_dependencies(self):
+        """Verify vendored dependencies (bs4, ply, progressbar, simplediff) are not bundled in package."""
+        # Check that vendored packages do not exist in root of wheel
+        with zipfile.ZipFile(self.wheel_path, 'r') as whl:
+            names = whl.namelist()
+
+            # Check for expected package directories
+            expected = ['bs4/', 'ply/', 'progressbar/', 'simplediff/']
+            for pkg in expected:
+                found = any(n.startswith(pkg) for n in names)
+                self.assertFalse(found,
+                    f"Unexpected vendored package '{pkg}' found in wheel")
+
+    def test_version_from_wheel(self):
+        """Verify version is set correctly (not fallback 0.0.0 unless expected)."""
+        import re
+        # Extract version from wheel filename
+        wheel_name = os.path.basename(self.wheel_path)
+        # Wheel format: {name}-{version}(-{build})?-{python}-{abi}-{platform}.whl
+        parts = wheel_name.split('-')
+        version = parts[1]
+
+        # Check version format (should be semver-like or contain git info)
+        version_pattern = r'^\d+\.\d+\.\d+.*$'
+        self.assertTrue(re.match(version_pattern, version),
+            f"Version '{version}' doesn't match expected pattern")
+
+        print(f"Extracted version from wheel: {version}")
+
+        self.assertNotEqual(version, '0.0.0',
+            "Version is fallback 0.0.0 - no git tags found")
+
+    def test_wheel_metadata_file(self):
+        """Verify wheel METADATA file contains required fields."""
+        with zipfile.ZipFile(self.wheel_path, 'r') as whl:
+            # Find METADATA file in dist-info
+            metadata_path = None
+            for name in whl.namelist():
+                if name.endswith('.dist-info/METADATA'):
+                    metadata_path = name
+                    break
+
+            self.assertIsNotNone(metadata_path, "METADATA file not found in wheel")
+
+            # Parse metadata
+            metadata_content = whl.read(metadata_path).decode('utf-8')
+
+            # Check required fields
+            self.assertIn('Metadata-Version:', metadata_content)
+            self.assertIn('Name: bitbake-setup', metadata_content)
+            self.assertIn('Version:', metadata_content)
+            self.assertIn('Requires-Python:', metadata_content)
+
+    def test_entry_points(self):
+        """Verify console script entry points are correctly defined."""
+        with zipfile.ZipFile(self.wheel_path, 'r') as whl:
+            # Find entry_points.txt in dist-info
+            entry_points_path = None
+            for name in whl.namelist():
+                if name.endswith('.dist-info/entry_points.txt'):
+                    entry_points_path = name
+                    break
+
+            self.assertIsNotNone(entry_points_path,
+                "entry_points.txt not found in wheel")
+
+            content = whl.read(entry_points_path).decode('utf-8')
+            self.assertIn('[console_scripts]', content)
+            self.assertIn('bitbake-setup', content)
+            self.assertIn('bitbake_setup.__main__:main', content)

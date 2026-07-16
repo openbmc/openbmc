@@ -1,0 +1,125 @@
+From 0d275fc5b6531957a6189069b04074065bb718a0 Mon Sep 17 00:00:00 2001
+From: Paul Eggleton <paul.eggleton@linux.intel.com>
+Date: Thu, 23 Jun 2016 22:59:05 +1200
+Subject: [PATCH 1/6] lib: implement basic task progress support
+
+For long-running tasks where we have some output from the task that
+gives us some idea of the progress of the task (such as a percentage
+complete), provide the means to scrape the output for that progress
+information and show it to the user in the default knotty terminal
+output in the form of a progress bar. This is implemented using a new
+TaskProgress event as well as some code we can insert to do output
+scanning/filtering.
+
+Any task can fire TaskProgress events; however, if you have a shell task
+whose output you wish to scan for progress information, you just need to
+set the "progress" varflag on the task. This can be set to:
+ * "percent" to just look for a number followed by a % sign
+ * "percent:<regex>" to specify your own regex matching a percentage
+   value (must have a single group which matches the percentage number)
+ * "outof:<regex>" to look for the specified regex matching x out of y
+   items completed (must have two groups - first group needs to be x,
+   second y).
+We can potentially extend this in future but this should be a good
+start.
+
+Part of the implementation for [YOCTO #5383].
+
+Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ lib/progressbar/progressbar.py | 16 +++++++++++----
+ lib/progressbar/widgets.py     | 36 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 48 insertions(+), 4 deletions(-)
+
+diff --git a/lib/bb/_vendor/progressbar/progressbar.py b/lib/bb/_vendor/progressbar/progressbar.py
+index 0b9dcf763..2873ad6ca 100644
+--- a/lib/bb/_vendor/progressbar/progressbar.py
++++ b/lib/bb/_vendor/progressbar/progressbar.py
+@@ -3,6 +3,8 @@
+ # progressbar  - Text progress bar library for Python.
+ # Copyright (c) 2005 Nilton Volpato
+ #
++# (With some small changes after importing into BitBake)
++#
+ # This library is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU Lesser General Public
+ # License as published by the Free Software Foundation; either
+@@ -261,12 +263,14 @@ class ProgressBar(object):
+         now = time.time()
+         self.seconds_elapsed = now - self.start_time
+         self.next_update = self.currval + self.update_interval
+-        self.fd.write(self._format_line() + '\r')
++        output = self._format_line()
++        self.fd.write(output + '\r')
+         self.fd.flush()
+         self.last_update_time = now
++        return output
+
+
+-    def start(self):
++    def start(self, update=True):
+         """Starts measuring time, and prints the bar at 0%.
+
+         It returns self so you can use it like this:
+@@ -289,8 +293,12 @@ class ProgressBar(object):
+             self.update_interval = self.maxval / self.num_intervals
+
+
+-        self.start_time = self.last_update_time = time.time()
+-        self.update(0)
++        self.start_time = time.time()
++        if update:
++            self.last_update_time = self.start_time
++            self.update(0)
++        else:
++            self.last_update_time = 0
+
+         return self
+
+diff --git a/lib/bb/_vendor/progressbar/widgets.py b/lib/bb/_vendor/progressbar/widgets.py
+index 6434ad559..77285ca7a 100644
+--- a/lib/bb/_vendor/progressbar/widgets.py
++++ b/lib/bb/_vendor/progressbar/widgets.py
+@@ -353,3 +353,39 @@ class BouncingBar(Bar):
+         if not self.fill_left: rpad, lpad = lpad, rpad
+
+         return '%s%s%s%s%s' % (left, lpad, marker, rpad, right)
++
++
++class BouncingSlider(Bar):
++    """
++    A slider that bounces back and forth in response to update() calls
++    without reference to the actual value. Based on a combination of
++    BouncingBar from a newer version of this module and RotatingMarker.
++    """
++    def __init__(self, marker='<=>'):
++        self.curmark = -1
++        self.forward = True
++        Bar.__init__(self, marker=marker)
++    def update(self, pbar, width):
++        left, marker, right = (format_updatable(i, pbar) for i in
++                               (self.left, self.marker, self.right))
++
++        width -= len(left) + len(right)
++        if width < 0:
++            return ''
++
++        if pbar.finished: return '%s%s%s' % (left, width * '=', right)
++
++        self.curmark = self.curmark + 1
++        position = int(self.curmark % (width * 2 - 1))
++        if position + len(marker) > width:
++            self.forward = not self.forward
++            self.curmark = 1
++            position = 1
++        lpad = ' ' * (position - 1)
++        rpad = ' ' * (width - len(marker) - len(lpad))
++
++        if not self.forward:
++            temp = lpad
++            lpad = rpad
++            rpad = temp
++        return '%s%s%s%s%s' % (left, lpad, marker, rpad, right)
+--
+2.49.0

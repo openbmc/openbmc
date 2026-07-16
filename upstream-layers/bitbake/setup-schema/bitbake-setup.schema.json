@@ -170,7 +170,28 @@
                             },
                             "setup-dir-name": {
                                 "type": "string",
-                                "description": "A suggestion for the setup directory name, $-prefixed keys from oe-fragments-one-of will be substituted with user selections"
+                                "description": "A suggestion for the setup directory name, $-prefixed keys from oe-fragments-one-of will be substituted with user selections."
+                            },
+                            "install-buildtools": {
+                                "type": "object",
+                                "description": "Settings for downloading buildtools via bb.fetch",
+                                "properties": {
+                                    "url": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "Full URL to the buildtools SDK installer."
+                                    },
+                                    "sha256sum": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "description": "SHA256 checksum of the buildtools installer."
+                                    }
+                                },
+                                "required": [
+                                    "url",
+                                    "sha256sum"
+                                ],
+                                "additionalProperties": false
                             }
                         },
                         "additionalProperties": false

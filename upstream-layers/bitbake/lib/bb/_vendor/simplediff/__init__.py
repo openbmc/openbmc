@@ -11,7 +11,7 @@ May be used and distributed under the zlib/libpng license
 '''
 
 __all__ = ['diff', 'string_diff', 'html_diff']
-__version__ = '1.0'
+__version__ = '1.1'
 
 
 def diff(old, new):

@@ -1,0 +1,19 @@
+[build-system]
+requires = []
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bitbake"
+version = "2.19.0"
+
+[tool.vendoring]
+destination = "lib/bb/_vendor"
+requirements = "vendor.txt"
+namespace = "bb._vendor"
+patches-dir = "vendor/patches"
+
+[tool.vendoring.license.directories]
+ply = "vendor/licenses/ply/LICENSE"
+
+[tool.vendoring.license.fallback-urls]
+ply = "https://raw.githubusercontent.com/dabeaz/ply/refs/heads/master/src/ply/lex.py"

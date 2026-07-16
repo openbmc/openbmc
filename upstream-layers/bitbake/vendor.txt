@@ -1,0 +1,5 @@
+beautifulsoup4==4.15.0
+ply==3.10
+progressbar==2.5
+simplediff==1.1
+typing_extensions==4.15.0

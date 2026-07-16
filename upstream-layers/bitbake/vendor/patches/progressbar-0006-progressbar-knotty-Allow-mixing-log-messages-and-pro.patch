@@ -1,0 +1,31 @@
+From e827db50d8f61f0d04c9bd0753c05aeb1ed0715f Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 24 Mar 2026 21:37:25 +0000
+Subject: [PATCH 6/6] progressbar/knotty: Allow mixing log messages and
+ progress bars
+
+If we try and print a log message in the middle of progress bar, the display
+can be corrupted. Add a clear() method to progress bars allowing them to be
+removed for the log message, then reprinted using update().
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+---
+ lib/progressbar/progressbar.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/lib/bb/_vendor/progressbar/progressbar.py b/lib/bb/_vendor/progressbar/progressbar.py
+index a8e2dc09c..1562774ba 100644
+--- a/lib/bb/_vendor/progressbar/progressbar.py
++++ b/lib/bb/_vendor/progressbar/progressbar.py
+@@ -278,6 +278,9 @@ class ProgressBar(object):
+         self.last_update_time = now
+         return output
+
++    def clear(self):
++        self.fd.write(" " * self.term_width + '\r')
++        self.fd.flush()
+
+     def start(self, update=True):
+         """Starts measuring time, and prints the bar at 0%.
+--
+2.49.0
