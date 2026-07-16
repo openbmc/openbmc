@@ -9,36 +9,48 @@ To fix following configure error
 |   add_library cannot create target "scap_error" because another target with
 |   the same name already exists.  The existing target is a static library
 
+Guard the libscap/libsinsp modules on the existence of the "scap"/"sinsp"
+targets rather than on a cached HAVE_LIBSCAP/HAVE_LIBSINSP flag. A cached
+flag persists into the CMakeCache, so when Ninja re-runs CMake during the
+build (the "cmake --regenerate-during-build" RERUN rule fires whenever a
+CMake input's timestamp changes) the guard is already true and the
+add_subdirectory() for libscap/libsinsp is skipped. That drops the scap/
+sinsp targets and their PUBLIC include directories, and the userspace/
+sysdig targets then fail to compile with "'libsinsp/sinsp.h' file not
+found". Target existence is global within a single CMake run (so it still
+prevents the duplicate add_library) but is not persisted across runs, so
+the modules are re-processed on every regeneration.
+
 Upstream-Status: Inappropriate [oe-specific]
 Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
- cmake/modules/libscap.cmake  | 2 +-
- cmake/modules/libsinsp.cmake | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ cmake/modules/libscap.cmake  | 3 +--
+ cmake/modules/libsinsp.cmake | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
 diff --git a/cmake/modules/libscap.cmake b/cmake/modules/libscap.cmake
-index b41b12ff3..1753598e9 100644
 --- a/cmake/modules/libscap.cmake
 +++ b/cmake/modules/libscap.cmake
-@@ -14,7 +14,7 @@
+@@ -13,8 +13,7 @@
+ # the License.
  #
  
- if(NOT HAVE_LIBSCAP)
+-if(NOT HAVE_LIBSCAP)
 -	set(HAVE_LIBSCAP On)
-+        set(HAVE_LIBSCAP On CACHE INTERNAL "Flag to indicate libscap has been processed")
++if(NOT TARGET scap)
  
  	if(NOT LIBS_DIR)
  		get_filename_component(LIBS_DIR ${CMAKE_CURRENT_LIST_DIR}/../.. ABSOLUTE)
 diff --git a/cmake/modules/libsinsp.cmake b/cmake/modules/libsinsp.cmake
-index ff336e27f..0fdd2d4a9 100644
 --- a/cmake/modules/libsinsp.cmake
 +++ b/cmake/modules/libsinsp.cmake
-@@ -14,7 +14,7 @@
+@@ -13,8 +13,7 @@
+ # the License.
  #
  
- if(NOT HAVE_LIBSINSP)
+-if(NOT HAVE_LIBSINSP)
 -	set(HAVE_LIBSINSP On)
-+        set(HAVE_LIBSINSP On CACHE INTERNAL "Flag to indicate libsinsp has been processed")
++if(NOT TARGET sinsp)
  
  	if(NOT LIBS_DIR)
  		get_filename_component(LIBS_DIR ${CMAKE_CURRENT_LIST_DIR}/../.. ABSOLUTE)

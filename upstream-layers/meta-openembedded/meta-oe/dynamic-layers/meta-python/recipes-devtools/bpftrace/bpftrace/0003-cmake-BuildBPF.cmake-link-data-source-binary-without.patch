@@ -1,0 +1,78 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 2 Jul 2026 15:30:00 -0700
+Subject: [PATCH] cmake/BuildBPF.cmake: link data source binary without host
+ runtime
+
+The `bpf()` helper links the intermediate DWARF carrier binary
+(data_source_exe) with the plain host gcc:
+
+  ${GCC} -g -o data_source_exe data_source.o
+
+and the resulting executable is then embedded byte-for-byte into
+bpftrace_test via embed()/xxd (tests/data/CMakeLists.txt). Linking it as
+a regular dynamic executable bakes host-toolchain artifacts into it:
+
+  * PT_INTERP: the absolute path of the host toolchain's dynamic
+    loader. With a vendored/SDK toolchain (e.g. Yocto
+    buildtools-extended installed under the build user's home) this is
+    an absolute build-host path such as
+    /srv/pokybuild/.../buildtools/sysroots/x86_64-pokysdk-linux/lib/ld-linux-x86-64.so.2
+  * crt startup objects (crt1.o, crti.o, crtbegin.o) including whatever
+    debug info the host libc was built with.
+
+Since the embedded blob carries these strings into the packaged test
+binary, the build is not reproducible across hosts and leaks build host
+paths, flagged by OE's buildpaths QA check:
+
+  WARNING: bpftrace-0.25.1-r0 do_package_qa: QA Issue: File
+  /usr/lib/bpftrace/ptest/tests/bpftrace_test in package bpftrace-ptest
+  contains a reference to the build host HOME directory. [buildpaths]
+
+The binary only serves as a DWARF/BTF container: the tests write it to
+a temp file and use it as a uprobe target (tests/dwarf_common.h), which
+parses debug info and symbols but never executes it. So link it with
+-nostdlib -no-pie: no interpreter, no dynamic segment, no host crt
+code. -Wl,--entry=0 silences the "cannot find entry symbol _start"
+warning. All function symbols, DWARF type information and the
+pahole -J BTF encoding step are unaffected.
+
+Because the object is now linked -nostdlib, it must not emit references
+to the libc stack-protector runtime. Host gcc toolchains that default to
+-fstack-protector-strong (e.g. Debian/Ubuntu, the Yocto autobuilders)
+otherwise leave an undefined reference and the link fails:
+
+  ld: data_source.o: in function `main':
+  data_source.c:212: undefined reference to `__stack_chk_fail'
+  collect2: error: ld returned 1 exit status
+
+Compile the object (and link the binary) with -fno-stack-protector; the
+canary is irrelevant to a DWARF/BTF carrier that is never run.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ cmake/BuildBPF.cmake | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/cmake/BuildBPF.cmake b/cmake/BuildBPF.cmake
+index cb8cd68..8aa059f 100644
+--- a/cmake/BuildBPF.cmake
++++ b/cmake/BuildBPF.cmake
+@@ -90,7 +90,7 @@ function(bpf NAME)
+     OUTPUT ${ARG_OBJECT}
+     DEPENDS ${ARG_SOURCE} ${ARG_DEPENDS}
+     # See above: fresh compilation and the use of `gcc`.
+-    COMMAND ${GCC} -Wno-attributes -g ${DEBUG_PREFIX_MAP_LIST} -I ${CMAKE_CURRENT_BINARY_DIR} -c ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_SOURCE} -o ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
++    COMMAND ${GCC} -Wno-attributes -fno-stack-protector -g ${DEBUG_PREFIX_MAP_LIST} -I ${CMAKE_CURRENT_BINARY_DIR} -c ${CMAKE_CURRENT_SOURCE_DIR}/${ARG_SOURCE} -o ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
+     COMMAND cmake -E env LLVM_OBJCOPY=${LLVM_OBJCOPY} ${PAHOLE} -J ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
+     VERBATIM
+   )
+@@ -107,7 +107,7 @@ function(bpf NAME)
+     add_custom_command(
+       OUTPUT ${ARG_BINARY}
+       DEPENDS ${ARG_SOURCE} ${NAME}_gen_object
+-      COMMAND ${GCC} -g -o ${CMAKE_CURRENT_BINARY_DIR}/${ARG_BINARY} ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
++      COMMAND ${GCC} -g -fno-stack-protector -nostdlib -no-pie -Wl,--entry=0 -o ${CMAKE_CURRENT_BINARY_DIR}/${ARG_BINARY} ${CMAKE_CURRENT_BINARY_DIR}/${ARG_OBJECT}
+       COMMAND cmake -E env LLVM_OBJCOPY=${LLVM_OBJCOPY} ${PAHOLE} -J ${CMAKE_CURRENT_BINARY_DIR}/${ARG_BINARY}
+       VERBATIM
+     )

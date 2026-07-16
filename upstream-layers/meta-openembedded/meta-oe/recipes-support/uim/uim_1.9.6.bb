@@ -43,6 +43,13 @@ EXTRA_OECONF += "--disable-emacs \
 
 CONFIGUREOPTS:remove:class-target = "--disable-silent-rules"
 
+# The target build runs the native uim-module-manager (from uim-native) to
+# generate installed-modules.scm. Registration dlopens the uim C plugins, so
+# point the loader at the native plugin directory; otherwise the native tool
+# loads the target plugins and crashes on hosts whose ABI differs from the
+# target. See uim-module-manager.patch.
+EXTRA_OEMAKE:append:class-target = " UIM_PLUGIN_LIB_DIR=${STAGING_LIBDIR_NATIVE}/uim/plugin"
+
 # https://github.com/uim/uim/issues/44
 PARALLEL_MAKE = ""
 

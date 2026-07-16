@@ -1,0 +1,28 @@
+From a82451e8f2db33e22fef6714ddbd35a3e03debff Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 14 May 2026 11:49:05 -0700
+Subject: [PATCH] pyproject.toml: Relax build requirements
+
+Allow building with wheel 0.47+ and drop the upstream setuptools upper
+cap. OE provides setuptools via DEPENDS and builds with --no-isolation,
+so the cap is spurious and breaks the build whenever oe-core ships a
+newer setuptools (currently 83.0.0).
+
+Upstream-Status: Inappropriate [oe-core specific dependency versions]
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ pyproject.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 20524ca..fc62798 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -1,5 +1,5 @@
+ [build-system]
+-requires = ["setuptools>=65.6,<83.0", "wheel>=0.37.1,<0.47.0"]
++requires = ["setuptools>=65.6", "wheel>=0.37.1,<0.48.0"]
+ build-backend = "setuptools.build_meta"
+
+ [project]

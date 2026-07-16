@@ -11,5 +11,5 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6a6e689d19255cf0557f3fe7d7068212 \
 GNOMEBASEBUILDCLASS = "cmake"
 inherit gnomebase upstream-version-is-even
 
-SRC_URI[archive.sha256sum] = "df4ec29950f29a76eac6fbe0f814c48d2cef7d3fdb905002a4a883dd761ce93c"
-PV = "3.56.2"
+SRC_URI[archive.sha256sum] = "2084dbdac396371b365d504c1ff45866ba8dca2f1252e5da1d3d9c33abdc1286"
+PV = "3.60.2"

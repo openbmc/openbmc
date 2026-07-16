@@ -21,6 +21,8 @@ inherit gnomebase gsettings gtk-icon-cache gettext features_check upstream-versi
 REQUIRED_DISTRO_FEATURES = "opengl"
 ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
 
+SRC_URI += "file://0001-Support-building-against-libical-4.0.patch"
+
 SRC_URI[archive.sha256sum] = "e69a5a66be820105a4d823d4dba9b4e6ef9f6e7523978aaf33361ebbb993e604"
 
 FILES:${PN} += " \

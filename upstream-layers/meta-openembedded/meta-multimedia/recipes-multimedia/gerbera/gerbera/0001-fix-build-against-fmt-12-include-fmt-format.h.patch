@@ -1,0 +1,53 @@
+From 9507706136fd0000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 8 Jul 2026 00:00:00 +0000
+Subject: [PATCH] fix build against fmt 12: include fmt/format.h
+
+Since fmt 11, <fmt/core.h> is a thin shim that only pulls in <fmt/base.h>
+and no longer declares fmt::format() unless FMT_DEPRECATED_HEAVY_CORE is
+defined. fmt 12.2.0 finishes the job and the build fails with:
+
+  src/exceptions.cc:37:31: error: no member named 'format' in namespace 'fmt'
+      : std::runtime_error(fmt::format("{}: Error: {}", message, userMessage))
+
+Include <fmt/format.h> in the central headers that expose fmt::format()
+to the rest of the tree (exceptions.h via throw_std_runtime_error, and
+search_handler.h) so all consumers see the declaration again.
+
+Backport of gerbera commit 9507706136fd.
+
+Upstream-Status: Backport [https://github.com/gerbera/gerbera/commit/9507706136fd]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/exceptions.h            | 2 +-
+ src/database/search_handler.h | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/exceptions.h b/src/exceptions.h
+index 1111111..2222222 100644
+--- a/src/exceptions.h
++++ b/src/exceptions.h
+@@ -34,7 +34,7 @@
+ #ifndef __EXCEPTIONS_H__
+ #define __EXCEPTIONS_H__
+
+-#include <fmt/core.h>
++#include <fmt/format.h>
+ #include <stdexcept>
+ #include <string>
+
+diff --git a/src/database/search_handler.h b/src/database/search_handler.h
+index 3333333..4444444 100644
+--- a/src/database/search_handler.h
++++ b/src/database/search_handler.h
+@@ -32,7 +32,7 @@
+ #include "util/tools.h"
+
+ #include <algorithm>
+-#include <fmt/core.h>
++#include <fmt/format.h>
+ #include <map>
+ #include <memory>
+ #include <tuple>
+--
+2.43.0

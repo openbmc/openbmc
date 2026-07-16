@@ -1,21 +1,39 @@
-From d61495d3fb039842b82df44184c67eb3c1256136 Mon Sep 17 00:00:00 2001
-From: Bian Naimeng <biannm@cn.fujitsu.com>
-Date: Fri, 26 Jun 2015 12:57:48 +0900
+From: Khem Raj <raj.khem@gmail.com>
+Date: Fri, 10 Jul 2026 00:00:00 +0000
+Subject: [PATCH] uim: run the native uim-module-manager against native plugins
 
+When cross compiling, scm/Makefile runs uim-module-manager to generate
+installed-modules.scm. Use the uim-module-manager from PATH (provided by
+uim-native) instead of the freshly cross-built one, and make its plugin
+search directory (LIBUIM_PLUGIN_LIB_DIR) overridable. Registration makes
+the tool dlopen the uim C plugins; if that points at the target .libs the
+native tool loads target objects and segfaults on a build host whose ABI
+differs from the target (e.g. x86-64 host, x86-64-v3 target). The recipe
+overrides UIM_PLUGIN_LIB_DIR to the native plugin directory.
+
+This extends the original scm/Makefile.am change by Bian Naimeng
+<biannm@cn.fujitsu.com>.
+
+Upstream-Status: Inappropriate [cross-compile specific]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
-Upstream-Status: Pending
-
- scm/Makefile.am | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scm/Makefile.am | 3 ++-
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 --- a/scm/Makefile.am
 +++ b/scm/Makefile.am
-@@ -115,7 +115,7 @@ if EXPAT
+@@ -115,11 +115,12 @@
    module_names += "yahoo-jp"
  endif
  
 -UIM_MODULE_MANAGER = $(top_builddir)/uim/uim-module-manager
++UIM_PLUGIN_LIB_DIR = $(abs_top_builddir)/uim/.libs
 +UIM_MODULE_MANAGER = uim-module-manager
  UIM_MODULE_MANAGER_ENV = \
          LIBUIM_SYSTEM_SCM_FILES=$(abs_top_srcdir)/sigscheme/lib \
          LIBUIM_SCM_FILES=$(abs_srcdir) \
+-        LIBUIM_PLUGIN_LIB_DIR=$(abs_top_builddir)/uim/.libs \
++        LIBUIM_PLUGIN_LIB_DIR=$(UIM_PLUGIN_LIB_DIR) \
+         UIM_DISABLE_NOTIFY=1
+ 
+ loader.scm: installed-modules.scm

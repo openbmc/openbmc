@@ -1,0 +1,87 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 2 Jul 2026 00:00:00 +0000
+Subject: [PATCH] Support building against libical 4.0
+
+libical 4.0 changed several parts of its GObject (libical-glib) API in
+ways that break gnome-calendar:
+
+* The per-part recurrence accessors i_cal_recurrence_get_by_day() and
+  i_cal_recurrence_set_by_day() were removed in favour of generic
+  accessors i_cal_recurrence_get_by()/i_cal_recurrence_set_by() that
+  take an ICalRecurrenceByRule selector.
+
+* i_cal_errno_return() was removed; the current error number is now
+  obtained through i_cal_error_icalerrno().
+
+* ICalTime became a registered GObject-derived type and libical-glib
+  now defines its g_autoptr() cleanup function itself, so the local
+  G_DEFINE_AUTOPTR_CLEANUP_FUNC() in gcal-utils.h is a redefinition.
+
+Guard all three on ICAL_CHECK_VERSION(4, 0, 0) so the code keeps
+building against both libical 3.x and 4.x.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/gnome-calendar/-/issues]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/core/gcal-recurrence.c        | 10 ++++++++++
+ src/gui/importer/gcal-importer.c  |  4 ++++
+ src/utils/gcal-utils.h            |  4 ++++
+ 3 files changed, 18 insertions(+)
+
+diff --git a/src/core/gcal-recurrence.c b/src/core/gcal-recurrence.c
+index 3d271036..2cdf85c5 100644
+--- a/src/core/gcal-recurrence.c
++++ b/src/core/gcal-recurrence.c
+@@ -22,6 +22,16 @@
+
+ #include <glib.h>
+
++/* libical 4.0 dropped the per-part i_cal_recurrence_{get,set}_by_day()
++ * accessors in favour of generic ones taking an ICalRecurrenceByRule
++ * selector.  Keep the old spelling working when building against it. */
++#if ICAL_CHECK_VERSION (4, 0, 0)
++#define i_cal_recurrence_get_by_day(recur, index) \
++        i_cal_recurrence_get_by ((recur), I_CAL_BY_DAY, (index))
++#define i_cal_recurrence_set_by_day(recur, index, value) \
++        i_cal_recurrence_set_by ((recur), I_CAL_BY_DAY, (index), (value))
++#endif
++
+ G_DEFINE_BOXED_TYPE (GcalRecurrence, gcal_recurrence, gcal_recurrence_ref, gcal_recurrence_unref)
+
+ static void
+diff --git a/src/gui/importer/gcal-importer.c b/src/gui/importer/gcal-importer.c
+index 7b0bbf10..cfc4eaee 100644
+--- a/src/gui/importer/gcal-importer.c
++++ b/src/gui/importer/gcal-importer.c
+@@ -147,7 +147,11 @@ read_file_in_thread (GTask        *task,
+   g_assert (g_utf8_validate (contents, length, NULL));
+
+   component = i_cal_parser_parse_string (contents);
++#if ICAL_CHECK_VERSION (4, 0, 0)
++  ical_error = i_cal_error_icalerrno ();
++#else
+   ical_error = i_cal_errno_return ();
++#endif
+
+   if (ical_error != I_CAL_NO_ERROR)
+     {
+diff --git a/src/utils/gcal-utils.h b/src/utils/gcal-utils.h
+index d7be86d9..0764e6ca 100644
+--- a/src/utils/gcal-utils.h
++++ b/src/utils/gcal-utils.h
+@@ -47,7 +47,11 @@ typedef void (*GcalAskRecurrenceCallback) (GcalEvent             *event,
+                                            GcalRecurrenceModType  modtype,
+                                            gpointer               user_data);
+
++/* libical-glib 4.0 makes ICalTime a registered GObject type and defines the
++ * autoptr cleanup func itself, so only declare it for older libical. */
++#if !ICAL_CHECK_VERSION (4, 0, 0)
+ G_DEFINE_AUTOPTR_CLEANUP_FUNC (ICalTime, g_object_unref)
++#endif
+
+ gchar*               gcal_get_weekday                            (gint                i);
+
+--
+2.43.0

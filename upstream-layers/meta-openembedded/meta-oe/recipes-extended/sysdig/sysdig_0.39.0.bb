@@ -62,9 +62,18 @@ EXTRA_OECMAKE = "\
                 -DCREATE_TEST_TARGETS=OFF \
 "
 
+# sysdig's chisel code does #include "lua.h". The recipe-sysroot also carries
+# stock Lua headers (openembedded-core lua installs lua.h into ${includedir}),
+# which are ABI-incompatible with the LuaJIT library sysdig links against: in
+# Lua >= 5.4.4 luaL_openlibs is a macro for luaL_openselectedlibs and
+# lua_setglobal/lua_pcallk are real symbols, none of which LuaJIT provides.
+# sysdig's luajit.cmake only honours LUA_INCLUDE_DIR in its stock-Lua fallback,
+# not when it finds LuaJIT, and the LuaJIT include dir does not win the search
+# order, so lua.h resolves to the stock header and the link fails. Put the
+# LuaJIT include dir first so its lua.h is used and matches the linked library.
 #Add include dir to find driver_config.h
-CXXFLAGS:append = " -I${WORKDIR}/driver_Make/driver/src"
-CFLAGS:append = " -I${WORKDIR}/driver_Make/driver/src"
+CXXFLAGS:append = " -I${STAGING_INCDIR}/luajit-2.1 -I${WORKDIR}/driver_Make/driver/src"
+CFLAGS:append = " -I${STAGING_INCDIR}/luajit-2.1 -I${WORKDIR}/driver_Make/driver/src"
 
 #To fix do_package QA Issue
 do_compile:append() {

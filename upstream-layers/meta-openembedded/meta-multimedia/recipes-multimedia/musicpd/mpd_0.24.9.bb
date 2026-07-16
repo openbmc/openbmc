@@ -20,6 +20,7 @@ DEPENDS += " \
 
 SRC_URI = "git://github.com/MusicPlayerDaemon/MPD;branch=master;protocol=https;tag=v${PV} \
            file://mpd.conf.in \
+           file://0001-libfmt-12.2.0-support-use-fmt-format.h-not-fmt-core.h.patch \
            "
 SRCREV = "7a9afa059e95668c912f779219ee8fe1e44dd2aa"
 

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+pytest --automake \
+    --deselect "tests/image_methods_test.py::test_inverse_fourier_transform" \
+    --deselect "tests/image_methods_test.py::test_forward_fourier_transform"

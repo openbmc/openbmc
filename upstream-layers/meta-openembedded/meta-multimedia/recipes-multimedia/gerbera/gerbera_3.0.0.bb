@@ -3,7 +3,10 @@ Description = "Gerbera is a UPnP media server which allows you to stream your di
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=25cdec9afe3f1f26212ead6bd2f7fac8"
 
-SRC_URI = "git://github.com/gerbera/gerbera.git;protocol=https;branch=master;tag=v${PV}"
+SRC_URI = "git://github.com/gerbera/gerbera.git;protocol=https;branch=master;tag=v${PV} \
+           file://0001-fix-build-against-fmt-12-include-fmt-format.h.patch \
+           file://0002-include-cstring-for-std-strerror-std-memcpy.patch \
+           "
 SRCREV = "7846f3dd5d0f848a60d0c3146c3b7290881a8992"
 
 

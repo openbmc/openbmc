@@ -22,6 +22,8 @@ SRCREV = "8d8f3d272dbd3f0a84156be7890835c4b6deff8e"
 
 EXTRA_OECMAKE:append = " -DSPIRV_INCLUDE_DIR=${STAGING_EXECPREFIXDIR} -DCL_INCLUDE_DIR=${STAGING_INCDIR} -DCL_LIB_DIR=${STAGING_LIBDIR} -DOPENCL_LIBRARIES=OpenCL"
 
+SECURITY_STRINGFORMAT:append:arm = " -Wno-free-nonheap-object"
+
 PACKAGECONFIG = " \
 	${@bb.utils.contains('DISTRO_FEATURES', 'opengl', 'opengl gles', '', d)} \
 	${@bb.utils.filter('DISTRO_FEATURES', 'vulkan', d)} \

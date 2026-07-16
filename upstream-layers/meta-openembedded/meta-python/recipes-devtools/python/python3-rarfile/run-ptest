@@ -1,0 +1,13 @@
+#!/bin/sh
+
+pytest --automake \
+    --deselect "test/test_api.py::test_not_rar" \
+    --deselect "test/test_extract.py::test_readonly[test/files/rar3-readonly-unix.rar]" \
+    --deselect "test/test_extract.py::test_readonly[test/files/rar3-readonly-win.rar]" \
+    --deselect "test/test_extract.py::test_readonly[test/files/rar5-readonly-unix.rar]" \
+    --deselect "test/test_extract.py::test_readonly[test/files/rar5-readonly-win.rar]" \
+    --deselect "test/test_reading.py::test_reading[test/files/rar15-comment-lock.rar]" \
+    --deselect "test/test_reading.py::test_reading[test/files/rar15-comment.rar]" \
+    --deselect "test/test_reading.py::test_reading[test/files/rar202-comment-nopsw.rar]" \
+    --deselect "test/test_reading.py::test_reading[test/files/rar202-comment-psw.rar]" \
+    --deselect "test/test_tool.py::test_unrar_tool"

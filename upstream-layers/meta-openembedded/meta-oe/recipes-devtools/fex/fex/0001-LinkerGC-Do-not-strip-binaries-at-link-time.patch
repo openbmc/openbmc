@@ -1,0 +1,28 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 9 Jul 2026 00:00:00 +0000
+Subject: [PATCH] LinkerGC: Do not strip binaries at link time
+
+FEX links Release binaries with --strip-all, which discards the symbol
+table before OE gets a chance to split out debug information. This makes
+the build fail the OE already-stripped QA check and prevents shipping
+-dbg packages. Let OE handle stripping instead.
+
+Upstream-Status: Inappropriate [OE handles stripping and debug packaging]
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ Data/CMake/LinkerGC.cmake | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Data/CMake/LinkerGC.cmake b/Data/CMake/LinkerGC.cmake
+index 1111111..2222222 100644
+--- a/Data/CMake/LinkerGC.cmake
++++ b/Data/CMake/LinkerGC.cmake
+@@ -9,7 +9,6 @@ macro(LinkerGC target)
+   if (CMAKE_BUILD_TYPE MATCHES "RELEASE")
+     target_link_options(${target} PRIVATE
+       "LINKER:--gc-sections"
+-      "LINKER:--strip-all"
+       "LINKER:--as-needed")
+   endif()
+ endmacro()

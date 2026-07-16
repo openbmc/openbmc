@@ -45,6 +45,11 @@ CFLAGS += "-I${STAGING_INCDIR}/${PYTHON_DIR}"
 SYSTEMD_SERVICE:${PN} = "postgresql.service"
 SYSTEMD_AUTO_ENABLE:${PN} = "disable"
 
+# The postinst below calls systemctl at rootfs time when both systemd and
+# sysvinit are enabled. systemd-systemctl-native was merged into
+# systemd-tools-native in oe-core, and systemd.bbclass no longer adds it to
+# PACKAGE_WRITE_DEPS, so depend on it explicitly here.
+PACKAGE_WRITE_DEPS:append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','systemd-tools-native','',d)}"
 pkg_postinst:${PN} () {
     if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd sysvinit', 'true', 'false', d)}; then
         if [ -n "$D" ]; then
@@ -64,7 +69,7 @@ PACKAGECONFIG[python] = "--with-python,--without-python,python3,python3"
 PACKAGECONFIG[gssapi] = "--with-gssapi,--without-gssapi,krb5"
 PACKAGECONFIG[pam] = "--with-pam,--without-pam,libpam"
 PACKAGECONFIG[ldap] = "--with-ldap,--without-ldap,openldap"
-PACKAGECONFIG[systemd] = "--with-systemd,--without-systemd,systemd systemd-systemctl-native"
+PACKAGECONFIG[systemd] = "--with-systemd,--without-systemd,systemd"
 PACKAGECONFIG[uuid] = "--with-uuid=e2fs,--without-uuid,util-linux"
 PACKAGECONFIG[libxml] = "--with-libxml,--without-libxml,libxml2,libxml2"
 PACKAGECONFIG[libxslt] = "--with-libxslt,--without-libxslt,libxslt"

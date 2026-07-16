@@ -4,11 +4,15 @@ LICENSE = "LGPL-2.1-or-later"
 SECTION = "devel/python"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4fbd65380cdd255951079008b364516c"
 
-SRC_URI[sha256sum] = "72d64574069ffb0a800020668376b7ebd7adea159adbf4d35f8effc62f0daa67"
+# The PyPI package omits files for testing
+# so use the GitHub source instead.
+SRCREV = "0735ad15fa001748dc3a13f36be2fe7a4971cf79"
+SRC_URI = " \
+    git://github.com/miurahr/pybcj;branch=main;protocol=https \
+    file://run-ptest \
+"
 
-inherit pypi python_setuptools_build_meta pypi
-
-#PROVIDES = "python3-pybcj"
+inherit python_setuptools_build_meta ptest
 
 DEPENDS += " \
     python3-setuptools-scm-native \
@@ -22,3 +26,19 @@ RDEPENDS:${PN} += "\
     python3-core \
     python3-compression \
 "
+
+RDEPENDS:${PN}-ptest += " \
+    python3-pytest \
+    python3-core \
+    python3-datetime \
+    python3-crypt \
+    python3-compression \
+    python3-hypothesis \
+    python3-unittest \
+    python3-unittest-automake-output \
+"
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+}

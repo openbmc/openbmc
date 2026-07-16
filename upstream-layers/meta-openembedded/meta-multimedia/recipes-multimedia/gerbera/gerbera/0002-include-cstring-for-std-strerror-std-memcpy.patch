@@ -1,0 +1,204 @@
+From 7caa9ae9ebf50000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 8 Jul 2026 00:00:01 +0000
+Subject: [PATCH] include <cstring> for std::strerror / std::memcpy / std::strchr
+
+Several translation units use std::strerror(), std::memcpy() and
+std::strchr() but relied on <cstring> being pulled in transitively
+through <fmt/core.h> (and other headers). With fmt 12 the fmt headers no
+longer drag in <cstring>, so the build fails with:
+
+  src/util/thread_runner.h:194:68: error: no member named 'strerror' in namespace 'std'
+  src/content/inotify/mt_inotify.cc:163:13: error: no member named 'memcpy' in namespace 'std'
+  src/util/url_utils.cc:144:24: error: no member named 'strchr' in namespace 'std'
+
+Include <cstring> explicitly in every file that uses these functions.
+
+Based on upstream gerbera commit 7caa9ae9ebf5, extended to cover all
+affected translation units in this release.
+
+Upstream-Status: Backport [https://github.com/gerbera/gerbera/commit/7caa9ae9ebf5]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/main.cc
++++ b/src/main.cc
+@@ -40,6 +40,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::server
+ 
+ #include "config/config_definition.h"
++#include <cstring>
+ #include "config/config_manager.h"
+ #include "config/config_val.h"
+ #include "config/grb_runtime.h"
+--- a/src/database/sqlite3/sqlite_database.cc
++++ b/src/database/sqlite3/sqlite_database.cc
+@@ -33,6 +33,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::sqlite3
+ 
+ #include "sqlite_database.h" // API
++#include <cstring>
+ 
+ #include "cds/cds_enums.h"
+ #include "config/config.h"
+--- a/src/database/postgres/postgres_database.cc
++++ b/src/database/postgres/postgres_database.cc
+@@ -25,6 +25,7 @@
+ 
+ #ifdef HAVE_PGSQL
+ #include "postgres_database.h" // API
++#include <cstring>
+ 
+ #include "cds/cds_enums.h"
+ #include "config/config.h"
+--- a/src/iohandler/mem_io_handler.cc
++++ b/src/iohandler/mem_io_handler.cc
+@@ -33,6 +33,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::iohandler
+ 
+ #include "mem_io_handler.h" // API
++#include <cstring>
+ 
+ #include "exceptions.h"
+ 
+--- a/src/iohandler/process_io_handler.cc
++++ b/src/iohandler/process_io_handler.cc
+@@ -33,6 +33,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::iohandler
+ 
+ #include "process_io_handler.h" // API
++#include <cstring>
+ 
+ #include "content/content.h"
+ #include "exceptions.h"
+--- a/src/iohandler/curl_io_handler.cc
++++ b/src/iohandler/curl_io_handler.cc
+@@ -34,6 +34,7 @@
+ 
+ #ifdef HAVE_CURL
+ #include "curl_io_handler.h" // API
++#include <cstring>
+ 
+ #include "config/config.h"
+ #include "exceptions.h"
+--- a/src/config/grb_runtime.cc
++++ b/src/config/grb_runtime.cc
+@@ -22,6 +22,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::server
+ 
+ #include "grb_runtime.h" // API
++#include <cstring>
+ 
+ #include "config/config.h"
+ #include "config/config_definition.h"
+--- a/src/util/grb_net.cc
++++ b/src/util/grb_net.cc
+@@ -21,6 +21,7 @@
+ /// @file util/grb_net.cc
+ #define GRB_LOG_FAC GrbLogFacility::clients
+ #include "grb_net.h" // API
++#include <cstring>
+ 
+ #include "exceptions.h"
+ #include "logger.h"
+--- a/src/util/grb_fs.cc
++++ b/src/util/grb_fs.cc
+@@ -21,6 +21,7 @@
+ /// @file util/grb_fs.cc
+ #define GRB_LOG_FAC GrbLogFacility::content
+ #include "grb_fs.h" // API
++#include <cstring>
+ 
+ #include "exceptions.h"
+ #include "util/logger.h"
+--- a/src/config/setup/config_setup_path.cc
++++ b/src/config/setup/config_setup_path.cc
+@@ -25,6 +25,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::config
+ 
+ #include "config_setup_path.h" // API
++#include <cstring>
+ 
+ #include "config/config_definition.h"
+ #include "config/config_options.h"
+--- a/src/util/thread_executor.cc
++++ b/src/util/thread_executor.cc
+@@ -32,6 +32,7 @@
+ /// @file util/thread_executor.cc
+ 
+ #include "thread_executor.h" // API
++#include <cstring>
+ 
+ #include "util/logger.h"
+ 
+--- a/src/util/thread_runner.h
++++ b/src/util/thread_runner.h
+@@ -28,6 +28,7 @@
+ 
+ #include "config/config.h"
+ #include "thread_executor.h"
++#include <cstring>
+ #include "util/logger.h"
+ 
+ #include <chrono>
+--- a/src/util/string_converter.cc
++++ b/src/util/string_converter.cc
+@@ -32,6 +32,7 @@
+ /// @file util/string_converter.cc
+ #define GRB_LOG_FAC GrbLogFacility::util
+ #include "string_converter.h" // API
++#include <cstring>
+ 
+ #include "common.h"
+ #include "config/config.h"
+--- a/src/content/inotify/mt_inotify.cc
++++ b/src/content/inotify/mt_inotify.cc
+@@ -41,6 +41,7 @@
+ 
+ #ifdef HAVE_INOTIFY
+ #include "mt_inotify.h"
++#include <cstring>
+ 
+ #include "exceptions.h"
+ #include "util/logger.h"
+--- a/src/metadata/metacontent_handler.cc
++++ b/src/metadata/metacontent_handler.cc
+@@ -25,6 +25,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::metadata
+ 
+ #include "metacontent_handler.h" // API
++#include <cstring>
+ 
+ #include "cds/cds_item.h"
+ #include "cds/cds_objects.h"
+--- a/src/transcoding/transcode_ext_handler.cc
++++ b/src/transcoding/transcode_ext_handler.cc
+@@ -33,6 +33,7 @@
+ #define GRB_LOG_FAC GrbLogFacility::transcoding
+ 
+ #include "transcode_ext_handler.h" // API
++#include <cstring>
+ 
+ #include "cds/cds_objects.h"
+ #include "config/config.h"
+--- a/src/util/tools.cc
++++ b/src/util/tools.cc
+@@ -32,6 +32,7 @@
+ /// @file util/tools.cc
+ #define GRB_LOG_FAC GrbLogFacility::content
+ #include "tools.h" // API
++#include <cstring>
+ 
+ #include "config/config.h"
+ #include "contrib/md5.h"
+--- a/src/util/url_utils.cc
++++ b/src/util/url_utils.cc
+@@ -22,6 +22,7 @@
+ /// @file util/url_utils.cc
+ #define GRB_LOG_FAC GrbLogFacility::content
+ #include "url_utils.h" // API
++#include <cstring>
+ 
+ #include "exceptions.h"
+ 
+--
+2.43.0

@@ -3,25 +3,34 @@ Subject: [PATCH] Prevent trying to donwload requierment which will cause
 
 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f1e83062ad0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /simple/setuptools-git/
 
+Dropping all setup_requires entries also avoids setuptools'
+fetch_build_eggs() code path, which enumerates every installed
+distribution in the native sysroot and crashes with
+"AttributeError: 'NoneType' object has no attribute 'lower'" when one of
+them exposes a None name under newer setuptools/Python. sphinx is only
+needed for the build_sphinx command (not run during do_compile) and is
+provided via DEPENDS, so it is safe to remove here.
+
 Upstream-Status: Inappropriate [oe specific]
 
-Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com> 
+Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
- setup.py | 1 -
- 1 file changed, 1 deletion(-)
+ setup.py | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/setup.py b/setup.py
 index 245193f..d899e4c 100755
 --- a/setup.py
 +++ b/setup.py
-@@ -92,7 +92,6 @@ setuptools.setup(
+@@ -92,8 +92,4 @@ setuptools.setup(
      exclude_package_data={'': ['.gitignore']},
      zip_safe=True,
-     setup_requires=[
+-    setup_requires=[
 -        'setuptools_git >= 0.3',
-         'sphinx',
-     ],
+-        'sphinx',
+-    ],
      install_requires=['lxml'],
--- 
+     tests_require=[],
+--
 2.43.0
 

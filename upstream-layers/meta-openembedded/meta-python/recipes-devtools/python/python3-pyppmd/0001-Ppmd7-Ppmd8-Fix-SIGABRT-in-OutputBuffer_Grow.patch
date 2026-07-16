@@ -1,0 +1,70 @@
+From f9c6a0549503f00a1ab0ad58a98a30ee99b96770 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Thu, 9 Jul 2026 11:37:04 +0000
+Subject: [PATCH] Ppmd7/Ppmd8: Fix SIGABRT in OutputBuffer_Grow
+
+The decode loop could abort in OutputBuffer_Grow() when a resumed
+decode thread wrote past the current call's max_length. Stop early
+once that limit is reached instead of trying to grow the buffer
+further.
+
+Also fix Ppmd8Decoder_decode because it never updated needs_input
+when input was fully consumed, unlike Ppmd7.
+
+Fixes test_ppmd7_decode_chunks and the equivalent Ppmd8 case,
+which previously aborted deterministically partway through decoding
+testdata2.ppmd in small chunks.
+
+This work was sponsored by GOVCERT.LU.
+
+Upstream-Status: Pending [https://github.com/miurahr/pyppmd/pull/131/]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ src/ext/_ppmdmodule.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/src/ext/_ppmdmodule.c b/src/ext/_ppmdmodule.c
+index dafa1c5..94f7f18 100644
+--- a/src/ext/_ppmdmodule.c
++++ b/src/ext/_ppmdmodule.c
+@@ -531,6 +531,12 @@ Ppmd7Decoder_decode(Ppmd7Decoder *self,  PyObject *args, PyObject *kwargs) {
+             break;
+         }
+         if (out->pos == out->size) {
++            /* Already reached max_length for this call; stop instead of
++               growing (avoids rest<=0 assert in OutputBuffer_Grow) */
++            if (self->blocksOutputBuffer->max_length >= 0 &&
++                self->blocksOutputBuffer->allocated >= self->blocksOutputBuffer->max_length) {
++                break;
++            }
+             if (OutputBuffer_Grow(self->blocksOutputBuffer, out) < 0) {
+                 PyErr_SetString(PyExc_ValueError, "No Memory.");
+                 goto error;
+@@ -1276,6 +1282,11 @@ Ppmd8Decoder_decode(Ppmd8Decoder *self,  PyObject *args, PyObject *kwargs) {
+              break;  // filled expected
+         }
+         if (out->pos == out->size) {
++            /* Same guard as for Ppmd7Decoder_decode() above */
++            if (self->blocksOutputBuffer->max_length >= 0 &&
++                self->blocksOutputBuffer->allocated >= self->blocksOutputBuffer->max_length) {
++                break;
++            }
+             if (OutputBuffer_Grow(self->blocksOutputBuffer, out) < 0) {
+                 PyErr_SetString(PyExc_ValueError, "L1586: Unknown status");
+                 goto error;
+@@ -1303,6 +1314,11 @@ Ppmd8Decoder_decode(Ppmd8Decoder *self,  PyObject *args, PyObject *kwargs) {
+             self->in_begin = 0;
+             self->in_end = 0;
+         }
++        if (self->eof) {
++            self->needs_input = False;
++        } else {
++            self->needs_input = True;
++        }
+     } else {
+         const size_t data_size = in->size - in->pos;
+         self->needs_input = False;
+-- 
+2.47.3
+

@@ -1,0 +1,37 @@
+From 22020dc444aaf3f98dc40f38c0a8aad48476db8f Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Wed, 8 Jul 2026 11:45:11 +0000
+Subject: [PATCH] pyproject.toml: Do not strip
+
+Switch from Release to RelWithDebInfo and explicitly disable
+scikit-build-core's strip, so bitbake will handle it Fixes:
+
+WARNING: python3-pikepdf-10.9.1-r0 do_populate_sysroot: File
+'/usr/lib/python3.14/site-packages/pikepdf/_core.abi3.so' from
+python3-pikepdf was already stripped, this will prevent future
+debugging!
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pyproject.toml | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/pyproject.toml b/pyproject.toml
+index 06ccfbb..475af59 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -7,7 +7,8 @@ build-backend = "scikit_build_core.build"
+ 
+ [tool.scikit-build]
+ wheel.packages = ["src/pikepdf"]
+-cmake.build-type = "Release"
++cmake.build-type = "RelWithDebInfo"
++install.strip = false
+ wheel.py-api = "cp314"
+ 
+ [project]
+-- 
+2.47.3
+

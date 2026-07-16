@@ -4,11 +4,30 @@ SECTION = "devel/python"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=a23813181e06852d377bc25ae5563a97"
 
-SRC_URI[sha256sum] = "9983076bcc7e34402a1a9e4d7dabf3729411fd2abb3f3b4be7eba73519cd2ed1"
+# The PyPI package omits files for testing
+# so use the GitHub source instead.
+SRCREV = "0cf3055ccaf583a00a7a3a049f85a7c58dfd8884"
+SRC_URI = " \
+    git://github.com/rr-/screeninfo;branch=master;protocol=https \
+    file://run-ptest \
+"
 
-inherit pypi python_poetry_core
+inherit python_poetry_core ptest
 
 RDEPENDS:${PN} += "\
     python3-core \
     python3-profile \
 "
+
+RDEPENDS:${PN}-ptest += " \
+    python3-pytest \
+    python3-core \
+    python3-unittest \
+    python3-unittest-automake-output \
+"
+
+do_install_ptest() {
+    install -d ${D}${PTEST_PATH}/tests
+    cp -rf ${S}/tests/* ${D}${PTEST_PATH}/tests/
+    cp -f ${S}/README.md ${D}${PTEST_PATH}/
+}
