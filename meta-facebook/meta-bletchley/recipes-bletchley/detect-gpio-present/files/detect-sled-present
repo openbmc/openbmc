@@ -27,6 +27,46 @@ unbind_i2c_driver()
     fi
 }
 
+LEDS_GPIO_DRV="/sys/bus/platform/drivers/leds-gpio"
+
+# The sled LED expander is second-sourced: a PCA9552 at 0x67 or a
+# PCA9532 at 0x66. The kernel rejects probe of the absent variant
+# (leds-pca9532 phantom-probe fix), so a plain bind attempt doubles
+# as presence detection; no i2cget probing is needed.
+bind_pca95xx_led()
+{
+    local bus=$1
+    local node="sled${SLED_ID}_gpio_leds"
+    local attempt
+
+    # Drop any stale binding left from a previously inserted sled of
+    # either variant (consumers first, then the expanders).
+    echo "${node}_alt" > "${LEDS_GPIO_DRV}/unbind" 2>/dev/null
+    echo "${node}" > "${LEDS_GPIO_DRV}/unbind" 2>/dev/null
+    unbind_i2c_driver "${bus}-0066" "leds-pca953x"
+    unbind_i2c_driver "${bus}-0067" "leds-pca955x"
+
+    # Bind whichever variant probes. The explicit leds-gpio bind below
+    # may race with deferred probe re-binding the node; the consumer
+    # starts from a fresh bind either way, so EBUSY here is harmless.
+    for attempt in 1 2 3; do
+        if bind_i2c_driver "${bus}-0067" "leds-pca955x" 2>/dev/null; then
+            echo "SLED${SLED_ID}: PCA9552 LED expander bound"
+            echo "${node}" > "${LEDS_GPIO_DRV}/bind" 2>/dev/null
+            return 0
+        fi
+        if bind_i2c_driver "${bus}-0066" "leds-pca953x" 2>/dev/null; then
+            echo "SLED${SLED_ID}: PCA9532 LED expander bound"
+            echo "${node}_alt" > "${LEDS_GPIO_DRV}/bind" 2>/dev/null
+            return 0
+        fi
+        [ "$attempt" -lt 3 ] && sleep 0.2
+    done
+
+    echo "SLED${SLED_ID}: no LED expander responded on bus ${bus}"
+    return 1
+}
+
 sled_insert_action()
 {
     SLED_ID=$1
@@ -51,8 +91,8 @@ sled_insert_action()
     # 004f: tmp421
     bind_i2c_driver "${I2C_BUS_NUM}-004f" "tmp421"
 
-    # 0067: pca9552
-    bind_i2c_driver "${I2C_BUS_NUM}-0067" "leds-pca955x"
+    # 0067: pca9552 / 0066: pca9532 (second source)
+    bind_pca95xx_led "${I2C_BUS_NUM}"
 
     # 0054: 24c64
     bind_i2c_driver "${I2C_BUS_NUM}-0054" "at24"
