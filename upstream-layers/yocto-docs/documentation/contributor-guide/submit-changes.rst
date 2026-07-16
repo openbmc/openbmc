@@ -447,7 +447,7 @@ it if you haven't done it yet.
 If you attempt to send patches to a list you haven't subscribed to, your email
 will be returned as undelivered.
 
-However, if you don't want to be receive all the messages sent to a mailing list,
+However, if you don't want to receive all the messages sent to a mailing list,
 you can set your subscription to "no email". You will still be a subscriber able
 to send messages, but you won't receive any e-mail. If people reply to your message,
 their e-mail clients will default to including your email address in the

@@ -2679,7 +2679,7 @@ system and gives an overview of their function and contents.
    :term:`EFI_ARCH`
       The CPU architecture name within EFI standard. Set in
       :oe_git:`meta/conf/image-uefi.conf
-      <openembedded-core/tree/meta/conf/image-uefi.conf>`.
+      </openembedded-core/tree/meta/conf/image-uefi.conf>`.
 
    :term:`EFI_PROVIDER`
       When building bootable images (i.e. where ``hddimg``, ``iso``, or
@@ -3786,7 +3786,7 @@ system and gives an overview of their function and contents.
             source $loadaddr#bootscr-boot.cmd
 
       More information can be found in the official U-Boot documentation:
-      `U-Boot source command <https://docs.u-boot.org/en/latest/usage/cmd/source.html#fit-image.f>`__
+      `U-Boot source command <https://docs.u-boot.org/en/latest/usage/cmd/source.html#fit-image>`__
 
    :term:`FONT_EXTRA_RDEPENDS`
       When inheriting the :ref:`ref-classes-fontcache` class,
@@ -3953,7 +3953,7 @@ system and gives an overview of their function and contents.
          GROUPADD_PARAM:${PN} = "-g 880 group1; -g 890 group2"
 
       For information on the standard Linux shell command
-      ``groupadd``, see https://linux.die.net/man/8/groupadd.
+      ``groupadd``, see :manpage:`groupadd(8)`.
 
    :term:`GROUPMEMS_PARAM`
       Deprecated in favor of :term:`USERMOD_PARAMS`. See
@@ -5031,7 +5031,7 @@ system and gives an overview of their function and contents.
 
       You can also find more information by referencing the
       ``conf/templates/default/local.conf.sample.extended``
-      configuration file in :yocto_git:`meta-poky <meta-yocto/tree/meta-poky>`, the :ref:`ref-classes-image`
+      configuration file in :yocto_git:`meta-poky </meta-yocto/tree/meta-poky>`, the :ref:`ref-classes-image`
       class, and the :ref:`ref-classes-kernel` class to see how to use the
       :term:`INITRAMFS_IMAGE` variable.
 
@@ -5603,17 +5603,18 @@ system and gives an overview of their function and contents.
       information.
 
    :term:`KERNEL_IMAGE_MAXSIZE`
-      Specifies the maximum size of the kernel image file in kilobytes. If
-      :term:`KERNEL_IMAGE_MAXSIZE` is set, the size of the kernel image file is
-      checked against the set value during the
-      :ref:`ref-tasks-sizecheck` task. The task fails if
-      the kernel image file is larger than the setting.
+      Specifies the maximum allowable size of the kernel image file in kibibytes.
+      If this variable is set, the sizes of all of the kernel image files listed
+      in :term:`KERNEL_IMAGETYPES` are checked against this value during the
+      :ref:`ref-tasks-sizecheck` task. That task will warn about any of the
+      kernel images that exceed the maximum, and will fail only if all images
+      are too large.
 
       :term:`KERNEL_IMAGE_MAXSIZE` is useful for target devices that have a
       limited amount of space in which the kernel image must be stored.
 
       By default, this variable is not set, which means the size of the
-      kernel image is not checked.
+      kernel images are not checked.
 
    :term:`KERNEL_IMAGE_NAME`
       The base name of the kernel image. This variable is set in the
@@ -5622,6 +5623,13 @@ system and gives an overview of their function and contents.
          KERNEL_IMAGE_NAME ?= "${KERNEL_ARTIFACT_NAME}"
 
       See :term:`KERNEL_ARTIFACT_NAME` for additional information.
+
+   :term:`KERNEL_IMAGE_STRIP_EXTRA_SECTIONS`
+      If this variable is set, it should contain the sections to be
+      stripped from the ``vmlinux`` image by the kernel-related
+      :ref:`ref-tasks-strip` task. As a simple example::
+
+         KERNEL_IMAGE_STRIP_EXTRA_SECTIONS = ".comment .note.* .debug"
 
    :term:`KERNEL_IMAGETYPE`
       The type of kernel to build for a device, usually set by the machine
@@ -6103,6 +6111,13 @@ system and gives an overview of their function and contents.
       :ref:`overview-manual/concepts:Package Splitting`. The list
       contains ``${datadir}/locale`` by default.
 
+   :term:`LOCALE_UTF8_IS_DEFAULT`
+      If set, locale names are renamed such that those lacking an explicit
+      encoding (e.g. ``en_US``) will always be UTF-8, and non-UTF-8 encodings
+      are renamed to, e.g., ``en_US.ISO-8859-1``. Otherwise, the encoding is
+      specified by `Glibc`'s ``SUPPORTED`` file. This is not supported for
+      pre-compiled locales.
+
    :term:`LOG_DIR`
       Specifies the directory to which the OpenEmbedded build system writes
       overall log files. The default directory is ``${TMPDIR}/log``.
@@ -6428,7 +6443,7 @@ system and gives an overview of their function and contents.
       See the :term:`KERNEL_MODULE_AUTOLOAD` variable for more information.
 
    :term:`module_conf`
-      Specifies `modprobe.d <https://linux.die.net/man/5/modprobe.d>`__
+      Specifies :manpage:`modprobe.d(5)`
       syntax lines for inclusion in the ``/etc/modprobe.d/modname.conf``
       file.
 
@@ -12233,7 +12248,7 @@ system and gives an overview of their function and contents.
 
       For more information, see
       ``conf/templates/default/local.conf.sample`` in
-      :yocto_git:`meta-poky <meta-yocto/tree/meta-poky>`.
+      :yocto_git:`meta-poky </meta-yocto/tree/meta-poky>`.
 
    :term:`USERADD_DEPENDS`
       Specifies a list of recipes that create users / groups (via
@@ -12325,7 +12340,7 @@ system and gives an overview of their function and contents.
 
       For information on the
       standard Linux shell command ``useradd``, see
-      https://linux.die.net/man/8/useradd.
+      :manpage:`useradd(8)`.
 
    :term:`USERADD_UID_TABLES`
       Specifies a password file to use for obtaining static user

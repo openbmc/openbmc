@@ -77,7 +77,7 @@ Default :term:`INIT_MANAGER` definition changed to ``systemd``
 --------------------------------------------------------------
 
 The default definition of :term:`INIT_MANAGER` in the :oe_git:`defaultsetup.conf
-<openembedded-core/tree/meta/conf/distro/defaultsetup.conf>` file was changed
+</openembedded-core/tree/meta/conf/distro/defaultsetup.conf>` file was changed
 from ``none`` to ``systemd``.
 
 This means that users of the default distro setup (appearing as the ``nodistro``
@@ -243,7 +243,7 @@ See commit :oecore_rev:`cd9e7304481b24b27df61c03ad73496d18e4d47c` for more infor
 
 All the :ref:`ref-classes-pkgconfig`-related variables, such as
 :term:`PKG_CONFIG_PATH`, are no longer exported in
-:oe_git:`meta/conf/bitbake.conf <bitbake/tree/meta/conf/bitbake.conf>` with the
+:oe_git:`meta/conf/bitbake.conf </bitbake/tree/meta/conf/bitbake.conf>` with the
 :ref:`export <bitbake:bitbake-user-manual/bitbake-user-manual-metadata:Exporting
 Variables to the Environment>` directive.
 

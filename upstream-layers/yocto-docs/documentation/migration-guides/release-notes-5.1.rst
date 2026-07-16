@@ -38,7 +38,7 @@ New Features / Enhancements in 5.1
 
 -  QEMU / ``runqemu`` changes:
 
-   -  runqemu: ``QB_DRIVE_TYPE`` now support for sd card (``/dev/mmcblk``)
+   -  runqemu: ``QB_DRIVE_TYPE`` now supports sd card (``/dev/mmcblk``)
 
    -  Trigger ``write_qemuboot_conf`` task on changes of kernel image realpath
       (:term:`KERNEL_IMAGE_NAME`).
@@ -166,7 +166,7 @@ New Features / Enhancements in 5.1
 
    -  ``fetcher2``: remote name for ``git://`` is now ``origin`` by default.
 
-   -  Codeparser now support shell substitution in quotes, for example::
+   -  Codeparser now supports shell substitution in quotes, for example::
 
          var1="$(cmd1 ...)"
 
@@ -318,7 +318,7 @@ New Features / Enhancements in 5.1
       -  ``systemd``: bpf-framework
       -  ``util-linux``: libmount-mountfd-support
 
-   -  Stop referring :term:`WORKDIR` for :term:`S` and :term:`B` and trigger
+   -  Stop referring to :term:`WORKDIR` for :term:`S` and :term:`B` and trigger
       :ref:`ref-classes-insane` errors when :term:`S` or :term:`B` are equal to
       :term:`WORKDIR`.
 
@@ -363,7 +363,7 @@ New Features / Enhancements in 5.1
       ``/etc/gitconfig`` for :ref:`ref-classes-native` recipes.
 
    -  The ``apt-native`` recipe, used to compile ``dpkg`` and handle ``deb``
-      packages, was modified to avoid files being overriden by other packages when
+      packages, was modified to avoid files being overridden by other packages when
       they share common files. Instead, prompt an error.
 
    -  The :ref:`ref-tasks-savedefconfig` was moved from the u-boot and kernel

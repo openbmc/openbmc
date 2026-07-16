@@ -294,7 +294,7 @@ This documentation was built for the &DISTRO_NAME; release.
    Policies on testing these layers depend on how widespread their usage is and
    determined on a case-by-case basis. You can find some :term:`Mixin` layers in the
    :yocto_git:`meta-lts-mixins </meta-lts-mixins>` repository. While the Yocto
-   Project provides hosting for those repositories, it does not provides
+   Project provides hosting for those repositories, it does not provide
    testing on them. Other :term:`Mixin` layers may be released elsewhere by the wider
    community.
 
@@ -369,7 +369,7 @@ that all of the main supposed architectures and recipes in OE-Core
 successfully build and behave properly.
 
 Various features such as ``multilib``, sub architectures (e.g. ``x32``,
-``poky-tiny``, ``musl``, ``no-x11`` and and so forth),
+``poky-tiny``, ``musl``, ``no-x11`` and so forth),
 ``bitbake-selftest``, and ``oe-selftest`` are tested as part of the QA
 process of a release. Complete testing and validation for a release
 takes the Autobuilder workers several hours.

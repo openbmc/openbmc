@@ -225,20 +225,20 @@ New Features / Enhancements in |yocto-ver|
       (:oecore_rev:`722897f96d30e978b20e140419fb044d850f5c74`)
 
    -  The :oe_git:`no-static-libs.inc
-      <openembedded-core/tree/meta/conf/distro/include/no-static-libs.inc>`
+      </openembedded-core/tree/meta/conf/distro/include/no-static-libs.inc>`
       file, disabling most static libraries in various recipes, is now included
       by default in the default distro setup (appearing as the ``nodistro``
       :term:`DISTRO`) (:oecore_rev:`03fc931bfe9ea3fa9f33553e6020cbc067b24291`)
 
    -  The :oe_git:`security_flags.inc
-      <openembedded-core/tree/meta/conf/distro/include/security_flags.inc>`
+      </openembedded-core/tree/meta/conf/distro/include/security_flags.inc>`
       file, adding various security related flags to the default compiler and
       linker, is now included by default in the default distro setup (appearing
       as ``nodistro`` :term:`DISTRO`)
       (:oecore_rev:`4c2d64c10a5b0437ab1ea04df22386f0f95124d1`)
 
    -  The :oe_git:`yocto-space-optimize.inc
-      <openembedded-core/tree/meta/conf/distro/include/yocto-space-optimize.inc>`
+      </openembedded-core/tree/meta/conf/distro/include/yocto-space-optimize.inc>`
       file, adding various space optimization tweaks, is now included by default
       in the default distro setup (appearing as ``nodistro`` :term:`DISTRO`)
       (:oecore_rev:`175fcf9fad699dd122680d3f6961af9bf8487046`)

@@ -89,6 +89,16 @@ generated with DocBook.
 How to build the Yocto Project documentation
 ============================================
 
+If possible, install pre-commit hooks to make sure you did not miss any
+updates that are run automatically:
+
+  $ pre-commit install
+
+The pre-commit project can be installed on your host using your package manager,
+usually under the name "pre-commit", e.g.:
+
+  $ sudo apt-get install pre-commit
+
 To build the documentation, you need Sphinx and a few other packages,
 which depend on your host GNU/Linux distribution. Such packages are listed on
 https://docs.yoctoproject.org/dev/ref-manual/system-requirements.html#required-packages-for-the-build-host

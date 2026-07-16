@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-glossaries
+        name: Check glossaries alphabetical order
+        entry: ./documentation/tools/check-glossaries
+        language: python
+        pass_filenames: false

@@ -350,7 +350,7 @@ commands.
 .. note::
 
    -  For more information on Git, see
-      https://git-scm.com/documentation.
+      https://git-scm.com/docs.
 
    -  If you need to download Git, it is recommended that you add Git to
       your system through your distribution's "software store" (e.g. for
@@ -474,7 +474,7 @@ you can manage with a small set of basic operations and workflows once
 you understand the basic philosophy behind Git. You do not have to be an
 expert in Git to be functional. A good place to look for instruction on
 a minimal set of Git commands is
-`here <https://git-scm.com/documentation>`__.
+`here <https://git-scm.com/docs>`__.
 
 The following list of Git commands briefly describes some basic Git
 operations as a way to get started. As with any set of commands, this

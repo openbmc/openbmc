@@ -217,7 +217,7 @@ New Features / Enhancements in 5.0
       state directory (i.e., ``/run``).
 
    -  Allow to disable colored text output through the
-      `NO_COLOR <https://no-color.org/>`__ environment variable.
+      ``NO_COLOR`` environment variable.
 
    -  ``git-make-shallow`` script: add support for Git's ``safe.bareRepository=explicit``
       configuration setting.
@@ -268,7 +268,7 @@ New Features / Enhancements in 5.0
 
 -  Packaging changes:
 
-   -  ``package_rpm``: the RPM package compressor's mode can now be overriden.
+   -  ``package_rpm``: the RPM package compressor's mode can now be overridden.
 
    -  ipk packaging (using ``opkg``) now uses ``zstd`` compression instead of
       ``xz`` for better compression and performance.

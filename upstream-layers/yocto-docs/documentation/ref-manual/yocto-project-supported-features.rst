@@ -72,7 +72,7 @@ Below is a list of primary tested features, their maintainer(s) and builder(s):
      - Buildtools generation
      - Collective effort
      - buildtools
-   * - `meta-agl-core <https://gerrit.automotivelinux.org/gerrit/AGL/meta-agl>`__
+   * - `meta-agl-core <https://git.automotivelinux.org/AGL/meta-agl/>`__
      - meta-agl-core layer testing
      - TBD
      - meta-agl-core

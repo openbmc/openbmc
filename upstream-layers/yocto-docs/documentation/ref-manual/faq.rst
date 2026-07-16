@@ -22,7 +22,7 @@ System` and :term:`BitBake`. The :term:`metadata` involved to build the
 -  :term:`OpenEmbedded-Core (OE-Core)`, which is hosted at
    :oe_git:`/openembedded-core`.
 
--  :yocto_git:`meta-poky <meta-yocto/tree/meta-poky>`, which defines the
+-  :yocto_git:`meta-poky </meta-yocto/tree/meta-poky>`, which defines the
    ``poky`` distro configuration file (:term:`DISTRO`).
 
 .. note::

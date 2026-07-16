@@ -837,7 +837,7 @@ different ways:
 -  *systemd:* System Management Daemon (systemd) was designed to replace
    SysVinit and to provide enhanced management of services. For more
    information on systemd, see the systemd homepage at
-   https://freedesktop.org/wiki/Software/systemd/.
+   https://systemd.io/.
 
    To enable a service using systemd, your recipe needs to inherit the
    :ref:`ref-classes-systemd` class. See the ``systemd.bbclass`` file

@@ -2,8 +2,8 @@
 
 import argparse
 import difflib
-import os
 import re
+import sys
 
 from pathlib import Path
 
@@ -13,7 +13,7 @@ def parse_arguments() -> argparse.Namespace:
 
     parser.add_argument("-d", "--docs-dir",
                         type=Path,
-                        default=Path(os.path.dirname(os.path.realpath(__file__))) / "documentation",
+                        default=Path(__file__).resolve().parent.parent,
                         help="Path to documentation/ directory in yocto-docs")
 
     return parser.parse_args()
@@ -33,6 +33,7 @@ def main():
     # :term:`A <ABIEXTENSION>` :term:`B` :term:`C <CACHE>`
     glossary_re = re.compile(r":term:`(?P<letter>[A-Z]{1})( <(?P<varname>[A-Z_]+)>)?`")
     entry_re = re.compile(r"^   :term:`(?P<entry>.+)`\s*$")
+    exit_code = 0
 
     for rst in glossaries:
 
@@ -74,6 +75,7 @@ def main():
         if diffs:
             print(f"WARNING: {rst}: entries are not properly sorted:")
             print('\n'.join(diffs))
+            exit_code = 1
 
         for letter in glossary:
             try:
@@ -81,9 +83,13 @@ def main():
             except ValueError:
                 print(f"WARNING: {rst}: variable "
                       f"{glossary[letter]} in glossary does not exist")
+                exit_code = 1
             if index > 0 and entries[index - 1].startswith(letter[0]):
                 print(f"WARNING: {rst}: The variable {glossary[letter]} shouldn't be in "
                      "the glossary.")
+                exit_code = 1
+
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

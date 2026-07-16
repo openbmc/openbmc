@@ -561,7 +561,7 @@ New Features / Enhancements in |yocto-ver|
       :term:`IMAGE_EXTRA_PARTITION_FILES` variable for more information.
 
    -  The ``--diskid`` option was added to allow passing a :wikipedia:`MS-DOS
-      </MS-DOS>` or :wikipedia:`GPT <GUID_Partition_Table>`-formatted
+      <MS-DOS>` or :wikipedia:`GPT <GUID_Partition_Table>`-formatted
       disk IDs for a partition (for example: ``deadbeef-cafe-babe-f00d-cec2ea4eface``).
 
 -  SDK-related changes:

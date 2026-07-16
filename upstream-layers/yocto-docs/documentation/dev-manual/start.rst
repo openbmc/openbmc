@@ -367,7 +367,7 @@ as your Yocto Project build host:
    Depending on your build host, you might have to install different
    software to support Docker containers. Go to the Docker installation
    page and read about the platform requirements in "`Supported
-   Platforms <https://docs.docker.com/engine/install/#supported-platforms>`__"
+   Platforms <https://docs.docker.com/engine/install/#installation-procedures-for-supported-platforms>`__"
    your build host needs to run containers.
 
 #. *Choose What To Install:* Depending on whether or not your build host
