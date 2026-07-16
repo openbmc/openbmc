@@ -1,4 +1,4 @@
-From 6ec23f12926c93746fdd30a9b5547a76878c9a4c Mon Sep 17 00:00:00 2001
+From 01b76242ff5a63c267faa58fbe64bb71038f6d6e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 27 Oct 2015 16:02:19 +0200
 Subject: [PATCH] FindGObjectIntrospection.cmake: prefix variables obtained

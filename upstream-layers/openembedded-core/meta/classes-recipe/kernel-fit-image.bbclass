@@ -55,6 +55,13 @@ FIT_KERNEL_SIGN_ENABLE ?= "${UBOOT_SIGN_ENABLE}"
 FIT_KERNEL_SIGN_KEYNAME ?= "${UBOOT_SIGN_KEYNAME}"
 FIT_KERNEL_SIGN_KEYDIR ?= "${UBOOT_SIGN_KEYDIR}"
 
+def apply_dtbvendored(d,dtb):
+    if d.getVar('KERNEL_DTBVENDORED') != "1":
+        mapped_name = os.path.basename(dtb)
+    else:
+        mapped_name = dtb.replace('/', '_')
+    return mapped_name
+
 python do_compile() {
     import shutil
     import oe.fitimage
@@ -97,10 +104,7 @@ python do_compile() {
             # With vendored DTs, use the DT name as listed in KERNEL_DEVICETREE
             # and replace any path separators with underscores, this behaves the
             # same way as KERNEL_DTBVENDORED = "1" did in OE 5.0 and older.
-            if d.getVar('KERNEL_DTBVENDORED') != "1":
-                conf_name = dtb_name
-            else:
-                conf_name = dtb.replace('/', '_')
+            conf_name = apply_dtbvendored(d, dtb)
 
             # Skip DTB if it's also provided in EXTERNAL_KERNEL_DEVICETREE directory
             if external_kernel_devicetree:
@@ -195,8 +199,15 @@ python do_compile() {
                                                  loadable_loadaddress,
                                                  loadable_entrypoint)
 
+    # Figure out if we have a default dtb and if we need to honor the
+    # KERNEL_DTBVENDORED variable to tweak the name to match what will be
+    # in the fitImage.
+    default_dtb = d.getVar("FIT_CONF_DEFAULT_DTB")
+    if default_dtb:
+        default_dtb = apply_dtbvendored(d, default_dtb)
+
     # Generate the configuration section
-    root_node.fitimage_emit_section_config(d.getVar("FIT_CONF_DEFAULT_DTB"), d.getVar("FIT_CONF_MAPPINGS"))
+    root_node.fitimage_emit_section_config(default_dtb, d.getVar("FIT_CONF_MAPPINGS"))
 
     # Write the its file
     root_node.write_its_file(itsfile)

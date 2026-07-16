@@ -27,6 +27,7 @@ SRC_URI = "https://sourceware.org/pub/${BPN}/${BPN}-${PV}.tar.gz \
            file://Makefile.am;subdir=${BP} \
            file://run-ptest \
            file://0001-fix-bzip2-version-tmp-aaa-will-hang.patch;subdir=${BP} \
+           file://CVE-2026-42250.patch;subdir=${BP} \
            "
 SRC_URI[sha256sum] = "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
 

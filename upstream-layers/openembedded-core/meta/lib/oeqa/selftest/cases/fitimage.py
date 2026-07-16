@@ -107,7 +107,7 @@ class FitImageTestCase(OESelftestTestCase):
     _MACHINE_SETTINGS = {
         "qemuarm": {
             "KERNEL_DEVICETREE": "arm/versatile-pb.dtb arm/versatile-ab.dtb",
-            "FIT_CONF_DEFAULT_DTB": "versatile-pb.dtb",
+            "FIT_CONF_DEFAULT_DTB": "arm/versatile-pb.dtb",
             "UBOOT_MACHINE": "am57xx_evm_defconfig",
             "UBOOT_DTB_BINARY": "u-boot.dtb",
             "UBOOT_ARCH": "arm",
@@ -117,7 +117,7 @@ class FitImageTestCase(OESelftestTestCase):
         },
         "qemuarm64": {
             "KERNEL_DEVICETREE": "arm/foundation-v8.dtb",
-            "FIT_CONF_DEFAULT_DTB": "foundation-v8.dtb",
+            "FIT_CONF_DEFAULT_DTB": "arm/foundation-v8.dtb",
             "UBOOT_MACHINE": "pine64_plus_defconfig",
             "UBOOT_DTB_BINARY": "u-boot.dtb",
             "UBOOT_ARCH": "arm64",
@@ -425,6 +425,16 @@ class FitImageTestCase(OESelftestTestCase):
         return a_comment
 
     @staticmethod
+    def _apply_dtbvendored(bb_vars,dtb):
+        """ This is (and should remain) the same logic that is in kernel-fit-image.bbclass
+        """
+        if bb_vars.get('KERNEL_DTBVENDORED') != "1":
+            mapped_name = os.path.basename(dtb)
+        else:
+            mapped_name = dtb.replace('/', '_')
+        return mapped_name
+
+    @staticmethod
     def _get_dtb_files(bb_vars):
         """Return a list of devicetree names
 
@@ -436,7 +446,7 @@ class FitImageTestCase(OESelftestTestCase):
         all_dtbs = []
         dtb_symlinks = []
         if kernel_devicetree:
-            all_dtbs += [os.path.basename(dtb) for dtb in kernel_devicetree.split()]
+            all_dtbs += [FitImageTestCase._apply_dtbvendored(bb_vars, dtb) for dtb in kernel_devicetree.split()]
         # Support only the test recipe which provides 1 devicetree and 1 devicetree overlay
         pref_prov_dtb = bb_vars.get('PREFERRED_PROVIDER_virtual/dtb')
         if pref_prov_dtb == "test-dtbs-as-ext":
@@ -678,6 +688,7 @@ class KernelFitImageBase(FitImageTestCase):
             'INITRAMFS_IMAGE',
             'KERNEL_DEPLOYSUBDIR',
             'KERNEL_DEVICETREE',
+            'KERNEL_DTBVENDORED',
             'KERNEL_FIT_LINK_NAME',
             'MACHINE',
             'PREFERRED_PROVIDER_virtual/dtb',
@@ -918,7 +929,7 @@ class KernelFitImageBase(FitImageTestCase):
         fit_conf_default_dtb = bb_vars.get('FIT_CONF_DEFAULT_DTB')
         if fit_conf_default_dtb:
             fit_conf_prefix = bb_vars.get('FIT_CONF_PREFIX', "conf-")
-            its_field_check.append('default = "' + fit_conf_prefix + fit_conf_default_dtb + '";')
+            its_field_check.append('default = "' + fit_conf_prefix + self._apply_dtbvendored(bb_vars, fit_conf_default_dtb) + '";')
 
         # configuration nodes (one per DTB and also one per symlink)
         dtb_files, dtb_symlinks = FitImageTestCase._get_dtb_files(bb_vars)
@@ -1438,6 +1449,42 @@ FIT_HASH_ALG = "sha256"
         self.write_config(config)
         bb_vars = self._fit_get_bb_vars()
         self._gen_signing_key(bb_vars)
+        self._gen_atf_tee_dummy_images(bb_vars)
+        self._test_fitimage(bb_vars)
+
+    def test_vendored_dtb_without_kernel_dtbvendored(self):
+        """
+        Summary:     Check if FIT image and Image Tree Source (its) are created correctly with KERNEL_DTBVENDORED turned off.
+        Expected:    1) its and FIT image are built successfully
+                     2) Dumping the FIT image indicates the devicetree overlay
+        """
+        machine = self._get_machine_or_skip()
+        config = """
+KERNEL_DTBVENDORED = "0"
+"""
+        config = FitImageTestCase._config_add_machine_settings(config, machine, keys=["KERNEL_DEVICETREE", "UBOOT_MACHINE", "UBOOT_DTB_BINARY", "UBOOT_ARCH"])
+        config = self._config_add_kernel_classes(config)
+        config = self._config_add_uboot_env(config)
+        self.write_config(config)
+        bb_vars = self._fit_get_bb_vars()
+        self._gen_atf_tee_dummy_images(bb_vars)
+        self._test_fitimage(bb_vars)
+
+    def test_vendored_dtb_with_kernel_dtbvendored(self):
+        """
+        Summary:     Check if FIT image and Image Tree Source (its) are created correctly with KERNEL_DTBVENDORED turned on.
+        Expected:    1) its and FIT image are built successfully
+                     2) Dumping the FIT image indicates the devicetree overlay
+        """
+        machine = self._get_machine_or_skip()
+        config = """
+KERNEL_DTBVENDORED = "1"
+"""
+        config = FitImageTestCase._config_add_machine_settings(config, machine, keys=["KERNEL_DEVICETREE", "UBOOT_MACHINE", "UBOOT_DTB_BINARY", "UBOOT_ARCH"])
+        config = self._config_add_kernel_classes(config)
+        config = self._config_add_uboot_env(config)
+        self.write_config(config)
+        bb_vars = self._fit_get_bb_vars()
         self._gen_atf_tee_dummy_images(bb_vars)
         self._test_fitimage(bb_vars)
 

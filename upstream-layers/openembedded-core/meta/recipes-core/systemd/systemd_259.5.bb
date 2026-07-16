@@ -266,7 +266,7 @@ do_install() {
 			sed -i -e 's#/root#${ROOT_HOME}#g' ${D}${exec_prefix}/lib/sysusers.d/basic.conf
 		fi
 	fi
-	install -d ${D}/${base_sbindir}
+	install -d ${D}${base_sbindir} ${D}${servicedir}
 
 	if ! ${@bb.utils.contains('PACKAGECONFIG', 'serial-getty-generator', 'true', 'false', d)}; then
 		# Remove the serial-getty generator and instead use explicit services
@@ -330,9 +330,9 @@ do_install() {
 		echo 'f /run/systemd/resolve/resolv.conf 0644 root root' >>${D}${exec_prefix}/lib/tmpfiles.d/systemd.conf
 		ln -s ../run/systemd/resolve/resolv.conf ${D}${sysconfdir}/resolv-conf.systemd
 	else
-		resolv_conf="${@bb.utils.contains('RESOLV_CONF', 'stub-resolv', 'run/systemd/resolve/stub-resolv.conf', 'run/systemd/resolve/resolv.conf', d)}"
-		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - ../${resolv_conf}%g" ${D}${exec_prefix}/lib/tmpfiles.d/systemd-resolve.conf
-		ln -s ../${resolv_conf} ${D}${sysconfdir}/resolv-conf.systemd
+		rc="../run/systemd/resolve/${@bb.utils.contains('RESOLV_CONF', 'stub-resolv', 'stub-', '', d)}resolv.conf"
+		sed -i -e "s%^L! /etc/resolv.conf.*$%L! /etc/resolv.conf - - - - $rc%" ${D}${exec_prefix}/lib/tmpfiles.d/systemd-resolve.conf
+		ln -s $rc ${D}${sysconfdir}/resolv-conf.systemd
 	fi
 	if ${@bb.utils.contains('DISTRO_FEATURES', 'x11', 'false', 'true', d)}; then
 		rm ${D}${exec_prefix}/lib/tmpfiles.d/x11.conf
@@ -719,6 +719,7 @@ FILES:${PN} = " ${base_bindir}/* \
                 ${exec_prefix}/lib/environment.d \
                 ${exec_prefix}/lib/nvpcr \
                 ${exec_prefix}/lib/pcrlock.d \
+                ${servicedir} \
                 ${localstatedir} \
                 ${nonarch_libdir}/modprobe.d/systemd.conf \
                 ${nonarch_libdir}/modprobe.d/README \

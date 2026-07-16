@@ -36,7 +36,7 @@ DEPENDS:append = " gtk-doc-native"
 export STAGING_DIR_HOST
 
 inherit pkgconfig qemu
-DEPENDS:append = "${@' qemu-native' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
+DEPENDS:append = "${@' qemu-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native python3-pygments-native' if d.getVar('GTKDOC_ENABLED') == 'True' else ''}"
 
 inherit_defer ${@bb.utils.contains('GTKDOC_ENABLED', 'True', 'python3native', '', d)}
 

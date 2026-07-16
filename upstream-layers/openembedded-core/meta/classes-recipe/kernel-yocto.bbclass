@@ -603,6 +603,9 @@ python do_kernel_configcheck() {
     env['STRIP'] = d.getVar('KERNEL_STRIP')
     env['ARCH'] = d.getVar('ARCH')
     env['srctree'] = s
+    toolchain = d.getVar('TOOLCHAIN') or ''
+    if 'clang' in toolchain:
+        env['CLANG_FLAGS'] = " -fintegrated-as"
 
     try:
         configs = subprocess.check_output(['scc', '--configs', '-o', s + '/.kernel-meta'], env=env).decode('utf-8')

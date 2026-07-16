@@ -8,6 +8,9 @@
 # This class is used for architecture independent recipes/data files (usually scripts)
 #
 
+# No need for virtual/libc or a cross compiler
+INHIBIT_DEFAULT_DEPS = "1"
+
 python allarch_package_arch_handler () {
     if bb.data.inherits_class("native", d) or bb.data.inherits_class("nativesdk", d) \
         or bb.data.inherits_class("crosssdk", d):

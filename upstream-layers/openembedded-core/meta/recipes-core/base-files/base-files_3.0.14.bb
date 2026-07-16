@@ -47,12 +47,12 @@ dirs755 = "/boot /dev ${base_bindir} ${base_sbindir} ${base_libdir} \
            /home ${prefix}/src ${localstatedir}/local \
            /media"
 
-dirs755-lsb = "/srv  \
+dirs755-lsb = "${servicedir} \
                ${prefix}/local ${prefix}/local/bin ${prefix}/local/games \
                ${prefix}/local/include ${prefix}/local/lib ${prefix}/local/sbin \
                ${prefix}/local/share ${prefix}/local/src \
                ${prefix}/lib/locale"
-dirs2775-lsb = "/var/mail"
+dirs2775-lsb = "${localstatedir}/mail"
 
 volatiles = "${@bb.utils.contains('FILESYSTEM_PERMS_TABLES', 'files/fs-perms-volatile-log.txt', 'log', '', d)} \
              ${@bb.utils.contains('FILESYSTEM_PERMS_TABLES', 'files/fs-perms-volatile-tmp.txt', 'tmp', '', d)}"

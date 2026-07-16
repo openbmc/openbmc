@@ -1,0 +1,56 @@
+From ffa3ed38663cc806f914691c63ca7d8fab959eef Mon Sep 17 00:00:00 2001
+From: Alexander Kanavin <alex@linutronix.de>
+Date: Sun, 21 Jun 2026 11:11:04 +0200
+Subject: [PATCH] meson.build: add an option to not check for runtime
+ dependencies at build time
+
+pygments and parametrized are run-time dependencies, and should
+not be enforced at build time as they are never actually used then.
+
+This is especially useful in cross-compilation, as the modules
+are checked in the python installation on the build host, and that
+has no relevance to the target environment that the build outputs
+will be executed in.
+
+https://gitlab.gnome.org/GNOME/gtk-doc/-/merge_requests/105
+Upstream-Status: Backport [link above]
+Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+---
+ meson.build       | 9 ++++++---
+ meson_options.txt | 6 ++++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 30f1520..e087cff 100644
+--- a/meson.build
++++ b/meson.build
+@@ -8,9 +8,12 @@ fs = import('fs')
+ gnome = import('gnome')
+ python = import('python')
+ 
+-required_python_modules = ['pygments']
+-if get_option('tests')
+-  required_python_modules += ['parameterized']
++required_python_modules = []
++if get_option('check_runtime_deps')
++  required_python_modules = ['pygments']
++  if get_option('tests')
++    required_python_modules += ['parameterized']
++  endif
+ endif
+ 
+ python3 = python.find_installation('python3', modules: required_python_modules)
+diff --git a/meson_options.txt b/meson_options.txt
+index d44dbb4..84463b2 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -21,3 +21,9 @@ option(
+   type: 'boolean', value: true,
+   description: 'Build the test suite (requires glib and the parameterized python module)'
+ )
++
++option(
++  'check_runtime_deps',
++  type: 'boolean', value: true,
++  description: 'Check for runtime dependencies during build configuration'
++)

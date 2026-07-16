@@ -23,6 +23,7 @@ CONFIGUREOPTS = "\
     '--enable-shared' \
     '--disable-static' \
     'CC=${CC}' \
+    'CFLAGS=${CFLAGS}' \
     'CPPFLAGS=${CPPFLAGS}' \
     'CXXFLAGS=${CXXFLAGS}' \
     'LDFLAGS=${LDFLAGS}' \

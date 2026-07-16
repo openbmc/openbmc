@@ -41,7 +41,7 @@ CPE_DISTRO ??= "${DISTRO}"
 CPE_NAME = "cpe:/o:openembedded:${CPE_DISTRO}:${VERSION_ID}"
 
 BUILD_ID ?= "${DATETIME}"
-BUILD_ID[vardepsexclude] = "DATETIME"
+BUILD_ID[vardepsexclude] ?= "DATETIME"
 
 def sanitise_value(ver):
     # unquoted fields like VERSION_ID should be (from os-release(5)):

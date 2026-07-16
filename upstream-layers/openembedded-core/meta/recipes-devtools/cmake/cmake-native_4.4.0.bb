@@ -13,8 +13,8 @@ LIC_FILES_CHKSUM:append = " \
     file://Utilities/cmlibarchive/COPYING;md5=7ce08437ff7f5e24d72e666313ae4084 \
     file://Utilities/cmexpat/COPYING;md5=f4fedd6116da0e171f7cb4d2923d7ac2 \
     file://Utilities/cmlibrhash/COPYING;md5=a8c2a557a5c53b1c12cddbee98c099af \
-    file://Utilities/cmlibuv/LICENSE;md5=ad93ca1fffe931537fcf64f6fcce084d \
-    file://Utilities/cmcurl/COPYING;md5=72f4e9890e99e68d77b7e40703d789b8 \
+    file://Utilities/cmlibuv/LICENSE;md5=74b6f2f7818a4e3a80d03556f71b129b \
+    file://Utilities/cmcurl/COPYING;md5=0515352b285b9c3f66464b135c9c0fdc \
     file://Utilities/cmcppdap/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57 \
 "
 

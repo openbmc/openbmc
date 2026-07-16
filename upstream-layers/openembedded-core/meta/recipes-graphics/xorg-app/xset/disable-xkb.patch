@@ -1,4 +1,4 @@
-From 3090dcafac7c8080091b5e3e3720209c65251a1a Mon Sep 17 00:00:00 2001
+From a9a90a95047a0a08bb0fd0823961ed9707f451d4 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard@openedhand.com>
 Date: Mon, 22 May 2006 22:15:57 +0000
 Subject: [PATCH] add "-disable-xkb" option
@@ -6,13 +6,12 @@ Subject: [PATCH] add "-disable-xkb" option
 Upstream-Status: Pending
 
 Rebase for 1.2.1 by: Yu Ke <ke.yu@intel.com>
-
 ---
  configure.ac | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/configure.ac b/configure.ac
-index e7c2bdf..8e1ed5e 100644
+index e578bfe..1847258 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -52,11 +52,15 @@ PKG_CHECK_MODULES(SET_XEXT, xext,

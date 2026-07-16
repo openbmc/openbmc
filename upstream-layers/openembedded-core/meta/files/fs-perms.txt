@@ -48,7 +48,7 @@ ${localstatedir}/run	link	/run
 ${localstatedir}/lock	link	/run/lock
 
 /home				0755	root	root	false - - -
-/srv				0755	root	root	false - - -
+${servicedir}			0755	root	root	false - - -
 ${prefix}/src			0755	root	root	false - - -
 ${localstatedir}/local		0755	root	root	false - - -
 

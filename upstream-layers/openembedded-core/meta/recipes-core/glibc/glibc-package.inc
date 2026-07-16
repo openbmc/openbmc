@@ -98,16 +98,20 @@ do_install() {
 		rm -f ${D}${infodir}/dir
 	fi
 
-	install -d ${D}${sysconfdir}/init.d
-	install -d ${D}${localstatedir}/db/nscd
-	install -m 0755 ${S}/nscd/nscd.init ${D}${sysconfdir}/init.d/nscd
-	install -m 0755 ${S}/nscd/nscd.conf ${D}${sysconfdir}/nscd.conf
+	install -d ${D}${localstatedir}/db
 	install -m 0755 ${UNPACKDIR}/makedbs.sh ${D}${localstatedir}/db
-	sed -i "s%daemon%start-stop-daemon --start --exec%g" ${D}${sysconfdir}/init.d/nscd
-	sed -i "s|\(enable-cache\t\+netgroup\t\+\)yes|\1no|" ${D}${sysconfdir}/nscd.conf
 
-	install -d ${D}${systemd_system_unitdir}
-	install -m 0644 ${S}/nscd/nscd.service ${D}${systemd_system_unitdir}/
+	if ${@bb.utils.contains('PACKAGECONFIG', 'nscd', 'true', 'false', d)}; then
+		install -d ${D}${sysconfdir}/init.d
+		install -d ${D}${localstatedir}/db/nscd
+		install -m 0755 ${S}/nscd/nscd.init ${D}${sysconfdir}/init.d/nscd
+		install -m 0755 ${S}/nscd/nscd.conf ${D}${sysconfdir}/nscd.conf
+		sed -i "s%daemon%start-stop-daemon --start --exec%g" ${D}${sysconfdir}/init.d/nscd
+		sed -i "s|\(enable-cache\t\+netgroup\t\+\)yes|\1no|" ${D}${sysconfdir}/nscd.conf
+
+		install -d ${D}${systemd_system_unitdir}
+		install -m 0644 ${S}/nscd/nscd.service ${D}${systemd_system_unitdir}/
+	fi
 
 	# The dynamic loader will have been installed into
 	# ${base_libdir}. However, if that isn't going to end up being
@@ -132,18 +136,19 @@ def get_libc_fpu_setting(bb, d):
     return ""
 
 do_install:append:class-target() {
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
-		install -d ${D}${nonarch_libdir}/tmpfiles.d
-		echo "d /run/nscd 755 root root -" \
-			> ${D}${nonarch_libdir}/tmpfiles.d/nscd.conf
-	fi
+	if ${@bb.utils.contains('PACKAGECONFIG', 'nscd', 'true', 'false', d)}; then
+		if ${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)}; then
+			install -d ${D}${nonarch_libdir}/tmpfiles.d
+			echo "d /run/nscd 755 root root -" \
+				> ${D}${nonarch_libdir}/tmpfiles.d/nscd.conf
+		fi
 
-	if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
-		install -d ${D}${sysconfdir}/default/volatiles
-		echo "d root root 0755 /var/run/nscd none" \
-			> ${D}${sysconfdir}/default/volatiles/98_nscd
+		if ${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'true', 'false', d)}; then
+			install -d ${D}${sysconfdir}/default/volatiles
+			echo "d root root 0755 /var/run/nscd none" \
+				> ${D}${sysconfdir}/default/volatiles/98_nscd
+		fi
 	fi
-
 }
 do_install:append:aarch64 () {
 	do_install_armmultilib
@@ -297,3 +302,6 @@ CONFFILES:nscd = "${sysconfdir}/nscd.conf"
 
 SYSTEMD_PACKAGES = "nscd"
 SYSTEMD_SERVICE:nscd = "nscd.service"
+
+INITSCRIPT_PACKAGES = "nscd"
+INITSCRIPT_NAME = "nscd"

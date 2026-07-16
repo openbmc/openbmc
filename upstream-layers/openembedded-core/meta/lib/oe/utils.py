@@ -515,9 +515,6 @@ def touch(filename):
 # Used by allarch recipes and other cases where arch independence is needed
 #
 def make_arch_independent(d):
-    # No need for virtual/libc or a cross compiler
-    d.setVar("INHIBIT_DEFAULT_DEPS","1")
-
     # Set these to a common set of values, we shouldn't be using them other that for WORKDIR directory
     # naming anyway
     d.setVar("baselib", "lib")

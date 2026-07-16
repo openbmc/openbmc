@@ -113,8 +113,8 @@ do_showconfig[nostamp] = "1"
 addtask showconfig after do_configure
 
 do_savedefconfig() {
-	bbplain "Saving defconfig to:\n${B}/defconfig"
-	oe_runmake -C ${B} savedefconfig
+    bbplain "Saving defconfig to:\n${KCONFIG_CONFIG_ROOTDIR}/defconfig"
+    oe_runmake -C ${KCONFIG_CONFIG_ROOTDIR} savedefconfig
 }
 do_savedefconfig[nostamp] = "1"
 addtask savedefconfig after do_configure
