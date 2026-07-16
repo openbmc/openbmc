@@ -5,7 +5,5 @@ header:
 
 local_conf_header:
   sstate_mirror: |
-    BB_HASHSERVE_UPSTREAM = "wss://hashserv.yoctoproject.org/ws"
-    SSTATE_MIRRORS = "file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH"
-    BB_HASHSERVE = "auto"
     BB_SIGNATURE_HANDLER = "OEEquivHash"
+    OE_FRAGMENTS += "core/yocto/sstate-mirror-cdn"

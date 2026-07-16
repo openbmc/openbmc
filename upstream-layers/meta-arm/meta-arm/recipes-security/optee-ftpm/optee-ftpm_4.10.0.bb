@@ -33,12 +33,15 @@ SRC_URI = "\
 # As per optee-ftpm TA documentation, we have to use this SHA of MS TPM reference
 SRCREV_ms-tpm   ?= "98b60a44aba79b15fcce1c0d1e46cf5918400f6a"
 
-# v4.9.0
+# v4.10.0
 SRCREV_optee-ta ?= "a09269b15de635e1816fe832e26adfbfb44c5455"
 
 SRCREV_FORMAT    = "ms-tpm_optee-ta"
 
-UPSTREAM_CHECK_COMMITS = "1"
+# Because of the OPTEE portion being put inside of the ms-tpm, the
+# tooling usings the ms-tpm source for version and not the optee-ta.
+# So, disable checking
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 S = "${UNPACKDIR}/ms-tpm"
 

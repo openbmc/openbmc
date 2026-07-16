@@ -11,11 +11,11 @@ LICENSE = "GPL-3.0-with-GCC-exception & GPL-3.0-only"
 LIC_FILES_CHKSUM:aarch64 = "file://share/doc/gcc/Copying.html;md5=90014a59d1783b37a10240d4d0002c6e"
 LIC_FILES_CHKSUM:x86-64 = "file://share/doc/gcc/Copying.html;md5=90014a59d1783b37a10240d4d0002c6e"
 
-SRC_URI = "https://developer.arm.com/-/media/Files/downloads/gnu/${PV}/binrel/arm-gnu-toolchain-${PV}-${HOST_ARCH}-${BINNAME}.tar.xz;name=gcc-${HOST_ARCH}"
-SRC_URI[gcc-aarch64.sha256sum] = "d061559d814b205ed30c5b7c577c03317ec447ca51cd5a159d26b12a5bbeb20c"
-SRC_URI[gcc-x86_64.sha256sum] = "597893282ac8c6ab1a4073977f2362990184599643b4c5ee34870a8215783a16"
+SRC_URI = "https://gitlab.arm.com/api/v4/projects/tooling%2Fgnu-toolchains-for-arm/packages/generic/gnu-toolchain/${PV}/arm-gnu-toolchain-${PV}-${HOST_ARCH}-${BINNAME}.tar.xz;name=gcc-${HOST_ARCH}"
+SRC_URI[gcc-aarch64.sha256sum] = "06979e0c8171de58e5dc2a2b2019330a290f30930f27728af98a83e1a7369b3a"
+SRC_URI[gcc-x86_64.sha256sum] = "563bebb2b97d53382b956d6ee1fe61e2cae26699901417234a37df505ef9b5fa"
 
 S = "${UNPACKDIR}/arm-gnu-toolchain-${PV}-${HOST_ARCH}-${BINNAME}"
 
-UPSTREAM_CHECK_URI = "https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads"
-UPSTREAM_CHECK_REGEX = "arm-gnu-toolchain-(?P<pver>\d+\.\d*\.[A-z]*\d*).*-${HOST_ARCH}-${BINNAME}\.tar\.\w+"
+UPSTREAM_CHECK_URI = "https://gitlab.arm.com/tooling/gnu-toolchains-for-arm/-/branches"
+UPSTREAM_CHECK_REGEX = "releases/(?P<pver>.+)\?"
