@@ -10,4 +10,16 @@ LinkLocalAddressing=no
 IPv6AcceptRA=false
 
 [Address]
-Address=192.168.31.2/32
+Address=192.168.31.2
+Peer=192.168.31.1/32
+
+[RoutingPolicyRule]
+From=192.168.31.2/32
+Table=100
+Priority=10000
+
+[Route]
+Table=100
+Destination=192.168.31.1/32
+Scope=link
+PreferredSource=192.168.31.2
