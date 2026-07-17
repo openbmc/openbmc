@@ -40,7 +40,7 @@ do_install:append() {
         install -m 0644 ${UNPACKDIR}/nslcd.service ${D}${systemd_system_unitdir}
 }
 
-RDEPENDS:${PN} += "nscd"
+RRECOMMENDS:${PN} += "nscd"
 
 FILES:${PN} += "${base_libdir}/security ${datadir}"
 FILES:${PN}-dbg += "${base_libdir}/security/.debug"
