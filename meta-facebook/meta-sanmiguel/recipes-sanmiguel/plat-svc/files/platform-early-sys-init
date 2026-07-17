@@ -2,6 +2,22 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+check_aspeed_usb()
+{
+    # Check onboard USB hub is detected or not to identify whether we need to
+    # re-bind aspeed usb driver
+    local usb_hub_link="/sys/bus/usb/devices/1-1"
+
+    if [ ! -L "$usb_hub_link" ]; then
+        echo "$usb_hub_link not found, re-binding aspeed usb driver..."
+        echo 1e6a3000.usb > /sys/bus/platform/drivers/ehci-platform/unbind
+        echo 1e6a3000.usb > /sys/bus/platform/drivers/ehci-platform/bind
+        sleep 3
+    fi
+}
+
+check_aspeed_usb
+
 # Enable standby power and bind i2c components
 echo "Attempting to enable standby power..."
 if /usr/libexec/plat-svc/standby-power-enable; then
