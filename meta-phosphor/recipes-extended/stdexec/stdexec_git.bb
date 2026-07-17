@@ -9,4 +9,4 @@ PR = "r1"
 inherit pkgconfig meson
 
 SRC_URI += "git://github.com/NVIDIA/stdexec;branch=main;protocol=https"
-SRCREV = "250f35737790392d666fd157e0af9be16d0c789f"
+SRCREV = "711da5971a8e8e940763c11bf6bbeb1c1bb22c3a"
