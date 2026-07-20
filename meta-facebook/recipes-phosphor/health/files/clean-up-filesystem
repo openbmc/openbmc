@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# clean up /var/log/redfish and files in /home/root/ which are not necessary
+# Clean up files/directories which are not necessary
 rm -rf /var/log/redfish*
 rm -rf /home/root/*
 rm -rf /run/mnt-persist/var-data/lib/phosphor-debug-collector/dumps/*
