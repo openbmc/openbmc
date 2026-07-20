@@ -69,9 +69,9 @@ do_install:append() {
                     ${D}${libexecdir}/${PN}/run-power-good
     install -m 0755 ${UNPACKDIR}/thermal-event-logger \
                     ${D}${libexecdir}/${PN}/thermal-event-logger
-    install -m 0755 ${UNPACKDIR}/thermal-event-logger \
+    install -m 0755 ${UNPACKDIR}/power-rail-event-logger \
                     ${D}${libexecdir}/${PN}/power-rail-event-logger
-    install -m 0755 ${UNPACKDIR}/thermal-event-logger \
+    install -m 0755 ${UNPACKDIR}/rmc-main-power \
                     ${D}${libexecdir}/${PN}/rmc-main-power
 
     install -d ${D}${systemd_system_unitdir}
