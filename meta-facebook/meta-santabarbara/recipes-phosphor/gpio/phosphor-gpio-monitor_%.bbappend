@@ -27,6 +27,8 @@ SERVICE_LIST = "assert-module-power-good@.service \
                 swb-pwr-fault-deassert.service \
                 mb-pwr-fault-assert.service \
                 mb-pwr-fault-deassert.service \
+                setup-nic-endpoint-slot@.service \
+                remove-nic-endpoint-slot@.service \
                 "
 
 SERVICE_FILE_FMT = "file://{0}"
@@ -52,6 +54,9 @@ SRC_URI += " \
     file://swb-pwr-fault-handler \
     file://mb-pwr-fault-handler \
     file://phosphor-multi-gpio-monitor.conf \
+    file://configure-nic-mctp-endpoint \
+    file://setup-nic-endpoint-slot@.service \
+    file://remove-nic-endpoint-slot@.service \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
     "
 
@@ -96,4 +101,7 @@ do_install:append() {
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \
         ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d/phosphor-multi-gpio-monitor.conf
+
+    install -d ${D}${bindir}
+    install -m 0755 ${UNPACKDIR}/configure-nic-mctp-endpoint ${D}${bindir}/
 }

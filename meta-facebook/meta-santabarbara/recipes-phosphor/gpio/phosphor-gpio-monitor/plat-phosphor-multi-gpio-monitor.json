@@ -530,5 +530,75 @@
             ]
         },
         "Continue": true
+    },
+    {
+        "Name": "PRSNT_NIC0_N",
+        "LineName": "PRSNT_NIC0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "remove-nic-endpoint-slot@0.service"
+            ],
+            "FALLING": [
+                "setup-nic-endpoint-slot@0.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NIC1_N",
+        "LineName": "PRSNT_NIC1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "remove-nic-endpoint-slot@1.service"
+            ],
+            "FALLING": [
+                "setup-nic-endpoint-slot@1.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NIC2_N",
+        "LineName": "PRSNT_NIC2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "remove-nic-endpoint-slot@2.service"
+            ],
+            "FALLING": [
+                "setup-nic-endpoint-slot@2.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NIC3_N",
+        "LineName": "PRSNT_NIC3_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "remove-nic-endpoint-slot@3.service"
+            ],
+            "FALLING": [
+                "setup-nic-endpoint-slot@3.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PRSNT_NIC4_N",
+        "LineName": "PRSNT_NIC4_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "remove-nic-endpoint-slot@4.service"
+            ],
+            "FALLING": [
+                "setup-nic-endpoint-slot@4.service"
+            ]
+        },
+        "Continue": true
     }
 ]

@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# This script is a backup solution for setting up/removing MCTP endpoints for NICs.
+action=$1
+slot=$2
+
+# NIC bus:
+#   NIC0: frontend  mctpi2c11
+#   NIC1~4: backend mctpi2c110~113
+case "$slot" in
+    0)
+        bus=11
+        nic_path="mb_nic0"
+        ;;
+    1)
+        bus=110
+        nic_path="swb_nic1"
+        ;;
+    2)
+        bus=111
+        nic_path="swb_nic2"
+        ;;
+    3)
+        bus=112
+        nic_path="swb_nic3"
+        ;;
+    4)
+        bus=113
+        nic_path="swb_nic4"
+        ;;
+    *)
+        echo "Invalid NIC slot: $slot"
+        exit 1
+        ;;
+esac
+
+mctp_dev="mctpi2c${bus}"
+version=""
+eid=""
+
+get_nic_eid() {
+    mctp route |
+        awk -v dev="$mctp_dev" '$8 == "dev" && $9 == dev {
+            print $3
+            exit
+        }'
+}
+
+set_nic_version() {
+    MAX_RETRIES=3
+    RETRY_COUNT=0
+
+    while [ "$RETRY_COUNT" -lt "$MAX_RETRIES" ]; do
+        eid=$(get_nic_eid)
+        version=$(
+            pldmtool fw_update GetFwParams -m "$eid" |
+                jq --raw-output '.ComponentParameterEntries | .[].ActiveComponentVersionString'
+        )
+
+        if [ -n "$version" ]; then
+            busctl set-property \
+                xyz.openbmc_project.Settings \
+                "/xyz/openbmc_project/software/chassis/${nic_path}" \
+                xyz.openbmc_project.Software.Version \
+                Version "s" "$version"
+            return 0
+        fi
+
+        echo "Version is empty, retrying... ($((RETRY_COUNT + 1))/$MAX_RETRIES)"
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        sleep 5
+    done
+
+    echo "Failed to get NIC${slot} firmware version"
+    return 1
+}
+
+clear_nic_version() {
+    busctl set-property \
+        xyz.openbmc_project.Settings \
+        "/xyz/openbmc_project/software/chassis/${nic_path}" \
+        xyz.openbmc_project.Software.Version \
+        Version "s" "$version"
+}
+
+rescan_fru() {
+    busctl call \
+        xyz.openbmc_project.FruDevice \
+        /xyz/openbmc_project/FruDevice \
+        xyz.openbmc_project.FruDeviceManager \
+        ReScanBus q "$bus"
+}
+
+case "$action" in
+    add)
+        # The PLDM PDR ready time after NIC insertion/power-on is not currently specified
+        # by the NIC FW provider. Based on validation on the Santa Barbara platform,
+        # 10 seconds is used as a conservative delay before starting MCTP/PLDM discovery.
+        NIC_PDR_INIT_DELAY=10
+        echo "Waiting ${NIC_PDR_INIT_DELAY}s for NIC${slot} firmware/PDR initialization"
+        sleep "$NIC_PDR_INIT_DELAY"
+        echo "Adding MCTP endpoint for slot $slot"
+        rescan_fru
+        set_nic_version
+        ;;
+    remove)
+        echo "Removing MCTP endpoint for slot $slot"
+        rescan_fru
+        clear_nic_version
+        ;;
+    *)
+        echo "Usage: $0 {add|remove} <slot>"
+        exit 1
+        ;;
+esac

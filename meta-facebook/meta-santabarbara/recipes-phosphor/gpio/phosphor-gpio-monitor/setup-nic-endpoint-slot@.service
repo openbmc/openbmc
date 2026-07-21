@@ -1,0 +1,7 @@
+[Unit]
+Description=Setup MCTP endpoint for Slot%i NIC
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/configure-nic-mctp-endpoint add %i
+SyslogIdentifier=setup-nic-endpoint-slot%i
