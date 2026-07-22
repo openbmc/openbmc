@@ -14,8 +14,6 @@ Conflicts=host-force-poweroff@%i.service
 After=host-graceful-poweroff@%i.service
 After=host-force-poweroff@%i.service
 
-Wants=phosphor-set-host-transition-to-running@service
-Before=phosphor-set-host-transition-to-running@service
 ConditionPathExists=!/run/openbmc/host@%i-on
 
 [Service]
