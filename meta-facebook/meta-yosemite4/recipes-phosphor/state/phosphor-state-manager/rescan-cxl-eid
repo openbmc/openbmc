@@ -19,6 +19,16 @@ check_slot_type() {
     fi
 }
 
+check_wf_type() {
+    local slot_number="$1"
+    local wf_type
+    wf_type=$(busctl get-property xyz.openbmc_project.EntityManager  /xyz/openbmc_project/inventory/system/board/Yosemite_4_Wailua_Falls_Slot_"$slot_number" xyz.openbmc_project.Inventory.Decorator.Asset Model | awk '{sub(/^s "/,""); sub(/"$/,""); print}')
+    if [[ "$wf_type" == "Wailua Falls without ASIC" ]]; then
+        echo "The Wailua Falls board in slot $slot_number does not have CXL. It is exiting."
+        exit 0
+    fi
+}
+
 # Function to check if an EID is already set
 check_eid() {
     local eid="$1"
@@ -84,6 +94,7 @@ check_host_status() {
 
 # Main script execution starts here
 check_slot_type "$1"
+check_wf_type "$1"
 wf_eid=$(($1 * 10 + 2))
 busnum=$(($1 - 1))
 cxl1_eid=$(($1 * 10 + 4))
