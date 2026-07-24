@@ -1,0 +1,105 @@
+# Fan rotor fault detection
+# Fan tachometer sensor paths to monitor
+- name: fan rpm path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN0_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN0_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN1_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN1_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN2_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN2_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN3_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/fan_tach/PDB_FAN3_TACH_OL_SPEED_RPM
+
+# Fan RPM critical alarm properties to monitor
+- name: fan rpm critical alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+      meta: PROPERTY
+      property: CriticalAlarmHigh
+    - interface: xyz.openbmc_project.Sensor.Threshold.Critical
+      meta: PROPERTY
+      property: CriticalAlarmLow
+
+# Watch fan RPM critical alarm assertions
+- name: fan rpm critical alarm assert
+  class: watch
+  watch: property
+  paths: fan rpm path group
+  properties: fan rpm critical alarm property
+  callback: check fan rpm critical threshold
+
+# Trigger fault if >= 1 fan reports a critical RPM alarm
+- name: check fan rpm critical threshold
+  class: condition
+  condition: count
+  paths: fan rpm path group
+  properties: fan rpm critical alarm property
+  defer: 10000000us
+  callback: fan rpm fault callback
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+# Start fan fault policy service when a fault is detected
+- name: fan rpm fault callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: fan-fault-policy.service
+        type: string
+      - value: replace
+        type: string
+
+# Host state watch to re-check fan rpm critical threshold
+- name: fan rpm fault host state watch
+  class: watch
+  watch: property
+  paths: host state path
+  properties: host state property
+  callback: fan rpm fault check host state running
+
+- name: fan rpm fault check host state running
+  class: condition
+  condition: count
+  paths: host state path
+  properties: host state property
+  callback: check fan rpm critical threshold
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: xyz.openbmc_project.State.Host.HostState.Running
+
+- name: host state path
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/state/host0
+
+- name: host state property
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Host
+      meta: PROPERTY
+      property: CurrentHostState

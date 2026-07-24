@@ -1,0 +1,54 @@
+#!/bin/bash
+
+HWMON_TEMP_SVC="xyz.openbmc_project.HwmonTempSensor"
+PROP_IF="xyz.openbmc_project.Sensor.Threshold.HardShutdown"
+PROP_NAME="HardShutdownAlarmHigh"
+
+declare -A SENSORS=(
+    ["/xyz/openbmc_project/sensors/temperature/MB_CPU_TEMP_C"]="$HWMON_TEMP_SVC"
+)
+
+add_sel() {
+    local message="$1"
+    busctl call \
+        xyz.openbmc_project.Logging /xyz/openbmc_project/logging \
+        xyz.openbmc_project.Logging.Create Create \
+        "ssa{ss}" "$message" \
+        xyz.openbmc_project.Logging.Entry.Level.Error 0 \
+        >/dev/null 2>&1
+}
+
+power_off_host() {
+    echo "Host powering off" >&2
+
+    if busctl set-property \
+        xyz.openbmc_project.State.Host0 \
+        /xyz/openbmc_project/state/host0 \
+        xyz.openbmc_project.State.Host \
+        RequestedHostTransition s \
+        xyz.openbmc_project.State.Host.Transition.Off >/dev/null 2>&1; then
+        return 0
+    else
+        echo "Failed to request host power off" >&2
+        return 1
+    fi
+}
+
+for path in "${!SENSORS[@]}"; do
+    service="${SENSORS[$path]}"
+    value=$(
+    busctl get-property "$service" "$path" "$PROP_IF" "$PROP_NAME" \
+        2>/dev/null | awk '{print $2}')
+
+    if [[ "$value" == "true" ]]; then
+        if power_off_host; then
+            sensor_name=$(basename "$path")
+            msg="Host shutting down due to UNR from sensor: $sensor_name"
+            add_sel "$msg"
+        fi
+        exit 0
+    fi
+done
+
+echo "No UNR sensors triggered."
+exit 0

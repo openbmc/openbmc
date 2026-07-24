@@ -1,0 +1,102 @@
+# Fan rotor missing detection
+# Fan inventory paths to monitor for presence
+- name: fan presence path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN0_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN0_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN1_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN1_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN2_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN2_TACH_OL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN3_TACH_IL_SPEED_RPM
+    - meta: PATH
+      path: /xyz/openbmc_project/inventory/PDB_FAN3_TACH_OL_SPEED_RPM
+
+# Fan presence property to monitor (true = present, false = missing)
+- name: fan present property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Inventory.Item
+      meta: PROPERTY
+      property: Present
+
+# Monitor fan presence changes and check threshold
+- name: fan missing detect
+  class: watch
+  watch: property
+  paths: fan presence path group
+  properties: fan present property
+  callback: check fan missing threshold
+
+# Trigger if >= 2 fan rotors report Present == false (missing)
+- name: check fan missing threshold
+  class: condition
+  condition: count
+  paths: fan presence path group
+  properties: fan present property
+  defer: 10000000us
+  callback: fan missing callback
+  countop: ">="
+  countbound: 2
+  op: "=="
+  bound: false
+
+# Start fan fault policy service when missing fans detected
+- name: fan missing callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: fan-fault-policy.service
+        type: string
+      - value: replace
+        type: string
+
+# Host state watch to re-check fan missing threshold
+- name: fan missing host state watch
+  class: watch
+  watch: property
+  paths: host state path
+  properties: host state property
+  callback: fan missing check host state running
+
+- name: fan missing check host state running
+  class: condition
+  condition: count
+  paths: host state path
+  properties: host state property
+  callback: check fan missing threshold
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: xyz.openbmc_project.State.Host.HostState.Running
+
+- name: host state path
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/state/host0
+
+- name: host state property
+  class: group
+  group: property
+  type: string
+  members:
+    - interface: xyz.openbmc_project.State.Host
+      meta: PROPERTY
+      property: CurrentHostState

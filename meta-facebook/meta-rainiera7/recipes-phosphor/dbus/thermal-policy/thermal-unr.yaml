@@ -1,0 +1,53 @@
+# Thermal UNR detection
+# Inventory paths of temperature sensors to monitor for UNR conditions
+- name: sensor unr path group
+  class: group
+  group: path
+  members:
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/MB_CPU_TEMP_C
+
+# UNR alarm property exposed by temperature sensors
+- name: sensor unr alarm property
+  class: group
+  group: property
+  type: boolean
+  members:
+    - interface: xyz.openbmc_project.Sensor.Threshold.HardShutdown
+      meta: PROPERTY
+      property: HardShutdownAlarmHigh
+
+# Watch for assertion of the UNR alarm property
+- name: sensor unr alarm assert
+  class: watch
+  watch: property
+  paths: sensor unr path group
+  properties: sensor unr alarm property
+  callback: check unr alarm assert
+
+# Trigger callback when >= 1 temperature sensors report UNR
+- name: check unr alarm assert
+  class: condition
+  condition: count
+  paths: sensor unr path group
+  properties: sensor unr alarm property
+  callback: sensor unr callback
+  countop: ">="
+  countbound: 1
+  op: "=="
+  bound: true
+
+# Power off the host when a temperature sensor UNR condition is detected
+- name: sensor unr callback
+  class: callback
+  callback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: thermal-unr-policy.service
+        type: string
+      - value: replace
+        type: string
+

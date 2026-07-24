@@ -1,0 +1,6 @@
+[Unit]
+Description=Thermal UNR handler service for host protection
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/thermal-policy/thermal-unr-policy
