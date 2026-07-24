@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+# DC off
+echo "Starting Graceful Power off"
+
+if ! graceful_power_off; then
+    echo "Graceful Power off failed."
+    exit 1
+fi

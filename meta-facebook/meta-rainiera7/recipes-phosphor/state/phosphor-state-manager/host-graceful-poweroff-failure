@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-phosphor/state/phosphor-state-manager/power-cmd
+source /usr/libexec/phosphor-state-manager/power-cmd
+
+echo "Starting Host Graceful Poweroff Failure"
+
+CHASSIS_ID=$1
+
+# Stop the service to avoid counting reboot times and changing the host state.
+/bin/systemctl stop phosphor-reboot-host@"${CHASSIS_ID}".service
+
+if [ "$(power_status)" == "on" ]; then
+    # Set host state to on
+    busctl set-property xyz.openbmc_project.State.Host /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.Host CurrentHostState s xyz.openbmc_project.State.Host.HostState.Running
+fi
