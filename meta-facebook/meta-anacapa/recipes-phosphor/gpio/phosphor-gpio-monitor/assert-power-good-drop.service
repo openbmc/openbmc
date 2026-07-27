@@ -1,5 +1,7 @@
 [Unit]
 Description=Assert Power Good Drop
+Conflicts=deassert-power-good-drop.service
+After=deassert-power-good-drop.service
 
 [Service]
 Type=oneshot
