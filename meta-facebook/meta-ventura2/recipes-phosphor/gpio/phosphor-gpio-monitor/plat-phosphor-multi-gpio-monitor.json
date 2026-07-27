@@ -940,6 +940,3590 @@
         "Continue": true
     },
     {
+        "Name": "CAN1_TRAY1_PWRGD",
+        "LineName": "CAN1_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY2_PWRGD",
+        "LineName": "CAN1_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY3_PWRGD",
+        "LineName": "CAN1_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY4_PWRGD",
+        "LineName": "CAN1_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY5_PWRGD",
+        "LineName": "CAN1_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY6_PWRGD",
+        "LineName": "CAN1_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY7_PWRGD",
+        "LineName": "CAN1_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY8_PWRGD",
+        "LineName": "CAN1_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY9_PWRGD",
+        "LineName": "CAN1_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY10_PWRGD",
+        "LineName": "CAN1_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY11_PWRGD",
+        "LineName": "CAN1_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY12_PWRGD",
+        "LineName": "CAN1_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY13_PWRGD",
+        "LineName": "CAN1_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY14_PWRGD",
+        "LineName": "CAN1_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY15_PWRGD",
+        "LineName": "CAN1_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY16_PWRGD",
+        "LineName": "CAN1_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY17_PWRGD",
+        "LineName": "CAN1_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY18_PWRGD",
+        "LineName": "CAN1_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY19_PWRGD",
+        "LineName": "CAN1_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY20_PWRGD",
+        "LineName": "CAN1_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY21_PWRGD",
+        "LineName": "CAN1_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY22_PWRGD",
+        "LineName": "CAN1_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY23_PWRGD",
+        "LineName": "CAN1_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY24_PWRGD",
+        "LineName": "CAN1_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY25_PWRGD",
+        "LineName": "CAN1_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY26_PWRGD",
+        "LineName": "CAN1_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY27_PWRGD",
+        "LineName": "CAN1_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY28_PWRGD",
+        "LineName": "CAN1_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY29_PWRGD",
+        "LineName": "CAN1_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY30_PWRGD",
+        "LineName": "CAN1_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY31_PWRGD",
+        "LineName": "CAN1_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN1_TRAY32_PWRGD",
+        "LineName": "CAN1_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN1_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN1_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY1_PWRGD",
+        "LineName": "CAN2_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY2_PWRGD",
+        "LineName": "CAN2_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY3_PWRGD",
+        "LineName": "CAN2_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY4_PWRGD",
+        "LineName": "CAN2_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY5_PWRGD",
+        "LineName": "CAN2_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY6_PWRGD",
+        "LineName": "CAN2_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY7_PWRGD",
+        "LineName": "CAN2_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY8_PWRGD",
+        "LineName": "CAN2_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY9_PWRGD",
+        "LineName": "CAN2_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY10_PWRGD",
+        "LineName": "CAN2_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY11_PWRGD",
+        "LineName": "CAN2_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY12_PWRGD",
+        "LineName": "CAN2_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY13_PWRGD",
+        "LineName": "CAN2_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY14_PWRGD",
+        "LineName": "CAN2_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY15_PWRGD",
+        "LineName": "CAN2_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY16_PWRGD",
+        "LineName": "CAN2_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY17_PWRGD",
+        "LineName": "CAN2_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY18_PWRGD",
+        "LineName": "CAN2_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY19_PWRGD",
+        "LineName": "CAN2_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY20_PWRGD",
+        "LineName": "CAN2_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY21_PWRGD",
+        "LineName": "CAN2_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY22_PWRGD",
+        "LineName": "CAN2_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY23_PWRGD",
+        "LineName": "CAN2_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY24_PWRGD",
+        "LineName": "CAN2_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY25_PWRGD",
+        "LineName": "CAN2_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY26_PWRGD",
+        "LineName": "CAN2_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY27_PWRGD",
+        "LineName": "CAN2_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY28_PWRGD",
+        "LineName": "CAN2_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY29_PWRGD",
+        "LineName": "CAN2_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY30_PWRGD",
+        "LineName": "CAN2_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY31_PWRGD",
+        "LineName": "CAN2_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN2_TRAY32_PWRGD",
+        "LineName": "CAN2_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN2_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN2_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY1_PWRGD",
+        "LineName": "CAN3_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY2_PWRGD",
+        "LineName": "CAN3_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY3_PWRGD",
+        "LineName": "CAN3_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY4_PWRGD",
+        "LineName": "CAN3_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY5_PWRGD",
+        "LineName": "CAN3_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY6_PWRGD",
+        "LineName": "CAN3_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY7_PWRGD",
+        "LineName": "CAN3_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY8_PWRGD",
+        "LineName": "CAN3_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY9_PWRGD",
+        "LineName": "CAN3_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY10_PWRGD",
+        "LineName": "CAN3_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY11_PWRGD",
+        "LineName": "CAN3_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY12_PWRGD",
+        "LineName": "CAN3_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY13_PWRGD",
+        "LineName": "CAN3_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY14_PWRGD",
+        "LineName": "CAN3_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY15_PWRGD",
+        "LineName": "CAN3_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY16_PWRGD",
+        "LineName": "CAN3_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY17_PWRGD",
+        "LineName": "CAN3_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY18_PWRGD",
+        "LineName": "CAN3_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY19_PWRGD",
+        "LineName": "CAN3_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY20_PWRGD",
+        "LineName": "CAN3_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY21_PWRGD",
+        "LineName": "CAN3_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY22_PWRGD",
+        "LineName": "CAN3_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY23_PWRGD",
+        "LineName": "CAN3_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY24_PWRGD",
+        "LineName": "CAN3_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY25_PWRGD",
+        "LineName": "CAN3_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY26_PWRGD",
+        "LineName": "CAN3_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY27_PWRGD",
+        "LineName": "CAN3_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY28_PWRGD",
+        "LineName": "CAN3_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY29_PWRGD",
+        "LineName": "CAN3_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY30_PWRGD",
+        "LineName": "CAN3_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY31_PWRGD",
+        "LineName": "CAN3_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN3_TRAY32_PWRGD",
+        "LineName": "CAN3_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN3_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN3_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY1_PWRGD",
+        "LineName": "CAN4_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY2_PWRGD",
+        "LineName": "CAN4_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY3_PWRGD",
+        "LineName": "CAN4_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY4_PWRGD",
+        "LineName": "CAN4_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY5_PWRGD",
+        "LineName": "CAN4_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY6_PWRGD",
+        "LineName": "CAN4_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY7_PWRGD",
+        "LineName": "CAN4_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY8_PWRGD",
+        "LineName": "CAN4_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY9_PWRGD",
+        "LineName": "CAN4_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY10_PWRGD",
+        "LineName": "CAN4_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY11_PWRGD",
+        "LineName": "CAN4_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY12_PWRGD",
+        "LineName": "CAN4_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY13_PWRGD",
+        "LineName": "CAN4_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY14_PWRGD",
+        "LineName": "CAN4_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY15_PWRGD",
+        "LineName": "CAN4_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY16_PWRGD",
+        "LineName": "CAN4_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY17_PWRGD",
+        "LineName": "CAN4_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY18_PWRGD",
+        "LineName": "CAN4_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY19_PWRGD",
+        "LineName": "CAN4_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY20_PWRGD",
+        "LineName": "CAN4_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY21_PWRGD",
+        "LineName": "CAN4_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY22_PWRGD",
+        "LineName": "CAN4_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY23_PWRGD",
+        "LineName": "CAN4_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY24_PWRGD",
+        "LineName": "CAN4_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY25_PWRGD",
+        "LineName": "CAN4_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY26_PWRGD",
+        "LineName": "CAN4_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY27_PWRGD",
+        "LineName": "CAN4_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY28_PWRGD",
+        "LineName": "CAN4_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY29_PWRGD",
+        "LineName": "CAN4_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY30_PWRGD",
+        "LineName": "CAN4_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY31_PWRGD",
+        "LineName": "CAN4_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN4_TRAY32_PWRGD",
+        "LineName": "CAN4_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN4_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN4_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY1_PWRGD",
+        "LineName": "CAN5_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY2_PWRGD",
+        "LineName": "CAN5_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY3_PWRGD",
+        "LineName": "CAN5_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY4_PWRGD",
+        "LineName": "CAN5_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY5_PWRGD",
+        "LineName": "CAN5_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY6_PWRGD",
+        "LineName": "CAN5_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY7_PWRGD",
+        "LineName": "CAN5_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY8_PWRGD",
+        "LineName": "CAN5_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY9_PWRGD",
+        "LineName": "CAN5_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY10_PWRGD",
+        "LineName": "CAN5_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY11_PWRGD",
+        "LineName": "CAN5_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY12_PWRGD",
+        "LineName": "CAN5_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY13_PWRGD",
+        "LineName": "CAN5_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY14_PWRGD",
+        "LineName": "CAN5_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY15_PWRGD",
+        "LineName": "CAN5_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY16_PWRGD",
+        "LineName": "CAN5_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY17_PWRGD",
+        "LineName": "CAN5_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY18_PWRGD",
+        "LineName": "CAN5_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY19_PWRGD",
+        "LineName": "CAN5_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY20_PWRGD",
+        "LineName": "CAN5_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY21_PWRGD",
+        "LineName": "CAN5_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY22_PWRGD",
+        "LineName": "CAN5_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY23_PWRGD",
+        "LineName": "CAN5_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY24_PWRGD",
+        "LineName": "CAN5_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY25_PWRGD",
+        "LineName": "CAN5_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY26_PWRGD",
+        "LineName": "CAN5_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY27_PWRGD",
+        "LineName": "CAN5_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY28_PWRGD",
+        "LineName": "CAN5_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY29_PWRGD",
+        "LineName": "CAN5_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY30_PWRGD",
+        "LineName": "CAN5_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY31_PWRGD",
+        "LineName": "CAN5_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN5_TRAY32_PWRGD",
+        "LineName": "CAN5_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN5_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN5_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY1_PWRGD",
+        "LineName": "CAN6_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY2_PWRGD",
+        "LineName": "CAN6_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY3_PWRGD",
+        "LineName": "CAN6_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY4_PWRGD",
+        "LineName": "CAN6_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY5_PWRGD",
+        "LineName": "CAN6_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY6_PWRGD",
+        "LineName": "CAN6_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY7_PWRGD",
+        "LineName": "CAN6_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY8_PWRGD",
+        "LineName": "CAN6_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY9_PWRGD",
+        "LineName": "CAN6_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY10_PWRGD",
+        "LineName": "CAN6_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY11_PWRGD",
+        "LineName": "CAN6_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY12_PWRGD",
+        "LineName": "CAN6_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY13_PWRGD",
+        "LineName": "CAN6_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY14_PWRGD",
+        "LineName": "CAN6_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY15_PWRGD",
+        "LineName": "CAN6_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY16_PWRGD",
+        "LineName": "CAN6_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY17_PWRGD",
+        "LineName": "CAN6_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY18_PWRGD",
+        "LineName": "CAN6_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY19_PWRGD",
+        "LineName": "CAN6_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY20_PWRGD",
+        "LineName": "CAN6_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY21_PWRGD",
+        "LineName": "CAN6_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY22_PWRGD",
+        "LineName": "CAN6_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY23_PWRGD",
+        "LineName": "CAN6_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY24_PWRGD",
+        "LineName": "CAN6_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY25_PWRGD",
+        "LineName": "CAN6_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY26_PWRGD",
+        "LineName": "CAN6_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY27_PWRGD",
+        "LineName": "CAN6_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY28_PWRGD",
+        "LineName": "CAN6_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY29_PWRGD",
+        "LineName": "CAN6_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY30_PWRGD",
+        "LineName": "CAN6_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY31_PWRGD",
+        "LineName": "CAN6_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN6_TRAY32_PWRGD",
+        "LineName": "CAN6_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN6_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN6_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY1_PWRGD",
+        "LineName": "CAN7_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY2_PWRGD",
+        "LineName": "CAN7_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY3_PWRGD",
+        "LineName": "CAN7_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY4_PWRGD",
+        "LineName": "CAN7_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY5_PWRGD",
+        "LineName": "CAN7_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY6_PWRGD",
+        "LineName": "CAN7_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY7_PWRGD",
+        "LineName": "CAN7_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY8_PWRGD",
+        "LineName": "CAN7_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY9_PWRGD",
+        "LineName": "CAN7_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY10_PWRGD",
+        "LineName": "CAN7_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY11_PWRGD",
+        "LineName": "CAN7_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY12_PWRGD",
+        "LineName": "CAN7_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY13_PWRGD",
+        "LineName": "CAN7_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY14_PWRGD",
+        "LineName": "CAN7_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY15_PWRGD",
+        "LineName": "CAN7_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY16_PWRGD",
+        "LineName": "CAN7_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY17_PWRGD",
+        "LineName": "CAN7_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY18_PWRGD",
+        "LineName": "CAN7_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY19_PWRGD",
+        "LineName": "CAN7_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY20_PWRGD",
+        "LineName": "CAN7_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY21_PWRGD",
+        "LineName": "CAN7_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY22_PWRGD",
+        "LineName": "CAN7_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY23_PWRGD",
+        "LineName": "CAN7_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY24_PWRGD",
+        "LineName": "CAN7_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY25_PWRGD",
+        "LineName": "CAN7_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY26_PWRGD",
+        "LineName": "CAN7_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY27_PWRGD",
+        "LineName": "CAN7_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY28_PWRGD",
+        "LineName": "CAN7_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY29_PWRGD",
+        "LineName": "CAN7_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY30_PWRGD",
+        "LineName": "CAN7_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY31_PWRGD",
+        "LineName": "CAN7_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN7_TRAY32_PWRGD",
+        "LineName": "CAN7_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN7_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN7_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY1_PWRGD",
+        "LineName": "CAN8_TRAY1_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY1_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY1_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY2_PWRGD",
+        "LineName": "CAN8_TRAY2_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY2_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY2_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY3_PWRGD",
+        "LineName": "CAN8_TRAY3_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY3_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY3_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY4_PWRGD",
+        "LineName": "CAN8_TRAY4_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY4_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY4_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY5_PWRGD",
+        "LineName": "CAN8_TRAY5_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY5_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY5_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY6_PWRGD",
+        "LineName": "CAN8_TRAY6_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY6_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY6_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY7_PWRGD",
+        "LineName": "CAN8_TRAY7_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY7_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY7_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY8_PWRGD",
+        "LineName": "CAN8_TRAY8_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY8_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY8_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY9_PWRGD",
+        "LineName": "CAN8_TRAY9_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY9_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY9_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY10_PWRGD",
+        "LineName": "CAN8_TRAY10_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY10_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY10_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY11_PWRGD",
+        "LineName": "CAN8_TRAY11_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY11_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY11_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY12_PWRGD",
+        "LineName": "CAN8_TRAY12_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY12_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY12_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY13_PWRGD",
+        "LineName": "CAN8_TRAY13_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY13_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY13_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY14_PWRGD",
+        "LineName": "CAN8_TRAY14_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY14_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY14_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY15_PWRGD",
+        "LineName": "CAN8_TRAY15_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY15_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY15_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY16_PWRGD",
+        "LineName": "CAN8_TRAY16_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY16_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY16_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY17_PWRGD",
+        "LineName": "CAN8_TRAY17_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY17_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY17_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY18_PWRGD",
+        "LineName": "CAN8_TRAY18_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY18_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY18_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY19_PWRGD",
+        "LineName": "CAN8_TRAY19_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY19_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY19_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY20_PWRGD",
+        "LineName": "CAN8_TRAY20_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY20_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY20_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY21_PWRGD",
+        "LineName": "CAN8_TRAY21_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY21_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY21_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY22_PWRGD",
+        "LineName": "CAN8_TRAY22_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY22_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY22_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY23_PWRGD",
+        "LineName": "CAN8_TRAY23_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY23_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY23_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY24_PWRGD",
+        "LineName": "CAN8_TRAY24_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY24_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY24_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY25_PWRGD",
+        "LineName": "CAN8_TRAY25_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY25_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY25_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY26_PWRGD",
+        "LineName": "CAN8_TRAY26_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY26_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY26_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY27_PWRGD",
+        "LineName": "CAN8_TRAY27_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY27_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY27_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY28_PWRGD",
+        "LineName": "CAN8_TRAY28_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY28_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY28_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY29_PWRGD",
+        "LineName": "CAN8_TRAY29_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY29_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY29_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY30_PWRGD",
+        "LineName": "CAN8_TRAY30_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY30_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY30_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY31_PWRGD",
+        "LineName": "CAN8_TRAY31_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY31_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY31_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CAN8_TRAY32_PWRGD",
+        "LineName": "CAN8_TRAY32_PWRGD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "FALLING": [
+                "power-rail-deassert-log@CAN8_TRAY32_PWRGD.service"
+            ],
+            "RISING": [
+                "power-rail-assert-log@CAN8_TRAY32_PWRGD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "AALC_RPU_READY",
         "LineName": "AALC_RPU_READY",
         "EventMon": "BOTH",
