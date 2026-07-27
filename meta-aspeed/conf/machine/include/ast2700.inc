@@ -1,5 +1,15 @@
 SOC_FAMILY = "aspeed-g7"
 include conf/machine/include/soc-family.inc
+
+# U-Boot Settings before aspeed.inc
+PREFERRED_PROVIDER_virtual/bootloader ?= "u-boot-aspeed"
+PREFERRED_PROVIDER_u-boot ?= "u-boot-aspeed"
+PREFERRED_VERSION_u-boot-aspeed ?= "2026.10"
+
+# fw_printenv/fw_setenv are provided by libubootenv; the fw_env.config
+# is installed by the libubootenv bbappend in meta-aspeed.
+PREFERRED_PROVIDER_u-boot-fw-utils ?= "libubootenv"
+
 require conf/machine/include/aspeed.inc
 
 DEFAULTTUNE = "cortexa35"
