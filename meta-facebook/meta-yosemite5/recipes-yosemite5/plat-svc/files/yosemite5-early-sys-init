@@ -145,9 +145,11 @@ set_gpio BMC_READY    1
 # I0-I7
 # M0-M7
 # N0-N7
+set_gpio FM_DBP_CPU_PREQ_GF_N 1
 # O0-O7
 # P0-P7
 # Q0-Q7
+set_gpio JTAG_1_BMC_TRST 0
 # R0-R7
 # S0-S7
 # T0-T7
@@ -172,7 +174,7 @@ set_gpio FM_I3C_SPD_AH_SEL_R 0
 set_gpio FM_I3C_SPD_IP_SEL_R 0
 set_gpio FM_JTAG_BMC_MUX_S0_R 0
 set_gpio FM_JTAG_BMC_MUX_S1_R 0
-set_gpio FM_JTAG_BMC_OE_1_R_N 1
+set_gpio FM_JTAG_BMC_OE_1_R_N 0
 set_gpio FM_JTAG_BMC_OE_R_N 1
 set_gpio FM_REMOTEJTAG_EN_R_N 1
 set_gpio FM_CPU_FORCE_SELFREFRESH_R 0
