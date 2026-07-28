@@ -8,15 +8,15 @@ IFACE="mctpi3c3"
 LOCAL_EID="8"
 HOST_EID="9"
 
-DEVICE="1e7a5000.i3c"
-DRIVER_PATH="/sys/bus/platform/drivers/ast2600-i3c-master"
+DEVICE="14c27000.i3c7"
+DRIVER_PATH="/sys/bus/platform/drivers/mipi-i3c-hci"
 
 is_eid_assigned() {
     busctl tree "$SVC" 2>/dev/null | grep -qE "/endpoints/${HOST_EID}$"
 }
 
 get_first_pid() {
-    for pid_file in /sys/bus/i3c/devices/3-*/pid; do
+    for pid_file in "/sys/bus/i3c/devices/${DEVICE}"/3-*/pid; do
         [ -f "$pid_file" ] && cat "$pid_file" && return 0
     done
 
