@@ -4,13 +4,15 @@ that watches DBus traffic for events and takes actions based on those events."
 HOMEPAGE = "http://github.com/openbmc/phosphor-dbus-monitor"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
+PACKAGECONFIG ??= "${@bb.utils.contains('DISTRO_FEATURES', 'phosphor-no-snmp', '', 'snmp', d)}"
+PACKAGECONFIG[snmp] = "-Dsnmp=enabled, -Dsnmp=disabled, phosphor-snmp"
+
 DEPENDS += " \
         ${PN}-config \
         phosphor-logging \
         ${PYTHON_PN}-sdbus++-native \
         sdeventplus \
         gtest \
-        phosphor-snmp \
         ${PYTHON_PN}-native \
         ${PYTHON_PN}-pyyaml-native \
         ${PYTHON_PN}-setuptools-native \

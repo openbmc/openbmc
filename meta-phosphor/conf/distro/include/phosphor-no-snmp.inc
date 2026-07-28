@@ -1,0 +1,1 @@
+DISTRO_FEATURES += "phosphor-no-snmp"
