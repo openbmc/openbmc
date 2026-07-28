@@ -1,0 +1,7 @@
+[Unit]
+Description=%i SMC Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/smc-event-logger "assert" "%i"
+SyslogIdentifier=%i-smc-assert

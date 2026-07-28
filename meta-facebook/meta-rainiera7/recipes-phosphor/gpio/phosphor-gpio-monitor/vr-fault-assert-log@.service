@@ -1,0 +1,7 @@
+[Unit]
+Description=%i VR Fault Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/vr-fault-event-logger "assert" "%i"
+SyslogIdentifier=%i-vr-fault-assert

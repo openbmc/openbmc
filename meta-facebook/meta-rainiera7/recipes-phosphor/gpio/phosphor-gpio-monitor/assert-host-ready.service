@@ -1,0 +1,8 @@
+[Unit]
+Description=Assert Host Ready
+
+[Service]
+Type=oneshot
+ExecStart=busctl set-property xyz.openbmc_project.State.Host0 /xyz/openbmc_project/state/host0 xyz.openbmc_project.State.OperatingSystem.Status OperatingSystemState s xyz.openbmc_project.State.OperatingSystem.Status.OSStatus.Standby
+
+SyslogIdentifier=assert-host-ready

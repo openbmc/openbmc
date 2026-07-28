@@ -1,0 +1,7 @@
+[Unit]
+Description=Reset button trigger:%i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/reset_btn %i
+SyslogIdentifier=reset_btn%i
