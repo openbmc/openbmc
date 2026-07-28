@@ -33,3 +33,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     smbios-mdr \
 "
+
+# Enable RSE postcode monitor
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    rse-postcode-monitor \
+"
