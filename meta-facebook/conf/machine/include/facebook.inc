@@ -2,6 +2,7 @@ DISTROOVERRIDES .= ":facebook"
 
 require conf/distro/include/cgroup.inc
 require conf/distro/include/phosphor-no-ipmi-rmcp.inc
+require conf/distro/include/phosphor-no-snmp.inc
 require conf/distro/include/phosphor-no-webui.inc
 require conf/distro/include/phosphor-production.inc
 
