@@ -34,6 +34,266 @@
                     "DutyOn": 50
                 }
             ]
+        },
+        {
+            "group": "drive0_fault",
+            "members": [
+                {
+                    "Name": "drive0_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive1_fault",
+            "members": [
+                {
+                    "Name": "drive1_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive2_fault",
+            "members": [
+                {
+                    "Name": "drive2_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive3_fault",
+            "members": [
+                {
+                    "Name": "drive3_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive4_fault",
+            "members": [
+                {
+                    "Name": "drive4_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive5_fault",
+            "members": [
+                {
+                    "Name": "drive5_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive6_fault",
+            "members": [
+                {
+                    "Name": "drive6_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive7_fault",
+            "members": [
+                {
+                    "Name": "drive7_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive8_fault",
+            "members": [
+                {
+                    "Name": "drive8_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive9_fault",
+            "members": [
+                {
+                    "Name": "drive9_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive10_fault",
+            "members": [
+                {
+                    "Name": "drive10_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive11_fault",
+            "members": [
+                {
+                    "Name": "drive11_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive12_fault",
+            "members": [
+                {
+                    "Name": "drive12_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive13_fault",
+            "members": [
+                {
+                    "Name": "drive13_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive14_fault",
+            "members": [
+                {
+                    "Name": "drive14_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive15_fault",
+            "members": [
+                {
+                    "Name": "drive15_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive16_fault",
+            "members": [
+                {
+                    "Name": "drive16_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive17_fault",
+            "members": [
+                {
+                    "Name": "drive17_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive18_fault",
+            "members": [
+                {
+                    "Name": "drive18_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive19_fault",
+            "members": [
+                {
+                    "Name": "drive19_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive20_fault",
+            "members": [
+                {
+                    "Name": "drive20_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive21_fault",
+            "members": [
+                {
+                    "Name": "drive21_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive22_fault",
+            "members": [
+                {
+                    "Name": "drive22_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive23_fault",
+            "members": [
+                {
+                    "Name": "drive23_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive24_fault",
+            "members": [
+                {
+                    "Name": "drive24_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
+        },
+        {
+            "group": "drive25_fault",
+            "members": [
+                {
+                    "Name": "drive25_fault_amber_pca955x",
+                    "Action": "On",
+                    "Priority": "On"
+                }
+            ]
         }
     ]
 }
