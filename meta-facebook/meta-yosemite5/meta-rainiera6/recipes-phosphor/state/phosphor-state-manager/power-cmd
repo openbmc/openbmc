@@ -8,6 +8,7 @@ PHX_PORESET="RST_SOC_PORESET_N_BMC"
 PWRBTN_HOLD_SEC=5
 PWRBTN_PULSE_SEC=1
 POWEROFF_TIMEOUT_SEC=20
+GRACEFUL_POWEROFF_TIMEOUT_SEC=180
 POWERON_TIMEOUT_SEC=10
 
 unbind_bios_flash()
@@ -56,7 +57,7 @@ graceful_power_off()
 {
     if [ "$(power_status)" = "on" ]; then
         press_power_button $PWRBTN_PULSE_SEC
-        for _ in $(seq 1 "$POWEROFF_TIMEOUT_SEC"); do
+        for _ in $(seq 1 "$GRACEFUL_POWEROFF_TIMEOUT_SEC"); do
             sleep 1
             if [ "$(power_status)" = "off" ]; then
                 return 0
