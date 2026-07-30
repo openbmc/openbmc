@@ -16,6 +16,107 @@ check_aspeed_usb()
     fi
 }
 
+identify_hsc_type()
+{
+    # identify hsc source by get MFR_ID
+    local retry=0
+    local max_retries=10
+    local mfr_id_val=""
+    local hsc_type=""
+
+    while [ "$retry" -lt "$max_retries" ]; do
+        if mfr_id_val=$(i2cget -y -f 9 0x10 0x99 s 2>/dev/null); then
+            if [ "${mfr_id_val}" == "0x54 0x49 0x00" ]; then
+                hsc_type="ti"
+            elif [ "${mfr_id_val}" == "0x53 0x50 0x4d" ]; then
+                hsc_type="mps"
+            elif [ "${mfr_id_val}" == "0x49 0x46 0x00" ]; then
+                hsc_type="ifx"
+            fi
+        elif mfr_id_val=$(i2cget -y -f 9 0x11 0x99 s 2>/dev/null); then
+            if [ "${mfr_id_val}" == "0x54 0x49 0x00" ]; then
+                hsc_type="ti-dvt"
+            fi
+        fi
+
+        if [ -n "${hsc_type}" ]; then
+            echo "${hsc_type}" > "/tmp/hsc_type"
+            echo "${hsc_type}"
+            return 0
+        fi
+
+        ((retry++))
+        sleep 1
+    done
+
+    echo "Cannot identify hsc type" >&2
+    return 1
+}
+
+config_ti_hsc()
+{
+    local hsc_type="$1"
+    local addrs=()
+
+    echo "Configure TI HSC"
+
+    if [ "${hsc_type}" == "ti-dvt" ]; then
+        addrs=(0x11 0x13 0x15 0x17)
+    else
+        addrs=(0x10 0x12 0x14 0x16)
+    fi
+
+    # Set HSC1 current range to high
+    i2cset -y -f 9 "${addrs[0]}" 0xd9 0x14 b
+    # Set HSC2 current range to low
+    i2cset -y -f 9 "${addrs[1]}" 0xd9 0x04 b
+    # Set HSC3 current range to low
+    i2cset -y -f 9 "${addrs[2]}" 0xd9 0x04 b
+    # Set HSC4 current range to high
+    i2cset -y -f 9 "${addrs[3]}" 0xd9 0x14 b
+
+    return 0
+}
+
+config_mps_hsc()
+{
+    echo "Configure MPS HSC"
+    return 0
+}
+
+config_ifx_hsc()
+{
+    echo "Configure IFX HSC"
+    return 0
+}
+
+config_hsc()
+{
+    local hsc_type=""
+
+    if ! hsc_type=$(identify_hsc_type); then
+        echo "Failed to identify HSC type, assume TI"
+        hsc_type="ti"
+    fi
+
+    echo "HSC type identified as: ${hsc_type}"
+
+    case "${hsc_type}" in
+        "ti-dvt"|"ti")
+            config_ti_hsc "${hsc_type}"
+            ;;
+        "mps")
+            config_mps_hsc
+            ;;
+        "ifx")
+            config_ifx_hsc
+            ;;
+    esac
+
+    return 0
+}
+
+
 check_aspeed_usb
 
 # Enable standby power and bind i2c components
@@ -25,5 +126,8 @@ if /usr/libexec/plat-svc/standby-power-enable; then
 else
     echo "Error: Standby power enable failed."
 fi
+
+# configure hsc
+config_hsc
 
 exit 0
