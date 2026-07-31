@@ -2,7 +2,7 @@ SUMMARY = "SPDM Stack"
 DESCRIPTION = "Implementation of the SPDM specification for secure authentication and attestation"
 
 SRC_URI = "git://github.com/openbmc/spdm.git;branch=main;protocol=https"
-SRCREV = "a325ae1ea00e667bbcd0a7002f745ac80b618a64"
+SRCREV = "72e3ea993685f5574899c323213ee2d241f69109"
 
 PV = "1.0+git${SRCPV}"
 PR = "r1"
