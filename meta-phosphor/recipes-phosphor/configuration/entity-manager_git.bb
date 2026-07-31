@@ -14,7 +14,7 @@ DEPENDS = " \
     valijson \
     zlib \
 "
-SRCREV = "5c23df2f9e6bcc2468a9dbc31b730efd4b0a8164"
+SRCREV = "365cbeb54fefef546d9fc8a60ca2513d0a2483c8"
 PACKAGECONFIG ??= "ipmi-fru gpio-presence"
 
 PACKAGECONFIG[dts-vpd] = "-Ddevicetree-vpd=true, -Ddevicetree-vpd=false"
