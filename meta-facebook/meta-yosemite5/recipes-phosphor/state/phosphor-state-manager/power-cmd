@@ -78,8 +78,41 @@ power_reset() {
 }
 
 is_service_busy() {
-    local output active sub
-    output=$(systemctl show -p ActiveState,SubState --value "$1")
-    { read -r active; read -r sub; } <<< "$output"
-    [ "$active" != "inactive" ] && [ "$sub" != "exited" ]
+    local unit path active sub
+    for unit in "$@"; do
+        path="/org/freedesktop/systemd1/unit/${unit//-/_2d}"
+        path="${path//@/_40}"
+        path="${path//./_2e}"
+
+        active=$(busctl get-property org.freedesktop.systemd1 "$path" org.freedesktop.systemd1.Unit ActiveState 2>/dev/null)
+        active="${active#s \"}"
+        active="${active%\"}"
+        if [ -z "$active" ] || [ "$active" = "inactive" ] || [ "$active" = "failed" ]; then
+            continue
+        fi
+
+        sub=$(busctl get-property org.freedesktop.systemd1 "$path" org.freedesktop.systemd1.Unit SubState 2>/dev/null)
+        sub="${sub#s \"}"
+        sub="${sub%\"}"
+        if [ "$sub" != "exited" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+HOST_STATE_SVC="xyz.openbmc_project.State.Host0"
+HOST_STATE_OBJ="/xyz/openbmc_project/state/host0"
+HOST_STATE_INTF="xyz.openbmc_project.State.Host"
+
+get_host_prop() {
+    local val
+    val=$(busctl get-property "$HOST_STATE_SVC" "$HOST_STATE_OBJ" "$HOST_STATE_INTF" "$1" 2>/dev/null)
+    val="${val#s \"}"
+    val="${val%\"}"
+    echo "$val"
+}
+
+set_host_prop() {
+    busctl set-property "$HOST_STATE_SVC" "$HOST_STATE_OBJ" "$HOST_STATE_INTF" "$1" s "$2"
 }
