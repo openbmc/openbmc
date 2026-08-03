@@ -116,7 +116,7 @@
         },
         {
             "bus": 6,
-            "addresses": ["0x51"]
+            "addresses": ["0x51", "0x6f"]
         },
         8,
         {
