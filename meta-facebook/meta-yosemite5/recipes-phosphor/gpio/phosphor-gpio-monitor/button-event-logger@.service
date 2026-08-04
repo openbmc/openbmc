@@ -1,0 +1,7 @@
+[Unit]
+Description=%i Button Event Logger
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/button-event-logger "%i"
+SyslogIdentifier=%i-button-event-logger

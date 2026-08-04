@@ -4,8 +4,28 @@
         "LineName": "ID_RST_BTN_BMC_N",
         "EventMon": "BOTH",
         "Targets": {
-            "RISING": ["reset_btn@RISING.service"],
-            "FALLING": ["reset_btn@FALLING.service"]
+            "RISING": ["reset_btn@RISING.service", "button-event-logger@Released_ID_RST_BTN_BMC_N.service"],
+            "FALLING": ["reset_btn@FALLING.service", "button-event-logger@Pressed_ID_RST_BTN_BMC_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "AC_PWR_BMC_BTN_N",
+        "LineName": "AC_PWR_BMC_BTN_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Released_AC_PWR_BMC_BTN_N.service"],
+            "FALLING": ["button-event-logger@Pressed_AC_PWR_BMC_BTN_N.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "PWR_BTN_BMC_N",
+        "LineName": "PWR_BTN_BMC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Released_PWR_BTN_BMC_N.service"],
+            "FALLING": ["button-event-logger@Pressed_PWR_BTN_BMC_N.service"]
         },
         "Continue": true
     },
