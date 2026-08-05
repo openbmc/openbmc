@@ -1,0 +1,10 @@
+[Unit]
+Description=AMC DateTime sync every 1 hour
+
+[Timer]
+OnBootSec=0
+OnUnitActiveSec=1h
+Unit=amc-datetime-sync.service
+
+[Install]
+WantedBy=timers.target

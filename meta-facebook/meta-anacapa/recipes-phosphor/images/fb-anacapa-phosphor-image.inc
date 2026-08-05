@@ -30,3 +30,8 @@ OBMC_IMAGE_EXTRA_INSTALL:append = " \
 OBMC_IMAGE_EXTRA_INSTALL:append = " \
     neard \
 "
+
+# AMC datetime sync
+OBMC_IMAGE_EXTRA_INSTALL:append = " \
+    amc-datetime-sync \
+"

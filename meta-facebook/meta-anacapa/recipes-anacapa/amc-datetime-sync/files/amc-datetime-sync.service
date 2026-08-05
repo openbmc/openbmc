@@ -1,0 +1,9 @@
+[Unit]
+Description=AMC DateTime Sync
+After=sys-subsystem-net-devices-usb0.device
+
+[Service]
+Type=oneshot
+SyslogIdentifier=amc-datetime-sync
+ExecStart=/usr/libexec/amc-datetime-sync/amc-datetime-sync
+LogLevelMax=warning

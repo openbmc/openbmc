@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -euo pipefail
+
+readonly REDFISH_HOST="192.168.31.1"
+readonly REDFISH_AMC_MANAGER_URL="http://${REDFISH_HOST}/redfish/v1/Managers/AMC"
+readonly CURL_TIMEOUT=10
+readonly RETRY_COUNT=30
+readonly RETRY_INTERVAL=20
+
+log_info()
+{
+    echo "<6>$*"
+}
+
+log_err()
+{
+    echo "<3>$*" >&2
+}
+
+syncdatetime()
+{
+    local datetime http_code rc attempt
+
+    for ((attempt = 1; attempt <= RETRY_COUNT; attempt++)); do
+        datetime="$(date -u +%Y-%m-%dT%H:%M:%S+00:00)"
+
+        log_info "Setting AMC DateTime to ${datetime} (${REDFISH_AMC_MANAGER_URL})"
+
+        rc=0
+        http_code="$(curl \
+            --connect-timeout "${CURL_TIMEOUT}" \
+            --max-time "${CURL_TIMEOUT}" \
+            -s -o /dev/null -w '%{http_code}' \
+            -H "Content-Type:application/json" \
+            -d "{\"DateTime\":\"${datetime}\"}" \
+            -X PATCH \
+            "${REDFISH_AMC_MANAGER_URL}")" || rc=$?
+
+        if [[ "${rc}" -eq 0 && "${http_code}" =~ ^2[0-9][0-9]$ ]]; then
+            log_info "AMC DateTime set OK (HTTP ${http_code})"
+            return 0
+        fi
+
+        if [[ "${rc}" -ne 0 ]]; then
+            log_err "AMC DateTime request failed: curl exit ${rc} (connect/timeout) [attempt ${attempt}/${RETRY_COUNT}]"
+        else
+            log_err "AMC DateTime set failed: HTTP ${http_code} [attempt ${attempt}/${RETRY_COUNT}]"
+        fi
+
+        if [[ "${attempt}" -lt "${RETRY_COUNT}" ]]; then
+            sleep "${RETRY_INTERVAL}"
+        fi
+    done
+
+    log_err "AMC DateTime set failed after ${RETRY_COUNT} attempts"
+    return 1
+}
+
+syncdatetime
