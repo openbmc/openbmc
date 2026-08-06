@@ -33,6 +33,10 @@ SYSTEMD_OVERRIDE:phosphor-fan-monitor:ibm-enterprise += "fan-watchdog-conflicts.
 
 # Enable the use of JSON on the fan applications that support it
 PACKAGECONFIG:append:ibm-enterprise = " json sensor-monitor"
+
+PACKAGECONFIG:remove:huygens = "presence"
+# Use multi-chassis option on huygens machine
+PACKAGECONFIG:append:huygens = " multi-chassis"
 PACKAGECONFIG:append:sbp1 = " json sensor-monitor"
 EXTRA_OEMESON:append:sbp1 = " -Duse-host-power-state=enabled"
 

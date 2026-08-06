@@ -13,6 +13,8 @@ DEPENDS += "libevdev"
 DEPENDS += "nlohmann-json"
 DEPENDS += "cli11"
 PACKAGECONFIG ?= "presence control monitor sensor-monitor"
+# multi-chassis fan apps options
+PACKAGECONFIG[multi-chassis] = "-Dmulti-chassis=enabled,-Dmulti-chassis=disabled"
 # The control, monitor, and presence apps can either be JSON or YAML driven.
 PACKAGECONFIG[json] = "-Djson-config=enabled, -Djson-config=disabled"
 # --------------------------------------
@@ -66,7 +68,7 @@ PR = "r1"
 OBMC_CHASSIS_ZERO_ONLY = "0"
 
 SYSTEMD_PACKAGES = "${FAN_PACKAGES}"
-SYSTEMD_SERVICE:${PN}-presence-tach += "${TMPL_TACH}"
+SYSTEMD_SERVICE:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'presence', '${TMPL_TACH}', '', d)}"
 SYSTEMD_LINK:${PN}-presence-tach += "${@compose_list(d, 'FMT_TACH', 'OBMC_CHASSIS_ZERO_ONLY')}"
 # JSON mode also gets linked into multi-user
 SYSTEMD_LINK:${PN}-presence-tach += "${@bb.utils.contains('PACKAGECONFIG', 'json', \
