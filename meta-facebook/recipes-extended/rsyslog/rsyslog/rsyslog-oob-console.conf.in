@@ -7,6 +7,9 @@ $ActionQueueType Direct
 # reopenOnTruncate+freshStartTail - ensures we
 # reopen when obmc-console rotates the log-file
 # and start a fresh on the new file.
+# deleteStateOnFileMove - imfile keys its state files by inode and
+# never reaps them, so each rotation would otherwise leave one behind
+# in $WorkDirectory forever.
 input(type="imfile"
   File="/var/log/obmc-console-__OOB_CONSOLE_HOST__.log"
   Tag="oob_console[mTerm___OOB_CONSOLE_HOST__]"
@@ -14,4 +17,5 @@ input(type="imfile"
   Facility="local3"
   reopenOnTruncate="on"
   freshStartTail="on"
+  deleteStateOnFileMove="on"
 )
