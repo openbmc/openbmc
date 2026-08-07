@@ -19,7 +19,6 @@ out_run_pwr_en="RUN_POWER_EN-O"
 out_shdn_req_n="SHDN_REQ_L-O"
 out_shdn_force_n="SHDN_FORCE_L-O"
 out_e1s_pwr_en="E1S_PWR_EN-O"
-out_bmc_ssd0_rst_n="BMC_SSD0_RST_L-O"
 out_ssd0_pwrdis="SSD0_PWRDIS-O"
 
 #======================================
@@ -235,8 +234,6 @@ host_power_on()
         set_gpio "B1_M0_${out_run_pwr_en}" "$GPIO_HIGH"
         set_gpio "${out_pdb_run_power_en}" "$GPIO_HIGH"
         set_gpio "${out_e1s_pwr_en}" "$GPIO_HIGH"
-        sleep 1
-        set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_HIGH"
         set_gpio "${out_smm_usb_pwr_en}" "$GPIO_HIGH"
         return 0
     fi
@@ -259,8 +256,6 @@ host_power_on()
     # Enable boot driver power
     set_gpio "${out_ssd0_pwrdis}" "$GPIO_LOW"
     set_gpio "${out_e1s_pwr_en}" "$GPIO_HIGH"
-    sleep 1
-    set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_HIGH"
 
     # Set RUN_POWER_EN, wait RUN_POWER_PG assert, 10s timeout
     if ! hpm_run_pwr_set_n_check; then
@@ -319,7 +314,6 @@ host_force_power_off()
         set_gpio "B1_M0_${out_run_pwr_en}" "$GPIO_LOW"
         set_gpio "${out_pdb_run_power_en}" "$GPIO_LOW"
         set_gpio "${out_e1s_pwr_en}" "$GPIO_LOW"
-        set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_LOW"
         set_gpio "${out_smm_usb_pwr_en}" "$GPIO_LOW"
         return 0
     fi
@@ -342,7 +336,6 @@ host_force_power_off()
 
     # Disable boot driver power
     set_gpio "${out_e1s_pwr_en}" "$GPIO_LOW"
-    set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_LOW"
     set_gpio "${out_ssd0_pwrdis}" "$GPIO_HIGH"
 
     # Release RUN_POWER_EN, wait RUN_POWER_PG deassert, 10s timeout
@@ -381,7 +374,6 @@ host_graceful_power_off()
         set_gpio "B1_M0_${out_run_pwr_en}" "$GPIO_LOW"
         set_gpio "${out_pdb_run_power_en}" "$GPIO_LOW"
         set_gpio "${out_e1s_pwr_en}" "$GPIO_LOW"
-        set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_LOW"
         set_gpio "${out_smm_usb_pwr_en}" "$GPIO_LOW"
         return 0
     fi
@@ -405,7 +397,6 @@ host_graceful_power_off()
 
     # Disable boot driver power
     set_gpio "${out_e1s_pwr_en}" "$GPIO_LOW"
-    set_gpio "${out_bmc_ssd0_rst_n}" "$GPIO_LOW"
     set_gpio "${out_ssd0_pwrdis}" "$GPIO_HIGH"
 
     # Release RUN_POWER_EN, wait RUN_POWER_PG deassert, 10s timeout

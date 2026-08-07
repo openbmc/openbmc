@@ -2,6 +2,8 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+GPIO_HIGH=1
+
 check_aspeed_usb()
 {
     # Check onboard USB hub is detected or not to identify whether we need to
@@ -129,5 +131,9 @@ fi
 
 # configure hsc
 config_hsc
+
+# The host boot drive reset pin does not require BMC control during host power on/off.
+# Drive the pin HIGH by default (deassert reset).
+set_gpio "BMC_SSD0_RST_L-O" "$GPIO_HIGH"
 
 exit 0
