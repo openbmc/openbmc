@@ -128,8 +128,187 @@ ti_hsc_init()
     fi
 }
 
+T22_init(){
+    echo "initial value for GPIO output pins of T22"
+
+    BOOTSTATUS_FILE="/sys/class/watchdog/watchdog0/bootstatus"
+
+    # Check bmc last boot status, if not power-on-reset, skip init
+    if [ -f "$BOOTSTATUS_FILE" ]; then
+        bootstatus=$(cat "$BOOTSTATUS_FILE" 2>/dev/null)
+    else
+        echo "$BOOTSTATUS_FILE not found, defaulting to 0 "
+        bootstatus=0
+    fi
+    if [ "$bootstatus" != "0" ]; then
+        echo "BMC not Power-On-Reset (bootstatus=$bootstatus), skip init"
+        exit 0
+    fi
+
+    # set initial value for IOEXP GPIO output pins
+    # 3kw board
+    set_gpio HSC_OC_GPIO0 0
+    set_gpio HSC_OC_GPIO1 0
+    set_gpio HSC_OC_GPIO2 0
+    set_gpio HSC_OC_GPIO3 1
+    set_gpio RST_SMB_MUX 1
+    set_gpio EN_P12V_SLOT_FLASH_R1 0
+
+    # Rio Grande
+    set_gpio EN_P12V_U2_1_R 0
+    set_gpio PWRDIS_U2_1 0
+    set_gpio EN_P12V_U2_2_R 0
+    set_gpio PWRDIS_U2_2 0
+    set_gpio PWRDIS_U2_3 0
+    set_gpio PWRDIS_U2_4 0
+    set_gpio PWRDIS_U2_5 0
+    set_gpio PWRDIS_U2_6 0
+    set_gpio PWRDIS_U2_7 0
+    set_gpio PWRDIS_U2_8 0
+    set_gpio PWRDIS_U2_9 0
+    set_gpio PWRDIS_U2_10 0
+    set_gpio RST_3A_IOEXP5_AND3_R_N 1
+    set_gpio RST_3A_IOEXP5_AND5_R_N 1
+    set_gpio RST_3A_IOEXP5_AND7_R_N 1
+    set_gpio RST_3A_IOEXP5_AND9_R_N 1
+    set_gpio RST_3A_IOEXP5_AND10_R_N 1
+    set_gpio RST_3A_IOEXP5_AND8_R_N 1
+    set_gpio RST_3A_IOEXP5_AND6_R_N 1
+    set_gpio RST_3A_IOEXP5_AND4_R_N 1
+    set_gpio RST_3A_IOEXP5_AND2_R_N 1
+    set_gpio RST_3A_IOEXP5_AND1_R_N 1
+    set_gpio EN_P12V_U2_3_R1 0
+    set_gpio EN_P12V_U2_4_R1 0
+    set_gpio EN_P12V_U2_5_R1 0
+    set_gpio EN_P12V_U2_6_R1 0
+    set_gpio EN_P12V_U2_7_R1 0
+    set_gpio EN_P12V_U2_8_R1 0
+    set_gpio EN_P12V_U2_9_R1 0
+    set_gpio EN_P12V_U2_10_R1 0
+    set_gpio PWRDIS_U2_11 0
+    set_gpio PWRDIS_U2_12 0
+    set_gpio PWRDIS_U2_13 0
+    set_gpio PWRDIS_U2_14 0
+    set_gpio PWRDIS_U2_15 0
+    set_gpio PWRDIS_U2_16 0
+    set_gpio PWRDIS_U2_17 0
+    set_gpio PWRDIS_U2_18 0
+    set_gpio RST_2A_IOEXP4_AND12_R_N 1
+    set_gpio RST_2A_IOEXP4_AND14_R_N 1
+    set_gpio RST_2A_IOEXP4_AND16_R_N 1
+    set_gpio RST_2A_IOEXP4_AND18_R_N 1
+    set_gpio RST_2A_IOEXP4_AND17_R_N 1
+    set_gpio RST_2A_IOEXP4_AND15_R_N 1
+    set_gpio RST_2A_IOEXP4_AND13_R_N 1
+    set_gpio RST_2A_IOEXP4_AND11_R_N 1
+    set_gpio EN_P12V_U2_11_R1 0
+    set_gpio EN_P12V_U2_12_R1 0
+    set_gpio EN_P12V_U2_13_R1 0
+    set_gpio EN_P12V_U2_14_R1 0
+    set_gpio EN_P12V_U2_15_R1 0
+    set_gpio EN_P12V_U2_16_R1 0
+    set_gpio EN_P12V_U2_17_R1 0
+    set_gpio EN_P12V_U2_18_R1 0
+    set_gpio PWRDIS_U2_19 0
+    set_gpio PWRDIS_U2_20 0
+    set_gpio PWRDIS_U2_21 0
+    set_gpio PWRDIS_U2_22 0
+    set_gpio PWRDIS_U2_23 0
+    set_gpio PWRDIS_U2_24 0
+    set_gpio PWRDIS_U2_25 0
+    set_gpio PWRDIS_U2_26 0
+    set_gpio RST_1A_IOEXP4_AND20_R_N 1
+    set_gpio RST_1A_IOEXP4_AND22_R_N 1
+    set_gpio RST_1A_IOEXP4_AND24_R_N 1
+    set_gpio RST_1A_IOEXP4_AND26_R_N 1
+    set_gpio RST_1A_IOEXP4_AND25_R_N 1
+    set_gpio RST_1A_IOEXP4_AND23_R_N 1
+    set_gpio RST_1A_IOEXP4_AND21_R_N 1
+    set_gpio RST_1A_IOEXP4_AND19_R_N 1
+    set_gpio EN_P12V_U2_19_R1 0
+    set_gpio EN_P12V_U2_20_R1 0
+    set_gpio EN_P12V_U2_21_R1 0
+    set_gpio EN_P12V_U2_22_R1 0
+    set_gpio EN_P12V_U2_23_R1 0
+    set_gpio EN_P12V_U2_24_R1 0
+    set_gpio EN_P12V_U2_25_R1 0
+    set_gpio EN_P12V_U2_26_R1 0
+
+    # Rio Grande ADC128D818 mode setting
+    # RIO_GRANDE_ADC0
+    i2cset -yf 69 0x2d 0x00 0x00
+    i2cset -yf 69 0x2d 0x0b 0x02
+    # RIO_GRANDE_ADC1
+    i2cset -yf 69 0x2e 0x00 0x00
+    i2cset -yf 69 0x2e 0x0b 0x02
+    # RIO_GRANDE_ADC2
+    i2cset -yf 70 0x2f 0x00 0x00
+    i2cset -yf 70 0x2f 0x0b 0x02
+    # RIO_GRANDE_ADC3
+    i2cset -yf 70 0x35 0x00 0x00
+    i2cset -yf 70 0x35 0x0b 0x02
+
+
+    # 40-bit IOE mask settings
+    i2cset -yf 15 0x26 0x20 0x00
+    i2cset -yf 15 0x26 0x22 0x00
+    i2cset -yf 15 0x26 0x23 0x00
+    i2cset -yf 15 0x26 0x24 0x00
+
+    i2cset -yf 12 0x26 0x20 0x00
+    i2cset -yf 12 0x26 0x22 0x00
+    i2cset -yf 12 0x26 0x23 0x00
+    i2cset -yf 12 0x26 0x24 0x80
+
+    i2cset -yf 2 0x26 0x20 0x00
+    i2cset -yf 2 0x26 0x22 0x00
+    i2cset -yf 2 0x26 0x23 0x00
+    i2cset -yf 2 0x26 0x24 0x00
+
+    hsc_init(){
+        local bus=$1
+        local addr=$2
+
+        # Get manufacturer ID from HSC
+        mfr_id=""
+        for b in $(i2cget -yf "$bus" "$addr" 0x99 s); do
+            mfr_id=$(printf '%02X' "$b")$mfr_id
+        done
+        mfr_id="0x$mfr_id"
+
+        # MPS config
+        if [ "$mfr_id" = "0x4D5053" ]; then
+            efuse_cfg=$(i2cget -yf "$bus" "$addr" 0xC4 w)
+            cfg=$(( (efuse_cfg | (1 << 8)) & 0xFFFF ))
+            i2cset -yf "$bus" "$addr" 0xC4 "$cfg" w
+        # TI config
+        elif [ "$mfr_id" = "0x4954" ]; then
+            alert_mask=$(i2cget -yf "$bus" "$addr" 0xDB w)
+            cfg=$(( (alert_mask | (1 << 1)) & 0xFFFF ))
+            i2cset -yf "$bus" "$addr" 0xDB "$cfg" w
+        else
+            echo "Unknown manufacturer ID: $mfr_id for address $addr"
+        fi
+    }
+
+    # HSC on bus 6
+    for addr in 0x42 0x43 0x44 0x45 0x48; do
+        hsc_init 6 "$addr"
+    done
+
+    # HSC on bus 8
+    hsc_init 8 0x47
+}
+
 set_product_versions_to_mb_cpld
-ti_hsc_init
+
+SKU=$(i2cget -yf 11 0x0F 0x19)
+bits=$(( (SKU >> 4) & 0x07 ))
+if [ "$bits" -eq 1 ]; then         # bits [6][5][4] = 001 --> T22
+    T22_init
+else
+    ti_hsc_init
+fi
 
 echo "initial value for GPIO output pins"
 # set initial value for GPIO output pins
