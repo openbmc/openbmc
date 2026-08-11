@@ -1,5 +1,5 @@
 [Unit]
-Conflicts=chassis-poweroff@@HOST_ID@.service slot-unplug@@HOST_ID@.service
+Conflicts=slot-unplug@@HOST_ID@.service
 
 [Install]
 WantedBy=chassis-powercycle@@HOST_ID@.service chassis-poweron@@HOST_ID@.service obmc-host-starting@@HOST_ID@.target obmc-host-reboot@@HOST_ID@.target slot-plug-in@@HOST_ID@.service
