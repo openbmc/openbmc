@@ -162,7 +162,7 @@ learn_iob_downstream_eid() {
 learn_clover_downstream_eid() {
     local rc=0
 
-    learn_eid "$((MCTP_EID + 1))" || rc=$?  # NIC
+    learn_eid "$((MCTP_EID + 2))" || rc=$?  # NIC
     return $rc
 }
 

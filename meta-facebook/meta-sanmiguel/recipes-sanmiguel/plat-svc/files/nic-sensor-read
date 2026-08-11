@@ -23,7 +23,7 @@ NIC_INFO_LIST=(
     "53 IOB2_NIC1"
     "61 IOB3_NIC0"
     "63 IOB3_NIC1"
-    "71 NS_NIC"
+    "72 NS_NIC"
 )
 
 declare -A NIC_SENSORS
