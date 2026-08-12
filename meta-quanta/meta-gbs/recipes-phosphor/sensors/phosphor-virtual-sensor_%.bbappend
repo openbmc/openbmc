@@ -4,7 +4,7 @@ SRC_URI:append:gbs = " file://config-virtual-sensor.json \
                        file://phosphor-virtual-sensor.service.replace \
                      "
 
-RDEPENDS:${PN}:append:gbs = "bash"
+RDEPENDS:${PN}:append:gbs = " bash"
 
 do_install:append:gbs() {
     install -d ${D}${datadir}/${PN}
