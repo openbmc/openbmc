@@ -118,6 +118,15 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector2",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/disk_backplane0/dp0_connector3"
                     ]
+                },
+                {
+                    "types": {
+                        "rType": "monitoring",
+                        "fType": "monitored_by"
+                    },
+                    "paths": [
+                        "/xyz/openbmc_project/state/chassis0"
+                    ]
                 }
             ]
         },

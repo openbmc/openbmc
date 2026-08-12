@@ -505,6 +505,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/rdx0/rdx_power_connector",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/rdx0/rdx_usb_connector"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "monitoring",
+                        "fType": "monitored_by"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/state/chassis0"
+                    ]
                 }
             ]
         },

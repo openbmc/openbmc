@@ -1654,6 +1654,17 @@
                     "/xyz/openbmc_project/sensors/current/ps0_output_current",
                     "/xyz/openbmc_project/sensors/current/ps1_output_current"
                 ]
+            },
+            {
+                "types":
+                {
+                    "rType": "monitoring",
+                    "fType": "monitored_by"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/state/chassis0"
+                ]
             }
         ]
     }

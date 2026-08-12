@@ -366,6 +366,17 @@
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/bmc/usb3_conn0",
                         "/xyz/openbmc_project/inventory/system/chassis/motherboard/bmc/usb3_conn1"
                     ]
+                },
+                {
+                    "types":
+                    {
+                        "rType": "monitoring",
+                        "fType": "monitored_by"
+                    },
+                    "paths":
+                    [
+                        "/xyz/openbmc_project/state/chassis0"
+                    ]
                 }
             ]
         },
