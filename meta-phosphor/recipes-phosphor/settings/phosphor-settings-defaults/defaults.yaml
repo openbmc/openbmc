@@ -16,13 +16,6 @@
           PowerSupplyRedundancyEnabled:
              Default: 'true'
 
-
-/xyz/openbmc_project/logging/rest_api_logs:
-    - Interface: xyz.openbmc_project.Object.Enable
-      Properties:
-          Enabled:
-             Default: 'false'
-
 /xyz/openbmc_project/logging/settings:
     - Interface: xyz.openbmc_project.Logging.Settings
       Properties:
