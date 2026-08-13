@@ -17,7 +17,7 @@ PACKAGECONFIG[default-link-local-autoconf] = "-Ddefault-link-local-autoconf=true
 PACKAGECONFIG[default-ipv6-accept-ra] = "-Ddefault-ipv6-accept-ra=true,-Ddefault-ipv6-accept-ra=false,,"
 PACKAGECONFIG[sync-mac] = "-Dsync-mac=true,-Dsync-mac=false,nlohmann-json,"
 PACKAGECONFIG[hyp-nw-config] = "-Dhyp-nw-config=true, -Dhyp-nw-config=false,,"
-PACKAGECONFIG[persist-mac] = "-Dpersist-mac=true, -persist-mac=false,,"
+PACKAGECONFIG[persist-mac] = "-Dpersist-mac=true,-Dpersist-mac=false,,"
 PV = "1.0+git${SRCPV}"
 PR = "r1"
 
