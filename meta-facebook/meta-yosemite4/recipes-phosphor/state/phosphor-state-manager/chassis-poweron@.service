@@ -7,6 +7,7 @@ After=multi-user.target
 Type=oneshot
 ExecStart=/usr/libexec/phosphor-state-manager/chassis-poweron %i
 ExecStartPost=/bin/bash -c '/bin/systemctl --no-block restart policy-chassis-poweron@%i.service || true'
+ExecStartPost=-/bin/busctl call xyz.openbmc_project.Console.host%i /xyz/openbmc_project/console/host%i xyz.openbmc_project.Console.Access Connect
 
 [Install]
 WantedBy=obmc-chassis-poweron@%i.target

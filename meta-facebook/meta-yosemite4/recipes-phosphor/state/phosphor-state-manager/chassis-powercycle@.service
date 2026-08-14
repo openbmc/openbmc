@@ -5,6 +5,7 @@ OnFailure=check-i3c-hub@%i.service
 [Service]
 Type=oneshot
 ExecStart=/usr/libexec/phosphor-state-manager/chassis-powercycle %i
+ExecStartPost=-/bin/busctl call xyz.openbmc_project.Console.host%i /xyz/openbmc_project/console/host%i xyz.openbmc_project.Console.Access Connect
 
 [Install]
 WantedBy=obmc-chassis-powercycle@%i.target
