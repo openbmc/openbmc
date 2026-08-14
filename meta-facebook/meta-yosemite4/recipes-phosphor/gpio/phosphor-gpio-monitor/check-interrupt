@@ -33,21 +33,6 @@ host_power_status() {
     fi
 }
 
-check_power_control_is_executed() {
-    id=$1
-    check_service=("chassis-powercycle@$id.service" "chassis-poweron@$id.service" "chassis-poweroff@$id.service" "host-powercycle@$id.service" "host-poweron@$id.service" "host-poweroff@$id.service")
-
-    for service in "${check_service[@]}"; do
-        status=$(systemctl is-active "$service")
-        if [ "$status" == "activating" ]; then
-            echo "true"
-            exit 0
-        fi
-    done
-    echo "false"
-    exit 0
-}
-
 check_cpu_power_status() {
     local slot_num=$1
     local host_id=$2
@@ -162,13 +147,13 @@ do
             fi
 
 
-            # Confirm whether power-control is being executed to avoid repeated execution
-            result=$(check_power_control_is_executed $host_id)
-            if [ "$result" == "false" ]; then
-                echo "Power state changes not caused by power-control on Host$host_id"
-                check_cpu_power_status $slot_num $host_id "Power state changes" "false"
-            else
+            # Check if a power-control operation is running via slot flock
+            slot_lock="/run/slot_power_control_${host_id}.lock"
+            if [ -e "$slot_lock" ] && ! flock -n -x "$slot_lock" -c true 2>/dev/null; then
                 echo "Power state changes caused by power-control on Host$host_id, just clear interrupt"
+            else
+                echo "Power state changes not caused by power-control on Host$host_id"
+                check_cpu_power_status $slot_num $host_id "Power state changes" "true"
             fi
 
             # Clear interrupt
