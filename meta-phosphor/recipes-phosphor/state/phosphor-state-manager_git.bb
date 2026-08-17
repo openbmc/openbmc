@@ -135,6 +135,7 @@ SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-on@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-reset-chassis-running@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-on@.service"
 SYSTEMD_SERVICE:${PN}-chassis += "phosphor-set-chassis-transition-to-off@.service"
+SYSTEMD_SERVICE:${PN}-chassis += "phosphor-wait-poweron-blocks.service"
 SYSTEMD_SERVICE:${PN}-chassis += "${@bb.utils.contains('PACKAGECONFIG', 'multi-chassis-smp', 'phosphor-chassis-wait-for-smp-poweron.service', '', d)}"
 FILES:${PN}-chassis += "${@bb.utils.contains('PACKAGECONFIG', 'multi-chassis-smp', '${libexecdir}/phosphor-state-manager/phosphor-chassis-wait-for-smp-poweron', '', d)}"
 
@@ -298,5 +299,5 @@ SYSTEMD_LINK:${PN}-obmc-targets += "${@compose_list_zip(d, 'RESET_FMT_CTRL', 'OB
 SYSTEMD_LINK[vardeps] += "OBMC_CHASSIS_INSTANCES OBMC_HOST_INSTANCES"
 
 SRC_URI = "git://github.com/openbmc/phosphor-state-manager;branch=master;protocol=https"
-SRCREV = "1f2d8f6c3556b529668dbbf19dac3fe6ab264e37"
+SRCREV = "a518bd393db4c04f2e1354e6540463a446dfde5b"
 
