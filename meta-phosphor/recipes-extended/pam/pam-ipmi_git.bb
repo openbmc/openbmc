@@ -16,4 +16,12 @@ FILES:${PN} += " \
                ${base_libdir}/security/ \
                ${sysconfdir}/key_file \
                ${sysconfdir}/ipmi_pass \
+               ${sysconfdir}/pam.d/ipmi \
                "
+
+SRC_URI += "file://pam.d/ipmi"
+
+do_install:append() {
+    install -d ${D}${sysconfdir}/pam.d
+    install -m 0644 ${UNPACKDIR}/pam.d/ipmi ${D}${sysconfdir}/pam.d/ipmi
+}
