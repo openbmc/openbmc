@@ -59,6 +59,10 @@ config_ti_hsc()
 {
     local hsc_type="$1"
     local addrs=()
+    local dev_setup_offset="0xd9"
+    local dev_setup_val=(0x14 0x04 0x04 0x14)
+    local res=0
+    local i
 
     echo "Configure TI HSC"
 
@@ -68,22 +72,37 @@ config_ti_hsc()
         addrs=(0x10 0x12 0x14 0x16)
     fi
 
-    # Set HSC1 current range to high
-    i2cset -y -f 9 "${addrs[0]}" 0xd9 0x14 b
-    # Set HSC2 current range to low
-    i2cset -y -f 9 "${addrs[1]}" 0xd9 0x04 b
-    # Set HSC3 current range to low
-    i2cset -y -f 9 "${addrs[2]}" 0xd9 0x04 b
-    # Set HSC4 current range to high
-    i2cset -y -f 9 "${addrs[3]}" 0xd9 0x14 b
+    # Config HSC current range via DEVICE_SETUP register
+    for i in "${!addrs[@]}"; do
+        if ! i2cset -y -f 9 "${addrs[$i]}" "${dev_setup_offset}" "${dev_setup_val[$i]}" b; then
+            echo "Failed to set HSC$((i + 1)) current range" >&2
+            res=1
+        fi
+    done
 
-    return 0
+    return "${res}"
 }
 
 config_mps_hsc()
 {
+    local addrs=(0x10 0x12 0x14 0x16)
+    local iin_tunes_offset="0x38"
+    local iin_tunes_val_lsb=(0x3c 0xef 0xf2 0x79)
+    local iin_tunes_val_msb=(0x00 0xf0 0xe8 0x00)
+    local res=0
+    local i
+
     echo "Configure MPS HSC"
-    return 0
+
+    # Config HSC IIN_TUNE register
+    for i in "${!addrs[@]}"; do
+        if ! i2ctransfer -y -f 9 "w3@${addrs[$i]}" "${iin_tunes_offset}" "${iin_tunes_val_lsb[$i]}" "${iin_tunes_val_msb[$i]}"; then
+            echo "Failed to set HSC$((i + 1)) IIN_TUNE" >&2
+            res=1
+        fi
+    done
+
+    return "${res}"
 }
 
 config_ifx_hsc()
@@ -95,6 +114,8 @@ config_ifx_hsc()
 config_hsc()
 {
     local hsc_type=""
+    local retry=0
+    local max_retries=3
 
     if ! hsc_type=$(identify_hsc_type); then
         echo "Failed to identify HSC type, assume TI"
@@ -103,19 +124,34 @@ config_hsc()
 
     echo "HSC type identified as: ${hsc_type}"
 
-    case "${hsc_type}" in
-        "ti-dvt"|"ti")
-            config_ti_hsc "${hsc_type}"
-            ;;
-        "mps")
-            config_mps_hsc
-            ;;
-        "ifx")
-            config_ifx_hsc
-            ;;
-    esac
+    while [ "${retry}" -lt "${max_retries}" ]; do
+        case "${hsc_type}" in
+            "ti-dvt"|"ti")
+                if config_ti_hsc "${hsc_type}"; then
+                    return 0
+                fi
+                ;;
+            "mps")
+                if config_mps_hsc; then
+                    return 0
+                fi
+                ;;
+            "ifx")
+                if config_ifx_hsc; then
+                    return 0
+                fi
+                ;;
+        esac
 
-    return 0
+        ((retry++))
+        if [ "${retry}" -lt "${max_retries}" ]; then
+            echo "Retrying HSC configuration (${retry}/${max_retries})..."
+            sleep 1
+        fi
+    done
+
+    echo "HSC configuration failed after ${max_retries} attempts" >&2
+    return 1
 }
 
 
@@ -130,7 +166,9 @@ else
 fi
 
 # configure hsc
-config_hsc
+if ! config_hsc; then
+    echo "Error: HSC configuration failed."
+fi
 
 # The host boot drive reset pin does not require BMC control during host power on/off.
 # Drive the pin HIGH by default (deassert reset).
