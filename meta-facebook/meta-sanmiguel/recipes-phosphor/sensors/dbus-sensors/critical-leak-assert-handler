@@ -1,5 +1,11 @@
 #!/bin/bash
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
+
+if [ $# -ne 1 ]; then
+    echo "Incorrect number of arguments. Expected 1, got $#."
+    exit 1
+fi
+
 source /usr/libexec/fb-common-functions
 
 GPIO_LOW=0
