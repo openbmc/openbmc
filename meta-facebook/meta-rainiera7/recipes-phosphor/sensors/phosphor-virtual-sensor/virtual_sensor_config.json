@@ -563,7 +563,8 @@
         },
         "Threshold": {
             "CriticalLow": 5,
-            "CriticalHigh": 95
+            "CriticalHigh": 95,
+            "HardShutdownHigh": 115
         },
         "Associations": [
             [
