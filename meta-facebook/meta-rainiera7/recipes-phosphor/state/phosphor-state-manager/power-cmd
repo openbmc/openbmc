@@ -20,7 +20,7 @@ is_service_busy() {
 
 unbind_bios_flash()
 {
-    if [ -d "/sys/devices/platform/ahb/1e631000.spi/spi_master/spi1/spi1.0/spi-nor" ]; then
+    if [ -d "/sys/devices/platform/bus@14000000/14010000.spi/spi_master/spi1/spi1.0/spi-nor" ]; then
         echo "UnBinding the BIOS flash driver before power ON !!"
         echo spi1.0 > /sys/bus/spi/drivers/spi-nor/unbind
     fi
