@@ -1,6 +1,4 @@
 #!/bin/bash
-# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
-source /usr/libexec/yosemite5-common-functions
 
 dev="${1:-}"
 mode="${2:-setup}"
@@ -13,32 +11,6 @@ get_mctp_iface_assigned_eid() {
 
 is_eid_assigned() {
     busctl tree au.com.codeconstruct.MCTP1 | grep -q "/endpoints/$1"
-}
-
-get_cxl_mctp_iface() {
-    local cxl_fru_names=("Maple_Falls" "Victoria_Falls")
-    local version
-
-    for name in "${cxl_fru_names[@]}"; do
-        version=$(get_product_version "$name")
-
-        if [ "$version" != "Unknown" ] && [ -n "$version" ]; then
-            # start from DVT3, CXL cable moves from MCIO4A to MCIO3A
-            case "$version" in
-                EVT|DVT|DVT1|DVT2)
-                    echo "mctpi2c12"
-                    ;;
-                *)
-                    echo "mctpi2c15"
-                    ;;
-            esac
-
-            return 0
-        fi
-    done
-
-    echo ""
-    return 1
 }
 
 setup_endpoint() {
@@ -101,16 +73,9 @@ remove_endpoint() {
     fi
 }
 
-CXL_IFACE=$(get_cxl_mctp_iface)
-if [[ $? -ne 0 || -z "$CXL_IFACE" ]]; then
-    echo "get_cxl_mctp_iface failed or returned empty. Using default iface"
-    CXL_IFACE="mctpi2c12"
-fi
-
 # Mapping table: "devname:iface:physaddr:eid"
 declare -a endpoint_map=(
     "nic_mctp:mctpi2c4:0x32:10"
-    "cxl_mctp:${CXL_IFACE}:0x32:20"
 )
 
 for entry in "${endpoint_map[@]}"; do
