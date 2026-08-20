@@ -98,5 +98,66 @@
             "  default : TEMP[0];",
             "}"
         ]
+    },
+    {
+        "Desc": {
+            "Name": "VIRTUAL_FIOBOARD_REMOTE_INLET_TEMP_C",
+            "SensorType": "temperature",
+            "MaxValue": 127,
+            "MinValue": -127
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/Catalina_FIO"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "FIOBOARD_REMOTE_INLET_TEMP_C",
+                    "Desc": {
+                        "Name": "FIOBOARD_REMOTE_INLET_TEMP_C",
+                        "SensorType": "temperature"
+                    }
+                },
+                {
+                    "ParamName": "MB_FAN_PWM_PCT",
+                    "Desc": {
+                        "Name": "MB_FAN_PWM_PCT",
+                        "SensorType": "fan_pwm"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var DUTY_AVG:=MB_FAN_PWM_PCT;",
+            "var DUTY_OFS[20]:={100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10, 0};",
+            "var CAL_OFS[20]:={-0.4, -0.4, -0.5, -0.5, -0.5, -0.5, -0.7, -0.7, -0.8, -0.8, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0};",
+            "var DUTY_AVG_VALID:=ifnan(DUTY_AVG, 999);",
+            "switch {",
+            "  case inrange(DUTY_OFS[1],DUTY_AVG_VALID,DUTY_OFS[0]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[0]+((DUTY_AVG-DUTY_OFS[0])*(CAL_OFS[1]-CAL_OFS[0])/(DUTY_OFS[1]-DUTY_OFS[0])));",
+            "  case inrange(DUTY_OFS[2],DUTY_AVG_VALID,DUTY_OFS[1]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[1]+((DUTY_AVG-DUTY_OFS[1])*(CAL_OFS[2]-CAL_OFS[1])/(DUTY_OFS[2]-DUTY_OFS[1])));",
+            "  case inrange(DUTY_OFS[3],DUTY_AVG_VALID,DUTY_OFS[2]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[2]+((DUTY_AVG-DUTY_OFS[2])*(CAL_OFS[3]-CAL_OFS[2])/(DUTY_OFS[3]-DUTY_OFS[2])));",
+            "  case inrange(DUTY_OFS[4],DUTY_AVG_VALID,DUTY_OFS[3]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[3]+((DUTY_AVG-DUTY_OFS[3])*(CAL_OFS[4]-CAL_OFS[3])/(DUTY_OFS[4]-DUTY_OFS[3])));",
+            "  case inrange(DUTY_OFS[5],DUTY_AVG_VALID,DUTY_OFS[4]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[4]+((DUTY_AVG-DUTY_OFS[4])*(CAL_OFS[5]-CAL_OFS[4])/(DUTY_OFS[5]-DUTY_OFS[4])));",
+            "  case inrange(DUTY_OFS[6],DUTY_AVG_VALID,DUTY_OFS[5]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[5]+((DUTY_AVG-DUTY_OFS[5])*(CAL_OFS[6]-CAL_OFS[5])/(DUTY_OFS[6]-DUTY_OFS[5])));",
+            "  case inrange(DUTY_OFS[7],DUTY_AVG_VALID,DUTY_OFS[6]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[6]+((DUTY_AVG-DUTY_OFS[6])*(CAL_OFS[7]-CAL_OFS[6])/(DUTY_OFS[7]-DUTY_OFS[6])));",
+            "  case inrange(DUTY_OFS[8],DUTY_AVG_VALID,DUTY_OFS[7]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[7]+((DUTY_AVG-DUTY_OFS[7])*(CAL_OFS[8]-CAL_OFS[7])/(DUTY_OFS[8]-DUTY_OFS[7])));",
+            "  case inrange(DUTY_OFS[9],DUTY_AVG_VALID,DUTY_OFS[8]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[8]+((DUTY_AVG-DUTY_OFS[8])*(CAL_OFS[9]-CAL_OFS[8])/(DUTY_OFS[9]-DUTY_OFS[8])));",
+            "  case inrange(DUTY_OFS[10],DUTY_AVG_VALID,DUTY_OFS[9]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[9]+((DUTY_AVG-DUTY_OFS[9])*(CAL_OFS[10]-CAL_OFS[9])/(DUTY_OFS[10]-DUTY_OFS[9])));",
+            "  case inrange(DUTY_OFS[11],DUTY_AVG_VALID,DUTY_OFS[10]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[10]+((DUTY_AVG-DUTY_OFS[10])*(CAL_OFS[11]-CAL_OFS[10])/(DUTY_OFS[11]-DUTY_OFS[10])));",
+            "  case inrange(DUTY_OFS[12],DUTY_AVG_VALID,DUTY_OFS[11]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[11]+((DUTY_AVG-DUTY_OFS[11])*(CAL_OFS[12]-CAL_OFS[11])/(DUTY_OFS[12]-DUTY_OFS[11])));",
+            "  case inrange(DUTY_OFS[13],DUTY_AVG_VALID,DUTY_OFS[12]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[12]+((DUTY_AVG-DUTY_OFS[12])*(CAL_OFS[13]-CAL_OFS[12])/(DUTY_OFS[13]-DUTY_OFS[12])));",
+            "  case inrange(DUTY_OFS[14],DUTY_AVG_VALID,DUTY_OFS[13]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[13]+((DUTY_AVG-DUTY_OFS[13])*(CAL_OFS[14]-CAL_OFS[13])/(DUTY_OFS[14]-DUTY_OFS[13])));",
+            "  case inrange(DUTY_OFS[15],DUTY_AVG_VALID,DUTY_OFS[14]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[14]+((DUTY_AVG-DUTY_OFS[14])*(CAL_OFS[15]-CAL_OFS[14])/(DUTY_OFS[15]-DUTY_OFS[14])));",
+            "  case inrange(DUTY_OFS[16],DUTY_AVG_VALID,DUTY_OFS[15]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[15]+((DUTY_AVG-DUTY_OFS[15])*(CAL_OFS[16]-CAL_OFS[15])/(DUTY_OFS[16]-DUTY_OFS[15])));",
+            "  case inrange(DUTY_OFS[17],DUTY_AVG_VALID,DUTY_OFS[16]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[16]+((DUTY_AVG-DUTY_OFS[16])*(CAL_OFS[17]-CAL_OFS[16])/(DUTY_OFS[17]-DUTY_OFS[16])));",
+            "  case inrange(DUTY_OFS[18],DUTY_AVG_VALID,DUTY_OFS[17]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[17]+((DUTY_AVG-DUTY_OFS[17])*(CAL_OFS[18]-CAL_OFS[17])/(DUTY_OFS[18]-DUTY_OFS[17])));",
+            "  case inrange(DUTY_OFS[19],DUTY_AVG_VALID,DUTY_OFS[18]): FIOBOARD_REMOTE_INLET_TEMP_C+(CAL_OFS[18]+((DUTY_AVG-DUTY_OFS[18])*(CAL_OFS[19]-CAL_OFS[18])/(DUTY_OFS[19]-DUTY_OFS[18])));",
+            "  default: FIOBOARD_REMOTE_INLET_TEMP_C+CAL_OFS[19];",
+            "}"
+        ]
     }
 ]
