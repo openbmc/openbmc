@@ -1,0 +1,7 @@
+[Unit]
+Description=Hotplug DC Cycle trigger
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/hotplug-policy/hotplug-dc-cycle
+SyslogIdentifier=hotplug-dc-cycle

@@ -1,0 +1,35 @@
+- name: object manager path group
+  class: group
+  group: path
+  members:
+      - meta: PATH
+        path: /xyz/openbmc_project/GPIODeviceDetected/MB_E1S0
+      - meta: PATH
+        path: /xyz/openbmc_project/GPIODeviceDetected/MB_E1S1
+      - meta: PATH
+        path: /xyz/openbmc_project/GPIODeviceDetected/E1S_EB_E1S2
+      - meta: PATH
+        path: /xyz/openbmc_project/GPIODeviceDetected/E1S_EB_E1S3
+
+- name: pathwatch plug in
+  class: pathwatch
+  pathwatch: path
+  paths: object manager path group
+  pathcallback: dc cycle method pathcallback
+  event: interfacesAdded
+  match_object_path: True
+
+- name: dc cycle method pathcallback
+  description: >
+      'The method callback invokes the specified D-Bus method.'
+  class: pathcallback
+  pathcallback: method
+  service: org.freedesktop.systemd1
+  path: /org/freedesktop/systemd1
+  interface: org.freedesktop.systemd1.Manager
+  method: StartUnit
+  args:
+      - value: hotplug-dc-cycle.service
+        type: string
+      - value: replace
+        type: string
