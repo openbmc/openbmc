@@ -514,7 +514,7 @@
             [
                 "chassis",
                 "all_sensors",
-                "/xyz/openbmc_project/inventory/system/board/Yosemite5_SCM"
+                "/xyz/openbmc_project/inventory/system/board/Rainier_SCM"
             ]
         ],
         "Params": {
