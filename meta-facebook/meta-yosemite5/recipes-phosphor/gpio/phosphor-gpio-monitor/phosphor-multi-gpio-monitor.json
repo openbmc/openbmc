@@ -557,5 +557,89 @@
             "FALLING": ["uart-select-led@bmc.service"]
         },
         "Continue": true
+    },
+    {
+        "Name": "IRQ_TEMP_0_ALERT_N",
+        "LineName": "IRQ_TEMP_0_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_IRQ_TEMP_0_ALERT_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_IRQ_TEMP_0_ALERT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "IRQ_TEMP_1_ALERT_N",
+        "LineName": "IRQ_TEMP_1_ALERT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_IRQ_TEMP_1_ALERT_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_IRQ_TEMP_1_ALERT_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_PMBUS_0_N",
+        "LineName": "ALERT_PMBUS_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@cxl_ALERT_PMBUS_0_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@cxl_ALERT_PMBUS_0_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_PMBUS_1_N",
+        "LineName": "ALERT_PMBUS_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@cxl_ALERT_PMBUS_1_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@cxl_ALERT_PMBUS_1_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_PMBUS_2_N",
+        "LineName": "ALERT_PMBUS_2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-deassert-log@cxl_ALERT_PMBUS_2_N.service"
+            ],
+            "FALLING": [
+                "smc-assert-log@cxl_ALERT_PMBUS_2_N.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "CXL_VRHOT_ALERT_R1_N",
+        "LineName": "CXL_VRHOT_ALERT_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_CXL_VRHOT_ALERT_R1_N.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_CXL_VRHOT_ALERT_R1_N.service"
+            ]
+        },
+        "Continue": true
     }
 ]

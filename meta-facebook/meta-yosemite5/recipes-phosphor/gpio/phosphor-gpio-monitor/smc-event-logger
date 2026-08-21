@@ -29,11 +29,15 @@ if [[ $GPIO_NAME == ALERT_CLKMUX_*_LOSS_N ]];then
 fi
 
 if [[ $BOARD == mb* ]]; then
-    DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/Yosemite5_MB/${GPIO_NAME}"
+    BOARD_NAME="Yosemite5_MB"
+elif [[ $BOARD == cxl* ]]; then
+    BOARD_NAME="Yosemite5_CXL"
 else
     echo "Unknown message format: $message"
     exit 1
 fi
+
+DEVICE_PATH="/xyz/openbmc_project/inventory/system/board/${BOARD_NAME}/${GPIO_NAME}"
 
 MSG_ID="xyz.openbmc_project.State.SMC.$action"
 STASH_FILE="/run/$GPIO_NAME.log_entry"
