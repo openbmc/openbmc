@@ -18,7 +18,7 @@ PACKAGECONFIG[mmc_layout] = "-Dbmc-layout=mmc"
 PACKAGECONFIG[flash_bios] = "-Dhost-bios-upgrade=enabled, -Dhost-bios-upgrade=disabled"
 PACKAGECONFIG[static-dual-image] = "-Dbmc-static-dual-image=enabled, -Dbmc-static-dual-image=disabled"
 PACKAGECONFIG[software-update-dbus-interface] = "-Dsoftware-update-dbus-interface=enabled, -Dsoftware-update-dbus-interface=disabled"
-PACKAGECONFIG[bios-software-update] = "-Dbios-software-update=enabled, -Dbios-software-update=disabled, libgpiod libpldm"
+PACKAGECONFIG[spi-flash-software-update] = "-Dspi-flash-software-update=enabled, -Dspi-flash-software-update=disabled, libgpiod libpldm"
 PACKAGECONFIG[i2cvr-software-update] = "-Di2cvr-software-update=enabled, -Di2cvr-software-update=disabled, libpldm libgpiod i2c-tools"
 PACKAGECONFIG[eepromdevice-software-update] = "-Deepromdevice-software-update=enabled, -Deepromdevice-software-update=disabled, libgpiod libpldm"
 PACKAGECONFIG[cpld-software-update] = "-Dcpld-software-update=enabled, -Dcpld-software-update=disabled, libgpiod libpldm i2c-tools"
@@ -37,7 +37,7 @@ SOFTWARE_MGR_PACKAGES = " \
     ${PN}-sync \
     ${PN}-usb \
     ${PN}-side-switch \
-    ${PN}-bios-software-update \
+    ${PN}-spi-flash-software-update \
     ${PN}-i2cvr-software-update \
     ${PN}-eepromdevice-software-update \
     ${PN}-cpld-software-update \
@@ -59,7 +59,7 @@ SYSTEMD_SERVICE:${PN}-side-switch += "${@bb.utils.contains('PACKAGECONFIG', 'sid
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-alt@.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-static-mount-alt.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'static-dual-image', 'obmc-flash-bmc-prepare-for-sync.service', '', d)}"
-SYSTEMD_SERVICE:${PN}-bios-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', 'xyz.openbmc_project.Software.BIOS.service', '', d)}"
+SYSTEMD_SERVICE:${PN}-spi-flash-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'spi-flash-software-update', 'xyz.openbmc_project.Software.SPIFlash.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-i2cvr-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', 'xyz.openbmc_project.Software.I2CVR.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-eepromdevice-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'eepromdevice-software-update', 'xyz.openbmc_project.Software.EEPROMDevice.service', '', d)}"
 SYSTEMD_SERVICE:${PN}-cpld-software-update += "${@bb.utils.contains('PACKAGECONFIG', 'cpld-software-update', 'xyz.openbmc_project.Software.CPLD.service', '', d)}"
@@ -87,7 +87,7 @@ RDEPENDS:${PN}-updater += " \
 "
 
 RRECOMMENDS:${PN} += "\
-    ${@bb.utils.contains('PACKAGECONFIG', 'bios-software-update', '${PN}-bios-software-update', '', d)} \
+    ${@bb.utils.contains('PACKAGECONFIG', 'spi-flash-software-update', '${PN}-spi-flash-software-update', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'i2cvr-software-update', '${PN}-i2cvr-software-update', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'eepromdevice-software-update', '${PN}-eepromdevice-software-update', '', d)} \
     ${@bb.utils.contains('PACKAGECONFIG', 'cpld-software-update', '${PN}-cpld-software-update', '', d)} \
@@ -122,8 +122,8 @@ FILES:${PN}-usb += "\
 FILES:${PN}-side-switch += "\
     ${libexecdir}/phosphor-code-mgmt/phosphor-bmc-side-switch \
     "
-FILES:${PN}-bios-software-update += "\
-    ${libexecdir}/phosphor-code-mgmt/phosphor-bios-software-update \
+FILES:${PN}-spi-flash-software-update += "\
+    ${libexecdir}/phosphor-code-mgmt/phosphor-spi-flash-software-update \
     "
 FILES:${PN}-i2cvr-software-update += "\
     ${libexecdir}/phosphor-code-mgmt/phosphor-i2cvr-software-update \

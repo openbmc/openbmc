@@ -8,5 +8,5 @@ PACKAGECONFIG:append = " \
 "
 
 PACKAGECONFIG:append:fb-compute-singlehost = " \
-    bios-software-update \
+    spi-flash-software-update \
 "
