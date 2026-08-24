@@ -77,6 +77,66 @@ bind_i2c_device()
     return 1
 }
 
+get_gpio_val_from_debugfs()
+{
+    local CHIP=$1
+    local LINE=$2
+    local DEBUGFS_GPIO="${DEBUGFS_GPIO:-/sys/kernel/debug/gpio}"
+
+    [ -n "$CHIP" ] && [ -n "$LINE" ] || return 1
+    [ -r "$DEBUGFS_GPIO" ] || return 1
+    [[ $CHIP =~ ^[0-9]+$ ]] && CHIP="gpiochip$CHIP"
+
+    awk -v chip="${CHIP}:" -v line="$LINE" '
+        /^gpiochip[0-9]+:/ {
+            if (insec) exit
+            insec = ($1 == chip)
+            if (insec) {
+                base = 0
+                if (match($0, /GPIOs [0-9]+-/))
+                    base = substr($0, RSTART + 6, RLENGTH - 7)
+                target = "gpio-" (base + line)
+            }
+            next
+        }
+        insec && $1 == target {
+            sub(/^[^)]*\)/, "")
+            for (i = 1; i <= NF; i++) {
+                if ($i == "hi") { print 1; found = 1; exit }
+                if ($i == "lo") { print 0; found = 1; exit }
+            }
+            exit
+        }
+        END { exit (found ? 0 : 1) }
+    ' "$DEBUGFS_GPIO"
+}
+
+get_gpio_val_by_name()
+{
+    local NET_NAME=$1
+    local CHIP LINE RET_VAL
+
+    if ! read -r CHIP LINE < <(gpiofind "$NET_NAME") || [ -z "$LINE" ]; then
+        echo "get_gpio_val_by_name: can not find gpio, $NET_NAME" >&2
+        return 1
+    fi
+
+    for _ in {1..10}; do
+        if RET_VAL=$(gpioget "$CHIP" "$LINE" 2>/dev/null); then
+            echo "$RET_VAL"
+            return 0
+        fi
+        if RET_VAL=$(get_gpio_val_from_debugfs "$CHIP" "$LINE"); then
+            echo "$RET_VAL"
+            return 0
+        fi
+        usleep 10000
+    done
+
+    echo "get_gpio_val_by_name: get $NET_NAME failed (chip=$CHIP line=$LINE)" >&2
+    return 1
+}
+
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     CMD=$1
     shift
@@ -89,6 +149,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
             ;;
         bind_i2c_device)
             bind_i2c_device "$@"
+            ;;
+        get_gpio_val_by_name)
+            get_gpio_val_by_name "$@"
             ;;
         *)
             echo "Usage: $0 {get_gpio|set_gpio|bind_i2c_device} args..."
