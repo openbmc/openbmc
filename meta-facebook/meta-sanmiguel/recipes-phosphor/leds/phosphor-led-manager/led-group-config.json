@@ -33,6 +33,18 @@
                     "Period": 1000
                 }
             ]
+        },
+        {
+            "group": "leak_detected",
+            "members": [
+                {
+                    "Name": "id_amber",
+                    "Action": "Blink",
+                    "Priority": "Blink",
+                    "DutyOn": 50,
+                    "Period": 1000
+                }
+            ]
         }
     ]
 }

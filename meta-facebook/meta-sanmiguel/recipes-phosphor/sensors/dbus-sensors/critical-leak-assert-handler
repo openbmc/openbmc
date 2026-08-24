@@ -39,4 +39,6 @@ case $1 in
     exit 1
 esac
 
+systemctl start obmc-led-group-start@leak_detected.service
+
 exit 0
