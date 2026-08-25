@@ -1,0 +1,115 @@
+#!/bin/bash
+#
+# config: 1234 99
+# @brief: Collect AMC dreport data via Redfish.
+#
+
+# The sourced `functions` file is not
+# available during shellcheck linting
+#
+# shellcheck disable=SC1090,SC1091
+. "$DREPORT_INCLUDE/functions"
+
+AMC_HOST="192.168.31.1"
+BASE_URL="http://${AMC_HOST}/redfish/v1"
+DIAGLOGS_URL="${BASE_URL}/Systems/Accelerators/LogServices/DiagLogs"
+POLL_INTERVAL=15
+POLL_TIMEOUT=600
+
+# AMC allows unauthenticated Redfish access on the internal link, so no
+# credentials are embedded here. -k keeps working if the endpoint moves to https.
+CURL_OPTS=(-sk --connect-timeout 10)
+
+function collect_amc_dreport()
+{
+    echo "Triggering CollectDiagnosticData on AMC (${AMC_HOST})..."
+
+    # Step 1: trigger diagnostic data collection; the POST returns a Task.
+    local trigger_resp task_id
+    trigger_resp=$(curl "${CURL_OPTS[@]}" -H "Content-Type: application/json" \
+        -X POST "${DIAGLOGS_URL}/Actions/LogService.CollectDiagnosticData" \
+        -d '{"DiagnosticDataType":"OEM","OEMDiagnosticDataType":"AllLogs"}')
+
+    task_id=$(echo "$trigger_resp" | jq -r '.Id // empty')
+
+    if [ -z "$task_id" ]; then
+        echo "Failed to create diagnostic task on AMC"
+        echo "$trigger_resp"
+        return 1
+    fi
+    echo "AMC diagnostic task id: ${task_id}"
+
+    # Step 2: poll the Task until it completes.
+    # A task is only considered done when PercentComplete=100 AND
+    # TaskState=Completed, so a task stuck mid-way is not treated as success.
+    local elapsed=0 state="" percent="" task_json
+    while [ "$elapsed" -lt "$POLL_TIMEOUT" ]; do
+        task_json=$(curl "${CURL_OPTS[@]}" -X GET \
+            "${BASE_URL}/TaskService/Tasks/${task_id}")
+        state=$(echo "$task_json" | jq -r '.TaskState // empty')
+        percent=$(echo "$task_json" | jq -r '.PercentComplete // empty')
+
+        case "$state" in
+            Completed)
+                if [ "$percent" = "100" ]; then
+                    echo "AMC task completed (PercentComplete=100)"
+                    break
+                fi
+                echo "AMC task state Completed but PercentComplete=${percent:-none}, waiting..."
+                ;;
+            Exception|Cancelled|Killed)
+                echo "AMC task failed with state: ${state}"
+                return 1
+                ;;
+            *)
+                echo "AMC task in progress (state=${state:-none}, percent=${percent:-none})"
+                ;;
+        esac
+
+        sleep "$POLL_INTERVAL"
+        elapsed=$((elapsed + POLL_INTERVAL))
+    done
+
+    if [ "$state" != "Completed" ] || [ "$percent" != "100" ]; then
+        echo "AMC task did not finish within ${POLL_TIMEOUT}s (last state: ${state:-none}, percent: ${percent:-none})"
+        return 1
+    fi
+
+    # Determine the DiagLogs entry created by this collection.
+    # The completed Task echoes the created resource in its Payload HttpHeaders
+    # "Location" value, so use that exact entry instead of guessing the newest
+    # id (which breaks with concurrent collections or non-incrementing ids).
+    local entry_path entry_id
+    entry_path=$(echo "$task_json" \
+        | jq -r '.Payload.HttpHeaders[]? | select(startswith("Location:"))' \
+        | sed -e 's#^Location:[[:space:]]*##' -e 's#[[:space:]]*$##')
+    entry_id=${entry_path##*/}
+
+    if [ -z "$entry_id" ]; then
+        echo "Could not determine diagnostic log entry from AMC task payload"
+        return 1
+    fi
+    echo "AMC diagnostic entry id: ${entry_id}"
+
+    # Step 3: download the attachment to the local BMC /tmp.
+    local local_file="/tmp/amc_all_logs.tar.xz"
+    curl "${CURL_OPTS[@]}" -H "Content-Type: application/json" -X GET \
+        "${DIAGLOGS_URL}/Entries/${entry_id}/attachment" -o "$local_file"
+
+    if [ ! -s "$local_file" ]; then
+        echo "Failed to download AMC diagnostic attachment"
+        rm -f "$local_file"
+        return 1
+    fi
+    echo "AMC diagnostic attachment saved to: $local_file"
+
+    # Keep the entry on AMC so the BMC dump entry maps 1:1 to the AMC entry.
+    # Add the compressed archive as-is instead of extracting it: /tmp is a small
+    # RAM-backed filesystem and the uncompressed AMC logs can exhaust it
+    # ("No space left on device"). dreport compresses the whole report at the
+    # end, so keeping a nested archive is fine.
+    add_copy_file "$local_file" "amc dreport dump"
+    rm -f "$local_file"
+}
+
+collect_amc_dreport
