@@ -6,6 +6,8 @@
   members:
     - meta: PATH
       path: /xyz/openbmc_project/sensors/temperature/MB_CPU_TEMP_C
+    - meta: PATH
+      path: /xyz/openbmc_project/sensors/temperature/NIC0_TEMP_C
 
 # UNR alarm property exposed by temperature sensors
 - name: sensor unr alarm property

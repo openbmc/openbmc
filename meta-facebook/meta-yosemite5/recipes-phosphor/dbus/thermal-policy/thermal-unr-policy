@@ -6,6 +6,7 @@ PROP_NAME="HardShutdownAlarmHigh"
 
 declare -A SENSORS=(
     ["/xyz/openbmc_project/sensors/temperature/MB_CPU_TEMP_C"]="$HWMON_TEMP_SVC"
+    ["/xyz/openbmc_project/sensors/temperature/NIC0_TEMP_C"]="$HWMON_TEMP_SVC"
 )
 
 add_sel() {
