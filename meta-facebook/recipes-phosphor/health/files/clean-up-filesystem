@@ -4,3 +4,4 @@
 rm -rf /var/log/redfish*
 rm -rf /home/root/*
 rm -rf /run/mnt-persist/var-data/lib/phosphor-debug-collector/dumps/*
+rm -rf /run/mnt-persist/var-data/spool/rsyslog/*
