@@ -13,7 +13,8 @@ GPIO_LOW=0
 #======================================
 # output pins
 #======================================
-out_rmc_large_leak_n="LEAK_DETECT_RMC_N"
+out_rmc_tray_leak_n="LEAK_DETECT_RMC_N"
+out_rmc_small_leak_n="SMALL_LEAK_RMC_N"
 
 set_request_host_transition()
 {
@@ -23,8 +24,19 @@ set_request_host_transition()
         RequestedHostTransition s "$1"
 }
 
-set_gpio "$out_rmc_large_leak_n" "$GPIO_LOW"
+case $1 in
+    Nvidia_SMA_10_LEAKDETECTOR_* | Nvidia_SMA_20_LEAKDETECTOR_*)
+    set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+    set_gpio "$out_rmc_tray_leak_n" "$GPIO_LOW"
+    ;;
 
-set_request_host_transition "xyz.openbmc_project.State.Host.Transition.Off"
+    Nvidia_SMA_40_LEAKDETECTOR_* | Nvidia_SMA_60_LEAKDETECTOR_* | Nvidia_SMA_70_LEAKDETECTOR_*)
+    set_gpio "$out_rmc_small_leak_n" "$GPIO_LOW"
+    ;;
+
+    *)
+    echo "Unrecognized leak sensor name."
+    exit 1
+esac
 
 exit 0
