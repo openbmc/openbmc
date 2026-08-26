@@ -96,6 +96,7 @@ ti_hsc_init()
         local REG_WRITE_PROTECT="0xF8"
         local REG_OC_TIMER="0xE6"
         local REG_ALERT_MASK="0xDB"
+        local REG_CLEAR_FAULTS="0x03"
         local WRITE_PROTECT_VAL="0xA2"
         local OC_TIMER_VAL="0x5c"
         local ALERT_MASK_VAL="0x0102"
@@ -105,6 +106,7 @@ ti_hsc_init()
         i2cset -y -f "$BUS" "$ADDR" "$REG_WRITE_PROTECT" "$WRITE_PROTECT_VAL" || echo "Failed to unlock write protection"
         i2cset -y -f "$BUS" "$ADDR" "$REG_OC_TIMER" "$OC_TIMER_VAL" || echo "Failed to set OC timer"
         i2cset -y -f "$BUS" "$ADDR" "$REG_ALERT_MASK" "$ALERT_MASK_VAL" w || echo "Failed to set alert mask"
+        i2cset -y -f "$BUS" "$ADDR" "$REG_CLEAR_FAULTS" || echo "Failed to clear faults"
 
         READ_VAL=$(i2cget -y -f "$BUS" "$ADDR" "$REG_OC_TIMER" 2>/dev/null)
         if [ -z "$READ_VAL" ]; then
@@ -285,7 +287,9 @@ T22_init(){
         elif [ "$mfr_id" = "0x4954" ]; then
             alert_mask=$(i2cget -yf "$bus" "$addr" 0xDB w)
             cfg=$(( (alert_mask | (1 << 1)) & 0xFFFF ))
+            i2cset -yf "$bus" "$addr" 0xF8 0xA2
             i2cset -yf "$bus" "$addr" 0xDB "$cfg" w
+            i2cset -yf "$bus" "$addr" 0x03 || echo "Failed to clear faults"
         else
             echo "Unknown manufacturer ID: $mfr_id for address $addr"
         fi
