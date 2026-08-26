@@ -22,7 +22,7 @@ RDEPENDS:${PN} += " \
   "
 
 SRC_URI = "git://github.com/openbmc/google-ipmi-sys;branch=master;protocol=https"
-SRCREV = "078fa89177769fd5a2a80ea51bec66354682f9ef"
+SRCREV = "6a9a95bd52b188eb47726206ee8f512be4566de6"
 
 FILES:${PN} += "${libdir}/ipmid-providers"
 
