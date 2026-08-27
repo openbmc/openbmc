@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Remove EID for SWB
-if i2cdetect -l | grep -q "^i2c-114[[:space:]]"; then
-    eid=$(mctp route | grep "mctpi2c114" | grep -oE "eid min [0-9]+" | awk '{print $3}' | head -n1)
-    if [[ -n "$eid" ]]; then
-        busctl call au.com.codeconstruct.MCTP1 \
-            /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
-            au.com.codeconstruct.MCTP.Endpoint1 Remove 2>/dev/null || true
+# Remove EID for SWB (BRCM SWB uses i2c-114 only; AEB SWB uses i2c-114..117)
+for bus in 114 115 116 117; do
+    if i2cdetect -l | grep -q "^i2c-${bus}[[:space:]]"; then
+        eid=$(mctp route | grep "mctpi2c$bus" | grep -oE "eid min [0-9]+" | awk '{print $3}' | head -n1)
+        if [[ -n "$eid" ]]; then
+            busctl call au.com.codeconstruct.MCTP1 \
+                /au/com/codeconstruct/mctp1/networks/1/endpoints/"$eid" \
+                au.com.codeconstruct.MCTP.Endpoint1 Remove 2>/dev/null || true
+        fi
     fi
-fi
+done
 
 exit 0
