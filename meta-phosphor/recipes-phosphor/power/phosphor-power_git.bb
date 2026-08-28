@@ -28,18 +28,19 @@ ALLOW_EMPTY:${PN} = "1"
 SYSTEMD_PACKAGES = "${POWER_SERVICE_PACKAGES}"
 
 DEPENDS += " \
-         phosphor-logging \
-         ${PYTHON_PN}-sdbus++-native \
-         sdeventplus \
-         nlohmann-json \
-         cli11 \
-         i2c-tools \
+         ${PYTHON_PN}-mako-native \
          ${PYTHON_PN}-native \
          ${PYTHON_PN}-pyyaml-native \
+         ${PYTHON_PN}-sdbus++-native \
          ${PYTHON_PN}-setuptools-native \
-         ${PYTHON_PN}-mako-native \
          boost \
+         cli11 \
+         i2c-tools \
          libgpiod \
+         libpldm \
+         nlohmann-json \
+         phosphor-logging \
+         sdeventplus \
          "
 
 # The monitor packages use an org.open_power D-Bus interface and so
