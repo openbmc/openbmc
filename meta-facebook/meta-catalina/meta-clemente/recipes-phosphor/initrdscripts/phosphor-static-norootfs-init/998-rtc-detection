@@ -1,0 +1,28 @@
+#!/bin/sh
+
+I2C_BUS=6
+I2C_ADDR=0x6f
+
+#Detect the rtc device by reading a vendor register
+DEVICE_ID=$(i2cget -f -y $I2C_BUS $I2C_ADDR 0x10)
+
+if [ "$DEVICE_ID" = "0x5c" ]; then
+    echo "NCT3018Y rtc device detected"
+
+    if ! echo nct3018y 0x6f > /sys/class/i2c-dev/i2c-6/device/new_device; then
+        echo "NCT3018Y rtc driver not bind"
+    fi
+    exit 0
+
+elif [ "$DEVICE_ID" = "0x4e" ]; then
+    echo "PCF85053A rtc device detected"
+
+    if ! echo pcf85053a 0x6f > /sys/class/i2c-dev/i2c-6/device/new_device; then
+        echo "PCF85053A rtc driver not bind"
+    fi
+    exit 0
+
+else
+    echo "Unknown device at address $I2C_ADDR"
+    exit 1
+fi
