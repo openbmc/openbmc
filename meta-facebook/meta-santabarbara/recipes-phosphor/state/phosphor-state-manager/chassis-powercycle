@@ -6,6 +6,9 @@ source /usr/libexec/phosphor-state-manager/power-cmd
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+# shellcheck source=meta-facebook/meta-santabarbara/recipes-phosphor/state/phosphor-state-manager/move-uart-log
+source /usr/libexec/phosphor-state-manager/move-uart-log
+
 #Sled cycle
 echo "Starting Chassis Power Cycle"
 
@@ -95,6 +98,7 @@ ChassisNumber=$1
 if [ "$ChassisNumber" == 0 ]
 then
   echo "Starting Chassis Power Cycle"
+  move-uart-log
   chassis-power-cycle
 elif [ "$ChassisNumber" == 1 ] || [ "$ChassisNumber" == 2 ] || 
     [ "$ChassisNumber" == 3 ] || [ "$ChassisNumber" == 4 ]

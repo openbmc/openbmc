@@ -95,13 +95,20 @@ SRC_URI:append = " \
     file://discover-sys-init.conf \
     file://phosphor-state-manager-init \
     file://phosphor-state-manager-init.conf \
+    file://move-uart-log \
+    file://move-uart-log.service \
     "
+
+FILES:${PN}-bmc += "${systemd_system_unitdir}/shutdown.target.wants/move-uart-log.service"
 
 RDEPENDS:${PN}:append = " bash"
 
 do_install:append() {
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
+
+    install -d ${D}${systemd_system_unitdir}/shutdown.target.wants
+    ln -sf ${systemd_system_unitdir}/move-uart-log.service ${D}${systemd_system_unitdir}/shutdown.target.wants/move-uart-log.service
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/chassis-poweroff ${D}${libexecdir}/${PN}/
@@ -113,6 +120,7 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/host-powerreset ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/power-cmd ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/phosphor-state-manager-init ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/move-uart-log ${D}${libexecdir}/${PN}/
 }
 SYSTEMD_OVERRIDE:${PN}-discover += "discover-sys-init.conf:phosphor-discover-system-state@0.service.d/discover-sys-init.conf"
 SYSTEMD_OVERRIDE:${PN}-systemd-target-monitor += "phosphor-state-manager-init.conf:phosphor-systemd-target-monitor.service.d/phosphor-state-manager-init.conf"

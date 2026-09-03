@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# /run is tmpfs and gets wiped on chassis AC cycle or BMC reboot, so move
+# the UART console logs to persistent storage beforehand.
+move-uart-log() {
+    local log_dir="/run/log"
+    local dest_dir="/var/log"
+
+    shopt -s nullglob
+    local files=("$log_dir"/*.log "$log_dir"/*.log.1)
+    shopt -u nullglob
+
+    if [ "${#files[@]}" -eq 0 ]; then
+        return 0
+    fi
+
+    if ! mv -f "${files[@]}" "$dest_dir"/; then
+        echo "Failed to move uart log from $log_dir to $dest_dir" >&2
+        return 1
+    fi
+
+    sync "$dest_dir"
+    return 0
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    move-uart-log
+fi

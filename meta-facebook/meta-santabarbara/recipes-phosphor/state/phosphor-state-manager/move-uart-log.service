@@ -1,0 +1,12 @@
+[Unit]
+Description=Move UART console logs to persistent storage before BMC reboot
+DefaultDependencies=no
+Before=shutdown.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+ExecStart=/usr/libexec/phosphor-state-manager/move-uart-log
+
+[Install]
+WantedBy=shutdown.target
