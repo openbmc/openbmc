@@ -1,0 +1,102 @@
+#!/bin/bash
+
+HELP_MSG="
+Usage: drive-fault-led <gpio_name> <event>
+<gpio_name> is a Rio Grande U.2 fault pin defined in json file,
+e.g. ALT_P12V_U2_5_N / FAULT_P3V3_AUX_U2_5_R1_N
+
+<event> is assert / deassert.
+"
+
+if [ "$#" -ne 2 ]; then
+    echo "$HELP_MSG"
+    exit 1
+fi
+
+source_gpio="$1"
+state="$2"
+
+LED_SERVICE="xyz.openbmc_project.LED.GroupManager"
+LED_IFACE="xyz.openbmc_project.Led.Group"
+LED_GROUP_ROOT="/xyz/openbmc_project/led/groups"
+
+# Alert and fault pins share the same drive slot.
+# Events create a stash file at /run/<gpio_name>.led.
+# The presence of the stash file indicates that the alert / fault remains asserted.
+drive_fault_pins() {
+    local idx="$1"
+
+    echo "ALT_P12V_U2_${idx}_N"
+    if [ "${idx}" -le 2 ]; then
+        echo "FAULT_P3V3_AUX_U2_${idx}_N"
+    else
+        echo "FAULT_P3V3_AUX_U2_${idx}_R1_N"
+    fi
+}
+
+set_drive_fault_led() {
+    local drive="$1"
+    local asserted="$2"
+
+    busctl set-property "${LED_SERVICE}" \
+        "${LED_GROUP_ROOT}/drive${drive}_fault" "${LED_IFACE}" \
+        "Asserted" "b" "${asserted}"
+}
+
+if [[ ! ${source_gpio} =~ _U2_([0-9]+)_ ]]; then
+    echo "[Error] Not a U.2 fault pin: ${source_gpio}"
+    exit 1
+fi
+
+u2_hw_index="${BASH_REMATCH[1]}"
+
+if [[ "${u2_hw_index}" -lt 1 || "${u2_hw_index}" -gt 26 ]]; then
+    echo "[Error] Invalid U.2 index: ${u2_hw_index}"
+    exit 1
+fi
+
+stash_file="/run/${source_gpio}.led"
+# LED group names are 0-based, while U.2 HW indexes are 1-based.
+# LED naming follows the sequence of U.2 HW index,
+# so drive0_fault LED corresponds to U.2 HW index 1.
+led_sw_index=$((u2_hw_index - 1))
+
+case "${state}" in
+    "assert")
+        if [ ! -e "${stash_file}" ]; then
+            if set_drive_fault_led "${led_sw_index}" true; then
+                : > "${stash_file}"
+                echo "[Info] drive${led_sw_index}_fault LED on"
+            fi
+        fi
+        ;;
+
+    "deassert")
+        if [ -e "${stash_file}" ]; then
+            rm -f "${stash_file}"
+        fi
+
+        # Keep the LED on while any other fault of the same drive is asserted.
+        found=0
+        while read -r name; do
+            if [ -e "/run/${name}.led" ]; then
+                found=1
+                echo "[Info] found stash file for ${name}, keeping drive${led_sw_index}_fault LED on"
+                break
+            fi
+        done < <(drive_fault_pins "${u2_hw_index}")
+
+        if [ "${found}" -eq 0 ]; then
+            set_drive_fault_led "${led_sw_index}" false
+            echo "[Info] drive${led_sw_index}_fault LED off"
+        fi
+        ;;
+
+    *)
+        echo "[Error] Not supported event: ${state}"
+        echo "$HELP_MSG"
+        exit 1
+        ;;
+esac
+
+exit 0

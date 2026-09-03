@@ -333,13 +333,19 @@ T22_init(){
 
 set_product_versions_to_mb_cpld
 
-SKU=$(i2cget -yf 11 0x0F 0x19)
-bits=$(( (SKU >> 4) & 0x07 ))
-if [ "$bits" -eq 1 ]; then         # bits [6][5][4] = 001 --> T22
-    T22_init
-else
-    ti_hsc_init
+if ! sku=$(get_sku) ; then
+    logger -t "yosemite5-early-sys-init" "Failed to get SKU, defaulting to 0"
+    sku=0
 fi
+
+case "${sku}" in
+    "${SKU_T22}")
+        T22_init
+    ;;
+    *)
+        ti_hsc_init
+    ;;
+esac
 
 echo "initial value for GPIO output pins"
 # set initial value for GPIO output pins

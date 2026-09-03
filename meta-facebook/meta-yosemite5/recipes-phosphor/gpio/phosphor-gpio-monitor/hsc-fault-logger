@@ -1,0 +1,205 @@
+#!/bin/bash
+
+HELP_MSG="
+Usage: hsc-fault-logger <event> <board>-<gpio_name>
+<event> is assert / deassert.
+
+<board>-<gpio_name> is defined in json file,
+e.g. Yosemite5_3KW_Paddle_Board-ALRT_HSC_SLOT_5_N
+
+On assert the hot swap controller behind the alert is read over PMBus and its
+status registers are carried in FAILURE_DATA, so the log says why the HSC
+tripped instead of only naming the pin.
+
+Nothing here is specific to one board:
+  - the logged inventory path comes from the <board> prefix, so moving the HSCs
+    to another board only changes the prefix in the gpio monitor json;
+  - the bus/address/vendor come from entity-manager, which already holds the
+    per-SKU mapping (each config exposes its controllers as '*HSC*<instance>'
+    with Bus/Address/Type), so a new SKU that moves or re-vendors the HSCs needs
+    no change here.
+"
+
+if [ "$#" -ne 2 ]; then
+    echo "$HELP_MSG"
+    exit 1
+fi
+
+event="$1"
+message="$2"
+
+board="${message%%-*}"
+gpio_name="${message#*-}"
+device_path="/xyz/openbmc_project/inventory/system/board/${board}/${gpio_name}"
+
+EM_SERVICE="xyz.openbmc_project.EntityManager"
+ASSERT_MSG_ID="xyz.openbmc_project.State.Power.PowerRailFault"
+DEASSERT_MSG_ID="xyz.openbmc_project.State.Power.PowerRailFaultRecovered"
+
+# One extra immediate attempt covers a transfer lost to bus arbitration or to
+# the driver's own poll. No backoff: this runs on a fault path and there can be
+# one instance per slot firing at once.
+RAW_ATTEMPTS=2
+
+# Alert pin name -> HSC instance. Add a pattern here for a board that names its
+# alert pins differently.
+INSTANCE_PATTERNS=(
+    'ALRT_HSC_SLOT_([0-9]+)_N$'
+    'FLT_HSC_SERVER_SLOT([0-9]+)_N$'
+    'FM_SLOT([0-9]+)_HSC_FAULT$'
+    '_HSC_?([0-9]+)_'
+)
+
+# PMBus status registers. STATUS_MFR_SPECIFIC (0x80) is vendor defined, which is
+# why the HSC Type is recorded alongside it.
+STATUS_REGS=(
+    "0x79:2:STATUS_WORD"
+    "0x78:1:STATUS_BYTE"
+    "0x7A:1:STATUS_VOUT"
+    "0x7B:1:STATUS_IOUT"
+    "0x7C:1:STATUS_INPUT"
+    "0x7D:1:STATUS_TEMPERATURE"
+    "0x7E:1:STATUS_CML"
+    "0x80:1:STATUS_MFR_SPECIFIC"
+)
+
+hsc_instance() {
+    local pin="$1"
+    local pattern
+
+    for pattern in "${INSTANCE_PATTERNS[@]}"; do
+        if [[ ${pin} =~ ${pattern} ]]; then
+            echo "${BASH_REMATCH[1]}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+em_property() {
+    busctl get-property "${EM_SERVICE}" "$1" "$2" "$3" 2>/dev/null \
+        | awk '{print $2}' | tr -d '"'
+}
+
+# Echo "<bus> <0xaddr> <type>" for an HSC instance, or return non-zero.
+# Matches any entity-manager Configuration object whose name looks like an HSC
+# for this instance, so it is not tied to one board's naming. The instance
+# digits must not touch another digit, otherwise HSC_1 would match instance 11.
+# '*Firmware' configurations are the update objects for the same chip, skip them.
+hsc_config() {
+    local instance="$1"
+    local tree obj iface bus addr
+
+    tree=$(busctl --no-pager tree "${EM_SERVICE}" 2>/dev/null) || return 1
+
+    while read -r obj; do
+        [ -n "${obj}" ] || continue
+        [[ ${obj##*/} =~ HSC[^0-9]*0*${instance}([^0-9]|$) ]] || continue
+
+        iface=$(busctl --no-pager introspect "${EM_SERVICE}" "${obj}" 2>/dev/null \
+            | grep -o 'xyz\.openbmc_project\.Configuration\.[A-Za-z0-9_]\+' \
+            | grep -v 'Firmware$' | sort -u | head -n 1)
+        [ -n "${iface}" ] || continue
+
+        bus=$(em_property "${obj}" "${iface}" Bus)
+        addr=$(em_property "${obj}" "${iface}" Address)
+        [[ ${bus} =~ ^[0-9]+$ ]] || continue
+        # Address is a JSON string ("0x48") in some configs and a number in
+        # others, normalise both to 0x form for i2ctransfer.
+        [[ ${addr} =~ ^(0[xX])?[0-9a-fA-F]+$ ]] || continue
+
+        printf '%s 0x%02x %s\n' "${bus}" "$(( addr ))" "${iface##*.}"
+        return 0
+    done <<< "$(printf '%s\n' "${tree}" | grep -o '/xyz/[^ ]*')"
+
+    return 1
+}
+
+# The pmbus driver owns the chip, so the transfer has to be forced.
+raw_read() {
+    local bus="$1" addr="$2" reg="$3" len="$4" i out
+
+    for ((i = 0; i < RAW_ATTEMPTS; i++)); do
+        if out=$(i2ctransfer -f -y "${bus}" "w1@${addr}" "${reg}" "r${len}" 2>/dev/null); then
+            echo "${out}"
+            return 0
+        fi
+    done
+    return 1
+}
+
+hsc_status() {
+    local bus="$1" addr="$2"
+    local entry reg len label raw low high out=""
+
+    for entry in "${STATUS_REGS[@]}"; do
+        reg="${entry%%:*}"
+        len="${entry#*:}"; len="${len%%:*}"
+        label="${entry##*:}"
+
+        if ! raw=$(raw_read "${bus}" "${addr}" "${reg}" "${len}"); then
+            out+=", (${reg}) ${label}: read failed"
+            continue
+        fi
+
+        if [ "${len}" -eq 2 ]; then
+            read -r low high <<< "${raw}"
+            out+=", (${reg}) ${label}: $(printf '0x%04X' "$(( low | (high << 8) ))")"
+        else
+            out+=", (${reg}) ${label}: ${raw}"
+        fi
+    done
+
+    echo "${out}"
+}
+
+hsc_failure_data() {
+    local instance="$1"
+    local cfg bus addr type
+    local out="HSC${instance} Fault"
+
+    # Capture first: a here-string always feeds read a line, so read's exit
+    # status would not tell us whether hsc_config actually failed.
+    if ! cfg=$(hsc_config "${instance}") || [ -z "${cfg}" ]; then
+        echo "${out} - HSC not found in inventory"
+        return
+    fi
+    read -r bus addr type <<< "${cfg}"
+
+    echo "${out} (${type} bus ${bus} addr ${addr})$(hsc_status "${bus}" "${addr}")"
+}
+
+if ! instance=$(hsc_instance "${gpio_name}"); then
+    echo "Cannot derive HSC instance from: ${gpio_name}"
+    exit 1
+fi
+
+stash_file="/run/${gpio_name}.log_entry"
+
+case "${event}" in
+    "assert")
+        if [ ! -s "${stash_file}" ]; then
+            failure_data=$(hsc_failure_data "${instance}")
+            /usr/bin/log-create "${ASSERT_MSG_ID}" --json \
+                "{ \"POWER_RAIL\": \"${device_path}\", \"FAILURE_DATA\": \"${failure_data}\"}" \
+                > "${stash_file}"
+        fi
+        ;;
+
+    "deassert")
+        if [ -s "${stash_file}" ]; then
+            log-resolve -p "$(< "${stash_file}")" || true
+            rm -f "${stash_file}"
+        fi
+        /usr/bin/log-create "${DEASSERT_MSG_ID}" --json \
+            "{ \"POWER_RAIL\": \"${device_path}\"}"
+        ;;
+
+    *)
+        echo "Not supported event: ${event}"
+        echo "$HELP_MSG"
+        exit 1
+        ;;
+esac
+
+exit 0

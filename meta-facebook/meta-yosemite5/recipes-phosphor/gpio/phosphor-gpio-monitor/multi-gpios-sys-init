@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
-source /usr/libexec/fb-common-functions
+# shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
+source /usr/libexec/yosemite5-common-functions
 
 CONF_RO_DIR="/usr/share/phosphor-gpio-monitor"
 GPIO_CONF_DEFAULT="${CONF_RO_DIR}/phosphor-multi-gpio-monitor.json"
+GPIO_CONF_DEFAULT_T22="${CONF_RO_DIR}/phosphor-multi-gpio-monitor-t22.json"
 GPIO_CONF_EVT="${CONF_RO_DIR}/phosphor-multi-gpio-monitor-evt.json"
 GPIO_CONF_LINK="/var/lib/phosphor-gpio-monitor/phosphor-multi-gpio-monitor.json"
 
@@ -57,11 +58,23 @@ e1s_pwr_init() {
 
 host_os_status_init
 
-if get_gpio E1S_0_PRSNT_N >/dev/null 2>&1; then
-    prepare_config_link "${GPIO_CONF_EVT}"
-    e1s_pwr_init
-else
-    prepare_config_link "${GPIO_CONF_DEFAULT}"
+if ! sku=$(get_sku) ; then
+  logger -t "multi-gpios-sys-init" "Failed to get SKU, defaulting to 0"
+  sku=0
 fi
+
+case "${sku}" in
+  "${SKU_T22}")
+    prepare_config_link "${GPIO_CONF_DEFAULT_T22}"
+  ;;
+  *)
+    if get_gpio E1S_0_PRSNT_N >/dev/null 2>&1; then
+      prepare_config_link "${GPIO_CONF_EVT}"
+      e1s_pwr_init
+    else
+      prepare_config_link "${GPIO_CONF_DEFAULT}"
+    fi
+  ;;
+esac
 
 exit 0

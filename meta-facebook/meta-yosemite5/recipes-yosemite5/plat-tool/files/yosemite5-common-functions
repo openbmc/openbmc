@@ -3,6 +3,16 @@
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
 
+# SKU is consumed by scripts that source this file.
+# shellcheck disable=SC2034
+SKU_T2=0
+# shellcheck disable=SC2034
+SKU_T11=1
+# shellcheck disable=SC2034
+SKU_T1=2
+# shellcheck disable=SC2034
+SKU_T22=3
+
 FRU_SVC="xyz.openbmc_project.FruDevice"
 FRU_ROOT="/xyz/openbmc_project/FruDevice"
 
@@ -83,4 +93,53 @@ get_product_source()
     fi
 
     echo "$SOURCE"
+}
+
+i2ctransfer_retry() {
+    local max_retries=5
+    local i
+
+    for ((i=0; i<max_retries; i++)); do
+        if i2ctransfer "$@"; then
+            return 0
+        fi
+
+        sleep 1
+    done
+
+    return 1
+}
+
+get_data_from_pdb_cpld() {
+    local bus=8
+    local addr=0x0f
+    local reg_value
+
+    if ! reg_value=$(i2ctransfer_retry -fy ${bus} w1@${addr} "${1}" r1 2>/dev/null); then
+        echo "Error: I2C transfer failed, bus=${bus}, addr=${addr}, reg=${1}" >&2
+        return 1
+    fi
+
+    echo "${reg_value}"
+    return 0
+}
+
+# Get SKU from PDB CPLD.
+# [3:0]:
+#   0x0 --> T2
+#   0x1 --> T11
+#   0x2 --> T1
+#   0x3 --> T22
+get_sku() {
+    local reg=0x12
+    local reg_value
+    local sku
+
+    if ! reg_value=$(get_data_from_pdb_cpld ${reg}); then
+        return 1
+    fi
+
+    sku=$((reg_value & 0x0f))
+    echo "${sku}"
+    return 0
 }

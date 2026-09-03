@@ -1,0 +1,8 @@
+[Unit]
+Description=%i Drive Fault LED Deassert
+Conflicts=drive-fault-led-assert@%i.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/drive-fault-led "%i" "deassert"
+SyslogIdentifier=%i-drive-fault-led-deassert

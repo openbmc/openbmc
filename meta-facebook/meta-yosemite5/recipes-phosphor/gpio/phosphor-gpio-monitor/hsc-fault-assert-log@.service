@@ -1,0 +1,7 @@
+[Unit]
+Description=%i HSC Fault Assert
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/phosphor-gpio-monitor/hsc-fault-logger "assert" "%i"
+SyslogIdentifier=%i-hsc-fault-assert

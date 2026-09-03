@@ -1,0 +1,1385 @@
+[
+    {
+        "Name": "ID_RST_BTN_BMC_N",
+        "LineName": "ID_RST_BTN_BMC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["reset_btn@FALLING.service", "button-event-logger@Pressed_RESET_BUTTON.service"],
+            "FALLING": ["reset_btn@RISING.service", "button-event-logger@Released_RESET_BUTTON.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "AC_PWR_BMC_BTN_N",
+        "LineName": "AC_PWR_BMC_BTN_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Pressed_AC_POWER_BUTTON.service"],
+            "FALLING": ["button-event-logger@Released_AC_POWER_BUTTON.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "PWR_BTN_BMC_N",
+        "LineName": "PWR_BTN_BMC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["button-event-logger@Pressed_POWER_BUTTON.service"],
+            "FALLING": ["button-event-logger@Released_POWER_BUTTON.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FM_BIOS_POST_CMPLT_N",
+        "LineName": "FM_BIOS_POST_CMPLT_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["assert-post-end.service"],
+            "FALLING": ["deassert-post-end.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "PWRGD_CPU_PWROK",
+        "LineName": "PWRGD_CPU_PWROK",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["deassert-power-good-drop.service"],
+            "FALLING": ["assert-power-good-drop.service", "mctp_remove@cxl_mctp.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "FM_CPU_THERMTRIP_N",
+        "LineName": "FM_CPU_THERMTRIP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-assert-log@thermtrip-FM_CPU_THERMTRIP_N-FM_CPU_THERMTRIP_N.service", "fault-led-assert@FM_CPU_THERMTRIP_N.service"
+            ],
+            "FALLING": [
+                "thermal-deassert-log@thermtrip-FM_CPU_THERMTRIP_N-FM_CPU_THERMTRIP_N.service", "fault-led-deassert@FM_CPU_THERMTRIP_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FM_CPU_PROCHOT_R_N",
+        "LineName": "FM_CPU_PROCHOT_R_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-assert-log@prochot-FM_CPU_PROCHOT_R_N-FM_CPU_PROCHOT_R_N.service", "fault-led-assert@FM_CPU_PROCHOT_R_N.service"
+            ],
+            "FALLING": [
+                "thermal-deassert-log@prochot-FM_CPU_PROCHOT_R_N-FM_CPU_PROCHOT_R_N.service", "fault-led-deassert@FM_CPU_PROCHOT_R_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_DIMM_0_N",
+        "LineName": "ALERT_INA230_DIMM_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_DIMM_0_N.service", "fault-led-assert@ALERT_INA230_DIMM_0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_DIMM_0_N.service", "fault-led-deassert@ALERT_INA230_DIMM_0_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_DIMM_1_N",
+        "LineName": "ALERT_INA230_DIMM_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_DIMM_1_N.service", "fault-led-assert@ALERT_INA230_DIMM_1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_DIMM_1_N.service", "fault-led-deassert@ALERT_INA230_DIMM_1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_E1S_0_N",
+        "LineName": "ALERT_INA230_E1S_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_E1S_0_N.service", "fault-led-assert@ALERT_INA230_E1S_0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_E1S_0_N.service", "fault-led-deassert@ALERT_INA230_E1S_0_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_E1S_1_N",
+        "LineName": "ALERT_INA230_E1S_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_E1S_1_N.service", "fault-led-assert@ALERT_INA230_E1S_1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_E1S_1_N.service", "fault-led-deassert@ALERT_INA230_E1S_1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN0_N",
+        "LineName": "ALERT_INA230_FAN0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_FAN0_N.service", "fault-led-assert@ALERT_INA230_FAN0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_FAN0_N.service", "fault-led-deassert@ALERT_INA230_FAN0_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN1_N",
+        "LineName": "ALERT_INA230_FAN1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_FAN1_N.service", "fault-led-assert@ALERT_INA230_FAN1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_FAN1_N.service", "fault-led-deassert@ALERT_INA230_FAN1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN2_N",
+        "LineName": "ALERT_INA230_FAN2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_FAN2_N.service", "fault-led-assert@ALERT_INA230_FAN2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_FAN2_N.service", "fault-led-deassert@ALERT_INA230_FAN2_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_FAN3_N",
+        "LineName": "ALERT_INA230_FAN3_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_FAN3_N.service", "fault-led-assert@ALERT_INA230_FAN3_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_FAN3_N.service", "fault-led-deassert@ALERT_INA230_FAN3_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_NIC_N",
+        "LineName": "ALERT_INA230_NIC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_NIC_N.service", "fault-led-assert@ALERT_INA230_NIC_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_NIC_N.service", "fault-led-deassert@ALERT_INA230_NIC_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INA230_SCM_N",
+        "LineName": "ALERT_INA230_SCM_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_SCM_N.service", "fault-led-assert@ALERT_INA230_SCM_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_SCM_N.service", "fault-led-deassert@ALERT_INA230_SCM_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_OC_PADDLE2_N",
+        "LineName": "ALERT_OC_PADDLE2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_3KW_Paddle_Board-ALERT_OC_PADDLE2_N.service", "fault-led-assert@ALERT_OC_PADDLE2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_3KW_Paddle_Board-ALERT_OC_PADDLE2_N.service", "fault-led-deassert@ALERT_OC_PADDLE2_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_UV_PADDLE2_N",
+        "LineName": "ALERT_UV_PADDLE2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_3KW_Paddle_Board-ALERT_UV_PADDLE2_N.service", "fault-led-assert@ALERT_UV_PADDLE2_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_3KW_Paddle_Board-ALERT_UV_PADDLE2_N.service", "fault-led-deassert@ALERT_UV_PADDLE2_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_VR_SMB_N",
+        "LineName": "ALERT_VR_SMB_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_VR_SMB_N.service", "fault-led-assert@ALERT_VR_SMB_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_VR_SMB_N.service", "fault-led-deassert@ALERT_VR_SMB_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_E1S_0_N",
+        "LineName": "FAULT_P3V3_E1S_0_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-FAULT_P3V3_E1S_0_N.service", "fault-led-assert@FAULT_P3V3_E1S_0_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-FAULT_P3V3_E1S_0_N.service", "fault-led-deassert@FAULT_P3V3_E1S_0_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_E1S_1_N",
+        "LineName": "FAULT_P3V3_E1S_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-FAULT_P3V3_E1S_1_N.service", "fault-led-assert@FAULT_P3V3_E1S_1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-FAULT_P3V3_E1S_1_N.service", "fault-led-deassert@FAULT_P3V3_E1S_1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_NIC_N",
+        "LineName": "FAULT_P3V3_NIC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-FAULT_P3V3_NIC_N.service", "fault-led-assert@FAULT_P3V3_NIC_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-FAULT_P3V3_NIC_N.service", "fault-led-deassert@FAULT_P3V3_NIC_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P12V_NIC_N",
+        "LineName": "FAULT_P12V_NIC_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-FAULT_P12V_NIC_N.service", "fault-led-assert@FAULT_P12V_NIC_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-FAULT_P12V_NIC_N.service", "fault-led-deassert@FAULT_P12V_NIC_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P12V_SCM_N",
+        "LineName": "FAULT_P12V_SCM_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-FAULT_P12V_SCM_N.service", "fault-led-assert@FAULT_P12V_SCM_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-FAULT_P12V_SCM_N.service", "fault-led-deassert@FAULT_P12V_SCM_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_INLET_TEMP_N",
+        "LineName": "ALERT_INLET_TEMP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-assert-log@prochot-ALERT_INLET_TEMP_N-ALERT_INLET_TEMP_N.service", "fault-led-assert@ALERT_INLET_TEMP_N.service"
+            ],
+            "FALLING": [
+                "thermal-deassert-log@prochot-ALERT_INLET_TEMP_N-ALERT_INLET_TEMP_N.service", "fault-led-deassert@ALERT_INLET_TEMP_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_OUTLET_TEMP_N",
+        "LineName": "ALERT_OUTLET_TEMP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-assert-log@prochot-ALERT_OUTLET_TEMP_N-ALERT_OUTLET_TEMP_N.service", "fault-led-assert@ALERT_OUTLET_TEMP_N.service"
+            ],
+            "FALLING": [
+                "thermal-deassert-log@prochot-ALERT_OUTLET_TEMP_N-ALERT_OUTLET_TEMP_N.service", "fault-led-deassert@ALERT_OUTLET_TEMP_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "PVDDCR_SOC_P0_OCP_N",
+        "LineName": "PVDDCR_SOC_P0_OCP_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-PVDDCR_SOC_P0_OCP_N.service", "fault-led-assert@PVDDCR_SOC_P0_OCP_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-PVDDCR_SOC_P0_OCP_N.service", "fault-led-deassert@PVDDCR_SOC_P0_OCP_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "Fault",
+        "LineName": "Fault",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-assert-log@Yosemite5_MB-Fault.service", "fault-led-assert@Fault.service"],
+            "FALLING": ["power-rail-deassert-log@Yosemite5_MB-Fault.service", "fault-led-deassert@Fault.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_0_LOSS_N",
+        "LineName": "ALERT_CLKMUX_0_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_0_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_0_LOSS_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_1_LOSS_N",
+        "LineName": "ALERT_CLKMUX_1_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_1_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_1_LOSS_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_2_LOSS_N",
+        "LineName": "ALERT_CLKMUX_2_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_2_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_2_LOSS_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALERT_CLKMUX_3_LOSS_N",
+        "LineName": "ALERT_CLKMUX_3_LOSS_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "smc-assert-log@mb_ALERT_CLKMUX_3_LOSS_N.service"
+            ],
+            "FALLING": [
+                "smc-deassert-log@mb_ALERT_CLKMUX_3_LOSS_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FM_SLOT5_HSC_FAULT",
+        "LineName": "FM_SLOT5_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-assert-log@Yosemite5_Medusa_Board-FM_SLOT5_HSC_FAULT.service"],
+            "FALLING": ["power-rail-deassert-log@Yosemite5_Medusa_Board-FM_SLOT5_HSC_FAULT.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FM_SLOT6_HSC_FAULT",
+        "LineName": "FM_SLOT6_HSC_FAULT",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["power-rail-assert-log@Yosemite5_Medusa_Board-FM_SLOT6_HSC_FAULT.service"],
+            "FALLING": ["power-rail-deassert-log@Yosemite5_Medusa_Board-FM_SLOT6_HSC_FAULT.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "NIC_PRSNT_N",
+        "LineName": "NIC_PRSNT_N",
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["hotplug-ac-cycle@FALLING.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "PRSNT_MCIO0A_E1S1_N",
+        "LineName": "PRSNT_MCIO0A_E1S1_N",
+        "EventMon": "RISING",
+        "Targets": {
+            "RISING": ["hotplug-ac-cycle@FALLING-PRSNT_MCIO0A_E1S1_N.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "UART_MUX_SEL",
+        "LineName": "UART_MUX_SEL",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["uart-select-led@host.service"],
+            "FALLING": ["uart-select-led@bmc.service"]
+        },
+        "Continue": true
+    },
+    {
+        "Name": "ALERT_INA230_P12V_0A_0B_R1_N",
+        "LineName": "ALERT_INA230_P12V_0A_0B_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-ALERT_INA230_P12V_0A_0B_R1_N.service", "fault-led-assert@ALERT_INA230_P12V_0A_0B_R1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-ALERT_INA230_P12V_0A_0B_R1_N.service", "fault-led-deassert@ALERT_INA230_P12V_0A_0B_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P12V_0A_0B_R1_N",
+        "LineName": "FAULT_P12V_0A_0B_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "vr-fault-assert-log@Yosemite5_MB-FAULT_P12V_0A_0B_R1_N.service", "fault-led-assert@FAULT_P12V_0A_0B_R1_N.service"
+            ],
+            "FALLING": [
+                "vr-fault-deassert-log@Yosemite5_MB-FAULT_P12V_0A_0B_R1_N.service", "fault-led-deassert@FAULT_P12V_0A_0B_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALRT_HSC_SLOT_5_N",
+        "LineName": "ALRT_HSC_SLOT_5_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["hsc-fault-assert-log@Yosemite5_3KW_Paddle_Board-ALRT_HSC_SLOT_5_N.service"],
+            "FALLING": ["hsc-fault-deassert-log@Yosemite5_3KW_Paddle_Board-ALRT_HSC_SLOT_5_N.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALRT_HSC_SLOT_7_N",
+        "LineName": "ALRT_HSC_SLOT_7_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": ["hsc-fault-assert-log@Yosemite5_3KW_Paddle_Board-ALRT_HSC_SLOT_7_N.service"],
+            "FALLING": ["hsc-fault-deassert-log@Yosemite5_3KW_Paddle_Board-ALRT_HSC_SLOT_7_N.service"]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_SMB_TMP1_R1_N",
+        "LineName": "ALT_SMB_TMP1_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-assert-log@prochot-ALT_SMB_TMP1_R1_N-ALT_SMB_TMP1_R1_N.service", "fault-led-assert@ALT_SMB_TMP1_R1_N.service"
+            ],
+            "FALLING": [
+                "thermal-deassert-log@prochot-ALT_SMB_TMP1_R1_N-ALT_SMB_TMP1_R1_N.service", "fault-led-deassert@ALT_SMB_TMP1_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_SMB_TMP2_R1_N",
+        "LineName": "ALT_SMB_TMP2_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-assert-log@prochot-ALT_SMB_TMP2_R1_N-ALT_SMB_TMP2_R1_N.service", "fault-led-assert@ALT_SMB_TMP2_R1_N.service"
+            ],
+            "FALLING": [
+                "thermal-deassert-log@prochot-ALT_SMB_TMP2_R1_N-ALT_SMB_TMP2_R1_N.service", "fault-led-deassert@ALT_SMB_TMP2_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_1_N",
+        "LineName": "ALT_P12V_U2_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd24-ALT_P12V_U2_1_N.service", "drive-fault-led-assert@ALT_P12V_U2_1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd24-ALT_P12V_U2_1_N.service", "drive-fault-led-deassert@ALT_P12V_U2_1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_2_N",
+        "LineName": "ALT_P12V_U2_2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd25-ALT_P12V_U2_2_N.service", "drive-fault-led-assert@ALT_P12V_U2_2_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd25-ALT_P12V_U2_2_N.service", "drive-fault-led-deassert@ALT_P12V_U2_2_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_3_N",
+        "LineName": "ALT_P12V_U2_3_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd0-ALT_P12V_U2_3_N.service", "drive-fault-led-assert@ALT_P12V_U2_3_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd0-ALT_P12V_U2_3_N.service", "drive-fault-led-deassert@ALT_P12V_U2_3_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_4_N",
+        "LineName": "ALT_P12V_U2_4_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd1-ALT_P12V_U2_4_N.service", "drive-fault-led-assert@ALT_P12V_U2_4_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd1-ALT_P12V_U2_4_N.service", "drive-fault-led-deassert@ALT_P12V_U2_4_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_5_N",
+        "LineName": "ALT_P12V_U2_5_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd2-ALT_P12V_U2_5_N.service", "drive-fault-led-assert@ALT_P12V_U2_5_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd2-ALT_P12V_U2_5_N.service", "drive-fault-led-deassert@ALT_P12V_U2_5_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_6_N",
+        "LineName": "ALT_P12V_U2_6_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd3-ALT_P12V_U2_6_N.service", "drive-fault-led-assert@ALT_P12V_U2_6_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd3-ALT_P12V_U2_6_N.service", "drive-fault-led-deassert@ALT_P12V_U2_6_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_7_N",
+        "LineName": "ALT_P12V_U2_7_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd4-ALT_P12V_U2_7_N.service", "drive-fault-led-assert@ALT_P12V_U2_7_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd4-ALT_P12V_U2_7_N.service", "drive-fault-led-deassert@ALT_P12V_U2_7_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_8_N",
+        "LineName": "ALT_P12V_U2_8_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd5-ALT_P12V_U2_8_N.service", "drive-fault-led-assert@ALT_P12V_U2_8_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd5-ALT_P12V_U2_8_N.service", "drive-fault-led-deassert@ALT_P12V_U2_8_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_9_N",
+        "LineName": "ALT_P12V_U2_9_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd6-ALT_P12V_U2_9_N.service", "drive-fault-led-assert@ALT_P12V_U2_9_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd6-ALT_P12V_U2_9_N.service", "drive-fault-led-deassert@ALT_P12V_U2_9_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_10_N",
+        "LineName": "ALT_P12V_U2_10_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd7-ALT_P12V_U2_10_N.service", "drive-fault-led-assert@ALT_P12V_U2_10_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd7-ALT_P12V_U2_10_N.service", "drive-fault-led-deassert@ALT_P12V_U2_10_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_11_N",
+        "LineName": "ALT_P12V_U2_11_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd8-ALT_P12V_U2_11_N.service", "drive-fault-led-assert@ALT_P12V_U2_11_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd8-ALT_P12V_U2_11_N.service", "drive-fault-led-deassert@ALT_P12V_U2_11_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_12_N",
+        "LineName": "ALT_P12V_U2_12_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd9-ALT_P12V_U2_12_N.service", "drive-fault-led-assert@ALT_P12V_U2_12_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd9-ALT_P12V_U2_12_N.service", "drive-fault-led-deassert@ALT_P12V_U2_12_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_13_N",
+        "LineName": "ALT_P12V_U2_13_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd10-ALT_P12V_U2_13_N.service", "drive-fault-led-assert@ALT_P12V_U2_13_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd10-ALT_P12V_U2_13_N.service", "drive-fault-led-deassert@ALT_P12V_U2_13_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_14_N",
+        "LineName": "ALT_P12V_U2_14_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd11-ALT_P12V_U2_14_N.service", "drive-fault-led-assert@ALT_P12V_U2_14_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd11-ALT_P12V_U2_14_N.service", "drive-fault-led-deassert@ALT_P12V_U2_14_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_15_N",
+        "LineName": "ALT_P12V_U2_15_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd12-ALT_P12V_U2_15_N.service", "drive-fault-led-assert@ALT_P12V_U2_15_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd12-ALT_P12V_U2_15_N.service", "drive-fault-led-deassert@ALT_P12V_U2_15_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_16_N",
+        "LineName": "ALT_P12V_U2_16_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd13-ALT_P12V_U2_16_N.service", "drive-fault-led-assert@ALT_P12V_U2_16_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd13-ALT_P12V_U2_16_N.service", "drive-fault-led-deassert@ALT_P12V_U2_16_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_17_N",
+        "LineName": "ALT_P12V_U2_17_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd14-ALT_P12V_U2_17_N.service", "drive-fault-led-assert@ALT_P12V_U2_17_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd14-ALT_P12V_U2_17_N.service", "drive-fault-led-deassert@ALT_P12V_U2_17_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_18_N",
+        "LineName": "ALT_P12V_U2_18_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd15-ALT_P12V_U2_18_N.service", "drive-fault-led-assert@ALT_P12V_U2_18_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd15-ALT_P12V_U2_18_N.service", "drive-fault-led-deassert@ALT_P12V_U2_18_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_19_N",
+        "LineName": "ALT_P12V_U2_19_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd16-ALT_P12V_U2_19_N.service", "drive-fault-led-assert@ALT_P12V_U2_19_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd16-ALT_P12V_U2_19_N.service", "drive-fault-led-deassert@ALT_P12V_U2_19_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_20_N",
+        "LineName": "ALT_P12V_U2_20_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd17-ALT_P12V_U2_20_N.service", "drive-fault-led-assert@ALT_P12V_U2_20_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd17-ALT_P12V_U2_20_N.service", "drive-fault-led-deassert@ALT_P12V_U2_20_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_21_N",
+        "LineName": "ALT_P12V_U2_21_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd18-ALT_P12V_U2_21_N.service", "drive-fault-led-assert@ALT_P12V_U2_21_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd18-ALT_P12V_U2_21_N.service", "drive-fault-led-deassert@ALT_P12V_U2_21_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_22_N",
+        "LineName": "ALT_P12V_U2_22_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd19-ALT_P12V_U2_22_N.service", "drive-fault-led-assert@ALT_P12V_U2_22_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd19-ALT_P12V_U2_22_N.service", "drive-fault-led-deassert@ALT_P12V_U2_22_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_23_N",
+        "LineName": "ALT_P12V_U2_23_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd20-ALT_P12V_U2_23_N.service", "drive-fault-led-assert@ALT_P12V_U2_23_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd20-ALT_P12V_U2_23_N.service", "drive-fault-led-deassert@ALT_P12V_U2_23_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_24_N",
+        "LineName": "ALT_P12V_U2_24_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd21-ALT_P12V_U2_24_N.service", "drive-fault-led-assert@ALT_P12V_U2_24_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd21-ALT_P12V_U2_24_N.service", "drive-fault-led-deassert@ALT_P12V_U2_24_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_25_N",
+        "LineName": "ALT_P12V_U2_25_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd22-ALT_P12V_U2_25_N.service", "drive-fault-led-assert@ALT_P12V_U2_25_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd22-ALT_P12V_U2_25_N.service", "drive-fault-led-deassert@ALT_P12V_U2_25_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "ALT_P12V_U2_26_N",
+        "LineName": "ALT_P12V_U2_26_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd23-ALT_P12V_U2_26_N.service", "drive-fault-led-assert@ALT_P12V_U2_26_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd23-ALT_P12V_U2_26_N.service", "drive-fault-led-deassert@ALT_P12V_U2_26_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd24-FAULT_P3V3_AUX_U2_1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd24-FAULT_P3V3_AUX_U2_1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_2_N",
+        "LineName": "FAULT_P3V3_AUX_U2_2_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd25-FAULT_P3V3_AUX_U2_2_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_2_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd25-FAULT_P3V3_AUX_U2_2_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_2_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_3_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_3_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd0-FAULT_P3V3_AUX_U2_3_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_3_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd0-FAULT_P3V3_AUX_U2_3_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_3_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_4_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_4_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd1-FAULT_P3V3_AUX_U2_4_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_4_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd1-FAULT_P3V3_AUX_U2_4_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_4_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_5_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_5_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd2-FAULT_P3V3_AUX_U2_5_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_5_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd2-FAULT_P3V3_AUX_U2_5_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_5_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_6_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_6_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd3-FAULT_P3V3_AUX_U2_6_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_6_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd3-FAULT_P3V3_AUX_U2_6_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_6_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_7_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_7_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd4-FAULT_P3V3_AUX_U2_7_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_7_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd4-FAULT_P3V3_AUX_U2_7_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_7_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_8_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_8_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd5-FAULT_P3V3_AUX_U2_8_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_8_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd5-FAULT_P3V3_AUX_U2_8_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_8_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_9_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_9_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd6-FAULT_P3V3_AUX_U2_9_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_9_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd6-FAULT_P3V3_AUX_U2_9_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_9_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_10_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_10_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd7-FAULT_P3V3_AUX_U2_10_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_10_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd7-FAULT_P3V3_AUX_U2_10_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_10_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_11_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_11_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd8-FAULT_P3V3_AUX_U2_11_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_11_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd8-FAULT_P3V3_AUX_U2_11_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_11_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_12_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_12_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd9-FAULT_P3V3_AUX_U2_12_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_12_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd9-FAULT_P3V3_AUX_U2_12_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_12_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_13_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_13_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd10-FAULT_P3V3_AUX_U2_13_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_13_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd10-FAULT_P3V3_AUX_U2_13_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_13_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_14_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_14_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd11-FAULT_P3V3_AUX_U2_14_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_14_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd11-FAULT_P3V3_AUX_U2_14_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_14_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_15_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_15_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd12-FAULT_P3V3_AUX_U2_15_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_15_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd12-FAULT_P3V3_AUX_U2_15_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_15_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_16_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_16_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd13-FAULT_P3V3_AUX_U2_16_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_16_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd13-FAULT_P3V3_AUX_U2_16_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_16_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_17_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_17_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd14-FAULT_P3V3_AUX_U2_17_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_17_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd14-FAULT_P3V3_AUX_U2_17_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_17_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_18_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_18_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd15-FAULT_P3V3_AUX_U2_18_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_18_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd15-FAULT_P3V3_AUX_U2_18_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_18_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_19_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_19_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd16-FAULT_P3V3_AUX_U2_19_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_19_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd16-FAULT_P3V3_AUX_U2_19_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_19_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_20_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_20_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd17-FAULT_P3V3_AUX_U2_20_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_20_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd17-FAULT_P3V3_AUX_U2_20_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_20_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_21_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_21_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd18-FAULT_P3V3_AUX_U2_21_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_21_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd18-FAULT_P3V3_AUX_U2_21_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_21_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_22_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_22_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd19-FAULT_P3V3_AUX_U2_22_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_22_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd19-FAULT_P3V3_AUX_U2_22_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_22_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_23_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_23_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd20-FAULT_P3V3_AUX_U2_23_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_23_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd20-FAULT_P3V3_AUX_U2_23_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_23_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_24_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_24_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd21-FAULT_P3V3_AUX_U2_24_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_24_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd21-FAULT_P3V3_AUX_U2_24_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_24_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_25_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_25_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd22-FAULT_P3V3_AUX_U2_25_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_25_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd22-FAULT_P3V3_AUX_U2_25_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_25_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    },
+    {
+        "Name": "FAULT_P3V3_AUX_U2_26_R1_N",
+        "LineName": "FAULT_P3V3_AUX_U2_26_R1_N",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "power-rail-assert-log@ssd23-FAULT_P3V3_AUX_U2_26_R1_N.service", "drive-fault-led-assert@FAULT_P3V3_AUX_U2_26_R1_N.service"
+            ],
+            "FALLING": [
+                "power-rail-deassert-log@ssd23-FAULT_P3V3_AUX_U2_26_R1_N.service", "drive-fault-led-deassert@FAULT_P3V3_AUX_U2_26_R1_N.service"
+            ]
+        },
+        "Continue": true,
+        "ActiveLow": true
+    }
+]

@@ -4,6 +4,7 @@ inherit systemd
 
 SRC_URI += "file://phosphor-multi-gpio-monitor.json \
             file://phosphor-multi-gpio-monitor-evt.json \
+            file://phosphor-multi-gpio-monitor-t22.json \
             file://reset_btn \
             file://reset_btn@.service \
             file://multi-gpios-sys-init \
@@ -38,6 +39,12 @@ SRC_URI += "file://phosphor-multi-gpio-monitor.json \
             file://set-uart-select-led \
             file://button-event-logger \
             file://button-event-logger@.service \
+            file://drive-fault-led-assert@.service \
+            file://drive-fault-led-deassert@.service \
+            file://drive-fault-led \
+            file://hsc-fault-assert-log@.service \
+            file://hsc-fault-deassert-log@.service \
+            file://hsc-fault-logger \
             "
 
 RDEPENDS:${PN}:append = " bash"
@@ -65,6 +72,10 @@ SYSTEMD_SERVICE:${PN} += " \
     hotplug-ac-cycle@.service \
     uart-select-led@.service \
     button-event-logger@.service \
+    drive-fault-led-assert@.service \
+    drive-fault-led-deassert@.service \
+    hsc-fault-assert-log@.service \
+    hsc-fault-deassert-log@.service \
     "
 
 do_install:append() {
@@ -73,6 +84,8 @@ do_install:append() {
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor.json
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor-evt.json \
                     ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-evt.json
+    install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor-t22.json \
+                    ${D}${datadir}/${PN}/phosphor-multi-gpio-monitor-t22.json
 
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
@@ -91,6 +104,8 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/hotplug-ac-cycle ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/set-uart-select-led ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/button-event-logger ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/drive-fault-led ${D}${libexecdir}/${PN}/
+    install -m 0755 ${UNPACKDIR}/hsc-fault-logger ${D}${libexecdir}/${PN}/
 
     install -d ${D}${systemd_system_unitdir}/phosphor-multi-gpio-monitor.service.d
     install -m 0644 ${UNPACKDIR}/phosphor-multi-gpio-monitor.conf \

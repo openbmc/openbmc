@@ -2,16 +2,24 @@
 # shellcheck source=meta-facebook/meta-yosemite5/recipes-yosemite5/plat-tool/files/yosemite5-common-functions
 source /usr/libexec/yosemite5-common-functions
 
-input="$1"
+message="$1"
+
+input="${message%%-*}"
+
+if [[ "$message" == *-* ]]; then
+    gpio_name="${message#*-}"
+else
+    gpio_name="NIC_PRSNT_N"
+fi
 
 if [ "$input" == "FALLING" ] ; then
     # debounce
     sleep 0.2
 
-    GPIO_STATUS=$(grep "NIC_PRSNT_N" /sys/kernel/debug/gpio)
+    GPIO_STATUS=$(grep "${gpio_name}" /sys/kernel/debug/gpio)
 
     if echo "$GPIO_STATUS" | grep -q " hi "; then
-        echo "NIC not present, skipping hotplug AC cycle."
+        echo "${gpio_name} not present, skipping hotplug AC cycle."
         exit 1
     fi
 
