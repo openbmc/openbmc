@@ -226,14 +226,18 @@ class Command(BaseCommand):
 
         total = len(index.distros)
         for i, id in enumerate(index.distros):
-            distro, created = Distro.objects.get_or_create(
-                name=index.distros[id].name,
-                layer_version=Layer_Version.objects.get(
-                    pk=li_layer_branch_id_to_toaster_lv_id[index.distros[id].layerbranch_id]))
-            distro.up_date = index.distros[id].updated
-            distro.name = index.distros[id].name
-            distro.description = index.distros[id].description
-            distro.save()
+            try:
+                distro, created = Distro.objects.get_or_create(
+                    name=index.distros[id].name,
+                    layer_version=Layer_Version.objects.get(
+                        pk=li_layer_branch_id_to_toaster_lv_id[index.distros[id].layerbranch_id]))
+                distro.up_date = index.distros[id].updated
+                distro.name = index.distros[id].name
+                distro.description = index.distros[id].description
+                distro.save()
+            except KeyError as e:
+                logger.warning("Couldn't process %s (%s)" % (i, repr(e)))
+                continue
             self.mini_progress("distros", i, total)
 
         # update machines

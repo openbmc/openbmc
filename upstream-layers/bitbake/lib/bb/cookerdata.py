@@ -16,9 +16,15 @@ import re
 import sys
 import hashlib
 from functools import wraps
-import bb
-from bb import data
+
+import bb.cache
+import bb.codeparser
+import bb.data
+import bb.data_smart
+import bb.event
+import bb.fetch2
 import bb.parse
+import bb.utils
 
 logger      = logging.getLogger("BitBake")
 parselog    = logging.getLogger("BitBake.Parsing")

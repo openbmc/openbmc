@@ -330,7 +330,7 @@ class TestProjectConfigTab(TestProjectConfigTabBase):
         self.wait_until_visible('#layer-container > form > div > span > div')
         self.wait_until_visible('.dropdown-menu')
         finder = lambda driver: driver.find_element(By.XPATH, '//*[@id="layer-container"]/form/div/span/div/div/div')
-        dropdown_item = self.wait_until_element_clickable(finder)
+        dropdown_item = self.wait_until_finder_clickable(finder)
         dropdown_item.click()
         self.wait_until_clickable('#add-layer-btn')
         add_layer_btn = layers.find_element(By.ID, 'add-layer-btn')

@@ -507,7 +507,10 @@ def handleVirtRecipeProviders(tasklist, d):
         taskdeps = (d.getVarFlag(task, "depends") or "").split()
         remapped = []
         for entry in taskdeps:
-            r, t = entry.split(":")
+            try:
+                r, t = entry.split(":")
+            except ValueError:
+                bb.fatal("Error, incorrect format for task dependency (task '%s'): %s" % (task, entry))
             if r in virtprovs:
                 r = d.getVar("PREFERRED_PROVIDER_" + r)
             remapped.append("%s:%s" % (r, t))

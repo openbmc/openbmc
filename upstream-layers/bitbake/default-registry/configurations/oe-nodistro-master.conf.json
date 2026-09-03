@@ -30,6 +30,7 @@
             "description": "OpenEmbedded 'nodistro'",
             "setup-dir-name": "oe-nodistro-master",
             "bb-layers": ["openembedded-core/meta"],
+            "oe-fragments": ["core/yocto/monitor-disk-space"],
             "oe-fragments-one-of": {
                 "machine": {
                     "description": "Target machines",

@@ -143,7 +143,7 @@ overview of their function and contents.
       .. note::
 
          For more details on how to make the BitBake server persistent, see the
-         :term:`BB_SERVER_TIMEOUT` variable.
+         ``BB_SERVER_TIMEOUT`` variable.
 
    :term:`BB_CURRENTTASK`
       Contains the name of the currently running task. The name does not

@@ -7,14 +7,18 @@
 import abc
 import asyncio
 import json
+import logging
 import os
 import socket
 import sys
 import re
 import contextlib
+import weakref
 from threading import Thread
 from .connection import StreamConnection, WebsocketConnection, DEFAULT_MAX_CHUNK
 from .exceptions import ConnectionClosedError, InvokeError
+
+logger = logging.getLogger("bb.asyncrpc.client")
 
 UNIX_PREFIX = "unix://"
 WS_PREFIX = "ws://"
@@ -224,7 +228,48 @@ class Client(object):
         # required (but harmless) with it.
         asyncio.set_event_loop(self.loop)
 
+        # The loop and its transports must be closed even if the caller never
+        # calls close(). Since set_event_loop() above replaces the reference
+        # held by the previous client, an unclosed loop only becomes reachable
+        # for collection once another client is created, at which point
+        # asyncio reports "unclosed transport" and "unclosed event loop"
+        # ResourceWarnings. The finalizer is detached by close() so that the
+        # normal path is unaffected.
+        self._finalizer = weakref.finalize(
+            self, self._close_loop, self.loop, self.client
+        )
+
         self._add_methods("connect_tcp", "ping")
+
+    @staticmethod
+    def _close_loop(loop, client):
+        if loop.is_closed():
+            return
+        try:
+            loop.run_until_complete(client.close())
+            loop.run_until_complete(loop.shutdown_asyncgens())
+        # This can be called from the finalizer, where an exception would be
+        # discarded by the interpreter and reported only as "Exception ignored
+        # in", so report the error here instead. The loop is closed below in
+        # every case.
+        except (OSError, ConnectionClosedError, asyncio.TimeoutError) as exc:
+            # The peer has gone away or is not responding. That is expected
+            # for a client that was never closed, so it is not worth warning
+            # about. asyncio.TimeoutError is only distinct from OSError on
+            # python older than 3.11.
+            logger.debug("Client connection already closed or unreachable: %s" % exc)
+        except RuntimeError as exc:
+            # The loop could not be run, for example because another loop is
+            # already running in this thread. Unlike the above, this means
+            # something is wrong with how the client is being used.
+            logger.warning("Could not shut down client event loop: %s" % exc)
+        except Exception as exc:
+            # Also covers the exceptions raised by websockets, which cannot be
+            # named here as it is imported lazily in connect_websocket(), and
+            # whatever may be raised while the interpreter is shutting down.
+            logger.warning("Error shutting down client connection: %s" % exc)
+        finally:
+            loop.close()
 
     @abc.abstractmethod
     def _get_async_client(self):
@@ -258,9 +303,8 @@ class Client(object):
 
     def close(self):
         if self.loop:
-            self.loop.run_until_complete(self.client.close())
-            self.loop.run_until_complete(self.loop.shutdown_asyncgens())
-            self.loop.close()
+            self._finalizer.detach()
+            self._close_loop(self.loop, self.client)
         self.loop = None
 
     def __enter__(self):

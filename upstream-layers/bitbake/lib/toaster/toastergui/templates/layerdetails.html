@@ -328,12 +328,12 @@
             <span class="current-value">{{layerversion.layer.summary|default_if_none:''}}</span>
             <form style="display:none; margin-bottom:20px; margin-top:5px;">
               <div class="form-group">
-                <textarea class="form-control" rows="2">{% if layerversion.layer.summary %}{{layerversion.layer.summary}}{% endif %}</textarea>
+                <textarea id="layer-summary" class="form-control" rows="2">{% if layerversion.layer.summary %}{{layerversion.layer.summary}}{% endif %}</textarea>
               </div>
               <button class="btn btn-default change-btn" data-layer-prop="summary" type="button">Save</button>
               <a href="#" class="btn btn-link cancel">Cancel</a>
             </form>
-            <span class="glyphicon glyphicon-edit"></span>
+            <span id="edit-layer-summary" class="glyphicon glyphicon-edit"></span>
             <span class="glyphicon glyphicon-trash delete-current-value" data-toggle="tooltip" title="Delete"></span>
             </dd>
             <dt>
@@ -344,12 +344,12 @@
             <span class="current-value">{{layerversion.layer.description|default_if_none:''}}</span>
             <form style="display:none; margin-bottom:20px; margin-top:5px;">
               <div class="form-group">
-                <textarea class="form-control" rows="6">{% if layerversion.layer.description %}{{layerversion.layer.description}}{% endif %}</textarea>
+                <textarea id="layer-description" class="form-control" rows="6">{% if layerversion.layer.description %}{{layerversion.layer.description}}{% endif %}</textarea>
               </div>
               <button class="btn btn-default change-btn" data-layer-prop="description" type="button" >Save</button>
               <a href="#" class="btn btn-link cancel">Cancel</a>
             </form>
-            <span class="glyphicon glyphicon-edit"></span>
+            <span id="edit-layer-description" class="glyphicon glyphicon-edit"></span>
             <span class="glyphicon glyphicon-trash delete-current-value" data-toggle="tooltip" title="Delete"></span>
             </dd>
             {% if layerversion.layer_source == layer_source.TYPE_LAYERINDEX  %}

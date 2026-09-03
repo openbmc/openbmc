@@ -21,6 +21,7 @@ import json
 import os
 import re
 import bb
+from bb.fetch2 import FetchError
 from bb.fetch2 import Fetch
 from bb.fetch2 import FetchMethod
 from bb.fetch2 import ParameterError
@@ -44,7 +45,7 @@ def foreach_dependencies(shrinkwrap, callback=None, dev=False):
             location = the location of the package (string)
     """
     packages = shrinkwrap.get("packages")
-    if not packages:
+    if packages is None:
         raise FetchError("Invalid shrinkwrap file format")
 
     for location, data in packages.items():
@@ -63,11 +64,7 @@ class NpmShrinkWrap(FetchMethod):
 
     def supports(self, ud, d):
         """Check if a given url can be fetched with npmsw"""
-        #return ud.type in ["npmsw"]
-        if ud.type in ["npmsw"]:
-            from bb.parse import SkipRecipe
-            raise SkipRecipe("The npmsw fetcher has been disabled due to security issues and there is no maintainer to address them")
-        return False
+        return ud.type in ["npmsw"]
 
     def urldata_init(self, ud, d):
         """Init npmsw specific variables within url data"""
@@ -126,6 +123,9 @@ class NpmShrinkWrap(FetchMethod):
                 extrapaths.append(resolvefile)
 
             # Handle http tarball sources
+            elif resolved is None:
+                raise ParameterError("Missing 'resolved' field for dependency '%s'" % name, ud.url)
+
             elif resolved.startswith("http") and integrity:
                 localfile = npm_localfile(os.path.basename(resolved))
 

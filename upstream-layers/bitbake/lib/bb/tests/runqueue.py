@@ -63,6 +63,15 @@ class RunQueueTests(unittest.TestCase):
 
             self.shutdown(tempdir)
 
+    def test_basic_scheduler(self):
+        with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
+            cmd = ["bitbake", "a1"]
+            tasks = self.run_bitbakecmd(cmd, tempdir, extraenv={"BB_SCHEDULER": "basic"})
+            expected = ['a1:' + task for task in self.alltasks]
+            self.assertEqual(set(tasks), set(expected))
+
+            self.shutdown(tempdir)
+
     def test_single_setscenevalid(self):
         with tempfile.TemporaryDirectory(prefix="runqueuetest") as tempdir:
             cmd = ["bitbake", "a1"]

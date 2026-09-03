@@ -56,7 +56,7 @@ class AsyncServerConnection(object):
             if not client_protocol:
                 return
 
-            (client_proto_name, client_proto_version) = client_protocol.split()
+            client_proto_name, client_proto_version = client_protocol.split()
             if client_proto_name != self.proto_name:
                 self.logger.debug("Rejecting invalid protocol %s" % (self.proto_name))
                 return
@@ -123,6 +123,7 @@ class StreamServer(object):
         self.handler = handler
         self.logger = logger
         self.closed = False
+        self.clients = []
 
     async def handle_stream_client(self, reader, writer):
         # writer.transport.set_write_buffer_limits(0)
@@ -131,10 +132,16 @@ class StreamServer(object):
             await socket.close()
             return
 
-        await self.handler(socket)
+        self.clients.append(socket)
+        try:
+            await self.handler(socket)
+        finally:
+            self.clients.remove(socket)
 
     async def stop(self):
         self.closed = True
+        for socket in self.clients:
+            await socket.close()
 
 
 class TCPStreamServer(StreamServer):
@@ -334,7 +341,7 @@ class AsyncServer(object):
             self.loop.add_signal_handler(signal.SIGQUIT, self.signal_handler)
             signal.pthread_sigmask(signal.SIG_UNBLOCK, [signal.SIGTERM])
 
-            self.loop.run_until_complete(asyncio.gather(*tasks))
+            self.loop.run_until_complete(bb.asyncrpc.TaskGroup.run(*tasks))
 
             self.logger.debug("Server shutting down")
         finally:

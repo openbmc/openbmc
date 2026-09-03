@@ -16,6 +16,11 @@ Supported SRC_URI options are:
 - version
     The npm package version. This is a mandatory parameter.
 
+- sha512sum / sha256sum / sha384sum / sha1sum
+    The expected checksum of the downloaded tarball. Exactly one is
+    mandatory: the registry cannot be trusted to supply its own tamper
+    detection, so the checksum must come from the recipe.
+
 - downloadfilename
     Specifies the filename used when storing the downloaded file.
 
@@ -33,12 +38,16 @@ import bb
 from bb.fetch2 import Fetch
 from bb.fetch2 import FetchError
 from bb.fetch2 import FetchMethod
+from bb.fetch2 import MalformedUrl
 from bb.fetch2 import MissingParameterError
 from bb.fetch2 import ParameterError
 from bb.fetch2 import URI
 from bb.fetch2 import check_network_access
 from bb.fetch2 import runfetchcmd
 from bb.utils import is_semver
+
+# Preference order matches strength; the first one present in SRC_URI wins.
+CHECKSUM_PARMS = ("sha512sum", "sha256sum", "sha384sum", "sha1sum")
 
 def npm_package(package):
     """Convert the npm package name to remove unsupported character"""
@@ -148,11 +157,7 @@ class Npm(FetchMethod):
 
     def supports(self, ud, d):
         """Check if a given url can be fetched with npm"""
-        #return ud.type in ["npm"]
-        if ud.type in ["npm"]:
-            from bb.parse import SkipRecipe
-            raise SkipRecipe("The npm fetcher has been disabled due to security issues and there is no maintainer to address them")
-        return False
+        return ud.type in ["npm"]
 
     def urldata_init(self, ud, d):
         """Init npm specific variables within url data"""
@@ -174,11 +179,32 @@ class Npm(FetchMethod):
         if not ud.version:
             raise MissingParameterError("Parameter 'version' required", ud.url)
 
-        if not is_semver(ud.version) and not ud.version == "latest":
+        if ud.version == "latest":
+            raise ParameterError(
+                "Version 'latest' is not reproducible; specify an exact semver version",
+                ud.url)
+
+        if not is_semver(ud.version):
             raise ParameterError("Invalid 'version' parameter", ud.url)
 
         # Extract the 'registry' part of the url
         ud.registry = re.sub(r"^npm://", "https://", ud.url.split(";")[0])
+        if not ud.url.split(";")[0][len("npm://"):]:
+            raise MalformedUrl(ud.url)
+
+        # A checksum is mandatory: the registry cannot be trusted to supply
+        # its own tamper detection, so the recipe must commit to one.
+        for cp in CHECKSUM_PARMS:
+            if cp in ud.parm:
+                ud.checksum_name = cp
+                ud.checksum_expected = ud.parm[cp]
+                break
+        else:
+            raise MissingParameterError(
+                "Missing checksum for npm package '%s@%s': a compromised "
+                "registry could otherwise serve a tampered tarball undetected. "
+                "Add one of %s to SRC_URI." % (ud.package, ud.version, ", ".join(CHECKSUM_PARMS)),
+                ud.url)
 
         # Using the 'downloadfilename' parameter as local filename
         # or the npm package name.
@@ -200,6 +226,13 @@ class Npm(FetchMethod):
         ud.resolvefile = self.localpath(ud, d) + ".resolved"
 
     def _resolve_proxy_url(self, ud, d):
+        """Resolve the tarball URL from the registry and cache it without any checksum.
+
+        Checksums must never be sourced from the registry: a compromised registry
+        controls both the tarball and its advertised hash, so any checksum obtained
+        there provides no tamper detection. Checksums are applied in _setup_proxy
+        from the recipe-provided SRC_URI parameters instead.
+        """
         def _npm_view():
             args = []
             args.append(("json", "true"))
@@ -215,50 +248,27 @@ class Npm(FetchMethod):
 
             try:
                 view = json.loads(view_string)
-
-                error = view.get("error")
-                if error is not None:
-                    raise FetchError(error.get("summary"), ud.url)
-
-                if ud.version == "latest":
-                    bb.warn("The npm package %s is using the latest " \
-                            "version available. This could lead to " \
-                            "non-reproducible builds." % pkgver)
-                elif ud.version != view.get("version"):
-                    raise ParameterError("Invalid 'version' parameter", ud.url)
-
-                return view
-
-            except Exception as e:
+            except json.JSONDecodeError as e:
                 raise FetchError("Invalid view from npm: %s" % str(e), ud.url)
 
-        def _get_url(view):
-            tarball_url = view.get("dist", {}).get("tarball")
+            error = view.get("error")
+            if error is not None:
+                raise FetchError(error.get("summary") or str(error), ud.url)
 
-            if tarball_url is None:
-                raise FetchError("Invalid 'dist.tarball' in view", ud.url)
+            if ud.version != view.get("version"):
+                raise ParameterError("Invalid 'version' parameter", ud.url)
 
-            uri = URI(tarball_url)
-            uri.params["downloadfilename"] = ud.localfile
+            return view
 
-            integrity = view.get("dist", {}).get("integrity")
-            shasum = view.get("dist", {}).get("shasum")
+        view = _npm_view()
+        tarball_url = view.get("dist", {}).get("tarball")
 
-            if integrity is not None:
-                checksum_name, checksum_expected = npm_integrity(integrity)
-                uri.params[checksum_name] = checksum_expected
-            elif shasum is not None:
-                uri.params["sha1sum"] = shasum
-            else:
-                raise FetchError("Invalid 'dist.integrity' in view", ud.url)
-
-            return str(uri)
-
-        url = _get_url(_npm_view())
+        if tarball_url is None:
+            raise FetchError("Invalid 'dist.tarball' in view", ud.url)
 
         bb.utils.mkdirhier(os.path.dirname(ud.resolvefile))
         with open(ud.resolvefile, "w") as f:
-            f.write(url)
+            f.write(tarball_url)
 
     def _setup_proxy(self, ud, d):
         if ud.proxy is None:
@@ -266,13 +276,26 @@ class Npm(FetchMethod):
                 self._resolve_proxy_url(ud, d)
 
             with open(ud.resolvefile, "r") as f:
-                url = f.read()
+                tarball_url = f.read().strip()
+
+            uri = URI(tarball_url)
+            # Discard any params that may have been embedded in the stored URL
+            # (e.g. from an npmsw-written .resolved file) and rebuild from
+            # scratch so that registry-sourced checksums can never flow through.
+            uri.params = {}
+            uri.params["downloadfilename"] = ud.localfile
+
+            # Inject the recipe-provided checksum into the proxy URL.
+            # Checksums from the remote registry are never used; only the
+            # value validated in urldata_init, sourced from the recipe, is
+            # trusted.
+            uri.params[ud.checksum_name] = ud.checksum_expected
 
             # Avoid conflicts between the environment data and:
             # - the proxy url checksum
             data = bb.data.createCopy(d)
             data.delVarFlags("SRC_URI")
-            ud.proxy = Fetch([url], data)
+            ud.proxy = Fetch([str(uri)], data)
 
     def _get_proxy_method(self, ud, d):
         self._setup_proxy(ud, d)
@@ -295,8 +318,6 @@ class Npm(FetchMethod):
     def need_update(self, ud, d):
         """Force a fetch, even if localpath exists ?"""
         if not os.path.exists(ud.resolvefile):
-            return True
-        if ud.version == "latest":
             return True
         proxy_m, proxy_ud, proxy_d = self._get_proxy_method(ud, d)
         return proxy_m.need_update(proxy_ud, proxy_d)

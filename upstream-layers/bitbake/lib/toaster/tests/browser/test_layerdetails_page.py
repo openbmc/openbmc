@@ -78,17 +78,20 @@ class TestLayerDetailsPage(SeleniumTestCase):
         self.wait_until_visible("#layer-git-repo-url")
 
         # Open every edit box
-        for btn in self.find_all("dd .glyphicon-edit"):
-            btn.click()
+        self.wait_until_element_clickable(self.find("#edit-layer-description"))
+        self.click("#edit-layer-description")
+        self.wait_until_element_clickable(self.find("#edit-layer-summary"))
+        self.click("#edit-layer-summary")
 
         # Wait for the inputs to become visible after animation
-        self.wait_until_visible("#layer-git input[type=text]")
-        self.wait_until_visible("dd textarea")
+        self.wait_until_visible("#layer-git-repo-url")
         self.wait_until_visible("dd .change-btn")
+        self.wait_until_element_clickable(self.find("#layer-description"))
+        self.wait_until_element_clickable(self.find("#layer-summary"))
 
         # Edit each value
         for inputs in self.find_all("#layer-git input[type=text]") + \
-                self.find_all("dd textarea"):
+                [self.find("#layer-summary"), self.find("#layer-description")]:
             # ignore the tt inputs (twitter typeahead input)
             if "tt-" in inputs.get_attribute("class"):
                 continue
@@ -100,7 +103,7 @@ class TestLayerDetailsPage(SeleniumTestCase):
                             (self.initial_values, value))
 
             # Make sure the input visible beofre sending keys
-            self.wait_until_clickable("#layer-git input[type=text]")
+            self.wait_until_element_clickable(inputs)
             inputs.send_keys("-edited")
 
         # Save the new values

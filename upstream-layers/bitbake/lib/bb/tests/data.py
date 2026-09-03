@@ -406,6 +406,31 @@ class TestOverrides(unittest.TestCase):
         bb.data.expandKeys(self.d)
         self.assertEqual(self.d.getVar("VERSION"), "2")
 
+    # Test an :append whose override name is only resolved by key expansion
+    def test_append_in_expanded_override(self):
+        self.d.setVar("MACHINE", "qemux86")
+        self.d.setVar("PN", "gizmo")
+        self.d.setVar("OVERRIDES", "gizmo:pn-gizmo-qemux86")
+        self.d.setVar("TEST:${PN}", "base")
+        self.d.setVar("TEST:${PN}:append:pn-gizmo-${MACHINE}", " appended")
+        bb.data.expandKeys(self.d)
+        self.assertEqual(self.d.getVar("TEST"), "base appended")
+
+    # Test renaming to a key which is itself not expanded yet, as native.bbclass
+    # does. The dependent override keys must be left for expandKeys() to rename.
+    def test_rename_to_unexpanded_key_with_override(self):
+        self.d.setVar("BPN", "gizmo")
+        self.d.setVar("PN", "gizmo-native")
+        self.d.setVar("OVERRIDES", "class-target")
+        self.d.setVar("TEST:${PN}-lib", "base")
+        self.d.setVar("TEST:${PN}-lib:class-target", "target")
+        with LogRecord() as logs:
+            self.d.renameVar("TEST:${PN}-lib", "TEST:${BPN}-lib-native")
+            bb.data.expandKeys(self.d)
+            self.assertFalse(logContains("renameVar with equivalent keys", logs))
+            self.assertFalse(logContains("replaces original key", logs))
+        self.assertEqual(self.d.getVar("TEST:gizmo-lib-native"), "target")
+
     def test_remove_with_override(self):
         self.d.setVar("TEST:bar", "testvalue2")
         self.d.setVar("TEST:some_val", "testvalue3 testvalue5")
@@ -723,3 +748,31 @@ class EmitVar(unittest.TestCase):
         self.assertEqual(self.get_output(out), ['bad_chars="a\\"b \\',
                                                 'c\\`d \\',
                                                 'e\\$f"'])
+
+class ExportedVars(unittest.TestCase):
+    def test_expanded_before_returning(self):
+        # Called while the variable is set, read once it is gone: the value
+        # has to be the one from the call, not from the read.
+        d = bb.data.init()
+        d.setVar("TESTVAR", "${@os.environ.get('BB_TEST_EXPORT', 'gone')}")
+        d.setVarFlag("TESTVAR", "export", "1")
+
+        with bb.utils.environment(BB_TEST_EXPORT="present"):
+            exported = bb.data.exported_vars(d)
+
+        self.assertEqual(dict(exported), {"TESTVAR": "present"})
+        self.assertIsInstance(exported, list)
+
+    def test_unexpandable_value_warns_and_is_skipped(self):
+        # The warning belongs to the call, not to a later iteration.
+        d = bb.data.init()
+        d.setVar("TESTVAR", "value")
+        d.setVarFlag("TESTVAR", "export", "1")
+        d.setVar("TESTBROKEN", "${@int('not a number')}")
+        d.setVarFlag("TESTBROKEN", "export", "1")
+
+        with LogRecord() as logs:
+            exported = bb.data.exported_vars(d)
+
+        self.assertEqual(dict(exported), {"TESTVAR": "value"})
+        self.assertTrue(logContains("Unable to export ${TESTBROKEN}", logs))

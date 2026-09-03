@@ -529,6 +529,9 @@ def lockfile(name, shared=False, retry=True, block=False):
 
     Returns the locked file descriptor in case of success, ``None`` otherwise.
     """
+    if not name:
+        return None
+
     basename = os.path.basename(name)
     if len(basename) > 255:
         root, ext = os.path.splitext(basename)
@@ -584,6 +587,14 @@ def lockfile(name, shared=False, retry=True, block=False):
         if not retry:
             return None
 
+# We have to drop the existing lock to avoid deadlocks
+def lockfile_to_exclusive(lf):
+    if not lf:
+        return
+    name = lf.name
+    unlockfile(lf)
+    return lockfile(name)
+
 def unlockfile(lf):
     """
     Unlock a file locked using ``bb.utils.lockfile()``.
@@ -594,6 +605,9 @@ def unlockfile(lf):
 
     No return value.
     """
+    if not lf:
+        return
+
     try:
         # If we had a shared lock, we need to promote to exclusive before
         # removing the lockfile. Attempt this, ignore failures.

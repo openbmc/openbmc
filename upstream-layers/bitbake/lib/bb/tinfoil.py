@@ -826,19 +826,38 @@ class Tinfoil:
             else:
                 return None
 
-    def build_file(self, buildfile, task, internal=True):
+    def build_file(self, buildfile, task, internal=True, taskonly=False):
         """
         Runs the specified task for just a single recipe (i.e. no dependencies).
         This is equivalent to bitbake -b, except with the default internal=True
         no warning about dependencies will be produced, normal info messages
         from the runqueue will be silenced and BuildInit, BuildStarted and
         BuildCompleted events will not be fired.
+        With taskonly=True the recipe's own task ordering is dropped as well, so
+        only the requested task runs.
         """
-        return self.run_command('buildFile', buildfile, task, internal)
+        return self.run_command('buildFile', buildfile, task, internal, taskonly)
 
     @wait_for
     def build_file_sync(self, *args):
         self.build_file(*args)
+
+    def run_prepared_task(self, recipe, task):
+        """Run *task* for one parsed recipe, and nothing else.
+
+        No dependencies are resolved and no other task of the recipe is run,
+        so everything the task consumes must already be in place. The task
+        runs through the normal BitBake worker path, including fakeroot setup
+        and dispatch of shell or Python task bodies.
+
+        The task is forced to execute rather than being skipped as up to date.
+        Returns False if the task failed.
+        """
+        self.run_command('setConfig', 'force', True)
+        try:
+            return self.build_file_sync(self.get_recipe_file(recipe), task, True, True)
+        finally:
+            self.run_command('setConfig', 'force', False)
 
     def build_targets(self, targets, task=None, handle_events=True, extra_events=None, event_callback=None):
         """

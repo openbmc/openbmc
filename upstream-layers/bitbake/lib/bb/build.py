@@ -24,7 +24,6 @@ import datetime
 import bb
 import bb.msg
 import bb.process
-import bb.progress
 from io import StringIO
 from bb import data, event, utils
 
@@ -387,6 +386,7 @@ esac
 '''
 
 def create_progress_handler(func, progress, logfile, d):
+    import bb.progress
     if progress == 'percent':
         # Use default regex
         return bb.progress.BasicProgressHandler(d, outfile=logfile)

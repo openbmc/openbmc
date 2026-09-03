@@ -5,12 +5,13 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
-from . import create_server, create_client
+from . import create_server, create_client, create_async_client
 from .server import DEFAULT_ANON_PERMS, ALL_PERMISSIONS
 from bb.asyncrpc import InvokeError
 import hashlib
 import logging
 from bb import multiprocessing
+import asyncio
 import os
 import sys
 import tempfile
@@ -30,7 +31,7 @@ BIN_DIR = THIS_DIR.parent.parent / "bin"
 
 def server_prefunc(server, idx):
     logging.basicConfig(level=logging.DEBUG, filename='bbhashserv-%d.log' % idx, filemode='w',
-                        format='%(levelname)s %(filename)s:%(lineno)d %(message)s')
+                        format='%(levelname)s %(filename)s:%(lineno)d %(message)s', force=True)
     server.logger.debug("Running server %d" % idx)
     sys.stdout = open('bbhashserv-stdout-%d.log' % idx, 'w')
     sys.stderr = sys.stdout
@@ -41,19 +42,15 @@ class HashEquivalenceTestSetup(object):
     server_index = 0
     client_index = 0
 
-    def start_server(self, dbpath=None, upstream=None, read_only=False, prefunc=server_prefunc, anon_perms=DEFAULT_ANON_PERMS, admin_username=None, admin_password=None):
+    def start_server(self, dbpath=None, upstream=None, read_only=False, prefunc=server_prefunc, anon_perms=DEFAULT_ANON_PERMS, admin_username=None, admin_password=None, addr=None):
         self.server_index += 1
+        if addr is None:
+            addr = self.get_server_addr(self.server_index)
+
         if dbpath is None:
             dbpath = self.make_dbpath()
 
-        def cleanup_server(server):
-            if server.process.exitcode is not None:
-                return
-
-            server.process.terminate()
-            server.process.join()
-
-        server = create_server(self.get_server_addr(self.server_index),
+        server = create_server(addr,
                                dbpath,
                                upstream=upstream,
                                read_only=read_only,
@@ -63,7 +60,7 @@ class HashEquivalenceTestSetup(object):
         server.dbpath = dbpath
 
         server.serve_as_process(prefunc=prefunc, args=(self.server_index,))
-        self.addCleanup(cleanup_server, server)
+        self.addCleanup(self.stop_server, server)
 
         return server
 
@@ -83,6 +80,13 @@ class HashEquivalenceTestSetup(object):
         self.server = self.start_server()
         return self.server.address
 
+    def stop_server(self, server):
+        if not server or server.process.exitcode is not None:
+            return
+
+        server.process.terminate()
+        server.process.join()
+
     def start_auth_server(self):
         auth_server = self.start_server(self.server.dbpath, anon_perms=[], admin_username="admin", admin_password="password")
         self.auth_server_address = auth_server.address
@@ -93,6 +97,8 @@ class HashEquivalenceTestSetup(object):
         return self.start_client(self.auth_server_address, user["username"], user["token"])
 
     def setUp(self):
+        logging.basicConfig(level=logging.DEBUG, filename='bbhashtest.log', filemode='w',
+                        format='%(levelname)s %(filename)s:%(lineno)d %(message)s')
         self.temp_dir = tempfile.TemporaryDirectory(prefix='bb-hashserv')
         self.addCleanup(self.temp_dir.cleanup)
 
@@ -372,20 +378,25 @@ class HashEquivalenceCommonTests(object):
             nonlocal side_client
 
             # check upstream server
+            self.assertTrue(self.client.unihash_exists(unihash))
             self.assertClientGetHash(self.client, taskhash, unihash)
 
             # Hash should *not* be present on the side server
+            if old_sidehash and unihash != old_sidehash:
+                self.assertFalse(side_client.unihash_exists(unihash))
             self.assertClientGetHash(side_client, taskhash, old_sidehash)
 
             # Hash should be present on the downstream server, since it
             # will defer to the upstream server. This will trigger
             # the backfill in the downstream server
+            self.assertTrue(down_client.unihash_exists(unihash))
             self.assertClientGetHash(down_client, taskhash, unihash)
 
             # After waiting for the downstream client to finish backfilling the
             # task from the upstream server, it should appear in the side server
             # since the database is populated
             down_client.backfill_wait()
+            self.assertTrue(side_client.unihash_exists(unihash))
             self.assertClientGetHash(side_client, taskhash, unihash)
 
         # Basic report
@@ -468,6 +479,169 @@ class HashEquivalenceCommonTests(object):
         self.assertEqual(result['unihash'], unihash9, 'Server failed to copy unihash from upstream')
         self.assertEqual(result['taskhash'], taskhash9, 'Server failed to copy unihash from upstream')
         self.assertEqual(result['method'], self.METHOD)
+
+    def test_upstream_batch(self):
+        down_server = self.start_server(upstream=self.server.address)
+        down_client = self.start_client(down_server.address)
+
+        taskhash1 = '8aa96fcffb5831b3c2c0cb75f0431e3f8b20554a'
+        outhash1 = 'afe240a439959ce86f5e322f8c208e1fedefea9e813f2140c81af866cc9edf7e'
+        unihash1 = '5b521d8a12683086cc08bc2c6d94a7a2dcff17eba53b9911e145d51164689380'
+        self.client.report_unihash(taskhash1, self.METHOD, outhash1, unihash1)
+
+        taskhash2 = "e3da00593d6a7fb435c7e2114976c59c5fd6d561"
+        outhash2 = "1cf8713e645f491eb9c959d20b5cae1c47133a292626dda9b10709857cbe688a"
+        unihash2 = "7aebef07d66a8c0f92d0c4f65ec8b1fbb850a3693c53827b8774b64fa9a8a9fe"
+        self.client.report_unihash(taskhash2, self.METHOD, outhash2, unihash2)
+
+        taskhash3 = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
+        outhash3 = '2765d4a5884be49b28601445c2760c5f21e7e5c0ee2b7e3fce98fd7e5970796f'
+        unihash3 = 'a69ec97f5af2e21e1a1f9cc8896965515d5559425666f734e245a3d40cee33d9'
+        self.client.report_unihash(taskhash3, self.METHOD, outhash3, unihash3)
+
+        def query_generator():
+            yield unihash1
+            yield unihash2
+            yield unihash3
+            yield "cc74784b2c0ad5b378a6b783c74c518d2c46b8b52fba29cb39a8430d742440d7"
+
+        results = down_client.unihash_exists_batch(query_generator())
+        self.assertEqual(results, [True, True, True, False])
+
+    def test_upstream_interrupted(self):
+        up_server = self.start_server()
+        down_server = self.start_server(upstream=up_server.address)
+
+        def restart_upstream():
+            nonlocal up_server
+
+            self.stop_server(up_server)
+            up_server = self.start_server(addr=up_server.address, dbpath=up_server.dbpath)
+
+        # Report some hashes
+        with self.start_client(up_server.address) as up_client:
+            taskhash1 = '8aa96fcffb5831b3c2c0cb75f0431e3f8b20554a'
+            outhash1 = 'afe240a439959ce86f5e322f8c208e1fedefea9e813f2140c81af866cc9edf7e'
+            unihash1 = '5b521d8a12683086cc08bc2c6d94a7a2dcff17eba53b9911e145d51164689380'
+            up_client.report_unihash(taskhash1, self.METHOD, outhash1, unihash1)
+
+            taskhash2 = "e3da00593d6a7fb435c7e2114976c59c5fd6d561"
+            outhash2 = "1cf8713e645f491eb9c959d20b5cae1c47133a292626dda9b10709857cbe688a"
+            unihash2 = "7aebef07d66a8c0f92d0c4f65ec8b1fbb850a3693c53827b8774b64fa9a8a9fe"
+            up_client.report_unihash(taskhash2, self.METHOD, outhash2, unihash2)
+
+            taskhash3 = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
+            outhash3 = '2765d4a5884be49b28601445c2760c5f21e7e5c0ee2b7e3fce98fd7e5970796f'
+            unihash3 = 'a69ec97f5af2e21e1a1f9cc8896965515d5559425666f734e245a3d40cee33d9'
+            up_client.report_unihash(taskhash3, self.METHOD, outhash3, unihash3)
+
+        restart_upstream()
+
+        with self.start_client(up_server.address) as up_client:
+            # Verify that reported hashes are correct after restaring server
+            self.assertTrue(up_client.unihash_exists(unihash1))
+            self.assertClientGetHash(up_client, taskhash1, unihash1)
+
+            self.assertTrue(up_client.unihash_exists(unihash2))
+            self.assertClientGetHash(up_client, taskhash2, unihash2)
+
+        async def check_unihashes():
+            async with await create_async_client(down_server.address) as down_client:
+                async with down_client.unihash_exists_stream() as stream:
+                    await stream.send_query(unihash1)
+                    r = await stream.get_result()
+                    self.assertTrue(r)
+
+                    restart_upstream()
+
+                    await stream.send_query(unihash2)
+                    r = await stream.get_result()
+                    self.assertTrue(r)
+
+                    await stream.send_query(unihash3)
+                    r = await stream.get_result()
+                    self.assertTrue(r)
+
+        asyncio.run(check_unihashes())
+
+    def test_upstream_lost(self):
+        up_server = self.start_server()
+        down_server = self.start_server(upstream=up_server.address)
+
+        def restart_upstream():
+            nonlocal up_server
+
+            self.stop_server(up_server)
+            up_server = self.start_server(addr=up_server.address, dbpath=up_server.dbpath)
+
+        # Report some hashes
+        with self.start_client(up_server.address) as up_client:
+            taskhash1 = '8aa96fcffb5831b3c2c0cb75f0431e3f8b20554a'
+            outhash1 = 'afe240a439959ce86f5e322f8c208e1fedefea9e813f2140c81af866cc9edf7e'
+            unihash1 = '5b521d8a12683086cc08bc2c6d94a7a2dcff17eba53b9911e145d51164689380'
+            up_client.report_unihash(taskhash1, self.METHOD, outhash1, unihash1)
+
+            taskhash2 = "e3da00593d6a7fb435c7e2114976c59c5fd6d561"
+            outhash2 = "1cf8713e645f491eb9c959d20b5cae1c47133a292626dda9b10709857cbe688a"
+            unihash2 = "7aebef07d66a8c0f92d0c4f65ec8b1fbb850a3693c53827b8774b64fa9a8a9fe"
+            up_client.report_unihash(taskhash2, self.METHOD, outhash2, unihash2)
+
+            taskhash3 = '35788efcb8dfb0a02659d81cf2bfd695fb30faf9'
+            outhash3 = '2765d4a5884be49b28601445c2760c5f21e7e5c0ee2b7e3fce98fd7e5970796f'
+            unihash3 = 'a69ec97f5af2e21e1a1f9cc8896965515d5559425666f734e245a3d40cee33d9'
+            up_client.report_unihash(taskhash3, self.METHOD, outhash3, unihash3)
+
+        async def check_unihashes():
+            async with await create_async_client(down_server.address) as down_client:
+                with self.assertRaises(ConnectionError):
+                    async with down_client.unihash_exists_stream() as stream:
+                        await stream.send_query(unihash1)
+                        r = await stream.get_result()
+                        self.assertTrue(r)
+
+                        self.stop_server(up_server)
+
+                        await stream.send_query(unihash2)
+                        r = await stream.get_result()
+
+        asyncio.run(check_unihashes())
+
+    def test_upstream_get_stream_miss(self):
+        down_server = self.start_server(upstream=self.server.address)
+        down_client = self.start_client(down_server.address)
+
+        # Two hashes present upstream (hits)
+        taskhash1 = '8aa96fcffb5831b3c2c0cb75f0431e3f8b20554a'
+        outhash1 = 'afe240a439959ce86f5e322f8c208e1fedefea9e813f2140c81af866cc9edf7e'
+        unihash1 = '5b521d8a12683086cc08bc2c6d94a7a2dcff17eba53b9911e145d51164689380'
+        self.client.report_unihash(taskhash1, self.METHOD, outhash1, unihash1)
+
+        taskhash2 = 'e3da00593d6a7fb435c7e2114976c59c5fd6d561'
+        outhash2 = '1cf8713e645f491eb9c959d20b5cae1c47133a292626dda9b10709857cbe688a'
+        unihash2 = '7aebef07d66a8c0f92d0c4f65ec8b1fbb850a3693c53827b8774b64fa9a8a9fe'
+        self.client.report_unihash(taskhash2, self.METHOD, outhash2, unihash2)
+
+        # Two taskhashes present nowhere (upstream misses)
+        miss1 = '0000000000000000000000000000000000000001'
+        miss2 = '0000000000000000000000000000000000000002'
+
+        # Miss interleaved with hits: a miss must not truncate the stream
+        results = down_client.get_unihash_batch([
+            (self.METHOD, miss1),
+            (self.METHOD, taskhash1),
+            (self.METHOD, miss2),
+            (self.METHOD, taskhash2),
+        ])
+        self.assertEqual(results, [None, unihash1, None, unihash2])
+
+        # All-miss batch
+        self.assertEqual(
+            down_client.get_unihash_batch([(self.METHOD, miss1), (self.METHOD, miss2)]),
+            [None, None],
+        )
+
+        # Singular get-unihash miss
+        self.assertClientGetHash(down_client, miss1, None)
 
     def test_unihash_exsits(self):
         taskhash, outhash, unihash = self.create_test_hash(self.client)
@@ -1055,7 +1229,7 @@ class HashEquivalenceCommonTests(object):
         # First hash is still present
         self.assertClientGetHash(self.client, taskhash, unihash)
 
-    def test_gc_stream(self):
+    def test_gc_batch(self):
         taskhash = '53b8dce672cb6d0c73170be43f540460bfc347b4'
         outhash = '5a9cb1649625f0bf41fc7791b635cd9c2d7118c7f021ba87dcd03f72b67ce7a8'
         unihash = '46edb5140d2613049332d0bf3745d9fafec9c559dac8cc61813739a28007fcdf'
@@ -1078,7 +1252,7 @@ class HashEquivalenceCommonTests(object):
         self.assertClientGetHash(self.client, taskhash3, unihash3)
 
         # Mark the first unihash to be kept
-        ret = self.client.gc_mark_stream("ABC", (f"unihash {h}" for h in [unihash, unihash2]))
+        ret = self.client.gc_mark_batch("ABC", (f"unihash {h}" for h in [unihash, unihash2]))
         self.assertEqual(ret, {"count": 2})
 
         ret = self.client.gc_status()
@@ -1555,6 +1729,102 @@ class TestHashEquivalenceTCPServer(HashEquivalenceTestSetup, HashEquivalenceComm
         # If IPv6 is enabled, it should be safe to use localhost directly, in general
         # case it is more reliable to resolve the IP address explicitly.
         return socket.gethostbyname("localhost") + ":0"
+
+    def test_get_stream_upstream_pipelined(self):
+        # Verify that, with an upstream configured, the get-stream handler
+        # pipelines its upstream queries instead of doing one blocking
+        # round-trip per task. A latency proxy injects RTT between this server
+        # and its upstream; a serial (one round-trip per task) implementation
+        # could not beat N * RTT, so finishing far faster proves the queries
+        # are pipelined.
+        import asyncio
+
+        LATENCY = 0.01  # 10ms each direction => ~20ms round trip
+        upstream_host, upstream_port = self.server_address.rsplit(":", 1)
+        upstream_port = int(upstream_port)
+
+        ready = threading.Event()
+        proxy = {}
+
+        def run_proxy():
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+            async def handle(creader, cwriter):
+                ureader, uwriter = await asyncio.open_connection(upstream_host, upstream_port)
+
+                async def pipe(r, w):
+                    try:
+                        while True:
+                            data = await r.read(65536)
+                            if not data:
+                                break
+                            await asyncio.sleep(LATENCY)
+                            w.write(data)
+                            await w.drain()
+                    except Exception:
+                        pass
+                    finally:
+                        try:
+                            w.close()
+                        except Exception:
+                            pass
+
+                await bb.asyncrpc.TaskGroup.run(pipe(creader, uwriter), pipe(ureader, cwriter))
+
+            stop_event = asyncio.Event()
+            proxy["stop_event"] = stop_event
+            proxy["loop"] = loop
+
+            async def main():
+                server = await asyncio.start_server(handle, "127.0.0.1", 0)
+                proxy["port"] = server.sockets[0].getsockname()[1]
+                ready.set()
+                async with server:
+                    await stop_event.wait()
+
+            try:
+                loop.run_until_complete(main())
+            except Exception:
+                pass
+            finally:
+                loop.close()
+
+        proxy_thread = threading.Thread(target=run_proxy, daemon=True)
+        proxy_thread.start()
+        self.assertTrue(ready.wait(10), "latency proxy did not start")
+        self.addCleanup(proxy_thread.join, 10)
+        self.addCleanup(lambda: proxy["loop"].call_soon_threadsafe(proxy["stop_event"].set))
+        proxy_addr = "127.0.0.1:%d" % proxy["port"]
+
+        N = 400
+        expected = []
+        for i in range(N):
+            taskhash = hashlib.sha256(("task%d" % i).encode()).hexdigest()
+            outhash = hashlib.sha256(("out%d" % i).encode()).hexdigest()
+            unihash = hashlib.sha256(("uni%d" % i).encode()).hexdigest()
+            self.client.report_unihash(taskhash, self.METHOD, outhash, unihash)
+            expected.append((self.METHOD, taskhash, unihash))
+
+        # Downstream server with an EMPTY local DB whose upstream is the slow proxy.
+        down_server = self.start_server(upstream=proxy_addr)
+        down_client = self.start_client(down_server.address)
+
+        args = [(m, th) for (m, th, _uh) in expected]
+        start = time.time()
+        results = down_client.get_unihash_batch(args)
+        elapsed = time.time() - start
+
+        self.assertEqual(results, [uh for (_m, _th, uh) in expected])
+
+        # A serial (one round-trip per task) implementation cannot beat N*RTT.
+        # Allow a generous margin to avoid flakiness on loaded CI machines.
+        serial_lower_bound = N * 2 * LATENCY
+        self.assertLess(elapsed, serial_lower_bound / 4,
+                        "Upstream queries are not being pipelined "
+                        "(%.3fs for %d queries at %.0fms injected RTT)"
+                        % (elapsed, N, 2 * LATENCY * 1000))
+
 
 
 class TestHashEquivalenceWebsocketServer(HashEquivalenceTestSetup, HashEquivalenceCommonTests, unittest.TestCase):

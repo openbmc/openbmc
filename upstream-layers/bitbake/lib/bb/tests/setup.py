@@ -907,12 +907,8 @@ class PyPIPackagingTest(unittest.TestCase):
         venv.create(self.venv_dir, with_pip=False, symlinks=True)
 
         # Get paths to venv python and bin directory
-        if sys.platform == 'win32':
-            self.venv_python = os.path.join(self.venv_dir, 'Scripts', 'python.exe')
-            self.venv_bin = os.path.join(self.venv_dir, 'Scripts')
-        else:
-            self.venv_python = os.path.join(self.venv_dir, 'bin', 'python')
-            self.venv_bin = os.path.join(self.venv_dir, 'bin')
+        self.venv_python = os.path.join(self.venv_dir, 'bin', 'python')
+        self.venv_bin = os.path.join(self.venv_dir, 'bin')
 
         # Install wheel using pip from the outer environment (offline, no-deps)
         site_packages = self._get_site_packages()

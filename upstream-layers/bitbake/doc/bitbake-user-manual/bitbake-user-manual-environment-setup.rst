@@ -25,20 +25,29 @@ the following tasks:
 Quick Start
 ===========
 
-#. If you haven't already, clone the BitBake repository:
+#. First, run the following command to install the ``bitbake-setup``
+   command-line tool in a Python `virtual environment
+   <https://docs.python.org/3/library/venv.html>`__:
 
    .. code-block:: shell
 
-      $ git clone https://git.openembedded.org/bitbake
+      $ python3 -m venv --clear ./bitbake-setup-venv
+      $ . ./bitbake-setup-venv/bin/activate
+      $ pip install bitbake-setup
 
-#. ``bitbake-setup`` is part of the BitBake source tree under
-   ``./bitbake/bin/bitbake-setup``.
+   .. tip::
 
-   To start, run:
+      To update ``bitbake-setup`` when already installed, you can run:
+
+      .. code-block:: console
+
+         $ pip install --upgrade bitbake-setup
+
+#. To start using ``bitbake-setup``, run:
 
    .. code-block:: shell
 
-      $ ./bitbake/bin/bitbake-setup init
+      $ bitbake-setup init
 
    This command will ask you to choose which configurations to use available as
    part of the default BitBake :term:`Configuration Templates <Configuration
@@ -103,6 +112,16 @@ Quick Start
 #. You can then start running ``bitbake`` in the current shell. For more information
    on how to use ``bitbake``, see the :doc:`/bitbake-user-manual/bitbake-user-manual-execution`
    section of this manual.
+
+.. note::
+
+   The ``bitbake-setup`` tool is developed and maintained in the BitBake
+   repository and can also be used directly from there:
+
+   .. code-block:: console
+
+      $ git clone https://git.openembedded.org/bitbake ./bitbake
+      $ ./bitbake/bin/bitbake-setup ...
 
 Terminology
 ===========
@@ -345,7 +364,7 @@ In addition, the command can take the following arguments:
 
    .. code-block:: shell
 
-      $ ./bitbake/bin/bitbake-setup \
+      $ bitbake-setup \
           --setting default registry 'git://example.com/bitbake-setup-configurations.git;protocol=https;branch=main;rev=main' \
           init
 
@@ -354,7 +373,7 @@ In addition, the command can take the following arguments:
 
    .. code-block:: shell
 
-      $ ./bitbake/bin/bitbake-setup init https://git.openembedded.org/bitbake/plain/default-registry/configurations/oe-nodistro-master.conf.json
+      $ bitbake-setup init https://git.openembedded.org/bitbake/plain/default-registry/configurations/oe-nodistro-master.conf.json
 
 -  This example initializes a :term:`Setup` with:
 
@@ -365,7 +384,7 @@ In addition, the command can take the following arguments:
 
    .. code-block:: shell
 
-      $ ./bitbake/bin/bitbake-setup \
+      $ bitbake-setup \
           --setting default top-dir-prefix /work/bitbake-setup \
           --setting default top-dir-name custom-project \
           init \
@@ -666,8 +685,8 @@ In addition, the command can take the following arguments:
 -  ``--sha256``: SHA256 checksum of the buildtools installer. Overrides the
    value from the configuration file.
 
-When ``url`` and ``sha256sum`` are set in the :term:`Configuration File`,
-the installer is downloaded via ``bb.fetch`` (cached in ``DL_DIR``) and its
+When ``url`` and ``sha256sum`` are set in the configuration file,
+the installer is downloaded via ``bb.fetch`` (cached in :term:`DL_DIR`) and its
 checksum is enforced. If no configuration is present, the script falls back
 to its built-in defaults::
 

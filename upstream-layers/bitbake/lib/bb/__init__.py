@@ -90,6 +90,7 @@ class BBLoggerMixin(object):
         return self.bbdebug(3, *args, **kwargs)
 
     def bbdebug(self, level, msg, *args, **kwargs):
+        import bb.event
         loglevel = logging.DEBUG - level + 1
         if not bb.event.worker_pid:
             if self.name in bb.msg.loggerDefaultDomains and loglevel > (bb.msg.loggerDefaultDomains[self.name]):

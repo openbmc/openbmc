@@ -8,70 +8,252 @@ import socket
 import asyncio
 import bb.asyncrpc
 import json
+from abc import abstractmethod
+from collections.abc import AsyncIterable
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
 from . import create_async_client
-
 
 logger = logging.getLogger("hashserv.client")
 
 
+class AsyncQueue(AsyncIterable):
+    class Shutdown(Exception):
+        pass
+
+    SHUTDOWN_SENTINEL = object()
+
+    def __init__(self, *args, **kwargs):
+        self.__queue = asyncio.Queue()
+        self.__shutdown = False
+        self.__is_done = False
+
+    async def done(self):
+        if self.__is_done:
+            return
+        self.__is_done = True
+        await self.__queue.put(self.SHUTDOWN_SENTINEL)
+
+    async def put(self, item):
+        if self.__is_done:
+            raise self.Shutdown
+        await self.__queue.put(item)
+
+    async def get(self):
+        if self.__shutdown:
+            raise self.Shutdown
+
+        item = await self.__queue.get()
+        if item is self.SHUTDOWN_SENTINEL:
+            self.__shutdown = True
+            raise self.Shutdown
+
+        return item
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            return await self.get()
+        except self.Shutdown:
+            raise StopAsyncIteration
+
+
+@dataclass(eq=False, frozen=True)
+class AsyncPipe:
+    send_queue: AsyncQueue
+    recv_queue: AsyncQueue
+
+
+class Stream(AsyncIterable):
+    def __init__(self, pipe):
+        self._pipe = pipe
+
+    async def done(self):
+        await self._pipe.send_queue.done()
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        try:
+            return await self.get_result()
+        except AsyncQueue.Shutdown:
+            raise StopAsyncIteration
+
+    @abstractmethod
+    async def _send_batch_input(self, i):
+        raise NotImplementedError("Not implemented")
+
+    @abstractmethod
+    async def get_result(self):
+        raise NotImplementedError("Not implemented")
+
+    async def batch(self, inputs):
+        """
+        Does a "batch" process of stream messages. This sends the query
+        messages as fast as possible, and simultaneously attempts to read the
+        messages back. This helps to mitigate the effects of latency to the
+        hash equivalence server be allowing multiple queries to be "in-flight"
+        at once
+
+        The input may be a generator or an async generator
+        """
+
+        async def get_inputs():
+            if isinstance(inputs, AsyncIterable):
+                async for i in inputs:
+                    yield i
+            else:
+                for i in inputs:
+                    yield i
+
+        async def send():
+            try:
+                async for i in get_inputs():
+                    await self._send_batch_input(i)
+            finally:
+                await self.done()
+
+        results = []
+
+        async def recv():
+            async for item in self:
+                results.append(item)
+
+        await bb.asyncrpc.TaskGroup.run(send(), recv())
+        return results
+
+
+class GetUnihashStream(Stream):
+    def __init__(self, pipe):
+        super().__init__(pipe)
+
+    async def _send_batch_input(self, i):
+        method, taskhash = i
+        await self.send_query(method, taskhash)
+
+    async def send_query(self, method, taskhash):
+        await self._pipe.send_queue.put(f"{method} {taskhash}")
+
+    async def get_result(self):
+        r = await self._pipe.recv_queue.get()
+        return r if r else None
+
+
+class UnihashExistsStream(Stream):
+    def __init__(self, pipe):
+        super().__init__(pipe)
+
+    async def _send_batch_input(self, i):
+        await self.send_query(i)
+
+    async def send_query(self, unihash):
+        await self._pipe.send_queue.put(unihash)
+
+    async def get_result(self):
+        r = await self._pipe.recv_queue.get()
+        return r == "true"
+
+
+class GcMarkStream(Stream):
+    def __init__(self, pipe, mark):
+        super().__init__(pipe)
+        self.mark = mark
+
+    async def _send_batch_input(self, i):
+        def row_to_dict(row):
+            pairs = row.split()
+            return dict(zip(pairs[::2], pairs[1::2]))
+
+        await self.send_mark(row_to_dict(i))
+
+    async def send_mark(self, where):
+        await self._pipe.send_queue.put(json.dumps({"mark": self.mark, "where": where}))
+
+    async def get_result(self):
+        r = await self._pipe.recv_queue.get()
+        return json.loads(r)
+
+
 class Batch(object):
-    def __init__(self):
-        self.done = False
+    def __init__(self, send_queue, recv_queue):
+        self.send_queue = send_queue
+        self.recv_queue = recv_queue
+        self.fill_done = False
+        self.send_done = False
         self.cond = asyncio.Condition()
         self.pending = []
-        self.results = []
         self.sent_count = 0
+        self.recv_count = 0
+        self.item = None
 
     async def recv(self, socket):
         while True:
             async with self.cond:
-                await self.cond.wait_for(lambda: self.pending or self.done)
-
+                await self.cond.wait_for(lambda: self.pending or self.send_done)
                 if not self.pending:
-                    if self.done:
+                    if self.send_done:
                         return
                     continue
 
-            r = await socket.recv()
-            self.results.append(r)
+            m = await socket.recv()
+            await self.recv_queue.put(m)
 
             async with self.cond:
+                self.recv_count += 1
                 self.pending.pop(0)
 
-    async def send(self, socket, msgs):
-        try:
-            # In the event of a restart due to a reconnect, all in-flight
-            # messages need to be resent first to keep to result count in sync
+    async def fill(self):
+        async for m in self.send_queue:
+            async with self.cond:
+                # Wait for item to be consumed
+                await self.cond.wait_for(lambda: self.item is None)
+                self.item = m
+                self.cond.notify_all()
+
+        async with self.cond:
+            self.fill_done = True
+            self.cond.notify_all()
+
+    async def send(self, socket):
+        # In the event of a restart due to a reconnect, all in-flight
+        # messages need to be resent first to keep to result count in sync
+        async with self.cond:
             for m in self.pending:
                 await socket.send(m)
 
-            for m in msgs:
-                # Add the message to the pending list before attempting to send
-                # it so that if the send fails it will be retried
-                async with self.cond:
-                    self.pending.append(m)
-                    self.cond.notify()
-                    self.sent_count += 1
-
-                await socket.send(m)
-
-        finally:
+        while True:
             async with self.cond:
-                self.done = True
-                self.cond.notify()
+                await self.cond.wait_for(
+                    lambda: self.item is not None or self.fill_done
+                )
+                if self.item is None:
+                    if self.fill_done:
+                        self.send_done = True
+                        self.cond.notify_all()
+                        return
+                    continue
 
-    async def process(self, socket, msgs):
-        await asyncio.gather(
-            self.recv(socket),
-            self.send(socket, msgs),
-        )
+                m = self.item
 
-        if len(self.results) != self.sent_count:
-            raise ValueError(
-                f"Expected result count {len(self.results)}. Expected {self.sent_count}"
+            await socket.send(m)
+
+            async with self.cond:
+                self.item = None
+                self.pending.append(m)
+                self.sent_count += 1
+                self.cond.notify_all()
+
+    async def stream(self, socket):
+        await bb.asyncrpc.TaskGroup.run(self.send(socket), self.recv(socket))
+
+    def check(self):
+        if self.sent_count != self.recv_count:
+            raise ConnectionError(
+                f"Sent {self.sent_count} messages but only received {self.recv_count}"
             )
-
-        return self.results
 
 
 class AsyncClient(bb.asyncrpc.AsyncClient):
@@ -98,29 +280,34 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
             if become:
                 await self.become_user(become)
 
-    async def send_stream_batch(self, mode, msgs):
-        """
-        Does a "batch" process of stream messages. This sends the query
-        messages as fast as possible, and simultaneously attempts to read the
-        messages back. This helps to mitigate the effects of latency to the
-        hash equivalence server be allowing multiple queries to be "in-flight"
-        at once
-
-        The implementation does more complicated tracking using a count of sent
-        messages so that `msgs` can be a generator function (i.e. its length is
-        unknown)
-
-        """
-
-        b = Batch()
+    @asynccontextmanager
+    async def send_stream(self, mode):
+        send_queue = AsyncQueue()
+        recv_queue = AsyncQueue()
+        b = Batch(send_queue, recv_queue)
 
         async def proc():
-            nonlocal b
-
             await self._set_mode(mode)
-            return await b.process(self.socket, msgs)
+            await b.stream(self.socket)
 
-        return await self._send_wrapper(proc)
+        async def process():
+            try:
+                await self._send_wrapper(proc)
+            finally:
+                await recv_queue.done()
+
+        # Create background process to process messages
+        async with bb.asyncrpc.TaskGroup() as group:
+            group.create_task(process())
+            group.create_task(b.fill())
+            try:
+                yield AsyncPipe(send_queue, recv_queue)
+                b.check()
+            except AsyncQueue.Shutdown as e:
+                pass
+            finally:
+                await send_queue.done()
+                await recv_queue.done()
 
     async def invoke(self, *args, skip_mode=False, **kwargs):
         # It's OK if connection errors cause a failure here, because the mode
@@ -173,15 +360,18 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         self.mode = new_mode
 
     async def get_unihash(self, method, taskhash):
-        r = await self.get_unihash_batch([(method, taskhash)])
-        return r[0]
+        async with self.get_unihash_stream() as stream:
+            await stream.send_query(method, taskhash)
+            return await stream.get_result()
 
     async def get_unihash_batch(self, args):
-        result = await self.send_stream_batch(
-            self.MODE_GET_STREAM,
-            (f"{method} {taskhash}" for method, taskhash in args),
-        )
-        return [r if r else None for r in result]
+        async with self.get_unihash_stream() as stream:
+            return await stream.batch(args)
+
+    @asynccontextmanager
+    async def get_unihash_stream(self):
+        async with self.send_stream(self.MODE_GET_STREAM) as pipe:
+            yield GetUnihashStream(pipe)
 
     async def report_unihash(self, taskhash, method, outhash, unihash, extra={}):
         m = extra.copy()
@@ -204,12 +394,18 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         )
 
     async def unihash_exists(self, unihash):
-        r = await self.unihash_exists_batch([unihash])
-        return r[0]
+        async with self.unihash_exists_stream() as stream:
+            await stream.send_query(unihash)
+            return await stream.get_result()
 
     async def unihash_exists_batch(self, unihashes):
-        result = await self.send_stream_batch(self.MODE_EXIST_STREAM, unihashes)
-        return [r == "true" for r in result]
+        async with self.unihash_exists_stream() as stream:
+            return await stream.batch(unihashes)
+
+    @asynccontextmanager
+    async def unihash_exists_stream(self):
+        async with self.send_stream(self.MODE_EXIST_STREAM) as pipe:
+            yield UnihashExistsStream(pipe)
 
     async def get_outhash(self, method, outhash, taskhash, with_unihash=True):
         return await self.invoke(
@@ -309,23 +505,22 @@ class AsyncClient(bb.asyncrpc.AsyncClient):
         """
         return await self.invoke({"gc-mark": {"mark": mark, "where": where}})
 
-    async def gc_mark_stream(self, mark, rows):
+    async def gc_mark_batch(self, mark, rows):
         """
         Similar to `gc-mark`, but accepts a list of "where" key-value pair
         conditions. It utilizes stream mode to mark hashes, which helps reduce
         the impact of latency when communicating with the hash equivalence
         server.
         """
-        def row_to_dict(row):
-            pairs = row.split()
-            return dict(zip(pairs[::2], pairs[1::2]))
+        async with self.gc_mark_stream(mark) as stream:
+            results = await stream.batch(rows)
 
-        responses = await self.send_stream_batch(
-            self.MODE_MARK_STREAM,
-            (json.dumps({"mark": mark, "where": row_to_dict(row)}) for row in rows),
-        )
+        return {"count": sum(int(r["count"]) for r in results)}
 
-        return {"count": sum(int(json.loads(r)["count"]) for r in responses)}
+    @asynccontextmanager
+    async def gc_mark_stream(self, mark):
+        async with self.send_stream(self.MODE_MARK_STREAM) as pipe:
+            yield GcMarkStream(pipe, mark)
 
     async def gc_sweep(self, mark):
         """
@@ -372,7 +567,7 @@ class Client(bb.asyncrpc.Client):
             "get_db_query_columns",
             "gc_status",
             "gc_mark",
-            "gc_mark_stream",
+            "gc_mark_batch",
             "gc_sweep",
         )
 

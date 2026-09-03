@@ -1097,7 +1097,8 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
     # False means try another url
 
     try:
-        if ud.lockfile and ud.lockfile != origud.lockfile:
+        lf = None
+        if ud.lockfile != origud.lockfile:
             lf = bb.utils.lockfile(ud.lockfile)
 
         if check:
@@ -1156,12 +1157,6 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
     except bb.fetch2.NetworkAccess:
         raise
 
-    except IOError as e:
-        if e.errno in [errno.ESTALE]:
-            logger.warning("Stale Error Observed %s." % ud.url)
-            return False
-        raise
-
     except bb.fetch2.BBFetchException as e:
         if isinstance(e, ChecksumError):
             logger.warning("Mirror checksum failure for url %s (original url: %s)\nCleaning and trying again." % (ud.url, origud.url))
@@ -1180,18 +1175,21 @@ def try_mirror_url(fetch, origud, ud, ld, check = False):
             pass
         return False
     finally:
-        if ud.lockfile and ud.lockfile != origud.lockfile:
+        if ud.lockfile != origud.lockfile:
             bb.utils.unlockfile(lf)
 
-def try_mirrors(fetch, d, origud, mirrors, check = False):
+def try_mirrors(fetch, d, origud, mirrorvar, check = False):
     """
     Try to use a mirrored version of the sources.
     This method will be automatically called before the fetchers go.
 
     d Is a bb.data instance
     uri is the original uri we're trying to download
-    mirrors is the list of mirrors we're going to try
+    mirrorvar is variable name that contains the list of mirrors we're going to try
     """
+    logger.debug("Trying mirrors in %s" % mirrorvar)
+    mirrors = mirror_from_string(d.getVar(mirrorvar))
+
     ld = d.createCopy()
 
     uris, uds = build_mirroruris(origud, mirrors, ld)
@@ -1440,9 +1438,6 @@ class FetchData(object):
 class FetchMethod(object):
     """Base class for 'fetch'ing data"""
 
-    def __init__(self, urls=None):
-        self.urls = []
-
     def supports(self, urldata, d):
         """
         Check to see if this fetch class supports a given url.
@@ -1502,14 +1497,6 @@ class FetchMethod(object):
         while os.path.isabs(relpath):
             relpath = relpath[1:]
         return relpath
-
-    def setUrls(self, urls):
-        self.__urls = urls
-
-    def getUrls(self):
-        return self.__urls
-
-    urls = property(getUrls, setUrls, None, "Urls property")
 
     def need_update(self, ud, d):
         """
@@ -1716,11 +1703,11 @@ class FetchMethod(object):
         """
         return True
 
-    def try_mirrors(self, fetch, urldata, d, mirrors, check=False):
+    def try_mirrors(self, fetch, urldata, d, mirrorvar, check=False):
         """
         Try to use a mirror
         """
-        return bool(try_mirrors(fetch, d, urldata, mirrors, check))
+        return bool(try_mirrors(fetch, d, urldata, mirrorvar, check))
 
     def checkstatus(self, fetch, urldata, d):
         """
@@ -1914,25 +1901,15 @@ class Fetch(object):
             done = False
 
             try:
-                if ud.lockfile:
-                    lf = bb.utils.lockfile(ud.lockfile)
+                lf = bb.utils.lockfile(ud.lockfile, shared=True)
 
                 self.d.setVar("BB_NO_NETWORK", network)
                 if m.verify_donestamp(ud, self.d) and not m.need_update(ud, self.d):
                     done = True
-                elif m.try_premirror(ud, self.d):
-                    logger.debug("Trying PREMIRRORS")
-                    mirrors = mirror_from_string(self.d.getVar('PREMIRRORS'))
-                    done = m.try_mirrors(self, ud, self.d, mirrors)
-                    if done:
-                        try:
-                            # early checksum verification so that if the checksum of the premirror
-                            # contents mismatch the fetcher can still try upstream and mirrors
-                            m.update_donestamp(ud, self.d)
-                        except ChecksumError as e:
-                            logger.warning("Checksum failure encountered with premirror download of %s - will attempt other sources." % u)
-                            logger.debug(str(e))
-                            done = False
+                if not done:
+                    lf = bb.utils.lockfile_to_exclusive(lf)
+                    if m.try_premirror(ud, self.d):
+                        done = m.try_mirrors(self, ud, self.d, 'PREMIRRORS')
 
                 d = self.d
                 if premirroronly:
@@ -1975,9 +1952,7 @@ class Fetch(object):
                         # Remove any incomplete fetch
                         if not verified_stamp and m.cleanup_upon_failure():
                             m.clean(ud, d)
-                        logger.debug("Trying MIRRORS")
-                        mirrors = mirror_from_string(d.getVar('MIRRORS'))
-                        done = m.try_mirrors(self, ud, d, mirrors)
+                        done = m.try_mirrors(self, ud, d, 'MIRRORS')
 
                 if not done or not m.done(ud, d):
                     if firsterr:
@@ -1985,12 +1960,6 @@ class Fetch(object):
                     raise FetchError("Unable to fetch URL from any source.", u)
 
                 m.update_donestamp(ud, d)
-
-            except IOError as e:
-                if e.errno in [errno.ESTALE]:
-                    logger.error("Stale Error Observed %s." % u)
-                    raise ChecksumError("Stale Error Detected")
-                raise
 
             except BBFetchException as e:
                 if isinstance(e, NoChecksumError):
@@ -2002,8 +1971,7 @@ class Fetch(object):
                 raise
 
             finally:
-                if ud.lockfile:
-                    bb.utils.unlockfile(lf)
+                bb.utils.unlockfile(lf)
         if checksum_missing_messages:
             logger.error("Missing SRC_URI checksum, please add those to the recipe: \n%s", "\n".join(checksum_missing_messages))
             raise BBFetchException("There was some missing checksums in the recipe")
@@ -2027,14 +1995,13 @@ class Fetch(object):
             logger.debug("Testing URL %s", u)
             # First try checking uri, u, from PREMIRRORS
             mirrors = mirror_from_string(self.d.getVar('PREMIRRORS'))
-            ret = m.try_mirrors(self, ud, self.d, mirrors, True)
+            ret = m.try_mirrors(self, ud, self.d, 'PREMIRRORS', True)
             if not ret:
                 # Next try checking from the original uri, u
                 ret = m.checkstatus(self, ud, self.d)
                 if not ret:
                     # Finally, try checking uri, u, from MIRRORS
-                    mirrors = mirror_from_string(self.d.getVar('MIRRORS'))
-                    ret = m.try_mirrors(self, ud, self.d, mirrors, True)
+                    ret = m.try_mirrors(self, ud, self.d, 'MIRRORS', True)
 
             if not ret:
                 raise FetchError("URL doesn't work", u)
@@ -2054,8 +2021,7 @@ class Fetch(object):
                 ud = self.ud[u]
                 ud.setup_localpath(self.d)
 
-                if ud.lockfile:
-                    lf = bb.utils.lockfile(ud.lockfile)
+                lf = bb.utils.lockfile(ud.lockfile, shared=True)
 
                 unpack_tracer.start_url(u)
                 if update:
@@ -2065,8 +2031,7 @@ class Fetch(object):
                 unpack_tracer.finish_url(u)
 
             finally:
-                if ud.lockfile:
-                    bb.utils.unlockfile(lf)
+                bb.utils.unlockfile(lf)
 
         unpack_tracer.complete()
 
@@ -2091,16 +2056,14 @@ class Fetch(object):
                 if not ud.localfile and ud.localpath is None:
                     continue
 
-                if ud.lockfile:
-                    lf = bb.utils.lockfile(ud.lockfile)
+                lf = bb.utils.lockfile(ud.lockfile)
 
                 ud.method.clean(ud, self.d)
                 if ud.donestamp:
                     bb.utils.remove(ud.donestamp)
 
             finally:
-                if ud.lockfile:
-                    bb.utils.unlockfile(lf)
+                bb.utils.unlockfile(lf)
 
     def expanded_urldata(self, urls=None):
         """
@@ -2127,26 +2090,28 @@ class FetchConnectionCache(object):
     def __init__(self):
         self.cache = {}
 
-    def get_connection_name(self, host, port):
-        return host + ':' + str(port)
+    def get_connection_name(self, host, port, connection_id=None):
+        if connection_id is None:
+            return host + ':' + str(port)
+        return (host, port, connection_id)
 
-    def add_connection(self, host, port, connection):
-        cn = self.get_connection_name(host, port)
+    def add_connection(self, host, port, connection, connection_id=None):
+        cn = self.get_connection_name(host, port, connection_id)
 
         if cn not in self.cache:
             self.cache[cn] = connection
 
-    def get_connection(self, host, port):
+    def get_connection(self, host, port, connection_id=None):
         connection = None
 
-        cn = self.get_connection_name(host, port)
+        cn = self.get_connection_name(host, port, connection_id)
         if cn in self.cache:
             connection = self.cache[cn]
 
         return connection
 
-    def remove_connection(self, host, port):
-        cn = self.get_connection_name(host, port)
+    def remove_connection(self, host, port, connection_id=None):
+        cn = self.get_connection_name(host, port, connection_id)
         if cn in self.cache:
             self.cache[cn].close()
             del self.cache[cn]

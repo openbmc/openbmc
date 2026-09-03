@@ -229,6 +229,68 @@ def permissions(*permissions, allow_anon=True, allow_self_service=False):
     return wrapper
 
 
+class UpstreamQueue(object):
+    UPSTREAM_NONCE = object()
+
+    def __init__(
+        self,
+        logger,
+        queue,
+        get_local_result,
+        send_upstream,
+        get_upstream_result,
+    ):
+        self.logger = logger
+        self.queue = queue
+        self.pending = []
+        self.cond = asyncio.Condition()
+        self.done = False
+        self.get_local_result = get_local_result
+        self.send_upstream = send_upstream
+        self.get_upstream_result = get_upstream_result
+
+    async def process_results(self):
+        try:
+            while True:
+                async with self.cond:
+                    await self.cond.wait_for(lambda: self.pending or self.done)
+                    if not self.pending:
+                        if self.done:
+                            return
+                        continue
+
+                    value, m = self.pending.pop(0)
+
+                if value is self.UPSTREAM_NONCE:
+                    value = await self.get_upstream_result(m)
+
+                if value is None:
+                    self.logger.error(
+                        "None is not allowed as a stream value. Terminating stream"
+                    )
+                    return
+
+                await self.queue.put(value)
+        finally:
+            await self.queue.put(None)
+
+    async def handler(self, m):
+        if m is None:
+            async with self.cond:
+                self.done = True
+                self.cond.notify_all()
+            return
+
+        value = await self.get_local_result(m)
+        if value is None:
+            await self.send_upstream(m)
+            value = self.UPSTREAM_NONCE
+
+        async with self.cond:
+            self.pending.append((value, m))
+            self.cond.notify_all()
+
+
 class ServerClient(bb.asyncrpc.AsyncServerConnection):
     def __init__(self, socket, server):
         super().__init__(socket, "OEHASHEQUIV", server.logger)
@@ -390,71 +452,124 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
         validate_unihash(unihash)
         return await self.db.insert_unihash(method, taskhash, unihash)
 
-    async def _stream_handler(self, handler):
+    async def _stream_queue_handler(self, handler, queue):
         await self.socket.send_message("ok")
 
-        while True:
-            upstream = None
-
-            l = await self.socket.recv()
-            if not l:
-                break
-
+        async def recv():
             try:
-                # This inner loop is very sensitive and must be as fast as
-                # possible (which is why the request sample is handled manually
-                # instead of using 'with', and also why logging statements are
-                # commented out.
-                self.request_sample = self.server.request_stats.start_sample()
-                request_measure = self.request_sample.measure()
-                request_measure.start()
+                while True:
+                    m = await self.socket.recv()
+                    if not m or m == "END":
+                        break
 
-                if l == "END":
+                    await handler(m)
+            finally:
+                await handler(None)
+
+        async def process():
+            while True:
+                m = await queue.get()
+                if m is None:
                     break
 
-                msg = await handler(l)
-                await self.socket.send(msg)
-            finally:
-                request_measure.end()
-                self.request_sample.end()
+                await self.socket.send(m)
 
+        await bb.asyncrpc.TaskGroup.run(recv(), process())
         await self.socket.send("ok")
+
+    async def _stream_handler(self, handler):
+        queue = asyncio.Queue(1000)
+
+        async def h(m):
+            if m is None:
+                await queue.put(None)
+            else:
+                await queue.put(await handler(m))
+
+        await self._stream_queue_handler(h, queue)
         return self.NO_RESPONSE
 
     @permissions(READ_PERM)
     async def handle_get_stream(self, request):
-        async def handler(l):
-            (method, taskhash) = l.split()
-            # self.logger.debug('Looking up %s %s' % (method, taskhash))
-            row = await self.db.get_equivalent(method, taskhash)
-
-            if row is not None:
-                # self.logger.debug('Found equivalent task %s -> %s', (row['taskhash'], row['unihash']))
+        async def get_unihash(m):
+            method, taskhash = m.split()
+            if (row := await self.db.get_equivalent(method, taskhash)) is not None:
                 return row["unihash"]
-
-            if self.upstream_client is not None:
-                upstream = await self.upstream_client.get_unihash(method, taskhash)
-                if upstream:
-                    await self.server.backfill_queue.put((method, taskhash))
-                    return upstream
 
             return ""
 
-        return await self._stream_handler(handler)
+        if not self.upstream_client:
+            return await self._stream_handler(get_unihash)
+
+        async with self.upstream_client.get_unihash_stream() as stream:
+
+            async def get_local_result(m):
+                method, taskhash = m.split()
+                if (row := await self.db.get_equivalent(method, taskhash)) is not None:
+                    return row["unihash"]
+                return None
+
+            async def send_upstream(m):
+                method, taskhash = m.split()
+                await stream.send_query(method, taskhash)
+
+            async def get_upstream_result(m):
+                unihash = await stream.get_result()
+                if unihash:
+                    method, taskhash = m.split()
+                    await self.server.backfill_queue.put((method, taskhash))
+                return unihash or ""
+
+            queue = asyncio.Queue()
+            upstream = UpstreamQueue(
+                self.logger,
+                queue,
+                get_local_result,
+                send_upstream,
+                get_upstream_result,
+            )
+
+            await bb.asyncrpc.TaskGroup.run(
+                self._stream_queue_handler(upstream.handler, queue),
+                upstream.process_results(),
+            )
+        return self.NO_RESPONSE
 
     @permissions(READ_PERM)
     async def handle_exists_stream(self, request):
-        async def handler(l):
+        async def exists_handler(l):
             if await self.db.unihash_exists(l):
                 return "true"
-
-            if self.upstream_client is not None:
-                if await self.upstream_client.unihash_exists(l):
-                    return "true"
-
             return "false"
 
-        return await self._stream_handler(handler)
+        if not self.upstream_client:
+            return await self._stream_handler(exists_handler)
+
+        async with self.upstream_client.unihash_exists_stream() as stream:
+
+            async def get_local_result(m):
+                if await self.db.unihash_exists(m):
+                    return "true"
+                return None
+
+            async def get_upstream_result(m):
+                exists = await stream.get_result()
+                return "true" if exists else "false"
+
+            queue = asyncio.Queue()
+            upstream = UpstreamQueue(
+                self.logger,
+                queue,
+                get_local_result,
+                stream.send_query,
+                get_upstream_result,
+            )
+
+            await bb.asyncrpc.TaskGroup.run(
+                self._stream_queue_handler(upstream.handler, queue),
+                upstream.process_results(),
+            )
+        return self.NO_RESPONSE
 
     async def report_readonly(self, data):
         method = data["method"]
@@ -646,7 +761,7 @@ class ServerClient(bb.asyncrpc.AsyncServerConnection):
 
     @permissions(DB_ADMIN_PERM)
     async def handle_gc_status(self, request):
-        (keep_rows, remove_rows, current_mark) = await self.db.gc_status()
+        keep_rows, remove_rows, current_mark = await self.db.gc_status()
         return {
             "keep": keep_rows,
             "remove": remove_rows,
@@ -903,7 +1018,9 @@ class Server(bb.asyncrpc.AsyncServer):
                 d = await client.get_taskhash(method, taskhash)
                 if d is not None:
                     if is_valid_unihash(d.get("unihash")):
-                        await db.insert_unihash(d["method"], d["taskhash"], d["unihash"])
+                        await db.insert_unihash(
+                            d["method"], d["taskhash"], d["unihash"]
+                        )
                     else:
                         self.logger.warning("Upstream server returned invalid unihash")
                 self.backfill_queue.task_done()

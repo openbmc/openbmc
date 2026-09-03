@@ -240,7 +240,7 @@ def main():
         marked_hashes = 0
 
         try:
-            result = client.gc_mark_stream(args.mark, stdin)
+            result = client.gc_mark_batch(args.mark, stdin)
             marked_hashes = result["count"]
         except ConnectionError:
             logger.warning(
