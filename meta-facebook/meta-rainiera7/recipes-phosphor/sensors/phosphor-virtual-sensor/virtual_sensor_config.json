@@ -640,6 +640,31 @@
     },
     {
         "Desc": {
+            "Name": "MB_CPU_PKG_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "SOC_TOTAL_POWER",
+                    "Desc": {
+                        "Name": "PHX_SOC_TotalPower",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "SOC_TOTAL_POWER"
+    },
+    {
+        "Desc": {
             "Name": "MB_VR_CPU_CPU0_VOLT_V",
             "SensorType": "voltage"
         },
@@ -1567,6 +1592,357 @@
                     "ParamName": "VR_TEMP",
                     "Desc": {
                         "Name": "PHX_VR7_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V0P75_PCIE_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.4,
+            "CriticalLow": 0.646,
+            "WarningLow": 0.68,
+            "WarningHigh": 1,
+            "CriticalHigh": 1.05,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "PHX_VR8_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V0P75_PCIE_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 26.62,
+            "CriticalHigh": 29.04,
+            "HardShutdownHigh": 33.6
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "PHX_VR8_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V0P75_PCIE_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "PHX_VR8_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V0P75_PCIE_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "PHX_VR8_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_VDDQ_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": -0.5,
+            "CriticalLow": 0.969,
+            "WarningLow": 1.02,
+            "WarningHigh": 1.2,
+            "CriticalHigh": 1.26,
+            "HardShutdownHigh": 1.36
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "PHX_VR9_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_VDDQ_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 9.482,
+            "CriticalHigh": 10.344,
+            "HardShutdownHigh": 15.75
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "PHX_VR9_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_VDDQ_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "PHX_VR9_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_VDDQ_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "PHX_VR9_T",
+                        "SensorType": "temperature"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_TEMP"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V1P2_VOLT_V",
+            "SensorType": "voltage"
+        },
+        "Threshold": {
+            "HardShutdownLow": 0,
+            "CriticalLow": 1.0355,
+            "WarningLow": 1.09,
+            "WarningHigh": 1.325,
+            "CriticalHigh": 1.39125,
+            "HardShutdownHigh": 1.386
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_VOLT",
+                    "Desc": {
+                        "Name": "PHX_VR10_V",
+                        "SensorType": "voltage"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_VOLT"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V1P2_CURR_A",
+            "SensorType": "current"
+        },
+        "Threshold": {
+            "WarningHigh": 15.202,
+            "CriticalHigh": 16.584,
+            "HardShutdownHigh": 19.95
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_CURR",
+                    "Desc": {
+                        "Name": "PHX_VR10_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_CURR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V1P2_PWR_W",
+            "SensorType": "power"
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_PWR",
+                    "Desc": {
+                        "Name": "PHX_VR10_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": "VR_PWR"
+    },
+    {
+        "Desc": {
+            "Name": "MB_VR_CPU_V1P2_TEMP_C",
+            "SensorType": "temperature"
+        },
+        "Threshold": {
+            "CriticalLow": 5,
+            "CriticalHigh": 125
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                    "/xyz/openbmc_project/inventory/system/board/PHX"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "VR_TEMP",
+                    "Desc": {
+                        "Name": "PHX_VR10_T",
                         "SensorType": "temperature"
                     }
                 }
