@@ -4,34 +4,53 @@
 # shellcheck disable=SC2034
 
 #Fan I2C Bus & Address
+# LPDB: main source MAX31790 at 0x2B/0x2F, 2nd source NCT7363 at 0x23
+# RPDB: main source MAX31790 at 0x2B,      2nd source NCT7363 at 0x21
 LPDB_BUS=33
-LPDB_ADDR1=0x2B
-LPDB_ADDR2=0x2F
+LPDB_MAX31790_ADDR1=0x2B
+LPDB_MAX31790_ADDR2=0x2F
+LPDB_NCT7363_ADDR=0x23
 RPDB_BUS=32
-RPDB_ADDR1=0x2B
+RPDB_MAX31790_ADDR=0x2B
+RPDB_NCT7363_ADDR=0x21
 
-#Fan Register Setting
-FREQ=0xBB
+# MAX31790 Register Settings
+FREQ=0xBB           # PWM frequency: 25kHz
+# Fan config per channel (registers 0x02~0x07):
+#   0x08 = PWM mode, TACH input enabled
+#   0x19 = RPM mode, TACH input enabled
 CONFIG_LPDB1_EVT1=(0x08 0x08 0x08 0x08 0x08 0x19)
 CONFIG_LPDB1=(0x08 0x08 0x08 0x08 0x19 0x19)
 CONFIG_LPDB2=(0x08 0x08 0x08 0x00 0x00 0x00)
 CONFIG_RPDB1=(0x08 0x08 0x08 0x08 0x19 0x19)
-DYNAMICS=0x6C
-PWM=0xE6
+DYNAMICS=0x6C       # Dynamics register: default ramp rate
+PWM=0xE6            # Initial PWM duty cycle: ~90%
+
+# NCT7363 Register Settings
+NCT7363_PWM_DUTY_REG_BASE=0x90  # PWM duty cycle base register; ch N at 0x90 + N*2
+
+# NCT7363 PWM Channel Mapping (LPDB): channels 0,3,6,9,12
+LPDB_NCT7363_PWM_CHANNELS=(0 3 6 9 12)
+
+# NCT7363 PWM Channel Mapping (RPDB): channels 0,6,9,12
+RPDB_NCT7363_PWM_CHANNELS=(0 6 9 12)
 
 SERVICE="xyz.openbmc_project.EntityManager"
 PDBL_OBJECT_PATH="/xyz/openbmc_project/inventory/system/board/PDB_L"
 PDBR_OBJECT_PATH="/xyz/openbmc_project/inventory/system/board/PDB_R"
 ASSET_INTERFACE="xyz.openbmc_project.Inventory.Decorator.Asset"
+MAX_RETRY=30
 
-MAX_RETRY=10
-
-configure_fan_controller() {
+# configure_max31790_controller bus addr configs_array
+#   Configure a MAX31790 fan controller and register it with the kernel driver.
+#   Writes frequency, per-channel config, dynamics, and initial PWM duty,
+#   then instantiates the driver via new_device.
+configure_max31790_controller() {
     local bus=$1
     local addr=$2
     local -n configs=$3
 
-    echo "Configuring controller at bus $bus addr $addr..."
+    echo "Configuring MAX31790 controller at bus $bus addr $addr..."
 
     # Set fan PWM frequency to 25kHz
     i2cset -f -y "$bus" "$addr" 0x01 "$FREQ"
@@ -52,15 +71,55 @@ configure_fan_controller() {
         reg=$(printf "0x%X" $((0x40 + i * 2)))
         i2cset -f -y "$bus" "$addr" "$reg" "$PWM"
     done
-}
 
-register_device() {
-    local bus=$1
-    local addr=$2
     echo max31790 "$addr" > "/sys/bus/i2c/devices/i2c-${bus}/new_device"
 }
 
-# Common function to check if PDB object exists
+# is_2nd_source bus second_addr main_addr
+#   Returns 0 only when the 2nd source is present and the main source is absent.
+#   Uses i2cdetect to match hex address or UU (driver already bound).
+is_2nd_source() {
+    local bus=$1
+    local second_addr=$2
+    local main_addr=$3
+    local second_addr_dec
+    local main_addr_dec
+
+    second_addr_dec=$(printf "%d" "$second_addr")
+    main_addr_dec=$(printf "%d" "$main_addr")
+
+    [ -e "/dev/i2c-${bus}" ] || return 1
+
+    if i2cdetect -y "$bus" "$second_addr_dec" "$second_addr_dec" 2>/dev/null | \
+        grep -q -E "($(printf "%02x" "$second_addr_dec")|UU)" &&
+        ! i2cdetect -y "$bus" "$main_addr_dec" "$main_addr_dec" 2>/dev/null | \
+        grep -q -E "($(printf "%02x" "$main_addr_dec")|UU)"; then
+        return 0
+    fi
+
+    return 1
+}
+
+# configure_nct7363_controller bus addr pwm_channels_array
+#   Set initial PWM duty cycle (~90%) for each NCT7363 PWM channel.
+configure_nct7363_controller() {
+    local bus=$1
+    local addr=$2
+    local -n pwm_channels=$3
+    local channel
+    local duty_reg
+
+    echo "Configuring NCT7363 controller at bus $bus addr $addr..."
+
+    for channel in "${pwm_channels[@]}"; do
+        duty_reg=$(printf "0x%02X" \
+            $((NCT7363_PWM_DUTY_REG_BASE + (channel * 2))))
+        i2cset -f -y "$bus" "$addr" "$duty_reg" "$PWM"
+    done
+}
+
+# check_pdb_ready object_path pdb_name
+#   Wait until entity-manager exposes the PDB inventory object.
 check_pdb_ready() {
     local object_path=$1
     local pdb_name=$2
@@ -70,52 +129,68 @@ check_pdb_ready() {
         retry=$((retry + 1))
         if [ "$retry" -ge "$MAX_RETRY" ]; then
             echo "$pdb_name not found after ${MAX_RETRY} retries."
-            return 1 # Check failed
+            return 1
         fi
         sleep 1
     done
 
     echo "$pdb_name found."
-    return 0 # Check succeeded
+    return 0
 }
 
-# ==========================================
-# ---- LPDB (Fan1~Fan5) Configuration ----
-# ==========================================
-if check_pdb_ready "$PDBL_OBJECT_PATH" "PDB_L"; then
-    echo "Processing LPDB configuration..."
+process_lpdb() {
+    local is_evt1=0
 
-    # Fan controller #1 (0x2b @ bus 33)
-    if busctl get-property "$SERVICE" "$PDBL_OBJECT_PATH" "$ASSET_INTERFACE" Model | grep -q "EVT1"; then
-        echo "PDB_L EVT1 detected."
-        configure_fan_controller "$LPDB_BUS" "$LPDB_ADDR1" CONFIG_LPDB1_EVT1
-    else
-        echo "PDB_L EVT2 or later detected."
-        configure_fan_controller "$LPDB_BUS" "$LPDB_ADDR1" CONFIG_LPDB1
+    if ! check_pdb_ready "$PDBL_OBJECT_PATH" "PDB_L"; then
+        echo "Skipping LPDB FAN config: PDB_L not found."
+        return
     fi
-    # Fan controller #2 (0x2f @ bus 33)
-    configure_fan_controller "$LPDB_BUS" "$LPDB_ADDR2" CONFIG_LPDB2
 
-    # LPDB Device Registration
-    register_device "$LPDB_BUS" "$LPDB_ADDR1"
-    register_device "$LPDB_BUS" "$LPDB_ADDR2"
-else
-    echo "Skipping LPDB configuration and registration due to missing PDB_L."
-fi
+    if is_2nd_source "$LPDB_BUS" "$LPDB_NCT7363_ADDR" "$LPDB_MAX31790_ADDR1"; then
+        echo "LPDB 2nd source (NCT7363) detected at $LPDB_NCT7363_ADDR."
+        configure_nct7363_controller \
+            "$LPDB_BUS" "$LPDB_NCT7363_ADDR" \
+            LPDB_NCT7363_PWM_CHANNELS
+        return
+    fi
 
-# ==========================================
-# ---- RPDB (Fan6~Fan9) Configuration ----
-# ==========================================
-if check_pdb_ready "$PDBR_OBJECT_PATH" "PDB_R"; then
-    echo "Processing RPDB configuration..."
+    if busctl get-property "$SERVICE" "$PDBL_OBJECT_PATH" "$ASSET_INTERFACE" Model 2>/dev/null | grep -q "EVT1"; then
+        is_evt1=1
+    fi
 
-    # Fan controller #1 (0x2b @ bus 32)
-    configure_fan_controller "$RPDB_BUS" "$RPDB_ADDR1" CONFIG_RPDB1
+    if [ "$is_evt1" -eq 1 ]; then
+        echo "LPDB EVT1 detected."
+        configure_max31790_controller \
+            "$LPDB_BUS" "$LPDB_MAX31790_ADDR1" CONFIG_LPDB1_EVT1
+    else
+        echo "LPDB EVT2 or later detected."
+        configure_max31790_controller \
+            "$LPDB_BUS" "$LPDB_MAX31790_ADDR1" CONFIG_LPDB1
+    fi
+    configure_max31790_controller "$LPDB_BUS" "$LPDB_MAX31790_ADDR2" CONFIG_LPDB2
+}
 
-    # RPDB Device Registration
-    register_device "$RPDB_BUS" "$RPDB_ADDR1"
-else
-    echo "Skipping RPDB configuration and registration due to missing PDB_R."
-fi
+process_rpdb() {
+    if ! check_pdb_ready "$PDBR_OBJECT_PATH" "PDB_R"; then
+        echo "Skipping RPDB FAN config: PDB_R not found."
+        return
+    fi
+
+    if is_2nd_source "$RPDB_BUS" "$RPDB_NCT7363_ADDR" "$RPDB_MAX31790_ADDR"; then
+        echo "RPDB 2nd source (NCT7363) detected at $RPDB_NCT7363_ADDR."
+        configure_nct7363_controller \
+            "$RPDB_BUS" "$RPDB_NCT7363_ADDR" \
+            RPDB_NCT7363_PWM_CHANNELS
+        return
+    fi
+
+    configure_max31790_controller "$RPDB_BUS" "$RPDB_MAX31790_ADDR" CONFIG_RPDB1
+}
+
+echo "Applying FAN config initialization for LPDB..."
+process_lpdb
+
+echo "Applying FAN config initialization for RPDB..."
+process_rpdb
 
 exit 0
