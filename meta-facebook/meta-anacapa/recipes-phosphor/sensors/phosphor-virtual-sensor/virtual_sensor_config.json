@@ -74,5 +74,124 @@
             "var C := 1.367104791e-07;",
             "1 / (A + B * log(R) + C * pow(log(R), 3)) - 273.15"
         ]
+    },
+    {
+        "Desc": {
+            "Name": "TRAY_TOTAL_PWR_W",
+            "SensorType": "power"
+        },
+       "Threshold":
+        {
+            "CriticalHigh":16000
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/MB"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "PDB_L_HSC0_PWR",
+                    "Desc": {
+                        "Name": "PDB_L_P50V_HSC0_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_L_HSC1_PWR",
+                    "Desc": {
+                        "Name": "PDB_L_P50V_HSC1_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_L_HSC5_PWR",
+                    "Desc": {
+                        "Name": "PDB_L_P50V_HSC5_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_R_HSC2_PWR",
+                    "Desc": {
+                        "Name": "PDB_R_P50V_HSC2_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_R_HSC3_PWR",
+                    "Desc": {
+                        "Name": "PDB_R_P50V_HSC3_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_R_HSC4_PWR",
+                    "Desc": {
+                        "Name": "PDB_R_P50V_HSC4_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_R_HSC_STBY_PWR",
+                    "Desc": {
+                        "Name": "PDB_R_P50V_HSC_STBY_PWR_W",
+                        "SensorType": "power"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "PDB_L_HSC0_PWR + PDB_L_HSC1_PWR + PDB_L_HSC5_PWR + PDB_R_HSC2_PWR + PDB_R_HSC3_PWR + PDB_R_HSC4_PWR + PDB_R_HSC_STBY_PWR"
+        ]
+    },
+    {
+        "Desc": {
+            "Name": "TRAY_FAN_PWR_W",
+            "SensorType": "power"
+        },
+       "Threshold":
+        {
+            "CriticalHigh":1490
+        },
+        "Associations": [
+            [
+                "chassis",
+                "all_sensors",
+                "/xyz/openbmc_project/inventory/system/board/MB"
+            ]
+        ],
+        "Params": {
+            "DbusParam": [
+                {
+                    "ParamName": "PDB_R_HSC_STBY_PWR",
+                    "Desc": {
+                        "Name": "PDB_R_P50V_HSC_STBY_PWR_W",
+                        "SensorType": "power"
+                    }
+                },
+                {
+                    "ParamName": "PDB_R_VRM_VOLT",
+                    "Desc": {
+                        "Name": "PDB_R_P12V_STBY_VRM_VOUT_VOLT_V",
+                        "SensorType": "voltage"
+                    }
+                },
+                {
+                    "ParamName": "PDB_R_VRM_CURR",
+                    "Desc": {
+                        "Name": "PDB_R_P12V_STBY_VRM_CURR_A",
+                        "SensorType": "current"
+                    }
+                }
+            ]
+        },
+        "Expression": [
+            "var efficiency_factor := 0.965;",
+            "PDB_R_HSC_STBY_PWR - ((PDB_R_VRM_VOLT * PDB_R_VRM_CURR) / efficiency_factor)"
+        ]
     }
 ]
