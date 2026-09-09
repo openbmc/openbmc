@@ -11,7 +11,6 @@ RDEPENDS:${PN} += "libgpiod-tools"
 RDEPENDS:${PN} += "fb-common-functions"
 
 SRC_URI += " \
-    file://gpio_util \
     file://ventura-sys-init.service \
     file://ventura-early-sys-init \
     file://ventura-schematic-init \
@@ -32,7 +31,6 @@ FILES:${PN} += "${systemd_system_unitdir}/*"
 do_install() {
     VENTURA_LIBEXECDIR="${D}${libexecdir}/ventura"
     install -d ${VENTURA_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/gpio_util ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-early-sys-init ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-schematic-init ${VENTURA_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/ventura-fan-status-monitor ${D}${libexecdir}
