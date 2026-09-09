@@ -1,0 +1,7 @@
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="32-0042", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="150"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="32-0043", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="150"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="32-0044", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="250"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="32-0045", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="250"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="33-0040", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="150"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="33-0041", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="150"
+ACTION=="add", SUBSYSTEM=="hwmon", KERNELS=="33-0045", ATTR{name}=="ltc4287", ATTR{shunt_resistor}="250"

@@ -13,6 +13,7 @@ RDEPENDS:${PN} += "fb-common-functions"
 SRC_URI:append = " \
     file://nic-temp-read \
     file://nic-temp-read.service \
+    file://99-ltc4287-shunt-fix.rules \
 "
 
 SYSTEMD_PACKAGES = "${PN}"
@@ -29,4 +30,7 @@ do_install() {
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/nic-temp-read.service ${D}${systemd_system_unitdir}
+
+    install -d ${D}${sysconfdir}/udev/rules.d
+    install -m 0644 ${UNPACKDIR}/99-ltc4287-shunt-fix.rules ${D}${sysconfdir}/udev/rules.d/99-ltc4287-shunt-fix.rules
 }
