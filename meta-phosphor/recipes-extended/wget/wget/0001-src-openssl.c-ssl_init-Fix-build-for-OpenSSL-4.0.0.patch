@@ -1,0 +1,27 @@
+From b7c532b48e5c9e4e4e0dc6317847fb89a103fd4d Mon Sep 17 00:00:00 2001
+From: "Vladimir B." <service@cybernet.su>
+Date: Wed, 17 Jun 2026 17:31:19 +0200
+Subject: [PATCH] * src/openssl.c (ssl_init): Fix build for OpenSSL 4.0.0
+
+Copyright-paperwork-exempt: Yes
+Upstream-Status: Backport
+---
+ src/openssl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/openssl.c b/src/openssl.c
+index a9708753..1f30d8f8 100644
+--- a/src/openssl.c
++++ b/src/openssl.c
+@@ -226,7 +226,7 @@ ssl_init (void)
+       break;
+ 
+     case secure_protocol_sslv3:
+-#ifndef OPENSSL_NO_SSL3_METHOD
++#if !defined OPENSSL_NO_SSL3_METHOD && OPENSSL_VERSION_NUMBER < 0x40000000L
+       meth = SSLv3_client_method ();
+ #endif
+       break;
+-- 
+2.54.0
+
