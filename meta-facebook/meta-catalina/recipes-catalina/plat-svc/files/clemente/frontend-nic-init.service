@@ -1,0 +1,13 @@
+[Unit]
+Description=frontend-nic-init
+After=xyz.openbmc_project.EntityManager.service
+After=mctpd.service
+Before=xyz.openbmc_project.mctpreactor.service
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/plat-svc/frontend-nic-init
+SyslogIdentifier=frontend-nic-init
+
+[Install]
+WantedBy=multi-user.target
