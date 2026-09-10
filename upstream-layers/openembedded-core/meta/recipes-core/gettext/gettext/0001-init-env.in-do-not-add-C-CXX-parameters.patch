@@ -6,17 +6,22 @@ Subject: [PATCH] init-env.in: do not add C/CXX parameters
 These are taken from the cross environment and include
 sysroot paths, so are not reproducible.
 
+OBJC/OBJCFLAGS dropped as well: the recipe now exports a fully-flagged
+OBJC (same command as CC, sysroot included), which would otherwise be
+recorded here verbatim and trip the buildpaths QA check.
+
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
 ---
- gettext-tools/tests/init-env.in | 4 ----
- 1 file changed, 4 deletions(-)
+ gettext-tools/tests/init-env.in | 6 ------
+ 1 file changed, 6 deletions(-)
 
 diff --git a/gettext-tools/tests/init-env.in b/gettext-tools/tests/init-env.in
 index 0968388..3d9a8a5 100644
 --- a/gettext-tools/tests/init-env.in
 +++ b/gettext-tools/tests/init-env.in
-@@ -3,10 +3,6 @@ top_builddir=../..
+@@ -3,12 +3,6 @@
  
  OBJEXT="@OBJEXT@"
  EXEEXT="@EXEEXT@"
@@ -24,6 +29,8 @@ index 0968388..3d9a8a5 100644
 -CFLAGS="@CFLAGS@"
 -CXX="@CXX@"
 -CXXFLAGS="@CXXFLAGS@"
- OBJC="@OBJC@"
- OBJCFLAGS="@OBJCFLAGS@"
+-OBJC="@OBJC@"
+-OBJCFLAGS="@OBJCFLAGS@"
  CPPFLAGS="@CPPFLAGS@"
+ LDFLAGS="@LDFLAGS@"
+ LTLIBINTL="@LTLIBINTL@"

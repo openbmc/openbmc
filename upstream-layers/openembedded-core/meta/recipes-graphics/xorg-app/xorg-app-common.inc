@@ -11,6 +11,9 @@ REQUIRED_DISTRO_FEATURES = "x11"
 SRC_URI_EXT = "bz2"
 SRC_URI = "${XORG_MIRROR}/individual/app/${BPN}-${PV}.tar.${SRC_URI_EXT}"
 
-inherit autotools pkgconfig features_check
+XORGBUILDCLASS ??= "autotools"
+inherit_defer ${XORGBUILDCLASS}
+
+inherit pkgconfig features_check
 
 FILES:${PN} += " ${libdir}/X11/${BPN} ${datadir}/X11/app-defaults/"

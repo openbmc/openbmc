@@ -1,0 +1,54 @@
+From 9ec97845821ead65ebd8ab26b69d949e10b65338 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 14 May 2024 22:04:43 -0700
+Subject: [PATCH] llvm: Add libunwind.pc.in and llvm-config scripts
+
+These are added by OE project
+
+Upstream-Status: Inappropriate [ OE-Specific ]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+---
+ libunwind/libunwind.pc.in          |  9 +++++++++
+ llvm/tools/llvm-config/llvm-config | 15 +++++++++++++++
+ 2 files changed, 24 insertions(+)
+ create mode 100644 libunwind/libunwind.pc.in
+ create mode 100644 llvm/tools/llvm-config/llvm-config
+
+diff --git a/libunwind/libunwind.pc.in b/libunwind/libunwind.pc.in
+new file mode 100644
+index 0000000..a93d676
+--- /dev/null
++++ b/libunwind/libunwind.pc.in
+@@ -0,0 +1,9 @@
++prefix=/usr
++exec_prefix=/usr
++libdir=@LIBDIR@
++includedir=/usr/include
++
++Name: libunwind
++Description: libunwind base library
++Version: @VERSION@
++Libs: -lunwind
+diff --git a/llvm/tools/llvm-config/llvm-config b/llvm/tools/llvm-config/llvm-config
+new file mode 100644
+index 0000000..0578773
+--- /dev/null
++++ b/llvm/tools/llvm-config/llvm-config
+@@ -0,0 +1,15 @@
++#!/bin/bash
++#
++# The llvm-config wrapper will act as a pure pass-through to the native llvm-config
++# while preserving Yocto-specific environment variables used for alternate executable
++# and library path resolution.
++#
++SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
++NEXT_LLVM_CONFIG="@LLVM_CONFIG_PATH@"
++export YOCTO_ALTERNATE_EXE_PATH="${YOCTO_ALTERNATE_EXE_PATH:="$(readlink -f "$SCRIPT_DIR/../llvm-config")"}"
++if [ -d "$(readlink -f "$SCRIPT_DIR/../../lib64")" ]; then
++    export YOCTO_ALTERNATE_LIBDIR="${YOCTO_ALTERNATE_LIBDIR:="/lib64"}"
++else
++    export YOCTO_ALTERNATE_LIBDIR="${YOCTO_ALTERNATE_LIBDIR:="/lib"}"
++fi
++exec "$NEXT_LLVM_CONFIG" "$@"

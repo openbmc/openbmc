@@ -6,11 +6,14 @@
 
 import os
 import re
+import shutil
 import time
 import logging
+import uuid
 import bb.tinfoil
 
 from oeqa.selftest.case import OESelftestTestCase
+from oeqa.utils.commands import bitbake
 
 class TinfoilTests(OESelftestTestCase):
     """ Basic tests for the tinfoil API """
@@ -76,6 +79,63 @@ class TinfoilTests(OESelftestTestCase):
             localdata = bb.data.createCopy(rd)
             localdata.setVar('PN', 'hello')
             self.assertEqual('hello', localdata.getVar('BPN'))
+
+    def test_run_prepared_task(self):
+        """Verify run_prepared_task() runs only the requested task, not its
+        dependency.
+
+        pseudo-pyc-test's do_tinfoil_* tasks depend on do_tinfoil_dep; both
+        write a marker file containing the task name plus the current value
+        of TINFOIL_TEST_MARKER_VALUE. A normal bitbake build is expected to
+        update both the dependency's and the requested tasks' markers to a
+        new value. Calling run_prepared_task() with another new value must
+        update only the requested tasks' markers, leaving do_tinfoil_dep's
+        marker at the value written by the earlier bitbake build.
+        """
+        marker_dir = os.path.join(
+            self.builddir, 'tmp', 'tinfoil-prepared-task')
+        shutil.rmtree(marker_dir, ignore_errors=True)
+        self.track_for_cleanup(marker_dir)
+
+        tasks = ('shell', 'shell_fakeroot', 'python', 'python_fakeroot')
+
+        # Use a fresh, random value each run so the tasks' signatures change
+        # and bitbake can't skip them as "up to date" from a previous run.
+        value1 = uuid.uuid4().hex
+        bitbake(' '.join('pseudo-pyc-test:do_tinfoil_%s' % task
+                          for task in tasks),
+                postconfig='TINFOIL_TEST_MARKER_VALUE = "%s"\n' % value1)
+
+        # do_tinfoil_dep is a dependency of all the tasks above, so a normal
+        # bitbake build is expected to have run it too, with the same value.
+        with open(os.path.join(marker_dir, 'dep')) as marker:
+            self.assertEqual(marker.read(), 'dep' + value1)
+        for task in tasks:
+            marker_name = task.replace('_', '-')
+            with open(os.path.join(marker_dir, marker_name)) as marker:
+                self.assertEqual(marker.read(), marker_name + value1)
+
+        with bb.tinfoil.Tinfoil() as tinfoil:
+            tinfoil.prepare(config_only=False, quiet=2)
+            # A distinct value per call proves each run_prepared_task()
+            # invocation re-reads the variable rather than reusing a value
+            # cached from an earlier call in this loop.
+            values2 = {task: uuid.uuid4().hex for task in tasks}
+            for task in tasks:
+                tinfoil.run_command('setVariable', 'TINFOIL_TEST_MARKER_VALUE', values2[task])
+                tinfoil.run_prepared_task(
+                    'pseudo-pyc-test', 'do_tinfoil_%s' % task)
+
+        # The requested tasks must have re-run and picked up their own value
+        for task in tasks:
+            marker_name = task.replace('_', '-')
+            with open(os.path.join(marker_dir, marker_name)) as marker:
+                self.assertEqual(marker.read(), marker_name + values2[task])
+
+        # ...but run_prepared_task() must not have run do_tinfoil_dep, so its
+        # marker should still hold the value written by the earlier bitbake build
+        with open(os.path.join(marker_dir, 'dep')) as marker:
+            self.assertEqual(marker.read(), 'dep' + value1)
 
     # The config_data API to parse_recipe_file is used by:
     # layerindex-web layerindex/update_layer.py

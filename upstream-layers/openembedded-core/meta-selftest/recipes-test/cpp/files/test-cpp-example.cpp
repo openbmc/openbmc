@@ -1,8 +1,8 @@
 /*
-* Copyright OpenEmbedded Contributors
-*
-* SPDX-License-Identifier: MIT
-*/
+ * Copyright OpenEmbedded Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
 #include "cpp-example-lib.hpp"
 
@@ -13,10 +13,11 @@
 #define FAIL_COMPARISON_STR ""
 #endif
 
-int main() {
+int main()
+{
     auto cpp_example = CppExample();
     auto ret_string = cpp_example.get_string();
-    if(0 == ret_string.compare(CppExample::test_string + FAIL_COMPARISON_STR)) {
+    if (ret_string == CppExample::test_string + FAIL_COMPARISON_STR) {
         std::cout << "PASS: " << ret_string << " = " << CppExample::test_string << std::endl;
     } else {
         std::cout << "FAIL: " << ret_string << " != " << CppExample::test_string << std::endl;

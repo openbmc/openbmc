@@ -15,6 +15,8 @@ DEPENDS += "libxext xorgproto"
 PROVIDES = "xinerama"
 PE = "1"
 
+XORGBUILDCLASS = "meson"
+
 XORG_PN = "libXinerama"
 SRC_URI[sha256sum] = "d00fc1599c303dc5cbc122b8068bdc7405d6fcb19060f4597fc51bd3a8be51d7"
 

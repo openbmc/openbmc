@@ -177,3 +177,12 @@ class TestMbox(base.Base):
                     % patchtest_patterns.auh_email,
                     commit=commit,
                 )
+
+    def test_auh_changelog_truncation_notice(self):
+        for commit in self.commits:
+            if patchtest_patterns.auh_changelog_truncated in commit.commit_message:
+                self.fail(
+                    "Commit message contains the AUH changelog-truncation notice left over from "
+                    "the auto upgrade. Remove it and summarize the relevant changes yourself",
+                    commit=commit,
+                )

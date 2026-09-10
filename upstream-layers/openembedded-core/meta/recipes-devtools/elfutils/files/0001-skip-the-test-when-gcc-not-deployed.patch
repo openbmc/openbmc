@@ -1,4 +1,4 @@
-From 168f8b6e37a762a6263c279d95fee9346e1f44ca Mon Sep 17 00:00:00 2001
+From db59c8a80a285f9cba3f789b6c2c240481b97db8 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <Mingli.Yu@windriver.com>
 Date: Tue, 21 May 2019 15:20:34 +0800
 Subject: [PATCH] skip the test when gcc not deployed

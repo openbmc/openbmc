@@ -1,4 +1,4 @@
-From 0c3a09a95875e5744a910a0d3c93fa2e9dbe8c69 Mon Sep 17 00:00:00 2001
+From 3c1d201eace11d557eb6c589842e93b8bacbe8f9 Mon Sep 17 00:00:00 2001
 From: Saul Wold <sgw@linux.intel.com>
 Date: Wed, 16 Aug 2017 11:16:30 +0800
 Subject: [PATCH] use pkgconfig instead of npth config

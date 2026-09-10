@@ -83,12 +83,12 @@ python build_syslinux_cfg () {
     if not workdir:
         bb.error("WORKDIR not defined, unable to package")
         return
-        
+
     labels = d.getVar('LABELS')
     if not labels:
         bb.debug(1, "LABELS not defined, nothing to do")
         return
-    
+
     if labels == []:
         bb.debug(1, "No labels, nothing to do")
         return
@@ -149,7 +149,7 @@ python build_syslinux_cfg () {
         splash = d.getVar('SYSLINUX_SPLASH')
         if splash:
             cfgfile.write('menu background splash.lss\n')
-    
+
     for label in labels.split():
         localdata = bb.data.createCopy(d)
 
@@ -158,7 +158,7 @@ python build_syslinux_cfg () {
             bb.fatal('OVERRIDES not defined')
 
         localdata.setVar('OVERRIDES', label + ':' + overrides)
-    
+
         btypes = [ [ "", syslinux_default_console ] ]
         if menu and syslinux_serial:
             btypes = [ [ "Graphics console ", syslinux_default_console  ],

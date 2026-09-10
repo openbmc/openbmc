@@ -1,6 +1,6 @@
 require gmp.inc
 
-LICENSE = "GPL-2.0-or-later | LGPL-3.0-or-later"
+LICENSE = "GPL-2.0-or-later OR LGPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = "\
         file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \

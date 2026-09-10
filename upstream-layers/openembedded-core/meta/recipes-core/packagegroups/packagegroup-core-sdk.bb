@@ -10,7 +10,7 @@ inherit packagegroup
 
 #PACKAGEFUNCS =+ 'generate_sdk_pkgs'
 
-TARGET_TOOLCHAIN_LANGS ??= "${SDK_TOOLCHAIN_LANGS}"
+TARGET_TOOLCHAIN_LANGS ??= "${@bb.utils.filter('SDK_FEATURES', 'go rust', d)}"
 TARGET_TOOLCHAIN_LANGS:remove:sdkmingw32 = "rust"
 # libstd-rs doesn't build for mips n32 with compiler constraint errors
 TARGET_TOOLCHAIN_LANGS:remove:mipsarchn32 = "rust"
@@ -62,7 +62,7 @@ RRECOMMENDS:packagegroup-core-sdk = "\
 #        # the package depchain code
 #        spkgdata = read_subpkgdata(pkg, d)
 #
-#        rdepends = explode_deps(spkgdata.get('RDEPENDS:%s' % pkg) or '')
+#        rdepends = bb.utils.explode_deps(spkgdata.get('RDEPENDS:%s' % pkg) or '')
 #        rreclist = []
 #
 #        for depend in rdepends:
@@ -72,7 +72,7 @@ RRECOMMENDS:packagegroup-core-sdk = "\
 #                rreclist.append('%s-dev' % name)
 #            else:
 #                deppkgdata = read_subpkgdata(name, d)
-#                rdepends2 = explode_deps(deppkgdata.get('RDEPENDS:%s' % name) or '')
+#                rdepends2 = bb.utils.explode_deps(deppkgdata.get('RDEPENDS:%s' % name) or '')
 #                for depend in rdepends2:
 #                    split_depend = depend.split(' (')
 #                    name = split_depend[0].strip()

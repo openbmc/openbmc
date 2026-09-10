@@ -1,5 +1,7 @@
 require vim.inc
 
+CVE_PRODUCT = "vim_development_group:vim vim:vim"
+
 PROVIDES = "xxd"
 
 RDEPENDS:${PN} = "ncurses-terminfo-base ${PN}-xxd"

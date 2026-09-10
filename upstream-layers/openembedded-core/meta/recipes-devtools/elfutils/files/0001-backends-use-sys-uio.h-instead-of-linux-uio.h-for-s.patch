@@ -1,0 +1,74 @@
+From 64e89606ff4967a647525524aec00dd33765ba2a Mon Sep 17 00:00:00 2001
+From: Daeho Ro <email@daeho.ro>
+Date: Sun, 16 Aug 2026 16:27:56 +0900
+Subject: [PATCH] backends: use <sys/uio.h> instead of <linux/uio.h> for
+ struct iovec
+
+Since commit 0e8b57a3 ("elfcompress: Handle existing output files
+(symlinks)") lib/system.h includes <fcntl.h>.  When _GNU_SOURCE is
+defined, glibc's <fcntl.h> pulls in <bits/types/struct_iovec.h> (via
+bits/fcntl-linux.h), which defines struct iovec.  The kernel UAPI header
+<linux/uio.h> defines struct iovec unconditionally, so including it
+after "system.h" now breaks the aarch64 backend build:
+
+  In file included from aarch64_initreg.c:36:
+  /usr/include/linux/uio.h:17:8: error: redefinition of 'struct iovec'
+     17 | struct iovec
+        |        ^~~~~
+  In file included from /usr/include/aarch64-linux-gnu/bits/fcntl-linux.h:38,
+                   from /usr/include/aarch64-linux-gnu/bits/fcntl.h:61,
+                   from /usr/include/fcntl.h:35,
+                   from ../lib/system.h:42,
+                   from aarch64_initreg.c:33:
+  /usr/include/aarch64-linux-gnu/bits/types/struct_iovec.h:26:8: note: originally defined here
+
+Seen building 0.196 on aarch64 with glibc 2.39 and gcc 13.3.0.
+
+Both files only need struct iovec to call ptrace (PTRACE_GETREGSET),
+which glibc provides in <sys/uio.h>; that header guards the definition
+with __iovec_defined, so it composes with the rest of system.h.
+arm_initreg.c does not currently include "system.h" and so still builds,
+but it has the same latent conflict.
+
+* backends/aarch64_initreg.c: Include <sys/uio.h> instead of
+  <linux/uio.h>.
+* backends/arm_initreg.c: Likewise.
+
+Signed-off-by: Daeho Ro <email@daeho.ro>
+
+Upstream-Status: Backport [https://sourceware.org/git/?p=elfutils.git;a=patch;h=64e89606ff4967a647525524aec00dd33765ba2a]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ backends/aarch64_initreg.c | 2 +-
+ backends/arm_initreg.c     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/backends/aarch64_initreg.c b/backends/aarch64_initreg.c
+index a6badbb4..539a6366 100644
+--- a/backends/aarch64_initreg.c
++++ b/backends/aarch64_initreg.c
+@@ -33,7 +33,7 @@
+ #include "system.h"
+ #include <assert.h>
+ #if defined(__aarch64__) && defined(__linux__)
+-# include <linux/uio.h>
++# include <sys/uio.h>
+ # include <sys/user.h>
+ # include <sys/ptrace.h>
+ # include <asm/ptrace.h>
+diff --git a/backends/arm_initreg.c b/backends/arm_initreg.c
+index efcabaf6..062bb9e0 100644
+--- a/backends/arm_initreg.c
++++ b/backends/arm_initreg.c
+@@ -38,7 +38,7 @@
+ #endif
+ 
+ #ifdef __aarch64__
+-# include <linux/uio.h>
++# include <sys/uio.h>
+ # include <sys/user.h>
+ # include <sys/ptrace.h>
+ /* Deal with old glibc defining user_pt_regs instead of user_regs_struct.  */
+-- 
+2.43.7
+

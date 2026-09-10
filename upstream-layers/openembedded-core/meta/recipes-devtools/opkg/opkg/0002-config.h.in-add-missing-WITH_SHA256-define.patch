@@ -1,0 +1,42 @@
+From 7477db1d557516386593261685a16f31b3aaff43 Mon Sep 17 00:00:00 2001
+From: Etienne Cordonnier <ecordonnier@snap.com>
+Date: Wed, 5 Aug 2026 11:15:25 +0200
+Subject: [PATCH] config.h.in: add missing WITH_SHA256 define
+
+WITH_SHA256 was used throughout the codebase (file_util.c,
+opkg_verify.c, release.c, release_parse.c) guarded by "#if
+WITH_SHA256", but config.h.in never generated the macro, so
+sha256sum support was always compiled out regardless of the
+WITH_SHA256 CMake option.
+
+Also add a comment noting that the option order in this file should
+match the option() order in CMakeLists.txt.
+
+AI-Generated: Claude Sonnet 5
+Upstream-Status: Backport [7477db1d557516386593261685a16f31b3aaff43]
+Signed-off-by: Etienne Cordonnier <ecordonnier@snap.com>
+Signed-off-by: Alex Stewart <alex.stewart@emerson.com>
+---
+ config.h.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/config.h.in b/config.h.in
+index f2d74c5..b45ea23 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -1,3 +1,4 @@
++/* Keep this list in the same order as the option()s in CMakeLists.txt */
+ #cmakedefine01 WITH_LIBOPKG_API
+ #cmakedefine01 WITH_XZ
+ #cmakedefine01 WITH_BZIP2
+@@ -5,6 +6,7 @@
+ #cmakedefine01 WITH_ZSTD
+ #cmakedefine01 WITH_CURL
+ #cmakedefine01 WITH_SSLCURL
++#cmakedefine01 WITH_SHA256
+ #cmakedefine01 WITH_ACL
+ #cmakedefine01 USE_XATTR
+ #cmakedefine01 USE_SOLVER_LIBSOLV
+-- 
+2.43.0
+

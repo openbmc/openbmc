@@ -1,4 +1,4 @@
-From 30fb6d1ce4cc721feef5665934f2b7f83fb50efb Mon Sep 17 00:00:00 2001
+From 4bc84380d2d0d85ed5a57cf9f78286531a19de48 Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@arm.com>
 Date: Fri, 15 Mar 2024 14:37:37 +0000
 Subject: [PATCH] Set the max-time timeout to 600 so the timeout is 10 minutes
@@ -12,15 +12,15 @@ Signed-off-by: Ross Burton <ross.burton@arm.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tests/servers.pm b/tests/servers.pm
-index 5d5d98b..442cfaf 100644
+index 99db988..81a7572 100644
 --- a/tests/servers.pm
 +++ b/tests/servers.pm
-@@ -124,7 +124,7 @@
+@@ -123,7 +123,7 @@ my $sshdverstr;    # for socks server, ssh daemon version string
  my $sshderror;     # for socks server, ssh daemon version error
  my %doesntrun;     # servers that do not work, identified by pidfile
  my %PORT = (nolisten => 47); # port we use for a local non-listening service
 -my $server_response_maxtime = 13;
 +my $server_response_maxtime = 600;
- my $httptlssrv = find_httptlssrv();
  my %run;           # running server
  my %runcert;       # cert file currently in use by an SSL running server
+ my $CLIENTIP = "127.0.0.1";  # address which curl uses for incoming connections

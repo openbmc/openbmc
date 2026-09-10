@@ -3,7 +3,7 @@ DESCRIPTION = "Piglit is an open-source test suite for OpenGL and OpenCL \
 implementations."
 HOMEPAGE = "https://gitlab.freedesktop.org/mesa/piglit"
 BUGTRACKER = "https://gitlab.freedesktop.org/mesa/piglit/-/issues"
-LICENSE = "MIT & LGPL-2.0-or-later & GPL-3.0-only & GPL-2.0-or-later & BSD-3-Clause"
+LICENSE = "BSD-3-Clause AND GPL-2.0-or-later AND GPL-3.0-only AND LGPL-2.0-or-later AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b2beded7103a3d8a442a2a0391d607b0"
 
 SRC_URI = "git://gitlab.freedesktop.org/mesa/piglit.git;protocol=https;branch=main \

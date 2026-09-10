@@ -1,4 +1,4 @@
-From 7b48ae456de3e2f2a94f91c800b238788d5fd277 Mon Sep 17 00:00:00 2001
+From 78415c6fc1f464e45222ba588a6cdc0292b4230a Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Tue, 15 Aug 2017 17:17:20 +0800
 Subject: [PATCH] fixheadercheck

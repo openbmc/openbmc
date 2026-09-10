@@ -33,7 +33,7 @@ python prexport_handler () {
         oe.prservice.prserv_export_tofile(e.data, None, datainfo, False)
         if 'AUTOINC' in ver:
             import re
-            srcpv =  bb.fetch2.get_srcrev(e.data)
+            srcpv =  bb.fetch.get_srcrev(e.data)
             base_ver = "AUTOINC-%s" % ver[:ver.find(srcpv)]
             e.data.setVar('PRSERV_DUMPOPT_VERSION', base_ver)
             retval = oe.prservice.prserv_dump_db(e.data)

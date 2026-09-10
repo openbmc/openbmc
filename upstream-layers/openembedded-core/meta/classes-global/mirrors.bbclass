@@ -5,6 +5,7 @@
 #
 
 MIRRORS += "\
+${YOCTO_MIRRORS} \
 ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian/20180310T215105Z/pool \
 ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian/20250101T023759Z/pool \
 ${DEBIAN_MIRROR}	http://snapshot.debian.org/archive/debian-archive/20120328T092752Z/debian/pool \
@@ -29,6 +30,11 @@ ${SAVANNAH_NONGNU_MIRROR} http://download-mirror.savannah.nongnu.org/releases \
 ftp://sourceware.org/pub http://mirrors.edge.kernel.org/sourceware \
 ftp://sourceware.org/pub http://gd.tuwien.ac.at/gnu/sourceware \
 ftp://sourceware.org/pub http://ftp.gwdg.de/pub/linux/sources.redhat.com/sourceware \
+${CPAN_MIRROR}  https://cpan.metacpan.org/ \
+"
+
+# Having a way to disable the Yocto Project related mirrors for YP CI purposes is valuable.
+YOCTO_MIRRORS ??= "\
 svn://.*/.*     https://downloads.yoctoproject.org/mirror/sources/ \
 git://.*/.*     https://downloads.yoctoproject.org/mirror/sources/ \
 gitsm://.*/.*   https://downloads.yoctoproject.org/mirror/sources/ \
@@ -36,7 +42,6 @@ hg://.*/.*      https://downloads.yoctoproject.org/mirror/sources/ \
 https?://.*/.*  https://downloads.yoctoproject.org/mirror/sources/ \
 ftp://.*/.*     https://downloads.yoctoproject.org/mirror/sources/ \
 npm://.*/?.*    https://downloads.yoctoproject.org/mirror/sources/ \
-${CPAN_MIRROR}  https://cpan.metacpan.org/ \
 https?://downloads.yoctoproject.org/releases/uninative/ https://mirrors.edge.kernel.org/yocto/uninative/ \
 https?://downloads.yoctoproject.org/mirror/sources/ https://mirrors.edge.kernel.org/yocto-sources/ \
 "

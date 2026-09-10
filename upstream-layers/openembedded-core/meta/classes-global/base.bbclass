@@ -35,16 +35,6 @@ TOOLCHAIN_NATIVE ??= "${PREFERRED_TOOLCHAIN_NATIVE}"
 inherit_defer toolchain/${TOOLCHAIN_NATIVE}-native
 inherit_defer toolchain/${TOOLCHAIN}
 
-def lsb_distro_identifier(d):
-    adjust = d.getVar('LSB_DISTRO_ADJUST')
-    adjust_func = None
-    if adjust:
-        try:
-            adjust_func = globals()[adjust]
-        except KeyError:
-            pass
-    return oe.lsb.distro_identifier(adjust_func)
-
 die() {
 	bbfatal_log "$*"
 }
@@ -72,7 +62,7 @@ BASEDEPENDS:class-nativesdk = "${@get_base_dep(d)}"
 
 DEPENDS:prepend = "${BASEDEPENDS} "
 
-FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", "${FILE_DIRNAME}/${BPN}", "${FILE_DIRNAME}/files"], d)}"
+FILESPATH = "${@oe.utils.base_set_filespath(["${FILE_DIRNAME}/${BP}", "${FILE_DIRNAME}/${BPN}", "${FILE_DIRNAME}/files"], d)}"
 # THISDIR only works properly with imediate expansion as it has to run
 # in the context of the location its used (:=)
 THISDIR = "${@os.path.dirname(d.getVar('FILE'))}"
@@ -186,9 +176,9 @@ python base_do_fetch() {
         return
 
     try:
-        fetcher = bb.fetch2.Fetch(src_uri, d)
+        fetcher = bb.fetch.Fetch(src_uri, d)
         fetcher.download()
-    except bb.fetch2.BBFetchException as e:
+    except bb.fetch.BBFetchException as e:
         bb.fatal("Bitbake Fetcher Error: " + repr(e))
 }
 
@@ -214,9 +204,9 @@ python base_do_unpack() {
             d.setVar("SOURCE_BASEDIR", unpackdir + '/' + basedir)
 
     try:
-        fetcher = bb.fetch2.Fetch(src_uri, d)
+        fetcher = bb.fetch.Fetch(src_uri, d)
         fetcher.unpack(d.getVar('UNPACKDIR'))
-    except bb.fetch2.BBFetchException as e:
+    except bb.fetch.BBFetchException as e:
         bb.fatal("Bitbake Fetcher Error: " + repr(e))
 }
 
@@ -313,7 +303,7 @@ python base_eventhandler() {
 
     if isinstance(e, bb.event.ConfigParsed):
         if not d.getVar("NATIVELSBSTRING", False):
-            d.setVar("NATIVELSBSTRING", lsb_distro_identifier(d))
+            d.setVar("NATIVELSBSTRING", oe.lsb.distro_identifier(d))
         d.setVar("ORIGNATIVELSBSTRING", d.getVar("NATIVELSBSTRING", False))
         d.setVar('BB_VERSION', bb.__version__)
 
@@ -356,7 +346,7 @@ python base_eventhandler() {
         #
         # If we have multiple providers of virtual/X and a PREFERRED_PROVIDER_virtual/X is set
         # skip parsing for all the other providers which will mean they get uninstalled from the
-        # sysroot since they're now "unreachable". This makes switching virtual/kernel work in 
+        # sysroot since they're now "unreachable". This makes switching virtual/kernel work in
         # particular.
         #
         pn = d.getVar('PN')
@@ -716,7 +706,7 @@ python () {
             for s in srcuri.split():
                 if not s.startswith("file://"):
                     continue
-                fetcher = bb.fetch2.Fetch([s], d)
+                fetcher = bb.fetch.Fetch([s], d)
                 local = fetcher.localpath(s)
                 for mp in paths:
                     if local.startswith(mp):
@@ -749,9 +739,9 @@ python do_cleanall() {
         return
 
     try:
-        fetcher = bb.fetch2.Fetch(src_uri, d)
+        fetcher = bb.fetch.Fetch(src_uri, d)
         fetcher.clean()
-    except bb.fetch2.BBFetchException as e:
+    except bb.fetch.BBFetchException as e:
         bb.fatal(str(e))
 }
 do_cleanall[nostamp] = "1"

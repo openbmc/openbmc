@@ -35,12 +35,37 @@ modprobedir ??= "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '${nonarch_b
 
 KERNEL_SPLIT_MODULES ?= "1"
 PACKAGESPLITFUNCS =+ "split_kernel_module_packages"
+# Order matters:
+# 1. Strip the modules
+# 2. Re-sign the modules (if enabled)
+# 3. Split the packages
+PACKAGESPLITFUNCS =+ "post_strip_kernel_modules_signing"
 
 KERNEL_MODULES_META_PACKAGE ?= "${@ d.getVar("KERNEL_PACKAGE_NAME") or "kernel" }-modules"
 
 KERNEL_MODULE_PACKAGE_PREFIX ?= ""
 KERNEL_MODULE_PACKAGE_SUFFIX ?= "-${KERNEL_VERSION}"
 KERNEL_MODULE_PROVIDE_VIRTUAL ?= "1"
+
+# This function supports both in-tree and out-of-tree modules.
+post_strip_kernel_modules_signing(){
+    # Read .config values to determine if module auto-signing is enabled
+    is_modules="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULES)"
+    is_module_sig="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULE_SIG)"
+    is_module_sig_all="$(${STAGING_KERNEL_DIR}/scripts/config --file ${KBUILD_OUTPUT}/.config --state MODULE_SIG_ALL)"
+
+    if [ "$is_modules" = "y" ] && [ "$is_module_sig" = "y" ] && [ "$is_module_sig_all" = "y" ]; then
+        # Sign modules under ${PKGD}, with M= if out-of-tree module.
+        # Out-of-tree module Makefiles invoke the kernel Makefile by appending M= (the module directory) to MAKEFLAGS.
+        # However, they usually do not provide a modules_sign target. Therefore, the kernel modules_sign target has to
+        # be invoked manually after retrieving M= variable from package source code Makefile.
+        oe_runmake \
+            -C ${KBUILD_OUTPUT}  \
+            MODLIB=${PKGD}${KERNEL_MODULE_INSTALL_PREFIX} \
+            ${@'M=%s' % '${S}' if not "virtual/kernel" in d.getVar('PROVIDES') else ''} \
+            modules_sign
+    fi
+}
 
 python split_kernel_module_packages () {
     import re

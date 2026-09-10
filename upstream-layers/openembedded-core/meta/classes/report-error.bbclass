@@ -60,7 +60,7 @@ python errorreport_handler () {
             nativelsbstr = e.data.getVar("NATIVELSBSTRING")
             # provide a bit more host info in case of uninative build
             if e.data.getVar('UNINATIVE_URL') != 'unset':
-                return '/'.join([nativelsbstr, lsb_distro_identifier(e.data)])
+                return '/'.join([nativelsbstr, oe.lsb.distro_identifier(e.data)])
             return nativelsbstr
 
         logpath = e.data.getVar('ERR_REPORT_DIR')

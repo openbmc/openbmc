@@ -1,0 +1,30 @@
+require findutils.inc
+
+# GPL-2.0-or-later (<< 4.2.32), GPL-3.0-or-later (>= 4.2.32)
+LICENSE = "GPL-3.0-or-later"
+LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464"
+
+DEPENDS = "bison-native"
+
+SRC_URI[sha256sum] = "bfd19cb06cc71f3352d567e90284d8cdac02ac89774bbeadf0b533b0c11432fd"
+
+PACKAGECONFIG[selinux] = "--with-selinux,--without-selinux,libselinux"
+
+EXTRA_OECONF += "ac_cv_path_SORT=${bindir}/sort"
+
+# need od from coreutils for -t option
+RDEPENDS:${PN}-ptest += "bash sed grep coreutils"
+
+do_install:append() {
+	rmdir ${D}${localstatedir}
+}
+
+do_install_ptest:class-target() {
+	mkdir -p ${D}${PTEST_PATH}/tests/
+	cp ${S}/init.cfg ${D}${PTEST_PATH}
+	cp -r ${S}/tests/* ${D}${PTEST_PATH}/tests/
+	install -m 755 ${B}/find/getlimits ${D}${PTEST_PATH}/
+
+	# substitute value in run-ptest with actual version
+	sed -i -e 's/__run_ptest_version__/${PV}/' ${D}${PTEST_PATH}/run-ptest
+}

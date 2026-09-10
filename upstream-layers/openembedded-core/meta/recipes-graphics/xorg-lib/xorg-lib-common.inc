@@ -3,7 +3,7 @@ BUGTRACKER = "https://bugs.freedesktop.org/enter_bug.cgi?product=xorg"
 
 SECTION = "x11/libs"
 LICENSE = "MIT"
-DEPENDS = "util-macros"
+DEPENDS = "util-macros-native"
 
 XORG_PN = "${BPN}"
 XORG_EXT ?= "tar.xz"
@@ -12,16 +12,12 @@ SRC_URI = "${XORG_MIRROR}/individual/lib/${XORG_PN}-${PV}.${XORG_EXT}"
 
 S = "${UNPACKDIR}/${XORG_PN}-${PV}"
 
-inherit autotools features_check pkgconfig
+XORGBUILDCLASS ??= "autotools"
+inherit_defer ${XORGBUILDCLASS}
 
-EXTRA_OECONF = "--disable-specs --without-groff --without-ps2pdf --without-fop"
+inherit features_check pkgconfig
 
-PACKAGECONFIG ??= ""
-PACKAGECONFIG[xmlto] = "--with-xmlto, --without-xmlto, xmlto-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"
-
-UNKNOWN_CONFIGURE_OPT_IGNORE += "--enable-malloc0returnsnull --disable-malloc0returnsnull \
-                                --disable-specs --without-groff --without-ps2pdf --without-fop \
-                                --without-xmlto --with-xmlto \
-"
+EXTRA_OECONF = "--disable-docs --disable-specs"
+UNKNOWN_CONFIGURE_OPT_IGNORE += "--disable-docs --disable-specs"
 
 REQUIRED_DISTRO_FEATURES ?= "x11"

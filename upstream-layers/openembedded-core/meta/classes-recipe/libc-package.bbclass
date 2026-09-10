@@ -68,7 +68,7 @@ do_prep_locale_tree() {
 	mkdir -p $treedir/${base_bindir} $treedir/${base_libdir} $treedir/${datadir} $treedir/${localedir}
 	tar -cf - -C ${LOCALETREESRC}${datadir} -p i18n | tar -xf - -C $treedir/${datadir}
 	# unzip to avoid parsing errors
-	for i in $treedir/${datadir}/i18n/charmaps/*gz; do 
+	for i in $treedir/${datadir}/i18n/charmaps/*gz; do
 		gunzip $i
 	done
 	# The extract pattern "./l*.so*" is carefully selected so that it will
@@ -283,8 +283,8 @@ python package_do_split_gconvs () {
 
             cmd = "PATH=\"%s\" I18NPATH=\"%s\" GCONV_PATH=\"%s\" cross-localedef %s" % \
                 (path, i18npath, gconvpath, localedef_opts)
-        else: # earlier slower qemu way 
-            qemu = qemu_target_binary(d) 
+        else: # earlier slower qemu way
+            qemu = qemu_target_binary(d)
             localedef_opts = "--force --no-hard-links --no-archive --prefix=%s \
                 --inputfile=%s/i18n/locales/%s --charmap=%s %s" \
                 % (treedir, datadir, locale, encoding, name)

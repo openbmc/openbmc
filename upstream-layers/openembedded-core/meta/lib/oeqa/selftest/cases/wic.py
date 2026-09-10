@@ -72,11 +72,22 @@ class WicTestCase(OESelftestTestCase):
             if self.td['USE_NLS'] != 'yes':
                 self.skipTest('wic-tools needs USE_NLS=yes')
 
-            bitbake('wic-tools core-image-minimal core-image-minimal-mtdutils')
+            targets = 'wic-tools core-image-minimal core-image-minimal-mtdutils'
+            targets += ' ' + ' '.join(self._firmware_recipes())
+            bitbake(targets)
             WicTestCase.image_is_ready = True
 
         os.environ['PATH'] = self._get_wic_path()
         rmtree(self.resultdir, ignore_errors=True)
+
+    def _firmware_recipes(self):
+        arch = self.td['HOST_ARCH']
+        recipes = []
+        if arch in ('i586', 'i686', 'x86_64', 'x86-64'):
+            recipes += ['syslinux', 'grub-efi', 'systemd-boot']
+        elif arch == 'aarch64':
+            recipes += ['grub-efi', 'systemd-boot']
+        return recipes
 
     def tearDownLocal(self):
         """Remove resultdir as it may contain images."""
@@ -89,18 +100,11 @@ class WicTestCase(OESelftestTestCase):
 
     def _get_wic_path(self):
         if WicTestCase.wic_bindir is None:
-            search_paths = [
-                os.path.join(self.td['COREBASE'], 'scripts'),
-                os.path.join(get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools'), 'usr', 'bin'),
-            ]
-
-            for bindir in search_paths:
-                if os.path.exists(os.path.join(bindir, 'wic')):
-                    WicTestCase.wic_bindir = bindir
-                    break
-
-            if WicTestCase.wic_bindir is None:
-                self.fail("Unable to find the wic binary in %s" % ', '.join(search_paths))
+            bindir = os.path.join(get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools'),
+                                  'usr', 'bin')
+            if not os.path.exists(os.path.join(bindir, 'wic')):
+                self.fail("Unable to find the wic binary in %s" % bindir)
+            WicTestCase.wic_bindir = bindir
 
         path_entries = []
         for path_group in (
@@ -391,9 +395,13 @@ class Wic(WicTestCase):
     @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_build_artifacts(self):
         """Test wic create directdisk providing all artifacts."""
-        bb_vars = get_bb_vars(['STAGING_DATADIR', 'RECIPE_SYSROOT_NATIVE'],
-                              'wic-tools')
-        bb_vars.update(get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_ROOTFS'],
+        # wic expects syslinux in core-image-minimal's recipe sysroot.
+        config = 'DEPENDS:pn-core-image-minimal += "syslinux"\n'
+        self.append_config(config)
+        bitbake('core-image-minimal')
+        self.remove_config(config)
+        bb_vars = get_bb_vars(['RECIPE_SYSROOT_NATIVE'], 'wic-tools')
+        bb_vars.update(get_bb_vars(['STAGING_DATADIR', 'DEPLOY_DIR_IMAGE', 'IMAGE_ROOTFS'],
                                    'core-image-minimal'))
         bbvars = {key.lower(): value for key, value in bb_vars.items()}
         bbvars['resultdir'] = self.resultdir
@@ -494,9 +502,13 @@ class Wic(WicTestCase):
     @skipIfNotArch(['i586', 'i686', 'x86_64'])
     def test_rootfs_artifacts(self):
         """Test usage of rootfs plugin with rootfs paths"""
-        bb_vars = get_bb_vars(['STAGING_DATADIR', 'RECIPE_SYSROOT_NATIVE'],
-                              'wic-tools')
-        bb_vars.update(get_bb_vars(['DEPLOY_DIR_IMAGE', 'IMAGE_ROOTFS'],
+        # wic expects syslinux in core-image-minimal's recipe sysroot.
+        config = 'DEPENDS:pn-core-image-minimal += "syslinux"\n'
+        self.append_config(config)
+        bitbake('core-image-minimal')
+        self.remove_config(config)
+        bb_vars = get_bb_vars(['RECIPE_SYSROOT_NATIVE'], 'wic-tools')
+        bb_vars.update(get_bb_vars(['STAGING_DATADIR', 'DEPLOY_DIR_IMAGE', 'IMAGE_ROOTFS'],
                                    'core-image-minimal'))
         bbvars = {key.lower(): value for key, value in bb_vars.items()}
         bbvars['wks'] = "directdisk-multi-rootfs"
@@ -513,104 +525,97 @@ class Wic(WicTestCase):
     def test_exclude_path(self):
         """Test --exclude-path wks option."""
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        try:
-            wks_file = 'temp.wks'
-            with open(wks_file, 'w') as wks:
-                rootfs_dir = get_bb_var('IMAGE_ROOTFS', 'core-image-minimal')
-                wks.write("""
+        wks_file = 'temp.wks'
+        with open(wks_file, 'w') as wks:
+            rootfs_dir = get_bb_var('IMAGE_ROOTFS', 'core-image-minimal')
+            wks.write("""
 part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path usr
 part /usr --source rootfs --ondisk mmcblk0 --fstype=ext4 --rootfs-dir %s/usr
 part /etc --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/ --rootfs-dir %s/usr
 part /mnt --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/whoami --rootfs-dir %s/usr"""
-                          % (rootfs_dir, rootfs_dir, rootfs_dir))
-            runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
+                      % (rootfs_dir, rootfs_dir, rootfs_dir))
+        runCmd("wic create %s -e core-image-minimal -o %s" \
+                                   % (wks_file, self.resultdir))
 
-            os.remove(wks_file)
-            wicout = glob(os.path.join(self.resultdir, "%s-*direct" % 'temp'))
-            self.assertEqual(1, len(wicout))
+        os.remove(wks_file)
+        wicout = glob(os.path.join(self.resultdir, "%s-*direct" % 'temp'))
+        self.assertEqual(1, len(wicout))
 
-            wicimg = wicout[0]
+        wicimg = wicout[0]
 
-            # verify partition size with wic
-            res = runCmd("parted -m %s unit b p" % wicimg, stderr=subprocess.PIPE)
+        # verify partition size with wic
+        res = runCmd("parted -m %s unit b p" % wicimg, stderr=subprocess.PIPE)
 
-            # parse parted output which looks like this:
-            # BYT;\n
-            # /var/tmp/wic/build/tmpfwvjjkf_-201611101222-hda.direct:200MiB:file:512:512:msdos::;\n
-            # 1:0.00MiB:200MiB:200MiB:ext4::;\n
-            partlns = res.output.splitlines()[2:]
+        # parse parted output which looks like this:
+        # BYT;\n
+        # /var/tmp/wic/build/tmpfwvjjkf_-201611101222-hda.direct:200MiB:file:512:512:msdos::;\n
+        # 1:0.00MiB:200MiB:200MiB:ext4::;\n
+        partlns = res.output.splitlines()[2:]
 
-            self.assertEqual(4, len(partlns))
+        self.assertEqual(4, len(partlns))
 
-            for part in [1, 2, 3, 4]:
-                part_file = os.path.join(self.resultdir, "selftest_img.part%d" % part)
-                partln = partlns[part-1].split(":")
-                self.assertEqual(7, len(partln))
-                start = int(partln[1].rstrip("B")) / 512
-                length = int(partln[3].rstrip("B")) / 512
-                runCmd("dd if=%s of=%s skip=%d count=%d" %
-                                           (wicimg, part_file, start, length))
+        for part in [1, 2, 3, 4]:
+            part_file = os.path.join(self.resultdir, "selftest_img.part%d" % part)
+            partln = partlns[part-1].split(":")
+            self.assertEqual(7, len(partln))
+            start = int(partln[1].rstrip("B")) / 512
+            length = int(partln[3].rstrip("B")) / 512
+            runCmd("dd if=%s of=%s skip=%d count=%d" %
+                                       (wicimg, part_file, start, length))
 
-            # Test partition 1, should contain the normal root directories, except
-            # /usr.
-            res = runCmd("debugfs -R 'ls -p' %s" % \
-                             os.path.join(self.resultdir, "selftest_img.part1"), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn("etc", files)
-            self.assertNotIn("usr", files)
+        # Test partition 1, should contain the normal root directories, except
+        # /usr.
+        res = runCmd("debugfs -R 'ls -p' %s" % \
+                         os.path.join(self.resultdir, "selftest_img.part1"), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn("etc", files)
+        self.assertNotIn("usr", files)
 
-            # Partition 2, should contain common directories for /usr, not root
-            # directories.
-            res = runCmd("debugfs -R 'ls -p' %s" % \
-                             os.path.join(self.resultdir, "selftest_img.part2"), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertNotIn("etc", files)
-            self.assertNotIn("usr", files)
-            self.assertIn("share", files)
+        # Partition 2, should contain common directories for /usr, not root
+        # directories.
+        res = runCmd("debugfs -R 'ls -p' %s" % \
+                         os.path.join(self.resultdir, "selftest_img.part2"), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertNotIn("etc", files)
+        self.assertNotIn("usr", files)
+        self.assertIn("share", files)
 
-            # Partition 3, should contain the same as partition 2, including the bin
-            # directory, but not the files inside it.
-            res = runCmd("debugfs -R 'ls -p' %s" % \
-                             os.path.join(self.resultdir, "selftest_img.part3"), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertNotIn("etc", files)
-            self.assertNotIn("usr", files)
-            self.assertIn("share", files)
-            self.assertIn("bin", files)
-            res = runCmd("debugfs -R 'ls -p bin' %s" % \
-                             os.path.join(self.resultdir, "selftest_img.part3"), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn(".", files)
-            self.assertIn("..", files)
-            self.assertEqual(2, len(files))
+        # Partition 3, should contain the same as partition 2, including the bin
+        # directory, but not the files inside it.
+        res = runCmd("debugfs -R 'ls -p' %s" % \
+                         os.path.join(self.resultdir, "selftest_img.part3"), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertNotIn("etc", files)
+        self.assertNotIn("usr", files)
+        self.assertIn("share", files)
+        self.assertIn("bin", files)
+        res = runCmd("debugfs -R 'ls -p bin' %s" % \
+                         os.path.join(self.resultdir, "selftest_img.part3"), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn(".", files)
+        self.assertIn("..", files)
+        self.assertEqual(2, len(files))
 
-            # Partition 4, should contain the same as partition 2, including the bin
-            # directory, but not whoami (a symlink to busybox.nosuid) inside it.
-            res = runCmd("debugfs -R 'ls -p' %s" % \
-                             os.path.join(self.resultdir, "selftest_img.part4"), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertNotIn("etc", files)
-            self.assertNotIn("usr", files)
-            self.assertIn("share", files)
-            self.assertIn("bin", files)
-            res = runCmd("debugfs -R 'ls -p bin' %s" % \
-                             os.path.join(self.resultdir, "selftest_img.part4"), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn(".", files)
-            self.assertIn("..", files)
-            self.assertIn("who", files)
-            self.assertNotIn("whoami", files)
+        # Partition 4, should contain the same as partition 2, including the bin
+        # directory, but not whoami (a symlink to busybox.nosuid) inside it.
+        res = runCmd("debugfs -R 'ls -p' %s" % \
+                         os.path.join(self.resultdir, "selftest_img.part4"), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertNotIn("etc", files)
+        self.assertNotIn("usr", files)
+        self.assertIn("share", files)
+        self.assertIn("bin", files)
+        res = runCmd("debugfs -R 'ls -p bin' %s" % \
+                         os.path.join(self.resultdir, "selftest_img.part4"), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn(".", files)
+        self.assertIn("..", files)
+        self.assertIn("who", files)
+        self.assertNotIn("whoami", files)
 
-            for part in [1, 2, 3, 4]:
-                part_file = os.path.join(self.resultdir, "selftest_img.part%d" % part)
-                os.remove(part_file)
-
-        finally:
-            os.environ['PATH'] = oldpath
+        for part in [1, 2, 3, 4]:
+            part_file = os.path.join(self.resultdir, "selftest_img.part%d" % part)
+            os.remove(part_file)
 
     def test_exclude_path_with_extra_space(self):
         """Test having --exclude-path with IMAGE_ROOTFS_EXTRA_SPACE. [Yocto #15555]"""
@@ -649,75 +654,61 @@ part /mnt --source rootfs --ondisk mmcblk0 --fstype=ext4 --exclude-path bin/whoa
     def test_include_path(self):
         """Test --include-path wks option."""
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        try:
-            include_path = os.path.join(self.resultdir, 'test-include')
-            os.makedirs(include_path)
-            with open(os.path.join(include_path, 'test-file'), 'w') as t:
-                t.write("test\n")
-            wks_file = os.path.join(include_path, 'temp.wks')
-            with open(wks_file, 'w') as wks:
-                rootfs_dir = get_bb_var('IMAGE_ROOTFS', 'core-image-minimal')
-                wks.write("""
+        include_path = os.path.join(self.resultdir, 'test-include')
+        os.makedirs(include_path)
+        with open(os.path.join(include_path, 'test-file'), 'w') as t:
+            t.write("test\n")
+        wks_file = os.path.join(include_path, 'temp.wks')
+        with open(wks_file, 'w') as wks:
+            rootfs_dir = get_bb_var('IMAGE_ROOTFS', 'core-image-minimal')
+            wks.write("""
 part /part1 --source rootfs --ondisk mmcblk0 --fstype=ext4
 part /part2 --source rootfs --ondisk mmcblk0 --fstype=ext4 --include-path %s"""
-                          % (include_path))
-            runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
+                      % (include_path))
+        runCmd("wic create %s -e core-image-minimal -o %s" \
+                                   % (wks_file, self.resultdir))
 
-            part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
-            part2 = glob(os.path.join(self.resultdir, 'temp-*.direct.p2'))[0]
+        part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
+        part2 = glob(os.path.join(self.resultdir, 'temp-*.direct.p2'))[0]
 
-            # Test partition 1, should not contain 'test-file'
-            res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertNotIn('test-file', files)
-            self.assertEqual(True, files_own_by_root(res.output))
+        # Test partition 1, should not contain 'test-file'
+        res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertNotIn('test-file', files)
+        self.assertEqual(True, files_own_by_root(res.output))
 
-            # Test partition 2, should contain 'test-file'
-            res = runCmd("debugfs -R 'ls -p' %s" % (part2), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn('test-file', files)
-            self.assertEqual(True, files_own_by_root(res.output))
-
-        finally:
-            os.environ['PATH'] = oldpath
+        # Test partition 2, should contain 'test-file'
+        res = runCmd("debugfs -R 'ls -p' %s" % (part2), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn('test-file', files)
+        self.assertEqual(True, files_own_by_root(res.output))
 
     def test_include_path_embeded(self):
         """Test --include-path wks option."""
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        try:
-            include_path = os.path.join(self.resultdir, 'test-include')
-            os.makedirs(include_path)
-            with open(os.path.join(include_path, 'test-file'), 'w') as t:
-                t.write("test\n")
-            wks_file = os.path.join(include_path, 'temp.wks')
-            with open(wks_file, 'w') as wks:
-                wks.write("""
+        include_path = os.path.join(self.resultdir, 'test-include')
+        os.makedirs(include_path)
+        with open(os.path.join(include_path, 'test-file'), 'w') as t:
+            t.write("test\n")
+        wks_file = os.path.join(include_path, 'temp.wks')
+        with open(wks_file, 'w') as wks:
+            wks.write("""
 part / --source rootfs  --fstype=ext4 --include-path %s --include-path core-image-minimal-mtdutils export/"""
-                          % (include_path))
-            runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
+                      % (include_path))
+        runCmd("wic create %s -e core-image-minimal -o %s" \
+                                   % (wks_file, self.resultdir))
 
-            part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
+        part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
 
-            res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn('test-file', files)
-            self.assertEqual(True, files_own_by_root(res.output))
+        res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn('test-file', files)
+        self.assertEqual(True, files_own_by_root(res.output))
 
-            res = runCmd("debugfs -R 'ls -p /export/etc/' %s" % (part1), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn('passwd', files)
-            self.assertEqual(True, files_own_by_root(res.output))
-
-        finally:
-            os.environ['PATH'] = oldpath
+        res = runCmd("debugfs -R 'ls -p /export/etc/' %s" % (part1), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn('passwd', files)
+        self.assertEqual(True, files_own_by_root(res.output))
 
     def test_include_path_errors(self):
         """Test --include-path wks option error handling."""
@@ -768,9 +759,6 @@ part / --source rootfs  --fstype=ext4 --include-path %s --include-path core-imag
         # prepare wicenv and rootfs
         bitbake('core-image-minimal core-image-minimal-mtdutils -c do_rootfs_wicenv')
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
         t_normal = """
 part / --source rootfs --fstype=ext4
 """
@@ -787,61 +775,50 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
 """
         tests = [t_normal, t_exclude, t_multi, t_change]
 
-        try:
-            for test in tests:
-                include_path = os.path.join(self.resultdir, 'test-include')
-                os.makedirs(include_path)
-                wks_file = os.path.join(include_path, 'temp.wks')
-                with open(wks_file, 'w') as wks:
-                    wks.write(test)
-                runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
-
-                for part in glob(os.path.join(self.resultdir, 'temp-*.direct.p*')):
-                    res = runCmd("debugfs -R 'ls -p' %s" % (part), stderr=subprocess.PIPE)
-                    self.assertEqual(True, files_own_by_root(res.output))
-
-                config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "%s"\n' % wks_file
-                self.append_config(config)
-                bitbake('core-image-minimal')
-                tmpdir = os.path.join(get_bb_var('WORKDIR', 'core-image-minimal'),'build-wic')
-
-                # check each partition for permission
-                for part in glob(os.path.join(tmpdir, 'temp-*.direct.p*')):
-                    res = runCmd("debugfs -R 'ls -p' %s" % (part), stderr=subprocess.PIPE)
-                    self.assertTrue(files_own_by_root(res.output)
-                        ,msg='Files permission incorrect using wks set "%s"' % test)
-
-                # clean config and result directory for next cases
-                self.remove_config(config)
-                rmtree(self.resultdir, ignore_errors=True)
-
-        finally:
-            os.environ['PATH'] = oldpath
-
-    def test_change_directory(self):
-        """Test --change-directory wks option."""
-
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
-        try:
+        for test in tests:
             include_path = os.path.join(self.resultdir, 'test-include')
             os.makedirs(include_path)
             wks_file = os.path.join(include_path, 'temp.wks')
             with open(wks_file, 'w') as wks:
-                wks.write("part /etc --source rootfs --fstype=ext4 --change-directory=etc")
+                wks.write(test)
             runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
+                                   % (wks_file, self.resultdir))
 
-            part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
+            for part in glob(os.path.join(self.resultdir, 'temp-*.direct.p*')):
+                res = runCmd("debugfs -R 'ls -p' %s" % (part), stderr=subprocess.PIPE)
+                self.assertEqual(True, files_own_by_root(res.output))
 
-            res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
-            files = extract_files(res.output)
-            self.assertIn('passwd', files)
+            config = 'IMAGE_FSTYPES += "wic"\nWKS_FILE = "%s"\n' % wks_file
+            self.append_config(config)
+            bitbake('core-image-minimal')
+            tmpdir = os.path.join(get_bb_var('WORKDIR', 'core-image-minimal'),'build-wic')
 
-        finally:
-            os.environ['PATH'] = oldpath
+            # check each partition for permission
+            for part in glob(os.path.join(tmpdir, 'temp-*.direct.p*')):
+                res = runCmd("debugfs -R 'ls -p' %s" % (part), stderr=subprocess.PIPE)
+                self.assertTrue(files_own_by_root(res.output)
+                    ,msg='Files permission incorrect using wks set "%s"' % test)
+
+            # clean config and result directory for next cases
+            self.remove_config(config)
+            rmtree(self.resultdir, ignore_errors=True)
+
+    def test_change_directory(self):
+        """Test --change-directory wks option."""
+
+        include_path = os.path.join(self.resultdir, 'test-include')
+        os.makedirs(include_path)
+        wks_file = os.path.join(include_path, 'temp.wks')
+        with open(wks_file, 'w') as wks:
+            wks.write("part /etc --source rootfs --fstype=ext4 --change-directory=etc")
+        runCmd("wic create %s -e core-image-minimal -o %s" \
+                                   % (wks_file, self.resultdir))
+
+        part1 = glob(os.path.join(self.resultdir, 'temp-*.direct.p1'))[0]
+
+        res = runCmd("debugfs -R 'ls -p' %s" % (part1), stderr=subprocess.PIPE)
+        files = extract_files(res.output)
+        self.assertIn('passwd', files)
 
     def test_change_directory_errors(self):
         """Test --change-directory wks option error handling."""
@@ -864,41 +841,34 @@ part /etc --source rootfs --fstype=ext4 --change-directory=etc
     def test_no_fstab_update(self):
         """Test --no-fstab-update wks option."""
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
-
         # Get stock fstab from base-files recipe
         bitbake('base-files -c do_install')
         bf_fstab = os.path.join(get_bb_var('D', 'base-files'), 'etc', 'fstab')
         self.assertEqual(True, os.path.exists(bf_fstab))
         bf_fstab_md5sum = runCmd('md5sum %s ' % bf_fstab).output.split(" ")[0]
 
-        try:
-            no_fstab_update_path = os.path.join(self.resultdir, 'test-no-fstab-update')
-            os.makedirs(no_fstab_update_path)
-            wks_file = os.path.join(no_fstab_update_path, 'temp.wks')
-            with open(wks_file, 'w') as wks:
-                wks.writelines(['part / --source rootfs --fstype=ext4 --label rootfs\n',
-                                'part /mnt/p2 --source rootfs --rootfs-dir=core-image-minimal ',
-                                '--fstype=ext4 --label p2 --no-fstab-update\n'])
-            runCmd("wic create %s -e core-image-minimal -o %s" \
-                                       % (wks_file, self.resultdir))
+        no_fstab_update_path = os.path.join(self.resultdir, 'test-no-fstab-update')
+        os.makedirs(no_fstab_update_path)
+        wks_file = os.path.join(no_fstab_update_path, 'temp.wks')
+        with open(wks_file, 'w') as wks:
+            wks.writelines(['part / --source rootfs --fstype=ext4 --label rootfs\n',
+                            'part /mnt/p2 --source rootfs --rootfs-dir=core-image-minimal ',
+                            '--fstype=ext4 --label p2 --no-fstab-update\n'])
+        runCmd("wic create %s -e core-image-minimal -o %s" \
+                                   % (wks_file, self.resultdir))
 
-            part_fstab_md5sum = []
-            for i in range(1, 3):
-                part = glob(os.path.join(self.resultdir, 'temp-*.direct.p') + str(i))[0]
-                part_fstab = runCmd("debugfs -R 'cat etc/fstab' %s" % (part), stderr=subprocess.PIPE)
-                part_fstab_md5sum.append(hashlib.md5((part_fstab.output + "\n\n").encode('utf-8')).hexdigest())
+        part_fstab_md5sum = []
+        for i in range(1, 3):
+            part = glob(os.path.join(self.resultdir, 'temp-*.direct.p') + str(i))[0]
+            part_fstab = runCmd("debugfs -R 'cat etc/fstab' %s" % (part), stderr=subprocess.PIPE)
+            part_fstab_md5sum.append(hashlib.md5((part_fstab.output + "\n\n").encode('utf-8')).hexdigest())
 
-            # '/etc/fstab' in partition 2 should contain the same stock fstab file
-            # as the one installed by the base-file recipe.
-            self.assertEqual(bf_fstab_md5sum, part_fstab_md5sum[1])
+        # '/etc/fstab' in partition 2 should contain the same stock fstab file
+        # as the one installed by the base-file recipe.
+        self.assertEqual(bf_fstab_md5sum, part_fstab_md5sum[1])
 
-            # '/etc/fstab' in partition 1 should contain an updated fstab file.
-            self.assertNotEqual(bf_fstab_md5sum, part_fstab_md5sum[0])
-
-        finally:
-            os.environ['PATH'] = oldpath
+        # '/etc/fstab' in partition 1 should contain an updated fstab file.
+        self.assertNotEqual(bf_fstab_md5sum, part_fstab_md5sum[0])
 
     def test_no_fstab_update_errors(self):
         """Test --no-fstab-update wks option error handling."""
@@ -972,153 +942,139 @@ bootloader --ptable gpt""")
     def test_wic_sector_size_env(self):
         """Test generation image sector size via environment (obsolete)"""
  
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+        # Add WIC_SECTOR_SIZE into config
+        config = 'WIC_SECTOR_SIZE = "4096"\n'\
+                 'WICVARS:append = " WIC_SECTOR_SIZE"\n'
+        self.append_config(config)
+        bitbake('core-image-minimal')
 
-        try:
-            # Add WIC_SECTOR_SIZE into config
-            config = 'WIC_SECTOR_SIZE = "4096"\n'\
-                     'WICVARS:append = " WIC_SECTOR_SIZE"\n'
-            self.append_config(config)
-            bitbake('core-image-minimal')
+        # Check WIC_SECTOR_SIZE apply to bitbake variable
+        wic_sector_size_str = get_bb_var('WIC_SECTOR_SIZE', 'core-image-minimal')
+        wic_sector_size = int(wic_sector_size_str)
+        self.assertEqual(4096, wic_sector_size)
 
-            # Check WIC_SECTOR_SIZE apply to bitbake variable
-            wic_sector_size_str = get_bb_var('WIC_SECTOR_SIZE', 'core-image-minimal')
-            wic_sector_size = int(wic_sector_size_str)
-            self.assertEqual(4096, wic_sector_size)
+        self.logger.info("Test wic_sector_size: %d \n" % wic_sector_size)
 
-            self.logger.info("Test wic_sector_size: %d \n" % wic_sector_size)
+        with NamedTemporaryFile("w", suffix=".wks") as wks:
+            wks.writelines(
+                ['bootloader --ptable gpt\n',
+                 'part --fstype vfat --fstype vfat --label emptyfat --size 1M --mkfs-extraopts "-S 4096"\n',
+                 'part --fstype ext4 --source rootfs --label rofs-a --mkfs-extraopts "-b 4096"\n',
+                 'part --fstype ext4 --source rootfs --use-uuid --mkfs-extraopts "-b 4096"\n'])
+            wks.flush()
+            cmd = "wic create %s -e core-image-minimal -o %s" % (wks.name, self.resultdir)
+            runCmd(cmd)
+            wksname = os.path.splitext(os.path.basename(wks.name))[0]
+            images = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
+            self.assertEqual(1, len(images))
 
-            with NamedTemporaryFile("w", suffix=".wks") as wks:
-                wks.writelines(
-                    ['bootloader --ptable gpt\n',
-                     'part --fstype vfat --fstype vfat --label emptyfat --size 1M --mkfs-extraopts "-S 4096"\n',
-                     'part --fstype ext4 --source rootfs --label rofs-a --mkfs-extraopts "-b 4096"\n',
-                     'part --fstype ext4 --source rootfs --use-uuid --mkfs-extraopts "-b 4096"\n'])
-                wks.flush()
-                cmd = "wic create %s -e core-image-minimal -o %s" % (wks.name, self.resultdir)
-                runCmd(cmd)
-                wksname = os.path.splitext(os.path.basename(wks.name))[0]
-                images = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
-                self.assertEqual(1, len(images))
+        sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
+        # list partitions
+        result = runCmd("wic ls %s -n %s" % (images[0], sysroot))
+        print(result.output)
+        # Deprecated message + 4 lines of output: header + 3 partitions
+        self.assertEqual(5, len(result.output.split('\n')))
 
-            sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
-            # list partitions
-            result = runCmd("wic ls %s -n %s" % (images[0], sysroot))
-            print(result.output)
-            # Deprecated message + 4 lines of output: header + 3 partitions
-            self.assertEqual(5, len(result.output.split('\n')))
+        # verify partition size with wic
+        res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (wic_sector_size, images[0]),
+                     stderr=subprocess.PIPE)
 
-            # verify partition size with wic
-            res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (wic_sector_size, images[0]),
-                         stderr=subprocess.PIPE)
+        print(res.output)
+        # parse parted output which looks like this:
+        # BYT;\n
+        # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
+        # 1:139264B:1187839B:1048576B::emptyfat:msftdata;
+        # 2:1187840B:149270527B:148082688B:ext4:rofs-a:;
+        # 3:149270528B:297353215B:148082688B:ext4:primary:;
+        disk_info = res.output.splitlines()[1]
+        # Check sector sizes
+        sector_size_logical = int(disk_info.split(":")[3])
+        sector_size_physical = int(disk_info.split(":")[4])
+        self.assertEqual(wic_sector_size, sector_size_logical, "Logical sector size is not %d." % wic_sector_size)
+        self.assertEqual(wic_sector_size, sector_size_physical, "Physical sector size is not %d." % wic_sector_size)
 
-            print(res.output)
-            # parse parted output which looks like this:
-            # BYT;\n
-            # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
-            # 1:139264B:1187839B:1048576B::emptyfat:msftdata;
-            # 2:1187840B:149270527B:148082688B:ext4:rofs-a:;
-            # 3:149270528B:297353215B:148082688B:ext4:primary:;
-            disk_info = res.output.splitlines()[1]
-            # Check sector sizes
-            sector_size_logical = int(disk_info.split(":")[3])
-            sector_size_physical = int(disk_info.split(":")[4])
-            self.assertEqual(wic_sector_size, sector_size_logical, "Logical sector size is not %d." % wic_sector_size)
-            self.assertEqual(wic_sector_size, sector_size_physical, "Physical sector size is not %d." % wic_sector_size)
+        # It is a known issue with parsed that a 4K FAT partition does
+        # not have a recognized filesystem type of *fat.
+        part_info = res.output.splitlines()[2]
+        partname = part_info.split(":")[5]
+        parttype = part_info.split(":")[6]
+        self.assertEqual('emptyfat', partname)
+        self.assertEqual('msftdata;', parttype)
 
-            # It is a known issue with parsed that a 4K FAT partition does
-            # not have a recognized filesystem type of *fat.
-            part_info = res.output.splitlines()[2]
-            partname = part_info.split(":")[5]
-            parttype = part_info.split(":")[6]
-            self.assertEqual('emptyfat', partname)
-            self.assertEqual('msftdata;', parttype)
+        part_info = res.output.splitlines()[3]
+        parttype = part_info.split(":")[4]
+        partname = part_info.split(":")[5]
+        self.assertEqual('ext4', parttype)
+        self.assertEqual('rofs-a', partname)
 
-            part_info = res.output.splitlines()[3]
-            parttype = part_info.split(":")[4]
-            partname = part_info.split(":")[5]
-            self.assertEqual('ext4', parttype)
-            self.assertEqual('rofs-a', partname)
-
-            part_info = res.output.splitlines()[4]
-            parttype = part_info.split(":")[4]
-            partname = part_info.split(":")[5]
-            self.assertEqual('ext4', parttype)
-            self.assertEqual('primary', partname)
-
-        finally:
-            os.environ['PATH'] = oldpath
+        part_info = res.output.splitlines()[4]
+        parttype = part_info.split(":")[4]
+        partname = part_info.split(":")[5]
+        self.assertEqual('ext4', parttype)
+        self.assertEqual('primary', partname)
 
     def test_wic_sector_size_cli(self):
         """Test sector size handling via CLI option."""
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+        bitbake('core-image-minimal')
 
-        try:
-            bitbake('core-image-minimal')
+        with NamedTemporaryFile("w", suffix=".wks") as wks:
+            wks.writelines(
+                ['bootloader --ptable gpt\n',
+                 'part --fstype vfat --fstype vfat --label emptyfat --size 1M\n',
+                 'part --fstype ext4 --source rootfs --label rofs-a\n',
+                 'part --fstype ext4 --source rootfs --use-uuid\n'])
+            wks.flush()
+            cmd = "wic create %s -e core-image-minimal -o %s --sector-size 4096" % (wks.name, self.resultdir)
+            runCmd(cmd)
+            wksname = os.path.splitext(os.path.basename(wks.name))[0]
+            images = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
+            self.assertEqual(1, len(images))
 
-            with NamedTemporaryFile("w", suffix=".wks") as wks:
-                wks.writelines(
-                    ['bootloader --ptable gpt\n',
-                     'part --fstype vfat --fstype vfat --label emptyfat --size 1M\n',
-                     'part --fstype ext4 --source rootfs --label rofs-a\n',
-                     'part --fstype ext4 --source rootfs --use-uuid\n'])
-                wks.flush()
-                cmd = "wic create %s -e core-image-minimal -o %s --sector-size 4096" % (wks.name, self.resultdir)
-                runCmd(cmd)
-                wksname = os.path.splitext(os.path.basename(wks.name))[0]
-                images = glob(os.path.join(self.resultdir, "%s-*direct" % wksname))
-                self.assertEqual(1, len(images))
+        sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
+        # list partitions
+        result = runCmd("wic ls %s -n %s --sector-size 4096" % (images[0], sysroot))
+        print(result.output)
+        # 4 lines of output: header + 3 partitions
+        self.assertEqual(4, len(result.output.split('\n')))
 
-            sysroot = get_bb_var('RECIPE_SYSROOT_NATIVE', 'wic-tools')
-            # list partitions
-            result = runCmd("wic ls %s -n %s --sector-size 4096" % (images[0], sysroot))
-            print(result.output)
-            # 4 lines of output: header + 3 partitions
-            self.assertEqual(4, len(result.output.split('\n')))
+        # verify partition size with parted output
+        res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (4096, images[0]),
+                     stderr=subprocess.PIPE)
 
-            # verify partition size with parted output
-            res = runCmd("export PARTED_SECTOR_SIZE=%d; parted -m %s unit b p" % (4096, images[0]),
-                         stderr=subprocess.PIPE)
+        print(res.output)
+        # parse parted output which looks like this:
+        # BYT;\n
+        # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
+        # 1:139264B:1187839B:1048576B::emptyfat:msftdata;
+        # 2:1187840B:149270527B:148082688B:ext4:rofs-a:;
+        # 3:149270528B:297353215B:148082688B:ext4:primary:;
+        disk_info = res.output.splitlines()[1]
+        # Check sector sizes
+        sector_size_logical = int(disk_info.split(":")[3])
+        sector_size_physical = int(disk_info.split(":")[4])
+        self.assertEqual(4096, sector_size_logical, "Logical sector size is not 4096.")
+        self.assertEqual(4096, sector_size_physical, "Physical sector size is not 4096.")
 
-            print(res.output)
-            # parse parted output which looks like this:
-            # BYT;\n
-            # /var/tmp/wic/build/tmpgjzzefdd-202410281021-sda.direct:78569472B:file:4096:4096:gpt::;\n
-            # 1:139264B:1187839B:1048576B::emptyfat:msftdata;
-            # 2:1187840B:149270527B:148082688B:ext4:rofs-a:;
-            # 3:149270528B:297353215B:148082688B:ext4:primary:;
-            disk_info = res.output.splitlines()[1]
-            # Check sector sizes
-            sector_size_logical = int(disk_info.split(":")[3])
-            sector_size_physical = int(disk_info.split(":")[4])
-            self.assertEqual(4096, sector_size_logical, "Logical sector size is not 4096.")
-            self.assertEqual(4096, sector_size_physical, "Physical sector size is not 4096.")
+        # It is a known issue with parsed that a 4K FAT partition does
+        # not have a recognized filesystem type of *fat.
+        part_info = res.output.splitlines()[2]
+        partname = part_info.split(":")[5]
+        parttype = part_info.split(":")[6]
+        self.assertEqual('emptyfat', partname)
+        self.assertEqual('msftdata;', parttype)
 
-            # It is a known issue with parsed that a 4K FAT partition does
-            # not have a recognized filesystem type of *fat.
-            part_info = res.output.splitlines()[2]
-            partname = part_info.split(":")[5]
-            parttype = part_info.split(":")[6]
-            self.assertEqual('emptyfat', partname)
-            self.assertEqual('msftdata;', parttype)
+        part_info = res.output.splitlines()[3]
+        parttype = part_info.split(":")[4]
+        partname = part_info.split(":")[5]
+        self.assertEqual('ext4', parttype)
+        self.assertEqual('rofs-a', partname)
 
-            part_info = res.output.splitlines()[3]
-            parttype = part_info.split(":")[4]
-            partname = part_info.split(":")[5]
-            self.assertEqual('ext4', parttype)
-            self.assertEqual('rofs-a', partname)
-
-            part_info = res.output.splitlines()[4]
-            parttype = part_info.split(":")[4]
-            partname = part_info.split(":")[5]
-            self.assertEqual('ext4', parttype)
-            self.assertEqual('primary', partname)
-
-        finally:
-            os.environ['PATH'] = oldpath
+        part_info = res.output.splitlines()[4]
+        parttype = part_info.split(":")[4]
+        partname = part_info.split(":")[5]
+        self.assertEqual('ext4', parttype)
+        self.assertEqual('primary', partname)
 
 class Wic2(WicTestCase):
 
@@ -1460,47 +1416,41 @@ run_wic_cmd() {
     def test_extra_partition_space(self):
         native_sysroot = get_bb_var("RECIPE_SYSROOT_NATIVE", "wic-tools")
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+        with NamedTemporaryFile("w", suffix=".wks") as tempf:
+            tempf.write("bootloader --ptable gpt\n" \
+                        "part                 --ondisk hda --size 10M        --extra-partition-space 10M --fstype=ext4\n" \
+                        "part                 --ondisk hda --fixed-size 20M  --extra-partition-space 10M --fstype=ext4\n" \
+                        "part --source rootfs --ondisk hda                   --extra-partition-space 10M --fstype=ext4\n" \
+                        "part --source rootfs --ondisk hda --fixed-size 200M --extra-partition-space 10M --fstype=ext4\n")
+            tempf.flush()
 
-        try:
-            with NamedTemporaryFile("w", suffix=".wks") as tempf:
-                tempf.write("bootloader --ptable gpt\n" \
-                            "part                 --ondisk hda --size 10M        --extra-partition-space 10M --fstype=ext4\n" \
-                            "part                 --ondisk hda --fixed-size 20M  --extra-partition-space 10M --fstype=ext4\n" \
-                            "part --source rootfs --ondisk hda                   --extra-partition-space 10M --fstype=ext4\n" \
-                            "part --source rootfs --ondisk hda --fixed-size 200M --extra-partition-space 10M --fstype=ext4\n")
-                tempf.flush()
+            _, wicimg = self._get_wic(tempf.name)
 
-                _, wicimg = self._get_wic(tempf.name)
+            res = runCmd("parted -m %s unit b p" % wicimg,
+                            native_sysroot=native_sysroot, stderr=subprocess.PIPE)
 
-                res = runCmd("parted -m %s unit b p" % wicimg,
-                                native_sysroot=native_sysroot, stderr=subprocess.PIPE)
+            # parse parted output which looks like this:
+            # BYT;\n
+            # /var/tmp/wic/build/tmpfwvjjkf_-201611101222-hda.direct:200MiB:file:512:512:msdos::;\n
+            # 1:0.00MiB:200MiB:200MiB:ext4::;\n
+            partlns = res.output.splitlines()[2:]
 
-                # parse parted output which looks like this:
-                # BYT;\n
-                # /var/tmp/wic/build/tmpfwvjjkf_-201611101222-hda.direct:200MiB:file:512:512:msdos::;\n
-                # 1:0.00MiB:200MiB:200MiB:ext4::;\n
-                partlns = res.output.splitlines()[2:]
+            self.assertEqual(4, len(partlns))
 
-                self.assertEqual(4, len(partlns))
-
-                # Test for each partitions that the extra part space exists
-                for part in range(0, len(partlns)):
-                    part_file = os.path.join(self.resultdir, "selftest_img.part%d" % (part + 1))
-                    partln = partlns[part].split(":")
-                    self.assertEqual(7, len(partln))
-                    self.assertRegex(partln[3], r'^[0-9]+B$')
-                    part_size = int(partln[3].rstrip("B"))
-                    start = int(partln[1].rstrip("B")) / 512
-                    length = part_size / 512
-                    runCmd("dd if=%s of=%s skip=%d count=%d" %
-                                                (wicimg, part_file, start, length))
-                    res = runCmd("dumpe2fs %s -h | grep \"^Block count\"" % part_file)
-                    fs_size = int(res.output.split(":")[1].strip()) * 1024
-                    self.assertLessEqual(fs_size + 10485760, part_size, "part file: %s" % part_file)
-        finally:
-            os.environ['PATH'] = oldpath
+            # Test for each partitions that the extra part space exists
+            for part in range(0, len(partlns)):
+                part_file = os.path.join(self.resultdir, "selftest_img.part%d" % (part + 1))
+                partln = partlns[part].split(":")
+                self.assertEqual(7, len(partln))
+                self.assertRegex(partln[3], r'^[0-9]+B$')
+                part_size = int(partln[3].rstrip("B"))
+                start = int(partln[1].rstrip("B")) / 512
+                length = part_size / 512
+                runCmd("dd if=%s of=%s skip=%d count=%d" %
+                                            (wicimg, part_file, start, length))
+                res = runCmd("dumpe2fs %s -h | grep \"^Block count\"" % part_file)
+                fs_size = int(res.output.split(":")[1].strip()) * 1024
+                self.assertLessEqual(fs_size + 10485760, part_size, "part file: %s" % part_file)
 
     # TODO this test could also work on aarch64
     @skipIfNotArch(['i586', 'i686', 'x86_64'])
@@ -1813,45 +1763,39 @@ INITRAMFS_IMAGE = "core-image-initramfs-boot"
             testfile.write("test %s" % testfilename)
             testfile.close()
 
-        oldpath = os.environ['PATH']
-        os.environ['PATH'] = get_bb_var("PATH", "wic-tools")
+        with NamedTemporaryFile("w", suffix=".wks") as wks:
+            wks.writelines([
+                'part / --source extra_partition --ondisk sda --sourceparams "name=foo" --align 4 --size 5M\n',
+                'part / --source extra_partition --ondisk sda --label foo --align 4 --size 5M\n',
+                'part / --source extra_partition --ondisk sda --fstype=vfat --uuid e7d0824e-cda3-4bed-9f54-9ef5312d105d --align 4 --size 5M\n',
+                'part / --source extra_partition --ondisk sda --fstype=ext4 --label bar --align 4 --size 5M\n',
+                'bootloader --ptable gpt\n',
+            ])
+            wks.flush()
+            _, wicimg = self._get_wic(wks.name)
 
-        try:
-            with NamedTemporaryFile("w", suffix=".wks") as wks:
-                wks.writelines([
-                    'part / --source extra_partition --ondisk sda --sourceparams "name=foo" --align 4 --size 5M\n',
-                    'part / --source extra_partition --ondisk sda --label foo --align 4 --size 5M\n',
-                    'part / --source extra_partition --ondisk sda --fstype=vfat --uuid e7d0824e-cda3-4bed-9f54-9ef5312d105d --align 4 --size 5M\n',
-                    'part / --source extra_partition --ondisk sda --fstype=ext4 --label bar --align 4 --size 5M\n',
-                    'bootloader --ptable gpt\n',
-                ])
-                wks.flush()
-                _, wicimg = self._get_wic(wks.name)
+        result = runCmd("wic ls %s -n %s" % (wicimg, sysroot))
+        partls = result.output.split('\n')[1:]
 
-            result = runCmd("wic ls %s -n %s" % (wicimg, sysroot))
-            partls = result.output.split('\n')[1:]
+        # Assert the number of partitions is correct
+        self.assertEqual(4, len(partls), msg="Expect 4 partitions, not %s" % result.output)
 
-            # Assert the number of partitions is correct
-            self.assertEqual(4, len(partls), msg="Expect 4 partitions, not %s" % result.output)
+        # Fstype column from 'wic ls' should be fstype as given in the part command
+        for part_id, part_fs in enumerate(["fat16", "fat16", "fat16", "ext4"]):
+            self.assertIn(part_fs, partls[part_id])
 
-            # Fstype column from 'wic ls' should be fstype as given in the part command
-            for part_id, part_fs in enumerate(["fat16", "fat16", "fat16", "ext4"]):
-                self.assertIn(part_fs, partls[part_id])
+        # For each partition, assert expected files exist
+        for part, part_glob in enumerate([
+            ["bar.conf"],
+            ["foo.conf"],
+            ["foobar.conf", "foobar2.conf", "bar3.conf", "bar4.conf"],
+            ["bar.conf", "bar2.conf"],
+        ]):
+            for part_file in part_glob:
+                result = runCmd("wic ls %s:%d/%s -n %s" % (wicimg, part + 1, part_file, sysroot))
+                self.assertEqual(0, result.status, msg="File '%s' not found in the partition #%d" % (part_file, part))
 
-            # For each partition, assert expected files exist
-            for part, part_glob in enumerate([
-                ["bar.conf"],
-                ["foo.conf"],
-                ["foobar.conf", "foobar2.conf", "bar3.conf", "bar4.conf"],
-                ["bar.conf", "bar2.conf"],
-            ]):
-                for part_file in part_glob:
-                    result = runCmd("wic ls %s:%d/%s -n %s" % (wicimg, part + 1, part_file, sysroot))
-                    self.assertEqual(0, result.status, msg="File '%s' not found in the partition #%d" % (part_file, part))
-
-            self.remove_config(config)
-        finally:
-            os.environ['PATH'] = oldpath
+        self.remove_config(config)
 
     def test_fs_types(self):
         """Test filesystem types for empty and not empty partitions"""

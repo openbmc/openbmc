@@ -1,0 +1,45 @@
+SUMMARY = "WebKit based web browser for GNOME"
+DESCRIPTION = "Epiphany is an open source web browser for the Linux desktop environment. \
+It provides a simple and easy-to-use internet browsing experience."
+HOMEPAGE = "https://wiki.gnome.org/Apps/Web"
+BUGTRACKER = "https://gitlab.gnome.org/GNOME/epiphany"
+LICENSE = "GPL-3.0-or-later"
+LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
+
+DEPENDS = " \
+          webkitgtk \
+          gcr \
+          gsettings-desktop-schemas \
+          nettle \
+          json-glib \
+          libadwaita \
+          libarchive \
+          libportal \
+          libsoup \
+          glib-2.0-native \
+          coreutils-native \
+          desktop-file-utils-native \
+          blueprint-compiler-native \
+          "
+
+inherit gnomebase gsettings features_check gettext mime-xdg gtk-icon-cache
+REQUIRED_DISTRO_FEATURES = "opengl"
+ANY_OF_DISTRO_FEATURES = "${GTK3DISTROFEATURES}"
+
+SRC_URI += "\
+           file://0002-help-meson.build-disable-the-use-of-yelp.patch \
+           file://migrator.patch \
+           file://distributor.patch \
+           "
+SRC_URI[archive.sha256sum] = "458222a8694cfc914e7a2d6de9879067001a8d65e00a907d96112059c67ad446"
+
+export GI_TYPELIB_PATH = "${STAGING_LIBDIR}/girepository-1.0/"
+
+# Developer mode enables debugging
+PACKAGECONFIG[developer-mode] = "-Ddeveloper_mode=true,-Ddeveloper_mode=false"
+
+FILES:${PN} += "${datadir}/dbus-1 ${datadir}/gnome-shell/search-providers ${datadir}/metainfo"
+RDEPENDS:${PN} = "iso-codes adwaita-icon-theme gsettings-desktop-schemas"
+
+# please see webkitgtk recipe for details
+COMPATIBLE_HOST:x86 = "null"

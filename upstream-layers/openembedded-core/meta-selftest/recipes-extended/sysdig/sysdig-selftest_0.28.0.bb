@@ -3,7 +3,7 @@ DESCRIPTION = "Sysdig is open source, system-level exploration: capture \
 system state and activity from a running Linux instance, then save, \
 filter and analyze."
 HOMEPAGE = "http://www.sysdig.org/"
-LICENSE = "Apache-2.0 & (MIT | GPL-2.0-only)"
+LICENSE = "Apache-2.0 AND (GPL-2.0-only OR MIT)"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f8fee3d59797546cffab04f3b88b2d44"
 
 inherit cmake pkgconfig

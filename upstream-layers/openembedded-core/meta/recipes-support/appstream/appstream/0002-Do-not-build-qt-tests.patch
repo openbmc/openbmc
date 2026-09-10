@@ -1,4 +1,4 @@
-From 1a1619dce3c3fa54fa5f47f7ed89447e0805de43 Mon Sep 17 00:00:00 2001
+From 0d387b6cb8907dd377212de187fbe749b40eedb4 Mon Sep 17 00:00:00 2001
 From: Marc Ferland <marc.ferland@sonatest.com>
 Date: Fri, 26 Jul 2024 15:41:00 -0400
 Subject: [PATCH] Do not build qt/tests
@@ -23,10 +23,10 @@ Signed-off-by: Marc Ferland <marc.ferland@sonatest.com>
  1 file changed, 2 deletions(-)
 
 diff --git a/qt/meson.build b/qt/meson.build
-index 407a57a..840c838 100644
+index 488fe60..83c2715 100644
 --- a/qt/meson.build
 +++ b/qt/meson.build
-@@ -130,5 +130,3 @@ install_data (
+@@ -144,5 +144,3 @@ install_data (
      join_paths(meson.current_build_dir(), 'AppStreamQtConfigVersion.cmake'),
      install_dir: join_paths(get_option('libdir'), 'cmake', 'AppStreamQt')
  )

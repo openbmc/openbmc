@@ -20,16 +20,16 @@ export VERBOSE
 export PSPLASH_FIFO_DIR
 
 startup_progress() {
-    step=$(($step + $step_change))
-    if [ "$num_steps" != "0" ]; then
-        progress=$((($step * $progress_size / $num_steps) + $first_step))
-    else
-        progress=$progress_size
-    fi
-    #echo "PROGRESS is $progress $runlevel $first_step + ($step of $num_steps) $step_change $progress_size"
-    if type psplash-write >/dev/null 2>&1; then
-        psplash-write "PROGRESS $progress" || true
-    fi
+	step=$(($step + $step_change))
+	if [ "$num_steps" != "0" ]; then
+		progress=$((($step * $progress_size / $num_steps) + $first_step))
+	else
+		progress=$progress_size
+	fi
+	#echo "PROGRESS is $progress $runlevel $first_step + ($step of $num_steps) $step_change $progress_size"
+	if type psplash-write >/dev/null 2>&1; then
+		psplash-write "PROGRESS $progress" || true
+	fi
 }
 
 
@@ -37,57 +37,57 @@ startup_progress() {
 # Start script or program.
 #
 startup() {
-  # Handle verbosity
-  [ "$VERBOSE" = very ] && echo "INIT: Running $@..."
+	# Handle verbosity
+	[ "$VERBOSE" = very ] && echo "INIT: Running $@..."
 
-  case "$1" in
-	*.sh)
-		# Source shell script for speed.
-		(
-			trap - INT QUIT TSTP
-			scriptname=$1
-			shift
-			. $scriptname
-		)
-		;;
-	*)
-		"$@"
-		;;
-  esac
-  startup_progress
+	case "$1" in
+		*.sh)
+			# Source shell script for speed.
+			(
+				trap - INT QUIT TSTP
+				scriptname=$1
+				shift
+				. $scriptname
+			)
+			;;
+		*)
+			"$@"
+			;;
+	esac
+	startup_progress
 }
 
-  # Ignore CTRL-C only in this shell, so we can interrupt subprocesses.
-  trap ":" INT QUIT TSTP
+# Ignore CTRL-C only in this shell, so we can interrupt subprocesses.
+trap ":" INT QUIT TSTP
 
-  # Set onlcr to avoid staircase effect.
-  stty onlcr 0>&1
+# Set onlcr to avoid staircase effect.
+stty onlcr 0>&1
 
-  # Limit stack size for startup scripts
-  [ "$STACK_SIZE" = "" ] || ulimit -S -s $STACK_SIZE
+# Limit stack size for startup scripts
+[ "$STACK_SIZE" = "" ] || ulimit -S -s $STACK_SIZE
 
-  # Now find out what the current and what the previous runlevel are.
+# Now find out what the current and what the previous runlevel are.
 
-  runlevel=$RUNLEVEL
-  # Get first argument. Set new runlevel to this argument.
-  [ "$1" != "" ] && runlevel=$1
-  if [ "$runlevel" = "" ]
-  then
+runlevel=$RUNLEVEL
+# Get first argument. Set new runlevel to this argument.
+[ "$1" != "" ] && runlevel=$1
+if [ "$runlevel" = "" ]
+then
 	echo "Usage: $0 <runlevel>" >&2
 	exit 1
-  fi
-  previous=$PREVLEVEL
-  [ "$previous" = "" ] && previous=N
+fi
+previous=$PREVLEVEL
+[ "$previous" = "" ] && previous=N
 
-  export runlevel previous
+export runlevel previous
 
-  # Is there an rc directory for this new runlevel?
-  if [ -d /etc/rc$runlevel.d ]
-  then
+# Is there an rc directory for this new runlevel?
+if [ -d /etc/rc$runlevel.d ]
+then
 	# Find out where in the progress bar the initramfs got to.
 	PROGRESS_STATE=0
 	#if [ -f /dev/.initramfs/progress_state ]; then
-	#    . /dev/.initramfs/progress_state
+	#	. /dev/.initramfs/progress_state
 	#fi
 
 	# Split the remaining portion of the progress bar into thirds
@@ -100,7 +100,7 @@ startup() {
 			progress_size=100
 			step_change=1
 			;;
-	        S)
+		S)
 			# Begin where the initramfs left off and use 2/3
 			# of the remaining space
 			first_step=$PROGRESS_STATE
@@ -117,14 +117,14 @@ startup() {
 
 	num_steps=0
 	for s in /etc/rc$runlevel.d/[SK]*; do
-            case "${s##/etc/rc$runlevel.d/S??}" in
-                gdm|xdm|kdm|reboot|halt)
-                    break
-                    ;;
-            esac
-            num_steps=$(($num_steps + 1))
-        done
-        step=0
+		case "${s##/etc/rc$runlevel.d/S??}" in
+			gdm|xdm|kdm|reboot|halt)
+				break
+				;;
+		esac
+		num_steps=$(($num_steps + 1))
+	done
+	step=0
 
 	# First, run the KILL scripts.
 	if [ $previous != N ]
@@ -172,11 +172,11 @@ startup() {
 				;;
 		esac
 	done
-  fi
+fi
 
 #Uncomment to cause psplash to exit manually, otherwise it exits when it sees a VC switch
 if [ "x$runlevel" != "xS" ] && [ ! -x /etc/rc${runlevel}.d/S??xserver-nodm ]; then
-    if type psplash-write >/dev/null 2>&1; then
-        psplash-write "QUIT" || true
-    fi
+	if type psplash-write >/dev/null 2>&1; then
+		psplash-write "QUIT" || true
+	fi
 fi

@@ -12,6 +12,7 @@ LIBV = "16"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}${LIBV}/${BP}.tar.xz \
            file://run-ptest \
+           file://0001-tests-stream-per-test-results-to-stdout.patch \
 "
 
 SRC_URI[sha256sum] = "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
@@ -33,13 +34,13 @@ PACKAGES =+ "${PN}-tools"
 
 FILES:${PN}-tools = "${bindir}/png-fix-itxt ${bindir}/pngfix ${bindir}/pngcp"
 
-RDEPENDS:${PN}-ptest += "make bash gawk"
+RDEPENDS:${PN}-ptest += "make bash gawk coreutils"
 
 do_install_ptest() {
     # Install test scripts to ptest path
     install -d ${D}${PTEST_PATH}/src/tests
     install -m 755 ${S}/tests/* ${D}${PTEST_PATH}/src/tests
-    install -m 755 ${S}/test-driver ${D}${PTEST_PATH}
+    install -m 755 ${S}/test-driver-tee ${D}${PTEST_PATH}
     install -d ${D}${PTEST_PATH}/src/tests/scripts
     install -m 755 ${S}/scripts/*.awk ${D}${PTEST_PATH}/src/tests/scripts
     install -m 644 ${S}/scripts/pnglib* ${S}/scripts/*.c ${S}/scripts/*.def ${S}/scripts/macro.lst ${D}${PTEST_PATH}/src/tests/scripts
@@ -72,3 +73,4 @@ do_install_ptest() {
 BBCLASSEXTEND = "native nativesdk"
 
 CVE_STATUS[CVE-2026-34757] = "fixed-version: fixed since 1.6.57"
+CVE_STATUS[CVE-2026-40930] = "cpe-incorrect: Yocto never included affected libpng-apng patch"

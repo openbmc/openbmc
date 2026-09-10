@@ -1,4 +1,4 @@
-From cbfb155a4a5682d350aac6a1b8ff924ccfde7604 Mon Sep 17 00:00:00 2001
+From a7e4c23c7f6faf76307ecad5f879e47b96ca66c9 Mon Sep 17 00:00:00 2001
 From: Alberto Garcia <berto@igalia.com>
 Date: Fri, 19 Dec 2025 10:10:41 +0000
 Subject: [PATCH] Use WTF_CPU_UNKNOWN when building for riscv64

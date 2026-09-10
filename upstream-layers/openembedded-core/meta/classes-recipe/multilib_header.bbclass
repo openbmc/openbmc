@@ -24,9 +24,9 @@ oe_multilib_header() {
         case ${TARGET_ARCH} in
         mips*)  case "${MIPSPKGSFX_ABI}" in
                 "-n32")
-                       ident=n32   
+                       ident=n32
                        ;;
-                *)     
+                *)
                        ident=${SITEINFO_BITS}
                        ;;
                 esac

@@ -9,6 +9,8 @@ inherit pypi python_setuptools_build_meta
 
 BBCLASSEXTEND = "native nativesdk"
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN}:class-target += "\
     python3-netclient \
 "

@@ -1,0 +1,47 @@
+From d6010680c68655b782c2e07bd0d38562c1ad0ccb Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Tue, 21 Jul 2026 09:28:12 +0000
+Subject: [PATCH] Add configure checks for perl 5.44.0 new symbols
+
+Add detection for d_getentropy, i_stdckdint, and i_sysrandom which
+are new config symbols required by perl 5.44.0.
+
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/178]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ cnf/configure_func.sh | 1 +
+ cnf/configure_hdrs.sh | 2 ++
+ 2 files changed, 3 insertions(+)
+
+diff --git a/cnf/configure_func.sh b/cnf/configure_func.sh
+index 20f9cdf..4cbee2f 100644
+--- a/cnf/configure_func.sh
++++ b/cnf/configure_func.sh
+@@ -104,6 +104,7 @@ checkfunc d_getaddrinfo 'getaddrinfo' "NULL,NULL,NULL,NULL" 'sys/types.h sys/soc
+ checkfunc d_get_current_dir_name 'get_current_dir_name' "" 'unistd.h'
+ checkfunc d_getcwd 'getcwd' 'NULL,0' 'unistd.h'
+ checkfunc d_getespwnam 'getespwnam'
++checkfunc d_getentropy 'getentropy' 'NULL,0' 'unistd.h'
+ checkfunc d_getfsstat 'getfsstat' "NULL,0,0" 'sys/types.h sys/mount.h'
+ checkfunc d_getgrent 'getgrent' "" 'sys/types.h grp.h'
+ checkfunc d_getgrps 'getgroups' "0,NULL" 'unistd.h'
+diff --git a/cnf/configure_hdrs.sh b/cnf/configure_hdrs.sh
+index 249f5bc..b2d9d88 100644
+--- a/cnf/configure_hdrs.sh
++++ b/cnf/configure_hdrs.sh
+@@ -64,6 +64,7 @@ checkhdr i_socks 'socks.h'
+ # i_stdarg below
+ checkhdr i_stdbool 'stdbool.h'
+ checkhdr i_stddef 'stddef.h'
++checkhdr i_stdckdint 'stdckdint.h'
+ checkhdr i_stdint 'stdint.h'
+ checkhdr i_stdlib 'stdlib.h'
+ checkhdr i_string 'string.h'
+@@ -88,6 +89,7 @@ checkhdr i_syssockio 'sys/sockio.h'
+ checkhdr i_sysstat 'sys/stat.h'
+ checkhdr i_sysstatfs 'sys/statfs.h'
+ checkhdr i_sysstatvfs 'sys/statvfs.h'
++checkhdr i_sysrandom 'sys/random.h'
+ checkhdr i_systime 'sys/time.h'
+ define i_systimek 'undef' # not a plain header check
+ checkhdr i_systimes 'sys/times.h'

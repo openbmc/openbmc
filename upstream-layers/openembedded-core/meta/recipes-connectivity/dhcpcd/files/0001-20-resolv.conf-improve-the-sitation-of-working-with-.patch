@@ -1,4 +1,4 @@
-From c91f9cdc0ef56fa64f6ffdd811cc5b0e41991b2e Mon Sep 17 00:00:00 2001
+From 5f9b3c4aa7965cf9edf7d6adc8626f50462ad979 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Wed, 9 Nov 2022 16:33:18 +0800
 Subject: [PATCH] 20-resolv.conf: improve the sitation of working with systemd
@@ -27,10 +27,10 @@ Signed-off-by: Chen Qi <Qi.Chen@windriver.com>
  1 file changed, 13 insertions(+), 4 deletions(-)
 
 diff --git a/hooks/20-resolv.conf b/hooks/20-resolv.conf
-index bd0b0df5..9c7721de 100644
+index 6aae9cc1..0fbcc9e8 100644
 --- a/hooks/20-resolv.conf
 +++ b/hooks/20-resolv.conf
-@@ -11,8 +11,12 @@ nocarrier_roaming_dir="$state_dir/roaming"
+@@ -14,8 +14,12 @@ nocarrier_roaming_dir="$state_dir/roaming"
  NL="
  "
  : ${resolvconf:=resolvconf}
@@ -43,9 +43,9 @@ index bd0b0df5..9c7721de 100644
  else
  	have_resolvconf=false
  fi
-@@ -69,8 +73,13 @@ build_resolv_conf()
+@@ -72,8 +76,13 @@ build_resolv_conf()
  	else
- 		echo "# /etc/resolv.conf.tail can replace this line" >> "$cf"
+ 		printf '%s\n' "# /etc/resolv.conf.tail can replace this line" >> "$cf"
  	fi
 -	if change_file /etc/resolv.conf "$cf"; then
 -		chmod 644 /etc/resolv.conf
@@ -59,7 +59,7 @@ index bd0b0df5..9c7721de 100644
  	fi
  	rm -f "$cf"
  }
-@@ -179,7 +188,7 @@ add_resolv_conf()
+@@ -182,7 +191,7 @@ add_resolv_conf()
  	for x in ${new_domain_name_servers}; do
  		conf="${conf}nameserver $x$NL"
  	done
@@ -68,7 +68,7 @@ index bd0b0df5..9c7721de 100644
  		[ -n "$ifmetric" ] && export IF_METRIC="$ifmetric"
  		printf %s "$conf" | "$resolvconf" -a "$ifname"
  		return $?
-@@ -195,7 +204,7 @@ add_resolv_conf()
+@@ -198,7 +207,7 @@ add_resolv_conf()
  
  remove_resolv_conf()
  {

@@ -103,6 +103,8 @@ def map_host_os_to_system_name(host_os):
         return 'Windows'
     if host_os.startswith('linux'):
         return 'Linux'
+    if host_os == 'eabi':
+        return 'Generic'
     return host_os
 
 # CMake expects target architectures in the format of uname(2),

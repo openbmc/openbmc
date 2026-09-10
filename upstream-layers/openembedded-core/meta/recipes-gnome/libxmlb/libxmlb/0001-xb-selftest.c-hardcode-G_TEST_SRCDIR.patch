@@ -1,4 +1,4 @@
-From da7a7acacde7771ce4c0fd3ae7e55d0c151ee063 Mon Sep 17 00:00:00 2001
+From d4aa8d857e1b18dff8bc23cc810c56b4dba3aa95 Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Sat, 16 Sep 2023 14:02:57 +0200
 Subject: [PATCH] xb-self-test.c: hardcode G_TEST_SRCDIR

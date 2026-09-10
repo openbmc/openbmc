@@ -11,20 +11,22 @@ Test Result Status Summary (Counts/Percentages sorted by testseries, ID)
 {{ 'Total'.ljust(maxlen['testseries']) }} | {{ reporttotalvalues['count'].ljust(maxlen['result_id']) }} | {{ reporttotalvalues['passed'].ljust(maxlen['passed']) }} | {{ reporttotalvalues['failed'].ljust(maxlen['failed']) }} | {{ reporttotalvalues['skipped'].ljust(maxlen['skipped']) }}
 --------------------------------------------------------------------------------------------------------------
 
+{% for libc in libcs %}
 {% for machine in machines %}
-{% if ptests[machine] %}
+{% if ptests[libc][machine] %}
 ==============================================================================================================
-{{ machine }} PTest Result Summary
+{{ machine }} PTest Result Summary (Libc: {{ libc }})
 ==============================================================================================================
 --------------------------------------------------------------------------------------------------------------
 {{ 'Recipe'.ljust(maxlen['ptest']) }} | {{ 'Passed'.ljust(maxlen['passed']) }} | {{ 'Failed'.ljust(maxlen['failed']) }} | {{ 'Skipped'.ljust(maxlen['skipped']) }} | {{ 'Time(s)'.ljust(10) }}
 --------------------------------------------------------------------------------------------------------------
-{% for ptest in ptests[machine] |sort %}
-{{ ptest.ljust(maxlen['ptest']) }} | {{ (ptests[machine][ptest]['passed']|string).ljust(maxlen['passed']) }} | {{ (ptests[machine][ptest]['failed']|string).ljust(maxlen['failed']) }} | {{ (ptests[machine][ptest]['skipped']|string).ljust(maxlen['skipped']) }} | {{ (ptests[machine][ptest]['duration']|string) }}
+{% for ptest in ptests[libc][machine] |sort %}
+{{ ptest.ljust(maxlen['ptest']) }} | {{ (ptests[libc][machine][ptest]['passed']|string).ljust(maxlen['passed']) }} | {{ (ptests[libc][machine][ptest]['failed']|string).ljust(maxlen['failed']) }} | {{ (ptests[libc][machine][ptest]['skipped']|string).ljust(maxlen['skipped']) }} | {{ (ptests[libc][machine][ptest]['duration']|string) }}
 {% endfor %}
 --------------------------------------------------------------------------------------------------------------
 
 {% endif %}
+{% endfor %}
 {% endfor %}
 
 {% for machine in machines %}

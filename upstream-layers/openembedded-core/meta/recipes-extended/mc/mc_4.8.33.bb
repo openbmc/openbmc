@@ -37,7 +37,7 @@ CACHED_CONFIGUREVARS += "mc_cv_have_zipinfo=yes"
 
 do_install:append () {
 	sed -i -e '1s,#!.*perl,#!${bindir}/env perl,' ${D}${libexecdir}/mc/extfs.d/*
-        
+
         rm ${D}${libexecdir}/mc/extfs.d/s3+ ${D}${libexecdir}/mc/extfs.d/uc1541
 }
 
@@ -47,8 +47,8 @@ SUMMARY:${BPN}-helpers-perl = "Midnight Commander Perl-based helper scripts"
 FILES:${BPN}-helpers-perl = "${libexecdir}/mc/extfs.d/a+ ${libexecdir}/mc/extfs.d/apt+ \
                              ${libexecdir}/mc/extfs.d/deb ${libexecdir}/mc/extfs.d/deba \
                              ${libexecdir}/mc/extfs.d/debd ${libexecdir}/mc/extfs.d/dpkg+ \
-                             ${libexecdir}/mc/extfs.d/mailfs ${libexecdir}/mc/extfs.d/patchfs \ 
-                             ${libexecdir}/mc/extfs.d/rpms+ ${libexecdir}/mc/extfs.d/ulib \ 
+                             ${libexecdir}/mc/extfs.d/mailfs ${libexecdir}/mc/extfs.d/patchfs \
+                             ${libexecdir}/mc/extfs.d/rpms+ ${libexecdir}/mc/extfs.d/ulib \
                              ${libexecdir}/mc/extfs.d/uzip"
 RDEPENDS:${BPN}-helpers-perl = "perl"
 

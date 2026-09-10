@@ -1,4 +1,4 @@
-From 217c3a07c7db694324b5c61eaaa07774735e2d7d Mon Sep 17 00:00:00 2001
+From 936de20fdc8475d3627986ff5525198332cf2b0a Mon Sep 17 00:00:00 2001
 From: Denis Ovsienko <denis@ovsienko.info>
 Date: Thu, 9 Oct 2025 20:51:45 +0100
 Subject: [PATCH] Fix error messages about 32-bit integer overflow.
@@ -40,7 +40,7 @@ Signed-off-by: Adarsh Jagadish Kamini <adarsh.jagadish.kamini@est.tech>
  2 files changed, 32 insertions(+), 10 deletions(-)
 
 diff --git a/pcap-filter.manmisc.in b/pcap-filter.manmisc.in
-index bfb692ff..929d668d 100644
+index 2444ff7..3c8a190 100644
 --- a/pcap-filter.manmisc.in
 +++ b/pcap-filter.manmisc.in
 @@ -18,7 +18,7 @@
@@ -52,7 +52,7 @@ index bfb692ff..929d668d 100644
  .SH NAME
  pcap-filter \- packet filter syntax
  .br
-@@ -886,6 +886,13 @@ integer constants (expressed in standard C syntax), the normal binary operators
+@@ -885,6 +885,13 @@ integer constants (expressed in standard C syntax), the normal binary operators
  a length operator, and special packet data
  accessors.  Note that all comparisons are unsigned, so that, for example,
  0x80000000 and 0xffffffff are > 0.
@@ -67,7 +67,7 @@ index bfb692ff..929d668d 100644
  The
  .B %
 diff --git a/scanner.l b/scanner.l
-index 57779497..49aaeab2 100644
+index 405d331..bd708c9 100644
 --- a/scanner.l
 +++ b/scanner.l
 @@ -48,8 +48,8 @@ typedef enum {
@@ -153,6 +153,3 @@ index 57779497..49aaeab2 100644
  				return STOULEN_ERROR;
  			}
  			n = (n * 10) + digit;
--- 
-2.34.1
-

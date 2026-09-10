@@ -6,7 +6,6 @@
 
 # fitImage kernel compression algorithm
 FIT_KERNEL_COMP_ALG ?= "gzip"
-FIT_KERNEL_COMP_ALG_EXTENSION ?= ".gz"
 
 # Kernel image type passed to mkimage (i.e. kernel kernel_noload...)
 UBOOT_MKIMAGE_KERNEL_TYPE ?= "kernel"
@@ -22,13 +21,11 @@ uboot_prep_kimage() {
 	linux_bin=$output_dir/linux.bin
 	if [ -e "arch/${ARCH}/boot/compressed/vmlinux" ]; then
 		vmlinux_path="arch/${ARCH}/boot/compressed/vmlinux"
-		linux_suffix=""
 		linux_comp="none"
 	elif [ -e "arch/${ARCH}/boot/vmlinuz.bin" ]; then
 		rm -f "$linux_bin"
 		cp -l "arch/${ARCH}/boot/vmlinuz.bin" "$linux_bin"
 		vmlinux_path=""
-		linux_suffix=""
 		linux_comp="none"
 	else
 		vmlinux_path="vmlinux"
@@ -38,21 +35,22 @@ uboot_prep_kimage() {
 		if [ "${INITRAMFS_IMAGE_BUNDLE}" = "1" ] && [ -e vmlinux.initramfs ]; then
 			vmlinux_path="vmlinux.initramfs"
 		fi
-		linux_suffix="${FIT_KERNEL_COMP_ALG_EXTENSION}"
 		linux_comp="${FIT_KERNEL_COMP_ALG}"
 	fi
 
 	[ -n "$vmlinux_path" ] && ${KERNEL_OBJCOPY} -O binary -R .note -R .comment -S "$vmlinux_path" "$linux_bin"
 
-	if [ "$linux_comp" != "none" ] ; then
-		if [ "$linux_comp" = "gzip" ] ; then
-			gzip -9 "$linux_bin"
-		elif [ "$linux_comp" = "lzo" ] ; then
-			lzop -9 "$linux_bin"
-		elif [ "$linux_comp" = "lzma" ] ; then
-			xz --format=lzma -f -6 "$linux_bin"
-		fi
-		mv -f "$linux_bin$linux_suffix" "$linux_bin"
+	if [ "$linux_comp" = "gzip" ] ; then
+		gzip -9 "$linux_bin"
+		mv -f "$linux_bin.gz" "$linux_bin"
+	elif [ "$linux_comp" = "lzo" ] ; then
+		lzop -9 "$linux_bin"
+		mv -f "$linux_bin.lzo" "$linux_bin"
+	elif [ "$linux_comp" = "lzma" ] ; then
+		xz --format=lzma -f -6 "$linux_bin"
+		mv -f "$linux_bin.lzma" "$linux_bin"
+	elif [ "$linux_comp" != "none" ] ; then
+		bbfatal "Unsupported FIT_KERNEL_COMP_ALG '$linux_comp'"
 	fi
 
 	printf "$linux_comp" > "$output_dir/linux_comp"

@@ -1,0 +1,223 @@
+From 0d6fcb99d691d920961938e61c43478566ef626e Mon Sep 17 00:00:00 2001
+From: Collin Funk <collin.funk1@gmail.com>
+Date: Mon, 18 May 2026 20:40:28 -0700
+Subject: [PATCH] tee: fix infinite loop when write returns EAGAIN and short
+ write errors
+
+* NEWS: Mention the bug fixes.
+* THANKS.in: Add Bernhard M. Wiedemann for reporting the bugs.
+* src/iopoll.c (close_wait): Remove function.
+(write_wait): Don't call wait_for_nonblocking_write if write is
+successful. Handle errors more robustly.
+* src/iopoll.h (close_wait): Remove declaration.
+* src/tee.c (tee_files): Use close instead of close_wait.
+* tests/tee/short-write.sh: New test for the bug.
+* tests/tee/write-eagain.sh: Likewise.
+* tests/local.mk (all_tests): Add the new tests.
+Fixes https://bugs.gnu.org/81060
+
+Upstream-Status: Backport [https://github.com/coreutils/coreutils/commit/0d6fcb99d691d920961938e61c43478566ef626e.patch]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+---
+ NEWS                      |  7 +++++
+ THANKS.in                 |  1 +
+ src/iopoll.c              | 59 ++++++++++++++++++++++++---------------
+ src/iopoll.h              |  1 -
+ src/tee.c                 |  2 +-
+ tests/local.mk            |  2 ++
+ tests/tee/short-write.sh  | 33 ++++++++++++++++++++++
+ tests/tee/write-eagain.sh | 31 ++++++++++++++++++++
+ 8 files changed, 111 insertions(+), 25 deletions(-)
+ create mode 100755 tests/tee/short-write.sh
+ create mode 100755 tests/tee/write-eagain.sh
+
+Index: coreutils-9.11/src/iopoll.c
+===================================================================
+--- coreutils-9.11.orig/src/iopoll.c
++++ coreutils-9.11/src/iopoll.c
+@@ -194,17 +194,6 @@ wait_for_nonblocking_write (int fd)
+   return true;
+ }
+ 
+-/* wrapper for close() that also waits for FD if non blocking.  */
+-
+-extern bool
+-close_wait (int fd)
+-{
+-  while (wait_for_nonblocking_write (fd))
+-    ;
+-  return close (fd) == 0;
+-}
+-
+-
+ /* wrapper for write() that also waits for FD if non blocking.  */
+ 
+ extern bool
+@@ -212,19 +201,43 @@ write_wait (int fd, void const *buffer,
+ {
+   unsigned char const *buf = buffer;
+ 
+-  while (true)
++  do
+     {
+-      ssize_t written = write (fd, buf, size);
+-      if (written < 0)
+-        written = 0;
+-
+-      size -= written;
+-      if (size <= 0)  /* everything written */
+-        return true;
+-
+-      if (! wait_for_nonblocking_write (fd))
+-        return false;
++      const ssize_t written = write (fd, buf, size);
++      /* POSIX says that calling write with SIZE of zero may detect and
++         return errors.  If no error occurs, or write makes no attempt
++         to detect errors, then write returns zero with no other
++         results.  write_fail will return successfully in this case.  */
++      if (written == 0)
++        {
++          if (size == 0)
++            return true;
++          else
++            {
++              /* If SIZE is greater than zero and write returns zero,
++                 treat it as an error.  Some buggy drivers behave this
++                 way.  See src/dd.c and Gnulib's lib/full-write.c for
++                 more details.  */
++              errno = ENOSPC;
++              return false;
++            }
++        }
+ 
+-      buf += written;
++      if (written < 0)
++        {
++          /* Return an error if write detected one with a SIZE of zero.
++             Otherwise, if SIZE is greater than zero, fail if it does
++             not become writable.  */
++          if (size == 0 || ! wait_for_nonblocking_write (fd))
++            return false;
++        }
++      else
++        {
++          buf += written;
++          size -= written;
++        }
+     }
++  while (0 < size);
++
++  return true;
+ }
+Index: coreutils-9.11/src/iopoll.h
+===================================================================
+--- coreutils-9.11.orig/src/iopoll.h
++++ coreutils-9.11/src/iopoll.h
+@@ -5,5 +5,4 @@ int iopoll (int fdin, int fdout, bool bl
+ bool iopoll_input_ok (int fdin);
+ bool iopoll_output_ok (int fdout);
+ 
+-bool close_wait (int fd);
+ bool write_wait (int fd, void const *buffer, size_t size);
+Index: coreutils-9.11/src/tee.c
+===================================================================
+--- coreutils-9.11.orig/src/tee.c
++++ coreutils-9.11/src/tee.c
+@@ -329,7 +329,7 @@ tee_files (int nfiles, char **files, boo
+ 
+   /* Close the files, but not standard output.  */
+   for (int i = 1; i <= nfiles; i++)
+-    if (0 <= descriptors[i] && ! close_wait (descriptors[i]))
++    if (0 <= descriptors[i] && close (descriptors[i]) < 0)
+       {
+         error (0, errno, "%s", quotef (files[i]));
+         ok = false;
+Index: coreutils-9.11/tests/local.mk
+===================================================================
+--- coreutils-9.11.orig/tests/local.mk
++++ coreutils-9.11/tests/local.mk
+@@ -485,7 +485,9 @@ all_tests =					\
+   tests/tac/tac-2-nonseekable.sh		\
+   tests/tail/tail.pl				\
+   tests/tee/append.sh				\
++  tests/tee/short-write.sh			\
+   tests/tee/tee.sh				\
++  tests/tee/write-eagain.sh			\
+   tests/test/test-N.sh				\
+   tests/test/test-diag.pl			\
+   tests/test/test-file.sh			\
+Index: coreutils-9.11/tests/tee/short-write.sh
+===================================================================
+--- /dev/null
++++ coreutils-9.11/tests/tee/short-write.sh
+@@ -0,0 +1,33 @@
++#!/bin/sh
++# Test 'tee' when a write is short.
++
++# Copyright (C) 2026 Free Software Foundation, Inc.
++
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++. "${srcdir=.}/tests/init.sh"; path_prepend_ ./src
++print_ver_ tee
++require_strace_ write
++
++printf 'abcdef' >file1-exp || framework_failure_
++printf 'f' >out-exp || framework_failure_
++
++# In coreutils-9.11, a short write would be treated as an error.
++strace -qqq -o /dev/null --trace-fds=1 -e trace=write \
++  -e inject=write:retval=1:when=1..5 tee file1 >out 2>err <file1-exp || fail=1
++compare file1-exp file1 || fail=1
++compare out-exp out || fail=1
++compare /dev/null err || fail=1
++
++Exit $fail
+Index: coreutils-9.11/tests/tee/write-eagain.sh
+===================================================================
+--- /dev/null
++++ coreutils-9.11/tests/tee/write-eagain.sh
+@@ -0,0 +1,31 @@
++#!/bin/sh
++# Test 'tee' when a write fails with errno set to EAGAIN.
++
++# Copyright (C) 2026 Free Software Foundation, Inc.
++
++# This program is free software: you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation, either version 3 of the License, or
++# (at your option) any later version.
++
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <https://www.gnu.org/licenses/>.
++
++. "${srcdir=.}/tests/init.sh"; path_prepend_ ./src
++print_ver_ tee
++require_strace_ write
++
++# In coreutils-9.11 the following test would infinite loop.
++echo a >exp || framework_failure_
++timeout 10 strace -qqq -o /dev/null -e trace-fds=3 \
++  -e inject=write:error=EAGAIN:when=1 tee file1 <exp >out 2>err || fail=1
++compare exp file1 || fail=1
++compare exp out || fail=1
++compare /dev/null err || fail=1
++
++Exit $fail

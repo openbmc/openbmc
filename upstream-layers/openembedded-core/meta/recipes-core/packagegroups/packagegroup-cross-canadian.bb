@@ -11,13 +11,13 @@ GCC = "gcc-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 GDB = "gdb-cross-canadian-${TRANSLATED_TARGET_ARCH}"
 
 RDEPENDS:${PN} = "\
-    ${@all_multilib_tune_values(d, 'BINUTILS')} \
-    ${@all_multilib_tune_values(d, 'GCC')} \
-    ${@all_multilib_tune_values(d, 'GDB')} \
+    ${@oe.utils.all_multilib_tune_values(d, 'BINUTILS')} \
+    ${@oe.utils.all_multilib_tune_values(d, 'GCC')} \
+    ${@oe.utils.all_multilib_tune_values(d, 'GDB')} \
     meta-environment-${MACHINE} \
     "
 
-# When TUNE_ARCH changes but MACHINE does not (for example when a machine definition is updated), 
+# When TUNE_ARCH changes but MACHINE does not (for example when a machine definition is updated),
 # cross-canadian.bbclass prevents variable dependency propagation to TRANSLATED_TARGET_ARCH
 # This will result in erroneous reuse of previous sstate packages. The following line
 # establishes a direct dependency instead.

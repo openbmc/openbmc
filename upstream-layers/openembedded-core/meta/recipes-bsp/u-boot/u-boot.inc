@@ -6,12 +6,12 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 DEPENDS += "${@bb.utils.contains('UBOOT_ENV_SUFFIX', 'scr', 'u-boot-mkimage-native', '', d)}"
 DEPENDS += "${@ 'u-boot-mkenvimage-native' if bb.utils.to_boolean(d.getVar('UBOOT_INITIAL_ENV_BINARY')) else ''}"
 
-inherit uboot-config uboot-extlinux-config uboot-sign deploy python3native kernel-arch
+inherit uboot-config uboot-extlinux-config uboot-sign deploy python3native
 
 DEPENDS += "swig-native"
 
 EXTRA_OEMAKE = 'CROSS_COMPILE=${TARGET_PREFIX} V=1'
-EXTRA_OEMAKE += 'CC="${TARGET_PREFIX}gcc ${TOOLCHAIN_OPTIONS} ${DEBUG_PREFIX_MAP}"'
+EXTRA_OEMAKE += 'CC="${TARGET_PREFIX}${@bb.utils.contains('TOOLCHAIN', 'clang', 'clang', 'gcc', d)} ${TOOLCHAIN_OPTIONS} ${DEBUG_PREFIX_MAP}"'
 EXTRA_OEMAKE += 'HOSTCC="${BUILD_CC} ${BUILD_CFLAGS} ${BUILD_LDFLAGS}"'
 EXTRA_OEMAKE += 'STAGING_INCDIR=${STAGING_INCDIR_NATIVE} STAGING_LIBDIR=${STAGING_LIBDIR_NATIVE}'
 
@@ -20,8 +20,6 @@ PACKAGECONFIG ??= "openssl"
 # configurations (aka when CONFIG_FIT_SIGNATURE is enabled) openssl is needed as
 # a host build dependency.
 PACKAGECONFIG[openssl] = ",,openssl-native"
-
-CVE_PRODUCT = "denx:u-boot"
 
 # Allow setting an additional version string that will be picked up by the
 # u-boot build system and appended to the u-boot version.  If the .scmversion
@@ -34,6 +32,11 @@ UBOOT_INITIAL_ENV ?= "${PN}-initial-env"
 
 require u-boot-configure.inc
 
+UBOOT_ARCH = "${@oe.kernel.map_uboot_arch(d)}"
+# UBOOT_ARCH_DIR is the directory which contains the UBOOT_ARCH, i.e. the options are
+# the directories listed by "ls arch/" in the u-boot source. It is broken for platforms which
+# use dts/upstream.
+# arm contains arm and arm64.
 UBOOT_ARCH_DIR = "${@'arm' if d.getVar('UBOOT_ARCH').startswith('arm') else d.getVar('UBOOT_ARCH')}"
 do_compile () {
     unset LDFLAGS

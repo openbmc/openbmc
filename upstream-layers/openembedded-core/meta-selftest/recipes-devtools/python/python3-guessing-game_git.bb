@@ -3,7 +3,7 @@ DESCRIPTION = "Wrap a version of the guessing game from The Rust Book \
 to run in Python using pyo3."
 HOMEPAGE = "https://www.maturin.rs/tutorial"
 SECTION = "devel/python"
-LICENSE = "MIT & Apache-2.0"
+LICENSE = "Apache-2.0 AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE-APACHE;md5=1836efb2eb779966696f473ee8540542 \
                     file://LICENSE-MIT;md5=85fd3b67069cff784d98ebfc7d5c0797"
 

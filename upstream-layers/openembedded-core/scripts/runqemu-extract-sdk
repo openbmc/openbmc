@@ -1,102 +1,30 @@
-#!/bin/bash
-#
-# This utility extracts an SDK image tarball using pseudo, and stores
-# the pseudo database in var/pseudo within the rootfs. If you want to
-# boot QEMU using an nfsroot, you *must* use this script to create the
-# rootfs to ensure it is done correctly with pseudo.
-#
-# Copyright (c) 2010 Intel Corp.
+#!/usr/bin/env python3
 #
 # SPDX-License-Identifier: GPL-2.0-only
-#
 
-function usage() {
-	echo "Usage: $0 <image-tarball> <extract-dir>"
-}
+import os
+import sys
 
-if [ $# -ne 2 ]; then
-	usage
-	exit 1
-fi
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib'))
 
-SYSROOT_SETUP_SCRIPT=`which oe-find-native-sysroot 2> /dev/null`
-if [ -z "$SYSROOT_SETUP_SCRIPT" ]; then
-	echo "Error: Unable to find the oe-find-native-sysroot script"
-	echo "Did you forget to source your build system environment setup script?"
-	exit 1
-fi
-. $SYSROOT_SETUP_SCRIPT qemu-helper-native
-PSEUDO_OPTS="-P $OECORE_NATIVE_SYSROOT/usr"
+from pseudo_rootfs_utils import PseudoRootfsError, extract_sdk_rootfs, pseudo_native_environment
 
-ROOTFS_TARBALL=$1
-SDK_ROOTFS_DIR=$2
 
-if [ ! -e "$ROOTFS_TARBALL" ]; then
-	echo "Error: sdk tarball '$ROOTFS_TARBALL' does not exist"
-	usage
-	exit 1
-fi
+def main():
+    argv = sys.argv[1:]
+    if len(argv) != 2:
+        print('Usage: %s <image-tarball> <extract-dir>' % sys.argv[0])
+        return 1
+    try:
+        environment = pseudo_native_environment()
+        pseudo_cmd = [environment['PSEUDO'], '-P',
+                      os.path.join(environment['OECORE_NATIVE_SYSROOT'], 'usr')]
+        extract_sdk_rootfs(*argv, pseudo_cmd, environment)
+    except PseudoRootfsError as exc:
+        print('Error: %s' % exc)
+        return 1
+    return 0
 
-# Convert SDK_ROOTFS_DIR to a full pathname
-if [[ ${SDK_ROOTFS_DIR:0:1} != "/" ]]; then
-	SDK_ROOTFS_DIR=$(readlink -f $(pwd)/$SDK_ROOTFS_DIR)
-fi
 
-TAR_OPTS=""
-if [[ "$ROOTFS_TARBALL" =~ tar\.xz$ ]]; then
-	TAR_OPTS="--numeric-owner -xJf"
-fi
-if [[ "$ROOTFS_TARBALL" =~ tar\.bz2$ ]]; then
-	TAR_OPTS="--numeric-owner -xjf"
-fi
-if [[ "$ROOTFS_TARBALL" =~ tar\.gz$ ]]; then
-	TAR_OPTS="--numeric-owner -xzf"
-fi
-if [[ "$ROOTFS_TARBALL" =~ tar\.zst$ ]]; then
-	TAR_OPTS="--numeric-owner --zstd -xf"
-fi
-if [[ "$ROOTFS_TARBALL" =~ \.tar$ ]]; then
-	TAR_OPTS="--numeric-owner -xf"
-fi
-if [ -z "$TAR_OPTS" ]; then
-	echo "Error: Unable to determine sdk tarball format"
-	echo "Accepted types: .tar / .tar.gz / .tar.bz2 / .tar.xz / tar.zst"
-	exit 1
-fi
-
-if [ ! -d "$SDK_ROOTFS_DIR" ]; then
-	echo "Creating directory $SDK_ROOTFS_DIR"
-	mkdir -p "$SDK_ROOTFS_DIR"
-fi
-
-pseudo_state_dir="$SDK_ROOTFS_DIR/../$(basename "$SDK_ROOTFS_DIR").pseudo_state"
-pseudo_state_dir="$(readlink -f $pseudo_state_dir)"
-
-debug_image="`echo $ROOTFS_TARBALL | grep '\-dbg\.rootfs\.tar'`"
-
-if [ -e "$pseudo_state_dir" -a -z "$debug_image" ]; then
-	echo "Error: $pseudo_state_dir already exists!"
-	echo "Please delete the rootfs tree and pseudo directory manually"
-	echo "if this is really what you want."
-	exit 1
-fi
-
-mkdir -p "$pseudo_state_dir"
-touch "$pseudo_state_dir/pseudo.pid"
-PSEUDO_LOCALSTATEDIR="$pseudo_state_dir"
-export PSEUDO_LOCALSTATEDIR
-
-echo "Extracting rootfs tarball using pseudo..."
-echo "$PSEUDO $PSEUDO_OPTS tar -C \"$SDK_ROOTFS_DIR\" $TAR_OPTS \"$ROOTFS_TARBALL\""
-$PSEUDO $PSEUDO_OPTS tar -C "$SDK_ROOTFS_DIR" $TAR_OPTS "$ROOTFS_TARBALL"
-
-DIRCHECK=`ls -l "$SDK_ROOTFS_DIR" | wc -l`
-if [ "$DIRCHECK" -lt 5 ]; then
-	echo "Warning: I don't see many files in $SDK_ROOTFS_DIR"
-	echo "Please double-check the extraction worked as intended"
-	exit 0
-fi
-
-echo "SDK image successfully extracted to $SDK_ROOTFS_DIR"
-
-exit 0
+if __name__ == "__main__":
+    sys.exit(main())

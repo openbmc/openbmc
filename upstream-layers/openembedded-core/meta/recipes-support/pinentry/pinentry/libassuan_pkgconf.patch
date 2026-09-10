@@ -1,5 +1,5 @@
 From 1bf04756b90832494020c39661ea944a0b11204f Mon Sep 17 00:00:00 2001
-From: Armin Kuster <akuster@mvista.com>
+From: Siddharth Doshi <sdoshi@mvista.com>
 Date: Thu, 22 May 2014 10:50:00 +0100
 Subject: [PATCH] libassuan: Improve pkgconfig support
 
@@ -9,6 +9,7 @@ the libassuan recipe for libassuan.pc generation.
 Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Armin Kuster <akuster@mvista.com>
+Signed-off-by: Siddharth Doshi <sdoshi@mvista.com>
 ---
  configure.ac    |  4 +--
  m4/libassuan.m4 | 94 ++++---------------------------------------------
@@ -51,7 +52,7 @@ index a2eb5d9..897f407 100644
 -  fi
 -
 -  use_gpgrt_config=""
--  if test x"$GPGRT_CONFIG" != x -a "$GPGRT_CONFIG" != "no"; then
+-  if test x"$GPGRT_CONFIG" != x && test "$GPGRT_CONFIG" != "no"; then
 -    if $GPGRT_CONFIG libassuan --exists; then
 -      LIBASSUAN_CONFIG="$GPGRT_CONFIG libassuan"
 -      AC_MSG_NOTICE([Use gpgrt-config as libassuan-config])

@@ -71,8 +71,7 @@ if test "$rpcbind" = yes
 then
 	if test -x /usr/sbin/rpcbind
 	then
-		service rpcbind status > /dev/null
-		if [ $? != 0 ]; then
+		if ! start-stop-daemon --stop --test --quiet --exec /usr/sbin/rpcbind; then
 			echo -n "Starting rpcbind..."
 			start-stop-daemon --start --quiet --exec /usr/sbin/rpcbind
 			sleep 2

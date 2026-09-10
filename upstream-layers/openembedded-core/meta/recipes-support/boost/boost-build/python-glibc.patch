@@ -1,0 +1,19 @@
+Calling ldd on the host glibc to make decisions about the target isn't cross compile
+safe, don't do it. We always have a new enough tagret glibc so we can skip this test.
+
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Upstream-Status: Inappropriate [Upstream would need a proper fix rather than a workaround]
+
+Index: boost-build-1.92.0/src/tools/python.jam
+===================================================================
+--- boost-build-1.92.0.orig/src/tools/python.jam
++++ boost-build-1.92.0/src/tools/python.jam
+@@ -624,6 +624,7 @@ local rule candidate-interpreters ( vers
+ local rule gcc-use-libutil ( )
+ {
+     local glibc ;
++    return ;
+     if [ feature.values <toolset> ] = gcc
+     {
+         debug-message Checking glibc (ldd) version... ;

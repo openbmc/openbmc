@@ -14,7 +14,6 @@ do_update_modules[network] = "1"
 
 python do_update_modules() {
     import subprocess, tempfile, json, re, urllib.parse
-    from oe.license import tidy_licenses
     from oe.license_finder import find_licenses_up
 
     def unescape_path(path):
@@ -75,24 +74,28 @@ python do_update_modules() {
             mod_dir = pkg['Module']['Dir']
             path = os.path.relpath(mod_dir, mod_cache_dir)
 
-            for name, file, md5 in find_licenses_up(pkg_dir, mod_dir, d, first_only=True, extra_hashes=extra_hashes):
-                lic_files[os.path.join(path, file)] = (name, md5)
+            for node, file, md5 in find_licenses_up(pkg_dir, mod_dir, d, first_only=True, extra_hashes=extra_hashes):
+                lic_files[os.path.join(path, file)] = (node, md5)
 
-        licenses = set()
+        licenses = []
         lic_files_chksum = []
         for lic_file in lic_files:
-            license_name, license_md5 = lic_files[lic_file]
-            if license_name == "Unknown":
+            node, license_md5 = lic_files[lic_file]
+            if isinstance(node, oe.spdx_license.UnknownId):
                 bb.warn(f"Unknown license: {lic_file} {license_md5}")
 
-            licenses.add(lic_files[lic_file][0])
+            licenses.append(node)
             lic_files_chksum.append(
-                f'file://pkg/mod/{lic_file};md5={license_md5};spdx={urllib.parse.quote_plus(license_name)}')
+                f'file://pkg/mod/{lic_file};md5={license_md5};spdx={urllib.parse.quote_plus(node.to_string())}')
 
         licenses_filename = os.path.join(thisdir, f"{bpn}-licenses.inc")
         with open(licenses_filename, "w") as f:
             f.write(notice)
-            f.write(f'LICENSE += "& {" & ".join(tidy_licenses(licenses))}"\n\n')
+            f.write('LICENSE += "AND')
+            if licenses:
+                f.write(' ')
+                f.write(oe.spdx_license.AndOp.join(licenses).sort().to_string())
+            f.write('"\n\n')
             f.write('LIC_FILES_CHKSUM += "\\\n')
             for lic in sorted(lic_files_chksum, key=fold_uri):
                 f.write('    ' + lic + ' \\\n')

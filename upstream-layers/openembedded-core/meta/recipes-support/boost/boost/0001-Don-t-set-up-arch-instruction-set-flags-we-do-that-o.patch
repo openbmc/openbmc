@@ -1,4 +1,4 @@
-From 98fff479c074472833dcacb815115f247e9023c7 Mon Sep 17 00:00:00 2001
+From d43269dab039cefe841c7fe9804d0cb6b5bbc393 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Tue, 18 Dec 2018 15:42:57 +0100
 Subject: [PATCH] Don't set up arch/instruction-set flags, we do that
@@ -13,7 +13,7 @@ Signed-off-by: Alexander Kanavin <alex.kanavin@gmail.com>
  1 file changed, 153 deletions(-)
 
 diff --git a/tools/build/src/tools/gcc.jam b/tools/build/src/tools/gcc.jam
-index acf02ce26..becd0ad05 100644
+index 5359b018d..ac313ce0d 100644
 --- a/tools/build/src/tools/gcc.jam
 +++ b/tools/build/src/tools/gcc.jam
 @@ -1150,156 +1150,3 @@ local rule cpu-flags ( toolset variable : architecture : instruction-set + :

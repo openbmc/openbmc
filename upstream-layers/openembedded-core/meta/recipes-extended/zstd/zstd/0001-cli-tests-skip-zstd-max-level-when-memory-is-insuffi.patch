@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pratik Farkase <pratik.farkase@est.tech>
+Date: Thu, 27 Aug 2026 12:00:00 +0000
+Subject: [PATCH] cli-tests: skip zstd --max level when memory is insufficient
+
+The --max compression level on 64-bit systems allocates ~8.5GB, which
+exceeds what is available in memory-constrained test environments such
+as QEMU. Extend the existing 32-bit skip logic to also check available
+system memory, using the same fallback (copy level-19 output as max).
+
+Upstream-Status: Inappropriate [https://github.com/facebook/zstd/issues/4748]
+Signed-off-by: Pratik Farkase <pratik.farkase@est.tech>
+---
+ tests/cli-tests/compression/levels.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tests/cli-tests/compression/levels.sh b/tests/cli-tests/compression/levels.sh
+index b8230f2..7846d3e 100755
+--- a/tests/cli-tests/compression/levels.sh
++++ b/tests/cli-tests/compression/levels.sh
+@@ -16,8 +16,8 @@ zstd --fast=10 file -o file-f10.zst -q
+ zstd --fast=1 file -o file-f1.zst -q
+ zstd -1 file -o file-1.zst -q
+ zstd -19 file -o file-19.zst -q
+-if echo "$version_info" | grep -q '32-bit'; then
+-    # skip --max test: not enough address space
++if echo "$version_info" | grep -q '32-bit' || [ "$(awk '/MemTotal/{print $2}' /proc/meminfo)" -lt 10000000 ]; then
++    # skip --max test: not enough address space or memory (<10GB)
+     cp file-19.zst file-max.zst
+ else
+     zstd --max file -o file-max.zst -q

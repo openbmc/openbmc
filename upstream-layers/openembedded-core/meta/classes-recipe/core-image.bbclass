@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 # IMAGE_FEATURES control the content of the core reference images
-# 
+#
 # By default we install packagegroup-core-boot and packagegroup-base-extended packages;
 # this gives us a working (console only) rootfs.
 #

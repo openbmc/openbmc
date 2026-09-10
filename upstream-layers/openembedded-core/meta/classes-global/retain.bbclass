@@ -46,6 +46,8 @@
 #   is writing out the data that you wish to save.
 # * The tarballs have the tarball name as a top-level directory so that
 #   multiple tarballs can be extracted side-by-side easily.
+# * Some tasks shouldn't by themselves trigger retention (e.g. do_clean).
+#   For that we have RETAIN_IGNORE_TASKS.
 #
 # Copyright (c) 2020, 2024 Microsoft Corporation
 #
@@ -59,6 +61,7 @@ RETAIN_DIRS_GLOBAL_FAILURE ?= ""
 RETAIN_DIRS_GLOBAL_ALWAYS ?= ""
 RETAIN_TARBALL_SUFFIX ?= "${DATETIME}.tar.gz"
 RETAIN_ENABLED ?= "1"
+RETAIN_IGNORE_TASKS ?= "do_clean do_cleansstate do_cleanall do_listtasks do_addto_recipe_sysroot"
 
 
 def retain_retain_dir(desc, tarprefix, path, tarbasepath, d):
@@ -99,6 +102,10 @@ python retain_task_handler() {
     if d.getVar('RETAIN_ENABLED') != '1':
         return
 
+    taskname = d.getVar('BB_CURRENTTASK')
+    if 'do_' + taskname in d.getVar('RETAIN_IGNORE_TASKS').split():
+        return
+
     dirs = d.getVar('RETAIN_DIRS_ALWAYS')
     if isinstance(e, bb.build.TaskFailed):
         dirs += ' ' + d.getVar('RETAIN_DIRS_FAILURE')
@@ -109,7 +116,6 @@ python retain_task_handler() {
         bb.utils.mkdirhier(outdir)
         dirlist_file = os.path.join(outdir, 'retain_dirs.list')
         pn = d.getVar('PN')
-        taskname = d.getVar('BB_CURRENTTASK')
         with open(dirlist_file, 'a') as f:
             for entry in dirs:
                 f.write('%s %s %s\n' % (pn, taskname, entry))

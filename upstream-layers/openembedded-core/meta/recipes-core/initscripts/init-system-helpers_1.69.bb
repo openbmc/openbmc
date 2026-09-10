@@ -13,7 +13,7 @@ specific to systemd at all. Maintainers of other init systems are welcome to \
 include their helpers in this package."
 HOMEPAGE = "https://salsa.debian.org/debian/init-system-helpers"
 SECTION = "base"
-LICENSE = "BSD-3-Clause & GPL-2.0-only"
+LICENSE = "BSD-3-Clause AND GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=c4ec20aa158fa9de26ee1accf78dcaae"
 
 SRCREV = "592518fcedf96c9b763f214a9acbdc1109aaa385"

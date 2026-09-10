@@ -16,6 +16,10 @@
 #
 #  NPM_INSTALL_DEV:
 #       Set to 1 to also install devDependencies.
+#
+#  NPM_PACK_EXTRA_EXCLUDES:
+#       Space-separated list of paths to exclude from ${S} when
+#       creating the npm_pack tarball.
 
 inherit python3native
 
@@ -46,6 +50,20 @@ NPM_CACHE = "${WORKDIR}/npm-cache"
 NPM_BUILD = "${WORKDIR}/npm-build"
 NPM_REGISTRY = "${WORKDIR}/npm-registry"
 
+# Space-separated list of paths or glob patterns to exclude from the
+# npm_pack() tar archive of ${S}, in addition to './node_modules' which
+# is always excluded.
+#
+# Patterns are passed to tar --exclude.  A leading './' anchors the
+# pattern to the top of the source tree; without it the pattern matches
+# at any depth.
+#
+# NOTE: the excluded files do not reach the final package.  The tarball
+# is unpacked into NPM_PACKAGE and installed by 'npm install', so
+# anything dropped here is absent from ${D}.  Do not exclude files the
+# build or the runtime needs.
+NPM_PACK_EXTRA_EXCLUDES ?= ""
+
 def npm_global_configs(d):
     """Get the npm global configuration"""
     configs = []
@@ -61,7 +79,7 @@ def npm_global_configs(d):
 ## 'npm pack' runs 'prepare' and 'prepack' scripts. Support for
 ## 'ignore-scripts' which prevents this behavior has been removed
 ## from nodejs 16.  Use simple 'tar' instead of.
-def npm_pack(env, srcdir, workdir):
+def npm_pack(env, srcdir, workdir, excludes=None):
     """Emulate 'npm pack' on a specified directory"""
     import subprocess
     import os
@@ -81,13 +99,15 @@ def npm_pack(env, srcdir, workdir):
 
     # TODO: real 'npm pack' does not include directories while 'tar'
     # does.  But this does not seem to matter...
-    subprocess.run(['tar', 'czf', tarball,
-                    '--exclude', './node-modules',
-                    '--exclude-vcs',
-                    '--transform', r's,^\./,package/,',
-                    '--mtime', '1985-10-26T08:15:00.000Z',
-                    '.'],
-                   check = True, cwd = srcdir)
+    cmd = ['tar', 'czf', tarball, '--exclude', './node_modules']
+    for e in excludes or []:
+        cmd += ['--exclude', e]
+    cmd += ['--exclude-vcs',
+            '--transform', r's,^\./,package/,',
+            '--mtime', '1985-10-26T08:15:00.000Z',
+            '.']
+
+    subprocess.run(cmd, check = True, cwd = srcdir)
 
     return (tarball, j)
 
@@ -109,10 +129,10 @@ python npm_do_configure() {
     import shlex
     import stat
     import tempfile
-    from bb.fetch2.npm import NpmEnvironment
-    from bb.fetch2.npm import npm_unpack
-    from bb.fetch2.npm import npm_package
-    from bb.fetch2.npmsw import foreach_dependencies
+    from bb.fetch.npm import NpmEnvironment
+    from bb.fetch.npm import npm_unpack
+    from bb.fetch.npm import npm_package
+    from bb.fetch.npmsw import foreach_dependencies
     from bb.progress import OutOfProgressHandler
     from oe.npm_registry import NpmRegistry
 
@@ -206,23 +226,24 @@ python npm_do_configure() {
     if has_shrinkwrap_file:
         foreach_dependencies(orig_shrinkwrap, _count_dependency, dev)
         foreach_dependencies(orig_shrinkwrap, _cache_dependency, dev)
-    
+
     # Manage Peer Dependencies
     if has_shrinkwrap_file:
         packages = orig_shrinkwrap.get("packages", {})
         peer_deps = packages.get("", {}).get("peerDependencies", {})
         package_runtime_dependencies = d.getVar("RDEPENDS:%s" % d.getVar("PN"))
-        
+
         for peer_dep in peer_deps:
             peer_dep_yocto_name = npm_package(peer_dep)
             if peer_dep_yocto_name not in package_runtime_dependencies:
-                bb.warn(peer_dep + " is a peer dependencie that is not in RDEPENDS variable. " + 
+                bb.warn(peer_dep + " is a peer dependencie that is not in RDEPENDS variable. " +
                 "Please add this peer dependencie to the RDEPENDS variable as %s and generate its recipe with devtool"
                 % peer_dep_yocto_name)
 
     # Configure the main package
     with tempfile.TemporaryDirectory() as tmpdir:
-        (tarball, _) = npm_pack(env, d.getVar("S"), tmpdir)
+        excludes = (d.getVar("NPM_PACK_EXTRA_EXCLUDES") or "").split()
+        (tarball, _) = npm_pack(env, d.getVar("S"), tmpdir, excludes)
         npm_unpack(tarball, d.getVar("NPM_PACKAGE"), d)
 
     # Configure the cached manifest file and cached shrinkwrap file
@@ -263,7 +284,7 @@ python npm_do_compile() {
     """
     import shlex
     import tempfile
-    from bb.fetch2.npm import NpmEnvironment
+    from bb.fetch.npm import NpmEnvironment
 
     bb.utils.remove(d.getVar("NPM_BUILD"), recurse=True)
 

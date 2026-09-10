@@ -33,7 +33,7 @@ PACKAGES = ""
 DEPENDS += "depmodwrapper-cross cross-localedef-native"
 RDEPENDS += "${PACKAGE_INSTALL} ${LINGUAS_INSTALL} ${IMAGE_INSTALL_DEBUGFS}"
 RRECOMMENDS += "${PACKAGE_INSTALL_ATTEMPTONLY}"
-PATH:prepend = "${@":".join(all_multilib_tune_values(d, 'STAGING_BINDIR_CROSS').split())}:"
+PATH:prepend = "${@":".join(oe.utils.all_multilib_tune_values(d, 'STAGING_BINDIR_CROSS').split())}:"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -102,7 +102,7 @@ USE_DEPMOD ?= "1"
 PID = "${@os.getpid()}"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
-SSTATE_ARCHS_TUNEPKG = "${@all_multilib_tune_values(d, 'TUNE_PKGARCH')}"
+SSTATE_ARCHS_TUNEPKG = "${@oe.utils.all_multilib_tune_values(d, 'TUNE_PKGARCH')}"
 
 LDCONFIGDEPEND ?= "ldconfig-native:do_populate_sysroot"
 LDCONFIGDEPEND:libc-musl = ""

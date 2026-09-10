@@ -1,4 +1,4 @@
-From 894c92ca133c5f1532a4ae155ae8f4d2c6da3c9a Mon Sep 17 00:00:00 2001
+From cb0f8bf74b53130ceedb97af317840f76ddfce31 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 11 Dec 2025 19:55:46 +0100
 Subject: [PATCH] ffbuild/common.mak: ensure target directories are created
@@ -29,10 +29,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/ffbuild/common.mak b/ffbuild/common.mak
-index 06d6f39..52a9a20 100644
+index 059de5a..9ca7219 100644
 --- a/ffbuild/common.mak
 +++ b/ffbuild/common.mak
-@@ -126,8 +126,8 @@ $(BIN2CEXE): ffbuild/bin2c_host.o
+@@ -114,8 +114,8 @@ $(BIN2CEXE): ffbuild/bin2c_host.o
  	$(HOSTLD) $(HOSTLDFLAGS) $(HOSTLD_O) $^ $(HOSTEXTRALIBS)
  
  RUN_BIN2C = $(BIN2C) $(patsubst $(SRC_PATH)/%,$(SRC_LINK)/%,$<) $@ $(subst .,_,$(basename $(notdir $@)))

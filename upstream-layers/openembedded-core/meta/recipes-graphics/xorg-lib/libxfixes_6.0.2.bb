@@ -13,6 +13,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a5a9755c8921cc7dc08a5cfe4267d0ff"
 
 DEPENDS += "virtual/libx11 xorgproto"
 
+XORGBUILDCLASS = "meson"
+
 PE = "1"
 
 XORG_PN = "libXfixes"

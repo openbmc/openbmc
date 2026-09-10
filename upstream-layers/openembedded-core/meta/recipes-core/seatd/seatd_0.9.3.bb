@@ -6,7 +6,7 @@ LICENSE = "MIT"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=715a99d2dd552e6188e74d4ed2914d5a"
 
-SRC_URI = "git://git.sr.ht/~kennylevinsen/seatd;protocol=https;branch=master \
+SRC_URI = "git://git.sr.ht/~kennylevinsen/seatd;protocol=https;branch=master;tag=${PV} \
            file://init"
 SRCREV = "daa8196e10b180b8b0caeafa8e5f860eb1bd6706"
 

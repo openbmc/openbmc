@@ -19,6 +19,9 @@ EXTRA_OEMAKE = " \
   LD='${LD}' \
   "
 
+# scripts/Makefile.clang hardcodes a generic triple per ARCH
+EXTRA_OEMAKE:append:class-target = " CLANG_TARGET_FLAGS=${TARGET_SYS}"
+
 do_compile:class-target () {
     export userccflags="${HOST_CC_ARCH}${TOOLCHAIN_OPTIONS}"
     export userldflags="${TARGET_LDFLAGS}${TOOLCHAIN_OPTIONS}"

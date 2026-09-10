@@ -3,7 +3,7 @@ DESCRIPTION = "This package provides the compose data files for libx11."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT & BSD-1-Clause & HPND & HPND-sell-variant & ISC"
+LICENSE = "BSD-1-Clause AND HPND AND HPND-sell-variant AND ISC AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1d49cdd2b386c5db11ec636d680b7116"
 
 XORG_PN = "libX11"

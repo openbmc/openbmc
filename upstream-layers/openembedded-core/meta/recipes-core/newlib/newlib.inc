@@ -3,7 +3,7 @@ HOMEPAGE = "https://sourceware.org/newlib/"
 DESCRIPTION = "C library intended for use on embedded systems. It is a conglomeration of several library parts, all under free software licenses that make them easily usable on embedded products."
 SECTION = "libs"
 
-LICENSE = "GPL-2.0-only & LGPL-3.0-only & GPL-3.0-only & LGPL-2.0-only & BSD-2-Clause & BSD-3-Clause & TCL & Apache-2.0-with-LLVM-exception"
+LICENSE = "BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-only AND GPL-3.0-only AND LGPL-2.0-only AND LGPL-3.0-only AND TCL AND Apache-2.0 WITH LLVM-exception"
 LIC_FILES_CHKSUM = " \
 		file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
 		file://COPYING3.LIB;md5=6a6a8e020838b23406c81b19c1d46df6 \

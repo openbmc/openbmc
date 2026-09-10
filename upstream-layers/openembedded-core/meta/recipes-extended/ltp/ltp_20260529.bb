@@ -2,7 +2,7 @@ SUMMARY = "Linux Test Project"
 DESCRIPTION = "The Linux Test Project is a joint project with SGI, IBM, OSDL, and Bull with a goal to deliver test suites to the open source community that validate the reliability, robustness, and stability of Linux. The Linux Test Project is a collection of tools for testing the Linux kernel and related features."
 HOMEPAGE = "https://linux-test-project.github.io/"
 SECTION = "console/utils"
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later & LGPL-2.0-or-later & LGPL-2.1-or-later & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.0-or-later AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
     file://testcases/open_posix_testsuite/COPYING;md5=48b1c5ec633e3e30ec2cf884ae699947 \
@@ -26,7 +26,7 @@ CFLAGS:append:powerpc64 = " -D__SANE_USERSPACE_TYPES__"
 CFLAGS:append:mipsarchn64 = " -D__SANE_USERSPACE_TYPES__"
 SRCREV = "3a64d78f58bdceba93ed321e91215fb969a047ed"
 
-SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/linux-test-project/ltp.git;branch=master;protocol=https;tag=${PV} \
            file://0001-Remove-OOM-tests-from-runtest-mm.patch \
            file://0001-Add-__clear_cache-declaration-for-clang.patch \
            file://0001-syscalls-semctl08-Skip-semctl08-when-__USE_TIME64_RE.patch \

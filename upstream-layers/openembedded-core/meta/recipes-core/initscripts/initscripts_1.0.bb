@@ -41,12 +41,10 @@ S = "${UNPACKDIR}"
 KERNEL_VERSION = ""
 
 DEPENDS:append = " update-rc.d-native"
-PACKAGE_WRITE_DEPS:append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd-systemctl-native','',d)}"
 
 PACKAGES =+ "${PN}-functions ${PN}-sushell"
 RDEPENDS:${PN} = "initd-functions \
                   ${@bb.utils.contains('DISTRO_FEATURES','selinux','${PN}-sushell','',d)} \
-                  init-system-helpers-service \
 		 "
 # Recommend pn-functions so that it will be a preferred default provider for initd-functions
 RRECOMMENDS:${PN} = "${PN}-functions"
@@ -154,32 +152,7 @@ do_install () {
 	update-rc.d -r ${D} dmesg.sh start 38 S .
 }
 
-MASKED_SCRIPTS = " \
-  banner \
-  bootmisc \
-  checkfs \
-  checkroot \
-  devpts \
-  dmesg \
-  hostname \
-  mountall \
-  mountnfs \
-  populate-volatile \
-  read-only-rootfs-hook \
-  rmnologin \
-  sysfs \
-  urandom"
-
 pkg_postinst:${PN} () {
-	if type systemctl >/dev/null 2>/dev/null; then
-		if [ -n "$D" ]; then
-			OPTS="--root=$D"
-		fi
-		for SERVICE in ${MASKED_SCRIPTS}; do
-			systemctl $OPTS mask $SERVICE.service
-		done
-	fi
-
     # Delete any old volatile cache script, as directories may have moved
     if [ -z "$D" ]; then
         rm -f "/etc/volatile.cache"

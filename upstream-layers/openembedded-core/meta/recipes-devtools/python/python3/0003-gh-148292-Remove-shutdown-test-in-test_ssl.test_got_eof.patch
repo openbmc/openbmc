@@ -1,0 +1,41 @@
+From 81911909bc439d6de8ce6a173b0691b3c58e9e1a Mon Sep 17 00:00:00 2001
+From: Victor Stinner <vstinner@python.org>
+Date: Mon, 4 May 2026 16:20:25 +0200
+Subject: [PATCH] gh-148292: Remove shutdown() test in test_ssl.test_got_eof()
+ (#149366)
+
+The shutdown() behavior depends too much on the operating system and
+it's unrelated to the got_eof_error change.
+
+(cherry picked from commit 1e21cf6fee3830012e458c0fe5dbc6fcd45ace92)
+
+Upstream-Status: Backport [https://github.com/python/cpython/commit/81911909bc43]
+
+Note: This is from the unmerged CPython PR #149783 which backports
+OpenSSL 4.0 support to the 3.14 branch. Upstream deferred merging
+until after Python 3.15.1 is released.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ Lib/test/test_ssl.py | 8 --------
+ 1 file changed, 8 deletions(-)
+
+diff --git a/Lib/test/test_ssl.py b/Lib/test/test_ssl.py
+index 03d9e3f9e5e96b5..6445f122b4272be 100644
+--- a/Lib/test/test_ssl.py
++++ b/Lib/test/test_ssl.py
+@@ -4820,14 +4820,6 @@ def test_got_eof(self):
+                 sslsock.do_handshake()
+ 
+             self.assertEqual(sslsock.pending(), 0)
+-            try:
+-                sslsock.shutdown(socket.SHUT_WR)
+-            except OSError as exc:
+-                self.assertEqual(exc.errno, errno.ENOTCONN)
+-            else:
+-                # On Windows and on OpenSSL 1.1.1, shutdown() doesn't
+-                # raise an error
+-                pass
+ 
+ 
+ @unittest.skipUnless(has_tls_version('TLSv1_3') and ssl.HAS_PHA,

@@ -10,6 +10,7 @@ inherit kernel-arch
 # in sstate, so we must force do_compile to run (once).
 do_configure[depends] += "make-mod-scripts:do_compile"
 
+export ARCH = "${@oe.kernel.map_kernel_arch(d)}"
 export OS = "${TARGET_OS}"
 export CROSS_COMPILE = "${TARGET_PREFIX}"
 

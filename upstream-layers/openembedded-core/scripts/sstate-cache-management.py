@@ -202,9 +202,10 @@ def parse_arguments():
 
     parser.add_argument(
         "--cache-dir",
-        default=os.environ.get("SSTATE_CACHE_DIR"),
-        help="""Specify sstate cache directory, will use the environment
-            variable SSTATE_CACHE_DIR if it is not specified.""",
+        default=os.environ.get("SSTATE_CACHE_DIR") or os.environ.get("SSTATE_DIR"),
+        help="""Specify the sstate cache directory. Defaults to the value of the
+            SSTATE_CACHE_DIR environment variable, or SSTATE_DIR if SSTATE_CACHE_DIR
+            is not set.""",
     )
 
     # parser.add_argument(

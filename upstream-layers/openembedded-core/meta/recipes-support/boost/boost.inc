@@ -49,10 +49,12 @@ BOOST_LIBS = "\
 	"
 
 # optional libraries
-PACKAGECONFIG ??= "locale python"
-PACKAGECONFIG[locale] = ",,icu"
+PACKAGECONFIG ??= "locale python icu"
+PACKAGECONFIG[locale] = ",,"
+PACKAGECONFIG[icu] = "boost.locale.icu=on -sICU_PATH=${STAGING_EXECPREFIXDIR},boost.locale.icu=off --disable-icu,icu"
 PACKAGECONFIG[graph_parallel] = ",,,boost-mpi mpich"
 PACKAGECONFIG[mpi] = ",,mpich"
+PACKAGECONFIG[numpy] = ",,python3-numpy"
 PACKAGECONFIG[python] = ",,python3"
 
 inherit python3-dir
@@ -86,10 +88,12 @@ FILES:${PN}-serialization = "${libdir}/libboost_serialization*.so.* \
 	${libdir}/libboost_wserialization*.so.*"
 FILES:${PN}-test = "${libdir}/libboost_prg_exec_monitor*.so.* \
 	${libdir}/libboost_unit_test_framework*.so.*"
+FILES:${PN}-python = "${libdir}/libboost_python*.so.* \
+        ${libdir}/libboost_numpy*.so.*"
 
 # -dev last to pick up the remaining stuff
 PACKAGES += "${PN}-dev ${PN}-staticdev"
-FILES:${PN}-dev = "${includedir} ${libdir}/libboost_*.so ${libdir}/cmake"
+FILES:${PN}-dev = "${includedir} ${libdir}/libboost_*.so ${libdir}/cmake ${datadir}"
 FILES:${PN}-staticdev = "${libdir}/libboost_*.a"
 
 # "boost" is a metapackage which pulls in all boost librabries
@@ -148,9 +152,8 @@ BOOST_PARALLEL_MAKE = "${@oe.utils.parallel_make_argument(d, '-j%d')}"
 BJAM_OPTS    = '${BOOST_PARALLEL_MAKE} -d+2 -q \
 		${BJAM_TOOLS} \
 		-sBOOST_BUILD_USER_CONFIG=${WORKDIR}/user-config.jam \
-		-sICU_PATH=${STAGING_EXECPREFIXDIR} \
+		${PACKAGECONFIG_CONFARGS} \
 		--build-dir=${B} \
-		--disable-icu \
 		${BJAM_EXTRA}'
 
 # Native compilation of bzip2 isn't working
@@ -173,7 +176,11 @@ do_configure() {
 
 	# If we want Python then we need to tell Boost *exactly* where to find it
 	if ${@bb.utils.contains('BOOST_LIBS', 'python', 'true', 'false', d)}; then
-		echo "using python : ${PYTHON_BASEVERSION} : ${STAGING_DIR_HOST}${bindir}/python3 : ${STAGING_DIR_HOST}${includedir}/${PYTHON_DIR}${PYTHON_ABI} : ${STAGING_DIR_HOST}${libdir}/${PYTHON_DIR} ;" >> ${WORKDIR}/user-config.jam
+		if ${@bb.utils.contains('PACKAGECONFIG', 'numpy', 'true', 'false', d)}; then
+                        # Use the python-numpy-include feature patched in to boost-build-native
+			ENABLE_NUMPY="<python-numpy-include>${STAGING_LIBDIR}/${PYTHON_DIR}/site-packages/numpy/_core/include"
+		fi
+		echo "using python : ${PYTHON_BASEVERSION} : ${STAGING_DIR_NATIVE}${bindir}/python3-native/python3 : ${STAGING_DIR_HOST}${includedir}/${PYTHON_DIR}${PYTHON_ABI} : ${STAGING_DIR_HOST}${libdir}/${PYTHON_DIR} : ${ENABLE_NUMPY} ;" >> ${WORKDIR}/user-config.jam
 	fi
 
 	if ${@bb.utils.contains('BOOST_LIBS', 'mpi', 'true', 'false', d)}; then
@@ -200,6 +207,7 @@ do_compile() {
 do_install() {
 	cd ${S}
 	b2 ${BJAM_OPTS} \
+		--prefix=${D}${prefix} \
 		--libdir=${D}${libdir} \
 		--includedir=${D}${includedir} \
 		install

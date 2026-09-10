@@ -18,6 +18,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=90b90b60eb30f65fc9c2673d7cf59e24"
 DEPENDS += "virtual/libx11 libxrender freetype fontconfig"
 PROVIDES = "xft"
 
+XORGBUILDCLASS = "meson"
+
 PE = "1"
 
 SRC_URI[sha256sum] = "60a25b78945ed6932635b3bb1899a517d31df7456e69867ffba27f89ff3976f5"

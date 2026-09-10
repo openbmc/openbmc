@@ -45,5 +45,5 @@ do_install () {
 	cp ${S}/gettext-runtime/po/remove-potcdate.sed ${D}${datadir}/gettext/po/
 	# The gettext recipe also installs the same Makevars.template at the same place, rename it
 	# cp ${S}/gettext-tools/po/Makevars.template ${D}${datadir}/gettext/po/Makevars.template.minimal
-	cp ${S}/gettext-tools/wizard/po-templates/traditional/Makevars.template ${D}${datadir}/gettext/po/Makevars.template.minimal 
+	cp ${S}/gettext-tools/wizard/po-templates/traditional/Makevars.template ${D}${datadir}/gettext/po/Makevars.template.minimal
 }

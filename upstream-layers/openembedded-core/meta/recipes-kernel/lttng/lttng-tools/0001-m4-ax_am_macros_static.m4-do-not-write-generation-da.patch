@@ -1,4 +1,4 @@
-From c58eed85e47a605e2a9f2b2bc91917f68bec023f Mon Sep 17 00:00:00 2001
+From 2e7fab06b2ede001dead4129e19d0793b5c367a6 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Thu, 18 Jun 2026 16:48:40 +0200
 Subject: [PATCH] m4/ax_am_macros_static.m4: do not write generation date into

@@ -52,10 +52,12 @@ python perform_packagecopy:prepend () {
 perform_packagecopy[vardeps] += "LICENSE_CREATE_PACKAGE"
 
 def get_recipe_info(d):
+    import oe.license
+
     info = {}
     info["PV"] = d.getVar("PV")
     info["PR"] = d.getVar("PR")
-    info["LICENSE"] = d.getVar("LICENSE")
+    info["LICENSE"] = oe.license.convert_legacy_license_to_spdx(d, d.getVar("LICENSE"))
     return info
 
 def add_package_and_files(d):
@@ -116,6 +118,7 @@ def find_license_files(d):
     """
     import shutil
     import oe.license
+    import oe.spdx_license
     from collections import defaultdict, OrderedDict
 
     # All the license files for the package
@@ -128,85 +131,17 @@ def find_license_files(d):
     # List of basename, path tuples
     lic_files_paths = []
     # hash for keep track generic lics mappings
-    non_generic_lics = {}
+    non_generic_lics = set()
     # Entries from LIC_FILES_CHKSUM
     lic_chksums = {}
-    license_source_dirs = []
-    license_source_dirs.append(generic_directory)
-    try:
-        additional_lic_dirs = d.getVar('LICENSE_PATH').split()
-        for lic_dir in additional_lic_dirs:
-            license_source_dirs.append(lic_dir)
-    except:
-        pass
-
-    class FindVisitor(oe.license.LicenseVisitor):
-        def visit_Str(self, node):
-            #
-            # Until I figure out what to do with
-            # the two modifiers I support (or greater = +
-            # and "with exceptions" being *
-            # we'll just strip out the modifier and put
-            # the base license.
-            find_licenses(node.s.replace("+", "").replace("*", ""))
-            self.generic_visit(node)
-
-        def visit_Constant(self, node):
-            find_licenses(node.value.replace("+", "").replace("*", ""))
-            self.generic_visit(node)
-
-    def find_licenses(license_type):
-        try:
-            bb.utils.mkdirhier(gen_lic_dest)
-        except:
-            pass
-        spdx_generic = None
-        license_source = None
-        # If the generic does not exist we need to check to see if there is an SPDX mapping to it,
-        # unless NO_GENERIC_LICENSE is set.
-        for lic_dir in license_source_dirs:
-            if not os.path.isfile(os.path.join(lic_dir, license_type)):
-                if d.getVarFlag('SPDXLICENSEMAP', license_type) != None:
-                    # Great, there is an SPDXLICENSEMAP. We can copy!
-                    bb.debug(1, "We need to use a SPDXLICENSEMAP for %s" % (license_type))
-                    spdx_generic = d.getVarFlag('SPDXLICENSEMAP', license_type)
-                    license_source = lic_dir
-                    break
-            elif os.path.isfile(os.path.join(lic_dir, license_type)):
-                spdx_generic = license_type
-                license_source = lic_dir
-                break
-
-        non_generic_lic = d.getVarFlag('NO_GENERIC_LICENSE', license_type)
-        if spdx_generic and license_source:
-            # we really should copy to generic_ + spdx_generic, however, that ends up messing the manifest
-            # audit up. This should be fixed in emit_pkgdata (or, we actually got and fix all the recipes)
-
-            lic_files_paths.append(("generic_" + license_type, os.path.join(license_source, spdx_generic),
-                                    None, None))
-
-            # The user may attempt to use NO_GENERIC_LICENSE for a generic license which doesn't make sense
-            # and should not be allowed, warn the user in this case.
-            if d.getVarFlag('NO_GENERIC_LICENSE', license_type):
-                oe.qa.handle_error("license-no-generic",
-                    "%s: %s is a generic license, please don't use NO_GENERIC_LICENSE for it." % (pn, license_type), d)
-
-        elif non_generic_lic and non_generic_lic in lic_chksums:
-            # if NO_GENERIC_LICENSE is set, we copy the license files from the fetched source
-            # of the package rather than the license_source_dirs.
-            lic_files_paths.append(("generic_" + license_type,
-                                    os.path.join(srcdir, non_generic_lic), None, None))
-            non_generic_lics[non_generic_lic] = license_type
-        else:
-            # Explicitly avoid the CLOSED license because this isn't generic
-            if license_type != 'CLOSED':
-                # And here is where we warn people that their licenses are lousy
-                oe.qa.handle_error("license-exists",
-                    "%s: No generic license file exists for: %s in any provider" % (pn, license_type), d)
-            pass
 
     if not generic_directory:
         bb.fatal("COMMON_LICENSE_DIR is unset. Please set this in your distro config")
+
+    try:
+        bb.utils.mkdirhier(gen_lic_dest)
+    except:
+        pass
 
     for url in lic_files.split():
         try:
@@ -221,14 +156,28 @@ def find_license_files(d):
         endline = parm.get('endline')
         lic_chksums[path] = (chksum, beginline, endline)
 
-    v = FindVisitor()
+    def walk_license(node):
+        if isinstance(node, oe.spdx_license.Identifier):
+            p, non_generic_fn = oe.license.get_license_path(d, node)
+            if p is not None and (not non_generic_fn or non_generic_fn in lic_chksums):
+                lic_files_paths.append(("generic_" + node.ident, p, None, None))
+                if non_generic_fn:
+                    non_generic_lics.add(non_generic_fn)
+            else:
+                oe.qa.handle_error("license-exists",
+                    "%s: No generic license file exists for: %s in any provider" % (pn, node.ident), d)
+
+        for child in node.children:
+            walk_license(child)
+
     try:
-        v.visit_string(d.getVar('LICENSE'))
-    except oe.license.InvalidLicense as exc:
-        bb.fatal('%s: %s' % (d.getVar('PF'), exc))
-    except SyntaxError:
-        oe.qa.handle_error("license-syntax",
-            "%s: Failed to parse LICENSE: %s" % (d.getVar('PF'), d.getVar('LICENSE')), d)
+        licensestr = d.getVar("LICENSE")
+        if licensestr and licensestr != "CLOSED":
+            node = oe.license.parse_legacy_license(d, licensestr)
+            walk_license(node)
+    except oe.spdx_license.ParseError as e:
+        oe.qa.handle_error("license-syntax", e.format(prefix=f"{d.getVar('PF')}: "), d)
+
     # Add files from LIC_FILES_CHKSUM to list of license files
     lic_chksum_paths = defaultdict(OrderedDict)
     for path, data in sorted(lic_chksums.items()):

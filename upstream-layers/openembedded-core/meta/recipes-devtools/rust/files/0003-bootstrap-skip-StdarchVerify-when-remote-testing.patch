@@ -1,0 +1,30 @@
+From ca4541f4241f48f8344bc8b8dd7fcbb476ea6900 Mon Sep 17 00:00:00 2001
+From: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+Date: Wed, 26 Aug 2026 03:49:52 -0700
+Subject: [PATCH] bootstrap: skip StdarchVerify when remote testing is enabled
+
+When TEST_DEVICE_ADDR is set for cross-testing, the StdarchVerify step
+incorrectly attempts to run on the remote target. Since stdarch-verify
+is a host-only verification tool, skip it when remote testing is enabled.
+
+Upstream-Status: Backport [https://github.com/rust-lang/rust/commit/ca4541f4241f48f8344bc8b8dd7fcbb476ea6900]
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
+
+diff --git a/src/bootstrap/src/core/build_steps/test.rs b/src/bootstrap/src/core/build_steps/test.rs
+index a2d05f8..3753aec 100644
+--- a/src/bootstrap/src/core/build_steps/test.rs
++++ b/src/bootstrap/src/core/build_steps/test.rs
+@@ -962,7 +962,12 @@ impl Step for StdarchVerify {
+     }
+
+     fn make_run(run: RunConfig<'_>) {
+-        run.builder.ensure(StdarchVerify);
++        let builder = run.builder;
++        if builder.remote_tested(run.target) {
++            builder.info("remote testing is not supported by stdarch-verify. skipping");
++            return;
++        }
++        builder.ensure(StdarchVerify);
+     }
+
+     fn run(self, builder: &Builder<'_>) {

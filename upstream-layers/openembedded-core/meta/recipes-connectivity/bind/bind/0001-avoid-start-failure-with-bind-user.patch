@@ -1,4 +1,4 @@
-From e4886a825c82a7d6f4bd6badeeaeea700e429483 Mon Sep 17 00:00:00 2001
+From 7682cbc2fa624fbeeb088736e154090d92c8b524 Mon Sep 17 00:00:00 2001
 From: Chen Qi <Qi.Chen@windriver.com>
 Date: Mon, 15 Oct 2018 16:55:09 +0800
 Subject: [PATCH] avoid start failure with bind user

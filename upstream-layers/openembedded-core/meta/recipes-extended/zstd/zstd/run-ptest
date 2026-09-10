@@ -1,0 +1,21 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+
+cd "$(dirname "$0")/tests" || exit 1
+
+run_test() {
+    name=$1; shift
+    if "$@"; then echo "PASS: $name"; else echo "FAIL: $name"; fi
+}
+
+run_test fullbench ./fullbench -i1
+
+if [ -d cli-tests ] && command -v python3 >/dev/null 2>&1; then
+    # cli-tests needs to write to bin/symlinks and scratch dirs.
+    # Run as ptest user so permission-related tests work correctly.
+    chown -R ptest:ptest .
+    su ptest -s /bin/sh -c "./cli-tests/run.py --exec-prefix='' --zstd='$(command -v zstd)' --datagen=./datagen"
+    run_test cli-tests test $? -eq 0
+else
+    echo "SKIP: cli-tests"
+fi

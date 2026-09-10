@@ -18,6 +18,8 @@ DEPENDS += " xorgproto virtual/libx11 libxfixes libxext"
 PROVIDES = "xcomposite"
 BBCLASSEXTEND = "native nativesdk"
 
+XORGBUILDCLASS = "meson"
+
 PE = "1"
 
 XORG_PN = "libXcomposite"

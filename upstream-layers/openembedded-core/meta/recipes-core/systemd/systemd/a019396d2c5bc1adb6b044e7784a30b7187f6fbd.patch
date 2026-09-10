@@ -1,0 +1,59 @@
+From a019396d2c5bc1adb6b044e7784a30b7187f6fbd Mon Sep 17 00:00:00 2001
+From: Luca Boccassi <luca.boccassi@gmail.com>
+Date: Wed, 2 Sep 2026 20:32:51 +0100
+Subject: [PATCH] tools: fix building manpages with lxml 6.1.3
+
+manpages build fails on Arch with new lxml:
+
+Traceback (most recent call last):
+  File "/work/src/tools/make-directive-index.py", line 169, in make_page
+    _extract_directives(directive_groups, formatting, page)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/src/tools/make-directive-index.py", line 18, in _extract_directives
+    t = xml_parse(page)
+  File "/work/src/tools/xml_helper.py", line 25, in xml_parse
+    doc = tree.parse(page, _parser)
+  File "src/lxml/etree.pyx", line 3717, in lxml.etree.parse
+  File "src/lxml/parser.pxi", line 2045, in lxml.etree._parseDocument
+  File "src/lxml/parser.pxi", line 2071, in lxml.etree._parseDocumentFromURL
+  File "src/lxml/parser.pxi", line 1962, in lxml.etree._parseDocFromFile
+  File "src/lxml/parser.pxi", line 1231, in lxml.etree._BaseParser._parseDocFromFile
+  File "src/lxml/parser.pxi", line 647, in lxml.etree._ParserContext._handleParseResultDoc
+  File "src/lxml/parser.pxi", line 765, in lxml.etree._handleParseResult
+  File "src/lxml/parser.pxi", line 689, in lxml.etree._raiseParseError
+  File "../src/man/hostname.xml", line 5
+lxml.etree.XMLSyntaxError: Entity 'entities' not defined, line 5, column 11
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/work/src/tools/make-directive-index.py", line 180, in <module>
+    _xml = make_page(_template_path, _xml_files)
+  File "/work/src/tools/make-directive-index.py", line 171, in make_page
+    raise ValueError('failed to process ' + page) from e
+ValueError: failed to process ../src/man/hostname.xml
+
+Relying on XMLParser() defaults leaves the external parameter entity
+used to load custom-entities.ent unresolved. Request entity resolution explicitly.
+
+Follow-up for 1a13e31d275430ffba713c8a68ee7f22093c29e0
+
+Upstream-Status: Backport [https://github.com/systemd/systemd/commit/a019396d2c5bc1adb6b044e7784a30b7187f6fbd]
+
+---
+ tools/xml_helper.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/xml_helper.py b/tools/xml_helper.py
+index 87c24ab02a0f..e26ca92d9454 100755
+--- a/tools/xml_helper.py
++++ b/tools/xml_helper.py
+@@ -16,7 +16,7 @@ def resolve(self, url, _id, context):
+         return None
+ 
+ 
+-_parser = tree.XMLParser()
++_parser = tree.XMLParser(resolve_entities=True)
+ # pylint: disable=no-member
+ _parser.resolvers.add(CustomResolver())
+ 

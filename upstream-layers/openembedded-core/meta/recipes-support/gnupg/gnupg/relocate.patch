@@ -1,4 +1,4 @@
-From 8d7658741da050f604bcf26f8a6c24a0b15df94b Mon Sep 17 00:00:00 2001
+From f49d102adf393f57e6ca7b6ec6969f60115055ef Mon Sep 17 00:00:00 2001
 From: Ross Burton <ross.burton@intel.com>
 Date: Wed, 19 Sep 2018 14:44:40 +0100
 Subject: [PATCH] Allow the environment to override where gnupg looks for its
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/common/homedir.c b/common/homedir.c
-index d26ddd9..24224c0 100644
+index 7538642..92e8125 100644
 --- a/common/homedir.c
 +++ b/common/homedir.c
-@@ -1451,7 +1451,7 @@ gnupg_socketdir (void)
+@@ -1575,7 +1575,7 @@ gnupg_socketdir (void)
    if (!name)
      {
        unsigned int dummy;
@@ -25,7 +25,7 @@ index d26ddd9..24224c0 100644
        gpgrt_annotate_leaked_object (name);
      }
  
-@@ -1480,7 +1480,7 @@ gnupg_sysconfdir (void)
+@@ -1604,7 +1604,7 @@ gnupg_sysconfdir (void)
    if (dir)
      return dir;
    else
@@ -34,7 +34,7 @@ index d26ddd9..24224c0 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1516,7 +1516,7 @@ gnupg_bindir (void)
+@@ -1640,7 +1640,7 @@ gnupg_bindir (void)
        return name;
      }
    else
@@ -43,7 +43,7 @@ index d26ddd9..24224c0 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1543,7 +1543,7 @@ gnupg_libexecdir (void)
+@@ -1667,7 +1667,7 @@ gnupg_libexecdir (void)
        return name;
      }
    else
@@ -52,7 +52,7 @@ index d26ddd9..24224c0 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1573,7 +1573,7 @@ gnupg_libdir (void)
+@@ -1697,7 +1697,7 @@ gnupg_libdir (void)
        return name;
      }
    else
@@ -61,7 +61,7 @@ index d26ddd9..24224c0 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1604,7 +1604,7 @@ gnupg_datadir (void)
+@@ -1728,7 +1728,7 @@ gnupg_datadir (void)
        return name;
      }
    else
@@ -70,7 +70,7 @@ index d26ddd9..24224c0 100644
  #endif /*!HAVE_W32_SYSTEM*/
  }
  
-@@ -1636,7 +1636,7 @@ gnupg_localedir (void)
+@@ -1760,7 +1760,7 @@ gnupg_localedir (void)
        return name;
      }
    else

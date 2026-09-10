@@ -1,7 +1,7 @@
 SUMMARY = "Jansson is a C library for encoding, decoding and manipulating JSON data"
 HOMEPAGE = "http://www.digip.org/jansson/"
 BUGTRACKER = "https://github.com/akheron/jansson/issues"
-LICENSE = "MIT & dtoa"
+LICENSE = "MIT AND dtoa"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d9911525d4128bee234ee2d3ccaa2537"
 
 GITHUB_BASE_URI = "https://github.com/akheron/jansson/releases"

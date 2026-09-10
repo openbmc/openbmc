@@ -1,4 +1,4 @@
-From 8e56c9b414b60db1a14ea8ca664e2cff941ae14d Mon Sep 17 00:00:00 2001
+From 1f305930a0e0660bf489ff408d4dedbddc82be0f Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 17 Jun 2026 10:04:13 +0200
 Subject: [PATCH] tests: do not strip a helper library
@@ -22,6 +22,3 @@ index 131a4af..38ce076 100644
  	@if [ x"$(srcdir)" != x"$(builddir)" ]; then \
  		for script in $(TEST_DEPS); do \
  			if [ x"$$(dirname $$script)" != x"." ]; then \
--- 
-2.47.3
-

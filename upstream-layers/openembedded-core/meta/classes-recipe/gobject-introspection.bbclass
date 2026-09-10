@@ -57,8 +57,8 @@ do_compile:prepend() {
 
 # .typelib files are needed at runtime and so they go to the main package (so
 # they'll be together with libraries they support).
-FILES:${PN}:append = " ${libdir}/girepository-*/*.typelib" 
-    
+FILES:${PN}:append = " ${libdir}/girepository-*/*.typelib"
+
 # .gir files go to dev package, as they're needed for developing (but not for
 # running) things that depends on introspection.
 FILES:${PN}-dev:append = " ${datadir}/gir-*/*.gir ${libdir}/gir-*/*.gir"

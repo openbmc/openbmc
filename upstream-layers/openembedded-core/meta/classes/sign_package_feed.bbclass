@@ -28,7 +28,6 @@
 # GPG_PATH
 #           Optional variable for specifying the gnupg "home" directory:
 #
-inherit sanity
 
 PACKAGE_FEED_SIGN = '1'
 PACKAGE_FEED_GPG_BACKEND ?= 'local'
@@ -42,11 +41,11 @@ python () {
     # Check sanity of configuration
     for var in ('PACKAGE_FEED_GPG_NAME', 'PACKAGE_FEED_GPG_PASSPHRASE_FILE'):
         if not d.getVar(var):
-            raise_sanity_error("You need to define %s in the config" % var, d)
+            oe.sanity.raise_sanity_error("You need to define %s in the config" % var, d)
 
     sigtype = d.getVar("PACKAGE_FEED_GPG_SIGNATURE_TYPE")
     if sigtype.upper() != "ASC" and sigtype.upper() != "BIN":
-        raise_sanity_error("Bad value for PACKAGE_FEED_GPG_SIGNATURE_TYPE (%s), use either ASC or BIN" % sigtype)
+        oe.sanity.raise_sanity_error("Bad value for PACKAGE_FEED_GPG_SIGNATURE_TYPE (%s), use either ASC or BIN" % sigtype)
 }
 
 do_package_index[depends] += "signing-keys:do_deploy"

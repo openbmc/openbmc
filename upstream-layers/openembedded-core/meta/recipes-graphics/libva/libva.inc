@@ -18,8 +18,8 @@ LICENSE = "MIT"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=2e48940f94acb0af582e5ef03537800f"
 
-SRC_URI = "git://github.com/intel/libva.git;branch=v2.23-branch;protocol=https;tag=${PV}"
-SRCREV = "dbf83dc3b1ce6bad46e1628aaf2da5ef731157b8"
+SRC_URI = "git://github.com/intel/libva.git;branch=v2.24-branch;protocol=https;tag=${PV}"
+SRCREV = "710eb465c6277ee2cac3e6948767b01eebe7e77a"
 
 UPSTREAM_CHECK_GITTAGREGEX = "^(?P<pver>(\d+(\.\d+)+))$"
 

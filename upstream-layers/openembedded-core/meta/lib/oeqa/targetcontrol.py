@@ -24,6 +24,7 @@ class BaseTarget(object, metaclass=ABCMeta):
     def __init__(self, d, logger):
         self.connection = None
         self.ip = None
+        self.port = None
         self.server_ip = None
         self.datetime = d.getVar('DATETIME')
         self.testdir = d.getVar("TEST_LOG_DIR")
@@ -163,6 +164,8 @@ class QemuTarget(BaseTarget):
         super(QemuTarget, self).deploy()
 
     def start(self, params=None, ssh=True, extra_bootparams='', runqemuparams='', launch_cmd='', discard_writes=True):
+        if 'slirp' in runqemuparams.split():
+            self.runner.use_slirp = True
         if launch_cmd:
             start = self.runner.launch(get_ip=ssh, launch_cmd=launch_cmd, qemuparams=params)
         else:
@@ -171,8 +174,16 @@ class QemuTarget(BaseTarget):
         if start:
             if ssh:
                 self.ip = self.runner.ip
+                self.port = None
+                if self.runner.use_slirp:
+                    # In slirp mode the runner's ip is "host:port"
+                    ip_port = self.runner.ip.split(':')
+                    if len(ip_port) == 2:
+                        self.ip, self.port = ip_port
+                    else:
+                        self.logger.error("Could not get host machine port to connect qemu with slirp, ssh will not be able to connect to qemu with slirp")
                 self.server_ip = self.runner.server_ip
-                self.connection = SSHControl(ip=self.ip, logfile=self.sshlog)
+                self.connection = SSHControl(ip=self.ip, logfile=self.sshlog, port=self.port)
         else:
             self.stop()
             if os.path.exists(self.qemulog):
@@ -192,13 +203,21 @@ class QemuTarget(BaseTarget):
         self.loggerhandler.close()
         self.connection = None
         self.ip = None
+        self.port = None
         self.server_ip = None
 
     def restart(self, params=None):
         if self.runner.restart(params):
             self.ip = self.runner.ip
+            self.port = None
+            if self.runner.use_slirp:
+                ip_port = self.runner.ip.split(':')
+                if len(ip_port) == 2:
+                    self.ip, self.port = ip_port
+                else:
+                    self.logger.error("Could not get host machine port to connect qemu with slirp, ssh will not be able to connect to qemu with slirp")
             self.server_ip = self.runner.server_ip
-            self.connection = SSHControl(ip=self.ip, logfile=self.sshlog)
+            self.connection = SSHControl(ip=self.ip, logfile=self.sshlog, port=self.port)
         else:
             raise RuntimeError("%s - FAILED to re-start qemu - check the task log and the boot log" % self.pn)
 

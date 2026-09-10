@@ -3,7 +3,7 @@ DESCRIPTION = "Sudo (superuser do) allows a system administrator to give certain
 HOMEPAGE = "http://www.sudo.ws"
 BUGTRACKER = "http://www.sudo.ws/bugs/"
 SECTION = "admin"
-LICENSE = "ISC & BSD-3-Clause & BSD-2-Clause & Zlib"
+LICENSE = "BSD-2-Clause AND BSD-3-Clause AND ISC AND Zlib"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=2841c822e587db145364ca95e9be2ffa \
                     file://plugins/sudoers/redblack.c;beginline=1;endline=46;md5=03e35317699ba00b496251e0dfe9f109 \
                     file://lib/util/reallocarray.c;beginline=3;endline=15;md5=397dd45c7683e90b9f8bf24638cf03bf \
@@ -19,7 +19,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=2841c822e587db145364ca95e9be2ffa \
 
 inherit autotools
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'audit selinux', d)}"
 PACKAGECONFIG[zlib] = "--enable-zlib,--disable-zlib,zlib"
 PACKAGECONFIG[pam-wheel] = ",,,pam-plugin-wheel"
 PACKAGECONFIG[audit] = "--with-linux-audit,--without-linux-audit,audit"
@@ -48,3 +48,4 @@ do_install:prepend (){
 }
 
 CVE_VERSION_SUFFIX = "patch"
+OEQA_BUILDPATHS_SKIP = "/home/buildroot"

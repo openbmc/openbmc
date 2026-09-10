@@ -29,7 +29,7 @@ TUNEVALID[altivec] = "Altivec"
 TUNE_CCARGS .= "${@bb.utils.contains('TUNE_FEATURES', 'altivec', ' -maltivec', '', d)}"
 
 # Basic tune definitions
-AVAILTUNES += "powerpc powerpc-nf powerpcle powerpcle-nf" 
+AVAILTUNES += "powerpc powerpc-nf powerpcle powerpcle-nf"
 
 TUNE_FEATURES:tune-powerpc-nf = "m32 fpu-soft bigendian"
 BASE_LIB:tune-powerpc-nf = "lib"

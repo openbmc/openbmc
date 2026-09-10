@@ -31,7 +31,7 @@ require libgcc-common.inc
 
 DEPENDS = "virtual/cross-cc"
 
-LICENSE = "GPL-3.0-with-GCC-exception"
+LICENSE = "GPL-3.0-or-later WITH GCC-exception-3.1"
 
 PACKAGES = ""
 

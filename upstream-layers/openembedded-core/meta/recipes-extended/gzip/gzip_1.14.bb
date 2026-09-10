@@ -7,6 +7,7 @@ LICENSE = "GPL-3.0-or-later"
 SRC_URI = "${GNU_MIRROR}/gzip/${BP}.tar.gz \
            file://run-ptest \
            file://CVE-2026-41992.patch \
+           file://CVE-2026-41991.patch \
            "
 SRC_URI:append:class-target = " file://wrong-path-fix.patch"
 

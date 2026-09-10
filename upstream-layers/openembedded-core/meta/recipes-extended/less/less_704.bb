@@ -19,7 +19,7 @@ SECTION = "console/utils"
 # --Mark
 #
 
-LICENSE = "GPL-3.0-or-later | BSD-2-Clause"
+LICENSE = "BSD-2-Clause OR GPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
                     file://LICENSE;md5=bee5763a5e2bccdcdbd9bfe982ffc82b \
                     "

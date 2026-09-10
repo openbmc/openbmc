@@ -46,7 +46,7 @@ def emit_terminal_func(command, envdata, d):
 def oe_terminal(command, title, d):
     import oe.data
     import oe.terminal
-    
+
     envdata = bb.data.init()
 
     for v in os.environ:

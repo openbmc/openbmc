@@ -2,14 +2,14 @@ SUMMARY = "X.Org font package creation/installation utilities"
 
 require xorg-font-common.inc
 
-LICENSE = "Unicode-TOU & MIT & X11 & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND MIT AND Unicode-TOU AND X11"
 LIC_FILES_CHKSUM = "file://COPYING;md5=756e7412ee04c80f5833cd2f35242f7a \
                     file://ucs2any.c;endline=28;md5=8357dc567fc628bd12696f15b2a33bcb \
                     file://bdftruncate.c;endline=26;md5=4f82ffc101a1b165eae9c6998abff937 \
                     file://map-ISO8859-1;beginline=1;endline=4;md5=9c9c1d525d29c0e82b5c99edbb8e71c1 \
                     "
 
-DEPENDS = "encodings util-macros"
+DEPENDS = "encodings util-macros-native"
 DEPENDS:class-native = "util-macros-native"
 RDEPENDS:${PN} = "mkfontdir mkfontscale encodings"
 RDEPENDS:${PN}:class-native = ""

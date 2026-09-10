@@ -18,10 +18,10 @@ Cc: Zac Walker <zac.walker@linaro.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ld/configure.tgt b/ld/configure.tgt
-index 3e158913b89..be62b312a8e 100644
+index 60b62e69c08..60efa496910 100644
 --- a/ld/configure.tgt
 +++ b/ld/configure.tgt
-@@ -1008,7 +1008,7 @@ x86_64-*-cygwin)	targ_emul=i386pep ;
+@@ -992,7 +992,7 @@ x86_64-*-cygwin)	targ_emul=i386pep ;
  			;;
  x86_64-*-mingw*)	targ_emul=i386pep ;
  			targ_extra_emuls=i386pe
@@ -29,6 +29,6 @@ index 3e158913b89..be62b312a8e 100644
 +			targ_extra_ofiles="deffilep.o pdb.o pe-dll.o"
  			;;
  x86_64-*-gnu*)		targ_emul=elf_x86_64
-			targ_extra_emuls=elf_iamcu
---
+ 			targ_extra_libpath="elf_i386 elf32_x86_64"
+-- 
 2.49.0

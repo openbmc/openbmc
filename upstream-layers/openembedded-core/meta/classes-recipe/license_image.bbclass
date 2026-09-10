@@ -118,23 +118,26 @@ def write_license_files(d, license_manifest, pkg_dic, rootfs):
     pkgarchs.reverse()
     incompatible_packages = []
 
-    exceptions = (d.getVar("INCOMPATIBLE_LICENSE_EXCEPTIONS") or "").split()
+    allow_licenses = (d.getVar("INCOMPATIBLE_LICENSE_EXCEPTIONS") or "").split()
     with open(license_manifest, "w") as license_file:
         for pkg in sorted(pkg_dic):
-            remaining_bad_licenses = oe.license.apply_pkg_license_exception(pkg, bad_licenses, exceptions)
-            incompatible_licenses = oe.license.incompatible_pkg_license(d, remaining_bad_licenses, pkg_dic[pkg]["LICENSE"])
-            if incompatible_licenses:
-                incompatible_packages.append("%s (%s)" % (pkg, ' '.join(incompatible_licenses)))
-            else:
-                incompatible_licenses = oe.license.incompatible_pkg_license(d, bad_licenses, pkg_dic[pkg]["LICENSE"])
-                if incompatible_licenses:
-                    oe.qa.handle_error('license-exception', "Including %s with incompatible license(s) %s into the image, because it has been allowed by exception list." %(pkg, ' '.join(incompatible_licenses)), d)
             try:
-                (pkg_dic[pkg]["LICENSE"], pkg_dic[pkg]["LICENSES"]) = \
-                    oe.license.manifest_licenses(pkg_dic[pkg]["LICENSE"],
-                    remaining_bad_licenses, oe.license.canonical_license, d)
-            except oe.license.LicenseError as exc:
-                bb.fatal('%s: %s' % (d.getVar('P'), exc))
+                node = oe.license.parse_legacy_license(d, pkg_dic[pkg]["LICENSE"])
+            except oe.spdx_license.ParseError as exc:
+                bb.fatal(exc.format(prefix=d.getVar("P") + ": "))
+
+            pkg_allow_licenses = oe.license.filter_pkg_license_list(pkg, allow_licenses)
+
+            if node:
+                if incompatible_licenses := oe.license.license_allowed(node, bad_licenses, pkg_allow_licenses):
+                    incompatible_packages.append("%s (%s)" % (pkg, ' '.join(n.to_string() for n in incompatible_licenses)))
+                elif incompatible_licenses := oe.license.license_allowed(node, bad_licenses, []):
+                    oe.qa.handle_error('license-exception', "Including %s with incompatible license(s) %s into the image, because it has been allowed by exception list." %
+                                       (pkg, ' '.join(n.to_string() for n in incompatible_licenses)), d)
+
+            (pkg_dic[pkg]["LICENSE"], pkg_dic[pkg]["LICENSES"]) = \
+                oe.license.manifest_licenses(d, pkg_dic[pkg]["LICENSE"],
+                                             bad_licenses, pkg_allow_licenses)
 
             if not "IMAGE_MANIFEST" in pkg_dic[pkg]:
                 # Rootfs manifest

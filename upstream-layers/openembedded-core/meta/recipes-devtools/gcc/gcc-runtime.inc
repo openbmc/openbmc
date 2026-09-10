@@ -4,11 +4,11 @@ SUMMARY = "Runtime libraries from GCC"
 
 # Over-ride the LICENSE set by gcc-${PV}.inc to remove "& GPLv3"
 # All gcc-runtime packages are now covered by the runtime exception.
-LICENSE = "GPL-3.0-with-GCC-exception"
+LICENSE = "GPL-3.0-or-later WITH GCC-exception-3.1"
 
 CXXFLAGS:remove = "-fvisibility-inlines-hidden"
 CFLAGS:append = " -Wno-error=discarded-qualifiers"
- 
+
 EXTRA_OECONF_PATHS = "\
     --with-gxx-include-dir=${includedir}/c++/${BINV} \
     --with-sysroot=/not/exist \
@@ -18,7 +18,6 @@ EXTRA_OECONF_PATHS = "\
 TARGET_CC_ARCH += "-fno-link-libatomic"
 SDK_CC_ARCH += "-fno-link-libatomic"
 
-EXTRA_OECONF:append:linuxstdbase = " --enable-clocale=gnu"
 EXTRA_OECONF:append = " --cache-file=${B}/config.cache"
 EXTRA_OECONF:append:libc-newlib = " --with-newlib --with-target-subdir"
 EXTRA_OECONF:append:libc-picolibc = " --with-newlib --with-target-subdir"
@@ -103,7 +102,7 @@ do_install () {
 	install -d ${D}${datadir}/gdb/auto-load/${libdir}
 	mv ${D}${libdir}/libstdc++*-gdb.py ${D}${datadir}/gdb/auto-load/${libdir}
 	if [ -d ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include ]; then
-		install -d ${D}${libdir}/${TARGET_SYS}/${BINV}/include 
+		install -d ${D}${libdir}/${TARGET_SYS}/${BINV}/include
 		mv ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include/* ${D}${libdir}/${TARGET_SYS}/${BINV}/include
 		rmdir --ignore-fail-on-non-empty -p ${D}${libdir}/gcc/${TARGET_SYS}/${BINV}/include
 	fi
@@ -309,6 +308,7 @@ do_check[depends] += "virtual/libc:do_populate_sysroot"
 do_check[depends] += "${@'qemu-native:do_populate_sysroot' if "user" in d.getVar('TOOLCHAIN_TEST_TARGET') else ''}"
 # extend the recipe sysroot to include the built libraries (for qemu usermode)
 do_check[prefuncs] += "extend_recipe_sysroot"
+do_check[vardepsexclude] += "extend_recipe_sysroot"
 do_check[prefuncs] += "check_prepare"
 do_check[dirs] = "${WORKDIR}/dejagnu ${B}"
 do_check[nostamp] = "1"

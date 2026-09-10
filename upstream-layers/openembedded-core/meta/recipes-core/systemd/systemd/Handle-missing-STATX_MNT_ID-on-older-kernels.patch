@@ -1,0 +1,160 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Daniel Turull <daniel.turull@ericsson.com>
+Date: Mon, 23 Jun 2026 12:00:00 +0200
+Subject: [PATCH] Handle missing STATX_MNT_ID on older kernels
+
+On hosts lacking STATX_MNT_ID (kernel < 5.8, e.g. RHEL 8), native tools
+(systemctl --root, systemd-hwdb --root) fail during path resolution with
+-EUNATCH. Fix by adding fd_get_mount_id() to read mnt_id from
+/proc/self/fdinfo (available since kernel 3.15) and using it as a fallback
+when statx() does not return STATX_MNT_ID in fds_inode_and_mount_same() and
+chase_statx().
+
+This restores the /proc/self/fdinfo fallback that existed in systemd 259
+(fd_fdinfo_mnt_id in mountpoint-util.c) but was removed upstream in 260+.
+
+This patch is only applied to the native tools recipe
+(systemd-tools-native) where /proc/self/fdinfo is guaranteed available.
+Do NOT apply to the target systemd recipe.
+
+Upstream-Status: Inappropriate [oe specific]
+
+Assisted-by: kiro:claude-opus-4.6
+Signed-off-by: Daniel Turull <daniel.turull@ericsson.com>
+---
+ src/basic/chase.c   | 20 ++++++++++++++-
+ src/basic/fd-util.c | 63 +++++++++++++++++++++++++++++++++++++++++++--
+ src/basic/fd-util.h |  1 +
+ 3 files changed, 82 insertions(+), 2 deletions(-)
+
+--- a/src/basic/fd-util.h	2026-06-25 14:01:12.009875526 +0200
++++ b/src/basic/fd-util.h	2026-06-25 14:01:20.909060415 +0200
+@@ -188,6 +188,7 @@ static inline int dir_fd_is_root_or_cwd(
+ }
+ 
+ int fds_inode_and_mount_same(int fd1, int fd2);
++int fd_get_mount_id(int fd, uint64_t *ret);
+ 
+ int resolve_xat_fdroot(int *fd, const char **path, char **ret_buffer);
+ 
+--- a/src/basic/fd-util.c	2026-06-25 14:01:12.011875567 +0200
++++ b/src/basic/fd-util.c	2026-06-25 14:01:40.007456905 +0200
+@@ -1082,6 +1082,38 @@ int path_is_root_at(int dir_fd, const ch
+         return fds_inode_and_mount_same(dir_fd, XAT_FDROOT);
+ }
+ 
++int fd_get_mount_id(int fd, uint64_t *ret) {
++        char path[STRLEN("/proc/self/fdinfo/") + DECIMAL_STR_MAX(int)];
++        _cleanup_close_ int real_fd = -EBADF;
++        _cleanup_free_ char *p = NULL;
++        uint64_t mnt_id;
++        int r;
++
++        assert(ret);
++
++        /* /proc/self/fdinfo/ requires a real fd; resolve AT_FDCWD/XAT_FDROOT via O_PATH. */
++        if (fd == AT_FDCWD || fd == XAT_FDROOT) {
++                real_fd = open(fd == XAT_FDROOT ? "/" : ".", O_PATH|O_CLOEXEC);
++                if (real_fd < 0)
++                        return -errno;
++                fd = real_fd;
++        }
++
++        assert(fd >= 0);
++        xsprintf(path, "/proc/self/fdinfo/%i", fd);
++
++        r = get_proc_field(path, "mnt_id", &p);
++        if (r < 0)
++                return r;
++
++        r = safe_atou64(p, &mnt_id);
++        if (r < 0)
++                return r;
++
++        *ret = mnt_id;
++        return 0;
++}
++
+ int fds_inode_and_mount_same(int fd1, int fd2) {
+         struct statx sx1, sx2;
+         int r;
+@@ -1092,7 +1124,20 @@ int fds_inode_and_mount_same(int fd1, in
+         r = xstatx(fd1, /* path = */ NULL, AT_EMPTY_PATH,
+                    STATX_TYPE|STATX_INO|STATX_MNT_ID,
+                    &sx1);
+-        if (r < 0)
++        if (r == -EUNATCH) {
++                uint64_t mnt_id;
++
++                /* Kernel lacks STATX_MNT_ID; fall back to /proc/self/fdinfo. */
++                r = xstatx(fd1, /* path = */ NULL, AT_EMPTY_PATH,
++                           STATX_TYPE|STATX_INO, &sx1);
++                if (r < 0)
++                        return r;
++                r = fd_get_mount_id(fd1, &mnt_id);
++                if (r < 0)
++                        return r;
++                sx1.stx_mnt_id = mnt_id;
++                sx1.stx_mask |= STATX_MNT_ID;
++        } else if (r < 0)
+                 return r;
+ 
+         if (fd1 == fd2) /* Shortcut things if fds are the same (only after validating the fd) */
+@@ -1101,7 +1146,19 @@ int fds_inode_and_mount_same(int fd1, in
+         r = xstatx(fd2, /* path = */ NULL, AT_EMPTY_PATH,
+                    STATX_TYPE|STATX_INO|STATX_MNT_ID,
+                    &sx2);
+-        if (r < 0)
++        if (r == -EUNATCH) {
++                uint64_t mnt_id;
++
++                r = xstatx(fd2, /* path = */ NULL, AT_EMPTY_PATH,
++                           STATX_TYPE|STATX_INO, &sx2);
++                if (r < 0)
++                        return r;
++                r = fd_get_mount_id(fd2, &mnt_id);
++                if (r < 0)
++                        return r;
++                sx2.stx_mnt_id = mnt_id;
++                sx2.stx_mask |= STATX_MNT_ID;
++        } else if (r < 0)
+                 return r;
+ 
+         r = statx_mount_same(&sx1, &sx2);
+--- a/src/basic/chase.c	2026-06-25 14:01:12.013875609 +0200
++++ b/src/basic/chase.c	2026-06-25 14:01:47.117604514 +0200
+@@ -40,7 +40,9 @@
+         (CHASE_MUST_BE_DIRECTORY|CHASE_MUST_BE_REGULAR|CHASE_MUST_BE_SOCKET)
+ 
+ static int chase_statx(int fd, struct statx *ret) {
+-        return xstatx_full(fd,
++        int r;
++
++        r = xstatx_full(fd,
+                         /* path= */ NULL,
+                         /* statx_flags= */ 0,
+                         XSTATX_MNT_ID_BEST,
+@@ -48,6 +50,23 @@ static int chase_statx(int fd, struct st
+                         /* optional_mask= */ 0,
+                         /* mandatory_attributes= */ 0,
+                         ret);
++        if (r == -EUNATCH) {
++                uint64_t mnt_id;
++
++                /* Kernel lacks STATX_MNT_ID; fall back to /proc/self/fdinfo. */
++                r = xstatx(fd, /* path= */ NULL, /* statx_flags= */ 0,
++                           STATX_TYPE|STATX_UID|STATX_INO,
++                           ret);
++                if (r < 0)
++                        return r;
++                r = fd_get_mount_id(fd, &mnt_id);
++                if (r < 0)
++                        return r;
++                ret->stx_mnt_id = mnt_id;
++                ret->stx_mask |= STATX_MNT_ID;
++        }
++
++        return r;
+ }
+ 
+ static int chase_openat2(int root_fd, int dir_fd, const char *path, ChaseFlags chase_flags) {

@@ -1,4 +1,4 @@
-From efa2836719b669c3200a615898627f6b6a4dd570 Mon Sep 17 00:00:00 2001
+From 0064679018642a9e0e2c9d36eeeedc3a8278356e Mon Sep 17 00:00:00 2001
 From: Hongxu Jia <hongxu.jia@windriver.com>
 Date: Fri, 23 Aug 2019 10:19:48 +0800
 Subject: [PATCH] musl-utils
@@ -38,12 +38,12 @@ index d4a4221..f6336d9 100644
  /* State of -D/-U flags.  */
  extern bool arlib_deterministic_output;
 diff --git a/src/elfcompress.c b/src/elfcompress.c
-index f771b92..263de62 100644
+index 7818cce..ed3654b 100644
 --- a/src/elfcompress.c
 +++ b/src/elfcompress.c
-@@ -37,6 +37,13 @@
- #include "libeu.h"
- #include "printversion.h"
+@@ -41,6 +41,13 @@
+ /* Really should come from libgen.h, but we poisoned basename in system.h.  */
+ extern char *dirname(char *path);
  
 +#if !defined(ALLPERMS)
 +# define ALLPERMS (S_ISUID|S_ISGID|S_ISVTX|S_IRWXU|S_IRWXG|S_IRWXO) /* 07777 */
@@ -56,7 +56,7 @@ index f771b92..263de62 100644
  ARGP_PROGRAM_VERSION_HOOK_DEF = print_version;
  
 diff --git a/src/strip.c b/src/strip.c
-index 20cc8a2..2ce52e8 100644
+index a8ecc80..bf88051 100644
 --- a/src/strip.c
 +++ b/src/strip.c
 @@ -45,6 +45,13 @@

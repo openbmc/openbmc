@@ -48,6 +48,7 @@ patchmetadata_regex = re.compile(
 
 # mbox
 auh_email = 'auh@yoctoproject.org'
+auh_changelog_truncated = 'the full changelog can be found in an attachment to the AUH email'
 
 invalid_submitters = [pyparsing.Regex("^Upgrade Helper.+"),
             pyparsing.Regex(auh_email),

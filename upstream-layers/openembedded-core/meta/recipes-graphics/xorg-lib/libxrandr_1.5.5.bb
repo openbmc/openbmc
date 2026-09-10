@@ -13,6 +13,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=c9d1a2118a6cd5727521db8e7a2fee69"
 
 DEPENDS += "virtual/libx11 xorgproto libxrender libxext"
 
+XORGBUILDCLASS = "meson"
+
 PE = "1"
 
 XORG_PN = "libXrandr"

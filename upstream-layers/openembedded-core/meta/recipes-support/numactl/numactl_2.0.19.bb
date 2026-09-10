@@ -1,9 +1,9 @@
 SUMMARY = "Development package for building Applications that use numa"
-HOMEPAGE = "http://oss.sgi.com/projects/libnuma/" 
+HOMEPAGE = "http://oss.sgi.com/projects/libnuma/"
 DESCRIPTION = "Simple NUMA policy support. It consists of a numactl program \
 to run other programs with a specific NUMA policy and a libnuma to do \
 allocations with NUMA policy in applications."
-LICENSE = "GPL-2.0-only & LGPL-2.1-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-only"
 SECTION = "apps"
 
 inherit autotools-brokensep ptest
@@ -12,7 +12,7 @@ LIC_FILES_CHKSUM = "file://README.md;beginline=19;endline=32;md5=9f34c3af4ed6f3f
 
 SRCREV = "3bc85e37d5a30da6790cb7e8bb488bb8f679170f"
 
-SRC_URI = "git://github.com/numactl/numactl;branch=master;protocol=https \
+SRC_URI = "git://github.com/numactl/numactl;branch=master;protocol=https;tag=v${PV} \
            file://Fix-the-test-output-format.patch \
            file://Makefile \
            file://run-ptest \

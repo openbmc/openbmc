@@ -64,7 +64,7 @@ python uninative_event_fetchloader() {
             # Our games with path manipulation of DL_DIR mean standard PREMIRRORS don't work
             # and we can't easily put 'chksum' into the url path from a url parameter with
             # the current fetcher url handling
-            premirrors = bb.fetch2.mirror_from_string(localdata.getVar("PREMIRRORS"))
+            premirrors = bb.fetch.mirror_from_string(localdata.getVar("PREMIRRORS"))
             for line in premirrors:
                 try:
                     (find, replace) = line
@@ -76,11 +76,11 @@ python uninative_event_fetchloader() {
             srcuri = d.expand("${UNINATIVE_URL}${UNINATIVE_TARBALL};sha256sum=%s" % chksum)
             bb.note("Fetching uninative binary shim %s (will check PREMIRRORS first)" % srcuri)
 
-            fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)
+            fetcher = bb.fetch.Fetch([srcuri], localdata, cache=False)
             fetcher.download()
             localpath = fetcher.localpath(srcuri)
             if localpath != tarballpath and os.path.exists(localpath) and not os.path.exists(tarballpath):
-                # Follow the symlink behavior from the bitbake fetch2.
+                # Follow the symlink behavior from the bb.fetch.
                 # This will cover the case where an existing symlink is broken
                 # as well as if there are two processes trying to create it
                 # at the same time.
@@ -118,7 +118,7 @@ ${UNINATIVE_STAGING_DIR}-uninative/relocate_sdk.py \
 
     except RuntimeError as e:
         bb.warn(str(e))
-    except bb.fetch2.BBFetchException as exc:
+    except bb.fetch.BBFetchException as exc:
         bb.warn("Disabling uninative as unable to fetch uninative tarball: %s" % str(exc))
         bb.warn("To build your own uninative loader, please bitbake uninative-tarball and set UNINATIVE_TARBALL appropriately.")
     except subprocess.CalledProcessError as exc:

@@ -30,6 +30,10 @@ PEP517_INSTALL_PYTHON:class-native = "nativepython3"
 # pypa/installer option to control the bytecode compilation
 INSTALL_WHEEL_COMPILE_BYTECODE ?= "--compile-bytecode=0"
 
+# Python wheels are tagged with the HOST platform when built, use HOST_ARCH
+# since we are cross-compiling, avoiding incorrect host or an empty tag
+export _PYTHON_HOST_PLATFORM = "linux-${HOST_ARCH}"
+
 # PEP517 doesn't have a specific configure step, so set an empty do_configure to avoid
 # running base_do_configure.
 python_pep517_do_configure () {

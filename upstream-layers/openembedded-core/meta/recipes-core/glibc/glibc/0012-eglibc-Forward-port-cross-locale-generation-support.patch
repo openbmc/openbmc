@@ -1,4 +1,4 @@
-From 6e7ac803914dbe730521c41ef0ba9803eded0ddd Mon Sep 17 00:00:00 2001
+From c581bc293f319bf6ca11a0ddd02fa5c73ca77e28 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:33:49 +0000
 Subject: [PATCH] eglibc: Forward port cross locale generation support
@@ -23,7 +23,7 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  create mode 100644 locale/catnames.c
 
 diff --git a/locale/Makefile b/locale/Makefile
-index fc38c02114..05dd3066f3 100644
+index 25f9b5bbce..d692e2afe5 100644
 --- a/locale/Makefile
 +++ b/locale/Makefile
 @@ -30,6 +30,7 @@ headers = \

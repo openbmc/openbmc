@@ -12,7 +12,7 @@ from oe.package_manager import *
 from oe.package_manager.common_deb_ipk import OpkgDpkgPM
 
 class OpkgIndexer(Indexer):
-    def write_index(self):
+    def write_index(self, skip_checksums=False):
         arch_vars = ["ALL_MULTILIB_PACKAGE_ARCHS",
                      "SDK_PACKAGE_ARCHS",
                      ]
@@ -44,8 +44,9 @@ class OpkgIndexer(Indexer):
                 if not os.path.exists(pkgs_file):
                     open(pkgs_file, "w").close()
 
-                index_cmds.add('%s --checksum md5 --checksum sha256 -r %s -p %s -m %s %s' %
-                                  (opkg_index_cmd, pkgs_file, pkgs_file, pkgs_dir, opkg_index_cmd_extra_params))
+                checksum_args = '' if skip_checksums else '--checksum md5 --checksum sha256 '
+                index_cmds.add('%s %s-r %s -p %s -m %s %s' %
+                                  (opkg_index_cmd, checksum_args, pkgs_file, pkgs_file, pkgs_dir, opkg_index_cmd_extra_params))
 
                 index_sign_files.add(pkgs_file)
 
@@ -103,8 +104,12 @@ class OpkgPM(OpkgDpkgPM):
         self.deploy_dir = oe.path.join(self.d.getVar('WORKDIR'), ipk_repo_workdir)
         self.deploy_lock_file = os.path.join(self.deploy_dir, "deploy.lock")
         self.opkg_cmd = bb.utils.which(os.getenv('PATH'), "opkg")
+        self.from_feeds = (self.d.getVar('BUILD_IMAGES_FROM_FEEDS') or "") == "1"
+        self._skip_checksums = self.d.getVar('PACKAGE_FEED_SIGN') != '1' and not self.from_feeds
         self.opkg_args = ['--volatile-cache', '-f', config_file, '-t', self.d.expand('${T}/ipktemp/'), '-o', target_rootfs]
         self.opkg_args.extend(shlex.split(self.d.getVar("OPKG_ARGS")))
+        if self._skip_checksums:
+            self.opkg_args.append('--force-checksum')
 
         if prepare_index:
             create_packages_dir(self.d, self.deploy_dir, d.getVar("DEPLOY_DIR_IPK"), "package_write_ipk", filterbydependencies)
@@ -116,7 +121,6 @@ class OpkgPM(OpkgDpkgPM):
         if not os.path.exists(self.d.expand('${T}/saved')):
             bb.utils.mkdirhier(self.d.expand('${T}/saved'))
 
-        self.from_feeds = (self.d.getVar('BUILD_IMAGES_FROM_FEEDS') or "") == "1"
         if self.from_feeds:
             self._create_custom_config()
         else:
@@ -346,7 +350,7 @@ class OpkgPM(OpkgDpkgPM):
     def write_index(self):
         self.deploy_dir_lock()
 
-        result = self.indexer.write_index()
+        result = self.indexer.write_index(skip_checksums=self._skip_checksums)
 
         self.deploy_dir_unlock()
 

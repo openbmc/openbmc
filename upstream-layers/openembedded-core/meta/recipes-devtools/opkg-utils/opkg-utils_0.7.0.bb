@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://opkg.py;beginline=2;endline=18;md5=ffa11ff3c15eb31c6a7ceaa00cc9f986"
 PROVIDES += "${@bb.utils.contains('PACKAGECONFIG', 'update-alternatives', 'virtual/update-alternatives', '', d)}"
 
-SRC_URI = "git://git.yoctoproject.org/opkg-utils;protocol=https;branch=master \
+SRC_URI = "git://git.yoctoproject.org/opkg-utils;protocol=https;branch=master;tag=${PV} \
            file://0001-update-alternatives-correctly-match-priority.patch \
            "
 SRCREV = "68a969f0e867ace0d94faf8ebe7c7bb67f59d386"

@@ -1,0 +1,47 @@
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Wed, 5 Aug 2026 06:55:00 +0000
+Subject: [PATCH] configure.ac: gate HAVE_NFSD_NETLINK on --enable-nfsdctl
+
+HAVE_NFSD_NETLINK is currently defined unconditionally, but the
+implementation of nfsd_nl_cmd_str() in support/nfs/nfsdnl.c is only
+compiled into libnfs when CONFIG_NFSDCTL is true (--enable-nfsdctl).
+
+This causes a link failure when building with --disable-nfsdctl:
+
+  ld: exportfs-exportfs.o: in function `unexportfs_parsed':
+  exportfs.c:491: undefined reference to `nfsd_nl_cmd_str'
+
+The callers (exportfs.c) guard their usage with #ifdef HAVE_NFSD_NETLINK,
+and nfsdnl.h provides a static inline stub returning -ENOSYS when the
+macro is not defined.  So the correct fix is to only define
+HAVE_NFSD_NETLINK when --enable-nfsdctl is in effect, keeping netlink
+support as an opt-in feature consistent with the CONFIG_NFSDCTL guard
+on nfsdnl.c.
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-nfs/9fec9f1b-1c10-4a20-8282-dfc9addb4ee8@est.tech/T/#u]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac
++++ b/configure.ac
+@@ -256,8 +256,6 @@
+ PKG_CHECK_MODULES(LIBNLGENL3, libnl-genl-3.0 >= 3.1)
+ 
+ AC_CHECK_HEADERS(linux/nfsd_netlink.h)
+-AC_DEFINE([HAVE_NFSD_NETLINK], 1,
+-	  [Define to 1 if nfsd generic netlink support is available])
+ 
+ # ensure the system netlink headers have the latest features
+ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <linux/nfsd_netlink.h>]],
+@@ -279,6 +277,8 @@
+ 	enable_nfsdctl="yes")
+ 	AM_CONDITIONAL(CONFIG_NFSDCTL, [test "$enable_nfsdctl" = "yes" ])
+ 	if test "$enable_nfsdctl" = yes; then
++		AC_DEFINE([HAVE_NFSD_NETLINK], 1,
++			  [Define to 1 if nfsd generic netlink support is available])
+ 		PKG_CHECK_MODULES(LIBREADLINE, readline)
+ 	fi
+ 

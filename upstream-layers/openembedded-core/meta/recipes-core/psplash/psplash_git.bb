@@ -26,7 +26,7 @@ python __anonymous() {
     pkgs = []
     localpaths = []
     for uri in splashfiles:
-        fetcher = bb.fetch2.Fetch([uri], d)
+        fetcher = bb.fetch.Fetch([uri], d)
         flocal = os.path.basename(fetcher.localpath(uri))
         fbase = os.path.splitext(flocal)[0]
         outsuffix = fetcher.ud[uri].parm.get("outsuffix")

@@ -79,7 +79,7 @@ python () {
 
         bb.fetch.get_hashvalue(d)
         local_srcuri = []
-        fetch = bb.fetch2.Fetch((d.getVar('SRC_URI') or '').split(), d)
+        fetch = bb.fetch.Fetch((d.getVar('SRC_URI') or '').split(), d)
         for url in fetch.urls:
             url_data = fetch.ud[url]
             parm = url_data.parm

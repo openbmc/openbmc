@@ -3,7 +3,7 @@
 #
 SUMMARY = "Locales support for musl"
 HOMEPAGE = "https://git.adelielinux.org/adelie/musl-locales/-/wikis/home"
-LICENSE = "MIT & LGPL-3.0-or-later"
+LICENSE = "LGPL-3.0-or-later AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=cf5713fba707073020b1db2acaa73e78 \
                     file://LICENSE.MIT;md5=a4f1c6864a83ddf4b754cdab7d593523"
 

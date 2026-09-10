@@ -1,4 +1,4 @@
-From 5a82f181583e02e19ed739a195801032532474bf Mon Sep 17 00:00:00 2001
+From 975357f7585076a072f61684db20180ef8dd31b7 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Fri, 22 Nov 2024 12:50:48 +0100
 Subject: [PATCH] config/eu.am: do not force -Werror
@@ -13,7 +13,7 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 2 deletions(-)
 
 diff --git a/config/eu.am b/config/eu.am
-index 321591f..a1748a8 100644
+index 4ea7251..2b688b3 100644
 --- a/config/eu.am
 +++ b/config/eu.am
 @@ -135,7 +135,6 @@ AM_CFLAGS = -Wall -Wshadow -Wformat=2 \

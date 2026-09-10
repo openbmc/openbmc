@@ -8,8 +8,8 @@ python read_subpackage_metadata () {
     import oe.packagedata
 
     vars = {
-        "PN" : d.getVar('PN'), 
-        "PE" : d.getVar('PE'), 
+        "PN" : d.getVar('PN'),
+        "PE" : d.getVar('PE'),
         "PV" : d.getVar('PV'),
         "PR" : d.getVar('PR'),
     }

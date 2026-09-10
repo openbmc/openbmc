@@ -94,7 +94,7 @@ python () {
     # Also need to handle multilib target vendors
     vendors = d.getVar("CANADIANEXTRAVENDOR")
     if not vendors:
-        vendors = all_multilib_tune_values(d, 'TARGET_VENDOR')
+        vendors = oe.utils.all_multilib_tune_values(d, 'TARGET_VENDOR')
     origvendor = d.getVar("TARGET_VENDOR_MULTILIB_ORIGINAL")
     if origvendor:
         d.setVar("TARGET_VENDOR", origvendor)

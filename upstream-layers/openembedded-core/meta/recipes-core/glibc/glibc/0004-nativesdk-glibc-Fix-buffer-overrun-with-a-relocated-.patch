@@ -1,4 +1,4 @@
-From e39b52defe90067e5725e99c7238246c68a2500e Mon Sep 17 00:00:00 2001
+From b1161d040b7e1b4023865edfcfbd2913f26132b0 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:50:00 +0000
 Subject: [PATCH] nativesdk-glibc: Fix buffer overrun with a relocated SDK
@@ -21,12 +21,12 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 12 insertions(+)
 
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index 2d32ae9676..a706cef129 100644
+index c7ae246437..28880171e1 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -1750,7 +1750,19 @@ open_path (const char *name, size_t namelen, int mode,
-        given on the command line when rtld is run directly.  */
-     return -1;
+@@ -1784,10 +1784,22 @@ open_path (const char *name, size_t namelen, int mode,
+      loader rejects empty names well before reaching here).  */
+   assert (namelen >= 1);
  
 +  do
 +    {
@@ -38,7 +38,10 @@ index 2d32ae9676..a706cef129 100644
 +    }
 +  while (*++dirs != NULL);
 +
-   buf = alloca (max_dirnamelen + max_capstrlen + namelen);
+   size_t bufsize = max_dirnamelen + max_capstrlen + namelen;
+   struct dl_scratch_buffer scratch = dl_scratch_buffer_init ();
+   dl_scratch_buffer_allocate (&scratch, bufsize, 0);
+   char *buf = scratch.data;
 +
 +  dirs = sps->dirs;
    do

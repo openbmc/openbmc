@@ -12,10 +12,10 @@ PTEST_PYTEST_DIR ?= "tests"
 
 do_install_ptest() {
 	# Check if the recipe provides its own version of run-ptest
-	# If nothing exists in the SRC_URI, dynamically create a 
+	# If nothing exists in the SRC_URI, dynamically create a
 	# run-test script of "last resort" that has the default
 	# pytest behavior.
-	# 
+	#
 	# Users can override this behavior by simply including a
 	# custom script (run-ptest) in the source file list
 	if [ ! -f "${UNPACKDIR}/run-ptest" ]; then

@@ -45,7 +45,7 @@ SECTION = "libs/multimedia"
 # libdbus is a system library that is covered by the "special exception" in
 # GPLv2's section 3, and therefore libdbus's GPL license doesn't affect
 # PulseAudio.
-LICENSE = "LGPL-2.1-or-later & MIT & BSD-3-Clause"
+LICENSE = "BSD-3-Clause AND LGPL-2.1-or-later AND MIT"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=0e5cd938de1a7a53ea5adac38cc10c39 \
                     file://GPL;md5=4325afd396febcb659c36b49533135d4 \
@@ -299,4 +299,6 @@ RDEPENDS:pulseaudio-server += "${@bb.utils.contains('DISTRO_FEATURES', 'x11', \
                                   bb.utils.contains('DISTRO_FEATURES', 'systemd', 'pulseaudio-module-systemd-login', 'pulseaudio-module-console-kit', d), \
                                   '', d)}"
 
+CVE_STATUS[CVE-2020-15710] = "not-applicable-platform: specific to Ubuntu"
+CVE_STATUS[CVE-2020-16123] = "not-applicable-platform: specific to Ubuntu"
 CVE_STATUS[CVE-2024-11586] = "not-applicable-platform: specific to Ubuntu 16.04"

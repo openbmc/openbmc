@@ -21,7 +21,7 @@ inherit cross-canadian
 do_generate_content[cleandirs] = "${SDK_OUTPUT}"
 do_generate_content[dirs] = "${SDK_OUTPUT}/${SDKPATH}"
 # Need to ensure we have the virtual mappings and site files for all multtilib variants
-do_generate_content[depends] = "${@oe.utils.build_depends_string(all_multilib_tune_values(d, 'TOOLCHAIN_NEED_CONFIGSITE_CACHE'), 'do_populate_sysroot')}"
+do_generate_content[depends] = "${@oe.utils.build_depends_string(oe.utils.all_multilib_tune_values(d, 'TOOLCHAIN_NEED_CONFIGSITE_CACHE'), 'do_populate_sysroot')}"
 python do_generate_content() {
     # Handle multilibs in the SDK environment, siteconfig, etc files...
     localdata = bb.data.createCopy(d)

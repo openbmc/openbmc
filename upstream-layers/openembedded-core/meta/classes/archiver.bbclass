@@ -189,19 +189,19 @@ python do_ar_original() {
     # archives more useful (no extra paths that are only used during
     # compilation).
     for i, url in enumerate(urls):
-        decoded = bb.fetch2.decodeurl(url)
+        decoded = bb.fetch.decodeurl(url)
         for param in ('destsuffix', 'subdir'):
             if param in decoded[5]:
                 del decoded[5][param]
-        encoded = bb.fetch2.encodeurl(decoded)
+        encoded = bb.fetch.encodeurl(decoded)
         urls[i] = encoded
 
-    # Cleanup SRC_URI before call bb.fetch2.Fetch() since now SRC_URI is in the
+    # Cleanup SRC_URI before call bb.fetch.Fetch() since now SRC_URI is in the
     # variable "urls", otherwise there might be errors like:
     # The SRCREV_FORMAT variable must be set when multiple SCMs are used
     ld = bb.data.createCopy(d)
     ld.setVar('SRC_URI', '')
-    fetch = bb.fetch2.Fetch(urls, ld)
+    fetch = bb.fetch.Fetch(urls, ld)
     tarball_suffix = {}
     for url in fetch.urls:
         local = fetch.localpath(url).rstrip("/");
@@ -216,9 +216,9 @@ python do_ar_original() {
             # This is an additional safety net, in practice the name has
             # to be set when using the git fetcher, otherwise SRCREV cannot
             # be set separately for each URL.
-            params = bb.fetch2.decodeurl(url)[5]
-            type = bb.fetch2.decodeurl(url)[0]
-            location = bb.fetch2.decodeurl(url)[2]
+            params = bb.fetch.decodeurl(url)[5]
+            type = bb.fetch.decodeurl(url)[0]
+            location = bb.fetch.decodeurl(url)[2]
             name = params.get('name', '')
             if type.lower() == 'file':
                 name_tmp = location.rstrip("*").rstrip("/")
@@ -348,7 +348,7 @@ python do_ar_mirror() {
 
     bb.utils.mkdirhier(destdir)
 
-    fetcher = bb.fetch2.Fetch(src_uri, d)
+    fetcher = bb.fetch.Fetch(src_uri, d)
 
     for ud in fetcher.expanded_urldata():
         if is_excluded(ud.url):

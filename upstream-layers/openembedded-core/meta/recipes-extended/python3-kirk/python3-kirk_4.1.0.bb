@@ -11,6 +11,4 @@ SRC_URI[sha256sum] = "dc4dc4fa8994b14565a3d4f31bb79d6d27102ecbbd4feaef4ebc1e10e9
 
 inherit pypi python_setuptools_build_meta
 
-PYPI_PACKAGE = "kirk"
-
 RDEPENDS:${PN} += "python3-asyncio python3-json"

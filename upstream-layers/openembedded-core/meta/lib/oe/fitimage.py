@@ -153,7 +153,7 @@ class ItsNodeRootKernel(ItsNode):
     If a device tree included in the FIT image, the default configuration is the
     firt DTB. If there is no dtb present than the default configuation the kernel.
     """
-    def __init__(self, description, address_cells, host_prefix, arch, conf_prefix,
+    def __init__(self, description, address_cells, host_prefix, arch, fit_os, conf_prefix,
                  sign_enable=False, sign_keydir=None,
                  mkimage=None, mkimage_dtcopts=None,
                  mkimage_extra_opts=None,
@@ -171,6 +171,7 @@ class ItsNodeRootKernel(ItsNode):
 
         self._host_prefix = host_prefix
         self._arch = arch
+        self._os = fit_os
         self._conf_prefix = conf_prefix
 
         # Signature related properties
@@ -276,18 +277,22 @@ class ItsNodeRootKernel(ItsNode):
                 if len(parts) == 3 and parts[2] == entrysymbol:
                     entrypoint = "<0x%s>" % parts[0]
                     break
+        opt_props = {
+            "data": '/incbin/("' + kernel_path + '")',
+            "arch": self._arch,
+            "os": self._os,
+        }
+        if load:
+            opt_props["load"] = f"<{load}>"
+        if entrypoint:
+            opt_props["entry"] = f"<{entrypoint}>"
+
         kernel_node = self.its_add_node_image(
             kernel_id,
             "Linux kernel",
             mkimage_kernel_type,
             compression,
-            {
-                "data": '/incbin/("' + kernel_path + '")',
-                "arch": self._arch,
-                "os": "linux",
-                "load": f"<{load}>",
-                "entry": f"<{entrypoint}>"
-            }
+            opt_props,
         )
         self._kernel = kernel_node
 
@@ -366,7 +371,7 @@ class ItsNodeRootKernel(ItsNode):
             {
                 "data": '/incbin/("' + setup_path + '")',
                 "arch": self._arch,
-                "os": "linux",
+                "os": self._os,
                 "load": load,
                 "entry": entry
             }
@@ -381,7 +386,7 @@ class ItsNodeRootKernel(ItsNode):
             "data": '/incbin/("' + ramdisk_path + '")',
             "type": "ramdisk",
             "arch": self._arch,
-            "os": "linux"
+            "os": self._os,
         }
         if load:
             opt_props["load"] = f"<{load}>"
@@ -397,12 +402,12 @@ class ItsNodeRootKernel(ItsNode):
         )
         self._ramdisk = ramdisk_node
 
-    def fitimage_emit_section_loadable(self, name, filepath, type=None, description=None, compression=None, arch=None, os=None, load=None, entry=None):
+    def fitimage_emit_section_loadable(self, name, filepath, type=None, description=None, compression=None, arch=None, fit_os=None, load=None, entry=None):
         """Emit one fitImage ITS loadable section"""
         opt_props = {
             "data": '/incbin/("' + filepath + '")',
             "arch": arch if arch is not None else self._arch,
-            "os": os if os is not None else "linux",
+            "os": fit_os if fit_os is not None else self._os,
         }
 
         if load:
@@ -453,9 +458,9 @@ class ItsNodeRootKernel(ItsNode):
 
         if self._bootscr:
             conf_desc.append("u-boot script")
-            opt_props["bootscr"] = self._bootscr.name
+            opt_props["script"] = self._bootscr.name
             if self._sign_enable:
-                sign_entries.append("bootscr")
+                sign_entries.append("script")
 
         if self._setup:
             conf_desc.append("setup")
@@ -480,7 +485,7 @@ class ItsNodeRootKernel(ItsNode):
             f"{default_flag} {', '.join(conf_desc)}",
             opt_props=opt_props
         )
-        if self._hash_algo:
+        if self._hash_algo and not self._sign_enable:
             ItsNodeHash(
                 "hash-1",
                 conf_node,
@@ -596,12 +601,14 @@ class ItsNodeRootKernel(ItsNode):
             bb.debug(1, "FIT image signing is disabled. Skipping signing.")
             return
 
-        # Some sanity checks because mkimage exits with 0 also without needed keys
-        sign_key_path = os.path.join(self._sign_keydir, self._sign_keyname_conf)
-        self._check_sign_key_files(sign_key_path, self._sign_algo)
-        if self._sign_individual:
-            sign_key_img_path = os.path.join(self._sign_keydir, self._sign_keyname_img)
-            self._check_sign_key_files(sign_key_img_path, self._sign_algo)
+        # Some sanity checks because mkimage exits with 0 also without needed keys.
+        # If the keydir is a PKCS#11 URI, skip this check.
+        if not self._sign_keydir.startswith('pkcs11:'):
+            sign_key_path = os.path.join(self._sign_keydir, self._sign_keyname_conf)
+            self._check_sign_key_files(sign_key_path, self._sign_algo)
+            if self._sign_individual:
+                sign_key_img_path = os.path.join(self._sign_keydir, self._sign_keyname_img)
+                self._check_sign_key_files(sign_key_img_path, self._sign_algo)
 
         cmd = [
             self._mkimage_sign,

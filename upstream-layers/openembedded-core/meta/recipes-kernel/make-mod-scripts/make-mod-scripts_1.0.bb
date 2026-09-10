@@ -3,8 +3,7 @@ HOMEPAGE = "https://www.yoctoproject.org/"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/GPL-2.0-only;md5=801f80980d171dd6425610833a22dbe6"
 
-inherit kernel-arch linux-kernel-base
-inherit pkgconfig
+inherit kernel-arch pkgconfig
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"
 
@@ -18,10 +17,14 @@ DEV_PKG_DEPENDENCY = ""
 DEPENDS += "bc-native bison-native"
 DEPENDS += "gmp-native"
 
-EXTRA_OEMAKE = " HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLDFLAGS="${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}""
+INHIBIT_DEFAULT_DEPS = "1"
+DEPENDS += "virtual/cross-cc virtual/cross-binutils"
+
+EXTRA_OEMAKE = ' ARCH="${@oe.kernel.map_kernel_arch(d)}"'
+EXTRA_OEMAKE += " HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLDFLAGS="${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}""
 EXTRA_OEMAKE += " HOSTCXX="${BUILD_CXX} ${BUILD_CXXFLAGS} ${BUILD_LDFLAGS}" CROSS_COMPILE=${TARGET_PREFIX}"
 
-KERNEL_LOCALVERSION = "${@get_kernellocalversion_file("${STAGING_KERNEL_BUILDDIR}")}"
+KERNEL_LOCALVERSION = "${@oe.kernel.get_localversion_file("${STAGING_KERNEL_BUILDDIR}")}"
 export LOCALVERSION = "${KERNEL_LOCALVERSION}"
 
 # Build some host tools under work-shared.  CC, LD, and AR are probably

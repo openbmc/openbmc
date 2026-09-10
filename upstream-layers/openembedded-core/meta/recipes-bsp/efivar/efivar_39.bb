@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=6626bb1e20189cfa95f2c508ba286393"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64|riscv64).*-linux"
 
-SRC_URI = "git://github.com/rhinstaller/efivar.git;branch=main;protocol=https \
+SRC_URI = "git://github.com/rhinstaller/efivar.git;branch=main;protocol=https;tag=${PV} \
            file://0001-docs-do-not-build-efisecdb-manpage.patch \
            file://0002-efivarfs-backport-patch-to-update-file-variable-store-on-SetVariableRT.patch \
            file://0003-fix-march-issue-for-ppc64le.patch \

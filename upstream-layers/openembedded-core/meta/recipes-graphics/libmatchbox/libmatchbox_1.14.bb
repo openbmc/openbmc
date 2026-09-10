@@ -7,7 +7,7 @@ SECTION = "x11/libs"
 HOMEPAGE = "http://matchbox-project.org/"
 BUGTRACKER = "http://bugzilla.yoctoproject.com/"
 
-LICENSE = "LGPL-2.0-or-later & HPND"
+LICENSE = "HPND AND LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=87712c91ca9a2c2d475a0604c00f8f54 \
                     file://COPYING.HPND;md5=508defeea3622831e69c4827a31d6db0"
 

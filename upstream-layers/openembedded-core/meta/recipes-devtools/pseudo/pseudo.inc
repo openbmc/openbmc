@@ -77,7 +77,7 @@ warn_32bit_missing() {
 }
 
 # Two below are the same
-# If necessary compile for the alternative machine arch.  This is only 
+# If necessary compile for the alternative machine arch.  This is only
 # necessary in a native build.
 do_compile:prepend:class-native () {
 	maybe_make32
@@ -96,7 +96,7 @@ do_compile:prepend:class-native () {
 		oe_runmake ${MAKEOPTS} libpseudo
 		eval "$save_traps"
 		# prevent it from removing the lib, but remove everything else
-		make 'LIB=foo' ${MAKEOPTS} distclean 
+		make 'LIB=foo' ${MAKEOPTS} distclean
 	fi
 }
 
@@ -108,7 +108,7 @@ do_compile:prepend:class-nativesdk () {
 		./configure ${PSEUDO_EXTRA_OPTS} --prefix=${prefix} --libdir=${prefix}/lib/pseudo/lib --with-sqlite-lib=${baselib} --with-sqlite=${STAGING_DIR_TARGET}${exec_prefix} --bits=32 --without-rpath
 		oe_runmake ${MAKEOPTS} libpseudo
 		# prevent it from removing the lib, but remove everything else
-		make 'LIB=foo' ${MAKEOPTS} distclean 
+		make 'LIB=foo' ${MAKEOPTS} distclean
 	fi
 }
 

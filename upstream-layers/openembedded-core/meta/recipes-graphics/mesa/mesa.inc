@@ -17,14 +17,13 @@ PE = "2"
 SRC_URI = "https://archive.mesa3d.org/mesa-${PV}.tar.xz \
            file://0001-meson-misdetects-64bit-atomics-on-mips-clang.patch \
            file://0001-freedreno-don-t-encode-build-path-into-binaries.patch \
-           file://0001-gallivm-Fix-armhf-build-against-LLVM-22.patch \
            file://0001-src-intel-compiler-jay-jay_ir.h-do-not-used-typed-en.patch \
-           file://0001-src-intel-compiler-jay-fix-GCC-10-case-label-declara.patch \
            file://0001-src-util-u_math.c-do-not-use-arm-fpu-instructions-if.patch \
+           file://0001-addrlib-avoid-builtin_cpu_supports-for-avx2-detecti.patch \
            "
 
-SRC_URI[sha256sum] = "072705caa9adf4740f1489194b13e278ad959166863b5271fe423a86353c9ab6"
-PV = "26.1.4"
+SRC_URI[sha256sum] = "eeb29ca7e56cfaa8e8a79538dcf834e3b18e501c31bef5145e959ea437cc4216"
+PV = "26.2.2"
 
 UPSTREAM_CHECK_GITTAGREGEX = "mesa-(?P<pver>\d+(\.\d+)+)"
 
@@ -45,8 +44,7 @@ do_install:append() {
 }
 
 # All dependencies **MUST** be -native. If not, then add a PACKAGECONFIG for it.
-DEPENDS = "makedepend-native flex-native bison-native chrpath-replacement-native python3-mako-native gettext-native python3-pyyaml-native"
-EXTRANATIVEPATH += "chrpath-native"
+DEPENDS = "flex-native bison-native python3-mako-native gettext-native python3-pyyaml-native"
 
 inherit meson pkgconfig python3native gettext features_check rust
 
@@ -110,7 +108,7 @@ PACKAGECONFIG[opengl] = "-Dopengl=true, -Dopengl=false"
 
 # "opencl" also requires libclc and gallium-llvm to be present in PACKAGECONFIG!
 # Be sure to enable them both for the target and for the native build.
-PACKAGECONFIG[opencl] = "-Dgallium-rusticl=true -Dmesa-clc-bundle-headers=enabled, -Dgallium-rusticl=false, bindgen-cli-native clang libclc spirv-tools spirv-llvm-translator"
+PACKAGECONFIG[opencl] = "-Dgallium-rusticl=true -Dmesa-clc-bundle-headers=enabled, -Dgallium-rusticl=false, bindgen-cli-native clang mesa-libclc spirv-tools spirv-llvm-translator"
 
 X11_DEPS = "xorgproto virtual/libx11 libxext libxxf86vm libxdamage libxfixes xrandr xorgproto libxshmfence"
 # "x11" requires "opengl"
@@ -254,7 +252,7 @@ RPROVIDES:libopencl-mesa += "virtual-opencl-icd"
 RPROVIDES:libgles2-mesa += "libgles3-mesa"
 RPROVIDES:libgles2-mesa-dev += "libgles3-mesa-dev"
 
-RDEPENDS:libopencl-mesa += "${@bb.utils.contains('PACKAGECONFIG', 'opencl', 'libclc', '', d)}"
+RDEPENDS:libopencl-mesa += "${@bb.utils.contains('PACKAGECONFIG', 'opencl', 'mesa-libclc', '', d)}"
 
 PACKAGES =+ "libegl-mesa libegl-mesa-dev \
              libgallium \

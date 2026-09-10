@@ -1,0 +1,27 @@
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 6 Aug 2026 10:55:00 +0000
+Subject: [PATCH] getport: fix missing stddef.h inclusion
+
+getport.c uses offsetof() but does not include <stddef.h>. On glibc
+this works because offsetof is pulled in transitively, but on musl it
+is not available without the explicit include, causing:
+
+  getport.c:459:41: error: implicit declaration of function 'offsetof'
+
+Upstream-Status: Submitted [https://lore.kernel.org/linux-nfs/20260806112023.25090-1-jaipaul.cheernam@est.tech/]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ support/nfs/getport.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/support/nfs/getport.c b/support/nfs/getport.c
+--- a/support/nfs/getport.c
++++ b/support/nfs/getport.c
+@@ -27,6 +27,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <stddef.h>
+ #include <sys/types.h>
+ #include <sys/time.h>
+ #include <unistd.h>

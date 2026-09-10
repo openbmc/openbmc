@@ -60,7 +60,7 @@ pkg_postinst_ontarget:${PN}-delayed-b () {
     touch ${TESTDIR}/delayed-b
 }
 
-# This scriptlet intentionally includes a bogus command in the middle to test 
+# This scriptlet intentionally includes a bogus command in the middle to test
 # that we catch and report such errors properly.
 pkg_postinst:${PN}-rootfs-failing () {
     mkdir -p $D${TESTDIR}

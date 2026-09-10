@@ -8,6 +8,7 @@ import bb
 import collections
 import json
 import oe.packagedata
+import os
 import re
 import shutil
 
@@ -169,53 +170,50 @@ def collect_package_providers(d, direct_deps):
 
 def get_patched_src(d):
     """
-    Save patched source of the recipe in SPDX_WORKDIR.
+    Save patched source of the recipe in SPDXWORK.
     """
     spdx_workdir = d.getVar("SPDXWORK")
-    spdx_sysroot_native = d.getVar("STAGING_DIR_NATIVE")
 
-    workdir = d.getVar("WORKDIR")
+    # Do not unpack the sources again for the recipe using work-shared
+    if not is_work_shared_spdx(d):
+        localdata = d.createCopy()
 
-    try:
-        # The kernel class functions require it to be on work-shared, so we dont change WORKDIR
-        if not is_work_shared_spdx(d):
-            # Change the WORKDIR to make do_unpack do_patch run in another dir.
-            d.setVar("WORKDIR", spdx_workdir)
-            # Restore the original path to recipe's native sysroot (it's relative to WORKDIR).
-            d.setVar("STAGING_DIR_NATIVE", spdx_sysroot_native)
+        # Change the UNPACKDIR to make do_unpack do_patch run in another dir.
+        localdata.setVar("UNPACKDIR", spdx_workdir)
 
-            # The changed 'WORKDIR' also caused 'B' changed, create dir 'B' for the
-            # possibly requiring of the following tasks (such as some recipes's
-            # do_patch required 'B' existed).
-            bb.utils.mkdirhier(d.getVar("B"))
+        bb.build.exec_func("do_unpack", localdata)
 
-            bb.build.exec_func("do_unpack", d)
+        if localdata.getVar("SRC_URI"):
+            if bb.data.inherits_class("dos2unix", localdata):
+                bb.build.exec_func("do_convert_crlf_to_lf", localdata)
+            bb.build.exec_func("do_patch", localdata)
 
-            if d.getVar("SRC_URI") != "":
-                if bb.data.inherits_class("dos2unix", d):
-                    bb.build.exec_func("do_convert_crlf_to_lf", d)
-                bb.build.exec_func("do_patch", d)
+        if bb.data.inherits_class("kernel", localdata):
+            # For kernel source, rename suffix dir to ${BP} (${BPN}-${PV})
+            dir_name = localdata.getVar("BP")
+            kernel_dst_path = f"{spdx_workdir}/{dir_name}"
+            kernel_src_path = localdata.getVar("S")
+            if not os.path.exists(kernel_dst_path):
+                shutil.move(kernel_src_path, kernel_dst_path)
 
-        # Copy source from work-share to spdx_workdir
-        if is_work_shared_spdx(d):
-            share_src = d.getVar("S")
-            d.setVar("WORKDIR", spdx_workdir)
-            d.setVar("STAGING_DIR_NATIVE", spdx_sysroot_native)
-            # Copy source to ${SPDXWORK}, same basename dir of ${S};
-            src_dir = spdx_workdir + "/" + os.path.basename(share_src)
-            # For kernel souce, rename suffix dir 'kernel-source'
-            # to ${BP} (${BPN}-${PV})
-            if bb.data.inherits_class("kernel", d):
-                src_dir = spdx_workdir + "/" + d.getVar("BP")
+    # Copy source from work-shared to spdx_workdir
+    else:
+        share_src = d.getVar("S")
 
-            bb.note(f"copyhardlinktree {share_src} to {src_dir}")
-            oe.path.copyhardlinktree(share_src, src_dir)
+        if bb.data.inherits_class("kernel", d):
+            # For kernel source, rename suffix dir 'kernel-source' to ${BP} (${BPN}-${PV})
+            dir_name = d.getVar("BP")
+        else:
+            # Copy source to ${SPDXWORK}, same basename dir of ${S}
+            dir_name = os.path.basename(share_src)
 
-        # Some userland has no source.
-        if not os.path.exists(spdx_workdir):
-            bb.utils.mkdirhier(spdx_workdir)
-    finally:
-        d.setVar("WORKDIR", workdir)
+        src_dir = f"{spdx_workdir}/{dir_name}"
+        bb.note(f"copyhardlinktree {share_src} to {src_dir}")
+        oe.path.copyhardlinktree(share_src, src_dir)
+
+    # Some userland has no source.
+    if not os.path.exists(spdx_workdir):
+        bb.utils.mkdirhier(spdx_workdir)
 
 
 def has_task(d, task):
@@ -280,14 +278,44 @@ def get_compiled_sources(d):
         bb.debug(1, "Do not have debugsources.list. Skipping")
         return [], []
 
-    # Sources are not split now in SPDX, so we aggregate them
-    sources = set(itertools.chain.from_iterable(source_info.values()))
-    # Check extensions of files
+    unpackdir = d.getVar("UNPACKDIR")
+    srcdir = d.getVar("S")
+    bp = d.getVar("BP")
+    kernel_src = d.getVar("KERNEL_SRC_PATH")
+    dbgsrc_dir = d.getVar("TARGET_DBGSRC_DIR")
+
+    # Compute the relative path of source directory from ${UNPACKDIR}.
+    # The goal is to replace ${TARGET_DBGSRC_DIR} by this relative path.
+    srcdir_rel = None
+    if srcdir and unpackdir:
+        srcdir_rel = os.path.relpath(srcdir, unpackdir)
+        if srcdir_rel.startswith(".."):
+            srcdir_rel = None
+
+    sources = set()
     types = set()
-    for src in sources:
+
+    # Sources are not split now in SPDX, so we aggregate them
+    for src in set(itertools.chain.from_iterable(source_info.values())):
+        # In the common case, the sources are located in ${S}. To format them as
+        # expected by SPDX, we replace /usr/src/debug/${PN}/${PV} with the path
+        # of ${S} relative to ${UNPACKDIR}.
+        if dbgsrc_dir and srcdir_rel:
+            src = src.replace(f"{dbgsrc_dir}/", f"{srcdir_rel}/")
+
+        # Kernel sources are in a different directory and are special case
+        # we format the sources as expected by spdx by replacing /usr/src/kernel/
+        # into ${BP}/
+        if kernel_src and bp:
+            src = src.replace(f"{kernel_src}/", f"{bp}/")
+
+        sources.add(src)
+
+        # Check extensions of files
         basename = os.path.basename(src)
         ext = basename.partition(".")[2]
-        if ext not in types and ext:
+        if ext:
             types.add(ext)
-    bb.debug(1, f"Num of sources: {len(sources)} and types: {len(types)} {str(types)}")
+
+    bb.debug(1, f"Num of sources: {len(sources)} and types: {len(types)} {types!s}")
     return sources, types

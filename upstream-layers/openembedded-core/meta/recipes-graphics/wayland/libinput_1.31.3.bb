@@ -47,3 +47,5 @@ RREPLACES:${PN} = "libinput"
 RCONFLICTS:${PN} = "libinput"
 
 FILES:${PN}-ptest += "${libexecdir}/libinput/libinput-test-suite"
+
+CVE_STATUS[CVE-2026-35094] = "fixed-version: Fixed since version 1.31.1"

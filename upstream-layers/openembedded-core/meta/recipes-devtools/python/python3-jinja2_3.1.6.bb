@@ -6,11 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=5dc88300786f1c214c1e9827a5229462"
 
 SRC_URI[sha256sum] = "0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d"
 
-PYPI_PACKAGE = "jinja2"
-
 CVE_PRODUCT = "jinja2 jinja"
-
-CLEANBROKEN = "1"
 
 inherit pypi python_flit_core ptest-python-pytest
 

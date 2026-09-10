@@ -9,11 +9,11 @@ be read directly by XKB-capable X servers or utilities."
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=be5e191f04d3f2cd80aa83b928ba984c"
 
-DEPENDS += "libxkbfile"
+DEPENDS += "bison-native libxkbfile"
 
 BBCLASSEXTEND = "native"
 
-EXTRA_OECONF += "--disable-selective-werror"
+XORGBUILDCLASS = "meson"
 
 SRC_URI_EXT = "xz"
 SRC_URI[sha256sum] = "2ac31f26600776db6d9cd79b3fcd272263faebac7eb85fb2f33c7141b8486060"

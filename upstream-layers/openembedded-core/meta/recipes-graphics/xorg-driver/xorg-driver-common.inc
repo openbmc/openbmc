@@ -6,7 +6,7 @@ LICENSE = "MIT"
 
 PE = "2"
 
-DEPENDS = "virtual/xserver xorgproto util-macros"
+DEPENDS = "virtual/xserver xorgproto util-macros-native"
 
 XORG_DRIVER_COMPRESSOR ?= ".tar.bz2"
 SRC_URI = "${XORG_MIRROR}/individual/driver/${BPN}-${PV}${XORG_DRIVER_COMPRESSOR}"

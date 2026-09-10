@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=01441d50dc74476db58a41ac10cb9fa2"
 
 SRC_URI[sha256sum] = "6d94c9f834dd9e44514162799d344d815a3a4faec913717a9ecbfa5be1bb8e61"
 
-PYPI_PACKAGE = "xmltodict"
+CVE_PRODUCT = "xmltodict:xmltodict"
 
 BBCLASSEXTEND = "native nativesdk"
 

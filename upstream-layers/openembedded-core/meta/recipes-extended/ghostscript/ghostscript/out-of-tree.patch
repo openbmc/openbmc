@@ -1,35 +1,39 @@
-From 6d9852d5bac17a5fc7f605bd596e93528b0fcf81 Mon Sep 17 00:00:00 2001
-From: Ross Burton <ross.burton@arm.com>
-Date: Thu, 2 Apr 2026 14:41:42 +0100
-Subject: [PATCH] Fix the build to do out-of-tree properly.
+From 8c71024e8b9dae1b691ad96eb5af39840fb73a99 Mon Sep 17 00:00:00 2001
+From: Chris Liddell <chris.liddell@artifex.com>
+Date: Tue, 4 Aug 2026 09:30:31 +0100
+Subject: Bug 709459: Fix out of tree cross compile builds
 
-The patches are in progress but are being submitted upstream.
+Fix path/file name for the configure generated arch.h.
 
-Upstream-Status: Submitted [https://bugs.ghostscript.com/show_bug.cgi?id=709459]
+Upstream-Status: Backport [https://cgit.ghostscript.com/cgi-bin/cgit.cgi/ghostpdl.git/commit/?id=8c71024e]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 ---
- configure.ac | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ configure.ac | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index b2b3678..dd00e86 100644
+index b25aaab1a..fe79c416e 100644
 --- a/configure.ac
 +++ b/configure.ac
+@@ -45,8 +45,8 @@ fi
+ THEMAKEFILE="${MAKEFILE:-Makefile}"
+ AUXFLAGS_MAK=auxflags.mak
+ 
+-ARCH_AUTOCONF_HEADER=arch-config/arch_autoconf.h
+-ARCH_AUTOCONF_HEADER_PROTO=arch/arch_autoconf.h.in
++ARCH_AUTOCONF_HEADER=./arch-config/arch_autoconf.h
++ARCH_AUTOCONF_HEADER_PROTO=$srcdir/arch/arch_autoconf.h.in
+ 
+ dnl --------------------------------------------------
+ dnl Local utilities
 @@ -400,7 +400,7 @@ if test x"$with_arch_h" = x""; then
            *)
              ARCH_CONF_HEADER=
              if test x"$host" != x"$build"; then
 -              ARCH_CONF_HEADER="\$(GLSRCDIR)/../$ARCH_AUTOCONF_HEADER"
-+              ARCH_CONF_HEADER="./$ARCH_AUTOCONF_HEADER"
++              ARCH_CONF_HEADER="$ARCH_AUTOCONF_HEADER"
              else
                ARCH_CONF_HEADER=
              fi
-@@ -889,7 +889,7 @@ AC_ARG_WITH([tesseract], AS_HELP_STRING([--without-tesseract],
- 
- if test x$with_tesseract != xno; then
-   AC_MSG_CHECKING([for local Tesseract library source])
--  if test -d $srcdir/tesseract && test -d $srcdir/leptonica; then
-+  if test -d $TESSERACTDIR && test -d $LEPTONICADIR; then
-     AC_MSG_RESULT([yes])
- 
-     if test x$with_tesseract != xno; then
+-- 
+cgit v1.2.3

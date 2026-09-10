@@ -1,10 +1,22 @@
 #!/bin/sh
 
+PTEST_DIR=$(cd "$(dirname "$0")" && pwd)
+cd "$PTEST_DIR"
+
 # The fuzz tests run 1000 randomised iterations per archive format and are
 # meant for dedicated fuzzing infrastructure, not routine ptest runs. They
 # regularly time out in the time/memory constrained autobuilder QEMU targets
 # (e.g. test_fuzz_iso9660). Skip them via the upstream escape hatch.
 export SKIP_TEST_FUZZ=1
+
+# The bsdcpio odc/newc format tests verify archive headers byte-by-byte
+# including inode and device numbers. On ext4 root filesystems inode numbers
+# can exceed the odc 6-octal-digit (262143) or newc 8-hex-digit (4294967295)
+# field widths, causing intermittent assertion failures. Set TMPDIR to a
+# tmpfs so test-created files get small inode numbers.
+WORKDIR=$(mktemp -d)
+mount -t tmpfs tmpfs "$WORKDIR"
+export TMPDIR="$WORKDIR"
 
 for t in libarchive_test bsdtar_test bsdcpio_test bsdcat_test bsdunzip_test; do
     ./$t
@@ -15,3 +27,5 @@ for t in libarchive_test bsdtar_test bsdcpio_test bsdcat_test bsdunzip_test; do
     fi
 done
 
+umount "$WORKDIR"
+rmdir "$WORKDIR"

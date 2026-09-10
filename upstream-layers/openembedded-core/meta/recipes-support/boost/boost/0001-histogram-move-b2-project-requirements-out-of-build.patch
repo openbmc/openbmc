@@ -1,0 +1,85 @@
+From 6f9d9d2c7c9736a8932460ee6c03244d55d24539 Mon Sep 17 00:00:00 2001
+From: Henry Schreiner <henryfs@princeton.edu>
+Date: Thu, 23 Jul 2026 10:12:17 -0400
+Subject: [PATCH] fix: move b2 project requirements out of build.jam
+
+<local-visibility>hidden as a global project requirement leaks into the
+install targets that boost-library generates and breaks alternative
+selection when building the Boost superproject. The warning flags,
+/bigobj, and hidden visibility only matter when compiling tests and
+examples, so move them into test/Jamfile and examples/Jamfile.
+
+Fixes #425
+
+Assisted-by: ClaudeCode:claude-fable-5
+
+Upstream-Status: Backport [https://github.com/boostorg/histogram/commit/6f9d9d2c7c9736a8932460ee6c03244d55d24539]
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ libs/histogram/build.jam        | 11 +----------
+ libs/histogram/examples/Jamfile |  7 +++++++
+ libs/histogram/test/Jamfile     |  7 +++++++
+ 3 files changed, 15 insertions(+), 10 deletions(-)
+
+diff --git a/libs/histogram/build.jam b/libs/histogram/build.jam
+index 3adb8997..4aa62f46 100644
+--- a/libs/histogram/build.jam
++++ b/libs/histogram/build.jam
+@@ -19,16 +19,7 @@ constant boost_dependencies :
+     /boost/throw_exception//boost_throw_exception
+     /boost/variant2//boost_variant2 ;
+ 
+-project /boost/histogram
+-    : requirements
+-        <toolset>clang:<cxxflags>"-Wsign-compare -Wstrict-aliasing -fstrict-aliasing -Wvexing-parse -Wfloat-conversion"
+-        <toolset>gcc:<cxxflags>"-Wsign-compare -Wstrict-aliasing -fstrict-aliasing -Wfloat-conversion"
+-        <toolset>msvc:<cxxflags>"/bigobj"
+-        <toolset>intel-win:<cxxflags>"/bigobj"
+-        <local-visibility>hidden
+-    : default-build
+-        <warnings>extra
+-    ;
++project /boost/histogram ;
+ 
+ explicit
+     [ alias boost_histogram : : :
+diff --git a/libs/histogram/examples/Jamfile b/libs/histogram/examples/Jamfile
+index 655c0228..33b98d0f 100644
+--- a/libs/histogram/examples/Jamfile
++++ b/libs/histogram/examples/Jamfile
+@@ -20,6 +20,13 @@ project
+       # list could go on...
+     ]
+     <library>/boost/format//boost_format
++    <toolset>clang:<cxxflags>"-Wsign-compare -Wstrict-aliasing -fstrict-aliasing -Wvexing-parse -Wfloat-conversion"
++    <toolset>gcc:<cxxflags>"-Wsign-compare -Wstrict-aliasing -fstrict-aliasing -Wfloat-conversion"
++    <toolset>msvc:<cxxflags>"/bigobj"
++    <toolset>intel-win:<cxxflags>"/bigobj"
++    <local-visibility>hidden
++    : default-build
++    <warnings>extra
+     ;
+ 
+ alias cxx14 :
+diff --git a/libs/histogram/test/Jamfile b/libs/histogram/test/Jamfile
+index f69299dc..c156e124 100644
+--- a/libs/histogram/test/Jamfile
++++ b/libs/histogram/test/Jamfile
+@@ -30,6 +30,13 @@ project
+       cxx14_constexpr cxx14_decltype_auto cxx14_generic_lambdas cxx14_return_type_deduction cxx11_user_defined_literals
+       # list could go on...
+     ]
++    <toolset>clang:<cxxflags>"-Wsign-compare -Wstrict-aliasing -fstrict-aliasing -Wvexing-parse -Wfloat-conversion"
++    <toolset>gcc:<cxxflags>"-Wsign-compare -Wstrict-aliasing -fstrict-aliasing -Wfloat-conversion"
++    <toolset>msvc:<cxxflags>"/bigobj"
++    <toolset>intel-win:<cxxflags>"/bigobj"
++    <local-visibility>hidden
++    : default-build
++    <warnings>extra
+     ;
+ 
+ # Check consistency of build systems
+-- 
+2.34.1
+

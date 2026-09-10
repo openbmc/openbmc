@@ -3,9 +3,9 @@ LLVM_DIR = "llvm${LLVM_RELEASE}"
 
 LLVM_HTTP ?= "https://github.com/llvm"
 
-MAJOR_VER = "22"
+MAJOR_VER = "23"
 MINOR_VER = "1"
-PATCH_VER = "8"
+PATCH_VER = "0"
 # could be 'rcX' or 'git' or empty ( for release )
 VER_SUFFIX = ""
 

@@ -8,8 +8,6 @@ DEPENDS = "python3-smmap"
 
 inherit pypi setuptools3
 
-PYPI_PACKAGE = "gitdb"
-
 SRC_URI[sha256sum] = "5ef71f855d191a3326fcfbc0d5da835f26b13fbcba60c32c21091c349ffdb571"
 
 RDEPENDS:${PN} += "python3-compression \

@@ -9,5 +9,8 @@ do_install:append () {
             -e 's@^\(predep_objects="\).*@\1"@' \
             -e 's@^\(postdep_objects="\).*@\1"@' \
             -e "s@${HOSTTOOLS_DIR}/@@g" \
+            -e 's@^build_alias=.*@build_alias=@' \
+            -e 's@^build=.*@build=@' \
+            -e 's@^build_os=.*@build_os=@' \
             -i ${D}${bindir}/libtool
 }

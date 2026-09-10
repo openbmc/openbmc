@@ -170,7 +170,7 @@ def fetch_url(tinfoil, srcuri, srcrev, destdir, logger, preserve_tmp=False, mirr
             logger.debug('Generating initial recipe %s for fetching' % fetchrecipe)
             with open(fetchrecipe, 'w') as f:
                 # We don't want to have to specify LIC_FILES_CHKSUM
-                f.write('LICENSE = "CLOSED"\n')
+                f.write('LICENSE = "LicenseRef-RecipetoolTransient"\n')
                 # We don't need the cross-compiler
                 f.write('INHIBIT_DEFAULT_DEPS = "1"\n')
                 # We don't have the checksums yet so we can't require them
@@ -202,7 +202,7 @@ def fetch_url(tinfoil, srcuri, srcrev, destdir, logger, preserve_tmp=False, mirr
             tinfoil.parse_recipes()
 
             def eventhandler(event):
-                if isinstance(event, bb.fetch2.MissingChecksumEvent):
+                if isinstance(event, bb.fetch.MissingChecksumEvent):
                     checksums.update(event.checksums)
                     return True
                 return False
@@ -211,7 +211,7 @@ def fetch_url(tinfoil, srcuri, srcrev, destdir, logger, preserve_tmp=False, mirr
             res = tinfoil.build_targets(fetchrecipepn,
                                         'do_unpack',
                                         handle_events=True,
-                                        extra_events=['bb.fetch2.MissingChecksumEvent'],
+                                        extra_events=['bb.fetch.MissingChecksumEvent'],
                                         event_callback=eventhandler)
             if not res:
                 raise FetchUrlFailure(srcuri)

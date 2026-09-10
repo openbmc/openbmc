@@ -36,16 +36,9 @@ def runstrip(file, elftype, strip, extra_strip_sections=''):
         os.chmod(file, newmode)
 
     stripcmd = [strip]
-    skip_strip = False
-    # kernel module: use --strip-debug and --preserve-dates (required for
-    # module signing to remain valid after stripping)
+    # kernel module
     if elftype & 16:
-        if is_kernel_module_signed(file):
-            bb.debug(1, "Skip strip on signed module %s" % file)
-            skip_strip = True
-        else:
-            stripcmd.extend(["--strip-debug", "--remove-section=.comment",
-                "--remove-section=.note", "--preserve-dates"])
+        stripcmd.extend(["--strip-debug", "--remove-section=.comment", "--remove-section=.note"])
     # .so and shared library
     elif ".so" in file and elftype & 8:
         stripcmd.extend(["--remove-section=.comment", "--remove-section=.note", "--strip-unneeded"])
@@ -59,8 +52,7 @@ def runstrip(file, elftype, strip, extra_strip_sections=''):
     stripcmd.append(file)
     bb.debug(1, "runstrip: %s" % stripcmd)
 
-    if not skip_strip:
-        output = subprocess.check_output(stripcmd, stderr=subprocess.STDOUT)
+    output = subprocess.check_output(stripcmd, stderr=subprocess.STDOUT)
 
     if newmode:
         os.chmod(file, origmode)
@@ -69,13 +61,6 @@ def runstrip(file, elftype, strip, extra_strip_sections=''):
 def is_kernel_module(path):
     with open(path) as f:
         return mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ).find(b"vermagic=") >= 0
-
-# Detect if .ko module is signed
-def is_kernel_module_signed(path):
-    with open(path, "rb") as f:
-        f.seek(-28, 2)
-        module_tail = f.read()
-        return "Module signature appended" in "".join(chr(c) for c in bytearray(module_tail))
 
 # Return type (bits):
 # 0 - not elf
@@ -277,7 +262,7 @@ def filedeprunner(pkg, pkgfiles, rpmdeps, pkgdest):
 
         return provides, requires
 
-    output = subprocess.check_output(shlex.split(rpmdeps) + pkgfiles, stderr=subprocess.STDOUT).decode("utf-8")
+    output = subprocess.check_output(shlex.split(rpmdeps) + pkgfiles).decode("utf-8")
     provides, requires = process_deps(output, pkg, pkgdest, provides, requires)
 
     return (pkg, provides, requires)
@@ -810,11 +795,6 @@ def splitdebuginfo(file, dvar, dv, d):
     debugfile = dvar + dest
     sources = []
 
-    if file.endswith(".ko") and file.find("/lib/modules/") != -1:
-        if oe.package.is_kernel_module_signed(file):
-            bb.debug(1, "Skip strip on signed module %s" % file)
-            return (file, sources)
-
     # Split the file...
     bb.utils.mkdirhier(os.path.dirname(debugfile))
     #bb.note("Split %s -> %s" % (file, debugfile))
@@ -1088,37 +1068,33 @@ def copydebugsources(debugsrcdir, sources, d):
                 os.rmdir(p)
 
 @bb.parse.vardepsexclude("BB_NUMBER_THREADS")
-def save_debugsources_info(debugsrcdir, sources_raw, d):
+def save_debugsources_info(sources_raw, d):
     import json
     import bb.compress.zstd
-    if debugsrcdir and sources_raw:
-        debugsources_file = d.expand("${PKGDESTWORK}/debugsources/${PN}-debugsources.json.zstd")
-        debugsources_dir = os.path.dirname(debugsources_file)
-        if not os.path.isdir(debugsources_dir):
-            bb.utils.mkdirhier(debugsources_dir)
-        bb.utils.remove(debugsources_file)
 
-        workdir = d.getVar("WORKDIR")
-        pn = d.getVar('PN')
+    if not sources_raw:
+        return
 
-        # Kernel sources are in a different directory and are special case
-        # we format the sources as expected by spdx by replacing /usr/src/kernel/
-        # into BP/
-        kernel_src = d.getVar('KERNEL_SRC_PATH')
-        bp = d.getVar('BP')
-        sources_dict = {}
-        for file, src_files in sources_raw:
-            file_clean = file.replace(f"{workdir}/package/","")
-            sources_clean = [
-                src.replace(f"{debugsrcdir}/{pn}/", "")
-                if not kernel_src else src.replace(f"{kernel_src}/", f"{bp}/")
-                for src in src_files
-                if not any(keyword in src for keyword in ("<internal>", "<built-in>")) and not src.endswith("/")
-            ]
-            sources_dict[file_clean] = sorted(sources_clean)
-        num_threads = int(d.getVar("BB_NUMBER_THREADS"))
-        with bb.compress.zstd.open(debugsources_file, "wt", encoding="utf-8", num_threads=num_threads) as f:
-            json.dump(sources_dict, f, sort_keys=True)
+    debugsources_file = d.expand("${PKGDESTWORK}/debugsources/${PN}-debugsources.json.zstd")
+    debugsources_dir = os.path.dirname(debugsources_file)
+    if not os.path.isdir(debugsources_dir):
+        bb.utils.mkdirhier(debugsources_dir)
+    bb.utils.remove(debugsources_file)
+
+    workdir = d.getVar("WORKDIR")
+
+    def _filter_src_file(src):
+        if src.endswith("/"):
+            return False
+        return not any(keyword in src for keyword in ("<internal>", "<built-in>"))
+
+    sources_dict = {}
+    for file, src_files in sources_raw:
+        file_clean = file.replace(f"{workdir}/package/", "")
+        sources_dict[file_clean] = sorted(filter(_filter_src_file, src_files))
+    num_threads = int(d.getVar("BB_NUMBER_THREADS"))
+    with bb.compress.zstd.open(debugsources_file, "wt", encoding="utf-8", num_threads=num_threads) as f:
+        json.dump(sources_dict, f, sort_keys=True)
 
 @bb.parse.vardepsexclude("BB_NUMBER_THREADS")
 def read_debugsources_info(d):
@@ -1292,10 +1268,9 @@ def process_split_and_strip_files(d):
 
         if dv["srcdir"] and not hostos.startswith("mingw"):
             if (d.getVar('PACKAGE_DEBUG_STATIC_SPLIT') == '1'):
-                results = oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, dv, d))
+                results.extend(oe.utils.multiprocess_launch(splitstaticdebuginfo, staticlibs, d, extraargs=(dvar, dv, d)))
             else:
-                for file in staticlibs:
-                    results.append( (file,source_info(file, d)) )
+                results.extend((file, source_info(file, d)) for file in staticlibs)
 
         d.setVar("PKGDEBUGSOURCES", {strip_pkgd_prefix(f): sorted(s) for f, s in results})
 
@@ -1365,7 +1340,7 @@ def process_split_and_strip_files(d):
         copydebugsources(dv["srcdir"], sources, d)
 
         # Save source info to be accessible to other tasks
-        save_debugsources_info(dv["srcdir"], results, d)
+        save_debugsources_info(results, d)
     #
     # End of debug splitting
     #
@@ -1853,7 +1828,8 @@ def process_shlibs(pkgfiles, d):
                     if s[0] not in shlib_provider:
                         shlib_provider[s[0]] = {}
                     shlib_provider[s[0]][s[1]] = (pkg, pkgver)
-        if needs_ldconfig:
+        if needs_ldconfig and \
+                not bb.utils.to_boolean(d.getVar('SKIP_LDCONFIG_POSTINST_FRAGMENT:%s' % pkg)):
             bb.debug(1, 'adding ldconfig call to postinst for %s' % pkg)
             postinst = d.getVar('pkg_postinst:%s' % pkg)
             if not postinst:

@@ -34,7 +34,7 @@ python devupstream_virtclass_handler () {
     d.setVar("DEFAULT_PREFERENCE", "-1")
 
     src_uri = d.getVar("SRC_URI:class-devupstream") or d.getVar("SRC_URI")
-    uri = bb.fetch2.URI(src_uri.split()[0])
+    uri = bb.fetch.URI(src_uri.split()[0])
 
     # Modify the PV if the recipe hasn't already overridden it
     pv = d.getVar("PV")

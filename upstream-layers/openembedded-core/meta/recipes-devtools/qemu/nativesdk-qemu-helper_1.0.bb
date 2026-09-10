@@ -1,7 +1,7 @@
 SUMMARY = "Qemu helper scripts"
 LICENSE = "GPL-2.0-only"
 # QEMU 11.0.0+ requires a 64-bit host architecture
-COMPATIBLE_HOST = "(aarch64|x86_64|ppc64|ppc64le|riscv64|loongarch64|mips64|s390x|sparc64).*-linux"
+COMPATIBLE_HOST = "(aarch64|x86_64|ppc64|ppc64le|riscv64|loongarch64|mips64|s390x|sparc64).*-.*"
 RDEPENDS:${PN} = "nativesdk-qemu nativesdk-unfs3 nativesdk-pseudo \
                   nativesdk-python3-shell nativesdk-python3-fcntl nativesdk-python3-logging \
                 "
@@ -9,6 +9,7 @@ RDEPENDS:${PN} = "nativesdk-qemu nativesdk-unfs3 nativesdk-pseudo \
 LIC_FILES_CHKSUM = "file://${COREBASE}/scripts/runqemu;beginline=5;endline=10;md5=ac2b489a58739c7628a2604698db5e7f"
 
 SRC_URI = "file://${COREBASE}/scripts/runqemu \
+           file://${COREBASE}/scripts/lib/pseudo_rootfs_utils.py \
            file://${COREBASE}/scripts/runqemu-addptable2image \
            file://${COREBASE}/scripts/runqemu-gen-tapdevs \
            file://${COREBASE}/scripts/runqemu-ifup \
@@ -30,4 +31,6 @@ do_install() {
 	install -d ${D}${bindir}
 	install -m 0755 ${S}${COREBASE}/scripts/oe-* ${D}${bindir}/
 	install -m 0755 ${S}${COREBASE}/scripts/runqemu* ${D}${bindir}/
+	# The runqemu-* wrappers import this module from their own directory.
+	install -m 0644 ${S}${COREBASE}/scripts/lib/pseudo_rootfs_utils.py ${D}${bindir}/
 }

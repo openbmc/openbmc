@@ -10,6 +10,8 @@ import shutil
 import tempfile
 import urllib.parse
 
+import oe.spdx_license
+
 from oeqa.utils.commands import runCmd, bitbake, get_bb_var
 from oeqa.utils.commands import get_bb_vars, create_temp_layer
 from oeqa.selftest.cases import devtool
@@ -406,7 +408,7 @@ class RecipetoolCreateTests(RecipetoolBase):
             self.fail('recipetool did not create recipe file; output:\n%s\ndirlist:\n%s' % (result.output, str(dirlist)))
         self.assertEqual(dirlist[0], 'socat_%s.bb' % pv, 'Recipe file incorrectly named')
         checkvars = {}
-        checkvars['LICENSE'] = set(['Unknown', 'GPL-2.0-only'])
+        checkvars['LICENSE'] = 'GPL-2.0-only AND Unknown'
         checkvars['LIC_FILES_CHKSUM'] = set(['file://COPYING.OpenSSL;md5=5c9bccc77f67a8328ef4ebaf468116f4', 'file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263'])
         # We don't check DEPENDS since they are variable for this recipe depending on what's in the sysroot
         checkvars['S'] = None
@@ -422,7 +424,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['LGPL-2.1-only', 'MPL-1.1-only'])
+        checkvars['LICENSE'] = 'LGPL-2.1-only AND MPL-1.1'
         checkvars['SRC_URI'] = 'http://taglib.github.io/releases/taglib-${PV}.tar.gz'
         checkvars['SRC_URI[sha256sum]'] = 'b6d1a5a610aae6ff39d93de5efd0fdc787aa9e9dc1e7026fa4c961b26563526b'
         checkvars['DEPENDS'] = set(['boost', 'zlib'])
@@ -445,7 +447,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars = {}
         checkvars['SUMMARY'] = 'Node Server Example'
         checkvars['HOMEPAGE'] = 'https://github.com/savoirfairelinux/node-server-example#readme'
-        checkvars['LICENSE'] = 'BSD-3-Clause & ISC & MIT & Unknown'
+        checkvars['LICENSE'] = 'BSD-3-Clause AND ISC AND MIT AND Unknown'
         urls = []
         urls.append('npm://registry.npmjs.org/;package=@savoirfairelinux/node-server-example;version=${PV}')
         urls.append('npmsw://${THISDIR}/${BPN}/npm-shrinkwrap.json')
@@ -469,7 +471,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd(cmd)
         self.assertTrue(os.path.isfile(recipefile), msg="recipe %s not created for command %s, output %s" % (recipefile, " ".join(cmd), result.output))
         checkvars = {}
-        checkvars['LICENSE'] = set(['Apache-2.0', "Unknown"])
+        checkvars['LICENSE'] = 'Apache-2.0 AND Unknown'
         checkvars['SRC_URI'] = 'git://github.com/mesonbuild/meson;protocol=https;branch=0.52'
         inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
@@ -487,7 +489,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd('recipetool create --no-pypi -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
         checkvars['SRC_URI'] = 'https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-${PV}.tar.gz'
         checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
@@ -505,7 +507,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
         checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
         checkvars['PYPI_PACKAGE'] = pn
@@ -527,7 +529,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
         checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
         checkvars['PYPI_PACKAGE'] = pn
@@ -541,7 +543,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         runCmd('recipetool create -o %s %s --version %s' % (temprecipe, srcuri, pv))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=16a934f165e8c3245f241e77d401bb88'
         checkvars['SRC_URI[sha256sum]'] = 'f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5'
         checkvars['PYPI_PACKAGE'] = pn
@@ -568,7 +570,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         recipefile = os.path.join(temprecipe, '%s_%s.bb' % (pn, latest_pv))
         # Do not check LIC_FILES_CHKSUM and SRC_URI checksum here to avoid having updating the test on each release
         checkvars = {}
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['PYPI_PACKAGE'] = pn
         inherits = ['setuptools3', "pypi"]
         self._test_recipe_contents(recipefile, checkvars, inherits)
@@ -588,7 +590,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
         checkvars['SUMMARY'] = 'A library for working with the color formats defined by HTML and CSS.'
-        checkvars['LICENSE'] = set(['BSD-3-Clause'])
+        checkvars['LICENSE'] = 'BSD-3-Clause'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=702b1ef12cf66832a88f24c8f2ee9c19'
         checkvars['SRC_URI[sha256sum]'] = 'c225b674c83fa923be93d235330ce0300373d02885cef23238813b0d5668304a'
         inherits = ['python_setuptools_build_meta', 'pypi']
@@ -611,7 +613,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
         checkvars['SUMMARY'] = 'A linter for YAML files.'
-        checkvars['LICENSE'] = set(['GPL-3.0-only'])
+        checkvars['LICENSE'] = 'GPL-3.0-only'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=1ebbd3e34237af26da5dc08a4e440464'
         checkvars['SRC_URI[sha256sum]'] = '81f7c0c5559becc8049470d86046b36e96113637bcbe4753ecef06977c00245d'
         inherits = ['python_setuptools_build_meta', 'pypi']
@@ -633,7 +635,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
         checkvars['SUMMARY'] = 'Sphinx SVG to PDF or PNG converter extension'
-        checkvars['LICENSE'] = set(['BSD-2-Clause'])
+        checkvars['LICENSE'] = 'BSD-2-Clause'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE.txt;md5=b11cf936853a71258d4b57bb1849a3f9'
         checkvars['SRC_URI[sha256sum]'] = 'ab9c8f1080391e231812d20abf2657a69ee35574563b1014414f953964a95fa3'
         inherits = ['python_setuptools_build_meta', 'pypi']
@@ -655,7 +657,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
         checkvars['SUMMARY'] = 'Simple module to parse ISO 8601 dates'
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=aab31f2ef7ba214a5a341eaa47a7f367'
         checkvars['SRC_URI[sha256sum]'] = '6b1d3829ee8921c4301998c909f7829fa9ed3cbdac0d3b16af2d743aed1ba8df'
         inherits = ['python_poetry_core', 'pypi']
@@ -700,7 +702,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         checkvars = {}
         checkvars['SUMMARY'] = 'An implementation of JSON Schema validation for Python'
         checkvars['HOMEPAGE'] = 'https://github.com/python-jsonschema/jsonschema'
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://COPYING;md5=7a60a81c146ec25599a3e1dabb8610a8 file://json/LICENSE;md5=9d4de43111d33570c8fe49b4cb0e01af'
         checkvars['SRC_URI[sha256sum]'] = 'ec84cc37cfa703ef7cd4928db24f9cb31428a5d0fa77747b8b51a847458e0bbf'
         inherits = ['python_hatchling', 'pypi']
@@ -722,7 +724,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
         checkvars['HOMEPAGE'] = 'https://github.com/pydantic/pydantic-core'
-        checkvars['LICENSE'] = set(['MIT'])
+        checkvars['LICENSE'] = 'MIT'
         checkvars['LIC_FILES_CHKSUM'] = 'file://LICENSE;md5=ab599c188b4a314d2856b3a55030c75c'
         checkvars['SRC_URI[sha256sum]'] = '6d30226dfc816dd0fdf120cae611dd2215117e4f9b124af8c60ab9093b6e8e71'
         inherits = ['python_maturin', 'pypi']
@@ -759,7 +761,7 @@ class RecipetoolCreateTests(RecipetoolBase):
         result = runCmd('recipetool create -o %s %s' % (temprecipe, srcuri))
         self.assertTrue(os.path.isfile(recipefile))
         checkvars = {}
-        checkvars['LICENSE'] = set(['Apache-2.0'])
+        checkvars['LICENSE'] = 'Apache-2.0'
         checkvars['SRC_URI'] = 'https://github.com/mesonbuild/meson/releases/download/${PV}/meson-${PV}.tar.gz'
         inherits = ['setuptools3']
         self._test_recipe_contents(recipefile, checkvars, inherits)
@@ -934,26 +936,26 @@ class RecipetoolTests(RecipetoolBase):
 
         extravalues = {
             # Duplicate and missing licenses
-            'LICENSE': 'Zlib & BSD-2-Clause & Zlib',
+            'LICENSE': 'Zlib AND BSD-2-Clause AND Zlib',
             'LIC_FILES_CHKSUM': [
                 'file://README.md;md5=0123456789abcdef0123456789abcd'
             ]
         }
         lines_before = []
         handled = []
-        licvalues = handle_license_vars(srctree, lines_before, handled, extravalues, d)
+        licnode = handle_license_vars(srctree, lines_before, handled, extravalues, d)
         expected_lines_before = [
             '# WARNING: the following LICENSE and LIC_FILES_CHKSUM values are best guesses - it is',
             '# your responsibility to verify that the values are complete and correct.',
-            '# NOTE: Original package / source metadata indicates license is: BSD-2-Clause & Zlib',
+            '# NOTE: Original package / source metadata indicates license is: BSD-2-Clause AND Zlib',
             '#',
-            '# NOTE: multiple licenses have been detected; they have been separated with &',
+            '# NOTE: multiple licenses have been detected; they have been separated with AND',
             '# in the LICENSE value for now since it is a reasonable assumption that all',
             '# of the licenses apply. If instead there is a choice between the multiple',
-            '# licenses then you should change the value to separate the licenses with |',
-            '# instead of &. If there is any doubt, check the accompanying documentation',
+            '# licenses then you should change the value to separate the licenses with OR',
+            '# instead of AND. If there is any doubt, check the accompanying documentation',
             '# to determine which situation is applicable.',
-            'LICENSE = "Apache-2.0 & BSD-2-Clause & BSD-3-Clause & ISC & MIT & Zlib"',
+            'LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND Zlib"',
             'LIC_FILES_CHKSUM = "file://LICENSE;md5=0835ade698e0bcf8506ecda2f7b4f302 \\\n'
             '                    file://LICENSE.Apache-2.0;md5=89aea4e17d99a7cacdbeed46a0096b10 \\\n'
             '                    file://LICENSE.BSD-3-Clause;md5=550794465ba0ec5312d6919e203a55f9 \\\n'
@@ -963,36 +965,32 @@ class RecipetoolTests(RecipetoolBase):
             ''
         ]
         self.assertEqual(lines_before, expected_lines_before)
-        expected_licvalues = [
-            ('MIT', 'LICENSE', '0835ade698e0bcf8506ecda2f7b4f302'),
-            ('Apache-2.0', 'LICENSE.Apache-2.0', '89aea4e17d99a7cacdbeed46a0096b10'),
-            ('BSD-3-Clause', 'LICENSE.BSD-3-Clause', '550794465ba0ec5312d6919e203a55f9'),
-            ('ISC', 'LICENSE.ISC', 'f3b90e78ea0cffb20bf5cca7947a896d'),
-            ('MIT', 'LICENSE.MIT', '0835ade698e0bcf8506ecda2f7b4f302')
-        ]
-        self.assertEqual(handled, [('license', expected_licvalues)])
+        expected_licvalue = oe.spdx_license.parse("Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND ISC AND MIT AND Zlib")
+        self.assertEqual(len(handled), 1)
+        self.assertEqual(handled[0][0], "license")
+        self.assertEqual(handled[0][1].to_string(), expected_licvalue.to_string())
         self.assertEqual(extravalues, {})
-        self.assertEqual(licvalues, expected_licvalues)
+        self.assertEqual(licnode.to_string(), expected_licvalue.to_string())
 
 
     def test_recipetool_split_pkg_licenses(self):
         from create import split_pkg_licenses
         licvalues = [
             # Duplicate licenses
-            ('BSD-2-Clause', 'x/COPYING', None),
-            ('BSD-2-Clause', 'x/LICENSE', None),
+            (oe.spdx_license.parse('BSD-2-Clause'), 'x/COPYING', None),
+            (oe.spdx_license.parse('BSD-2-Clause'), 'x/LICENSE', None),
             # Multiple licenses
-            ('MIT', 'x/a/LICENSE.MIT', None),
-            ('ISC', 'x/a/LICENSE.ISC', None),
+            (oe.spdx_license.parse('MIT'), 'x/a/LICENSE.MIT', None),
+            (oe.spdx_license.parse('ISC'), 'x/a/LICENSE.ISC', None),
             # Alternative licenses
-            ('(MIT | ISC)', 'x/b/LICENSE', None),
+            (oe.spdx_license.parse('(MIT OR ISC)'), 'x/b/LICENSE', None),
             # Alternative licenses without brackets
-            ('MIT | BSD-2-Clause', 'x/c/LICENSE', None),
+            (oe.spdx_license.parse('MIT OR BSD-2-Clause'), 'x/c/LICENSE', None),
             # Multi licenses with alternatives
-            ('MIT', 'x/d/COPYING', None),
-            ('MIT | BSD-2-Clause', 'x/d/LICENSE', None),
+            (oe.spdx_license.parse('MIT'), 'x/d/COPYING', None),
+            (oe.spdx_license.parse('MIT OR BSD-2-Clause'), 'x/d/LICENSE', None),
             # Multi licenses with alternatives and brackets
-            ('Apache-2.0 & ((MIT | ISC) & BSD-3-Clause)', 'x/e/LICENSE', None)
+            (oe.spdx_license.parse('Apache-2.0 AND ((MIT OR ISC) AND BSD-3-Clause)'), 'x/e/LICENSE', None)
         ]
         packages = {
             '${PN}': '',
@@ -1013,23 +1011,23 @@ class RecipetoolTests(RecipetoolBase):
         outlines = []
         outlicenses = split_pkg_licenses(licvalues, packages, outlines, fallback_licenses)
         expected_outlicenses = {
-            '${PN}': ['BSD-2-Clause'],
-            'a': ['ISC', 'MIT'],
-            'b': ['(ISC | MIT)'],
-            'c': ['(BSD-2-Clause | MIT)'],
-            'd': ['(BSD-2-Clause | MIT)', 'MIT'],
-            'e': ['(ISC | MIT)', 'Apache-2.0', 'BSD-3-Clause'],
-            'f': ['BSD-3-Clause'],
-            'g': ['Unknown']
+            '${PN}': 'BSD-2-Clause',
+            'a': 'ISC AND MIT',
+            'b': 'ISC OR MIT',
+            'c': 'BSD-2-Clause OR MIT',
+            'd': 'MIT AND (BSD-2-Clause OR MIT)',
+            'e': 'Apache-2.0 AND BSD-3-Clause AND (ISC OR MIT)',
+            'f': 'BSD-3-Clause',
+            'g': 'Unknown',
         }
         self.assertEqual(outlicenses, expected_outlicenses)
         expected_outlines = [
             'LICENSE:${PN} = "BSD-2-Clause"',
-            'LICENSE:a = "ISC & MIT"',
-            'LICENSE:b = "(ISC | MIT)"',
-            'LICENSE:c = "(BSD-2-Clause | MIT)"',
-            'LICENSE:d = "(BSD-2-Clause | MIT) & MIT"',
-            'LICENSE:e = "(ISC | MIT) & Apache-2.0 & BSD-3-Clause"',
+            'LICENSE:a = "ISC AND MIT"',
+            'LICENSE:b = "ISC OR MIT"',
+            'LICENSE:c = "BSD-2-Clause OR MIT"',
+            'LICENSE:d = "MIT AND (BSD-2-Clause OR MIT)"',
+            'LICENSE:e = "Apache-2.0 AND BSD-3-Clause AND (ISC OR MIT)"',
             'LICENSE:f = "BSD-3-Clause"',
             'LICENSE:g = "Unknown"'
         ]

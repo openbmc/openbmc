@@ -18,8 +18,8 @@ SRCREV = "9091d6dbcce3d8fb87adf9249a2eb346d25a562c"
 
 inherit autotools gettext
 
-# Upstream has a custom autogen.sh which invokes po/update-potfiles as they 
-# don't ship a po/POTFILES.in (which is silly).  Without that file gettext 
+# Upstream has a custom autogen.sh which invokes po/update-potfiles as they
+# don't ship a po/POTFILES.in (which is silly).  Without that file gettext
 # doesn't believe po/ is a gettext directory and won't generate po/Makefile.
 do_configure:prepend() {
     ( cd ${S} && po/update-potfiles )

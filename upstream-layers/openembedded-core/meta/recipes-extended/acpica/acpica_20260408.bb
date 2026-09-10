@@ -9,7 +9,7 @@ ACPI tables."
 HOMEPAGE = "https://www.intel.com/content/www/us/en/developer/topic-technology/open/acpica/overview.html"
 SECTION = "console/tools"
 
-LICENSE = "Intel | BSD-3-Clause | GPL-2.0-only"
+LICENSE = "BSD-3-Clause OR GPL-2.0-only OR Intel"
 LIC_FILES_CHKSUM = "file://source/compiler/aslcompile.c;beginline=7;endline=150;md5=4877caee45a613e9706946c3205a6fb9"
 
 COMPATIBLE_HOST = "(i.86|x86_64|arm|aarch64).*-linux"

@@ -2,7 +2,7 @@ SUMMARY = "Device Tree Compiler"
 HOMEPAGE = "https://devicetree.org/"
 DESCRIPTION = "The Device Tree Compiler is a toolchain for working with device tree source and binary files."
 SECTION = "bootloader"
-LICENSE = "GPL-2.0-only | BSD-2-Clause"
+LICENSE = "BSD-2-Clause OR GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://BSD-2-Clause;md5=5d6306d1b08f8df623178dfd81880927 \
@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://GPL;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     "
 
 SRC_URI = " \
-    git://git.kernel.org/pub/scm/utils/dtc/dtc.git;branch=main;protocol=https \
+    git://git.kernel.org/pub/scm/utils/dtc/dtc.git;branch=main;protocol=https;tag=v${PV} \
 "
 SRCREV = "8f48565e5cfedc74d3f7512f1e0188e9d85dc1de"
 

@@ -1,4 +1,4 @@
-From c8fd85d80eb64fede8447842042977b70b3c96bc Mon Sep 17 00:00:00 2001
+From 74473daa46b315f3d98fbf9a6a58f52c9c29a365 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Tue, 17 May 2022 17:22:48 +0800
 Subject: [PATCH] pyproject.toml: remove --benchmark-disable option
@@ -19,22 +19,22 @@ Upstream-Status: Inappropriate [OE specific]
 
 Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
 
-Refresh for 42.02
+Refresh for 50.0.0
 Signed-off-by: Tim Orling <tim.orling@konsulko.com>
 ---
  pyproject.toml | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/pyproject.toml b/pyproject.toml
-index cddaf7f..921badf 100644
+index b56cda9..781743b 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -139,7 +139,7 @@ exclude = [
+@@ -140,7 +140,7 @@ exclude = [
  ]
  
  [tool.pytest.ini_options]
 -addopts = "-r s --capture=no --strict-markers --benchmark-disable"
 +addopts = "-r s --capture=no --strict-markers"
+ testpaths = ["tests"]
  console_output_style = "progress-even-when-capture-no"
  markers = [
-     "skip_fips: this test is not executed in FIPS mode",

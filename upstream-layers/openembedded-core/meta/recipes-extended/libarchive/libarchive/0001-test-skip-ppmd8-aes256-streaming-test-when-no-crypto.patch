@@ -1,0 +1,46 @@
+From c2b00a5fff659bbe8d70b5e00cb6abb831170aeb Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Wed, 29 Jul 2026 13:33:10 +0000
+Subject: [PATCH] test: skip ppmd8 aes256 streaming test when no crypto library
+ is present
+
+test_read_format_zip_ppmd8_aes256_streaming fails with 6 assertion
+failures on systems without a crypto library (openssl/nettle/mbedtls)
+because it tries to decrypt a pre-built encrypted zipx file without
+checking crypto availability first.
+
+Add the same guard used by the other encrypted zip tests in this file.
+
+Upstream-Status: Submitted [https://github.com/libarchive/libarchive/pull/3335]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ .../test/test_read_format_zip_zipx_encrypted.c     | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/libarchive/test/test_read_format_zip_zipx_encrypted.c b/libarchive/test/test_read_format_zip_zipx_encrypted.c
+index f07e1e5c..a0a431fb 100644
+--- a/libarchive/test/test_read_format_zip_zipx_encrypted.c
++++ b/libarchive/test/test_read_format_zip_zipx_encrypted.c
+@@ -257,8 +257,22 @@ DEFINE_TEST(test_read_format_zip_zipx_zstd_encrypted_streaming)
+ DEFINE_TEST(test_read_format_zip_ppmd8_aes256_streaming)
+ {
+ 	const char *refname = "test_read_format_zip_ppmd8_aes256_streaming.zipx";
++	struct archive *a;
+ 	size_t used;
+ 	char buff[600];
++
++	/* Check if running system has cryptographic functionality. */
++	assert((a = archive_write_new()) != NULL);
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_set_format_zip(a));
++	assertEqualIntA(a, ARCHIVE_OK, archive_write_add_filter_none(a));
++	if (ARCHIVE_OK != archive_write_set_options(a,
++			"zip:encryption=aes256")) {
++		skipping("This system does not have cryptographic library");
++		archive_write_free(a);
++		return;
++	}
++	archive_write_free(a);
++
+ 	extract_reference_file(refname);
+ 	FILE *f = fopen(refname, "rb");
+ 	used = fread(buff, 1, sizeof(buff), f);

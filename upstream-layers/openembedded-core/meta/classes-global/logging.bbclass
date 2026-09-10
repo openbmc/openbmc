@@ -22,7 +22,7 @@ bbplain() {
 	fi
 }
 
-# Notify the user of a noteworthy condition. 
+# Notify the user of a noteworthy condition.
 # Output: logs
 bbnote() {
 	if [ -p ${LOGFIFO} ] ; then
@@ -99,7 +99,7 @@ bbdebug() {
 	if [ $# -lt 2 ]; then
 		bbfatal "$USAGE"
 	fi
-	
+
 	# Strip off the debug level and ensure it is an integer
 	DBGLVL=$1; shift
 	NONDIGITS=$(echo "$DBGLVL" | tr -d "[:digit:]")

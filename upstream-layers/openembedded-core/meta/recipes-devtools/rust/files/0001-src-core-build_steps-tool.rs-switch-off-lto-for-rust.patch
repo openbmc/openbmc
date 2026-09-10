@@ -16,6 +16,7 @@ various crates, which should be safe to mix.
 
 Upstream-Status: Inappropriate [reported at https://github.com/rust-lang/rust/issues/134589]
 Signed-off-by: Alexander Kanavin <alex@linutronix.de>
+Signed-off-by: Deepesh Varatharajan <Deepesh.Varatharajan@windriver.com>
 ---
  src/bootstrap/src/core/build_steps/tool.rs | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
@@ -25,7 +26,7 @@ index 087df2f8a..00790affb 100644
 --- a/src/bootstrap/src/core/build_steps/tool.rs
 +++ b/src/bootstrap/src/core/build_steps/tool.rs
 @@ -13,14 +13,12 @@ use std::ffi::OsStr;
- use std::path::PathBuf;
+ use std::path::{Path, PathBuf};
  use std::{env, fs};
 
 -use crate::core::build_steps::compile::is_lto_stage;
@@ -42,7 +43,7 @@ index 087df2f8a..00790affb 100644
  use crate::utils::exec::{BootstrapCommand, command};
  use crate::utils::helpers::{add_dylib_path, exe, t};
  use crate::{Compiler, FileType, Kind, Mode};
-@@ -121,22 +121,7 @@ impl Step for ToolBuild {
+@@ -121,22 +118,7 @@ impl Step for ToolBuild {
              cargo.env("RUSTC_WRAPPER", ccache);
          }
 
@@ -67,6 +68,7 @@ index 087df2f8a..00790affb 100644
              cargo.allow_features(self.allow_features);
          }
 diff --git a/src/bootstrap/src/core/builder/mod.rs b/src/bootstrap/src/core/builder/mod.rs
+index 1234567..abcdefg 100644
 --- a/src/bootstrap/src/core/builder/mod.rs
 +++ b/src/bootstrap/src/core/builder/mod.rs
 @@ -13,7 +13,7 @@ use clap::ValueEnum;

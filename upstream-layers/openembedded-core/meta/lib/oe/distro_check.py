@@ -4,6 +4,9 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
 
+import os
+import shutil
+
 def create_socket(url, d):
     import urllib
     from bb.utils import export_proxies
@@ -150,8 +153,6 @@ def get_latest_released_ubuntu_source_package_list(d):
     return latest, package_names
 
 def create_distro_packages_list(distro_check_dir, d):
-    import shutil
-
     pkglst_dir = os.path.join(distro_check_dir, "package_lists")
     bb.utils.remove(pkglst_dir, True)
     bb.utils.mkdirhier(pkglst_dir)

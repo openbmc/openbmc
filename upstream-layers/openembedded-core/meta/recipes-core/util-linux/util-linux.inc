@@ -17,8 +17,19 @@ SRC_URI = "${KERNELORG_MIRROR}/linux/utils/util-linux/v${MAJOR_VERSION}/util-lin
            file://display_testname_for_subtest.patch \
            file://avoid_parallel_tests.patch \
            file://0001-tests-script-Disable-size-option-test.patch \
+           file://0001-libmount-add-missing-fileutils.h-include-to-hook_idma.patch \
+           file://0002-lib-fileutils-fix-unused-parameter-warnings-without-.patch \
+           file://0003-mount-fix-grammar-and-typo-in-X-mount.idmap-document.patch \
+           file://0004-libmount-use-USE_LIBMOUNT_MOUNTFD_SUPPORT-for-idmap-h.patch \
+           file://0005-tools-add-non-newmount.conf-config-gen-profile.patch \
            "
 
-SRC_URI[sha256sum] = "03a05d3adf9602ef128f2da05b84b3205ce60c351e5737c0370f74000679ce8a"
+SRC_URI[sha256sum] = "66ac7c0e725278eb2b039e3104f2c91119341d941b41bac7a285c695f940bd57"
 
 CVE_PRODUCT = "util-linux"
+
+CVE_STATUS[CVE-2026-3184] = "fixed-version: Fixed since 2.42"
+
+# util-linux publishes bugfix/security-only point releases on its
+# stable/v<major.minor> branches.
+inherit upstream-stable-release-point

@@ -73,7 +73,7 @@ require ../conf/image-uefi.conf
 
 INITRAMFS_IMAGE ?= "core-image-minimal-initramfs"
 
-do_image_complete[depends] += "${INITRAMFS_IMAGE}:do_image_complete"
+do_image_complete[depends] += "${@ '${INITRAMFS_IMAGE}:do_image_complete' if d.getVar('INITRAMFS_IMAGE') else ''}"
 
 UKIFY_CMD ?= "ukify build"
 UKI_CONFIG_FILE ?= "${UNPACKDIR}/uki.conf"
@@ -127,9 +127,11 @@ python do_uki() {
     ukify_cmd += " --stub %s" % (stub)
 
     # initrd
-    uki_fstype = d.getVar("INITRAMFS_FSTYPES").split()[0]
-    initramfs_image = "%s-%s.%s" % (d.getVar('INITRAMFS_IMAGE'), d.getVar('MACHINE'), uki_fstype)
-    ukify_cmd += " --initrd=%s" % (os.path.join(deploy_dir_image, initramfs_image))
+    initramfs_image = d.getVar('INITRAMFS_IMAGE')
+    if initramfs_image:
+        uki_fstype = d.getVar("INITRAMFS_FSTYPES").split()[0]
+        initramfs_file = "%s-%s.%s" % (initramfs_image, d.getVar('MACHINE'), uki_fstype)
+        ukify_cmd += " --initrd=%s" % (os.path.join(deploy_dir_image, initramfs_file))
 
     # kernel
     kernel_filename = d.getVar('UKI_KERNEL_FILENAME') or None

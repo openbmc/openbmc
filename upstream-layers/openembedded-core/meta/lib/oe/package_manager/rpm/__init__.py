@@ -318,7 +318,8 @@ class RpmPM(PackageManager):
                              "-c", oe.path.join(self.target_rootfs, "etc/dnf/dnf.conf"),
                              "--setopt=reposdir=%s" %(oe.path.join(self.target_rootfs, "etc/yum.repos.d")),
                              "--installroot=%s" % (self.target_rootfs),
-                             "--setopt=logdir=%s" % (self.d.getVar('T'))
+                             "--setopt=logdir=%s" % (self.d.getVar('T')),
+                             "--setopt=optional_metadata_types=filelists",
                             ]
         if hasattr(self, "rpm_repo_dir"):
             standard_dnf_args.append("--repofrompath=oe-repo,%s" % (self.rpm_repo_dir))
@@ -332,6 +333,13 @@ class RpmPM(PackageManager):
         except subprocess.CalledProcessError as e:
             if print_output:
                 e_output = e.output.decode("utf-8")
+                # RPM 6 fails the entire transaction when a %post scriptlet
+                # fails, causing dnf to exit non-zero. Let install_pkgs handle
+                # scriptlet failures via its existing "Error in POSTIN scriptlet"
+                # scanning rather than treating this as a fatal dnf invocation error.
+                if "Error in POSTIN scriptlet in rpm package" in e_output:
+                    bb.note(e_output)
+                    return e_output
                 extra_info = ""
                 if "install" in dnf_args:
                     if "Error: Unable to find a match:" in e_output:

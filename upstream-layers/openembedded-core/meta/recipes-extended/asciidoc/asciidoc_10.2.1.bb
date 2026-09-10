@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=aaee33adce0fc7cc40fee23f82f7f101 \
                     file://LICENSE;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     "
 
-SRC_URI = "git://github.com/asciidoc/asciidoc-py;protocol=https;branch=main"
+SRC_URI = "git://github.com/asciidoc/asciidoc-py;protocol=https;branch=main;tag=${PV}"
 SRCREV = "21e33efe96ba9a51d99d1150691dae750afd6ed1"
 
 DEPENDS = "libxml2-native libxslt-native docbook-xml-dtd4-native docbook-xsl-stylesheets-native"

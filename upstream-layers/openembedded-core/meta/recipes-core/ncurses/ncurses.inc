@@ -161,6 +161,9 @@ _install_cfgs = "\
   PKG_CONFIG_LIBDIR='${libdir}/pkgconfig' \
 "
 
+TERMINFO_BASE = "alacritty ansi console dumb linux rxvt screen screen-256color sun \
+  tmux tmux-256color vt52 vt100 vt102 vt200 vt220 xterm xterm-color xterm-xfree86 xterm-256color"
+
 do_install() {
         # Order of installation is important; widec installs a 'curses.h'
         # header with more definitions and must be installed last hence.
@@ -179,27 +182,6 @@ do_install() {
             oe_runmake -C widec ${_install_cfgs} ${_install_opts}
 
         cd narrowc
-
-        # include some basic terminfo files
-        # stolen ;) from gentoo and modified a bit
-        for x in alacritty ansi console dumb linux rxvt screen screen-256color sun tmux tmux-256color vt52 vt100 vt102 vt200 vt220 xterm-color xterm-xfree86 xterm-256color
-        do
-                local termfile="$(find "${D}${datadir}/terminfo/" -name "${x}" 2>/dev/null)"
-                local basedir="$(basename $(dirname "${termfile}"))"
-
-                if [ -n "${termfile}" ]
-                then
-                        install -d ${D}${sysconfdir}/terminfo/${basedir}
-                        mv ${termfile} ${D}${sysconfdir}/terminfo/${basedir}/
-                        ln -s /etc/terminfo/${basedir}/${x} \
-                                ${D}${datadir}/terminfo/${basedir}/${x}
-                fi
-        done
-        # i think we can use xterm-color as default xterm
-        if [ -e ${D}${sysconfdir}/terminfo/x/xterm-color ]
-        then
-                ln -sf xterm-color ${D}${sysconfdir}/terminfo/x/xterm
-        fi
 
         # create linker scripts for libcurses.so and libncurses to
         # link against -ltinfo when needed. Some builds might break
@@ -308,7 +290,7 @@ FILES:${PN}-terminfo = "\
 "
 
 FILES:${PN}-terminfo-base = "\
-  ${sysconfdir}/terminfo \
+  ${@' '.join(map(lambda x: '${datadir}/terminfo/'+x[0]+'/'+x, '${TERMINFO_BASE}'.split()))} \
 "
 
 RSUGGESTS:${PN}-libtinfo = "${PN}-terminfo"

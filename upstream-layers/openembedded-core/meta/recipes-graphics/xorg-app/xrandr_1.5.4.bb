@@ -14,4 +14,6 @@ PE = "1"
 SRC_URI_EXT = "xz"
 SRC_URI[sha256sum] = "2cafccb2aaf2491a4068676117a0d4f90ab307724b96fffc54cd1da953779400"
 
+XORGBUILDCLASS = "meson"
+
 BBCLASSEXTEND = "native nativesdk"

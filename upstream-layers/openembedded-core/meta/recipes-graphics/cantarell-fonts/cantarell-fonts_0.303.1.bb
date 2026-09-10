@@ -7,7 +7,7 @@ DESCRIPTION = "The Cantarell font typeface is designed as a \
 
 HOMEPAGE = "https://gitlab.gnome.org/GNOME/cantarell-fonts/"
 SECTION = "fonts"
-LICENSE = "OFL-1.1 & Apache-2.0"
+LICENSE = "Apache-2.0 AND OFL-1.1"
 LIC_FILES_CHKSUM = "file://COPYING;md5=fb1ef92b6909969a472a6ea3c4e99cb7"
 
 inherit gnomebase allarch fontcache

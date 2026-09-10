@@ -7,7 +7,7 @@ BUGTRACKER = "http://bugzilla.libsdl.org/"
 
 SECTION = "libs"
 
-LICENSE = "Zlib & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND Zlib"
 LIC_FILES_CHKSUM = "\
     file://LICENSE.txt;md5=cbf0e3161523f9a9315b6b915c5c4457 \
     file://src/hidapi/LICENSE.txt;md5=7c3949a631240cb6c31c50f3eb696077 \
@@ -16,7 +16,7 @@ LIC_FILES_CHKSUM = "\
 "
 
 # arm-neon adds MIT license
-LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'arm-neon', '& MIT', '', d)}"
+LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'arm-neon', 'AND MIT', '', d)}"
 LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'arm-neon', 'file://src/video/arm/pixman-arm-neon-asm.h;md5=9a9cc1e51abbf1da58f4d9528ec9d49b;beginline=1;endline=24', '', d)}"
 
 PROVIDES = "virtual/libsdl2"

@@ -1,4 +1,4 @@
-From b4a3b9f913e06f9b71966cd695df1ab14a031ed0 Mon Sep 17 00:00:00 2001
+From a3239f480eecc8d45bd15b8c0f6774424249a295 Mon Sep 17 00:00:00 2001
 From: Joshua Watt <JPEWhacker@gmail.com>
 Date: Thu, 20 Feb 2020 15:20:45 -0600
 Subject: [PATCH] build: Fix strndup detection on MinGW
@@ -20,7 +20,7 @@ Signed-off-by: Denys Dmytriyenko <denis@denix.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/meson.build b/meson.build
-index 33653e7..e05eaef 100644
+index 2c010be..3b6f8d7 100644
 --- a/meson.build
 +++ b/meson.build
 @@ -49,12 +49,12 @@ have_funcs = [

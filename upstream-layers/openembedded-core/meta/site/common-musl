@@ -45,6 +45,3 @@ ac_cv_va_copy=${ac_cv_va_copy=yes}
 ac_cv___va_copy=${ac_cv___va_copy=yes}
 ac_cv_func_va_copy=${ac_cv_func_va_copy=yes}
 ac_cv_func___va_copy=${ac_cv_func___va_copy=yes}
-
-# Xorg
-xorg_cv_malloc0_returns_null=${xorg_cv_malloc0_returns_null=yes}

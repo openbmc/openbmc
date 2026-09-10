@@ -45,7 +45,7 @@ python package_generate_dlopen_deps() {
     dep_map = {
         "required": "RDEPENDS",
         "recommended": "RRECOMMENDS",
-        "suggested": "RSUGGESTS"
+        "suggested": "RRECOMMENDS"
     }
 
     shlibs = oe.package.read_shlib_providers(d)

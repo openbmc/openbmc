@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
+import os
 import bb
 import json
 import subprocess

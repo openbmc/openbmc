@@ -1,3 +1,11 @@
 
 option('FAILING_TEST', type : 'feature', value : 'disabled',
     description : 'Compile a failing unit test to test the test infrastructure')
+option('WITH_SYSTEMD', type : 'feature', value : 'disabled',
+    description : 'Target is managed by systemd: skip the legacy SysV daemonize/pidfile/privilege-drop code')
+option('BINARY_NAME', type : 'string', value : 'mesonex',
+    description : 'Name of the installed executable')
+option('TEST_BINARY_NAME', type : 'string', value : 'test-mesonex',
+    description : 'Name of the installed test executable')
+option('CONFIG_FILE_NAME', type : 'string', value : 'meson-example.conf',
+    description : 'Configuration file name in sysconfdir')

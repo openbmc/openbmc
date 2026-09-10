@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=12f884d2ae1ff87c09e5b7ccc2c4ca7e \
 
 DEPENDS = "dbus glib-2.0 libnl autoconf-archive-native"
 
-SRC_URI = "git://github.com/linux-nfc/neard;protocol=https;branch=master \
+SRC_URI = "git://github.com/linux-nfc/neard;protocol=https;branch=master;tag=v${PV} \
            file://neard.in \
            file://Makefile.am-do-not-ship-version.h.patch \
            file://0001-Add-header-dependency-to-nciattach.o.patch \

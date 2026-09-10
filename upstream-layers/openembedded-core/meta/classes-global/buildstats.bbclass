@@ -24,11 +24,11 @@ def get_process_cputime(pid):
     import resource
     with open("/proc/%d/stat" % pid, "r") as f:
         fields = f.readline().rstrip().split()
-    stats = { 
+    stats = {
         'utime'  : fields[13],
-        'stime'  : fields[14], 
-        'cutime' : fields[15], 
-        'cstime' : fields[16],  
+        'stime'  : fields[14],
+        'cutime' : fields[15],
+        'cstime' : fields[16],
     }
     iostats = {}
     if os.path.isfile("/proc/%d/io" % pid):
@@ -161,7 +161,7 @@ def write_host_data(logfile, e, d, type):
             bb.warn("buildstats: Collecting host data failed. BB_HEARTBEAT_EVENT interval not enough to run the specified commands. Increase value of BB_HEARTBEAT_EVENT in conf/local.conf.")
             return
 
-    # set the environment variables 
+    # set the environment variables
     path = d.getVar("PATH")
     opath = d.getVar("BB_ORIGENV", False).getVar("PATH")
     ospath = os.environ['PATH']

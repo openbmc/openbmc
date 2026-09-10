@@ -4,11 +4,11 @@ tracepath, tracepath6, ping, ping6 and arping."
 HOMEPAGE = "https://github.com/iputils/iputils"
 SECTION = "console/network"
 
-LICENSE = "BSD-3-Clause & GPL-2.0-or-later"
+LICENSE = "BSD-3-Clause AND GPL-2.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=627cc07ec86a45951d43e30658bbd819"
 
-SRC_URI = "git://github.com/iputils/iputils;branch=master;protocol=https \
+SRC_URI = "git://github.com/iputils/iputils;branch=master;protocol=https;tag=${PV} \
           "
 SRCREV = "6e1cb146547eb6fbb127ffc8397a9241be0d33c2"
 

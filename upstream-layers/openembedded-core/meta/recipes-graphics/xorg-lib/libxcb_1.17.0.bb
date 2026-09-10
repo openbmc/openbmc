@@ -16,7 +16,7 @@ SRC_URI[sha256sum] = "599ebf9996710fea71622e6e184f3a8ad5b43d0e5fa8c4e407123c88a5
 
 BBCLASSEXTEND = "native nativesdk"
 
-DEPENDS = "xcb-proto xorgproto libxau libpthread-stubs libxdmcp"
+DEPENDS = "util-macros-native xcb-proto xorgproto libxau libpthread-stubs libxdmcp"
 
 PACKAGES_DYNAMIC = "^${PN}-.*"
 

@@ -2,7 +2,7 @@ SUMMARY = "High level language (GLib) binding for D-Bus"
 DESCRIPTION = "GLib bindings for the D-Bus message bus that integrate \
 the D-Bus library with the GLib thread abstraction and main loop."
 HOMEPAGE = "https://www.freedesktop.org/Software/dbus"
-LICENSE = "(AFL-2.1 & LGPL-2.0-or-later & MIT) | (GPL-2.0-or-later & LGPL-2.0-or-later & MIT)"
+LICENSE = "AFL-2.1 AND LGPL-2.0-or-later AND MIT OR GPL-2.0-or-later AND LGPL-2.0-or-later AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=267b04646da5ce3ea2df7a38a07c3f0b \
                     file://LICENSES/AFL-2.1.txt;md5=f3ad2f482ec639b440413665cfb9e714 \
                     file://LICENSES/GPL-2.0-or-later.txt;md5=3d26203303a722dedc6bf909d95ba815 \

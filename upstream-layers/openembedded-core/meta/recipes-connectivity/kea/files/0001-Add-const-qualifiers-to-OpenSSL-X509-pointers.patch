@@ -1,0 +1,49 @@
+From 82d28b1be73bbc00e73e59d0c59c51a1e76519a5 Mon Sep 17 00:00:00 2001
+From: Simo Sorce <simo@redhat.com>
+Date: Mon, 27 Apr 2026 17:49:56 -0400
+Subject: [PATCH] Add const qualifiers to OpenSSL X509 pointers
+
+Added const qualifiers to the X509_NAME and X509_NAME_ENTRY pointers when
+retrieving subject and issuer names from TLS certificates. This ensures const-
+correctness and maintains compatibility with newer OpenSSL versions, which
+return const pointers from these getter functions.
+
+Signed-off-by: Simo Sorce <simo@redhat.com>
+
+Upstream-Status: Submitted [https://gitlab.isc.org/isc-projects/kea/-/issues/4673]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/lib/asiolink/openssl_tls.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/lib/asiolink/openssl_tls.h b/src/lib/asiolink/openssl_tls.h
+index 57c3323..52a969b 100644
+--- a/src/lib/asiolink/openssl_tls.h
++++ b/src/lib/asiolink/openssl_tls.h
+@@ -175,9 +175,9 @@ public:
+         if (!cert) {
+             return ("");
+         }
+-        ::X509_NAME *name = ::X509_get_subject_name(cert);
++        const ::X509_NAME *name = ::X509_get_subject_name(cert);
+         int loc = ::X509_NAME_get_index_by_NID(name, NID_commonName, -1);
+-        ::X509_NAME_ENTRY* ne = ::X509_NAME_get_entry(name, loc);
++        const ::X509_NAME_ENTRY* ne = ::X509_NAME_get_entry(name, loc);
+         if (!ne) {
+             ::X509_free(cert);
+             return ("");
+@@ -209,9 +209,9 @@ public:
+         if (!cert) {
+             return ("");
+         }
+-        ::X509_NAME *name = ::X509_get_issuer_name(cert);
++        const ::X509_NAME *name = ::X509_get_issuer_name(cert);
+         int loc = ::X509_NAME_get_index_by_NID(name, NID_commonName, -1);
+-        ::X509_NAME_ENTRY* ne = ::X509_NAME_get_entry(name, loc);
++        const ::X509_NAME_ENTRY* ne = ::X509_NAME_get_entry(name, loc);
+         if (!ne) {
+             ::X509_free(cert);
+             return ("");
+-- 
+2.53.0
+

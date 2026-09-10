@@ -118,7 +118,7 @@ def determine_file_source(targetpath, rd):
             workdirfile = os.path.relpath(srcpath, unpackdir)
             # FIXME this is where we ought to have some code in the fetcher, because this is naive
             for item in src_uri.split():
-                localpath = bb.fetch2.localpath(item, rd)
+                localpath = bb.fetch.localpath(item, rd)
                 # Source path specified in do_install might be a glob
                 if fnmatch.fnmatch(os.path.basename(localpath), workdirfile):
                     srcfile = 'file://%s' % localpath

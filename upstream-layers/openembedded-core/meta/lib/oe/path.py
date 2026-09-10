@@ -6,6 +6,7 @@
 
 import errno
 import glob
+import os
 import shutil
 import subprocess
 import os.path
@@ -169,7 +170,18 @@ def symlink(source, destination, force=False):
     """Create a symbolic link"""
     try:
         if force:
-            remove(destination)
+            # Remove the exact destination path. Do not route this through
+            # remove(), which treats its argument as a glob pattern: a
+            # destination containing glob metacharacters (for example a
+            # '[' in the name) could fail to match, or match and delete
+            # unrelated files.
+            try:
+                os.unlink(destination)
+            except OSError as exc:
+                if exc.errno == errno.EISDIR:
+                    shutil.rmtree(destination)
+                elif exc.errno != errno.ENOENT:
+                    raise
         os.symlink(source, destination)
     except OSError as e:
         if e.errno != errno.EEXIST or os.readlink(destination) != source:
@@ -234,7 +246,7 @@ def __realpath(file, root, loop_cnt, assume_dir):
     try:
         is_dir = os.path.isdir(file)
     except:
-        is_dir = false
+        is_dir = False
 
     return (file, is_dir)
 
@@ -345,7 +357,11 @@ def canonicalize(paths, sep=','):
     # prefixes in sting compares later on, where the slashes then are important.
     canonical_paths = []
     for path in (paths or '').split(sep):
-        if '$' not in path:
+        # Skip empty tokens as well as unexpanded bitbake variables: an
+        # empty path would otherwise reach os.path.realpath(''), which
+        # returns the current working directory, so canonicalize('') or
+        # canonicalize(None) would wrongly produce the cwd instead of ''.
+        if path and '$' not in path:
             trailing_slash = path.endswith('/') and '/' or ''
             canonical_paths.append(os.path.realpath(path) + trailing_slash)
 

@@ -233,6 +233,7 @@ INHERIT:remove = \"report-error\"
 
     def test_non_gplv3(self):
         self.write_config('''INCOMPATIBLE_LICENSE = "GPL-3.0-or-later"
+INCOMPATIBLE_LICENSE_EXCEPTIONS = "GCC-exception-3.1"
 OVERRIDES .= ":gplv3test"
 require conf/distro/include/no-gplv3.inc
 ''')
@@ -364,7 +365,7 @@ require conf/distro/include/no-gplv3.inc
         self.write_config("DISTROOVERRIDES .= \":gitunpack-enable-recipe\"")
 
         result = bitbake('gitunpackoffline-fail -c fetch', ignore_status=True)
-        self.assertTrue(re.search("Recipe uses a floating tag/branch .* for repo .* without a fixed SRCREV yet doesn't call bb.fetch2.get_srcrev()", result.output), msg = "Recipe without PV set to SRCPV should have failed: %s" % result.output)
+        self.assertTrue(re.search("Recipe uses a floating tag/branch .* for repo .* without a fixed SRCREV yet doesn't call bb.fetch.get_srcrev()", result.output), msg = "Recipe without PV set to SRCPV should have failed: %s" % result.output)
 
     def test_unexpanded_variable_in_path(self):
         """

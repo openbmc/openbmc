@@ -1,0 +1,1033 @@
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
+import os
+import oe.utils
+
+def bblayers_conf_file(d):
+    return os.path.join(d.getVar('TOPDIR'), 'conf/bblayers.conf')
+
+def sanity_conf_read(fn):
+    with open(fn, 'r') as f:
+        lines = f.readlines()
+    return lines
+
+def sanity_conf_find_line(pattern, lines):
+    import re
+    return next(((index, line)
+        for index, line in enumerate(lines)
+        if re.search(pattern, line)), (None, None))
+
+def sanity_conf_update(fn, lines, version_var_name, new_version):
+    index, line = sanity_conf_find_line(r"^%s" % version_var_name, lines)
+    lines[index] = '%s = "%d"\n' % (version_var_name, new_version)
+    with open(fn, "w") as f:
+        f.write(''.join(lines))
+
+def raise_sanity_error(msg, d, network_error=False):
+    if d.getVar("SANITY_USE_EVENTS") == "1":
+        try:
+            bb.event.fire(bb.event.SanityCheckFailed(msg, network_error), d)
+        except TypeError:
+            bb.event.fire(bb.event.SanityCheckFailed(msg), d)
+        return
+
+    bb.fatal(""" OE-core's config sanity checker detected a potential misconfiguration.
+    Either fix the cause of this error or at your own risk disable the checker (see sanity.conf).
+    Following is the list of potential problems / advisories:
+
+    %s""" % msg)
+
+# Check a single tune for validity.
+def check_toolchain_tune(data, tune, multilib):
+    tune_errors = []
+    if not tune:
+        return "No tuning found for %s multilib." % multilib
+    localdata = bb.data.createCopy(data)
+    if multilib != "default":
+        # Apply the overrides so we can look at the details.
+        overrides = localdata.getVar("OVERRIDES", False) + ":virtclass-multilib-" + multilib
+        localdata.setVar("OVERRIDES", overrides)
+    bb.debug(2, "Sanity-checking tuning '%s' (%s) features:" % (tune, multilib))
+    features = (localdata.getVar("TUNE_FEATURES:tune-%s" % tune) or "").split()
+    if not features:
+        return "Tuning '%s' has no defined features, and cannot be used." % tune
+    valid_tunes = localdata.getVarFlags('TUNEVALID') or {}
+    conflicts = localdata.getVarFlags('TUNECONFLICTS') or {}
+    # [doc] is the documentation for the variable, not a real feature
+    if 'doc' in valid_tunes:
+        del valid_tunes['doc']
+    if 'doc' in conflicts:
+        del conflicts['doc']
+    for feature in features:
+        if feature in conflicts:
+            for conflict in conflicts[feature].split():
+                if conflict in features:
+                    tune_errors.append("Feature '%s' conflicts with '%s'." %
+                        (feature, conflict))
+        if feature in valid_tunes:
+            bb.debug(2, "  %s: %s" % (feature, valid_tunes[feature]))
+        else:
+            tune_errors.append("Feature '%s' is not defined." % feature)
+    if tune_errors:
+        return "Tuning '%s' has the following errors:\n" % tune + '\n'.join(tune_errors)
+
+def check_toolchain(data):
+    tune_error_set = []
+    deftune = data.getVar("DEFAULTTUNE")
+    tune_errors = check_toolchain_tune(data, deftune, 'default')
+    if tune_errors:
+        tune_error_set.append(tune_errors)
+
+    multilibs = (data.getVar("MULTILIB_VARIANTS") or "").split()
+    global_multilibs = (data.getVar("MULTILIB_GLOBAL_VARIANTS") or "").split()
+
+    if multilibs:
+        seen_libs = []
+        seen_tunes = []
+        for lib in multilibs:
+            if lib in seen_libs:
+                tune_error_set.append("The multilib '%s' appears more than once." % lib)
+            else:
+                seen_libs.append(lib)
+            if not lib in global_multilibs:
+                tune_error_set.append("Multilib %s is not present in MULTILIB_GLOBAL_VARIANTS" % lib)
+            tune = data.getVar("DEFAULTTUNE:virtclass-multilib-%s" % lib)
+            if tune in seen_tunes:
+                tune_error_set.append("The tuning '%s' appears in more than one multilib." % tune)
+            else:
+                seen_libs.append(tune)
+            if tune == deftune:
+                tune_error_set.append("Multilib '%s' (%s) is also the default tuning." % (lib, deftune))
+            else:
+                tune_errors = check_toolchain_tune(data, tune, lib)
+            if tune_errors:
+                tune_error_set.append(tune_errors)
+    if tune_error_set:
+        return "Toolchain tunings invalid:\n" + '\n'.join(tune_error_set) + "\n"
+
+    return ""
+
+def check_conf_exists(fn, data):
+    bbpath = []
+    fn = data.expand(fn)
+    vbbpath = data.getVar("BBPATH", False)
+    if vbbpath:
+        bbpath += vbbpath.split(":")
+    for p in bbpath:
+        currname = os.path.join(data.expand(p), fn)
+        if os.access(currname, os.R_OK):
+            return True
+    return False
+
+def check_create_long_filename(filepath, pathname):
+    import string, random
+    testfile = os.path.join(filepath, ''.join(random.choice(string.ascii_letters) for x in range(200)))
+    try:
+        if not os.path.exists(filepath):
+            bb.utils.mkdirhier(filepath)
+        f = open(testfile, "w")
+        f.close()
+        os.remove(testfile)
+    except IOError as e:
+        import errno
+        err, strerror = e.args
+        if err == errno.ENAMETOOLONG:
+            return "Failed to create a file with a long name in %s. Please use a filesystem that does not unreasonably limit filename length.\n" % pathname
+        else:
+            return "Failed to create a file in %s: %s.\n" % (pathname, strerror)
+    except OSError as e:
+        errno, strerror = e.args
+        return "Failed to create %s directory in which to run long name sanity check: %s.\n" % (pathname, strerror)
+    return ""
+
+def check_path_length(filepath, pathname, limit):
+    if len(filepath) > limit:
+        return "The length of %s is longer than %s, this would cause unexpected errors, please use a shorter path.\n" % (pathname, limit)
+    return ""
+
+def check_non_ascii(filepath, pathname):
+    if(not filepath.isascii()):
+        return "Non-ASCII character(s) in %s path (\"%s\") detected. This would cause build failures as we build software that doesn't support this.\n" % (pathname, filepath)
+    return ""
+
+def get_filesystem_id(path):
+    import subprocess
+    try:
+        return subprocess.check_output(["stat", "-f", "-c", "%t", path]).decode('utf-8').strip()
+    except subprocess.CalledProcessError:
+        bb.warn("Can't get filesystem id of: %s" % path)
+        return None
+
+# Check that the path isn't located on nfs.
+def check_not_nfs(path, name):
+    # The nfs' filesystem id is 6969
+    if get_filesystem_id(path) == "6969":
+        return "The %s: %s can't be located on nfs.\n" % (name, path)
+    return ""
+
+# Check that the path is on a case-sensitive file system
+def check_case_sensitive(path, name):
+    import tempfile
+    with tempfile.NamedTemporaryFile(prefix='TmP', dir=path) as tmp_file:
+        if os.path.exists(tmp_file.name.lower()):
+            return "The %s (%s) can't be on a case-insensitive file system.\n" % (name, path)
+        return ""
+
+# Check that path isn't a broken symlink
+def check_symlink(lnk, data):
+    if os.path.islink(lnk) and not os.path.exists(lnk):
+        raise_sanity_error("%s is a broken symlink." % lnk, data)
+
+def check_connectivity(d):
+    # URI's to check can be set in the CONNECTIVITY_CHECK_URIS variable
+    # using the same syntax as for SRC_URI. If the variable is not set
+    # the check is skipped
+    test_uris = (d.getVar('CONNECTIVITY_CHECK_URIS') or "").split()
+    retval = ""
+
+    bbn = d.getVar('BB_NO_NETWORK')
+    if bbn not in (None, '0', '1'):
+        return 'BB_NO_NETWORK should be "0" or "1", but it is "%s"' % bbn
+
+    # Only check connectivity if network enabled and the
+    # CONNECTIVITY_CHECK_URIS are set
+    network_enabled = not (bbn == '1')
+    check_enabled = len(test_uris)
+    if check_enabled and network_enabled:
+        # Take a copy of the data store and unset MIRRORS and PREMIRRORS
+        data = bb.data.createCopy(d)
+        data.delVar('PREMIRRORS')
+        data.delVar('MIRRORS')
+        try:
+            fetcher = bb.fetch.Fetch(test_uris, data)
+            fetcher.checkstatus()
+        except Exception as err:
+            # Allow the message to be configured so that users can be
+            # pointed to a support mechanism.
+            msg = data.getVar('CONNECTIVITY_CHECK_MSG') or ""
+            if len(msg) == 0:
+                msg = "%s.\n" % err
+                msg += "    Please ensure your host's network is configured correctly.\n"
+                msg += "    Please ensure CONNECTIVITY_CHECK_URIS is correct and specified URIs are available.\n"
+                msg += "    If your ISP or network is blocking the above URL,\n"
+                msg += "    try with another domain name, for example by setting:\n"
+                msg += "    CONNECTIVITY_CHECK_URIS = \"https://www.example.com/\""
+                msg += "    You could also set BB_NO_NETWORK = \"1\" to disable network\n"
+                msg += "    access if all required sources are on local disk.\n"
+            else:
+                msg = "%s.\n%s" % (err, msg)
+            retval = msg
+
+    return retval
+
+def check_supported_distro(sanity_data):
+    from fnmatch import fnmatch
+
+    tested_distros = sanity_data.getVar('SANITY_TESTED_DISTROS')
+    if not tested_distros:
+        return
+
+    try:
+        distro = oe.lsb.distro_identifier(sanity_data)
+    except Exception:
+        distro = None
+
+    if not distro:
+        bb.warn('Host distribution could not be determined; you may possibly experience unexpected failures. It is recommended that you use a tested distribution.')
+
+    for supported in [x.strip() for x in tested_distros.split('\\n')]:
+        if fnmatch(distro, supported):
+            return
+
+    bb.warn('Host distribution "%s" has not been validated with this version of the build system; you may possibly experience unexpected failures. It is recommended that you use a tested distribution.' % distro)
+
+# Checks we should only make if MACHINE is set correctly
+def check_sanity_validmachine(sanity_data):
+    messages = ""
+
+    # Check TUNE_ARCH is set
+    if sanity_data.getVar('TUNE_ARCH') == 'INVALID':
+        messages = messages + 'TUNE_ARCH is unset. Please ensure your MACHINE configuration includes a valid tune configuration file which will set this correctly.\n'
+
+    # Check TARGET_OS is set
+    if sanity_data.getVar('TARGET_OS') == 'INVALID':
+        messages = messages + 'Please set TARGET_OS directly, or choose a MACHINE or DISTRO that does so.\n'
+
+    # Check that we don't have duplicate entries in PACKAGE_ARCHS & that TUNE_PKGARCH is in PACKAGE_ARCHS
+    pkgarchs = sanity_data.getVar('PACKAGE_ARCHS')
+    tunepkg = sanity_data.getVar('TUNE_PKGARCH')
+    defaulttune = sanity_data.getVar('DEFAULTTUNE')
+    tunefound = False
+    seen = {}
+    dups = []
+
+    for pa in pkgarchs.split():
+        if seen.get(pa, 0) == 1:
+            dups.append(pa)
+        else:
+            seen[pa] = 1
+        if pa == tunepkg:
+            tunefound = True
+
+    if len(dups):
+        messages = messages + "Error, the PACKAGE_ARCHS variable contains duplicates. The following archs are listed more than once: %s" % " ".join(dups)
+
+    if tunefound == False:
+        messages = messages + "Error, the PACKAGE_ARCHS variable (%s) for DEFAULTTUNE (%s) does not contain TUNE_PKGARCH (%s)." % (pkgarchs, defaulttune, tunepkg)
+
+    return messages
+
+# Patch before 2.7 can't handle all the features in git-style diffs.  Some
+# patches may incorrectly apply, and others won't apply at all.
+def check_patch_version(sanity_data):
+    import re, subprocess
+
+    patch_minimum_version = "2.7"
+
+    try:
+        result = subprocess.check_output(["patch", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
+        version = re.search(r"[0-9.]+", result.splitlines()[0]).group()
+        if bb.utils.vercmp_string_op(version, patch_minimum_version, "<"):
+            return ("Your version of patch is older than %s and has bugs which will break builds. "
+                "Please install a newer version of patch.\n" % patch_minimum_version)
+        else:
+            return None
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute patch --version, exit code %d:\n%s\n" % (e.returncode, e.output)
+
+# Glibc needs make 4.0 or later, we may as well match at this point
+def check_make_version(sanity_data):
+    make_minimum_version = "4.0"
+    import subprocess
+
+    try:
+        result = subprocess.check_output(['make', '--version'], stderr=subprocess.STDOUT).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute make --version, exit code %d\n%s\n" % (e.returncode, e.output)
+    version = result.split()[2]
+    if bb.utils.vercmp_string_op(version, make_minimum_version, "<"):
+        return "Please install a make version of %s or later.\n" % make_minimum_version
+
+    if bb.utils.vercmp_string_op(version, "4.2.1", "=="):
+        distro = oe.lsb.distro_identifier(sanity_data)
+        if "ubuntu" in distro or "debian" in distro or "linuxmint" in distro:
+            return None
+        return "make version 4.2.1 is known to have issues on Centos/OpenSUSE and other non-Ubuntu systems. Please use a buildtools-make-tarball or a newer version of make.\n"
+    return None
+
+
+# Check if we're running on WSL (Windows Subsystem for Linux).
+# WSLv1 is known not to work but WSLv2 should work properly as
+# long as the VHDX file is optimized often, let the user know
+# upfront.
+# More information on installing WSLv2 at:
+# https://docs.microsoft.com/en-us/windows/wsl/wsl2-install
+def check_wsl(d):
+    with open("/proc/version", "r") as f:
+        verdata = f.readlines()
+    for l in verdata:
+        if "Microsoft" in l:
+            return "OpenEmbedded doesn't work under WSLv1, please upgrade to WSLv2 if you want to run builds on Windows"
+        elif "microsoft" in l:
+            bb.warn("You are running bitbake under WSLv2, this works properly but you should optimize your VHDX file eventually to avoid running out of storage space")
+    return None
+
+def check_userns():
+    """
+    Check that user namespaces are functional, as they're used for network isolation.
+    """
+
+    # There is a known failure case with AppAmrmor where the unshare() call
+    # succeeds (at which point the uid is nobody) but writing to the uid_map
+    # fails (so the uid isn't reset back to the user's uid). We can detect this.
+    parentuid = os.getuid()
+    if not bb.utils.is_local_uid(parentuid):
+        return None
+    pid = os.fork()
+    if not pid:
+        try:
+            bb.utils.disable_network()
+        except:
+            pass
+        os._exit(parentuid != os.getuid())
+
+    ret = os.waitpid(pid, 0)[1]
+    if ret:
+        bb.fatal("User namespaces are not usable by BitBake, possibly due to AppArmor.\n"
+                 "See https://discourse.ubuntu.com/t/ubuntu-24-04-lts-noble-numbat-release-notes/39890#unprivileged-user-namespace-restrictions for more information.")
+
+
+# Require at least gcc version 10.1
+#
+# A less invasive fix is with scripts/install-buildtools (or with user
+# built buildtools-extended-tarball)
+#
+def check_gcc_version(sanity_data):
+    gcc_minimum_version = "10.1"
+    version = oe.utils.get_host_gcc_version(sanity_data)
+    if bb.utils.vercmp_string_op(version, gcc_minimum_version, "<"):
+        return ("Your version of gcc is older than %s and will break builds. Please install a newer "
+            "version of gcc (you could use the project's buildtools-extended-tarball or use "
+            "scripts/install-buildtools).\n" % gcc_minimum_version)
+    return None
+
+# Tar version 1.24 and onwards handle overwriting symlinks correctly
+# but earlier versions do not; this needs to work properly for sstate
+# Version 1.28 is needed so opkg-build works correctly when reproducible builds are enabled
+# Gtar is assumed at to be used as tar in poky
+def check_tar_version(sanity_data):
+    tar_minimum_version = "1.28"
+    import subprocess
+    try:
+        result = subprocess.check_output(["tar", "--version"], stderr=subprocess.STDOUT).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute tar --version, exit code %d\n%s\n" % (e.returncode, e.output)
+    if not "GNU" in result:
+        return "Your version of tar is not gtar. Please install gtar (you could use the project's buildtools-tarball from our last release or use scripts/install-buildtools).\n"
+    version = result.split()[3]
+    if bb.utils.vercmp_string_op(version, tar_minimum_version, "<"):
+        return ("Your version of tar is older than %s and does not have the support needed to enable reproducible "
+            "builds. Please install a newer version of tar (you could use the project's buildtools-tarball from "
+            "our last release or use scripts/install-buildtools).\n" % tar_minimum_version)
+
+    try:
+        result = subprocess.check_output(["tar", "--help"], stderr=subprocess.STDOUT).decode('utf-8')
+        if "--xattrs" not in result:
+            return "Your tar doesn't support --xattrs, please use GNU tar.\n"
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute tar --help, exit code %d\n%s\n" % (e.returncode, e.output)
+
+    try:
+        distro = oe.lsb.distro_identifier(sanity_data)
+    except Exception:
+        distro = None
+
+    if distro:
+        rhel9_alike_prefixes = ("rhel-9", "centos-9", "rocky-9", "almalinux-9")
+        rhel9_tar_minimum_version = "1.35"
+        for prefix in rhel9_alike_prefixes:
+            if distro.startswith(prefix) and bb.utils.vercmp_string_op(version, rhel9_tar_minimum_version, "<"):
+                return ("Your version of tar is older than %s and crashes when extracting read-only files with xattrs. "
+                        "Your distro is %s which triggers this bug due to the presence of selinux attributes. "
+                        "Please install a newer version of tar (you could use the project's buildtools-tarball from "
+                        "our last release or use scripts/install-buildtools).\n" % (rhel9_tar_minimum_version, distro))
+
+    return None
+
+# We use git branch --show-current which was introduced in 2.22.0
+def check_git_version(sanity_data):
+    git_minimum_version = "2.22.0"
+    import subprocess
+    try:
+        result = subprocess.check_output(["git", "--version"], stderr=subprocess.DEVNULL).decode('utf-8')
+    except subprocess.CalledProcessError as e:
+        return "Unable to execute git --version, exit code %d\n%s\n" % (e.returncode, e.output)
+    version = result.split()[2]
+    if bb.utils.vercmp_string_op(version, git_minimum_version, "<"):
+        return ("Your version of git is older than %s and is missing functionality we use. "
+            "Please install a newer version of git.\n" % git_minimum_version)
+    return None
+
+# Check the required perl modules which may not be installed by default
+def check_perl_modules(sanity_data):
+    import subprocess
+    ret = ""
+    modules = ( "Text::ParseWords", "Thread::Queue", "Data::Dumper", "File::Compare", "File::Copy", "open ':std'", "FindBin" )
+    errresult = ''
+    for m in modules:
+        try:
+            subprocess.check_output(["perl", "-e", "use %s" % m])
+        except subprocess.CalledProcessError as e:
+            errresult += bytes.decode(e.output)
+            ret += "%s " % m
+    if ret:
+        return "Required perl module(s) not found: %s\n\n%s\n" % (ret, errresult)
+    return None
+
+def sanity_check_conffiles(d):
+    funcs = d.getVar('BBLAYERS_CONF_UPDATE_FUNCS').split()
+    for func in funcs:
+        conffile, current_version, required_version, func = func.split(":")
+        if check_conf_exists(conffile, d) and d.getVar(current_version) is not None and \
+                d.getVar(current_version) != d.getVar(required_version):
+            try:
+                bb.build.exec_func(func, d)
+            except NotImplementedError as e:
+                bb.fatal(str(e))
+            d.setVar("BB_INVALIDCONF", True)
+
+def drop_v14_cross_builds(d):
+    import glob
+    indexes = glob.glob(d.expand("${SSTATE_MANIFESTS}/index-${BUILD_ARCH}_*"))
+    for i in indexes:
+        with open(i, "r") as f:
+            lines = f.readlines()
+            for l in reversed(lines):
+                try:
+                    (stamp, manifest, workdir) = l.split()
+                except ValueError:
+                    bb.fatal("Invalid line '%s' in sstate manifest '%s'" % (l, i))
+                for m in glob.glob(manifest + ".*"):
+                    if m.endswith(".postrm"):
+                        continue
+                    sstate_clean_manifest(m, d)
+                bb.utils.remove(stamp + "*")
+                bb.utils.remove(workdir, recurse = True)
+
+def check_cpp_toolchain_flag(d, flag, error_message=None):
+    """
+    Checks if the g++ compiler supports the given flag
+    """
+    import shlex
+    import subprocess
+
+    cpp_code = """
+    #include <iostream>
+    int main() {
+        std::cout << "Hello, World!" << std::endl;
+        return 0;
+    }
+    """
+
+    cmd = ["g++", "-x", "c++","-", "-o", "/dev/null", flag]
+    try:
+        subprocess.run(cmd, input=cpp_code, capture_output=True, text=True, check=True)
+        return None
+    except subprocess.CalledProcessError as e:
+        return error_message or f"An unexpected issue occurred during the C++ toolchain check: {str(e)}"
+
+def sanity_handle_abichanges(status, d):
+    #
+    # Check the 'ABI' of TMPDIR
+    #
+    import subprocess
+
+    current_abi = d.getVar('OELAYOUT_ABI')
+    abifile = d.getVar('SANITY_ABIFILE')
+    if os.path.exists(abifile):
+        with open(abifile, "r") as f:
+            abi = f.read().strip()
+        if not abi.isdigit():
+            with open(abifile, "w") as f:
+                f.write(current_abi)
+        elif int(abi) <= 11 and current_abi == "12":
+            status.addresult("The layout of TMPDIR changed for Recipe Specific Sysroots.\nConversion doesn't make sense and this change will rebuild everything so please delete TMPDIR (%s).\n" % d.getVar("TMPDIR"))
+        elif int(abi) <= 13 and current_abi == "14":
+            status.addresult("TMPDIR changed to include path filtering from the pseudo database.\nIt is recommended to use a clean TMPDIR with the new pseudo path filtering so TMPDIR (%s) would need to be removed to continue.\n" % d.getVar("TMPDIR"))
+        elif int(abi) == 14 and current_abi == "15":
+            drop_v14_cross_builds(d)
+            with open(abifile, "w") as f:
+                f.write(current_abi)
+        elif (abi != current_abi):
+            # Code to convert from one ABI to another could go here if possible.
+            status.addresult("Error, TMPDIR has changed its layout version number (%s to %s) and you need to either rebuild, revert or adjust it at your own risk.\n" % (abi, current_abi))
+    else:
+        with open(abifile, "w") as f:
+            f.write(current_abi)
+
+def check_sanity_sstate_dir_change(sstate_dir, data):
+    # Sanity checks to be done when the value of SSTATE_DIR changes
+
+    # Check that SSTATE_DIR isn't on a filesystem with limited filename length (eg. eCryptFS)
+    testmsg = ""
+    if sstate_dir != "":
+        testmsg = check_create_long_filename(sstate_dir, "SSTATE_DIR")
+        # If we don't have permissions to SSTATE_DIR, suggest the user set it as an SSTATE_MIRRORS
+        try:
+            err = testmsg.split(': ')[1].strip()
+            if err == "Permission denied.":
+                testmsg = testmsg + "You could try using %s in SSTATE_MIRRORS rather than as an SSTATE_CACHE.\n" % (sstate_dir)
+        except IndexError:
+            pass
+    return testmsg
+
+def check_sanity_version_change(status, d):
+    import glob
+
+    # Sanity checks to be done when SANITY_VERSION or NATIVELSBSTRING changes
+    # In other words, these tests run once in a given build directory and then
+    # never again until the sanity version or host distribution id/version changes.
+
+    # Check the python install is complete. Examples that are often removed in
+    # minimal installations: glib-2.0-natives requires xml.parsers.expat
+    try:
+        import xml.parsers.expat
+    except ImportError as e:
+        status.addresult('Your Python 3 is not a full install. Please install the module %s (see the Getting Started guide for further information).\n' % e.name)
+
+    status.addresult(check_gcc_version(d))
+    status.addresult(check_make_version(d))
+    status.addresult(check_patch_version(d))
+    status.addresult(check_tar_version(d))
+    status.addresult(check_git_version(d))
+    status.addresult(check_perl_modules(d))
+    status.addresult(check_wsl(d))
+    status.addresult(check_userns())
+
+    missing = ""
+
+    if not oe.utils.check_app_exists("${MAKE}", d):
+        missing = missing + "GNU make,"
+
+    if not oe.utils.check_app_exists('gcc', d):
+        missing = missing + "C Compiler (gcc),"
+
+    if not oe.utils.check_app_exists('g++', d):
+        missing = missing + "C++ Compiler (g++),"
+
+    # installing emacs on Ubuntu 24.04 pulls in emacs-gtk -> libgcc-14-dev despite gcc being 13
+    # this breaks libcxx-native and compiler-rt-native builds so tell the user to fix things
+    if glob.glob("/usr/lib/gcc/*/14/libgcc_s.so") and not glob.glob("/usr/lib/gcc/*/14/libstdc++.so"):
+        status.addresult('libgcc-14-dev is installed and not libstdc++-14-dev which will break clang native compiles. Please remove one or install the other.')
+
+    required_utilities = d.getVar('SANITY_REQUIRED_UTILITIES')
+
+    for util in required_utilities.split():
+        if not oe.utils.check_app_exists(util, d):
+            missing = missing + "%s," % util
+
+    if missing:
+        missing = missing.rstrip(',')
+        status.addresult("Please install the following missing utilities: %s\n" % missing)
+
+    assume_provided = d.getVar('ASSUME_PROVIDED').split()
+    # Check user doesn't have ASSUME_PROVIDED = instead of += in local.conf
+    if "diffstat-native" not in assume_provided:
+        status.addresult('Please use ASSUME_PROVIDED +=, not ASSUME_PROVIDED = in your local.conf\n')
+
+    # Check that TMPDIR isn't on a filesystem with limited filename length (eg. eCryptFS)
+    import stat
+    tmpdir = d.getVar('TMPDIR')
+    topdir = d.getVar('TOPDIR')
+    status.addresult(check_create_long_filename(tmpdir, "TMPDIR"))
+    tmpdirmode = os.stat(tmpdir).st_mode
+    if (tmpdirmode & stat.S_ISGID):
+        status.addresult("TMPDIR is setgid, please don't build in a setgid directory")
+    if (tmpdirmode & stat.S_ISUID):
+        status.addresult("TMPDIR is setuid, please don't build in a setuid directory")
+
+    # Check that a user isn't building in a path in PSEUDO_IGNORE_PATHS
+    pseudoignorepaths = (d.getVar('PSEUDO_IGNORE_PATHS', expand=True) or "").split(",")
+    workdir = d.getVar('WORKDIR', expand=True)
+    for i in pseudoignorepaths:
+        if i and workdir.startswith(i):
+            status.addresult("You are building in a path included in PSEUDO_IGNORE_PATHS " + str(i) + " please locate the build outside this path.\n")
+
+    # Check if PSEUDO_IGNORE_PATHS and paths under pseudo control overlap
+    pseudoignorepaths = (d.getVar('PSEUDO_IGNORE_PATHS', expand=True) or "").split(",")
+    pseudo_control_dir = "${D},${PKGD},${PKGDEST},${IMAGEROOTFS},${SDK_OUTPUT}"
+    pseudocontroldir = d.expand(pseudo_control_dir).split(",")
+    for i in pseudoignorepaths:
+        for j in pseudocontroldir:
+            if i and j:
+                if j.startswith(i):
+                    status.addresult("A path included in PSEUDO_IGNORE_PATHS " + str(i) + " and the path " + str(j) + " overlap and this will break pseudo permission and ownership tracking. Please set the path " + str(j) + " to a different directory which does not overlap with pseudo controlled directories. \n")
+
+    # Some third-party software apparently relies on chmod etc. being suid root (!!)
+    import stat
+    suid_check_bins = "chown chmod mknod".split()
+    for bin_cmd in suid_check_bins:
+        bin_path = bb.utils.which(os.environ["PATH"], bin_cmd)
+        if bin_path:
+            bin_stat = os.stat(bin_path)
+            if bin_stat.st_uid == 0 and bin_stat.st_mode & stat.S_ISUID:
+                status.addresult('%s has the setuid bit set. This interferes with pseudo and may cause other issues that break the build process.\n' % bin_path)
+
+    # Check that we can fetch from various network transports
+    netcheck = check_connectivity(d)
+    status.addresult(netcheck)
+    if netcheck:
+        status.network_error = True
+
+    nolibs = d.getVar('NO32LIBS')
+    if not nolibs:
+        lib32path = '/lib'
+        if os.path.exists('/lib64') and ( os.path.islink('/lib64') or os.path.islink('/lib') ):
+           lib32path = '/lib32'
+
+        if os.path.exists('%s/libc.so.6' % lib32path) and not os.path.exists('/usr/include/gnu/stubs-32.h'):
+            status.addresult("You have a 32-bit libc, but no 32-bit headers.  You must install the 32-bit libc headers.\n")
+
+    bbpaths = d.getVar('BBPATH').split(":")
+    if ("." in bbpaths or "./" in bbpaths or "" in bbpaths):
+        status.addresult("BBPATH references the current directory, either through "    \
+                "an empty entry, a './' or a '.'.\n\t This is unsafe and means your "\
+                "layer configuration is adding empty elements to BBPATH.\n\t "\
+                "Please check your layer.conf files and other BBPATH "        \
+                "settings to remove the current working directory "           \
+                "references.\n" \
+                "Parsed BBPATH is" + str(bbpaths));
+
+    oes_bb_conf = d.getVar( 'OES_BITBAKE_CONF')
+    if not oes_bb_conf:
+        status.addresult('You are not using the OpenEmbedded version of conf/bitbake.conf. This means your environment is misconfigured, in particular check BBPATH.\n')
+
+    # The length of TMPDIR can't be longer than 400
+    status.addresult(check_path_length(tmpdir, "TMPDIR", 400))
+
+    # Check that TOPDIR does not contain non ascii chars (perl_5.40.0, Perl-native and shadow-native build failures)
+    status.addresult(check_non_ascii(topdir, "TOPDIR"))
+
+    # Check that TMPDIR isn't located on nfs
+    status.addresult(check_not_nfs(tmpdir, "TMPDIR"))
+
+    # Check for case-insensitive file systems (such as Linux in Docker on
+    # macOS with default HFS+ file system)
+    status.addresult(check_case_sensitive(tmpdir, "TMPDIR"))
+
+    # Check if linking with lstdc++ is failing
+    status.addresult(check_cpp_toolchain_flag(d, "-lstdc++"))
+
+    # Check if the C++ toochain support the "--std=gnu++20" flag
+    status.addresult(check_cpp_toolchain_flag(d, "--std=gnu++20",
+        "An error occurred during checking the C++ toolchain for '--std=gnu++20' support. "
+        "Please use a g++ compiler that supports C++20 (e.g. g++ version 10 onwards)."))
+
+    # Check there aren't obsolete wic/wks directories
+    for component in d.getVar("BBPATH").split(":") + d.getVar("BBLAYERS").split():
+        for subcomponent in ['wic', 'scripts/lib/wic/canned-wks']:
+            testpath = os.path.join(component, subcomponent)
+            if os.path.exists(testpath):
+                status.addresult("wic/wks files at %s need to be moved to files/wic within the layer to be found/used\n" % testpath)
+
+def sanity_check_locale(d):
+    """
+    Currently bitbake switches locale to en_US.UTF-8 so check that this locale actually exists.
+    """
+    import locale
+    try:
+        locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+    except locale.Error:
+        raise_sanity_error("Your system needs to support the en_US.UTF-8 locale.", d)
+
+def check_cargo_config(d):
+    # Cargo merges .cargo/config[.toml] from every directory between CWD and
+    # the filesystem root. Warn for anything found in ancestor directories
+    # above BASE_WORKDIR that Cargo would pick up silently.
+    import os
+
+    base_workdir = d.getVar('BASE_WORKDIR')
+    ancestor = os.path.dirname(base_workdir)
+    found = []
+    last_ancestor = None
+    while True:
+        for name in ('config', 'config.toml'):
+            cfg = os.path.join(ancestor, '.cargo', name)
+            if os.path.exists(cfg):
+                found.append(cfg)
+                last_ancestor = ancestor
+                break
+        parent = os.path.dirname(ancestor)
+        if parent == ancestor:
+            break
+        ancestor = parent
+
+    if found:
+        bb.warn("Cargo config file(s) found at %s which is/are outside the build "
+                "directory. Cargo will silently apply their settings during the "
+                "rust/cargo build and can override Yocto's settings like linker, "
+                "registry or compiler settings causing build failures. You can "
+                "either remove these file(s) or move your build directory outside "
+                "of %s to fix this. "
+                "See https://bugzilla.yoctoproject.org/show_bug.cgi?id=15637 for more details."
+                % (', '.join(found), last_ancestor))
+
+def check_sanity_everybuild(status, d):
+    import os, stat
+    # Sanity tests which test the users environment so need to run at each build (or are so cheap
+    # it makes sense to always run them.
+
+    if 0 == os.getuid():
+        raise_sanity_error("Do not use Bitbake as root.", d)
+
+    # Check the Python version, we now have a minimum of Python 3.9
+    import sys
+    if sys.hexversion < 0x030900F0:
+        status.addresult('The system requires at least Python 3.9 to run. Please update your Python interpreter.\n')
+
+    # Check the bitbake version meets minimum requirements
+    minversion = d.getVar('BB_MIN_VERSION')
+    if bb.utils.vercmp_string_op(bb.__version__, minversion, "<"):
+        status.addresult('Bitbake version %s is required and version %s was found\n' % (minversion, bb.__version__))
+
+    sanity_check_locale(d)
+    check_cargo_config(d)
+
+    paths = d.getVar('PATH').split(":")
+    if "." in paths or "./" in paths or "" in paths:
+        status.addresult("PATH contains '.', './' or '' (empty element), which will break the build, please remove this.\nParsed PATH is " + str(paths) + "\n")
+
+    #Check if bitbake is present in PATH environment variable
+    bb_check = bb.utils.which(d.getVar('PATH'), 'bitbake')
+    if not bb_check:
+        bb.warn("bitbake binary is not found in PATH, did you source the script?")
+
+    # Check whether 'inherit' directive is found (used for a class to inherit)
+    # in conf file it's supposed to be uppercase INHERIT
+    inherit = d.getVar('inherit')
+    if inherit:
+        status.addresult("Please don't use inherit directive in your local.conf. The directive is supposed to be used in classes and recipes only to inherit of bbclasses. Here INHERIT should be used.\n")
+
+    # Check that the DISTRO is valid, if set
+    # need to take into account DISTRO renaming DISTRO
+    distro = d.getVar('DISTRO')
+    if distro and distro != "nodistro":
+        if not ( check_conf_exists("conf/distro/${DISTRO}.conf", d) or check_conf_exists("conf/distro/include/${DISTRO}.inc", d) ):
+            status.addresult("DISTRO '%s' not found. Please set a valid DISTRO in your local.conf\n" % d.getVar("DISTRO"))
+
+    # Check that these variables don't use tilde-expansion as we don't do that
+    for v in ("TMPDIR", "DL_DIR", "SSTATE_DIR"):
+        if d.getVar(v).startswith("~"):
+            status.addresult("%s uses ~ but Bitbake will not expand this, use an absolute path or variables." % v)
+
+    # Check that DL_DIR is set, exists and is writable. In theory, we should never even hit the check if DL_DIR isn't
+    # set, since so much relies on it being set.
+    dldir = d.getVar('DL_DIR')
+    if not dldir:
+        status.addresult("DL_DIR is not set. Your environment is misconfigured, check that DL_DIR is set, and if the directory exists, that it is writable. \n")
+    if os.path.exists(dldir) and not os.access(dldir, os.W_OK):
+        status.addresult("DL_DIR: %s exists but you do not appear to have write access to it. \n" % dldir)
+    check_symlink(dldir, d)
+
+    # Check that the MACHINE is valid, if it is set
+    machinevalid = True
+    if d.getVar('MACHINE'):
+        if not check_conf_exists("conf/machine/${MACHINE}.conf", d):
+            status.addresult('MACHINE=%s is invalid. Please set a valid MACHINE in your local.conf, environment or other configuration file.\n' % (d.getVar('MACHINE')))
+            machinevalid = False
+        else:
+            status.addresult(check_sanity_validmachine(d))
+    else:
+        status.addresult('Please set a MACHINE in your local.conf or environment\n')
+        machinevalid = False
+    if machinevalid:
+        status.addresult(check_toolchain(d))
+
+    # Check that the SDKMACHINE is valid, if it is set
+    if d.getVar('SDKMACHINE'):
+        if not check_conf_exists("conf/machine-sdk/${SDKMACHINE}.conf", d):
+            status.addresult('Specified SDKMACHINE value is not valid\n')
+        elif d.getVar('SDK_ARCH', False) == "${BUILD_ARCH}":
+            status.addresult('SDKMACHINE is set, but SDK_ARCH has not been changed as a result - SDKMACHINE may have been set too late (e.g. in the distro configuration)\n')
+
+    # If SDK_VENDOR looks like "-my-sdk" then the triples are badly formed so fail early
+    sdkvendor = d.getVar("SDK_VENDOR")
+    if not (sdkvendor.startswith("-") and sdkvendor.count("-") == 1):
+        status.addresult("SDK_VENDOR should be of the form '-foosdk' with a single dash; found '%s'\n" % sdkvendor)
+
+    check_supported_distro(d)
+
+    omask = os.umask(0o022)
+    if omask & 0o755:
+        status.addresult("Please use a umask which allows a+rx and u+rwx\n")
+    os.umask(omask)
+
+    # Ensure /tmp is NOT mounted with noexec
+    if os.statvfs("/tmp").f_flag & os.ST_NOEXEC:
+        raise_sanity_error("/tmp shouldn't be mounted with noexec.", d)
+
+    if d.getVar('TARGET_ARCH') == "arm":
+        # This path is no longer user-readable in modern (very recent) Linux
+        try:
+            if os.path.exists("/proc/sys/vm/mmap_min_addr"):
+                f = open("/proc/sys/vm/mmap_min_addr", "r")
+                try:
+                    if (int(f.read().strip()) > 65536):
+                        status.addresult("/proc/sys/vm/mmap_min_addr is not <= 65536. This will cause problems with qemu so please fix the value (as root).\n\nTo fix this in later reboots, set vm.mmap_min_addr = 65536 in /etc/sysctl.conf.\n")
+                finally:
+                    f.close()
+        except:
+            pass
+
+    for checkdir in ['COREBASE', 'TMPDIR']:
+        val = d.getVar(checkdir)
+        if val.find('..') != -1:
+            status.addresult("Error, you have '..' in your %s directory path. Please ensure the variable contains an absolute path as this can break some recipe builds in obtuse ways." % checkdir)
+        if val.find('+') != -1:
+            status.addresult("Error, you have an invalid character (+) in your %s directory path. Please move the installation to a directory which doesn't include any + characters." % checkdir)
+        if val.find('@') != -1:
+            status.addresult("Error, you have an invalid character (@) in your %s directory path. Please move the installation to a directory which doesn't include any @ characters." % checkdir)
+        if val.find(' ') != -1:
+            status.addresult("Error, you have a space in your %s directory path. Please move the installation to a directory which doesn't include a space since autotools doesn't support this." % checkdir)
+        if val.find('%') != -1:
+            status.addresult("Error, you have an invalid character (%) in your %s directory path which causes problems with python string formatting. Please move the installation to a directory which doesn't include any % characters." % checkdir)
+
+    # Redundant slashes (trailing slash or consecutive slashes) in TMPDIR
+    # break the sstate staging machinery which relies on exact string matching
+    # of manifest paths.  Reject any TMPDIR that differs from its normalised form.
+    tmpdir = d.getVar('TMPDIR')
+    if tmpdir and tmpdir != os.path.normpath(tmpdir):
+        status.addresult("Error, TMPDIR (%s) contains redundant slashes. "
+            "Please set TMPDIR to a clean path with no trailing slash or "
+            "consecutive slashes (e.g. %s).\n" % (tmpdir, os.path.normpath(tmpdir)))
+
+    # Check whether the SOURCE_MIRROR_URL variable, belonging to the 'own-mirrors' class, is defined
+    if oe.utils.inherits(d, 'own-mirrors') and not d.getVar('SOURCE_MIRROR_URL'):
+        status.addresult("own-mirrors is enabled, but SOURCE_MIRROR_URL is not defined")
+
+    # Check the format of MIRRORS, PREMIRRORS and SSTATE_MIRRORS
+    import re
+    mirror_vars = ['MIRRORS', 'PREMIRRORS', 'SSTATE_MIRRORS']
+    protocols = ['http', 'ftp', 'file', 'https', \
+                 'git', 'gitsm', 'hg', 'p4', 'svn', \
+                 'npm', 'sftp', 'ssh', 's3', \
+                 'az', 'ftps', 'crate', 'gs']
+    for mirror_var in mirror_vars:
+        mirrors = (d.getVar(mirror_var) or '').replace('\\n', ' ').split()
+
+        # Split into pairs
+        if len(mirrors) % 2 != 0:
+            bb.warn('Invalid mirror variable value for %s: %s, should contain paired members.' % (mirror_var, str(mirrors)))
+            continue
+        mirrors = list(zip(*[iter(mirrors)]*2))
+
+        for mirror_entry in mirrors:
+            pattern, mirror = mirror_entry
+
+            decoded = bb.fetch.decodeurl(pattern)
+            try:
+                pattern_scheme = re.compile(decoded[0])
+            except re.error as exc:
+                bb.warn('Invalid scheme regex (%s) in %s; %s' % (pattern, mirror_var, mirror_entry))
+                continue
+
+            if not any(pattern_scheme.match(protocol) for protocol in protocols):
+                bb.warn('Invalid protocol (%s) in %s: %s' % (decoded[0], mirror_var, mirror_entry))
+                continue
+
+            if not any(mirror.startswith(protocol + '://') for protocol in protocols):
+                bb.warn('Invalid protocol in %s: %s' % (mirror_var, mirror_entry))
+                continue
+
+            if mirror.startswith('file://'):
+                import urllib
+                check_symlink(urllib.parse.urlparse(mirror).path, d)
+                # SSTATE_MIRROR ends with a /PATH string
+                if mirror.endswith('/PATH'):
+                    # remove /PATH$ from SSTATE_MIRROR to get a working
+                    # base directory path
+                    mirror_base = urllib.parse.urlparse(mirror[:-1*len('/PATH')]).path
+                    check_symlink(mirror_base, d)
+
+    if d.getVar("BB_SIGNATURE_HANDLER") == "OEEquivHash":
+        # Check sstate mirrors aren't being used with a local hash server and no remote
+        hashserv = d.getVar("BB_HASHSERVE")
+        if d.getVar("SSTATE_MIRRORS") and hashserv and hashserv.startswith("unix://") and not d.getVar("BB_HASHSERVE_UPSTREAM"):
+            bb.warn("You are using a local hash equivalence server but have configured an sstate mirror. This will likely mean no sstate will match from the mirror. You may wish to disable the hash equivalence use (BB_HASHSERVE), or use a hash equivalence server alongside the sstate mirror.")
+
+        # Check that when SSTATE_DIR is shared between builds, hashserve database is not private to a build
+        hashserv_proto,_,hashserv_path,_,_,_ = bb.fetch.decodeurl(hashserv)
+        if hashserv_proto == "unix":
+            dbdir = d.getVar("BB_HASHSERVE_DB_DIR") or d.getVar("PERSISTENT_DIR") or d.getVar("CACHE")
+            topdir = d.getVar("TOPDIR")
+            sstatedir = d.getVar("SSTATE_DIR")
+
+            if (hashserv_path.startswith(topdir) and dbdir.startswith(topdir) and not sstatedir.startswith(topdir)):
+                if bb.utils.is_path_on_nfs(sstatedir):
+                    bb.warn("""Sstate directory is on a shared NFS (it is set via SSTATE_DIR to {}),
+        but hash equivalency database is inside this particular build directory {}.
+
+        This will prevent sstate reuse, and it is recommended to set up a permanently running hash equivalency server
+        according to https://docs.yoctoproject.org/dev-manual/hashequivserver.html""".format(sstatedir, topdir))
+                else:
+                    bb.warn("""Sstate directory is shared between several builds (it is set via SSTATE_DIR to {}),
+        but hash equivalency database is inside this particular build directory {}.
+
+        This will prevent sstate reuse, and it is recommended to set the location for the database to a common path
+        via BB_HASHSERVE_DB_DIR, for example:
+
+        BB_HASHSERVE_DB_DIR = \"${{SSTATE_DIR}}\"""".format(sstatedir, topdir))
+
+    # Check that TMPDIR hasn't changed location since the last time we were run
+    tmpdir = d.getVar('TMPDIR')
+    checkfile = os.path.join(tmpdir, "saved_tmpdir")
+    if os.path.exists(checkfile):
+        with open(checkfile, "r") as f:
+            saved_tmpdir = f.read().strip()
+            if (saved_tmpdir != tmpdir):
+                status.addresult("Error, TMPDIR has changed location. You need to either move it back to %s or delete it and rebuild\n" % saved_tmpdir)
+    else:
+        bb.utils.mkdirhier(tmpdir)
+        # Remove setuid, setgid and sticky bits from TMPDIR
+        try:
+            os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISUID)
+            os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISGID)
+            os.chmod(tmpdir, os.stat(tmpdir).st_mode & ~ stat.S_ISVTX)
+        except OSError as exc:
+            bb.warn("Unable to chmod TMPDIR: %s" % exc)
+        with open(checkfile, "w") as f:
+            f.write(tmpdir)
+
+    # If /bin/sh is a symlink, check that it points to dash or bash
+    if os.path.islink('/bin/sh'):
+        real_sh = os.path.realpath('/bin/sh')
+        # Due to update-alternatives, the shell name may take various
+        # forms, such as /bin/dash, bin/bash, /bin/bash.bash ...
+        if '/dash' not in real_sh and '/bash' not in real_sh:
+            status.addresult("Error, /bin/sh links to %s, must be dash or bash\n" % real_sh)
+
+def check_sanity(sanity_data):
+    class SanityStatus(object):
+        def __init__(self):
+            self.messages = ""
+            self.network_error = False
+
+        def addresult(self, message):
+            if message:
+                self.messages = self.messages + message
+
+    status = SanityStatus()
+
+    tmpdir = sanity_data.getVar('TMPDIR')
+    sstate_dir = sanity_data.getVar('SSTATE_DIR')
+
+    check_symlink(sstate_dir, sanity_data)
+
+    # Check saved sanity info
+    last_sanity_version = 0
+    last_tmpdir = ""
+    last_sstate_dir = ""
+    last_nativelsbstr = ""
+    sanityverfile = sanity_data.expand("${TOPDIR}/cache/sanity_info")
+    if os.path.exists(sanityverfile):
+        with open(sanityverfile, 'r') as f:
+            for line in f:
+                if line.startswith('SANITY_VERSION'):
+                    last_sanity_version = int(line.split()[1])
+                if line.startswith('TMPDIR'):
+                    last_tmpdir = line.split()[1]
+                if line.startswith('SSTATE_DIR'):
+                    last_sstate_dir = line.split()[1]
+                if line.startswith('NATIVELSBSTRING'):
+                    last_nativelsbstr = line.split()[1]
+
+    check_sanity_everybuild(status, sanity_data)
+
+    sanity_version = int(sanity_data.getVar('SANITY_VERSION') or 1)
+    network_error = False
+    # NATIVELSBSTRING var may have been overridden with "universal", so
+    # get actual host distribution id and version
+    nativelsbstr = oe.lsb.distro_identifier(sanity_data)
+    if last_sanity_version < sanity_version or last_nativelsbstr != nativelsbstr:
+        check_sanity_version_change(status, sanity_data)
+        status.addresult(check_sanity_sstate_dir_change(sstate_dir, sanity_data))
+    else:
+        if last_sstate_dir != sstate_dir:
+            status.addresult(check_sanity_sstate_dir_change(sstate_dir, sanity_data))
+
+    if os.path.exists(os.path.dirname(sanityverfile)) and not status.messages:
+        with open(sanityverfile, 'w') as f:
+            f.write("SANITY_VERSION %s\n" % sanity_version)
+            f.write("TMPDIR %s\n" % tmpdir)
+            f.write("SSTATE_DIR %s\n" % sstate_dir)
+            f.write("NATIVELSBSTRING %s\n" % nativelsbstr)
+
+    sanity_handle_abichanges(status, sanity_data)
+
+    if status.messages != "":
+        raise_sanity_error(sanity_data.expand(status.messages), sanity_data, status.network_error)
+

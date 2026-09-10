@@ -14,6 +14,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=7908e342491198401321cec1956807ec"
 DEPENDS += " xorgproto"
 PROVIDES = "xau"
 
+XORGBUILDCLASS = "meson"
+
 PE = "1"
 
 XORG_PN = "libXau"

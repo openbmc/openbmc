@@ -76,6 +76,18 @@ def list_and_fetch_failed_tests_artifacts(d, tc, artifacts_list, outputdir):
         bb.warn(f"Can not retrieve artifacts from test target: {e}")
 
 
+#
+# coredumpctl
+#
+def run_coredumpctl_info(d, tc, artifacts_list, outputdir):
+    # "info" shows the last coredump unless you specify a filter. This is the
+    # message ID for coredumps, so it shows all of the coredumps that are in the
+    # journal.
+    output_file = d.expand("${localstatedir}/log/coredumps.txt")
+    cmd = f"coredumpctl info MESSAGE_ID=fc2e22bc6ee647b6b90729ab34a250b1 | tee {output_file}"
+    tc.target.run(cmd, ignore_ssh_fails=True)
+
+
 ##################################################################
 # General post actions runner
 ##################################################################
@@ -93,6 +105,7 @@ def run_failed_tests_post_actions(d, tc):
     os.chmod(outputdir, stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
     post_actions=[
+        run_coredumpctl_info,
         list_and_fetch_failed_tests_artifacts,
         get_target_disk_usage,
         get_host_disk_usage

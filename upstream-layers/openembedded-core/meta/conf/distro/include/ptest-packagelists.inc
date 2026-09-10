@@ -72,6 +72,7 @@ PTESTS_FAST = "\
     python3-attrs \
     python3-bcrypt \
     python3-calver \
+    python3-certifi \
     python3-hypothesis \
     python3-idna \
     python3-jinja2 \
@@ -85,6 +86,7 @@ PTESTS_FAST = "\
     python3-pluggy \
     python3-pefile \
     python3-pyasn1 \
+    python3-pyopenssl \
     python3-pytz \
     python3-pyyaml \
     python3-rpds-py \
@@ -101,6 +103,7 @@ PTESTS_FAST = "\
     slang \
     utfcpp \
     wayland \
+    wget \
     xz \
     zlib \
 "
@@ -148,6 +151,7 @@ PTESTS_SLOW = "\
     tcl \
     tcl8 \
     util-linux \
+    zstd \
 "
 
 # python3 ptests hang on qemuriscv64

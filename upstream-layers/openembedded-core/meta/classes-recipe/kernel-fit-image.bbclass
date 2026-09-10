@@ -1,5 +1,5 @@
 
-inherit kernel-arch kernel-artifact-names uboot-config deploy
+inherit kernel-artifact-names uboot-config deploy
 require conf/image-fitimage.conf
 
 S = "${UNPACKDIR}"
@@ -76,7 +76,8 @@ python do_compile() {
     # Collect all the its nodes before the its file is generated and mkimage gets executed
     root_node = oe.fitimage.ItsNodeRootKernel(
         d.getVar("FIT_DESC"), d.getVar("FIT_ADDRESS_CELLS"),
-        d.getVar('HOST_PREFIX'), d.getVar('UBOOT_ARCH'),  d.getVar("FIT_CONF_PREFIX"),
+        d.getVar('HOST_PREFIX'), oe.kernel.map_uboot_arch(d), d.getVar('FIT_OS'),
+        d.getVar("FIT_CONF_PREFIX"),
         oe.types.boolean(d.getVar('FIT_KERNEL_SIGN_ENABLE')), d.getVar("FIT_KERNEL_SIGN_KEYDIR"),
         d.getVar("UBOOT_MKIMAGE"), d.getVar("UBOOT_MKIMAGE_DTCOPTS"),
         d.getVar('FIT_MKIMAGE_EXTRA_OPTS'),

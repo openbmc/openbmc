@@ -10,40 +10,15 @@
 ## Cargo.
 
 inherit cargo_common
-inherit rust-target-config
 
 # the binary we will use
 CARGO = "cargo"
 
-# We need cargo to compile for the target
-BASEDEPENDS:append = " cargo-native"
-
-# Ensure we get the right rust variant
-DEPENDS:append:class-target = " rust-native ${RUSTLIB_DEP}"
-DEPENDS:append:class-nativesdk = " rust-native ${RUSTLIB_DEP}"
-DEPENDS:append:class-native = " rust-native"
-
 # Enable build separation
 B = "${WORKDIR}/build"
 
-# In case something fails in the build process, give a bit more feedback on
-# where the issue occured
-export RUST_BACKTRACE = "1"
-
-RUSTFLAGS ??= ""
-BUILD_MODE = "${@['--release', ''][d.getVar('DEBUG_BUILD') == '1']}"
-# --frozen flag will prevent network access (which is required since only
-# the do_fetch step is authorized to access network)
-# and will require an up to date Cargo.lock file.
-# This force the package being built to already ship a Cargo.lock, in the end
-# this is what we want, at least, for reproducibility of the build.
-CARGO_BUILD_FLAGS = "-v --frozen --target ${RUST_HOST_SYS} ${BUILD_MODE} --manifest-path=${CARGO_MANIFEST_PATH}"
-
-# This is based on the content of CARGO_BUILD_FLAGS and generally will need to
-# change if CARGO_BUILD_FLAGS changes.
-BUILD_DIR = "${@['release', 'debug'][d.getVar('DEBUG_BUILD') == '1']}"
-CARGO_TARGET_SUBDIR = "${RUST_HOST_SYS}/${BUILD_DIR}"
-oe_cargo_build () {
+do_compile[progress] = "outof:\s+(\d+)/(\d+)"
+cargo_do_compile () {
 	export RUSTFLAGS="${RUSTFLAGS}"
 	bbnote "Using rust targets from ${RUST_TARGET_PATH}"
 	bbnote "cargo = $(which ${CARGO})"
@@ -51,17 +26,12 @@ oe_cargo_build () {
 	"${CARGO}" build ${CARGO_BUILD_FLAGS} ${PACKAGECONFIG_CONFARGS} "$@"
 }
 
-do_compile[progress] = "outof:\s+(\d+)/(\d+)"
-cargo_do_compile () {
-	oe_cargo_build
-}
-
 cargo_do_install () {
 	local have_installed=false
 	for tgt in "${B}/target/${CARGO_TARGET_SUBDIR}/"*; do
 		case $tgt in
 		*.so|*.rlib)
-                        if [ -n "${CARGO_INSTALL_LIBRARIES}" ]; then
+			if [ -n "${CARGO_INSTALL_LIBRARIES}" ]; then
 				install -d "${D}${rustlibdir}"
 				install -m755 "$tgt" "${D}${rustlibdir}"
 				have_installed=true

@@ -20,6 +20,7 @@ SRC_URI += "file://CVE-2025-32049-1.patch \
             file://CVE-2026-1539.patch \
             file://CVE-2026-5119.patch \
             file://CVE-2026-2708.patch \
+            file://CVE-2026-4271.patch \
 "
 
 PROVIDES = "libsoup-3.0"

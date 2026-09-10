@@ -10,6 +10,7 @@ SRC_URI = "${APACHE_MIRROR}/${BPN}/${BPN}-${PV}.tar.bz2 \
            file://0002-SConstruct-Fix-path-quoting-for-.def-generator.patch \
            file://0003-gen_def.patch \
            file://SConstruct.stop.creating.directories.without.sandbox-install.prefix.patch \
+           file://0001-Fix-build-with-OpenSSL-4.0-use-ASN1_STRING-accessors.patch \
            "
 
 SRC_URI[sha256sum] = "be81ef08baa2516ecda76a77adf7def7bc3227eeb578b9a33b45f7b41dc064e6"

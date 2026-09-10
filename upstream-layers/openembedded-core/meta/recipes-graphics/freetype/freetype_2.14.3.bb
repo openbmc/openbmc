@@ -7,7 +7,7 @@ HOMEPAGE = "https://freetype.org/"
 BUGTRACKER = "https://gitlab.freedesktop.org/groups/freetype/-/issues"
 SECTION = "libs"
 
-LICENSE = "(FTL | GPL-2.0-or-later) & MIT"
+LICENSE = "MIT AND (FTL OR GPL-2.0-or-later)"
 LIC_FILES_CHKSUM = "file://LICENSE.TXT;md5=eeb073d5fb86d23c52bb9b84aa256307 \
                     file://docs/FTL.TXT;md5=72d844cd2f3bcaf6a85244b508032be7 \
                     file://docs/GPLv2.TXT;md5=8ef380476f642c20ebf40fecb0add2ec \

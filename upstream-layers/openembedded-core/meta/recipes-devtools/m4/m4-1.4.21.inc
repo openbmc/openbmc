@@ -23,6 +23,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464\
 
 EXTRA_OECONF += "--without-libsigsegv-prefix"
 
+# see https://lists.gnu.org/archive/html/bug-gnulib/2026-07/msg00165.html
+# Drop it when upgrading to next release where above fix is accepted
+CACHED_CONFIGUREVARS:append:libc-glibc = " ac_cv_func_posix_spawn_file_actions_addchdir=yes"
+CACHED_CONFIGUREVARS:append:class-native = " ac_cv_func_posix_spawn_file_actions_addchdir=yes"
+
 EXTRA_OEMAKE += "'infodir=${infodir}'"
 
 do_compile_ptest() {

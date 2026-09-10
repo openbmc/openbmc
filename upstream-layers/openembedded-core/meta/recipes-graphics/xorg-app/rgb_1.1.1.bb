@@ -6,7 +6,7 @@ to RGB values (rgb.txt) and, if configured to use a database for color \
 lookup, the rgb program to convert the text file into the binary database \
 format."
 
-DEPENDS += " xorgproto util-macros"
+DEPENDS += "xorgproto"
 LIC_FILES_CHKSUM = "file://COPYING;md5=dc4f23db04773a414e3c39cc97a9f415"
 PE = "1"
 

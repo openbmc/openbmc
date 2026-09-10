@@ -21,4 +21,6 @@ RDEPENDS:${PN} += "\
     python3-netclient \
 "
 
+CVE_PRODUCT = "pyyaml"
+
 BBCLASSEXTEND = "native nativesdk"

@@ -5,7 +5,7 @@ internationalization (I18N) and globalization (G11N), giving applications the \
 same results on all platforms."
 HOMEPAGE = "https://icu.unicode.org/"
 
-LICENSE = "ICU & MIT"
+LICENSE = "ICU AND MIT"
 DEPENDS = "icu-native"
 
 CVE_PRODUCT = "international_components_for_unicode"

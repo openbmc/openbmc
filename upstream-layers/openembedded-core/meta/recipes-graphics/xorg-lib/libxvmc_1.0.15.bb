@@ -12,6 +12,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=0a207f08d4961489c55046c9a5e500da \
 
 DEPENDS += "libxext libxv xorgproto"
 
+XORGBUILDCLASS = "meson"
+
 PE = "1"
 
 XORG_PN = "libXvMC"

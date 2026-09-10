@@ -375,6 +375,9 @@ TMPDIR = "${TOPDIR}/tmp-sstatesamehash2"
 BUILD_ARCH = "i686"
 BUILD_OS = "linux"
 SDKMACHINE = "%s"
+# We dropped i686 build host support but the test is still useful, work around it
+UNINATIVE_VERSION:forcevariable = "5.1"
+UNINATIVE_CHECKSUM[i686] = "761502cc9aef4d54d0c6fe9418beb9fdd2c6220da6f2b04128c89f47902ab9ae"
 PACKAGE_CLASSES = "package_rpm package_ipk package_deb"
 BB_SIGNATURE_HANDLER = "OEBasicHash"
 """ % sdkmachine)

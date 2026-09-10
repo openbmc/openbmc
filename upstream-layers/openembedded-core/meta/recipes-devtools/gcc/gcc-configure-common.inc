@@ -42,7 +42,7 @@ EXTRA_OECONF = "\
     ${@get_gcc_multiarch_setting(bb, d)} \
 "
 
-# glibc version is a minimum controlling whether features are enabled. 
+# glibc version is a minimum controlling whether features are enabled.
 # Doesn't need to track glibc exactly
 EXTRA_OECONF:append:libc-glibc = " --with-glibc-version=2.28 "
 

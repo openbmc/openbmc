@@ -18,13 +18,3 @@ do_install () {
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 0755 ${S}/modutils.sh ${D}${sysconfdir}/init.d/
 }
-
-PACKAGE_WRITE_DEPS:append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd','systemd-systemctl-native','',d)}"
-pkg_postinst:${PN} () {
-	if type systemctl >/dev/null 2>/dev/null; then
-		if [ -n "$D" ]; then
-			OPTS="--root=$D"
-		fi
-		systemctl $OPTS mask modutils.service
-	fi
-}

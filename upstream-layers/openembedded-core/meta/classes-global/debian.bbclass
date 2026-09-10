@@ -127,7 +127,7 @@ python debian_package_name_hook () {
             add_rprovides(orig_pkg, d)
 
     # reversed sort is needed when some package is substring of another
-    # ie in ncurses we get without reverse sort: 
+    # ie in ncurses we get without reverse sort:
     # DEBUG: LIBNAMES: pkgname libtic5 devname libtic pkg ncurses-libtic orig_pkg ncurses-libtic debian_pn None newpkg libtic5
     # and later
     # DEBUG: LIBNAMES: pkgname libtic5 devname libtic pkg ncurses-libticw orig_pkg ncurses-libtic debian_pn None newpkg libticw

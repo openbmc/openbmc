@@ -11,8 +11,6 @@ SRC_URI += " \
         file://run-ptest \
 "
 
-PYPI_PACKAGE = "libarchive-c"
-
 inherit pypi setuptools3 ptest-python-pytest
 
 SRC_URI[sha256sum] = "7bcce24ea6c0fa3bc62468476c6d2f6264156db2f04878a372027c10615a2721"

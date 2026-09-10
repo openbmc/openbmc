@@ -2,7 +2,7 @@ SUMMARY = "Internationalized Domain Name support library"
 DESCRIPTION = "Implementation of the Stringprep, Punycode and IDNA specifications defined by the IETF Internationalized Domain Names (IDN) working group."
 HOMEPAGE = "http://www.gnu.org/software/libidn/"
 SECTION = "libs"
-LICENSE = "(GPL-2.0-or-later | LGPL-3.0-only) & GPL-3.0-or-later & Unicode-DFS-2016"
+LICENSE = "GPL-3.0-or-later AND Unicode-DFS-2016 AND (GPL-2.0-or-later OR LGPL-3.0-only)"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1ebbd3e34237af26da5dc08a4e440464 \
                     file://COPYING.LESSERv3;md5=3000208d539ec061b899bce1d9ce9404 \
                     file://COPYINGv2;md5=570a9b3749dd0463a1778803b12a6dce \
@@ -27,7 +27,7 @@ do_install:append() {
 	sed -i -e 's|-L${STAGING_LIBDIR}||' -e 's/  */ /g' ${D}${libdir}/pkgconfig/libidn2.pc
 }
 
-LICENSE:${PN} = "(GPL-2.0-or-later | LGPL-3.0-only) & Unicode-DFS-2016"
+LICENSE:${PN} = "Unicode-DFS-2016 AND (GPL-2.0-or-later OR LGPL-3.0-only)"
 LICENSE:${PN}-bin = "GPL-3.0-or-later"
 
 BBCLASSEXTEND = "native nativesdk"

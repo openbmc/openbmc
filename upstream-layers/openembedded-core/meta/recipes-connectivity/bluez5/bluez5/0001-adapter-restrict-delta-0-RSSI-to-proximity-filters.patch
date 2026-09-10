@@ -1,0 +1,86 @@
+From 7789da9b8d9a488e06fc7dbd33167228692de676 Mon Sep 17 00:00:00 2001
+From: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+Date: Wed, 15 Jul 2026 17:19:36 +0800
+Subject: [PATCH] adapter: restrict delta=0 RSSI to proximity filters
+
+When a discovery filter is active (filtered_discovery=true), BlueZ
+unconditionally calls device_set_rssi_with_delta(..., delta=0),
+causing every BLE advertisement to emit a PropertiesChanged(RSSI)
+signal regardless of whether the RSSI value changed.
+
+delta=0 is only needed when a client has expressed explicit proximity
+interest by setting an RSSI or pathloss threshold in its discovery
+filter. Filters that specify only transport type or UUIDs do not
+require per-packet RSSI precision; for those, the standard
+RSSI_THRESHOLD=8 rate-limiting is both correct and desirable.
+
+The problem is triggered on dual-mode adapters by a transport-only
+filter (e.g. Transport=le). In merge_discovery_filters(), the
+transport-specific scan type (SCAN_TYPE_LE=6) does not equal the
+adapter scan type (SCAN_TYPE_DUAL=7), so has_filtered_discovery is
+set, filtered_discovery becomes true, and delta=0 is applied even
+though no proximity condition was requested. With hundreds of BLE
+devices advertising simultaneously this generates hundreds of
+unnecessary PropertiesChanged(RSSI) signals per second.
+
+Confirmed on QCS6490 (BlueZ 5.72) with Transport=le filter:
+
+  adapter.c: filtered_discovery=1 (current_discovery_filter=set)
+  device.c:  device_set_rssi_with_delta() rssi=-86 delta_threshold=0
+  device.c:  device_set_rssi_with_delta() rssi=-79 delta_threshold=0
+
+Add discovery_filter_has_proximity() which walks discovery_list and
+returns true only when at least one active filter carries a real
+proximity condition (rssi != DISTANCE_VAL_INVALID or pathloss !=
+DISTANCE_VAL_INVALID). Use this to gate the delta=0 path.
+
+Other filter fields (transport, uuids, duplicate, discoverable)
+express capability or content criteria and carry no proximity
+implication, so they are intentionally excluded from the check.
+
+Upstream-Status: Backport [e004414a1751d29216ccab976d6c7174ec48d11c]
+Signed-off-by: Xiuzhuo Shang <xiuzhuo.shang@oss.qualcomm.com>
+---
+ src/adapter.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 538f63e0a..6cdc27e80 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7249,6 +7249,22 @@ static void filter_duplicate_data(void *data, void *user_data)
+ 	*duplicate = client->discovery_filter->duplicate;
+ }
+
++static bool discovery_filter_has_proximity(struct btd_adapter *adapter)
++{
++	GSList *l;
++
++	for (l = adapter->discovery_list; l; l = g_slist_next(l)) {
++		struct discovery_client *client = l->data;
++		struct discovery_filter *filter = client->discovery_filter;
++
++		if (filter && (filter->rssi != DISTANCE_VAL_INVALID ||
++				filter->pathloss != DISTANCE_VAL_INVALID))
++			return true;
++	}
++
++	return false;
++}
++
+ static bool device_is_discoverable(struct btd_adapter *adapter,
+ 					struct eir_data *eir, const char *addr,
+ 					uint8_t bdaddr_type, bool *auto_connect)
+@@ -7445,7 +7461,8 @@ void btd_adapter_device_found(struct btd_adapter *adapter,
+ 	if (name_resolve_failed)
+ 		device_name_resolve_fail(dev);
+
+-	if (adapter->filtered_discovery)
++	if (adapter->filtered_discovery &&
++				discovery_filter_has_proximity(adapter))
+ 		device_set_rssi_with_delta(dev, rssi, 0);
+ 	else
+ 		device_set_rssi(dev, rssi);
+--
+2.43.0
+

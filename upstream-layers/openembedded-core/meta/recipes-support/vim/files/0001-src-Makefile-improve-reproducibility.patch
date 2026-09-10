@@ -1,4 +1,4 @@
-From 133ab27cdb17ca20ef6b0304cf30621d2bcbe757 Mon Sep 17 00:00:00 2001
+From f8d147b328ae37a99b6804d5d127d91c905b7ca4 Mon Sep 17 00:00:00 2001
 From: Mingli Yu <mingli.yu@windriver.com>
 Date: Thu, 31 Jan 2019 21:32:26 -0800
 Subject: [PATCH] src/Makefile: improve reproducibility
@@ -17,10 +17,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index 32c0d97d1..97c754673 100644
+index 98baecf6f..ee64d987b 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -3143,16 +3143,10 @@ auto/pathdef.c: Makefile auto/config.mk
+@@ -3201,16 +3201,10 @@ auto/pathdef.c: Makefile auto/config.mk
  	-@echo '#include "vim.h"' >> $@
  	-@echo 'char_u *default_vim_dir = (char_u *)"$(VIMRCLOC)";' | $(QUOTESED) >> $@
  	-@echo 'char_u *default_vimruntime_dir = (char_u *)"$(VIMRUNTIMEDIR)";' | $(QUOTESED) >> $@

@@ -15,7 +15,7 @@ PACKAGECONFIG[popt] = "--without-included-popt,--with-included-popt,popt"
 
 RRECOMMENDS:${PN}-server = "avahi-daemon"
 
-SRC_URI = "git://github.com/distcc/distcc.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/distcc/distcc.git;branch=master;protocol=https;tag=v${PV} \
            file://default \
            file://distcc \
            file://distcc.service \

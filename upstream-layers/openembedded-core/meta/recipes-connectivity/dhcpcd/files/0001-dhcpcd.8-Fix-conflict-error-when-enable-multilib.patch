@@ -1,4 +1,4 @@
-From dd892eba0147120efdcae923746c444a9d2a76d2 Mon Sep 17 00:00:00 2001
+From e9b462a5b3fe875effc05a246948533da1c5baaf Mon Sep 17 00:00:00 2001
 From: Lei Maohui <leimaohui@fujitsu.com>
 Date: Fri, 10 Mar 2023 03:48:46 +0000
 Subject: [PATCH] dhcpcd.8: Fix conflict error when enable multilib.
@@ -29,10 +29,10 @@ Signed-off-by: Lei Maohui <leimaohui@fujitsu.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/dhcpcd.8.in b/src/dhcpcd.8.in
-index ebbf06c0..c7ffee6b 100644
+index 26d37772..1b13dc4e 100644
 --- a/src/dhcpcd.8.in
 +++ b/src/dhcpcd.8.in
-@@ -826,7 +826,7 @@ Configuration file for dhcpcd.
+@@ -825,7 +825,7 @@ Configuration file for dhcpcd.
  If you always use the same options, put them here.
  .It Pa @SCRIPT@
  Bourne shell script that is run to configure or de-configure an interface.

@@ -82,6 +82,7 @@ python buildhistory_emit_pkghistory() {
     import shlex
     import errno
     import shutil
+    import oe.license
 
     if not "package" in (d.getVar('BUILDHISTORY_FEATURES') or "").split():
         return 0
@@ -199,7 +200,7 @@ python buildhistory_emit_pkghistory() {
     pv = d.getVar('PV')
     pr = d.getVar('PR')
     layer = bb.utils.get_file_layer(d.getVar('FILE'), d)
-    license = d.getVar('LICENSE')
+    license = oe.license.convert_legacy_license_to_spdx(d, d.getVar('LICENSE'))
 
     pkgdata_dir = d.getVar('PKGDATA_DIR')
     packages = ""

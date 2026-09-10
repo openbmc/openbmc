@@ -1,0 +1,66 @@
+From 1609881b8d1246e85d9eb68275d54d28e2170301 Mon Sep 17 00:00:00 2001
+From: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+Date: Tue, 25 Aug 2026 11:03:34 +0200
+Subject: [PATCH] examples: gtk: show player warnings in a dialog box
+
+Right now, the player example fails silently on playback failures. Show
+a dialog box with the warning message coming from the gstplay instance.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12346]
+Signed-off-by: Mathieu Dubois-Briand <mathieu.dubois-briand@bootlin.com>
+---
+ .../playback/player/gtk/gtk-play.c            | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+
+diff --git a/subprojects/gst-examples/playback/player/gtk/gtk-play.c b/subprojects/gst-examples/playback/player/gtk/gtk-play.c
+index fb83f6be29c5..2310c716f2e9 100644
+--- a/subprojects/gst-examples/playback/player/gtk/gtk-play.c
++++ b/subprojects/gst-examples/playback/player/gtk/gtk-play.c
+@@ -88,6 +88,7 @@ typedef struct
+   gboolean loop;
+   gboolean fullscreen;
+   gint toolbar_hide_timeout;
++  gboolean warning_shown;
+ 
+   GtkBuilder *toolbar_ui;
+ } GtkPlay;
+@@ -438,6 +439,7 @@ play_current_uri (GtkPlay * play, GList * uri, const gchar * ext_suburi)
+   else
+     gst_play_set_uri (play->player, uri->data);
+   play->current_uri = uri;
++  play->warning_shown = FALSE;
+   if (play->playing) {
+     if (play->inhibit_cookie)
+       gtk_application_uninhibit (GTK_APPLICATION (g_application_get_default ()),
+@@ -1740,6 +1742,22 @@ show_cb (GtkWidget * widget, gpointer user_data)
+   play_current_uri (self, g_list_first (self->uris), NULL);
+ }
+ 
++static void
++warning_cb (GstPlaySignalAdapter * adapter, GError * warning,
++    GstStructure * details, GtkPlay * self)
++{
++  GtkWidget *dialog;
++
++  if (!self->warning_shown) {
++    self->warning_shown = TRUE;
++    dialog = gtk_message_dialog_new (GTK_WINDOW (self),
++        GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_WARNING,
++        GTK_BUTTONS_CLOSE, "%s", warning->message);
++    gtk_dialog_run (GTK_DIALOG (dialog));
++    gtk_widget_destroy (dialog);
++  }
++}
++
+ static GObject *
+ gtk_play_constructor (GType type, guint n_construct_params,
+     GObjectConstructParam * construct_params)
+@@ -1774,6 +1792,8 @@ gtk_play_constructor (GType type, guint n_construct_params,
+       G_CALLBACK (media_info_updated_cb), self);
+   g_signal_connect (self->signal_adapter, "volume-changed",
+       G_CALLBACK (player_volume_changed_cb), self);
++  g_signal_connect (self->signal_adapter, "warning",
++      G_CALLBACK (warning_cb), self);
+ 
+   /* enable visualization (by default playbin uses goom) */
+   /* if visualization is enabled then use the first element */

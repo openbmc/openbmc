@@ -29,7 +29,7 @@ list_order_fields = ['PACKAGES']
 defaultval_map = {'PKG': 'PKG', 'PKGE': 'PE', 'PKGV': 'PV', 'PKGR': 'PR'}
 numeric_fields = ['PKGSIZE', 'IMAGESIZE', 'SDKSIZE']
 # Fields to monitor
-monitor_fields = ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RREPLACES', 'RCONFLICTS', 'PACKAGES', 'FILELIST', 'PKGSIZE', 'IMAGESIZE', 'SDKSIZE', 'PKG']
+monitor_fields = ['RPROVIDES', 'RDEPENDS', 'RRECOMMENDS', 'RSUGGESTS', 'RREPLACES', 'RCONFLICTS', 'PACKAGES', 'FILELIST', 'PKGSIZE', 'IMAGESIZE', 'SDKSIZE', 'PKG']
 ver_monitor_fields = ['PKGE', 'PKGV', 'PKGR']
 # Percentage change to alert for numeric fields
 monitor_numeric_threshold = 10

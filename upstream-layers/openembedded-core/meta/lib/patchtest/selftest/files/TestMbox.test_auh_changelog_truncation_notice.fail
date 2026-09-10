@@ -1,0 +1,25 @@
+From c9519f11502d5bb5c143ed43b4c981b6a211bdf9 Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Fri, 31 May 2024 09:54:50 -0400
+Subject: [PATCH] selftest-hello: upgrade 1.0 -> 1.1
+
+[Changelog truncated as it exceeds 3000 characters;
+the full changelog can be found in an attachment to the AUH email]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+index 2dc352d479e..b6be3f2e1e0 100644
+--- a/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
++++ b/meta-selftest/recipes-test/selftest-hello/selftest-hello_1.0.bb
+@@ -1,4 +1,4 @@
+-SUMMARY = "This is an example summary"
++SUMMARY = "This is an example summary, slightly updated"
+ DESCRIPTION = "Simple helloworld application -- selftest variant"
+ SECTION = "examples"
+ LICENSE = "MIT"
+-- 
+2.45.1

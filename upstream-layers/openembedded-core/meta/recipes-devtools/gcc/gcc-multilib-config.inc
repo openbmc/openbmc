@@ -14,7 +14,7 @@
 #    gcc/config/mips/linux64.h
 #    gcc/config/rs6000/linux64.h
 
-MULTILIB_OPTION_WHITELIST ??= "-m32 -m64 -mx32 -mabi=n32 -mabi=32 -mabi=64" 
+MULTILIB_OPTION_WHITELIST ??= "-m32 -m64 -mx32 -mabi=n32 -mabi=32 -mabi=64"
 
 python gcc_multilib_setup() {
     import re

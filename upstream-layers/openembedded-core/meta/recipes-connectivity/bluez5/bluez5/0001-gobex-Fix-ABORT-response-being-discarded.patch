@@ -1,0 +1,44 @@
+From 7302872e85bbb655018ed21f4c449a22cf047235 Mon Sep 17 00:00:00 2001
+From: Jinwang Li <jinwang.li@oss.qualcomm.com>
+Date: Thu, 27 Aug 2026 16:36:51 +0800
+Subject: [PATCH] gobex: Fix ABORT response being discarded
+
+g_obex_drop_tx_queue() in transfer_complete() clears any pending tx,
+so the ABORT success response should be enqueued after transfer_complete().
+
+Fixes the following PTS test cases:
+- OPP/SR/OPH/BV-27-I
+- FTP/SR/OTR/BV-02-C
+- PBAP/PSE/PDF/BV-06-I
+- PBAP/PSE/PBF/BV-03-I
+
+Fixes: 7a35c12a6ceb ("gobex: Fix segfault caused by interrupted transfer")
+Assisted-by: Claude:claude-sonnet-5
+Upstream-Status: Backport [commit d094be10ff0cc9d48714d35557e0fd297f36f907]
+Signed-off-by: Jinwang Li <jinwang.li@oss.qualcomm.com>
+---
+ gobex/gobex-transfer.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index c94d018b2..e4c7c557d 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -314,11 +314,12 @@ static void transfer_abort_req(GObex *obex, GObexPacket *req, gpointer user_data
+ 
+ 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+ 						"Request was aborted");
+-	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
+-	g_obex_send(obex, rsp, NULL);
+ 
+ 	transfer_complete(transfer, err);
+ 	g_error_free(err);
++
++	rsp = g_obex_packet_new(G_OBEX_RSP_SUCCESS, TRUE, G_OBEX_HDR_INVALID);
++	g_obex_send(obex, rsp, NULL);
+ }
+ 
+ static guint8 put_get_bytes(struct transfer *transfer, GObexPacket *req)
+-- 
+2.34.1
+

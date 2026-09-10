@@ -5,7 +5,7 @@ exception-throwing code with about the same amount of typing."
 HOMEPAGE = "https://github.com/rjbs/Test-Fatal"
 BUGTRACKER = "https://github.com/rjbs/Test-Fatal/issues"
 SECTION = "libs"
-LICENSE = "Artistic-1.0-Perl | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0-Perl OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f7fc7d4b26ddae0843b09ba56109e65a"
 

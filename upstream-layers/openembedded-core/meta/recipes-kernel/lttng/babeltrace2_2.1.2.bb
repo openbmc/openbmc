@@ -2,7 +2,7 @@ SUMMARY = "Babeltrace2 - Trace Format Babel Tower"
 DESCRIPTION = "Babeltrace provides trace read and write libraries in host side, as well as a trace converter, which used to convert LTTng 2.0 traces into human-readable log."
 HOMEPAGE = "http://babeltrace.org/"
 BUGTRACKER = "https://bugs.lttng.org/projects/babeltrace"
-LICENSE = "MIT & GPL-2.0-only & LGPL-2.1-only & BSD-2-Clause & BSD-4-Clause & GPL-3.0-or-later & CC-BY-SA-4.0 & PSF-2.0"
+LICENSE = "BSD-2-Clause AND BSD-4-Clause AND CC-BY-SA-4.0 AND GPL-2.0-only AND GPL-3.0-or-later AND LGPL-2.1-only AND MIT AND PSF-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=f6b015e4f388d6e78adb1b1f9a887d06"
 
 DEPENDS = "glib-2.0 util-linux popt bison-native flex-native virtual/libiconv swig-native"
@@ -15,11 +15,14 @@ SRC_URI = "git://git.efficios.com/babeltrace.git;branch=stable-2.1;protocol=http
            file://0001-Make-bt_field_blob_get_length-return-size_t-instead-.patch \
            file://external-python-tests.patch \
            file://0001-src-explicitly-only-build-shared-plugins.patch \
+           file://0001-bt2-replace-removed-Python-2-C-API-macros-for-SWIG-4.5.0.patch \
            "
 SRCREV = "d0e946a71faf5f0c2d7f1fb5b92a369983e9cf10"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>2(\.\d+)+)$"
 
-inherit autotools pkgconfig ptest setuptools3-base
+# babeltrace2 publishes bugfix/security-only releases on its per-minor
+# stable-X.Y branches.
+inherit autotools pkgconfig ptest setuptools3-base upstream-stable-release-point
 
 EXTRA_OECONF = "--disable-debug-info --disable-Werror --enable-python-plugins --enable-python-bindings"
 

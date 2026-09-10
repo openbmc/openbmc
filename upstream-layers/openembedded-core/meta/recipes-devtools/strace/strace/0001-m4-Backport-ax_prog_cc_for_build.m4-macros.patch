@@ -1,4 +1,4 @@
-From 77790a889ca5227936e2de2c587ef1fd9c8e718c Mon Sep 17 00:00:00 2001
+From b402cfcdfb782ab3a8b264b23536a4de5f709746 Mon Sep 17 00:00:00 2001
 From: Khem Raj <khem.raj@oss.qualcomm.com>
 Date: Fri, 10 Apr 2026 23:39:47 +0000
 Subject: [PATCH] m4: Backport ax_prog_cc_for_build.m4 macros

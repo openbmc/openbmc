@@ -1,0 +1,38 @@
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Wed, 26 Aug 2026 16:30:00 +0530
+Subject: [PATCH] rustc_codegen_llvm: do not pass amx-tf32 to LLVM 23
+
+LLVM 23 removed the x86 amx-tf32 subtarget feature
+(https://github.com/llvm/llvm-project/pull/207673). rust 1.98 still
+lists it in the x86 table in rustc_target, so a rustc built against
+LLVM 23 aborts at startup with
+
+  '+amx-tf32' is not a recognized feature for this target
+
+Skip the feature in to_llvm_features when the LLVM in use is 23 or
+newer, in the same style the surrounding code already uses for
+avx10.1/avx10.2 on older LLVM majors. amx-tf32 is the only x86
+feature LLVM 23 removed; the rest of the table still matches X86.td.
+
+rust dropped the feature outright after 1.98
+(https://github.com/rust-lang/rust/pull/159310), which requires
+LLVM 23 or newer unconditionally. This recipe builds against whatever
+LLVM major the layer provides, so the version guard is kept instead.
+
+Upstream-Status: Inappropriate [rust dropped the feature after 1.98 via https://github.com/rust-lang/rust/pull/159310; this guard only exists to build 1.98 against more than one LLVM major]
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+ compiler/rustc_codegen_llvm/src/llvm_util.rs | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/compiler/rustc_codegen_llvm/src/llvm_util.rs
++++ b/compiler/rustc_codegen_llvm/src/llvm_util.rs
+@@ -286,6 +286,8 @@
+                     s,
+                     smallvec![TargetFeatureFoldStrength::EnableOnly("evex512")],
+                 )),
++                // AMX-TF32 was removed from LLVM 23
++                "amx-tf32" if major >= 23 => None,
+                 "avx10.1" if major < 22 => Some(LLVMFeature::new("avx10.1-512")),
+                 "avx10.2" if major < 22 => Some(LLVMFeature::new("avx10.2-512")),
+                 "apxf" => Some(LLVMFeature::with_dependencies(

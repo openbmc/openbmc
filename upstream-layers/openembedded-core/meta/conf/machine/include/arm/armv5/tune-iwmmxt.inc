@@ -1,4 +1,4 @@
-# Configurations for the Intel PXA27x Appications Processor Family. 
+# Configurations for the Intel PXA27x Appications Processor Family.
 # Please use tune-xscale for PXA255/PXA26x based processors.
 
 DEFAULTTUNE ?= "iwmmxt"

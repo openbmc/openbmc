@@ -12,7 +12,7 @@ independent of any particular user interface policy or style."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT & MIT"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d6e9ca2c4b2276625afe025b0a2a4d8c"
 
 DEPENDS += "util-linux libxcb libsm virtual/libx11 xorgproto libxdmcp"

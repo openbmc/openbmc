@@ -3,7 +3,7 @@ HOMEPAGE = "https://github.com/arsv/perl-cross"
 DESCRIPTION = "perl-cross provides configure script, top-level Makefile and some auxiliary files for perl, \
 with the primary emphasis on cross-compiling the source."
 SECTION = "devel"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 # README.md is taken from https://github.com/arsv/perl-cross/blob/master/README.md
 # but is not provided inside the release tarballs
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/README.md;md5=252fcce2026b765fee1ad74d2fb07a3b"
@@ -15,7 +15,9 @@ SRC_URI = "${GITHUB_BASE_URI}/download/${PV}/perl-cross-${PV}.tar.gz;name=perl-c
            file://0001-perl-cross-add-LDFLAGS-when-linking-libperl.patch \
            file://determinism.patch \
            file://0001-Makefile-check-the-file-if-patched-or-not.patch \
-           file://0001-patches-for-perl-5.42.2.patch \
+           file://0001-patches-for-perl-5.44.0.patch \
+           file://0002-Add-configure-checks-for-perl-5.44.0.patch \
+           file://0003-Fix-checkfield-for-C23-compatibility.patch \
            "
 GITHUB_BASE_URI = "https://github.com/arsv/perl-cross/releases/"
 

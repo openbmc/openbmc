@@ -67,7 +67,7 @@ def preferred_ml_updates(d):
     sort_versions(required_versions, "REQUIRED")
     sort_versions(preferred_versions, "PREFERRED")
 
-    for prov in providers:
+    for prov in sorted(providers):
         val = d.getVar(prov, False)
         pkg = prov.replace("PREFERRED_PROVIDER_", "")
         if pkg.endswith("-native") or "-crosssdk-" in pkg or pkg.startswith(("nativesdk-", "virtual/nativesdk-")):
@@ -112,7 +112,7 @@ def preferred_ml_updates(d):
         if prov != provexp and d.getVar(prov, False):
             d.renameVar(prov, provexp)
 
-    for prov in rproviders:
+    for prov in sorted(rproviders):
         val = d.getVar(prov, False)
         pkg = prov.replace("PREFERRED_RPROVIDER_", "")
         for p in prefixes:

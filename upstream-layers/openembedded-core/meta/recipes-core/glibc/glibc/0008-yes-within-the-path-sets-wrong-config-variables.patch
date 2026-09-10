@@ -1,4 +1,4 @@
-From 0804cd4b41d81095705b8f7f93c222277201dc05 Mon Sep 17 00:00:00 2001
+From 738f10de6f6671739ce61e50326acaf0918184c2 Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 00:31:06 +0000
 Subject: [PATCH] 'yes' within the path sets wrong config variables
@@ -9,7 +9,7 @@ false-positive matches with the path it is configured into.
 
 The change is to use a more elaborated string to grep for.
 
-Upstream-Status: Submitted [libc-alpha@sourceware.org]
+Upstream-Status: Submitted [https://inbox.sourceware.org/libc-alpha/1425394379-41448-1-git-send-email-benjamin.esquivel@linux.intel.com/]
 
 Signed-off-by: Benjamin Esquivel <benjamin.esquivel@linux.intel.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
@@ -67,10 +67,10 @@ index b9981861f6..b52cbd88c8 100644
 diff --git a/sysdeps/arm/configure b/sysdeps/arm/configure
 old mode 100644
 new mode 100755
-index 935e022c74..9f7c98bcd3
+index 0cfc1159a0..52113812a7
 --- a/sysdeps/arm/configure
 +++ b/sysdeps/arm/configure
-@@ -153,12 +153,12 @@ else case e in #(
+@@ -205,12 +205,12 @@ else case e in #(
    e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
  /* end confdefs.h.  */
  #ifdef __ARM_PCS_VFP
@@ -86,10 +86,10 @@ index 935e022c74..9f7c98bcd3
    libc_cv_arm_pcs_vfp=yes
  else case e in #(
 diff --git a/sysdeps/arm/configure.ac b/sysdeps/arm/configure.ac
-index cd00ddc9d9..d3831867ac 100644
+index ab864b665b..50f100770f 100644
 --- a/sysdeps/arm/configure.ac
 +++ b/sysdeps/arm/configure.ac
-@@ -10,8 +10,8 @@ GLIBC_PROVIDES dnl See aclocal.m4 in the top level source directory.
+@@ -39,8 +39,8 @@ fi
  # the dynamic linker via %ifdef.
  AC_CACHE_CHECK([whether the compiler is using the ARM hard-float ABI],
    [libc_cv_arm_pcs_vfp],

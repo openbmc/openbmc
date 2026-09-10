@@ -4,7 +4,7 @@ debuginfo and source file distributions, collect build-ids and rewrite \
 source paths in DWARF data for debugging, tracing and profiling."
 HOMEPAGE = "https://sourceware.org/debugedit/"
 
-LICENSE = "GPL-2.0-only & GPL-3.0-only & LGPL-2.1-only"
+LICENSE = "GPL-2.0-only AND GPL-3.0-only AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552 \
                     file://COPYING.LIB;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://COPYING3;md5=d32239bcb673463ab874e80d47fae504"

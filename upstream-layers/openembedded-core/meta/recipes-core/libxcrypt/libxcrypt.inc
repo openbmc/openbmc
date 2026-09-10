@@ -2,7 +2,7 @@ SUMMARY = "Extended cryptographic library (from glibc)"
 DESCRIPTION = "Forked code from glibc libary to extract only crypto part."
 HOMEPAGE = "https://github.com/besser82/libxcrypt"
 SECTION = "libs"
-LICENSE = "LGPL-2.1-only & 0BSD & BSD-3-Clause"
+LICENSE = "0BSD AND BSD-3-Clause AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://LICENSING;md5=b65434749329c34b5d32c2df3f1b4112 \
                     file://COPYING.LIB;md5=4fbd65380cdd255951079008b364516c \
                     "

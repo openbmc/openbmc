@@ -25,7 +25,7 @@ class MesonTestBase(OESDKTestCase):
             self.skipTest(f"{self.id()} does not support eSDK (https://bugzilla.yoctoproject.org/show_bug.cgi?id=15854)")
 
         self.ensure_host_package("meson")
-        self.ensure_host_package("pkgconfig")
+        self.ensure_host_package("pkgconf")
 
     def build_meson(self, sourcedir, builddir, installdir=None, options=""):
         """

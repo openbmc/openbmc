@@ -5,6 +5,7 @@
 #
 import logging
 import oe.classutils
+import os
 import shlex
 from bb.process import Popen, ExecutionError
 

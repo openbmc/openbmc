@@ -1,4 +1,4 @@
-From 179c398399444e772bb9f5c4ef6d8682ce390387 Mon Sep 17 00:00:00 2001
+From 60f2397f95b1291ffe1818b2833fd0edf118713b Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 18 Mar 2015 01:51:38 +0000
 Subject: [PATCH] nativesdk-glibc: Raise the size of arrays containing dl paths
@@ -26,10 +26,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  8 files changed, 15 insertions(+), 10 deletions(-)
 
 diff --git a/elf/dl-cache.c b/elf/dl-cache.c
-index 9458ffae2a..0e80847695 100644
+index c6820a9f41..120f560c1d 100644
 --- a/elf/dl-cache.c
 +++ b/elf/dl-cache.c
-@@ -335,6 +335,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
+@@ -345,6 +345,10 @@ search_cache (const char *string_table, uint32_t string_table_size,
    return best;
  }
  
@@ -41,10 +41,10 @@ index 9458ffae2a..0e80847695 100644
  _dl_cache_libcmp (const char *p1, const char *p2)
  {
 diff --git a/elf/dl-load.c b/elf/dl-load.c
-index a706cef129..19a93ea9a8 100644
+index 28880171e1..e7ecee07df 100644
 --- a/elf/dl-load.c
 +++ b/elf/dl-load.c
-@@ -107,8 +107,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
+@@ -84,8 +84,8 @@ enum { ncapstr = 1, max_capstrlen = 0 };
     gen-trusted-dirs.awk.  */
  #include "trusted-dirs.h"
  
@@ -98,10 +98,10 @@ index bdc7291966..5c401940a5 100644
 +const char __invoke_dynamic_linker__[4096] __attribute__ ((section (".interp")))
    = RUNTIME_LINKER;
 diff --git a/elf/ldconfig.c b/elf/ldconfig.c
-index aca967403a..dde1960347 100644
+index a39f3ecfcd..92da658f31 100644
 --- a/elf/ldconfig.c
 +++ b/elf/ldconfig.c
-@@ -150,6 +150,8 @@ static struct argp argp =
+@@ -163,6 +163,8 @@ static struct argp argp =
    options, parse_opt, NULL, doc, NULL, more_help, NULL
  };
  
@@ -111,10 +111,10 @@ index aca967403a..dde1960347 100644
  static error_t
  parse_opt (int key, char *arg, struct argp_state *state)
 diff --git a/elf/rtld.c b/elf/rtld.c
-index 29e7a4ddfa..70483518ed 100644
+index fc053df858..d23a5239f8 100644
 --- a/elf/rtld.c
 +++ b/elf/rtld.c
-@@ -189,6 +189,7 @@ dso_name_valid_for_suid (const char *p)
+@@ -187,6 +187,7 @@ dso_name_valid_for_suid (const char *p)
      }
    return *p != '\0';
  }
@@ -136,7 +136,7 @@ index a1f10ea88a..888d9a18f3 100644
  /* Type to represent search path.  */
  struct path_elem
 diff --git a/sysdeps/generic/dl-cache.h b/sysdeps/generic/dl-cache.h
-index 26f0c1e0bd..41541a889f 100644
+index 972ab32b86..28ce74affe 100644
 --- a/sysdeps/generic/dl-cache.h
 +++ b/sysdeps/generic/dl-cache.h
 @@ -34,10 +34,6 @@

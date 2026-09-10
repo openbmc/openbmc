@@ -1,0 +1,35 @@
+From 7faa8a36afb579f07101a48065e4a19729034807 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Wed, 22 Jul 2026 09:21:26 +0000
+Subject: [PATCH] configure_type_ext: Fix checkfield for C23/GCC 16
+
+In C23, 'void foo()' means no parameters, so calling foo(value.field)
+fails with GCC 16 when -Werror is used. This breaks detection of
+struct fields like tm_gmtoff and tm_zone.
+
+Use (void)value.field instead, which works for any field type.
+
+Upstream-Status: Submitted [https://github.com/arsv/perl-cross/pull/178]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ cnf/configure_type_ext.sh | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/cnf/configure_type_ext.sh b/cnf/configure_type_ext.sh
+index 0136c90..9ecd3fb 100644
+--- a/cnf/configure_type_ext.sh
++++ b/cnf/configure_type_ext.sh
+@@ -7,11 +7,9 @@ checkfield() {
+ 	
+ 	try_start
+ 	try_includes $4
+-	try_add 'void foo();'
+-	try_add 'void bar()'
+-        try_add "{"
++	try_add 'void bar(void) {'
+ 	try_add "	$2 value;"
+-	try_add "	foo(value.$3);"
++	try_add "	(void)value.$3;"
+ 	try_add "}"
+ 	try_compile
+ 

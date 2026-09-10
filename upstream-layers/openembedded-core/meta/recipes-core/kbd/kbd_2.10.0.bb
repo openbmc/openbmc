@@ -3,12 +3,12 @@ HOMEPAGE = "http://www.kbd-project.org/"
 DESCRIPTION = "The kbd project contains tools for managing Linux console (Linux console, virtual terminals, keyboard, etc.) - mainly, what they do is loading console fonts and keyboard maps."
 
 # consolefonts and keymaps contain also some public domain and author notice licenses
-LICENSE = "GPL-2.0-or-later & LGPL-2.0-or-later & GPL-3.0-or-later"
+LICENSE = "GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
     file://data/keymaps/pine/en.map;beginline=2;endline=15;md5=20914a59c0546a7b77ebf959bc88ad5d \
 "
-LICENSE:${PN} = "GPL-2.0-or-later & LGPL-2.0-or-later"
+LICENSE:${PN} = "GPL-2.0-or-later AND LGPL-2.0-or-later"
 LICENSE:${PN}-consolefonts = "GPL-2.0-or-later"
 LICENSE:${PN}-consoletrans = "GPL-2.0-or-later"
 LICENSE:${PN}-keymaps-pine = "GPL-3.0-or-later"

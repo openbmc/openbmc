@@ -1,0 +1,47 @@
+From 858d6d9a587e4ed44f92e017375c5265bc40934b Mon Sep 17 00:00:00 2001
+From: Trevor Gamblin <tgamblin@baylibre.com>
+Date: Mon, 24 Aug 2026 17:55:00 +0000
+Subject: [PATCH 3/3] target/riscv: use a targeted TLB page flush for
+ sfence.vma with a vaddr operand
+
+sfence.vma unconditionally called helper_tlb_flush(), regardless of the
+rs1 (vaddr) and rs2 (asid) operands, forcing a page-table walk on the
+next access. Use helper_tlb_flush_page() whenever rs1 != 0, falling back
+to the existing full flush for rs1 == 0. This makes RISC-V behaviour
+more similar to ARM's equivalent (tlbi_aa64_vae1_write), which already
+does tlb_flush_page_by_mmuidx() instead of a full flush.
+
+Pass get_address(ctx, a->rs1, 0) to gen_helper_tlb_flush_page() rather
+than get_gpr(), so that the address being passed matches the current
+addr_xl width regardless of '-cpu' input. Otherwise, the raw register
+value can carry garbage above that width and never match the address the
+TLB entry was actually filled under, so the flush silently misses and a
+stale mapping survives.
+
+Upstream-Status: Submitted [https://lists.gnu.org/archive/html/qemu-devel/2026-08/msg08496.html]
+
+Signed-off-by: Trevor Gamblin <tgamblin@baylibre.com>
+---
+ target/riscv/tcg/insn_trans/trans_privileged.c.inc | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/target/riscv/tcg/insn_trans/trans_privileged.c.inc b/target/riscv/tcg/insn_trans/trans_privileged.c.inc
+index a8eaccef67..8655fa332e 100644
+--- a/target/riscv/tcg/insn_trans/trans_privileged.c.inc
++++ b/target/riscv/tcg/insn_trans/trans_privileged.c.inc
+@@ -155,7 +155,11 @@ static bool trans_sfence_vma(DisasContext *ctx, arg_sfence_vma *a)
+ {
+ #ifndef CONFIG_USER_ONLY
+     decode_save_opc(ctx, 0);
+-    gen_helper_tlb_flush(tcg_env);
++    if (a->rs1 == 0) {
++        gen_helper_tlb_flush(tcg_env);
++    } else {
++        gen_helper_tlb_flush_page(tcg_env, get_address(ctx, a->rs1, 0));
++    }
+     return true;
+ #endif
+     return false;
+-- 
+2.55.0
+

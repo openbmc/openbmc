@@ -9,7 +9,7 @@ second library, libXmuu."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT & MIT"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e79ad4fcc53b9bfe0fc38507a56446b9"
 
 DEPENDS += "libxt libxext"

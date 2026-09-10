@@ -96,14 +96,14 @@ class PatchSet(object):
             if not patch.get("remote"):
                 raise PatchError("Patch file must be specified in patch import.")
             else:
-                patch["file"] = bb.fetch2.localpath(patch["remote"], self.d)
+                patch["file"] = bb.fetch.localpath(patch["remote"], self.d)
 
         for param in PatchSet.defaults:
             if not patch.get(param):
                 patch[param] = PatchSet.defaults[param]
 
         if patch.get("remote"):
-            patch["file"] = self.d.expand(bb.fetch2.localpath(patch["remote"], self.d))
+            patch["file"] = self.d.expand(bb.fetch.localpath(patch["remote"], self.d))
 
         patch["filemd5"] = bb.utils.md5_file(patch["file"])
 
@@ -530,7 +530,7 @@ class GitApplyTree(PatchTree):
         patches = []
         try:
             for name, rev in startcommits.items():
-                cmd = ["git", "format-patch", "--no-signature", "--no-numbered", rev, "-o", tempdir]
+                cmd = ["git", "format-patch", "--no-from", "--no-signature", "--no-numbered", rev, "-o", tempdir]
                 if paths:
                     cmd.append('--')
                     cmd.extend(paths)
@@ -575,7 +575,7 @@ class GitApplyTree(PatchTree):
         return patches
 
     def _need_dirty_check(self):
-        fetch = bb.fetch2.Fetch([], self.d)
+        fetch = bb.fetch.Fetch([], self.d)
         check_dirtyness = False
         for url in fetch.urls:
             url_data = fetch.ud[url]
@@ -798,7 +798,7 @@ class QuiltTree(PatchSet):
             if type == "file":
                 import shutil
                 if not patch.get("file") and patch.get("remote"):
-                    patch["file"] = bb.fetch2.localpath(patch["remote"], self.d)
+                    patch["file"] = bb.fetch.localpath(patch["remote"], self.d)
 
                 shutil.copyfile(patch["quiltfile"], patch["file"])
             else:
@@ -928,7 +928,7 @@ def patch_path(url, fetch, unpackdir, expand=True):
 
 def src_patches(d, all=False, expand=True):
     unpackdir = d.getVar('UNPACKDIR')
-    fetch = bb.fetch2.Fetch([], d)
+    fetch = bb.fetch.Fetch([], d)
     patches = []
     sources = []
     for url in fetch.urls:

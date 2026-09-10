@@ -1,4 +1,4 @@
-From 015ff68e79298c5148350cf3bf0b72d1d409ba4b Mon Sep 17 00:00:00 2001
+From fe651521b9d970a84432b37d2731932a4862deb2 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Wed, 11 May 2022 21:41:14 +0200
 Subject: [PATCH] _distutils/sysconfig.py: make it possible to substite the

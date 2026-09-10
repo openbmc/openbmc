@@ -9,7 +9,7 @@ demonstration.)"
 HOMEPAGE = "https://github.com/karenetheridge/Test-Warnings"
 BUGTRACKER = "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Warnings"
 SECTION = "libs"
-LICENSE = "Artistic-1.0-Perl | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0-Perl OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENCE;md5=f98106ac3cc05d9cbebcdb8fbf7b7815"
 

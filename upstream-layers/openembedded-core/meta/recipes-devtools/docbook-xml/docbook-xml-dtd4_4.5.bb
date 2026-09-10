@@ -3,7 +3,7 @@ DESCRIPTION = "Document type definitions for verification of XML data \
 files against the DocBook rule set."
 HOMEPAGE = "https://docbook.org"
 
-LICENSE = "DocBook"
+LICENSE = "LicenseRef-DocBook"
 NO_GENERIC_LICENSE[DocBook] = "LICENSE-OASIS"
 
 LIC_FILES_CHKSUM = "file://docbook-4.5/docbookx.dtd;beginline=15;endline=30;md5=ab12da76ad94a41d04e1587693ebd9b6 \

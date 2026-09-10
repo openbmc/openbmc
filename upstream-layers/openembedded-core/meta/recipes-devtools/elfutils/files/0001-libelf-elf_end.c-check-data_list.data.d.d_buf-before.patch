@@ -1,4 +1,4 @@
-From 6b339ad9f9084b653b0d0c3823c871a7a9774b63 Mon Sep 17 00:00:00 2001
+From bf22ef3c1a559dc0b265a9c7c2fcda4a20519e63 Mon Sep 17 00:00:00 2001
 From: Robert Yang <liezhi.yang@windriver.com>
 Date: Thu, 16 Aug 2018 09:58:26 +0800
 Subject: [PATCH] libelf/elf_end.c: check data_list.data.d.d_buf before free it

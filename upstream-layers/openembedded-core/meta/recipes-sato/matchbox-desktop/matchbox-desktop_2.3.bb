@@ -3,7 +3,7 @@ DESCRIPTION = "A lightweight windows manager for embedded systems. It uses the d
 HOMEPAGE = "http://matchbox-project.org/"
 BUGTRACKER = "http://bugzilla.yoctoproject.org/"
 
-LICENSE = "GPL-2.0-or-later & LGPL-2.0-or-later"
+LICENSE = "GPL-2.0-or-later AND LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \
                     file://src/desktop.c;endline=20;md5=2e488557570c7dee53bfd0567e4273a9 \
                     file://src/main.c;endline=19;md5=5d2234b35efa927ab3ae36ebac52ba59"

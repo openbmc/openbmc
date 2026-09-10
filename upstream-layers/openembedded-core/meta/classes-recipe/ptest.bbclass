@@ -9,7 +9,7 @@ DESCRIPTION:${PN}-ptest ?= "${DESCRIPTION}  \
 This package contains a test directory ${PTEST_PATH} for package test purposes."
 
 PTEST_PATH ?= "${libdir}/${BPN}/ptest"
-PTEST_BUILD_HOST_FILES ?= "Makefile"
+PTEST_BUILD_HOST_FILES ?= "Makefile site.exp"
 PTEST_BUILD_HOST_PATTERN ?= ""
 PTEST_PARALLEL_MAKE ?= "${PARALLEL_MAKE}"
 PTEST_PARALLEL_MAKEINST ?= "${PARALLEL_MAKEINST}"
@@ -69,6 +69,14 @@ do_install_ptest_base() {
             sed -e 's#${HOSTTOOLS_DIR}/*##g' \
                 -e 's#${WORKDIR}/*=#.=#g' \
                 -e 's#${WORKDIR}/*##g' \
+                -e 's#^\(build_triplet[[:space:]]*=\).*#\1#' \
+                -e 's#^\(build_alias[[:space:]]*=\).*#\1#' \
+                -e 's#^\(build[[:space:]]*=\).*#\1#' \
+                -e 's#^\(build_cpu[[:space:]]*=\).*#\1#' \
+                -e 's#^\(build_vendor[[:space:]]*=\).*#\1#' \
+                -e 's#^\(build_os[[:space:]]*=\).*#\1#' \
+                -e 's#^\(set build_triplet\).*#\1#' \
+                -e 's#^\(set build_alias\).*#\1#' \
                 -i $installed_ptest_file
             if [ -n "${PTEST_BUILD_HOST_PATTERN}" ]; then
                sed -E '/${PTEST_BUILD_HOST_PATTERN}/d' \

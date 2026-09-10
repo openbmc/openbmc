@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit toolchain-scripts-base siteinfo kernel-arch meson-routines
+inherit toolchain-scripts-base siteinfo meson-routines
 
 # We want to be able to change the value of MULTIMACH_TARGET_SYS, because it
 # doesn't always match our expectations... but we default to the stock value
@@ -63,6 +63,8 @@ toolchain_create_sdk_env_script () {
 	echo "export PATH=$sdkpathnative$bindir:$sdkpathnative$sbindir:$sdkpathnative$base_bindir:$sdkpathnative$base_sbindir:$sdkpathnative$bindir/../${HOST_SYS}/bin:$sdkpathnative$bindir/${TARGET_SYS}"$EXTRAPATH':"$PATH"' >> $script
 	echo 'export PKG_CONFIG_SYSROOT_DIR=$SDKTARGETSYSROOT' >> $script
 	echo 'export PKG_CONFIG_PATH=$SDKTARGETSYSROOT'"$libdir"'/pkgconfig:$SDKTARGETSYSROOT'"$prefix"'/share/pkgconfig' >> $script
+	echo 'export PKG_CONFIG_SYSTEM_INCLUDE_PATH=$SDKTARGETSYSROOT'"$prefix"'/include:'"$sdkpathnative${includedir_nativesdk}" >> $script
+	echo 'export PKG_CONFIG_SYSTEM_LIBRARY_PATH=$SDKTARGETSYSROOT'"$libdir"':$SDKTARGETSYSROOT/${baselib}:'"$sdkpathnative${libdir_nativesdk}" >> $script
 	echo 'export CONFIG_SITE=${SDKPATH}/site-config-'"${multimach_target_sys}" >> $script
 	echo "export OECORE_NATIVE_SYSROOT=\"$sdkpathnative\"" >> $script
 	echo 'export OECORE_TARGET_SYSROOT="$SDKTARGETSYSROOT"' >> $script
@@ -92,7 +94,7 @@ toolchain_create_tree_env_script () {
 	touch $script
 	echo 'standalone_sysroot_target="${STAGING_DIR}/${MACHINE}"' >> $script
 	echo 'standalone_sysroot_native="${STAGING_DIR}/${BUILD_ARCH}"' >> $script
-	echo "orig=`pwd`; cd ${COREBASE}; set ${TOPDIR} $bitbakedir; . ./oe-init-build-env; cd \$orig" >> $script
+	echo "orig=\$(pwd); cd ${COREBASE}; set ${TOPDIR} $bitbakedir; . ./oe-init-build-env; cd \$orig" >> $script
 	echo 'export PATH=$standalone_sysroot_native/${bindir_native}:$standalone_sysroot_native/${bindir_native}/${TARGET_SYS}:$PATH' >> $script
 	echo 'export PKG_CONFIG_SYSROOT_DIR=$standalone_sysroot_target' >> $script
 	echo 'export PKG_CONFIG_PATH=$standalone_sysroot_target'"$libdir"'/pkgconfig:$standalone_sysroot_target'"$prefix"'/share/pkgconfig' >> $script
@@ -155,7 +157,7 @@ toolchain_shared_env_script () {
 	echo 'export KCFLAGS="--sysroot=$SDKTARGETSYSROOT"' >> $script
 	echo 'export OECORE_DISTRO_VERSION="${DISTRO_VERSION}"' >> $script
 	echo 'export OECORE_SDK_VERSION="${SDK_VERSION}"' >> $script
-	echo 'export ARCH=${ARCH}' >> $script
+	echo 'export ARCH=${@oe.kernel.map_kernel_arch(d)}' >> $script
 	echo 'export CROSS_COMPILE=${TARGET_PREFIX}' >> $script
 	echo 'export OECORE_TUNE_CCARGS="${TUNE_CCARGS}"' >> $script
 

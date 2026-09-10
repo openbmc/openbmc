@@ -1,4 +1,4 @@
-From ef9ea8e83468ce974079964a5104df170beba85b Mon Sep 17 00:00:00 2001
+From 13b84f40e56cf70d0a74a2a9fb51161b041a31bf Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>
 Date: Wed, 22 May 2024 14:02:55 +0200
 Subject: [PATCH] configure: lookup meson exutable from PATH
@@ -13,10 +13,10 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
  1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/configure b/configure
-index eea903067..217af781f 100755
+index 6ddfe4b53..13cb19ee5 100755
 --- a/configure
 +++ b/configure
-@@ -981,10 +981,7 @@ get_pwd() {
+@@ -967,10 +967,7 @@ get_pwd() {
      fi
  }
  

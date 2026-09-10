@@ -9,7 +9,7 @@ import os
 import textwrap
 
 from oeqa.selftest.case import OESelftestTestCase
-from oeqa.utils.commands import bitbake, runqemu, get_bb_var, get_bb_vars, runCmd
+from oeqa.utils.commands import bitbake, runqemu, get_bb_var, get_bb_vars
 from oeqa.core.decorator.data import skipIfNotArch, skipIfNotBuildArch
 from oeqa.core.decorator import OETestTag
 
@@ -51,10 +51,8 @@ QEMU_USE_KVM = "False"
     def test_boot_uboot_kvm_to_full_target(self):
         """
         Tests building u-boot and booting it with QEMU and KVM.
-        Requires working KVM on build host. See "kvm-ok" output.
+        Requires working KVM on build host.
         """
-
-        runCmd("kvm-ok")
 
         image = "core-image-minimal"
         vars = get_bb_vars(['HOST_ARCH', 'BUILD_ARCH'], image)

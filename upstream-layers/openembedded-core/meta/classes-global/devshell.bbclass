@@ -39,7 +39,7 @@ python () {
        # can't manipulate the environment and variables here yet (see YOCTO #4795)
        d.setVarFlag("do_devshell", "manualfakeroot", "1")
        d.delVarFlag("do_devshell", "fakeroot")
-} 
+}
 
 def pydevshell(d):
 

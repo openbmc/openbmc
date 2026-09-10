@@ -1,0 +1,54 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pratik Farkase <pratik.farkase@est.tech>
+Date: Mon, 17 Aug 2026 08:00:00 +0000
+Subject: [PATCH] testsuite: skip signal-based kill tests
+
+The kill tests that send signals to a pipeproc helper (SIGUSR1, SIGUSR2,
+and queued signal) have a race condition where test_process can exit or
+become unavailable before the expect script reads its output, resulting
+in "spawn id not open" errors. This causes intermittent failures on
+loaded systems, particularly under QEMU emulation.
+
+Skip these tests with 'untested' while keeping the non-signal kill tests
+(argument parsing, signal name/number conversion) which are reliable.
+
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=16263
+
+Upstream-Status: Inappropriate [upstream ticket: https://gitlab.com/procps-ng/procps/-/issues/423]
+Signed-off-by: Pratik Farkase <pratik.farkase@est.tech>
+---
+ testsuite/kill.test/kill.exp | 21 +++++++--------------
+ 1 file changed, 7 insertions(+), 14 deletions(-)
+
+diff --git a/testsuite/kill.test/kill.exp b/testsuite/kill.test/kill.exp
+index 49bac96..30a602f 100644
+--- a/testsuite/kill.test/kill.exp
++++ b/testsuite/kill.test/kill.exp
+@@ -45,21 +45,9 @@ set test "kill convert signal number to name with space"
+ spawn  $kill -l 1
+ expect_pass "$test" "^HUP\\s*"
+ 
+-make_pipeproc
+-
+-set test "kill with SIGUSR1"
+-spawn $kill -USR1 $pipeproc_pid
+-expect_blank_continue "$test"
+-expect_pipeproc_pass "$test" "SIG SIGUSR1"
+-
+-set test "kill with long SIGUSR2"
+-spawn $kill -s SIGUSR2 $pipeproc_pid
+-expect_blank_continue "$test"
+-expect_pipeproc_pass "$test" "SIG SIGUSR2"
+-
+-set test "kill with queued int"
+-spawn $kill -USR1 -q 42 $pipeproc_pid
+-expect_blank_continue "$test"
+-expect_pipeproc_pass "$test" "SIG SIGUSR1 value=42"
+-
+-kill_pipeproc
++# Skip signal-based tests: they have a race condition where test_process
++# can become unavailable before expect reads its output, causing
++# "spawn id not open" errors under load (upstream issue #423)
++untested "kill with SIGUSR1"
++untested "kill with long SIGUSR2"
++untested "kill with queued int"

@@ -8,8 +8,11 @@ set -eu
 if test $# -gt 0; then
     TESTS=$*
 else
-    # Skip test_symbol_presence as this is for developers
-    TESTS="alltests -test_symbol_presence"
+    # Skip test_symbol_presence as this is for developers.
+    # Skip test_quic_multistream as it has a 60s internal timeout per
+    # operation that is too tight under QEMU emulation on loaded hosts,
+    # causing intermittent failures (upstream: https://github.com/openssl/openssl/issues/27104)
+    TESTS="alltests -test_symbol_presence -test_quic_multistream"
 fi
 
 export TOP=.

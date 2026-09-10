@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 13 Aug 2026 11:52:00 +0000
+Subject: [PATCH] Fix build with OpenSSL 4.0: use ASN1_STRING accessors
+
+OpenSSL 4.0 made ASN1_STRING opaque. Direct access to struct members
+(->data, ->length) is no longer possible. Use the accessor functions
+ASN1_STRING_get0_data() and ASN1_STRING_length() instead.
+
+These accessors have been available since OpenSSL 1.1.0, so this change
+is backward compatible.
+
+Upstream-Status: Backport [https://svn.apache.org/repos/asf/serf/trunk r1935023]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ buckets/ssl_buckets.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+--- a/buckets/ssl_buckets.c
++++ b/buckets/ssl_buckets.c
+@@ -567,11 +567,11 @@
+             switch (nm->type) {
+                 case GEN_DNS:
+                     if (copy_action == ErrorOnNul &&
+-                        strlen(nm->d.ia5->data) != nm->d.ia5->length)
++                        strlen((const char *)ASN1_STRING_get0_data(nm->d.ia5)) != (size_t)ASN1_STRING_length(nm->d.ia5))
+                         return SERF_ERROR_SSL_CERT_FAILED;
+                     if (san_arr && *san_arr)
+-                        p = pstrdup_escape_nul_bytes((const char *)nm->d.ia5->data,
+-                                                     nm->d.ia5->length,
++                        p = pstrdup_escape_nul_bytes((const char *)ASN1_STRING_get0_data(nm->d.ia5),
++                                                     ASN1_STRING_length(nm->d.ia5),
+                                                      pool);
+                     break;
+                 default:

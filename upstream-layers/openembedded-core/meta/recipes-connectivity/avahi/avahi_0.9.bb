@@ -11,7 +11,7 @@ SECTION = "network"
 
 # major part is under LGPL-2.1-or-later, but several .dtd, .xsl, initscripts and
 # python scripts are under GPL-2.0-or-later
-LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later"
+LICENSE = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://avahi-common/address.h;endline=25;md5=b1d1d2cda1c07eb848ea7d6215712d9d \
                     file://avahi-core/dns.h;endline=23;md5=6fe82590b81aa0ddea5095b548e2fdcb \
@@ -184,7 +184,7 @@ do_install:append() {
 	sed -i -e 's,@sbindir@,${sbindir},g' -e 's,@sysconfdir@,${sysconfdir},g' ${D}${sysconfdir}/init.d/avahi-*
 }
 
-# At the time the postinst runs, dbus might not be setup so only restart if running 
+# At the time the postinst runs, dbus might not be setup so only restart if running
 # Don't exit early, because update-rc.d needs to run subsequently.
 pkg_postinst:avahi-daemon () {
 if [ -z "$D" ]; then

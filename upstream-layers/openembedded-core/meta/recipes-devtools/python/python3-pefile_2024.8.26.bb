@@ -6,7 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=e34c75178086aca0a17551ffbacaca53"
 
 inherit setuptools3 ptest-python-pytest
 SRCREV = "4b3b1e2e568a88d4f1897d694d684f23d9e270c4"
-SRC_URI = "git://github.com/erocarrera/pefile;branch=master;protocol=https \
+SRC_URI = "git://github.com/erocarrera/pefile;branch=master;protocol=https;tag=v${PV} \
            file://run-ptest"
 
 BBCLASSEXTEND = "native nativesdk"

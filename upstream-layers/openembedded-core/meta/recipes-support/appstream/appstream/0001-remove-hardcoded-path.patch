@@ -1,4 +1,4 @@
-From bf79c20cfee4a074ca752a1466dc96d0b9eb6175 Mon Sep 17 00:00:00 2001
+From 0a532ef29855599e4761923bb38069e98d78e25f Mon Sep 17 00:00:00 2001
 From: Markus Volk <f_l_k@t-online.de>
 Date: Mon, 12 Dec 2022 15:42:42 +0100
 Subject: [PATCH] remove hardcoded path
@@ -14,10 +14,10 @@ Upstream-Status: Inappropriate [oe-specific]
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/meson.build b/meson.build
-index 9af5f58..ad1483d 100644
+index 004dce3..cefb852 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -194,10 +194,10 @@ endif
+@@ -229,10 +229,10 @@ endif
  stemmer_inc_dirs = include_directories()
  if get_option('stemming')
      stemmer_lib = cc.find_library('stemmer', required: true)

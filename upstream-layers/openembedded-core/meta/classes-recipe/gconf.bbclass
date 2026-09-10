@@ -51,7 +51,7 @@ python populate_packages:append () {
     import re
     packages = d.getVar('PACKAGES').split()
     pkgdest =  d.getVar('PKGDEST')
-    
+
     for pkg in packages:
         schema_dir = '%s/%s/etc/gconf/schemas' % (pkgdest, pkg)
         schemas = []

@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c98
 
 inherit pypi ptest-python-pytest python_hatchling
 
+CVE_PRODUCT = "attrs_project:attrs"
+
 DEPENDS += " \
     python3-hatch-vcs-native \
     python3-hatch-fancy-pypi-readme-native \

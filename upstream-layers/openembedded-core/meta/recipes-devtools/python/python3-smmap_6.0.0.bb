@@ -9,8 +9,6 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=e910b35b0ef4e1f665
 
 inherit pypi setuptools3
 
-PYPI_PACKAGE = "smmap"
-
 SRC_URI[sha256sum] = "8d79028ea6cc131da5eab099a5d95a998d43c6779956fffe3b455040911076da"
 
 RDEPENDS:${PN} += "python3-codecs \

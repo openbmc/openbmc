@@ -28,7 +28,7 @@ flatten_map = {
 }
 regression_map = {
     "oeselftest": ['TEST_TYPE', 'MACHINE'],
-    "runtime": ['TESTSERIES', 'TEST_TYPE', 'IMAGE_BASENAME', 'MACHINE', 'IMAGE_PKGTYPE', 'DISTRO'],
+    "runtime": ['TESTSERIES', 'TEST_TYPE', 'IMAGE_BASENAME', 'MACHINE', 'IMAGE_PKGTYPE', 'DISTRO', 'TCLIBC'],
     "sdk": ['TESTSERIES', 'TEST_TYPE', 'IMAGE_BASENAME', 'MACHINE', 'SDKMACHINE'],
     "sdkext": ['TESTSERIES', 'TEST_TYPE', 'IMAGE_BASENAME', 'MACHINE', 'SDKMACHINE'],
     "manual": ['TEST_TYPE', 'TEST_MODULE', 'IMAGE_BASENAME', 'MACHINE']
@@ -87,7 +87,14 @@ def append_resultsdata(results, f, configmap=store_map, configvars=extra_configv
         testtype = data[res]["configuration"].get("TEST_TYPE")
         if testtype not in configmap:
             raise ValueError("Unknown test type %s" % testtype)
-        testpath = "/".join(data[res]["configuration"].get(i) for i in configmap[testtype])
+        paths = []
+        for i in configmap[testtype]:
+            try:
+                paths.append(data[res]["configuration"].get(i))
+            # Some variables may not exist in older data
+            except KeyError:
+                continue
+        testpath = "/".join(paths)
         if testpath not in results:
             results[testpath] = {}
         results[testpath][res] = data[res]

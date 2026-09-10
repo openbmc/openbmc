@@ -17,6 +17,8 @@ PROVIDES = "libxss"
 RREPLACES:${PN} = "libxss"
 PE = "1"
 
+XORGBUILDCLASS = "meson"
+
 XORG_PN = "libXScrnSaver"
 
 SRC_URI[sha256sum] = "5057365f847253e0e275871441e10ff7846c8322a5d88e1e187d326de1cd8d00"

@@ -50,32 +50,6 @@ perform_useradd () {
 	fi
 }
 
-perform_groupmems () {
-	local rootdir="$1"
-	local opts="$2"
-	bbnote "${PN}: Performing groupmems with [$opts]"
-	local groupname=`echo "$opts" | awk '{ for (i = 1; i < NF; i++) if ($i == "-g" || $i == "--group") print $(i+1) }'`
-	local username=`echo "$opts" | awk '{ for (i = 1; i < NF; i++) if ($i == "-a" || $i == "--add") print $(i+1) }'`
-	local prefix=`echo "$opts" | awk '{ for (i = 1; i < NF; i++) if ($i == "-P" || $i == "--prefix") print $(i+1) }'`
-	if test "x$groupname" = "x"; then
-		bbfatal "${PN}: groupmems: No user specified using --add."
-
-	elif test "x$username" = "x"; then
-		bbfatal "${PN}: groupmems: No group specified using --group."
-	fi
-	bbnote "${PN}: Emulating groupmems command using usermod with group $groupname and user $username"
-	local mem_exists="`grep "^$groupname:[^:]*:[^:]*:\([^,]*,\)*$username\(,[^,]*\)*$" $rootdir/etc/group || true`"
-	if test "x$mem_exists" = "x"; then
-		eval flock -x $rootdir${sysconfdir} -c \"$PSEUDO usermod \${prefix:+--prefix \$prefix} --append --groups \$groupname \$username\" || true
-		mem_exists="`grep "^$groupname:[^:]*:[^:]*:\([^,]*,\)*$username\(,[^,]*\)*$" $rootdir/etc/group || true`"
-		if test "x$mem_exists" = "x"; then
-			bbfatal "${PN}: groupmems command (emulated using usermod) did not succeed."
-		fi
-	else
-		bbnote "${PN}: group $groupname already contains $username, not re-adding it"
-	fi
-}
-
 perform_groupdel () {
 	local rootdir="$1"
 	local opts="$2"

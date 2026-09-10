@@ -10,7 +10,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/release/Module-Build"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=881;endline=886;md5=3027f56c664545e54678c26b7f1ac19c"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/L/LE/LEONT/Module-Build-${PV}.tar.gz \
@@ -31,8 +31,6 @@ do_patch_module_build () {
 }
 
 do_patch[postfuncs] += "do_patch_module_build"
-
-EXTRA_CPAN_BUILD_FLAGS = "--create_packlist=0"
 
 do_install:prepend () {
 	# We do not have a recipe for libpod-parser-perl which is for

@@ -1,0 +1,40 @@
+From 41048806aec8a4b71f3ccf11fdedbec88080a675 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Thu, 23 Jul 2026 17:35:23 +0100
+Subject: [PATCH] cmake: mark system libraries are private link libraries
+
+When generating libgit2Targets.cmake, mark the system libraries that
+libgit2.so links to as private, as the don't not need to be seen by
+applications that link to libgit2.
+
+This stops the generated file from containing absolute paths to the
+libraries, which both leaks build information and means the build output
+is not relocatable:
+
+set_target_properties(libgit2::libgit2package PROPERTIES
+  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include"
+  INTERFACE_LINK_LIBRARIES "/PATH/TO/SYSROOT/usr/lib/libssl.so;/PATH/TO/SYSROOT/usr/lib/libcrypto.so;/PATH/TO/SYSROOT/usr/lib/libpcre2-8.so;/PATH/TO/SYSROOT/usr/lib/libz.so;rt"
+)
+
+Making the linkage private removes the INTERFACE_LINK_LIBRARIES line,
+and applications linking to libgit2 still succeed.
+
+Upstream-Status: Submitted [https://github.com/libgit2/libgit2/pull/7324]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/libgit2/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libgit2/CMakeLists.txt b/src/libgit2/CMakeLists.txt
+index 8045ddef9..fafdb09ec 100644
+--- a/src/libgit2/CMakeLists.txt
++++ b/src/libgit2/CMakeLists.txt
+@@ -65,7 +65,7 @@ if (NOT BUILD_SHARED_LIBS AND XCODE_VERSION)
+ endif()
+ 
+ add_library(libgit2package ${SRC_RC} ${LIBGIT2_OBJECTS})
+-target_link_libraries(libgit2package ${LIBGIT2_SYSTEM_LIBS})
++target_link_libraries(libgit2package PRIVATE ${LIBGIT2_SYSTEM_LIBS})
+ target_include_directories(libgit2package SYSTEM PRIVATE ${LIBGIT2_INCLUDES})
+ target_include_directories(libgit2package INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+ 

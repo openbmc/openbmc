@@ -24,7 +24,7 @@ do_install:append() {
 	find ${D}${libdir}/X11/fonts -type f -name fonts.dir | xargs rm -f
 	find ${D}${libdir}/X11/fonts -type f -name fonts.scale | xargs rm -f
 	find ${D}${datadir}/fonts/X11 -type f -name fonts.dir | xargs rm -f
-	find ${D}${datadir}/fonts/X11 -type f -name fonts.scale | xargs rm -f	
+	find ${D}${datadir}/fonts/X11 -type f -name fonts.scale | xargs rm -f
 }
 
 FILES:${PN} += " ${libdir}/X11/fonts ${datadir}"

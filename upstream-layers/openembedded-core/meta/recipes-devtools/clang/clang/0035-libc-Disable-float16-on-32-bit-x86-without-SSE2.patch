@@ -1,0 +1,36 @@
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Fri, 29 Aug 2026 13:55:00 +0530
+Subject: [PATCH] libc: Disable float16 on 32-bit x86 without SSE2
+
+GCC 16 defines __FLT16_MANT_DIG__ when targeting i686 even though
+_Float16 is only usable on x86-32 with SSE2 enabled. The float16
+detection in float16-macros.h keys on that macro, so the shared f16
+math headers are compiled on plain i686 and every use of _Float16
+fails:
+
+  libc/src/__support/FPUtil/BasicOperations.h:63:67:
+      error: SSE register return with SSE2 disabled
+  libc/src/__support/math/acosf16.h:73:14:
+      error: invalid conversion from type '_Float16' without option '-msse2'
+
+Since llvm/lib/Support/APFloat.cpp started including shared/math.h,
+this breaks the LLVM build itself for 32-bit x86 baselines older than
+SSE2 (e.g. -march=pentiumpro), as used by Yocto/OpenEmbedded multilib.
+
+Require SSE2 on 32-bit x86 in the guard, matching the existing
+exclusions for 32-bit Arm and RISC-V. Targets with SSE2 are unaffected.
+
+Upstream-Status: Backport [https://github.com/llvm/llvm-project/commit/05da143c63d333420b99eab198e1a89c97480929]
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+--- a/libc/include/llvm-libc-macros/float16-macros.h	2026-08-29 13:55:04.771442947 +0530
++++ b/libc/include/llvm-libc-macros/float16-macros.h	2026-08-29 13:55:04.773991812 +0530
+@@ -15,7 +15,7 @@
+     (!defined(__GNUC__) || __GNUC__ >= 13 ||                                   \
+      (defined(__clang__) && __clang_major__ >= 12)) &&                         \
+     !defined(__arm__) && !defined(_M_ARM) && !defined(__riscv) &&              \
+-    !defined(_WIN32)
++    !defined(_WIN32) && (!defined(__i386__) || defined(__SSE2__))
+ #define LIBC_TYPES_HAS_FLOAT16
+ 
+ // TODO: This would no longer be required if HdrGen let us guard function

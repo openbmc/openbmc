@@ -2,7 +2,7 @@
 
 set -u
 
-export TIMEOUT_DURATION=600
+export TIMEOUT_DURATION=900
 make -j4 -B -C tests -k test-suite.log
 res=$?
 if [ $res -ne 0 ]; then

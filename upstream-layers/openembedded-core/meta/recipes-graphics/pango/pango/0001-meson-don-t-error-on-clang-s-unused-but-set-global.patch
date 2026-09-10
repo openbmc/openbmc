@@ -1,0 +1,28 @@
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Wed, 20 Aug 2026 10:45:00 +0530
+Subject: [PATCH] meson: don't error on clang's -Wunused-but-set-global
+
+clang 23 added -Wunused-but-set-global to the -Wunused-but-set-variable
+group, so the -Werror=unused-but-set-variable in test_cflags now turns
+it into an error. It fires on the <type>_parent_class variables that
+GLib's G_DEFINE_TYPE family of macros emit, which pango cannot fix, and
+on a few deliberately write-only globals in the test suite.
+
+Keep the warning visible but not fatal. gcc does not know this warning
+group, so cc.get_supported_arguments() drops the flag there.
+
+Upstream-Status: Submitted [https://gitlab.gnome.org/GNOME/pango/-/issues/900]
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+--- a/meson.build
++++ b/meson.build
+@@ -148,6 +148,9 @@
+     '-Werror=empty-body',
+     '-Werror=write-strings',
+     '-Werror=unused-but-set-variable',
++    # clang 23 made this part of the group above; it fires on GLib's
++    # G_DEFINE_TYPE boilerplate, which pango cannot fix.
++    '-Wno-error=unused-but-set-global',
+     '-Wundef', # FIXME: https://bugzilla.gnome.org/show_bug.cgi?id=792481
+   ]
+ 

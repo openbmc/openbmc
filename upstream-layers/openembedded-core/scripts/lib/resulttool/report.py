@@ -24,22 +24,24 @@ class ResultsTextReport(object):
                              'skipped': ['SKIPPED', 'skipped', 'UNSUPPORTED', 'UNTESTED', 'UNRESOLVED']}
 
 
-    def handle_ptest_result(self, k, status, result, machine):
-        if machine not in self.ptests:
-            self.ptests[machine] = {}
+    def handle_ptest_result(self, k, status, result, machine, libc):
+        if libc not in self.ptests:
+            self.ptests[libc] = {}
+        if machine not in self.ptests[libc]:
+            self.ptests[libc][machine] = {}
 
         if k == 'ptestresult.sections':
             # Ensure tests without any test results still show up on the report
             for suite in result['ptestresult.sections']:
-                if suite not in self.ptests[machine]:
-                    self.ptests[machine][suite] = {
+                if suite not in self.ptests[libc][machine]:
+                    self.ptests[libc][machine][suite] = {
                             'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-',
                             'failed_testcases': [], "testcases": set(),
                             }
                 if 'duration' in result['ptestresult.sections'][suite]:
-                    self.ptests[machine][suite]['duration'] = result['ptestresult.sections'][suite]['duration']
+                    self.ptests[libc][machine][suite]['duration'] = result['ptestresult.sections'][suite]['duration']
                 if 'timeout' in result['ptestresult.sections'][suite]:
-                    self.ptests[machine][suite]['duration'] += " T"
+                    self.ptests[libc][machine][suite]['duration'] += " T"
             return True
 
         # process test result
@@ -57,21 +59,21 @@ class ResultsTextReport(object):
             except ValueError:
                 pass
 
-        if suite not in self.ptests[machine]:
-            self.ptests[machine][suite] = {
+        if suite not in self.ptests[libc][machine]:
+            self.ptests[libc][machine][suite] = {
                     'passed': 0, 'failed': 0, 'skipped': 0, 'duration' : '-',
                     'failed_testcases': [], "testcases": set(),
                     }
 
         # do not process duplicate results
-        if test in self.ptests[machine][suite]["testcases"]:
+        if test in self.ptests[libc][machine][suite]["testcases"]:
             print("Warning duplicate ptest result '{}.{}' for {}".format(suite, test, machine))
             return False
 
         for tk in self.result_types:
             if status in self.result_types[tk]:
-                self.ptests[machine][suite][tk] += 1
-        self.ptests[machine][suite]["testcases"].add(test)
+                self.ptests[libc][machine][suite][tk] += 1
+        self.ptests[libc][machine][suite]["testcases"].add(test)
         return True
 
     def handle_ltptest_result(self, k, status, result, machine):
@@ -136,13 +138,13 @@ class ResultsTextReport(object):
             if status in self.result_types[tk]:
                 self.ltpposixtests[machine][suite][tk] += 1
 
-    def get_aggregated_test_result(self, logger, testresult, machine):
+    def get_aggregated_test_result(self, logger, testresult, machine, libc):
         test_count_report = {'passed': 0, 'failed': 0, 'skipped': 0, 'failed_testcases': []}
         result = testresult.get('result', [])
         for k in result:
             test_status = result[k].get('status', [])
             if k.startswith("ptestresult."):
-                if not self.handle_ptest_result(k, test_status, result, machine):
+                if not self.handle_ptest_result(k, test_status, result, machine, libc):
                     continue
             elif k.startswith("ltpresult."):
                 self.handle_ltptest_result(k, test_status, result, machine)
@@ -166,6 +168,7 @@ class ResultsTextReport(object):
         havefailed = False
         reportvalues = []
         machines = []
+        libcs = set()
         cols = ['passed', 'failed', 'skipped']
         maxlen = {'passed' : 0, 'failed' : 0, 'skipped' : 0, 'result_id': 0, 'testseries' : 0, 'ptest' : 0 ,'ltptest': 0, 'ltpposixtest': 0}
         for line in test_count_reports:
@@ -192,10 +195,12 @@ class ResultsTextReport(object):
         for k in cols:
             reporttotalvalues[k] = '%s' % sum([line[k] for line in test_count_reports])
         reporttotalvalues['count'] = '%s' % len(test_count_reports)
-        for (machine, report) in self.ptests.items():
-            for ptest in self.ptests[machine]:
-                if len(ptest) > maxlen['ptest']:
-                    maxlen['ptest'] = len(ptest)
+        for libc in self.ptests:
+            libcs.add(libc)
+            for machine in self.ptests[libc]:
+                for ptest in self.ptests[libc][machine]:
+                    if len(ptest) > maxlen['ptest']:
+                        maxlen['ptest'] = len(ptest)
         for (machine, report) in self.ltptests.items():
             for ltptest in self.ltptests[machine]:
                 if len(ltptest) > maxlen['ltptest']:
@@ -208,6 +213,7 @@ class ResultsTextReport(object):
                                  reporttotalvalues=reporttotalvalues,
                                  havefailed=havefailed,
                                  machines=machines,
+                                 libcs=list(libcs),
                                  ptests=self.ptests,
                                  ltptests=self.ltptests,
                                  ltpposixtests=self.ltpposixtests,
@@ -268,6 +274,11 @@ class ResultsTextReport(object):
                 skip = False
                 result = testresults[testsuite][resultid]
                 machine = result['configuration']['MACHINE']
+                try:
+                    libc = result['configuration']['TCLIBC']
+                except KeyError:
+                    # We don't have libc in old test results, not much we can do
+                    libc = 'unknown'
 
                 # Check to see if there is already results for these kinds of tests for the machine
                 for key in result['result'].keys():
@@ -280,7 +291,7 @@ class ResultsTextReport(object):
                 if skip:
                     break
 
-                test_count_report = self.get_aggregated_test_result(logger, result, machine)
+                test_count_report = self.get_aggregated_test_result(logger, result, machine, libc)
                 test_count_report['machine'] = machine
                 test_count_report['testseries'] = result['configuration']['TESTSERIES']
                 test_count_report['result_id'] = resultid

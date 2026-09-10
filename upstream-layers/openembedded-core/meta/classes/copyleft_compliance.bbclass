@@ -30,7 +30,7 @@ python do_prepare_copyleft_sources () {
     sources_dir = d.getVar('COPYLEFT_SOURCES_DIR')
     dl_dir = d.getVar('DL_DIR')
     src_uri = d.getVar('SRC_URI').split()
-    fetch = bb.fetch2.Fetch(src_uri, d)
+    fetch = bb.fetch.Fetch(src_uri, d)
     ud = fetch.ud
 
     pf = d.getVar('PF')

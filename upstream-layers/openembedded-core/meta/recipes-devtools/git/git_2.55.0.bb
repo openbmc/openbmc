@@ -2,7 +2,7 @@ SUMMARY = "Distributed version control system"
 HOMEPAGE = "http://git-scm.com"
 DESCRIPTION = "Git is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency."
 SECTION = "console/utils"
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later & BSD-3-Clause & MIT & LGPL-2.1-or-later"
+LICENSE = "BSD-3-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT"
 DEPENDS = "openssl zlib"
 
 PROVIDES:append:class-native = " git-replacement-native"
@@ -45,6 +45,10 @@ EXTRA_OECONF:append:class-native = " --with-gitconfig=/etc/gitconfig "
 
 # Needs brokensep as this doesn't use automake
 inherit autotools-brokensep perlnative bash-completion manpages
+
+# Git's maintainer docs define vX.Y.Z (Z>0) maintenance releases as
+# bugfix-only, scoped to the corresponding vX.Y.0 feature release.
+inherit upstream-stable-release-point
 
 EXTRA_OEMAKE = "NO_RUST=1 NO_PYTHON=1 CFLAGS='${CFLAGS}' LDFLAGS='${LDFLAGS}'"
 EXTRA_OEMAKE += "'PERL_PATH=/usr/bin/env perl'"

@@ -11,15 +11,15 @@ Updated by: Robert Yang <liezhi.yang@windriver.com>
  Makefile.am | 17 -----------------
  1 file changed, 17 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 51c1fbdb..4962c3ad 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -408,23 +408,6 @@ $(notes_txt): $(notes_texi)
+Index: libtool-2.6.2/Makefile.am
+===================================================================
+--- libtool-2.6.2.orig/Makefile.am
++++ libtool-2.6.2/Makefile.am
+@@ -419,25 +419,6 @@ $(notes_txt): $(notes_texi)
  	$(AM_V_GEN)$(MAKEINFO) -P '$(srcdir)/doc' --no-headers \
  	    $(MAKEINFOFLAGS) -o '$@' '$(notes_texi)'
  
--dist_man1_MANS		= $(libtool_1) $(libtoolize_1)
+-dist_man1_MANS		= $(libtool_1) $(libtoolize_1) $(libtoolnextv_1)
 -MAINTAINERCLEANFILES	+= $(dist_man1_MANS)
 -update_mans = \
 -  PATH=".$(PATH_SEPARATOR)$$PATH"; export PATH; \
@@ -33,12 +33,11 @@ index 51c1fbdb..4962c3ad 100644
 -	$(AM_V_GEN)$(update_mans) -n 'Provide generalized library-building support services' --help-option=--help-all libtool
 -$(libtoolize_1): $(libtoolize_in)
 -	$(AM_V_GEN)$(update_mans) -n 'Prepare a package to use libtool' libtoolize
+-$(libtoolnextv_1): $(libtoolnextv_in)
+-	$(AM_V_GEN)$(update_mans) -n 'Determines next version to use for a libtool library' libtool-next-version
 -
 -
 -
  ## ------------- ##
  ## Installation. ##
  ## ------------- ##
--- 
-2.39.5
-

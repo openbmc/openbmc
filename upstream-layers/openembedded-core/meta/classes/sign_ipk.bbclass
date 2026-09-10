@@ -26,8 +26,6 @@
 #           Optional variable for specifying the gnupg "home" directory:
 #
 
-inherit sanity
-
 IPK_SIGN_PACKAGES = '1'
 IPK_GPG_BACKEND ?= 'local'
 IPK_GPG_SIGNATURE_TYPE ?= 'ASC'
@@ -36,11 +34,11 @@ python () {
     # Check configuration
     for var in ('IPK_GPG_NAME', 'IPK_GPG_PASSPHRASE_FILE'):
         if not d.getVar(var):
-            raise_sanity_error("You need to define %s in the config" % var, d)
+            oe.sanity.raise_sanity_error("You need to define %s in the config" % var, d)
 
     sigtype = d.getVar("IPK_GPG_SIGNATURE_TYPE")
     if sigtype.upper() != "ASC" and sigtype.upper() != "BIN":
-        raise_sanity_error("Bad value for IPK_GPG_SIGNATURE_TYPE (%s), use either ASC or BIN" % sigtype)
+        oe.sanity.raise_sanity_error("Bad value for IPK_GPG_SIGNATURE_TYPE (%s), use either ASC or BIN" % sigtype)
 }
 
 def sign_ipk(d, ipk_to_sign):

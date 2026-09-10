@@ -1,4 +1,4 @@
-From 0c8334d3b9b69f097546f5fb08310acced202e24 Mon Sep 17 00:00:00 2001
+From a6e91e04651dbd2d003dbaef0919284a8944184e Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 21 Jun 2026 22:57:24 +0200
 Subject: [PATCH] Source/cmake/FindGLib.cmake: do not set include dirs from

@@ -6,6 +6,9 @@
 
 inherit module-base kernel-module-split pkgconfig
 
+INHIBIT_DEFAULT_DEPS = "1"
+DEPENDS += "virtual/cross-cc virtual/cross-binutils"
+
 EXTRA_OEMAKE += "KERNEL_SRC=${STAGING_KERNEL_DIR}"
 
 MODULES_INSTALL_TARGET ?= "modules_install"
@@ -43,7 +46,7 @@ module_do_compile() {
 
 module_do_install() {
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS
-	oe_runmake DEPMOD=echo MODLIB="${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}" \
+	oe_runmake DEPMOD=echo MODLIB="${D}${KERNEL_MODULE_INSTALL_PREFIX}" \
 	           INSTALL_FW_PATH="${D}${firmwaredir}" \
 	           CC="${KERNEL_CC}" LD="${KERNEL_LD}" OBJCOPY="${KERNEL_OBJCOPY}" \
 	           STRIP="${KERNEL_STRIP}" \

@@ -663,7 +663,7 @@ def sstate_package(ss, d):
             for dir in dirs:
                 dir = os.path.join(walkroot, dir).removeprefix(state[1])
                 if tmpdir in dir:
-                    bb.error("sstate found a tmpdir path reference in installation directiory %s which must be removed." % dir)
+                    bb.error("sstate found a tmpdir path reference in installation directory %s which must be removed." % dir)
                     exit = True
         bb.debug(2, "Preparing tree %s for packaging at %s" % (state[1], sstatebuild + state[0]))
         bb.utils.rename(state[1], sstatebuild + state[0])
@@ -714,7 +714,7 @@ def sstate_package(ss, d):
 sstate_package[vardepsexclude] += "SSTATE_SIG_KEY SSTATE_PKG"
 
 def pstaging_fetch(sstatefetch, d):
-    import bb.fetch2
+    import bb.fetch
 
     # Only try and fetch if the user has configured a mirror
     mirrors = d.getVar('SSTATE_MIRRORS')
@@ -751,11 +751,11 @@ def pstaging_fetch(sstatefetch, d):
             localdata.delVar('SRC_URI')
             localdata.setVar('SRC_URI', srcuri)
             try:
-                fetcher = bb.fetch2.Fetch([srcuri], localdata, cache=False)
+                fetcher = bb.fetch.Fetch([srcuri], localdata, cache=False)
                 fetcher.checkstatus()
                 fetcher.download()
 
-            except bb.fetch2.BBFetchException:
+            except bb.fetch.BBFetchException:
                 pass
 
 def sstate_setscene(d):
@@ -932,12 +932,13 @@ sstate_unpack_package () {
 	fi
 
 	tar -I "$ZSTD" -xvpf ${SSTATE_PKG}
-	# update .siginfo atime on local/NFS mirror if it is a symbolic link
-	[ ! -h ${SSTATE_PKG}.siginfo ] || [ ! -e ${SSTATE_PKG}.siginfo ] || touch -a ${SSTATE_PKG}.siginfo 2>/dev/null || true
-	# update each symbolic link instead of any referenced file
-	touch --no-dereference ${SSTATE_PKG} 2>/dev/null || true
-	[ ! -e ${SSTATE_PKG}.sig ] || touch --no-dereference ${SSTATE_PKG}.sig 2>/dev/null || true
-	[ ! -e ${SSTATE_PKG}.siginfo ] || touch --no-dereference ${SSTATE_PKG}.siginfo 2>/dev/null || true
+
+	# Update both any file and any symlink pointing to the file for sigs as well as the file
+	for file in ${SSTATE_PKG} ${SSTATE_PKG}.sig ${SSTATE_PKG}.siginfo
+	do
+		[ ! -e $file ] || touch $file 2>/dev/null || true
+		[ ! -e $file ] || touch --no-dereference $file 2>/dev/null || true
+	done
 }
 
 BB_HASHCHECK_FUNCTION = "sstate_checkhashes"
@@ -978,6 +979,9 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
 
         if os.path.exists(sstatefile):
             oe.utils.touch(sstatefile)
+            for ext in ['.sig', '.siginfo']:
+                if os.path.exists(sstatefile + ext):
+                    oe.utils.touch(sstatefile + ext)
             found.add(tid)
             bb.debug(2, "SState: Found valid sstate file %s" % sstatefile)
         else:
@@ -1004,7 +1008,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
                 bb.utils.to_boolean(localdata.getVar('SSTATE_MIRROR_ALLOW_NETWORK')):
             localdata.delVar('BB_NO_NETWORK')
 
-        from bb.fetch2 import FetchConnectionCache
+        from bb.fetch import FetchConnectionCache
         def checkstatus_init():
             while not connection_cache_pool.full():
                 connection_cache_pool.put(FetchConnectionCache())
@@ -1026,13 +1030,13 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
             import traceback
 
             try:
-                fetcher = bb.fetch2.Fetch(srcuri.split(), localdata2,
+                fetcher = bb.fetch.Fetch(srcuri.split(), localdata2,
                             connection_cache=connection_cache)
                 fetcher.checkstatus()
                 bb.debug(2, "SState: Successful fetch test for %s" % srcuri)
                 found.add(tid)
                 missed.remove(tid)
-            except bb.fetch2.FetchError as e:
+            except bb.fetch.FetchError as e:
                 bb.debug(2, "SState: Unsuccessful fetch test for %s (%s)\n%s" % (srcuri, repr(e), traceback.format_exc()))
             except Exception as e:
                 bb.error("SState: cannot test %s: %s\n%s" % (srcuri, repr(e), traceback.format_exc()))
@@ -1059,7 +1063,7 @@ def sstate_checkhashes(sq_data, d, siginfo=False, currentcount=0, summary=True, 
                 bb.event.fire(bb.event.ProcessStarted(msg, len(tasklist)), d)
 
             # Have to setup the fetcher environment here rather than in each thread as it would race
-            fetcherenv = bb.fetch2.get_fetcher_environment(d)
+            fetcherenv = bb.fetch.get_fetcher_environment(d)
             with bb.utils.environment(**fetcherenv):
                 bb.event.enable_threadlock()
                 import concurrent.futures

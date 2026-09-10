@@ -31,6 +31,8 @@ EXTRA_OECMAKE += "-DVKB_WSI_SELECTION=D2D"
 
 # Clang is fussy about incompatible options on aarch64/x86_64
 # x86_64-poky-linux-clang++: error: overriding '-ffp-model=precise' option with '-ffp-contract=fast' [-Werror,-Woverriding-option]
-CXXFLAGS:append:toolchain-clang = " -Wno-error=overriding-option"
+# clang 23's -Wdangling-gsl also flags framework code taking .begin() of a
+# temporary (postprocessing_computepass.cpp); keep it a warning, not an error.
+CXXFLAGS:append:toolchain-clang = " -Wno-error=overriding-option -Wno-error=dangling-gsl"
 
 COMPATIBLE_HOST = "(aarch64|x86_64).*-linux"

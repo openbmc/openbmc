@@ -3,6 +3,11 @@
 #
 # SPDX-License-Identifier: MIT
 #
+
+import importlib
+import os
+import sys
+
 # Enable other layers to have modules in the same named directory
 from pkgutil import extend_path
 __path__ = extend_path(__path__, __name__)
@@ -24,8 +29,6 @@ def avoid_paths_in_environ(paths):
 
         Returns new PATH without avoided PATHs.
     """
-    import os
-
     new_path = ''
     for p in os.environ['PATH'].split(':'):
        avoid = False
@@ -56,9 +59,6 @@ def make_logger_bitbake_compatible(logger):
     return logger
 
 def load_test_components(logger, executor):
-    import sys
-    import os
-    import importlib
 
     from oeqa.core.context import OETestContextExecutor
 

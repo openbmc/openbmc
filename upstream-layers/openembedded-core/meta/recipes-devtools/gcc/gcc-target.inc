@@ -6,8 +6,6 @@ EXTRA_OECONF_PATHS = "\
     --with-build-sysroot=${STAGING_DIR_TARGET} \
 "
 
-EXTRA_OECONF:append:linuxstdbase = " --enable-clocale=gnu"
-
 # Configure gcc running on the target to default to an architecture which will
 # be compatible with that of gcc-runtime (which is cross compiled to be target
 # specific). For example, for ARM, ARMv6+ adds atomic instructions that may

@@ -72,6 +72,17 @@ IMAGE_CMD:jffs2 = "mkfs.jffs2 --root=${IMAGE_ROOTFS} --faketime --output=${IMGDE
 
 IMAGE_CMD:cramfs = "mkfs.cramfs ${IMAGE_ROOTFS} ${IMGDEPLOYDIR}/${IMAGE_NAME}.cramfs ${EXTRA_IMAGECMD}"
 
+# Derive a deterministic directory hash seed from SOURCE_DATE_EPOCH so
+# reproducible builds get stable ext2/3/4 directory indexes
+def oe_ext234_hash_seed(d):
+    sde = d.getVar('SOURCE_DATE_EPOCH')
+    if not sde:
+        return ''
+    import uuid
+    return str(uuid.uuid5(uuid.UUID('e7429877-e7b3-4a68-a5c9-2f2fdf33d460'), sde))
+
+REPRODUCIBLE_EXT234_HASH_SEED ?= "${@oe_ext234_hash_seed(d)}"
+
 oe_mkext234fs () {
 	fstype=$1
 	extra_imagecmd=""
@@ -79,6 +90,14 @@ oe_mkext234fs () {
 	if [ $# -gt 1 ]; then
 		shift
 		extra_imagecmd=$@
+	fi
+
+	# For reproducible builds, make mke2fs/e2fsck deterministic: a fixed time and
+	# directory hash seed (the fsck "-D" pass reorders directories using it).
+	# This mirrors what wic does for its ext4 partitions.
+	if [ -n "$SOURCE_DATE_EPOCH" ]; then
+		export E2FSPROGS_FAKE_TIME="$SOURCE_DATE_EPOCH"
+		extra_imagecmd="$extra_imagecmd -E hash_seed=${REPRODUCIBLE_EXT234_HASH_SEED}"
 	fi
 
 	# If generating an empty image the size of the sparse block should be large
@@ -98,6 +117,19 @@ oe_mkext234fs () {
 	mkfs.$fstype -F $extra_imagecmd ${IMGDEPLOYDIR}/${IMAGE_NAME}.$fstype -d ${IMAGE_ROOTFS}
 	# Error codes 0-3 indicate successfull operation of fsck (no errors or errors corrected)
 	fsck.$fstype -pvfD ${IMGDEPLOYDIR}/${IMAGE_NAME}.$fstype || [ $? -le 3 ]
+
+	# e2fsck stamps the superblock write/last-check times with the current time
+	# even under E2FSPROGS_FAKE_TIME, so normalize every superblock time field
+	if [ -n "$SOURCE_DATE_EPOCH" ]; then
+		printf '%s\n' \
+			"set_super_value mkfs_time @$SOURCE_DATE_EPOCH" \
+			"set_super_value wtime @$SOURCE_DATE_EPOCH" \
+			"set_super_value lastcheck @$SOURCE_DATE_EPOCH" \
+			"set_super_value mtime @0" \
+			"set_super_value first_error_time @0" \
+			"set_super_value last_error_time @0" \
+			| debugfs -w -f - ${IMGDEPLOYDIR}/${IMAGE_NAME}.$fstype
+	fi
 }
 
 IMAGE_CMD:ext2 = "oe_mkext234fs ext2 ${EXTRA_IMAGECMD}"
@@ -270,7 +302,7 @@ IMAGE_CMD:f2fs () {
 
 EXTRA_IMAGECMD = ""
 
-inherit siteinfo kernel-arch image-artifact-names
+inherit siteinfo image-artifact-names
 
 JFFS2_ENDIANNESS ?= "${@oe.utils.conditional('SITEINFO_ENDIANNESS', 'le', '-l', '-b', d)}"
 JFFS2_ERASEBLOCK ?= "0x40000"
@@ -355,7 +387,7 @@ CONVERSION_CMD:sha256sum = "sha256sum ${IMAGE_NAME}.${type} > ${IMAGE_NAME}.${ty
 CONVERSION_CMD:sha384sum = "sha384sum ${IMAGE_NAME}.${type} > ${IMAGE_NAME}.${type}.sha384sum"
 CONVERSION_CMD:sha512sum = "sha512sum ${IMAGE_NAME}.${type} > ${IMAGE_NAME}.${type}.sha512sum"
 CONVERSION_CMD:bmap = "bmaptool create ${IMAGE_NAME}.${type} -o ${IMAGE_NAME}.${type}.bmap"
-CONVERSION_CMD:u-boot = "mkimage -A ${UBOOT_ARCH} -O linux -T ramdisk -C none -n ${IMAGE_NAME} -d ${IMAGE_NAME}.${type} ${IMAGE_NAME}.${type}.u-boot"
+CONVERSION_CMD:u-boot = "mkimage -A ${@oe.kernel.map_uboot_arch(d)} -O linux -T ramdisk -C none -n ${IMAGE_NAME} -d ${IMAGE_NAME}.${type} ${IMAGE_NAME}.${type}.u-boot"
 CONVERSION_CMD:vmdk = "qemu-img convert -O vmdk ${IMAGE_NAME}.${type} ${IMAGE_NAME}.${type}.vmdk"
 CONVERSION_CMD:vhdx = "qemu-img convert -O vhdx -o subformat=dynamic ${IMAGE_NAME}.${type} ${IMAGE_NAME}.${type}.vhdx"
 CONVERSION_CMD:vhd = "qemu-img convert -O vpc -o subformat=fixed ${IMAGE_NAME}.${type} ${IMAGE_NAME}.${type}.vhd"

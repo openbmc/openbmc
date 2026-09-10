@@ -1,4 +1,4 @@
-From 238020ed859acb41f1f43352afc28db14cecb34e Mon Sep 17 00:00:00 2001
+From 368d04b58ce8b52e93d33be1321e78a9c6bf80ae Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Thu, 3 Dec 2015 04:08:00 +0100
 Subject: [PATCH] Define TESTS variable

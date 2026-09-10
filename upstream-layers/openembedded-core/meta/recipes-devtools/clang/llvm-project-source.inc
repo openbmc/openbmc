@@ -65,18 +65,19 @@ python do_preconfigure() {
     triple = ""
     name = ""
     check = ""
-    oe_names = ""
+    oe_names = []
     distros = d.getVar('CLANG_EXTRA_OE_DISTRO')
     for distro in distros.split():
-        distro_id = distro.split(":")[0].replace('-','_')
+        distro_id_raw = distro.split(":")[0]
+        distro_id = distro_id_raw.replace('-','_')
         distro_triple = distro.split(":")[1]
-        case += '\\n    .Case("' + distro_id + '", Distro::' + distro_id.upper() + ')'
+        case += '\\n    .Case("' + distro_id_raw + '", Distro::' + distro_id.upper() + ')'
         triple += '\\n   if (Distro.Is' + distro_id.upper() + '())\\n     return "x86_64-' + distro_triple + '-linux";'
         name += '\\n    '+ distro_id.upper() + ','
         check += '\\nbool Is' + distro_id.upper() + '() const { return DistroVal == ' + distro_id.upper() + '; }'
-        oe_names +=  distro_id.upper() + ' ||'
+        oe_names.append('DistroVal == ' + distro_id.upper())
 
-    check += '\\nbool IsOpenEmbedded() const { return DistroVal == ' + oe_names[0:-3] + '; }'
+    check += '\\nbool IsOpenEmbedded() const { return ' + ' || '.join(oe_names) + '; }'
 
     cmd = ['sed', '-i', 's#//CLANG_EXTRA_OE_DISTRO_NAME#%s#g' % name, source + '/clang/include/clang/Driver/Distro.h']
     subprocess.check_output(cmd, stderr=subprocess.STDOUT)

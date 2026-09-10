@@ -85,7 +85,7 @@ python do_install_ptest_cargo() {
     cargo_test_binaries_file = d.getVar('CARGO_TEST_BINARIES_FILES')
     rust_test_args = d.getVar('RUST_TEST_ARGS') or ""
 
-    ptest_dir = os.path.join(dest_dir, ptest_path.lstrip('/'))
+    ptest_dir = oe.path.join(dest_dir, ptest_path)
     os.makedirs(ptest_dir, exist_ok=True)
 
     test_bins = []
@@ -95,6 +95,8 @@ python do_install_ptest_cargo() {
 
     test_paths = []
     for test_bin in test_bins:
+        # Note that we can't strip the hash from the filename as some packages
+        # (eg librsvg) have multiple binaries with the same prefix.
         shutil.copy2(test_bin, ptest_dir)
         test_paths.append(os.path.join(ptest_path, os.path.basename(test_bin)))
 
@@ -105,7 +107,7 @@ python do_install_ptest_cargo() {
             f.write("#!/bin/sh\n")
         else:
             f.write(f"\necho \"\"\n")
-            f.write(f"echo \"## starting to run rust tests ##\"\n")               
+            f.write(f"echo \"## starting to run rust tests ##\"\n")
         f.write("if [ -z \"$rc\" ]; then rc=0; fi\n")
         for test_path in test_paths:
             script = textwrap.dedent(f"""\
@@ -118,7 +120,7 @@ python do_install_ptest_cargo() {
                 fi
             """)
             f.write(script)
-        
+
         f.write("exit $rc\n")
 
     if not script_exists:

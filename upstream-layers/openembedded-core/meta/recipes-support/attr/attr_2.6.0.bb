@@ -6,7 +6,7 @@ SECTION = "libs"
 
 DEPENDS = "virtual/libintl"
 
-LICENSE = "LGPL-2.1-or-later & GPL-2.0-or-later"
+LICENSE = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 LICENSE:${PN} = "GPL-2.0-or-later"
 LICENSE:lib${BPN} = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=2d0aa14b3fce4694e4f615e30186335f \

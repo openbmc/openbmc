@@ -4,11 +4,11 @@ These tools include a set of conventions about how programs should be written to
 naming organization for the message catalogs themselves, a runtime library supporting the retrieval of translated messages, and \
 a few stand-alone programs to massage in various ways the sets of translatable and already translated strings."
 SECTION = "libs"
-LICENSE = "GPL-3.0-or-later & LGPL-2.1-or-later"
+LICENSE = "GPL-3.0-or-later AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c678957b0c8e964aa6c70fd77641a71e"
 
 # without libxml in PACKAGECONFIG vendor copy of the lib will be used
-LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', '& MIT', d)}"
+LICENSE:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', 'AND MIT', d)}"
 LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'libxml', '', 'file://libtextstyle/lib/libxml/COPYING;md5=2044417e2e5006b65a8b9067b683fcf1', d)}"
 # without glib in PACKAGECONFIG vendor copy of the lib will be used
 LIC_FILES_CHKSUM:append = " ${@bb.utils.contains('PACKAGECONFIG', 'glib', '', 'file://libtextstyle/lib/glib/ghash.c;md5=e3159f5ac38dfe77af5cc0ee104dab2d;beginline=10;endline=27', d)}"
@@ -30,6 +30,11 @@ SRC_URI += " \
 SRC_URI:append:libc-musl = " file://0001-Ignore-failing-tests-needing-BIG5-encoding-on-musl.patch"
 
 inherit autotools texinfo pkgconfig ptest
+
+# configure's Objective-C probe would pick the bare ${HOST_PREFIX}cc, which
+# has no default sysroot and trips the configure-unsafe QA check; give it
+# the fully-flagged C compiler instead.
+export OBJC = "${CC}"
 
 EXTRA_OECONF += "--without-lispdir \
                  --disable-csharp \

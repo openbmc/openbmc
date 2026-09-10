@@ -59,7 +59,7 @@ fi
 python populate_packages:append () {
     packages = d.getVar('PACKAGES').split()
     pkgdest =  d.getVar('PKGDEST')
-    
+
     for pkg in packages:
         icon_dir = '%s/%s/%s/icons' % (pkgdest, pkg, d.getVar('datadir'))
         if not os.path.exists(icon_dir):

@@ -29,7 +29,9 @@ LIC_FILES_CHKSUM ?= "file://${COMMON_LICENSE_DIR}/GPL-2.0-only;md5=801f80980d171
 INHIBIT_DEFAULT_DEPS = "1"
 DEPENDS += "dtc-native"
 
-inherit deploy kernel-arch
+inherit deploy
+
+export ARCH = "${@oe.kernel.map_kernel_arch(d)}"
 
 COMPATIBLE_MACHINE ?= "^$"
 

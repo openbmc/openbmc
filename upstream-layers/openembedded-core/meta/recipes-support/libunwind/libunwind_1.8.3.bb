@@ -27,6 +27,8 @@ PACKAGECONFIG[zlib] = "--enable-zlibdebuginfo,--disable-zlibdebuginfo,zlib"
 PACKAGECONFIG[latexdocs] = "--enable-documentation, --disable-documentation, latex2man-native"
 
 EXTRA_OECONF = "--enable-static --disable-tests"
+EXTRA_OECONF:append:riscv64 = " --disable-cxx-exceptions"
+
 
 # http://errors.yoctoproject.org/Errors/Details/20487/
 ARM_INSTRUCTION_SET:armv4 = "arm"

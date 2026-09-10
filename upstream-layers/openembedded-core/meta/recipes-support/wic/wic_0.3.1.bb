@@ -15,6 +15,17 @@ RDEPENDS:${PN} += " \
     python3-json \
     python3-logging \
     python3-misc \
+    parted \
+    dosfstools \
+    mtools \
+    bmaptool \
+    btrfs-tools \
+    squashfs-tools \
+    e2fsprogs \
+    e2fsprogs-resize2fs \
+    util-linux \
+    tar \
+    erofs-utils \
     "
 
 BBCLASSEXTEND = "native nativesdk"

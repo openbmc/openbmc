@@ -1,0 +1,67 @@
+From b79c9ccbf17852f3ffd6acb8cc56124829e03edf Mon Sep 17 00:00:00 2001
+From: Paul Barker <paul@pbarker.dev>
+Date: Fri, 31 Jul 2026 13:15:37 +0100
+Subject: [PATCH] Avoid build-time race condition when cross-compiling from a
+ source tarball
+
+Since commit 66529eef883c ("Force to update revision.h when commits
+differ"), the Makefile rule for $(REVISION_H) is always marked as PHONY
+when building from a source tarball. This has no benefit,
+file2lastrev.rb will just print a warning and exit if we're not in a VCS
+checkout, but it can cause problems.
+
+When cross-compiling, the generated file $(arch)-fake.rb is used by
+every invocation of MINIRUBY. $(arch)-fake.rb depends on $(REVISION_H),
+so it is considered perpetually out-of-date and sub-make invocations
+will repeatedly regenerate this file.
+
+There is no enforcement of dependencies between sub-make invocations, so
+one sub-make can be running MINIRUBY (and so using $(arch)-fake.rb) at
+the same time as a different sub-make is regenerating $(arch)-fake.rb.
+Truncating and re-writing $(arch)-fake.rb while it is mmapped by a
+running ruby interpreter can cause a SIGBUS error, for example:
+
+  i686-linux-gnu-fake.rb: [BUG] Bus Error at 0x00007fee11f02765
+
+No addition of dependencies to Makefile rules can address this. Instead,
+we need to stop treating $(REVISION_H) as PHONY when not building from a
+git checkout.
+
+[YOCTO #16283]
+
+Upstream-Status: Backport [squashed two commits:
+  https://github.com/ruby/ruby/commit/bb235bddd4ce7d9e73a80931782f0f0b3971d12b
+  https://github.com/ruby/ruby/commit/ef6b630cdb51d3223299a4ddc9c97b2444235f59
+  ]
+Signed-off-by: Paul Barker <paul@pbarker.dev>
+---
+ defs/gmake.mk | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/defs/gmake.mk b/defs/gmake.mk
+index e6f553fa8c1b..413057ca6896 100644
+--- a/defs/gmake.mk
++++ b/defs/gmake.mk
+@@ -435,9 +435,7 @@ endif
+ 
+ ifeq ($(HAVE_GIT),yes)
+ REVISION_LATEST := $(shell $(GIT_LOG_FORMAT)%H -1 2>/dev/null)
+-else
+-REVISION_LATEST := update
+-endif
++ifneq ($(REVISION_LATEST),)
+ REVISION_IN_HEADER := $(shell sed '/^\#define RUBY_FULL_REVISION "\(.*\)"/!d;s//\1/;q' $(wildcard $(srcdir)/revision.h revision.h) /dev/null 2>/dev/null)
+ ifeq ($(REVISION_IN_HEADER),)
+ REVISION_IN_HEADER := none
+@@ -445,6 +443,8 @@ endif
+ ifneq ($(REVISION_IN_HEADER),$(REVISION_LATEST))
+ $(REVISION_H): PHONY
+ endif
++endif
++endif
+ 
+ include $(top_srcdir)/yjit/yjit.mk
+ include $(top_srcdir)/zjit/zjit.mk
+-- 
+2.43.0
+

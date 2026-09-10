@@ -1,0 +1,35 @@
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Wed, 20 Aug 2026 10:45:00 +0530
+Subject: [PATCH] CryptoPkg/IntrinsicLib: fix memcpy alias prototype for clang
+
+The clang-only memcpy alias declares its size parameter as unsigned int
+while the __memcpy aliasee uses size_t (UINTN, unsigned long long on
+X64). clang 23 diagnoses mismatched alias/aliasee types via the new
+-Wattribute-alias warning, which the CLANGDWARF build's -Werror turns
+into a hard error:
+
+  CopyMem.c:29:17: error: alias and aliasee have different types
+  'void *(void *, const void *, unsigned int)' and
+  'void *(void *, const void *, size_t)' [-Werror,-Wattribute-alias]
+
+Declare the alias with size_t, matching the aliasee on every
+architecture (UINTN is unsigned int on IA32, unsigned long long on X64).
+
+Upstream-Status: Submitted [https://github.com/tianocore/edk2/pull/13038]
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+--- a/CryptoPkg/Library/IntrinsicLib/CopyMem.c
++++ b/CryptoPkg/Library/IntrinsicLib/CopyMem.c
+@@ -29,9 +29,9 @@
+ __attribute__ ((__alias__ ("__memcpy")))
+ void *
+ memcpy (
+-  void          *dest,
+-  const void    *src,
+-  unsigned int  count
++  void        *dest,
++  const void  *src,
++  size_t      count
+   );
+ 
+ #else

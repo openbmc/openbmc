@@ -1,0 +1,44 @@
+From 1567250294e9666747ee63f5c6364bbceadd300b Mon Sep 17 00:00:00 2001
+From: Sunil Dora <sunilkumar.dora@windriver.com>
+Date: Sun, 30 Aug 2026 11:39:28 +0530
+Subject: [PATCH] gtype: Mark the G_DEFINE_TYPE parent_class variable as unused
+
+clang 23 added -Wunused-but-set-global, which fires on the
+type_name##_parent_class variable that _G_DEFINE_TYPE_EXTENDED_BEGIN_PRE
+emits whenever a type never chains up to its parent:
+
+  error: variable 'my_thing_parent_class' set but not used
+  [-Werror,-Wunused-but-set-global]
+
+Projects that promote the unused-but-set group to an error (pango, for
+one) now fail to build with clang 23, and they cannot fix it on their
+side because the variable comes from this macro.
+
+Annotate it G_GNUC_UNUSED, the same treatment the adjacent
+get_instance_private helper already gets.
+
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+Fixes: #4038
+
+Upstream-Status: Backport [1567250294e9666747ee63f5c6364bbceadd300b]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ gobject/gtype.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gobject/gtype.h b/gobject/gtype.h
+index 1d383a8ea..de5188f9f 100644
+--- a/gobject/gtype.h
++++ b/gobject/gtype.h
+@@ -2295,7 +2295,7 @@ static void     type_name##_class_intern_init (gpointer klass) \
+ static void     type_name##_init              (TypeName        *self); \
+ static void     type_name##_class_init        (TypeName##Class *klass); \
+ static GType    type_name##_get_type_once     (void); \
+-static gpointer type_name##_parent_class = NULL; \
++G_GNUC_UNUSED static gpointer type_name##_parent_class = NULL; \
+ static gint     TypeName##_private_offset; \
+ \
+ _G_DEFINE_TYPE_EXTENDED_CLASS_INIT(TypeName, type_name) \
+-- 
+2.43.0
+

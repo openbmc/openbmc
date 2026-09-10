@@ -13,8 +13,7 @@ LICENSE = "MIT"
 
 SECTION = "x11/libs"
 
-DEPENDS = "libxcb"
-DEPENDS += "gperf-native"
+DEPENDS = "util-macros-native gperf-native libxcb"
 
 SRC_URI = "http://xcb.freedesktop.org/dist/${BPN}-${PV}.tar.xz"
 

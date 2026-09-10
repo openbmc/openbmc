@@ -1,4 +1,4 @@
-From d308d9b835f4ad11e5824e7333668792980c1357 Mon Sep 17 00:00:00 2001
+From 450187e8feac041de02afd4c0c9039cc41e04cb9 Mon Sep 17 00:00:00 2001
 From: Qing He <qing.he@intel.com>
 Date: Tue, 30 Nov 2010 13:35:42 +0800
 Subject: [PATCH] bind: add new recipe

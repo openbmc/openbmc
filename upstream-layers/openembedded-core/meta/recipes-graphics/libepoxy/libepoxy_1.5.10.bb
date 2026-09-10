@@ -9,7 +9,7 @@ SECTION = "libs"
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=58ef4c80d401e07bd9ee8b6b58cf464b"
 
-SRC_URI = "git://github.com/anholt/libepoxy;branch=master;protocol=https"
+SRC_URI = "git://github.com/anholt/libepoxy;branch=master;protocol=https;tag=${PV}"
 SRCREV = "c84bc9459357a40e46e2fec0408d04fbdde2c973"
 
 inherit meson pkgconfig features_check github-releases

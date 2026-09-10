@@ -1,6 +1,6 @@
 require gcc-configure-common.inc
 
-LICENSE = "NCSA | MIT"
+LICENSE = "MIT OR NCSA"
 
 LIC_FILES_CHKSUM = "\
     file://libsanitizer/LICENSE.TXT;md5=0249c37748936faf5b1efd5789587909 \

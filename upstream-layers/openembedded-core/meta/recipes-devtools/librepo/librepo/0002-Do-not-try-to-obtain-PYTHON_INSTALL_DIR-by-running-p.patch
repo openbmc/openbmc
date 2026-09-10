@@ -1,4 +1,4 @@
-From 0062f49b62ce014dc81485c6ae101d49399d22cf Mon Sep 17 00:00:00 2001
+From ba81dfc3aaeadad0e22272136740864bc95d4f6b Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex.kanavin@gmail.com>
 Date: Fri, 30 Dec 2016 18:05:36 +0200
 Subject: [PATCH] Do not try to obtain PYTHON_INSTALL_DIR by running python.
@@ -11,7 +11,7 @@ Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/librepo/python/CMakeLists.txt b/librepo/python/CMakeLists.txt
-index 8523ca7..06e5f7b 100644
+index 91b7385..b08358b 100644
 --- a/librepo/python/CMakeLists.txt
 +++ b/librepo/python/CMakeLists.txt
 @@ -16,12 +16,12 @@ SET (librepomodule_SRCS

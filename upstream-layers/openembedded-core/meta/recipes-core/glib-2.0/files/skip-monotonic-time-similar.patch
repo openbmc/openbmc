@@ -1,0 +1,32 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Pratik Farkase <pratik.farkase@est.tech>
+Date: Tue, 5 Aug 2026 08:00:00 +0000
+Subject: [PATCH] Skip /monotonic-time-ns/similar test
+
+The test_similar test compares g_get_monotonic_time() and
+g_get_monotonic_time_ns() by spinning until the microsecond clock ticks
+and then asserting the two clocks haven't diverged beyond a factor of
+50. This is inherently racy under QEMU emulation on loaded hosts: the
+process can be preempted between the two clock reads, causing the
+assertion "50 * ns_elapsed > 1000 * us_elapsed" to fail.
+
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=16230
+
+Upstream-Status: Inappropriate [upstream ticket: https://gitlab.gnome.org/GNOME/glib/-/work_items/4025]
+Signed-off-by: Pratik Farkase <pratik.farkase@est.tech>
+---
+ glib/tests/monotonic-time.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/glib/tests/monotonic-time.c b/glib/tests/monotonic-time.c
+index 1234567..abcdef0 100644
+--- a/glib/tests/monotonic-time.c
++++ b/glib/tests/monotonic-time.c
+@@ -153,7 +153,6 @@ main (int argc, char *argv[])
+   g_test_add_func ("/monotonic-time-ns/increasing", test_increasing_ns);
+   g_test_add_func ("/monotonic-time/usleep", test_usleep);
+   g_test_add_func ("/monotonic-time-ns/usleep", test_usleep_ns);
+-  g_test_add_func ("/monotonic-time-ns/similar", test_similar);
+ 
+   return g_test_run ();
+ }

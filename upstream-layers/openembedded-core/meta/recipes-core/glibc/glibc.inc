@@ -3,10 +3,6 @@ require glibc-ld.inc
 
 DEPENDS = "virtual/cross-cc virtual/cross-binutils libgcc-initial linux-libc-headers gawk-replacement-native"
 
-# remove at next version upgrade or when output changes
-PR = "r1"
-HASHEQUIV_HASH_VERSION .= ".1"
-
 PROVIDES = "virtual/libc"
 PROVIDES += "virtual/libintl virtual/libiconv"
 
@@ -32,22 +28,6 @@ CACHED_CONFIGUREVARS:append:mipsarch = " libc_cv_ld_gnu_indirect_function=no"
 
 GLIBC_EXTRA_OECONF ?= ""
 GLIBC_EXTRA_OECONF:class-nativesdk = ""
-
-# glibc uses PARALLELMFLAGS variable to pass parallel build info so transfer
-# PARALLEL_MAKE into PARALLELMFLAGS and empty out PARALLEL_MAKE
-EGLIBCPARALLELISM := "PARALLELMFLAGS="${PARALLEL_MAKE}""
-EXTRA_OEMAKE[vardepsexclude] += "EGLIBCPARALLELISM"
-EXTRA_OEMAKE += "${EGLIBCPARALLELISM}"
-PARALLEL_MAKE = ""
-
-# glibc make-syscalls.sh has a number of issues with /bin/dash and
-# it's output which make calls via the SHELL also has issues, so
-# ensure make uses /bin/bash
-EXTRA_OEMAKE += "SHELL=/bin/bash"
-
-# We do not need bash to run tzselect script, the default is to use
-# bash but it can be configured by setting KSHELL Makefile variable
-EXTRA_OEMAKE += "KSHELL=/bin/sh"
 
 TARGET_CC_ARCH:append:toolchain-gcc = " -fno-link-libatomic"
 SDK_CC_ARCH:append:toolchain-gcc = " -fno-link-libatomic"

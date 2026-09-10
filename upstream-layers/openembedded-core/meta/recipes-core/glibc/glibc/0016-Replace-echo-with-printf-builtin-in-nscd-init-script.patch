@@ -8,7 +8,7 @@ since it uses bash specific extentions namely (translated strings)
 and echo -n command, replace echo with printf and
 switch the shell interpreter to #!/bin/sh.
 
-Upstream-Status: Pending
+Upstream-Status: Submitted [https://inbox.sourceware.org/libc-alpha/20260806135239.1656089-1-ross.burton@arm.com/T/#u]
 Signed-off-by: Ross Burton <ross.burton@arm.com>
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---

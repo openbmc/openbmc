@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+#
+
+@TEST_BINARY_NAME@
+
+# Note: run-ptest exits with exit value from @TEST_BINARY_NAME@

@@ -32,5 +32,6 @@ build_flags=WITH_THREAD
 suppress_build_script_link_lines=false
 EOF
 }
+python_pyo3_do_configure[vardepsexclude] = "SITEINFO_BITS"
 
 EXPORT_FUNCTIONS do_configure

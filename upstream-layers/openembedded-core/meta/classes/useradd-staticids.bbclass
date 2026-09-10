@@ -211,8 +211,8 @@ def update_useradd_static_config(d):
             # If a field is left blank, the original value will be used. The 'groupname' field
             # is required.
             #
-            # Note: similar to the passwd file, the 'password' filed is ignored
-            # Note: group_members is ignored, group members must be configured with the GROUPMEMS_PARAM
+            # Note: similar to the passwd file, the 'password' field is ignored
+            # Note: the group_members field is ignored, group members must be configured with USERMOD_PARAM
             if not groups:
                 files, table_var, table_value = get_table_list(d, 'USERADD_GID_TABLES', 'files/group')
                 groups = merge_files(files, 4)
@@ -265,8 +265,7 @@ def update_useradd_static_config(d):
     useradd_packages = d.getVar('USERADD_PACKAGES') or ""
 
     for pkg in useradd_packages.split():
-        # Groupmems doesn't have anything we might want to change, so simply validating
-        # is a bit of a waste -- only process useradd/groupadd
+        # Only process useradd/groupadd parameters.
         useradd_param = d.getVar('USERADD_PARAM:%s' % pkg)
         if useradd_param:
             #bb.warn("Before: 'USERADD_PARAM:%s' - '%s'" % (pkg, useradd_param))

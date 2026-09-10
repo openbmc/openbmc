@@ -7,7 +7,7 @@ SECTION = "base"
 # PAM is dual licensed under GPL and BSD.
 # /etc/pam.d comes from Debian libpam-runtime in 2009-11 (at that time
 # libpam-runtime-1.0.1 is GPL-2.0-or-later), by openembedded
-LICENSE = "GPL-2.0-or-later | BSD-3-Clause"
+LICENSE = "BSD-3-Clause OR GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7eb5c1bf854e8881005d673599ee74d3 \
                     file://libpamc/License;md5=a4da476a14c093fdc73be3c3c9ba8fb3 \
                     "
@@ -36,7 +36,7 @@ S = "${UNPACKDIR}/Linux-PAM-${PV}"
 
 inherit meson gettext pkgconfig systemd ptest github-releases
 
-PACKAGECONFIG ??= ""
+PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'audit', d)}"
 PACKAGECONFIG[audit] = "-Daudit=enabled,-Daudit=disabled,audit,"
 PACKAGECONFIG[userdb] = "-Dpam_userdb=enabled -Ddb=gdbm,-Dpam_userdb=disabled,gdbm,"
 PACKAGECONFIG[selinux] = "-Dselinux=enabled,-Dselinux=disabled,libselinux,"

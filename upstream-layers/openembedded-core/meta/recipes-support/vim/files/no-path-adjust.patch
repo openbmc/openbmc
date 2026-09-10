@@ -1,4 +1,4 @@
-From 4125a1ccb82fd53d003acdc34e462f238f0c4f0d Mon Sep 17 00:00:00 2001
+From 58cbbb08f33f3718b599b967e6a028669b3cf67f Mon Sep 17 00:00:00 2001
 From: Joe Slater <joe.slater@windriver.com>
 Date: Fri, 8 Jul 2022 11:03:22 +0800
 Subject: [PATCH] vim: do not adjust script pathnames
@@ -15,10 +15,10 @@ Signed-off-by: Mingli Yu <mingli.yu@windriver.com>
  1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/src/Makefile b/src/Makefile
-index c9513a632..7a7cbdc43 100644
+index ee64d987b..653e21926 100644
 --- a/src/Makefile
 +++ b/src/Makefile
-@@ -2531,11 +2531,7 @@ installtools: $(TOOLS) $(DESTDIR)$(exec_prefix) $(DEST_BIN) \
+@@ -2589,11 +2589,7 @@ installtools: $(TOOLS) $(DESTDIR)$(exec_prefix) $(DEST_BIN) \
  		 rm -rf $$cvs; \
  	      fi
  	-chmod $(FILEMOD) $(DEST_TOOLS)/*
@@ -31,6 +31,3 @@ index c9513a632..7a7cbdc43 100644
  	-chmod $(SCRIPTMOD) `grep -l "^#!" $(DEST_TOOLS)/*`
  
  # install the language specific files for tools, if they were unpacked
--- 
-2.25.1
-

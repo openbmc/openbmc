@@ -12,3 +12,5 @@ SRC_URI_EXT = "xz"
 SRC_URI[sha256sum] = "5608d76b7b1aac5ed7f22f1b6b5ad74ef98c8693220f32b4b87dccee4a956eaa"
 
 DEPENDS += "libxau libxt libxext libxmu libxrender libxi"
+
+XORGBUILDCLASS = "meson"

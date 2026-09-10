@@ -1,4 +1,4 @@
-From 4303ca5212f78fa276be750e077303f5090b7e33 Mon Sep 17 00:00:00 2001
+From dde7b7ff56ed406ef96b975b88b6ab663fd10386 Mon Sep 17 00:00:00 2001
 From: Tudor Florea <tudor.florea@enea.com>
 Date: Mon, 14 Jun 2021 14:00:31 +0200
 Subject: [PATCH] util-linux: Add ptest
@@ -14,7 +14,7 @@ Upstream-Status: Inappropriate
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index e2061e7..f816656 100644
+index ea3875e..9e0377e 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -11,7 +11,7 @@ AC_CONFIG_MACRO_DIR([m4])

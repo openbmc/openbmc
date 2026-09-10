@@ -7,7 +7,7 @@ BUGTRACKER = "http://savannah.nongnu.org/bugs/?group=acl"
 
 SECTION = "libs"
 
-LICENSE = "LGPL-2.1-or-later & GPL-2.0-or-later"
+LICENSE = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 LICENSE:${PN} = "GPL-2.0-or-later"
 LICENSE:lib${BPN} = "LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=c781d70ed2b4d48995b790403217a249 \

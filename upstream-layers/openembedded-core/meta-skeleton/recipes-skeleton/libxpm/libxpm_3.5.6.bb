@@ -1,7 +1,7 @@
 require recipes-graphics/xorg-lib/xorg-lib-common.inc
 
 DESCRIPTION = "X11 Pixmap library"
-LICENSE = "X-BSD"
+LICENSE = "MIT AND X11"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3e07763d16963c3af12db271a31abaa5"
 DEPENDS += "libxext"
 PE = "1"

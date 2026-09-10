@@ -18,10 +18,11 @@ inherit cmake pkgconfig python3targetconfig
 DEPENDS += "elfutils libffi clang"
 
 EXTRA_OECMAKE += "-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                  -DOPENMP_LIBDIR_SUFFIX=${@d.getVar('baselib').replace('lib', '')} \
+                  -DLLVM_ENABLE_RUNTIMES=openmp \
+                  -DLLVM_LIBDIR_SUFFIX=${LLVM_LIBDIR_SUFFIX} \
                   "
 
-OECMAKE_SOURCEPATH = "${S}/openmp"
+OECMAKE_SOURCEPATH = "${S}/runtimes"
 
 PACKAGECONFIG ?= "ompt-tools offloading-plugin"
 

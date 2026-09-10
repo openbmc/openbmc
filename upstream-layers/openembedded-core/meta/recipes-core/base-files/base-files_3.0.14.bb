@@ -3,7 +3,7 @@ DESCRIPTION = "The base-files package creates the basic system directory structu
 SECTION = "base"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://licenses/GPL-2;md5=94d55d512a9ba36caa9b7df079bae19f"
-# Removed all license related tasks in this recipe as license.bbclass 
+# Removed all license related tasks in this recipe as license.bbclass
 # now deals with this. In order to get accurate licensing on to the image:
 # Set COPY_LIC_MANIFEST to just copy just the license.manifest to the image
 # For the manifest and the license text for each package:
@@ -46,13 +46,6 @@ dirs755 = "/boot /dev ${base_bindir} ${base_sbindir} ${base_libdir} \
            ${localstatedir}/${@bb.utils.contains('FILESYSTEM_PERMS_TABLES', 'files/fs-perms-volatile-log.txt', 'volatile/', '', d)}log \
            /home ${prefix}/src ${localstatedir}/local \
            /media"
-
-dirs755-lsb = "${servicedir} \
-               ${prefix}/local ${prefix}/local/bin ${prefix}/local/games \
-               ${prefix}/local/include ${prefix}/local/lib ${prefix}/local/sbin \
-               ${prefix}/local/share ${prefix}/local/src \
-               ${prefix}/lib/locale"
-dirs2775-lsb = "${localstatedir}/mail"
 
 volatiles = "${@bb.utils.contains('FILESYSTEM_PERMS_TABLES', 'files/fs-perms-volatile-log.txt', 'log', '', d)} \
              ${@bb.utils.contains('FILESYSTEM_PERMS_TABLES', 'files/fs-perms-volatile-tmp.txt', 'tmp', '', d)}"
@@ -109,7 +102,8 @@ do_install () {
 	install -m 0644 ${S}/host.conf ${D}${sysconfdir}/host.conf
 	install -m 0644 ${S}/motd ${D}${sysconfdir}/motd
 
-	ln -sf /proc/mounts ${D}${sysconfdir}/mtab
+	# systemd likes to have a relative link
+	ln -sf --relative ${D}/proc/self/mounts ${D}${sysconfdir}/mtab
 
 	# deal with hostname
 	if [ "${hostname}" ]; then
@@ -144,16 +138,6 @@ do_install_basefilesissue () {
  	fi
 }
 do_install_basefilesissue[vardepsexclude] += "DATE"
-
-do_install:append:linuxstdbase() {
-	for d in ${dirs755-lsb}; do
-                install -m 0755 -d ${D}$d
-        done
-
-	for d in ${dirs2775-lsb}; do
-                install -m 2775 -d ${D}$d
-        done
-}
 
 SYSROOT_DIRS += "${sysconfdir}/skel"
 

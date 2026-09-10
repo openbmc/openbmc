@@ -1,0 +1,21 @@
+#!/bin/sh
+# SPDX-License-Identifier: GPL-3.0-only
+
+cd "$(dirname "$0")/testenv" || exit 1
+
+WGET_PATH="$(command -v wget)"
+export WGET_PATH
+
+export SSL_TESTS=1
+
+for t in Test-*.py test_*.py; do
+    [ -f "$t" ] || continue
+    python3 -O "$t" > "$t.log" 2>&1
+    ret=$?
+    case $ret in
+        0)  echo "PASS: $t" ;;
+        77) echo "SKIP: $t" ;;
+        *)  echo "FAIL: $t" ;;
+    esac
+    rm -f "$t.log"
+done

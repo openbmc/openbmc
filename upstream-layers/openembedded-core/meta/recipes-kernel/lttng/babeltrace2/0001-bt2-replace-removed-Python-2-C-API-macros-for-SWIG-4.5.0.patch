@@ -1,0 +1,70 @@
+From 1c59884d4d3c74d8ea7257d9cdc0fa4b533ae7b3 Mon Sep 17 00:00:00 2001
+From: Jitka Plesnikova <jplesnik@redhat.com>
+Date: Mon, 28 Jul 2026 13:29:18 +0000
+Subject: [PATCH] bt2: replace removed Python 2 C API macros for SWIG 4.5.0
+ compatibility
+
+SWIG 4.5.0 has removed some Python 2/3 compatibility macros.  The two
+that affect us are `PyString_FromString` and
+`SWIG_Python_str_FromChar`, which are both replaced with
+`PyUnicode_FromString`.
+
+Change-Id: I3c74d8ea7257d9cdc0fa4b533ae7b3a5ef9521d1
+Signed-off-by: Simon Marchi <simon.marchi@efficios.com>
+Signed-off-by: Jitka Plesnikova <jplesnik@redhat.com>
+Reviewed-on: https://review.lttng.org/c/babeltrace/+/18423
+Tested-by: jenkins <jenkins@lttng.org>
+(cherry picked from commit 1c59884d4d3c74d8ea7257d9cdc0fa4b533ae7b3)
+
+Upstream-Status: Backport [https://github.com/efficios/babeltrace/commit/1c59884d4d]
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/bindings/python/bt2/bt2/native_bt.i           | 4 ++--
+ src/bindings/python/bt2/bt2/native_bt_error.i.hpp | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/src/bindings/python/bt2/bt2/native_bt.i b/src/bindings/python/bt2/bt2/native_bt.i
+index 7f8d9f699..1807d8ff6 100644
+--- a/src/bindings/python/bt2/bt2/native_bt.i
++++ b/src/bindings/python/bt2/bt2/native_bt.i
+@@ -56,7 +56,7 @@ typedef uint64_t bt_listener_id;
+  *
+  * We initialize the output parameter `temp_value` to an invalid but non-zero
+  * pointer value.  This is to make sure we don't rely on its initial value in
+- * the epilogue (where we call SWIG_Python_str_FromChar).  When they fail,
++ * the epilogue (where we call PyUnicode_FromString).  When they fail,
+  * functions on which we apply this typemap don't guarantee that the value of
+  * `temp_value` will be unchanged or valid.
+  */
+@@ -67,7 +67,7 @@ typedef uint64_t bt_listener_id;
+ %typemap(argout) (const char **) {
+ 	if (*$1) {
+ 		/* SWIG_AppendOutput() steals the created object */
+-		$result = SWIG_AppendOutput($result, SWIG_Python_str_FromChar(*$1));
++		$result = SWIG_AppendOutput($result, PyUnicode_FromString(*$1));
+ 	} else {
+ 		/* SWIG_AppendOutput() steals Py_None */
+ 		Py_INCREF(Py_None);
+diff --git a/src/bindings/python/bt2/bt2/native_bt_error.i.hpp b/src/bindings/python/bt2/bt2/native_bt_error.i.hpp
+index ba8cef097..2be1e347c 100644
+--- a/src/bindings/python/bt2/bt2/native_bt_error.i.hpp
++++ b/src/bindings/python/bt2/bt2/native_bt_error.i.hpp
+@@ -19,7 +19,7 @@ static PyObject *bt_bt2_format_bt_error_cause(const bt_error_cause *error_cause)
+                               BT_COMMON_COLOR_WHEN_NEVER);
+     BT_ASSERT(error_cause_str);
+ 
+-    py_error_cause_str = PyString_FromString(error_cause_str);
++    py_error_cause_str = PyUnicode_FromString(error_cause_str);
+ 
+     g_free(error_cause_str);
+ 
+@@ -35,7 +35,7 @@ static PyObject *bt_bt2_format_bt_error(const bt_error *error)
+                                 BT_COMMON_COLOR_WHEN_NEVER);
+     BT_ASSERT(error_str);
+ 
+-    py_error_str = PyString_FromString(error_str);
++    py_error_str = PyUnicode_FromString(error_str);
+ 
+     g_free(error_str);
+ 

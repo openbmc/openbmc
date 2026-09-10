@@ -5,7 +5,7 @@ users, without giving them full root permissions."
 HOMEPAGE = "http://sites.google.com/site/fullycapable/"
 
 # The library is BSD | GPLv2, the PAM module is BSD | LGPLv2+
-LICENSE = "(BSD-3-Clause | GPL-2.0-only) & (BSD-3-Clause | LGPL-2.0-or-later)"
+LICENSE = "(BSD-3-Clause OR GPL-2.0-only) AND (BSD-3-Clause OR LGPL-2.0-or-later)"
 LIC_FILES_CHKSUM = "file://License;md5=2965a646645b72ecee859b43c592dcaa \
                     file://pam_cap/License;md5=905326f41d3d1f8df21943f9a4ed6b50 \
                     "
@@ -75,13 +75,13 @@ LIBCAP_PTEST_TESTS = " \
   exploit \
   noexploit \
 "
- 
+
 do_compile_ptest() {
         oe_runmake -C tests ${LIBCAP_PTEST_TESTS} \
                 AR="${AR}" \
                 CC="${CC}" \
                 RANLIB="${RANLIB}" \
-                OBJCOPY="${OBJCOPY}" 
+                OBJCOPY="${OBJCOPY}"
         oe_runmake -C libcap cap_test \
                 AR="${AR}" \
                 CC="${CC}" \
@@ -108,8 +108,8 @@ do_install_ptest() {
 FILES:${PN} += "${base_libdir}/security/*.so"
 
 # The license of the main package depends on whether PAM is enabled or not
-LICENSE:${PN} = "(BSD-3-Clause | GPL-2.0-only)${@bb.utils.contains('PACKAGECONFIG', 'pam', ' & (BSD-3-Clause | LGPL-2.0-or-later)', '', d)}"
-LICENSE:${PN}-dev = "(BSD-3-Clause | GPL-2.0-only)"
+LICENSE:${PN} = "(BSD-3-Clause OR GPL-2.0-only)${@bb.utils.contains('PACKAGECONFIG', 'pam', ' AND (BSD-3-Clause OR LGPL-2.0-or-later)', '', d)}"
+LICENSE:${PN}-dev = "BSD-3-Clause OR GPL-2.0-only"
 
 BBCLASSEXTEND = "native nativesdk"
 

@@ -18,7 +18,7 @@ class TestSDKBase(object):
                         'IMAGE_BASENAME': d.getVar("IMAGE_BASENAME"),
                         'IMAGE_PKGTYPE': d.getVar("IMAGE_PKGTYPE"),
                         'STARTTIME': d.getVar("DATETIME"),
-                        'HOST_DISTRO': oe.lsb.distro_identifier().replace(' ', '-'),
+                        'HOST_DISTRO': oe.lsb.distro_identifier(d).replace(' ', '-'),
                         'LAYERS': get_layers(d.getVar("BBLAYERS"))}
         return configuration
 

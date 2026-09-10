@@ -4,7 +4,7 @@ HOMEPAGE = "https://github.com/python-poetry/poetry-core"
 BUGTRACKER = "https://github.com/python-poetry/poetry-core"
 CHANGELOG = "https://github.com/python-poetry/poetry-core/blob/master/CHANGELOG.md"
 
-LICENSE = "Apache-2.0 & BSD-2-Clause & BSD-3-Clause & MIT"
+LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND MIT"
 LIC_FILES_CHKSUM = "\
     file://LICENSE;md5=78c39cfd009863ae44237a7ab1f9cedc \
     file://src/poetry/core/_vendor/fastjsonschema/LICENSE;md5=18950e8362b69c0c617b42b8bd8e7532 \

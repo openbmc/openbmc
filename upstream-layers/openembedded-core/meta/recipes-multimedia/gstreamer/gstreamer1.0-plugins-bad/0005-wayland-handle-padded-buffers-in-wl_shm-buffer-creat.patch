@@ -1,4 +1,4 @@
-From 8ff54f765defbb343340da5de3cf5c89e400a8ff Mon Sep 17 00:00:00 2001
+From c1680a0a91fd383cfb918f3baf39434be75add36 Mon Sep 17 00:00:00 2001
 From: Tushar Darote <tdarote@qti.qualcomm.com>
 Date: Mon, 8 Jun 2026 18:05:51 +0530
 Subject: [PATCH] wayland: handle padded buffers in wl_shm buffer creation
@@ -30,7 +30,7 @@ Signed-off-by: Tushar Darote <tdarote@qti.qualcomm.com>
  5 files changed, 52 insertions(+), 35 deletions(-)
 
 diff --git a/ext/gtk/gstgtkwaylandsink.c b/ext/gtk/gstgtkwaylandsink.c
-index 0660b30..81bcd7f 100644
+index 7844645818b9..13d846e083cc 100644
 --- a/ext/gtk/gstgtkwaylandsink.c
 +++ b/ext/gtk/gstgtkwaylandsink.c
 @@ -1179,7 +1179,6 @@ gst_gtk_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
@@ -73,7 +73,7 @@ index 0660b30..81bcd7f 100644
  
          if (G_UNLIKELY (!wbuf))
 diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
-index 443db24..60aa11d 100644
+index 3aa454076609..0baafd7e453c 100644
 --- a/ext/wayland/gstwaylandsink.c
 +++ b/ext/wayland/gstwaylandsink.c
 @@ -1011,7 +1011,6 @@ gst_wayland_sink_show_frame (GstVideoSink * vsink, GstBuffer * buffer)
@@ -116,7 +116,7 @@ index 443db24..60aa11d 100644
  
          if (G_UNLIKELY (!wbuf))
 diff --git a/gst-libs/gst/wayland/gstwlshmallocator.c b/gst-libs/gst/wayland/gstwlshmallocator.c
-index 671f2b7..11fb22c 100644
+index 671f2b7295d4..11fb22c797b2 100644
 --- a/gst-libs/gst/wayland/gstwlshmallocator.c
 +++ b/gst-libs/gst/wayland/gstwlshmallocator.c
 @@ -76,32 +76,60 @@ gst_wl_shm_validate_video_info (const GstVideoInfo * vinfo)
@@ -206,7 +206,7 @@ index 671f2b7..11fb22c 100644
  
    return wbuffer;
 diff --git a/gst-libs/gst/wayland/gstwlshmallocator.h b/gst-libs/gst/wayland/gstwlshmallocator.h
-index 4309bd7..38f3ba5 100644
+index 4309bd7f4950..38f3ba53eba3 100644
 --- a/gst-libs/gst/wayland/gstwlshmallocator.h
 +++ b/gst-libs/gst/wayland/gstwlshmallocator.h
 @@ -33,7 +33,7 @@ GST_WL_API
@@ -219,7 +219,7 @@ index 4309bd7..38f3ba5 100644
  
  G_END_DECLS
 diff --git a/gst-libs/gst/wayland/gstwlwindow.c b/gst-libs/gst/wayland/gstwlwindow.c
-index 3c5c3cc..cd9c964 100644
+index 3c5c3cc017dd..cd9c964f7cfa 100644
 --- a/gst-libs/gst/wayland/gstwlwindow.c
 +++ b/gst-libs/gst/wayland/gstwlwindow.c
 @@ -985,9 +985,7 @@ gst_wl_window_update_borders (GstWlWindow * self)

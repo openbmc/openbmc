@@ -6,7 +6,7 @@ SUMMARY = "GNU Aspell spell-checker"
 SECTION = "console/utils"
 HOMEPAGE = "https://ftp.gnu.org/gnu/aspell/"
 
-LICENSE = "LGPL-2.0-only | LGPL-2.1-only"
+LICENSE = "LGPL-2.0-only OR LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=7fbc338309ac38fefcd64b04bb903e34"
 
 SRC_URI = "${GNU_MIRROR}/aspell/aspell-${PV}.tar.gz"

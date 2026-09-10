@@ -127,7 +127,7 @@ QB_DRIVE_TYPE ?= "/dev/sd"
 inherit image-artifact-names
 
 # Create qemuboot.conf
-addtask do_write_qemuboot_conf after do_rootfs before do_image
+addtask do_write_qemuboot_conf after do_image before do_image_complete
 do_write_qemuboot_conf[depends] += "${@ '' if bb.utils.to_boolean(d.getVar('INITRAMFS_IMAGE_BUNDLE')) else (d.getVar('KERNEL_DEPLOY_DEPEND') or '')}"
 
 def qemuboot_vars(d):

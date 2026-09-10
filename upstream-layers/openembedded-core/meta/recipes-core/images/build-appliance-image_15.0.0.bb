@@ -26,9 +26,9 @@ inherit core-image features_check
 
 REQUIRED_DISTRO_FEATURES += "xattr"
 
-SRCREV_bitbake ?= "33581c84f3a85008239acbd940501a35de48dc91"
-SRCREV_oe-core ?= "6b553a5042b9d5828a9da675ede16e10f06dae90"
-SRCREV_yocto ?= "904846ae078ee20de073040ebb77c86e19250f56"
+SRCREV_bitbake ?= "046a90b0e9b7b914b7a95aec579cdc3fc9c7617a"
+SRCREV_oe-core ?= "fa11c2f1badc10cd31650b4e3484abe1d611ab5e"
+SRCREV_yocto ?= "7e41504cd63b099b214f10d92cfdaf358ab98c5f"
 SRCREV_FORMAT = "bitbake_oe-core_yocto"
 
 SRC_URI = "git://git.openembedded.org/bitbake;name=bitbake;branch=master;destsuffix=bitbake;protocol=https \
@@ -48,7 +48,7 @@ IMAGE_CMD:ext4:append () {
 }
 
 fakeroot do_populate_poky_src () {
-	# Because fetch2's git's unpack uses -s cloneflag, the unpacked git repo
+	# Because bb.fetch's git's unpack uses -s cloneflag, the unpacked git repo
 	# will become invalid in the target.
 	for d in bitbake openembedded-core meta-yocto; do
 		rm -rf ${UNPACKDIR}/$d/.git

@@ -8,7 +8,7 @@ structures to direct the dialogue. In addition, the user can take control and \
 interact directly when desired, afterward returning control to the script. \
 "
 HOMEPAGE = "http://sourceforge.net/projects/expect/"
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 SECTION = "devel"
 
 LIC_FILES_CHKSUM = "file://license.terms;md5=fbf2de7e9102505b1439db06fc36ce5c"

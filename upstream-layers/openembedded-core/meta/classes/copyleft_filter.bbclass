@@ -61,9 +61,9 @@ def copyleft_should_include(d):
         exclude = oe.data.typed_value('COPYLEFT_LICENSE_EXCLUDE', d)
 
         try:
-            is_included, reason = oe.license.is_included(d.getVar('LICENSE'), include, exclude)
+            is_included, reason = oe.license.is_included(d, d.getVar('LICENSE'), include, exclude)
         except oe.license.LicenseError as exc:
-            bb.fatal('%s: %s' % (d.getVar('PF'), exc))
+            bb.fatal(exc.format(prefix=d.getVar("PF") + ": "))
         else:
             if is_included:
                 if reason:

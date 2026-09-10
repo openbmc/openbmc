@@ -8,13 +8,15 @@ inherit python3native
 inherit rust-target-config
 
 # Common variables used by all Rust builds
-export rustlibdir = "${libdir}/rustlib/${RUST_HOST_SYS}/lib"
+rustlibdir = "${libdir}/rustlib/${RUST_HOST_SYS}/lib"
 FILES:${PN} += "${rustlibdir}/*.so"
 FILES:${PN}-dev += "${rustlibdir}/*.rlib ${rustlibdir}/*.rmeta"
 FILES:${PN}-dbg += "${rustlibdir}/.debug"
 
 RUSTLIB ?= "-L ${STAGING_DIR_HOST}${rustlibdir}"
-RUST_DEBUG_REMAP = "--remap-path-prefix=${WORKDIR}=${TARGET_DBGSRC_DIR}"
+RUST_DEBUG_REMAP = "--remap-path-prefix=${WORKDIR}=${TARGET_DBGSRC_DIR} \
+                    --remap-path-prefix=${TMPDIR}/work-shared=${TARGET_DBGSRC_DIR} \
+"
 RUSTFLAGS += "${RUSTLIB} ${RUST_DEBUG_REMAP}"
 RUSTLIB_DEP ??= "libstd-rs"
 RUST_PANIC_STRATEGY ??= "unwind"

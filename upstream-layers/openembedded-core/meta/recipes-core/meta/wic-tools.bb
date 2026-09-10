@@ -4,16 +4,11 @@ LICENSE = "MIT"
 
 DEPENDS = "\
            wic-native \
-           parted-native gptfdisk-native dosfstools-native \
-           mtools-native bmaptool-native grub-native cdrtools-native \
-           btrfs-tools-native squashfs-tools-native pseudo-native \
-           e2fsprogs-native util-linux-native tar-native erofs-utils-native \
-           virtual/cross-binutils \
+           cdrtools-native grub-native pseudo-native \
            "
-DEPENDS:append:x86 = " syslinux-native syslinux grub-efi systemd-boot"
-DEPENDS:append:x86-64 = " syslinux-native syslinux grub-efi systemd-boot"
-DEPENDS:append:x86-x32 = " syslinux-native syslinux grub-efi"
-DEPENDS:append:aarch64 = " grub-efi systemd-boot"
+DEPENDS:append:x86 = " syslinux-native"
+DEPENDS:append:x86-64 = " syslinux-native"
+DEPENDS:append:x86-x32 = " syslinux-native"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
@@ -29,3 +24,4 @@ python do_build_sysroot () {
     bb.build.exec_func("extend_recipe_sysroot", d)
 }
 addtask do_build_sysroot after do_prepare_recipe_sysroot before do_build
+do_build_sysroot[vardepsexclude] += "extend_recipe_sysroot"

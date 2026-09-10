@@ -39,10 +39,8 @@ class Retain(OESelftestTestCase):
             self.fail('RETAIN_OUTDIR value "%s" is invalid' % retain_outdir)
         if not oe.path.is_path_parent(tmpdir, retain_outdir):
             self.fail('RETAIN_OUTDIR (%s) is not underneath TMPDIR (%s)' % (retain_outdir, tmpdir))
-        try:
-            shutil.rmtree(retain_outdir)
-        except FileNotFoundError:
-            pass
+        if os.path.exists(retain_outdir) and os.listdir(retain_outdir):
+            self.fail('RETAIN_OUTDIR should be empty after -c clean')
 
         bitbake(test_recipe)
         if not glob.glob(os.path.join(retain_outdir, '%s_temp_*.tar.gz' % test_recipe)):

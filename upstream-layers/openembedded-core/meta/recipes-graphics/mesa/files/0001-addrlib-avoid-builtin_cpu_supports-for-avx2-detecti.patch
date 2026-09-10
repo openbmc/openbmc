@@ -1,0 +1,55 @@
+From 229a8815750765d7125f0c7efe9c8d6216678bef Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Thu, 13 Aug 2026 00:00:00 +0000
+Subject: [PATCH] addrlib: avoid __builtin_cpu_supports for avx2 detection
+
+__builtin_cpu_supports("avx2") lowers to a PC-relative reference to the
+libgcc/compiler-rt __cpu_model global. With clang+lld, linking that
+reference into a shared library fails because __cpu_model is treated as
+preemptible there:
+
+  relocation R_X86_64_PC32 cannot be used against symbol '__cpu_model';
+  recompile with -fPIC
+
+Check CPUID directly instead, which avoids the __cpu_model reference
+entirely and works with both GCC and Clang.
+
+Upstream-Status: Submitted [https://gitlab.freedesktop.org/mesa/mesa/-/merge_requests/43820]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/amd/addrlib/src/core/addrswizzlersimd.h | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/src/amd/addrlib/src/core/addrswizzlersimd.h b/src/amd/addrlib/src/core/addrswizzlersimd.h
+index fd53e40..ce30204 100644
+--- a/src/amd/addrlib/src/core/addrswizzlersimd.h
++++ b/src/amd/addrlib/src/core/addrswizzlersimd.h
+@@ -57,6 +57,8 @@
+ #if ADDR_HAS_AVX2
+ #if _MSC_VER
+ #include <Windows.h>
++#else
++#include <cpuid.h>
+ #endif
+ #include <immintrin.h>
+ 
+@@ -85,7 +87,18 @@ static inline bool CpuSupportsAvx2() {
+ #if _MSC_VER
+     return IsProcessorFeaturePresent(PF_AVX2_INSTRUCTIONS_AVAILABLE);
+ #elif defined(__GNUC__)
+-    return __builtin_cpu_supports("avx2");
++    // __builtin_cpu_supports() lowers to a PC-relative reference to the
++    // libgcc/compiler-rt __cpu_model global, which some clang+lld
++    // configurations reject when linking into a shared library (the
++    // symbol is treated as preemptible: "relocation R_X86_64_PC32 cannot
++    // be used against symbol '__cpu_model'"). Check CPUID directly instead.
++    unsigned int eax, ebx, ecx, edx;
++    if (__get_cpuid_max(0, nullptr) < 7)
++    {
++        return false;
++    }
++    __cpuid_count(7, 0, eax, ebx, ecx, edx);
++    return (ebx & bit_AVX2) != 0;
+ #else
+ #error "What platform is this?"
+ #endif

@@ -25,6 +25,7 @@ require ${BPN}-crates.inc
 
 SRC_URI += "file://0001-query-rustc-append-RUSTFLAGS-to-rustc-executable.patch \
             file://0001-tests-revert-Take-care-of-deprecated-assert_cmd-Comm.patch \
+            file://text-text-03-b-ref.png \
             file://run-ptest"
 SRC_URI[archive.sha256sum] = "7eb449b2722a768021356f66dfee3202c229b54ed4e6a70ce40c090e97ff16f2"
 
@@ -88,6 +89,11 @@ do_install_ptest:append() {
 	# with a symlink that points to the current folder
 	ln -s . ${D}${PTEST_PATH}/rsvg
 	ln -s ptest ${D}${PTEST_PATH}/../rsvg
+
+	# Until a release after librsvg 2.63.3 is made, we need to update the test data
+	# to match the behaviour of pango 1.58.1 onwards.
+	# https://gitlab.gnome.org/GNOME/librsvg/-/commit/55a08a24cbd93c042872d6b95f7bb59d3460a0f3
+	install -m644 ${UNPACKDIR}/text-text-03-b-ref.png ${D}${PTEST_PATH}/tests/fixtures/reftests/svg1.1/
 }
 
 PACKAGES =+ "librsvg-gtk rsvg"

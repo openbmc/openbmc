@@ -11,13 +11,6 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 INHIBIT_DEFAULT_DEPS = "1"
 
-# As the recipe doesn't inherit systemd.bbclass, we need to set this variable
-# manually to avoid unnecessary postinst/preinst generated.
-python __anonymous() {
-    if not bb.utils.contains('DISTRO_FEATURES', 'sysvinit', True, False, d):
-        d.setVar("INHIBIT_UPDATERCD_BBCLASS", "1")
-}
-
 inherit update-rc.d
 
 SRC_URI = "file://keymap.sh"
@@ -34,16 +27,6 @@ do_install () {
 	install -d ${D}${sysconfdir}/init.d/
 	install -m 0755 ${S}/keymap.sh ${D}${sysconfdir}/init.d/
     fi
-}
-
-PACKAGE_WRITE_DEPS:append = " ${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','systemd-systemctl-native','',d)}"
-pkg_postinst:${PN} () {
-	if ${@bb.utils.contains('DISTRO_FEATURES','systemd sysvinit','true','false',d)}; then
-		if [ -n "$D" ]; then
-			OPTS="--root=$D"
-		fi
-		systemctl $OPTS mask keymap.service
-	fi
 }
 
 ALLOW_EMPTY:${PN} = "1"

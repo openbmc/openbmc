@@ -3,7 +3,7 @@ DESCRIPTION = "Contains the lsusb utility for inspecting the devices connected t
 HOMEPAGE = "http://www.linux-usb.org"
 SECTION = "base"
 
-LICENSE = "GPL-2.0-or-later & (GPL-2.0-only | GPL-3.0-only) & CC0-1.0 & LGPL-2.1-or-later & MIT"
+LICENSE = "CC0-1.0 AND GPL-2.0-or-later AND LGPL-2.1-or-later AND MIT AND (GPL-2.0-only OR GPL-3.0-only)"
 LIC_FILES_CHKSUM = "file://LICENSES/CC0-1.0.txt;md5=cf1af55fc6f5b9a23e12086005298dcd \
 		    file://LICENSES/GPL-2.0-only.txt;md5=c89d4ad08368966d8df5a90ea96bebe4 \
 		    file://LICENSES/GPL-2.0-or-later.txt;md5=c89d4ad08368966d8df5a90ea96bebe4 \
@@ -25,7 +25,7 @@ ALTERNATIVE_PRIORITY = "100"
 # The binaries are mostly GPL-2.0-or-later apart from lsusb.py which is
 # GPL-2.0-only or GPL-3.0-only.
 LICENSE:${PN} = "GPL-2.0-or-later"
-LICENSE:${PN}-python = "GPL-2.0-only | GPL-3.0-only"
+LICENSE:${PN}-python = "GPL-2.0-only OR GPL-3.0-only"
 
 RRECOMMENDS:${PN} = "udev-hwdb"
 

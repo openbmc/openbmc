@@ -2,11 +2,12 @@ SUMMARY = "Python Library for the Device Tree Compiler"
 HOMEPAGE = "https://devicetree.org/"
 DESCRIPTION = "A python library for the Device Tree Compiler, a tool used to manipulate Device Tree files which contain a data structure for describing hardware."
 SECTION = "bootloader"
-LICENSE = "GPL-2.0-only | BSD-2-Clause"
+LICENSE = "BSD-2-Clause OR GPL-2.0-only"
 
 DEPENDS = "flex-native bison-native swig-native python3-setuptools-scm-native libyaml dtc"
 
-SRC_URI = "git://git.kernel.org/pub/scm/utils/dtc/dtc.git;branch=main \
+SRC_URI = "git://git.kernel.org/pub/scm/utils/dtc/dtc.git;branch=main;protocol=https;tag=v${PV} \
+           file://0001-pylibfdt-Replace-removed-SWIG-Python-2-compatibility.patch \
            "
 
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"

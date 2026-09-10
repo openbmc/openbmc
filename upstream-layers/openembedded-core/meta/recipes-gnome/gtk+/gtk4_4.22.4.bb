@@ -25,7 +25,7 @@ DEPENDS = " \
     tiff \
 "
 
-LICENSE = "LGPL-2.0-only & LGPL-2.0-or-later & LGPL-2.1-or-later"
+LICENSE = "LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=5f30f0716dfdd0d91eb439ebec522ec2 \
     file://gtk/gtk.h;endline=25;md5=61900d77e8d5bc67cf15ad93de9a3490 \

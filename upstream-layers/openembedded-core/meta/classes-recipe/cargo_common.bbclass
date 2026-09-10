@@ -15,15 +15,41 @@
 ##
 
 # add crate fetch support
-inherit rust-common
+inherit rust
+
+BASEDEPENDS:append = " cargo-native"
+
+# In case something fails in the build process, give a bit more feedback on
+# where the issue occured
+export RUST_BACKTRACE = "1"
+
+# Flags passed to all invocations of rustc
+# https://doc.rust-lang.org/cargo/reference/config.html#buildrustflags
+RUSTFLAGS ??= ""
+
+# The cargo profile to use. Defaults to release or dev based on DEBUG_BUILD, but
+# can be set to any valid profile.
+# https://doc.rust-lang.org/cargo/reference/profiles.html
+CARGO_PROFILE ?= "${@oe.utils.vartrue('DEBUG_BUILD', 'dev', 'release', d)}"
+
+# --frozen flag will prevent network access (which is required since only
+# the do_fetch step is authorized to access network)
+# and will require an up to date Cargo.lock file.
+# This force the package being built to already ship a Cargo.lock, in the end
+# this is what we want, at least, for reproducibility of the build.
+CARGO_BUILD_FLAGS = "-v --frozen --target ${RUST_HOST_SYS} --profile=${CARGO_PROFILE} --manifest-path=${CARGO_MANIFEST_PATH}"
+
+# The build directory is named after the profile, apart from the dev profile
+# which uses 'debug'.
+def cargo_build_directory(d):
+    profile = d.getVar("CARGO_PROFILE")
+    return "debug" if profile == "dev" else profile
+BUILD_DIR = "${@cargo_build_directory(d)}"
+
+CARGO_TARGET_SUBDIR = "${RUST_HOST_SYS}/${BUILD_DIR}"
 
 # Where we download our registry and dependencies to
 export CARGO_HOME = "${UNPACKDIR}/cargo_home"
-
-# The pkg-config-rs library used by cargo build scripts disables itself when
-# cross compiling unless this is defined. We set up pkg-config appropriately
-# for cross compilation, so tell it we know better than it.
-export PKG_CONFIG_ALLOW_CROSS = "1"
 
 # Don't instruct cargo to use crates downloaded by bitbake. Some rust packages,
 # for example the rust compiler itself, come with their own vendored sources.
@@ -143,7 +169,7 @@ python cargo_common_do_patch_paths() {
 
     patches = dict()
     workdir = d.getVar('UNPACKDIR')
-    fetcher = bb.fetch2.Fetch(src_uri, d)
+    fetcher = bb.fetch.Fetch(src_uri, d)
     for url in fetcher.urls:
         ud = fetcher.ud[url]
         if ud.type == 'git' or ud.type == 'gitsm':
@@ -226,6 +252,33 @@ oe_cargo_fix_env () {
 	export HOST_CFLAGS="${BUILD_CFLAGS}"
 	export HOST_CXXFLAGS="${BUILD_CXXFLAGS}"
 	export HOST_AR="${BUILD_AR}"
+
+	# Tell crates to use system libraries instead of vendoring C code
+
+	# git2-rs
+	export LIBGIT2_NO_VENDOR="1"
+
+	# libssh2-sys
+	export LIBSSH2_SYS_USE_PKG_CONFIG="1"
+
+	# libsqlite3-sys
+	export LIBSQLITE3_SYS_USE_PKG_CONFIG="1"
+
+	# openssl-sys
+	export OPENSSL_NO_VENDOR="1"
+
+	# pkg-config-rs.
+	# https://docs.rs/pkg-config/latest/pkg_config/
+	# In cross pkg-config-rs disables itself unless this is defined to tell it
+	# we have set up sysroots appropriately.
+	export PKG_CONFIG_ALLOW_CROSS="1"
+	# Crates can still override the dynamic linking but try to dynamically link
+	# to system libraries.
+	export PKG_CONFIG_ALL_DYNAMIC="1"
+	export SYSTEM_DEPS_BUILD_INTERNAL="never"
+
+	# zstd-sys
+	export ZSTD_SYS_USE_PKG_CONFIG="1"
 }
 
 EXTRA_OECARGO_PATHS ??= ""

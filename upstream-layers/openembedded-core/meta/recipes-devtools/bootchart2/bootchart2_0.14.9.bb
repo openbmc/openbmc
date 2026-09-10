@@ -1,20 +1,20 @@
 # Copyright (c) 2013 LG Electronics, Inc.
 # Copyright (C) 2014 Intel Corp.
 
-# This recipe creates packages for the bootchart2 system-wide profiler daemon 
+# This recipe creates packages for the bootchart2 system-wide profiler daemon
 # and related utilities. Depending on the images you're building, additional
 # configuration may be needed in order to use it.
 #
 # Packages:
 #   *   bootchart2 - The daemon itself.
 #   *   pybootchartgui - Python program to visualize and display the data
-#       collected by bootchart2 or compatible daemons such as the original 
+#       collected by bootchart2 or compatible daemons such as the original
 #       bootchart.
 #   *   bootchartd-stop-initscript - A SysV init script to stop data collection
 #       when booting completes (see below for details.)
 #
-# While bootchart2 is designed to stop collecting data roughly when the boot 
-# process completes, it is not exactly a stopwatch. It has a list of programs 
+# While bootchart2 is designed to stop collecting data roughly when the boot
+# process completes, it is not exactly a stopwatch. It has a list of programs
 # which are supposed signify that the boot process has completed (for example,
 # openbox or gnome-shell,) but it waits a full 20 seconds after such a program
 # is launched before stopping itself, to collect additional data.
@@ -30,22 +30,22 @@
 # You might set this command to be launched by the desktop environment shipped
 # on the image you're building after the other startup programs are complete.
 # This will not incur the 20 second wait period and will cause bootchart2 to
-# behave a bit more like a stopwatch. An example of this is shown in this 
+# behave a bit more like a stopwatch. An example of this is shown in this
 # recipe, specifically the bootchartd-stop-initscript package, which stops data
 # collection as the last action when switching to runlevels 2 through 5. You can
 # add bootchartd-stop-initscript to IMAGE_INSTALL if you need to use it.
 #
-# Unless you're doing something special, if your image does not launch an X 
+# Unless you're doing something special, if your image does not launch an X
 # window manager, you will need to add bootchartd-stop-initscript to your image.
 #
 # Bootchart2 can be started in two ways. Data collection can be initiated by
 # running the following command:
 #   bootchartd start
 # However, for the most complete data, the bootchart2 developers recommend
-# running it as PID 1. This can be done by adding the following to the kernel 
+# running it as PID 1. This can be done by adding the following to the kernel
 # command line parameters in the bootloader setup:
 #   init=/sbin/bootchartd
-# When invoked this way, bootchart2 will set itself up and then automatically 
+# When invoked this way, bootchart2 will set itself up and then automatically
 # run /sbin/init. For example, when booting the default qemux86 image, one might
 # use a command like this:
 #   runqemu qemux86 bootparams="initcall_debug printk.time=y quiet \
@@ -54,10 +54,10 @@
 # Neither method is actually implemented here, choose what works for you.
 #
 # If you are building your image with systemd instead of SysV init, bootchart2
-# includes systemd service files to begin collection automatically at boot and 
+# includes systemd service files to begin collection automatically at boot and
 # end collection automatically 20 seconds after the boot process has completed.
 # However, be aware that systemd tends to start bootchart2 relatively late into
-# the boot process, so it's highly recommended to use bootchart2 as PID 1. If 
+# the boot process, so it's highly recommended to use bootchart2 as PID 1. If
 # you're using systemd and you wish to use another method to stop data
 # collection at a time of your choosing, you may do so as long as you get to it
 # before the 20 second timeout of the systemd service files. Also, you may write
@@ -76,8 +76,8 @@
 # and find pybootchartgui in the native sysroot:
 #    bitbake bootchart2-native
 #   ./tmp/sysroots/x86_64-linux/usr/bin/pybootchartgui /path/to/bootchart.tgz
-# Note that, whether installed on your build system or on your image, the 
-# pybootchartgui provided by this recipe does not support the -i option. You 
+# Note that, whether installed on your build system or on your image, the
+# pybootchartgui provided by this recipe does not support the -i option. You
 # will need to install pybootchartgui by other means in order to run it in
 # interactive mode.
 
@@ -89,7 +89,7 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=44ac4678311254db62edf8fd39cb8124"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+(\.\d+)*)"
 
-SRC_URI = "git://github.com/xrmx/bootchart.git;branch=master;protocol=https \
+SRC_URI = "git://github.com/xrmx/bootchart.git;branch=master;protocol=https;tag=${PV} \
            file://bootchartd_stop.sh \
            file://0001-collector-Allocate-space-on-heap-for-chunks.patch \
            file://0001-bootchartd.in-make-sure-only-one-bootchartd-process.patch \
@@ -135,6 +135,13 @@ do_install () {
     oe_runmake install NO_PYTHON_COMPILE=1
     install -d ${D}${sysconfdir}/init.d
     install -m 0755 ${UNPACKDIR}/bootchartd_stop.sh ${D}${sysconfdir}/init.d
+
+    if test "${bindir}" = "${sbindir}"
+    then
+        install -d ${D}${bindir}
+        mv ${D}${EARLY_PREFIX}/sbin/* ${D}${bindir}
+        rmdir ${D}${EARLY_PREFIX}/sbin
+    fi
 
     if ${@bb.utils.contains('DISTRO_FEATURES', 'usrmerge', 'true', 'false', d)}; then
         mv ${D}${EARLY_PREFIX}${sysconfdir}/bootchartd.conf ${D}${sysconfdir}/bootchartd.conf

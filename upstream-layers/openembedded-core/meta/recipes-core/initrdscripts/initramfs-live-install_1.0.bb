@@ -12,7 +12,7 @@ do_install() {
         install -m 0755 ${S}/init-install.sh ${D}/install.sh
 }
 
-# While this package maybe an allarch due to it being a 
+# While this package maybe an allarch due to it being a
 # simple script, reality is that it is Host specific based
 # on the COMPATIBLE_HOST below, which needs to take precedence
 #inherit allarch

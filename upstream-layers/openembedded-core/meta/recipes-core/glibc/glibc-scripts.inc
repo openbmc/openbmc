@@ -15,7 +15,7 @@ do_install() {
 	done
 }
 
-# sotruss script requires sotruss-lib.so (given by libsotruss package), 
+# sotruss script requires sotruss-lib.so (given by libsotruss package),
 # to produce trace of the library calls.
 RDEPENDS:${PN} += "libsotruss"
 

@@ -7,7 +7,7 @@ LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=55c5fdf02cfcca3fc9621b6f2ceae10f"
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
 
-SRC_URI = "git://github.com/openSUSE/xinetd.git;protocol=https;branch=master \
+SRC_URI = "git://github.com/openSUSE/xinetd.git;protocol=https;branch=master;tag=${PV} \
            file://0001-Use-monotonic-time.patch \
            file://xinetd.init \
            file://xinetd.default \

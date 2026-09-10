@@ -5,14 +5,14 @@
 # Handle Go vendor support for offline builds
 #
 # When importing Go modules, Go downloads the imported modules using
-# a network (proxy) connection ahead of the compile stage. This contradicts 
+# a network (proxy) connection ahead of the compile stage. This contradicts
 # the yocto build concept of fetching every source ahead of build-time
 # and supporting offline builds.
 #
-# To support offline builds, we use Go 'vendoring': module dependencies are 
+# To support offline builds, we use Go 'vendoring': module dependencies are
 # downloaded during the fetch-phase and unpacked into the modules 'vendor'
 # folder. Additionally a manifest file is generated for the 'vendor' folder
-# 
+#
 
 inherit go-mod
 
@@ -40,13 +40,14 @@ def go_src_uri(repo, version, path=None, subdir=None, \
 
     return src_uri
 
-python do_vendor_unlink() {
+fakeroot python do_vendor_unlink() {
     go_import = d.getVar('GO_IMPORT')
     linkname = os.path.join(d.getVar('D') + d.getVar('libdir'), 'go', 'src', go_import, 'vendor')
     if os.path.islink(linkname):
         os.unlink(linkname)
 }
 
+do_vendor_unlink[depends] += "virtual/fakeroot-native:do_populate_sysroot"
 addtask vendor_unlink before do_package after do_install
 
 python do_go_vendor() {
@@ -59,7 +60,7 @@ python do_go_vendor() {
 
     base_package = d.getVar('BP')
     default_destsuffix = "{}/src/import/vendor.fetch".format(base_package)
-    fetcher = bb.fetch2.Fetch(src_uri, d)
+    fetcher = bb.fetch.Fetch(src_uri, d)
     go_import = d.getVar('GO_IMPORT')
     source_dir = d.getVar('S')
 
@@ -86,7 +87,7 @@ python do_go_vendor() {
 
         destsuffix = fetcher.ud[url].parm.get('destsuffix')
         # We derive the module repo / version in the following manner (exmaple):
-        # 
+        #
         # destsuffix = git/src/import/vendor.fetch/github.com/foo/bar@v1.2.3
         # p = github.com/foo/bar@v1.2.3
         # repo = github.com/foo/bar
@@ -141,7 +142,7 @@ python do_go_vendor() {
         shutil.copytree(src, dst, symlinks=True, dirs_exist_ok=True, \
             ignore=shutil.ignore_patterns(".git", \
                                             "vendor", \
-                                            "*._test.go"))
+                                            "*_test.go"))
 
         # If the root directory has a LICENSE file but not the subdir
         # we copy the root license to the sub module since the license
@@ -149,9 +150,9 @@ python do_go_vendor() {
         # see https://go.dev/ref/mod#vcs-license
         if subdir:
             rootdirLicese = os.path.join(rootdir, "LICENSE")
-            subdirLicense = os.path.join(src, "LICENSE")
+            subdirLicense = os.path.join(dst, "LICENSE")
 
-            if not os.path.exists(subdir) and \
+            if not os.path.exists(subdirLicense) and \
                 os.path.exists(rootdirLicese):
                 shutil.copy2(rootdirLicese, subdirLicense)
 

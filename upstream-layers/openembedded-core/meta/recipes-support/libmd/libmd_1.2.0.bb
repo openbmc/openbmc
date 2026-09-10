@@ -5,7 +5,7 @@ libmd (FreeBSD, DragonflyBSD, macOS, Solaris) libraries and \
 lacking on others like GNU systems."
 HOMEPAGE = "https://www.hadrons.org/software/libmd/"
 
-LICENSE = "BSD-3-Clause & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://COPYING;md5=261bf22602270e2b29c53930d409a3ca"
 
 SRC_URI = "https://archive.hadrons.org/software/libmd/libmd-${PV}.tar.xz \

@@ -12,11 +12,12 @@
 #
 # Heavily inspired of bootimg_partition.py
 #
-def get_boot_files(deploy_dir, boot_files):
-    import re
-    import os
-    from glob import glob
 
+import os
+import re
+import glob
+
+def get_boot_files(deploy_dir, boot_files):
     if boot_files is None:
         return None
 
@@ -45,7 +46,7 @@ def get_boot_files(deploy_dir, boot_files):
                                 os.path.join(dst,
                                              os.path.basename(name))
 
-            srcs = glob(os.path.join(deploy_dir, src))
+            srcs = glob.glob(os.path.join(deploy_dir, src))
 
             for entry in srcs:
                 src = os.path.relpath(entry, deploy_dir)

@@ -1,4 +1,4 @@
-From 3adae0d97f655c2991d5b428a3bc95a972e6228b Mon Sep 17 00:00:00 2001
+From 35ba9a2f6f5ffccca93aa430ef94cb174dd68ea5 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 14 Jun 2026 17:42:19 +0200
 Subject: [PATCH] src/intel/compiler/jay/jay_ir.h: do not used typed enum
@@ -13,10 +13,10 @@ Signed-off-by: Alexander Kanavin <alex@linutronix.de>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/intel/compiler/jay/jay_ir.h b/src/intel/compiler/jay/jay_ir.h
-index 8307044..abf175a 100644
+index 3b819cb..34b8877 100644
 --- a/src/intel/compiler/jay/jay_ir.h
 +++ b/src/intel/compiler/jay/jay_ir.h
-@@ -579,7 +579,7 @@ jay_type_is_any_float(enum jay_type t)
+@@ -518,7 +518,7 @@ jay_type_is_any_float(enum jay_type t)
     return jay_base_type(t) == JAY_TYPE_F || jay_base_type(t) == JAY_TYPE_BF;
  }
  
@@ -25,15 +25,12 @@ index 8307044..abf175a 100644
     /** No predication. */
     JAY_NOT_PREDICATED = 0,
  
-@@ -634,7 +634,7 @@ typedef struct jay_inst {
+@@ -592,7 +592,7 @@ typedef struct jay_inst {
     bool decrement_dep:1;
-    unsigned padding  :12;
+    uint8_t padding   :1;
  
 -   enum jay_predication predication;
 +   uint8_t predication;
-    enum jay_conditional_mod conditional_mod;
+    gen_condition conditional_mod;
  
     jay_def cond_flag; /**< conditional flag */
--- 
-2.47.3
-

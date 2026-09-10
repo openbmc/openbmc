@@ -4,7 +4,7 @@ HOMEPAGE = "https://sequoia-pgp.org/"
 # The license line is taken verbatim from Fedora's specfile
 # with formatting differences for Yocto. (AND -> &, OR -> |)
 # https://src.fedoraproject.org/rpms/rust-rpm-sequoia/blob/rawhide/f/rust-rpm-sequoia.spec
-LICENSE = "LGPL-2.0-or-later & Apache-2.0 & BSL-1.0 & MIT & Unicode-DFS-2016 & (Apache-2.0 | MIT) & (MIT | Apache-2.0 | Zlib) & (Unlicense | MIT)"
+LICENSE = "Apache-2.0 AND BSL-1.0 AND LGPL-2.0-or-later AND MIT AND Unicode-DFS-2016 AND (Apache-2.0 OR MIT) AND (Apache-2.0 OR MIT OR Zlib) AND (MIT OR Unlicense)"
 
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=f0ff5ff7747cf7d394079c6ae87f5f0c"
 

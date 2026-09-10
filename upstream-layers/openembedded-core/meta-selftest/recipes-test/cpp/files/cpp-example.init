@@ -14,14 +14,18 @@ PIDFILE="/var/run/$DAEMON.pid"
 LOCK_FILE="/var/lock/subsys/$DAEMON"
 
 start() {
+    # A debugger which kills the process it debugs leaves the PID file behind
+    if [ -f $PIDFILE ] && ! kill -0 $(cat $PIDFILE) 2>/dev/null; then
+        rm -f $PIDFILE $LOCK_FILE
+    fi
+
     if [ -f $PIDFILE ]; then
         echo "$DAEMON is already running."
         return 1
     fi
 
     echo -n "Starting $DAEMON: "
-    start-stop-daemon --start --quiet --pidfile $PIDFILE --make-pidfile \
-        --background --chuid $USER --exec $DAEMON_PATH -- $DAEMON_ARGS
+    $DAEMON_PATH --daemonize --pidfile "$PIDFILE" --uid "$(id -u "$USER")" --gid "$(id -g "$USER")" $DAEMON_ARGS
     RETVAL=$?
     if [ $RETVAL -eq 0 ]; then
         echo "OK"
@@ -34,8 +38,11 @@ start() {
 
 stop() {
     echo -n "Stopping $DAEMON: "
-    start-stop-daemon --stop --quiet --pidfile $PIDFILE
-    RETVAL=$?
+    if [ -f "$PIDFILE" ] && kill "$(cat "$PIDFILE")" 2>/dev/null; then
+        RETVAL=0
+    else
+        RETVAL=1
+    fi
     if [ $RETVAL -eq 0 ]; then
         echo "OK"
         rm -f $PIDFILE $LOCK_FILE

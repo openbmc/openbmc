@@ -2,9 +2,10 @@ SUMMARY = "Hardware accelerated JPEG compression/decompression library"
 DESCRIPTION = "libjpeg-turbo is a derivative of libjpeg that uses SIMD instructions (MMX, SSE2, NEON) to accelerate baseline JPEG compression and decompression"
 HOMEPAGE = "http://libjpeg-turbo.org/"
 
-LICENSE = "IJG & BSD-3-Clause & Zlib"
+LICENSE = "BSD-3-Clause AND IJG AND Zlib"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=d21daef3b4b318f77062055059c72934"
 
+DEPENDS = "zlib"
 DEPENDS:append:x86-64:class-target = " nasm-native"
 DEPENDS:append:x86:class-target = " nasm-native"
 
@@ -28,6 +29,8 @@ export NASMENV = "--reproducible --debug-prefix-map=${WORKDIR}=${TARGET_DBGSRC_D
 EXTRA_OECMAKE += "-DCMAKE_SKIP_INSTALL_RPATH=ON"
 # Ensure the -fPIC options are used to avoid -native compile failures, e.g. on opensuse160
 EXTRA_OECMAKE += "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+# Use system zlib instead of the bundled copy
+EXTRA_OECMAKE += "-DWITH_SYSTEM_ZLIB=ON"
 
 # Add nasm-native dependency consistently for all build arches is hard
 EXTRA_OECMAKE:append:class-native = " -DWITH_SIMD=False"

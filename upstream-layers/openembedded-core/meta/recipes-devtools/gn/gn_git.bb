@@ -8,7 +8,7 @@ UPSTREAM_CHECK_COMMITS = "1"
 
 SRC_URI = "git://gn.googlesource.com/gn;protocol=https;branch=main \
 "
-SRCREV = "1d86777e7f2562a86ecea77d1809ac4f82bb5bfe"
+SRCREV = "17b0057970fa2b07a20cbb4289ab78cf93565f35"
 PV = "0+git"
 
 BB_GIT_SHALLOW = ""

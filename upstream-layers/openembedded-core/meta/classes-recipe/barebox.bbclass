@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit kernel-arch deploy cml1 pkgconfig
+inherit deploy cml1 pkgconfig
 
 LICENSE ?= "GPL-2.0-only"
 
@@ -49,7 +49,7 @@ BAREBOX_FIRMWARE_DIR[doc] = "Overwrite barebox' firmware blobs search directory 
 BAREBOX_FIRMWARE_DIR ??= "${B}/firmware"
 
 EXTRA_OEMAKE = " \
-    CROSS_COMPILE=${TARGET_PREFIX} -C ${S} O=${B} \
+    ARCH=${@oe.kernel.map_kernel_arch(d)} CROSS_COMPILE=${TARGET_PREFIX} -C ${S} O=${B} \
     BUILDSYSTEM_VERSION=${BAREBOX_BUILDSYSTEM_VERSION} \
     CONFIG_EXTRA_FIRMWARE_DIR=${BAREBOX_FIRMWARE_DIR} \
     PKG_CONFIG=pkg-config-native \

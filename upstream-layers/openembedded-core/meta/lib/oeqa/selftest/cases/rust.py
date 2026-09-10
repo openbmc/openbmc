@@ -46,7 +46,8 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
         recipe = "rust"
         start_time = time.time()
         bitbake("{} -c test_compile".format(recipe))
-        builddir = get_bb_var("RUSTSRC", "rust")
+        builddir = get_bb_var("B", "rust")
+        sourcedir = get_bb_var("RUSTSRC", "rust")
         # build core-image-minimal with required packages
         default_installed_packages = ["libgcc", "libstdc++", "libatomic", "libgomp", "libzstd", "llvm", "openssl"]
         features = []
@@ -81,7 +82,8 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
                             'src/tools/suggest-tests',
                             'src/tools/tidy',
                             'tests/assembly-llvm/asm/aarch64-outline-atomics.rs',
-                            'tests/assembly-llvm/c-variadic-arm.rs',
+                            'tests/assembly-llvm/c-variadic/arm.rs',
+                            'tests/assembly-llvm/x86_64-windows-float-abi.rs',
                             'tests/codegen-llvm/thread-local.rs',
                             'tests/mir-opt/',
                             'tests/run-make',
@@ -91,6 +93,7 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
                             'tests/rustdoc-js-std',
                             'tests/ui/abi/stack-probes-lto.rs',
                             'tests/ui/abi/stack-probes.rs',
+                            'tests/ui/codegen/huge-stacks.rs',
                             'tests/ui/codegen/mismatched-data-layouts.rs',
                             'tests/codegen-llvm/rust-abi-arch-specific-adjustment.rs',
                             'tests/ui/debuginfo/debuginfo-emit-llvm-ir-and-split-debuginfo.rs',
@@ -111,7 +114,7 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
             # Copy remote-test-server to image through scp
             host_sys = get_bb_var("RUST_BUILD_SYS", "rust")
             ssh = SSHControl(ip=qemu.ip, logfile=qemu.sshlog, user="root")
-            ssh.copy_to(builddir + "/build/" + host_sys + "/stage2-tools-bin/remote-test-server","~/")
+            ssh.copy_to(builddir + "/rust-build/" + host_sys + "/stage2-tools-bin/remote-test-server","~/")
             # Execute remote-test-server on image through background ssh
             command = '~/remote-test-server --bind 0.0.0.0:12345 -v'
             sshrun=subprocess.Popen(("ssh", '-o',  'UserKnownHostsFile=/dev/null', '-o',  'StrictHostKeyChecking=no', '-f', "root@%s" % qemu.ip, command), shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -131,8 +134,10 @@ class RustSelfTestSystemEmulated(OESelftestTestCase, OEPTestResultTestCase):
             # PowerPC mac99 QEMU has 768MB RAM limit, so we need to minimize test binary sizes
             cmd = cmd + " export RUSTFLAGS='-C strip=debuginfo -Clink-arg=-lz -Clink-arg=-lzstd';"
             # Trigger testing.
+            # Run bootstrap from sourcedir with explicit --build-dir and --config
+            # pointing to the separate build directory.
             cmd = cmd + " export TEST_DEVICE_ADDR=\"%s:12345\";" % qemu.ip
-            cmd = cmd + " cd %s; python3 src/bootstrap/bootstrap.py test %s --target %s" % (builddir, testargs, targetsys)
+            cmd = cmd + " cd %s; python3 src/bootstrap/bootstrap.py --build-dir %s/rust-build --config %s/config.toml test %s --target %s" % (sourcedir, builddir, builddir, testargs, targetsys)
             retval = runCmd(cmd)
             end_time = time.time()
 

@@ -11,7 +11,7 @@ PACKAGES = ""
 
 # This exists as an optimization for SPDX processing to only run in image and
 # SDK processing context.  This class happens to be common to these usages.
-SPDX_MULTILIB_SSTATE_ARCHS = "${@all_multilib_tune_values(d, 'SSTATE_ARCHS')}"
+SPDX_MULTILIB_SSTATE_ARCHS = "${@oe.utils.all_multilib_tune_values(d, 'SSTATE_ARCHS')}"
 
 inherit image-postinst-intercepts image-artifact-names nopackages
 
@@ -59,27 +59,27 @@ B:task-populate-sdk = "${SDK_DIR}"
 
 SDKTARGETSYSROOT = "${SDKPATH}/sysroots/${REAL_MULTIMACH_TARGET_SYS}"
 
-SDK_TOOLCHAIN_LANGS ??= ""
-SDK_TOOLCHAIN_LANGS:remove:sdkmingw32 = "rust"
+SDK_FEATURES:remove:sdkmingw32 = "rust"
 # libstd-rs doesn't build for mips n32 with compiler constraint errors
-SDK_TOOLCHAIN_LANGS:remove:mipsarchn32 = "rust"
+SDK_FEATURES:remove:mipsarchn32 = "rust"
 # go will not build for x86-x32 or mingw
-SDK_TOOLCHAIN_LANGS:remove:linux-gnux32 = "go"
-SDK_TOOLCHAIN_LANGS:remove:riscv32 = "go"
-SDK_TOOLCHAIN_LANGS:remove:sdkmingw32 = "go"
-SDK_TOOLCHAIN_LANGS:remove:powerpc = "go"
+SDK_FEATURES:remove:linux-gnux32 = "go"
+SDK_FEATURES:remove:riscv32 = "go"
+SDK_FEATURES:remove:sdkmingw32 = "go"
+SDK_FEATURES:remove:powerpc = "go"
 
 TOOLCHAIN_HOST_TASK ?= " \
     nativesdk-packagegroup-sdk-host \
     packagegroup-cross-canadian-${MACHINE} \
-    ${@bb.utils.contains('SDK_TOOLCHAIN_LANGS', 'go', 'packagegroup-go-cross-canadian-${MACHINE}', '', d)} \
-    ${@bb.utils.contains('SDK_TOOLCHAIN_LANGS', 'rust', 'packagegroup-rust-cross-canadian-${MACHINE}', '', d)} \
+    ${@bb.utils.contains('SDK_FEATURES', 'go', 'packagegroup-go-cross-canadian-${MACHINE}', '', d)} \
+    ${@bb.utils.contains('SDK_FEATURES', 'rust', 'packagegroup-rust-cross-canadian-${MACHINE}', '', d)} \
 "
 TOOLCHAIN_HOST_TASK_ATTEMPTONLY ?= ""
 TOOLCHAIN_TARGET_TASK ?= " \
-    ${@multilib_pkg_extend(d, 'packagegroup-core-standalone-sdk-target')} \
-    ${@bb.utils.contains('SDK_TOOLCHAIN_LANGS', 'go', multilib_pkg_extend(d, 'packagegroup-go-sdk-target'), '', d)} \
-    ${@bb.utils.contains('SDK_TOOLCHAIN_LANGS', 'rust', multilib_pkg_extend(d, 'libstd-rs'), '', d)} \
+    ${@oe.utils.multilib_pkg_extend(d, 'packagegroup-core-standalone-sdk-target')} \
+    ${@bb.utils.contains('SDK_FEATURES', 'go', oe.utils.multilib_pkg_extend(d, 'packagegroup-go-sdk-target'), '', d)} \
+    ${@bb.utils.contains('SDK_FEATURES', 'rust', oe.utils.multilib_pkg_extend(d, 'libstd-rs'), '', d)} \
+    ${@bb.utils.contains('SDK_FEATURES', 'kernel-src', 'kernel-devsrc', '', d)} \
     target-sdk-provides-dummy \
 "
 TOOLCHAIN_TARGET_TASK_ATTEMPTONLY ?= ""
@@ -118,7 +118,7 @@ python () {
 
 SDK_RDEPENDS = "${TOOLCHAIN_TARGET_TASK} ${TOOLCHAIN_HOST_TASK}"
 SDK_DEPENDS = "virtual/fakeroot-native ${SDK_ARCHIVE_DEPENDS} cross-localedef-native"
-PATH:prepend = "${WORKDIR}/recipe-sysroot/${SDKPATHNATIVE}${bindir}/crossscripts:${@":".join(all_multilib_tune_values(d, 'STAGING_BINDIR_CROSS').split())}:"
+PATH:prepend = "${WORKDIR}/recipe-sysroot/${SDKPATHNATIVE}${bindir}/crossscripts:${@":".join(oe.utils.all_multilib_tune_values(d, 'STAGING_BINDIR_CROSS').split())}:"
 SDK_DEPENDS += "nativesdk-glibc-locale"
 
 # We want the MULTIARCH_TARGET_SYS to point to the TUNE_PKGARCH, not PACKAGE_ARCH as it
@@ -248,7 +248,7 @@ def populate_sdk_common(d):
     oe.packagedata.runtime_mapping_rename("TOOLCHAIN_HOST_TASK_ATTEMPTONLY", pn, ld)
     d.setVar("TOOLCHAIN_HOST_TASK", ld.getVar("TOOLCHAIN_HOST_TASK"))
     d.setVar("TOOLCHAIN_HOST_TASK_ATTEMPTONLY", ld.getVar("TOOLCHAIN_HOST_TASK_ATTEMPTONLY"))
-    
+
     # create target/host SDK manifests
     create_manifest(d, manifest_dir=d.getVar('SDK_DIR'),
                     manifest_type=Manifest.MANIFEST_TYPE_SDK_HOST)

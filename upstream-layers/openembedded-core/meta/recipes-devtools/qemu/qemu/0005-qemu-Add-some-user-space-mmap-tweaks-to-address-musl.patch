@@ -1,4 +1,4 @@
-From 072e2a2a97e0376e56d975c984db3f8584022849 Mon Sep 17 00:00:00 2001
+From f92e779a55ab3e5d14884a4ea55369f7a16923d3 Mon Sep 17 00:00:00 2001
 From: Richard Purdie <richard.purdie@linuxfoundation.org>
 Date: Fri, 8 Jan 2021 17:27:06 +0000
 Subject: [PATCH] qemu: Add some user space mmap tweaks to address musl 32 bit
@@ -22,10 +22,10 @@ Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index b635b6a21..a5a617516 100644
+index cc0c2ee6c..5afd41319 100644
 --- a/linux-user/mmap.c
 +++ b/linux-user/mmap.c
-@@ -1113,6 +1113,11 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
+@@ -1114,6 +1114,11 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
      int prot;
      void *host_addr;
  

@@ -12,9 +12,9 @@ import re
 import sys
 import tempfile
 import bb
-from bb.fetch2.npm import NpmEnvironment
-from bb.fetch2.npm import npm_package
-from bb.fetch2.npmsw import foreach_dependencies
+from bb.fetch.npm import NpmEnvironment
+from bb.fetch.npm import npm_package
+from bb.fetch.npmsw import foreach_dependencies
 from oe.license_finder import match_licenses, find_license_files
 from recipetool.create import RecipeHandler
 from recipetool.create import generate_common_licenses_chksums
@@ -160,19 +160,19 @@ class NpmRecipeHandler(RecipeHandler):
         _get_package_licenses(srctree, "${PN}")
 
         return licfiles, packages, fallback_licenses
-    
-    # Handle the peer dependencies   
+
+    # Handle the peer dependencies
     def _handle_peer_dependency(self, shrinkwrap_file):
         """Check if package has peer dependencies and show warning if it is the case"""
         with open(shrinkwrap_file, "r") as f:
             shrinkwrap = json.load(f)
-        
+
         packages = shrinkwrap.get("packages", {})
         peer_deps = packages.get("", {}).get("peerDependencies", {})
-        
+
         for peer_dep in peer_deps:
             peer_dep_yocto_name = npm_package(peer_dep)
-            bb.warn(peer_dep + " is a peer dependencie of the actual package. " + 
+            bb.warn(peer_dep + " is a peer dependencie of the actual package. " +
             "Please add this peer dependencie to the RDEPENDS variable as %s and generate its recipe with devtool"
             % peer_dep_yocto_name)
 
@@ -275,7 +275,7 @@ class NpmRecipeHandler(RecipeHandler):
         # dependencies have to be fetched again using the npmsw url
         bb.note("Fetching npm dependencies ...")
         bb.utils.remove(os.path.join(srctree, "node_modules"), recurse=True)
-        fetcher = bb.fetch2.Fetch([url_local], d)
+        fetcher = bb.fetch.Fetch([url_local], d)
         fetcher.download()
         fetcher.unpack(srctree)
 
@@ -283,7 +283,8 @@ class NpmRecipeHandler(RecipeHandler):
         (licfiles, packages, fallback_licenses) = self._handle_licenses(srctree, shrinkwrap_file, dev)
         licvalues = match_licenses(licfiles, srctree, d)
         split_pkg_licenses(licvalues, packages, lines_after, fallback_licenses)
-        fallback_licenses_flat = [license for sublist in fallback_licenses.values() for license in sublist]
+        fallback_licenses_flat = set(license for sublist in fallback_licenses.values() for license in sublist)
+        fallback_licesens_flat = sorted(fallback_licenses_flat).sort()
         extravalues["LIC_FILES_CHKSUM"] = generate_common_licenses_chksums(fallback_licenses_flat, d)
         extravalues["LICENSE"] = fallback_licenses_flat
 

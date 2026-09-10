@@ -50,9 +50,9 @@ python do_checkuri() {
         return
 
     try:
-        fetcher = bb.fetch2.Fetch(src_uri, d)
+        fetcher = bb.fetch.Fetch(src_uri, d)
         fetcher.checkstatus()
-    except bb.fetch2.BBFetchException as e:
+    except bb.fetch.BBFetchException as e:
         bb.fatal(str(e))
 }
 

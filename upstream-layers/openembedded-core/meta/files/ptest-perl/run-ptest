@@ -8,7 +8,7 @@ for case in `find t -type f -name '*.t'`; do
     if [ $ret -ne 0 ]; then
         result=1
         echo "FAIL: ${case%.t}"
-    elif grep -i 'SKIP' $case.output; then
+    elif grep -q '^1\.\.0' $case.output; then
         echo "SKIP: ${case%.t}"
     else
         echo "PASS: ${case%.t}"

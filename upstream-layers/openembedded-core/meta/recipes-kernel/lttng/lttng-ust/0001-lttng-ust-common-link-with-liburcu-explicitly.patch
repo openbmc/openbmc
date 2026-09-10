@@ -1,4 +1,4 @@
-From 182cb1e754e861a4eff4bde3919bc32462e3072c Mon Sep 17 00:00:00 2001
+From 3d9cfc77caca0624c8018542167cc7c79bf6e857 Mon Sep 17 00:00:00 2001
 From: Alexander Kanavin <alex@linutronix.de>
 Date: Sun, 5 Sep 2021 10:44:19 +0200
 Subject: [PATCH] lttng-ust-common: link with liburcu explicitly

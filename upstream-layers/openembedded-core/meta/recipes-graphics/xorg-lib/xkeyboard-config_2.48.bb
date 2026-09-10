@@ -9,14 +9,14 @@ systems."
 HOMEPAGE = "http://freedesktop.org/wiki/Software/XKeyboardConfig"
 BUGTRACKER = "https://bugs.freedesktop.org/enter_bug.cgi?product=xkeyboard-config"
 
-LICENSE = "MIT & MIT"
+LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=faa756e04053029ddc602caf99e5ef1d"
 
 SRC_URI = "${XORG_MIRROR}/individual/data/xkeyboard-config/${BPN}-${PV}.tar.xz"
 SRC_URI[sha256sum] = "b77041324f0109f77161ee43743fe04baa485866af8460d31e476ad3f7648fd5"
 
 SECTION = "x11/libs"
-DEPENDS = "util-macros libxslt-native"
+DEPENDS = "libxslt-native"
 
 FILES:${PN} += "${datadir}/X11/xkb ${datadir}/xkeyboard-config-2"
 

@@ -5522,7 +5522,7 @@ index b97a2c6e6b6..3e171c6c536 100755
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 11153 "configure"
+-#line 11155 "configure"
 +line $LINENO "configure"
  #include "confdefs.h"
  
@@ -5544,7 +5544,7 @@ index b97a2c6e6b6..3e171c6c536 100755
    lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
    lt_status=$lt_dlunknown
    cat > conftest.$ac_ext <<_LT_EOF
--#line 11259 "configure"
+-#line 11261 "configure"
 +#line $LINENO "configure"
  #include "confdefs.h"
  

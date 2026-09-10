@@ -1,4 +1,4 @@
-From c52e8734d043ed43d21370b2c29104fdc8cc8cb7 Mon Sep 17 00:00:00 2001
+From bfb6add8bda9ad7cb7f969f061e3c24bbb8604cd Mon Sep 17 00:00:00 2001
 From: Khem Raj <raj.khem@gmail.com>
 Date: Wed, 16 Apr 2025 19:51:01 -0700
 Subject: [PATCH] Propagate -ffile-prefix-map from CFLAGS to ASFLAGS.
@@ -14,10 +14,10 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makeconfig b/Makeconfig
-index 603ed955c4..2f0e5d25f8 100644
+index fd62fdf49b..970b0dc32d 100644
 --- a/Makeconfig
 +++ b/Makeconfig
-@@ -1194,7 +1194,7 @@ endif
+@@ -1215,7 +1215,7 @@ endif
  
  # The assembler can generate debug information too.
  ifndef ASFLAGS

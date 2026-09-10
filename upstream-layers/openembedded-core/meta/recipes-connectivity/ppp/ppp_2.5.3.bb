@@ -5,7 +5,7 @@ SECTION = "console/network"
 HOMEPAGE = "http://samba.org/ppp/"
 BUGTRACKER = "http://ppp.samba.org/cgi-bin/ppp-bugs"
 DEPENDS = "libpcap virtual/crypt"
-LICENSE = "BSD-2-Clause & GPL-2.0-or-later & LGPL-2.0-or-later & RSA-MD & MIT"
+LICENSE = "BSD-2-Clause AND GPL-2.0-or-later AND LGPL-2.0-or-later AND MIT AND RSA-MD"
 LIC_FILES_CHKSUM = "file://pppd/ccp.c;beginline=1;endline=25;md5=f0463bd67ae70535c709fca554089bd8 \
                     file://pppd/tdb.c;beginline=1;endline=27;md5=4ca3a9991b011038d085d6675ae7c4e6 \
                     file://chat/chat.c;beginline=1;endline=1;md5=234d7d4edd08962c0144e4604050e0b6 \
@@ -78,3 +78,4 @@ SUMMARY:${PN}-l2tp     = "Plugin for PPP for l2tp support"
 SUMMARY:${PN}-dhcpv6relay     = "Plugin which can be used to provide IPv6 RAs to the remote side and relay the subsequent incoming DHCPv6 requests to a DHCPv6 server"
 SUMMARY:${PN}-tools    = "Additional tools for the PPP package"
 
+CVE_STATUS[CVE-2020-15704] = "not-applicable-platform: specific to Ubuntu"

@@ -8,7 +8,7 @@ HOMEPAGE = "http://libevent.org/"
 BUGTRACKER = "https://github.com/libevent/libevent/issues"
 SECTION = "libs"
 
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=17f20574c0b154d12236d5fbe964f549"
 
 SRC_URI = "${GITHUB_BASE_URI}/download/release-${PV}-stable/${BP}-stable.tar.gz \
@@ -55,3 +55,5 @@ do_install_ptest() {
         # handle multilib
         sed -i s:@libdir@:${libdir}:g ${D}${PTEST_PATH}/run-ptest
 }
+
+CVE_STATUS[CVE-2026-63380] = "fixed-version: only affects 2.2.1-alpha"

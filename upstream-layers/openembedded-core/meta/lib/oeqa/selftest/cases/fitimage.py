@@ -36,7 +36,7 @@ class BbVarsMockGenKeys:
         return self.bb_vars[var]
 
 class FitImageTestCase(OESelftestTestCase):
-    """Test functions usable for testing kernel-fitimage.bbclass and uboot-sign.bbclass
+    """Test functions usable for testing kernel-fit-image.bbclass and uboot-sign.bbclass
 
     A brief summary showing the structure of a test case:
 
@@ -260,9 +260,7 @@ class FitImageTestCase(OESelftestTestCase):
         function generates only the keys which are really needed, not just two.
         """
 
-        # Define some variables which are usually defined by the kernel-fitimage.bbclass.
-        # But for testing purpose check if the uboot-sign.bbclass is independent from
-        # the kernel-fitimage.bbclass
+        # Define some variables which are usually defined by image-fitimage.conf
         fit_sign_numbits = bb_vars.get('FIT_SIGN_NUMBITS', "2048")
         fit_key_genrsa_args = bb_vars.get('FIT_KEY_GENRSA_ARGS', "-F4")
         fit_key_req_args =  bb_vars.get('FIT_KEY_REQ_ARGS', "-batch -new")
@@ -521,7 +519,7 @@ class FitImageTestCase(OESelftestTestCase):
                 elif line.endswith('{'):
                     its_path.append(line[:-1].strip())
                     its_paths.append(its_path[:])
-                # kernel-fitimage uses signature-1, uboot-sign uses signature
+                # kernel-fit-image uses signature-1, uboot-sign uses signature
                 elif its_path and (its_path[-1] == 'signature-1' or its_path[-1] == 'signature'):
                     itsdotpath = '.'.join(its_path)
                     if not itsdotpath in sigs:
@@ -680,6 +678,7 @@ class KernelFitImageBase(FitImageTestCase):
             'FIT_LOADABLES',
             'FIT_LOADABLE_ENTRYPOINT',
             'FIT_LOADABLE_LOADADDRESS',
+            'FIT_OS',
             'FIT_SIGN_ALG',
             'FIT_SIGN_INDIVIDUAL',
             'FIT_UBOOT_ENV',
@@ -892,9 +891,10 @@ class KernelFitImageBase(FitImageTestCase):
             if uboot_sign_enable == "1" and fit_sign_individual == "1":
                 req_its_paths.append(['/', 'images', image, 'signature-1'])
         for configuration in configurations:
-            req_its_paths.append(['/', 'configurations', configuration, 'hash-1'])
             if uboot_sign_enable == "1":
                 req_its_paths.append(['/', 'configurations', configuration, 'signature-1'])
+            else:
+                req_its_paths.append(['/', 'configurations', configuration, 'hash-1'])
 
         not_req_its_paths = []
         for image in not_images:
@@ -915,7 +915,7 @@ class KernelFitImageBase(FitImageTestCase):
             # 'compression = "' + str(bb_vars['FIT_KERNEL_COMP_ALG']) + '";', defined based on files in TMPDIR, not ideal...
             'data = /incbin/("linux.bin");',
             'arch = "' + str(bb_vars['UBOOT_ARCH']) + '";',
-            'os = "linux";',
+            'os = "%s";' % bb_vars['FIT_OS'],
             'load = <' + str(bb_vars['UBOOT_LOADADDRESS']) + '>;',
             'entry = <' + str(bb_vars['UBOOT_ENTRYPOINT']) + '>;',
         ]
@@ -964,7 +964,7 @@ class KernelFitImageBase(FitImageTestCase):
         if bb_vars['INITRAMFS_IMAGE'] and bb_vars['INITRAMFS_IMAGE_BUNDLE'] != "1":
             sign_images += ', "ramdisk"'
         if bb_vars['FIT_UBOOT_ENV']:
-            sign_images += ', "bootscr"'
+            sign_images += ', "script"'
         if bb_vars.get('KERNEL_SETUP_BIN'):
             sign_images += ', "setup"'
         req_sigvalues_config = {
@@ -1065,14 +1065,15 @@ class KernelFitImageBase(FitImageTestCase):
         # Add signing related properties if needed
         if uboot_sign_enable == "1":
             for section in req_sections:
-                req_sections[section]['Hash algo'] = fit_hash_alg
                 if section.startswith(bb_vars['FIT_CONF_PREFIX']):
-                    req_sections[section]['Hash value'] = "unavailable"
                     req_sections[section]['Sign algo'] = "%s,%s:%s" % (fit_hash_alg, fit_sign_alg, uboot_sign_keyname)
                     num_signatures += 1
                 elif fit_sign_individual == "1":
+                    req_sections[section]['Hash algo'] = fit_hash_alg
                     req_sections[section]['Sign algo'] = "%s,%s:%s" % (fit_hash_alg, fit_sign_alg, uboot_sign_img_keyname)
                     num_signatures += 1
+                else:
+                    req_sections[section]['Hash algo'] = fit_hash_alg
         return (req_sections, num_signatures)
 
     def _check_signing(self, bb_vars, sections, num_signatures, uboot_tools_bindir, fitimage_path):
@@ -1159,7 +1160,7 @@ class KernelFitImageBase(FitImageTestCase):
                              (num_signatures, a_comment))
 
 class KernelFitImageRecipeTests(KernelFitImageBase):
-    """Test cases for the kernel-fitimage bbclass"""
+    """Test cases for the kernel-fit-image bbclass"""
 
     def test_fit_image(self):
         """
@@ -1510,6 +1511,7 @@ class FitImagePyTests(KernelFitImageBase):
             'FIT_KEY_SIGN_PKCS': "-x509",
             'FIT_LOADABLES': "",
             'FIT_LINUX_BIN': "linux.bin",
+            'FIT_OS': "linux",
             'FIT_PAD_ALG': "pkcs-1.5",
             'FIT_SIGN_ALG': "rsa2048",
             'FIT_SIGN_INDIVIDUAL': "0",
@@ -1523,7 +1525,6 @@ class FitImagePyTests(KernelFitImageBase):
             'INITRAMFS_IMAGE_BUNDLE': "",
             # kernel-uboot.bbclass
             'FIT_KERNEL_COMP_ALG': "gzip",
-            'FIT_KERNEL_COMP_ALG_EXTENSION': ".gz",
             'UBOOT_MKIMAGE_KERNEL_TYPE': "kernel",
             # uboot-config.bbclass
             'UBOOT_MKIMAGE_DTCOPTS': "",
@@ -1550,7 +1551,8 @@ class FitImagePyTests(KernelFitImageBase):
 
         root_node = oe.fitimage.ItsNodeRootKernel(
             bb_vars["FIT_DESC"], bb_vars["FIT_ADDRESS_CELLS"],
-            bb_vars['HOST_PREFIX'], bb_vars['UBOOT_ARCH'],  bb_vars["FIT_CONF_PREFIX"],
+            bb_vars['HOST_PREFIX'], bb_vars['UBOOT_ARCH'], bb_vars['FIT_OS'],
+            bb_vars["FIT_CONF_PREFIX"],
             oe.types.boolean(bb_vars['UBOOT_SIGN_ENABLE']), bb_vars["UBOOT_SIGN_KEYDIR"],
             bb_vars["UBOOT_MKIMAGE"], bb_vars["UBOOT_MKIMAGE_DTCOPTS"],
             bb_vars["UBOOT_MKIMAGE_SIGN"], bb_vars["UBOOT_MKIMAGE_SIGN_ARGS"],
@@ -1656,6 +1658,12 @@ class FitImagePyTests(KernelFitImageBase):
         }
         self._test_fitimage_py(bb_vars_overrides)
 
+    def test_fitimage_py_conf_os(self):
+        """Test FIT_OS functionality"""
+        bb_vars_overrides = {
+            'FIT_OS': "efi",
+        }
+        self._test_fitimage_py(bb_vars_overrides)
 
 class UBootFitImageTests(FitImageTestCase):
     """Test cases for the uboot-sign bbclass"""
@@ -1790,7 +1798,7 @@ class UBootFitImageTests(FitImageTestCase):
                 'entry = <%s>;' % bb_vars['UBOOT_FIT_TEE_ENTRYPOINT'],
                 'compression = "none";',
             ]
-            loadables.insert(0, "tee")
+            loadables.append("tee")
         if bb_vars['UBOOT_FIT_ARM_TRUSTED_FIRMWARE'] == "1":
             its_field_check += [
                 'description = "ARM Trusted Firmware";',
@@ -1842,7 +1850,7 @@ class UBootFitImageTests(FitImageTestCase):
             }
         }
         if bb_vars['UBOOT_FIT_TEE'] == "1":
-            loadables.insert(0, "tee")
+            loadables.append("tee")
             req_sections['tee'] = {
                 "Type": "Trusted Execution Environment Image",
                 # "Load Address": bb_vars['UBOOT_FIT_TEE_LOADADDRESS'], not printed by mkimage?
@@ -2173,7 +2181,7 @@ UBOOT_FIT_HASH_ALG = "sha256"
         """
         Summary:     Check if the device-tree from U-Boot has two public keys
                      for verifying the kernel FIT image created by the
-                     kernel-fitimage.bbclass included.
+                     kernel-fit-image.bbclass included.
                      This test sets: FIT_SIGN_INDIVIDUAL = "1"
         Expected:    There must be two signature nodes. One is required for
                      the individual image nodes, the other is required for the

@@ -1,0 +1,179 @@
+From 007b77c2f51d4c1c696fbf1ff92694b585b35f57 Mon Sep 17 00:00:00 2001
+From: Wojciech Dubowik <Wojciech.Dubowik@mt.com>
+Date: Tue, 9 Jun 2026 09:01:04 +0200
+Subject: [PATCH] tools: mkeficapsule: Rework pkcs11 support
+
+Some distros like OpenEmbedded are using gnutls library
+without pkcs11 support and linking of mkeficapsule will fail.
+It would make maintenance of default configs a hurdle.
+Add detection of pkcs11 support in gnutls so it's enabled
+when available and doesn't need to be set explicitly.
+
+Upstream-Status: Submitted [https://lists.openembedded.org/g/openembedded-core/message/238267]
+
+Reviewed-by: Simon Glass <sjg@chromium.org>
+Acked-by: Quentin Schulz <quentin.schulz@cherry.de>
+Suggested-by: Tom Rini <trini@konsulko.com>
+Cc: Franz Schnyder <fra.schnyder@gmail.com>
+Signed-off-by: Wojciech Dubowik <Wojciech.Dubowik@mt.com>
+---
+ tools/Makefile       |  5 +++
+ tools/mkeficapsule.c | 95 +++++++++++++++++++++++++++++++++-----------
+ 2 files changed, 77 insertions(+), 23 deletions(-)
+
+diff --git a/tools/Makefile b/tools/Makefile
+index 1a5f425ecdaa..e85f5a354b81 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -271,6 +271,11 @@ mkeficapsule-objs := generated/lib/uuid.o \
+ 	$(LIBFDT_OBJS) \
+ 	mkeficapsule.o
+ hostprogs-always-$(CONFIG_TOOLS_MKEFICAPSULE) += mkeficapsule
++GNUTLS_SUPPORTS_P11KIT = $(shell pkg-config --libs gnutls --print-requires-private \
++			 2> /dev/null | grep p11-kit-1)
++ifeq ($(GNUTLS_SUPPORTS_P11KIT),p11-kit-1)
++HOSTCFLAGS_mkeficapsule.o += -DMKEFICAPSULE_PKCS11
++endif
+ 
+ include tools/fwumdata_src/fwumdata.mk
+ 
+diff --git a/tools/mkeficapsule.c b/tools/mkeficapsule.c
+index ec640c57e8a5..c3cf48f4cc1d 100644
+--- a/tools/mkeficapsule.c
++++ b/tools/mkeficapsule.c
+@@ -207,6 +207,71 @@ static int write_capsule_file(FILE *f, void *data, size_t size, const char *msg)
+ 	return 0;
+ }
+ 
++#ifdef MKEFICAPSULE_PKCS11
++static int pkcs11_init(void)
++{
++	const char *lib;
++	int ret;
++
++	lib = getenv("PKCS11_MODULE_PATH");
++	if (!lib) {
++		fprintf(stdout,
++			"PKCS11_MODULE_PATH not set in the environment\n");
++		return -1;
++	}
++
++	gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
++	gnutls_global_init();
++
++	ret = gnutls_pkcs11_add_provider(lib, "trusted");
++	if (ret < 0) {
++		fprintf(stdout, "Failed to add pkcs11 provider\n");
++		return -1;
++	}
++
++	return 0;
++}
++
++static int import_pkcs11_crt(gnutls_x509_crt_t *x509, struct auth_context *ctx)
++{
++	gnutls_pkcs11_obj_t *obj_list;
++	unsigned int obj_list_size = 0;
++	int ret;
++
++	ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size,
++						 ctx->cert_file, 0);
++	if (ret < 0 || obj_list_size == 0)
++		return -1;
++
++	gnutls_x509_crt_import_pkcs11(*x509, obj_list[0]);
++
++	return 0;
++}
++
++static int import_pkcs11_key(gnutls_privkey_t *pkey, struct auth_context *ctx)
++{
++	return gnutls_privkey_import_pkcs11_url(*pkey, ctx->key_file);
++}
++#else
++static int pkcs11_init(void)
++{
++	fprintf(stderr, "Pkcs11 support is disabled\n");
++	return -1;
++}
++
++static int import_pkcs11_crt(gnutls_x509_crt_t *x509, struct auth_context *ctx)
++{
++	fprintf(stderr, "Pkcs11 support is disabled\n");
++	return -1;
++}
++
++static int import_pkcs11_key(gnutls_privkey_t *pkey, struct auth_context *ctx)
++{
++	fprintf(stderr, "Pkcs11 support is disabled\n");
++	return -1;
++}
++#endif
++
+ /**
+  * create_auth_data - compose authentication data in capsule
+  * @auth_context:	Pointer to authentication context
+@@ -229,9 +294,6 @@ static int create_auth_data(struct auth_context *ctx)
+ 	gnutls_pkcs7_t pkcs7;
+ 	gnutls_datum_t data;
+ 	gnutls_datum_t signature;
+-	gnutls_pkcs11_obj_t *obj_list;
+-	unsigned int obj_list_size = 0;
+-	const char *lib;
+ 	int ret;
+ 	bool pkcs11_cert = false;
+ 	bool pkcs11_key = false;
+@@ -243,19 +305,8 @@ static int create_auth_data(struct auth_context *ctx)
+ 		pkcs11_key = true;
+ 
+ 	if (pkcs11_cert || pkcs11_key) {
+-		lib = getenv("PKCS11_MODULE_PATH");
+-		if (!lib) {
+-			fprintf(stdout,
+-				"PKCS11_MODULE_PATH not set in the environment\n");
+-			return -1;
+-		}
+-
+-		gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_MANUAL, NULL);
+-		gnutls_global_init();
+-
+-		ret = gnutls_pkcs11_add_provider(lib, "trusted");
++		ret = pkcs11_init();
+ 		if (ret < 0) {
+-			fprintf(stdout, "Failed to add pkcs11 provider\n");
+ 			return -1;
+ 		}
+ 	}
+@@ -301,14 +352,12 @@ static int create_auth_data(struct auth_context *ctx)
+ 
+ 	/* load x509 certificate */
+ 	if (pkcs11_cert) {
+-		ret = gnutls_pkcs11_obj_list_import_url4(&obj_list, &obj_list_size,
+-							 ctx->cert_file, 0);
+-		if (ret < 0 || obj_list_size == 0) {
+-			fprintf(stdout, "Failed to import crt_file URI objects\n");
++		ret = import_pkcs11_crt(&x509, ctx);
++		if (ret < 0) {
++			fprintf(stderr, "error in import_pkcs11_crt(): %s\n",
++				gnutls_strerror(ret));
+ 			return -1;
+ 		}
+-
+-		gnutls_x509_crt_import_pkcs11(x509, obj_list[0]);
+ 	} else {
+ 		ret = gnutls_x509_crt_import(x509, &cert, GNUTLS_X509_FMT_PEM);
+ 		if (ret < 0) {
+@@ -320,9 +369,9 @@ static int create_auth_data(struct auth_context *ctx)
+ 
+ 	/* load a private key */
+ 	if (pkcs11_key) {
+-		ret = gnutls_privkey_import_pkcs11_url(pkey, ctx->key_file);
++		ret = import_pkcs11_key(&pkey, ctx);
+ 		if (ret < 0) {
+-			fprintf(stderr, "error in %d: %s\n", __LINE__,
++			fprintf(stderr, "error in import_pkcs11_key(): %s\n",
+ 				gnutls_strerror(ret));
+ 			return -1;
+ 		}
+-- 
+2.47.3

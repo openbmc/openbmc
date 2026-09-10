@@ -12,11 +12,13 @@
 #                              e.g.: ".*-downloads closed-.*"
 #
 
+import os
+import re
 import stat
 import shutil
+import subprocess
 
 def _smart_copy(src, dest):
-    import subprocess
     # smart_copy will choose the correct function depending on whether the
     # source is a file or a directory.
     mode = os.stat(src).st_mode
@@ -38,7 +40,6 @@ class BuildSystem(object):
         self.layers_exclude_pattern = d.getVar('SDK_LAYERS_EXCLUDE_PATTERN')
 
     def copy_bitbake_and_layers(self, destdir, workspace_name=None):
-        import re
         # Copy in all metadata layers + bitbake (as repositories)
         copied_corebase = None
         layers_copied = []
@@ -261,7 +262,6 @@ def merge_lockedsigs(copy_tasks, lockedsigs_main, lockedsigs_extra, merged_outpu
         write_sigs_file(merged_output, arch_order, merged)
 
 def create_locked_sstate_cache(lockedsigs, input_sstate_cache, output_sstate_cache, d, fixedlsbstring="", filterfile=None):
-    import shutil
     bb.note('Generating sstate-cache...')
 
     nativelsbstring = d.getVar('NATIVELSBSTRING')
@@ -282,8 +282,6 @@ def create_locked_sstate_cache(lockedsigs, input_sstate_cache, output_sstate_cac
                         shutil.move(src, dest)
 
 def check_sstate_task_list(d, targets, filteroutfile, cmdprefix='', cwd=None, logfile=None):
-    import subprocess
-
     bb.note('Generating sstate task list...')
 
     if not cwd:

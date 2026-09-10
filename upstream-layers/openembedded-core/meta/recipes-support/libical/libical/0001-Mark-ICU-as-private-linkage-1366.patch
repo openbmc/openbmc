@@ -1,0 +1,76 @@
+From 13642054f650795446f6020d9d2e14d147b8da51 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross@burtonini.com>
+Date: Wed, 2 Sep 2026 16:14:44 +0100
+Subject: [PATCH] Mark ICU as private linkage (#1366)
+
+* libical-glib: Hide some target options in the installed CMake files
+
+The build paths could be shown in the installed .cmake files, thus
+hide them from there, because they are not needed.
+
+Closes https://github.com/libical/libical/issues/532
+
+* libical: mark ICU linkage as private
+
+There's no need to expose the ICU linkage publically as the .so will
+pull this in itself.
+
+This has a side-effect of removing build/sysroot paths from the installed
+.cmake files.
+
+Closes #532.
+
+---------
+
+Co-authored-by: Milan Crha <mcrha@redhat.com>
+(cherry picked from commit 38c7e6d31a3a1a4bd67479f402c323fb0679271e)
+
+Upstream-Status: Backport [libical 13642054f650795446f6020d9d2e14d147b8da51]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/libical-glib/CMakeLists.txt | 9 +++++----
+ src/libical/CMakeLists.txt      | 2 +-
+ 2 files changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/src/libical-glib/CMakeLists.txt b/src/libical-glib/CMakeLists.txt
+index d63bbf3c..470a4d22 100644
+--- a/src/libical-glib/CMakeLists.txt
++++ b/src/libical-glib/CMakeLists.txt
+@@ -24,16 +24,17 @@ if(NOT DEFINED LIBXML2_DEFINITIONS)
+ endif()
+ target_compile_options(
+   ical-glib-src-generator
+-  PUBLIC
++  PRIVATE
+     ${GLIB_CFLAGS}
+     ${LIBXML2_DEFINITIONS}
+     -DG_LOG_DOMAIN=\"src-generator\"
+ )
+ target_link_libraries(
+   ical-glib-src-generator
+-  ${GLIB_LDFLAGS}
+-  ${GOBJECT_LDFLAGS}
+-  ${LIBXML2_LIBRARIES}
++  PRIVATE
++    ${GLIB_LDFLAGS}
++    ${GOBJECT_LDFLAGS}
++    ${LIBXML2_LIBRARIES}
+ )
+ 
+ install(
+diff --git a/src/libical/CMakeLists.txt b/src/libical/CMakeLists.txt
+index 6fc2e953..583f2eeb 100644
+--- a/src/libical/CMakeLists.txt
++++ b/src/libical/CMakeLists.txt
+@@ -294,7 +294,7 @@ if(DEFINED CMAKE_THREAD_LIBS_INIT)
+   target_link_libraries(ical ${CMAKE_THREAD_LIBS_INIT})
+ endif()
+ if(ICU_FOUND)
+-  target_link_libraries(ical ${ICU_LIBRARIES})
++  target_link_libraries(ical PRIVATE ${ICU_LIBRARIES})
+   if(VCPKG_MANIFEST_MODE)
+     if(NOT APPLE AND NOT WIN32)
+       target_link_libraries(ical "m;stdc++")
+-- 
+2.43.0
+

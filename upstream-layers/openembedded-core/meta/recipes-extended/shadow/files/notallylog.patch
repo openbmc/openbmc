@@ -1,13 +1,21 @@
+From 20dc49519cc177d4c829f4dd5cc277ada24376d7 Mon Sep 17 00:00:00 2001
+From: Richard Purdie <richard.purdie@linuxfoundation.org>
+Date: Tue, 21 Apr 2026 11:30:52 +0100
+Subject: [PATCH] shadow: Disable tallylog execution
+
 We don't want to call /sbin/pam_tally2 in the native tools case so
 disable this function.
 
 Upstream-Status: Inappropriate [OE cross configuration specific]
+---
+ src/useradd.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Index: shadow-4.19.4/src/useradd.c
-===================================================================
---- shadow-4.19.4.orig/src/useradd.c
-+++ shadow-4.19.4/src/useradd.c
-@@ -2046,6 +2046,9 @@ static void tallylog_reset (const char *
+diff --git a/src/useradd.c b/src/useradd.c
+index 5404b46..78bb70a 100644
+--- a/src/useradd.c
++++ b/src/useradd.c
+@@ -2015,6 +2015,9 @@ static void tallylog_reset (const char *user_name)
  	int failed;
  	int status;
  

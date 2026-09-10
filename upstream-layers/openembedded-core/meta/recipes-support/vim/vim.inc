@@ -18,8 +18,8 @@ SRC_URI = "git://github.com/vim/vim.git;branch=master;protocol=https;tag=v${PV} 
            file://no-path-adjust.patch \
            "
 
-PV .= ".0782"
-SRCREV = "834b8d218f1db92e587ecd449e5ce88b41fbe256"
+PV .= ".0993"
+SRCREV = "ffce1ce58dd3d08110c35c8af61ad2555b344569"
 
 # Do not consider .z in x.y.z, as that is updated with every commit
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+\.\d+)\.0"
@@ -28,7 +28,7 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 
 VIMDIR = "vim${@d.getVar('PV').split('.')[0]}${@d.getVar('PV').split('.')[1]}"
 
-inherit autotools-brokensep update-alternatives mime-xdg pkgconfig
+inherit autotools-brokensep update-alternatives pkgconfig
 
 CLEANBROKEN = "1"
 
@@ -53,9 +53,11 @@ do_configure () {
 
 PACKAGECONFIG ??= "\
     ${@bb.utils.filter('DISTRO_FEATURES', 'acl selinux x11', d)} \
+    desktop \
     nls \
 "
 
+PACKAGECONFIG[desktop] = ""
 PACKAGECONFIG[gtkgui] = "--enable-gui=gtk3,--enable-gui=no,gtk+3"
 PACKAGECONFIG[acl] = "--enable-acl,--disable-acl,acl,"
 PACKAGECONFIG[x11] = "--with-x,--without-x,xt,"
@@ -64,6 +66,8 @@ PACKAGECONFIG[selinux] = "--enable-selinux,--disable-selinux,libselinux,"
 PACKAGECONFIG[elfutils] = "--enable-elf-check,,elfutils,"
 PACKAGECONFIG[nls] = "--enable-nls,--disable-nls,,"
 PACKAGECONFIG[sound] = "--enable-canberra,--disable-canberra,canberra,"
+
+inherit_defer ${@bb.utils.contains('PACKAGECONFIG', 'desktop', 'mime-xdg', '', d)}
 
 EXTRA_OECONF = " \
     --disable-gpm \
@@ -98,7 +102,7 @@ do_install() {
     chmod -x ${D}${datadir}/${BPN}/${VIMDIR}/tools/mve.awk
     chmod -x ${D}${datadir}/${BPN}/${VIMDIR}/tools/*.pl
     chmod -x ${D}${datadir}/${BPN}/${VIMDIR}/tools/*.py
-    
+
     # Install example vimrc from runtime files
     install -m 0644 runtime/vimrc_example.vim ${D}/${datadir}/${BPN}/vimrc
 
@@ -110,6 +114,11 @@ do_install() {
 	# drag make vim go into visual mode and there is no right click menu),
 	# delete the block.
 	sed -i '/the mouse works just fine/,+4d' ${D}/${datadir}/${BPN}/vimrc
+    fi
+
+    if ${@bb.utils.contains('PACKAGECONFIG', 'desktop', 'false', 'true', d)}; then
+        rm -f ${D}${datadir}/applications/vim.desktop
+        rm -f ${D}${datadir}/applications/gvim.desktop
     fi
 }
 

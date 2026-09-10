@@ -1,4 +1,4 @@
-From 6f0289bc8ee2c5a6d386d6d6921875219b268951 Mon Sep 17 00:00:00 2001
+From f3736e5535236cf978fd368b6905098ff6e4fd84 Mon Sep 17 00:00:00 2001
 From: Paul Gortmaker <paul.gortmaker@windriver.com>
 Date: Tue, 9 Jun 2015 11:22:00 -0400
 Subject: [PATCH] bind: ensure searching for json headers searches sysroot
@@ -32,10 +32,10 @@ Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/configure.ac b/configure.ac
-index 7b9a63b..c845a8e 100644
+index c06a0d7..56bca5b 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -865,7 +865,7 @@ AS_CASE([$with_lmdb],
+@@ -872,7 +872,7 @@ AS_CASE([$with_lmdb],
  	[no],[],
  	[auto|yes], [PKG_CHECK_MODULES([LMDB], [lmdb],
  				       [ac_lib_lmdb_found=yes],

@@ -12,7 +12,7 @@ DEPENDS = "zlib e2fsprogs util-linux"
 RDEPENDS:mtd-utils-tests += "bash"
 
 SRCREV = "053ee1038e5dedae61a88cadfb7bdfe9894d8bb6"
-SRC_URI = "git://git.infradead.org/mtd-utils.git;branch=master \
+SRC_URI = "git://git.infradead.org/mtd-utils.git;branch=master;tag=v${PV} \
            file://ubihealthd.service"
 
 # xattr support creates an additional compile-time dependency on acl because

@@ -9,7 +9,7 @@
 # Usage: add INHERIT += "image-buildinfo" to your conf file
 #
 
-# Desired variables to display 
+# Desired variables to display
 IMAGE_BUILDINFO_VARS ?= "DISTRO DISTRO_VERSION"
 
 # Desired location of the output file in the image.

@@ -1,0 +1,130 @@
+Fix a couple of compile failures with musl:
+
+| In file included from ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/commands/get-channel-memory-usage.hpp:13,
+|                  from ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/commands/get-channel-memory-usage.cpp:8:
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:31:59: error: 'uid_t' has not been declared; did you mean 'pid_t'?
+|    31 |         stream_group_owner(ust::application_abi bitness_, uid_t uid_) noexcept :
+|       |                                                           ^~~~~
+|       |                                                           pid_t
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:31:9: error: 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, int)' cannot be overloaded with 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, pid_t)'
+|    31 |         stream_group_owner(ust::application_abi bitness_, uid_t uid_) noexcept :
+|       |         ^~~~~~~~~~~~~~~~~~
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:26:9: note: previous declaration 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, pid_t)'
+|    26 |         stream_group_owner(ust::application_abi bitness_, pid_t pid_) noexcept :
+|       |         ^~~~~~~~~~~~~~~~~~
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:50:17: error: 'uid_t' does not name a type; did you mean 'pid_t'?
+|    50 |                 uid_t uid;
+|       |                 ^~~~~
+|       |                 pid_t
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp: In constructor 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, int)':
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:32:60: error: 'const lttng::sessiond::commands::stream_group_owner::<unnamed union>' has no non-static data member named 'uid'
+|    32 |                 owner_type(type::USER), bitness(bitness_), id{ .uid = uid_ }
+|       |                                                            ^~~~~~~~~~~~~~~~~
+| In file included from ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/commands/reclaim-channel-memory.hpp:15,
+|                  from ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/commands/reclaim-channel-memory.cpp:8:
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:31:59: error: 'uid_t' has not been declared; did you mean 'pid_t'?
+|    31 |         stream_group_owner(ust::application_abi bitness_, uid_t uid_) noexcept :
+|       |                                                           ^~~~~
+|       |                                                           pid_t
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:31:9: error: 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, int)' cannot be overloaded with 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, pid_t)'
+|    31 |         stream_group_owner(ust::application_abi bitness_, uid_t uid_) noexcept :
+|       |         ^~~~~~~~~~~~~~~~~~
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:26:9: note: previous declaration 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, pid_t)'
+|    26 |         stream_group_owner(ust::application_abi bitness_, pid_t pid_) noexcept :
+|       |         ^~~~~~~~~~~~~~~~~~
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:50:17: error: 'uid_t' does not name a type; did you mean 'pid_t'?
+|    50 |                 uid_t uid;
+|       |                 ^~~~~
+|       |                 pid_t
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp: In constructor 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, int)':
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:32:60: error: 'const lttng::sessiond::commands::stream_group_owner::<unnamed union>' has no non-static data member named 'uid'
+|    32 |                 owner_type(type::USER), bitness(bitness_), id{ .uid = uid_ }
+|       |                                                            ^~~~~~~~~~~~~~~~~
+| In file included from ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/domain-orchestrator.hpp:16,
+|                  from ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/map-action-register.cpp:8:
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:31:59: error: 'uid_t' has not been declared; did you mean 'pid_t'?
+|    31 |         stream_group_owner(ust::application_abi bitness_, uid_t uid_) noexcept :
+|       |                                                           ^~~~~
+|       |                                                           pid_t
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:31:9: error: 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, int)' cannot be overloaded with 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, pid_t)'
+|    31 |         stream_group_owner(ust::application_abi bitness_, uid_t uid_) noexcept :
+|       |         ^~~~~~~~~~~~~~~~~~
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:26:9: note: previous declaration 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, pid_t)'
+|    26 |         stream_group_owner(ust::application_abi bitness_, pid_t pid_) noexcept :
+|       |         ^~~~~~~~~~~~~~~~~~
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:50:17: error: 'uid_t' does not name a type; did you mean 'pid_t'?
+|    50 |                 uid_t uid;
+|       |                 ^~~~~
+|       |                 pid_t
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp: In constructor 'lttng::sessiond::commands::stream_group_owner::stream_group_owner(lttng::sessiond::ust::application_abi, int)':
+| ../../../../sources/lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp:32:60: error: 'const lttng::sessiond::commands::stream_group_owner::<unnamed union>' has no non-static data member named 'uid'
+|    32 |                 owner_type(type::USER), bitness(bitness_), id{ .uid = uid_ }
+|       |                                                            ^~~~~~~~~~~~~~~~~
+| At global scope:
+| cc1plus: note: unrecognized command-line option '-Wno-gnu-folding-constant' may have been intended to silence earlier diagnostics
+| cc1plus: note: unrecognized command-line option '-Wno-incomplete-setjmp-declaration' may have been intended to silence earlier diagnostics
+| At global scope:
+| cc1plus: note: unrecognized command-line option '-Wno-gnu-folding-constant' may have been intended to silence earlier diagnostics
+| cc1plus: note: unrecognized command-line option '-Wno-incomplete-setjmp-declaration' may have been intended to silence earlier diagnostics
+| make[3]: *** [Makefile:1210: commands/get-channel-memory-usage.lo] Error 1
+| make[3]: *** Waiting for unfinished jobs....
+| make[3]: *** [Makefile:1210: map-action-register.lo] Error 1
+| At global scope:
+| cc1plus: note: unrecognized command-line option '-Wno-gnu-folding-constant' may have been intended to silence earlier diagnostics
+| cc1plus: note: unrecognized command-line option '-Wno-incomplete-setjmp-declaration' may have been intended to silence earlier diagnostics
+| make[3]: *** [Makefile:1210: commands/reclaim-channel-memory.lo] Error 1
+| make[3]: Leaving directory '/media/build/poky/build/tmp/work/x86-64-v3-poky-linux-musl/lttng-tools/2.16.0/build/src/bin/lttng-sessiond'
+| make[2]: *** [Makefile:633: all-recursive] Error 1
+| make[2]: Leaving directory '/media/build/poky/build/tmp/work/x86-64-v3-poky-linux-musl/lttng-tools/2.16.0/build/src/bin'
+| make[1]: *** [Makefile:626: all-recursive] Error 1
+| make[1]: Leaving directory '/media/build/poky/build/tmp/work/x86-64-v3-poky-linux-musl/lttng-tools/2.16.0/build/src'
+| make: *** [Makefile:781: all-recursive] Error 1
+
+and
+
+| ../../../../sources/lttng-tools-2.16.0/tests/utils/testapp/gen-ust-events-ns.cpp: In function 'int main(int, const char**)':
+| ../../../../sources/lttng-tools-2.16.0/tests/utils/testapp/gen-ust-events-ns.cpp:238:33: error: 'basename' was not declared in this scope; did you mean 'rename'?
+|   238 |         cmd_name = (argc > 0) ? basename(argv[0]) : "COMMAND";
+|       |                                 ^~~~~~~~
+|       |                                 rename
+
+which is because basename isn't available in C++ even with _GNU_SOURCE. There is a posix version but doesn't
+take a const char*. I hacked around it here to get things compiling.
+
+Upstream-Status: Submitted [https://bugs.lttng.org/issues/1445]
+Signed-off-by: Richard Purdie <richard.purdie@linuxfoundation.org>
+
+Index: lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp
+===================================================================
+--- lttng-tools-2.16.0.orig/src/bin/lttng-sessiond/channel-memory-types.hpp
++++ lttng-tools-2.16.0/src/bin/lttng-sessiond/channel-memory-types.hpp
+@@ -8,6 +8,8 @@
+ #ifndef LTTNG_SESSIOND_CHANNEL_MEMORY_TYPES_HPP
+ #define LTTNG_SESSIOND_CHANNEL_MEMORY_TYPES_HPP
+ 
++#include <unistd.h>
++
+ #include <common/format.hpp>
+ 
+ #include <vendor/optional.hpp>
+Index: lttng-tools-2.16.0/tests/utils/testapp/gen-ust-events-ns.cpp
+===================================================================
+--- lttng-tools-2.16.0.orig/tests/utils/testapp/gen-ust-events-ns.cpp
++++ lttng-tools-2.16.0/tests/utils/testapp/gen-ust-events-ns.cpp
+@@ -16,6 +16,7 @@
+ #include <common/macros.hpp>
+ 
+ #include <inttypes.h>
++#include <libgen.h>
+ #include <popt.h>
+ #include <sched.h>
+ #include <stdarg.h>
+@@ -235,7 +236,7 @@ int main(int argc, const char **argv)
+ 	int ret = EXIT_SUCCESS;
+ 	poptContext pc;
+ 
+-	cmd_name = (argc > 0) ? basename(argv[0]) : "COMMAND";
++	cmd_name = (argc > 0) ? basename(strdup(argv[0])) : "COMMAND";
+ 
+ 	pc = poptGetContext(nullptr, argc, argv, opts, 0);
+ 	poptReadDefaultConfig(pc, 0);

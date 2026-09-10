@@ -6,8 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=5ce2a2b07fca326bc7c146d10105ccfc"
 
 SRC_URI[sha256sum] = "660d82dcbeb8e83d1702bd97f223f761625da06111c0cc988eac6b8ab0c1b61f"
 
-PYPI_PACKAGE = "pyelftools"
-
 inherit pypi python_setuptools_build_meta
 
 BBCLASSEXTEND = "native"

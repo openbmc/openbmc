@@ -6,7 +6,7 @@ basic functions of the window system."
 
 require xorg-lib-common.inc
 
-LICENSE = "MIT & BSD-1-Clause & HPND & HPND-sell-variant & ISC"
+LICENSE = "BSD-1-Clause AND HPND AND HPND-sell-variant AND ISC AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=8f2a1d92c4a50eedcf7c12672b908851"
 
 DEPENDS += "xorgproto \

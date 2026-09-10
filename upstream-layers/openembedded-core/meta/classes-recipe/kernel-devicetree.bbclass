@@ -44,7 +44,7 @@ get_real_dtb_path_in_kernel () {
 	echo "$dtb_path"
 }
 
-do_configure:append() {
+kernel_do_configure:append() {
 	if [ "${KERNEL_DEVICETREE_BUNDLE}" = "1" ]; then
 		if echo ${KERNEL_IMAGETYPE_FOR_MAKE} | grep -q 'zImage'; then
 			case "${ARCH}" in
@@ -66,7 +66,7 @@ do_configure:append() {
 	fi
 }
 
-do_compile:append() {
+kernel_do_compile:append() {
 	if [ -n "${KERNEL_DTC_FLAGS}" ]; then
 		export DTC_FLAGS="${KERNEL_DTC_FLAGS}"
 	fi
@@ -77,7 +77,7 @@ do_compile:append() {
 	done
 }
 
-do_install:append() {
+kernel_do_install:append() {
 	install -d ${D}/${KERNEL_DTBDEST}
 	for dtbf in ${KERNEL_DEVICETREE}; do
 		dtb=`normalize_dtb "$dtbf"`
@@ -91,7 +91,7 @@ do_install:append() {
 	done
 }
 
-do_deploy:append() {
+kernel_do_deploy:append() {
 	for dtbf in ${KERNEL_DEVICETREE}; do
 		dtb=`normalize_dtb "$dtbf"`
 		dtb_ext=${dtb##*.}

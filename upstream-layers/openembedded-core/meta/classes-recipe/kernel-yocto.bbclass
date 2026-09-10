@@ -69,7 +69,7 @@ def find_sccs(d):
 # the name of the repository or directory as it will be found in UNPACKDIR
 def find_kernel_feature_dirs(d):
     feature_dirs=[]
-    fetch = bb.fetch2.Fetch([], d)
+    fetch = bb.fetch.Fetch([], d)
     for url in fetch.urls:
         urldata = fetch.ud[url]
         parm = urldata.parm
@@ -89,7 +89,7 @@ def find_kernel_feature_dirs(d):
 # find the master/machine source branch. In the same way that the fetcher proceses
 # git repositories in the SRC_URI we take the first repo found, first branch.
 def get_machine_branch(d, default):
-    fetch = bb.fetch2.Fetch([], d)
+    fetch = bb.fetch.Fetch([], d)
     for url in fetch.urls:
         urldata = fetch.ud[url]
         parm = urldata.parm
@@ -98,7 +98,7 @@ def get_machine_branch(d, default):
             btype = urldata.parm.get("type")
             if btype != "kmeta":
                 return branches[0]
-	    
+
     return default
 
 # returns a list of all directories that are on FILESEXTRAPATHS (and
@@ -425,11 +425,11 @@ do_kernel_checkout() {
 		# checkout and clobber any unimportant files
 		git checkout -f ${machine_branch}
 	else
-		# case: we have no git repository at all. 
-		# To support low bandwidth options for building the kernel, we'll just 
+		# case: we have no git repository at all.
+		# To support low bandwidth options for building the kernel, we'll just
 		# convert the tree to a git repo and let the rest of the process work unchanged
-		
-		# if ${S} hasn't been set to the proper subdirectory a default of "linux" is 
+
+		# if ${S} hasn't been set to the proper subdirectory a default of "linux" is
 		# used, but we can't initialize that empty directory. So check it and throw a
 		# clear error
 
@@ -513,7 +513,7 @@ do_kernel_configme() {
 	fi
 }
 
-addtask kernel_configme before do_configure after do_patch
+addtask kernel_configme before do_configure after do_patch do_unpack
 addtask config_analysis
 
 do_config_analysis[depends] = "virtual/kernel:do_configure"
@@ -770,14 +770,8 @@ KBUILD_OUTPUT = "${B}"
 
 python () {
     # If diffconfig is available, ensure it runs after kernel_configme
-    if 'do_diffconfig' in d:
+    if d.getVar('do_diffconfig', False):
         bb.build.addtask('do_diffconfig', None, 'do_kernel_configme', d)
-
-    externalsrc = d.getVar('EXTERNALSRC')
-    if externalsrc:
-        # If we deltask do_patch, do_kernel_configme is left without
-        # dependencies and runs too early
-        d.setVarFlag('do_kernel_configme', 'deps', (d.getVarFlag('do_kernel_configme', 'deps', False) or []) + ['do_unpack'])
 }
 
 # extra tasks

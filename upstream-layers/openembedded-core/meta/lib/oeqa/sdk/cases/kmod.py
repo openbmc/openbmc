@@ -26,18 +26,22 @@ class KernelModuleTest(OESDKTestCase):
         parallel_make = "-j %d" % (pmv) if pmv else ""
 
         self.ensure_target_package("kernel-devsrc")
+        # the kernel assigns HOSTPKG_CONFIG with '=', so it has to come from
+        # the make command line, and kernel.bbclass already gives its own
+        # host tools this same wrapper
+        host_pkg_config = 'HOSTPKG_CONFIG="pkg-config-native"'
         # These targets need to be built before kernel modules can be built.
-        self._run("make %s -C $OECORE_TARGET_SYSROOT/usr/src/kernel prepare scripts" % (parallel_make))
+        self._run("make %s %s -C $OECORE_TARGET_SYSROOT/usr/src/kernel prepare scripts" % (parallel_make, host_pkg_config))
 
         with tempfile.TemporaryDirectory(prefix="cryptodev", dir=self.tc.sdk_dir) as testdir:
             git_url = "https://github.com/cryptodev-linux/cryptodev-linux"
-            # This is a knnown-good commit post-1.13 that builds with kernel 6.7+
-            git_sha = "bb8bc7cf60d2c0b097c8b3b0e807f805b577a53f"
+            # This is a known-good commit post-1.14 that builds with kernel 6.18+
+            git_sha = "08644db02d43478f802755903212f5ee506af73b"
 
             sourcedir = os.path.join(testdir, "cryptodev-linux")
             subprocess.check_output(["git", "clone", git_url, sourcedir], stderr=subprocess.STDOUT)
             self.assertTrue(os.path.isdir(sourcedir))
             subprocess.check_output(["git", "-C", sourcedir, "checkout", git_sha], stderr=subprocess.STDOUT)
 
-            self._run("make -C %s V=1 KERNEL_DIR=$OECORE_TARGET_SYSROOT/usr/src/kernel" % sourcedir)
+            self._run("make -C %s V=1 %s KERNEL_DIR=$OECORE_TARGET_SYSROOT/usr/src/kernel" % (sourcedir, host_pkg_config))
             self.check_elf(os.path.join(sourcedir, "cryptodev.ko"))

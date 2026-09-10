@@ -13,7 +13,7 @@ do_compile() {
 	rm -f $archconf
 	ipkgarchs="${ALL_MULTILIB_PACKAGE_ARCHS}"
 	priority=1
-	for arch in $ipkgarchs; do 
+	for arch in $ipkgarchs; do
 		echo "arch $arch $priority" >> $archconf
 		priority=$(expr $priority + 5)
 	done

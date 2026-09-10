@@ -4,7 +4,7 @@ TUNEVALID[arm] = "Enable ARM instruction set"
 TUNEVALID[armv4] = "Enable instructions for ARMv4"
 TUNE_CCARGS_MARCH .= "${@bb.utils.contains('TUNE_FEATURES', 'armv4', ' -march=armv4${ARMPKGSFX_THUMB}', '', d)}"
 # enable --fix-v4bx when we have armv4 in TUNE_FEATURES, but then disable it when we have also armv5 or thumb
-# maybe we should extend bb.utils.contains to support check for any checkvalues in value, now it does 
+# maybe we should extend bb.utils.contains to support check for any checkvalues in value, now it does
 # checkvalues.issubset(val) which cannot be used for negative test of foo neither bar in value
 FIX_V4BX_ARMV4 = "${@bb.utils.contains('TUNE_FEATURES', 'armv4', '--fix-v4bx', '', d)}"
 FIX_V4BX_ARMV5 = "${@bb.utils.contains('TUNE_FEATURES', 'armv5', '', '${FIX_V4BX_ARMV4}', d)}"

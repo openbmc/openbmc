@@ -4,7 +4,10 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit linux-kernel-base kernel-module-split features_check
+inherit kernel-arch kernel-module-split kernel-devicetree kernel-artifact-names
+inherit features_check  deploy cml1 pkgconfig
+
+ARCH = "${@oe.kernel.map_kernel_arch(d)}"
 
 COMPATIBLE_HOST = ".*-linux"
 
@@ -213,8 +216,6 @@ python do_symlink_kernsrc () {
 # do_configure on do_symlink_kernsrc.
 addtask symlink_kernsrc before do_patch do_configure after do_unpack
 
-inherit kernel-arch deploy
-
 PACKAGES_DYNAMIC += "^${KERNEL_PACKAGE_NAME}-module-.*"
 PACKAGES_DYNAMIC += "^${KERNEL_PACKAGE_NAME}-image-.*"
 PACKAGES_DYNAMIC += "^${KERNEL_PACKAGE_NAME}-firmware-.*"
@@ -233,7 +234,7 @@ KERNEL_DTBVENDORED ?= "0"
 #
 # configuration
 #
-KERNEL_VERSION = "${@get_kernelversion_headers('${B}')}"
+KERNEL_VERSION = "${@oe.kernel.get_version_headers('${B}')}"
 
 # kernels are generally machine specific
 PACKAGE_ARCH = "${MACHINE_ARCH}"
@@ -245,6 +246,7 @@ UBOOT_LOADADDRESS ?= "${UBOOT_ENTRYPOINT}"
 # Some Linux kernel configurations need additional parameters on the command line
 KERNEL_EXTRA_ARGS ?= ""
 
+EXTRA_OEMAKE += ' ARCH="${@oe.kernel.map_kernel_arch(d)}"'
 EXTRA_OEMAKE += ' CC="${KERNEL_CC}" LD="${KERNEL_LD}" OBJCOPY="${KERNEL_OBJCOPY}" STRIP="${KERNEL_STRIP}"'
 EXTRA_OEMAKE += ' HOSTCC="${BUILD_CC}" HOSTCFLAGS="${BUILD_CFLAGS}" HOSTLDFLAGS="${BUILD_LDFLAGS}" HOSTCPP="${BUILD_CPP}"'
 EXTRA_OEMAKE += ' HOSTCXX="${BUILD_CXX}" HOSTCXXFLAGS="${BUILD_CXXFLAGS}"'
@@ -451,11 +453,11 @@ kernel_do_install() {
 	#
 	unset CFLAGS CPPFLAGS CXXFLAGS LDFLAGS MACHINE
 	if (grep -q -i -e '^CONFIG_MODULES=y$' .config); then
-		oe_runmake DEPMOD=echo MODLIB=${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION} INSTALL_FW_PATH=${D}${firmwaredir} modules_install
-		rm -f "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/build"
-		rm -f "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/source"
+		oe_runmake DEPMOD=echo MODLIB=${D}${KERNEL_MODULE_INSTALL_PREFIX} INSTALL_FW_PATH=${D}${firmwaredir} modules_install
+		rm -f "${D}${KERNEL_MODULE_INSTALL_PREFIX}/build"
+		rm -f "${D}${KERNEL_MODULE_INSTALL_PREFIX}/source"
 		# Remove empty module directories to prevent QA issues
-		[ -d "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/kernel" ] && find "${D}${nonarch_base_libdir}/modules/${KERNEL_VERSION}/kernel" -type d -empty -delete
+		[ -d "${D}${KERNEL_MODULE_INSTALL_PREFIX}/kernel" ] && find "${D}${KERNEL_MODULE_INSTALL_PREFIX}/kernel" -type d -empty -delete
 	else
 		bbnote "no modules to install"
 	fi
@@ -643,7 +645,7 @@ KERNEL_LOCALVERSION ??= ""
 #
 # Note: This class saves the value of localversion to a file
 # so other recipes like make-mod-scripts can restore it via the
-# helper function get_kernellocalversion_file
+# helper function oe.kernel.get_localversion_file
 export LOCALVERSION = "${KERNEL_LOCALVERSION}"
 
 kernel_do_configure() {
@@ -672,17 +674,15 @@ kernel_do_configure() {
 	${KERNEL_CONFIG_COMMAND}
 }
 
-inherit cml1 pkgconfig
-
 EXPORT_FUNCTIONS do_compile do_transform_kernel do_transform_bundled_initramfs do_install do_configure
 
 # kernel-base becomes kernel-${KERNEL_VERSION}
 # kernel-image becomes kernel-image-${KERNEL_VERSION}
 PACKAGES = "${KERNEL_PACKAGE_NAME} ${KERNEL_PACKAGE_NAME}-base ${KERNEL_PACKAGE_NAME}-vmlinux ${KERNEL_PACKAGE_NAME}-image ${KERNEL_PACKAGE_NAME}-dev ${KERNEL_PACKAGE_NAME}-modules ${KERNEL_PACKAGE_NAME}-dbg"
 FILES:${PN} = ""
-FILES:${KERNEL_PACKAGE_NAME}-base = "${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.order ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.builtin ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/modules.builtin.modinfo"
+FILES:${KERNEL_PACKAGE_NAME}-base = "${KERNEL_MODULE_INSTALL_PREFIX}/modules.order ${KERNEL_MODULE_INSTALL_PREFIX}/modules.builtin ${KERNEL_MODULE_INSTALL_PREFIX}/modules.builtin.modinfo"
 FILES:${KERNEL_PACKAGE_NAME}-image = ""
-FILES:${KERNEL_PACKAGE_NAME}-dev = "/${KERNEL_IMAGEDEST}/System.map* /${KERNEL_IMAGEDEST}/Module.symvers* /${KERNEL_IMAGEDEST}/config* ${KERNEL_SRC_PATH} ${nonarch_base_libdir}/modules/${KERNEL_VERSION}/build"
+FILES:${KERNEL_PACKAGE_NAME}-dev = "/${KERNEL_IMAGEDEST}/System.map* /${KERNEL_IMAGEDEST}/Module.symvers* /${KERNEL_IMAGEDEST}/config* ${KERNEL_SRC_PATH} ${KERNEL_MODULE_INSTALL_PREFIX}/build"
 FILES:${KERNEL_PACKAGE_NAME}-vmlinux = "/${KERNEL_IMAGEDEST}/vmlinux-${KERNEL_VERSION_NAME}"
 FILES:${KERNEL_PACKAGE_NAME}-modules = ""
 FILES:${KERNEL_PACKAGE_NAME}-dbg = "/usr/lib/debug /usr/src/debug"
@@ -750,7 +750,7 @@ python do_strip() {
     if (extra_sections and kernel_image.find(d.getVar('KERNEL_IMAGEDEST') + '/vmlinux') != -1):
         kernel_image_stripped = kernel_image + ".stripped"
         shutil.copy2(kernel_image, kernel_image_stripped)
-        oe.package.runstrip((kernel_image_stripped, 8, strip, extra_sections))
+        oe.package.runstrip(kernel_image_stripped, 8, strip, extra_sections)
         bb.debug(1, "KERNEL_IMAGE_STRIP_EXTRA_SECTIONS is set, stripping sections: " + \
             extra_sections)
 }
@@ -785,8 +785,6 @@ do_sizecheck() {
 do_sizecheck[dirs] = "${B}"
 
 addtask sizecheck before do_install after do_strip
-
-inherit kernel-artifact-names
 
 kernel_do_deploy() {
 	deployDir="${DEPLOYDIR}"
@@ -912,5 +910,4 @@ do_create_spdx:append() {
 }
 do_create_spdx[depends] += "virtual/kernel:do_configure"
 
-# Add using Device Tree support
-inherit kernel-devicetree
+

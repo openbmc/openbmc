@@ -4,14 +4,14 @@ Huffman coding. Compression is generally considerably better than that achieved 
 LZ77/LZ78-based compressors, and approaches the performance of the PPM family of statistical compressors."
 HOMEPAGE = "https://sourceware.org/bzip2/"
 SECTION = "console/utils"
-LICENSE = "bzip2-1.0.6 & GPL-3.0-or-later & Apache-2.0 & MS-PL & BSD-3-Clause & Zlib"
+LICENSE = "Apache-2.0 AND BSD-3-Clause AND GPL-3.0-or-later AND MS-PL AND Zlib AND bzip2-1.0.6"
 LICENSE:${PN} = "bzip2-1.0.6"
 LICENSE:${PN}-dev = "bzip2-1.0.6"
 LICENSE:${PN}-dbg = "bzip2-1.0.6"
 LICENSE:${PN}-doc = "bzip2-1.0.6"
 LICENSE:${PN}-src = "bzip2-1.0.6"
 LICENSE:libbz2 = "bzip2-1.0.6"
-LICENSE:${PN}-ptest = "bzip2-1.0.6 & GPL-3.0-or-later & Apache-2.0 & MS-PL & BSD-3-Clause & Zlib"
+LICENSE:${PN}-ptest = "Apache-2.0 AND BSD-3-Clause AND GPL-3.0-or-later AND MS-PL AND Zlib AND bzip2-1.0.6"
 
 LIC_FILES_CHKSUM = "file://LICENSE;beginline=4;endline=37;md5=600af43c50f1fcb82e32f19b32df4664 \
                     file://${UNPACKDIR}/bzip2-tests/commons-compress/LICENSE.txt;md5=86d3f3a95c324c9479bd8986968f4327 \
@@ -67,7 +67,7 @@ FILES:libbz2 = "${libdir}/lib*${SOLIBS}"
 
 RDEPENDS:${PN}-ptest += "make bash"
 
-CVE_PRODUCT = "bzip:bzip2"
+CVE_PRODUCT = "bzip:bzip2 bzip2:bzip2"
 
 PROVIDES:append:class-native = " bzip2-replacement-native"
 BBCLASSEXTEND = "native nativesdk"

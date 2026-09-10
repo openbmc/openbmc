@@ -6,8 +6,8 @@ LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=59530bdf33659b29e73d4adb9f9f6552"
 
-SRCREV = "74862a684907ada3d4ed2ce0f8111adf626e1456"
-SRC_URI = "git://codeberg.org/xmlto/xmlto.git;protocol=https;branch=master"
+SRCREV = "635dcd5bc84a7b67a3a2050a179d96e1d3050b15"
+SRC_URI = "git://codeberg.org/xmlto/xmlto.git;protocol=https;branch=master;tag=${PV}"
 
 inherit autotools
 

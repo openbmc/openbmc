@@ -1,0 +1,37 @@
+From a2a217409e01e3ebea88dce85d81dbe6b3c79187 Mon Sep 17 00:00:00 2001
+From: Ross Burton <ross.burton@arm.com>
+Date: Wed, 12 Aug 2026 12:35:29 +0100
+Subject: [PATCH] Ignore invalid distributions when checking dependencies
+
+If there's an empty directory foo-1.2.dist-info/ on the search path then
+importlib will return that as a distribution called "foo".
+
+However it has no code and no metadata, so doesn't exist in any real way.
+Check that the found distribution is in some way valid by verifying that
+it has a name set.
+
+In Yocto this can happen if foo was removed as a dependency from the sysroot:
+the dist-info directory is empties but remains in the sysroot.
+
+Upstream-Status: Submitted [https://github.com/pypa/build/pull/1145]
+Signed-off-by: Ross Burton <ross.burton@arm.com>
+---
+ src/build/_util.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/src/build/_util.py b/src/build/_util.py
+index cce8f94..54bc02c 100644
+--- a/src/build/_util.py
++++ b/src/build/_util.py
+@@ -63,6 +63,11 @@ def _check_dependency(
+         yield (*ancestral_req_strings, normalised_req_string)
+         return
+ 
++    if not dist.name:
++        # If the distribution doesn't have a name it has no metadata
++        yield (*ancestral_req_strings, normalised_req_string)
++        return
++
+     if req.specifier and not req.specifier.contains(dist.version, prereleases=True):
+         # the installed version is incompatible.
+         yield (*ancestral_req_strings, normalised_req_string)

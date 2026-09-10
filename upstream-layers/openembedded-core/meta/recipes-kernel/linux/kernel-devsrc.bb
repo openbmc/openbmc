@@ -129,9 +129,11 @@ do_install() {
 
         rm -f $kerneldir/include/generated/.vdso-offsets.h.cmd
         rm -f $kerneldir/build/include/generated/.vdso-offsets.h.cmd
+        rm -f $kerneldir/include/generated/.vdso-cfi-offsets.h.cmd
+        rm -f $kerneldir/build/include/generated/.vdso-cfi-offsets.h.cmd
         rm -f $kerneldir/build/include/generated/.compat_vdso-offsets.h.cmd
         rm -f $kerneldir/build/include/generated/.vdso32-offsets.h.cmd
-        rm -f $kerneldir/build/include/generated/.vdso64-offsets.h.cmd 
+        rm -f $kerneldir/build/include/generated/.vdso64-offsets.h.cmd
     )
 
     # now grab the chunks from the source tree that we need
@@ -156,6 +158,11 @@ do_install() {
         # Remove as we else would ned to RDEPEND on make
         rm $kerneldir/build/scripts/package/debian/rules 2>/dev/null || :
 
+        # tools/include is needed by the archscripts host tools that
+        # 'make scripts prepare' rebuilds on target (e.g. x86 vdso2c) and
+	# not checked against objtool as it previously was.
+        cp -a --parents tools/include/* $kerneldir/build/
+
         # if our build dir had objtool, it will also be rebuilt on target, so
         # we copy what is required for that build
         if [ -f ${B}/tools/objtool/objtool ]; then
@@ -171,10 +178,20 @@ do_install() {
             cp -a --parents tools/lib/* $kerneldir/build/
             cp -a --parents tools/lib/subcmd/* $kerneldir/build/
 
-            cp -a --parents tools/include/* $kerneldir/build/
-
             cp -a --parents $(find tools/arch/${ARCH}/ -type f) $kerneldir/build/
         fi
+
+        # For v5.2+ when BTF is enabled, scripts prepare may rebuild the
+        # resolve_btfids host tool. Copy the minimal sources it needs instead
+        # of coupling this recipe to a specific kernel CONFIG_ symbol.
+        cp -a --parents tools/bpf/resolve_btfids/* $kerneldir/build/ 2>/dev/null || :
+        cp -a --parents tools/lib/bpf/* $kerneldir/build/ 2>/dev/null || :
+        cp -a --parents tools/lib/subcmd/* $kerneldir/build/ 2>/dev/null || :
+        cp -a --parents tools/lib/ctype.c tools/lib/rbtree.c tools/lib/str_error_r.c \
+            tools/lib/string.c tools/lib/zalloc.c $kerneldir/build/ 2>/dev/null || :
+        cp -a --parents tools/build/Build.include tools/build/Build tools/build/fixdep.c \
+            tools/scripts/Makefile.arch tools/scripts/Makefile.include \
+            tools/scripts/utilities.mak $kerneldir/build/ 2>/dev/null || :
 
         if [ "${ARCH}" = "arm64" ]; then
             # arch/arm64/include/asm/xen references arch/arm
@@ -207,6 +224,9 @@ do_install() {
             # 6.12+
             cp -a --parents arch/arm64/tools/syscall_64.tbl $kerneldir/build/   2>/dev/null || :
             cp -a --parents arch/arm64/tools/syscall_32.tbl $kerneldir/build/   2>/dev/null || :
+
+            # 7.0+
+            cp -a --parents arch/arm64/tools/gen-kernel-hwcaps.sh $kerneldir/build/   2>/dev/null || :
 
             if [ -e $kerneldir/build/arch/arm64/tools/gen-cpucaps.awk ]; then
                  sed -i -e "s,#!.*awk.*,#!${USRBINPATH}/env awk," $kerneldir/build/arch/arm64/tools/gen-cpucaps.awk
@@ -309,6 +329,9 @@ do_install() {
             cp -a --parents arch/x86/tools/relocs.c $kerneldir/build/
             cp -a --parents arch/x86/tools/relocs_common.c $kerneldir/build/
             cp -a --parents arch/x86/tools/relocs.h $kerneldir/build/
+            # v7.2+ archscripts also builds the vdso2c host tool
+            cp -a --parents arch/x86/tools/vdso2c.c $kerneldir/build/ 2>/dev/null || :
+            cp -a --parents arch/x86/tools/vdso2c.h $kerneldir/build/ 2>/dev/null || :
             cp -a --parents arch/x86/tools/gen-insn-attr-x86.awk $kerneldir/build/ 2>/dev/null || :
             cp -a --parents arch/x86/tools/cpufeaturemasks.awk $kerneldir/build/ 2>/dev/null || :
             cp -a --parents arch/x86/purgatory/purgatory.c $kerneldir/build/
@@ -352,6 +375,9 @@ do_install() {
         cp -a --parents kernel/sched/stats.h $kerneldir/build 2>/dev/null || :
         cp -a --parents kernel/sched/ext.h $kerneldir/build 2>/dev/null || :
         cp -a --parents kernel/workqueue_internal.h $kerneldir/build 2>/dev/null || :
+
+        # 7.1+
+        cp -a --parents kernel/sched/ext/ext.h $kerneldir/build 2>/dev/null || :
 
         if [ "${ARCH}" = "mips" ]; then
             cp -a --parents arch/mips/Kbuild.platforms $kerneldir/build/
@@ -397,6 +423,7 @@ do_install() {
 
     if [ -e "$kerneldir/build/include/config/auto.conf.cmd" ]; then
         sed -i 's/ifneq "$(CC)" ".*-linux-.*gcc.*$/ifneq "$(CC)" "gcc"/' "$kerneldir/build/include/config/auto.conf.cmd"
+        sed -i 's/ifneq "$(CC)" ".*clang.*$/ifneq "$(CC)" "clang"/' "$kerneldir/build/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(LD)" ".*-linux-.*ld.bfd.*$/ifneq "$(LD)" "ld"/' "$kerneldir/build/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(AR)" ".*-linux-.*ar.*$/ifneq "$(AR)" "ar"/' "$kerneldir/build/include/config/auto.conf.cmd"
         sed -i 's/ifneq "$(OBJCOPY)" ".*-linux-.*objcopy.*$/ifneq "$(OBJCOPY)" "objcopy"/' "$kerneldir/build/include/config/auto.conf.cmd"

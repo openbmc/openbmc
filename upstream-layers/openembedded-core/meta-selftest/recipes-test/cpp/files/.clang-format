@@ -1,0 +1,42 @@
+---
+# Copyright OpenEmbedded Contributors
+#
+# SPDX-License-Identifier: MIT
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++17
+
+IndentWidth: 4
+UseTab: Never
+ColumnLimit: 100
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterClass: true
+  AfterStruct: true
+  AfterEnum: true
+  AfterUnion: true
+  AfterNamespace: false
+  AfterControlStatement: Never
+  BeforeElse: false
+  BeforeCatch: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+AlwaysBreakAfterReturnType: None
+IndentCaseLabels: true
+NamespaceIndentation: None
+AccessModifierOffset: -4
+
+PointerAlignment: Right
+ReferenceAlignment: Right
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+
+SortIncludes: false
+IncludeBlocks: Preserve

@@ -3,8 +3,8 @@ DESCRIPTION = "GnuPG Made Easy (GPGME) is a library designed to make access to G
 HOMEPAGE = "http://www.gnupg.org/gpgme.html"
 BUGTRACKER = "https://bugs.g10code.com/gnupg/index"
 
-LICENSE = "GPL-2.0-or-later & LGPL-2.1-or-later & GPL-3.0-or-later"
-LICENSE:${PN} = "GPL-2.0-or-later & LGPL-2.1-or-later"
+LICENSE = "GPL-2.0-or-later AND GPL-3.0-or-later AND LGPL-2.1-or-later"
+LICENSE:${PN} = "GPL-2.0-or-later AND LGPL-2.1-or-later"
 LICENSE:${PN}-tool = "GPL-3.0-or-later"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=94d55d512a9ba36caa9b7df079bae19f \

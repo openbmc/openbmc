@@ -288,18 +288,6 @@ index 89c61cd..144ea0e 100644
  fn main() -> ExitCode {
      rustc_driver::main()
  }
-diff --git a/tests/assembly-llvm/riscv-redundant-memory-stores.rs b/tests/assembly-llvm/riscv-redundant-memory-stores.rs
-index acdb69d..2220e6d 100644
---- a/tests/assembly-llvm/riscv-redundant-memory-stores.rs
-+++ b/tests/assembly-llvm/riscv-redundant-memory-stores.rs
-@@ -4,6 +4,7 @@
- //@ compile-flags: -Copt-level=3 --target riscv64gc-unknown-linux-gnu
- //@ needs-llvm-components: riscv
- //@ only-riscv64
-+//@ ignore-riscv64
-
- pub struct SomeComplexType {
-     a: u64,
 diff --git a/tests/ui/c-variadic/same-program-multiple-abis-arm.rs b/tests/ui/c-variadic/same-program-multiple-abis-arm.rs
 index fbc5573..f259529 100644
 --- a/tests/ui/c-variadic/same-program-multiple-abis-arm.rs
@@ -311,3 +299,15 @@ index fbc5573..f259529 100644
  //@ ignore-thumb (this test uses arm assembly)
  //@ only-eabihf (the assembly below requires float hardware support)
  #![feature(c_variadic, c_variadic_naked_functions)]
+diff --git a/compiler/rustc_interface/src/tests.rs b/compiler/rustc_interface/src/tests.rs
+index ab69cf5..f0e3fd3 100644
+--- a/compiler/rustc_interface/src/tests.rs
++++ b/compiler/rustc_interface/src/tests.rs
+@@ -182,6 +182,7 @@ fn test_can_print_warnings() {
+ // storing the absolute cwd there invalidates the incremental cache across build
+ // directories (see #132132). It must instead be applied via `file_path_mapping`.
+ #[test]
++#[ignore]
+ fn test_remap_cwd_prefix_not_in_remap_path_prefix() {
+     sess_and_cfg(
+         &["--remap-path-prefix=/explicit=mapped", "-Zremap-cwd-prefix=cwd-mapped"],

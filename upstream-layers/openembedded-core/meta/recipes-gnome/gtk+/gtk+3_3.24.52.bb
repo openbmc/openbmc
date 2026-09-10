@@ -13,7 +13,7 @@ CVE_PRODUCT = "gnome:gtk gtk:gtk+"
 
 DEPENDS = "glib-2.0 cairo pango atk jpeg libpng gdk-pixbuf gdk-pixbuf-native"
 
-LICENSE = "LGPL-2.0-only & LGPL-2.0-or-later & LGPL-2.1-or-later"
+LICENSE = "LGPL-2.0-only AND LGPL-2.0-or-later AND LGPL-2.1-or-later"
 
 GNOMEBN = "gtk"
 

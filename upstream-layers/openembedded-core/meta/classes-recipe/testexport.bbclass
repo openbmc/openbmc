@@ -117,9 +117,10 @@ def copy_needed_files(d, tc):
             shutil.copy2(src, dst)
 
     # layer specific files/dirs
-    layer_files_to_copy = [ os.path.join('lib', 'oeqa', 'core'),
-                      os.path.join('lib', 'oeqa', 'runtime'),
+    layer_files_to_copy = [ os.path.join('lib', 'oe'),
+                      os.path.join('lib', 'oeqa', 'core'),
                       os.path.join('lib', 'oeqa', 'files'),
+                      os.path.join('lib', 'oeqa', 'runtime'),
                       os.path.join('lib', 'oeqa', 'utils'),]
     for layer in bblayers:
         meta = os.path.basename(layer)

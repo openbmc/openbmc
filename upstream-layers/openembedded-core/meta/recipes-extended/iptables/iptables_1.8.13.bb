@@ -71,7 +71,7 @@ do_install:append() {
 
     # if libnftnl is included, make the iptables symlink point to the nft-based binary by default
     if ${@bb.utils.contains('PACKAGECONFIG', 'libnftnl', 'true', 'false', d)} ; then
-        ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables 
+        ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables
         ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables-save
         ln -sf ${sbindir}/xtables-nft-multi ${D}${sbindir}/iptables-restore
         # ethertypes is provided by the netbase package

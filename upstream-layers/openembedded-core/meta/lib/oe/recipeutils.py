@@ -393,7 +393,7 @@ def patch_recipe(d, fn, varvalues, patch=False, relpath='', redirect_output=None
 def copy_recipe_files(d, tgt_dir, whole_dir=False, download=True, all_variants=False):
     """Copy (local) recipe files, including both files included via include/require,
     and files referred to in the SRC_URI variable."""
-    import bb.fetch2
+    import bb.fetch
     import oe.path
 
     # FIXME need a warning if the unexpanded SRC_URI value contains variable references
@@ -404,7 +404,7 @@ def copy_recipe_files(d, tgt_dir, whole_dir=False, download=True, all_variants=F
         # Collect the local paths from SRC_URI
         srcuri = rdata.getVar('SRC_URI') or ""
         if srcuri not in uri_values:
-            fetch = bb.fetch2.Fetch(srcuri.split(), rdata)
+            fetch = bb.fetch.Fetch(srcuri.split(), rdata)
             if download:
                 fetch.download()
             for pth in fetch.localpaths():
@@ -455,7 +455,7 @@ def get_recipe_local_files(d, patches=False, archives=False):
     """Get a list of local files in SRC_URI within a recipe."""
     import oe.patch
     uris = (d.getVar('SRC_URI') or "").split()
-    fetch = bb.fetch2.Fetch(uris, d)
+    fetch = bb.fetch.Fetch(uris, d)
     # FIXME this list should be factored out somewhere else (such as the
     # fetcher) though note that this only encompasses actual container formats
     # i.e. that can contain multiple files as opposed to those that only
@@ -1011,17 +1011,17 @@ def get_recipe_pv_with_pfx_sfx(pv, uri_type):
 
 def get_recipe_upstream_version(rd, stable_upgrade=False):
     """
-        Get upstream version of recipe using bb.fetch2 methods with support for
+        Get upstream version of recipe using bb.fetch methods with support for
         http, https, ftp and git.
 
-        bb.fetch2 exceptions can be raised,
+        bb.fetch exceptions can be raised,
             FetchError when don't have network access or upstream site don't response.
             NoMethodError when uri latest_versionstring method isn't implemented.
 
         Returns a dictonary with version, repository revision, current_version, type and datetime.
         Type can be A for Automatic, M for Manual and U for Unknown.
     """
-    from bb.fetch2 import decodeurl
+    from bb.fetch import decodeurl
     from datetime import datetime
 
     ru = {}
@@ -1067,9 +1067,9 @@ def get_recipe_upstream_version(rd, stable_upgrade=False):
         ru['type'] = 'A'
         ru['datetime'] = datetime.now()
     else:
-        ud = bb.fetch2.FetchData(src_uri, rd)
+        ud = bb.fetch.FetchData(src_uri, rd)
         if rd.getVar("UPSTREAM_CHECK_COMMITS") == "1":
-            bb.fetch2.get_srcrev(rd)
+            bb.fetch.get_srcrev(rd)
             upversion = None
             revision = None
             try:
@@ -1077,7 +1077,7 @@ def get_recipe_upstream_version(rd, stable_upgrade=False):
                 upversion = pv
                 if revision != ud.revision:
                     upversion = upversion + "-new-commits-available"
-            except bb.fetch2.FetchError as e:
+            except bb.fetch.FetchError as e:
                 bb.warn("Unable to obtain latest revision: {}".format(e))
         else:
             if stable_upgrade:

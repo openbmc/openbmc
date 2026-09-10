@@ -1,0 +1,35 @@
+From ed5956d0000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 30 Jul 2026 11:28:36 +0000
+Subject: [PATCH] gio/tests/services: Fix installed service file containing
+ build path
+
+The refactoring in !5259 changed the installed service file's
+configure_file() to use the build output as input instead of the
+original .in template. Since @installed_tests_dir@ is already
+substituted in the build output, the installed version gets the
+build directory path instead of the install prefix.
+
+Use the .in template directly as input for the installed version.
+
+Closes #4011
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glib/-/commit/ed5956d]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ gio/tests/services/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gio/tests/services/meson.build b/gio/tests/services/meson.build
+index 1111111..2222222 100644
+--- a/gio/tests/services/meson.build
++++ b/gio/tests/services/meson.build
+@@ -18,7 +18,7 @@ foreach service_file_name : dbus_service_files
+     # Build a second copy of the service file for the installed
+     # version of the tests.
+     installed_service_file = configure_file(
+-      input: service_file,
++      input: service_file_name + '.in',
+       output: service_file_name + '.to-install',
+       configuration: installed_cdata,
+     )

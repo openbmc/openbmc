@@ -1,4 +1,4 @@
-From 803e6f21d3d7ef6399f6ffe58cd28fa6dc7b94e9 Mon Sep 17 00:00:00 2001
+From aa31b72c260de3f15289db8d78c9674b0cf55f7f Mon Sep 17 00:00:00 2001
 From: Peter Marko <peter.marko@siemens.com>
 Date: Mon, 26 May 2025 21:11:14 +0200
 Subject: [PATCH] Revert "cmake: Fix installation directories in
@@ -66,10 +66,10 @@ index ff6433f..b775cfe 100644
  set(LIBXML2_LIBRARIES ${LIBXML2_LIBRARY})
  set(LIBXML2_INCLUDE_DIRS ${LIBXML2_INCLUDE_DIR})
 diff --git a/meson.build b/meson.build
-index 2cfecb6..f78da31 100644
+index f8337ea..19fdbb0 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -593,9 +593,6 @@ config_cmake = configuration_data()
+@@ -594,9 +594,6 @@ config_cmake = configuration_data()
  config_cmake.set('LIBXML_MAJOR_VERSION', v_maj)
  config_cmake.set('LIBXML_MINOR_VERSION', v_min)
  config_cmake.set('LIBXML_MICRO_VERSION', v_mic)

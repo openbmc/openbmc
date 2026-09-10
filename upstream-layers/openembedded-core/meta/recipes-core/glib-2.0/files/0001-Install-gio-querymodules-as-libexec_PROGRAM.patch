@@ -1,4 +1,4 @@
-From 72a58d19ae7f80985d9c91751fd6c359464ce292 Mon Sep 17 00:00:00 2001
+From 25d6cb83b6b46181fbdad1a6f872a3788d6e4843 Mon Sep 17 00:00:00 2001
 From: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Date: Tue, 22 Mar 2016 15:14:58 +0200
 Subject: [PATCH] Install gio-querymodules as libexec_PROGRAM
@@ -9,15 +9,15 @@ renamer does not cope with library packages with files in ${bindir}
 Signed-off-by: Jussi Kukkonen <jussi.kukkonen@intel.com>
 Upstream-Status: Inappropriate [OE specific]
 ---
- gio/meson.build | 1 +
- 1 file changed, 1 insertion(+)
+ gio/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/gio/meson.build b/gio/meson.build
-index a3e6f18..c7da257 100644
+index a3e6f18..f9aa0c8 100644
 --- a/gio/meson.build
 +++ b/gio/meson.build
-@@ -1067,7 +1066,7 @@ executable('gresource', 'gresource-tool.c',
-
+@@ -1066,7 +1066,7 @@ executable('gresource', 'gresource-tool.c',
+ 
  gio_querymodules = executable('gio-querymodules', 'gio-querymodules.c', 'giomodule-priv.c',
    install : true,
 -  install_dir : multiarch_bindir,
