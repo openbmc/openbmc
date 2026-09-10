@@ -48,6 +48,20 @@
         "Continue": true
     },
     {
+        "Name": "SOC_HOT_N_CPLD",
+        "LineName": "SOC_HOT_N_CPLD",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "thermal-deassert-log@prochot_SOC_HOT_N_CPLD.service"
+            ],
+            "FALLING": [
+                "thermal-assert-log@prochot_SOC_HOT_N_CPLD.service"
+            ]
+        },
+        "Continue": true
+    },
+    {
         "Name": "ALL_POWER_OK_1",
         "LineName": "wALL_POWER_OK_1",
         "EventMon": "BOTH",
