@@ -4,11 +4,11 @@
 Introduction
 ************
 
-eSDK Introduction
-=================
+SDK/eSDK Introduction
+=====================
 
-Welcome to the Yocto Project Application Development and the Extensible
-Software Development Kit (eSDK) manual. This manual
+Welcome to the Yocto Project Application Development and
+Software Development Kits (SDK/eSDK) manual. This manual
 explains how to use both the Yocto Project extensible and standard
 SDKs to develop applications and images.
 
@@ -35,9 +35,7 @@ destined to run on some target machine. SDKs are completely
 self-contained. The binaries are linked against their own copy of
 ``libc``, which results in no dependencies on the target system. To
 achieve this, the pointer to the dynamic loader is configured at install
-time since that path cannot be dynamically altered. This is the reason
-for a wrapper around the ``populate_sdk`` and ``populate_sdk_ext``
-archives.
+time since that path cannot be dynamically altered.
 
 Another feature of the SDKs is that only one set of cross-compiler
 toolchain binaries are produced for any given architecture. This feature
@@ -47,7 +45,7 @@ environment script and contained in variables such as
 :term:`CC` and
 :term:`LD`. This reduces the space needed
 for the tools. Understand, however, that every target still needs its own
-sysroot because those binaries are target-specific.
+:term:`sysroot` because those binaries are target-specific.
 
 The SDK development environment consists of the following:
 
@@ -119,11 +117,30 @@ cross-toolchain works with a matching target sysroot.
 Sysroots
 --------
 
-The native and target sysroots contain needed headers and libraries for
+The native and target :term:`sysroots <Sysroot>` contain needed headers and libraries for
 generating binaries that run on the target architecture. The target
 sysroot is based on the target root filesystem image that is built by
 the OpenEmbedded build system and uses the same metadata configuration
 used to build the cross-toolchain.
+
+However, the extensible and standard SDKs :term:`sysroots <Sysroot>` differ in content:
+
+-  The standard SDK :term:`sysroot` only contains libraries and headers for the packages
+   --- and their dependencies --- found in the :term:`TOOLCHAIN_TARGET_TASK`
+   and :term:`TOOLCHAIN_HOST_TASK` definitions, for the target and host
+   :term:`sysroots <sysroot>` respectively.
+
+   See :doc:`/sdk-manual/appendix-obtain` to learn how to build it and
+   :doc:`/sdk-manual/appendix-customizing-standard` to learn how to customize
+   it.
+
+-  The extensible SDK :term:`sysroot` is completely managed by the :doc:`devtool
+   </ref-manual/devtool-reference>` command-line tool, and its content is the
+   same as the :term:`sysroot` of the image recipe for which the SDK was built.
+
+   See :doc:`/sdk-manual/appendix-obtain` to learn how to build it and
+   :doc:`/sdk-manual/appendix-customizing` to learn how to customize
+   it.
 
 The QEMU Emulator
 -----------------

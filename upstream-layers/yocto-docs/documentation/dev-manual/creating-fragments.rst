@@ -13,9 +13,9 @@ This section will describe how to create new fragments for your builds.
 
 There are two kinds of configuration fragments:
 
--  Standard :term:`Configuration Fragments <Configuration Fragment>` which a
+-  Standard :term:`Configuration Fragments <Configuration Fragment>` which are
    stored in a file. These fragments include a summary and a description,
-   following by configuration statements.
+   followed by configuration statements.
 
 -  :term:`Built-in Fragments <Built-in Fragment>` which can be used to assign a
    value to a single variable and do not require a separate definition file.

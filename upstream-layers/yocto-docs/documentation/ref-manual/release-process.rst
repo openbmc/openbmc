@@ -210,6 +210,8 @@ following criteria:
    third part (e.g. ``2.41.3`` to ``2.41.4``) are stable point releases.
    Similarly, systemd maintains ``stable/v259-stable``.
 
+And at least one of the following:
+
 2. **Upstream maintainer confirmation** --- the upstream project's maintainer
    explicitly confirms that a bump in a certain part of the version is
    bug-fix only.
@@ -271,8 +273,8 @@ upgrade to the following :term:`LTS` release.
 
 The currently supported :term:`LTS` releases are:
 
+-  Version 6.0 ("Wrynose"), released in May 2026 and supported until April 2030.
 -  Version 5.0 ("Scarthgap"), released in April 2024 and supported until April 2028.
--  Version 4.0 ("Kirkstone"), released in May 2022 and supported until May 2026.
 
 See :yocto_wiki:`/Stable_Release_and_LTS` for details about the management
 of stable and :term:`LTS` releases.

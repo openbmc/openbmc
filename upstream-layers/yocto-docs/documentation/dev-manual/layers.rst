@@ -32,7 +32,7 @@ Follow these general steps to create your layer without using tools:
 
    .. note::
 
-      For information on BSP layers, see the ":ref:`bsp-guide/bsp:bsp layers`"
+      For information on BSP layers, see the ":ref:`bsp-manual/bsp:bsp layers`"
       section in the Yocto Project Board Specific (BSP) Developer's Guide.
 
 #. *Create a new Layer:* Create the directory for your layer. The
@@ -166,7 +166,7 @@ Follow these general steps to create your layer without using tools:
    .. note::
 
       For an explanation of layer hierarchy that is compliant with the
-      Yocto Project, see the ":ref:`bsp-guide/bsp:example filesystem layout`"
+      Yocto Project, see the ":ref:`bsp-manual/bsp:example filesystem layout`"
       section in the Yocto Project Board Support Package (BSP) Developer's Guide.
 
 #. *Optionally Test for Compatibility:* If you want permission to use
@@ -252,7 +252,7 @@ following list:
          KERNEL_CC:append:arc = " ${TOOLCHAIN_OPTIONS}"
          KERNEL_LD:append:arc = " ${TOOLCHAIN_OPTIONS}"
 
-         KERNEL_FEATURES:append:qemuall=" features/debug/printk.scc"
+         KERNEL_FEATURES:append:qemuall = " features/debug/printk.scc"
 
    -  *Place Machine-Specific Files in Machine-Specific Locations:* When
       you have a base recipe, such as ``base-files.bb``, that contains a
@@ -963,13 +963,13 @@ above:
 
       Setting up source meta-intel, revision 15.0-hardknott-3.3-310-g0a96edae, branch master
       Running 'git init -q /srv/work/alex/my-build/meta-intel'
-      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin git://git.yoctoproject.org/meta-intel' in /srv/work/alex/my-build/meta-intel
+      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin https://git.yoctoproject.org/meta-intel' in /srv/work/alex/my-build/meta-intel
       Running 'git fetch -q origin || true' in /srv/work/alex/my-build/meta-intel
       Running 'git checkout -q 0a96edae609a3f48befac36af82cf1eed6786b4a' in /srv/work/alex/my-build/meta-intel
 
       Setting up source poky, revision 4.1_M1-372-g55483d28f2, branch akanavin/setup-layers
       Running 'git init -q /srv/work/alex/my-build/poky'
-      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin git://git.yoctoproject.org/poky' in /srv/work/alex/my-build/poky
+      Running 'git remote remove origin > /dev/null 2>&1; git remote add origin https://git.yoctoproject.org/poky' in /srv/work/alex/my-build/poky
       Running 'git fetch -q origin || true' in /srv/work/alex/my-build/poky
       Running 'git remote remove poky-contrib > /dev/null 2>&1; git remote add poky-contrib ssh://git@push.yoctoproject.org/poky-contrib' in /srv/work/alex/my-build/poky
       Running 'git fetch -q poky-contrib || true' in /srv/work/alex/my-build/poky

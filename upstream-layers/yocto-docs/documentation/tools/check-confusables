@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+#
+# Check documentation sources for non-ASCII typographic characters that
+# should be plain ASCII.
+#
+# Copyright (c) Vaisala Oyj. All rights reserved.
+#
+# SPDX-License-Identifier: MIT
+#
+
+import argparse
+import sys
+
+from pathlib import Path
+
+
+def parse_arguments() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Check documentation sources for non-ASCII typographic "
+                    "characters that should be plain ASCII")
+
+    parser.add_argument("files",
+                        nargs="*",
+                        type=Path,
+                        help="Specific files to check; if none are given, "
+                             "all *.rst files under --docs-dir are scanned")
+
+    parser.add_argument("-d", "--docs-dir",
+                        type=Path,
+                        default=Path(__file__).resolve().parent.parent,
+                        help="Path to documentation/ directory in yocto-docs")
+
+    return parser.parse_args()
+
+
+NO_BREAK_SPACE = "\u00a0"
+
+# Map of "confusable" characters that are frequently introduced by editors,
+# word processors or copy-pasting, to their plain ASCII replacement. These
+# look almost identical to regular ASCII but break tooling, e.g. a curly
+# quote in a recipe example causes:
+#
+#   ERROR: ParseError ...: unparsed line: 'RDEPENDS:${PN} = “foo”'
+#
+# Only these characters are flagged; legitimate non-ASCII such as box-drawing
+# characters used in directory trees, accented letters in contributor names
+# and CJK characters are intentionally left alone.
+CONFUSABLES = {
+    "\u2018": "'",        # LEFT SINGLE QUOTATION MARK
+    "\u2019": "'",        # RIGHT SINGLE QUOTATION MARK
+    "\u201c": '"',        # LEFT DOUBLE QUOTATION MARK
+    "\u201d": '"',        # RIGHT DOUBLE QUOTATION MARK
+    "\u2032": "'",        # PRIME
+    "\u2033": '"',        # DOUBLE PRIME
+    "\u2013": "-",        # EN DASH
+    "\u2014": "--",       # EM DASH
+    "\u2010": "-",        # HYPHEN
+    "\u2011": "-",        # NON-BREAKING HYPHEN
+    "\u2212": "-",        # MINUS SIGN
+    NO_BREAK_SPACE: " ",  # NO-BREAK SPACE
+    "\u202f": " ",        # NARROW NO-BREAK SPACE
+    "\u200b": "",         # ZERO WIDTH SPACE
+    "\ufeff": "",         # ZERO WIDTH NO-BREAK SPACE / BOM
+    "\u00ad": "",         # SOFT HYPHEN
+}
+
+
+def is_box_drawing(char: str) -> bool:
+    # Box Drawing Unicode block (U+2500..U+257F), used for the directory
+    # trees rendered in the manuals.
+    return "\u2500" <= char <= "\u257f"
+
+
+def check_file(path: Path) -> bool:
+    found = False
+
+    with open(path, "r", encoding="utf-8") as f:
+        for lineno, line in enumerate(f, start=1):
+            # The tree(1) command indents its directory listings with
+            # no-break spaces; such listings are embedded verbatim in the
+            # manuals. A no-break space is therefore tolerated on any line
+            # that also contains box-drawing characters (i.e. inside a
+            # rendered directory tree), but still flagged elsewhere.
+            in_tree = any(is_box_drawing(c) for c in line)
+            for col, char in enumerate(line, start=1):
+                if char not in CONFUSABLES:
+                    continue
+                if char == NO_BREAK_SPACE and in_tree:
+                    continue
+                replacement = CONFUSABLES[char]
+                hint = f"'{replacement}'" if replacement else "(remove)"
+                print(f"WARNING: {path}:{lineno}:{col}: non-ASCII "
+                      f"character U+{ord(char):04X} should be "
+                      f"replaced with {hint}")
+                found = True
+
+    return found
+
+
+def main():
+
+    args = parse_arguments()
+
+    # When invoked with explicit files (e.g. by pre-commit, which passes the
+    # staged filenames) only those are checked; otherwise the whole tree of
+    # *.rst files under --docs-dir is scanned (e.g. by "make checks").
+    if args.files:
+        targets = args.files
+    else:
+        targets = sorted(args.docs_dir.rglob("*.rst"))
+
+    exit_code = 0
+    for path in targets:
+        if check_file(path):
+            exit_code = 1
+
+    sys.exit(exit_code)
+
+
+if __name__ == "__main__":
+    main()

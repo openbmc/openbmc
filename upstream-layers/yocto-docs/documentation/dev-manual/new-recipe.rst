@@ -99,14 +99,14 @@ command::
                        otherwise $EDITOR, otherwise vi.
    Use recipetool <subcommand> --help to get help on a specific command
 
-Running ``recipetool create -o OUTFILE`` creates the base recipe and
+Running ``recipetool create -o OUTFILE`` creates the base recipe and
 locates it properly in the layer that contains your source files.
 Here are some syntax examples:
 
  - Use this syntax to generate a recipe based on source. Once generated,
    the recipe resides in the existing source code layer::
 
-      recipetool create -o OUTFILE source
+      recipetool create -o OUTFILE source
 
  - Use this syntax to generate a recipe using code that
    you extract from source. The extracted code is placed in its own layer
@@ -1055,7 +1055,7 @@ correctly trigger an upgrade.
 In order to ensure the versions compare properly, the recommended
 convention is to use a tilde (``~``) character as follows::
 
-  PV = 0.8.16~rc1
+  PV = "0.8.16~rc1"
 
 This way ``0.8.16~rc1`` sorts before ``0.8.16``. See the
 ":ref:`contributor-guide/recipe-style-guide:version policy`" section in the
@@ -1656,7 +1656,7 @@ in the BitBake User Manual.
    You indicate Python code using the ``${@python_code}`` syntax for the
    variable assignment::
 
-      SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/zip${@d.getVar('PV',1).replace('.', '')}.tgz
+      SRC_URI = "ftp://ftp.info-zip.org/pub/infozip/src/zip${@d.getVar('PV',1).replace('.', '')}.tgz"
 
 -  *Shell Function Syntax:* Write shell functions as if you were writing
    a shell script when you describe a list of actions to take. You

@@ -131,11 +131,11 @@ that most themes only style these two admonitions.
 The [doc directive](https://www.sphinx-doc.org/en/master/usage/referencing.html#role-doc)
 allows to refer to another document within yocto-docs, like:
 
-    For more information, read :doc:`/bsp-guide/index`.
+    For more information, read :doc:`/bsp-manual/index`.
 
 Note that only "absolute" paths (starting with a '/') are allowed. The root
-directory of that path is documentation/, that is, :doc:`/bsp-guide/index`
-points at documentation/bsp-guide/index.rst.
+directory of that path is documentation/, that is, :doc:`/bsp-manual/index`
+points at documentation/bsp-manual/index.rst.
 
 ## Adding screenshots
 

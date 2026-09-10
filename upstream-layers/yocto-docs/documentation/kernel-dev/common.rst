@@ -81,7 +81,7 @@ section:
       see the
       ":ref:`dev-manual/layers:understanding and creating layers`"
       section in the Yocto Project Development Tasks Manual and the
-      ":ref:`bsp-guide/bsp:bsp layers`" section in the Yocto Project Board
+      ":ref:`bsp-manual/bsp:bsp layers`" section in the Yocto Project Board
       Support (BSP) Developer's Guide, respectively. For information on how to
       use the ``bitbake-layers create-layer`` command to quickly set up a layer,
       see the
@@ -176,7 +176,7 @@ section:
       see the
       ":ref:`dev-manual/layers:understanding and creating layers`"
       section in the Yocto Project Development Tasks Manual and the
-      ":ref:`bsp-guide/bsp:bsp layers`" section in the Yocto Project Board
+      ":ref:`bsp-manual/bsp:bsp layers`" section in the Yocto Project Board
       Support (BSP) Developer's Guide, respectively. For information on how to
       use the ``bitbake-layers create-layer`` command to quickly set up a layer,
       see the
@@ -207,7 +207,7 @@ section:
    ``linux-yocto-4.12`` kernel and be in the ``standard/base`` branch::
 
       $ cd ~
-      $ git clone git://git.yoctoproject.org/linux-yocto-4.12 --branch standard/base
+      $ git clone https://git.yoctoproject.org/linux-yocto-4.12 --branch standard/base
       Cloning into 'linux-yocto-4.12'...
       remote: Counting objects: 6097195, done.
       remote: Compressing objects: 100% (901026/901026), done.
@@ -233,7 +233,7 @@ section:
    ``yocto-kernel-cache`` and switch to the ``yocto-4.12`` branch::
 
       $ cd ~
-      $ git clone git://git.yoctoproject.org/yocto-kernel-cache --branch yocto-4.12
+      $ git clone https://git.yoctoproject.org/yocto-kernel-cache --branch yocto-4.12
       Cloning into 'yocto-kernel-cache'...
       remote: Counting objects: 22639, done.
       remote: Compressing objects: 100% (9761/9761), done.
@@ -369,7 +369,7 @@ your layer in the following area::
 .. note::
 
    If you are working on a new machine Board Support Package (BSP), be
-   sure to refer to the :doc:`/bsp-guide/index`.
+   sure to refer to the :doc:`/bsp-manual/index`.
 
 As an example, consider the following append file used by the BSPs in
 ``meta-yocto-bsp``:
@@ -577,7 +577,7 @@ applies the new configuration before building the kernel.
 For a detailed example showing how to configure the kernel, see the
 ":ref:`kernel-dev/common:configuring the kernel`" section.
 
-Using an "In-Tree"  ``defconfig`` File
+Using an "In-Tree"  ``defconfig`` File
 --------------------------------------
 
 It might be desirable to have kernel configuration fragment support
@@ -653,21 +653,6 @@ the ":ref:`kernel-dev/common:getting ready to develop using ``devtool```" Sectio
    Use the following ``devtool`` command to check out the code::
 
       $ devtool modify linux-yocto
-
-   .. note::
-
-      During the checkout operation, there is a bug that could cause
-      errors such as the following:
-
-      .. code-block:: none
-
-              ERROR: Taskhash mismatch 2c793438c2d9f8c3681fd5f7bc819efa versus
-                     be3a89ce7c47178880ba7bf6293d7404 for
-                     /path/to/esdk/layers/openembedded-core/meta/recipes-kernel/linux/linux-yocto_4.10.bb.do_unpack
-
-
-      You can safely ignore these messages. The source code is correctly
-      checked out.
 
 #. *Edit the Source Files* Follow these steps to make some simple
    changes to the source files:
@@ -973,7 +958,7 @@ possible.
 For more information on kernel configuration, see the
 ":ref:`kernel-dev/common:changing the configuration`" section.
 
-Using  ``menuconfig``
+Using  ``menuconfig``
 ---------------------
 
 The easiest way to define kernel configurations is to set them through
@@ -1079,7 +1064,7 @@ kernel layer.
    Be sure to make a copy of the ``.config`` file and do not just rename it.
    The build system needs an existing ``.config`` file from which to work.
 
-Creating a  ``defconfig`` File
+Creating a  ``defconfig`` File
 ------------------------------
 
 A ``defconfig`` file in the context of the Yocto Project is often a
@@ -1708,12 +1693,12 @@ Showing a Particular Feature or Branch Change
 ---------------------------------------------
 
 Tags in the Yocto Project kernel tree divide changes for significant
-features or branches. The ``git show`` tag command shows changes based
+features or branches. The ``git show`` tag command shows changes based
 on a tag. Here is an example that shows ``systemtap`` changes::
 
    $ git show systemtap
 
-You can use the ``git branch --contains`` tag command to
+You can use the ``git branch --contains`` tag command to
 show the branches that contain a particular feature. This command shows
 the branches that contain the ``systemtap`` feature::
 

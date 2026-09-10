@@ -517,7 +517,7 @@ Deploying Your Software on the Target Machine
 Use the ``devtool deploy-target`` command to deploy the recipe's build
 output to the live target machine::
 
-   $ devtool deploy-target recipe target
+   $ devtool deploy-target recipe target
 
 The target is the address of the target machine, which must be running
 an SSH server (i.e. ``user@hostname[:destdir]``).
@@ -588,7 +588,7 @@ command to work, you must have previously used the
 ":ref:`devtool deploy-target <ref-manual/devtool-reference:deploying your software on the target machine>`"
 command::
 
-   $ devtool undeploy-target recipe target
+   $ devtool undeploy-target recipe target
 
 The target is the
 address of the target machine, which must be running an SSH server (i.e.

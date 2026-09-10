@@ -49,6 +49,7 @@ Yocto Project Development Tasks Manual
    wayland
    qemu
    bblock
+   sstate-mirrors-setup
    hashequivserver
 
 .. include:: /boilerplate.rst

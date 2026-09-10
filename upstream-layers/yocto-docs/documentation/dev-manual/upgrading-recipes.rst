@@ -73,7 +73,7 @@ The following steps describe how to set up the AUH utility:
    onto your development host. The following command uses Git to create
    a local copy of the repository on your system::
 
-      $ git clone git://git.yoctoproject.org/auto-upgrade-helper
+      $ git clone https://git.yoctoproject.org/auto-upgrade-helper
       Cloning into 'auto-upgrade-helper'... remote: Counting objects: 768, done.
       remote: Compressing objects: 100% (300/300), done.
       remote: Total 768 (delta 499), reused 703 (delta 434)
@@ -237,7 +237,7 @@ repository that you use during build operations. Because you have built the
 recipe in the past, the layer is likely added to your
 configuration already. If for some reason, the layer is not added, you
 could add it easily using the
-":ref:`bitbake-layers <bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script>`"
+":ref:`bitbake-layers <bsp-manual/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script>`"
 script. For example, suppose you use the ``nano.bb`` recipe from the
 ``meta-oe`` layer in the ``meta-openembedded`` repository. For this
 example, assume that the layer has been cloned into following area::

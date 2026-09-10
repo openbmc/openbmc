@@ -2929,7 +2929,7 @@ system and gives an overview of their function and contents.
         - "read-only-rootfs" --- creates an image whose root filesystem is
           read-only. See the
           ":ref:`security-manual/read-only-rootfs:creating a read-only root filesystem`"
-          section in the Yocto Project Development Tasks Manual for more
+          section in the Yocto Project Security Manual for more
           information
         - "tools-debug" --- adds debugging tools such as gdb and strace.
         - "tools-sdk" --- adds development tools such as gcc, make,
@@ -3285,7 +3285,7 @@ system and gives an overview of their function and contents.
       :ref:`ref-classes-base` class found in ``meta/classes-global`` in
       :term:`OpenEmbedded-Core (OE-Core)`::
 
-         FILESPATH = "${@base_set_filespath(["${FILE_DIRNAME}/${BP}", \
+         FILESPATH = "${@oe.utils.base_set_filespath(["${FILE_DIRNAME}/${BP}", \
              "${FILE_DIRNAME}/${BPN}", "${FILE_DIRNAME}/files"], d)}"
 
       The
@@ -3667,7 +3667,9 @@ system and gives an overview of their function and contents.
          FIT_LOADABLE_OS[tee] = "tee"
          FIT_LOADABLE_LOADADDRESS[tee] = "0x96000000"
 
-      and will be converted to the following FIT source::
+      and will be converted to the following FIT source:
+
+      .. code-block:: devicetree
 
          images {
                  atf {
@@ -3954,10 +3956,6 @@ system and gives an overview of their function and contents.
 
       For information on the standard Linux shell command
       ``groupadd``, see :manpage:`groupadd(8)`.
-
-   :term:`GROUPMEMS_PARAM`
-      Deprecated in favor of :term:`USERMOD_PARAMS`. See
-      :ref:`ref-migration-6-1-groupmems` for more information.
 
    :term:`GRUB_GFXSERIAL`
       Configures the GNU GRand Unified Bootloader (GRUB) to have graphics
@@ -4806,6 +4804,12 @@ system and gives an overview of their function and contents.
       - ``GPL-3.0*``: ``GPL-3.0-only``, ``GPL-3.0-or-later``
       - ``LGPL-3.0*``: ``LGPL-3.0-only``, ``LGPL-3.0-or-later``
 
+      If a license in :term:`LICENSE` has an exception listed using the
+      ``WITH`` operator, the license will still match this variable and the
+      license will not be allowed. To explicitly allow an SPDX license
+      exception to a license, the exception must be listed in
+      :term:`INCOMPATIBLE_LICENSE_EXCEPTIONS`
+
       .. note::
 
          This functionality is only regularly tested using the following
@@ -4819,12 +4823,12 @@ system and gives an overview of their function and contents.
          are required to produce a functional system image.
 
    :term:`INCOMPATIBLE_LICENSE_EXCEPTIONS`
-      Specifies a space-separated list of package and license pairs that
-      are allowed to be used even if the license is specified in
-      :term:`INCOMPATIBLE_LICENSE`. The package and license pairs are
-      separated using a colon. Example::
+      Specifies a space-separated list of package and SPDX license or SPDX
+      license exception pairs that are allowed to be used even if the license
+      is specified in :term:`INCOMPATIBLE_LICENSE`. The package and license
+      pairs are separated using a colon. Example::
 
-         INCOMPATIBLE_LICENSE_EXCEPTIONS = "gdbserver:GPL-3.0-only gdbserver:LGPL-3.0-only"
+         INCOMPATIBLE_LICENSE_EXCEPTIONS = "gdbserver:GPL-3.0-only gdbserver:LGPL-3.0-only gcc:GCC-exception-3.1"
 
    :term:`INHERIT`
       Causes the named class or classes to be inherited globally. Anonymous
@@ -5559,7 +5563,7 @@ system and gives an overview of their function and contents.
          KERNEL_EXTRA_FEATURES ?= "features/netfilter/netfilter.scc features/taskstats/taskstats.scc"
          KERNEL_FEATURES:append = " ${KERNEL_EXTRA_FEATURES}"
          KERNEL_FEATURES:append:qemuall = " cfg/virtio.scc"
-         KERNEL_FEATURES:append:qemux86 = "  cfg/sound.scc cfg/paravirt_kvm.scc"
+         KERNEL_FEATURES:append:qemux86 = " cfg/sound.scc cfg/paravirt_kvm.scc"
          KERNEL_FEATURES:append:qemux86-64 = " cfg/sound.scc"
 
    :term:`KERNEL_FIT_LINK_NAME`
@@ -5945,27 +5949,24 @@ system and gives an overview of their function and contents.
 
    :term:`LICENSE`
       This is a required field in an OpenEmbedded recipe file, and should
-      contain a list of source licenses for the recipe. Follow these rules:
+      contain a :term:`SPDX License Expression` that describes the source
+      license(s) for the recipe. Keep in mind a few rules:
 
-      -  Do not use spaces within individual license names.
+      -  Separate license name using ``OR`` when there is a choice between
+         licenses
 
-      -  Separate license names using \| (pipe) when there is a choice
-         between licenses.
+      -  Separate license names using ``AND`` when multiple licenses apply to
+         different parts of the source code
 
-      -  Separate license names using & (ampersand) when there are
-         multiple licenses for different parts of the source.
+      -  All licenses must be valid `SPDX License Identifiers <https://spdx.org/licenses/>`__
 
-      -  You can use spaces between license names.
-
-      -  For standard licenses, use the names of the files in
-         ``meta/files/common-licenses/`` or the
-         :term:`SPDXLICENSEMAP` flag names defined in
-         ``meta/conf/licenses.conf``.
+      -  Any License that does not come from the `SPDX License List <https://spdx.org/licenses/>`__
+         must be prefixed with ``LicenseRef-``.
 
       Here are some examples::
 
-         LICENSE = "LGPL-2.1-only | GPL-3.0-only"
-         LICENSE = "MPL-1.0 & LGPL-2.1-only"
+         LICENSE = "LGPL-2.1-only OR GPL-3.0-only"
+         LICENSE = "MPL-1.0 AND LGPL-2.1-only"
          LICENSE = "GPL-2.0-or-later"
 
       The first example is from the
@@ -5981,15 +5982,14 @@ system and gives an overview of their function and contents.
       but has accompanying documentation licensed under the GNU Free
       Documentation License 1.2 could be specified as follows::
 
-         LICENSE = "GFDL-1.2 & GPL-2.0-only"
+         LICENSE = "GFDL-1.2 AND GPL-2.0-only"
          LICENSE:${PN} = "GPL-2.0.only"
          LICENSE:${PN}-doc = "GFDL-1.2"
 
       .. note::
 
          A recipe's :term:`LICENSE` value must be accompanied by an associated
-         :term:`LIC_FILES_CHKSUM` value, except in the special case where
-         the :term:`LICENSE` value is set to "CLOSED".
+         :term:`LIC_FILES_CHKSUM` value.
 
    :term:`LICENSE_CREATE_PACKAGE`
       Setting :term:`LICENSE_CREATE_PACKAGE` to "1" causes the OpenEmbedded
@@ -7166,6 +7166,53 @@ system and gives an overview of their function and contents.
       install, the build system does not generate an error. This variable
       is generally not user-defined.
 
+   :term:`PACKAGE_NO_LOCALE`
+      The :term:`PACKAGE_NO_LOCALE` variable can be set to "1" to prevent the
+      :term:`OpenEmbedded Build System` from splitting the locales found in the
+      :term:`PKGD` directory into split packages.
+
+      For example, the ``quilt`` recipe automatically produces split packages
+      after the :ref:`ref-tasks-package` task is run. Taking a look inside the
+      :term:`WORKDIR` directory of ``quilt``:
+
+      .. code-block:: console
+
+         $ ls -1 packages-split/
+         guards
+         guards-doc
+         quilt
+         quilt-dbg
+         quilt-dev
+         quilt-doc
+         quilt-locale-de
+         quilt-locale-fr
+         quilt-locale-ja
+         quilt-locale-ru
+         quilt-ptest
+         quilt-src
+         quilt-staticdev
+
+      We can see the ``quilt-locale-*`` packages were automatically generated.
+      Setting :term:`PACKAGE_NO_LOCALE` to "1" would produce the following
+      packages:
+
+      .. code-block:: console
+
+         $ ls -1 packages-split/
+         guards
+         guards-doc
+         quilt
+         quilt-dbg
+         quilt-dev
+         quilt-doc
+         quilt-locale
+         quilt-ptest
+         quilt-src
+         quilt-staticdev
+
+      The ``quilt-locale`` package contains the merged content of the previous
+      ``quilt-locale-*`` packages.
+
    :term:`PACKAGE_PREPROCESS_FUNCS`
       Specifies a list of functions run to pre-process the
       :term:`PKGD` directory prior to splitting the files out
@@ -7312,6 +7359,12 @@ system and gives an overview of their function and contents.
       :term:`PACKAGECONFIG` but not a class that handles the
       :ref:`ref-tasks-configure` task, then you need to use
       :term:`PACKAGECONFIG_CONFARGS` appropriately.
+
+   :term:`PACKAGEFUNCS`
+      The :term:`PACKAGEFUNCS` variable holds a list of functions which are
+      executed to process metadata based on split packages found in the
+      :term:`PKGDEST` directory. These functions are executed in the
+      :ref:`ref-classes-package` class in the order found in the list.
 
    :term:`PACKAGEGROUP_DISABLE_COMPLEMENTARY`
       For recipes inheriting the :ref:`ref-classes-packagegroup` class, setting
@@ -7843,7 +7896,8 @@ system and gives an overview of their function and contents.
              git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
              ftp://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
              http://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
-             https://.*/.* &YOCTO_DL_URL;/mirror/sources/"
+             https://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+         "
 
       These changes cause the
       build system to intercept Git, FTP, HTTP, and HTTPS requests and
@@ -8083,6 +8137,25 @@ system and gives an overview of their function and contents.
       replaces the ``@CLIENT@`` and ``@GATEWAY@`` place holders by the IP and
       the gateway address of the QEMU guest.
 
+   :term:`QB_DEFAULT_BIOS`
+      The :term:`QB_DEFAULT_BIOS` variable can be used to provide a default
+      value for the path of a file located in :term:`DEPLOY_DIR_IMAGE` and
+      used by ``runqemu`` to specify the `-bios <https://www.qemu.org/docs/master/system/invocation.html#hxtool-8>`__
+      option of QEMU. For example, this variable can be set as follows to
+      emulate U-Boot for the :oecore_path:`qemuarm64 <meta/conf/machine/qemuarm64.conf>`
+      machine::
+
+         QB_DEFAULT_BIOS = "u-boot.bin"
+
+      The above example makes the assumption the U-Boot recipe was built
+      and that the ``u-boot.bin`` is deployed in the :term:`DEPLOY_DIR_IMAGE`
+      directory.
+
+      .. note::
+
+         When using ``runqemu``, the ``BIOS`` environment variable takes
+         precedence over this variable.
+
    :term:`QB_DEFAULT_FSTYPE`
 
       The :term:`QB_DEFAULT_FSTYPE` variable controls the default filesystem
@@ -8186,12 +8259,12 @@ system and gives an overview of their function and contents.
    :term:`QB_SMP`
 
       When using ``runqemu``, the :term:`QB_SMP` variable controls
-      amount of CPU cores made availalble inside the QEMU guest, each mapped to
+      amount of CPU cores made available inside the QEMU guest, each mapped to
       a thread on the host.
 
       For example::
 
-         QB_SMP = "-smp 8".
+         QB_SMP = "-smp 8"
 
    :term:`QB_TAP_NAMESERVER`
 
@@ -10100,53 +10173,6 @@ system and gives an overview of their function and contents.
       cache (sstate-cache) results from previous builds. The sstate-cache
       you point to can also be from builds on other machines.
 
-      When pointing to sstate build artifacts on another machine that uses
-      a different GCC version for native builds, you must configure
-      :term:`SSTATE_MIRRORS` with a regular expression that maps local search
-      paths to server paths. The paths need to take into account
-      :term:`NATIVELSBSTRING` set by the :ref:`ref-classes-uninative` class.
-      For example, the following maps the local search path ``universal-4.9``
-      to the server-provided path server_url_sstate_path::
-
-         SSTATE_MIRRORS ?= "file://universal-4.9/(.*) https://server_url_sstate_path/universal-4.8/\1"
-
-      If a mirror uses the same structure as
-      :term:`SSTATE_DIR`, you need to add "PATH" at the
-      end as shown in the examples below. The build system substitutes the
-      correct path within the directory structure::
-
-         SSTATE_MIRRORS ?= "\
-             file://.* https://someserver.tld/share/sstate/PATH;downloadfilename=PATH \
-             file://.* file:///some-local-dir/sstate/PATH"
-
-      .. note::
-
-         If the mirror is protected behind a username and password, the
-         :term:`build host` needs to be configured so the :term:`build system
-         <OpenEmbedded Build System>` is able to download the sstate cache using
-         authentication.
-
-         The recommended way to do that is by setting the following parameters
-         in ``$HOME/.netrc`` (``$HOME`` being the :term:`build host` home
-         directory)::
-
-            machine someserver.tld
-            login <user>
-            password <password>
-
-         This file requires permissions set to ``400`` or ``600`` to prevent
-         other users from reading the file::
-
-            chmod 600 "$HOME/.netrc"
-
-         Another method to configure the username and password is from the
-         URL in :term:`SSTATE_MIRRORS` directly, with the ``user`` and ``pswd``
-         parameters::
-
-            SSTATE_MIRRORS ?= "\
-                file://.* https://someserver.tld/share/sstate/PATH;user=<user>;pswd=<password>;downloadfilename=PATH \
-            "
-
       The Yocto Project actually shares the cache data objects built by its
       autobuilder::
 
@@ -10156,6 +10182,10 @@ system and gives an overview of their function and contents.
       supported by the various Poky releases, they are less likely to be
       reusable in real projects building binaries optimized for a specific
       CPU family.
+
+      See the :doc:`/dev-manual/sstate-mirrors-setup` section of the Yocto
+      Project Development Tasks Manual for details on how to setup a shared
+      state mirror.
 
    :term:`SSTATE_SCAN_FILES`
       Controls the list of files the OpenEmbedded build system scans for
@@ -11233,7 +11263,8 @@ system and gives an overview of their function and contents.
       For background information on cross-development toolchains in the
       Yocto Project development environment, see the
       ":ref:`sdk-manual/intro:the cross-development toolchain`"
-      section in the Yocto Project Overview and Concepts Manual. For
+      section in the Yocto Project Application Development and Software
+      Development Kits (SDK/eSDK) Manual. For
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
 
@@ -11293,7 +11324,8 @@ system and gives an overview of their function and contents.
       For background information on cross-development toolchains in the
       Yocto Project development environment, see the
       ":ref:`sdk-manual/intro:the cross-development toolchain`"
-      section in the Yocto Project Overview and Concepts Manual. For
+      section in the Yocto Project Application Development and Software
+      Development Kits (SDK/eSDK) Manual. For
       information on setting up a cross-development environment, see the
       :doc:`/sdk-manual/index` manual.
 
@@ -11416,7 +11448,7 @@ system and gives an overview of their function and contents.
 
          TUNE_PKGARCH:tune-core2-32 = "core2-32"
 
-   :term:`TUNECONFLICTS[feature]`
+   :term:`TUNECONFLICTS`
       Specifies CPU or Application Binary Interface (ABI) tuning features
       that conflict with feature.
 
@@ -11428,7 +11460,7 @@ system and gives an overview of their function and contents.
 
          TUNECONFLICTS[n32] = "o32 n64"
 
-   :term:`TUNEVALID[feature]`
+   :term:`TUNEVALID`
       Specifies a valid CPU or Application Binary Interface (ABI) tuning
       feature. The specified feature is stored as a flag. Valid features
       are specified in the machine include files (e.g.
@@ -11612,6 +11644,190 @@ system and gives an overview of their function and contents.
       The default is ``txt`` which means the script is installed as-is, with
       no modification.
 
+   :term:`UBOOT_EXTLINUX`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class in a
+      U-Boot recipe, the :term:`UBOOT_EXTLINUX` variable should be set to "1" to
+      enable the class functionality (inheriting the class is not enough).
+
+   :term:`UBOOT_EXTLINUX_CONF_NAME`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_CONF_NAME` variable controls the name of the
+      file used for booting, which is ``extlinux.conf`` by default.
+
+   :term:`UBOOT_EXTLINUX_CONSOLE`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_CONSOLE` variable can be set to control the
+      ``console=`` parameter of the `Linux kernel command-line
+      <https://docs.kernel.org/admin-guide/kernel-parameters.html>`__. For
+      example::
+
+         UBOOT_EXTLINUX_CONSOLE = "console=ttyS0,115200n8"
+
+      This is added to the ``APPEND`` property of the ``extlinux.conf`` file
+      used for booting.
+
+   :term:`UBOOT_EXTLINUX_DEFAULT_LABEL`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_DEFAULT_LABEL` variable can be set to the name of
+      the label to automatically boot after the timeout period (controlled with
+      :term:`UBOOT_EXTLINUX_TIMEOUT`).
+
+   :term:`UBOOT_EXTLINUX_FDT`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_FDT` variable can be set to control the ``FDT``
+      property of the ``extlinux.conf`` file used for booting, which controls
+      the Linux kernel device tree to use. For example::
+
+         UBOOT_EXTLINUX_FDT = "../am335x-bone.dtb"
+
+      .. note::
+
+         The above path is relative to the ``extlinux.conf`` file used for
+         booting. It can also be absolute, with the path being the one as stored
+         in the partition from which the ``extlinux.conf`` file is.
+
+   :term:`UBOOT_EXTLINUX_FDTDIR`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_FDTDIR` variable can be set to control the ``FDTDIR``
+      property of the ``extlinux.conf`` file used for booting, which controls
+      the directory where the Linux kernel device tree specified in the
+      ``fdtfile`` U-Boot environment variable is. For example::
+
+         UBOOT_EXTLINUX_FDTDIR = "../"
+
+      .. note::
+
+         The above path is relative to the ``extlinux.conf`` file used for
+         booting. It can also be absolute, with the path being the one as stored
+         in the partition from which the ``extlinux.conf`` file is.
+
+   :term:`UBOOT_EXTLINUX_FDTOVERLAYS`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_FDT` variable can be set to control the ``FDTOVERLAYS``
+      property of the ``extlinux.conf`` file used for booting, which controls
+      the Linux kernel device overlays tree to apply on top of the device tree.
+      For example::
+
+         UBOOT_EXTLINUX_FDTOVERLAYS = "../am335x-bone-wifi.dtbo"
+
+      .. note::
+
+         The above path is relative to the ``extlinux.conf`` file used for
+         booting. It can also be absolute, with the path being the one as stored
+         in the partition from which the ``extlinux.conf`` file is.
+
+   :term:`UBOOT_EXTLINUX_INITRD`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_INITRD` variable is optional and sets the value of
+      the ``INITRD`` property of the ``extlinux.conf`` file used for booting, if
+      the initramfs is external to the Linux kernel (see
+      :term:`INITRAMFS_IMAGE_BUNDLE`). For example::
+
+         UBOOT_EXTLINUX_INITRD = "../ramdisk.tar.zst"
+
+      .. note::
+
+         The above path is relative to the ``extlinux.conf`` file used for
+         booting. It can also be absolute, with the path being the one as stored
+         in the partition from which the ``extlinux.conf`` file is.
+
+   :term:`UBOOT_EXTLINUX_INSTALL_DIR`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_INSTALL_DIR` variable controls the name of the
+      directory where the ``extlinux.conf`` file used for booting is installed,
+      relative to the root of the partition where the directory will belong.
+
+   :term:`UBOOT_EXTLINUX_KERNEL_ARGS`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_KERNEL_ARGS` variable can be used to pass extra
+      parameters to the `Linux kernel command-line
+      <https://docs.kernel.org/admin-guide/kernel-parameters.html>`__. For
+      example::
+
+         UBOOT_EXTLINUX_KERNEL_ARGS = "rootwait ro"
+
+      This is included in the ``APPEND`` property of the ``extlinux.conf`` file
+      used for booting.
+
+   :term:`UBOOT_EXTLINUX_KERNEL_IMAGE`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_KERNEL_IMAGE` variable can be used to specify the
+      ``KERNEL`` property of the ``extlinux.conf`` file used for booting, which controls
+      the Linux kernel image to use. For example::
+
+         UBOOT_EXTLINUX_KERNEL_IMAGE = "../zImage"
+
+      .. note::
+
+         The above path is relative to the ``extlinux.conf`` file used for
+         booting. It can also be absolute, with the path being the one as stored
+         in the partition from which the ``extlinux.conf`` file is.
+
+      .. tip::
+
+         The :term:`KERNEL_IMAGETYPE` variable can be used to get the name of
+         the current Linux kernel being built by its associated recipe.
+
+   :term:`UBOOT_EXTLINUX_LABELS`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_LABELS` variable contains a list of labels
+      (``LABEL`` property of the ``extlinux.conf`` file used for booting) that
+      can be used for booting. This list must contain at least one entry, and
+      default to "linux".
+
+      When multiple labels are specified in this list, all of the
+      ``UBOOT_EXTLINUX_`` variables should be specified with overrides-style
+      assignments. For example, if the :term:`UBOOT_EXTLINUX_LABELS` variable
+      contains::
+
+         UBOOT_EXTLINUX_LABELS = "compressed uncompressed"
+
+      Then the :term:`UBOOT_EXTLINUX_KERNEL_IMAGE` variable can be specified
+      multiple times as follows::
+
+         UBOOT_EXTLINUX_KERNEL_IMAGE:compressed = "../zImage"
+         UBOOT_EXTLINUX_KERNEL_IMAGE:uncompressed = "../Image"
+
+      This will make the value of the ``KERNEL`` property be different in each
+      of the associated labels.
+
+      Note that default values are used when no overrides-style assignments are
+      found for the current label. For example, taking the above example again,
+      the following assignment would apply to both ``compressed`` and
+      ``uncompressed`` labels if and only if ``UBOOT_EXTLINUX_FDT:compressed``
+      and ``UBOOT_EXTLINUX_FDT:uncompressed`` aren't set::
+
+         UBOOT_EXTLINUX_FDT = "../am335x-bone-wifi.dtbo"
+
+   :term:`UBOOT_EXTLINUX_MENU_DESCRIPTION`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_MENU_DESCRIPTION` variable sets the value of the
+      ``LABEL`` property of the ``extlinux.conf`` file. If not specified, the
+      name of the label itself is used as the description.
+
+   :term:`UBOOT_EXTLINUX_MENU_TITLE`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_MENU_TITLE` variable sets the ``MENU TITLE``
+      property of the ``extlinux.conf`` file used for booting. This variable
+      doesn't support the overrides-style syntax described in
+      the definition of :term:`UBOOT_EXTLINUX_LABELS` as it applies to the whole
+      ``extlinux.conf`` file.
+
+   :term:`UBOOT_EXTLINUX_ROOT`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_ROOT` variable is mandatory and contains the
+      ``root=`` parameter of the `Linux kernel command-line
+      <https://docs.kernel.org/admin-guide/kernel-parameters.html>`__. For
+      example, the following would set this value to instruct the kernel to use
+      the second partition of MMC block device 0 as its root partition::
+
+         UBOOT_EXTLINUX_ROOT = "root=/dev/mmcblk0p2"
+
+   :term:`UBOOT_EXTLINUX_TIMEOUT`
+      When inheriting the :ref:`ref-classes-uboot-extlinux-config` class, the
+      :term:`UBOOT_EXTLINUX_TIMEOUT` variable is optional and sets the value of
+      the ``TIMEOUT`` property of the ``extlinux.conf`` file used for booting.
+
    :term:`UBOOT_FIT_ADDRESS_CELLS`
       Specifies the value of the ``#address-cells`` value for the
       description of the U-Boot FIT image.
@@ -11768,7 +11984,9 @@ system and gives an overview of their function and contents.
       https://fitspec.osfw.foundation/\ .
 
       The original content of the U-Boot Image Tree Source (ITS) is as
-      follows::
+      follows:
+
+      .. code-block:: devicetree
 
          images {
              uboot {
@@ -11805,7 +12023,9 @@ system and gives an overview of their function and contents.
       ``\n``.
 
       The generated content of the U-Boot Image Tree Source (ITS) is as
-      follows::
+      follows:
+
+      .. code-block:: devicetree
 
          images {
              uboot {
@@ -12324,7 +12544,7 @@ system and gives an overview of their function and contents.
 
          It follows that if you are going to use the :term:`USERADD_PACKAGES`
          variable, you need to set one or more of the :term:`USERADD_PARAM`,
-         :term:`GROUPADD_PARAM`, or :term:`GROUPMEMS_PARAM` variables.
+         :term:`GROUPADD_PARAM`, or :term:`USERMOD_PARAM` variables.
 
    :term:`USERADD_PARAM`
       When inheriting the :ref:`ref-classes-useradd` class,
@@ -12381,7 +12601,7 @@ system and gives an overview of their function and contents.
       Additionally, you should also set the
       :term:`USERADD_ERROR_DYNAMIC` variable.
 
-   :term:`USERMOD_PARAMS`
+   :term:`USERMOD_PARAM`
       When a recipe inherits the :ref:`ref-classes-useradd` class, this variable
       specifies for a package what parameters should be passed to the ``usermod``
       command if you wish to modify a user when the package is installed.

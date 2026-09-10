@@ -103,6 +103,10 @@ em {
     background: #f8f8f8;
 }
 
+section#welcome-to-the-yocto-project-documentation p.caption {
+   display: none;
+}
+
 @media screen {
     .wy-nav-content {
        max-width: 1000px;

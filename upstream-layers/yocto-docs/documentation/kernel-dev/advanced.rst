@@ -458,7 +458,7 @@ supported kernel type.
 This section overviews the BSP description structure, the aggregation
 concepts, and presents a detailed example using a BSP supported by the
 Yocto Project (i.e. BeagleBone Board). For complete information on BSP
-layer file hierarchy, see the :doc:`/bsp-guide/index`.
+layer file hierarchy, see the :doc:`/bsp-manual/index`.
 
 Description Overview
 ~~~~~~~~~~~~~~~~~~~~
@@ -741,8 +741,8 @@ Metadata to the build as a "type=kmeta" repository through the
 example, consider the following :term:`SRC_URI` statement from the
 ``linux-yocto_5.15.bb`` kernel recipe::
 
-   SRC_URI = "git://git.yoctoproject.org/linux-yocto.git;name=machine;branch=${KBRANCH};protocol=https \
-              git://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.15;destsuffix=${KMETA};protocol=https"
+   SRC_URI = "https://git.yoctoproject.org/linux-yocto.git;name=machine;branch=${KBRANCH};protocol=https \
+              https://git.yoctoproject.org/yocto-kernel-cache;type=kmeta;name=meta;branch=yocto-5.15;destsuffix=${KMETA};protocol=https"
 
 ``${KMETA}``, in this context, is simply used to name the directory into
 which the Git fetcher places the Metadata. This behavior is no different

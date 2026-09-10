@@ -94,7 +94,7 @@ Scripts and Tools Changes
    cases, they are also limited in scope. The
    ``bitbake-layers create-layer`` command is a direct replacement for
    ``yocto-layer``. See the documentation to create a BSP or kernel
-   recipe in the ":ref:`bsp-guide/bsp:bsp kernel recipe example`" section.
+   recipe in the ":ref:`bsp-manual/bsp:bsp kernel recipe example`" section.
 
 -  ``devtool finish``: ``devtool finish`` now exits with an error if
    there are uncommitted changes or a rebase/am in progress in the

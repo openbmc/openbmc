@@ -247,7 +247,7 @@ The following variables have been removed:
    built during the build. This was partly broken and hard to maintain.
 
 -  ``GPE_MIRROR``: this variable used to contain the
-   "http://gpe.linuxtogo.org/download/source" URL, but was not used by any
+   "https://web.archive.org/web/20160319203545/http://gpe.linuxtogo.org/download/source/" URL, but was not used by any
    recipe in OE-Core.
 
 Removed recipes

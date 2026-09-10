@@ -11,6 +11,7 @@ Yocto Project Security Manual
    :numbered:
 
    intro
+   build-process-security
    securing-images
    vulnerabilities
    read-only-rootfs

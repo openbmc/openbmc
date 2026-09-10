@@ -191,7 +191,7 @@ Known Issues in 4.1
 ~~~~~~~~~~~~~~~~~~~
 
 - The change to :ref:`migration-4.1-complementary-deps` means that images
-  built with the ``ptest-pkgs`` :term:`IMAGE_FEATURES` don’t automatically
+  built with the ``ptest-pkgs`` :term:`IMAGE_FEATURES` don't automatically
   install ``ptest-runner``, as that package is a recommendation of the
   individual ``-ptest`` packages.  This will be resolved in the next point
   release, and can be worked around by explicitly installing ``ptest-runner``

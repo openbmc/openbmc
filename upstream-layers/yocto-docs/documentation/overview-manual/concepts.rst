@@ -435,7 +435,7 @@ A BSP layer provides machine configurations that target specific
 hardware. Everything in this layer is specific to the machine for which
 you are building the image or the SDK. A common structure or form is
 defined for BSP layers. You can learn more about this structure in the
-:doc:`/bsp-guide/index`.
+:doc:`/bsp-manual/index`.
 
 .. note::
 
@@ -2296,7 +2296,9 @@ The contents of ``libhello/hellolib.c`` are::
       puts("Hello from a Yocto demo \n");
    }
 
-The contents of ``sayhello/Makefile`` are::
+The contents of ``sayhello/Makefile`` are:
+
+.. code-block:: make
 
    EXEC=sayhello
    LDFLAGS += -lhello

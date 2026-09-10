@@ -142,7 +142,7 @@ the following types of tests:
    built by the OpenEmbedded build system on the target machine. See the
    :ref:`Testing Packages With
    ptest <test-manual/ptest:Testing Packages With ptest>` section
-   in the Yocto Project Development Tasks Manual and the
+   in the Yocto Project Test Environment Manual and the
    ":yocto_wiki:`Ptest </Ptest>`" Wiki page for more
    information on Ptest.
 
@@ -325,7 +325,9 @@ This section provides example tests for each of the tests listed in the
 ``bitbake-selftest``
 --------------------
 
-A simple test example from ``bitbake/lib/bb/tests/data.py`` is::
+A simple test example from ``bitbake/lib/bb/tests/data.py`` is:
+
+.. code-block:: python
 
    class DataExpansions(unittest.TestCase):
       def setUp(self):
@@ -358,7 +360,9 @@ for full builds. Rather than directly using `Python unittest
 <https://docs.python.org/3/library/unittest.html>`__, the code
 wraps most of the standard objects. The tests can be simple, such as
 testing a command from within the OE build environment using the
-following example::
+following example:
+
+.. code-block:: python
 
    class BitbakeLayers(OESelftestTestCase):
       def test_bitbakelayers_showcrossdepends(self):
@@ -401,7 +405,9 @@ These tests are run once an image is up and running, either on target
 hardware or under QEMU. As a result, they are assumed to be running in a
 target image environment, as opposed to in a host build environment. A
 simple example from ``meta/lib/oeqa/runtime/cases/python.py`` contains
-the following::
+the following:
+
+.. code-block:: python
 
    class PythonTest(OERuntimeTestCase):
       @OETestDepends(['ssh.SSHTest.test_ssh'])
@@ -427,7 +433,9 @@ the image.
 
 These tests are run against built extensible SDKs (eSDKs). The tests can
 assume that the eSDK environment has already been set up. An example from
-``meta/lib/oeqa/sdk/cases/devtool.py`` contains the following::
+``meta/lib/oeqa/sdk/cases/devtool.py`` contains the following:
+
+.. code-block:: python
 
    class DevtoolTest(OESDKExtTestCase):
       @classmethod def setUpClass(cls):
@@ -460,7 +468,9 @@ the ``devtool build`` command within the eSDK.
 These tests are run against built SDKs. The tests can assume that an SDK
 has already been extracted and its environment file has been sourced. A
 simple example from ``meta/lib/oeqa/sdk/cases/python.py`` contains the
-following::
+following:
+
+.. code-block:: python
 
    class Python3Test(OESDKTestCase):
       def setUp(self):

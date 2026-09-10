@@ -192,11 +192,11 @@ Custom tasks should be sorted similarly.
 
 Package specific variables are typically grouped together, e.g.::
 
-    RDEPENDS:${PN} = “foo”
-    RDEPENDS:${PN}-libs = “bar”
+    RDEPENDS:${PN} = "foo"
+    RDEPENDS:${PN}-libs = "bar"
 
-    RRECOMMENDS:${PN} = “one”
-    RRECOMMENDS:${PN}-libs = “two”
+    RRECOMMENDS:${PN} = "one"
+    RRECOMMENDS:${PN}-libs = "two"
 
 Recipe License Fields
 ---------------------

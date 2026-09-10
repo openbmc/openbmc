@@ -243,7 +243,7 @@ Namely, it contains the distro :term:`configuration file` for Poky:
 
 This directory contains the Yocto Project reference hardware Board
 Support Packages (BSPs). For more information on BSPs, see the
-:doc:`/bsp-guide/index`.
+:doc:`/bsp-manual/index`.
 
 .. _structure-build:
 

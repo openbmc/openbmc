@@ -15,7 +15,7 @@ that the Yocto Project already supports.
    manual.
 
 For a complete example that shows how to add a new machine, see the
-":ref:`bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
+":ref:`bsp-manual/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
 section in the Yocto Project Board Support Package (BSP) Developer's
 Guide.
 

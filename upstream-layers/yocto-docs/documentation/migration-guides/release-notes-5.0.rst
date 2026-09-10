@@ -166,7 +166,7 @@ New Features / Enhancements in 5.0
       ``meta/lib/patchtest/tests``) and make a number of improvements to enable
       it to validate patches submitted on the mailing list again. Additionally,
       make it work with the original upstream version of
-      `Patchwork <http://jk.ozlabs.org/projects/patchwork/>`__.
+      `Patchwork <https://web.archive.org/web/20250823174533/http://jk.ozlabs.org/projects/patchwork/>`__.
 
    -  Add an optional ``unimplemented-ptest`` QA warning to detect upstream
       packages with tests, that do not use ptest.

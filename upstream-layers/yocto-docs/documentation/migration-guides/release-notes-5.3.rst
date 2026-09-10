@@ -253,7 +253,8 @@ New Features / Enhancements in |yocto-ver|
       the :term:`Poky` distro.
 
    -  ``linux/generate-cve-exclusions``: use data from CVEProject instead of
-      the archived https://linuxkernelcves.com.
+      the archived https://linuxkernelcves.com (see
+      https://web.archive.org/web/20240420122324/https://www.linuxkernelcves.com/).
 
    -  ``kernel-yocto``: allow annotated options to be modified. For example if
       the following kernel configuration is set::

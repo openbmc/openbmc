@@ -164,7 +164,7 @@ to support, however there isn't wide enough interest and support to justify
 testing all incoming changes on it. There are however project member
 organisations and maintainers willing to run tests and review fixes.
 
-This category may be applicable as support/usage in an area develops and grows,
+This category may be applicable as support/usage in an area develops and grows,
 or as support/usage fades but we continue to have tests. It can also apply where
 resourcing isn't available for full primary support but there is
 member/maintainer support for running tests.
@@ -173,21 +173,21 @@ We therefore have the following criteria and policies for such items:
 
 -  It can be clearly isolated and defined by specific configuration.
 
--  There is a clear documented group of maintainers agreeing to maintain it.
+-  There is a clear documented group of maintainers agreeing to maintain it.
 
 -  Those maintainers are active and responsive.
 
 -  It is being actively and publicly tested (potentially using
-   the :ref:`Autobuilder <test-manual/intro:Yocto Project Autobuilder Overview>`
+   the :ref:`Autobuilder <test-manual/intro:Yocto Project Autobuilder Overview>`
    by agreement, or otherwise).
 
--  Testing would not be part of standard incoming change testing and regressions
+-  Testing would not be part of standard incoming change testing and regressions
    would not block incoming patches.
 
 -  The :yocto_wiki:`SWAT </Yocto_Build_Failure_Swat_Team>` team would not handle
    any test builds on the Autobuilder.
 
--  Test results can be submitted as part of the release process if desired.
+-  Test results can be submitted as part of the release process if desired.
 
 The Yocto Project :yocto_wiki:`Technical Steering Committee (TSC) </TSC>` makes
 decisions on features in this status and Autobuilder testing. Such support would

@@ -152,7 +152,7 @@ Shell functions and tasks can also be inspected with the same mechanism::
 
 For Python functions and tasks, ``bitbake -e recipename`` can be used instead.
 
-Moreover, the output of the ``bitbake -e`` and ``bitbake -e`` recipe commands
+Moreover, the output of the ``bitbake -e`` and ``bitbake -e`` recipe commands
 includes the following information:
 
 -  The output starts with a tree listing all configuration files and
@@ -187,7 +187,7 @@ Here are a few of the available ``oe-pkgdata-util`` subcommands.
    that have been built, optionally limiting the match to packages that
    match pattern.
 
--  ``oe-pkgdata-util list-pkg-files package ...``: Lists the
+-  ``oe-pkgdata-util list-pkg-files package ...``: Lists the
    files and directories contained in the given packages.
 
    .. note::
@@ -205,7 +205,7 @@ Here are a few of the available ``oe-pkgdata-util`` subcommands.
       directory, make sure that :ref:`ref-classes-rm-work` is not
       enabled when you build the recipe.
 
--  ``oe-pkgdata-util find-path path ...``: Lists the names of
+-  ``oe-pkgdata-util find-path path ...``: Lists the names of
    the packages that contain the given paths. For example, the following
    tells us that ``/usr/share/man/man1/make.1`` is contained in the
    ``make-doc`` package::
@@ -213,7 +213,7 @@ Here are a few of the available ``oe-pkgdata-util`` subcommands.
       $ oe-pkgdata-util find-path /usr/share/man/man1/make.1
       make-doc: /usr/share/man/man1/make.1
 
--  ``oe-pkgdata-util lookup-recipe package ...``: Lists the name
+-  ``oe-pkgdata-util lookup-recipe package ...``: Lists the name
    of the recipes that produce the given packages.
 
 For more information on the ``oe-pkgdata-util`` command, use the help
@@ -362,7 +362,7 @@ You can also use BitBake to dump out the signature construction
 information without executing tasks by using either of the following
 BitBake command-line options::
 
-   ‐‐dump-signatures=SIGNATURE_HANDLER
+   --dump-signatures=SIGNATURE_HANDLER
    -S SIGNATURE_HANDLER
 
 
@@ -1072,7 +1072,7 @@ debugger.
       the actual image (e.g. ``gdb-cross-i586``). The suggestion is usually the
       actual name you want to use.
 
-#. *Set up the* ``debugfs``\ *:*
+#. *Set up the* ``debugfs``\ *:*
 
    Run the following commands to set up the ``debugfs``::
 
@@ -1106,7 +1106,7 @@ debugger.
 
    .. code-block:: shell
 
-      root@qemux86:~# gdbserver localhost:1234 /bin/gzip —help
+      root@qemux86:~# gdbserver localhost:1234 /bin/gzip --help
 
    For
    additional gdbserver options, see the `GDB Server

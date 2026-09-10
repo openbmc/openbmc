@@ -132,7 +132,7 @@ Prelinking disabled by default
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Recent tests have shown that prelinking works only when PIE is not
-enabled (see `here <https://rlbl.me/prelink-1>`__ and `here <https://rlbl.me/prelink-2>`__),
+enabled (see `here <https://web.archive.org/web/20211129050029/https://embed.endfa.net/yocto-cross-prelink-1/>`__),
 and as PIE is both a desirable security feature, and the only
 configuration provided and tested by the Yocto Project, there is
 simply no sense in continuing to enable prelink.

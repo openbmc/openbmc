@@ -21,11 +21,8 @@ build a reference embedded OS called Poky.
       you want to use Yocto Project on to build an image
       (:term:`Build Host`) is not
       a native Linux system, you can still perform these steps by using
-      CROss PlatformS (CROPS) and setting up a Poky container. See the
-      :ref:`dev-manual/start:setting up to use cross platforms (crops)`
-      section
-      in the Yocto Project Development Tasks Manual for more
-      information.
+      an :wikipedia:`OCI container <Open_Container_Initiative>` (using
+      `Docker <https://www.docker.com/>`__ or `Podman <https://podman.io/>`__).
 
    -  You may use version 2 of Windows Subsystem For Linux (WSL 2) to set
       up a build host using Windows 10 or later, Windows Server 2019 or later.
@@ -84,23 +81,35 @@ Build Host Packages
    see the :ref:`ref-manual/system-requirements:required packages for the build host`
    section in the Yocto Project Reference Manual.
 
-Use Git to clone bitbake-setup
-==============================
+Install and use bitbake-setup
+=============================
 
 Once you complete the setup instructions for your machine, you need to
 get a copy of the ``bitbake-setup`` tool to set up the :term:`Poky` reference
-distribution on your build host. Use the following commands to clone
-the bitbake repository.
+distribution on your :term:`build host`. Use the following commands to install
+the tool in a Python `virtual environment <https://docs.python.org/3/library/venv.html>`__:
 
 .. code-block:: console
 
-   $ git clone https://git.openembedded.org/bitbake
+   $ python3 -m venv --clear ./bitbake-setup-venv
+   $ . ./bitbake-setup-venv/bin/activate
+   $ pip install bitbake-setup
+
+.. note::
+
+   The ``bitbake-setup`` tool is developed and maintained in :term:`BitBake`
+   repository, and so can be used directly from there:
+
+   .. code-block:: console
+
+      $ git clone https://git.openembedded.org/bitbake ./bitbake
+      $ ./bitbake/bin/bitbake-setup ...
 
 Setup a build environment with the following command:
 
 .. code-block:: console
 
-   $ ./bitbake/bin/bitbake-setup init
+   $ bitbake-setup init
 
 By default, this will set up a top directory in the current directory.
 
@@ -109,7 +118,7 @@ If you prefer to set up your builds in a different top directory, for example
 
 .. code-block:: console
 
-   $ ./bitbake/bin/bitbake-setup settings set --global default top-dir-prefix $HOME
+   $ bitbake-setup settings set --global default top-dir-prefix $HOME
 
 .. note::
 
@@ -126,9 +135,9 @@ differ from the examples below.
 
       Available Configuration Templates:
       1. oe-nodistro-master   OpenEmbedded - 'nodistro' basic configuration
-      2. oe-nodistro-&DISTRO_NAME_NO_CAP  OpenEmbedded - 'nodistro' basic configuration, release &DISTRO_RELEASE_SERIES; '&DISTRO_NAME_NO_CAP;' (supported until ...)
+      2. oe-nodistro-&DISTRO_NAME_NO_CAP;  OpenEmbedded - 'nodistro' basic configuration, release &DISTRO_RELEASE_SERIES; '&DISTRO_NAME_NO_CAP;' (supported until ...)
       3. poky-master          Poky - The Yocto Project testing distribution configurations and hardware test platforms
-      4. poky-&DISTRO_NAME_NO_CAP         Poky - The Yocto Project testing distribution configurations and hardware test platforms, release &DISTRO_RELEASE_SERIES; '&DISTRO_NAME_NO_CAP;' (supported until ...)
+      4. poky-&DISTRO_NAME_NO_CAP;         Poky - The Yocto Project testing distribution configurations and hardware test platforms, release &DISTRO_RELEASE_SERIES; '&DISTRO_NAME_NO_CAP;' (supported until ...)
 
       Please select one of the above configurations by its number: 3
 
@@ -183,7 +192,7 @@ differ from the examples below.
 
    .. code-block:: console
 
-      $ ./bitbake/bin/bitbake-setup init --non-interactive poky-master poky distro/poky machine/qemux86-64
+      $ bitbake-setup init --non-interactive poky-master poky distro/poky machine/qemux86-64
 
 The ``init`` command creates a new :term:`bitbake:Setup` in the
 :term:`bitbake:top directory`. The default name is derived from the selected

@@ -49,7 +49,7 @@ contact us with other suggestions.
    their silicon. These layers have names such as "meta-intel" or "meta-ti". Try
    not to build layers from scratch. If you do have custom silicon, use one of
    these layers as a guide or template and familiarize yourself with the
-   :doc:`/bsp-guide/index`.
+   :doc:`/bsp-manual/index`.
 
 #. **Do not put everything into one layer:**
    Use different layers to logically separate information in your build. As an
@@ -86,13 +86,13 @@ contact us with other suggestions.
    pinpoint where trouble is occurring and how the build is breaking. The
    workflow breaks down into the following steps:
 
-   #. Fetch – get the source code
-   #. Extract – unpack the sources
-   #. Patch – apply patches for bug fixes and new capability
-   #. Configure – set up your environment specifications
-   #. Build – compile and link
-   #. Install – copy files to target directories
-   #. Package – bundle files for installation
+   #. Fetch - get the source code
+   #. Extract - unpack the sources
+   #. Patch - apply patches for bug fixes and new capability
+   #. Configure - set up your environment specifications
+   #. Build - compile and link
+   #. Install - copy files to target directories
+   #. Package - bundle files for installation
 
    During "fetch", there may be an inability to find code. During "extract",
    there is likely an invalid zip or something similar. In other words, the
@@ -208,8 +208,8 @@ contact us with other suggestions.
      recipes, and configure the kernel.
 
    * **Learn About Board Support Packages (BSPs)**: If you want to learn about
-     BSPs, see the :doc:`/bsp-guide/index`. This manual also provides an
-     example BSP creation workflow. See the :doc:`/bsp-guide/bsp` section.
+     BSPs, see the :doc:`/bsp-manual/index`. This manual also provides an
+     example BSP creation workflow. See the :doc:`/bsp-manual/bsp` section.
 
    * **Learn About Toaster**: Toaster is a web interface to the Yocto Project's
      OpenEmbedded build system. If you are interested in using this type of

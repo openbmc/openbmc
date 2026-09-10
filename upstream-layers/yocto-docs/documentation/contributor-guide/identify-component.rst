@@ -1,7 +1,7 @@
 .. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
-Identify the component
-**********************
+Identifying the component
+*************************
 
 The Yocto Project and OpenEmbedded ecosystem is built of :term:`layers <Layer>`
 so the first step is to identify the component where the issue likely lies.
@@ -18,5 +18,5 @@ maintainers.
 
 If the issue is in the core metadata layer (OpenEmbedded-Core) or in BitBake,
 issues can be reported in the :yocto_bugs:`Yocto Project Bugzilla <>`. The
-:yocto_lists:`yocto </g/yocto>` mailing list is a general “catch-all” location
-where questions can be sent if you can’t work out where something should go.
+:yocto_lists:`yocto </g/yocto>` mailing list is a general "catch-all" location
+where questions can be sent if you can't work out where something should go.

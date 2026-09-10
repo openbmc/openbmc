@@ -6,22 +6,53 @@
 # list see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
+import datetime
+import importlib.util
 import os
 import re
 import sys
-import datetime
+
+from sphinx.builders.epub3 import Epub3Builder
+from sphinx.search import SearchEnglish
+from sphinx.search import languages
+
 try:
     import yaml
 except ImportError:
     sys.stderr.write("The Yocto Project Sphinx documentation requires PyYAML.\
     \nPlease make sure to install pyyaml Python package.\n")
     sys.exit(1)
+
+# -- Project information -----------------------------------------------------
+
+project = 'The Yocto Project \xae'
+copyright = '2010-%s, The Linux Foundation, CC-BY-SA-2.0-UK license' % datetime.datetime.now().year
+author = 'The Linux Foundation'
+
+# -- Path setup --------------------------------------------------------------
+
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+
+sys.path.insert(0, os.path.abspath('sphinx'))
+
+# -- General configuration ---------------------------------------------------
+
+# Prevent building with an outdated version of sphinx
+needs_sphinx = "4.0"
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+# ones.
+extensions = [
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.extlinks',
+    'sphinx.ext.intersphinx',
+    'sphinx_copybutton',
+    'sphinxcontrib.rsvgconverter',
+    'yocto-vars'
+]
 
 # current_version = "dev"
 # bitbake_version = "" # Leave empty for development branch
@@ -45,33 +76,6 @@ if current_version == 'dev':
 # Version seen in documentation_options.js and hence in js switchers code
 release = current_version
 
-
-# -- Project information -----------------------------------------------------
-project = 'The Yocto Project \xae'
-copyright = '2010-%s, The Linux Foundation, CC-BY-SA-2.0-UK license' % datetime.datetime.now().year
-author = 'The Linux Foundation'
-
-# -- General configuration ---------------------------------------------------
-
-# Prevent building with an outdated version of sphinx
-needs_sphinx = "4.0"
-
-# to load local extension from the folder 'sphinx'
-sys.path.insert(0, os.path.abspath('sphinx'))
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
-extensions = [
-    'sphinx.ext.autosectionlabel',
-    'sphinx.ext.extlinks',
-    'sphinx.ext.intersphinx',
-    'sphinx_copybutton',
-    'sphinxcontrib.rsvgconverter',
-    'yocto-vars'
-]
-autosectionlabel_prefix_document = True
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
@@ -90,6 +94,105 @@ rst_prolog = """
 .. |copyright| replace:: %s
 .. |author| replace:: %s
 """ % (project, copyright, author)
+
+# To be able to use :manpage:`<something>` in the docs.
+manpages_url = 'https://manpages.debian.org/{path}'
+
+# Suppress "WARNING: unknown mimetype for ..."
+suppress_warnings = ['epub.unknown_project_files']
+
+# We need XeTeX to process special unicode character, sometimes the contributor
+# list from the release note contains those.
+# See https://docs.readthedocs.io/en/stable/guides/pdf-non-ascii-languages.html.
+latex_engine = 'xelatex'
+latex_use_xindy = False
+latex_elements = {
+    'passoptionstopackages': '\\PassOptionsToPackage{bookmarksdepth=5}{hyperref}',
+    'preamble': '\\usepackage[UTF8]{ctex}\n\\setcounter{tocdepth}{2}',
+}
+
+class DashFriendlySearchEnglish(SearchEnglish):
+
+    # Accept words that can include 'inner' hyphens or dots
+    _word_re = re.compile(r'[\w]+(?:[\.\-][\w]+)*')
+
+    js_splitter_code = r"""
+function splitQuery(query) {
+    return query
+        .split(/[^\p{Letter}\p{Number}_\p{Emoji_Presentation}\-\.]+/gu)
+        .filter(term => term.length > 0);
+}
+"""
+
+languages['en'] = DashFriendlySearchEnglish
+
+# Make the EPUB builder prefer PNG to SVG because of issues rendering Inkscape SVG
+Epub3Builder.supported_image_types = ['image/png', 'image/gif', 'image/jpeg']
+
+# -- Options for HTML output -------------------------------------------------
+
+# The theme to use for HTML and HTML Help pages.  See the documentation for
+# a list of builtin themes.
+
+if not importlib.util.find_spec('sphinx_rtd_theme'):
+    sys.stderr.write("The Sphinx sphinx_rtd_theme HTML theme was not found.\
+    \nPlease make sure to install the sphinx_rtd_theme Python package.\n")
+    sys.exit(1)
+
+html_theme = 'sphinx_rtd_theme'
+html_theme_options = {
+    'sticky_navigation': False,
+}
+
+html_logo = 'sphinx-static/YoctoProject_Logo_RGB.jpg'
+html_favicon = 'sphinx-static/favicon.ico'
+
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['sphinx-static']
+
+html_context = {
+    'current_version': current_version,
+}
+
+# Add customm CSS and JS files
+html_css_files = ['theme_overrides.css']
+html_js_files = ['switchers.js']
+
+# Hide 'Created using Sphinx' text
+html_show_sphinx = False
+
+# Add 'Last updated' on each page
+html_last_updated_fmt = '%b %d, %Y'
+
+# Remove the trailing 'dot' in section numbers
+html_secnumber_suffix = " "
+
+# -- linkcheck configuration -------------------------------------------------
+
+# Don't check self-references to yocto-docs since they are already
+# checked when building.
+linkcheck_ignore = [r'https?://docs\.yoctoproject\.org.*']
+
+# When using the linkcheck builder, ignore the following links which are too
+# frequent in the docs, unless the LINKCHECK_NOT_NICE environment variable is set
+# to 1.
+if os.environ.get('LINKCHECK_NOT_NICE') != "1":
+    linkcheck_ignore.extend([
+        r'https?://nvd\.nist\.gov.*',
+        r'https?://git\.yoctoproject\.org.*',
+        r'https?://git\.openembedded\.org.*',
+        r'https?://downloads\.yoctoproject\.org.*',
+        r'https?://mirrors\.kernel\.org.*',
+        r'https?://mirrors\.edge\.kernel\.org.*',
+    ])
+
+# -- sphinx.ext.autosectionlabel configuration -------------------------------
+
+autosectionlabel_prefix_document = True
+
+# -- sphinx.ext.extlinks configuration ---------------------------------------
 
 # base url definitions
 oe_git_server = "https://git.openembedded.org"
@@ -129,89 +232,14 @@ extlinks = {
     'wikipedia': ('https://en.wikipedia.org/wiki/%s', None),
 }
 
-# To be able to use :manpage:`<something>` in the docs.
-manpages_url = 'https://manpages.debian.org/{path}'
+# -- sphinx.ext.intersphinx configuration ------------------------------------
 
 # Intersphinx config to use cross reference with BitBake user manual
 intersphinx_mapping = {
     'bitbake': ('https://docs.yoctoproject.org/bitbake/' + bitbake_version, None)
 }
 
-# Suppress "WARNING: unknown mimetype for ..."
-suppress_warnings = ['epub.unknown_project_files']
+# -- sphinx_copybutton configuration -----------------------------------------
 
 # sphinx-copybutton configuration
 copybutton_prompt_text = "$ "
-
-# -- Options for HTML output -------------------------------------------------
-
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
-try:
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_options = {
-        'sticky_navigation': False,
-    }
-except ImportError:
-    sys.stderr.write("The Sphinx sphinx_rtd_theme HTML theme was not found.\
-    \nPlease make sure to install the sphinx_rtd_theme Python package.\n")
-    sys.exit(1)
-
-html_logo = 'sphinx-static/YoctoProject_Logo_RGB.jpg'
-html_favicon = 'sphinx-static/favicon.ico'
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['sphinx-static']
-
-html_context = {
-    'current_version': current_version,
-}
-
-# Add customm CSS and JS files
-html_css_files = ['theme_overrides.css']
-html_js_files = ['switchers.js']
-
-# Hide 'Created using Sphinx' text
-html_show_sphinx = False
-
-# Add 'Last updated' on each page
-html_last_updated_fmt = '%b %d, %Y'
-
-# Remove the trailing 'dot' in section numbers
-html_secnumber_suffix = " "
-
-# We need XeTeX to process special unicode character, sometimes the contributor
-# list from the release note contains those.
-# See https://docs.readthedocs.io/en/stable/guides/pdf-non-ascii-languages.html.
-latex_engine = 'xelatex'
-latex_use_xindy = False
-latex_elements = {
-    'passoptionstopackages': '\\PassOptionsToPackage{bookmarksdepth=5}{hyperref}',
-    'preamble': '\\usepackage[UTF8]{ctex}\n\\setcounter{tocdepth}{2}',
-}
-
-
-from sphinx.search import SearchEnglish
-from sphinx.search import languages
-class DashFriendlySearchEnglish(SearchEnglish):
-
-    # Accept words that can include 'inner' hyphens or dots
-    _word_re = re.compile(r'[\w]+(?:[\.\-][\w]+)*')
-
-    js_splitter_code = r"""
-function splitQuery(query) {
-    return query
-        .split(/[^\p{Letter}\p{Number}_\p{Emoji_Presentation}\-\.]+/gu)
-        .filter(term => term.length > 0);
-}
-"""
-
-languages['en'] = DashFriendlySearchEnglish
-
-# Make the EPUB builder prefer PNG to SVG because of issues rendering Inkscape SVG
-from sphinx.builders.epub3 import Epub3Builder
-Epub3Builder.supported_image_types = ['image/png', 'image/gif', 'image/jpeg']

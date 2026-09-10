@@ -99,12 +99,12 @@ New Features / Enhancements in |yocto-ver|
       several recipes to replace ``${nonarch_base_libdir}/firmware``
       (:oecore_rev:`2b75c7ba5e3aa6fc57d7b4afe59e2277b4d87de1`)
 
-   -  :ref:`ref-classes-useradd`: Add support for the :term:`USERMOD_PARAMS`
-      variable, acting as a replacement of the :term:`GROUPMEMS_PARAM` variable
+   -  :ref:`ref-classes-useradd`: Add support for the :term:`USERMOD_PARAM`
+      variable, acting as a replacement of the ``GROUPMEMS_PARAM`` variable
       (:oecore_rev:`b8da733ab12c64503a353d5ceb2eb63fed95d851`,
       :oecore_rev:`cec67e24ac94554e092f8ab18b42e09b4feba77e`)
 
-      Show a deprecation warning if :term:`GROUPMEMS_PARAM` is used
+      Show a deprecation warning if ``GROUPMEMS_PARAM`` is used
       (:oecore_rev:`06f48de92f4b8d7116cd1ce8ba5bc0bd7f8eda9e`)
 
    -  :ref:`ref-classes-useradd`: Switch from ``--root`` to ``--prefix`` option

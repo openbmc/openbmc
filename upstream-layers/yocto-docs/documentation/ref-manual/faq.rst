@@ -66,8 +66,8 @@ See :yocto_wiki:`Products that use the Yocto Project
 Wiki. Don't hesitate to contribute to this page if you know other such
 products.
 
-Why isn't systemd the default init system for OpenEmbedded-Core/Yocto Project or in Poky?
------------------------------------------------------------------------------------------
+Why isn't systemd the default init system in the Poky distro?
+-------------------------------------------------------------
 
 `systemd <https://systemd.io/>`__ is a desktop Linux init system with a specific
 focus that is not entirely aligned with a customisable "embedded" build
@@ -126,7 +126,8 @@ attempt before any others by adding something like the following to the
        git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
        ftp://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
        http://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
-       https://.*/.* &YOCTO_DL_URL;/mirror/sources/"
+       https://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+   "
 
 These changes cause the build system to intercept Git, FTP, HTTP, and
 HTTPS requests and direct them to the ``http://`` sources mirror. You
@@ -165,7 +166,8 @@ file as long as the :term:`PREMIRRORS` server is current::
        git://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
        ftp://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
        http://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
-       https://.*/.* &YOCTO_DL_URL;/mirror/sources/"
+       https://.*/.* &YOCTO_DL_URL;/mirror/sources/ \
+   "
    BB_FETCH_PREMIRRORONLY = "1"
 
 These changes would cause the build system to successfully fetch source
@@ -363,7 +365,7 @@ Support Package (BSP) layer for it. For more information on how to
 create a BSP layer, see the
 ":ref:`dev-manual/layers:understanding and creating layers`"
 section in the Yocto Project Development Tasks Manual and the
-:doc:`/bsp-guide/index`.
+:doc:`/bsp-manual/index`.
 
 Usually, if the board is not completely exotic, adding support in the
 Yocto Project is fairly straightforward.
@@ -519,7 +521,7 @@ How do I disable the cursor on my touchscreen device?
 -----------------------------------------------------
 
 You need to create a form factor file as described in the
-":ref:`bsp-guide/bsp:miscellaneous bsp-specific recipe files`" section in
+":ref:`bsp-manual/bsp:miscellaneous bsp-specific recipe files`" section in
 the Yocto Project Board Support Packages (BSP) Developer's Guide. Set
 the ``HAVE_TOUCHSCREEN`` variable equal to one as follows::
 
@@ -531,7 +533,7 @@ How to always bring up connected network interfaces?
 The default interfaces file provided by the netbase recipe does
 not automatically bring up network interfaces. Therefore, you will need
 to add a BSP-specific netbase that includes an interfaces file. See the
-":ref:`bsp-guide/bsp:miscellaneous bsp-specific recipe files`" section in
+":ref:`bsp-manual/bsp:miscellaneous bsp-specific recipe files`" section in
 the Yocto Project Board Support Packages (BSP) Developer's Guide for
 information on creating these types of miscellaneous recipe files.
 

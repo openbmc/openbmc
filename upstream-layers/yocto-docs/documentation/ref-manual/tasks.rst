@@ -17,7 +17,7 @@ you can run:
    $ bitbake -c listtasks recipename
    do_build                              Default task for a recipe - depends on all other normal tasks required to 'build' a recipe
    do_checkuri                           Validates the SRC_URI value
-   do_clean                              Removes all output files for a target
+   do_clean                              Removes all output files for a target including ${WORKDIR}, sstate manifests and stamps
    do_cleanall                           Removes all output files, shared state cache, and downloaded source files for a target
    do_cleansstate                        Removes all output files and shared state cache for a target
    do_compile                            Compiles the source in the compilation directory
@@ -501,9 +501,10 @@ You can run this task using BitBake as follows::
 
    $ bitbake -c clean recipe
 
-Running this task does not remove the
-:ref:`sstate <overview-manual/concepts:shared state cache>` cache files.
-Consequently, if no changes have been made and the recipe is rebuilt
+Running this task removes the working directory of the recipe (represented by its :term:`WORKDIR` value),
+the sstate manifests and the :ref:`stamps <overview-manual/concepts:Stamp Files and the Rerunning of Tasks>`.
+However, it does not remove the :ref:`sstate <overview-manual/concepts:shared state cache>`
+cache files. Consequently, if no changes have been made and the recipe is rebuilt
 after cleaning, output files are simply restored from the sstate cache.
 If you want to remove the sstate cache files for the recipe, you need to
 use the :ref:`ref-tasks-cleansstate` task instead

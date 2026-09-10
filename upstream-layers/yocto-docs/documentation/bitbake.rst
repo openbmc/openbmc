@@ -1,8 +1,8 @@
 .. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
-=====================
-BitBake Documentation
-=====================
+===================
+BitBake User Manual
+===================
 
 |
 

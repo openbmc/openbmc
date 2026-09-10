@@ -358,7 +358,7 @@ You can examine build history output from the command line or from a web
 interface.
 
 To see any changes that have occurred (assuming you have
-:term:`BUILDHISTORY_COMMIT` = "1"),
+:term:`BUILDHISTORY_COMMIT` = "1"),
 you can simply use any Git command that allows you to view the history
 of a repository. Here is one method::
 

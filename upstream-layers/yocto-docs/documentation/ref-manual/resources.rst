@@ -144,7 +144,7 @@ Here is a list of resources you might find helpful:
    allows you to develop projects inside or outside of the Yocto Project
    environment.
 
--  :doc:`/bsp-guide/bsp`: This guide defines the structure
+-  :doc:`/bsp-manual/bsp`: This guide defines the structure
    for BSP components. Having a commonly understood structure encourages
    standardization.
 

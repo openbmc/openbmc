@@ -1,8 +1,8 @@
 .. SPDX-License-Identifier: CC-BY-SA-2.0-UK
 
-**************************************************
-Board Support Packages (BSP) --- Developer's Guide
-**************************************************
+************************************************
+Yocto Project Board Support Package (BSP) Manual
+************************************************
 
 A Board Support Package (BSP) is a collection of information that
 defines how to support a particular hardware device, set of devices, or
@@ -16,7 +16,7 @@ This guide presents information about BSP layers, defines a structure
 for components so that BSPs follow a commonly understood layout,
 discusses how to customize a recipe for a BSP, addresses BSP licensing,
 and provides information that shows you how to create a BSP
-Layer using the :ref:`bitbake-layers <bsp-guide/bsp:Creating a new BSP Layer Using the \`\`bitbake-layers\`\` Script>`
+Layer using the :ref:`bitbake-layers <bsp-manual/bsp:Creating a new BSP Layer Using the \`\`bitbake-layers\`\` Script>`
 tool.
 
 BSP Layers
@@ -60,7 +60,7 @@ repository unto itself and clicking on the layer name displays two URLs
 from which you can clone the layer's repository to your local system.
 Here is an example that clones the Raspberry Pi BSP layer::
 
-   $ git clone git://git.yoctoproject.org/meta-raspberrypi
+   $ git clone https://git.yoctoproject.org/meta-raspberrypi
 
 In addition to BSP layers, the ``meta-yocto-bsp`` layer is part of
 :yocto_git:`meta-yocto </meta-yocto>`. The ``meta-yocto-bsp`` layer maintains
@@ -68,7 +68,7 @@ several "reference" BSPs including the ARM-based Beaglebone and generic
 versions of both 32-bit and 64-bit IA machines.
 
 For information on typical BSP development workflow, see the
-:ref:`bsp-guide/bsp:developing a board support package (bsp)`
+:ref:`bsp-manual/bsp:developing a board support package (bsp)`
 section. For more
 information on how to set up a local copy of source files from a Git
 repository, see the
@@ -136,19 +136,18 @@ Preparing Your Build Host to Work With BSP Layers
 This section describes how to get your build host ready to work with BSP
 layers. Once you have the host set up, you can create the layer as
 described in the
-":ref:`bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
+":ref:`bsp-manual/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
 section.
 
 .. note::
 
    For structural information on BSPs, see the
-   :ref:`bsp-guide/bsp:example filesystem layout` section.
+   :ref:`bsp-manual/bsp:example filesystem layout` section.
 
 #. *Set Up the Build Environment:* Be sure you are set up to use BitBake
    in a shell. See the ":ref:`dev-manual/start:preparing the build host`"
    section in the Yocto Project Development Tasks Manual for information on how
-   to get a build host ready that is either a native Linux machine or a machine
-   that uses CROPS.
+   to get a :term:`build host` ready.
 
 #. *Prepare the Source Repositories*:
 
@@ -178,7 +177,7 @@ section.
 
    #. *Clone the Layer:* ::
 
-         $ git clone git://git.yoctoproject.org/meta-intel.git
+         $ git clone https://git.yoctoproject.org/meta-intel.git
          Cloning into 'meta-intel'...
          remote: Counting objects: 15585, done.
          remote: Compressing objects: 100% (5056/5056), done.
@@ -211,7 +210,7 @@ section.
    your hardware most closely matches the ``meta-raspberrypi``, clone
    that layer::
 
-      $ git clone git://git.yoctoproject.org/meta-raspberrypi
+      $ git clone https://git.yoctoproject.org/meta-raspberrypi
       Cloning into 'meta-raspberrypi'...
       remote: Counting objects: 4743, done.
       remote: Compressing objects: 100% (2185/2185), done.
@@ -266,7 +265,7 @@ Before looking at the recommended form for the directory structure
 inside a BSP layer, you should be aware that there are some requirements
 in order for a BSP layer to be considered compliant with the Yocto
 Project. For that list of requirements, see the
-":ref:`bsp-guide/bsp:released bsp requirements`" section.
+":ref:`bsp-manual/bsp:released bsp requirements`" section.
 
 Below is the typical directory structure for a BSP layer. While this
 basic form represents the standard, realize that the actual layout for
@@ -513,10 +512,10 @@ use these kernels and images to get a system running and quickly get
 started on development tasks.
 
 The exact types of binaries present are highly hardware-dependent. The
-:ref:`README <bsp-guide/bsp:readme file>` file should be present in the
+:ref:`README <bsp-manual/bsp:readme file>` file should be present in the
 BSP Layer and it explains how to use the images with the target
 hardware. Additionally, the
-:ref:`README.sources <bsp-guide/bsp:readme.sources file>` file should be
+:ref:`README.sources <bsp-manual/bsp:readme.sources file>` file should be
 present to locate the sources used to build the images and provide
 information on the Metadata.
 
@@ -718,7 +717,7 @@ repository, which contains many BSPs supported by the Yocto Project, is
 part of the example.
 
 For an example that shows how to create a new layer using the tools, see
-the ":ref:`bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
+the ":ref:`bsp-manual/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
 section.
 
 The following illustration and list summarize the BSP creation general
@@ -737,7 +736,7 @@ workflow.
    local copies of these supported BSP layers on your system gives you
    access to layers you might be able to leverage when creating your
    BSP. For information on how to get these files, see the
-   ":ref:`bsp-guide/bsp:preparing your build host to work with bsp layers`"
+   ":ref:`bsp-manual/bsp:preparing your build host to work with bsp layers`"
    section.
 
 #. *Create Your Own BSP Layer Using the bitbake-layers Script:*
@@ -747,7 +746,7 @@ workflow.
    in itself, a special type of layer. The simplest way to create a new
    BSP layer that is compliant with the Yocto Project is to use the
    ``bitbake-layers`` script. For information about that script, see the
-   ":ref:`bsp-guide/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
+   ":ref:`bsp-manual/bsp:creating a new bsp layer using the \`\`bitbake-layers\`\` script`"
    section.
 
    Another example that illustrates a layer is an application. Suppose
@@ -761,7 +760,7 @@ workflow.
    section in the Yocto Project Overview and Concepts Manual. You can also
    reference the ":ref:`dev-manual/layers:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual. For more
-   information on BSP layers, see the ":ref:`bsp-guide/bsp:bsp layers`"
+   information on BSP layers, see the ":ref:`bsp-manual/bsp:bsp layers`"
    section.
 
    .. note::
@@ -778,7 +777,7 @@ workflow.
          -  A generic ARM 64 platform (``genericarm64``)
 
    When you set up a layer for a new BSP, you should follow a standard
-   layout. This layout is described in the ":ref:`bsp-guide/bsp:example filesystem layout`"
+   layout. This layout is described in the ":ref:`bsp-manual/bsp:example filesystem layout`"
    section. In the standard layout, notice
    the suggested structure for recipes and configuration information.
    You can see the standard layout for a BSP by examining any supported
@@ -833,7 +832,7 @@ Before looking at BSP requirements, you should consider the following:
 -  The requirements here assume the BSP layer is a well-formed, "legal"
    layer that can be added to the Yocto Project. For guidelines on
    creating a layer that meets these base requirements, see the
-   ":ref:`bsp-guide/bsp:bsp layers`" section in this manual and the
+   ":ref:`bsp-manual/bsp:bsp layers`" section in this manual and the
    ":ref:`dev-manual/layers:understanding and creating layers`"
    section in the Yocto Project Development Tasks Manual.
 
@@ -860,7 +859,7 @@ The requirements for a released BSP that conform to the Yocto Project are:
 
 -  *Layer Name:* The BSP must have a layer name that follows the Yocto
    Project standards. For information on BSP layer names, see the
-   ":ref:`bsp-guide/bsp:bsp layers`" section.
+   ":ref:`bsp-manual/bsp:bsp layers`" section.
 
 -  *File System Layout:* When possible, use the same directory names in
    your BSP layer as listed in the ``recipes.txt`` file, which is found
