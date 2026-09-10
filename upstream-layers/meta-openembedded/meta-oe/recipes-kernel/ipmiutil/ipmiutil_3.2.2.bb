@@ -25,6 +25,10 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/ipmiutil/ipmiutil-${PV}.tar.gz \
           "
 SRC_URI[sha256sum] = "37f9bc8e6b18c1155e4d5ea38c87b83908b7acc7a44fbc5e3af493f26ef8b767"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/ipmiutil/files/"
+UPSTREAM_CHECK_REGEX = "ipmiutil-(?P<pver>\d+(\.\d+)+)\.tar\.gz"
+
+
 inherit autotools-brokensep pkgconfig systemd
 
 PACKAGECONFIG ?= "lanplus gpl"

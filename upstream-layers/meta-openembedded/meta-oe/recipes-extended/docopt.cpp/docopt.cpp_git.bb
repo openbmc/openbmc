@@ -7,7 +7,7 @@ automatically generates a parser for the command line arguments."
 
 HOMEPAGE = "https://github.com/docopt/docopt.cpp"
 
-LICENSE = "MIT | BSL-1.0"
+LICENSE = "BSL-1.0 OR MIT"
 LIC_FILES_CHKSUM = "\
     file://LICENSE-Boost-1.0;md5=e4224ccaecb14d942c71d31bef20d78c \
     file://LICENSE-MIT;md5=4b242fd9ef20207e18286d73da8a6677 \

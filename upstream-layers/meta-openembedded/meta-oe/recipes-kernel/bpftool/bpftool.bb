@@ -26,6 +26,8 @@ SECURITY_CFLAGS = ""
 
 do_configure[depends] += "virtual/kernel:do_shared_workdir"
 
+do_configure[cleandirs] = "${B}"
+
 COMPATIBLE_HOST = "(x86_64|aarch64|riscv64).*-linux"
 
 do_compile() {

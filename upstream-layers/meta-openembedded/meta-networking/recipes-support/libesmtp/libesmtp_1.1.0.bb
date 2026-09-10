@@ -9,7 +9,9 @@ SECTION = "libs"
 DEPENDS = "openssl"
 
 SRC_URI = "git://github.com/libesmtp/libESMTP.git;branch=master;protocol=https \
-           file://0001-Add-build-option-for-NTLM-support.patch"
+           file://0001-Add-build-option-for-NTLM-support.patch \
+           file://0001-Fix-build-with-OpenSSL-4.0-opaque-ASN1_STRING.patch \
+           "
 SRCREV = "1d0af244310a66943ab400be56b15a9087f181eb"
 
 

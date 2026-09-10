@@ -1,6 +1,6 @@
 DESCRIPTION = "REALTIMEKIT Realtime Policy and Watchdog Daemon"
 HOMEPAGE = "https://gitlab.freedesktop.org/pipewire/rtkit"
-LICENSE = "GPL-3.0-only & BSD-3-Clause"
+LICENSE = "BSD-3-Clause AND GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a8e768468b658b3ed44971b53d4a6716"
 
 SRC_URI = "git://gitlab.freedesktop.org/pipewire/rtkit.git;protocol=https;branch=master"

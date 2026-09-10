@@ -1,7 +1,7 @@
 SUMMARY = "NVMe management command line interface"
 HOMEPAGE = "https://github.com/linux-nvme/nvme-cli"
 SECTION = "console/utils"
-LICENSE = "GPL-2.0-only & CC0-1.0 & MIT"
+LICENSE = "CC0-1.0 AND GPL-2.0-only AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8264535c0c4e9c6c335635c4026a8022 \
                     file://ccan/licenses/CC0;md5=c17af43b05840255a6fedc5eda9d56cc \
                     file://ccan/licenses/BSD-MIT;md5=838c366f69b72c5df05c96dff79b35f2"

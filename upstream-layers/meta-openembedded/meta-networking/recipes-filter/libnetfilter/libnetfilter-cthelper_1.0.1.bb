@@ -15,3 +15,6 @@ SRC_URI[sha256sum] = "14073d5487233897355d3ff04ddc1c8d03cc5ba8d2356236aa88161a9f
 S = "${UNPACKDIR}/libnetfilter_cthelper-${PV}"
 
 inherit autotools pkgconfig
+
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/pub/libnetfilter_cthelper/"
+UPSTREAM_CHECK_REGEX = "libnetfilter_cthelper-(?P<pver>\d+(\.\d+)+)\.tar\.bz2"

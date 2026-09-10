@@ -2,7 +2,7 @@ DESCRIPTION = "A fast and lightweight IDE"
 HOMEPAGE = "http://plugins.geany.org/"
 
 LICENSE_DEFAULT = "GPL-2.0-only"
-LICENSE = "${LICENSE_DEFAULT} & BSD-2-Clause & GPL-3.0-only"
+LICENSE = "BSD-2-Clause AND GPL-3.0-only AND ${LICENSE_DEFAULT}"
 
 python () {
     for plugin in d.getVar('PLUGINS').split():

@@ -10,6 +10,8 @@ SRC_URI = "git://luajit.org/git/luajit-2.0.git;protocol=http;branch=v2.1 \
 
 PV = "2.1"
 SRCREV = "659a61693aa3b87661864ad0f12eee14c865cd7f"
+# The v2.1 branch is rolling with no tags; track commits.
+UPSTREAM_CHECK_COMMITS = "1"
 
 inherit pkgconfig binconfig siteinfo
 

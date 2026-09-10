@@ -1,13 +1,16 @@
 SUMMARY = "Canonical libwebsockets.org websocket library"
 HOMEPAGE = "https://libwebsockets.org/"
-LICENSE = "MIT & Zlib & BSD-3-Clause & Apache-2.0 & OFL-1.1"
+LICENSE = "Apache-2.0 AND BSD-3-Clause AND MIT AND OFL-1.1 AND Zlib"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=b5d391cc7929bcba238f9ba6805f7574"
 
 DEPENDS = "zlib"
 DEPENDS:append:class-native = " libcap-native"
 
 SRCREV = "fbb0baf6af9c4324f0f1591734c78b0089b599d4"
-SRC_URI = "git://github.com/warmcat/libwebsockets.git;protocol=https;branch=v4.5-stable;tag=v${PV}"
+SRC_URI = " \
+    git://github.com/warmcat/libwebsockets.git;protocol=https;branch=v4.5-stable;tag=v${PV} \
+    file://CVE-2026-10650.patch \
+"
 
 UPSTREAM_CHECK_URI = "https://github.com/warmcat/${BPN}/releases"
 UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
@@ -73,3 +76,5 @@ RDEPENDS:${PN}-dev += " ${@bb.utils.contains('PACKAGECONFIG', 'static', '${PN}-s
 SSTATE_SCAN_FILES += "*.cmake"
 
 BBCLASSEXTEND = "native"
+
+CVE_STATUS[CVE-2025-1866] = "fixed-version: fixed since 4.3.4"

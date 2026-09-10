@@ -9,7 +9,7 @@ done when adding or deleting new users."
 SUMMARY = "High-performance and highly configurable RADIUS server"
 HOMEPAGE = "http://www.freeradius.org/"
 SECTION = "System/Servers"
-LICENSE = "GPL-2.0-only & LGPL-2.0-or-later"
+LICENSE = "GPL-2.0-only AND LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=eb723b61539feef013de476e68b5c50a"
 DEPENDS = "openssl-native openssl libidn libtool libpcap libtalloc"
 
@@ -38,6 +38,8 @@ SRC_URI = "git://github.com/FreeRADIUS/freeradius-server.git;branch=v3.2.x;tag=$
     file://0015-bootstrap-check-commands-of-openssl-exist.patch \
     file://0016-version.c-don-t-print-build-flags.patch \
     file://0017-Add-acinclude.m4-to-include-required-macros.patch \
+    file://0018-Fix-permissions-after-generating-certificates-with-m.patch \
+    file://0001-Use-ASN1_STRING-functions-for-OpenSSL-4.0-compat.patch \
 "
 
 raddbdir = "${sysconfdir}/${MLPREFIX}raddb"

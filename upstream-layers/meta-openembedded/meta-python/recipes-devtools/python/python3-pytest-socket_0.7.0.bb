@@ -12,4 +12,3 @@ RDEPENDS:${PN} = "python3-pytest"
 BBCLASSEXTEND = "native nativesdk"
 
 PYPI_PACKAGE = "pytest_socket"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"

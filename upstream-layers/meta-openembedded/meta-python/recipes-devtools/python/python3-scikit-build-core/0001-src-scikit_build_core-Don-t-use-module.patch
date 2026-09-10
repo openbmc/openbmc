@@ -1,0 +1,107 @@
+From 8223ad7e5606174ac0ff47068cd22776a499854c Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Fri, 17 Jul 2026 14:40:58 +0300
+Subject: [PATCH] src/scikit_build_core: Don't use ${module}
+
+Replace ${module} with __module__ and renmame the the placeholder
+directories to avoid the following bitbake error:
+
+ERROR: Directory name ${module} contains unexpanded bitbake variable.
+This may cause build failures and WORKDIR polution.
+
+Upstream-Status: Inappropriate [oe-specific]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ src/scikit_build_core/init/__main__.py                | 11 +++++++++--
+ .../abi3/src/{${module} => __module__}/_core.c        |  0
+ .../abi3t/src/{${module} => __module__}/_core.c       |  0
+ .../templates/c/src/{${module} => __module__}/_core.c |  0
+ .../src/{${module} => __module__}/__init__.py.in      |  0
+ .../cython/src/{${module} => __module__}/_core.pyx    |  0
+ .../fortran/src/{${module} => __module__}/_core.f     |  0
+ .../nanobind/src/{${module} => __module__}/_core.cpp  |  0
+ .../pybind11/src/{${module} => __module__}/_core.cpp  |  0
+ .../swig/src/{${module} => __module__}/_core.c        |  0
+ .../swig/src/{${module} => __module__}/_core.i        |  0
+ 11 files changed, 9 insertions(+), 2 deletions(-)
+ rename src/scikit_build_core/resources/templates/abi3/src/{${module} => __module__}/_core.c (100%)
+ rename src/scikit_build_core/resources/templates/abi3t/src/{${module} => __module__}/_core.c (100%)
+ rename src/scikit_build_core/resources/templates/c/src/{${module} => __module__}/_core.c (100%)
+ rename src/scikit_build_core/resources/templates/common/src/{${module} => __module__}/__init__.py.in (100%)
+ rename src/scikit_build_core/resources/templates/cython/src/{${module} => __module__}/_core.pyx (100%)
+ rename src/scikit_build_core/resources/templates/fortran/src/{${module} => __module__}/_core.f (100%)
+ rename src/scikit_build_core/resources/templates/nanobind/src/{${module} => __module__}/_core.cpp (100%)
+ rename src/scikit_build_core/resources/templates/pybind11/src/{${module} => __module__}/_core.cpp (100%)
+ rename src/scikit_build_core/resources/templates/swig/src/{${module} => __module__}/_core.c (100%)
+ rename src/scikit_build_core/resources/templates/swig/src/{${module} => __module__}/_core.i (100%)
+
+diff --git a/src/scikit_build_core/init/__main__.py b/src/scikit_build_core/init/__main__.py
+index 1d213fe..36f4db5 100644
+--- a/src/scikit_build_core/init/__main__.py
++++ b/src/scikit_build_core/init/__main__.py
+@@ -103,12 +103,19 @@ def _generate(
+ 
+     written: list[Path] = []
+     for root in (resources / "templates" / "common", resources / "templates" / backend):
+-        # Walk the tree; path components are templated too (e.g. ``${module}``).
++        # Walk the tree and process the templated path components for
++        # __module__ that has replaced ${module} to avoid the following
++        # bitbake error:
++        # ${module} contains unexpanded bitbake variable.
++        # This may cause build failures and WORKDIR polution.
+         stack = [(root, Path())]
+         while stack:
+             node, rel = stack.pop()
+             for entry in node.iterdir():
+-                name = string.Template(entry.name).safe_substitute(substitutions)
++                if entry.name == "__module__":
++                    name = module
++                else:
++                    name = string.Template(entry.name).safe_substitute(substitutions)
+                 if entry.is_dir():
+                     stack.append((entry, rel / name))
+                     continue
+diff --git a/src/scikit_build_core/resources/templates/abi3/src/${module}/_core.c b/src/scikit_build_core/resources/templates/abi3/src/__module__/_core.c
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/abi3/src/${module}/_core.c
+rename to src/scikit_build_core/resources/templates/abi3/src/__module__/_core.c
+diff --git a/src/scikit_build_core/resources/templates/abi3t/src/${module}/_core.c b/src/scikit_build_core/resources/templates/abi3t/src/__module__/_core.c
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/abi3t/src/${module}/_core.c
+rename to src/scikit_build_core/resources/templates/abi3t/src/__module__/_core.c
+diff --git a/src/scikit_build_core/resources/templates/c/src/${module}/_core.c b/src/scikit_build_core/resources/templates/c/src/__module__/_core.c
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/c/src/${module}/_core.c
+rename to src/scikit_build_core/resources/templates/c/src/__module__/_core.c
+diff --git a/src/scikit_build_core/resources/templates/common/src/${module}/__init__.py.in b/src/scikit_build_core/resources/templates/common/src/__module__/__init__.py.in
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/common/src/${module}/__init__.py.in
+rename to src/scikit_build_core/resources/templates/common/src/__module__/__init__.py.in
+diff --git a/src/scikit_build_core/resources/templates/cython/src/${module}/_core.pyx b/src/scikit_build_core/resources/templates/cython/src/__module__/_core.pyx
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/cython/src/${module}/_core.pyx
+rename to src/scikit_build_core/resources/templates/cython/src/__module__/_core.pyx
+diff --git a/src/scikit_build_core/resources/templates/fortran/src/${module}/_core.f b/src/scikit_build_core/resources/templates/fortran/src/__module__/_core.f
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/fortran/src/${module}/_core.f
+rename to src/scikit_build_core/resources/templates/fortran/src/__module__/_core.f
+diff --git a/src/scikit_build_core/resources/templates/nanobind/src/${module}/_core.cpp b/src/scikit_build_core/resources/templates/nanobind/src/__module__/_core.cpp
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/nanobind/src/${module}/_core.cpp
+rename to src/scikit_build_core/resources/templates/nanobind/src/__module__/_core.cpp
+diff --git a/src/scikit_build_core/resources/templates/pybind11/src/${module}/_core.cpp b/src/scikit_build_core/resources/templates/pybind11/src/__module__/_core.cpp
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/pybind11/src/${module}/_core.cpp
+rename to src/scikit_build_core/resources/templates/pybind11/src/__module__/_core.cpp
+diff --git a/src/scikit_build_core/resources/templates/swig/src/${module}/_core.c b/src/scikit_build_core/resources/templates/swig/src/__module__/_core.c
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/swig/src/${module}/_core.c
+rename to src/scikit_build_core/resources/templates/swig/src/__module__/_core.c
+diff --git a/src/scikit_build_core/resources/templates/swig/src/${module}/_core.i b/src/scikit_build_core/resources/templates/swig/src/__module__/_core.i
+similarity index 100%
+rename from src/scikit_build_core/resources/templates/swig/src/${module}/_core.i
+rename to src/scikit_build_core/resources/templates/swig/src/__module__/_core.i
+-- 
+2.43.0
+

@@ -7,11 +7,6 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=134f1026f0de92fd30
 SRC_URI += "file://0001-pyprojects-Relax-required-version-of-uv-to-be-0.12.patch"
 SRC_URI[sha256sum] = "d960383d5885300ebcbcb14e41657946fde2a59d5c0f485eb291bc6a0e228acc"
 
-inherit pypi python_setuptools_build_meta
+inherit pypi python_uv_build
 
 PYPI_PACKAGE = "cucumber_tag_expressions"
-
-DEPENDS += "\
-    python3-setuptools-scm-native \
-    python3-uv-build-native \
-"

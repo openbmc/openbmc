@@ -15,6 +15,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/tinyxml/tinyxml_${@'${PV}'.replace('.', '_')}.t
            file://CVE-2023-34194.patch \
 "
 SRC_URI[sha256sum] = "15bdfdcec58a7da30adc87ac2b078e4417dbe5392f3afb719f9ba6d062645593"
+# Upstream (SourceForge tinyxml) is dead at 2.6.2 (2011), its final release.
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 S = "${UNPACKDIR}/tinyxml"
 

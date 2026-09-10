@@ -1,0 +1,36 @@
+From f0768d0a3d08b4ba7fbc85f874fbe905cd4a6880 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Viktor=20Mal=C3=ADk?= <viktor.malik@gmail.com>
+Date: Wed, 19 Aug 2026 09:25:25 +0200
+Subject: [PATCH] Add support for LLVM 23 (#5299)
+
+- Bump MAX_LLVM_MAJOR
+- Add new Nix targets
+- Bump BCC version to the commit fixing LLVM 23 build
+- Adjust CI jobs
+
+Also drop support for LLVM 18. Since the Nix fuzz shell depended on LLVM
+18, move that to 22.
+
+Signed-off-by: Viktor Malik <viktor.malik@gmail.com>
+
+Only the CMakeLists.txt hunk is backported here; the Nix and CI changes of
+the original commit do not apply to an OE build, and the BCC bump is
+handled by the bcc recipe.
+
+Upstream-Status: Backport [https://github.com/bpftrace/bpftrace/commit/f0768d0a3d08b4ba7fbc85f874fbe905cd4a6880]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index baea14e65c60..a781bf347d61 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -156,7 +156,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   # releases.
+   set(MAX_LLVM_MAJOR 999)
+ else()
+-  set(MAX_LLVM_MAJOR 22)
++  set(MAX_LLVM_MAJOR 23)
+ endif()
+ 
+ if((${LLVM_VERSION_MAJOR} VERSION_LESS ${MIN_LLVM_MAJOR}) OR (${LLVM_VERSION_MAJOR} VERSION_GREATER ${MAX_LLVM_MAJOR}))

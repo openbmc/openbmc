@@ -6,7 +6,7 @@ DESCRIPTION = "Modern C++ network programming libraries."
 # for most functionality.
 
 SECTION = "libs"
-LICENSE = "BSL-1.0 & MIT & Python-2.0"
+LICENSE = "BSL-1.0 AND MIT AND Python-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE_1_0.txt;md5=e4224ccaecb14d942c71d31bef20d78c"
 PV = "0.13.0"
 

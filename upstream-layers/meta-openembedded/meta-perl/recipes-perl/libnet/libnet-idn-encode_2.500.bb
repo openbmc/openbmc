@@ -4,7 +4,7 @@ DESCRIPTION = "This module provides an easy-to-use interface for encoding \
 
 SECTION = "libs"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=8ea5704cf65ca4ec6e9e167fb94f14dd"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/C/CF/CFAERBER/Net-IDN-Encode-${PV}.tar.gz \

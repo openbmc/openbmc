@@ -37,24 +37,31 @@ mkdir -p "${TESTDIR}/testtablespace"
 chmod 0700 "${TESTDIR}/testtablespace"
 chown postgres:postgres "${TESTDIR}/testtablespace"
 
-# Disable set -e before the pipe so we can capture PIPESTATUS
+# Disable set -e so we can capture the regression run's exit status
 set +e
 
-# Run the regression tests.
+# Run the regression tests, capturing output to a plain file instead of
+# piping live into sed: ${PIPESTATUS[0]} is a bashism this script's
+# "#!/bin/sh" shebang can't rely on (target /bin/sh is dash, which has no
+# PIPESTATUS array and fails with "bad substitution"), and batching
+# through a file avoids needing stdbuf, which isn't guaranteed installed.
 # --dlpath points to the standard PostgreSQL package library directory
 # where regress.so and contrib modules (autoinc.so, refint.so, etc.)
 # are installed, so that CREATE FUNCTION ... AS tests can locate them.
+REGRESS_LOG=$(mktemp /tmp/postgresql-ptest.XXXXXX)
 su - postgres -c "cd ${TESTDIR} && \
     ${TESTDIR}/pg_regress \
         --inputdir=. \
         --bindir=${PGBIN} \
         --dlpath=${PKGLIBDIR} \
         --max-concurrent-tests=20 \
-        --schedule=parallel_schedule" 2>&1 | \
-    stdbuf -oL sed -n \
-        -e 's/^ok [0-9]\+\s\+[+* ]\?\s*/PASS: /p' \
-        -e 's/^not ok [0-9]\+\s\+[+* ]\?\s*/FAIL: /p'
-RESULT=${PIPESTATUS[0]}
+        --schedule=parallel_schedule" > "${REGRESS_LOG}" 2>&1
+RESULT=$?
+
+sed -n \
+    -e 's/^ok [0-9]\+\s\+[+* ]\?\s*/PASS: /p' \
+    -e 's/^not ok [0-9]\+\s\+[+* ]\?\s*/FAIL: /p' "${REGRESS_LOG}"
+rm -f "${REGRESS_LOG}"
 
 if [ "${RESULT}" = "0" ]; then
     echo "PASS: all tests passed"

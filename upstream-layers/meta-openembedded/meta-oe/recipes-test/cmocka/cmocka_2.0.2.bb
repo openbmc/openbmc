@@ -7,10 +7,11 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
 SRCREV = "fefa2b8a023121f7235e18ed17249e4012dd144f"
-SRC_URI = "git://git.cryptomilk.org/projects/cmocka.git;protocol=https;branch=stable-2.0;tag=cmocka-${PV} \
+SRC_URI = "git://gitlab.com/cmocka/cmocka.git;protocol=https;branch=stable-2.0;tag=cmocka-${PV} \
            file://run-ptest \
           "
 
+UPSTREAM_CHECK_TAGREGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"
 
 inherit cmake ptest
 

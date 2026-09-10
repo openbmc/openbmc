@@ -7,7 +7,7 @@ etc."
 
 HOMEPAGE = "https://metacpan.org/release/Unix-Statgrab"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later | LGPL-2.1-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later OR LGPL-2.1-or-later"
 DEPENDS += "libcapture-tiny-perl-native"
 DEPENDS += "libconfig-autoconf-perl-native"
 DEPENDS += "libstatgrab"

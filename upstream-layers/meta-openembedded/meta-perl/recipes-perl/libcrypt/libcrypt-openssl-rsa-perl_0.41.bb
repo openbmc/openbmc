@@ -1,7 +1,7 @@
 SUMMARY = "Crypt Openssl RSA cpan module"
 SECTION = "libs"
 HOMEPAGE = "https://metacpan.org/pod/Crypt::OpenSSL::RSA"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=399bd4de06d233aa49afa7c47cea8117"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/T/TI/TIMLEGGE/Crypt-OpenSSL-RSA-${PV}.tar.gz \

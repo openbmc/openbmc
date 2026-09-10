@@ -1,6 +1,6 @@
 SUMMARY = "Linux dynamic kernel patching infrastructure"
 DESCRIPTION = "kpatch is a Linux dynamic kernel patching infrastructure which allows you to patch a running kernel without rebooting or restarting any processes."
-LICENSE = "GPL-2.0-only & LGPL-2.0-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.0-only"
 DEPENDS = "elfutils bash"
 
 SRC_URI = "git://github.com/dynup/kpatch.git;protocol=https;branch=master \

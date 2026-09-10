@@ -1,7 +1,7 @@
 SUMMARY = "Synergy - control multiple computers with one keyboard and mouse"
 HOMEPAGE = "http://synergy-project.org"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=54c1fc8d8bb6776ae501acfb1585e9d6"
-LICENSE = "GPL-2.0-with-OpenSSL-exception"
+LICENSE = "LicenseRef-GPL-2.0-with-OpenSSL-exception"
 SECTION = "x11/utils"
 
 DEPENDS = "virtual/libx11 libxtst libxinerama curl openssl"

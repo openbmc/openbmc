@@ -18,6 +18,7 @@ SRC_URI = "gitsm://github.com/ntop/ntopng;protocol=https;branch=6.6-stable \
            file://0001-configure.ac.in-Allow-dynamic-linking-against-ndpi-3.patch \
            file://0001-luaengine-Use-lua-5.5-API-signature-for-lua_newstate.patch \
            file://ntopng.service \
+           file://0001-Fix-build-with-OpenSSL-4.0.patch \
            "
 
 # don't use the lua under thirdparty as it supports cross compiling badly

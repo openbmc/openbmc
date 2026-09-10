@@ -1,6 +1,6 @@
 SUMMARY = "Debugging and profiling extension for PHP"
 HOMEPAGE = "https://xdebug.org/"
-LICENSE = "Xdebug"
+LICENSE = "LicenseRef-Xdebug"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=afd6ce4aa04fdc346e5b3c6e634bd75c"
 
 DEPENDS = "php re2c-native"

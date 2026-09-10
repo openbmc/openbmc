@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b9a4414e08f0571d55184531cefc131b"
 
 SRC_URI[sha256sum] = "3fa6de6efa2493a7c827472e984ce9b020797d0da16f1db67197bcc23c8fae54"
 
-PYPI_PACKAGE = "raven"
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \

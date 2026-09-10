@@ -10,7 +10,6 @@ LIC_FILES_CHKSUM = "file://LICENSES.txt;md5=5b4e3a2172bba4c47cded5885e7e507e"
 SRC_URI[sha256sum] = "4a2bf149adf42997e1bb44b70c43b613275ec9852c3edacca86a9166b27e945e"
 
 CVE_PRODUCT = "supervisord:supervisor"
-PYPI_PACKAGE = "supervisor"
 inherit pypi systemd setuptools3
 RDEPENDS:${PN} = "\
     python3-fcntl \

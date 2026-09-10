@@ -15,7 +15,7 @@ DEPENDS = " \
     freetype \
     gdk-pixbuf-native \
     gegl \
-    gexiv2 \
+    gexiv2-0.14 \
     glib-2.0 \
     glib-2.0-native \
     gtk+3 \
@@ -135,7 +135,7 @@ do_install:prepend() {
 
 FILES:${PN} += "${datadir}/metainfo"
 
-RDEPENDS:${PN} = "mypaint-brushes glib-networking python3-pygobject python3-pycairo"
+RDEPENDS:${PN} = "mypaint-brushes glib-networking librsvg-gtk python3-pygobject python3-pycairo"
 
 CVE_STATUS[CVE-2007-3741] = "not-applicable-platform: This only applies for Mandriva Linux"
 CVE_STATUS[CVE-2025-8672] = "not-applicable-config: the vulnerability only affects MacOS"

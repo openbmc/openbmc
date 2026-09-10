@@ -10,6 +10,10 @@ SRC_URI = "https://moji.or.jp/wp-content/ipafont/IPAfont/IPAfont00303.zip "
 
 SRC_URI[sha256sum] = "f755ed79a4b8e715bed2f05a189172138aedf93db0f465b4e20c344a02766fe5"
 
+# Ver.003.03 (the last IPAfont release) is only published as unversioned-directory
+# zips named IPAfont00303.zip; no listing exposes a version comparable to PV.
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 S = "${UNPACKDIR}/IPAfont00303"
 
 PACKAGES = "ttf-ipag ttf-ipagp ttf-ipam ttf-ipamp"

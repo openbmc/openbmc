@@ -13,7 +13,7 @@ data."
 SECTION = "System/Servers"
 
 LIC_FILES_CHKSUM = "file://src/prot.c;beginline=1;endline=1;md5=96964cadf07e8f8c1e2ffb3b507dd647"
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 
 DEPENDS += "coreutils"
 

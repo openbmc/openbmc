@@ -4,7 +4,7 @@ DESCRIPTION = "A parser generator utility that reads a grammar specification fro
 parser for it.  The parsers consist of a set of LALR(1) parsing tables and a driver routine written in the C \
 programming language."
 SECTION = "devel"
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 
 SRC_URI = "https://invisible-mirror.net/archives/byacc/byacc-${PV}.tgz \
            file://byacc-open.patch \

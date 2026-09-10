@@ -10,6 +10,8 @@ To fix it we need to reduce the count of parameters in sysviews test.
 Also we need to reduce the row count in expected result of sysview test
 to make the test output shown as pass.
 
+Rebased on 18.4: context shifted (offset only, same single-line change).
+
 Upstream-Status: Inappropriate [oe specific]
 
 Signed-off-by: Manoj Saun <manojsingh.saun@windriver.com>
@@ -19,12 +21,11 @@ Signed-off-by: Manoj Saun <manojsingh.saun@windriver.com>
  2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/src/test/regress/expected/sysviews.out b/src/test/regress/expected/sysviews.out
-index 2176a54..a84bc27 100644
 --- a/src/test/regress/expected/sysviews.out
 +++ b/src/test/regress/expected/sysviews.out
-@@ -52,7 +52,7 @@ from pg_backend_memory_contexts where name = 'Caller tuples';
- 
- rollback;
+@@ -66,7 +66,7 @@
+ (1 row)
+
  -- At introduction, pg_config had 23 entries; it may grow
 -select count(*) > 20 as ok from pg_config;
 +select count(*) > 13 as ok from pg_config;
@@ -32,15 +33,16 @@ index 2176a54..a84bc27 100644
  ----
   t
 diff --git a/src/test/regress/sql/sysviews.sql b/src/test/regress/sql/sysviews.sql
-index b047fb5..d1e3999 100644
 --- a/src/test/regress/sql/sysviews.sql
 +++ b/src/test/regress/sql/sysviews.sql
-@@ -33,7 +33,7 @@ from pg_backend_memory_contexts where name = 'Caller tuples';
- rollback;
- 
+@@ -43,7 +43,7 @@
+ and c1.path[c2.level] = c2.path[c2.level];
+
  -- At introduction, pg_config had 23 entries; it may grow
 -select count(*) > 20 as ok from pg_config;
 +select count(*) > 13 as ok from pg_config;
- 
+
  -- We expect no cursors in this test; see also portals.sql
  select count(*) = 0 as ok from pg_cursors;
+--
+2.43.0

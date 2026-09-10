@@ -244,7 +244,7 @@ INITSCRIPT_PARAMS = "start 64 . stop 36 0 1 2 3 4 5 6 ."
 do_install:append() {
     # install contrib
     oe_runmake DESTDIR=${D} -C contrib install
-    oe_multilib_header pg_config.h pg_config_ext.h ecpg_config.h postgresql/server/pg_config.h postgresql/server/pg_config_ext.h
+    oe_multilib_header pg_config.h ecpg_config.h postgresql/server/pg_config.h
     # install tutorial
     install -d -m 0755 ${D}${libdir}/${BPN}/tutorial
     install ${B}/src/tutorial/* ${D}${libdir}/${BPN}/tutorial

@@ -10,7 +10,7 @@ HOMEPAGE = "http://www.fping.org/"
 BUGTRACKER = "https://github.com/schweikert/fping/issues"
 SECTION = "net"
 
-LICENSE = "fping"
+LICENSE = "LicenseRef-fping"
 NO_GENERIC_LICENSE[fping] = "COPYING"
 LIC_FILES_CHKSUM = "file://COPYING;md5=c6170fbadddfcd74f011515291d96901"
 

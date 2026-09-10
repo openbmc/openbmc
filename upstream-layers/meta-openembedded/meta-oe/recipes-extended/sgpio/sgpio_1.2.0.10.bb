@@ -8,6 +8,11 @@ SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BPN}-1.2-0.10-src.ta
            "
 SRC_URI[sha256sum] = "9bf8c42acaa247efd9321bdb1fc2390022f0c554d77fbbd4a7363d990fc0270b"
 
+# The Fedora lookaside cache only ever holds the one tarball we fetch; upstream
+# publishes sgpio tarballs as attachments on the dmraid eventing wiki page
+UPSTREAM_CHECK_URI = "https://sourceware.org/lvm2/wiki/DMRAID_Eventing"
+UPSTREAM_CHECK_REGEX = "sgpio-(?P<pver>\d+(\.\d+)+)\.tgz"
+
 S = "${UNPACKDIR}/${BPN}"
 
 LICENSE = "GPL-2.0-or-later"

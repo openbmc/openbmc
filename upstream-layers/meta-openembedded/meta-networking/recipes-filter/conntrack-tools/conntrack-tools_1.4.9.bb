@@ -15,6 +15,9 @@ SRC_URI = "http://www.netfilter.org/projects/conntrack-tools/files/conntrack-too
 "
 SRC_URI[sha256sum] = "c15afe488a8d408c9d6d61e97dbd19f3c591942f62c13df6453a961ca4231cae"
 
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/pub/conntrack-tools/"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)\.tar\.xz"
+
 inherit autotools update-rc.d pkgconfig systemd
 
 PACKAGECONFIG ?= "cthelper cttimeout \

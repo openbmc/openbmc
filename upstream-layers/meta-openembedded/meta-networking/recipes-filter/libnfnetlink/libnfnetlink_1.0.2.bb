@@ -20,3 +20,6 @@ SRC_URI[sha256sum] = "b064c7c3d426efb4786e60a8e6859b82ee2f2c5e49ffeea640cfe4fe33
 inherit autotools pkgconfig
 
 BBCLASSEXTEND = "native"
+
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/pub/libnfnetlink/"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)\.tar\.bz2"

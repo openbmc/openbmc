@@ -1,6 +1,6 @@
 SUMMARY  = "Safe C Library"
 
-LICENSE  = "safec"
+LICENSE  = "LicenseRef-safec"
 LIC_FILES_CHKSUM = "file://COPYING;md5=6d0eb7dfc57806a006fcbc4e389cf164"
 SECTION = "lib"
 

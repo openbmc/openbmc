@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "73b8b65163ebf10f9f671efab9eed3d56f20d2ca68bda83fa64740a92c
 
 inherit pypi python_poetry_core ptest-python-pytest
 
+DEPENDS += "python3-wheel-native"
+
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[dev] = ",,,python3-black python3-flake8 python3-pre-commit"
 

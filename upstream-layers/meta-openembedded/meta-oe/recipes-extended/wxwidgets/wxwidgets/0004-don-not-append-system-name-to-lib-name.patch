@@ -14,15 +14,16 @@ Signed-off-by: Kai Kang <kai.kang@windriver.com>
 Rebase for wxWidgets 3.2.1.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebased on 3.2.11: context shifted by 109 lines (offset only, same change).
 ---
  build/cmake/functions.cmake | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/build/cmake/functions.cmake b/build/cmake/functions.cmake
-index 81ede7d8ae..23eebeb914 100644
 --- a/build/cmake/functions.cmake
 +++ b/build/cmake/functions.cmake
-@@ -243,9 +243,9 @@ function(wx_set_target_properties target_name)
+@@ -352,9 +352,9 @@
      endif()
  
      set(cross_target)
@@ -34,7 +35,6 @@ index 81ede7d8ae..23eebeb914 100644
 +    #endif()
  
      set(lib_prefix "lib")
-     if(MSVC OR (WIN32 AND wxBUILD_SHARED))
--- 
+     if(WIN32_MSVC_NAMING OR (WIN32 AND wxBUILD_SHARED))
+--
 2.25.1
-

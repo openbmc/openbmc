@@ -14,3 +14,6 @@ SRC_URI[sha256sum] = "769d3eaf57fa4fbdb05dd12873b6cb9a5be7844d8937e222b647381d44
 S = "${UNPACKDIR}/libnetfilter_conntrack-${PV}"
 
 inherit autotools pkgconfig
+
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/pub/libnetfilter_conntrack/"
+UPSTREAM_CHECK_REGEX = "libnetfilter_conntrack-(?P<pver>\d+(\.\d+)+)\.tar\.xz"

@@ -1,0 +1,53 @@
+From c8a74ad998879e52badd09e9e52477c8e87d0e5d Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 31 Jul 2026 02:25:45 -0700
+Subject: [PATCH] cmake: Pass _GNU_SOURCE via CMAKE_REQUIRED_DEFINITIONS too
+
+CMake's check_symbol_exists() does not forward CMAKE_REQUIRED_FLAGS to the
+try_compile() it performs - it only forwards CMAKE_REQUIRED_DEFINITIONS,
+CMAKE_REQUIRED_INCLUDES, CMAKE_REQUIRED_LINK_OPTIONS and
+CMAKE_REQUIRED_LIBRARIES. Its sibling modules (CheckIncludeFile,
+Internal/CheckSourceCompiles) do pass CMAKE_REQUIRED_FLAGS along as
+-DCOMPILE_DEFINITIONS, which is why only check_symbol_exists() is affected.
+
+As a result the -D_GNU_SOURCE=1 added to CMAKE_REQUIRED_FLAGS never reaches
+any check_symbol_exists() test, and every glibc extension guarded by
+__USE_GNU in the system headers is detected as missing:
+
+  HAVE_GETRESUID, HAVE_GETRESGID, HAVE_MEMFD_CREATE, HAVE_PPOLL,
+  HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR, LIBC_HAS_FOPEN64, ...
+
+Most of these just silently disable functionality, but HAVE_GETRESUID being
+unset is a hard build failure, because src/core/unix/SDL_gtk.c then defines
+its own static fallback which collides with the declaration in <unistd.h>:
+
+  SDL_gtk.c:90:19: error: static declaration of 'getresuid' follows
+                          non-static declaration
+  /usr/include/unistd.h:755:12: note: previous declaration is here
+
+Add -D_GNU_SOURCE=1 to CMAKE_REQUIRED_DEFINITIONS as well so that the
+symbol checks see it too.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 93a99bc..e37858d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -122,6 +122,11 @@ set(SDL_CHECK_REQUIRED_LINK_OPTIONS "" CACHE STRING "Extra link options (for CMA
+ mark_as_advanced(SDL_CHECK_REQUIRED_INCLUDES SDL_CHECK_REQUIRED_LINK_OPTIONS)
+ 
+ string(APPEND CMAKE_REQUIRED_FLAGS " -D_GNU_SOURCE=1")
++# check_symbol_exists() does not forward CMAKE_REQUIRED_FLAGS to try_compile(),
++# so _GNU_SOURCE has to be passed via CMAKE_REQUIRED_DEFINITIONS as well,
++# otherwise every check for a glibc extension (getresuid, memfd_create, ppoll,
++# posix_spawn_file_actions_addchdir, ...) is misdetected as missing.
++list(APPEND CMAKE_REQUIRED_DEFINITIONS "-D_GNU_SOURCE=1")
+ list(APPEND CMAKE_REQUIRED_INCLUDES ${SDL_CHECK_REQUIRED_INCLUDES})
+ list(APPEND CMAKE_REQUIRED_LINK_OPTIONS ${SDL_CHECK_REQUIRED_LINK_OPTIONS})
+ 

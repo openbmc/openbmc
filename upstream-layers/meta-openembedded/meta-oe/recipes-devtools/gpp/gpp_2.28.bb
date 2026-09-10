@@ -8,6 +8,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504"
 SRC_URI = "https://github.com/logological/gpp/releases/download/${PV}/gpp-${PV}.tar.bz2"
 SRC_URI[sha256sum] = "343d33d562e2492ca9b51ff2cc4b06968a17a85fdc59d5d4e78eed3b1d854b70"
 
+UPSTREAM_CHECK_URI = "https://github.com/logological/gpp/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+
 inherit autotools
 
 BBCLASSEXTEND = "native"

@@ -23,7 +23,7 @@ S = "${UNPACKDIR}/xforms-${PV}"
 DEPENDS = "libxpm jpeg libx11 virtual/libgl"
 RDEPENDS:${PN} = "bash"
 
-EXTRA_OECONF = "--with-extra-inc=${S}/lib" 
+EXTRA_OECONF = "--with-extra-inc=${S}/lib"
 
 do_compile:append() {
     sed -i -e 's|${B}|.|' ${B}/fd2ps/fd2ps

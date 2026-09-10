@@ -28,3 +28,5 @@ PACKAGE_BEFORE_PN = "${PN}-utils"
 FILES:${PN}-utils = "${bindir}"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2025-31498] = "fixed-version: Fixed since 1.34.5"

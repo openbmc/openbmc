@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=f75d2927d3c1ed2414ef72048f5ad640"
 
 SRC_URI[sha256sum] = "a8afc92bec6666807ca50524156fca22655325cba6e2b51d842b8ec0d399c708"
 
-inherit pypi python_setuptools_build_meta
+inherit pypi python_flit_core
 
 RDEPENDS:${PN} += " \
     python3-asyncio \

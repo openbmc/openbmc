@@ -1,19 +1,20 @@
-From 792cb4f9d13450251c6344eed2b35f382c98df0d Mon Sep 17 00:00:00 2001
+From f57a965e30deb280894779c177c443302a8439fc Mon Sep 17 00:00:00 2001
 From: Alex Kiernan <alexk@zuma.ai>
 Date: Thu, 19 Jan 2023 13:00:45 +0000
 Subject: [PATCH] wscript: Add BISONFLAGS support
 
----
 Upstream-Status: Pending
+Signed-off-by: Ankur Tyagi <ankur.tyagi85@gmail.com>
 
+---
  wscript | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/wscript b/wscript
-index 7329d6e46889..de51f1e9cdd9 100644
+index 65592c9..694869f 100644
 --- a/wscript
 +++ b/wscript
-@@ -140,6 +140,7 @@ def configure(ctx):
+@@ -139,6 +139,7 @@ def configure(ctx):
      # Ensure m4 is present, or bison will fail with SIGPIPE
      ctx.find_program('m4')
      ctx.load('bison')
@@ -21,8 +22,8 @@ index 7329d6e46889..de51f1e9cdd9 100644
  
      for opt in opt_map:
          ctx.env[opt] = opt_map[opt]
-@@ -911,6 +912,7 @@ int main(int argc, char **argv) {
-     msg_setting("CFLAGS", " ".join(ctx.env.CFLAGS))
+@@ -888,6 +889,7 @@ int main(int argc, char **argv) {
+     # print("CFLAGS:", sorted(ctx.env.CFLAGS))
      msg_setting("LDFLAGS", " ".join(ctx.env.LDFLAGS))
      msg_setting("LINKFLAGS_NTPD", " ".join(ctx.env.LINKFLAGS_NTPD))
 +    msg_setting("BISONFLAGS", ctx.env.BISONFLAGS)

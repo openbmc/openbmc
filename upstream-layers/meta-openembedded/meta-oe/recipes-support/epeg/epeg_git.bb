@@ -8,4 +8,8 @@ DEPENDS = "jpeg libexif"
 SRC_URI = "git://github.com/mattes/epeg.git;branch=master;protocol=https"
 SRCREV = "17bbae0f0a0b777e5fb01e0d16891e07153a41eb"
 
+# PV is just "git", so it can never be compared against the upstream v0.9.x
+# tags. SRCREV is pinned to master HEAD (== tag v0.9.3), so track commits.
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit autotools pkgconfig

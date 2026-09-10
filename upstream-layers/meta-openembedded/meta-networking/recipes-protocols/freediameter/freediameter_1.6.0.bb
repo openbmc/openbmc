@@ -125,7 +125,7 @@ FILES:${PN}-dbg += "${libdir}/${fd_pkgname}/.debug/*"
 FILES:${PN} += "${libdir}/${fd_pkgname}/*"
 
 RDEPENDS:${PN}  = "glib-2.0 gnutls libidn"
-RDEPENDS:${PN} += "openssl openssl-conf openssl-engines"
+RDEPENDS:${PN} += "openssl openssl-conf"
 RRECOMMENDS:${PN} += "kernel-module-tipc kernel-module-sctp"
 RRECOMMENDS:${PN} += "kernel-module-udp-tunnel kernel-module-ipip"
 RDEPENDS:${PN}-ptest = "cmake"

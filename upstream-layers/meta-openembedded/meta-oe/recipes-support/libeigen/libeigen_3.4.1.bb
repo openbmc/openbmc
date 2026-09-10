@@ -1,10 +1,10 @@
 DESCRIPTION = "Eigen is a C++ template library for linear algebra: matrices, vectors, numerical solvers, and related algorithms."
 HOMEPAGE = "http://eigen.tuxfamily.org/"
-LICENSE = "MPL-2.0 & Apache-2.0 & BSD-3-Clause & GPL-2.0-only & Minpack"
+LICENSE = "Apache-2.0 AND BSD-3-Clause AND GPL-2.0-only AND MPL-2.0 AND Minpack"
 # The GPL code is only used for benchmark tests and does not affect what is installed.
-LICENSE:${PN} = "MPL-2.0 & Apache-2.0 & BSD-3-Clause & Minpack"
-LICENSE:${PN}-dbg = "MPL-2.0 & Apache-2.0 & BSD-3-Clause & Minpack"
-LICENSE:${PN}-dev = "MPL-2.0 & Apache-2.0 & BSD-3-Clause & Minpack"
+LICENSE:${PN} = "Apache-2.0 AND BSD-3-Clause AND MPL-2.0 AND Minpack"
+LICENSE:${PN}-dbg = "Apache-2.0 AND BSD-3-Clause AND MPL-2.0 AND Minpack"
+LICENSE:${PN}-dev = "Apache-2.0 AND BSD-3-Clause AND MPL-2.0 AND Minpack"
 LIC_FILES_CHKSUM = "file://COPYING.MPL2;md5=815ca599c9df247a0c7f619bab123dad \
                     file://COPYING.APACHE;md5=8de23b8e93c63005353056b2475e9aa5 \
                     file://COPYING.BSD;md5=2dd0510ee95e59ca28834b875bc96596 \

@@ -9,6 +9,13 @@ Subject: [PATCH] psqlodbc: fixes for ptest support
 * Fix the output format for ptest.
 * Fix the results and exe dir.
 
+Rebased on 18.00.0002: upstream now generates a second (ANSI) DSN block
+alongside the original Unicode one, so the localhost/postgres/5432 defaults
+are applied to both; upstream also added a server_version parameter to
+runtest() and native TAP "ok"/"not ok" progress lines, neither of which this
+patch touches -- it only continues to reformat the final PASS:/FAIL: lines
+per-test, which is what ptest-runner's log parser matches on.
+
 Upstream-Status: Inappropriate [OE ptest specific]
 
 Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
@@ -19,10 +26,9 @@ Signed-off-by: Jackie Huang <jackie.huang@windriver.com>
  3 files changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/test/Makefile.in b/test/Makefile.in
-index 3f9a9af..09406ae 100644
 --- a/test/Makefile.in
 +++ b/test/Makefile.in
-@@ -19,7 +19,7 @@ CPPFLAGS = @CPPFLAGS@ -I..	# config.h
+@@ -19,7 +19,7 @@
  ODBC_CONFIG = @ODBC_CONFIG@
  PROVE = @PROVE@
  
@@ -32,7 +38,6 @@ index 3f9a9af..09406ae 100644
  all: $(TESTBINS) runsuite reset-db
  
 diff --git a/test/odbcini-gen.sh b/test/odbcini-gen.sh
-index 2eaba35..d7c03ba 100755
 --- a/test/odbcini-gen.sh
 +++ b/test/odbcini-gen.sh
 @@ -6,7 +6,7 @@
@@ -44,7 +49,7 @@ index 2eaba35..d7c03ba 100755
  driver=${drvr}.so
  if test ! -e $driver ; then
  	driver=${drvr}.dll
-@@ -16,7 +16,7 @@ if test ! -e $driver ; then
+@@ -16,7 +16,7 @@
  	fi
  fi
  
@@ -53,7 +58,21 @@ index 2eaba35..d7c03ba 100755
  drivera=${drvra}.so
  if test ! -e $drivera ; then
  	drivera=${drvra}.dll
-@@ -52,10 +52,10 @@ Driver          = PostgreSQL Unicode
+@@ -52,10 +52,10 @@
+ Trace           = No
+ TraceFile               =
+ Database                = contrib_regression
+-Servername              =
+-Username                =
++Servername              = localhost
++Username                = postgres
+ Password                =
+-Port                    =
++Port                    = 5432
+ ReadOnly                = No
+ RowVersioning           = No
+ ShowSystemTables                = No
+@@ -78,10 +78,10 @@
  Trace           = No
  TraceFile               =
  Database                = contrib_regression
@@ -68,10 +87,9 @@ index 2eaba35..d7c03ba 100755
  RowVersioning           = No
  ShowSystemTables                = No
 diff --git a/test/runsuite.c b/test/runsuite.c
-index 6ac3709..023ac1d 100644
 --- a/test/runsuite.c
 +++ b/test/runsuite.c
-@@ -55,7 +55,7 @@ bailout(const char *fmt, ...)
+@@ -55,7 +55,7 @@
  
  /* Given a test program's name, get the test name */
  void
@@ -80,7 +98,7 @@ index 6ac3709..023ac1d 100644
  {
  	const char *basename;
  #ifdef WIN32
-@@ -69,7 +69,7 @@ parse_argument(const char *in, char *testname, char *binname)
+@@ -69,7 +69,7 @@
  	if (strchr(in, DIR_SEP) == NULL)
  	{
  		strcpy(testname, in);
@@ -89,16 +107,16 @@ index 6ac3709..023ac1d 100644
  		return;
  	}
  
-@@ -131,7 +131,7 @@ int main(int argc, char **argv)
+@@ -139,7 +139,7 @@
  	failures = 0;
  	for (i = 1, j = 1; i <= numtests; i++, j++)
  	{
 -		parse_argument(argv[j], testname, binname);
 +		parse_argument(argv[j], testname, binname, inputdir);
- 		if (runtest(binname, testname, i, inputdir) != 0)
+ 		if (runtest(binname, testname, i, inputdir, server_version) != 0)
  			failures++;
  	}
-@@ -161,29 +161,29 @@ runtest(const char *binname, const char *testname, int testno, const char *input
+@@ -169,29 +169,29 @@
  #ifndef WIN32
  	snprintf(cmdline, sizeof(cmdline),
  			 "ODBCSYSINI=. ODBCINSTINI=./odbcinst.ini ODBCINI=./odbc.ini "
@@ -115,7 +133,7 @@ index 6ac3709..023ac1d 100644
  #endif
  	rc = system(cmdline);
  
- 	diff = rundiff(testname, inputdir);
+ 	diff = rundiff(testname, inputdir, server_version);
  	if (rc != 0)
  	{
 -		printf("not ok %d - %s test returned %d\n", testno, testname, rc);
@@ -135,3 +153,5 @@ index 6ac3709..023ac1d 100644
  		ret = 0;
  	}
  	fflush(stdout);
+--
+2.43.0

@@ -1,0 +1,41 @@
+From 910aad27e06cf7180599c1dc5649a2dfadae6597 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 27 Aug 2026 09:14:24 +0000
+Subject: [PATCH] lib/crypt: fix const X509_NAME for OpenSSL 4.0
+
+OpenSSL 4.0 returns const X509_NAME* from X509_get_subject_name().
+Cast where X509_NAME_oneline requires non-const.
+
+Upstream-Status: Submitted [https://github.com/BOINC/boinc/pull/7209]
+
+Note: The upstream fix is part of a large 29-commit refactoring PR
+that rewrites the entire crypt.cpp. This is a minimal standalone fix
+for the const X509_NAME issue only.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ lib/crypt.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lib/crypt.cpp b/lib/crypt.cpp
+index 904fe2736c..a06b453324 100644
+--- a/lib/crypt.cpp
++++ b/lib/crypt.cpp
+@@ -774,7 +774,7 @@ int cert_verify_file(
+     DATA_BLOCK sig_db;
+     BIO *bio;
+     X509 *cert;
+-    X509_NAME *subj;
++    const X509_NAME *subj;
+ 
+     if (signatures->signatures.size() == 0) {
+         printf("No signatures available for file ('%s').\n", origFile);
+@@ -824,7 +824,7 @@ int cert_verify_file(
+             }
+             fflush(stdout);
+             subj = X509_get_subject_name(cert);
+-            X509_NAME_oneline(subj, buf, 256);
++            X509_NAME_oneline((X509_NAME *)subj, buf, 256);
+             // ???
+             //X509_NAME_free(subj);
+             X509_free(cert);

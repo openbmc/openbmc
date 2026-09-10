@@ -3,7 +3,7 @@ require recipes-graphics/xorg-font/xorg-font-common.inc
 SUMMARY = "X.org miscellaneous fonts"
 HOMEPAGE = "http://cgit.freedesktop.org/xorg/font/misc-misc/"
 SECTION = "x11/font"
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 LIC_FILES_CHKSUM = "file://COPYING;md5=200c507f595ee97008c7c5c3e94ab9a8"
 
 DEPENDS = "util-macros-native font-util-native bdftopcf-native font-util"

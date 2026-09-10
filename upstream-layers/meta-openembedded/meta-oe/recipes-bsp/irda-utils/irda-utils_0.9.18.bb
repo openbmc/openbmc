@@ -18,6 +18,10 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/irda/irda-utils-${PV}.tar.gz \
 
 SRC_URI[sha256sum] = "61980551e46b2eaa9e17ad31cbc1a638074611fc33bff34163d10c7a67a9fdc6"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/irda/files/irda-utils/"
+UPSTREAM_CHECK_REGEX = "irda-utils/(?P<pver>\d+(\.\d+)+)/"
+
+
 inherit update-rc.d
 
 RRECOMMENDS:${PN} = "\

@@ -10,3 +10,5 @@ SRC_URI[sha256sum] = "feec40075be03a04501a973d81f633735b4b69f98b05450592310c0f40
 
 BBCLASSEXTEND = "native nativesdk"
 inherit pypi python_setuptools_build_meta
+
+DEPENDS += "python3-wheel-native"

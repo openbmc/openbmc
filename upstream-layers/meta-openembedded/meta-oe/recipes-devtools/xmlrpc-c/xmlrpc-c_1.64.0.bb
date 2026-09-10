@@ -2,7 +2,7 @@ DESCRIPTION = "XML-RPC for C/C++ is programming libraries and related tools to h
 write an XML-RPC server or client in C or C++."
 
 HOMEPAGE = "http://xmlrpc-c.sourceforge.net/"
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 LIC_FILES_CHKSUM = "file://doc/COPYING;md5=aefbf81ba0750f02176b6f86752ea951"
 
 SRC_URI = "git://github.com/mirror/xmlrpc-c.git;branch=master;protocol=https \
@@ -12,6 +12,10 @@ SRC_URI = "git://github.com/mirror/xmlrpc-c.git;branch=master;protocol=https \
            file://0001-fix-bool-reserved-word-error-in-gcc-15.patch;striplevel=2 \
            "
 SRCREV = "8ce36bce2438df9b02fcaafd19efa90a56426601"
+
+# The github mirror carries no tags, and upstream releases on SourceForge use a
+# different (1.NN.PP) numbering than this recipe's PV, so track new commits.
+UPSTREAM_CHECK_COMMITS = "1"
 
 S = "${UNPACKDIR}/${BP}/advanced"
 

@@ -3,26 +3,28 @@ From: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
 Date: Tue, 1 Oct 2024 17:01:33 +0200
 Subject: [PATCH] Do not hardcode systemd unit directories
 
+Refreshed for netdata v2.10.4 (context shifted; same intent preserved).
+
 Upstream-Status: Inappropriate [oe-core specific]
 Signed-off-by: Enguerrand de Ribaucourt <enguerrand.de-ribaucourt@savoirfairelinux.com>
 ---
  CMakeLists.txt | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-Index: netdata-v1.47.3/CMakeLists.txt
-===================================================================
---- netdata-v1.47.3.orig/CMakeLists.txt
-+++ netdata-v1.47.3/CMakeLists.txt
-@@ -2531,7 +2531,7 @@ if(BUILD_FOR_PACKAGING)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d6dafd9..530298e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3642,7 +3642,7 @@ if(BUILD_FOR_PACKAGING)
          install(FILES
                  ${CMAKE_BINARY_DIR}/system/systemd/netdata.service
                  COMPONENT netdata
 -                DESTINATION lib/systemd/system)
 +                DESTINATION $ENV{systemd_system_unitdir})
-         install(DIRECTORY
-                 COMPONENT netdata
-                 DESTINATION usr/lib/systemd/journald@netdata.conf.d)
-@@ -2620,11 +2620,11 @@ if(NOT OS_WINDOWS)
+         install(FILES
+                 ${CMAKE_BINARY_DIR}/system/systemd/sysusers/netdata.conf
+                 COMPONENT user
+@@ -3739,11 +3739,11 @@ if(NOT OS_WINDOWS)
      install(FILES
              ${CMAKE_BINARY_DIR}/system/systemd/netdata-updater.service
              COMPONENT netdata

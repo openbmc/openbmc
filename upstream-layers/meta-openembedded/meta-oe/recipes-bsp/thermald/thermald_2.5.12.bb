@@ -12,7 +12,10 @@ DEPENDS += "autoconf-archive-native"
 LICENSE = "GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ea8831610e926e2e469075b52bf08848"
 
-SRC_URI = "git://github.com/intel/thermal_daemon/;branch=master;protocol=https;tag=v${PV}"
+SRC_URI = " \
+    git://github.com/intel/thermal_daemon/;branch=master;protocol=https;tag=v${PV} \
+    file://0001-thd_gddv-fix-building-on-32-bit-systems.patch \
+"
 
 SRCREV = "9996a1a1cdd01d32cd411459368a177f463d0047"
 
@@ -26,6 +29,7 @@ do_configure:prepend () {
 
 EXTRA_OECONF = " \
                  --with-systemdsystemunitdir=${systemd_system_unitdir} \
+                 --disable-werror \
                  "
 
 FILES:${PN} += "${datadir}/dbus-1"

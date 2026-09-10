@@ -1,0 +1,31 @@
+From: Fabio Estevam <festevam@gmail.com>
+Date: Sun, 26 Jul 2026 09:15:12 -0300
+Subject: [PATCH] convlb: Remove redundant NULL definition
+
+convlb.c includes standard headers that already define NULL. Defining it
+again is unnecessary and Clang rejects the redefinition because the project
+enables warnings as errors:
+
+convlb.c:24:9: error: 'NULL' macro redefined [-Werror,-Wmacro-redefined]
+
+Remove the local definition and use the one supplied by the standard headers.
+
+Upstream-Status: Pending
+Signed-off-by: Fabio Estevam <festevam@gmail.com>
+---
+ src/tools/convlb/convlb.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/tools/convlb/convlb.c b/src/tools/convlb/convlb.c
+index 0a0197e..2459359 100644
+--- a/src/tools/convlb/convlb.c
++++ b/src/tools/convlb/convlb.c
+@@ -21,8 +21,6 @@
+                                 GLOBALS
+ =============================================================================*/
+ 
+-#define NULL ((void *)0)
+-
+ #define TEMPFILENAME ".convlb.tmp"
+ 
+ char *toolname = NULL;

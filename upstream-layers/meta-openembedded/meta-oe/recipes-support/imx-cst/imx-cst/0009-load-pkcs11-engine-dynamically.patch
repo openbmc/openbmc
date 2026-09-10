@@ -1,0 +1,69 @@
+From: Tobias Deiminger <tobias.deiminger@linutronix.de>
+Date: Fri, 30 Jan 2026 01:55:36 +0100
+Subject: Load pkcs11 engine dynamically
+
+Upstream links a static copy of OpenSSL. It also hardcodes to statically link
+the pkcs11 engine from libp11.
+ We want to use system shared libraries instead and therefore adjust the
+ following:
+ - Don't call the bind_engine function from pkcs11 explicitly. It would require
+   linking, which in turn would require rpath for engines-3/pkcs11.so since
+   it's not in the system search path. Rather use OpenSSLs dynamic engine load
+   feature.
+ - Remove hardcoded static linking settings from CMakeLists.txt.
+
+Last-Update: 2025-05-27
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/openssl_engine_dynload.patch]
+---
+ src/CMakeLists.txt        |  2 --
+ src/lib/back_end/engine.c | 16 +---------------
+ 2 files changed, 1 insertion(+), 17 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 73035c6..236cc47 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -4,7 +4,6 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
+ 
+ option(CST_WITH_OPENSSL "Enable OpenSSL backend" ON)
+ if (CST_WITH_OPENSSL)
+-  set(OPENSSL_USE_STATIC_LIBS TRUE)
+   find_package(OpenSSL 3.0.0 REQUIRED)
+   if(NOT OPENSSL_FOUND)
+       message(FATAL "Cannot find OpenSSL, please check environment")
+@@ -119,7 +118,6 @@ function(find_cst_dependency_library LIB_NAME LIB_DIR_VAR LIB_VAR INCLUDE_VAR)
+ endfunction()
+ 
+ if(CST_WITH_PKCS11)
+-    find_cst_dependency_library("libpkcs11.a" libp11_DIR PKCS11_LIB PKCS11_INCLUDE_DIR)
+     add_compile_definitions(CST_WITH_PKCS11)
+ endif()
+ 
+diff --git a/src/lib/back_end/engine.c b/src/lib/back_end/engine.c
+index 83fa6dc..dd7eeb0 100644
+--- a/src/lib/back_end/engine.c
++++ b/src/lib/back_end/engine.c
+@@ -61,21 +61,7 @@ int32_t engine_ctx_init(struct engine_ctx *ctx)
+ 
+ 	ENGINE_load_builtin_engines();
+ 
+-    ctx->engine = ENGINE_new();
+-    if (ctx->engine == NULL) {
+-        error("Error creating new engine instance: %s\n",
+-              ERR_reason_error_string(ERR_get_error()));
+-        return 0;
+-    }
+-
+-    memset(&fns, 0, sizeof(fns));
+-    /* Bind the engine using the bind_engine function */
+-    if (!bind_engine(ctx->engine, "pkcs11", &fns)) {
+-        error("Error binding pkcs11 engine: %s\n",
+-              ERR_reason_error_string(ERR_get_error()));
+-        ENGINE_free(ctx->engine);
+-        return 0;
+-    }
++	ctx->engine = ENGINE_by_id("pkcs11");
+ 
+ #ifdef DEBUG
+ 	ENGINE_ctrl_cmd_string(ctx->engine, "VERBOSE", NULL, 0);

@@ -15,4 +15,3 @@ RDEPENDS:${PN} += " \
 "
 
 PYPI_PACKAGE = "pytest_xdist"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"

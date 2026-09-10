@@ -12,6 +12,9 @@ SRC_URI = "https://github.com/maxmind/geoipupdate/releases/download/v3.1.1/geoip
           "
 SRC_URI[sha256sum] = "3de22e3fe3282024288a00807bbea9a1ffa2d1e8fe9c611f4b14a5b4d8ebe08a"
 
+UPSTREAM_CHECK_URI = "https://github.com/maxmind/geoipupdate/tags"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
+
 LICENSE = "GPL-2.0-only"
 
 LIC_FILES_CHKSUM = "\

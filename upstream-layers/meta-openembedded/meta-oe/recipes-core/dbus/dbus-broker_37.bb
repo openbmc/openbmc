@@ -40,7 +40,7 @@ RDEPENDS:${PN} += "dbus-common dbus-tools"
 FILES:${PN} += "${nonarch_libdir}/systemd/catalog"
 FILES:${PN} += "${systemd_system_unitdir}"
 FILES:${PN} += "${systemd_user_unitdir}"
-FILES:${PN}-ptest += "${libdir}/${PN}/tests"
+FILES:${PN}-ptest += "${nonarch_libdir}/${PN}/tests"
 
 # test-sockopt fails to compile with musl without this flag
 CFLAGS:append:libc-musl = "${@bb.utils.contains('PTEST_ENABLED', '1', ' -Wno-error=incompatible-pointer-types ', '', d)}"

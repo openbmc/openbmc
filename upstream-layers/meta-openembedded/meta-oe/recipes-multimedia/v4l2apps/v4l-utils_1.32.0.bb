@@ -1,6 +1,6 @@
 SUMMARY = "v4l2 and IR applications"
 HOMEPAGE = "https://git.linuxtv.org/v4l-utils.git"
-LICENSE = "GPL-2.0-only & LGPL-2.1-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=0ebceacbd7029b5e7051e9f529542b7c \
                     file://COPYING.libv4l;md5=88b8889c2c4329d4cf18ce5895e64c16"
 PROVIDES = "libv4l media-ctl"

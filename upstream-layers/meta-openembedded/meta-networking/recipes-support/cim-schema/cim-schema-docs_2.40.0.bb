@@ -2,7 +2,7 @@ require cim-schema.inc
 
 SECTION = "doc"
 
-LICENSE = "DMTF"
+LICENSE = "LicenseRef-DMTF"
 
 SRC_URI = "http://dmtf.org/sites/default/files/cim/cim_schema_v2400/cim_schema_${PV}Final-Doc.zip;subdir=${BP} \
            file://LICENSE \

@@ -2,7 +2,7 @@ SUMMARY = "D-Bus implementation in C++"
 HOMEPAGE = "https://dbus-cxx.github.io/"
 BUGTRACKER = "https://github.com/dbus-cxx/dbus-cxx/issues"
 SECTION = "base"
-LICENSE = "LGPL-3.0-or-later | BSD-3-Clause"
+LICENSE = "BSD-3-Clause OR LGPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=24594f493407a4cd401ce9794e0b9308"
 
 SRC_URI = "git://github.com/dbus-cxx/dbus-cxx.git;branch=master;protocol=https;tag=${PV}"

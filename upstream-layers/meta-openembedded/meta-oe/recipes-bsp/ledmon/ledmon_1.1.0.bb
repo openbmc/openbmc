@@ -27,6 +27,6 @@ EXTRA_OECONF += "${@bb.utils.contains('DISTRO_FEATURES', 'systemd', '--enable-sy
 
 EXTRA_OEMAKE = "CC='${CC}' LDFLAGS='${LDFLAGS}' CFLAGS='${CFLAGS}'"
 
-# The ledmon sources include headers in ${S}/config to build but not in CFLAGS. 
+# The ledmon sources include headers in ${S}/config to build but not in CFLAGS.
 # We need to add this include path in CFLAGS.
 CFLAGS += "-I${S}/config"

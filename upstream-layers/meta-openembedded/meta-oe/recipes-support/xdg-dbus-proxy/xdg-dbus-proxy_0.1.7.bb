@@ -23,6 +23,6 @@ CVE_STATUS[CVE-2026-34080] = "fixed-version: fixed in 0.1.7"
 PACKAGECONFIG = "${@bb.utils.contains('PTEST_ENABLED', '1', 'tests', '', d)}"
 PACKAGECONFIG[tests] = "-Dtests=true -Dinstalled_tests=true,-Dtests=false -Dinstalled_tests=false"
 
-RDEPENDS:${PN}-ptest += "dbus"
+RDEPENDS:${PN}-ptest += "${VIRTUAL-RUNTIME_dbus}"
 
 BBCLASSEXTEND = "native"

@@ -5,7 +5,7 @@ SECTION = "libs"
 # android-platform-tools source package.
 # BoringSSL is a fork of OpenSSL; new files carry ISC license, OpenSSL license
 # covers the forked parts.
-LICENSE = "OpenSSL & ISC"
+LICENSE = "ISC AND OpenSSL"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=2ca501bc96ce9ed0814e2c592c3f9593"
 
 SRC_URI = "https://deb.debian.org/debian/pool/main/a/android-platform-external-boringssl/android-platform-external-boringssl_${PV}.orig.tar.xz \

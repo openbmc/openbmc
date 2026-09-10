@@ -12,27 +12,26 @@ Upstream-Status: Pending
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/gpl/png-fix-IDAT-windowsize.c b/gpl/png-fix-IDAT-windowsize.c
-index 6d4ef9c..d212017 100644
+index 6543d20..b190906 100644
 --- a/gpl/png-fix-IDAT-windowsize.c
 +++ b/gpl/png-fix-IDAT-windowsize.c
-@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
+@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
              fprintf(stderr, "  Compiled with zlib %s; using zlib %s.\n",
                ZLIB_VERSION, zlib_version);
              fprintf(stderr, "\n");
--            fprintf(stderr, png_fix_IDAT_windowsize_usage);
-+            fprintf(stderr, "%s", png_fix_IDAT_windowsize_usage);
+-            fprintf(stderr, PNG_FIX_IDAT_WINDOWSIZE_USAGE);
++            fprintf(stderr, "%s", PNG_FIX_IDAT_WINDOWSIZE_USAGE);
              fflush(stderr);
              return 1;
          }
-@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
+@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
      fflush(stdout);
  
      if ( argn == argc ) {
--        fprintf(stderr, png_fix_IDAT_windowsize_usage);
-+        fprintf(stderr, "%s", png_fix_IDAT_windowsize_usage);
+-        fprintf(stderr, PNG_FIX_IDAT_WINDOWSIZE_USAGE);
++        fprintf(stderr, "%s", PNG_FIX_IDAT_WINDOWSIZE_USAGE);
          fflush(stderr);
          return 5;
      } else {
 -- 
-2.12.2
-
+2.25.1

@@ -1,0 +1,54 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sat, 23 Aug 2026 00:00:00 -0700
+Subject: [PATCH] vboxvideo: let the build decide if drm_fb_helper_alloc_info()
+ exists
+
+Linux commit 63c971af4036 ("drm/fb-helper: Allocate and release fb_info in
+a single place") moved the struct fb_info allocation out of the drivers and
+into the DRM core, and turned drm_fb_helper_alloc_info() into a static
+function. Drivers now find the instance ready to use in fb_helper->info by
+the time their .fbdev_probe callback runs.
+
+vbox_fb.c guards its drm_fb_helper_alloc_info() call with RTLNX_VER_MIN(6,19,0),
+which is where the change landed in mainline. That is not sufficient: the
+commit was also picked up as a Stable-dep-of and so appeared in the middle of
+several stable series - v6.6.151, v6.12.103 and v6.18.44 all dropped the
+declaration while v6.6.150, v6.12.102 and v6.18.43 still have it. Building
+vboxvideo against any of those kernels fails with
+
+  vbox_fb.c:336:16: error: implicit declaration of function 'drm_fb_helper_alloc_info'; did you mean 'drm_fb_helper_fill_info'? [-Wimplicit-function-declaration]
+  vbox_fb.c:336:14: error: assignment to 'struct fb_info *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+
+Since LINUX_VERSION_CODE cannot express "somewhere inside 6.6.y/6.12.y/6.18.y",
+add an escape hatch the build system can set once it has looked at the kernel
+headers it is actually compiling against. Leaving
+VBOX_NO_DRM_FB_HELPER_ALLOC_INFO undefined keeps the previous behaviour, so
+this is a no-op for anyone building the way VirtualBox intends.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ vboxvideo/vbox_fb.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/vboxvideo/vbox_fb.c b/vboxvideo/vbox_fb.c
+index 063be63..7163780 100644
+--- a/vboxvideo/vbox_fb.c
++++ b/vboxvideo/vbox_fb.c
+@@ -330,7 +330,14 @@ int vboxfb_create(struct drm_fb_helper *helper,
+ 		return ret;
+ 	}
+ 
+-#if RTLNX_VER_MIN(6,19,0) || RTLNX_RHEL_RANGE(9,9, 9,99)
++	/*
++	 * Since Linux 6.19 the DRM core allocates the struct fb_info instance
++	 * before it calls into this callback, and drm_fb_helper_alloc_info() is
++	 * no longer available to drivers. A version check alone cannot express
++	 * that, because the change was backported into the middle of the 6.6,
++	 * 6.12 and 6.18 stable series, so let the build system tell us as well.
++	 */
++#if RTLNX_VER_MIN(6,19,0) || RTLNX_RHEL_RANGE(9,9, 9,99) || defined(VBOX_NO_DRM_FB_HELPER_ALLOC_INFO)
+ 	info = helper->info;
+ #elif RTLNX_VER_MIN(6,2,0) || RTLNX_RHEL_RANGE(8,9, 8,99) || RTLNX_RHEL_RANGE(9,3, 9,99)
+ 	info = drm_fb_helper_alloc_info(helper);

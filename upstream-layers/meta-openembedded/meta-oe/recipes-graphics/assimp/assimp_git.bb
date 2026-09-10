@@ -11,7 +11,7 @@ DEPENDS = "zlib"
 
 SRC_URI = "git://github.com/assimp/assimp.git;protocol=https;branch=master"
 
-SRCREV = "1962da5ac484434524e7a25d566046edd932f901"
+SRCREV = "fe1965b3e73f7c241265e8e5b3015764936a6ce5"
 
 PV = "5.x+git${SRCPV}"
 
@@ -20,12 +20,12 @@ inherit cmake
 EXTRA_OECMAKE = "\
     -DASSIMP_BUILD_ASSIMP_TOOLS=OFF \
     -DASSIMP_BUILD_TESTS=OFF \
-    -DASSIMP_WARNINGS_AS_ERRORS=OFF \
     -DASSIMP_LIB_INSTALL_DIR=${baselib} \
     -DCMAKE_INSTALL_PREFIX=${prefix} \
     -DCMAKE_INSTALL_LIBDIR=${baselib} \
     -DCMAKE_SKIP_RPATH=ON \
     -DCMAKE_BUILD_WITH_INSTALL_RPATH=OFF \
+    -DASSIMP_WARNINGS_AS_ERRORS=OFF \
 "
 
 do_install:append() {

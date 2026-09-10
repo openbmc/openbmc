@@ -1,0 +1,38 @@
+From d09a791bb88c69c34dd2e294213ed2a47568267f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Viktor=20Mal=C3=ADk?= <viktor.malik@gmail.com>
+Date: Tue, 18 Aug 2026 21:47:37 +0200
+Subject: [PATCH] IRBuilderBPF: Fix HasTerminator on LLVM 23 (#5298)
+
+LLVM 23 changed the implementation of BasicBlock::getTerminator(), which
+now doesn't check that a basic block actually has a terminator and
+should only be called after a successful BasicBlock::hasTerminator()
+check. Add the check to IRBuilderBPF::HasTerminator() for LLVM 23.
+
+Signed-off-by: Viktor Malik <viktor.malik@gmail.com>
+
+Upstream-Status: Backport [https://github.com/bpftrace/bpftrace/commit/d09a791bb88c69c34dd2e294213ed2a47568267f]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ src/ast/irbuilderbpf.cpp | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/src/ast/irbuilderbpf.cpp b/src/ast/irbuilderbpf.cpp
+index fb94f9bdde6b..2a2ac6209c19 100644
+--- a/src/ast/irbuilderbpf.cpp
++++ b/src/ast/irbuilderbpf.cpp
+@@ -2512,7 +2512,13 @@ llvm::Value *IRBuilderBPF::CreateCheckedBinop(Binop &binop,
+ bool IRBuilderBPF::HasTerminator()
+ {
+   BasicBlock *current_block = GetInsertBlock();
+-  return current_block && current_block->getTerminator();
++  if (!current_block)
++    return false;
++#if LLVM_VERSION_MAJOR >= 23
++  if (!current_block->hasTerminator())
++    return false;
++#endif
++  return current_block->getTerminator();
+ }
+ 
+ } // namespace bpftrace::ast

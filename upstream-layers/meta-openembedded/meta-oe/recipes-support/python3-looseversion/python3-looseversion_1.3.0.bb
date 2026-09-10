@@ -10,5 +10,3 @@ DEPENDS = "python3-hatchling-native"
 SRC_URI[sha256sum] = "ebde65f3f6bb9531a81016c6fef3eb95a61181adc47b7f949e9c0ea47911669e"
 
 inherit pypi python_hatchling
-
-PYPI_PACKAGE = "looseversion"

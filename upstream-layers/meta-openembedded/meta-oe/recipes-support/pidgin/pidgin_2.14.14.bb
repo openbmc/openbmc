@@ -14,6 +14,9 @@ SRC_URI = "\
 
 SRC_URI[sha256sum] = "0ffc9994def10260f98a55cd132deefa8dc4a9835451cc0e982747bd458e2356"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/pidgin/files/Pidgin/"
+UPSTREAM_CHECK_REGEX = "Pidgin/(?P<pver>\d+(\.\d+)+)/"
+
 CVE_STATUS[CVE-2011-3594] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 
 PACKAGECONFIG ??= "gnutls consoleui avahi dbus idn nss \

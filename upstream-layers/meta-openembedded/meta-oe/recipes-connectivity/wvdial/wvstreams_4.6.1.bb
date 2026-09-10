@@ -27,7 +27,7 @@ SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.
 
 SRC_URI[sha256sum] = "8403f5fbf83aa9ac0c6ce15d97fd85607488152aa84e007b7d0621b8ebc07633"
 
-# The code.google.com/archive page is generated using Javascript from a JSON file and does not 
+# The code.google.com/archive page is generated using Javascript from a JSON file and does not
 # allow devtool to find the latest version
 UPSTREAM_VERSION_UNKNOWN = "1"
 

@@ -13,7 +13,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/pod/Import::Into"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=209;endline=223;md5=3cf363f1e405dea6db2c6cd0ef23680c"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/H/HA/HAARG/Import-Into-${PV}.tar.gz"

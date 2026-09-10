@@ -1,6 +1,6 @@
 SUMMARY = "A spell checker and morphological analyzer library"
 HOMEPAGE = "http://hunspell.github.io/"
-LICENSE = "GPL-2.0-only | LGPL-2.1-only"
+LICENSE = "GPL-2.0-only OR LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=75859989545e37968a99b631ef42722e \
     file://COPYING.LESSER;md5=c96ca6c1de8adc025adfada81d06fba5 \
@@ -34,6 +34,11 @@ do_install_ptest() {
     sed -i 's|alias analyze=.*ANALYZE.*|alias analyze="$ANALYZE"|' ${D}${PTEST_PATH}/tests/test.sh
 }
 
-RDEPENDS:${PN}-ptest += "bash glibc-gconv-iso8859-2"
+RDEPENDS:${PN}-ptest += " \
+    bash \
+    glibc-gconv-iso8859-1 \
+    glibc-gconv-iso8859-2 \
+    glibc-gconv-iso8859-15 \
+"
 
 BBCLASSEXTEND = "native"

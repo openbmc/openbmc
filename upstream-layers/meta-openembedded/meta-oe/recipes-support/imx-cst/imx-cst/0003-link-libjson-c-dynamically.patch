@@ -1,0 +1,23 @@
+From: Tobias Deiminger <tobias.deiminger@linutronix.de>
+Date: Fri, 30 Jan 2026 01:55:37 +0100
+Subject: [PATCH] Link libjson-c as shared system library
+
+The ahab_signed_message tool requires libjson-c. Upstream hardcodes static
+linking. Use the system shared library instead.
+
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/libjson_c_dynlink.patch]
+---
+ src/tools/ahab_signed_message/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tools/ahab_signed_message/CMakeLists.txt b/src/tools/ahab_signed_message/CMakeLists.txt
+index 1555ff7..6616986 100644
+--- a/src/tools/ahab_signed_message/CMakeLists.txt
++++ b/src/tools/ahab_signed_message/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-find_cst_dependency_library("libjson-c.a" json_c_DIR JSONC_LIB JSONC_INCLUDE_DIR)
++find_cst_dependency_library("libjson-c.so" json_c_DIR JSONC_LIB JSONC_INCLUDE_DIR)
+ 
+ add_executable(ahab_signed_message
+     ahab_signed_message.c

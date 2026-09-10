@@ -9,5 +9,5 @@ PYPI_PACKAGE = "requests_unixsocket"
 
 inherit pypi python_setuptools_build_meta
 
-DEPENDS += "python3-pbr-native python3-setuptools-scm-native"
+DEPENDS += "python3-setuptools-scm-native"
 RDEPENDS:${PN} = "python3-requests python3-urllib3"

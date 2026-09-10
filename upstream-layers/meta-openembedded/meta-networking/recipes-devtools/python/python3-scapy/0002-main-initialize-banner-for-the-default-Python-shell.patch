@@ -1,0 +1,44 @@
+From 3d1f9f8043e239d6313d9b9c02a9d6ead6c32302 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 20 Aug 2026 00:14:29 +0200
+Subject: [PATCH] main: initialize banner for the default Python shell
+
+interact() only assigns the local variable "banner" in the branches that
+handle the ipython, ptipython, ptpython and bpython shells. The plain
+Python shell leaves it unbound, so the unconditional
+
+    banner += "\n"
+
+in the "if mybanner is not None:" block raises
+
+    UnboundLocalError: cannot access local variable 'banner' where it is
+    not associated with a value
+
+This is easy to hit: requesting an interpreter that is not installed
+(e.g. conf.interactive_shell = "ipython" without IPython) falls back to
+conf.interactive_shell = "python", and any caller passing mybanner then
+crashes instead of getting a shell. The mybanneronly path happens to be
+safe only because it assigns banner = "" first.
+
+Initialize banner from banner_text before the shell-specific chain so it
+is always bound.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ scapy/main.py | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scapy/main.py b/scapy/main.py
+index 990f27f..924e6dc 100644
+--- a/scapy/main.py
++++ b/scapy/main.py
+@@ -828,6 +828,7 @@ def interact(mydict=None,
+         # repl.use_ui_colorscheme("scapy")
+
+     # Extend banner text
++    banner = banner_text
+     if conf.interactive_shell in ["ipython", "ptipython"]:
+         import IPython
+         if conf.interactive_shell == "ptipython":

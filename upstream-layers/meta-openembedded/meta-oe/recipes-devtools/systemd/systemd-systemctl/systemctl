@@ -179,12 +179,18 @@ class SystemdUnit():
 
         raise SystemdUnitNotFoundError(self.root, unit)
 
-    def _process_deps(self, config, service, location, prop, dirstem):
+    def _process_deps(self, config, service, location, prop, dirstem,
+                      template_only):
         systemdir = self.root / SYSCONFDIR / "systemd" / "system"
 
         target = ROOT / location.relative_to(self.root)
         try:
             for dependent in config.get('Install', prop):
+                # template-only dependencies means either foo@.unit or foo@bar.unit,
+                # but not foo.unit, as then systemd cannot resolve the instance
+                if template_only and not re.match(r"[^@]+@[^\.]*\.", dependent):
+                        continue
+
                 wants = systemdir / "{}.{}".format(dependent, dirstem) / service
                 add_link(wants, target)
 
@@ -209,20 +215,24 @@ class SystemdUnit():
             return
 
         config = SystemdFile(self.root, path)
+        service = self.unit
+        template_only = False
+
+        # handle enabling a template unit with unspecified instance
         if instance == "":
             try:
                 default_instance = config.get('Install', 'DefaultInstance')[0]
             except KeyError:
-                # no default instance, so nothing to enable
-                return
+                # no default instance, allow template only dependencies
+                template_only = True
+            else:
+                # otherwise rewrite the service name with the default instance
+                service = self.unit.replace("@.", "@{}.".format(default_instance))
 
-            service = self.unit.replace("@.",
-                                        "@{}.".format(default_instance))
-        else:
-            service = self.unit
-
-        self._process_deps(config, service, path, 'WantedBy', 'wants')
-        self._process_deps(config, service, path, 'RequiredBy', 'requires')
+        self._process_deps(config, service, path, 'WantedBy', 'wants',
+                           template_only)
+        self._process_deps(config, service, path, 'RequiredBy', 'requires',
+                           template_only)
 
         try:
             for also in config.get('Install', 'Also'):

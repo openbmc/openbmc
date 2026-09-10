@@ -7,7 +7,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=d3f53e7cc5bf80b16eff1f4a38c73182"
 SRC_URI[sha256sum] = "eb54b2f82dd300d3142c49a89da195e823f5e5284d43203593f87c67bad92a96"
 
 PYPI_PACKAGE = "eth_utils"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi setuptools3
 

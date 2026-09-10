@@ -15,18 +15,22 @@ Rebase for wxWidgets 3.2.1. Replace wxPLATFORM_LIB_DIR with LIB_SUFFIX
 in this patch that LIB_SUFFIX has been passed to cmake in cmake.bbclass.
 
 Signed-off-by: Kai Kang <kai.kang@windriver.com>
+
+Rebased on 3.2.11: upstream refactored install.cmake/config.cmake/
+webview/CMakeLists.txt to derive their install paths from a new
+library_dir variable (= CMAKE_INSTALL_LIBDIR, from GNUInstallDirs) and
+wxCONFIG_DIR (derived from wxOUTPUT_DIR), which are already multilib-aware
+on their own -- dropped those 3 now-redundant hunks. Only wxOUTPUT_DIR
+in CMakeLists.txt (a build-dir path, not an install path, so untouched by
+that refactor) still needs the LIB_SUFFIX fix.
 ---
- CMakeLists.txt                         |  2 +-
- build/cmake/config.cmake               |  2 +-
- build/cmake/install.cmake              | 12 ++++++------
- build/cmake/lib/webview/CMakeLists.txt |  2 +-
- 4 files changed, 9 insertions(+), 9 deletions(-)
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index d6a4b49..9e86b87 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -43,7 +43,7 @@ include(build/cmake/policies.cmake NO_POLICY_SCOPE)
+@@ -48,7 +48,7 @@
  # Initialize variables for quick access to wx root dir in sub dirs
  set(wxSOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
  set(wxBINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -35,80 +39,5 @@ index d6a4b49..9e86b87 100644
  
  # parse the version number from wx/version.h and include in wxMAJOR_VERSION and wxMINOR_VERSION
  file(READ "${wxSOURCE_DIR}/include/wx/version.h" WX_VERSION_H_CONTENTS)
-diff --git a/build/cmake/config.cmake b/build/cmake/config.cmake
-index addd8d6..9ec6775 100644
---- a/build/cmake/config.cmake
-+++ b/build/cmake/config.cmake
-@@ -100,7 +100,7 @@ function(wx_write_config_inplace)
-     execute_process(
-         COMMAND
-         "${CMAKE_COMMAND}" -E ${COPY_CMD}
--        "${wxBINARY_DIR}/lib/wx/config/inplace-${TOOLCHAIN_FULLNAME}"
-+        "${wxBINARY_DIR}/lib${LIB_SUFFIX}/wx/config/inplace-${TOOLCHAIN_FULLNAME}"
-         "${wxBINARY_DIR}/wx-config"
-         )
- endfunction()
-diff --git a/build/cmake/install.cmake b/build/cmake/install.cmake
-index 202d054..e255e0b 100644
---- a/build/cmake/install.cmake
-+++ b/build/cmake/install.cmake
-@@ -44,11 +44,11 @@ if(WIN32_MSVC_NAMING)
- else()
-     install(
-         DIRECTORY "${wxSETUP_HEADER_PATH}"
--        DESTINATION "lib/wx/include")
-+        DESTINATION "lib${LIB_SUFFIX}/wx/include")
- 
-     install(
-         FILES "${wxOUTPUT_DIR}/wx/config/${wxBUILD_FILE_ID}"
--        DESTINATION "lib/wx/config"
-+        DESTINATION "lib${LIB_SUFFIX}/wx/config"
-         PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
-                     GROUP_EXECUTE GROUP_READ
-                     WORLD_EXECUTE WORLD_READ
-@@ -57,13 +57,13 @@ else()
-     install(DIRECTORY DESTINATION "bin")
-     install(CODE "execute_process( \
-         COMMAND ${CMAKE_COMMAND} -E create_symlink \
--        \"${CMAKE_INSTALL_PREFIX}/lib/wx/config/${wxBUILD_FILE_ID}\" \
-+        \"${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/wx/config/${wxBUILD_FILE_ID}\" \
-         \"\$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/wx-config\" \
-         )"
-     )
- endif()
- 
--install(EXPORT wxWidgetsTargets NAMESPACE wx:: DESTINATION "lib/cmake/wxWidgets/${wxPLATFORM_LIB_DIR}")
-+install(EXPORT wxWidgetsTargets NAMESPACE wx:: DESTINATION "lib${LIB_SUFFIX}/cmake/wxWidgets/${wxPLATFORM_LIB_DIR}")
- 
- # find_package config file
- include(CMakePackageConfigHelpers)
-@@ -86,11 +86,11 @@ write_basic_package_version_file(
- configure_package_config_file(
-     "${wxSOURCE_DIR}/build/cmake/wxWidgetsConfig.cmake.in"
-     "${projectConfig}"
--    INSTALL_DESTINATION "lib/cmake/wxWidgets"
-+    INSTALL_DESTINATION "lib${LIB_SUFFIX}/cmake/wxWidgets"
- )
- install(
-     FILES "${projectConfig}" "${versionConfig}"
--    DESTINATION "lib/cmake/wxWidgets"
-+    DESTINATION "lib${LIB_SUFFIX}/cmake/wxWidgets"
- )
- 
- # uninstall target
-diff --git a/build/cmake/lib/webview/CMakeLists.txt b/build/cmake/lib/webview/CMakeLists.txt
-index 2cb35e7..7977a84 100644
---- a/build/cmake/lib/webview/CMakeLists.txt
-+++ b/build/cmake/lib/webview/CMakeLists.txt
-@@ -146,7 +146,7 @@ if(WXGTK AND wxUSE_WEBVIEW_WEBKIT2)
-         ${WEBKIT2_LIBRARIES}
-         )
- 
--    wx_install(TARGETS wxwebkit2_ext LIBRARY DESTINATION "lib/wx/${WX_WEB_EXT_VERSION}/web-extensions")
-+    wx_install(TARGETS wxwebkit2_ext LIBRARY DESTINATION "lib${LIB_SUFFIX}/wx/${WX_WEB_EXT_VERSION}/web-extensions")
- 
-     wx_add_dependencies(wxwebview wxwebkit2_ext)
- endif()
--- 
+--
 2.49.0
-

@@ -21,5 +21,3 @@ RDEPENDS:${PN} += "python3-aiohttp \
                    python3-yarl"
 
 # optionally needs asynctest asynctest.case ddt but recipes do not exist for them
-
-PYPI_PACKAGE = "aioresponses"

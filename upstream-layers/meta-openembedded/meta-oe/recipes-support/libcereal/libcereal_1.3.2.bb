@@ -3,7 +3,7 @@ HOMEPAGE = "https://uscilab.github.io/cereal/"
 
 SECTION = "libs"
 
-LICENSE = "BSD-3-Clause & MIT & BSL-1.0"
+LICENSE = "BSD-3-Clause AND BSL-1.0 AND MIT"
 LIC_FILES_CHKSUM = "\
     file://LICENSE;md5=4921372a1fb38469e667c38b17a1c4b3 \
     file://include/cereal/external/rapidxml/license.txt;md5=d63ab70ba21ca0544b03284958324301 \

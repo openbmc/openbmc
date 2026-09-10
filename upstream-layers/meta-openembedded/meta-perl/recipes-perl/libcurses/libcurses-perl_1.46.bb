@@ -3,7 +3,7 @@ the curses library."
 
 SECTION = "libs"
 HOMEPAGE = "https://metacpan.org/pod/Curses"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README;beginline=26;endline=30;md5=0b37356c5e9e28080a3422d82af8af09"
 

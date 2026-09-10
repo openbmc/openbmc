@@ -43,8 +43,8 @@ Signed-off-by: Khem Raj <raj.khem@gmail.com>
      sck.close()
 
  = Sending and receiving an ICMPv6EchoRequest
--~ netaccess ipv6
-+~ netaccess ipv6 skipped_ptest
+-~ netaccess ipv6 needs_root
++~ netaccess ipv6 needs_root skipped_ptest
  def _test():
      with no_debug_dissector():
          x = sr1(IPv6(dst="www.google.com")/ICMPv6EchoRequest(),timeout=3)

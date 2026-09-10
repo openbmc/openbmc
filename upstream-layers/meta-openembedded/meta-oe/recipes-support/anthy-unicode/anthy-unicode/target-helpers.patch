@@ -1,0 +1,125 @@
+Upstream-Status: Inappropriate [cross-compile specific]
+
+For the target build, do not compile or run the dictionary-generation helpers
+(mkfiledic, mkdepgraph, mkworddic, calctrans, proccorpus) locally -- they are
+built by anthy-unicode-native and installed into the native sysroot. Drop the
+"./" prefix from the dictionary rules so the helpers are taken from PATH, and
+disable the local build of the helpers that also provide libraries.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+diff --git a/calctrans/Makefile.am b/calctrans/Makefile.am
+index a48867a..b47b6af 100644
+--- a/calctrans/Makefile.am
++++ b/calctrans/Makefile.am
+@@ -15,31 +15,31 @@ dict_source_files = anthy.cand_info anthy.trans_info anthy.corpus_array anthy.co
+ 
+ update_params:
+ 	rm -f parsed_data2
+-	./proccorpus $(srcdir)/corpus.?.txt > parsed_data
+-	./calctrans parsed_data -o $(srcdir)/corpus_info
+-	./calctrans parsed_data -e -o $(srcdir)/weak_words
++	proccorpus $(srcdir)/corpus.?.txt > parsed_data
++	calctrans parsed_data -o $(srcdir)/corpus_info
++	calctrans parsed_data -e -o $(srcdir)/weak_words
+ 	make do_update_params
+ 
+ update_params0:
+ 	rm -f parsed_data2
+-	./proccorpus $(srcdir)/corpus.0.txt > parsed_data
+-	./calctrans parsed_data -o $(srcdir)/corpus_info
+-	./calctrans parsed_data -e -o $(srcdir)/weak_words
++	proccorpus $(srcdir)/corpus.0.txt > parsed_data
++	calctrans parsed_data -o $(srcdir)/corpus_info
++	calctrans parsed_data -e -o $(srcdir)/weak_words
+ 	make do_update_params
+ 
+ update_params2:
+-	./proccorpus $(srcdir)/corpus.?.txt >> parsed_data2
+-	./calctrans parsed_data parsed_data2 -o $(srcdir)/corpus_info
+-	./calctrans parsed_data parsed_data2 -e -o $(srcdir)/weak_words
++	proccorpus $(srcdir)/corpus.?.txt >> parsed_data2
++	calctrans parsed_data parsed_data2 -o $(srcdir)/corpus_info
++	calctrans parsed_data parsed_data2 -e -o $(srcdir)/weak_words
+ 	make do_update_params
+ 
+ do_update_params:
+-	./calctrans -c $(srcdir)/corpus_info
++	calctrans -c $(srcdir)/corpus_info
+ 	rm -f $(dict_source_files)
+ 	make $(dict_source_files)
+ 
+-$(dict_source_files): $(srcdir)/corpus_info $(srcdir)/weak_words calctrans
+-	./calctrans -c $(srcdir)/corpus_info $(srcdir)/weak_words
++$(dict_source_files): $(srcdir)/corpus_info $(srcdir)/weak_words
++	calctrans -c $(srcdir)/corpus_info $(srcdir)/weak_words
+ 
+ noinst_DATA = $(dict_source_files)
+ CLEANFILES = $(dict_source_files) parsed_data parsed_data2 anthy.feature_info
+diff --git a/depgraph/Makefile.am b/depgraph/Makefile.am
+index 468f90c..1f3de05 100644
+--- a/depgraph/Makefile.am
++++ b/depgraph/Makefile.am
+@@ -9,11 +9,11 @@ CLEANFILES = anthy.dep
+ EXTRA_DIST = indepword.txt $(DEPWORDS)
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkdepgraph
+-mkdepgraph_SOURCES = mkdepgraph.c
+-mkdepgraph_LDADD =  ../src-main/libanthy-unicode.la ../src-worddic/libanthydic-unicode.la
++#noinst_PROGRAMS = mkdepgraph
++#mkdepgraph_SOURCES = mkdepgraph.c
++#mkdepgraph_LDADD =  ../src-main/libanthy-unicode.la ../src-worddic/libanthydic-unicode.la
+ 
+-anthy.dep : mkdepgraph $(DEPWORDS)
+-	./mkdepgraph
++anthy.dep : $(DEPWORDS)
++	mkdepgraph
+ 
+ noinst_DATA = anthy.dep
+diff --git a/mkanthydic/Makefile.am b/mkanthydic/Makefile.am
+index dfabff6..d1109cc 100644
+--- a/mkanthydic/Makefile.am
++++ b/mkanthydic/Makefile.am
+@@ -3,12 +3,12 @@ noinst_SCRIPTS =
+ CLEANFILES = anthy.dic
+ INCLUDES = -I$(top_srcdir)/ -DSRCDIR=\"$(srcdir)\"
+ 
+-noinst_PROGRAMS = mkfiledic
+-mkfiledic_SOURCES = mkfiledic.c
+-mkfiledic_LDADD = ../src-diclib/libdiclib.la
++#noinst_PROGRAMS = mkfiledic
++#mkfiledic_SOURCES = mkfiledic.c
++#mkfiledic_LDADD = ../src-diclib/libdiclib.la
+ 
+-anthy.dic : mkfiledic ../mkworddic/anthy.wdic ../depgraph/anthy.dep ../calctrans/anthy.cand_info ../calctrans/anthy.trans_info ../calctrans/anthy.corpus_array ../calctrans/anthy.corpus_bucket
+-	./mkfiledic
++anthy.dic : ../mkworddic/anthy.wdic ../depgraph/anthy.dep ../calctrans/anthy.cand_info ../calctrans/anthy.trans_info ../calctrans/anthy.corpus_array ../calctrans/anthy.corpus_bucket
++	mkfiledic
+ 
+ 
+ # To install 
+diff --git a/mkworddic/Makefile.am b/mkworddic/Makefile.am
+index d9b262e..6a8a54c 100644
+--- a/mkworddic/Makefile.am
++++ b/mkworddic/Makefile.am
+@@ -26,14 +26,14 @@ DIC_FILES = @top_srcdir@/alt-cannadic/gcanna.ctd \
+ 	    @top_srcdir@/mkworddic/udict
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkworddic
+-mkworddic_SOURCES = mkdic.c writewords.c mkudic.c calcfreq.c mkdic.h
+-mkworddic_LDADD = ../src-worddic/libanthydic-unicode.la
++#noinst_PROGRAMS = mkworddic
++#mkworddic_SOURCES = mkdic.c writewords.c mkudic.c calcfreq.c mkdic.h
++#mkworddic_LDADD = ../src-worddic/libanthydic-unicode.la
+ 
+ noinst_DATA = anthy.wdic
+ 
+-anthy.wdic : mkworddic $(DIC_FILES)
+-	   ./mkworddic -f ./dict.args
++anthy.wdic : $(DIC_FILES)
++	   mkworddic -f ./dict.args
+ 
+ 
+ # To install

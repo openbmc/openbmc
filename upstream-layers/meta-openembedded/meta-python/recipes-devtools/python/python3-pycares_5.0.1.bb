@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=b1538fcaea82ebf2313ed648b96c69b1"
 
 SRC_URI[sha256sum] = "5a3c249c830432631439815f9a818463416f2a8cbdb1e988e78757de9ae75081"
 
-PYPI_PACKAGE = "pycares"
 
 inherit pypi python_setuptools_build_meta
 

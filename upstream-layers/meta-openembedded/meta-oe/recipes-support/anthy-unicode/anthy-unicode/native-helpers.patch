@@ -1,0 +1,61 @@
+Upstream-Status: Inappropriate [cross-compile specific]
+
+Stage the native anthy-unicode helpers (mkfiledic, mkdepgraph, mkworddic,
+calctrans, proccorpus) as bin_PROGRAMS so anthy-unicode-native installs them
+into the native sysroot, where the target build's dictionary rules pick them
+up from PATH (see target-helpers.patch).
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+diff --git a/calctrans/Makefile.am b/calctrans/Makefile.am
+index a48867a..dc6af11 100644
+--- a/calctrans/Makefile.am
++++ b/calctrans/Makefile.am
+@@ -3,7 +3,7 @@ EXTRA_DIST =\
+  corpus.3.txt corpus.4.txt corpus.5.txt\
+  corpus_info weak_words
+ 
+-noinst_PROGRAMS = calctrans proccorpus
++bin_PROGRAMS = calctrans proccorpus
+ INCLUDES = -I$(top_srcdir)/
+ 
+ calctrans_SOURCES = calctrans.c input_set.c input_set.h corpus.c
+diff --git a/depgraph/Makefile.am b/depgraph/Makefile.am
+index 468f90c..75b285c 100644
+--- a/depgraph/Makefile.am
++++ b/depgraph/Makefile.am
+@@ -9,7 +9,7 @@ CLEANFILES = anthy.dep
+ EXTRA_DIST = indepword.txt $(DEPWORDS)
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkdepgraph
++bin_PROGRAMS = mkdepgraph
+ mkdepgraph_SOURCES = mkdepgraph.c
+ mkdepgraph_LDADD =  ../src-main/libanthy-unicode.la ../src-worddic/libanthydic-unicode.la
+ 
+diff --git a/mkanthydic/Makefile.am b/mkanthydic/Makefile.am
+index dfabff6..1c665eb 100644
+--- a/mkanthydic/Makefile.am
++++ b/mkanthydic/Makefile.am
+@@ -3,7 +3,7 @@ noinst_SCRIPTS =
+ CLEANFILES = anthy.dic
+ INCLUDES = -I$(top_srcdir)/ -DSRCDIR=\"$(srcdir)\"
+ 
+-noinst_PROGRAMS = mkfiledic
++bin_PROGRAMS = mkfiledic
+ mkfiledic_SOURCES = mkfiledic.c
+ mkfiledic_LDADD = ../src-diclib/libdiclib.la
+ 
+diff --git a/mkworddic/Makefile.am b/mkworddic/Makefile.am
+index d9b262e..b0a9e01 100644
+--- a/mkworddic/Makefile.am
++++ b/mkworddic/Makefile.am
+@@ -26,7 +26,7 @@ DIC_FILES = @top_srcdir@/alt-cannadic/gcanna.ctd \
+ 	    @top_srcdir@/mkworddic/udict
+ 
+ # Generate the dictionary
+-noinst_PROGRAMS = mkworddic
++bin_PROGRAMS = mkworddic
+ mkworddic_SOURCES = mkdic.c writewords.c mkudic.c calcfreq.c mkdic.h
+ mkworddic_LDADD = ../src-worddic/libanthydic-unicode.la
+ 

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# test_core.py does `GlancesMain(args_begin_at=2)` at module import time,
+# slicing the real process sys.argv; passing --automake on the command line
+# (rather than via PYTEST_ADDOPTS) shifts that slice and breaks it.
+PYTEST_ADDOPTS="--automake" pytest tests/test_core.py

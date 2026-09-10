@@ -4,7 +4,7 @@ together with some small examples. \
 The provided modules are Chipcard::PCSC and Chipcard::PCSC::Card."
 HOMEPAGE = "https://metacpan.org/dist/pcsc-perl"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENCE;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "https://cpan.metacpan.org/authors/id/W/WH/WHOM/pcsc-perl-${PV}.tar.bz2"

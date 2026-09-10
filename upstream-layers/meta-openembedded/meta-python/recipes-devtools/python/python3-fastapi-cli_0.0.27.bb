@@ -9,8 +9,6 @@ inherit pypi python_pdm
 
 PYPI_PACKAGE = "fastapi_cli"
 
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
-
 RDEPENDS:${PN} += "\
     python3-difflib \
     python3-pydantic \

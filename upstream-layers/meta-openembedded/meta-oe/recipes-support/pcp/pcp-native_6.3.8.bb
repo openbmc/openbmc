@@ -1,6 +1,6 @@
 require pcp.inc
-inherit python3native native 
-#autotools-brokensep 
+inherit python3native native
+#autotools-brokensep
 DEPENDS = "python3-native python3-setuptools-native flex-native bison-native readline-native ncurses-native"
 
 export PCP_DIR = "${D}"
@@ -13,7 +13,7 @@ do_configure:prepend() {
     export SED=${HOSTTOOLS_DIR}/sed
     export AR=${HOSTTOOLS_DIR}/ar
 #    export PYTHON=python3
-    
+
     rm -rf ${S}/include/pcp/configsz.h
     rm -rf ${S}/include/pcp/platformsz.h
 

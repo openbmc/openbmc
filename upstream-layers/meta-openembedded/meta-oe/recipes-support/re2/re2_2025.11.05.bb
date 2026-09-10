@@ -12,6 +12,13 @@ SRC_URI = "git://github.com/google/re2.git;branch=main;protocol=https;tag=2025-1
 
 UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(-\d+)+)"
 
+# The tag regex above does find the newest upstream tag (2025-11-05), but
+# upstream tags use "-" separators while PV uses ".", and bb.utils.vercmp_string
+# parses "2025-11-05" as version "2025-11" + revision "05", so the two can never
+# compare equal. Flag the version as unknown rather than permanently broken: a
+# genuinely newer upstream tag still shows up as KNOWN_BROKEN.
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 DEPENDS = "abseil-cpp ${@bb.utils.contains('PTEST_ENABLED', '1', 'gtest googlebenchmark', '', d)}"
 
 inherit cmake ptest

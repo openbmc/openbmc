@@ -1,0 +1,49 @@
+From 12710dde230ae1721e1c7119f51490c239513c41 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 27 Aug 2026 09:42:20 +0000
+Subject: [PATCH] tsi: fix remaining const qualifiers for OpenSSL 4.0
+
+OpenSSL 4.0 returns const pointers from X509_NAME_get_entry(),
+X509_NAME_ENTRY_get_data(), and X509_get_subject_name().
+Combine X509_get_subject_name + X509_NAME_dup into single call
+to avoid const-to-non-const assignment.
+
+Upstream-Status: Submitted [https://github.com/grpc/grpc/pull/41932]
+
+Note: Our fix for areas not covered by the upstream PR.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/core/tsi/ssl_transport_security.cc | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport_security.cc
+index ee2092acece..23340beda98 100644
+--- a/src/core/tsi/ssl_transport_security.cc
++++ b/src/core/tsi/ssl_transport_security.cc
+@@ -891,8 +891,8 @@ static int looks_like_ip_address(absl::string_view name) {
+ static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
+                                            size_t* utf8_size) {
+   int common_name_index = -1;
+-  X509_NAME_ENTRY* common_name_entry = nullptr;
+-  ASN1_STRING* common_name_asn1 = nullptr;
++  const X509_NAME_ENTRY* common_name_entry = nullptr;
++  const ASN1_STRING* common_name_asn1 = nullptr;
+   auto* subject_name = X509_get_subject_name(cert);
+   int utf8_returned_size = 0;
+   if (subject_name == nullptr) {
+@@ -1342,13 +1342,12 @@ static tsi_result x509_store_load_certs(X509_STORE* cert_store,
+       break;  // We're at the end of stream.
+     }
+     if (root_names != nullptr) {
+-      root_name = X509_get_subject_name(root);
++      root_name = X509_NAME_dup(X509_get_subject_name(root));
+       if (root_name == nullptr) {
+         LOG(ERROR) << "Could not get name from root certificate.";
+         result = TSI_INVALID_ARGUMENT;
+         break;
+       }
+-      root_name = X509_NAME_dup(root_name);
+       if (root_name == nullptr) {
+         result = TSI_OUT_OF_RESOURCES;
+         break;

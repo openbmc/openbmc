@@ -1,7 +1,7 @@
 SUMMARY = "Collects and summarises system performance statistics"
 DESCRIPTION = "collectd is a daemon which collects system performance statistics periodically and provides mechanisms to store the values in a variety of ways, for example in RRD files."
 HOMEPAGE = "https://collectd.org/"
-LICENSE = "GPL-2.0-only & MIT"
+LICENSE = "GPL-2.0-only AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1bd21f19f7f0c61a7be8ecacb0e28854"
 
 DEPENDS = "curl libpcap libxml2 yajl libgcrypt libtool lvm2"
@@ -17,6 +17,10 @@ SRC_URI = "${GITHUB_BASE_URI}download/${BP}/${BP}.tar.bz2 \
            file://0001-Remove-including-sys-sysctl.h-on-glibc-based-systems.patch \
            "
 SRC_URI[sha256sum] = "5bae043042c19c31f77eb8464e56a01a5454e0b39fa07cf7ad0f1bfc9c3a09d6"
+
+# Release tags are "collectd-<pver>", which the github-releases default regex
+# ("releases/tag/v?...") does not match.
+UPSTREAM_CHECK_REGEX = "releases/tag/collectd-(?P<pver>\d+(\.\d+)+)$"
 
 inherit autotools python3native update-rc.d pkgconfig systemd github-releases
 

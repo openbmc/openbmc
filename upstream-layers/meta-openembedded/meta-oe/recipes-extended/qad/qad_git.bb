@@ -5,7 +5,7 @@ intervention as Q.A.D allows inputs to be injected via http/https requests. \
 This both eliminates the need to physically interact with the rig and allows \
 for tasks to be carried out entirely automatically."
 
-LICENSE = "MIT & GPL-2.0-or-later"
+LICENSE = "GPL-2.0-or-later AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=402cce7fbcb6ea9ab5a0378dd7f40806 \
                     file://openqa/COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                    "

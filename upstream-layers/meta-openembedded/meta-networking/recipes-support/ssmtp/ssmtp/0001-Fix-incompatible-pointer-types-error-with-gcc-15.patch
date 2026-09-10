@@ -17,11 +17,19 @@ TOPDIR/tmp/work/core2-64-oe-linux/ssmtp/2.64/recipe-sysroot/usr/include/signal.h
  1393 | void handler(void)
       |      ^~~~~~~
 
+Note: as of ssmtp 2.66, the call site already reads
+"(void)signal(SIGALRM, (sighandler_t)handler);", so once handler()'s
+signature below is changed to take an int argument it matches
+sighandler_t (void (*)(int)) exactly and the incompatible-pointer-types
+warning/error is gone. Only the handler() signature hunk from the
+original patch is still needed; the call-site hunk has been dropped
+since it no longer applies and is unnecessary.
+
 Upstream-Status: Inactive-Upstream [This package has been orphaned https://bugs.debian.org/925056]
 Signed-off-by: mark.yang <mark.yang@lge.com>
 ---
- ssmtp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ ssmtp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/ssmtp.c b/ssmtp.c
 index 4dedaf8..a938d14 100644
@@ -35,13 +43,4 @@ index 4dedaf8..a938d14 100644
 +void handler(__attribute__((unused)) int sig)
  {
  	extern jmp_buf TimeoutJmpBuf;
- 
-@@ -1451,7 +1451,7 @@ int ssmtp(char *argv[])
- 	from = from_format(uad, override_from);
- 
- 	/* Now to the delivery of the message */
--	(void)signal(SIGALRM, (void(*)())handler);	/* Catch SIGALRM */
-+	(void)signal(SIGALRM, handler);	/* Catch SIGALRM */
- 	(void)alarm((unsigned) MAXWAIT);			/* Set initial timer */
- 	if(setjmp(TimeoutJmpBuf) != 0) {
- 		/* Then the timer has gone off and we bail out */
+

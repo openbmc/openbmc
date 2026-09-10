@@ -1,0 +1,36 @@
+From ef8edd2f8931c8f43d8f4fef836678ecf643608d Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 20 Aug 2026 10:41:55 +0530
+Subject: [PATCH] pcm: fix pcm_ioctl to dispatch through plugin ops
+
+pcm_ioctl() bypassed pcm->ops->ioctl() and called ioctl(pcm->fd, ...)
+directly, per a FIXME comment noting it does not handle plugins. For
+plugin-backed (virtual) pcm devices, pcm->fd is not a real character
+device descriptor, so calls such as SNDRV_PCM_IOCTL_RESET or
+SNDRV_PCM_IOCTL_PAUSE silently fail with -1 and never reach the
+plugin's ioctl callback.
+
+Both hw_ops and plug_ops already implement .ioctl correctly (hw_ops
+just forwards to the raw fd, so behavior for real hardware pcms is
+unchanged), so dispatch pcm_ioctl() through pcm->ops->ioctl() instead.
+
+Upstream-Status: Inactive-Upstream [fixed independently in a later
+upstream commit that changed this to pcm->ops->ioctl(pcm->data, ...)]
+---
+ src/pcm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/pcm.c b/src/pcm.c
+index 1b2103a..a37c383 100644
+--- a/src/pcm.c
++++ b/src/pcm.c
+@@ -1806,6 +1806,8 @@ int pcm_ioctl(struct pcm *pcm, int request, ...)
+     arg = va_arg(ap, void *);
+     va_end(ap);
+ 
+-    // FIXME Does not handle plugins
++    if (pcm->ops && pcm->ops->ioctl)
++        return pcm->ops->ioctl(pcm->data, request, arg);
++
+     return ioctl(pcm->fd, request, arg);
+ }

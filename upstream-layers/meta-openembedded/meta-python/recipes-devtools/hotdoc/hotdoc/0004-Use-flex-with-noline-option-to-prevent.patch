@@ -4,26 +4,36 @@ To fix following do_package QA Issue:
 
 do_package_qa:QA Issue: File /usr/src/debug/hotdoc/0.17.4/hotdoc/parsers/c_comment_scanner/scanner.c in package hotdoc-src contains reference to TMPDIR [buildpaths]
 
+Also drop the verbose=1 keyword from the spawn.spawn() call: newer
+setuptools/distutils' spawn() forwards **kwargs directly to
+subprocess.check_call(), which does not accept a verbose argument,
+causing do_compile to fail with:
+
+  TypeError: Popen.__init__() got an unexpected keyword argument 'verbose'
+
 Upstream-Status: Inappropriate [oe-specific]
 
 Signed-off-by: Liu Yiding <liuyd.fnst@fujitsu.com>
 ---
- setup.py | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ setup.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/setup.py b/setup.py
-index 9ee504d..9bbc744 100644
+index 9ee504d..a2ebdb1 100644
 --- a/setup.py
 +++ b/setup.py
-@@ -365,7 +365,7 @@ class FlexExtension (Extension):
- 
+@@ -365,10 +365,10 @@ class FlexExtension (Extension):
+
          self.sources.append(built_scanner_path)
          if newer_group(self.__flex_sources, built_scanner_path):
 -            cmd = ['flex', '-o', built_scanner_path]
 +            cmd = ['flex', '--noline', '-o', built_scanner_path]
              for s in self.__flex_sources:
                  cmd.append(s)
-             spawn.spawn(cmd, verbose=1)
--- 
-2.43.0
+-            spawn.spawn(cmd, verbose=1)
++            spawn.spawn(cmd)
 
+     def build_custom(self):
+         if self.__flex_sources:
+--
+2.43.0

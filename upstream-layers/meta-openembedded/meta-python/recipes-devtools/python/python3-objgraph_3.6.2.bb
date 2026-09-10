@@ -17,5 +17,3 @@ do_install_ptest:append() {
 
 RDEPENDS:${PN} += "python3-core python3-io"
 RDEPENDS:${PN}-ptest += "python3-tox"
-
-PYPI_PACKAGE = "objgraph"

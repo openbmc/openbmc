@@ -10,6 +10,8 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
           "
 
 SRC_URI[sha256sum] = "5991020192f52cc40fa852fbf6bbf5bd5db5d5d00aa9905c67f6f0eadeed48ea"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/log4c/files/log4c/"
+UPSTREAM_CHECK_REGEX = "/(?P<pver>\d+(\.\d+)+)/"
 
 PACKAGECONFIG ??= "expat"
 PACKAGECONFIG[expat] = "--with-expat,--without-expat,expat"

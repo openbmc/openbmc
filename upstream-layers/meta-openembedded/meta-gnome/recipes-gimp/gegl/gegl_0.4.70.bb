@@ -34,7 +34,7 @@ PACKAGECONFIG ??= "gexiv2 libraw librsvg pango poppler sdl2"
 PACKAGECONFIG:class-native = "librsvg"
 
 PACKAGECONFIG[jasper] = "-Djasper=enabled,-Djasper=disabled,jasper"
-PACKAGECONFIG[gexiv2] = "-Dgexiv2=enabled,-Dgexiv2=disabled,gexiv2"
+PACKAGECONFIG[gexiv2] = "-Dgexiv2=enabled,-Dgexiv2=disabled,gexiv2-0.14"
 PACKAGECONFIG[graphviz] = "-Dgraphviz=enabled,-Dgraphviz=disabled,graphviz"
 PACKAGECONFIG[lcms] = "-Dlcms=enabled,-Dlcms=disabled,lcms"
 PACKAGECONFIG[libav] = "-Dlibav=enabled,-Dlibav=disabled,libav"

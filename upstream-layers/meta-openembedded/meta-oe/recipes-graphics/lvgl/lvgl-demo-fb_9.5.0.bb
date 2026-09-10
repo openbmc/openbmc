@@ -17,6 +17,12 @@ SRC_URI = "\
 SRCREV_demo = "045137cf0fa1781483cb796261a11b5eb21e99d9"
 SRCREV_lvgl = "85aa60d18b3d5e5588d7b247abf90198f07c8a63"
 SRCREV_FORMAT = "demo_lvgl"
+# The version check runs against the first SRC_URI (the demo repo), whose tags
+# are "vX.Y.Z" but top out at v9.2.2 -- below PV 9.5.0+git, which follows the
+# bundled lvgl release. Regex is correct; marked unknown until the demo repo
+# tags a >=9.5.0 release.
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 inherit cmake pkgconfig
 

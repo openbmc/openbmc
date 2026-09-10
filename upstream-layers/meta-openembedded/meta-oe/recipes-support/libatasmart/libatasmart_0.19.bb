@@ -9,6 +9,11 @@ SRC_URI = "git://git.0pointer.net/libatasmart.git;protocol=http;branch=master \
            file://0001-Makefile.am-add-CFLAGS-and-LDFLAGS-definiton.patch \
 "
 
+# Upstream defunct: 0.19 (2012) is the last release and git.0pointer.net no
+# longer serves the repo (all requests redirect to a placeholder page), so
+# there is no listing or tag source to check.
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 
 inherit autotools lib_package pkgconfig
 

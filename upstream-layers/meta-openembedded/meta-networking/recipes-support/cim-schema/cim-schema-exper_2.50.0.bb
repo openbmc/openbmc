@@ -1,6 +1,6 @@
 require cim-schema.inc
 
-LICENSE = "DMTF"
+LICENSE = "LicenseRef-DMTF"
 
 RCONFLICTS:${PN} = "cim-schema-final"
 

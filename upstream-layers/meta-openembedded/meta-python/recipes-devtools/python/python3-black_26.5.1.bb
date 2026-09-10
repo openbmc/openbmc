@@ -24,3 +24,5 @@ RDEPENDS:${PN} = " \
     python3-typing-extensions \
     python3-pytokens \
 "
+
+BBCLASSEXTEND = "native nativesdk"

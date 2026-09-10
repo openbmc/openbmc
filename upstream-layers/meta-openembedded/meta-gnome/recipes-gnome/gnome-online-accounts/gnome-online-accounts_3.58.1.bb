@@ -12,7 +12,7 @@ SRC_URI[archive.sha256sum] = "9ec1900cc51409c2067c07c828c10be06fe3bf68d2999bb72d
 
 PACKAGECONFIG ?= "goabackend kerberos owncloud google"
 
-PACKAGECONFIG[goabackend] = "-Dgoabackend=true,-Dgoabackend=false,gtk4 libadwaita json-glib libxml2 libsoup rest libsecret webkitgtk"
+PACKAGECONFIG[goabackend] = "-Dgoabackend=true,-Dgoabackend=false,gtk4 libadwaita json-glib libxml2 libsoup rest libsecret"
 PACKAGECONFIG[kerberos] = "-Dkerberos=true, -Dkerberos=false,krb5"
 PACKAGECONFIG[exchange] = "-Dexchange=true, -Dexchange=false"
 PACKAGECONFIG[google] = "-Dgoogle=true, -Dgoogle=false"

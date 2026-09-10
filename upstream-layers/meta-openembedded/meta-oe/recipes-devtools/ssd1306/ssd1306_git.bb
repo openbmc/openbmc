@@ -10,6 +10,8 @@ SRC_URI = " \
     git://github.com/armlabs/ssd1306_linux.git;protocol=https;branch=master \
 "
 SRCREV = "19128ed4b6108408fea05b9d0551236b6d638dbc"
+# Upstream repo has no tags/releases; track commits.
+UPSTREAM_CHECK_COMMITS = "1"
 
 
 # coreutils provides fmt which is used in the Makefile

@@ -1,6 +1,6 @@
 SUMMARY = "A collection of powerful tools for manipulating EPROM load files."
 SECTION = "devel"
-LICENSE = "GPL-3.0-or-later & LGPL-3.0-or-later"
+LICENSE = "GPL-3.0-or-later AND LGPL-3.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=d32239bcb673463ab874e80d47fae504"
 
 SRC_URI = " \
@@ -13,7 +13,8 @@ SRC_URI = " \
 SRC_URI[sha256sum] = "81c3d07cf15ce50441f43a82cefd0ac32767c535b5291bcc41bd2311d1337644"
 S = "${UNPACKDIR}/${BP}-Source"
 
-UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/srecord/files/releases"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/srecord/files/srecord/1.65/"
+UPSTREAM_CHECK_REGEX = "srecord-(?P<pver>\d+(\.\d+)+)-Source\.tar\.gz"
 
 DEPENDS = "boost libgcrypt"
 

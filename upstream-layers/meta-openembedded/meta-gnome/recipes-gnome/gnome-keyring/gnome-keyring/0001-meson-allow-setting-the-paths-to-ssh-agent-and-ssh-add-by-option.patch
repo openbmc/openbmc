@@ -1,0 +1,77 @@
+From ed91fc1a7fabd32055442204291db39bb73a603e Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Mon, 7 Sep 2026 09:20:06 +0200
+Subject: [PATCH] meson: allow setting the paths to ssh-agent and ssh-add by
+ option
+
+When cross compiling there are no target executables in the sysroot, so
+find_program() cannot locate ssh-agent and ssh-add although they will be
+available at runtime. Add string options that take the paths directly
+and fall back to the lookup when they are not set.
+
+Upstream-Status: Inappropriate [OE specific]
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+---
+ meson.build       | 14 ++++++++++----
+ meson_options.txt | 12 ++++++++++++
+ 2 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 001ed81..10e8f9a 100644
+--- a/meson.build
++++ b/meson.build
+@@ -48,8 +48,14 @@ if libsystemd_dep.found()
+ endif
+ 
+ if get_option('ssh-agent')
+-  ssh_agent_bin = find_program('ssh-agent')
+-  ssh_add_bin = find_program('ssh-add')
++  ssh_agent_path = get_option('ssh-agent-path')
++  if ssh_agent_path == ''
++    ssh_agent_path = find_program('ssh-agent').full_path()
++  endif
++  ssh_add_path = get_option('ssh-add-path')
++  if ssh_add_path == ''
++    ssh_add_path = find_program('ssh-add').full_path()
++  endif
+ endif
+ 
+ if get_option('pam')
+@@ -97,8 +103,8 @@ conf.set('WITH_SELINUX', libselinux_dep.found())
+ conf.set('WITH_SYSTEMD', libsystemd_dep.found())
+ if get_option('ssh-agent')
+   conf.set('WITH_SSH', true)
+-  conf.set_quoted('SSH_AGENT', ssh_agent_bin.full_path())
+-  conf.set_quoted('SSH_ADD', ssh_add_bin.full_path())
++  conf.set_quoted('SSH_AGENT', ssh_agent_path)
++  conf.set_quoted('SSH_ADD', ssh_add_path)
+ endif
+ conf.set('DOTLOCK_USE_PTHREAD', true)
+ conf.set('DOTLOCK_GLIB_LOGGING', true)
+diff --git a/meson_options.txt b/meson_options.txt
+index 55d9a3f..ed860fb 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -10,6 +10,18 @@ option('ssh-agent',
+   description: 'Include SSH agent in gnome-keyring',
+ )
+ 
++option('ssh-agent-path',
++  type: 'string',
++  value: '',
++  description: 'Path to the ssh-agent binary (skips the build time lookup)',
++)
++
++option('ssh-add-path',
++  type: 'string',
++  value: '',
++  description: 'Path to the ssh-add binary (skips the build time lookup)',
++)
++
+ option('selinux',
+   type: 'feature',
+   value: 'auto',
+-- 
+2.55.0
+

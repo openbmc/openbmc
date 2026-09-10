@@ -6,7 +6,6 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=ad407cda031a6aaf51a1fecaaa6e7d29"
 SRC_URI += "file://0001-pyproject.toml-Replace-install_requires.patch"
 SRC_URI[sha256sum] = "f20befe5c1106dd8ddca9f60a2f18bf5ec7d5f06f6f09a03fa66bae54777e6bb"
 
-PYPI_PACKAGE = "robotframework-seriallibrary"
 
 inherit pypi python_poetry_core
 

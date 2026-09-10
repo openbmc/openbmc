@@ -1,0 +1,279 @@
+From 673ee0734c5aec9afbe24dc50a7436f67e42b7aa Mon Sep 17 00:00:00 2001
+From: Markus Volk <f_l_k@t-online.de>
+Date: Sun, 6 Sep 2026 11:18:10 +0200
+Subject: [PATCH] build: add an option to disable the uninstalled helper paths
+
+The daemons and the command line tool compare their working directory
+with the compiled-in build root and, when they match, run the helpers
+from the build tree instead of libexecdir. That is convenient for
+development, but distribution builds have no use for it and the build
+directory ends up as a string in every installed binary, which breaks
+reproducible builds.
+
+Add a meson option "uninstalled_helpers" (default: true) that controls
+whether BUILDROOT, SRCROOT, BUILDDIR and BUILD_EXTRACTDIR are defined,
+and guard the in-tree code paths with #ifdef BUILDROOT so they compile
+away when it is disabled.
+
+Upstream-Status: Pending
+
+AI-Generated: Uses Claude Code (Claude Fable 5.1)
+---
+ meson.build                            | 12 ++++++++++++
+ meson_options.txt                      |  2 ++
+ src/cli/meson.build                    |  3 +--
+ src/cli/tracker-cli-utils.c            |  4 ++++
+ src/cli/tracker-extract.c              |  5 ++++-
+ src/cli/tracker-info.c                 |  5 ++++-
+ src/common/meson.build                 |  4 +---
+ src/common/tracker-landlock.c          |  4 +++-
+ src/indexer/meson.build                | 14 +++++++++++---
+ src/indexer/tracker-application.c      |  4 +++-
+ src/indexer/tracker-extract-watchdog.c |  4 +++-
+ 11 files changed, 48 insertions(+), 13 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 7a311d4..fd29c73 100644
+--- a/meson.build
++++ b/meson.build
+@@ -355,6 +355,18 @@ srcinc = include_directories('src/')
+ 
+ build_root = meson.current_build_dir()
+ 
++# Compiled-in build tree paths that let the daemons and tools run uninstalled.
++# Distribution builds disable this so the build directory does not end up in
++# the binaries.
++if get_option('uninstalled_helpers')
++  build_tree_c_args = [
++    '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
++    '-DSRCROOT="@0@"'.format(meson.global_source_root()),
++  ]
++else
++  build_tree_c_args = []
++endif
++
+ # We use tracker-miners-3.0 rather than tracker3-miners inside the lib64
+ # directory, following the existing convention in that directory.
+ tracker_api_versioned_name = 'localsearch-@0@'.format(tracker_api_version)
+diff --git a/meson_options.txt b/meson_options.txt
+index 70e764a..621d7ce 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -99,3 +99,5 @@ option('tests_tap_protocol', type: 'boolean', value: false,
+        description: 'Whether to enable TAP protocol on tests')
+ option('test_utils_dir', type: 'string', value: '',
+        description: 'Directory to install trackertestutils Python package (or empty to use the default)')
++option('uninstalled_helpers', type: 'boolean', value: true,
++       description: 'Let the daemons and tools find their helpers in the build tree when run uninstalled')
+diff --git a/src/cli/meson.build b/src/cli/meson.build
+index dd6177d..851ce05 100644
+--- a/src/cli/meson.build
++++ b/src/cli/meson.build
+@@ -44,11 +44,10 @@ executable(main_command_name,
+     sparql_gresource,
+     indexer_dbus_proxy,
+     control_dbus_proxy,
+-    c_args: tracker_c_args + [
++    c_args: tracker_c_args + build_tree_c_args + [
+         '-DMAIN_COMMAND_NAME="@0@"'.format(main_command_name),
+         '-DLIBEXECDIR="@0@"'.format(join_paths(get_option('prefix'), get_option('libexecdir'))),
+         '-DPYTHON_UTILS_DIR="@0@"'.format(testutils_dir / 'trackertestutils'),
+-        '-DBUILDROOT="@0@"'.format(build_root),
+         '-DMANDIR="@0@"'.format(join_paths(get_option('prefix'), get_option('datadir'), 'man')),
+         '-DBINDIR="@0@"'.format(join_paths(get_option('prefix'), get_option('bindir'))),
+     ],
+diff --git a/src/cli/tracker-cli-utils.c b/src/cli/tracker-cli-utils.c
+index 735bb4b..a941921 100644
+--- a/src/cli/tracker-cli-utils.c
++++ b/src/cli/tracker-cli-utils.c
+@@ -199,6 +199,7 @@ tracker_cli_print_errors (GList    *keyfiles,
+ gboolean
+ tracker_cli_check_inside_build_tree (const gchar* argv0)
+ {
++#ifdef BUILDROOT
+ 	g_autoptr (GFile) build_root = NULL;
+ 	g_autoptr (GFile) path = NULL;
+ 
+@@ -206,4 +207,7 @@ tracker_cli_check_inside_build_tree (const gchar* argv0)
+ 	path = g_file_new_for_path (argv0);
+ 
+ 	return g_file_has_prefix (path, build_root);
++#else
++	return FALSE;
++#endif
+ }
+diff --git a/src/cli/tracker-extract.c b/src/cli/tracker-extract.c
+index 7342b24..cb74e9b 100644
+--- a/src/cli/tracker-extract.c
++++ b/src/cli/tracker-extract.c
+@@ -72,10 +72,13 @@ extract_files (char *output_format)
+ 
+ 	tracker_term_pipe_to_pager ();
+ 
++#ifdef BUILDROOT
+ 	if (inside_build_tree) {
+ 		/* Developer convenience - use uninstalled version if running from build tree */
+ 		tracker_extract_path = g_build_filename(BUILDROOT, "src", "extractor", EXTRACTOR_NAME, NULL);
+-	} else {
++	} else
++#endif
++	{
+ 		tracker_extract_path = g_build_filename(LIBEXECDIR, EXTRACTOR_NAME, NULL);
+ 	}
+ 
+diff --git a/src/cli/tracker-info.c b/src/cli/tracker-info.c
+index 6b46f1f..18fadbd 100644
+--- a/src/cli/tracker-info.c
++++ b/src/cli/tracker-info.c
+@@ -311,10 +311,13 @@ output_eligible_status_for_file (gchar   *path,
+ {
+ 	g_autofree char *tracker_miner_fs_path = NULL;
+ 
++#ifdef BUILDROOT
+ 	if (inside_build_tree) {
+ 		/* Developer convenience - use uninstalled version if running from build tree */
+ 		tracker_miner_fs_path = g_build_filename (BUILDROOT, "src", "indexer", "localsearch-3", NULL);
+-	} else {
++	} else
++#endif
++	{
+ 		tracker_miner_fs_path = g_build_filename (LIBEXECDIR, "localsearch-3", NULL);
+ 	}
+ 
+diff --git a/src/common/meson.build b/src/common/meson.build
+index 93da66e..73b7388 100644
+--- a/src/common/meson.build
++++ b/src/common/meson.build
+@@ -52,13 +52,11 @@ endif
+ libtracker_miners_common = static_library('tracker-miners-common',
+   tracker_miners_common_sources,
+   dependencies: tracker_miners_common_dependencies + tracker_miners_common_private_dependencies,
+-  c_args: tracker_c_args + [
++  c_args: tracker_c_args + build_tree_c_args + [
+     '-DTRACKERSHAREDIR="@0@"'.format(tracker_versioned_name),
+     '-DLIBDIR="@0@"'.format(get_option ('libdir')),
+     '-DDATADIR="@0@"'.format(get_option ('datadir')),
+     '-DPREFIX="@0@"'.format(get_option ('prefix')),
+-    '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
+-    '-DSRCROOT="@0@"'.format(meson.global_source_root()),
+     '-DLIBEXECDIR="@0@"'.format(join_paths(get_option('prefix'), get_option('libexecdir'))),
+     '-DTRACKER_EXTRACTOR_RULES_DIR="@0@"'.format(tracker_extract_rules_dir),
+     '-DTRACKER_EXTRACTORS_DIR="@0@"'.format(tracker_extract_modules_dir)
+diff --git a/src/common/tracker-landlock.c b/src/common/tracker-landlock.c
+index a3f3905..3f136a3 100644
+--- a/src/common/tracker-landlock.c
++++ b/src/common/tracker-landlock.c
+@@ -234,7 +234,7 @@ tracker_landlock_init (const gchar         *executable_name,
+ 		{ ".pki", LANDLOCK_ACCESS_FS_READ_DIR },
+ 		{ ".gnupg", LANDLOCK_ACCESS_FS_READ_DIR },
+ 	};
+-	g_autofree gchar *current_dir = NULL, *cache_dir = NULL, *executable_path = NULL;
++	g_autofree gchar *current_dir G_GNUC_UNUSED = NULL, *cache_dir = NULL, *executable_path = NULL;
+ 	g_auto (GStrv) library_paths = NULL;
+ 	const gchar *ld_library_path = NULL;
+ 	int i, landlock_fd;
+@@ -300,6 +300,7 @@ tracker_landlock_init (const gchar         *executable_name,
+ 		}
+ 	}
+ 
++#ifdef BUILDROOT
+ 	current_dir = g_get_current_dir ();
+ 
+ 	/* Detect running in-tree */
+@@ -319,6 +320,7 @@ tracker_landlock_init (const gchar         *executable_name,
+ 			          in_tree_rules[i].flags);
+ 		}
+ 	}
++#endif
+ 
+ 	/* Add user cache for readonly databases */
+ #ifdef MINER_FS_CACHE_LOCATION
+diff --git a/src/indexer/meson.build b/src/indexer/meson.build
+index 55ff6ab..0879e41 100644
+--- a/src/indexer/meson.build
++++ b/src/indexer/meson.build
+@@ -84,6 +84,15 @@ executable('localsearch-endpoint-@0@'.format(tracker_api_major),
+     install_rpath: tracker_internal_libs_dir,
+ )
+ 
++if get_option('uninstalled_helpers')
++  indexer_build_tree_c_args = [
++    '-DBUILDDIR="@0@"'.format(meson.current_build_dir()),
++    '-DBUILD_EXTRACTDIR="@0@"'.format(meson.project_build_root() / 'src' / 'extractor'),
++  ]
++else
++  indexer_build_tree_c_args = []
++endif
++
+ executable('localsearch-@0@'.format(tracker_api_major),
+     sources,
+     miner_fs_resources[0], miner_fs_resources[1],
+@@ -91,9 +100,8 @@ executable('localsearch-@0@'.format(tracker_api_major),
+     dependencies: tracker_miner_fs_deps,
+     c_args: [
+         tracker_c_args,
+-        '-DBUILDROOT="@0@"'.format(meson.global_build_root()),
+-        '-DBUILDDIR="@0@"'.format(meson.current_build_dir()),
+-        '-DBUILD_EXTRACTDIR="@0@"'.format(meson.project_build_root() / 'src' / 'extractor'),
++        build_tree_c_args,
++        indexer_build_tree_c_args,
+         '-DLIBEXECDIR="@0@"'.format(get_option('prefix') / get_option('libexecdir')),
+     ],
+     install: true,
+diff --git a/src/indexer/tracker-application.c b/src/indexer/tracker-application.c
+index d3caf3d..c00ffaa 100644
+--- a/src/indexer/tracker-application.c
++++ b/src/indexer/tracker-application.c
+@@ -270,7 +270,7 @@ open_connection (TrackerApplication  *app,
+ 		g_autoptr (GSocket) socket = NULL;
+ 		g_autoptr (GIOStream) stream = NULL;
+ 		g_autoptr (GFile) location = NULL;
+-		g_autofree char *guid = NULL, *current_dir = NULL;
++		g_autofree char *guid = NULL, *current_dir G_GNUC_UNUSED = NULL;
+ 		const char *helper_path;
+ 
+ 		g_assert (instance->root);
+@@ -298,11 +298,13 @@ open_connection (TrackerApplication  *app,
+ 
+ 		guid = g_dbus_generate_guid ();
+ 
++#ifdef BUILDROOT
+ 		current_dir = g_get_current_dir ();
+ 
+ 		if (g_strcmp0 (current_dir, BUILDROOT) == 0)
+ 			helper_path = BUILDDIR "/localsearch-endpoint-3";
+ 		else
++#endif
+ 			helper_path = LIBEXECDIR "/localsearch-endpoint-3";
+ 
+ 		location = g_file_get_child (instance->root, ".localsearch3");
+diff --git a/src/indexer/tracker-extract-watchdog.c b/src/indexer/tracker-extract-watchdog.c
+index 27f6b49..37da365 100644
+--- a/src/indexer/tracker-extract-watchdog.c
++++ b/src/indexer/tracker-extract-watchdog.c
+@@ -488,7 +488,7 @@ void
+ tracker_extract_watchdog_ensure_started (TrackerExtractWatchdog *watchdog)
+ {
+ 	g_autoptr (GError) error = NULL;
+-	g_autofree gchar *current_dir = NULL;
++	g_autofree gchar *current_dir G_GNUC_UNUSED = NULL;
+ 	g_autoptr (GStrvBuilder) strv_builder = NULL;
+ 	g_auto (GStrv) arguments = NULL;
+ 	const gchar *extract_path;
+@@ -516,11 +516,13 @@ tracker_extract_watchdog_ensure_started (TrackerExtractWatchdog *watchdog)
+ 		return;
+ 	}
+ 
++#ifdef BUILDROOT
+ 	current_dir = g_get_current_dir ();
+ 
+ 	if (g_strcmp0 (current_dir, BUILDROOT) == 0)
+ 		extract_path = BUILD_EXTRACTDIR "/" EXECUTABLE_NAME;
+ 	else
++#endif
+ 		extract_path = LIBEXECDIR "/" EXECUTABLE_NAME;
+ 
+ 	strv_builder = g_strv_builder_new ();
+-- 
+2.55.0
+

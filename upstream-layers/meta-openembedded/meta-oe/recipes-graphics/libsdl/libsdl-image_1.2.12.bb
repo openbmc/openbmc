@@ -17,6 +17,14 @@ inherit autotools pkgconfig
 
 export SDL_CONFIG = "${STAGING_BINDIR_CROSS}/sdl-config"
 
+# configure.in runs AC_PROG_OBJC and libSDL_image_la_SOURCES carries an
+# Objective-C file, so automake picks Objective-C as the link language and
+# links via $(OBJCLD) = $(OBJC) instead of $(CC). AC_PROG_OBJC detects a bare
+# compiler with none of the toolchain options, so the link loses --sysroot and
+# the tune flags and then fails to find crtbeginS.o, -lz, -lSDL and friends.
+# Point OBJC at the full CC; configure.in already forces OBJCFLAGS=$CFLAGS.
+export OBJC = "${CC}"
+
 # Disable the run-time loading of the libs and bring back the soname dependencies.
 EXTRA_OECONF += "--disable-jpg-shared --disable-png-shared -disable-tif-shared"
 

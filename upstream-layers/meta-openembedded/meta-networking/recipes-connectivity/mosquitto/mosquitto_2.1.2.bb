@@ -6,7 +6,7 @@ provides a lightweight method of carrying out messaging using a \
 publish/subscribe model. "
 HOMEPAGE = "http://mosquitto.org/"
 SECTION = "console/network"
-LICENSE = "EPL-2.0 | BSD-3-Clause"
+LICENSE = "BSD-3-Clause OR EPL-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=f6d64fd27a4071b14ef656a0e8a4f4cf \
                     file://edl-v10;md5=9f6accb1afcb570f8be65039e2fcd49e \
                     file://epl-v20;md5=2dd765ca47a05140be15ebafddbeadfe \

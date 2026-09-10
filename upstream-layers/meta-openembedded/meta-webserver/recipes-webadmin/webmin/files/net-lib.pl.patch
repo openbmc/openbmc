@@ -3,15 +3,17 @@ Upstream-Status: Inappropriate [config]
 XXX: need to work out a better fix.
 
 Signed-off-by: Dexuan Cui <dexuan.cui@intel.com>
+---
+ net/net-lib.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 --- a/net/net-lib.pl
 +++ b/net/net-lib.pl
-@@ -38,7 +38,7 @@ elsif ($gconfig{'os_type'} eq 'debian-li
- 	$net_mode = "netplan";
+@@ -42,7 +42,7 @@ elsif ($auto_net_mode eq "dhcpcd") {
+ 	$net_mode = "dhcpcd";
  	}
  else {
 -	do "$gconfig{'os_type'}-lib.pl";
 +	do "debian-linux-lib.pl";
  	$net_mode = $gconfig{'os_type'};
  	}
- 

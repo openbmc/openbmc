@@ -1,0 +1,43 @@
+From: Tobias Deiminger <tobias.deiminger@linutronix.de>
+Date: Fri, 30 Jan 2026 01:55:36 +0100
+Subject: Fix shebang in hab_srktool_scripts
+
+The shebang has to be the first line, *above* the copyrights.
+Description: Fix shebang in hab_srktool_scripts The shebang has to be the first line, *above* the copyrights.
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/fix_scripts_shebang.patch]
+---
+ src/tools/hab_srktool_scripts/createSRKFuses | 2 +-
+ src/tools/hab_srktool_scripts/createSRKTable | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/tools/hab_srktool_scripts/createSRKFuses b/src/tools/hab_srktool_scripts/createSRKFuses
+index b7b0ad0..a932868 100755
+--- a/src/tools/hab_srktool_scripts/createSRKFuses
++++ b/src/tools/hab_srktool_scripts/createSRKFuses
+@@ -1,9 +1,9 @@
++#!/bin/bash
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+ # Copyright 2017-2018, 2023 NXP
+ #
+ ##########################################################################
+-#!/bin/bash
+ #
+ # SCRIPT:  	createSRKFuses
+ #
+diff --git a/src/tools/hab_srktool_scripts/createSRKTable b/src/tools/hab_srktool_scripts/createSRKTable
+index 85237df..03f41a2 100755
+--- a/src/tools/hab_srktool_scripts/createSRKTable
++++ b/src/tools/hab_srktool_scripts/createSRKTable
+@@ -1,9 +1,9 @@
++#!/bin/bash
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+ # Copyright 2017-2018, 2023 NXP
+ #
+ ##########################################################################
+-#!/bin/bash
+ #
+ # SCRIPT:  	createSRKTable
+ #

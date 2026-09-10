@@ -4,17 +4,18 @@ HOMEPAGE = "https://mimic.mycroft.ai/"
 SECTION = "multimedia"
 
 # "Mimic is available under permissive BSD-like licenses"
-LICENSE = "MIT & \
-           PD & \
-           CMU-Tex & \
-           rateconv & \
-           BSD-2-Clause & \
-           BSD-3-Clause & \
-           flite & \
-           (flite & Sun) & \
-           BellBird & \
-           Apache-2.0 \
-           "
+LICENSE = " \
+    Apache-2.0 AND \
+    BSD-2-Clause AND \
+    BSD-3-Clause AND \
+    MIT AND \
+    LicenseRef-BellBird AND \
+    LicenseRef-CMU-Tex AND \
+    LicenseRef-PD AND \
+    LicenseRef-Sun AND \
+    LicenseRef-flite AND \
+    LicenseRef-rateconv \
+"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a2c2c7371b58b9cdeae0dc68846fe9f1"
 
 DEPENDS = "curl-native libpcre2"

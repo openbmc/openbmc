@@ -4,7 +4,6 @@ LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=48fd6c978d39a38b3a04f45a1456d0fa"
 
 inherit pypi setuptools3
-PYPI_PACKAGE = "pylddwrap"
 SRC_URI[sha256sum] = "a70437fea7bca647c0e98161e1006ef49970267999c571b499760f1c43c6ba10"
 
 PR = "r0"

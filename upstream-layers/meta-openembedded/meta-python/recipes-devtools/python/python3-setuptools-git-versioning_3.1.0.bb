@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "612dfcf184addac9e1c2216f4f229724b2390e5bf613fb925ae80b84f2
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 PACKAGECONFIG ?= ""
 PACKAGECONFIG[python-version-smaller-3-dot-11] = ",,,python3-tomli"
 

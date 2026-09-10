@@ -19,6 +19,9 @@ SRC_URI = "https://downloads.sourceforge.net/gimp-print/${BP}.tar.xz \
            "
 SRC_URI[sha256sum] = "f5a9f47de28530b1ae2069cfbc647a9a641baeeabe809bb0ef2b3ec5b9668d70"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/gimp-print/files/gutenprint-5.3/"
+UPSTREAM_CHECK_REGEX = "gutenprint-5\.3/(?P<pver>\d+(\.\d+)+)/"
+
 inherit autotools gettext pkgconfig
 
 DEPENDS += "glib-2.0-native cups gutenprint-native tiff libusb libpng libjpeg-turbo ghostscript"

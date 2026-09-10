@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 SUMMARY = "OpenThread Border Router"
 SECTION = "net"
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=87109e44b2fda96a8991f27684a7349c \
                     file://third_party/cJSON/repo/LICENSE;md5=218947f77e8cb8e2fa02918dc41c50d0 \
                     file://third_party/cpp-httplib/repo/LICENSE;md5=1321bdf796c67e3a8ab8e352dd81474b \

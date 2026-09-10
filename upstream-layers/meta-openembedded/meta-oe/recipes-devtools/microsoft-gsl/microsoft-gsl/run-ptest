@@ -1,4 +1,14 @@
 #!/bin/sh
 
-gsl_tests && echo "PASS: gsl_tests" || echo "FAIL: gsl_tests"
-gsl_noexcept_tests && echo "PASS: gsl_noexcept_tests" || echo "FAIL: gsl_noexcept_tests"
+# Upstream builds one executable per tests/*.cpp source, so iterate rather
+# than naming them individually.
+cd "$(dirname "$0")" || exit 1
+
+for t in *_tests; do
+    [ -x "./$t" ] || continue
+    if "./$t"; then
+        echo "PASS: $t"
+    else
+        echo "FAIL: $t"
+    fi
+done

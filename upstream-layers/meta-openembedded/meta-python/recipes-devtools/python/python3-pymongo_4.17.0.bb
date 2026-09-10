@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=86d3f3a95c324c9479bd8986968f4327"
 
 SRC_URI[sha256sum] = "70ffa08ba641468cc068cf46c06b34f01a8ce3489f6411309fcb5ceabe6b2fc0"
 
-CVE_PRODUCT = "pymongo"
+CVE_PRODUCT = "mongodb:python_driver mongodb:pymongo"
 
 inherit pypi python_hatchling
 

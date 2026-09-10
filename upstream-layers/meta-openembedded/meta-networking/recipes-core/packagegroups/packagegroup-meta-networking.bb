@@ -185,7 +185,6 @@ RDEPENDS:packagegroup-meta-networking-support = "\
     libtalloc \
     ipcalc \
     libtevent \
-    linux-atm \
     lksctp-tools \
     mctp \
     memcached \

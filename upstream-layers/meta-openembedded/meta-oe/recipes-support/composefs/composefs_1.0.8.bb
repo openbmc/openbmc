@@ -3,7 +3,7 @@ DESCRIPTION = "The composefs project combines several underlying Linux \
 features to provide a very flexible mechanism to support read-only mountable \
 filesystem trees, stacking on top of an underlying "lower" Linux filesystem."
 HOMEPAGE = "https://github.com/containers/composefs"
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later & LGPL-2.1-or-later & Apache-2.0"
+LICENSE = "Apache-2.0 AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "\
     file://BSD-2-Clause.txt;md5=121c8a0a8fa5961a26b7863034ebcce8 \
     file://COPYING;md5=5cbca48090f7fe0169186a551a5bf78c \

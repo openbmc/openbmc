@@ -10,7 +10,6 @@ SRC_URI[sha256sum] = "2b043372abf8f6029a632c3aab36b641c5d5872b1cbad599fc68e17ac4
 
 CLEANBROKEN = "1"
 
-PYPI_PACKAGE = "smbus2"
 
 RDEPENDS:${PN} += "\
         python3-ctypes \

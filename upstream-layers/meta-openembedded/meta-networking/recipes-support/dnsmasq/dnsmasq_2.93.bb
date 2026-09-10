@@ -2,7 +2,7 @@ SUMMARY = "Lightweight, easy to configure DNS forwarder and DHCP server"
 HOMEPAGE = "http://www.thekelleys.org.uk/dnsmasq/doc.html"
 SECTION = "net"
 # GPLv3 was added in version 2.41 as license option
-LICENSE = "GPL-2.0-only | GPL-3.0-only"
+LICENSE = "GPL-2.0-only OR GPL-3.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING-v3;md5=d32239bcb673463ab874e80d47fae504 \
                     "
@@ -17,6 +17,8 @@ SRC_URI = "http://www.thekelleys.org.uk/dnsmasq/${@['archive/', ''][float(d.getV
            file://dnsmasq-resolved.conf \
 "
 SRC_URI[sha256sum] = "cc967771abdafeb43d10db18932d6b59fd4bed2c69c22acf8cb96aff6920d55f"
+
+CVE_PRODUCT = "dnsmasq:dnsmasq the_kelleys:dnsmasq thekelleys:dnsmasq"
 
 inherit pkgconfig update-rc.d systemd
 

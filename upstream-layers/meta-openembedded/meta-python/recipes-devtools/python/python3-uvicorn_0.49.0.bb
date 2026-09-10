@@ -6,11 +6,12 @@ RECIPE_MAINTAINER = "Tom Geelen <t.f.g.geelen@gmail.com>"
 
 SRC_URI[sha256sum] = "ebf4271aa580d9de97f93192d4595176df6e91f9aae919ca73e4fc07df1e66a3"
 
-SRC_URI += "file://0001-ptest-disable-failing-tests.patch"
+SRC_URI += "file://0001-ptest-disable-failing-tests.patch \
+            file://0002-ptest-skip-test_headers.patch \
+            "
 
 inherit pypi python_hatchling ptest-python-pytest
 
-PYPI_PACKAGE = "uvicorn"
 CVE_PRODUCT = "encode:uvicorn"
 CVE_STATUS[CVE-2020-7694] = "fixed-version: The vulnerability has been fixed since 0.11.7"
 

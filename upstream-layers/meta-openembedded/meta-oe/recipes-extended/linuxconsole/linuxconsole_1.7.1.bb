@@ -20,6 +20,8 @@ SRC_URI = "\
 "
 
 SRC_URI[sha256sum] = "bd4d4b7e37da02fc67e47ddf20b6f1243c0a7af7b02b918d5e72138ea8727547"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/linuxconsole/files/"
+UPSTREAM_CHECK_REGEX = "linuxconsoletools-(?P<pver>\d+(\.\d+)+)\.tar"
 
 S = "${UNPACKDIR}/linuxconsoletools-${PV}"
 

@@ -1,6 +1,10 @@
 #!/bin/sh
 
 for case in `find tests -type f -name '*.sh'`; do
+    if ! command -v dbus-launch >/dev/null 2>&1; then
+        echo "SKIP: ${case} (dbus-launch not installed)"
+        continue
+    fi
     bash $case python3 >$case.output 2>&1
     ret=$?
     if [ $ret -ne 0 ]; then

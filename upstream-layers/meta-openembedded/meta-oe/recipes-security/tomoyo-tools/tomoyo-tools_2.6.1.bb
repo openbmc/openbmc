@@ -2,11 +2,16 @@ SUMMARY = "TOMOYO Linux tools"
 DESCRIPTION = "TOMOYO Linux is a Mandatory Access Control (MAC) implementation \
 for Linux that can be used to increase the security of a system, while also \
 being useful purely as a system analysis tool."
-HOMEPAGE = "http://tomoyo.sourceforge.jp/"
+HOMEPAGE = "https://tomoyo.sourceforge.net/"
 SECTION = "System Environment/Kernel"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/tomoyo/${BP}.tar.gz"
 SRC_URI[sha256sum] = "f5d1f422df0f68937245fb97c18336bcd813221955cbcdb3b1a3f65b3cae1a06"
+
+# downloads.sourceforge.net has no browsable listing; the dated re-releases all
+# live in the 2.6 directory, so check that page directly
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/tomoyo/files/tomoyo-tools/2.6/"
+UPSTREAM_CHECK_REGEX = "tomoyo-tools-(?P<pver>\d+(\.\d+)+-\d+)\.tar\.gz"
 
 # there are periodic new releases of the same version, with this date updated
 PV .= "-20250707"

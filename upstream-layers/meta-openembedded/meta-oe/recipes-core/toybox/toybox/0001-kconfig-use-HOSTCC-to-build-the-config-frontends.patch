@@ -1,0 +1,44 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 4 Aug 2026 00:00:00 -0700
+Subject: [PATCH] kconfig: use HOSTCC to build the config frontends
+
+Commit 228cb983 ("Simplify build dependencies, shrink Makefile, move more
+config plumbing over to new stuff") replaced $(HOSTCC) with a hardcoded
+"cc" in the rules that build kconfig/conf and kconfig/mconf.
+
+These are build-host programs, so they have to be compiled with the host
+compiler the build system provides. When cross compiling in an
+environment that only exports an explicit HOSTCC (and has no "cc" in
+PATH), "make oldconfig" fails with:
+
+  cc -o kconfig/conf kconfig/conf.c kconfig/zconf.tab.c ...
+  make: cc: No such file or directory
+  make: *** [kconfig/Makefile:43: kconfig/conf] Error 127
+
+The top level Makefile already exports HOSTCC, and scripts/portability.sh
+uses $HOSTCC for the other host-side helpers, so honour it here too.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+diff --git a/kconfig/Makefile b/kconfig/Makefile
+index 1331434..842d6a2 100644
+--- a/kconfig/Makefile
++++ b/kconfig/Makefile
+@@ -35,12 +35,12 @@ SHIPPED = kconfig/zconf.tab.c kconfig/lex.zconf.c kconfig/zconf.hash.c
+ gen_config.h: .config
+ 
+ kconfig/mconf: $(SHIPPED)
+-	cc -o $@ kconfig/mconf.c kconfig/zconf.tab.c \
++	$(HOSTCC) -o $@ kconfig/mconf.c kconfig/zconf.tab.c \
+ 		kconfig/lxdialog/*.c -lcurses -DCURSES_LOC="<ncurses.h>" \
+ 		-DKBUILD_NO_NLS=1 -DPROJECT_NAME=\"$(KCONFIG_PROJECT)\"
+ 
+ kconfig/conf: $(SHIPPED)
+-	cc -o $@ kconfig/conf.c kconfig/zconf.tab.c -DKBUILD_NO_NLS=1 \
++	$(HOSTCC) -o $@ kconfig/conf.c kconfig/zconf.tab.c -DKBUILD_NO_NLS=1 \
+ 		-DPROJECT_NAME=\"$(KCONFIG_PROJECT)\"
+ 
+ clean::

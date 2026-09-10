@@ -1,6 +1,6 @@
 SECTION = "base"
 SUMMARY = "MIME files 'mime.types'"
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 LIC_FILES_CHKSUM = "file://debian/copyright;md5=f3ace4a4ff8aa9e374be6080e41a822e"
 DEPENDS = "file"
 RDEPENDS:${PN} = "perl"

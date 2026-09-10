@@ -13,6 +13,8 @@ SRC_URI[sha256sum] = "5f0b9e53c1e82e88c10d7c180069363980136b9d7a8306c4dca4f760d6
 
 inherit pkgconfig pypi python_setuptools_build_meta ptest-python-pytest
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN}-ptest += "\
     python3-coverage \
     python3-pytest-cov \

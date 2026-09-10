@@ -1,24 +1,26 @@
 DESCRIPTION = "A multilingual user input method library"
 HOMEPAGE = "http://uim.freedesktop.org/"
-LICENSE = "BSD-3-Clause & LGPL-2.0-or-later"
+LICENSE = "BSD-3-Clause AND LGPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=ab2826b41ca0ff4030d38cc39791d1c8"
 SECTION = "inputmethods"
 
-SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2"
+SRC_URI = "https://github.com/uim/uim/releases/download/${PV}/uim-${PV}.tar.bz2 \
+    file://0001-sigscheme-GC-protect-the-objects-used-by-require.patch \
+"
 SRC_URI:append:class-target = "\
     file://uim-module-manager.patch \
 "
 SRC_URI[sha256sum] = "67f0e5fa4292a533edc6f98b842df60c531a89cf82d0336a4e1ab72202ab8c83"
 
 UPSTREAM_CHECK_URI = "https://github.com/${BPN}/${BPN}/releases"
-UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
 
-DEPENDS = "anthy fontconfig libxft libxt glib-2.0 ncurses intltool libedit autoconf-archive-native"
+DEPENDS = "anthy-unicode fontconfig libxft libxt glib-2.0 ncurses intltool libedit autoconf-archive-native"
 DEPENDS:append:class-target = " intltool-native gtk+ gtk+3 uim-native"
 
 RDEPENDS:uim = "libuim0 libedit"
-RDEPENDS:uim-anthy = "anthy libanthy0"
-RDEPENDS:uim-anthy:append:libc-glibc = " glibc-utils glibc-gconv-euc-jp"
+RDEPENDS:uim-anthy-utf8 = "libanthy-unicode0"
+RDEPENDS:uim-anthy-utf8:append:libc-glibc = " glibc-utils glibc-gconv-euc-jp"
 
 LEAD_SONAME = "libuim.so.1"
 
@@ -33,6 +35,8 @@ GTKIMMODULES_PACKAGES = "uim-gtk2.0 uim-gtk3"
 
 EXTRA_OECONF += "--disable-emacs \
     --with-libedit=${STAGING_EXECPREFIXDIR} \
+    --without-anthy \
+    --with-anthy-utf8 \
     --without-scim \
     --without-m17nlib \
     --without-prime \
@@ -65,7 +69,7 @@ do_install:append() {
     rm -rf ${D}${datadir}/applications
 }
 
-PACKAGES =+ "uim-xim uim-utils uim-skk uim-gtk2.0 uim-gtk3 uim-fep uim-anthy uim-common libuim0 libuim-dev"
+PACKAGES =+ "uim-xim uim-utils uim-skk uim-gtk2.0 uim-gtk3 uim-fep uim-anthy-utf8 uim-common libuim0 libuim-dev"
 
 FILES:${PN} = "${bindir}/uim-help \
     ${libdir}/uim/plugin/libuim-* \
@@ -87,8 +91,8 @@ FILES:libuim-dev = "${libdir}/libuim*.a \
     ${includedir}/uim \
     ${libdir}/pkgconfig/uim.pc \
 "
-FILES:uim-anthy = "${libdir}/uim/plugin/libuim-anthy.* \
-    ${datadir}/uim/anthy*.scm \
+FILES:uim-anthy-utf8 = "${libdir}/uim/plugin/libuim-anthy-utf8.* \
+    ${datadir}/uim/anthy-utf8*.scm \
 "
 FILES:${PN}-dbg += "${libdir}/*/*/*/.debug ${libdir}/*/*/.debug"
 FILES:${PN}-dev += "${libdir}/uim/plugin/*.la"
@@ -126,19 +130,19 @@ FILES:uim-skk = "${libdir}/uim/plugin/libuim-skk.* \
 "
 
 PACKAGE_WRITE_DEPS += "qemu-native"
-pkg_postinst:uim-anthy() {
+pkg_postinst:uim-anthy-utf8() {
     if test -n "$D"; then
-        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --register anthy --path $D${datadir}/uim
+        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --register anthy-utf8 --path $D${datadir}/uim
     else
-		uim-module-manager --register anthy --path ${datadir}/uim
+		uim-module-manager --register anthy-utf8 --path ${datadir}/uim
     fi
 }
 
-pkg_prerm:uim-anthy() {
+pkg_prerm:uim-anthy-utf8() {
     if test -n "$D"; then
-        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --path $D${datadir}/uim --unregister anthy
+        ${@qemu_run_binary(d, '$D', '${bindir}/uim-module-manager')} --path $D${datadir}/uim --unregister anthy-utf8
     else
-		uim-module-manager --path ${datadir}/uim --unregister anthy
+		uim-module-manager --path ${datadir}/uim --unregister anthy-utf8
     fi
 }
 

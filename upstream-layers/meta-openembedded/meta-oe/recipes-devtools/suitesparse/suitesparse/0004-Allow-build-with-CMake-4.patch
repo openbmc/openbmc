@@ -1,0 +1,86 @@
+From 57e1fd1a4bf7878136a9f5070dadb310f233f489 Mon Sep 17 00:00:00 2001
+From: Tim Davis <DrTimothyAldenDavis@gmail.com>
+Date: Wed, 9 Mar 2022 10:33:33 -0600
+Subject: [PATCH] require cmake 3.13
+
+Upstream-Status: Backport [https://github.com/DrTimothyAldenDavis/SuiteSparse/commit/ae0be0028e68d429feb565f093aec875235447cc]
+Backport-Changes:
+ * Also update the two bundled GraphBLAS CMake entry points reached by
+   the SuiteSparse 5.10.1 build.
+ * Preserve the METIS_VERSION value supplied by the existing OE patch
+   after CMake policy CMP0048 becomes NEW.
+
+(cherry picked from commit ae0be0028e68d429feb565f093aec875235447cc)
+Signed-off-by: Deepak Rathore <deeratho@cisco.com>
+---
+ GraphBLAS/CMakeLists.txt           | 2 +-
+ GraphBLAS/GraphBLAS/CMakeLists.txt | 2 +-
+ Mongoose/CMakeLists.txt            | 2 +-
+ metis-5.1.0/CMakeLists.txt         | 2 +-
+ metis-5.1.0/GKlib/CMakeLists.txt   | 2 +-
+ 5 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/GraphBLAS/CMakeLists.txt b/GraphBLAS/CMakeLists.txt
+index 7eb999189..eecfa0ac5 100644
+--- a/GraphBLAS/CMakeLists.txt
++++ b/GraphBLAS/CMakeLists.txt
+@@ -12,7 +12,7 @@
+ #-------------------------------------------------------------------------------
+ 
+ # cmake 3.13 is preferred.
+-cmake_minimum_required ( VERSION 2.8.12 )
++cmake_minimum_required ( VERSION 3.13 )
+ 
+ message ( STATUS "CMake version: " ${CMAKE_VERSION} )
+ 
+diff --git a/GraphBLAS/GraphBLAS/CMakeLists.txt b/GraphBLAS/GraphBLAS/CMakeLists.txt
+index f365251db..26928dc0a 100644
+--- a/GraphBLAS/GraphBLAS/CMakeLists.txt
++++ b/GraphBLAS/GraphBLAS/CMakeLists.txt
+@@ -17,7 +17,7 @@
+ #-------------------------------------------------------------------------------
+ 
+ # cmake 3.13 is preferred.
+-cmake_minimum_required ( VERSION 2.8.12 )
++cmake_minimum_required ( VERSION 3.13 )
+ 
+ message ( STATUS "CMake version: " ${CMAKE_VERSION} )
+ 
+diff --git a/Mongoose/CMakeLists.txt b/Mongoose/CMakeLists.txt
+index 91a7f70ef..361fa1239 100644
+--- a/Mongoose/CMakeLists.txt
++++ b/Mongoose/CMakeLists.txt
+@@ -20,7 +20,7 @@
+ #
+ #   make distclean
+ 
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.13)
+ include(CMake/cmake_colors.cmake)
+ 
+ if (POLICY CMP0048)
+diff --git a/metis-5.1.0/CMakeLists.txt b/metis-5.1.0/CMakeLists.txt
+index 318019bfc..1a72ed0d0 100644
+--- a/metis-5.1.0/CMakeLists.txt
++++ b/metis-5.1.0/CMakeLists.txt
+@@ -1,5 +1,5 @@
+-cmake_minimum_required(VERSION 2.8)
+-project(METIS)
++cmake_minimum_required(VERSION 3.13)
++project(METIS VERSION ${METIS_VERSION})
+ 
+ set(GKLIB_PATH "GKlib" CACHE PATH "path to GKlib")
+ set(SHARED FALSE CACHE BOOL "build a shared library")
+diff --git a/metis-5.1.0/GKlib/CMakeLists.txt b/metis-5.1.0/GKlib/CMakeLists.txt
+index 67b600aa6..2f4ae75d7 100644
+--- a/metis-5.1.0/GKlib/CMakeLists.txt
++++ b/metis-5.1.0/GKlib/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 2.8)
++cmake_minimum_required(VERSION 3.13)
+ project(GKlib)
+ 
+ get_filename_component(abs "." ABSOLUTE)
+-- 
+2.35.6
+

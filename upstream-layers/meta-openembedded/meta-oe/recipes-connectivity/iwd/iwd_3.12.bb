@@ -7,7 +7,7 @@ DEPENDS = "dbus"
 
 SRC_URI = "https://www.kernel.org/pub/linux/network/wireless/${BP}.tar.xz \
            file://0001-build-Use-abs_top_srcdir-instead-of-abs_srcdir-for-e.patch \
-           file://iwd \ 
+           file://iwd \
            "
 SRC_URI[sha256sum] = "d89a5e45c7180170e19be828f9e944a768c593758094fc57a358d0e7c4cb1a49"
 

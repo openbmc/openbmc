@@ -1,0 +1,45 @@
+From d0e1b29ee5ae0e6e91944fd5c04b943fc810e13c Mon Sep 17 00:00:00 2001
+From: Ravi Kant Sharma <ravi.kant.sharma@canonical.com>
+Date: Mon, 3 Aug 2026 23:02:04 +0200
+Subject: [PATCH] Use ASN1_STRING accessors for opaque ASN1_INTEGER
+
+OpenSSL 4.0 made ASN1_INTEGER opaque. Replace direct struct member
+access (->length, ->type, ->data) with ASN1_STRING_length(),
+ASN1_STRING_type(), ASN1_STRING_get0_data().
+Upstream-Status: Submitted [https://github.com/lefcha/imapfilter/pull/317]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/cert.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/cert.c b/src/cert.c
+index a6f614a..b188dd0 100644
+--- a/src/cert.c
++++ b/src/cert.c
+@@ -186,21 +186,21 @@ get_serial(X509 *cert)
+ 	serial = X509_get_serialNumber(cert);
+ 	buf = xmalloc(LINE_MAX);
+ 	*buf = '\0';
+-	if (serial->length <= (int)sizeof(long)) {
++	if (ASN1_STRING_length(serial) <= (int)sizeof(long)) {
+ 		num = ASN1_INTEGER_get(serial);
+-		if (serial->type == V_ASN1_NEG_INTEGER) {
++		if (ASN1_STRING_type(serial) == V_ASN1_NEG_INTEGER) {
+ 			snprintf(buf, LINE_MAX, "-%lX", -num);
+ 		} else {
+ 			snprintf(buf, LINE_MAX, "%lX", num);
+ 		}
+ 	} else {
+-		if (serial->type == V_ASN1_NEG_INTEGER) {
++		if (ASN1_STRING_type(serial) == V_ASN1_NEG_INTEGER) {
+ 			snprintf(buf, LINE_MAX, "-");
+ 		}
+-		for (i = 0; i < serial->length; i++) {
++		for (i = 0; i < ASN1_STRING_length(serial); i++) {
+ 			len = strlen(buf);
+ 			snprintf(buf + len, LINE_MAX - len, "%02X",
+-			    serial->data[i]);
++			    ASN1_STRING_get0_data(serial)[i]);
+ 		}
+ 	}
+ 	return buf;

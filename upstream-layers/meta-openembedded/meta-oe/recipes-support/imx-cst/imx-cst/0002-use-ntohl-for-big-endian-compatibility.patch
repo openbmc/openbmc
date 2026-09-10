@@ -1,0 +1,30 @@
+From: Andrej Shadura <andrew.shadura@collabora.co.uk>
+Date: Tue, 3 Jun 2025 17:20:10 +0200
+Subject: [PATCH] Use ntohl instead of a custom macro for big-endian compat
+
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/be-compat.patch]
+---
+ src/tools/hab_csf_parser/csf_parser.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/src/tools/hab_csf_parser/csf_parser.h b/src/tools/hab_csf_parser/csf_parser.h
+index b387cdc..e6755bd 100644
+--- a/src/tools/hab_csf_parser/csf_parser.h
++++ b/src/tools/hab_csf_parser/csf_parser.h
+@@ -17,12 +17,10 @@
+ #define PASS 1
+ #define FAIL 0
+ 
++#include <arpa/inet.h>
++
+ /* For little endian systems */
+-#define from_be32(x) \
+-        ((((x) & 0x000000ff) << 24) | \
+-        (((x) & 0x0000ff00) << 8 ) | \
+-        (((x) & 0x00ff0000) >> 8 ) | \
+-        (((x) & 0xff000000) >> 24))
++#define from_be32(x) ntohl(x)
+ 
+ #define assert(x)       if ((x) == 0) { \
+                                 printf("ASSERT failed at %s:%d\n", __FUNCTION__, __LINE__);    \

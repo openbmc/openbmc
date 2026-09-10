@@ -1,4 +1,4 @@
-From 0aee90d953406414f09740a6ef851ed7e666dc9e Mon Sep 17 00:00:00 2001
+From 7aa7a9be9c1d7906b9d4e8f89c078887e8dc5bfc Mon Sep 17 00:00:00 2001
 From: Leon Anavi <leon.anavi@konsulko.com>
 Date: Mon, 27 Jan 2025 19:17:48 +0200
 Subject: [PATCH] builder.py: Check PYTHON_INCLUDE_DIR
@@ -15,15 +15,18 @@ Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/scikit_build_core/builder/builder.py b/src/scikit_build_core/builder/builder.py
-index d05065f..b01d621 100644
+index 4be0cca..0fc54f4 100644
 --- a/src/scikit_build_core/builder/builder.py
 +++ b/src/scikit_build_core/builder/builder.py
-@@ -228,7 +228,7 @@ class Builder:
-         python_sabi_library = (
-             get_python_library(self.config.env, abi3=True) if limited_api else None
-         )
+@@ -395,7 +395,7 @@ class Builder:
+             python_sabi_library = get_python_library(self.config.env, abi3t=True)
+         elif sabi == _SabiMode.ABI3:
+             python_sabi_library = get_python_library(self.config.env, abi3=True)
 -        python_include_dir = get_python_include_dir()
 +        python_include_dir = os.getenv("PYTHON_INCLUDE_DIR") or get_python_include_dir()
          numpy_include_dir = get_numpy_include_dir()
  
          # Warning for CPython 3.13.4 Windows bug
+-- 
+2.47.3
+

@@ -1,5 +1,5 @@
 SUMMARY = "Tracker miners and metadata extractors"
-LICENSE = "GPL-2.0-only & LGPL-2.1-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING.GPL;md5=ee31012bf90e7b8c108c69f197f3e3a4 \
     file://COPYING.LGPL;md5=2d5025d4aa3495befef8f17206a5b0a1 \
@@ -15,7 +15,7 @@ DEPENDS = " \
 inherit gnomebase gsettings gobject-introspection vala bash-completion features_check
 
 SRC_URI:append = " \
-	file://0001-fix-reproducibility.patch \
+	file://0001-build-add-an-option-to-disable-the-uninstalled-helper.patch \
 	file://0001-Set-header-file-to-a-fixed-path-instead-of-a-host-pa.patch \
 "
 SRC_URI[archive.sha256sum] = "7b39a6c28a8acf2b172f15b2fb5ee7c7a3764c447c2f4a14caa239b7ebe61942"
@@ -71,7 +71,7 @@ PACKAGECONFIG[landlock]        = "-Dlandlock=enabled,-Dlandlock=disabled"
 PACKAGECONFIG[seccomp] = "-Dseccomp=true,-Dseccomp=false,libseccomp"
 
 EXTRA_OEMESON += " \
-    -Dman=false -Dfunctional_tests=false \
+    -Dman=false -Dfunctional_tests=false -Duninstalled_helpers=false \
     -Dsystemd_user_services=${@bb.utils.contains('DISTRO_FEATURES', 'systemd', 'true', 'false', d)} \
     -Dsystemd_user_services_dir=${systemd_user_unitdir} \
 "

@@ -41,7 +41,11 @@ RRECOMMENDS:${PN} = " \
 
 do_configure:prepend() {
     if ${@bb.utils.contains('DISTRO_FEATURES','usrmerge','true','false',d)}; then
-        sed -i -e 's|/lib|${nonarch_base_libdir}|' ${S}/setup.py
+        # setup.py has a single os.path.join('/lib', 'ufw'); anchor the match to
+        # the quoted literal so re-running do_configure on an already-patched
+        # ${S} (cached unpack/patch) is a no-op instead of prepending another
+        # /usr each time (which produced /usr/usr/lib/ufw and QA failures).
+        sed -i -e "s|'/lib'|'${nonarch_base_libdir}'|" ${S}/setup.py
     fi
 }
 

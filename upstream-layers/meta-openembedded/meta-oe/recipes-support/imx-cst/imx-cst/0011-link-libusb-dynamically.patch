@@ -1,0 +1,26 @@
+From: Tobias Deiminger <tobias.deiminger@linutronix.de>
+Date: Fri, 30 Jan 2026 01:55:37 +0100
+Subject: Link libusb as shared system library
+
+The hab_log_parser tool requires libusb. Upstream hardcodes static linking.
+ We want to link the system shared library instead and must thus change the
+ related cmake find function.
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/libusb_dynlink.patch]
+---
+ src/tools/hab_log_parser/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/tools/hab_log_parser/CMakeLists.txt b/src/tools/hab_log_parser/CMakeLists.txt
+index 086496e..067d728 100644
+--- a/src/tools/hab_log_parser/CMakeLists.txt
++++ b/src/tools/hab_log_parser/CMakeLists.txt
+@@ -3,7 +3,7 @@ add_executable(hab_log_parser
+     usbhid.c
+ )
+ 
+-find_cst_dependency_library("libusb-1.0.a" libusb_DIR LIBUSB_LIB LIBUSB_INCLUDE_DIR)
++find_cst_dependency_library("libusb-1.0.so" libusb_DIR LIBUSB_LIB LIBUSB_INCLUDE_DIR)
+ 
+ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+     find_cst_dependency_library("libhidapi.a" hidapi_DIR LIBHIDAPI_LIB LIBHIDAPI_INCLUDE_DIR)

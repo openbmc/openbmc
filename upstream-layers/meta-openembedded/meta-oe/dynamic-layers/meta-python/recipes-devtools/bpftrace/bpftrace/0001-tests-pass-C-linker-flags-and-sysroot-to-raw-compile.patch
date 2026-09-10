@@ -1,0 +1,79 @@
+From 94892d6ac971155b43a6bbff942acede21b60efb Mon Sep 17 00:00:00 2001
+From: x <x@x>
+Date: Mon, 7 Sep 2026 17:54:26 +0000
+Subject: [PATCH] tests: pass C/linker flags and sysroot to raw compiler
+ invocations in testprogs
+
+Several add_custom_command() rules in tests/testprogs invoke
+${CMAKE_C_COMPILER} directly (false.bin and the split-DWARF dwo/dwp
+builds). Unlike add_executable() targets, these do not automatically
+receive CMAKE_C_FLAGS, CMAKE_EXE_LINKER_FLAGS or CMAKE_SYSROOT, so with
+cross toolchains that have no built-in default sysroot (e.g.
+Yocto/OpenEmbedded) the compile fails with:
+
+  uprobe_test.c:1:10: fatal error: unistd.h: No such file or directory
+
+Build a flag list from CMAKE_C_COMPILER_ARG1, CMAKE_SYSROOT and
+CMAKE_C_FLAGS and pass it to each raw compiler invocation. The dwo/dwp
+commands compile and link in a single step, so also pass
+CMAKE_EXE_LINKER_FLAGS to those.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/testprogs/CMakeLists.txt | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+
+--- a/tests/testprogs/CMakeLists.txt
++++ b/tests/testprogs/CMakeLists.txt
+@@ -17,6 +17,23 @@ test_and_add_testprog_cflag("-fno-omit-f
+ test_and_add_testprog_cflag("-mno-omit-leaf-frame-pointer")
+ get_property(testprog_cflags GLOBAL PROPERTY testprog_cflags)
+ 
++# Flags for the add_custom_command() invocations below that call the C
++# compiler directly. Unlike add_executable(), custom commands do not
++# automatically receive CMAKE_C_FLAGS or the sysroot, which breaks cross
++# compilation with toolchains that have no default sysroot (e.g. Yocto).
++set(testprog_raw_cc_flags "")
++if(CMAKE_C_COMPILER_ARG1)
++  separate_arguments(_arg1 UNIX_COMMAND "${CMAKE_C_COMPILER_ARG1}")
++  list(APPEND testprog_raw_cc_flags ${_arg1})
++endif()
++if(CMAKE_SYSROOT)
++  list(APPEND testprog_raw_cc_flags "--sysroot=${CMAKE_SYSROOT}")
++endif()
++separate_arguments(_c_flags UNIX_COMMAND "${CMAKE_C_FLAGS}")
++list(APPEND testprog_raw_cc_flags ${_c_flags})
++# Linker flags for the custom commands that compile and link in one step.
++separate_arguments(testprog_raw_ld_flags UNIX_COMMAND "${CMAKE_EXE_LINKER_FLAGS}")
++
+ file(GLOB testprog_sources CONFIGURE_DEPENDS *.c *.cpp)
+ set(testprogtargets "")
+ function(testprog_compile is_pie)
+@@ -85,7 +102,7 @@ endif()
+ find_program(LLVM_OBJCOPY llvm-objcopy REQUIRED)
+ add_custom_command(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/false.bin
+-  COMMAND ${CMAKE_C_COMPILER} -c ${CMAKE_CURRENT_SOURCE_DIR}/false.c -o ${CMAKE_CURRENT_BINARY_DIR}/false.o
++  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -c ${CMAKE_CURRENT_SOURCE_DIR}/false.c -o ${CMAKE_CURRENT_BINARY_DIR}/false.o
+   COMMAND ${LLVM_OBJCOPY} -S --only-section=.text --keep-symbol=main -O binary ${CMAKE_CURRENT_BINARY_DIR}/false.o ${CMAKE_CURRENT_BINARY_DIR}/false.bin
+   COMMAND ${CMAKE_COMMAND} -E rm -f ${CMAKE_CURRENT_BINARY_DIR}/false.o
+   WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+@@ -147,7 +164,7 @@ add_custom_command(
+   OUTPUT
+     ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split
+     ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split-uprobe_test.dwo
+-  COMMAND ${CMAKE_C_COMPILER} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split
++  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split ${testprog_raw_ld_flags}
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c
+ )
+ list(APPEND testprogtargets ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split)
+@@ -159,7 +176,7 @@ add_custom_command(
+   OUTPUT
+     ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split
+     ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split.dwp
+-  COMMAND ${CMAKE_C_COMPILER} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split
++  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split ${testprog_raw_ld_flags}
+   COMMAND ${LLVM_DWP} -e ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split -o ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split.dwp
+   COMMAND ${CMAKE_COMMAND} -E rm -f ${EXTERNAL_DEBUG_DIR}/dwp/*.dwo
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c

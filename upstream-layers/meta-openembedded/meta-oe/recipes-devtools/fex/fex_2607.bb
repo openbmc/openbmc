@@ -1,6 +1,6 @@
 SUMMARY = "A fast usermode x86 and x86-64 emulator for Arm64 Linux"
 HOMEPAGE = "https://github.com/FEX-Emu/FEX"
-LICENSE = "MIT & BSL-1.0 & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND BSL-1.0 AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=70d20d502833c35d6d5a4f0ef5d9efcc"
 LIC_FILES_CHKSUM += "file://External/range-v3/LICENSE.txt;md5=5dc23d5193abaedb6e42f05650004624"
 LIC_FILES_CHKSUM += "file://External/xxhash/LICENSE;md5=13be6b481ff5616f77dda971191bb29b"

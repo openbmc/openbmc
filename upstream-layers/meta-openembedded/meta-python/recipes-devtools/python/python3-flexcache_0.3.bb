@@ -6,7 +6,8 @@ DEPENDS += "python3-setuptools-scm-native"
 SRC_URI[sha256sum] = "18743bd5a0621bfe2cf8d519e4c3bfdf57a269c15d1ced3fb4b64e0ff4600656"
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
-PYPI_PACKAGE = "flexcache"
+
+DEPENDS += "python3-wheel-native"
 
 PTEST_PYTEST_DIR = "flexcache/testsuite"
 

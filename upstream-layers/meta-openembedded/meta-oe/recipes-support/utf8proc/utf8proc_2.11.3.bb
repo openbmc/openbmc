@@ -5,7 +5,7 @@ encoding, supporting Unicode version 16.0"
 HOMEPAGE = "https://juliastrings.github.io/utf8proc/"
 SECTION = "libs"
 
-LICENSE = "MIT & Unicode-3.0"
+LICENSE = "MIT AND Unicode-3.0"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=96d5a3ba306e0f24fb289427af484408"
 
 SRC_URI = "\

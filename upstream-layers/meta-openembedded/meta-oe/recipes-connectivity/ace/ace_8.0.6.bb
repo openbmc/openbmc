@@ -1,7 +1,7 @@
 SUMMARY = "C++ framework for implementing distributed and networked applications"
 DESCRIPTION = "C++ network programming framework that implements many core \
 patterns for concurrent communication software"
-LICENSE = "ACE-TAO-CIAO"
+LICENSE = "LicenseRef-ACE-TAO-CIAO"
 HOMEPAGE = "http://www.dre.vanderbilt.edu/~schmidt/ACE.html"
 LIC_FILES_CHKSUM = "file://COPYING;md5=d2c090e9c730fd91677782d8e2091d77"
 

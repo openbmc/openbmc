@@ -10,6 +10,8 @@ SRC_URI = " \
     https://github.com/adobe-fonts/source-han-sans/releases/download/${PV}R/${ZIPNAME}.zip;subdir=${BP};downloadfilename=${BP}.zip \
     file://44-${BPN}.conf \
 "
+UPSTREAM_CHECK_URI = "https://github.com/adobe-fonts/source-han-sans/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)R"
 
 do_install() {
     install -d ${D}${sysconfdir}/fonts/conf.d/

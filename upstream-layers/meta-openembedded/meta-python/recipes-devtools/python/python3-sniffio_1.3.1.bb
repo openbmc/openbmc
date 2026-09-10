@@ -1,6 +1,6 @@
 SUMMARY = "Sniff out which async library your code is running under"
 SECTION = "devel/python"
-LICENSE = "MIT | Apache-2.0"
+LICENSE = "Apache-2.0 OR MIT"
 LIC_FILES_CHKSUM = "\
     file://LICENSE;md5=fa7b86389e58dd4087a8d2b833e5fe96 \
     file://LICENSE.MIT;md5=e62ba5042d5983462ad229f5aec1576c \

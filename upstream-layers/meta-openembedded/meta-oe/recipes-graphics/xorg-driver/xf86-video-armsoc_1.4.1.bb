@@ -1,7 +1,7 @@
 require recipes-graphics/xorg-driver/xorg-driver-video.inc
 
 SUMMARY = "X.Org X server -- ARM SOC display driver"
-LICENSE = "MIT & GPL-2.0-or-later"
+LICENSE = "GPL-2.0-or-later AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=10ce5de3b111315ea652a5f74ec0c602"
 
 DEPENDS += "virtual/libx11 libdrm xorgproto"

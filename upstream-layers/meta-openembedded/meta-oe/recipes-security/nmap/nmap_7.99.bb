@@ -1,7 +1,7 @@
 SUMMARY = "network auditing tool"
 DESCRIPTION = "Nmap (Network Mapper) is a free and open source (license) utility for network discovery and security auditing.\nGui support via appending to IMAGE_FEATURES x11-base in local.conf"
 SECTION = "security"
-LICENSE = "NPSL"
+LICENSE = "LicenseRef-NPSL"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=895af8527fe4bcb72f271fd1841fd2f6"
 

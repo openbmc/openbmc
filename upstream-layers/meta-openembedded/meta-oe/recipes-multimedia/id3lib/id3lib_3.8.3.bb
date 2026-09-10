@@ -12,6 +12,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/id3lib/id3lib-${PV}.tar.gz;name=archive \
 SRC_URI[archive.sha256sum] = "2749cc3c0cd7280b299518b1ddf5a5bcfe2d1100614519b68702230e26c7d079"
 SRC_URI[patch.sha256sum] = "6170f085972fdeb5fd69e346860100416707bb0b9f3a73a17a64945dc8b7cfe1"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/id3lib/files/id3lib/"
+UPSTREAM_CHECK_REGEX = "id3lib/(?P<pver>\d+(\.\d+)+)/"
+
 CVE_STATUS[CVE-2007-4460] = "patched: fix is included in debian patch"
 
 inherit autotools

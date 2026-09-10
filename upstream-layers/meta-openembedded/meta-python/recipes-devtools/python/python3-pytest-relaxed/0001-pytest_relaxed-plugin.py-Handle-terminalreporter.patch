@@ -1,0 +1,38 @@
+From f9822e9fdc2bfb7762eb2bc740f16bbe543e500b Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Tue, 21 Jul 2026 14:05:17 +0300
+Subject: [PATCH] pytest_relaxed/plugin.py: Handle terminalreporter
+
+Guard against missing terminal reporter in pytest_configure because
+some plugins/configurations unregister or never register the
+builtin "terminalreporter" plugin, which caused an INTERNALERROR
+when RelaxedReporter tried to access builtin.config on None.
+
+Fixes:
+
+INTERNALERROR> AttributeError: 'NoneType' object has no attribute 'config'
+
+Upstream-Status: Submitted [https://github.com/bitprophet/pytest-relaxed/pull/35]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ pytest_relaxed/plugin.py | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/pytest_relaxed/plugin.py b/pytest_relaxed/plugin.py
+index ed448de..840082b 100644
+--- a/pytest_relaxed/plugin.py
++++ b/pytest_relaxed/plugin.py
+@@ -42,6 +42,9 @@ def pytest_configure(config):
+     # TODO: we _may_ sometime want to do the isatty/slaveinput/etc checks that
+     # pytest-sugar does?
+     builtin = config.pluginmanager.getplugin("terminalreporter")
++    # Guard against missing terminal reporter
++    if builtin is None:
++        return
+     # Pass the configured, instantiated builtin terminal reporter to our
+     # instance so it can refer to e.g. the builtin reporter's configuration
+     ours = RelaxedReporter(builtin)
+-- 
+2.43.0
+

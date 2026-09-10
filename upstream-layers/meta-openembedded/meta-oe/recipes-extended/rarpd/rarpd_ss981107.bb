@@ -11,6 +11,9 @@ SECTION = "System Environment/Daemons"
 
 SRC_URI = "http://pkgs.fedoraproject.org/repo/pkgs/${BPN}/${BP}.tar.gz/be2a88f8ccddf2a40ac484cb3294fedc/${BP}.tar.gz"
 SRC_URI[sha256sum] = "4d6145d435a5d8b567b9798620f57f9b0a464078a1deba267958f168fbe776e6"
+# Snapshot ss981107 from the Fedora lookaside cache; upstream is long dead and
+# there is no release listing to check.
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 SRC_URI += "file://0001-rarpd.8-add-man-file.patch \
     file://0002-Makefile-modify-compile-parameters.patch \

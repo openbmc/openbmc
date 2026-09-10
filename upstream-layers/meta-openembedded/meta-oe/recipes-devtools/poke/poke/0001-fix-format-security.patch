@@ -1,0 +1,37 @@
+From dbaecb5f0032401617254a2f6eb10cdd28ea04f2 Mon Sep 17 00:00:00 2001
+From: Wang Mingyu <wangmy@fujitsu.com>
+Date: Thu, 20 Aug 2026 10:24:56 +0000
+Subject: [PATCH] fix format security
+
+Upstream-Status: Submitted
+
+Signed-off-by: Wang Mingyu <wangmy@fujitsu.com>
+---
+ jitter/gnulib-local/openat-die.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/jitter/gnulib-local/openat-die.c b/jitter/gnulib-local/openat-die.c
+index d37e399..f4b3301 100644
+--- a/jitter/gnulib-local/openat-die.c
++++ b/jitter/gnulib-local/openat-die.c
+@@ -35,7 +35,7 @@ openat_save_fail (int errnum)
+ {
+ #ifndef GNULIB_LIBPOSIX
+   error (exit_failure, errnum,
+-         _("unable to record current working directory"));
++         "%s", _("unable to record current working directory"));
+ #endif
+   /* _Noreturn cannot be applied to error, since it returns
+      when its first argument is 0.  To help compilers understand that this
+@@ -54,7 +54,7 @@ openat_restore_fail (int errnum)
+ {
+ #ifndef GNULIB_LIBPOSIX
+   error (exit_failure, errnum,
+-         _("failed to return to initial working directory"));
++         "%s", _("failed to return to initial working directory"));
+ #endif
+ 
+   /* As above.  */
+-- 
+2.43.0
+

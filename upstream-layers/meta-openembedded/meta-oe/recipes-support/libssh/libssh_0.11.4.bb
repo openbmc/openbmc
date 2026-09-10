@@ -15,6 +15,7 @@ SRC_URI:append:toolchain-clang = " file://0001-CompilerChecks.cmake-drop-Wunused
 
 SRCREV = "ca9c055d7c78ce357346ac7c2b14047568d47aa1"
 
+CVE_PRODUCT = "libssh:libssh"
 
 inherit cmake ptest
 

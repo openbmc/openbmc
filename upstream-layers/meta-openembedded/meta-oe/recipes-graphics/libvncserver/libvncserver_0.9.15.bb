@@ -49,6 +49,7 @@ SRC_URI = "git://github.com/LibVNC/libvncserver;branch=master;protocol=https;tag
 "
 SRCREV = "9b54b1ec32731bd23158ca014dc18014db4194c3"
 
+UPSTREAM_CHECK_GITTAGREGEX = "LibVNCServer-(?P<pver>\d+(\.\d+)+)"
 
 EXTRA_OECMAKE = "-DMAKE_INSTALL_LIBDIR=${libdir}"
 

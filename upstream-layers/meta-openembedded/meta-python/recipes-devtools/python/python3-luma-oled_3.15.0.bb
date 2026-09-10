@@ -8,10 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE.rst;md5=ddfca5d3a55dc20707b094137c913c4c"
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 SRC_URI[sha256sum] = "16925fe668f484803df0683add800b19e5dd7316a1d64eb06ec2ae817473901e"
 
 PYPI_PACKAGE = "luma_oled"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} += " \
 	python3-luma-core \

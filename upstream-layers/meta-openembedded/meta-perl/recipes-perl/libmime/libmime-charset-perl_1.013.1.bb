@@ -4,7 +4,7 @@ messages on Internet."
 HOMEPAGE = "https://metacpan.org/release/NEZUMI/MIME-Charset-1.013.1"
 SECTION = "libs"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/N/NE/NEZUMI/MIME-Charset-${PV}.tar.gz"

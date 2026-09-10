@@ -8,41 +8,60 @@ Bug: https://bugzilla.gnome.org/show_bug.cgi?id=676076
 Bug-Debian: https://bugs.debian.org/684300
 Bug-Ubuntu: https://launchpad.net/bugs/946171
 
+Guard the X11 specific parts with GDK_WINDOWING_X11 so this still builds
+against a gtk+3 configured without the X11 backend, as is the case on
+wayland only distros:
+
+  polkitgnomeauthenticator.c:29:10: fatal error: 'gdk/gdkx.h' file not found
+
+gdk/gdkx.h does not exist in such a build, and GDK_IS_X11_WINDOW() is
+declared there too, so the include and the gdk_x11_get_server_time() call
+both have to be compiled out rather than only guarded at runtime.
+
+gdk/gdk.h is included explicitly before the guard because GDK_WINDOWING_X11
+comes from gdkconfig.h, and no gdk or gtk header is pulled in earlier in
+this file; without it the guard would always be false and X11 builds would
+silently lose the fresh timestamp.
+
 Upstream-Status: Pending
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 ---
- src/polkitgnomeauthenticator.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ src/polkitgnomeauthenticator.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
 diff --git a/src/polkitgnomeauthenticator.c b/src/polkitgnomeauthenticator.c
-index 23163b4..e57d76e 100644
+index 23163b4..ae237de 100644
 --- a/src/polkitgnomeauthenticator.c
 +++ b/src/polkitgnomeauthenticator.c
-@@ -26,6 +26,7 @@
+@@ -26,6 +26,10 @@
  #include <sys/types.h>
  #include <pwd.h>
  #include <glib/gi18n.h>
++#include <gdk/gdk.h>
++#ifdef GDK_WINDOWING_X11
 +#include <gdk/gdkx.h>
++#endif
  
  #include <polkit/polkit.h>
  #include <polkitagent/polkitagent.h>
-@@ -306,7 +307,17 @@ session_request (PolkitAgentSession *session,
+@@ -306,7 +310,19 @@ session_request (PolkitAgentSession *session,
      }
  
    gtk_widget_show_all (GTK_WIDGET (authenticator->dialog));
 -  gtk_window_present (GTK_WINDOW (authenticator->dialog));
++#ifdef GDK_WINDOWING_X11
 +  GdkWindow *window = gtk_widget_get_window (GTK_WIDGET (authenticator->dialog));
 +
 +  if (GDK_IS_X11_WINDOW (window))
 +    {
-+    gtk_window_present_with_time (GTK_WINDOW (authenticator->dialog), gdk_x11_get_server_time (window));
++      gtk_window_present_with_time (GTK_WINDOW (authenticator->dialog), gdk_x11_get_server_time (window));
 +    }
 +  else
++#endif
 +    {
-+    gtk_window_present (GTK_WINDOW (authenticator->dialog));
++      gtk_window_present (GTK_WINDOW (authenticator->dialog));
 +    }
 +
    password = polkit_gnome_authentication_dialog_run_until_response_for_prompt (POLKIT_GNOME_AUTHENTICATION_DIALOG (authenticator->dialog),
                                                                                 modified_request,
                                                                                 echo_on,
-

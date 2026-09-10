@@ -1,0 +1,61 @@
+From 50bd3a46c2c5ccd7298415d1a66ef27c96d0fa2b Mon Sep 17 00:00:00 2001
+From: Chocobo1 <Chocobo1@users.noreply.github.com>
+Date: Sun, 19 Apr 2026 01:01:53 +0800
+Subject: [PATCH] Add support for OpenSSL 4.0
+
+The accessor functions for `ASN1_STRING` are available since OpenSSL 1.0.1 so we are free to use
+them without conditional guards.
+See: https://openssl-library.org/post/2026-04-13-asn1_string/
+
+Closes #8268.
+Upstream-Status: Backport [https://github.com/arvidn/libtorrent/commit/50bd3a46c2c5]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/torrent.cpp | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/src/torrent.cpp b/src/torrent.cpp
+index c6564b67f82..7fcc75b3ed4 100644
+--- a/src/torrent.cpp
++++ b/src/torrent.cpp
+@@ -1630,9 +1630,9 @@ aux::vector<download_priority_t, piece_index_t> file_to_piece_prio(
+ 			GENERAL_NAME* gen = sk_GENERAL_NAME_value(gens, i);
+ 			if (gen->type != GEN_DNS) continue;
+ 			ASN1_IA5STRING* domain = gen->d.dNSName;
+-			if (domain->type != V_ASN1_IA5STRING || !domain->data || !domain->length) continue;
+-			auto const* torrent_name = reinterpret_cast<char const*>(domain->data);
+-			auto const name_length = aux::numeric_cast<std::size_t>(domain->length);
++			if (ASN1_STRING_type(domain) != V_ASN1_IA5STRING || !ASN1_STRING_get0_data(domain) || !ASN1_STRING_length(domain)) continue;
++			auto const* torrent_name = reinterpret_cast<char const*>(ASN1_STRING_get0_data(domain));
++			auto const name_length = aux::numeric_cast<std::size_t>(ASN1_STRING_length(domain));
+ 
+ #ifndef TORRENT_DISABLE_LOGGING
+ 			if (i > 1) names += " | n: ";
+@@ -1654,18 +1654,22 @@ aux::vector<download_priority_t, piece_index_t> file_to_piece_prio(
+ 
+ 		// no match in the alternate names, so try the common names. We should only
+ 		// use the "most specific" common name, which is the last one in the list.
++#if OPENSSL_VERSION_NUMBER >= 0x30000000L
++		X509_NAME const* name = X509_get_subject_name(cert);
++#else
+ 		X509_NAME* name = X509_get_subject_name(cert);
++#endif
+ 		int i = -1;
+-		ASN1_STRING* common_name = nullptr;
++		ASN1_STRING const* common_name = nullptr;
+ 		while ((i = X509_NAME_get_index_by_NID(name, NID_commonName, i)) >= 0)
+ 		{
+-			X509_NAME_ENTRY* name_entry = X509_NAME_get_entry(name, i);
++			X509_NAME_ENTRY const* name_entry = X509_NAME_get_entry(name, i);
+ 			common_name = X509_NAME_ENTRY_get_data(name_entry);
+ 		}
+-		if (common_name && common_name->data && common_name->length)
++		if (common_name && ASN1_STRING_get0_data(common_name) && ASN1_STRING_length(common_name))
+ 		{
+-			auto const* torrent_name = reinterpret_cast<char const*>(common_name->data);
+-			auto const name_length = aux::numeric_cast<std::size_t>(common_name->length);
++			auto const* torrent_name = reinterpret_cast<char const*>(ASN1_STRING_get0_data(common_name));
++			auto const name_length = aux::numeric_cast<std::size_t>(ASN1_STRING_length(common_name));
+ 
+ #ifndef TORRENT_DISABLE_LOGGING
+ 			if (!names.empty()) names += " | n: ";

@@ -1,0 +1,18 @@
+libsimplelog: upgrade 1.0.8 -> 1.1.0
+
+Upgrade libsimplelog to the latest upstream version 1.1.0.
+
+Drop 0001-allow-build-with-cmake-4.patch as it is now integrated
+upstream (commit 4827c4325063266f6d2a7e133a9d3a9050ff6a3c).
+
+Update LIC_FILES_CHKSUM due to upstream updating the copyright year 
+range from 2024 to 2024-2026 in LICENSE.txt. The project remains fully 
+under the MIT license.
+
+Append -D__LINUX__=1 and -D_GNU_SOURCE=1 to EXTRA_OECMAKE to enable 
+Linux and GNU-specific extensions like sched_getcpu() for better 
+performance effectiveness. These flags are optional; without them, 
+version 1.1.0 remains fully backward compatible and adapts perfectly 
+with strictly POSIX musl environments.
+
+Signed-off-by: Thuận Nguyễn-Thái <nguyenthaithuanalg@gmail.com>

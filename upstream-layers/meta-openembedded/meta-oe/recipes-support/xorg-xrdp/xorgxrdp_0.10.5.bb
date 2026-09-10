@@ -3,7 +3,7 @@ SUMMARY = "Xorg drivers for xrdp."
 LICENSE = "MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a2523660329fdca3d954c0a87390e007"
 
-inherit autotools pkgconfig 
+inherit autotools pkgconfig
 
 DEPENDS = "virtual/libx11 xserver-xorg xrdp nasm-native"
 

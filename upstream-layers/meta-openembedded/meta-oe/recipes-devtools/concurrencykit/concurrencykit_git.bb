@@ -3,7 +3,7 @@ safe memory reclamation mechanisms and non-blocking data structures \
 designed to aid in the design and implementation of high performance \
 concurrent systems."
 
-LICENSE = "BSD-2-Clause & Apache-2.0"
+LICENSE = "Apache-2.0 AND BSD-2-Clause"
 HOMEPAGE = "http://concurrencykit.org"
 SECTION = "base"
 

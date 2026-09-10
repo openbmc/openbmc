@@ -1,4 +1,4 @@
-GO_MOD_LICENSES = "Apache-2.0 & BSD-2-Clause & BSD-3-Clause & EPL-1.0 & ISC & MIT & MPL-2.0"
+GO_MOD_LICENSES = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND EPL-1.0 AND ISC AND MIT AND MPL-2.0"
 
 LIC_FILES_CHKSUM += "\
     file://pkg/mod/cloud.google.com/go/bigtable@v1.2.0/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57;spdx=Apache-2.0 \

@@ -1,0 +1,52 @@
+From 784139a16a03cd0c6486e4b587b995e9d5ab21dd Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 29 Jul 2026 05:10:29 +0000
+Subject: [PATCH] locktest: do not tie struct delegation to the F_GETDELEG
+ guard
+
+glibc 2.43 added F_GETDELEG/F_SETDELEG to <bits/fcntl-linux.h>, but it
+does not declare struct delegation and neither does the kernel UAPI.
+
+locktest.c defined struct delegation inside "#ifndef F_GETDELEG", which
+assumes that any libc providing the fcntl commands also provides the
+struct. On glibc 2.43+ the guard is taken, the struct is never defined
+and the build fails:
+
+  locktest.c:1065:20: error: variable has incomplete type 'struct delegation'
+  locktest.c:1365:23: error: variable has incomplete type 'struct delegation'
+  locktest.c:1615:20: error: variable has incomplete type 'struct delegation'
+
+Keep the F_GETDELEG/F_SETDELEG fallbacks guarded, but define the struct
+unconditionally since no libc declares it.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/locktest.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/src/locktest.c b/src/locktest.c
+index 54ee1f0..e24a0fe 100644
+--- a/src/locktest.c
++++ b/src/locktest.c
+@@ -80,13 +80,18 @@ extern int h_errno;
+ #ifndef F_GETDELEG
+ #define F_GETDELEG	(1024 + 15)
+ #define F_SETDELEG	(1024 + 16)
++#endif
+ 
++/*
++ * glibc 2.43 added F_GETDELEG/F_SETDELEG to <bits/fcntl-linux.h> but it does
++ * not declare struct delegation, and neither does the kernel UAPI. Therefore
++ * the struct definition cannot be tied to the F_GETDELEG guard above.
++ */
+ struct delegation {
+ 	uint32_t d_flags;
+ 	uint16_t d_type;
+ 	uint16_t __pad;
+ };
+-#endif
+ 
+ static char	*prog;
+ static char	*filename = 0;

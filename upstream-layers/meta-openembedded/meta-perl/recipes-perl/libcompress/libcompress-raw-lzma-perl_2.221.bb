@@ -3,7 +3,7 @@ DESCRIPTION = "This module provides a Perl interface to allow reading and \
 wrting of lzma, lzip and xz files/buffers."
 HOMEPAGE = "https://metacpan.org/release/Compress-Raw-Lzma"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README;beginline=8;endline=10;md5=dcf5ec9168367166aaeabb92ee5754e1"
 

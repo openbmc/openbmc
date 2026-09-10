@@ -14,5 +14,11 @@ SRCREV = "9752b50e922572e4cd214ac45ed95e4ee410fe24"
 
 PV = "1.0.6+git"
 
+# bitmath.org only tags up to v1.0.5 while this recipe already tracks the 1.0.6
+# development head, so tag comparison always looks like a regression. Upstream
+# development moved to gitlab.freedesktop.org/libevdev/evemu (2.x), which is a
+# different source; track new commits on the current remote instead.
+UPSTREAM_CHECK_COMMITS = "1"
+
 
 PARALLEL_MAKE = ""

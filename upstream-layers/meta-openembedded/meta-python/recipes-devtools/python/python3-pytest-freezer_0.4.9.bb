@@ -13,4 +13,3 @@ RDEPENDS:${PN} = "\
 "
 
 PYPI_PACKAGE = "pytest_freezer"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"

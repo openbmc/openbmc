@@ -11,6 +11,9 @@ SRC_URI = "https://github.com/alobbs/macchanger/releases/download/${PV}/${BPN}-$
 SRC_URI[md5sum] = "ca56f16142914337391dac91603eb332"
 SRC_URI[sha256sum] = "dae2717c270fd5f62d790dbf80c19793c651b1b26b62c101b82d5fdf25a845bf"
 
+UPSTREAM_CHECK_URI = "https://github.com/alobbs/macchanger/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+
 FILES:${PN} = " \
     ${bindir}/${BPN} \
     ${datadir}/${BPN}/wireless.list \

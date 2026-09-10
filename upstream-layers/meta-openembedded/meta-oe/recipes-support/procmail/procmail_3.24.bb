@@ -13,7 +13,7 @@ SRC_URI = "git://github.com/BuGlessRB/procmail;protocol=https;branch=master;tag=
            file://procmail-3.24-consolidated_fixes-1.patch \
           "
 
-LICENSE = "GPL-2.0-only & Artistic-1.0"
+LICENSE = "Artistic-1.0 AND GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=a71e50e197a992c862379e576e669757 \
     file://Artistic;md5=505e00d03c3428cde21b17b2a386590e"
 

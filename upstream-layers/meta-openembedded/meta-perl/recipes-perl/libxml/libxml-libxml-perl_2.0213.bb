@@ -8,7 +8,7 @@ your programs."
 
 HOMEPAGE = "https://metacpan.org/dist/XML-LibXML"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 DEPENDS += "libxml2 \
         libxml-sax-perl-native \
         zlib \

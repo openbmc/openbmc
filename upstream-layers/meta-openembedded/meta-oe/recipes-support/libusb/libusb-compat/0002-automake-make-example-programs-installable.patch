@@ -17,8 +17,8 @@ index 9bd3efc..f4324c2 100644
 +++ b/examples/Makefile.am
 @@ -1,5 +1,5 @@
  AM_CPPFLAGS = -I$(top_srcdir)/libusb
--noinst_PROGRAMS = lsusb testlibusb
-+bin_PROGRAMS = lsusb testlibusb
+-noinst_PROGRAMS = lsusb testlibusb hotplug_monitor
++bin_PROGRAMS = lsusb testlibusb hotplug_monitor
  
  lsusb_SOURCES = lsusb.c
  lsusb_LDADD = ../libusb/libusb.la

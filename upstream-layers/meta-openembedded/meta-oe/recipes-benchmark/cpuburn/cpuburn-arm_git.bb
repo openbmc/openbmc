@@ -15,6 +15,7 @@ SRC_URI = "git://github.com/ssvb/cpuburn-arm.git;branch=master;protocol=https \
            file://0003-burn.S-Remove-.func-.endfunc.patch \
            "
 
+UPSTREAM_CHECK_COMMITS = "1"
 
 do_compile() {
 

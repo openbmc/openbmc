@@ -1,7 +1,7 @@
 DESCRIPTION = "autossh is a program to start a copy of ssh and monitor it, restarting it as necessary should it die or stop passing traffic"
 HOMEPAGE = "https://www.harding.motd.ca/autossh/"
 
-LICENSE = "BSD-1-Clause & BSD-4-Clause"
+LICENSE = "BSD-1-Clause AND BSD-4-Clause"
 LIC_FILES_CHKSUM = "file://autossh.c;beginline=7;endline=22;md5=9ae0c9b04856148d77984ef58536732b \
                     file://daemon.h;beginline=7;endline=36;md5=839bb7bf781ff48da4a3fec2a62a1a47"
 

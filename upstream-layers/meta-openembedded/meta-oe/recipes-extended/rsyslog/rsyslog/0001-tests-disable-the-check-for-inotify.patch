@@ -15,6 +15,8 @@ since 2.6.13 [1].
 Upstream-Status: Inappropriate [OE-specific]
 
 Signed-off-by: Yi Fan Yu <yifan.yu@windriver.com>
+
+Rebased for rsyslog 8.2606.0 (line offset only, no context changes).
 ---
  tests/diag.sh | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
@@ -23,7 +25,7 @@ diff --git a/tests/diag.sh b/tests/diag.sh
 index a9c2a75..0b017c5 100755
 --- a/tests/diag.sh
 +++ b/tests/diag.sh
-@@ -3683,7 +3683,7 @@
+@@ -5449,7 +5449,7 @@
  		fi
  		;;
  	'check-inotify') # Check for inotify/fen support
@@ -31,8 +33,8 @@ index a9c2a75..0b017c5 100755
 +		if true; then
  			echo [inotify mode]
  		elif [ -n "$(find /usr/include/sys/ -name 'port.h' -print -quit)" ]; then
- 			grep -qF "PORT_SOURCE_FILE" < /usr/include/sys/port.h
-@@ -3698,7 +3698,7 @@
+ 			if ! grep -qF "PORT_SOURCE_FILE" < /usr/include/sys/port.h; then
+@@ -5463,7 +5463,7 @@
  		fi
  		;;
  	'check-inotify-only') # Check for ONLY inotify support

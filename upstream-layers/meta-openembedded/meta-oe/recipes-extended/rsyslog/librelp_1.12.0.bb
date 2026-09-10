@@ -28,7 +28,7 @@ PACKAGECONFIG[tls] = "--enable-tls,--disable-tls,gnutls nettle"
 PACKAGECONFIG[tls-openssl] = "--enable-tls-openssl,--disable-tls-openssl,openssl"
 PACKAGECONFIG[valgrind] = "--enable-valgrind,--disable-valgrind,"
 
-# For ptests, copy source tests/*.sh scripts, Makefile and 
+# For ptests, copy source tests/*.sh scripts, Makefile and
 # executables and run them with make on target.
 TESTDIR = "tests"
 do_compile_ptest() {

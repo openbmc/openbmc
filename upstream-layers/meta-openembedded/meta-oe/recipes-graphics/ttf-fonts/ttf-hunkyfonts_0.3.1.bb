@@ -16,3 +16,8 @@ FILES:ttf-hunky-sans = "${datadir}/fonts/truetype/HunkySans*.ttf"
 FILES:ttf-hunky-serif = "${datadir}/fonts/truetype/HunkySerif*.ttf"
 
 SRC_URI[sha256sum] = "3fc528737ccd12ec3c09c4a91447d241d3c5bceeeb4d24b7f2c29b15c9735328"
+
+# The SourceForge download mirror has no browsable listing; check the project's
+# file area instead. 0.3.1 (2005) is still the last release.
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/hunkyfonts/files/hunkyfonts/"
+UPSTREAM_CHECK_REGEX = "hunkyfonts-(?P<pver>\d+(\.\d+)+)\.tar"

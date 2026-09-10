@@ -9,7 +9,6 @@ SRC_URI[sha256sum] = "6358c52882c96e66ac4a55eb3a72c7dd4a70763f8cc6fa4e70abde2656
 inherit pypi python_hatchling ptest-python-pytest
 
 PYPI_PACKAGE = "service_identity"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += "python3-hatch-vcs-native python3-hatch-fancy-pypi-readme-native"
 

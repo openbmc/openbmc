@@ -6,6 +6,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=c9e8d74e78283c6319317d3cb15eded4"
 SRCREV = "23b693f7f7cad8b459beb5cf748078f9cc0e5dc8"
 SRC_URI = "git://github.com/lefcha/imapfilter;protocol=https;branch=master;tag=v${PV} \
            file://ldflags.patch \
+           file://0001-Use-ASN1_STRING-accessors-for-opaque-ASN1_INTEGER.patch \
 "
 
 DEPENDS = "openssl lua libpcre2"

@@ -3,7 +3,7 @@ DESCRIPTION = "BYTE Magazine's native benchmarks (also called BYTEmark) \
 designed to expose the capabilities of a system's CPU, FPU, \
 and memory system."
 HOMEPAGE = "http://www.tux.org/~mayer/linux/"
-LICENSE = "nbench-byte"
+LICENSE = "LicenseRef-nbench-byte"
 LIC_FILES_CHKSUM = "file://README;beginline=57;endline=66;md5=020ef579f8fa5746b7e307a54707834f"
 SECTION = "console/utils"
 

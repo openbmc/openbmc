@@ -5,7 +5,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=963a24c175e658fbf16a764135121ffa"
 
 SRC_URI[sha256sum] = "e682ac522bb63e041d16cbc9d0ca86a4f00194db16d0847c7efe066f836b2e37"
 
-inherit pypi python_poetry_core
+inherit pypi python_setuptools_build_meta
 
 RDEPENDS:${PN} = "\
     python3-core \

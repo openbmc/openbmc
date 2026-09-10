@@ -24,6 +24,8 @@ SRC_URI = "http://prdownloads.sourceforge.net/lirc/lirc-${PV}.tar.bz2 \
            file://0001-Unbolt-ubuntu-hack.patch \
            "
 SRC_URI[sha256sum] = "3d44ec8274881cf262f160805641f0827ffcc20ade0d85e7e6f3b90e0d3d222a"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/lirc/files/LIRC/"
+UPSTREAM_CHECK_REGEX = "/(?P<pver>\d+(\.\d+)+)/"
 
 SYSTEMD_PACKAGES = "lirc lirc-exec"
 SYSTEMD_SERVICE:${PN} = "lircd.service lircmd.service lircd-setup.service lircd-uinput.service"

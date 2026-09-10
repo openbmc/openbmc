@@ -6,7 +6,7 @@ memory overhead."
 HOMEPAGE = "https://metacpan.org/dist/Config-Tiny"
 SECTION = "libraries"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ab27c3cedbdb0eb6e656a8722476191a"
 
 RDEPENDS:${PN} += "perl"

@@ -1,0 +1,43 @@
+From: Andrej Shadura <andrew.shadura@collabora.co.uk>
+Date: Tue, 2 Jun 2026 12:00:00 +0200
+Subject: Fix FTBFS with OpenSSL 4.0: use ASN1_STRING accessors
+
+OpenSSL 4.0 makes ASN1_INTEGER (aka struct asn1_string_st) fully opaque.
+Direct access to the ->data and ->length members is no longer allowed.
+
+Replace the direct struct member accesses in get_certificate_serial_number_length()
+with the public accessor functions ASN1_STRING_get0_data() and
+ASN1_STRING_length(), which have been available since OpenSSL 1.1.0 and are
+compatible with all supported Debian releases.
+
+Bug-Debian: https://bugs.debian.org/1138459
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/fix-openssl4-asn1-opaque.patch]
+---
+ src/lib/common/openssl_helper.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/lib/common/openssl_helper.c b/src/lib/common/openssl_helper.c
+index 36017ff..7a6980e 100644
+--- a/src/lib/common/openssl_helper.c
++++ b/src/lib/common/openssl_helper.c
+@@ -1234,7 +1234,7 @@ int get_signature_size(const EVP_PKEY *pkey, size_t *sig0_size,
+ int get_certificate_serial_number_length(X509 *cert)
+ {
+     ASN1_INTEGER *serial_number = NULL;
+-    uint8_t *serial_bytes = NULL;
++    const uint8_t *serial_bytes = NULL;
+     int serial_length = 0;
+ 
+     if (!cert)
+@@ -1251,8 +1251,8 @@ int get_certificate_serial_number_length(X509 *cert)
+     }
+ 
+     /* Get the raw data of the serial number */
+-    serial_bytes = serial_number->data;
+-    serial_length = serial_number->length;
++    serial_bytes = ASN1_STRING_get0_data(serial_number);
++    serial_length = ASN1_STRING_length(serial_number);
+ 
+     /* Check if the serial number is negative (MSB of first byte is set) */
+     if (serial_bytes[0] & 0x80)

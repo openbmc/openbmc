@@ -25,6 +25,10 @@ SRCREV_libjaylink = "0d23921a05d5d427332a142d154c213d0c306eb1"
 
 PV = "0.12+git"
 
+# Upstream tags releases as vX.Y.Z; PV only carries the two-component version,
+# so match just the X.Y part to compare against it.
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+\.\d+)\.\d+"
+
 inherit pkgconfig autotools-brokensep gettext
 
 BBCLASSEXTEND += "native nativesdk"

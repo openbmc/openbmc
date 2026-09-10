@@ -14,3 +14,6 @@ SRC_URI[sha256sum] = "0b59da2f3204e1c80cb85d1f6d72285fc07b01a2f5678abf5dccfbbefd
 S = "${UNPACKDIR}/libnetfilter_cttimeout-${PV}"
 
 inherit autotools pkgconfig
+
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/pub/libnetfilter_cttimeout/"
+UPSTREAM_CHECK_REGEX = "libnetfilter_cttimeout-(?P<pver>\d+(\.\d+)+)\.tar\.bz2"

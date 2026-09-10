@@ -2,7 +2,7 @@ SUMMARY = "Python interface to Pocketsphinx libraries."
 DESCRIPTION = "Pythonsphinx is an Open source large vocabulary, speaker-independent continuous speech recognition engines."
 HOMEPAGE = "https://github.com/cmusphinx/pocketsphinx"
 SECTION = "devel/python"
-LICENSE = "BSD-2-Clause | BSD-3-Clause | MIT"
+LICENSE = "BSD-2-Clause OR BSD-3-Clause OR MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c4d720cdc9c6953091f65e8b01524bb4"
 
 SRC_URI += "file://0001-cython-Use-cythyon3-in-cmake-check.patch"

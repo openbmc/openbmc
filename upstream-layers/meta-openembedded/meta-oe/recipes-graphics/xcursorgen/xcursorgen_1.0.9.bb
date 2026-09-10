@@ -1,4 +1,4 @@
-LICENSE = "ManishSingh"
+LICENSE = "LicenseRef-ManishSingh"
 LIC_FILES_CHKSUM = "file://COPYING;md5=bd1fb9ee90eead85f7b171807b3ab4f2"
 
 DEPENDS = "libpng libxcursor"

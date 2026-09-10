@@ -1,0 +1,103 @@
+From 5e66246bd994a2f693bd02773823691c8d07a070 Mon Sep 17 00:00:00 2001
+From: Bart Van Assche <bvanassche@acm.org>
+Date: Fri, 24 Jul 2026 09:34:18 -0700
+Subject: [PATCH] apps/Makefile.in: Link libraries explicitly
+
+When building Net-SNMP with -no-undefined (which is used for libraries like
+libnetsnmpmibs.la and libnetsnmptrapd.la) and link_all_deplibs=no (default on
+modern systems to prevent overlinking), compilation fails due to undefined
+references to symbols from transitive dependencies.
+
+1. libnetsnmpmibs.la fails to link because it uses OpenSSL DH/BN symbols
+   (when snmp-usm-dh-objects-mib is enabled) but does not link with
+   libcrypto directly. Fix this by adding LIBCRYPTO to LMIBLIBS in
+   configure if OpenSSL is used, and exporting LIBCRYPTO.
+
+2. libnetsnmptrapd.la fails to link because it uses symbols from
+   libnetsnmpagent.la (like vacm_check_view_contents) but does not link with
+   it directly. Fix this by adding $(AGENTLIB) to libnetsnmptrapd.la link
+   line in apps/Makefile.in.
+
+3. Executables in apps/ (like snmpusm and snmptls) fail to link because
+   they use OpenSSL symbols directly but do not link with libcrypto/libssl
+   directly. Fix this by adding @LIBCRYPTO@ to LIBS in apps/Makefile.in.
+
+This makes Net-SNMP compatible with newer versions of libtool.
+
+Upstream-Status: Backport [https://github.com/net-snmp/net-snmp/commit/5e66246bd994a2f693bd02773823691c8d07a070]
+
+The libnetsnmptrapd.la hunk is rebased: 5.9.5.2 still puts $(LDFLAGS) at
+the end of that link command, upstream has since moved it before
+$(LLIBTRAPD_OBJS). The change itself is unmodified.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ apps/Makefile.in            | 4 ++--
+ configure                   | 7 +++++++
+ configure.d/config_os_libs2 | 6 ++++++
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/apps/Makefile.in b/apps/Makefile.in
+index 57b8524..252fd84 100644
+--- a/apps/Makefile.in
++++ b/apps/Makefile.in
+@@ -95,7 +95,7 @@ MYSQL_LIBS	= @MYSQL_LIBS@
+ MYSQL_INCLUDES	= @MYSQL_INCLUDES@
+ 
+ VAL_LIBS	= @VAL_LIBS@
+-LIBS		= $(USELIBS) $(VAL_LIBS) @LIBS@
++LIBS		= $(USELIBS) $(VAL_LIBS) @LIBS@ @LIBCRYPTO@
+ PERLLDOPTS_FOR_APPS = @PERLLDOPTS_FOR_APPS@
+ PERLLDOPTS_FOR_LIBS = @PERLLDOPTS_FOR_LIBS@
+ 
+@@ -235,7 +235,7 @@ snmppcap$(EXEEXT):    snmppcap.$(OSUFFIX) $(USEAGENTLIBS)
+ 	$(LINK) ${CFLAGS} -o $@ snmppcap.$(OSUFFIX) ${LDFLAGS} ${USEAGENTLIBS} ${LIBS} -lpcap
+ 
+ libnetsnmptrapd.$(LIB_EXTENSION)$(LIB_VERSION): $(LLIBTRAPD_OBJS)
+-	$(LIB_LD_CMD) $@ ${LLIBTRAPD_OBJS} $(MIBLIB) $(MYSQL_LIBS) $(USELIBS) $(PERLLDOPTS_FOR_LIBS) $(LDFLAGS)
++	$(LIB_LD_CMD) $@ ${LLIBTRAPD_OBJS} $(MIBLIB) $(AGENTLIB) $(MYSQL_LIBS) $(USELIBS) $(PERLLDOPTS_FOR_LIBS) $(LDFLAGS)
+ 	$(RANLIB) $@
+ 
+ snmpinforminstall:
+diff --git a/configure b/configure
+index 6ef0026..4270aff 100755
+--- a/configure
++++ b/configure
+@@ -683,6 +683,7 @@ PERLLDOPTS_FOR_APPS
+ PERLLDOPTS_FOR_LIBS
+ EMBEDPERLUNINSTALL
+ EMBEDPERLINSTALL
++LIBCRYPTO
+ LIBCURSES
+ HAVE_LIBCURSES
+ NETSNMP_BUILD_PCAP_PROG_FALSE
+@@ -32065,6 +32066,12 @@ printf "%s\n" "$netsnmp_cv_func_ceil_LNETSNMPLIBS" >&6; }
+  fi
+ 
+ 
++if test x$CRYPTO != x; then
++    LMIBLIBS="$LMIBLIBS $LIBCRYPTO"
++fi
++
++
++
+ cat >confcache <<\_ACEOF
+ # This file is a shell script that caches the results of configure
+ # tests run on this system so they can be shared between configure
+diff --git a/configure.d/config_os_libs2 b/configure.d/config_os_libs2
+index 5787e58..d21ea77 100644
+--- a/configure.d/config_os_libs2
++++ b/configure.d/config_os_libs2
+@@ -718,3 +718,9 @@ AC_SUBST([LIBCURSES])
+ #   libm for ceil
+ #
+ NETSNMP_SEARCH_LIBS(ceil, m,,,, LNETSNMPLIBS)
++
++if test x$CRYPTO != x; then
++    LMIBLIBS="$LMIBLIBS $LIBCRYPTO"
++fi
++
++AC_SUBST(LIBCRYPTO)
+-- 
+2.43.0
+

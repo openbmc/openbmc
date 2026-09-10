@@ -1,0 +1,65 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Sun, 6 Sep 2026 22:40:00 -0700
+Subject: [PATCH] ipa_data_serializer: Mark vector readPOD() overload as
+ maybe_unused
+
+clang 23 enables -Wunused-template as part of -Wall (via -Wmost ->
+-Wunused; it was not enabled by -Wall or -Wextra before). Combined with
+libcamera's -Werror this breaks the build:
+
+  In file included from include/libcamera/ipa/core_ipa_serializer.h:18:
+  include/libcamera/internal/ipa_data_serializer.h:57:3: error: unused
+      function template 'readPOD' [-Werror,-Wunused-template]
+     57 | T readPOD(std::vector<uint8_t> &vec, size_t pos)
+        |   ^~~~~~~
+
+The POD helpers live in an anonymous namespace, so they have internal
+linkage and clang diagnoses them per translation unit. appendPOD() and
+the iterator overload of readPOD() are referenced by the IPADataSerializer
+specialisations in this header, so they are seen as used everywhere.
+
+The std::vector overload of readPOD() is different: nothing in libcamera
+itself calls it. Its only callers are the IPA proxies and proxy workers
+generated at build time from the mojom templates, for example
+
+  [[maybe_unused]] const size_t ipaControlsBufSize =
+          readPOD<uint32_t>(_ipcOutputBuf.data(), 4);
+
+in src/libcamera/proxy/soft_ipa_proxy.cpp. It is therefore genuinely
+unused in every translation unit that includes this header without being
+generated proxy code, which is exactly what [[maybe_unused]] is for.
+
+Note the overload cannot simply be dropped: doing so breaks the generated
+proxies with "no matching function for call to 'readPOD'".
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ include/libcamera/internal/ipa_data_serializer.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/include/libcamera/internal/ipa_data_serializer.h b/include/libcamera/internal/ipa_data_serializer.h
+index 0dda76d..528527d 100644
+--- a/include/libcamera/internal/ipa_data_serializer.h
++++ b/include/libcamera/internal/ipa_data_serializer.h
+@@ -52,9 +52,15 @@ T readPOD(std::vector<uint8_t>::const_iterator it, size_t pos,
+ 	return ret;
+ }
+
++/*
++ * This overload is only used by the generated IPA proxies and proxy workers,
++ * and thus is unused in translation units that include this header without
++ * being generated proxy code. Mark it as such to avoid -Wunused-template
++ * warnings, which clang enables as part of -Wall since version 23.
++ */
+ template<typename T,
+ 	 std::enable_if_t<std::is_arithmetic_v<T>> * = nullptr>
+-T readPOD(std::vector<uint8_t> &vec, size_t pos)
++[[maybe_unused]] T readPOD(std::vector<uint8_t> &vec, size_t pos)
+ {
+ 	return readPOD<T>(vec.cbegin(), pos, vec.end());
+ }
+--
+2.51.0
+

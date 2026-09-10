@@ -1,0 +1,36 @@
+From 315fbacc4e4b9c7ea21d25ad489a90b73a526326 Mon Sep 17 00:00:00 2001
+From: Brad King <brad.king@kitware.com>
+Date: Wed, 10 Jun 2026 10:55:10 -0400
+Subject: [PATCH] Port to LLVM/Clang Git main as of 2026-10-10 (6f47b6de08)
+
+Upstream-Status: Backport [https://github.com/CastXML/CastXML/commit/315fbacc4e4b]
+
+Signed-off-by: Sunil Dora <sunilkumar.dora@windriver.com>
+---
+ src/Output.cxx | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/Output.cxx b/src/Output.cxx
+index bb986d4b..9f722efd 100644
+--- a/src/Output.cxx
++++ b/src/Output.cxx
+@@ -119,6 +119,10 @@ clang::NestedNameSpecifier const& deref(NestedNameSpecifier const& nns)
+ #  define isPureVirtual isPure
+ #endif
+ 
++#if LLVM_VERSION_MAJOR < 23
++#  define getRawCommentNoCache getRawCommentForDeclNoCache
++#endif
++
+ class ASTVisitorBase
+ {
+ protected:
+@@ -1973,7 +1977,7 @@ void ASTVisitor::PrintCommentAttribute(clang::Decl const* d,
+   if (!this->Opts.CastXml) {
+     return;
+   }
+-  if (clang::RawComment const* rc = this->CTX.getRawCommentForDeclNoCache(d)) {
++  if (clang::RawComment const* rc = this->CTX.getRawCommentNoCache(d)) {
+     unsigned int index = ++this->CommentCount;
+     CommentEntry e = { index, rc, dn };
+     this->CommentQueue.push(e);

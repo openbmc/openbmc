@@ -23,6 +23,8 @@ SRC_URI:append:mips = " file://0001-check-for-mips-targets-for-stat.st_dev-defin
 
 inherit python_setuptools3_rust cargo-update-recipe-crates
 
+DEPENDS += "python3-wheel-native"
+
 # crossbeam-* -> std::sync::atomic AtomicI64, AtomicU64
 # not supported on mips/powerpc with 32-bit pointers
 # https://doc.rust-lang.org/std/sync/atomic/#portability

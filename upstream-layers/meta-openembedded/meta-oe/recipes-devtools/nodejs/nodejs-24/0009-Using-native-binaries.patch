@@ -10,25 +10,21 @@ https://git.openembedded.org/meta-openembedded/commit/?id=1c8e4a679ae382f953b2e5
 later extended and renamed in:
 https://git.openembedded.org/meta-openembedded/commit/?id=feeb172d1a8bf010490d22b8df9448b20d9d2aed
 
+Rebased on 24.19.0: upstream added its own '<@(emulator)' gyp variable
+(defaults to empty in common.gypi) to a couple of the same action arrays this
+patch touches; this recipe never sets GYP_DEFINES emulator=..., so it stays
+empty and our v8-qemu-wrapper.sh insertion is unaffected either way.
+
 Signed-off-by: Archana Polampalli <archana.polampalli@windriver.com>
 ---
- node.gyp                 | 3 +
+ node.gyp                 | 3 +++
  tools/v8_gypfiles/v8.gyp | 5 +++++
- 2 files changed, 6 insertions(+)
+ 2 files changed, 8 insertions(+)
 
 diff --git a/node.gyp b/node.gyp
-index e8e1d9f9..e60ccc10 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -320,6 +320,7 @@
-                   'action_name': 'node_mksnapshot',
-                   'process_outputs_as_sources': 1,
-                   'inputs': [
-+                    '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
-                     '<(node_mksnapshot_exec)',
-                     '<(node_snapshot_main)',
-                   ],
-@@ -935,6 +935,7 @@
+@@ -993,6 +993,7 @@
            'action_name': 'node_js2c',
            'process_outputs_as_sources': 1,
            'inputs': [
@@ -36,20 +32,26 @@ index e8e1d9f9..e60ccc10 100644
              '<(node_js2c_exec)',
              '<@(library_files)',
              '<@(deps_files)',
-@@ -944,6 +945,7 @@
-             '<(SHARED_INTERMEDIATE_DIR)/node_javascript.cc',
+@@ -1013,6 +1014,7 @@
            ],
            'action': [
+             '<@(emulator)',
 +            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
              '<(node_js2c_exec)',
              '<@(_outputs)',
              'lib',
-
+@@ -1072,6 +1074,7 @@
+                   'action_name': 'node_mksnapshot',
+                   'process_outputs_as_sources': 1,
+                   'inputs': [
++                    '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
+                     '<(node_mksnapshot_exec)',
+                     '<(node_snapshot_main)',
+                   ],
 diff --git a/tools/v8_gypfiles/v8.gyp b/tools/v8_gypfiles/v8.gyp
-index 42e26cd9..bc721991 100644
 --- a/tools/v8_gypfiles/v8.gyp
 +++ b/tools/v8_gypfiles/v8.gyp
-@@ -68,6 +68,7 @@
+@@ -113,6 +113,7 @@
          {
            'action_name': 'run_torque_action',
            'inputs': [  # Order matters.
@@ -57,15 +59,15 @@ index 42e26cd9..bc721991 100644
              '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
              '<@(torque_files)',
            ],
-@@ -99,6 +100,7 @@
-             '<@(torque_outputs_inc)',
+@@ -145,6 +146,7 @@
            ],
            'action': [
+             '<@(emulator)',
 +            '<(PRODUCT_DIR)/v8-qemu-wrapper.sh',
              '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)torque<(EXECUTABLE_SUFFIX)',
              '-o', '<(SHARED_INTERMEDIATE_DIR)/torque-generated',
              '-v8-root', '<(V8_ROOT)',
-@@ -211,6 +213,7 @@
+@@ -257,6 +259,7 @@
          {
            'action_name': 'generate_bytecode_builtins_list_action',
            'inputs': [
@@ -73,7 +75,7 @@ index 42e26cd9..bc721991 100644
              '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)bytecode_builtins_list_generator<(EXECUTABLE_SUFFIX)',
            ],
            'outputs': [
-@@ -400,6 +403,7 @@
+@@ -443,6 +446,7 @@
              ],
            },
            'inputs': [
@@ -81,7 +83,7 @@ index 42e26cd9..bc721991 100644
              '<(mksnapshot_exec)',
            ],
            'outputs': [
-@@ -1539,6 +1543,7 @@
+@@ -1976,6 +1980,7 @@
          {
            'action_name': 'run_gen-regexp-special-case_action',
            'inputs': [
@@ -89,6 +91,5 @@ index 42e26cd9..bc721991 100644
              '<(PRODUCT_DIR)/<(EXECUTABLE_PREFIX)gen-regexp-special-case<(EXECUTABLE_SUFFIX)',
            ],
            'outputs': [
--- 
+--
 2.34.1
-

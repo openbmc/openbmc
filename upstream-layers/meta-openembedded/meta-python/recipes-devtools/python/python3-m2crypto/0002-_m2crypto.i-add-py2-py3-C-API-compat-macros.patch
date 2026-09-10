@@ -1,0 +1,41 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Subject: _m2crypto.i: add py2/py3 C-API compat macros
+
+_rsa.i, _lib.i and _ec.i use the Python 2 C-API names PyInt_AsLong,
+PyInt_FromLong and PyString_FromString. Python 3.14 no longer ships
+any fallback definitions for them, so the generated _m2crypto_wrap.c
+fails to compile:
+
+  src/SWIG/_m2crypto_wrap.c:4895:21: error: call to undeclared function 'PyInt_AsLong'
+  src/SWIG/_m2crypto_wrap.c:9842:26: error: call to undeclared function 'PyString_FromString'
+
+Map them to their Python 3 equivalents in the shared raw-C block that
+is emitted ahead of the %include'd modules that use them.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/SWIG/_m2crypto.i
++++ b/src/SWIG/_m2crypto.i
+@@ -64,6 +64,21 @@
+ static PyObject *x509_store_verify_cb_func;
+ %}
+
++%{
++#ifndef PyInt_Check
++#define PyInt_Check(x) PyLong_Check(x)
++#endif
++#ifndef PyInt_AsLong
++#define PyInt_AsLong(x) PyLong_AsLong(x)
++#endif
++#ifndef PyInt_FromLong
++#define PyInt_FromLong(x) PyLong_FromLong(x)
++#endif
++#ifndef PyString_FromString
++#define PyString_FromString(x) PyUnicode_FromString(x)
++#endif
++%}
++
+ %include <openssl/opensslv.h>
+
+ /* Bring in STACK_OF macro definition */

@@ -9,6 +9,10 @@ SRC_URI = "git://github.com/ajaxorg/ace-builds.git;protocol=https;branch=master"
 PV = "02.07.17+git"
 SRCREV = "812e2c56aed246931a667f16c28b096e34597016"
 
+# Upstream tags are v<major>.<minor>.<micro> (currently v1.44.0), which cannot be
+# compared with this recipe's zero-padded date-like PV, so track commits instead.
+UPSTREAM_CHECK_COMMITS = "1"
+
 FILES:${PN} = "${datadir}/ace-builds"
 
 

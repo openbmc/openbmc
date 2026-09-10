@@ -1,7 +1,5 @@
 SUMMARY = "User-Interface for malcontent."
 HOMEPAGE = "https://gitlab.freedesktop.org/pwithnall/malcontent"
-LICENSE = "LGPL-2.1-only"
-LIC_FILES_CHKSUM = "file://COPYING;md5=4fbd65380cdd255951079008b364516c"
 
 require malcontent.inc
 
@@ -20,6 +18,8 @@ DEPENDS += " \
 	flatpak \
 	libadwaita \
 	gtk4 \
+	gi-docgen-native \
+	gnome-desktop \
 "
 
 GIR_MESON_OPTION = ""

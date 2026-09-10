@@ -52,6 +52,7 @@ RDEPENDS:packagegroup-meta-oe = "\
 
 RDEPENDS:packagegroup-meta-oe-benchmarks = "\
     bonnie++ \
+    coremark-pro \
     cpupower \
     dbench \
     dhrystone \
@@ -66,14 +67,21 @@ RDEPENDS:packagegroup-meta-oe-benchmarks = "\
     mbw \
     memtester \
     nbench-byte \
+    osbench \
     phoronix-test-suite \
     qperf \
+    ramspeed \
+    ramspeed-smp \
     rtla \
     s-suite \
+    sockperf \
     stressapptest \
     tinymembench \
     tiobench \
+    unixbench \
     whetstone \
+    wrk \
+    wrk2 \
 "
 RDEPENDS:packagegroup-meta-oe-benchmarks:append:armv7a = " cpuburn-arm sysbench"
 RDEPENDS:packagegroup-meta-oe-benchmarks:append:armv7ve = " cpuburn-arm sysbench"
@@ -180,7 +188,6 @@ RDEPENDS:packagegroup-meta-oe-core = "\
     mm-common \
     ${@bb.utils.contains("DISTRO_FEATURES", "systemd", "ndctl", "", d)} \
     pim435 \
-    proxy-libintl \
     safec \
     sdbus-c++ \
     sdbus-c++-tools \
@@ -411,7 +418,6 @@ RDEPENDS:packagegroup-meta-oe-extended = "\
     tmate \
     tmux \
     triggerhappy \
-    uml-utilities \
     upm \
     vlock \
     volume-key \
@@ -706,7 +712,7 @@ RDEPENDS:packagegroup-meta-oe-shells = "\
 
 RDEPENDS:packagegroup-meta-oe-support = "\
     ace-cloud-editor \
-    anthy \
+    anthy-unicode \
     asio \
     atop \
     augeas \

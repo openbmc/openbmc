@@ -4,7 +4,7 @@ DESCRIPTION = "\
     utility lsi2c. \
 "
 HOMEPAGE = "https://github.com/costad2/i2cdev"
-LICENSE = "LGPL-2.1-only & GPL-2.0-or-later"
+LICENSE = "GPL-2.0-or-later AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "\
     file://COPYING;md5=768997ba510a952bef1775c50bc22b00 \
     file://include/libi2cdev.h;beginline=12;endline=25;md5=72486a5e192d6ac5c7e55a4a95e380a6 \
@@ -21,5 +21,7 @@ SRC_URI = "\
 "
 SRCREV = "ed9ad777d842880e7ac6ca5e0de4bd2d3b4d02dc"
 
+# Upstream repo does not tag and publishes no releases
+UPSTREAM_CHECK_COMMITS = "1"
 
 inherit autotools

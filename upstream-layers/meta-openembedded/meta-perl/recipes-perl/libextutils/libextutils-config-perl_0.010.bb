@@ -4,7 +4,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/dist/ExtUtils-Config"
 
-LICENSE = "Artistic-1.0-Perl | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0-Perl OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=ddb4d526cd95b017e23486893490883e"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/L/LE/LEONT/ExtUtils-Config-${PV}.tar.gz"

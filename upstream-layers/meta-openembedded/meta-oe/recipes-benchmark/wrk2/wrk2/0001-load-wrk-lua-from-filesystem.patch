@@ -1,0 +1,29 @@
+From: Vaibhav Jindal <vaibjind@qti.qualcomm.com>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Load wrk.lua from filesystem instead of embedded bytecode
+
+This patch allows wrk2 to load the wrk.lua module from the filesystem
+instead of relying on embedded bytecode compilation. This solves
+cross-compilation issues where bytecode cannot be compiled for the
+target architecture.
+
+Upstream-Status: Inappropriate [cross-compilation]
+
+diff --git a/src/script.c b/src/script.c
+index 30ef4fd..38f97d6 100644
+--- a/src/script.c
++++ b/src/script.c
+@@ -48,7 +48,12 @@ static const struct luaL_Reg threadlib[] = {
+ lua_State *script_create(char *file, char *url, char **headers) {
+     lua_State *L = luaL_newstate();
+     luaL_openlibs(L);
+-    (void) luaL_dostring(L, "wrk = require \"wrk\"");
++    if (luaL_loadfile(L, "/usr/share/wrk2/wrk.lua") ||
++        lua_pcall(L, 0, 1, 0)) {
++        fprintf(stderr, "Failed to load /usr/share/wrk2/wrk.lua\n");
++        return NULL;
++    }
++    lua_setglobal(L, "wrk");
+ 
+     luaL_newmetatable(L, "wrk.addr");
+     luaL_register(L, NULL, addrlib);

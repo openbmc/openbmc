@@ -1,7 +1,7 @@
 SUMMARY = "User-space front-end command-line tool for ftrace"
 HOMEPAGE = "https://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git"
 
-LICENSE = "GPL-2.0-only & LGPL-2.1-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://LICENSES/GPL-2.0;md5=e6a75371ba4d16749254a51215d13f97 \
     file://LICENSES/LGPL-2.1;md5=b370887980db5dd40659b50909238dbd \
@@ -12,6 +12,10 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/trace-cmd.git;b
            file://0002-Drop-using-_LARGEFILE64_SOURCE.patch \
            file://0001-Do-not-emit-useless-rpath.patch"
 SRCREV = "18233e4c32857cb7ddd4960beeec8360ed834fc5"
+# The kernel.org mirror we fetch from only tags up to trace-cmd-v2.9.x; the 3.x
+# line (PV 3.1.5) lives in the newer trace-cmd.org repo, so no tag here matches PV.
+UPSTREAM_CHECK_GITTAGREGEX = "trace-cmd-v(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 
 DEPENDS += "libtraceevent libtracefs zstd xmlto-native asciidoc-native swig-native bison-native flex-native"

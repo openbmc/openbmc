@@ -1,0 +1,40 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 29 Jul 2026 20:10:00 +0000
+Subject: [PATCH] libsensors: do not emit #line directives in generated sources
+
+bison and flex embed the absolute path of both the input grammar and the
+generated output into #line directives. Those paths live in the file
+contents rather than in debug info, so -ffile-prefix-map cannot rewrite
+them, and the generated conf-parse.[ch]/conf-lex.c shipped in the debug
+source package end up referencing the host build directory. That makes
+the build unreproducible and trips OE's buildpaths QA check.
+
+Pass -l (bison) and -L (flex) to suppress the #line directives. The only
+effect is that compiler diagnostics for the generated parser point at the
+generated file instead of the grammar, which is an acceptable trade for a
+vendored parser that is not being developed here.
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/collectors/debugfs.plugin/libsensors/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- a/src/collectors/debugfs.plugin/libsensors/CMakeLists.txt
++++ b/src/collectors/debugfs.plugin/libsensors/CMakeLists.txt
+@@ -16,12 +16,12 @@
+
+ # Generate Bison parser
+ bison_target(LibsensorsParser vendored/lib/conf-parse.y ${CMAKE_CURRENT_BINARY_DIR}/conf-parse.c
+-        COMPILE_FLAGS "-p sensors_yy --defines=${CMAKE_CURRENT_BINARY_DIR}/conf-parse.h"
++        COMPILE_FLAGS "-p sensors_yy -l --defines=${CMAKE_CURRENT_BINARY_DIR}/conf-parse.h"
+ )
+
+ # Generate Flex scanner
+ flex_target(LibsensorsLexer vendored/lib/conf-lex.l ${CMAKE_CURRENT_BINARY_DIR}/conf-lex.c
+-        COMPILE_FLAGS "-Psensors_yy -Cfe -8"
++        COMPILE_FLAGS "-Psensors_yy -Cfe -8 -L"
+ )
+
+ # Add dependency to ensure correct build order

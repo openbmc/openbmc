@@ -8,6 +8,9 @@ LIC_FILES_CHKSUM = "file://UNLICENSE;md5=7246f848faa4e9c9fc0ea91122d6e680"
 SRC_URI = "git://gitlab.com/mbitsnbites/osbench.git;protocol=https;branch=master"
 SRCREV = "c59c7c58649162c33250a326ca8fa582b520a29e"
 
+# Upstream repo does not tag or publish releases
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit meson
 
 MESON_SOURCEPATH = "${S}/src"

@@ -8,7 +8,6 @@ LIC_FILES_CHKSUM = "file://PKG-INFO;beginline=8;endline=8;md5=7145f7cdd263359b62
 inherit pypi setuptools3
 
 PYPI_PACKAGE = "grpcio_tools"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += "python3-grpcio"
 

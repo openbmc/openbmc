@@ -1,0 +1,45 @@
+From ab54bb415451f0b85207867ae2d68c5dcf1a191c Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 7 Sep 2026 18:39:42 -0700
+Subject: [PATCH] meson: don't error on clang's -Wunused-but-set-global
+
+clang 23 added -Wunused-but-set-global to the -Wunused warning group, so
+the -Werror that meson.build adds for git builds now turns it into a hard
+error:
+
+  osinfo/osinfo_avatar_format.c:24:1: error: variable
+    'osinfo_avatar_format_parent_class' set but not used
+    [-Werror,-Wunused-but-set-global]
+
+It fires on the <type>_parent_class variables that GLib's G_DEFINE_TYPE
+family of macros emit, which libosinfo cannot fix, and on the write-only
+'format' global in tools/osinfo-detect.c.
+
+Keep the warning visible but not fatal. gcc does not know this warning
+group and rejects the flag outright, so compiler.has_argument() drops it
+there.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ meson.build | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 377539d..7fd9de7 100644
+--- a/meson.build
++++ b/meson.build
+@@ -246,6 +246,12 @@ if compiler.get_id() == 'clang'
+     libosinfo_check_cflags += [
+         '-Wno-typedef-redefinition',
+         '-Wno-missing-field-initializers',
++        # clang 23 added -Wunused-but-set-global to the -Wunused group. It
++        # fires on the <type>_parent_class variables that GLib's G_DEFINE_TYPE
++        # family of macros emit, which libosinfo cannot fix, and on the
++        # deliberately write-only 'format' global in osinfo-detect.
++        # Keep the warning visible but not fatal.
++        '-Wno-error=unused-but-set-global',
+     ]
+ endif
+ 

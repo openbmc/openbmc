@@ -1,0 +1,42 @@
+From 0c9dcc44df3592d8e08b46f5dfca664de5918bc5 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 27 Aug 2026 09:13:35 +0000
+Subject: [PATCH] HTTPserver: fix const X509_NAME for OpenSSL 4.0
+
+OpenSSL 4.0 changed X509_get_subject_name() to return const X509_NAME*.
+Update the local variable to match and cast where non-const API requires it.
+
+Upstream-Status: Backport [https://github.com/ntop/ntopng/pull/10830]
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/HTTPserver.cpp | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/HTTPserver.cpp b/src/HTTPserver.cpp
+index 21895bf10e..f7b4164ab4 100644
+--- a/src/HTTPserver.cpp
++++ b/src/HTTPserver.cpp
+@@ -403,7 +403,7 @@ static bool ssl_client_x509_auth(const struct mg_connection *const conn,
+ 				 char *const group, bool *const localuser) {
+   bool ret = false;
+   X509 *cert = NULL;
+-  X509_NAME *subj = NULL;
++  const X509_NAME *subj = NULL;
+   char subject[256];
+   char key[CONST_MAX_LEN_REDIS_KEY];
+ 
+@@ -411,12 +411,12 @@ static bool ssl_client_x509_auth(const struct mg_connection *const conn,
+ 
+   if ((cert = SSL_get_peer_certificate(conn->ssl))) {
+     if ((subj = X509_get_subject_name(cert))) {
+-      X509_NAME_oneline(subj, subject, sizeof(subject));
++      X509_NAME_oneline((X509_NAME *)subj, subject, sizeof(subject));
+       
+       ntop->getTrace()->traceEvent(TRACE_INFO, "Client X.509 certificate subject name: '%s'", subject);
+ 
+       if (SSL_get_verify_result(conn->ssl) == X509_V_OK &&
+-          X509_NAME_get_text_by_NID(subj, NID_commonName, username, NTOP_USERNAME_MAXLEN) >= 0) {
++          X509_NAME_get_text_by_NID((X509_NAME *)subj, NID_commonName, username, NTOP_USERNAME_MAXLEN) >= 0) {
+         snprintf(key, sizeof(key), CONST_STR_USER_GROUP, username);
+       
+         ntop->getTrace()->traceEvent(TRACE_INFO, "Client X.509 certificate CN: '%s'", username);

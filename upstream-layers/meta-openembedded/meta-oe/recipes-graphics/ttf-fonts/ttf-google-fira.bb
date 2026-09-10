@@ -25,6 +25,10 @@ SRC_URI = "git://github.com/google/fonts.git;protocol=https;branch=main;subpath=
 
 S = "${UNPACKDIR}"
 
+# google/fonts is a rolling monorepo; its v0.x.y tags version the tooling, not
+# the fonts, so track new commits instead.
+UPSTREAM_CHECK_COMMITS = "1"
+
 do_install:append() {
     install -d ${D}${datadir}/fonts/truetype/
     find ${S} -path 'fira*/*.tt[cf]' -exec install -m 0644 {} ${D}${datadir}/fonts/truetype/{} \;

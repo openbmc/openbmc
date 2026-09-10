@@ -2,7 +2,7 @@ SUMMARY = "Paho MQTT - C libraries for the MQTT and MQTT-SN protocols"
 DESCRIPTION = "Client implementation of open and standard messaging protocols for Machine-to-Machine (M2M) and Internet of Things (IoT)."
 HOMEPAGE = "http://www.eclipse.org/paho/"
 SECTION = "console/network"
-LICENSE = "EPL-2.0 | EDL-1.0"
+LICENSE = "EPL-2.0 OR LicenseRef-EDL-1.0"
 
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=fd3b896dadaeec3410d753ffaeadcfac \

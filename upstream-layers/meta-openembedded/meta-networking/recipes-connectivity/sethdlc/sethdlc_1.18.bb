@@ -1,7 +1,7 @@
 DESCRIPTION = "set Linux HDLC packet radio modem driver port information"
 HOMEPAGE = "https://www.kernel.org/pub/linux/utils/net/hdlc"
 SECTION = "comm"
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later "
+LICENSE = "GPL-2.0-only AND GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://sethdlc.c;endline=10;md5=90f936879e9f8b755a138aeb348782eb"
 
 

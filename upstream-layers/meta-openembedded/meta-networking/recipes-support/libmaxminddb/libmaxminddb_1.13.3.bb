@@ -16,3 +16,5 @@ SRC_URI[sha256sum] = "a66502ea76eadbe17f2cd6fd708946777253972d2ae8157dee1b23a2fb
 
 inherit autotools-brokensep
 
+UPSTREAM_CHECK_URI = "https://github.com/maxmind/libmaxminddb/tags"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"

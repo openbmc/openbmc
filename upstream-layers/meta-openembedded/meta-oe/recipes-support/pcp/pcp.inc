@@ -2,7 +2,7 @@ SUMMARY = "System-level performance monitoring and performance management"
 HOMEPAGE = "http://www.pcp.io"
 SECTION =  "Applications/System"
 
-LICENSE = "GPL-2.0-or-later & LGPL-2.1-only"
+LICENSE = "GPL-2.0-or-later AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=37ab75b580d5aad4ada04260efa3702f \
                     "
 COMPATIBLE_HOST:libc-musl = "null"

@@ -17,6 +17,7 @@ SRC_URI = "git://github.com/eclipse/${BPN}.git;protocol=https;branch=master \
            file://0001-cmake-Disable-Wno-misleading-indentation-with-clang-.patch \
            file://0001-cmake-Disable-using-Wno-maybe-uninitialized.patch \
            file://0001-include-missing-cstdint.patch \
+           file://0002-carrays_uint32_t.i-use-PyLong_AsLong-instead-of-PyI.patch \
            "
 
 SRC_URI:append:toolchain-clang:x86 = " file://0001-nmea_gps-Link-with-latomic.patch "

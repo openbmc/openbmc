@@ -8,6 +8,10 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=a36207309d382da27cd66fdaae922e3c"
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.src.tar.gz"
 SRC_URI[sha256sum] = "6540716a1a3b2b9711635108da14b26baea488881d4a682121c0bddbba6b74cb"
 
+# Tarballs live in per-version subdirectories, the top level listing has no filenames
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/bvi/files/bvi/"
+UPSTREAM_CHECK_REGEX = "bvi/(?P<pver>\d+(\.\d+)+)/"
+
 DEPENDS += "ncurses"
 
 # The project uses old style C interfaces and it is not compatible with C23

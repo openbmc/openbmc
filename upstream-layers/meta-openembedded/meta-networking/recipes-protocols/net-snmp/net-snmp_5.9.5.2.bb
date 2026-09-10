@@ -1,7 +1,7 @@
 SUMMARY = "Various tools relating to the Simple Network Management Protocol"
 HOMEPAGE = "http://www.net-snmp.org/"
 SECTION = "net"
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 
 LIC_FILES_CHKSUM = "file://COPYING;md5=9d100a395a38584f2ec18a8275261687"
 
@@ -24,6 +24,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/net-snmp/net-snmp-${PV}.tar.gz \
            file://0009-net-snmp-fix-for-disable-des.patch \
            file://0010-net-snmp-Reproducibility-Don-t-check-build-host-for.patch \
            file://0011-ac_add_search_path.m4-keep-consistent-between-32bit-.patch \
+           file://0012-apps-Makefile.in-Link-libraries-explicitly.patch \
            file://netsnmp-swinst-crash.patch \
            "
 SRC_URI[sha256sum] = "16707719f833184a4b72835dac359ae188123b06b5e42817c00790d7dc1384bf"

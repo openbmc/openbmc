@@ -1,0 +1,61 @@
+From bc125c84cffdbb23ea7977b1f235635607e00a18 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 7 Sep 2026 16:36:50 -0700
+Subject: [PATCH] tests: do not embed build paths in split DWARF test programs
+
+The two split-DWARF test binaries are compiled by add_custom_command() with
+an absolute -o path. clang derives the .dwo file name from -o and records it
+verbatim in DW_AT_dwo_name, without applying -ffile-prefix-map, so the
+absolute build directory ends up baked into uprobe_test-split, its .dwo and
+the .dwp built from it. gcc remaps it, clang does not.
+
+Compile from inside the target directory with a relative -o instead. The
+recorded DW_AT_dwo_name then becomes a plain file name, which is what the
+dwarf parser looks for anyway (it uses only the basename), and llvm-dwp
+resolves it relative to its working directory.
+
+This keeps the shipped test programs free of build paths, which matters for
+distributions that package tests/ and check for host paths in the output.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ tests/testprogs/CMakeLists.txt | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/tests/testprogs/CMakeLists.txt b/tests/testprogs/CMakeLists.txt
+index 4cc9967..2b407b7 100644
+--- a/tests/testprogs/CMakeLists.txt
++++ b/tests/testprogs/CMakeLists.txt
+@@ -160,11 +160,16 @@ list(APPEND testprogtargets
+   ${CMAKE_CURRENT_BINARY_DIR}/.debug/uprobe_separate_debug-stripped.debug)
+ 
+ # Build a binary with split DWARF (.dwo files) to verify parsing of the split debug info format.
++# Compile from within the output directory and pass a relative -o: some compilers
++# (e.g. clang) record the -o derived .dwo path verbatim in DW_AT_dwo_name without
++# applying -ffile-prefix-map, which would bake the absolute build directory into
++# both the binary and the .dwo file.
+ add_custom_command(
+   OUTPUT
+     ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split
+     ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split-uprobe_test.dwo
+-  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split ${testprog_raw_ld_flags}
++  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o uprobe_test-split ${testprog_raw_ld_flags}
++  WORKING_DIRECTORY ${EXTERNAL_DEBUG_DIR}/dwo
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c
+ )
+ list(APPEND testprogtargets ${EXTERNAL_DEBUG_DIR}/dwo/uprobe_test-split)
+@@ -176,9 +181,10 @@ add_custom_command(
+   OUTPUT
+     ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split
+     ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split.dwp
+-  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split ${testprog_raw_ld_flags}
+-  COMMAND ${LLVM_DWP} -e ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split -o ${EXTERNAL_DEBUG_DIR}/dwp/uprobe_test-split.dwp
++  COMMAND ${CMAKE_C_COMPILER} ${testprog_raw_cc_flags} -g -O0 -gsplit-dwarf ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c -o uprobe_test-split ${testprog_raw_ld_flags}
++  COMMAND ${LLVM_DWP} -e uprobe_test-split -o uprobe_test-split.dwp
+   COMMAND ${CMAKE_COMMAND} -E rm -f ${EXTERNAL_DEBUG_DIR}/dwp/*.dwo
++  WORKING_DIRECTORY ${EXTERNAL_DEBUG_DIR}/dwp
+   DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uprobe_test.c
+ )
+ list(APPEND testprogtargets

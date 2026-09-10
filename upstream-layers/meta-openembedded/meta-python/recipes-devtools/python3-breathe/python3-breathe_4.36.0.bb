@@ -10,6 +10,5 @@ inherit pypi python_flit_core ptest ptest-python-pytest
 
 RDEPENDS:${PN} = "python3-sphinx"
 
-PYPI_PACKAGE = "breathe"
 
 BBCLASSEXTEND =+ "native nativesdk"

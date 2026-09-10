@@ -9,6 +9,8 @@ RDEPENDS:${PN} += "python3-setuptools"
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 SRC_URI += " file://0001-Fix-build-error-as-following.patch \
            "
 

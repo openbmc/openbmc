@@ -20,6 +20,11 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/xmlstar/${BP}.tar.gz \
 		   file://0001-Define-ATTRIBUTE_UNUSED-if-its-not-defined.patch"
 SRC_URI[sha256sum] = "15d838c4f3375332fd95554619179b69e4ec91418a3a5296e7c631b7ed19e7ca"
 
+# The SourceForge download mirror has no browsable listing; check the release
+# directories in the project's file area instead.
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/xmlstar/files/xmlstarlet/"
+UPSTREAM_CHECK_REGEX = "xmlstarlet/(?P<pver>\d+(\.\d+)+)/"
+
 inherit autotools
 
 # doc build: requires (native) xstlproc, fop, pdf2ps

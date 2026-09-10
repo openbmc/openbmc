@@ -1,16 +1,19 @@
-Use DESTDIR during  install/uninstall, this helps
-with cross or staged builds. Additionally pass LDFLAGS
-during linking.
+Use DESTDIR during install/uninstall, this helps
+with cross or staged builds.
+
+Note: as of ssmtp 2.66, upstream already appends $(LDFLAGS) to the
+link command for the ssmtp binary, so that part of the original patch
+is no longer needed and has been dropped.
 
 Signed-off-by: Khem Raj <raj.khem@gmail.com>
 Upstream-Status: Pending
 
 
-Index: ssmtp-2.64/Makefile.in
+Index: ssmtp-2.66/Makefile.in
 ===================================================================
---- ssmtp-2.64.orig/Makefile.in
-+++ ssmtp-2.64/Makefile.in
-@@ -46,40 +46,40 @@ all: ssmtp
+--- ssmtp-2.66.orig/Makefile.in
++++ ssmtp-2.66/Makefile.in
+@@ -46,36 +46,36 @@
  
  .PHONY: install
  install: ssmtp $(GEN_CONFIG)
@@ -67,8 +70,3 @@ Index: ssmtp-2.64/Makefile.in
  
  # Binaries:
  ssmtp: $(OBJS)
--	$(CC) -o ssmtp $(OBJS) @LIBS@ $(CFLAGS)
-+	$(CC) -o ssmtp $(OBJS) @LIBS@ $(CFLAGS) $(LDFLAGS)
- 
- .PHONY: clean
- clean:

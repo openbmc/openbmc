@@ -6,9 +6,14 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=e136a7b2560d80bcbf0d9b3e1356ecff"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/iperf-${PV}.tar.gz \
            file://0001-fix-for-buildroot-linux-breakage-ticket-342.patch \
+           file://0001-fix-for-ticket-389-Compilation-fails-with-disable-ip.patch \
 "
 
 SRC_URI[sha256sum] = "754ab0a7e28033dbea81308ef424bc7df4d6e2fe31b60cc536b61b51fefbd8fb"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/${BPN}/files/"
+UPSTREAM_CHECK_REGEX = "iperf-(?P<pver>\d+(\.\d+)+)\.tar\.gz"
+
 
 S = "${UNPACKDIR}/iperf-${PV}"
 

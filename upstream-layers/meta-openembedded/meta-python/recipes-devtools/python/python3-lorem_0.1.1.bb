@@ -8,7 +8,6 @@ SRC_URI += "\
         file://run-ptest \
 "
 
-PYPI_PACKAGE = "lorem"
 
 inherit pypi setuptools3 ptest
 

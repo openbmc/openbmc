@@ -13,7 +13,7 @@ DEPENDS = " \
     dbus \
     gegl \
     geocode-glib \
-    gexiv2 \
+    gexiv2-0.14 \
     gnome-online-accounts \
     gsettings-desktop-schemas \
     itstool-native \

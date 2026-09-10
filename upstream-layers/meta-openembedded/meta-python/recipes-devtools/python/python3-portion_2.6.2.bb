@@ -13,8 +13,12 @@ RDEPENDS:${PN} += "\
 	python3-sortedcontainers \
 "
 
+# python3-misc for timeit, python3-statistics for statistics (both used by
+# pytest-benchmark's storage/stats machinery)
 RDEPENDS:${PN}-ptest += "\
+	python3-misc \
 	python3-pytest-benchmark \
+	python3-statistics \
 "
 
 do_install_ptest:append () {

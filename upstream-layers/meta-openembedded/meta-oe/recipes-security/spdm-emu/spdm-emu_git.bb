@@ -9,6 +9,11 @@ LIC_FILES_CHKSUM = "file://LICENSE.md;md5=ed4cfe4688e1ac2cc2e6748766571949"
 SRC_URI = "gitsm://github.com/DMTF/spdm-emu;protocol=https;branch=main"
 
 SRCREV = "5fca359b15e4edd4f070ca83c9da02799b6f78ae"
+# Upstream release tags are "X.Y.Z" (newest 3.8.0).
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+)"
+# PV is "git" (AUTOINC recipe with no numeric PV), so the resolved tag (3.8.0)
+# has nothing to compare against; reported unknown rather than broken.
+UPSTREAM_VERSION_UNKNOWN = "1"
 inherit cmake pkgconfig systemd
 
 DEPENDS = "openssl"

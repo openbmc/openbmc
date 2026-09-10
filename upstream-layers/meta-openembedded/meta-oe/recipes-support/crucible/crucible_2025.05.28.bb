@@ -1,6 +1,6 @@
 SUMMARY = "Utility that provides userspace support for reading and writing to the i.MX fuses"
 
-LICENSE = "BSD-3-Clause & ${GO_MOD_LICENSES}"
+LICENSE = "BSD-3-Clause AND ${GO_MOD_LICENSES}"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=201414b6610203caed355323b1ab3116"
 require ${BPN}-licenses.inc
 

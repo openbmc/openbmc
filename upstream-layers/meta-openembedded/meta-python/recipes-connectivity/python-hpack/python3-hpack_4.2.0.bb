@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "0895cfa3b5531fc65fe439c05eb65144f123bf7a394fcaa56aa423548d
 
 inherit ptest-python-pytest pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN} += "python3-logging"
 RDEPENDS:${PN}-ptest += "python3-hypothesis"
 

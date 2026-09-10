@@ -1,0 +1,140 @@
+From 664032e1cee574e5d3874bbf55466448f537ab1a Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 27 Aug 2026 10:55:42 +0000
+Subject: [PATCH] Fix OpenSSL 4.0 compatibility in bundled grpc
+
+OpenSSL 4.0 returns const pointers from X509 accessor functions
+and makes ASN1_OCTET_STRING opaque. Use auto* for const returns
+and ASN1_STRING accessors for opaque access.
+
+Upstream-Status: Submitted [https://github.com/grpc/grpc/pull/41932]
+
+Note: Fixes bundled grpc 1.78.0 C core. Our fix for areas not
+covered by the upstream PR.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ .../transport/tls/grpc_tls_crl_provider.cc      |  2 +-
+ src/core/tsi/ssl_transport_security.cc          | 17 ++++++++---------
+ src/core/tsi/ssl_transport_security_utils.cc    | 10 +++++-----
+ 3 files changed, 14 insertions(+), 15 deletions(-)
+
+diff --git a/src/core/credentials/transport/tls/grpc_tls_crl_provider.cc b/src/core/credentials/transport/tls/grpc_tls_crl_provider.cc
+index 7bd4c5a..22d266e 100644
+--- a/src/core/credentials/transport/tls/grpc_tls_crl_provider.cc
++++ b/src/core/credentials/transport/tls/grpc_tls_crl_provider.cc
+@@ -56,7 +56,7 @@ absl::StatusOr<std::string> IssuerFromCrl(X509_CRL* crl) {
+   if (crl == nullptr) {
+     return absl::InvalidArgumentError("crl cannot be null");
+   }
+-  X509_NAME* issuer = X509_CRL_get_issuer(crl);
++  auto* issuer = X509_CRL_get_issuer(crl);
+   if (issuer == nullptr) {
+     return absl::InvalidArgumentError("crl cannot have null issuer");
+   }
+diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport_security.cc
+index 6526d3f..ff03697 100644
+--- a/src/core/tsi/ssl_transport_security.cc
++++ b/src/core/tsi/ssl_transport_security.cc
+@@ -406,9 +406,9 @@ static int looks_like_ip_address(absl::string_view name) {
+ static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
+                                            size_t* utf8_size) {
+   int common_name_index = -1;
+-  X509_NAME_ENTRY* common_name_entry = nullptr;
+-  ASN1_STRING* common_name_asn1 = nullptr;
+-  X509_NAME* subject_name = X509_get_subject_name(cert);
++  const X509_NAME_ENTRY* common_name_entry = nullptr;
++  const ASN1_STRING* common_name_asn1 = nullptr;
++  auto* subject_name = X509_get_subject_name(cert);
+   int utf8_returned_size = 0;
+   if (subject_name == nullptr) {
+     VLOG(2) << "Could not get subject name from certificate.";
+@@ -466,7 +466,7 @@ static tsi_result peer_property_from_x509_common_name(
+ static tsi_result peer_property_from_x509_subject(X509* cert,
+                                                   tsi_peer_property* property,
+                                                   bool is_verified_root_cert) {
+-  X509_NAME* subject_name = X509_get_subject_name(cert);
++  auto* subject_name = X509_get_subject_name(cert);
+   if (subject_name == nullptr) {
+     GRPC_TRACE_LOG(tsi, INFO) << "Could not get subject name from certificate.";
+     return TSI_NOT_FOUND;
+@@ -562,16 +562,16 @@ static tsi_result add_subject_alt_names_properties_to_peer(
+       char ntop_buf[INET6_ADDRSTRLEN];
+       int af;
+ 
+-      if (subject_alt_name->d.iPAddress->length == 4) {
++      if (ASN1_STRING_length(subject_alt_name->d.iPAddress) == 4) {
+         af = AF_INET;
+-      } else if (subject_alt_name->d.iPAddress->length == 16) {
++      } else if (ASN1_STRING_length(subject_alt_name->d.iPAddress) == 16) {
+         af = AF_INET6;
+       } else {
+         LOG(ERROR) << "SAN IP Address contained invalid IP";
+         result = TSI_INTERNAL_ERROR;
+         break;
+       }
+-      const char* name = inet_ntop(af, subject_alt_name->d.iPAddress->data,
++      const char* name = inet_ntop(af, ASN1_STRING_get0_data(subject_alt_name->d.iPAddress),
+                                    ntop_buf, INET6_ADDRSTRLEN);
+       if (name == nullptr) {
+         LOG(ERROR) << "Could not get IP string from asn1 octet.";
+@@ -855,13 +855,12 @@ static tsi_result x509_store_load_certs(X509_STORE* cert_store,
+       break;  // We're at the end of stream.
+     }
+     if (root_names != nullptr) {
+-      root_name = X509_get_subject_name(root);
++      root_name = X509_NAME_dup(X509_get_subject_name(root));
+       if (root_name == nullptr) {
+         LOG(ERROR) << "Could not get name from root certificate.";
+         result = TSI_INVALID_ARGUMENT;
+         break;
+       }
+-      root_name = X509_NAME_dup(root_name);
+       if (root_name == nullptr) {
+         result = TSI_OUT_OF_RESOURCES;
+         break;
+diff --git a/src/core/tsi/ssl_transport_security_utils.cc b/src/core/tsi/ssl_transport_security_utils.cc
+index 8f6607c..93876bb 100644
+--- a/src/core/tsi/ssl_transport_security_utils.cc
++++ b/src/core/tsi/ssl_transport_security_utils.cc
+@@ -281,11 +281,11 @@ bool VerifyCrlCertIssuerNamesMatch(X509_CRL* crl, X509* cert) {
+   if (cert == nullptr || crl == nullptr) {
+     return false;
+   }
+-  X509_NAME* cert_issuer_name = X509_get_issuer_name(cert);
++  auto* cert_issuer_name = X509_get_issuer_name(cert);
+   if (cert == nullptr) {
+     return false;
+   }
+-  X509_NAME* crl_issuer_name = X509_CRL_get_issuer(crl);
++  auto* crl_issuer_name = X509_CRL_get_issuer(crl);
+   if (crl_issuer_name == nullptr) {
+     return false;
+   }
+@@ -316,7 +316,7 @@ absl::StatusOr<std::string> IssuerFromCert(X509* cert) {
+   if (cert == nullptr) {
+     return absl::InvalidArgumentError("cert cannot be null");
+   }
+-  X509_NAME* issuer = X509_get_issuer_name(cert);
++  auto* issuer = X509_get_issuer_name(cert);
+   unsigned char* buf = nullptr;
+   int len = i2d_X509_NAME(issuer, &buf);
+   if (len < 0 || buf == nullptr) {
+@@ -331,7 +331,7 @@ absl::StatusOr<std::string> AkidFromCertificate(X509* cert) {
+   if (cert == nullptr) {
+     return absl::InvalidArgumentError("cert cannot be null.");
+   }
+-  ASN1_OCTET_STRING* akid = nullptr;
++  const ASN1_OCTET_STRING* akid = nullptr;
+   int j = X509_get_ext_by_NID(cert, NID_authority_key_identifier, -1);
+   // Can't have multiple occurrences
+   if (j >= 0) {
+@@ -356,7 +356,7 @@ absl::StatusOr<std::string> AkidFromCrl(X509_CRL* crl) {
+   if (crl == nullptr) {
+     return absl::InvalidArgumentError("Could not get AKID from crl.");
+   }
+-  ASN1_OCTET_STRING* akid = nullptr;
++  const ASN1_OCTET_STRING* akid = nullptr;
+   int j = X509_CRL_get_ext_by_NID(crl, NID_authority_key_identifier, -1);
+   // Can't have multiple occurrences
+   if (j >= 0) {

@@ -7,9 +7,10 @@ SRC_URI += "file://0001-pyproject.toml-Remove-upper-version-constraint-for-C.pat
 SRC_URI[sha256sum] = "e1d3ee49a4a81524d7caaa2d5a31fc71075a1c977b661df958cee24bef86b8fe"
 
 PYPI_PACKAGE = "dbus_fast"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 inherit pypi python_poetry_core cython
+
+DEPENDS += "python3-wheel-native"
 
 RDEPENDS:${PN} += " \
     python3-core (>=3.7) \

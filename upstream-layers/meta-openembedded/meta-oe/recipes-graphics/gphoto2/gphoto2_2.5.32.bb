@@ -13,6 +13,10 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/gphoto/${BP}.tar.bz2;name=gphoto2 \
 "
 SRC_URI[gphoto2.sha256sum] = "4e379a0f12f72b49ee5ee2283ffd806b5d12d099939d75197a3f4bbc7f27a1a1"
 
+# Tarballs live in per-version subdirectories, the top level listing has no filenames
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/gphoto/files/gphoto/"
+UPSTREAM_CHECK_REGEX = "gphoto/(?P<pver>\d+(\.\d+)+)/"
+
 inherit autotools pkgconfig gettext
 
 EXTRA_OECONF += "--with-jpeg-prefix=${STAGING_INCDIR} \

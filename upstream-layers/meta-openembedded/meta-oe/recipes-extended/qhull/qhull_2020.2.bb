@@ -9,6 +9,9 @@ SRC_URI = "http://www.qhull.org/download/qhull-2020-src-8.0.2.tgz \
     file://0002-allow-build-with-cmake-4.patch \
 "
 SRC_URI[sha256sum] = "b5c2d7eb833278881b952c8a52d20179eab87766b00b865000469a45c1838b7e"
+# Upstream ships a single "qhull-2020-src-8.0.2.tgz"; the dual 2020.2 / 8.0.2
+# numbering has no parseable listing that maps to PV.
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 CFLAGS += "-fPIC"
 

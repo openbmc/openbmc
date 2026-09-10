@@ -1,6 +1,6 @@
 SUMMARY = "Netscape Portable Runtime Library"
 HOMEPAGE =  "http://www.mozilla.org/projects/nspr/"
-LICENSE = "GPL-2.0-only | MPL-2.0 | LGPL-2.1-only"
+LICENSE = "GPL-2.0-only OR LGPL-2.1-only OR MPL-2.0"
 LIC_FILES_CHKSUM = "file://configure.in;beginline=3;endline=6;md5=90c2fdee38e45d6302abcfe475c8b5c5 \
                     file://Makefile.in;beginline=4;endline=38;md5=beda1dbb98a515f557d3e58ef06bca99"
 SECTION = "libs/network"

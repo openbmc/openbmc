@@ -10,6 +10,7 @@ SRC_URI = "git://github.com/rsyslog/libfastjson.git;protocol=https;branch=master
 
 SRCREV = "3a8402c1de7c7747c95229db26d8d32fb85a7a52"
 
+EXTRA_OECONF += "LIBS='-lm'"
 
 CVE_PRODUCT = "rsyslog:libfastjson"
 

@@ -65,7 +65,7 @@ EXTRA_OECONF += "--enable-crypt"
 # Backends="asyncmeta dnssrv ldap mdb meta null passwd perl relay sock sql wt"
 #
 # Note that multiple backends can be built.  The ldbm backend requires a
-# build-time choice of database API. To use the gdbm (or other) API the 
+# build-time choice of database API. To use the gdbm (or other) API the
 # Berkely database module must be removed from the build.
 md = "${libexecdir}/openldap"
 #

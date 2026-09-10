@@ -15,6 +15,10 @@ SRC_URI = " \
     file://0001-fix-build-with-gcc-15-Wincompatible-pointer-types-er.patch \
 "
 
+# git.linaro.org no longer serves this repo (HTTP 504) and there is no
+# replacement upstream, so no version can be resolved.
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 
 CFLAGS += "-pthread"
 

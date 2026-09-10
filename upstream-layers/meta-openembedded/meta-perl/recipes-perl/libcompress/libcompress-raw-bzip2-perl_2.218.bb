@@ -3,7 +3,7 @@ DESCRIPTION = ""Compress::Raw::Bzip2" provides an interface to the in-memory \
 compression/uncompression functions from the bzip2 compression library."
 HOMEPAGE = "https://metacpan.org/release/Compress-Raw-Bzip2"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README;beginline=8;endline=10;md5=7b6eb3b7380815648e5067943ed15621"
 

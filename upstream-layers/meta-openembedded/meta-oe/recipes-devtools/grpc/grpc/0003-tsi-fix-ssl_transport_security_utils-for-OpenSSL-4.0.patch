@@ -1,0 +1,63 @@
+From d2beead89706a34ade404bfa7bec2f95e9b6225a Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Wed, 26 Aug 2026 19:51:01 +0000
+Subject: [PATCH] tsi: fix ssl_transport_security_utils for OpenSSL 4.0
+
+OpenSSL 4.0 returns const pointers from X509_get_issuer_name(),
+X509_CRL_get_issuer(), and makes ASN1_OCTET_STRING opaque. Use
+auto* for X509_NAME and const for ASN1_OCTET_STRING.
+
+Upstream-Status: Submitted [https://github.com/grpc/grpc/pull/41932]
+
+Note: Our fix for areas not covered by the upstream PR.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/core/tsi/ssl_transport_security_utils.cc | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/core/tsi/ssl_transport_security_utils.cc b/src/core/tsi/ssl_transport_security_utils.cc
+index 7318bc3f780..2738ffad923 100644
+--- a/src/core/tsi/ssl_transport_security_utils.cc
++++ b/src/core/tsi/ssl_transport_security_utils.cc
+@@ -282,11 +282,11 @@ bool VerifyCrlCertIssuerNamesMatch(X509_CRL* crl, X509* cert) {
+   if (cert == nullptr || crl == nullptr) {
+     return false;
+   }
+-  X509_NAME* cert_issuer_name = X509_get_issuer_name(cert);
++  auto* cert_issuer_name = X509_get_issuer_name(cert);
+   if (cert_issuer_name == nullptr) {
+     return false;
+   }
+-  X509_NAME* crl_issuer_name = X509_CRL_get_issuer(crl);
++  auto* crl_issuer_name = X509_CRL_get_issuer(crl);
+   if (crl_issuer_name == nullptr) {
+     return false;
+   }
+@@ -317,7 +317,7 @@ absl::StatusOr<std::string> IssuerFromCert(X509* cert) {
+   if (cert == nullptr) {
+     return absl::InvalidArgumentError("cert cannot be null");
+   }
+-  X509_NAME* issuer = X509_get_issuer_name(cert);
++  auto* issuer = X509_get_issuer_name(cert);
+   unsigned char* buf = nullptr;
+   int len = i2d_X509_NAME(issuer, &buf);
+   if (len < 0 || buf == nullptr) {
+@@ -332,7 +332,7 @@ absl::StatusOr<std::string> AkidFromCertificate(X509* cert) {
+   if (cert == nullptr) {
+     return absl::InvalidArgumentError("cert cannot be null.");
+   }
+-  ASN1_OCTET_STRING* akid = nullptr;
++  const ASN1_OCTET_STRING* akid = nullptr;
+   int j = X509_get_ext_by_NID(cert, NID_authority_key_identifier, -1);
+   // Can't have multiple occurrences
+   if (j >= 0) {
+@@ -357,7 +357,7 @@ absl::StatusOr<std::string> AkidFromCrl(X509_CRL* crl) {
+   if (crl == nullptr) {
+     return absl::InvalidArgumentError("Could not get AKID from crl.");
+   }
+-  ASN1_OCTET_STRING* akid = nullptr;
++  const ASN1_OCTET_STRING* akid = nullptr;
+   int j = X509_CRL_get_ext_by_NID(crl, NID_authority_key_identifier, -1);
+   // Can't have multiple occurrences
+   if (j >= 0) {

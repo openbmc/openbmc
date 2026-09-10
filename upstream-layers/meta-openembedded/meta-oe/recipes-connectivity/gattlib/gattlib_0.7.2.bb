@@ -1,7 +1,7 @@
 DESCRIPTION = "Bluetooth library with attribute support"
 SECTION = "libs/network"
 
-LICENSE = "GPL-2.0-or-later | BSD-3-Clause"
+LICENSE = "BSD-3-Clause OR GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://CMakeLists.txt;beginline=1;endline=6;md5=f44a9a14d37330e7cd454e694e714ab8"
 
 DEPENDS = "bluez5 glib-2.0 glib-2.0-native python3-packaging-native"

@@ -17,7 +17,6 @@ S = "${UNPACKDIR}/dirty_equals-${PV}"
 inherit pypi python_hatchling
 
 PYPI_PACKAGE = "dirty_equals"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 RDEPENDS:${PN} += " \
     python3-pytz \

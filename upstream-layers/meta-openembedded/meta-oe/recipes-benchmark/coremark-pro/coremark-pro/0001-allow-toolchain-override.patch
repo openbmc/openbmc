@@ -1,0 +1,39 @@
+From: Vaibhav Jindal <vaibjind@qti.qualcomm.com>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Allow toolchain components to be overridden for cross-compilation
+
+Allow toolchain components (CC, AS, AR, and LD) to be overridden by the build
+environment. This enables cross-compilation support while preserving the existing
+default behavior for native builds.
+
+Upstream-Status: Pending
+diff --git a/util/make/gcc64.mak b/util/make/gcc64.mak
+index d8d5e51..5ee9b52 100644
+--- a/util/make/gcc64.mak
++++ b/util/make/gcc64.mak
+@@ -41,7 +41,7 @@ TOOLS	= /usr
+ 
+ # Variable: CC
+ #	name of the compiler
+-CC		= $(TOOLS)/bin/gcc
++CC		?= $(TOOLS)/bin/gcc
+ # Solaris: /usr/ccs/bin/as requires space after -o passed from gcc.
+ #OBJOUT = -o \#
+ OBJOUT	= -o
+@@ -50,13 +50,13 @@ CINCD	= -I
+ CDEFN	= -D
+ OEXT = .o
+ 
+-AS		= $(TOOLS)/bin/as
++AS		?= $(TOOLS)/bin/as
+ 
+-LD		= $(TOOLS)/bin/gcc
++LD		?= $(TOOLS)/bin/gcc
+ EXEOUT	= -o
+ EXE		= .exe
+ 
+-AR		= $(TOOLS)/bin/ar
++AR		?= $(TOOLS)/bin/ar
+ LIBTYPE	= .a
+ LIBOUT	= 
+ 

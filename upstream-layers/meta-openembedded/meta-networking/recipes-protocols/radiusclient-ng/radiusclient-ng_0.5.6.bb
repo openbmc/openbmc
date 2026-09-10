@@ -11,7 +11,7 @@ SRC_URI = "http://archive.ubuntu.com/ubuntu/pool/universe/r/${BPN}/${BPN}_${PV}.
 
 SRC_URI[sha256sum] = "282a9f1355f190efbb06c0d7c4e062eaa652caf342ed3ad361ac595f72f09f14"
 
-LICENSE = "BSD-3-Clause & BSD-2-Clause & HPND"
+LICENSE = "BSD-2-Clause AND BSD-3-Clause AND HPND"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=3e47566c9271b786693d8a08792dbf41"
 
 inherit autotools-brokensep

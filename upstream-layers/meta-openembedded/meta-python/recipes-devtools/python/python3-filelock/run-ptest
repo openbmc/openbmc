@@ -3,4 +3,6 @@
 # Some tests require non-root
 useradd tester || echo test user exists already
 
-su tester -c "pytest --automake"
+# tester can't write pytest's cache dir under the read-only-to-them
+# /usr/lib/python3-filelock/ptest install path; disable it, it's not needed
+su tester -c "pytest --automake -p no:cacheprovider"

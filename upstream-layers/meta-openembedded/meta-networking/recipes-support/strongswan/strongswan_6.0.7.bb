@@ -62,7 +62,7 @@ PACKAGECONFIG[tpm2] = "--enable-tpm,--disable-tpm,,${PN}-plugin-tpm"
 
 
 # integraty configuration needs meta-integraty
-#imc 
+#imc
 PACKAGECONFIG[tnc-imc] = "--enable-tnc-imc,--disable-tnc-imc,,  ${PN}-plugin-tnc-imc ${PN}-plugin-tnc-tnccs"
 PACKAGECONFIG[imc-test] = "--enable-imc-test,--disable-imc-test,,"
 PACKAGECONFIG[imc-scanner] = "--enable-imc-scanner,--disable-imc-scanner,,"

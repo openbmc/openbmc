@@ -17,7 +17,7 @@ SRC_URI = "\
 SRC_URI[sha256sum] = "2a5cfc5ae259e4e97f86b68dfffc152cdaffe94e2060b770cb827238d769fc05"
 
 UPSTREAM_CHECK_URI = "https://github.com/kkos/oniguruma/releases/"
-UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
 
 BINCONFIG = "${bindir}/onig-config"
 

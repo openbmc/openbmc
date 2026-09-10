@@ -12,7 +12,9 @@ SECTION = "libs"
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263"
 
-SRC_URI = "git://github.com/pjsip/pjproject.git;protocol=https;branch=master;tag=${PV}"
+SRC_URI = "git://github.com/pjsip/pjproject.git;protocol=https;branch=master;tag=${PV} \
+           file://0001-ssl_sock_ossl-fix-OpenSSL-4.0-compatibility.patch \
+           "
 SRCREV = "5a457451fa2712ba18e12b01738e8ff3af2b26fd"
 
 DEPENDS = "swig-native python3-setuptools-native"

@@ -10,6 +10,8 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=321bf41f280cf805086dd5a720b37785"
 inherit autotools pkgconfig
 
 SRC_URI = "https://github.com/ClusterLabs/${BPN}/releases/download/v${PV}/${BP}.tar.xz"
+UPSTREAM_CHECK_URI = "https://github.com/ClusterLabs/libqb/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
 SRC_URI[sha256sum] = "326a69fb5b2ee4479f0db4f98d10d670ad0798b5ded8c4cfd585b765fd8941e8"
 
 DEPENDS += "libxml2"

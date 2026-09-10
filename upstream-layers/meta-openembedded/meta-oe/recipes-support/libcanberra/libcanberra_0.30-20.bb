@@ -14,6 +14,10 @@ SRC_URI = " \
 "
 SRCREV = "47d67f43c58af36143060888fc8e69a9cb0eddea"
 
+# Upstream is dormant at 0.30; the Debian packaging repo we fetch from tags
+# releases as "debian/<upstream>-<debrev>", which PV mirrors.
+UPSTREAM_CHECK_GITTAGREGEX = "debian/(?P<pver>\d+(\.\d+)+-\d+)"
+
 EXTRA_OECONF = "\
     --enable-null \
     --disable-oss \

@@ -3,7 +3,7 @@ DESCRIPTION = "A library to provide support for making real-mode calls x86 calls
 x86 hardware, vm86 mode is used. On other platforms, x86 emulation is \
 provided."
 HOMEPAGE = "http://www.codon.org.uk/~mjg59/libx86/"
-LICENSE = "MIT & BSD-3-Clause"
+LICENSE = "BSD-3-Clause AND MIT"
 SECTION = "libs"
 LIC_FILES_CHKSUM = "file://COPYRIGHT;md5=633af6c02e6f624d4c472d970a2aca53"
 

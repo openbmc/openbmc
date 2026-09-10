@@ -12,7 +12,7 @@ SRC_URI = "https://github.com/msktutil/msktutil/releases/download/${PV}/${BP}.ta
 SRC_URI[sha256sum] = "51314bb222c20e963da61724c752e418261a7bfc2408e7b7d619e82a425f6541"
 
 UPSTREAM_CHECK_URI = "https://github.com/msktutil/msktutil/releases/"
-UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
 
 DEPENDS += "krb5 cyrus-sasl openldap"
 

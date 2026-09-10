@@ -5,7 +5,7 @@ DESCRIPTION = "read-edid is a set of two tools - get-edid, which gets the raw \
 	       section."
 HOMEPAGE = "http://www.polypux.org/projects/read-edid/"
 SECTION = "console/utils"
-LICENSE = "read-edid"
+LICENSE = "LicenseRef-read-edid"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=292c42e2aedc4af636636bf7af0e2b26"
 
 SRC_URI = "http://polypux.org/projects/read-edid/read-edid-${PV}.tar.gz \

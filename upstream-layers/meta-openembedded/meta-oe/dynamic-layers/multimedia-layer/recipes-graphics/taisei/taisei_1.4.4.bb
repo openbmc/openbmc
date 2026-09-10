@@ -6,7 +6,7 @@ DESCRIPTION = "Taisei Project is an open source fan-game set in the world of \
                mastery through practice."
 HOMEPAGE = "https://taisei-project.org"
 BUGTRACKER = "https://github.com/taisei-project/taisei/issues"
-LICENSE = "CC-BY-4.0 & CC0-1.0 & MIT"
+LICENSE = "CC-BY-4.0 AND CC0-1.0 AND MIT"
 LIC_FILES_CHKSUM = "file://COPYING;md5=1a11ffd7e1bdd1d3156cecec60a2846f"
 
 DEPENDS = "\

@@ -24,6 +24,10 @@ SRC_URI[sha256sum] = "872e4b134e5df29c8933dff12350785054d2fd2839b5ae6b5587b14db1
 
 inherit autotools pkgconfig github-releases
 
+# mosh tags releases as "mosh-X.Y.Z", not the "vX.Y.Z" the github-releases class
+# default expects.
+UPSTREAM_CHECK_REGEX = "releases/tag/mosh-(?P<pver>\d+(\.\d+)+)"
+
 PACKAGE_BEFORE_PN += "${PN}-server"
 FILES:${PN}-server = "${bindir}/mosh-server"
 

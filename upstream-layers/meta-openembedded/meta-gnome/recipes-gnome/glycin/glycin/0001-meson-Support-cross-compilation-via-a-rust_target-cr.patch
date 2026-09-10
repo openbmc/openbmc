@@ -1,0 +1,97 @@
+From b4fac7e77a2a88be19fc83b3890711e2e3165859 Mon Sep 17 00:00:00 2001
+From: Anton Politov <ampernic@inbox.ru>
+Date: Thu, 18 Jun 2026 14:03:36 +0300
+Subject: [PATCH] meson: Support cross-compilation via a rust_target cross
+ property
+
+cargo was always invoked without --target and the artifact paths assumed
+the native layout (cargo-target/<profile>/), so the Rust components could
+not be cross-compiled. Read the rust target triple from the cross file's
+[properties] (rust_target); when set, pass it as --target and read the
+artifacts from the per-target subdirectory cargo writes to. When it is
+unset the build is unchanged.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glycin/-/commit/13b6b060d41aa4cdce3eb878e83c6dd01014e669]
+---
+ glycin-loaders/meson.build     | 4 ++--
+ glycin-thumbnailer/meson.build | 3 ++-
+ libglycin/meson.build          | 2 +-
+ meson.build                    | 9 +++++++++
+ 4 files changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/glycin-loaders/meson.build b/glycin-loaders/meson.build
+index 805a646..03db09e 100644
+--- a/glycin-loaders/meson.build
++++ b/glycin-loaders/meson.build
+@@ -49,7 +49,7 @@ manifest = meson.project_source_root() / 'Cargo.toml'
+ cargo_options = [
+   '--profile', cargo_profile,
+   '--manifest-path', manifest,
+-]
++] + cargo_target_args
+ 
+ git_version = ''
+ 
+@@ -103,7 +103,7 @@ foreach loader : get_option('loaders')
+     output: loader,
+     command: [
+       'cp',
+-      cargo_target_dir / rust_target / loader,
++      cargo_artifact_dir / rust_target / loader,
+       '@OUTPUT@',
+     ],
+   )
+diff --git a/glycin-thumbnailer/meson.build b/glycin-thumbnailer/meson.build
+index 3e205e3..1580378 100644
+--- a/glycin-thumbnailer/meson.build
++++ b/glycin-thumbnailer/meson.build
+@@ -21,6 +21,7 @@ cargo_build = custom_target(
+         '--profile', cargo_profile,
+         '--manifest-path', cargo_manifest,
+         '--package=glycin-thumbnailer',
++        cargo_target_args,
+     ],
+ )
+ 
+@@ -34,7 +35,7 @@ custom_target(
+     output: 'glycin-thumbnailer',
+     command: [
+         'cp',
+-        cargo_target_dir / rust_target / 'glycin-thumbnailer',
++        cargo_artifact_dir / rust_target / 'glycin-thumbnailer',
+         '@OUTPUT@',
+     ],
+ )
+diff --git a/libglycin/meson.build b/libglycin/meson.build
+index 12cbd5f..3a2a8b6 100644
+--- a/libglycin/meson.build
++++ b/libglycin/meson.build
+@@ -17,7 +17,7 @@ cargo_options = [
+     '--target-dir', cargo_target_dir,
+     '--profile', cargo_profile,
+     '--manifest-path', manifest,
+-]
++] + cargo_target_args
+ 
+ cargo_env_module = cargo_env
+ 
+diff --git a/meson.build b/meson.build
+index bb4a5e4..72d1ae8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -25,6 +25,15 @@ cargo_target_dir = meson.project_build_root() / 'cargo-target'
+ cargo_home = meson.project_build_root() / 'cargo-home'
+ cargo_manifest = meson.project_source_root() / 'Cargo.toml'
+ 
++cargo_build_target = meson.get_external_property('rust_target', '')
++if cargo_build_target != ''
++  cargo_target_args = ['--target', cargo_build_target]
++  cargo_artifact_dir = cargo_target_dir / cargo_build_target
++else
++  cargo_target_args = []
++  cargo_artifact_dir = cargo_target_dir
++endif
++
+ cargo_bin = find_program('cargo')
+ crate_version_bin = find_program(meson.project_source_root() / 'build-aux/crates-version.py')
+ 

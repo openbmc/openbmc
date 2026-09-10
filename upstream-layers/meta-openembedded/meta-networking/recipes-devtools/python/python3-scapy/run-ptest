@@ -6,6 +6,17 @@ if ! nslookup example.com; then
   trap "mv /etc/resolv.conf.bak /etc/resolv.conf" INT EXIT
 fi
 
-python3 UTscapy.py -t regression.uts -f text -l -C -K skipped_ptest \
-    -o @PTEST_PATH@/scapy_ptest_$(date +%Y%m%d-%H%M%S).log \
+UTSCAPY_LOG=@PTEST_PATH@/scapy_ptest_$(date +%Y%m%d-%H%M%S).log
+
+# -F expands only the failed tests in the report, keeping it small while still
+# recording the traceback of anything that failed.
+python3 UTscapy.py -t regression.uts -f text -l -C -F -K skipped_ptest \
+    -o $UTSCAPY_LOG \
     2>&1 | sed -e 's/^passed None/PASS:/' -e 's/^failed None/FAIL:/'
+
+# The report only exists inside the ephemeral test image, so echo the details of
+# any failure to stdout, where ptest-runner records them.
+if grep -qE '^###.*=\[(failed|interrupted)\]' $UTSCAPY_LOG 2>/dev/null; then
+    echo "--- UTscapy failure details ---"
+    cat $UTSCAPY_LOG
+fi

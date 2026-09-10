@@ -26,5 +26,5 @@ CXXFLAGS:append:toolchain-clang:runtime-llvm = " -DCATCH_CONFIG_CPP11_NO_SHUFFLE
 
 do_install() {
     install -d ${D}${includedir}
-    install -m 0644 ${S}/src/fifo_map.hpp ${D}${includedir} 
+    install -m 0644 ${S}/src/fifo_map.hpp ${D}${includedir}
 }

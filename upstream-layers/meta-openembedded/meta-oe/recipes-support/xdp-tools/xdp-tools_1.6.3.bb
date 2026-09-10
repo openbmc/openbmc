@@ -5,7 +5,7 @@ with XDP eBPF programs in Linux, including tools for loading programs, packet \
 processing, monitoring, traffic generation, and benchmarking."
 
 HOMEPAGE = "https://github.com/xdp-project/xdp-tools"
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later & LGPL-2.1-only & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND GPL-2.0-only AND GPL-2.0-or-later AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=9ee53f8d06bbdb4c11b1557ecc4f8cd5 \
     file://LICENSES/GPL-2.0;md5=994331978b428511800bfbd17eea3001 \

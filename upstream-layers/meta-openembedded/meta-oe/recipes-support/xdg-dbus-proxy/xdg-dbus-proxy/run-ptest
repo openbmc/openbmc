@@ -1,2 +1,11 @@
 #!/bin/sh
+# tests/test-proxy.c spawns the reference bus implementation directly as
+# "dbus-daemon --session --print-address=1 --nofork". Distros that select a
+# different VIRTUAL-RUNTIME_dbus (e.g. dbus-broker, which RCONFLICTS with dbus)
+# have no dbus-daemon and no CLI-compatible replacement, so the test cannot run.
+if ! command -v dbus-daemon >/dev/null 2>&1; then
+    echo "SKIP: xdg-dbus-proxy/test-proxy.test (no dbus-daemon; requires VIRTUAL-RUNTIME_dbus = dbus)"
+    exit 0
+fi
+
 gnome-desktop-testing-runner xdg-dbus-proxy

@@ -1,7 +1,7 @@
 SUMMARY = "minicoredumper provides an alternate core dump facility for Linux \
 to allow minimal and customized crash dumps"
 HOMEPAGE = "https://www.linutronix.de/minicoredumper/"
-LICENSE = " LGPL-2.1-only & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=be36ac4e46b05b190e6b9d3ec415aa63 \
                     file://COPYING.BSD;md5=b915ac80d5236d6aa659cb986daf00e5 \
                     file://COPYING.LGPLv2.1;md5=3254c7b4d4712a396bd036bfb211a908 \

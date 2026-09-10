@@ -9,6 +9,10 @@ SRC_URI = "git://github.com/usbids/usbids.git;branch=master;protocol=https"
 # December 13, 2025
 SRCREV = "5de1427442504bc8e28d35cca5397d64ea177456"
 
+# The database is published as a rolling git repo with no tags or releases, so
+# track new commits instead.
+UPSTREAM_CHECK_COMMITS = "1"
+
 
 do_install() {
 	install -d ${D}${datadir}

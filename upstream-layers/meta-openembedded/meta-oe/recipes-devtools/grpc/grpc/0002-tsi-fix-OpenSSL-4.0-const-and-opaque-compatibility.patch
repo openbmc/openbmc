@@ -1,0 +1,61 @@
+From 42693a829197a9120816fa91b9ce55535d798b28 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Wed, 26 Aug 2026 19:50:00 +0000
+Subject: [PATCH] tsi: fix OpenSSL 4.0 const and opaque type compatibility
+
+OpenSSL 4.0 returns const pointers from X509_get_subject_name(),
+X509_get_issuer_name(), X509_get0_serialNumber() and makes
+ASN1_OCTET_STRING opaque. Use auto* to deduce correct const type
+and use ASN1_STRING accessors for opaque struct access.
+
+Upstream-Status: Submitted [https://github.com/grpc/grpc/pull/41932]
+
+Note: Our fix for areas not covered by the upstream PR.
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+ src/core/tsi/ssl_transport_security.cc | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/core/tsi/ssl_transport_security.cc b/src/core/tsi/ssl_transport_security.cc
+index 922bb836e14..ee2092acece 100644
+--- a/src/core/tsi/ssl_transport_security.cc
++++ b/src/core/tsi/ssl_transport_security.cc
+@@ -893,7 +893,7 @@ static tsi_result ssl_get_x509_common_name(X509* cert, unsigned char** utf8,
+   int common_name_index = -1;
+   X509_NAME_ENTRY* common_name_entry = nullptr;
+   ASN1_STRING* common_name_asn1 = nullptr;
+-  X509_NAME* subject_name = X509_get_subject_name(cert);
++  auto* subject_name = X509_get_subject_name(cert);
+   int utf8_returned_size = 0;
+   if (subject_name == nullptr) {
+     VLOG(2) << "Could not get subject name from certificate.";
+@@ -951,7 +951,7 @@ static tsi_result peer_property_from_x509_common_name(
+ static tsi_result peer_property_from_x509_subject(X509* cert,
+                                                   tsi_peer_property* property,
+                                                   bool is_verified_root_cert) {
+-  X509_NAME* subject_name = X509_get_subject_name(cert);
++  auto* subject_name = X509_get_subject_name(cert);
+   if (subject_name == nullptr) {
+     GRPC_TRACE_LOG(tsi, INFO) << "Could not get subject name from certificate.";
+     return TSI_NOT_FOUND;
+@@ -1047,16 +1047,16 @@ static tsi_result add_subject_alt_names_properties_to_peer(
+       char ntop_buf[INET6_ADDRSTRLEN];
+       int af;
+ 
+-      if (subject_alt_name->d.iPAddress->length == 4) {
++      if (ASN1_STRING_length(subject_alt_name->d.iPAddress) == 4) {
+         af = AF_INET;
+-      } else if (subject_alt_name->d.iPAddress->length == 16) {
++      } else if (ASN1_STRING_length(subject_alt_name->d.iPAddress) == 16) {
+         af = AF_INET6;
+       } else {
+         LOG(ERROR) << "SAN IP Address contained invalid IP";
+         result = TSI_INTERNAL_ERROR;
+         break;
+       }
+-      const char* name = inet_ntop(af, subject_alt_name->d.iPAddress->data,
++      const char* name = inet_ntop(af, ASN1_STRING_get0_data(subject_alt_name->d.iPAddress),
+                                    ntop_buf, INET6_ADDRSTRLEN);
+       if (name == nullptr) {
+         LOG(ERROR) << "Could not get IP string from asn1 octet.";

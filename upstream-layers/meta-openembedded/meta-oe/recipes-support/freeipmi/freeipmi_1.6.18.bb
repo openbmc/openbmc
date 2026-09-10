@@ -16,6 +16,9 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=d32239bcb673463ab874e80d47fae504 \
 SRC_URI = "${GNU_MIRROR}/freeipmi/freeipmi-${PV}.tar.gz"
 SRC_URI[sha256sum] = "8098b23820038ad0aa39abf0f9a012e24683d384d9f91e760acb2a68b465e0fe"
 
+UPSTREAM_CHECK_URI = "https://ftp.gnu.org/gnu/freeipmi/"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)\.tar\.gz"
+
 DEPENDS = "libgcrypt"
 DEPENDS:append:libc-musl = " argp-standalone"
 

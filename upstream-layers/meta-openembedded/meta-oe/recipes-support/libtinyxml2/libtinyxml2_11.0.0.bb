@@ -14,8 +14,8 @@ inherit cmake ptest
 EXTRA_OECMAKE += "${@bb.utils.contains('PTEST_ENABLED', '1', '-Dtinyxml2_BUILD_TESTING=ON', '', d)}"
 
 PACKAGECONFIG ?= "shared-libs"
-PACKAGECONFIG[shared-libs] = "-DBUILD_SHARED_LIBS=ON,-DBUILD_SHARED_LIBS=OFF" 
- 
+PACKAGECONFIG[shared-libs] = "-DBUILD_SHARED_LIBS=ON,-DBUILD_SHARED_LIBS=OFF"
+
 CXXFLAGS:append:libc-musl = " -D_LARGEFILE64_SOURCE"
 
 do_install_ptest() {

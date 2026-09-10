@@ -28,6 +28,9 @@ EXTRA_OEMESON:append:libc-musl = " -Dwtmpfile=/var/log/wtmp -Dtests=false"
 
 SRC_URI[sha256sum] = "adda4cdeae24fa0992e7df3ffff9effa7090be3ac233a3edfdf69d5a9c9b924f"
 
+UPSTREAM_CHECK_URI = "https://gitlab.freedesktop.org/accountsservice/accountsservice/-/tags"
+UPSTREAM_CHECK_REGEX = "(?P<pver>\d+(\.\d+)+)"
+
 GTKDOC_MESON_OPTION = "gtk_doc"
 
 PACKAGECONFIG ??= "${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)} admin_group"

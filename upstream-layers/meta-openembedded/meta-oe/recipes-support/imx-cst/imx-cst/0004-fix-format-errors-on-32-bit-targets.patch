@@ -1,0 +1,79 @@
+From: Tobias Deiminger <tobias.deiminger@linutronix.de>
+Date: Fri, 30 Jan 2026 01:55:37 +0100
+Subject: [PATCH] Fix -Wformat errors on i386
+
+gcc -Wformat ahab_image_verifier.c fails on i386 with the following errors:
+  "format '%zu' expects argument of type 'size_t', but argument has type 'long int'"
+  "format '%ld' expects argument of type 'long int', but argument has type 'size_t' {aka 'unsigned int'}"
+
+'printf("%zu", (long) 0);' and 'printf("%ld", (size_t) 0);' work by chance on
+architectures like amd64 where size_t expands to 'typedef long unsigned int
+size_t;'. However, on i386, size_t expands to 'typedef unsigned int size_t;'
+and thus -Wformat triggers a compilation error.
+
+To fix it, replace the format specifiers with the actual variable types.
+
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/formatstr-compat.patch]
+---
+ src/tools/image_verifier/ahab_image_verifier.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/tools/image_verifier/ahab_image_verifier.c b/src/tools/image_verifier/ahab_image_verifier.c
+index 17880ba..d7e73dd 100644
+--- a/src/tools/image_verifier/ahab_image_verifier.c
++++ b/src/tools/image_verifier/ahab_image_verifier.c
+@@ -671,7 +671,7 @@ static void verify_image(FILE *file, long file_size, long container_offset,
+     if (image->image_size > file_size)
+     {
+         fprintf(stderr,
+-                "Error: Invalid image size (image_size: %u, file_size: %zu).\n",
++                "Error: Invalid image size (image_size: %u, file_size: %li).\n",
+                 image->image_size, file_size);
+         return;
+     }
+@@ -1760,7 +1760,7 @@ static void parse_signature(FILE *file, long file_size, long container_offset,
+         (size_t) data_offset > file_size)
+     {
+         fprintf(stderr,
+-                "Error: Offset exceeds file size (file_size: %zu, "
++                "Error: Offset exceeds file size (file_size: %li, "
+                 "signature_offset: %ld, data_offset: %ld).\n",
+                 file_size, signature_offset, data_offset);
+         return;
+@@ -1770,7 +1770,7 @@ static void parse_signature(FILE *file, long file_size, long container_offset,
+     {
+         fprintf(
+             stderr,
+-            "Error: Invalid data length (data_length: %zu, file_size: %zu).\n",
++            "Error: Invalid data length (data_length: %zu, file_size: %li).\n",
+             data_length, file_size);
+         return;
+     }
+@@ -1779,7 +1779,7 @@ static void parse_signature(FILE *file, long file_size, long container_offset,
+     {
+         fprintf(stderr,
+                 "Error: Data range exceeds file bounds (data_offset: %ld, "
+-                "data_length: %zu, file_size: %zu).\n",
++                "data_length: %zu, file_size: %li).\n",
+                 data_offset, data_length, file_size);
+         return;
+     }
+@@ -1791,7 +1791,7 @@ static void parse_signature(FILE *file, long file_size, long container_offset,
+         fprintf(
+             stderr,
+             "Error: Signature offset is outside valid range (container_offset: "
+-            "%zu, file_size: %zu, signature_offset: %ld).\n",
++            "%li, file_size: %li, signature_offset: %ld).\n",
+             container_offset, file_size, signature_offset);
+         return;
+     }
+@@ -1829,7 +1829,7 @@ static void parse_signature(FILE *file, long file_size, long container_offset,
+ 
+     if (signature_length > MAX_SIGNATURE_LENGTH)
+     {
+-        fprintf(stderr, "Error: Invalid signature length: %ld\n",
++        fprintf(stderr, "Error: Invalid signature length: %zu\n",
+                 signature_length);
+         exit(EXIT_FAILURE);
+     }

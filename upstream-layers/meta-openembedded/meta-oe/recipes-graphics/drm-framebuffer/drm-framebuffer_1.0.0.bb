@@ -9,7 +9,7 @@ SRC_URI = "git://github.com/embear-engineering/drm-framebuffer;protocol=https;br
 
 SRCREV = "09df30960552f23d0fa7471be0caf7f095fcd522"
 
-inherit cmake pkgconfig 
+inherit cmake pkgconfig
 
 DEPENDS = "libdrm"
 

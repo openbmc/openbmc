@@ -12,6 +12,10 @@ LIC_FILES_CHKSUM = "file://IPA_Font_License_Agreement_v1.0.txt;md5=6cd3351ba979c
 SRC_URI = "https://launchpad.net/takao-fonts/trunk/15.03/+download/TakaoFonts_00303.01.tar.xz"
 SRC_URI[sha256sum] = "e9871f72ac69acb3e277aebbee7ca01fbebf54800733e29fafdc46133fc3552f"
 
+# Launchpad project dormant since the 15.03 release; the only published tarballs
+# are named TakaoFonts_00303.01, which is not comparable to PV 003.03.01.
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 S = "${UNPACKDIR}/TakaoFonts_00303.01"
 
 PACKAGES = "ttf-takao-pgothic ttf-takao-gothic ttf-takao-pmincho ttf-takao-mincho"

@@ -16,6 +16,10 @@ SRC_URI = "http://prdownloads.sourceforge.net/scsirastools/scsirastools-${PV}.ta
 "
 SRC_URI[sha256sum] = "e7b997e75decb06a650c42c35cd63d0c94c34e39cf133c723337b0eeabbfdf6a"
 
+# prdownloads.sourceforge.net has no browsable listing, use the SF files page
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/scsirastools/files/scsirastools/"
+UPSTREAM_CHECK_REGEX = "scsirastools-(?P<pver>\d+(\.\d+)+)\.tar\.gz"
+
 inherit autotools update-rc.d
 
 # mdadm Makefile has CC set to gcc, hence override CC to ${CC}

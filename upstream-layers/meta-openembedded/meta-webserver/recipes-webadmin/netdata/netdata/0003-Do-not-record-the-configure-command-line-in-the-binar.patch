@@ -1,0 +1,31 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 29 Jul 2026 20:00:00 +0000
+Subject: [PATCH] Do not record the configure command line in the binary
+
+The CONFIGURE_COMMAND string is baked into config.h and reported by
+"netdata -W buildinfo". In a cross build the collected flags contain
+--sysroot=, -ffile-prefix-map= and similar arguments that carry absolute
+host build paths, so the resulting binary embeds the build directory.
+That makes the build unreproducible and trips OE's buildpaths QA check.
+
+The string is purely informational, so report it as unavailable rather
+than leaking the build environment into the shipped binary.
+
+Upstream-Status: Inappropriate [embedded specific]
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -3397,7 +3397,7 @@
+         "-DCMAKE_SHARED_LINKER_FLAGS='${CMAKE_SHARED_LINKER_FLAGS}'"
+ )
+
+-string(JOIN " " CONFIGURE_COMMAND "cmake" ${CONFIGURE_OPTIONS})
++set(CONFIGURE_COMMAND "unavailable (stripped for reproducible builds)")
+
+ if (NOT NETDATA_USER)
+         set(NETDATA_USER "netdata")

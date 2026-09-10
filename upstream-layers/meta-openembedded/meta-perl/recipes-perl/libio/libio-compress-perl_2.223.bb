@@ -12,7 +12,7 @@ formats \
 "
 HOMEPAGE = "https://metacpan.org/release/IO-Compress"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README;beginline=8;endline=10;md5=a05fdd79b87a410b6178b73126ffafdd"
 

@@ -10,6 +10,8 @@ PYPI_PACKAGE = "python-uinput"
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
+DEPENDS += "python3-wheel-native"
+
 DEPENDS += "udev"
 RDEPENDS:${PN} += " \
     python3-ctypes \

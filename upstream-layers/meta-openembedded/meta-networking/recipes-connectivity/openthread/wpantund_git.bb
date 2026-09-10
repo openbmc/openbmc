@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 SUMMARY = "wpantund, Userspace WPAN Network Daemon"
 SECTION = "net"
-LICENSE = "Apache-2.0 & MIT & BSL-1.0 & BSD-3-Clause"
+LICENSE = "Apache-2.0 AND BSD-3-Clause AND BSL-1.0 AND MIT"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e7820bc7f7d1638a6b54fc2e8d7fb103 \
                     file://third_party/assert-macros/LICENSE;md5=cbf35ecdc8161026afe4da2906fab204 \
                     file://third_party/boost/LICENSE;md5=e4224ccaecb14d942c71d31bef20d78c \

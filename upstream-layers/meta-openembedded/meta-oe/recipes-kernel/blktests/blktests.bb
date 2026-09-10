@@ -10,6 +10,11 @@ SRC_URI = " \
 	git://github.com/osandov/blktests.git;nobranch=1;protocol=https \
 	"
 
+# Upstream repo carries no tags at all (releases are plain master commits) and
+# UPSTREAM_CHECK_COMMITS cannot work here because SRC_URI uses nobranch=1, so
+# there is no ref for latest_revision to resolve.
+UPSTREAM_VERSION_UNKNOWN = "1"
+
 
 inherit autotools-brokensep
 

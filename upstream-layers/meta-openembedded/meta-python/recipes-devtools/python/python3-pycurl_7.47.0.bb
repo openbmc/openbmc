@@ -7,7 +7,7 @@ be used to fetch objects identified by a URL from a Python program \
 SECTION = "devel/python"
 HOMEPAGE = "http://pycurl.io/"
 
-LICENSE = "LGPL-2.1-only | MIT"
+LICENSE = "LGPL-2.1-only OR MIT"
 LIC_FILES_CHKSUM = "file://COPYING-LGPL;md5=4fbd65380cdd255951079008b364516c \
                     file://COPYING-MIT;md5=be42e1b1e58c8d59c2901fd747bfc55d \
                     "
@@ -19,6 +19,8 @@ SRC_URI += " file://run-ptest"
 DEPENDS = "curl"
 
 inherit pypi python_setuptools_build_meta ptest
+
+DEPENDS += "python3-wheel-native"
 
 RDEPENDS:${PN}-ptest += " \
     python3-pytest \

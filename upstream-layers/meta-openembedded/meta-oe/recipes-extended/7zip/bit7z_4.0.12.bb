@@ -82,3 +82,6 @@ ALLOW_EMPTY:${PN} = "1"
 RDEPENDS:${PN}-ptest += "libstdc++ 7zip"
 # test data contains various file types with different architectures
 INSANE_SKIP:${PN}-ptest += "arch"
+
+CVE_STATUS[CVE-2026-45380] = "fixed-version: Fixed since 4.0.12"
+CVE_STATUS[CVE-2026-45384] = "fixed-version: Fixed since 4.0.12"

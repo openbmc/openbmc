@@ -32,8 +32,8 @@ index 8247cfd..b8d8547 100644
 +SRCS=	netcat.c atomicio.c socks.c base64.c
  
  PKG_CONFIG ?= pkg-config
--LIBS=  `$(PKG_CONFIG) --libs libbsd` -lresolv
-+LIBS=  `$(PKG_CONFIG) --libs libbsd`
+-LIBS ?= `$(PKG_CONFIG) --libs libbsd` -lresolv
++LIBS ?= `$(PKG_CONFIG) --libs libbsd`
  OBJS=  $(SRCS:.c=.o)
  CFLAGS=  -g -O2
  LDFLAGS=  -Wl,--no-add-needed
@@ -362,8 +362,8 @@ index a0fb51b..9c4ed23 100644
 +++ b/netcat.c
 @@ -239,6 +239,9 @@ char *proto_name(int, int);
  static int connect_with_timeout(int, const struct sockaddr *, socklen_t, int);
- static void quit();
- 
+ static void quit(int sig);
+
 +int    b64_ntop(u_char const *src, size_t srclength, char *target, size_t targsize);
 +int    b64_pton(char const *src, u_char *target, size_t targsize);
 +

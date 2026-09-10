@@ -9,7 +9,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/release/SMUELLER/ExtUtils-ParseXS-3.35"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=120;endline=129;md5=eb858f0e3b1b0bee0c05b86a474ae2b6"
 
 SRCNAME = "ExtUtils-ParseXS"

@@ -1,0 +1,87 @@
+From c3af69a818548c8b45c5cb7ac1ab782f63233ce4 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 16 Aug 2026 06:38:10 +0200
+Subject: [PATCH] ptest: skip tests broken by the websockets 17.0.1 client
+ API
+
+Three tests use client-side helper code that no longer matches the
+distro's pinned websockets==17.0.1:
+
+* test_headers calls websockets.client.connect() (the legacy
+  websockets.legacy.client API, which is still what the
+  "websockets.client" submodule resolves to). That legacy client
+  protocol's handshake is incompatible with the modern-only server
+  implementation uvicorn uses for the "websockets" and
+  "websockets-sansio" backends: the connection is closed before a
+  valid HTTP response is sent, so the client raises
+  "websockets.exceptions.InvalidMessage: did not receive a valid HTTP
+  response" for those two backends (all http_protocol_cls variants).
+  The wsproto backend is unaffected.
+
+* test_fragmented_message_exceeding_max_size and
+  test_fragmented_message_reassembly call websockets.connect() (the
+  new asyncio client) and then ws.write_frame(...) on the returned
+  ClientConnection. write_frame only exists on the legacy
+  WebSocketCommonProtocol; the new asyncio/sansio ClientConnection
+  never had it, so these fail with
+  "AttributeError: 'ClientConnection' object has no attribute
+  'write_frame'" for every backend combination.
+
+All three are plain client-side test-helper API mismatches against
+websockets 17.0.1, not uvicorn server bugs. Reproduced locally against
+the distro's exact pinned dependency versions (websockets==17.0.1,
+wsproto==1.3.2, h11==0.16.0, httptools==0.8.0), independent of qemu/
+target. Skipped to match this recipe's existing precedent in
+0001-ptest-disable-failing-tests.patch, which also skips fully
+parametrized tests based on only some combinations failing.
+
+Upstream-Status: Inappropriate (embedded specific)
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/protocols/test_websocket.py | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/tests/protocols/test_websocket.py b/tests/protocols/test_websocket.py
+index 87a151d..85eb362 100644
+--- a/tests/protocols/test_websocket.py
++++ b/tests/protocols/test_websocket.py
+@@ -204,6 +204,11 @@ async def test_close_connection(ws_protocol_cls: WSProtocol, http_protocol_cls:
+         assert not is_open
+
+
++# FAIL: tests/protocols/test_websocket.py:test_headers[websockets-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_headers[websockets-h11]
++# FAIL: tests/protocols/test_websocket.py:test_headers[websockets-sansio-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_headers[websockets-sansio-h11]
++@pytest.mark.skip(reason="failing on Yocto/OpenEmbedded")
+ async def test_headers(ws_protocol_cls: WSProtocol, http_protocol_cls: HTTPProtocol, unused_tcp_port: int):
+     class App(WebSocketResponse):
+         async def websocket_connect(self, message: WebSocketConnectEvent):
+@@ -758,6 +763,13 @@ async def test_send_binary_data_to_server_bigger_than_default_on_websockets(
+                 assert ws.close_code == expected_result
+
+
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_exceeding_max_size[wsproto-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_exceeding_max_size[wsproto-h11]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_exceeding_max_size[websockets-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_exceeding_max_size[websockets-h11]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_exceeding_max_size[websockets-sansio-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_exceeding_max_size[websockets-sansio-h11]
++@pytest.mark.skip(reason="failing on Yocto/OpenEmbedded")
+ async def test_fragmented_message_exceeding_max_size(
+     ws_protocol_cls: WSProtocol, http_protocol_cls: HTTPProtocol, unused_tcp_port: int
+ ):
+@@ -782,6 +794,13 @@ async def test_fragmented_message_exceeding_max_size(
+     assert exc_info.value.rcvd.code == 1009
+
+
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_reassembly[wsproto-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_reassembly[wsproto-h11]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_reassembly[websockets-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_reassembly[websockets-h11]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_reassembly[websockets-sansio-httptools]
++# FAIL: tests/protocols/test_websocket.py:test_fragmented_message_reassembly[websockets-sansio-h11]
++@pytest.mark.skip(reason="failing on Yocto/OpenEmbedded")
+ async def test_fragmented_message_reassembly(
+     ws_protocol_cls: WSProtocol, http_protocol_cls: HTTPProtocol, unused_tcp_port: int
+ ):

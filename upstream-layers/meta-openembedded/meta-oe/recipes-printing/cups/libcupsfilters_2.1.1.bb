@@ -13,5 +13,10 @@ SRC_URI[sha256sum] = "6c303e36cfde05a6c88fb940c62b6a18e7cdbfb91f077733ebc98f1049
 
 inherit autotools gettext pkgconfig github-releases
 
+# github-releases defaults GITHUB_BASE_URI to github.com/<BPN>/<BPN>, which 404s
+# for this project; releases live under the OpenPrinting org.
+GITHUB_BASE_URI = "https://github.com/OpenPrinting/${BPN}/releases/"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+
 FILES:${PN} += "${datadir}"
 RDEPENDS:${PN} += "ghostscript"

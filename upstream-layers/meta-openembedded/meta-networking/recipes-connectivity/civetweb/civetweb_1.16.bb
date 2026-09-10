@@ -8,6 +8,7 @@ SRCREV = "b6ef58f4c4c7fbe90fd1065bccf45b143345f1a6"
 PV .= "+git"
 SRC_URI = "git://github.com/civetweb/civetweb.git;branch=master;protocol=https \
            file://0001-Unittest-Link-librt-and-libm-using-l-option.patch \
+           file://0001-Fix-compilation-with-openssl-4.patch \
            "
 
 CVE_STATUS[CVE-2025-55763] = "fixed-version: The vulnerability is fixed in the used revision"

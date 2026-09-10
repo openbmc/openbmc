@@ -11,6 +11,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=815ca599c9df247a0c7f619bab123dad"
 BRANCH = "master"
 SRC_URI = "git://github.com/tomba/kmsxx.git;protocol=https;branch=${BRANCH}"
 SRCREV = "4a7836fe42a7bc0664d912246c5fbf17f240d152"
+
+# Upstream repo does not tag and publishes no releases
+UPSTREAM_CHECK_COMMITS = "1"
+
 PACKAGES =+ "${PN}-python"
 
 PACKAGECONFIG ?= "utils python "

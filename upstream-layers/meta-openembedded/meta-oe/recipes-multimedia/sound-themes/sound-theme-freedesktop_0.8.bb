@@ -1,6 +1,6 @@
 SUMMARY = "Freedesktop sound theme"
 HOMEPAGE = "http://freedesktop.org/wiki/Specifications/sound-theme-spec"
-LICENSE = "GPL-2.0-or-later & CC-BY-3.0 & CC-BY-SA-3.0"
+LICENSE = "CC-BY-3.0 AND CC-BY-SA-3.0 AND GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://CREDITS;md5=3213e601ce34bb42ddc3498903ac4e69"
 
 # glib-2.0 for glib-gettext.m4 which provides AM_GLIB_GNU_GETTEXT

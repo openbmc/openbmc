@@ -9,5 +9,5 @@ SRC_URI += "file://0001-downgrade-numpy-version-to-1.26.4.patch"
 
 SRC_URI[sha256sum] = "8f2bcedb786ba26c367a3680f9c4eb5b2ad9dccb2b34eaeb205e0a021e1dfb8d"
 
-DEPENDS = "python3-numpy-native virtual/crypt"
+DEPENDS = "python3-numpy-native virtual/crypt python3-wheel-native"
 RDEPENDS:${PN} = "python3-matplotlib python3-pillow python3-profile"

@@ -3,7 +3,7 @@ DESCRIPTION = "base64 encoding/decoding library - runtime library \
 libb64 is a library of ANSI C routines for fast encoding/decoding data into \
 and from a base64-encoded format"
 HOMEPAGE = "https://github.com/libb64"
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 LIC_FILES_CHKSUM = "file://LICENSE.md;md5=81296a564fa0621472714aae7c763d96"
 
 PV .= "+2.0.0.2+git"

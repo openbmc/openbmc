@@ -10,6 +10,10 @@ SRC_URI = "http://downloads.sourceforge.net/espeak/espeak-1.48.04-source.zip \
 "
 SRC_URI[sha256sum] = "bf9a17673adffcc28ff7ea18764f06136547e97bbd9edf2ec612f09b207f0659"
 
+# Tarballs live under per-minor-release directories (espeak-1.48/), not the top level
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/espeak/files/espeak/espeak-1.48/"
+UPSTREAM_CHECK_REGEX = "espeak-(?P<pver>\d+(\.\d+)+)-source\.zip"
+
 S = "${UNPACKDIR}/espeak-${PV}-source"
 
 DEPENDS = "portaudio-v19 qemu-helper-native"

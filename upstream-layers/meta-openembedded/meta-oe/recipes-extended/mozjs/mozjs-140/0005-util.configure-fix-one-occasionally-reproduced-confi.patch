@@ -1,0 +1,29 @@
+From fe1c2336dfe5e8b4357d5e382edd1eba30cfa7d7 Mon Sep 17 00:00:00 2001
+From: x <a@b.c>
+Date: Wed, 2 Sep 2026 20:23:10 +0000
+Subject: [PATCH] util.configure: fix one occasionally reproduced configure
+ failure
+
+try_invoke_compiler() creates its temporary files with the prefix "conftest",
+which collides with the files other configure checks create under the same
+name. Under parallel builds this occasionally makes a check pick up a stale
+file and fail. Use a distinct prefix.
+
+Upstream-Status: Pending
+---
+ build/moz.configure/util.configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/build/moz.configure/util.configure b/build/moz.configure/util.configure
+index 8d31d112a..cb0884496 100644
+--- a/build/moz.configure/util.configure
++++ b/build/moz.configure/util.configure
+@@ -169,7 +169,7 @@ normalize_path = normalize_path()
+ def make_create_temporary_file():
+     @contextmanager
+     def create_temporary_file(suffix):
+-        fd, path = mkstemp(prefix="conftest", suffix=suffix)
++        fd, path = mkstemp(prefix="try_invoke_compiler_conftest", suffix=suffix)
+         os.close(fd)
+         yield path
+         try:

@@ -8,4 +8,4 @@ SRC_URI[sha256sum] = "e6cd08c90292a11f30b8de401863dcde7bc66a671d8173f9066ebd15d9
 
 RDEPENDS:${PN} += "python3-profile python3-logging"
 
-inherit pypi python_hatchling python_poetry_core
+inherit pypi python_hatchling

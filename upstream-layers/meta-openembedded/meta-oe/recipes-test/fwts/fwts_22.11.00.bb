@@ -16,6 +16,11 @@ SRC_URI = "http://fwts.ubuntu.com/release/fwts-V${PV}.tar.gz;subdir=${BP} \
            "
 SRC_URI[sha256sum] = "4af4e1e0f1ae9313297af722d744ba47a81c81bc5bdeab3f4f40837a39e4b808"
 
+# fwts.ubuntu.com no longer serves a browsable release listing (port 80/443
+# both refuse/time out), so track the upstream git release tags instead.
+UPSTREAM_CHECK_URI = "https://github.com/fwts/fwts/tags"
+UPSTREAM_CHECK_REGEX = "releases/tag/V(?P<pver>\d+(\.\d+)+)"
+
 COMPATIBLE_HOST = "(i.86|x86_64|aarch64|powerpc64).*-linux"
 
 DEPENDS = "libpcre glib-2.0 dtc bison-native flex-native libbsd"

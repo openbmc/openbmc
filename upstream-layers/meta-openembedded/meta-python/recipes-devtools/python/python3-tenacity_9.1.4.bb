@@ -11,7 +11,6 @@ DEPENDS += "python3-setuptools-scm-native"
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
-PYPI_PACKAGE = "tenacity"
 
 RDEPENDS:${PN}-ptest += "\
     python3-tornado \

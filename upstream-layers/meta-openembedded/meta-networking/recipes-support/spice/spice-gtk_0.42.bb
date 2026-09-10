@@ -1,6 +1,6 @@
 SUMMARY = "A Gtk client and libraries for SPICE remote desktop servers."
 HOMEPAGE = "https://spice-space.org"
-LICENSE = "LGPL-2.1-only & BSD-3-Clause & GPL-2.0-only"
+LICENSE = "BSD-3-Clause AND GPL-2.0-only AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
 	file://COPYING;md5=4fbd65380cdd255951079008b364516c \
 	file://subprojects/spice-common/COPYING;md5=4b54a1fd55a448865a0b32d41598759d \

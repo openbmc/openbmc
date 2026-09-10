@@ -7,7 +7,7 @@ for digital audio."
 
 HOMEPAGE = "https://www.iis.fraunhofer.de/en/ff/amm/impl.html"
 
-LICENSE = "Fraunhofer_FDK_AAC_Codec_Library_for_Android"
+LICENSE = "LicenseRef-Fraunhofer-FDK-AAC-Codec-Library-for-Android"
 LICENSE_FLAGS = "commercial"
 LIC_FILES_CHKSUM = "file://NOTICE;md5=5985e1e12f4afa710d64ed7bfd291875"
 

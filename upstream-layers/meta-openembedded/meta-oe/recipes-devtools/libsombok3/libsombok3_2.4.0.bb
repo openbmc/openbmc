@@ -4,10 +4,10 @@ Unicode Standard Annex #14 (UAX #14).  East_Asian_Width informative \
 properties defined by Annex #11 (UAX #11) may be concerned to determin \
 breaking positions.  This package also implements "default" Grapheme \
 Cluster segmentation described in Annex #29 (UAX #29)."
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=5b122a36d0f6dc55279a0ebc69f3c60b"
 
-SRC_URI = "git://github.com/hatukanezumi/sombok.git;protocol=https;branch=master \
+SRC_URI = "git://github.com/hatukanezumi/sombok.git;protocol=https;branch=master;tag=sombok-${PV} \
            file://0001-configure.ac-fix-cross-compiling-issue.patch \
           "
 
@@ -16,6 +16,7 @@ inherit autotools-brokensep pkgconfig
 # sombok-2.4.0
 SRCREV = "0098d85a037ef5c99a648a3669a077781a45e8cc"
 
+UPSTREAM_CHECK_GITTAGREGEX = "sombok-(?P<pver>2(\.\d+)+)"
 
 # Disable libthai support
 EXTRA_OECONF = "--disable-libthai"

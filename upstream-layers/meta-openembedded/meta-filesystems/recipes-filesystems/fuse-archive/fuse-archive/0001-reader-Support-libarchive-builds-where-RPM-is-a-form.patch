@@ -1,0 +1,49 @@
+From 2d7f7e39af9d68360997434c7680a644d7127987 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Jul 2026 18:00:36 -0700
+Subject: [PATCH] reader: Support libarchive builds where RPM is a format
+
+libarchive is moving the RPM reader from a filter to a proper format
+(libarchive PR #2846), which drops archive_read_support_filter_rpm()
+from the public API in favour of archive_read_support_format_rpm().
+Distributions carrying that change (e.g. OpenEmbedded, which needs it
+for RPM 6 support) fail to build fuse-archive with:
+
+  lib/reader.cc:509:9: error: use of undeclared identifier
+      'archive_read_support_filter_rpm'
+
+Pick the available API at compile time. ARCHIVE_FORMAT_RPM is defined by
+archive.h only in versions that provide the new format entry point, so it
+is a reliable feature test.
+
+The new format appends the payload decompression filter itself based on
+the RPM PAYLOADCOMPRESSOR tag, so the remaining registrations are kept
+unchanged and stay harmless.
+
+Reported upstream - https://github.com/google/fuse-archive/issues/63
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ lib/reader.cc | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/lib/reader.cc b/lib/reader.cc
+index f336fa0..5bc3708 100644
+--- a/lib/reader.cc
++++ b/lib/reader.cc
+@@ -506,7 +506,13 @@ void Reader::SetRarFormat() {
+
+ void Reader::SetRpmFormat() {
+   Archive* const a = archive.get();
++#ifdef ARCHIVE_FORMAT_RPM
++  // Newer libarchive handles RPM as a format rather than as a filter, and
++  // appends the payload decompression filter itself.
++  Check(archive_read_support_format_rpm(a));
++#else
+   Check(archive_read_support_filter_rpm(a));
++#endif
+   Check(archive_read_support_filter_gzip(a));
+   Check(archive_read_support_filter_lzip(a));
+   Check(archive_read_support_filter_lzma(a));

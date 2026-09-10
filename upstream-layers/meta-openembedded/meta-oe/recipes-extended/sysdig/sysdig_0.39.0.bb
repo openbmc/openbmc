@@ -3,7 +3,7 @@ DESCRIPTION = "Sysdig is open source, system-level exploration: capture \
 system state and activity from a running Linux instance, then save, \
 filter and analyze."
 HOMEPAGE = "http://www.sysdig.org/"
-LICENSE = "Apache-2.0 & (MIT | GPL-2.0-only)"
+LICENSE = "Apache-2.0 AND (GPL-2.0-only OR MIT)"
 LIC_FILES_CHKSUM = "file://COPYING;md5=f8fee3d59797546cffab04f3b88b2d44"
 
 inherit cmake pkgconfig
@@ -60,17 +60,24 @@ EXTRA_OECMAKE = "\
                 -DUSE_BUNDLED_JSONCPP=OFF \
                 -DBUILD_SYSDIG_MODERN_BPF=OFF \
                 -DCREATE_TEST_TARGETS=OFF \
+                -DCURSES_INCLUDE_DIR=${STAGING_INCDIR} \
+                -DCURSES_LIBRARIES=${STAGING_LIBDIR}/libncurses.so\;${STAGING_LIBDIR}/libform.so \
 "
 
-# sysdig's chisel code does #include "lua.h". The recipe-sysroot also carries
-# stock Lua headers (openembedded-core lua installs lua.h into ${includedir}),
-# which are ABI-incompatible with the LuaJIT library sysdig links against: in
-# Lua >= 5.4.4 luaL_openlibs is a macro for luaL_openselectedlibs and
-# lua_setglobal/lua_pcallk are real symbols, none of which LuaJIT provides.
-# sysdig's luajit.cmake only honours LUA_INCLUDE_DIR in its stock-Lua fallback,
-# not when it finds LuaJIT, and the LuaJIT include dir does not win the search
-# order, so lua.h resolves to the stock header and the link fails. Put the
-# LuaJIT include dir first so its lua.h is used and matches the linked library.
+# sysdig's chisel code does #include "lua.h", but the only lua.h it must ever
+# resolve to is LuaJIT's (it links libluajit-5.1.so). The native sysroot also
+# ships a stock Lua header (lua-native pulls lua.h into
+# recipe-sysroot-native/usr/include), and in Lua >= 5.4.4 luaL_openlibs is a
+# macro for luaL_openselectedlibs while lua_setglobal/getglobal/pcallk are real
+# symbols, none of which LuaJIT provides -- so compiling chisel against it makes
+# the link fail with undefined Lua symbols.
+#
+# That native include dir leaks onto the target compile line because sysdig's
+# ncurses.cmake runs find_package(Curses), which resolves CURSES_INCLUDE_DIR to
+# the native sysroot (native also carries ncurses.h/form.h) and then does
+# include_directories(${CURSES_INCLUDE_DIR}), placing it ahead of the LuaJIT
+# include dir. Pin Curses to the target sysroot so the native dir (and its stray
+# lua.h) never reaches the target build; lua.h then resolves via LUAJIT_INCLUDE.
 #Add include dir to find driver_config.h
 CXXFLAGS:append = " -I${STAGING_INCDIR}/luajit-2.1 -I${WORKDIR}/driver_Make/driver/src"
 CFLAGS:append = " -I${STAGING_INCDIR}/luajit-2.1 -I${WORKDIR}/driver_Make/driver/src"

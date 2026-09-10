@@ -1,0 +1,103 @@
+From: Khem Raj <raj.khem@gmail.com>
+Date: Sun, 2 Aug 2026 00:00:00 +0000
+Subject: [PATCH] sigscheme: GC-protect the objects used by require
+
+uim-module-manager segfaults inside uim_init() while requiring key.scm:
+
+    #0  __strlen_evex ()
+    #1  make_loaded_str (filename=0x7e)
+    #2  scm_p_require ()
+    ...
+    #26 uim_scm_require_file ()
+    #29 uim_init ()
+
+scm_p_require() dereferences its FILENAME argument again after
+scm_require_internal() has run, and scm_require_internal() keeps
+LOADED_STR live across a nested scm_load().  Neither object is
+GC-protected.
+
+SigScheme's conservative collector only recognizes *tagged* ScmObj
+values: within_heapp() rejects any candidate word whose tag is not
+consistent with the cell it points to (SCM_TAG_CONSISTENTP()).  An
+optimizing compiler is free to keep only SCM_DROP_TAG(filename) and the
+interior "char *" returned by SCM_STRING_STR(), and gcc does exactly
+that here:
+
+    scm_p_require:
+        mov  %rdi,%rbp
+        and  $0xfffffffffffffff8,%rbp   # SCM_DROP_TAG(filename)
+        mov  0x0(%rbp),%r12             # SCM_STRING_STR(filename)
+        ...                             # no tagged copy is kept anywhere
+
+While the nested scm_load() runs, the string is therefore unreachable
+for the GC.  A cons allocation inside that load triggers a mark & sweep,
+the string cell is put on the free list (its body free()d by
+SCM_CELL_STRING_FIN()) and the cell is immediately recycled.  The
+following SCM_STRING_STR(filename) then returns whatever the new
+occupant stores in obj_x -- 0x7e above -- and strlen() faults:
+
+    before load: cell=0x7ffff7d5a090 obj_x=0x555555569180 "key.scm"
+    after  load: cell=0x7ffff7d5a090 obj_x=0x7e            <- recycled
+
+Whether this is hit depends purely on allocation timing, which is why it
+shows up for one build of uim and not for another built from the same
+sources on the same host.
+
+Protect the objects for as long as they are needed.
+
+Upstream-Status: Submitted [https://github.com/uim/uim/issues]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ sigscheme/src/module-sscm-ext.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+--- a/sigscheme/src/module-sscm-ext.c
++++ b/sigscheme/src/module-sscm-ext.c
+@@ -224,11 +224,15 @@
+ {
+     ScmObj loaded_str;
+ 
+-    loaded_str = make_loaded_str(filename);
++    /* scm_load() below can trigger a GC and the conservative collector only
++     * recognizes tagged ScmObj values, so protect LOADED_STR explicitly. */
++    scm_gc_protect_with_init(&loaded_str, make_loaded_str(filename));
+     if (!scm_providedp(loaded_str)) {
+         scm_load(filename);
+         scm_provide(loaded_str);
+     }
++    scm_gc_unprotect(&loaded_str);
++
+     return NULL;
+ }
+ 
+@@ -242,15 +246,28 @@
+ 
+     ENSURE_STRING(filename);
+ 
++    /* FILENAME is dereferenced again below and its body is handed to
++     * scm_load() as a plain char *.  Optimizing compilers keep only
++     * SCM_DROP_TAG(filename) and SCM_STRING_STR(filename) live, and
++     * within_heapp() rejects both, so without this explicit protection the
++     * string is swept (and its body free()d) by a GC triggered from the
++     * nested load. */
++    scm_gc_protect(&filename);
++
+     scm_require_internal(SCM_STRING_STR(filename));
+ 
+ #if SCM_COMPAT_SIOD
+-    loaded_str = make_loaded_str(SCM_STRING_STR(filename));
++    scm_gc_protect_with_init(&loaded_str,
++                             make_loaded_str(SCM_STRING_STR(filename)));
+     retsym = scm_intern(SCM_STRING_STR(loaded_str));
+     SCM_SYMBOL_SET_VCELL(retsym, SCM_TRUE);
++    scm_gc_unprotect(&loaded_str);
++    scm_gc_unprotect(&filename);
+ 
+     return retsym;
+ #else
++    scm_gc_unprotect(&filename);
++
+     return SCM_TRUE;
+ #endif
+ }

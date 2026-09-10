@@ -13,6 +13,5 @@ DEPENDS += "python3-setuptools-scm-native python3-hatch-fancy-pypi-readme-native
 RDEPENDS:${PN} += "python3-coverage python3-pytest python3-pluggy"
 
 PYPI_PACKAGE = "pytest_cov"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -8,6 +8,8 @@ SRC_URI = " \
 "
 
 SRCREV = "45eb2ffa5378396e85432872833890b0a1cba872"
+# Upstream repo has no tags/releases; track commits.
+UPSTREAM_CHECK_COMMITS = "1"
 
 
 inherit autotools

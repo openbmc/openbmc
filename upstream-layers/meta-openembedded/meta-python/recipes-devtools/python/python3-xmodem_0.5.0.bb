@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "a1a818f31c29412f1cab0cd69deccd7be77bc1feb516723af990d00161
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 do_install:append() {
     install -d ${D}${docdir}/${PN}
     mv ${D}${prefix}/doc/* ${D}${docdir}/${PN}/

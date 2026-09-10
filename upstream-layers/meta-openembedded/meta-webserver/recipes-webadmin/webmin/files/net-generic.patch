@@ -1,20 +1,30 @@
 Add support for configuring network interfaces on a generic linux system
 
+Refreshed for webmin 2.653 (upstream added alpine-linux to os_support).
+
 Upstream-Status: Inappropriate [config]
 
 Signed-off-by: Paul Eggleton <paul.eggleton@linux.intel.com>
---- a/net/module.info
-+++ b/net/module.info
-@@ -1,6 +1,6 @@
- name=Networking
- category=net
--os_support=solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
-+os_support=generic-linux solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
- desc=Network Configuration
- longdesc=Configure boot time and active interfaces, DNS, routing and /etc/hosts.
- readonly=1
+---
+ net/generic-linux-lib.pl | 2 ++
+ net/module.info          | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/generic-linux-lib.pl b/net/generic-linux-lib.pl
+new file mode 100644
 --- /dev/null
 +++ b/net/generic-linux-lib.pl
 @@ -0,0 +1,2 @@
 +do 'linux-lib.pl';
 +
+diff --git a/net/module.info b/net/module.info
+--- a/net/module.info
++++ b/net/module.info
+@@ -1,6 +1,6 @@
+ name=Networking
+ category=net
+-os_support=solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux alpine-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
++os_support=generic-linux solaris coherent-linux redhat-linux/5.0-* mandrake-linux united-linux suse-linux/6.0-* open-linux unixware turbo-linux/4.0 freebsd/3.2-* openbsd debian-linux/2.2-* cobalt-linux/2.2-* msc-linux gentoo-linux alpine-linux macos/1.5-* trustix-linux slackware-linux/8.0-* openmamba-linux cygwin windows pardus-linux
+ desc=Network Configuration
+ longdesc=Configure boot time and active interfaces, DNS, routing and /etc/hosts.
+ readonly=1

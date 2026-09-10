@@ -3,7 +3,7 @@ HOMEPAGE = "https://developers.google.com/protocol-buffers/"
 SECTION = "devel/python"
 # MIT license is from utf8_range although it's packaged without this information
 # https://github.com/protocolbuffers/protobuf/blob/main/third_party/utf8_range/LICENSE
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 LIC_FILES_CHKSUM = " \
     file://PKG-INFO;beginline=9;endline=9;md5=53dbfa56f61b90215a9f8f0d527c043d \
     file://utf8_range/utf8_range.h;beginline=1;endline=2;md5=f05b3ef36cc354d7134597075a1af64f \
@@ -50,3 +50,5 @@ do_install:append () {
     # https://github.com/python/cpython/issues/122220
     rm -f ${D}${PYTHON_SITEPACKAGES_DIR}/protobuf-*-nspkg.pth
 }
+
+CVE_STATUS[CVE-2024-7254] = "fixed-version: Fixed since 4.28.2"

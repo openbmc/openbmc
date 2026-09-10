@@ -13,4 +13,8 @@ PV = "1.0.1+git"
 SRCREV = "a0cec3b34fb112168aaae9fbb024e15302563b34"
 SRC_URI = "git://github.com/libimobiledevice/idevicerestore;protocol=https;branch=master"
 
+# PV tracks master, which is ahead of the only release tag (1.0.0), so a
+# tag-based check can never resolve >= PV.
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit autotools pkgconfig

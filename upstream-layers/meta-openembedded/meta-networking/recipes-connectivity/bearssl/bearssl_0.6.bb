@@ -30,7 +30,7 @@ SRC_URI = "git://www.bearssl.org/git/BearSSL;protocol=https;branch=master \
            "
 
 SONAME = "libbearssl.so.6"
-# without compile errors like 
+# without compile errors like
 # <..>/ld: build/obj/ghash_pclmul.o: warning: relocation against `br_ghash_pclmul' in read-only section `.text'
 CFLAGS += "-fPIC"
 

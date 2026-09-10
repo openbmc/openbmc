@@ -8,7 +8,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/release/NEILB/Text-Diff-1.45"
 
-LICENSE = "Artistic-1.0 | GPL-2.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9e795454c53c99fe48b8180eb5917b10"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/N/NE/NEILB/Text-Diff-${PV}.tar.gz \

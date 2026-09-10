@@ -1,0 +1,54 @@
+From 6109e8fc11f396d91c7fea8bf2dbf4aaf40af5af Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Thu, 6 Aug 2026 05:34:55 +0000
+Subject: [PATCH] zstd: disable the x86-64 BMI2 assembly fast loops
+
+thirdparty/zstd.cmake compiles huf_decompress.c but not the assembly
+file it pairs with, zstd/lib/decompress/huf_decompress_amd64.S. zstd
+selects the assembly fast loops in portability_macros.h whenever
+
+  !defined(ZSTD_DISABLE_ASM) && ZSTD_ASM_SUPPORTED &&
+  defined(__x86_64__) && (DYNAMIC_BMI2 || defined(__BMI2__))
+
+so setting DYNAMIC_BMI2=0 is not enough: any x86-64 build whose -march
+implies BMI2, such as -march=x86-64-v3, still takes that path and then
+fails to link:
+
+| ld.lld: error: undefined hidden symbol: HUF_decompress4X2_usingDTable_internal_fast_asm_loop
+| >>> referenced by huf_decompress.c:1739
+| >>>               thirdparty/apitrace.lto.libzstd_bundled.a(huf_decompress.c.o)
+| ld.lld: error: undefined hidden symbol: HUF_decompress4X1_usingDTable_internal_fast_asm_loop
+| >>> referenced by huf_decompress.c:917
+
+Plain -march=x86-64 does not define __BMI2__, which is why this only
+shows up on the more specific tunes.
+
+Define ZSTD_DISABLE_ASM so the C fast loops are used consistently. The
+alternative would be to add huf_decompress_amd64.S to the target and
+enable the ASM language, guarded to x86-64, but the C loops are already
+what every non-BMI2 build gets today.
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ thirdparty/zstd.cmake | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/thirdparty/zstd.cmake b/thirdparty/zstd.cmake
+index cb1e5851..84642916 100644
+--- a/thirdparty/zstd.cmake
++++ b/thirdparty/zstd.cmake
+@@ -40,6 +40,11 @@ target_compile_definitions(zstd_bundled PRIVATE
+ 
+     # Would be better to copy their logic for enabling this asm support.
+     DYNAMIC_BMI2=0
++
++    # huf_decompress_amd64.S is not built above, but zstd still selects the
++    # assembly fast loops whenever the compiler targets BMI2 (for example
++    # -march=x86-64-v3), which then fails to link. Keep the C fast loops.
++    ZSTD_DISABLE_ASM
+ )
+ 
+ target_optimize(zstd_bundled)
+-- 
+2.43.0
+

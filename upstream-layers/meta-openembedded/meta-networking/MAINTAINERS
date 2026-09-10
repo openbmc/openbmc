@@ -34,6 +34,10 @@ S:      Maintained
 F:      conf
 F:      recipes-*
 
+NANOMSG
+M:      Nate Kent <nate@nkent.net>
+F:      recipes-connectivity/nanomsg/
+
 OPENTHREAD
 M:      Stefan Schmidt <stefan@datenfreihafen.org>
 F:      recipes-connectivity/openthread/

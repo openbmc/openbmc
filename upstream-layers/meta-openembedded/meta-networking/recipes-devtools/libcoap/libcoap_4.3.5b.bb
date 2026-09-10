@@ -4,13 +4,16 @@ devices that are constrained their resources such as computing power, \
 RF range, memory, bandwith, or network packet sizes."
 HOMEPAGE = "https://libcoap.net/"
 
-LICENSE = "BSD-2-Clause & BSD-3-Clause"
+LICENSE = "BSD-2-Clause AND BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=05d17535846895e23ea4c79b16a9e904"
 
 SRC_URI = "git://github.com/obgm/libcoap.git;branch=release-4.3.5-patches;protocol=https;tag=v${PV} \
            file://run-ptest \
+           file://0001-OpenSSL-Support-4.0-and-later-builds.patch \
            "
 SRCREV = "851533c3cf63d16984d370ce39d586ecb3694971"
+
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+(\.\d+)+(?:[a-z]))"
 
 # patch releases often use alphabetical suffixes
 CVE_VERSION_SUFFIX = "alphabetical"
@@ -63,5 +66,6 @@ PACKAGE_BEFORE_PN += "\
 FILES:${PN}-bin = "${bindir}"
 FILES:${PN}-dev += "${datadir}/${BPN}/examples"
 
+CVE_STATUS[CVE-2023-51847] = "fixed-version: both introduced and fixed in 4.3.5"
 CVE_STATUS[CVE-2025-50518] = "disputed: happens only when library is used incorrectly"
 CVE_STATUS[CVE-2026-29013] = "fixed-version: fixed in 4.3.5b"

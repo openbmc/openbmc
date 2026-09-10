@@ -1,7 +1,7 @@
 DESCRIPTION = "Whetstone benchmark is a synthetic benchmark for evaluating the performance of computers"
 SUMMARY = "CPU benchmark to measure floating point performance"
 
-LICENSE = "PD"
+LICENSE = "LicenseRef-PD"
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/whetstone.c;beginline=1;endline=52;md5=c795edc15e7e1d92ca8f88ad718449f5"
 
 SRC_URI = "http://www.netlib.org/benchmark/whetstone.c"

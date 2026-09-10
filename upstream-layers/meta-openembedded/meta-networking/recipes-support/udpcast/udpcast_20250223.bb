@@ -7,7 +7,7 @@ multicast abilities: it won't take longer to install 15 machines than it would \
 to install just 2."
 HOMEPAGE = "http://www.udpcast.linux.lu/"
 SECTION = "console/network"
-LICENSE = "GPL-2.0-or-later & BSD-2-Clause"
+LICENSE = "BSD-2-Clause AND GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=e3cf524a29c8476be354bb329d36ff80"
 
 SRC_URI = "http://www.udpcast.linux.lu/download/${BP}.tar.gz \

@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "ac7742a6cc6c25a2c35e9292dfd554b897b517d2dec26891a2e8debf20
 
 inherit pypi python_setuptools_build_meta ptest-python-pytest
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN}-ptest += " \
         python3-sqlite3 \
 "

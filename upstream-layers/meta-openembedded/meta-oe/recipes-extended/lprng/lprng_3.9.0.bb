@@ -1,6 +1,6 @@
 SUMMARY = "An Enhanced Printer Spooler"
 SECTION = "console/utils"
-LICENSE = "GPL-2.0-only | Artistic-1.0"
+LICENSE = "Artistic-1.0 OR GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=c6570d8d699af1883db9d0e733ac9bfb"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz"

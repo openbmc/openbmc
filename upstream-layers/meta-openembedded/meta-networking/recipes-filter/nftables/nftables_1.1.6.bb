@@ -17,6 +17,9 @@ SRC_URI = "http://www.netfilter.org/projects/nftables/files/${BP}.tar.xz \
           "
 SRC_URI[sha256sum] = "372931bda8556b310636a2f9020adc710f9bab66f47efe0ce90bff800ac2530c"
 
+UPSTREAM_CHECK_URI = "https://www.netfilter.org/pub/nftables/"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)\.tar\.xz"
+
 inherit autotools manpages pkgconfig ptest python3native systemd
 
 PACKAGECONFIG ?= "python readline json ${@bb.utils.filter('DISTRO_FEATURES', 'systemd', d)}"

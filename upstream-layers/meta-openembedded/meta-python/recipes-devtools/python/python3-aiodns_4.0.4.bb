@@ -15,4 +15,7 @@ RDEPENDS:${PN} += " \
     python3-pycares \
 "
 
+CVE_PRODUCT = "aio-libs:aiodns"
+CVE_STATUS[CVE-2025-48945] = "cpe-incorrect: this CVE is for pycares, fixed in pycares 4.9.0"
+
 BBCLASSEXTEND = "native nativesdk"

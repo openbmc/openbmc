@@ -11,7 +11,8 @@ SRC_URI[sha256sum] = "752a96d0a59456511d933311d4a81f642cd668296eacd2561905727d5e
 
 inherit pypi python_setuptools_build_meta
 
-PYPI_PACKAGE = "exhale"
+DEPENDS += "python3-wheel-native"
+
 
 RDEPENDS:${PN} = "\
     python3-beautifulsoup4 \

@@ -3,7 +3,7 @@ DESCRIPTION = "Monocypher is an easy to use, easy to deploy, \
 auditable crypto library written in portable C. It approaches the size of TweetNaCl and the speed of libsodium."
 HOMEPAGE = "https://monocypher.org/"
 SECTION = "libs"
-LICENSE = "BSD-2-Clause | CC0-1.0"
+LICENSE = "BSD-2-Clause OR CC0-1.0"
 LIC_FILES_CHKSUM = "file://LICENCE.md;md5=ff30a1c41dfd9e6fa559a9e45ee98302"
 
 SRC_URI = "https://monocypher.org/download/${BPN}-${PV}.tar.gz"

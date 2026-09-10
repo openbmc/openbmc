@@ -16,6 +16,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/sipe/pidgin-sipe-${PV}.tar.xz \
 
 SRC_URI[sha256sum] = "738b121b11f2b3f1744150c00cb381222eb6cf67161a7742797eb4f03e64a2ba"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/sipe/files/sipe/"
+UPSTREAM_CHECK_REGEX = "pidgin-sipe-(?P<pver>\d+(\.\d+)+)/"
+
 PACKAGECONFIG ??= "nss krb5"
 PACKAGECONFIG[nss] = "--enable-nss=yes,--enable-nss=no,nss"
 PACKAGECONFIG[openssl] = "--enable-openssl=yes,--enable-openssl=no,openssl"

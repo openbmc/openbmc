@@ -1,7 +1,7 @@
 SUMMARY = "A Library to Access SMI MIB Information"
 HOMEPAGE = "https://www.ibr.cs.tu-bs.de/projects/libsmi"
 
-LICENSE = "BSD-3-Clause & TCL"
+LICENSE = "BSD-3-Clause AND TCL"
 LIC_FILES_CHKSUM = "file://COPYING;md5=3ad3076f9332343a21636cfd351f05b7"
 
 SRC_URI = "https://www.ibr.cs.tu-bs.de/projects/${BPN}/download/${BP}.tar.gz \
@@ -13,6 +13,9 @@ SRC_URI = "https://www.ibr.cs.tu-bs.de/projects/${BPN}/download/${BP}.tar.gz \
           "
 
 SRC_URI[sha256sum] = "f21accdadb1bb328ea3f8a13fc34d715baac6e2db66065898346322c725754d3"
+# Upstream download dir (ibr.cs.tu-bs.de) forbids scripted access and its newest
+# tarball is 0.4.8, below this recipe's 0.5.0 snapshot; no other release channel.
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 UPSTREAM_CHECK_URI = "https://repology.org/project/libsmi/information"
 UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)"

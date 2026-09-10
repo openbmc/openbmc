@@ -1,17 +1,15 @@
 SUMMARY = "USB Gadget neXt Configfs Library"
-LICENSE = "GPL-2.0-only & LGPL-2.1-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-only"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://COPYING.LGPL;md5=4fbd65380cdd255951079008b364516c"
 
 inherit autotools pkgconfig systemd update-rc.d update-alternatives
 
-PV = "0.2.0+git"
-SRCREV = "ec0b01c03fdc7893997b7b32ec1c12c6103f62f3"
+PV = "0.3.0"
+SRCREV = "dbedf16f80c5b4e1807ea4f80cc89d1f15d36f0a"
 SRCBRANCH = "master"
 SRC_URI = " \
-    git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH};protocol=https \
-    file://0001-libusbgx-Add-interface-name-for-NCM-Feature-Descript.patch \
-    file://0001-fix-stack-buffer-overflow-in-usbg_f_foo_attr_val-pro.patch \
+    git://github.com/libusbgx/libusbgx.git;branch=${SRCBRANCH};protocol=https;tag=libusbgx-v${PV} \
     file://gadget-start \
     file://gadget-stop \
     file://usbgx.initd \

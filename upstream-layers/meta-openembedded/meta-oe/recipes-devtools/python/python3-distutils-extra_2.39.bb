@@ -8,6 +8,11 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=4325afd396febcb659c36b49533135d4"
 SRC_URI = "https://launchpad.net/python-distutils-extra/trunk/${PV}/+download/python-distutils-extra-${PV}.tar.gz"
 SRC_URI[sha256sum] = "723f24f4d65fc8d99b33a002fbbb3771d4cc9d664c97085bf37f3997ae8063af"
 
+# The per-version +download directory derived from SRC_URI is not browsable;
+# the project-wide download page lists every release tarball.
+UPSTREAM_CHECK_URI = "https://launchpad.net/python-distutils-extra/+download"
+UPSTREAM_CHECK_REGEX = "python-distutils-extra-(?P<pver>\d+(\.\d+)+)\.tar\.gz"
+
 inherit setuptools3
 
 S = "${UNPACKDIR}/python-distutils-extra-${PV}"

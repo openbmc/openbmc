@@ -5,7 +5,7 @@ DESCRIPTION = "This module provides subroutines to read or write \
 "
 SECTION = "libs"
 HOMEPAGE = "https://metacpan.org/dist/File-Slurp"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://README.md;beginline=488;endline=493;md5=7ac91b9bf12fda89deba7383172cbefe"
 SRC_URI = "${CPAN_MIRROR}/authors/id/C/CA/CAPOEIRAB/File-Slurp-${PV}.tar.gz"

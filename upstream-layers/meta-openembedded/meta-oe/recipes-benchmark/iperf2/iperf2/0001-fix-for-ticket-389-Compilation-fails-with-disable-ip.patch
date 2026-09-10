@@ -1,0 +1,25 @@
+From ffc2004daf5e8335b7a87664426728f53fc7a5d0 Mon Sep 17 00:00:00 2001
+From: Robert McMahon <rjmcmahon@rjmcmahon.com>
+Date: Mon, 12 Jan 2026 10:14:08 -0800
+Subject: [PATCH] fix for ticket 389: Compilation fails with --disable-ipv6
+
+Upstream-Status: Backport [https://sourceforge.net/p/iperf2/code/ci/0fe3730e2c1d045077ac2cf76a796e95f3455952/]
+
+Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+---
+ src/iperf_multicast_api.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/iperf_multicast_api.c b/src/iperf_multicast_api.c
+index 48c0184d..06f3399d 100644
+--- a/src/iperf_multicast_api.c
++++ b/src/iperf_multicast_api.c
+@@ -176,7 +176,7 @@ static int iperf_multicast_join_v4_pi (struct thread_Settings *inSettings) {
+ 
+ static int iperf_multicast_join_v6 (struct thread_Settings *inSettings) {
+ #if (HAVE_DECL_IPV6_JOIN_GROUP || HAVE_DECL_IPV6_ADD_MEMBERSHIP)
+-#if HAVE_STRUCT_IPV6_MREQ
++#if (HAVE_IPV6 && HAVE_STRUCT_IPV6_MREQ)
+     struct ipv6_mreq mreq;
+     memcpy(&mreq.ipv6mr_multiaddr, SockAddr_get_in6_addr(&inSettings->multicast_group), sizeof(mreq.ipv6mr_multiaddr));
+     mreq.ipv6mr_interface = mcast_iface(inSettings);

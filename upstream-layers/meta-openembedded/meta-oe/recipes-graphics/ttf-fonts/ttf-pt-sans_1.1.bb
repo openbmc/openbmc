@@ -4,7 +4,7 @@ HOMEPAGE = "http://www.paratype.com/public/"
 
 SECTION = "x11/fonts"
 
-LICENSE = "ParaTypeFFL-1.3"
+LICENSE = "LicenseRef-ParaTypeFFL-1.3"
 LIC_FILES_CHKSUM = "file://${UNPACKDIR}/PT%20Free%20Font%20License_eng.txt;md5=d720f3a281ed81c3f4cfc465e11b1d0d"
 
 inherit allarch fontcache

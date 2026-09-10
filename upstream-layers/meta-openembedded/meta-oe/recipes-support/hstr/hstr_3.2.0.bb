@@ -14,7 +14,11 @@ S = "${UNPACKDIR}/${BPN}"
 
 SRC_URI[sha256sum] = "abf0a8625545b2022d62bf0d1c576e3cc783c4ea7cc2ae2843c518743f77f4c9"
 
-UPSTREAM_CHECK_URI = "https://github.com/dvorka/hstr/releases"
-UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
+# Upstream tags/release names are 2-component ("v3.2") while the tarball it
+# ships is 3-component ("hstr-3.2.0-tarball.tgz"), so a tag-based check always
+# resolves lower than PV. Check the release directory holding the tarballs
+# instead; bump it together with SRC_URI on upgrade.
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/hstr/files/v3.2/"
+UPSTREAM_CHECK_REGEX = "hstr-(?P<pver>\d+(\.\d+)+)-tarball\.tgz"
 
 inherit autotools pkgconfig bash-completion

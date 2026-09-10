@@ -1,7 +1,7 @@
 DESCRIPTION = "InfluxDB is a time series database designed to handle high write and query loads."
 HOMEPAGE = "https://www.influxdata.com/products/influxdb-overview/"
 
-LICENSE = "MIT & ${GO_MOD_LICENSES}"
+LICENSE = "MIT AND ${GO_MOD_LICENSES}"
 LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=f39a8d10930fb37bd59adabb3b9d0bd6"
 require ${BPN}-licenses.inc
 

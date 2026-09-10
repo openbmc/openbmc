@@ -10,5 +10,4 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=ee157eec4b228c8d5b7a6e0feab2864a"
 
 SRC_URI[sha256sum] = "eb6dc23601be359ee00f5a3d31a46adf3bad0a16f8d60af216cd67982ca75cf4"
 
-PYPI_PACKAGE = "tinyrecord"
 inherit pypi setuptools3

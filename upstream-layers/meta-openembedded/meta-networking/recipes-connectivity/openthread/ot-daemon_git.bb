@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 SUMMARY = "OpenThread Daemon is an OpenThread POSIX build mode that runs OpenThread as a service."
 SECTION = "net"
-LICENSE = "BSD-3-Clause & Apache-2.0"
+LICENSE = "Apache-2.0 AND BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=543b6fe90ec5901a683320a36390c65f \
                     file://third_party/mbedtls/repo/LICENSE;md5=379d5819937a6c2f1ef1630d341e026d \
                     "

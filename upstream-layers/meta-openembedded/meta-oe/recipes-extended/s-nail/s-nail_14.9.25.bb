@@ -2,7 +2,7 @@ SUMMARY = "Feature-rich BSD mail(1)"
 HOMEPAGE = "https://www.sdaoden.eu/code.html#s-mailx"
 SECTION = "console/network"
 
-LICENSE = "ISC & BSD-3-Clause & BSD-4-Clause"
+LICENSE = "BSD-3-Clause AND BSD-4-Clause AND ISC"
 LIC_FILES_CHKSUM = "file://COPYING;md5=87266591c81260f10221f1f38872d023"
 
 SRC_URI = "https://ftp.sdaoden.eu/${BP}.tar.xz \

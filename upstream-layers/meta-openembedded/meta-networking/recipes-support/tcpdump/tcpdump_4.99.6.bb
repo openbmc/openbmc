@@ -52,3 +52,5 @@ do_install:append() {
 do_compile_ptest() {
     oe_runmake buildtest-TESTS
 }
+
+CVE_STATUS[CVE-2024-2397] = "fixed-version: Fixed since 4.99.5"

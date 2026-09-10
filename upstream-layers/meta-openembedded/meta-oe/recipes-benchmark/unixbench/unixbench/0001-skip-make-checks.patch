@@ -1,0 +1,32 @@
+From: Vaibhav Jindal <vaibjind@qti.qualcomm.com>
+Date: Mon, 1 Jan 2024 00:00:00 +0000
+Subject: [PATCH] Skip make checks for prebuilt Yocto package
+
+The UnixBench Run script expects a source tree and invokes
+'make check' and 'make all'. In Yocto, binaries are prebuilt
+during do_compile() and only runtime artifacts are installed.
+Skip the build verification step.
+
+Upstream-Status: Inappropriate [cross-compilation]
+
+diff --git a/UnixBench/Run b/UnixBench/Run
+index 898eb5c..fb24263 100755
+--- a/UnixBench/Run
++++ b/UnixBench/Run
+@@ -1037,16 +1037,6 @@ sub preChecks {
+     # Set the language.
+     $ENV{'LANG'} = $language;
+ 
+-    # Check that the required files are in the proper places.
+-    my $make = $ENV{MAKE} || "make";
+-    system("$make check");
+-    if ($? != 0) {
+-        system("$make all");
+-        if ($? != 0) {
+-            abortRun("\"$make all\" failed");
+-        }
+-    }
+-
+     # Create a script to kill this run.
+     system("echo \"kill -9 $$\" > \"${TMPDIR}/kill_run\"");
+     chmod(0755, $TMPDIR . "/kill_run");

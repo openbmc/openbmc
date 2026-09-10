@@ -1,0 +1,43 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Subject: swig/python/OpenIPMI_lang.i: add py2/py3 C-API compat macros
+
+The Python-language SWIG typemaps use the Python 2 C-API names
+PyInt_Check/PyInt_AsLong/PyInt_FromLong/PyString_FromString(AndSize).
+Python 3.14 no longer ships any fallback definitions for them, so the
+generated OpenIPMI_wrap.c fails to compile:
+
+  OpenIPMI_wrap.c:13486:10: error: use of undeclared identifier 'PyInt_Check'
+  OpenIPMI_wrap.c:14950:21: error: use of undeclared identifier 'PyString_FromString'; did you mean 'PyLong_FromString'?
+
+Map them to their Python 3 equivalents.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/swig/python/OpenIPMI_lang.i
++++ b/swig/python/OpenIPMI_lang.i
+@@ -31,6 +31,24 @@
+  *  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+
++%{
++#ifndef PyInt_Check
++#define PyInt_Check(x) PyLong_Check(x)
++#endif
++#ifndef PyInt_AsLong
++#define PyInt_AsLong(x) PyLong_AsLong(x)
++#endif
++#ifndef PyInt_FromLong
++#define PyInt_FromLong(x) PyLong_FromLong(x)
++#endif
++#ifndef PyString_FromString
++#define PyString_FromString(x) PyUnicode_FromString(x)
++#endif
++#ifndef PyString_FromStringAndSize
++#define PyString_FromStringAndSize(x, n) PyUnicode_FromStringAndSize(x, n)
++#endif
++%}
++
+ %typemap(in) swig_cb * {
+     if ($input == Py_None)
+ 	$1 = NULL;

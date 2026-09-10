@@ -21,3 +21,7 @@ DEPENDS += "ncurses"
 SRC_URI = "http://downloads.sourceforge.net/project/cscope/cscope/v${PV}/${BP}.tar.gz"
 
 SRC_URI[sha256sum] = "c5505ae075a871a9cd8d9801859b0ff1c09782075df281c72c23e72115d9f159"
+
+# Tarballs live in per-version subdirectories; newer ones are prefixed with "v"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/cscope/files/cscope/"
+UPSTREAM_CHECK_REGEX = "cscope/v?(?P<pver>\d+(\.\d+)+)/"

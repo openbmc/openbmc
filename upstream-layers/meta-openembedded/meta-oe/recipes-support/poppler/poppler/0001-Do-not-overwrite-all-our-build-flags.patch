@@ -14,10 +14,10 @@ Signed-off-by: Andreas Müller <schnitzeltony@gmail.com>
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/cmake/modules/PopplerMacros.cmake b/cmake/modules/PopplerMacros.cmake
-index 2aed028..3c30f3f 100644
+index df03671..895ac19 100644
 --- a/cmake/modules/PopplerMacros.cmake
 +++ b/cmake/modules/PopplerMacros.cmake
-@@ -117,13 +117,13 @@ if(CMAKE_COMPILER_IS_GNUCXX)
+@@ -116,13 +116,13 @@ if(CMAKE_COMPILER_IS_GNUCXX)
    set(DEFAULT_COMPILE_WARNINGS "${_warn}")
    set(DEFAULT_COMPILE_WARNINGS_EXTRA "${_warn} ${_warnx}")
  
@@ -33,12 +33,12 @@ index 2aed028..3c30f3f 100644
    set(CMAKE_C_FLAGS_RELWITHDEBINFO   "-O2 -g")
    set(CMAKE_C_FLAGS_RELEASE          "-O2 -DNDEBUG")
    set(CMAKE_C_FLAGS_DEBUG            "-g -O2 -fno-reorder-blocks -fno-schedule-insns -fno-inline")
-@@ -161,14 +161,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-   set(DEFAULT_COMPILE_WARNINGS "${_warn}")
+@@ -160,14 +160,14 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
    set(DEFAULT_COMPILE_WARNINGS_EXTRA "${_warn} ${_warnx}")
  
--  set(CMAKE_CXX_FLAGS                "-fno-exceptions -fno-check-new -fno-common -D_DEFAULT_SOURCE")
-+  set(CMAKE_CXX_FLAGS                "-fno-exceptions -fno-check-new -fno-common -D_DEFAULT_SOURCE ${_save_cxxflags}")
+   add_compile_options("-fno-check-new")
+-  set(CMAKE_CXX_FLAGS                "-fno-exceptions -fno-common -D_DEFAULT_SOURCE")
++  set(CMAKE_CXX_FLAGS                "-fno-exceptions -fno-common -D_DEFAULT_SOURCE ${_save_cxxflags}")
    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
    set(CMAKE_CXX_FLAGS_RELEASE        "-O2 -DNDEBUG")
    # clang does not support -fno-reorder-blocks -fno-schedule-insns, so do not use -O2
@@ -52,4 +52,3 @@ index 2aed028..3c30f3f 100644
    # clang does not support -fno-reorder-blocks -fno-schedule-insns, so do not use -O2
 -- 
 2.25.1
-

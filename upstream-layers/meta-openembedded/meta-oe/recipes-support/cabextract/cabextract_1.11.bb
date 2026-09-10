@@ -13,6 +13,9 @@ SRC_URI = "\
 
 SRC_URI[sha256sum] = "b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6"
 
+UPSTREAM_CHECK_URI = "https://github.com/kyz/libmspack/tags"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
+
 DEPENDS = "libmspack"
 
 EXTRA_OECONF = "--with-external-libmspack"

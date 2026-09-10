@@ -8,7 +8,6 @@ inherit pypi setuptools3
 SRC_URI[sha256sum] = "fbc676aaedc8ec542056c21e5e206b8b62b8d11c3f3c5cfb32b273936da89604"
 
 PYPI_PACKAGE = "dynamic_dispatch"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += "python3-setuptools-scm-native"
 RDEPENDS:${PN} += "\

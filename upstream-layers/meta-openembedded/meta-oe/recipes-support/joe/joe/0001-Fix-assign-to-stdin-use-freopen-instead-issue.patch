@@ -1,0 +1,31 @@
+From 0be9f4f2b7c4202b183f65aa65ecfd32f565385d Mon Sep 17 00:00:00 2001
+From: Joe Allen <jhallenworld@gmail.com>
+Date: Wed, 6 May 2026 09:34:34 -0400
+Subject: [PATCH] Fix assign to stdin, use freopen instead issue
+
+Upstream-Status: Backport [0be9f4f2b7c4202b183f65aa65ecfd32f565385d]
+Signed-off-by: Max Krummenacher <max.oss.09@gmail.com>
+
+---
+ joe/main.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/joe/main.c b/joe/main.c
+index bfbfb90711e8..61f0324ee094 100644
+--- a/joe/main.c
++++ b/joe/main.c
+@@ -755,7 +755,10 @@ int main(int argc, char **real_argv, const char * const *envv)
+ 			/* Close stdin, so that if user kills the copying the program feeding stdin sees a SIGPIPE */
+ 			/* It won't if there are any extra file descriptors open */
+ 			fclose(stdin);
+-			stdin = fopen("/dev/tty", "rb");
++			if (!freopen("/dev/tty", "rb", stdin))
++			{
++				/* This should not fail */
++			}
+ 		}
+ 	}
+ 
+-- 
+2.51.0
+

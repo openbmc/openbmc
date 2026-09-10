@@ -15,6 +15,9 @@ SRC_URI = "git://git.kernel.org/pub/scm/linux/kernel/git/gong.chen/aer-inject.gi
 "
 SRCREV = "9bd5e2c7886fca72f139cd8402488a2235957d41"
 
+# Upstream kernel.org repo carries no tags and publishes no release tarballs
+UPSTREAM_CHECK_COMMITS = "1"
+
 
 DEPENDS = "bison-native"
 

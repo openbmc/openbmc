@@ -1,0 +1,27 @@
+From 65d2d8a7c335dd6a815aaa37bf954b2862852949 Mon Sep 17 00:00:00 2001
+From: Michal Sieron <michal.sieron@nokia.com>
+Date: Thu, 20 Aug 2026 09:54:37 +0200
+Subject: [PATCH] Makefile.am: Don't build deprecated ntpdate
+
+ntpdate has been deprecated. meta-openembedded@6315006aadd in theory
+dropped it, but in practice the binary was still being built and
+shipped, but now as part of ntp-utils package.
+To avoid this, let's patch it out of the build.
+
+Upstream-Status: Inappropriate [OE specific]
+---
+ Makefile.am | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 1967f98a0..5b49acee0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -11,7 +11,6 @@ SUBDIRS =		\
+ 	sntp		\
+ 	libparse	\
+ 	ntpd		\
+-	ntpdate		\
+ 	ntpdc		\
+ 	ntpq		\
+ 	ntpsnmpd	\

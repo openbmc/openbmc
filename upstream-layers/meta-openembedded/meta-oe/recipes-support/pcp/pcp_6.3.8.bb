@@ -80,7 +80,7 @@ do_compile:prepend() {
 }
 
 do_compile() {
-        oe_runmake default_pcp 
+        oe_runmake default_pcp
 }
 
 do_install () {
@@ -115,7 +115,7 @@ PACKAGES =+ " ${PN}-export-zabbix-agent ${PN}-testsuite \
 FILES:libpcp-gui2 = "${libdir}/libpcp_gui.so.2 \
 "
 FILES:libpcp-archive1 = "${libdir}/libpcp_archive.so.1 \
-"	
+"
 FILES:libpcp-gui2-dev = " \
 	${libdir}/libpcp_gui.so \
 	${libdir}/libpcp_gui.a \

@@ -1,7 +1,7 @@
 DESCRIPTION = "Google gRPC"
 HOMEPAGE = "https://www.grpc.io/"
 SECTION = "devel/python"
-LICENSE = "Apache-2.0 & BSD-3-Clause & MPL-2.0 & MIT & BSD-2-Clause"
+LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND MIT AND MPL-2.0"
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=731e401b36f8077ae0c134b59be5c906 \
     file://third_party/utf8_range/utf8_validity.h;beginline=1;endline=5;md5=db08ddb5817e660489678e7c3653805a \
@@ -11,6 +11,7 @@ LIC_FILES_CHKSUM = " \
 DEPENDS += "c-ares openssl python3-protobuf re2 zlib"
 
 SRC_URI += "file://0001-python-enable-unbundled-cross-compilation.patch \
+           file://0001-Fix-OpenSSL-4.0-compatibility.patch \
            file://abseil-ppc-fixes.patch \
            "
 SRC_URI[sha256sum] = "7382b95189546f375c174f53a5fa873cef91c4b8005faa05cc5b3beea9c4f1c5"
@@ -19,6 +20,8 @@ RDEPENDS:${PN} = "python3-protobuf python3-typing-extensions"
 
 inherit python_setuptools_build_meta cython
 inherit pypi
+
+DEPENDS += "python3-wheel-native"
 
 CFLAGS:append:libc-musl = " -D_LARGEFILE64_SOURCE"
 
@@ -51,3 +54,5 @@ CCACHE_DISABLE = "1"
 
 CVE_PRODUCT += "grpc:grpc"
 CVE_STATUS[CVE-2026-33186] = "cpe-incorrect: the vulnerabilty affects only the go implementation"
+CVE_STATUS[CVE-2023-33953] = "fixed-version: Fixed since 1.56.2"
+CVE_STATUS[CVE-2024-37168] = "cpe-incorrect: This CVE is for grps-js"

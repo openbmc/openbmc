@@ -7,6 +7,10 @@ SRCREV = "a4b17d543f072d2e3ba564e4bc5c3a0d2b05c338"
 
 SRC_URI = "git://github.com/ArashPartow/exprtk.git;branch=release;protocol=https"
 
+# PV is just "git", so it can never be compared against the upstream 0.0.x
+# tags. SRCREV is pinned to the release branch HEAD (== tag 0.0.3).
+UPSTREAM_CHECK_COMMITS = "1"
+
 
 # other packages commonly reference the file directly as "exprtk.hpp"
 # create symlink to allow this usage

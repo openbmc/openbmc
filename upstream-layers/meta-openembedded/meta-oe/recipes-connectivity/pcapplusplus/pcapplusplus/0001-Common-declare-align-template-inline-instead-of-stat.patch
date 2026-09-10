@@ -1,0 +1,34 @@
+From fe044dbd8459924558c0965833b8f1e78c8921ea Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Sep 2026 02:16:00 +0000
+Subject: [PATCH] Common++: declare align() template inline instead of static
+
+Newer clang (23+) enables -Wunused-template for namespace-scope static
+function templates defined in headers, which fails the -Werror build for
+every translation unit that includes GeneralUtils.h without using
+align():
+
+  Common++/header/GeneralUtils.h:50:38: error: unused function template 'align' [-Werror,-Wunused-template]
+
+Declare it inline instead; that is the correct linkage for a template
+defined in a header and does not trigger the warning.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ Common++/header/GeneralUtils.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Common++/header/GeneralUtils.h b/Common++/header/GeneralUtils.h
+index 060acb4c..ba5428d6 100644
+--- a/Common++/header/GeneralUtils.h
++++ b/Common++/header/GeneralUtils.h
+@@ -47,7 +47,7 @@ namespace pcpp
+ 	/// Calculates alignment.
+ 	/// @param[in] number Given number
+ 	/// @return The aligned number
+-	template <int alignment> static int align(int number)
++	template <int alignment> inline int align(int number)
+ 	{
+ 		// Only works for alignment with power of 2
+ 		constexpr bool isPowerOfTwo = alignment && ((alignment & (alignment - 1)) == 0);

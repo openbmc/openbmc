@@ -7,6 +7,7 @@ LIC_FILES_CHKSUM = "file://gpl_license.txt;md5=11c7b65c4a4acb9d5175f7e9bf99c403"
 SRCREV = "4651194df5f985ebfc989da0a20d62b9baecf314"
 SRC_URI = "git://github.com/arno-iptables-firewall/aif;branch=master;protocol=https;tag=${PV}"
 
+UPSTREAM_CHECK_GITTAGREGEX = "(?P<pver>\d+(\.\d+)+(?:[a-z]))"
 
 inherit systemd
 

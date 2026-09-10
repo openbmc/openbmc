@@ -1,0 +1,32 @@
+From 20473b50925ede8a00c19be50ad8d6ae77b37fd9 Mon Sep 17 00:00:00 2001
+From: Zheng Ruoqin <zhengrq.fnst@fujitsu.com>
+Date: Tue, 18 Aug 2026 12:43:22 +0900
+Subject: [PATCH] Fix permissions after generating certificates with make
+
+To fix Permissions denied error
+
+Upstream-Status: Inappropriate [embedded specific]
+
+Signed-off-by: Zheng Ruoqin <zhengrq.fnst@fujitsu.com>
+---
+ raddb/certs/bootstrap | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/raddb/certs/bootstrap b/raddb/certs/bootstrap
+index 4641c71700..37e0469e41 100755
+--- a/raddb/certs/bootstrap
++++ b/raddb/certs/bootstrap
+@@ -29,7 +29,9 @@ make -h > /dev/null 2>&1
+ #
+ if [ "$?" = "0" ]; then
+   make all
+-  exit $?
++  ret=$?
++  chown root:radiusd ca.* client.* server.*
++  exit $ret
+ fi
+ 
+ #
+-- 
+2.43.0
+

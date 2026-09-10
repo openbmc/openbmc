@@ -4,7 +4,7 @@ HOMEPAGE    = "https://pipewire.org/"
 BUGTRACKER  = "https://gitlab.freedesktop.org/pipewire/pipewire/issues"
 SECTION     = "multimedia"
 
-LICENSE = "MIT & LGPL-2.1-or-later & GPL-2.0-only"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-or-later AND MIT"
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=2158739e172e58dc9ab1bdd2d6ec9c72 \
     file://COPYING;md5=97be96ca4fab23e9657ffa590b931c1a \
@@ -17,6 +17,7 @@ BRANCH = "${@oe.utils.trim_version('${PV}', 2)}"
 SRC_URI = "git://gitlab.freedesktop.org/pipewire/pipewire.git;branch=${BRANCH};protocol=https;tag=${PV}"
 SRC_URI += "file://0001-pipewire-compress-offload.patch"
 SRC_URI += "file://0002-spa-plugins-alsa-acp-compat.h-p-is-already-const-do-.patch"
+SRC_URI += "file://0003-tools-add-pw-voiceui-SVA-voice-UI-control-listen-cl.patch"
 
 inherit meson pkgconfig systemd gettext useradd
 
@@ -331,6 +332,7 @@ FILES:${PN}-tools = " \
     ${bindir}/pw-reserve \
     ${bindir}/pw-sysex \
     ${bindir}/pw-top \
+    ${bindir}/pw-voiceui \
 "
 
 # This is a shim daemon that is intended to be used as a

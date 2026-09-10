@@ -7,9 +7,10 @@ SRC_URI[sha256sum] = "35c3f2a4172b33136ab9f6b3ef1c00260dd2f66f858f24d88418a015f4
 
 inherit pypi python_poetry_core
 
+PACKAGECONFIG ?= "pillow png"
+PACKAGECONFIG[pillow] = ",,,python3-pillow"
+PACKAGECONFIG[png] = ",,,python3-pypng"
+
 RDEPENDS:${PN} = " \
-    python3-six \
-    python3-pillow \
-    python3-pypng \
     python3-typing-extensions \
 "

@@ -1,5 +1,5 @@
 SUMMARY = "GNOME terminal"
-LICENSE = "GPL-3.0-only & GFDL-1.3"
+LICENSE = "GFDL-1.3-no-invariants-only AND GPL-3.0-only"
 LIC_FILES_CHKSUM = " \
     file://COPYING;md5=f27defe1e96c2e1ecd4e0c9be8967949 \
     file://COPYING.GFDL;md5=a22d0be1ce2284b67950a4d1673dd1b0 \

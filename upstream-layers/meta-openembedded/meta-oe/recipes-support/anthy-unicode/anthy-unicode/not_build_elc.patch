@@ -1,0 +1,23 @@
+Upstream-Status: Inappropriate [cross-compile specific]
+
+Do not byte-compile the Emacs lisp files at build time; there is no target
+Emacs available under cross compilation. The .el sources are still shipped.
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+
+diff --git a/src-util/Makefile.am b/src-util/Makefile.am
+index c51c076..7ccad01 100644
+--- a/src-util/Makefile.am
++++ b/src-util/Makefile.am
+@@ -16,10 +16,7 @@ bin_PROGRAMS = \
+     anthy-agent-unicode \
+     anthy-morphological-analyzer-unicode \
+     $(NULL)
+-ELCFILES = anthy-unicode.elc anthy-unicode-azik.elc anthy-unicode-conf.elc \
+-    anthy-unicode-dic.elc anthy-unicode-isearch.elc anthy-unicode-kyuri.elc \
+-    leim-list.elc \
+-    $(NULL)
++ELCFILES =
+ if ELISP
+ lisp_LISP = $(ELISP_FILES)
+ endif

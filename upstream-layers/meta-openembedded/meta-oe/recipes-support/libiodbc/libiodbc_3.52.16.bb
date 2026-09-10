@@ -7,7 +7,7 @@ royalties to other parties. \
 
 HOMEPAGE = "http://www.iodbc.org/"
 
-LICENSE = "LGPL-2.0-only | BSD-2-Clause"
+LICENSE = "BSD-2-Clause OR LGPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE.LGPL;md5=8c0138a8701f0e1282f5c8b2c7d39114 \
                     file://LICENSE.BSD;md5=5b36348a404e1d65b57df8d33fd6e414 \
                     "

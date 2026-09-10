@@ -1,17 +1,17 @@
-LICENSE = "Apache-2.0 & BSD-3-Clause & MIT & Zlib"
+LICENSE = "Apache-2.0 AND BSD-3-Clause AND MIT AND Zlib"
 
-LIC_FILES_CHKSUM = "file://LICENSE;md5=c0c9924c5c63b4834b8b1959816c8e3b \
+LIC_FILES_CHKSUM = "file://LICENSE;md5=3b06e43f2e368eb8663632d529232353 \
                     file://buildtools/libcxx/LICENSE.TXT;md5=55d89dd7eec8d3b4204b680e27da3953 \
                     file://buildtools/libcxxabi/LICENSE.TXT;md5=7b9334635b542c56868400a46b272b1e \
                     file://buildtools/libunwind/LICENSE.TXT;md5=f66970035d12f196030658b11725e1a1 \
                     file://buildtools/protobuf/LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b \
                     file://buildtools/zlib/LICENSE;md5=8c75f2b4df47a77f9445315a9500cd1c \
-                    file://debian/copyright;md5=55b18749ff89714316c007d06f305c4a \
                     file://python/LICENSE;md5=c602a632c34ade9c78a976734077bce7"
 
 # Dependencies from perfetto/tools/install-build-deps
 SRC_URI:append = " \
-           git://github.com/protocolbuffers/protobuf.git;branch=main;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/protobuf;name=protobuf \
+           git://github.com/protocolbuffers/protobuf.git;branch=31.x;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/protobuf;name=protobuf \
+           git://github.com/abseil/abseil-cpp.git;branch=lts_2025_05_12;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/abseil-cpp;name=abseil \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxx.git;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/libcxx;branch=main;name=libcxx \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libcxxabi.git;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/libcxxabi;branch=main;name=libcxxabi \
            git://chromium.googlesource.com/external/github.com/llvm/llvm-project/libunwind.git;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/libunwind;branch=main;name=libunwind \
@@ -24,6 +24,7 @@ SRC_URI:append = " \
            git://chromium.googlesource.com/chromium/src/third_party/zlib.git;nobranch=1;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zlib;name=zlib \
            git://android.googlesource.com/platform/external/lzma.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/lzma;name=lzma \
            git://android.googlesource.com/platform/external/zstd.git;branch=master;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/zstd;name=zstd \
+           git://chromium.googlesource.com/external/github.com/google/re2.git;nobranch=1;protocol=https;destsuffix=${BB_GIT_DEFAULT_DESTSUFFIX}/buildtools/re2;name=re2 \
            \
            file://0001-Remove-check_build_deps-build-steps.patch \
            "
@@ -32,17 +33,19 @@ SRCREV_bionic = "a0d0355105cb9d4a4b5384897448676133d7b8e2"
 SRCREV_core = "9e6cef7f07d8c11b3ea820938aeb7ff2e9dbaa52"
 SRCREV_lzma = "7851dce6f4ca17f5caa1c93a4e0a45686b1d56c3"
 SRCREV_libprocinfo = "fd214c13ededecae97a3b15b5fccc8925a749a84"
-SRCREV_logging = "7b36b566c9113fc703d68f76e8f40c0c2432481c"
+SRCREV_logging = "da4d6df49d1d6c971be508dcde18e8b00bb74581"
 SRCREV_unwinding = "4b59ea8471e89d01300481a92de3230b79b6d7c7"
-SRCREV_protobuf = "f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c"
-SRCREV_libbase = "78f1c2f83e625bdf66d55b48bdb3a301c20d2fb3"
+SRCREV_protobuf = "74211c0dfc2777318ab53c2cd2c317a2ef9012de"
+SRCREV_abseil = "76bb24329e8bf5f39704eb10d21b9a80befa7c81"
+SRCREV_libbase = "18c2bd4f3607cb300bb96e543df91dfdda6a9655"
 SRCREV_libcxx = "852bc6746f45add53fec19f3a29280e69e358d44"
 SRCREV_libcxxabi = "a37a3aa431f132b02a58656f13984d51098330a2"
 SRCREV_libunwind = "419b03c0b8f20d6da9ddcb0d661a94a97cdd7dad"
 SRCREV_zlib = "6f9b4e61924021237d474569027cfb8ac7933ee6"
 SRCREV_zstd = "77211fcc5e08c781734a386402ada93d0d18d093"
+SRCREV_re2 = "927f5d53caf8111721e734cf24724686bb745f55"
 
-SRCREV_FORMAT .= "_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_libbase_libcxx_libcxxabi_libunwind_zlib_zstd"
+SRCREV_FORMAT .= "_bionic_core_lzma_libprocinfo_logging_unwinding_protobuf_abseil_libbase_libcxx_libcxxabi_libunwind_zlib_zstd_re2"
 
 require perfetto.inc
 

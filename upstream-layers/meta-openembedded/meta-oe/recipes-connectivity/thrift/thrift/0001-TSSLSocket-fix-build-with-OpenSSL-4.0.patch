@@ -1,0 +1,113 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+Date: Thu, 27 Aug 2026 11:00:00 +0000
+Subject: [PATCH] Fix build with OpenSSL 4.0
+
+OpenSSL 4.0 removes SSLv3_method(), per-version TLS method functions,
+ERR_remove_state(), ASN1_STRING_data(), and returns const pointers
+from X509 accessor functions.
+
+C++ (TSSLSocket.cpp):
+- Guard SSLv3 and TLS version methods with version check
+- Replace ASN1_STRING_data with ASN1_STRING_get0_data
+- Add const qualifiers for X509_NAME, X509_NAME_ENTRY, ASN1_STRING
+
+C (thrift_ssl_socket.c):
+- Remove ERR_remove_state() calls (no-op since OpenSSL 1.1)
+- Guard SSLv3 and TLS version methods with version check
+
+Upstream-Status: Submitted [https://github.com/apache/thrift/pull/3752]
+
+Signed-off-by: Jaipaul Cheernam <jaipaul.cheernam@est.tech>
+---
+diff --git a/lib/cpp/src/thrift/transport/TSSLSocket.cpp b/lib/cpp/src/thrift/transport/TSSLSocket.cpp
+--- a/lib/cpp/src/thrift/transport/TSSLSocket.cpp	2026-08-27 11:26:40.242005669 +0000
++++ b/lib/cpp/src/thrift/transport/TSSLSocket.cpp	2026-08-27 11:26:40.263005736 +0000
+@@ -182,16 +182,18 @@
+ SSLContext::SSLContext(const SSLProtocol& protocol) {
+   if (protocol == SSLTLS) {
+     ctx_ = SSL_CTX_new(SSLv23_method());
+-#ifndef OPENSSL_NO_SSL3
++#if !defined(OPENSSL_NO_SSL3) && OPENSSL_VERSION_NUMBER < 0x40000000L
+   } else if (protocol == SSLv3) {
+     ctx_ = SSL_CTX_new(SSLv3_method());
+ #endif
++#if OPENSSL_VERSION_NUMBER < 0x40000000L
+   } else if (protocol == TLSv1_0) {
+     ctx_ = SSL_CTX_new(TLSv1_method());
+   } else if (protocol == TLSv1_1) {
+     ctx_ = SSL_CTX_new(TLSv1_1_method());
+   } else if (protocol == TLSv1_2) {
+     ctx_ = SSL_CTX_new(TLSv1_2_method());
++#endif
+   } else {
+     /// UNKNOWN PROTOCOL!
+     throw TSSLException("SSL_CTX_new: Unknown protocol");
+@@ -770,7 +772,7 @@
+       if (name == nullptr) {
+         continue;
+       }
+-      char* data = (char*)ASN1_STRING_data(name->d.ia5);
++      const char* data = (const char*)ASN1_STRING_get0_data(name->d.ia5);
+       int length = ASN1_STRING_length(name->d.ia5);
+       switch (name->type) {
+       case GEN_DNS:
+@@ -796,19 +798,19 @@
+   }
+ 
+   // extract commonName
+-  X509_NAME* name = X509_get_subject_name(cert);
++  const X509_NAME* name = X509_get_subject_name(cert);
+   if (name != nullptr) {
+-    X509_NAME_ENTRY* entry;
++    const X509_NAME_ENTRY* entry;
+     unsigned char* utf8;
+     int last = -1;
+     while (decision == AccessManager::SKIP) {
+-      last = X509_NAME_get_index_by_NID(name, NID_commonName, last);
++      last = X509_NAME_get_index_by_NID((X509_NAME *)name, NID_commonName, last);
+       if (last == -1)
+         break;
+       entry = X509_NAME_get_entry(name, last);
+       if (entry == nullptr)
+         continue;
+-      ASN1_STRING* common = X509_NAME_ENTRY_get_data(entry);
++      const ASN1_STRING* common = X509_NAME_ENTRY_get_data(entry);
+       int size = ASN1_STRING_to_UTF8(&utf8, common);
+       if (host.empty()) {
+         host = (server() ? getPeerHost() : getHost());
+diff --git a/lib/c_glib/src/thrift/c_glib/transport/thrift_ssl_socket.c b/lib/c_glib/src/thrift/c_glib/transport/thrift_ssl_socket.c
+--- a/lib/c_glib/src/thrift/c_glib/transport/thrift_ssl_socket.c	2026-08-27 11:26:40.245005679 +0000
++++ b/lib/c_glib/src/thrift/c_glib/transport/thrift_ssl_socket.c	2026-08-27 11:26:52.923045957 +0000
+@@ -285,7 +285,6 @@
+       SSL_shutdown(ssl_socket->ssl);
+       SSL_free(ssl_socket->ssl);
+       ssl_socket->ssl = NULL;
+-      ERR_remove_state(0);
+   }
+   return thrift_socket_close(transport, error);
+ }
+@@ -710,7 +709,6 @@
+   ERR_free_strings();
+   EVP_cleanup();
+   CRYPTO_cleanup_all_ex_data();
+-  ERR_remove_state(0);
+ }
+ 
+ 
+@@ -835,6 +833,7 @@
+     case SSLTLS:
+       context = SSL_CTX_new(SSLv23_method());
+       break;
++#if OPENSSL_VERSION_NUMBER < 0x40000000L
+ #ifndef OPENSSL_NO_SSL3
+     case SSLv3:
+       context = SSL_CTX_new(SSLv3_method());
+@@ -849,6 +848,7 @@
+     case TLSv1_2:
+       context = SSL_CTX_new(TLSv1_2_method());
+       break;
++#endif /* OPENSSL_VERSION_NUMBER < 0x40000000L */
+     default:
+       g_set_error (error, THRIFT_TRANSPORT_ERROR,
+ 		   THRIFT_SSL_SOCKET_ERROR_CIPHER_NOT_AVAILABLE,

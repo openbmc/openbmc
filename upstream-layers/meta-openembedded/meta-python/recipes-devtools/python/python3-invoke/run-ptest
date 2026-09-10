@@ -1,0 +1,19 @@
+#!/bin/sh
+
+pytest -s --automake \
+  --deselect "tests/runners.py::Local_::pty::when_pty_True_we_use_pty_fork_and_os_exec" \
+  --deselect "tests/runners.py::Local_::pty::pty_uses_WEXITSTATUS_if_WIFEXITED" \
+  --deselect "tests/runners.py::Local_::pty::pty_uses_WTERMSIG_if_WIFSIGNALED" \
+  --deselect "tests/runners.py::Local_::pty::WTERMSIG_result_turned_negative_to_match_subprocess" \
+  --deselect "tests/runners.py::Local_::pty::pty_is_set_to_controlling_terminal_size" \
+  --deselect "tests/runners.py::Local_::pty::spurious_OSErrors_handled_gracefully" \
+  --deselect "tests/runners.py::Local_::pty::other_spurious_OSErrors_handled_gracefully" \
+  --deselect "tests/runners.py::Local_::pty::non_spurious_OSErrors_bubble_up" \
+  --deselect "tests/runners.py::Local_::pty::stop_mutes_errors_on_pty_close" \
+  --deselect "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_kwarg" \
+  --deselect "tests/runners.py::Local_::pty::fallback::can_be_overridden_by_config" \
+  --deselect "tests/runners.py::Local_::pty::fallback::overridden_fallback_affects_result_pty_value" \
+  --deselect "tests/runners.py::Local_::shell::defaults_to_bash_or_cmdexe_when_pty_True" \
+  --deselect "tests/runners.py::Local_::shell::may_be_overridden_when_pty_True" \
+  --deselect "tests/runners.py::Local_::env::uses_execve_for_pty_True" \
+  --deselect "tests/runners.py::Local_::get_pid::is_top_level_pid_when_using_pty"

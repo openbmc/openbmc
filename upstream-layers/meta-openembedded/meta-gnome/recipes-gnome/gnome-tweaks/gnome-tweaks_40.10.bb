@@ -1,5 +1,5 @@
 SUMMARY = "GNOME tweaks: Advanced options for GNOME 3 session"
-LICENSE = "GPL-3.0-only & CC0-1.0"
+LICENSE = "CC0-1.0 AND GPL-3.0-only"
 LIC_FILES_CHKSUM = " \
     file://LICENSES/CC0-1.0;md5=65d3616852dbf7b1a6d4b53b00626032 \
     file://LICENSES/GPL-3.0;md5=9eef91148a9b14ec7f9df333daebc746 \

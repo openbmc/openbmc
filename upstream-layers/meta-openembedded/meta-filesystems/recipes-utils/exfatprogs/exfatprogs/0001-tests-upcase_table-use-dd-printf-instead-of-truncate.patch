@@ -1,0 +1,230 @@
+From de421347db0026110c4997ef48bdd16f50a5a65b Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Wed, 29 Jul 2026 05:34:27 +0000
+Subject: [PATCH] tests: upcase_table: use dd/printf instead of truncate and
+ xxd -r
+
+The upcase_table test scripts used `truncate` (coreutils) and
+`xxd -r - <file>` to build and corrupt the test image. In minimal
+images (e.g. Yocto core-image-minimal + BusyBox) `truncate` is often
+absent and BusyBox's `xxd` applet does not implement the two-operand
+`xxd -r - <file>` revert form, so the scripts fail with:
+
+  truncate: command not found
+  FAIL: to create corrupted image
+
+Every xxd/truncate use here reduces to "size the image to 32 MiB" and
+"write one constant byte at a computed offset", both of which `dd`
+(with printf for the byte value) does portably with tools already
+present in a base rootfs.
+
+Upstream-Status: Submitted [https://github.com/exfatprogs/exfatprogs]
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ ...le-use-dd-printf-instead-of-truncate.patch | 111 ++++++++++++++++++
+ .../0001-TableChecksum-and-upcase-table.sh    |   6 +-
+ tests/upcase_table/0002-FirstCluster.sh       |   4 +-
+ tests/upcase_table/0003-DataLength.sh         |   6 +-
+ tests/upcase_table/0004-EntryType.sh          |   4 +-
+ 5 files changed, 121 insertions(+), 10 deletions(-)
+ create mode 100644 out/0001-tests-upcase_table-use-dd-printf-instead-of-truncate.patch
+
+diff --git a/out/0001-tests-upcase_table-use-dd-printf-instead-of-truncate.patch b/out/0001-tests-upcase_table-use-dd-printf-instead-of-truncate.patch
+new file mode 100644
+index 0000000..2cec31f
+--- /dev/null
++++ b/out/0001-tests-upcase_table-use-dd-printf-instead-of-truncate.patch
+@@ -0,0 +1,111 @@
++From 65d12741714de046a37ef3cf4ae2c1660235901a Mon Sep 17 00:00:00 2001
++From: Khem Raj <khem.raj@oss.qualcomm.com>
++Date: Wed, 29 Jul 2026 05:34:27 +0000
++Subject: [PATCH] tests: upcase_table: use dd/printf instead of truncate and
++ xxd -r
++
++The upcase_table test scripts used `truncate` (coreutils) and
++`xxd -r - <file>` to build and corrupt the test image. In minimal
++images (e.g. Yocto core-image-minimal + BusyBox) `truncate` is often
++absent and BusyBox's `xxd` applet does not implement the two-operand
++`xxd -r - <file>` revert form, so the scripts fail with:
++
++  truncate: command not found
++  FAIL: to create corrupted image
++
++Every xxd/truncate use here reduces to "size the image to 32 MiB" and
++"write one constant byte at a computed offset", both of which `dd`
++(with printf for the byte value) does portably with tools already
++present in a base rootfs.
++
++Upstream-Status: Submitted [https://github.com/exfatprogs/exfatprogs]
++
++Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
++---
++ tests/upcase_table/0001-TableChecksum-and-upcase-table.sh | 6 +++---
++ tests/upcase_table/0002-FirstCluster.sh                   | 4 ++--
++ tests/upcase_table/0003-DataLength.sh                     | 6 +++---
++ tests/upcase_table/0004-EntryType.sh                      | 4 ++--
++ 4 files changed, 10 insertions(+), 10 deletions(-)
++
++diff --git a/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh b/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh
++index 57390e1..507d0c2 100755
++--- a/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh
+++++ b/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh
++@@ -3,7 +3,7 @@
++ 
++ img=${1:-"exfat.img"}
++ 
++-truncate -s 32M $img
+++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
++ mkfs.exfat $img >> /dev/null
++ dump_info=$(dump.exfat $img)
++ clu_heap_off=$(echo "${dump_info}" | grep "Cluster Heap Offset (sector offset):" | cut -d ':' -f 2)
++@@ -14,8 +14,8 @@ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | c
++ 
++ # Make TableChecksum field corrupted
++ checksum_off=$((${upcase_entry_off}+4))
++-echo "$(printf "%x" $checksum_off):0xff" | xxd -r - $img
+++printf '\377' | dd of=$img bs=1 seek=$checksum_off conv=notrunc 2>/dev/null
++ 
++ # Make upcase table corrupted
++ upcase_off=$(((${upcase_clu} - 2) * ${clu_size} + ${clu_heap_off} * ${sector_size}))
++-echo "$(printf "%x" $upcase_off):0x7F" | xxd -r - $img
+++printf '\177' | dd of=$img bs=1 seek=$upcase_off conv=notrunc 2>/dev/null
++diff --git a/tests/upcase_table/0002-FirstCluster.sh b/tests/upcase_table/0002-FirstCluster.sh
++index 9dfb1dc..ae84555 100755
++--- a/tests/upcase_table/0002-FirstCluster.sh
+++++ b/tests/upcase_table/0002-FirstCluster.sh
++@@ -3,11 +3,11 @@
++ 
++ img=${1:-"exfat.img"}
++ 
++-truncate -s 32M $img
+++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
++ mkfs.exfat $img >> /dev/null
++ dump_info=$(dump.exfat $img)
++ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | cut -d ':' -f 2)
++ 
++ # Make FirstCluster field corrupted
++ start_clu_off=$((${upcase_entry_off}+20))
++-echo "$(printf "%x" $start_clu_off):0x00" | xxd -r - $img
+++printf '\000' | dd of=$img bs=1 seek=$start_clu_off conv=notrunc 2>/dev/null
++diff --git a/tests/upcase_table/0003-DataLength.sh b/tests/upcase_table/0003-DataLength.sh
++index 68742b2..661d218 100755
++--- a/tests/upcase_table/0003-DataLength.sh
+++++ b/tests/upcase_table/0003-DataLength.sh
++@@ -3,7 +3,7 @@
++ 
++ img=${1:-"exfat.img"}
++ 
++-truncate -s 32M $img
+++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
++ mkfs.exfat $img >> /dev/null
++ 
++ dump_info=$(dump.exfat $img)
++@@ -11,5 +11,5 @@ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | c
++ size_off=$((${upcase_entry_off}+24))
++ 
++ # Make DataLength field corrupted
++-echo "$(printf "%x" $size_off):0x00" | xxd -r - $img
++-echo "$(printf "%x" $(($size_off + 1))):0x00" | xxd -r - $img
+++printf '\000' | dd of=$img bs=1 seek=$size_off conv=notrunc 2>/dev/null
+++printf '\000' | dd of=$img bs=1 seek=$(($size_off + 1)) conv=notrunc 2>/dev/null
++diff --git a/tests/upcase_table/0004-EntryType.sh b/tests/upcase_table/0004-EntryType.sh
++index b34661f..74d40a7 100755
++--- a/tests/upcase_table/0004-EntryType.sh
+++++ b/tests/upcase_table/0004-EntryType.sh
++@@ -3,11 +3,11 @@
++ 
++ img=${1:-"exfat.img"}
++ 
++-truncate -s 32M $img
+++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
++ mkfs.exfat $img >> /dev/null
++ 
++ dump_info=$(dump.exfat $img)
++ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | cut -d ':' -f 2)
++ 
++ # Make EntryType field corrupted
++-echo "$(printf "%x" $upcase_entry_off):0x7F" | xxd -r - $img
+++printf '\177' | dd of=$img bs=1 seek=$upcase_entry_off conv=notrunc 2>/dev/null
+diff --git a/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh b/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh
+index 57390e1..507d0c2 100755
+--- a/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh
++++ b/tests/upcase_table/0001-TableChecksum-and-upcase-table.sh
+@@ -3,7 +3,7 @@
+ 
+ img=${1:-"exfat.img"}
+ 
+-truncate -s 32M $img
++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
+ mkfs.exfat $img >> /dev/null
+ dump_info=$(dump.exfat $img)
+ clu_heap_off=$(echo "${dump_info}" | grep "Cluster Heap Offset (sector offset):" | cut -d ':' -f 2)
+@@ -14,8 +14,8 @@ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | c
+ 
+ # Make TableChecksum field corrupted
+ checksum_off=$((${upcase_entry_off}+4))
+-echo "$(printf "%x" $checksum_off):0xff" | xxd -r - $img
++printf '\377' | dd of=$img bs=1 seek=$checksum_off conv=notrunc 2>/dev/null
+ 
+ # Make upcase table corrupted
+ upcase_off=$(((${upcase_clu} - 2) * ${clu_size} + ${clu_heap_off} * ${sector_size}))
+-echo "$(printf "%x" $upcase_off):0x7F" | xxd -r - $img
++printf '\177' | dd of=$img bs=1 seek=$upcase_off conv=notrunc 2>/dev/null
+diff --git a/tests/upcase_table/0002-FirstCluster.sh b/tests/upcase_table/0002-FirstCluster.sh
+index 9dfb1dc..ae84555 100755
+--- a/tests/upcase_table/0002-FirstCluster.sh
++++ b/tests/upcase_table/0002-FirstCluster.sh
+@@ -3,11 +3,11 @@
+ 
+ img=${1:-"exfat.img"}
+ 
+-truncate -s 32M $img
++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
+ mkfs.exfat $img >> /dev/null
+ dump_info=$(dump.exfat $img)
+ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | cut -d ':' -f 2)
+ 
+ # Make FirstCluster field corrupted
+ start_clu_off=$((${upcase_entry_off}+20))
+-echo "$(printf "%x" $start_clu_off):0x00" | xxd -r - $img
++printf '\000' | dd of=$img bs=1 seek=$start_clu_off conv=notrunc 2>/dev/null
+diff --git a/tests/upcase_table/0003-DataLength.sh b/tests/upcase_table/0003-DataLength.sh
+index 68742b2..661d218 100755
+--- a/tests/upcase_table/0003-DataLength.sh
++++ b/tests/upcase_table/0003-DataLength.sh
+@@ -3,7 +3,7 @@
+ 
+ img=${1:-"exfat.img"}
+ 
+-truncate -s 32M $img
++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
+ mkfs.exfat $img >> /dev/null
+ 
+ dump_info=$(dump.exfat $img)
+@@ -11,5 +11,5 @@ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | c
+ size_off=$((${upcase_entry_off}+24))
+ 
+ # Make DataLength field corrupted
+-echo "$(printf "%x" $size_off):0x00" | xxd -r - $img
+-echo "$(printf "%x" $(($size_off + 1))):0x00" | xxd -r - $img
++printf '\000' | dd of=$img bs=1 seek=$size_off conv=notrunc 2>/dev/null
++printf '\000' | dd of=$img bs=1 seek=$(($size_off + 1)) conv=notrunc 2>/dev/null
+diff --git a/tests/upcase_table/0004-EntryType.sh b/tests/upcase_table/0004-EntryType.sh
+index b34661f..e7098b4 100755
+--- a/tests/upcase_table/0004-EntryType.sh
++++ b/tests/upcase_table/0004-EntryType.sh
+@@ -3,11 +3,11 @@
+ 
+ img=${1:-"exfat.img"}
+ 
+-truncate -s 32M $img
++dd if=/dev/zero of=$img bs=1048576 count=32 2>/dev/null
+ mkfs.exfat $img >> /dev/null
+ 
+ dump_info=$(dump.exfat $img)
+ upcase_entry_off=$(echo "${dump_info}" | grep "Upcase table entry position:" | cut -d ':' -f 2)
+ 
+ # Make EntryType field corrupted
+-echo "$(printf "%x" $upcase_entry_off):0x7F" | xxd -r - $img
++printf '\177' | dd of=$img bs=1 seek=$((upcase_entry_off)) conv=notrunc 2>/dev/null

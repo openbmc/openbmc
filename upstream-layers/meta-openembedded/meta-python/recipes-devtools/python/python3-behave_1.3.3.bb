@@ -10,6 +10,8 @@ SRC_URI += "git://github.com/behave/behave;branch=release/v1.3.x;protocol=https"
 
 inherit python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN} += " \
     python3-parse-type \
     python3-setuptools \

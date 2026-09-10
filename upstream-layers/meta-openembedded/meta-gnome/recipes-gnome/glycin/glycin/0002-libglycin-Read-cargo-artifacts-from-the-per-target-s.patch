@@ -1,0 +1,31 @@
+From 6fa1351e99a52e9efc8724952275ee51a15afc7e Mon Sep 17 00:00:00 2001
+From: x <a@b.c>
+Date: Wed, 2 Sep 2026 19:57:42 +0000
+Subject: [PATCH] libglycin: Read cargo artifacts from the per-target
+ subdirectory
+
+Commit 13b6b06 ("meson: Support cross-compilation via a rust_target cross
+property") converted the loaders and the thumbnailer to cargo_artifact_dir
+but left the libglycin shared object path pointing at cargo_target_dir.
+When --target is passed, cargo writes to cargo-target/<triple>/<profile>/
+and the copy step fails. Upstream fixed this as part of the much larger
+windows-gnu commit 4d1a505, so only the relevant hunk is taken here.
+
+Upstream-Status: Backport [https://gitlab.gnome.org/GNOME/glycin/-/commit/4d1a505]
+---
+ libglycin/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libglycin/meson.build b/libglycin/meson.build
+index 3a2a8b6..dbadf49 100644
+--- a/libglycin/meson.build
++++ b/libglycin/meson.build
+@@ -72,7 +72,7 @@ foreach package : packages
+         endif
+     endif
+ 
+-    cargo_output = cargo_target_dir / rust_target / f'libglycin@suffix@.so'.replace('-', '_')
++    cargo_output = cargo_artifact_dir / rust_target / f'libglycin@suffix@.so'.replace('-', '_')
+ 
+     # Build library with Rust
+     libglycin = custom_target(

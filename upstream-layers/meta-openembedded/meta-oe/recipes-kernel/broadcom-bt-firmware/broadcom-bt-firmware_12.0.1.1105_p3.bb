@@ -5,7 +5,7 @@ SUMMARY = "Broadcom Bluetooth firmware files"
 DESCRIPTION = "Firmware for Broadcom Bluetooth devices. Note that in case of BT+WiFi devices, separate WiFi firmware might be needed."
 HOMEPAGE = "https://github.com/winterheart/broadcom-bt-firmware"
 
-LICENSE = "Firmware-Broadcom-WIDCOMM"
+LICENSE = "LicenseRef-Firmware-Broadcom-WIDCOMM"
 NO_GENERIC_LICENSE[Firmware-Broadcom-WIDCOMM] = "LICENSE.broadcom_bcm20702"
 
 LIC_FILES_CHKSUM = "file://LICENSE.broadcom_bcm20702;md5=c0d5ea0502b00df74173d0f8a48b619d"

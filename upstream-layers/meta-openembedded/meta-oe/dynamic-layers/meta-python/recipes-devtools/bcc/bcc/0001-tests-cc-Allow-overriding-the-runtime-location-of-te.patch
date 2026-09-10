@@ -1,0 +1,49 @@
+From ba4c3827dd93a21e35d324b41b90ffbd1dff5c4f Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 28 Jul 2026 21:04:15 -0700
+Subject: [PATCH] tests/cc: Allow overriding the runtime location of test
+ assets
+
+tests/cc bakes CMAKE_CURRENT_BINARY_DIR into every test object so that the
+tests can find archive.zip, the debuginfo test libraries and
+dummy_proc_map.txt at runtime.
+
+That makes the build directory part of the installed test binaries. For
+distributions which build the tests in one place and run them somewhere else
+this is both useless and a reproducibility problem: the absolute build path
+ends up embedded in a shipped binary, and the assets have to be installed at
+that same path for the tests to pass.
+
+Introduce a TEST_ASSET_DIR cache variable which defaults to
+CMAKE_CURRENT_BINARY_DIR, so the default behaviour is unchanged, and use it
+for the macro definition. Packagers can now point it at wherever the assets
+are installed.
+
+The macro keeps its current name to avoid churn in the test sources.
+
+Upstream-Status: Submitted [https://github.com/iovisor/bcc/issues]
+
+Signed-off-by: Khem Raj <raj.khem@gmail.com>
+---
+ tests/cc/CMakeLists.txt | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/tests/cc/CMakeLists.txt b/tests/cc/CMakeLists.txt
+index b4dd3f9..8f56fc9 100644
+--- a/tests/cc/CMakeLists.txt
++++ b/tests/cc/CMakeLists.txt
+@@ -19,7 +19,13 @@ else()
+ endif()
+ 
+ add_test(NAME c_test_static COMMAND ${TEST_WRAPPER} c_test_static sudo ${CMAKE_CURRENT_BINARY_DIR}/test_static)
+-add_compile_options(-DCMAKE_CURRENT_BINARY_DIR="${CMAKE_CURRENT_BINARY_DIR}")
++# The tests locate their assets (archive.zip, the debuginfo libraries,
++# dummy_proc_map.txt, ...) through this macro. Let the runtime location be
++# overridden so that distributions can install the assets next to the test
++# binaries instead of baking the build directory into them.
++set(TEST_ASSET_DIR "${CMAKE_CURRENT_BINARY_DIR}" CACHE STRING
++    "Directory containing the test assets at runtime")
++add_compile_options(-DCMAKE_CURRENT_BINARY_DIR="${TEST_ASSET_DIR}")
+ 
+ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-result -fPIC")
+ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-result -fPIC")

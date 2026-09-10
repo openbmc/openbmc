@@ -1,6 +1,6 @@
 DESCRIPTION = "SDK for connecting to AWS IoT using Python."
 HOMEPAGE = "https://github.com/aws/aws-iot-device-sdk-python"
-LICENSE = "Apache-2.0 & (EPL-1.0 | EDL-1.0)"
+LICENSE = "Apache-2.0 AND (EPL-1.0 OR LicenseRef-EDL-1.0)"
 LICENSE:${PN}-examples = "Apache-2.0"
 LIC_FILES_CHKSUM = "\
     file://LICENSE.txt;md5=9ac49901b833e769c7d6f21e8dbd7b30 \

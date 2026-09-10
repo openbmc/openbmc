@@ -13,7 +13,6 @@ SRC_URI[sha256sum] = "1849a238f6f396da19762269de72cb1814ab44416fa73a8686deac10b0
 inherit pypi python_setuptools_build_meta ptest
 
 PYPI_PACKAGE = "pytest_mock"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 DEPENDS += "python3-setuptools-scm-native"
 

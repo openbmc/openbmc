@@ -43,7 +43,7 @@ do_configure() {
     cd ${B}
     # configure only
     oe_runconf  --enable-long-double
-    mv ${B} ${WORKDIR}/build-fftwl 
+    mv ${B} ${WORKDIR}/build-fftwl
 
     # configure fftwf
     rm -rf ${WORKDIR}/build-fftwf

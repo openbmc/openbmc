@@ -7,6 +7,8 @@ SRC_URI = "http://downloads.sourceforge.net/${BPN}/${BP}.tar.gz \
            file://fix-pc.patch;striplevel=2 \
           "
 SRC_URI[sha256sum] = "a036bc6bd6044479e6c456de7edd042b060ea5c843e47beb75f59baea9b20e3a"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/log4cpp/files/log4cpp-1.1.x%20%28new%29/log4cpp-1.1/"
+UPSTREAM_CHECK_REGEX = "log4cpp-(?P<pver>\d+(\.\d+)+)\.tar"
 
 S = "${UNPACKDIR}/${BPN}"
 

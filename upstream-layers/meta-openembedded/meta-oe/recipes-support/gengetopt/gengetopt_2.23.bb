@@ -10,6 +10,12 @@ SRC_URI = "${GNU_MIRROR}/gengetopt/${BPN}-${PV}.tar.xz"
 
 SRC_URI[sha256sum] = "b941aec9011864978dd7fdeb052b1943535824169d2aa2b0e7eae9ab807584ac"
 
+# ftpmirror.gnu.org redirects to a random mirror, several of which serve a
+# non-Apache index the auto-derived regex cannot parse. Pin the check to the
+# canonical GNU FTP listing.
+UPSTREAM_CHECK_URI = "https://ftp.gnu.org/gnu/gengetopt/"
+UPSTREAM_CHECK_REGEX = "gengetopt-(?P<pver>\d+(\.\d+)+)\.tar"
+
 inherit autotools texinfo
 
 CXXFLAGS += "-std=c++14"

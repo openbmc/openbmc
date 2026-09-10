@@ -9,10 +9,14 @@ DEPENDS = "xmlto-native"
 
 SRC_URI = "${SOURCEFORGE_MIRROR}/giflib/${BP}.tar.gz \
            https://sourceforge.net/p/giflib/code/ci/d54b45b0240d455bbaedee4be5203d2703e59967/tree/doc/giflib-logo.gif?format=raw;subdir=${BP}/doc;name=logo;downloadfilename=giflib-logo.gif \
+           file://CVE-2026-26740.patch \
 "
 
 SRC_URI[logo.sha256sum] = "1a54383986adad1521d00e003b4c482c27e8bc60690be944a1f3319c75abc2c9"
 SRC_URI[sha256sum] = "b65b66b99f0424b93525f987386f22fc5efb9da2bfc92ad4a532249aaffbab0e"
+
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/giflib/files/"
+UPSTREAM_CHECK_REGEX = "giflib-(?P<pver>\d+(\.\d+)+)\.tar"
 
 do_install() {
     # using autotools's default will end up in /usr/local

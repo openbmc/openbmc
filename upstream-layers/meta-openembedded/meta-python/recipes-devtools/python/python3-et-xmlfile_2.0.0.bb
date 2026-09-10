@@ -21,4 +21,3 @@ RDEPENDS:${PN} += " \
 inherit setuptools3 pypi
 
 PYPI_PACKAGE = "et_xmlfile"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"

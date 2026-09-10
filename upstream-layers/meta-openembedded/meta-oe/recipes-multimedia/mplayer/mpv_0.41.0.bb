@@ -16,6 +16,12 @@ DEPENDS = " \
 LICENSE = "GPL-2.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE.GPL;md5=570a9b3749dd0463a1778803b12a6dce"
 
+# mpv links against ffmpeg, which carries LICENSE_FLAGS = "commercial";
+# propagate the flag so mpv is cleanly skipped (in both world and universe)
+# unless "commercial" is in LICENSE_FLAGS_ACCEPTED, rather than surfacing as an
+# unbuildable "Nothing PROVIDES 'ffmpeg'" dependency.
+LICENSE_FLAGS = "commercial"
+
 SRCREV = "41f6a645068483470267271e1d09966ca3b9f413"
 SRC_URI = "git://github.com/mpv-player/mpv;name=mpv;branch=release/${@oe.utils.trim_version('${PV}', 2)};protocol=https;tag=v${PV}"
 
@@ -100,4 +106,3 @@ do_configure:append() {
 }
 
 FILES:${PN} += "${datadir}"
-EXCLUDE_FROM_WORLD = "${@bb.utils.contains("LICENSE_FLAGS_ACCEPTED", "commercial", "0", "1", d)}"

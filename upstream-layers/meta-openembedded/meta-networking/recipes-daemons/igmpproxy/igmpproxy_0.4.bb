@@ -8,5 +8,6 @@ SRC_URI = "https://github.com/pali/igmpproxy/releases/download/${PV}/${BP}.tar.g
 SRC_URI[sha256sum] = "afa4b75a823b82f71ce99f33eae4e8136b906ae8a5ede5caaad93bac38cdae24"
 
 UPSTREAM_CHECK_URI = "https://github.com/pali/${BPN}/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/(?P<pver>\d+(\.\d+)+)"
 
 inherit autotools pkgconfig

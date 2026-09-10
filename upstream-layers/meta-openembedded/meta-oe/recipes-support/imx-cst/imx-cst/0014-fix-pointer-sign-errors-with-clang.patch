@@ -1,0 +1,57 @@
+From: Fabio Estevam <festevam@gmail.com>
+Date: Sun, 26 Jul 2026 09:31:41 -0300
+Subject: [PATCH] Fix pointer sign errors with Clang
+
+Clang diagnoses mismatches between pointers to char, signed char, and
+unsigned char. Since warnings are treated as errors, these mismatches break
+the build.
+
+Keep the signed byte-sized values used for the -1 sentinel and make the
+receiving parameter types match them. Also use const char pointers for
+string literals.
+
+Upstream-Status: Pending
+Signed-off-by: Fabio Estevam <festevam@gmail.com>
+---
+ src/lib/front_end/csf_cmd_ins_key.c             | 10 +++++-----
+ src/tools/image_verifier/ahab_image_verifier.c | 2 +-
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/src/lib/front_end/csf_cmd_ins_key.c b/src/lib/front_end/csf_cmd_ins_key.c
+index b9dc4b4..ffb001b 100644
+--- a/src/lib/front_end/csf_cmd_ins_key.c
++++ b/src/lib/front_end/csf_cmd_ins_key.c
+@@ -48,2 +48,2 @@ static int32_t process_installkey_arguments(
+-    quadruple_t *uuid, uint8_t *fuse_version, uint8_t *check_all_signatures,
+-    uint8_t *fast_boot);
++    quadruple_t *uuid, uint8_t *fuse_version, int8_t *check_all_signatures,
++    int8_t *fast_boot);
+@@ -108,2 +108,2 @@ static int32_t process_installkey_arguments(
+-    quadruple_t *uuid, uint8_t *fuse_version, uint8_t *check_all_signatures,
+-    uint8_t *fast_boot)
++    quadruple_t *uuid, uint8_t *fuse_version, int8_t *check_all_signatures,
++    int8_t *fast_boot)
+@@ -527,7 +527,7 @@ int32_t cmd_handler_installsrk(command_t* cmd)
+     uint8_t *srk_key_data = NULL;
+     size_t num_tables = 1;
+     size_t srk_table_offset = 0;
+-    uint8_t *sd_alg_str = NULL;
++    const char *sd_alg_str = NULL;
+     srk_entry_t *temp_srk_entry = NULL;
+ 
+     PRINT_V("Install SRK\n");
+diff --git a/src/tools/image_verifier/ahab_image_verifier.c b/src/tools/image_verifier/ahab_image_verifier.c
+index 5d693ba..0b939f7 100644
+--- a/src/tools/image_verifier/ahab_image_verifier.c
++++ b/src/tools/image_verifier/ahab_image_verifier.c
+@@ -436,7 +436,7 @@ static void parse_container_header_flags(uint32_t flags, uint8_t version)
+  */
+ static enum parse_error_e display_header(struct ahab_container_header_s *header)
+ {
+-    uint8_t *tag = NULL;
++    const char *tag = NULL;
+ 
+     /* Check for NULL header */
+     if (header == NULL)
+-- 
+2.50.1

@@ -1,7 +1,7 @@
 SUMMARY = "The ABI Generic Analysis and Instrumentation Library"
 HOMEPAGE = "https://sourceware.org/libabigail/"
 
-LICENSE = "Apache-2.0-with-LLVM-exception"
+LICENSE = "Apache-2.0 WITH LLVM-exception"
 LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=0bcd48c3bdfef0c9d9fd17726e4b7dab"
 
 SRC_URI = "http://mirrors.kernel.org/sourceware/${BPN}/${BP}.tar.xz \

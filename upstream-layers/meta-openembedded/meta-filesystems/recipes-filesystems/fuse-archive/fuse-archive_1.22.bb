@@ -6,7 +6,9 @@ SECTION = "base"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57"
 
-SRC_URI = "git://github.com/google/fuse-archive.git;branch=main;protocol=https;tag=v${PV}"
+SRC_URI = "git://github.com/google/fuse-archive.git;branch=main;protocol=https;tag=v${PV} \
+           file://0001-reader-Support-libarchive-builds-where-RPM-is-a-form.patch \
+           "
 SRCREV = "e218685189aabebb95d33e2542e2a122ea81392d"
 
 DEPENDS = "boost fuse3 libarchive"

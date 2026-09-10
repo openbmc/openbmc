@@ -8,6 +8,9 @@ LIC_FILES_CHKSUM = "file://OFL.txt;md5=ee870a4a7cee012360178b2f8bccb725"
 SRC_URI = "git://github.com/coz-m/MPLUS_FONTS.git;protocol=https;branch=master"
 SRCREV = "80ac404d0c80442781b6f4c6119a8c9e71770806"
 
+# Upstream publishes no tags or GitHub releases, so track new commits instead.
+UPSTREAM_CHECK_COMMITS = "1"
+
 PACKAGESPLITFUNCS:prepend = "split_ttf_mplus_packages "
 
 python split_ttf_mplus_packages() {

@@ -1,0 +1,48 @@
+From e5997938100dd459ad9473bf574ab9a75e5a0a53 Mon Sep 17 00:00:00 2001
+From: Khem Raj <raj.khem@gmail.com>
+Date: Tue, 8 Sep 2026 05:31:46 +0000
+Subject: [PATCH] internal: declare match_no_control() inline instead of static
+
+Newer clang (23+) enables -Wunused-template for namespace-scope static
+function templates defined in headers. match_no_control() is only ever
+referenced from other templates, so in any translation unit where none of
+those get instantiated the internal-linkage template is genuinely unused
+and the -Werror test build fails:
+
+  include/tao/pegtl/internal/match_impl.hpp:24:30: error: unused function
+    template 'match_no_control' [-Werror,-Wunused-template]
+
+This breaks every test in src/test, since they are all compiled with
+-Wall -Werror.
+
+Declare the two overloads inline instead; that is the correct linkage for
+a function template defined in a header and does not trigger the warning.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ include/tao/pegtl/internal/match_impl.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/include/tao/pegtl/internal/match_impl.hpp b/include/tao/pegtl/internal/match_impl.hpp
+index 8723dae2..c13dd4f7 100644
+--- a/include/tao/pegtl/internal/match_impl.hpp
++++ b/include/tao/pegtl/internal/match_impl.hpp
+@@ -21,7 +21,7 @@ namespace TAO_PEGTL_NAMESPACE::internal
+              template< typename... > class Control,
+              typename ParseInput,
+              typename... States >
+-   [[nodiscard]] static auto match_no_control( ParseInput& in, States&&... st )
++   [[nodiscard]] inline auto match_no_control( ParseInput& in, States&&... st )
+       -> decltype( Rule::template match< A, M, Action, Control >( in, st... ) )
+    {
+       return Rule::template match< A, M, Action, Control >( in, st... );
+@@ -34,7 +34,7 @@ namespace TAO_PEGTL_NAMESPACE::internal
+              template< typename... > class Control,
+              typename ParseInput,
+              typename... States >
+-   [[nodiscard]] static auto match_no_control( ParseInput& in, States&&... /*unused*/ )
++   [[nodiscard]] inline auto match_no_control( ParseInput& in, States&&... /*unused*/ )
+       -> decltype( Rule::match( in ) )
+    {
+       return Rule::match( in );

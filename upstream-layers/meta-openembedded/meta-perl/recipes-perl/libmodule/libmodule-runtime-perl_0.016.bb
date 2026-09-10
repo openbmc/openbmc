@@ -16,7 +16,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/dist/Module-Runtime"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=36;endline=44;md5=9416434672a57853d6181f3da9094963"
 
 SRCNAME = "Module-Runtime"

@@ -9,7 +9,7 @@ differences. \
 SECTION = "libs"
 HOMEPAGE = "https://metacpan.org/release/RJBS/Algorithm-Diff-1.201"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://lib/Algorithm/Diff.pm;beginline=1671;endline=1675;md5=f6b2fe8ca06ca6faefa4f265fc494c2c"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/R/RJ/RJBS/Algorithm-Diff-${PV}.tar.gz"

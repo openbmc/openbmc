@@ -1,0 +1,43 @@
+From e387d7d7c1c3f22496e95def77889a6465ddff08 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Tue, 14 Jul 2026 19:42:24 +0000
+Subject: [PATCH] tests/test_utils/utils.py: Adjust source code dir
+
+Fall back to the installed oletools location for the directory with
+source code if the sibling "oletools" dir doesn't exist (e.g.
+packaged/ptest installs).
+
+Upstream-Status: Pending [https://github.com/decalage2/oletools/pull/889]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ tests/test_utils/utils.py | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
+
+diff --git a/tests/test_utils/utils.py b/tests/test_utils/utils.py
+index 45cedc8..c0f3aae 100644
+--- a/tests/test_utils/utils.py
++++ b/tests/test_utils/utils.py
+@@ -14,9 +14,16 @@ PROJECT_ROOT = dirname(dirname(dirname(abspath(__file__))))
+ # Directory with test data, independent of current working directory
+ DATA_BASE_DIR = join(PROJECT_ROOT, 'tests', 'test-data')
+ 
+-# Directory with source code
+-SOURCE_BASE_DIR = join(PROJECT_ROOT, 'oletools')
+-
++# Fall back to the installed oletools location for the directory
++# with the source code if the sibling "oletools" dir doesn't exist
++_source_base_dir = join(PROJECT_ROOT, 'oletools')
++if not os.path.isdir(_source_base_dir):
++    try:
++        import oletools as _oletools
++        _source_base_dir = dirname(abspath(_oletools.__file__))
++    except ImportError:
++        pass
++SOURCE_BASE_DIR = _source_base_dir
+ 
+ def call_and_capture(module, args=None, accept_nonzero_exit=False,
+                      exclude_stderr=False):
+-- 
+2.47.3
+

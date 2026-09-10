@@ -4,7 +4,7 @@ The module implements the URI class. URI objects can be used to access \
 and manipulate the various components that make up these strings."
 HOMEPAGE = "https://metacpan.org/dist/URI"
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a4fff76c97b0801ffb7096967487beac"
 

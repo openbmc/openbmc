@@ -60,7 +60,7 @@ do_compile() {
 # To ship crash into your sdk, you should create/update a packagegroup-cross-canadian.bbappend and
 # add the following
 # CRASH = "crash-cross-canadian-${TRANSLATED_TARGET_ARCH}"
-# RDEPENDS:${PN} += "${@all_multilib_tune_values(d, 'CRASH')}"
+# RDEPENDS:${PN} += "${@oe.utils.all_multilib_tune_values(d, 'CRASH')}"
 #
 # You should also add some kernel packages in your sdk, add the followng in your conf/local.conf:
 #

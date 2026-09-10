@@ -1,0 +1,54 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Fri, 7 Aug 2026 00:00:00 +0000
+Subject: [PATCH] gladeui-enum-types templates: use @basename@ instead of
+ @filename@
+
+glib-mkenums records the "enumerations from" comment using the input
+file's full path (@filename@), which embeds the build host's absolute
+source path (including TMPDIR and, since the build is run from a
+checkout under $HOME, the host's HOME directory) into the installed
+gladeui-enum-types.c/.h, tripping the buildpaths QA check:
+
+  WARNING: glade-3.40.0-r0 do_package_qa: QA Issue: File
+  /usr/src/debug/glade/3.40.0/gladeui/gladeui-enum-types.c in package
+  glade-src contains reference to TMPDIR [buildpaths]
+
+glib-mkenums has supported @basename@ (base name of the current input
+file) since glib 2.22, which avoids embedding the build path. This is
+the same fix already applied upstream/downstream for the analogous
+gcab-enums.c.etemplate issue.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ gladeui/gladeui-enum-types.c.template | 2 +-
+ gladeui/gladeui-enum-types.h.template | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gladeui/gladeui-enum-types.c.template b/gladeui/gladeui-enum-types.c.template
+index 1111111..2222222 100644
+--- a/gladeui/gladeui-enum-types.c.template
++++ b/gladeui/gladeui-enum-types.c.template
+@@ -5,7 +5,7 @@
+ /*** END file-header ***/
+
+ /*** BEGIN file-production ***/
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+
+ /*** BEGIN value-header ***/
+diff --git a/gladeui/gladeui-enum-types.h.template b/gladeui/gladeui-enum-types.h.template
+index 3333333..4444444 100644
+--- a/gladeui/gladeui-enum-types.h.template
++++ b/gladeui/gladeui-enum-types.h.template
+@@ -10,7 +10,7 @@ G_BEGIN_DECLS
+
+ /*** BEGIN file-production ***/
+
+-/* enumerations from "@filename@" */
++/* enumerations from "@basename@" */
+ /*** END file-production ***/
+
+ /*** BEGIN value-header ***/

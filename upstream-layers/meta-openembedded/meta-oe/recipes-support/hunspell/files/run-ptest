@@ -16,15 +16,20 @@ for test in $tests; do
     if echo "$SKIP_TESTS" | grep -qw "$test"; then
         continue
     fi
-    
-    if ./test.sh "$test" > /dev/null 2>&1; then
+
+    # Capture test.sh output rather than discarding it: on failure it
+    # reports which check failed and which words were misrecognised,
+    # which is the only usable diagnostic when running on target.
+    output=$(./test.sh "$test" 2>&1)
+    status=$?
+
+    if [ $status -eq 0 ]; then
         echo "PASS: $test"
+    elif [ $status -eq 3 ]; then
+        echo "SKIP: $test"
     else
-        status=$?
-        if [ $status -eq 3 ]; then
-            echo "SKIP: $test"
-        else
-            echo "FAIL: $test"
-        fi
+        echo "FAIL: $test"
+        # Indent so ptest-runner does not mistake diagnostics for results.
+        printf '%s\n' "$output" | sed 's/^/    /'
     fi
 done

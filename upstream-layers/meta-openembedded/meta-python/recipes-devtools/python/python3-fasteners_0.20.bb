@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "55dce8792a41b56f727ba6e123fcaee77fd87e638a6863cec00007bfea
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN} += "\
 	python3-logging \
 	python3-fcntl \

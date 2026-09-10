@@ -17,6 +17,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=eb21481ad45c5578ae8c8d37b8c8d76d"
 SRC_URI = "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/minini/minIni_12b.zip;subdir=${BP}"
 
 SRC_URI[sha256sum] = "b08839af74acb36061fb76e1123bf56711bc5cf7a08b32e189b0ad78a2e888e2"
+# Upstream lived on code.google.com (defunct); only archived zips remain, no
+# browsable release listing.
+UPSTREAM_VERSION_UNKNOWN = "1"
 
 do_configure[noexec] = "1"
 

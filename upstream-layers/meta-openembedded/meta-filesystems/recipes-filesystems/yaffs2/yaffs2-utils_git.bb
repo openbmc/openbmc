@@ -10,7 +10,7 @@ LIC_FILES_CHKSUM = "file://utils/mkyaffs2image.c;beginline=11;endline=13;md5=5f5
                     "
 
 # The commit date of SRCREV
-PV = "20221209"
+PV = "20260629"
 
 DEPENDS = "mtd-utils"
 
@@ -21,7 +21,7 @@ SRC_URI = "git://github.com/Aleph-One-Ltd/yaffs2;protocol=https;branch=master \
            file://0004-utils-Makefile-fix-symbolic-links.patch \
            "
 
-SRCREV = "68030683543cccb4d942e3fedbcad1dc267e261c"
+SRCREV = "474b3acb927d27b2305618aaf24456b9d33fe91b"
 
 UPSTREAM_CHECK_COMMITS = "1"
 

@@ -16,6 +16,5 @@ inherit pypi setuptools3_legacy ptest-python-pytest
 PTEST_PYTEST_DIR = "test"
 
 PYPI_PACKAGE = "IPy"
-UPSTREAM_CHECK_PYPI_PACKAGE = "${PYPI_PACKAGE}"
 
 BBCLASSEXTEND = "native"

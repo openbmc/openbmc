@@ -13,7 +13,9 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=153d2db1c329326a2d9f881317ea942e"
 SRC_URI = "git://github.com/lsd-rs/lsd.git;protocol=https;branch=main;tag=v${PV}"
 SRCREV = "d5a4e1cb80626d5ec94b237f6b77f7280d0f2fc9"
 
-inherit cargo cargo-update-recipe-crates
+DEPENDS = "libgit2"
+
+inherit cargo cargo-update-recipe-crates pkgconfig
 
 require ${BPN}-crates.inc
 

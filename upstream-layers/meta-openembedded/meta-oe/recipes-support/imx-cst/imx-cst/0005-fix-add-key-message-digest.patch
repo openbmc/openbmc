@@ -1,0 +1,43 @@
+From: Tobias Deiminger <tobias.deiminger@linutronix.de>
+Date: Fri, 30 Jan 2026 01:55:37 +0100
+Subject: [PATCH] Fix setting message digest in non-interactive mode for HABv4
+
+add_key must hard code message digest to sha256 if HABv4 is selected. However,
+this was only done in interactive mode. In non-interactive mode, the variable
+remained uninitialized and OpenSSL then failed in EVP_DigestSignInit_ex.
+Move the hard coding to a place where it is effective for all modes.
+
+Upstream-Status: Pending
+Origin: Debian [https://salsa.debian.org/collabora-team/imx-code-signing-tool/-/blob/fb2961efc88b9b6f37e98a5feed26873713299ee/debian/patches/fix_add_key_md.patch]
+---
+ src/tools/pki_tree/add_key.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/src/tools/pki_tree/add_key.c b/src/tools/pki_tree/add_key.c
+index 09dd191..d276140 100644
+--- a/src/tools/pki_tree/add_key.c
++++ b/src/tools/pki_tree/add_key.c
+@@ -342,10 +342,6 @@ int main(int argc, char **argv)
+                 sizeof(md), md_valid_values, ARRAY_SIZE(md_valid_values));
+ #endif
+         }
+-        else
+-        {
+-            strcpy(md, "sha256");
+-        }
+ 
+         do
+         {
+@@ -397,6 +393,12 @@ int main(int argc, char **argv)
+         }
+     }
+ 
++    /* Hardcode sha256 for HAB4 */
++    if (strcmp(ver, "4") == 0)
++    {
++        strcpy(md, "sha256");
++    }
++
+     /* Compute validity period */
+     val_period = duration * 365;
+ 

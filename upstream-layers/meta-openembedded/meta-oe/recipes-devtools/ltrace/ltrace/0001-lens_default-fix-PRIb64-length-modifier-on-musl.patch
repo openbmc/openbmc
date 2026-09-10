@@ -1,0 +1,49 @@
+From 1a03dca3000616aa61d2c8137068706c9095a653 Mon Sep 17 00:00:00 2001
+From: Alejandro Mery <amery@geeks.cl>
+Date: Mon, 20 Jul 2026 20:13:56 +0000
+Subject: [PATCH] lens_default: fix PRIb64 length modifier on LP64 musl
+
+The fallback that defines PRIb64 hardcodes __PRI64_PREFIX as "ll", which
+is only correct where uint64_t is unsigned long long (ILP32). On LP64
+targets uint64_t is unsigned long, so the resulting "%llb" conversion
+does not match the argument and, with -Werror=format, aborts the build:
+
+    lens_default.c:90:48: error: format '%llb' expects argument of type
+    'long long unsigned int', but argument 3 has type 'uint64_t'
+    {aka 'long unsigned int'}
+
+glibc never reaches the fallback: it defines __PRI64_PREFIX itself,
+wordsize aware, in <inttypes.h>. musl provides the same modifier there
+under the name __PRI64 but not __PRI64_PREFIX, so the hardcoded "ll" is
+used and is wrong on 64-bit.
+
+Reuse musl's __PRI64 when __PRI64_PREFIX is absent, keeping the literal
+"ll" as a last resort for C libraries that expose neither.
+
+Upstream-Status: Submitted [https://gitlab.com/cespedes/ltrace/-/merge_requests/69]
+Signed-off-by: Alejandro Mery <amery@geeks.cl>
+---
+ lens_default.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lens_default.c b/lens_default.c
+index 0de6f37..28df811 100644
+--- a/lens_default.c
++++ b/lens_default.c
+@@ -64,8 +64,13 @@ READER(read_double, double)
+ 
+ #ifndef PRIb64  // Underlying format supported by bookworm glibc, but macros not exposed until 2.38
+ #ifndef __PRI64_PREFIX
++/* glibc exposes the 64-bit length modifier as __PRI64_PREFIX; musl as __PRI64 */
++#ifdef __PRI64
++#define __PRI64_PREFIX __PRI64
++#else
+ #define __PRI64_PREFIX "ll"
+ #endif
++#endif
+ #define PRIb64 __PRI64_PREFIX "b"
+ #endif
+ #define HANDLE_WIDTH(BITS)						\
+-- 
+2.47.3
+

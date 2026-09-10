@@ -7,7 +7,7 @@ although it has been put to limited use in settings such as XML::LibXML and \
 the AxKit XML Application Server. \
 "
 SECTION = "libs"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 HOMEPAGE = "https://metacpan.org/dist/XML-SAX-Writer"
 DEPENDS += "libxml-filter-buffertext-perl-native"
 RDEPENDS:${PN} += "libxml-filter-buffertext-perl"

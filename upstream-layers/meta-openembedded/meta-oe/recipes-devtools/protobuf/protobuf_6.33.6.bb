@@ -4,7 +4,7 @@ efficient yet extensible format. Google uses Protocol Buffers for almost \
 all of its internal RPC protocols and file formats."
 HOMEPAGE = "https://github.com/google/protobuf"
 SECTION = "console/tools"
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 LIC_FILES_CHKSUM = " \
     file://LICENSE;md5=37b5762e07f0af8c74ce80a8bda4266b \
     file://third_party/utf8_range/LICENSE;md5=d4974d297231477b2ff507c35d61c13c \
@@ -24,7 +24,12 @@ SRC_URI = "git://github.com/protocolbuffers/protobuf.git;branch=${PROTOC_BRANCH}
            file://0001-fix-protobuf-native-build-failure-with-gcc-10.patch \
            "
 
-UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d\.\d+\.\d+)"
+# Upstream dropped the language-major prefix after v6.31.1: releases are now
+# tagged vNN.N (v33.6 == this recipe's 6.33.6, cf. PROTOC_VERSION above). Match
+# those two-component tags so the real latest release is reported; the leading
+# "6." in PV means the comparison stays off-by-a-major, so this reads as UPDATE
+# rather than MATCH even when current.
+UPSTREAM_CHECK_GITTAGREGEX = "v(?P<pver>\d+\.\d+)$"
 
 CVE_PRODUCT = "google:protobuf protobuf:protobuf google-protobuf protobuf-cpp"
 
@@ -129,3 +134,5 @@ RDEPENDS:${PN}-ptest = "bash ${@bb.utils.contains('PACKAGECONFIG', 'python', 'py
 MIPS_INSTRUCTION_SET = "mips"
 
 BBCLASSEXTEND = "native nativesdk"
+
+CVE_STATUS[CVE-2024-7254] = "fixed-version: Fixed since 4.28.2"

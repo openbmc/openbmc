@@ -6,7 +6,7 @@ SECTION = "libs"
 
 HOMEPAGE = "http://metapan.org/release/Moo/"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://README;beginline=742;endline=787;md5=74f4de483dce5aa45ed6da875f11258a"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/H/HA/HAARG/Moo-${PV}.tar.gz"

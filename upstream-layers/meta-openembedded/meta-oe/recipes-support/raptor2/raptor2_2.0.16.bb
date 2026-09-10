@@ -1,5 +1,5 @@
 SUMMARY = "Library for parsing and serializing RDF syntaxes"
-LICENSE = "GPL-2.0-only | LGPL-2.1-only | Apache-2.0"
+LICENSE = "Apache-2.0 OR GPL-2.0-only OR LGPL-2.1-only"
 LIC_FILES_CHKSUM = " \
     file://LICENSE.txt;md5=f7fed8b6ab9289b77f5c14f3f79572cc \
     file://COPYING;md5=751419260aa954499f7abaabaa882bbe \

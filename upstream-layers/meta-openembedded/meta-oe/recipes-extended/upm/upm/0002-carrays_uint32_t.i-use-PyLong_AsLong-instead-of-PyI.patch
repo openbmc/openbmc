@@ -1,0 +1,23 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Subject: carrays_uint32_t.i: use PyLong_AsLong instead of PyInt_AsLong
+
+PyInt_AsLong is a Python 2 C-API name with no fallback definition in
+Python 3.14, so any SWIG module that %includes this file (e.g. hmtrp)
+fails to compile:
+
+  hmtrpPYTHON_wrap.cxx:7351:14: error: use of undeclared identifier 'PyInt_AsLong'; did you mean 'PyLong_AsLong'?
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/src/carrays_uint32_t.i
++++ b/src/carrays_uint32_t.i
+@@ -45,7 +45,7 @@
+   long v;
+   int res = SWIG_AsVal_long ($input, &v);
+   if (SWIG_IsOK(res)) {
+-    $1 = PyInt_AsLong($input);
++    $1 = PyLong_AsLong($input);
+   }
+   else {
+     SWIG_exception_fail(SWIG_ArgError(res), "failed to convert uint32");

@@ -29,4 +29,4 @@ RDEPENDS:${PN} = " \
     python3-unittest \
 "
 
-CVE_PRODUCT = "python-ldap"
+CVE_PRODUCT = "python-ldap:python-ldap"

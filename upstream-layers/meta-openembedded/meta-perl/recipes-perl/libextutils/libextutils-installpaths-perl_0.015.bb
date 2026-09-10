@@ -5,7 +5,7 @@ SECTION = "libs"
 
 HOMEPAGE = "https://metacpan.org/pod/ExtUtils::InstallPaths"
 
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=4109085ee02c4453f25d919938e72e96"
 
 SRC_URI = "${CPAN_MIRROR}/authors/id/L/LE/LEONT/ExtUtils-InstallPaths-${PV}.tar.gz"

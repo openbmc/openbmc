@@ -26,3 +26,13 @@ RDEPENDS:${PN} += " \
     python3-core \
 "
 
+do_install_ptest:append() {
+	# test_endarray_leak asserts sys.getrefcount(j1['v']) == 3, but modern
+	# CPython's specialized dict/subscript bytecode holds one fewer temporary
+	# reference during the call, so the real count is 2 regardless of
+	# environment (reproduces on plain upstream CPython 3.13, unrelated to
+	# this target). Upstream test-authoring assumption broken by CPython
+	# internals, not a packaging issue.
+	sed -i -e "/--automake/ s/$/ -k 'not test_endarray_leak'/" \
+		${D}${PTEST_PATH}/run-ptest
+}

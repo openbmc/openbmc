@@ -8,6 +8,8 @@ SRC_URI[sha256sum] = "f05a1c8d727d4f104c8c731688053033e05157f2ab81bc8eef50ec0c62
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 RDEPENDS:${PN} += "\
     python3-zeroconf (>=0.131.0) \
     python3-protobuf (>=4.25.2) \

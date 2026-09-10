@@ -52,6 +52,7 @@ RDEPENDS:${PN}:remove = "python3-core"
 RDEPENDS:${PN}-python3 = "${PN} python3-core python3-ctypes python3-stringold"
 
 FILES:${PN}-iiod = " \
+    ${sysconfdir}/init.d/iiod \
     ${sbindir}/iiod \
     ${systemd_system_unitdir}/iiod.service \
 "
@@ -60,7 +61,8 @@ FILES:${PN}-python3 = "${PYTHON_SITEPACKAGES_DIR}"
 
 SYSTEMD_PACKAGES = "${PN}-iiod"
 SYSTEMD_SERVICE:${PN}-iiod = "iiod.service"
-INITSCRIPT_NAME = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'iiod', '', d)}"
+INITSCRIPT_PACKAGES = "${PN}-iiod"
+INITSCRIPT_NAME:${PN}-iiod = "${@bb.utils.contains('DISTRO_FEATURES', 'sysvinit', 'iiod', '', d)}"
 
 # Explicitly define do_configure, do_compile and do_install because both cmake and setuptools3 have
 # EXPORT_FUNCTIONS do_configure do_compile do_install

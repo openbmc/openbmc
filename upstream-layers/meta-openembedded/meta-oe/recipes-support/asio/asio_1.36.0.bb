@@ -21,6 +21,11 @@ LIC_FILES_CHKSUM = "file://COPYING;md5=92db288d8a7d89bb9c5821c447c3052c"
 
 SRC_URI[sha256sum] = "7bf4dbe3c1ccd9cc4c94e6e6be026dcc2110f9201d286bb9500dc85d69825524"
 
+# Releases live in per-version directories named "<pver> (Stable)" / "<pver> (Development)",
+# so match only the stable ones.
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/asio/files/asio/"
+UPSTREAM_CHECK_REGEX = "files/asio/(?P<pver>\d+(\.\d+)+)%20%28Stable%29"
+
 PACKAGECONFIG ??= "boost"
 
 PACKAGECONFIG[boost] = "--with-boost=${STAGING_LIBDIR},--without-boost,boost"

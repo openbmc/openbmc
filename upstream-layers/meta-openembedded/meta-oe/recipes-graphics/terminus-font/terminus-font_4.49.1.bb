@@ -14,6 +14,11 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BPN}-${PV}.tar.gz \
           "
 SRC_URI[sha256sum] = "d961c1b781627bf417f9b340693d64fc219e0113ad3a3af1a3424c7aa373ef79"
 
+# The SF release directories are named terminus-font-4.49 while the tarball
+# inside is terminus-font-4.49.1.tar.gz, so scan the project homepage instead
+UPSTREAM_CHECK_URI = "http://terminus-font.sourceforge.net/"
+UPSTREAM_CHECK_REGEX = "terminus-font-(?P<pver>\d+(\.\d+)+)\.tar"
+
 inherit allarch fontcache
 
 PACKAGECONFIG ?= "${@bb.utils.filter('DISTRO_FEATURES', 'x11', d)}"

@@ -17,24 +17,20 @@ Signed-off-by: Aníbal Limón <anibal@rzerosystems.com>
 
 Upstream-Status: Inappropriate
 ---
- unattended-upgrade | 38 --------------------------------------
- 1 file changed, 38 deletions(-)
-
 diff --git a/unattended-upgrade b/unattended-upgrade
-index 802d4d5..3b4e83e 100755
+index b72e59e..8ff0c1c 100755
 --- a/unattended-upgrade
 +++ b/unattended-upgrade
-@@ -83,9 +83,6 @@ import apt
+@@ -89,8 +89,6 @@ import apt
  import apt_inst
  import apt_pkg
  
 -import distro_info
 -
--
- # the reboot required flag file used by packages
- REBOOT_REQUIRED_FILE = "/var/run/reboot-required"
- KEPT_PACKAGES_FILE = "var/lib/unattended-upgrades/kept-back"
-@@ -2061,41 +2058,6 @@ def run(options,             # type: Options
+ # workaround debian #1076097, it's unclear why we get the warning:
+ # "DeprecationWarning: This process (pid=3710789) is multi-threaded,
+ #  use of fork() may lead to deadlocks in the child."
+@@ -2436,42 +2434,6 @@ def run(options,             # type: Options
      if should_stop():
          return UnattendedUpgradesResult(False)
  
@@ -53,7 +49,8 @@ index 802d4d5..3b4e83e 100755
 -        except Exception as e:
 -            logging.warning("Could not figure out development release: %s" % e)
 -        else:
--            if ((devel.series == DISTRO_CODENAME
+-            if ((isinstance(devel, distro_info.DistroRelease)
+-                 and devel.series == DISTRO_CODENAME
 -                 and devel.release is not None
 -                 and devel.release - date.today() > DEVEL_UNTIL_RELEASE)):
 -                syslog.syslog((_("Not running on this development "

@@ -9,6 +9,10 @@ SRC_URI = "git://github.com/rm5248/libcppgenerate.git;branch=master;protocol=htt
 
 SRCREV = "930c5503f76c877b72b9ff8546353d6f422bd010"
 
+# Upstream stopped tagging after cppgenerate-0.2; PV 0.3 comes from the version
+# in master's CMakeLists.txt, so tags can only ever look like a downgrade.
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit cmake
 
 BBCLASSEXTEND = "native nativesdk"

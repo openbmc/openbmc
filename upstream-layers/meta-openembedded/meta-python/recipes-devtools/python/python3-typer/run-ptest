@@ -1,5 +1,17 @@
 #!/bin/sh
 
+# Force a wide console so rich does not wrap/truncate the error-panel text.
+# Several tests assert on trailing substrings ("is a file", "is a directory",
+# "unknown error") of long error messages that get word-wrapped - and thus
+# split - inside an 80-column rich panel when stdout is not a tty (as in the
+# ptest QEMU environment). A wide terminal keeps the message on one line.
+export COLUMNS=200
+
+# test_binary_stderr spawns a fresh interpreter to run this test file as a
+# script; the file does "from tests.utils import ...", so the ptest root (the
+# parent of tests/) must be importable in that subprocess.
+export PYTHONPATH="$(pwd)${PYTHONPATH:+:$PYTHONPATH}"
+
 # Ignore the test_tutorial and test_completion.
 # Because it needs the docs_src package what is not in Yocto.
 # And the tests are not that useful for Yocto.

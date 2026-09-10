@@ -1,7 +1,7 @@
 SUMMARY = "RFC 3986 compliant URI parsing library"
 HOMEPAGE = "https://uriparser.github.io"
 
-LICENSE = "BSD-3-Clause & LGPL-2.1-or-later"
+LICENSE = "BSD-3-Clause AND LGPL-2.1-or-later"
 LICENSE:${PN} = "BSD-3-Clause"
 LICENSE:${PN}-ptest = "LGPL-2.1-or-later"
 

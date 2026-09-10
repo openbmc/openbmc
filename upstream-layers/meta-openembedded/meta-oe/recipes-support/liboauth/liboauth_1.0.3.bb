@@ -3,7 +3,7 @@
 
 DESCRIPTION = "C library implementing OAuth Core RFC 5849"
 HOMEPAGE = "http://liboauth.sourceforge.net"
-LICENSE = "MIT|GPL-2.0-only"
+LICENSE = "MIT OR GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://COPYING.MIT;md5=6266718a5241c045c8099d9be48817df \
                     file://COPYING.GPL;md5=0636e73ff0215e8d672dc4c32c317bb3"
 SECTION = "libs"
@@ -13,5 +13,7 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/project/${BPN}/${BP}.tar.gz \
            file://0001-Support-OpenSSL-1.1.0.patch \
            "
 SRC_URI[sha256sum] = "0df60157b052f0e774ade8a8bac59d6e8d4b464058cc55f9208d72e41156811f"
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/liboauth/files/"
+UPSTREAM_CHECK_REGEX = "liboauth-(?P<pver>\d+(\.\d+)+)\.tar"
 
 inherit autotools pkgconfig

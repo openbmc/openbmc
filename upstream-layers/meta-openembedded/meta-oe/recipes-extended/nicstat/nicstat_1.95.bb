@@ -10,6 +10,9 @@ SRC_URI = "${SOURCEFORGE_MIRROR}/${BPN}/${BP}.tar.gz \
            "
 SRC_URI[sha256sum] = "c4cc33f8838f4523f27c3d7584eedbe59f4c587f0821612f5ac2201adc18b367"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/nicstat/files/"
+UPSTREAM_CHECK_REGEX = "${BPN}-(?P<pver>\d+(\.\d+)+)\.tar\.gz"
+
 do_compile() {
     ${CC} ${CFLAGS} ${LDFLAGS} -o nicstat nicstat.c
 }

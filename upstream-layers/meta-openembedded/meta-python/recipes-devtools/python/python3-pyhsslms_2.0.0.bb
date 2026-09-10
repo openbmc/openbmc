@@ -5,6 +5,8 @@ LIC_FILES_CHKSUM = "file://LICENSE.txt;md5=bbc59ef8bf238c2902ca816b87b58571"
 
 inherit python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 # Maintainer refused to upload source to pypi.org, but said he would in a
 # future release. In the meantime, do github
 SRC_URI = "git:///github.com/russhousley/pyhsslms.git;branch=master;protocol=https"

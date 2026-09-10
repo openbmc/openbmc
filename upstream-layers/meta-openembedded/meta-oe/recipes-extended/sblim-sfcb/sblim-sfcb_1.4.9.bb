@@ -33,6 +33,9 @@ SRC_URI = "http://downloads.sourceforge.net/sblim/${BP}.tar.bz2 \
 
 SRC_URI[sha256sum] = "634a67b2f7ac3b386a79160eb44413d618e33e4e7fc74ae68b0240484af149dd"
 
+UPSTREAM_CHECK_URI = "https://sourceforge.net/projects/sblim/files/sblim-sfcb/1.4%20branch%20%28current%29/"
+UPSTREAM_CHECK_REGEX = "sblim-sfcb-(?P<pver>\d+(\.\d+)+)\.tar\.bz2"
+
 CVE_STATUS[CVE-2012-3381] = "fixed-version: The CPE in the NVD database doesn't reflect correctly the vulnerable versions."
 
 inherit autotools

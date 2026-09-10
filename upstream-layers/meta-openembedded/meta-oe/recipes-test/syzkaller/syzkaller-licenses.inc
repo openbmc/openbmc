@@ -1,4 +1,4 @@
-LICENSE += "& BSD-3-Clause & MIT"
+LICENSE += "AND BSD-3-Clause AND MIT"
 
 LIC_FILES_CHKSUM += "\
     file://pkg/mod/cel.dev/expr@v0.24.0/LICENSE;md5=3b83ef96387f14655fc854ddc3c6bd57;spdx=Apache-2.0 \

@@ -1,0 +1,36 @@
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Subject: fann2.i: add py2/py3 C-API compat macros
+
+The HELPER_ARRAY_TEMPLATE typemaps in fann2.i use the Python 2 C-API
+names PyInt_Check/PyInt_AsLong/PyInt_FromLong. Python 3.14 no longer
+ships any fallback definitions for them, so the SWIG-generated wrapper
+fails to compile:
+
+  fann2/fann2_wrap.cxx:10062:41: error: use of undeclared identifier 'PyInt_AsLong'; did you mean 'PyLong_AsLong'?
+
+Map them to their PyLong_* equivalents.
+
+Upstream-Status: Pending
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+--- a/fann2/fann2.i
++++ b/fann2/fann2.i
+@@ -15,6 +15,18 @@
+ #include "fann_cpp_subclass.h"
+ %}
+ 
++%{
++#ifndef PyInt_Check
++#define PyInt_Check(x) PyLong_Check(x)
++#endif
++#ifndef PyInt_AsLong
++#define PyInt_AsLong(x) PyLong_AsLong(x)
++#endif
++#ifndef PyInt_FromLong
++#define PyInt_FromLong(x) PyLong_FromLong(x)
++#endif
++%}
++
+ %define HELPER_ARRAY_TEMPLATE( templ , T, GetFunc, SetFunc, cast)
+     %typemap(in) templ<T> *  (templ<T> temp){
+         // templ<T>* type_map in

@@ -6,6 +6,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=1d34d9701a1461e4bd71a904ac4cf7be"
 
 SRC_URI[sha256sum] = "b4a75a3fa94fef4d23d502eb3c2244146ef9a1ee0082cf1cb0a91586ba0510c3"
 
+CVE_PRODUCT = "ethereum:web3.py apeworx:web3.py"
+
 inherit pypi setuptools3
 
 RDEPENDS:${PN} += " \

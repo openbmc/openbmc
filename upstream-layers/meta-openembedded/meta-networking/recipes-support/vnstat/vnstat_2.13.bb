@@ -8,6 +8,9 @@ DEPENDS = "gd sqlite3"
 SRC_URI = "https://github.com/vergoh/vnstat/releases/download/v${PV}/${BPN}-${PV}.tar.gz"
 SRC_URI[sha256sum] = "c9fe19312d1ec3ddfbc4672aa951cf9e61ca98dc14cad3d3565f7d9803a6b187"
 
+UPSTREAM_CHECK_URI = "https://github.com/vergoh/vnstat/releases"
+UPSTREAM_CHECK_REGEX = "releases/tag/v(?P<pver>\d+(\.\d+)+)"
+
 inherit autotools pkgconfig systemd
 
 EXTRA_OECONF = "--disable-extra-paths"

@@ -1,0 +1,68 @@
+From d0fd7b4be89feb6a8809216b0dc1d84299bbad96 Mon Sep 17 00:00:00 2001
+From: Khem Raj <khem.raj@oss.qualcomm.com>
+Date: Mon, 7 Sep 2026 19:27:57 -0700
+Subject: [PATCH] Mark write-only real_* pointers as unused
+
+clang 23 added -Wunused-but-set-global, which together with the -Werror
+in src/Makefile breaks the build:
+
+  libfaketime.c:340:23: error: variable 'real_lstat' set but not used
+    [-Werror,-Wunused-but-set-global]
+
+ftpl_init() deliberately resolves every real_* pointer up front ('Look
+up all real_* functions. NULL will mark missing ones.'), but several of
+them are only consumed on other platforms or under build options that
+are off by default, so on Linux/glibc they are written and never read.
+
+Annotate exactly those with __attribute__((unused)). This is understood
+by every gcc and clang that can build libfaketime, unlike a
+-Wno-error=unused-but-set-global flag, which older compilers reject.
+
+Upstream-Status: Pending
+
+Signed-off-by: Khem Raj <khem.raj@oss.qualcomm.com>
+---
+ src/libfaketime.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/src/libfaketime.c b/src/libfaketime.c
+index e674883..2addaab 100644
+--- a/src/libfaketime.c
++++ b/src/libfaketime.c
+@@ -337,26 +337,26 @@ static __thread bool dont_fake = false;
+ /* pointers to real (not faked) functions */
+ static int          (*real_stat)            (const char *, struct stat *);
+ static int          (*real_fstat)           (int, struct stat *);
+-static int          (*real_lstat)           (const char *, struct stat *);
++static int          (*real_lstat)           (const char *, struct stat *) __attribute__((unused));
+ #ifndef __ANDROID__
+ static int          (*real_xstat)           (int, const char *, struct stat *);
+ static int          (*real_fxstat)          (int, int, struct stat *);
+-static int          (*real_fxstatat)        (int, int, const char *, struct stat *, int);
+-static int          (*real_lxstat)          (int, const char *, struct stat *);
++static int          (*real_fxstatat)        (int, int, const char *, struct stat *, int) __attribute__((unused));
++static int          (*real_lxstat)          (int, const char *, struct stat *) __attribute__((unused));
+ #endif
+ #if !defined(__APPLE__) || !__DARWIN_ONLY_64_BIT_INO_T
+ #ifndef __ANDROID__
+-static int          (*real_stat64)          (const char *, struct stat64 *);
+-static int          (*real_xstat64)         (int, const char *, struct stat64 *);
+-static int          (*real_fxstat64)        (int, int , struct stat64 *);
+-static int          (*real_fxstatat64)      (int, int , const char *, struct stat64 *, int);
+-static int          (*real_lxstat64)        (int, const char *, struct stat64 *);
++static int          (*real_stat64)          (const char *, struct stat64 *) __attribute__((unused));
++static int          (*real_xstat64)         (int, const char *, struct stat64 *) __attribute__((unused));
++static int          (*real_fxstat64)        (int, int , struct stat64 *) __attribute__((unused));
++static int          (*real_fxstatat64)      (int, int , const char *, struct stat64 *, int) __attribute__((unused));
++static int          (*real_lxstat64)        (int, const char *, struct stat64 *) __attribute__((unused));
+ #endif
+ #endif
+ #ifdef STATX_TYPE
+-static int          (*real_statx)           (int dirfd, const char *pathname, int flags, unsigned int mask, struct statx *statxbuf);
++static int          (*real_statx)           (int dirfd, const char *pathname, int flags, unsigned int mask, struct statx *statxbuf) __attribute__((unused));
+ #endif
+-static time_t       (*real_time)            (time_t *);
++static time_t       (*real_time)            (time_t *) __attribute__((unused));
+ #ifndef __ANDROID__
+ static int          (*real_ftime)           (struct timeb *);
+ #endif

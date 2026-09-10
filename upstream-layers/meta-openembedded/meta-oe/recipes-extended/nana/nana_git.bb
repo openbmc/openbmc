@@ -6,6 +6,10 @@ SECTION = "Development/Languages/C and C++"
 
 PV = "2.5+git"
 SRCREV = "6d70617db8b9972e6c1008265fc228aba91c2042"
+
+# Upstream git repo has no tags (2.5 was the last tarball release on Savannah),
+# so there is no version to compare against; track commits instead.
+UPSTREAM_CHECK_COMMITS = "1"
 SRC_URI = "git://github.com/pjmaker/nana;protocol=https;branch=master \
     file://0001-Makefile.am-fix-build-with-separate-build-dir.patch \
     file://0002-man-Makefile.am-we-seem-not-to-need-the-work-around-.patch \

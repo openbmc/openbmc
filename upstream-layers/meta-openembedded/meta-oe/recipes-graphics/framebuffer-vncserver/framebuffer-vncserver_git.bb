@@ -19,6 +19,9 @@ SRC_URI = "\
 "
 SRCREV = "1963e57bebfde420baeecbb2c6848a2382488413"
 
+# Upstream repo carries no tags and publishes no GitHub releases
+UPSTREAM_CHECK_COMMITS = "1"
+
 inherit cmake systemd
 
 do_install:append() {

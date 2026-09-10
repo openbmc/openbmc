@@ -7,6 +7,8 @@ SRC_URI[sha256sum] = "57a5b9bb9ad350c278e8aa6be4cdebbcd925b9ba71d6a712a178a618cf
 
 inherit pypi python_setuptools_build_meta
 
+DEPENDS += "python3-wheel-native"
+
 DEPENDS += "python3-setuptools-scm-native"
 
 BBCLASSEXTEND = "native nativesdk"

@@ -18,6 +18,10 @@ SRC_URI = "git://git.kernel.org/pub/scm/utils/cpu/mce/mce-test.git;protocol=git;
 SRCREV = "9d11fc3e05eae7b454efeb5941beded56f80445b"
 PV = "20230601+git"
 
+# Upstream has a single ancient tag (v1.0) which is older than the snapshot
+# date used as PV, so tag-based checking cannot work; track commits instead.
+UPSTREAM_CHECK_COMMITS = "1"
+
 RDEPENDS:${PN} = "mcelog mce-inject dialog bash"
 
 COMPATIBLE_HOST = '(i.86|x86_64).*-linux'

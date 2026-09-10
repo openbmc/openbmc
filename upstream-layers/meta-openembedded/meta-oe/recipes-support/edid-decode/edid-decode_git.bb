@@ -8,6 +8,8 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=2ef696d66c156139232201f223c22592"
 
 SRC_URI = "git://git.linuxtv.org/edid-decode.git;protocol=https;branch=master"
 SRCREV = "5920bf2a756b2f748c49ff6a08b9f421026473c5"
+# Upstream (git.linuxtv.org) publishes no tags or releases; track commits.
+UPSTREAM_CHECK_COMMITS = "1"
 PV = "0.0+git"
 
 # Upstream repo does not tag
