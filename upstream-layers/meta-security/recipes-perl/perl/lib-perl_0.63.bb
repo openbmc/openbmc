@@ -5,7 +5,7 @@ will find modules which are not located in the default search path."
 
 SECTION = "libs"
 HOMEPAGE = "https://metacpan.org/dist/lib"
-LICENSE = "Artistic-1.0 | GPL-1.0-or-later"
+LICENSE = "Artistic-1.0 OR GPL-1.0-or-later"
 PR = "r0"
 
 LIC_FILES_CHKSUM = "file://README;beginline=26;endline=30;md5=94b119f1a7b8d611efc89b5d562a1a50"

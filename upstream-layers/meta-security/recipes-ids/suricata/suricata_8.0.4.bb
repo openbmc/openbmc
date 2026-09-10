@@ -86,12 +86,17 @@ CFLAGS += "-Wno-error=incompatible-pointer-types \
 # breaks building this recipe. Providing a copy of the original function
 # Armin 2025/04/01
 #
-oe_cargo_build () {
+# 08/2026 note - oe_cargo_build function inlined into cargo_do_compile
+# upstream in openembedded-core commit a64ac03a61, handle by renaming
+# our forked function to cargo_do_compile to override it directly.
+# This still works since before a64ac03a61 cargo_do_compile did nothing
+# but call oe_cargo_build.
+cargo_do_compile () {
     export RUSTFLAGS="${RUSTFLAGS}"
     bbnote "Using rust targets from ${RUST_TARGET_PATH}"
     bbnote "cargo = $(which ${CARGO})"
-    bbnote "${CARGO} build ${CARGO_BUILD_FLAGS}$@"
-    "${CARGO}" build ${CARGO_BUILD_FLAGS}"$@"
+    bbnote "${CARGO} build ${CARGO_BUILD_FLAGS} $@"
+    "${CARGO}" build ${CARGO_BUILD_FLAGS} "$@"
 }
 
 do_compile () {

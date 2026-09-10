@@ -7,6 +7,7 @@ DEPENDS = "bison-native libpcre2"
 
 SRC_URI = "https://github.com/aide/aide/releases/download/v${PV}/${BPN}-${PV}.tar.gz \
            file://0001-Fixes-build-issues.patch \
+           file://0002-Support-build-with-nettle-4.patch \
            file://aide.conf \
 "
 
@@ -31,8 +32,6 @@ PACKAGECONFIG[e2fsattrs] = "--with-e2fsattrs, --without-e2fsattrs, e2fsprogs, e2
 PACKAGECONFIG[capabilities] = "--with-capabilities, --without-capabilities, libcap, libcap"
 PACKAGECONFIG[posix-acl] = "--with-posix-acl, --without-posix-acl, acl, acl"
 
-do_install[nostamp] = "1"
-
 do_install:append () {
     install -d ${D}${libdir}/${PN}/logs   
     install -d ${D}${sysconfdir}   
@@ -47,14 +46,11 @@ do_install:append () {
 }
 
 do_install:class-native () {
-    install -d ${STAGING_AIDE_DIR}/bin
-    install -d ${STAGING_AIDE_DIR}/lib/logs
+    install -d ${D}${bindir}
+    install -d ${D}${datadir}/${BPN}
 
-    install ${B}/aide ${STAGING_AIDE_DIR}/bin
-    install ${UNPACKDIR}/aide.conf ${STAGING_AIDE_DIR}/
-
-    sed -i -s "s:\@\@define DBDIR.*:\@\@define DBDIR ${STAGING_AIDE_DIR}/lib:" ${STAGING_AIDE_DIR}/aide.conf
-    sed -i -e "s:\@\@define LOGDIR.*:\@\@define LOGDIR ${STAGING_AIDE_DIR}/lib/logs:" ${STAGING_AIDE_DIR}/aide.conf
+    install ${B}/aide ${D}${bindir}
+    install ${UNPACKDIR}/aide.conf ${D}${datadir}/${BPN}/
 }
 
 CONF_FILE = "${sysconfdir}/aide.conf"

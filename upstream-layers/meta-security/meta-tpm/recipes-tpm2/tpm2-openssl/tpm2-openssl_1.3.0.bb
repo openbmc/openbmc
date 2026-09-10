@@ -1,4 +1,5 @@
 SUMMARY = "Provider for integration of TPM 2.0 to OpenSSL 3.0"
+HOMEPAGE = "https://github.com/tpm2-software/tpm2-openssl"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=3f4b4cb00f4d0d6807a0dc79759a57ac"
 

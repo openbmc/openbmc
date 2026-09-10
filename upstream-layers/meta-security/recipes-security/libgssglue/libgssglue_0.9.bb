@@ -8,7 +8,7 @@ depending on the mechanism. \
 HOMEPAGE = "https://gitlab.com/gsasl/libgssglue"
 SECTION = "libs"
 
-LICENSE = "BSD-3-Clause | HPND"
+LICENSE = "BSD-3-Clause OR HPND"
 
 #Copyright (c) 1996, by Sun Microsystems, Inc.                   HPND
 #Copyright (c) 2007 The Regents of the University of Michigan. BSD-3-Clause

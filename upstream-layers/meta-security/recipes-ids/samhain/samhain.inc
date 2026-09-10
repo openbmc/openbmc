@@ -20,6 +20,7 @@ SRC_URI = "https://la-samhna.de/archive/samhain_signed-${PV}.tar.gz \
            file://0009-fix-build-with-new-version-attr.patch \
            file://0010-Fix-initializer-element-is-not-constant.patch \
            file://0001-Format-test-output-to-match-Automake-standards.patch \
+           file://0013-yulerc-set-SetLockfilePath-to-run-yule.pid.patch \
            "
 
 SRC_URI[sha256sum] = "e7837adfde3d59a23c59e1bf3ebacdf71bce018619194cfad938cd30cbb9d15b"

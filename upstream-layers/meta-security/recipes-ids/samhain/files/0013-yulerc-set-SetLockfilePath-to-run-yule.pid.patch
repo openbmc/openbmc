@@ -1,0 +1,41 @@
+From 7070832b4652f3cdaa2e37325fc6f9456859cb5d Mon Sep 17 00:00:00 2001
+From: Bin Cao <bin.cao.cn@windriver.com>
+Date: Mon, 25 May 2026 14:55:37 +0800
+Subject: [PATCH] yulerc: set SetLockfilePath to /run/yule.pid
+
+On systemd-based systems, /var/run is a symlink to /run. Samhain's
+security-hardened code uses lstat() to verify the PID file directory
+is a real directory and rejects symlinks. This causes yule (the samhain
+server) to fail to start with "Path of PID directory refers to a
+non-directory object".
+
+Set SetLockfilePath explicitly to /run/yule.pid to bypass the
+compiled-in default of /var/run/samhain.pid.
+
+This is the same approach used in 0004-Set-the-PID-Lock-path-for-
+samhain.pid.patch for the standalone/client configuration.
+
+Upstream-Status: Inappropriate [OE-specific configuration]
+Signed-off-by: Bin Cao <bin.cao.cn@windriver.com>
+---
+ yulerc.template | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/yulerc.template b/yulerc.template
+index 512bc0d..24b437c 100644
+--- a/yulerc.template
++++ b/yulerc.template
+@@ -173,6 +173,10 @@ Daemon=yes
+ # SetLoopTime = 60
+ SetLoopTime = 600
+ 
++## Path to the PID file
++#
++SetLockfilePath = /run/yule.pid
++
+ ## Normally, client messages are regarded as data within a
+ ## server message of fixed severity. The following two
+ ## options cause the server to use the original severity/class
+-- 
+2.34.1
+

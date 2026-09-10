@@ -1,8 +1,8 @@
 SUMMARY = "ClamAV anti-virus utilities and scanner tools"
-DESCRIPTION = "ClamAV is an open source antivirus engine for detecting trojans, viruses, malware & other malicious threats."
+DESCRIPTION = "ClamAV is an open source antivirus engine for detecting trojans, viruses, malware AND other malicious threats."
 HOMEPAGE = "http://www.clamav.net/index.html"
 SECTION = "security"
-LICENSE = "GPL-2.0-only & LGPL-2.1-only & BSD-2-Clause & Zlib & Apache-2.0-with-LLVM-exception"
+LICENSE = "GPL-2.0-only AND LGPL-2.1-only AND BSD-2-Clause AND Zlib AND Apache-2.0-with-LLVM-exception"
 LIC_FILES_CHKSUM = "file://COPYING.txt;md5=2c0b5770a62017a3121c69bb9f680b0c \
                     file://COPYING/COPYING.LGPL;md5=2d5025d4aa3495befef8f17206a5b0a1 \
                     file://COPYING/COPYING.bzip2;md5=ae8d555c34b656ff864ea9437a10d3a0 \

@@ -31,6 +31,13 @@
 inherit aide-base 
 
 aide_init_db() {
+    install -d ${STAGING_AIDE_DIR}/lib/logs
+    rm -f ${STAGING_AIDE_DIR}/aide.conf ${STAGING_AIDE_DIR}/lib/aide.db ${STAGING_AIDE_DIR}/lib/aide.db.gz ${STAGING_AIDE_DIR}/lib/logs/aide.log
+    install ${STAGING_DATADIR_NATIVE}/aide/aide.conf ${STAGING_AIDE_DIR}/
+
+    sed -i -s "s:\@\@define DBDIR.*:\@\@define DBDIR ${STAGING_AIDE_DIR}/lib:" ${STAGING_AIDE_DIR}/aide.conf
+    sed -i -e "s:\@\@define LOGDIR.*:\@\@define LOGDIR ${STAGING_AIDE_DIR}/lib/logs:" ${STAGING_AIDE_DIR}/aide.conf
+
     for dir in ${AIDE_INCLUDE_DIRS}; do
         echo "${IMAGE_ROOTFS}${dir} NORMAL" >> ${STAGING_AIDE_DIR}/aide.conf
     done
@@ -39,7 +46,7 @@ aide_init_db() {
     done
 
 
-    ${STAGING_AIDE_DIR}/bin/aide -c ${STAGING_AIDE_DIR}/aide.conf --init
+    ${STAGING_BINDIR_NATIVE}/aide -c ${STAGING_AIDE_DIR}/aide.conf --init
     gunzip ${STAGING_AIDE_DIR}/lib/aide.db.gz 
     # strip out native path
     sed -i -e 's:${IMAGE_ROOTFS}::' ${STAGING_AIDE_DIR}/lib/aide.db
@@ -47,6 +54,6 @@ aide_init_db() {
     cp -f ${STAGING_AIDE_DIR}/lib/aide.db.gz ${IMAGE_ROOTFS}${libdir}/aide
 }
 
-EXTRA_IMAGEDEPENDS:append = " aide-native"
+do_rootfs[depends] += "aide-native:do_populate_sysroot"
 
 ROOTFS_POSTPROCESS_COMMAND:append = " aide_init_db;"

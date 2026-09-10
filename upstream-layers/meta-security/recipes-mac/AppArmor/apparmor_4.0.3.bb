@@ -8,7 +8,7 @@ DESCRIPTION = "user-space parser utility for AppArmor \
 HOMEPAGE = "http://apparmor.net/"
 SECTION = "admin"
 
-LICENSE = "GPL-2.0-only & GPL-2.0-or-later & BSD-3-Clause & LGPL-2.1-or-later"
+LICENSE = "GPL-2.0-only AND GPL-2.0-or-later AND BSD-3-Clause AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=fd57a4b0bc782d7b80fd431f10bbf9d0"
 
 DEPENDS = "bison-native apr autoconf-archive-native gettext-native coreutils-native swig-native"

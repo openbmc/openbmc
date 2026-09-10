@@ -1,4 +1,4 @@
-DESCRIPTION = "OpenSSL secure engine based on TPM hardware"
+SUMMARY = "OpenSSL secure engine based on TPM hardware"
 HOMEPAGE = "https://github.com/mgerstner/openssl_tpm_engine"
 SECTION = "security/tpm"
 

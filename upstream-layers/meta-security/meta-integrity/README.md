@@ -270,5 +270,5 @@ No package manager is integrated with IMA/EVM. When updating packages,
 files will end up getting installed without correct IMA/EVM attributes
 and thus will not be usable when appraisal is turned on.
 
-[1] http://permalink.gmane.org/gmane.comp.handhelds.tizen.devel/6281
-[2] http://permalink.gmane.org/gmane.comp.handhelds.tizen.devel/6275
+[1] https://www.mail-archive.com/dev@lists.tizen.org/msg06106.html
+[2] https://www.mail-archive.com/dev@lists.tizen.org/msg06100.html
