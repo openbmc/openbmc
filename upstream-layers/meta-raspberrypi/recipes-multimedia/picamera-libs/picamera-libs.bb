@@ -1,6 +1,6 @@
 SUMMARY = "Raspberrypi firmware libraries which are required by picamera library"
 DESCRIPTION = "Raspberrypi firmware libraries required by picamera library"
-LICENSE = "Broadcom-RPi"
+LICENSE = "LicenseRef-Broadcom-RPi"
 
 LIC_FILES_CHKSUM = "file://opt/vc/LICENCE;md5=86e53f5f5909ee66900418028de11780"
 

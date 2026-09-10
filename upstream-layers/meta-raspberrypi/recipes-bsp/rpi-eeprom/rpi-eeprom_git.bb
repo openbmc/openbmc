@@ -1,7 +1,7 @@
 SUMMARY = "Installation scripts and binaries for the Raspberry Pi 4 EEPROM"
 DESCRIPTION = "This repository contains the rpi4/rpi5 bootloader and scripts \
 for updating it in the spi eeprom"
-LICENSE = "BSD-3-Clause & Broadcom-RPi"
+LICENSE = "BSD-3-Clause AND LicenseRef-Broadcom-RPi"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a6c5149578a16272119f3f9c13d6549b"
 
 SRC_URI = " \

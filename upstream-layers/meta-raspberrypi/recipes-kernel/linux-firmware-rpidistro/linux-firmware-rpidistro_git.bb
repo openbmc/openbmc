@@ -5,7 +5,7 @@ to linux-firmware for general use."
 HOMEPAGE = "https://github.com/RPi-Distro/firmware-nonfree"
 SECTION = "kernel"
 
-LICENSE = "GPL-2.0-only & binary-redist-Cypress-rpidistro & Synaptics-rpidistro"
+LICENSE = "GPL-2.0-only AND LicenseRef-binary-redist-Cypress-rpidistro AND LicenseRef-Synaptics-rpidistro"
 LIC_FILES_CHKSUM = "\
     file://debian/copyright;md5=454e44c688dc909e16223e4aee63568c \
 "
@@ -66,12 +66,12 @@ PACKAGES = "\
     ${PN}-module-conf \
 "
 
-LICENSE:${PN}-bcm43430 = "binary-redist-Cypress-rpidistro"
-LICENSE:${PN}-bcm43436 = "Synaptics-rpidistro"
-LICENSE:${PN}-bcm43436s = "Synaptics-rpidistro"
-LICENSE:${PN}-bcm43439 = "Synaptics-rpidistro"
-LICENSE:${PN}-bcm43455 = "binary-redist-Cypress-rpidistro"
-LICENSE:${PN}-bcm43456 = "Synaptics-rpidistro"
+LICENSE:${PN}-bcm43430 = "LicenseRef-binary-redist-Cypress-rpidistro"
+LICENSE:${PN}-bcm43436 = "LicenseRef-Synaptics-rpidistro"
+LICENSE:${PN}-bcm43436s = "LicenseRef-Synaptics-rpidistro"
+LICENSE:${PN}-bcm43439 = "LicenseRef-Synaptics-rpidistro"
+LICENSE:${PN}-bcm43455 = "LicenseRef-binary-redist-Cypress-rpidistro"
+LICENSE:${PN}-bcm43456 = "LicenseRef-Synaptics-rpidistro"
 LICENSE:${PN}-license = "GPL-2.0-only"
 
 FILES:${PN}-bcm43430 = " \
