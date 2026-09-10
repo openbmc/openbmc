@@ -1,6 +1,6 @@
 # Common src definitions for trusted-firmware-m and trusted-firmware-m-scripts
 
-LICENSE = "BSD-2-Clause & BSD-3-Clause & Apache-2.0"
+LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause"
 
 LIC_FILES_CHKSUM = "file://license.rst;md5=07f368487da347f3c7bd0fc3085f3afa \
                     file://external/tf-m-tests/license.rst;md5=4481bae2221b0cfca76a69fb3411f390 \

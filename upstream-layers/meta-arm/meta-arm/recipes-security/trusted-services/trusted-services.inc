@@ -1,7 +1,7 @@
 SUMMARY ?= "The Trusted Services: framework for developing root-of-trust services"
 HOMEPAGE = "https://trusted-services.readthedocs.io/en/latest/index.html"
 
-LICENSE = "Apache-2.0 & BSD-3-Clause & Zlib"
+LICENSE = "Apache-2.0 AND BSD-3-Clause AND Zlib"
 
 inherit python3native cmake pkgconfig
 

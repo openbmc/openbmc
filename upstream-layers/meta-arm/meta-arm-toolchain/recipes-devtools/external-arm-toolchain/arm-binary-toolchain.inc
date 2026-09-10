@@ -26,6 +26,6 @@ PRIVATE_LIBS = "libgcc_s.so.1 libstdc++.so.6"
 BBCLASSEXTEND = "native nativesdk"
 
 # Skipping file deps - we don't control the dependencies for prebuilt libraries, resulting in
-# nothing provides libcrypt.so.1()(64bit) needed by nativesdk-gcc-arm-none-eabi 
+# nothing provides libcrypt.so.1()(64bit) needed by nativesdk-gcc-arm-none-eabi
 # when packaged as RPM for SDK.
 SKIP_FILEDEPS = "1"

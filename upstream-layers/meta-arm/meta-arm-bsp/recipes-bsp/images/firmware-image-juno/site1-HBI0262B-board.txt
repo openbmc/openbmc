@@ -1,0 +1,22 @@
+BOARD: HBI0262
+TITLE: V2M-Juno DevChip Configuration File
+
+[SCC REGISTERS]
+TOTALSCCS: 12                   ;Total Number of SCC registers
+SCC: 0x054 0x0007FFFE           ;Enable non-secure DMA operations
+SCC: 0x05C 0x00FE001E           ;Enable default GPU Texture Formats
+SCC: 0x100 0x003F1000           ;A57 PLL Register 0 (800MHz)
+SCC: 0x104 0x0001F300           ;A57 PLL Register 1
+SCC: 0x108 0x00371000           ;A53 PLL Register 0 (700MHz)
+SCC: 0x10C 0x0001B300           ;A53 PLL Register 1
+SCC: 0x118 0x003F1000           ;SYS PLL Register 0 (1600MHz)
+SCC: 0x11C 0x0001F100           ;SYS PLL Register 1
+SCC: 0x0F8 0x0BEC0000           ;BL1 entry point
+SCC: 0x0FC 0xABE40000           ;BL0 entry point
+
+SCC: 0x00C 0x000000C2           ;Clock Control, TMIF2XCLK, Register 0xC1 = default
+                                ;[3:0] CLKSEL : 0 Output gated, 1 AON_REF_CLK, 2 SYSCLK
+                                ;[7:4] CLKDIV : Clock divider -1 (0 give a division of 1)
+SCC: 0x010 0x000000C2           ;Clock Control, TSIF2XCLK, Register 0xC1 = default
+                                ;[3:0] CLKSEL : 0 Output gated, 1 AON_REF_CLK, 2 SYSCLK
+                                ;[7:4] CLKDIV : Clock divider -1 (0 give a division of 1)

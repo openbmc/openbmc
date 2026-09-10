@@ -17,14 +17,13 @@ DEPENDS += "openssl-native"
 
 inherit native
 
-EXTRA_OEMAKE = "V=1 HOSTCC='${BUILD_CC}' OPENSSL_DIR=${STAGING_DIR_NATIVE}/${prefix_native}"
+EXTRA_OEMAKE = "V=1 \
+    HOSTCC='${BUILD_CC}' \
+    HOSTCCFLAGS='${BUILD_CPPFLAGS} ${BUILD_CFLAGS}' \
+    HOSTLDFLAGS='${BUILD_LDFLAGS}' \
+    OPENSSL_DIR=${STAGING_DIR_NATIVE}/${prefix_native}"
 
 do_compile () {
-    # This is still needed to have the native fiptool executing properly by
-    # setting the RPATH
-    sed -i '/^LDOPTS/ s,$, \$\{BUILD_LDFLAGS},' ${S}/tools/fiptool/Makefile
-    sed -i '/^INCLUDE_PATHS/ s,$, \$\{BUILD_CFLAGS},' ${S}/tools/fiptool/Makefile
-
     oe_runmake fiptool
 }
 

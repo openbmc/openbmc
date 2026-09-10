@@ -1,7 +1,7 @@
 require recipes-bsp/uefi/edk2-firmware_202605.bb
 PROVIDES:remove = "virtual/bootloader"
 
-LICENSE += "& Apache-2.0"
+LICENSE += "AND Apache-2.0"
 LIC_FILES_CHKSUM += "file://ShellPkg/Application/sbsa-acs/LICENSE.md;md5=2a944942e1496af1886903d274dedb13"
 
 SRC_URI += "git://github.com/ARM-software/sbsa-acs;destsuffix=edk2/ShellPkg/Application/sbsa-acs;protocol=https;branch=master;name=acs \

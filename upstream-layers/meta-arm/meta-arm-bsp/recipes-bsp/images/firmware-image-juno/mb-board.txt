@@ -1,0 +1,26 @@
+BOARD: HBI0262
+TITLE: MotherBoard Configuration File
+
+[MCCS]
+MBBIOS: mbb_v151.ebf        ;MB BIOS IMAGE
+
+[FPGAS]
+MBIOFPGA: io_b118.bit       ;MB IOFPGA
+
+[PMIC]
+MBPMIC: pms_v103.bin        ;MB PMIC
+
+[OSCCLKS]
+TOTALOSCCLKS: 11
+OSC0: 50.0                  ;OSC0 Juno SYSREFCLK    (System clock)
+OSC1: 50.0                  ;OSC1 Juno AONREFCLK    (Always On)
+OSC2: 50.0                  ;OSC2 Juno PXLREFCLK    (HS pixel clock)
+OSC3: 47.5                  ;OSC3 Juno PXCLKIN      (LS pixel clock)
+OSC4: 2.11                  ;OSC4 Juno I2SCLK       (Audio)
+OSC5: 50.0                  ;OSC5 Juno SMCMCLK      (Static memory)
+OSC6: 50.0                  ;OSC6 Juno CA53 REF_CLK (RSVD)
+OSC7: 50.0                  ;OSC7 Juno CA57 REF_CLK (RSVD)
+OSC8: 50.0                  ;OSC8 Juno GPU  REF_CLK (RSVD)
+OSC9: 30.0                  ;OSC9  IOFPGA BOOT      (RSVD)
+OSC10: 24.0                 ;OSC10 IOFPGA UART      (RSVD)
+OSC11: 7.37                 ;OSC11 Juno UARTCLK     (UART clock)

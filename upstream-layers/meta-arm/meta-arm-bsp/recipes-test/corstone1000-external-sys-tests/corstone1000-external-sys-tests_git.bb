@@ -1,6 +1,6 @@
 SUMMARY = "CORSTONE1000 external systems communications tests"
 DESCRIPTION = "This is a Linux userspace tool to test the communication between Corstone1000 cores"
-HOMEPAGE = "https://git.linaro.org/landing-teams/working/arm/test-apps.git"
+HOMEPAGE = "https://gitlab.arm.com/arm-reference-solutions/corstone1000/applications"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e44b2531cd6ffe9dece394dbe988d9a0"
 

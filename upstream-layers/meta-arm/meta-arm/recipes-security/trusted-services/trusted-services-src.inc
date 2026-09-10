@@ -1,6 +1,6 @@
 # Define sources of Trusted Service and all external dependencies
 
-LICENSE = "Apache-2.0 & BSD-3-Clause & BSD-2-Clause & Zlib"
+LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND Zlib"
 
 
 FILESEXTRAPATHS:prepend := "${THISDIR}/files:"

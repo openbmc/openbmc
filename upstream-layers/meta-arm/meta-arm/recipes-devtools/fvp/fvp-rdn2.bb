@@ -14,7 +14,5 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 LIC_FILES_CHKSUM = "file://license_terms/license_agreement.txt;md5=1a33828e132ba71861c11688dbb0bd16 \
                     file://license_terms/third_party_licenses/third_party_licenses.txt;md5=b9005e55057311e41efe02ccfea8ea72"
 
-COMPATIBLE_HOST = "(aarch64|x86_64).*-linux"
-
 require remove-execstack.inc
 REMOVE_EXECSTACKS:x86-64 = "${FVPDIR}/models/${FVP_ARCH_DIR}*/libarmctmodel.so"

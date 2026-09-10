@@ -1,5 +1,5 @@
 DESCRIPTION = "Trusted Firmware-A tests(aka TFTF)"
-LICENSE = "BSD-3-Clause & NCSA"
+LICENSE = "BSD-3-Clause AND NCSA"
 
 LIC_FILES_CHKSUM += "file://docs/license.rst;md5=6175cc0aa2e63b6d21a32aa0ee7d1b4a"
 

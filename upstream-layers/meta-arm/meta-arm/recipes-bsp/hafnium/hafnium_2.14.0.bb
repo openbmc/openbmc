@@ -2,7 +2,7 @@ SUMMARY = "Hafnium"
 DESCRIPTION = "A reference Secure Partition Manager (SPM) for systems that implement the Armv8.4-A Secure-EL2 extension"
 DEPENDS = "gn-native ninja-native bison-native bc-native dtc-native openssl-native clang-native lld-native"
 
-LICENSE = "BSD-3-Clause & GPL-2.0-only"
+LICENSE = "BSD-3-Clause AND GPL-2.0-only"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=782b40c14bad5294672c500501edc103"
 
 PACKAGE_ARCH = "${MACHINE_ARCH}"

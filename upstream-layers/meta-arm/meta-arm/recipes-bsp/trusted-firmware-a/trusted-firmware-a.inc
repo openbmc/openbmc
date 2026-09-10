@@ -1,6 +1,6 @@
 DESCRIPTION = "Trusted Firmware-A"
 HOMEPAGE = "https://trustedfirmware-a.readthedocs.io/"
-LICENSE = "BSD-2-Clause & BSD-3-Clause & MIT & Apache-2.0"
+LICENSE = "Apache-2.0 AND BSD-2-Clause AND BSD-3-Clause AND MIT"
 
 inherit firmware
 
@@ -93,6 +93,10 @@ def remove_options_tail (in_string):
     from itertools import takewhile
     return ' '.join(takewhile(lambda x: not x.startswith('-'), in_string.split(' ')))
 
+# tools/cert_create/src/key.c uses the OpenSSL engine API, but this has been removed
+# from OpenSSL 4.  Enable the compatibility stub APIs until upstream is fixed.
+BUILD_CFLAGS += "-DOPENSSL_ENGINE_STUBS"
+
 EXTRA_OEMAKE += "${@'' if d.getVar('TFA_LTO') else "'LD=" + remove_options_tail(d.getVar('LD')) + "'"}"
 
 EXTRA_OEMAKE += "CC='${@remove_options_tail(d.getVar('CC'))}'"
@@ -158,6 +162,7 @@ do_compile() {
     sed -i '/^LDOPTS/ s,$, \$\{BUILD_LDFLAGS},' ${S}/tools/fiptool/Makefile
     sed -i '/^INCLUDE_PATHS/ s,$, \$\{BUILD_CFLAGS},' ${S}/tools/fiptool/Makefile
     sed -i '/^LIB/ s,$, \$\{BUILD_LDFLAGS},' ${S}/tools/cert_create/Makefile
+    sed -i '/^INC_DIR / s,$, \$\{BUILD_CFLAGS},' ${S}/tools/cert_create/Makefile
 
     # Currently there are races if you build all the targets at once in parallel
     for T in ${TFA_BUILD_TARGET}; do

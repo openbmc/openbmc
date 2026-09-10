@@ -1,7 +1,7 @@
 HOMEPAGE = "https://developer.arm.com/tools-and-software/simulation-models/fixed-virtual-platforms"
 
 LICENSE_FLAGS = "Arm-FVP-EULA"
-LICENSE = "Proprietary & Apache-2.0 & Python-2.0 & GPL-3.0-with-GCC-exception & Zlib & NCSA & LGPL-2.0-or-later & MIT & BSD-3-Clause"
+LICENSE = "0BSD AND Apache-2.0 AND Apache-2.0 WITH LLVM-exception AND BSD-3-Clause AND BSL-1.0 AND bzip2-1.0.6 AND GPL-3.0-or-later WITH GCC-exception-3.1 AND IJG AND LGPL-2.1-or-later AND MIT AND MIT WITH fmt-exception AND Python-2.0 AND Unlicense AND Zlib AND LicenseRef-Proprietary"
 
 # FVP has an End User License Agreement. Add Arm-FVP-EULA to
 # LICENSE_FLAGS_ACCEPTED if the EULA has been accepted, so it can
@@ -15,7 +15,7 @@ Please refer to 'https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula'\
 ${@bb.utils.contains('BB_ENV_PASSTHROUGH_ADDITIONS', 'ARM_FVP_EULA_ACCEPT', ' and export ARM_FVP_EULA_ACCEPT to 1', '', d)}.\
 "
 
-COMPATIBLE_HOST = "x86_64.*-linux"
+COMPATIBLE_HOST = "(aarch64|x86_64).*-linux"
 
 # The architecture-specific download filename suffix
 FVP_ARCH:aarch64 = "Linux64_armv8l"

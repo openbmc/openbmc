@@ -8,7 +8,7 @@ HOMEPAGE = "https://github.com/ARM-software/gator"
 # configuration requirement specified here:
 # https://github.com/ARM-software/gator#kernel-configuration
 
-LICENSE = "GPL-2.0-only & LGPL-2.1-or-later & Apache-2.0"
+LICENSE = "Apache-2.0 AND GPL-2.0-only AND LGPL-2.1-or-later"
 LIC_FILES_CHKSUM = "file://COPYING;md5=b234ee4d69f5fce4486a80fdaf4a4263 \
                     file://libsensors/COPYING.LGPL;md5=4fbd65380cdd255951079008b364516c \
                     file://mxml/LICENSE;md5=86d3f3a95c324c9479bd8986968f4327 \

@@ -1,0 +1,28 @@
+TITLE: V2M-Juno Configuration File
+
+[CONFIGURATION]
+AUTORUN: TRUE                    ;Auto Run from power on
+TESTMENU: FALSE                  ;MB Peripheral Test Menu
+
+UPDATE: FALSE                    ;Force JTAG and FPGA update to DBs
+VERIFY: FALSE                    ;Force FPGA verify to DBs
+
+DVIMODE: VGA                     ;VGA or SVGA or XGA or SXGA or UXGA
+
+MBLOG: FALSE                     ;LOG MB MICRO in run mode FALSE/UART0/UART1
+DBLOG: FALSE                     ;LOG DB MICRO in run mode FALSE/UART1 (when MBLOG is not UART1)
+
+USERSWITCH: 00000000             ;UserSwitch[7:0] in binary
+CONFSWITCH: 00000000             ;Configuration Switch[7:0] in binary, Core[0:1] Cluster[2]
+ASSERTNPOR: TRUE                 ;External resets assert nPOR
+WDTRESET: RESETMB                ;Watchdog reset options NONE/RESETMB/RESETDB
+
+PCIMASTER: DB1                   ;Port Failover DB1/SL3
+MASTERSITE: DB1                  ;Boot Master DB1/SL3
+
+REMOTE: NONE                     ;Selects remote command via USB or FTP NONE/USB/FTP
+
+MCCMACADDRESS: 0xFFFFFFFFFFFF    ;MCC MAC Address (must be even MAC address)
+SMCMACADDRESS: 0xFFFFFFFFFFFF    ;SMC MAC Address
+
+HOSTNAME: V2M-JUNO-A2		 ;Host name for FTP [15 characters max]

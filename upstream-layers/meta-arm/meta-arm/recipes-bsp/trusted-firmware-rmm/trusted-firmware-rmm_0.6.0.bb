@@ -1,6 +1,6 @@
 SUMMARY = "RMM Firmware"
 DESCRIPTION = "RMM Firmware for Arm reference platforms"
-LICENSE = "BSD-3-Clause & MIT"
+LICENSE = "BSD-3-Clause AND MIT"
 
 SRC_URI = "gitsm://git.trustedfirmware.org/TF-RMM/tf-rmm.git;protocol=https;branch=main"
 SRCREV = "7f6bc132caef3596fbb88d3a419c2a3cb499cde2"

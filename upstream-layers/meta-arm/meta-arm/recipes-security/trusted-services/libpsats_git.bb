@@ -20,7 +20,7 @@ do_install:append () {
         sed -i -e "s#/${TS_ENV}##g" $target_cmake
     fi
 
-    # Remove files installed by libts too. 
+    # Remove files installed by libts too.
     rm ${D}${TS_INSTALL}/include/util.h
     rm ${D}${TS_INSTALL}/include/compiler.h
 }

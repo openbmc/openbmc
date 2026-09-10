@@ -6,7 +6,7 @@ require arm-binary-toolchain.inc
 COMPATIBLE_HOST = "(x86_64|aarch64).*-linux"
 
 SUMMARY = "Arm GNU Toolchain - AArch32 bare-metal target (arm-none-eabi)"
-LICENSE = "GPL-3.0-with-GCC-exception & GPL-3.0-only"
+LICENSE = "GPL-3.0-only AND GPL-3.0-or-later WITH GCC-exception-3.1"
 
 LIC_FILES_CHKSUM:aarch64 = "file://share/doc/gcc/Copying.html;md5=90014a59d1783b37a10240d4d0002c6e"
 LIC_FILES_CHKSUM:x86-64 = "file://share/doc/gcc/Copying.html;md5=90014a59d1783b37a10240d4d0002c6e"

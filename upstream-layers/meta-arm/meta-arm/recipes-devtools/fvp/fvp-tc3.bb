@@ -12,3 +12,5 @@ UPSTREAM_VERSION_UNKNOWN = "1"
 
 LIC_FILES_CHKSUM = "file://license_terms/license_agreement.txt;md5=1a33828e132ba71861c11688dbb0bd16 \
                     file://license_terms/third_party_licenses/third_party_licenses.txt;md5=58b552b918d097a8ba802168312d76b2"
+
+COMPATIBLE_HOST = "x86_64.*-linux"

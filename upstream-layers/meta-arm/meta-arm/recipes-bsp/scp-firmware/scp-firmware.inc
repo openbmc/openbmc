@@ -2,7 +2,7 @@ SUMMARY = "SCP and MCP Firmware"
 DESCRIPTION = "Firmware for SCP and MCP software reference implementation"
 HOMEPAGE = "https://gitlab.arm.com/firmware/SCP-firmware"
 
-LICENSE = "BSD-3-Clause & Apache-2.0"
+LICENSE = "Apache-2.0 AND BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://license.md;beginline=5;md5=9db9e3d2fb8d9300a6c3d15101b19731 \
                     file://contrib/cmsis/git/LICENSE.txt;md5=e3fc50a88d0a364313df4b21ef20c29e"
 

@@ -40,6 +40,4 @@ do_install() {
     done
 }
 
-COMPATIBLE_HOST = "(aarch64|x86_64).*-linux"
-
 INSANE_SKIP:${PN} += "dev-so"
