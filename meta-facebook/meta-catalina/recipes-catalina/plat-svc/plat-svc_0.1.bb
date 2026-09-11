@@ -69,8 +69,6 @@ do_install:append:catalina() {
 # Clemente
 #===============================================================================
 SRC_URI:append:clemente = " \
-    file://backend-nic-driver-bind \
-    file://backend-nic-driver-bind.service \
     file://check-bootdrive-led \
     file://check-bootdrive-led.service \
     file://init-sma \
@@ -79,7 +77,6 @@ SRC_URI:append:clemente = " \
     "
 
 SYSTEMD_SERVICE:${PN}:append:clemente = " \
-    backend-nic-driver-bind.service \
     check-bootdrive-led.service \
     init-sma.service \
     cx-ready.target \
@@ -88,12 +85,10 @@ SYSTEMD_SERVICE:${PN}:append:clemente = " \
 do_install:append:clemente() {
     PLATSVC_LIBEXECDIR="${D}${libexecdir}/plat-svc"
     install -d ${PLATSVC_LIBEXECDIR}
-    install -m 0755 ${UNPACKDIR}/backend-nic-driver-bind ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/check-bootdrive-led ${PLATSVC_LIBEXECDIR}
     install -m 0755 ${UNPACKDIR}/init-sma ${PLATSVC_LIBEXECDIR}
 
     install -d ${D}${systemd_system_unitdir}
-    install -m 0644 ${UNPACKDIR}/backend-nic-driver-bind.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/check-bootdrive-led.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/init-sma.service ${D}${systemd_system_unitdir}
     install -m 0644 ${UNPACKDIR}/cx-ready.target ${D}${systemd_system_unitdir}

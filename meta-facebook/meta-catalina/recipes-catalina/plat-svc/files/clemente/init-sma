@@ -52,7 +52,7 @@ is_cx8_ready() {
         "CX_BOOT_CMPLT_CX0"
         "CX_BOOT_CMPLT_CX1"
         "SEC_CX_BOOT_CMPLT_CX0"
-        "SEC_CX_BOOT_CMPLT_CX0"
+        "SEC_CX_BOOT_CMPLT_CX1"
     )
     while [ $cur_retry -lt $MAX_RETRY ]; do
         cur_retry=$((cur_retry + 1))
