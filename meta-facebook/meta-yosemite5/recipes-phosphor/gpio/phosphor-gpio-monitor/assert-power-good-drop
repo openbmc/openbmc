@@ -10,15 +10,13 @@ if [ "$(get_host_prop RequestedHostTransition)" = "$REQ_OFF" ]; then
     exit 0
 fi
 
-if is_service_busy \
-    host-graceful-poweroff@0.service \
-    host-force-poweroff@0.service \
-    host-powerreset@0.service; then
-    exit 0
-fi
+is_power_transition_active && exit 0
 
 set_host_prop CurrentHostState "$STATE_TRANS_OFF"
 sleep 3
+
+is_power_transition_active && exit 0
+
 if [ "$(power_status)" = "off" ]; then
     if [ "$(get_host_prop RequestedHostTransition)" != "$REQ_OFF" ]; then
         set_host_prop RequestedHostTransition "$REQ_OFF"

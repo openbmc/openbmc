@@ -35,9 +35,7 @@ if [ "$currentstate" = "$STATE_TRANS_RUNNING" ]; then
     exit 0
 fi
 
-if is_service_busy host-poweron@0.service host-powerreset@0.service; then
-    exit 0
-fi
+is_power_transition_active && exit 0
 
 if [ "$(power_status)" = "on" ]; then
     transition=$(get_host_prop RequestedHostTransition)

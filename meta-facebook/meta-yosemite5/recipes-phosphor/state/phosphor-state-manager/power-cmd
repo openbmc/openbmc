@@ -101,6 +101,13 @@ is_service_busy() {
     return 1
 }
 
+is_power_transition_active() {
+    systemctl --no-legend --no-pager list-jobs 2>/dev/null | grep -qE \
+        'obmc-host-(shutdown|start|startmin|stop|reboot|warm-reboot|force-warm-reboot)@0\.target|phosphor-reboot-host@0\.service' && return 0
+
+    is_service_busy phosphor-reboot-host@0.service
+}
+
 HOST_STATE_SVC="xyz.openbmc_project.State.Host0"
 HOST_STATE_OBJ="/xyz/openbmc_project/state/host0"
 HOST_STATE_INTF="xyz.openbmc_project.State.Host"
