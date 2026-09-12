@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# config: 2 99
+# @brief: Collect the registers of every Modbus device on Ventura2.
+#
+
+# The sourced `functions` file is not
+# available during shellcheck linting
+#
+# shellcheck disable=SC1091
+. "$DREPORT_INCLUDE/functions"
+
+cmd="modbus-tool dump --all --yes"
+file_name="modbus.json"
+desc="'$cmd' output"
+
+add_cmd_output "$cmd" "$file_name" "$desc"
