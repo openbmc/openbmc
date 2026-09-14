@@ -20,6 +20,10 @@ SYSTEMD_SERVICE:${PN}:append = " \
     rainier-mctp-i3c@0.service \
 "
 
+FILES:${PN}:append = " \
+    ${systemd_system_unitdir}/rainier-mctp-i3c@.service \
+"
+
 RDEPENDS:${PN}:append = "bash"
 
 do_install:append () {
