@@ -41,6 +41,9 @@ update_netboot_status() {
   local retries="${4-}"
   local time
 
+  NETBOOT_STATUS_STATE="$state"
+  NETBOOT_STATUS_CODE="$code"
+
   if [[ "$code" == "START" ]]; then
     NETBOOT_STATUS_START["$state"]=$SECONDS
     time=0
@@ -69,15 +72,18 @@ if [ "$1" = bound ]; then
   # If we can't acquire the lock we already have a successful DHCP process in the works
   flock -xn $PID_FD || exit 0
 
-  # Write out the current PID and cleanup when complete
-  trap 'rm -f $PID_FILE' EXIT
+  gbmc_br_exit() {
+    local ret=$?
+    if (( ret != 0 )); then
+      if [[ "${NETBOOT_STATUS_CODE-}" != "FAIL" ]]; then
+        update_netboot_status "${NETBOOT_STATUS_STATE:-dhcp}" "DHCP failed with exit code $ret" "FAIL"
+      fi
+    else
+      sleep infinity
+    fi
+  }
+  trap 'gbmc_br_exit' EXIT
   echo "$$" >&$PID_FD
-
-  # Don't let other DHCP processes start by hogging the pidfile indefinitely
-  # on successful termination.
-  # This intentionally comes after the pidfile hook to replace it, since we
-  # won't need to remove the pidfile if we never terminate.
-  trap '(( $? == 0 )) && sleep infinity' EXIT
 
   update_netboot_status "netboot" "BMC netboot started" "START"
   # Variable is from the environment via udhcpc6
@@ -139,7 +145,10 @@ if [ "$1" = bound ]; then
     fi
 
     update_netboot_status "dhcp_ip" "Attempt to set ips to ${ipv6s[*]}" "START"
-    gbmc_br_set_ip "${ipv6s[@]}" || exit
+    if ! gbmc_br_set_ip "${ipv6s[@]}"; then
+      update_netboot_status "dhcp_ip" "Failed to set ips to ${ipv6s[*]}" "FAIL"
+      exit 1
+    fi
     update_netboot_status "dhcp_ip" "Successfully set ips to ${ipv6s[*]}" "SUCCESS"
     update_netboot_status "dhcp" "DHCP complete" "SUCCESS"
   else
@@ -147,7 +156,10 @@ if [ "$1" = bound ]; then
     update_netboot_status "dhcp" "skip ip/fqdn settings" "SUCCESS"
   fi
 
-  gbmc_br_run_hooks GBMC_BR_DHCP_HOOKS || exit
+  if ! gbmc_br_run_hooks GBMC_BR_DHCP_HOOKS; then
+    update_netboot_status "netboot" "DHCP hooks failed" "FAIL"
+    exit 1
+  fi
 
   # If any of our hooks had expectations we should fail here
   if [ "${#GBMC_BR_DHCP_OUTSTANDING[@]}" -gt 0 ]; then
