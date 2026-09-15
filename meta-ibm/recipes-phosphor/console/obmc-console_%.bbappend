@@ -49,6 +49,8 @@ do_install:append:mf-redundant-bmc() {
 }
 
 SRC_URI:append:ibm-enterprise = " file://client.2201.conf"
+SRC_URI:append:ibm-enterprise = " file://dropbear.2200.env"
+SRC_URI:append:ibm-enterprise = " file://dropbear.2201.env"
 SRC_URI:append:ibm-enterprise = " file://server.ttyVUART1.conf"
 
 REGISTERED_SERVICES:${PN}:append:ibm-enterprise = " obmc_console_hypervisor:tcp:2201:"
@@ -64,6 +66,9 @@ PACKAGECONFIG:append:ibm-enterprise = " concurrent-servers"
 
 do_install:append:ibm-enterprise() {
         install_concurrent_console_config
+        # Install per-port idle timeout overrides (dropbear.%i.env pattern)
+        install -m 0644 ${UNPACKDIR}/dropbear.2200.env ${D}${sysconfdir}/obmc-console/dropbear.2200.env
+        install -m 0644 ${UNPACKDIR}/dropbear.2201.env ${D}${sysconfdir}/obmc-console/dropbear.2201.env
 }
 
 SRC_URI:append:sbp1 = " file://server.ttyVUART0.conf"
