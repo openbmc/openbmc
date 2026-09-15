@@ -3,5 +3,7 @@ Description=Sys PSU Hard Reset
 StopWhenUnneeded=true
 Wants=gbmc-psu-hardreset-pre.target
 After=gbmc-psu-hardreset-pre.target
+Wants=hwclock-save.service
+After=hwclock-save.service
 Conflicts=systemd-random-seed.service
 After=systemd-random-seed.service

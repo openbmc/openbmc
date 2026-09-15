@@ -13,6 +13,7 @@ SRC_URI:append = " \
   file://gbmc-psu-hardreset-pre.target \
   file://gbmc-psu-hardreset-time.service \
   file://gbmc-psu-hardreset.target \
+  file://hwclock-save.service \
   file://gbmc-enqueue-powercycle.sh \
   file://40-gbmc-forward.conf \
   file://40-gbmc-sysctl.conf \
@@ -50,6 +51,7 @@ SYSTEMD_SERVICE:${PN}:append = " \
   gbmc-psu-hardreset-pre.target \
   gbmc-psu-hardreset-time.service \
   gbmc-psu-hardreset.target \
+  hwclock-save.service \
   "
 
 RDEPENDS:${PN}:append = " bash"
@@ -69,6 +71,7 @@ do_install() {
   install -m 0644 ${UNPACKDIR}/gbmc-psu-hardreset-pre.target ${D}${systemd_system_unitdir}/
   install -m 0644 ${UNPACKDIR}/gbmc-psu-hardreset-time.service ${D}${systemd_system_unitdir}/
   install -m 0644 ${UNPACKDIR}/gbmc-psu-hardreset.target ${D}${systemd_system_unitdir}/
+  install -m 0644 ${UNPACKDIR}/hwclock-save.service ${D}${systemd_system_unitdir}/
   # mask systemd-pstore.service to avoid copying logs to SPI
   mkdir -p ${D}${sysconfdir}/systemd/system
   ln -sv /dev/null ${D}${sysconfdir}/systemd/system/systemd-pstore.service

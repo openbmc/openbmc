@@ -1,0 +1,14 @@
+[Unit]
+Description=Save System Time to Hardware Clock
+Documentation=man:hwclock(8)
+DefaultDependencies=no
+Before=shutdown.target
+ConditionPathExistsGlob=/dev/rtc*
+
+[Service]
+Type=oneshot
+ExecStart=-/sbin/hwclock --systohc
+RemainAfterExit=no
+
+[Install]
+WantedBy=shutdown.target
