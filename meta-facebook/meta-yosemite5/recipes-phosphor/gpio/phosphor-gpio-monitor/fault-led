@@ -37,15 +37,17 @@ if [ "$power_state" == "assert" ]; then
 elif [ "$power_state" == "deassert" ]; then
     found=0
 
+    stash_list=$(printf '%s\n' /run/*.log_entry 2>/dev/null)
+
     for name in "${GPIO_NAME[@]}"; do
         [[ "$name" == "$source_gpio" ]] && continue
-        if [ -e "/run/$name.log_entry" ]; then
+        if printf '%s\n' "$stash_list" | grep -q -- "${name}\.log_entry$"; then
             found=1
             break
         fi
     done
 
-    if [ $found -eq 0 ]; then
+    if [ "$found" -eq 0 ]; then
         busctl set-property "xyz.openbmc_project.LED.GroupManager" "/xyz/openbmc_project/led/groups/power_fault" "xyz.openbmc_project.Led.Group" "Asserted" "b" "false"
     fi
 fi
