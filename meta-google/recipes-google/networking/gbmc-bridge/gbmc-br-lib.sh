@@ -143,11 +143,8 @@ gbmc_br_set_ip() {
       echo "Not setting invalid IPv6: $ip" >&2
       return 1
     fi
-    mkdir -p /var/google || return
-    echo "$ip" >/var/google/gbmc-br-ip || return
   else
     [ ! -f "/var/google/gbmc-br-ip" ] && return
-    rm -rf /var/google/gbmc-br-ip
   fi
 
   # Remove existing loaded configurations
@@ -162,6 +159,13 @@ gbmc_br_set_ip() {
   done
 
   gbmc_br_run_hooks GBMC_BR_LIB_SET_IP_HOOKS "$ip" || return
+
+  if [ -n "$ip" ]; then
+    mkdir -p /var/google || return
+    echo "$ip" >/var/google/gbmc-br-ip || return
+  else
+    rm -rf /var/google/gbmc-br-ip
+  fi
 }
 
 gbmc_br_lib_init=1
