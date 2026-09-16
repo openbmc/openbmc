@@ -21,7 +21,6 @@ echo "cpu_boot_done: $cpu_boot_done_val"
 if [[ "$cpu_boot_done_val" == "1" ]]; then
     set_gpio "USB_PWR_EN-O" 0
     set_gpio "E1S_PWR_EN-O" 0
-    set_gpio "BMC_SSD0_RST_L-O" 0
     hpm_run_pwr_release_n_check
     pdb_run_pwr_release_n_check
 
