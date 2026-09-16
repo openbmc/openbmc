@@ -20,6 +20,7 @@ SRC_URI:append = " \
     file://set-uart-select-led \
     file://rainier-gpio-handler \
     file://rainier-gpio-handler@.service \
+    file://rainier-mctp-ready@.target \
     "
 
 RDEPENDS:${PN}:append = " bash"
@@ -45,6 +46,8 @@ do_install:append() {
 
     install -d ${D}${systemd_system_unitdir}/
     install -m 0644 ${UNPACKDIR}/*.service ${D}${systemd_system_unitdir}/
+    install -m 0644 ${UNPACKDIR}/rainier-mctp-ready@.target \
+                    ${D}${systemd_system_unitdir}/
 
     install -d ${D}${libexecdir}/${PN}
     install -m 0755 ${UNPACKDIR}/reset_btn ${D}${libexecdir}/${PN}/

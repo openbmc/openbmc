@@ -1,14 +1,69 @@
 #!/bin/bash
 # shellcheck source=meta-facebook/recipes-fb/obmc_functions/files/fb-common-functions
 source /usr/libexec/fb-common-functions
+
 input="$1"
 if [[ "$input" != *":"* ]]; then
     echo "Error: Invalid instance format, expected ':' separator"
     exit 1
 fi
 
-GPIO_NET=$(echo "$input" | cut -d':' -f1)
-Event=$(echo "$input" | cut -d':' -f2)
+GPIO_NET="${input%%:*}"
+Event="${input#*:}"
+
+MCTP_POST_READY="rainier-mctp-ready@soc-post.target"
+MCTP_POWER_READY="rainier-mctp-ready@power-good.target"
+MCTP_SERVICE="rainier-mctp-i3c@0.service"
+
+mctp_is_ready() {
+    systemctl --quiet is-active "$MCTP_POST_READY" &&
+        systemctl --quiet is-active "$MCTP_POWER_READY"
+}
+
+start_mctp_if_ready() {
+    if ! mctp_is_ready; then
+        echo "I3C MCTP not started: SOC POST complete and" \
+            "power-good are not both asserted"
+        return 0
+    fi
+
+    echo "Starting ${MCTP_SERVICE}: SOC POST complete and" \
+        "power-good are asserted"
+    systemctl start "$MCTP_SERVICE"
+}
+
+stop_mctp() {
+    echo \
+        "Stopping ${MCTP_SERVICE}: platform is no longer ready for CPU MCTP"
+    systemctl stop "$MCTP_SERVICE"
+}
+
+set_ready_marker() {
+    local unit="$1"
+
+    if ! systemctl start "$unit"; then
+        echo "Error: failed to activate MCTP readiness marker ${unit}" >&2
+        return 1
+    fi
+}
+
+clear_ready_marker() {
+    local unit="$1"
+
+    if ! systemctl stop "$unit"; then
+        echo "Error: failed to clear MCTP readiness marker ${unit}" >&2
+        return 1
+    fi
+}
+
+invalidate_mctp_post_ready() {
+    local rc=0
+
+    clear_ready_marker "$MCTP_POST_READY" || rc=1
+    stop_mctp || rc=1
+
+    return "$rc"
+}
 
 trigger_ext_warm_reset() {
     set_gpio RST_SOC_EXTWARMRESET_CPLD 1
@@ -20,37 +75,93 @@ trigger_host_reboot() {
     systemctl start obmc-host-reboot@0.target
 }
 
-trigger_host_poweroff(){
+trigger_host_poweroff() {
     systemctl start obmc-host-shutdown@0.target
 }
+
 press_reset_button() {
     systemctl start obmc-host-force-warm-reboot@0.target
 }
 
-trigger_mctp_init() {
-    systemctl restart rainier-mctp-i3c@0.service
+handle_soc_post_complete() {
+    local rc=0
+
+    case "$Event" in
+        RISING|INIT_HIGH)
+            set_ready_marker "$MCTP_POST_READY" || return 1
+            start_mctp_if_ready
+            ;;
+        FALLING|INIT_LOW)
+            clear_ready_marker "$MCTP_POST_READY" || rc=1
+            stop_mctp || rc=1
+            return "$rc"
+            ;;
+        *)
+            echo "Error: unsupported SOC_POST_COMPLETE_CPLD event: $Event"
+            return 1
+            ;;
+    esac
+}
+
+handle_all_power_ok() {
+    local rc=0
+
+    case "$Event" in
+        RISING|INIT_HIGH)
+            # Configure both PMBus mux lines before publishing power-good
+            # readiness. Attempt both writes even if one of them fails.
+            set_gpio PMBUS_MUX_SEL_C0 0 || rc=1
+            set_gpio PMBUS_MUX_SEL_C1 0 || rc=1
+            if [ "$rc" -ne 0 ]; then
+                echo "Error: failed to configure PMBus mux for power-good" >&2
+                return "$rc"
+            fi
+
+            set_ready_marker "$MCTP_POWER_READY" || return 1
+            start_mctp_if_ready
+            ;;
+        FALLING|INIT_LOW)
+            # Power-good loss invalidates both readiness conditions. Clear
+            # them before changing the mux so concurrent handlers cannot
+            # start MCTP while the platform is being torn down.
+            clear_ready_marker "$MCTP_POWER_READY" || rc=1
+            clear_ready_marker "$MCTP_POST_READY" || rc=1
+
+            # Keep the existing PMBus mux behavior even if readiness state
+            # cleanup failed.
+            set_gpio PMBUS_MUX_SEL_C0 1 || rc=1
+            set_gpio PMBUS_MUX_SEL_C1 1 || rc=1
+
+            stop_mctp || rc=1
+            return "$rc"
+            ;;
+        *)
+            echo "Error: unsupported wALL_POWER_OK_1 event: $Event"
+            return 1
+            ;;
+    esac
 }
 
 case "$GPIO_NET" in
     SOC_PORQ)
+        # MCTP cleanup must not block the original host reset action.
+        invalidate_mctp_post_ready || true
         trigger_host_reboot
         ;;
     SOC_RESETREQ)
+        # MCTP cleanup must not block the original host reset action.
+        invalidate_mctp_post_ready || true
         press_reset_button
         ;;
     SOC_POST_COMPLETE_CPLD)
-        trigger_mctp_init
+        handle_soc_post_complete
         ;;
     wALL_POWER_OK_1)
-        if [ "$Event" = "RISING" ]; then
-            set_gpio PMBUS_MUX_SEL_C0 0
-            set_gpio PMBUS_MUX_SEL_C1 0
-        else
-            set_gpio PMBUS_MUX_SEL_C0 1
-            set_gpio PMBUS_MUX_SEL_C1 1
-        fi
+        handle_all_power_ok
         ;;
     SOC_SYS_PWRDN_CPLD)
+        # MCTP cleanup must not block the original host power-off action.
+        invalidate_mctp_post_ready || true
         trigger_host_poweroff
         ;;
     *)

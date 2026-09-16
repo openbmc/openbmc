@@ -16,8 +16,21 @@
     {
         "Name": "SOC_POST_COMPLETE",
         "LineName": "SOC_POST_COMPLETE_CPLD",
-        "EventMon": "RISING",
-        "Target": "rainier-gpio-handler@SOC_POST_COMPLETE_CPLD:RISING.service",
+        "EventMon": "BOTH",
+        "Targets": {
+            "RISING": [
+                "rainier-gpio-handler@SOC_POST_COMPLETE_CPLD:RISING.service"
+            ],
+            "FALLING": [
+                "rainier-gpio-handler@SOC_POST_COMPLETE_CPLD:FALLING.service"
+            ],
+            "INIT_HIGH": [
+                "rainier-gpio-handler@SOC_POST_COMPLETE_CPLD:INIT_HIGH.service"
+            ],
+            "INIT_LOW": [
+                "rainier-gpio-handler@SOC_POST_COMPLETE_CPLD:INIT_LOW.service"
+            ]
+        },
         "Continue": true
     },
     {
@@ -46,6 +59,12 @@
             "FALLING": [
                 "rainier-gpio-handler@wALL_POWER_OK_1:FALLING.service",
                 "assert-power-good-drop.service"
+            ],
+            "INIT_HIGH": [
+                "rainier-gpio-handler@wALL_POWER_OK_1:INIT_HIGH.service"
+            ],
+            "INIT_LOW": [
+                "rainier-gpio-handler@wALL_POWER_OK_1:INIT_LOW.service"
             ]
         },
         "Continue": true
