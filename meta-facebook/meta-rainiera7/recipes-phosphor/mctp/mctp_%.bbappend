@@ -17,7 +17,10 @@ SYSTEMD_SERVICE:${PN}:append = " \
     mctp_init.service \
     mctp_remove@.service \
     mctp_setup@.service \
-    rainier-mctp-i3c@0.service \
+"
+
+FILES:${PN}:append = " \
+    ${systemd_system_unitdir}/rainier-mctp-i3c@.service \
 "
 
 FILES:${PN}:append = " \
