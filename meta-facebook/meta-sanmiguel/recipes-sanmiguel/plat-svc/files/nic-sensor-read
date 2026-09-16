@@ -59,32 +59,37 @@ update_sensor_val() {
     busctl set-property "$EXT_SENSOR_SERVICE" "$path" "$SENSOR_VAL_INTF" Value d "$val"
 }
 
-get_numeric_sensor_by_eid() {
-    local eid="$1"
-    local sensor_id="$2"
-    local out
-
-    out=$(pldmtool platform GetSensorReading -i "$sensor_id" -r 0 -m "$eid") || return 1
-
-    jq -e '.presentReading' <<< "$out" 2> /dev/null
-}
-
 update_numeric_sensor_value() {
     local eid="$1"
     local sensor_id="$2"
     local sensor_name="$3"
     local val
     local path
+    local out
+    local op_state
 
-    if ! val=$(get_numeric_sensor_by_eid "$eid" "$sensor_id"); then
+    if ! out=$(pldmtool platform GetSensorReading -i "$sensor_id" -r 0 -m "$eid" 2>/dev/null); then
         echo "sensor read failed: eid=$eid id=$sensor_id name=$sensor_name"
         return 1
     fi
 
-    # The power sensor (ID 50-59) has "unitModifier" = -1 in PDR.
-    # The actual reading should be the original value * 0.1.
-    if [[ ${sensor_id} -ge 50 && ${sensor_id} -le 59 ]]; then
-        val="$((val / 10)).$((val % 10))"
+    # Check sensor operational state
+    # If sensor is not enabled, set the sensor value to NaN (unavailable).
+    # Otherwise, get the sensor value from presentReading.
+    op_state=$(jq -r -e '.sensorOperationalState' <<< "$out" 2> /dev/null)
+    if [ "$op_state" != "Sensor Enabled" ]; then
+        val="nan"
+    else
+        if ! val=$(jq -e '.presentReading' <<< "$out" 2> /dev/null); then
+            echo "sensor read failed: eid=$eid id=$sensor_id name=$sensor_name"
+            return 1
+        fi
+
+        # The power sensor (ID 50-59) has "unitModifier" = -1 in PDR.
+        # The actual reading should be the original value * 0.1.
+        if [[ ${sensor_id} -ge 50 && ${sensor_id} -le 59 ]]; then
+            val="$((val / 10)).$((val % 10))"
+        fi
     fi
 
     if path=$(get_sensor_path "$sensor_name"); then
@@ -139,11 +144,11 @@ build_sensor_list() {
     out=()
 
     local jq_out
-    if ! jq_out=$(jq -r '
+    if ! jq_out=$(jq --arg eid "$eid" -r '
         [ .[] | select(.PDRType == "Numeric Sensor PDR") ] as $numeric |
         ( [ $numeric[] | select(.sensorID >= 50 and .sensorID <= 59) | .sensorID ] | first // "null" ),
         ( [ $numeric[] | select(.sensorID >= 300 and .sensorID <= 399) | .sensorID ] | first // "null" ),
-        ( [ $numeric[] | select(.sensorID >= 500 and .sensorID <= 699) | .sensorID ] | first // "null" )
+        ( if $eid == "72" then "null" else ([ $numeric[] | select(.sensorID >= 500 and .sensorID <= 699) | .sensorID ] | first // "null") end )
     ' "$file" 2>/dev/null) || [[ -z "$jq_out" ]]; then
         echo "Error: Failed to parse PDR JSON or empty output for EID $eid" >&2
         return 1
