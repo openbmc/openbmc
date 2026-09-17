@@ -1,13 +1,13 @@
 # The offsets of the partitions that change when Hoth is enabled
 # From the device tree, in kB
-FLASH_IMAGE_DESC_OFFSET:hoth = "${@960 if FLASH_SIZE == '65536' else 7232}"
-FLASH_HOTH_UPDATE_OFFSET:hoth = "${@1024 if FLASH_SIZE == '65536' else 31744}"
-FLASH_HOTH_MAILBOX_OFFSET:hoth = "${@65472 if FLASH_SIZE == '65536' else 7168}"
-FLASH_HOTH_SECONDARY_OFFSET:hoth = "${@61376 if FLASH_SIZE == '65536' else 7296}"
+FLASH_IMAGE_DESC_OFFSET:hoth = "${@960 if d.getVar('FLASH_SIZE') == '65536' else 7232}"
+FLASH_HOTH_UPDATE_OFFSET:hoth = "${@1024 if d.getVar('FLASH_SIZE') == '65536' else 31744}"
+FLASH_HOTH_MAILBOX_OFFSET:hoth = "${@65472 if d.getVar('FLASH_SIZE') == '65536' else 7168}"
+FLASH_HOTH_SECONDARY_OFFSET:hoth = "${@61376 if d.getVar('FLASH_SIZE') == '65536' else 7296}"
 
 # 64 bit kernels are larger, so they require a different layout
-FLASH_IMAGE_DESC_OFFSET:hoth:aarch64 = "${@61312 if FLASH_SIZE == '65536' else 7232}"
-FLASH_HOTH_UPDATE_OFFSET:hoth:aarch64 = "${@61376 if FLASH_SIZE == '65536' else 31744}"
+FLASH_IMAGE_DESC_OFFSET:hoth:aarch64 = "${@61312 if d.getVar('FLASH_SIZE') == '65536' else 7232}"
+FLASH_HOTH_UPDATE_OFFSET:hoth:aarch64 = "${@61376 if d.getVar('FLASH_SIZE') == '65536' else 31744}"
 
 FLASH_IMAGE_DESC_OFFSET:hoth:aarch64:flash-131072 = "126848"
 FLASH_HOTH_UPDATE_OFFSET:hoth:aarch64:flash-131072 = "126912"
@@ -22,18 +22,20 @@ FLASH_UBOOT_ENV_OFFSET:flash-131072 = "${FLASH_KERNEL_OFFSET:flash-131072}"
 ENABLE_HOTH_SECONDARY ?= "no"
 
 python do_generate_static:append() {
-    _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
-                               'image-hoth-update'),
-                  int(d.getVar('FLASH_HOTH_UPDATE_OFFSET', True)),
-                  int(d.getVar('FLASH_SIZE', True)))
-    if d.getVar('ENABLE_HOTH_SECONDARY',True) == 'yes':
+    if d.getVar('GBMC_EMBED_HOTH') != 'no':
         _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
-                               'image-hoth-update-2nd'),
-                  int(d.getVar('FLASH_HOTH_SECONDARY_OFFSET', True)),
-                  int(d.getVar('FLASH_RWFS_OFFSET', True)))
+                                   'image-hoth-update'),
+                      int(d.getVar('FLASH_HOTH_UPDATE_OFFSET', True)),
+                      int(d.getVar('FLASH_SIZE', True)))
+        if d.getVar('ENABLE_HOTH_SECONDARY',True) == 'yes':
+            _append_image(os.path.join(d.getVar('DEPLOY_DIR_IMAGE', True),
+                                   'image-hoth-update-2nd'),
+                      int(d.getVar('FLASH_HOTH_SECONDARY_OFFSET', True)),
+                      int(d.getVar('FLASH_RWFS_OFFSET', True)))
 }
-do_generate_static[depends] += "virtual/hoth-firmware:do_deploy"
-do_generate_static[depends] += "${@'virtual/hoth-firmware-2nd:do_deploy' if ENABLE_HOTH_SECONDARY == 'yes' else ''}"
+do_generate_static[depends] += "${@'' if d.getVar('GBMC_EMBED_HOTH') == 'no' else 'virtual/hoth-firmware:do_deploy'}"
+do_generate_static[depends] += "${@'' if d.getVar('GBMC_EMBED_HOTH') == 'no' or d.getVar('ENABLE_HOTH_SECONDARY') != 'yes' else 'virtual/hoth-firmware-2nd:do_deploy'}"
+
 
 python do_generate_layout () {
     import time
@@ -192,6 +194,7 @@ python do_generate_layout () {
     if not platform:
         raise NameError('PLATFORM not found, unable to generate layout, stopping build')
 
+    build_ts = d.getVar('REPRODUCIBLE_TIMESTAMP_ROOTFS') or d.getVar('SOURCE_DATE_EPOCH')
     layout = {
             'name': name,
             'major': int(version[0]),
@@ -200,15 +203,15 @@ python do_generate_layout () {
             'subpoint': int(version[3]),
             'platform': platform,
             'flash_capacity': int(d.getVar('FLASH_SIZE')) * 1024,
-            'build_timestamp': int(time.time()),
+            'build_timestamp': int(build_ts) if build_ts else int(time.time()),
             'region': region,
     }
 
-    dir = d.getVar('DEPLOY_DIR_IMAGE')
-    os.makedirs(dir, exist_ok=True)
-    path = os.path.join(dir, 'cr51-image-layout.json')
-    with open(path, 'w') as f:
-        json.dump(layout, f, sort_keys=True, indent=4)
+    for out_dir in filter(None, [d.getVar('IMGDEPLOYDIR'), d.getVar('DEPLOY_DIR_IMAGE')]):
+        os.makedirs(out_dir, exist_ok=True)
+        path = os.path.join(out_dir, 'cr51-image-layout.json')
+        with open(path, 'w') as f:
+            json.dump(layout, f, sort_keys=True, indent=4)
 }
 
-addtask generate_layout before do_image_complete
+addtask generate_layout before do_image_complete after do_image

@@ -134,7 +134,7 @@ L2BR_DHCP_TYPE ?= ""
 
 ethernet_bridge_install() {
   # install udev rules if any
-  if [ -z "${GBMC_BRIDGE_INTFS}"]; then
+  if [ -z "${GBMC_BRIDGE_INTFS}" ]; then
     return
   fi
   cat /dev/null > ${UNPACKDIR}/-ether-bridge.network
