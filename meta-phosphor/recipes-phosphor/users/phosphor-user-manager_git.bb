@@ -28,6 +28,11 @@ PACKAGECONFIG[root-user-mgmt] = "-Droot_user_mgmt=enabled, -Droot_user_mgmt=disa
 PACKAGECONFIG:remove:df-phosphor-no-root-login = "root-user-mgmt"
 PACKAGECONFIG[ldap] = "-Dldap=enabled, -Dldap=disabled, nss-pam-ldapd"
 
+PREDEFINED_GROUPS = "redfish,ssh,hostconsole"
+PREDEFINED_GROUPS:append = "${@bb.utils.contains('DISTRO_FEATURES', 'phosphor-no-ipmi-rmcp', '', ',ipmi', d)}"
+
+EXTRA_OEMESON += "-Dpredefined_groups=${PREDEFINED_GROUPS}"
+
 do_install:append() {
   install -d ${D}${libexecdir}
   install -m 0755 ${UNPACKDIR}/upgrade_hostconsole_group.sh ${D}${libexecdir}/upgrade_hostconsole_group.sh
