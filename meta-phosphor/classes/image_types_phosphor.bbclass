@@ -119,7 +119,7 @@ DISTROOVERRIDES .= ":mmc-rwfs-${FLASH_EXT4_OVERLAY_BASETYPE}"
 
 JFFS2_RWFS_CMD = "mkfs.jffs2 --root=jffs2 --faketime --output=${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.jffs2"
 UBIFS_RWFS_CMD = "mkfs.ubifs -r ubifs -c ${FLASH_UBI_RWFS_LEBS} -m ${FLASH_PAGE_SIZE} -e ${FLASH_LEB_SIZE} ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.ubifs"
-EXT4_RWFS_CMD = "mkfs.ext4 -F ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4"
+EXT4_RWFS_CMD = "mkfs.ext4 -F -U 00000000-0000-4000-8000-000000000001 ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4"
 
 FLASH_STATIC_RWFS_CMD:static-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
 FLASH_UBI_RWFS_CMD:ubi-rwfs-jffs2 = "${JFFS2_RWFS_CMD}"
@@ -179,6 +179,7 @@ do_generate_rwfs_ubi[depends] += " \
         "
 
 do_generate_rwfs_ext4() {
+    export E2FSPROGS_FAKE_TIME="${REPRODUCIBLE_TIMESTAMP_ROOTFS}"
     clean_rwfs rwfs.${FLASH_EXT4_OVERLAY_BASETYPE}
     mk_empty_image ${IMGDEPLOYDIR}/${IMAGE_LINK_NAME}.rwfs.ext4 1024
     make_rwfs ${FLASH_EXT4_OVERLAY_BASETYPE} "${FLASH_EXT4_RWFS_CMD}" ${OVERLAY_MKFS_OPTS}
@@ -392,7 +393,8 @@ do_generate_static_alltar() {
 
     make_signatures image-bmc MANIFEST publickey
 
-    tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar \
+    tar -h --sort=name --mtime="@${REPRODUCIBLE_TIMESTAMP_ROOTFS}" --owner=0 --group=0 --numeric-owner \
+        -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.static.mtd.all.tar \
         image-bmc MANIFEST publickey ${signature_files}
 
     cd ${IMGDEPLOYDIR}
@@ -433,7 +435,8 @@ make_tar_of_images() {
     extra_files="$@"
 
     # Create the tar archive
-    tar -h -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.tar \
+    tar -h --sort=name --mtime="@${REPRODUCIBLE_TIMESTAMP_ROOTFS}" --owner=0 --group=0 --numeric-owner \
+        -cvf ${IMGDEPLOYDIR}/${IMAGE_NAME}.$type.tar \
         image-u-boot image-kernel image-rofs image-rwfs $extra_files
 
     cd ${IMGDEPLOYDIR}
@@ -625,7 +628,7 @@ do_generate_ext4_tar() {
     install -d boot-image
     install -m 644 ${DEPLOY_DIR_IMAGE}/${FLASH_KERNEL_IMAGE} boot-image/fitImage
     mk_empty_image_zeros boot-image.${FLASH_EXT4_BASETYPE} ${MMC_BOOT_PARTITION_SIZE}
-    mkfs.ext4 -F ${EXTRA_IMAGECMD:ext4} -d boot-image boot-image.${FLASH_EXT4_BASETYPE}
+    E2FSPROGS_FAKE_TIME="${REPRODUCIBLE_TIMESTAMP_ROOTFS}" mkfs.ext4 -F -U 00000000-0000-4000-8000-000000000002 ${EXTRA_IMAGECMD:ext4} -d boot-image boot-image.${FLASH_EXT4_BASETYPE}
     # Error codes 0-3 indicate successfull operation of fsck
     fsck.ext4 -pvfD boot-image.${FLASH_EXT4_BASETYPE} || [ $? -le 3 ]
     zstd -f -k -T0 -c -${ZSTD_COMPRESSION_LEVEL} boot-image.${FLASH_EXT4_BASETYPE} > boot-image.${FLASH_EXT4_BASETYPE}.zst

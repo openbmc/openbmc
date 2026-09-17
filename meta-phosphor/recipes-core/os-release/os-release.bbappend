@@ -26,8 +26,13 @@ DISTRO_VERSION ??= "${PHOSPHOR_OS_RELEASE_DISTRO_VERSION}"
 EXTENDED_VERSION ??= "${PHOSPHOR_OS_RELEASE_DISTRO_VERSION}"
 VERSION = "${@'-'.join(d.getVar('VERSION_ID').split('-')[0:2])}"
 OPENBMC_TARGET_MACHINE = "${MACHINE}"
+BUILD_ID = "${@time.strftime('%Y%m%d%H%M%S', time.gmtime(int(d.getVar('REPRODUCIBLE_TIMESTAMP_ROOTFS') or '1520598896'))) if d.getVar('BUILD_REPRODUCIBLE_BINARIES') == '1' else d.getVar('DATETIME')}"
+BUILD_ID[vardepsexclude] = "DATETIME"
 OS_RELEASE_FIELDS:append = " BUILD_ID OPENBMC_TARGET_MACHINE EXTENDED_VERSION"
+PACKAGE_ARCH = "${MACHINE_ARCH}"
+
 # Ensure the git commands run every time bitbake is invoked.
 BB_DONT_CACHE = "1"
+
 # Make os-release available to other recipes.
 SYSROOT_DIRS:append = " ${sysconfdir}"
