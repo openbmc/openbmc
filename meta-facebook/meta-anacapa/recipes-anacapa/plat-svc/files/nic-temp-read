@@ -12,25 +12,6 @@ is_host_on() {
     return 0
 }
 
-setup_eid() {
-    for i in $(seq 0 8); do
-        result=$(busctl call au.com.codeconstruct.MCTP1 \
-            "/au/com/codeconstruct/mctp1/interfaces/mctpusb$i" \
-            au.com.codeconstruct.MCTP.BusOwner1 SetupEndpoint ay 0 \
-            2> /dev/null)
-
-        if [ -z "$result" ]; then
-            echo "SetupEndpoint failed: mctpusb$i"
-            EIDS[i]=""
-            continue
-        fi
-
-        EID=$(echo "$result" | awk '{print $2}')
-        EIDS[i]="$EID"
-    done
-    return 0
-}
-
 get_numeric_sensor_by_eid() {
     local eid=$1
     local sensor_id=$2
@@ -131,6 +112,22 @@ set_all_external_sensors_invalid() {
     done
 }
 
+refresh_eids() {
+    # clear the original data
+    EIDS=()
+
+    local json_file="/run/mctp-eids.json"
+
+    [ -f "$json_file" ] || return 0
+
+    while read -r iface eid; do
+        idx=${iface#meta_mctpusb}
+        EIDS[idx]=$eid
+    done < <(
+        jq -r '.[] | "\(.interface) \(.eid)"' "$json_file"
+    )
+}
+
 execute_when_host_off() {
     set_all_external_sensors_invalid
     LAST_HOST_READY="0"
@@ -138,8 +135,6 @@ execute_when_host_off() {
 
 # Get initial host power state
 LAST_HOST_READY=$(is_host_on && echo "1" || echo "0")
-
-setup_eid
 
 while true; do
     sleep 1
@@ -158,6 +153,8 @@ while true; do
     if [ "$HOST_READY" != "1" ]; then
         continue
     fi
+
+    refresh_eids
 
     for i in "${!EIDS[@]}"; do
         if [ -z "${EIDS[$i]}" ]; then

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+handled=""
+
+log()
+{
+    logger -t mctpusb-init "$*"
+}
+
+i=1
+
+while [ "$i" -le 60 ]; do
+    for iface in /sys/class/net/meta_mctpusb*; do
+        [ -e "$iface" ] || continue
+
+        name=${iface##*/}
+
+        # Skip interfaces that have already been scheduled.
+        case " $handled " in
+            *" $name "*)
+                continue
+                ;;
+        esac
+
+        unit="mctpusb-hotplug@${name}.service"
+
+        log "Requesting ${unit} (scan ${i}/60)"
+
+        # Queue the service start without waiting for completion.
+        if systemctl --no-block start "$unit"; then
+            handled="$handled $name"
+            log "Start request queued for ${unit}"
+        else
+            log "Failed to queue ${unit}; will retry"
+        fi
+    done
+
+    [ "$i" -eq 60 ] || sleep 1
+    i=$((i + 1))
+done
+
+exit 0

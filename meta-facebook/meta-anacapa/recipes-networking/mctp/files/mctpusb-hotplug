@@ -1,0 +1,240 @@
+#!/bin/bash
+
+set -u
+
+LOCAL_EID=8
+INTERFACE="$1"
+newEid=""
+
+log()
+{
+    logger -t mctpusb-hotplug "$*"
+}
+
+# /etc/udev/rules.d/91-bmc-mctpusb-network.rules
+# rename the mctpusb device on enumeration and wait until the new
+# interface name is available before processing it.
+wait_interface()
+{
+    local iface="$1"
+
+    log "waiting for ${iface}"
+
+    for _ in $(seq 1 45); do
+        [ -e "/sys/class/net/${iface}" ] && return 0
+        sleep 1
+    done
+
+    log "waiting timeout for ${iface}"
+    echo "${0##*/}: timeout waiting for ${iface}" >&2
+    return 1
+}
+
+wait_mctpd()
+{
+    local iface="$1"
+
+    for _ in $(seq 1 45); do
+        busctl introspect \
+            au.com.codeconstruct.MCTP1 \
+            "/au/com/codeconstruct/mctp1/interfaces/$iface" \
+            >/dev/null 2>&1 &&
+            return 0
+
+        sleep 1
+    done
+
+    return 1
+}
+
+setup_be_nic_mctpusb_local_eid()
+{
+    local iface="$1"
+
+    if ! mctp link set "$iface" up; then
+        echo "${0##*/}: failed to bring up ${iface}" >&2
+        return 1
+    fi
+
+    log "add local EID ${LOCAL_EID} to ${iface}"
+
+    mctp addr add "$LOCAL_EID" dev "$iface" \
+         >/dev/null 2>&1 || true
+}
+
+get_saved_eid()
+{
+    local iface="$1"
+    local json_file="/run/mctp-eids.json"
+
+    [ -f "$json_file" ] || return 1
+
+    jq -er \
+        --arg iface "$iface" \
+        '.[] | select(.interface == $iface) | .eid' \
+        "$json_file" 2>/dev/null
+}
+
+# After a firmware update, the MCTP bridge is removed and re-enumerated.
+# The downstream endpoint may still exist with the previous routing entry.
+# Remove the stale endpoint before calling SetupEndpoint to assign a new
+# EID to the FD.
+remove_old_route()
+{
+    local eid="$1"
+    local endpoint
+
+    [ -n "$eid" ] || return 0
+    [ "$eid" = "null" ] && return 0
+
+    # EID should be numeric.
+    case "$eid" in
+        ''|*[!0-9]*)
+            log "invalid EID: $eid"
+            return 0
+            ;;
+    esac
+
+    # Bridge route still exists. Nothing to clean.
+    if mctp route 2>/dev/null | \
+        awk -v eid="$eid" '
+            $3 == eid && $8 == "dev" {
+                found = 1
+            }
+            END { exit !found }
+        '
+    then
+        log "bridge route still exists for EID ${eid}, skip cleanup"
+        return 0
+    fi
+
+    while read -r endpoint; do
+        [ -n "$endpoint" ] || continue
+
+        log "delete stale route: endpoint=${endpoint}, gw=${eid}"
+
+        mctp route del "$endpoint" gw "$eid" \
+            >/dev/null 2>&1 || true
+    done < <(
+        mctp route 2>/dev/null |
+        awk -v gw="$eid" '
+            $8 == "gw" && $9 == gw {
+                print $3
+            }
+        '
+    )
+}
+
+setup_endpoint()
+{
+    local iface="$1"
+
+    setup_be_nic_mctpusb_local_eid "$iface" >/dev/null 2>&1
+
+    busctl call au.com.codeconstruct.MCTP1 \
+        "/au/com/codeconstruct/mctp1/interfaces/$iface" \
+        au.com.codeconstruct.MCTP.BusOwner1 \
+        SetupEndpoint ay 0 \
+        2>/dev/null
+}
+
+set_endpoint_mtu()
+{
+    local eid="$1"
+    local mtu="${2:-68}"
+
+    busctl call au.com.codeconstruct.MCTP1 \
+        "/au/com/codeconstruct/mctp1/networks/1/endpoints/${eid}" \
+        au.com.codeconstruct.MCTP.Endpoint1 \
+        SetMTU u "$mtu" 2>/dev/null || true
+}
+
+update_eid_json()
+{
+    local iface="$1"
+    local eid="$2"
+
+    local json_file="/run/mctp-eids.json"
+    local lock_file="/run/mctp-eids.lock"
+    local tmp
+
+    (
+        flock -x 200
+
+        # Create an empty JSON array if the file does not exist.
+        if [ ! -f "$json_file" ]; then
+            echo "[]" > "$json_file" || exit 1
+        fi
+
+        tmp=$(mktemp "${json_file}.XXXXXX") || exit 1
+
+        if jq \
+            --arg iface "$iface" \
+            --argjson eid "$eid" \
+            '
+            if any(.[]; .interface == $iface) then
+                map(
+                    if .interface == $iface
+                    then .eid = $eid
+                    else .
+                    end
+                )
+            else
+                . + [{
+                    "interface": $iface,
+                    "eid": $eid
+                }]
+            end
+            ' \
+            "$json_file" > "$tmp"
+        then
+            mv -f "$tmp" "$json_file"
+        else
+            rm -f "$tmp"
+            exit 1
+        fi
+
+    ) 200>"$lock_file"
+}
+
+###############################################################################
+# Main
+###############################################################################
+
+# setup local eid on loopback device
+mctp addr add "$LOCAL_EID" dev lo >/dev/null 2>&1 || true
+
+if [ "$(cat /proc/1/comm 2>/dev/null)" != "systemd" ]; then
+    log "${INTERFACE} script not running under systemd (in initramfs), exit."
+    exit 0
+fi
+
+wait_interface "$INTERFACE" || exit 0
+
+wait_mctpd "$INTERFACE" || exit 1
+
+oldEid=$(get_saved_eid "$INTERFACE" 2>/dev/null || true)
+
+remove_old_route "$oldEid"
+
+for attempt in $(seq 1 3); do
+    result=$(setup_endpoint "$INTERFACE")
+
+    [ -n "$result" ] && break
+
+    log "SetupEndpoint failed (${attempt}/3): ${INTERFACE}"
+    sleep 3
+done
+
+if [ -z "$result" ]; then
+    log "SetupEndpoint failed after retries: ${INTERFACE}"
+    exit 1
+fi
+
+newEid=$(echo "$result" | awk '{print $2}')
+
+set_endpoint_mtu "$newEid"
+
+update_eid_json "$INTERFACE" "$newEid"
+
+log "SetupEndpoint success: ${INTERFACE} -> EID ${newEid}"

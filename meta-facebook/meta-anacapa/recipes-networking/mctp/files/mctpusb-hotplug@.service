@@ -1,0 +1,8 @@
+[Unit]
+Description=MCTP USB re-enumeration for %I
+After=mctpd.service
+Requires=mctpd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/mctp/mctpusb-hotplug %I

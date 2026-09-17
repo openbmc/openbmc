@@ -1,0 +1,11 @@
+[Unit]
+Description=Initialize MCTP USB devices
+After=mctpd.service
+Requires=mctpd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/mctp/mctpusb-init
+
+[Install]
+WantedBy=multi-user.target

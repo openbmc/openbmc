@@ -3,8 +3,12 @@
 # Set mctpusb link up and assign local address.
 localEid=8
 
+# setup local eid on loopback device
+mctp addr add "$localEid" dev lo 2>/dev/null || true
+
 for interface in $(seq 0 8); do
-    mctp link set mctpusb"$interface" up
-    mctp addr add "$localEid" dev mctpusb"$interface"
+    mctp link set meta_mctpusb"$interface" up 2>/dev/null || true
+    mctp addr add "$localEid" dev "meta_mctpusb${interface}" \
+        2>/dev/null || true
 done
 

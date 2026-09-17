@@ -1,9 +1,18 @@
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.6*", NAME="mctpusb0"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.1*", NAME="mctpusb1"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.2*", NAME="mctpusb2"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.4*", NAME="mctpusb3"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.3*", NAME="mctpusb4"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.4*", NAME="mctpusb5"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.3*", NAME="mctpusb6"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.2*", NAME="mctpusb7"
-SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.1*", NAME="mctpusb8"
+#
+# Use DEVPATH to map each MCTP USB device to a unique interface name.
+#
+# This avoids interface name conflicts during MCTP USB re-enumeration.
+# After a firmware update, multiple devices may be removed and
+# re-enumerated simultaneously. The kernel may temporarily assign
+# mctpusbX names that conflict with udev rename targets, causing
+# rename failures when the target name is already in use.
+#
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.6*", NAME="meta_mctpusb0"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.1*", NAME="meta_mctpusb1"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.2*", NAME="meta_mctpusb2"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.4*", NAME="meta_mctpusb3"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.5.3*", NAME="meta_mctpusb4"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.4*", NAME="meta_mctpusb5"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.3*", NAME="meta_mctpusb6"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.2*", NAME="meta_mctpusb7"
+SUBSYSTEM=="net", SUBSYSTEMS=="usb", KERNEL=="mctpusb*", ENV{DEVPATH}=="*1-1.4.1*", NAME="meta_mctpusb8"
