@@ -41,7 +41,7 @@ machine() {
         setopt local_options shwordsplit
     fi
     if which find > /dev/null 2>&1; then
-        configs="$(find meta-* -path "*/conf/machine/*.conf")"
+        configs="$(find meta-* -path "*/conf/machine/*.conf" | LC_ALL=C sort)"
     else
         configs=$(ls -1 meta-*/meta-*/conf/machine/*.conf meta-*/conf/machine/*.conf)
     fi
