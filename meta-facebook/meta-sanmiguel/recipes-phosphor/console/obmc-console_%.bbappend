@@ -3,6 +3,7 @@ RDEPENDS:${PN}:append = " bash"
 
 SRC_URI:append = " \
     file://plat-80-obmc-console-uart.rules \
+    file://server.ttyACM0.conf \
     file://server.ttyUSB1.conf \
     file://server.ttyUSB5.conf \
     file://server.VSER0.conf \
@@ -41,7 +42,7 @@ SRC_URI:append = " \
     "
 
 OBMC_CONSOLE_TTYS:append = " \
-    ttyUSB1 ttyUSB5 \
+    ttyACM0 ttyUSB1 ttyUSB5 \
     VSER0 VSER1 VSER2 VSER3 VSER4 VSER5 VSER6 VSER7 \
     VSER8 VSER9 VSER10 VSER11 VSER12 VSER13 VSER14 VSER15 \
     VSER16 VSER17 VSER18 VSER19 VSER20 VSER21 VSER22 VSER23 \
