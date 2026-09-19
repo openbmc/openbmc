@@ -9,8 +9,8 @@ EXTRA_OEMESON:append = " \
 "
 
 RDEPENDS:phosphor-software-manager-updater-mmc += " \
-    gptfdisk \
     parted \
+    util-linux \
     zstd \
 "
 
