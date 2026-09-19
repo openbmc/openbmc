@@ -21,10 +21,10 @@ RDEPENDS:${PN} += " \
     ${VIRTUAL-RUNTIME_base-utils} \
     e2fsprogs-e2fsck \
     e2fsprogs-mke2fs \
-    gptfdisk \
     libgpiod-tools \
     parted \
     udev \
+    util-linux \
 "
 
 FILES:${PN} += " /init /dev "

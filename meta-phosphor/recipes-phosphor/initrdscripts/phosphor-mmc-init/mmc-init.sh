@@ -76,7 +76,7 @@ done
 # Move the secondary GPT to the end of the device if needed. Look for the GPT
 # header signature "EFI PART" located sector_size bytes from the end of the device.
 if ! tail -c "${sector_size}" "${blkdev}" | hexdump -C -n 8 | grep -q "EFI PART"; then
-    sgdisk -e "${blkdev}"
+    sfdisk --relocate gpt-bak-std "${blkdev}"
     partprobe
 fi
 
