@@ -17,6 +17,38 @@
 
 [ -n "${gbmc_net_lib_init-}" ] && return
 
+# Safely mask or remove a filesystem target (file or directory).
+# If GBMC_AVOID_RWFS is set, avoids writing or unlinking on persistent
+# storage (RWFS) by bind-mounting /dev/null (for files) or an empty
+# directory (for directories) over the target if not already mounted.
+# If GBMC_AVOID_RWFS is unset, unmounts any active mount and removes the
+# target directly via rm -rf.
+# Arguments:
+#   $1: Path to the target file or directory to mask or remove
+gbmc_net_mask_or_rm() {
+  local target="$1"
+  [ -e "$target" ] || return 0
+  if [ -n "${gbmc_net_avoid_rwfs-${GBMC_AVOID_RWFS-}}" ]; then
+    if grep -q " $target " /proc/mounts 2>/dev/null; then
+      return 0
+    fi
+    echo "Masking RWFS path $target from $(caller 0 2>/dev/null || echo unknown)" >&2
+    if [ -d "$target" ]; then
+      local empty_dir="/run/gbmc-empty-d"
+      mkdir -p "$empty_dir"
+      mount --bind "$empty_dir" "$target" || return
+    else
+      mount --bind /dev/null "$target" || return
+    fi
+  else
+    echo "Removing path $target from $(caller 0 2>/dev/null || echo unknown)" >&2
+    if grep -q " $target " /proc/mounts 2>/dev/null; then
+      umount "$target" 2>/dev/null || true
+    fi
+    rm -rf "$target" || return
+  fi
+}
+
 GBMC_NET_RELOAD_REFCOUNT=0
 GBMC_NET_NETWORKD_RELOAD_PENDING=0
 declare -A GBMC_NET_NETWORKD_RELOAD_INTFS=()

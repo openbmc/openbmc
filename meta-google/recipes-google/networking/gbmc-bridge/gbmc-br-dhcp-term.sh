@@ -15,12 +15,14 @@
 
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
+source /usr/share/gbmc-br-lib.sh || exit
 
 # Wait until a well known service is network available
 echo 'Waiting for network reachability' >&2
 while true; do
   before=$SECONDS
-  if ip="$(cat /var/google/gbmc-br-ip 2>/dev/null)"; then
+  if ip="$(gbmc_br_get_ip)" && [ -n "$ip" ]; then
     echo "Trying reachability from $ip" >&2
     for i in {0..5}; do
       ping -I "$ip" -c 1 -W 1 2001:4860:4860::8888 >/dev/null 2>&1 && break 3

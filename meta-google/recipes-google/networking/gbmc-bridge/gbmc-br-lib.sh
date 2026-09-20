@@ -54,6 +54,16 @@ gbmc_br_run_hooks() {
   return $rc
 }
 
+gbmc_br_get_ip() {
+  local ip
+  ip="$(cat /run/gbmc-br-ip 2>/dev/null)"
+  if [ -n "$ip" ]; then
+    echo "$ip"
+    return 0
+  fi
+  cat /var/google/gbmc-br-ip 2>/dev/null || true
+}
+
 gbmc_br_set_runtime_ip() {
   local name="$1"
   local ip="$2"
@@ -121,14 +131,20 @@ EOF
 }
 
 gbmc_br_reload_ips() {
+  echo "Reloading gbmcbr IPs" >&2
   gbmc_net_reload_queue_start
   # Remove legacy network configuration
-  rm -rf /etc/systemd/network/{00,}-bmc-gbmcbr.network.d
+  local d
+  for d in /etc/systemd/network/{00,}-bmc-gbmcbr.network.d; do
+    gbmc_net_mask_or_rm "$d"
+  done
 
   # Remove existing loaded configurations
   (shopt -s nullglob; rm -rf /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-static*.conf)
 
-  gbmc_br_set_runtime_ip static "$(cat /var/google/gbmc-br-ip 2>/dev/null)" || true
+  local cur_ip
+  cur_ip="$(gbmc_br_get_ip)"
+  gbmc_br_set_runtime_ip static "$cur_ip" || true
   local ip
   local i=0
   for ip in $(shopt -s nullglob; cat /run/gbmc-br-ips/* 2>/dev/null); do
@@ -149,11 +165,22 @@ gbmc_br_set_ip() {
       echo "Not setting invalid IPv6: $ip" >&2
       return 1
     fi
-    mkdir -p /var/google || return
-    echo "$ip" >/var/google/gbmc-br-ip || return
+    echo "Setting gbmcbr IP: $ip alt(${alt_ips[*]})" >&2
+    if [ -z "${GBMC_AVOID_RWFS-}" ]; then
+      if grep -q " /var/google/gbmc-br-ip " /proc/mounts 2>/dev/null; then
+        umount /var/google/gbmc-br-ip 2>/dev/null || true
+      fi
+      mkdir -p /var/google || return
+      echo "$ip" >/var/google/gbmc-br-ip || return
+    fi
+    echo "$ip" >/run/gbmc-br-ip || return
   else
-    [ ! -f "/var/google/gbmc-br-ip" ] && return
-    rm -rf /var/google/gbmc-br-ip
+    local cur_ip
+    cur_ip="$(gbmc_br_get_ip)"
+    [ -z "$cur_ip" ] && return
+    echo "Clearing gbmcbr IP (was $cur_ip)" >&2
+    gbmc_net_mask_or_rm /var/google/gbmc-br-ip
+    rm -f /run/gbmc-br-ip
   fi
 
   gbmc_net_reload_queue_start

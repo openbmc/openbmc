@@ -19,6 +19,8 @@
 source /usr/share/network/lib.sh || exit
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
 source /usr/share/gbmc-net-lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
+source /usr/share/gbmc-br-lib.sh || exit
 
 declare -A gbmc_br_gw_src_ips=()
 declare -A gbmc_br_gw_src_routes=()
@@ -146,7 +148,7 @@ gbmc_br_gw_src_update() {
     dev_ip_to_metric["$rt_dev-$ip"]+="$rt_metric"
   done
   local primary_ip
-  primary_ip=$(cat /var/google/gbmc-br-ip 2>/dev/null)
+  primary_ip="$(gbmc_br_get_ip)"
   for route in "${!gbmc_br_gw_src_routes[@]}"; do
     local new_src
     local new_len=16
