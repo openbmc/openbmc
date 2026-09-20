@@ -17,7 +17,7 @@
 source /usr/share/gbmc-br-lib.sh || exit
 
 update_rtr() {
-  true
+  default_update_rtr "$@"
 }
 
 update_fqdn() {

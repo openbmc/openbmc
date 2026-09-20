@@ -11,6 +11,7 @@ IPv6SendRA=yes
 [IPv6AcceptRA]
 DHCPv6Client=false
 RouteMetric=1056
+UseGateway=false
 [IPv6SendRA]
 RouterLifetimeSec=0
 [RoutingPolicyRule]
