@@ -63,7 +63,7 @@ gbmc_br_from_ra_update() {
         echo "gBMC Bridge RA Addr Del: $addr" >&2
         unset 'gbmc_br_from_ra_prev_addrs[$addr]'
       fi
-      ip addr del "$addr" dev gbmcbr
+      ip addr del "$addr" dev gbmcbr 2>/dev/null || true
       unset 'gbmc_br_from_ra_pfxs[$pfx]'
     fi
   done

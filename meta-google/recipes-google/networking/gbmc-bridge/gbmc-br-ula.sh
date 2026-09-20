@@ -30,7 +30,7 @@ gbmc_br_ula_cleanup() {
     local val="${gbmc_br_ulas["$addr"]}"
     if (( val & GBMC_BR_ULA_SFX_HAS_LL == 0 )); then
       echo "Removing Stale ULA: $addr" >&2
-      ip addr del "$addr"/64 dev gbmcbr || true
+      ip addr del "$addr"/64 dev gbmcbr 2>/dev/null || true
     fi
   done
 }
@@ -51,10 +51,31 @@ gbmc_br_ula_is_ula() {
      bytes[6] == 0x00 && bytes[7] == 0x00 ))
 }
 
+gbmc_br_ula_update() {
+  local addr
+  for addr in "${!gbmc_br_ulas[@]}"; do
+    local val="${gbmc_br_ulas["$addr"]}"
+    if (( val == GBMC_BR_ULA_SFX_HAS_LL )); then
+      # We have a link local address but no ULA, so we need to add the ULA
+      echo "Adding ULA: $addr" >&2
+      ip addr replace "$addr"/64 dev gbmcbr
+    elif (( val == GBMC_BR_ULA_SFX_HAS_ULA )); then
+      # We have a ULA without a link local, so we should no longer have this ULA
+      echo "Removing ULA: $addr" >&2
+      ip addr del "$addr"/64 dev gbmcbr 2>/dev/null || true
+    elif (( val == 0 )); then
+      # Cleanup the map if we no longer have any addresses for the suffix
+      unset 'gbmc_br_ulas[$addr]'
+    fi
+  done
+}
+
 gbmc_br_ula_hook() {
   # shellcheck disable=SC2154
   if [[ $change == init ]]; then
     gbmc_br_ula_cleanup
+  elif [[ $change == defer ]]; then
+    gbmc_br_ula_update
   elif [[ $change == addr && $intf == gbmcbr && $fam == inet6 ]]; then
     local pfx_bytes=()
     ip_to_bytes pfx_bytes "$ip" || return
@@ -82,17 +103,9 @@ gbmc_br_ula_hook() {
       val=$((old & ~val))
     fi
     gbmc_br_ulas["$addr"]=$val
-    if (( val == GBMC_BR_ULA_SFX_HAS_LL )); then
-      # We have a link local address but no ULA, so we need to add the ULA
-      echo "Adding ULA: $addr" >&2
-      ip addr replace "$addr"/64 dev gbmcbr
-    elif (( val == GBMC_BR_ULA_SFX_HAS_ULA )); then
-      # We have a ULA without a link local, so we should not longer have this ULA
-      echo "Removing ULA: $addr" >&2
-      ip addr del "$addr"/64 dev gbmcbr || true
-    elif (( val == 0 )); then
-      # Cleanup the map if we no longer have any addresses for the suffix
-      unset 'gbmc_br_ulas[$addr]'
+    # If the state changed such that an action is required, debounce via deferral
+    if (( val != old )); then
+      gbmc_ip_monitor_defer
     fi
   fi
 }
