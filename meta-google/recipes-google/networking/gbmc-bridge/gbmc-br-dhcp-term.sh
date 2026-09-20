@@ -34,8 +34,10 @@ while true; do
   fi
 done
 
-# We need to guarantee we wait at least 10 minutes from reachable in
-# case networking just came up
+# The 10 minute wait is intentional because gBMC uses DHCP to trigger a
+# reinstall process. DHCP servers only respond when a reinstall is queued,
+# not during normal system operation and bootup. We must wait at least 10 minutes
+# from reachability to allow any scheduled reinstall jobs to arrive.
 wait_min=10
 echo "Network is reachable, waiting $wait_min min" >&2
 sleep $((60 * wait_min))
