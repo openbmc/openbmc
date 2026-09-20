@@ -2,8 +2,10 @@
 # shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
 source /usr/share/gbmc-net-lib.sh || exit
 
+gbmc_net_reload_queue_start
 # shellcheck disable=SC2043
 for nic in @IFS@; do
+  echo "Configuring devlab RA and firewall rules for $nic" >&2
   netconfdir="/etc/systemd/network/-bmc-${nic}.network.d"
   nftconfdir="/etc/nftables/"
   mkdir -p "${netconfdir}"
@@ -19,7 +21,8 @@ EOF
   printf "%s" "$nfcontents" > "${nftconfdir}/50-gbmc-$nic-lab.rules"
   echo "[Network]" > "${netconfdir}/10-ra-config.conf"
   echo "IPv6AcceptRA=true" >> "${netconfdir}/10-ra-config.conf"
-  systemctl reload nftables
+  gbmc_net_nftables_reload
   gbmc_net_networkd_reload "${nic}"
 done
+gbmc_net_reload_queue_end
 

@@ -15,9 +15,13 @@
 
 [[ "$1" != "@NCSI_IF@" ]] && exit 0
 
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+
 # shellcheck disable=SC2034
 HAS_DHCRELAY='@GBMC_DHCP_RELAY@'
 
+echo "Configuring NCSI SmartNIC workaround for @NCSI_IF@" >&2
 echo '@NCSI_IF@' >>/run/gbmc-br-dhcp-intfs
 if systemctl is-active --quiet gbmc-br-dhcp@gbmcbr; then
   systemctl reset-failed gbmc-br-dhcp@@NCSI_IF@
@@ -49,5 +53,4 @@ EOF
 rfile=/run/nftables/75-gbmc-ncsi-smartnic.rules
 mkdir -p "$(dirname "$rfile")"
 printf '%s' "$contents" >"$rfile"
-systemctl reset-failed nftables
-systemctl --no-block reload-or-restart nftables
+gbmc_net_nftables_reload

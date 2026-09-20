@@ -14,6 +14,9 @@
 
 [ -n "${gbmc_ncsi_clear_ip-}" ] && return
 
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
+
 gbmc_ncsi_clear_ip_hook() {
   local ip="${1-}"
 

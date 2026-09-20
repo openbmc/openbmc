@@ -44,10 +44,14 @@ gbmc_br_source_dir /usr/share/gbmc-br-lib || exit
 gbmc_br_run_hooks() {
   local -n hookvar="$1"
   shift
+  gbmc_net_reload_queue_start
   local hook
+  local rc=0
   for hook in "${hookvar[@]}"; do
-    "$hook" "$@" || return
+    "$hook" "$@" || rc=$?
   done
+  gbmc_net_reload_queue_end || rc=1
+  return $rc
 }
 
 gbmc_br_set_runtime_ip() {
@@ -117,6 +121,7 @@ EOF
 }
 
 gbmc_br_reload_ips() {
+  gbmc_net_reload_queue_start
   # Remove legacy network configuration
   rm -rf /etc/systemd/network/{00,}-bmc-gbmcbr.network.d
 
@@ -130,6 +135,7 @@ gbmc_br_reload_ips() {
     gbmc_br_set_runtime_ip static$i "$ip"
     (( i += 1 ))
   done
+  gbmc_net_reload_queue_end || true
 }
 
 gbmc_br_set_ip() {
@@ -150,18 +156,26 @@ gbmc_br_set_ip() {
     rm -rf /var/google/gbmc-br-ip
   fi
 
+  gbmc_net_reload_queue_start
+  local rc=0
+
   # Remove existing loaded configurations
   (shopt -s nullglob; rm -rf /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-ip-alt*.conf)
 
-  gbmc_br_set_runtime_ip static "$ip" || return
+  gbmc_br_set_runtime_ip static "$ip" || rc=$?
   local alt_ip
   local i=0
   for alt_ip in "${alt_ips[@]}"; do
-    gbmc_br_set_runtime_ip alt$i "$alt_ip" || return
+    gbmc_br_set_runtime_ip alt$i "$alt_ip" || { rc=$?; break; }
     (( i += 1 ))
   done
 
-  gbmc_br_run_hooks GBMC_BR_LIB_SET_IP_HOOKS "$ip" || return
+  if (( rc == 0 )); then
+    gbmc_br_run_hooks GBMC_BR_LIB_SET_IP_HOOKS "$ip" || rc=$?
+  fi
+
+  gbmc_net_reload_queue_end || rc=1
+  return $rc
 }
 
 gbmc_br_lib_init=1

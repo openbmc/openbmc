@@ -13,10 +13,11 @@ SRC_URI += " \
 
 S = "${UNPACKDIR}"
 
-DEPENDS += "test-sh"
+DEPENDS += "test-sh gbmc-net-common"
 
 RDEPENDS:${PN} += " \
   bash \
+  gbmc-net-common \
   iproute2 \
   "
 

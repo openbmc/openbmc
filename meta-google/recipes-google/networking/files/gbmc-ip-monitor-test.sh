@@ -1,5 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2317
+# shellcheck disable=SC2329
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -205,6 +206,223 @@ testParseLinkUsb() {
   expect_streq "$intf" 'gusbem0'
   expect_streq "$mac" 'aa:aa:aa:aa:aa:aa'
   expect_streq "$carrier" 'UP'
+}
+
+testParseDefer() {
+  GBMC_IP_MONITOR_DEFER_OUTSTANDING=1
+  expect_err 0 gbmc_ip_monitor_parse_line '[DEFER]'
+  expect_streq "$change" 'defer'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
+}
+
+testReloadCoalesceLive() {
+  local reload_exec_count=0
+  _gbmc_net_networkd_reload_exec() {
+    (( reload_exec_count += 1 ))
+  }
+
+  gbmc_ip_monitor_defer_() {
+    printf '[DEFER]\n' >&"$GBMC_IP_MONITOR_DEFER"
+  }
+
+  local test_fifo
+  test_fifo="$(mktemp -u)"
+  mkfifo "$test_fifo"
+  exec {GBMC_IP_MONITOR_DEFER}<>"$test_fifo"
+  rm -f "$test_fifo"
+
+  gbmc_ip_monitor_init_done=1
+  GBMC_IP_MONITOR_HOOKS=()
+
+  hook_reload() {
+    gbmc_net_networkd_reload "$intf"
+  }
+  GBMC_IP_MONITOR_HOOKS+=(hook_reload)
+
+  change='link'
+  intf=eth0
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
+  expect_streq "$reload_exec_count" '0'
+
+  # Burst: another event arrives during deferral window
+  change=addr
+  intf=gbmcbr
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$reload_exec_count" '0'
+
+  # Read [DEFER] from FIFO
+  local def_line
+  read -r -u "$GBMC_IP_MONITOR_DEFER" def_line
+  gbmc_ip_monitor_parse_line "$def_line"
+  expect_streq "$change" 'defer'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" ''
+
+  GBMC_IP_MONITOR_HOOKS=()
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$reload_exec_count" '0'
+
+  # End defer queue (simulating while loop handling of change=defer)
+  gbmc_net_reload_queue_end
+  expect_streq "$reload_exec_count" '1'
+
+  exec {GBMC_IP_MONITOR_DEFER}>&-
+}
+
+testReloadCoalesceInit() {
+  local reload_exec_count=0
+  _gbmc_net_networkd_reload_exec() {
+    (( reload_exec_count += 1 ))
+  }
+
+  gbmc_ip_monitor_defer_() {
+    printf '[DEFER]\n' >&"$GBMC_IP_MONITOR_DEFER"
+  }
+
+  local test_fifo
+  test_fifo="$(mktemp -u)"
+  mkfifo "$test_fifo"
+  exec {GBMC_IP_MONITOR_DEFER}<>"$test_fifo"
+  rm -f "$test_fifo"
+
+  gbmc_net_reload_queue_start
+  gbmc_ip_monitor_init_done=
+  GBMC_IP_MONITOR_HOOKS=()
+
+  hook_init_reload() {
+    if [ "$change" = 'link' ]; then
+      gbmc_net_networkd_reload eth0
+    elif [ "$change" = 'init' ]; then
+      gbmc_ip_monitor_defer
+    fi
+  }
+  GBMC_IP_MONITOR_HOOKS+=(hook_init_reload)
+
+  change='link'
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$reload_exec_count" '0'
+
+  change=init
+  gbmc_ip_monitor_run_hooks
+  gbmc_ip_monitor_init_done=1
+  gbmc_net_reload_queue_end
+  expect_streq "$reload_exec_count" '0'
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
+
+  local def_line
+  read -r -u "$GBMC_IP_MONITOR_DEFER" def_line
+  gbmc_ip_monitor_parse_line "$def_line"
+  expect_streq "$change" 'defer'
+
+  GBMC_IP_MONITOR_HOOKS=()
+  gbmc_ip_monitor_run_hooks
+  gbmc_net_reload_queue_end
+  expect_streq "$reload_exec_count" '1'
+
+  exec {GBMC_IP_MONITOR_DEFER}>&-
+}
+
+testNftablesReloadCoalesceInit() {
+  local nft_exec_count=0
+  local net_exec_count=0
+  _gbmc_net_nftables_reload_exec() {
+    (( nft_exec_count += 1 ))
+  }
+  _gbmc_net_networkd_reload_exec() {
+    (( net_exec_count += 1 ))
+  }
+
+  gbmc_net_reload_queue_start
+  gbmc_ip_monitor_init_done=
+  GBMC_IP_MONITOR_HOOKS=()
+
+  hook_nft_init() {
+    if [ "$change" = 'link' ]; then
+      gbmc_net_nftables_reload
+      gbmc_net_networkd_reload eth0
+    elif [ "$change" = 'addr' ]; then
+      gbmc_net_nftables_reload
+    fi
+  }
+  GBMC_IP_MONITOR_HOOKS+=(hook_nft_init)
+
+  change='link'
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$nft_exec_count" '0'
+  expect_streq "$net_exec_count" '0'
+
+  change='addr'
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$nft_exec_count" '0'
+  expect_streq "$net_exec_count" '0'
+
+  change=init
+  gbmc_ip_monitor_run_hooks
+  gbmc_ip_monitor_init_done=1
+  gbmc_net_reload_queue_end
+
+  expect_streq "$nft_exec_count" '1'
+  expect_streq "$net_exec_count" '1'
+}
+
+testCombinedReloadCoalesceLive() {
+  local net_exec_count=0
+  local nft_exec_count=0
+  _gbmc_net_networkd_reload_exec() {
+    (( net_exec_count += 1 ))
+  }
+  _gbmc_net_nftables_reload_exec() {
+    (( nft_exec_count += 1 ))
+  }
+
+  gbmc_ip_monitor_defer_() {
+    printf '[DEFER]\n' >&"$GBMC_IP_MONITOR_DEFER"
+  }
+
+  local test_fifo
+  test_fifo="$(mktemp -u)"
+  mkfifo "$test_fifo"
+  exec {GBMC_IP_MONITOR_DEFER}<>"$test_fifo"
+  rm -f "$test_fifo"
+
+  gbmc_ip_monitor_init_done=1
+  GBMC_IP_MONITOR_HOOKS=()
+
+  hook_combined() {
+    if [ "$change" = 'link' ]; then
+      gbmc_net_networkd_reload "$intf"
+    elif [ "$change" = 'addr' ]; then
+      gbmc_net_nftables_reload
+    fi
+  }
+  GBMC_IP_MONITOR_HOOKS+=(hook_combined)
+
+  change='link'
+  intf=eth0
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$GBMC_IP_MONITOR_DEFER_OUTSTANDING" '1'
+  expect_streq "$net_exec_count" '0'
+  expect_streq "$nft_exec_count" '0'
+
+  change='addr'
+  intf=gbmcbr
+  gbmc_ip_monitor_run_hooks
+  expect_streq "$net_exec_count" '0'
+  expect_streq "$nft_exec_count" '0'
+
+  local def_line
+  read -r -u "$GBMC_IP_MONITOR_DEFER" def_line
+  gbmc_ip_monitor_parse_line "$def_line"
+  expect_streq "$change" 'defer'
+
+  GBMC_IP_MONITOR_HOOKS=()
+  gbmc_ip_monitor_run_hooks
+  gbmc_net_reload_queue_end
+
+  expect_streq "$net_exec_count" '1'
+  expect_streq "$nft_exec_count" '1'
+
+  exec {GBMC_IP_MONITOR_DEFER}>&-
 }
 
 main

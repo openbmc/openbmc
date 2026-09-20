@@ -50,6 +50,7 @@ update_pfx() {
   # Don't change anything for an empty prefix
   [ -z "$pfx" ] && return
 
+  echo "Updating NCSI RA prefix $pfx on $RA_IF" >&2
   # We no longer need NCSId if we are in this configuration
   systemctl stop --no-block ncsid@"$RA_IF" || true
 
@@ -68,7 +69,7 @@ table inet filter {
   }
 }
 EOF
-    systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
+    gbmc_net_nftables_reload || true
   fi
 
   # We need to know which NCSI path has which route

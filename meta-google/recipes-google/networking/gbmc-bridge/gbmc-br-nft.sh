@@ -17,6 +17,8 @@
 
 # shellcheck source=meta-google/recipes-google/networking/network-sh/lib.sh
 source /usr/share/network/lib.sh || exit
+# shellcheck source=meta-google/recipes-google/networking/gbmc-net-common/gbmc-net-lib.sh
+source /usr/share/gbmc-net-lib.sh || exit
 
 declare -A gbmc_br_nft_pfx=()
 
@@ -37,8 +39,7 @@ gbmc_br_nft_update() {
   mkdir -p "$(dirname "$rfile")"
   printf '%s' "$contents" >"$rfile"
 
-  # shellcheck disable=SC2015
-  systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
+  gbmc_net_nftables_reload || true
 }
 
 gbmc_br_nft_hook() {

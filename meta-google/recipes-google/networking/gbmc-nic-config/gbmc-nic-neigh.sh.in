@@ -86,8 +86,7 @@ EOF
       rm -f /run/nftables/40-gbmc-"$intf"-br.rules
     fi
   done
-  systemctl reset-failed nftables || true
-  systemctl --no-block reload-or-restart nftables || true
+  gbmc_net_nftables_reload || true
   # shellcheck disable=SC2119
   gbmc_net_networkd_reload
 }

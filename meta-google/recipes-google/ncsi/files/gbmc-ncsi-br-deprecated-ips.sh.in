@@ -155,7 +155,7 @@ EOF
     gbmc_ncsi_br_deprecated_ips_add_neighs "$intf" || st=$?
   fi
   if (( st != 0 )); then
-    gbmc_net_networkd_reload $intf
+    gbmc_net_networkd_reload "$intf"
   fi
 
   if [ -n "$del" ]; then
@@ -186,7 +186,7 @@ EOF
     else
       printf '%s' "$nfcontents" >"$rfile"
     fi
-    systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
+    gbmc_net_nftables_reload || true
   fi
 }
 

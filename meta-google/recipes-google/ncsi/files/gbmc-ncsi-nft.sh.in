@@ -15,6 +15,7 @@
 [ -n "${gbmc_ncsi_nft_lib-}" ] && return
 
 source /usr/share/network/lib.sh || exit
+source /usr/share/gbmc-net-lib.sh || exit
 
 gbmc_ncsi_nft_init=
 gbmc_ncsi_nft_lastip4=
@@ -48,7 +49,7 @@ gbmc_ncsi_nft_update() {
   mkdir -p -m 755 "$(dirname "$rfile")"
   printf '%s' "$contents" >"$rfile"
 
-  systemctl reset-failed nftables && systemctl --no-block reload-or-restart nftables || true
+  gbmc_net_nftables_reload || true
 }
 
 gbmc_ncsi_nft_hook() {
