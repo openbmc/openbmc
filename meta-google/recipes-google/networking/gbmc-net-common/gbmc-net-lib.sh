@@ -310,6 +310,15 @@ _gbmc_net_nftables_reload_exec() {
 
 GBMC_INTF_ROUTE_TABLE_BASE=1000
 
+# Calculate and print the deterministic routing table number for a network
+# interface based on its kernel ifindex.
+# The table number is calculated as GBMC_INTF_ROUTE_TABLE_BASE (1000) + ifindex.
+# Arguments:
+#   $1: Interface name (e.g. eth0, gbmcbr)
+# Outputs:
+#   The computed integer route table ID to stdout
+# Returns:
+#   0 on success, non-zero if the interface sysfs ifindex cannot be read.
 gbmc_net_route_table_for_intf() {
   local intf="$1"
   local idx=
