@@ -18,8 +18,11 @@ source /usr/share/gbmc-net-lib.sh || exit
 
 oldname=
 while read -r _; do
-  # Don't bother parsing the output, just read the final hostname
-  name="$(</etc/hostname)" || continue
+  # Don't bother parsing the output, just read the final hostname. The kernel
+  # copy is authoritative and always available, unlike /etc/hostname which is
+  # empty on read-only and volatile root filesystems.
+  name="$(</proc/sys/kernel/hostname)" || continue
+  [ -z "$name" ] && continue
   [[ "$oldname" == "$name" ]] && continue
   oldname="$name"
   echo "Updating BMC RA Hostname $name" >&2
