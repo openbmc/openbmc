@@ -41,7 +41,7 @@ update_netboot_status() {
   local retries="${4-}"
   local time
 
-  NETBOOT_STATUS_STATE="$state"
+  # Remembered so the exit trap can tell whether a failure was already reported
   NETBOOT_STATUS_CODE="$code"
 
   if [[ "$code" == "START" ]]; then
@@ -75,10 +75,14 @@ if [ "$1" = bound ]; then
   gbmc_br_exit() {
     local ret=$?
     if (( ret != 0 )); then
+      # Report against the umbrella state: the last state we touched may have
+      # already reported SUCCESS, and netboot is only closed out on success.
       if [[ "${NETBOOT_STATUS_CODE-}" != "FAIL" ]]; then
-        update_netboot_status "${NETBOOT_STATUS_STATE:-dhcp}" "DHCP failed with exit code $ret" "FAIL"
+        update_netboot_status "netboot" "DHCP failed with exit code $ret" "FAIL"
       fi
     else
+      # Don't let other DHCP processes start by hogging the pidfile indefinitely
+      # on successful termination.
       sleep infinity
     fi
   }
