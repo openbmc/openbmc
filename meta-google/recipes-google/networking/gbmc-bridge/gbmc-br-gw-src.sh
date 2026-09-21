@@ -31,6 +31,7 @@ primary_rt_metric=700
 
 # For tray, priorize the route sent by host BMC
 primary_ip_from_br=""
+declare -A gbmc_br_gw_src_br_routes=()
 
 gbmc_br_set_router() {
   local defgw=
@@ -48,17 +49,13 @@ gbmc_br_set_router() {
   [[ -z $defgw ]] && return
   [[ $defgw == "$gbmc_br_gw_defgw" ]] && return
   gbmc_br_gw_defgw="$defgw"
+  echo "gBMC Bridge enabling router RA" >&2
 
-  local files=(/run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-defgw.conf)
-  if [[ -n $defgw ]]; then
-    local file
-    for file in "${files[@]}"; do
-      mkdir -p "$(dirname "$file")"
-      printf '[IPv6SendRA]\nRouterLifetimeSec=120\n' >"$file"
-    done
-  else
-    rm -f "${files[@]}"
-  fi
+  local file
+  for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/50-defgw.conf; do
+    mkdir -p "$(dirname "$file")"
+    printf '[IPv6SendRA]\nRouterLifetimeSec=120\n' >"$file"
+  done
 
   # shellcheck disable=SC2119
   gbmc_net_networkd_reload
@@ -70,6 +67,7 @@ gbmc_br_config_primary_ip() {
 
    local route_new
    route_new=$(echo "$route" | sed -E 's/ metric [0-9]+//')
+   echo "gBMC Bridge primary IP route $op (metric $primary_rt_metric): $route_new" >&2
    if [[ "$op" == "del" ]]; then
      # shellcheck disable=SC2086
      ip route "$op" $route_new metric "$primary_rt_metric" 2>/dev/null
@@ -96,6 +94,7 @@ primary_route_to_br_update() {
   if [[ -z "$new_src" || ${#gbmc_br_gw_src_ips[@]} -eq 0 ]]; then
     for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
       [ -f "$file" ] || continue
+      echo "gBMC Bridge removing hybrid route notification: $file" >&2
       rm -rf "$file"
       need_reload=1
     done
@@ -107,6 +106,7 @@ LifetimeSec=90
 EOF
     for file in /run/systemd/network/{00,}-bmc-gbmcbr.network.d/70-ip-hybrid-route.conf; do
       grep -q "Route=$new_src/124" "$file" 2>/dev/null && continue
+      echo "gBMC Bridge notifying hybrid route $new_src/124 via $dev: $file" >&2
       mkdir -p "$(dirname "$file")"
       printf '%s\n' "$notify_route" >"$file"
       need_reload=1
@@ -123,11 +123,13 @@ gbmc_br_deprioritize_l2br() {
   local fpath="/run/systemd/network/00-bmc-l2br.network.d/50-ra-metric.conf"
 
   [ -f "$fpath" ] && return
+  echo "gBMC Bridge deprioritizing l2br RA metric" >&2
 
   read -r -d '' ra_metric <<EOF
 [IPv6AcceptRA]
 RouteMetric=2048
 EOF
+  mkdir -p "$(dirname "$fpath")"
   printf '%s\n' "$ra_metric" >"$fpath"
 
   # shellcheck disable=SC2119
@@ -218,12 +220,36 @@ gbmc_br_gw_src_update() {
   primary_route_to_br_update
 }
 
+gbmc_br_gw_src_br_update() {
+  local new_brip=""
+  local brip
+  for brip in "${!gbmc_br_gw_src_br_routes[@]}"; do
+    new_brip="$brip"
+    break
+  done
+
+  if [[ "$new_brip" != "$primary_ip_from_br" ]]; then
+    if [[ -n "$new_brip" ]]; then
+      echo "Change preferred src from bridge RA: ${gbmc_br_gw_src_br_routes["$new_brip"]}" >&2
+      primary_ip_from_br="$new_brip"
+      gbmc_br_deprioritize_l2br
+    else
+      echo "Remove preferred src from bridge RA: $primary_ip_from_br" >&2
+      primary_ip_from_br=""
+    fi
+    gbmc_br_gw_src_update
+  fi
+}
+
 gbmc_br_gw_src_hook() {
+  local br_route_regex='^[0-9a-f:]+/124 .*dev gbmcbr( |$)'
+  # shellcheck disable=SC2154
+  if [[ $change == init || $change == defer ]]; then
+    gbmc_br_gw_src_br_update
   # We only want to match default gateway routes that are dynamic
   # (have an expiration time). These will be updated with our preferred
   # source.
-  # shellcheck disable=SC2154
-  if [[ $change == route && $route == 'default '*':'* ]]; then
+  elif [[ $change == route && $route == 'default '*':'* ]]; then
     # ignore everything except main table
     [[ $route == *" table "* ]] && return
     # ignore the primary route as this script fully controls it
@@ -295,28 +321,23 @@ gbmc_br_gw_src_hook() {
     fi
     gbmc_br_gw_src_update
   # check route on gbmcbr with /124 address
-  elif [[ $change == route && $route =~ ^[0-9a-f:]+'/124 '.*' dev gbmcbr ' ]]; then
-    local expires='0sec'
+  elif [[ $change == route && $route =~ $br_route_regex ]]; then
     local br_expires_regex='^(.*)( +expires +[^ ]+)(.*)$'
     if [[ $route =~ $br_expires_regex ]]; then
       route="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
-      expires="${BASH_REMATCH[2]}"
     fi
-    local brip=${route%%/124 *}
+    local brip="${route%%/124 *}"
     if [[ $action == add ]]; then
-      [[ "$brip" == "$primary_ip_from_br" ]] && return
-      echo "Change preferred src from bridge RA: $route" >&2
-      primary_ip_from_br="$brip"
-      gbmc_br_deprioritize_l2br
-      gbmc_br_gw_src_update
+      local old="${gbmc_br_gw_src_br_routes["$brip"]-}"
+      gbmc_br_gw_src_br_routes["$brip"]="$route"
+      if [[ -z "$old" || "$brip" != "$primary_ip_from_br" ]]; then
+        gbmc_ip_monitor_defer
+      fi
     elif [[ $action == del ]]; then
-      # Every RA will trigger a delete and re-add. Only delete when the route is
-      # truly expired to prevent redundant config.
-      [[ "$expires" != "0sec" ]] && return
-      [[ "$brip" == "$primary_ip_from_br" ]] || return
-      echo "Remove preferred src from bridge RA: $route $expires" >&2
-      primary_ip_from_br=''
-      gbmc_br_gw_src_update
+      if [[ -n ${gbmc_br_gw_src_br_routes["$brip"]-} ]]; then
+        unset 'gbmc_br_gw_src_br_routes["$brip"]'
+        gbmc_ip_monitor_defer
+      fi
     fi
   fi
 }
