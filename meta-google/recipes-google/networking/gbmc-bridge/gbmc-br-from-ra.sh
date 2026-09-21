@@ -50,20 +50,17 @@ gbmc_br_from_ra_update() {
     fi
     local valid="${gbmc_br_from_ra_pfxs["$pfx"]}"
     if (( valid > 0 )); then
-      if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
-        echo "gBMC Bridge RA Addr Add: $addr" >&2
+      if [[ -z ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]] || ! ip addr show dev gbmcbr | grep -q "$addr"; then
+        echo "gBMC Bridge RA Addr Add: $addr (pfx $pfx label 99)" >&2
         gbmc_br_from_ra_prev_addrs["$addr"]=1
         ip addr replace "$addr" dev gbmcbr noprefixroute
-      elif ! ip addr show dev gbmcbr | grep -q "$addr"; then
-        echo "gBMC Bridge RA missing addr add: $addr" >&2
-        ip addr replace "$addr" dev gbmcbr noprefixroute
+        ip addrlabel add prefix "$pfx" label 99 2>/dev/null || true
       fi
     else
-      if [[ -n ${gbmc_br_from_ra_prev_addrs["$addr"]-} ]]; then
-        echo "gBMC Bridge RA Addr Del: $addr" >&2
-        unset 'gbmc_br_from_ra_prev_addrs[$addr]'
-      fi
+      echo "gBMC Bridge RA Addr Del: $addr (pfx $pfx label 99)" >&2
+      unset 'gbmc_br_from_ra_prev_addrs[$addr]'
       ip addr del "$addr" dev gbmcbr 2>/dev/null || true
+      ip addrlabel del prefix "$pfx" label 99 2>/dev/null || true
       unset 'gbmc_br_from_ra_pfxs[$pfx]'
     fi
   done
