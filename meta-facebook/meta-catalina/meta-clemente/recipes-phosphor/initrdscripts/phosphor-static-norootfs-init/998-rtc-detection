@@ -17,6 +17,34 @@ if [ "$DEVICE_ID" = "0x5c" ]; then
 elif [ "$DEVICE_ID" = "0x4e" ]; then
     echo "PCF85053A rtc device detected"
 
+    # Workaround for NXP RTC oscillator issue
+    # Apply settings: 6pF CL, high drive strength, -29 offset
+    echo "Applying NXP RTC oscillator workaround..."
+
+    # Give primary I2C ownership of oscillator/offset registers
+    i2cset -f -y $I2C_BUS $I2C_ADDR 0x14 0x80 b
+    sleep 1
+
+    # High drive, normal offset mode, internal CL = 6 pF
+    # OSCD=10, CL=01 -> register 0x13 = 0x09
+    i2cset -f -y $I2C_BUS $I2C_ADDR 0x13 0x09 b
+    sleep 2
+
+    # Offset = -29 decimal = 0xE3
+    i2cset -f -y $I2C_BUS $I2C_ADDR 0x12 0xe3 b
+    sleep 1
+
+    # Return ownership to secondary I2C
+    i2cset -f -y $I2C_BUS $I2C_ADDR 0x14 0x00 b
+    sleep 1
+
+    # Verify workaround settings
+    REG_12=$(i2cget -f -y $I2C_BUS $I2C_ADDR 0x12 b)
+    REG_13=$(i2cget -f -y $I2C_BUS $I2C_ADDR 0x13 b)
+    REG_14=$(i2cget -f -y $I2C_BUS $I2C_ADDR 0x14 b)
+    REG_0B=$(i2cget -f -y $I2C_BUS $I2C_ADDR 0x0b b)
+    echo "Verification: reg0x12=$REG_12 (exp 0xe3), reg0x13=$REG_13 (exp 0x09), reg0x14=$REG_14 (exp 0x00), reg0x0b=$REG_0B (exp 0x07)"
+
     if ! echo pcf85053a 0x6f > /sys/class/i2c-dev/i2c-6/device/new_device; then
         echo "PCF85053A rtc driver not bind"
     fi
