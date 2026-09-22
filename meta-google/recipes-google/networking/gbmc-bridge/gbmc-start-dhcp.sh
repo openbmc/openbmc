@@ -13,12 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# stop dhcp term service first to prevent race condition
+systemctl is-active --quiet gbmc-br-dhcp-term && systemctl stop gbmc-br-dhcp-term
+
 systemctl stop gbmc-br-dhcp@'*'
+rm -f /run/netboot_done /run/gbmc-br-dhcp.pid
 
 systemctl restart dhcp-done
-
-# stop dhcp term service to prevent race condition
-systemctl is-active --quiet gbmc-br-dhcp-term && systemctl stop gbmc-br-dhcp-term
 
 # start the dhcp service
 for intf in gbmcbr $(cat /run/gbmc-br-dhcp-intfs 2>/dev/null); do
