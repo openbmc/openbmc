@@ -75,12 +75,14 @@ if [ "$1" = bound ]; then
   gbmc_br_exit() {
     local ret=$?
     if (( ret != 0 )); then
+      rm -f "$PID_FILE"
       # Report against the umbrella state: the last state we touched may have
       # already reported SUCCESS, and netboot is only closed out on success.
       if [[ "${NETBOOT_STATUS_CODE-}" != "FAIL" ]]; then
         update_netboot_status "netboot" "DHCP failed with exit code $ret" "FAIL"
       fi
     else
+      touch /run/netboot_done
       # Don't let other DHCP processes start by hogging the pidfile indefinitely
       # on successful termination.
       sleep infinity
@@ -176,6 +178,4 @@ if [ "$1" = bound ]; then
   echo 'Signaling dhcp done' >&2
   update_netboot_status "netboot" "BMC Netboot Complete" "SUCCESS"
   update-dhcp-status 'DONE' "Netboot finished"
-
-  touch /run/netboot_done
 fi
