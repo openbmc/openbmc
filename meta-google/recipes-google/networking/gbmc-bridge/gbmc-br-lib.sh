@@ -26,6 +26,41 @@ source /usr/share/gbmc-net-lib.sh || exit
 # shellcheck disable=SC2034
 GBMC_BR_LIB_SET_IP_HOOKS=()
 
+# A dict of netboot status to retain start of each state
+declare -A NETBOOT_STATUS_START=()
+
+update_netboot_status() {
+  local state="$1"
+  local message="$2"
+  local code="$3"
+  local retries="${4-}"
+  local time
+
+  # Remembered so the exit trap can tell whether a failure was already reported
+  # shellcheck disable=SC2034
+  NETBOOT_STATUS_CODE="$code"
+
+  if [[ "$code" == "START" ]]; then
+    NETBOOT_STATUS_START["$state"]=$SECONDS
+    time=0
+  elif [[ -v NETBOOT_STATUS_START["$state"] ]]; then
+    time=$((SECONDS - NETBOOT_STATUS_START["$state"]))
+  else
+    # easy indicator to flag error, no state should ever report before START is defined.
+    time=-1
+  fi
+  local json_output="{\"Message\":\"$message\",\"State\":\"$state\",\"Code\":\"$code\",\"Time\":\"$time\""
+
+  if [[ -n "$retries" ]]; then
+    json_output+=",\"retries\":\"$retries\""
+  fi
+
+  json_output+="}"
+
+  systemd-cat -t "gbmc-netboot" <<<"$json_output"
+  update-dhcp-status 'ONGOING' "$json_output"
+}
+
 gbmc_br_source_dir() {
   local dir="$1"
 

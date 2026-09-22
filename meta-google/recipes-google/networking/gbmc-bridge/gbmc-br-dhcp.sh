@@ -21,8 +21,6 @@ GBMC_BR_DHCP_HOOKS=()
 
 # A dict of outstanding items that should prevent DHCP completion
 declare -A GBMC_BR_DHCP_OUTSTANDING=()
-# A dict of netboot status to retain start of each state
-declare -A NETBOOT_STATUS_START=()
 
 # SC can't find this path during repotest
 # shellcheck disable=SC1091
@@ -34,36 +32,6 @@ source /usr/share/gbmc-br-lib.sh || exit
 # Load configurations from a known location in the filesystem to populate
 # hooks that are executed after each event.
 gbmc_br_source_dir /usr/share/gbmc-br-dhcp || exit
-update_netboot_status() {
-  local state="$1"
-  local message="$2"
-  local code="$3"
-  local retries="${4-}"
-  local time
-
-  # Remembered so the exit trap can tell whether a failure was already reported
-  NETBOOT_STATUS_CODE="$code"
-
-  if [[ "$code" == "START" ]]; then
-    NETBOOT_STATUS_START["$state"]=$SECONDS
-    time=0
-  elif [[ -v NETBOOT_STATUS_START["$state"] ]]; then
-    time=$((SECONDS - NETBOOT_STATUS_START["$state"]))
-  else
-    # easy indicator to flag error, no state should ever report before START is defined.
-    time=-1
-  fi
-  local json_output="{\"Message\":\"$message\",\"State\":\"$state\",\"Code\":\"$code\",\"Time\":\"$time\""
-
-  if [[ -n "$retries" ]]; then
-    json_output+=",\"retries\":\"$retries\""
-  fi
-
-  json_output+="}"
-
-  systemd-cat -t "gbmc-netboot" <<<"$json_output"
-  update-dhcp-status 'ONGOING' "$json_output"
-}
 
 if [ "$1" = bound ]; then
   # We don't want to allow 2 simultaneous sessions. Check for a pidfile
