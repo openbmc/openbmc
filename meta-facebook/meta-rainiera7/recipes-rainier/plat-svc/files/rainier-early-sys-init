@@ -180,15 +180,6 @@ set_gpio FM_TPM_MUX6_SEL 0
 set_gpio RST_SOC_PORESET_N_BMC 1
 set_gpio SOC_BMC_READY_CPLD 1
 
-echo "Reading CLK GEN CK440Q ..."
-i2ctransfer -y 11 w1@0x5F 0x06 r2
-# Disable CLK GEN CK440Q SSC, write 0x3C to byte 6
-if i2ctransfer -y 11 w3@0x5F 0x06 0x01 0x3C; then
-    echo "Disabled CLK GEN CK440Q SSC..."
-else
-    echo "Failed to disable CLK GEN CK440Q SSC..!!"
-fi
-
 # Release USB Hub out of reset
 set_gpio RST_USB_HUB_R_N 1
 
