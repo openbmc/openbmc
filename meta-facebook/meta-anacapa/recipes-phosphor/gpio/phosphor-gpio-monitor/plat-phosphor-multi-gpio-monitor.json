@@ -434,57 +434,57 @@
         "Continue": true
     },
     {
-        "Name": "HPM_EDSFF_PG",
-        "LineName": "HPM_EDSFF_PG",
+        "Name": "EDSFF_BOOT_FLT",
+        "LineName": "EDSFF_BOOT_FLT",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@HPM_EDSFF_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@HPM_EDSFF_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@HPM_EDSFF_PG:deassert.service"]
+            "INIT_HIGH": ["power-rail-assert-log@Anacapa_MB-EDSFF_BOOT_FLT.service"],
+            "RISING":    ["power-rail-assert-log@Anacapa_MB-EDSFF_BOOT_FLT.service"],
+            "FALLING":   ["power-rail-deassert-log@Anacapa_MB-EDSFF_BOOT_FLT.service"]
         },
         "Continue": true
     },
     {
-        "Name": "L_EDSFF0_PG",
-        "LineName": "L_EDSFF0_PG",
+        "Name": "L_EDSFF0_FLT",
+        "LineName": "L_EDSFF0_FLT",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF0_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@L_EDSFF0_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@L_EDSFF0_PG:deassert.service"]
+            "INIT_HIGH": ["power-rail-assert-log@Anacapa_MB-L_EDSFF0_FLT.service"],
+            "RISING":    ["power-rail-assert-log@Anacapa_MB-L_EDSFF0_FLT.service"],
+            "FALLING":   ["power-rail-deassert-log@Anacapa_MB-L_EDSFF0_FLT.service"]
         },
         "Continue": true
     },
     {
-        "Name": "L_EDSFF1_PG",
-        "LineName": "L_EDSFF1_PG",
+        "Name": "L_EDSFF1_FLT",
+        "LineName": "L_EDSFF1_FLT",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@L_EDSFF1_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@L_EDSFF1_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@L_EDSFF1_PG:deassert.service"]
+            "INIT_HIGH": ["power-rail-assert-log@Anacapa_MB-L_EDSFF1_FLT.service"],
+            "RISING":    ["power-rail-assert-log@Anacapa_MB-L_EDSFF1_FLT.service"],
+            "FALLING":   ["power-rail-deassert-log@Anacapa_MB-L_EDSFF1_FLT.service"]
         },
         "Continue": true
     },
     {
-        "Name": "R_EDSFF2_PG",
-        "LineName": "R_EDSFF2_PG",
+        "Name": "R_EDSFF2_FLT",
+        "LineName": "R_EDSFF2_FLT",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@R_EDSFF2_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@R_EDSFF2_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@R_EDSFF2_PG:deassert.service"]
+            "INIT_HIGH": ["power-rail-assert-log@Anacapa_MB-R_EDSFF2_FLT.service"],
+            "RISING":    ["power-rail-assert-log@Anacapa_MB-R_EDSFF2_FLT.service"],
+            "FALLING":   ["power-rail-deassert-log@Anacapa_MB-R_EDSFF2_FLT.service"]
         },
         "Continue": true
     },
     {
-        "Name": "R_EDSFF3_PG",
-        "LineName": "R_EDSFF3_PG",
+        "Name": "R_EDSFF3_FLT",
+        "LineName": "R_EDSFF3_FLT",
         "EventMon": "BOTH",
         "Targets": {
-            "INIT_LOW": ["ssd-pg-event-logger@R_EDSFF3_PG:assert.service"],
-            "FALLING":  ["ssd-pg-event-logger@R_EDSFF3_PG:assert.service"],
-            "RISING":   ["ssd-pg-event-logger@R_EDSFF3_PG:deassert.service"]
+            "INIT_HIGH": ["power-rail-assert-log@Anacapa_MB-R_EDSFF3_FLT.service"],
+            "RISING":    ["power-rail-assert-log@Anacapa_MB-R_EDSFF3_FLT.service"],
+            "FALLING":   ["power-rail-deassert-log@Anacapa_MB-R_EDSFF3_FLT.service"]
         },
         "Continue": true
     },

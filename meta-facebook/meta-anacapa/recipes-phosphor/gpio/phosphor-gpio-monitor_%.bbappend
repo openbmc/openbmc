@@ -15,7 +15,6 @@ SERVICE_LIST = "assert-post-end.service \
                 hpm-power-fault@.service \
                 thermal-event-logger@.service \
                 fan-pg-event-logger@.service \
-                ssd-pg-event-logger@.service \
                 rescan-fru-device@.service \
                 amc-boot-failure-logger@.service \
                 "
@@ -35,7 +34,6 @@ SRC_URI += " \
     file://hpm-power-fault \
     file://thermal-event-logger \
     file://fan-pg-event-logger \
-    file://ssd-pg-event-logger \
     file://rescan-fru-device \
     file://amc-boot-failure-logger \
     ${@compose_list(d, 'SERVICE_FILE_FMT', 'SERVICE_LIST')} \
@@ -71,7 +69,6 @@ do_install:append() {
     install -m 0755 ${UNPACKDIR}/hpm-power-fault ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/thermal-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/fan-pg-event-logger ${D}${libexecdir}/${PN}/
-    install -m 0755 ${UNPACKDIR}/ssd-pg-event-logger ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/rescan-fru-device ${D}${libexecdir}/${PN}/
     install -m 0755 ${UNPACKDIR}/amc-boot-failure-logger ${D}${libexecdir}/${PN}/
 
