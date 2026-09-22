@@ -30,6 +30,8 @@ SYSTEMD_SERVICE:${PN} += "vpd-manager.service"
 
 PACKAGECONFIG ??= ""
 PACKAGECONFIG[ibm_system] = "-Dibm_system=enabled, -Dibm_system=disabled, nlohmann-json cli11"
+PACKAGECONFIG[pgood-chassis-check] = "-Dpgood-chassis-check=enabled, -Dpgood-chassis-check=disabled,"
+SYSTEMD_SERVICE:${PN}:append = "${@bb.utils.contains('PACKAGECONFIG', 'pgood-chassis-check', ' pgood-chassis-check.service', '', d)}"
 
 EXTRA_OEMESON = " \
              -Dtests=disabled \
