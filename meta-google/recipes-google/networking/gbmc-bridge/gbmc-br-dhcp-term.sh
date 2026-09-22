@@ -18,6 +18,8 @@ source /usr/share/network/lib.sh || exit
 # shellcheck source=meta-google/recipes-google/networking/gbmc-bridge/gbmc-br-lib.sh
 source /usr/share/gbmc-br-lib.sh || exit
 
+NETBOOT_STATUS_START["netboot"]=$SECONDS
+
 # Wait until a well known service is network available
 echo 'Waiting for network reachability' >&2
 while true; do
@@ -77,7 +79,7 @@ while true; do
   activestr="$(echo "$json" | jq -r '.data[0].ActiveState.data')"
 
   # The process is already stopped, we are done
-  [[ "$activestr" == 'inactive' ]] && exit
+  [[ "$activestr" == 'inactive' ]] && break
 
   # If the process is running, give it at least 10 minutes from when it started
   cur_s="$(cut -d' ' -f1 /proc/uptime)"
@@ -95,4 +97,7 @@ while true; do
 done
 
 echo "Stopping DHCP processing" >&2
-systemctl stop --no-block gbmc-br-dhcp@'*'
+systemctl stop gbmc-br-dhcp@'*'
+if [[ ! -e /run/netboot_done ]]; then
+  update_netboot_status "netboot" "DHCP is not running" "FAIL"
+fi
