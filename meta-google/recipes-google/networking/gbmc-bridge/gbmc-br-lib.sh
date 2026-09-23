@@ -202,11 +202,7 @@ gbmc_br_set_ip() {
     fi
     echo "Setting gbmcbr IP: $ip alt(${alt_ips[*]})" >&2
     if [ -z "${GBMC_AVOID_RWFS-}" ]; then
-      if grep -q " /var/google/gbmc-br-ip " /proc/mounts 2>/dev/null; then
-        umount /var/google/gbmc-br-ip 2>/dev/null || true
-      fi
-      mkdir -p /var/google || return
-      echo "$ip" >/var/google/gbmc-br-ip || return
+      gbmc_net_unmask_and_write /var/google/gbmc-br-ip "$ip" || return
     fi
     echo "$ip" >/run/gbmc-br-ip || return
   else

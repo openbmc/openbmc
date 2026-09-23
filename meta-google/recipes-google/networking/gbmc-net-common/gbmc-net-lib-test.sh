@@ -339,4 +339,42 @@ testReloadQueuedMessages() {
   unset -f _gbmc_net_networkd_reload_exec _gbmc_net_nftables_reload_exec
 }
 
+testUnmaskAndWrite() {
+  local test_dir
+  test_dir="$(mktemp -d)"
+
+  # Writing with contents creates parent directories and file
+  gbmc_net_unmask_and_write "$test_dir/subdir/testfile" "hello world"
+  local content
+  content=$(<"$test_dir/subdir/testfile")
+  if [ "$content" != "hello world" ]; then
+    echo "Expected 'hello world', got '$content'" >&2
+    fail
+  fi
+
+  # Writing multiple arguments joins with space
+  gbmc_net_unmask_and_write "$test_dir/subdir/testfile" "foo" "bar" "baz"
+  content=$(<"$test_dir/subdir/testfile")
+  if [ "$content" != "foo bar baz" ]; then
+    echo "Expected 'foo bar baz', got '$content'" >&2
+    fail
+  fi
+
+  # Writing without content touches the file
+  gbmc_net_unmask_and_write "$test_dir/emptyfile"
+  if [ ! -f "$test_dir/emptyfile" ] || [ -s "$test_dir/emptyfile" ]; then
+    echo "Expected empty file at $test_dir/emptyfile" >&2
+    fail
+  fi
+
+  # Mask or rm unmounted path removes file
+  gbmc_net_mask_or_rm "$test_dir/emptyfile"
+  if [ -e "$test_dir/emptyfile" ]; then
+    echo "Expected $test_dir/emptyfile to be removed" >&2
+    fail
+  fi
+
+  rm -rf "$test_dir"
+}
+
 main

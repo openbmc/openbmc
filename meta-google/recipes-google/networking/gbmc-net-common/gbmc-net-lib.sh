@@ -49,6 +49,34 @@ gbmc_net_mask_or_rm() {
   fi
 }
 
+# Safely unmask any bind-mounts over a persistent target file and write content to it.
+# Unmounts any active mount over the target, ensures the parent directory exists,
+# touches the file up front to confirm it can be written to RWFS, and writes the contents.
+# Arguments:
+#   $1: Path to the target file
+#   $2+: Contents to write (if provided, written separated by spaces with trailing newline)
+gbmc_net_unmask_and_write() {
+  local target="$1"
+  shift
+
+  while grep -q " $target " /proc/mounts 2>/dev/null; do
+    echo "Unmasking RWFS path $target from $(caller 0 2>/dev/null || echo unknown)" >&2
+    umount "$target" 2>/dev/null || break
+  done
+
+  if [ -c "$target" ]; then
+    rm -f "$target" || return
+  fi
+
+  mkdir -p "$(dirname "$target")" || return
+
+  touch "$target" || return
+
+  if (( $# > 0 )); then
+    printf '%s\n' "$*" >"$target" || return
+  fi
+}
+
 GBMC_NET_RELOAD_REFCOUNT=0
 GBMC_NET_NETWORKD_RELOAD_PENDING=0
 declare -A GBMC_NET_NETWORKD_RELOAD_INTFS=()
