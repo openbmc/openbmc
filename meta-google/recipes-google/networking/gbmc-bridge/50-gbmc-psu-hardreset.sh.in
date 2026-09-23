@@ -33,6 +33,7 @@ gbmc_psu_hardreset_hook() {
   fi
   update_netboot_status "pwr_check" "Power cycle needed" "SUCCESS"
 
+  gbmc_br_dhcp_rwfs_sync_ro
   update_netboot_status "pwr_req" "Starting power cycle request" "START"
   # Don't do coordinated powercycle for standard l2 dhcp
   # shellcheck disable=SC2154

@@ -26,6 +26,7 @@ gbmc_reboot_hook() {
   fi
   update_netboot_status "reboot_check" "Reboot is needed" "SUCCESS"
 
+  gbmc_br_dhcp_rwfs_sync_ro
   update_netboot_status "reboot" "triggerring bmc reboot" "START"
   update_netboot_status "reboot" "About to reboot" "SUCCESS"
   reboot -f
