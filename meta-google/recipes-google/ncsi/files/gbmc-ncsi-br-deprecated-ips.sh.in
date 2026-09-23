@@ -142,8 +142,8 @@ EOF
       ip -6 neigh del proxy $stateless_ip dev $intf 2>/dev/null || true
     fi
   else
-    ip -6 rule add to "$pfx/76" pref $GBMC_INTF_ROUTE_TABLE_BASE lookup main || st=$?
-    ip -6 rule add from "$pfx/76" pref $rt lookup $rt || st=$?
+    ip -6 rule add proto static to "$pfx/76" pref $GBMC_INTF_ROUTE_TABLE_BASE lookup main || st=$?
+    ip -6 rule add proto static from "$pfx/76" pref $rt lookup $rt || st=$?
     gbmc_ncsi_br_deprecated_ips_savedconf["$pfx"]="$intf"
     gbmc_ncsi_br_deprecated_ips_savedconf["$stateless_pfx"]="$intf"
     if [ -n "$host_pfx" ]; then

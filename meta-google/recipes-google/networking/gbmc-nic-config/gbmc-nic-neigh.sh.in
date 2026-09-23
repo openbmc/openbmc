@@ -83,9 +83,9 @@ EOF
         ip -6 neigh replace proxy "$neigh_ip" dev "$intf" || st=$?
       done
       ip -6 rule del to "$ip/64" lookup main pref "$GBMC_INTF_ROUTE_TABLE_BASE" 2>/dev/null || true
-      ip -6 rule add to "$ip/64" lookup main pref "$GBMC_INTF_ROUTE_TABLE_BASE" || st=$?
+      ip -6 rule add proto static to "$ip/64" lookup main pref "$GBMC_INTF_ROUTE_TABLE_BASE" || st=$?
       ip -6 rule del from "$ip/64" lookup "$rt" pref "$rt" 2>/dev/null || true
-      ip -6 rule add from "$ip/64" lookup "$rt" pref "$rt" || st=$?
+      ip -6 rule add proto static from "$ip/64" lookup "$rt" pref "$rt" || st=$?
       # Write the necessary firewall rules to forward IP traffic
       cat >/run/nftables/40-gbmc-"$intf"-br.rules <<EOF
 table inet filter {
