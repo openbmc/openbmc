@@ -28,6 +28,9 @@ source /usr/share/network/lib.sh || exit
 # SC can't find this path during repotest
 # shellcheck disable=SC1091
 source /usr/share/gbmc-br-lib.sh || exit
+# SC can't find this path during repotest
+# shellcheck disable=SC1091
+source /usr/share/gbmc-br-dhcp-lib.sh || exit
 
 # Load configurations from a known location in the filesystem to populate
 # hooks that are executed after each event.
@@ -119,7 +122,7 @@ if [ "$1" = bound ]; then
     fi
 
     update_netboot_status "dhcp_ip" "Attempt to set ips to ${ipv6s[*]}" "START"
-    if ! gbmc_br_set_ip "${ipv6s[@]}"; then
+    if ! GBMC_AVOID_RWFS=1 gbmc_br_set_ip "${ipv6s[@]}"; then
       update_netboot_status "dhcp_ip" "Failed to set ips to ${ipv6s[*]}" "FAIL"
       exit 1
     fi
@@ -139,6 +142,11 @@ if [ "$1" = bound ]; then
   if [ "${#GBMC_BR_DHCP_OUTSTANDING[@]}" -gt 0 ]; then
     update_netboot_status "netboot" "Outstanding DHCP hooks ${!GBMC_BR_DHCP_OUTSTANDING[*]}" "FAIL"
     exit 1
+  fi
+
+  # Persist primary IP to RWFS now that netboot hooks and purge have completed
+  if [[ -n "${ipv6s[0]-}" ]]; then
+    gbmc_net_unmask_and_write /var/google/gbmc-br-ip "${ipv6s[0]}" || true
   fi
 
   # Ensure that the installer knows we have completed processing DHCP by
