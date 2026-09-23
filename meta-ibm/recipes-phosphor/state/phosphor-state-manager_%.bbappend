@@ -29,6 +29,9 @@ RRECOMMENDS:${PN}-host:append:ibm-enterprise = " ${PN}-secure-check"
 # system power on if chassis power is in a bad state
 RRECOMMENDS:${PN}-chassis:append = " ${PN}-chassis-check-power-status"
 
+# IBM Huygens systems use the chassis availability monitor
+RRECOMMENDS:${PN}-chassis:append:huygens = " ${PN}-chassis-availability"
+
 # IBM enterprise systems implement chassis powercycle by hard powering off
 # the chassis and then booting the host back up once the power off completes.
 # Only the system chassis (instance 0) supports powercycle, so the links are
