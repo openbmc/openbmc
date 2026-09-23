@@ -18,6 +18,7 @@ SRC_URI:append = " \
   file://40-gbmc-forward.conf \
   file://40-gbmc-sysctl.conf \
   file://40-gbmc-time.conf \
+  file://40-gbmc-networkd.conf \
   file://10-gbmc.conf \
   file://10-reboot-timeout.conf \
   file://10-poweroff-timeout.conf \
@@ -30,6 +31,7 @@ FILES:${PN}:append = " \
   ${systemd_unitdir}/coredump.conf.d/40-gbmc-coredump.conf \
   ${systemd_unitdir}/resolved.conf.d/40-gbmc-nomdns.conf \
   ${systemd_unitdir}/timesyncd.conf.d/40-gbmc-time.conf \
+  ${systemd_unitdir}/networkd.conf.d/40-gbmc-networkd.conf \
   ${libdir}/sysctl.d/40-gbmc-sysctl.conf \
   ${libdir}/sysctl.d/40-gbmc-forward.conf \
   ${systemd_system_unitdir}/sysinit.target.wants/systemd-time-wait-sync.service \
@@ -97,6 +99,9 @@ do_install() {
 
   install -d -m 0755 ${D}${systemd_unitdir}/timesyncd.conf.d/
   install -D -m0644 ${UNPACKDIR}/40-gbmc-time.conf ${D}${systemd_unitdir}/timesyncd.conf.d/
+
+  install -d -m 0755 ${D}${systemd_unitdir}/networkd.conf.d/
+  install -D -m0644 ${UNPACKDIR}/40-gbmc-networkd.conf ${D}${systemd_unitdir}/networkd.conf.d/
 
   mkdir -p ${D}${systemd_system_unitdir}/sysinit.target.wants/
   ln -sv ${systemd_system_unitdir}/systemd-time-wait-sync.service ${D}${systemd_system_unitdir}/sysinit.target.wants/
