@@ -63,5 +63,83 @@
 	"RAW_EVENT": ""
       }
     }
+  },
+  {
+    "name": "PSB_NO_BIOS_SIGNING_KEY",
+    "description": "P0: BIOS signing key entry not found",
+    "primary": "0xEFE00022",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EFE00022) P0: BIOS signing key entry not found",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_BIOS_SIGNING_KEY_FLAG_VIOLATION",
+    "description": "P0: OEM BIOS Signing Key Usage flag violation",
+    "primary": "0xEFE0006F",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EFE0006F) P0: OEM BIOS Signing Key Usage flag violation",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_NO_BIOS_RTM_SIGNATURE",
+    "description": "P0: BIOS RTM Signature entry not found",
+    "primary": "0xEFE00078",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EFE00078) P0: BIOS RTM Signature entry not found",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_BIOS_RTM_SIGNATURE_VERIFICATION_FAILED",
+    "description": "P0: BIOS RTM Signature verification failed",
+    "primary": "0xEFE0007A",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EFE0007A) P0: BIOS RTM Signature verification failed",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_BIOS_SIGNING_KEY_VERIFICATION_FAILED",
+    "description": "P0: OEM BIOS Signing Key failed signature verification",
+    "primary": "0xEFE0007B",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EFE0007B) P0: OEM BIOS Signing Key failed signature verification",
+	"RAW_EVENT": ""
+      }
+    }
+  },
+  {
+    "name": "PSB_BIOS_COPY_BIT_UNSET",
+    "description": "P0: BIOS Copy bit is unset for reset image",
+    "primary": "0xEFE0007D",
+    "event": {
+      "name": "com.meta.IPMI.UnifiedSEL.UnifiedSELEvent",
+      "arguments": {
+        "SOURCE": "/xyz/openbmc_project/state/host0",
+        "EVENT": "PSB Event(EFE0007D) P0: BIOS Copy bit is unset for reset image",
+	"RAW_EVENT": ""
+      }
+    }
   }
 ]
