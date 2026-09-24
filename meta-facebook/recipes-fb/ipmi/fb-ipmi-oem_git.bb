@@ -5,7 +5,7 @@ LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=9e69ba356fa59848ffd865152a3ccc13"
 
 SRC_URI = "git://github.com/openbmc/fb-ipmi-oem;branch=master;protocol=https"
-SRCREV = "a1094aba019190d3d3eab55b4f2d1ae290461853"
+SRCREV = "bcdae6074648ca28be1d00df62d0437aa8ee308f"
 
 PV = "0.1+git${SRCPV}"
 
