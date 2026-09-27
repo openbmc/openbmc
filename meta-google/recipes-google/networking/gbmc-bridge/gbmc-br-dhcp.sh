@@ -145,7 +145,7 @@ if [ "$1" = bound ]; then
   fi
 
   # Persist primary IP to RWFS now that netboot hooks and purge have completed
-  if [[ -n "${ipv6s[0]-}" ]]; then
+  if gbmc_rwfs_purge_done && [[ -n "${ipv6s[0]-}" ]]; then
     gbmc_net_unmask_and_write /var/google/gbmc-br-ip "${ipv6s[0]}" || true
   fi
 
