@@ -44,9 +44,13 @@ gbmc_fetch_trip_id() {
 gbmc_rwfs_purge_done() {
   gbmc_fetch_trip_id || true
   if [ -n "${GBMC_TRIP_ID-}" ]; then
-    [ -r "/var/google/rwfs-purged" ] || return 1
-    [ "$(< /var/google/rwfs-purged)" = "$GBMC_TRIP_ID" ]
-    return
+    if [ -r "/var/google/rwfs-purged" ] && [ "$(< /var/google/rwfs-purged)" = "$GBMC_TRIP_ID" ]; then
+      return 0
+    fi
+    if [ -r "/run/initramfs/rwfs-purged" ] && [ "$(< /run/initramfs/rwfs-purged)" = "$GBMC_TRIP_ID" ]; then
+      return 0
+    fi
+    return 1
   fi
 
   [ -e "/run/initramfs/rwfs-purged" ]
