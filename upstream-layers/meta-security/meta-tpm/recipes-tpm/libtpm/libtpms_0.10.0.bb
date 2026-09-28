@@ -1,4 +1,5 @@
 SUMMARY = "LIBPM - Software TPM Library"
+HOMEPAGE = "https://github.com/stefanberger/libtpms"
 LICENSE = "BSD-3-Clause"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e73f0786a936da3814896df06ad225a9"
 

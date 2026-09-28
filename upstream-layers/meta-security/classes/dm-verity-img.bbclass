@@ -202,7 +202,6 @@ IMAGE_FSTYPES += "${@get_verity_fstypes(d)}"
 python __anonymous() {
     verity_image = d.getVar('DM_VERITY_IMAGE')
     verity_type = d.getVar('DM_VERITY_IMAGE_TYPE')
-    verity_hash = d.getVar('DM_VERITY_SEPARATE_HASH')
     image_fstypes = d.getVar('IMAGE_FSTYPES')
     pn = d.getVar('PN')
 

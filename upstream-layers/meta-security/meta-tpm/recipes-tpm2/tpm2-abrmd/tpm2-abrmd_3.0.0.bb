@@ -5,6 +5,7 @@ is implemented using Glib and the GObject system. In this documentation and \
 in the code we use `tpm2-abrmd` and `tabrmd` interchangeably. \
 "
 SECTION = "security/tpm"
+HOMEPAGE = "https://github.com/tpm2-software/tpm2-abrmd"
 
 LICENSE = "BSD-2-Clause"
 LIC_FILES_CHKSUM = "file://${S}/LICENSE;md5=500b2e742befc3da00684d8a1d5fd9da"

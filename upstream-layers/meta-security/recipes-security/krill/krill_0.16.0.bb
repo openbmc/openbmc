@@ -5,10 +5,10 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=9741c346eef56131163e13b9db1241b3"
 
 DEPENDS = "openssl"
 
-# SRC_URI += "crate://crates.io/krill/0.9.1"
-SRC_URI = "git://github.com/NLnetLabs/krill.git;protocol=https;branch=main"
-SRCREV = "e92098419c7ad82939e0483bc76df21eff705b80"
-SRC_URI += "file://panic_workaround.patch"
+SRC_URI = "git://github.com/NLnetLabs/krill.git;protocol=https;branch=main \
+           file://0001-Disable-abort-on-panic.patch \
+"
+SRCREV = "b2a26cd9f44a385d8a62a0199b082f44e5062039"
 
 include krill-crates.inc
 

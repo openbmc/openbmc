@@ -13,7 +13,8 @@ DAEMON=/usr/sbin/samhain
 RETVAL=0
 PIDFILE=/var/run/samhain.pid
 
-. /etc/default/rcS
+# Source rcS only if it exists (not present on systemd-based systems)
+[ -f /etc/default/rcS ] && . /etc/default/rcS
 
 . /etc/default/samhain-client
 

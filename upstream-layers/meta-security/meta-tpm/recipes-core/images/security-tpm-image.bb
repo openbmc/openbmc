@@ -1,4 +1,4 @@
-DESCRIPTION = "A small image for building a tpm image for testing"
+SUMMARY = "A small image for building a tpm image for testing"
 
 IMAGE_FEATURES += "ssh-server-openssh"
 

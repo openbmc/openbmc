@@ -115,7 +115,7 @@ The following build artifacts were used to create the image(s):
   NATIVE_SYSROOT:    /home/paul/poky/build-bbb-verity/tmp/work/cortexa8hf-neon-poky-linux-gnueabi/wic-tools/1.0-r0/recipe-sysroot-native
 
 INFO: The image(s) were created using OE kickstart file:
-  /home/paul/poky/meta-security/wic/beaglebone-yocto-verity.wks.in
+  /home/paul/poky/meta-security/files/wic/beaglebone-yocto-verity.wks.in
              ----------------------
 
 The "direct" image contains the partition table, bootloader, and dm-verity

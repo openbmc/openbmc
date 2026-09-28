@@ -1,4 +1,5 @@
 SUMMARY = "The tpm-tools package contains commands to allow the platform administrator the ability to manage and diagnose the platform's TPM."
+HOMEPAGE = "https://sourceforge.net/p/trousers/tpm-tools"
 DESCRIPTION = " \
   The tpm-tools package contains commands to allow the platform administrator \
   the ability to manage and diagnose the platform's TPM.  Additionally, the \

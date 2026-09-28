@@ -13,7 +13,7 @@ LIC_FILES_CHKSUM = "file://src/${GO_IMPORT}/LICENSE;md5=1e58fe4126ce0b50677f3aa6
 CROWDSEC_BRANCH_VERSION = "${@'.'.join(d.getVar('PV').split('.')[0:2])}"
 SRC_URI = "gitsm://${GO_IMPORT};protocol=https;branch=releases/${CROWDSEC_BRANCH_VERSION}.x;tag=v${PV};destsuffix=${GO_SRCURI_DESTSUFFIX}"
 
-SRCREV = "027974f20cf422bbe1406cf4297fbff37417bd03"
+SRCREV = "909b5157986a2b2c2163300fdaef5ed01289f7d2"
 
 require ${BPN}-licenses.inc
 require ${BPN}-go-mods.inc

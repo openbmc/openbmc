@@ -14,8 +14,8 @@ writing (kernel v6.1) the resulting qemux86-64 build can also be booted
 successfully on physical hardware, but if you don't intend to use qemu,
 you might instead want to choose "genericx86-64"
 
-This will make use of wic/systemd-bootdisk-dmverity.wks.in -- note that it
-contains a dependency on the meta-intel layer for microcode, so you'll need
+This will make use of files/wic/systemd-bootdisk-dmverity.wks.in -- note that
+it contains a dependency on the meta-intel layer for microcode, so you'll need
 to fetch and add that layer in addition to the meta-security related layers.
 
 In addition to the basic dm-verity settings, choose systemd in local.conf:
@@ -56,7 +56,7 @@ The following build artifacts were used to create the image(s):
   NATIVE_SYSROOT:               /home/paul/poky/build-qemu-x86_64/tmp/work/core2-64-poky-linux/wic-tools/1.0-r0/recipe-sysroot-native
 
 INFO: The image(s) were created using OE kickstart file:
-  /home/paul/poky/meta-security/wic/systemd-bootdisk-dmverity.wks.in
+  /home/paul/poky/meta-security/files/wic/systemd-bootdisk-dmverity.wks.in
 build-qemu-x86_64$
            ------------------------------
 

@@ -1,0 +1,24 @@
+From 2ab05412b6c4abf21c1eec11fb62b28068e5ea81 Mon Sep 17 00:00:00 2001
+From: Armin Kuster <akuster808@gmail.com>
+Date: Tue, 27 Jul 2021 08:06:43 -0700
+Subject: [PATCH] Disable abort on panic
+
+Upstream-Status: Inappropriate [OE specific]
+Signed-off-by: Armin Kuster <akuster808@gmail.com>
+---
+ Cargo.toml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Cargo.toml b/Cargo.toml
+index 8e37e968..92e6fb9a 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -107,7 +107,7 @@ urlparse  = "0.7"
+ # Make sure that Krill crashes on panics, rather than losing threads and
+ # limping on in a bad state.
+ [profile.release]
+-panic = "abort"
++#panic = "abort"
+ 
+ # ------------------------------------------------------------------------------
+ # START DEBIAN PACKAGING

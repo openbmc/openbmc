@@ -22,7 +22,7 @@ SRC_URI = "git://github.com/Cisco-Talos/clamav;branch=rel/1.4;protocol=https \
            file://tmpfiles.clamav \
            "
 
-# ClamAV version 1.4.4
+# ClamAV version 1.4.6
 SRCREV = "f6d84be3c0048deb15c54d67e140dae062e5b82b"
 
 COMPATIBLE_HOST:libc-musl:class-target = "null"

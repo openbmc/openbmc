@@ -8,7 +8,7 @@ LIC_FILES_CHKSUM = "file://LICENSE;md5=3edd6782854304fd11da4975ab9799c1"
 
 SRC_URI = "git://github.com/CISOfy/lynis.git;branch=master;protocol=https"
 
-SRCREV = "06153321ea50d53a27446084e646d9f43fe46e0e"
+SRCREV = "2e99f92265760b73fd6b139868eb8d4116624030"
 
 #UPSTREAM_CHECK = "https://downloads.cisofy.com/lynis"
 
