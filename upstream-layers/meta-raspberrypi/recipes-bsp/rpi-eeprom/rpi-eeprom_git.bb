@@ -1,15 +1,15 @@
 SUMMARY = "Installation scripts and binaries for the Raspberry Pi 4 EEPROM"
 DESCRIPTION = "This repository contains the rpi4/rpi5 bootloader and scripts \
 for updating it in the spi eeprom"
-LICENSE = "BSD-3-Clause & Broadcom-RPi"
+LICENSE = "BSD-3-Clause AND LicenseRef-Broadcom-RPi"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=a6c5149578a16272119f3f9c13d6549b"
 
 SRC_URI = " \
     git://github.com/raspberrypi/rpi-eeprom.git;protocol=https;branch=master \
 "
 
-SRCREV = "2349daafacfb7a7abe2cfecf30a49ae837bdf2c6"
-PV = "v2025.07.17-2712"
+SRCREV = "e25fc5dcb8eb072eafb745cd546c3d9f73d102b5"
+PV = "v2026.05.11-2712"
 
 RDEPENDS:${PN} += " \
     coreutils \
@@ -18,6 +18,7 @@ RDEPENDS:${PN} += " \
     openssl \
     xxd \
     pciutils \
+    util-linux-findmnt \
 "
 
 inherit python3native

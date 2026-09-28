@@ -28,11 +28,16 @@ RPI_KERNEL_DEVICETREE_OVERLAYS ?= " \
     overlays/gpio-key.dtbo \
     overlays/gpio-poweroff.dtbo \
     overlays/gpio-shutdown.dtbo \
+    overlays/hifiberry-adc.dtbo \
+    overlays/hifiberry-adc8x.dtbo \
     overlays/hifiberry-amp.dtbo \
     overlays/hifiberry-amp100.dtbo \
     overlays/hifiberry-amp3.dtbo \
     overlays/hifiberry-amp4pro.dtbo \
     overlays/hifiberry-dac.dtbo \
+    overlays/hifiberry-dac8x.dtbo \
+    overlays/hifiberry-dacplus-pro.dtbo \
+    overlays/hifiberry-dacplus-std.dtbo \
     overlays/hifiberry-dacplus.dtbo \
     overlays/hifiberry-dacplusadc.dtbo \
     overlays/hifiberry-dacplusadcpro.dtbo \

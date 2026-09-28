@@ -14,7 +14,7 @@ SECTION = "kernel"
 # conflicts with linux-firmware.
 #
 # [^1]: https://github.com/RPi-Distro/bluez-firmware/issues/1
-LICENSE = "Firmware-cypress-rpidistro"
+LICENSE = "LicenseRef-Firmware-cypress-rpidistro"
 LIC_FILES_CHKSUM = "\
     file://LICENCE.cypress-rpidistro;md5=be80828daf682762f392131141288a74 \
 "
@@ -61,12 +61,12 @@ PACKAGES = "\
     ${PN}-bcm4345c5-hcd \
 "
 
-LICENSE:${PN}-bcm43430a1-hcd = "Firmware-cypress-rpidistro"
-LICENSE:${PN}-bcm43430b0-hcd = "Firmware-cypress-rpidistro"
-LICENSE:${PN}-bcm4343a2-hcd = "Firmware-cypress-rpidistro"
-LICENSE:${PN}-bcm4345c0-hcd = "Firmware-cypress-rpidistro"
-LICENSE:${PN}-bcm4345c5-hcd = "Firmware-cypress-rpidistro"
-LICENSE:${PN}-cypress-license = "Firmware-cypress-rpidistro"
+LICENSE:${PN}-bcm43430a1-hcd = "LicenseRef-Firmware-cypress-rpidistro"
+LICENSE:${PN}-bcm43430b0-hcd = "LicenseRef-Firmware-cypress-rpidistro"
+LICENSE:${PN}-bcm4343a2-hcd = "LicenseRef-Firmware-cypress-rpidistro"
+LICENSE:${PN}-bcm4345c0-hcd = "LicenseRef-Firmware-cypress-rpidistro"
+LICENSE:${PN}-bcm4345c5-hcd = "LicenseRef-Firmware-cypress-rpidistro"
+LICENSE:${PN}-cypress-license = "LicenseRef-Firmware-cypress-rpidistro"
 
 FILES:${PN}-cypress-license = "\
     ${nonarch_base_libdir}/firmware/LICENCE.cypress-rpidistro \

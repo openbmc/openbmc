@@ -1,0 +1,130 @@
+From 3319a0cd854552451c3fbc31b1abf334ce256583 Mon Sep 17 00:00:00 2001
+From: Leon Anavi <leon.anavi@konsulko.com>
+Date: Mon, 17 Aug 2026 16:26:16 +0300
+Subject: [PATCH] PY_LGPIO/lgpio.i: Replace undefined functions
+
+Replace functions PyInt_Check, PyInt_AsLong, PyInt_FromLong and
+PyString_FromString for Python3 because SWIG dropped its Python
+2/3 compat shim in version 4.1. Fixes:
+
+error: implicit declaration of function 'PyInt_FromLong';
+did you mean 'PyLong_FromLong'? [-Wimplicit-function-declaration]
+
+error: implicit declaration of function 'PyInt_Check';
+did you mean 'PySet_Check'? [-Wimplicit-function-declaration]
+
+error: implicit declaration of function 'PyInt_AsLong';
+did you mean 'PyLong_AsLong'? [-Wimplicit-function-declaration]
+
+Upstream-Status: Submitted [https://github.com/joan2937/lg/pull/46]
+
+Signed-off-by: Leon Anavi <leon.anavi@konsulko.com>
+---
+ PY_LGPIO/lgpio.i | 42 +++++++++++++++++++++---------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/PY_LGPIO/lgpio.i b/PY_LGPIO/lgpio.i
+index 5f1bfeb..bead4e3 100644
+--- a/lgpio.i
++++ b/lgpio.i
+@@ -296,12 +296,12 @@ error_text                Get the error text for an error code
+ // lgSpiRead
+ %typemap(in) (char *rxBuf, int count)
+ {
+-   if (!PyInt_Check($input))
++   if (!PyLong_Check($input))
+    {
+       PyErr_SetString(PyExc_ValueError, "Expecting an integer");
+       SWIG_fail;
+    }
+-   $2 = PyInt_AsLong($input);
++   $2 = PyLong_AsLong($input);
+    if ($2 < 0)
+    {
+       PyErr_SetString(PyExc_ValueError, "Positive integer expected");
+@@ -360,7 +360,7 @@ error_text                Get the error text for an error code
+    Py_XDECREF($result);   /* Blow away any previous result */
+ 
+    $result = PyList_New(2);
+-   o1 = PyInt_FromLong(result);
++   o1 = PyLong_FromLong(result);
+    PyList_SetItem($result, 0, o1);
+ 
+    if (result > 0) o2 = PyByteArray_FromStringAndSize($2, result);
+@@ -408,7 +408,7 @@ error_text                Get the error text for an error code
+    PyObject *o1, *o2;
+    Py_XDECREF($result);   /* Blow away any previous result */
+    $result = PyList_New(2);
+-   o1 = PyInt_FromLong(result);
++   o1 = PyLong_FromLong(result);
+    PyList_SetItem($result, 0, o1);
+    if (result > 0) o2 = PyByteArray_FromStringAndSize($1, result);
+    else o2 = PyByteArray_FromStringAndSize("", 0);
+@@ -428,7 +428,7 @@ error_text                Get the error text for an error code
+    Py_XDECREF($result);   /* Blow away any previous result */
+    $result = PyList_New(2);
+ 
+-   o1 = PyInt_FromLong(result);
++   o1 = PyLong_FromLong(result);
+    PyList_SetItem($result, 0, o1);
+ 
+    if (result > 0) o2 = PyByteArray_FromStringAndSize($1, result);
+@@ -494,18 +494,18 @@ error_text                Get the error text for an error code
+    {
+       result = 0;
+ 
+-      o2 = PyInt_FromLong(chipInf2.lines);
+-      o3 = PyString_FromString(chipInf2.name);
+-      o4 = PyString_FromString(chipInf2.label);
++      o2 = PyLong_FromLong(chipInf2.lines);
++      o3 = PyUnicode_FromString(chipInf2.name);
++      o4 = PyUnicode_FromString(chipInf2.label);
+    }
+    else
+    {
+-      o2 = PyInt_FromLong(0);
+-      o3 = PyString_FromString("");
+-      o4 = PyString_FromString("");
++      o2 = PyLong_FromLong(0);
++      o3 = PyUnicode_FromString("");
++      o4 = PyUnicode_FromString("");
+    }
+ 
+-   o1 = PyInt_FromLong(result);
++   o1 = PyLong_FromLong(result);
+ 
+    PyList_SetItem($result, 0, o1);
+    PyList_SetItem($result, 1, o2);
+@@ -530,20 +530,20 @@ error_text                Get the error text for an error code
+    {
+       result = 0;
+ 
+-      o2 = PyInt_FromLong(lineInf3.offset);
+-      o3 = PyInt_FromLong(lineInf3.lFlags);
+-      o4 = PyString_FromString(lineInf3.name);
+-      o5 = PyString_FromString(lineInf3.user);
++      o2 = PyLong_FromLong(lineInf3.offset);
++      o3 = PyLong_FromLong(lineInf3.lFlags);
++      o4 = PyUnicode_FromString(lineInf3.name);
++      o5 = PyUnicode_FromString(lineInf3.user);
+    }
+    else
+    {
+-      o2 = PyInt_FromLong(0);
+-      o3 = PyInt_FromLong(0);
+-      o4 = PyString_FromString("");
+-      o5 = PyString_FromString("");
++      o2 = PyLong_FromLong(0);
++      o3 = PyLong_FromLong(0);
++      o4 = PyUnicode_FromString("");
++      o5 = PyUnicode_FromString("");
+    }
+ 
+-   o1 = PyInt_FromLong(result);
++   o1 = PyLong_FromLong(result);
+ 
+    PyList_SetItem($result, 0, o1);
+    PyList_SetItem($result, 1, o2);
+-- 
+2.47.3
+
