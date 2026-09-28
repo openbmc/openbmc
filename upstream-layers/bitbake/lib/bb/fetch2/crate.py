@@ -45,6 +45,17 @@ class Crate(Wget):
 
         super(Crate, self).urldata_init(ud, d)
 
+    def _generate_index_path(self, name):
+        # https://doc.rust-lang.org/cargo/reference/registry-index.html#index-files
+        if len(name) == 1:
+            return f"1/{name}"
+        elif len(name) == 2:
+            return f"2/{name}"
+        elif len(name) == 3:
+            return f"3/{name[0]}/{name}"
+        else:
+            return f"{name[0:2]}/{name[2:4]}/{name}"
+
     def _crate_urldata_init(self, ud, d):
         """
         Sets up the download for a crate
@@ -65,12 +76,15 @@ class Crate(Wget):
         # host (this is to allow custom crate registries to be specified
         host = '/'.join(parts[2:-2])
 
-        # if using upstream just fix it up nicely
+        # If using crates.io use the CDN directly as per https://crates.io/data-access
         if host == 'crates.io':
-            host = 'crates.io/api/v1/crates'
+            ud.url = "https://static.crates.io/crates/%s/%s/download" % (name, version)
+            ud.versionsurl = 'https://index.crates.io/' + self._generate_index_path(name)
+            self.latest_versionstring = self.latest_versionstring_from_index
+        else:
+            ud.url = "https://%s/%s/%s/download" % (host, name, version)
+            ud.versionsurl = "https://%s/%s/versions" % (host, name)
 
-        ud.url = "https://%s/%s/%s/download" % (host, name, version)
-        ud.versionsurl = "https://%s/%s/versions" % (host, name)
         ud.parm['downloadfilename'] = "%s-%s.crate" % (name, version)
         if 'name' not in ud.parm:
             ud.parm['name'] = '%s-%s' % (name, version)
@@ -142,9 +156,29 @@ class Crate(Wget):
                 json.dump(metadata, f)
 
     def latest_versionstring(self, ud, d):
+        """
+        Return the latest version available when versionsurl is the [name]/versions URL.
+        """
         from functools import cmp_to_key
         json_data = json.loads(self._fetch_index(ud.versionsurl, ud, d))
         versions = [(0, i["num"], "") for i in json_data["versions"]]
         versions = sorted(versions, key=cmp_to_key(bb.utils.vercmp))
 
+        return (versions[-1][1], "")
+
+    def latest_versionstring_from_index(self, ud, d):
+        """
+        Return the latest version available when versionsurl is a Cargo index
+        file.
+        https://doc.rust-lang.org/cargo/reference/registry-index.html#index-files
+        """
+        from functools import cmp_to_key
+
+        versions = []
+        response = self._fetch_index(ud.versionsurl, ud, d)
+        for line in response.splitlines():
+            data = json.loads(line)
+            versions.append((0, data["vers"], ""))
+
+        versions = sorted(versions, key=cmp_to_key(bb.utils.vercmp))
         return (versions[-1][1], "")
