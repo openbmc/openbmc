@@ -12,19 +12,27 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 COMPATIBLE_MACHINE = "juno"
 
-LINARO_RELEASE = "19.06"
-
-SRC_URI = "http://releases.linaro.org/members/arm/platforms/${LINARO_RELEASE}/juno-latest-oe-uboot.zip;subdir=${S} \
-    file://images-r0.txt \
-    file://images-r1.txt \
-    file://images-r2.txt \
+SRC_URI = " \
+    file://mbb_v151.ebf \
+    file://io_b118.bit \
+    file://tapid.arm \
+    file://pms_v103.bin \
+    file://pms_v104.bin \
+    file://pms_v105.bin \
+    file://mb-board.txt \
+    file://site1-HBI0262B-board.txt \
+    file://site1-HBI0262C-board.txt \
+    file://site1-HBI0262D-board.txt \
+    file://site1-images.txt \
+    file://hdlcdclk.dat \
+    file://startup.nsh \
+    file://selftest \
+    file://config.txt \
     file://uEnv.txt \
 "
-SRC_URI[md5sum] = "01b662b81fa409d55ff298238ad24003"
-SRC_URI[sha256sum] = "b8a3909bb3bc4350a8771b863193a3e33b358e2a727624a77c9ecf13516cec82"
 
-FIRMWARE_DIR = "juno-firmware-${LINARO_RELEASE}"
-S = "${UNPACKDIR}/${FIRMWARE_DIR}"
+FIRMWARE_DIR = "juno-firmware"
+S = "${UNPACKDIR}"
 
 inherit deploy nopackages
 
@@ -34,23 +42,63 @@ do_compile[noexec] = "1"
 # The ${D} is used as a temporary directory and we don't generate any
 # packages for this recipe.
 do_install() {
-    cp -a ${S} ${D}/
+    install -d ${D}/${FIRMWARE_DIR}/
+    cp -f ${UNPACKDIR}/config.txt ${D}/${FIRMWARE_DIR}/
+
+    # Files in the MB directory are mostly the same, except for the PMS file and references to the PMS file by name
+    install -d ${D}/${FIRMWARE_DIR}/MB/HBI0262B/
+    cp -f ${UNPACKDIR}/mbb_v151.ebf ${D}/${FIRMWARE_DIR}/MB/HBI0262B/
+    cp -f ${UNPACKDIR}/io_b118.bit ${D}/${FIRMWARE_DIR}/MB/HBI0262B/
+    cp -f ${UNPACKDIR}/tapid.arm  ${D}/${FIRMWARE_DIR}/MB/HBI0262B/
+    cp -f ${UNPACKDIR}/pms_v103.bin ${D}/${FIRMWARE_DIR}/MB/HBI0262B/
+    cp -f ${UNPACKDIR}/mb-board.txt ${D}/${FIRMWARE_DIR}/MB/HBI0262B/board.txt
+
+    install -d ${D}/${FIRMWARE_DIR}/MB/HBI0262C/
+    cp -f ${UNPACKDIR}/mbb_v151.ebf ${D}/${FIRMWARE_DIR}/MB/HBI0262C/
+    cp -f ${UNPACKDIR}/io_b118.bit ${D}/${FIRMWARE_DIR}/MB/HBI0262C/
+    cp -f ${UNPACKDIR}/tapid.arm  ${D}/${FIRMWARE_DIR}/MB/HBI0262C/
+    cp -f ${UNPACKDIR}/pms_v104.bin ${D}/${FIRMWARE_DIR}/MB/HBI0262C/
+    sed 's/pms_v103/pms_v104/g' ${UNPACKDIR}/mb-board.txt > ${D}/${FIRMWARE_DIR}/MB/HBI0262C/board.txt
+
+    install -d ${D}/${FIRMWARE_DIR}/MB/HBI0262D/
+    cp -f ${UNPACKDIR}/mbb_v151.ebf ${D}/${FIRMWARE_DIR}/MB/HBI0262D/
+    cp -f ${UNPACKDIR}/io_b118.bit ${D}/${FIRMWARE_DIR}/MB/HBI0262D/
+    cp -f ${UNPACKDIR}/tapid.arm  ${D}/${FIRMWARE_DIR}/MB/HBI0262D/
+    cp -f ${UNPACKDIR}/pms_v105.bin ${D}/${FIRMWARE_DIR}/MB/HBI0262D/
+    sed 's/pms_v103/pms_v105/g' ${UNPACKDIR}/mb-board.txt > ${D}/${FIRMWARE_DIR}/MB/HBI0262D/board.txt
+
+    # The SITE1 image files are mostly the same except for the DTB they reference
+    install -d ${D}/${FIRMWARE_DIR}/SITE1/HBI0262B/
+    cp -f ${UNPACKDIR}/site1-HBI0262B-board.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262B/board.txt
+    cp -f ${UNPACKDIR}/site1-images.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262B/images.txt
+
+    install -d ${D}/${FIRMWARE_DIR}/SITE1/HBI0262C/
+    cp -f ${UNPACKDIR}/site1-HBI0262C-board.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262C/board.txt
+    sed 's/juno\.dtb/juno-r1.dtb/g' ${UNPACKDIR}/site1-images.txt > ${D}/${FIRMWARE_DIR}/SITE1/HBI0262C/images.txt
+
+    install -d ${D}/${FIRMWARE_DIR}/SITE1/HBI0262D/
+    cp -f ${UNPACKDIR}/site1-HBI0262D-board.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262D/board.txt
+    sed 's/juno\.dtb/juno-r2.dtb/g' ${UNPACKDIR}/site1-images.txt > ${D}/${FIRMWARE_DIR}/SITE1/HBI0262D/images.txt
+
+    # The files in SOFTWARE are listed in the SITE1 board.txt file by name
+    install -d ${D}/${FIRMWARE_DIR}/SOFTWARE/
+    cp -f ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/fip.bin \
+        ${D}/${FIRMWARE_DIR}/SOFTWARE/fip.bin
+
     cp -f ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/bl1.bin \
         ${D}/${FIRMWARE_DIR}/SOFTWARE/bl1.bin
 
-    cp -f ${RECIPE_SYSROOT}/firmware/trusted-firmware-a/fip.bin \
-        ${D}/${FIRMWARE_DIR}/SOFTWARE/fip.bin
+    cp -f ${UNPACKDIR}/hdlcdclk.dat ${D}/${FIRMWARE_DIR}/SOFTWARE/
 
     cp -f ${RECIPE_SYSROOT}/firmware/scp-firmware/scp_romfw_bypass.bin \
         ${D}/${FIRMWARE_DIR}/SOFTWARE/scp_bl1.bin
 
+    cp -f ${UNPACKDIR}/startup.nsh ${D}/${FIRMWARE_DIR}/SOFTWARE/
+    cp -f ${UNPACKDIR}/selftest ${D}/${FIRMWARE_DIR}/SOFTWARE/
+    dd if=/dev/zero of="${D}/${FIRMWARE_DIR}/SOFTWARE/blank.img" bs=1024 count=192 status=none
+
     # u-boot environment file
     cp -f ${UNPACKDIR}/uEnv.txt ${D}/${FIRMWARE_DIR}/SOFTWARE/
-
-    # Juno images list file
-    cp -f ${UNPACKDIR}/images-r0.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262B/images.txt
-    cp -f ${UNPACKDIR}/images-r1.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262C/images.txt
-    cp -f ${UNPACKDIR}/images-r2.txt ${D}/${FIRMWARE_DIR}/SITE1/HBI0262D/images.txt
 }
 
 do_deploy() {

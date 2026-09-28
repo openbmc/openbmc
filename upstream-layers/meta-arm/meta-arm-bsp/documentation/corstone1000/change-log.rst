@@ -11,6 +11,71 @@ This document contains a summary of the new features, changes and
 fixes in each release of Corstone-1000 software stack.
 
 ***************
+Version 2026.05
+***************
+
+Changes
+=======
+
+- Upgraded key Corstone-1000 components to U-Boot 2025.10, TF-A 2.14.1, TF-M 2.2.2, OP-TEE 4.9.0, Trusted Services 1.3.0, and Linux 6.19.
+- Added GPT support in TF-M and updated MCUboot to use the GPT library for firmware-update partitions.
+- Extended the TF-M firmware update flow with GPT fixes, partition create/remove/duplicate operations, metadata-only handling, flash erase protection, stale partition cleanup, and better handling of older images during PSA FWU.
+- Added SSH-enabled build overlay for FVP mass-storage images.
+- Removed GRUB from the initramfs boot package set.
+
+Corstone-1000 components versions
+=================================
+
++-------------------------------------------+-------------------+
+| linux-yocto                               | 6.19              |
++-------------------------------------------+-------------------+
+| u-boot                                    | 2025.10           |
++-------------------------------------------+-------------------+
+| external-system                           | 0.1.0             |
++-------------------------------------------+-------------------+
+| optee-client                              | 4.9.0             |
++-------------------------------------------+-------------------+
+| optee-os                                  | 4.9.0             |
++-------------------------------------------+-------------------+
+| trusted-firmware-a                        | 2.14.1            |
++-------------------------------------------+-------------------+
+| trusted-firmware-m                        | 2.2.2             |
++-------------------------------------------+-------------------+
+| libts                                     | v1.3.0            |
++-------------------------------------------+-------------------+
+| ts-sp-{se-proxy, smm-gateway}             | v1.3.0            |
++-------------------------------------------+-------------------+
+| ts-psa-{crypto, iat, its. ps}-api-test    | 74dc6646ff        |
++-------------------------------------------+-------------------+
+
+Yocto distribution components versions
+======================================
+
++-------------------------------------------+----------------+
+| meta-arm                                  | wrynose        |
++-------------------------------------------+----------------+
+| bitbake                                   | 22021758e6     |
++-------------------------------------------+----------------+
+| meta-openembedded                         | 9af4488d46     |
++-------------------------------------------+----------------+
+| openembedded-core                         | 06dd66e622     |
++-------------------------------------------+----------------+
+| meta-yocto                                | 8251bdad5f     |
++-------------------------------------------+----------------+
+| meta-secure-core                          | 07a99ae241     |
++-------------------------------------------+----------------+
+| busybox                                   | 1.37.0         |
++-------------------------------------------+----------------+
+| musl                                      | 1.2.6          |
++-------------------------------------------+----------------+
+| gcc-arm-none-eabi                         | 15.2.rel1      |
++-------------------------------------------+----------------+
+| gcc-cross-aarch64                         | 15.2.0         |
++-------------------------------------------+----------------+
+| openssl                                   | 3.5.6          |
++-------------------------------------------+----------------+
+
+***************
 Version 2025.12
 ***************
 

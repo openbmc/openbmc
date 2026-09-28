@@ -4,7 +4,7 @@ All the tests in this chapter assume you have already built the software stack a
 
 ## Reports {.reference}
 
-Reports for the tests conducted on the [Corstone-1000 software (CORSTONE1000-2025.12)](https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2025.12) release are available for reference in the [GitLab repo](https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2025.12/embedded-a/corstone1000/CORSTONE1000-2025.12?ref_type=tags).
+Reports for the tests conducted on the [Corstone-1000 software (CORSTONE1000-2026.05)](https://git.yoctoproject.org/meta-arm/tag/?h=CORSTONE1000-2026.05) release are available for reference in the [GitLab repo](https://gitlab.arm.com/arm-reference-solutions/arm-reference-solutions-test-report/-/tree/CORSTONE1000-2026.05/embedded-a/corstone1000/CORSTONE1000-2026.05?ref_type=tags).
 
 ## SystemReady IR {.reference}
 
@@ -21,11 +21,11 @@ A storage with EFI System Partition (ESP) must exist in the system for the UEFI-
 1. Build an ESP partition for your target
 
    ```
-   kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml --target corstone1000-esp-image
+   kas build meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml --target corstone1000-esp-image
    ```
 
-2. Locate the `corstone1000-esp-image-corstone1000-fvp.wic` build artefact
-   in `${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/`
+2. Locate the `corstone1000-esp-image-corstone1000-a320-fvp.wic` build artefact
+   in `${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/`
 
 ### Use the EFI system partition {.reference}
 
@@ -121,7 +121,7 @@ To build and run ACS tests on Corstone-1000:
    ```
    ./meta-arm/scripts/runfvp \
    --terminals=tmux \
-   ./build/tmp/deploy/images/corstone1000-fvp/corstone1000-flash-firmware-image-corstone1000-fvp.fvpconf \
+   ./build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000-flash-firmware-image-corstone1000-a320-fvp.fvpconf \
    -- -C board.msd_mmc.p_mmc_file=${WORKSPACE}/arm-systemready/IR/prebuilt_images/v23.09_2.1.0/ir-acs-live-image-generic-arm64.wic
    ```
 
@@ -196,6 +196,11 @@ The following payloads can be individually updated:
 for the host machine during the firmware image building process.
 The tool can be found at `${WORKSPACE}/build/tmp/sysroots-components/aarch64/edk2-basetools-native/usr/bin/edk2-BaseTools/BinWrappers/PosixLike/GenerateCapsule`.
 
+:::note
+The `aarch64` part of this path depends on the build host architecture
+and can be different on another host.
+:::
+
 A JSON file containing metadata about the capsule payloads needs to be created using the script
 found at `${WORKSPACE}/meta-arm/meta-arm/scripts/generate_capsule_json_multiple.py`.
 This JSON file is required by EDK II's `GenerateCapsule` tool to generate the capsule.
@@ -205,7 +210,7 @@ and `${WORKSPACE}/meta-arm/kas/corstone1000-image-configuration.yml` files.
 
 #### Valid full capsule {.reference}
 
-An automatically generated capsule can be found at `${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/corstone1000-fvp-v6.uefi.capsule` after running a firmware build.
+An automatically generated capsule can be found at `${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000-a320-fvp-v6.uefi.capsule` after running a firmware build.
 
 The default metadata values are assumed to be correct to generate a valid capsule.
 
@@ -234,27 +239,27 @@ b57e432b-a250-5c73-93e3-90205e64baba \
 --lowest_supported_versions 5 5 5 5 5 5 \
 --monotonic_counts 1  1  1  1  1  1 \
 --payloads \
-build/tmp/work/corstone1000_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
-build/tmp/deploy/images/corstone1000-fvp/trusted-firmware-m/bl2_signed.bin \
-build/tmp/deploy/images/corstone1000-fvp/trusted-firmware-m/tfm_s_signed.bin \
-build/tmp/deploy/images/corstone1000-fvp/signed_fip.bin \
-build/tmp/deploy/images/corstone1000-fvp/Image.gz-initramfs-corstone1000-fvp.bin \
-build/tmp/work/corstone1000_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+build/tmp/work/corstone1000_a320_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/trusted-firmware-m/bl2_signed.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/trusted-firmware-m/tfm_s_signed.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/signed_fip.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/Image.gz-initramfs-corstone1000-a320-fvp.bin \
+build/tmp/work/corstone1000_a320_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
 --update_image_indexes 5  1  2  3  4  6 \
 --private_keys \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
 --certificates \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
 --output capsule_config.json
 ```
 
@@ -265,7 +270,7 @@ Run the command below to generate the partial capsule:
 -e \
 -j capsule_config.json \
 --capflag PersistAcrossReset \
--o corstone1000-fvp-partial-v7.uefi.capsule
+-o corstone1000-a320-fvp-partial-v7.uefi.capsule
 ```
 
 The partial capsule will be located in the `${WORKSPACE}` directory.
@@ -292,27 +297,27 @@ b57e432b-a250-5c73-93e3-90205e64baba \
 --lowest_supported_versions 5 5 5 5 5 5 \
 --monotonic_counts 1  1  1  1  1  1 \
 --payloads \
-build/tmp/work/corstone1000_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
-build/tmp/deploy/images/corstone1000-fvp/trusted-firmware-m/bl2_signed.bin \
-build/tmp/deploy/images/corstone1000-fvp/trusted-firmware-m/tfm_s_signed.bin \
-build/tmp/deploy/images/corstone1000-fvp/signed_fip.bin \
-build/tmp/deploy/images/corstone1000-fvp/Image.gz-initramfs-corstone1000-fvp.bin \
-build/tmp/work/corstone1000_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+build/tmp/work/corstone1000_a320_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/trusted-firmware-m/bl2_signed.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/trusted-firmware-m/tfm_s_signed.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/signed_fip.bin \
+build/tmp/deploy/images/corstone1000-a320-fvp/Image.gz-initramfs-corstone1000-a320-fvp.bin \
+build/tmp/work/corstone1000_a320_fvp-poky-linux-musl/corstone1000-flash-firmware-image/1.0/sources/corstone1000-flash-firmware-image-1.0/dummy.bin \
 --update_image_indexes 5  1  2  3  4  6 \
 --private_keys \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_key.key \
 --certificates \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
-build/tmp/deploy/images/corstone1000-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
+build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000_capsule_cert.crt \
 --output capsule_config.json
 ```
 
@@ -323,7 +328,7 @@ Run the command below to generate the invalid capsule:
 -e \
 -j capsule_config.json \
 --capflag PersistAcrossReset \
--o corstone1000-fvp-v5.uefi.capsule
+-o corstone1000-a320-fvp-v5.uefi.capsule
 ```
 
 The invalid capsule will be located in the `${WORKSPACE}` directory.
@@ -363,9 +368,9 @@ as opposed to the on-disk method (delivery of capsules using a file on a mass st
 4. Copy the capsules:
 
    ```
-   sudo cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/corstone1000-fvp-v6.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
-   sudo cp ${WORKSPACE}/corstone1000-fvp-v5.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
-   sudo cp ${WORKSPACE}/corstone1000-fvp-partial-v7.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
+   sudo cp ${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000-a320-fvp-v6.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
+   sudo cp ${WORKSPACE}/corstone1000-a320-fvp-v5.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
+   sudo cp ${WORKSPACE}/corstone1000-a320-fvp-partial-v7.uefi.capsule /mnt/ir-acs-live-image-generic-arm64/
    sync
    ```
 
@@ -388,7 +393,7 @@ This sequence order must be respected as the invalid capsule has a firmware vers
 
 To run the test:
 
-1. Run Corstone-1000 with the ACS image containing the two capsule files:
+1. Run Corstone-1000 with the ACS image containing the capsule files:
 
    1. Run `tmux`:
 
@@ -399,7 +404,7 @@ To run the test:
    2. Run the FVP within `tmux` with the IR prebuilt image which now also contains the two capsules:
 
       ```
-      kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml \
+      kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml \
       -c "../meta-arm/scripts/runfvp --terminals=tmux \
       -- -C board.msd_mmc.p_mmc_file=${ACS_IMAGE_PATH}/ir-acs-live-image-generic-arm64.wic"
       ```
@@ -419,42 +424,32 @@ To run the test:
 4. Run the `CapsuleApp` application with the valid capsule file:
 
    ```
-   EFI/BOOT/app/CapsuleApp.efi corstone1000-fvp-v6.uefi.capsule
+   EFI/BOOT/app/CapsuleApp.efi corstone1000-a320-fvp-v6.uefi.capsule
    ```
 
-   The capsule update will be started. The capsule update takes about 15-30 minutes to complete on FVP. The Corstone-1000 will reset after successfully applying the capsule.
+   The capsule update will be started.
+
+   :::note
+   The capsule update takes about 15-30 minutes to complete on FVP.
+
+   The platform will reset after successfully applying the capsule.
+   :::
 
    The software stack copies the capsule content to the external flash, which is shared between the Secure Enclave and the Host Processor
-   before rebooting the system.
-
-   After the first reboot, TrustedFirmware-M should apply the valid capsule and display the following log on the Secure Enclave terminal
-   before rebooting the system a second time:
+   before rebooting the system, and the following logs should be displayed on the Secure Enclave terminal:
 
    ```
    ...
-   SysTick_Handler: counted = 10, expiring on = 360
-   SysTick_Handler: counted = 20, expiring on = 360
-   SysTick_Handler: counted = 30, expiring on = 360
-   ...
+   fwu_bootloader_install_image: enter
+   metadata_read: success: active = 0, previous = 1
+   fwu_update_metadata: enter
    metadata_write: success: active = 1, previous = 0
-   flash_full_capsule: exit
-   corstone1000_fwu_flash_image: exit: ret = 0
+   fwu_update_metadata: exit: ret = 0
+   fwu_bootloader_install_image: exit: ret = 0
    ...
    ```
 
-   The above log snippet indicates that the new capsule image is successfully applied, and the board is booting with the external flash's Bank-1.
-
-   After a second reboot, the following log should be displayed on on the Secure Enclave terminal (`ttyUSB1`):
-
-   ```
-   ...
-   fmp_set_image_info:133 Enter
-   FMP image update: image id = 0
-   FMP image update: status = 0version=6 last_attempt_version=6.
-   fmp_set_image_info:157 Exit.
-   corstone1000_fwu_host_ack: exit: ret = 0
-   ...
-   ```
+   The above log snippet indicates that the new capsule image is successfully applied.
 
 5. Interrupt the U-Boot shell.
 
@@ -462,12 +457,40 @@ To run the test:
    Hit any key to stop autoboot:
    ```
 
-6. Run the following commands in order to run the Corstone-1000 Linux kernel, otherwise, the execution ends up in the ACS live image:
+   After the first reboot, TrustedFirmware-M should display the following logs on the Secure Enclave terminal:
+
+   ```
+   ...
+   [INF] Starting TF-M BL1_1
+   metadata_read: success: active = 1, previous = 0
+   get_fwu_agent_state: exit: FWU Agent PSA_FWU_TRIAL (index mismatch)
+   bl1_get_active_bl2_image: booting from trial bank: 1
+   bl1_get_active_bl2_image: exit: booting from bank = 1, offset = 0x1002000
+   ...
+   ```
+
+6. Run the following commands in order to run the Corstone-1000 Linux kernel.
+
+   :::note
+   Otherwise, the execution ends up in the ACS live image.
+   :::
 
    ```
    $ unzip $kernel_addr 0x90000000
    $ loadm 0x90000000 $kernel_addr_r $filesize
    $ bootefi $kernel_addr_r $fdtcontroladdr
+   ```
+
+   After executing the above set of commands, the following logs should be displayed on the Secure Enclave terminal:
+
+   ```
+   ...
+   fwu_accept_image: success: fwu state is changed to regular
+   update_nv_counters: success
+   disable_host_ack_timer: timer to reset is disabled
+   FMP image update: status = 0version=6 last_attempt_version=6.
+   fwu_bootloader_mark_image_accepted: exit: ret = 0
+   ...
    ```
 
 7. The first boot after a capsule update is considered the trial stage, during which the FWU image is accepted.
@@ -495,11 +518,15 @@ To run the test:
    $ bootefi $kernel_addr_r $fdtcontroladdr
    ```
 
-10. Once the system has fully booted again, read [Verifying firmware versions with ESRT] to confirm that the firmware version reflects the updated capsule. Do not terminate FVP between the positive full capsule update and partial capsule update tests.
+10. Once the system has fully booted again, read [Verifying firmware versions with ESRT] to confirm that the firmware version reflects the updated capsule.
+
+:::note
+Do not terminate FVP between the positive full capsule update and partial capsule update tests.
+:::
 
 #### Positive partial capsule update {.reference}
 
-Follow the steps for the [Positive full capsule update test], ensuring you use `corstone1000-fvp-partial-v7.uefi.capsule` instead of `corstone1000-fvp-v6.uefi.capsule`.
+Follow the steps for the [Positive full capsule update test], ensuring you use `corstone1000-a320-fvp-partial-v7.uefi.capsule` instead of `corstone1000-a320-fvp-v6.uefi.capsule`.
 
 Once the system has fully booted again, read [Verifying firmware versions with ESRT] to confirm that the firmware version reflects the updated capsule.
 
@@ -534,28 +561,27 @@ To run the rollback protection capsule update test:
 4. Run the `CapsuleApp` application with the invalid capsule file:
 
    ```
-   EFI/BOOT/app/CapsuleApp.efi corstone1000-fvp-v5.uefi.capsule
+   EFI/BOOT/app/CapsuleApp.efi corstone1000-a320-fvp-v5.uefi.capsule
    ```
 
 5. TrustedFirmware-M should reject the capsule due to having a lower firmware version and display the following log on the Secure Enclave terminal:
 
    ```
    ...
-     uefi_capsule_retrieve_images: image 0 at 0xa0000070, size=15654928
-     uefi_capsule_retrieve_images: exit
-     flash_full_capsule: enter: image = 0x0xa0000070, size = 7764541, version = 5
-     ERROR: flash_full_capsule: version error
-     private_metadata_write: enter: boot_index = 1
-     private_metadata_write: success
-     fmp_set_image_info:133 Enter
-     FMP image update: image id = 0
-     FMP image update: status = 1version=6 last_attempt_version=5.
-     fmp_set_image_info:157 Exit.
-     corstone1000_fwu_flash_image: exit: ret = -1
-     fmp_get_image_info:232 Enter
-     pack_image_info:207 ImageInfo size = 105, ImageName size = 34, ImageVersionName
-     size = 36
-     fmp_get_image_info:236 Exit
+   fwu_bootloader_load_image: enter: block_offset = 0
+   FMP version: 0x5, metadata version : 0x7
+   private_metadata_write: enter: boot_index = 0
+   private_metadata_write: success
+   fmp_set_image_info:160 Enter
+   FMP image update: image id = 0
+   FMP image update: status = 1version=7 last_attempt_version=5.
+   fmp_set_image_info:184 Exit.
+   ERROR: fwu_bootloader_load_image: version error
+   remove_all_stale_partitions: Removed GPT partition 'bl2_secondary'
+   remove_all_stale_partitions: Removed GPT partition 'tfm_secondary'
+   remove_all_stale_partitions: Removed GPT partition 'FIP_B'
+   remove_all_stale_partitions: Removed GPT partition 'kernel_secondary'
+   fwu_bootloader_load_image: exit: ret = -248
    ...
    ```
 
@@ -816,7 +842,7 @@ Corstone-1000 on-board non-volatile storage size is insufficient for installing 
    ```
    dd if=/dev/zero of=${WORKSPACE}/fvp_distro_system_drive.img \
    bs=1 count=0 seek=10G; sync; \
-   parted -s fvp_distro_system_drive.img mklabel gpt
+   parted -s ${WORKSPACE}/fvp_distro_system_drive.img mklabel gpt
    ```
 
 2. This MMC image will be used as the primary drive to boot the distribution.
@@ -834,11 +860,15 @@ To install:
 2. Start the FVP within `tmux` with the system drive as the primary drive and the distro ISO file as the secondary drive:
 
    ```
-   kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml \
+   kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml \
    -c "../meta-arm/scripts/runfvp --terminals=tmux -- \
    -C board.msd_mmc.p_mmc_file=${WORKSPACE}/fvp_distro_system_drive.img \
    -C board.msd_mmc_2.p_mmc_file=${DISTRO_INSTALLER_ISO_PATH}"
    ```
+
+   :::note
+   The FVP distribution installation process can take 6-8 hours to complete.
+   :::
 
    The Linux distribution will be installed on `fvp_distro_system_drive.img`.
 
@@ -846,7 +876,7 @@ To install:
 
 The Debian installation may need the following extra steps:
 
-1. Answer `Yes` to the question `Force grub installation to the EFI removable media path?`.
+1. Answer `Yes` to the section `Install the GRUB boot loader`.
 
    If the GRUB installation fails, these are the steps to follow on the subsequent
    popups:
@@ -890,7 +920,7 @@ cd ${WORKSPACE} && tmux
 Run the command below to simulate a cold boot:
 
 ```
-kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml \
+kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml \
 -c "../meta-arm/scripts/runfvp --terminals=tmux -- \
 -C board.msd_mmc.p_mmc_file=${WORKSPACE}/fvp_distro_system_drive.img"
 ```
@@ -970,19 +1000,19 @@ To generate keys:
    cd ${WORKSPACE}
 
    git clone https://gitlab.arm.com/arm-reference-solutions/iot-platform-assets \
-   -b CORSTONE1000-2025.12
+   -b CORSTONE1000-2026.05
    ```
 
 3. Set the current working directory to build directory's subdirectory containing the software stack build images.
 
    ```
-   cd ${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/
+   cd ${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/
    ```
 
 4. Run the image signing script (without changing the current working directory).
 
    ```
-   ./${WORKSPACE}/iot-platform-assets/corstone1000/secureboot/create_keys_and_sign.sh \
+   ${WORKSPACE}/iot-platform-assets/corstone1000/secureboot/create_keys_and_sign.sh \
    -d fvp \
    -v ${CERTIFICATE_VALIDITY_DURATION_IN_DAYS}
    ```
@@ -991,7 +1021,7 @@ To generate keys:
    The [efitools](https://github.com/vathpela/efitools/) package is required to execute the script. `${CERTIFICATE_VALIDITY_DURATION_IN_DAYS}` is an integer that specifies the certificate's validity period in days. Consult the image signing script help message (`-h`) for more information about other optional arguments. The script is interactive and contains commands that require `sudo` level permissions.
    :::
 
-   The keys, signed kernel image, and unsigned kernel image will be copied to the exisiting ESP image. The modified ESP image can be found at `${WORKSPACE}/build/tmp/deploy/images/corstone1000-fvp/corstone1000-esp-image-corstone1000-fvp.wic`.
+   The keys, signed kernel image, and unsigned kernel image will be copied to the exisiting ESP image. The modified ESP image can be found at `${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000-esp-image-corstone1000-a320-fvp.wic`.
 
 ### Run unsigned image boot test {.reference}
 
@@ -1001,7 +1031,7 @@ To run an unsigned image boot test:
 
 2. Run the software stack as described in the Running the FVP model section of the Build, Flash and Run chapter.
 
-3. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message `Press any key to stop`.
+3. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message `Hit any key to stop autoboot`.
 
    :::note
    There is a timeout of 3 seconds to stop the execution at the U-Boot prompt. The U-Boot  prompt looks as follows:
@@ -1024,19 +1054,19 @@ To run an unsigned image boot test:
 
    ```
    corstone1000# \
-   load mmc 1:1 \$loadaddr corstone1000_secureboot_keys/PK.auth && setenv -e -nv -bs -rt -at -i \$loadaddr:\$filesize PK; \
-   load mmc 1:1 \$loadaddr corstone1000_secureboot_keys/KEK.auth && setenv -e -nv -bs -rt -at -i \$loadaddr:\$filesize KEK; \
-   load mmc 1:1 \$loadaddr corstone1000_secureboot_keys/db.auth && setenv -e -nv -bs -rt -at -i \$loadaddr:\$filesize db; \
-   load mmc 1:1 \$loadaddr corstone1000_secureboot_keys/dbx.auth && setenv -e -nv -bs -rt -at -i \$loadaddr:\$filesize dbx
+   load mmc 1:1 $loadaddr corstone1000_secureboot_keys/PK.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
+   load mmc 1:1 $loadaddr corstone1000_secureboot_keys/KEK.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize KEK; \
+   load mmc 1:1 $loadaddr corstone1000_secureboot_keys/db.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize db; \
+   load mmc 1:1 $loadaddr corstone1000_secureboot_keys/dbx.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize dbx
    ```
 
 6. Attempt to Load the unsigned kernel image.
 
    ```
    corstone1000# \
-   load mmc 1:1 \$loadaddr corstone1000_secureboot_fvp_images/Image_fvp; \
-   loadm \$loadaddr \$kernel_addr_r \$filesize; \
-   bootefi \$kernel_addr_r \$fdtcontroladdr
+   load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp; \
+   loadm $loadaddr $kernel_addr_r $filesize; \
+   bootefi $kernel_addr_r $fdtcontroladdr
 
    Booting /MemoryMapped(0x0,0x88200000,0x236aa00)
    Image not authenticated
@@ -1053,9 +1083,9 @@ Load the signed kernel image.
 
 ```
 corstone1000# \
-load mmc 1:1 \$loadaddr corstone1000_secureboot_fvp_images/Image_fvp.signed; \
-loadm \$loadaddr \$kernel_addr_r $filesize; \
-bootefi \$kernel_addr_r \$fdtcontroladdr
+load mmc 1:1 $loadaddr corstone1000_secureboot_fvp_images/Image_fvp.signed; \
+loadm $loadaddr $kernel_addr_r $filesize; \
+bootefi $kernel_addr_r $fdtcontroladdr
 ```
 
 The signed Linux kernel image should be booted successfully.
@@ -1068,14 +1098,17 @@ As a result, U-Boot reads these variables and verifies the Linux kernel image be
 In a typical boot scenario, the Linux kernel image is not signed, which will prevent the system from booting due to failed image authentication.
 To resolve this, the Platform Key (one of the UEFI authenticated variables for secure boot) needs to be deleted.
 
-1. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message `Press any key to stop`.
+For FVP, continue in the same boot cycle in which the UEFI secure boot keys were enrolled.
+Do not cold boot FVP before deleting the Platform Key, because the secure flash contents are not preserved across an FVP cold boot.
+
+1. On the Host Processor terminal host side, stop the execution of U-Boot when prompted to do so with the message `Hit any key to stop autoboot`.
 
 2. On the U-Boot , delete the Platform Key (PK).
 
    ```
    corstone1000# \
    mmc dev 1; \
-   load mmc 1:1 \$loadaddr corstone1000_secureboot_keys/PK_delete.auth && setenv -e -nv -bs -rt -at -i \$loadaddr:\$filesize PK; \
+   load mmc 1:1 $loadaddr corstone1000_secureboot_keys/PK_delete.auth && setenv -e -nv -bs -rt -at -i $loadaddr:$filesize PK; \
    boot
    ```
 
@@ -1107,14 +1140,14 @@ Symmetric multiprocessing (SMP) mode is supported on the Corstone-1000 with Cort
 1. Build the software stack with SMP mode enabled.
 
    ```
-   kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+   kas build meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
    meta-arm/kas/corstone1000-multicore.yml
    ```
 
 2. Run the Corstone-1000 FVP.
 
    ```
-   kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+   kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
    meta-arm/kas/corstone1000-multicore.yml \
    -c "../meta-arm/scripts/runfvp"
    ```
@@ -1135,7 +1168,7 @@ To build on Ethos-U85 NPU:
    ```
    cd ${WORKSPACE}
    git clone https://git.gitlab.arm.com/arm-reference-solutions/iot-platform-assets.git \
-   -b CORSTONE1000-2025.12
+   -b CORSTONE1000-2026.05
    ```
 
 2. Copy the additional kas configuration file to:
@@ -1163,14 +1196,14 @@ To build on Ethos-U85 NPU:
 5. Re-build the Corstone-1000 FVP software stack as follows:
 
    ```
-   kas build meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+   kas build meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
    meta-arm/kas/ethos-u85-test.yml
    ```
 
 6. Run the Corstone-1000 FVP:
 
    ```
-   kas shell meta-arm/kas/corstone1000-fvp.yml:meta-arm/ci/debug.yml:meta-arm/kas/corstone1000-a320.yml:\
+   kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml:\
    meta-arm/kas/ethos-u85-test.yml \
    -c "../meta-arm/scripts/runfvp"
    ```

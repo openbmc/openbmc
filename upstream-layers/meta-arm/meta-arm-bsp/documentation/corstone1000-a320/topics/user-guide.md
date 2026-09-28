@@ -1,8 +1,8 @@
 # Build, flash and run {.chapter permissions=non-confidential}
 
-The Arm Corstone-1000 software stack uses the Yocto Project to build a tiny Linux distribution suitable for the Arm Corstone-1000 platform (kernel and initramfs filesystem less than 6 MB on the flash).
+The Arm Corstone-1000 with Cortex-A320 software stack uses the Yocto Project to build a tiny Linux distribution suitable for the Arm Corstone-1000 with Cortex-A320 platform (kernel and initramfs filesystem less than 6 MB on the flash).
 
-The Corstone-1000 software stack can be run on [Arm Corstone-1000 Ecosystem FVP (Fixed Virtual Platform)](https://developer.arm.com/downloads/-/arm-ecosystem-fvps) and is built on top of Yocto Project's [Whinlatter release]($meta_arm_repository_release_branch).
+The Corstone-1000 with Cortex-A320 software stack can be run on [Arm Corstone-1000 with Cortex-A320 FVP (Fixed Virtual Platform)](https://developer.arm.com/downloads/-/arm-ecosystem-fvps) and is built on top of Yocto Project's [Wrynose release]($meta_arm_repository_release_branch).
 
 The Yocto Project relies on the [BitBake](https://docs.yoctoproject.org/bitbake.html#bitbake-documentation) tool as its build tool. Please see the [Yocto Project documentation](https://docs.yoctoproject.org/) for more information.
 
@@ -27,9 +27,9 @@ Please follow the steps described in the Yocto mega manual:
 
 ## Software components {.reference}
 
-Within the Yocto Project, each component included in the Corstone-1000 software stack is specified as
+Within the Yocto Project, each component included in the Corstone-1000 with Cortex-A320 software stack is specified as
 a [BitBake recipe](https://docs.yoctoproject.org/bitbake/2.2/bitbake-user-manual/bitbake-user-manual-intro.html#recipes).
-The recipes specific to the Corstone-1000 BSP are located at:
+The recipes specific to the Corstone-1000 with Cortex-A320 BSP are located at:
 `${WORKSPACE}/meta-arm/meta-arm-bsp/`.
 
 `${WORKSPACE}` refers to the absolute path to your workspace where the `meta-arm` repository will be cloned. Consider exporting it (e.g., `export WORKSPACE=$(realpath .)`) if you're already in the workspace directory,
@@ -57,7 +57,7 @@ Table: Trusted Firmware-A components
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-a/trusted-firmware-a_%.bbappend`                |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.0.bb`                     |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-a/trusted-firmware-a_2.14.1.bb`                     |
 
 #### Trusted Services {.reference}
 
@@ -90,7 +90,7 @@ Table: OP-TEE components
 
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
-| bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_4.%.bbappend`                               |
+| bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-security/optee/optee-os_%.bbappend`                                 |
 | Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-security/optee/optee-os_4.9.0.bb`                                       |
 
 #### U-Boot {.reference}
@@ -103,7 +103,7 @@ Table: U-Boot components
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/u-boot/u-boot_%.bbappend`                                           |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_%.bbappend`                                       |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.04.bb`                                       |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/u-boot/u-boot_2025.10.bb`                                       |
 
 #### Linux {.reference}
 
@@ -135,7 +135,7 @@ Table: Trusted Firmware-M secure enclave components
 | Type      | Path                                                                                                             |
 | --------- | ---------------------------------------------------------------------------------------------------------------- |
 | bbappend  | `${WORKSPACE}/meta-arm/meta-arm-bsp/recipes-bsp/trusted-firmware-m/trusted-firmware-m_%.bbappend`                |
-| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.1.bb`                     |
+| Recipe    | `${WORKSPACE}/meta-arm/meta-arm/recipes-bsp/trusted-firmware-m/trusted-firmware-m_2.2.2.bb`                     |
 
 ## Build {.reference}
 
@@ -164,19 +164,19 @@ Building binaries natively on Windows and AArch64 Linux is not supported. Use an
 
    ```
    cd ${WORKSPACE}
-   git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2025.12
+   git clone https://git.yoctoproject.org/git/meta-arm -b CORSTONE1000-2026.05
    ```
 
-4. Build a Corstone-1000 image:
-
-   ```
-   kas build meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml
-   ```
-
-5. Accept the EULA on the [Arm Developer](https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula) site to build a Corstone-1000 image for FVP as follows:
+4. Accept the EULA on the [Arm Developer](https://developer.arm.com/downloads/-/arm-ecosystem-fvps/eula) site to build a Corstone-1000 with Cortex-A320 image for FVP as follows:
 
    ```
    export ARM_FVP_EULA_ACCEPT="True"
+   ```
+
+5. Build a Corstone-1000 with Cortex-A320 image:
+
+   ```
+   kas build meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml
    ```
 
 A clean build takes a significant amount of time given that all of the development machine utilities are also
@@ -188,7 +188,7 @@ Once the build succeeds, all output binaries will be placed in `${WORKSPACE}/bui
 Everything apart from the Secure Enclave ROM firmware is bundled into a single binary, the
 `corstone1000-flash-firmware-image-corstone1000-a320-fvp.wic` file.
 
-The output binaries run in the Corstone-1000 platform are the following:
+The output binaries run in the Corstone-1000 with Cortex-A320 platform are the following:
 
 - The Secure Enclave ROM firmware: `${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/trusted-firmware-m/bl1.bin`
 - The internal firmware flash image: `${WORKSPACE}/build/tmp/deploy/images/corstone1000-a320-fvp/corstone1000-flash-firmware-image-corstone1000-a320-fvp.wic`
@@ -218,21 +218,21 @@ on memories and peripherals before bringing the Host Processor out of reset.
 
 The Host Processor will boot TrustedFirmware-A, OP-TEE, U-Boot and then Linux before presenting a login prompt.
 
-A Fixed Virtual Platform (FVP) model of the Corstone-1000 platform must be available to run the
-Corstone-1000 FVP software image.
+A Fixed Virtual Platform (FVP) model of the Corstone-1000 with Cortex-A320 platform must be available to run the
+Corstone-1000 with Cortex-A320 FVP software image.
 
 A Yocto recipe is provided to download the latest supported FVP version.
 
 The recipe is located at `${WORKSPACE}/meta-arm/meta-arm/recipes-devtools/fvp/fvp-corstone1000-a320.bb`.
 
-The latest FVP version is `11.30.27` for Corstone-1000, and the model is automatically downloaded and installed when using the `runfvp` command as follows:
+The latest FVP version is `11.31.cs1000_a320_2` for Corstone-1000 with Cortex-A320, and the model is automatically downloaded and installed when using the `runfvp` command as follows:
 
 ```
 kas shell meta-arm/kas/corstone1000-a320-fvp.yml:meta-arm/ci/debug.yml \
 -c "../meta-arm/scripts/runfvp -- --version"
 ```
 
-The FVP can also be manually downloaded from [Arm Developer](https://developer.arm.com/downloads/-/arm-ecosystem-fvps) to download the Corstone-1000 platform FVP installer.
+The FVP can also be manually downloaded from [Arm Developer](https://developer.arm.com/downloads/-/arm-ecosystem-fvps) to download the Corstone-1000 with Cortex-A320 FVP package.
 
 To set up the FVP:
 
@@ -262,4 +262,4 @@ To set up the FVP:
 
 ## Security issue reporting {.reference}
 
-To report any security issues identified with Corstone-1000, please send an email to [psirt@arm.com](mailto:psirt@arm.com).
+To report any security issues identified with Corstone-1000 with Cortex-A320, please send an email to [psirt@arm.com](mailto:psirt@arm.com).

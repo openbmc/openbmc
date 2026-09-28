@@ -2,6 +2,76 @@
 
 This document contains a summary of the new features, changes and fixes in each release of the Corstone-1000 with Cortex-A320 software stack.
 
+## Version 2026.05 {.reference}
+
+The following changes are present in this release:
+
+- Continued Corstone-1000 with Cortex-A320 enablement across U-Boot, TF-A, TF-M, OP-TEE, and Linux with the split A320 device tree, GIC-700 support, Ethos-U85 DT alignment, and NPU reset via the external-system controller.
+- Enabled and documented FVP SMP builds and platform-agnostic multicore support, including the errata override fixes for Corstone-1000 with Cortex-A320 and removal of the reboot workaround note.
+- Split Corstone-1000 with Cortex-A320 FVP support into a dedicated machine configuration and standalone documentation.
+
+### Corstone-1000 with Cortex-A320 components versions {.reference}
+
+The following component versions are available:
+
+Table: Corstone-1000 with Cortex-A320 component versions
+
++----------------------------------------+-----------------------------------+
+| Component                              | Version                           |
++========================================+===================================+
+| linux-yocto                            | 6.19                              |
++----------------------------------------+-----------------------------------+
+| u-boot                                 | 2025.10                           |
++----------------------------------------+-----------------------------------+
+| external-system                        | 0.1.0                             |
++----------------------------------------+-----------------------------------+
+| optee-client                           | 4.9.0                             |
++----------------------------------------+-----------------------------------+
+| optee-os                               | 4.9.0                             |
++----------------------------------------+-----------------------------------+
+| trusted-firmware-a                     | 2.14.1                            |
++----------------------------------------+-----------------------------------+
+| trusted-firmware-m                     | 2.2.2                             |
++----------------------------------------+-----------------------------------+
+| libts                                  | v1.3.0                            |
++----------------------------------------+-----------------------------------+
+| ts-sp-{se-proxy, smm-gateway}          | v1.3.0                            |
++----------------------------------------+-----------------------------------+
+| ts-psa-{crypto, iat, its. ps}-api-test | 74dc6646ff                        |
++----------------------------------------+-----------------------------------+
+
+### Yocto distribution components versions {.reference}
+
+The following Yocto distribution components versions are available:
+
+Table: Yocto distribution component versions
+
++-------------------+------------+
+| Component         | Version    |
++===================+============+
+| meta-arm          | wrynose    |
++-------------------+------------+
+| bitbake           | 22021758e6 |
++-------------------+------------+
+| meta-openembedded | 9af4488d46 |
++-------------------+------------+
+| openembedded-core | 06dd66e622 |
++-------------------+------------+
+| meta-yocto        | 8251bdad5f |
++-------------------+------------+
+| meta-secure-core  | 07a99ae241 |
++-------------------+------------+
+| busybox           | 1.37.0     |
++-------------------+------------+
+| musl              | 1.2.6      |
++-------------------+------------+
+| gcc-arm-none-eabi | 15.2.rel1  |
++-------------------+------------+
+| gcc-cross-aarch64 | 15.2.0     |
++-------------------+------------+
+| openssl           | 3.5.6      |
++-------------------+------------+
+
 ## Version 2025.12 {.reference}
 
 The following changes are present in this release:

@@ -5,21 +5,25 @@ distro: poky
 
 defaults:
   repos:
-    branch: master
+    branch: wrynose
 
 repos:
   bitbake:
     url: https://git.openembedded.org/bitbake
+    branch: "2.18"
+    commit: 22021758e66737bcf68dfd2b74adc6a0cb1d42d9
     layers:
       bitbake: disabled
 
   core:
     url: https://git.openembedded.org/openembedded-core
+    commit: 06dd66e6220e5ce4ed4b9af4d8231ae5f0a8ce80
     layers:
       meta:
 
   meta-yocto:
     url: https://git.yoctoproject.org/meta-yocto
+    commit: 8251bdad5fda780a000fb41e6eda82eadf0fa39e
     layers:
       meta-poky:
 
@@ -31,7 +35,7 @@ repos:
 
   meta-openembedded:
     url: https://git.openembedded.org/meta-openembedded
-    # commit: 461d85a1831318747af5abe86da193bcde3fd9b4
+    commit: 9af4488d46cb4fd4c0d2d64820c86225ebd6ac71
     layers:
       meta-oe:
       meta-python:
@@ -39,7 +43,7 @@ repos:
 
   meta-secure-core:
     url: https://github.com/wind-river/meta-secure-core.git
-    # commit: 59d7e90542947c342098863b9998693ac79352b0
+    commit: 07a99ae241acd488a2feda1ededf87dc70dfde80
     layers:
       meta-secure-core-common:
       meta-signing-key:
