@@ -13,6 +13,7 @@ BitBake 'Fetch' implementation for crates.io
 import hashlib
 import json
 import os
+import re
 import subprocess
 import bb
 from   bb.fetch2 import logger, subprocess_setup, UnpackError
@@ -155,18 +156,20 @@ class Crate(Wget):
             with open(mdpath, "w") as f:
                 json.dump(metadata, f)
 
-    def latest_versionstring(self, ud, d):
+    def latest_versionstring(self, ud, d, filter_regex=None):
         """
         Return the latest version available when versionsurl is the [name]/versions URL.
         """
         from functools import cmp_to_key
         json_data = json.loads(self._fetch_index(ud.versionsurl, ud, d))
         versions = [(0, i["num"], "") for i in json_data["versions"]]
+        if filter_regex:
+            versions = [v for v in versions if re.match(filter_regex, v[1])]
         versions = sorted(versions, key=cmp_to_key(bb.utils.vercmp))
 
-        return (versions[-1][1], "")
+        return (versions[-1][1], "") if versions else ("", "")
 
-    def latest_versionstring_from_index(self, ud, d):
+    def latest_versionstring_from_index(self, ud, d, filter_regex=None):
         """
         Return the latest version available when versionsurl is a Cargo index
         file.
@@ -178,7 +181,11 @@ class Crate(Wget):
         response = self._fetch_index(ud.versionsurl, ud, d)
         for line in response.splitlines():
             data = json.loads(line)
-            versions.append((0, data["vers"], ""))
+            if not data.get("yanked", False):
+                versions.append((0, data["vers"], ""))
+
+        if filter_regex:
+            versions = [v for v in versions if re.match(filter_regex, v[1])]
 
         versions = sorted(versions, key=cmp_to_key(bb.utils.vercmp))
-        return (versions[-1][1], "")
+        return (versions[-1][1], "") if versions else ("", "")

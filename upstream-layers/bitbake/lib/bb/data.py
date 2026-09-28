@@ -193,6 +193,12 @@ def exported_keys(d):
                                       not bb.utils.to_boolean(d.getVarFlag(key, 'unexport')))
 
 def exported_vars(d):
+    """Return the exported variables as a list of (key, value) pairs.
+
+    Every value is expanded before returning, so a caller that changes the
+    environment afterwards still gets what the expansion saw.
+    """
+    exported = []
     k = list(exported_keys(d))
     for key in k:
         try:
@@ -202,7 +208,9 @@ def exported_vars(d):
             continue
 
         if value is not None:
-            yield key, str(value)
+            exported.append((key, str(value)))
+
+    return exported
 
 def emit_func(func, o=sys.__stdout__, d = init()):
     """Emits all items in the data store in a format such that it can be sourced by a shell."""
@@ -378,7 +386,7 @@ def generate_dependencies(d, ignored_vars):
     mod_funcs = set(bb.codeparser.modulecode_deps.keys())
     keys = set(key for key in d if not key.startswith("__")) | mod_funcs
     shelldeps = set(key for key in d.getVar("__exportlist", False) if bb.utils.to_boolean(d.getVarFlag(key, "export")) and not bb.utils.to_boolean(d.getVarFlag(key, "unexport")))
-    varflagsexcl = d.getVar('BB_SIGNATURE_EXCLUDE_FLAGS')
+    varflagsexcl = (d.getVar('BB_SIGNATURE_EXCLUDE_FLAGS') or "").split()
 
     codeparserd = d.createCopy()
     for forced in (d.getVar('BB_HASH_CODEPARSER_VALS') or "").split():

@@ -723,3 +723,31 @@ class EmitVar(unittest.TestCase):
         self.assertEqual(self.get_output(out), ['bad_chars="a\\"b \\',
                                                 'c\\`d \\',
                                                 'e\\$f"'])
+
+class ExportedVars(unittest.TestCase):
+    def test_expanded_before_returning(self):
+        # Called while the variable is set, read once it is gone: the value
+        # has to be the one from the call, not from the read.
+        d = bb.data.init()
+        d.setVar("TESTVAR", "${@os.environ.get('BB_TEST_EXPORT', 'gone')}")
+        d.setVarFlag("TESTVAR", "export", "1")
+
+        with bb.utils.environment(BB_TEST_EXPORT="present"):
+            exported = bb.data.exported_vars(d)
+
+        self.assertEqual(dict(exported), {"TESTVAR": "present"})
+        self.assertIsInstance(exported, list)
+
+    def test_unexpandable_value_warns_and_is_skipped(self):
+        # The warning belongs to the call, not to a later iteration.
+        d = bb.data.init()
+        d.setVar("TESTVAR", "value")
+        d.setVarFlag("TESTVAR", "export", "1")
+        d.setVar("TESTBROKEN", "${@int('not a number')}")
+        d.setVarFlag("TESTBROKEN", "export", "1")
+
+        with LogRecord() as logs:
+            exported = bb.data.exported_vars(d)
+
+        self.assertEqual(dict(exported), {"TESTVAR": "value"})
+        self.assertTrue(logContains("Unable to export ${TESTBROKEN}", logs))

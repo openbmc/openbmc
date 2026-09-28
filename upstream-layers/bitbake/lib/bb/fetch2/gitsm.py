@@ -88,7 +88,10 @@ class GitSM(Git):
 
             # Convert relative to absolute uri based on parent uri
             if  uris[m].startswith('..') or uris[m].startswith('./'):
-                newud = copy.copy(ud)
+                if hasattr(ud, "origud"):
+                    newud = copy.copy(ud.origud)
+                else:
+                    newud = copy.copy(ud)
                 newud.path = os.path.normpath(os.path.join(newud.path, uris[m]))
                 uris[m] = Git._get_repo_url(self, newud)
 
